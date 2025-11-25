@@ -144,6 +144,18 @@
 								}
 							]
 						},
+						"format": {
+							"description": "The format provides additional information about the attribute's shape.",
+							"type": "string",
+							"enum": [
+								"date-time",
+								"uri",
+								"email",
+								"ip",
+								"uuid",
+								"hex-color"
+							]
+						},
 						"enum": {
 							"description": "An attribute can be defined as one of a fixed set of values. This is specified by an enum, which contains an array of allowed values:",
 							"type": "array",

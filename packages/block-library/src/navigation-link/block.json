@@ -35,6 +35,7 @@
 		},
 		"url": {
 			"type": "string",
+			"format": "uri",
 			"role": "content"
 		},
 		"title": {

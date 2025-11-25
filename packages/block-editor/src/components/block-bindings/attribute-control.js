@@ -50,10 +50,12 @@ export default function BlockBindingsAttributeControl( {
 				getBlockType,
 			} = unlock( select( blocksStore ) );
 
-			const _attributeType =
-				getBlockType( blockName ).attributes?.[ attribute ]?.type;
+			const blockAttribute =
+				getBlockType( blockName ).attributes?.[ attribute ];
+			const _attributeType = blockAttribute?.type;
 			const attributeType =
 				_attributeType === 'rich-text' ? 'string' : _attributeType;
+			const attributeFormat = blockAttribute?.format;
 
 			const sourceFields = {};
 			Object.entries( getAllBlockBindingsSources() ).forEach(
@@ -66,7 +68,11 @@ export default function BlockBindingsAttributeControl( {
 						return;
 					}
 					const compatibleFieldsList = fieldsList.filter(
-						( field ) => field.type === attributeType
+						( field ) =>
+							attributeType === field.type &&
+							( attributeFormat
+								? attributeFormat === field.format
+								: true )
 					);
 					if ( compatibleFieldsList.length ) {
 						sourceFields[ sourceName ] = compatibleFieldsList;
