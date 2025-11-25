@@ -3,6 +3,7 @@
 @use "@wordpress/global-styles-ui/build-style/style.css" as *;
 @use "@wordpress/dataviews/build-style/style.css" as *;
 @use "./components/autocompleters/style.scss" as *;
+@use "./components/accessibility-insights/style.scss" as *;
 @use "./components/collab-sidebar/style.scss" as *;
 @use "./components/collapsible-block-toolbar/style.scss" as *;
 @use "./components/block-visibility/style.scss" as *;

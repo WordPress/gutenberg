@@ -1,0 +1,133 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/variables" as *;
+
+.accessibility-insights-panel {
+	padding: $grid-unit-15;
+
+	&__header {
+		margin-bottom: $grid-unit-20;
+	}
+
+	&__description {
+		color: $gray-700;
+		font-size: $default-font-size;
+		margin: 0 0 $grid-unit-15;
+	}
+}
+
+.accessibility-insights-summary {
+	display: flex;
+	gap: $grid-unit-15;
+	padding: $grid-unit-10 $grid-unit-15;
+	background: $gray-100;
+	border-radius: $radius-small;
+
+	&__errors {
+		color: $alert-red;
+		font-weight: 600;
+	}
+
+	&__warnings {
+		color: $alert-yellow;
+		font-weight: 600;
+	}
+
+	&--success {
+		margin: 0;
+
+		.components-notice__content {
+			margin: 0;
+		}
+	}
+}
+
+.accessibility-insights-category {
+	&__counts {
+		display: flex;
+		gap: $grid-unit-10;
+		margin-bottom: $grid-unit-10;
+		font-size: $default-font-size;
+	}
+
+	&__error-count {
+		color: $alert-red;
+	}
+
+	&__warning-count {
+		color: $alert-yellow;
+	}
+
+	&__issues {
+		display: flex;
+		flex-direction: column;
+		gap: $grid-unit-10;
+	}
+}
+
+.accessibility-insights-issue {
+	padding: $grid-unit-15;
+	border-radius: $radius-small;
+	border-left: 3px solid;
+
+	&--error {
+		background: rgba($alert-red, 0.05);
+		border-left-color: $alert-red;
+	}
+
+	&--warning {
+		background: rgba($alert-yellow, 0.1);
+		border-left-color: $alert-yellow;
+	}
+
+	&__header {
+		display: flex;
+		align-items: flex-start;
+		gap: $grid-unit-10;
+	}
+
+	&__icon {
+		flex-shrink: 0;
+		margin-top: 2px;
+
+		.accessibility-insights-issue--error & {
+			fill: $alert-red;
+		}
+
+		.accessibility-insights-issue--warning & {
+			fill: $alert-yellow;
+		}
+	}
+
+	&__message {
+		font-size: $default-font-size;
+		line-height: 1.4;
+		flex: 1;
+	}
+
+	&__actions {
+		display: flex;
+		gap: $grid-unit-10;
+		margin-top: $grid-unit-10;
+		padding-left: $grid-unit-20 + $grid-unit-10; // Align with message
+	}
+
+	&__navigate,
+	&__toggle {
+		font-size: $default-font-size - 1px;
+		padding: 0;
+		height: auto;
+	}
+
+	&__suggestion {
+		margin-top: $grid-unit-10;
+		padding: $grid-unit-10 $grid-unit-15;
+		background: $white;
+		border-radius: $radius-small;
+		font-size: $default-font-size - 1px;
+		color: $gray-700;
+		line-height: 1.5;
+		margin-left: $grid-unit-20 + $grid-unit-10; // Align with message
+	}
+}
+
