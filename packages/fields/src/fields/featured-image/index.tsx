@@ -8,14 +8,20 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import type { BasePostWithEmbeddedFeaturedMedia } from '../../types';
-import { FeaturedImageEdit } from './featured-image-edit';
+import MediaEdit from '../../components/media-edit';
 import { FeaturedImageView } from './featured-image-view';
 
 const featuredImageField: Field< BasePostWithEmbeddedFeaturedMedia > = {
 	id: 'featured_media',
 	type: 'media',
 	label: __( 'Featured Image' ),
-	Edit: FeaturedImageEdit,
+	Edit: ( props ) => (
+		<MediaEdit
+			{ ...props }
+			title={ __( 'Select Featured Image' ) }
+			placeholder={ __( 'Choose featured image…' ) }
+		/>
+	),
 	render: FeaturedImageView,
 	enableSorting: false,
 	filterBy: false,

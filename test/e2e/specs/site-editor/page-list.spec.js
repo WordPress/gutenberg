@@ -67,7 +67,7 @@ test.describe( 'Page List', () => {
 			featuredImage: {
 				performEdit: async ( page ) => {
 					const placeholder = page.getByRole( 'button', {
-						name: 'Choose an image…',
+						name: 'Choose featured image…',
 					} );
 					await placeholder.click();
 					const mediaLibrary = page.getByRole( 'dialog' );
@@ -92,21 +92,19 @@ test.describe( 'Page List', () => {
 						.click();
 				},
 				assertInitialState: async ( page ) => {
-					const el = page.getByText( 'Choose an image…' );
+					const el = page.getByText( 'Choose featured image…' );
 					const placeholder = page.getByRole( 'button', {
-						name: 'Choose an image…',
+						name: 'Choose featured image…',
 					} );
 					await expect( el ).toBeVisible();
 					await expect( placeholder ).toBeVisible();
 				},
 				assertEditedState: async ( page ) => {
 					const placeholder = page.getByRole( 'button', {
-						name: 'Choose an image…',
+						name: 'Choose featured image…',
 					} );
 					await expect( placeholder ).toBeHidden();
-					const img = page.locator(
-						'.fields-controls__featured-image-image'
-					);
+					const img = page.locator( '.fields-controls__media-image' );
 					await expect( img ).toBeVisible();
 				},
 			},
@@ -352,7 +350,7 @@ test.describe( 'Page List', () => {
 		} ) => {
 			const selectedItem = page.locator( '.is-selected' );
 			const imagePlaceholder = selectedItem.locator(
-				'.fields-controls__featured-image-placeholder'
+				'.fields-controls__media-placeholder'
 			);
 			const status = selectedItem.getByRole( 'cell', {
 				name: 'Published',
@@ -397,7 +395,7 @@ test.describe( 'Page List', () => {
 		// 	expect( await selectedItems.all() ).toHaveLength( 2 );
 
 		// 	const imagePlaceholders = selectedItems.locator(
-		// 		'.fields-controls__featured-image-placeholder',
+		// 		'.fields-controls__media-placeholder',
 		// 		{ strict: false }
 		// 	);
 

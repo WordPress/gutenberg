@@ -1,3 +1,8 @@
+/**
+ * WordPress dependencies
+ */
+import type { DataFormControlProps } from '@wordpress/dataviews';
+
 type PostStatus =
 	| 'publish'
 	| 'draft'
@@ -133,3 +138,24 @@ export interface PostType {
 
 // Will be unnecessary after typescript 5.0 upgrade.
 export type CoreDataError = { message?: string; code?: string };
+
+export interface MediaEditProps< Item > extends DataFormControlProps< Item > {
+	/**
+	 * Array of allowed media types (e.g., ['image', 'video']).
+	 *
+	 * @default ['image']
+	 */
+	allowedTypes?: string[];
+	/**
+	 * Title for the media picker modal.
+	 *
+	 * @default 'Select Media'
+	 */
+	title?: string;
+	/**
+	 * Placeholder text when no media is selected.
+	 *
+	 * @default 'Choose media…'
+	 */
+	placeholder?: string;
+}

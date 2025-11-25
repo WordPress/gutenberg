@@ -2,22 +2,21 @@
  * WordPress dependencies
  */
 import { Button, __experimentalGrid as Grid } from '@wordpress/components';
+import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import { useCallback, useRef, useState } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
+import { lineSolid } from '@wordpress/icons';
 import {
 	privateApis as mediaUtilsPrivateApis,
 	MediaUpload,
 } from '@wordpress/media-utils';
-import { lineSolid } from '@wordpress/icons';
-import { store as coreStore } from '@wordpress/core-data';
-import type { DataFormControlProps } from '@wordpress/dataviews';
-import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
-import type { BasePostWithEmbeddedFeaturedMedia } from '../../types';
 import { unlock } from '../../lock-unlock';
+import type { MediaEditProps } from '../../types';
 
 const { MediaUploadModal } = unlock( mediaUtilsPrivateApis );
 
@@ -57,17 +56,58 @@ function ConditionalMediaUpload( { render, ...props }: any ) {
 	return <MediaUpload { ...props } render={ render } />;
 }
 
-export const FeaturedImageEdit = ( {
+/**
+ * A reusable media edit control component that can be used to edit WordPress media (attachments).
+ * Renders a media picker with upload functionality, supporting both the traditional WordPress
+ * media library and the experimental DataViews media modal.
+ *
+ * @template Item - The type of the item being edited.
+ *
+ * @param {MediaEditProps<Item>} props                               - The component props.
+ * @param {Item}                 props.data                          - The item being edited.
+ * @param {Object}               props.field                         - The field configuration with getValue and setValue methods.
+ * @param {Function}             props.onChange                      - Callback function when the media selection changes.
+ * @param {string[]}             [props.allowedTypes=['image']]      - Array of allowed media types.
+ * @param {string}               [props.title='Select Media']        - Title for the media picker modal.
+ * @param {string}               [props.placeholder='Choose media…'] - Placeholder text when no media is selected.
+ *
+ * @return {JSX.Element} The media edit control component.
+ *
+ * @example
+ * ```tsx
+ * import MediaEdit from '@wordpress/fields';
+ * import type { MediaEditProps } from '@wordpress/fields';
+ *
+ * const featuredImageField = {
+ *   id: 'featured_media',
+ *   type: 'media',
+ *   label: 'Featured Image',
+ *   Edit: (props: MediaEditProps<MyPostType>) => (
+ *     <MediaEdit
+ *       {...props}
+ *       allowedTypes={['image']}
+ *       title="Select Featured Image"
+ *       placeholder="Choose featured image…"
+ *     />
+ *   ),
+ * };
+ * ```
+ */
+export default function MediaEdit< Item >( {
 	data,
 	field,
 	onChange,
-}: DataFormControlProps< BasePostWithEmbeddedFeaturedMedia > ) => {
-	const { id } = field;
-
+	allowedTypes = [ 'image' ],
+	title = __( 'Select Media' ),
+	placeholder = __( 'Choose media…' ),
+}: MediaEditProps< Item > ) {
 	const value = field.getValue( { item: data } );
 
-	const media = useSelect(
+	const attachment = useSelect(
 		( select ) => {
+			if ( ! value ) {
+				return null;
+			}
 			const { getEntityRecord } = select( coreStore );
 			return getEntityRecord( 'postType', 'attachment', value );
 		},
@@ -76,26 +116,24 @@ export const FeaturedImageEdit = ( {
 
 	const onChangeControl = useCallback(
 		( newValue: number ) =>
-			onChange( {
-				[ id ]: newValue,
-			} ),
-		[ id, onChange ]
+			onChange( field.setValue( { item: data, value: newValue } ) ),
+		[ data, field, onChange ]
 	);
 
-	const url = media?.source_url;
-	const title = media?.title?.rendered;
+	const url = attachment?.source_url;
+	const attachmentTitle = attachment?.title?.rendered;
 	const ref = useRef( null );
 
 	return (
-		<fieldset className="fields-controls__featured-image">
-			<div className="fields-controls__featured-image-container">
+		<fieldset className="fields-controls__media">
+			<div className="fields-controls__media-container">
 				<ConditionalMediaUpload
 					onSelect={ ( selectedMedia: any ) => {
 						onChangeControl( selectedMedia.id );
 					} }
-					allowedTypes={ [ 'image' ] }
+					allowedTypes={ allowedTypes }
 					value={ value }
-					title={ __( 'Select Featured Image' ) }
+					title={ title }
 					render={ ( { open }: any ) => (
 						<div
 							ref={ ref }
@@ -120,28 +158,28 @@ export const FeaturedImageEdit = ( {
 								{ url && (
 									<>
 										<img
-											className="fields-controls__featured-image-image"
+											className="fields-controls__media-image"
 											alt=""
 											width={ 24 }
 											height={ 24 }
 											src={ url }
 										/>
-										<span className="fields-controls__featured-image-title">
-											{ title }
+										<span className="fields-controls__media-title">
+											{ attachmentTitle }
 										</span>
 									</>
 								) }
 								{ ! url && (
 									<>
 										<span
-											className="fields-controls__featured-image-placeholder"
+											className="fields-controls__media-placeholder"
 											style={ {
 												width: '24px',
 												height: '24px',
 											} }
 										/>
-										<span className="fields-controls__featured-image-title">
-											{ __( 'Choose an image…' ) }
+										<span className="fields-controls__media-title">
+											{ placeholder }
 										</span>
 									</>
 								) }
@@ -149,7 +187,7 @@ export const FeaturedImageEdit = ( {
 									<>
 										<Button
 											size="small"
-											className="fields-controls__featured-image-remove-button"
+											className="fields-controls__media-remove-button"
 											icon={ lineSolid }
 											onClick={ (
 												event: React.MouseEvent< HTMLButtonElement >
@@ -167,4 +205,4 @@ export const FeaturedImageEdit = ( {
 			</div>
 		</fieldset>
 	);
-};
+}
