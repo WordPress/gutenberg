@@ -6,12 +6,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import type {
-	DataViewRenderFieldProps,
-	Field,
-	Rules,
-	SortDirection,
-} from '../types';
+import type { DataViewRenderFieldProps, Rules, SortDirection } from '../types';
 import type { TypeProvidedProps } from '../types/private';
 import {
 	OPERATOR_IS,
@@ -27,7 +22,6 @@ import {
 	OPERATOR_BETWEEN,
 } from '../constants';
 import RenderFromElements from './utils/render-from-elements';
-import getValueFromId from './utils/get-value-from-id';
 
 function isEmpty( value: unknown ): value is '' | undefined | null {
 	return value === '' || value === undefined || value === null;
@@ -59,17 +53,11 @@ const isValid: Rules< any > = {
 	},
 };
 
-export default function normalizeField< Item >(
-	field: Field< Item >
-): TypeProvidedProps< Item > {
-	const getValue = field.getValue || getValueFromId( field.id );
+const sort = ( a: any, b: any, direction: SortDirection ) => {
+	return direction === 'asc' ? a - b : b - a;
+};
 
-	const sort = ( a: Item, b: Item, direction: SortDirection ) => {
-		const valueA = getValue( { item: a } );
-		const valueB = getValue( { item: b } );
-		return direction === 'asc' ? valueA - valueB : valueB - valueA;
-	};
-
+export default function normalizeField< Item >(): TypeProvidedProps< Item > {
 	return {
 		type: 'number',
 		render,

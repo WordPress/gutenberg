@@ -6,12 +6,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import type {
-	DataViewRenderFieldProps,
-	Field,
-	Rules,
-	SortDirection,
-} from '../types';
+import type { DataViewRenderFieldProps, Rules, SortDirection } from '../types';
 import type { TypeProvidedProps } from '../types/private';
 import {
 	OPERATOR_IS_ALL,
@@ -19,7 +14,6 @@ import {
 	OPERATOR_IS_NONE,
 	OPERATOR_IS_NOT_ALL,
 } from '../constants';
-import getValueFromId from './utils/get-value-from-id';
 
 function render( { item, field }: DataViewRenderFieldProps< any > ) {
 	const value = field.getValue( { item } ) || [];
@@ -47,30 +41,24 @@ const isValid: Rules< any > = {
 	},
 };
 
-export default function normalizeField< Item >(
-	field: Field< Item >
-): TypeProvidedProps< Item > {
-	const getValue = field.getValue || getValueFromId( field.id );
-
-	const sort = ( a: any, b: any, direction: SortDirection ) => {
-		// Sort arrays by length, then alphabetically by joined string
-		const valueA = getValue( a );
-		const valueB = getValue( b );
-		const arrA = Array.isArray( valueA ) ? valueA : [];
-		const arrB = Array.isArray( valueB ) ? valueB : [];
-		if ( arrA.length !== arrB.length ) {
-			return direction === 'asc'
-				? arrA.length - arrB.length
-				: arrB.length - arrA.length;
-		}
-
-		const joinedA = arrA.join( ',' );
-		const joinedB = arrB.join( ',' );
+const sort = ( a: any, b: any, direction: SortDirection ) => {
+	// Sort arrays by length, then alphabetically by joined string
+	const arrA = Array.isArray( a ) ? a : [];
+	const arrB = Array.isArray( b ) ? b : [];
+	if ( arrA.length !== arrB.length ) {
 		return direction === 'asc'
-			? joinedA.localeCompare( joinedB )
-			: joinedB.localeCompare( joinedA );
-	};
+			? arrA.length - arrB.length
+			: arrB.length - arrA.length;
+	}
 
+	const joinedA = arrA.join( ',' );
+	const joinedB = arrB.join( ',' );
+	return direction === 'asc'
+		? joinedA.localeCompare( joinedB )
+		: joinedB.localeCompare( joinedA );
+};
+
+export default function normalizeField< Item >(): TypeProvidedProps< Item > {
 	return {
 		type: 'array',
 		render,

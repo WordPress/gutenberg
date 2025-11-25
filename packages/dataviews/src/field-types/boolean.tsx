@@ -6,16 +6,10 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import type {
-	DataViewRenderFieldProps,
-	Field,
-	Rules,
-	SortDirection,
-} from '../types';
+import type { DataViewRenderFieldProps, Rules, SortDirection } from '../types';
 import type { TypeProvidedProps } from '../types/private';
 import RenderFromElements from './utils/render-from-elements';
 import { OPERATOR_IS, OPERATOR_IS_NOT } from '../constants';
-import getValueFromId from './utils/get-value-from-id';
 
 function render( { item, field }: DataViewRenderFieldProps< any > ) {
 	if ( field.hasElements ) {
@@ -49,30 +43,24 @@ const isValid: Rules< any > = {
 	},
 };
 
-export default function normalizeField< Item >(
-	field: Field< Item >
-): TypeProvidedProps< Item > {
-	const getValue = field.getValue || getValueFromId( field.id );
+const sort = ( a: any, b: any, direction: SortDirection ) => {
+	const boolA = Boolean( a );
+	const boolB = Boolean( b );
 
-	const sort = ( a: any, b: any, direction: SortDirection ) => {
-		const valueA = getValue( { item: a } );
-		const valueB = getValue( { item: b } );
-		const boolA = Boolean( valueA );
-		const boolB = Boolean( valueB );
+	if ( boolA === boolB ) {
+		return 0;
+	}
 
-		if ( boolA === boolB ) {
-			return 0;
-		}
+	// In ascending order, false comes before true
+	if ( direction === 'asc' ) {
+		return boolA ? 1 : -1;
+	}
 
-		// In ascending order, false comes before true
-		if ( direction === 'asc' ) {
-			return boolA ? 1 : -1;
-		}
+	// In descending order, true comes before false
+	return boolA ? -1 : 1;
+};
 
-		// In descending order, true comes before false
-		return boolA ? -1 : 1;
-	};
-
+export default function normalizeField< Item >(): TypeProvidedProps< Item > {
 	return {
 		type: 'boolean',
 		render,

@@ -10,8 +10,6 @@ import type {
 	DataViewRenderFieldProps,
 	Field,
 	FormatDate,
-	Operator,
-	Rules,
 	SortDirection,
 } from '../types';
 import type { TypeProvidedProps } from '../types/private';
@@ -28,7 +26,6 @@ import {
 	OPERATOR_BETWEEN,
 	DAYS_OF_WEEK,
 } from '../constants';
-import getValueFromId from './utils/get-value-from-id';
 
 function getFormat< Item >( field: Field< Item > ): Required< FormatDate > {
 	return {
@@ -70,58 +67,47 @@ function render( { item, field }: DataViewRenderFieldProps< any > ) {
 	return dateI18n( format.date, getDate( value ) );
 }
 
-const isValid: Rules< any > = {
-	elements: true,
-	custom: () => null,
+const sort = ( a: any, b: any, direction: SortDirection ) => {
+	const timeA = new Date( a ).getTime();
+	const timeB = new Date( b ).getTime();
+
+	return direction === 'asc' ? timeA - timeB : timeB - timeA;
 };
 
-const defaultOperators: Operator[] = [
-	OPERATOR_ON,
-	OPERATOR_NOT_ON,
-	OPERATOR_BEFORE,
-	OPERATOR_AFTER,
-	OPERATOR_BEFORE_INC,
-	OPERATOR_AFTER_INC,
-	OPERATOR_IN_THE_PAST,
-	OPERATOR_OVER,
-	OPERATOR_BETWEEN,
-];
-const validOperators: Operator[] = [
-	OPERATOR_ON,
-	OPERATOR_NOT_ON,
-	OPERATOR_BEFORE,
-	OPERATOR_AFTER,
-	OPERATOR_BEFORE_INC,
-	OPERATOR_AFTER_INC,
-	OPERATOR_IN_THE_PAST,
-	OPERATOR_OVER,
-	OPERATOR_BETWEEN,
-];
-
-export default function normalizeField< Item >(
-	field: Field< Item >
-): TypeProvidedProps< Item > {
-	const getValue = field.getValue || getValueFromId( field.id );
-
-	const sort = ( a: Item, b: Item, direction: SortDirection ) => {
-		const valueA = getValue( { item: a } );
-		const valueB = getValue( { item: b } );
-		const timeA = new Date( valueA ).getTime();
-		const timeB = new Date( valueB ).getTime();
-
-		return direction === 'asc' ? timeA - timeB : timeB - timeA;
-	};
-
+export default function normalizeField< Item >(): TypeProvidedProps< Item > {
 	return {
 		type: 'date',
 		render,
 		Edit: 'date',
 		sort,
-		isValid,
+		isValid: {
+			elements: true,
+			custom: () => null,
+		},
 		enableSorting: true,
 		enableGlobalSearch: false,
-		defaultOperators,
-		validOperators,
+		defaultOperators: [
+			OPERATOR_ON,
+			OPERATOR_NOT_ON,
+			OPERATOR_BEFORE,
+			OPERATOR_AFTER,
+			OPERATOR_BEFORE_INC,
+			OPERATOR_AFTER_INC,
+			OPERATOR_IN_THE_PAST,
+			OPERATOR_OVER,
+			OPERATOR_BETWEEN,
+		],
+		validOperators: [
+			OPERATOR_ON,
+			OPERATOR_NOT_ON,
+			OPERATOR_BEFORE,
+			OPERATOR_AFTER,
+			OPERATOR_BEFORE_INC,
+			OPERATOR_AFTER_INC,
+			OPERATOR_IN_THE_PAST,
+			OPERATOR_OVER,
+			OPERATOR_BETWEEN,
+		],
 		getFormat,
 	};
 }

@@ -6,12 +6,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import type {
-	DataViewRenderFieldProps,
-	Field,
-	Rules,
-	SortDirection,
-} from '../types';
+import type { DataViewRenderFieldProps, Rules, SortDirection } from '../types';
 import type { TypeProvidedProps } from '../types/private';
 import RenderFromElements from './utils/render-from-elements';
 import {
@@ -25,7 +20,6 @@ import {
 	OPERATOR_NOT_CONTAINS,
 	OPERATOR_STARTS_WITH,
 } from '../constants';
-import getValueFromId from './utils/get-value-from-id';
 
 // Email validation regex based on HTML5 spec
 // https://html.spec.whatwg.org/multipage/input.html#valid-e-mail-address
@@ -56,19 +50,11 @@ const isValid: Rules< any > = {
 	},
 };
 
-export default function normalizeField< Item >(
-	field: Field< Item >
-): TypeProvidedProps< Item > {
-	const getValue = field.getValue || getValueFromId( field.id );
+const sort = ( a: any, b: any, direction: SortDirection ) => {
+	return direction === 'asc' ? a.localeCompare( b ) : b.localeCompare( a );
+};
 
-	const sort = ( a: any, b: any, direction: SortDirection ) => {
-		const valueA = getValue( { item: a } );
-		const valueB = getValue( { item: b } );
-		return direction === 'asc'
-			? valueA.localeCompare( valueB )
-			: valueB.localeCompare( valueA );
-	};
-
+export default function normalizeField< Item >(): TypeProvidedProps< Item > {
 	return {
 		type: 'email',
 		render,

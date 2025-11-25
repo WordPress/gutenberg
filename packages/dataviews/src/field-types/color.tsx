@@ -11,12 +11,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import type {
-	DataViewRenderFieldProps,
-	Field,
-	Rules,
-	SortDirection,
-} from '../types';
+import type { DataViewRenderFieldProps, Rules, SortDirection } from '../types';
 import type { TypeProvidedProps } from '../types/private';
 import RenderFromElements from './utils/render-from-elements';
 import {
@@ -25,7 +20,6 @@ import {
 	OPERATOR_IS_NONE,
 	OPERATOR_IS_NOT,
 } from '../constants';
-import getValueFromId from './utils/get-value-from-id';
 
 function render( { item, field }: DataViewRenderFieldProps< any > ) {
 	if ( field.hasElements ) {
@@ -72,39 +66,35 @@ const isValid: Rules< any > = {
 	},
 };
 
-export default function normalizeField< Item >(
-	field: Field< Item >
-): TypeProvidedProps< Item > {
-	const getValue = field.getValue || getValueFromId( field.id );
+const sort = ( a: any, b: any, direction: SortDirection ) => {
+	// Convert colors to HSL for better sorting
+	const colorA = colord( a );
+	const colorB = colord( b );
 
-	const sort = ( valueA: any, valueB: any, direction: SortDirection ) => {
-		// Convert colors to HSL for better sorting
-		const colorA = colord( getValue( { item: valueA } ) );
-		const colorB = colord( getValue( { item: valueB } ) );
+	if ( ! colorA.isValid() && ! colorB.isValid() ) {
+		return 0;
+	}
+	if ( ! colorA.isValid() ) {
+		return direction === 'asc' ? 1 : -1;
+	}
+	if ( ! colorB.isValid() ) {
+		return direction === 'asc' ? -1 : 1;
+	}
 
-		if ( ! colorA.isValid() && ! colorB.isValid() ) {
-			return 0;
-		}
-		if ( ! colorA.isValid() ) {
-			return direction === 'asc' ? 1 : -1;
-		}
-		if ( ! colorB.isValid() ) {
-			return direction === 'asc' ? -1 : 1;
-		}
+	// Sort by hue, then saturation, then lightness
+	const hslA = colorA.toHsl();
+	const hslB = colorB.toHsl();
 
-		// Sort by hue, then saturation, then lightness
-		const hslA = colorA.toHsl();
-		const hslB = colorB.toHsl();
+	if ( hslA.h !== hslB.h ) {
+		return direction === 'asc' ? hslA.h - hslB.h : hslB.h - hslA.h;
+	}
+	if ( hslA.s !== hslB.s ) {
+		return direction === 'asc' ? hslA.s - hslB.s : hslB.s - hslA.s;
+	}
+	return direction === 'asc' ? hslA.l - hslB.l : hslB.l - hslA.l;
+};
 
-		if ( hslA.h !== hslB.h ) {
-			return direction === 'asc' ? hslA.h - hslB.h : hslB.h - hslA.h;
-		}
-		if ( hslA.s !== hslB.s ) {
-			return direction === 'asc' ? hslA.s - hslB.s : hslB.s - hslA.s;
-		}
-		return direction === 'asc' ? hslA.l - hslB.l : hslB.l - hslA.l;
-	};
-
+export default function normalizeField< Item >(): TypeProvidedProps< Item > {
 	return {
 		type: 'color',
 		render,

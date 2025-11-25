@@ -23,7 +23,6 @@ import { default as color } from './color';
 import { default as url } from './url';
 import RenderFromElements from './utils/render-from-elements';
 import { ALL_OPERATORS, OPERATOR_IS, OPERATOR_IS_NOT } from '../constants';
-import getValueFromId from './utils/get-value-from-id';
 
 const render = ( {
 	item,
@@ -36,24 +35,15 @@ const render = ( {
 	);
 };
 
-function normalizeField< Item >(
-	field: Field< Item >
-): TypeProvidedProps< Item > {
-	const getValue = field.getValue || getValueFromId( field.id );
+const sort = ( a: any, b: any, direction: SortDirection ) => {
+	if ( typeof a === 'number' && typeof b === 'number' ) {
+		return direction === 'asc' ? a - b : b - a;
+	}
 
-	const sort = ( a: any, b: any, direction: SortDirection ) => {
-		const valueA = getValue( { item: a } );
-		const valueB = getValue( { item: b } );
+	return direction === 'asc' ? a.localeCompare( b ) : b.localeCompare( a );
+};
 
-		if ( typeof valueA === 'number' && typeof valueB === 'number' ) {
-			return direction === 'asc' ? valueA - valueB : valueB - valueA;
-		}
-
-		return direction === 'asc'
-			? valueA.localeCompare( valueB )
-			: valueB.localeCompare( valueA );
-	};
-
+function normalizeField< Item >(): TypeProvidedProps< Item > {
 	return {
 		// type: no type for this
 		render,

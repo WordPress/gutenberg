@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import type { DataViewRenderFieldProps, Field, SortDirection } from '../types';
+import type { DataViewRenderFieldProps, SortDirection } from '../types';
 import type { TypeProvidedProps } from '../types/private';
 import RenderFromElements from './utils/render-from-elements';
 import parseDateTime from './utils/parse-date-time';
@@ -15,7 +15,6 @@ import {
 	OPERATOR_IN_THE_PAST,
 	OPERATOR_OVER,
 } from '../constants';
-import getValueFromId from './utils/get-value-from-id';
 
 function render( { item, field }: DataViewRenderFieldProps< any > ) {
 	if ( field.elements ) {
@@ -35,20 +34,14 @@ function render( { item, field }: DataViewRenderFieldProps< any > ) {
 	}
 }
 
-export default function normalizeField< Item >(
-	field: Field< Item >
-): TypeProvidedProps< Item > {
-	const getValue = field.getValue || getValueFromId( field.id );
+const sort = ( a: any, b: any, direction: SortDirection ) => {
+	const timeA = new Date( a ).getTime();
+	const timeB = new Date( b ).getTime();
 
-	const sort = ( a: Item, b: Item, direction: SortDirection ) => {
-		const valueA = getValue( { item: a } );
-		const valueB = getValue( { item: b } );
-		const timeA = new Date( valueA ).getTime();
-		const timeB = new Date( valueB ).getTime();
+	return direction === 'asc' ? timeA - timeB : timeB - timeA;
+};
 
-		return direction === 'asc' ? timeA - timeB : timeB - timeA;
-	};
-
+export default function normalizeField< Item >(): TypeProvidedProps< Item > {
 	return {
 		type: 'datetime',
 		render,
