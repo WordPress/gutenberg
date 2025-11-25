@@ -2182,6 +2182,21 @@ const DataAdapterComponent = () => {
 			label: 'User Email',
 			type: 'email',
 		},
+		{
+			id: 'user.profile.tags',
+			label: 'User Tags',
+			type: 'array',
+			placeholder: 'Enter comma-separated tags',
+			description:
+				'Add tags separated by commas (e.g., "tag1, tag2, tag3")',
+			elements: [
+				{ value: 'astronomy', label: 'Astronomy' },
+				{ value: 'book-review', label: 'Book review' },
+				{ value: 'event', label: 'Event' },
+				{ value: 'photography', label: 'Photography' },
+				{ value: 'travel', label: 'Travel' },
+			],
+		},
 		// Example of adapting a data value to a control value
 		// by providing getValue/setValue methods.
 		{
@@ -2238,7 +2253,11 @@ const DataAdapterComponent = () => {
 		// Edits will respect the shape of the data
 		// because fields provide the proper information
 		// (via field.id or via field.setValue).
-		setData( ( prev ) => deepMerge( prev, edits ) );
+		setData( ( prev ) =>
+			deepMerge( prev, edits, {
+				arrayMerge: ( target, source ) => source,
+			} )
+		);
 	}, [] );
 
 	return (
@@ -2279,6 +2298,7 @@ const DataAdapterComponent = () => {
 							children: [
 								'user.profile.name',
 								'user.profile.email',
+								'user.profile.tags',
 							],
 						},
 					],

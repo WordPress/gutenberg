@@ -1028,6 +1028,7 @@ export default () => {
 
 			// Get the content of this router region.
 			const vdom = routerRegions.get( regionId )!.value;
+
 			if ( vdom && typeof vdom.type !== 'string' ) {
 				// The scope needs to be injected.
 				const previousScope = getScope();

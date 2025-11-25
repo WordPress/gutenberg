@@ -59,17 +59,9 @@
 		border-top: 1px solid $gray-100;
 		background-color: inherit;
 
-		.dataviews-view-table-header-button {
-			gap: $grid-unit-05;
-		}
-
 		td:first-child,
 		th:first-child {
 			padding-left: $grid-unit-60;
-
-			.dataviews-view-table-header-button {
-				margin-left: - #{$grid-unit-10};
-			}
 		}
 
 		td:last-child,
@@ -155,13 +147,27 @@
 			background-color: inherit;
 			padding-top: $grid-unit-10;
 			padding-bottom: $grid-unit-10;
-			padding-left: $grid-unit-15;
 			font-size: 11px;
 			text-transform: uppercase;
 			font-weight: $font-weight-medium;
 
-			&:has(.dataviews-view-table-header-button):not(:first-child) {
+			&:has(.dataviews-view-table-header-button) {
 				padding-left: $grid-unit-05;
+				padding-right: $grid-unit-05;
+
+				.dataviews-view-table-header-button {
+					gap: $grid-unit-05;
+				}
+			}
+
+			&:has(.dataviews-view-table-header-button):first-child {
+				// Table cell padding minus the header button padding.
+				padding-left: $grid-unit-50;
+			}
+
+			&:has(.dataviews-view-table-header-button):last-child {
+				// Table cell padding minus the header button padding.
+				padding-right: $grid-unit-50;
 			}
 		}
 	}
@@ -223,6 +229,10 @@
 			th {
 				&:has(.dataviews-view-table-header-button):not(:first-child) {
 					padding-left: 0;
+				}
+
+				&:has(.dataviews-view-table-header-button):not(:last-child) {
+					padding-right: 0;
 				}
 			}
 		}

@@ -28,6 +28,9 @@ function gutenberg_boot_register_default_menu_items() {
 	register_gutenberg_boot_menu_item( 'styles', __( 'Styles', 'gutenberg' ), '/styles', '' );
 	register_gutenberg_boot_menu_item( 'navigation', __( 'Navigation', 'gutenberg' ), '/navigation', '' );
 	register_gutenberg_boot_menu_item( 'pages', __( 'Pages', 'gutenberg' ), '/types/page', '' );
+	if ( gutenberg_is_experiment_enabled( 'active_templates' ) ) {
+		register_gutenberg_boot_menu_item( 'templates', __( 'Templates', 'gutenberg' ), '/templates', '' );
+	}
 	register_gutenberg_boot_menu_item( 'templateParts', __( 'Template Parts', 'gutenberg' ), '/template-parts', '' );
 	register_gutenberg_boot_menu_item( 'patterns', __( 'Patterns', 'gutenberg' ), '/patterns', '' );
 }

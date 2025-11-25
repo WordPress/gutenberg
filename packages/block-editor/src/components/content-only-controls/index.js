@@ -24,7 +24,7 @@ import { store as blockEditorStore } from '../../store';
 import BlockIcon from '../block-icon';
 import useBlockDisplayTitle from '../block-title/use-block-display-title';
 import useBlockDisplayInformation from '../use-block-display-information';
-const { fieldsKey } = unlock( blocksPrivateApis );
+const { fieldsKey, formKey } = unlock( blocksPrivateApis );
 import FieldsDropdownMenu from './fields-dropdown-menu';
 
 // controls
@@ -197,14 +197,8 @@ function BlockFields( { clientId } ) {
 
 	const blockTypeFields = blockType?.[ fieldsKey ];
 
-	// Track visible fields
-	const [ visibleFields, setVisibleFields ] = useState( () => {
-		// Show fields that have shownByDefault: true by default
-		return (
-			blockTypeFields
-				?.filter( ( field ) => field.shownByDefault )
-				.map( ( field ) => field.id ) || []
-		);
+	const [ form, setForm ] = useState( () => {
+		return blockType?.[ formKey ];
 	} );
 
 	// Build DataForm fields with proper structure
@@ -315,22 +309,19 @@ function BlockFields( { clientId } ) {
 		updateBlockAttributes,
 	] );
 
-	// Build form config showing only visible fields
-	const form = useMemo(
-		() => ( {
-			fields: dataFormFields
-				.filter( ( field ) => visibleFields.includes( field.id ) )
-				.map( ( field ) => field.id ),
-		} ),
-		[ dataFormFields, visibleFields ]
-	);
-
 	const handleToggleField = ( fieldId ) => {
-		setVisibleFields( ( prev ) => {
-			if ( prev.includes( fieldId ) ) {
-				return prev.filter( ( id ) => id !== fieldId );
+		setForm( ( prev ) => {
+			if ( prev.fields?.includes( fieldId ) ) {
+				return {
+					...prev,
+					fields: prev.fields.filter( ( id ) => id !== fieldId ),
+				};
 			}
-			return [ ...prev, fieldId ];
+
+			return {
+				...prev,
+				fields: [ ...( prev.fields || [] ), fieldId ],
+			};
 		} );
 	};
 
@@ -350,7 +341,7 @@ function BlockFields( { clientId } ) {
 					</HStack>
 					<FieldsDropdownMenu
 						fields={ dataFormFields }
-						visibleFields={ visibleFields }
+						visibleFields={ form.fields }
 						onToggleField={ handleToggleField }
 					/>
 				</HStack>

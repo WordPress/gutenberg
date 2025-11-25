@@ -16,7 +16,7 @@ import save from './save';
 import transforms from './transforms';
 import { unlock } from '../lock-unlock';
 
-const { fieldsKey } = unlock( blocksPrivateApis );
+const { fieldsKey, formKey } = unlock( blocksPrivateApis );
 
 const { name } = metadata;
 
@@ -46,15 +46,16 @@ if ( window.__experimentalContentOnlyPatternInsertion ) {
 			id: 'value',
 			label: __( 'Content' ),
 			type: 'richtext',
-			shownByDefault: true,
 		},
 		{
 			id: 'citation',
 			label: __( 'Citation' ),
 			type: 'richtext',
-			shownByDefault: false,
 		},
 	];
+	settings[ formKey ] = {
+		fields: [ 'value' ],
+	};
 }
 
 export const init = () => initBlock( { name, metadata, settings } );

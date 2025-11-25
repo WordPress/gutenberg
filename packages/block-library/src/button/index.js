@@ -15,7 +15,7 @@ import metadata from './block.json';
 import save from './save';
 import { unlock } from '../lock-unlock';
 
-const { fieldsKey } = unlock( blocksPrivateApis );
+const { fieldsKey, formKey } = unlock( blocksPrivateApis );
 
 const { name } = metadata;
 
@@ -44,13 +44,11 @@ if ( window.__experimentalContentOnlyPatternInsertion ) {
 			id: 'text',
 			label: __( 'Content' ),
 			type: 'richtext',
-			shownByDefault: true,
 		},
 		{
 			id: 'link',
 			label: __( 'Link' ),
 			type: 'link',
-			shownByDefault: false,
 			mapping: {
 				url: 'url',
 				rel: 'rel',
@@ -58,6 +56,9 @@ if ( window.__experimentalContentOnlyPatternInsertion ) {
 			},
 		},
 	];
+	settings[ formKey ] = {
+		fields: [ 'text' ],
+	};
 }
 
 export const init = () => initBlock( { name, metadata, settings } );

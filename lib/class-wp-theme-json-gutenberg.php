@@ -232,6 +232,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * @since 6.2.0 Added `outline-*`, and `min-height` properties.
 	 * @since 6.3.0 Added `writing-mode` property.
 	 * @since 6.6.0 Added `background-[image|position|repeat|size]` properties.
+	 * @since 7.0.0 Added `dimensions.width`.
 	 *
 	 * @var array
 	 */
@@ -297,6 +298,7 @@ class WP_Theme_JSON_Gutenberg {
 		'text-transform'                    => array( 'typography', 'textTransform' ),
 		'filter'                            => array( 'filter', 'duotone' ),
 		'box-shadow'                        => array( 'shadow' ),
+		'width'                             => array( 'dimensions', 'width' ),
 		'writing-mode'                      => array( 'typography', 'writingMode' ),
 	);
 
@@ -386,6 +388,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * @since 6.4.0 Added `layout.allowEditing`.
 	 * @since 6.4.0 Added `lightbox`.
 	 * @since 7.0.0 Added type markers to the schema for boolean values.
+	 * @since 7.0.0 Added `dimensions.width`.
 	 * @var array
 	 */
 	const VALID_SETTINGS = array(
@@ -425,6 +428,7 @@ class WP_Theme_JSON_Gutenberg {
 			'aspectRatios'        => null,
 			'defaultAspectRatios' => null,
 			'minHeight'           => null,
+			'width'               => null,
 		),
 		'layout'                        => array(
 			'contentSize'                   => null,
@@ -539,6 +543,7 @@ class WP_Theme_JSON_Gutenberg {
 		'dimensions' => array(
 			'aspectRatio' => null,
 			'minHeight'   => null,
+			'width'       => null,
 		),
 		'filter'     => array(
 			'duotone' => null,
@@ -641,6 +646,7 @@ class WP_Theme_JSON_Gutenberg {
 	const BLOCK_SUPPORT_FEATURE_LEVEL_SELECTORS = array(
 		'__experimentalBorder' => 'border',
 		'color'                => 'color',
+		'dimensions'           => 'dimensions',
 		'spacing'              => 'spacing',
 		'typography'           => 'typography',
 	);
@@ -741,6 +747,7 @@ class WP_Theme_JSON_Gutenberg {
 	 *
 	 * @since 6.0.0
 	 * @since 6.2.0 Added `dimensions.minHeight` and `position.sticky`.
+	 * @since 7.0.0 Added `dimensions.width`.
 	 * @var array
 	 */
 	const APPEARANCE_TOOLS_OPT_INS = array(
@@ -756,6 +763,7 @@ class WP_Theme_JSON_Gutenberg {
 		array( 'color', 'caption' ),
 		array( 'dimensions', 'aspectRatio' ),
 		array( 'dimensions', 'minHeight' ),
+		array( 'dimensions', 'width' ),
 		// BEGIN EXPERIMENTAL.
 		// Allow `position.fixed` to be opted-in by default.
 		// Sticky position support was backported to WordPress 6.2 in https://core.trac.wordpress.org/ticket/57618.

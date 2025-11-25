@@ -11,7 +11,7 @@ function PreviewField( { item }: { item: WpTemplatePart } ) {
 	return (
 		<Preview
 			content={ item?.content?.raw }
-			blocks={ item.blocks }
+			blocks={ item?.blocks }
 			description={ description }
 		/>
 	);

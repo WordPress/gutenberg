@@ -47,7 +47,9 @@ function ModalContent< Item >( {
 	const { fields } = useContext( DataFormContext );
 	const [ changes, setChanges ] = useState< Partial< Item > >( {} );
 	const modalData = useMemo( () => {
-		return deepMerge( data, changes );
+		return deepMerge( data, changes, {
+			arrayMerge: ( target, source ) => source,
+		} );
 	}, [ data, changes ] );
 
 	const form: NormalizedForm = useMemo(
@@ -73,7 +75,11 @@ function ModalContent< Item >( {
 	};
 
 	const handleOnChange = ( newValue: Partial< Item > ) => {
-		setChanges( ( prev ) => deepMerge( prev, newValue ) );
+		setChanges( ( prev ) =>
+			deepMerge( prev, newValue, {
+				arrayMerge: ( target, source ) => source,
+			} )
+		);
 	};
 
 	const focusOnMountRef = useFocusOnMount( 'firstInputElement' );

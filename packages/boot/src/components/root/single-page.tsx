@@ -10,6 +10,7 @@ import { privateApis as routePrivateApis } from '@wordpress/route';
 // @ts-expect-error Commands is not typed properly.
 import { CommandMenu } from '@wordpress/commands';
 import { privateApis as themePrivateApis } from '@wordpress/theme';
+import { EditorSnackbars } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -46,6 +47,7 @@ export default function RootSinglePage() {
 				>
 					<CommandMenu />
 					<SavePanel />
+					<EditorSnackbars />
 					<div className="boot-layout__surfaces">
 						<ThemeProvider
 							color={ { bg: '#ffffff', primary: '#3858e9' } }

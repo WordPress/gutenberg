@@ -10,6 +10,7 @@ import { privateApis as routePrivateApis } from '@wordpress/route';
 // @ts-expect-error Commands is not typed properly.
 import { CommandMenu } from '@wordpress/commands';
 import { privateApis as themePrivateApis } from '@wordpress/theme';
+import { EditorSnackbars } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -43,6 +44,7 @@ export default function Root() {
 				>
 					<CommandMenu />
 					<SavePanel />
+					<EditorSnackbars />
 					{ ! isFullScreen && (
 						<div className="boot-layout__sidebar">
 							<Sidebar />
