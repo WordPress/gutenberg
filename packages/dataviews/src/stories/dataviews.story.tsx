@@ -83,6 +83,10 @@ export const Default = ( {
 	perPageSizes = [ 10, 25, 50, 100 ],
 	hasClickableItems = true,
 	backgroundColor,
+}: {
+	perPageSizes?: number[];
+	hasClickableItems?: boolean;
+	backgroundColor?: string;
 } ) => {
 	const [ view, setView ] = useState< View >( {
 		...DEFAULT_VIEW,
@@ -95,7 +99,13 @@ export const Default = ( {
 		return filterSortAndPaginate( data, view, fields );
 	}, [ view ] );
 	return (
-		<div style={ { '--wp-dataviews-color-background': backgroundColor } }>
+		<div
+			style={
+				{
+					'--wp-dataviews-color-background': backgroundColor,
+				} as React.CSSProperties
+			}
+		>
 			<DataViews
 				getItemId={ ( item ) => item.id.toString() }
 				paginationInfo={ paginationInfo }
