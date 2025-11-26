@@ -1,13 +1,18 @@
 /**
  * WordPress dependencies
  */
-import { useDispatch, useRegistry } from '@wordpress/data';
+import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
+import { useCallback, useContext, useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../store';
+import { store as blocksStore } from '@wordpress/blocks';
 import { useBlockEditContext } from '../components/block-edit';
+import BlockContext from '../components/block-context';
+import isURLLike from '../components/link-control/is-url-like';
+import { unlock } from '../lock-unlock';
 
 const DEFAULT_ATTRIBUTE = '__default';
 const PATTERN_OVERRIDES_SOURCE = 'core/pattern-overrides';
@@ -200,4 +205,345 @@ export function useBlockBindingsUtils( clientId ) {
 	};
 
 	return { updateBlockBindings, removeAllBlockBindings };
+}
+
+/**
+ * Default value used for blocks which do not define their own context needs,
+ * used to guarantee that a block's `context` prop will always be an object.
+ *
+ * @type {{}}
+ */
+const DEFAULT_BLOCK_CONTEXT = {};
+
+/**
+ * Hook that provides computed block attributes with values from block bindings sources.
+ * This hook replicates the logic from EditWithGeneratedProps.computedAttributes
+ * to enable block bindings support in components that need to read bound attribute values.
+ *
+ * @param {string} clientId The block client ID.
+ *
+ * @return {Object} Computed attributes with values from block bindings sources.
+ */
+export function useBlockBindingsComputedAttributes( clientId ) {
+	const blockContext = useContext( BlockContext );
+
+	const { attributes, blockType, bindableAttributes, registeredSources } =
+		useSelect(
+			( select ) => {
+				const { getBlockAttributes, getBlockName } =
+					select( blockEditorStore );
+				const { getBlockType } = select( blocksStore );
+				const { __experimentalBlockBindingsSupportedAttributes } =
+					select( blockEditorStore ).getSettings();
+
+				const blockName = getBlockName( clientId );
+				const blockAttributes = getBlockAttributes( clientId );
+
+				return {
+					attributes: blockAttributes,
+					blockType: getBlockType( blockName ),
+					bindableAttributes:
+						__experimentalBlockBindingsSupportedAttributes?.[
+							blockName
+						],
+					registeredSources: unlock(
+						select( blocksStore )
+					).getAllBlockBindingsSources(),
+				};
+			},
+			[ clientId ]
+		);
+
+	const { blockBindings, context } = useMemo( () => {
+		// Assign context values using the block type's declared context needs.
+		const computedContext = blockType?.usesContext
+			? Object.fromEntries(
+					Object.entries( blockContext ).filter( ( [ key ] ) =>
+						blockType.usesContext.includes( key )
+					)
+			  )
+			: DEFAULT_BLOCK_CONTEXT;
+		// Add context requested by Block Bindings sources.
+		if ( attributes?.metadata?.bindings ) {
+			Object.values( attributes?.metadata?.bindings || {} ).forEach(
+				( binding ) => {
+					registeredSources[ binding?.source ]?.usesContext?.forEach(
+						( key ) => {
+							computedContext[ key ] = blockContext[ key ];
+						}
+					);
+				}
+			);
+		}
+		return {
+			blockBindings: replacePatternOverridesDefaultBinding(
+				attributes?.metadata?.bindings,
+				bindableAttributes
+			),
+			context: computedContext,
+		};
+	}, [
+		blockType?.usesContext,
+		blockContext,
+		attributes?.metadata?.bindings,
+		registeredSources,
+		bindableAttributes,
+	] );
+
+	const computedAttributes = useSelect(
+		( select ) => {
+			if ( ! blockBindings ) {
+				return attributes;
+			}
+
+			const attributesFromSources = {};
+			const blockBindingsBySource = new Map();
+
+			for ( const [ attributeName, binding ] of Object.entries(
+				blockBindings
+			) ) {
+				const { source: sourceName, args: sourceArgs } = binding;
+				const source = registeredSources[ sourceName ];
+				if (
+					! source ||
+					! bindableAttributes?.includes( attributeName )
+				) {
+					continue;
+				}
+
+				blockBindingsBySource.set( source, {
+					...blockBindingsBySource.get( source ),
+					[ attributeName ]: {
+						args: sourceArgs,
+					},
+				} );
+			}
+
+			if ( blockBindingsBySource.size ) {
+				for ( const [ source, bindings ] of blockBindingsBySource ) {
+					// Get values in batch if the source supports it.
+					let values = {};
+					if ( ! source.getValues ) {
+						Object.keys( bindings ).forEach( ( attr ) => {
+							// Default to the the source label when `getValues` doesn't exist.
+							values[ attr ] = source.label;
+						} );
+					} else {
+						values = source.getValues( {
+							select,
+							context,
+							clientId,
+							bindings,
+						} );
+					}
+					for ( const [ attributeName, value ] of Object.entries(
+						values
+					) ) {
+						if (
+							attributeName === 'url' &&
+							( ! value || ! isURLLike( value ) )
+						) {
+							// Return null if value is not a valid URL.
+							attributesFromSources[ attributeName ] = null;
+						} else {
+							attributesFromSources[ attributeName ] = value;
+						}
+					}
+				}
+			}
+
+			return {
+				...attributes,
+				...attributesFromSources,
+			};
+		},
+		[
+			attributes,
+			bindableAttributes,
+			blockBindings,
+			clientId,
+			context,
+			registeredSources,
+		]
+	);
+
+	return computedAttributes;
+}
+
+/**
+ * Hook that provides a block bindings-aware setAttributes function.
+ * This hook replicates the logic from EditWithGeneratedProps.setBoundAttributes
+ * to enable block bindings support in components that don't have access to
+ * the wrapped setAttributes prop.
+ *
+ * @param {string} clientId The block client ID.
+ *
+ * @return {Function} A function that updates block attributes with block bindings support.
+ */
+export function useBlockBindingsAwareSetAttributes( clientId ) {
+	const registry = useRegistry();
+	const blockContext = useContext( BlockContext );
+	const { updateBlockAttributes } = useDispatch( blockEditorStore );
+
+	const { attributes, blockType, bindableAttributes, registeredSources } =
+		useSelect(
+			( select ) => {
+				const { getBlockAttributes, getBlockName } =
+					select( blockEditorStore );
+				const { getBlockType } = select( blocksStore );
+				const { __experimentalBlockBindingsSupportedAttributes } =
+					select( blockEditorStore ).getSettings();
+
+				const blockName = getBlockName( clientId );
+				const blockAttributes = getBlockAttributes( clientId );
+
+				return {
+					attributes: blockAttributes,
+					blockType: getBlockType( blockName ),
+					bindableAttributes:
+						__experimentalBlockBindingsSupportedAttributes?.[
+							blockName
+						],
+					registeredSources: unlock(
+						select( blocksStore )
+					).getAllBlockBindingsSources(),
+				};
+			},
+			[ clientId ]
+		);
+
+	const { blockBindings, context, hasPatternOverrides } = useMemo( () => {
+		// Assign context values using the block type's declared context needs.
+		const computedContext = blockType?.usesContext
+			? Object.fromEntries(
+					Object.entries( blockContext ).filter( ( [ key ] ) =>
+						blockType.usesContext.includes( key )
+					)
+			  )
+			: DEFAULT_BLOCK_CONTEXT;
+		// Add context requested by Block Bindings sources.
+		if ( attributes?.metadata?.bindings ) {
+			Object.values( attributes?.metadata?.bindings || {} ).forEach(
+				( binding ) => {
+					registeredSources[ binding?.source ]?.usesContext?.forEach(
+						( key ) => {
+							computedContext[ key ] = blockContext[ key ];
+						}
+					);
+				}
+			);
+		}
+		return {
+			blockBindings: replacePatternOverridesDefaultBinding(
+				attributes?.metadata?.bindings,
+				bindableAttributes
+			),
+			context: computedContext,
+			hasPatternOverrides: hasPatternOverridesDefaultBinding(
+				attributes?.metadata?.bindings
+			),
+		};
+	}, [
+		blockType?.usesContext,
+		blockContext,
+		attributes?.metadata?.bindings,
+		registeredSources,
+		bindableAttributes,
+	] );
+
+	const setAttributes = useCallback(
+		( nextAttributes ) => {
+			if ( ! blockBindings ) {
+				updateBlockAttributes( clientId, nextAttributes );
+				return;
+			}
+
+			registry.batch( () => {
+				const keptAttributes = { ...nextAttributes };
+				const blockBindingsBySource = new Map();
+
+				// Loop only over the updated attributes to avoid modifying the bound ones that haven't changed.
+				for ( const [ attributeName, newValue ] of Object.entries(
+					keptAttributes
+				) ) {
+					if (
+						! blockBindings[ attributeName ] ||
+						! bindableAttributes?.includes( attributeName )
+					) {
+						continue;
+					}
+
+					const binding = blockBindings[ attributeName ];
+					const source = registeredSources[ binding?.source ];
+					if ( ! source?.setValues ) {
+						continue;
+					}
+					blockBindingsBySource.set( source, {
+						...blockBindingsBySource.get( source ),
+						[ attributeName ]: {
+							args: binding.args,
+							newValue,
+						},
+					} );
+					delete keptAttributes[ attributeName ];
+				}
+
+				if ( blockBindingsBySource.size ) {
+					// Mark changes as persistent for pattern overrides so they get saved.
+					// Check if any of the bindings being updated are pattern overrides.
+					const hasPatternOverrideBindings = Array.from(
+						blockBindingsBySource.keys()
+					).some(
+						( source ) => source.name === PATTERN_OVERRIDES_SOURCE
+					);
+					if ( hasPatternOverrideBindings ) {
+						registry
+							.dispatch( blockEditorStore )
+							.__unstableMarkLastChangeAsPersistent();
+					}
+
+					for ( const [
+						source,
+						bindings,
+					] of blockBindingsBySource ) {
+						source.setValues( {
+							select: registry.select,
+							dispatch: registry.dispatch,
+							context,
+							clientId,
+							bindings,
+						} );
+					}
+				}
+
+				const hasParentPattern = !! context[ 'pattern/overrides' ];
+
+				if (
+					// Don't update non-connected attributes if the block is using pattern overrides
+					// and the editing is happening while overriding the pattern (not editing the original).
+					! ( hasPatternOverrides && hasParentPattern ) &&
+					Object.keys( keptAttributes ).length
+				) {
+					// Don't update caption and href until they are supported.
+					if ( hasPatternOverrides ) {
+						delete keptAttributes.caption;
+						delete keptAttributes.href;
+					}
+					updateBlockAttributes( clientId, keptAttributes );
+				}
+			} );
+		},
+		[
+			bindableAttributes,
+			blockBindings,
+			clientId,
+			context,
+			hasPatternOverrides,
+			updateBlockAttributes,
+			registeredSources,
+			registry,
+		]
+	);
+
+	return setAttributes;
 }

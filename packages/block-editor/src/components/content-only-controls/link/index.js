@@ -72,10 +72,10 @@ export default function Link( { data, field, config = {} } ) {
 	const { popoverProps } = useInspectorPopoverPlacement( {
 		isControl: true,
 	} );
-	const { clientId, updateBlockAttributes, fieldDef } = config;
+	const { setAttributes, fieldDef } = config;
 	const updateAttributes = ( newValue ) => {
 		const mappedChanges = field.setValue( { item: data, value: newValue } );
-		updateBlockAttributes( clientId, mappedChanges );
+		setAttributes( mappedChanges );
 	};
 
 	const value = field.getValue( { item: data } );

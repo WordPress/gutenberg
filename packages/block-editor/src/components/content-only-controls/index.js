@@ -10,7 +10,7 @@ import {
 	Icon,
 	Navigator,
 } from '@wordpress/components';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { arrowLeft, arrowRight } from '@wordpress/icons';
 import { DataForm } from '@wordpress/dataviews';
@@ -21,6 +21,10 @@ import { useState, useMemo } from '@wordpress/element';
  */
 import { unlock } from '../../lock-unlock';
 import { store as blockEditorStore } from '../../store';
+import {
+	useBlockBindingsAwareSetAttributes,
+	useBlockBindingsComputedAttributes,
+} from '../../utils/block-bindings';
 import BlockIcon from '../block-icon';
 import useBlockDisplayTitle from '../block-title/use-block-display-title';
 import useBlockDisplayInformation from '../use-block-display-information';
@@ -174,21 +178,20 @@ function denormalizeLinkValue( value, fieldDef ) {
 }
 
 function BlockFields( { clientId } ) {
-	const { attributes, blockType } = useSelect(
+	const attributes = useBlockBindingsComputedAttributes( clientId );
+	const { blockType } = useSelect(
 		( select ) => {
-			const { getBlockAttributes, getBlockName } =
-				select( blockEditorStore );
+			const { getBlockName } = select( blockEditorStore );
 			const { getBlockType } = select( blocksStore );
 			const blockName = getBlockName( clientId );
 			return {
-				attributes: getBlockAttributes( clientId ),
 				blockType: getBlockType( blockName ),
 			};
 		},
 		[ clientId ]
 	);
 
-	const { updateBlockAttributes } = useDispatch( blockEditorStore );
+	const setAttributes = useBlockBindingsAwareSetAttributes( clientId );
 	const blockTitle = useBlockDisplayTitle( {
 		clientId,
 		context: 'list-view',
@@ -295,19 +298,14 @@ function BlockFields( { clientId } ) {
 				field.Edit = createConfiguredControl( {
 					control: fieldDef.type,
 					clientId,
-					updateBlockAttributes,
+					setAttributes,
 					fieldDef,
 				} );
 			}
 
 			return field;
 		} );
-	}, [
-		blockTypeFields,
-		blockType?.attributes,
-		clientId,
-		updateBlockAttributes,
-	] );
+	}, [ blockTypeFields, blockType?.attributes, clientId, setAttributes ] );
 
 	const handleToggleField = ( fieldId ) => {
 		setForm( ( prev ) => {
@@ -370,7 +368,7 @@ function BlockFields( { clientId } ) {
 							}
 						}
 					);
-					updateBlockAttributes( clientId, mappedChanges );
+					setAttributes( mappedChanges );
 				} }
 			/>
 		</div>

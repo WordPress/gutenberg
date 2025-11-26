@@ -28,10 +28,10 @@ export default function RichTextControl( {
 	const registry = useRegistry();
 	const attrValue = field.getValue( { item: data } );
 	const fieldConfig = field.config || {};
-	const { clientId, updateBlockAttributes } = config;
+	const { clientId, setAttributes } = config;
 	const updateAttributes = ( html ) => {
 		const mappedChanges = field.setValue( { item: data, value: html } );
-		updateBlockAttributes( clientId, mappedChanges );
+		setAttributes( mappedChanges );
 	};
 	const [ selection, setSelection ] = useState( {
 		start: undefined,

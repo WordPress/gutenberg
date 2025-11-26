@@ -89,13 +89,13 @@ export default function Media( { data, field, config = {} } ) {
 	} );
 	const value = field.getValue( { item: data } );
 	const { allowedTypes = [], multiple = false } = field.config || {};
-	const { clientId, updateBlockAttributes, fieldDef } = config;
+	const { setAttributes, fieldDef } = config;
 	const updateAttributes = ( newFieldValue ) => {
 		const mappedChanges = field.setValue( {
 			item: data,
 			value: newFieldValue,
 		} );
-		updateBlockAttributes( clientId, mappedChanges );
+		setAttributes( mappedChanges );
 	};
 
 	// Check if featured image is supported by checking if it's in the mapping
