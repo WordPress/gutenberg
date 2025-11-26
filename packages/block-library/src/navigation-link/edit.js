@@ -9,6 +9,9 @@ import clsx from 'clsx';
 import { createBlock } from '@wordpress/blocks';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
+	PanelBody,
+	TextControl,
+	TextareaControl,
 	ToolbarButton,
 	ToolbarGroup,
 	VisuallyHidden,
@@ -23,15 +26,13 @@ import {
 	store as blockEditorStore,
 	getColorClassName,
 	useInnerBlocksProps,
-<<<<<<< HEAD
 	useBlockEditingMode,
-=======
 	__experimentalLinkControl as LinkControl,
->>>>>>> 9fd8fde7cfa (Implement proof of concept)
 } from '@wordpress/block-editor';
 import { isURL, prependHTTP } from '@wordpress/url';
 import { useState, useEffect, useRef, useCallback } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
+import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { link as linkIcon, addSubmenu } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
 import { useMergeRefs, useInstanceId } from '@wordpress/compose';
@@ -39,12 +40,8 @@ import { useMergeRefs, useInstanceId } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-<<<<<<< HEAD
-=======
 import { name } from './block.json';
-import { LinkUI, getSuggestionsQuery } from './link-ui';
-import { updateAttributes } from './update-attributes';
->>>>>>> 9fd8fde7cfa (Implement proof of concept)
+import { getSuggestionsQuery } from './link-ui';
 import { getColors } from '../navigation/edit/utils';
 import {
 	Controls,
@@ -205,7 +202,8 @@ export default function NavigationLinkEdit( {
 	context,
 	clientId,
 } ) {
-	const { id, label, type, url, description, kind, metadata } = attributes;
+	const { id, label, type, url, description, kind, metadata, title, rel } =
+		attributes;
 	const { maxNestingLevel } = context;
 
 	const {
@@ -537,25 +535,6 @@ export default function NavigationLinkEdit( {
 				</ToolbarGroup>
 			</BlockControls>
 			<InspectorControls>
-<<<<<<< HEAD
-				<Controls
-					attributes={ attributes }
-					setAttributes={ setAttributes }
-					clientId={ clientId }
-				/>
-=======
-				{ /* className="wp-block-navigation-link__inline-link-input"
-				clientId={ clientId }
-				link={ attributes }
-				onClose={ () => setIsLinkOpen( false ) }
-				anchor={ popoverAnchor }
-				hasCreateSuggestion={ userCanCreate }
-				onRemove={ removeLink }
-				onChange=
-				{ ( updatedValue ) => {
-					updateAttributes( updatedValue, setAttributes, attributes );
-				} } */ }
-
 				<PanelBody title={ __( 'Link settings' ) }>
 					<LinkControl
 						hasTextControl
@@ -575,37 +554,7 @@ export default function NavigationLinkEdit( {
 						} }
 						onRemove={ removeLink }
 					/>
-					<TextControl
-						value={ label ? stripHTML( label ) : '' }
-						onChange={ ( labelValue ) => {
-							setAttributes( { label: labelValue } );
-						} }
-						label={ __( 'Label' ) }
-						autoComplete="off"
-					/>
-					<TextControl
-						value={ url || '' }
-						onChange={ ( urlValue ) => {
-							updateAttributes(
-								{ url: urlValue },
-								setAttributes,
-								attributes
-							);
-						} }
-						label={ __( 'URL' ) }
-						autoComplete="off"
-					/>
-					<TextareaControl
-						__nextHasNoMarginBottom
-						value={ description || '' }
-						onChange={ ( descriptionValue ) => {
-							setAttributes( { description: descriptionValue } );
-						} }
-						label={ __( 'Description' ) }
-						help={ __(
-							'The description will be displayed in the menu if the current theme supports it.'
-						) }
-					/>
+
 					<TextControl
 						value={ title || '' }
 						onChange={ ( titleValue ) => {
@@ -623,7 +572,6 @@ export default function NavigationLinkEdit( {
 						autoComplete="off"
 					/>
 				</PanelBody>
->>>>>>> 9fd8fde7cfa (Implement proof of concept)
 			</InspectorControls>
 			<div { ...blockProps }>
 				{ hasMissingEntity && (
