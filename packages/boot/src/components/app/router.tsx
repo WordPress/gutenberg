@@ -234,6 +234,7 @@ export default function Router( {
 					routeTree,
 					defaultPreload: 'intent',
 					defaultNotFoundComponent: NotFoundComponent,
+					defaultViewTransition: true,
 				} );
 				setRouter( newRouter );
 			}
