@@ -216,7 +216,7 @@ export const getBlockBindingsSourceFieldsList = createRegistrySelector(
 		createSelector(
 			( state, source, blockContext ) => {
 				if ( ! source.getFieldsList ) {
-					return;
+					return [];
 				}
 
 				const context = {};
