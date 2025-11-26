@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 30.9.0 (2025-11-26)
+
 ### Bug Fixes
 
 -   `ExternalLink`: Fix arrow direction for RTL languages. The external link arrow now correctly points to the top-left (↖) instead of top-right (↗) in RTL layouts. ([#73400](https://github.com/WordPress/gutenberg/pull/73400))

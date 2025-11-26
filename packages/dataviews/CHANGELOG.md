@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 11.0.0 (2025-11-26)
+
 ### Enhancements
 
 - Simplify field normalization and types. [#73387](https://github.com/WordPress/gutenberg/pull/73387)

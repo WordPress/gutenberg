@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 11.3.0 (2025-11-26)
+
 ### Enhancements
 
 - Add new `cart` icon. ([#73509](https://github.com/WordPress/gutenberg/pull/73509))
