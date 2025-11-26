@@ -61,7 +61,6 @@ function ToolbarEditButton( {
 				mediaId={ mediaId }
 				mediaURL={ mediaUrl }
 				allowedTypes={ ALLOWED_MEDIA_TYPES }
-				accept="image/*,video/*"
 				onSelect={ onSelectMedia }
 				onToggleFeaturedImage={ toggleUseFeaturedImage }
 				useFeaturedImage={ useFeaturedImage }
@@ -91,7 +90,6 @@ function PlaceholderContainer( {
 			} }
 			className={ className }
 			onSelect={ onSelectMedia }
-			accept="image/*,video/*"
 			onToggleFeaturedImage={ toggleUseFeaturedImage }
 			allowedTypes={ ALLOWED_MEDIA_TYPES }
 			onError={ onUploadError }
