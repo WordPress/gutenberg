@@ -172,30 +172,12 @@ function gutenberg_register_packages_styles( $styles ) {
 
 	gutenberg_override_style(
 		$styles,
-		'wp-editor',
-		gutenberg_url( 'build/styles/editor/style.css' ),
-		array( 'wp-components', 'wp-block-editor', 'wp-patterns', 'wp-reusable-blocks', 'wp-preferences' ),
-		$version
-	);
-	$styles->add_data( 'wp-editor', 'rtl', 'replace' );
-
-	gutenberg_override_style(
-		$styles,
 		'wp-edit-post',
 		gutenberg_url( 'build/styles/edit-post/style.css' ),
 		array( 'wp-base-styles', 'wp-components', 'wp-block-editor', 'wp-editor', 'wp-edit-blocks', 'wp-block-library', 'wp-commands', 'wp-preferences' ),
 		$version
 	);
 	$styles->add_data( 'wp-edit-post', 'rtl', 'replace' );
-
-	gutenberg_override_style(
-		$styles,
-		'wp-components',
-		gutenberg_url( 'build/styles/components/style.css' ),
-		array( 'dashicons' ),
-		$version
-	);
-	$styles->add_data( 'wp-components', 'rtl', 'replace' );
 
 	$block_library_filename = wp_should_load_separate_core_block_assets() ? 'common' : 'style';
 	gutenberg_override_style(
