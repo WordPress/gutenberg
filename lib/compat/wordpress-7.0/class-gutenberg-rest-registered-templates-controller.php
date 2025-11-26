@@ -1,9 +1,5 @@
 <?php
 /**
- * Note:
- *
- * Moved from lib/compat/wordpress-6.9/template-activate.php to here as it needs to inherit from Gutenberg_REST_Templates_Controller_7_0.
- *
  * @see Gutenberg_REST_Templates_Controller_7_0
  */
 class Gutenberg_REST_Registered_Templates_Controller extends Gutenberg_REST_Templates_Controller_7_0 {
