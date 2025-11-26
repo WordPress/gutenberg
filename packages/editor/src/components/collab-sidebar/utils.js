@@ -140,5 +140,14 @@ export function focusCommentThread( commentId, container, additionalSelector ) {
 			observer.disconnect();
 			resolve( null );
 		}, 3000 );
-	} ).then( ( element ) => element?.focus() );
+	} ).then( ( element ) => {
+		if ( element ) {
+			element.focus();
+			element.scrollIntoView( {
+				behavior: 'smooth',
+				block: 'nearest',
+				inline: 'nearest',
+			} );
+		}
+	} );
 }
