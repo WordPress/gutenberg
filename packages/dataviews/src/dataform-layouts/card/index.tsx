@@ -7,7 +7,13 @@ import {
 	CardBody,
 	CardHeader as OriginalCardHeader,
 } from '@wordpress/components';
-import { useCallback, useContext, useMemo, useState } from '@wordpress/element';
+import {
+	useCallback,
+	useContext,
+	useMemo,
+	useState,
+	useRef,
+} from '@wordpress/element';
 import { chevronDown, chevronUp } from '@wordpress/icons';
 
 /**
@@ -50,9 +56,20 @@ const NonCollapsibleCardHeader = ( {
 export function useCardHeader( layout: NormalizedCardLayout ) {
 	const { isOpened, isCollapsible } = layout;
 	const [ isOpen, setIsOpen ] = useState( isOpened );
+	const toggleButtonRef = useRef< HTMLButtonElement >( null );
 
 	const toggle = useCallback( () => {
+		// Store reference to the toggle button before state change
+		const currentToggleButton = toggleButtonRef.current;
+
 		setIsOpen( ( prev ) => ! prev );
+
+		// Restore focus to the toggle button after the state update and re-render
+		setTimeout( () => {
+			if ( currentToggleButton ) {
+				currentToggleButton.focus();
+			}
+		}, 0 );
 	}, [] );
 
 	const CollapsibleCardHeader = useCallback(
@@ -83,6 +100,7 @@ export function useCardHeader( layout: NormalizedCardLayout ) {
 					{ children }
 				</div>
 				<Button
+					ref={ toggleButtonRef }
 					__next40pxDefaultSize
 					variant="tertiary"
 					icon={ isOpen ? chevronUp : chevronDown }

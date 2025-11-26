@@ -457,3 +457,8 @@ const view = {
 ## 0.3.0 (2024-01-10)
 
 ## 0.2.0 (2023-12-13)
+
+## 2.2.0 (2025-11-26)
+
+### Bug Fix
+- Fixed focus loss when collapsing cards in DataForm view ([#73242](https://github.com/WordPress/gutenberg/pull/73242))
