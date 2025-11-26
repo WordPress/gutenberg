@@ -1,0 +1,55 @@
+/**
+ * Frontend Edit Overlay Styles
+ *
+ * Styles for the "Edit this" hover button overlay.
+ */
+
+:root {
+	--wp-edit-overlay-button-bg: #000;
+	--wp-edit-overlay-button-color: #fff;
+	--wp-edit-overlay-button-border-color: #fff;
+	--wp-edit-overlay-z-index: 999999;
+	--wp-edit-overlay-button-padding: 0.5rem 1rem;
+	--wp-edit-overlay-button-font-size: 0.875rem;
+	--wp-edit-overlay-button-border-radius: 3px;
+}
+
+.wp-edit-overlay__button {
+	padding: var(--wp-edit-overlay-button-padding);
+	background-color: var(--wp-edit-overlay-button-bg);
+	color: var(--wp-edit-overlay-button-color);
+	border: 2px solid #fff;
+	border-radius: var(--wp-edit-overlay-button-border-radius);
+	font-size: var(--wp-edit-overlay-button-font-size);
+	font-weight: 500;
+	cursor: pointer;
+	transition: all 0.15s ease-in-out;
+	white-space: nowrap;
+	z-index: var(--wp-edit-overlay-z-index);
+	opacity: 0;
+	pointer-events: none;
+}
+
+.wp-edit-overlay__button.wp-edit-overlay--visible {
+	opacity: 1;
+	pointer-events: auto;
+}
+
+.wp-edit-overlay__button:hover {
+	background-color: #333;
+	border-color: #fff;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+	transform: translateY(-2px);
+}
+
+.wp-edit-overlay__button:focus {
+	outline: 2px solid #0073aa;
+	outline-offset: 2px;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.wp-edit-overlay__button:active {
+	background-color: #1a1a1a;
+	border-color: #1a1a1a;
+	transform: translateY(0);
+}
