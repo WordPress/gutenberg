@@ -38,18 +38,11 @@
 	"sideEffects": [
 		"build-style/**",
 		"src/**/*.scss",
-		"src/index.js",
 		"src/store/index.js",
 		"src/hooks/**",
 		"src/bindings/**",
 		"build/index.js",
-		"build/store/index.js",
-		"build/hooks/**",
-		"build/bindings/**",
-		"build-module/index.js",
-		"build-module/store/index.js",
-		"build-module/hooks/**",
-		"build-module/bindings/**"
+		"build-module/index.js"
 	],
 	"dependencies": {
 		"@floating-ui/react-dom": "2.0.8",

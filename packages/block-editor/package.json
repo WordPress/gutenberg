@@ -41,15 +41,10 @@
 	"sideEffects": [
 		"build-style/**",
 		"src/**/*.scss",
-		"src/index.js",
 		"src/store/index.js",
 		"src/hooks/**",
 		"build/index.js",
-		"build/store/index.js",
-		"build/hooks/**",
-		"build-module/index.js",
-		"build-module/store/index.js",
-		"build-module/hooks/**"
+		"build-module/index.js"
 	],
 	"dependencies": {
 		"@react-spring/web": "^9.4.5",
