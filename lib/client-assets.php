@@ -154,6 +154,15 @@ function gutenberg_register_packages_styles( $styles ) {
 	// add wp-base-styles to the already registered wp-admin stylesheet
 	$styles->query( 'wp-admin', 'registered' )->deps[] = 'wp-base-styles';
 
+	gutenberg_override_style(
+		$styles,
+		'wp-block-editor-content',
+		gutenberg_url( 'build/styles/block-editor/content.css' ),
+		array( 'wp-components' ),
+		$version
+	);
+	$styles->add_data( 'wp-block-editor-content', 'rtl', 'replace' );
+
 	$block_library_filename = wp_should_load_separate_core_block_assets() ? 'common' : 'style';
 	gutenberg_override_style(
 		$styles,
