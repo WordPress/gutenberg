@@ -8,9 +8,11 @@ import clsx from 'clsx';
  */
 import {
 	Button,
+	Dropdown,
 	Spinner,
 	Notice,
 	TextControl,
+	__experimentalDropdownContentWrapper as DropdownContentWrapper,
 	__experimentalHStack as HStack,
 	__experimentalInputControlSuffixWrapper as InputControlSuffixWrapper,
 } from '@wordpress/components';
@@ -115,6 +117,14 @@ const noop = () => {};
 const PREFERENCE_SCOPE = 'core/block-editor';
 const PREFERENCE_KEY = 'linkControlSettingsDrawer';
 
+const popoverProps = {
+	placement: 'left-start',
+	offset: 36,
+	shift: true,
+	flip: true,
+	resize: false,
+};
+
 /**
  * Renders a link control. A link control is a controlled input which maintains
  * a value associated with a link (HTML anchor element) and relevant settings
@@ -144,12 +154,15 @@ function LinkControl( {
 	renderControlBottom = null,
 	handleEntities = false,
 	hasCopyControl = true,
+	useDropdownMode = false,
 } ) {
 	if ( withCreateSuggestion === undefined && createSuggestion ) {
 		withCreateSuggestion = true;
 	}
 
 	const [ settingsOpen, setSettingsOpen ] = useState( false );
+	const [ isDropdownOpen, setIsDropdownOpen ] = useState( false );
+	const dropdownToggleRef = useRef( null );
 
 	const { advancedSettingsPreference } = useSelect( ( select ) => {
 		const prefsStore = select( preferencesStore );
@@ -235,6 +248,16 @@ function LinkControl( {
 		setIsEditingLink( forceIsEditingLink );
 	}, [ forceIsEditingLink ] );
 
+	// Handle dropdown toggle - sync with editing state
+	const handleDropdownToggle = ( isOpen ) => {
+		setIsDropdownOpen( isOpen );
+		if ( isOpen ) {
+			setIsEditingLink( true );
+		} else if ( hasLinkValue ) {
+			setIsEditingLink( false );
+		}
+	};
+
 	useEffect( () => {
 		// We don't auto focus into the Link UI on mount
 		// because otherwise using the keyboard to select text
@@ -303,6 +326,9 @@ function LinkControl( {
 		} );
 
 		stopEditing();
+		if ( useDropdownMode && dropdownToggleRef.current ) {
+			dropdownToggleRef.current();
+		}
 	};
 
 	const handleSubmit = () => {
@@ -316,6 +342,9 @@ function LinkControl( {
 			} );
 		}
 		stopEditing();
+		if ( useDropdownMode && dropdownToggleRef.current ) {
+			dropdownToggleRef.current();
+		}
 	};
 
 	const handleSubmitWithEnter = ( event ) => {
@@ -347,6 +376,10 @@ function LinkControl( {
 		} else {
 			// If there is no link value, then remove the link entirely.
 			onRemove?.();
+		}
+
+		if ( useDropdownMode && dropdownToggleRef.current ) {
+			dropdownToggleRef.current();
 		}
 
 		onCancel?.();
@@ -421,6 +454,205 @@ function LinkControl( {
 		return value;
 	}, [ value ] );
 
+	/**
+	 * Renders the editing content for LinkControl.
+	 * This includes the search input, text control, settings, and action buttons.
+	 */
+	const renderEditingContent = () => {
+		return (
+			<>
+				<div
+					className={ clsx( {
+						'block-editor-link-control__search-input-wrapper': true,
+						'has-text-control': showTextControl,
+						'has-actions': showActions,
+					} ) }
+				>
+					{ showTextControl && (
+						<TextControl
+							__nextHasNoMarginBottom
+							ref={ textInputRef }
+							className="block-editor-link-control__field block-editor-link-control__text-content"
+							label={ __( 'Text' ) }
+							value={ internalControlValue?.title }
+							onChange={ setInternalTextInputValue }
+							onKeyDown={ handleSubmitWithEnter }
+							__next40pxDefaultSize
+						/>
+					) }
+					<LinkControlSearchInput
+						ref={ searchInputRef }
+						currentLink={ value }
+						className="block-editor-link-control__field block-editor-link-control__search-input"
+						placeholder={ searchInputPlaceholder }
+						value={ currentUrlInputValue }
+						withCreateSuggestion={ withCreateSuggestion }
+						onCreateSuggestion={ createPage }
+						onChange={ setInternalURLInputValue }
+						onSelect={ handleSelectSuggestion }
+						showInitialSuggestions={ showInitialSuggestions }
+						allowDirectEntry={ ! noDirectEntry }
+						showSuggestions={ showSuggestions }
+						suggestionsQuery={ suggestionsQuery }
+						withURLSuggestion={ ! noURLSuggestion }
+						createSuggestionButtonText={
+							createSuggestionButtonText
+						}
+						hideLabelFromVision={ ! showTextControl }
+						isEntity={ isEntity }
+						suffix={
+							<SearchSuffixControl
+								isEntity={ isEntity }
+								showActions={ showActions }
+								isDisabled={ isDisabled }
+								onUnlink={ handleUnlink }
+								onSubmit={ handleSubmit }
+								helpTextId={ helpTextId }
+							/>
+						}
+					/>
+					{ isEntity && helpTextId && (
+						<p
+							id={ helpTextId }
+							className="block-editor-link-control__help"
+						>
+							{ sprintf(
+								/* translators: %s: entity type (e.g., page, post) */
+								__( 'Synced with the selected %s.' ),
+								internalControlValue?.type || 'item'
+							) }
+						</p>
+					) }
+				</div>
+				{ errorMessage && (
+					<Notice
+						className="block-editor-link-control__search-error"
+						status="error"
+						isDismissible={ false }
+					>
+						{ errorMessage }
+					</Notice>
+				) }
+				{ showSettings && (
+					<div className="block-editor-link-control__tools">
+						{ ! currentInputIsEmpty && (
+							<LinkControlSettingsDrawer
+								settingsOpen={ isSettingsOpen }
+								setSettingsOpen={
+									setSettingsOpenWithPreference
+								}
+							>
+								<LinkSettings
+									value={ internalControlValue }
+									settings={ settings }
+									onChange={ createSetInternalSettingValueHandler(
+										settingsKeys
+									) }
+								/>
+							</LinkControlSettingsDrawer>
+						) }
+					</div>
+				) }
+				{ showActions && (
+					<HStack
+						justify="right"
+						className="block-editor-link-control__search-actions"
+					>
+						<Button
+							__next40pxDefaultSize
+							variant="tertiary"
+							onClick={ handleCancel }
+						>
+							{ __( 'Cancel' ) }
+						</Button>
+						<Button
+							__next40pxDefaultSize
+							variant="primary"
+							onClick={ isDisabled ? noop : handleSubmit }
+							className="block-editor-link-control__search-submit"
+							aria-disabled={ isDisabled }
+						>
+							{ __( 'Apply' ) }
+						</Button>
+					</HStack>
+				) }
+			</>
+		);
+	};
+
+	// When in dropdown mode, wrap everything in a Dropdown
+	if ( useDropdownMode ) {
+		// If there's no value, show editing content directly (dropdown opens automatically)
+		const shouldShowEditing = isEditing || ! value || ! value.url;
+
+		return (
+			<div
+				tabIndex={ -1 }
+				ref={ wrapperNode }
+				className="block-editor-link-control"
+			>
+				{ isCreatingPage && (
+					<div className="block-editor-link-control__loading">
+						<Spinner /> { __( 'Creating' ) }…
+					</div>
+				) }
+
+				{ shouldShowEditing && ! value && (
+					// Show editing content directly when there's no value
+					<DropdownContentWrapper paddingSize="none">
+						<div className="block-editor-link-control__dropdown-content">
+							{ renderEditingContent() }
+						</div>
+					</DropdownContentWrapper>
+				) }
+
+				{ value && ! isCreatingPage && (
+					<Dropdown
+						popoverProps={ popoverProps }
+						className="block-editor-link-control__dropdown"
+						renderToggle={ ( { onToggle, isOpen } ) => {
+							// Store the toggle function so actions can close the dropdown
+							dropdownToggleRef.current = onToggle;
+
+							// Sync dropdown state with our internal state
+							if ( isOpen !== isDropdownOpen ) {
+								handleDropdownToggle( isOpen );
+							}
+
+							return (
+								<LinkPreview
+									key={ previewValue?.url }
+									value={ previewValue }
+									onToggle={ onToggle }
+									isOpen={ isOpen }
+									hasRichPreviews={ hasRichPreviews }
+									hasUnlinkControl={ shownUnlinkControl }
+									hasCopyControl={ hasCopyControl }
+									onRemove={ () => {
+										onRemove();
+										onToggle();
+									} }
+								/>
+							);
+						} }
+						renderContent={ () => (
+							<DropdownContentWrapper paddingSize="none">
+								<div className="block-editor-link-control__dropdown-content">
+									{ renderEditingContent() }
+								</div>
+							</DropdownContentWrapper>
+						) }
+					/>
+				) }
+
+				{ ! isCreatingPage &&
+					renderControlBottom &&
+					renderControlBottom() }
+			</div>
+		);
+	}
+
+	// Original non-dropdown mode
 	return (
 		<div
 			tabIndex={ -1 }
@@ -433,82 +665,7 @@ function LinkControl( {
 				</div>
 			) }
 
-			{ isEditing && (
-				<>
-					<div
-						className={ clsx( {
-							'block-editor-link-control__search-input-wrapper': true,
-							'has-text-control': showTextControl,
-							'has-actions': showActions,
-						} ) }
-					>
-						{ showTextControl && (
-							<TextControl
-								__nextHasNoMarginBottom
-								ref={ textInputRef }
-								className="block-editor-link-control__field block-editor-link-control__text-content"
-								label={ __( 'Text' ) }
-								value={ internalControlValue?.title }
-								onChange={ setInternalTextInputValue }
-								onKeyDown={ handleSubmitWithEnter }
-								__next40pxDefaultSize
-							/>
-						) }
-						<LinkControlSearchInput
-							ref={ searchInputRef }
-							currentLink={ value }
-							className="block-editor-link-control__field block-editor-link-control__search-input"
-							placeholder={ searchInputPlaceholder }
-							value={ currentUrlInputValue }
-							withCreateSuggestion={ withCreateSuggestion }
-							onCreateSuggestion={ createPage }
-							onChange={ setInternalURLInputValue }
-							onSelect={ handleSelectSuggestion }
-							showInitialSuggestions={ showInitialSuggestions }
-							allowDirectEntry={ ! noDirectEntry }
-							showSuggestions={ showSuggestions }
-							suggestionsQuery={ suggestionsQuery }
-							withURLSuggestion={ ! noURLSuggestion }
-							createSuggestionButtonText={
-								createSuggestionButtonText
-							}
-							hideLabelFromVision={ ! showTextControl }
-							isEntity={ isEntity }
-							suffix={
-								<SearchSuffixControl
-									isEntity={ isEntity }
-									showActions={ showActions }
-									isDisabled={ isDisabled }
-									onUnlink={ handleUnlink }
-									onSubmit={ handleSubmit }
-									helpTextId={ helpTextId }
-								/>
-							}
-						/>
-						{ isEntity && helpTextId && (
-							<p
-								id={ helpTextId }
-								className="block-editor-link-control__help"
-							>
-								{ sprintf(
-									/* translators: %s: entity type (e.g., page, post) */
-									__( 'Synced with the selected %s.' ),
-									internalControlValue?.type || 'item'
-								) }
-							</p>
-						) }
-					</div>
-					{ errorMessage && (
-						<Notice
-							className="block-editor-link-control__search-error"
-							status="error"
-							isDismissible={ false }
-						>
-							{ errorMessage }
-						</Notice>
-					) }
-				</>
-			) }
+			{ isEditing && renderEditingContent() }
 
 			{ value && ! isEditingLink && ! isCreatingPage && (
 				<LinkPreview
@@ -523,49 +680,6 @@ function LinkControl( {
 						setIsEditingLink( true );
 					} }
 				/>
-			) }
-
-			{ showSettings && (
-				<div className="block-editor-link-control__tools">
-					{ ! currentInputIsEmpty && (
-						<LinkControlSettingsDrawer
-							settingsOpen={ isSettingsOpen }
-							setSettingsOpen={ setSettingsOpenWithPreference }
-						>
-							<LinkSettings
-								value={ internalControlValue }
-								settings={ settings }
-								onChange={ createSetInternalSettingValueHandler(
-									settingsKeys
-								) }
-							/>
-						</LinkControlSettingsDrawer>
-					) }
-				</div>
-			) }
-
-			{ showActions && (
-				<HStack
-					justify="right"
-					className="block-editor-link-control__search-actions"
-				>
-					<Button
-						__next40pxDefaultSize
-						variant="tertiary"
-						onClick={ handleCancel }
-					>
-						{ __( 'Cancel' ) }
-					</Button>
-					<Button
-						__next40pxDefaultSize
-						variant="primary"
-						onClick={ isDisabled ? noop : handleSubmit }
-						className="block-editor-link-control__search-submit"
-						aria-disabled={ isDisabled }
-					>
-						{ __( 'Apply' ) }
-					</Button>
-				</HStack>
 			) }
 
 			{ ! isCreatingPage && renderControlBottom && renderControlBottom() }

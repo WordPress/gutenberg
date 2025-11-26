@@ -55,6 +55,8 @@ export default function LinkPreview( {
 	hasUnlinkControl = false,
 	hasCopyControl = true,
 	onRemove,
+	onToggle,
+	isOpen,
 } ) {
 	const showIconLabels = useSelect(
 		( select ) =>
@@ -102,19 +104,45 @@ export default function LinkPreview( {
 		} );
 	} );
 
+	const containerProps = onToggle
+		? {
+				role: 'button',
+				'aria-label': __( 'Edit link' ),
+				'aria-expanded': isOpen,
+				onClick: onToggle,
+				onKeyDown: ( event ) => {
+					if ( event.key === 'Enter' || event.key === ' ' ) {
+						event.preventDefault();
+						onToggle();
+					}
+				},
+				tabIndex: 0,
+				className: clsx( 'block-editor-link-control__search-item', {
+					'is-current': true,
+					'is-rich': hasRichData,
+					'is-fetching': !! isFetching,
+					'is-preview': true,
+					'is-error': isEmptyURL,
+					'is-url-title': displayTitle === displayURL,
+					'is-dropdown-toggle': true,
+					'is-open': isOpen,
+				} ),
+		  }
+		: {
+				role: 'group',
+				'aria-label': __( 'Manage link' ),
+				className: clsx( 'block-editor-link-control__search-item', {
+					'is-current': true,
+					'is-rich': hasRichData,
+					'is-fetching': !! isFetching,
+					'is-preview': true,
+					'is-error': isEmptyURL,
+					'is-url-title': displayTitle === displayURL,
+				} ),
+		  };
+
 	return (
-		<div
-			role="group"
-			aria-label={ __( 'Manage link' ) }
-			className={ clsx( 'block-editor-link-control__search-item', {
-				'is-current': true,
-				'is-rich': hasRichData,
-				'is-fetching': !! isFetching,
-				'is-preview': true,
-				'is-error': isEmptyURL,
-				'is-url-title': displayTitle === displayURL,
-			} ) }
-		>
+		<div { ...containerProps }>
 			<div className="block-editor-link-control__search-item-top">
 				<span
 					className="block-editor-link-control__search-item-header"
@@ -163,7 +191,7 @@ export default function LinkPreview( {
 				<Button
 					icon={ pencil }
 					label={ __( 'Edit link' ) }
-					onClick={ onEditClick }
+					onClick={ onToggle || onEditClick }
 					size="compact"
 					showTooltip={ ! showIconLabels }
 				/>

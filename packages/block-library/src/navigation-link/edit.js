@@ -540,6 +540,7 @@ export default function NavigationLinkEdit( {
 						hasTextControl
 						hasRichPreviews
 						hasCopyControl={ false }
+						useDropdownMode={ true }
 						className="wp-block-navigation-link__inline-link-input"
 						value={ testLink }
 						showInitialSuggestions={ true }
