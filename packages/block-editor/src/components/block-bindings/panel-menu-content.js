@@ -61,7 +61,7 @@ function BlockBindingsSourceMenuItem( {
 					[ attribute ]: itemBindings,
 				},
 			} ),
-		[ itemBindings, source ]
+		[ attribute, blockContext, itemBindings, source ]
 	);
 	const { updateBlockBindings } = useBlockBindingsUtils();
 
@@ -98,6 +98,45 @@ function BlockBindingsSourceMenuItem( {
 	);
 }
 
+function BlockBindingsSourceMenu( { attribute, binding, sourceKey, data } ) {
+	const isMobile = useViewportMatch( 'medium', '<' );
+
+	// Only render source if it has compatible data for this specific attribute.
+	if ( ! data || data.length === 0 ) {
+		return null;
+	}
+
+	const source = getBlockBindingsSource( sourceKey );
+
+	return (
+		<Menu
+			key={ sourceKey }
+			placement={ isMobile ? 'bottom-start' : 'left-start' }
+		>
+			<Menu.SubmenuTriggerItem>
+				<Menu.ItemLabel>{ source.label }</Menu.ItemLabel>
+			</Menu.SubmenuTriggerItem>
+			<Menu.Popover gutter={ 8 }>
+				<Menu.Group>
+					{ data.map( ( item ) => (
+						<BlockBindingsSourceMenuItem
+							key={
+								sourceKey + JSON.stringify( item.args ) ||
+								item.key
+							}
+							attribute={ attribute }
+							binding={ binding }
+							item={ item }
+							source={ source }
+							sourceKey={ sourceKey }
+						/>
+					) ) }
+				</Menu.Group>
+			</Menu.Popover>
+		</Menu>
+	);
+}
+
 export default function BlockBindingsPanelMenuContent( {
 	attribute,
 	binding,
@@ -118,47 +157,18 @@ export default function BlockBindingsPanelMenuContent( {
 	return (
 		<Menu placement={ isMobile ? 'bottom-start' : 'left-start' }>
 			{ Object.entries( sources ).map( ( [ sourceKey, data ] ) => {
-				// Only show sources that have compatible data for this specific attribute.
 				const sourceDataItems = data.filter(
 					( item ) => item.type === attributeType
 				);
 
-				const noItemsAvailable =
-					! sourceDataItems || sourceDataItems.length === 0;
-
-				if ( noItemsAvailable ) {
-					return null;
-				}
-
-				const source = getBlockBindingsSource( sourceKey );
-
 				return (
-					<Menu
+					<BlockBindingsSourceMenu
 						key={ sourceKey }
-						placement={ isMobile ? 'bottom-start' : 'left-start' }
-					>
-						<Menu.SubmenuTriggerItem>
-							<Menu.ItemLabel>{ source.label }</Menu.ItemLabel>
-						</Menu.SubmenuTriggerItem>
-						<Menu.Popover gutter={ 8 }>
-							<Menu.Group>
-								{ sourceDataItems.map( ( item ) => (
-									<BlockBindingsSourceMenuItem
-										key={
-											sourceKey +
-												JSON.stringify( item.args ) ||
-											item.key
-										}
-										attribute={ attribute }
-										binding={ binding }
-										item={ item }
-										source={ source }
-										sourceKey={ sourceKey }
-									/>
-								) ) }
-							</Menu.Group>
-						</Menu.Popover>
-					</Menu>
+						attribute={ attribute }
+						binding={ binding }
+						sourceKey={ sourceKey }
+						data={ sourceDataItems }
+					/>
 				);
 			} ) }
 		</Menu>
