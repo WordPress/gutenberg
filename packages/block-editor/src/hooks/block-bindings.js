@@ -7,6 +7,7 @@ import {
 	__experimentalItemGroup as ItemGroup,
 	__experimentalText as Text,
 	__experimentalToolsPanel as ToolsPanel,
+	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { useContext } from '@wordpress/element';
@@ -17,7 +18,7 @@ import { useViewportMatch } from '@wordpress/compose';
  */
 import {
 	BlockBindingsPanelItem,
-	BlockBindingsPanelMenuContent,
+	BlockBindingsSourceMenu,
 	getAttributeType,
 } from '../components/block-bindings';
 import { useBlockBindingsUtils } from '../utils/block-bindings';
@@ -25,6 +26,8 @@ import { unlock } from '../lock-unlock';
 import InspectorControls from '../components/inspector-controls';
 import BlockContext from '../components/block-context';
 import { store as blockEditorStore } from '../store';
+
+const { Menu } = unlock( componentsPrivateApis );
 
 const useToolsPanelDropdownMenuProps = () => {
 	const isMobile = useViewportMatch( 'medium', '<' );
@@ -43,6 +46,7 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 	const blockContext = useContext( BlockContext );
 	const { removeAllBlockBindings } = useBlockBindingsUtils();
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
+	const isMobile = useViewportMatch( 'medium', '<' );
 
 	// Use useSelect to ensure sources are updated whenever there are updates in block context
 	// or when underlying data changes.
@@ -162,11 +166,24 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 								sources={ sources }
 								blockName={ blockName }
 							>
-								<BlockBindingsPanelMenuContent
-									attribute={ attribute }
-									binding={ binding }
-									sources={ sources }
-								/>
+								<Menu
+									placement={
+										isMobile ? 'bottom-start' : 'left-start'
+									}
+								>
+									{ Object.entries( sources ).map(
+										( [ sourceKey, data ] ) => (
+											<BlockBindingsSourceMenu
+												key={ sourceKey }
+												args={ binding?.args }
+												attribute={ attribute }
+												blockName={ blockName }
+												sourceKey={ sourceKey }
+												data={ data }
+											/>
+										)
+									) }
+								</Menu>
 							</BlockBindingsPanelItem>
 						);
 					} ) }

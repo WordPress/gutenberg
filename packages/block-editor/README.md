@@ -104,6 +104,10 @@ _Related_
 
 Internal dependencies
 
+### BlockBindingsSourceMenu
+
+Undocumented declaration.
+
 ### BlockBreadcrumb
 
 Block breadcrumb component, displaying the hierarchy of the current block selection as a breadcrumb.

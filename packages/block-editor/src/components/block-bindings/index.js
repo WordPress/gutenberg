@@ -3,6 +3,6 @@
  */
 export { default as BlockBindingsPanelItem } from './attribute';
 export {
-	default as BlockBindingsPanelMenuContent,
+	default as BlockBindingsSourceMenu,
 	getAttributeType,
-} from './panel-menu-content';
+} from './source-menu';

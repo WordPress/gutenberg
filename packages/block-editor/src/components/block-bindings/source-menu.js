@@ -18,8 +18,6 @@ import { useViewportMatch } from '@wordpress/compose';
 import { useBlockBindingsUtils } from '../../utils/block-bindings';
 import { unlock } from '../../lock-unlock';
 import BlockContext from '../block-context';
-import { useBlockEditContext } from '../block-edit';
-import { store as blockEditorStore } from '../../store';
 
 const { Menu } = unlock( componentsPrivateApis );
 
@@ -98,7 +96,7 @@ function BlockBindingsSourceMenuItem( {
 	);
 }
 
-function BlockBindingsSourceMenu( {
+export default function BlockBindingsSourceMenu( {
 	args,
 	attribute,
 	blockName,
@@ -143,35 +141,6 @@ function BlockBindingsSourceMenu( {
 					) ) }
 				</Menu.Group>
 			</Menu.Popover>
-		</Menu>
-	);
-}
-
-export default function BlockBindingsPanelMenuContent( {
-	attribute,
-	binding,
-	sources,
-} ) {
-	const { clientId } = useBlockEditContext();
-	const isMobile = useViewportMatch( 'medium', '<' );
-	const { blockName } = useSelect(
-		( select ) => ( {
-			blockName: select( blockEditorStore ).getBlock( clientId ).name,
-		} ),
-		[ clientId ]
-	);
-	return (
-		<Menu placement={ isMobile ? 'bottom-start' : 'left-start' }>
-			{ Object.entries( sources ).map( ( [ sourceKey, data ] ) => (
-				<BlockBindingsSourceMenu
-					key={ sourceKey }
-					args={ binding?.args }
-					attribute={ attribute }
-					blockName={ blockName }
-					sourceKey={ sourceKey }
-					data={ data }
-				/>
-			) ) }
 		</Menu>
 	);
 }
