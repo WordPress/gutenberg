@@ -98,11 +98,21 @@ function BlockBindingsSourceMenuItem( {
 	);
 }
 
-function BlockBindingsSourceMenu( { args, attribute, sourceKey, data } ) {
+function BlockBindingsSourceMenu( {
+	args,
+	attribute,
+	blockName,
+	sourceKey,
+	data,
+} ) {
 	const isMobile = useViewportMatch( 'medium', '<' );
 
+	const sourceDataItems = data.filter(
+		( item ) => item.type === getAttributeType( blockName, attribute )
+	);
+
 	// Only render source if it has compatible data for this specific attribute.
-	if ( ! data || data.length === 0 ) {
+	if ( ! sourceDataItems || sourceDataItems.length === 0 ) {
 		return null;
 	}
 
@@ -118,7 +128,7 @@ function BlockBindingsSourceMenu( { args, attribute, sourceKey, data } ) {
 			</Menu.SubmenuTriggerItem>
 			<Menu.Popover gutter={ 8 }>
 				<Menu.Group>
-					{ data.map( ( item ) => (
+					{ sourceDataItems.map( ( item ) => (
 						<BlockBindingsSourceMenuItem
 							key={
 								sourceKey + JSON.stringify( item.args ) ||
@@ -144,33 +154,24 @@ export default function BlockBindingsPanelMenuContent( {
 } ) {
 	const { clientId } = useBlockEditContext();
 	const isMobile = useViewportMatch( 'medium', '<' );
-	const { attributeType } = useSelect(
-		( select ) => {
-			const { name: blockName } =
-				select( blockEditorStore ).getBlock( clientId );
-			return {
-				attributeType: getAttributeType( blockName, attribute ),
-			};
-		},
-		[ clientId, attribute ]
+	const { blockName } = useSelect(
+		( select ) => ( {
+			blockName: select( blockEditorStore ).getBlock( clientId ).name,
+		} ),
+		[ clientId ]
 	);
 	return (
 		<Menu placement={ isMobile ? 'bottom-start' : 'left-start' }>
-			{ Object.entries( sources ).map( ( [ sourceKey, data ] ) => {
-				const sourceDataItems = data.filter(
-					( item ) => item.type === attributeType
-				);
-
-				return (
-					<BlockBindingsSourceMenu
-						key={ sourceKey }
-						args={ binding?.args }
-						attribute={ attribute }
-						sourceKey={ sourceKey }
-						data={ sourceDataItems }
-					/>
-				);
-			} ) }
+			{ Object.entries( sources ).map( ( [ sourceKey, data ] ) => (
+				<BlockBindingsSourceMenu
+					key={ sourceKey }
+					args={ binding?.args }
+					attribute={ attribute }
+					blockName={ blockName }
+					sourceKey={ sourceKey }
+					data={ data }
+				/>
+			) ) }
 		</Menu>
 	);
 }
