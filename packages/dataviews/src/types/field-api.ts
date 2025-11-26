@@ -302,6 +302,22 @@ export type FieldValidity = {
 		type: 'valid' | 'invalid' | 'validating';
 		message: string;
 	};
+	min?: {
+		type: 'valid' | 'invalid' | 'validating';
+		message: string;
+	};
+	max?: {
+		type: 'valid' | 'invalid' | 'validating';
+		message: string;
+	};
+	minLength?: {
+		type: 'valid' | 'invalid' | 'validating';
+		message: string;
+	};
+	maxLength?: {
+		type: 'valid' | 'invalid' | 'validating';
+		message: string;
+	};
 	elements?: {
 		type: 'valid' | 'invalid' | 'validating';
 		message: string;
