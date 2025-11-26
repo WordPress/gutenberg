@@ -6,16 +6,32 @@ const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 async function navigateToTemplateEditor( { admin, editor, page } ) {
 	await admin.visitAdminPage( 'edit.php', 'post_type=page' );
 	await page.getByLabel( '“Privacy Policy” (Edit)' ).click();
-	await page.getByRole( 'button', { name: 'Close' } ).click();
+
+	// Close welcome guide if visible.
+	const welcomeGuide = page.getByRole( 'dialog', {
+		name: 'Welcome to the editor',
+	} );
+	const welcomeGuideVisible = await welcomeGuide.isVisible();
+	if ( welcomeGuideVisible ) {
+		await welcomeGuide.getByRole( 'button', { name: 'Close' } ).click();
+	}
+
+	// Close pattern chooser dialog if visible.
+	const patternDialog = page.getByRole( 'dialog', {
+		name: 'Choose a pattern',
+	} );
+	try {
+		await expect( patternDialog ).toBeVisible( { timeout: 2000 } );
+		await patternDialog.getByRole( 'button', { name: 'Close' } ).click();
+		await expect( patternDialog ).toBeHidden();
+	} catch {
+		// Dialog not visible.
+	}
 
 	await editor.openDocumentSettingsSidebar();
 	const settingsPanel = page.getByRole( 'region', {
 		name: 'Editor settings',
 	} );
-	await page
-		.getByRole( 'dialog', { name: 'Choose a pattern' } )
-		.getByRole( 'button', { name: 'Close' } )
-		.click();
 	await settingsPanel.getByRole( 'tab', { name: 'Page' } ).click();
 	await settingsPanel
 		.getByRole( 'button', { name: 'Template options' } )
@@ -28,8 +44,11 @@ async function navigateToTemplateEditor( { admin, editor, page } ) {
 	const getStartedButton = page.getByRole( 'button', {
 		name: 'Get started',
 	} );
-	if ( await getStartedButton.isVisible() ) {
+	try {
+		await expect( getStartedButton ).toBeVisible( { timeout: 2000 } );
 		await getStartedButton.click();
+	} catch {
+		// Welcome guide not visible.
 	}
 }
 
