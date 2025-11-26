@@ -588,8 +588,7 @@ add_action( 'pre_get_block_template', 'gutenberg_get_block_template', 10, 3 );
 ///////////////////////////////////////////////////////////////////////
 // This function is a copy of core's, except for the marked section. //
 ///////////////////////////////////////////////////////////////////////
-function gutenberg_get_block_template( $output, $id, $template_type ) {
-	function gutenberg_get_block_template( $output = null, $id = null, $template_type = null ) {
+function gutenberg_get_block_template( $output = null, $id = null, $template_type = null ) {
 	// get_block_template() expects 2 arguments: $template_type and $id.
 	// This allows gutenberg_get_block_template() to also be called with 2 arguments,
 	// and treat them as $template_type and $id.
