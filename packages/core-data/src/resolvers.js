@@ -906,8 +906,8 @@ export const getDefaultTemplateId =
 		// instead of numeric wp_id, as the frontend expects string IDs for templates
 		// when the experiment is disabled.
 		const id = window?.__experimentalTemplateActivate
-			? template?.wp_id || template?.id
-			: template?.id || template?.wp_id;
+			? template?.wp_id
+			: template?.id;
 		// Endpoint may return an empty object if no template is found.
 		if ( id ) {
 			template.id = id;
