@@ -17,6 +17,7 @@ import { EditorSnackbars } from '@wordpress/editor';
  */
 import Sidebar from '../sidebar';
 import SavePanel from '../save-panel';
+import CanvasRenderer from '../canvas-renderer';
 import { unlock } from '../../lock-unlock';
 import type { CanvasData } from '../../store/types';
 import './style.scss';
@@ -31,6 +32,8 @@ export default function Root() {
 		| CanvasData
 		| null
 		| undefined;
+	const routeContentModule = ( currentMatch?.loaderData as any )
+		?.routeContentModule as string | undefined;
 	const isFullScreen = canvas && ! canvas.isPreview;
 
 	return (
@@ -56,6 +59,15 @@ export default function Root() {
 						>
 							<Outlet />
 						</ThemeProvider>
+						{ /* Render Canvas in Root to prevent remounting on route changes */ }
+						{ ( canvas || canvas === null ) && (
+							<div className="boot-layout__canvas">
+								<CanvasRenderer
+									canvas={ canvas }
+									routeContentModule={ routeContentModule }
+								/>
+							</div>
+						) }
 					</div>
 				</div>
 			</ThemeProvider>
