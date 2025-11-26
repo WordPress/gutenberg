@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 9.1.0 (2025-11-26)
+
 ## 9.0.0 (2025-11-12)
 
 ### Breaking Changes

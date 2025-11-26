@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/e2e-tests",
-	"version": "9.0.0",
+	"version": "9.1.0-prerelease",
 	"description": "Test plugins and mu-plugins for E2E tests in WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
