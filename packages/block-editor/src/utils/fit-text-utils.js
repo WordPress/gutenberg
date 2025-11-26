@@ -11,48 +11,28 @@
  * @return {number} Optimal font size
  */
 function findOptimalFontSize( textElement, applyFontSize ) {
-	const alreadyHasScrollableHeight =
-		textElement.scrollHeight > textElement.clientHeight;
-	let minSize = 5;
-	let maxSize = 2400;
-	let bestSize = minSize;
-
 	const computedStyle = window.getComputedStyle( textElement );
 	const paddingLeft = parseFloat( computedStyle.paddingLeft ) || 0;
 	const paddingRight = parseFloat( computedStyle.paddingRight ) || 0;
 	const range = document.createRange();
 	range.selectNodeContents( textElement );
 
-	while ( minSize <= maxSize ) {
-		const midSize = Math.floor( ( minSize + maxSize ) / 2 );
-		applyFontSize( midSize );
-
-		// When there is padding if the text overflows to the
-		// padding area, it should be considered overflowing.
-		// Use Range API to measure actual text content dimensions.
-		const rect = range.getBoundingClientRect();
-		const textWidth = rect.width;
-
-		// Check if text fits within the element's width and is not
-		// overflowing into the padding area.
-		const fitsWidth =
-			textElement.scrollWidth <= textElement.clientWidth &&
-			textWidth <= textElement.clientWidth - paddingLeft - paddingRight;
-		// Check if text fits within the element's height.
-		const fitsHeight =
-			alreadyHasScrollableHeight ||
-			textElement.scrollHeight <= textElement.clientHeight;
-
-		if ( fitsWidth && fitsHeight ) {
-			bestSize = midSize;
-			minSize = midSize + 1;
-		} else {
-			maxSize = midSize - 1;
-		}
-	}
+	const currentFontSize = parseFloat( computedStyle.fontSize ) || 16;
+	const currentWidth = range.getBoundingClientRect().width;
 	range.detach();
 
-	return bestSize;
+	const availableWidth = textElement.clientWidth - paddingLeft - paddingRight;
+
+	// Estimate optimal size by scaling proportionally.
+	// If text at currentFontSize takes currentWidth, then to fit availableWidth:
+	// optimalSize ≈ currentFontSize * (availableWidth / currentWidth)
+	const estimatedSize = Math.floor(
+		currentFontSize * ( availableWidth / currentWidth )
+	);
+
+	applyFontSize( estimatedSize );
+
+	return estimatedSize;
 }
 
 /**
