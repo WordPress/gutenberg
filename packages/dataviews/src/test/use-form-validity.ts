@@ -799,6 +799,801 @@ describe( 'useFormValidity', () => {
 		} );
 	} );
 
+	describe( 'isValid.min', () => {
+		const MIN_MESSAGE = {
+			min: {
+				type: 'invalid',
+				message: 'Value is below the minimum.',
+			},
+		};
+
+		it( 'integer is valid when value is at min', () => {
+			const item = { id: 1, quantity: 5 };
+			const fields: Field< {} >[] = [
+				{
+					id: 'quantity',
+					type: 'integer',
+					isValid: {
+						min: 5,
+					},
+				},
+			];
+			const form = { fields: [ 'quantity' ] };
+			const {
+				result: {
+					current: { validity, isValid },
+				},
+			} = renderHook( () => useFormValidity( item, fields, form ) );
+			expect( validity ).toEqual( undefined );
+			expect( isValid ).toBe( true );
+		} );
+
+		it( 'integer is valid when value is above min', () => {
+			const item = { id: 1, quantity: 10 };
+			const fields: Field< {} >[] = [
+				{
+					id: 'quantity',
+					type: 'integer',
+					isValid: {
+						min: 5,
+					},
+				},
+			];
+			const form = { fields: [ 'quantity' ] };
+			const {
+				result: {
+					current: { validity, isValid },
+				},
+			} = renderHook( () => useFormValidity( item, fields, form ) );
+			expect( validity ).toEqual( undefined );
+			expect( isValid ).toBe( true );
+		} );
+
+		it( 'integer is invalid when value is below min', () => {
+			const item = { id: 1, quantity: 3 };
+			const fields: Field< {} >[] = [
+				{
+					id: 'quantity',
+					type: 'integer',
+					isValid: {
+						min: 5,
+					},
+				},
+			];
+			const form = { fields: [ 'quantity' ] };
+			const {
+				result: {
+					current: { validity, isValid },
+				},
+			} = renderHook( () => useFormValidity( item, fields, form ) );
+			expect( validity?.quantity ).toEqual( MIN_MESSAGE );
+			expect( isValid ).toBe( false );
+		} );
+
+		it( 'integer is valid when value is empty and min is defined', () => {
+			const item = { id: 1, quantity: undefined };
+			const fields: Field< {} >[] = [
+				{
+					id: 'quantity',
+					type: 'integer',
+					isValid: {
+						min: 5,
+					},
+				},
+			];
+			const form = { fields: [ 'quantity' ] };
+			const {
+				result: {
+					current: { validity, isValid },
+				},
+			} = renderHook( () => useFormValidity( item, fields, form ) );
+			expect( validity ).toEqual( undefined );
+			expect( isValid ).toBe( true );
+		} );
+
+		it( 'number is valid when value is at or above min', () => {
+			const item = { id: 1, price: 9.99 };
+			const fields: Field< {} >[] = [
+				{
+					id: 'price',
+					type: 'number',
+					isValid: {
+						min: 5.5,
+					},
+				},
+			];
+			const form = { fields: [ 'price' ] };
+			const {
+				result: {
+					current: { validity, isValid },
+				},
+			} = renderHook( () => useFormValidity( item, fields, form ) );
+			expect( validity ).toEqual( undefined );
+			expect( isValid ).toBe( true );
+		} );
+
+		it( 'number is invalid when value is below min', () => {
+			const item = { id: 1, price: 2.5 };
+			const fields: Field< {} >[] = [
+				{
+					id: 'price',
+					type: 'number',
+					isValid: {
+						min: 5.5,
+					},
+				},
+			];
+			const form = { fields: [ 'price' ] };
+			const {
+				result: {
+					current: { validity, isValid },
+				},
+			} = renderHook( () => useFormValidity( item, fields, form ) );
+			expect( validity?.price ).toEqual( MIN_MESSAGE );
+			expect( isValid ).toBe( false );
+		} );
+	} );
+
+	describe( 'isValid.max', () => {
+		const MAX_MESSAGE = {
+			max: {
+				type: 'invalid',
+				message: 'Value is above the maximum.',
+			},
+		};
+
+		it( 'integer is valid when value is at max', () => {
+			const item = { id: 1, quantity: 100 };
+			const fields: Field< {} >[] = [
+				{
+					id: 'quantity',
+					type: 'integer',
+					isValid: {
+						max: 100,
+					},
+				},
+			];
+			const form = { fields: [ 'quantity' ] };
+			const {
+				result: {
+					current: { validity, isValid },
+				},
+			} = renderHook( () => useFormValidity( item, fields, form ) );
+			expect( validity ).toEqual( undefined );
+			expect( isValid ).toBe( true );
+		} );
+
+		it( 'integer is valid when value is below max', () => {
+			const item = { id: 1, quantity: 50 };
+			const fields: Field< {} >[] = [
+				{
+					id: 'quantity',
+					type: 'integer',
+					isValid: {
+						max: 100,
+					},
+				},
+			];
+			const form = { fields: [ 'quantity' ] };
+			const {
+				result: {
+					current: { validity, isValid },
+				},
+			} = renderHook( () => useFormValidity( item, fields, form ) );
+			expect( validity ).toEqual( undefined );
+			expect( isValid ).toBe( true );
+		} );
+
+		it( 'integer is invalid when value is above max', () => {
+			const item = { id: 1, quantity: 150 };
+			const fields: Field< {} >[] = [
+				{
+					id: 'quantity',
+					type: 'integer',
+					isValid: {
+						max: 100,
+					},
+				},
+			];
+			const form = { fields: [ 'quantity' ] };
+			const {
+				result: {
+					current: { validity, isValid },
+				},
+			} = renderHook( () => useFormValidity( item, fields, form ) );
+			expect( validity?.quantity ).toEqual( MAX_MESSAGE );
+			expect( isValid ).toBe( false );
+		} );
+
+		it( 'integer is valid when value is empty and max is defined', () => {
+			const item = { id: 1, quantity: undefined };
+			const fields: Field< {} >[] = [
+				{
+					id: 'quantity',
+					type: 'integer',
+					isValid: {
+						max: 100,
+					},
+				},
+			];
+			const form = { fields: [ 'quantity' ] };
+			const {
+				result: {
+					current: { validity, isValid },
+				},
+			} = renderHook( () => useFormValidity( item, fields, form ) );
+			expect( validity ).toEqual( undefined );
+			expect( isValid ).toBe( true );
+		} );
+
+		it( 'number is valid when value is at or below max', () => {
+			const item = { id: 1, price: 99.99 };
+			const fields: Field< {} >[] = [
+				{
+					id: 'price',
+					type: 'number',
+					isValid: {
+						max: 100.0,
+					},
+				},
+			];
+			const form = { fields: [ 'price' ] };
+			const {
+				result: {
+					current: { validity, isValid },
+				},
+			} = renderHook( () => useFormValidity( item, fields, form ) );
+			expect( validity ).toEqual( undefined );
+			expect( isValid ).toBe( true );
+		} );
+
+		it( 'number is invalid when value is above max', () => {
+			const item = { id: 1, price: 150.5 };
+			const fields: Field< {} >[] = [
+				{
+					id: 'price',
+					type: 'number',
+					isValid: {
+						max: 100.0,
+					},
+				},
+			];
+			const form = { fields: [ 'price' ] };
+			const {
+				result: {
+					current: { validity, isValid },
+				},
+			} = renderHook( () => useFormValidity( item, fields, form ) );
+			expect( validity?.price ).toEqual( MAX_MESSAGE );
+			expect( isValid ).toBe( false );
+		} );
+	} );
+
+	describe( 'isValid.minLength', () => {
+		const MIN_LENGTH_MESSAGE = {
+			minLength: {
+				type: 'invalid',
+				message: 'Value is too short.',
+			},
+		};
+
+		it( 'text is valid when value length is at minLength', () => {
+			const item = { id: 1, username: 'abcde' };
+			const fields: Field< {} >[] = [
+				{
+					id: 'username',
+					type: 'text',
+					isValid: {
+						minLength: 5,
+					},
+				},
+			];
+			const form = { fields: [ 'username' ] };
+			const {
+				result: {
+					current: { validity, isValid },
+				},
+			} = renderHook( () => useFormValidity( item, fields, form ) );
+			expect( validity ).toEqual( undefined );
+			expect( isValid ).toBe( true );
+		} );
+
+		it( 'text is valid when value length is above minLength', () => {
+			const item = { id: 1, username: 'abcdefghij' };
+			const fields: Field< {} >[] = [
+				{
+					id: 'username',
+					type: 'text',
+					isValid: {
+						minLength: 5,
+					},
+				},
+			];
+			const form = { fields: [ 'username' ] };
+			const {
+				result: {
+					current: { validity, isValid },
+				},
+			} = renderHook( () => useFormValidity( item, fields, form ) );
+			expect( validity ).toEqual( undefined );
+			expect( isValid ).toBe( true );
+		} );
+
+		it( 'text is invalid when value length is below minLength', () => {
+			const item = { id: 1, username: 'abc' };
+			const fields: Field< {} >[] = [
+				{
+					id: 'username',
+					type: 'text',
+					isValid: {
+						minLength: 5,
+					},
+				},
+			];
+			const form = { fields: [ 'username' ] };
+			const {
+				result: {
+					current: { validity, isValid },
+				},
+			} = renderHook( () => useFormValidity( item, fields, form ) );
+			expect( validity?.username ).toEqual( MIN_LENGTH_MESSAGE );
+			expect( isValid ).toBe( false );
+		} );
+
+		it( 'text is valid when value is empty and minLength is defined', () => {
+			const item = { id: 1, username: '' };
+			const fields: Field< {} >[] = [
+				{
+					id: 'username',
+					type: 'text',
+					isValid: {
+						minLength: 5,
+					},
+				},
+			];
+			const form = { fields: [ 'username' ] };
+			const {
+				result: {
+					current: { validity, isValid },
+				},
+			} = renderHook( () => useFormValidity( item, fields, form ) );
+			expect( validity ).toEqual( undefined );
+			expect( isValid ).toBe( true );
+		} );
+
+		it( 'email is valid when value length meets minLength', () => {
+			const item = { id: 1, email: 'user@example.com' };
+			const fields: Field< {} >[] = [
+				{
+					id: 'email',
+					type: 'email',
+					isValid: {
+						minLength: 10,
+					},
+				},
+			];
+			const form = { fields: [ 'email' ] };
+			const {
+				result: {
+					current: { validity, isValid },
+				},
+			} = renderHook( () => useFormValidity( item, fields, form ) );
+			expect( validity ).toEqual( undefined );
+			expect( isValid ).toBe( true );
+		} );
+
+		it( 'email is invalid when value length is below minLength', () => {
+			const item = { id: 1, email: 'a@b.co' };
+			const fields: Field< {} >[] = [
+				{
+					id: 'email',
+					type: 'email',
+					isValid: {
+						minLength: 10,
+					},
+				},
+			];
+			const form = { fields: [ 'email' ] };
+			const {
+				result: {
+					current: { validity, isValid },
+				},
+			} = renderHook( () => useFormValidity( item, fields, form ) );
+			expect( validity?.email ).toEqual( MIN_LENGTH_MESSAGE );
+			expect( isValid ).toBe( false );
+		} );
+
+		it( 'url is valid when value length meets minLength', () => {
+			const item = { id: 1, website: 'https://example.com' };
+			const fields: Field< {} >[] = [
+				{
+					id: 'website',
+					type: 'url',
+					isValid: {
+						minLength: 10,
+					},
+				},
+			];
+			const form = { fields: [ 'website' ] };
+			const {
+				result: {
+					current: { validity, isValid },
+				},
+			} = renderHook( () => useFormValidity( item, fields, form ) );
+			expect( validity ).toEqual( undefined );
+			expect( isValid ).toBe( true );
+		} );
+
+		it( 'url is invalid when value length is below minLength', () => {
+			const item = { id: 1, website: 'http://a' };
+			const fields: Field< {} >[] = [
+				{
+					id: 'website',
+					type: 'url',
+					isValid: {
+						minLength: 15,
+					},
+				},
+			];
+			const form = { fields: [ 'website' ] };
+			const {
+				result: {
+					current: { validity, isValid },
+				},
+			} = renderHook( () => useFormValidity( item, fields, form ) );
+			expect( validity?.website ).toEqual( MIN_LENGTH_MESSAGE );
+			expect( isValid ).toBe( false );
+		} );
+
+		it( 'telephone is valid when value length meets minLength', () => {
+			const item = { id: 1, phone: '+1-555-123-4567' };
+			const fields: Field< {} >[] = [
+				{
+					id: 'phone',
+					type: 'telephone',
+					isValid: {
+						minLength: 10,
+					},
+				},
+			];
+			const form = { fields: [ 'phone' ] };
+			const {
+				result: {
+					current: { validity, isValid },
+				},
+			} = renderHook( () => useFormValidity( item, fields, form ) );
+			expect( validity ).toEqual( undefined );
+			expect( isValid ).toBe( true );
+		} );
+
+		it( 'telephone is invalid when value length is below minLength', () => {
+			const item = { id: 1, phone: '555' };
+			const fields: Field< {} >[] = [
+				{
+					id: 'phone',
+					type: 'telephone',
+					isValid: {
+						minLength: 10,
+					},
+				},
+			];
+			const form = { fields: [ 'phone' ] };
+			const {
+				result: {
+					current: { validity, isValid },
+				},
+			} = renderHook( () => useFormValidity( item, fields, form ) );
+			expect( validity?.phone ).toEqual( MIN_LENGTH_MESSAGE );
+			expect( isValid ).toBe( false );
+		} );
+
+		it( 'password is valid when value length meets minLength', () => {
+			const item = { id: 1, password: 'securepassword123' };
+			const fields: Field< {} >[] = [
+				{
+					id: 'password',
+					type: 'password',
+					isValid: {
+						minLength: 8,
+					},
+				},
+			];
+			const form = { fields: [ 'password' ] };
+			const {
+				result: {
+					current: { validity, isValid },
+				},
+			} = renderHook( () => useFormValidity( item, fields, form ) );
+			expect( validity ).toEqual( undefined );
+			expect( isValid ).toBe( true );
+		} );
+
+		it( 'password is invalid when value length is below minLength', () => {
+			const item = { id: 1, password: 'short' };
+			const fields: Field< {} >[] = [
+				{
+					id: 'password',
+					type: 'password',
+					isValid: {
+						minLength: 8,
+					},
+				},
+			];
+			const form = { fields: [ 'password' ] };
+			const {
+				result: {
+					current: { validity, isValid },
+				},
+			} = renderHook( () => useFormValidity( item, fields, form ) );
+			expect( validity?.password ).toEqual( MIN_LENGTH_MESSAGE );
+			expect( isValid ).toBe( false );
+		} );
+	} );
+
+	describe( 'isValid.maxLength', () => {
+		const MAX_LENGTH_MESSAGE = {
+			maxLength: {
+				type: 'invalid',
+				message: 'Value is too long.',
+			},
+		};
+
+		it( 'text is valid when value length is at maxLength', () => {
+			const item = { id: 1, username: 'abcdefghij' };
+			const fields: Field< {} >[] = [
+				{
+					id: 'username',
+					type: 'text',
+					isValid: {
+						maxLength: 10,
+					},
+				},
+			];
+			const form = { fields: [ 'username' ] };
+			const {
+				result: {
+					current: { validity, isValid },
+				},
+			} = renderHook( () => useFormValidity( item, fields, form ) );
+			expect( validity ).toEqual( undefined );
+			expect( isValid ).toBe( true );
+		} );
+
+		it( 'text is valid when value length is below maxLength', () => {
+			const item = { id: 1, username: 'abc' };
+			const fields: Field< {} >[] = [
+				{
+					id: 'username',
+					type: 'text',
+					isValid: {
+						maxLength: 10,
+					},
+				},
+			];
+			const form = { fields: [ 'username' ] };
+			const {
+				result: {
+					current: { validity, isValid },
+				},
+			} = renderHook( () => useFormValidity( item, fields, form ) );
+			expect( validity ).toEqual( undefined );
+			expect( isValid ).toBe( true );
+		} );
+
+		it( 'text is invalid when value length is above maxLength', () => {
+			const item = { id: 1, username: 'abcdefghijklmnop' };
+			const fields: Field< {} >[] = [
+				{
+					id: 'username',
+					type: 'text',
+					isValid: {
+						maxLength: 10,
+					},
+				},
+			];
+			const form = { fields: [ 'username' ] };
+			const {
+				result: {
+					current: { validity, isValid },
+				},
+			} = renderHook( () => useFormValidity( item, fields, form ) );
+			expect( validity?.username ).toEqual( MAX_LENGTH_MESSAGE );
+			expect( isValid ).toBe( false );
+		} );
+
+		it( 'text is valid when value is empty and maxLength is defined', () => {
+			const item = { id: 1, username: '' };
+			const fields: Field< {} >[] = [
+				{
+					id: 'username',
+					type: 'text',
+					isValid: {
+						maxLength: 10,
+					},
+				},
+			];
+			const form = { fields: [ 'username' ] };
+			const {
+				result: {
+					current: { validity, isValid },
+				},
+			} = renderHook( () => useFormValidity( item, fields, form ) );
+			expect( validity ).toEqual( undefined );
+			expect( isValid ).toBe( true );
+		} );
+
+		it( 'email is valid when value length meets maxLength', () => {
+			const item = { id: 1, email: 'user@example.com' };
+			const fields: Field< {} >[] = [
+				{
+					id: 'email',
+					type: 'email',
+					isValid: {
+						maxLength: 50,
+					},
+				},
+			];
+			const form = { fields: [ 'email' ] };
+			const {
+				result: {
+					current: { validity, isValid },
+				},
+			} = renderHook( () => useFormValidity( item, fields, form ) );
+			expect( validity ).toEqual( undefined );
+			expect( isValid ).toBe( true );
+		} );
+
+		it( 'email is invalid when value length is above maxLength', () => {
+			const item = { id: 1, email: 'verylongemailaddress@example.com' };
+			const fields: Field< {} >[] = [
+				{
+					id: 'email',
+					type: 'email',
+					isValid: {
+						maxLength: 20,
+					},
+				},
+			];
+			const form = { fields: [ 'email' ] };
+			const {
+				result: {
+					current: { validity, isValid },
+				},
+			} = renderHook( () => useFormValidity( item, fields, form ) );
+			expect( validity?.email ).toEqual( MAX_LENGTH_MESSAGE );
+			expect( isValid ).toBe( false );
+		} );
+
+		it( 'url is valid when value length meets maxLength', () => {
+			const item = { id: 1, website: 'https://example.com' };
+			const fields: Field< {} >[] = [
+				{
+					id: 'website',
+					type: 'url',
+					isValid: {
+						maxLength: 50,
+					},
+				},
+			];
+			const form = { fields: [ 'website' ] };
+			const {
+				result: {
+					current: { validity, isValid },
+				},
+			} = renderHook( () => useFormValidity( item, fields, form ) );
+			expect( validity ).toEqual( undefined );
+			expect( isValid ).toBe( true );
+		} );
+
+		it( 'url is invalid when value length is above maxLength', () => {
+			const item = {
+				id: 1,
+				website: 'https://verylongdomainname.example.com/path',
+			};
+			const fields: Field< {} >[] = [
+				{
+					id: 'website',
+					type: 'url',
+					isValid: {
+						maxLength: 30,
+					},
+				},
+			];
+			const form = { fields: [ 'website' ] };
+			const {
+				result: {
+					current: { validity, isValid },
+				},
+			} = renderHook( () => useFormValidity( item, fields, form ) );
+			expect( validity?.website ).toEqual( MAX_LENGTH_MESSAGE );
+			expect( isValid ).toBe( false );
+		} );
+
+		it( 'telephone is valid when value length meets maxLength', () => {
+			const item = { id: 1, phone: '+1-555-123-4567' };
+			const fields: Field< {} >[] = [
+				{
+					id: 'phone',
+					type: 'telephone',
+					isValid: {
+						maxLength: 20,
+					},
+				},
+			];
+			const form = { fields: [ 'phone' ] };
+			const {
+				result: {
+					current: { validity, isValid },
+				},
+			} = renderHook( () => useFormValidity( item, fields, form ) );
+			expect( validity ).toEqual( undefined );
+			expect( isValid ).toBe( true );
+		} );
+
+		it( 'telephone is invalid when value length is above maxLength', () => {
+			const item = { id: 1, phone: '+1-555-123-4567-extension-12345' };
+			const fields: Field< {} >[] = [
+				{
+					id: 'phone',
+					type: 'telephone',
+					isValid: {
+						maxLength: 15,
+					},
+				},
+			];
+			const form = { fields: [ 'phone' ] };
+			const {
+				result: {
+					current: { validity, isValid },
+				},
+			} = renderHook( () => useFormValidity( item, fields, form ) );
+			expect( validity?.phone ).toEqual( MAX_LENGTH_MESSAGE );
+			expect( isValid ).toBe( false );
+		} );
+
+		it( 'password is valid when value length meets maxLength', () => {
+			const item = { id: 1, password: 'secure123' };
+			const fields: Field< {} >[] = [
+				{
+					id: 'password',
+					type: 'password',
+					isValid: {
+						maxLength: 20,
+					},
+				},
+			];
+			const form = { fields: [ 'password' ] };
+			const {
+				result: {
+					current: { validity, isValid },
+				},
+			} = renderHook( () => useFormValidity( item, fields, form ) );
+			expect( validity ).toEqual( undefined );
+			expect( isValid ).toBe( true );
+		} );
+
+		it( 'password is invalid when value length is above maxLength', () => {
+			const item = { id: 1, password: 'verylongsecurepassword123456' };
+			const fields: Field< {} >[] = [
+				{
+					id: 'password',
+					type: 'password',
+					isValid: {
+						maxLength: 20,
+					},
+				},
+			];
+			const form = { fields: [ 'password' ] };
+			const {
+				result: {
+					current: { validity, isValid },
+				},
+			} = renderHook( () => useFormValidity( item, fields, form ) );
+			expect( validity?.password ).toEqual( MAX_LENGTH_MESSAGE );
+			expect( isValid ).toBe( false );
+		} );
+	} );
+
 	describe( 'isValid.custom', () => {
 		it( 'integer is valid if value is integer', () => {
 			const item = { id: 1, order: 2, title: 'hi' };
