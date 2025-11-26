@@ -211,27 +211,28 @@ export function getBlockBindingsSource( state, sourceName ) {
 	return state.blockBindingsSources[ sourceName ];
 }
 
-export const getSourceFieldsList = createRegistrySelector( ( select ) =>
-	createSelector(
-		( state, source, blockContext ) => {
-			if ( ! source.getFieldsList ) {
-				return;
-			}
-
-			const context = {};
-			if ( source?.usesContext?.length ) {
-				for ( const key of source.usesContext ) {
-					context[ key ] = blockContext[ key ];
+export const getBlockBindingsSourceFieldsList = createRegistrySelector(
+	( select ) =>
+		createSelector(
+			( state, source, blockContext ) => {
+				if ( ! source.getFieldsList ) {
+					return;
 				}
-			}
-			return source.getFieldsList( { select, context } );
-		},
-		( state, source, blockContext ) => [
-			source.getFieldsList,
-			source.usesContext,
-			blockContext,
-		]
-	)
+
+				const context = {};
+				if ( source?.usesContext?.length ) {
+					for ( const key of source.usesContext ) {
+						context[ key ] = blockContext[ key ];
+					}
+				}
+				return source.getFieldsList( { select, context } );
+			},
+			( state, source, blockContext ) => [
+				source.getFieldsList,
+				source.usesContext,
+				blockContext,
+			]
+		)
 );
 
 /**
