@@ -151,16 +151,14 @@ export function MediaPlaceholder( {
 		} );
 	}
 
-	const { mediaUpload: mediaUploadFromSettings, allowedMimeTypes } =
-		useSelect( ( select ) => {
-			const { getSettings } = select( blockEditorStore );
-			const settings = getSettings();
-			return {
-				mediaUpload: settings.mediaUpload,
-				allowedMimeTypes: settings.allowedMimeTypes,
-			};
-		}, [] );
-	const mediaUpload = mediaUploadFromSettings;
+	const { mediaUpload, allowedMimeTypes } = useSelect( ( select ) => {
+		const { getSettings } = select( blockEditorStore );
+		const settings = getSettings();
+		return {
+			mediaUpload: settings.mediaUpload,
+			allowedMimeTypes: settings.allowedMimeTypes,
+		};
+	}, [] );
 	const [ src, setSrc ] = useState( '' );
 
 	useEffect( () => {
