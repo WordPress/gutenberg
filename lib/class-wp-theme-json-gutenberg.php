@@ -1292,6 +1292,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * It is recursive and modifies the input in-place.
 	 *
 	 * @since 5.8.0
+	 * @since 7.0.0 Added type validation for boolean values.
 	 *
 	 * @param array $tree   Input to process.
 	 * @param array $schema Schema to adhere to.
