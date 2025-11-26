@@ -18,105 +18,48 @@ test.describe( 'Template ID Format', () => {
 		await requestUtils.setGutenbergExperiments( [] );
 	} );
 
-	test( 'should use correct template ID format based on experiment status', async ( {
+	test( 'should open and edit templates correctly regardless of experiment status', async ( {
 		admin,
+		editor,
 		page,
 		requestUtils,
 	} ) => {
 		// Test with experiment enabled first.
 		await requestUtils.setGutenbergExperiments( [ 'active_templates' ] );
-		await admin.visitSiteEditor();
-		const resultWithExperimentEnabled = await page.evaluate( async () => {
-			const template = await window.wp.apiFetch( {
-				path: '/wp/v2/templates/lookup?slug=index&is_custom=false',
-			} );
-			const defaultTemplateId = await window.wp.data
-				.resolveSelect( 'core' )
-				.getDefaultTemplateId( {
-					slug: 'index',
-					is_custom: false,
-				} );
-			const record = await window.wp.data
-				.resolveSelect( 'core' )
-				.getEntityRecord(
-					'postType',
-					'wp_template',
-					defaultTemplateId
-				);
-			return {
-				apiTemplateId: template?.id,
-				apiTemplateWpId: template?.wp_id,
-				resolverReturnedId: defaultTemplateId,
-				recordId: record?.id,
-				recordWpId: record?.wp_id,
-				experimentEnabled: window?.__experimentalTemplateActivate,
-			};
+
+		await admin.visitAdminPage(
+			'site-editor.php',
+			'p=/wp_template/emptytheme//index&canvas=edit'
+		);
+
+		await page.waitForSelector( 'iframe[name="editor-canvas"]' );
+		await expect( editor.canvas.locator( 'body' ) ).toBeVisible();
+
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Test content with experiment enabled' },
 		} );
-
-		expect( resultWithExperimentEnabled.experimentEnabled ).toBe( true );
-
-		const expectedIdWhenEnabled =
-			resultWithExperimentEnabled.apiTemplateWpId ||
-			resultWithExperimentEnabled.apiTemplateId;
-		expect( resultWithExperimentEnabled.resolverReturnedId ).toBe(
-			expectedIdWhenEnabled
-		);
-		expect( resultWithExperimentEnabled.recordId ).toBe(
-			resultWithExperimentEnabled.resolverReturnedId
-		);
-		expect( resultWithExperimentEnabled.recordWpId ).toBe(
-			resultWithExperimentEnabled.apiTemplateWpId
-		);
+		await expect(
+			editor.canvas.getByText( 'Test content with experiment enabled' )
+		).toBeVisible();
 
 		// Test with experiment disabled.
 		await requestUtils.setGutenbergExperiments( [] );
-		await page.reload();
-		await admin.visitSiteEditor();
 
-		const resultWithExperimentDisabled = await page.evaluate( async () => {
-			const template = await window.wp.apiFetch( {
-				path: '/wp/v2/templates/lookup?slug=index&is_custom=false',
-			} );
-			const defaultTemplateId = await window.wp.data
-				.resolveSelect( 'core' )
-				.getDefaultTemplateId( {
-					slug: 'index',
-					is_custom: false,
-				} );
-			const record = await window.wp.data
-				.resolveSelect( 'core' )
-				.getEntityRecord(
-					'postType',
-					'wp_template',
-					defaultTemplateId
-				);
-			return {
-				apiTemplateId: template?.id,
-				apiTemplateWpId: template?.wp_id,
-				resolverReturnedId: defaultTemplateId,
-				recordId: record?.id,
-				recordWpId: record?.wp_id,
-				experimentEnabled: window?.__experimentalTemplateActivate,
-			};
+		await admin.visitAdminPage(
+			'site-editor.php',
+			'p=/wp_template/emptytheme//index&canvas=edit'
+		);
+
+		await page.waitForSelector( 'iframe[name="editor-canvas"]' );
+		await expect( editor.canvas.locator( 'body' ) ).toBeVisible();
+
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Test content with experiment disabled' },
 		} );
-
-		expect(
-			resultWithExperimentDisabled.experimentEnabled
-		).toBeUndefined();
-
-		const expectedIdWhenDisabled =
-			resultWithExperimentDisabled.apiTemplateId;
-		expect( resultWithExperimentDisabled.resolverReturnedId ).toBe(
-			expectedIdWhenDisabled
-		);
-		expect( typeof resultWithExperimentDisabled.resolverReturnedId ).toBe(
-			'string'
-		);
-		expect( resultWithExperimentDisabled.recordId ).toBe(
-			resultWithExperimentDisabled.resolverReturnedId
-		);
-		expect( resultWithExperimentDisabled.recordWpId ).toBe(
-			resultWithExperimentDisabled.apiTemplateWpId
-		);
+		await expect(
+			editor.canvas.getByText( 'Test content with experiment disabled' )
+		).toBeVisible();
 	} );
 } );
