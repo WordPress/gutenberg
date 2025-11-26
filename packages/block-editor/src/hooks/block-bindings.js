@@ -153,7 +153,6 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 									attribute={ attribute }
 									binding={ binding }
 									sources={ sources }
-									blockName={ blockName }
 								/>
 							);
 						}
@@ -164,7 +163,6 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 								attribute={ attribute }
 								binding={ binding }
 								sources={ sources }
-								blockName={ blockName }
 							>
 								<Menu
 									placement={

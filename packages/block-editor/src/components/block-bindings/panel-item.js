@@ -22,28 +22,27 @@ import { useViewportMatch } from '@wordpress/compose';
  */
 import { useBlockBindingsUtils } from '../../utils/block-bindings';
 import { unlock } from '../../lock-unlock';
-import { getAttributeType } from './panel-menu-content';
 
 const { Menu } = unlock( componentsPrivateApis );
 
-function BlockBindingsAttribute( { attribute, binding, sources, blockName } ) {
+export default function BlockBindingsPanelItem( {
+	attribute,
+	binding,
+	children,
+	sources,
+} ) {
+	const { updateBlockBindings } = useBlockBindingsUtils();
+	const isMobile = useViewportMatch( 'medium', '<' );
+
 	const { source: sourceName, args } = binding || {};
 	const data = sources?.[ sourceName ];
 	const source = getBlockBindingsSource( sourceName );
 
 	let displayText;
 	let isValid = true;
-	const isNotBound = binding === undefined;
 
-	if ( isNotBound ) {
-		// Check if there are any compatible sources for this attribute type.
-		const attributeType = getAttributeType( blockName, attribute );
-
-		const hasCompatibleSources = Object.values( sources ).some( ( items ) =>
-			items.some( ( item ) => item.type === attributeType )
-		);
-
-		if ( ! hasCompatibleSources ) {
+	if ( binding === undefined ) {
+		if ( ! children ) {
 			displayText = __( 'No sources available' );
 		} else {
 			displayText = __( 'Not connected' );
@@ -61,30 +60,6 @@ function BlockBindingsAttribute( { attribute, binding, sources, blockName } ) {
 	}
 
 	return (
-		<VStack className="block-editor-bindings__item" spacing={ 0 }>
-			<Text truncate>{ attribute }</Text>
-			<Text
-				truncate
-				variant={ isValid ? 'muted' : undefined }
-				isDestructive={ ! isValid }
-			>
-				{ displayText }
-			</Text>
-		</VStack>
-	);
-}
-
-export default function BlockBindingsPanelItem( {
-	attribute,
-	binding,
-	children,
-	sources,
-	blockName,
-} ) {
-	const { updateBlockBindings } = useBlockBindingsUtils();
-	const isMobile = useViewportMatch( 'medium', '<' );
-
-	return (
 		<ToolsPanelItem
 			hasValue={ () => !! binding }
 			label={ attribute }
@@ -99,12 +74,19 @@ export default function BlockBindingsPanelItem( {
 		>
 			<Menu placement={ isMobile ? 'bottom-start' : 'left-start' }>
 				<Menu.TriggerButton render={ <Item /> } disabled={ ! children }>
-					<BlockBindingsAttribute
-						attribute={ attribute }
-						binding={ binding }
-						sources={ sources }
-						blockName={ blockName }
-					/>
+					<VStack
+						className="block-editor-bindings__item"
+						spacing={ 0 }
+					>
+						<Text truncate>{ attribute }</Text>
+						<Text
+							truncate
+							variant={ isValid ? 'muted' : undefined }
+							isDestructive={ ! isValid }
+						>
+							{ displayText }
+						</Text>
+					</VStack>
 				</Menu.TriggerButton>
 				{ !! children && (
 					<Menu.Popover gutter={ isMobile ? 8 : 36 }>
