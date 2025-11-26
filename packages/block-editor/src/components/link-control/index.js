@@ -143,6 +143,7 @@ function LinkControl( {
 	hasTextControl = false,
 	renderControlBottom = null,
 	handleEntities = false,
+	hasCopyControl = true,
 } ) {
 	if ( withCreateSuggestion === undefined && createSuggestion ) {
 		withCreateSuggestion = true;
@@ -516,6 +517,7 @@ function LinkControl( {
 					onEditClick={ () => setIsEditingLink( true ) }
 					hasRichPreviews={ hasRichPreviews }
 					hasUnlinkControl={ shownUnlinkControl }
+					hasCopyControl={ hasCopyControl }
 					onRemove={ () => {
 						onRemove();
 						setIsEditingLink( true );

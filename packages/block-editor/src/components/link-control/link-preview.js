@@ -53,6 +53,7 @@ export default function LinkPreview( {
 	onEditClick,
 	hasRichPreviews = false,
 	hasUnlinkControl = false,
+	hasCopyControl = true,
 	onRemove,
 } ) {
 	const showIconLabels = useSelect(
@@ -175,15 +176,17 @@ export default function LinkPreview( {
 						showTooltip={ ! showIconLabels }
 					/>
 				) }
-				<Button
-					icon={ copySmall }
-					label={ __( 'Copy link' ) }
-					ref={ ref }
-					accessibleWhenDisabled
-					disabled={ isEmptyURL }
-					size="compact"
-					showTooltip={ ! showIconLabels }
-				/>
+				{ hasCopyControl && (
+					<Button
+						icon={ copySmall }
+						label={ __( 'Copy link' ) }
+						ref={ ref }
+						accessibleWhenDisabled
+						disabled={ isEmptyURL }
+						size="compact"
+						showTooltip={ ! showIconLabels }
+					/>
+				) }
 				<ViewerSlot fillProps={ value } />
 			</div>
 		</div>
