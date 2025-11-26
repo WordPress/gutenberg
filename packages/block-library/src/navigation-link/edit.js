@@ -9,6 +9,7 @@ import clsx from 'clsx';
 import { createBlock } from '@wordpress/blocks';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
+	BaseControl,
 	PanelBody,
 	TextControl,
 	TextareaControl,
@@ -580,27 +581,35 @@ export default function NavigationLinkEdit( {
 			</BlockControls>
 			<InspectorControls>
 				<PanelBody title={ __( 'Link settings' ) }>
-					<LinkControl
-						hasTextControl={ false }
-						hasRichPreviews
-						hasCopyControl={ false }
-						useDropdownMode={ true }
-						handleEntities={ isBoundEntityAvailable }
-						className="wp-block-navigation-link__inline-link-input"
-						value={ testLink }
-						showInitialSuggestions={ true }
-						noDirectEntry={ !! type }
-						noURLSuggestion={ !! type }
-						suggestionsQuery={ getSuggestionsQuery( type, kind ) }
-						onChange={ ( updatedValue ) => {
-							updateAttributes(
-								updatedValue,
-								setAttributes,
-								attributes
-							);
-						} }
-						onRemove={ removeLink }
-					/>
+					<BaseControl __nextHasNoMarginBottom>
+						<BaseControl.VisualLabel>
+							{ __( 'Link' ) }
+						</BaseControl.VisualLabel>
+						<LinkControl
+							hasTextControl={ false }
+							hasRichPreviews
+							hasCopyControl={ false }
+							useDropdownMode={ true }
+							handleEntities={ isBoundEntityAvailable }
+							className="wp-block-navigation-link__inline-link-input"
+							value={ testLink }
+							showInitialSuggestions={ true }
+							noDirectEntry={ !! type }
+							noURLSuggestion={ !! type }
+							suggestionsQuery={ getSuggestionsQuery(
+								type,
+								kind
+							) }
+							onChange={ ( updatedValue ) => {
+								updateAttributes(
+									updatedValue,
+									setAttributes,
+									attributes
+								);
+							} }
+							onRemove={ removeLink }
+						/>
+					</BaseControl>
 
 					<TextControl
 						value={ title || '' }
