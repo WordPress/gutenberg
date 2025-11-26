@@ -37,7 +37,7 @@ export const getAttributeType = ( blockName, attribute ) => {
 	return _attributeType === 'rich-text' ? 'string' : _attributeType;
 };
 
-function BlockBindingsPanelMenuItem( {
+function BlockBindingsSourceMenuItem( {
 	attribute,
 	binding,
 	item,
@@ -143,7 +143,7 @@ export default function BlockBindingsPanelMenuContent( {
 						<Menu.Popover gutter={ 8 }>
 							<Menu.Group>
 								{ sourceDataItems.map( ( item ) => (
-									<BlockBindingsPanelMenuItem
+									<BlockBindingsSourceMenuItem
 										key={
 											sourceKey +
 												JSON.stringify( item.args ) ||
