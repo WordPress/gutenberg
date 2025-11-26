@@ -289,7 +289,7 @@ function gutenberg_register_packages_styles( $styles ) {
 		$styles,
 		'wp-commands',
 		gutenberg_url( 'build/styles/commands/style.css' ),
-		array( 'wp-components' ),
+		array( 'wp-base-styles', 'wp-components' ),
 		$version
 	);
 	$styles->add_data( 'wp-commands', 'rtl', 'replace' );
@@ -311,59 +311,6 @@ function gutenberg_register_packages_styles( $styles ) {
 		$version
 	);
 	$styles->add_data( 'wp-edit-widgets', 'rtl', 'replace' );
-
-	gutenberg_override_style(
-		$styles,
-		'wp-block-directory',
-		gutenberg_url( 'build/styles/block-directory/style.css' ),
-		array( 'wp-block-editor', 'wp-components' ),
-		$version
-	);
-	$styles->add_data( 'wp-block-directory', 'rtl', 'replace' );
-
-	gutenberg_override_style(
-		$styles,
-		'wp-customize-widgets',
-		gutenberg_url( 'build/styles/customize-widgets/style.css' ),
-		array( 'wp-components', 'wp-block-editor', 'wp-editor', 'wp-edit-blocks', 'wp-widgets', 'wp-preferences' ),
-		$version
-	);
-	$styles->add_data( 'wp-customize-widgets', 'rtl', 'replace' );
-
-	gutenberg_override_style(
-		$styles,
-		'wp-patterns',
-		gutenberg_url( 'build/styles/patterns/style.css' ),
-		array( 'wp-components' ),
-		$version
-	);
-	$styles->add_data( 'wp-patterns', 'rtl', 'replace' );
-
-	gutenberg_override_style(
-		$styles,
-		'wp-reusable-blocks',
-		gutenberg_url( 'build/styles/reusable-blocks/style.css' ),
-		array( 'wp-components' ),
-		$version
-	);
-	$styles->add_data( 'wp-reusable-blocks', 'rtl', 'replace' );
-
-	gutenberg_override_style(
-		$styles,
-		'wp-widgets',
-		gutenberg_url( 'build/styles/widgets/style.css' ),
-		array( 'wp-components' )
-	);
-	$styles->add_data( 'wp-widgets', 'rtl', 'replace' );
-
-	gutenberg_override_style(
-		$styles,
-		'wp-preferences',
-		gutenberg_url( 'build/styles/preferences/style.css' ),
-		array( 'wp-components' ),
-		$version
-	);
-	$styles->add_data( 'wp-preferences', 'rtl', 'replace' );
 }
 add_action( 'wp_default_styles', 'gutenberg_register_packages_styles', 15 );
 
