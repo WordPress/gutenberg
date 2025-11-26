@@ -167,7 +167,12 @@ export default function LinkPreview( {
 							<>
 								<ExternalLink
 									className="block-editor-link-control__search-item-title"
-									href={ value.url }
+									href={ onToggle ? undefined : value.url }
+									onClick={
+										onToggle
+											? ( e ) => e.preventDefault()
+											: undefined
+									}
 								>
 									<Truncate numberOfLines={ 1 }>
 										{ displayTitle }
@@ -188,14 +193,16 @@ export default function LinkPreview( {
 						) }
 					</span>
 				</span>
-				<Button
-					icon={ pencil }
-					label={ __( 'Edit link' ) }
-					onClick={ onToggle || onEditClick }
-					size="compact"
-					showTooltip={ ! showIconLabels }
-				/>
-				{ hasUnlinkControl && (
+				{ ! onToggle && (
+					<Button
+						icon={ pencil }
+						label={ __( 'Edit link' ) }
+						onClick={ onEditClick }
+						size="compact"
+						showTooltip={ ! showIconLabels }
+					/>
+				) }
+				{ ! onToggle && hasUnlinkControl && (
 					<Button
 						icon={ linkOff }
 						label={ __( 'Remove link' ) }

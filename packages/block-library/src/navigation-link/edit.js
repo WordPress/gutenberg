@@ -581,7 +581,7 @@ export default function NavigationLinkEdit( {
 			<InspectorControls>
 				<PanelBody title={ __( 'Link settings' ) }>
 					<LinkControl
-						hasTextControl
+						hasTextControl={ false }
 						hasRichPreviews
 						hasCopyControl={ false }
 						useDropdownMode={ true }

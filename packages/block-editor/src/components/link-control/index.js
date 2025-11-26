@@ -155,6 +155,7 @@ function LinkControl( {
 	handleEntities = false,
 	hasCopyControl = true,
 	useDropdownMode = false,
+	className,
 } ) {
 	if ( withCreateSuggestion === undefined && createSuggestion ) {
 		withCreateSuggestion = true;
@@ -589,7 +590,7 @@ function LinkControl( {
 			<div
 				tabIndex={ -1 }
 				ref={ wrapperNode }
-				className="block-editor-link-control"
+				className={ clsx( 'block-editor-link-control', className ) }
 			>
 				{ isCreatingPage && (
 					<div className="block-editor-link-control__loading">
@@ -657,7 +658,7 @@ function LinkControl( {
 		<div
 			tabIndex={ -1 }
 			ref={ wrapperNode }
-			className="block-editor-link-control"
+			className={ clsx( 'block-editor-link-control', className ) }
 		>
 			{ isCreatingPage && (
 				<div className="block-editor-link-control__loading">
