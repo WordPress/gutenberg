@@ -1,4 +1,8 @@
-// dirty hack to clean up modal
+@use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/colors" as *;
+
+// Here we extend the modal styles to be tighter, and to the center. Because the palette uses the modal as a container.
 .commands-command-menu {
 	border-radius: $grid-unit-05;
 	width: calc(100% - #{$grid-unit-40});
@@ -39,6 +43,12 @@
 			border-top-left-radius: 0;
 			border-bottom-left-radius: 0;
 		}
+	}
+}
+
+.commands-command-menu__header-search-icon {
+	&:dir(ltr) {
+		transform: scaleX(-1);
 	}
 }
 
@@ -106,11 +116,13 @@
 	}
 
 	[cmdk-root] > [cmdk-list] {
-		max-height: 368px; // Specific to not have commands overflow oddly.
+		max-height: $palette-max-height; // Specific to not have commands overflow oddly.
 		overflow: auto;
 
 		// Ensures there is always padding bottom on the last group, when there are commands.
-		& [cmdk-list-sizer] > [cmdk-group]:last-child [cmdk-group-items]:not(:empty) {
+		&
+		[cmdk-list-sizer] > [cmdk-group]:last-child
+		[cmdk-group-items]:not(:empty) {
 			padding-bottom: $grid-unit-10;
 		}
 

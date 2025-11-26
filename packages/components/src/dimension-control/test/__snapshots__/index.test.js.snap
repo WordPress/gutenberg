@@ -74,7 +74,7 @@ exports[`DimensionControl rendering renders with custom sizes 1`] = `
 
 .emotion-12.emotion-12.emotion-12 {
   font-size: 11px;
-  font-weight: 500;
+  font-weight: 499;
   line-height: 1.4;
   text-transform: uppercase;
   box-sizing: border-box;
@@ -193,13 +193,13 @@ exports[`DimensionControl rendering renders with custom sizes 1`] = `
 
 <div>
   <div
-    class="components-base-control emotion-0 emotion-1"
+    class="components-base-control components-select-control block-editor-dimension-control emotion-0 emotion-1"
   >
     <div
       class="components-base-control__field emotion-2 emotion-3"
     >
       <div
-        class="components-flex components-input-base components-select-control block-editor-dimension-control emotion-4 emotion-5 emotion-6 emotion-7"
+        class="components-flex components-input-base emotion-4 emotion-5 emotion-6 emotion-7"
         data-wp-c16t="true"
         data-wp-component="InputBase"
       >
@@ -356,7 +356,7 @@ exports[`DimensionControl rendering renders with defaults 1`] = `
 
 .emotion-12.emotion-12.emotion-12 {
   font-size: 11px;
-  font-weight: 500;
+  font-weight: 499;
   line-height: 1.4;
   text-transform: uppercase;
   box-sizing: border-box;
@@ -475,13 +475,13 @@ exports[`DimensionControl rendering renders with defaults 1`] = `
 
 <div>
   <div
-    class="components-base-control emotion-0 emotion-1"
+    class="components-base-control components-select-control block-editor-dimension-control emotion-0 emotion-1"
   >
     <div
       class="components-base-control__field emotion-2 emotion-3"
     >
       <div
-        class="components-flex components-input-base components-select-control block-editor-dimension-control emotion-4 emotion-5 emotion-6 emotion-7"
+        class="components-flex components-input-base emotion-4 emotion-5 emotion-6 emotion-7"
         data-wp-c16t="true"
         data-wp-component="InputBase"
       >
@@ -648,7 +648,7 @@ exports[`DimensionControl rendering renders with icon and custom icon label 1`] 
 
 .emotion-12.emotion-12.emotion-12 {
   font-size: 11px;
-  font-weight: 500;
+  font-weight: 499;
   line-height: 1.4;
   text-transform: uppercase;
   box-sizing: border-box;
@@ -767,13 +767,13 @@ exports[`DimensionControl rendering renders with icon and custom icon label 1`] 
 
 <div>
   <div
-    class="components-base-control emotion-0 emotion-1"
+    class="components-base-control components-select-control block-editor-dimension-control emotion-0 emotion-1"
   >
     <div
       class="components-base-control__field emotion-2 emotion-3"
     >
       <div
-        class="components-flex components-input-base components-select-control block-editor-dimension-control emotion-4 emotion-5 emotion-6 emotion-7"
+        class="components-flex components-input-base emotion-4 emotion-5 emotion-6 emotion-7"
         data-wp-c16t="true"
         data-wp-component="InputBase"
       >
@@ -952,7 +952,7 @@ exports[`DimensionControl rendering renders with icon and default icon label 1`]
 
 .emotion-12.emotion-12.emotion-12 {
   font-size: 11px;
-  font-weight: 500;
+  font-weight: 499;
   line-height: 1.4;
   text-transform: uppercase;
   box-sizing: border-box;
@@ -1071,13 +1071,13 @@ exports[`DimensionControl rendering renders with icon and default icon label 1`]
 
 <div>
   <div
-    class="components-base-control emotion-0 emotion-1"
+    class="components-base-control components-select-control block-editor-dimension-control emotion-0 emotion-1"
   >
     <div
       class="components-base-control__field emotion-2 emotion-3"
     >
       <div
-        class="components-flex components-input-base components-select-control block-editor-dimension-control emotion-4 emotion-5 emotion-6 emotion-7"
+        class="components-flex components-input-base emotion-4 emotion-5 emotion-6 emotion-7"
         data-wp-c16t="true"
         data-wp-component="InputBase"
       >

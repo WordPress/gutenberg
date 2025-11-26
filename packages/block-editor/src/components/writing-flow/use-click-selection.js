@@ -27,7 +27,9 @@ export default function useClickSelection() {
 				const clickedClientId = getBlockClientId( event.target );
 
 				if ( event.shiftKey ) {
-					if ( startClientId !== clickedClientId ) {
+					// When selecting a single block in a document by holding the shift key,
+					// don't mark this action as multiselection.
+					if ( startClientId && startClientId !== clickedClientId ) {
 						node.contentEditable = true;
 						// Firefox doesn't automatically move focus.
 						node.focus();

@@ -37,7 +37,7 @@ $font-line-height-2x-large: 40px;
 
 // Weights
 $font-weight-regular: 400;
-$font-weight-medium: 500;
+$font-weight-medium: 499; // ensures fallback to 400 (instead of 600)
 
 // Families
 $font-family-headings: -apple-system, "system-ui", "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
@@ -97,7 +97,7 @@ $button-size: 36px;
 $button-size-next-default-40px: 40px; // transitionary variable for next default button size
 $button-size-small: 24px;
 $button-size-compact: 32px;
-$header-height: 60px;
+$header-height: 64px;
 $panel-header-height: $grid-unit-60;
 $nav-sidebar-width: 300px;
 $admin-bar-height: 32px;
@@ -111,6 +111,7 @@ $modal-width-medium: 512px;
 $modal-width-large: 840px;
 $spinner-size: 16px;
 $canvas-padding: $grid-unit-20;
+$palette-max-height: 368px;
 
 /**
  * Mobile specific styles

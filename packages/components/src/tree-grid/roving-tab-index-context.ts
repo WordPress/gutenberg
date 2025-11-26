@@ -12,6 +12,8 @@ const RovingTabIndexContext = createContext<
 	  }
 	| undefined
 >( undefined );
+RovingTabIndexContext.displayName = 'RovingTabIndexContext';
+
 export const useRovingTabIndexContext = () =>
 	useContext( RovingTabIndexContext );
 export const RovingTabIndexProvider = RovingTabIndexContext.Provider;

@@ -9,6 +9,7 @@ import { createSelector, createRegistrySelector } from '@wordpress/data';
 import { getDefaultTemplateId, getEntityRecord, type State } from './selectors';
 import { STORE_NAME } from './name';
 import { unlock } from './lock-unlock';
+import logEntityDeprecation from './utils/log-entity-deprecation';
 
 type EntityRecordKey = string | number;
 
@@ -97,6 +98,7 @@ export function getEntityRecordPermissions(
 	name: string,
 	id: string
 ) {
+	logEntityDeprecation( kind, name, 'getEntityRecordPermissions' );
 	return getEntityRecordsPermissions( state, kind, name, id )[ 0 ];
 }
 
@@ -138,6 +140,7 @@ export const getHomePage = createRegistrySelector( ( select ) =>
 				'root',
 				'__unstableBase'
 			) as SiteData | undefined;
+			// Still resolving getEntityRecord.
 			if ( ! siteData ) {
 				return null;
 			}
@@ -153,9 +156,16 @@ export const getHomePage = createRegistrySelector( ( select ) =>
 			).getDefaultTemplateId( {
 				slug: 'front-page',
 			} );
+			// Still resolving getDefaultTemplateId.
+			if ( ! frontPageTemplateId ) {
+				return null;
+			}
 			return { postType: 'wp_template', postId: frontPageTemplateId };
 		},
 		( state ) => [
+			// Even though getDefaultTemplateId.shouldInvalidate returns true when root/site changes,
+			// it doesn't seem to invalidate this cache, I'm not sure why.
+			getEntityRecord( state, 'root', 'site' ),
 			getEntityRecord( state, 'root', '__unstableBase' ),
 			getDefaultTemplateId( state, {
 				slug: 'front-page',
@@ -258,3 +268,25 @@ export const getTemplateId = createRegistrySelector(
 		} );
 	}
 );
+
+/**
+ * Returns the editor settings.
+ *
+ * @param state Data state.
+ * @return Editor settings object or null if not loaded.
+ */
+export function getEditorSettings(
+	state: State
+): Record< string, any > | null {
+	return state.editorSettings;
+}
+
+/**
+ * Returns the editor assets.
+ *
+ * @param state Data state.
+ * @return Editor assets object or null if not loaded.
+ */
+export function getEditorAssets( state: State ): Record< string, any > | null {
+	return state.editorAssets;
+}

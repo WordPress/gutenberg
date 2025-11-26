@@ -58,7 +58,6 @@ const applyWidthConstraints = ( width ) =>
 	);
 
 function getImageSourceUrlBySizeSlug( image, slug ) {
-	// eslint-disable-next-line camelcase
 	return image?.media_details?.sizes?.[ slug ]?.source_url;
 }
 
@@ -105,7 +104,6 @@ function attributesFromMedia( {
 			// Try the "large" size URL, falling back to the "full" size URL below.
 			src =
 				media.sizes?.large?.url ||
-				// eslint-disable-next-line camelcase
 				media.media_details?.sizes?.large?.source_url;
 		}
 
@@ -199,9 +197,14 @@ function MediaTextEdit( {
 			return {
 				featuredImageMedia:
 					featuredImage && useFeaturedImage
-						? select( coreStore ).getMedia( featuredImage, {
-								context: 'view',
-						  } )
+						? select( coreStore ).getEntityRecord(
+								'postType',
+								'attachment',
+								featuredImage,
+								{
+									context: 'view',
+								}
+						  )
 						: undefined,
 			};
 		},
@@ -213,9 +216,14 @@ function MediaTextEdit( {
 			return {
 				image:
 					mediaId && isSelected
-						? select( coreStore ).getMedia( mediaId, {
-								context: 'view',
-						  } )
+						? select( coreStore ).getEntityRecord(
+								'postType',
+								'attachment',
+								mediaId,
+								{
+									context: 'view',
+								}
+						  )
 						: null,
 			};
 		},
@@ -317,8 +325,8 @@ function MediaTextEdit( {
 					mediaAlt: '',
 					focalPoint: undefined,
 					mediaWidth: 50,
-					mediaSizeSlug: undefined,
 				} );
+				updateImage( DEFAULT_MEDIA_SIZE_SLUG );
 			} }
 			dropdownMenuProps={ dropdownMenuProps }
 		>

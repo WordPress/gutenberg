@@ -3,39 +3,52 @@
  */
 import {
 	BaseControl,
-	RangeControl,
 	__experimentalParseQuantityAndUnitFromRawValue as parseQuantityAndUnitFromRawValue,
 	__experimentalUseCustomUnits as useCustomUnits,
+	__experimentalVStack as VStack,
+	__experimentalHStack as HStack,
 } from '@wordpress/components';
-import { useState } from '@wordpress/element';
+import { useState, useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
-import AllInputControl from './all-input-control';
-import InputControls from './input-controls';
 import LinkedButton from './linked-button';
 import { useSettings } from '../use-settings';
+import { hasDefinedValues, hasMixedValues } from './utils';
+import SingleInputControl from './single-input-control';
 import {
-	getAllValue,
-	getAllUnit,
-	hasDefinedValues,
-	hasMixedValues,
-} from './utils';
+	DEFAULT_VALUES,
+	RANGE_CONTROL_MAX_SIZE,
+	EMPTY_ARRAY,
+} from './constants';
 
-const DEFAULT_VALUES = {
-	topLeft: undefined,
-	topRight: undefined,
-	bottomLeft: undefined,
-	bottomRight: undefined,
-};
-const MIN_BORDER_RADIUS_VALUE = 0;
-const MAX_BORDER_RADIUS_VALUES = {
-	px: 100,
-	em: 20,
-	rem: 20,
-};
+function useBorderRadiusSizes( presets ) {
+	const defaultSizes = presets?.default ?? EMPTY_ARRAY;
+	const customSizes = presets?.custom ?? EMPTY_ARRAY;
+	const themeSizes = presets?.theme ?? EMPTY_ARRAY;
+
+	return useMemo( () => {
+		const sizes = [
+			{ name: __( 'None' ), slug: '0', size: 0 },
+			...customSizes,
+			...themeSizes,
+			...defaultSizes,
+		];
+
+		return sizes.length > RANGE_CONTROL_MAX_SIZE
+			? [
+					{
+						name: __( 'Default' ),
+						slug: 'default',
+						size: undefined,
+					},
+					...sizes,
+			  ]
+			: sizes;
+	}, [ customSizes, themeSizes, defaultSizes ] );
+}
 
 /**
  * Control to display border radius options.
@@ -43,14 +56,15 @@ const MAX_BORDER_RADIUS_VALUES = {
  * @param {Object}   props          Component props.
  * @param {Function} props.onChange Callback to handle onChange.
  * @param {Object}   props.values   Border radius values.
+ * @param {Object}   props.presets  Border radius presets.
  *
  * @return {Element}              Custom border radius control.
  */
-export default function BorderRadiusControl( { onChange, values } ) {
+export default function BorderRadiusControl( { onChange, values, presets } ) {
 	const [ isLinked, setIsLinked ] = useState(
 		! hasDefinedValues( values ) || ! hasMixedValues( values )
 	);
-
+	const options = useBorderRadiusSizes( presets );
 	// Tracking selected units via internal state allows filtering of CSS unit
 	// only values from being saved while maintaining preexisting unit selection
 	// behaviour. Filtering CSS unit only values prevents invalid style values.
@@ -72,64 +86,49 @@ export default function BorderRadiusControl( { onChange, values } ) {
 		availableUnits: availableUnits || [ 'px', 'em', 'rem' ],
 	} );
 
-	const unit = getAllUnit( selectedUnits );
-	const unitConfig = units && units.find( ( item ) => item.value === unit );
-	const step = unitConfig?.step || 1;
-
-	const [ allValue ] = parseQuantityAndUnitFromRawValue(
-		getAllValue( values )
-	);
-
 	const toggleLinked = () => setIsLinked( ! isLinked );
-
-	const handleSliderChange = ( next ) => {
-		onChange( next !== undefined ? `${ next }${ unit }` : undefined );
-	};
 
 	return (
 		<fieldset className="components-border-radius-control">
-			<BaseControl.VisualLabel as="legend">
-				{ __( 'Radius' ) }
-			</BaseControl.VisualLabel>
-			<div className="components-border-radius-control__wrapper">
-				{ isLinked ? (
-					<>
-						<AllInputControl
-							className="components-border-radius-control__unit-control"
-							values={ values }
-							min={ MIN_BORDER_RADIUS_VALUE }
-							onChange={ onChange }
-							selectedUnits={ selectedUnits }
-							setSelectedUnits={ setSelectedUnits }
-							units={ units }
-						/>
-						<RangeControl
-							__next40pxDefaultSize
-							label={ __( 'Border radius' ) }
-							hideLabelFromVision
-							className="components-border-radius-control__range-control"
-							value={ allValue ?? '' }
-							min={ MIN_BORDER_RADIUS_VALUE }
-							max={ MAX_BORDER_RADIUS_VALUES[ unit ] }
-							initialPosition={ 0 }
-							withInputField={ false }
-							onChange={ handleSliderChange }
-							step={ step }
-							__nextHasNoMarginBottom
-						/>
-					</>
-				) : (
-					<InputControls
-						min={ MIN_BORDER_RADIUS_VALUE }
+			<HStack className="components-border-radius-control__header">
+				<BaseControl.VisualLabel as="legend">
+					{ __( 'Radius' ) }
+				</BaseControl.VisualLabel>
+				<LinkedButton onClick={ toggleLinked } isLinked={ isLinked } />
+			</HStack>
+			{ isLinked ? (
+				<>
+					<SingleInputControl
 						onChange={ onChange }
 						selectedUnits={ selectedUnits }
 						setSelectedUnits={ setSelectedUnits }
-						values={ values || DEFAULT_VALUES }
+						values={ values }
 						units={ units }
+						corner="all"
+						presets={ options }
 					/>
-				) }
-				<LinkedButton onClick={ toggleLinked } isLinked={ isLinked } />
-			</div>
+				</>
+			) : (
+				<VStack>
+					{ [
+						'topLeft',
+						'topRight',
+						'bottomLeft',
+						'bottomRight',
+					].map( ( corner ) => (
+						<SingleInputControl
+							key={ corner }
+							onChange={ onChange }
+							selectedUnits={ selectedUnits }
+							setSelectedUnits={ setSelectedUnits }
+							values={ values || DEFAULT_VALUES }
+							units={ units }
+							corner={ corner }
+							presets={ options }
+						/>
+					) ) }
+				</VStack>
+			) }
 		</fieldset>
 	);
 }

@@ -27,13 +27,14 @@ const meta: Meta< typeof ToggleGroupControl > = {
 	component: ToggleGroupControl,
 	// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 	subcomponents: { ToggleGroupControlOption, ToggleGroupControlOptionIcon },
-	title: 'Components (Experimental)/Selection & Input/ToggleGroupControl',
-	id: 'components-experimental-togglegroupcontrol',
+	title: 'Components/Selection & Input/Common/ToggleGroupControl',
+	id: 'components-togglegroupcontrol',
 	argTypes: {
 		help: { control: { type: 'text' } },
 		onChange: { action: 'onChange' },
 		value: { control: false },
 	},
+	tags: [ 'status-experimental' ],
 	parameters: {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },

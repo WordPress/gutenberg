@@ -78,6 +78,7 @@ export const processBlockType =
 		const bootstrappedBlockType = select.getBootstrappedBlockType( name );
 
 		const blockType = {
+			apiVersion: 1,
 			name,
 			icon: BLOCK_ICON_DEFAULT,
 			keywords: [],
@@ -102,12 +103,33 @@ export const processBlockType =
 			),
 		};
 
+		// If the block is registering attributes as null or undefined, warn and default to empty object.
+		if (
+			! blockType.attributes ||
+			typeof blockType.attributes !== 'object'
+		) {
+			warning(
+				'The block "' +
+					name +
+					'" is registering attributes as `null` or `undefined`. Use an empty object (`attributes: {}`) or exclude the `attributes` key.'
+			);
+			blockType.attributes = {};
+		}
+
 		const settings = applyFilters(
 			'blocks.registerBlockType',
 			blockType,
 			name,
 			null
 		);
+
+		if ( settings.apiVersion <= 2 ) {
+			warning(
+				`The block "${ name }" is registered with API version 2 or lower. This means that the post editor may work as a non-iframe editor.\n` +
+					`Since all editors are planned to work as iframes in the future, set the \`apiVersion\` field to 3 and test the block inside the iframe editor.\n` +
+					`See: https://developer.wordpress.org/block-editor/reference-guides/block-api/block-api-versions/#version-3-wordpress-6-3`
+			);
+		}
 
 		if (
 			settings.description &&

@@ -47,7 +47,7 @@ export default function Token( {
 	const transformedValue = displayTransform( value );
 	const termPositionAndCount = sprintf(
 		/* translators: 1: term name, 2: term position in a set of terms, 3: total term set count. */
-		__( '%1$s (%2$s of %3$s)' ),
+		__( '%1$s (%2$d of %3$d)' ),
 		transformedValue,
 		termPosition,
 		termsCount

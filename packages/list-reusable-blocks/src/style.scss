@@ -1,5 +1,6 @@
-@import "./components/import-dropdown/style.scss";
-@import "./components/import-form/style.scss";
+@use "@wordpress/base-styles/mixins" as *;
+@use "./components/import-dropdown/style.scss" as *;
+@use "./components/import-form/style.scss" as *;
 
 .list-reusable-blocks__container {
 	display: inline-flex;

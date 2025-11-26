@@ -66,7 +66,8 @@ export default function AddNewPostModal( { postType, onSave, onClose } ) {
 				sprintf(
 					// translators: %s: Title of the created post or template, e.g: "Hello world".
 					__( '"%s" successfully created.' ),
-					decodeEntities( newPage.title?.rendered || title )
+					decodeEntities( newPage.title?.rendered || title ) ||
+						__( '(no title)' )
 				),
 				{ type: 'snackbar' }
 			);

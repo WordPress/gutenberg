@@ -5,7 +5,7 @@ import type { Meta, StoryFn } from '@storybook/react';
 /**
  * WordPress dependencies
  */
-import { useState, createContext, useContext } from '@wordpress/element';
+import { createContext, useContext, useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
@@ -37,7 +37,6 @@ const meta: Meta< typeof CircularOptionPicker > = {
 		children: { control: { type: 'text' } },
 	},
 	parameters: {
-		actions: { argTypesRegex: '^on.*' },
 		controls: { expanded: true },
 		docs: {
 			canvas: { sourceState: 'shown' },
@@ -152,7 +151,7 @@ WithDropdownLinkAction.args = {
 	actions: (
 		<CircularOptionPicker.DropdownLinkAction
 			dropdownProps={ {
-				popoverProps: { position: 'top right' },
+				popoverProps: { placement: 'top-end' },
 				renderContent: () => (
 					<div>This is an example of a DropdownLinkAction.</div>
 				),

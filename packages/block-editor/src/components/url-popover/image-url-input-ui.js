@@ -2,7 +2,12 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useRef, useEffect, useState } from '@wordpress/element';
+import {
+	useRef,
+	useEffect,
+	useState,
+	createInterpolateElement,
+} from '@wordpress/element';
 import { focus } from '@wordpress/dom';
 import {
 	ToolbarButton,
@@ -12,6 +17,7 @@ import {
 	ToggleControl,
 	TextControl,
 	__experimentalVStack as VStack,
+	ExternalLink,
 } from '@wordpress/components';
 import {
 	Icon,
@@ -21,6 +27,7 @@ import {
 	fullscreen,
 	linkOff,
 } from '@wordpress/icons';
+import { prependHTTP } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -149,7 +156,7 @@ const ImageURLInputUI = ( {
 					)?.linkDestination || LINK_DESTINATION_CUSTOM;
 
 				onChangeUrl( {
-					href: urlInput,
+					href: prependHTTP( urlInput ),
 					linkDestination: selectedDestination,
 					lightbox: { enabled: false },
 				} );
@@ -229,9 +236,19 @@ const ImageURLInputUI = ( {
 			<TextControl
 				__next40pxDefaultSize
 				__nextHasNoMarginBottom
-				label={ __( 'Link rel' ) }
+				label={ __( 'Link relation' ) }
 				value={ rel ?? '' }
 				onChange={ onSetLinkRel }
+				help={ createInterpolateElement(
+					__(
+						'The <a>Link Relation</a> attribute defines the relationship between a linked resource and the current document.'
+					),
+					{
+						a: (
+							<ExternalLink href="https://developer.mozilla.org/docs/Web/HTML/Attributes/rel" />
+						),
+					}
+				) }
 			/>
 			<TextControl
 				__next40pxDefaultSize

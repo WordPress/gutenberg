@@ -29,5 +29,6 @@ const initialContextValue: SlotFillBubblesVirtuallyContext = {
 };
 
 const SlotFillContext = createContext( initialContextValue );
+SlotFillContext.displayName = 'SlotFillContext';
 
 export default SlotFillContext;

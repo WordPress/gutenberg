@@ -46,6 +46,7 @@ const CONFIG_CACHE_KEY = 'config_checksum';
  * @param {Object}  options.spinner A CLI spinner which indicates progress.
  * @param {boolean} options.update  If true, update sources.
  * @param {string}  options.xdebug  The Xdebug mode to set.
+ * @param {string}  options.spx     The SPX mode to set.
  * @param {boolean} options.scripts Indicates whether or not lifecycle scripts should be executed.
  * @param {boolean} options.debug   True if debug mode is enabled.
  */
@@ -53,6 +54,7 @@ module.exports = async function start( {
 	spinner,
 	update,
 	xdebug,
+	spx,
 	scripts,
 	debug,
 } ) {
@@ -63,6 +65,7 @@ module.exports = async function start( {
 		spinner,
 		debug,
 		xdebug,
+		spx,
 		writeChanges: true,
 	} );
 

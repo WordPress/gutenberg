@@ -1,0 +1,99 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
+@use "../utils/theme-variables" as *;
+
+.components-validated-control {
+	// For components based on InputBase
+	&:has(:is(input, select):user-invalid)
+	.components-input-control__backdrop {
+		--wp-components-color-accent: #{$alert-red};
+		border-color: $alert-red;
+	}
+
+	// For TextControl, TextareaControl
+	:is(textarea, input[type="text"]):user-invalid {
+		--wp-admin-theme-color: #{$alert-red};
+		--wp-components-color-accent: #{$alert-red};
+		border-color: $alert-red;
+	}
+
+	// For ComboboxControl
+	.components-combobox-control__suggestions-container:has(
+	input:user-invalid
+):not(:has([aria-expanded="true"])) {
+		border-color: $alert-red;
+	}
+}
+
+.components-validated-control__wrapper-with-error-delegate {
+	position: relative;
+
+	// For CustomSelectControl
+	&:has(select:user-invalid) .components-input-control__backdrop {
+		--wp-components-color-accent: #{$alert-red};
+		border-color: $alert-red;
+	}
+
+	// For ToggleGroupControl
+	&:has(input[type="radio"]:invalid) {
+		--wp-components-color-accent: #{$alert-red};
+	}
+
+	// For FormTokenField
+	&:has(input:user-invalid) .components-form-token-field__input-container:not(:has([aria-expanded="true"])) {
+		--wp-components-color-accent: #{$alert-red};
+		border-color: $alert-red;
+	}
+}
+
+.components-validated-control__error-delegate {
+	position: absolute;
+	top: 0;
+	height: 100%;
+	width: 100%;
+	opacity: 0;
+	pointer-events: none;
+}
+
+.components-validated-control__indicator {
+	display: flex;
+	align-items: flex-start;
+	gap: 4px;
+	margin: 8px 0 0;
+	font-family: $font-family-body;
+	font-size: $font-size-small;
+	line-height: 16px; // matches the icon size
+	color: $components-color-gray-700;
+	animation:
+		components-validated-control__indicator-jump 0.2s
+		cubic-bezier(0.68, -0.55, 0.27, 1.55);
+
+	&.is-invalid {
+		color: $alert-red;
+	}
+
+	&.is-valid {
+		color: color-mix(in srgb, $black 30%, $alert-green);
+	}
+}
+
+.components-validated-control__indicator-icon {
+	flex-shrink: 0;
+}
+
+.components-validated-control__indicator-spinner {
+	margin: 2px;
+	width: $grid-unit-15;
+	height: $grid-unit-15;
+}
+
+@keyframes components-validated-control__indicator-jump {
+	0% {
+		transform: translateY(-4px);
+		opacity: 0;
+	}
+	100% {
+		transform: translateY(0);
+		opacity: 1;
+	}
+}

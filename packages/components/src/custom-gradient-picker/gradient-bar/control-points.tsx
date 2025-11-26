@@ -58,7 +58,7 @@ function ControlPointButton( {
 				aria-label={ sprintf(
 					// translators: 1: gradient position e.g: 70. 2: gradient color code e.g: rgb(52,121,151).
 					__(
-						'Gradient control point at position %1$s%% with color code %2$s.'
+						'Gradient control point at position %1$d%% with color code %2$s.'
 					),
 					position,
 					color

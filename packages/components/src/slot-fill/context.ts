@@ -19,5 +19,6 @@ const initialValue: BaseSlotFillContext = {
 	updateFill: () => {},
 };
 export const SlotFillContext = createContext( initialValue );
+SlotFillContext.displayName = 'SlotFillContext';
 
 export default SlotFillContext;

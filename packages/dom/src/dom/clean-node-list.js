@@ -10,7 +10,6 @@ import isElement from './is-element';
 
 const noop = () => {};
 
-/* eslint-disable jsdoc/valid-types */
 /**
  * @typedef SchemaItem
  * @property {string[]}                            [attributes] Attributes.
@@ -22,7 +21,6 @@ const noop = () => {};
  */
 
 /** @typedef {{ [tag: string]: SchemaItem }} Schema */
-/* eslint-enable jsdoc/valid-types */
 
 /**
  * Given a schema, unwraps or removes nodes, attributes and classes on a node

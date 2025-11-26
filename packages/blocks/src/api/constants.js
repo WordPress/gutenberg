@@ -222,6 +222,11 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 		support: [ 'dimensions', 'minHeight' ],
 		useEngine: true,
 	},
+	width: {
+		value: [ 'dimensions', 'width' ],
+		support: [ 'dimensions', 'width' ],
+		useEngine: true,
+	},
 	padding: {
 		value: [ 'spacing', 'padding' ],
 		support: [ 'spacing', 'padding' ],
@@ -284,6 +289,9 @@ export const __EXPERIMENTAL_ELEMENTS = {
 	caption:
 		'.wp-element-caption, .wp-block-audio figcaption, .wp-block-embed figcaption, .wp-block-gallery figcaption, .wp-block-image figcaption, .wp-block-table figcaption, .wp-block-video figcaption',
 	cite: 'cite',
+	select: 'select',
+	textInput:
+		'textarea, input:where([type=email],[type=number],[type=password],[type=search],[type=tel],[type=text],[type=url])',
 };
 
 // These paths may have three origins, custom, theme, and default,

@@ -23,7 +23,4 @@ export const store = createReduxStore( STORE_NAME, {
 	actions,
 	selectors,
 } );
-
-// Once we build a more generic persistence plugin that works across types of stores
-// we'd be able to replace this with a register call.
 register( store );

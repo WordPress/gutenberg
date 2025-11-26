@@ -7,26 +7,18 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import {
-	HorizontalRule,
-	SelectControl,
-	PanelBody,
-	__experimentalToolsPanel as ToolsPanel,
-	__experimentalToolsPanelItem as ToolsPanelItem,
-} from '@wordpress/components';
-import {
-	useBlockProps,
 	getColorClassName,
-	__experimentalUseColorProps as useColorProps,
 	InspectorControls,
+	useBlockProps,
+	__experimentalUseColorProps as useColorProps,
 } from '@wordpress/block-editor';
-import { Platform } from '@wordpress/element';
+import { HorizontalRule, SelectControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import useDeprecatedOpacity from './use-deprecated-opacity';
-import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
 const HtmlElementControl = ( { tagName, setAttributes } ) => {
 	return (
@@ -58,7 +50,6 @@ export default function SeparatorEdit( { attributes, setAttributes } ) {
 	const colorProps = useColorProps( attributes );
 	const currentColor = colorProps?.style?.backgroundColor;
 	const hasCustomColor = !! style?.color?.background;
-	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
 	useDeprecatedOpacity( opacity, currentColor, setAttributes );
 
@@ -84,37 +75,11 @@ export default function SeparatorEdit( { attributes, setAttributes } ) {
 
 	return (
 		<>
-			<InspectorControls>
-				{ Platform.isNative ? (
-					<PanelBody title={ __( 'Settings' ) }>
-						<HtmlElementControl
-							tagName={ tagName }
-							setAttributes={ setAttributes }
-						/>
-					</PanelBody>
-				) : (
-					<ToolsPanel
-						label={ __( 'Settings' ) }
-						resetAll={ () => {
-							setAttributes( { tagName: 'hr' } );
-						} }
-						dropdownMenuProps={ dropdownMenuProps }
-					>
-						<ToolsPanelItem
-							hasValue={ () => tagName !== 'hr' }
-							label={ __( 'HTML element' ) }
-							onDeselect={ () =>
-								setAttributes( { tagName: 'hr' } )
-							}
-							isShownByDefault
-						>
-							<HtmlElementControl
-								tagName={ tagName }
-								setAttributes={ setAttributes }
-							/>
-						</ToolsPanelItem>
-					</ToolsPanel>
-				) }
+			<InspectorControls group="advanced">
+				<HtmlElementControl
+					tagName={ tagName }
+					setAttributes={ setAttributes }
+				/>
 			</InspectorControls>
 			<Wrapper
 				{ ...useBlockProps( {

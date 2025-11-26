@@ -3,7 +3,7 @@
 /**
  * Test the block WP_Navigation_Block_Renderer class.
  *
- * @package Gutenberg
+ * @package gutenberg
  */
 
 class WP_Navigation_Block_Renderer_Test extends WP_UnitTestCase {

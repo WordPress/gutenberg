@@ -151,7 +151,7 @@ function useInsertionPoint( {
 			if (
 				! isAppender &&
 				selectedBlock &&
-				isUnmodifiedDefaultBlock( selectedBlock )
+				isUnmodifiedDefaultBlock( selectedBlock, 'content' )
 			) {
 				replaceBlocks(
 					selectedBlock.clientId,

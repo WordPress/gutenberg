@@ -10,6 +10,7 @@ import useSaveImage from './use-save-image';
 import useTransformImage from './use-transform-image';
 
 const ImageEditingContext = createContext( {} );
+ImageEditingContext.displayName = 'ImageEditingContext';
 
 export const useImageEditingContext = () => useContext( ImageEditingContext );
 

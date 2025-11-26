@@ -5,31 +5,45 @@ import { __ } from '@wordpress/i18n';
 import { ComboboxControl } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-import { useState } from '@wordpress/element';
+import { useMemo, useState } from '@wordpress/element';
+import { debounce } from '@wordpress/compose';
+import { decodeEntities } from '@wordpress/html-entities';
 
 const AUTHORS_QUERY = {
 	who: 'authors',
-	per_page: -1,
+	per_page: 100,
 	_fields: 'id,name',
 	context: 'view',
 };
 
-function UserControl( { value, onChange } ) {
-	const [ filteredAuthorsList, setFilteredAuthorsList ] = useState();
-	const authorsList = useSelect( ( select ) => {
-		const { getUsers } = select( coreStore );
-		return getUsers( AUTHORS_QUERY );
-	}, [] );
-	if ( ! authorsList ) {
-		return null;
-	}
+export default function UserControl( { value, onChange } ) {
+	const [ filterValue, setFilterValue ] = useState( '' );
+	const { authors, isLoading } = useSelect(
+		( select ) => {
+			const { getUsers, isResolving } = select( coreStore );
 
-	const options = authorsList.map( ( author ) => {
-		return {
-			label: author.name,
-			value: author.id,
-		};
-	} );
+			const query = { ...AUTHORS_QUERY };
+			if ( filterValue ) {
+				query.search = filterValue;
+				query.search_columns = [ 'name' ];
+			}
+
+			return {
+				authors: getUsers( query ),
+				isLoading: isResolving( 'getUsers', [ query ] ),
+			};
+		},
+		[ filterValue ]
+	);
+
+	const options = useMemo( () => {
+		return ( authors ?? [] ).map( ( author ) => {
+			return {
+				value: author.id,
+				label: decodeEntities( author.name ),
+			};
+		} );
+	}, [ authors ] );
 
 	return (
 		<ComboboxControl
@@ -41,18 +55,9 @@ function UserControl( { value, onChange } ) {
 			) }
 			value={ value }
 			onChange={ onChange }
-			options={ filteredAuthorsList || options }
-			onFilterValueChange={ ( inputValue ) =>
-				setFilteredAuthorsList(
-					options.filter( ( option ) =>
-						option.label
-							.toLowerCase()
-							.startsWith( inputValue.toLowerCase() )
-					)
-				)
-			}
+			options={ options }
+			onFilterValueChange={ debounce( setFilterValue, 300 ) }
+			isLoading={ isLoading }
 		/>
 	);
 }
-
-export default UserControl;

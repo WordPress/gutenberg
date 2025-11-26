@@ -401,7 +401,7 @@ _Parameters_
 
 -   _props_ `Object`: The component props.
 -   _props.close_ `Function`: The function to close the dialog.
--   _props.renderDialog_ `boolean`: Whether to render the component with modal dialog behavior.
+-   _props.renderDialog_ `boolean=`: Whether to render the component with modal dialog behavior.
 -   _props.variant_ `string`: Changes the layout of the component. When an `inline` value is provided, the action buttons are rendered at the end of the component instead of at the start.
 
 _Returns_
@@ -489,7 +489,7 @@ The module also checks for sessionStorage support and conditionally exports the 
 
 ### mediaUpload
 
-Upload a media file when the file upload button is activated. Wrapper around mediaUpload() that injects the current post ID.
+Upload a media file when the file upload button is activated. Wrapper around uploadMedia() that injects the current post ID.
 
 _Parameters_
 

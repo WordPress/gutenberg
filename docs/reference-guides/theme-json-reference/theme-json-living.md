@@ -2,7 +2,7 @@
 
 > This is the living specification for  **version 3** of `theme.json`. This version works with WordPress 6.6 or later, and the latest Gutenberg plugin.
 >
-> There are some related documents that you may be interested in: 
+> There are some related documents that you may be interested in:
 > - the [theme.json v1](/docs/reference-guides/theme-json-reference/theme-json-v1.md) specification,
 > - the [theme.json v2](/docs/reference-guides/theme-json-reference/theme-json-v2.md) specification, and
 > - the [reference to migrate from older theme.json versions](/docs/reference-guides/theme-json-reference/theme-json-migrations.md).
@@ -15,7 +15,7 @@ This documentation was generated from the JSON schema for theme.json.
 
 The latest schema for version 3, including all the latest changes from the Gutenberg plugin, is available at <code>https://schemas.wp.org/trunk/theme.json</code>.
 
-Theme.json schemas for each WordPress version are available at <code>https://schemas.wp.org/wp/{{version}}/theme.json</code>.  
+Theme.json schemas for each WordPress version are available at <code>https://schemas.wp.org/wp/{{version}}/theme.json</code>.
 For example, a schema for WordPress 5.8 is available at <code>https://schemas.wp.org/wp/5.8/theme.json</code>.
 
 See [Developing with theme.json](/docs/how-to-guides/themes/global-settings-and-styles.md#developing-with-themejson) for how to use the JSON schema in your editor.
@@ -46,7 +46,7 @@ Setting that enables the following UI tools:
 - background: backgroundImage, backgroundSize
 - border: color, radius, style, width
 - color: link, heading, button, caption
-- dimensions: aspectRatio, minHeight
+- dimensions: aspectRatio, minHeight, width
 - position: sticky
 - spacing: blockGap, margin, padding
 - typography: lineHeight
@@ -74,6 +74,7 @@ Settings related to borders.
 | radius | Allow users to set custom border radius. | `boolean` | `false` |
 | style | Allow users to set custom border styles. | `boolean` | `false` |
 | width | Allow users to set custom border widths. | `boolean` | `false` |
+| radiusSizes | Border radius size presets for the border radius selector. | `[ { name, slug, size } ]` |  |
 
 ---
 
@@ -111,6 +112,7 @@ Settings related to dimensions.
 | defaultAspectRatios | Allow users to choose aspect ratios from the default set of aspect ratios. | `boolean` | `true` |
 | aspectRatios | Allow users to define aspect ratios for some blocks. | `[ { name, slug, ratio } ]` |  |
 | minHeight | Allow users to set custom minimum height. | `boolean` | `false` |
+| width | Allow users to set custom width. | `boolean` | `false` |
 
 ---
 
@@ -267,6 +269,7 @@ Dimensions styles.
 | -------- | ----------- | ---- |
 | aspectRatio | Sets the `aspect-ratio` CSS property. | `string`, `{ ref }` |
 | minHeight | Sets the `min-height` CSS property. | `string`, `{ ref }` |
+| width | Sets the `width` CSS property. | `string`, `{ ref }` |
 
 ---
 

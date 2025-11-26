@@ -7,7 +7,7 @@ const spawn = require( 'cross-spawn' );
  * Internal dependencies
  */
 const { getArgFromCLI, hasArgInCLI } = require( '../utils' );
-const { checkDepsInTree } = require( '../utils/license' );
+const { checkDeps, getLicenses } = require( '../utils/license' );
 
 /*
  * WARNING: Changes to this file may inadvertently cause us to distribute code that
@@ -29,26 +29,22 @@ const ignored = hasArgInCLI( '--ignore' )
 			.map( ( moduleName ) => moduleName.trim() )
 	: [];
 
-// Use `npm ls` to grab a list of all the packages.
-const child = spawn.sync(
-	'npm',
-	[
-		'ls',
-		'--json',
-		'--long',
-		'--all',
-		...( prod ? [ '--omit=dev' ] : [] ),
-		...( dev ? [ '--include=dev' ] : [] ),
-	],
-	/*
-	 * Set the max buffer to ~157MB, since the output size for
-	 * prod is ~21 MB and dev is ~110 MB
-	 */
-	{ maxBuffer: 1024 * 1024 * 150 }
-);
+let query = '';
+if ( prod ) {
+	query += '.prod';
+} else if ( dev ) {
+	query += '.dev';
+} else {
+	query += '*';
+}
 
-const result = JSON.parse( child.stdout.toString() );
+query += `:not(${ getLicenses( gpl2 )
+	.map( ( license ) => `[license=${ JSON.stringify( license ) }]` )
+	.join( ',' ) })`;
 
-const topLevelDeps = result.dependencies;
+// Use `npm query` to grab a list of all the packages.
+const child = spawn.sync( 'npm', [ 'query', query ] );
 
-checkDepsInTree( topLevelDeps, { ignored, gpl2 } );
+const packages = JSON.parse( child.stdout.toString() );
+
+checkDeps( packages, { ignored, gpl2 } );

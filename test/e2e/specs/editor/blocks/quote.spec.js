@@ -79,6 +79,9 @@ test.describe( 'Quote', () => {
 			.locator( 'role=button[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '/quote' );
+		await expect(
+			page.getByRole( 'option', { name: 'Quote', exact: true } )
+		).toBeVisible();
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'I’m a quote' );
 		expect( await editor.getEditedPostContent() ).toBe(
@@ -235,22 +238,6 @@ test.describe( 'Quote', () => {
 <h2 class="wp-block-heading">test</h2>
 <!-- /wp:heading --></blockquote>
 <!-- /wp:quote -->`
-		);
-	} );
-
-	test( 'can be converted to a pullquote', async ( { editor, page } ) => {
-		await editor.insertBlock( { name: 'core/quote' } );
-		await page.keyboard.type( 'one' );
-		await page.keyboard.press( 'Enter' );
-		await page.keyboard.type( 'two' );
-		await editor.clickBlockToolbarButton( 'Select parent block: Quote' );
-		await editor.clickBlockToolbarButton( 'Add citation' );
-		await page.keyboard.type( 'cite' );
-		await editor.transformBlockTo( 'core/pullquote' );
-		expect( await editor.getEditedPostContent() ).toBe(
-			`<!-- wp:pullquote -->
-<figure class="wp-block-pullquote"><blockquote><p>one<br>two</p><cite>cite</cite></blockquote></figure>
-<!-- /wp:pullquote -->`
 		);
 	} );
 

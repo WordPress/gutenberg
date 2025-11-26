@@ -1,3 +1,5 @@
+@use "@wordpress/base-styles/colors" as *;
+
 // These rules are needed for backwards compatibility.
 .wp-block-button__link {
 	color: $white;

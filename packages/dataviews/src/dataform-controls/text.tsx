@@ -1,40 +1,35 @@
 /**
  * WordPress dependencies
  */
-import { TextControl } from '@wordpress/components';
-import { useCallback } from '@wordpress/element';
+import { createElement } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import type { DataFormControlProps } from '../types';
+import ValidatedText from './utils/validated-input';
 
 export default function Text< Item >( {
 	data,
 	field,
 	onChange,
 	hideLabelFromVision,
+	config,
+	validity,
 }: DataFormControlProps< Item > ) {
-	const { id, label, placeholder } = field;
-	const value = field.getValue( { item: data } );
-
-	const onChangeControl = useCallback(
-		( newValue: string ) =>
-			onChange( {
-				[ id ]: newValue,
-			} ),
-		[ id, onChange ]
-	);
+	const { prefix, suffix } = config || {};
 
 	return (
-		<TextControl
-			label={ label }
-			placeholder={ placeholder }
-			value={ value ?? '' }
-			onChange={ onChangeControl }
-			__next40pxDefaultSize
-			__nextHasNoMarginBottom
-			hideLabelFromVision={ hideLabelFromVision }
+		<ValidatedText
+			{ ...{
+				data,
+				field,
+				onChange,
+				hideLabelFromVision,
+				validity,
+				prefix: prefix ? createElement( prefix ) : undefined,
+				suffix: suffix ? createElement( suffix ) : undefined,
+			} }
 		/>
 	);
 }

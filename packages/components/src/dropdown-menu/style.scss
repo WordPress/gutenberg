@@ -1,3 +1,6 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
+
 .components-dropdown-menu__toggle {
 	vertical-align: top;
 }
@@ -15,6 +18,7 @@
 		outline: none;
 		cursor: pointer;
 		white-space: nowrap;
+		font-weight: $font-weight-regular;
 
 		&.has-separator {
 			margin-top: 6px;

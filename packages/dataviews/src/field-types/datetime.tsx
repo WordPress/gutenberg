@@ -1,28 +1,76 @@
 /**
  * Internal dependencies
  */
-import type { SortDirection, ValidationContext } from '../types';
+import type { DataViewRenderFieldProps, SortDirection } from '../types';
+import type { FieldType } from '../types/private';
+import RenderFromElements from './utils/render-from-elements';
+import parseDateTime from './utils/parse-date-time';
+import {
+	OPERATOR_ON,
+	OPERATOR_NOT_ON,
+	OPERATOR_BEFORE,
+	OPERATOR_AFTER,
+	OPERATOR_BEFORE_INC,
+	OPERATOR_AFTER_INC,
+	OPERATOR_IN_THE_PAST,
+	OPERATOR_OVER,
+} from '../constants';
 
-function sort( a: any, b: any, direction: SortDirection ) {
+function render( { item, field }: DataViewRenderFieldProps< any > ) {
+	if ( field.elements ) {
+		return <RenderFromElements item={ item } field={ field } />;
+	}
+
+	const value = field.getValue( { item } );
+	if ( [ '', undefined, null ].includes( value ) ) {
+		return null;
+	}
+
+	try {
+		const dateValue = parseDateTime( value );
+		return dateValue?.toLocaleString();
+	} catch ( error ) {
+		return null;
+	}
+}
+
+const sort = ( a: any, b: any, direction: SortDirection ) => {
 	const timeA = new Date( a ).getTime();
 	const timeB = new Date( b ).getTime();
 
 	return direction === 'asc' ? timeA - timeB : timeB - timeA;
-}
-
-function isValid( value: any, context?: ValidationContext ) {
-	if ( context?.elements ) {
-		const validValues = context?.elements.map( ( f ) => f.value );
-		if ( ! validValues.includes( value ) ) {
-			return false;
-		}
-	}
-
-	return true;
-}
+};
 
 export default {
-	sort,
-	isValid,
+	type: 'datetime',
+	render,
 	Edit: 'datetime',
-};
+	sort,
+	isValid: {
+		elements: true,
+		custom: () => null,
+	},
+	enableSorting: true,
+	enableGlobalSearch: false,
+	defaultOperators: [
+		OPERATOR_ON,
+		OPERATOR_NOT_ON,
+		OPERATOR_BEFORE,
+		OPERATOR_AFTER,
+		OPERATOR_BEFORE_INC,
+		OPERATOR_AFTER_INC,
+		OPERATOR_IN_THE_PAST,
+		OPERATOR_OVER,
+	],
+	validOperators: [
+		OPERATOR_ON,
+		OPERATOR_NOT_ON,
+		OPERATOR_BEFORE,
+		OPERATOR_AFTER,
+		OPERATOR_BEFORE_INC,
+		OPERATOR_AFTER_INC,
+		OPERATOR_IN_THE_PAST,
+		OPERATOR_OVER,
+	],
+	getFormat: () => ( {} ),
+} satisfies FieldType< any >;

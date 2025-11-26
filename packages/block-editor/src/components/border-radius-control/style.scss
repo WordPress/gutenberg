@@ -1,26 +1,20 @@
+@use "@wordpress/base-styles/variables" as *;
+
+.components-border-radius-control__header {
+	height: $grid-unit-20;
+	margin-bottom: $grid-unit-15;
+}
+
 .components-border-radius-control {
+	// Reset `fieldset` browser defaults.
+	border: 0;
+	padding: 0;
+	margin: 0;
+
 	margin-bottom: $grid-unit-15;
 
 	legend {
-		margin-bottom: $grid-unit-10;
-	}
-
-	.components-border-radius-control__wrapper {
-		display: flex;
-		justify-content: space-between;
-		align-items: flex-start;
-
-		.components-border-radius-control__unit-control {
-			width: calc((100% - #{$grid-unit-20}) / 2);
-			margin-bottom: 0;
-			margin-right: $grid-unit-20;
-			flex-shrink: 0;
-		}
-
-		.components-border-radius-control__range-control {
-			flex: 1;
-			margin-right: $grid-unit-15;
-		}
+		margin-bottom: 0;
 	}
 
 	.components-border-radius-control__input-controls-wrapper {
@@ -30,13 +24,21 @@
 		margin-right: $grid-unit-15;
 	}
 
-	.component-border-radius-control__linked-button {
+	.components-border-radius-control__linked-button {
 		display: flex;
 		justify-content: center;
-		margin-top: $grid-unit-10;
 
 		svg {
 			margin-right: 0;
 		}
 	}
+}
+
+.components-border-radius-control__custom-select-control,
+.components-border-radius-control__range-control {
+	flex: 1;
+}
+
+.components-border-radius-control__icon {
+	flex: 0 0 auto;
 }

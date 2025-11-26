@@ -94,7 +94,7 @@ const deletePostAction: Action< Template | TemplatePart | Pattern > = {
 										getMessage: ( item ) => {
 											return isResetting
 												? sprintf(
-														/* translators: The template/part's name. */
+														/* translators: %s: The template/part's name. */
 														__( '"%s" reset.' ),
 														decodeEntities(
 															getItemTitle( item )

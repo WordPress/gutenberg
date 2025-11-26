@@ -1,0 +1,44 @@
+/**
+ * Internal dependencies
+ */
+import type { FieldType } from '../types/private';
+import {
+	OPERATOR_IS,
+	OPERATOR_IS_ALL,
+	OPERATOR_IS_NOT_ALL,
+	OPERATOR_IS_ANY,
+	OPERATOR_IS_NONE,
+	OPERATOR_IS_NOT,
+	OPERATOR_CONTAINS,
+	OPERATOR_NOT_CONTAINS,
+	OPERATOR_STARTS_WITH,
+} from '../constants';
+import render from './utils/render-default';
+import sort from './utils/sort-text';
+
+export default {
+	type: 'url',
+	render,
+	Edit: 'url',
+	sort,
+	isValid: {
+		elements: true,
+		custom: () => null,
+	},
+	enableSorting: true,
+	enableGlobalSearch: false,
+	defaultOperators: [ OPERATOR_IS_ANY, OPERATOR_IS_NONE ],
+	validOperators: [
+		OPERATOR_IS,
+		OPERATOR_IS_NOT,
+		OPERATOR_CONTAINS,
+		OPERATOR_NOT_CONTAINS,
+		OPERATOR_STARTS_WITH,
+		// Multiple selection
+		OPERATOR_IS_ANY,
+		OPERATOR_IS_NONE,
+		OPERATOR_IS_ALL,
+		OPERATOR_IS_NOT_ALL,
+	],
+	getFormat: () => ( {} ),
+} satisfies FieldType< any >;

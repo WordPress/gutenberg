@@ -4,7 +4,7 @@
 import { useEntityRecord } from '@wordpress/core-data';
 
 function Media( { id, size = [ 'large', 'medium', 'thumbnail' ], ...props } ) {
-	const { record: media } = useEntityRecord( 'root', 'media', id );
+	const { record: media } = useEntityRecord( 'postType', 'attachment', id );
 	const currentSize = size.find(
 		( s ) => !! media?.media_details?.sizes?.[ s ]
 	);

@@ -22,7 +22,7 @@ import type { KeyboardEventHandler } from 'react';
  */
 import { __, _n, sprintf, isRTL } from '@wordpress/i18n';
 import { arrowLeft, arrowRight } from '@wordpress/icons';
-import { dateI18n, getSettings } from '@wordpress/date';
+import { getSettings, gmdateI18n } from '@wordpress/date';
 import { useState, useRef, useEffect } from '@wordpress/element';
 
 /**
@@ -33,13 +33,14 @@ import type { DatePickerProps } from '../types';
 import {
 	Wrapper,
 	Navigator,
+	ViewPreviousMonthButton,
+	ViewNextMonthButton,
 	NavigatorHeading,
 	Calendar,
 	DayOfWeek,
 	DayButton,
 } from './styles';
 import { inputToDate } from '../utils';
-import Button from '../../button';
 import { TIMEZONELESS_FORMAT } from '../constants';
 
 /**
@@ -111,7 +112,7 @@ export function DatePicker( {
 			aria-label={ __( 'Calendar' ) }
 		>
 			<Navigator>
-				<Button
+				<ViewPreviousMonthButton
 					icon={ isRTL() ? arrowRight : arrowLeft }
 					variant="tertiary"
 					aria-label={ __( 'View previous month' ) }
@@ -128,16 +129,10 @@ export function DatePicker( {
 					size="compact"
 				/>
 				<NavigatorHeading level={ 3 }>
-					<strong>
-						{ dateI18n(
-							'F',
-							viewing,
-							-viewing.getTimezoneOffset()
-						) }
-					</strong>{ ' ' }
-					{ dateI18n( 'Y', viewing, -viewing.getTimezoneOffset() ) }
+					<strong>{ gmdateI18n( 'F', viewing ) }</strong>{ ' ' }
+					{ gmdateI18n( 'Y', viewing ) }
 				</NavigatorHeading>
-				<Button
+				<ViewNextMonthButton
 					icon={ isRTL() ? arrowLeft : arrowRight }
 					variant="tertiary"
 					aria-label={ __( 'View next month' ) }
@@ -160,7 +155,7 @@ export function DatePicker( {
 			>
 				{ calendar[ 0 ][ 0 ].map( ( day ) => (
 					<DayOfWeek key={ day.toString() }>
-						{ dateI18n( 'D', day, -day.getTimezoneOffset() ) }
+						{ gmdateI18n( 'D', day ) }
 					</DayOfWeek>
 				) ) }
 				{ calendar[ 0 ].map( ( week ) =>
@@ -319,18 +314,14 @@ function Day( {
 			onClick={ onClick }
 			onKeyDown={ onKeyDown }
 		>
-			{ dateI18n( 'j', day, -day.getTimezoneOffset() ) }
+			{ gmdateI18n( 'j', day ) }
 		</DayButton>
 	);
 }
 
 function getDayLabel( date: Date, isSelected: boolean, numEvents: number ) {
 	const { formats } = getSettings();
-	const localizedDate = dateI18n(
-		formats.date,
-		date,
-		-date.getTimezoneOffset()
-	);
+	const localizedDate = gmdateI18n( formats.date, date );
 	if ( isSelected && numEvents > 0 ) {
 		return sprintf(
 			// translators: 1: The calendar date. 2: Number of events on the calendar date.
@@ -344,7 +335,7 @@ function getDayLabel( date: Date, isSelected: boolean, numEvents: number ) {
 		);
 	} else if ( isSelected ) {
 		return sprintf(
-			// translators: %s: The calendar date.
+			// translators: 1: The calendar date.
 			__( '%1$s. Selected' ),
 			localizedDate
 		);

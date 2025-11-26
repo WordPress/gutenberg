@@ -57,10 +57,10 @@ test.describe( 'Cover', () => {
 			name: 'Block: Cover',
 		} );
 
-		const filename = await coverBlockUtils.upload(
+		const fileName = await coverBlockUtils.upload(
 			coverBlock.getByTestId( 'form-file-upload-input' )
 		);
-		const fileBasename = path.basename( filename );
+		const fileBasename = path.basename( fileName );
 
 		// Wait for the img's src attribute to be prefixed with http.
 		// Otherwise, the URL for the img src attribute starts is a placeholder
@@ -364,12 +364,12 @@ class CoverBlockUtils {
 		const tmpDirectory = await fs.mkdtemp(
 			path.join( os.tmpdir(), 'gutenberg-test-image-' )
 		);
-		const filename = uuid();
-		const tmpFileName = path.join( tmpDirectory, filename + '.png' );
+		const fileName = uuid();
+		const tmpFileName = path.join( tmpDirectory, fileName + '.png' );
 		await fs.copyFile( this.TEST_IMAGE_FILE_PATH, tmpFileName );
 
 		await locator.setInputFiles( tmpFileName );
 
-		return filename;
+		return fileName;
 	}
 }

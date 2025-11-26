@@ -8,6 +8,7 @@ import { __ } from '@wordpress/i18n';
  */
 import SidebarNavigationScreen from '../sidebar-navigation-screen';
 import DataviewsTemplatesSidebarContent from './content';
+import DataviewsTemplatesSidebarContentLegacy from './content-legacy';
 
 export default function SidebarNavigationScreenTemplatesBrowse( { backPath } ) {
 	return (
@@ -17,7 +18,13 @@ export default function SidebarNavigationScreenTemplatesBrowse( { backPath } ) {
 				'Create new templates, or reset any customizations made to the templates supplied by your theme.'
 			) }
 			backPath={ backPath }
-			content={ <DataviewsTemplatesSidebarContent /> }
+			content={
+				window?.__experimentalTemplateActivate ? (
+					<DataviewsTemplatesSidebarContent />
+				) : (
+					<DataviewsTemplatesSidebarContentLegacy />
+				)
+			}
 		/>
 	);
 }

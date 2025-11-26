@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-const resolverNode = require( 'eslint-import-resolver-node' );
+const resolverNode = require( 'eslint-import-resolver-typescript' );
 const path = require( 'path' );
 
 const PACKAGES_DIR = path.resolve( __dirname, '../../packages' );

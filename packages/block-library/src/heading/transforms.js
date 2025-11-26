@@ -7,7 +7,7 @@ import { createBlock, getBlockAttributes } from '@wordpress/blocks';
  * Internal dependencies
  */
 import { getLevelFromHeadingNodeName } from './shared';
-import { getTransformedMetadata } from '../utils/get-transformed-metadata';
+import { getTransformedAttributes } from '../utils/get-transformed-attributes';
 
 const transforms = {
 	from: [
@@ -16,21 +16,22 @@ const transforms = {
 			isMultiBlock: true,
 			blocks: [ 'core/paragraph' ],
 			transform: ( attributes ) =>
-				attributes.map(
-					( { content, anchor, align: textAlign, metadata } ) =>
-						createBlock( 'core/heading', {
-							content,
-							anchor,
-							textAlign,
-							metadata: getTransformedMetadata(
-								metadata,
-								'core/heading',
-								( { content: contentBinding } ) => ( {
-									content: contentBinding,
-								} )
-							),
-						} )
-				),
+				attributes.map( ( _attributes ) => {
+					const { content, anchor, style } = _attributes;
+					const textAlign = style?.typography?.textAlign;
+					return createBlock( 'core/heading', {
+						...getTransformedAttributes(
+							_attributes,
+							'core/heading',
+							( { content: contentBinding } ) => ( {
+								content: contentBinding,
+							} )
+						),
+						content,
+						anchor,
+						textAlign,
+					} );
+				} ),
 		},
 		{
 			type: 'raw',
@@ -91,19 +92,26 @@ const transforms = {
 			isMultiBlock: true,
 			blocks: [ 'core/paragraph' ],
 			transform: ( attributes ) =>
-				attributes.map( ( { content, textAlign: align, metadata } ) =>
-					createBlock( 'core/paragraph', {
-						content,
-						align,
-						metadata: getTransformedMetadata(
-							metadata,
+				attributes.map( ( _attributes ) => {
+					const { content, textAlign } = _attributes;
+					return createBlock( 'core/paragraph', {
+						...getTransformedAttributes(
+							_attributes,
 							'core/paragraph',
 							( { content: contentBinding } ) => ( {
 								content: contentBinding,
 							} )
 						),
-					} )
-				),
+						content,
+						...( textAlign && {
+							style: {
+								typography: {
+									textAlign,
+								},
+							},
+						} ),
+					} );
+				} ),
 		},
 	],
 };

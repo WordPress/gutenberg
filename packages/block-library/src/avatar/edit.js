@@ -12,10 +12,11 @@ import {
 	__experimentalUseBorderProps as useBorderProps,
 } from '@wordpress/block-editor';
 import {
-	PanelBody,
 	RangeControl,
 	ResizableBox,
 	ToggleControl,
+	__experimentalToolsPanel as ToolsPanel,
+	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { __, isRTL } from '@wordpress/i18n';
 import { addQueryArgs, removeQueryArgs } from '@wordpress/url';
@@ -23,7 +24,8 @@ import { addQueryArgs, removeQueryArgs } from '@wordpress/url';
 /**
  * Internal dependencies
  */
-import { useUserAvatar, useCommentAvatar } from './hooks';
+import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
+import { useCommentAvatar, useUserAvatar } from './hooks';
 import UserControl from './user-control';
 
 const AvatarInspectorControls = ( {
@@ -31,56 +33,102 @@ const AvatarInspectorControls = ( {
 	avatar,
 	attributes,
 	selectUser,
-} ) => (
-	<InspectorControls>
-		<PanelBody title={ __( 'Settings' ) }>
-			<RangeControl
-				__nextHasNoMarginBottom
-				__next40pxDefaultSize
-				label={ __( 'Image size' ) }
-				onChange={ ( newSize ) =>
+} ) => {
+	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
+	return (
+		<InspectorControls>
+			<ToolsPanel
+				label={ __( 'Settings' ) }
+				resetAll={ () => {
 					setAttributes( {
-						size: newSize,
-					} )
-				}
-				min={ avatar.minSize }
-				max={ avatar.maxSize }
-				initialPosition={ attributes?.size }
-				value={ attributes?.size }
-			/>
-			<ToggleControl
-				__nextHasNoMarginBottom
-				label={ __( 'Link to user profile' ) }
-				onChange={ () =>
-					setAttributes( { isLink: ! attributes.isLink } )
-				}
-				checked={ attributes.isLink }
-			/>
-			{ attributes.isLink && (
-				<ToggleControl
-					__nextHasNoMarginBottom
-					label={ __( 'Open in new tab' ) }
-					onChange={ ( value ) =>
-						setAttributes( {
-							linkTarget: value ? '_blank' : '_self',
-						} )
-					}
-					checked={ attributes.linkTarget === '_blank' }
-				/>
-			) }
-			{ selectUser && (
-				<UserControl
-					value={ attributes?.userId }
-					onChange={ ( value ) => {
-						setAttributes( {
-							userId: value,
-						} );
-					} }
-				/>
-			) }
-		</PanelBody>
-	</InspectorControls>
-);
+						size: 96,
+						isLink: false,
+						linkTarget: '_self',
+						userId: undefined,
+					} );
+				} }
+				dropdownMenuProps={ dropdownMenuProps }
+			>
+				<ToolsPanelItem
+					label={ __( 'Image size' ) }
+					isShownByDefault
+					hasValue={ () => attributes?.size !== 96 }
+					onDeselect={ () => setAttributes( { size: 96 } ) }
+				>
+					<RangeControl
+						__nextHasNoMarginBottom
+						__next40pxDefaultSize
+						label={ __( 'Image size' ) }
+						onChange={ ( newSize ) =>
+							setAttributes( {
+								size: newSize,
+							} )
+						}
+						min={ avatar.minSize }
+						max={ avatar.maxSize }
+						initialPosition={ attributes?.size }
+						value={ attributes?.size }
+					/>
+				</ToolsPanelItem>
+				<ToolsPanelItem
+					label={ __( 'Link to user profile' ) }
+					isShownByDefault
+					hasValue={ () => attributes?.isLink }
+					onDeselect={ () => setAttributes( { isLink: false } ) }
+				>
+					<ToggleControl
+						__nextHasNoMarginBottom
+						label={ __( 'Link to user profile' ) }
+						onChange={ () =>
+							setAttributes( { isLink: ! attributes.isLink } )
+						}
+						checked={ attributes.isLink }
+					/>
+				</ToolsPanelItem>
+				{ attributes.isLink && (
+					<ToolsPanelItem
+						label={ __( 'Open in new tab' ) }
+						isShownByDefault
+						hasValue={ () => attributes?.linkTarget !== '_self' }
+						onDeselect={ () =>
+							setAttributes( { linkTarget: '_self' } )
+						}
+					>
+						<ToggleControl
+							__nextHasNoMarginBottom
+							label={ __( 'Open in new tab' ) }
+							onChange={ ( value ) =>
+								setAttributes( {
+									linkTarget: value ? '_blank' : '_self',
+								} )
+							}
+							checked={ attributes.linkTarget === '_blank' }
+						/>
+					</ToolsPanelItem>
+				) }
+				{ selectUser && (
+					<ToolsPanelItem
+						label={ __( 'User' ) }
+						isShownByDefault
+						hasValue={ () => !! attributes?.userId }
+						onDeselect={ () =>
+							setAttributes( { userId: undefined } )
+						}
+					>
+						<UserControl
+							value={ attributes?.userId }
+							onChange={ ( value ) => {
+								setAttributes( {
+									userId: value,
+								} );
+							} }
+						/>
+					</ToolsPanelItem>
+				) }
+			</ToolsPanel>
+		</InspectorControls>
+	);
+};
 
 const ResizableAvatar = ( {
 	setAttributes,

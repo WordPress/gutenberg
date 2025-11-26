@@ -6,6 +6,7 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
+import { Page } from '@wordpress/admin-ui';
 import { __ } from '@wordpress/i18n';
 import { DataForm } from '@wordpress/dataviews';
 import { useDispatch, useSelect } from '@wordpress/data';
@@ -17,7 +18,6 @@ import { privateApis as editorPrivateApis } from '@wordpress/editor';
 /**
  * Internal dependencies
  */
-import Page from '../page';
 import { unlock } from '../../lock-unlock';
 import usePatternSettings from '../page-patterns/use-pattern-settings';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
@@ -29,7 +29,7 @@ const fieldsWithBulkEditSupport = [
 	'status',
 	'date',
 	'author',
-	'comment_status',
+	'discussion',
 ];
 
 function PostEditForm( { postType, postId } ) {
@@ -56,7 +56,7 @@ function PostEditForm( { postType, postId } ) {
 	);
 	const [ multiEdits, setMultiEdits ] = useState( {} );
 	const { editEntityRecord } = useDispatch( coreDataStore );
-	const { fields: _fields } = usePostFields( { postType } );
+	const _fields = usePostFields( { postType } );
 	const fields = useMemo(
 		() =>
 			_fields?.map( ( field ) => {
@@ -75,11 +75,15 @@ function PostEditForm( { postType, postId } ) {
 
 	const form = useMemo(
 		() => ( {
-			type: 'panel',
+			layout: {
+				type: 'panel',
+			},
 			fields: [
 				{
 					id: 'featured_media',
-					layout: 'regular',
+					layout: {
+						type: 'regular',
+					},
 				},
 				{
 					id: 'status',
@@ -90,17 +94,25 @@ function PostEditForm( { postType, postId } ) {
 				'date',
 				'slug',
 				'parent',
-				'comment_status',
+				{
+					id: 'discussion',
+					label: __( 'Discussion' ),
+					children: [ 'comment_status', 'ping_status' ],
+				},
 				{
 					label: __( 'Template' ),
-					labelPosition: 'side',
 					id: 'template',
-					layout: 'regular',
+					layout: {
+						type: 'regular',
+						labelPosition: 'side',
+					},
 				},
 			].filter(
 				( field ) =>
 					ids.length === 1 ||
-					fieldsWithBulkEditSupport.includes( field )
+					fieldsWithBulkEditSupport.includes(
+						typeof field === 'string' ? field : field.id
+					)
 			),
 		} ),
 		[ ids ]

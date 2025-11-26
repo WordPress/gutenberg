@@ -88,6 +88,7 @@ export function BlockSettingsDropdown( {
 		selectedBlockClientIds,
 		openedBlockSettingsMenu,
 		isContentOnly,
+		isZoomOut,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -98,6 +99,7 @@ export function BlockSettingsDropdown( {
 				getBlockAttributes,
 				getOpenedBlockSettingsMenu,
 				getBlockEditingMode,
+				isZoomOut: _isZoomOut,
 			} = unlock( select( blockEditorStore ) );
 
 			const { getActiveBlockVariation } = select( blocksStore );
@@ -122,6 +124,7 @@ export function BlockSettingsDropdown( {
 				openedBlockSettingsMenu: getOpenedBlockSettingsMenu(),
 				isContentOnly:
 					getBlockEditingMode( firstBlockClientId ) === 'contentOnly',
+				isZoomOut: _isZoomOut(),
 			};
 		},
 		[ firstBlockClientId ]
@@ -275,20 +278,24 @@ export function BlockSettingsDropdown( {
 											clientId={ firstBlockClientId }
 										/>
 									) }
-									<CopyMenuItem
-										clientIds={ clientIds }
-										onCopy={ onCopy }
-										shortcut={ shortcuts.copy }
-									/>
-									<CopyMenuItem
-										clientIds={ clientIds }
-										label={ __( 'Cut' ) }
-										eventType="cut"
-										shortcut={ shortcuts.cut }
-										__experimentalUpdateSelection={
-											! __experimentalSelectBlock
-										}
-									/>
+									{ ! isContentOnly && (
+										<CopyMenuItem
+											clientIds={ clientIds }
+											onCopy={ onCopy }
+											shortcut={ shortcuts.copy }
+										/>
+									) }
+									{ ! isContentOnly && (
+										<CopyMenuItem
+											clientIds={ clientIds }
+											label={ __( 'Cut' ) }
+											eventType="cut"
+											shortcut={ shortcuts.cut }
+											__experimentalUpdateSelection={
+												! __experimentalSelectBlock
+											}
+										/>
+									) }
 									{ canDuplicate && (
 										<MenuItem
 											onClick={ pipe(
@@ -301,7 +308,7 @@ export function BlockSettingsDropdown( {
 											{ __( 'Duplicate' ) }
 										</MenuItem>
 									) }
-									{ canInsertBlock && ! isContentOnly && (
+									{ canInsertBlock && ! isZoomOut && (
 										<>
 											<MenuItem
 												onClick={ pipe(
@@ -327,9 +334,14 @@ export function BlockSettingsDropdown( {
 											</MenuItem>
 										</>
 									) }
-									<CommentIconSlotFill.Slot
-										fillProps={ { onClose } }
-									/>
+									{ count === 1 && (
+										<CommentIconSlotFill.Slot
+											fillProps={ {
+												clientId: firstBlockClientId,
+												onClose,
+											} }
+										/>
+									) }
 								</MenuGroup>
 								{ canCopyStyles && ! isContentOnly && (
 									<MenuGroup>

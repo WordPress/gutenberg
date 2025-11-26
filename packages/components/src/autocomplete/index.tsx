@@ -126,6 +126,10 @@ export function useAutocomplete( {
 		// Reset autocomplete state after insertion rather than before
 		// so insertion events don't cause the completion menu to redisplay.
 		reset();
+
+		// Make sure that the content remains focused after making a selection
+		// and that the text cursor position is not lost.
+		contentRef.current?.focus();
 	}
 
 	function reset() {

@@ -1,4 +1,28 @@
+@use "@wordpress/base-styles/colors" as *;
+
 .dataviews-controls__datetime {
 	border: none;
 	padding: 0;
+}
+
+.dataviews-controls__relative-date-number,
+.dataviews-controls__relative-date-unit {
+	flex: 1 1 50%;
+}
+
+.dataviews-controls__date {
+	// Hide the native date picker icon since we're using our own calendar.
+	input[type="date"]::-webkit-inner-spin-button,
+	input[type="date"]::-webkit-calendar-picker-indicator {
+		display: none;
+		-webkit-appearance: none;
+	}
+}
+
+.dataviews-controls__date-preset {
+	border: 1px solid #ddd;
+
+	&:active {
+		background-color: $black;
+	}
 }

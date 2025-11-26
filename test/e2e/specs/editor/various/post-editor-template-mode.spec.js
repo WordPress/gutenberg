@@ -89,24 +89,20 @@ test.describe( 'Post Editor Template mode', () => {
 		await postEditorTemplateMode.disableTemplateWelcomeGuide();
 		await postEditorTemplateMode.openTemplatePopover();
 		// Change to a custom template, save and reload.
-		await page
-			.getByRole( 'menuitem', {
-				name: 'Change template',
-			} )
-			.click();
-		await page
-			.getByRole( 'option', {
-				name: 'Custom',
-			} )
-			.click();
+		await page.getByRole( 'menuitem', { name: 'Change template' } ).click();
+		await page.getByRole( 'option', { name: 'Custom' } ).click();
+		await expect(
+			page.getByRole( 'button', { name: 'Template options' } )
+		).toHaveText( 'Custom' );
 		await editor.saveDraft();
 		await page.reload();
+		await expect(
+			page.getByRole( 'button', { name: 'Template options' } )
+		).toHaveText( 'Custom' );
 		// Change to the default template.
 		await postEditorTemplateMode.openTemplatePopover();
 		await page
-			.getByRole( 'menuitem', {
-				name: 'Use default template',
-			} )
+			.getByRole( 'menuitem', { name: 'Use default template' } )
 			.click();
 		await expect(
 			page.getByRole( 'button', { name: 'Template options' } )

@@ -1,0 +1,26 @@
+{
+	"extends": "../../tsconfig.base.json",
+	"compilerOptions": {
+		"rootDir": "src",
+		"declarationDir": "build-types",
+		"checkJs": false
+	},
+	"references": [
+		{ "path": "../a11y" },
+		{ "path": "../api-fetch" },
+		{ "path": "../block-editor" },
+		{ "path": "../components" },
+		{ "path": "../compose" },
+		{ "path": "../core-data" },
+		{ "path": "../date" },
+		{ "path": "../data" },
+		{ "path": "../element" },
+		{ "path": "../global-styles-engine" },
+		{ "path": "../i18n" },
+		{ "path": "../icons" },
+		{ "path": "../keycodes" },
+		{ "path": "../private-apis" }
+	],
+	"include": [ "src/**/*" ],
+	"exclude": [ "src/font-library-modal/lib/**/*" ]
+}

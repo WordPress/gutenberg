@@ -1,3 +1,8 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/z-index" as *;
+
 .dataviews-view-table {
 	width: 100%;
 	text-indent: 0;
@@ -6,6 +11,7 @@
 	position: relative;
 	color: $gray-700;
 	margin-bottom: auto;
+	background-color: inherit;
 
 	th {
 		text-align: left;
@@ -16,31 +22,46 @@
 	td,
 	th {
 		padding: $grid-unit-15;
-		white-space: nowrap;
 
 		&.dataviews-view-table__actions-column {
 			text-align: right;
 		}
 
+		&.dataviews-view-table__actions-column--sticky {
+			position: sticky;
+			right: 0;
+			background-color: inherit;
+		}
+
+		&.dataviews-view-table__actions-column--stuck {
+			&::after {
+				display: block;
+				content: "";
+				position: absolute;
+				top: 0;
+				bottom: 0;
+				left: 0;
+				width: 1px;
+				background-color: $gray-100;
+			}
+		}
+
 		&.dataviews-view-table__checkbox-column {
 			padding-right: 0;
-			width: 1%;
+
+			.dataviews-view-table__cell-content-wrapper {
+				max-width: auto;
+				min-width: auto;
+			}
 		}
 	}
 	tr {
 		border-top: 1px solid $gray-100;
-
-		.dataviews-view-table-header-button {
-			gap: $grid-unit-05;
-		}
+		background-color: inherit;
 
 		td:first-child,
 		th:first-child {
 			padding-left: $grid-unit-60;
-
-			.dataviews-view-table-header-button {
-				margin-left: - #{$grid-unit-10};
-			}
 		}
 
 		td:last-child,
@@ -52,43 +73,24 @@
 			border-bottom: 0;
 		}
 
-		&.is-hovered {
+		&.is-hovered,
+		&.is-hovered .dataviews-view-table__actions-column--sticky {
 			background-color: #f8f8f8;
-		}
-
-		.components-checkbox-control__input.components-checkbox-control__input {
-			opacity: 0;
-
-			&:checked,
-			&:indeterminate,
-			&:focus {
-				opacity: 1;
-			}
 		}
 
 		.dataviews-item-actions .components-button:not(.dataviews-all-actions-button) {
 			opacity: 0;
 		}
 
-		&:focus-within,
-		&.is-hovered,
-		&:hover {
-			.components-checkbox-control__input,
-			.dataviews-item-actions .components-button:not(.dataviews-all-actions-button) {
-				opacity: 1;
-			}
-		}
-
 		@media (hover: none) {
-			// Show checkboxes and quick-actions on devices that do not support hover.
-			.components-checkbox-control__input.components-checkbox-control__input,
+			// Show quick-actions on devices that do not support hover.
 			.dataviews-item-actions .components-button:not(.dataviews-all-actions-button) {
 				opacity: 1;
 			}
 		}
 
 		&.is-selected {
-			background-color: rgba(var(--wp-admin-theme-color--rgb), 0.04);
+			background-color: color-mix(in srgb, rgb(var(--wp-admin-theme-color--rgb)) 4%, $white);
 			color: $gray-700;
 
 			&,
@@ -97,29 +99,75 @@
 			}
 
 			&:hover {
-				background-color: rgba(var(--wp-admin-theme-color--rgb), 0.08);
+				background-color: color-mix(in srgb, rgb(var(--wp-admin-theme-color--rgb)) 8%, $white);
+			}
+
+			.dataviews-view-table__actions-column--sticky {
+				background-color: color-mix(in srgb, rgb(var(--wp-admin-theme-color--rgb)) 4%, $white);
+			}
+
+			&:hover .dataviews-view-table__actions-column--sticky {
+				background-color: color-mix(in srgb, rgb(var(--wp-admin-theme-color--rgb)) 8%, $white);
 			}
 		}
 	}
+
+	// Hover styles only apply when bulk actions are available
+	&.has-bulk-actions {
+		tr {
+			// Only apply hover background to non-selected rows
+			&:not(.is-selected) {
+				&.is-hovered,
+				&.is-hovered .dataviews-view-table__actions-column--sticky {
+					background-color: #f8f8f8;
+				}
+			}
+
+			&:focus-within,
+			&.is-hovered,
+			&:hover {
+				.components-checkbox-control__input,
+				.dataviews-item-actions .components-button:not(.dataviews-all-actions-button) {
+					opacity: 1;
+				}
+			}
+		}
+	}
+
 	thead {
 		position: sticky;
 		inset-block-start: 0;
 		z-index: z-index(".dataviews-view-table thead");
+		background-color: inherit;
 
 		tr {
 			border: 0;
 		}
 		th {
-			background-color: $white;
+			background-color: inherit;
 			padding-top: $grid-unit-10;
 			padding-bottom: $grid-unit-10;
-			padding-left: $grid-unit-15;
 			font-size: 11px;
 			text-transform: uppercase;
-			font-weight: 500;
+			font-weight: $font-weight-medium;
 
-			&:has(.dataviews-view-table-header-button):not(:first-child) {
+			&:has(.dataviews-view-table-header-button) {
 				padding-left: $grid-unit-05;
+				padding-right: $grid-unit-05;
+
+				.dataviews-view-table-header-button {
+					gap: $grid-unit-05;
+				}
+			}
+
+			&:has(.dataviews-view-table-header-button):first-child {
+				// Table cell padding minus the header button padding.
+				padding-left: $grid-unit-50;
+			}
+
+			&:has(.dataviews-view-table-header-button):last-child {
+				// Table cell padding minus the header button padding.
+				padding-right: $grid-unit-50;
 			}
 		}
 	}
@@ -131,6 +179,15 @@
 			min-height: $grid-unit-40;
 			display: flex;
 			align-items: center;
+			white-space: nowrap;
+
+			&.dataviews-view-table__cell-align-end {
+				justify-content: flex-end;
+			}
+
+			&.dataviews-view-table__cell-align-center {
+				justify-content: center;
+			}
 		}
 
 		.components-v-stack > .dataviews-view-table__cell-content-wrapper:not(:first-child) {
@@ -141,7 +198,7 @@
 		padding: $grid-unit-05 $grid-unit-10;
 		font-size: 11px;
 		text-transform: uppercase;
-		font-weight: 500;
+		font-weight: $font-weight-medium;
 
 		&:not(:hover) {
 			color: $gray-900;
@@ -161,14 +218,10 @@
 	}
 
 	.dataviews-view-table__actions-column {
-		width: 1%;
+		width: auto;
+		white-space: nowrap;
 	}
 
-	&:has(tr.is-selected) {
-		.components-checkbox-control__input {
-			opacity: 1;
-		}
-	}
 
 	// Density style overrides.
 	&.has-compact-density {
@@ -176,6 +229,10 @@
 			th {
 				&:has(.dataviews-view-table-header-button):not(:first-child) {
 					padding-left: 0;
+				}
+
+				&:has(.dataviews-view-table-header-button):not(:last-child) {
+					padding-right: 0;
 				}
 			}
 		}
@@ -224,4 +281,47 @@
 
 .dataviews-column-primary__media {
 	max-width: 60px;
+	overflow: hidden;
+	position: relative;
+	flex-shrink: 0;
+	background-color: $white;
+	border-radius: $radius-medium;
+
+	img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
+
+	&::after {
+		content: "";
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		box-shadow: inset 0 0 0 $border-width rgba(0, 0, 0, 0.1);
+		border-radius: $radius-medium;
+	}
+}
+
+.dataviews-view-table__cell-content-wrapper,
+.dataviews-view-table__primary-column-content {
+	&:not(.dataviews-column-primary__media) {
+		min-width: 15ch;
+		max-width: 80ch;
+	}
+}
+
+.dataviews-view-table__group-header-row {
+	.dataviews-view-table__group-header-cell {
+		font-weight: $font-weight-medium;
+		padding: $grid-unit-15 $grid-unit-60;
+		color: $gray-900;
+	}
+}
+
+/* Column width intents via colgroup: make non-primary columns shrink-to-fit */
+.dataviews-view-table col[class^="dataviews-view-table__col-"]:not(.dataviews-view-table__col-primary) {
+	width: 1%;
 }
