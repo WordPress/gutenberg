@@ -1,0 +1,163 @@
+/**
+ * External dependencies
+ */
+import fastDeepEqual from 'fast-deep-equal/es6';
+
+/**
+ * WordPress dependencies
+ */
+import { getBlockBindingsSource, getBlockType } from '@wordpress/blocks';
+import { privateApis as componentsPrivateApis } from '@wordpress/components';
+import { useSelect } from '@wordpress/data';
+import { useContext } from '@wordpress/element';
+import { useViewportMatch } from '@wordpress/compose';
+
+/**
+ * Internal dependencies
+ */
+import { useBlockBindingsUtils } from '../../utils/block-bindings';
+import { unlock } from '../../lock-unlock';
+import BlockContext from '../block-context';
+import { useBlockEditContext } from '../block-edit';
+import { store as blockEditorStore } from '../../store';
+
+const { Menu } = unlock( componentsPrivateApis );
+
+/**
+ * Get the normalized attribute type for block bindings.
+ * Converts 'rich-text' to 'string' since rich-text is stored as string.
+ *
+ * @param {string} blockName The block name.
+ * @param {string} attribute The attribute name.
+ * @return {string} The normalized attribute type.
+ */
+export const getAttributeType = ( blockName, attribute ) => {
+	const _attributeType =
+		getBlockType( blockName ).attributes?.[ attribute ]?.type;
+	return _attributeType === 'rich-text' ? 'string' : _attributeType;
+};
+
+export default function BlockBindingsPanelMenuContent( {
+	attribute,
+	binding,
+	sources,
+} ) {
+	const { clientId } = useBlockEditContext();
+	const { updateBlockBindings } = useBlockBindingsUtils();
+	const isMobile = useViewportMatch( 'medium', '<' );
+	const blockContext = useContext( BlockContext );
+	const { attributeType, select } = useSelect(
+		( _select ) => {
+			const { name: blockName } =
+				_select( blockEditorStore ).getBlock( clientId );
+			return {
+				attributeType: getAttributeType( blockName, attribute ),
+				select: _select,
+			};
+		},
+		[ clientId, attribute ]
+	);
+	return (
+		<Menu placement={ isMobile ? 'bottom-start' : 'left-start' }>
+			{ Object.entries( sources ).map( ( [ sourceKey, data ] ) => {
+				// Only show sources that have compatible data for this specific attribute.
+				const sourceDataItems = data.filter(
+					( item ) => item.type === attributeType
+				);
+
+				const noItemsAvailable =
+					! sourceDataItems || sourceDataItems.length === 0;
+
+				if ( noItemsAvailable ) {
+					return null;
+				}
+
+				const source = getBlockBindingsSource( sourceKey );
+
+				return (
+					<Menu
+						key={ sourceKey }
+						placement={ isMobile ? 'bottom-start' : 'left-start' }
+					>
+						<Menu.SubmenuTriggerItem>
+							<Menu.ItemLabel>{ source.label }</Menu.ItemLabel>
+						</Menu.SubmenuTriggerItem>
+						<Menu.Popover gutter={ 8 }>
+							<Menu.Group>
+								{ sourceDataItems.map( ( item ) => {
+									const itemBindings = {
+										source: sourceKey,
+										args: item.args || {
+											key: item.key,
+										},
+									};
+									let values = {};
+									try {
+										values = source.getValues( {
+											select,
+											context: blockContext,
+											bindings: {
+												[ attribute ]: itemBindings,
+											},
+										} );
+									} catch ( e ) {}
+
+									return (
+										<Menu.CheckboxItem
+											key={
+												sourceKey +
+													JSON.stringify(
+														item.args
+													) || item.key
+											}
+											onChange={ () => {
+												const isCurrentlySelected =
+													fastDeepEqual(
+														binding?.args,
+														item.args
+													) ??
+													// Deprecate key dependency in 7.0.
+													item.key ===
+														binding?.args?.key;
+
+												if ( isCurrentlySelected ) {
+													// Unset if the same item is selected again.
+													updateBlockBindings( {
+														[ attribute ]:
+															undefined,
+													} );
+												} else {
+													updateBlockBindings( {
+														[ attribute ]:
+															itemBindings,
+													} );
+												}
+											} }
+											name={ attribute + '-binding' }
+											value={ values[ attribute ] }
+											checked={
+												fastDeepEqual(
+													binding?.args,
+													item.args
+												) ??
+												// Deprecate key dependency in 7.0.
+												item.key === binding?.args?.key
+											}
+										>
+											<Menu.ItemLabel>
+												{ item.label }
+											</Menu.ItemLabel>
+											<Menu.ItemHelpText>
+												{ values[ attribute ] }
+											</Menu.ItemHelpText>
+										</Menu.CheckboxItem>
+									);
+								} ) }
+							</Menu.Group>
+						</Menu.Popover>
+					</Menu>
+				);
+			} ) }
+		</Menu>
+	);
+}
