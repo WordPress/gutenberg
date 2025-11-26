@@ -38,8 +38,8 @@ export const getAttributeType = ( blockName, attribute ) => {
 };
 
 function BlockBindingsSourceMenuItem( {
+	args,
 	attribute,
-	binding,
 	item,
 	source,
 	sourceKey,
@@ -69,9 +69,9 @@ function BlockBindingsSourceMenuItem( {
 		<Menu.CheckboxItem
 			onChange={ () => {
 				const isCurrentlySelected =
-					fastDeepEqual( binding?.args, item.args ) ??
+					fastDeepEqual( args, item.args ) ??
 					// Deprecate key dependency in 7.0.
-					item.key === binding?.args?.key;
+					item.key === args?.key;
 
 				if ( isCurrentlySelected ) {
 					// Unset if the same item is selected again.
@@ -87,9 +87,9 @@ function BlockBindingsSourceMenuItem( {
 			name={ attribute + '-binding' }
 			value={ values[ attribute ] }
 			checked={
-				fastDeepEqual( binding?.args, item.args ) ??
+				fastDeepEqual( args, item.args ) ??
 				// Deprecate key dependency in 7.0.
-				item.key === binding?.args?.key
+				item.key === args?.key
 			}
 		>
 			<Menu.ItemLabel>{ item.label }</Menu.ItemLabel>
@@ -98,7 +98,7 @@ function BlockBindingsSourceMenuItem( {
 	);
 }
 
-function BlockBindingsSourceMenu( { attribute, binding, sourceKey, data } ) {
+function BlockBindingsSourceMenu( { args, attribute, sourceKey, data } ) {
 	const isMobile = useViewportMatch( 'medium', '<' );
 
 	// Only render source if it has compatible data for this specific attribute.
@@ -124,8 +124,8 @@ function BlockBindingsSourceMenu( { attribute, binding, sourceKey, data } ) {
 								sourceKey + JSON.stringify( item.args ) ||
 								item.key
 							}
+							args={ args }
 							attribute={ attribute }
-							binding={ binding }
 							item={ item }
 							source={ source }
 							sourceKey={ sourceKey }
@@ -164,8 +164,8 @@ export default function BlockBindingsPanelMenuContent( {
 				return (
 					<BlockBindingsSourceMenu
 						key={ sourceKey }
+						args={ binding?.args }
 						attribute={ attribute }
-						binding={ binding }
 						sourceKey={ sourceKey }
 						data={ sourceDataItems }
 					/>
