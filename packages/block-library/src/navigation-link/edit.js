@@ -626,6 +626,14 @@ export default function NavigationLinkEdit( {
 					</BaseControl>
 
 					<TextControl
+						value={ label || '' }
+						onChange={ ( labelValue ) => {
+							setAttributes( { label: labelValue } );
+						} }
+						label={ __( 'Label' ) }
+						autoComplete="off"
+					/>
+					<TextControl
 						value={ title || '' }
 						onChange={ ( titleValue ) => {
 							setAttributes( { title: titleValue } );
