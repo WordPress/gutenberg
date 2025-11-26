@@ -42,8 +42,10 @@ export default ( props ) => ( element ) => {
 		event.preventDefault();
 
 		// Allows us to ask for this information when we get a report.
-		window.console.log( 'Received HTML:\n\n', html );
-		window.console.log( 'Received plain text:\n\n', plainText );
+		if ( globalThis.SCRIPT_DEBUG ) {
+			window.console.log( 'Received HTML:\n\n', html );
+			window.console.log( 'Received plain text:\n\n', plainText );
+		}
 
 		if ( disableFormats ) {
 			onChange( insert( value, plainText ) );

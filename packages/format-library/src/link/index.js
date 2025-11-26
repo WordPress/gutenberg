@@ -249,7 +249,9 @@ export const link = {
 		}
 
 		// Allows us to ask for this information when we get a report.
-		window.console.log( 'Created link:\n\n', pastedText );
+		if ( globalThis.SCRIPT_DEBUG ) {
+			window.console.log( 'Created link:\n\n', pastedText );
+		}
 
 		const format = {
 			type: name,
