@@ -304,6 +304,46 @@ export default function NavigationLinkEdit( {
 		validateLinkStatus
 	);
 
+	// Fetch entity title for entity links
+	const entityTitle = useSelect(
+		( select ) => {
+			// Only fetch if we have an entity ID
+			if ( ! id || ! kind || ! type ) {
+				return null;
+			}
+
+			const { getEntityRecord } = select( coreStore );
+			const isPostType = kind === 'post-type';
+			const isTaxonomy = kind === 'taxonomy';
+
+			if ( ! isPostType && ! isTaxonomy ) {
+				return null;
+			}
+
+			try {
+				const entityType = isTaxonomy ? 'taxonomy' : 'postType';
+				const typeForAPI = type === 'tag' ? 'post_tag' : type;
+				const entityRecord = getEntityRecord(
+					entityType,
+					typeForAPI,
+					id
+				);
+
+				if ( ! entityRecord ) {
+					return null;
+				}
+
+				// For posts, use title.rendered; for taxonomies, use name
+				return isPostType
+					? entityRecord.title?.rendered || entityRecord.title
+					: entityRecord.name;
+			} catch {
+				return null;
+			}
+		},
+		[ id, kind, type ]
+	);
+
 	/**
 	 * Transform to submenu block.
 	 */
@@ -508,7 +548,11 @@ export default function NavigationLinkEdit( {
 	const testLink = {
 		url,
 		opensInNewTab: attributes?.opensInNewTab,
-		title: label && stripHTML( label ),
+		// Use entity title if available (for entity links), otherwise use label
+		title: entityTitle || ( label && stripHTML( label ) ),
+		kind,
+		type,
+		id,
 	};
 
 	return (
@@ -541,6 +585,7 @@ export default function NavigationLinkEdit( {
 						hasRichPreviews
 						hasCopyControl={ false }
 						useDropdownMode={ true }
+						handleEntities={ isBoundEntityAvailable }
 						className="wp-block-navigation-link__inline-link-input"
 						value={ testLink }
 						showInitialSuggestions={ true }
