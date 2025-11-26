@@ -21,6 +21,7 @@ import {
 import { compose } from '@wordpress/compose';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { store as noticesStore } from '@wordpress/notices';
+import { useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -68,10 +69,14 @@ const MediaReplaceFlow = ( {
 	}, [] );
 	const errorNoticeID = `block-editor/media-replace-flow/error-notice/${ ++uniqueId }`;
 
-	const computedAccept = getComputedAcceptAttribute(
-		allowedTypes,
-		allowedMimeTypes,
-		accept
+	const computedAccept = useMemo(
+		() =>
+			getComputedAcceptAttribute(
+				allowedTypes,
+				allowedMimeTypes,
+				accept
+			),
+		[ allowedTypes, allowedMimeTypes, accept ]
 	);
 
 	const onUploadError = ( message ) => {

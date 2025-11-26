@@ -16,7 +16,7 @@ import {
 	withFilters,
 } from '@wordpress/components';
 import { __, _x } from '@wordpress/i18n';
-import { useState, useEffect } from '@wordpress/element';
+import { useState, useEffect, useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { keyboardReturn } from '@wordpress/icons';
 import deprecated from '@wordpress/deprecated';
@@ -165,10 +165,14 @@ export function MediaPlaceholder( {
 		setSrc( value?.src ?? '' );
 	}, [ value?.src ] );
 
-	const computedAccept = getComputedAcceptAttribute(
-		allowedTypes,
-		allowedMimeTypes,
-		accept
+	const computedAccept = useMemo(
+		() =>
+			getComputedAcceptAttribute(
+				allowedTypes,
+				allowedMimeTypes,
+				accept
+			),
+		[ allowedTypes, allowedMimeTypes, accept ]
 	);
 
 	const onlyAllowsImages = () => {
