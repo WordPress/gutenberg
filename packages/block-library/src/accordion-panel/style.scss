@@ -1,8 +1,4 @@
-// Some classic themes may use selectors like `.wp-block .wp-block`
-// and apply some kind of width to the blocks. To properly override
-// those styles, use a selector with a specificity of `0-2-0`.
-.wp-block-accordion-panel.wp-block-accordion-panel {
-	min-width: 100%;
+.wp-block-accordion-panel {
 
 	// Prevent blockGap from Accordion Content block from adding extra margin between accordions.
 	&[inert],

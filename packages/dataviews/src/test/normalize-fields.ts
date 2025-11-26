@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import normalizeFields from '../utils/normalize-fields';
+import normalizeFields from '../field-types';
 import type { Field } from '../types';
 
 describe( 'normalizeFields: default getValue', () => {
@@ -165,7 +165,10 @@ describe( 'normalizeFields: default getValue', () => {
 			];
 			const normalizedFields = normalizeFields( fields );
 			const result = normalizedFields[ 0 ].filterBy;
-			expect( result ).toStrictEqual( { operators: [ 'is', 'isNot' ] } );
+			expect( result ).toStrictEqual( {
+				isPrimary: false,
+				operators: [ 'is', 'isNot' ],
+			} );
 		} );
 		it( 'returns the default field type definition if undefined for untyped field (for primary filters)', () => {
 			const fields: Field< {} >[] = [
@@ -194,6 +197,7 @@ describe( 'normalizeFields: default getValue', () => {
 			const normalizedFields = normalizeFields( fields );
 			const result = normalizedFields[ 0 ].filterBy;
 			expect( result ).toStrictEqual( {
+				isPrimary: false,
 				operators: [
 					'is',
 					'isNot',
@@ -216,6 +220,7 @@ describe( 'normalizeFields: default getValue', () => {
 			const normalizedFields = normalizeFields( fields );
 			const result = normalizedFields[ 0 ].filterBy;
 			expect( result ).toStrictEqual( {
+				isPrimary: false,
 				operators: [
 					'is',
 					'isNot',
@@ -331,6 +336,57 @@ describe( 'normalizeFields: default getValue', () => {
 				isPrimary: true,
 				operators: [ 'lessThan' ],
 			} );
+		} );
+	} );
+
+	describe( 'format normalization', () => {
+		it( 'applies default format when not provided for date fields', () => {
+			const fields: Field< {} >[] = [
+				{
+					id: 'publishDate',
+					type: 'date',
+				},
+			];
+			const normalizedFields = normalizeFields( fields );
+			expect( normalizedFields[ 0 ].format ).toBeDefined();
+			expect( normalizedFields[ 0 ].format.date ).toBeDefined();
+			expect( typeof normalizedFields[ 0 ].format.date ).toBe( 'string' );
+			expect( normalizedFields[ 0 ].format.weekStartsOn ).toBeDefined();
+			expect( typeof normalizedFields[ 0 ].format.weekStartsOn ).toBe(
+				'number'
+			);
+		} );
+
+		it( 'preserves custom format when provided', () => {
+			const fields: Field< {} >[] = [
+				{
+					id: 'publishDate',
+					type: 'date',
+					format: {
+						date: 'F j, Y',
+						weekStartsOn: 1,
+					},
+				},
+			];
+			const normalizedFields = normalizeFields( fields );
+			expect( normalizedFields[ 0 ].format.date ).toBe( 'F j, Y' );
+			expect( normalizedFields[ 0 ].format.weekStartsOn ).toBe( 1 );
+		} );
+
+		it( 'adds empty format for non-date field types', () => {
+			const fields: Field< {} >[] = [
+				{
+					id: 'title',
+					type: 'text',
+				},
+				{
+					id: 'count',
+					type: 'integer',
+				},
+			];
+			const normalizedFields = normalizeFields( fields );
+			expect( normalizedFields[ 0 ].format ).toEqual( {} );
+			expect( normalizedFields[ 1 ].format ).toEqual( {} );
 		} );
 	} );
 } );

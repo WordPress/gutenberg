@@ -1,25 +1,26 @@
 /**
  * External dependencies
  */
-import { Outlet, useMatches } from '@tanstack/react-router';
 import clsx from 'clsx';
 
 /**
  * WordPress dependencies
  */
+import { privateApis as routePrivateApis } from '@wordpress/route';
 // @ts-expect-error Commands is not typed properly.
 import { CommandMenu } from '@wordpress/commands';
 import { privateApis as themePrivateApis } from '@wordpress/theme';
+import { EditorSnackbars } from '@wordpress/editor';
 
 /**
  * Internal dependencies
  */
-import Canvas from '../canvas';
 import SavePanel from '../save-panel';
 import { unlock } from '../../lock-unlock';
 import type { CanvasData } from '../../store/types';
 import './style.scss';
 
+const { useMatches, Outlet } = unlock( routePrivateApis );
 const { ThemeProvider } = unlock( themePrivateApis );
 
 /**
@@ -31,6 +32,7 @@ export default function RootSinglePage() {
 	const currentMatch = matches[ matches.length - 1 ];
 	const canvas = ( currentMatch?.loaderData as any )?.canvas as
 		| CanvasData
+		| null
 		| undefined;
 	const isFullScreen = canvas && ! canvas.isPreview;
 
@@ -39,22 +41,18 @@ export default function RootSinglePage() {
 			<ThemeProvider color={ { bg: '#1d2327', primary: '#3858e9' } }>
 				<div
 					className={ clsx( 'boot-layout boot-layout--single-page', {
-						'has-canvas': !! canvas,
+						'has-canvas': !! canvas || canvas === null,
 						'has-full-canvas': isFullScreen,
 					} ) }
 				>
 					<CommandMenu />
 					<SavePanel />
+					<EditorSnackbars />
 					<div className="boot-layout__surfaces">
 						<ThemeProvider
 							color={ { bg: '#ffffff', primary: '#3858e9' } }
 						>
 							<Outlet />
-							{ canvas && (
-								<div className="boot-layout__canvas">
-									<Canvas canvas={ canvas } />
-								</div>
-							) }
 						</ThemeProvider>
 					</div>
 				</div>

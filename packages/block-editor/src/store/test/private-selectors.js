@@ -10,6 +10,10 @@ import {
 	getExpandedBlock,
 	isDragging,
 	getBlockStyles,
+	isEditLockedBlock,
+	isMoveLockedBlock,
+	isRemoveLockedBlock,
+	isLockedBlock,
 } from '../private-selectors';
 import { getBlockEditingMode } from '../selectors';
 
@@ -679,6 +683,244 @@ describe( 'private selectors', () => {
 				'block-1': { color: 'red' },
 				'non-existent-block': undefined,
 			} );
+		} );
+	} );
+
+	describe( 'isEditLockedBlock', () => {
+		it( 'returns false when block has no lock attribute', () => {
+			const state = {
+				blocks: {
+					byClientId: new Map( [
+						[ 'block-1', { clientId: 'block-1' } ],
+					] ),
+					attributes: new Map( [ [ 'block-1', {} ] ] ),
+				},
+			};
+			expect( isEditLockedBlock( state, 'block-1' ) ).toBe( false );
+		} );
+
+		it( 'returns false when block has lock attribute but edit is false', () => {
+			const state = {
+				blocks: {
+					byClientId: new Map( [
+						[ 'block-1', { clientId: 'block-1' } ],
+					] ),
+					attributes: new Map( [
+						[ 'block-1', { lock: { edit: false, move: true } } ],
+					] ),
+				},
+			};
+			expect( isEditLockedBlock( state, 'block-1' ) ).toBe( false );
+		} );
+
+		it( 'returns true when block has lock attribute with edit set to true', () => {
+			const state = {
+				blocks: {
+					byClientId: new Map( [
+						[ 'block-1', { clientId: 'block-1' } ],
+					] ),
+					attributes: new Map( [
+						[ 'block-1', { lock: { edit: true } } ],
+					] ),
+				},
+			};
+			expect( isEditLockedBlock( state, 'block-1' ) ).toBe( true );
+		} );
+
+		it( 'returns false when block has no attributes', () => {
+			const state = {
+				blocks: {
+					byClientId: new Map(),
+					attributes: new Map(),
+				},
+			};
+			expect( isEditLockedBlock( state, 'block-1' ) ).toBe( false );
+		} );
+	} );
+
+	describe( 'isMoveLockedBlock', () => {
+		const createState = ( templateLock, blockLock ) => ( {
+			blocks: {
+				byClientId: new Map( [
+					[ 'block-1', { clientId: 'block-1' } ],
+					[ 'parent-block', { clientId: 'parent-block' } ],
+				] ),
+				attributes: new Map( [
+					[ 'block-1', blockLock ? { lock: blockLock } : {} ],
+					[ 'parent-block', {} ],
+				] ),
+				parents: new Map( [
+					[ 'block-1', 'parent-block' ],
+					[ 'parent-block', '' ],
+				] ),
+			},
+			settings: {},
+			blockListSettings: {
+				'parent-block': templateLock ? { templateLock } : {},
+			},
+		} );
+
+		it( 'returns false when block has no lock and no templateLock', () => {
+			const state = createState( null, null );
+			expect( isMoveLockedBlock( state, 'block-1' ) ).toBe( false );
+		} );
+
+		it( 'returns true when parent has templateLock set to "all"', () => {
+			const state = createState( 'all', null );
+			expect( isMoveLockedBlock( state, 'block-1' ) ).toBe( true );
+		} );
+
+		it( 'returns false when parent has templateLock set to "contentOnly"', () => {
+			const state = createState( 'contentOnly', null );
+			expect( isMoveLockedBlock( state, 'block-1' ) ).toBe( false );
+		} );
+
+		it( 'returns true when block has lock.move set to true', () => {
+			const state = createState( null, { move: true } );
+			expect( isMoveLockedBlock( state, 'block-1' ) ).toBe( true );
+		} );
+
+		it( 'returns false when block has lock.move set to false', () => {
+			const state = createState( null, { move: false } );
+			expect( isMoveLockedBlock( state, 'block-1' ) ).toBe( false );
+		} );
+
+		it( 'prioritizes block lock over template lock', () => {
+			const state = createState( 'all', { move: false } );
+			expect( isMoveLockedBlock( state, 'block-1' ) ).toBe( false );
+		} );
+	} );
+
+	describe( 'isRemoveLockedBlock', () => {
+		const createState = ( templateLock, blockLock ) => ( {
+			blocks: {
+				byClientId: new Map( [
+					[ 'block-1', { clientId: 'block-1' } ],
+					[ 'parent-block', { clientId: 'parent-block' } ],
+				] ),
+				attributes: new Map( [
+					[ 'block-1', blockLock ? { lock: blockLock } : {} ],
+					[ 'parent-block', {} ],
+				] ),
+				parents: new Map( [
+					[ 'block-1', 'parent-block' ],
+					[ 'parent-block', '' ],
+				] ),
+			},
+			settings: {},
+			blockListSettings: {
+				'parent-block': templateLock ? { templateLock } : {},
+			},
+		} );
+
+		it( 'returns false when block has no lock and no templateLock', () => {
+			const state = createState( null, null );
+			expect( isRemoveLockedBlock( state, 'block-1' ) ).toBe( false );
+		} );
+
+		it( 'returns true when parent has templateLock set to "all"', () => {
+			const state = createState( 'all', null );
+			expect( isRemoveLockedBlock( state, 'block-1' ) ).toBe( true );
+		} );
+
+		it( 'returns true when parent has templateLock set to "insert"', () => {
+			const state = createState( 'insert', null );
+			expect( isRemoveLockedBlock( state, 'block-1' ) ).toBe( true );
+		} );
+
+		it( 'returns false when parent has templateLock set to "contentOnly"', () => {
+			const state = createState( 'contentOnly', null );
+			expect( isRemoveLockedBlock( state, 'block-1' ) ).toBe( false );
+		} );
+
+		it( 'returns true when block has lock.remove set to true', () => {
+			const state = createState( null, { remove: true } );
+			expect( isRemoveLockedBlock( state, 'block-1' ) ).toBe( true );
+		} );
+
+		it( 'returns false when block has lock.remove set to false', () => {
+			const state = createState( null, { remove: false } );
+			expect( isRemoveLockedBlock( state, 'block-1' ) ).toBe( false );
+		} );
+
+		it( 'prioritizes block lock over template lock', () => {
+			const state = createState( 'all', { remove: false } );
+			expect( isRemoveLockedBlock( state, 'block-1' ) ).toBe( false );
+		} );
+	} );
+
+	describe( 'isLockedBlock', () => {
+		const createState = ( templateLock, blockLock ) => ( {
+			blocks: {
+				byClientId: new Map( [
+					[ 'block-1', { clientId: 'block-1' } ],
+					[ 'parent-block', { clientId: 'parent-block' } ],
+				] ),
+				attributes: new Map( [
+					[ 'block-1', blockLock ? { lock: blockLock } : {} ],
+					[ 'parent-block', {} ],
+				] ),
+				parents: new Map( [
+					[ 'block-1', 'parent-block' ],
+					[ 'parent-block', '' ],
+				] ),
+			},
+			settings: {},
+			blockListSettings: {
+				'parent-block': templateLock ? { templateLock } : {},
+			},
+		} );
+
+		it( 'returns false when block is not locked in any way', () => {
+			const state = createState( null, null );
+			expect( isLockedBlock( state, 'block-1' ) ).toBe( false );
+		} );
+
+		it( 'returns true when block has lock.edit set to true', () => {
+			const state = createState( null, { edit: true } );
+			expect( isLockedBlock( state, 'block-1' ) ).toBe( true );
+		} );
+
+		it( 'returns true when block has lock.move set to true', () => {
+			const state = createState( null, { move: true } );
+			expect( isLockedBlock( state, 'block-1' ) ).toBe( true );
+		} );
+
+		it( 'returns true when block has lock.remove set to true', () => {
+			const state = createState( null, { remove: true } );
+			expect( isLockedBlock( state, 'block-1' ) ).toBe( true );
+		} );
+
+		it( 'returns true when parent has templateLock set to "all"', () => {
+			const state = createState( 'all', null );
+			expect( isLockedBlock( state, 'block-1' ) ).toBe( true );
+		} );
+
+		it( 'returns true when block has multiple locks', () => {
+			const state = createState( null, {
+				edit: true,
+				move: true,
+				remove: true,
+			} );
+			expect( isLockedBlock( state, 'block-1' ) ).toBe( true );
+		} );
+
+		it( 'returns true when only one lock type is active', () => {
+			const state = createState( null, {
+				edit: false,
+				move: true,
+				remove: false,
+			} );
+			expect( isLockedBlock( state, 'block-1' ) ).toBe( true );
+		} );
+
+		it( 'returns false when all lock types are explicitly false', () => {
+			const state = createState( null, {
+				edit: false,
+				move: false,
+				remove: false,
+			} );
+			expect( isLockedBlock( state, 'block-1' ) ).toBe( false );
 		} );
 	} );
 } );

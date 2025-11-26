@@ -24,6 +24,8 @@ import { useView } from '@wordpress/views';
 import {
 	OPERATOR_IS_ANY,
 	OPERATOR_IS_NONE,
+	OPERATOR_BEFORE,
+	OPERATOR_AFTER,
 	LAYOUT_LIST,
 } from '../../utils/constants';
 
@@ -122,6 +124,17 @@ export default function PostList( { postType } ) {
 				filter.operator === OPERATOR_IS_NONE
 			) {
 				filters.author_exclude = filter.value;
+			}
+			if ( filter.field === 'date' ) {
+				// Skip if no value is set yet
+				if ( ! filter.value ) {
+					return;
+				}
+				if ( filter.operator === OPERATOR_BEFORE ) {
+					filters.before = filter.value;
+				} else if ( filter.operator === OPERATOR_AFTER ) {
+					filters.after = filter.value;
+				}
 			}
 		} );
 

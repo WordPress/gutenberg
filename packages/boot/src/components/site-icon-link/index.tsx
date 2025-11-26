@@ -1,13 +1,16 @@
 /**
- * External dependencies
+ * WordPress dependencies
  */
-import { Link, useCanGoBack, useRouter } from '@tanstack/react-router';
+import { Link, privateApis as routePrivateApis } from '@wordpress/route';
 
 /**
  * Internal dependencies
  */
+import { unlock } from '../../lock-unlock';
 import SiteIcon from '../site-icon';
 import './style.scss';
+
+const { useCanGoBack, useRouter } = unlock( routePrivateApis );
 
 function SiteIconLink( {
 	to,

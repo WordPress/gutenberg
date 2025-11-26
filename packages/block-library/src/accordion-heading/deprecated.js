@@ -74,7 +74,7 @@ const v1 = {
 			},
 		},
 		shadow: true,
-		blockVisibility: false,
+		visibility: false,
 	},
 	save( { attributes } ) {
 		const { level, title, iconPosition, showIcon } = attributes;

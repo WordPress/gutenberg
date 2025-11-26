@@ -6,6 +6,10 @@ If anything looks incorrect here, please bring it up in #core-editor in [WordPre
 
 | Gutenberg Versions | WordPress Version |
 | ------------------ | ----------------- |
+| 20.5-21.9          | 6.9               |
+| 19.4-20.4          | 6.8.3             |
+| 19.4-20.4          | 6.8.2             |
+| 19.4-20.4          | 6.8.1             | 
 | 19.4-20.4          | 6.8               |
 | 18.6-19.3          | 6.7.2             |
 | 18.6-19.3          | 6.7.1             |

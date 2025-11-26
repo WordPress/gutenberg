@@ -304,6 +304,46 @@ describe( 'blocks', () => {
 			} );
 		} );
 
+		it( 'should default to empty object when attributes is omitted and without warning', () => {
+			registerBlockType( 'core/test-block-omitted-attributes', {
+				title: 'block title',
+				category: 'text',
+				save: noop,
+			} );
+
+			// Verify no warning was shown (unlike when explicitly set to null/undefined)
+			expect( console ).not.toHaveWarned();
+
+			const blockType = getBlockType(
+				'core/test-block-omitted-attributes'
+			);
+			expect( blockType.attributes ).toEqual( {} );
+		} );
+
+		it.each( [
+			[ 'undefined', undefined ],
+			[ 'null', null ],
+		] )(
+			'should warn and default to empty object when attributes is %s',
+			( _label, value ) => {
+				registerBlockType( 'core/test-block-null-attributes', {
+					title: 'block title',
+					category: 'text',
+					save: noop,
+					attributes: value,
+				} );
+
+				expect( console ).toHaveWarnedWith(
+					'The block "core/test-block-null-attributes" is registering attributes as `null` or `undefined`. Use an empty object (`attributes: {}`) or exclude the `attributes` key.'
+				);
+
+				const blockType = getBlockType(
+					'core/test-block-null-attributes'
+				);
+				expect( blockType.attributes ).toEqual( {} );
+			}
+		);
+
 		it( 'should default to browser-initialized global attributes', () => {
 			const attributes = { ok: { type: 'boolean' } };
 			unstable__bootstrapServerSideBlockDefinitions( {

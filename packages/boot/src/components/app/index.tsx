@@ -22,10 +22,12 @@ export async function init( {
 	mountId,
 	menuItems,
 	routes,
+	initModules,
 }: {
 	mountId: string;
 	menuItems?: MenuItem[];
 	routes?: Route[];
+	initModules?: string[];
 } ) {
 	( menuItems ?? [] ).forEach( ( menuItem ) => {
 		dispatch( store ).registerMenuItem( menuItem.id, menuItem );
@@ -34,6 +36,11 @@ export async function init( {
 	( routes ?? [] ).forEach( ( route ) => {
 		dispatch( store ).registerRoute( route );
 	} );
+
+	for ( const moduleId of initModules ?? [] ) {
+		const module = await import( moduleId );
+		await module.init();
+	}
 
 	// Render the app
 	const rootElement = document.getElementById( mountId );

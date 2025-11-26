@@ -1,13 +1,16 @@
 /**
- * External dependencies
- */
-import { useRouter, useMatches } from '@tanstack/react-router';
-
-/**
  * WordPress dependencies
  */
+import { privateApis as routePrivateApis } from '@wordpress/route';
 import { useEffect, useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
+
+/**
+ * Internal dependencies
+ */
+import { unlock } from '../../lock-unlock';
+
+const { useRouter, useMatches } = unlock( routePrivateApis );
 
 /**
  * Internal dependencies

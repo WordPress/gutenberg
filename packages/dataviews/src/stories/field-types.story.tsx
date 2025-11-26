@@ -832,14 +832,39 @@ export const DateComponent = ( {
 	type,
 	Edit,
 	asyncElements,
+	formatDate,
+	formatWeekStartsOn,
 }: {
 	type: PanelTypes;
 	Edit: ControlTypes;
 	asyncElements: boolean;
+	formatDate?: string;
+	formatWeekStartsOn?: 0 | 1 | 2 | 3 | 4 | 5 | 6;
 } ) => {
 	const dateFields = useMemo(
-		() => fields.filter( ( field ) => field.type === 'date' ),
-		[]
+		() =>
+			fields
+				.filter( ( field ) => field.type === 'date' )
+				.map( ( field ) => {
+					if ( formatDate || formatWeekStartsOn !== undefined ) {
+						const format: {
+							date?: string;
+							weekStartsOn?: 0 | 1 | 2 | 3 | 4 | 5 | 6;
+						} = {};
+						if ( formatDate ) {
+							format.date = formatDate;
+						}
+						if ( formatWeekStartsOn !== undefined ) {
+							format.weekStartsOn = formatWeekStartsOn;
+						}
+						return {
+							...field,
+							format,
+						};
+					}
+					return field;
+				} ),
+		[ formatDate, formatWeekStartsOn ]
 	);
 
 	return (
@@ -852,6 +877,32 @@ export const DateComponent = ( {
 	);
 };
 DateComponent.storyName = 'date';
+DateComponent.args = {
+	formatDate: '',
+	formatWeekStartsOn: undefined,
+};
+DateComponent.argTypes = {
+	formatDate: {
+		control: 'text',
+		description:
+			'Custom PHP date format string (e.g., "F j, Y" for "November 6, 2010"). Leave empty to use WordPress default.',
+	},
+	formatWeekStartsOn: {
+		control: 'select',
+		options: {
+			Default: undefined,
+			Sunday: 0,
+			Monday: 1,
+			Tuesday: 2,
+			Wednesday: 3,
+			Thursday: 4,
+			Friday: 5,
+			Saturday: 6,
+		},
+		description:
+			'Day that the week starts on. Leave as Default to use WordPress default.',
+	},
+};
 
 export const EmailComponent = ( {
 	type,

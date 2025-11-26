@@ -563,6 +563,7 @@ function BlockListBlockProvider( props ) {
 				isSelectionEnabled,
 				getTemplateLock,
 				isSectionBlock: _isSectionBlock,
+				getParentSectionBlock,
 				getBlockWithoutAttributes,
 				getBlockAttributes,
 				canRemoveBlock,
@@ -674,6 +675,9 @@ function BlockListBlockProvider( props ) {
 				isSelectionEnabled: isSelectionEnabled(),
 				isLocked: !! getTemplateLock( rootClientId ),
 				isSectionBlock: _isSectionBlock( clientId ),
+				isWithinSectionBlock:
+					_isSectionBlock( clientId ) ||
+					!! getParentSectionBlock( clientId ),
 				canRemove,
 				canMove,
 				isSelected: _isSelected,
@@ -756,6 +760,7 @@ function BlockListBlockProvider( props ) {
 		isDragging,
 		hasChildSelected,
 		isSectionBlock,
+		isWithinSectionBlock,
 		isEditingDisabled,
 		hasEditableOutline,
 		className,
@@ -802,6 +807,7 @@ function BlockListBlockProvider( props ) {
 		isDragging,
 		hasChildSelected,
 		isSectionBlock,
+		isWithinSectionBlock,
 		isEditingDisabled,
 		hasEditableOutline,
 		isEditingContentOnlySection,

@@ -13,7 +13,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import normalizeFields from '../utils/normalize-fields';
+import normalizeFields from '../field-types';
 import normalizeForm from '../dataform-layouts/normalize-form';
 import type {
 	Field,
@@ -444,6 +444,42 @@ function validateFormField< Item >(
 		return {
 			required: { type: 'invalid' },
 		};
+	}
+
+	// Validate the field: isValid.pattern
+	if (
+		!! formField.field &&
+		formField.field.isValid.pattern &&
+		( formField.field.type === 'text' ||
+			formField.field.type === 'email' ||
+			formField.field.type === 'url' ||
+			formField.field.type === 'telephone' ||
+			formField.field.type === 'password' )
+	) {
+		const value = formField.field.getValue( { item } );
+		// Only validate pattern if the value is not empty
+		if ( ! isEmptyNullOrUndefined( value ) ) {
+			try {
+				const regex = new RegExp( formField.field.isValid.pattern );
+				if ( ! regex.test( String( value ) ) ) {
+					return {
+						pattern: {
+							type: 'invalid',
+							message: __(
+								'Value does not match the required pattern.'
+							),
+						},
+					};
+				}
+			} catch ( error ) {
+				return {
+					pattern: {
+						type: 'invalid',
+						message: __( 'Invalid pattern configuration.' ),
+					},
+				};
+			}
+		}
 	}
 
 	// Validate the field: isValid.elements (static)

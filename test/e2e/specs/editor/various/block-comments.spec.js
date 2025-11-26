@@ -477,6 +477,31 @@ test.describe( 'Block Comments', () => {
 			await expect( thread ).toBeFocused();
 		} );
 
+		test( 'should collapse a comment when the focus moves outside the note', async ( {
+			page,
+			blockCommentUtils,
+		} ) => {
+			await blockCommentUtils.addBlockWithComment( {
+				type: 'core/heading',
+				attributes: { content: 'Testing block comments' },
+				comment: 'Test comment',
+			} );
+
+			const thread = page
+				.getByRole( 'region', {
+					name: 'Editor settings',
+				} )
+				.getByRole( 'treeitem', {
+					name: 'Note: Test comment',
+				} );
+
+			await thread.click();
+			await expect( thread ).toHaveAttribute( 'aria-expanded', 'true' );
+			await page.keyboard.press( 'Shift+Tab' );
+			await expect( thread ).not.toBeFocused();
+			await expect( thread ).toHaveAttribute( 'aria-expanded', 'false' );
+		} );
+
 		test( 'should have accessible name for the comment threads', async ( {
 			page,
 			blockCommentUtils,
@@ -676,7 +701,7 @@ test.describe( 'Block Comments', () => {
 					name: 'Note: Test comment',
 				} );
 			const addNewCommentButton = thread.getByRole( 'button', {
-				name: 'Add new note',
+				name: 'Add new reply',
 			} );
 			await thread.focus();
 			await page.keyboard.press( 'Tab' );
@@ -709,6 +734,7 @@ test.describe( 'Block Comments', () => {
 				} );
 			const replyButton = thread.getByRole( 'button', {
 				name: 'Reply',
+				exact: true,
 			} );
 			const backToBlockButton = thread.getByRole( 'button', {
 				name: 'Back to block',

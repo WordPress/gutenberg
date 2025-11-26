@@ -30,7 +30,12 @@ import { __, _n } from '@wordpress/i18n';
  * Internal dependencies
  */
 import DataViews from '../components/dataviews/index';
-import { LAYOUT_GRID, LAYOUT_LIST, LAYOUT_TABLE } from '../constants';
+import {
+	LAYOUT_GRID,
+	LAYOUT_LIST,
+	LAYOUT_TABLE,
+	LAYOUT_ACTIVITY,
+} from '../constants';
 import filterSortAndPaginate from '../utils/filter-sort-and-paginate';
 import type { Field, View } from '../types';
 import {
@@ -39,6 +44,9 @@ import {
 	data,
 	fields,
 	type SpaceObject,
+	orderEventData,
+	orderEventFields,
+	orderEventActions,
 } from './dataviews.fixtures';
 
 import './dataviews.style.css';
@@ -68,11 +76,17 @@ const defaultLayouts = {
 	[ LAYOUT_TABLE ]: {},
 	[ LAYOUT_GRID ]: {},
 	[ LAYOUT_LIST ]: {},
+	[ LAYOUT_ACTIVITY ]: {},
 };
 
 export const Default = ( {
 	perPageSizes = [ 10, 25, 50, 100 ],
 	hasClickableItems = true,
+	backgroundColor,
+}: {
+	perPageSizes?: number[];
+	hasClickableItems?: boolean;
+	backgroundColor?: string;
 } ) => {
 	const [ view, setView ] = useState< View >( {
 		...DEFAULT_VIEW,
@@ -85,28 +99,45 @@ export const Default = ( {
 		return filterSortAndPaginate( data, view, fields );
 	}, [ view ] );
 	return (
-		<DataViews
-			getItemId={ ( item ) => item.id.toString() }
-			paginationInfo={ paginationInfo }
-			data={ shownData }
-			view={ view }
-			fields={ fields }
-			onChangeView={ setView }
-			actions={ actions }
-			renderItemLink={ ( { item, ...props }: { item: SpaceObject } ) => (
-				<button
-					style={ { background: 'none', border: 'none', padding: 0 } }
-					onClick={ () => {
-						// eslint-disable-next-line no-alert
-						alert( 'Clicked: ' + item.name.title );
-					} }
-					{ ...props }
-				/>
-			) }
-			isItemClickable={ () => hasClickableItems }
-			defaultLayouts={ defaultLayouts }
-			config={ { perPageSizes } }
-		/>
+		<div
+			style={
+				{
+					'--wp-dataviews-color-background': backgroundColor,
+				} as React.CSSProperties
+			}
+		>
+			<DataViews
+				getItemId={ ( item ) => item.id.toString() }
+				paginationInfo={ paginationInfo }
+				data={ shownData }
+				view={ view }
+				fields={ fields }
+				onChangeView={ setView }
+				actions={ actions }
+				renderItemLink={ ( {
+					item,
+					...props
+				}: {
+					item: SpaceObject;
+				} ) => (
+					<button
+						style={ {
+							background: 'none',
+							border: 'none',
+							padding: 0,
+						} }
+						onClick={ () => {
+							// eslint-disable-next-line no-alert
+							alert( 'Clicked: ' + item.name.title );
+						} }
+						{ ...props }
+					/>
+				) }
+				isItemClickable={ () => hasClickableItems }
+				defaultLayouts={ defaultLayouts }
+				config={ { perPageSizes } }
+			/>
+		</div>
 	);
 };
 
@@ -123,6 +154,10 @@ Default.argTypes = {
 	hasClickableItems: {
 		control: 'boolean',
 		description: 'Are the items clickable',
+	},
+	backgroundColor: {
+		control: 'color',
+		description: 'Background color of the DataViews component',
 	},
 };
 
@@ -191,10 +226,10 @@ const MinimalUIComponent = ( {
 	} ) );
 
 	useEffect( () => {
-		setView( {
-			...view,
+		setView( ( prevView ) => ( {
+			...prevView,
 			type: layout as any,
-		} );
+		} ) );
 	}, [ layout ] );
 
 	return (
@@ -217,7 +252,7 @@ export const MinimalUI = {
 	argTypes: {
 		layout: {
 			control: 'select',
-			options: [ 'table', 'list', 'grid' ],
+			options: [ 'table', 'list', 'grid', 'activity' ],
 			defaultValue: 'table',
 		},
 	},
@@ -407,7 +442,7 @@ export const GroupByLayout = () => {
 		titleField: 'title',
 		descriptionField: 'description',
 		mediaField: 'image',
-		groupByField: 'type',
+		groupBy: { field: 'type', direction: 'asc' },
 		layout: {
 			badgeFields: [ 'satellites' ],
 		},
@@ -424,11 +459,7 @@ export const GroupByLayout = () => {
 			fields={ fields }
 			onChangeView={ setView }
 			actions={ actions }
-			defaultLayouts={ {
-				[ LAYOUT_GRID ]: {},
-				[ LAYOUT_LIST ]: {},
-				[ LAYOUT_TABLE ]: {},
-			} }
+			defaultLayouts={ defaultLayouts }
 		/>
 	);
 };
@@ -504,6 +535,7 @@ export const InfiniteScroll = () => {
 		}
 		setIsLoadingMore( false );
 	}, [
+		shownData,
 		view.search,
 		view.filters,
 		view.perPage,
@@ -548,12 +580,97 @@ export const InfiniteScroll = () => {
 				onChangeView={ setView }
 				actions={ actions }
 				isLoading={ isLoadingMore }
-				defaultLayouts={ {
-					[ LAYOUT_GRID ]: {},
-					[ LAYOUT_LIST ]: {},
-					[ LAYOUT_TABLE ]: {},
-				} }
+				defaultLayouts={ defaultLayouts }
 			/>
 		</>
 	);
+};
+
+const ActivityComponent = ( {
+	showMedia = true,
+	grouping = true,
+}: {
+	showMedia: boolean;
+	grouping: boolean;
+} ) => {
+	const [ view, setView ] = useState< View >( {
+		type: LAYOUT_ACTIVITY,
+		search: '',
+		page: 1,
+		perPage: 20,
+		filters: [],
+		fields: [ 'time', 'categories', 'orderNumber' ],
+		titleField: 'title',
+		descriptionField: 'description',
+		mediaField: 'icon',
+		showMedia,
+		sort: {
+			field: 'datetime',
+			direction: 'asc',
+		},
+		groupBy: grouping
+			? {
+					field: 'date',
+					direction: 'asc',
+			  }
+			: undefined,
+	} );
+	useEffect( () => {
+		setView( ( prevView ) => {
+			return {
+				...prevView,
+				groupBy: grouping
+					? { field: 'date', direction: 'asc' }
+					: undefined,
+				showMedia,
+			};
+		} );
+	}, [ showMedia, grouping ] );
+
+	const { data: shownData, paginationInfo } = useMemo( () => {
+		return filterSortAndPaginate( orderEventData, view, orderEventFields );
+	}, [ view ] );
+
+	return (
+		<DataViews
+			getItemId={ ( item ) => item.id.toString() }
+			paginationInfo={ paginationInfo }
+			data={ shownData }
+			view={ view }
+			fields={ orderEventFields }
+			onChangeView={ setView }
+			actions={ orderEventActions }
+			defaultLayouts={ {
+				[ LAYOUT_ACTIVITY ]: {
+					sort: {
+						field: 'datetime',
+						direction: 'asc',
+					},
+				},
+			} }
+		/>
+	);
+};
+
+export const Activity = {
+	render: ActivityComponent,
+	args: {
+		showMedia: true,
+		grouping: true,
+	},
+	argTypes: {
+		showMedia: {
+			control: 'boolean',
+			options: [ true, false ],
+			defaultValue: true,
+			description: 'Whether the icon is shown in the activity list',
+		},
+		grouping: {
+			control: 'boolean',
+			options: [ true, false ],
+			defaultValue: true,
+			description:
+				'Whether items are grouped by date in the activity list',
+		},
+	},
 };

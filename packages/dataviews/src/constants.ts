@@ -7,7 +7,7 @@ import { arrowDown, arrowUp } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import type { Operator } from './types';
+import type { Operator, DayNumber } from './types';
 
 // Filter operators.
 export const OPERATOR_IS = 'is';
@@ -183,7 +183,10 @@ export const sortIcons = {
 export const LAYOUT_TABLE = 'table';
 export const LAYOUT_GRID = 'grid';
 export const LAYOUT_LIST = 'list';
+export const LAYOUT_ACTIVITY = 'activity';
 
 // Picker view layouts.
 export const LAYOUT_PICKER_GRID = 'pickerGrid';
 export const LAYOUT_PICKER_TABLE = 'pickerTable';
+
+export const DAYS_OF_WEEK: DayNumber[] = [ 0, 1, 2, 3, 4, 5, 6 ];
