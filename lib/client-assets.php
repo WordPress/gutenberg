@@ -151,33 +151,8 @@ function gutenberg_register_packages_styles( $styles ) {
 	// wp-customize-widgets: add wp-edit-blocks (custom handle not auto-inferred)
 	$styles->query( 'wp-customize-widgets', 'registered' )->deps[] = 'wp-edit-blocks';
 
-	gutenberg_override_style(
-		$styles,
-		'wp-block-editor-content',
-		gutenberg_url( 'build/styles/block-editor/content.css' ),
-		array( 'wp-base-styles', 'wp-components' ),
-		$version
-	);
-	$styles->add_data( 'wp-block-editor-content', 'rtl', 'replace' );
-
-	// Editor Styles.
-	gutenberg_override_style(
-		$styles,
-		'wp-block-editor',
-		gutenberg_url( 'build/styles/block-editor/style.css' ),
-		array( 'wp-base-styles', 'wp-components', 'wp-preferences' ),
-		$version
-	);
-	$styles->add_data( 'wp-block-editor', 'rtl', 'replace' );
-
-	gutenberg_override_style(
-		$styles,
-		'wp-edit-post',
-		gutenberg_url( 'build/styles/edit-post/style.css' ),
-		array( 'wp-base-styles', 'wp-components', 'wp-block-editor', 'wp-editor', 'wp-edit-blocks', 'wp-block-library', 'wp-commands', 'wp-preferences' ),
-		$version
-	);
-	$styles->add_data( 'wp-edit-post', 'rtl', 'replace' );
+	// add wp-base-styles to the already registered wp-admin stylesheet
+	$styles->query( 'wp-admin', 'registered' )->deps[] = 'wp-base-styles';
 
 	$block_library_filename = wp_should_load_separate_core_block_assets() ? 'common' : 'style';
 	gutenberg_override_style(
@@ -200,6 +175,7 @@ function gutenberg_register_packages_styles( $styles ) {
 		// Until #37466, we can't specifically add them as editor styles yet,
 		// so we must hard-code it here as a dependency.
 		'wp-block-editor-content',
+		'wp-base-styles',
 	);
 
 	// Only load the default layout and margin styles for themes without theme.json file.
@@ -257,42 +233,6 @@ function gutenberg_register_packages_styles( $styles ) {
 		$version
 	);
 	$styles->add_data( 'wp-block-library-theme', 'rtl', 'replace' );
-
-	gutenberg_override_style(
-		$styles,
-		'wp-list-reusable-blocks',
-		gutenberg_url( 'build/styles/list-reusable-blocks/style.css' ),
-		array( 'wp-base-styles', 'wp-components' ),
-		$version
-	);
-	$styles->add_data( 'wp-list-reusable-block', 'rtl', 'replace' );
-
-	gutenberg_override_style(
-		$styles,
-		'wp-commands',
-		gutenberg_url( 'build/styles/commands/style.css' ),
-		array( 'wp-base-styles', 'wp-components' ),
-		$version
-	);
-	$styles->add_data( 'wp-commands', 'rtl', 'replace' );
-
-	gutenberg_override_style(
-		$styles,
-		'wp-edit-site',
-		gutenberg_url( 'build/styles/edit-site/style.css' ),
-		array( 'wp-base-styles', 'wp-components', 'wp-block-editor', 'wp-editor', 'wp-block-library-editor', 'common', 'forms', 'wp-commands', 'wp-preferences' ),
-		$version
-	);
-	$styles->add_data( 'wp-edit-site', 'rtl', 'replace' );
-
-	gutenberg_override_style(
-		$styles,
-		'wp-edit-widgets',
-		gutenberg_url( 'build/styles/edit-widgets/style.css' ),
-		array( 'wp-base-styles', 'wp-components', 'wp-block-editor', 'wp-editor', 'wp-edit-blocks', 'wp-patterns', 'wp-widgets', 'wp-preferences' ),
-		$version
-	);
-	$styles->add_data( 'wp-edit-widgets', 'rtl', 'replace' );
 }
 add_action( 'wp_default_styles', 'gutenberg_register_packages_styles', 15 );
 

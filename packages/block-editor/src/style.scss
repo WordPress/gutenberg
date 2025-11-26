@@ -64,5 +64,3 @@
 @use "./components/block-toolbar/style.scss" as *;
 @use "./components/inserter/style.scss" as *;
 @use "./components/spacing-sizes-control/style.scss" as *;
-
-@include wordpress-admin-schemes();
