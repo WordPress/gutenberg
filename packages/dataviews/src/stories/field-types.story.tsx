@@ -116,6 +116,7 @@ type DataType = {
 	password: string;
 	passwordWithElements: string;
 	media: string;
+	mediaName: string;
 	mediaWithElements: string;
 	array: string[];
 	arrayWithElements: string[];
@@ -156,6 +157,7 @@ const data: DataType[] = [
 		password: 'secretpassword123',
 		passwordWithElements: 'secretpassword123',
 		media: 'https://live.staticflickr.com/7398/9458193857_e1256123e3_z.jpg',
+		mediaName: 'Image name',
 		mediaWithElements:
 			'https://live.staticflickr.com/7398/9458193857_e1256123e3_z.jpg',
 		array: [ 'item1', 'item2', 'item3' ],
@@ -411,6 +413,11 @@ const fields: Field< DataType >[] = [
 		],
 	},
 	{
+		id: 'mediaName',
+		type: 'text',
+		label: 'Media Name',
+	},
+	{
 		id: 'media',
 		type: 'media',
 		label: 'Media',
@@ -589,8 +596,14 @@ const FieldTypeStory = ( {
 	}, [ _fields, Edit, asyncElements ] );
 	const form = useMemo(
 		() => ( {
-			layout: { type },
-			fields: storyFields.map( ( field ) => field.id ),
+			layout: {
+				type: 'panel',
+				openAs: 'modal',
+				summary: [ 'mediaName' ],
+			},
+			fields: storyFields
+				.filter( ( field ) => field.id !== 'mediaName' )
+				.map( ( field ) => field.id ),
 		} ),
 		[ type, storyFields ]
 	) as Form;
@@ -1013,7 +1026,10 @@ export const MediaComponent = ( {
 	asyncElements: boolean;
 } ) => {
 	const mediaFields = useMemo(
-		() => fields.filter( ( field ) => field.type === 'media' ),
+		() =>
+			fields.filter(
+				( field ) => field.id === 'mediaName' || field.id === 'media'
+			),
 		[]
 	);
 
