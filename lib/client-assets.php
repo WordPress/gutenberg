@@ -155,7 +155,7 @@ function gutenberg_register_packages_styles( $styles ) {
 		$styles,
 		'wp-block-editor-content',
 		gutenberg_url( 'build/styles/block-editor/content.css' ),
-		array( 'wp-components' ),
+		array( 'wp-base-styles', 'wp-components' ),
 		$version
 	);
 	$styles->add_data( 'wp-block-editor-content', 'rtl', 'replace' );
@@ -184,7 +184,7 @@ function gutenberg_register_packages_styles( $styles ) {
 		$styles,
 		'wp-block-library',
 		gutenberg_url( 'build/styles/block-library/' . $block_library_filename . '.css' ),
-		array( 'wp-base-styles' ),
+		array(),
 		$version
 	);
 	$styles->add_data( 'wp-block-library', 'rtl', 'replace' );
