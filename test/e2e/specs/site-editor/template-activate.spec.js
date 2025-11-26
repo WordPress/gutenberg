@@ -245,8 +245,7 @@ test.describe( 'Template Activate', () => {
 		).toBeUndefined();
 
 		const expectedIdWhenDisabled =
-			resultWithExperimentDisabled.apiTemplateId ||
-			resultWithExperimentDisabled.apiTemplateWpId;
+			resultWithExperimentDisabled.apiTemplateId;
 		expect( resultWithExperimentDisabled.resolverReturnedId ).toBe(
 			expectedIdWhenDisabled
 		);
