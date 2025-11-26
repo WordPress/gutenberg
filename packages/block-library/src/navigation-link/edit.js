@@ -12,10 +12,10 @@ import {
 	BaseControl,
 	PanelBody,
 	TextControl,
-	TextareaControl,
 	ToolbarButton,
 	ToolbarGroup,
 	VisuallyHidden,
+	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { displayShortcut, isKeyboardEvent } from '@wordpress/keycodes';
 import { __, sprintf } from '@wordpress/i18n';
@@ -51,6 +51,9 @@ import {
 	useEntityBinding,
 	MissingEntityHelpText,
 } from './shared';
+import { unlock } from '../lock-unlock';
+
+const { Badge } = unlock( componentsPrivateApis );
 
 const DEFAULT_BLOCK = { name: 'core/navigation-link' };
 const NESTING_BLOCK_NAMES = [
@@ -585,6 +588,7 @@ export default function NavigationLinkEdit( {
 						<BaseControl.VisualLabel>
 							{ __( 'Link' ) }
 						</BaseControl.VisualLabel>
+
 						<LinkControl
 							hasTextControl={ false }
 							hasRichPreviews

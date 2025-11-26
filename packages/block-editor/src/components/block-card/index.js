@@ -103,6 +103,19 @@ function BlockCard( {
 		( { title, icon, description } = blockType );
 	}
 
+	const { blockName } = useSelect(
+		( select ) => {
+			if ( ! clientId ) {
+				return { blockName: null };
+			}
+			const { getBlockName } = select( blockEditorStore );
+			return {
+				blockName: getBlockName( clientId ),
+			};
+		},
+		[ clientId ]
+	);
+
 	const parentNavBlockClientId = useSelect(
 		( select ) => {
 			if ( parentClientId || isChild || ! allowParentNavigation ) {
@@ -176,10 +189,16 @@ function BlockCard( {
 							<Badge>{ title }</Badge>
 						) }
 					</TitleElement>
-					{ ! parentClientId && ! isChild && description && (
-						<Text className="block-editor-block-card__description">
-							{ description }
-						</Text>
+					{ ! parentClientId &&
+					! isChild &&
+					blockName === 'core/navigation-link' ? (
+						<Badge intent="success">{ __( 'Active' ) }</Badge>
+					) : (
+						description && (
+							<Text className="block-editor-block-card__description">
+								{ description }
+							</Text>
+						)
 					) }
 					{ children }
 				</VStack>
