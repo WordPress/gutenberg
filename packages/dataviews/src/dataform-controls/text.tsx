@@ -6,7 +6,7 @@ import { createElement } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import type { DataFormControlProps } from '../types';
+import type { DataFormControlProps, DataFormControlConfigText } from '../types';
 import ValidatedText from './utils/validated-input';
 
 export default function Text< Item >( {
@@ -17,7 +17,7 @@ export default function Text< Item >( {
 	config,
 	validity,
 }: DataFormControlProps< Item > ) {
-	const { prefix, suffix } = config || {};
+	const { prefix, suffix } = ( config as DataFormControlConfigText ) || {};
 
 	return (
 		<ValidatedText

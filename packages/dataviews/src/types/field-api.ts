@@ -115,10 +115,89 @@ export type EditConfigText = {
 };
 
 /**
- * Edit configuration for other control types (excluding 'text' and 'textarea').
+ * Edit configuration for media controls.
+ * Provides all the props needed to render a DataViewsPicker for media selection.
+ */
+export type EditConfigMedia< Item = any > = {
+	control: 'media';
+	/**
+	 * The view configuration for the picker.
+	 */
+	view: {
+		type: string;
+		fields?: string[];
+		titleField?: string;
+		mediaField?: string;
+		search?: string;
+		page?: number;
+		perPage?: number;
+		filters?: Array< {
+			field: string;
+			operator: Operator;
+			value: any;
+		} >;
+		sort?: {
+			field: string;
+			direction: SortDirection;
+		};
+	};
+	/**
+	 * Callback to update the view configuration.
+	 */
+	onChangeView: ( view: EditConfigMedia< Item >[ 'view' ] ) => void;
+	/**
+	 * Fields configuration for the picker items.
+	 */
+	fields: Array< Field< Item > >;
+	/**
+	 * The data items to display in the picker.
+	 */
+	data: Item[];
+	/**
+	 * Actions available on the picker items.
+	 */
+	actions?: Array< {
+		id: string;
+		label: string | ( ( items: Item[] ) => string );
+		icon?: any;
+		callback: (
+			items: Item[],
+			context: {
+				registry: any;
+				onActionPerformed?: ( items: Item[] ) => void;
+			}
+		) => void;
+	} >;
+	/**
+	 * Currently selected item IDs.
+	 */
+	selection?: string[];
+	/**
+	 * Callback when selection changes.
+	 */
+	onChangeSelection?: ( items: string[] ) => void;
+	/**
+	 * Pagination information.
+	 */
+	paginationInfo: {
+		totalItems: number;
+		totalPages: number;
+	};
+	/**
+	 * Whether the picker is loading data.
+	 */
+	isLoading?: boolean;
+	/**
+	 * Function to get the unique ID of an item.
+	 */
+	getItemId: ( item: Item ) => string;
+};
+
+/**
+ * Edit configuration for other control types (excluding 'text', 'textarea', and 'media').
  */
 export type EditConfigGeneric = {
-	control: Exclude< FieldTypeName, 'text' | 'textarea' >;
+	control: Exclude< FieldTypeName, 'text' | 'textarea' | 'media' >;
 };
 
 /**
@@ -128,6 +207,7 @@ export type EditConfigGeneric = {
 export type EditConfig =
 	| EditConfigTextarea
 	| EditConfigText
+	| EditConfigMedia
 	| EditConfigGeneric;
 
 /**
@@ -309,6 +389,23 @@ export type FieldValidity = {
 	children?: Record< string, FieldValidity >;
 };
 
+/**
+ * Configuration for text/textarea controls.
+ */
+export type DataFormControlConfigText = {
+	prefix?: React.ComponentType;
+	suffix?: React.ComponentType;
+	rows?: number;
+};
+
+/**
+ * Configuration for media controls (without the 'control' property).
+ */
+export type DataFormControlConfigMedia< Item = any > = Omit<
+	EditConfigMedia< Item >,
+	'control'
+>;
+
 export type DataFormControlProps< Item > = {
 	data: Item;
 	field: NormalizedField< Item >;
@@ -327,11 +424,7 @@ export type DataFormControlProps< Item > = {
 	/**
 	 * Configuration object for the control.
 	 */
-	config?: {
-		prefix?: React.ComponentType;
-		suffix?: React.ComponentType;
-		rows?: number;
-	};
+	config?: DataFormControlConfigText | DataFormControlConfigMedia< any >;
 };
 
 export type DataViewRenderFieldProps< Item > = {

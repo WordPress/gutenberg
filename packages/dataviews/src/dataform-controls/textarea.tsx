@@ -7,7 +7,7 @@ import { useCallback } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import type { DataFormControlProps } from '../types';
+import type { DataFormControlProps, DataFormControlConfigText } from '../types';
 import { unlock } from '../lock-unlock';
 import getCustomValidity from './utils/get-custom-validity';
 
@@ -21,7 +21,7 @@ export default function Textarea< Item >( {
 	config,
 	validity,
 }: DataFormControlProps< Item > ) {
-	const { rows = 4 } = config || {};
+	const { rows = 4 } = ( config as DataFormControlConfigText ) || {};
 	const { label, placeholder, description, setValue, isValid } = field;
 	const value = field.getValue( { item: data } );
 
