@@ -42,6 +42,9 @@ test.describe( 'Template ID Format', () => {
 		await expect(
 			editor.canvas.getByText( 'Test content with experiment enabled' )
 		).toBeVisible();
+		await expect( page.locator( 'body' ) ).not.toContainText(
+			'No templates exist with that id.'
+		);
 
 		// Test with experiment disabled.
 		await requestUtils.setGutenbergExperiments( [] );
@@ -61,5 +64,8 @@ test.describe( 'Template ID Format', () => {
 		await expect(
 			editor.canvas.getByText( 'Test content with experiment disabled' )
 		).toBeVisible();
+		await expect( page.locator( 'body' ) ).not.toContainText(
+			'No templates exist with that id.'
+		);
 	} );
 } );
