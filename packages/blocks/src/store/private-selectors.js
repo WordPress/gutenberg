@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { createSelector } from '@wordpress/data';
+import { createSelector, createRegistrySelector } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
 
 /**
@@ -210,6 +210,29 @@ export function getAllBlockBindingsSources( state ) {
 export function getBlockBindingsSource( state, sourceName ) {
 	return state.blockBindingsSources[ sourceName ];
 }
+
+export const getSourceFieldsList = createRegistrySelector( ( select ) =>
+	createSelector(
+		( state, source, blockContext ) => {
+			if ( ! source.getFieldsList ) {
+				return;
+			}
+
+			const context = {};
+			if ( source?.usesContext?.length ) {
+				for ( const key of source.usesContext ) {
+					context[ key ] = blockContext[ key ];
+				}
+			}
+			return source.getFieldsList( { select, context } );
+		},
+		( state, source, blockContext ) => [
+			source.getFieldsList,
+			source.usesContext,
+			blockContext,
+		]
+	)
+);
 
 /**
  * Determines if any of the block type's attributes have
