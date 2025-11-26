@@ -12,6 +12,10 @@ async function navigateToTemplateEditor( { admin, editor, page } ) {
 	const settingsPanel = page.getByRole( 'region', {
 		name: 'Editor settings',
 	} );
+	await page
+		.getByRole( 'dialog', { name: 'Choose a pattern' } )
+		.getByRole( 'button', { name: 'Close' } )
+		.click();
 	await settingsPanel.getByRole( 'tab', { name: 'Page' } ).click();
 	await settingsPanel
 		.getByRole( 'button', { name: 'Template options' } )
@@ -34,11 +38,17 @@ test.describe( 'Template ID Format', () => {
 		await requestUtils.activateTheme( 'twentytwentyfive' );
 		await requestUtils.deleteAllTemplates( 'wp_template' );
 		await requestUtils.deleteAllTemplates( 'wp_template_part' );
+		await requestUtils.deleteAllPages();
+		await requestUtils.createPage( {
+			title: 'Privacy Policy',
+			status: 'publish',
+		} );
 	} );
 
 	test.afterAll( async ( { requestUtils } ) => {
 		await requestUtils.deleteAllTemplates( 'wp_template' );
 		await requestUtils.deleteAllTemplates( 'wp_template_part' );
+		await requestUtils.deleteAllPages();
 		await requestUtils.activateTheme( 'twentytwentyone' );
 		// Ensure experiment is disabled after test.
 		await requestUtils.setGutenbergExperiments( [] );
