@@ -22,7 +22,11 @@ export function getComputedAcceptAttribute(
 	}
 
 	// If allowedMimeTypes is not available, fall back to wildcard.
-	if ( ! allowedMimeTypes || typeof allowedMimeTypes !== 'object' ) {
+	if (
+		! allowedMimeTypes ||
+		typeof allowedMimeTypes !== 'object' ||
+		Object.keys( allowedMimeTypes ).length === 0
+	) {
 		if ( allowedTypes && allowedTypes.length > 0 ) {
 			return allowedTypes.map( ( type ) => `${ type }/*` ).join( ',' );
 		}
@@ -57,10 +61,5 @@ export function getComputedAcceptAttribute(
 		return acceptedMimeTypes.join( ',' );
 	}
 
-	// Fallback to wildcard if no specific types were found.
-	if ( allowedTypes && allowedTypes.length > 0 ) {
-		return allowedTypes.map( ( type ) => `${ type }/*` ).join( ',' );
-	}
-
-	return undefined;
+	return allowedTypes.map( ( type ) => `${ type }/*` ).join( ',' );
 }
