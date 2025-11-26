@@ -3,6 +3,32 @@
  */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
+async function navigateToTemplateEditor( { admin, editor, page } ) {
+	await admin.visitAdminPage( 'edit.php', 'post_type=page' );
+	await page.getByLabel( '“Privacy Policy” (Edit)' ).click();
+	await page.getByRole( 'button', { name: 'Close' } ).click();
+
+	await editor.openDocumentSettingsSidebar();
+	const settingsPanel = page.getByRole( 'region', {
+		name: 'Editor settings',
+	} );
+	await settingsPanel.getByRole( 'tab', { name: 'Page' } ).click();
+	await settingsPanel
+		.getByRole( 'button', { name: 'Template options' } )
+		.click();
+	await page.getByRole( 'menuitem', { name: 'Edit template' } ).click();
+	await page.waitForSelector( 'iframe[name="editor-canvas"]' );
+	await expect( editor.canvas.locator( 'body' ) ).toBeVisible();
+
+	// Dismiss welcome guide if visible.
+	const getStartedButton = page.getByRole( 'button', {
+		name: 'Get started',
+	} );
+	if ( await getStartedButton.isVisible() ) {
+		await getStartedButton.click();
+	}
+}
+
 test.describe( 'Template ID Format', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.activateTheme( 'twentytwentyfive' );
@@ -27,22 +53,7 @@ test.describe( 'Template ID Format', () => {
 		// Test with experiment enabled first.
 		await requestUtils.setGutenbergExperiments( [ 'active_templates' ] );
 
-		await admin.visitAdminPage( 'edit.php', 'post_type=page' );
-		await page.getByLabel( '“Privacy Policy” (Edit)' ).click();
-		await page.getByRole( 'button', { name: 'Close' } ).click();
-		const settingsPanel = page.getByRole( 'region', {
-			name: 'Editor settings',
-		} );
-
-		await editor.openDocumentSettingsSidebar();
-		await settingsPanel.getByRole( 'tab', { name: 'Page' } ).click();
-		await settingsPanel
-			.getByRole( 'button', { name: 'Template options' } )
-			.click();
-		await page.getByRole( 'menuitem', { name: 'Edit template' } ).click();
-		await page.waitForSelector( 'iframe[name="editor-canvas"]' );
-		await expect( editor.canvas.locator( 'body' ) ).toBeVisible();
-		await page.getByRole( 'button', { name: 'Get started' } ).click();
+		await navigateToTemplateEditor( { admin, editor, page } );
 
 		await editor.insertBlock( {
 			name: 'core/paragraph',
@@ -58,18 +69,7 @@ test.describe( 'Template ID Format', () => {
 		// Test with experiment disabled.
 		await requestUtils.setGutenbergExperiments( [] );
 
-		await admin.visitAdminPage( 'edit.php', 'post_type=page' );
-		await page.getByLabel( '“Privacy Policy” (Edit)' ).click();
-		await page.getByRole( 'button', { name: 'Close' } ).click();
-
-		await editor.openDocumentSettingsSidebar();
-		await settingsPanel.getByRole( 'tab', { name: 'Page' } ).click();
-		await settingsPanel
-			.getByRole( 'button', { name: 'Template options' } )
-			.click();
-		await page.getByRole( 'menuitem', { name: 'Edit template' } ).click();
-		await page.waitForSelector( 'iframe[name="editor-canvas"]' );
-		await expect( editor.canvas.locator( 'body' ) ).toBeVisible();
+		await navigateToTemplateEditor( { admin, editor, page } );
 
 		await editor.insertBlock( {
 			name: 'core/paragraph',
