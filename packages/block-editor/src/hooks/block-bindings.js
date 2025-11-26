@@ -130,6 +130,7 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 				<ItemGroup isBordered isSeparated>
 					{ bindableAttributes.map( ( attribute ) => {
 						const binding = bindings?.[ attribute ];
+						const { source: sourceName } = binding || {};
 
 						// Check if this specific attribute has compatible data from any source.
 						const attributeType = getAttributeType(
@@ -152,7 +153,7 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 									key={ attribute }
 									attribute={ attribute }
 									binding={ binding }
-									sources={ sources }
+									data={ sources?.[ sourceName ] }
 								/>
 							);
 						}
@@ -162,7 +163,7 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 								key={ attribute }
 								attribute={ attribute }
 								binding={ binding }
-								sources={ sources }
+								data={ sources?.[ sourceName ] }
 							>
 								<Menu
 									placement={

@@ -29,13 +29,12 @@ export default function BlockBindingsPanelItem( {
 	attribute,
 	binding,
 	children,
-	sources,
+	data,
 } ) {
 	const { updateBlockBindings } = useBlockBindingsUtils();
 	const isMobile = useViewportMatch( 'medium', '<' );
 
 	const { source: sourceName, args } = binding || {};
-	const data = sources?.[ sourceName ];
 	const source = getBlockBindingsSource( sourceName );
 
 	let displayText;
