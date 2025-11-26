@@ -53,8 +53,6 @@ import {
 } from './shared';
 import { unlock } from '../lock-unlock';
 
-const { Badge } = unlock( componentsPrivateApis );
-
 const DEFAULT_BLOCK = { name: 'core/navigation-link' };
 const NESTING_BLOCK_NAMES = [
 	'core/navigation-link',
@@ -308,12 +306,12 @@ export default function NavigationLinkEdit( {
 		validateLinkStatus
 	);
 
-	// Fetch entity title for entity links
-	const entityTitle = useSelect(
+	// Fetch entity title and status for entity links
+	const { entityTitle, entityStatus } = useSelect(
 		( select ) => {
 			// Only fetch if we have an entity ID
 			if ( ! id || ! kind || ! type ) {
-				return null;
+				return { entityTitle: null, entityStatus: null };
 			}
 
 			const { getEntityRecord } = select( coreStore );
@@ -321,7 +319,7 @@ export default function NavigationLinkEdit( {
 			const isTaxonomy = kind === 'taxonomy';
 
 			if ( ! isPostType && ! isTaxonomy ) {
-				return null;
+				return { entityTitle: null, entityStatus: null };
 			}
 
 			try {
@@ -334,15 +332,25 @@ export default function NavigationLinkEdit( {
 				);
 
 				if ( ! entityRecord ) {
-					return null;
+					return { entityTitle: null, entityStatus: null };
 				}
 
 				// For posts, use title.rendered; for taxonomies, use name
-				return isPostType
+				const title = isPostType
 					? entityRecord.title?.rendered || entityRecord.title
 					: entityRecord.name;
+
+				// Get status (for post types) or use 'publish' for taxonomies
+				const status = isTaxonomy
+					? 'publish'
+					: entityRecord.status || 'draft';
+
+				return {
+					entityTitle: title,
+					entityStatus: status,
+				};
 			} catch {
-				return null;
+				return { entityTitle: null, entityStatus: null };
 			}
 		},
 		[ id, kind, type ]
@@ -557,6 +565,8 @@ export default function NavigationLinkEdit( {
 		kind,
 		type,
 		id,
+		// Pass status for entity links so LinkPreview can display it
+		status: entityStatus,
 	};
 
 	return (

@@ -64,6 +64,85 @@ export default function LinkPreview( {
 		[]
 	);
 
+	// Get entity type name and status from value props (for entity links)
+	const getEntityDisplayInfo = () => {
+		// Only process if we have an entity ID
+		if ( ! value?.id || ! value?.kind || ! value?.type ) {
+			return { entityTypeName: null, entityStatus: null };
+		}
+
+		const isPostType = value.kind === 'post-type';
+		const isTaxonomy = value.kind === 'taxonomy';
+
+		if ( ! isPostType && ! isTaxonomy ) {
+			return { entityTypeName: null, entityStatus: null };
+		}
+
+		// Get entity type name
+		let typeName = value.type;
+		if ( isPostType ) {
+			switch ( value.type ) {
+				case 'post':
+					typeName = __( 'Post' );
+					break;
+				case 'page':
+					typeName = __( 'Page' );
+					break;
+				default:
+					typeName = value.type;
+			}
+		} else {
+			switch ( value.type ) {
+				case 'category':
+					typeName = __( 'Category' );
+					break;
+				case 'tag':
+					typeName = __( 'Tag' );
+					break;
+				default:
+					typeName = __( 'Term' );
+			}
+		}
+
+		// Get status from value.status if provided, otherwise default
+		// For taxonomies, always show "Published"
+		let status = null;
+		if ( isTaxonomy ) {
+			status = __( 'Published' );
+		} else if ( value.status ) {
+			// Status can be passed in the value prop
+			switch ( value.status ) {
+				case 'publish':
+					status = __( 'Published' );
+					break;
+				case 'draft':
+					status = __( 'Draft' );
+					break;
+				case 'pending':
+					status = __( 'Pending' );
+					break;
+				case 'private':
+					status = __( 'Private' );
+					break;
+				case 'future':
+					status = __( 'Scheduled' );
+					break;
+				default:
+					status = value.status;
+			}
+		} else {
+			// Default to Published if no status provided
+			status = __( 'Published' );
+		}
+
+		return {
+			entityTypeName: typeName,
+			entityStatus: status,
+		};
+	};
+
+	const { entityTypeName, entityStatus } = getEntityDisplayInfo();
+
 	// Avoid fetching if rich previews are not desired.
 	const showRichPreviews = hasRichPreviews ? value?.url : null;
 
@@ -72,9 +151,13 @@ export default function LinkPreview( {
 	// Rich data may be an empty object so test for that.
 	const hasRichData = richData && Object.keys( richData ).length;
 
+	// For entity links, show entity type and status instead of URL
 	const displayURL =
-		( value && filterURLForDisplay( safeDecodeURI( value.url ), 24 ) ) ||
-		'';
+		entityTypeName && entityStatus
+			? `${ entityTypeName } - ${ entityStatus }`
+			: ( value &&
+					filterURLForDisplay( safeDecodeURI( value.url ), 24 ) ) ||
+			  '';
 
 	// url can be undefined if the href attribute is unset
 	const isEmptyURL = ! value?.url?.length;
