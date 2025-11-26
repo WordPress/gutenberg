@@ -184,7 +184,7 @@ function gutenberg_register_packages_styles( $styles ) {
 		$styles,
 		'wp-block-library',
 		gutenberg_url( 'build/styles/block-library/' . $block_library_filename . '.css' ),
-		array(),
+		array( 'wp-base-styles' ),
 		$version
 	);
 	$styles->add_data( 'wp-block-library', 'rtl', 'replace' );
