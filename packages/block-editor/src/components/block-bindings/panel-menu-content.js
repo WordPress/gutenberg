@@ -37,22 +37,80 @@ export const getAttributeType = ( blockName, attribute ) => {
 	return _attributeType === 'rich-text' ? 'string' : _attributeType;
 };
 
+function BlockBindingsPanelMenuItem( {
+	attribute,
+	binding,
+	item,
+	source,
+	sourceKey,
+} ) {
+	const itemBindings = {
+		source: sourceKey,
+		args: item.args || {
+			key: item.key,
+		},
+	};
+
+	const blockContext = useContext( BlockContext );
+	const values = useSelect(
+		( select ) =>
+			source.getValues( {
+				select,
+				context: blockContext,
+				bindings: {
+					[ attribute ]: itemBindings,
+				},
+			} ),
+		[ itemBindings, source ]
+	);
+	const { updateBlockBindings } = useBlockBindingsUtils();
+
+	return (
+		<Menu.CheckboxItem
+			onChange={ () => {
+				const isCurrentlySelected =
+					fastDeepEqual( binding?.args, item.args ) ??
+					// Deprecate key dependency in 7.0.
+					item.key === binding?.args?.key;
+
+				if ( isCurrentlySelected ) {
+					// Unset if the same item is selected again.
+					updateBlockBindings( {
+						[ attribute ]: undefined,
+					} );
+				} else {
+					updateBlockBindings( {
+						[ attribute ]: itemBindings,
+					} );
+				}
+			} }
+			name={ attribute + '-binding' }
+			value={ values[ attribute ] }
+			checked={
+				fastDeepEqual( binding?.args, item.args ) ??
+				// Deprecate key dependency in 7.0.
+				item.key === binding?.args?.key
+			}
+		>
+			<Menu.ItemLabel>{ item.label }</Menu.ItemLabel>
+			<Menu.ItemHelpText>{ values[ attribute ] }</Menu.ItemHelpText>
+		</Menu.CheckboxItem>
+	);
+}
+
 export default function BlockBindingsPanelMenuContent( {
 	attribute,
 	binding,
 	sources,
 } ) {
 	const { clientId } = useBlockEditContext();
-	const { updateBlockBindings } = useBlockBindingsUtils();
 	const isMobile = useViewportMatch( 'medium', '<' );
-	const blockContext = useContext( BlockContext );
-	const { attributeType, select } = useSelect(
-		( _select ) => {
+	const { attributeType } = useSelect(
+		( select ) => {
 			const { name: blockName } =
-				_select( blockEditorStore ).getBlock( clientId );
+				select( blockEditorStore ).getBlock( clientId );
 			return {
 				attributeType: getAttributeType( blockName, attribute ),
-				select: _select,
 			};
 		},
 		[ clientId, attribute ]
@@ -84,75 +142,20 @@ export default function BlockBindingsPanelMenuContent( {
 						</Menu.SubmenuTriggerItem>
 						<Menu.Popover gutter={ 8 }>
 							<Menu.Group>
-								{ sourceDataItems.map( ( item ) => {
-									const itemBindings = {
-										source: sourceKey,
-										args: item.args || {
-											key: item.key,
-										},
-									};
-									let values = {};
-									try {
-										values = source.getValues( {
-											select,
-											context: blockContext,
-											bindings: {
-												[ attribute ]: itemBindings,
-											},
-										} );
-									} catch ( e ) {}
-
-									return (
-										<Menu.CheckboxItem
-											key={
-												sourceKey +
-													JSON.stringify(
-														item.args
-													) || item.key
-											}
-											onChange={ () => {
-												const isCurrentlySelected =
-													fastDeepEqual(
-														binding?.args,
-														item.args
-													) ??
-													// Deprecate key dependency in 7.0.
-													item.key ===
-														binding?.args?.key;
-
-												if ( isCurrentlySelected ) {
-													// Unset if the same item is selected again.
-													updateBlockBindings( {
-														[ attribute ]:
-															undefined,
-													} );
-												} else {
-													updateBlockBindings( {
-														[ attribute ]:
-															itemBindings,
-													} );
-												}
-											} }
-											name={ attribute + '-binding' }
-											value={ values[ attribute ] }
-											checked={
-												fastDeepEqual(
-													binding?.args,
-													item.args
-												) ??
-												// Deprecate key dependency in 7.0.
-												item.key === binding?.args?.key
-											}
-										>
-											<Menu.ItemLabel>
-												{ item.label }
-											</Menu.ItemLabel>
-											<Menu.ItemHelpText>
-												{ values[ attribute ] }
-											</Menu.ItemHelpText>
-										</Menu.CheckboxItem>
-									);
-								} ) }
+								{ sourceDataItems.map( ( item ) => (
+									<BlockBindingsPanelMenuItem
+										key={
+											sourceKey +
+												JSON.stringify( item.args ) ||
+											item.key
+										}
+										attribute={ attribute }
+										binding={ binding }
+										item={ item }
+										source={ source }
+										sourceKey={ sourceKey }
+									/>
+								) ) }
 							</Menu.Group>
 						</Menu.Popover>
 					</Menu>
