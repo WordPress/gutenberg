@@ -16,8 +16,8 @@ import { useViewportMatch } from '@wordpress/compose';
  * Internal dependencies
  */
 import {
-	EditableBlockBindingsPanelItem,
-	ReadOnlyBlockBindingsPanelItem,
+	BlockBindingsPanelItem,
+	BlockBindingsPanelMenuContent,
 	getAttributeType,
 } from '../components/block-bindings';
 import { useBlockBindingsUtils } from '../utils/block-bindings';
@@ -142,22 +142,32 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 						const isAttributeReadOnly =
 							readOnly || ! hasCompatibleDataForAttribute;
 
-						return isAttributeReadOnly ? (
-							<ReadOnlyBlockBindingsPanelItem
+						if ( isAttributeReadOnly ) {
+							return (
+								<BlockBindingsPanelItem
+									key={ attribute }
+									attribute={ attribute }
+									binding={ binding }
+									sources={ sources }
+									blockName={ blockName }
+								/>
+							);
+						}
+
+						return (
+							<BlockBindingsPanelItem
 								key={ attribute }
 								attribute={ attribute }
 								binding={ binding }
 								sources={ sources }
 								blockName={ blockName }
-							/>
-						) : (
-							<EditableBlockBindingsPanelItem
-								key={ attribute }
-								attribute={ attribute }
-								binding={ binding }
-								sources={ sources }
-								blockName={ blockName }
-							/>
+							>
+								<BlockBindingsPanelMenuContent
+									attribute={ attribute }
+									binding={ binding }
+									sources={ sources }
+								/>
+							</BlockBindingsPanelItem>
 						);
 					} ) }
 				</ItemGroup>

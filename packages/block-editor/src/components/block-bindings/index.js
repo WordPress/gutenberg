@@ -1,8 +1,8 @@
 /**
  * Internal dependencies
  */
+export { default as BlockBindingsPanelItem } from './attribute';
 export {
-	EditableBlockBindingsPanelItem,
-	ReadOnlyBlockBindingsPanelItem,
-} from './attribute';
-export { getAttributeType } from './panel-menu-content';
+	default as BlockBindingsPanelMenuContent,
+	getAttributeType,
+} from './panel-menu-content';

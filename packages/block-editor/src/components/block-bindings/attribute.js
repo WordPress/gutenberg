@@ -22,19 +22,11 @@ import { useViewportMatch } from '@wordpress/compose';
  */
 import { useBlockBindingsUtils } from '../../utils/block-bindings';
 import { unlock } from '../../lock-unlock';
-import {
-	default as BlockBindingsPanelMenuContent,
-	getAttributeType,
-} from './panel-menu-content';
+import { getAttributeType } from './panel-menu-content';
 
 const { Menu } = unlock( componentsPrivateApis );
 
-export function BlockBindingsAttribute( {
-	attribute,
-	binding,
-	sources,
-	blockName,
-} ) {
+function BlockBindingsAttribute( { attribute, binding, sources, blockName } ) {
 	const { source: sourceName, args } = binding || {};
 	const data = sources?.[ sourceName ];
 	const source = getBlockBindingsSource( sourceName );
@@ -82,33 +74,10 @@ export function BlockBindingsAttribute( {
 	);
 }
 
-export function ReadOnlyBlockBindingsPanelItem( {
+export default function BlockBindingsPanelItem( {
 	attribute,
 	binding,
-	sources,
-	blockName,
-} ) {
-	const isMobile = useViewportMatch( 'medium', '<' );
-
-	return (
-		<ToolsPanelItem hasValue={ () => !! binding } label={ attribute }>
-			<Menu placement={ isMobile ? 'bottom-start' : 'left-start' }>
-				<Menu.TriggerButton render={ <Item /> } disabled>
-					<BlockBindingsAttribute
-						attribute={ attribute }
-						binding={ binding }
-						sources={ sources }
-						blockName={ blockName }
-					/>
-				</Menu.TriggerButton>
-			</Menu>
-		</ToolsPanelItem>
-	);
-}
-
-export function EditableBlockBindingsPanelItem( {
-	attribute,
-	binding,
+	children,
 	sources,
 	blockName,
 } ) {
@@ -119,14 +88,17 @@ export function EditableBlockBindingsPanelItem( {
 		<ToolsPanelItem
 			hasValue={ () => !! binding }
 			label={ attribute }
-			onDeselect={ () => {
-				updateBlockBindings( {
-					[ attribute ]: undefined,
-				} );
-			} }
+			onDeselect={
+				!! children &&
+				( () => {
+					updateBlockBindings( {
+						[ attribute ]: undefined,
+					} );
+				} )
+			}
 		>
 			<Menu placement={ isMobile ? 'bottom-start' : 'left-start' }>
-				<Menu.TriggerButton render={ <Item /> }>
+				<Menu.TriggerButton render={ <Item /> } disabled={ ! children }>
 					<BlockBindingsAttribute
 						attribute={ attribute }
 						binding={ binding }
@@ -134,13 +106,11 @@ export function EditableBlockBindingsPanelItem( {
 						blockName={ blockName }
 					/>
 				</Menu.TriggerButton>
-				<Menu.Popover gutter={ isMobile ? 8 : 36 }>
-					<BlockBindingsPanelMenuContent
-						attribute={ attribute }
-						binding={ binding }
-						sources={ sources }
-					/>
-				</Menu.Popover>
+				{ !! children && (
+					<Menu.Popover gutter={ isMobile ? 8 : 36 }>
+						{ children }
+					</Menu.Popover>
+				) }
 			</Menu>
 		</ToolsPanelItem>
 	);

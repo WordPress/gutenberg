@@ -100,6 +100,10 @@ _Related_
 
 -   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-alignment-control/README.md>
 
+### BlockBindingsPanelItem
+
+Internal dependencies
+
 ### BlockBreadcrumb
 
 Block breadcrumb component, displaying the hierarchy of the current block selection as a breadcrumb.
@@ -383,10 +387,6 @@ _Returns_
 ### DefaultBlockAppender
 
 Undocumented declaration.
-
-### EditableBlockBindingsPanelItem
-
-Internal dependencies
 
 ### FontSizePicker
 
@@ -777,10 +777,6 @@ _Returns_
 ### privateApis
 
 Private @wordpress/block-editor APIs.
-
-### ReadOnlyBlockBindingsPanelItem
-
-Internal dependencies
 
 ### RecursionProvider
 

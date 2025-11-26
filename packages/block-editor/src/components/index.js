@@ -11,11 +11,7 @@ export {
 	BlockAlignmentControl,
 	BlockAlignmentToolbar,
 } from './block-alignment-control';
-export {
-	EditableBlockBindingsPanelItem,
-	ReadOnlyBlockBindingsPanelItem,
-	getAttributeType,
-} from './block-bindings';
+export { BlockBindingsPanelItem, getAttributeType } from './block-bindings';
 export { default as __experimentalBlockFullHeightAligmentControl } from './block-full-height-alignment-control';
 export { default as __experimentalBlockAlignmentMatrixControl } from './block-alignment-matrix-control';
 export { default as BlockBreadcrumb } from './block-breadcrumb';
