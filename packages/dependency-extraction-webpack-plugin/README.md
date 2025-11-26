@@ -137,10 +137,28 @@ For example:
 // Source file entrypoint.js
 import { store, getContext } from '@wordpress/interactivity';
 
-// Webpack will produce the output output/entrypoint.js
-/* bundled JavaScript output */
+/*
+ * Depending on your webpack configuration, the output filename used for the
+ * bundled script may differ from the entry point name. The Dependency
+ * Extraction Webpack Plugin will always generate the corresponding asset
+ * metadata file based on the final output filename.
+ *
+ * Examples:
+ * - With @wordpress/scripts default config:
+ *     build/main.js
+ *     build/main.asset.php
+ *
+ * - With a custom filename:
+ *     output/bunny-plugin-entrypoint.min.js
+ *     output/bunny-plugin-entrypoint.min.asset.php
+ *
+ * In all cases, the asset file is named:
+ *
+ *     <output-filename>.asset.php
+ *
+ * and contains the dependency list and a version hash.
+ */
 
-// Webpack will also produce output/entrypoint.asset.php declaring script dependencies
 <?php return array('dependencies' => array('@wordpress/interactivity'), 'version' => 'dd4c2dc50d046ed9d4c063a7ca95702f');
 ```
 
