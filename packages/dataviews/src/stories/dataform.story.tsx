@@ -553,10 +553,12 @@ const ValidationComponent = ( {
 	required,
 	elements,
 	custom,
+	pattern,
 }: {
 	required: boolean;
 	elements: 'sync' | 'async' | 'none';
 	custom: 'sync' | 'async' | 'none';
+	pattern: boolean;
 } ) => {
 	type ValidatedItem = {
 		text: string;
@@ -912,10 +914,15 @@ const ValidationComponent = ( {
 				id: 'text',
 				type: 'text',
 				label: 'Text',
+				placeholder: pattern ? 'user_name123' : undefined,
+				description: pattern
+					? 'Must contain only letters, numbers, and underscores'
+					: undefined,
 				isValid: {
 					required,
 					elements: elements !== 'none' ? true : false,
 					custom: maybeCustomRule( customTextRule ),
+					pattern: pattern ? '^[a-zA-Z0-9_]+$' : undefined,
 				},
 			},
 			{
@@ -974,30 +981,51 @@ const ValidationComponent = ( {
 				id: 'email',
 				type: 'email',
 				label: 'e-mail',
+				placeholder: pattern ? 'user@company.com' : undefined,
+				description: pattern
+					? 'Email must be from @company.com domain'
+					: undefined,
 				isValid: {
 					required,
 					elements: elements !== 'none' ? true : false,
 					custom: maybeCustomRule( customEmailRule ),
+					pattern: pattern ? '^[a-zA-Z0-9]+@company.com$' : undefined,
 				},
 			},
 			{
 				id: 'telephone',
 				type: 'telephone',
 				label: 'telephone',
+				placeholder: pattern ? '+1-555-123-4567' : undefined,
+				description: pattern
+					? 'US phone format with country code'
+					: undefined,
 				isValid: {
 					required,
 					elements: elements !== 'none' ? true : false,
 					custom: maybeCustomRule( customTelephoneRule ),
+					pattern: pattern
+						? '^\\+1-\\d{3}-\\d{3}-\\d{4}$'
+						: undefined,
 				},
 			},
 			{
 				id: 'url',
 				type: 'url',
 				label: 'URL',
+				placeholder: pattern
+					? 'https://github.com/user/repo'
+					: undefined,
+				description: pattern
+					? 'Must be a GitHub repository URL'
+					: undefined,
 				isValid: {
 					required,
 					elements: elements !== 'none' ? true : false,
 					custom: maybeCustomRule( customUrlRule ),
+					pattern: pattern
+						? '^https:\\/\\/github\\.com\\/.*'
+						: undefined,
 				},
 			},
 			{
@@ -1080,10 +1108,14 @@ const ValidationComponent = ( {
 				id: 'password',
 				type: 'password',
 				label: 'Password',
+				description: pattern
+					? 'Must have 8 numbers or letters'
+					: undefined,
 				isValid: {
 					required,
 					elements: elements !== 'none' ? true : false,
 					custom: maybeCustomRule( customPasswordRule ),
+					pattern: pattern ? '^[0-9a-zA-Z]{8}$' : undefined,
 				},
 			},
 			{
@@ -2084,11 +2116,17 @@ export const Validation = {
 			description: 'Whether or not the custom validation rule is active.',
 			options: [ 'sync', 'async', 'none' ],
 		},
+		pattern: {
+			control: { type: 'boolean' },
+			description:
+				'Whether or not the pattern validation rule is active.',
+		},
 	},
 	args: {
 		required: true,
 		elements: 'sync',
 		custom: 'sync',
+		pattern: false,
 	},
 };
 
@@ -2143,6 +2181,21 @@ const DataAdapterComponent = () => {
 			id: 'user.profile.email',
 			label: 'User Email',
 			type: 'email',
+		},
+		{
+			id: 'user.profile.tags',
+			label: 'User Tags',
+			type: 'array',
+			placeholder: 'Enter comma-separated tags',
+			description:
+				'Add tags separated by commas (e.g., "tag1, tag2, tag3")',
+			elements: [
+				{ value: 'astronomy', label: 'Astronomy' },
+				{ value: 'book-review', label: 'Book review' },
+				{ value: 'event', label: 'Event' },
+				{ value: 'photography', label: 'Photography' },
+				{ value: 'travel', label: 'Travel' },
+			],
 		},
 		// Example of adapting a data value to a control value
 		// by providing getValue/setValue methods.
@@ -2200,7 +2253,11 @@ const DataAdapterComponent = () => {
 		// Edits will respect the shape of the data
 		// because fields provide the proper information
 		// (via field.id or via field.setValue).
-		setData( ( prev ) => deepMerge( prev, edits ) );
+		setData( ( prev ) =>
+			deepMerge( prev, edits, {
+				arrayMerge: ( target, source ) => source,
+			} )
+		);
 	}, [] );
 
 	return (
@@ -2241,6 +2298,7 @@ const DataAdapterComponent = () => {
 							children: [
 								'user.profile.name',
 								'user.profile.email',
+								'user.profile.tags',
 							],
 						},
 					],

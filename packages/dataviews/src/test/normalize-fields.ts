@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import normalizeFields from '../field-types/utils/normalize-fields';
+import normalizeFields from '../field-types';
 import type { Field } from '../types';
 
 describe( 'normalizeFields: default getValue', () => {
@@ -353,7 +353,7 @@ describe( 'normalizeFields: default getValue', () => {
 			expect( typeof normalizedFields[ 0 ].format.date ).toBe( 'string' );
 			expect( normalizedFields[ 0 ].format.weekStartsOn ).toBeDefined();
 			expect( typeof normalizedFields[ 0 ].format.weekStartsOn ).toBe(
-				'string'
+				'number'
 			);
 		} );
 
@@ -364,15 +364,13 @@ describe( 'normalizeFields: default getValue', () => {
 					type: 'date',
 					format: {
 						date: 'F j, Y',
-						weekStartsOn: 'monday',
+						weekStartsOn: 1,
 					},
 				},
 			];
 			const normalizedFields = normalizeFields( fields );
 			expect( normalizedFields[ 0 ].format.date ).toBe( 'F j, Y' );
-			expect( normalizedFields[ 0 ].format.weekStartsOn ).toBe(
-				'monday'
-			);
+			expect( normalizedFields[ 0 ].format.weekStartsOn ).toBe( 1 );
 		} );
 
 		it( 'adds empty format for non-date field types', () => {

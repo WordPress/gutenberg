@@ -61,7 +61,7 @@ export type Operator =
 	| 'inThePast'
 	| 'over';
 
-export type FieldType =
+export type FieldTypeName =
 	| 'text'
 	| 'integer'
 	| 'number'
@@ -79,6 +79,7 @@ export type FieldType =
 export type Rules< Item > = {
 	required?: boolean;
 	elements?: boolean;
+	pattern?: string;
 	custom?:
 		| ( ( item: Item, field: NormalizedField< Item > ) => null | string )
 		| ( (
@@ -117,7 +118,7 @@ export type EditConfigText = {
  * Edit configuration for other control types (excluding 'text' and 'textarea').
  */
 export type EditConfigGeneric = {
-	control: Exclude< FieldType, 'text' | 'textarea' >;
+	control: Exclude< FieldTypeName, 'text' | 'textarea' >;
 };
 
 /**
@@ -136,7 +137,7 @@ export type Field< Item > = {
 	/**
 	 * Type of the fields.
 	 */
-	type?: FieldType;
+	type?: FieldTypeName;
 
 	/**
 	 * The unique identifier of the field.
@@ -243,8 +244,6 @@ export type Field< Item > = {
 	format?: FormatDate;
 };
 
-export type NormalizedFormat = Required< FormatDate > | {};
-
 /**
  * Format for date fields:
  *
@@ -255,17 +254,9 @@ export type NormalizedFormat = Required< FormatDate > | {};
  */
 export type FormatDate = {
 	date?: string;
-	weekStartsOn?: DayString;
+	weekStartsOn?: DayNumber;
 };
 export type DayNumber = 0 | 1 | 2 | 3 | 4 | 5 | 6;
-export type DayString =
-	| 'sunday'
-	| 'monday'
-	| 'tuesday'
-	| 'wednesday'
-	| 'thursday'
-	| 'friday'
-	| 'saturday';
 
 type NormalizedFieldBase< Item > = Omit< Field< Item >, 'Edit' > & {
 	label: string;
@@ -302,6 +293,10 @@ export type FieldValidity = {
 	required?: {
 		type: 'valid' | 'invalid' | 'validating';
 		message?: string;
+	};
+	pattern?: {
+		type: 'valid' | 'invalid' | 'validating';
+		message: string;
 	};
 	elements?: {
 		type: 'valid' | 'invalid' | 'validating';

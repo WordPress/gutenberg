@@ -14,7 +14,7 @@ import edit from './edit';
 import variations from './variations';
 import { unlock } from '../lock-unlock';
 
-const { fieldsKey } = unlock( blocksPrivateApis );
+const { fieldsKey, formKey } = unlock( blocksPrivateApis );
 
 const { name } = metadata;
 
@@ -42,15 +42,16 @@ if ( window.__experimentalContentOnlyPatternInsertion ) {
 			id: 'buttonText',
 			label: __( 'Button text' ),
 			type: 'richtext',
-			shownByDefault: false,
 		},
 		{
 			id: 'placeholder',
 			label: __( 'Placeholder' ),
 			type: 'richtext',
-			shownByDefault: false,
 		},
 	];
+	settings[ formKey ] = {
+		fields: [ 'label' ],
+	};
 }
 
 export const init = () => initBlock( { name, metadata, settings } );

@@ -16,7 +16,7 @@ import save from './save';
 import transforms from './transforms';
 import { unlock } from '../lock-unlock';
 
-const { fieldsKey } = unlock( blocksPrivateApis );
+const { fieldsKey, formKey } = unlock( blocksPrivateApis );
 
 const { name } = metadata;
 
@@ -42,7 +42,6 @@ if ( window.__experimentalContentOnlyPatternInsertion ) {
 			id: 'audio',
 			label: __( 'Audio' ),
 			type: 'media',
-			shownByDefault: true,
 			mapping: {
 				id: 'id',
 				url: 'src',
@@ -56,9 +55,11 @@ if ( window.__experimentalContentOnlyPatternInsertion ) {
 			id: 'caption',
 			label: __( 'Caption' ),
 			type: 'richtext',
-			shownByDefault: false,
 		},
 	];
+	settings[ formKey ] = {
+		fields: [ 'audio' ],
+	};
 }
 
 export const init = () => initBlock( { name, metadata, settings } );

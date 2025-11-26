@@ -16,7 +16,7 @@ import save from './save';
 import transforms from './transforms';
 import { unlock } from '../lock-unlock';
 
-const { fieldsKey } = unlock( blocksPrivateApis );
+const { fieldsKey, formKey } = unlock( blocksPrivateApis );
 
 const { name } = metadata;
 
@@ -42,7 +42,6 @@ if ( window.__experimentalContentOnlyPatternInsertion ) {
 			id: 'file',
 			label: __( 'File' ),
 			type: 'media',
-			shownByDefault: true,
 			mapping: {
 				id: 'id',
 				url: 'href',
@@ -56,15 +55,16 @@ if ( window.__experimentalContentOnlyPatternInsertion ) {
 			id: 'fileName',
 			label: __( 'Filename' ),
 			type: 'richtext',
-			shownByDefault: false,
 		},
 		{
 			id: 'downloadButtonText',
 			label: __( 'Button Text' ),
 			type: 'richtext',
-			shownByDefault: false,
 		},
 	];
+	settings[ formKey ] = {
+		fields: [ 'file' ],
+	};
 }
 
 export const init = () => initBlock( { name, metadata, settings } );

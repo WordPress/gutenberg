@@ -14,6 +14,7 @@
 		{ "path": "../compose" },
 		{ "path": "../data" },
 		{ "path": "../date" },
+		{ "path": "../dom" },
 		{ "path": "../element" },
 		{ "path": "../i18n" },
 		{ "path": "../icons" },
