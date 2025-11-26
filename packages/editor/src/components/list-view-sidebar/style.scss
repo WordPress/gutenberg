@@ -22,9 +22,22 @@
 	// This allows items in the list view to have equidistant padding left and right
 	// right up until a scrollbar is present.
 	scrollbar-gutter: auto;
+}
 
-	// The table cells use an extra pixels of space left and right. We compensate for that here.
+// The table cells use an extra pixels of space left and right. We compensate for that here.
+.editor-list-view-sidebar__list-view-panel-content {
+	// Keep the original padding for the List View panel so its spacing matches trunk.
 	padding: $grid-unit-05;
+}
+
+// Apply the new padding only to the Document Outline panel.
+.editor-list-view-sidebar__list-view-container > .document-outline {
+	padding: $grid-unit-20;
+
+	// Reset the top margin to avoid stacking margin + padding (previously 36px total).
+	.document-outline__summary {
+		margin-top: 0;
+	}
 }
 
 .editor-list-view-sidebar__list-view-container {
