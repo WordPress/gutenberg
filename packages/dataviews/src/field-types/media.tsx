@@ -6,7 +6,7 @@ import type { FieldType } from '../types/private';
 export default {
 	type: 'media',
 	render: () => null,
-	Edit: null,
+	Edit: 'media',
 	sort: () => 0,
 	isValid: {
 		elements: true,

@@ -24,6 +24,7 @@ import toggleGroup from './toggle-group';
 import array from './array';
 import color from './color';
 import password from './password';
+import media from './media';
 import hasElements from '../field-types/utils/has-elements';
 
 interface FormControls {
@@ -40,6 +41,7 @@ const FORM_CONTROLS: FormControls = {
 	telephone,
 	url,
 	integer,
+	media,
 	number,
 	password,
 	radio,
