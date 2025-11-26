@@ -33,6 +33,7 @@ import usePageTypeBadge from '../../utils/pageTypeBadge';
 import { getTemplateInfo } from '../../utils/get-template-info';
 import { getStylesCanvasTitle } from '../styles-canvas';
 import { unlock } from '../../lock-unlock';
+import useEditedSectionDetails from './useEditedSectionDetails';
 
 /** @typedef {import("@wordpress/components").IconType} IconType */
 
@@ -61,38 +62,8 @@ export default function DocumentBar( props ) {
 		useDispatch( blockEditorStore )
 	);
 
-	// Check if a pattern block is unlocked and being edited
-	const unlockedPatternInfo = useSelect( ( select ) => {
-		const { getBlockAttributes, __experimentalGetParsedPattern } =
-			select( blockEditorStore );
-		const { getEditedContentOnlySection } = unlock(
-			select( blockEditorStore )
-		);
-
-		// Get the clientId of the unlocked pattern/section
-		const editedSectionId = getEditedContentOnlySection();
-		if ( ! editedSectionId ) {
-			return null;
-		}
-
-		const attributes = getBlockAttributes( editedSectionId );
-		const patternName = attributes?.metadata?.patternName;
-
-		if ( ! patternName ) {
-			return null;
-		}
-
-		// Get pattern details if available
-		const pattern =
-			typeof __experimentalGetParsedPattern === 'function'
-				? __experimentalGetParsedPattern( patternName )
-				: null;
-
-		return {
-			patternName,
-			patternTitle: pattern?.title || attributes?.metadata?.name,
-		};
-	}, [] );
+	// Get details about the currently edited content-only section
+	const unlockedPatternInfo = useEditedSectionDetails();
 
 	const {
 		postId,
@@ -273,7 +244,10 @@ export default function DocumentBar( props ) {
 							</span>
 							{ unlockedPatternInfo && (
 								<span className="editor-document-bar__post-type-label">
-									{ `· ${ __( 'Pattern' ) }` }
+									{ unlockedPatternInfo.type ===
+									'template-part'
+										? `· ${ __( 'Template Part' ) }`
+										: `· ${ __( 'Pattern' ) }` }
 								</span>
 							) }
 							{ ! unlockedPatternInfo && pageTypeBadge && (
