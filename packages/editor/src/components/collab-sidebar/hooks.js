@@ -361,16 +361,6 @@ export function useEnableFloatingSidebar( enabled = false ) {
 	}, [ enabled, registry ] );
 }
 
-export function useBlockMode( blockClientId ) {
-	return useSelect(
-		( select ) =>
-			blockClientId
-				? select( blockEditorStore ).getBlockMode( blockClientId )
-				: null,
-		[ blockClientId ]
-	);
-}
-
 export function useFloatingThread( {
 	thread,
 	calculatedOffset,
@@ -382,7 +372,16 @@ export function useFloatingThread( {
 	const blockRef = useRef();
 	useBlockElementRef( thread.blockClientId, blockRef );
 
-	const blockMode = useBlockMode( thread.blockClientId );
+	const blockMode = useSelect(
+		( select ) => {
+			return thread.blockClientId
+				? select( blockEditorStore ).getBlockMode(
+						thread.blockClientId
+				  )
+				: null;
+		},
+		[ thread.blockClientId ]
+	);
 
 	const updateHeight = useCallback(
 		( id, newHeight ) => {
