@@ -172,3 +172,7 @@ export { useBlockEditingMode } from './block-editing-mode';
 export { default as BlockEditorProvider } from './provider';
 export { useSettings, useSetting } from './use-settings';
 export { useBlockCommands } from './use-block-commands';
+
+// This component is no longer used in Gutenberg,
+// but kept for backwards compatibility.
+export { default as ToolSelector } from './tool-selector';
