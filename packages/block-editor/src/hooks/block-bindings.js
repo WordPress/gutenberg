@@ -138,14 +138,19 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 							attribute
 						);
 
-						const hasCompatibleDataForAttribute = Object.values(
-							sources
-						).some( ( data ) =>
-							data.some( ( item ) => item.type === attributeType )
-						);
+						const compatibleDataForAttribute = {};
+						for ( const sourceKey in sources ) {
+							const data = sources[ sourceKey ].filter(
+								( item ) => item.type === attributeType
+							);
+							if ( data.length ) {
+								compatibleDataForAttribute[ sourceKey ] = data;
+							}
+						}
 
 						const isAttributeReadOnly =
-							readOnly || ! hasCompatibleDataForAttribute;
+							readOnly ||
+							! Object.keys( compatibleDataForAttribute ).length;
 
 						if ( isAttributeReadOnly ) {
 							return (
@@ -153,7 +158,11 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 									key={ attribute }
 									attribute={ attribute }
 									binding={ binding }
-									data={ sources?.[ sourceName ] }
+									data={
+										compatibleDataForAttribute?.[
+											sourceName
+										]
+									}
 								/>
 							);
 						}
@@ -163,25 +172,27 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 								key={ attribute }
 								attribute={ attribute }
 								binding={ binding }
-								data={ sources?.[ sourceName ] }
+								data={
+									compatibleDataForAttribute?.[ sourceName ]
+								}
 							>
 								<Menu
 									placement={
 										isMobile ? 'bottom-start' : 'left-start'
 									}
 								>
-									{ Object.entries( sources ).map(
-										( [ sourceKey, data ] ) => (
-											<BlockBindingsSourceMenu
-												key={ sourceKey }
-												args={ binding?.args }
-												attribute={ attribute }
-												blockName={ blockName }
-												sourceKey={ sourceKey }
-												data={ data }
-											/>
-										)
-									) }
+									{ Object.entries(
+										compatibleDataForAttribute
+									).map( ( [ sourceKey, data ] ) => (
+										<BlockBindingsSourceMenu
+											key={ sourceKey }
+											args={ binding?.args }
+											attribute={ attribute }
+											blockName={ blockName }
+											sourceKey={ sourceKey }
+											data={ data }
+										/>
+									) ) }
 								</Menu>
 							</BlockBindingsPanelItem>
 						);

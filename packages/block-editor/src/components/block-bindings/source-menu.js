@@ -99,18 +99,13 @@ function BlockBindingsSourceMenuItem( {
 export default function BlockBindingsSourceMenu( {
 	args,
 	attribute,
-	blockName,
 	sourceKey,
 	data,
 } ) {
 	const isMobile = useViewportMatch( 'medium', '<' );
 
-	const sourceDataItems = data.filter(
-		( item ) => item.type === getAttributeType( blockName, attribute )
-	);
-
-	// Only render source if it has compatible data for this specific attribute.
-	if ( ! sourceDataItems || sourceDataItems.length === 0 ) {
+	// Only render source if it has compatible data.
+	if ( ! data || data.length === 0 ) {
 		return null;
 	}
 
@@ -126,7 +121,7 @@ export default function BlockBindingsSourceMenu( {
 			</Menu.SubmenuTriggerItem>
 			<Menu.Popover gutter={ 8 }>
 				<Menu.Group>
-					{ sourceDataItems.map( ( item ) => (
+					{ data.map( ( item ) => (
 						<BlockBindingsSourceMenuItem
 							key={
 								sourceKey + JSON.stringify( item.args ) ||
