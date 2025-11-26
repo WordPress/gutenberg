@@ -24,6 +24,7 @@ import { store as blockEditorStore } from '../../store';
 import {
 	useBlockBindingsAwareSetAttributes,
 	useBlockBindingsComputedAttributes,
+	hasPatternOverridesDefaultBinding,
 } from '../../utils/block-bindings';
 import BlockIcon from '../block-icon';
 import useBlockDisplayTitle from '../block-title/use-block-display-title';
@@ -179,13 +180,47 @@ function denormalizeLinkValue( value, fieldDef ) {
 
 function BlockFields( { clientId } ) {
 	const attributes = useBlockBindingsComputedAttributes( clientId );
-	const { blockType } = useSelect(
+	const {
+		blockType,
+		isEditingPatternValue,
+		hasPatternParentValue,
+		blockAttributes: rawBlockAttributes,
+	} = useSelect(
 		( select ) => {
-			const { getBlockName } = select( blockEditorStore );
+			const {
+				getBlockName,
+				getBlockAttributes,
+				getBlockParentsByBlockName,
+			} = select( blockEditorStore );
 			const { getBlockType } = select( blocksStore );
 			const blockName = getBlockName( clientId );
+			const currentBlockAttributes = getBlockAttributes( clientId );
+
+			// Check if this block is inside a synced pattern
+			const [ patternClientId ] = getBlockParentsByBlockName(
+				clientId,
+				'core/block',
+				true
+			);
+			const hasPatternParent = !! patternClientId;
+
+			// Check if we're editing the pattern by checking the pattern block's editing mode
+			// When editing a pattern (via "Edit section" or "Edit original"), the pattern block
+			// will have editing mode 'default'. Otherwise, it will be 'disabled' or 'contentOnly'.
+			let isEditingPattern = false;
+			if ( patternClientId ) {
+				const { getBlockEditingMode } = select( blockEditorStore );
+				const patternEditingMode =
+					getBlockEditingMode( patternClientId );
+				// If the pattern block has 'default' editing mode, we're editing it
+				isEditingPattern = patternEditingMode === 'default';
+			}
+
 			return {
 				blockType: getBlockType( blockName ),
+				isEditingPatternValue: isEditingPattern,
+				hasPatternParentValue: hasPatternParent,
+				blockAttributes: currentBlockAttributes,
 			};
 		},
 		[ clientId ]
@@ -210,7 +245,54 @@ function BlockFields( { clientId } ) {
 			return [];
 		}
 
-		return blockTypeFields.map( ( fieldDef ) => {
+		// When not editing the pattern, only show fields that are overridable
+		// (have pattern overrides bindings)
+		const hasPatternOverrides =
+			hasPatternParentValue &&
+			hasPatternOverridesDefaultBinding(
+				rawBlockAttributes?.metadata?.bindings
+			);
+
+		// Filter fields based on whether we're editing the pattern
+		const filteredFields = isEditingPatternValue
+			? blockTypeFields
+			: blockTypeFields.filter( ( fieldDef ) => {
+					// If not in a pattern or pattern doesn't have overrides, show all fields
+					if ( ! hasPatternOverrides ) {
+						return true;
+					}
+
+					// Check if this field maps to an attribute that has pattern overrides binding
+					const bindings = rawBlockAttributes?.metadata?.bindings;
+					if ( ! bindings ) {
+						return false;
+					}
+
+					// For fields with mapping, check if any mapped attribute has pattern overrides
+					if ( fieldDef.mapping ) {
+						return Object.values( fieldDef.mapping ).some(
+							( attrKey ) => {
+								// Check if this attribute has pattern overrides binding
+								// (either directly or through __default)
+								return (
+									bindings[ attrKey ]?.source ===
+										'core/pattern-overrides' ||
+									bindings.__default?.source ===
+										'core/pattern-overrides'
+								);
+							}
+						);
+					}
+
+					// For simple id-based fields, check if the id attribute has pattern overrides
+					return (
+						bindings[ fieldDef.id ]?.source ===
+							'core/pattern-overrides' ||
+						bindings.__default?.source === 'core/pattern-overrides'
+					);
+			  } );
+
+		return filteredFields.map( ( fieldDef ) => {
 			const ControlComponent = CONTROLS[ fieldDef.type ];
 
 			const defaultValues = {};
@@ -305,7 +387,15 @@ function BlockFields( { clientId } ) {
 
 			return field;
 		} );
-	}, [ blockTypeFields, blockType?.attributes, clientId, setAttributes ] );
+	}, [
+		blockTypeFields,
+		blockType?.attributes,
+		clientId,
+		setAttributes,
+		isEditingPatternValue,
+		hasPatternParentValue,
+		rawBlockAttributes,
+	] );
 
 	const handleToggleField = ( fieldId ) => {
 		setForm( ( prev ) => {

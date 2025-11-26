@@ -254,41 +254,71 @@ export function useBlockBindingsComputedAttributes( clientId ) {
 			[ clientId ]
 		);
 
-	const { blockBindings, context } = useMemo( () => {
-		// Assign context values using the block type's declared context needs.
-		const computedContext = blockType?.usesContext
-			? Object.fromEntries(
-					Object.entries( blockContext ).filter( ( [ key ] ) =>
-						blockType.usesContext.includes( key )
-					)
-			  )
-			: DEFAULT_BLOCK_CONTEXT;
-		// Add context requested by Block Bindings sources.
-		if ( attributes?.metadata?.bindings ) {
-			Object.values( attributes?.metadata?.bindings || {} ).forEach(
-				( binding ) => {
-					registeredSources[ binding?.source ]?.usesContext?.forEach(
-						( key ) => {
+	const { blockBindings, context } = useSelect(
+		( select ) => {
+			const { getBlockAttributes, getBlockParentsByBlockName } =
+				select( blockEditorStore );
+
+			// Assign context values using the block type's declared context needs.
+			const computedContext = blockType?.usesContext
+				? Object.fromEntries(
+						Object.entries( blockContext ).filter( ( [ key ] ) =>
+							blockType.usesContext.includes( key )
+						)
+				  )
+				: DEFAULT_BLOCK_CONTEXT;
+
+			// Add context requested by Block Bindings sources.
+			if ( attributes?.metadata?.bindings ) {
+				Object.values( attributes?.metadata?.bindings || {} ).forEach(
+					( binding ) => {
+						registeredSources[
+							binding?.source
+						]?.usesContext?.forEach( ( key ) => {
 							computedContext[ key ] = blockContext[ key ];
-						}
-					);
+						} );
+					}
+				);
+			}
+
+			// If pattern/overrides context is missing but the block has pattern overrides,
+			// fetch it from the pattern block's content attribute.
+			if (
+				! computedContext[ 'pattern/overrides' ] &&
+				hasPatternOverridesDefaultBinding(
+					attributes?.metadata?.bindings
+				)
+			) {
+				const [ patternClientId ] = getBlockParentsByBlockName(
+					clientId,
+					'core/block',
+					true
+				);
+				if ( patternClientId ) {
+					const patternAttributes =
+						getBlockAttributes( patternClientId );
+					computedContext[ 'pattern/overrides' ] =
+						patternAttributes?.content;
 				}
-			);
-		}
-		return {
-			blockBindings: replacePatternOverridesDefaultBinding(
-				attributes?.metadata?.bindings,
-				bindableAttributes
-			),
-			context: computedContext,
-		};
-	}, [
-		blockType?.usesContext,
-		blockContext,
-		attributes?.metadata?.bindings,
-		registeredSources,
-		bindableAttributes,
-	] );
+			}
+
+			return {
+				blockBindings: replacePatternOverridesDefaultBinding(
+					attributes?.metadata?.bindings,
+					bindableAttributes
+				),
+				context: computedContext,
+			};
+		},
+		[
+			blockType?.usesContext,
+			blockContext,
+			attributes?.metadata?.bindings,
+			registeredSources,
+			bindableAttributes,
+			clientId,
+		]
+	);
 
 	const computedAttributes = useSelect(
 		( select ) => {
@@ -302,6 +332,10 @@ export function useBlockBindingsComputedAttributes( clientId ) {
 			for ( const [ attributeName, binding ] of Object.entries(
 				blockBindings
 			) ) {
+				// Skip if binding is undefined or null
+				if ( ! binding ) {
+					continue;
+				}
 				const { source: sourceName, args: sourceArgs } = binding;
 				const source = registeredSources[ sourceName ];
 				if (
