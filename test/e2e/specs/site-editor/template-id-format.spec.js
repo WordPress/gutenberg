@@ -13,48 +13,6 @@ async function closeWelcomeGuide( page, buttonName = 'Get started' ) {
 	}
 }
 
-async function navigateToTemplateEditor( { admin, editor, page }, pageId ) {
-	// Navigate directly to the page editor using the page ID.
-	await admin.visitAdminPage( 'post.php', `post=${ pageId }&action=edit` );
-
-	await editor.setPreferences( 'core/edit-post', {
-		welcomeGuide: false,
-	} );
-	await editor.setPreferences( 'core/edit-site', {
-		welcomeGuide: false,
-	} );
-
-	// Wait for the editor to be ready.
-	await expect(
-		page.locator( 'iframe[name="editor-canvas"]' )
-	).toBeVisible();
-
-	// Close pattern chooser dialog if visible.
-	const patternDialog = page.getByRole( 'dialog', {
-		name: 'Choose a pattern',
-	} );
-	try {
-		await expect( patternDialog ).toBeVisible( { timeout: 2000 } );
-		await patternDialog.getByRole( 'button', { name: 'Close' } ).click();
-		await expect( patternDialog ).toBeHidden();
-	} catch {
-		// Dialog not visible.
-	}
-
-	await editor.openDocumentSettingsSidebar();
-	const settingsPanel = page.getByRole( 'region', {
-		name: 'Editor settings',
-	} );
-	await settingsPanel.getByRole( 'tab', { name: 'Page' } ).click();
-	await settingsPanel
-		.getByRole( 'button', { name: 'Template options' } )
-		.click();
-	await page.getByRole( 'menuitem', { name: 'Edit template' } ).click();
-	await expect( editor.canvas.locator( 'body' ) ).toBeVisible();
-
-	await closeWelcomeGuide( page );
-}
-
 test.describe( 'Template ID Format', () => {
 	let pageId;
 
@@ -86,7 +44,33 @@ test.describe( 'Template ID Format', () => {
 	) => {
 		await requestUtils.setGutenbergExperiments( experiments );
 
-		await navigateToTemplateEditor( { admin, editor, page }, pageId );
+		// Navigate directly to the page editor using the page ID.
+		await admin.editPost( pageId );
+
+		// Wait for the editor to be ready.
+		await expect(
+			page.locator( 'iframe[name="editor-canvas"]' )
+		).toBeVisible();
+
+		// Close pattern chooser dialog if visible.
+		const patternDialog = page.getByRole( 'dialog', {
+			name: 'Choose a pattern',
+		} );
+		await expect( patternDialog ).toBeVisible( { timeout: 2000 } );
+		await patternDialog.getByRole( 'button', { name: 'Close' } ).click();
+
+		await editor.openDocumentSettingsSidebar();
+		const settingsPanel = page.getByRole( 'region', {
+			name: 'Editor settings',
+		} );
+		await settingsPanel.getByRole( 'tab', { name: 'Page' } ).click();
+		await settingsPanel
+			.getByRole( 'button', { name: 'Template options' } )
+			.click();
+		await page.getByRole( 'menuitem', { name: 'Edit template' } ).click();
+		await expect( editor.canvas.locator( 'body' ) ).toBeVisible();
+
+		await closeWelcomeGuide( page );
 
 		await editor.insertBlock( {
 			name: 'core/paragraph',
