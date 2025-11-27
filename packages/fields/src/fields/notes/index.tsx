@@ -17,6 +17,8 @@ const notesField: Field< PostWithNotesCount > = {
 	id: 'notesCount',
 	label: __( 'Notes' ),
 	type: 'integer',
+	enableSorting: false,
+	filterBy: false,
 };
 
 /**
