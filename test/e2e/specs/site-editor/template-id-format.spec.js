@@ -3,16 +3,6 @@
  */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
-async function closeWelcomeGuide( page, buttonName = 'Get started' ) {
-	const welcomeGuide = page.getByRole( 'dialog', {
-		name: /^Welcome to the/i,
-	} );
-	const welcomeGuideVisible = await welcomeGuide.isVisible();
-	if ( welcomeGuideVisible ) {
-		await welcomeGuide.getByRole( 'button', { name: buttonName } ).click();
-	}
-}
-
 test.describe( 'Template ID Format', () => {
 	let pageId;
 
@@ -70,15 +60,16 @@ test.describe( 'Template ID Format', () => {
 		await page.getByRole( 'menuitem', { name: 'Edit template' } ).click();
 		await expect( editor.canvas.locator( 'body' ) ).toBeVisible();
 
-		await closeWelcomeGuide( page );
+		// Set preferences for the site editor context.
+		await editor.setPreferences( 'core/edit-post', {
+			welcomeGuideTemplate: false,
+		} );
 
 		await editor.insertBlock( {
 			name: 'core/paragraph',
 			attributes: { content: contentText },
 		} );
 		await expect( editor.canvas.getByText( contentText ) ).toBeVisible();
-
-		await closeWelcomeGuide( page );
 
 		await page
 			.getByRole( 'region', { name: 'Editor top bar' } )
