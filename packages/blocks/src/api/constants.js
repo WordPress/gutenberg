@@ -265,7 +265,7 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 	},
 	textIndent: {
 		value: [ 'typography', 'textIndent' ],
-		support: [ 'typography', '__experimentalTextIndent' ],
+		support: [ 'typography', 'textIndent' ],
 		useEngine: true,
 	},
 	writingMode: {

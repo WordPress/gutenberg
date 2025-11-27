@@ -30,7 +30,7 @@ function gutenberg_register_typography_support( $block_type ) {
 	$has_text_columns_support    = $typography_supports['textColumns'] ?? false;
 	$has_text_decoration_support = $typography_supports['__experimentalTextDecoration'] ?? false;
 	$has_text_transform_support  = $typography_supports['__experimentalTextTransform'] ?? false;
-	$has_text_indent_support     = $typography_supports['__experimentalTextIndent'] ?? false;
+	$has_text_indent_support     = $typography_supports['textIndent'] ?? false;
 	$has_writing_mode_support    = $typography_supports['__experimentalWritingMode'] ?? false;
 
 	$has_typography_support = $has_font_family_support
@@ -103,7 +103,7 @@ function gutenberg_apply_typography_support( $block_type, $block_attributes ) {
 	$has_text_columns_support    = $typography_supports['textColumns'] ?? false;
 	$has_text_decoration_support = $typography_supports['__experimentalTextDecoration'] ?? false;
 	$has_text_transform_support  = $typography_supports['__experimentalTextTransform'] ?? false;
-	$has_text_indent_support     = $typography_supports['__experimentalTextIndent'] ?? false;
+	$has_text_indent_support     = $typography_supports['textIndent'] ?? false;
 	$has_writing_mode_support    = $typography_supports['__experimentalWritingMode'] ?? false;
 
 	// Whether to skip individual block support features.
