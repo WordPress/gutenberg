@@ -104,7 +104,7 @@ _Related_
 
 Internal dependencies
 
-### BlockBindingsSourceMenu
+### BlockBindingsSourceFieldsList
 
 Undocumented declaration.
 

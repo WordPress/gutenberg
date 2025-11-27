@@ -18,7 +18,7 @@ import { useViewportMatch } from '@wordpress/compose';
  */
 import {
 	BlockBindingsAttributeControl,
-	BlockBindingsSourceMenu,
+	BlockBindingsSourceFieldsList,
 } from '../components/block-bindings';
 import { useBlockBindingsUtils } from '../utils/block-bindings';
 import { unlock } from '../lock-unlock';
@@ -187,7 +187,7 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 									{ Object.entries(
 										compatibleDataForAttribute
 									).map( ( [ sourceKey, data ] ) => (
-										<BlockBindingsSourceMenu
+										<BlockBindingsSourceFieldsList
 											key={ sourceKey }
 											args={ binding?.args }
 											attribute={ attribute }

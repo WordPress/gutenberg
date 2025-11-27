@@ -21,7 +21,7 @@ import BlockContext from '../block-context';
 
 const { Menu } = unlock( componentsPrivateApis );
 
-function BlockBindingsSourceMenuItem( {
+function BlockBindingsSourceFieldsListItem( {
 	args,
 	attribute,
 	item,
@@ -82,7 +82,7 @@ function BlockBindingsSourceMenuItem( {
 	);
 }
 
-export default function BlockBindingsSourceMenu( {
+export default function BlockBindingsSourceFieldsList( {
 	args,
 	attribute,
 	sourceKey,
@@ -108,7 +108,7 @@ export default function BlockBindingsSourceMenu( {
 			<Menu.Popover gutter={ 8 }>
 				<Menu.Group>
 					{ data.map( ( item ) => (
-						<BlockBindingsSourceMenuItem
+						<BlockBindingsSourceFieldsListItem
 							key={
 								sourceKey + JSON.stringify( item.args ) ||
 								item.key

@@ -13,7 +13,7 @@ export {
 } from './block-alignment-control';
 export {
 	BlockBindingsAttributeControl,
-	BlockBindingsSourceMenu,
+	BlockBindingsSourceFieldsList,
 } from './block-bindings';
 export { default as __experimentalBlockFullHeightAligmentControl } from './block-full-height-alignment-control';
 export { default as __experimentalBlockAlignmentMatrixControl } from './block-alignment-matrix-control';
