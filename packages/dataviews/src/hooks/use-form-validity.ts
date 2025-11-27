@@ -22,6 +22,7 @@ import type {
 	FormValidity,
 	NormalizedField,
 	NormalizedFormField,
+	Option,
 } from '../types';
 
 function isFormValid( formValidity: FormValidity | undefined ): boolean {
@@ -175,8 +176,13 @@ function handleElementsValidationAsync< Item >(
 			if ( currentToken !== elementsCounterRef.current[ formField.id ] ) {
 				return;
 			}
-
-			if ( ! Array.isArray( result ) ) {
+			const elements: Option[] =
+				result &&
+				Array.isArray( result.elements ) &&
+				!! result.elements.length
+					? result.elements
+					: [];
+			if ( elements.length === 0 ) {
 				setFormValidity( ( prev ) => {
 					const newFormValidity = setValidityAtPath(
 						prev,
@@ -197,7 +203,7 @@ function handleElementsValidationAsync< Item >(
 				formField.field?.isValid.elements &&
 				! formField.field.isValid.elements.validate( item, {
 					...formField.field,
-					elements: result,
+					elements,
 				} )
 			) {
 				setFormValidity( ( prev ) => {
