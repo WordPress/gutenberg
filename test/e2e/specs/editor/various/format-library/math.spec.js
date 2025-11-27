@@ -31,10 +31,8 @@ test.describe( 'Format Library - Math', () => {
 			},
 		] );
 
-		const mathInput = page.locator(
-			'.block-editor-format-toolbar__math-input input'
-		);
-		await mathInput.fill( 'x^2' );
+		await page.keyboard.press( 'Tab' );
+		await page.keyboard.type( 'x^2' );
 
 		expect( await editor.getBlocks() ).toMatchObject( [
 			{

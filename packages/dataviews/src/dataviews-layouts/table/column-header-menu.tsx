@@ -13,7 +13,7 @@ import {
 	Icon,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
-import { forwardRef, Children, Fragment } from '@wordpress/element';
+import { forwardRef, Children, Fragment, useContext } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -27,6 +27,8 @@ import type {
 	ViewPickerTable as ViewPickerTableType,
 	Operator,
 } from '../../types';
+import DataViewsContext from '../../components/dataviews-context';
+import getHideableFields from '../../utils/get-hideable-fields';
 
 const { Menu } = unlock( componentsPrivateApis );
 
@@ -38,6 +40,8 @@ interface HeaderMenuProps< Item > {
 	onHide: ( field: NormalizedField< Item > ) => void;
 	setOpenedFilter: ( fieldId: string ) => void;
 	canMove?: boolean;
+	canInsertLeft?: boolean;
+	canInsertRight?: boolean;
 }
 
 function WithMenuSeparators( { children }: { children: ReactNode } ) {
@@ -60,6 +64,8 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
 		onHide,
 		setOpenedFilter,
 		canMove = true,
+		canInsertLeft = true,
+		canInsertRight = true,
 	}: HeaderMenuProps< Item >,
 	ref: Ref< HTMLButtonElement >
 ) {
@@ -71,6 +77,8 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
 	let canAddFilter = false;
 	let operators: Operator[] = [];
 	const field = fields.find( ( f ) => f.id === fieldId );
+
+	const { setIsShowingFilter } = useContext( DataViewsContext );
 
 	if ( ! field ) {
 		// No combined or regular field found.
@@ -98,6 +106,12 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
 	if ( ! isSortable && ! canMove && ! isHidable && ! canAddFilter ) {
 		return header;
 	}
+
+	const hiddenFields = getHideableFields( view, fields ).filter(
+		( f ) => ! visibleFieldIds.includes( f.id )
+	);
+	const canInsert =
+		( canInsertLeft || canInsertRight ) && !! hiddenFields.length;
 
 	return (
 		<Menu>
@@ -168,6 +182,7 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
 								prefix={ <Icon icon={ funnel } /> }
 								onClick={ () => {
 									setOpenedFilter( fieldId );
+									setIsShowingFilter( true );
 									onChangeView( {
 										...view,
 										page: 1,
@@ -188,7 +203,7 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
 							</Menu.Item>
 						</Menu.Group>
 					) }
-					{ ( canMove || isHidable ) && field && (
+					{ ( canMove || isHidable || canInsert ) && field && (
 						<Menu.Group>
 							{ canMove && (
 								<Menu.Item
@@ -243,6 +258,76 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
 										{ __( 'Move right' ) }
 									</Menu.ItemLabel>
 								</Menu.Item>
+							) }
+							{ canInsertLeft && !! hiddenFields.length && (
+								<Menu>
+									<Menu.SubmenuTriggerItem>
+										<Menu.ItemLabel>
+											{ __( 'Insert left' ) }
+										</Menu.ItemLabel>
+									</Menu.SubmenuTriggerItem>
+									<Menu.Popover>
+										{ hiddenFields.map( ( hiddenField ) => (
+											<Menu.Item
+												key={ hiddenField.id }
+												onClick={ () => {
+													onChangeView( {
+														...view,
+														fields: [
+															...visibleFieldIds.slice(
+																0,
+																index
+															),
+															hiddenField.id,
+															...visibleFieldIds.slice(
+																index
+															),
+														],
+													} );
+												} }
+											>
+												<Menu.ItemLabel>
+													{ hiddenField.label }
+												</Menu.ItemLabel>
+											</Menu.Item>
+										) ) }
+									</Menu.Popover>
+								</Menu>
+							) }
+							{ canInsertRight && !! hiddenFields.length && (
+								<Menu>
+									<Menu.SubmenuTriggerItem>
+										<Menu.ItemLabel>
+											{ __( 'Insert right' ) }
+										</Menu.ItemLabel>
+									</Menu.SubmenuTriggerItem>
+									<Menu.Popover>
+										{ hiddenFields.map( ( hiddenField ) => (
+											<Menu.Item
+												key={ hiddenField.id }
+												onClick={ () => {
+													onChangeView( {
+														...view,
+														fields: [
+															...visibleFieldIds.slice(
+																0,
+																index + 1
+															),
+															hiddenField.id,
+															...visibleFieldIds.slice(
+																index + 1
+															),
+														],
+													} );
+												} }
+											>
+												<Menu.ItemLabel>
+													{ hiddenField.label }
+												</Menu.ItemLabel>
+											</Menu.Item>
+										) ) }
+									</Menu.Popover>
+								</Menu>
 							) }
 							{ isHidable && field && (
 								<Menu.Item

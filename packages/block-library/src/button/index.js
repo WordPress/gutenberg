@@ -3,6 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { button as icon } from '@wordpress/icons';
+import { privateApis as blocksPrivateApis } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -12,6 +13,9 @@ import deprecated from './deprecated';
 import edit from './edit';
 import metadata from './block.json';
 import save from './save';
+import { unlock } from '../lock-unlock';
+
+const { fieldsKey, formKey } = unlock( blocksPrivateApis );
 
 const { name } = metadata;
 
@@ -35,26 +39,26 @@ export const settings = {
 };
 
 if ( window.__experimentalContentOnlyPatternInsertion ) {
-	settings.fields = [
+	settings[ fieldsKey ] = [
 		{
+			id: 'text',
 			label: __( 'Content' ),
-			type: 'RichText',
-			shownByDefault: true,
-			mapping: {
-				value: 'text',
-			},
+			type: 'richtext',
 		},
 		{
+			id: 'link',
 			label: __( 'Link' ),
-			type: 'Link',
-			shownByDefault: false,
+			type: 'link',
 			mapping: {
-				href: 'url',
+				url: 'url',
 				rel: 'rel',
-				target: 'linkTarget',
+				linkTarget: 'linkTarget',
 			},
 		},
 	];
+	settings[ formKey ] = {
+		fields: [ 'text' ],
+	};
 }
 
 export const init = () => initBlock( { name, metadata, settings } );

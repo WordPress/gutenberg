@@ -446,7 +446,6 @@ export default function TypographyPanel( {
 						value={ fontFamily }
 						onChange={ setFontFamily }
 						size="__unstable-large"
-						__nextHasNoMarginBottom
 					/>
 				</ToolsPanelItem>
 			) }

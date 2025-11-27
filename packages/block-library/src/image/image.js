@@ -718,7 +718,6 @@ export default function Image( {
 					mediaId={ id }
 					mediaURL={ url }
 					allowedTypes={ ALLOWED_MEDIA_TYPES }
-					accept="image/*"
 					onSelect={ onSelectImage }
 					onSelectURL={ onSelectURL }
 					onError={ onUploadError }

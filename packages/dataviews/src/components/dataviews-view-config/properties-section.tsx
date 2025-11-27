@@ -18,6 +18,7 @@ import { check } from '@wordpress/icons';
  */
 import type { NormalizedField } from '../../types';
 import DataViewsContext from '../dataviews-context';
+import getHideableFields from '../../utils/get-hideable-fields';
 
 function FieldItem( {
 	field,
@@ -53,19 +54,8 @@ export function PropertiesSection( {
 } ) {
 	const { view, fields, onChangeView } = useContext( DataViewsContext );
 
-	const togglableFields = [
-		view?.titleField,
-		view?.mediaField,
-		view?.descriptionField,
-	].filter( Boolean );
-
 	// Get all regular fields (non-locked) in their original order from fields prop
-	const regularFields = fields.filter(
-		( f ) =>
-			! togglableFields.includes( f.id ) &&
-			f.type !== 'media' &&
-			f.enableHiding !== false
-	);
+	const regularFields = getHideableFields( view, fields );
 
 	if ( ! regularFields?.length ) {
 		return null;

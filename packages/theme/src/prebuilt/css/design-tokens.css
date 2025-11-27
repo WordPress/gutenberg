@@ -96,10 +96,11 @@
 	--wpds-color-stroke-surface-warning: #d2b581; /* Decorative stroke color used to define warning-toned surface boundaries with normal emphasis. */
 	--wpds-color-stroke-surface-warning-strong: #936400; /* Decorative stroke color used to define warning-toned surface boundaries with strong emphasis. */
 	--wpds-dimension-base: 4px; /* Base dimension unit */
-	--wpds-dimension-padding-surface-large: 24px; /* Large spacing for surfaces */
-	--wpds-dimension-padding-surface-medium: 16px; /* Medium spacing for surfaces */
-	--wpds-dimension-padding-surface-small: 12px; /* Small spacing for surfaces */
-	--wpds-dimension-padding-surface-x-small: 8px; /* Extra small spacing for surfaces */
+	--wpds-dimension-padding-surface-2xs: 4px; /* 2x extra small spacing for surfaces */
+	--wpds-dimension-padding-surface-lg: 32px; /* Large spacing for surfaces */
+	--wpds-dimension-padding-surface-md: 24px; /* Medium spacing for surfaces */
+	--wpds-dimension-padding-surface-sm: 16px; /* Small spacing for surfaces */
+	--wpds-dimension-padding-surface-xs: 8px; /* Extra small spacing for surfaces */
 	--wpds-elevation-large: 0 5px 15px 0 #00000014, 0 15px 27px 0 #00000012,
 		0 30px 36px 0 #0000000a, 0 50px 43px 0 #00000005; /* For components that confirm decisions or handle necessary interruptions. Example: Modals. */
 	--wpds-elevation-medium: 0 2px 3px 0 #0000000d, 0 4px 5px 0 #0000000a,
@@ -125,6 +126,31 @@
 	--wpds-font-size-small: 12px; /* Small font size */
 	--wpds-font-size-x-large: 20px; /* Extra large font size */
 	--wpds-font-size-x-small: 11px; /* Extra small font size */
+}
+
+[data-wpds-theme-provider-id][data-wpds-density='default'] {
+	--wpds-dimension-base: 4px; /* Base dimension unit */
+	--wpds-dimension-padding-surface-2xs: 4px; /* 2x extra small spacing for surfaces */
+	--wpds-dimension-padding-surface-lg: 32px; /* Large spacing for surfaces */
+	--wpds-dimension-padding-surface-md: 24px; /* Medium spacing for surfaces */
+	--wpds-dimension-padding-surface-sm: 16px; /* Small spacing for surfaces */
+	--wpds-dimension-padding-surface-xs: 8px; /* Extra small spacing for surfaces */
+}
+
+[data-wpds-theme-provider-id][data-wpds-density='compact'] {
+	--wpds-dimension-padding-surface-2xs: 4px; /* 2x extra small spacing for surfaces */
+	--wpds-dimension-padding-surface-lg: 24px; /* Large spacing for surfaces */
+	--wpds-dimension-padding-surface-md: 20px; /* Medium spacing for surfaces */
+	--wpds-dimension-padding-surface-sm: 12px; /* Small spacing for surfaces */
+	--wpds-dimension-padding-surface-xs: 4px; /* Extra small spacing for surfaces */
+}
+
+[data-wpds-theme-provider-id][data-wpds-density='comfortable'] {
+	--wpds-dimension-padding-surface-2xs: 8px; /* 2x extra small spacing for surfaces */
+	--wpds-dimension-padding-surface-lg: 40px; /* Large spacing for surfaces */
+	--wpds-dimension-padding-surface-md: 32px; /* Medium spacing for surfaces */
+	--wpds-dimension-padding-surface-sm: 20px; /* Small spacing for surfaces */
+	--wpds-dimension-padding-surface-xs: 12px; /* Extra small spacing for surfaces */
 }
 
 @media ( -webkit-min-device-pixel-ratio: 2 ), ( min-resolution: 192dpi ) {

@@ -35,7 +35,6 @@ const meta: Meta< typeof Tabs > = {
 	},
 	tags: [ 'status-private' ],
 	parameters: {
-		actions: { argTypesRegex: '^on.*' },
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
 	},

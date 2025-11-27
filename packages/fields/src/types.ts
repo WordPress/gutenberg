@@ -24,6 +24,7 @@ interface Links {
 }
 
 interface Author {
+	id: number;
 	name: string;
 	avatar_urls: Record< string, string >;
 }

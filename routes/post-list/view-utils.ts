@@ -213,6 +213,15 @@ export function viewToQuery( view: View, postType: string ) {
 		result.media_type = mediaType.value;
 	}
 
+	const date = view.filters?.find( ( filter ) => filter.field === 'date' );
+	if ( date && date.value ) {
+		if ( date.operator === 'before' ) {
+			result.before = date.value;
+		} else if ( date.operator === 'after' ) {
+			result.after = date.value;
+		}
+	}
+
 	// For attachments, we need to embed the parent (attached to) post to get its title.
 	if ( postType === 'attachment' ) {
 		result._embed = 'wp:attached-to';

@@ -1,12 +1,4 @@
-// In many classic themes, selectors like `.entry-content h1` are used,
-// potentially applying relatively high specificity (such as `0-1-1`) to
-// heading elements. To properly override those styles, use a selector
-// with a specificity of `0-2-0`.
-.wp-block-accordion-heading.wp-block-accordion-heading {
-	// Some themes may have an explicit width. Since it's unpredictable
-	// what CSS specificity should be used to override them, ensure 100%
-	// width using min-width instead.
-	min-width: 100%;
+.wp-block-accordion-heading {
 	// Some classic themes apply default margins to heading elements,
 	// so those styles need to be reset.
 	margin: 0;

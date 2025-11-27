@@ -22,7 +22,7 @@ import type { KeyboardEventHandler } from 'react';
  */
 import { __, _n, sprintf, isRTL } from '@wordpress/i18n';
 import { arrowLeft, arrowRight } from '@wordpress/icons';
-import { dateI18n, getSettings } from '@wordpress/date';
+import { getSettings, gmdateI18n } from '@wordpress/date';
 import { useState, useRef, useEffect } from '@wordpress/element';
 
 /**
@@ -129,14 +129,8 @@ export function DatePicker( {
 					size="compact"
 				/>
 				<NavigatorHeading level={ 3 }>
-					<strong>
-						{ dateI18n(
-							'F',
-							viewing,
-							-viewing.getTimezoneOffset()
-						) }
-					</strong>{ ' ' }
-					{ dateI18n( 'Y', viewing, -viewing.getTimezoneOffset() ) }
+					<strong>{ gmdateI18n( 'F', viewing ) }</strong>{ ' ' }
+					{ gmdateI18n( 'Y', viewing ) }
 				</NavigatorHeading>
 				<ViewNextMonthButton
 					icon={ isRTL() ? arrowLeft : arrowRight }
@@ -161,7 +155,7 @@ export function DatePicker( {
 			>
 				{ calendar[ 0 ][ 0 ].map( ( day ) => (
 					<DayOfWeek key={ day.toString() }>
-						{ dateI18n( 'D', day, -day.getTimezoneOffset() ) }
+						{ gmdateI18n( 'D', day ) }
 					</DayOfWeek>
 				) ) }
 				{ calendar[ 0 ].map( ( week ) =>
@@ -320,18 +314,14 @@ function Day( {
 			onClick={ onClick }
 			onKeyDown={ onKeyDown }
 		>
-			{ dateI18n( 'j', day, -day.getTimezoneOffset() ) }
+			{ gmdateI18n( 'j', day ) }
 		</DayButton>
 	);
 }
 
 function getDayLabel( date: Date, isSelected: boolean, numEvents: number ) {
 	const { formats } = getSettings();
-	const localizedDate = dateI18n(
-		formats.date,
-		date,
-		-date.getTimezoneOffset()
-	);
+	const localizedDate = gmdateI18n( formats.date, date );
 	if ( isSelected && numEvents > 0 ) {
 		return sprintf(
 			// translators: 1: The calendar date. 2: Number of events on the calendar date.

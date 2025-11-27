@@ -52,6 +52,7 @@ const IGNORE_PATTERNS = [
 	'**/*.native.*',
 	'**/*.ios.*',
 	'**/*.android.*',
+	'**/*.{spec,test}.*',
 ];
 const TEST_FILE_PATTERNS = [
 	/\/(benchmark|__mocks__|__tests__|test|storybook|stories)\/.+/,
@@ -1605,6 +1606,7 @@ async function watchMode() {
 				const script = fullToShort.get( fullScript );
 				try {
 					const rebundleStartTime = Date.now();
+					await compileStyles( script );
 					await bundlePackage( script );
 					const rebundleTime = Date.now() - rebundleStartTime;
 					console.log(

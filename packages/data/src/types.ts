@@ -18,7 +18,7 @@ export interface StoreInstance< Config extends AnyConfig > {
 	subscribe: ( listener: () => void ) => () => void;
 }
 
-export interface StoreDescriptor< Config extends AnyConfig > {
+export interface StoreDescriptor< Config extends AnyConfig = AnyConfig > {
 	/**
 	 * Store Name
 	 */

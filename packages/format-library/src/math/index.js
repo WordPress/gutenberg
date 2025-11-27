@@ -12,6 +12,7 @@ import {
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { math as icon } from '@wordpress/icons';
+import { speak } from '@wordpress/a11y';
 
 /**
  * Internal dependencies
@@ -52,6 +53,7 @@ function InlineUI( {
 				setError( null );
 			} catch ( err ) {
 				setError( err.message );
+				speak( err.message );
 				return;
 			}
 		}

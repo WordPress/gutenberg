@@ -32,6 +32,7 @@ import {
 	attributesFromMedia,
 	IMAGE_BACKGROUND_TYPE,
 	VIDEO_BACKGROUND_TYPE,
+	EMBED_VIDEO_BACKGROUND_TYPE,
 	dimRatioToClass,
 	isContentPositionCenter,
 	getPositionClassName,
@@ -48,6 +49,7 @@ import {
 	DEFAULT_OVERLAY_COLOR,
 } from './color-utils';
 import { DEFAULT_MEDIA_SIZE_SLUG } from '../constants';
+import { getIframeSrc, getBackgroundVideoSrc } from '../embed-video-utils';
 
 function getInnerBlocksTemplate( attributes ) {
 	return [
@@ -319,10 +321,71 @@ function CoverEdit( {
 		createErrorNotice( message, { type: 'snackbar' } );
 	};
 
+	const onSelectEmbedUrl = ( embedUrl ) => {
+		// Only set a new dimRatio if there was no previous media selected
+		// to avoid resetting to 50 if it has been explicitly set to 100.
+		const newDimRatio =
+			originalUrl === undefined && dimRatio === 100 ? 50 : dimRatio;
+
+		// Set initial attributes with URL
+		setAttributes( {
+			url: embedUrl,
+			backgroundType: EMBED_VIDEO_BACKGROUND_TYPE,
+			dimRatio: newDimRatio,
+			id: undefined,
+			focalPoint: undefined,
+			hasParallax: undefined,
+			isRepeated: undefined,
+			useFeaturedImage: undefined,
+		} );
+	};
+
+	// Fetch embed preview for embed videos
+	const { embedPreview, isFetchingEmbed } = useSelect(
+		( select ) => {
+			if ( backgroundType !== EMBED_VIDEO_BACKGROUND_TYPE || ! url ) {
+				return {
+					embedPreview: undefined,
+					isFetchingEmbed: false,
+				};
+			}
+
+			const { getEmbedPreview, isRequestingEmbedPreview } =
+				select( coreStore );
+
+			return {
+				embedPreview: getEmbedPreview( url ),
+				isFetchingEmbed: isRequestingEmbedPreview( url ),
+			};
+		},
+		[ url, backgroundType ]
+	);
+
+	// Compute embedSrc on-the-fly from embed preview for editor display
+	const embedSrc = useMemo( () => {
+		if (
+			backgroundType !== EMBED_VIDEO_BACKGROUND_TYPE ||
+			! embedPreview?.html
+		) {
+			return null;
+		}
+
+		// Extract iframe src from embed HTML
+		const iframeSrc = getIframeSrc( embedPreview.html );
+		if ( ! iframeSrc ) {
+			return null;
+		}
+
+		// Modify the src to add background video parameters (provider auto-detected)
+		return getBackgroundVideoSrc( iframeSrc );
+	}, [ embedPreview, backgroundType ] );
+
 	const isUploadingMedia = isTemporaryMedia( id, url );
 
 	const isImageBackground = IMAGE_BACKGROUND_TYPE === backgroundType;
 	const isVideoBackground = VIDEO_BACKGROUND_TYPE === backgroundType;
+	const isEmbedVideoBackground =
+		EMBED_VIDEO_BACKGROUND_TYPE === backgroundType;
 
 	const blockEditingMode = useBlockEditingMode();
 	const hasNonContentControls = blockEditingMode === 'default';
@@ -449,6 +512,7 @@ function CoverEdit( {
 			attributes={ attributes }
 			setAttributes={ setAttributes }
 			onSelectMedia={ onSelectMedia }
+			onSelectEmbedUrl={ onSelectEmbedUrl }
 			currentSettings={ currentSettings }
 			toggleUseFeaturedImage={ toggleUseFeaturedImage }
 			onClearMedia={ onClearMedia }
@@ -599,6 +663,23 @@ function CoverEdit( {
 						poster={ poster }
 						style={ mediaStyle }
 					/>
+				) }
+				{ isEmbedVideoBackground && embedSrc && (
+					<div
+						ref={ mediaElement }
+						className="wp-block-cover__video-background wp-block-cover__embed-background"
+						style={ mediaStyle }
+					>
+						<iframe
+							src={ embedSrc }
+							title="Background video"
+							frameBorder="0"
+							allow="autoplay; fullscreen"
+						/>
+					</div>
+				) }
+				{ isEmbedVideoBackground && ! embedSrc && isFetchingEmbed && (
+					<Spinner />
 				) }
 
 				{ showOverlay && (

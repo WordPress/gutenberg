@@ -10,12 +10,14 @@ import { privateApis as routePrivateApis } from '@wordpress/route';
 // @ts-expect-error Commands is not typed properly.
 import { CommandMenu } from '@wordpress/commands';
 import { privateApis as themePrivateApis } from '@wordpress/theme';
+import { EditorSnackbars } from '@wordpress/editor';
 
 /**
  * Internal dependencies
  */
 import Sidebar from '../sidebar';
 import SavePanel from '../save-panel';
+import CanvasRenderer from '../canvas-renderer';
 import { unlock } from '../../lock-unlock';
 import type { CanvasData } from '../../store/types';
 import './style.scss';
@@ -30,6 +32,8 @@ export default function Root() {
 		| CanvasData
 		| null
 		| undefined;
+	const routeContentModule = ( currentMatch?.loaderData as any )
+		?.routeContentModule as string | undefined;
 	const isFullScreen = canvas && ! canvas.isPreview;
 
 	return (
@@ -43,6 +47,7 @@ export default function Root() {
 				>
 					<CommandMenu />
 					<SavePanel />
+					<EditorSnackbars />
 					{ ! isFullScreen && (
 						<div className="boot-layout__sidebar">
 							<Sidebar />
@@ -54,6 +59,15 @@ export default function Root() {
 						>
 							<Outlet />
 						</ThemeProvider>
+						{ /* Render Canvas in Root to prevent remounting on route changes */ }
+						{ ( canvas || canvas === null ) && (
+							<div className="boot-layout__canvas">
+								<CanvasRenderer
+									canvas={ canvas }
+									routeContentModule={ routeContentModule }
+								/>
+							</div>
+						) }
 					</div>
 				</div>
 			</ThemeProvider>

@@ -30,6 +30,12 @@ if ( file_exists( $build_registration ) ) {
  * @return bool True when the experiment is enabled.
  */
 function gutenberg_is_experiment_enabled( $name ) {
+	// Special handling for active_templates - check if the active_templates option exists.
+	// This is not stored in the experiments array but as a separate option.
+	if ( 'active_templates' === $name ) {
+		return is_array( get_option( 'active_templates' ) );
+	}
+
 	$experiments = get_option( 'gutenberg-experiments' );
 	return ! empty( $experiments[ $name ] );
 }
@@ -46,8 +52,6 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 
 	// WordPress 6.9 compat.
 	require __DIR__ . '/compat/wordpress-6.9/class-gutenberg-rest-attachments-controller-6-9.php';
-	require __DIR__ . '/compat/wordpress-6.9/class-gutenberg-rest-static-templates-controller.php';
-	require __DIR__ . '/compat/wordpress-6.9/template-activate.php';
 	require __DIR__ . '/compat/wordpress-6.9/block-bindings.php';
 	require __DIR__ . '/compat/wordpress-6.9/post-data-block-bindings.php';
 	require __DIR__ . '/compat/wordpress-6.9/term-data-block-bindings.php';
@@ -57,6 +61,9 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	require __DIR__ . '/compat/wordpress-6.9/class-gutenberg-rest-comment-controller-6-9.php';
 
 	// WordPress 7.0 compat.
+	require __DIR__ . '/compat/wordpress-7.0/class-gutenberg-rest-block-patterns-controller-7-0.php';
+	require __DIR__ . '/compat/wordpress-7.0/class-gutenberg-rest-static-templates-controller.php';
+	require __DIR__ . '/compat/wordpress-7.0/template-activate.php';
 	require __DIR__ . '/compat/wordpress-7.0/rest-api.php';
 
 	// Plugin specific code.
@@ -93,10 +100,10 @@ require __DIR__ . '/compat/wordpress-6.8/site-preview.php';
 // WordPress 6.9 compat.
 require __DIR__ . '/compat/wordpress-6.9/customizer-preview-custom-css.php';
 require __DIR__ . '/compat/wordpress-6.9/command-palette.php';
-require __DIR__ . '/compat/wordpress-6.9/preload.php';
 require __DIR__ . '/compat/wordpress-6.9/client-assets.php';
 
 // WordPress 7.0 compat.
+require __DIR__ . '/compat/wordpress-7.0/preload.php';
 require __DIR__ . '/compat/wordpress-7.0/php-only-blocks.php';
 require __DIR__ . '/compat/wordpress-7.0/blocks.php';
 
