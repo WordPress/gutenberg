@@ -2,14 +2,9 @@
  * Internal dependencies
  */
 import { __dangerousOptInToUnstableAPIsOnlyForCoreModules } from '../';
-import {
-	resetRegisteredPrivateApis,
-	resetAllowedCoreModules,
-	allowCoreModule,
-} from '../implementation';
+import { resetAllowedCoreModules, allowCoreModule } from '../implementation';
 
 beforeEach( () => {
-	resetRegisteredPrivateApis();
 	resetAllowedCoreModules();
 	allowCoreModule( '@privateApis/test' );
 	allowCoreModule( '@privateApis/test-consumer' );
