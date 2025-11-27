@@ -122,8 +122,8 @@ export function CheckboxControl(
 						onClick={ ( event ) => {
 							// Compat code for Safari to ensure that the checkbox is focused when clicked.
 							event.currentTarget.focus();
+
 							onClick?.( event );
-							event.stopPropagation();
 						} }
 						{ ...additionalProps }
 					/>
