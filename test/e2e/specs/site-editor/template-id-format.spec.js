@@ -3,6 +3,39 @@
  */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
+async function navigateToTemplateEditor( { admin, editor, page }, pageId ) {
+	// Navigate directly to the page editor using the page ID.
+	await admin.editPost( pageId );
+
+	// Wait for the editor to be ready.
+	await expect(
+		page.locator( 'iframe[name="editor-canvas"]' )
+	).toBeVisible();
+
+	// Close pattern chooser dialog if visible.
+	const patternDialog = page.getByRole( 'dialog', {
+		name: 'Choose a pattern',
+	} );
+	await expect( patternDialog ).toBeVisible( { timeout: 2000 } );
+	await patternDialog.getByRole( 'button', { name: 'Close' } ).click();
+
+	await editor.openDocumentSettingsSidebar();
+	const settingsPanel = page.getByRole( 'region', {
+		name: 'Editor settings',
+	} );
+	await settingsPanel.getByRole( 'tab', { name: 'Page' } ).click();
+	await settingsPanel
+		.getByRole( 'button', { name: 'Template options' } )
+		.click();
+	await page.getByRole( 'menuitem', { name: 'Edit template' } ).click();
+	await expect( editor.canvas.locator( 'body' ) ).toBeVisible();
+
+	// Set preferences for the site editor context.
+	await editor.setPreferences( 'core/edit-post', {
+		welcomeGuideTemplate: false,
+	} );
+}
+
 test.describe( 'Template ID Format', () => {
 	let pageId;
 
@@ -34,36 +67,7 @@ test.describe( 'Template ID Format', () => {
 	) => {
 		await requestUtils.setGutenbergExperiments( experiments );
 
-		// Navigate directly to the page editor using the page ID.
-		await admin.editPost( pageId );
-
-		// Wait for the editor to be ready.
-		await expect(
-			page.locator( 'iframe[name="editor-canvas"]' )
-		).toBeVisible();
-
-		// Close pattern chooser dialog if visible.
-		const patternDialog = page.getByRole( 'dialog', {
-			name: 'Choose a pattern',
-		} );
-		await expect( patternDialog ).toBeVisible( { timeout: 2000 } );
-		await patternDialog.getByRole( 'button', { name: 'Close' } ).click();
-
-		await editor.openDocumentSettingsSidebar();
-		const settingsPanel = page.getByRole( 'region', {
-			name: 'Editor settings',
-		} );
-		await settingsPanel.getByRole( 'tab', { name: 'Page' } ).click();
-		await settingsPanel
-			.getByRole( 'button', { name: 'Template options' } )
-			.click();
-		await page.getByRole( 'menuitem', { name: 'Edit template' } ).click();
-		await expect( editor.canvas.locator( 'body' ) ).toBeVisible();
-
-		// Set preferences for the site editor context.
-		await editor.setPreferences( 'core/edit-post', {
-			welcomeGuideTemplate: false,
-		} );
+		await navigateToTemplateEditor( { admin, editor, page }, pageId );
 
 		await editor.insertBlock( {
 			name: 'core/paragraph',
@@ -75,6 +79,30 @@ test.describe( 'Template ID Format', () => {
 			.getByRole( 'region', { name: 'Editor top bar' } )
 			.getByRole( 'button', { name: 'Save' } )
 			.click();
+
+		await navigateToTemplateEditor( { admin, editor, page }, pageId );
+
+		// Make a second edit to the template to ensure wp_id is not 0.
+		const secondEditText = `Second edit - ${ contentText }`;
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: secondEditText },
+		} );
+		await expect( editor.canvas.getByText( secondEditText ) ).toBeVisible();
+
+		const saveButton = page
+			.getByRole( 'region', { name: 'Editor top bar' } )
+			.getByRole( 'button', { name: 'Save' } );
+		await saveButton.click();
+
+		if ( experiments.includes( 'active_templates' ) ) {
+			const secondSaveButton = page
+				.getByRole( 'region', { name: 'Editor publish' } )
+				.getByRole( 'button', { name: 'Save' } );
+			await secondSaveButton.click();
+		} else {
+			await expect( saveButton ).toBeDisabled( { timeout: 5000 } );
+		}
 
 		await expect( page.locator( 'body' ) ).not.toContainText(
 			'No templates exist with that id.'
