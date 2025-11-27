@@ -196,17 +196,19 @@ const EmptyComponent = ( { customEmpty }: { customEmpty?: boolean } ) => {
 	} );
 
 	return (
-		<DataViews
-			getItemId={ ( item ) => item.id.toString() }
-			paginationInfo={ { totalItems: 0, totalPages: 0 } }
-			data={ [] }
-			view={ view }
-			fields={ fields }
-			onChangeView={ setView }
-			actions={ actions }
-			defaultLayouts={ defaultLayouts }
-			empty={ customEmpty ? <CustomEmptyComponent /> : undefined }
-		/>
+		<div style={ { height: 600 } }>
+			<DataViews
+				getItemId={ ( item ) => item.id.toString() }
+				paginationInfo={ { totalItems: 0, totalPages: 0 } }
+				data={ [] }
+				view={ view }
+				fields={ fields }
+				onChangeView={ setView }
+				actions={ actions }
+				defaultLayouts={ defaultLayouts }
+				empty={ customEmpty ? <CustomEmptyComponent /> : undefined }
+			/>
+		</div>
 	);
 };
 
