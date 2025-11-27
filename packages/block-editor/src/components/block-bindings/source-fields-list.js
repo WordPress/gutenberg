@@ -90,7 +90,7 @@ export default function BlockBindingsSourceFieldsList( {
 } ) {
 	const isMobile = useViewportMatch( 'medium', '<' );
 
-	// Only render source if it has compatible data.
+	// Only render source if it has compatible fields.
 	if ( ! fields || fields.length === 0 ) {
 		return null;
 	}

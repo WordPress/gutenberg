@@ -87,19 +87,19 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 				getAllBlockBindingsSources,
 				getBlockBindingsSourceFieldsList,
 			} = unlock( select( blocksStore ) );
-			const data = {};
+			const fields = {};
 			Object.entries( getAllBlockBindingsSources() ).forEach(
 				( [ sourceName, source ] ) => {
-					const items = getBlockBindingsSourceFieldsList(
+					const fieldsList = getBlockBindingsSourceFieldsList(
 						source,
 						blockContext
 					);
-					if ( items?.length ) {
-						data[ sourceName ] = items;
+					if ( fieldsList?.length ) {
+						fields[ sourceName ] = fieldsList;
 					}
 				}
 			);
-			return data;
+			return fields;
 		},
 		[ blockContext ]
 	);
@@ -135,7 +135,7 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 						const binding = bindings?.[ attribute ];
 						const { source: sourceName } = binding || {};
 
-						// Check if this specific attribute has compatible data from any source.
+						// Check if this specific attribute has compatible fields from any source.
 						const attributeType = getAttributeType(
 							blockName,
 							attribute
@@ -143,12 +143,12 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 
 						const compatibleFieldsForAttribute = {};
 						for ( const sourceKey in sources ) {
-							const data = sources[ sourceKey ].filter(
+							const fields = sources[ sourceKey ].filter(
 								( item ) => item.type === attributeType
 							);
-							if ( data.length ) {
+							if ( fields.length ) {
 								compatibleFieldsForAttribute[ sourceKey ] =
-									data;
+									fields;
 							}
 						}
 
