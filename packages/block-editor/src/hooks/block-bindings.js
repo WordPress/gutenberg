@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { store as blockStore } from '@wordpress/blocks';
+import { getBlockType, store as blockStore } from '@wordpress/blocks';
 import {
 	__experimentalItemGroup as ItemGroup,
 	__experimentalText as Text,
@@ -19,7 +19,6 @@ import { useViewportMatch } from '@wordpress/compose';
 import {
 	BlockBindingsAttributeControl,
 	BlockBindingsSourceMenu,
-	getAttributeType,
 } from '../components/block-bindings';
 import { useBlockBindingsUtils } from '../utils/block-bindings';
 import { unlock } from '../lock-unlock';
@@ -28,6 +27,20 @@ import BlockContext from '../components/block-context';
 import { store as blockEditorStore } from '../store';
 
 const { Menu } = unlock( componentsPrivateApis );
+
+/**
+ * Get the normalized attribute type for block bindings.
+ * Converts 'rich-text' to 'string' since rich-text is stored as string.
+ *
+ * @param {string} blockName The block name.
+ * @param {string} attribute The attribute name.
+ * @return {string} The normalized attribute type.
+ */
+const getAttributeType = ( blockName, attribute ) => {
+	const _attributeType =
+		getBlockType( blockName ).attributes?.[ attribute ]?.type;
+	return _attributeType === 'rich-text' ? 'string' : _attributeType;
+};
 
 const useToolsPanelDropdownMenuProps = () => {
 	const isMobile = useViewportMatch( 'medium', '<' );

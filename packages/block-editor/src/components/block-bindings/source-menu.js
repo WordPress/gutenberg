@@ -6,7 +6,7 @@ import fastDeepEqual from 'fast-deep-equal/es6';
 /**
  * WordPress dependencies
  */
-import { getBlockBindingsSource, getBlockType } from '@wordpress/blocks';
+import { getBlockBindingsSource } from '@wordpress/blocks';
 import { privateApis as componentsPrivateApis } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { useContext } from '@wordpress/element';
@@ -20,20 +20,6 @@ import { unlock } from '../../lock-unlock';
 import BlockContext from '../block-context';
 
 const { Menu } = unlock( componentsPrivateApis );
-
-/**
- * Get the normalized attribute type for block bindings.
- * Converts 'rich-text' to 'string' since rich-text is stored as string.
- *
- * @param {string} blockName The block name.
- * @param {string} attribute The attribute name.
- * @return {string} The normalized attribute type.
- */
-export const getAttributeType = ( blockName, attribute ) => {
-	const _attributeType =
-		getBlockType( blockName ).attributes?.[ attribute ]?.type;
-	return _attributeType === 'rich-text' ? 'string' : _attributeType;
-};
 
 function BlockBindingsSourceMenuItem( {
 	args,

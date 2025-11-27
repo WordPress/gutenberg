@@ -398,19 +398,6 @@ _Related_
 
 -   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/font-sizes/README.md>
 
-### getAttributeType
-
-Get the normalized attribute type for block bindings. Converts 'rich-text' to 'string' since rich-text is stored as string.
-
-_Parameters_
-
--   _blockName_ `string`: The block name.
--   _attribute_ `string`: The attribute name.
-
-_Returns_
-
--   `string`: The normalized attribute type.
-
 ### getColorClassName
 
 Returns a class based on the context a color is being used and its slug.
