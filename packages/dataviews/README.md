@@ -1746,7 +1746,16 @@ Example:
 
 ### `getElements`
 
-Async function that fetches elements only when they are needed, enabling lazy loading. It returns a promise that resolves to an array of elements.
+Async function that fetches elements only when they are needed, enabling lazy loading. It returns a promise that resolves to an object containing the elements array and optional pagination information.
+
+The function receives an optional query parameter object with:
+- `search`: String to filter elements
+- `include`: Array of values that should always be included (e.g., currently selected values)
+- `perPage`: Number of items per page (-1 returns all results)
+
+The returned object structure:
+- `elements`: Array of Option objects
+- `paginationInfo`: Optional object with `totalItems` and `totalPages`
 
 Note this function may be called many times in the lifetime of the DataViews/DataForm component. For example, if elements are used in the `render` method of a field, it'll trigger as many times as records displayed in the page. It's the consumer responsibility to cache the results to avoid unnecessary costly operations (network requests, etc.).
 
@@ -1755,13 +1764,29 @@ Note this function may be called many times in the lifetime of the DataViews/Dat
 	id: 'selectedProduct',
 	type: 'integer',
 	label: 'Selected product',
-	getElements: () => {
-		return Promise.resolve( [
-			{ value: '1', label: 'Product A' },
-			{ value: '2', label: 'Product B' },
-			{ value: '3', label: 'Product C' },
-			{ value: '4', label: 'Product D' },
-		] );
+	getElements: async ( { search, include, perPage } ) => {
+		// Fetch products based on query parameters
+		const params = new URLSearchParams();
+		if ( search ) {
+			params.append( 'search', search );
+		}
+		if ( include?.length ) {
+			params.append( 'include', include.join( ',' ) );
+		}
+
+		const response = await fetch( `/api/products?${ params }` );
+		const data = await response.json();
+
+		return {
+			elements: data.items.map( item => ( {
+				value: item.id,
+				label: item.name,
+			} ) ),
+			paginationInfo: {
+				totalItems: data.total,
+				totalPages: data.pages,
+			},
+		};
 	}
 }
 ```

@@ -44,6 +44,10 @@
 - Dataviews: Fix column header move item in RTL moves in the opposite direction to the arrow. [#74644](https://github.com/WordPress/gutenberg/pull/74644)
 - Dataviews: Fix insert left and right handling in table layout for RTL languages. [#74681](https://github.com/WordPress/gutenberg/pull/74681)
 
+### Breaking changes
+
+- Field API: `getElements` signature changed to support pagination and filtering. [#73623](https://github.com/WordPress/gutenberg/pull/73623)
+
 ### Enhancements
 
 - DataViewsPicker: Ensure checkbox column in table picker layout is always `48px` wide. [#74181](https://github.com/WordPress/gutenberg/pull/74181)
