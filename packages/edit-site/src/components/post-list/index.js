@@ -167,7 +167,8 @@ export default function PostList( { postType } ) {
 		() => records?.map( ( record ) => record.id ) ?? [],
 		[ records ]
 	);
-	const { notesCount } = useNotesCount( postIds );
+	const { notesCount, isLoading: isLoadingNotesCount } =
+		useNotesCount( postIds );
 
 	// The REST API sort the authors by ID, but we want to sort them by name.
 	const data = useMemo( () => {
@@ -290,7 +291,7 @@ export default function PostList( { postType } ) {
 				fields={ fields }
 				actions={ actions }
 				data={ data || EMPTY_ARRAY }
-				isLoading={ isLoadingData }
+				isLoading={ isLoadingData || isLoadingNotesCount }
 				view={ view }
 				onChangeView={ onChangeView }
 				selection={ selection }
