@@ -36,13 +36,13 @@ class Gutenberg_REST_Attachments_Controller_6_9 extends WP_REST_Attachments_Cont
 		$media_type_array = null;
 		$mime_type_array  = null;
 
-		if ( ! empty( $request['media_type'] ) && is_array( $request['media_type'] ) ) {
-			$media_type_array = $request['media_type'];
+		if ( ! empty( $request['media_type'] ) ) {
+			$media_type_array = is_array( $request['media_type'] ) ? $request['media_type'] : array( $request['media_type'] );
 			unset( $request['media_type'] );
 		}
 
-		if ( ! empty( $request['mime_type'] ) && is_array( $request['mime_type'] ) ) {
-			$mime_type_array = $request['mime_type'];
+		if ( ! empty( $request['mime_type'] ) ) {
+			$mime_type_array = is_array( $request['mime_type'] ) ? $request['mime_type'] : array( $request['mime_type'] );
 			unset( $request['mime_type'] );
 		}
 
@@ -110,19 +110,34 @@ class Gutenberg_REST_Attachments_Controller_6_9 extends WP_REST_Attachments_Cont
 		$params['media_type'] = array(
 			'default'     => null,
 			'description' => __( 'Limit result set to attachments of a particular media type or media types.' ),
-			'type'        => 'array',
-			'items'       => array(
-				'type' => 'string',
-				'enum' => $media_types,
+			'oneOf'       => array(
+				array(
+					'type' => 'string',
+					'enum' => $media_types,
+				),
+				array(
+					'type'  => 'array',
+					'items' => array(
+						'type' => 'string',
+						'enum' => $media_types,
+					),
+				),
 			),
 		);
 
 		$params['mime_type'] = array(
 			'default'     => null,
 			'description' => __( 'Limit result set to attachments of a particular MIME type or MIME types.' ),
-			'type'        => 'array',
-			'items'       => array(
-				'type' => 'string',
+			'oneOf'       => array(
+				array(
+					'type' => 'string',
+				),
+				array(
+					'type'  => 'array',
+					'items' => array(
+						'type' => 'string',
+					),
+				),
 			),
 		);
 
