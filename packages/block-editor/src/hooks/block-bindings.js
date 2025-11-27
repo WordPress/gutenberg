@@ -17,7 +17,7 @@ import { useViewportMatch } from '@wordpress/compose';
  * Internal dependencies
  */
 import {
-	BlockBindingsPanelItem,
+	BlockBindingsAttributeControl,
 	BlockBindingsSourceMenu,
 	getAttributeType,
 } from '../components/block-bindings';
@@ -144,7 +144,7 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 
 						if ( isAttributeReadOnly ) {
 							return (
-								<BlockBindingsPanelItem
+								<BlockBindingsAttributeControl
 									key={ attribute }
 									attribute={ attribute }
 									binding={ binding }
@@ -158,7 +158,7 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 						}
 
 						return (
-							<BlockBindingsPanelItem
+							<BlockBindingsAttributeControl
 								key={ attribute }
 								attribute={ attribute }
 								binding={ binding }
@@ -184,7 +184,7 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 										/>
 									) ) }
 								</Menu>
-							</BlockBindingsPanelItem>
+							</BlockBindingsAttributeControl>
 						);
 					} ) }
 				</ItemGroup>

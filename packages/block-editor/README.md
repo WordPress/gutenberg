@@ -100,7 +100,7 @@ _Related_
 
 -   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-alignment-control/README.md>
 
-### BlockBindingsPanelItem
+### BlockBindingsAttributeControl
 
 Internal dependencies
 

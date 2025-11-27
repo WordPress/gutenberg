@@ -25,7 +25,7 @@ import { unlock } from '../../lock-unlock';
 
 const { Menu } = unlock( componentsPrivateApis );
 
-export default function BlockBindingsPanelItem( {
+export default function BlockBindingsAttributeControl( {
 	attribute,
 	binding,
 	children,

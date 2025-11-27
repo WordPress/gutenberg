@@ -12,7 +12,7 @@ export {
 	BlockAlignmentToolbar,
 } from './block-alignment-control';
 export {
-	BlockBindingsPanelItem,
+	BlockBindingsAttributeControl,
 	BlockBindingsSourceMenu,
 	getAttributeType,
 } from './block-bindings';
