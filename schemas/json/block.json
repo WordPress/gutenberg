@@ -378,7 +378,7 @@
 					"default": true
 				},
 				"visibility": {
-					"description": "By default, a block can be visibility by a user from the block 'Options' dropdown. To disable this behavior, set visibility to false.",
+					"description": "By default, a block can be hidden by a user from the block 'Options' dropdown. To disable this behavior, set visibility to false.",
 					"type": "boolean",
 					"default": true
 				},
