@@ -16,6 +16,8 @@ import type {
 	Operator,
 	Option,
 	SortDirection,
+	GetElementsQuery,
+	GetElementsResult,
 } from './field-api';
 import type { SetSelection } from './private';
 
@@ -63,7 +65,7 @@ export interface NormalizedFilter {
 	/**
 	 * Retrieval function to get the elements.
 	 */
-	getElements?: () => Promise< Option[] >;
+	getElements?: ( query?: GetElementsQuery ) => Promise< GetElementsResult >;
 
 	/**
 	 * Whether the filter has elements.

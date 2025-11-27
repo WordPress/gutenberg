@@ -9,9 +9,9 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { useInstanceId } from '@wordpress/compose';
-import { __, sprintf } from '@wordpress/i18n';
-import { useState, useMemo, useDeferredValue } from '@wordpress/element';
+import { useInstanceId, useDebouncedInput } from '@wordpress/compose';
+import { __, sprintf, _n } from '@wordpress/i18n';
+import { useState, useMemo } from '@wordpress/element';
 import {
 	VisuallyHidden,
 	Icon,
@@ -37,6 +37,31 @@ interface SearchWidgetProps {
 
 function normalizeSearchInput( input = '' ) {
 	return removeAccents( input.trim().toLowerCase() );
+}
+
+function NoResultsFound() {
+	return (
+		<div className="dataviews-filters__search-widget-no-elements">
+			{ __( 'No elements found' ) }
+		</div>
+	);
+}
+
+function TotalResultsCount( { count }: { count: number } ) {
+	return (
+		<div
+			className="dataviews-filters__search-widget-results-count"
+			role="status"
+			aria-live="polite"
+			aria-atomic="true"
+		>
+			{ sprintf(
+				/* translators: %d: number of results. */
+				_n( '%d total result', '%d total results', count ),
+				count
+			) }
+		</div>
+	);
 }
 
 const getNewValue = (
@@ -90,6 +115,10 @@ const SingleSelectionOption = ( { selected }: { selected: boolean } ) => {
 
 function ListBox( { view, filter, onChangeView }: SearchWidgetProps ) {
 	const baseId = useInstanceId( ListBox, 'dataviews-filter-list-box' );
+	const { elements } = useElements( {
+		elements: filter.elements,
+		getElements: filter.getElements,
+	} );
 
 	const [ activeCompositeId, setActiveCompositeId ] = useState<
 		string | null | undefined
@@ -106,6 +135,11 @@ function ListBox( { view, filter, onChangeView }: SearchWidgetProps ) {
 		( f ) => f.field === filter.field
 	);
 	const currentValue = getCurrentValue( filter, currentFilter );
+
+	if ( elements.length === 0 ) {
+		return <NoResultsFound />;
+	}
+
 	return (
 		<Composite
 			virtualFocus
@@ -122,18 +156,18 @@ function ListBox( { view, filter, onChangeView }: SearchWidgetProps ) {
 			onFocusVisible={ () => {
 				// `onFocusVisible` needs the `Composite` component to be focusable,
 				// which is implicitly achieved via the `virtualFocus` prop.
-				if ( ! activeCompositeId && filter.elements.length ) {
+				if ( ! activeCompositeId && elements.length ) {
 					setActiveCompositeId(
 						generateFilterElementCompositeItemId(
 							baseId,
-							filter.elements[ 0 ].value
+							elements[ 0 ].value
 						)
 					);
 				}
 			} }
 			render={ <Composite.Typeahead /> }
 		>
-			{ filter.elements.map( ( element ) => (
+			{ elements.map( ( element ) => (
 				<Composite.Hover
 					key={ element.value }
 					render={
@@ -214,18 +248,35 @@ function ListBox( { view, filter, onChangeView }: SearchWidgetProps ) {
 }
 
 function ComboboxList( { view, filter, onChangeView }: SearchWidgetProps ) {
-	const [ searchValue, setSearchValue ] = useState( '' );
-	const deferredSearchValue = useDeferredValue( searchValue );
+	const [ searchValue, setSearchValue, debouncedSearchValue ] =
+		useDebouncedInput( '' );
+
+	const query = useMemo(
+		() => ( { search: normalizeSearchInput( debouncedSearchValue ) } ),
+		[ debouncedSearchValue ]
+	);
+	const { elements, isLoading, paginationInfo } = useElements( {
+		elements: filter.elements,
+		getElements: filter.getElements,
+		query,
+	} );
 	const currentFilter = view.filters?.find(
 		( _filter ) => _filter.field === filter.field
 	);
 	const currentValue = getCurrentValue( filter, currentFilter );
+
+	// Filter matches based on search. If `getElements` exists,
+	// elements are already filtered.
 	const matches = useMemo( () => {
-		const normalizedSearch = normalizeSearchInput( deferredSearchValue );
-		return filter.elements.filter( ( item ) =>
-			normalizeSearchInput( item.label ).includes( normalizedSearch )
+		const normalizedSearchTerm =
+			normalizeSearchInput( debouncedSearchValue );
+		if ( ! normalizedSearchTerm || filter.getElements ) {
+			return elements;
+		}
+		return elements.filter( ( item ) =>
+			normalizeSearchInput( item.label ).includes( normalizedSearchTerm )
 		);
-	}, [ filter.elements, deferredSearchValue ] );
+	}, [ elements, filter.getElements, debouncedSearchValue ] );
 	return (
 		<Ariakit.ComboboxProvider
 			selectedValue={ currentValue }
@@ -275,6 +326,7 @@ function ComboboxList( { view, filter, onChangeView }: SearchWidgetProps ) {
 					autoSelect="always"
 					placeholder={ __( 'Search' ) }
 					className="dataviews-filters__search-widget-filter-combobox__input"
+					value={ searchValue }
 				/>
 				<div className="dataviews-filters__search-widget-filter-combobox__icon">
 					<Icon icon={ search } />
@@ -284,71 +336,67 @@ function ComboboxList( { view, filter, onChangeView }: SearchWidgetProps ) {
 				className="dataviews-filters__search-widget-filter-combobox-list"
 				alwaysVisible
 			>
-				{ matches.map( ( element ) => {
-					return (
-						<Ariakit.ComboboxItem
-							resetValueOnSelect={ false }
-							key={ element.value }
-							value={ element.value }
-							className="dataviews-filters__search-widget-listitem"
-							hideOnClick={ false }
-							setValueOnClick={ false }
-							focusOnHover
-						>
-							{ filter.singleSelection && (
-								<SingleSelectionOption
-									selected={ currentValue === element.value }
-								/>
-							) }
-							{ ! filter.singleSelection && (
-								<MultiSelectionOption
-									selected={ currentValue.includes(
-										element.value
-									) }
-								/>
-							) }
-							<span>
-								<Ariakit.ComboboxItemValue
-									className="dataviews-filters__search-widget-filter-combobox-item-value"
-									value={ element.label }
-								/>
-								{ !! element.description && (
-									<span className="dataviews-filters__search-widget-listitem-description">
-										{ element.description }
-									</span>
+				{ isLoading && (
+					<div className="dataviews-filters__search-widget-is-loading">
+						<Spinner />
+					</div>
+				) }
+				{ ! isLoading && matches.length === 0 && <NoResultsFound /> }
+				{ ! isLoading &&
+					!! matches.length &&
+					matches.map( ( element ) => {
+						return (
+							<Ariakit.ComboboxItem
+								resetValueOnSelect={ false }
+								key={ element.value }
+								value={ element.value }
+								className="dataviews-filters__search-widget-listitem"
+								hideOnClick={ false }
+								setValueOnClick={ false }
+								focusOnHover
+							>
+								{ filter.singleSelection && (
+									<SingleSelectionOption
+										selected={
+											currentValue === element.value
+										}
+									/>
 								) }
-							</span>
-						</Ariakit.ComboboxItem>
-					);
-				} ) }
-				{ ! matches.length && <p>{ __( 'No results found' ) }</p> }
+								{ ! filter.singleSelection && (
+									<MultiSelectionOption
+										selected={ currentValue.includes(
+											element.value
+										) }
+									/>
+								) }
+								<span>
+									<Ariakit.ComboboxItemValue
+										className="dataviews-filters__search-widget-filter-combobox-item-value"
+										value={ element.label }
+									/>
+									{ !! element.description && (
+										<span className="dataviews-filters__search-widget-listitem-description">
+											{ element.description }
+										</span>
+									) }
+								</span>
+							</Ariakit.ComboboxItem>
+						);
+					} ) }
+				{ ! isLoading && !! paginationInfo.totalItems && (
+					<TotalResultsCount count={ paginationInfo.totalItems } />
+				) }
 			</Ariakit.ComboboxList>
 		</Ariakit.ComboboxProvider>
 	);
 }
 
 export default function SearchWidget( props: SearchWidgetProps ) {
-	const { elements, isLoading } = useElements( {
-		elements: props.filter.elements,
-		getElements: props.filter.getElements,
-	} );
-
-	if ( isLoading ) {
-		return (
-			<div className="dataviews-filters__search-widget-no-elements">
-				<Spinner />
-			</div>
-		);
+	// Use ComboboxList when we have async search (getElements) or
+	// more than 10 static elements.
+	if ( props.filter.getElements || props.filter.elements.length > 10 ) {
+		return <ComboboxList { ...props } />;
 	}
-
-	if ( elements.length === 0 ) {
-		return (
-			<div className="dataviews-filters__search-widget-no-elements">
-				{ __( 'No elements found' ) }
-			</div>
-		);
-	}
-
-	const Widget = elements.length > 10 ? ComboboxList : ListBox;
-	return <Widget { ...props } filter={ { ...props.filter, elements } } />;
+	// Use ListBox for small static lists (≤10 items, easy to browse).
+	return <ListBox { ...props } />;
 }

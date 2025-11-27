@@ -14,6 +14,8 @@ import useElements from '../../hooks/use-elements';
 
 const { ValidatedFormTokenField } = unlock( privateApis );
 
+const QUERY_ALL_RESULTS = { perPage: -1 };
+
 export default function ArrayControl< Item >( {
 	data,
 	field,
@@ -27,6 +29,7 @@ export default function ArrayControl< Item >( {
 	const { elements, isLoading } = useElements( {
 		elements: field.elements,
 		getElements: field.getElements,
+		query: QUERY_ALL_RESULTS,
 	} );
 
 	// Convert stored values to element objects for the token field

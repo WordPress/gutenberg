@@ -14,6 +14,8 @@ import useElements from '../../hooks/use-elements';
 
 const { ValidatedRadioControl } = unlock( privateApis );
 
+const QUERY_ALL_RESULTS = { perPage: -1 };
+
 export default function Radio< Item >( {
 	data,
 	field,
@@ -25,6 +27,7 @@ export default function Radio< Item >( {
 	const { elements, isLoading } = useElements( {
 		elements: field.elements,
 		getElements: field.getElements,
+		query: QUERY_ALL_RESULTS,
 	} );
 	const value = getValue( { item: data } );
 

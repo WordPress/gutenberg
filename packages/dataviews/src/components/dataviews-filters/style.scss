@@ -182,6 +182,16 @@
 	}
 }
 
+.dataviews-filters__search-widget-results-count {
+	padding: $grid-unit-10 $grid-unit-15;
+	color: $gray-900;
+	font-weight: $font-weight-medium;
+	font-size: 11px;
+	text-transform: uppercase;
+	border-top: 1px solid $gray-200;
+	background: transparent;
+}
+
 .dataviews-filters__search-widget-listbox {
 	padding: $grid-unit-05;
 	overflow: auto;
@@ -412,4 +422,10 @@
 	align-items: center;
 	justify-content: center;
 	padding: $grid-unit-20;
+}
+
+.dataviews-filters__search-widget-is-loading {
+	display: flex;
+	align-items: center;
+	justify-content: center;
 }

@@ -14,6 +14,31 @@ export type DeepPartial< T > = {
 export type SortDirection = 'asc' | 'desc';
 
 /**
+ * Query parameters for getElements function.
+ */
+export type GetElementsQuery = {
+	search?: string;
+	include?: ( string | number )[];
+	perPage?: number;
+};
+
+/**
+ * Pagination information returned by getElements.
+ */
+export type GetElementsPaginationInfo = {
+	totalItems: number;
+	totalPages: number;
+};
+
+/**
+ * Result type for getElements function.
+ */
+export type GetElementsResult = {
+	elements: Option[];
+	paginationInfo?: GetElementsPaginationInfo;
+};
+
+/**
  * Generic option type.
  */
 export interface Option< Value extends any = any > {
@@ -253,9 +278,59 @@ export type Field< Item > = {
 	elements?: Option[];
 
 	/**
-	 * Retrieval function for elements.
+	 * Async function to fetch elements for a field.
+	 *
+	 * When implementing getElements, you should:
+	 *
+	 * 1. Return paginationInfo alongside with elements:
+	 *    - totalItems: Total number of available items
+	 *    - totalPages: Total number of pages (if pagination is supported)
+	 *
+	 * 2. Support the 'search' parameter:
+	 *    - Filter elements based on the user's search query
+	 *    - Used when user types in the filter dropdown search input
+	 *
+	 * 3. Support the 'include' parameter:
+	 *    - Return active/selected elements even if they don't match the search query.
+	 *    - Ensures currently selected values can be retrieved and displayed where needed,
+	 *      like in the filter summary, even if they are not included in the search results.
+	 *    - Example: If user has selected "John Doe" but searches for "Jane",
+	 *      "John Doe" should still appear because it's in the include array
+	 *
+	 * 4. Support the 'perPage' parameter:
+	 *    - Controls how many items to return per page
+	 *    - Use -1 to return all results (WordPress convention)
+	 *    - Form controls (radio, select, toggle-group) will pass perPage: -1
+	 *    - Search/filter interfaces may use pagination (perPage: 20, etc.)
+	 *
+	 * @example
+	 * ```typescript
+	 * getElements: async ({ search, include, perPage }) => {
+	 *   const params = new URLSearchParams();
+	 *   if (search) params.append('search', search);
+	 *   if (include?.length) params.append('include', include.join(','));
+	 *
+	 *   // Use perPage to control pagination
+	 *   const itemsPerPage = perPage ?? 20;
+	 *   params.append('per_page', itemsPerPage.toString());
+	 *
+	 *   const response = await fetch(`/api/elements?${params}`);
+	 *   const data = await response.json();
+	 *
+	 *   return {
+	 *     elements: data.items.map(item => ({
+	 *       value: item.id,
+	 *       label: item.name,
+	 *     })),
+	 *     paginationInfo: {
+	 *       totalItems: data.total,
+	 *       totalPages: data.pages,
+	 *     },
+	 *   };
+	 * }
+	 * ```
 	 */
-	getElements?: () => Promise< Option[] >;
+	getElements?: ( query?: GetElementsQuery ) => Promise< GetElementsResult >;
 
 	/**
 	 * Filter config for the field.
