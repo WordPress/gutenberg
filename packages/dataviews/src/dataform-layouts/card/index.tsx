@@ -91,18 +91,18 @@ const CollapsibleCardHeader = ( {
 			} }
 		>
 			{ children }
+			<Button
+				ref={ btnRef }
+				type="button"
+				__next40pxDefaultSize
+				variant="tertiary"
+				icon={ isOpen ? chevronUp : chevronDown }
+				aria-expanded={ isOpen }
+				aria-controls={ controlsId }
+				aria-label={ isOpen ? __( 'Collapse' ) : __( 'Expand' ) }
+				onClick={ onToggle }
+			/>
 		</div>
-		<Button
-			ref={ btnRef }
-			type="button"
-			__next40pxDefaultSize
-			variant="tertiary"
-			icon={ isOpen ? chevronUp : chevronDown }
-			aria-expanded={ isOpen }
-			aria-controls={ controlsId }
-			aria-label={ isOpen ? __( 'Collapse' ) : __( 'Expand' ) }
-			onClick={ onToggle }
-		/>
 	</OriginalCardHeader>
 );
 
