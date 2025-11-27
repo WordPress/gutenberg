@@ -399,6 +399,16 @@ function gutenberg_register_packages_styles( $styles ) {
 
 	gutenberg_override_style(
 		$styles,
+		'classic-theme-styles',
+		gutenberg_url( 'build/styles/block-library/classic.css' ),
+		array(),
+		$version
+	);
+	$styles->add_data( 'classic-theme-styles', 'rtl', 'replace' );
+	$styles->add_data( 'classic-theme-styles', 'path', gutenberg_dir_path() . 'build/styles/block-library/classic.css' );
+
+	gutenberg_override_style(
+		$styles,
 		'wp-list-reusable-blocks',
 		gutenberg_url( 'build/list-reusable-blocks/style.css' ),
 		array( 'wp-components' ),
