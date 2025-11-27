@@ -39,6 +39,7 @@ import { noop } from './utils';
 const { useBlockElementRef, cleanEmptyObject } = unlock(
 	blockEditorPrivateApis
 );
+const { RECEIVE_INTERMEDIATE_RESULTS } = unlock( coreStore );
 
 export function useBlockComments( postId ) {
 	const [ commentLastUpdated, reflowComments ] = useReducer(
@@ -46,18 +47,44 @@ export function useBlockComments( postId ) {
 		0
 	);
 
+	// Initial query to fetch top-level notes only.
 	const queryArgs = {
 		post: postId,
 		type: 'note',
 		status: 'all',
+		parent: 0,
+		per_page: 100,
+	};
+
+	const { records: topLevelThreads } = useEntityRecords(
+		'root',
+		'comment',
+		queryArgs,
+		{
+			enabled: !! postId && typeof postId === 'number',
+		}
+	);
+
+	// Background query: fetch all notes.
+	const allCommentsQueryArgs = {
+		post: postId,
+		type: 'note',
+		status: 'all',
 		per_page: -1,
+		[ RECEIVE_INTERMEDIATE_RESULTS ]: true,
 	};
 
 	const { records: threads } = useEntityRecords(
 		'root',
 		'comment',
-		queryArgs,
-		{ enabled: !! postId && typeof postId === 'number' }
+		allCommentsQueryArgs,
+		{
+			enabled:
+				!! postId &&
+				typeof postId === 'number' &&
+				topLevelThreads &&
+				topLevelThreads.length > 0,
+		}
 	);
 
 	const { getBlockAttributes } = useSelect( blockEditorStore );
