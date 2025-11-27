@@ -1175,4 +1175,15 @@ the selection correctly and we know where to split.
 
 ## visibility
 
+_**Note:** Since WordPress 6.9._
+
+-   Type: `boolean`
+-   Default value: `true`
+
 By default, a block can be hidden by a user from the block 'Options' dropdown. To disable this behavior, set visibility to false.
+
+```js
+supports: {
+	visibility: false,
+}
+```
