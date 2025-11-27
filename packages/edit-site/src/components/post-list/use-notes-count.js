@@ -23,6 +23,7 @@ export default function useNotesCount( postIds ) {
 			type: 'note',
 			status: 'all',
 			per_page: -1,
+			_fields: 'id,post',
 		},
 		{
 			enabled: postIds?.length > 0,
