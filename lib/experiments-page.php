@@ -210,6 +210,19 @@ function gutenberg_initialize_experiments_settings() {
 	);
 
 	add_settings_field(
+		'gutenberg-content-only-inspector-fields',
+		__( 'contentOnly: Enable editable inspector fields', 'gutenberg' ),
+		'gutenberg_display_experiment_field',
+		'gutenberg-experiments',
+		'gutenberg_experiments_section',
+		array(
+			'label'    => __( 'Enables editable inspector fields (media, links, alt text, etc.) in the content-only pattern editing interface. Requires "contentOnly: Make patterns contentOnly by default upon insertion" to be enabled.', 'gutenberg' ),
+			'id'       => 'gutenberg-content-only-inspector-fields',
+			'requires' => 'gutenberg-content-only-pattern-insertion',
+		)
+	);
+
+	add_settings_field(
 		'gutenberg-workflow-palette',
 		__( 'Workflow Palette', 'gutenberg' ),
 		'gutenberg_display_experiment_field',
@@ -246,14 +259,31 @@ add_action( 'admin_init', 'gutenberg_initialize_experiments_settings' );
  *
  * @since 6.3.0
  *
- * @param array $args ( $label, $id ).
+ * @param array $args ( $label, $id, $requires ).
  */
 function gutenberg_display_experiment_field( $args ) {
 	$options = get_option( 'gutenberg-experiments' );
 	$value   = isset( $options[ $args['id'] ] ) ? 1 : 0;
+
+	// Check if this experiment requires another experiment to be enabled
+	$is_disabled = false;
+	if ( isset( $args['requires'] ) ) {
+		$is_disabled = ! isset( $options[ $args['requires'] ] );
+		// If the required experiment is disabled, also disable this one
+		if ( $is_disabled && $value ) {
+			$value = 0;
+		}
+	}
 	?>
 		<label for="<?php echo $args['id']; ?>">
-			<input type="checkbox" name="<?php echo 'gutenberg-experiments[' . $args['id'] . ']'; ?>" id="<?php echo $args['id']; ?>" value="1" <?php checked( 1, $value ); ?> />
+			<input 
+				type="checkbox" 
+				name="<?php echo 'gutenberg-experiments[' . $args['id'] . ']'; ?>" 
+				id="<?php echo $args['id']; ?>" 
+				value="1" 
+				<?php checked( 1, $value ); ?>
+				<?php disabled( $is_disabled ); ?>
+			/>
 			<?php echo $args['label']; ?>
 		</label>
 	<?php
@@ -289,5 +319,13 @@ function gutenberg_handle_template_activate_setting_submission() {
 		update_option( 'active_templates', gutenberg_get_migrated_active_templates() );
 	} else {
 		delete_option( 'active_templates' );
+	}
+
+	// If the parent experiment (gutenberg-content-only-pattern-insertion) is disabled,
+	// automatically disable the sub-experiment (gutenberg-content-only-inspector-fields).
+	$gutenberg_experiments = get_option( 'gutenberg-experiments', array() );
+	if ( ! isset( $_POST['gutenberg-experiments']['gutenberg-content-only-pattern-insertion'] ) ) {
+		unset( $gutenberg_experiments['gutenberg-content-only-inspector-fields'] );
+		update_option( 'gutenberg-experiments', $gutenberg_experiments );
 	}
 }
