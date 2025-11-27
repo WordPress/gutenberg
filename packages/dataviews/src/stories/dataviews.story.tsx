@@ -189,14 +189,26 @@ const CustomEmptyComponent = () => (
 	</VStack>
 );
 
-const EmptyComponent = ( { customEmpty }: { customEmpty?: boolean } ) => {
+const EmptyComponent = ( {
+	customEmpty,
+	containerHeight,
+}: {
+	customEmpty?: boolean;
+	containerHeight?: 'auto' | '50vh' | '100vh';
+} ) => {
 	const [ view, setView ] = useState< View >( {
 		...DEFAULT_VIEW,
 		fields: [ 'title', 'description', 'categories' ],
 	} );
 
 	return (
-		<div style={ { height: 600 } }>
+		<div
+			style={ {
+				display: 'flex',
+				flexDirection: 'column',
+				height: containerHeight,
+			} }
+		>
 			<DataViews
 				getItemId={ ( item ) => item.id.toString() }
 				paginationInfo={ { totalItems: 0, totalPages: 0 } }
@@ -216,11 +228,17 @@ export const Empty = {
 	render: EmptyComponent,
 	args: {
 		customEmpty: false,
+		containerHeight: '50vh',
 	},
 	argTypes: {
 		customEmpty: {
 			control: 'boolean',
 			description: 'Use custom empty state with planet illustration',
+		},
+		containerHeight: {
+			control: 'select',
+			options: [ 'auto', '50vh', '100vh' ],
+			description: 'Height of the container',
 		},
 	},
 };
