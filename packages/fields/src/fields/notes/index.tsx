@@ -10,11 +10,11 @@ import { __ } from '@wordpress/i18n';
 import type { BasePost } from '../../types';
 
 interface PostWithNotesCount extends BasePost {
-	_notesCount?: number;
+	notesCount?: number;
 }
 
 const notesField: Field< PostWithNotesCount > = {
-	id: '_notesCount',
+	id: 'notesCount',
 	label: __( 'Notes' ),
 	type: 'integer',
 };

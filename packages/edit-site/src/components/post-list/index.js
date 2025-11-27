@@ -184,7 +184,7 @@ export default function PostList( { postType } ) {
 		if ( processedRecords ) {
 			return processedRecords.map( ( record ) => ( {
 				...record,
-				_notesCount: notesCount[ record.id ] ?? 0,
+				notesCount: notesCount[ record.id ] ?? 0,
 			} ) );
 		}
 
