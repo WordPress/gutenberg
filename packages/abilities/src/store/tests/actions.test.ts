@@ -93,7 +93,10 @@ describe( 'Store Actions', () => {
 
 			expect( mockDispatch ).toHaveBeenCalledWith( {
 				type: REGISTER_ABILITY,
-				ability,
+				ability: {
+					...ability,
+					meta: { _clientRegistered: true },
+				},
 			} );
 		} );
 
@@ -112,7 +115,10 @@ describe( 'Store Actions', () => {
 
 			expect( mockDispatch ).toHaveBeenCalledWith( {
 				type: REGISTER_ABILITY,
-				ability,
+				ability: {
+					...ability,
+					meta: { _clientRegistered: true },
+				},
 			} );
 		} );
 
@@ -295,7 +301,10 @@ describe( 'Store Actions', () => {
 
 				expect( mockDispatch ).toHaveBeenCalledWith( {
 					type: REGISTER_ABILITY,
-					ability,
+					ability: {
+						...ability,
+						meta: { _clientRegistered: true },
+					},
 				} );
 			}
 		} );
@@ -363,7 +372,10 @@ describe( 'Store Actions', () => {
 
 			expect( mockDispatch ).toHaveBeenCalledWith( {
 				type: REGISTER_ABILITY,
-				ability,
+				ability: {
+					...ability,
+					meta: { _clientRegistered: true },
+				},
 			} );
 		} );
 
@@ -757,7 +769,10 @@ describe( 'Store Actions', () => {
 			// Should successfully register with the new category
 			expect( mockDispatch ).toHaveBeenCalledWith( {
 				type: REGISTER_ABILITY,
-				ability,
+				ability: {
+					...ability,
+					meta: { _clientRegistered: true },
+				},
 			} );
 		} );
 	} );

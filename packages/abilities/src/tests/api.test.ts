@@ -344,9 +344,10 @@ describe( 'API functions', () => {
 				input_schema: { type: 'object' },
 				output_schema: { type: 'object' },
 				meta: {
+					_serverRegistered: true,
 					annotations: { readonly: true },
 				},
-				serverCallback: mockServerCallback,
+				callback: mockServerCallback,
 			};
 
 			const mockGetAbility = jest.fn().mockReturnValue( mockAbility );
@@ -378,12 +379,13 @@ describe( 'API functions', () => {
 				},
 				output_schema: { type: 'string' },
 				meta: {
+					_serverRegistered: true,
 					annotations: {
 						destructive: true,
 						idempotent: true,
 					},
 				},
-				serverCallback: mockServerCallback,
+				callback: mockServerCallback,
 			};
 
 			const mockGetAbility = jest.fn().mockReturnValue( mockAbility );
@@ -413,6 +415,7 @@ describe( 'API functions', () => {
 				input_schema: { type: 'object' },
 				output_schema: { type: 'object' },
 				callback: mockCallback,
+				meta: { _clientRegistered: true },
 			};
 
 			const mockGetAbility = jest.fn().mockReturnValue( mockAbility );
@@ -425,7 +428,7 @@ describe( 'API functions', () => {
 			).rejects.toThrow( 'Execution failed' );
 
 			expect( consoleErrorSpy ).toHaveBeenCalledWith(
-				'Error executing client ability test/client-ability:',
+				'Error executing ability test/client-ability:',
 				executionError
 			);
 
@@ -448,7 +451,8 @@ describe( 'API functions', () => {
 				category: 'test-category',
 				input_schema: { type: 'object' },
 				output_schema: { type: 'object' },
-				serverCallback: mockServerCallback,
+				callback: mockServerCallback,
+				meta: { _serverRegistered: true },
 			};
 
 			const mockGetAbility = jest.fn().mockReturnValue( mockAbility );
@@ -479,8 +483,9 @@ describe( 'API functions', () => {
 				category: 'test-category',
 				input_schema: { type: 'object' },
 				output_schema: { type: 'object' },
-				// No callback - should execute as server ability
-				serverCallback: mockServerCallback,
+				// Server ability - should execute without client validation
+				callback: mockServerCallback,
+				meta: { _serverRegistered: true },
 			};
 
 			const mockGetAbility = jest.fn().mockReturnValue( mockAbility );
@@ -516,6 +521,7 @@ describe( 'API functions', () => {
 					required: [ 'result' ],
 				},
 				callback: mockCallback,
+				meta: { _clientRegistered: true },
 			};
 
 			const mockGetAbility = jest.fn().mockReturnValue( mockAbility );
