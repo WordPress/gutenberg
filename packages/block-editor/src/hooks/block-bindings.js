@@ -191,7 +191,6 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 											key={ sourceKey }
 											args={ binding?.args }
 											attribute={ attribute }
-											blockName={ blockName }
 											sourceKey={ sourceKey }
 											data={ data }
 										/>
