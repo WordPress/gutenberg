@@ -513,7 +513,6 @@ export default function TypographyPanel( {
 			) }
 			{ hasAppearanceControl && (
 				<ToolsPanelItem
-					className="single-column"
 					label={ appearanceControlLabel }
 					hasValue={ hasFontAppearance }
 					onDeselect={ resetFontAppearance }
