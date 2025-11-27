@@ -61,13 +61,25 @@ const getPageNavigationCommandLoader = () =>
 			[ search ]
 		);
 
+		const sortedPages = useMemo( () => {
+			if ( ! pages ) {
+				return [];
+			}
+			return [ ...pages ].sort( ( a, b ) => {
+				if ( a.menu_order === b.menu_order ) {
+					return a.title.rendered.localeCompare( b.title.rendered );
+				}
+				return a.menu_order - b.menu_order;
+			} );
+		}, [ pages ] );
+
 		const commands = useMemo( () => {
 			// Don't show commands if not editing a page or if searching
 			if ( currentPostType !== 'page' || search ) {
 				return [];
 			}
 
-			return pages.map( ( pageRecord ) => ( {
+			return sortedPages.map( ( pageRecord ) => ( {
 				name: 'core/edit-site/navigate-to-page-' + pageRecord.id,
 				label: pageRecord.title?.rendered
 					? decodeEntities( pageRecord.title.rendered )
@@ -78,7 +90,7 @@ const getPageNavigationCommandLoader = () =>
 					close();
 				},
 			} ) );
-		}, [ currentPostType, pages, history, search ] );
+		}, [ currentPostType, sortedPages, history, search ] );
 
 		return {
 			commands,
