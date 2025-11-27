@@ -44,7 +44,7 @@ function LibraryFontVariant( {
 	const checkboxId = useId();
 
 	return (
-		<div className="font-library-modal__font-card">
+		<div className="font-library__font-card">
 			<Flex justify="flex-start" align="center" gap="1rem">
 				<CheckboxControl
 					checked={ isInstalled }

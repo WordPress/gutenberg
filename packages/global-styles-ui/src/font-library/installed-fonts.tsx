@@ -232,9 +232,9 @@ function InstalledFonts() {
 
 	const hasFonts = baseThemeFonts.length > 0 || baseCustomFonts.length > 0;
 	return (
-		<div className="font-library-modal__tabpanel-layout">
+		<div className="font-library__tabpanel-layout">
 			{ isResolvingLibrary && (
-				<div className="font-library-modal__loading">
+				<div className="font-library__loading">
 					<ProgressBar />
 				</div>
 			) }
@@ -263,7 +263,7 @@ function InstalledFonts() {
 								) }
 								{ baseThemeFonts.length > 0 && (
 									<VStack>
-										<h2 className="font-library-modal__fonts-title">
+										<h2 className="font-library__fonts-title">
 											{
 												/* translators: Heading for a list of fonts provided by the theme. */
 												_x( 'Theme', 'font source' )
@@ -276,12 +276,12 @@ function InstalledFonts() {
 										/* eslint-disable jsx-a11y/no-redundant-roles */ }
 										<ul
 											role="list"
-											className="font-library-modal__fonts-list"
+											className="font-library__fonts-list"
 										>
 											{ baseThemeFonts.map( ( font ) => (
 												<li
 													key={ font.slug }
-													className="font-library-modal__fonts-list-item"
+													className="font-library__fonts-list-item"
 												>
 													<FontCard
 														font={ font }
@@ -304,7 +304,7 @@ function InstalledFonts() {
 								) }
 								{ baseCustomFonts.length > 0 && (
 									<VStack>
-										<h2 className="font-library-modal__fonts-title">
+										<h2 className="font-library__fonts-title">
 											{
 												/* translators: Heading for a list of fonts installed by the user. */
 												_x( 'Custom', 'font source' )
@@ -317,12 +317,12 @@ function InstalledFonts() {
 										/* eslint-disable jsx-a11y/no-redundant-roles */ }
 										<ul
 											role="list"
-											className="font-library-modal__fonts-list"
+											className="font-library__fonts-list"
 										>
 											{ baseCustomFonts.map( ( font ) => (
 												<li
 													key={ font.slug }
-													className="font-library-modal__fonts-list-item"
+													className="font-library__fonts-list-item"
 												>
 													<FontCard
 														font={ font }
@@ -403,7 +403,7 @@ function InstalledFonts() {
 							<Spacer margin={ 4 } />
 							<VStack spacing={ 0 }>
 								<CheckboxControl
-									className="font-library-modal__select-all"
+									className="font-library__select-all"
 									label={ __( 'Select all' ) }
 									checked={ isSelectAllChecked }
 									onChange={ toggleSelectAll }
@@ -418,7 +418,7 @@ function InstalledFonts() {
 								/* eslint-disable jsx-a11y/no-redundant-roles */ }
 								<ul
 									role="list"
-									className="font-library-modal__fonts-list"
+									className="font-library__fonts-list"
 								>
 									{ libraryFontSelected &&
 										getFontFacesToDisplay(
@@ -426,7 +426,7 @@ function InstalledFonts() {
 										).map( ( face, i ) => (
 											<li
 												key={ `face${ i }` }
-												className="font-library-modal__fonts-list-item"
+												className="font-library__fonts-list-item"
 											>
 												<LibraryFontVariant
 													font={ libraryFontSelected }
@@ -441,10 +441,7 @@ function InstalledFonts() {
 						</Navigator.Screen>
 					</Navigator>
 
-					<HStack
-						justify="flex-end"
-						className="font-library-modal__footer"
-					>
+					<HStack justify="flex-end" className="font-library__footer">
 						{ isInstalling && <ProgressBar /> }
 						{ shouldDisplayDeleteButton && (
 							<Button
