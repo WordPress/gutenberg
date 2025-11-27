@@ -185,6 +185,9 @@ class Tests_Resolve_Patterns_In_Template_Parts extends WP_Test_REST_Controller_T
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
 
+		// Clean up template part.
+		wp_delete_post( $template_part_id, true );
+
 		$this->assertSame( 200, $response->get_status() );
 		$this->assertArrayHasKey( 'content', $data );
 
@@ -218,9 +221,6 @@ class Tests_Resolve_Patterns_In_Template_Parts extends WP_Test_REST_Controller_T
 		foreach ( $blocks as $block ) {
 			$this->assertNotSame( 'core/pattern', $block['blockName'], 'Pattern block should be resolved and not present in the content.' );
 		}
-
-		// Clean up.
-		wp_delete_post( $template_part_id, true );
 	}
 
 	/**
@@ -277,6 +277,10 @@ class Tests_Resolve_Patterns_In_Template_Parts extends WP_Test_REST_Controller_T
 		$request  = new WP_REST_Request( 'GET', '/wp/v2/template-parts' );
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
+
+		// Clean up template parts.
+		wp_delete_post( $template_part_id_1, true );
+		wp_delete_post( $template_part_id_2, true );
 
 		$this->assertSame( 200, $response->get_status() );
 		$this->assertIsArray( $data );
@@ -336,9 +340,5 @@ class Tests_Resolve_Patterns_In_Template_Parts extends WP_Test_REST_Controller_T
 		}
 		$this->assertFalse( $has_pattern_block, 'Pattern block should be resolved in template part 2.' );
 		$this->assertGreaterThanOrEqual( 2, $paragraph_count, 'Template part 2 should have resolved pattern content with multiple blocks.' );
-
-		// Clean up.
-		wp_delete_post( $template_part_id_1, true );
-		wp_delete_post( $template_part_id_2, true );
 	}
 }

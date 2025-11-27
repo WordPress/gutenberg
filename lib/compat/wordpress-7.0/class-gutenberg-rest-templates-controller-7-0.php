@@ -3,7 +3,6 @@
 /**
  * Core class used to access templates via the REST API for WordPress 7.0.
  *
- * Note: no changes have been made to this class.
  * This class extension exists only to override the core route,
  * and to ensure the gutenberg_resolve_pattern_blocks function is used in the prepare_item_for_response method.
  * See: https://github.com/WordPress/gutenberg/pull/73477
@@ -158,7 +157,13 @@ class Gutenberg_REST_Templates_Controller_7_0 extends WP_REST_Templates_Controll
 		 * in the editor, improving performance.
 		 */
 		$blocks        = parse_blocks( $item->content );
-		$blocks        = gutenberg_resolve_pattern_blocks( $blocks );
+		//////////////////////////////
+		// START CORE MODIFICATIONS //
+		//////////////////////////////
+		$blocks = gutenberg_resolve_pattern_blocks( $blocks );
+		//////////////////////////////
+		// END CORE MODIFICATIONS //
+		//////////////////////////////
 		$item->content = serialize_blocks( $blocks );
 
 		// Restores the more descriptive, specific name for use within this method.

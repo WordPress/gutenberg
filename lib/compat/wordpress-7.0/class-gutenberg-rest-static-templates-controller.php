@@ -1,6 +1,8 @@
 <?php
-
-class Gutenberg_REST_Static_Templates_Controller extends WP_REST_Templates_Controller {
+/**
+ * @see Gutenberg_REST_Templates_Controller_7_0
+ */
+class Gutenberg_REST_Static_Templates_Controller extends Gutenberg_REST_Templates_Controller_7_0 {
 	public function __construct() {
 		$this->rest_base = 'registered-templates';
 		$this->namespace = 'wp/v2';
