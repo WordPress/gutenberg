@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { getBlockType, store as blockStore } from '@wordpress/blocks';
+import { getBlockType, store as blocksStore } from '@wordpress/blocks';
 import {
 	__experimentalItemGroup as ItemGroup,
 	__experimentalText as Text,
@@ -86,7 +86,7 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 			const {
 				getAllBlockBindingsSources,
 				getBlockBindingsSourceFieldsList,
-			} = unlock( select( blockStore ) );
+			} = unlock( select( blocksStore ) );
 			const data = {};
 			Object.entries( getAllBlockBindingsSources() ).forEach(
 				( [ sourceName, source ] ) => {
