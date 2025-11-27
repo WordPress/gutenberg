@@ -63,18 +63,12 @@ export interface Ability {
 	output_schema?: Record< string, any >;
 
 	/**
-	 * Callback function for client-side abilities.
-	 * If present, the ability will be executed locally in the browser.
-	 * If not present, the ability will be executed via REST API on the server.
+	 * Callback function for ability execution.
+	 * For client-side abilities (meta._clientRegistered), executes locally in the browser.
+	 * For server-side abilities (meta._serverRegistered), executes via REST API on the server.
+	 * This property is required for all abilities.
 	 */
 	callback?: AbilityCallback;
-
-	/**
-	 * Server callback function for server-side abilities.
-	 * Used to execute abilities that run on the server.
-	 * The core-abilities package provides implementations for WordPress REST API.
-	 */
-	serverCallback?: AbilityCallback;
 
 	/**
 	 * Client Permission callback for abilities.
@@ -85,9 +79,16 @@ export interface Ability {
 
 	/**
 	 * Metadata about the ability.
+	 *
+	 * Special properties:
+	 * - _clientRegistered: true if the ability was registered on the client
+	 * - _serverRegistered: true if the ability was fetched from the server
+	 *
 	 * @see WP_Ability::get_meta()
 	 */
 	meta?: {
+		_clientRegistered?: boolean;
+		_serverRegistered?: boolean;
 		annotations?: {
 			readonly?: boolean | null;
 			destructive?: boolean | null;

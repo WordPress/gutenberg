@@ -27,7 +27,6 @@ const ABILITY_KEYS = [
 	'output_schema',
 	'meta',
 	'callback',
-	'serverCallback',
 	'permissionCallback',
 ] as const;
 

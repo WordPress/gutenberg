@@ -190,7 +190,7 @@ describe( 'API functions', () => {
 	} );
 
 	describe( 'executeAbility', () => {
-		it( 'should execute a server-side ability via serverCallback', async () => {
+		it( 'should execute a server-side ability via callback', async () => {
 			const mockServerCallback = jest
 				.fn()
 				.mockResolvedValue( { success: true, result: 'test' } );
@@ -207,7 +207,8 @@ describe( 'API functions', () => {
 					required: [ 'message' ],
 				},
 				output_schema: { type: 'object' },
-				serverCallback: mockServerCallback,
+				callback: mockServerCallback,
+				meta: { _serverRegistered: true },
 			};
 
 			const mockGetAbility = jest.fn().mockReturnValue( mockAbility );
@@ -237,6 +238,7 @@ describe( 'API functions', () => {
 				input_schema: { type: 'object' },
 				output_schema: { type: 'object' },
 				callback: mockCallback,
+				meta: { _clientRegistered: true },
 			};
 
 			const mockGetAbility = jest.fn().mockReturnValue( mockAbility );
@@ -281,6 +283,7 @@ describe( 'API functions', () => {
 				},
 				output_schema: { type: 'object' },
 				callback: mockCallback,
+				meta: { _clientRegistered: true },
 			};
 
 			const mockGetAbility = jest.fn().mockReturnValue( mockAbility );
@@ -311,9 +314,10 @@ describe( 'API functions', () => {
 				},
 				output_schema: { type: 'object' },
 				meta: {
+					_serverRegistered: true,
 					annotations: { readonly: true },
 				},
-				serverCallback: mockServerCallback,
+				callback: mockServerCallback,
 			};
 
 			const mockGetAbility = jest.fn().mockReturnValue( mockAbility );

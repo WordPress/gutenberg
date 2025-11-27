@@ -103,10 +103,19 @@ async function initializeAbilities(): Promise< void > {
 
 		if ( abilities && Array.isArray( abilities ) ) {
 			for ( const ability of abilities ) {
-				// Register the ability with a serverCallback
+				const meta: Record< string, any > =
+					! ability.meta ||
+					( Array.isArray( ability.meta ) &&
+						ability.meta.length === 0 )
+						? {}
+						: ability.meta;
+				meta._serverRegistered = true;
+
+				// Register the ability with a callback
 				registerAbility( {
 					...ability,
-					serverCallback: createServerCallback( ability ),
+					callback: createServerCallback( ability ),
+					meta,
 				} );
 			}
 		}

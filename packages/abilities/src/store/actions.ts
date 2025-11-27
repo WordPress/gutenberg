@@ -100,10 +100,19 @@ export function registerAbility( ability: Ability ) {
 			);
 		}
 
+		// Add _clientRegistered to meta if not server-registered
+		const meta = ability.meta || {};
+		if ( ! meta._serverRegistered ) {
+			meta._clientRegistered = true;
+		}
+
 		// All validation passed, dispatch the registration action
 		dispatch( {
 			type: REGISTER_ABILITY,
-			ability,
+			ability: {
+				...ability,
+				meta,
+			},
 		} );
 	};
 }

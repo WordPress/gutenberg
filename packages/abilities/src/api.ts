@@ -262,17 +262,17 @@ async function executeServerAbility(
 	ability: Ability,
 	input: AbilityInput
 ): Promise< AbilityOutput > {
-	if ( ! ability.serverCallback ) {
+	if ( ! ability.callback ) {
 		throw new Error(
 			sprintf(
-				'Server ability "%s" is missing serverCallback. Please ensure the appropriate server integration package (e.g. @wordpress/core-abilities) is loaded.',
+				'Server ability "%s" is missing callback. Please ensure the appropriate server integration package (e.g. @wordpress/core-abilities) is loaded.',
 				ability.name
 			)
 		);
 	}
 
 	try {
-		return await ability.serverCallback( input );
+		return await ability.callback( input );
 	} catch ( error ) {
 		// eslint-disable-next-line no-console
 		console.error( `Error executing ability ${ ability.name }:`, error );
@@ -300,7 +300,8 @@ export async function executeAbility(
 		throw new Error( sprintf( 'Ability not found: %s', name ) );
 	}
 
-	if ( ability.callback ) {
+	// Route based on meta property
+	if ( ability.meta?._clientRegistered ) {
 		return executeClientAbility( ability, input );
 	}
 
