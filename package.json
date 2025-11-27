@@ -282,9 +282,10 @@
 		"*.{js,json,ts,tsx,yml,yaml}": [
 			"wp-scripts format"
 		],
-		"*.{js,ts,tsx}": [
+		"**/*.{js,ts,tsx,jsx}": [
 			"npm run prelint",
-			"wp-scripts lint-js"
+			"wp-scripts lint-js",
+			"eslint --config .eslintrc.strict.js"
 		],
 		"*.scss": [
 			"wp-scripts lint-style"
