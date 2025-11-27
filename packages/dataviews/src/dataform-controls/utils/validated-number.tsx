@@ -157,7 +157,7 @@ export default function ValidatedNumber< Item >( {
 
 	return (
 		<ValidatedNumberControl
-			required={ !! isValid?.required }
+			required={ !! isValid.required }
 			customValidity={ getCustomValidity( isValid, validity ) }
 			label={ label }
 			help={ description }
@@ -166,8 +166,8 @@ export default function ValidatedNumber< Item >( {
 			__next40pxDefaultSize
 			hideLabelFromVision={ hideLabelFromVision }
 			step={ step }
-			min={ isValid?.min }
-			max={ isValid?.max }
+			min={ isValid.min ? isValid.min.constraint : undefined }
+			max={ isValid.max ? isValid.max.constraint : undefined }
 		/>
 	);
 }

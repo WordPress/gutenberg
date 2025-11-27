@@ -10,7 +10,7 @@ import type {
 	DataViewRenderFieldProps,
 	Field,
 	FormatInteger,
-	Rules,
+	NormalizedField,
 } from '../types';
 import type { FieldType } from '../types/private';
 import {
@@ -28,6 +28,10 @@ import {
 } from '../constants';
 import RenderFromElements from './utils/render-from-elements';
 import sort from './utils/sort-number';
+import isValidRequired from './utils/is-valid-required';
+import isValidMin from './utils/is-valid-min';
+import isValidMax from './utils/is-valid-max';
+import isValidElements from './utils/is-valid-elements';
 
 function getFormat< Item >( field: Field< Item > ): Required< FormatInteger > {
 	const fieldFormat = field.format as FormatInteger | undefined;
@@ -84,27 +88,22 @@ function render( { item, field }: DataViewRenderFieldProps< any > ) {
 	return formatInteger( Number( value ), format );
 }
 
-const isValid: Rules< any > = {
-	elements: true,
-	custom: ( item: any, normalizedField ) => {
-		const value = normalizedField.getValue( { item } );
-		if (
-			! [ undefined, '', null ].includes( value ) &&
-			! Number.isInteger( value )
-		) {
-			return __( 'Value must be an integer.' );
-		}
-
-		return null;
-	},
-};
+function isValidCustom< Item >( item: Item, field: NormalizedField< Item > ) {
+	const value = field.getValue( { item } );
+	if (
+		! [ undefined, '', null ].includes( value ) &&
+		! Number.isInteger( value )
+	) {
+		return __( 'Value must be an integer.' );
+	}
+	return null;
+}
 
 export default {
 	type: 'integer',
 	render,
 	Edit: 'integer',
 	sort,
-	isValid,
 	enableSorting: true,
 	enableGlobalSearch: false,
 	defaultOperators: [
@@ -132,4 +131,11 @@ export default {
 		OPERATOR_IS_NOT_ALL,
 	],
 	getFormat,
+	validate: {
+		required: isValidRequired,
+		min: isValidMin,
+		max: isValidMax,
+		elements: isValidElements,
+		custom: isValidCustom,
+	},
 } satisfies FieldType< any >;

@@ -26,9 +26,9 @@ import type {
 	FieldValidity,
 	Form,
 	Layout,
+	NormalizedRules,
 	PanelLayout,
 	RegularLayout,
-	Rules,
 } from '../types';
 import { unlock } from '../lock-unlock';
 import DateControl from '../dataform-controls/date';
@@ -497,7 +497,7 @@ const LayoutPanelComponent = ( {
 };
 
 function getCustomValidity< Item >(
-	isValid: Rules< Item >,
+	isValid: NormalizedRules< Item >,
 	validity: FieldValidity | undefined
 ) {
 	let customValidity;

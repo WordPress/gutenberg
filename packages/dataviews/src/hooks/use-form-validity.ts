@@ -23,36 +23,6 @@ import type {
 	NormalizedField,
 	NormalizedFormField,
 } from '../types';
-const isEmptyNullOrUndefined = ( value: any ) =>
-	[ undefined, '', null ].includes( value );
-
-const isArrayOrElementsEmptyNullOrUndefined = ( value: any ) => {
-	return (
-		! Array.isArray( value ) ||
-		value.length === 0 ||
-		value.every( ( element: any ) => isEmptyNullOrUndefined( element ) )
-	);
-};
-
-function isInvalidForRequired( fieldType: string | undefined, value: any ) {
-	if (
-		( fieldType === undefined && isEmptyNullOrUndefined( value ) ) ||
-		( fieldType === 'text' && isEmptyNullOrUndefined( value ) ) ||
-		( fieldType === 'email' && isEmptyNullOrUndefined( value ) ) ||
-		( fieldType === 'url' && isEmptyNullOrUndefined( value ) ) ||
-		( fieldType === 'telephone' && isEmptyNullOrUndefined( value ) ) ||
-		( fieldType === 'password' && isEmptyNullOrUndefined( value ) ) ||
-		( fieldType === 'integer' && isEmptyNullOrUndefined( value ) ) ||
-		( fieldType === 'number' && isEmptyNullOrUndefined( value ) ) ||
-		( fieldType === 'array' &&
-			isArrayOrElementsEmptyNullOrUndefined( value ) ) ||
-		( fieldType === 'boolean' && value !== true )
-	) {
-		return true;
-	}
-
-	return false;
-}
 
 function isFormValid( formValidity: FormValidity | undefined ): boolean {
 	if ( ! formValidity ) {
@@ -223,57 +193,12 @@ function handleElementsValidationAsync< Item >(
 				return;
 			}
 
-			const validValues = result.map( ( el ) => el.value );
 			if (
-				!! formField.field &&
-				formField.field.type !== 'array' &&
-				! validValues.includes( formField.field.getValue( { item } ) )
-			) {
-				setFormValidity( ( prev ) => {
-					const newFormValidity = setValidityAtPath(
-						prev,
-						{
-							elements: {
-								type: 'invalid',
-								message: __(
-									'Value must be one of the elements.'
-								),
-							},
-						},
-						[ ...path, formField.id ]
-					);
-					return newFormValidity;
-				} );
-				return;
-			}
-
-			if (
-				!! formField.field &&
-				formField.field.type === 'array' &&
-				! Array.isArray( formField.field.getValue( { item } ) )
-			) {
-				setFormValidity( ( prev ) => {
-					const newFormValidity = setValidityAtPath(
-						prev,
-						{
-							elements: {
-								type: 'invalid',
-								message: __( 'Value must be an array.' ),
-							},
-						},
-						[ ...path, formField.id ]
-					);
-					return newFormValidity;
-				} );
-				return;
-			}
-
-			if (
-				!! formField.field &&
-				formField.field.type === 'array' &&
-				formField.field
-					.getValue( { item } )
-					.some( ( v: any ) => ! validValues.includes( v ) )
+				formField.field?.isValid.elements &&
+				! formField.field.isValid.elements.validate( item, {
+					...formField.field,
+					elements: result,
+				} )
 			) {
 				setFormValidity( ( prev ) => {
 					const newFormValidity = setValidityAtPath(
@@ -434,12 +359,8 @@ function validateFormField< Item >(
 ): FieldValidity | undefined {
 	// Validate the field: isValid.required
 	if (
-		!! formField.field &&
-		formField.field.isValid.required &&
-		isInvalidForRequired(
-			formField.field.type,
-			formField.field.getValue( { item } )
-		)
+		formField.field?.isValid.required &&
+		! formField.field.isValid.required.validate( item, formField.field )
 	) {
 		return {
 			required: { type: 'invalid' },
@@ -448,168 +369,83 @@ function validateFormField< Item >(
 
 	// Validate the field: isValid.pattern
 	if (
-		!! formField.field &&
-		formField.field.isValid.pattern &&
-		( formField.field.type === 'text' ||
-			formField.field.type === 'email' ||
-			formField.field.type === 'url' ||
-			formField.field.type === 'telephone' ||
-			formField.field.type === 'password' )
+		formField.field?.isValid.pattern &&
+		! formField.field.isValid.pattern.validate( item, formField.field )
 	) {
-		const value = formField.field.getValue( { item } );
-		// Only validate pattern if the value is not empty
-		if ( ! isEmptyNullOrUndefined( value ) ) {
-			try {
-				const regex = new RegExp( formField.field.isValid.pattern );
-				if ( ! regex.test( String( value ) ) ) {
-					return {
-						pattern: {
-							type: 'invalid',
-							message: __(
-								'Value does not match the required pattern.'
-							),
-						},
-					};
-				}
-			} catch ( error ) {
-				return {
-					pattern: {
-						type: 'invalid',
-						message: __( 'Invalid pattern configuration.' ),
-					},
-				};
-			}
-		}
+		return {
+			pattern: {
+				type: 'invalid',
+				message: __( 'Value does not match the required pattern.' ),
+			},
+		};
 	}
 
 	// Validate the field: isValid.min
 	if (
-		!! formField.field &&
-		formField.field.isValid.min !== undefined &&
-		( formField.field.type === 'integer' ||
-			formField.field.type === 'number' )
+		formField.field?.isValid.min &&
+		! formField.field.isValid.min.validate( item, formField.field )
 	) {
-		const value = formField.field.getValue( { item } );
-		if ( ! isEmptyNullOrUndefined( value ) ) {
-			if ( Number( value ) < formField.field.isValid.min ) {
-				return {
-					min: {
-						type: 'invalid',
-						message: __( 'Value is below the minimum.' ),
-					},
-				};
-			}
-		}
+		return {
+			min: {
+				type: 'invalid',
+				message: __( 'Value is below the minimum.' ),
+			},
+		};
 	}
 
 	// Validate the field: isValid.max
 	if (
-		!! formField.field &&
-		formField.field.isValid.max !== undefined &&
-		( formField.field.type === 'integer' ||
-			formField.field.type === 'number' )
+		formField.field?.isValid.max &&
+		! formField.field.isValid.max.validate( item, formField.field )
 	) {
-		const value = formField.field.getValue( { item } );
-		if ( ! isEmptyNullOrUndefined( value ) ) {
-			if ( Number( value ) > formField.field.isValid.max ) {
-				return {
-					max: {
-						type: 'invalid',
-						message: __( 'Value is above the maximum.' ),
-					},
-				};
-			}
-		}
+		return {
+			max: {
+				type: 'invalid',
+				message: __( 'Value is above the maximum.' ),
+			},
+		};
 	}
 
 	// Validate the field: isValid.minLength
 	if (
-		!! formField.field &&
-		formField.field.isValid.minLength !== undefined &&
-		( formField.field.type === 'text' ||
-			formField.field.type === 'email' ||
-			formField.field.type === 'url' ||
-			formField.field.type === 'telephone' ||
-			formField.field.type === 'password' )
+		formField.field?.isValid.minLength &&
+		! formField.field.isValid.minLength.validate( item, formField.field )
 	) {
-		const value = formField.field.getValue( { item } );
-		if ( ! isEmptyNullOrUndefined( value ) ) {
-			if ( String( value ).length < formField.field.isValid.minLength ) {
-				return {
-					minLength: {
-						type: 'invalid',
-						message: __( 'Value is too short.' ),
-					},
-				};
-			}
-		}
+		return {
+			minLength: {
+				type: 'invalid',
+				message: __( 'Value is too short.' ),
+			},
+		};
 	}
 
 	// Validate the field: isValid.maxLength
 	if (
-		!! formField.field &&
-		formField.field.isValid.maxLength !== undefined &&
-		( formField.field.type === 'text' ||
-			formField.field.type === 'email' ||
-			formField.field.type === 'url' ||
-			formField.field.type === 'telephone' ||
-			formField.field.type === 'password' )
+		formField.field?.isValid.maxLength &&
+		! formField.field.isValid.maxLength.validate( item, formField.field )
 	) {
-		const value = formField.field.getValue( { item } );
-		if ( ! isEmptyNullOrUndefined( value ) ) {
-			if ( String( value ).length > formField.field.isValid.maxLength ) {
-				return {
-					maxLength: {
-						type: 'invalid',
-						message: __( 'Value is too long.' ),
-					},
-				};
-			}
-		}
+		return {
+			maxLength: {
+				type: 'invalid',
+				message: __( 'Value is too long.' ),
+			},
+		};
 	}
 
 	// Validate the field: isValid.elements (static)
 	if (
-		!! formField.field &&
-		formField.field.isValid.elements &&
+		formField.field?.isValid.elements &&
 		formField.field.hasElements &&
 		! formField.field.getElements &&
-		Array.isArray( formField.field.elements )
+		Array.isArray( formField.field.elements ) &&
+		! formField.field.isValid.elements.validate( item, formField.field )
 	) {
-		const value = formField.field.getValue( { item } );
-		const validValues = formField.field.elements.map( ( el ) => el.value );
-
-		if (
-			formField.field.type !== 'array' &&
-			! validValues.includes( value )
-		) {
-			return {
-				elements: {
-					type: 'invalid',
-					message: __( 'Value must be one of the elements.' ),
-				},
-			};
-		}
-
-		if ( formField.field.type === 'array' && ! Array.isArray( value ) ) {
-			return {
-				elements: {
-					type: 'invalid',
-					message: __( 'Value must be an array.' ),
-				},
-			};
-		}
-		if (
-			formField.field.type === 'array' &&
-			value.some( ( v: any ) => ! validValues.includes( v ) )
-		) {
-			return {
-				elements: {
-					type: 'invalid',
-					message: __( 'Value must be one of the elements.' ),
-				},
-			};
-		}
+		return {
+			elements: {
+				type: 'invalid',
+				message: __( 'Value must be one of the elements.' ),
+			},
+		};
 	}
 
 	// Validate the field: isValid.elements (async)
@@ -635,10 +471,10 @@ function validateFormField< Item >(
 
 	// Validate the field: isValid.custom (sync)
 	let customError;
-	if ( !! formField.field ) {
+	if ( !! formField.field && formField.field.isValid.custom ) {
 		try {
 			const value = formField.field.getValue( { item } );
-			customError = formField.field.isValid?.custom?.(
+			customError = formField.field.isValid.custom(
 				deepMerge(
 					item,
 					formField.field.setValue( {

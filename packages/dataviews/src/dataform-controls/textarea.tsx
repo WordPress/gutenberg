@@ -33,7 +33,7 @@ export default function Textarea< Item >( {
 
 	return (
 		<ValidatedTextareaControl
-			required={ !! isValid?.required }
+			required={ !! isValid.required }
 			customValidity={ getCustomValidity( isValid, validity ) }
 			label={ label }
 			placeholder={ placeholder }
@@ -41,8 +41,12 @@ export default function Textarea< Item >( {
 			help={ description }
 			onChange={ onChangeControl }
 			rows={ rows }
-			minLength={ isValid?.minLength }
-			maxLength={ isValid?.maxLength }
+			minLength={
+				isValid.minLength ? isValid.minLength.constraint : undefined
+			}
+			maxLength={
+				isValid.maxLength ? isValid.maxLength.constraint : undefined
+			}
 			__next40pxDefaultSize
 			__nextHasNoMarginBottom
 			hideLabelFromVision={ hideLabelFromVision }
