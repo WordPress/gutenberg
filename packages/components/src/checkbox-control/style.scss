@@ -35,7 +35,6 @@
 	vertical-align: top;
 	width: var(--checkbox-input-size);
 	height: var(--checkbox-input-size);
-	position: relative;
 
 	appearance: none;
 
@@ -62,9 +61,8 @@
 		content: none;
 	}
 
-	&::after {
+	&::after { /* increase clickable area */
 		content: "";
-		display: block;
 		inset: 0;
 		position: absolute;
 		width: calc(var(--checkbox-input-size) + var(--checkbox-input-margin) * 2);
@@ -72,7 +70,6 @@
 		padding: var(--checkbox-input-margin);
 		margin-left: calc(-1 * var(--checkbox-input-margin));
 		margin-top: calc(-1 * var(--checkbox-input-margin));
-		cursor: pointer;
 	}
 }
 
