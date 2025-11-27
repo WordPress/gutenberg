@@ -1616,6 +1616,80 @@ test.describe( 'Navigation block', () => {
 				await expect( linkInput ).toBeEnabled();
 			} );
 		} );
+
+		test( 'Page List renders HTML formatting in page titles', async ( {
+			editor,
+			admin,
+			requestUtils,
+		} ) => {
+			// Create a page with HTML in the title
+			await requestUtils.createPage( {
+				title: '<strong>Bold Title</strong>',
+				status: 'publish',
+			} );
+
+			// Insert Navigation block
+			await admin.createNewPost();
+			await editor.insertBlock( { name: 'core/navigation' } );
+
+			// Wait for Page List block to be visible
+			const pageListBlock = editor.canvas.getByRole( 'document', {
+				name: 'Block: Page List',
+			} );
+
+			await expect( pageListBlock ).toBeVisible( {
+				// Wait for the Nav and Page List block API requests to resolve.
+				timeout: 10000,
+			} );
+
+			// Locate the page list item
+			const pageItems = pageListBlock.locator( 'li' );
+
+			// Wait for Page List to load pages
+			await pageItems.first().waitFor( { state: 'visible' } );
+
+			// Find the link element - try to find by text content
+			// The link might show raw HTML or rendered HTML, so we'll check both
+			const links = pageListBlock.locator( 'a' );
+			const linkCount = await links.count();
+			expect( linkCount ).toBeGreaterThan( 0 );
+
+			// Find the link that contains our test page title
+			// It might be rendered as "Bold Title" or as raw "<strong>Bold Title</strong>"
+			let link = null;
+			for ( let i = 0; i < linkCount; i++ ) {
+				const currentLink = links.nth( i );
+				const text = await currentLink.textContent();
+				if (
+					text &&
+					( text.includes( 'Bold Title' ) ||
+						text.includes( '<strong>' ) )
+				) {
+					link = currentLink;
+					break;
+				}
+			}
+
+			expect( link ).not.toBeNull();
+			await expect( link ).toBeVisible();
+
+			// Verify text content shows "Bold Title" not raw HTML
+			await expect( link ).toHaveText( 'Bold Title' );
+
+			// Verify HTML is rendered (check for strong tag)
+			const strongElement = link.locator( 'css=strong' );
+			await expect( strongElement ).toBeVisible();
+			await expect( strongElement ).toHaveText( 'Bold Title' );
+
+			// Verify innerHTML contains the strong tag (not escaped)
+			const innerHTML = await link.innerHTML();
+			expect( innerHTML ).toContain( '<strong>' );
+			expect( innerHTML ).toContain( '</strong>' );
+			expect( innerHTML ).toContain( 'Bold Title' );
+			// Ensure it's not showing raw HTML as text
+			expect( innerHTML ).not.toContain( '&lt;strong&gt;' );
+			expect( innerHTML ).not.toContain( '&lt;/strong&gt;' );
+		} );
 	} );
 } );
 
