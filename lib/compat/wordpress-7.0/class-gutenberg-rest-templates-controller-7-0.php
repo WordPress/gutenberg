@@ -7,6 +7,8 @@
  * and to ensure the gutenberg_resolve_pattern_blocks function is used in the prepare_item_for_response method.
  * See: https://github.com/WordPress/gutenberg/pull/73477
  *
+ * Note: there are no changes in this class that need to be backported to core.
+ *
  * @see WP_REST_Templates_Controller
  */
 class Gutenberg_REST_Templates_Controller_7_0 extends WP_REST_Templates_Controller {
@@ -156,7 +158,7 @@ class Gutenberg_REST_Templates_Controller_7_0 extends WP_REST_Templates_Controll
 		 * Resolve pattern blocks so they don't need to be resolved client-side
 		 * in the editor, improving performance.
 		 */
-		$blocks        = parse_blocks( $item->content );
+		$blocks = parse_blocks( $item->content );
 		//////////////////////////////
 		// START CORE MODIFICATIONS //
 		//////////////////////////////
