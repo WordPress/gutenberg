@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/latex-to-mathml",
-	"version": "1.4.0",
+	"version": "1.4.1-next.8b30e05b0.0",
 	"description": "Convert LaTeX math syntax to MathML.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
