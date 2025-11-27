@@ -29,7 +29,7 @@ export default function BlockBindingsAttributeControl( {
 	attribute,
 	binding,
 	children,
-	data,
+	fields,
 } ) {
 	const { updateBlockBindings } = useBlockBindingsUtils();
 	const isMobile = useViewportMatch( 'medium', '<' );
@@ -53,7 +53,8 @@ export default function BlockBindingsAttributeControl( {
 		displayText = __( 'Source not registered' );
 	} else {
 		displayText =
-			data?.find( ( item ) => fastDeepEqual( item.args, args ) )?.label ||
+			fields?.find( ( item ) => fastDeepEqual( item.args, args ) )
+				?.label ||
 			source?.label ||
 			sourceName;
 	}

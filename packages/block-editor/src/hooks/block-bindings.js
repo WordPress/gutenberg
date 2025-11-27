@@ -161,7 +161,7 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 									key={ attribute }
 									attribute={ attribute }
 									binding={ binding }
-									data={
+									fields={
 										compatibleDataForAttribute?.[
 											sourceName
 										]
@@ -175,7 +175,7 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 								key={ attribute }
 								attribute={ attribute }
 								binding={ binding }
-								data={
+								fields={
 									compatibleDataForAttribute?.[ sourceName ]
 								}
 							>
@@ -186,13 +186,13 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 								>
 									{ Object.entries(
 										compatibleDataForAttribute
-									).map( ( [ sourceKey, data ] ) => (
+									).map( ( [ sourceKey, fields ] ) => (
 										<BlockBindingsSourceFieldsList
 											key={ sourceKey }
 											args={ binding?.args }
 											attribute={ attribute }
 											sourceKey={ sourceKey }
-											data={ data }
+											fields={ fields }
 										/>
 									) ) }
 								</Menu>

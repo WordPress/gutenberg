@@ -86,12 +86,12 @@ export default function BlockBindingsSourceFieldsList( {
 	args,
 	attribute,
 	sourceKey,
-	data,
+	fields,
 } ) {
 	const isMobile = useViewportMatch( 'medium', '<' );
 
 	// Only render source if it has compatible data.
-	if ( ! data || data.length === 0 ) {
+	if ( ! fields || fields.length === 0 ) {
 		return null;
 	}
 
@@ -107,7 +107,7 @@ export default function BlockBindingsSourceFieldsList( {
 			</Menu.SubmenuTriggerItem>
 			<Menu.Popover gutter={ 8 }>
 				<Menu.Group>
-					{ data.map( ( item ) => (
+					{ fields.map( ( item ) => (
 						<BlockBindingsSourceFieldsListItem
 							key={
 								sourceKey + JSON.stringify( item.args ) ||
