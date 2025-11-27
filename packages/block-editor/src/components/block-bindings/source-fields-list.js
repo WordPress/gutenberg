@@ -24,14 +24,14 @@ const { Menu } = unlock( componentsPrivateApis );
 function BlockBindingsSourceFieldsListItem( {
 	args,
 	attribute,
-	item,
+	field,
 	source,
 	sourceKey,
 } ) {
 	const itemBindings = {
 		source: sourceKey,
-		args: item.args || {
-			key: item.key,
+		args: field.args || {
+			key: field.key,
 		},
 	};
 
@@ -53,12 +53,12 @@ function BlockBindingsSourceFieldsListItem( {
 		<Menu.CheckboxItem
 			onChange={ () => {
 				const isCurrentlySelected =
-					fastDeepEqual( args, item.args ) ??
+					fastDeepEqual( args, field.args ) ??
 					// Deprecate key dependency in 7.0.
-					item.key === args?.key;
+					field.key === args?.key;
 
 				if ( isCurrentlySelected ) {
-					// Unset if the same item is selected again.
+					// Unset if the same field is selected again.
 					updateBlockBindings( {
 						[ attribute ]: undefined,
 					} );
@@ -71,12 +71,12 @@ function BlockBindingsSourceFieldsListItem( {
 			name={ attribute + '-binding' }
 			value={ values[ attribute ] }
 			checked={
-				fastDeepEqual( args, item.args ) ??
+				fastDeepEqual( args, field.args ) ??
 				// Deprecate key dependency in 7.0.
-				item.key === args?.key
+				field.key === args?.key
 			}
 		>
-			<Menu.ItemLabel>{ item.label }</Menu.ItemLabel>
+			<Menu.ItemLabel>{ field.label }</Menu.ItemLabel>
 			<Menu.ItemHelpText>{ values[ attribute ] }</Menu.ItemHelpText>
 		</Menu.CheckboxItem>
 	);
@@ -107,15 +107,15 @@ export default function BlockBindingsSourceFieldsList( {
 			</Menu.SubmenuTriggerItem>
 			<Menu.Popover gutter={ 8 }>
 				<Menu.Group>
-					{ fields.map( ( item ) => (
+					{ fields.map( ( field ) => (
 						<BlockBindingsSourceFieldsListItem
 							key={
-								sourceKey + JSON.stringify( item.args ) ||
-								item.key
+								sourceKey + JSON.stringify( field.args ) ||
+								field.key
 							}
 							args={ args }
 							attribute={ attribute }
-							item={ item }
+							field={ field }
 							source={ source }
 							sourceKey={ sourceKey }
 						/>

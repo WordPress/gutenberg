@@ -144,7 +144,7 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 						const compatibleFieldsForAttribute = {};
 						for ( const sourceKey in sources ) {
 							const fields = sources[ sourceKey ].filter(
-								( item ) => item.type === attributeType
+								( field ) => field.type === attributeType
 							);
 							if ( fields.length ) {
 								compatibleFieldsForAttribute[ sourceKey ] =

@@ -53,7 +53,7 @@ export default function BlockBindingsAttributeControl( {
 		displayText = __( 'Source not registered' );
 	} else {
 		displayText =
-			fields?.find( ( item ) => fastDeepEqual( item.args, args ) )
+			fields?.find( ( field ) => fastDeepEqual( field.args, args ) )
 				?.label ||
 			source?.label ||
 			sourceName;
