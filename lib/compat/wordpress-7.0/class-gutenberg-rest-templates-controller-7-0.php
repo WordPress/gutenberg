@@ -6,7 +6,7 @@
  * Note: no changes have been made to this class.
  * This class extension exists only to override the core route,
  * and to ensure the gutenberg_resolve_pattern_blocks function is used in the prepare_item_for_response method.
- * See: https://github.com/WordPress/gutenberg/pull/72988
+ * See: https://github.com/WordPress/gutenberg/pull/73477
  *
  * @see WP_REST_Templates_Controller
  */
