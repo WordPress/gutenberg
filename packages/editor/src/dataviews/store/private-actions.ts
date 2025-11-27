@@ -52,30 +52,17 @@ declare global {
 }
 
 /**
- * Check if a post type supports a given feature key (e.g., 'editor.notes').
+ * Check if a post type supports editor notes.
  *
  * @param supports The post type supports object.
- * @param key      The support key to check (e.g., 'editor.notes').
- * @return Whether the feature is supported.
+ * @return Whether editor notes are supported.
  */
-function checkSupport(
-	supports: PostType[ 'supports' ] = {},
-	key: string
-): boolean {
-	// Check for top-level support keys.
-	if ( supports[ key as keyof typeof supports ] !== undefined ) {
-		return !! supports[ key as keyof typeof supports ];
+function hasEditorNotesSupport( supports?: PostType[ 'supports' ] ): boolean {
+	const editor = supports?.editor;
+	if ( Array.isArray( editor ) ) {
+		return !! editor[ 0 ]?.notes;
 	}
-
-	const [ topKey, subKey ] = key.split( '.' );
-	const topSupport = supports[ topKey as keyof typeof supports ];
-
-	// Try to unwrap sub-properties from the superfluous array.
-	const [ subProperties ] = Array.isArray( topSupport ) ? topSupport : [];
-
-	return Array.isArray( subProperties )
-		? subProperties.includes( subKey )
-		: !! ( subProperties as Record< string, boolean > )?.[ subKey ];
+	return false;
 }
 
 export function registerEntityAction< Item >(
@@ -238,8 +225,7 @@ export const registerPostTypeSchema =
 			postTypeConfig.supports?.editor &&
 				postTypeConfig.viewable &&
 				postPreviewField,
-			checkSupport( postTypeConfig.supports, 'editor.notes' ) &&
-				notesField,
+			hasEditorNotesSupport( postTypeConfig.supports ) && notesField,
 		].filter( Boolean );
 		if ( postTypeConfig.supports?.title ) {
 			let _titleField;
