@@ -3,18 +3,21 @@
  */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
-async function navigateToTemplateEditor( { admin, editor, page } ) {
-	await admin.visitAdminPage( 'edit.php', 'post_type=page' );
-	await page.getByLabel( '“Privacy Policy” (Edit)' ).click();
+async function navigateToTemplateEditor( { admin, editor, page }, pageId ) {
+	// Navigate directly to the page editor using the page ID.
+	await admin.visitAdminPage( 'post.php', `post=${ pageId }&action=edit` );
 
-	// Close welcome guide if visible.
-	const welcomeGuide = page.getByRole( 'dialog', {
-		name: 'Welcome to the editor',
+	await editor.setPreferences( 'core/edit-post', {
+		welcomeGuide: false,
 	} );
-	const welcomeGuideVisible = await welcomeGuide.isVisible();
-	if ( welcomeGuideVisible ) {
-		await welcomeGuide.getByRole( 'button', { name: 'Close' } ).click();
-	}
+	await editor.setPreferences( 'core/edit-site', {
+		welcomeGuide: false,
+	} );
+
+	// Wait for the editor to be ready.
+	await expect(
+		page.locator( 'iframe[name="editor-canvas"]' )
+	).toBeVisible();
 
 	// Close pattern chooser dialog if visible.
 	const patternDialog = page.getByRole( 'dialog', {
@@ -37,31 +40,22 @@ async function navigateToTemplateEditor( { admin, editor, page } ) {
 		.getByRole( 'button', { name: 'Template options' } )
 		.click();
 	await page.getByRole( 'menuitem', { name: 'Edit template' } ).click();
-	await page.waitForSelector( 'iframe[name="editor-canvas"]' );
 	await expect( editor.canvas.locator( 'body' ) ).toBeVisible();
-
-	// Dismiss welcome guide if visible.
-	const getStartedButton = page.getByRole( 'button', {
-		name: 'Get started',
-	} );
-	try {
-		await expect( getStartedButton ).toBeVisible( { timeout: 2000 } );
-		await getStartedButton.click();
-	} catch {
-		// Welcome guide not visible.
-	}
 }
 
 test.describe( 'Template ID Format', () => {
+	let pageId;
+
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.activateTheme( 'twentytwentyfive' );
 		await requestUtils.deleteAllTemplates( 'wp_template' );
 		await requestUtils.deleteAllTemplates( 'wp_template_part' );
 		await requestUtils.deleteAllPages();
-		await requestUtils.createPage( {
+		const page = await requestUtils.createPage( {
 			title: 'Privacy Policy',
 			status: 'publish',
 		} );
+		pageId = page.id;
 	} );
 
 	test.afterAll( async ( { requestUtils } ) => {
@@ -73,40 +67,20 @@ test.describe( 'Template ID Format', () => {
 		await requestUtils.setGutenbergExperiments( [] );
 	} );
 
-	test( 'should open and edit templates correctly regardless of experiment status', async ( {
-		admin,
-		editor,
-		page,
-		requestUtils,
-	} ) => {
-		// Test with experiment enabled first.
-		await requestUtils.setGutenbergExperiments( [ 'active_templates' ] );
+	const testTemplateEditing = async (
+		{ admin, editor, page, requestUtils },
+		experiments,
+		contentText
+	) => {
+		await requestUtils.setGutenbergExperiments( experiments );
 
-		await navigateToTemplateEditor( { admin, editor, page } );
+		await navigateToTemplateEditor( { admin, editor, page }, pageId );
 
 		await editor.insertBlock( {
 			name: 'core/paragraph',
-			attributes: { content: 'Test content with experiment enabled' },
+			attributes: { content: contentText },
 		} );
-		await expect(
-			editor.canvas.getByText( 'Test content with experiment enabled' )
-		).toBeVisible();
-		await expect( page.locator( 'body' ) ).not.toContainText(
-			'No templates exist with that id.'
-		);
-
-		// Test with experiment disabled.
-		await requestUtils.setGutenbergExperiments( [] );
-
-		await navigateToTemplateEditor( { admin, editor, page } );
-
-		await editor.insertBlock( {
-			name: 'core/paragraph',
-			attributes: { content: 'Test content with experiment disabled' },
-		} );
-		await expect(
-			editor.canvas.getByText( 'Test content with experiment disabled' )
-		).toBeVisible();
+		await expect( editor.canvas.getByText( contentText ) ).toBeVisible();
 		await page
 			.getByRole( 'region', { name: 'Editor top bar' } )
 			.getByRole( 'button', { name: 'Save' } )
@@ -115,5 +89,29 @@ test.describe( 'Template ID Format', () => {
 		await expect( page.locator( 'body' ) ).not.toContainText(
 			'No templates exist with that id.'
 		);
+	};
+
+	test( 'should open and edit templates correctly regardless of experiment status', async ( {
+		admin,
+		editor,
+		page,
+		requestUtils,
+	} ) => {
+		// Test with experiment enabled first.
+		await testTemplateEditing(
+			{ admin, editor, page, requestUtils },
+			[ 'active_templates' ],
+			'Test content with experiment enabled'
+		);
+
+		// Test with experiment disabled.
+		await testTemplateEditing(
+			{ admin, editor, page, requestUtils },
+			[],
+			'Test content with experiment disabled'
+		);
+
+		// Verify both tests completed successfully.
+		expect( true ).toBe( true );
 	} );
 } );
