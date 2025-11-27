@@ -1,0 +1,15 @@
+.edit-site-zoom-out-page-navigation__prev,
+.edit-site-zoom-out-page-navigation__next {
+	position: absolute;
+	top: 50%;
+	transform: translateY(-50%);
+	z-index: 1000;
+}
+
+.edit-site-zoom-out-page-navigation__prev {
+	left: 0;
+}
+
+.edit-site-zoom-out-page-navigation__next {
+	right: 0;
+}

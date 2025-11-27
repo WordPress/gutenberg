@@ -33,6 +33,7 @@
 @use "./components/resizable-frame/style.scss" as *;
 @use "./components/pagination/style.scss" as *;
 @use "./components/sidebar-global-styles/style.scss" as *;
+@use "./components/zoom-out-page-navigation/style.scss" as *;
 
 /* stylelint-disable -- Disable reason: View Transitions not supported properly by stylelint. */
 ::view-transition-image-pair(root) {

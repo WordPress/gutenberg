@@ -46,6 +46,7 @@ import {
 	useSyncDeprecatedEntityIntoState,
 } from './use-resolve-edited-entity';
 import SitePreview from './site-preview';
+import ZoomOutPageNavigation from '../zoom-out-page-navigation';
 
 const { Editor, BackButton } = unlock( editorPrivateApis );
 const { useHistory, useLocation } = unlock( routerPrivateApis );
@@ -235,6 +236,7 @@ export default function EditSiteEditor( { isHomeRoute = false } ) {
 							<PluginTemplateSettingPanel.Slot />
 						)
 					}
+					extraContent={ <ZoomOutPageNavigation /> }
 				>
 					{ isEditMode && (
 						<BackButton>
