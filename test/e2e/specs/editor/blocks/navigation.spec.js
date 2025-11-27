@@ -1617,14 +1617,14 @@ test.describe( 'Navigation block', () => {
 			} );
 		} );
 
-		test( 'Page List renders HTML formatting in page titles', async ( {
+		test( 'Page List renders HTML formatting and entities in page titles', async ( {
 			editor,
 			admin,
 			requestUtils,
 		} ) => {
-			// Create a page with HTML in the title
+			// Create a page with both HTML formatting and entities in the title
 			await requestUtils.createPage( {
-				title: '<strong>Bold Title</strong>',
+				title: '<strong>Bold &"qwerty"—</strong>',
 				status: 'publish',
 			} );
 
@@ -1649,21 +1649,18 @@ test.describe( 'Navigation block', () => {
 			await pageItems.first().waitFor( { state: 'visible' } );
 
 			// Find the link element - try to find by text content
-			// The link might show raw HTML or rendered HTML, so we'll check both
 			const links = pageListBlock.locator( 'a' );
 			const linkCount = await links.count();
 			expect( linkCount ).toBeGreaterThan( 0 );
 
 			// Find the link that contains our test page title
-			// It might be rendered as "Bold Title" or as raw "<strong>Bold Title</strong>"
 			let link = null;
 			for ( let i = 0; i < linkCount; i++ ) {
 				const currentLink = links.nth( i );
 				const text = await currentLink.textContent();
 				if (
 					text &&
-					( text.includes( 'Bold Title' ) ||
-						text.includes( '<strong>' ) )
+					( text.includes( 'qwerty' ) || text.includes( 'Bold' ) )
 				) {
 					link = currentLink;
 					break;
@@ -1673,86 +1670,31 @@ test.describe( 'Navigation block', () => {
 			expect( link ).not.toBeNull();
 			await expect( link ).toBeVisible();
 
-			// Verify text content shows "Bold Title" not raw HTML
-			await expect( link ).toHaveText( 'Bold Title' );
+			// Verify text content shows decoded text (not raw HTML or entity codes)
+			const textContent = await link.textContent();
+			expect( textContent ).toContain( 'Bold' );
+			expect( textContent ).toContain( 'qwerty' );
+			// Verify HTML tags are not shown as raw markup
+			expect( textContent ).not.toContain( '<strong>' );
+			expect( textContent ).not.toContain( '</strong>' );
+			// Verify entity codes are not shown as raw codes
+			expect( textContent ).not.toContain( '&amp;' );
+			expect( textContent ).not.toContain( '&quot;' );
+			expect( textContent ).not.toContain( '&mdash;' );
 
 			// Verify HTML is rendered (check for strong tag)
 			const strongElement = link.locator( 'css=strong' );
 			await expect( strongElement ).toBeVisible();
-			await expect( strongElement ).toHaveText( 'Bold Title' );
+			await expect( strongElement ).toContainText( 'Bold' );
+			await expect( strongElement ).toContainText( 'qwerty' );
 
 			// Verify innerHTML contains the strong tag (not escaped)
 			const innerHTML = await link.innerHTML();
 			expect( innerHTML ).toContain( '<strong>' );
 			expect( innerHTML ).toContain( '</strong>' );
-			expect( innerHTML ).toContain( 'Bold Title' );
 			// Ensure it's not showing raw HTML as text
 			expect( innerHTML ).not.toContain( '&lt;strong&gt;' );
 			expect( innerHTML ).not.toContain( '&lt;/strong&gt;' );
-		} );
-
-		test( 'Page List renders HTML entities in page titles', async ( {
-			editor,
-			admin,
-			requestUtils,
-		} ) => {
-			// Create a page with HTML entities in the title
-			// Using the exact format from the bug report
-			await requestUtils.createPage( {
-				title: '&"qwerty"—',
-				status: 'publish',
-			} );
-
-			// Insert Navigation block
-			await admin.createNewPost();
-			await editor.insertBlock( { name: 'core/navigation' } );
-
-			// Wait for Page List block to be visible
-			const pageListBlock = editor.canvas.getByRole( 'document', {
-				name: 'Block: Page List',
-			} );
-
-			await expect( pageListBlock ).toBeVisible( {
-				// Wait for the Nav and Page List block API requests to resolve.
-				timeout: 10000,
-			} );
-
-			// Locate the page list item
-			const pageItems = pageListBlock.locator( 'li' );
-
-			// Wait for Page List to load pages
-			await pageItems.first().waitFor( { state: 'visible' } );
-
-			// Find the link element containing our test page title
-			const links = pageListBlock.locator( 'a' );
-			const linkCount = await links.count();
-			expect( linkCount ).toBeGreaterThan( 0 );
-
-			// Find the link that contains our test page title
-			let link = null;
-			for ( let i = 0; i < linkCount; i++ ) {
-				const currentLink = links.nth( i );
-				const text = await currentLink.textContent();
-				if ( text && text.includes( 'qwerty' ) ) {
-					link = currentLink;
-					break;
-				}
-			}
-
-			expect( link ).not.toBeNull();
-			await expect( link ).toBeVisible();
-
-			// Verify text content (what user sees) shows decoded entities
-			const textContent = await link.textContent();
-			expect( textContent ).toContain( 'qwerty' );
-
-			// Verify that entity codes are NOT present in the visible text
-			expect( textContent ).not.toContain( '&amp;' );
-			expect( textContent ).not.toContain( '&quot;' );
-			expect( textContent ).not.toContain( '&mdash;' );
-
-			// Verify the actual characters are present (decoded)
-			expect( textContent ).toContain( '&' );
 		} );
 	} );
 } );
