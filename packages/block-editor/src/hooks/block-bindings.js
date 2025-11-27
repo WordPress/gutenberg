@@ -141,19 +141,21 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 							attribute
 						);
 
-						const compatibleDataForAttribute = {};
+						const compatibleFieldsForAttribute = {};
 						for ( const sourceKey in sources ) {
 							const data = sources[ sourceKey ].filter(
 								( item ) => item.type === attributeType
 							);
 							if ( data.length ) {
-								compatibleDataForAttribute[ sourceKey ] = data;
+								compatibleFieldsForAttribute[ sourceKey ] =
+									data;
 							}
 						}
 
 						const isAttributeReadOnly =
 							readOnly ||
-							! Object.keys( compatibleDataForAttribute ).length;
+							! Object.keys( compatibleFieldsForAttribute )
+								.length;
 
 						if ( isAttributeReadOnly ) {
 							return (
@@ -162,7 +164,7 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 									attribute={ attribute }
 									binding={ binding }
 									fields={
-										compatibleDataForAttribute?.[
+										compatibleFieldsForAttribute?.[
 											sourceName
 										]
 									}
@@ -176,7 +178,7 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 								attribute={ attribute }
 								binding={ binding }
 								fields={
-									compatibleDataForAttribute?.[ sourceName ]
+									compatibleFieldsForAttribute?.[ sourceName ]
 								}
 							>
 								<Menu
@@ -185,7 +187,7 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 									}
 								>
 									{ Object.entries(
-										compatibleDataForAttribute
+										compatibleFieldsForAttribute
 									).map( ( [ sourceKey, fields ] ) => (
 										<BlockBindingsSourceFieldsList
 											key={ sourceKey }
