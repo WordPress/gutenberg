@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import type { ReactNode } from 'react';
+
+/**
  * WordPress dependencies
  */
 import {
@@ -13,7 +18,9 @@ import {
 	useMemo,
 	useState,
 	useRef,
+	useEffect,
 } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
 import { chevronDown, chevronUp } from '@wordpress/icons';
 
 /**
@@ -36,12 +43,12 @@ const NonCollapsibleCardHeader = ( {
 	children,
 	...props
 }: {
-	children: React.ReactNode;
+	children: ReactNode;
 } ) => (
 	<OriginalCardHeader isBorderless { ...props }>
 		<div
 			style={ {
-				height: '40px', // This is to match the chevron's __next40pxDefaultSize
+				height: '40px', // match the chevron's __next40pxDefaultSize
 				width: '100%',
 				display: 'flex',
 				justifyContent: 'space-between',
@@ -55,38 +62,41 @@ const NonCollapsibleCardHeader = ( {
 
 export function useCardHeader( layout: NormalizedCardLayout ) {
 	const { isOpened, isCollapsible } = layout;
-	const [ isOpen, setIsOpen ] = useState( isOpened );
+	const [ isOpen, setIsOpen ] = useState( !! isOpened );
 	const toggleButtonRef = useRef< HTMLButtonElement >( null );
+	const shouldFocusRef = useRef( false );
+
+	// keep internal state in sync if layout.isOpened changes later
+	useEffect( () => {
+		setIsOpen( !! isOpened );
+	}, [ isOpened ] );
 
 	const toggle = useCallback( () => {
-		// Store reference to the toggle button before state change
-		const currentToggleButton = toggleButtonRef.current;
-
+		shouldFocusRef.current = true;
 		setIsOpen( ( prev ) => ! prev );
-
-		// Restore focus to the toggle button after the state update and re-render
-		setTimeout( () => {
-			if ( currentToggleButton ) {
-				currentToggleButton.focus();
-			}
-		}, 0 );
 	}, [] );
+
+	// Return focus to the toggle button after the open state changes
+	useEffect( () => {
+		if ( shouldFocusRef.current && toggleButtonRef.current ) {
+			toggleButtonRef.current.focus();
+			shouldFocusRef.current = false;
+		}
+	}, [ isOpen ] );
 
 	const CollapsibleCardHeader = useCallback(
 		( {
 			children,
+			controlsId,
 			...props
 		}: {
-			children: React.ReactNode;
+			children: ReactNode;
+			controlsId?: string;
 			[ key: string ]: any;
 		} ) => (
 			<OriginalCardHeader
 				{ ...props }
-				onClick={ toggle }
-				style={ {
-					cursor: 'pointer',
-					...props.style,
-				} }
+				// Do not attach onClick to header; button controls the toggle.
 				isBorderless
 			>
 				<div
@@ -101,15 +111,18 @@ export function useCardHeader( layout: NormalizedCardLayout ) {
 				</div>
 				<Button
 					ref={ toggleButtonRef }
+					type="button"
 					__next40pxDefaultSize
 					variant="tertiary"
 					icon={ isOpen ? chevronUp : chevronDown }
 					aria-expanded={ isOpen }
-					aria-label={ isOpen ? 'Collapse' : 'Expand' }
+					aria-controls={ controlsId }
+					aria-label={ isOpen ? __( 'Collapse' ) : __( 'Expand' ) }
+					onClick={ toggle }
 				/>
 			</OriginalCardHeader>
 		),
-		[ toggle, isOpen ]
+		[ isOpen, toggle ]
 	);
 
 	const effectiveIsOpen = isCollapsible ? isOpen : true;
@@ -125,7 +138,7 @@ function isSummaryFieldVisible< Item >(
 	summaryConfig: NormalizedCardLayout[ 'summary' ],
 	isOpen: boolean
 ) {
-	// If no summary config, dont't show any fields
+	// If no summary config, don't show any fields
 	if (
 		! summaryConfig ||
 		( Array.isArray( summaryConfig ) && summaryConfig.length === 0 )
@@ -197,29 +210,22 @@ export default function FormCardField< Item >( {
 		isSummaryFieldVisible( summaryField, layout.summary, isOpen )
 	);
 
-	const sizeCard = {
-		blockStart: 'medium' as const,
-		blockEnd: 'medium' as const,
-		inlineStart: 'medium' as const,
-		inlineEnd: 'medium' as const,
-	};
+	// Stable id to connect the toggle button to the collapsible body
+	const panelId = useMemo(
+		() => `df-card-panel-${ String( field.id ) }`,
+		[ field.id ]
+	);
 
 	if ( !! field.children ) {
 		const withHeader = !! field.label && layout.withHeader;
 
-		const sizeCardBody = {
-			blockStart: withHeader
-				? ( 'none' as const )
-				: ( 'medium' as const ),
-			blockEnd: 'medium' as const,
-			inlineStart: 'medium' as const,
-			inlineEnd: 'medium' as const,
-		};
-
 		return (
-			<Card className="dataforms-layouts-card__field" size={ sizeCard }>
+			<Card className="dataforms-layouts-card__field">
 				{ withHeader && (
-					<CardHeader className="dataforms-layouts-card__field-header">
+					<CardHeader
+						className="dataforms-layouts-card__field-header"
+						controlsId={ panelId }
+					>
 						<span className="dataforms-layouts-card__field-header-label">
 							{ field.label }
 						</span>
@@ -240,10 +246,8 @@ export default function FormCardField< Item >( {
 					</CardHeader>
 				) }
 				{ ( isOpen || ! withHeader ) && (
-					// If it doesn't have a header, keep it open.
-					// Otherwise, the card will not be visible.
 					<CardBody
-						size={ sizeCardBody }
+						id={ panelId }
 						className="dataforms-layouts-card__field-control"
 					>
 						{ field.description && (
@@ -277,17 +281,13 @@ export default function FormCardField< Item >( {
 	}
 	const withHeader = !! fieldDefinition.label && layout.withHeader;
 
-	const sizeCardBody = {
-		blockStart: withHeader ? ( 'none' as const ) : ( 'medium' as const ),
-		blockEnd: 'medium' as const,
-		inlineStart: 'medium' as const,
-		inlineEnd: 'medium' as const,
-	};
-
 	return (
-		<Card className="dataforms-layouts-card__field" size={ sizeCard }>
+		<Card className="dataforms-layouts-card__field">
 			{ withHeader && (
-				<CardHeader className="dataforms-layouts-card__field-header">
+				<CardHeader
+					className="dataforms-layouts-card__field-header"
+					controlsId={ panelId }
+				>
 					<span className="dataforms-layouts-card__field-header-label">
 						{ fieldDefinition.label }
 					</span>
@@ -305,10 +305,8 @@ export default function FormCardField< Item >( {
 				</CardHeader>
 			) }
 			{ ( isOpen || ! withHeader ) && (
-				// If it doesn't have a header, keep it open.
-				// Otherwise, the card will not be visible.
 				<CardBody
-					size={ sizeCardBody }
+					id={ panelId }
 					className="dataforms-layouts-card__field-control"
 				>
 					<RegularLayout
