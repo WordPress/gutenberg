@@ -165,70 +165,81 @@ export function unregisterAbilityCategory( slug: string ): void {
 }
 
 /**
- * Execute a client-side ability.
+ * Execute an ability.
  *
- * @param ability The ability to execute.
- * @param input   Input parameters for the ability.
+ * Executes abilities with validation for client-side abilities only.
+ * Server abilities bypass validation as it's handled on the server.
+ *
+ * @param name  The ability name.
+ * @param input Optional input parameters for the ability.
  * @return Promise resolving to the ability execution result.
- * @throws Error if validation fails or execution errors.
+ * @throws Error if the ability is not found or execution fails.
  */
-async function executeClientAbility(
-	ability: Ability,
-	input: AbilityInput
+export async function executeAbility(
+	name: string,
+	input?: AbilityInput
 ): Promise< AbilityOutput > {
+	const ability = getAbility( name );
+	if ( ! ability ) {
+		throw new Error( sprintf( 'Ability not found: %s', name ) );
+	}
+
 	if ( ! ability.callback ) {
 		throw new Error(
 			sprintf(
-				'Client ability %s is missing callback function',
+				'Ability "%s" is missing callback. Please ensure the ability is properly registered.',
 				ability.name
 			)
 		);
 	}
 
-	// Check permission callback if defined
-	if ( ability.permissionCallback ) {
-		const hasPermission = await ability.permissionCallback( input );
-		if ( ! hasPermission ) {
-			const error = new Error(
-				sprintf( 'Permission denied for ability: %s', ability.name )
+	// Only validate for client-side abilities
+	if ( ability.meta?._clientRegistered ) {
+		// Check permission callback if defined
+		if ( ability.permissionCallback ) {
+			const hasPermission = await ability.permissionCallback( input );
+			if ( ! hasPermission ) {
+				const error = new Error(
+					sprintf( 'Permission denied for ability: %s', ability.name )
+				);
+				( error as any ).code = 'ability_permission_denied';
+				throw error;
+			}
+		}
+
+		// Validate input
+		if ( ability.input_schema ) {
+			const inputValidation = validateValueFromSchema(
+				input,
+				ability.input_schema,
+				'input'
 			);
-			( error as any ).code = 'ability_permission_denied';
-			throw error;
+			if ( inputValidation !== true ) {
+				const error = new Error(
+					sprintf(
+						'Ability "%1$s" has invalid input. Reason: %2$s',
+						ability.name,
+						inputValidation
+					)
+				);
+				( error as any ).code = 'ability_invalid_input';
+				throw error;
+			}
 		}
 	}
 
-	if ( ability.input_schema ) {
-		const inputValidation = validateValueFromSchema(
-			input,
-			ability.input_schema,
-			'input'
-		);
-		if ( inputValidation !== true ) {
-			const error = new Error(
-				sprintf(
-					'Ability "%1$s" has invalid input. Reason: %2$s',
-					ability.name,
-					inputValidation
-				)
-			);
-			( error as any ).code = 'ability_invalid_input';
-			throw error;
-		}
-	}
-
+	// Execute the ability
 	let result: AbilityOutput;
 	try {
 		result = await ability.callback( input );
 	} catch ( error ) {
 		// eslint-disable-next-line no-console
-		console.error(
-			`Error executing client ability ${ ability.name }:`,
-			error
-		);
+		console.error( `Error executing ability ${ ability.name }:`, error );
 		throw error;
 	}
 
-	if ( ability.output_schema ) {
+	// Only validate output for client-side abilities
+	if ( ability.meta?._clientRegistered && ability.output_schema ) {
 		const outputValidation = validateValueFromSchema(
 			result,
 			ability.output_schema,
@@ -248,62 +259,4 @@ async function executeClientAbility(
 	}
 
 	return result;
-}
-
-/**
- * Execute a server-side ability.
- *
- * @param ability The ability to execute.
- * @param input   Input parameters for the ability.
- * @return Promise resolving to the ability execution result.
- * @throws Error if the ability has no serverCallback.
- */
-async function executeServerAbility(
-	ability: Ability,
-	input: AbilityInput
-): Promise< AbilityOutput > {
-	if ( ! ability.callback ) {
-		throw new Error(
-			sprintf(
-				'Server ability "%s" is missing callback. Please ensure the appropriate server integration package (e.g. @wordpress/core-abilities) is loaded.',
-				ability.name
-			)
-		);
-	}
-
-	try {
-		return await ability.callback( input );
-	} catch ( error ) {
-		// eslint-disable-next-line no-console
-		console.error( `Error executing ability ${ ability.name }:`, error );
-		throw error;
-	}
-}
-
-/**
- * Execute an ability.
- *
- * Determines whether to execute locally (client abilities) or remotely (server abilities)
- * based on whether the ability has a callback function.
- *
- * @param name  The ability name.
- * @param input Optional input parameters for the ability.
- * @return Promise resolving to the ability execution result.
- * @throws Error if the ability is not found or execution fails.
- */
-export async function executeAbility(
-	name: string,
-	input?: AbilityInput
-): Promise< AbilityOutput > {
-	const ability = getAbility( name );
-	if ( ! ability ) {
-		throw new Error( sprintf( 'Ability not found: %s', name ) );
-	}
-
-	// Route based on meta property
-	if ( ability.meta?._clientRegistered ) {
-		return executeClientAbility( ability, input );
-	}
-
-	return executeServerAbility( ability, input );
 }
