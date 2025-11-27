@@ -192,9 +192,11 @@ const CustomEmptyComponent = () => (
 const EmptyComponent = ( {
 	customEmpty,
 	containerHeight,
+	isLoading,
 }: {
 	customEmpty?: boolean;
 	containerHeight?: 'auto' | '50vh' | '100vh';
+	isLoading?: boolean;
 } ) => {
 	const [ view, setView ] = useState< View >( {
 		...DEFAULT_VIEW,
@@ -218,6 +220,7 @@ const EmptyComponent = ( {
 				onChangeView={ setView }
 				actions={ actions }
 				defaultLayouts={ defaultLayouts }
+				isLoading={ isLoading }
 				empty={ customEmpty ? <CustomEmptyComponent /> : undefined }
 			/>
 		</div>
@@ -229,6 +232,7 @@ export const Empty = {
 	args: {
 		customEmpty: false,
 		containerHeight: '50vh',
+		isLoading: false,
 	},
 	argTypes: {
 		customEmpty: {
@@ -239,6 +243,10 @@ export const Empty = {
 			control: 'select',
 			options: [ 'auto', '50vh', '100vh' ],
 			description: 'Height of the container',
+		},
+		isLoading: {
+			control: 'boolean',
+			description: 'Show loading state',
 		},
 	},
 };
