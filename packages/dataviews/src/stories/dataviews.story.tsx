@@ -161,7 +161,35 @@ Default.argTypes = {
 	},
 };
 
-export const Empty = () => {
+const PlanetIllustration = () => (
+	<svg
+		width="120"
+		height="120"
+		viewBox="0 0 120 120"
+		fill="none"
+		style={ { opacity: 0.6 } }
+	>
+		<circle cx="60" cy="60" r="35" fill="#9ca3af" />
+		<ellipse
+			cx="60"
+			cy="60"
+			rx="55"
+			ry="12"
+			stroke="#9ca3af"
+			strokeWidth="3"
+			fill="none"
+		/>
+	</svg>
+);
+
+const CustomEmptyComponent = () => (
+	<VStack alignment="center" justify="center" spacing={ 3 }>
+		<PlanetIllustration />
+		<Text>No celestial bodies found</Text>
+	</VStack>
+);
+
+const EmptyComponent = ( { customEmpty }: { customEmpty?: boolean } ) => {
 	const [ view, setView ] = useState< View >( {
 		...DEFAULT_VIEW,
 		fields: [ 'title', 'description', 'categories' ],
@@ -177,29 +205,22 @@ export const Empty = () => {
 			onChangeView={ setView }
 			actions={ actions }
 			defaultLayouts={ defaultLayouts }
+			empty={ customEmpty ? <CustomEmptyComponent /> : undefined }
 		/>
 	);
 };
 
-export const CustomEmpty = () => {
-	const [ view, setView ] = useState< View >( {
-		...DEFAULT_VIEW,
-		fields: [ 'title', 'description', 'categories' ],
-	} );
-
-	return (
-		<DataViews
-			getItemId={ ( item ) => item.id.toString() }
-			paginationInfo={ { totalItems: 0, totalPages: 0 } }
-			data={ [] }
-			view={ view }
-			fields={ fields }
-			onChangeView={ setView }
-			actions={ actions }
-			defaultLayouts={ defaultLayouts }
-			empty={ <p>{ view.search ? 'No sites found' : 'No sites' }</p> }
-		/>
-	);
+export const Empty = {
+	render: EmptyComponent,
+	args: {
+		customEmpty: false,
+	},
+	argTypes: {
+		customEmpty: {
+			control: 'boolean',
+			description: 'Use custom empty state with planet illustration',
+		},
+	},
 };
 
 const MinimalUIComponent = ( {
