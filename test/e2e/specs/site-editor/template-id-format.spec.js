@@ -3,6 +3,16 @@
  */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
+async function closeWelcomeGuide( page, buttonName = 'Get started' ) {
+	const welcomeGuide = page.getByRole( 'dialog', {
+		name: /^Welcome to the/i,
+	} );
+	const welcomeGuideVisible = await welcomeGuide.isVisible();
+	if ( welcomeGuideVisible ) {
+		await welcomeGuide.getByRole( 'button', { name: buttonName } ).click();
+	}
+}
+
 async function navigateToTemplateEditor( { admin, editor, page }, pageId ) {
 	// Navigate directly to the page editor using the page ID.
 	await admin.visitAdminPage( 'post.php', `post=${ pageId }&action=edit` );
@@ -41,6 +51,8 @@ async function navigateToTemplateEditor( { admin, editor, page }, pageId ) {
 		.click();
 	await page.getByRole( 'menuitem', { name: 'Edit template' } ).click();
 	await expect( editor.canvas.locator( 'body' ) ).toBeVisible();
+
+	await closeWelcomeGuide( page );
 }
 
 test.describe( 'Template ID Format', () => {
@@ -81,6 +93,9 @@ test.describe( 'Template ID Format', () => {
 			attributes: { content: contentText },
 		} );
 		await expect( editor.canvas.getByText( contentText ) ).toBeVisible();
+
+		await closeWelcomeGuide( page );
+
 		await page
 			.getByRole( 'region', { name: 'Editor top bar' } )
 			.getByRole( 'button', { name: 'Save' } )
