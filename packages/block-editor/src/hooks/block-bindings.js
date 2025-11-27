@@ -111,12 +111,12 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 
 	const { bindings } = metadata || {};
 
-	const hasCompatibleData = Object.keys( sources ).length > 0;
+	const hasCompatibleFields = Object.keys( sources ).length > 0;
 
 	// Lock the UI when the user can't update bindings or there are no fields to connect to.
-	const readOnly = ! canUpdateBlockBindings || ! hasCompatibleData;
+	const readOnly = ! canUpdateBlockBindings || ! hasCompatibleFields;
 
-	if ( bindings === undefined && ! hasCompatibleData ) {
+	if ( bindings === undefined && ! hasCompatibleFields ) {
 		return null;
 	}
 
