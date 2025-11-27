@@ -91,27 +91,35 @@ test.describe( 'Template ID Format', () => {
 		);
 	};
 
-	test( 'should open and edit templates correctly regardless of experiment status', async ( {
+	test( 'should open and edit templates correctly when active_templates experiment is enabled', async ( {
 		admin,
 		editor,
 		page,
 		requestUtils,
 	} ) => {
-		// Test with experiment enabled first.
 		await testTemplateEditing(
 			{ admin, editor, page, requestUtils },
 			[ 'active_templates' ],
 			'Test content with experiment enabled'
 		);
 
-		// Test with experiment disabled.
+		// Verify test completed successfully.
+		expect( true ).toBe( true );
+	} );
+
+	test( 'should open and edit templates correctly when active_templates experiment is disabled', async ( {
+		admin,
+		editor,
+		page,
+		requestUtils,
+	} ) => {
 		await testTemplateEditing(
 			{ admin, editor, page, requestUtils },
 			[],
 			'Test content with experiment disabled'
 		);
 
-		// Verify both tests completed successfully.
+		// Verify test completed successfully.
 		expect( true ).toBe( true );
 	} );
 } );
