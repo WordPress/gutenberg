@@ -1172,3 +1172,7 @@ is only meant for simple text blocks such as paragraphs and headings with a
 single `RichText` field. RichText in the `edit` function _must_ have an
 `identifier` prop that matches the attribute key of the text, so that it updates
 the selection correctly and we know where to split.
+
+## visibility
+
+By default, a block can be hidden by a user from the block 'Options' dropdown. To disable this behavior, set visibility to false.
