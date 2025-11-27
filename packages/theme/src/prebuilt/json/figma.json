@@ -56,61 +56,61 @@
 	},
 	"Color/Semantic/Background/Success/bgSur-success": {
 		"value": {
-			".": "#cbf5d1"
+			".": "#c5f7cc"
 		},
 		"description": "Background color for surfaces with success tone and normal emphasis."
 	},
 	"Color/Semantic/Background/Success/bgSur-success-weak": {
 		"value": {
-			".": "#f0fcf2"
+			".": "#eaffed"
 		},
 		"description": "Background color for surfaces with success tone and weak emphasis."
 	},
 	"Color/Semantic/Background/Info/bgSur-info": {
 		"value": {
-			".": "#dfebf8"
+			".": "#deebfa"
 		},
 		"description": "Background color for surfaces with info tone and normal emphasis."
 	},
 	"Color/Semantic/Background/Info/bgSur-info-weak": {
 		"value": {
-			".": "#f5f9fd"
+			".": "#f3f9ff"
 		},
 		"description": "Background color for surfaces with info tone and weak emphasis."
 	},
 	"Color/Semantic/Background/Warning/bgSur-warning": {
 		"value": {
-			".": "#f8e8cc"
+			".": "#fde6bd"
 		},
 		"description": "Background color for surfaces with warning tone and normal emphasis."
 	},
 	"Color/Semantic/Background/Warning/bgSur-warning-weak": {
 		"value": {
-			".": "#fdf7ee"
+			".": "#fff7e0"
 		},
 		"description": "Background color for surfaces with warning tone and weak emphasis."
 	},
 	"Color/Semantic/Background/Caution/bgSur-caution": {
 		"value": {
-			".": "#f7eab3"
+			".": "#fee994"
 		},
 		"description": "Background color for surfaces with caution tone and normal emphasis."
 	},
 	"Color/Semantic/Background/Caution/bgSur-caution-weak": {
 		"value": {
-			".": "#fdf9e7"
+			".": "#fff9c9"
 		},
 		"description": "Background color for surfaces with caution tone and weak emphasis."
 	},
 	"Color/Semantic/Background/Error/bgSur-error": {
 		"value": {
-			".": "#fae4e1"
+			".": "#f6e6e3"
 		},
 		"description": "Background color for surfaces with error tone and normal emphasis."
 	},
 	"Color/Semantic/Background/Error/bgSur-error-weak": {
 		"value": {
-			".": "#fdf6f5"
+			".": "#fff6f4"
 		},
 		"description": "Background color for surfaces with error tone and weak emphasis."
 	},
@@ -176,7 +176,7 @@
 	},
 	"Color/Semantic/Background/Brand/bgInt-brand-active": {
 		"value": {
-			".": "#f6f8fc"
+			".": "#f6f8fd"
 		},
 		"description": "Background color for interactive elements with brand tone and normal emphasis that are hovered, focused, or active."
 	},
@@ -212,7 +212,7 @@
 	},
 	"Color/Semantic/Background/Brand/bgInt-brand-weak-active": {
 		"value": {
-			".": "#e4eaf7"
+			".": "#e6eaf4"
 		},
 		"description": "Background color for interactive elements with brand tone and weak emphasis that are hovered, focused, or active."
 	},
@@ -308,7 +308,7 @@
 	},
 	"Color/Semantic/Foreground/Warning/fgCon-warning-weak": {
 		"value": {
-			".": "#936400"
+			".": "#926300"
 		},
 		"description": "Foreground color for content like text with warning tone and weak emphasis."
 	},
@@ -320,7 +320,7 @@
 	},
 	"Color/Semantic/Foreground/Caution/fgCon-caution-weak": {
 		"value": {
-			".": "#836b00"
+			".": "#826a00"
 		},
 		"description": "Foreground color for content like text with caution tone and weak emphasis."
 	},
@@ -440,7 +440,7 @@
 	},
 	"Color/Semantic/Stroke/Brand/strokeSur-brand": {
 		"value": {
-			".": "#a2b1d6"
+			".": "#a3b1d4"
 		},
 		"description": "Decorative stroke color used to define brand-toned surface boundaries with normal emphasis."
 	},
@@ -452,7 +452,7 @@
 	},
 	"Color/Semantic/Stroke/Success/strokeSur-success": {
 		"value": {
-			".": "#82c98f"
+			".": "#8ac894"
 		},
 		"description": "Decorative stroke color used to define success-toned surface boundaries with normal emphasis."
 	},
@@ -464,7 +464,7 @@
 	},
 	"Color/Semantic/Stroke/Info/strokeSur-info": {
 		"value": {
-			".": "#9fbcdd"
+			".": "#9fbcdc"
 		},
 		"description": "Decorative stroke color used to define info-toned surface boundaries with normal emphasis."
 	},
@@ -476,19 +476,19 @@
 	},
 	"Color/Semantic/Stroke/Warning/strokeSur-warning": {
 		"value": {
-			".": "#d2b581"
+			".": "#d0b381"
 		},
 		"description": "Decorative stroke color used to define warning-toned surface boundaries with normal emphasis."
 	},
 	"Color/Semantic/Stroke/Warning/strokeSur-warning-strong": {
 		"value": {
-			".": "#936400"
+			".": "#926300"
 		},
 		"description": "Decorative stroke color used to define warning-toned surface boundaries with strong emphasis."
 	},
 	"Color/Semantic/Stroke/Error/strokeSur-error": {
 		"value": {
-			".": "#e1a198"
+			".": "#daa39b"
 		},
 		"description": "Decorative stroke color used to define error-toned surface boundaries with normal emphasis."
 	},
