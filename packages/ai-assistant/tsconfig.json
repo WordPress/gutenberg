@@ -1,0 +1,22 @@
+{
+	"extends": "../../tsconfig.json",
+	"compilerOptions": {
+		"rootDir": "src",
+		"declarationDir": "build-types"
+	},
+	"references": [
+		{ "path": "../abilities" },
+		{ "path": "../api-fetch" },
+		{ "path": "../block-editor" },
+		{ "path": "../blocks" },
+		{ "path": "../components" },
+		{ "path": "../data" },
+		{ "path": "../dom-ready" },
+		{ "path": "../element" },
+		{ "path": "../i18n" },
+		{ "path": "../icons" },
+		{ "path": "../primitives" },
+		{ "path": "../url" }
+	],
+	"include": [ "src/**/*" ]
+}

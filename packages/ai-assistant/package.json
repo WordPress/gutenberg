@@ -1,0 +1,68 @@
+{
+	"name": "@wordpress/ai-assistant",
+	"version": "0.1.0",
+	"description": "AI-powered assistant for WordPress block editor using natural language commands.",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"gutenberg",
+		"ai",
+		"assistant",
+		"block-editor",
+		"abilities",
+		"experimental"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/ai-assistant/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git",
+		"directory": "packages/ai-assistant"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"engines": {
+		"node": ">=18.12.0",
+		"npm": ">=8.19.2"
+	},
+	"files": [
+		"build",
+		"build-module",
+		"build-types",
+		"src",
+		"*.md"
+	],
+	"main": "build/index.js",
+	"module": "build-module/index.js",
+	"exports": {
+		".": {
+			"types": "./build-types/index.d.ts",
+			"import": "./build-module/index.js",
+			"require": "./build/index.js"
+		},
+		"./package.json": "./package.json"
+	},
+	"types": "build-types",
+	"dependencies": {
+		"@wordpress/abilities": "file:../abilities",
+		"@wordpress/api-fetch": "file:../api-fetch",
+		"@wordpress/block-editor": "file:../block-editor",
+		"@wordpress/blocks": "file:../blocks",
+		"@wordpress/components": "file:../components",
+		"@wordpress/data": "file:../data",
+		"@wordpress/dom-ready": "file:../dom-ready",
+		"@wordpress/element": "file:../element",
+		"@wordpress/i18n": "file:../i18n",
+		"@wordpress/icons": "file:../icons",
+		"@wordpress/primitives": "file:../primitives",
+		"@wordpress/url": "file:../url"
+	},
+	"peerDependencies": {
+		"react": "^18.0.0",
+		"react-dom": "^18.0.0"
+	},
+	"publishConfig": {
+		"access": "public"
+	}
+}

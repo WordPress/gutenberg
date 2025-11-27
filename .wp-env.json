@@ -1,7 +1,7 @@
 {
 	"$schema": "./schemas/json/wp-env.json",
 	"core": "WordPress/WordPress",
-	"plugins": [ "." ],
+	"plugins": [ ".", "./ai-assistant-plugin" ],
 	"themes": [ "./test/emptytheme" ],
 	"env": {
 		"development": {
