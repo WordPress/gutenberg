@@ -13,6 +13,7 @@ import {
 	BlockEditorProvider,
 	BlockContextProvider,
 	privateApis as blockEditorPrivateApis,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { store as noticesStore } from '@wordpress/notices';
 import { privateApis as editPatternsPrivateApis } from '@wordpress/patterns';
@@ -283,6 +284,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 		} = unlock( useDispatch( editorStore ) );
 		const { createWarningNotice, removeNotice } =
 			useDispatch( noticesStore );
+		const { resetBlockEditingModes } = useDispatch( blockEditorStore );
 
 		// Ideally this should be synced on each change and not just something you do once.
 		useLayoutEffect( () => {
@@ -326,6 +328,12 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 				removeNotice( 'template-activate-notice' );
 			}
 		}, [ post.type, post.id, setEditedPost, removeNotice ] );
+
+		// Reset block editing modes when switching posts to ensure
+		// stale modes from the previous post don't persist.
+		useEffect( () => {
+			resetBlockEditingModes();
+		}, [ post.id, resetBlockEditingModes ] );
 
 		// Synchronize the editor settings as they change.
 		useEffect( () => {

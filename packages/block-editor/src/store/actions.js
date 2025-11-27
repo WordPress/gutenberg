@@ -2135,3 +2135,14 @@ export function unsetBlockEditingMode( clientId = '' ) {
 		clientId,
 	};
 }
+
+/**
+ * Clears all block editing modes.
+ *
+ * @return {Object} Action object.
+ */
+export function resetBlockEditingModes() {
+	return {
+		type: 'RESET_BLOCK_EDITING_MODES',
+	};
+}

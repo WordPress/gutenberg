@@ -1579,6 +1579,14 @@ _Returns_
 
 -   `Object`: Action object.
 
+### resetBlockEditingModes
+
+Clears all block editing modes.
+
+_Returns_
+
+-   `Object`: Action object.
+
 ### resetBlocks
 
 Action that resets blocks state to the specified array of blocks, taking precedence over any other content reflected as an edit in state.
