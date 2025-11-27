@@ -35,6 +35,7 @@
 	vertical-align: top;
 	width: var(--checkbox-input-size);
 	height: var(--checkbox-input-size);
+	position: relative;
 
 	appearance: none;
 
@@ -60,6 +61,19 @@
 	&:checked::before {
 		content: none;
 	}
+
+	&::after {
+		content: "";
+		display: block;
+		inset: 0;
+		position: absolute;
+		width: calc(var(--checkbox-input-size) + var(--checkbox-input-margin) * 2);
+		height: calc(var(--checkbox-input-size) + var(--checkbox-input-margin) * 2);
+		padding: var(--checkbox-input-margin);
+		margin-left: calc(-1 * var(--checkbox-input-margin));
+		margin-top: calc(-1 * var(--checkbox-input-margin));
+		cursor: pointer;
+	}
 }
 
 .components-checkbox-control__input-container {
@@ -71,23 +85,6 @@
 	aspect-ratio: 1;
 	line-height: 1; // maintains proper height even with WP common.css
 	flex-shrink: 0;
-}
-
-.components-checkbox-control__input-container-area {
-	position: absolute;
-	inset: 0;
-	padding: 8px;
-	margin-left: -8px;
-	margin-top: -8px;
-	width: calc(var(--checkbox-input-size) + 16px);
-	height: calc(var(--checkbox-input-size) + 16px);
-	transition: cubic-bezier(0.075, 0.82, 0.165, 1) background-color 150ms;
-}
-
-.components-checkbox-control__input-container-area:hover {
-	cursor: pointer;
-	background-color: color-mix(in srgb, $components-color-accent 8%, $white);
-	border-radius: 50%;
 }
 
 svg.components-checkbox-control__checked,

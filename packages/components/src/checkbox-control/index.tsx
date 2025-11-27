@@ -110,48 +110,37 @@ export function CheckboxControl(
 		>
 			<HStack spacing={ 0 } justify="start" alignment="top">
 				<span className="components-checkbox-control__input-container">
-					<span
-						className="components-checkbox-control__input-container-area"
-						aria-hidden="true"
+					<input
+						ref={ ref }
+						id={ id }
+						className="components-checkbox-control__input"
+						type="checkbox"
+						value="1"
+						onChange={ onChangeValue }
+						checked={ checked }
+						aria-describedby={ !! help ? id + '__help' : undefined }
 						onClick={ ( event ) => {
-							event.currentTarget.firstElementChild?.click();
+							// Compat code for Safari to ensure that the checkbox is focused when clicked.
+							event.currentTarget.focus();
+							onClick?.( event );
 							event.stopPropagation();
 						} }
-					>
-						<input
-							ref={ ref }
-							id={ id }
-							className="components-checkbox-control__input"
-							type="checkbox"
-							value="1"
-							onChange={ onChangeValue }
-							checked={ checked }
-							aria-describedby={
-								!! help ? id + '__help' : undefined
-							}
-							onClick={ ( event ) => {
-								// Compat code for Safari to ensure that the checkbox is focused when clicked.
-								event.currentTarget.focus();
-								onClick?.( event );
-								event.stopPropagation();
-							} }
-							{ ...additionalProps }
+						{ ...additionalProps }
+					/>
+					{ showIndeterminateIcon ? (
+						<Icon
+							icon={ reset }
+							className="components-checkbox-control__indeterminate"
+							role="presentation"
 						/>
-						{ showIndeterminateIcon ? (
-							<Icon
-								icon={ reset }
-								className="components-checkbox-control__indeterminate"
-								role="presentation"
-							/>
-						) : null }
-						{ showCheckedIcon ? (
-							<Icon
-								icon={ check }
-								className="components-checkbox-control__checked"
-								role="presentation"
-							/>
-						) : null }
-					</span>
+					) : null }
+					{ showCheckedIcon ? (
+						<Icon
+							icon={ check }
+							className="components-checkbox-control__checked"
+							role="presentation"
+						/>
+					) : null }
 				</span>
 				{ label && (
 					<label
