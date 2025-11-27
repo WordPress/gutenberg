@@ -102,7 +102,10 @@ export function registerAbility( ability: Ability ) {
 
 		// Add _clientRegistered to meta if not server-registered
 		const meta = ability.meta || {};
-		if ( ! meta._serverRegistered ) {
+		if (
+			! meta._serverRegistered &&
+			meta._clientRegistered === undefined
+		) {
 			meta._clientRegistered = true;
 		}
 
