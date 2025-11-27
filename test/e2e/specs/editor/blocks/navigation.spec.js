@@ -1690,6 +1690,70 @@ test.describe( 'Navigation block', () => {
 			expect( innerHTML ).not.toContain( '&lt;strong&gt;' );
 			expect( innerHTML ).not.toContain( '&lt;/strong&gt;' );
 		} );
+
+		test( 'Page List renders HTML entities in page titles', async ( {
+			editor,
+			admin,
+			requestUtils,
+		} ) => {
+			// Create a page with HTML entities in the title
+			// Using the exact format from the bug report
+			await requestUtils.createPage( {
+				title: '&"qwerty"—',
+				status: 'publish',
+			} );
+
+			// Insert Navigation block
+			await admin.createNewPost();
+			await editor.insertBlock( { name: 'core/navigation' } );
+
+			// Wait for Page List block to be visible
+			const pageListBlock = editor.canvas.getByRole( 'document', {
+				name: 'Block: Page List',
+			} );
+
+			await expect( pageListBlock ).toBeVisible( {
+				// Wait for the Nav and Page List block API requests to resolve.
+				timeout: 10000,
+			} );
+
+			// Locate the page list item
+			const pageItems = pageListBlock.locator( 'li' );
+
+			// Wait for Page List to load pages
+			await pageItems.first().waitFor( { state: 'visible' } );
+
+			// Find the link element containing our test page title
+			const links = pageListBlock.locator( 'a' );
+			const linkCount = await links.count();
+			expect( linkCount ).toBeGreaterThan( 0 );
+
+			// Find the link that contains our test page title
+			let link = null;
+			for ( let i = 0; i < linkCount; i++ ) {
+				const currentLink = links.nth( i );
+				const text = await currentLink.textContent();
+				if ( text && text.includes( 'qwerty' ) ) {
+					link = currentLink;
+					break;
+				}
+			}
+
+			expect( link ).not.toBeNull();
+			await expect( link ).toBeVisible();
+
+			// Verify text content (what user sees) shows decoded entities
+			const textContent = await link.textContent();
+			expect( textContent ).toContain( 'qwerty' );
+
+			// Verify that entity codes are NOT present in the visible text
+			expect( textContent ).not.toContain( '&amp;' );
+			expect( textContent ).not.toContain( '&quot;' );
+			expect( textContent ).not.toContain( '&mdash;' );
+
+			// Verify the actual characters are present (decoded)
+			expect( textContent ).toContain( '&' );
+		} );
 	} );
 } );
 
