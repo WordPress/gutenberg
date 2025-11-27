@@ -374,6 +374,7 @@ const actions = [
 
 -   `totalItems`: the total number of items in the datasets.
 -   `totalPages`: the total number of pages, taking into account the total items in the dataset and the number of items per page provided by the user.
+-   `infiniteScrollHandler`: a function that handles infinite scrolling. This function should be called when the user scrolls to the bottom of the page. See [example in storybook](https://wordpress.github.io/gutenberg/?path=/story/dataviews-dataviews--infinite-scroll).
 
 #### `search`: `boolean`
 
@@ -404,7 +405,7 @@ const defaultLayouts = {
 };
 ```
 
-The `defaultLayouts` property should be an object that includes properties named `table`, `grid`, and/or `list`. These properties are applied to the view object each time the user switches to the corresponding layout.
+The `defaultLayouts` property should be an object that includes properties named `table`, `grid`, `list`, and `activity`. These properties are applied to the view object each time the user switches to the corresponding layout.
 
 #### `selection`: `string[]`
 
@@ -425,6 +426,12 @@ Note: `DataViews` still requires at least one bulk action to make items selectab
 #### `isItemClickable`: `function`
 
 A function that determines if a media field or a primary field is clickable. It receives an item as an argument and returns a boolean value indicating whether the item can be clicked.
+
+Note that layouts may still decide not to render clickable primary and media fields. For example, the `list` layout has a different interaction model and doesn't enable this feature.
+
+#### `onClickItem`: `function`
+
+A function that is called when an item is clicked. It receives the item as a parameter.
 
 #### `renderItemLink`: `React.ComponentType`
 
