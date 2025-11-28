@@ -128,9 +128,31 @@ When creating a new package, you need to provide at least the following. Package
 
 To ensure your package is recognized in npm workspaces, you should run `npm install` to update the package lock file.
 
-## Making a Package Private
+## When to Omit or Set `wpScript` to `false`
 
-If a package is only used internally within Gutenberg (or WordPress core) and should not be published to npm, mark it as private by adding the following to the package's `package.json`:
+By default, packages do not expose as WordPress scripts/modules (not accessible via the `wp` global). Only packages that should be directly available in WordPress should set `wpScript: true`.
+
+Omit `wpScript` (or explicitly set to `false`) for packages designed solely as dependencies for other packages:
+
+```json
+{
+	"wpScript": false
+}
+```
+
+**Examples of packages that should not expose to the `wp` global:**
+- Utility packages used internally by other packages
+- Shared logic or helpers without a direct WordPress use case
+- Intermediate packages intended only as dependencies of other `@wordpress/*` packages
+
+When a package omits `wpScript` or sets it to `false`, it:
+- Will not be exposed as a WordPress script (not available via the `wp` global)
+- Can still be used as a dependency by other packages (via npm imports)
+- Should still be published to npm to support backporting to WordPress core releases
+
+### Truly Private Packages
+
+In rare cases, if a package is only used internally within Gutenberg and should never be published to npm, mark it as private:
 
 ```json
 {
@@ -139,7 +161,7 @@ If a package is only used internally within Gutenberg (or WordPress core) and sh
 }
 ```
 
-Private packages will be excluded from npm publication but will still work within the monorepo as dependencies for other packages. Setting `wpScript` to `false` ensures the package is not exposed as a WordPress script.
+Private packages will be excluded from npm publication and should only be used for development-only utilities (such as build tools or internal development helpers). They should not be used as dependencies for other packages, as this could break the backporting process to WordPress core.
 
 Note: You can safely include the `publishConfig` field in private packages—it will be ignored by npm since the `private` flag takes precedence.
 
