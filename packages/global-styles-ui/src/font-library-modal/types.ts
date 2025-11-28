@@ -24,7 +24,6 @@ export interface FontLibraryState {
 	uninstallFontFamily: ( fontFamily: FontFamily ) => Promise< {
 		deleted: boolean;
 	} >;
-	refreshLibrary: () => void;
 	// Additional properties found in the codebase
 	baseCustomFonts: FontFamily[];
 	modalTabOpen: string;

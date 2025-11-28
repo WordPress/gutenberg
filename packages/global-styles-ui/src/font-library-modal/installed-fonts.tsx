@@ -47,7 +47,6 @@ function InstalledFonts() {
 		baseCustomFonts,
 		libraryFontSelected,
 		handleSetLibraryFontSelected,
-		refreshLibrary,
 		uninstallFontFamily,
 		isResolvingLibrary,
 		isInstalling,
@@ -176,7 +175,6 @@ function InstalledFonts() {
 
 	useEffect( () => {
 		handleSetLibraryFontSelected( libraryFontSelected );
-		refreshLibrary();
 	}, [] );
 
 	// Get activated fonts count.

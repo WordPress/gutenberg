@@ -2,7 +2,12 @@
  * WordPress dependencies
  */
 import { createContext, useState, useEffect } from '@wordpress/element';
-import { useSelect, useDispatch, resolveSelect } from '@wordpress/data';
+import {
+	useSelect,
+	useDispatch,
+	resolveSelect,
+	useRegistry,
+} from '@wordpress/data';
 import {
 	useEntityRecord,
 	useEntityRecords,
@@ -46,6 +51,7 @@ export const FontLibraryContext = createContext< FontLibraryState >(
 FontLibraryContext.displayName = 'FontLibraryContext';
 
 function FontLibraryProvider( { children }: { children: React.ReactNode } ) {
+	const registry = useRegistry();
 	const { saveEntityRecord, deleteEntityRecord } = useDispatch( coreStore );
 	const { globalStylesId } = useSelect( ( select ) => {
 		const { __experimentalGetCurrentGlobalStylesId } = select( coreStore );
@@ -59,18 +65,12 @@ function FontLibraryProvider( { children }: { children: React.ReactNode } ) {
 	);
 
 	const [ isInstalling, setIsInstalling ] = useState( false );
-	const [ refreshKey, setRefreshKey ] = useState( 0 );
-
-	const refreshLibrary = () => {
-		setRefreshKey( Date.now() );
-	};
 
 	const { records: libraryPosts = [], isResolving: isResolvingLibrary } =
 		useEntityRecords< CollectionFontFamily >(
 			'postType',
 			'wp_font_family',
 			{
-				refreshKey,
 				_embed: true,
 			}
 		);
@@ -274,7 +274,8 @@ function FontLibraryProvider( { children }: { children: React.ReactNode } ) {
 					isANewFontFamily = true;
 					// Prepare font family form data to install.
 					installedFontFamily = await fetchInstallFontFamily(
-						makeFontFamilyFormData( fontFamilyToInstall )
+						makeFontFamilyFormData( fontFamilyToInstall ),
+						registry
 					);
 				}
 
@@ -317,7 +318,8 @@ function FontLibraryProvider( { children }: { children: React.ReactNode } ) {
 						installedFontFamily.id,
 						makeFontFacesFormData(
 							fontFamilyToInstall as FontFamily
-						)
+						),
+						registry
 					);
 					successfullyInstalledFontFaces = response?.successes;
 					unsuccessfullyInstalledFontFaces = response?.errors;
@@ -381,8 +383,6 @@ function FontLibraryProvider( { children }: { children: React.ReactNode } ) {
 				);
 				// Save the global styles to the database.
 				await saveFontFamilies( activeFonts );
-
-				refreshLibrary();
 			}
 
 			if ( installationErrorMessages.length > 0 ) {
@@ -417,7 +417,6 @@ function FontLibraryProvider( { children }: { children: React.ReactNode } ) {
 			const activeFonts = deactivateFontFamily( fontFamilyToUninstall );
 			// Save the global styles to the database.
 			await saveFontFamilies( activeFonts );
-			refreshLibrary();
 			return { deleted: true };
 		} catch ( error ) {
 			// eslint-disable-next-line no-console
@@ -561,7 +560,6 @@ function FontLibraryProvider( { children }: { children: React.ReactNode } ) {
 				getAvailableFontsOutline,
 				modalTabOpen,
 				setModalTabOpen,
-				refreshLibrary,
 				saveFontFamilies,
 				isResolvingLibrary,
 				isInstalling,
