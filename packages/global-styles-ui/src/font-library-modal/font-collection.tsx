@@ -89,7 +89,7 @@ function FontCollection( { slug }: { slug: string } ) {
 		requiresPermission && ! getGoogleFontsPermissionFromStorage()
 	);
 	const { installFonts, isInstalling } = useContext( FontLibraryContext );
-	const { record: selectedCollection } =
+	const { record: selectedCollection, isResolving: isLoading } =
 		useEntityRecord< FontCollectionType >( 'root', 'fontCollection', slug );
 
 	useEffect( () => {
@@ -132,8 +132,6 @@ function FontCollection( { slug }: { slug: string } ) {
 		() => filterFonts( collectionFonts, filters ),
 		[ collectionFonts, filters ]
 	);
-
-	const isLoading = ! selectedCollection?.font_families && ! notice;
 
 	// NOTE: The height of the font library modal unavailable to use for rendering font family items is roughly 417px
 	// The height of each font family item is 61px.
