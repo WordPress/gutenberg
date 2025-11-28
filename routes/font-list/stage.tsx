@@ -5,10 +5,11 @@ import { Page } from '@wordpress/admin-ui';
 import { __ } from '@wordpress/i18n';
 import { privateApis as componentsPrivateApis } from '@wordpress/components';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
-import { store as coreStore } from '@wordpress/core-data';
+import { store as coreStore, useEntityRecords } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
-import { useState, useContext } from '@wordpress/element';
-import { FontLibrary, FontLibraryContext } from '@wordpress/global-styles-ui';
+import { useState } from '@wordpress/element';
+import { FontLibrary } from '@wordpress/global-styles-ui';
+import type { FontCollection as FontCollectionType } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -20,7 +21,10 @@ const { Tabs } = unlock( componentsPrivateApis );
 const { useGlobalStyles } = unlock( editorPrivateApis );
 
 function FontLibraryPage() {
-	const { collections } = useContext( FontLibraryContext );
+	const { records: collections = [] } =
+		useEntityRecords< FontCollectionType >( 'root', 'fontCollection', {
+			_fields: 'slug,name,description',
+		} );
 	const [ activeTab, setActiveTab ] = useState( 'installed-fonts' );
 
 	// Use the useGlobalStyles hook from @wordpress/editor
@@ -59,7 +63,9 @@ function FontLibraryPage() {
 			...( collections || [] ).map( ( { slug, name } ) => ( {
 				id: slug,
 				title:
-					collections.length === 1 && slug === 'google-fonts'
+					collections &&
+					collections.length === 1 &&
+					slug === 'google-fonts'
 						? __( 'Install Fonts' )
 						: name,
 			} ) )
