@@ -75,34 +75,24 @@ test.describe( 'Template ID Format', () => {
 		} );
 		await expect( editor.canvas.getByText( contentText ) ).toBeVisible();
 
-		await page
-			.getByRole( 'region', { name: 'Editor top bar' } )
-			.getByRole( 'button', { name: 'Save' } )
-			.click();
+		await editor.saveSiteEditorEntities( {
+			isOnlyCurrentEntityDirty:
+				! experiments.includes( 'active_templates' ),
+		} );
 
 		await navigateToTemplateEditor( { admin, editor, page }, pageId );
 
 		// Make a second edit to the template to ensure wp_id is not 0.
-		const secondEditText = `Second edit - ${ contentText }`;
+		const secondEditText = `Second edit: ${ contentText }`;
 		await editor.insertBlock( {
 			name: 'core/paragraph',
 			attributes: { content: secondEditText },
 		} );
 		await expect( editor.canvas.getByText( secondEditText ) ).toBeVisible();
 
-		const saveButton = page
-			.getByRole( 'region', { name: 'Editor top bar' } )
-			.getByRole( 'button', { name: 'Save' } );
-		await saveButton.click();
-
-		if ( experiments.includes( 'active_templates' ) ) {
-			const secondSaveButton = page
-				.getByRole( 'region', { name: 'Editor publish' } )
-				.getByRole( 'button', { name: 'Save' } );
-			await secondSaveButton.click();
-		} else {
-			await expect( saveButton ).toBeDisabled( { timeout: 5000 } );
-		}
+		await editor.saveSiteEditorEntities( {
+			isOnlyCurrentEntityDirty: true,
+		} );
 
 		await expect( page.locator( 'body' ) ).not.toContainText(
 			'No templates exist with that id.'
