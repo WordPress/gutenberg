@@ -215,7 +215,7 @@
 		position: absolute;
 		top: calc(env(safe-area-inset-top) + 16px); // equivalent to $grid-unit-20
 		right: calc(env(safe-area-inset-right) + 16px); // equivalent to $grid-unit-20
-		padding: 0;
+		padding: 0 4px;
 		cursor: pointer;
 		z-index: 5000000;
 		min-width: 40px; // equivalent to $button-size-next-default-40px
@@ -284,7 +284,7 @@
 		&:not(:hover):not(:active):not(.has-background) {
 			background: none;
 			border: none;
-			padding: 0 8px;
+			padding: 0 4px;
 		}
 
 		&:has(.wp-lightbox-navigation-text:not([hidden])) .wp-lightbox-navigation-icon svg {
