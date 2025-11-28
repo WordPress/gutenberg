@@ -1857,10 +1857,12 @@ Valid operators per field type:
 
 ### `format`
 
-Display format configuration for fields. Currently supported for date fields. This configuration affects how the field is displayed in the `render` method, the `Edit` control, and filter controls.
+Display format configuration for fields. Supported for date, number, and integer fields. This configuration affects how the field is displayed in the `render` method, the `Edit` control, and filter controls.
 
 -   Type: `object`.
 -   Optional.
+
+For `date` fields:
 -   Properties:
     -   `date`: The format string using PHP date format (e.g., 'F j, Y' for 'March 10, 2023'). Optional, defaults to WordPress "Date Format" setting.
     -   `weekStartsOn`: Specifies the first day of the week for calendar controls. One of 0, 1, 2, 3, 4, 5, 6. Optional, defaults to WordPress "Week Starts On" setting, whose value is 0 (Sunday).
@@ -1875,6 +1877,46 @@ Example:
 	format: {
 		date: 'F j, Y',
 		weekStartsOn: 1,
+	},
+}
+```
+
+For `number` fields:
+
+-   Properties:
+    -   `separatorThousand`: The character used as thousand separator (e.g., ',' for '1,234'). Optional, defaults to ','.
+    -   `separatorDecimal`: The character used as decimal separator (e.g., '.' for '1.23'). Optional, defaults to '.'.
+    -   `decimals`: Number of decimal places to display (0-100). Optional, defaults to 2.
+
+Example:
+
+```js
+{
+	id: 'price',
+	type: 'number',
+	label: 'Price',
+	format: {
+		separatorThousand: ',',
+		separatorDecimal: '.',
+		decimals: 2,
+	},
+}
+```
+
+For `integer` fields:
+
+-   Properties:
+    -   `separatorThousand`: The character used as thousand separator (e.g., ',' for '1,234'). Optional, defaults to ','.
+
+Example:
+
+```js
+{
+	id: 'quantity',
+	type: 'integer',
+	label: 'Quantity',
+	format: {
+		separatorThousand: ',',
 	},
 }
 ```
