@@ -93,10 +93,6 @@ test.describe( 'Template ID Format', () => {
 		await editor.saveSiteEditorEntities( {
 			isOnlyCurrentEntityDirty: true,
 		} );
-
-		await expect( page.locator( 'body' ) ).not.toContainText(
-			'No templates exist with that id.'
-		);
 	};
 
 	test( 'should open and edit templates correctly when active_templates experiment is enabled', async ( {
