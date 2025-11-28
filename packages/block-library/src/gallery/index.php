@@ -37,7 +37,7 @@ add_filter( 'render_block_data', 'block_core_gallery_data_id_backcompatibility' 
 /**
  * Adds a unique ID to the gallery block context.
  *
- * @since 6.9.0
+ * @since 7.0.0
  *
  * @param array $context      Default context.
  * @param array $parsed_block Block being rendered, filtered by render_block_data.
