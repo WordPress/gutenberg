@@ -110,11 +110,3 @@
 	padding: $grid-unit-10 0 0;
 	overflow: hidden; // Prevent cells with white backgrounds overflowing the card
 }
-
-/**
- * When DataViews are placed within modals, apply a consistent padding to match the header.
- */
-.components-modal__content:has(.components-modal__children-container > .dataviews-wrapper:first-child),
-.components-modal__content:has(.components-modal__children-container > .dataviews-picker-wrapper:first-child) {
-	padding: $grid-unit-10 $grid-unit-10 $grid-unit-10;
-}
