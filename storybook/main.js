@@ -75,12 +75,34 @@ module.exports = {
 		reactDocgen: 'react-docgen-typescript',
 	},
 	webpackFinal: async ( config ) => {
+		// Find the `babel-loader` rule added by `@storybook/addon-webpack5-compiler-babel`
+		// and add exclude for `packages/*/build-module` folders.
+		const rules = config.module.rules.map( ( rule ) => {
+			const usesBabelLoader =
+				Array.isArray( rule.use ) &&
+				rule.use.some(
+					( loader ) =>
+						typeof loader === 'object' &&
+						loader.loader &&
+						loader.loader.includes( 'babel-loader' )
+				);
+
+			// Add exclude for `build-module` folders
+			if ( usesBabelLoader && Array.isArray( rule.exclude ) ) {
+				return {
+					...rule,
+					exclude: [ ...rule.exclude, /build-module/ ],
+				};
+			}
+			return rule;
+		} );
+
 		return {
 			...config,
 			module: {
 				...config.module,
 				rules: [
-					...config.module.rules,
+					...rules,
 					{
 						test: /\.md$/,
 						type: 'asset/source',
