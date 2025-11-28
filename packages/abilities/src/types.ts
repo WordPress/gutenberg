@@ -165,21 +165,6 @@ export interface AbilityCategoryArgs {
 }
 
 /**
- * The state shape for the abilities store.
- */
-export interface AbilitiesState {
-	/**
-	 * Map of ability names to ability objects.
-	 */
-	abilitiesByName: Record< string, Ability >;
-
-	/**
-	 * Map of category slugs to category objects.
-	 */
-	categoriesBySlug: Record< string, AbilityCategory >;
-}
-
-/**
  * Input parameters for ability execution.
  * Can be any JSON-serializable value: primitive, array, object, or null.
  */

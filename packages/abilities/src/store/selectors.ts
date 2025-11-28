@@ -6,12 +6,8 @@ import { createSelector } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import type {
-	Ability,
-	AbilityCategory,
-	AbilitiesQueryArgs,
-	AbilitiesState,
-} from '../types';
+import type { Ability, AbilityCategory, AbilitiesQueryArgs } from '../types';
+import type { AbilitiesState } from './types';
 
 /**
  * Returns all registered abilities.
