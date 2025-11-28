@@ -42,6 +42,29 @@ export const SearchInput = forwardRef< HTMLInputElement >(
 		// Current selected value (URL from uncommitted value)
 		const currentValue = uncommittedValue?.url || null;
 
+		// Immediately set options for URL-like input (before debounce)
+		// This prevents "No results found" from flashing while typing URLs
+		useEffect( () => {
+			if ( searchValue && isURLLike( searchValue ) ) {
+				const url = prependHTTP( searchValue );
+				setOptions( [
+					{
+						label: url,
+						value: url,
+						suggestion: {
+							title: url,
+							url,
+							type: 'URL',
+						},
+					},
+				] );
+				setIsLoading( false );
+			} else if ( searchValue && ! isURLLike( searchValue ) && searchValue.length < 2 ) {
+				// Clear options if input is too short and not URL-like
+				setOptions( [] );
+			}
+		}, [ searchValue ] );
+
 		// Fetch and set suggestions based on search query
 		const fetchAndSetSuggestions = useCallback( async ( query: string, isInitial = false ) => {
 			if ( ! fetchSuggestions ) {
@@ -97,7 +120,7 @@ export const SearchInput = forwardRef< HTMLInputElement >(
 		useEffect( () => {
 			const isInitial = showInitialSuggestions && ! debouncedSearch;
 			fetchAndSetSuggestions( debouncedSearch || '', isInitial );
-		}, [ debouncedSearch, fetchSuggestions, showInitialSuggestions, uncommittedValue ] );
+		}, [ debouncedSearch, fetchAndSetSuggestions, showInitialSuggestions ] );
 
 		// Load initial suggestions on mount if enabled
 		useEffect( () => {
@@ -157,7 +180,6 @@ export const SearchInput = forwardRef< HTMLInputElement >(
 			return currentValue;
 		}, [ searchValue, currentValue ] );
 
-		// eslint-disable-next-line @typescript-eslint/no-restricted-imports
 		return (
 			<ComboboxControl
 				label={ __( 'URL' ) }
