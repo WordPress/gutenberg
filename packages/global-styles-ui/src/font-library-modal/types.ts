@@ -51,18 +51,6 @@ export interface FontFamily {
 	category?: string;
 }
 
-export interface FontCollection {
-	id: string;
-	slug: string;
-	name: string;
-	description?: string;
-	font_families?: CollectionFontFamily[];
-	categories?: {
-		slug: string;
-		name: string;
-	}[];
-}
-
 export interface FontLibraryState {
 	isInstalling: boolean;
 	fontFamilies: Record< string, FontFamilyPreset[] >;
@@ -100,8 +88,6 @@ export interface FontLibraryState {
 			| undefined
 	) => Promise< void >;
 	isResolvingLibrary: boolean;
-	collections: FontCollection[];
-	getFontCollection: ( slug: string ) => Promise< FontCollection | void >;
 }
 
 export interface FontDemoProps {

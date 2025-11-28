@@ -21,8 +21,6 @@ import {
 	fetchGetFontFamilyBySlug,
 	fetchInstallFontFamily,
 	fetchUninstallFontFamily,
-	fetchFontCollections,
-	fetchFontCollection,
 } from './resolvers';
 import {
 	setUIValuesNeeded,
@@ -39,7 +37,6 @@ import { setImmutably } from './utils/set-immutably';
 import { toggleFont } from './utils/toggleFont';
 import type {
 	CollectionFontFamily,
-	FontCollection,
 	FontFace,
 	FontFamily,
 	FontLibraryState,
@@ -525,40 +522,6 @@ function FontLibraryProvider( { children }: { children: React.ReactNode } ) {
 		loadedFontUrls.add( src );
 	};
 
-	// Font Collections
-	const [ collections, setFontCollections ] = useState< FontCollection[] >(
-		[]
-	);
-	const getFontCollections = async () => {
-		const response = await fetchFontCollections();
-		setFontCollections( response );
-	};
-	const getFontCollection = async ( slug: string ) => {
-		try {
-			const hasData = !! collections.find(
-				( collection ) => collection.slug === slug
-			)?.font_families;
-			if ( hasData ) {
-				return;
-			}
-			const response = await fetchFontCollection( slug );
-			const updatedCollections = collections.map( ( collection ) =>
-				collection.slug === slug
-					? { ...collection, ...response }
-					: collection
-			);
-			setFontCollections( updatedCollections );
-		} catch ( e ) {
-			// eslint-disable-next-line no-console
-			console.error( e );
-			throw e;
-		}
-	};
-
-	useEffect( () => {
-		getFontCollections();
-	}, [] );
-
 	return (
 		<FontLibraryContext.Provider
 			value={ {
@@ -579,8 +542,6 @@ function FontLibraryProvider( { children }: { children: React.ReactNode } ) {
 				saveFontFamilies,
 				isResolvingLibrary,
 				isInstalling,
-				collections,
-				getFontCollection,
 			} }
 		>
 			{ children }
