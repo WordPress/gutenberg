@@ -164,10 +164,14 @@ export function Comments( {
 
 	// Auto-select the related comment thread when a block is selected.
 	useEffect( () => {
-		// Fallback to 'new-note-thread' when showing the comment board for a new note.
-		setSelectedThread(
-			newNoteFormState === 'open' ? 'new-note-thread' : blockCommentId
-		);
+		if ( newNoteFormState === 'open' ) {
+			setSelectedThread( 'new-note-thread' );
+			return;
+		}
+
+		if ( blockCommentId ) {
+			setSelectedThread( blockCommentId );
+		}
 	}, [ blockCommentId, newNoteFormState ] );
 
 	const setBlockRef = useCallback( ( id, blockRef ) => {
