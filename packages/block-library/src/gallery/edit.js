@@ -104,7 +104,7 @@ const NAVIGATION_BUTTON_TYPE_OPTIONS = [
 		value: 'text',
 	},
 	{
-		label: __( 'Icon and Text' ),
+		label: __( 'Icon and text' ),
 		value: 'icon-and-text',
 	},
 ];
