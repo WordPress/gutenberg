@@ -3,6 +3,7 @@
  */
 import { useState, useEffect } from '@wordpress/element';
 import { Spinner } from '@wordpress/components';
+import { useNavigate } from '@wordpress/route';
 
 /**
  * Internal dependencies
@@ -23,6 +24,7 @@ interface CanvasProps {
  */
 export default function Canvas( { canvas }: CanvasProps ) {
 	const [ Editor, setEditor ] = useState< any >( null );
+	const navigate = useNavigate();
 
 	useEffect( () => {
 		// Dynamically import the lazy-editor module
@@ -63,17 +65,39 @@ export default function Canvas( { canvas }: CanvasProps ) {
 
 	// Render the editor with canvas data
 	return (
-		<div
-			style={ { height: '100%' } }
-			// @ts-expect-error inert untyped properly.
-			inert={ canvas.isPreview ? 'true' : undefined }
-		>
-			<Editor
-				postType={ canvas.postType }
-				postId={ canvas.postId }
-				settings={ { isPreviewMode: canvas.isPreview } }
-				backButton={ backButton }
-			/>
+		<div style={ { height: '100%', position: 'relative' } }>
+			<div
+				style={ { height: '100%' } }
+				// @ts-expect-error inert not typed properly
+				inert={ canvas.isPreview ? 'true' : undefined }
+			>
+				<Editor
+					postType={ canvas.postType }
+					postId={ canvas.postId }
+					settings={ { isPreviewMode: canvas.isPreview } }
+					backButton={ backButton }
+				/>
+			</div>
+			{ canvas.isPreview && canvas.editLink && (
+				<div
+					onClick={ () => navigate( { to: canvas.editLink } ) }
+					onKeyDown={ ( e ) => {
+						if ( e.key === 'Enter' || e.key === ' ' ) {
+							e.preventDefault();
+							navigate( { to: canvas.editLink } );
+						}
+					} }
+					style={ {
+						position: 'absolute',
+						inset: 0,
+						cursor: 'pointer',
+						zIndex: 1,
+					} }
+					role="button"
+					tabIndex={ 0 }
+					aria-label="Click to edit"
+				/>
+			) }
 		</div>
 	);
 }

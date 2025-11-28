@@ -89,7 +89,9 @@
 /packages/base-styles
 /packages/icons
 /packages/primitives
-/packages/dataviews                              @oandregal @gigitux @ntsekouras 
+/packages/dataviews                             @oandregal @gigitux @ntsekouras
+/packages/theme                                 @WordPress/gutenberg-components
+/packages/ui                                    @WordPress/gutenberg-components
 
 # Utilities
 /packages/a11y

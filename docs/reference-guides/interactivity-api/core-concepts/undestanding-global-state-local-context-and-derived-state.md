@@ -714,7 +714,7 @@ const { state } = store( 'myProductPlugin', {
 		},
 		get priceWithTax() {
 			const { priceWithoutTax } = getContext();
-			return price * ( 1 + state.taxRate );
+			return priceWithoutTax * ( 1 + state.taxRate );
 		},
 	},
 	actions: {

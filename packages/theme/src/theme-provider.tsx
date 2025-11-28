@@ -49,6 +49,7 @@ export const ThemeProvider = ( {
 	children,
 	color = {},
 	isRoot = false,
+	density,
 }: ThemeProviderProps ) => {
 	const instanceId = useId();
 
@@ -76,6 +77,7 @@ export const ThemeProvider = ( {
 			<div
 				data-wpds-theme-provider-id={ instanceId }
 				data-wpds-root-provider={ isRoot }
+				data-wpds-density={ density }
 				className={ styles.root }
 			>
 				<ThemeContext.Provider value={ contextValue }>

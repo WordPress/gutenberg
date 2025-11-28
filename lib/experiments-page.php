@@ -22,6 +22,28 @@ if ( ! function_exists( 'the_gutenberg_experiments' ) ) {
 		<form method="post" action="options.php">
 			<?php settings_fields( 'gutenberg-experiments' ); ?>
 			<?php do_settings_sections( 'gutenberg-experiments' ); ?>
+			<!-- We use a separate table for the template activation experiment because the option is managed separately. -->
+			<table class="form-table">
+				<tr>
+					<th scope="row">
+						<label for="active_templates"><?php echo __( 'Template Activation', 'gutenberg' ); ?></label>
+						<br><a href="https://github.com/WordPress/gutenberg/issues/66950" target="_blank"><?php echo __( 'Learn more', 'gutenberg' ); ?></a>
+					</th>
+					<td>
+						<label for="active_templates">
+							<input
+								type="checkbox"
+								name="active_templates"
+								id="active_templates"
+								value="1"
+								<?php checked( 1, gutenberg_is_experiment_enabled( 'active_templates' ) ); ?>
+							/>
+							<?php echo __( 'Allows multiple templates of the same type to be created, of which one can be active at a time.', 'gutenberg' ); ?>
+							<p class="description"><?php echo __( 'Warning: when you deactivate this experiment, it is best to delete all created templates except for the active ones.', 'gutenberg' ); ?></p>
+						</label>
+					</td>
+				</tr>
+			</table>
 			<?php submit_button(); ?>
 		</form>
 		</div>
@@ -187,6 +209,30 @@ function gutenberg_initialize_experiments_settings() {
 		)
 	);
 
+	add_settings_field(
+		'gutenberg-workflow-palette',
+		__( 'Workflow Palette', 'gutenberg' ),
+		'gutenberg_display_experiment_field',
+		'gutenberg-experiments',
+		'gutenberg_experiments_section',
+		array(
+			'label' => __( 'Enables the Workflow Palette for running workflows composed of abilities, from a unified interface.', 'gutenberg' ),
+			'id'    => 'gutenberg-workflow-palette',
+		)
+	);
+
+	add_settings_field(
+		'gutenberg-customizable-navigation-overlays',
+		__( 'Customizable Navigation Overlays', 'gutenberg' ),
+		'gutenberg_display_experiment_field',
+		'gutenberg-experiments',
+		'gutenberg_experiments_section',
+		array(
+			'label' => __( 'Enables custom mobile overlay design and content control for Navigation blocks, allowing you to create flexible, professional menu experiences.', 'gutenberg' ),
+			'id'    => 'gutenberg-customizable-navigation-overlays',
+		)
+	);
+
 	register_setting(
 		'gutenberg-experiments',
 		'gutenberg-experiments'
@@ -223,4 +269,25 @@ function gutenberg_display_experiment_section() {
 	<p><?php echo __( "The block editor includes experimental features that are usable while they're in development. Select the ones you'd like to enable. These features are likely to change, so avoid using them in production.", 'gutenberg' ); ?></p>
 
 	<?php
+}
+
+add_action( 'admin_init', 'gutenberg_handle_template_activate_setting_submission' );
+function gutenberg_handle_template_activate_setting_submission() {
+	if ( ! isset( $_POST['option_page'] ) || 'gutenberg-experiments' !== $_POST['option_page'] ) {
+		return;
+	}
+
+	if ( ! isset( $_POST['_wpnonce'] ) || ! wp_verify_nonce( $_POST['_wpnonce'], 'gutenberg-experiments-options' ) ) {
+		return;
+	}
+
+	if ( ! current_user_can( 'manage_options' ) ) {
+		return;
+	}
+
+	if ( isset( $_POST['active_templates'] ) && '1' === $_POST['active_templates'] ) {
+		update_option( 'active_templates', gutenberg_get_migrated_active_templates() );
+	} else {
+		delete_option( 'active_templates' );
+	}
 }

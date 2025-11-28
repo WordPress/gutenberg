@@ -168,9 +168,20 @@ test.describe( 'Page List', () => {
 					const selectElement = page.locator(
 						'select:has(option[value="1"])'
 					);
-					await selectElement.selectOption( { value: '1' } );
+					await selectElement.selectOption( {
+						label: 'Test Author',
+					} );
 				},
-				assertEditedState: async () => {},
+				assertEditedState: async ( page ) => {
+					const author = page.getByLabel( 'Edit Author' );
+					await expect( author ).toContainText( 'Test Author' );
+					// Check that the list still shows "admin" (changes not yet saved).
+					const selectedItem = page.locator( '.is-selected' );
+					const authorCell = selectedItem.getByRole( 'cell', {
+						name: 'admin',
+					} );
+					await expect( authorCell ).toBeVisible();
+				},
 			},
 			date: {
 				assertInitialState: async ( page ) => {
@@ -294,6 +305,14 @@ test.describe( 'Page List', () => {
 			await requestUtils.setGutenbergExperiments( [
 				'gutenberg-quick-edit-dataviews',
 			] );
+			// Create a test user for `author` field testing.
+			await requestUtils.createUser( {
+				username: 'testauthor',
+				email: 'testauthor@example.com',
+				firstName: 'Test',
+				lastName: 'Author',
+				password: '1',
+			} );
 		} );
 
 		test.beforeEach( async ( { admin, page } ) => {
@@ -423,6 +442,7 @@ test.describe( 'Page List', () => {
 
 		test.afterAll( async ( { requestUtils } ) => {
 			await requestUtils.setGutenbergExperiments( [] );
+			await requestUtils.deleteAllUsers();
 		} );
 	} );
 } );

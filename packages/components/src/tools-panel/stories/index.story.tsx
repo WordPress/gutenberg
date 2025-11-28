@@ -3,6 +3,7 @@
  */
 import type { Meta, StoryFn } from '@storybook/react';
 import styled from '@emotion/styled';
+import { fn } from '@storybook/test';
 
 /**
  * WordPress dependencies
@@ -37,8 +38,10 @@ const meta: Meta< typeof ToolsPanel > = {
 		resetAll: { action: 'resetAll' },
 	},
 	tags: [ 'status-experimental' ],
+	args: {
+		resetAll: fn(),
+	},
 	parameters: {
-		actions: { argTypesRegex: '^on.*' },
 		controls: {
 			expanded: true,
 		},

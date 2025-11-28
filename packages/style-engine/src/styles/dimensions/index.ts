@@ -28,4 +28,16 @@ const aspectRatio = {
 	},
 };
 
-export default [ minHeight, aspectRatio ];
+const width = {
+	name: 'width',
+	generate: ( style: Style, options: StyleOptions ) => {
+		return generateRule(
+			style,
+			options,
+			[ 'dimensions', 'width' ],
+			'width'
+		);
+	},
+};
+
+export default [ minHeight, aspectRatio, width ];

@@ -4,6 +4,7 @@
 import { parseHref } from '@tanstack/history';
 import {
 	createBrowserHistory,
+	createLazyRoute,
 	createLink,
 	createRootRoute,
 	createRoute,
@@ -12,6 +13,7 @@ import {
 	redirect,
 	RouterProvider,
 	useCanGoBack,
+	useLocation,
 	useMatches,
 	useRouter,
 } from '@tanstack/react-router';
@@ -32,6 +34,7 @@ export const privateApis = {};
 lock( privateApis, {
 	// Router creation and setup
 	createBrowserHistory,
+	createLazyRoute,
 	createRouter,
 	createRootRoute,
 	createRoute,
@@ -42,6 +45,7 @@ lock( privateApis, {
 	redirect,
 	createLink,
 	useCanGoBack,
+	useLocation,
 	useMatches,
 	useRouter,
 

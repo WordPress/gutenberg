@@ -56,14 +56,14 @@ type CreateTemplatePartModalContentsProps = {
 /**
  * A React component that renders a modal for creating a template part. The modal displays a title and the contents for creating the template part.
  * This component should not live in this package, it should be moved to a dedicated package responsible for managing template.
- * @param {Object} props            The component props.
- * @param          props.modalTitle
+ * @param props            The component props.
+ * @param props.modalTitle
  */
 export default function CreateTemplatePartModal( {
 	modalTitle,
 	...restProps
 }: {
-	modalTitle: string;
+	modalTitle?: string;
 } & CreateTemplatePartModalContentsProps ) {
 	const defaultModalTitle = useSelect(
 		( select ) =>

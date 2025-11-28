@@ -18,7 +18,7 @@ export interface StoreInstance< Config extends AnyConfig > {
 	subscribe: ( listener: () => void ) => () => void;
 }
 
-export interface StoreDescriptor< Config extends AnyConfig > {
+export interface StoreDescriptor< Config extends AnyConfig = AnyConfig > {
 	/**
 	 * Store Name
 	 */
@@ -159,6 +159,9 @@ export interface SelectorWithCustomCurrySignature {
 
 export interface DataRegistry {
 	register: ( store: StoreDescriptor< any > ) => void;
+	dispatch: < S extends StoreDescriptor< any > >(
+		store: S
+	) => ActionCreatorsOf< ConfigOf< S > >;
 }
 
 // Type Helpers.
