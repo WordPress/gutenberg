@@ -69,7 +69,7 @@ test.describe( 'Math Block', () => {
 		] );
 
 		await expect( page.locator( '[aria-live="polite"]' ) ).toHaveText(
-			`Expected 'EOF', got '&' at position 1: &̲x^2`
+			`Error: Expected 'EOF', got '&' at position 1: &̲x^2`
 		);
 
 		// Can delete the math block.
