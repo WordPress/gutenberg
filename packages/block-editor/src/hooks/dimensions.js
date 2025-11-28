@@ -81,6 +81,7 @@ export function DimensionsPanel( { clientId, name, setAttributes, settings } ) {
 		},
 		[ clientId, isEnabled ]
 	);
+
 	const [ visualizedProperty, setVisualizedProperty ] = useVisualizer();
 	const onChange = ( newStyle ) => {
 		setAttributes( {
@@ -156,7 +157,11 @@ export function hasDimensionsSupport( blockName, feature = 'any' ) {
 	}
 
 	if ( feature === 'any' ) {
-		return !! ( support?.aspectRatio || !! support?.minHeight );
+		return !! (
+			support?.aspectRatio ||
+			!! support?.minHeight ||
+			!! support?.width
+		);
 	}
 
 	return !! support?.[ feature ];
@@ -164,9 +169,9 @@ export function hasDimensionsSupport( blockName, feature = 'any' ) {
 
 export default {
 	useBlockProps,
-	attributeKeys: [ 'minHeight', 'style' ],
+	attributeKeys: [ 'minHeight', 'width', 'style' ],
 	hasSupport( name ) {
-		return hasDimensionsSupport( name, 'aspectRatio' );
+		return hasDimensionsSupport( name );
 	},
 };
 

@@ -1,0 +1,35 @@
+{
+	"name": "@wordpress/edit-site-init",
+	"version": "1.0.0",
+	"description": "Initialization module for edit-site (gutenberg-boot) page.",
+	"private": true,
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/edit-site-init/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git",
+		"directory": "packages/edit-site-init"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"engines": {
+		"node": ">=20.10.0",
+		"npm": ">=10.2.3"
+	},
+	"main": "build/index.js",
+	"module": "build-module/index.js",
+	"wpScriptModuleExports": "./build-module/index.js",
+	"dependencies": {
+		"@wordpress/boot": "file:../boot",
+		"@wordpress/data": "file:../data",
+		"@wordpress/icons": "file:../icons"
+	},
+	"publishConfig": {
+		"access": "public"
+	}
+}

@@ -37,7 +37,6 @@ const meta: Meta< typeof CircularOptionPicker > = {
 		children: { control: { type: 'text' } },
 	},
 	parameters: {
-		actions: { argTypesRegex: '^on.*' },
 		controls: { expanded: true },
 		docs: {
 			canvas: { sourceState: 'shown' },

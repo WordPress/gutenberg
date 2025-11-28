@@ -67,6 +67,9 @@ export default function ValidatedText< Item >( {
 			type={ type }
 			prefix={ prefix }
 			suffix={ suffix }
+			pattern={ isValid?.pattern }
+			minLength={ isValid?.minLength }
+			maxLength={ isValid?.maxLength }
 			__next40pxDefaultSize
 		/>
 	);

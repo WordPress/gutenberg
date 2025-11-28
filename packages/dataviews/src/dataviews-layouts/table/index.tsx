@@ -362,8 +362,8 @@ function ViewTable< Item >( {
 		( field ) => field.id === view.descriptionField
 	);
 
-	const groupField = view.groupByField
-		? fields.find( ( f ) => f.id === view.groupByField )
+	const groupField = view.groupBy?.field
+		? fields.find( ( f ) => f.id === view.groupBy?.field )
 		: null;
 	const dataByGroup = groupField ? getDataByGroup( data, groupField ) : null;
 	const { showTitle = true, showMedia = true, showDescription = true } = view;
@@ -394,6 +394,7 @@ function ViewTable< Item >( {
 						[ 'compact', 'comfortable' ].includes(
 							view.layout.density
 						),
+					'has-bulk-actions': hasBulkActions,
 				} ) }
 				aria-busy={ isLoading }
 				aria-describedby={ tableNoticeId }
@@ -457,6 +458,10 @@ function ViewTable< Item >( {
 										onHide={ onHide }
 										setOpenedFilter={ setOpenedFilter }
 										canMove={ false }
+										canInsertLeft={ false }
+										canInsertRight={
+											view.layout?.enableMoving ?? true
+										}
 									/>
 								) }
 							</th>
@@ -465,6 +470,8 @@ function ViewTable< Item >( {
 							// Explicit picks the supported styles.
 							const { width, maxWidth, minWidth, align } =
 								view.layout?.styles?.[ column ] ?? {};
+							const canInsertOrMove =
+								view.layout?.enableMoving ?? true;
 							return (
 								<th
 									key={ column }
@@ -490,9 +497,9 @@ function ViewTable< Item >( {
 										onChangeView={ onChangeView }
 										onHide={ onHide }
 										setOpenedFilter={ setOpenedFilter }
-										canMove={
-											view.layout?.enableMoving ?? true
-										}
+										canMove={ canInsertOrMove }
+										canInsertLeft={ canInsertOrMove }
+										canInsertRight={ canInsertOrMove }
 									/>
 								</th>
 							);
@@ -516,7 +523,7 @@ function ViewTable< Item >( {
 						) }
 					</tr>
 				</thead>
-				{ /* Render grouped data if groupByField is specified */ }
+				{ /* Render grouped data if groupBy is specified */ }
 				{ hasData && groupField && dataByGroup ? (
 					Array.from( dataByGroup.entries() ).map(
 						( [ groupName, groupItems ] ) => (

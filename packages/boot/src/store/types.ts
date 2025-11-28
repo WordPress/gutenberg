@@ -42,9 +42,25 @@ export interface RouteLoaderContext {
  * Canvas data returned by route's canvas function.
  */
 export interface CanvasData {
+	/**
+	 * Post type to render in the canvas.
+	 */
 	postType: string;
+
+	/**
+	 * Post ID to render in the canvas.
+	 */
 	postId: string;
+
+	/**
+	 * Indicates if the canvas is in preview mode.
+	 */
 	isPreview?: boolean;
+	/**
+	 * Optional edit link for click-to-edit navigation.
+	 * When provided with isPreview: true, clicking the canvas navigates to this URL.
+	 */
+	editLink?: string;
 }
 
 /**
@@ -58,8 +74,11 @@ export interface Route {
 	path: string;
 
 	/**
-	 * Module path for lazy loading the route's surfaces (stage, inspector).
-	 * The module must export: RouteSurfaces (stage and/or inspector components)
+	 * Module path for lazy loading the route's surfaces.
+	 * The module can export:
+	 * - stage?: Main content component (ComponentType)
+	 * - inspector?: Sidebar component (ComponentType)
+	 * - canvas?: Custom canvas component (ComponentType)
 	 * This enables code splitting for better performance.
 	 */
 	content_module?: string;
@@ -69,7 +88,10 @@ export interface Route {
 	 * The module should export a named export `route` containing:
 	 * - beforeLoad?: Pre-navigation hook (authentication, validation, redirects)
 	 * - loader?: Data preloading function
-	 * - canvas?: Function that returns canvas data for rendering an editor
+	 * - canvas?: Function that returns canvas data for rendering
+	 *   - Returns CanvasData to use default editor canvas
+	 *   - Returns null to use custom canvas component from content_module
+	 *   - Returns undefined to show no canvas
 	 */
 	route_module?: string;
 }

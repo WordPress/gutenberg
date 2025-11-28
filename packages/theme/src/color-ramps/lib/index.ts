@@ -15,10 +15,9 @@ import {
  * Internal dependencies
  */
 import './register-color-spaces';
-import { getContrast, getColorString } from './color-utils';
+import { clampToGamut, getContrast, getColorString } from './color-utils';
 import { findColorMeetingRequirements } from './find-color-with-constraints';
 import {
-	clampToGamut,
 	sortByDependency,
 	computeBetterFgColorDirection,
 	adjustContrastTarget,
@@ -67,10 +66,8 @@ function calculateRamp( {
 		value: number;
 	};
 } ) {
-	const rampResults = {} as Record<
-		keyof Ramp,
-		{ color: string; warning: boolean }
-	>;
+	const rampResults = {} as Record< keyof Ramp, string >;
+	let warnings: string[] | undefined;
 	let maxDeficit = -Infinity;
 	let maxDeficitDirection: RampDirection = 'lighter';
 	let maxDeficitStep;
@@ -113,10 +110,7 @@ function calculateRamp( {
 			if ( candidateContrast >= adjustedTarget ) {
 				// Store the reused color
 				calculatedColors.set( stepName, candidateColor );
-				rampResults[ stepName ] = {
-					color: getColorString( candidateColor ),
-					warning: false,
-				};
+				rampResults[ stepName ] = getColorString( candidateColor );
 
 				continue; // Skip to next step
 			}
@@ -193,14 +187,17 @@ function calculateRamp( {
 		calculatedColors.set( stepName, searchResults.color );
 
 		// Add to results
-		rampResults[ stepName ] = {
-			color: getColorString( searchResults.color ),
-			warning:
-				! contrast.ignoreWhenAdjustingSeed && ! searchResults.reached,
-		};
+		rampResults[ stepName ] = getColorString( searchResults.color );
+
+		if ( ! searchResults.reached && ! contrast.ignoreWhenAdjustingSeed ) {
+			warnings ??= [];
+			warnings.push( stepName );
+		}
 	}
+
 	return {
 		rampResults,
+		warnings,
 		maxDeficit,
 		maxDeficitDirection,
 		maxDeficitStep,
@@ -250,15 +247,20 @@ export function buildRamp(
 	const sortedSteps = sortByDependency( config );
 
 	// Calculate the ramp with the initial seed.
-	const { rampResults, maxDeficit, maxDeficitDirection, maxDeficitStep } =
-		calculateRamp( {
-			seed,
-			sortedSteps,
-			config,
-			mainDir,
-			oppDir,
-			pinLightness,
-		} );
+	const {
+		rampResults,
+		warnings,
+		maxDeficit,
+		maxDeficitDirection,
+		maxDeficitStep,
+	} = calculateRamp( {
+		seed,
+		sortedSteps,
+		config,
+		mainDir,
+		oppDir,
+		pinLightness,
+	} );
 
 	let bestRamp = rampResults;
 
@@ -326,6 +328,7 @@ export function buildRamp(
 
 	return {
 		ramp: bestRamp,
+		warnings,
 		direction: mainDir,
 	};
 }

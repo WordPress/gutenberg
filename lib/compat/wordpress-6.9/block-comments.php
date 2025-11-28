@@ -115,21 +115,3 @@ function gutenberg_filter_comment_count_query_exclude_block_comments( $query ) {
 	return $query;
 }
 add_filter( 'query', 'gutenberg_filter_comment_count_query_exclude_block_comments' );
-
-/**
- * Allows duplicate block comment.
- *
- * @since 6.9.0
- *
- * @param int $dupe_id The duplicate comment ID.
- * @param array $commentdata The comment data.
- *
- * @return int ID of the comment identified as a duplicate.
- */
-function gutenberg_allow_duplicate_note_resolution( $dupe_id, $commentdata ) {
-	if ( isset( $commentdata['comment_type'] ) && 'note' === $commentdata['comment_type'] ) {
-		return false;
-	}
-	return $dupe_id;
-}
-add_filter( 'duplicate_comment_id', 'gutenberg_allow_duplicate_note_resolution', 10, 2 );

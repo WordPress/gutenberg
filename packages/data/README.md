@@ -516,10 +516,6 @@ _Related_
 
 -   [use](#use)
 
-_Type_
-
--   `Object`
-
 ### register
 
 Registers a standard `@wordpress/data` store descriptor.

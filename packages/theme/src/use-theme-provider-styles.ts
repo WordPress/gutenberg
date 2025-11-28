@@ -162,10 +162,7 @@ function colorTokensCSS(
 			const key = `${ rampName }-${ tokenName }`;
 			const aliasedBy = colorTokens[ key ] ?? [];
 			for ( const aliasedId of aliasedBy ) {
-				entries.push( [
-					`--wpds-color-${ aliasedId }`,
-					tokenValue.color,
-				] );
+				entries.push( [ `--wpds-color-${ aliasedId }`, tokenValue ] );
 			}
 		}
 	}

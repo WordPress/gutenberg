@@ -24,6 +24,8 @@ import { useView } from '@wordpress/views';
 import {
 	OPERATOR_IS_ANY,
 	OPERATOR_IS_NONE,
+	OPERATOR_BEFORE,
+	OPERATOR_AFTER,
 	LAYOUT_LIST,
 } from '../../utils/constants';
 
@@ -31,6 +33,7 @@ import AddNewPostModal from '../add-new-post';
 import { unlock } from '../../lock-unlock';
 import { useEditPostAction } from '../dataviews-actions';
 import { defaultLayouts, getDefaultView } from './view-utils';
+import useNotesCount from './use-notes-count';
 
 const { usePostActions, usePostFields } = unlock( editorPrivateApis );
 const { useLocation, useHistory } = unlock( routerPrivateApis );
@@ -123,6 +126,17 @@ export default function PostList( { postType } ) {
 			) {
 				filters.author_exclude = filter.value;
 			}
+			if ( filter.field === 'date' ) {
+				// Skip if no value is set yet
+				if ( ! filter.value ) {
+					return;
+				}
+				if ( filter.operator === OPERATOR_BEFORE ) {
+					filters.before = filter.value;
+				} else if ( filter.operator === OPERATOR_AFTER ) {
+					filters.after = filter.value;
+				}
+			}
 		} );
 
 		// We want to provide a different default item for the status filter
@@ -149,18 +163,34 @@ export default function PostList( { postType } ) {
 		totalPages,
 	} = useEntityRecordsWithPermissions( 'postType', postType, queryArgs );
 
+	const postIds = useMemo(
+		() => records?.map( ( record ) => record.id ) ?? [],
+		[ records ]
+	);
+	const { notesCount, isLoading: isLoadingNotesCount } =
+		useNotesCount( postIds );
+
 	// The REST API sort the authors by ID, but we want to sort them by name.
 	const data = useMemo( () => {
+		let processedRecords = records;
+
 		if ( view?.sort?.field === 'author' ) {
-			return filterSortAndPaginate(
+			processedRecords = filterSortAndPaginate(
 				records,
 				{ sort: { ...view.sort } },
 				fields
 			).data;
 		}
 
-		return records;
-	}, [ records, fields, view?.sort ] );
+		if ( processedRecords ) {
+			return processedRecords.map( ( record ) => ( {
+				...record,
+				notesCount: notesCount[ record.id ] ?? 0,
+			} ) );
+		}
+
+		return processedRecords;
+	}, [ records, fields, view?.sort, notesCount ] );
 
 	const ids = data?.map( ( record ) => getItemId( record ) ) ?? [];
 	const prevIds = usePrevious( ids ) ?? [];
@@ -261,7 +291,7 @@ export default function PostList( { postType } ) {
 				fields={ fields }
 				actions={ actions }
 				data={ data || EMPTY_ARRAY }
-				isLoading={ isLoadingData }
+				isLoading={ isLoadingData || isLoadingNotesCount }
 				view={ view }
 				onChangeView={ onChangeView }
 				selection={ selection }

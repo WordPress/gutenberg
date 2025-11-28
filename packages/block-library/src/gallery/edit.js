@@ -596,7 +596,6 @@ export default function GalleryEdit( props ) {
 				instructions: PLACEHOLDER_TEXT,
 			} }
 			onSelect={ updateImages }
-			accept="image/*"
 			allowedTypes={ ALLOWED_MEDIA_TYPES }
 			multiple
 			onError={ onUploadError }
@@ -910,7 +909,6 @@ export default function GalleryEdit( props ) {
 						<BlockControls group="other">
 							<MediaReplaceFlow
 								allowedTypes={ ALLOWED_MEDIA_TYPES }
-								accept="image/*"
 								handleUpload={ false }
 								onSelect={ updateImages }
 								name={ __( 'Add' ) }

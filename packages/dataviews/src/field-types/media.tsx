@@ -1,20 +1,20 @@
 /**
  * Internal dependencies
  */
-import type { FieldTypeDefinition } from '../types';
-
-function sort() {
-	return 0;
-}
+import type { FieldType } from '../types/private';
 
 export default {
-	sort,
+	type: 'media',
+	render: () => null,
+	Edit: null,
+	sort: () => 0,
 	isValid: {
 		elements: true,
 		custom: () => null,
 	},
-	Edit: null,
-	render: () => null,
 	enableSorting: false,
-	filterBy: false,
-} satisfies FieldTypeDefinition< any >;
+	enableGlobalSearch: false,
+	defaultOperators: [],
+	validOperators: [],
+	getFormat: () => ( {} ),
+} satisfies FieldType< any >;

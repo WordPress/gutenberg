@@ -19,9 +19,7 @@ import {
 import { __, sprintf } from '@wordpress/i18n';
 import { useRef, createInterpolateElement } from '@wordpress/element';
 import { closeSmall } from '@wordpress/icons';
-
-const ENTER = 'Enter';
-const SPACE = ' ';
+import { dateI18n, getDate } from '@wordpress/date';
 
 /**
  * Internal dependencies
@@ -56,6 +54,7 @@ import {
 import type {
 	Filter,
 	NormalizedField,
+	NormalizedFieldDate,
 	NormalizedFilter,
 	Operator,
 	Option,
@@ -63,6 +62,9 @@ import type {
 } from '../../types';
 import useElements from '../../hooks/use-elements';
 import parseDateTime from '../../field-types/utils/parse-date-time';
+
+const ENTER = 'Enter';
+const SPACE = ' ';
 
 interface FilterTextProps {
 	activeElements: Option[];
@@ -498,7 +500,19 @@ export default function Filter( {
 		const field = fields.find( ( f ) => f.id === filter.field );
 		let label = filterInView.value;
 
-		if ( field?.type === 'datetime' && typeof label === 'string' ) {
+		if ( field?.type === 'date' && typeof label === 'string' ) {
+			try {
+				const dateValue = parseDateTime( label );
+				if ( dateValue !== null ) {
+					label = dateI18n(
+						( field as NormalizedFieldDate< any > ).format.date,
+						getDate( label )
+					);
+				}
+			} catch ( e ) {
+				label = filterInView.value;
+			}
+		} else if ( field?.type === 'datetime' && typeof label === 'string' ) {
 			try {
 				const dateValue = parseDateTime( label );
 				if ( dateValue !== null ) {

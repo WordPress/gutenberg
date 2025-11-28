@@ -55,3 +55,5 @@ export const OPERATOR_IS = 'is';
 export const OPERATOR_IS_NOT = 'isNot';
 export const OPERATOR_IS_ANY = 'isAny';
 export const OPERATOR_IS_NONE = 'isNone';
+export const OPERATOR_BEFORE = 'before';
+export const OPERATOR_AFTER = 'after';

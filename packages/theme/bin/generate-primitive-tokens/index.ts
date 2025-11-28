@@ -87,7 +87,7 @@ function generatePrimitiveColorTokens() {
 				ramp.ramp
 			) ) {
 				colorJson.color.primitive[ scaleName ][ tokenName ] = {
-					$value: transformColorStringToDTCGValue( tokenValue.color ),
+					$value: transformColorStringToDTCGValue( tokenValue ),
 				};
 			}
 		} );

@@ -222,6 +222,11 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 		support: [ 'dimensions', 'minHeight' ],
 		useEngine: true,
 	},
+	width: {
+		value: [ 'dimensions', 'width' ],
+		support: [ 'dimensions', 'width' ],
+		useEngine: true,
+	},
 	padding: {
 		value: [ 'spacing', 'padding' ],
 		support: [ 'spacing', 'padding' ],

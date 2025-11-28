@@ -3,6 +3,8 @@
 // Add any picker-specific overrides here if needed in the future.
 
 .dataviews-view-picker-table {
+	background-color: inherit;
+
 	tbody:focus-visible {
 		// Only show one focus outline at a time. When focus is on a child element,
 		// hide the table's own focus outline.

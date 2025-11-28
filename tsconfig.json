@@ -3,6 +3,7 @@
 	"references": [
 		{ "path": "bin" },
 		{ "path": "packages/a11y" },
+		{ "path": "packages/abilities" },
 		{ "path": "packages/admin-ui" },
 		{ "path": "packages/api-fetch" },
 		{ "path": "packages/asset-loader" },
@@ -36,6 +37,7 @@
 		{ "path": "packages/html-entities" },
 		{ "path": "packages/i18n" },
 		{ "path": "packages/icons" },
+		{ "path": "packages/image-cropper" },
 		{ "path": "packages/interactivity" },
 		{ "path": "packages/interactivity/tsconfig.test.json" },
 		{ "path": "packages/interactivity-router" },
@@ -57,6 +59,7 @@
 		{ "path": "packages/redux-routine" },
 		{ "path": "packages/report-flaky-tests" },
 		{ "path": "packages/rich-text" },
+		{ "path": "packages/route" },
 		{ "path": "packages/router" },
 		{ "path": "packages/shortcode" },
 		{ "path": "packages/style-engine" },

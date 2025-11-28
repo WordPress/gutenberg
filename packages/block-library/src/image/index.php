@@ -196,6 +196,7 @@ function block_core_image_render_lightbox( $block_content, $block ) {
 	$img_styles        = $processor->get_attribute( 'style' );
 	$img_width         = 'none';
 	$img_height        = 'none';
+	$img_srcset        = false;
 	$aria_label        = __( 'Enlarge' );
 	$dialog_aria_label = __( 'Enlarged image' );
 
