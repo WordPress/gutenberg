@@ -652,56 +652,29 @@ body.editor-styles-wrapper .wp-block-navigation__responsive-container.is-menu-op
 
 /**
  * Toolbar inserter button
- * Black square with white plus icon, matching the mockup design
+ * Black square with rounded corners and white plus icon, matching the standard block inserter
  */
-.block-editor-block-toolbar .wp-block-navigation__toolbar-inserter-button.components-button,
-.block-editor-block-toolbar .components-toolbar__control.wp-block-navigation__toolbar-inserter-button,
-.components-toolbar-group .wp-block-navigation__toolbar-inserter-button.components-button {
-	// Black square with white plus icon
-	background: $gray-900 !important;
-	color: $white !important;
-	padding: 0 !important;
-	min-width: $button-size-small !important;
-	width: $button-size-small !important;
-	height: $button-size-small !important;
-	border-radius: 0;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-
-	// Override default toolbar button padding and sizing
-	&.has-icon,
-	&.has-icon.has-icon {
-		padding-left: 0 !important;
-		padding-right: 0 !important;
-		min-width: $button-size-small !important;
-		width: $button-size-small !important;
-		height: $button-size-small !important;
-	}
+.wp-block-navigation__toolbar-inserter-group .wp-block-navigation__toolbar-inserter-button.components-button.has-icon.has-icon {
+	// Match standard inserter toggle styles
+	background: $gray-900;
+	color: $white;
+	padding: 0;
+	min-width: auto;
+	width: $button-size-small;
+	height: $button-size-small;
 
 	// Hide the default focus ::before pseudo-element
 	&::before {
-		display: none !important;
+		display: none;
 	}
 
 	&:hover {
-		color: $white !important;
-		background: var(--wp-admin-theme-color) !important;
+		color: $white;
+		background: var(--wp-admin-theme-color);
 	}
 
 	&:focus {
-		box-shadow: inset 0 0 0 2px var(--wp-admin-theme-color) !important;
+		box-shadow: inset 0 0 0 2px var(--wp-admin-theme-color);
 		outline: none;
-
-		&::before {
-			display: none !important;
-		}
-	}
-
-	// Ensure the icon is centered
-	svg {
-		margin: 0;
-		width: 20px;
-		height: 20px;
 	}
 }

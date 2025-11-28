@@ -47,7 +47,7 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
-import { close, Icon, plus } from '@wordpress/icons';
+import { close, Icon } from '@wordpress/icons';
 import { useInstanceId } from '@wordpress/compose';
 
 /**
@@ -100,23 +100,20 @@ function NavigationAddPageButton( { clientId } ) {
 
 	return (
 		<BlockControls group="other">
-			<ToolbarGroup>
+			<ToolbarGroup className="wp-block-navigation__toolbar-inserter-group">
 				<VStack alignment="center">
 					<Inserter
 						rootClientId={ clientId }
 						directInsertBlock={ directInsertBlock }
 						isAppender
-						renderToggle={ ( { onToggle, disabled } ) => (
-							<ToolbarButton
-								name="add-page"
-								icon={ plus }
-								onClick={ onToggle }
-								label={ __( 'Add page' ) }
-								showTooltip
-								className="wp-block-navigation__toolbar-inserter-button"
-								disabled={ disabled }
-							/>
-						) }
+						toggleProps={ {
+							as: ToolbarButton,
+							name: 'add-page',
+							label: __( 'Add page' ),
+							showTooltip: true,
+							className:
+								'wp-block-navigation__toolbar-inserter-button',
+						} }
 					/>
 				</VStack>
 			</ToolbarGroup>
