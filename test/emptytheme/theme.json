@@ -1,5 +1,5 @@
 {
-	"$schema": "https://schemas.wp.org/trunk/theme.json",
+	"$schema": "../../schemas/json/theme.json",
 	"version": 3,
 	"settings": {
 		"appearanceTools": true,
@@ -8,42 +8,12 @@
 			"wideSize": "1100px"
 		}
 	},
-	"styles": {
-		"blocks": {
-			"core/accordion-item": {
-				"border": {
-					"color": "#d5dae2",
-					"style": "solid",
-					"width": "1px",
-					"radius": "12px"
-				},
-				"color": {
-					"background": "#f6f7f9",
-					"text": "#343b46"
-				},
-				"shadow": "0 10px 15px -3px #80000080, 0 4px 6px -4px #80000080"
-			},
-			"core/accordion-heading": {
-				"css": "&__toggle { padding: var(--wp--preset--spacing--40) var(--wp--style--block-gap); }",
-				"typography": {
-					"fontFamily": "inherit",
-					"fontSize": "inherit",
-					"fontStyle": "inherit",
-					"fontWeight": "500",
-					"lineHeight": "inherit",
-					"textTransform": "inherit"
-				}
-			},
-			"core/accordion-panel": {
-				"spacing": {
-					"padding": {
-						"top": "var(--wp--style--block-gap)",
-						"bottom": "var(--wp--style--block-gap)",
-						"left": "var(--wp--style--block-gap)",
-						"right": "var(--wp--style--block-gap)"
-					}
-				}
-			}
+	"customTemplates": [
+		{
+			"name": "custom-template",
+			"title": "Custom",
+			"postTypes": [ "post" ]
 		}
-	}
+	],
+	"patterns": [ "short-text-surrounded-by-round-images", "partner-logos" ]
 }
