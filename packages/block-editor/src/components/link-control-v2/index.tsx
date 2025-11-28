@@ -1,0 +1,113 @@
+/**
+ * WordPress dependencies
+ */
+
+/**
+ * Internal dependencies
+ */
+import { UnforwardedLinkControlV2 } from './component';
+import { LinkControlV2Context } from './context';
+import { SearchInput } from './search-input';
+import { Preview } from './preview';
+import { SettingsDrawer } from './settings-drawer';
+import { TextControl } from './text-control';
+import { Actions } from './actions';
+
+/**
+ * LinkControlV2 is a compound component that provides a flexible API
+ * for managing link values with opinionated defaults.
+ *
+ * By default, it handles committed/uncommitted values internally, but
+ * consumers can access and control state via the `useLinkControlV2` hook.
+ *
+ * @example
+ * ```tsx
+ * // Basic usage with defaults
+ * <LinkControlV2
+ *   value={linkValue}
+ *   onChange={setLinkValue}
+ * />
+ *
+ * // Custom composition
+ * <LinkControlV2 value={linkValue} onChange={setLinkValue}>
+ *   <LinkControlV2.SearchInput />
+ *   <LinkControlV2.Preview />
+ * </LinkControlV2>
+ *
+ * // Replace default components
+ * <LinkControlV2
+ *   value={linkValue}
+ *   onChange={setLinkValue}
+ *   components={{
+ *     SearchInput: MyCustomSearchInput
+ *   }}
+ * />
+ * ```
+ */
+export const __experimentalLinkControlV2 = Object.assign(
+	UnforwardedLinkControlV2,
+	{
+		/**
+		 * Context for LinkControlV2.
+		 *
+		 * Can be used to access context outside of component tree if needed.
+		 */
+		Context: Object.assign( LinkControlV2Context, {
+			displayName: 'LinkControlV2.Context',
+		} ),
+		/**
+		 * SearchInput subcomponent.
+		 *
+		 * Uses ValidatedComboboxControl for entity search functionality.
+		 */
+		SearchInput: Object.assign( SearchInput, {
+			displayName: 'LinkControlV2.SearchInput',
+		} ),
+		/**
+		 * Preview subcomponent.
+		 *
+		 * Displays the committed link value with edit/unlink actions.
+		 */
+		Preview: Object.assign( Preview, {
+			displayName: 'LinkControlV2.Preview',
+		} ),
+		/**
+		 * SettingsDrawer subcomponent.
+		 *
+		 * Collapsible drawer for link settings.
+		 */
+		SettingsDrawer: Object.assign( SettingsDrawer, {
+			displayName: 'LinkControlV2.SettingsDrawer',
+		} ),
+		/**
+		 * TextControl subcomponent.
+		 *
+		 * Optional text input for link title/text.
+		 */
+		TextControl: Object.assign( TextControl, {
+			displayName: 'LinkControlV2.TextControl',
+		} ),
+		/**
+		 * Actions subcomponent.
+		 *
+		 * Provides Apply and Cancel buttons.
+		 */
+		Actions: Object.assign( Actions, {
+			displayName: 'LinkControlV2.Actions',
+		} ),
+	}
+);
+
+// Export hook for consumers
+export { useLinkControlV2 } from './hook';
+
+// Export types
+export type {
+	LinkValue,
+	LinkSuggestion,
+	LinkSetting,
+	FetchSuggestionsOptions,
+	FetchSuggestionsFunction,
+	LinkControlV2Props,
+} from './types';
+
