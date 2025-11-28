@@ -26,8 +26,8 @@ import {
 	__experimentalColorGradientSettingsDropdown as ColorGradientSettingsDropdown,
 	__experimentalUseMultipleOriginColorsAndGradients as useMultipleOriginColorsAndGradients,
 	useBlockEditingMode,
-	BlockControls,
 	Inserter,
+	__unstableBlockToolbarLastItem as BlockToolbarLastItem,
 } from '@wordpress/block-editor';
 import { EntityProvider, store as coreStore } from '@wordpress/core-data';
 
@@ -45,7 +45,7 @@ import {
 	ToolbarButton,
 	ToolbarGroup,
 } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
 import { close, Icon } from '@wordpress/icons';
 import { useInstanceId } from '@wordpress/compose';
@@ -99,7 +99,7 @@ function NavigationAddPageButton( { clientId } ) {
 	};
 
 	return (
-		<BlockControls group="other">
+		<BlockToolbarLastItem>
 			<ToolbarGroup className="wp-block-navigation__toolbar-inserter-group">
 				<VStack alignment="center">
 					<Inserter
@@ -108,8 +108,12 @@ function NavigationAddPageButton( { clientId } ) {
 						isAppender
 						toggleProps={ {
 							as: ToolbarButton,
-							name: 'add-page',
-							label: __( 'Add page' ),
+							name: 'add-block',
+							label: sprintf(
+								// translators: %s: The type of navigation link (e.g., "page", "post")
+								__( 'Add %s' ),
+								DEFAULT_BLOCK.attributes.type
+							),
 							showTooltip: true,
 							className:
 								'wp-block-navigation__toolbar-inserter-button',
@@ -117,7 +121,7 @@ function NavigationAddPageButton( { clientId } ) {
 					/>
 				</VStack>
 			</ToolbarGroup>
-		</BlockControls>
+		</BlockToolbarLastItem>
 	);
 }
 
