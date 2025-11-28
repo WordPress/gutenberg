@@ -2,6 +2,40 @@
 
 This repository uses [npm workspaces](https://docs.npmjs.com/cli/v10/using-npm/workspaces) to manage WordPress packages and [lerna](https://lerna.js.org/) to publish them with to [npm](https://www.npmjs.com/).
 
+## Package Guidelines
+
+Packages are the first layer of architecture and organization in Gutenberg. They exist to separate concerns, provide clarity, and establish a shared mental model across teams. To maintain good package hygiene, follow these guidelines when creating new packages or iterating on existing ones:
+
+1. **Each package should have a single, clear purpose.**
+
+   It should be immediately obvious why the package exists.
+
+2. **Every package must include a README.**
+
+   This is the first place contributors look to understand scope and usage.
+
+3. **Any prerequisites must be documented.**
+
+   Generic packages without prerequisites are better, but packages with some prerequisites are acceptable. Examples of prerequisites: API endpoints that must exist, authentication assumptions, environment dependencies. These should be clearly stated in the README.
+
+4. **Public APIs should have documentation.**
+
+   Either inline in the README or linked to external docs.
+
+5. **Avoid utility and kitchen-sink packages.**
+
+   They tend to grow without a coherent domain and become junk drawers.
+
+6. **Avoid broad, catch-all scopes.**
+
+   For example: "Reusable components for the WooCommerce plugin." This creates unclear ownership and encourages uncontrolled growth.
+
+7. **Default to bundled packages (no globals, no modules) unless necessary.**
+
+   In Gutenberg, we should default to "bundled" packages unless there's a specific need for globals or modules. See the [@wordpress/build README](../wp-build/README.md) for more information on package configuration.
+
+For more information on the build system and package configuration, see the [@wordpress/build README](../wp-build/README.md).
+
 ## Creating a New Package
 
 When creating a new package, you need to provide at least the following. Packages bundled in Gutenberg or WordPress must include a `wpScript` and or `wpScriptModuleExports` field in their `package.json` file. See the details below.
@@ -71,6 +105,8 @@ When creating a new package, you need to provide at least the following. Package
     ```
 
     Both `wpScript` and `wpScriptModuleExports` may be included if the package exposes both a script and a script module. These fields are also essential when performing a license check for all their dependencies, because they trigger strict validation against compatibility with GPL v2. All remaining dependencies WordPress doesn't distribute but uses for development purposes can contain also a few other OSS compatible licenses.
+
+    For more details on package configuration options, see the [@wordpress/build README](../wp-build/README.md).
 
 1. `README.md` file containing at least:
     - Package name

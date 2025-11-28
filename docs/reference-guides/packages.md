@@ -2,6 +2,40 @@
 
 WordPress exposes a list of JavaScript packages and tools for WordPress development.
 
+For information on creating and managing packages in Gutenberg, see the [packages README](../../packages/README.md). For details on the build system and package configuration, see the [@wordpress/build README](../../packages/wp-build/README.md).
+
+## Package Guidelines
+
+Packages are the first layer of architecture and organization in Gutenberg. They exist to separate concerns, provide clarity, and establish a shared mental model across teams. To maintain good package hygiene, follow these guidelines when creating new packages or iterating on existing ones:
+
+1. **Each package should have a single, clear purpose.**
+
+   It should be immediately obvious why the package exists.
+
+2. **Every package must include a README.**
+
+   This is the first place contributors look to understand scope and usage.
+
+3. **Any prerequisites must be documented.**
+
+   Generic packages without prerequisites are better, but packages with some prerequisites are acceptable. Examples of prerequisites: API endpoints that must exist, authentication assumptions, environment dependencies. These should be clearly stated in the README.
+
+4. **Public APIs should have documentation.**
+
+   Either inline in the README or linked to external docs.
+
+5. **Avoid utility and kitchen-sink packages.**
+
+   They tend to grow without a coherent domain and become junk drawers.
+
+6. **Avoid broad, catch-all scopes.**
+
+   For example: "Reusable components for the WooCommerce plugin." This creates unclear ownership and encourages uncontrolled growth.
+
+7. **Default to bundled packages (no globals, no modules) unless necessary.**
+
+   In Gutenberg, we should default to "bundled" packages unless there's a specific need for globals or modules. See the [@wordpress/build README](../../packages/wp-build/README.md) for more information on package configuration.
+
 ## Using the packages via WordPress global
 
 JavaScript packages are available as a registered script in WordPress and can be accessed using the `wp` global variable.
