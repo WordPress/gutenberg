@@ -28,7 +28,7 @@ Packages are the first layer of architecture and organization in Gutenberg. They
 
 6. **Avoid broad, catch-all scopes.**
 
-   For example: "Reusable components for the WooCommerce plugin." This creates unclear ownership and encourages uncontrolled growth.
+   For example: "Reusable WordPress components" or "Utilities for different use cases." These create unclear ownership and encourage uncontrolled growth. Instead, define a specific domain or purpose.
 
 7. **Default to bundled packages (no globals, no modules) unless necessary.**
 
@@ -127,6 +127,21 @@ When creating a new package, you need to provide at least the following. Package
     ```
 
 To ensure your package is recognized in npm workspaces, you should run `npm install` to update the package lock file.
+
+## Making a Package Private
+
+If a package is only used internally within Gutenberg (or WordPress core) and should not be published to npm, mark it as private by adding the following to the package's `package.json`:
+
+```json
+{
+	"private": true,
+	"wpScript": false
+}
+```
+
+Private packages will be excluded from npm publication but will still work within the monorepo as dependencies for other packages. Setting `wpScript` to `false` ensures the package is not exposed as a WordPress script.
+
+Note: You can safely include the `publishConfig` field in private packages—it will be ignored by npm since the `private` flag takes precedence.
 
 ## Managing Dependencies
 
