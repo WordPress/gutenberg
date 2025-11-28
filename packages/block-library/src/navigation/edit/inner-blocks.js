@@ -57,13 +57,6 @@ export default function NavigationInnerBlocks( {
 		'wp_navigation'
 	);
 
-	// When the block is selected itself or has a top level item selected that
-	// doesn't itself have children, show the standard appender. Else show no
-	// appender.
-	const parentOrChildHasSelection =
-		isSelected ||
-		( isImmediateParentOfSelectedBlock && ! selectedBlockHasChildren );
-
 	const placeholder = useMemo( () => <PlaceholderPreview />, [] );
 
 	const hasMenuItems = !! blocks?.length;
@@ -74,6 +67,14 @@ export default function NavigationInnerBlocks( {
 	// alongside the appender.
 	const showPlaceholder =
 		! hasCustomPlaceholder && ! hasMenuItems && ! isSelected;
+
+	// Hide the in-canvas appender when the Navigation block itself is selected,
+	// since the toolbar-based [+] button will be available instead.
+	// Show the appender when child blocks are selected to allow inserting between items.
+	const shouldShowAppender =
+		! isSelected &&
+		( ( isImmediateParentOfSelectedBlock && ! selectedBlockHasChildren ) ||
+			hasSelectedDescendant );
 
 	const innerBlocksProps = useInnerBlocksProps(
 		{
@@ -94,15 +95,11 @@ export default function NavigationInnerBlocks( {
 			// This should be a temporary fix, to be replaced by improvements to
 			// the sibling inserter.
 			// See https://github.com/WordPress/gutenberg/issues/37572.
-			renderAppender:
-				isSelected ||
-				( isImmediateParentOfSelectedBlock &&
-					! selectedBlockHasChildren ) ||
-				hasSelectedDescendant ||
-				// Show the appender while dragging to allow inserting element between item and the appender.
-				parentOrChildHasSelection
-					? InnerBlocks.ButtonBlockAppender
-					: false,
+			// Hide the appender when the Navigation block itself is selected,
+			// as the toolbar-based inserter will be available instead.
+			renderAppender: shouldShowAppender
+				? InnerBlocks.ButtonBlockAppender
+				: false,
 			placeholder: showPlaceholder ? placeholder : undefined,
 			__experimentalCaptureToolbars: true,
 			__unstableDisableLayoutClassNames: true,

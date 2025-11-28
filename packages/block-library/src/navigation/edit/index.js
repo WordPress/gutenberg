@@ -46,7 +46,7 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
-import { close, Icon, page } from '@wordpress/icons';
+import { close, Icon, plus } from '@wordpress/icons';
 import { createBlock } from '@wordpress/blocks';
 import { useInstanceId } from '@wordpress/compose';
 
@@ -107,15 +107,18 @@ function NavigationAddPageButton( { clientId } ) {
 	}, [ clientId, insertBlock, getBlockCount ] );
 
 	return (
-		<BlockControls>
+		<BlockControls group="other">
 			<ToolbarGroup>
-				<ToolbarButton
-					name="add-page"
-					icon={ page }
-					onClick={ onAddPage }
-				>
-					{ __( 'Add page' ) }
-				</ToolbarButton>
+				<VStack alignment="center">
+					<ToolbarButton
+						name="add-page"
+						icon={ plus }
+						onClick={ onAddPage }
+						label={ __( 'Add page' ) }
+						showTooltip
+						className="wp-block-navigation__toolbar-inserter-button"
+					/>
+				</VStack>
 			</ToolbarGroup>
 		</BlockControls>
 	);
@@ -982,7 +985,7 @@ function Navigation( {
 					blockEditingMode={ blockEditingMode }
 				/>
 				{ blockEditingMode === 'default' && stylingInspectorControls }
-				{ blockEditingMode === 'contentOnly' && isEntityAvailable && (
+				{ isEntityAvailable && (
 					<NavigationAddPageButton clientId={ clientId } />
 				) }
 				{ blockEditingMode === 'default' && isEntityAvailable && (
