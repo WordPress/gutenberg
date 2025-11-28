@@ -80,6 +80,10 @@ export type Rules< Item > = {
 	required?: boolean;
 	elements?: boolean;
 	pattern?: string;
+	minLength?: number;
+	maxLength?: number;
+	min?: number;
+	max?: number;
 	custom?:
 		| ( ( item: Item, field: NormalizedField< Item > ) => null | string )
 		| ( (
@@ -295,6 +299,22 @@ export type FieldValidity = {
 		message?: string;
 	};
 	pattern?: {
+		type: 'valid' | 'invalid' | 'validating';
+		message: string;
+	};
+	min?: {
+		type: 'valid' | 'invalid' | 'validating';
+		message: string;
+	};
+	max?: {
+		type: 'valid' | 'invalid' | 'validating';
+		message: string;
+	};
+	minLength?: {
+		type: 'valid' | 'invalid' | 'validating';
+		message: string;
+	};
+	maxLength?: {
 		type: 'valid' | 'invalid' | 'validating';
 		message: string;
 	};

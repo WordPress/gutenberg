@@ -33,6 +33,10 @@ import {
 	chevronLeft,
 	chevronRight,
 } from '@wordpress/icons';
+import {
+	useEntityRecord,
+	type FontCollection as FontCollectionType,
+} from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -49,7 +53,7 @@ import GoogleFontsConfirmDialog from './google-fonts-confirm-dialog';
 import { downloadFontFaceAssets } from './utils';
 import { sortFontFaces } from './utils/sort-font-faces';
 import CollectionFontVariant from './collection-font-variant';
-import type { FontFace, FontFamily } from './types';
+import type { FontFace, FontFamily, CollectionFontFamily } from './types';
 
 const DEFAULT_CATEGORY = {
 	slug: 'all',
@@ -84,11 +88,9 @@ function FontCollection( { slug }: { slug: string } ) {
 	const [ renderConfirmDialog, setRenderConfirmDialog ] = useState(
 		requiresPermission && ! getGoogleFontsPermissionFromStorage()
 	);
-	const { collections, getFontCollection, installFonts, isInstalling } =
-		useContext( FontLibraryContext );
-	const selectedCollection = collections.find(
-		( collection ) => collection.slug === slug
-	);
+	const { installFonts, isInstalling } = useContext( FontLibraryContext );
+	const { record: selectedCollection, isResolving: isLoading } =
+		useEntityRecord< FontCollectionType >( 'root', 'fontCollection', slug );
 
 	useEffect( () => {
 		const handleStorage = () => {
@@ -107,23 +109,6 @@ function FontCollection( { slug }: { slug: string } ) {
 	};
 
 	useEffect( () => {
-		const fetchFontCollection = async () => {
-			try {
-				await getFontCollection( slug );
-				resetFilters();
-			} catch ( e ) {
-				if ( ! notice ) {
-					setNotice( {
-						type: 'error',
-						message: ( e as Error )?.message,
-					} );
-				}
-			}
-		};
-		fetchFontCollection();
-	}, [ slug, getFontCollection, setNotice, notice ] );
-
-	useEffect( () => {
 		setSelectedFont( null );
 	}, [ slug ] );
 
@@ -133,7 +118,10 @@ function FontCollection( { slug }: { slug: string } ) {
 	}, [ selectedFont ] );
 
 	const collectionFonts = useMemo(
-		() => selectedCollection?.font_families ?? [],
+		() =>
+			( selectedCollection?.font_families as
+				| CollectionFontFamily[]
+				| undefined ) ?? [],
 		[ selectedCollection ]
 	);
 	const collectionCategories = selectedCollection?.categories ?? [];
@@ -144,8 +132,6 @@ function FontCollection( { slug }: { slug: string } ) {
 		() => filterFonts( collectionFonts, filters ),
 		[ collectionFonts, filters ]
 	);
-
-	const isLoading = ! selectedCollection?.font_families && ! notice;
 
 	// NOTE: The height of the font library modal unavailable to use for rendering font family items is roughly 417px
 	// The height of each font family item is 61px.
@@ -168,11 +154,6 @@ function FontCollection( { slug }: { slug: string } ) {
 
 	// @ts-expect-error
 	const debouncedUpdateSearchInput = debounce( handleUpdateSearchInput, 300 );
-
-	const resetFilters = () => {
-		setFilters( {} );
-		setPage( 1 );
-	};
 
 	const handleToggleVariant = ( font: FontFamily, face?: FontFace ) => {
 		const newFontsToInstall = toggleFont( font, face, fontsToInstall );

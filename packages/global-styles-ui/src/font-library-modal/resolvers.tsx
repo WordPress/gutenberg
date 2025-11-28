@@ -9,12 +9,10 @@ import apiFetch from '@wordpress/api-fetch';
 import type {
 	CollectionFontFace,
 	CollectionFontFamily,
-	FontCollection,
 	FontFace,
 } from './types';
 
 const FONT_FAMILIES_URL = '/wp/v2/font-families';
-const FONT_COLLECTIONS_URL = '/wp/v2/font-collections';
 
 export async function fetchInstallFontFamily( data: FormData ) {
 	const config = {
@@ -78,20 +76,4 @@ export async function fetchUninstallFontFamily(
 		method: 'DELETE',
 	};
 	return await apiFetch( config );
-}
-
-export async function fetchFontCollections() {
-	const config = {
-		path: `${ FONT_COLLECTIONS_URL }?_fields=slug,name,description`,
-		method: 'GET',
-	};
-	return ( await apiFetch( config ) ) as FontCollection[];
-}
-
-export async function fetchFontCollection( id: string ) {
-	const config = {
-		path: `${ FONT_COLLECTIONS_URL }/${ id }`,
-		method: 'GET',
-	};
-	return ( await apiFetch( config ) ) as FontCollection;
 }

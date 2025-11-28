@@ -13,6 +13,7 @@ import {
 	redirect,
 	RouterProvider,
 	useCanGoBack,
+	useLocation,
 	useMatches,
 	useRouter,
 } from '@tanstack/react-router';
@@ -44,6 +45,7 @@ lock( privateApis, {
 	redirect,
 	createLink,
 	useCanGoBack,
+	useLocation,
 	useMatches,
 	useRouter,
 

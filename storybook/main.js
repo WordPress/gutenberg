@@ -38,6 +38,7 @@ const stories = [
 	'../packages/global-styles-ui/src/**/stories/*.story.@(jsx|tsx|mdx)',
 	'../packages/dataviews/src/**/stories/*.story.@(jsx|tsx|mdx)',
 	'../packages/fields/src/**/stories/*.story.@(jsx|tsx|mdx)',
+	'../packages/image-cropper/src/**/stories/*.story.@(js|tsx|mdx)',
 	'../packages/theme/src/**/stories/*.story.@(tsx|mdx)',
 	'../packages/ui/src/**/stories/*.story.@(ts|tsx)',
 ].filter( Boolean );
