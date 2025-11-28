@@ -166,6 +166,8 @@ export default function ValidatedNumber< Item >( {
 			__next40pxDefaultSize
 			hideLabelFromVision={ hideLabelFromVision }
 			step={ step }
+			min={ isValid?.min }
+			max={ isValid?.max }
 		/>
 	);
 }

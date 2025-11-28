@@ -34,6 +34,13 @@
 		margin: 0 4px;
 		vertical-align: text-top;
 	}
+	.components-button {
+		&:hover {
+			svg {
+				fill: $white;
+			}
+		}
+	}
 }
 
 .edit-template-welcome-guide {

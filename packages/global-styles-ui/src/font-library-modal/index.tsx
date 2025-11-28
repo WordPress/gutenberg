@@ -6,9 +6,9 @@ import {
 	Modal,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
-import { store as coreStore } from '@wordpress/core-data';
+import { store as coreStore, useEntityRecords } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
-import { useContext } from '@wordpress/element';
+import type { FontCollection as FontCollectionType } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -16,8 +16,6 @@ import { useContext } from '@wordpress/element';
 import InstalledFonts from './installed-fonts';
 import FontCollection from './font-collection';
 import UploadFonts from './upload-fonts';
-import { FontLibraryContext } from './context';
-import type { FontCollection as FontCollectionType } from './types';
 import { unlock } from '../lock-unlock';
 
 const { Tabs } = unlock( componentsPrivateApis );
@@ -48,7 +46,10 @@ function FontLibraryModal( {
 	onRequestClose: () => void;
 	defaultTabId?: string;
 } ) {
-	const { collections } = useContext( FontLibraryContext );
+	const { records: collections = [] } =
+		useEntityRecords< FontCollectionType >( 'root', 'fontCollection', {
+			_fields: 'slug,name,description',
+		} );
 	const canUserCreate = useSelect( ( select ) => {
 		return select( coreStore ).canUser( 'create', {
 			kind: 'postType',

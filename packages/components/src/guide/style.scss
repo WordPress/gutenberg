@@ -31,12 +31,6 @@
 			align-self: flex-start;
 			margin: $grid-unit-10 $grid-unit-10 0 0;
 			position: static;
-
-			&:hover {
-				svg {
-					fill: $white;
-				}
-			}
 		}
 	}
 

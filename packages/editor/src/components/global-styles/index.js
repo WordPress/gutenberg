@@ -33,7 +33,7 @@ function useServerData() {
 
 		const canUserUploadMedia = canUser( 'create', {
 			kind: 'postType',
-			name: 'attachement',
+			name: 'attachment',
 		} );
 
 		return {

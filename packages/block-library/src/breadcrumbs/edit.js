@@ -116,9 +116,11 @@ export default function BreadcrumbEdit( {
 		);
 	}
 
-	// Determine breadcrumb type for accurate previews (matching PHP logic).
+	// Try to determine breadcrumb type for more accurate previews.
 	let _showTerms;
-	if ( ! isPostTypeHierarchical ) {
+	// Some non-hierarchical post types (e.g., attachments) can have parents.
+	// Use hierarchical breadcrumbs if a parent exists, otherwise use taxonomy breadcrumbs.
+	if ( ! isPostTypeHierarchical && ! post?.parent ) {
 		_showTerms = true;
 	} else if ( ! postTypeHasTaxonomies ) {
 		// Hierarchical post type without taxonomies can only use ancestors.

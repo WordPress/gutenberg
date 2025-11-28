@@ -5,6 +5,7 @@ import type { Context, Updatable } from './helpers';
 import type { Attachment } from './attachment';
 import type { Base, TemplatePartArea, TemplateType } from './base';
 import type { Comment } from './comment';
+import type { FontCollection } from './font-collection';
 import type { GlobalStylesRevision } from './global-styles-revision';
 import type { MenuLocation } from './menu-location';
 import type { NavMenu } from './nav-menu';
@@ -33,6 +34,7 @@ export type {
 	Base as UnstableBase,
 	Comment,
 	Context,
+	FontCollection,
 	GlobalStylesRevision,
 	MenuLocation,
 	NavMenu,
@@ -95,6 +97,7 @@ export interface PerPackageEntityRecords< C extends Context > {
 		| Base< C >
 		| Attachment< C >
 		| Comment< C >
+		| FontCollection< C >
 		| GlobalStylesRevision< C >
 		| MenuLocation< C >
 		| NavMenu< C >

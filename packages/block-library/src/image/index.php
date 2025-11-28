@@ -198,6 +198,7 @@ function block_core_image_render_lightbox( $block_content, $block, $block_instan
 	$img_styles       = $processor->get_attribute( 'style' );
 	$img_width        = 'none';
 	$img_height       = 'none';
+	$img_srcset       = false;
 
 	wp_interactivity_config(
 		'core/image',

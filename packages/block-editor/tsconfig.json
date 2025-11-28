@@ -9,6 +9,7 @@
 		{ "path": "../components" },
 		{ "path": "../compose" },
 		{ "path": "../data" },
+		{ "path": "../dataviews" },
 		{ "path": "../date" },
 		{ "path": "../deprecated" },
 		{ "path": "../dom" },

@@ -42,7 +42,8 @@ function getTemplateLockValue( lock ) {
 
 export default function BlockLockModal( { clientId, onClose } ) {
 	const [ lock, setLock ] = useState( { move: false, remove: false } );
-	const { canEdit, canMove, canRemove } = useBlockLock( clientId );
+	const { isEditLocked, isMoveLocked, isRemoveLocked } =
+		useBlockLock( clientId );
 	const { allowsEditLocking, templateLock, hasTemplateLock } = useSelect(
 		( select ) => {
 			const { getBlockName, getBlockAttributes } =
@@ -66,11 +67,11 @@ export default function BlockLockModal( { clientId, onClose } ) {
 
 	useEffect( () => {
 		setLock( {
-			move: ! canMove,
-			remove: ! canRemove,
-			...( allowsEditLocking ? { edit: ! canEdit } : {} ),
+			move: isMoveLocked,
+			remove: isRemoveLocked,
+			...( allowsEditLocking ? { edit: isEditLocked } : {} ),
 		} );
-	}, [ canEdit, canMove, canRemove, allowsEditLocking ] );
+	}, [ isEditLocked, isMoveLocked, isRemoveLocked, allowsEditLocking ] );
 
 	const isAllChecked = Object.values( lock ).every( Boolean );
 	const isMixed = Object.values( lock ).some( Boolean ) && ! isAllChecked;

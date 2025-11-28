@@ -106,6 +106,20 @@
 	@include break-large() {
 		max-height: 70%;
 	}
+
+	&.is-full-screen {
+		// When full screen, make sure the children container is full height.
+		.components-modal__content {
+			display: flex;
+			// If this container is scrollable, bottom padding won't apply so we use margin instead.
+			margin-bottom: $grid-unit-40;
+			padding-bottom: 0;
+
+			> :last-child {
+				flex: 1;
+			}
+		}
+	}
 }
 
 @keyframes components-modal__appear-animation {

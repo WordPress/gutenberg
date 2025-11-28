@@ -203,15 +203,29 @@ If `handlePrefix` is omitted, it defaults to the namespace key (e.g., `"woo"` â†
 
 ### `wpPlugin.pages` (Experimental)
 
-Define admin pages that support routes. Each page gets generated PHP functions for route registration and can be extended by other plugins:
+Define admin pages that support routes. Each page gets generated PHP functions for route registration and can be extended by other plugins.
+
+Pages can be defined as simple strings or as objects with initialization modules:
 
 ```json
 {
 	"wpPlugin": {
-		"pages": ["my-admin-page"]
+		"pages": [
+			"my-admin-page",
+			{
+				"id": "my-other-page",
+				"init": ["@my-plugin/my-page-init"]
+			}
+		]
 	}
 }
 ```
+
+**Page Configuration:**
+- **String format**: `"my-admin-page"` - Simple page with no init modules
+- **Object format**: `{ "id": "page-slug", "init": ["@scope/package"] }` - Page with init modules
+
+**Generated Files:**
 
 This generates two page modes:
 - `build/pages/my-admin-page/page.php` - Full-page mode (takes over entire admin screen with custom sidebar)
@@ -231,6 +245,45 @@ add_menu_page( 'Title', 'Menu', 'capability', $url, '', 'icon', 20 );
 ```php
 add_menu_page( 'Title', 'Menu', 'capability', 'my-admin-page', 'my_admin_page_render_page', 'icon', 20 );
 ```
+
+**Init Modules:**
+Init modules are JavaScript packages that execute during page initialization, before routes are registered and the app renders. They're ideal for:
+- Adding icons to menu items (icons can't be passed from PHP)
+- Registering command palette entries
+
+**Creating an Init Module:**
+
+In `packages/my-page-init/package.json`:
+```json
+{
+	"name": "@my-plugin/my-page-init",
+	"wpScriptModuleExports": "./build-module/index.js",
+	"dependencies": {
+		"@wordpress/boot": "file:../boot",
+		"@wordpress/data": "file:../data",
+		"@wordpress/icons": "file:../icons"
+	}
+}
+```
+
+In `packages/my-page-init/src/index.ts`:
+```typescript
+import { home, styles } from '@wordpress/icons';
+import { dispatch } from '@wordpress/data';
+import { store as bootStore } from '@wordpress/boot';
+
+/**
+ * Initialize page - this function is mandatory.
+ * All init modules must export an 'init' function.
+ */
+export async function init() {
+	// Add icons to menu items
+	dispatch( bootStore ).updateMenuItem( 'home', { icon: home } );
+	dispatch( bootStore ).updateMenuItem( 'styles', { icon: styles } );
+}
+```
+
+The `init()` function is **mandatory** - all init modules must export this named function. Init modules are loaded as static dependencies and executed sequentially before the boot system registers menu items and routes.
 
 ### Example: WordPress Core (Gutenberg)
 

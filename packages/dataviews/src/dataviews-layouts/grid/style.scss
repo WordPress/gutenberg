@@ -5,6 +5,46 @@
 @use "../utils/grid-items.scss" as *;
 
 .dataviews-view-grid {
+	padding: 0 $grid-unit-60 $grid-unit-30;
+	display: flex;
+	flex-direction: column;
+	gap: $grid-unit-40;
+	container-type: inline-size;
+
+	@media not (prefers-reduced-motion) {
+		transition: padding ease-out 0.1s;
+	}
+
+	@container (max-width: 430px) {
+		padding-left: $grid-unit-30;
+		padding-right: $grid-unit-30;
+	}
+
+	.dataviews-view-grid__row {
+		display: grid;
+		gap: $grid-unit-40;
+
+		.dataviews-view-grid__row__gridcell {
+			border-radius: $radius-medium;
+			position: relative;
+
+			&[data-focus-visible]::after {
+				content: "";
+				position: absolute;
+				top: 0;
+				left: 0;
+				width: 100%;
+				height: 100%;
+				box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+				border-radius: $radius-medium;
+				pointer-events: none;
+
+				// Windows High Contrast mode will show this outline, but not the box-shadow.
+				outline: 2px solid transparent;
+			}
+		}
+	}
+
 	.dataviews-view-grid__card {
 		height: 100%;
 		justify-content: flex-start;

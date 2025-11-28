@@ -1428,6 +1428,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/abilities",
+		"slug": "packages-abilities",
+		"markdown_source": "../packages/abilities/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/admin-ui",
 		"slug": "packages-admin-ui",
 		"markdown_source": "../packages/admin-ui/README.md",

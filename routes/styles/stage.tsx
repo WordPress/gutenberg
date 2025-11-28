@@ -6,6 +6,9 @@ import { Page } from '@wordpress/admin-ui';
 import { __ } from '@wordpress/i18n';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { useViewportMatch } from '@wordpress/compose';
+import { Button, __experimentalHStack as HStack } from '@wordpress/components';
+import { seen } from '@wordpress/icons';
+import { useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -22,6 +25,9 @@ function Stage() {
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 
 	const section = ( search.section ?? '/' ) as string;
+	const [ isStyleBookOpened, setIsStyleBookOpened ] = useState(
+		search.preview === 'stylebook'
+	);
 
 	const onChangeSection = ( updatedSection: string ) => {
 		navigate( {
@@ -36,10 +42,34 @@ function Stage() {
 		<Page
 			actions={
 				! isMobileViewport ? (
-					<GlobalStylesActionMenu
-						hideWelcomeGuide
-						onChangePath={ onChangeSection }
-					/>
+					<HStack>
+						<Button
+							size="compact"
+							isPressed={ isStyleBookOpened }
+							icon={ seen }
+							label={ __( 'Style Book' ) }
+							onClick={ () => {
+								const newIsStyleBookOpened =
+									! isStyleBookOpened;
+								setIsStyleBookOpened( newIsStyleBookOpened );
+								navigate( {
+									search: newIsStyleBookOpened
+										? { ...search, preview: 'stylebook' }
+										: ( () => {
+												const {
+													preview,
+													...restSearch
+												} = search;
+												return restSearch;
+										  } )(),
+								} );
+							} }
+						/>
+						<GlobalStylesActionMenu
+							hideWelcomeGuide
+							onChangePath={ onChangeSection }
+						/>
+					</HStack>
 				) : null
 			}
 			className="routes-styles__page"

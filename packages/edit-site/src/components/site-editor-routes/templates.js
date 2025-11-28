@@ -10,6 +10,7 @@ import Editor from '../editor';
 import SidebarNavigationScreenTemplatesBrowse from '../sidebar-navigation-screen-templates-browse';
 import SidebarNavigationScreenUnsupported from '../sidebar-navigation-screen-unsupported';
 import PageTemplates from '../page-templates';
+import PageTemplatesLegacy from '../page-templates/index-legacy';
 import { getDefaultView } from '../page-templates/view-utils';
 
 async function isTemplateListView( query ) {
@@ -37,7 +38,16 @@ export const templatesRoute = {
 		},
 		content( { siteData } ) {
 			const isBlockTheme = siteData.currentTheme?.is_block_theme;
-			return isBlockTheme ? <PageTemplates /> : undefined;
+			if ( ! isBlockTheme ) {
+				return undefined;
+			}
+			// Use the new template activation system if experiment is enabled,
+			// otherwise use the legacy simple template list.
+			return window?.__experimentalTemplateActivate ? (
+				<PageTemplates />
+			) : (
+				<PageTemplatesLegacy />
+			);
 		},
 		async preview( { query, siteData } ) {
 			const isBlockTheme = siteData.currentTheme?.is_block_theme;
@@ -49,10 +59,19 @@ export const templatesRoute = {
 		},
 		mobile( { siteData } ) {
 			const isBlockTheme = siteData.currentTheme?.is_block_theme;
-			return isBlockTheme ? (
+			if ( ! isBlockTheme ) {
+				return <SidebarNavigationScreenUnsupported />;
+			}
+			// Check if the template activation experiment is enabled.
+			const isTemplateActivateEnabled =
+				typeof window !== 'undefined' &&
+				window.__experimentalTemplateActivate;
+			// Use the new template activation system if experiment is enabled,
+			// otherwise use the legacy simple template list.
+			return isTemplateActivateEnabled ? (
 				<PageTemplates />
 			) : (
-				<SidebarNavigationScreenUnsupported />
+				<PageTemplatesLegacy />
 			);
 		},
 	},

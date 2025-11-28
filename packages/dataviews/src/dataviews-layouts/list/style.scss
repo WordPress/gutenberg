@@ -24,6 +24,7 @@ div.dataviews-view-list {
 			width: max-content;
 			flex: 0 0 auto;
 			gap: $grid-unit-05;
+			white-space: nowrap;
 
 			.components-button {
 				position: relative;

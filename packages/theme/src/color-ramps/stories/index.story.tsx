@@ -133,10 +133,12 @@ export const Default: StoryObj< typeof ColorGen > = {
 									fgName,
 									fgColor,
 									unmetContrast,
+									achievedContrast,
 								},
 								i
 							) => (
 								<li key={ i }>
+									{ fgName } (
 									<span
 										style={ {
 											width: 20,
@@ -144,8 +146,8 @@ export const Default: StoryObj< typeof ColorGen > = {
 											backgroundColor: fgColor,
 											display: 'inline-block',
 										} }
-									></span>
-									{ fgName } over
+									/>
+									{ fgColor }) over { bgName } (
 									<span
 										style={ {
 											width: 20,
@@ -153,8 +155,9 @@ export const Default: StoryObj< typeof ColorGen > = {
 											backgroundColor: bgColor,
 											display: 'inline-block',
 										} }
-									></span>
-									{ bgName } did not meet { unmetContrast }
+									/>
+									{ bgColor }) did not meet { unmetContrast },
+									achieved just { achievedContrast }
 								</li>
 							)
 						) }
