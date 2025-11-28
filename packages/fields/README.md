@@ -71,10 +71,6 @@ Export action as JSON for Pattern.
 
 Featured Image field for BasePostWithEmbeddedFeaturedMedia.
 
-### notesField
-
-Notes count field for post types that support editor.notes.
-
 ### MediaEdit
 
 A reusable media edit control component that can be used to edit WordPress media (attachments). Renders a media picker with upload functionality, supporting both the traditional WordPress media library and the experimental DataViews media modal.
@@ -117,6 +113,10 @@ _Returns_
 ### MediaEditProps
 
 Undocumented declaration.
+
+### notesField
+
+Notes count field for post types that support editor.notes.
 
 ### orderField
 
