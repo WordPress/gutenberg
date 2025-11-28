@@ -11,23 +11,18 @@
 	position: relative;
 	z-index: 1;
 	flex-flow: column;
-	container: admin-ui-page / inline-size;
-
-	@media not (prefers-reduced-motion) {
-		transition: width ease-out 0.2s;
-	}
 }
 
 .admin-ui-page__header {
-	padding: $grid-unit-20 $grid-unit-60;
+	padding: $grid-unit-20 $grid-unit-30;
 	border-bottom: 1px solid $gray-100;
 	background: $white;
 	position: sticky;
 	top: 0;
+}
 
-	@container (max-width: 430px) {
-		padding: $grid-unit-20 $grid-unit-30;
-	}
+.admin-ui-page__sidebar-toggle-slot:empty {
+	display: none;
 }
 
 .admin-ui-page__header-subtitle {
@@ -44,10 +39,7 @@
 	flex-direction: column;
 
 	&.has-padding {
-		padding: $grid-unit-20 $grid-unit * 2.5;
-		@container (max-width: 430px) {
-			padding: $grid-unit-20 $grid-unit-30;
-		}
+		padding: $grid-unit-20 $grid-unit-30;
 	}
 }
 
@@ -71,4 +63,3 @@
 
 	}
 }
-
