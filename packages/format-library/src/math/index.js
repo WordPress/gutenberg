@@ -53,7 +53,13 @@ function InlineUI( {
 				setError( null );
 			} catch ( err ) {
 				setError( err.message );
-				speak( err.message );
+				speak(
+					sprintf(
+						/* translators: %s: error message returned when parsing LaTeX. */
+						__( 'Error parsing mathematical expression: %s' ),
+						err.message
+					)
+				);
 				return;
 			}
 		}
