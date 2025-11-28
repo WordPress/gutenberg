@@ -5,7 +5,12 @@ import type { Context, Updatable } from './helpers';
 import type { Attachment } from './attachment';
 import type { Base, TemplatePartArea, TemplateType } from './base';
 import type { Comment } from './comment';
-import type { FontCollection } from './font-collection';
+import type {
+	FontCollection,
+	CollectionFontFamily,
+	CollectionFontFace,
+} from './font-collection';
+import type { FontFamily, FontFace, WpFontFamily } from './font-family';
 import type { GlobalStylesRevision } from './global-styles-revision';
 import type { MenuLocation } from './menu-location';
 import type { NavMenu } from './nav-menu';
@@ -32,9 +37,13 @@ export type { BaseEntityRecords } from './base-entity-records';
 export type {
 	Attachment,
 	Base as UnstableBase,
+	CollectionFontFace,
+	CollectionFontFamily,
 	Comment,
 	Context,
 	FontCollection,
+	FontFace,
+	FontFamily,
 	GlobalStylesRevision,
 	MenuLocation,
 	NavMenu,
@@ -56,6 +65,7 @@ export type {
 	User,
 	Widget,
 	WidgetType,
+	WpFontFamily,
 	WpTemplate,
 	WpTemplatePart,
 };
@@ -116,6 +126,7 @@ export interface PerPackageEntityRecords< C extends Context > {
 		| Type< C >
 		| Widget< C >
 		| WidgetType< C >
+		| WpFontFamily< C >
 		| WpTemplate< C >
 		| WpTemplatePart< C >;
 }

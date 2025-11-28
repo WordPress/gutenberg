@@ -1,7 +1,7 @@
 /**
- * Internal dependencies
+ * WordPress dependencies
  */
-import type { CollectionFontFamily } from '../types';
+import type { CollectionFontFamily } from '@wordpress/core-data';
 
 /**
  * Filters a list of fonts based on the specified filters.

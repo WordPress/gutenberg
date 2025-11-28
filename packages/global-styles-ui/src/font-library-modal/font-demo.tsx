@@ -3,6 +3,7 @@
  */
 import { __experimentalText as Text } from '@wordpress/components';
 import { useContext, useEffect, useState, useRef } from '@wordpress/element';
+import type { FontFamily, FontFace } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -12,7 +13,7 @@ import {
 	getFacePreviewStyle,
 	getFamilyPreviewStyle,
 } from './utils/preview-styles';
-import type { FontFamily, FontFace, FontDemoProps } from './types';
+import type { FontDemoProps } from './types';
 
 function getPreviewUrl( fontFace: FontFace ): string | undefined {
 	if ( fontFace.preview ) {
@@ -48,7 +49,6 @@ function getDisplayFontFace( font: FontFamily | FontFace ): FontFace {
 		fontStyle: 'normal',
 		fontWeight: '400',
 		fontFamily: font.fontFamily,
-		fake: true,
 	};
 }
 

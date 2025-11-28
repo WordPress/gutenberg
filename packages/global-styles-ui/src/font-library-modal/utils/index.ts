@@ -2,14 +2,15 @@
  * WordPress dependencies
  */
 import { privateApis as componentsPrivateApis } from '@wordpress/components';
+import type { FontFamily, FontFace } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
  */
 import { FONT_WEIGHTS, FONT_STYLES } from './constants';
-import { fetchInstallFontFace } from '../resolvers';
+import { fetchInstallFontFace } from '../api';
 import { formatFontFaceName } from './preview-styles';
-import type { FontFamily, FontFace, FontUploadResult } from '../types';
+import type { FontFamilyToUpload, FontUploadResult } from '../types';
 import { unlock } from '../../lock-unlock';
 
 /**
@@ -221,7 +222,7 @@ export function makeFontFamilyFormData( fontFamily: FontFamily ): FormData {
 	return formData;
 }
 
-export function makeFontFacesFormData( font: FontFamily ): FormData[] {
+export function makeFontFacesFormData( font: FontFamilyToUpload ): FormData[] {
 	const fontFacesFormData = ( font?.fontFace ?? [] ).map(
 		( item, faceIndex ) => {
 			const face = { ...item };

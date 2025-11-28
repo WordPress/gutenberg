@@ -4,9 +4,9 @@
 import type { CSSProperties } from 'react';
 
 /**
- * Internal dependencies
+ * WordPress dependencies
  */
-import type { FontFace, FontFamily } from '../types';
+import type { FontFace, FontFamily } from '@wordpress/core-data';
 
 function findNearest( input: number, numbers: number[] ) {
 	// If the numbers array is empty, return null

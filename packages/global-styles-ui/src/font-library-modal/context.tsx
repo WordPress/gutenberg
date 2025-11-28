@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { createContext, useState, useEffect } from '@wordpress/element';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSelect, useDispatch, resolveSelect } from '@wordpress/data';
 import {
 	useEntityRecord,
 	useEntityRecords,
@@ -13,15 +13,17 @@ import type {
 	FontFamilyPreset,
 	GlobalStylesConfig,
 } from '@wordpress/global-styles-engine';
+import type {
+	CollectionFontFace,
+	CollectionFontFamily,
+	FontFace,
+	FontFamily,
+} from '@wordpress/core-data';
 
 /**
  * Internal dependencies
  */
-import {
-	fetchGetFontFamilyBySlug,
-	fetchInstallFontFamily,
-	fetchUninstallFontFamily,
-} from './resolvers';
+import { fetchInstallFontFamily } from './api';
 import {
 	setUIValuesNeeded,
 	mergeFontFamilies,
@@ -35,12 +37,7 @@ import {
 } from './utils';
 import { setImmutably } from './utils/set-immutably';
 import { toggleFont } from './utils/toggleFont';
-import type {
-	CollectionFontFamily,
-	FontFace,
-	FontFamily,
-	FontLibraryState,
-} from './types';
+import type { FontFamilyToUpload, FontLibraryState } from './types';
 import { useSetting } from '../hooks';
 
 export const FontLibraryContext = createContext< FontLibraryState >(
@@ -49,7 +46,7 @@ export const FontLibraryContext = createContext< FontLibraryState >(
 FontLibraryContext.displayName = 'FontLibraryContext';
 
 function FontLibraryProvider( { children }: { children: React.ReactNode } ) {
-	const { saveEntityRecord } = useDispatch( coreStore );
+	const { saveEntityRecord, deleteEntityRecord } = useDispatch( coreStore );
 	const { globalStylesId } = useSelect( ( select ) => {
 		const { __experimentalGetCurrentGlobalStylesId } = select( coreStore );
 		return { globalStylesId: __experimentalGetCurrentGlobalStylesId() };
@@ -112,6 +109,9 @@ function FontLibraryProvider( { children }: { children: React.ReactNode } ) {
 			| Record< string, FontFamilyPreset[] >
 			| undefined
 	) => {
+		if ( ! globalStyles.record ) {
+			return;
+		}
 		// Gets the global styles database post content.
 		const updatedGlobalStyles = globalStyles.record;
 
@@ -230,7 +230,7 @@ function FontLibraryProvider( { children }: { children: React.ReactNode } ) {
 		return getActivatedFontsOutline( source )[ slug ] || [];
 	};
 
-	async function installFonts( fontFamiliesToInstall: FontFamily[] ) {
+	async function installFonts( fontFamiliesToInstall: FontFamilyToUpload[] ) {
 		setIsInstalling( true );
 		try {
 			const fontFamiliesToActivate = [];
@@ -242,9 +242,32 @@ function FontLibraryProvider( { children }: { children: React.ReactNode } ) {
 				let isANewFontFamily = false;
 
 				// Get the font family if it already exists.
-				let installedFontFamily = await fetchGetFontFamilyBySlug(
-					fontFamilyToInstall.slug
-				);
+				const fontFamilyRecords = await resolveSelect(
+					coreStore
+				).getEntityRecords( 'postType', 'wp_font_family', {
+					slug: fontFamilyToInstall.slug,
+					per_page: 1,
+					_embed: true,
+				} );
+
+				const fontFamilyPost =
+					fontFamilyRecords && fontFamilyRecords.length > 0
+						? fontFamilyRecords[ 0 ]
+						: null;
+
+				let installedFontFamily = fontFamilyPost
+					? {
+							id: fontFamilyPost.id,
+							...fontFamilyPost.font_family_settings,
+							fontFace:
+								(
+									fontFamilyPost?._embedded?.font_faces ?? []
+								).map(
+									( face: CollectionFontFace ) =>
+										face.font_face_settings
+								) || [],
+					  }
+					: null;
 
 				// Otherwise create it.
 				if ( ! installedFontFamily ) {
@@ -329,7 +352,12 @@ function FontLibraryProvider( { children }: { children: React.ReactNode } ) {
 					( fontFamilyToInstall?.fontFace?.length ?? 0 ) > 0 &&
 					successfullyInstalledFontFaces?.length === 0
 				) {
-					await fetchUninstallFontFamily( installedFontFamily.id );
+					await deleteEntityRecord(
+						'postType',
+						'wp_font_family',
+						installedFontFamily.id,
+						{ force: true }
+					);
 				}
 
 				installationErrors = installationErrors.concat(
@@ -378,24 +406,19 @@ function FontLibraryProvider( { children }: { children: React.ReactNode } ) {
 		try {
 			// Uninstall the font family.
 			// (Removes the font files from the server and the posts from the database).
-			const uninstalledFontFamily = await fetchUninstallFontFamily(
-				fontFamilyToUninstall.id
+			await deleteEntityRecord(
+				'postType',
+				'wp_font_family',
+				fontFamilyToUninstall.id,
+				{ force: true }
 			);
 
-			// Deactivate the font family if delete request is successful
-			// (Removes the font family from the global styles).
-			if ( uninstalledFontFamily.deleted ) {
-				const activeFonts = deactivateFontFamily(
-					fontFamilyToUninstall
-				);
-				// Save the global styles to the database.
-				await saveFontFamilies( activeFonts );
-			}
-
-			// Refresh the library (the library font families from database).
+			// Deactivate the font family (remove from global styles).
+			const activeFonts = deactivateFontFamily( fontFamilyToUninstall );
+			// Save the global styles to the database.
+			await saveFontFamilies( activeFonts );
 			refreshLibrary();
-
-			return uninstalledFontFamily;
+			return { deleted: true };
 		} catch ( error ) {
 			// eslint-disable-next-line no-console
 			console.error(
