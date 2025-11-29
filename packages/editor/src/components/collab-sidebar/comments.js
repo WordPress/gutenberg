@@ -23,12 +23,15 @@ import {
 	FlexItem,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
-import { useDebounce } from '@wordpress/compose';
+import { useDebounce, useRefEffect } from '@wordpress/compose';
 
 import { published, moreVertical } from '@wordpress/icons';
 import { __, _x, sprintf, _n } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
+import {
+	__unstableStripHTML as stripHTML,
+	getScrollContainer,
+} from '@wordpress/dom';
 import {
 	store as blockEditorStore,
 	privateApis as blockEditorPrivateApis,
@@ -94,6 +97,17 @@ export function Comments( {
 	}, [] );
 
 	const relatedBlockElement = useBlockElement( selectedBlockClientId );
+
+	const editorCanvasElement = useMemo( () => {
+		if ( ! relatedBlockElement ) {
+			return null;
+		}
+		const editorBody = relatedBlockElement.closest( 'body' );
+		if ( ! editorBody ) {
+			return null;
+		}
+		return getScrollContainer( editorBody );
+	}, [ relatedBlockElement ] );
 
 	const threads = useMemo( () => {
 		const t = [ ...noteThreads ];
@@ -173,6 +187,34 @@ export function Comments( {
 	const setBlockRef = useCallback( ( id, blockRef ) => {
 		setBlockRefs( ( prev ) => ( { ...prev, [ id ]: blockRef } ) );
 	}, [] );
+
+	// Pass wheel events from the comments sidebar to the editor canvas.
+	// Only enable this for floating sidebar, as the regular sidebar can scroll itself.
+	const scrollToCanvasEffect = useRefEffect(
+		( node ) => {
+			if ( ! isFloating || ! editorCanvasElement ) {
+				return;
+			}
+
+			function onWheel( event ) {
+				const { deltaX, deltaY } = event;
+				editorCanvasElement.scrollBy( deltaX, deltaY );
+			}
+			const options = { passive: true };
+			node.addEventListener( 'wheel', onWheel, options );
+			return () => {
+				node.removeEventListener( 'wheel', onWheel, options );
+			};
+		},
+		[ editorCanvasElement, isFloating ]
+	);
+
+	// Apply the scroll effect to the sidebar ref.
+	useEffect( () => {
+		if ( commentSidebarRef?.current ) {
+			return scrollToCanvasEffect( commentSidebarRef.current );
+		}
+	}, [ commentSidebarRef, scrollToCanvasEffect ] );
 
 	// Recalculate floating comment thread offsets whenever the heights change.
 	useEffect( () => {
