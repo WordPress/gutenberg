@@ -63,7 +63,7 @@
 		}
 	},
 	"selectors": {
-		"root": ".wp-block-list > li",
-		"border": ".wp-block-list:not(.wp-block-list .wp-block-list) > li"
+		"root": ".wp-block-list-item",
+		"border": ".wp-block-list-item:not(.wp-block-list .wp-block-list > .wp-block-list-item)"
 	}
 }
