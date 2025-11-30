@@ -6,11 +6,10 @@ import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 
 /**
- * Returns the user label.
+ * Renders a user label for the autocompleter.
  *
  * @param {Object} user User object.
- *
- * @return {Object} User label component.
+ * @return {JSX.Element} User label component.
  */
 export function getUserLabel( user ) {
 	const avatar =
