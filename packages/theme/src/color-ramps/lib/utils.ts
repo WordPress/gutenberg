@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { toGamut, to, P3, OKLCH, type ColorTypes } from 'colorjs.io/fn';
+import { type ColorTypes } from 'colorjs.io/fn';
 
 /**
  * Internal dependencies
@@ -18,13 +18,6 @@ import {
 } from './constants';
 import type { Ramp, RampConfig, RampDirection } from './types';
 import { getContrast } from './color-utils';
-
-/**
- * Make sure that a color is valid in the p3 gamut, and converts it to oklch.
- * @param c
- */
-export const clampToGamut = ( c: ColorTypes ) =>
-	to( toGamut( c, { space: P3, method: 'css' } ), OKLCH ); // map into Display-P3 using CSS OKLCH method
 
 /**
  * Build a dependency graph from the steps configuration

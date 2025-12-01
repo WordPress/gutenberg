@@ -533,6 +533,272 @@ describe( 'useFormValidity', () => {
 		} );
 	} );
 
+	describe( 'isValid.pattern', () => {
+		const PATTERN_MESSAGE = {
+			pattern: {
+				type: 'invalid',
+				message: 'Value does not match the required pattern.',
+			},
+		};
+
+		it( 'text is valid when value matches the pattern', () => {
+			const item = { id: 1, username: 'user_name123' };
+			const fields: Field< {} >[] = [
+				{
+					id: 'username',
+					type: 'text',
+					isValid: {
+						pattern: '^[a-zA-Z0-9_]+$',
+					},
+				},
+			];
+			const form = { fields: [ 'username' ] };
+			const {
+				result: {
+					current: { validity, isValid },
+				},
+			} = renderHook( () => useFormValidity( item, fields, form ) );
+			expect( validity ).toEqual( undefined );
+			expect( isValid ).toBe( true );
+		} );
+
+		it( 'text is invalid when value does not match the pattern', () => {
+			const item = { id: 1, username: 'user@name!' };
+			const fields: Field< {} >[] = [
+				{
+					id: 'username',
+					type: 'text',
+					isValid: {
+						pattern: '^[a-zA-Z0-9_]+$',
+					},
+				},
+			];
+			const form = { fields: [ 'username' ] };
+			const {
+				result: {
+					current: { validity, isValid },
+				},
+			} = renderHook( () => useFormValidity( item, fields, form ) );
+			expect( validity?.username ).toEqual( PATTERN_MESSAGE );
+			expect( isValid ).toBe( false );
+		} );
+
+		it( 'text is valid when value is empty and pattern is defined', () => {
+			const item = { id: 1, username: '' };
+			const fields: Field< {} >[] = [
+				{
+					id: 'username',
+					type: 'text',
+					isValid: {
+						pattern: '^[a-zA-Z0-9_]+$',
+					},
+				},
+			];
+			const form = { fields: [ 'username' ] };
+			const {
+				result: {
+					current: { validity, isValid },
+				},
+			} = renderHook( () => useFormValidity( item, fields, form ) );
+			expect( validity ).toEqual( undefined );
+			expect( isValid ).toBe( true );
+		} );
+
+		it( 'email is valid when value matches the pattern', () => {
+			const item = { id: 1, email: 'user@company.com' };
+			const fields: Field< {} >[] = [
+				{
+					id: 'email',
+					type: 'email',
+					isValid: {
+						pattern: '^[a-zA-Z0-9]+@company.com$',
+					},
+				},
+			];
+			const form = { fields: [ 'email' ] };
+			const {
+				result: {
+					current: { validity, isValid },
+				},
+			} = renderHook( () => useFormValidity( item, fields, form ) );
+			expect( validity ).toEqual( undefined );
+			expect( isValid ).toBe( true );
+		} );
+
+		it( 'email is invalid when value does not match the pattern', () => {
+			const item = { id: 1, email: 'user@other.com' };
+			const fields: Field< {} >[] = [
+				{
+					id: 'email',
+					type: 'email',
+					isValid: {
+						pattern: '^[a-zA-Z0-9]+@company.com$',
+					},
+				},
+			];
+			const form = { fields: [ 'email' ] };
+			const {
+				result: {
+					current: { validity, isValid },
+				},
+			} = renderHook( () => useFormValidity( item, fields, form ) );
+			expect( validity?.email ).toEqual( PATTERN_MESSAGE );
+			expect( isValid ).toBe( false );
+		} );
+
+		it( 'url is valid when value matches the pattern', () => {
+			const item = { id: 1, website: 'https://example.com' };
+			const fields: Field< {} >[] = [
+				{
+					id: 'website',
+					type: 'url',
+					isValid: {
+						pattern: '^https://.*',
+					},
+				},
+			];
+			const form = { fields: [ 'website' ] };
+			const {
+				result: {
+					current: { validity, isValid },
+				},
+			} = renderHook( () => useFormValidity( item, fields, form ) );
+			expect( validity ).toEqual( undefined );
+			expect( isValid ).toBe( true );
+		} );
+
+		it( 'url is invalid when value does not match the pattern', () => {
+			const item = { id: 1, website: 'http://example.com' };
+			const fields: Field< {} >[] = [
+				{
+					id: 'website',
+					type: 'url',
+					isValid: {
+						pattern: '^https://.*',
+					},
+				},
+			];
+			const form = { fields: [ 'website' ] };
+			const {
+				result: {
+					current: { validity, isValid },
+				},
+			} = renderHook( () => useFormValidity( item, fields, form ) );
+			expect( validity?.website ).toEqual( PATTERN_MESSAGE );
+			expect( isValid ).toBe( false );
+		} );
+
+		it( 'telephone is valid when value matches the pattern', () => {
+			const item = { id: 1, phone: '+1-555-123-4567' };
+			const fields: Field< {} >[] = [
+				{
+					id: 'phone',
+					type: 'telephone',
+					isValid: {
+						pattern: '^\\+1-[0-9]{3}-[0-9]{3}-[0-9]{4}$',
+					},
+				},
+			];
+			const form = { fields: [ 'phone' ] };
+			const {
+				result: {
+					current: { validity, isValid },
+				},
+			} = renderHook( () => useFormValidity( item, fields, form ) );
+			expect( validity ).toEqual( undefined );
+			expect( isValid ).toBe( true );
+		} );
+
+		it( 'telephone is invalid when value does not match the pattern', () => {
+			const item = { id: 1, phone: '555-123-4567' };
+			const fields: Field< {} >[] = [
+				{
+					id: 'phone',
+					type: 'telephone',
+					isValid: {
+						pattern: '^\\+1-[0-9]{3}-[0-9]{3}-[0-9]{4}$',
+					},
+				},
+			];
+			const form = { fields: [ 'phone' ] };
+			const {
+				result: {
+					current: { validity, isValid },
+				},
+			} = renderHook( () => useFormValidity( item, fields, form ) );
+			expect( validity?.phone ).toEqual( PATTERN_MESSAGE );
+			expect( isValid ).toBe( false );
+		} );
+
+		it( 'password is valid when value matches the pattern', () => {
+			const item = { id: 1, password: 'Abcd1234' };
+			const fields: Field< {} >[] = [
+				{
+					id: 'password',
+					type: 'password',
+					isValid: {
+						pattern: '^[0-9a-zA-Z]{8}$',
+					},
+				},
+			];
+			const form = { fields: [ 'password' ] };
+			const {
+				result: {
+					current: { validity, isValid },
+				},
+			} = renderHook( () => useFormValidity( item, fields, form ) );
+			expect( validity ).toEqual( undefined );
+			expect( isValid ).toBe( true );
+		} );
+
+		it( 'password is invalid when value does not match the pattern', () => {
+			const item = { id: 1, password: 'short' };
+			const fields: Field< {} >[] = [
+				{
+					id: 'password',
+					type: 'password',
+					isValid: {
+						pattern: '^[0-9a-zA-Z]{8}$',
+					},
+				},
+			];
+			const form = { fields: [ 'password' ] };
+			const {
+				result: {
+					current: { validity, isValid },
+				},
+			} = renderHook( () => useFormValidity( item, fields, form ) );
+			expect( validity?.password ).toEqual( PATTERN_MESSAGE );
+			expect( isValid ).toBe( false );
+		} );
+
+		it( 'invalid regex pattern returns error', () => {
+			const item = { id: 1, username: 'test' };
+			const fields: Field< {} >[] = [
+				{
+					id: 'username',
+					type: 'text',
+					isValid: {
+						pattern: '[invalid(regex',
+					},
+				},
+			];
+			const form = { fields: [ 'username' ] };
+			const {
+				result: {
+					current: { validity, isValid },
+				},
+			} = renderHook( () => useFormValidity( item, fields, form ) );
+			expect( validity?.username ).toEqual( {
+				pattern: {
+					type: 'invalid',
+					message: 'Invalid pattern configuration.',
+				},
+			} );
+			expect( isValid ).toBe( false );
+		} );
+	} );
+
 	describe( 'isValid.custom', () => {
 		it( 'integer is valid if value is integer', () => {
 			const item = { id: 1, order: 2, title: 'hi' };

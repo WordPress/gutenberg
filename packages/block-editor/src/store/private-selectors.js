@@ -518,10 +518,7 @@ export function isSectionBlock( state, clientId ) {
 	}
 
 	const blockName = getBlockName( state, clientId );
-	if (
-		blockName === 'core/block' ||
-		getTemplateLock( state, clientId ) === 'contentOnly'
-	) {
+	if ( blockName === 'core/block' ) {
 		return true;
 	}
 
@@ -533,6 +530,19 @@ export function isSectionBlock( state, clientId ) {
 	) {
 		return true;
 	}
+
+	// TemplateLock cascades to all inner parent blocks. Only the top-level
+	// block that's contentOnly templateLocked is the true contentLocker,
+	// all the others are mere imitators.
+	const hasContentOnlyTempateLock =
+		getTemplateLock( state, clientId ) === 'contentOnly';
+	const rootClientId = getBlockRootClientId( state, clientId );
+	const hasRootContentOnlyTemplateLock =
+		getTemplateLock( state, rootClientId ) === 'contentOnly';
+	if ( hasContentOnlyTempateLock && ! hasRootContentOnlyTemplateLock ) {
+		return true;
+	}
+
 	return false;
 }
 

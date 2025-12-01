@@ -1,5 +1,52 @@
 <?php
 
+// Migrate existing "edited" templates. By existing, it means that the template
+// is active.
+function gutenberg_get_migrated_active_templates() {
+	// Query all templates in the database. See `get_block_templates`.
+	$wp_query_args = array(
+		'post_status'         => 'publish',
+		'post_type'           => 'wp_template',
+		'posts_per_page'      => -1,
+		'no_found_rows'       => true,
+		'lazy_load_term_meta' => false,
+		'tax_query'           => array(
+			array(
+				'taxonomy' => 'wp_theme',
+				'field'    => 'name',
+				'terms'    => get_stylesheet(),
+			),
+		),
+		// Only get templates that are not inactive by default.
+		'meta_query'          => array(
+			'relation' => 'OR',
+			array(
+				'key'     => 'is_inactive_by_default',
+				'compare' => 'NOT EXISTS',
+			),
+			array(
+				'key'     => 'is_inactive_by_default',
+				'value'   => false,
+				'compare' => '=',
+			),
+		),
+	);
+
+	$template_query   = new WP_Query( $wp_query_args );
+	$active_templates = array();
+
+	foreach ( $template_query->posts as $post ) {
+		$active_templates[ $post->post_name ] = $post->ID;
+	}
+
+	return $active_templates;
+}
+
+// Only load template activation system if the experiment is enabled.
+if ( ! gutenberg_is_experiment_enabled( 'active_templates' ) ) {
+	return;
+}
+
 require_once __DIR__ . '/class-gutenberg-rest-old-templates-controller.php';
 
 // How does this work?
@@ -498,55 +545,6 @@ function gutenberg_set_active_template_theme( $changes, $request ) {
 		'is_inactive_by_default' => true,
 	);
 	return $changes;
-}
-
-// Migrate existing "edited" templates. By existing, it means that the template
-// is active.
-add_action( 'init', 'gutenberg_migrate_existing_templates' );
-function gutenberg_migrate_existing_templates() {
-	$active_templates = get_option( 'active_templates', false );
-
-	if ( false !== $active_templates ) {
-		return;
-	}
-
-	// Query all templates in the database. See `get_block_templates`.
-	$wp_query_args = array(
-		'post_status'         => 'publish',
-		'post_type'           => 'wp_template',
-		'posts_per_page'      => -1,
-		'no_found_rows'       => true,
-		'lazy_load_term_meta' => false,
-		'tax_query'           => array(
-			array(
-				'taxonomy' => 'wp_theme',
-				'field'    => 'name',
-				'terms'    => get_stylesheet(),
-			),
-		),
-		// Only get templates that are not inactive by default.
-		'meta_query'          => array(
-			'relation' => 'OR',
-			array(
-				'key'     => 'is_inactive_by_default',
-				'compare' => 'NOT EXISTS',
-			),
-			array(
-				'key'     => 'is_inactive_by_default',
-				'value'   => false,
-				'compare' => '=',
-			),
-		),
-	);
-
-	$template_query   = new WP_Query( $wp_query_args );
-	$active_templates = array();
-
-	foreach ( $template_query->posts as $post ) {
-		$active_templates[ $post->post_name ] = $post->ID;
-	}
-
-	update_option( 'active_templates', $active_templates );
 }
 
 add_action( 'save_post_wp_template', 'gutenberg_maybe_update_active_templates' );

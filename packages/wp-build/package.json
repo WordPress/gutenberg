@@ -51,6 +51,26 @@
 		"rtlcss": "4.3.0",
 		"toposort": "2.0.2"
 	},
+	"peerDependencies": {
+		"@wordpress/boot": "^0.2.0",
+		"@wordpress/private-apis": "^1.0.0",
+		"@wordpress/route": "^1.0.0",
+		"@wordpress/theme": "^1.0.0"
+	},
+	"peerDependenciesMeta": {
+		"@wordpress/boot": {
+			"optional": true
+		},
+		"@wordpress/private-apis": {
+			"optional": true
+		},
+		"@wordpress/route": {
+			"optional": true
+		},
+		"@wordpress/theme": {
+			"optional": true
+		}
+	},
 	"publishConfig": {
 		"access": "public"
 	}

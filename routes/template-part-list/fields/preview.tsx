@@ -8,7 +8,13 @@ import type { WpTemplatePart } from '@wordpress/core-data';
 function PreviewField( { item }: { item: WpTemplatePart } ) {
 	const description = item.description;
 
-	return <Preview item={ item } description={ description } />;
+	return (
+		<Preview
+			content={ item?.content?.raw }
+			blocks={ item.blocks }
+			description={ description }
+		/>
+	);
 }
 
 export const previewField = {

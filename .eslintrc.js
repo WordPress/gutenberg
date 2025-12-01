@@ -440,9 +440,24 @@ module.exports = {
 				'jsdoc/valid-types': 'off',
 			},
 		},
+		// Progressively opting in to stricter rules for enforcing file
+		// extensions matching the presence of JSX syntax. This should be
+		// expanded and eventually enforced on all files.
 		{
 			files: [
-				'**/@(storybook|stories)/*',
+				'**/@(storybook|stories)/**',
+				'packages/components/src/**/*.tsx',
+			],
+			rules: {
+				'react/jsx-filename-extension': [
+					'error',
+					{ extensions: [ '.jsx', '.tsx' ] },
+				],
+			},
+		},
+		{
+			files: [
+				'**/@(storybook|stories)/**',
 				'packages/components/src/**/*.tsx',
 			],
 			rules: {

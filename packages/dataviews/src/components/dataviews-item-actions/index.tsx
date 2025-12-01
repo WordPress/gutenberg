@@ -31,6 +31,7 @@ export interface ActionTriggerProps< Item > {
 	onClick: MouseEventHandler;
 	isBusy?: boolean;
 	items: Item[];
+	variant?: 'primary' | 'secondary' | 'tertiary' | 'link';
 }
 
 export interface ActionModalProps< Item > {
@@ -63,12 +64,14 @@ interface PrimaryActionsProps< Item > {
 	item: Item;
 	actions: Action< Item >[];
 	registry: ReturnType< typeof useRegistry >;
+	buttonVariant?: 'primary' | 'secondary' | 'tertiary' | 'link';
 }
 
 function ButtonTrigger< Item >( {
 	action,
 	onClick,
 	items,
+	variant,
 }: ActionTriggerProps< Item > ) {
 	const label =
 		typeof action.label === 'string' ? action.label : action.label( items );
@@ -77,6 +80,7 @@ function ButtonTrigger< Item >( {
 			disabled={ !! action.disabled }
 			accessibleWhenDisabled
 			size="compact"
+			variant={ variant }
 			onClick={ onClick }
 		>
 			{ label }
@@ -277,10 +281,11 @@ function CompactItemActions< Item >( {
 	);
 }
 
-function PrimaryActions< Item >( {
+export function PrimaryActions< Item >( {
 	item,
 	actions,
 	registry,
+	buttonVariant,
 }: PrimaryActionsProps< Item > ) {
 	const [ activeModalAction, setActiveModalAction ] = useState( null as any );
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
@@ -306,6 +311,7 @@ function PrimaryActions< Item >( {
 						action.callback( [ item ], { registry } );
 					} }
 					items={ [ item ] }
+					variant={ buttonVariant }
 				/>
 			) ) }
 			{ !! activeModalAction && (

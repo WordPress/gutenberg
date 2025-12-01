@@ -38,7 +38,7 @@ jobs:
         steps:
             - name: Checkout (for CLI)
               if: ${{ github.event.inputs.release_type != 'wp' }}
-              uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+              uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
               with:
                   path: cli
                   ref: trunk
@@ -47,7 +47,7 @@ jobs:
 
             - name: Checkout (for publishing)
               if: ${{ github.event.inputs.release_type != 'wp' }}
-              uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+              uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
               with:
                   path: publish
                   # Later, we switch this branch in the script that publishes packages.
@@ -58,7 +58,7 @@ jobs:
 
             - name: Checkout (for publishing WP major version)
               if: ${{ github.event.inputs.release_type == 'wp' && github.event.inputs.wp_version }}
-              uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+              uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
               with:
                   path: publish
                   ref: wp/${{ github.event.inputs.wp_version }}

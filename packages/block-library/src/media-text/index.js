@@ -3,6 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { mediaAndText as icon } from '@wordpress/icons';
+import { privateApis as blocksPrivateApis } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -13,6 +14,9 @@ import edit from './edit';
 import metadata from './block.json';
 import save from './save';
 import transforms from './transforms';
+import { unlock } from '../lock-unlock';
+
+const { fieldsKey } = unlock( blocksPrivateApis );
 
 const { name } = metadata;
 
@@ -51,15 +55,17 @@ export const settings = {
 };
 
 if ( window.__experimentalContentOnlyPatternInsertion ) {
-	settings.fields = [
+	settings[ fieldsKey ] = [
 		{
+			id: 'media',
 			label: __( 'Media' ),
-			type: 'Media',
+			type: 'media',
 			shownByDefault: true,
 			mapping: {
 				id: 'mediaId',
 				type: 'mediaType',
-				src: 'mediaUrl',
+				url: 'mediaUrl',
+				link: 'mediaLink',
 			},
 			args: {
 				allowedTypes: [ 'image', 'video' ],
@@ -67,13 +73,14 @@ if ( window.__experimentalContentOnlyPatternInsertion ) {
 			},
 		},
 		{
+			id: 'link',
 			label: __( 'Link' ),
-			type: 'Link',
+			type: 'link',
 			shownByDefault: false,
 			mapping: {
-				href: 'href',
+				url: 'href',
 				rel: 'rel',
-				target: 'linkTarget',
+				linkTarget: 'linkTarget',
 			},
 		},
 	];

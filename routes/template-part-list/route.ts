@@ -38,10 +38,14 @@ export const route = {
 
 		// Check if postId is provided in query params
 		if ( search.postIds && search.postIds.length > 0 ) {
+			const postId = search.postIds[ 0 ].toString();
 			return {
 				postType: 'wp_template_part',
-				postId: search.postIds[ 0 ].toString(),
+				postId,
 				isPreview: true,
+				editLink: `/types/wp_template_part/edit/${ encodeURIComponent(
+					postId
+				) }`,
 			};
 		}
 
@@ -55,10 +59,14 @@ export const route = {
 
 		// Return first template part if available
 		if ( posts && posts.length > 0 ) {
+			const postId = ( posts[ 0 ] as any ).id.toString();
 			return {
 				postType: 'wp_template_part',
-				postId: ( posts[ 0 ] as any ).id.toString(),
+				postId,
 				isPreview: true,
+				editLink: `/types/wp_template_part/edit/${ encodeURIComponent(
+					postId
+				) }`,
 			};
 		}
 

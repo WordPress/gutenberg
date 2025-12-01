@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import type { DayNumber, DayString } from '../types/field-api';
+import type { DayNumber, DayString } from '../../types/field-api';
 
 export const DAYS_OF_WEEK: DayString[] = [
 	'sunday',

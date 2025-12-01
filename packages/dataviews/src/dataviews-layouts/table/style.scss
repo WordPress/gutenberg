@@ -81,14 +81,9 @@
 			border-bottom: 0;
 		}
 
-		.components-checkbox-control__input.components-checkbox-control__input {
-			opacity: 0;
-
-			&:checked,
-			&:indeterminate,
-			&:focus {
-				opacity: 1;
-			}
+		&.is-hovered,
+		&.is-hovered .dataviews-view-table__actions-column--sticky {
+			background-color: #f8f8f8;
 		}
 
 		.dataviews-item-actions .components-button:not(.dataviews-all-actions-button) {
@@ -96,8 +91,7 @@
 		}
 
 		@media (hover: none) {
-			// Show checkboxes and quick-actions on devices that do not support hover.
-			.components-checkbox-control__input.components-checkbox-control__input,
+			// Show quick-actions on devices that do not support hover.
 			.dataviews-item-actions .components-button:not(.dataviews-all-actions-button) {
 				opacity: 1;
 			}
@@ -156,10 +150,6 @@
 
 		tr {
 			border: 0;
-			// Header select all checkbox should always be visible.
-			.components-checkbox-control__input.components-checkbox-control__input {
-				opacity: 1;
-			}
 		}
 		th {
 			background-color: inherit;
@@ -226,11 +216,6 @@
 		white-space: nowrap;
 	}
 
-	&:has(tr.is-selected) {
-		.components-checkbox-control__input {
-			opacity: 1;
-		}
-	}
 
 	// Density style overrides.
 	&.has-compact-density {

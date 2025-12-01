@@ -36,7 +36,7 @@ import {
 	OPERATOR_IN_THE_PAST,
 	OPERATOR_OVER,
 } from '../constants';
-import normalizeFields from './normalize-fields';
+import normalizeFields from '../field-types/utils/normalize-fields';
 import type { Field, View } from '../types';
 
 function normalizeSearchInput( input = '' ) {
@@ -387,15 +387,19 @@ export default function filterSortAndPaginate< Item >(
 				return field.id === view.sort?.field;
 		  } )
 		: null;
-	const groupByField = view.groupByField
+	const groupByField = view.groupBy?.field
 		? _fields.find( ( field ) => {
-				return field.id === view.groupByField;
+				return field.id === view.groupBy?.field;
 		  } )
 		: null;
 	if ( sortByField || groupByField ) {
 		filteredData.sort( ( a, b ) => {
 			if ( groupByField ) {
-				const groupCompare = groupByField.sort( a, b, 'asc' );
+				const groupCompare = groupByField.sort(
+					a,
+					b,
+					view.groupBy?.direction ?? 'asc'
+				);
 
 				// If items are in different groups, return the group comparison result.
 				// Otherwise, fall back to sorting by the sort field.
