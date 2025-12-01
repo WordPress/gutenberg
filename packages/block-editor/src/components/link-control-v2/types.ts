@@ -165,25 +165,101 @@ export interface LinkControlV2Props {
 	settings?: LinkSetting[];
 	/**
 	 * Search handler function that determines what happens when a search is made.
-	 * If not provided, a default handler will be created.
+	 *
+	 * The search handler is an imperative function that receives the search query and context,
+	 * and returns a promise resolving to search results. This provides complete control over
+	 * search behavior, including:
+	 * - What kind of input to accept (searches, direct entry URLs)
+	 * - How to handle input into the search box
+	 * - What fetch handler to run (if any)
+	 * - How to handle direct entry
+	 *
+	 * **Default Behavior:**
+	 * If not provided, `LinkControlV2` automatically creates a default handler that:
+	 * - Uses `__experimentalFetchLinkSuggestions` from block editor settings (like original LinkControl)
+	 * - Requires minimum 2 characters before searching
+	 * - Handles direct URL entry automatically
+	 * - Shows initial suggestions by default
+	 *
+	 * **When to Provide a Custom Handler:**
+	 * - You need to search a specific post type (e.g., Nav block "Product link" variation)
+	 * - You need custom search logic or filtering
+	 * - You need to disable initial suggestions
+	 * - You need to customize minimum search length
+	 * - You need to combine multiple search strategies
+	 *
+	 * **Available Utilities:**
+	 * - `createDefaultSearchHandler()` - Creates handler with sensible defaults
+	 * - `createTypedSearchHandler()` - Creates handler for specific post types
+	 * - Mixins: `withMinLength()`, `withDirectEntry()`, `withFetch()`, `withInitialSuggestions()`
+	 * - Utilities: `detectDirectEntry()`, `checkMinLength()`, `createDirectEntrySuggestion()`
 	 *
 	 * @example
 	 * ```tsx
-	 * // Use default handler with fetch function
+	 * // Default behavior (uses settings automatically - no handler needed)
+	 * <LinkControlV2 value={value} onChange={onChange} />
+	 *
+	 * // Custom handler for product links (Nav block use case)
+	 * import { createTypedSearchHandler } from '@wordpress/block-editor';
+	 *
+	 * const productHandler = createTypedSearchHandler(fetchSuggestions, {
+	 *   type: 'product'
+	 * });
+	 *
 	 * <LinkControlV2
-	 *   searchHandler={createDefaultSearchHandler(fetchSuggestions)}
+	 *   value={value}
+	 *   onChange={onChange}
+	 *   searchHandler={productHandler}
 	 * />
 	 *
-	 * // Custom handler for product links
+	 * // Custom handler with disabled initial suggestions
+	 * import { createDefaultSearchHandler } from '@wordpress/block-editor';
+	 *
+	 * const handler = createDefaultSearchHandler(undefined, {
+	 *   showInitialSuggestions: false
+	 * });
+	 *
 	 * <LinkControlV2
-	 *   searchHandler={createTypedSearchHandler(fetchSuggestions, { type: 'product' })}
+	 *   value={value}
+	 *   onChange={onChange}
+	 *   searchHandler={handler}
 	 * />
 	 *
-	 * // Fully custom handler
+	 * // Fully custom handler using mixins
+	 * import {
+	 *   compose,
+	 *   withMinLength,
+	 *   withDirectEntry,
+	 *   withFetch,
+	 * } from '@wordpress/block-editor';
+	 *
+	 * const customHandler = compose(
+	 *   withMinLength(3), // Require 3 characters
+	 *   withDirectEntry(),
+	 *   withFetch(myFetchFunction, (searchValue, context) => ({
+	 *     type: 'post',
+	 *     subtype: 'page',
+	 *     isInitialSuggestions: context.isInitial,
+	 *   }))
+	 * )(() => ({ suggestions: [] }));
+	 *
 	 * <LinkControlV2
-	 *   searchHandler={async (value, context) => {
-	 *     // Custom logic
-	 *     return { suggestions: [] };
+	 *   value={value}
+	 *   onChange={onChange}
+	 *   searchHandler={customHandler}
+	 * />
+	 *
+	 * // Fully custom handler (complete control)
+	 * <LinkControlV2
+	 *   value={value}
+	 *   onChange={onChange}
+	 *   searchHandler={async (searchValue, context) => {
+	 *     // Your custom logic here
+	 *     if (context.isInitial) {
+	 *       return { suggestions: [] }; // No initial suggestions
+	 *     }
+	 *     const results = await myCustomSearch(searchValue);
+	 *     return { suggestions: results };
 	 *   }}
 	 * />
 	 * ```

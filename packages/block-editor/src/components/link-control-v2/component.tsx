@@ -58,7 +58,9 @@ const DefaultComponents = {
  * @param root0.value           The committed link value (from parent).
  * @param root0.onChange        Callback when link value is committed.
  * @param root0.settings        Link settings configuration.
- * @param root0.searchHandler   Search handler function (optional, defaults to basic handler).
+ * @param root0.searchHandler   Search handler function (optional). If not provided, automatically
+ *                              uses `__experimentalFetchLinkSuggestions` from block editor settings.
+ *                              See `LinkControlV2Props.searchHandler` for detailed documentation and examples.
  * @param root0.components      Component overrides or disable flags.
  * @param root0.children        Custom composition (mutually exclusive with components).
  *

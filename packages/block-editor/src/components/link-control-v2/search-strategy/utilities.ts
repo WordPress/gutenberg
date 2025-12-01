@@ -7,7 +7,11 @@ import { prependHTTP } from '@wordpress/url';
  * Internal dependencies
  */
 import { isURLLike } from '../utils/is-url-like';
-import type { LinkSuggestion } from '../types';
+import type {
+	LinkSuggestion,
+	FetchSuggestionsFunction,
+	FetchSuggestionsOptions,
+} from '../types';
 
 /**
  * Detects if a string looks like a URL (direct entry).
