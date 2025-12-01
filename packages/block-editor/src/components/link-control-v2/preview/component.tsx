@@ -9,10 +9,12 @@ import clsx from 'clsx';
 import { forwardRef } from '@wordpress/element';
 import type { ComponentType, ReactNode } from 'react';
 import { __ } from '@wordpress/i18n';
+import { useInstanceId } from '@wordpress/compose';
 import {
 	Button,
 	ExternalLink,
 	__experimentalTruncate as Truncate,
+	BaseControl,
 } from '@wordpress/components';
 import { useCopyToClipboard } from '@wordpress/compose';
 import { filterURLForDisplay, safeDecodeURI } from '@wordpress/url';
@@ -57,6 +59,10 @@ interface PreviewProps {
 	 * Callback when the remove/unlink button is clicked.
 	 */
 	onRemove?: () => void;
+	/**
+	 * Whether to show the label.
+	 */
+	showLabel?: boolean;
 }
 
 /**
@@ -71,6 +77,7 @@ export const Preview = forwardRef< HTMLDivElement, PreviewProps >(
 		{
 			hasUnlinkControl = false,
 			onRemove,
+			showLabel = false,
 			...props
 		},
 		ref
@@ -80,11 +87,24 @@ export const Preview = forwardRef< HTMLDivElement, PreviewProps >(
 			uncommittedValue,
 			isEditing,
 			setIsEditing,
+			setUncommittedValue,
 		} = useLinkControlV2Context();
+
+		const id = useInstanceId( Preview, 'link-control-v2-preview' );
 
 		// When editing an entity, show uncommitted value (the entity being edited)
 		// Otherwise, show committed value (the saved/locked state)
 		const displayValue = isEditing ? uncommittedValue : committedValue;
+
+		// Check if we're editing an entity (has kind, type, id)
+		const isEditingEntity =
+			isEditing &&
+			!! (
+				uncommittedValue?.kind &&
+				uncommittedValue?.type &&
+				uncommittedValue?.id !== undefined &&
+				uncommittedValue?.id !== null
+			);
 
 		const showIconLabels = useSelect(
 			( select ) =>
@@ -194,24 +214,35 @@ export const Preview = forwardRef< HTMLDivElement, PreviewProps >(
 			setIsEditing( true );
 		};
 
+		// Handle unlink when editing an entity - reset to empty and show search
+		const handleUnlinkEntity = () => {
+			setUncommittedValue( undefined );
+			setIsEditing( true );
+		};
+
 		return (
-			<div
-				ref={ ref }
-				role="group"
-				aria-label={ __( 'Manage link' ) }
-				className={ clsx(
-					'block-editor-link-control__search-item',
-					'block-editor-link-control-v2__preview',
-					{
-						'is-current': true,
-						'is-rich': !!( displayValue?.icon || displayValue?.image ),
-						'is-preview': true,
-						'is-error': isEmptyURL,
-						'is-url-title': displayTitle === displayURL,
-					}
-				) }
-				{ ...props }
+			<BaseControl
+				id={ showLabel ? id : undefined }
+				label={ showLabel ? __( 'Link' ) : undefined }
+				__nextHasNoMarginBottom
 			>
+				<div
+					ref={ ref }
+					role="group"
+					aria-label={ __( 'Manage link' ) }
+					className={ clsx(
+						'block-editor-link-control__search-item',
+						'block-editor-link-control-v2__preview',
+						{
+							'is-current': true,
+							'is-rich': !!( displayValue?.icon || displayValue?.image ),
+							'is-preview': true,
+							'is-error': isEmptyURL,
+							'is-url-title': displayTitle === displayURL,
+						}
+					) }
+					{ ...props }
+				>
 				<div className="block-editor-link-control__search-item-top">
 					<span
 						className="block-editor-link-control__search-item-header"
@@ -264,36 +295,51 @@ export const Preview = forwardRef< HTMLDivElement, PreviewProps >(
 							) }
 						</span>
 					</span>
-					<Button
-						icon={ pencil }
-						label={ __( 'Edit link' ) }
-						onClick={ handleEditClick }
-						size="compact"
-						showTooltip={ ! showIconLabels }
-					/>
-					{ hasUnlinkControl && (
+					{ isEditingEntity ? (
+						// When editing an entity, show unlink button only
 						<Button
 							icon={ linkOff }
-							label={ __( 'Remove link' ) }
-							onClick={ handleRemove }
+							label={ __( 'Unlink' ) }
+							onClick={ handleUnlinkEntity }
 							size="compact"
 							showTooltip={ ! showIconLabels }
 						/>
+					) : (
+						// When not editing an entity, show edit and copy buttons
+						<>
+							<Button
+								icon={ pencil }
+								label={ __( 'Edit link' ) }
+								onClick={ handleEditClick }
+								size="compact"
+								showTooltip={ ! showIconLabels }
+							/>
+							{ hasUnlinkControl && (
+								<Button
+									icon={ linkOff }
+									label={ __( 'Remove link' ) }
+									onClick={ handleRemove }
+									size="compact"
+									showTooltip={ ! showIconLabels }
+								/>
+							) }
+							<Button
+								icon={ copySmall }
+								label={ __( 'Copy link' ) }
+								ref={ copyRef }
+								accessibleWhenDisabled
+								disabled={ isEmptyURL }
+								size="compact"
+								showTooltip={ ! showIconLabels }
+							/>
+						</>
 					) }
-					<Button
-						icon={ copySmall }
-						label={ __( 'Copy link' ) }
-						ref={ copyRef }
-						accessibleWhenDisabled
-						disabled={ isEmptyURL }
-						size="compact"
-						showTooltip={ ! showIconLabels }
-					/>
 					{ displayValue && (
 						<ViewerSlot fillProps={ displayValue } />
 					) }
 				</div>
 			</div>
+			</BaseControl>
 		);
 	}
 );

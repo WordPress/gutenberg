@@ -15,14 +15,21 @@ import { transformSuggestionsToOptions } from '../utils/transform-suggestions';
 import { isURLLike } from '../utils/is-url-like';
 import type { ComboboxControlOption, LinkSuggestion } from '../types';
 
+interface SearchInputProps {
+	/**
+	 * Whether to show the label.
+	 */
+	showLabel?: boolean;
+}
+
 /**
  * SearchInput subcomponent for LinkControlV2.
  *
  * Uses ValidatedComboboxControl to provide entity search functionality.
  * Supports direct URL entry and entity search via fetchSuggestions.
  */
-export const SearchInput = forwardRef< HTMLInputElement >(
-	function SearchInput( props ) {
+export const SearchInput = forwardRef< HTMLInputElement, SearchInputProps >(
+	function SearchInput( { showLabel = false, ...props } ) {
 		const context = useLinkControlV2Context();
 		const {
 			uncommittedValue,
@@ -228,8 +235,8 @@ export const SearchInput = forwardRef< HTMLInputElement >(
 
 		return (
 			<ComboboxControl
-				label={ __( 'URL' ) }
-				hideLabelFromVision
+				label={ __( 'Link' ) }
+				hideLabelFromVision={ ! showLabel }
 				placeholder={ __( 'Paste URL or type to search' ) }
 				value={ displayValue }
 				options={ displayOptions }

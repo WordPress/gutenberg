@@ -1,10 +1,15 @@
 /**
+ * External dependencies
+ */
+import type { ComponentType } from 'react';
+import fastDeepEqual from 'fast-deep-equal';
+
+/**
  * WordPress dependencies
  */
 import { useMemo, useState, useEffect, useRef } from '@wordpress/element';
 import { useInstanceId } from '@wordpress/compose';
-import type { ComponentType } from 'react';
-import fastDeepEqual from 'fast-deep-equal';
+import { __experimentalVStack as VStack } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -176,6 +181,8 @@ function UnforwardedLinkControlV2( {
 			fetchSuggestions,
 			showInitialSuggestions,
 			instanceId,
+			commitValue,
+			revertValue,
 		]
 	);
 
@@ -202,13 +209,16 @@ function UnforwardedLinkControlV2( {
 
 		// Default composition - simple and opinionated
 		// Consumers can override via children or component replacement/disable
-		// eslint-disable-next-line @typescript-eslint/no-restricted-imports
 		return (
-			<>
+			<VStack spacing={ 4 }>
 				{ isEditing && ! editingEntity && (
 					<>
+						{ Components.TitleInput !== false &&
+							( committedValue || uncommittedValue ) && (
+								<Components.TitleInput />
+							) }
 						{ Components.SearchInput !== false && (
-							<Components.SearchInput />
+							<Components.SearchInput showLabel={ isEditing } />
 						) }
 						{ Components.Settings !== false && (
 							<Components.Settings />
@@ -220,8 +230,12 @@ function UnforwardedLinkControlV2( {
 				) }
 				{ editingEntity && (
 					<>
+						{ Components.TitleInput !== false &&
+							( committedValue || uncommittedValue ) && (
+								<Components.TitleInput />
+							) }
 						{ Components.Preview !== false && (
-							<Components.Preview />
+							<Components.Preview showLabel={ isEditing } />
 						) }
 						{ Components.Settings !== false && (
 							<Components.Settings />
@@ -236,7 +250,7 @@ function UnforwardedLinkControlV2( {
 					Components.Preview !== false && (
 						<Components.Preview />
 					) }
-			</>
+			</VStack>
 		);
 	};
 
