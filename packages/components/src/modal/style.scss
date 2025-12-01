@@ -112,7 +112,7 @@
 		:where(.components-modal__content) {
 			display: flex;
 			// If this container is scrollable, bottom padding won't apply so we use margin instead.
-			margin-bottom: $grid-unit-40;
+			margin-bottom: $grid-unit-30;
 			padding-bottom: 0;
 
 			> :last-child {
