@@ -2,7 +2,7 @@
  * External dependencies
  */
 const path = require( 'node:path' );
-const { existsSync } = require( 'node:fs' );
+const { existsSync, readFileSync } = require( 'node:fs' );
 const resolverNode = require( 'eslint-import-resolver-typescript' );
 const PACKAGES_DIR = path.resolve( __dirname, '../../packages' );
 
@@ -29,7 +29,7 @@ exports.resolve = function ( source, file, config ) {
 		// source file using its declared exports.
 		try {
 			const manifestPath = path.join( packagePath, 'package.json' );
-			const manifest = require( manifestPath );
+			const manifest = JSON.parse( readFileSync( manifestPath, 'utf8' ) );
 			const subpath = path.join( '.', pathParts.join( '/' ) );
 			const exportPath = manifest.exports?.[ subpath ]?.import;
 			const sourcePath = exportPath.replace( 'build-module', 'src' );
