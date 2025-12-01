@@ -170,6 +170,17 @@ function UnforwardedLinkControlV2( {
 		]
 	);
 
+	// Helper to check if a value represents an entity (Post, Page, etc.)
+	const isEntity = ( val: LinkValue | undefined ): boolean => {
+		return !! (
+			val &&
+			val.kind &&
+			val.type &&
+			val.id !== undefined &&
+			val.id !== null
+		);
+	};
+
 	// If children are provided, render them (full flexibility)
 	// Otherwise, render default composition (opinionated default)
 	const renderContent = () => {
@@ -177,14 +188,24 @@ function UnforwardedLinkControlV2( {
 			return children;
 		}
 
+		// Determine if we're editing an entity
+		const editingEntity = isEditing && isEntity( uncommittedValue );
+
 		// Default composition - simple and opinionated
 		// Consumers can override via children or component replacement
 		// eslint-disable-next-line @typescript-eslint/no-restricted-imports
 		return (
 			<>
-				{ isEditing && (
+				{ isEditing && ! editingEntity && (
 					<>
 						<Components.SearchInput />
+						<Components.Settings />
+						<Components.Actions />
+					</>
+				) }
+				{ editingEntity && (
+					<>
+						<Components.Preview />
 						<Components.Settings />
 						<Components.Actions />
 					</>

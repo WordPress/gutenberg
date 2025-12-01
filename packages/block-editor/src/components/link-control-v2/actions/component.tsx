@@ -16,16 +16,27 @@ import { isShallowEqualObjects } from '@wordpress/is-shallow-equal';
  */
 import { useLinkControlV2Context } from '../context';
 
-const noop = () => {};
+
+interface ActionsProps {
+	/**
+	 * Custom callback for Cancel button click.
+	 * If provided, overrides the default behavior of reverting changes and exiting edit mode.
+	 */
+	onCancel?: () => void;
+}
 
 /**
  * Actions subcomponent for LinkControlV2.
  *
  * Provides Apply and Cancel buttons that commit or revert changes.
- * Only shown when editing and there's a URL value.
+ * Rendering is controlled by composition (default or custom).
+ * Apply button is disabled when there are no changes or when the URL is empty.
+ *
+ * By default, Cancel reverts changes and exits edit mode (showing Preview).
+ * This can be customized via the `onCancel` prop.
  */
-export const Actions = forwardRef< HTMLDivElement >(
-	function Actions( props, ref ) {
+export const Actions = forwardRef< HTMLDivElement, ActionsProps >(
+	function Actions( { onCancel, ...props }, ref ) {
 		const {
 			committedValue,
 			uncommittedValue,
@@ -49,17 +60,8 @@ export const Actions = forwardRef< HTMLDivElement >(
 		// Check if the URL input is empty
 		const isURLEmpty = ! uncommittedValue?.url?.trim()?.length;
 
-		// Check if there's a link value (committed or uncommitted)
-		// Actions are shown when editing and there's a URL value
-		const hasLinkValue =
-			( committedValue?.url?.trim()?.length ?? 0 ) > 0 ||
-			( uncommittedValue?.url?.trim()?.length ?? 0 ) > 0;
-
 		// Apply button is disabled if no changes or URL is empty
 		const isApplyDisabled = ! hasChanges || isURLEmpty;
-
-		// Only show actions when editing and there's a URL value
-		const showActions = isEditing && hasLinkValue;
 
 		// Handle Apply button click
 		const handleApply = () => {
@@ -74,7 +76,13 @@ export const Actions = forwardRef< HTMLDivElement >(
 			event.preventDefault();
 			event.stopPropagation();
 
-			// Revert any uncommitted changes
+			// If custom onCancel is provided, use it
+			if ( onCancel ) {
+				onCancel();
+				return;
+			}
+
+			// Default behavior: revert changes and exit edit mode (shows Preview)
 			revertValue();
 
 			// If there's a committed link value, exit editing mode and show preview
@@ -83,10 +91,6 @@ export const Actions = forwardRef< HTMLDivElement >(
 				setIsEditing( false );
 			}
 		};
-
-		if ( ! showActions ) {
-			return null;
-		}
 
 		return (
 			<HStack
@@ -105,9 +109,9 @@ export const Actions = forwardRef< HTMLDivElement >(
 				<Button
 					__next40pxDefaultSize
 					variant="primary"
-					onClick={ isApplyDisabled ? noop : handleApply }
+					onClick={ handleApply }
+					disabled={ isApplyDisabled }
 					className="block-editor-link-control-v2__apply"
-					aria-disabled={ isApplyDisabled }
 				>
 					{ __( 'Apply' ) }
 				</Button>

@@ -63,7 +63,8 @@ interface PreviewProps {
  * Preview subcomponent for LinkControlV2.
  *
  * Displays the committed link value with edit, unlink, and copy actions.
- * Reads display data directly from the committedValue object.
+ * Displays the link value with edit, unlink, and copy actions.
+ * When editing, shows uncommittedValue; otherwise shows committedValue.
  */
 export const Preview = forwardRef< HTMLDivElement, PreviewProps >(
 	function Preview(
@@ -76,8 +77,14 @@ export const Preview = forwardRef< HTMLDivElement, PreviewProps >(
 	) {
 		const {
 			committedValue,
+			uncommittedValue,
+			isEditing,
 			setIsEditing,
 		} = useLinkControlV2Context();
+
+		// When editing an entity, show uncommitted value (the entity being edited)
+		// Otherwise, show committed value (the saved/locked state)
+		const displayValue = isEditing ? uncommittedValue : committedValue;
 
 		const showIconLabels = useSelect(
 			( select ) =>
@@ -86,15 +93,15 @@ export const Preview = forwardRef< HTMLDivElement, PreviewProps >(
 		);
 
 		const displayURL =
-			( committedValue?.url &&
+			( displayValue?.url &&
 				filterURLForDisplay(
-					safeDecodeURI( committedValue.url ),
+					safeDecodeURI( displayValue.url ),
 					24
 				) ) ||
 			'';
 
 		// url can be undefined if the href attribute is unset
-		const isEmptyURL = ! committedValue?.url?.length;
+		const isEmptyURL = ! displayValue?.url?.length;
 
 		// Display priority for preview:
 		// 1. Entity title (what the link points to - e.g., Page title "Contact")
@@ -104,8 +111,8 @@ export const Preview = forwardRef< HTMLDivElement, PreviewProps >(
 		const displayTitle =
 			! isEmptyURL
 				? stripHTML(
-						committedValue?.title ||
-							committedValue?.label ||
+						displayValue?.title ||
+							displayValue?.label ||
 							displayURL ||
 							''
 				  )
@@ -113,19 +120,19 @@ export const Preview = forwardRef< HTMLDivElement, PreviewProps >(
 
 		// Show label as secondary info if it exists and differs from title
 		const showLabelAsSecondary =
-			committedValue?.label &&
-			committedValue?.title &&
-			committedValue.label !== committedValue.title;
+			displayValue?.label &&
+			displayValue?.title &&
+			displayValue.label !== displayValue.title;
 
 		const isUrlRedundant =
-			! committedValue?.url ||
+			! displayValue?.url ||
 			filterTitleForDisplay( displayTitle ) === displayURL;
 
 		let icon;
 
 		// Handle icon from value - can be Component, SVG, or URL
-		if ( committedValue?.icon ) {
-			const iconValue = committedValue.icon;
+		if ( displayValue?.icon ) {
+			const iconValue = displayValue.icon;
 
 			// If it's a React component (function)
 			if ( typeof iconValue === 'function' ) {
@@ -159,8 +166,8 @@ export const Preview = forwardRef< HTMLDivElement, PreviewProps >(
 					);
 				}
 			}
-		} else if ( committedValue?.image ) {
-			icon = <img src={ committedValue.image } alt="" />;
+		} else if ( displayValue?.image ) {
+			icon = <img src={ displayValue.image } alt="" />;
 		} else if ( isEmptyURL ) {
 			icon = <Icon icon={ info } size={ 32 } />;
 		} else {
@@ -169,7 +176,7 @@ export const Preview = forwardRef< HTMLDivElement, PreviewProps >(
 
 		const { createNotice } = useDispatch( noticesStore );
 		const copyRef = useCopyToClipboard(
-			committedValue?.url ?? '',
+			displayValue?.url ?? '',
 			() => {
 				createNotice( 'info', __( 'Link copied to clipboard.' ), {
 					isDismissible: true,
@@ -197,7 +204,7 @@ export const Preview = forwardRef< HTMLDivElement, PreviewProps >(
 					'block-editor-link-control-v2__preview',
 					{
 						'is-current': true,
-						'is-rich': !!( committedValue?.icon || committedValue?.image ),
+						'is-rich': !!( displayValue?.icon || displayValue?.image ),
 						'is-preview': true,
 						'is-error': isEmptyURL,
 						'is-url-title': displayTitle === displayURL,
@@ -218,7 +225,7 @@ export const Preview = forwardRef< HTMLDivElement, PreviewProps >(
 							className={ clsx(
 								'block-editor-link-control__search-item-icon',
 								{
-									'is-image': !!( committedValue?.icon || committedValue?.image ),
+									'is-image': !!( displayValue?.icon || displayValue?.image ),
 								}
 							) }
 						>
@@ -229,7 +236,7 @@ export const Preview = forwardRef< HTMLDivElement, PreviewProps >(
 								<>
 									<ExternalLink
 										className="block-editor-link-control__search-item-title"
-										href={ committedValue.url || '' }
+										href={ displayValue?.url || '' }
 									>
 										<Truncate numberOfLines={ 1 }>
 											{ displayTitle }
@@ -238,7 +245,7 @@ export const Preview = forwardRef< HTMLDivElement, PreviewProps >(
 									{ showLabelAsSecondary && (
 										<span className="block-editor-link-control__search-item-info">
 											<Truncate numberOfLines={ 1 }>
-												{ stripHTML( committedValue.label || '' ) }
+												{ stripHTML( displayValue?.label || '' ) }
 											</Truncate>
 										</span>
 									) }
@@ -282,8 +289,8 @@ export const Preview = forwardRef< HTMLDivElement, PreviewProps >(
 						size="compact"
 						showTooltip={ ! showIconLabels }
 					/>
-					{ committedValue && (
-						<ViewerSlot fillProps={ committedValue } />
+					{ displayValue && (
+						<ViewerSlot fillProps={ displayValue } />
 					) }
 				</div>
 			</div>
