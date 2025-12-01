@@ -153,6 +153,12 @@ export interface LinkControlV2Props {
 	showInitialSuggestions?: boolean;
 	/**
 	 * Custom components to replace defaults.
+	 *
+	 * Mutually exclusive with `children`. Use this to replace individual
+	 * components while keeping the default composition logic (editing mode
+	 * handling, conditional rendering, etc.).
+	 *
+	 * If you need full control over composition, use `children` instead.
 	 */
 	components?: {
 		SearchInput?: ComponentType< any >;
@@ -163,6 +169,13 @@ export interface LinkControlV2Props {
 	};
 	/**
 	 * Children to render inside the component.
+	 *
+	 * Mutually exclusive with `components`. Use this for full control over
+	 * composition. You'll need to handle display logic yourself (e.g., when
+	 * to show SearchInput vs Preview), but you can access state via
+	 * `useLinkControlV2()` hook.
+	 *
+	 * If you just want to replace individual components, use `components` instead.
 	 */
 	children?: ReactNode;
 }

@@ -55,7 +55,7 @@ const DefaultComponents = {
  *   <LinkControlV2.Preview />
  * </LinkControlV2>
  *
- * // Replace default components
+ * // Replace default components (keeps default composition logic)
  * <LinkControlV2
  *   value={linkValue}
  *   onChange={setLinkValue}
@@ -63,6 +63,9 @@ const DefaultComponents = {
  *     SearchInput: MyCustomSearchInput
  *   }}
  * />
+ *
+ * // Note: components and children are mutually exclusive.
+ * // Use components to replace parts, children for full control.
  * ```
  */
 function UnforwardedLinkControlV2( {
@@ -75,6 +78,21 @@ function UnforwardedLinkControlV2( {
 	children,
 }: LinkControlV2Props ) {
 	const instanceId = useInstanceId( UnforwardedLinkControlV2, 'link-control-v2' );
+
+	// components and children are mutually exclusive
+	// components = replace individual components, keep default composition
+	// children = full control over composition
+	if ( children && Object.keys( components ).length > 0 ) {
+		if ( process.env.NODE_ENV !== 'production' ) {
+			// eslint-disable-next-line no-console
+			console.error(
+				'LinkControlV2: `components` and `children` props are mutually exclusive. ' +
+					'Use `components` to replace individual components while keeping default composition, ' +
+					'or use `children` for full control over composition. ' +
+					'The `components` prop will be ignored when `children` is provided.'
+			);
+		}
+	}
 
 	// Opinionated default: manage committed/uncommitted values internally
 	const [ committedValue, setCommittedValue ] = useState< LinkValue | undefined >(
