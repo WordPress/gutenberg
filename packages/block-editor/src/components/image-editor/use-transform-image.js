@@ -42,16 +42,16 @@ export default function useTransformImage( {
 	 * This creates a new rotated image file, bypassing the image-cropper’s CSS transform rotation.
 	 * It's a bespoke solution to ensure that the rotated image fills the entire canvas.
 	 */
-	const [ iternalRotation, setInternalRotation ] = useState( 0 );
+	const [ internalRotation, setInternalRotation ] = useState( 0 );
 	const rotateClockwise = useCallback( () => {
-		const angle = ( iternalRotation + 90 ) % 360;
+		const angle = ( internalRotation + 90 ) % 360;
 
 		let naturalAspectRatio = defaultAspect;
 		const isDefaultAspect =
 			defaultAspect === aspectRatio || rotatedAspect === aspectRatio;
 		const shouldResetAspect = zoom !== 1 || ! isDefaultAspect;
 
-		if ( iternalRotation % 180 === 90 ) {
+		if ( internalRotation % 180 === 90 ) {
 			naturalAspectRatio = 1 / defaultAspect;
 		}
 
@@ -128,7 +128,7 @@ export default function useTransformImage( {
 			el.crossOrigin = imgCrossOrigin;
 		}
 	}, [
-		iternalRotation,
+		internalRotation,
 		defaultAspect,
 		url,
 		setCropperState,
@@ -146,7 +146,7 @@ export default function useTransformImage( {
 			crop: croppedArea,
 			zoom,
 			setZoom,
-			rotation: iternalRotation,
+			rotation: internalRotation,
 			rotateClockwise,
 			aspect: aspectRatio,
 			setAspect: setAspectRatio,
@@ -157,7 +157,7 @@ export default function useTransformImage( {
 			croppedArea,
 			zoom,
 			setZoom,
-			iternalRotation,
+			internalRotation,
 			rotateClockwise,
 			aspectRatio,
 			setAspectRatio,
