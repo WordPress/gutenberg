@@ -37,7 +37,6 @@ import { store as preferencesStore } from '@wordpress/preferences';
  * Internal dependencies
  */
 import { useLinkControlV2Context } from '../context';
-import { ViewerSlot } from '../../link-control/viewer-slot';
 
 /**
  * Filters the title for display. Removes the protocol and www prefix.
@@ -232,21 +231,19 @@ export const Preview = forwardRef< HTMLDivElement, PreviewProps >(
 					role="group"
 					aria-label={ __( 'Manage link' ) }
 					className={ clsx(
-						'block-editor-link-control__search-item',
+						'block-editor-link-control-v2__preview-item',
 						'block-editor-link-control-v2__preview',
 						{
-							'is-current': true,
 							'is-rich': !!( displayValue?.icon || displayValue?.image ),
-							'is-preview': true,
 							'is-error': isEmptyURL,
 							'is-url-title': displayTitle === displayURL,
 						}
 					) }
 					{ ...props }
 				>
-				<div className="block-editor-link-control__search-item-top">
+				<div className="block-editor-link-control-v2__preview-top">
 					<span
-						className="block-editor-link-control__search-item-header"
+						className="block-editor-link-control-v2__preview-header"
 						role="figure"
 						aria-label={
 							/* translators: Accessibility text for the link preview when editing a link. */
@@ -255,7 +252,7 @@ export const Preview = forwardRef< HTMLDivElement, PreviewProps >(
 					>
 						<span
 							className={ clsx(
-								'block-editor-link-control__search-item-icon',
+								'block-editor-link-control-v2__preview-icon',
 								{
 									'is-image': !!( displayValue?.icon || displayValue?.image ),
 								}
@@ -263,11 +260,11 @@ export const Preview = forwardRef< HTMLDivElement, PreviewProps >(
 						>
 							{ icon }
 						</span>
-						<span className="block-editor-link-control__search-item-details">
+						<span className="block-editor-link-control-v2__preview-details">
 							{ ! isEmptyURL ? (
 								<>
 									<ExternalLink
-										className="block-editor-link-control__search-item-title"
+										className="block-editor-link-control-v2__preview-title"
 										href={ displayValue?.url || '' }
 									>
 										<Truncate numberOfLines={ 1 }>
@@ -275,14 +272,14 @@ export const Preview = forwardRef< HTMLDivElement, PreviewProps >(
 										</Truncate>
 									</ExternalLink>
 									{ showLabelAsSecondary && (
-										<span className="block-editor-link-control__search-item-info">
+										<span className="block-editor-link-control-v2__preview-info">
 											<Truncate numberOfLines={ 1 }>
 												{ stripHTML( displayValue?.label || '' ) }
 											</Truncate>
 										</span>
 									) }
 									{ ! showLabelAsSecondary && ! isUrlRedundant && (
-										<span className="block-editor-link-control__search-item-info">
+										<span className="block-editor-link-control-v2__preview-info">
 											<Truncate numberOfLines={ 1 }>
 												{ displayURL }
 											</Truncate>
@@ -290,7 +287,7 @@ export const Preview = forwardRef< HTMLDivElement, PreviewProps >(
 									) }
 								</>
 							) : (
-								<span className="block-editor-link-control__search-item-error-notice">
+								<span className="block-editor-link-control-v2__preview-error-notice">
 									{ __( 'Link is empty' ) }
 								</span>
 							) }
@@ -335,11 +332,8 @@ export const Preview = forwardRef< HTMLDivElement, PreviewProps >(
 							/>
 						</>
 					) }
-					{ displayValue && (
-						<ViewerSlot fillProps={ displayValue } />
-					) }
 				</div>
-			</div>
+				</div>
 			</BaseControl>
 		);
 	}

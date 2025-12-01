@@ -61,6 +61,8 @@ export const Settings = forwardRef< HTMLDivElement >(
 		 * Note that Block Editor components can be consumed by non-WordPress
 		 * environments which may not have preferences setup.
 		 * Therefore a local state is also used as a fallback.
+		 *
+		 * @param {boolean} prefVal The open/closed state of the Advanced Settings Drawer.
 		 */
 		const setSettingsOpenWithPreference = ( prefVal: boolean ) => {
 			if ( setPreference ) {
@@ -120,7 +122,7 @@ export const Settings = forwardRef< HTMLDivElement >(
 						return (
 							<div
 								key={ setting.id }
-								className="block-editor-link-control__setting"
+								className="block-editor-link-control-v2__setting"
 							>
 								{ renderedContent }
 							</div>
@@ -134,7 +136,7 @@ export const Settings = forwardRef< HTMLDivElement >(
 				return (
 					<CheckboxControl
 						__nextHasNoMarginBottom
-						className="block-editor-link-control__setting"
+						className="block-editor-link-control-v2__setting"
 						key={ setting.id }
 						label={ setting.title }
 						onChange={ handleSettingChange( setting ) }
@@ -147,17 +149,16 @@ export const Settings = forwardRef< HTMLDivElement >(
 			} )
 			.filter( Boolean ); // Remove null entries
 
-		// eslint-disable-next-line @typescript-eslint/no-restricted-imports
 		return (
 			<div
 				ref={ ref }
 				className="block-editor-link-control-v2__settings"
 				{ ...props }
 			>
-				<div className="block-editor-link-control__tools">
+				<div className="block-editor-link-control-v2__tools">
 					<Button
 						__next40pxDefaultSize
-						className="block-editor-link-control__drawer-toggle"
+						className="block-editor-link-control-v2__drawer-toggle"
 						aria-expanded={ isSettingsOpen }
 						onClick={ () =>
 							setSettingsOpenWithPreference( ! isSettingsOpen )
@@ -170,7 +171,7 @@ export const Settings = forwardRef< HTMLDivElement >(
 					<MaybeAnimatePresence>
 						{ isSettingsOpen && (
 							<MaybeMotionDiv
-								className="block-editor-link-control__drawer"
+								className="block-editor-link-control-v2__drawer"
 								hidden={ ! isSettingsOpen }
 								id={ settingsDrawerId }
 								initial="collapsed"
@@ -192,8 +193,8 @@ export const Settings = forwardRef< HTMLDivElement >(
 										  }
 								}
 							>
-								<div className="block-editor-link-control__drawer-inner">
-									<fieldset className="block-editor-link-control__settings">
+								<div className="block-editor-link-control-v2__drawer-inner">
+									<fieldset className="block-editor-link-control-v2__settings-fieldset">
 										<VisuallyHidden as="legend">
 											{ __( 'Currently selected link settings' ) }
 										</VisuallyHidden>

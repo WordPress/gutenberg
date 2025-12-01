@@ -1,0 +1,137 @@
+@use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/colors" as *;
+
+// Preview-specific styles - decoupled from search results
+.block-editor-link-control-v2__preview-item {
+	flex-direction: column; // allow for stacking.
+	background: transparent;
+	border: 1px solid $gray-300;
+	border-radius: $radius-small;
+	width: 100%;
+	cursor: default;
+	padding: $grid-unit-20;
+
+	&.is-error .block-editor-link-control-v2__preview-header {
+		align-items: center;
+	}
+
+	&.is-url-title .block-editor-link-control-v2__preview-title {
+		// To prevent overflow when the title is a URL
+		word-break: break-all;
+	}
+}
+
+.block-editor-link-control-v2__preview-top {
+	display: flex;
+	flex-direction: row;
+	width: 100%; // clip.
+	align-items: center;
+}
+
+.block-editor-link-control-v2__preview-header {
+	display: flex;
+	flex: 1; // Fill available space.
+	flex-direction: row;
+	align-items: center;
+	margin-right: $grid-unit-10;
+	gap: $grid-unit-10;
+
+	// Force text to wrap to improve UX when encountering long lines
+	// of text, particular those with no spaces.
+	// See: https://github.com/WordPress/gutenberg/issues/33586#issuecomment-888921188
+	white-space: pre-wrap;
+	overflow-wrap: break-word;
+}
+
+.block-editor-link-control-v2__preview-details {
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+	gap: $grid-unit-05;
+}
+
+.block-editor-link-control-v2__preview-header .block-editor-link-control-v2__preview-icon {
+	background-color: $gray-100;
+	width: $grid-unit-40;
+	height: $grid-unit-40;
+	border-radius: $radius-small;
+}
+
+.block-editor-link-control-v2__preview-icon {
+	position: relative;
+	flex-shrink: 0;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+
+	img {
+		width: $grid-unit-20; // favicons often have a source of 32px
+	}
+}
+
+.block-editor-link-control-v2__preview-item.is-error .block-editor-link-control-v2__preview-icon {
+	top: 0;
+	width: 32px;
+	max-height: 32px;
+}
+
+.block-editor-link-control-v2__preview-title {
+	line-height: 1.1;
+
+	&:focus {
+		box-shadow: none;
+	}
+
+	&:focus-visible {
+		@include block-toolbar-button-style__focus();
+		text-decoration: none;
+	}
+
+	mark {
+		font-weight: 600;
+		color: inherit;
+		background-color: transparent;
+	}
+
+	span {
+		font-weight: normal;
+	}
+
+	.components-external-link__icon {
+		position: absolute;
+		width: 1px;
+		height: 1px;
+		padding: 0;
+		margin: -1px;
+		overflow: hidden;
+		clip: rect(0, 0, 0, 0); // specifically requested to be removed visually as well.
+		border: 0;
+	}
+}
+
+.block-editor-link-control-v2__preview-info {
+	color: $gray-700;
+	line-height: 1.1;
+	font-size: $helptext-font-size;
+	word-break: break-all;
+}
+
+// Icon labels support
+.show-icon-labels {
+	.block-editor-link-control-v2__preview-top {
+		gap: $grid-unit-05;
+		flex-wrap: wrap;
+
+		.components-button.has-icon {
+			width: auto;
+			padding: $grid-unit-05;
+		}
+	}
+
+	.block-editor-link-control-v2__preview-header {
+		min-width: 100%;
+		margin-right: 0;
+	}
+}
+
