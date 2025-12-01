@@ -104,13 +104,16 @@ function UnforwardedLinkControlV2( {
 	);
 
 	// Create default search handler if none provided
-	// For backwards compatibility, we'll create a handler that only handles direct entry
-	// Consumers should provide a handler with fetchSuggestions for full functionality
+	// Fallback chain:
+	// 1. Use providedSearchHandler if given (full control)
+	// 2. createDefaultSearchHandler will automatically use settings.__experimentalFetchLinkSuggestions
+	// 3. Final fallback to handler with only direct entry (no fetch)
 	const searchHandler: HandleSearch = useMemo( () => {
 		if ( providedSearchHandler ) {
 			return providedSearchHandler;
 		}
-		// Default handler only handles direct entry (no fetch)
+
+		// createDefaultSearchHandler automatically falls back to settings if no fetch function provided
 		return createDefaultSearchHandler();
 	}, [ providedSearchHandler ] );
 
