@@ -1342,7 +1342,7 @@ const ValidationComponent = ( {
 
 	return (
 		<form>
-			<VStack alignment="left">
+			<VStack alignment="left" spacing={ 8 }>
 				<DataForm< ValidatedItem >
 					data={ post }
 					fields={ _fields }
@@ -1355,6 +1355,13 @@ const ValidationComponent = ( {
 						} ) )
 					}
 				/>
+				<PanelValidationSection
+					required={ required }
+					elements={ elements }
+					custom={ custom }
+					pattern={ pattern }
+					minMax={ minMax }
+				/>
 				<Button
 					__next40pxDefaultSize
 					accessibleWhenDisabled
@@ -1365,6 +1372,459 @@ const ValidationComponent = ( {
 				</Button>
 			</VStack>
 		</form>
+	);
+};
+
+const PanelValidationSection = ( {
+	required,
+	elements,
+	custom,
+	pattern,
+	minMax,
+}: {
+	required: boolean;
+	elements: 'sync' | 'async' | 'none';
+	custom: 'sync' | 'async' | 'none';
+	pattern: boolean;
+	minMax: boolean;
+} ) => {
+	type PanelItem = {
+		slug: string;
+		categories: string[];
+		tags: string[];
+		weight: number;
+		description: string;
+		email: string;
+		telephone: string;
+		url: string;
+		foregroundColor: string;
+		backgroundColor: string;
+	};
+
+	const [ data, setData ] = useState< PanelItem >( {
+		slug: 'pizza oven', // Has spaces - will trigger validation error
+		categories: [],
+		tags: [ 'Pizza', 'Oven', 'Baking' ],
+		weight: 18,
+		description: 'No assembly, no mess, no fuss.',
+		email: 'invalid-email',
+		telephone: '+1-555-1234',
+		url: 'https://example.com',
+		foregroundColor: '#ffffff',
+		backgroundColor: '#ff6600',
+	} );
+
+	const panelFields: Field< PanelItem >[] = useMemo( () => {
+		const customSlugRule = ( item: PanelItem ) => {
+			if ( item.slug.includes( ' ' ) ) {
+				return 'Slug cannot contain spaces';
+			}
+			return null;
+		};
+
+		const asyncCustomSlugRule = async ( item: PanelItem ) => {
+			return await new Promise< string | null >( ( resolve ) => {
+				setTimeout( () => {
+					resolve( customSlugRule( item ) );
+				}, 2000 );
+			} );
+		};
+
+		const customDescriptionRule = ( item: PanelItem ) => {
+			if ( item.description.length < 20 ) {
+				return 'Description must be at least 20 characters';
+			}
+			return null;
+		};
+
+		const asyncCustomDescriptionRule = async ( item: PanelItem ) => {
+			return await new Promise< string | null >( ( resolve ) => {
+				setTimeout( () => {
+					resolve( customDescriptionRule( item ) );
+				}, 2000 );
+			} );
+		};
+
+		const customEmailRule = ( item: PanelItem ) => {
+			if ( ! /^[a-zA-Z0-9._%+-]+@example\.com$/.test( item.email ) ) {
+				return 'Email address must be from @example.com domain.';
+			}
+			return null;
+		};
+
+		const asyncCustomEmailRule = async ( item: PanelItem ) => {
+			return await new Promise< string | null >( ( resolve ) => {
+				setTimeout( () => {
+					resolve( customEmailRule( item ) );
+				}, 2000 );
+			} );
+		};
+
+		const customTelephoneRule = ( item: PanelItem ) => {
+			if ( ! /^\+30\d{10}$/.test( item.telephone ) ) {
+				return 'Telephone must start with +30 and have 10 digits after.';
+			}
+			return null;
+		};
+
+		const asyncCustomTelephoneRule = async ( item: PanelItem ) => {
+			return await new Promise< string | null >( ( resolve ) => {
+				setTimeout( () => {
+					resolve( customTelephoneRule( item ) );
+				}, 2000 );
+			} );
+		};
+
+		const customUrlRule = ( item: PanelItem ) => {
+			if ( ! /^https:\/\/example\.com$/.test( item.url ) ) {
+				return 'URL must be https://example.com.';
+			}
+			return null;
+		};
+
+		const asyncCustomUrlRule = async ( item: PanelItem ) => {
+			return await new Promise< string | null >( ( resolve ) => {
+				setTimeout( () => {
+					resolve( customUrlRule( item ) );
+				}, 2000 );
+			} );
+		};
+
+		const customColorRule = ( item: PanelItem, fieldId: string ) => {
+			const value =
+				fieldId === 'foregroundColor'
+					? item.foregroundColor
+					: item.backgroundColor;
+			if ( ! /^#[0-9A-Fa-f]{6}$/.test( value ) ) {
+				return 'Color must be a valid hex format (e.g., #ff6600).';
+			}
+			return null;
+		};
+
+		const maybeCustomRule = < T, >(
+			rule: ( item: T ) => string | null,
+			asyncRule: ( item: T ) => Promise< string | null >
+		) => {
+			if ( custom === 'sync' ) {
+				return rule;
+			}
+			if ( custom === 'async' ) {
+				return asyncRule;
+			}
+			return undefined;
+		};
+
+		const getDescription = (
+			patternDesc: string,
+			minMaxDesc: string,
+			customDesc: string
+		) => {
+			const parts = [];
+			if ( pattern ) {
+				parts.push( patternDesc );
+			}
+			if ( minMax ) {
+				parts.push( minMaxDesc );
+			}
+			if ( custom !== 'none' ) {
+				parts.push( customDesc );
+			}
+			return parts.length > 0 ? parts.join( '. ' ) : undefined;
+		};
+
+		return [
+			{
+				id: 'slug',
+				label: 'Slug',
+				type: 'text',
+				description: getDescription(
+					'Only lowercase letters, numbers, and hyphens',
+					'',
+					'No spaces allowed'
+				),
+				isValid: {
+					required,
+					pattern: pattern ? '^[a-z0-9-]+$' : undefined, // No spaces allowed
+					custom: maybeCustomRule(
+						customSlugRule,
+						asyncCustomSlugRule
+					),
+				},
+			},
+			{
+				id: 'categories',
+				label: 'Categories',
+				type: 'array',
+				description: required
+					? 'Select at least one category'
+					: undefined,
+				elements:
+					elements === 'async'
+						? undefined
+						: [
+								{ value: 'pizza-ovens', label: 'Pizza Ovens' },
+								{ value: 'grills', label: 'Grills' },
+								{ value: 'accessories', label: 'Accessories' },
+						  ],
+				getElements:
+					elements === 'async'
+						? () =>
+								new Promise( ( resolve ) =>
+									setTimeout(
+										() =>
+											resolve( [
+												{
+													value: 'pizza-ovens',
+													label: 'Pizza Ovens',
+												},
+												{
+													value: 'grills',
+													label: 'Grills',
+												},
+												{
+													value: 'accessories',
+													label: 'Accessories',
+												},
+											] ),
+										2000
+									)
+								)
+						: undefined,
+				isValid: {
+					required,
+					elements: elements !== 'none',
+				},
+			},
+			{
+				id: 'tags',
+				label: 'Tags',
+				type: 'array',
+				description: 'Add relevant tags for the product',
+				elements: [
+					{ value: 'Pizza', label: 'Pizza' },
+					{ value: 'Oven', label: 'Oven' },
+					{ value: 'Baking', label: 'Baking' },
+				],
+				isValid: {
+					elements: elements !== 'none',
+				},
+			},
+			{
+				id: 'weight',
+				label: 'Weight',
+				type: 'integer',
+				description: minMax ? 'Weight in kg (1-100)' : 'Weight in kg',
+				isValid: {
+					required,
+					min: minMax ? 1 : undefined,
+					max: minMax ? 100 : undefined,
+				},
+			},
+			{
+				id: 'description',
+				label: 'Description',
+				type: 'text',
+				Edit: 'textarea',
+				description: getDescription(
+					'',
+					'Between 20 and 200 characters',
+					'Must be at least 20 characters'
+				),
+				isValid: {
+					required,
+					minLength: minMax ? 20 : undefined,
+					maxLength: minMax ? 200 : undefined,
+					custom: maybeCustomRule(
+						customDescriptionRule,
+						asyncCustomDescriptionRule
+					),
+				},
+			},
+			{
+				id: 'email',
+				label: 'Email',
+				type: 'email',
+				description: getDescription(
+					'Must be a @company.com email',
+					'Between 10 and 50 characters',
+					'Must be from @example.com domain'
+				),
+				isValid: {
+					required,
+					pattern: pattern
+						? '^[a-zA-Z0-9._%+-]+@company\\.com$'
+						: undefined,
+					minLength: minMax ? 10 : undefined,
+					maxLength: minMax ? 50 : undefined,
+					custom: maybeCustomRule(
+						customEmailRule,
+						asyncCustomEmailRule
+					),
+				},
+			},
+			{
+				id: 'telephone',
+				label: 'Telephone',
+				type: 'telephone',
+				description: getDescription(
+					'Must start with +30 followed by 10 digits',
+					'Between 10 and 20 characters',
+					'Greek phone format: +30XXXXXXXXXX'
+				),
+				isValid: {
+					required,
+					pattern: pattern ? '^\\+30\\d{10}$' : undefined,
+					minLength: minMax ? 10 : undefined,
+					maxLength: minMax ? 20 : undefined,
+					custom: maybeCustomRule(
+						customTelephoneRule,
+						asyncCustomTelephoneRule
+					),
+				},
+			},
+			{
+				id: 'url',
+				label: 'URL',
+				type: 'url',
+				description: getDescription(
+					'Must be an https://example.com URL',
+					'Between 10 and 100 characters',
+					'Must be from example.com domain'
+				),
+				isValid: {
+					required,
+					pattern: pattern
+						? '^https:\\/\\/example\\.com.*$'
+						: undefined,
+					minLength: minMax ? 10 : undefined,
+					maxLength: minMax ? 100 : undefined,
+					custom: maybeCustomRule(
+						customUrlRule,
+						asyncCustomUrlRule
+					),
+				},
+			},
+			{
+				id: 'foregroundColor',
+				label: 'Foreground Color',
+				type: 'color',
+				description:
+					custom !== 'none'
+						? 'Valid hex color format (e.g., #ff6600)'
+						: undefined,
+				render: ( { item } ) => (
+					<span
+						style={ {
+							display: 'inline-flex',
+							alignItems: 'center',
+							gap: '8px',
+						} }
+					>
+						<span
+							style={ {
+								width: '16px',
+								height: '16px',
+								borderRadius: '2px',
+								backgroundColor: item.foregroundColor,
+								border: '1px solid #ccc',
+							} }
+						/>
+						{ item.foregroundColor }
+					</span>
+				),
+				isValid: {
+					required,
+					custom:
+						custom !== 'none'
+							? ( item: PanelItem ) =>
+									customColorRule( item, 'foregroundColor' )
+							: undefined,
+				},
+			},
+			{
+				id: 'backgroundColor',
+				label: 'Background Color',
+				type: 'color',
+				description:
+					custom !== 'none'
+						? 'Valid hex color format (e.g., #ff6600)'
+						: undefined,
+				render: ( { item } ) => (
+					<span
+						style={ {
+							display: 'inline-flex',
+							alignItems: 'center',
+							gap: '8px',
+						} }
+					>
+						<span
+							style={ {
+								width: '16px',
+								height: '16px',
+								borderRadius: '2px',
+								backgroundColor: item.backgroundColor,
+								border: '1px solid #ccc',
+							} }
+						/>
+						{ item.backgroundColor }
+					</span>
+				),
+				isValid: {
+					required,
+					custom:
+						custom !== 'none'
+							? ( item: PanelItem ) =>
+									customColorRule( item, 'backgroundColor' )
+							: undefined,
+				},
+			},
+		];
+	}, [ required, elements, custom, pattern, minMax ] );
+
+	const panelForm: Form = {
+		layout: { type: 'panel' },
+		fields: [
+			{ id: 'slug', layout: { type: 'panel' } },
+			{
+				id: 'moreInfo',
+				label: 'More info',
+				children: [ 'categories', 'tags', 'weight' ],
+				layout: { type: 'panel' },
+			},
+			{ id: 'description', layout: { type: 'panel' } },
+			{
+				id: 'profile',
+				label: 'Profile',
+				children: [ 'email', 'telephone', 'url' ],
+				layout: { type: 'panel' },
+			},
+			{
+				id: 'colors',
+				label: 'Colors',
+				children: [ 'foregroundColor', 'backgroundColor' ],
+				layout: {
+					type: 'panel',
+					summary: [ 'foregroundColor', 'backgroundColor' ],
+				},
+			},
+		],
+	};
+
+	const { validity } = useFormValidity( data, panelFields, panelForm );
+
+	return (
+		<VStack spacing={ 4 }>
+			<h3>Panel Layout Validation</h3>
+			<DataForm< PanelItem >
+				data={ data }
+				fields={ panelFields }
+				form={ panelForm }
+				validity={ validity }
+				onChange={ ( edits ) =>
+					setData( ( prev ) => ( { ...prev, ...edits } ) )
+				}
+			/>
+		</VStack>
 	);
 };
 
