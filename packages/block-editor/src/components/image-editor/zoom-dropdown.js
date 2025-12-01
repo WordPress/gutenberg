@@ -39,8 +39,8 @@ export default function ZoomDropdown() {
 						label={ __( 'Zoom' ) }
 						min={ MIN_ZOOM }
 						max={ MAX_ZOOM }
-						value={ Math.round( zoom ) }
-						onChange={ setZoom }
+						value={ Math.round( zoom * 100 ) }
+						onChange={ ( newZoom ) => setZoom( newZoom / 100 ) }
 					/>
 				</DropdownContentWrapper>
 			) }
