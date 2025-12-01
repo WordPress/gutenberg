@@ -131,7 +131,7 @@ function NotesSidebar( { postId, mode } ) {
 		? resultComments.find( ( thread ) => thread.id === blockCommentId )
 		: null;
 	const showAllNotesSidebar =
-		resultComments.length > 0 || ! showFloatingSidebar;
+		resultComments.length > 0 || newNoteFormState !== 'closed';
 
 	async function openTheSidebar() {
 		const prevArea = await getActiveComplementaryArea( 'core' );
