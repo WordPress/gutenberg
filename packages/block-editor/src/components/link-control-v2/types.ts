@@ -41,10 +41,14 @@ export interface LinkValue {
 	url?: string;
 	/**
 	 * The label/text displayed in the link (the HTML string inside `<a>`).
+	 * This is the custom, editable text for the link (e.g., "Get In Touch").
+	 * Can be edited via TitleInput component.
 	 */
 	label?: string;
 	/**
-	 * Title for display (used if label is not provided).
+	 * The entity's actual title (e.g., Page title "Contact").
+	 * This is displayed in the preview to show what entity the link points to.
+	 * Distinct from label - label is the custom link text, title is the entity title.
 	 */
 	title?: string;
 	/**

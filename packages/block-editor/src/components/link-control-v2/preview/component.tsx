@@ -96,19 +96,26 @@ export const Preview = forwardRef< HTMLDivElement, PreviewProps >(
 		// url can be undefined if the href attribute is unset
 		const isEmptyURL = ! committedValue?.url?.length;
 
-		// Display priority:
-		// 1. Link label (custom text for the link)
-		// 2. Title from value (if provided)
+		// Display priority for preview:
+		// 1. Entity title (what the link points to - e.g., Page title "Contact")
+		// 2. Link label (custom text - e.g., "Get In Touch") - only if no title
 		// 3. URL (fallback)
+		// Note: label is the editable link text, title is the entity's actual title
 		const displayTitle =
 			! isEmptyURL
 				? stripHTML(
-						committedValue?.label ||
-							committedValue?.title ||
+						committedValue?.title ||
+							committedValue?.label ||
 							displayURL ||
 							''
 				  )
 				: '';
+
+		// Show label as secondary info if it exists and differs from title
+		const showLabelAsSecondary =
+			committedValue?.label &&
+			committedValue?.title &&
+			committedValue.label !== committedValue.title;
 
 		const isUrlRedundant =
 			! committedValue?.url ||
@@ -228,7 +235,14 @@ export const Preview = forwardRef< HTMLDivElement, PreviewProps >(
 											{ displayTitle }
 										</Truncate>
 									</ExternalLink>
-									{ ! isUrlRedundant && (
+									{ showLabelAsSecondary && (
+										<span className="block-editor-link-control__search-item-info">
+											<Truncate numberOfLines={ 1 }>
+												{ stripHTML( committedValue.label || '' ) }
+											</Truncate>
+										</span>
+									) }
+									{ ! showLabelAsSecondary && ! isUrlRedundant && (
 										<span className="block-editor-link-control__search-item-info">
 											<Truncate numberOfLines={ 1 }>
 												{ displayURL }

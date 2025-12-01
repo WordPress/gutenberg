@@ -280,7 +280,8 @@ function TitleInputExample() {
 }
 
 /**
- * Story with TitleInput using custom composition.
+ * Story with TitleInput using custom composition with context.
+ * Shows how to conditionally render TitleInput based on editing state.
  */
 export const WithTitleInputComposition = {
 	render: function Template( { onChange, ...args } ) {
@@ -297,10 +298,7 @@ export const WithTitleInputComposition = {
 					} }
 					fetchSuggestions={ mockFetchSuggestions }
 				>
-					<__experimentalLinkControlV2.SearchInput />
-					<__experimentalLinkControlV2.TitleInput />
-					<__experimentalLinkControlV2.SettingsDrawer />
-					<__experimentalLinkControlV2.Actions />
+					<TitleInputCompositionExample />
 				</__experimentalLinkControlV2>
 			</div>
 		);
@@ -308,14 +306,45 @@ export const WithTitleInputComposition = {
 	args: {
 		value: {
 			url: 'https://example.com/sample-page',
-			label: 'Sample Page',
+			title: 'Contact',
+			label: 'Get In Touch',
 		},
 		onChange: fn(),
 	},
 };
 
 /**
- * Story with custom composition using children.
+ * Example component showing TitleInput with context-based conditional rendering.
+ */
+function TitleInputCompositionExample() {
+	const { isEditing, committedValue, uncommittedValue } = useLinkControlV2();
+
+	// Use context to conditionally show components
+	if ( isEditing ) {
+		return (
+			<>
+				<__experimentalLinkControlV2.SearchInput />
+				{ /* TitleInput only shows when there's a URL */ }
+				{ uncommittedValue?.url && (
+					<__experimentalLinkControlV2.TitleInput />
+				) }
+				<__experimentalLinkControlV2.SettingsDrawer />
+				<__experimentalLinkControlV2.Actions />
+			</>
+		);
+	}
+
+	// Show preview when not editing
+	if ( committedValue ) {
+		return <__experimentalLinkControlV2.Preview />;
+	}
+
+	return null;
+}
+
+/**
+ * Story with custom composition using children and context.
+ * Demonstrates using useLinkControlV2 hook to conditionally show/hide components.
  */
 export const CustomComposition = {
 	render: function Template( { onChange, ...args } ) {
@@ -332,11 +361,7 @@ export const CustomComposition = {
 					} }
 					fetchSuggestions={ mockFetchSuggestions }
 				>
-					<__experimentalLinkControlV2.SearchInput />
-					<div style={ { padding: '10px', background: '#f0f0f0' } }>
-						Custom content between components
-					</div>
-					<__experimentalLinkControlV2.Preview />
+					<CustomCompositionExample />
 				</__experimentalLinkControlV2>
 			</div>
 		);
@@ -345,10 +370,67 @@ export const CustomComposition = {
 		value: {
 			url: 'https://example.com/sample-page',
 			title: 'Sample Page',
+			label: 'Custom Label',
 		},
 		onChange: fn(),
 	},
 };
+
+/**
+ * Example component demonstrating custom composition with context-based conditional rendering.
+ */
+function CustomCompositionExample() {
+	const { isEditing, committedValue, uncommittedValue } = useLinkControlV2();
+
+	// Use context to conditionally render components
+	if ( isEditing ) {
+		return (
+			<>
+				<__experimentalLinkControlV2.SearchInput />
+				<div
+					style={ {
+						padding: '10px',
+						background: '#f0f0f0',
+						margin: '10px 0',
+					} }
+				>
+					<p>
+						<strong>Custom content</strong> - Only shown when
+						editing
+					</p>
+					<p>Uncommitted URL: { uncommittedValue?.url || 'None' }</p>
+				</div>
+				<__experimentalLinkControlV2.TitleInput />
+				<__experimentalLinkControlV2.SettingsDrawer />
+				<__experimentalLinkControlV2.Actions />
+			</>
+		);
+	}
+
+	// Show preview when not editing and there's a committed value
+	if ( committedValue ) {
+		return (
+			<>
+				<__experimentalLinkControlV2.Preview />
+				<div
+					style={ {
+						padding: '10px',
+						background: '#e8f5e9',
+						margin: '10px 0',
+					} }
+				>
+					<p>
+						<strong>Custom preview info</strong> - Only shown when
+						not editing
+					</p>
+					<p>Committed URL: { committedValue?.url || 'None' }</p>
+				</div>
+			</>
+		);
+	}
+
+	return null;
+}
 
 /**
  * Story demonstrating the useLinkControlV2 hook.
@@ -381,7 +463,7 @@ export const WithHook = {
 };
 
 /**
- * Example component demonstrating useLinkControlV2 hook usage.
+ * Example component demonstrating useLinkControlV2 hook usage with conditional rendering.
  */
 function HookExample() {
 	const {
@@ -392,29 +474,55 @@ function HookExample() {
 		commitValue,
 	} = useLinkControlV2();
 
-	return (
-		<div>
-			<__experimentalLinkControlV2.SearchInput />
-			<div
-				style={ {
-					marginTop: '10px',
-					padding: '10px',
-					background: '#f9f9f9',
-				} }
-			>
-				<p>
-					<strong>Committed:</strong>{ ' ' }
-					{ committedValue?.url || 'None' }
-				</p>
-				<p>
-					<strong>Uncommitted:</strong>{ ' ' }
-					{ uncommittedValue?.url || 'None' }
-				</p>
-				<p>
-					<strong>Editing:</strong> { isEditing ? 'Yes' : 'No' }
-				</p>
+	// Use context to conditionally render based on editing state
+	if ( isEditing ) {
+		return (
+			<div>
+				<__experimentalLinkControlV2.SearchInput />
+				<div
+					style={ {
+						marginTop: '10px',
+						padding: '10px',
+						background: '#f9f9f9',
+					} }
+				>
+					<p>
+						<strong>Committed:</strong>{ ' ' }
+						{ committedValue?.url || 'None' }
+					</p>
+					<p>
+						<strong>Uncommitted:</strong>{ ' ' }
+						{ uncommittedValue?.url || 'None' }
+					</p>
+					<p>
+						<strong>Editing:</strong> { isEditing ? 'Yes' : 'No' }
+					</p>
+				</div>
+				<__experimentalLinkControlV2.Actions />
 			</div>
-			<__experimentalLinkControlV2.Actions />
-		</div>
-	);
+		);
+	}
+
+	// Show preview when not editing
+	if ( committedValue ) {
+		return (
+			<>
+				<__experimentalLinkControlV2.Preview />
+				<div
+					style={ {
+						marginTop: '10px',
+						padding: '10px',
+						background: '#e3f2fd',
+					} }
+				>
+					<p>
+						<strong>Preview Mode</strong> - Not editing
+					</p>
+					<p>Committed URL: { committedValue?.url || 'None' }</p>
+				</div>
+			</>
+		);
+	}
+
+	return null;
 }
