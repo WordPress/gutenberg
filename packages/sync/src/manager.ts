@@ -99,9 +99,7 @@ export function createSyncManager(): SyncManager {
 			void updateEntityRecord( objectType, objectId );
 		};
 
-		if ( syncConfig.supports?.undo ) {
-			undoManager.addToScope( recordMap );
-		}
+		undoManager.addToScope( recordMap );
 
 		const entityState: EntityState = {
 			handlers,
