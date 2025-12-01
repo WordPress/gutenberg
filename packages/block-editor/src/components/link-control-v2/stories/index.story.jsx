@@ -136,13 +136,6 @@ const meta = {
 				type: { summary: 'FetchSuggestionsFunction' },
 			},
 		},
-		suggestionsQuery: {
-			control: { type: 'object' },
-			description: 'Query options for suggestions.',
-			table: {
-				type: { summary: 'SuggestionsQuery' },
-			},
-		},
 		showInitialSuggestions: {
 			control: { type: 'boolean' },
 			description: 'Whether to show initial suggestions on mount.',
@@ -223,10 +216,10 @@ export const WithValue = {
 };
 
 /**
- * Story with TitleInput enabled using custom composition.
- * Shows how to add the TitleInput component to edit the link label.
+ * Story demonstrating disabling the TitleInput component using the components prop.
+ * Shows how to pass false to disable a component while keeping the default composition.
  */
-export const WithTitleInput = {
+export const DisablingTitleField = {
 	render: function Template( { onChange, ...args } ) {
 		const [ value, setValue ] = useState( args.value );
 
@@ -240,107 +233,22 @@ export const WithTitleInput = {
 						onChange( newValue );
 					} }
 					fetchSuggestions={ mockFetchSuggestions }
-				>
-					<TitleInputExample />
-				</__experimentalLinkControlV2>
-			</div>
-		);
-	},
-	args: {
-		value: {
-			url: 'https://example.com/sample-page',
-			label: 'Sample Page',
-		},
-		onChange: fn(),
-	},
-};
-
-/**
- * Example component showing TitleInput in composition.
- */
-function TitleInputExample() {
-	const { isEditing, value } = useLinkControlV2();
-
-	if ( isEditing ) {
-		return (
-			<>
-				<__experimentalLinkControlV2.SearchInput />
-				<__experimentalLinkControlV2.TitleInput />
-				<__experimentalLinkControlV2.Settings />
-				<__experimentalLinkControlV2.Actions />
-			</>
-		);
-	}
-
-	if ( value ) {
-		return <__experimentalLinkControlV2.Preview />;
-	}
-
-	return null;
-}
-
-/**
- * Story with TitleInput using custom composition with context.
- * Shows how to conditionally render TitleInput based on editing state.
- */
-export const WithTitleInputComposition = {
-	render: function Template( { onChange, ...args } ) {
-		const [ value, setValue ] = useState( args.value );
-
-		return (
-			<div style={ { maxWidth: '400px', padding: '20px' } }>
-				<__experimentalLinkControlV2
-					{ ...args }
-					value={ value }
-					onChange={ ( newValue ) => {
-						setValue( newValue );
-						onChange( newValue );
+					components={ {
+						TitleInput: false,
 					} }
-					fetchSuggestions={ mockFetchSuggestions }
-				>
-					<TitleInputCompositionExample />
-				</__experimentalLinkControlV2>
+				/>
 			</div>
 		);
 	},
 	args: {
 		value: {
 			url: 'https://example.com/sample-page',
-			title: 'Contact',
-			label: 'Get In Touch',
+			title: 'Sample Page',
+			label: 'Custom Label',
 		},
 		onChange: fn(),
 	},
 };
-
-/**
- * Example component showing TitleInput with context-based conditional rendering.
- */
-function TitleInputCompositionExample() {
-	const { isEditing, value, uncommittedValue } = useLinkControlV2();
-
-	// Use context to conditionally show components
-	if ( isEditing ) {
-		return (
-			<>
-				<__experimentalLinkControlV2.SearchInput />
-				{ /* TitleInput only shows when there's a URL */ }
-				{ uncommittedValue?.url && (
-					<__experimentalLinkControlV2.TitleInput />
-				) }
-				<__experimentalLinkControlV2.Settings />
-				<__experimentalLinkControlV2.Actions />
-			</>
-		);
-	}
-
-	// Show preview when not editing
-	if ( value ) {
-		return <__experimentalLinkControlV2.Preview />;
-	}
-
-	return null;
-}
 
 /**
  * Story with custom composition using children and context.
