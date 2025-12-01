@@ -266,7 +266,7 @@ function TitleInputExample() {
 			<>
 				<__experimentalLinkControlV2.SearchInput />
 				<__experimentalLinkControlV2.TitleInput />
-				<__experimentalLinkControlV2.SettingsDrawer />
+				<__experimentalLinkControlV2.Settings />
 				<__experimentalLinkControlV2.Actions />
 			</>
 		);
@@ -328,7 +328,7 @@ function TitleInputCompositionExample() {
 				{ uncommittedValue?.url && (
 					<__experimentalLinkControlV2.TitleInput />
 				) }
-				<__experimentalLinkControlV2.SettingsDrawer />
+				<__experimentalLinkControlV2.Settings />
 				<__experimentalLinkControlV2.Actions />
 			</>
 		);
@@ -401,7 +401,7 @@ function CustomCompositionExample() {
 					<p>Uncommitted URL: { uncommittedValue?.url || 'None' }</p>
 				</div>
 				<__experimentalLinkControlV2.TitleInput />
-				<__experimentalLinkControlV2.SettingsDrawer />
+				<__experimentalLinkControlV2.Settings />
 				<__experimentalLinkControlV2.Actions />
 			</>
 		);

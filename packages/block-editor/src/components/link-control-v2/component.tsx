@@ -19,8 +19,8 @@ import { DEFAULT_LINK_SETTINGS } from '../link-control/constants';
 // Import default subcomponents (will be created next)
 import { SearchInput } from './search-input';
 import { Preview } from './preview';
-import { SettingsDrawer } from './settings-drawer';
-import { TitleInput } from './text-control';
+import { Settings } from './settings';
+import { TitleInput } from './title-input';
 import { Actions } from './actions';
 
 /**
@@ -29,7 +29,7 @@ import { Actions } from './actions';
 const DefaultComponents = {
 	SearchInput,
 	Preview,
-	SettingsDrawer,
+		Settings,
 	TitleInput,
 	Actions,
 };
@@ -185,7 +185,7 @@ function UnforwardedLinkControlV2( {
 				{ isEditing && (
 					<>
 						<Components.SearchInput />
-						<Components.SettingsDrawer />
+						<Components.Settings />
 						<Components.Actions />
 					</>
 				) }

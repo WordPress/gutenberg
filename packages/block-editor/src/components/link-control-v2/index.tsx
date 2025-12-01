@@ -9,8 +9,8 @@ import { UnforwardedLinkControlV2 } from './component';
 import { LinkControlV2Context } from './context';
 import { SearchInput } from './search-input';
 import { Preview } from './preview';
-import { SettingsDrawer } from './settings-drawer';
-import { TitleInput } from './text-control';
+import { Settings } from './settings';
+import { TitleInput } from './title-input';
 import { Actions } from './actions';
 
 /**
@@ -72,12 +72,12 @@ export const __experimentalLinkControlV2 = Object.assign(
 			displayName: 'LinkControlV2.Preview',
 		} ),
 		/**
-		 * SettingsDrawer subcomponent.
+		 * Settings subcomponent.
 		 *
 		 * Collapsible drawer for link settings.
 		 */
-		SettingsDrawer: Object.assign( SettingsDrawer, {
-			displayName: 'LinkControlV2.SettingsDrawer',
+		Settings: Object.assign( Settings, {
+			displayName: 'LinkControlV2.Settings',
 		} ),
 		/**
 		 * TitleInput subcomponent.

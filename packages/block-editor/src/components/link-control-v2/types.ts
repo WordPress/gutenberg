@@ -167,7 +167,7 @@ export interface LinkControlV2Props {
 	components?: {
 		SearchInput?: ComponentType< any >;
 		Preview?: ComponentType< any >;
-		SettingsDrawer?: ComponentType< any >;
+		Settings?: ComponentType< any >;
 		TitleInput?: ComponentType< any >;
 		Actions?: ComponentType< any >;
 	};

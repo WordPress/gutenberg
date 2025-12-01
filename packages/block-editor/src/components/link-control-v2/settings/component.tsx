@@ -9,27 +9,27 @@ import { forwardRef } from '@wordpress/element';
 import { useLinkControlV2Context } from '../context';
 
 /**
- * SettingsDrawer subcomponent for LinkControlV2.
+ * Settings subcomponent for LinkControlV2.
  *
  * Collapsible drawer for link settings.
  */
-export const SettingsDrawer = forwardRef< HTMLDivElement >(
-	function SettingsDrawer( props, ref ) {
+export const Settings = forwardRef< HTMLDivElement >(
+	function Settings( props, ref ) {
 		useLinkControlV2Context();
 
-		// TODO: Implement settings drawer
+		// TODO: Implement settings
 		// eslint-disable-next-line @typescript-eslint/no-restricted-imports
 		return (
 			<div
 				ref={ ref }
-				className="block-editor-link-control-v2__settings-drawer"
+				className="block-editor-link-control-v2__settings"
 				{ ...props }
 			>
-				SettingsDrawer placeholder
+				Settings placeholder
 			</div>
 		);
 	}
 );
 
-SettingsDrawer.displayName = 'LinkControlV2.SettingsDrawer';
+Settings.displayName = 'LinkControlV2.Settings';
 

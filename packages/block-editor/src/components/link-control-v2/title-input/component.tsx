@@ -36,7 +36,7 @@ export const TitleInput = forwardRef< HTMLInputElement >(
 				label={ __( 'Title' ) }
 				value={ uncommittedValue?.label || '' }
 				onChange={ handleChange }
-				className="block-editor-link-control-v2__text-control"
+				className="block-editor-link-control-v2__title-input"
 				__nextHasNoMarginBottom
 				__next40pxDefaultSize
 				{ ...props }
