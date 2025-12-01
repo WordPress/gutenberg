@@ -16,7 +16,12 @@ export {
 /**
  * Mixins
  */
-export { withMinLength, withDirectEntry, withFetch } from './mixins';
+export {
+	withMinLength,
+	withDirectEntry,
+	withFetch,
+	withInitialSuggestions,
+} from './mixins';
 
 /**
  * Compose utility (re-exported from @wordpress/compose)
@@ -27,6 +32,7 @@ export { compose } from '@wordpress/compose';
  * Default handler
  */
 export { createDefaultSearchHandler } from './default';
+export type { DefaultSearchHandlerOptions } from './default';
 
 /**
  * Typed handler (for post type-specific searches)

@@ -491,3 +491,36 @@ export const TypedSearchHandler = {
 		onChange: fn(),
 	},
 };
+
+/**
+ * Story demonstrating disabling initial suggestions.
+ * Shows that no suggestions appear until the user starts typing.
+ */
+export const WithoutInitialSuggestions = {
+	render: function Template( { onChange, ...args } ) {
+		const [ value, setValue ] = useState( args.value );
+
+		// Create handler with initial suggestions disabled
+		const handler = createDefaultSearchHandler( mockFetchSuggestions, {
+			showInitialSuggestions: false,
+		} );
+
+		return (
+			<div style={ { maxWidth: '400px', padding: '20px' } }>
+				<__experimentalLinkControlV2
+					{ ...args }
+					value={ value }
+					onChange={ ( newValue ) => {
+						setValue( newValue );
+						onChange( newValue );
+					} }
+					searchHandler={ handler }
+				/>
+			</div>
+		);
+	},
+	args: {
+		value: undefined,
+		onChange: fn(),
+	},
+};

@@ -132,4 +132,7 @@ export {
 	// Typed handler (for post type-specific searches)
 	createTypedSearchHandler,
 } from './search-strategy';
-export type { TypedSearchHandlerConfig } from './search-strategy';
+export type {
+	TypedSearchHandlerConfig,
+	DefaultSearchHandlerOptions,
+} from './search-strategy';
