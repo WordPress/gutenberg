@@ -9,14 +9,18 @@ import clsx from 'clsx';
 import {
 	__experimentalVStack as VStack,
 	__experimentalHStack as HStack,
+	Icon,
+	Tooltip,
 } from '@wordpress/components';
 import { useState, useContext } from '@wordpress/element';
+import { error as errorIcon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import type {
 	FieldLayoutProps,
+	FieldValidity,
 	NormalizedField,
 	NormalizedFormField,
 	NormalizedPanelLayout,
@@ -25,6 +29,70 @@ import DataFormContext from '../../components/dataform-context';
 import PanelDropdown from './dropdown';
 import PanelModal from './modal';
 import { getSummaryFields } from '../get-summary-fields';
+
+const VALIDATION_TYPES = [
+	'required',
+	'pattern',
+	'min',
+	'max',
+	'minLength',
+	'maxLength',
+	'elements',
+	'custom',
+] as const;
+
+function getFirstValidationError(
+	validity: FieldValidity | undefined
+): string | undefined {
+	if ( ! validity ) {
+		return undefined;
+	}
+
+	for ( const type of VALIDATION_TYPES ) {
+		const validation = validity[ type ];
+		if ( validation?.type === 'invalid' && validation.message ) {
+			return validation.message;
+		}
+	}
+
+	// Check children recursively
+	if ( validity.children ) {
+		for ( const childValidity of Object.values( validity.children ) ) {
+			const childError = getFirstValidationError( childValidity );
+			if ( childError ) {
+				return childError;
+			}
+		}
+	}
+
+	return undefined;
+}
+
+function hasInvalidValidation(
+	validity: FieldValidity | undefined
+): boolean {
+	if ( ! validity ) {
+		return false;
+	}
+
+	for ( const type of VALIDATION_TYPES ) {
+		const validation = validity[ type ];
+		if ( validation?.type === 'invalid' ) {
+			return true;
+		}
+	}
+
+	// Check children recursively
+	if ( validity.children ) {
+		for ( const childValidity of Object.values( validity.children ) ) {
+			if ( hasInvalidValidation( childValidity ) ) {
+				return true;
+			}
+		}
+	}
+
+	return false;
+}
 
 const getFieldDefinition = < Item, >(
 	field: NormalizedFormField,
@@ -111,11 +179,22 @@ export default function FormPanelField< Item >( {
 	}
 
 	const labelPosition = layout.labelPosition;
+	const hasError = hasInvalidValidation( validity );
+	const errorMessage = getFirstValidationError( validity );
 	const labelClassName = clsx(
 		'dataforms-layouts-panel__field-label',
-		`dataforms-layouts-panel__field-label--label-position-${ labelPosition }`
+		`dataforms-layouts-panel__field-label--label-position-${ labelPosition }`,
+		{ 'has-error': hasError }
 	);
 	const fieldLabel = !! field.children ? field.label : fieldDefinition?.label;
+
+	const validationIndicator = hasError && (
+		<Tooltip text={ errorMessage } placement="top">
+			<span className="dataforms-layouts-panel__field-error-indicator">
+				<Icon icon={ errorIcon } size={ 20 } />
+			</span>
+		</Tooltip>
+	);
 
 	const renderedControl =
 		layout.openAs === 'modal' ? (
@@ -147,6 +226,7 @@ export default function FormPanelField< Item >( {
 					className={ labelClassName }
 					style={ { paddingBottom: 0 } }
 				>
+					{ validationIndicator }
 					{ fieldLabel }
 				</div>
 				<div className="dataforms-layouts-panel__field-control">
@@ -170,7 +250,10 @@ export default function FormPanelField< Item >( {
 			ref={ setPopoverAnchor }
 			className="dataforms-layouts-panel__field"
 		>
-			<div className={ labelClassName }>{ fieldLabel }</div>
+			<div className={ labelClassName }>
+				{ validationIndicator }
+				{ fieldLabel }
+			</div>
 			<div className="dataforms-layouts-panel__field-control">
 				{ renderedControl }
 			</div>
