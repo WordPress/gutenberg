@@ -138,26 +138,6 @@ describe( 'SyncManager', () => {
 				'post',
 				'123',
 				expect.any( Y.Doc ),
-				undefined
-			);
-		} );
-
-		it( 'creates providers with awareness when supported', async () => {
-			const manager = createSyncManager();
-
-			await manager.load(
-				{ ...mockSyncConfig, supports: { awareness: true } },
-				'post',
-				'123',
-				mockRecord,
-				mockHandlers
-			);
-
-			expect( mockProviderCreator ).toHaveBeenCalledTimes( 1 );
-			expect( mockProviderCreator ).toHaveBeenCalledWith(
-				'post',
-				'123',
-				expect.any( Y.Doc ),
 				expect.any( Awareness )
 			);
 		} );

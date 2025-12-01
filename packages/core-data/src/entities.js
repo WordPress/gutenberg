@@ -382,7 +382,6 @@ async function loadPostTypeEntities() {
 					 * @type {Record< string, boolean >}
 					 */
 					supports: {
-						awareness: true,
 						crdtPersistence: true,
 					},
 				};
