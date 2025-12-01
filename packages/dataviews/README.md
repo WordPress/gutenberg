@@ -1803,7 +1803,7 @@ Or multi-selection operators:
 		{ value: 'd', label: 'Product D' },
 	],
 	filterBy: {
-		operators: [ `isAny`, `isNone`, `isAll`, `isNotAll` ];
+		operators: [ `isAny`, `isNone`, `isAll` ];
 	}
 }
 ```
@@ -1822,7 +1822,6 @@ The next table lists all available operators:
 | `greaterThanOrEqual` | The result is numerically greater than or equal to a single value.              | Age is greater than or equal to: 65                  |
 | `inThePast`          | The result is within the last N units (days, weeks, months, or years) from now. | Orders in the past: 7 days                           |
 | `isAll`              | The result includes all values in the list.                                     | Category includes all: Book, Review, Science Fiction |
-| `isNotAll`           | The result does not include all values in the list.                             | Category is not all: Book, Review, Science Fiction   |
 | `isAny`              | The result includes some values in the list.                                    | Author includes: Admin, Editor                       |
 | `isNone`             | The result does not include some values in the list.                            | Author excludes: Admin, Editor                       |
 | `is`                 | The result is equal to a single value.                                          | Author is: Admin                                     |
@@ -1835,23 +1834,23 @@ The next table lists all available operators:
 | `over`               | The result is older than N units (days, weeks, months, or years) from now.      | Orders over: 7 days ago                              |
 | `startsWith`         | The result starts with the given substring.                                     | Title starts with: Mar                               |
 
-Some operators are single-selection: `is`, `isNot`, `on`, `notOn`, `lessThan`, `greaterThan`, `lessThanOrEqual`, `greaterThanOrEqual`, `before`, `after`, `beforeInc`, `afterInc`, `contains`, `notContains`, and `startsWith`. Others are multi-selection: `isAny`, `isNone`, `isAll`, and `isNotAll`. A filter cannot mix single-selection & multi-selection operators; if a single-selection operator is present in the list of valid operators, the multi-selection ones will be discarded, and the filter won't allow selecting more than one item.
+Some operators are single-selection: `is`, `isNot`, `on`, `notOn`, `lessThan`, `greaterThan`, `lessThanOrEqual`, `greaterThanOrEqual`, `before`, `after`, `beforeInc`, `afterInc`, `contains`, `notContains`, and `startsWith`. Others are multi-selection: `isAny`, `isNone`, `isAll`. A filter cannot mix single-selection & multi-selection operators; if a single-selection operator is present in the list of valid operators, the multi-selection ones will be discarded, and the filter won't allow selecting more than one item.
 
 Valid operators per field type:
 
--   array: `isAny`, `isNone`, `isAll`, `isNotAll`.
+-   array: `isAny`, `isNone`, `isAll`.
 -   boolean: `is`, `isNot`.
 -   color: `is`, `isNot`, `isAny`, `isNone`.
 -   date: `on`, `notOn`, `before`, `beforeInc`, `after`, `afterInc`, `inThePast`, `over`, `between`.
 -   datetime: `on`, `notOn`, `before`, `beforeInc`, `after`, `afterInc`, `inThePast`, `over`.
--   email: `is`, `isNot`, `contains`, `notContains`, `startsWith`, `isAny`, `isNone`, `isAll`, `isNotAll`.
--   integer: `is`, `isNot`, `lessThan`, `greaterThan`, `lessThanOrEqual`, `greaterThanOrEqual`, `between`, `isAny`, `isNone`, `isAll`, `isNotAll`.
+-   email: `is`, `isNot`, `contains`, `notContains`, `startsWith`, `isAny`, `isNone`, `isAll`.
+-   integer: `is`, `isNot`, `lessThan`, `greaterThan`, `lessThanOrEqual`, `greaterThanOrEqual`, `between`, `isAny`, `isNone`, `isAll`.
 -   media: none.
--   number: `is`, `isNot`, `lessThan`, `greaterThan`, `lessThanOrEqual`, `greaterThanOrEqual`, `between`, `isAny`, `isNone`, `isAll`, `isNotAll`.
+-   number: `is`, `isNot`, `lessThan`, `greaterThan`, `lessThanOrEqual`, `greaterThanOrEqual`, `between`, `isAny`, `isNone`, `isAll`.
 -   password: none.
--   email: `is`, `isNot`, `contains`, `notContains`, `startsWith`, `isAny`, `isNone`, `isAll`, `isNotAll`.
--   text: `is`, `isNot`, `contains`, `notContains`, `startsWith`, `isAny`, `isNone`, `isAll`, `isNotAll`.
--   url: `is`, `isNot`, `contains`, `notContains`, `startsWith`, `isAny`, `isNone`, `isAll`, `isNotAll`.
+-   email: `is`, `isNot`, `contains`, `notContains`, `startsWith`, `isAny`, `isNone`, `isAll`.
+-   text: `is`, `isNot`, `contains`, `notContains`, `startsWith`, `isAny`, `isNone`, `isAll`.
+-   url: `is`, `isNot`, `contains`, `notContains`, `startsWith`, `isAny`, `isNone`, `isAll`.
 -   fields with no type: any operator.
 
 ### `format`
