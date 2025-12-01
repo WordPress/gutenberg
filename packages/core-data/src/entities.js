@@ -373,7 +373,6 @@ async function loadPostTypeEntities() {
 					 * @type {Record< string, boolean >}
 					 */
 					supports: {
-						undo: true,
 						crdtPersistence: true,
 					},
 				};
