@@ -27,4 +27,3 @@ export function isURLLike( val: string ): boolean {
 	// Use WordPress URL validation
 	return wpIsURL( val );
 }
-

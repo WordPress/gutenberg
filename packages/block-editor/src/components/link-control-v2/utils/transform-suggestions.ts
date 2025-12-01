@@ -1,10 +1,7 @@
 /**
  * Internal dependencies
  */
-import type {
-	LinkSuggestion,
-	ComboboxControlOption,
-} from '../types';
+import type { LinkSuggestion, ComboboxControlOption } from '../types';
 
 /**
  * Transforms a LinkSuggestion to a ComboboxControlOption.
@@ -34,4 +31,3 @@ export function transformSuggestionsToOptions(
 ): ComboboxControlOption[] {
 	return suggestions.map( transformSuggestionToOption );
 }
-

@@ -7,7 +7,13 @@ import fastDeepEqual from 'fast-deep-equal';
 /**
  * WordPress dependencies
  */
-import { useMemo, useState, useEffect, useRef, useCallback } from '@wordpress/element';
+import {
+	useMemo,
+	useState,
+	useEffect,
+	useRef,
+	useCallback,
+} from '@wordpress/element';
 import { useInstanceId } from '@wordpress/compose';
 import { __experimentalVStack as VStack } from '@wordpress/components';
 
@@ -21,6 +27,8 @@ import type {
 	LinkValue,
 } from './types';
 import { DEFAULT_LINK_SETTINGS } from '../link-control/constants';
+import { createDefaultSearchHandler } from './search-strategy';
+import type { HandleSearch } from './search-strategy';
 
 // Import default subcomponents (will be created next)
 import { SearchInput } from './search-input';
@@ -35,7 +43,7 @@ import { Actions } from './actions';
 const DefaultComponents = {
 	SearchInput,
 	Preview,
-		Settings,
+	Settings,
 	TitleInput,
 	Actions,
 };
@@ -46,14 +54,13 @@ const DefaultComponents = {
  * Provides opinionated defaults for managing committed/uncommitted values,
  * but allows full flexibility for consumers to access and control state.
  *
- * @param root0 Props object.
- * @param root0.value The committed link value (from parent).
- * @param root0.onChange Callback when link value is committed.
- * @param root0.settings Link settings configuration.
- * @param root0.fetchSuggestions Function to fetch link suggestions.
- * @param root0.showInitialSuggestions Whether to show initial suggestions.
- * @param root0.components Component overrides or disable flags.
- * @param root0.children Custom composition (mutually exclusive with components).
+ * @param root0                Props object.
+ * @param root0.value           The committed link value (from parent).
+ * @param root0.onChange        Callback when link value is committed.
+ * @param root0.settings        Link settings configuration.
+ * @param root0.searchHandler   Search handler function (optional, defaults to basic handler).
+ * @param root0.components      Component overrides or disable flags.
+ * @param root0.children        Custom composition (mutually exclusive with components).
  *
  * @example
  * ```tsx
@@ -87,12 +94,25 @@ function UnforwardedLinkControlV2( {
 	value,
 	onChange,
 	settings = DEFAULT_LINK_SETTINGS,
-	fetchSuggestions,
-	showInitialSuggestions = false,
+	searchHandler: providedSearchHandler,
 	components = {},
 	children,
 }: LinkControlV2Props ) {
-	const instanceId = useInstanceId( UnforwardedLinkControlV2, 'link-control-v2' );
+	const instanceId = useInstanceId(
+		UnforwardedLinkControlV2,
+		'link-control-v2'
+	);
+
+	// Create default search handler if none provided
+	// For backwards compatibility, we'll create a handler that only handles direct entry
+	// Consumers should provide a handler with fetchSuggestions for full functionality
+	const searchHandler: HandleSearch = useMemo( () => {
+		if ( providedSearchHandler ) {
+			return providedSearchHandler;
+		}
+		// Default handler only handles direct entry (no fetch)
+		return createDefaultSearchHandler();
+	}, [ providedSearchHandler ] );
 
 	// components and children are mutually exclusive
 	// components = replace individual components, keep default composition
@@ -111,9 +131,9 @@ function UnforwardedLinkControlV2( {
 
 	// Opinionated default: manage uncommitted value internally
 	// The value prop is the committed value (what's been saved)
-	const [ uncommittedValue, setUncommittedValue ] = useState< LinkValue | undefined >(
-		value
-	);
+	const [ uncommittedValue, setUncommittedValue ] = useState<
+		LinkValue | undefined
+	>( value );
 	const previousValueRef = useRef( value );
 
 	// Sync uncommitted value when prop changes (external updates)
@@ -184,8 +204,7 @@ function UnforwardedLinkControlV2( {
 			isEditing,
 			setIsEditing,
 			settings,
-			fetchSuggestions,
-			showInitialSuggestions,
+			searchHandler,
 			instanceId,
 		} ),
 		[
@@ -193,8 +212,7 @@ function UnforwardedLinkControlV2( {
 			uncommittedValue,
 			isEditing,
 			settings,
-			fetchSuggestions,
-			showInitialSuggestions,
+			searchHandler,
 			instanceId,
 			commitValue,
 			revertValue,
@@ -260,11 +278,9 @@ function UnforwardedLinkControlV2( {
 						) }
 					</>
 				) }
-				{ ! isEditing &&
-					value &&
-					Components.Preview !== false && (
-						<Components.Preview />
-					) }
+				{ ! isEditing && value && Components.Preview !== false && (
+					<Components.Preview />
+				) }
 			</VStack>
 		);
 	};
@@ -279,4 +295,3 @@ function UnforwardedLinkControlV2( {
 }
 
 export { UnforwardedLinkControlV2 };
-

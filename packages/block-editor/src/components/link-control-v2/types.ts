@@ -99,8 +99,8 @@ export interface LinkSetting {
 	 * Optional custom render function for the setting.
 	 * If provided, this will be used instead of the default CheckboxControl.
 	 *
-	 * @param setting The setting configuration object.
-	 * @param value The current link value.
+	 * @param setting  The setting configuration object.
+	 * @param value    The current link value.
 	 * @param onChange Callback to update the link value.
 	 * @return React element to render for this setting.
 	 */
@@ -164,15 +164,31 @@ export interface LinkControlV2Props {
 	 */
 	settings?: LinkSetting[];
 	/**
-	 * Function to fetch link suggestions.
-	 * Consumers can determine query parameters (type, subtype, etc.) based on
-	 * the search string and options context passed to this function.
+	 * Search handler function that determines what happens when a search is made.
+	 * If not provided, a default handler will be created.
+	 *
+	 * @example
+	 * ```tsx
+	 * // Use default handler with fetch function
+	 * <LinkControlV2
+	 *   searchHandler={createDefaultSearchHandler(fetchSuggestions)}
+	 * />
+	 *
+	 * // Custom handler for product links
+	 * <LinkControlV2
+	 *   searchHandler={createTypedSearchHandler(fetchSuggestions, { type: 'product' })}
+	 * />
+	 *
+	 * // Fully custom handler
+	 * <LinkControlV2
+	 *   searchHandler={async (value, context) => {
+	 *     // Custom logic
+	 *     return { suggestions: [] };
+	 *   }}
+	 * />
+	 * ```
 	 */
-	fetchSuggestions?: FetchSuggestionsFunction;
-	/**
-	 * Whether to show initial suggestions on mount.
-	 */
-	showInitialSuggestions?: boolean;
+	searchHandler?: import('./search-strategy').HandleSearch;
 	/**
 	 * Custom components to replace defaults or disable them.
 	 *
@@ -240,11 +256,8 @@ export interface LinkControlV2ContextValue {
 	setIsEditing: ( value: boolean ) => void;
 	// Settings configuration
 	settings: LinkSetting[];
-	// Fetch suggestions function
-	fetchSuggestions: FetchSuggestionsFunction | undefined;
-	// Whether to show initial suggestions
-	showInitialSuggestions: boolean;
+	// Search handler function
+	searchHandler: import('./search-strategy').HandleSearch;
 	// Instance ID for unique identifiers
 	instanceId: string;
 }
-

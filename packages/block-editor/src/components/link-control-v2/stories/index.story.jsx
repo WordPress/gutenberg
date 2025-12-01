@@ -1,13 +1,22 @@
 /**
+ * External dependencies
+ */
+import { fn } from '@storybook/test';
+
+/**
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
-import { fn } from '@storybook/test';
 
 /**
  * Internal dependencies
  */
-import { __experimentalLinkControlV2, useLinkControlV2 } from '../';
+import {
+	__experimentalLinkControlV2,
+	useLinkControlV2,
+	createDefaultSearchHandler,
+	createTypedSearchHandler,
+} from '../';
 
 /**
  * Mock fetchSuggestions function for Storybook.
@@ -17,11 +26,11 @@ const mockFetchSuggestions = async ( search, options = {} ) => {
 	// Simulate network delay
 	await new Promise( ( resolve ) => setTimeout( resolve, 300 ) );
 
-	const { isInitialSuggestions = false } = options;
+	const { isInitialSuggestions = false, type } = options;
 
 	// Initial suggestions (when no search query)
 	if ( isInitialSuggestions || ! search ) {
-		return [
+		const suggestions = [
 			{
 				id: 1,
 				title: 'Sample Page',
@@ -44,6 +53,13 @@ const mockFetchSuggestions = async ( search, options = {} ) => {
 				kind: 'post-type',
 			},
 		];
+
+		// Filter by type if specified
+		if ( type ) {
+			return suggestions.filter( ( s ) => s.type === type );
+		}
+
+		return suggestions;
 	}
 
 	// Filter suggestions based on search query
@@ -86,11 +102,18 @@ const mockFetchSuggestions = async ( search, options = {} ) => {
 	];
 
 	const searchLower = search.toLowerCase();
-	return allSuggestions.filter(
+	const filtered = allSuggestions.filter(
 		( suggestion ) =>
 			suggestion.title.toLowerCase().includes( searchLower ) ||
 			suggestion.url.toLowerCase().includes( searchLower )
 	);
+
+	// Filter by type if specified
+	if ( type ) {
+		return filtered.filter( ( s ) => s.type === type );
+	}
+
+	return filtered;
 };
 
 const meta = {
@@ -102,7 +125,7 @@ const meta = {
 			canvas: { sourceState: 'shown' },
 			description: {
 				component:
-					'LinkControlV2 is a compound component that provides a flexible API for managing link values with opinionated defaults. It uses ValidatedComboboxControl for entity search functionality.',
+					'LinkControlV2 is a compound component that provides a flexible API for managing link values with opinionated defaults. It uses search handlers for flexible search functionality.',
 			},
 		},
 	},
@@ -129,27 +152,12 @@ const meta = {
 				type: { summary: 'LinkSetting[]' },
 			},
 		},
-		fetchSuggestions: {
+		searchHandler: {
 			control: { type: null },
-			description: 'Function to fetch link suggestions.',
+			description:
+				'Search handler function that determines what happens when a search is made.',
 			table: {
-				type: { summary: 'FetchSuggestionsFunction' },
-			},
-		},
-		showInitialSuggestions: {
-			control: { type: 'boolean' },
-			description: 'Whether to show initial suggestions on mount.',
-			table: {
-				type: { summary: 'boolean' },
-				defaultValue: { summary: 'false' },
-			},
-		},
-		allowDirectEntry: {
-			control: { type: 'boolean' },
-			description: 'Whether to allow direct URL entry.',
-			table: {
-				type: { summary: 'boolean' },
-				defaultValue: { summary: 'true' },
+				type: { summary: 'HandleSearch' },
 			},
 		},
 	},
@@ -161,8 +169,12 @@ export default meta;
  * Default story with basic usage.
  */
 export const Default = {
-	render: function Template( { onChange, ...args } ) {
+	render: function Template( { onChange, searchHandler, ...args } ) {
 		const [ value, setValue ] = useState( args.value );
+
+		// Create default handler with fetch function if not provided
+		const handler =
+			searchHandler || createDefaultSearchHandler( mockFetchSuggestions );
 
 		return (
 			<div style={ { maxWidth: '400px', padding: '20px' } }>
@@ -173,7 +185,7 @@ export const Default = {
 						setValue( newValue );
 						onChange( newValue );
 					} }
-					fetchSuggestions={ mockFetchSuggestions }
+					searchHandler={ handler }
 				/>
 			</div>
 		);
@@ -181,7 +193,7 @@ export const Default = {
 	args: {
 		value: undefined,
 		onChange: fn(),
-		showInitialSuggestions: true,
+		searchHandler: createDefaultSearchHandler( mockFetchSuggestions ),
 	},
 };
 
@@ -189,8 +201,12 @@ export const Default = {
  * Story with an existing link value.
  */
 export const WithValue = {
-	render: function Template( { onChange, ...args } ) {
+	render: function Template( { onChange, searchHandler, ...args } ) {
 		const [ value, setValue ] = useState( args.value );
+
+		// Create default handler with fetch function if not provided
+		const handler =
+			searchHandler || createDefaultSearchHandler( mockFetchSuggestions );
 
 		return (
 			<div style={ { maxWidth: '400px', padding: '20px' } }>
@@ -201,7 +217,7 @@ export const WithValue = {
 						setValue( newValue );
 						onChange( newValue );
 					} }
-					fetchSuggestions={ mockFetchSuggestions }
+					searchHandler={ handler }
 				/>
 			</div>
 		);
@@ -212,6 +228,7 @@ export const WithValue = {
 			title: 'Sample Page',
 		},
 		onChange: fn(),
+		searchHandler: createDefaultSearchHandler( mockFetchSuggestions ),
 	},
 };
 
@@ -220,8 +237,12 @@ export const WithValue = {
  * Shows how to pass false to disable a component while keeping the default composition.
  */
 export const DisablingTitleField = {
-	render: function Template( { onChange, ...args } ) {
+	render: function Template( { onChange, searchHandler, ...args } ) {
 		const [ value, setValue ] = useState( args.value );
+
+		// Create default handler with fetch function if not provided
+		const handler =
+			searchHandler || createDefaultSearchHandler( mockFetchSuggestions );
 
 		return (
 			<div style={ { maxWidth: '400px', padding: '20px' } }>
@@ -232,7 +253,7 @@ export const DisablingTitleField = {
 						setValue( newValue );
 						onChange( newValue );
 					} }
-					fetchSuggestions={ mockFetchSuggestions }
+					searchHandler={ handler }
 					components={ {
 						TitleInput: false,
 					} }
@@ -247,6 +268,7 @@ export const DisablingTitleField = {
 			label: 'Custom Label',
 		},
 		onChange: fn(),
+		searchHandler: createDefaultSearchHandler( mockFetchSuggestions ),
 	},
 };
 
@@ -255,8 +277,12 @@ export const DisablingTitleField = {
  * Demonstrates using useLinkControlV2 hook to conditionally show/hide components.
  */
 export const CustomComposition = {
-	render: function Template( { onChange, ...args } ) {
+	render: function Template( { onChange, searchHandler, ...args } ) {
 		const [ value, setValue ] = useState( args.value );
+
+		// Create default handler with fetch function if not provided
+		const handler =
+			searchHandler || createDefaultSearchHandler( mockFetchSuggestions );
 
 		return (
 			<div style={ { maxWidth: '400px', padding: '20px' } }>
@@ -267,7 +293,7 @@ export const CustomComposition = {
 						setValue( newValue );
 						onChange( newValue );
 					} }
-					fetchSuggestions={ mockFetchSuggestions }
+					searchHandler={ handler }
 				>
 					<CustomCompositionExample />
 				</__experimentalLinkControlV2>
@@ -281,6 +307,7 @@ export const CustomComposition = {
 			label: 'Custom Label',
 		},
 		onChange: fn(),
+		searchHandler: createDefaultSearchHandler( mockFetchSuggestions ),
 	},
 };
 
@@ -344,8 +371,12 @@ function CustomCompositionExample() {
  * Story demonstrating the useLinkControlV2 hook.
  */
 export const WithHook = {
-	render: function Template( { onChange, ...args } ) {
+	render: function Template( { onChange, searchHandler, ...args } ) {
 		const [ value, setValue ] = useState( args.value );
+
+		// Create default handler with fetch function if not provided
+		const handler =
+			searchHandler || createDefaultSearchHandler( mockFetchSuggestions );
 
 		return (
 			<div style={ { maxWidth: '400px', padding: '20px' } }>
@@ -356,7 +387,7 @@ export const WithHook = {
 						setValue( newValue );
 						onChange( newValue );
 					} }
-					fetchSuggestions={ mockFetchSuggestions }
+					searchHandler={ handler }
 				>
 					<HookExample />
 				</__experimentalLinkControlV2>
@@ -366,7 +397,7 @@ export const WithHook = {
 	args: {
 		value: undefined,
 		onChange: fn(),
-		showInitialSuggestions: true,
+		searchHandler: createDefaultSearchHandler( mockFetchSuggestions ),
 	},
 };
 
@@ -374,13 +405,7 @@ export const WithHook = {
  * Example component demonstrating useLinkControlV2 hook usage with conditional rendering.
  */
 function HookExample() {
-	const {
-		value,
-		uncommittedValue,
-		isEditing,
-		setUncommittedURL,
-		commitValue,
-	} = useLinkControlV2();
+	const { value, uncommittedValue, isEditing } = useLinkControlV2();
 
 	// Use context to conditionally render based on editing state
 	if ( isEditing ) {
@@ -433,3 +458,36 @@ function HookExample() {
 
 	return null;
 }
+
+/**
+ * Story demonstrating typed search handler for specific post types.
+ * Shows how Nav block "Product link" variation would work.
+ */
+export const TypedSearchHandler = {
+	render: function Template( { onChange, ...args } ) {
+		const [ value, setValue ] = useState( args.value );
+
+		// Create typed handler for products (like Nav block "Product link" variation)
+		const productHandler = createTypedSearchHandler( mockFetchSuggestions, {
+			type: 'product',
+		} );
+
+		return (
+			<div style={ { maxWidth: '400px', padding: '20px' } }>
+				<__experimentalLinkControlV2
+					{ ...args }
+					value={ value }
+					onChange={ ( newValue ) => {
+						setValue( newValue );
+						onChange( newValue );
+					} }
+					searchHandler={ productHandler }
+				/>
+			</div>
+		);
+	},
+	args: {
+		value: undefined,
+		onChange: fn(),
+	},
+};

@@ -46,4 +46,3 @@ export const TitleInput = forwardRef< HTMLInputElement >(
 );
 
 TitleInput.displayName = 'LinkControlV2.TitleInput';
-

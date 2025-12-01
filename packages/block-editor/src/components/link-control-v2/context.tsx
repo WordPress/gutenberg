@@ -26,4 +26,3 @@ export function useLinkControlV2Context(): LinkControlV2ContextValue {
 	}
 	return context;
 }
-

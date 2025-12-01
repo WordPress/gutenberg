@@ -16,7 +16,6 @@ import { isShallowEqualObjects } from '@wordpress/is-shallow-equal';
  */
 import { useLinkControlV2Context } from '../context';
 
-
 interface ActionsProps {
 	/**
 	 * Custom callback for Cancel button click.

@@ -111,3 +111,25 @@ export type {
 	LinkControlV2Props,
 } from './types';
 
+// Export search strategy utilities
+export {
+	// Types
+	type HandleSearch,
+	type SearchContext,
+	type SearchResult,
+	// Utilities
+	detectDirectEntry,
+	checkMinLength,
+	createDirectEntrySuggestion,
+	createFetchHandler,
+	// Mixins
+	withMinLength,
+	withDirectEntry,
+	withFetch,
+	compose,
+	// Default handler
+	createDefaultSearchHandler,
+	// Typed handler (for post type-specific searches)
+	createTypedSearchHandler,
+} from './search-strategy';
+export type { TypedSearchHandlerConfig } from './search-strategy';

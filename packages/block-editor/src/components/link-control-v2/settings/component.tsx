@@ -32,25 +32,20 @@ const PREFERENCE_KEY = 'linkControlSettingsDrawer';
  */
 export const Settings = forwardRef< HTMLDivElement >(
 	function Settings( props, ref ) {
-		const {
-			uncommittedValue,
-			setUncommittedValue,
-			settings,
-		} = useLinkControlV2Context();
+		const { uncommittedValue, setUncommittedValue, settings } =
+			useLinkControlV2Context();
 
 		const [ localSettingsOpen, setLocalSettingsOpen ] = useState( false );
 
 		// Try to get preference, fallback to local state
-		const { advancedSettingsPreference } = useSelect(
-			( select ) => {
-				const prefsStore = select( preferencesStore );
-				return {
-					advancedSettingsPreference:
-						prefsStore?.get( PREFERENCE_SCOPE, PREFERENCE_KEY ) ?? false,
-				};
-			},
-			[]
-		);
+		const { advancedSettingsPreference } = useSelect( ( select ) => {
+			const prefsStore = select( preferencesStore );
+			return {
+				advancedSettingsPreference:
+					prefsStore?.get( PREFERENCE_SCOPE, PREFERENCE_KEY ) ??
+					false,
+			};
+		}, [] );
 
 		const { set: setPreference } = useDispatch( preferencesStore );
 
@@ -74,8 +69,7 @@ export const Settings = forwardRef< HTMLDivElement >(
 		// Block Editor components can be consumed by non-WordPress environments
 		// which may not have these preferences setup.
 		// Therefore a local state is used as a fallback.
-		const isSettingsOpen =
-			advancedSettingsPreference ?? localSettingsOpen;
+		const isSettingsOpen = advancedSettingsPreference ?? localSettingsOpen;
 
 		const prefersReducedMotion = useReducedMotion();
 		const MaybeAnimatePresence = prefersReducedMotion
@@ -97,14 +91,13 @@ export const Settings = forwardRef< HTMLDivElement >(
 			return null;
 		}
 
-		const handleSettingChange = ( setting: LinkSetting ) => (
-			newValue: boolean
-		) => {
-			setUncommittedValue( {
-				...uncommittedValue,
-				[ setting.id ]: newValue,
-			} );
-		};
+		const handleSettingChange =
+			( setting: LinkSetting ) => ( newValue: boolean ) => {
+				setUncommittedValue( {
+					...uncommittedValue,
+					[ setting.id ]: newValue,
+				} );
+			};
 
 		const theSettings = settings
 			.map( ( setting ) => {
@@ -141,7 +134,9 @@ export const Settings = forwardRef< HTMLDivElement >(
 						label={ setting.title }
 						onChange={ handleSettingChange( setting ) }
 						checked={
-							uncommittedValue ? !! uncommittedValue[ setting.id ] : false
+							uncommittedValue
+								? !! uncommittedValue[ setting.id ]
+								: false
 						}
 						help={ setting?.help }
 					/>
@@ -181,8 +176,14 @@ export const Settings = forwardRef< HTMLDivElement >(
 									prefersReducedMotion
 										? undefined
 										: {
-												open: { opacity: 1, height: 'auto' },
-												collapsed: { opacity: 0, height: 0 },
+												open: {
+													opacity: 1,
+													height: 'auto',
+												},
+												collapsed: {
+													opacity: 0,
+													height: 0,
+												},
 										  }
 								}
 								transition={
@@ -196,7 +197,9 @@ export const Settings = forwardRef< HTMLDivElement >(
 								<div className="block-editor-link-control-v2__drawer-inner">
 									<fieldset className="block-editor-link-control-v2__settings-fieldset">
 										<VisuallyHidden as="legend">
-											{ __( 'Currently selected link settings' ) }
+											{ __(
+												'Currently selected link settings'
+											) }
 										</VisuallyHidden>
 										{ theSettings }
 									</fieldset>
@@ -211,4 +214,3 @@ export const Settings = forwardRef< HTMLDivElement >(
 );
 
 Settings.displayName = 'LinkControlV2.Settings';
-

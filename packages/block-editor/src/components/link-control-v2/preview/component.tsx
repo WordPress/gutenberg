@@ -9,10 +9,7 @@ import clsx from 'clsx';
 import { forwardRef } from '@wordpress/element';
 import type { ComponentType, ReactNode } from 'react';
 import { __ } from '@wordpress/i18n';
-import {
-	useInstanceId,
-	useCopyToClipboard,
-} from '@wordpress/compose';
+import { useInstanceId, useCopyToClipboard } from '@wordpress/compose';
 import {
 	Button,
 	ExternalLink,
@@ -61,12 +58,7 @@ interface PreviewProps {
  */
 export const Preview = forwardRef< HTMLDivElement, PreviewProps >(
 	function Preview(
-		{
-			hasUnlinkControl = false,
-			onRemove,
-			showLabel = false,
-			...props
-		},
+		{ hasUnlinkControl = false, onRemove, showLabel = false, ...props },
 		ref
 	) {
 		const {
@@ -115,14 +107,9 @@ export const Preview = forwardRef< HTMLDivElement, PreviewProps >(
 		// 2. URL (fallback for non-entities)
 		// Note: label is the editable link text and should NOT be used as the preview title
 		// The preview should reflect the selected entity or direct entry link, not the label
-		const displayTitle =
-			! isEmptyURL
-				? stripHTML(
-						displayValue?.title ||
-							displayURL ||
-							''
-				  )
-				: '';
+		const displayTitle = ! isEmptyURL
+			? stripHTML( displayValue?.title || displayURL || '' )
+			: '';
 
 		let icon;
 
@@ -171,15 +158,12 @@ export const Preview = forwardRef< HTMLDivElement, PreviewProps >(
 		}
 
 		const { createNotice } = useDispatch( noticesStore );
-		const copyRef = useCopyToClipboard(
-			displayValue?.url ?? '',
-			() => {
-				createNotice( 'info', __( 'Link copied to clipboard.' ), {
-					isDismissible: true,
-					type: 'snackbar',
-				} );
-			}
-		);
+		const copyRef = useCopyToClipboard( displayValue?.url ?? '', () => {
+			createNotice( 'info', __( 'Link copied to clipboard.' ), {
+				isDismissible: true,
+				type: 'snackbar',
+			} );
+		} );
 
 		const handleEditClick = () => {
 			setIsEditing( true );
@@ -210,98 +194,102 @@ export const Preview = forwardRef< HTMLDivElement, PreviewProps >(
 						'block-editor-link-control-v2__preview-item',
 						'block-editor-link-control-v2__preview',
 						{
-							'is-rich': !!( displayValue?.icon || displayValue?.image ),
+							'is-rich': !! (
+								displayValue?.icon || displayValue?.image
+							),
 							'is-error': isEmptyURL,
 							'is-url-title': displayTitle === displayURL,
 						}
 					) }
 					{ ...props }
 				>
-				<div className="block-editor-link-control-v2__preview-top">
-					<span
-						className="block-editor-link-control-v2__preview-header"
-						role="figure"
-						aria-label={
-							/* translators: Accessibility text for the link preview when editing a link. */
-							__( 'Link information' )
-						}
-					>
+					<div className="block-editor-link-control-v2__preview-top">
 						<span
-							className={ clsx(
-								'block-editor-link-control-v2__preview-icon',
-								{
-									'is-image': !!( displayValue?.icon || displayValue?.image ),
-								}
-							) }
+							className="block-editor-link-control-v2__preview-header"
+							role="figure"
+							aria-label={
+								/* translators: Accessibility text for the link preview when editing a link. */
+								__( 'Link information' )
+							}
 						>
-							{ icon }
-						</span>
-						<span className="block-editor-link-control-v2__preview-details">
-							{ ! isEmptyURL ? (
-								<>
-									<ExternalLink
-										className="block-editor-link-control-v2__preview-title"
-										href={ displayValue?.url || '' }
-									>
-										<Truncate numberOfLines={ 1 }>
-											{ displayTitle }
-										</Truncate>
-									</ExternalLink>
+							<span
+								className={ clsx(
+									'block-editor-link-control-v2__preview-icon',
+									{
+										'is-image': !! (
+											displayValue?.icon ||
+											displayValue?.image
+										),
+									}
+								) }
+							>
+								{ icon }
+							</span>
+							<span className="block-editor-link-control-v2__preview-details">
+								{ ! isEmptyURL ? (
+									<>
+										<ExternalLink
+											className="block-editor-link-control-v2__preview-title"
+											href={ displayValue?.url || '' }
+										>
+											<Truncate numberOfLines={ 1 }>
+												{ displayTitle }
+											</Truncate>
+										</ExternalLink>
 
-									<span className="block-editor-link-control-v2__preview-info">
-										<Truncate numberOfLines={ 1 }>
-											{ displayURL }
-										</Truncate>
+										<span className="block-editor-link-control-v2__preview-info">
+											<Truncate numberOfLines={ 1 }>
+												{ displayURL }
+											</Truncate>
+										</span>
+									</>
+								) : (
+									<span className="block-editor-link-control-v2__preview-error-notice">
+										{ __( 'Link is empty' ) }
 									</span>
-
-								</>
-							) : (
-								<span className="block-editor-link-control-v2__preview-error-notice">
-									{ __( 'Link is empty' ) }
-								</span>
-							) }
+								) }
+							</span>
 						</span>
-					</span>
-					{ isEditingEntity ? (
-						// When editing an entity, show unlink button only
-						<Button
-							icon={ linkOff }
-							label={ __( 'Unlink' ) }
-							onClick={ handleUnlinkEntity }
-							size="compact"
-							showTooltip={ ! showIconLabels }
-						/>
-					) : (
-						// When not editing an entity, show edit and copy buttons
-						<>
+						{ isEditingEntity ? (
+							// When editing an entity, show unlink button only
 							<Button
-								icon={ pencil }
-								label={ __( 'Edit link' ) }
-								onClick={ handleEditClick }
+								icon={ linkOff }
+								label={ __( 'Unlink' ) }
+								onClick={ handleUnlinkEntity }
 								size="compact"
 								showTooltip={ ! showIconLabels }
 							/>
-							{ hasUnlinkControl && (
+						) : (
+							// When not editing an entity, show edit and copy buttons
+							<>
 								<Button
-									icon={ linkOff }
-									label={ __( 'Remove link' ) }
-									onClick={ handleRemove }
+									icon={ pencil }
+									label={ __( 'Edit link' ) }
+									onClick={ handleEditClick }
 									size="compact"
 									showTooltip={ ! showIconLabels }
 								/>
-							) }
-							<Button
-								icon={ copySmall }
-								label={ __( 'Copy link' ) }
-								ref={ copyRef }
-								accessibleWhenDisabled
-								disabled={ isEmptyURL }
-								size="compact"
-								showTooltip={ ! showIconLabels }
-							/>
-						</>
-					) }
-				</div>
+								{ hasUnlinkControl && (
+									<Button
+										icon={ linkOff }
+										label={ __( 'Remove link' ) }
+										onClick={ handleRemove }
+										size="compact"
+										showTooltip={ ! showIconLabels }
+									/>
+								) }
+								<Button
+									icon={ copySmall }
+									label={ __( 'Copy link' ) }
+									ref={ copyRef }
+									accessibleWhenDisabled
+									disabled={ isEmptyURL }
+									size="compact"
+									showTooltip={ ! showIconLabels }
+								/>
+							</>
+						) }
+					</div>
 				</div>
 			</BaseControl>
 		);
@@ -309,4 +297,3 @@ export const Preview = forwardRef< HTMLDivElement, PreviewProps >(
 );
 
 Preview.displayName = 'LinkControlV2.Preview';
-

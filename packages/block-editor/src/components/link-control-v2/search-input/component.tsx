@@ -1,10 +1,15 @@
 /**
  * WordPress dependencies
  */
-import { forwardRef, useState, useEffect, useMemo, useCallback } from '@wordpress/element';
+import {
+	forwardRef,
+	useState,
+	useEffect,
+	useMemo,
+	useCallback,
+} from '@wordpress/element';
 import { useDebouncedInput } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
-import { prependHTTP } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -12,7 +17,6 @@ import { prependHTTP } from '@wordpress/url';
 import { ComboboxControl } from '@wordpress/components';
 import { useLinkControlV2Context } from '../context';
 import { transformSuggestionsToOptions } from '../utils/transform-suggestions';
-import { isURLLike } from '../utils/is-url-like';
 import type { ComboboxControlOption, LinkSuggestion } from '../types';
 
 interface SearchInputProps {
@@ -25,8 +29,8 @@ interface SearchInputProps {
 /**
  * SearchInput subcomponent for LinkControlV2.
  *
- * Uses ValidatedComboboxControl to provide entity search functionality.
- * Supports direct URL entry and entity search via fetchSuggestions.
+ * Uses ComboboxControl to provide entity search functionality.
+ * Delegates all search logic to the searchHandler from context.
  */
 export const SearchInput = forwardRef< HTMLInputElement, SearchInputProps >(
 	function SearchInput( { showLabel = false, ...props } ) {
@@ -34,10 +38,10 @@ export const SearchInput = forwardRef< HTMLInputElement, SearchInputProps >(
 		const {
 			uncommittedValue,
 			setUncommittedValue,
-			fetchSuggestions,
-			showInitialSuggestions,
+			searchHandler,
 			commitValue,
 			setIsEditing,
+			value: currentLinkValue,
 		} = context;
 
 		// Current search input value with debouncing
@@ -45,121 +49,59 @@ export const SearchInput = forwardRef< HTMLInputElement, SearchInputProps >(
 			useDebouncedInput( '' );
 
 		// Options for ComboboxControl
-		const [ options, setOptions ] = useState< ComboboxControlOption[] >( [] );
+		const [ options, setOptions ] = useState< ComboboxControlOption[] >(
+			[]
+		);
 		const [ isLoading, setIsLoading ] = useState( false );
 
 		// Current selected value (URL from uncommitted value)
 		const currentValue = uncommittedValue?.url || null;
 
-		// Immediately set options for URL-like input (before debounce)
-		// This prevents "No results found" from flashing while typing URLs
-		useEffect( () => {
-			if ( searchValue && isURLLike( searchValue ) ) {
-				const url = prependHTTP( searchValue );
-				setOptions( [
-					{
-						label: url,
-						value: url,
-						suggestion: {
-							title: url,
-							url,
-							type: 'URL',
-						},
-					},
-				] );
-				setIsLoading( false );
-			} else if ( searchValue && ! isURLLike( searchValue ) && searchValue.length < 2 ) {
-				// Only clear options if user has typed something
-				// This prevents "No results found" from showing on initial focus
-				if ( searchValue.length > 0 ) {
-					setOptions( [] );
+		// Call search handler and update options
+		const performSearch = useCallback(
+			async ( query: string, isInitial = false ) => {
+				if ( ! searchHandler ) {
+					// If no handler, only clear options if user has typed something
+					if ( query.length > 0 ) {
+						setOptions( [] );
+					}
+					return;
 				}
-			}
-		}, [ searchValue ] );
 
-		// Fetch and set suggestions based on search query
-		const fetchAndSetSuggestions = useCallback( async ( query: string, isInitial = false ) => {
-			// If showInitialSuggestions is false, never fetch initial suggestions
-			if ( isInitial && ! showInitialSuggestions ) {
-				return;
-			}
+				setIsLoading( true );
 
-			if ( ! fetchSuggestions ) {
-				// Only clear options if user has typed something
-				if ( query.length > 0 ) {
+				try {
+					const result = await searchHandler( query, {
+						currentValue: currentLinkValue,
+						isInitial,
+					} );
+
+					// Transform suggestions to options
+					const transformedOptions = transformSuggestionsToOptions(
+						result.suggestions
+					);
+					setOptions( transformedOptions );
+				} catch {
 					setOptions( [] );
+				} finally {
+					setIsLoading( false );
 				}
-				return;
-			}
+			},
+			[ searchHandler, currentLinkValue ]
+		);
 
-			// If it looks like a URL, skip fetching and show direct entry option
-			if ( query && isURLLike( query ) ) {
-				const url = prependHTTP( query );
-				setOptions( [
-					{
-						label: url,
-						value: url,
-						suggestion: {
-							title: url,
-							url,
-							type: 'URL',
-						},
-					},
-				] );
-				setIsLoading( false );
-				return;
-			}
-
-			const shouldFetch = query.length >= 2 || isInitial;
-
-			if ( ! shouldFetch ) {
-				// Don't clear options if user hasn't typed anything yet
-				// This prevents "No results found" from showing on initial focus
-				if ( query.length > 0 ) {
-					setOptions( [] );
-				}
-				setIsLoading( false );
-				return;
-			}
-
-			setIsLoading( true );
-
-			try {
-				const suggestions = await fetchSuggestions( query, {
-					isInitialSuggestions: isInitial,
-					currentValue: uncommittedValue,
-				} );
-
-				// Transform to options
-				const transformedOptions = transformSuggestionsToOptions( suggestions );
-				setOptions( transformedOptions );
-			} catch {
-				setOptions( [] );
-			} finally {
-				setIsLoading( false );
-			}
-		}, [ fetchSuggestions, uncommittedValue, showInitialSuggestions ] );
-
-		// Fetch suggestions when search changes
+		// Perform search when debounced search value changes
 		useEffect( () => {
-			// Only treat as initial if showInitialSuggestions is enabled AND there's no search query
-			const isInitial = showInitialSuggestions && ! debouncedSearch;
-
-			// If showInitialSuggestions is false, don't fetch when query is empty
-			if ( ! showInitialSuggestions && ! debouncedSearch ) {
+			// If there's a search value, perform search (not initial)
+			if ( debouncedSearch ) {
+				performSearch( debouncedSearch, false );
 				return;
 			}
 
-			fetchAndSetSuggestions( debouncedSearch || '', isInitial );
-		}, [ debouncedSearch, fetchAndSetSuggestions, showInitialSuggestions ] );
-
-		// Load initial suggestions on mount if enabled
-		useEffect( () => {
-			// Only load initial suggestions if explicitly enabled
-			if ( showInitialSuggestions && fetchSuggestions && ! searchValue ) {
-				fetchAndSetSuggestions( '', true );
-			}
-		}, [ fetchAndSetSuggestions, fetchSuggestions, searchValue, showInitialSuggestions ] );
+			// If no search value, try initial suggestions
+			// The handler will decide whether to return initial suggestions
+			performSearch( '', true );
+		}, [ debouncedSearch, performSearch ] );
 
 		// Handle selection change
 		const handleChange = ( selectedValue: string | null | undefined ) => {
@@ -185,6 +127,23 @@ export const SearchInput = forwardRef< HTMLInputElement, SearchInputProps >(
 					suggestion.id !== undefined &&
 					suggestion.kind !== undefined &&
 					suggestion.type !== undefined;
+				const isDirectEntry = suggestion.isDirectEntry === true;
+
+				// Handle direct entry (URL) - no entity data
+				if ( isDirectEntry ) {
+					const newValue = {
+						...uncommittedValue,
+						url: suggestion.url,
+						title: suggestion.url, // Use URL as title for direct entries
+					};
+					// Auto-commit when a suggestion is selected
+					commitValue( newValue );
+					// Exit editing mode (mirrors original LinkControl behavior)
+					setIsEditing( false );
+					return;
+				}
+
+				// Handle entity suggestions
 				const newValue = {
 					...uncommittedValue,
 					url: suggestion.url,
@@ -204,7 +163,7 @@ export const SearchInput = forwardRef< HTMLInputElement, SearchInputProps >(
 				// Exit editing mode (mirrors original LinkControl behavior)
 				setIsEditing( false );
 			} else {
-				// Direct URL entry
+				// Fallback: direct URL entry (shouldn't happen if handler works correctly)
 				setUncommittedValue( {
 					...uncommittedValue,
 					url: selectedValue,
@@ -225,14 +184,10 @@ export const SearchInput = forwardRef< HTMLInputElement, SearchInputProps >(
 			return currentValue;
 		}, [ searchValue, currentValue ] );
 
-		// When showInitialSuggestions is false and user hasn't typed anything,
+		// When user hasn't typed anything and there are no options,
 		// provide a placeholder option to prevent "No results found" from showing
 		const displayOptions = useMemo( () => {
-			if (
-				! showInitialSuggestions &&
-				searchValue.length === 0 &&
-				options.length === 0
-			) {
+			if ( searchValue.length === 0 && options.length === 0 ) {
 				// Return a disabled placeholder option to prevent "No results" message
 				return [
 					{
@@ -243,11 +198,11 @@ export const SearchInput = forwardRef< HTMLInputElement, SearchInputProps >(
 				];
 			}
 			return options;
-		}, [ options, showInitialSuggestions, searchValue ] );
+		}, [ options, searchValue ] );
 
 		return (
 			<ComboboxControl
-				label={ __( 'Link' ) }
+				label={ showLabel ? __( 'Link' ) : undefined }
 				hideLabelFromVision={ ! showLabel }
 				placeholder={ __( 'Paste URL or type to search' ) }
 				value={ displayValue }
@@ -255,7 +210,7 @@ export const SearchInput = forwardRef< HTMLInputElement, SearchInputProps >(
 				onChange={ handleChange }
 				onFilterValueChange={ handleFilterChange }
 				isLoading={ isLoading }
-				expandOnFocus={ showInitialSuggestions }
+				expandOnFocus={ false }
 				__next40pxDefaultSize
 				__nextHasNoMarginBottom
 				{ ...props }
