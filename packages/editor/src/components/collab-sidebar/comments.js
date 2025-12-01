@@ -23,7 +23,7 @@ import {
 	FlexItem,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
-import { useDebounce, useRefEffect } from '@wordpress/compose';
+import { useDebounce } from '@wordpress/compose';
 
 import { published, moreVertical } from '@wordpress/icons';
 import { __, _x, sprintf, _n } from '@wordpress/i18n';
@@ -190,31 +190,27 @@ export function Comments( {
 
 	// Pass wheel events from the comments sidebar to the editor canvas.
 	// Only enable this for floating sidebar, as the regular sidebar can scroll itself.
-	const scrollToCanvasEffect = useRefEffect(
-		( node ) => {
-			if ( ! isFloating || ! editorCanvasElement ) {
-				return;
-			}
-
-			function onWheel( event ) {
-				const { deltaX, deltaY } = event;
-				editorCanvasElement.scrollBy( deltaX, deltaY );
-			}
-			const options = { passive: true };
-			node.addEventListener( 'wheel', onWheel, options );
-			return () => {
-				node.removeEventListener( 'wheel', onWheel, options );
-			};
-		},
-		[ editorCanvasElement, isFloating ]
-	);
-
-	// Apply the scroll effect to the sidebar ref.
 	useEffect( () => {
-		if ( commentSidebarRef?.current ) {
-			return scrollToCanvasEffect( commentSidebarRef.current );
+		if ( ! isFloating || ! editorCanvasElement ) {
+			return;
 		}
-	}, [ commentSidebarRef, scrollToCanvasEffect ] );
+
+		const node = commentSidebarRef?.current;
+		if ( ! node ) {
+			return;
+		}
+
+		function onWheel( event ) {
+			const { deltaX, deltaY } = event;
+			editorCanvasElement.scrollBy( deltaX, deltaY );
+		}
+		const options = { passive: true };
+		node.addEventListener( 'wheel', onWheel, options );
+
+		return () => {
+			node.removeEventListener( 'wheel', onWheel, options );
+		};
+	}, [ commentSidebarRef, editorCanvasElement, isFloating ] );
 
 	// Recalculate floating comment thread offsets whenever the heights change.
 	useEffect( () => {
