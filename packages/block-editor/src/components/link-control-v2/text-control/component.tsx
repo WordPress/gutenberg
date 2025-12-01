@@ -2,34 +2,48 @@
  * WordPress dependencies
  */
 import { forwardRef } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
+import { TextControl as WPTextControl } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
-import { useLinkControlV2Context } from '../context';
+import { useLinkControlV2 } from '../hook';
 
 /**
- * TextControl subcomponent for LinkControlV2.
+ * TitleInput subcomponent for LinkControlV2.
  *
- * Optional text input for link title/text.
+ * Input for editing the link label/title text (the text displayed in the link).
  */
-export const TextControl = forwardRef< HTMLInputElement >(
-	function TextControl( props, ref ) {
-		useLinkControlV2Context();
+export const TitleInput = forwardRef< HTMLInputElement >(
+	function TitleInput( props, ref ) {
+		const { uncommittedValue, setUncommittedLabel } = useLinkControlV2();
 
-		// TODO: Implement text control
-		// eslint-disable-next-line @typescript-eslint/no-restricted-imports
+		const handleChange = ( value: string ) => {
+			setUncommittedLabel( value );
+		};
+
+		// Only show if there's a URL value
+		const hasURL = !! uncommittedValue?.url;
+
+		if ( ! hasURL ) {
+			return null;
+		}
+
 		return (
-			<div
+			<WPTextControl
 				ref={ ref }
+				label={ __( 'Title' ) }
+				value={ uncommittedValue?.label || '' }
+				onChange={ handleChange }
 				className="block-editor-link-control-v2__text-control"
+				__nextHasNoMarginBottom
+				__next40pxDefaultSize
 				{ ...props }
-			>
-				TextControl placeholder
-			</div>
+			/>
 		);
 	}
 );
 
-TextControl.displayName = 'LinkControlV2.TextControl';
+TitleInput.displayName = 'LinkControlV2.TitleInput';
 

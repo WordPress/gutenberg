@@ -10,7 +10,7 @@ import { LinkControlV2Context } from './context';
 import { SearchInput } from './search-input';
 import { Preview } from './preview';
 import { SettingsDrawer } from './settings-drawer';
-import { TextControl } from './text-control';
+import { TitleInput } from './text-control';
 import { Actions } from './actions';
 
 /**
@@ -80,12 +80,12 @@ export const __experimentalLinkControlV2 = Object.assign(
 			displayName: 'LinkControlV2.SettingsDrawer',
 		} ),
 		/**
-		 * TextControl subcomponent.
+		 * TitleInput subcomponent.
 		 *
-		 * Optional text input for link title/text.
+		 * Input for editing the link label/title text (the text displayed in the link).
 		 */
-		TextControl: Object.assign( TextControl, {
-			displayName: 'LinkControlV2.TextControl',
+		TitleInput: Object.assign( TitleInput, {
+			displayName: 'LinkControlV2.TitleInput',
 		} ),
 		/**
 		 * Actions subcomponent.

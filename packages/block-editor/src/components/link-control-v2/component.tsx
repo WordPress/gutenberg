@@ -20,7 +20,7 @@ import { DEFAULT_LINK_SETTINGS } from '../link-control/constants';
 import { SearchInput } from './search-input';
 import { Preview } from './preview';
 import { SettingsDrawer } from './settings-drawer';
-import { TextControl } from './text-control';
+import { TitleInput } from './text-control';
 import { Actions } from './actions';
 
 /**
@@ -30,7 +30,7 @@ const DefaultComponents = {
 	SearchInput,
 	Preview,
 	SettingsDrawer,
-	TextControl,
+	TitleInput,
 	Actions,
 };
 

@@ -159,14 +159,6 @@ const meta = {
 				defaultValue: { summary: 'true' },
 			},
 		},
-		hasTextControl: {
-			control: { type: 'boolean' },
-			description: 'Whether to show text control for link title.',
-			table: {
-				type: { summary: 'boolean' },
-				defaultValue: { summary: 'false' },
-			},
-		},
 	},
 };
 
@@ -231,9 +223,10 @@ export const WithValue = {
 };
 
 /**
- * Story with text control enabled.
+ * Story with TitleInput enabled using custom composition.
+ * Shows how to add the TitleInput component to edit the link label.
  */
-export const WithTextControl = {
+export const WithTitleInput = {
 	render: function Template( { onChange, ...args } ) {
 		const [ value, setValue ] = useState( args.value );
 
@@ -247,17 +240,77 @@ export const WithTextControl = {
 						onChange( newValue );
 					} }
 					fetchSuggestions={ mockFetchSuggestions }
-				/>
+				>
+					<TitleInputExample />
+				</__experimentalLinkControlV2>
 			</div>
 		);
 	},
 	args: {
 		value: {
 			url: 'https://example.com/sample-page',
-			title: 'Sample Page',
+			label: 'Sample Page',
 		},
 		onChange: fn(),
-		hasTextControl: true,
+	},
+};
+
+/**
+ * Example component showing TitleInput in composition.
+ */
+function TitleInputExample() {
+	const { isEditing, committedValue } = useLinkControlV2();
+
+	if ( isEditing ) {
+		return (
+			<>
+				<__experimentalLinkControlV2.SearchInput />
+				<__experimentalLinkControlV2.TitleInput />
+				<__experimentalLinkControlV2.SettingsDrawer />
+				<__experimentalLinkControlV2.Actions />
+			</>
+		);
+	}
+
+	if ( committedValue ) {
+		return <__experimentalLinkControlV2.Preview />;
+	}
+
+	return null;
+}
+
+/**
+ * Story with TitleInput using custom composition.
+ */
+export const WithTitleInputComposition = {
+	render: function Template( { onChange, ...args } ) {
+		const [ value, setValue ] = useState( args.value );
+
+		return (
+			<div style={ { maxWidth: '400px', padding: '20px' } }>
+				<__experimentalLinkControlV2
+					{ ...args }
+					value={ value }
+					onChange={ ( newValue ) => {
+						setValue( newValue );
+						onChange( newValue );
+					} }
+					fetchSuggestions={ mockFetchSuggestions }
+				>
+					<__experimentalLinkControlV2.SearchInput />
+					<__experimentalLinkControlV2.TitleInput />
+					<__experimentalLinkControlV2.SettingsDrawer />
+					<__experimentalLinkControlV2.Actions />
+				</__experimentalLinkControlV2>
+			</div>
+		);
+	},
+	args: {
+		value: {
+			url: 'https://example.com/sample-page',
+			label: 'Sample Page',
+		},
+		onChange: fn(),
 	},
 };
 

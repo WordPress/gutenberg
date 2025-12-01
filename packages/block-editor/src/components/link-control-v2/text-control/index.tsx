@@ -1,5 +1,5 @@
 /**
  * Internal dependencies
  */
-export { TextControl } from './component';
+export { TitleInput } from './component';
 
