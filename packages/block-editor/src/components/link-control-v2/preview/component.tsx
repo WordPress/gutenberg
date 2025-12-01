@@ -38,19 +38,6 @@ import { store as preferencesStore } from '@wordpress/preferences';
  */
 import { useLinkControlV2Context } from '../context';
 
-/**
- * Filters the title for display. Removes the protocol and www prefix.
- *
- * @param title The title to be filtered.
- * @return The filtered title.
- */
-function filterTitleForDisplay( title: string ): string {
-	// Derived from `filterURLForDisplay` in `@wordpress/url`.
-	return title
-		.replace( /^[a-z\-.\+]+[0-9]*:(\/\/)?/i, '' )
-		.replace( /^www\./i, '' );
-}
-
 interface PreviewProps {
 	/**
 	 * Whether to show the unlink/remove button.
@@ -125,28 +112,17 @@ export const Preview = forwardRef< HTMLDivElement, PreviewProps >(
 
 		// Display priority for preview:
 		// 1. Entity title (what the link points to - e.g., Page title "Contact")
-		// 2. Link label (custom text - e.g., "Get In Touch") - only if no title
-		// 3. URL (fallback)
-		// Note: label is the editable link text, title is the entity's actual title
+		// 2. URL (fallback for non-entities)
+		// Note: label is the editable link text and should NOT be used as the preview title
+		// The preview should reflect the selected entity or direct entry link, not the label
 		const displayTitle =
 			! isEmptyURL
 				? stripHTML(
 						displayValue?.title ||
-							displayValue?.label ||
 							displayURL ||
 							''
 				  )
 				: '';
-
-		// Show label as secondary info if it exists and differs from title
-		const showLabelAsSecondary =
-			displayValue?.label &&
-			displayValue?.title &&
-			displayValue.label !== displayValue.title;
-
-		const isUrlRedundant =
-			! displayValue?.url ||
-			filterTitleForDisplay( displayTitle ) === displayURL;
 
 		let icon;
 
@@ -271,20 +247,13 @@ export const Preview = forwardRef< HTMLDivElement, PreviewProps >(
 											{ displayTitle }
 										</Truncate>
 									</ExternalLink>
-									{ showLabelAsSecondary && (
-										<span className="block-editor-link-control-v2__preview-info">
-											<Truncate numberOfLines={ 1 }>
-												{ stripHTML( displayValue?.label || '' ) }
-											</Truncate>
-										</span>
-									) }
-									{ ! showLabelAsSecondary && ! isUrlRedundant && (
-										<span className="block-editor-link-control-v2__preview-info">
-											<Truncate numberOfLines={ 1 }>
-												{ displayURL }
-											</Truncate>
-										</span>
-									) }
+
+									<span className="block-editor-link-control-v2__preview-info">
+										<Truncate numberOfLines={ 1 }>
+											{ displayURL }
+										</Truncate>
+									</span>
+
 								</>
 							) : (
 								<span className="block-editor-link-control-v2__preview-error-notice">

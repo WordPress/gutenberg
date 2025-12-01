@@ -181,11 +181,17 @@ export const SearchInput = forwardRef< HTMLInputElement, SearchInputProps >(
 			if ( selectedOption?.suggestion ) {
 				// Update uncommitted value with suggestion data
 				const suggestion = selectedOption.suggestion as LinkSuggestion;
+				const isEntity =
+					suggestion.id !== undefined &&
+					suggestion.kind !== undefined &&
+					suggestion.type !== undefined;
 				const newValue = {
 					...uncommittedValue,
 					url: suggestion.url,
-					// Don't set label from suggestion - let user customize it
-					// Entity data can be added to the value by the consumer
+					// For entities, use suggestion title; for non-entities, use URL as title
+					title: isEntity ? suggestion.title : suggestion.url,
+					// For entities, set label to match title by default
+					label: isEntity ? suggestion.title : undefined,
 					id:
 						typeof suggestion.id === 'number'
 							? suggestion.id
