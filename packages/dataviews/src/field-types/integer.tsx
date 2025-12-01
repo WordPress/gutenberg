@@ -48,7 +48,7 @@ export function formatInteger(
 		return String( value );
 	}
 	const { separatorThousand } = format;
-	const integerValue = Math.floor( value );
+	const integerValue = Math.trunc( value );
 	if ( ! separatorThousand ) {
 		return String( integerValue );
 	}

@@ -63,10 +63,9 @@ export function formatNumber(
 	const { separatorThousand, separatorDecimal, decimals } = format;
 	const fixedValue = value.toFixed( decimals );
 	const [ integerPart, decimalPart ] = fixedValue.split( '.' );
-	const formattedInteger = integerPart.replace(
-		/\B(?=(\d{3})+(?!\d))/g,
-		separatorThousand
-	);
+	const formattedInteger = separatorThousand
+		? integerPart.replace( /\B(?=(\d{3})+(?!\d))/g, separatorThousand )
+		: integerPart;
 	return decimals === 0
 		? formattedInteger
 		: formattedInteger + separatorDecimal + decimalPart;
