@@ -91,6 +91,24 @@ export interface LinkSuggestion {
 export interface LinkSetting {
 	id: string;
 	title: string;
+	/**
+	 * Optional help text for the setting.
+	 */
+	help?: string;
+	/**
+	 * Optional custom render function for the setting.
+	 * If provided, this will be used instead of the default CheckboxControl.
+	 *
+	 * @param setting The setting configuration object.
+	 * @param value The current link value.
+	 * @param onChange Callback to update the link value.
+	 * @return React element to render for this setting.
+	 */
+	render?: (
+		setting: LinkSetting,
+		value: LinkValue | undefined,
+		onChange: ( newValue: LinkValue ) => void
+	) => React.ReactNode;
 }
 
 /**
@@ -156,20 +174,39 @@ export interface LinkControlV2Props {
 	 */
 	showInitialSuggestions?: boolean;
 	/**
-	 * Custom components to replace defaults.
+	 * Custom components to replace defaults or disable them.
 	 *
 	 * Mutually exclusive with `children`. Use this to replace individual
 	 * components while keeping the default composition logic (editing mode
-	 * handling, conditional rendering, etc.).
+	 * handling, conditional rendering, etc.), or pass `false` to disable
+	 * a component entirely.
 	 *
 	 * If you need full control over composition, use `children` instead.
+	 *
+	 * @example
+	 * ```tsx
+	 * // Replace a component
+	 * <LinkControlV2
+	 *   components={{
+	 *     SearchInput: MyCustomSearchInput,
+	 *   }}
+	 * />
+	 *
+	 * // Disable a component
+	 * <LinkControlV2
+	 *   components={{
+	 *     TitleInput: false,  // Don't show title input
+	 *     Settings: false,    // Don't show settings
+	 *   }}
+	 * />
+	 * ```
 	 */
 	components?: {
-		SearchInput?: ComponentType< any >;
-		Preview?: ComponentType< any >;
-		Settings?: ComponentType< any >;
-		TitleInput?: ComponentType< any >;
-		Actions?: ComponentType< any >;
+		SearchInput?: ComponentType< any > | false;
+		Preview?: ComponentType< any > | false;
+		Settings?: ComponentType< any > | false;
+		TitleInput?: ComponentType< any > | false;
+		Actions?: ComponentType< any > | false;
 	};
 	/**
 	 * Children to render inside the component.

@@ -3,6 +3,7 @@
  */
 import { useMemo, useState, useEffect, useRef } from '@wordpress/element';
 import { useInstanceId } from '@wordpress/compose';
+import type { ComponentType } from 'react';
 import fastDeepEqual from 'fast-deep-equal';
 
 /**
@@ -136,13 +137,21 @@ function UnforwardedLinkControlV2( {
 	}, [ committedValue ] );
 
 	// Merge default components with custom overrides
-	const Components = useMemo(
-		() => ( {
+	// Components can be replaced or disabled (false)
+	const Components = useMemo( () => {
+		const merged = {
 			...DefaultComponents,
 			...components,
-		} ),
-		[ components ]
-	);
+		};
+		// Type assertion needed because TypeScript doesn't know components can be false
+		return merged as {
+			SearchInput: ComponentType< any > | false;
+			Preview: ComponentType< any > | false;
+			Settings: ComponentType< any > | false;
+			TitleInput: ComponentType< any > | false;
+			Actions: ComponentType< any > | false;
+		};
+	}, [ components ] );
 
 	// Context value
 	const contextValue: LinkControlV2ContextValue = useMemo(
@@ -192,27 +201,41 @@ function UnforwardedLinkControlV2( {
 		const editingEntity = isEditing && isEntity( uncommittedValue );
 
 		// Default composition - simple and opinionated
-		// Consumers can override via children or component replacement
+		// Consumers can override via children or component replacement/disable
 		// eslint-disable-next-line @typescript-eslint/no-restricted-imports
 		return (
 			<>
 				{ isEditing && ! editingEntity && (
 					<>
-						<Components.SearchInput />
-						<Components.Settings />
-						<Components.Actions />
+						{ Components.SearchInput !== false && (
+							<Components.SearchInput />
+						) }
+						{ Components.Settings !== false && (
+							<Components.Settings />
+						) }
+						{ Components.Actions !== false && (
+							<Components.Actions />
+						) }
 					</>
 				) }
 				{ editingEntity && (
 					<>
-						<Components.Preview />
-						<Components.Settings />
-						<Components.Actions />
+						{ Components.Preview !== false && (
+							<Components.Preview />
+						) }
+						{ Components.Settings !== false && (
+							<Components.Settings />
+						) }
+						{ Components.Actions !== false && (
+							<Components.Actions />
+						) }
 					</>
 				) }
-				{ ! isEditing && committedValue && (
-					<Components.Preview />
-				) }
+				{ ! isEditing &&
+					committedValue &&
+					Components.Preview !== false && (
+						<Components.Preview />
+					) }
 			</>
 		);
 	};
