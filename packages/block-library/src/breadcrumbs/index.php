@@ -136,7 +136,7 @@ function render_block_core_breadcrumbs( $attributes, $content, $block ) {
 		}
 
 		// Add post title: linked when viewing a paginated page, plain text otherwise.
-		$is_paged = (int) get_query_var( 'page' ) > 1;
+		$is_paged = (int) get_query_var( 'page' ) > 1 || (int) get_query_var( 'cpage' ) > 1;
 		$title    = block_core_breadcrumbs_get_post_title( $post );
 
 		if ( $is_paged ) {
@@ -145,8 +145,7 @@ function render_block_core_breadcrumbs( $attributes, $content, $block ) {
 				'url'        => get_permalink( $post ),
 				'allow_html' => true,
 			);
-
-			$breadcrumb_items[] = block_core_breadcrumbs_create_page_number_item( 'page' );
+			$breadcrumb_items[] = block_core_breadcrumbs_create_page_number_item( (int) get_query_var( 'cpage' ) > 1 ? 'cpage' : 'page' );
 		} else {
 			$breadcrumb_items[] = array(
 				'label'      => $title,
@@ -213,6 +212,16 @@ function block_core_breadcrumbs_is_paged() {
  */
 function block_core_breadcrumbs_create_page_number_item( $query_var = 'paged' ) {
 	$paged = (int) get_query_var( $query_var );
+
+	if ( 'cpage' === $query_var ) {
+		return array(
+			'label' => sprintf(
+				/* translators: %s: comment page number */
+				__( 'Comments Page %s' ),
+				number_format_i18n( $paged )
+			),
+		);
+	}
 
 	return array(
 		'label' => sprintf(
