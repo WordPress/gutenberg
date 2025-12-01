@@ -177,6 +177,50 @@ exports[`rawHandler should convert a caption shortcode with link 1`] = `
 <!-- /wp:image -->"
 `;
 
+exports[`rawHandler should convert a gallery shortcode with captions in content 1`] = `
+"<!-- wp:gallery {"columns":3,"linkTo":"none","className":"gallery gallery-columns-2"} -->
+<figure class="wp-block-gallery has-nested-images columns-3 is-cropped gallery gallery-columns-2"><!-- wp:image {"id":10} -->
+<figure class="wp-block-image"><img alt="" class="wp-image-10"/><figcaption class="wp-element-caption">First image caption</figcaption></figure>
+<!-- /wp:image -->
+
+<!-- wp:image {"id":11} -->
+<figure class="wp-block-image"><img alt="" class="wp-image-11"/><figcaption class="wp-element-caption">Second image caption</figcaption></figure>
+<!-- /wp:image --></figure>
+<!-- /wp:gallery -->"
+`;
+
+exports[`rawHandler should convert a gallery shortcode with size attribute 1`] = `
+"<!-- wp:gallery {"columns":2,"linkTo":"none","sizeSlug":"medium"} -->
+<figure class="wp-block-gallery has-nested-images columns-2 is-cropped"><!-- wp:image {"id":1,"sizeSlug":"medium"} -->
+<figure class="wp-block-image size-medium"><img alt="" class="wp-image-1"/></figure>
+<!-- /wp:image -->
+
+<!-- wp:image {"id":2,"sizeSlug":"medium"} -->
+<figure class="wp-block-image size-medium"><img alt="" class="wp-image-2"/></figure>
+<!-- /wp:image -->
+
+<!-- wp:image {"id":3,"sizeSlug":"medium"} -->
+<figure class="wp-block-image size-medium"><img alt="" class="wp-image-3"/></figure>
+<!-- /wp:image --></figure>
+<!-- /wp:gallery -->"
+`;
+
+exports[`rawHandler should convert a gallery shortcode without size attribute 1`] = `
+"<!-- wp:gallery {"columns":3,"linkTo":"none"} -->
+<figure class="wp-block-gallery has-nested-images columns-3 is-cropped"><!-- wp:image {"id":4} -->
+<figure class="wp-block-image"><img alt="" class="wp-image-4"/></figure>
+<!-- /wp:image -->
+
+<!-- wp:image {"id":5} -->
+<figure class="wp-block-image"><img alt="" class="wp-image-5"/></figure>
+<!-- /wp:image -->
+
+<!-- wp:image {"id":6} -->
+<figure class="wp-block-image"><img alt="" class="wp-image-6"/></figure>
+<!-- /wp:image --></figure>
+<!-- /wp:gallery -->"
+`;
+
 exports[`rawHandler should convert a list with attributes 1`] = `
 "<!-- wp:list {"ordered":true,"type":"lower-roman","start":2,"reversed":true} -->
 <ol reversed start="2" style="list-style-type:lower-roman" class="wp-block-list"><!-- wp:list-item -->
