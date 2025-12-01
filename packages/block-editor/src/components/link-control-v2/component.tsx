@@ -7,7 +7,7 @@ import fastDeepEqual from 'fast-deep-equal';
 /**
  * WordPress dependencies
  */
-import { useMemo, useState, useEffect, useRef } from '@wordpress/element';
+import { useMemo, useState, useEffect, useRef, useCallback } from '@wordpress/element';
 import { useInstanceId } from '@wordpress/compose';
 import { __experimentalVStack as VStack } from '@wordpress/components';
 
@@ -45,6 +45,15 @@ const DefaultComponents = {
  *
  * Provides opinionated defaults for managing committed/uncommitted values,
  * but allows full flexibility for consumers to access and control state.
+ *
+ * @param root0 Props object.
+ * @param root0.value The committed link value (from parent).
+ * @param root0.onChange Callback when link value is committed.
+ * @param root0.settings Link settings configuration.
+ * @param root0.fetchSuggestions Function to fetch link suggestions.
+ * @param root0.showInitialSuggestions Whether to show initial suggestions.
+ * @param root0.components Component overrides or disable flags.
+ * @param root0.children Custom composition (mutually exclusive with components).
  *
  * @example
  * ```tsx
@@ -100,46 +109,52 @@ function UnforwardedLinkControlV2( {
 		}
 	}
 
-	// Opinionated default: manage committed/uncommitted values internally
-	const [ committedValue, setCommittedValue ] = useState< LinkValue | undefined >(
-		value
-	);
+	// Opinionated default: manage uncommitted value internally
+	// The value prop is the committed value (what's been saved)
 	const [ uncommittedValue, setUncommittedValue ] = useState< LinkValue | undefined >(
 		value
 	);
 	const previousValueRef = useRef( value );
 
-	// Sync committed value when prop changes
+	// Sync uncommitted value when prop changes (external updates)
+	// This handles both external prop changes and when parent updates after commit
 	useEffect( () => {
 		if ( ! fastDeepEqual( value, previousValueRef.current ) ) {
 			previousValueRef.current = value;
-			setCommittedValue( value );
 			setUncommittedValue( value );
 		}
 	}, [ value ] );
 
-	// Commit uncommitted value (opinionated default behavior)
-	const commitValue = () => {
-		if ( uncommittedValue ) {
-			setCommittedValue( uncommittedValue );
-			onChange?.( uncommittedValue );
-		}
-	};
+	// Commit uncommitted value (calls onChange and syncs uncommittedValue)
+	// Accepts optional value to commit directly, otherwise uses uncommittedValue
+	const commitValue = useCallback(
+		( valueToCommit?: LinkValue | undefined ) => {
+			const finalValue = valueToCommit ?? uncommittedValue;
+			if ( finalValue ) {
+				// Optimistically update uncommittedValue to match what we're committing
+				// The useEffect will sync it again when parent updates value prop (no-op if same)
+				setUncommittedValue( finalValue );
+				// Call onChange - parent will update value prop, which becomes the new committed value
+				onChange?.( finalValue );
+			}
+		},
+		[ uncommittedValue, onChange ]
+	);
 
-	// Revert to committed value
-	const revertValue = () => {
-		setUncommittedValue( committedValue );
-	};
+	// Revert to committed value (from value prop)
+	const revertValue = useCallback( () => {
+		setUncommittedValue( value );
+	}, [ value ] );
 
 	// Editing state
 	const [ isEditing, setIsEditing ] = useState( ! value || ! value.url );
 
 	// Auto-enter editing mode when value becomes empty
 	useEffect( () => {
-		if ( ! committedValue || ! committedValue.url ) {
+		if ( ! value || ! value.url ) {
 			setIsEditing( true );
 		}
-	}, [ committedValue ] );
+	}, [ value ] );
 
 	// Merge default components with custom overrides
 	// Components can be replaced or disabled (false)
@@ -161,7 +176,7 @@ function UnforwardedLinkControlV2( {
 	// Context value
 	const contextValue: LinkControlV2ContextValue = useMemo(
 		() => ( {
-			committedValue,
+			value,
 			uncommittedValue,
 			setUncommittedValue,
 			commitValue,
@@ -174,7 +189,7 @@ function UnforwardedLinkControlV2( {
 			instanceId,
 		} ),
 		[
-			committedValue,
+			value,
 			uncommittedValue,
 			isEditing,
 			settings,
@@ -214,7 +229,7 @@ function UnforwardedLinkControlV2( {
 				{ isEditing && ! editingEntity && (
 					<>
 						{ Components.TitleInput !== false &&
-							( committedValue || uncommittedValue ) && (
+							( value || uncommittedValue ) && (
 								<Components.TitleInput />
 							) }
 						{ Components.SearchInput !== false && (
@@ -231,7 +246,7 @@ function UnforwardedLinkControlV2( {
 				{ editingEntity && (
 					<>
 						{ Components.TitleInput !== false &&
-							( committedValue || uncommittedValue ) && (
+							( value || uncommittedValue ) && (
 								<Components.TitleInput />
 							) }
 						{ Components.Preview !== false && (
@@ -246,7 +261,7 @@ function UnforwardedLinkControlV2( {
 					</>
 				) }
 				{ ! isEditing &&
-					committedValue &&
+					value &&
 					Components.Preview !== false && (
 						<Components.Preview />
 					) }
@@ -254,7 +269,6 @@ function UnforwardedLinkControlV2( {
 		);
 	};
 
-	// eslint-disable-next-line @typescript-eslint/no-restricted-imports
 	return (
 		<LinkControlV2Context.Provider value={ contextValue }>
 			<div className="block-editor-link-control-v2">

@@ -18,10 +18,10 @@ import type { LinkValue } from './types';
  * @example
  * ```tsx
  * function MyComponent() {
- *   const { committedValue, uncommittedValue, commitValue, setUncommittedValue } = useLinkControlV2();
+ *   const { value, uncommittedValue, commitValue, setUncommittedValue } = useLinkControlV2();
  *
  *   // Access current values
- *   console.log('Committed:', committedValue);
+ *   console.log('Committed:', value);
  *   console.log('Uncommitted:', uncommittedValue);
  *
  *   // Override commit behavior
@@ -37,9 +37,9 @@ export function useLinkControlV2() {
 
 	return {
 		/**
-		 * The committed (saved) link value.
+		 * The committed (saved) link value (from value prop).
 		 */
-		committedValue: context.committedValue,
+		value: context.value,
 		/**
 		 * The uncommitted (being edited) link value.
 		 */

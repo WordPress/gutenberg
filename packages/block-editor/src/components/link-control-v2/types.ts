@@ -225,15 +225,15 @@ export interface LinkControlV2Props {
  * Context value for LinkControlV2.
  */
 export interface LinkControlV2ContextValue {
-	// Committed value (what's been saved)
-	committedValue: LinkValue | undefined;
+	// Committed value (from value prop - what's been saved)
+	value: LinkValue | undefined;
 	// Uncommitted value (what's being edited)
 	uncommittedValue: LinkValue | undefined;
 	// Set uncommitted value
 	setUncommittedValue: ( value: LinkValue | undefined ) => void;
-	// Commit the uncommitted value
-	commitValue: () => void;
-	// Revert to committed value
+	// Commit the uncommitted value (calls onChange and syncs uncommittedValue)
+	commitValue: ( value?: LinkValue | undefined ) => void;
+	// Revert to committed value (from value prop)
 	revertValue: () => void;
 	// Whether in editing mode
 	isEditing: boolean;

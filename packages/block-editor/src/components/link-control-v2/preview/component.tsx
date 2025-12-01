@@ -9,14 +9,16 @@ import clsx from 'clsx';
 import { forwardRef } from '@wordpress/element';
 import type { ComponentType, ReactNode } from 'react';
 import { __ } from '@wordpress/i18n';
-import { useInstanceId } from '@wordpress/compose';
+import {
+	useInstanceId,
+	useCopyToClipboard,
+} from '@wordpress/compose';
 import {
 	Button,
 	ExternalLink,
 	__experimentalTruncate as Truncate,
 	BaseControl,
 } from '@wordpress/components';
-import { useCopyToClipboard } from '@wordpress/compose';
 import { filterURLForDisplay, safeDecodeURI } from '@wordpress/url';
 import {
 	Icon,
@@ -68,9 +70,8 @@ interface PreviewProps {
 /**
  * Preview subcomponent for LinkControlV2.
  *
- * Displays the committed link value with edit, unlink, and copy actions.
  * Displays the link value with edit, unlink, and copy actions.
- * When editing, shows uncommittedValue; otherwise shows committedValue.
+ * When editing, shows uncommittedValue; otherwise shows value prop (committed value).
  */
 export const Preview = forwardRef< HTMLDivElement, PreviewProps >(
 	function Preview(
@@ -83,7 +84,7 @@ export const Preview = forwardRef< HTMLDivElement, PreviewProps >(
 		ref
 	) {
 		const {
-			committedValue,
+			value,
 			uncommittedValue,
 			isEditing,
 			setIsEditing,
@@ -93,8 +94,8 @@ export const Preview = forwardRef< HTMLDivElement, PreviewProps >(
 		const id = useInstanceId( Preview, 'link-control-v2-preview' );
 
 		// When editing an entity, show uncommitted value (the entity being edited)
-		// Otherwise, show committed value (the saved/locked state)
-		const displayValue = isEditing ? uncommittedValue : committedValue;
+		// Otherwise, show committed value (from value prop - the saved/locked state)
+		const displayValue = isEditing ? uncommittedValue : value;
 
 		// Check if we're editing an entity (has kind, type, id)
 		const isEditingEntity =

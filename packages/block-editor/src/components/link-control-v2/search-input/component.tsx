@@ -36,6 +36,8 @@ export const SearchInput = forwardRef< HTMLInputElement, SearchInputProps >(
 			setUncommittedValue,
 			fetchSuggestions,
 			showInitialSuggestions,
+			commitValue,
+			setIsEditing,
 		} = context;
 
 		// Current search input value with debouncing
@@ -179,7 +181,7 @@ export const SearchInput = forwardRef< HTMLInputElement, SearchInputProps >(
 			if ( selectedOption?.suggestion ) {
 				// Update uncommitted value with suggestion data
 				const suggestion = selectedOption.suggestion as LinkSuggestion;
-				setUncommittedValue( {
+				const newValue = {
 					...uncommittedValue,
 					url: suggestion.url,
 					// Don't set label from suggestion - let user customize it
@@ -190,7 +192,11 @@ export const SearchInput = forwardRef< HTMLInputElement, SearchInputProps >(
 							: undefined,
 					kind: suggestion.kind,
 					type: suggestion.type,
-				} );
+				};
+				// Auto-commit when a suggestion is selected
+				commitValue( newValue );
+				// Exit editing mode (mirrors original LinkControl behavior)
+				setIsEditing( false );
 			} else {
 				// Direct URL entry
 				setUncommittedValue( {

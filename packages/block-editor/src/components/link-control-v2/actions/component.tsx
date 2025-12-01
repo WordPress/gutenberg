@@ -38,24 +38,23 @@ interface ActionsProps {
 export const Actions = forwardRef< HTMLDivElement, ActionsProps >(
 	function Actions( { onCancel, ...props }, ref ) {
 		const {
-			committedValue,
+			value,
 			uncommittedValue,
 			commitValue,
 			revertValue,
-			isEditing,
 			setIsEditing,
 		} = useLinkControlV2Context();
 
-		// Determine if there are changes between committed and uncommitted values
+		// Determine if there are changes between committed (value prop) and uncommitted values
 		const hasChanges = useMemo( () => {
-			if ( ! committedValue && ! uncommittedValue ) {
+			if ( ! value && ! uncommittedValue ) {
 				return false;
 			}
-			if ( ! committedValue || ! uncommittedValue ) {
+			if ( ! value || ! uncommittedValue ) {
 				return true;
 			}
-			return ! isShallowEqualObjects( committedValue, uncommittedValue );
-		}, [ committedValue, uncommittedValue ] );
+			return ! isShallowEqualObjects( value, uncommittedValue );
+		}, [ value, uncommittedValue ] );
 
 		// Check if the URL input is empty
 		const isURLEmpty = ! uncommittedValue?.url?.trim()?.length;
@@ -87,7 +86,7 @@ export const Actions = forwardRef< HTMLDivElement, ActionsProps >(
 
 			// If there's a committed link value, exit editing mode and show preview
 			// Otherwise, stay in editing mode (empty state)
-			if ( ( committedValue?.url?.trim()?.length ?? 0 ) > 0 ) {
+			if ( ( value?.url?.trim()?.length ?? 0 ) > 0 ) {
 				setIsEditing( false );
 			}
 		};
@@ -111,6 +110,7 @@ export const Actions = forwardRef< HTMLDivElement, ActionsProps >(
 					variant="primary"
 					onClick={ handleApply }
 					disabled={ isApplyDisabled }
+					accessibleWhenDisabled
 					className="block-editor-link-control-v2__apply"
 				>
 					{ __( 'Apply' ) }

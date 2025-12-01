@@ -259,7 +259,7 @@ export const WithTitleInput = {
  * Example component showing TitleInput in composition.
  */
 function TitleInputExample() {
-	const { isEditing, committedValue } = useLinkControlV2();
+	const { isEditing, value } = useLinkControlV2();
 
 	if ( isEditing ) {
 		return (
@@ -272,7 +272,7 @@ function TitleInputExample() {
 		);
 	}
 
-	if ( committedValue ) {
+	if ( value ) {
 		return <__experimentalLinkControlV2.Preview />;
 	}
 
@@ -317,7 +317,7 @@ export const WithTitleInputComposition = {
  * Example component showing TitleInput with context-based conditional rendering.
  */
 function TitleInputCompositionExample() {
-	const { isEditing, committedValue, uncommittedValue } = useLinkControlV2();
+	const { isEditing, value, uncommittedValue } = useLinkControlV2();
 
 	// Use context to conditionally show components
 	if ( isEditing ) {
@@ -335,7 +335,7 @@ function TitleInputCompositionExample() {
 	}
 
 	// Show preview when not editing
-	if ( committedValue ) {
+	if ( value ) {
 		return <__experimentalLinkControlV2.Preview />;
 	}
 
@@ -380,7 +380,7 @@ export const CustomComposition = {
  * Example component demonstrating custom composition with context-based conditional rendering.
  */
 function CustomCompositionExample() {
-	const { isEditing, committedValue, uncommittedValue } = useLinkControlV2();
+	const { isEditing, value, uncommittedValue } = useLinkControlV2();
 
 	// Use context to conditionally render components
 	if ( isEditing ) {
@@ -408,7 +408,7 @@ function CustomCompositionExample() {
 	}
 
 	// Show preview when not editing and there's a committed value
-	if ( committedValue ) {
+	if ( value ) {
 		return (
 			<>
 				<__experimentalLinkControlV2.Preview />
@@ -423,7 +423,7 @@ function CustomCompositionExample() {
 						<strong>Custom preview info</strong> - Only shown when
 						not editing
 					</p>
-					<p>Committed URL: { committedValue?.url || 'None' }</p>
+					<p>Committed URL: { value?.url || 'None' }</p>
 				</div>
 			</>
 		);
@@ -467,7 +467,7 @@ export const WithHook = {
  */
 function HookExample() {
 	const {
-		committedValue,
+		value,
 		uncommittedValue,
 		isEditing,
 		setUncommittedURL,
@@ -487,8 +487,7 @@ function HookExample() {
 					} }
 				>
 					<p>
-						<strong>Committed:</strong>{ ' ' }
-						{ committedValue?.url || 'None' }
+						<strong>Committed:</strong> { value?.url || 'None' }
 					</p>
 					<p>
 						<strong>Uncommitted:</strong>{ ' ' }
@@ -504,7 +503,7 @@ function HookExample() {
 	}
 
 	// Show preview when not editing
-	if ( committedValue ) {
+	if ( value ) {
 		return (
 			<>
 				<__experimentalLinkControlV2.Preview />
@@ -518,7 +517,7 @@ function HookExample() {
 					<p>
 						<strong>Preview Mode</strong> - Not editing
 					</p>
-					<p>Committed URL: { committedValue?.url || 'None' }</p>
+					<p>Committed URL: { value?.url || 'None' }</p>
 				</div>
 			</>
 		);
