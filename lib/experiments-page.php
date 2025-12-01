@@ -259,31 +259,14 @@ add_action( 'admin_init', 'gutenberg_initialize_experiments_settings' );
  *
  * @since 6.3.0
  *
- * @param array $args ( $label, $id, $requires ).
+ * @param array $args ( $label, $id ).
  */
 function gutenberg_display_experiment_field( $args ) {
 	$options = get_option( 'gutenberg-experiments' );
 	$value   = isset( $options[ $args['id'] ] ) ? 1 : 0;
-
-	// Check if this experiment requires another experiment to be enabled
-	$is_disabled = false;
-	if ( isset( $args['requires'] ) ) {
-		$is_disabled = ! isset( $options[ $args['requires'] ] );
-		// If the required experiment is disabled, also disable this one
-		if ( $is_disabled && $value ) {
-			$value = 0;
-		}
-	}
 	?>
 		<label for="<?php echo $args['id']; ?>">
-			<input 
-				type="checkbox" 
-				name="<?php echo 'gutenberg-experiments[' . $args['id'] . ']'; ?>" 
-				id="<?php echo $args['id']; ?>" 
-				value="1" 
-				<?php checked( 1, $value ); ?>
-				<?php disabled( $is_disabled ); ?>
-			/>
+			<input type="checkbox" name="<?php echo 'gutenberg-experiments[' . $args['id'] . ']'; ?>" id="<?php echo $args['id']; ?>" value="1" <?php checked( 1, $value ); ?> />
 			<?php echo $args['label']; ?>
 		</label>
 	<?php
@@ -301,59 +284,23 @@ function gutenberg_display_experiment_section() {
 	<?php
 }
 
-/**
- * Handles form submission for the Gutenberg experiments settings page.
- *
- * This function processes the experiments form submission and handles:
- * 1. Template activation setting (active_templates) - managed separately from regular experiments
- * 2. Experiment dependency management - ensures sub-experiments are automatically disabled
- *    when their parent experiments are disabled
- */
-add_action( 'admin_init', 'gutenberg_handle_experiments_setting_submission' );
-function gutenberg_handle_experiments_setting_submission() {
-	// Only process submissions for the gutenberg-experiments settings page.
+add_action( 'admin_init', 'gutenberg_handle_template_activate_setting_submission' );
+function gutenberg_handle_template_activate_setting_submission() {
 	if ( ! isset( $_POST['option_page'] ) || 'gutenberg-experiments' !== $_POST['option_page'] ) {
 		return;
 	}
 
-	// Verify nonce for security.
 	if ( ! isset( $_POST['_wpnonce'] ) || ! wp_verify_nonce( $_POST['_wpnonce'], 'gutenberg-experiments-options' ) ) {
 		return;
 	}
 
-	// Check user capabilities.
 	if ( ! current_user_can( 'manage_options' ) ) {
 		return;
 	}
 
-	// Handle template activation setting.
-	// This is managed separately from regular experiments as it uses a different option.
 	if ( isset( $_POST['active_templates'] ) && '1' === $_POST['active_templates'] ) {
 		update_option( 'active_templates', gutenberg_get_migrated_active_templates() );
 	} else {
 		delete_option( 'active_templates' );
-	}
-
-	// Handle experiment dependencies.
-	// If the parent experiment (gutenberg-content-only-pattern-insertion) is disabled,
-	// automatically disable the sub-experiment (gutenberg-content-only-inspector-fields).
-	// This ensures sub-experiments can never be enabled without their parent experiment.
-	// Only process this if gutenberg-experiments data was submitted in the form.
-	if ( isset( $_POST['gutenberg-experiments'] ) && is_array( $_POST['gutenberg-experiments'] ) ) {
-		$gutenberg_experiments = get_option( 'gutenberg-experiments' );
-		// Ensure we have an array to work with (get_option can return false if option doesn't exist).
-		if ( ! is_array( $gutenberg_experiments ) ) {
-			$gutenberg_experiments = array();
-		}
-
-		// Check if the parent experiment is enabled in the form submission.
-		$parent_experiment_enabled = isset( $_POST['gutenberg-experiments']['gutenberg-content-only-pattern-insertion'] );
-
-		// If parent experiment is not enabled, disable the sub-experiment.
-		// Only update if the sub-experiment is currently enabled to avoid unnecessary option updates.
-		if ( ! $parent_experiment_enabled && isset( $gutenberg_experiments['gutenberg-content-only-inspector-fields'] ) ) {
-			unset( $gutenberg_experiments['gutenberg-content-only-inspector-fields'] );
-			update_option( 'gutenberg-experiments', $gutenberg_experiments );
-		}
 	}
 }
