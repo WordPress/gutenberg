@@ -60,15 +60,26 @@ export const SearchInput = forwardRef< HTMLInputElement >(
 				] );
 				setIsLoading( false );
 			} else if ( searchValue && ! isURLLike( searchValue ) && searchValue.length < 2 ) {
-				// Clear options if input is too short and not URL-like
-				setOptions( [] );
+				// Only clear options if user has typed something
+				// This prevents "No results found" from showing on initial focus
+				if ( searchValue.length > 0 ) {
+					setOptions( [] );
+				}
 			}
 		}, [ searchValue ] );
 
 		// Fetch and set suggestions based on search query
 		const fetchAndSetSuggestions = useCallback( async ( query: string, isInitial = false ) => {
+			// If showInitialSuggestions is false, never fetch initial suggestions
+			if ( isInitial && ! showInitialSuggestions ) {
+				return;
+			}
+
 			if ( ! fetchSuggestions ) {
-				setOptions( [] );
+				// Only clear options if user has typed something
+				if ( query.length > 0 ) {
+					setOptions( [] );
+				}
 				return;
 			}
 
@@ -93,7 +104,11 @@ export const SearchInput = forwardRef< HTMLInputElement >(
 			const shouldFetch = query.length >= 2 || isInitial;
 
 			if ( ! shouldFetch ) {
-				setOptions( [] );
+				// Don't clear options if user hasn't typed anything yet
+				// This prevents "No results found" from showing on initial focus
+				if ( query.length > 0 ) {
+					setOptions( [] );
+				}
 				setIsLoading( false );
 				return;
 			}
@@ -114,16 +129,24 @@ export const SearchInput = forwardRef< HTMLInputElement >(
 			} finally {
 				setIsLoading( false );
 			}
-		}, [ fetchSuggestions, uncommittedValue ] );
+		}, [ fetchSuggestions, uncommittedValue, showInitialSuggestions ] );
 
 		// Fetch suggestions when search changes
 		useEffect( () => {
+			// Only treat as initial if showInitialSuggestions is enabled AND there's no search query
 			const isInitial = showInitialSuggestions && ! debouncedSearch;
+
+			// If showInitialSuggestions is false, don't fetch when query is empty
+			if ( ! showInitialSuggestions && ! debouncedSearch ) {
+				return;
+			}
+
 			fetchAndSetSuggestions( debouncedSearch || '', isInitial );
 		}, [ debouncedSearch, fetchAndSetSuggestions, showInitialSuggestions ] );
 
 		// Load initial suggestions on mount if enabled
 		useEffect( () => {
+			// Only load initial suggestions if explicitly enabled
 			if ( showInitialSuggestions && fetchSuggestions && ! searchValue ) {
 				fetchAndSetSuggestions( '', true );
 			}
@@ -131,11 +154,13 @@ export const SearchInput = forwardRef< HTMLInputElement >(
 
 		// Handle selection change
 		const handleChange = ( selectedValue: string | null | undefined ) => {
-			if ( ! selectedValue ) {
-				setUncommittedValue( {
-					...uncommittedValue,
-					url: undefined,
-				} );
+			if ( ! selectedValue || selectedValue === '__placeholder__' ) {
+				if ( ! selectedValue ) {
+					setUncommittedValue( {
+						...uncommittedValue,
+						url: undefined,
+					} );
+				}
 				return;
 			}
 
@@ -181,13 +206,33 @@ export const SearchInput = forwardRef< HTMLInputElement >(
 			return currentValue;
 		}, [ searchValue, currentValue ] );
 
+		// When showInitialSuggestions is false and user hasn't typed anything,
+		// provide a placeholder option to prevent "No results found" from showing
+		const displayOptions = useMemo( () => {
+			if (
+				! showInitialSuggestions &&
+				searchValue.length === 0 &&
+				options.length === 0
+			) {
+				// Return a disabled placeholder option to prevent "No results" message
+				return [
+					{
+						label: __( 'Start typing to search' ),
+						value: '__placeholder__',
+						disabled: true,
+					},
+				];
+			}
+			return options;
+		}, [ options, showInitialSuggestions, searchValue ] );
+
 		return (
 			<ComboboxControl
 				label={ __( 'URL' ) }
 				hideLabelFromVision
 				placeholder={ __( 'Paste URL or type to search' ) }
 				value={ displayValue }
-				options={ options }
+				options={ displayOptions }
 				onChange={ handleChange }
 				onFilterValueChange={ handleFilterChange }
 				isLoading={ isLoading }
