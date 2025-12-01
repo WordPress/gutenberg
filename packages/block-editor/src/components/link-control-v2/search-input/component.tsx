@@ -150,7 +150,8 @@ export const SearchInput = forwardRef< HTMLInputElement >(
 				setUncommittedValue( {
 					...uncommittedValue,
 					url: suggestion.url,
-					title: suggestion.title || uncommittedValue?.title,
+					// Don't set label from suggestion - let user customize it
+					// Entity data can be added to the value by the consumer
 					id:
 						typeof suggestion.id === 'number'
 							? suggestion.id

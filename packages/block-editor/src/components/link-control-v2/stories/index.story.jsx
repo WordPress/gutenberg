@@ -109,7 +109,8 @@ const meta = {
 	argTypes: {
 		value: {
 			control: { type: 'object' },
-			description: 'The committed link value (what has been saved/applied).',
+			description:
+				'The committed link value (what has been saved/applied).',
 			table: {
 				type: { summary: 'LinkValue' },
 			},
@@ -161,22 +162,6 @@ const meta = {
 		hasTextControl: {
 			control: { type: 'boolean' },
 			description: 'Whether to show text control for link title.',
-			table: {
-				type: { summary: 'boolean' },
-				defaultValue: { summary: 'false' },
-			},
-		},
-		hasRichPreviews: {
-			control: { type: 'boolean' },
-			description: 'Whether to show rich previews.',
-			table: {
-				type: { summary: 'boolean' },
-				defaultValue: { summary: 'false' },
-			},
-		},
-		handleEntities: {
-			control: { type: 'boolean' },
-			description: 'Whether to handle entity links (with ID).',
 			table: {
 				type: { summary: 'boolean' },
 				defaultValue: { summary: 'false' },
@@ -357,7 +342,13 @@ function HookExample() {
 	return (
 		<div>
 			<__experimentalLinkControlV2.SearchInput />
-			<div style={ { marginTop: '10px', padding: '10px', background: '#f9f9f9' } }>
+			<div
+				style={ {
+					marginTop: '10px',
+					padding: '10px',
+					background: '#f9f9f9',
+				} }
+			>
 				<p>
 					<strong>Committed:</strong>{ ' ' }
 					{ committedValue?.url || 'None' }
@@ -374,4 +365,3 @@ function HookExample() {
 		</div>
 	);
 }
-

@@ -7,6 +7,7 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import { forwardRef } from '@wordpress/element';
+import type { ComponentType, ReactNode } from 'react';
 import { __ } from '@wordpress/i18n';
 import {
 	Button,
@@ -32,8 +33,6 @@ import { store as preferencesStore } from '@wordpress/preferences';
  * Internal dependencies
  */
 import { useLinkControlV2Context } from '../context';
-// eslint-disable-next-line @wordpress/no-unsafe-wp-apis
-import useRichUrlData from '../../link-control/use-rich-url-data.js';
 import { ViewerSlot } from '../../link-control/viewer-slot';
 
 /**
@@ -51,10 +50,6 @@ function filterTitleForDisplay( title: string ): string {
 
 interface PreviewProps {
 	/**
-	 * Whether to fetch and display rich previews (metadata, icons, etc.).
-	 */
-	hasRichPreviews?: boolean;
-	/**
 	 * Whether to show the unlink/remove button.
 	 */
 	hasUnlinkControl?: boolean;
@@ -68,35 +63,27 @@ interface PreviewProps {
  * Preview subcomponent for LinkControlV2.
  *
  * Displays the committed link value with edit, unlink, and copy actions.
- * Supports rich previews with metadata fetching.
+ * Reads display data directly from the committedValue object.
  */
 export const Preview = forwardRef< HTMLDivElement, PreviewProps >(
 	function Preview(
 		{
-			hasRichPreviews = false,
 			hasUnlinkControl = false,
 			onRemove,
 			...props
 		},
 		ref
 	) {
-		const { committedValue, setIsEditing } = useLinkControlV2Context();
+		const {
+			committedValue,
+			setIsEditing,
+		} = useLinkControlV2Context();
 
 		const showIconLabels = useSelect(
 			( select ) =>
 				select( preferencesStore ).get( 'core', 'showIconLabels' ),
 			[]
 		);
-
-		// Avoid fetching if rich previews are not desired.
-		const showRichPreviews = hasRichPreviews
-			? committedValue?.url ?? null
-			: null;
-
-		const { richData, isFetching } = useRichUrlData( showRichPreviews );
-
-		// Rich data may be an empty object so test for that.
-		const hasRichData = richData && Object.keys( richData ).length > 0;
 
 		const displayURL =
 			( committedValue?.url &&
@@ -109,10 +96,14 @@ export const Preview = forwardRef< HTMLDivElement, PreviewProps >(
 		// url can be undefined if the href attribute is unset
 		const isEmptyURL = ! committedValue?.url?.length;
 
+		// Display priority:
+		// 1. Link label (custom text for the link)
+		// 2. Title from value (if provided)
+		// 3. URL (fallback)
 		const displayTitle =
 			! isEmptyURL
 				? stripHTML(
-						richData?.title ||
+						committedValue?.label ||
 							committedValue?.title ||
 							displayURL ||
 							''
@@ -125,8 +116,44 @@ export const Preview = forwardRef< HTMLDivElement, PreviewProps >(
 
 		let icon;
 
-		if ( richData?.icon ) {
-			icon = <img src={ richData.icon } alt="" />;
+		// Handle icon from value - can be Component, SVG, or URL
+		if ( committedValue?.icon ) {
+			const iconValue = committedValue.icon;
+
+			// If it's a React component (function)
+			if ( typeof iconValue === 'function' ) {
+				const IconComponent = iconValue as ComponentType< any >;
+				icon = <IconComponent />;
+			}
+			// If it's already a ReactNode (JSX element)
+			else if (
+				typeof iconValue === 'object' &&
+				iconValue !== null &&
+				'$$typeof' in iconValue
+			) {
+				icon = iconValue as ReactNode;
+			}
+			// If it's a string
+			else if ( typeof iconValue === 'string' ) {
+				// Check if it's a URL (starts with http:// or https://)
+				if (
+					iconValue.startsWith( 'http://' ) ||
+					iconValue.startsWith( 'https://' )
+				) {
+					icon = <img src={ iconValue } alt="" />;
+				}
+				// Otherwise assume it's SVG markup
+				else {
+					icon = (
+						<span
+							dangerouslySetInnerHTML={ { __html: iconValue } }
+							aria-hidden="true"
+						/>
+					);
+				}
+			}
+		} else if ( committedValue?.image ) {
+			icon = <img src={ committedValue.image } alt="" />;
 		} else if ( isEmptyURL ) {
 			icon = <Icon icon={ info } size={ 32 } />;
 		} else {
@@ -163,8 +190,7 @@ export const Preview = forwardRef< HTMLDivElement, PreviewProps >(
 					'block-editor-link-control-v2__preview',
 					{
 						'is-current': true,
-						'is-rich': hasRichData,
-						'is-fetching': !! isFetching,
+						'is-rich': !!( committedValue?.icon || committedValue?.image ),
 						'is-preview': true,
 						'is-error': isEmptyURL,
 						'is-url-title': displayTitle === displayURL,
@@ -185,7 +211,7 @@ export const Preview = forwardRef< HTMLDivElement, PreviewProps >(
 							className={ clsx(
 								'block-editor-link-control__search-item-icon',
 								{
-									'is-image': !! richData?.icon,
+									'is-image': !!( committedValue?.icon || committedValue?.image ),
 								}
 							) }
 						>

@@ -89,13 +89,14 @@ export function useLinkControlV2() {
 			[ context ]
 		),
 		/**
-		 * Update the title in the uncommitted value.
+		 * Update the label (link text) in the uncommitted value.
+		 * This is the text displayed in the link, distinct from the entity title.
 		 */
-		setUncommittedTitle: useCallback(
-			( title: string ) => {
+		setUncommittedLabel: useCallback(
+			( label: string ) => {
 				context.setUncommittedValue( {
 					...context.uncommittedValue,
-					title,
+					label,
 				} );
 			},
 			[ context ]

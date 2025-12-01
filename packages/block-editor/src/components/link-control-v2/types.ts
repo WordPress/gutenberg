@@ -14,15 +14,58 @@ export interface ComboboxControlOption {
 }
 
 /**
- * Link value structure matching the current LinkControl API.
+ * Link value structure representing a link reference.
+ *
+ * Consumers can include any properties they need for display or functionality.
+ * The component reads common properties like url, label, title, icon, image, etc.
+ *
+ * @example
+ * ```tsx
+ * // Simple URL link
+ * { url: 'https://example.com' }
+ *
+ * // Link with display data
+ * {
+ *   url: 'https://example.com/page',
+ *   label: 'Get In Touch', // Custom link text
+ *   title: 'Contact Us', // Title for display
+ *   image: 'https://...', // Image for preview
+ *   icon: 'https://...', // Icon for preview
+ * }
+ * ```
  */
 export interface LinkValue {
+	/**
+	 * The URL the link points to.
+	 */
 	url?: string;
+	/**
+	 * The label/text displayed in the link (the HTML string inside `<a>`).
+	 */
+	label?: string;
+	/**
+	 * Title for display (used if label is not provided).
+	 */
 	title?: string;
-	id?: number;
-	kind?: string;
-	type?: string;
+	/**
+	 * Icon for preview display. Can be:
+	 * - A React component
+	 * - An SVG (string or ReactNode)
+	 * - A URL (string)
+	 */
+	icon?: ComponentType< any > | ReactNode | string;
+	/**
+	 * Image URL for preview display.
+	 */
+	image?: string;
+	/**
+	 * Whether the link should open in a new tab.
+	 */
 	opensInNewTab?: boolean;
+	/**
+	 * Additional properties.
+	 * Consumers can include any custom properties they need.
+	 */
 	[ key: string ]: any;
 }
 
