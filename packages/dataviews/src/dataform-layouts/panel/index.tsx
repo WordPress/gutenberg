@@ -50,7 +50,12 @@ function getFirstValidationError(
 
 	for ( const type of VALIDATION_TYPES ) {
 		const validation = validity[ type ];
-		if ( validation?.type === 'invalid' && validation.message ) {
+		if ( validation?.type === 'invalid' ) {
+			// Provide default message for required validation (message is optional)
+			if ( type === 'required' ) {
+				return validation.message || 'A required field is empty';
+			}
+			if ( validation.message ) {
 			return validation.message;
 		}
 	}
