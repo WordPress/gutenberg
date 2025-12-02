@@ -34,6 +34,8 @@ import { store as blockEditorStore } from '../../store';
 
 const { Menu } = unlock( componentsPrivateApis );
 
+const EMPTY_OBJECT = {};
+
 /**
  * Get the normalized attribute type for block bindings.
  * Converts 'rich-text' to 'string' since rich-text is stored as string.
@@ -63,7 +65,7 @@ export default function BlockBindingsAttributeControl( {
 				getAllBlockBindingsSources,
 				getBlockBindingsSourceFieldsList,
 			} = unlock( select( blocksStore ) );
-			const sourceFields = {};
+			const sourceFields = EMPTY_OBJECT;
 			Object.entries( getAllBlockBindingsSources() ).forEach(
 				( [ sourceName, source ] ) => {
 					const fieldsList = getBlockBindingsSourceFieldsList(
