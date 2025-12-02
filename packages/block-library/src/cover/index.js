@@ -78,7 +78,7 @@ if ( window.__experimentalContentOnlyPatternInsertion ) {
 		},
 	];
 	settings[ formKey ] = {
-		fields: [ 'content' ],
+		fields: [ 'background' ],
 	};
 }
 
