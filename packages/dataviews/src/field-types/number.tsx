@@ -111,19 +111,7 @@ function isValidCustom< Item >( item: Item, field: NormalizedField< Item > ) {
 		return __( 'Value must be a number.' );
 	}
 
-	// If the field type is number, we've already normalized the format,
-	// and so it's safe to tell TypeScript to trust us ("as Required<FormatNumber>").
-	//
-	// There're no runtime paths where this render function is called with a non-number field,
-	// but TypeScript is unable to infer this, hence the type assertion.
-	let format: Required< FormatNumber >;
-	if ( field.type !== 'number' ) {
-		format = getFormat( field as Field< any > );
-	} else {
-		format = field.format as Required< FormatNumber >;
-	}
-
-	return formatNumber( Number( value ), format );
+	return null;
 }
 
 export default {
