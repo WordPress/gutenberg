@@ -482,6 +482,92 @@ function validateFormField< Item >(
 		}
 	}
 
+	// Validate the field: isValid.min
+	if (
+		!! formField.field &&
+		formField.field.isValid.min !== undefined &&
+		( formField.field.type === 'integer' ||
+			formField.field.type === 'number' )
+	) {
+		const value = formField.field.getValue( { item } );
+		if ( ! isEmptyNullOrUndefined( value ) ) {
+			if ( Number( value ) < formField.field.isValid.min ) {
+				return {
+					min: {
+						type: 'invalid',
+						message: __( 'Value is below the minimum.' ),
+					},
+				};
+			}
+		}
+	}
+
+	// Validate the field: isValid.max
+	if (
+		!! formField.field &&
+		formField.field.isValid.max !== undefined &&
+		( formField.field.type === 'integer' ||
+			formField.field.type === 'number' )
+	) {
+		const value = formField.field.getValue( { item } );
+		if ( ! isEmptyNullOrUndefined( value ) ) {
+			if ( Number( value ) > formField.field.isValid.max ) {
+				return {
+					max: {
+						type: 'invalid',
+						message: __( 'Value is above the maximum.' ),
+					},
+				};
+			}
+		}
+	}
+
+	// Validate the field: isValid.minLength
+	if (
+		!! formField.field &&
+		formField.field.isValid.minLength !== undefined &&
+		( formField.field.type === 'text' ||
+			formField.field.type === 'email' ||
+			formField.field.type === 'url' ||
+			formField.field.type === 'telephone' ||
+			formField.field.type === 'password' )
+	) {
+		const value = formField.field.getValue( { item } );
+		if ( ! isEmptyNullOrUndefined( value ) ) {
+			if ( String( value ).length < formField.field.isValid.minLength ) {
+				return {
+					minLength: {
+						type: 'invalid',
+						message: __( 'Value is too short.' ),
+					},
+				};
+			}
+		}
+	}
+
+	// Validate the field: isValid.maxLength
+	if (
+		!! formField.field &&
+		formField.field.isValid.maxLength !== undefined &&
+		( formField.field.type === 'text' ||
+			formField.field.type === 'email' ||
+			formField.field.type === 'url' ||
+			formField.field.type === 'telephone' ||
+			formField.field.type === 'password' )
+	) {
+		const value = formField.field.getValue( { item } );
+		if ( ! isEmptyNullOrUndefined( value ) ) {
+			if ( String( value ).length > formField.field.isValid.maxLength ) {
+				return {
+					maxLength: {
+						type: 'invalid',
+						message: __( 'Value is too long.' ),
+					},
+				};
+			}
+		}
+	}
+
 	// Validate the field: isValid.elements (static)
 	if (
 		!! formField.field &&

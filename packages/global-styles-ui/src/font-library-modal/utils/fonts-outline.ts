@@ -1,7 +1,7 @@
 /**
- * Internal dependencies
+ * WordPress dependencies
  */
-import type { FontFace, FontFamily } from '../types';
+import type { FontFace, FontFamily } from '@wordpress/core-data';
 
 export function getFontsOutline(
 	fonts: FontFamily[]

@@ -4,11 +4,15 @@
  */
 
 export default [
-	'--wpds-border-radius-x-small',
-	'--wpds-border-radius-small',
-	'--wpds-border-radius-medium',
-	'--wpds-border-radius-large',
-	'--wpds-border-width-focus',
+	'--wpds-border-radius-surface-xs',
+	'--wpds-border-radius-surface-sm',
+	'--wpds-border-radius-surface-md',
+	'--wpds-border-radius-surface-lg',
+	'--wpds-border-width-surface-xs',
+	'--wpds-border-width-surface-sm',
+	'--wpds-border-width-surface-md',
+	'--wpds-border-width-surface-lg',
+	'--wpds-border-width-interactive-focus',
 	'--wpds-color-bg-surface-neutral',
 	'--wpds-color-bg-surface-neutral-strong',
 	'--wpds-color-bg-surface-neutral-weak',

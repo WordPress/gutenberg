@@ -28,6 +28,9 @@ export const Default: Story = {
 		backgroundColor: 'info',
 		color: 'info',
 		padding: 'sm',
+		borderColor: 'brand',
+		borderRadius: 'md',
+		borderWidth: 'sm',
 	},
 	argTypes: {
 		padding: {

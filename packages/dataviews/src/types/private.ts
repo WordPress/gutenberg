@@ -1,7 +1,14 @@
 /**
  * Internal dependencies
  */
-import type { Field, FormatDate, NormalizedField, Operator } from './field-api';
+import type {
+	Field,
+	FormatDate,
+	FormatInteger,
+	FormatNumber,
+	NormalizedField,
+	Operator,
+} from './field-api';
 
 export type SelectionOrUpdater = string[] | ( ( prev: string[] ) => string[] );
 export type SetSelection = ( selection: SelectionOrUpdater ) => void;
@@ -19,5 +26,9 @@ export type FieldType< Item > = Pick<
 	defaultOperators: Operator[];
 	getFormat: (
 		field: Field< Item >
-	) => Record< string, any > | Required< FormatDate >;
+	) =>
+		| Record< string, any >
+		| Required< FormatDate >
+		| Required< FormatNumber >
+		| Required< FormatInteger >;
 };

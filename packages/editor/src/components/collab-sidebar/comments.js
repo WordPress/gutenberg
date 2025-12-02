@@ -69,22 +69,29 @@ export function Comments( {
 	const { selectBlock, toggleBlockSpotlight } = unlock(
 		useDispatch( blockEditorStore )
 	);
-	const { blockCommentId, selectedBlockClientId, orderedBlockIds } =
-		useSelect( ( select ) => {
-			const {
-				getBlockAttributes,
-				getSelectedBlockClientId,
-				getClientIdsWithDescendants,
-			} = select( blockEditorStore );
-			const clientId = getSelectedBlockClientId();
-			return {
-				blockCommentId: clientId
-					? getBlockAttributes( clientId )?.metadata?.noteId
-					: null,
-				selectedBlockClientId: clientId,
-				orderedBlockIds: getClientIdsWithDescendants(),
-			};
-		}, [] );
+
+	const {
+		blockCommentId,
+		selectedBlockClientId,
+		orderedBlockIds,
+		blockMode,
+	} = useSelect( ( select ) => {
+		const {
+			getBlockAttributes,
+			getSelectedBlockClientId,
+			getClientIdsWithDescendants,
+			getBlockMode,
+		} = select( blockEditorStore );
+		const clientId = getSelectedBlockClientId();
+		return {
+			blockCommentId: clientId
+				? getBlockAttributes( clientId )?.metadata?.noteId
+				: null,
+			selectedBlockClientId: clientId,
+			orderedBlockIds: getClientIdsWithDescendants(),
+			blockMode: clientId ? getBlockMode( clientId ) : null,
+		};
+	}, [] );
 
 	const relatedBlockElement = useBlockElement( selectedBlockClientId );
 
@@ -311,6 +318,7 @@ export function Comments( {
 		threads,
 		selectedThread,
 		setCanvasMinHeight,
+		blockMode,
 	] );
 
 	const handleThreadNavigation = ( event, thread, isSelected ) => {

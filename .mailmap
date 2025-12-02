@@ -1,0 +1,121 @@
+# Aliases names and emails inside of commits.
+# See https://git-scm.com/docs/gitmailmap
+#
+# Some entries appear as duplicates, but are both required to correct
+# identities with just the wrong name as well as those with the wrong
+# name and also the wrong email address.
+
+# Accounts with a display name.
+Aaron Jorbin <jorbin@git.wordpress.org> <aaron@jorb.in>
+Aaron Jorbin <jorbin@git.wordpress.org> <aaronjorbin@users.noreply.github.com>
+Aaron Robertshaw <aaronrobertshaw@git.wordpress.org> <60436221+aaronrobertshaw@users.noreply.github.com>
+Adam Silverstein <adamsilverstein@git.wordpress.org> <adam@10up.com>
+Adam Silverstein <adamsilverstein@git.wordpress.org> <adam@earthbound.com>
+Adam Silverstein <adamsilverstein@git.wordpress.org> <adamjs@google.com>
+Adam Silverstein <adamsilverstein@git.wordpress.org> <adamsilverstein@earthboundhosting.com>
+Adam Zieliński <zieladam@git.wordpress.org> <adam@adamziel.com>
+Aki Hamano <wildworks@git.wordpress.org> <54422211+t-hamano@users.noreply.github.com>
+Alex Lende <ajlende@git.wordpress.org> <ajlende@gmail.com>
+Alex Lende <ajlende@git.wordpress.org> <alex+github.com@lende.xyz>
+Alex Lende <ajlende@git.wordpress.org> <alex@lende.xyz>
+Alexander Botteram <xyfi@git.wordpress.org> <alexander@yoast.com>
+Alexander Botteram <xyfi@git.wordpress.org> <Xyfi@users.noreply.github.com>
+Andrea Fercia <afercia@git.wordpress.org> <a.fercia@gmail.com>
+Andrei Draganescu <andraganescu@git.wordpress.org> <andrei.draganescu@automattic.com>
+Andrei Draganescu <andraganescu@git.wordpress.org> <me@andreidraganescu.info>
+Andrei Draganescu <andraganescu@git.wordpress.org> <me@andreidraganescue.info>
+Andrew Duthie <aduth@git.wordpress.org> <1779930+aduth@users.noreply.github.com>
+Andrew Duthie <aduth@git.wordpress.org> <aduthie7@gmail.com>
+Andrew Duthie <aduth@git.wordpress.org> <andrew@andrewduthie.com>
+Andrew Ozz <azaozz@git.wordpress.org> <743931+azaozz@users.noreply.github.com>
+Andrew Ozz <azaozz@git.wordpress.org> <azaozz@users.noreply.github.com>
+Andrew Serong <andrewserong@git.wordpress.org> <14988353+andrewserong@users.noreply.github.com>
+Andrew Serong <andrewserong@git.wordpress.org> <andrewserong@gmail.com>
+André Maneiro <oandregal@git.wordpress.org> <583546+oandregal@users.noreply.github.com>
+André Maneiro <oandregal@git.wordpress.org> <andres.maneiro@automattic.com>
+André Maneiro <oandregal@git.wordpress.org> <nosolosw@users.noreply.github.com>
+Artemio Morales <artemiosans@git.wordpress.org> <artemio.morales@a8c.com>
+Artemio Morales <artemiosans@git.wordpress.org> <artemio@altsalt.com>
+Artemio Morales <artemiosans@git.wordpress.org> <ra.morales244@gmail.com>
+Artemio Morales <artemiosans@git.wordpress.org> <ric.morales22@gmail.com>
+Ben Dwyer <scruffian@git.wordpress.org> <ben@scruffian.com>
+Bernie Reiter <bernhard-reiter@git.wordpress.org> <96308+ockham@users.noreply.github.com>
+Bernie Reiter <bernhard-reiter@git.wordpress.org> <ockham@raz.or.at>
+Carolina Nymark <poena@git.wordpress.org> <hi@themesbycarolina.com>
+Carolina Nymark <poena@git.wordpress.org> <myazalea@hotmail.com>
+Daniel Richards <talldanwp@git.wordpress.org> <daniel.p.richards@gmail.com>
+Daniel Richards <talldanwp@git.wordpress.org> <daniel.richards@automattic.com>
+David Calhoun <dpcalhoun@git.wordpress.org> <438664+dcalhoun@users.noreply.github.com>
+David Calhoun <dpcalhoun@git.wordpress.org> <dpcalhoun@gmail.com>
+David Calhoun <dpcalhoun@git.wordpress.org> <github@davidcalhoun.me>
+David Smith <get_dave@git.wordpress.org> <getdavemail@gmail.com>
+Dennis Snell <dmsnell@git.wordpress.org> <dennis.snell@automattic.com>
+Ella van Durpe <ellatrix@git.wordpress.org> <4710635+ellatrix@users.noreply.github.com>
+Ella van Durpe <ellatrix@git.wordpress.org> <ella@iseulde.com>
+Ella van Durpe <ellatrix@git.wordpress.org> <ella@vandurpe.com>
+Ella van Durpe <ellatrix@git.wordpress.org> <iseulde@automattic.com>
+Ella van Durpe <ellatrix@git.wordpress.org> <wp@iseulde.com>
+George Mamadashvili <mamaduka@git.wordpress.org> <georgemamadashvili@gmail.com>
+Gerardo Pacheco <geriux@git.wordpress.org> <gerardo.pacheco@automattic.com>
+Gerardo Pacheco <geriux@git.wordpress.org> <gerardo.sicart@gmail.com>
+Grzegorz (Greg) Ziółkowski <gziolo@git.wordpress.org> <grzegorz.ziolkowski@automattic.com>
+Grzegorz (Greg) Ziółkowski <gziolo@git.wordpress.org> <grzegorz@gziolo.pl>
+Héctor Prieto <preithor@git.wordpress.org> <27339341+priethor@users.noreply.github.com>
+Isabel Brison <isabel_brison@git.wordpress.org> <isabel@tellthemachines.com>
+Isabel Brison <isabel_brison@git.wordpress.org> <tellthemachines@users.noreply.github.com>
+James Koster <jameskoster@git.wordpress.org> <james@jameskoster.co.uk>
+James Nylen <jnylen0@git.wordpress.org> <jnylen@gmail.com>
+Jarda Snajdr <jsnajdr@git.wordpress.org> <jsnajdr@gmail.com>
+Joen Asmussen <joen@git.wordpress.org> <1204802+jasmussen@users.noreply.github.com>
+Joen Asmussen <joen@git.wordpress.org> <asmussen@gmail.com>
+Joen Asmussen <joen@git.wordpress.org> <joen@automattic.com>
+Jon Surrell <jonsurrell@git.wordpress.org> <jon.surrell@automattic.com>
+Jon Surrell <jonsurrell@git.wordpress.org> <sirreal@users.noreply.github.com>
+Jonathan Desrosiers <desrosj@git.wordpress.org> <359867+desrosj@users.noreply.github.com>
+Jonathan Desrosiers <desrosj@git.wordpress.org> <desrosj@users.noreply.github.com>
+Jorge Costa <jorgefilipecosta@git.wordpress.org> <jorge.costa@automattic.com>
+Jorge Costa <jorgefilipecosta@git.wordpress.org> <jorge.costa@developer.pt>
+Kai Hao <kevin940726@git.wordpress.org> <kevin830726@gmail.com>
+Lena Morita <0mirka00@git.wordpress.org> <lena@jaguchi.com>
+Marco Ciampini <mciampini@git.wordpress.org> <marco.ciampo@gmail.com>
+Marcus Kazmierczak <mkaz@git.wordpress.org> <marcus@mkaz.com>
+Marin Atanasov <tyxla@git.wordpress.org> <8436925+tyxla@users.noreply.github.com>
+Marin Atanasov <tyxla@git.wordpress.org> <tyxla@abv.bg>
+Marin Atanasov <tyxla@git.wordpress.org> <tyxla@users.noreply.github.com>
+Matías Ventura <mtias@git.wordpress.org> <mv@matiasventura.com>
+Miguel Fonseca <mcsf@git.wordpress.org> <150562+mcsf@users.noreply.github.com>
+Miguel Fonseca <mcsf@git.wordpress.org> <miguelcsf@gmail.com>
+Nick Diego <ndiego@git.wordpress.org> <ndiego@outermost.co>
+Nick Diego <ndiego@git.wordpress.org> <ndiego@outermostdesign.com>
+Nick Diego <ndiego@git.wordpress.org> <nick.diego@automattic.com>
+Nick Diego <ndiego@git.wordpress.org> <nickmdiego@gmail.com>
+Nik Tsekouras <ntsekouras@git.wordpress.org> <ntsekouras@outlook.com>
+Pascal Birchler <swisspidy@git.wordpress.org> <hello@pascalbirchler.ch>
+Pascal Birchler <swisspidy@git.wordpress.org> <pascal.birchler@gmail.com>
+Pascal Birchler <swisspidy@git.wordpress.org> <pascalb@google.com>
+Peter Wilson <peterwilsoncc@git.wordpress.org> <519727+peterwilsoncc@users.noreply.github.com>
+Peter Wilson <peterwilsoncc@git.wordpress.org> <peterwilsoncc@users.noreply.github.com>
+Q <itsjonq@git.wordpress.org> <hello@jonquach.com>
+Ramon <ramonopoly@git.wordpress.org> <ramonjd@users.noreply.github.com>
+Riad Benguella <youknowriad@git.wordpress.org> <benguella@gmail.com>
+Rich Tabor <richtabor@git.wordpress.org> <hello@themebeans.com>
+Rich Tabor <richtabor@git.wordpress.org> <hi@richtabor.com>
+Robert Anderson <noisysocks@git.wordpress.org> <noisysocks@users.noreply.github.com>
+Robert Anderson <noisysocks@git.wordpress.org> <robert@noisysocks.com>
+Ryan Welcher <welcher@git.wordpress.org> <me@ryanwelcher.com>
+Ryan Welcher <welcher@git.wordpress.org> <ryan.welcher@10up.com>
+Ryan Welcher <welcher@git.wordpress.org> <ryan.welcher@automattic.com>
+Sara Marcondes <sarayourfriend@git.wordpress.org> <24264157+sarayourfriend@users.noreply.github.com>
+Sara Marcondes <sarayourfriend@git.wordpress.org> <saram@fastmail.com>
+Sara Marcondes <sarayourfriend@git.wordpress.org> <sarayourfriend@fastmail.com>
+Sarah Norris <mikachan@git.wordpress.org> <1645628+mikachan@users.noreply.github.com>
+Sarah Norris <mikachan@git.wordpress.org> <sarah@sekai.co.uk>
+Siobhan Bamber <siobhyb@git.wordpress.org> <SiobhyB@users.noreply.github.com>
+Siobhan Bamber <siobhyb@git.wordpress.org> <siobhan@automattic.com>
+Sören Wünsch <soean@git.wordpress.org> <Soeren.Wrede@parshipgroup.com>
+Sören Wünsch <soean@git.wordpress.org> <soerenwrede@gmail.com>
+Tammie Lister <karmatosed@git.wordpress.org> <karmatosed@gmail.com>
+Tammie Lister <karmatosed@git.wordpress.org> <tammie@automattic.com>
+Weston Ruter <westonruter@git.wordpress.org> <weston@ruter.net>
+Weston Ruter <westonruter@git.wordpress.org> <weston@xwp.co>
+Weston Ruter <westonruter@git.wordpress.org> <westonruter@google.com>

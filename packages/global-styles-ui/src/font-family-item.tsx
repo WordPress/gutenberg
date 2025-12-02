@@ -8,13 +8,13 @@ import {
 	FlexItem,
 } from '@wordpress/components';
 import { useContext } from '@wordpress/element';
+import type { FontFamily } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
  */
 import { FontLibraryContext } from './font-library-modal/context';
 import { getFamilyPreviewStyle } from './font-library-modal/utils/preview-styles';
-import type { FontFamily } from './font-library-modal/types';
 
 interface FontFamilyItemProps {
 	font: FontFamily;

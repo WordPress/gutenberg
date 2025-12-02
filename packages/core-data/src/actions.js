@@ -88,10 +88,10 @@ export function receiveEntityRecords(
 	kind,
 	name,
 	records,
-	query,
+	query = undefined,
 	invalidateCache = false,
-	edits,
-	meta
+	edits = undefined,
+	meta = undefined
 ) {
 	// Auto drafts should not have titles, but some plugins rely on them so we can't filter this
 	// on the server.

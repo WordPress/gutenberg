@@ -115,3 +115,17 @@ function gutenberg_filter_comment_count_query_exclude_block_comments( $query ) {
 	return $query;
 }
 add_filter( 'query', 'gutenberg_filter_comment_count_query_exclude_block_comments' );
+
+/**
+ * Adjusts the comments list table query so `comment_type=note` never displays.
+ *
+ * @param array $args An array of get_comments() arguments.
+ * @return array Possibly modified arguments for get_comments().
+ */
+function gutenberg_hide_note_from_comment_list_table( $args ) {
+	if ( ! empty( $_REQUEST['comment_type'] ) && 'note' === $_REQUEST['comment_type'] ) {
+		unset( $args['type'] );
+	}
+	return $args;
+}
+add_filter( 'comments_list_table_query_args', 'gutenberg_hide_note_from_comment_list_table' );

@@ -37,6 +37,7 @@
 		{ "path": "packages/html-entities" },
 		{ "path": "packages/i18n" },
 		{ "path": "packages/icons" },
+		{ "path": "packages/image-cropper" },
 		{ "path": "packages/interactivity" },
 		{ "path": "packages/interactivity/tsconfig.test.json" },
 		{ "path": "packages/interactivity-router" },

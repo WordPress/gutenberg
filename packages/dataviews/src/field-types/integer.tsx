@@ -6,7 +6,12 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import type { Rules } from '../types';
+import type {
+	DataViewRenderFieldProps,
+	Field,
+	FormatInteger,
+	Rules,
+} from '../types';
 import type { FieldType } from '../types/private';
 import {
 	OPERATOR_IS,
@@ -21,8 +26,63 @@ import {
 	OPERATOR_IS_NOT_ALL,
 	OPERATOR_BETWEEN,
 } from '../constants';
-import render from './utils/render-default';
+import RenderFromElements from './utils/render-from-elements';
 import sort from './utils/sort-number';
+
+function getFormat< Item >( field: Field< Item > ): Required< FormatInteger > {
+	const fieldFormat = field.format as FormatInteger | undefined;
+	return {
+		separatorThousand:
+			fieldFormat?.separatorThousand !== undefined &&
+			typeof fieldFormat.separatorThousand === 'string'
+				? fieldFormat.separatorThousand
+				: ',',
+	};
+}
+
+export function formatInteger(
+	value: number,
+	format: Required< FormatInteger >
+): string {
+	if ( ! Number.isFinite( value ) ) {
+		return String( value );
+	}
+	const { separatorThousand } = format;
+	const integerValue = Math.trunc( value );
+	if ( ! separatorThousand ) {
+		return String( integerValue );
+	}
+	// Add thousand separators.
+	return String( integerValue ).replace(
+		/\B(?=(\d{3})+(?!\d))/g,
+		separatorThousand
+	);
+}
+
+function render( { item, field }: DataViewRenderFieldProps< any > ) {
+	if ( field.hasElements ) {
+		return <RenderFromElements item={ item } field={ field } />;
+	}
+
+	const value = field.getValue( { item } );
+	if ( [ null, undefined ].includes( value ) ) {
+		return '';
+	}
+
+	// If the field type is integer, we've already normalized the format,
+	// and so it's safe to tell TypeScript to trust us ("as Required<FormatInteger>").
+	//
+	// There're no runtime paths where this render function is called with a non-integer field,
+	// but TypeScript is unable to infer this, hence the type assertion.
+	let format: Required< FormatInteger >;
+	if ( field.type !== 'integer' ) {
+		format = getFormat( field as Field< any > );
+	} else {
+		format = field.format as Required< FormatInteger >;
+	}
+
+	return formatInteger( Number( value ), format );
+}
 
 const isValid: Rules< any > = {
 	elements: true,
@@ -71,5 +131,5 @@ export default {
 		OPERATOR_IS_ALL,
 		OPERATOR_IS_NOT_ALL,
 	],
-	getFormat: () => ( {} ),
+	getFormat,
 } satisfies FieldType< any >;
