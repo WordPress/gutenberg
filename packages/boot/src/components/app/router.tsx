@@ -29,6 +29,7 @@ const {
 	RouterProvider,
 	createBrowserHistory,
 	parseHref,
+	useLoaderData,
 } = unlock( routePrivateApis );
 
 // Not found component
@@ -45,10 +46,15 @@ function NotFoundComponent() {
 function RouteComponent( {
 	stage: Stage,
 	inspector: Inspector,
+	routePath,
 }: {
 	stage?: ComponentType;
 	inspector?: ComponentType;
+	routePath: string;
 } ) {
+	const { inspector: showInspector } =
+		useLoaderData( { from: routePath } ) ?? {};
+
 	return (
 		<>
 			{ Stage && (
@@ -56,7 +62,7 @@ function RouteComponent( {
 					<Stage />
 				</div>
 			) }
-			{ Inspector && (
+			{ Inspector && showInspector && (
 				<div className="boot-layout__inspector">
 					<Inspector />
 				</div>
@@ -76,11 +82,13 @@ async function createRouteFromDefinition(
 	route: Route,
 	parentRoute: AnyRoute
 ) {
-	// Load route module for lifecycle functions if specified
 	let routeConfig: {
 		beforeLoad?: ( context: RouteLoaderContext ) => void | Promise< void >;
 		loader?: ( context: RouteLoaderContext ) => Promise< unknown >;
 		canvas?: ( context: RouteLoaderContext ) => Promise< any >;
+		inspector?: (
+			context: RouteLoaderContext
+		) => boolean | Promise< boolean >;
 	} = {};
 
 	if ( route.route_module ) {
@@ -105,7 +113,6 @@ async function createRouteFromDefinition(
 				search: opts.deps || {},
 			};
 
-			// Call both loader and canvas functions if they exist
 			const [ loaderData, canvasData ] = await Promise.all( [
 				routeConfig.loader
 					? routeConfig.loader( context )
@@ -115,10 +122,15 @@ async function createRouteFromDefinition(
 					: Promise.resolve( undefined ),
 			] );
 
+			let inspector = true;
+			if ( routeConfig.inspector ) {
+				inspector = await routeConfig.inspector( context );
+			}
+
 			return {
 				...( loaderData as any ),
 				canvas: canvasData,
-				// Include content module path so Root can load custom canvas
+				inspector,
 				routeContentModule: route.content_module,
 			};
 		},
@@ -137,6 +149,7 @@ async function createRouteFromDefinition(
 					<RouteComponent
 						stage={ module.stage }
 						inspector={ module.inspector }
+						routePath={ route.path }
 					/>
 				);
 			},
