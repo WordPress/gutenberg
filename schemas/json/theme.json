@@ -1788,6 +1788,9 @@
 				},
 				":visited": {
 					"$ref": "#/definitions/stylesPropertiesComplete"
+				},
+				":placeholder": {
+					"$ref": "#/definitions/stylesPropertiesComplete"
 				}
 			}
 		},
@@ -1816,7 +1819,8 @@
 				":focus-visible",
 				":hover",
 				":link",
-				":visited"
+				":visited",
+				":placeholder"
 			]
 		},
 		"stylesElementsPropertiesComplete": {
