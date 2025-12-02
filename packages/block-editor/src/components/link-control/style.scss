@@ -48,7 +48,7 @@ $block-editor-link-control-number-of-actions: 1;
 				padding: $grid-unit-05;
 			}
 
-			.block-editor-link-control_preview-header {
+			.block-editor-link-control_link-information {
 				min-width: 100%;
 				margin-right: 0;
 			}
@@ -170,7 +170,7 @@ $block-editor-link-control-number-of-actions: 1;
 	border: 0;
 	padding: $grid-unit-20;
 
-	.block-editor-link-control__preview-header {
+	.block-editor-link-control__link-information {
 		margin-right: $grid-unit-10;
 		gap: $grid-unit-10;
 
