@@ -23,6 +23,11 @@ import { store as editorStore } from '../../store';
 
 const EMPTY_OBJECT = {};
 
+/**
+ * Renders controls for editing the blog posts page title.
+ *
+ * @return {JSX.Element|null} Blog title settings component, or null.
+ */
 export default function BlogTitle() {
 	const { editEntityRecord } = useDispatch( coreStore );
 	const { postsPageTitle, postsPageId, isTemplate, postSlug } = useSelect(

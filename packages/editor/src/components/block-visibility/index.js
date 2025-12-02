@@ -18,6 +18,11 @@ import { unlock } from '../../lock-unlock';
 const { BlockManager } = unlock( blockEditorPrivateApis );
 const EMPTY_ARRAY = [];
 
+/**
+ * Renders controls for hiding or showing editor blocks.
+ *
+ * @return {JSX.Element} Block visibility settings component.
+ */
 export default function BlockVisibility() {
 	const { showBlockTypes, hideBlockTypes } = unlock(
 		useDispatch( editorStore )
