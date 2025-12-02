@@ -283,20 +283,22 @@ export function getBlockStyleVariationSelector(
 		return variationClass;
 	}
 
-	const ancestorRegex = /((?::\([^)]+\))?\s*)([^\s:]+)/;
-	const addVariationClass = (
-		_match: string,
-		group1: string,
-		group2: string
-	) => {
-		return group1 + group2 + variationClass;
-	};
+	const ancestorRegex = /((?::+:?[\w-]+(?:\([^)]+\))?)+)$/;
+	const result = blockSelector.split( ',' ).map( ( part: string ) => {
+		part = part.trim();
 
-	const result = blockSelector
-		.split( ',' )
-		.map( ( part ) => part.replace( ancestorRegex, addVariationClass ) );
-
-	return result.join( ',' );
+		// Check if the part ends with a pseudo-selector
+		if ( ancestorRegex.test( part ) ) {
+			// Case 1: It ends with :not(), :hover, etc.
+			// We replace the match (the pseudo part) with "variationClass + match"
+			// '$1' represents the captured pseudo-class text
+			return part.replace( ancestorRegex, variationClass + '$1' );
+		}
+		// Case 2: It ends with a standard element or class
+		// We simply append the variation class to the end
+		return part + variationClass;
+	} );
+	return result.join( ', ' );
 }
 
 /**
