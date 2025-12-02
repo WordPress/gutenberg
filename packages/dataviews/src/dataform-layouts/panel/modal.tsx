@@ -71,7 +71,7 @@ function ModalContent< Item >( {
 			elements: f.isValid.elements?.constraint,
 			min: f.isValid.min?.constraint,
 			max: f.isValid.max?.constraint,
-			pattern: f.isValid.pattern?.constraint?.source,
+			pattern: f.isValid.pattern?.constraint,
 			minLength: f.isValid.minLength?.constraint,
 			maxLength: f.isValid.maxLength?.constraint,
 		},

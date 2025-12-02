@@ -82,18 +82,10 @@ export default function getIsValid< Item >(
 		field.isValid?.pattern !== undefined &&
 		fieldType.validate.pattern !== undefined
 	) {
-		try {
-			const regex = new RegExp( field.isValid.pattern );
-			pattern = {
-				constraint: regex,
-				validate: fieldType.validate.pattern,
-			};
-		} catch ( error ) {
-			pattern = {
-				constraint: null,
-				validate: () => false,
-			};
-		}
+		pattern = {
+			constraint: field.isValid?.pattern,
+			validate: fieldType.validate.pattern,
+		};
 	}
 
 	const custom = field.isValid?.custom ?? fieldType.validate.custom;

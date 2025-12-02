@@ -112,7 +112,7 @@ type NormalizedRule< Item, ConstraintType > = {
 export type NormalizedRules< Item > = {
 	required?: NormalizedRule< Item, boolean >;
 	elements?: NormalizedRule< Item, boolean >;
-	pattern?: NormalizedRule< Item, RegExp | null >;
+	pattern?: NormalizedRule< Item, string >;
 	minLength?: NormalizedRule< Item, number >;
 	maxLength?: NormalizedRule< Item, number >;
 	min?: NormalizedRule< Item, number >;
