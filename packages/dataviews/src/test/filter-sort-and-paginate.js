@@ -321,6 +321,7 @@ describe( 'filters', () => {
 			},
 			fields
 		);
+		expect( console ).toHaveWarned();
 		expect( result ).toHaveLength( 10 );
 		expect( result[ 0 ].name.title ).toBe( 'Moon' );
 		expect( result[ 1 ].name.title ).toBe( 'Io' );
