@@ -118,7 +118,12 @@ export default function LinkPreview( {
 				'is-url-title': displayTitle === displayURL,
 			} ) }
 		>
-			<Flex direction="row" align="center" justify="space-between">
+			<Flex
+				direction="row"
+				align="center"
+				justify="space-between"
+				gap={ 0 }
+			>
 				<Flex
 					className="block-editor-link-control__preview-header"
 					aria-label={
