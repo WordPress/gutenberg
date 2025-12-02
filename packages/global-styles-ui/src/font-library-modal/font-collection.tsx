@@ -33,9 +33,12 @@ import {
 	chevronLeft,
 	chevronRight,
 } from '@wordpress/icons';
-import {
-	useEntityRecord,
-	type FontCollection as FontCollectionType,
+import { useEntityRecord } from '@wordpress/core-data';
+import type {
+	FontCollection as FontCollectionType,
+	FontFace,
+	FontFamily,
+	CollectionFontFamily,
 } from '@wordpress/core-data';
 
 /**
@@ -53,7 +56,7 @@ import GoogleFontsConfirmDialog from './google-fonts-confirm-dialog';
 import { downloadFontFaceAssets } from './utils';
 import { sortFontFaces } from './utils/sort-font-faces';
 import CollectionFontVariant from './collection-font-variant';
-import type { FontFace, FontFamily, CollectionFontFamily } from './types';
+import type { FontFamilyToUpload } from './types';
 
 const DEFAULT_CATEGORY = {
 	slug: 'all',
@@ -193,7 +196,7 @@ function FontCollection( { slug }: { slug: string } ) {
 	const handleInstall = async () => {
 		setNotice( null );
 
-		const fontFamily = fontsToInstall[ 0 ];
+		const fontFamily: FontFamilyToUpload = fontsToInstall[ 0 ];
 
 		try {
 			if ( fontFamily?.fontFace ) {

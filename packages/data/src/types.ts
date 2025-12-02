@@ -159,6 +159,9 @@ export interface SelectorWithCustomCurrySignature {
 
 export interface DataRegistry {
 	register: ( store: StoreDescriptor< any > ) => void;
+	dispatch: < S extends StoreDescriptor< any > >(
+		store: S
+	) => ActionCreatorsOf< ConfigOf< S > >;
 }
 
 // Type Helpers.

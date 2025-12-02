@@ -37,6 +37,21 @@ type ForegroundColor =
 	| 'error'
 	| 'error-weak';
 
+type StrokeColor =
+	| 'brand'
+	| 'brand-strong'
+	| 'error'
+	| 'error-strong'
+	| 'info'
+	| 'info-strong'
+	| 'neutral'
+	| 'neutral-strong'
+	| 'neutral-weak'
+	| 'success'
+	| 'success-strong'
+	| 'warning'
+	| 'warning-strong';
+
 type DimensionVariant< T > = {
 	block?: T;
 	blockStart?: T;
@@ -66,6 +81,21 @@ export interface BoxProps extends ComponentProps< 'div' > {
 	 * The surface spacing design token or base unit multiplier for box padding.
 	 */
 	padding?: Size | DimensionVariant< Size >;
+
+	/**
+	 * The surface border radius design token.
+	 */
+	borderRadius?: Exclude< SizeToken, '2xs' >;
+
+	/**
+	 * The surface border width design token.
+	 */
+	borderWidth?: Exclude< SizeToken, '2xs' >;
+
+	/**
+	 * The surface border stroke color design token.
+	 */
+	borderColor?: StrokeColor;
 
 	/**
 	 * The content to be rendered inside the component.

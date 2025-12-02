@@ -28,16 +28,17 @@ import {
 } from '../constants';
 
 function getFormat< Item >( field: Field< Item > ): Required< FormatDate > {
+	const fieldFormat = field.format as FormatDate | undefined;
 	return {
 		date:
-			field.format?.date !== undefined &&
-			typeof field.format.date === 'string'
-				? field.format.date
+			fieldFormat?.date !== undefined &&
+			typeof fieldFormat.date === 'string'
+				? fieldFormat.date
 				: getSettings().formats.date,
 		weekStartsOn:
-			field.format?.weekStartsOn !== undefined &&
-			DAYS_OF_WEEK.includes( field.format?.weekStartsOn )
-				? field.format.weekStartsOn
+			fieldFormat?.weekStartsOn !== undefined &&
+			DAYS_OF_WEEK.includes( fieldFormat?.weekStartsOn )
+				? fieldFormat.weekStartsOn
 				: getSettings().l10n.startOfWeek,
 	};
 }

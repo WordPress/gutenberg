@@ -3,6 +3,7 @@
  */
 import type { Context } from './helpers';
 import type { BaseEntityRecords as _BaseEntityRecords } from './base-entity-records';
+import type { FontFace, FontFamily } from './font-family';
 
 declare module './base-entity-records' {
 	export namespace BaseEntityRecords {
@@ -35,25 +36,24 @@ declare module './base-entity-records' {
 	}
 }
 
-interface CollectionFontFamily {
+/**
+ * Collection wrapper for REST API font family responses.
+ */
+export interface CollectionFontFamily {
 	id: string;
-	font_family_settings: Record<
-		string,
-		{
-			name: string;
-			fontFamily: string;
-			slug: string;
-			fontFace: {
-				src: string;
-				fontWeight?: string;
-				fontStyle?: string;
-				fontFamily?: string;
-				preview?: string;
-			}[];
-			preview: string;
-		}
-	>;
+	font_family_settings: FontFamily;
 	categories?: string[];
+	_embedded?: {
+		font_faces?: CollectionFontFace[];
+	};
+}
+
+/**
+ * Collection wrapper for REST API font face responses.
+ */
+export interface CollectionFontFace {
+	id: string;
+	font_face_settings: FontFace;
 }
 
 export type FontCollection< C extends Context = 'edit' > =

@@ -245,7 +245,7 @@ export type Field< Item > = {
 	/**
 	 * Display format configuration for fields.
 	 */
-	format?: FormatDate;
+	format?: FormatDate | FormatNumber | FormatInteger;
 };
 
 /**
@@ -261,6 +261,32 @@ export type FormatDate = {
 	weekStartsOn?: DayNumber;
 };
 export type DayNumber = 0 | 1 | 2 | 3 | 4 | 5 | 6;
+
+/**
+ * Format for number fields:
+ *
+ * - separatorThousand: character to use for thousand separators (e.g., ',')
+ * - separatorDecimal: character to use for decimal point (e.g., '.')
+ * - decimals: number of decimal places to display (e.g., 2)
+ *
+ * If not provided, defaults to ',' for thousands, '.' for decimal, 2 decimals.
+ */
+export type FormatNumber = {
+	separatorThousand?: string;
+	separatorDecimal?: string;
+	decimals?: number;
+};
+
+/**
+ * Format for integer fields:
+ *
+ * - separatorThousand: character to use for thousand separators (e.g., ',')
+ *
+ * If not provided, defaults to ',' for thousands.
+ */
+export type FormatInteger = {
+	separatorThousand?: string;
+};
 
 type NormalizedFieldBase< Item > = Omit< Field< Item >, 'Edit' > & {
 	label: string;
@@ -284,9 +310,21 @@ export type NormalizedFieldDate< Item > = NormalizedFieldBase< Item > & {
 	format: Required< FormatDate >;
 };
 
+export type NormalizedFieldNumber< Item > = NormalizedFieldBase< Item > & {
+	type: 'number';
+	format: Required< FormatNumber >;
+};
+
+export type NormalizedFieldInteger< Item > = NormalizedFieldBase< Item > & {
+	type: 'integer';
+	format: Required< FormatInteger >;
+};
+
 export type NormalizedField< Item > =
 	| NormalizedFieldBase< Item >
-	| NormalizedFieldDate< Item >;
+	| NormalizedFieldDate< Item >
+	| NormalizedFieldNumber< Item >
+	| NormalizedFieldInteger< Item >;
 
 /**
  * A collection of dataview fields for a data type.

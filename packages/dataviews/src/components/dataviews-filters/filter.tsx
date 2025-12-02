@@ -55,6 +55,8 @@ import type {
 	Filter,
 	NormalizedField,
 	NormalizedFieldDate,
+	NormalizedFieldNumber,
+	NormalizedFieldInteger,
 	NormalizedFilter,
 	Operator,
 	Option,
@@ -62,6 +64,8 @@ import type {
 } from '../../types';
 import useElements from '../../hooks/use-elements';
 import parseDateTime from '../../field-types/utils/parse-date-time';
+import { formatNumber } from '../../field-types/number';
+import { formatInteger } from '../../field-types/integer';
 
 const ENTER = 'Enter';
 const SPACE = ' ';
@@ -521,6 +525,12 @@ export default function Filter( {
 			} catch ( e ) {
 				label = filterInView.value;
 			}
+		} else if ( field?.type === 'number' && typeof label === 'number' ) {
+			const numberField = field as NormalizedFieldNumber< any >;
+			label = formatNumber( label, numberField.format );
+		} else if ( field?.type === 'integer' && typeof label === 'number' ) {
+			const integerField = field as NormalizedFieldInteger< any >;
+			label = formatInteger( label, integerField.format );
 		}
 
 		activeElements = [

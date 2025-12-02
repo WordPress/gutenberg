@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import {
 	useBlockProps,
 	store as blockEditorStore,
@@ -98,7 +98,15 @@ export default function MathEdit( { attributes, setAttributes, isSelected } ) {
 										setError( null );
 									} catch ( err ) {
 										setError( err.message );
-										speak( err.message );
+										speak(
+											sprintf(
+												/* translators: %s: error message returned when parsing LaTeX. */
+												__(
+													'Error parsing mathematical expression: %s'
+												),
+												err.message
+											)
+										);
 									}
 									setAttributes( {
 										mathML: newMathML,
@@ -113,7 +121,11 @@ export default function MathEdit( { attributes, setAttributes, isSelected } ) {
 										intent="error"
 										className="wp-block-math__error"
 									>
-										{ error }
+										{ sprintf(
+											/* translators: %s: error message returned when parsing LaTeX. */
+											__( 'Error: %s' ),
+											error
+										) }
 									</Badge>
 									<style children=".wp-block-math__error .components-badge__content{white-space:normal}" />
 								</>

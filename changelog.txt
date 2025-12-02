@@ -1,5 +1,28 @@
 == Changelog ==
 
+= 22.2.0-rc.2 =
+
+
+## Changelog
+
+### Bug Fixes
+
+- Private APIs: Remove re-registration check. ([73610](https://github.com/WordPress/gutenberg/pull/73610))
+
+#### Templates API
+- Template Activation: Rename gutenberg_get_block_template. ([73582](https://github.com/WordPress/gutenberg/pull/73582))
+- Template Activation: Use string IDs when experiment is off. ([73585](https://github.com/WordPress/gutenberg/pull/73585))
+
+
+
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@ellatrix @mikachan
+
+
 = 22.2.0-rc.1 =
 
 
