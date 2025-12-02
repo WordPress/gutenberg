@@ -95,7 +95,7 @@
 		"@types/uuid": "8.3.1",
 		"@wordpress/build": "file:./packages/wp-build",
 		"ajv": "8.17.1",
-		"appium": "2.0.0",
+		"appium": "3.1.1",
 		"babel-jest": "29.7.0",
 		"babel-loader": "9.2.1",
 		"babel-plugin-inline-json-import": "0.3.2",
