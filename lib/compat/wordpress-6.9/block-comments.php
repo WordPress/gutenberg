@@ -129,3 +129,22 @@ function gutenberg_hide_note_from_comment_list_table( $args ) {
 	return $args;
 }
 add_filter( 'comments_list_table_query_args', 'gutenberg_hide_note_from_comment_list_table' );
+
+/**
+ * Override comment_count to exclude notes from the comment count.
+ *
+ * @param int|null $new     The new comment count. Default null.
+ * @param int      $old     The old comment count.
+ * @param int      $post_id Post ID.
+ * @return int|null The modified comment count.
+ */
+function gutenberg_exclude_notes_from_comment_count( $new_count, $old_count, $post_id ) {
+	global $wpdb;
+	// If another filter already set a count, respect it.
+	if ( null !== $new_count ) {
+		return $new_count;
+	}
+	$new_count = (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->comments WHERE comment_post_ID = %d AND comment_approved = '1' AND comment_type != 'note'", $post_id ) );
+	return $new_count;
+}
+add_filter( 'pre_wp_update_comment_count_now', 'gutenberg_exclude_notes_from_comment_count', 10, 3 );
