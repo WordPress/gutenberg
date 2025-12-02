@@ -1764,6 +1764,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/image-cropper",
+		"slug": "packages-image-cropper",
+		"markdown_source": "../packages/image-cropper/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/interactivity-router",
 		"slug": "packages-interactivity-router",
 		"markdown_source": "../packages/interactivity-router/README.md",
