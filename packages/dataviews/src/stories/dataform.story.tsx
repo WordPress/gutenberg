@@ -1121,7 +1121,7 @@ const ValidationComponent = ( {
 					required,
 					elements: elements !== 'none' ? true : false,
 					custom: maybeCustomRule( customIntegerRule ),
-					min: minMax ? 0 : undefined,
+					min: minMax ? 10 : undefined,
 					max: minMax ? 100 : undefined,
 				},
 			},
