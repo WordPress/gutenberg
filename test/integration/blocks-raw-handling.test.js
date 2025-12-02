@@ -569,4 +569,9 @@ describe( 'rawHandler', () => {
 <p style="border: 1px solid tomato;"></p>`;
 		expect( serialize( rawHandler( { HTML } ) ) ).toMatchSnapshot();
 	} );
+
+	it( 'should remove convertable spans', () => {
+		const HTML = `<span style="font-weight: 400">a</span>`;
+		expect( serialize( rawHandler( { HTML } ) ) ).toMatchSnapshot();
+	} );
 } );
