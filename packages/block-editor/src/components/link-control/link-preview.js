@@ -104,9 +104,6 @@ export default function LinkPreview( {
 
 	return (
 		<Flex
-			direction="row"
-			align="center"
-			justify="space-between"
 			role="group"
 			aria-label={ __( 'Manage link' ) }
 			className={ clsx( 'block-editor-link-control__preview', {
@@ -118,12 +115,7 @@ export default function LinkPreview( {
 				'is-url-title': displayTitle === displayURL,
 			} ) }
 		>
-			<Flex
-				direction="row"
-				align="center"
-				justify="space-between"
-				gap={ 0 }
-			>
+			<Flex gap={ 0 }>
 				<Flex
 					className="block-editor-link-control__preview-header"
 					aria-label={
