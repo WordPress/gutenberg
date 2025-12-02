@@ -133,7 +133,6 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 				<ItemGroup isBordered isSeparated>
 					{ bindableAttributes.map( ( attribute ) => {
 						const binding = bindings?.[ attribute ];
-						const { source: sourceName } = binding || {};
 
 						// Check if this specific attribute has compatible fields from any source.
 						const attributeType = getAttributeType(
@@ -162,12 +161,8 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 								<BlockBindingsAttributeControl
 									key={ attribute }
 									attribute={ attribute }
+									blockName={ blockName }
 									binding={ binding }
-									fields={
-										compatibleFieldsForAttribute?.[
-											sourceName
-										]
-									}
 								/>
 							);
 						}
@@ -176,10 +171,8 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 							<BlockBindingsAttributeControl
 								key={ attribute }
 								attribute={ attribute }
+								blockName={ blockName }
 								binding={ binding }
-								fields={
-									compatibleFieldsForAttribute?.[ sourceName ]
-								}
 							>
 								<Menu
 									placement={
