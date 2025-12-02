@@ -50,11 +50,9 @@ function filterTitleForDisplay( title ) {
 
 export default function LinkPreview( {
 	value,
-	ariaLabel = __( 'Manage link' ),
 	onEditClick,
 	hasRichPreviews = false,
 	hasUnlinkControl = false,
-	hasCopyControl = true,
 	onRemove,
 } ) {
 	const showIconLabels = useSelect(
@@ -106,7 +104,7 @@ export default function LinkPreview( {
 	return (
 		<div
 			role="group"
-			aria-label={ ariaLabel }
+			aria-label={ __( 'Manage link' ) }
 			className={ clsx( 'block-editor-link-control__preview', {
 				'is-current': true,
 				'is-rich': hasRichData,
@@ -161,15 +159,13 @@ export default function LinkPreview( {
 						) }
 					</span>
 				</span>
-				{ typeof onEditClick === 'function' && (
-					<Button
-						icon={ pencil }
-						label={ __( 'Edit link' ) }
-						onClick={ onEditClick }
-						size="compact"
-						showTooltip={ ! showIconLabels }
-					/>
-				) }
+				<Button
+					icon={ pencil }
+					label={ __( 'Edit link' ) }
+					onClick={ onEditClick }
+					size="compact"
+					showTooltip={ ! showIconLabels }
+				/>
 				{ hasUnlinkControl && (
 					<Button
 						icon={ linkOff }
@@ -179,17 +175,15 @@ export default function LinkPreview( {
 						showTooltip={ ! showIconLabels }
 					/>
 				) }
-				{ hasCopyControl && (
-					<Button
-						icon={ copySmall }
-						label={ __( 'Copy link' ) }
-						ref={ ref }
-						accessibleWhenDisabled
-						disabled={ isEmptyURL }
-						size="compact"
-						showTooltip={ ! showIconLabels }
-					/>
-				) }
+				<Button
+					icon={ copySmall }
+					label={ __( 'Copy link' ) }
+					ref={ ref }
+					accessibleWhenDisabled
+					disabled={ isEmptyURL }
+					size="compact"
+					showTooltip={ ! showIconLabels }
+				/>
 				<ViewerSlot fillProps={ value } />
 			</div>
 		</div>
