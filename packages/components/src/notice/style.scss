@@ -46,12 +46,6 @@
 	margin-top: $grid-unit-15;
 }
 
-.components-notice__action.components-button {
-	&.is-secondary {
-		vertical-align: initial;
-	}
-}
-
 .components-notice__dismiss {
 	color: $gray-700;
 
@@ -80,10 +74,5 @@
 		margin-top: $grid-unit-15;
 		margin-bottom: $grid-unit-15;
 		line-height: 2;
-	}
-
-	.components-notice__action.components-button {
-		display: block;
-		margin-left: 0;
 	}
 }
