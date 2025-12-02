@@ -80,12 +80,10 @@ export default function BlockBindingsAttributeControl( {
 		[ blockContext ]
 	);
 
-	const { canUpdateBlockBindings } = useSelect( ( select ) => {
-		return {
-			canUpdateBlockBindings:
-				select( blockEditorStore ).getSettings().canUpdateBlockBindings,
-		};
-	} );
+	const { canUpdateBlockBindings } = useSelect( ( select ) => ( {
+		canUpdateBlockBindings:
+			select( blockEditorStore ).getSettings().canUpdateBlockBindings,
+	} ) );
 
 	// Check if this attribute has compatible fields from any source.
 	const attributeType = getAttributeType( blockName, attribute );
