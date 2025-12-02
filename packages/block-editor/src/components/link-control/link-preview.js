@@ -50,9 +50,11 @@ function filterTitleForDisplay( title ) {
 
 export default function LinkPreview( {
 	value,
+	ariaLabel = __( 'Manage link' ),
 	onEditClick,
 	hasRichPreviews = false,
 	hasUnlinkControl = false,
+	hasCopyControl = true,
 	onRemove,
 } ) {
 	const showIconLabels = useSelect(
@@ -104,8 +106,8 @@ export default function LinkPreview( {
 	return (
 		<div
 			role="group"
-			aria-label={ __( 'Manage link' ) }
-			className={ clsx( 'block-editor-link-control__search-item', {
+			aria-label={ ariaLabel }
+			className={ clsx( 'block-editor-link-control__preview', {
 				'is-current': true,
 				'is-rich': hasRichData,
 				'is-fetching': !! isFetching,
@@ -114,9 +116,9 @@ export default function LinkPreview( {
 				'is-url-title': displayTitle === displayURL,
 			} ) }
 		>
-			<div className="block-editor-link-control__search-item-top">
+			<div className="block-editor-link-control__preview-top">
 				<span
-					className="block-editor-link-control__search-item-header"
+					className="block-editor-link-control__preview-header"
 					role="figure"
 					aria-label={
 						/* translators: Accessibility text for the link preview when editing a link. */
@@ -125,7 +127,7 @@ export default function LinkPreview( {
 				>
 					<span
 						className={ clsx(
-							'block-editor-link-control__search-item-icon',
+							'block-editor-link-control__preview-icon',
 							{
 								'is-image': richData?.icon,
 							}
@@ -133,11 +135,11 @@ export default function LinkPreview( {
 					>
 						{ icon }
 					</span>
-					<span className="block-editor-link-control__search-item-details">
+					<span className="block-editor-link-control__preview-details">
 						{ ! isEmptyURL ? (
 							<>
 								<ExternalLink
-									className="block-editor-link-control__search-item-title"
+									className="block-editor-link-control__preview-title"
 									href={ value.url }
 								>
 									<Truncate numberOfLines={ 1 }>
@@ -145,7 +147,7 @@ export default function LinkPreview( {
 									</Truncate>
 								</ExternalLink>
 								{ ! isUrlRedundant && (
-									<span className="block-editor-link-control__search-item-info">
+									<span className="block-editor-link-control__preview-info">
 										<Truncate numberOfLines={ 1 }>
 											{ displayURL }
 										</Truncate>
@@ -153,19 +155,21 @@ export default function LinkPreview( {
 								) }
 							</>
 						) : (
-							<span className="block-editor-link-control__search-item-error-notice">
+							<span className="block-editor-link-control__preview-error-notice">
 								{ __( 'Link is empty' ) }
 							</span>
 						) }
 					</span>
 				</span>
-				<Button
-					icon={ pencil }
-					label={ __( 'Edit link' ) }
-					onClick={ onEditClick }
-					size="compact"
-					showTooltip={ ! showIconLabels }
-				/>
+				{ typeof onEditClick === 'function' && (
+					<Button
+						icon={ pencil }
+						label={ __( 'Edit link' ) }
+						onClick={ onEditClick }
+						size="compact"
+						showTooltip={ ! showIconLabels }
+					/>
+				) }
 				{ hasUnlinkControl && (
 					<Button
 						icon={ linkOff }
@@ -175,15 +179,17 @@ export default function LinkPreview( {
 						showTooltip={ ! showIconLabels }
 					/>
 				) }
-				<Button
-					icon={ copySmall }
-					label={ __( 'Copy link' ) }
-					ref={ ref }
-					accessibleWhenDisabled
-					disabled={ isEmptyURL }
-					size="compact"
-					showTooltip={ ! showIconLabels }
-				/>
+				{ hasCopyControl && (
+					<Button
+						icon={ copySmall }
+						label={ __( 'Copy link' ) }
+						ref={ ref }
+						accessibleWhenDisabled
+						disabled={ isEmptyURL }
+						size="compact"
+						showTooltip={ ! showIconLabels }
+					/>
+				) }
 				<ViewerSlot fillProps={ value } />
 			</div>
 		</div>
