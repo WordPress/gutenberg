@@ -65,32 +65,6 @@ function getFirstValidationError(
 	return undefined;
 }
 
-function hasInvalidValidation( validity: FieldValidity | undefined ): boolean {
-	if ( ! validity ) {
-		return false;
-	}
-
-	for ( const [ key, validation ] of Object.entries( validity ) ) {
-		if ( key === 'children' ) {
-			continue;
-		}
-		if ( validation?.type === 'invalid' ) {
-			return true;
-		}
-	}
-
-	// Check children recursively
-	if ( validity.children ) {
-		for ( const childValidity of Object.values( validity.children ) ) {
-			if ( hasInvalidValidation( childValidity ) ) {
-				return true;
-			}
-		}
-	}
-
-	return false;
-}
-
 const getFieldDefinition = < Item, >(
 	field: NormalizedFormField,
 	fields: NormalizedField< Item >[]
@@ -180,10 +154,8 @@ export default function FormPanelField< Item >( {
 	}
 
 	const labelPosition = layout.labelPosition;
-	const hasError = hasInvalidValidation( validity );
 	const errorMessage = getFirstValidationError( validity );
-
-	const showError = touched && hasError;
+	const showError = touched && !! errorMessage;
 	const labelClassName = clsx(
 		'dataforms-layouts-panel__field-label',
 		`dataforms-layouts-panel__field-label--label-position-${ labelPosition }`,
