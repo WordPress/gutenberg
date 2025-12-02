@@ -55,25 +55,22 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 		[ blockName ]
 	);
 
-	const sources = useSelect(
+	const { hasCompatibleFields } = useSelect(
 		( select ) => {
 			const {
 				getAllBlockBindingsSources,
 				getBlockBindingsSourceFieldsList,
 			} = unlock( select( blocksStore ) );
-			const fields = {};
-			Object.entries( getAllBlockBindingsSources() ).forEach(
-				( [ sourceName, source ] ) => {
-					const fieldsList = getBlockBindingsSourceFieldsList(
-						source,
-						blockContext
-					);
-					if ( fieldsList?.length ) {
-						fields[ sourceName ] = fieldsList;
-					}
-				}
-			);
-			return fields;
+
+			return {
+				hasCompatibleFields: Object.values(
+					getAllBlockBindingsSources()
+				).some(
+					( source ) =>
+						getBlockBindingsSourceFieldsList( source, blockContext )
+							?.length > 0
+				),
+			};
 		},
 		[ blockContext ]
 	);
@@ -84,8 +81,6 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 	}
 
 	const { bindings } = metadata || {};
-
-	const hasCompatibleFields = Object.keys( sources ).length > 0;
 
 	if ( bindings === undefined && ! hasCompatibleFields ) {
 		return null;
