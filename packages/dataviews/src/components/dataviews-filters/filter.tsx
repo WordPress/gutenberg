@@ -118,7 +118,8 @@ const FilterText = ( {
 				/* translators: 1: Filter name. 2: Operator name. 3: Filter value. e.g.: "Author is any: Admin, Editor". */
 				__( '<Name>%1$s %2$s: </Name><Value>%3$s</Value>' ),
 				filter.name,
-				OPERATORS[ filterInView.operator ].label.toLowerCase(),
+				OPERATORS[ filterInView.operator ].display ??
+					OPERATORS[ filterInView.operator ].label.toLowerCase(),
 				activeElements.map( ( element ) => element.label ).join( ', ' )
 			),
 			filterTextWrappers
@@ -152,7 +153,8 @@ const FilterText = ( {
 				/* translators: 1: Filter name. 2: Operator name. 3: Filter value. e.g.: "Author starts with: Adm". */
 				__( '<Name>%1$s %2$s: </Name><Value>%3$s</Value>' ),
 				filter.name,
-				OPERATORS[ filterInView.operator ].label.toLowerCase(),
+				OPERATORS[ filterInView.operator ].display ??
+					OPERATORS[ filterInView.operator ].label.toLowerCase(),
 				activeElements[ 0 ].label
 			),
 			filterTextWrappers
