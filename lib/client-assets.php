@@ -414,3 +414,55 @@ add_action( 'enqueue_block_editor_assets', 'gutenberg_enqueue_latex_to_mathml_lo
 function gutenberg_enqueue_latex_to_mathml_loader() {
 	wp_enqueue_script_module( '@wordpress/latex-to-mathml/loader' );
 }
+
+/**
+ * Enqueue the frontend edit overlay script and styles.
+ *
+ * Only enqueues for logged-in users with edit capabilities when the experiment is enabled.
+ */
+function gutenberg_enqueue_frontend_edit_overlay() {
+	// Only enqueue for logged-in users.
+	if ( ! is_user_logged_in() ) {
+		return;
+	}
+
+	// Only enqueue for users who can edit posts.
+	if ( ! current_user_can( 'edit_posts' ) ) {
+		return;
+	}
+
+	// Only enqueue when the experiment is enabled.
+	if ( ! function_exists( 'gutenberg_is_experiment_enabled' ) || ! gutenberg_is_experiment_enabled( 'gutenberg-frontend-edit-overlay' ) ) {
+		return;
+	}
+
+	$version = defined( 'GUTENBERG_VERSION' ) && ! SCRIPT_DEBUG ? GUTENBERG_VERSION : time();
+
+	// Enqueue the stylesheet.
+	wp_enqueue_style(
+		'wp-frontend-edit-overlay',
+		gutenberg_url( 'lib/frontend-edit-overlay/style.css' ),
+		array(),
+		$version
+	);
+
+	// Enqueue the script.
+	wp_enqueue_script(
+		'wp-frontend-edit-overlay',
+		gutenberg_url( 'lib/frontend-edit-overlay/view.js' ),
+		array(),
+		$version,
+		array(
+			'in_footer' => true,
+		)
+	);
+
+	// Inline the experiment flag.
+	wp_add_inline_script(
+		'wp-frontend-edit-overlay',
+		'window.__experimentalFrontendEditOverlay = true;',
+		'before'
+	);
+}
+
+add_action( 'wp_enqueue_scripts', 'gutenberg_enqueue_frontend_edit_overlay' );

@@ -126,6 +126,11 @@ if ( gutenberg_is_experiment_enabled( 'gutenberg-no-tinymce' ) ) {
 	require __DIR__ . '/experimental/disable-tinymce.php';
 }
 
+// Frontend Edit Overlay experiment.
+if ( gutenberg_is_experiment_enabled( 'gutenberg-frontend-edit-overlay' ) ) {
+	require __DIR__ . '/frontend-edit-overlay.php';
+}
+
 // Load the BC Layer to avoid fatal errors of extenders using the Fonts API.
 // @core-merge: do not merge the BC layer files into WordPress Core.
 require __DIR__ . '/experimental/font-face/bc-layer/class-wp-fonts-provider.php';

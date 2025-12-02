@@ -246,6 +246,18 @@ function gutenberg_initialize_experiments_settings() {
 		)
 	);
 
+	add_settings_field(
+		'gutenberg-frontend-edit-overlay',
+		__( 'Frontend: "Edit this" overlay', 'gutenberg' ),
+		'gutenberg_display_experiment_field',
+		'gutenberg-experiments',
+		'gutenberg_experiments_section',
+		array(
+			'label' => __( 'Enables hover-over "Edit this" buttons on the site frontend for template parts and post content when logged in as an admin user.', 'gutenberg' ),
+			'id'    => 'gutenberg-frontend-edit-overlay',
+		)
+	);
+
 	register_setting(
 		'gutenberg-experiments',
 		'gutenberg-experiments'
