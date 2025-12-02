@@ -11,6 +11,7 @@ import {
 	Button,
 	ExternalLink,
 	__experimentalTruncate as Truncate,
+	Flex,
 } from '@wordpress/components';
 import { useCopyToClipboard } from '@wordpress/compose';
 import { filterURLForDisplay, safeDecodeURI } from '@wordpress/url';
@@ -102,7 +103,10 @@ export default function LinkPreview( {
 	} );
 
 	return (
-		<div
+		<Flex
+			direction="row"
+			align="center"
+			justify="space-between"
 			role="group"
 			aria-label={ __( 'Manage link' ) }
 			className={ clsx( 'block-editor-link-control__preview', {
@@ -114,26 +118,30 @@ export default function LinkPreview( {
 				'is-url-title': displayTitle === displayURL,
 			} ) }
 		>
-			<div className="block-editor-link-control__preview-top">
-				<span
+			<Flex direction="row" align="center" justify="space-between">
+				<Flex
 					className="block-editor-link-control__preview-header"
-					role="figure"
 					aria-label={
 						/* translators: Accessibility text for the link preview when editing a link. */
 						__( 'Link information' )
 					}
 				>
-					<span
+					<Flex
 						className={ clsx(
 							'block-editor-link-control__preview-icon',
 							{
 								'is-image': richData?.icon,
 							}
 						) }
+						justify="center"
 					>
 						{ icon }
-					</span>
-					<span className="block-editor-link-control__preview-details">
+					</Flex>
+					<Flex
+						className="block-editor-link-control__preview-details"
+						direction="column"
+						gap={ 1 }
+					>
 						{ ! isEmptyURL ? (
 							<>
 								<ExternalLink
@@ -157,8 +165,8 @@ export default function LinkPreview( {
 								{ __( 'Link is empty' ) }
 							</span>
 						) }
-					</span>
-				</span>
+					</Flex>
+				</Flex>
 				<Button
 					icon={ pencil }
 					label={ __( 'Edit link' ) }
@@ -185,7 +193,7 @@ export default function LinkPreview( {
 					showTooltip={ ! showIconLabels }
 				/>
 				<ViewerSlot fillProps={ value } />
-			</div>
-		</div>
+			</Flex>
+		</Flex>
 	);
 }
