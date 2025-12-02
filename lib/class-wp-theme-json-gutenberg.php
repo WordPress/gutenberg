@@ -590,12 +590,12 @@ class WP_Theme_JSON_Gutenberg {
 	 * @since 6.1.0
 	 * @since 6.2.0 Added support for `:link` and `:any-link`.
 	 * @since 6.8.0 Added support for `:focus-visible`.
-	 * @since #.#.# Added support for `:placeholder`.
+	 * @since #.#.# Added support for `::placeholder`.
 	 */
 	const VALID_ELEMENT_PSEUDO_SELECTORS = array(
 		'link'   => array( ':link', ':any-link', ':visited', ':hover', ':focus', ':focus-visible', ':active' ),
 		'button' => array( ':link', ':any-link', ':visited', ':hover', ':focus', ':focus-visible', ':active' ),
-		'textInput' => array( ':hover', ':focus', ':focus-visible', ':placeholder' ),
+		'textInput' => array( ':hover', ':focus', ':focus-visible', '::placeholder' ),
 	);
 
 	/**

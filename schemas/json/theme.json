@@ -1789,7 +1789,7 @@
 				":visited": {
 					"$ref": "#/definitions/stylesPropertiesComplete"
 				},
-				":placeholder": {
+				"::placeholder": {
 					"$ref": "#/definitions/stylesPropertiesComplete"
 				}
 			}
@@ -1820,7 +1820,7 @@
 				":hover",
 				":link",
 				":visited",
-				":placeholder"
+				"::placeholder"
 			]
 		},
 		"stylesElementsPropertiesComplete": {
