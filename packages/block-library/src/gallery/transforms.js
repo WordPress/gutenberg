@@ -23,51 +23,6 @@ const parseShortcodeIds = ( ids ) => {
 };
 
 /**
- * Parses the caption for each image from the shortcode content.
- *
- * The content comes from WordPress's shortcode rendering, which has already
- * been sanitized by KSES. This follows the same pattern used by the image
- * block's caption shortcode transform.
- *
- * @param {string} content The shortcode content (HTML rendered by gallery shortcode).
- * @return {Object} A map of image ID to caption HTML.
- */
-function parseCaptions( content ) {
-	if ( ! content ) {
-		return {};
-	}
-
-	const captionsById = {};
-	const { body } = document.implementation.createHTMLDocument( '' );
-	body.innerHTML = content;
-
-	// Find all gallery items and extract their captions
-	const galleryItems = body.querySelectorAll( '.gallery-item' );
-	galleryItems.forEach( ( item ) => {
-		const img = item.querySelector( 'img' );
-		const captionElement = item.querySelector( '.gallery-caption' );
-
-		if ( img && captionElement ) {
-			// Extract image ID from data-id attribute or class (wp-image-XXX)
-			let imageId = img.getAttribute( 'data-id' );
-			if ( ! imageId ) {
-				const classMatch = img.className.match( /wp-image-(\d+)/ );
-				if ( classMatch ) {
-					imageId = classMatch[ 1 ];
-				}
-			}
-
-			if ( imageId ) {
-				captionsById[ parseInt( imageId, 10 ) ] =
-					captionElement.innerHTML;
-			}
-		}
-	} );
-
-	return captionsById;
-}
-
-/**
  * Third party block plugins don't have an easy way to detect if the
  * innerBlocks version of the Gallery is running when they run a
  * 3rdPartyBlock -> GalleryBlock transform so this transform filter
@@ -200,10 +155,7 @@ const transforms = {
 		{
 			type: 'shortcode',
 			tag: 'gallery',
-			transform(
-				{ named: { ids, columns = 3, link, orderby, size } },
-				{ shortcode }
-			) {
+			transform( { named: { ids, columns = 3, link, orderby, size } } ) {
 				const imageIds = parseShortcodeIds( ids ).map( ( id ) =>
 					parseInt( id, 10 )
 				);
@@ -214,9 +166,6 @@ const transforms = {
 				} else if ( link === 'file' ) {
 					linkTo = LINK_DESTINATION_MEDIA;
 				}
-
-				// Parse captions from the shortcode content (rendered HTML)
-				const captions = parseCaptions( shortcode?.content );
 
 				const galleryBlock = createBlock(
 					'core/gallery',
@@ -230,9 +179,6 @@ const transforms = {
 						createBlock( 'core/image', {
 							id: imageId,
 							...( size && { sizeSlug: size } ),
-							...( captions[ imageId ] && {
-								caption: captions[ imageId ],
-							} ),
 						} )
 					)
 				);
