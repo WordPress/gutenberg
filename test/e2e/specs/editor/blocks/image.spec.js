@@ -460,7 +460,7 @@ test.describe( 'Image', () => {
 			.getByRole( 'listbox', { name: 'Media List' } )
 			.getByRole( 'option' )
 			.first()
-			.dragTo( imageBlock );
+			.dragTo( imageBlock, { steps: 3 } );
 
 		await expect( async () => {
 			const blocks = await editor.getBlocks();
@@ -493,7 +493,7 @@ test.describe( 'Image', () => {
 			.getByRole( 'listbox', { name: 'Media List' } )
 			.getByRole( 'option' )
 			.nth( 1 )
-			.dragTo( imageBlock );
+			.dragTo( imageBlock, { steps: 3 } );
 
 		await expect( async () => {
 			const blocks = await editor.getBlocks();
