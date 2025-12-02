@@ -21,14 +21,15 @@ const InserterDraggableBlocks = ( {
 	children,
 	pattern,
 } ) => {
+	const blockName = blocks.length === 1 ? blocks[ 0 ].name : undefined;
 	const blockTypeIcon = useSelect(
 		( select ) => {
-			const { getBlockType } = select( blocksStore );
 			return (
-				blocks.length === 1 && getBlockType( blocks[ 0 ].name )?.icon
+				blockName &&
+				select( blocksStore ).getBlockType( blockName )?.icon
 			);
 		},
-		[ blocks ]
+		[ blockName ]
 	);
 
 	const { startDragging, stopDragging } = unlock(
