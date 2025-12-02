@@ -105,8 +105,8 @@ export default function BlockBindingsAttributeControl( {
 	const isAttributeReadOnly =
 		! canUpdateBlockBindings || ! hasCompatibleFields;
 
-	const { source: sourceName, args } = binding || {};
-	const source = getBlockBindingsSource( sourceName );
+	const { source: boundSourceName, args } = binding || {};
+	const source = getBlockBindingsSource( boundSourceName );
 
 	let displayText;
 	let isValid = true;
@@ -124,11 +124,11 @@ export default function BlockBindingsAttributeControl( {
 		displayText = __( 'Source not registered' );
 	} else {
 		displayText =
-			compatibleFieldsForAttribute?.[ sourceName ]?.find( ( field ) =>
-				fastDeepEqual( field.args, args )
+			compatibleFieldsForAttribute?.[ boundSourceName ]?.find(
+				( field ) => fastDeepEqual( field.args, args )
 			)?.label ||
 			source?.label ||
-			sourceName;
+			boundSourceName;
 	}
 
 	return (
