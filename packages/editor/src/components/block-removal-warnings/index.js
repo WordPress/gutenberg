@@ -63,6 +63,12 @@ const BLOCK_REMOVAL_RULES = [
 	},
 ];
 
+/**
+ * Renders a warning modal when certain blocks are deleted
+ * in templates, template parts, or patterns.
+ *
+ * @return {JSX.Element|null} Block removal warning modal component, or null.
+ */
 export default function BlockRemovalWarnings() {
 	const currentPostType = useSelect(
 		( select ) => select( editorStore ).getCurrentPostType(),
