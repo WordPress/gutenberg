@@ -16,7 +16,8 @@
 defined( 'GUTENBERG_DEVELOPMENT_MODE' ) or define( 'GUTENBERG_DEVELOPMENT_MODE', true );
 ### END AUTO-GENERATED DEFINES
 defined( 'GUTENBERG_MINIMUM_WP_VERSION' ) or define( 'GUTENBERG_MINIMUM_WP_VERSION', '6.7' );
-
+// Custom constant to indicate that this is a custom fork of Gutenberg.
+defined( 'IS_CUSTOM_GUTENBERG_FORK') or define( 'IS_CUSTOM_GUTENBERG_FORK', true );
 
 gutenberg_pre_init();
 
