@@ -16,18 +16,6 @@ jest.mock( 'uuid', () => ( {
 } ) );
 
 /**
- * Mock @wordpress/blocks module
- */
-jest.mock( '@wordpress/blocks', () => ( {
-	getBlockTypes: jest.fn( () => [
-		{
-			name: 'core/paragraph',
-			attributes: { content: { type: 'rich-text' } },
-		},
-	] ),
-} ) );
-
-/**
  * Internal dependencies
  */
 import {

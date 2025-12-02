@@ -26,7 +26,7 @@ import {
 	CRDT_RECORD_MAP_KEY,
 	WORDPRESS_META_KEY_FOR_CRDT_DOC_PERSISTENCE,
 } from '../sync';
-import type { WPBlockSelection, WPSelection } from '../types';
+import type { WPSelection } from '../types';
 
 export type PostChanges = Partial< Post > & {
 	blocks?: Block[];
@@ -34,9 +34,6 @@ export type PostChanges = Partial< Post > & {
 	selection?: WPSelection;
 	title?: Post[ 'title' ] | string;
 };
-
-// Hold a reference to the last known selection to help compute Y.Text deltas.
-let lastSelection: WPBlockSelection | null = null;
 
 // Properties that are allowed to be synced for a post.
 const allowedPostProperties = new Set< string >( [
@@ -142,9 +139,14 @@ export function applyPostChangesToCRDTDoc(
 				// Block[] from local changes.
 				const newBlocks = ( newValue as PostChanges[ 'blocks' ] ) ?? [];
 
+				// Block changes from typing are bundled with a 'selection' update.
+				// Pass the resulting cursor position to the mergeCrdtBlocks function.
+				const cursorPosition =
+					changes.selection?.selectionStart?.offset ?? null;
+
 				// Merge blocks does not need `setValue` because it is operating on a
 				// Yjs type that is already in the Y.Doc.
-				mergeCrdtBlocks( currentBlocks, newBlocks, lastSelection );
+				mergeCrdtBlocks( currentBlocks, newBlocks, cursorPosition );
 				break;
 			}
 
@@ -222,11 +224,6 @@ export function applyPostChangesToCRDTDoc(
 			}
 		}
 	} );
-
-	// Update the lastSelection for use in computing Y.Text deltas.
-	if ( 'selection' in changes ) {
-		lastSelection = changes.selection?.selectionStart ?? null;
-	}
 }
 
 export function defaultGetChangesFromCRDTDoc( crdtDoc: CRDTDoc ): ObjectData {
