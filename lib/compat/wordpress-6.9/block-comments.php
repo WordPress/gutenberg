@@ -122,8 +122,7 @@ add_filter( 'query', 'gutenberg_filter_comment_count_query_exclude_block_comment
  * @return void
  */
 function gutenberg_register_wp_notes_notify_setting() {
-	$register_setting = get_registered_settings();
-	if ( isset( $register_setting['discussion']['wp_notes_notify'] ) ) {
+	if ( is_wp_version_compatible( '6.9' ) ) {
 		return;
 	}
 
