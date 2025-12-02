@@ -1575,6 +1575,7 @@ const LayoutCardComponent = ( {
 
 	const form: Form = useMemo(
 		() => ( {
+			layout: { type: 'card' },
 			fields: [
 				{
 					id: 'customerCard',
