@@ -77,16 +77,10 @@ export interface WPSelection {
 
 export interface RecordHandlers {
 	editRecord: ( data: Partial< ObjectData > ) => void;
+	editEntityRecord: ( edits: Partial< ObjectData > ) => void;
 	getEditedRecord: () => Promise< ObjectData >;
 	refetchRecord: () => Promise< void >;
 	saveRecord: () => Promise< void >;
-	resetSelection: (
-		selectionStart: WPBlockSelection | { clientId: string },
-		selectionEnd: WPBlockSelection | { clientId: string }
-	) => void;
-	subscribeToSelectionChange: (
-		callback: ( selection: WPSelection ) => void
-	) => void;
 }
 
 export interface SyncConfig {
@@ -134,28 +128,7 @@ export interface SyncUndoManager extends WPUndoManager< ObjectData > {
 	addToScope: (
 		ymap: Y.Map< any >,
 		handlers: {
-			subscribeToSelectionChange: RecordHandlers[ 'subscribeToSelectionChange' ];
-			resetSelection: RecordHandlers[ 'resetSelection' ];
+			editEntityRecord: RecordHandlers[ 'editEntityRecord' ];
 		}
 	) => void;
 }
-
-export enum PositionType {
-	RelativeSelection = 'RelativeSelection',
-	BlockSelection = 'BlockSelection',
-}
-
-export interface RelativePosition {
-	type: PositionType.RelativeSelection;
-	attributeKey: string;
-	relativePosition: Y.RelativePosition;
-	clientId: string;
-	offset: number;
-}
-
-export interface BlockPosition {
-	type: PositionType.BlockSelection;
-	clientId: string;
-}
-
-export type Position = RelativePosition | BlockPosition;

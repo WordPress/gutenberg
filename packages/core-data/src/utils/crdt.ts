@@ -95,6 +95,31 @@ const disallowedPostMetaKeys = new Set< string >( [
 	WORDPRESS_META_KEY_FOR_CRDT_DOC_PERSISTENCE,
 ] );
 
+enum PositionType {
+	RelativeSelection = 'RelativeSelection',
+	BlockSelection = 'BlockSelection',
+}
+
+interface RelativePosition {
+	type: PositionType.RelativeSelection;
+	attributeKey: string;
+	relativePosition: Y.RelativePosition;
+	clientId: string;
+	offset: number;
+}
+
+interface BlockPosition {
+	type: PositionType.BlockSelection;
+	clientId: string;
+}
+
+type Position = RelativePosition | BlockPosition;
+
+interface PositionMeta {
+	position: Position;
+	backupPositions?: Position[];
+}
+
 /**
  * Given a set of local changes to a generic entity record, apply those changes
  * to the local Y.Doc.
@@ -140,6 +165,8 @@ export function applyPostChangesToCRDTDoc(
 	changes: PostChanges,
 	_postType: Type // eslint-disable-line @typescript-eslint/no-unused-vars
 ): void {
+	console.log( 'applyPostChangesToCRDTDoc() with changes:', changes );
+
 	const ymap = getRootMap< YPostRecord >( ydoc, CRDT_RECORD_MAP_KEY );
 
 	Object.keys( changes ).forEach( ( key ) => {
@@ -250,9 +277,58 @@ export function applyPostChangesToCRDTDoc(
 		}
 	} );
 
+	// Process changes that we don't want to persist to the CRDT document.
+
 	if ( changes.selection ) {
+		// Keep track of selection history for the undo/redo stack.
 		const selectionHistory = getSelectionHistory( ydoc );
 		selectionHistory.updateSelection( changes.selection );
+	}
+
+	if ( changes[ 'undo-manager-event' ] ) {
+		const {
+			eventType,
+			meta,
+		}: { eventType: string; meta: Map< string, any > } = // alecg: This should be a shared type.
+			changes[ 'undo-manager-event' ];
+
+		if ( eventType === 'stack-item-added' ) {
+			const selectionHistory = getSelectionHistory( ydoc );
+
+			let positionToStore = selectionHistory.getCurrentPosition();
+			const backupPositions = selectionHistory.getBlockHistory( 3 );
+
+			if ( positionToStore === null && backupPositions.length === 0 ) {
+				// If we don't have a last selection and no backup positions, then don't save anything extra
+				return;
+			} else if ( positionToStore === null ) {
+				// If positionToStore is null for some reason, use a backup position
+				positionToStore = backupPositions[ 0 ];
+			}
+
+			const positionMeta: PositionMeta = {
+				position: positionToStore,
+				backupPositions,
+			};
+
+			console.log( 'Setting undo position meta:', positionMeta );
+			meta.set( 'position', positionMeta );
+		}
+
+		if ( eventType === 'stack-item-popped' ) {
+			const positionMeta: PositionMeta | undefined =
+				meta.get( 'position' );
+
+			if ( ! positionMeta ) {
+				return;
+			}
+
+			const { position, backupPositions } = positionMeta;
+			console.log(
+				'applyPostChangesToCRDTDoc() received stack-item-popped event with:',
+				{ position, backupPositions }
+			);
+		}
 	}
 }
 
@@ -277,6 +353,13 @@ export function getPostChangesFromCRDTDoc(
 	_postType: Type, // eslint-disable-line @typescript-eslint/no-unused-vars
 	origin: Origin
 ): PostChanges {
+	console.log(
+		'getPostChangesFromCRDTDoc() from',
+		origin instanceof Y.UndoManager ? 'undo-manager' : origin,
+		'with editedRecord:',
+		editedRecord
+	);
+
 	const ymap = getRootMap< YPostRecord >( ydoc, CRDT_RECORD_MAP_KEY );
 
 	let allowedMetaChanges: Post[ 'meta' ] = {};

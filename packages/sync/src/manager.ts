@@ -137,10 +137,9 @@ export function createSyncManager(): SyncManager {
 			} );
 		};
 
-		const { subscribeToSelectionChange, resetSelection } = handlers;
+		const { editEntityRecord } = handlers;
 		undoManager.addToScope( recordMap, {
-			subscribeToSelectionChange,
-			resetSelection,
+			editEntityRecord,
 		} );
 
 		const entityState: EntityState = {
@@ -390,6 +389,10 @@ export function createSyncManager(): SyncManager {
 		objectId: ObjectID,
 		origin: Origin
 	): Promise< void > {
+		console.log(
+			'SyncManager calling updateEntityRecord() with origin:',
+			JSON.stringify( origin )
+		);
 		const entityId = getEntityId( objectType, objectId );
 		const entityState = entityStates.get( entityId );
 
