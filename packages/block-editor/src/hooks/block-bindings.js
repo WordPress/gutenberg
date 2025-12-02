@@ -40,29 +40,20 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 	const { removeAllBlockBindings } = useBlockBindingsUtils();
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
-	const { bindableAttributes } = useSelect(
+	const { bindableAttributes, hasCompatibleFields } = useSelect(
 		( select ) => {
 			const { __experimentalBlockBindingsSupportedAttributes } =
 				select( blockEditorStore ).getSettings();
-
-			return {
-				bindableAttributes:
-					__experimentalBlockBindingsSupportedAttributes?.[
-						blockName
-					],
-			};
-		},
-		[ blockName ]
-	);
-
-	const { hasCompatibleFields } = useSelect(
-		( select ) => {
 			const {
 				getAllBlockBindingsSources,
 				getBlockBindingsSourceFieldsList,
 			} = unlock( select( blocksStore ) );
 
 			return {
+				bindableAttributes:
+					__experimentalBlockBindingsSupportedAttributes?.[
+						blockName
+					],
 				hasCompatibleFields: Object.values(
 					getAllBlockBindingsSources()
 				).some(
@@ -72,7 +63,7 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 				),
 			};
 		},
-		[ blockContext ]
+		[ blockName, blockContext ]
 	);
 
 	// Return early if there are no bindable attributes.
