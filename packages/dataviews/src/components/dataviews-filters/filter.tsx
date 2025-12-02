@@ -104,278 +104,61 @@ const FilterText = ( {
 		),
 	};
 
-	if ( filterInView?.operator === OPERATOR_IS_ANY ) {
+	if (
+		filterInView?.operator !== undefined &&
+		[
+			OPERATOR_IS_ANY,
+			OPERATOR_IS_NONE,
+			OPERATOR_IS_ALL,
+			OPERATOR_IS_NOT_ALL,
+		].includes( filterInView.operator )
+	) {
 		return createInterpolateElement(
 			sprintf(
-				/* translators: 1: Filter name. 2: Filter value. e.g.: "Author is any: Admin, Editor". */
-				__( '<Name>%1$s includes: </Name><Value>%2$s</Value>' ),
+				/* translators: 1: Filter name. 2: Operator name. 3: Filter value. e.g.: "Author is any: Admin, Editor". */
+				__( '<Name>%1$s %2$s: </Name><Value>%3$s</Value>' ),
 				filter.name,
+				OPERATORS[ filterInView.operator ].label.toLowerCase(),
 				activeElements.map( ( element ) => element.label ).join( ', ' )
 			),
 			filterTextWrappers
 		);
 	}
 
-	if ( filterInView?.operator === OPERATOR_IS_NONE ) {
+	if (
+		filterInView?.operator !== undefined &&
+		[
+			OPERATOR_IS,
+			OPERATOR_IS_NOT,
+			OPERATOR_LESS_THAN,
+			OPERATOR_GREATER_THAN,
+			OPERATOR_LESS_THAN_OR_EQUAL,
+			OPERATOR_GREATER_THAN_OR_EQUAL,
+			OPERATOR_CONTAINS,
+			OPERATOR_NOT_CONTAINS,
+			OPERATOR_STARTS_WITH,
+			OPERATOR_BEFORE,
+			OPERATOR_AFTER,
+			OPERATOR_BEFORE_INC,
+			OPERATOR_AFTER_INC,
+			OPERATOR_BETWEEN,
+			OPERATOR_ON,
+			OPERATOR_NOT_ON,
+			OPERATOR_IN_THE_PAST,
+		].includes( filterInView.operator )
+	) {
 		return createInterpolateElement(
 			sprintf(
-				/* translators: 1: Filter name. 2: Filter value. e.g.: "Author is none: Admin, Editor". */
-				__( '<Name>%1$s is none of: </Name><Value>%2$s</Value>' ),
+				/* translators: 1: Filter name. 2: Operator name. 3: Filter value. e.g.: "Author starts with: Adm". */
+				__( '<Name>%1$s %2$s: </Name><Value>%3$s</Value>' ),
 				filter.name,
-				activeElements.map( ( element ) => element.label ).join( ', ' )
-			),
-			filterTextWrappers
-		);
-	}
-
-	if ( filterInView?.operator === OPERATOR_IS_ALL ) {
-		return createInterpolateElement(
-			sprintf(
-				/* translators: 1: Filter name. 2: Filter value. e.g.: "Author is all: Admin, Editor". */
-				__( '<Name>%1$s includes all: </Name><Value>%2$s</Value>' ),
-				filter.name,
-				activeElements.map( ( element ) => element.label ).join( ', ' )
-			),
-			filterTextWrappers
-		);
-	}
-
-	if ( filterInView?.operator === OPERATOR_IS_NOT_ALL ) {
-		return createInterpolateElement(
-			sprintf(
-				/* translators: 1: Filter name. 2: Filter value. e.g.: "Author is not all: Admin, Editor". */
-				__( '<Name>%1$s is not all: </Name><Value>%2$s</Value>' ),
-				filter.name,
-				activeElements.map( ( element ) => element.label ).join( ', ' )
-			),
-			filterTextWrappers
-		);
-	}
-
-	if ( filterInView?.operator === OPERATOR_IS ) {
-		return createInterpolateElement(
-			sprintf(
-				/* translators: 1: Filter name. 2: Filter value. e.g.: "Author is: Admin". */
-				__( '<Name>%1$s is: </Name><Value>%2$s</Value>' ),
-				filter.name,
+				OPERATORS[ filterInView.operator ].label.toLowerCase(),
 				activeElements[ 0 ].label
 			),
 			filterTextWrappers
 		);
 	}
 
-	if ( filterInView?.operator === OPERATOR_IS_NOT ) {
-		return createInterpolateElement(
-			sprintf(
-				/* translators: 1: Filter name. 2: Filter value. e.g.: "Author is not: Admin". */
-				__( '<Name>%1$s is not: </Name><Value>%2$s</Value>' ),
-				filter.name,
-				activeElements[ 0 ].label
-			),
-			filterTextWrappers
-		);
-	}
-
-	if ( filterInView?.operator === OPERATOR_LESS_THAN ) {
-		return createInterpolateElement(
-			sprintf(
-				/* translators: 1: Filter name. 2: Filter value. e.g.: "Price is less than: 10". */
-				__( '<Name>%1$s is less than: </Name><Value>%2$s</Value>' ),
-				filter.name,
-				activeElements[ 0 ].label
-			),
-			filterTextWrappers
-		);
-	}
-
-	if ( filterInView?.operator === OPERATOR_GREATER_THAN ) {
-		return createInterpolateElement(
-			sprintf(
-				/* translators: 1: Filter name. 2: Filter value. e.g.: "Price is greater than: 10". */
-				__( '<Name>%1$s is greater than: </Name><Value>%2$s</Value>' ),
-				filter.name,
-				activeElements[ 0 ].label
-			),
-			filterTextWrappers
-		);
-	}
-
-	if ( filterInView?.operator === OPERATOR_LESS_THAN_OR_EQUAL ) {
-		return createInterpolateElement(
-			sprintf(
-				/* translators: 1: Filter name. 2: Filter value. e.g.: "Price is less than or equal to: 10". */
-				__(
-					'<Name>%1$s is less than or equal to: </Name><Value>%2$s</Value>'
-				),
-				filter.name,
-				activeElements[ 0 ].label
-			),
-			filterTextWrappers
-		);
-	}
-
-	if ( filterInView?.operator === OPERATOR_GREATER_THAN_OR_EQUAL ) {
-		return createInterpolateElement(
-			sprintf(
-				/* translators: 1: Filter name. 2: Filter value. e.g.: "Price is greater than or equal to: 10". */
-				__(
-					'<Name>%1$s is greater than or equal to: </Name><Value>%2$s</Value>'
-				),
-				filter.name,
-				activeElements[ 0 ].label
-			),
-			filterTextWrappers
-		);
-	}
-
-	if ( filterInView?.operator === OPERATOR_CONTAINS ) {
-		return createInterpolateElement(
-			sprintf(
-				/* translators: 1: Filter name. 2: Filter value. e.g.: "Title contains: Mars". */
-				__( '<Name>%1$s contains: </Name><Value>%2$s</Value>' ),
-				filter.name,
-				activeElements[ 0 ].label
-			),
-			filterTextWrappers
-		);
-	}
-
-	if ( filterInView?.operator === OPERATOR_NOT_CONTAINS ) {
-		return createInterpolateElement(
-			sprintf(
-				/* translators: 1: Filter name. 2: Filter value. e.g.: "Description doesn't contain: photo". */
-				__( "<Name>%1$s doesn't contain: </Name><Value>%2$s</Value>" ),
-				filter.name,
-				activeElements[ 0 ].label
-			),
-			filterTextWrappers
-		);
-	}
-
-	if ( filterInView?.operator === OPERATOR_STARTS_WITH ) {
-		return createInterpolateElement(
-			sprintf(
-				/* translators: 1: Filter name. 2: Filter value. e.g.: "Title starts with: Mar". */
-				__( '<Name>%1$s starts with: </Name><Value>%2$s</Value>' ),
-				filter.name,
-				activeElements[ 0 ].label
-			),
-			filterTextWrappers
-		);
-	}
-
-	if ( filterInView?.operator === OPERATOR_BEFORE ) {
-		return createInterpolateElement(
-			sprintf(
-				/* translators: 1: Filter name. 2: Filter value. e.g.: "Date is before: 2024-01-01". */
-				__( '<Name>%1$s is before: </Name><Value>%2$s</Value>' ),
-				filter.name,
-				activeElements[ 0 ].label
-			),
-			filterTextWrappers
-		);
-	}
-
-	if ( filterInView?.operator === OPERATOR_AFTER ) {
-		return createInterpolateElement(
-			sprintf(
-				/* translators: 1: Filter name. 2: Filter value. e.g.: "Date is after: 2024-01-01". */
-				__( '<Name>%1$s is after: </Name><Value>%2$s</Value>' ),
-				filter.name,
-				activeElements[ 0 ].label
-			),
-			filterTextWrappers
-		);
-	}
-
-	if ( filterInView?.operator === OPERATOR_BEFORE_INC ) {
-		return createInterpolateElement(
-			sprintf(
-				/* translators: 1: Filter name. 2: Filter value. e.g.: "Date is on or before: 2024-01-01". */
-				__( '<Name>%1$s is on or before: </Name><Value>%2$s</Value>' ),
-				filter.name,
-				activeElements[ 0 ].label
-			),
-			filterTextWrappers
-		);
-	}
-
-	if ( filterInView?.operator === OPERATOR_AFTER_INC ) {
-		return createInterpolateElement(
-			sprintf(
-				/* translators: 1: Filter name. 2: Filter value. e.g.: "Date is on or after: 2024-01-01". */
-				__( '<Name>%1$s is on or after: </Name><Value>%2$s</Value>' ),
-				filter.name,
-				activeElements[ 0 ].label
-			),
-			filterTextWrappers
-		);
-	}
-
-	if ( filterInView?.operator === OPERATOR_BETWEEN ) {
-		const { label } = activeElements[ 0 ];
-
-		return createInterpolateElement(
-			sprintf(
-				/* translators: 1: Filter name. 2: Min value. 3: Max value. e.g.: "Item count between (inc): 10 and 180". */
-				__(
-					'<Name>%1$s between (inc): </Name><Value>%2$s and %3$s</Value>'
-				),
-				filter.name,
-				label[ 0 ],
-				label[ 1 ]
-			),
-			filterTextWrappers
-		);
-	}
-
-	if ( filterInView?.operator === OPERATOR_ON ) {
-		return createInterpolateElement(
-			sprintf(
-				/* translators: 1: Filter name. 2: Filter value. e.g.: "Date is: 2024-01-01". */
-				__( '<Name>%1$s is: </Name><Value>%2$s</Value>' ),
-				filter.name,
-				activeElements[ 0 ].label
-			),
-			filterTextWrappers
-		);
-	}
-
-	if ( filterInView?.operator === OPERATOR_NOT_ON ) {
-		return createInterpolateElement(
-			sprintf(
-				/* translators: 1: Filter name. 2: Filter value. e.g.: "Date is not: 2024-01-01". */
-				__( '<Name>%1$s is not: </Name><Value>%2$s</Value>' ),
-				filter.name,
-				activeElements[ 0 ].label
-			),
-			filterTextWrappers
-		);
-	}
-
-	if ( filterInView?.operator === OPERATOR_IN_THE_PAST ) {
-		return createInterpolateElement(
-			sprintf(
-				/* translators: 1: Filter name. 2: Filter value. e.g.: "Date is in the past: 1 days". */
-				__( '<Name>%1$s is in the past: </Name><Value>%2$s</Value>' ),
-				filter.name,
-				`${ activeElements[ 0 ].value.value } ${ activeElements[ 0 ].value.unit }`
-			),
-			filterTextWrappers
-		);
-	}
-
-	if ( filterInView?.operator === OPERATOR_OVER ) {
-		return createInterpolateElement(
-			sprintf(
-				/* translators: 1: Filter name. 2: Filter value. e.g.: "Date is over: 1 days ago". */
-				__( '<Name>%1$s is over: </Name><Value>%2$s</Value> ago' ),
-				filter.name,
-				`${ activeElements[ 0 ].value.value } ${ activeElements[ 0 ].value.unit }`
-			),
-			filterTextWrappers
-		);
-	}
 	return sprintf(
 		/* translators: 1: Filter name e.g.: "Unknown status for Author". */
 		__( 'Unknown status for %1$s' ),

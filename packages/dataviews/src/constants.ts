@@ -87,19 +87,19 @@ export const OPERATORS: Record< Operator, { key: string; label: string } > = {
 	},
 	[ OPERATOR_IS_ANY ]: {
 		key: 'is-any-filter',
-		label: __( 'Is any' ),
+		label: __( 'Includes' ),
 	},
 	[ OPERATOR_IS_NONE ]: {
 		key: 'is-none-filter',
-		label: __( 'Is none' ),
+		label: __( 'Is none of' ),
 	},
 	[ OPERATOR_IS_ALL ]: {
 		key: 'is-all-filter',
-		label: __( 'Is all' ),
+		label: __( 'Includes all' ),
 	},
 	[ OPERATOR_IS_NOT_ALL ]: {
 		key: 'is-not-all-filter',
-		label: __( 'Is not all' ),
+		label: __( 'Is none of' ),
 	},
 	[ OPERATOR_LESS_THAN ]: {
 		key: 'less-than-filter',
