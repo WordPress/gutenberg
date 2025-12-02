@@ -40,7 +40,7 @@ export default function useTransformImage( {
 	 * rotateClockwise rotates the image by 90° clockwise by drawing the original image onto a canvas with rotation applied,
 	 * then saves it as a new blob URL (editedUrl).
 	 * This creates a new rotated image file, bypassing the image-cropper’s CSS transform rotation.
-	 * It's a bespoke solution to ensure that the rotated image fills the entire canvas.
+	 * It's a bespoke solution to ensure that the rotated image fills the content width.
 	 */
 	const [ internalRotation, setInternalRotation ] = useState( 0 );
 	const rotateClockwise = useCallback( () => {
