@@ -4,15 +4,12 @@
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 async function navigateToTemplateEditor( { admin, editor, page }, pageId ) {
-	// Navigate directly to the page editor using the page ID.
 	await admin.editPost( pageId );
-
-	// Wait for the editor to be ready.
 	await expect(
 		page.locator( 'iframe[name="editor-canvas"]' )
 	).toBeVisible();
 
-	// Close pattern chooser dialog if visible.
+	// Close pattern chooser dialog.
 	const patternDialog = page.getByRole( 'dialog', {
 		name: 'Choose a pattern',
 	} );
@@ -30,7 +27,6 @@ async function navigateToTemplateEditor( { admin, editor, page }, pageId ) {
 	await page.getByRole( 'menuitem', { name: 'Edit template' } ).click();
 	await expect( editor.canvas.locator( 'body' ) ).toBeVisible();
 
-	// Set preferences for the site editor context.
 	await editor.setPreferences( 'core/edit-post', {
 		welcomeGuideTemplate: false,
 	} );
