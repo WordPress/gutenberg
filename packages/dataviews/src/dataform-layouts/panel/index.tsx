@@ -177,6 +177,10 @@ export default function FormPanelField< Item >( {
 		null
 	);
 
+	// Track if the panel has been opened (touched) to only show errors after interaction.
+	const [ touched, setTouched ] = useState( false );
+	const handleOpen = () => setTouched( true );
+
 	const { fieldDefinition, summaryFields } =
 		getFieldDefinitionAndSummaryFields( layout, field, fields );
 
@@ -187,14 +191,16 @@ export default function FormPanelField< Item >( {
 	const labelPosition = layout.labelPosition;
 	const hasError = hasInvalidValidation( validity );
 	const errorMessage = getFirstValidationError( validity );
+
+	const showError = touched && hasError;
 	const labelClassName = clsx(
 		'dataforms-layouts-panel__field-label',
 		`dataforms-layouts-panel__field-label--label-position-${ labelPosition }`,
-		{ 'has-error': hasError }
+		{ 'has-error': showError }
 	);
 	const fieldLabel = !! field.children ? field.label : fieldDefinition?.label;
 
-	const labelContent = hasError ? (
+	const labelContent = showError ? (
 		<Tooltip text={ errorMessage } placement="top">
 			<span className="dataforms-layouts-panel__field-label-content">
 				<span className="dataforms-layouts-panel__field-error-indicator">
@@ -216,6 +222,7 @@ export default function FormPanelField< Item >( {
 				labelPosition={ labelPosition }
 				summaryFields={ summaryFields }
 				fieldDefinition={ fieldDefinition }
+				onOpen={ handleOpen }
 			/>
 		) : (
 			<PanelDropdown
@@ -227,6 +234,7 @@ export default function FormPanelField< Item >( {
 				summaryFields={ summaryFields }
 				fieldDefinition={ fieldDefinition }
 				popoverAnchor={ popoverAnchor }
+				onOpen={ handleOpen }
 			/>
 		);
 

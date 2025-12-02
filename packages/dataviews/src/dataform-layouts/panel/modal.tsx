@@ -151,6 +151,7 @@ function PanelModal< Item >( {
 	labelPosition,
 	summaryFields,
 	fieldDefinition,
+	onOpen,
 }: {
 	data: Item;
 	field: NormalizedFormField;
@@ -158,6 +159,7 @@ function PanelModal< Item >( {
 	labelPosition: 'side' | 'top' | 'none';
 	summaryFields: NormalizedField< Item >[];
 	fieldDefinition: NormalizedField< Item >;
+	onOpen?: () => void;
 } ) {
 	const [ isOpen, setIsOpen ] = useState( false );
 
@@ -171,7 +173,12 @@ function PanelModal< Item >( {
 				labelPosition={ labelPosition }
 				fieldLabel={ fieldLabel }
 				disabled={ fieldDefinition.readOnly === true }
-				onClick={ () => setIsOpen( true ) }
+				onClick={ () => {
+					if ( onOpen ) {
+						onOpen();
+					}
+					setIsOpen( true );
+				} }
 				aria-expanded={ isOpen }
 			/>
 			{ isOpen && (
