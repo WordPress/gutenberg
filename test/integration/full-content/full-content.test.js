@@ -35,13 +35,6 @@ import {
 	writeBlockFixtureSerializedHTML,
 } from '../fixtures';
 
-/* eslint-disable no-restricted-syntax */
-import * as form from '@wordpress/block-library/src/form';
-import * as formInput from '@wordpress/block-library/src/form-input';
-import * as formSubmitButton from '@wordpress/block-library/src/form-submit-button';
-import * as formSubmissionNotification from '@wordpress/block-library/src/form-submission-notification';
-/* eslint-enable no-restricted-syntax */
-
 const blockBasenames = getAvailableBlockFixturesBasenames();
 
 /**
@@ -59,6 +52,7 @@ const normalizeParsedBlocks = ( blocks ) =>
 	} ) );
 
 describe( 'full post content fixture', () => {
+	let originalEnableFormBlocks;
 	beforeAll( () => {
 		const blockMetadataFiles = glob.sync(
 			'packages/block-library/src/*/block.json'
@@ -70,23 +64,21 @@ describe( 'full post content fixture', () => {
 			} )
 		);
 		unstable__bootstrapServerSideBlockDefinitions( blockDefinitions );
-		registerCoreBlocks();
-
 		// Form-related blocks will not be registered unless they are opted
-		// in on the experimental settings page. Therefore, these blocks
-		// must be explicitly registered.
-		registerCoreBlocks( [
-			form,
-			formInput,
-			formSubmitButton,
-			formSubmissionNotification,
-		] );
+		// in on the experimental settings page.
+		originalEnableFormBlocks = window.__experimentalEnableFormBlocks;
+		window.__experimentalEnableFormBlocks = true;
+		registerCoreBlocks();
 
 		if ( globalThis.IS_GUTENBERG_PLUGIN ) {
 			__experimentalRegisterExperimentalCoreBlocks( {
 				enableFSEBlocks: true,
 			} );
 		}
+	} );
+
+	afterAll( () => {
+		window.__experimentalEnableFormBlocks = originalEnableFormBlocks;
 	} );
 
 	let spacer = 4;
