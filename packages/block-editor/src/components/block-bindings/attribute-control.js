@@ -26,9 +26,11 @@ import { useViewportMatch } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
+import BlockContext from '../block-context';
+import BlockBindingsSourceFieldsList from './source-fields-list';
 import { useBlockBindingsUtils } from '../../utils/block-bindings';
 import { unlock } from '../../lock-unlock';
-import BlockContext from '../block-context';
+import { store as blockEditorStore } from '../../store';
 
 const { Menu } = unlock( componentsPrivateApis );
 
@@ -50,7 +52,6 @@ export default function BlockBindingsAttributeControl( {
 	attribute,
 	binding,
 	blockName,
-	children,
 } ) {
 	const { updateBlockBindings } = useBlockBindingsUtils();
 	const isMobile = useViewportMatch( 'medium', '<' );
@@ -79,6 +80,13 @@ export default function BlockBindingsAttributeControl( {
 		[ blockContext ]
 	);
 
+	const { canUpdateBlockBindings } = useSelect( ( select ) => {
+		return {
+			canUpdateBlockBindings:
+				select( blockEditorStore ).getSettings().canUpdateBlockBindings,
+		};
+	} );
+
 	// Check if this attribute has compatible fields from any source.
 	const attributeType = getAttributeType( blockName, attribute );
 
@@ -92,6 +100,13 @@ export default function BlockBindingsAttributeControl( {
 		}
 	}
 
+	const hasCompatibleFields =
+		Object.keys( compatibleFieldsForAttribute ).length > 0;
+
+	// Lock the UI when the user can't update bindings or there are no fields to connect to.
+	const isAttributeReadOnly =
+		! canUpdateBlockBindings || ! hasCompatibleFields;
+
 	const { source: sourceName, args } = binding || {};
 	const source = getBlockBindingsSource( sourceName );
 
@@ -99,7 +114,7 @@ export default function BlockBindingsAttributeControl( {
 	let isValid = true;
 
 	if ( binding === undefined ) {
-		if ( ! children ) {
+		if ( ! hasCompatibleFields ) {
 			displayText = __( 'No sources available' );
 		} else {
 			displayText = __( 'Not connected' );
@@ -123,7 +138,7 @@ export default function BlockBindingsAttributeControl( {
 			hasValue={ () => !! binding }
 			label={ attribute }
 			onDeselect={
-				!! children &&
+				!! hasCompatibleFields &&
 				( () => {
 					updateBlockBindings( {
 						[ attribute ]: undefined,
@@ -132,7 +147,10 @@ export default function BlockBindingsAttributeControl( {
 			}
 		>
 			<Menu placement={ isMobile ? 'bottom-start' : 'left-start' }>
-				<Menu.TriggerButton render={ <Item /> } disabled={ ! children }>
+				<Menu.TriggerButton
+					render={ <Item /> }
+					disabled={ ! hasCompatibleFields }
+				>
 					<VStack
 						className="block-editor-bindings__item"
 						spacing={ 0 }
@@ -147,9 +165,25 @@ export default function BlockBindingsAttributeControl( {
 						</Text>
 					</VStack>
 				</Menu.TriggerButton>
-				{ !! children && (
+				{ ! isAttributeReadOnly && (
 					<Menu.Popover gutter={ isMobile ? 8 : 36 }>
-						{ children }
+						<Menu
+							placement={
+								isMobile ? 'bottom-start' : 'left-start'
+							}
+						>
+							{ Object.entries(
+								compatibleFieldsForAttribute
+							).map( ( [ sourceKey, fields ] ) => (
+								<BlockBindingsSourceFieldsList
+									key={ sourceKey }
+									args={ binding?.args }
+									attribute={ attribute }
+									sourceKey={ sourceKey }
+									fields={ fields }
+								/>
+							) ) }
+						</Menu>
 					</Menu.Popover>
 				) }
 			</Menu>
