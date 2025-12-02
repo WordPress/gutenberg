@@ -30,17 +30,6 @@ import PanelDropdown from './dropdown';
 import PanelModal from './modal';
 import { getSummaryFields } from '../get-summary-fields';
 
-const VALIDATION_TYPES = [
-	'required',
-	'pattern',
-	'min',
-	'max',
-	'minLength',
-	'maxLength',
-	'elements',
-	'custom',
-] as const;
-
 function getFirstValidationError(
 	validity: FieldValidity | undefined
 ): string | undefined {
@@ -48,11 +37,13 @@ function getFirstValidationError(
 		return undefined;
 	}
 
-	for ( const type of VALIDATION_TYPES ) {
-		const validation = validity[ type ];
+	for ( const [ key, validation ] of Object.entries( validity ) ) {
+		if ( key === 'children' ) {
+			continue;
+		}
 		if ( validation?.type === 'invalid' ) {
 			// Provide default message for required validation (message is optional)
-			if ( type === 'required' ) {
+			if ( key === 'required' ) {
 				return validation.message || 'A required field is empty';
 			}
 			if ( validation.message ) {
@@ -74,15 +65,15 @@ function getFirstValidationError(
 	return undefined;
 }
 
-function hasInvalidValidation(
-	validity: FieldValidity | undefined
-): boolean {
+function hasInvalidValidation( validity: FieldValidity | undefined ): boolean {
 	if ( ! validity ) {
 		return false;
 	}
 
-	for ( const type of VALIDATION_TYPES ) {
-		const validation = validity[ type ];
+	for ( const [ key, validation ] of Object.entries( validity ) ) {
+		if ( key === 'children' ) {
+			continue;
+		}
 		if ( validation?.type === 'invalid' ) {
 			return true;
 		}
