@@ -2,12 +2,11 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { getBlockType, store as blocksStore } from '@wordpress/blocks';
+import { store as blocksStore } from '@wordpress/blocks';
 import {
 	__experimentalItemGroup as ItemGroup,
 	__experimentalText as Text,
 	__experimentalToolsPanel as ToolsPanel,
-	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { useContext } from '@wordpress/element';
@@ -16,31 +15,12 @@ import { useViewportMatch } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import {
-	BlockBindingsAttributeControl,
-	BlockBindingsSourceFieldsList,
-} from '../components/block-bindings';
+import { BlockBindingsAttributeControl } from '../components/block-bindings';
 import { useBlockBindingsUtils } from '../utils/block-bindings';
 import { unlock } from '../lock-unlock';
 import InspectorControls from '../components/inspector-controls';
 import BlockContext from '../components/block-context';
 import { store as blockEditorStore } from '../store';
-
-const { Menu } = unlock( componentsPrivateApis );
-
-/**
- * Get the normalized attribute type for block bindings.
- * Converts 'rich-text' to 'string' since rich-text is stored as string.
- *
- * @param {string} blockName The block name.
- * @param {string} attribute The attribute name.
- * @return {string} The normalized attribute type.
- */
-const getAttributeType = ( blockName, attribute ) => {
-	const _attributeType =
-		getBlockType( blockName ).attributes?.[ attribute ]?.type;
-	return _attributeType === 'rich-text' ? 'string' : _attributeType;
-};
 
 const useToolsPanelDropdownMenuProps = () => {
 	const isMobile = useViewportMatch( 'medium', '<' );
@@ -59,19 +39,13 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 	const blockContext = useContext( BlockContext );
 	const { removeAllBlockBindings } = useBlockBindingsUtils();
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
-	const isMobile = useViewportMatch( 'medium', '<' );
 
-	// Use useSelect to ensure sources are updated whenever there are updates in block context
-	// or when underlying data changes.
-	const { canUpdateBlockBindings, bindableAttributes } = useSelect(
+	const { bindableAttributes } = useSelect(
 		( select ) => {
 			const { __experimentalBlockBindingsSupportedAttributes } =
 				select( blockEditorStore ).getSettings();
 
 			return {
-				canUpdateBlockBindings:
-					select( blockEditorStore ).getSettings()
-						.canUpdateBlockBindings,
 				bindableAttributes:
 					__experimentalBlockBindingsSupportedAttributes?.[
 						blockName
@@ -113,9 +87,6 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 
 	const hasCompatibleFields = Object.keys( sources ).length > 0;
 
-	// Lock the UI when the user can't update bindings or there are no fields to connect to.
-	const readOnly = ! canUpdateBlockBindings || ! hasCompatibleFields;
-
 	if ( bindings === undefined && ! hasCompatibleFields ) {
 		return null;
 	}
@@ -131,69 +102,14 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 				className="block-editor-bindings__panel"
 			>
 				<ItemGroup isBordered isSeparated>
-					{ bindableAttributes.map( ( attribute ) => {
-						const binding = bindings?.[ attribute ];
-
-						// Check if this specific attribute has compatible fields from any source.
-						const attributeType = getAttributeType(
-							blockName,
-							attribute
-						);
-
-						const compatibleFieldsForAttribute = {};
-						for ( const sourceKey in sources ) {
-							const fields = sources[ sourceKey ].filter(
-								( field ) => field.type === attributeType
-							);
-							if ( fields.length ) {
-								compatibleFieldsForAttribute[ sourceKey ] =
-									fields;
-							}
-						}
-
-						const isAttributeReadOnly =
-							readOnly ||
-							! Object.keys( compatibleFieldsForAttribute )
-								.length;
-
-						if ( isAttributeReadOnly ) {
-							return (
-								<BlockBindingsAttributeControl
-									key={ attribute }
-									attribute={ attribute }
-									blockName={ blockName }
-									binding={ binding }
-								/>
-							);
-						}
-
-						return (
-							<BlockBindingsAttributeControl
-								key={ attribute }
-								attribute={ attribute }
-								blockName={ blockName }
-								binding={ binding }
-							>
-								<Menu
-									placement={
-										isMobile ? 'bottom-start' : 'left-start'
-									}
-								>
-									{ Object.entries(
-										compatibleFieldsForAttribute
-									).map( ( [ sourceKey, fields ] ) => (
-										<BlockBindingsSourceFieldsList
-											key={ sourceKey }
-											args={ binding?.args }
-											attribute={ attribute }
-											sourceKey={ sourceKey }
-											fields={ fields }
-										/>
-									) ) }
-								</Menu>
-							</BlockBindingsAttributeControl>
-						);
-					} ) }
+					{ bindableAttributes.map( ( attribute ) => (
+						<BlockBindingsAttributeControl
+							key={ attribute }
+							attribute={ attribute }
+							blockName={ blockName }
+							binding={ bindings?.[ attribute ] }
+						/>
+					) ) }
 				</ItemGroup>
 				{ /*
 					Use a div element to make the ToolsPanelHiddenInnerWrapper
