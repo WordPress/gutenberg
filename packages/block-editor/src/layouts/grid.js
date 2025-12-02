@@ -243,7 +243,7 @@ function GridLayoutMinimumWidthControl( { layout, onChange } ) {
 	return (
 		<fieldset className="block-editor-hooks__grid-layout-minimum-width-control">
 			<BaseControl.VisualLabel as="legend">
-				{ __( 'Minimum column width' ) }
+				{ __( 'Min. column width' ) }
 			</BaseControl.VisualLabel>
 			<Flex gap={ 4 }>
 				<FlexItem isBlock>
@@ -278,6 +278,11 @@ function GridLayoutMinimumWidthControl( { layout, onChange } ) {
 					/>
 				</FlexItem>
 			</Flex>
+			<p className="components-base-control__help">
+				{ __(
+					'Columns will wrap to fewer per row when they can no longer maintain the minimum width.'
+				) }
+			</p>
 		</fieldset>
 	);
 }
@@ -301,7 +306,7 @@ function GridLayoutColumnsAndRowsControl( {
 			<fieldset className="block-editor-hooks__grid-layout-columns-and-rows-controls">
 				{ ! isManualPlacement && (
 					<BaseControl.VisualLabel as="legend">
-						{ __( 'Columns' ) }
+						{ __( 'Max. columns' ) }
 					</BaseControl.VisualLabel>
 				) }
 				<Flex gap={ 4 }>
