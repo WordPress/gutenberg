@@ -27,12 +27,17 @@
 	}
 }
 
+.dataforms-layouts-panel__field-label-content {
+	display: inline-flex;
+	align-items: center;
+	cursor: help;
+}
+
 .dataforms-layouts-panel__field-error-indicator {
 	display: inline-flex;
 	align-items: center;
 	color: $alert-red;
 	margin-right: $grid-unit-05;
-	cursor: help;
 
 	svg {
 		fill: currentColor;

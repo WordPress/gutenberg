@@ -56,7 +56,8 @@ function getFirstValidationError(
 				return validation.message || 'A required field is empty';
 			}
 			if ( validation.message ) {
-			return validation.message;
+				return validation.message;
+			}
 		}
 	}
 
@@ -193,12 +194,17 @@ export default function FormPanelField< Item >( {
 	);
 	const fieldLabel = !! field.children ? field.label : fieldDefinition?.label;
 
-	const validationIndicator = hasError && (
+	const labelContent = hasError ? (
 		<Tooltip text={ errorMessage } placement="top">
-			<span className="dataforms-layouts-panel__field-error-indicator">
-				<Icon icon={ errorIcon } size={ 20 } />
+			<span className="dataforms-layouts-panel__field-label-content">
+				<span className="dataforms-layouts-panel__field-error-indicator">
+					<Icon icon={ errorIcon } size={ 20 } />
+				</span>
+				{ fieldLabel }
 			</span>
 		</Tooltip>
+	) : (
+		fieldLabel
 	);
 
 	const renderedControl =
@@ -231,8 +237,7 @@ export default function FormPanelField< Item >( {
 					className={ labelClassName }
 					style={ { paddingBottom: 0 } }
 				>
-					{ validationIndicator }
-					{ fieldLabel }
+					{ labelContent }
 				</div>
 				<div className="dataforms-layouts-panel__field-control">
 					{ renderedControl }
@@ -255,10 +260,7 @@ export default function FormPanelField< Item >( {
 			ref={ setPopoverAnchor }
 			className="dataforms-layouts-panel__field"
 		>
-			<div className={ labelClassName }>
-				{ validationIndicator }
-				{ fieldLabel }
-			</div>
+			<div className={ labelClassName }>{ labelContent }</div>
 			<div className="dataforms-layouts-panel__field-control">
 				{ renderedControl }
 			</div>
