@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ReactNode } from 'react';
+import type { ReactNode, MouseEvent } from 'react';
 
 /**
  * WordPress dependencies
@@ -93,7 +93,7 @@ const CardHeader = ( {
 						aria-label={
 							isOpen ? __( 'Collapse' ) : __( 'Expand' )
 						}
-						onClick={ ( e ) => {
+						onClick={ ( e: MouseEvent< HTMLButtonElement > ) => {
 							e.stopPropagation();
 							onToggle();
 						} }
