@@ -1,30 +1,6 @@
 == Changelog ==
 
-= 22.2.0-rc.2 =
-
-
-## Changelog
-
-### Bug Fixes
-
-- Private APIs: Remove re-registration check. ([73610](https://github.com/WordPress/gutenberg/pull/73610))
-
-#### Templates API
-- Template Activation: Rename gutenberg_get_block_template. ([73582](https://github.com/WordPress/gutenberg/pull/73582))
-- Template Activation: Use string IDs when experiment is off. ([73585](https://github.com/WordPress/gutenberg/pull/73585))
-
-
-
-
-## Contributors
-
-The following contributors merged PRs in this release:
-
-@ellatrix @mikachan
-
-
-= 22.2.0-rc.1 =
-
+= 22.2.0 =
 
 ## Changelog
 
@@ -181,6 +157,8 @@ The following contributors merged PRs in this release:
 #### Templates API
 - Add template route to the new site editor infrastructure. ([73525](https://github.com/WordPress/gutenberg/pull/73525))
 - Template Route: Add the 'add new template' button. ([73542](https://github.com/WordPress/gutenberg/pull/73542))
+- Template Activation: Rename gutenberg_get_block_template. ([73582](https://github.com/WordPress/gutenberg/pull/73582))
+- Template Activation: Use string IDs when experiment is off. ([73585](https://github.com/WordPress/gutenberg/pull/73585))
 
 #### Block Library
 - Disable TinyMCE: Polish refresh message. ([73485](https://github.com/WordPress/gutenberg/pull/73485))
@@ -213,6 +191,7 @@ The following contributors merged PRs in this release:
 
 - Asset Loader: Load all scripts in body (footer). ([73584](https://github.com/WordPress/gutenberg/pull/73584))
 - Core Data: Update Attachment type to more accurately reflect fields in media API responses. ([73223](https://github.com/WordPress/gutenberg/pull/73223))
+- Private APIs: Remove re-registration check. ([73610](https://github.com/WordPress/gutenberg/pull/73610))
 
 #### Patterns
 - Content only block experiment: Blocks provide the form. ([73479](https://github.com/WordPress/gutenberg/pull/73479))
@@ -295,6 +274,8 @@ The following PRs were merged by first-time contributors:
 The following contributors merged PRs in this release:
 
 @aaronrobertshaw @adamsilverstein @aduth @andrewserong @annezazu @anomiex @audrasjb @bph @cbravobernal @DAreRodz @ellatrix @felixarntz @getdave @gigitux @harshbhonsle @hbhalodia @jameskoster @jasmussen @jeryj @jorgefilipecosta @jsnajdr @karthick-murugan @luisherranz @MaggieCabrera @Mamaduka @mcsf @mikachan @mikejolley @mtias @ntsekouras @oandregal @ockham @PaulAsaf2 @priethor @ramonjd @RoyHridoy @ryanwelcher @scruffian @senadir @shimotmk @simison @SirLouen @t-hamano @talldan @tellthemachines @triple0t @tyxla @xristos3490 @youknowriad
+
+
 
 
 = 22.1.2 =
