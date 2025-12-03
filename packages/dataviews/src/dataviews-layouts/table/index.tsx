@@ -407,10 +407,16 @@ function ViewTable< Item >( {
 					{ hasPrimaryColumn && (
 						<col className="dataviews-view-table__col-primary" />
 					) }
-					{ columns.map( ( column ) => (
+					{ columns.map( ( column, index ) => (
 						<col
 							key={ `col-${ column }` }
-							className={ `dataviews-view-table__col-${ column }` }
+							className={ clsx(
+								`dataviews-view-table__col-${ column }`,
+								{
+									'dataviews-view-table__col-primary':
+										! hasPrimaryColumn && index === 0,
+								}
+							) }
 						/>
 					) ) }
 					{ !! actions?.length && (
