@@ -10,6 +10,9 @@ import {
 	InspectorControls,
 	useBlockProps,
 	__experimentalUseColorProps as useColorProps,
+	__experimentalGetSpacingClassesAndStyles as useSpacingProps,
+	getTypographyClassesAndStyles as useTypographyProps,
+	useSettings,
 } from '@wordpress/block-editor';
 import {
 	PanelBody,
@@ -24,6 +27,19 @@ import { close as closeIcon } from '@wordpress/icons';
 export default function OverlayCloseEdit( { attributes, setAttributes } ) {
 	const { displayMode, text } = attributes;
 	const colorProps = useColorProps( attributes );
+	const spacingProps = useSpacingProps( attributes );
+	const [ fluidTypographySettings, layout ] = useSettings(
+		'typography.fluid',
+		'layout'
+	);
+	const typographyProps = useTypographyProps( attributes, {
+		typography: {
+			fluid: fluidTypographySettings,
+		},
+		layout: {
+			wideSize: layout?.wideSize,
+		},
+	} );
 	const blockProps = useBlockProps( {
 		className: 'wp-block-overlay-close',
 	} );
@@ -78,9 +94,15 @@ export default function OverlayCloseEdit( { attributes, setAttributes } ) {
 				<Button
 					className={ clsx(
 						'wp-block-overlay-close__button',
-						colorProps.className
+						colorProps.className,
+						spacingProps.className,
+						typographyProps.className
 					) }
-					style={ colorProps.style }
+					style={ {
+						...colorProps.style,
+						...spacingProps.style,
+						...typographyProps.style,
+					} }
 					icon={ showIcon ? closeIcon : undefined }
 					text={ showText ? text : undefined }
 					aria-label={ __( 'Close' ) }

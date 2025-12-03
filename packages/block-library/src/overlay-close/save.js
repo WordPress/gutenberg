@@ -9,11 +9,15 @@ import clsx from 'clsx';
 import {
 	useBlockProps,
 	__experimentalGetColorClassesAndStyles as getColorClassesAndStyles,
+	__experimentalGetSpacingClassesAndStyles as getSpacingClassesAndStyles,
+	getTypographyClassesAndStyles,
 } from '@wordpress/block-editor';
 
 export default function overlayCloseSave( { attributes } ) {
 	const { displayMode, text } = attributes;
 	const colorProps = getColorClassesAndStyles( attributes );
+	const spacingProps = getSpacingClassesAndStyles( attributes );
+	const typographyProps = getTypographyClassesAndStyles( attributes );
 
 	const showIcon = displayMode === 'icon' || displayMode === 'both';
 	const showText = displayMode === 'text' || displayMode === 'both';
@@ -23,9 +27,15 @@ export default function overlayCloseSave( { attributes } ) {
 			{ ...useBlockProps.save( {
 				className: clsx(
 					'wp-block-overlay-close',
-					colorProps.className
+					colorProps.className,
+					spacingProps.className,
+					typographyProps.className
 				),
-				style: colorProps.style,
+				style: {
+					...colorProps.style,
+					...spacingProps.style,
+					...typographyProps.style,
+				},
 				type: 'button',
 				'aria-label': 'Close',
 			} ) }
