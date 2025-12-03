@@ -297,3 +297,38 @@ const AsyncValidationWithTest: StoryObj< typeof ValidatedInputControl > = {
 		);
 	},
 };
+
+/**
+ * Custom validity errors are effective immediately, even when they are not yet visible
+ * to the user. For example, in this form where the initial value is already invalid,
+ * the error message will be shown to the user once the submit button is clicked,
+ * even if the input has never been interacted with.
+ */
+export const CustomErrorsOnSubmit: StoryObj< typeof ValidatedInputControl > = {
+	args: {
+		label: 'Text',
+		required: true,
+		help: 'The word "error" will trigger an error.',
+	},
+	render: function Template( { ...args } ) {
+		const [ text, setText ] = useState< string | undefined >( 'error' );
+
+		return (
+			<>
+				<ValidatedInputControl
+					{ ...args }
+					value={ text }
+					onChange={ setText }
+					customValidity={
+						text === 'error'
+							? {
+									type: 'invalid',
+									message: 'The word "error" is not allowed.',
+							  }
+							: undefined
+					}
+				/>
+			</>
+		);
+	},
+};
