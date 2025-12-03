@@ -1226,7 +1226,7 @@ class WP_Theme_JSON_Gutenberg {
 
 					foreach ( $registered_styles[ $block_name ] as $block_style ) {
 						if ( ! isset( $style_selectors[ $block_style['name'] ] ) ) {
-							$block_element = $block_metadata['blockElement'] ?? null;
+							$block_element                           = $block_metadata['blockElement'] ?? null;
 							$style_selectors[ $block_style['name'] ] = static::get_block_style_variation_selector( $block_style['name'], $block_metadata['selector'], $block_element );
 						}
 					}
@@ -1274,7 +1274,7 @@ class WP_Theme_JSON_Gutenberg {
 			$style_selectors = array();
 			if ( ! empty( $block_type->styles ) ) {
 				foreach ( $block_type->styles as $style ) {
-					$block_element = static::$blocks_metadata[ $block_name ]['blockElement'] ?? null;
+					$block_element                     = static::$blocks_metadata[ $block_name ]['blockElement'] ?? null;
 					$style_selectors[ $style['name'] ] = static::get_block_style_variation_selector( $style['name'], static::$blocks_metadata[ $block_name ]['selector'], $block_element );
 				}
 			}
@@ -1282,7 +1282,7 @@ class WP_Theme_JSON_Gutenberg {
 			// Block style variations can be registered through the WP_Block_Styles_Registry as well as block.json.
 			$registered_styles = $style_registry->get_registered_styles_for_block( $block_name );
 			foreach ( $registered_styles as $style ) {
-				$block_element = static::$blocks_metadata[ $block_name ]['blockElement'] ?? null;
+				$block_element                     = static::$blocks_metadata[ $block_name ]['blockElement'] ?? null;
 				$style_selectors[ $style['name'] ] = static::get_block_style_variation_selector( $style['name'], static::$blocks_metadata[ $block_name ]['selector'], $block_element );
 			}
 
@@ -4762,7 +4762,7 @@ class WP_Theme_JSON_Gutenberg {
 		}
 
 		// Simple approach: find the target element and add variation class after it (but before pseudo-selectors)
-		$pattern = '/(?<![a-zA-Z0-9_-])' . preg_quote( $block_element, '/' ) . '((?:\.[a-zA-Z0-9_-]+|#[a-zA-Z0-9_-]+|\[[^\]]+\])*)/';
+		$pattern     = '/(?<![a-zA-Z0-9_-])' . preg_quote( $block_element, '/' ) . '((?:\.[a-zA-Z0-9_-]+|#[a-zA-Z0-9_-]+|\[[^\]]+\])*)/';
 		$replacement = $block_element . '$1' . $variation_class;
 
 		$result = preg_replace( $pattern, $replacement, $selector_part );

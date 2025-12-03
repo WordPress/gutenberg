@@ -5795,144 +5795,144 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 	public function data_get_block_style_variation_selector() {
 		return array(
 			// Standard selector tests (no blockElement parameter)
-			'empty block selector'     => array(
+			'empty block selector'            => array(
 				'selector' => '',
 				'expected' => '.is-style-custom',
 			),
-			'class selector'           => array(
+			'class selector'                  => array(
 				'selector' => '.wp-block',
 				'expected' => '.wp-block.is-style-custom',
 			),
-			'id selector'              => array(
+			'id selector'                     => array(
 				'selector' => '#wp-block',
 				'expected' => '#wp-block.is-style-custom',
 			),
-			'element tag selector'     => array(
+			'element tag selector'            => array(
 				'selector' => 'p',
 				'expected' => 'p.is-style-custom',
 			),
-			'attribute selector'       => array(
+			'attribute selector'              => array(
 				'selector' => '[style*="color"]',
 				'expected' => '[style*="color"].is-style-custom',
 			),
-			'descendant selector'      => array(
+			'descendant selector'             => array(
 				'selector' => '.wp-block .inner',
 				'expected' => '.wp-block.is-style-custom .inner',
 			),
-			'comma separated selector' => array(
+			'comma separated selector'        => array(
 				'selector' => '.wp-block .inner, .wp-block .alternative',
 				'expected' => '.wp-block.is-style-custom .inner, .wp-block.is-style-custom .alternative',
 			),
-			'pseudo selector'          => array(
+			'pseudo selector'                 => array(
 				'selector' => 'div:first-child',
 				'expected' => 'div.is-style-custom:first-child',
 			),
-			':is selector'             => array(
+			':is selector'                    => array(
 				'selector' => '.wp-block:is(.outer .inner:first-child)',
 				'expected' => '.wp-block.is-style-custom:is(.outer .inner:first-child)',
 			),
-			':not selector'            => array(
+			':not selector'                   => array(
 				'selector' => '.wp-block:not(.outer .inner:first-child)',
 				'expected' => '.wp-block.is-style-custom:not(.outer .inner:first-child)',
 			),
-			':has selector'            => array(
+			':has selector'                   => array(
 				'selector' => '.wp-block:has(.outer .inner:first-child)',
 				'expected' => '.wp-block.is-style-custom:has(.outer .inner:first-child)',
 			),
-			':where selector'          => array(
+			':where selector'                 => array(
 				'selector' => '.wp-block:where(.outer .inner:first-child)',
 				'expected' => '.wp-block.is-style-custom:where(.outer .inner:first-child)',
 			),
-			'wrapping :where selector' => array(
+			'wrapping :where selector'        => array(
 				'selector' => ':where(.outer .inner:first-child)',
 				'expected' => ':where(.outer.is-style-custom .inner:first-child)',
 			),
-			'complex'                  => array(
+			'complex'                         => array(
 				'selector' => '.wp:where(.something):is(.test:not(.nothing p)):has(div[style]) .content, .wp:where(.nothing):not(.test:is(.something div)):has(span[style]) .inner',
 				'expected' => '.wp.is-style-custom:where(.something):is(.test:not(.nothing p)):has(div[style]) .content, .wp.is-style-custom:where(.nothing):not(.test:is(.something div)):has(span[style]) .inner',
 			),
-			'child combinator selector' => array(
+			'child combinator selector'       => array(
 				'selector' => '.wp-block-list > li',
 				'expected' => '.wp-block-list.is-style-custom > li',
 			),
-			':not with child combinator' => array(
+			':not with child combinator'      => array(
 				'selector' => '.wp-block-list:not(.nested) > li',
 				'expected' => '.wp-block-list.is-style-custom:not(.nested) > li',
 			),
-			'complex :not selector'    => array(
+			'complex :not selector'           => array(
 				'selector' => '.wp-block-list:not(.wp-block-list .wp-block-list) > li',
 				'expected' => '.wp-block-list.is-style-custom:not(.wp-block-list .wp-block-list) > li',
 			),
 
 			// Element-only blockElement tests (recommended)
-			'list item basic'          => array(
+			'list item basic'                 => array(
 				'selector'      => '.wp-block-list > li',
 				'expected'      => '.wp-block-list > li.is-style-custom',
 				'block_element' => 'li',
 			),
-			'list item with :not'      => array(
+			'list item with :not'             => array(
 				'selector'      => '.wp-block-list:not(.wp-block-list .wp-block-list) > li',
 				'expected'      => '.wp-block-list:not(.wp-block-list .wp-block-list) > li.is-style-custom',
 				'block_element' => 'li',
 			),
-			'list item with classes'   => array(
+			'list item with classes'          => array(
 				'selector'      => '.wp-block-list > li.some-class',
 				'expected'      => '.wp-block-list > li.some-class.is-style-custom',
 				'block_element' => 'li',
 			),
-			'descendant with element'  => array(
+			'descendant with element'         => array(
 				'selector'      => '.wp-block-container div.content',
 				'expected'      => '.wp-block-container div.content.is-style-custom',
 				'block_element' => 'div',
 			),
-			'comma separated with element' => array(
+			'comma separated with element'    => array(
 				'selector'      => '.wp-block-list > li, .wp-block-list > li.alternative',
 				'expected'      => '.wp-block-list > li.is-style-custom, .wp-block-list > li.alternative.is-style-custom',
 				'block_element' => 'li',
 			),
-			'element not found fallback' => array(
+			'element not found fallback'      => array(
 				'selector'      => '.wp-block-button',
 				'expected'      => '.wp-block-button.is-style-custom',
 				'block_element' => 'span',
 			),
-			'complex nested selectors' => array(
+			'complex nested selectors'        => array(
 				'selector'      => '.wp-block-group .wp-block-list:not(.nested) > li:first-child',
 				'expected'      => '.wp-block-group .wp-block-list:not(.nested) > li.is-style-custom:first-child',
 				'block_element' => 'li',
 			),
 
 			// Combinator syntax blockElement tests (works but less semantic)
-			'basic > li combinator'     => array(
+			'basic > li combinator'           => array(
 				'selector'      => '.wp-block-list > li',
 				'expected'      => '.wp-block-list > li.is-style-custom',
 				'block_element' => '> li',
 			),
-			'> li with pseudo-selector' => array(
+			'> li with pseudo-selector'       => array(
 				'selector'      => '.wp-block-list > li:first-child',
 				'expected'      => '.wp-block-list > li.is-style-custom:first-child',
 				'block_element' => '> li',
 			),
-			'> li with existing class'  => array(
+			'> li with existing class'        => array(
 				'selector'      => '.wp-block-list > li.existing',
 				'expected'      => '.wp-block-list > li.existing.is-style-custom',
 				'block_element' => '> li',
 			),
-			'> li with complex selector' => array(
+			'> li with complex selector'      => array(
 				'selector'      => '.wp-block-group .wp-block-list:not(.nested) > li:first-child',
 				'expected'      => '.wp-block-group .wp-block-list:not(.nested) > li.is-style-custom:first-child',
 				'block_element' => '> li',
 			),
-			'+ span combinator'         => array(
+			'+ span combinator'               => array(
 				'selector'      => '.wp-block-wrapper + span',
 				'expected'      => '.wp-block-wrapper + span.is-style-custom',
 				'block_element' => '+ span',
 			),
-			'~ p combinator'            => array(
+			'~ p combinator'                  => array(
 				'selector'      => '.wp-block-header ~ p.content',
 				'expected'      => '.wp-block-header ~ p.content.is-style-custom',
 				'block_element' => '~ p',
 			),
-			'multiple selectors with >' => array(
+			'multiple selectors with >'       => array(
 				'selector'      => '.wp-block-list > li, .wp-block-list > li.alternative',
 				'expected'      => '.wp-block-list > li.is-style-custom, .wp-block-list > li.alternative.is-style-custom',
 				'block_element' => '> li',
@@ -5942,7 +5942,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 				'expected'      => '.wp-block-button.is-style-custom',
 				'block_element' => '> li',
 			),
-			'no spaces combinator >li'  => array(
+			'no spaces combinator >li'        => array(
 				'selector'      => '.wp-block-list>li',
 				'expected'      => '.wp-block-list>li.is-style-custom',
 				'block_element' => '>li',
