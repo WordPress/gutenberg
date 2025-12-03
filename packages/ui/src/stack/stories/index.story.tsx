@@ -24,7 +24,6 @@ export default meta;
 const DemoBox = ( { variant }: { variant?: 'lg' } ) => (
 	<Box
 		backgroundColor="brand"
-		padding="sm"
 		style={ {
 			width: variant === 'lg' ? '150px' : '100px',
 			height: variant === 'lg' ? '150px' : '100px',
