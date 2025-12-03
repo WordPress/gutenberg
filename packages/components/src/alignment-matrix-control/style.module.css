@@ -1,0 +1,86 @@
+/* Grid structure */
+.gridContainer {
+	direction: ltr;
+
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	grid-template-rows: repeat(3, 1fr);
+
+	box-sizing: border-box;
+	aspect-ratio: 1;
+
+	border: 1px solid transparent;
+	border-radius: 4px; /* CONFIG.radiusMedium */
+	outline: none;
+
+	cursor: pointer;
+}
+
+.gridRow {
+	grid-column: 1 / -1;
+
+	box-sizing: border-box;
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+}
+
+/* Cell */
+.cell {
+	position: relative;
+
+	display: flex;
+	align-items: center;
+	justify-content: center;
+
+	box-sizing: border-box;
+	margin: 0;
+	padding: 0;
+
+	appearance: none;
+	border: none;
+	outline: none;
+}
+
+/* Point */
+.point {
+	display: block;
+	contain: strict;
+
+	box-sizing: border-box;
+	width: 6px;
+	aspect-ratio: 1;
+
+	margin: auto;
+
+	color: var( --wp-components-color-gray-400, #ccc );
+
+	/* Use border instead of background color so that the point shows
+	in Windows High Contrast Mode */
+	border: 3px solid currentColor;
+}
+
+/* Highlight active item */
+.cell[data-active-item] .point {
+	color: var(--wp-components-color-foreground, #1e1e1e);
+	transform: scale(calc(5 / 3));
+}
+
+/* Hover styles for non-active items */
+.cell:not([data-active-item]):hover .point {
+	color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
+}
+
+/* Show an outline only when interacting with keyboard */
+.cell[data-focus-visible] .point {
+	outline: 1px solid var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
+	outline-offset: 1px;
+}
+
+@media not (prefers-reduced-motion) {
+	.point {
+		transition-property: color, transform;
+		transition-duration: 120ms;
+		transition-timing-function: linear;
+	}
+}
+
