@@ -14,7 +14,9 @@
 			"default": "icon"
 		},
 		"text": {
-			"type": "string",
+			"type": "rich-text",
+			"source": "rich-text",
+			"selector": "span",
 			"default": "Close"
 		}
 	},

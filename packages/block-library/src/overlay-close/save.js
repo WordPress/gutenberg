@@ -8,6 +8,7 @@ import clsx from 'clsx';
  */
 import {
 	useBlockProps,
+	RichText,
 	__experimentalGetColorClassesAndStyles as getColorClassesAndStyles,
 	__experimentalGetSpacingClassesAndStyles as getSpacingClassesAndStyles,
 	getTypographyClassesAndStyles,
@@ -52,7 +53,13 @@ export default function overlayCloseSave( { attributes } ) {
 					<path d="M13 11.8l6.1-6.3-1.1-1-6.1 6.2-6.1-6.2-1.1 1 6.1 6.3-6.5 6.7 1.1 1 6.5-6.6 6.5 6.6 1.1-1z" />
 				</svg>
 			) }
-			{ showText && <span>{ text }</span> }
+			{ showText && (
+				<RichText.Content
+					tagName="span"
+					value={ text }
+					className="wp-block-overlay-close__text"
+				/>
+			) }
 		</button>
 	);
 }

@@ -9,6 +9,7 @@ import clsx from 'clsx';
 import {
 	InspectorControls,
 	useBlockProps,
+	RichText,
 	__experimentalUseColorProps as useColorProps,
 	__experimentalGetSpacingClassesAndStyles as useSpacingProps,
 	getTypographyClassesAndStyles as useTypographyProps,
@@ -18,7 +19,6 @@ import {
 	PanelBody,
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
-	TextControl,
 	Button,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
@@ -74,20 +74,6 @@ export default function OverlayCloseEdit( { attributes, setAttributes } ) {
 							label={ __( 'Both' ) }
 						/>
 					</ToggleGroupControl>
-					{ showText && (
-						<TextControl
-							label={ __( 'Text' ) }
-							value={ text }
-							onChange={ ( value ) =>
-								setAttributes( { text: value } )
-							}
-							help={ __(
-								'Customize the close button text label.'
-							) }
-							__next40pxDefaultSize
-							__nextHasNoMarginBottom
-						/>
-					) }
 				</PanelBody>
 			</InspectorControls>
 			<div { ...blockProps }>
@@ -104,10 +90,23 @@ export default function OverlayCloseEdit( { attributes, setAttributes } ) {
 						...typographyProps.style,
 					} }
 					icon={ showIcon ? closeIcon : undefined }
-					text={ showText ? text : undefined }
 					aria-label={ __( 'Close' ) }
 					__next40pxDefaultSize
-				/>
+				>
+					{ showText && (
+						<RichText
+							value={ text }
+							onChange={ ( value ) =>
+								setAttributes( { text: value } )
+							}
+							placeholder={ __( 'Close' ) }
+							allowedFormats={ [ 'core/bold', 'core/italic' ] }
+							withoutInteractiveFormatting
+							tagName="span"
+							className="wp-block-overlay-close__text"
+						/>
+					) }
+				</Button>
 			</div>
 		</>
 	);
