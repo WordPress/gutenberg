@@ -33,20 +33,8 @@ type Story = StoryObj< typeof ControlWithError >;
  */
 export const WithMultipleControls: Story = {
 	render: function Template() {
-		const [ text, setText ] = useState( '' );
-		const [ text2, setText2 ] = useState( '' );
-		const [ customValidity, setCustomValidity ] =
-			useState<
-				React.ComponentProps<
-					typeof ValidatedInputControl
-				>[ 'customValidity' ]
-			>( undefined );
-		const [ customValidity2, setCustomValidity2 ] =
-			useState<
-				React.ComponentProps<
-					typeof ValidatedInputControl
-				>[ 'customValidity' ]
-			>( undefined );
+		const [ text, setText ] = useState< string | undefined >( '' );
+		const [ text2, setText2 ] = useState< string | undefined >( '' );
 
 		return (
 			<>
@@ -55,38 +43,30 @@ export const WithMultipleControls: Story = {
 					required
 					value={ text }
 					help="The word 'error' will trigger an error."
-					onChange={ ( value ) => {
-						setText( value ?? '' );
-
-						if ( value?.toLowerCase() === 'error' ) {
-							setCustomValidity( {
-								type: 'invalid',
-								message: 'The word "error" is not allowed.',
-							} );
-						} else {
-							setCustomValidity( undefined );
-						}
-					} }
-					customValidity={ customValidity }
+					onChange={ setText }
+					customValidity={
+						text?.toLowerCase() === 'error'
+							? {
+									type: 'invalid',
+									message: 'The word "error" is not allowed.',
+							  }
+							: undefined
+					}
 				/>
 				<ValidatedInputControl
 					label="Text"
 					required
 					value={ text2 }
 					help="The word 'error' will trigger an error."
-					onChange={ ( value ) => {
-						setText2( value ?? '' );
-
-						if ( value?.toLowerCase() === 'error' ) {
-							setCustomValidity2( {
-								type: 'invalid',
-								message: 'The word "error" is not allowed.',
-							} );
-						} else {
-							setCustomValidity2( undefined );
-						}
-					} }
-					customValidity={ customValidity2 }
+					onChange={ setText2 }
+					customValidity={
+						text2?.toLowerCase() === 'error'
+							? {
+									type: 'invalid',
+									message: 'The word "error" is not allowed.',
+							  }
+							: undefined
+					}
 				/>
 			</>
 		);
@@ -99,13 +79,8 @@ export const WithMultipleControls: Story = {
  */
 export const WithHelpTextReplacement: Story = {
 	render: function Template() {
-		const [ text, setText ] = useState( '' );
-		const [ customValidity, setCustomValidity ] =
-			useState<
-				React.ComponentProps<
-					typeof ValidatedInputControl
-				>[ 'customValidity' ]
-			>( undefined );
+		const [ text, setText ] = useState< string | undefined >( '' );
+		const isInvalid = text?.toLowerCase() === 'error';
 
 		return (
 			<>
@@ -125,25 +100,21 @@ export const WithHelpTextReplacement: Story = {
 						<span
 							className={ clsx(
 								'my-control__help',
-								! customValidity && 'is-visible'
+								! isInvalid && 'is-visible'
 							) }
 						>
 							The word &quot;error&quot; is not allowed.
 						</span>
 					}
-					onChange={ ( value ) => {
-						if ( value?.toLowerCase() === 'error' ) {
-							setCustomValidity( {
-								type: 'invalid',
-								message: 'The word "error" is not allowed.',
-							} );
-						} else {
-							setCustomValidity( undefined );
-						}
-
-						setText( value ?? '' );
-					} }
-					customValidity={ customValidity }
+					onChange={ setText }
+					customValidity={
+						isInvalid
+							? {
+									type: 'invalid',
+									message: 'The word "error" is not allowed.',
+							  }
+							: undefined
+					}
 				/>
 			</>
 		);

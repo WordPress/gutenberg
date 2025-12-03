@@ -29,32 +29,27 @@ export default meta;
 
 export const Default: StoryObj< typeof ValidatedTextControl > = {
 	render: function Template( { onChange, ...args } ) {
-		const [ value, setValue ] = useState( '' );
-		const [ customValidity, setCustomValidity ] =
+		const [ value, setValue ] =
 			useState<
-				React.ComponentProps<
-					typeof ValidatedTextControl
-				>[ 'customValidity' ]
-			>( undefined );
+				React.ComponentProps< typeof ValidatedTextControl >[ 'value' ]
+			>( '' );
 
 		return (
 			<ValidatedTextControl
 				{ ...args }
 				value={ value }
 				onChange={ ( newValue ) => {
-					if ( newValue?.toString().toLowerCase() === 'error' ) {
-						setCustomValidity( {
-							type: 'invalid',
-							message: 'The word "error" is not allowed.',
-						} );
-					} else {
-						setCustomValidity( undefined );
-					}
-
 					setValue( newValue );
 					onChange?.( newValue );
 				} }
-				customValidity={ customValidity }
+				customValidity={
+					value === 'error'
+						? {
+								type: 'invalid',
+								message: 'The word "error" is not allowed.',
+						  }
+						: undefined
+				}
 			/>
 		);
 	},

@@ -36,37 +36,27 @@ export default meta;
 export const Default: StoryObj< typeof ValidatedFormTokenField > = {
 	render: function Template( { onChange, ...args } ) {
 		const [ value, setValue ] = useState< ( string | TokenItem )[] >( [] );
-		const [ customValidity, setCustomValidity ] =
-			useState<
-				React.ComponentProps<
-					typeof ValidatedFormTokenField
-				>[ 'customValidity' ]
-			>( undefined );
 
 		return (
 			<ValidatedFormTokenField
 				{ ...args }
 				value={ value }
-				onChange={ ( newValue, ...rest ) => {
-					if (
-						newValue?.some( ( token ) => {
-							const tokenValue =
-								typeof token === 'string' ? token : token.value;
-							return tokenValue.toLowerCase() === 'error';
-						} )
-					) {
-						setCustomValidity( {
-							type: 'invalid',
-							message: 'The tag "error" is not allowed.',
-						} );
-					} else {
-						setCustomValidity( undefined );
-					}
-
+				onChange={ ( newValue ) => {
 					setValue( newValue );
-					onChange?.( newValue, ...rest );
+					onChange?.( newValue );
 				} }
-				customValidity={ customValidity }
+				customValidity={
+					value?.some( ( token ) => {
+						const tokenValue =
+							typeof token === 'string' ? token : token.value;
+						return tokenValue.toLowerCase() === 'error';
+					} )
+						? {
+								type: 'invalid',
+								message: 'The tag "error" is not allowed.',
+						  }
+						: undefined
+				}
 			/>
 		);
 	},

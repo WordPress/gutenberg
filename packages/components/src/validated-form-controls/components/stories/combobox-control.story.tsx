@@ -35,31 +35,23 @@ export const Default: StoryObj< typeof ValidatedComboboxControl > = {
 					typeof ValidatedComboboxControl
 				>[ 'value' ]
 			>();
-		const [ customValidity, setCustomValidity ] =
-			useState<
-				React.ComponentProps<
-					typeof ValidatedComboboxControl
-				>[ 'customValidity' ]
-			>( undefined );
 
 		return (
 			<ValidatedComboboxControl
 				{ ...args }
 				value={ value }
 				onChange={ ( newValue ) => {
-					if ( newValue === 'a' ) {
-						setCustomValidity( {
-							type: 'invalid',
-							message: 'Option A is not allowed.',
-						} );
-					} else {
-						setCustomValidity( undefined );
-					}
-
 					setValue( newValue );
 					onChange?.( newValue );
 				} }
-				customValidity={ customValidity }
+				customValidity={
+					value === 'a'
+						? {
+								type: 'invalid',
+								message: 'Option A is not allowed.',
+						  }
+						: undefined
+				}
 			/>
 		);
 	},
