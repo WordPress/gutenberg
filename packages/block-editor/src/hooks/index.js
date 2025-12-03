@@ -35,6 +35,7 @@ import blockHooks from './block-hooks';
 import blockBindingsPanel from './block-bindings';
 import './block-renaming';
 import './grid-visualizer';
+import './block-visibility-breakpoints';
 
 createBlockEditFilter(
 	[

@@ -22,6 +22,7 @@ import BlockModeToggle from '../block-settings-menu/block-mode-toggle';
 import { ModifyContentOnlySectionMenuItem } from '../content-lock';
 import { BlockRenameControl, useBlockRename } from '../block-rename';
 import { BlockVisibilityMenuItem } from '../block-visibility';
+import { BlockVisibilityBreakpointsMenuItem } from '../block-visibility-breakpoints';
 import { EditSectionMenuItem } from './edit-section-menu-item';
 
 const { Fill, Slot } = createSlotFill( 'BlockSettingsMenuControls' );
@@ -116,9 +117,15 @@ const BlockSettingsMenuControlsSlot = ( { fillProps, clientIds = null } ) => {
 							/>
 						) }
 						{ showVisibilityButton && (
-							<BlockVisibilityMenuItem
-								clientIds={ selectedClientIds }
-							/>
+							<>
+								<BlockVisibilityMenuItem
+									clientIds={ selectedClientIds }
+								/>
+								<BlockVisibilityBreakpointsMenuItem
+									clientIds={ selectedClientIds }
+									onClose={ fillProps?.onClose }
+								/>
+							</>
 						) }
 						{ fills }
 						{ selectedClientIds.length === 1 && (

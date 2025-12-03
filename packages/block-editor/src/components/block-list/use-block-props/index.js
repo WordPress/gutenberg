@@ -9,7 +9,12 @@ import clsx from 'clsx';
 import { useContext } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { __unstableGetBlockProps as getBlockProps } from '@wordpress/blocks';
-import { useMergeRefs, useDisabled } from '@wordpress/compose';
+import {
+	useMergeRefs,
+	useDisabled,
+	useViewportMatch,
+} from '@wordpress/compose';
+import { useSelect } from '@wordpress/data';
 import warning from '@wordpress/warning';
 
 /**
@@ -30,6 +35,7 @@ import { useIntersectionObserver } from './use-intersection-observer';
 import { useScrollIntoView } from './use-scroll-into-view';
 import { useFlashEditableBlocks } from '../../use-flash-editable-blocks';
 import { useFirefoxDraggableCompatibility } from './use-firefox-draggable-compatibility';
+import { store as blockEditorStore } from '../../../store';
 
 /**
  * This hook is used to lightly mark an element as a block element. The element
@@ -138,6 +144,36 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		  }
 		: {};
 
+	// Get breakpoint visibility settings from block attributes
+	const breakpointVisibility = useSelect(
+		( select ) => {
+			const block = select( blockEditorStore ).getBlock( clientId );
+			return block?.attributes?.metadata?.blockVisibilityBreakpoints;
+		},
+		[ clientId ]
+	);
+
+	// Detect current viewport - all hooks must be called unconditionally
+	const isSmallOrLarger = useViewportMatch( 'small', '>=' ); // >= 600px
+	const isLargeOrLarger = useViewportMatch( 'large', '>=' ); // >= 960px
+	const isMobileViewport = ! isSmallOrLarger; // < 600px
+	const isTabletViewport = isSmallOrLarger && ! isLargeOrLarger; // 600px - 960px
+	const isDesktopViewport = isLargeOrLarger; // >= 960px
+
+	// Determine which breakpoint classes to apply
+	const breakpointClasses = {};
+	if ( breakpointVisibility ) {
+		if ( breakpointVisibility.mobile && isMobileViewport ) {
+			breakpointClasses[ 'wp-block-hidden-mobile' ] = true;
+		}
+		if ( breakpointVisibility.tablet && isTabletViewport ) {
+			breakpointClasses[ 'wp-block-hidden-tablet' ] = true;
+		}
+		if ( breakpointVisibility.desktop && isDesktopViewport ) {
+			breakpointClasses[ 'wp-block-hidden-desktop' ] = true;
+		}
+	}
+
 	// Ensures it warns only inside the `edit` implementation for the block.
 	if ( blockApiVersion < 2 && clientId === blockEditContext.clientId ) {
 		warning(
@@ -186,6 +222,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 				'has-negative-margin': hasNegativeMargin,
 				'is-editing-content-only-section': isEditingContentOnlySection,
 				'is-block-hidden': isBlockHidden,
+				...breakpointClasses,
 			},
 			className,
 			props.className,

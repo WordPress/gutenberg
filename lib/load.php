@@ -185,6 +185,7 @@ require __DIR__ . '/block-supports/background.php';
 require __DIR__ . '/block-supports/block-style-variations.php';
 require __DIR__ . '/block-supports/aria-label.php';
 require __DIR__ . '/block-supports/block-visibility.php';
+require __DIR__ . '/block-supports/block-visibility-breakpoints.php';
 
 // Client-side media processing.
 if ( gutenberg_is_experiment_enabled( 'gutenberg-media-processing' ) ) {
