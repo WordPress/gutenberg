@@ -92,6 +92,34 @@ export type Rules< Item > = {
 		  ) => Promise< null | string > );
 };
 
+export type Validator< Item > = (
+	item: Item,
+	field: NormalizedField< Item >
+) => boolean;
+
+export type CustomValidator< Item > =
+	| ( ( item: Item, field: NormalizedField< Item > ) => null | string )
+	| ( (
+			item: Item,
+			field: NormalizedField< Item >
+	  ) => Promise< null | string > );
+
+type NormalizedRule< Item, ConstraintType > = {
+	constraint: ConstraintType;
+	validate: Validator< Item >;
+};
+
+export type NormalizedRules< Item > = {
+	required?: NormalizedRule< Item, boolean >;
+	elements?: NormalizedRule< Item, boolean >;
+	pattern?: NormalizedRule< Item, string >;
+	minLength?: NormalizedRule< Item, number >;
+	maxLength?: NormalizedRule< Item, number >;
+	min?: NormalizedRule< Item, number >;
+	max?: NormalizedRule< Item, number >;
+	custom?: CustomValidator< Item >;
+};
+
 /**
  * Edit configuration for textarea controls.
  */
@@ -288,7 +316,7 @@ export type FormatInteger = {
 	separatorThousand?: string;
 };
 
-type NormalizedFieldBase< Item > = Omit< Field< Item >, 'Edit' > & {
+type NormalizedFieldBase< Item > = Omit< Field< Item >, 'Edit' | 'isValid' > & {
 	label: string;
 	header: string | ReactElement;
 	getValue: ( args: { item: Item } ) => any;
@@ -297,7 +325,7 @@ type NormalizedFieldBase< Item > = Omit< Field< Item >, 'Edit' > & {
 	Edit: ComponentType< DataFormControlProps< Item > > | null;
 	hasElements: boolean;
 	sort: ( a: Item, b: Item, direction: SortDirection ) => number;
-	isValid: Rules< Item >;
+	isValid: NormalizedRules< Item >;
 	enableHiding: boolean;
 	enableSorting: boolean;
 	filterBy: Required< FilterByConfig > | false;

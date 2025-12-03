@@ -14,6 +14,7 @@ import type {
 } from '../types';
 import type { FieldType } from '../types/private';
 import RenderFromElements from './utils/render-from-elements';
+import isValidElements from './utils/is-valid-elements';
 import {
 	OPERATOR_ON,
 	OPERATOR_NOT_ON,
@@ -26,6 +27,7 @@ import {
 	OPERATOR_BETWEEN,
 	DAYS_OF_WEEK,
 } from '../constants';
+import isValidRequired from './utils/is-valid-required';
 
 function getFormat< Item >( field: Field< Item > ): Required< FormatDate > {
 	const fieldFormat = field.format as FormatDate | undefined;
@@ -60,7 +62,7 @@ function render( { item, field }: DataViewRenderFieldProps< any > ) {
 	// but TypeScript is unable to infer this, hence the type assertion.
 	let format: Required< FormatDate >;
 	if ( field.type !== 'date' ) {
-		format = getFormat( field as Field< any > );
+		format = getFormat( {} as Field< any > );
 	} else {
 		format = field.format as Required< FormatDate >;
 	}
@@ -80,10 +82,6 @@ export default {
 	render,
 	Edit: 'date',
 	sort,
-	isValid: {
-		elements: true,
-		custom: () => null,
-	},
 	enableSorting: true,
 	enableGlobalSearch: false,
 	defaultOperators: [
@@ -109,4 +107,8 @@ export default {
 		OPERATOR_BETWEEN,
 	],
 	getFormat,
+	validate: {
+		required: isValidRequired,
+		elements: isValidElements,
+	},
 } satisfies FieldType< any >;

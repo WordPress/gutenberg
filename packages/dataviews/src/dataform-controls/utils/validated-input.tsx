@@ -56,7 +56,7 @@ export default function ValidatedText< Item >( {
 
 	return (
 		<ValidatedInputControl
-			required={ !! isValid?.required }
+			required={ !! isValid.required }
 			customValidity={ getCustomValidity( isValid, validity ) }
 			label={ label }
 			placeholder={ placeholder }
@@ -67,9 +67,13 @@ export default function ValidatedText< Item >( {
 			type={ type }
 			prefix={ prefix }
 			suffix={ suffix }
-			pattern={ isValid?.pattern }
-			minLength={ isValid?.minLength }
-			maxLength={ isValid?.maxLength }
+			pattern={ isValid.pattern ? isValid.pattern.constraint : undefined }
+			minLength={
+				isValid.minLength ? isValid.minLength.constraint : undefined
+			}
+			maxLength={
+				isValid.maxLength ? isValid.maxLength.constraint : undefined
+			}
 			__next40pxDefaultSize
 		/>
 	);

@@ -2,24 +2,21 @@
  * Internal dependencies
  */
 import type {
+	CustomValidator,
 	Field,
 	FormatDate,
 	FormatInteger,
 	FormatNumber,
 	NormalizedField,
 	Operator,
+	Validator,
 } from './field-api';
 
 export type SelectionOrUpdater = string[] | ( ( prev: string[] ) => string[] );
 export type SetSelection = ( selection: SelectionOrUpdater ) => void;
 export type FieldType< Item > = Pick<
 	NormalizedField< Item >,
-	| 'type'
-	| 'render'
-	| 'sort'
-	| 'isValid'
-	| 'enableSorting'
-	| 'enableGlobalSearch'
+	'type' | 'render' | 'sort' | 'enableSorting' | 'enableGlobalSearch'
 > & {
 	Edit: string | null;
 	validOperators: Operator[];
@@ -31,4 +28,14 @@ export type FieldType< Item > = Pick<
 		| Required< FormatDate >
 		| Required< FormatNumber >
 		| Required< FormatInteger >;
+	validate: {
+		required?: Validator< Item >;
+		elements?: Validator< Item >;
+		pattern?: Validator< Item >;
+		minLength?: Validator< Item >;
+		maxLength?: Validator< Item >;
+		min?: Validator< Item >;
+		max?: Validator< Item >;
+		custom?: CustomValidator< Item >;
+	};
 };
