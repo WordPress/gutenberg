@@ -143,11 +143,38 @@ export function focusCommentThread( commentId, container, additionalSelector ) {
 	} ).then( ( element ) => {
 		if ( element ) {
 			element.focus();
-			element.scrollIntoView( {
-				behavior: 'smooth',
-				block: 'nearest',
-				inline: 'nearest',
-			} );
+			const scrollableParent = element.closest(
+				'.editor-collab-sidebar-panel'
+			);
+
+			if ( scrollableParent ) {
+				const elementRect = element.getBoundingClientRect();
+				const containerRect = scrollableParent.getBoundingClientRect();
+
+				const isAboveView = elementRect.top < containerRect.top;
+				const isBelowView = elementRect.bottom > containerRect.bottom;
+
+				if ( isAboveView || isBelowView ) {
+					const elementTop = element.offsetTop;
+					const containerHeight = scrollableParent.clientHeight;
+					const elementHeight = element.offsetHeight;
+
+					const scrollTop = isAboveView
+						? elementTop
+						: elementTop - containerHeight + elementHeight;
+
+					scrollableParent.scrollTo( {
+						top: scrollTop,
+						behavior: 'smooth',
+					} );
+				}
+			} else {
+				element.scrollIntoView( {
+					behavior: 'smooth',
+					block: 'nearest',
+					inline: 'nearest',
+				} );
+			}
 		}
 	} );
 }
