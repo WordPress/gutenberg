@@ -19,7 +19,7 @@ import {
 	Button,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { close } from '@wordpress/icons';
+import { close as closeIcon } from '@wordpress/icons';
 
 export default function OverlayCloseEdit( { attributes, setAttributes } ) {
 	const { displayMode, text } = attributes;
@@ -81,7 +81,7 @@ export default function OverlayCloseEdit( { attributes, setAttributes } ) {
 						colorProps.className
 					) }
 					style={ colorProps.style }
-					icon={ showIcon ? close : undefined }
+					icon={ showIcon ? closeIcon : undefined }
 					text={ showText ? text : undefined }
 					aria-label={ __( 'Close' ) }
 					__next40pxDefaultSize
