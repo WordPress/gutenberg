@@ -1226,7 +1226,8 @@ class WP_Theme_JSON_Gutenberg {
 
 					foreach ( $registered_styles[ $block_name ] as $block_style ) {
 						if ( ! isset( $style_selectors[ $block_style['name'] ] ) ) {
-							$style_selectors[ $block_style['name'] ] = static::get_block_style_variation_selector( $block_style['name'], $block_metadata['selector'] );
+							$block_element = $block_metadata['blockElement'] ?? null;
+							$style_selectors[ $block_style['name'] ] = static::get_block_style_variation_selector( $block_style['name'], $block_metadata['selector'], $block_element );
 						}
 					}
 
@@ -1241,6 +1242,11 @@ class WP_Theme_JSON_Gutenberg {
 
 			static::$blocks_metadata[ $block_name ]['selector']  = $root_selector;
 			static::$blocks_metadata[ $block_name ]['selectors'] = static::get_block_selectors( $block_type, $root_selector );
+
+			// Extract blockElement from block type's selectors configuration if available
+			if ( isset( $block_type->selectors['blockElement'] ) && is_string( $block_type->selectors['blockElement'] ) ) {
+				static::$blocks_metadata[ $block_name ]['blockElement'] = $block_type->selectors['blockElement'];
+			}
 
 			$elements = static::get_block_element_selectors( $root_selector );
 			if ( ! empty( $elements ) ) {
@@ -1268,14 +1274,16 @@ class WP_Theme_JSON_Gutenberg {
 			$style_selectors = array();
 			if ( ! empty( $block_type->styles ) ) {
 				foreach ( $block_type->styles as $style ) {
-					$style_selectors[ $style['name'] ] = static::get_block_style_variation_selector( $style['name'], static::$blocks_metadata[ $block_name ]['selector'] );
+					$block_element = static::$blocks_metadata[ $block_name ]['blockElement'] ?? null;
+					$style_selectors[ $style['name'] ] = static::get_block_style_variation_selector( $style['name'], static::$blocks_metadata[ $block_name ]['selector'], $block_element );
 				}
 			}
 
 			// Block style variations can be registered through the WP_Block_Styles_Registry as well as block.json.
 			$registered_styles = $style_registry->get_registered_styles_for_block( $block_name );
 			foreach ( $registered_styles as $style ) {
-				$style_selectors[ $style['name'] ] = static::get_block_style_variation_selector( $style['name'], static::$blocks_metadata[ $block_name ]['selector'] );
+				$block_element = static::$blocks_metadata[ $block_name ]['blockElement'] ?? null;
+				$style_selectors[ $style['name'] ] = static::get_block_style_variation_selector( $style['name'], static::$blocks_metadata[ $block_name ]['selector'], $block_element );
 			}
 
 			if ( ! empty( $style_selectors ) ) {
@@ -4707,34 +4715,71 @@ class WP_Theme_JSON_Gutenberg {
 	/**
 	 * Generates a selector for a block style variation.
 	 *
-	 * @param string $variation_name Name of the block style variation.
-	 * @param string $block_selector CSS selector for the block.
+	 * @param string      $variation_name Name of the block style variation.
+	 * @param string      $block_selector CSS selector for the block.
+	 * @param string|null $block_element  Optional. The specific element within the selector that represents the block.
+	 *                                    If provided, the variation class will be added to this element instead of the first element.
 	 *
 	 * @return string Block selector with block style variation selector added to it.
 	 */
-	protected static function get_block_style_variation_selector( $variation_name, $block_selector ) {
+	protected static function get_block_style_variation_selector( $variation_name, $block_selector, $block_element = null ) {
 		$variation_class = ".is-style-$variation_name";
 
 		if ( ! $block_selector ) {
 			return $variation_class;
 		}
 
-		$limit          = 1;
 		$selector_parts = explode( ',', $block_selector );
 		$result         = array();
 
 		foreach ( $selector_parts as $part ) {
-			$result[] = preg_replace_callback(
+			$result[] = static::apply_variation_to_selector_part( trim( $part ), $variation_class, $block_element );
+		}
+
+		return implode( ', ', $result );
+	}
+
+	/**
+	 * Applies a variation class to a specific part of a CSS selector.
+	 *
+	 * @param string      $selector_part   A single CSS selector part (no commas).
+	 * @param string      $variation_class The variation class to add (e.g., ".is-style-custom").
+	 * @param string|null $block_element   Optional. The specific element to target (e.g., "li").
+	 *
+	 * @return string The modified selector part with variation class applied.
+	 */
+	private static function apply_variation_to_selector_part( $selector_part, $variation_class, $block_element ) {
+		// If no specific block element is provided, use the original logic
+		if ( ! $block_element ) {
+			return preg_replace_callback(
 				'/((?::\([^)]+\))?\s*)([^\s:]+)/',
 				function ( $matches ) use ( $variation_class ) {
 					return $matches[1] . $matches[2] . $variation_class;
 				},
-				$part,
-				$limit
+				$selector_part,
+				1
 			);
 		}
 
-		return implode( ',', $result );
+		// Simple approach: find the target element and add variation class after it (but before pseudo-selectors)
+		$pattern = '/(?<![a-zA-Z0-9_-])' . preg_quote( $block_element, '/' ) . '((?:\.[a-zA-Z0-9_-]+|#[a-zA-Z0-9_-]+|\[[^\]]+\])*)/';
+		$replacement = $block_element . '$1' . $variation_class;
+
+		$result = preg_replace( $pattern, $replacement, $selector_part );
+
+		// If no replacement was made, fall back to the original logic
+		if ( $result === $selector_part ) {
+			return preg_replace_callback(
+				'/((?::\([^)]+\))?\s*)([^\s:]+)/',
+				function ( $matches ) use ( $variation_class ) {
+					return $matches[1] . $matches[2] . $variation_class;
+				},
+				$selector_part,
+				1
+			);
+		}
+
+		return $result;
 	}
 
 	/**
