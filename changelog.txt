@@ -1,5 +1,32 @@
 == Changelog ==
 
+= 22.1.3 =
+
+
+## Changelog
+
+### Bug Fixes
+
+#### Templates API
+- Template Activation: Rename gutenberg_get_block_template. ([73582](https://github.com/WordPress/gutenberg/pull/73582))
+- Template Activation: Use string IDs when experiment is off. ([73585](https://github.com/WordPress/gutenberg/pull/73585))
+
+#### Site Editor
+- Site Hub: Use optional chaining on currentTheme. ([73587](https://github.com/WordPress/gutenberg/pull/73587))
+
+#### Block Library
+- Paragraph block: Backward compatibility support for align attribute. ([73578](https://github.com/WordPress/gutenberg/pull/73578))
+
+
+
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@mikachan @youknowriad
+
+
 = 22.1.2 =
 
 
