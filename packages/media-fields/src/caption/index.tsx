@@ -28,7 +28,7 @@ const captionField: Partial< Field< Updatable< Attachment > > > = {
 			/>
 		);
 	},
-	enableSorting: true,
+	enableSorting: false,
 	filterBy: false,
 };
 

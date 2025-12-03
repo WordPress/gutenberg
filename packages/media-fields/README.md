@@ -1,8 +1,6 @@
 # Media Fields
 
-**This is an internal package** – not intended for external use.
-
-This package provides reusable field definitions for displaying and editing media attachment properties in WordPress DataViews. It's used internally by the media-utils package and is not published to npm.
+This package provides reusable field definitions for displaying and editing media attachment properties in WordPress DataViews. It's primarily intended for internal use within Gutenberg and may change significantly between releases.
 
 ## Usage
 
@@ -49,8 +47,6 @@ export function MyMediaLibrary( { items } ) {
 
 ## Contributing to this package
 
-This is an internal package that's part of the Gutenberg project. It is not published to npm and is only used within the Gutenberg repository itself.
-
-To find out more about contributing to this package or Gutenberg as a whole, please read the project's main [contributor guide](https://github.com/WordPress/gutenberg/tree/HEAD/CONTRIBUTING.md).
+This package is part of the Gutenberg project. To find out more about contributing to this package or Gutenberg as a whole, please read the project's main [contributor guide](https://github.com/WordPress/gutenberg/tree/HEAD/CONTRIBUTING.md).
 
 <br /><br /><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>
