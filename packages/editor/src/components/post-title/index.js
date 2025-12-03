@@ -30,17 +30,13 @@ import usePostTitle from './use-post-title';
 import PostTypeSupportCheck from '../post-type-support-check';
 
 const PostTitle = forwardRef( ( _, forwardedRef ) => {
-	const { placeholder } = useSelect( ( select ) => {
+	const { placeholder, collaboratorMode } = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
 		const { titlePlaceholder } = getSettings();
 
-		return {
-			placeholder: titlePlaceholder,
-		};
-	}, [] );
+		const { getCollaboratorMode } = select( coreDataStore );
 
-	const collaboratorMode = useSelect( ( select ) => {
-		return select( coreDataStore ).getCollaboratorMode();
+		return { placeholder: titlePlaceholder, collaboratorMode: getCollaboratorMode() };
 	}, [] );
 
 	const [ isSelected, setIsSelected ] = useState( false );
