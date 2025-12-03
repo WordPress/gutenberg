@@ -567,7 +567,7 @@ Separate your content into a multi-page experience. ([Source](https://github.com
 
 ## Overlay Close
 
-A button to close navigation overlays. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/overlay-close))
+A customizable button to close overlays. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/overlay-close))
 
 -	**Name:** core/overlay-close
 -	**Category:** design

@@ -4,7 +4,7 @@
 	"name": "core/overlay-close",
 	"title": "Overlay Close",
 	"category": "design",
-	"description": "A button to close navigation overlays.",
+	"description": "A customizable button to close overlays.",
 	"keywords": [ "close", "overlay", "navigation", "menu" ],
 	"textdomain": "default",
 	"attributes": {
