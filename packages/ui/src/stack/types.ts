@@ -3,6 +3,8 @@
  */
 import { type ComponentProps } from '../utils/types';
 
+export type SizeToken = '2xs' | 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+
 export interface StackProps extends ComponentProps< 'div' > {
 	/**
 	 * The direction of the stack.
@@ -18,7 +20,7 @@ export interface StackProps extends ComponentProps< 'div' > {
 	 *
 	 * @default 'initial'
 	 */
-	gap?: number | React.CSSProperties[ 'gap' ];
+	gap?: number | SizeToken | React.CSSProperties[ 'gap' ];
 
 	/**
 	 * The alignment of the stack items along the cross axis.

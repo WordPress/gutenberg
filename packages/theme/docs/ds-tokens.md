@@ -128,6 +128,7 @@ Do not edit directly.
 | `--wpds-dimension-gap-sm`              | Small gap                           |
 | `--wpds-dimension-gap-md`              | Medium gap                          |
 | `--wpds-dimension-gap-lg`              | Large gap                           |
+| `--wpds-dimension-gap-xl`              | Extra large gap                     |
 
 ### Elevation
 

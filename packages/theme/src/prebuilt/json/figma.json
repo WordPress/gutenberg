@@ -640,27 +640,35 @@
 	},
 	"Dimension/Semantic/gap-sm": {
 		"value": {
-			".": "16px",
-			"compact": "12px",
-			"comfortable": "20px"
+			".": "12px",
+			"compact": "8px",
+			"comfortable": "16px"
 		},
 		"description": "Small gap"
 	},
 	"Dimension/Semantic/gap-md": {
 		"value": {
-			".": "24px",
-			"compact": "20px",
-			"comfortable": "32px"
+			".": "16px",
+			"compact": "12px",
+			"comfortable": "20px"
 		},
 		"description": "Medium gap"
 	},
 	"Dimension/Semantic/gap-lg": {
 		"value": {
-			".": "32px",
-			"compact": "24px",
-			"comfortable": "40px"
+			".": "24px",
+			"compact": "20px",
+			"comfortable": "32px"
 		},
 		"description": "Large gap"
+	},
+	"Dimension/Semantic/gap-xl": {
+		"value": {
+			".": "40px",
+			"compact": "32px",
+			"comfortable": "48px"
+		},
+		"description": "Extra large gap"
 	},
 	"Elevation/x-small": {
 		"value": {

@@ -111,6 +111,7 @@ export default [
 	'--wpds-dimension-gap-sm',
 	'--wpds-dimension-gap-md',
 	'--wpds-dimension-gap-lg',
+	'--wpds-dimension-gap-xl',
 	'--wpds-elevation-x-small',
 	'--wpds-elevation-small',
 	'--wpds-elevation-medium',

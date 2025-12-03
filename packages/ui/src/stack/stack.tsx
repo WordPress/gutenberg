@@ -12,18 +12,20 @@ import { forwardRef } from '@wordpress/element';
  * Internal dependencies
  */
 import { renderElement } from '../utils/element';
-import { type StackProps } from './types';
+import { type StackProps, type SizeToken } from './types';
 import styles from './style.module.css';
-
-/**
- * Design tokens for gap spacing.
- */
-type TokenName = '2xs' | 'xs' | 'sm' | 'md' | 'lg';
 
 /**
  * Set of token names for gap spacing.
  */
-const TOKEN_NAMES = new Set< TokenName >( [ '2xs', 'xs', 'sm', 'md', 'lg' ] );
+const TOKEN_NAMES = new Set< SizeToken >( [
+	'2xs',
+	'xs',
+	'sm',
+	'md',
+	'lg',
+	'xl',
+] );
 
 /**
  * Normalizes the gap value. When given a positive number, it will be converted
@@ -34,13 +36,13 @@ const TOKEN_NAMES = new Set< TokenName >( [ '2xs', 'xs', 'sm', 'md', 'lg' ] );
  * @return The normalized gap value.
  */
 export function getNormalizedGap(
-	gap: number | TokenName | React.CSSProperties[ 'gap' ]
+	gap: number | SizeToken | React.CSSProperties[ 'gap' ]
 ): string {
 	if ( typeof gap === 'number' ) {
 		return `calc( ${ gap } * var( --wpds-dimension-base ) )`;
 	}
 
-	if ( TOKEN_NAMES.has( gap as TokenName ) ) {
+	if ( TOKEN_NAMES.has( gap as SizeToken ) ) {
 		return `var(--wpds-dimension-gap-${ gap })`;
 	}
 
