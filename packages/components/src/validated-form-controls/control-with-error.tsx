@@ -153,14 +153,15 @@ function UnforwardedControlWithError< C extends React.ReactElement >(
 		}
 	}, [ customValidity, getValidityTarget ] );
 
-	// Show messages if field has been touched (i.e. has blurred at least once).
+	// Show messages if field has been touched (i.e. has blurred at least once),
+	// or validation has been triggered by the consumer/user.
 	useEffect( (): ReturnType< React.EffectCallback > => {
 		if ( ! isTouched || showMessage ) {
 			return;
 		}
 
 		if ( customValidity?.type === 'validating' ) {
-			// Wait before showing a validating state.
+			// Don't show validating indicators for quick calls that take less than 1 sec.
 			const timer = setTimeout( () => {
 				setShowMessage( true );
 			}, 1000 );
