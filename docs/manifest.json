@@ -1848,6 +1848,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/media-fields",
+		"slug": "packages-media-fields",
+		"markdown_source": "../packages/media-fields/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/media-utils",
 		"slug": "packages-media-utils",
 		"markdown_source": "../packages/media-utils/README.md",
