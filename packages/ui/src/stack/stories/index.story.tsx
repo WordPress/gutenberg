@@ -4,6 +4,11 @@
 import type { Meta, StoryObj } from '@storybook/react';
 
 /**
+ * WordPress dependencies
+ */
+import '@wordpress/theme/design-tokens.css'; // eslint-disable-line no-restricted-syntax
+
+/**
  * Internal dependencies
  */
 import { Stack } from '../index';
