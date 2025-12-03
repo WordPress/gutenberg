@@ -565,6 +565,15 @@ Separate your content into a multi-page experience. ([Source](https://github.com
 -	**Parent:** core/post-content
 -	**Supports:** interactivity (clientNavigation), ~~className~~, ~~customClassName~~, ~~html~~
 
+## Overlay Close
+
+A button to close navigation overlays. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/overlay-close))
+
+-	**Name:** core/overlay-close
+-	**Category:** design
+-	**Supports:** anchor, color (background, text, ~~gradients~~), spacing (padding), typography (fontSize, lineHeight)
+-	**Attributes:** displayMode, text
+
 ## Page List
 
 Display a list of all pages. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/page-list))

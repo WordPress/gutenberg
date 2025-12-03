@@ -1,0 +1,32 @@
+.wp-block-overlay-close {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.5em;
+	padding: 0.5em;
+	border: none;
+	background: transparent;
+	cursor: pointer;
+	text-decoration: none;
+	transition: opacity 0.2s;
+
+	&:hover {
+		opacity: 0.8;
+	}
+
+	&:focus {
+		outline: 2px solid currentColor;
+		outline-offset: 2px;
+	}
+
+	svg {
+		width: 1.5em;
+		height: 1.5em;
+		fill: currentColor;
+	}
+
+	span {
+		display: inline-block;
+	}
+}
+
