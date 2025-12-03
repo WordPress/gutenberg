@@ -21,4 +21,3 @@ export * from './utils';
 export { storeConfig, store } from './store';
 export { SETTINGS_DEFAULTS } from './store/defaults';
 export { privateApis } from './private-apis';
-export { BlockCanvasCover } from './components/block-canvas';
