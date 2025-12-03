@@ -22,7 +22,11 @@ import { unlock } from '../../lock-unlock';
 import usePatternSettings from '../page-patterns/use-pattern-settings';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 
-const { usePostFields, PostCardPanel } = unlock( editorPrivateApis );
+const { usePostFields, PostCardPanel, useOpenPostPicker } =
+	unlock( editorPrivateApis );
+const { ExperimentalBlockEditorProvider, postPickerKey } = unlock(
+	blockEditorPrivateApis
+);
 
 const fieldsWithBulkEditSupport = [
 	'title',
@@ -32,7 +36,7 @@ const fieldsWithBulkEditSupport = [
 	'discussion',
 ];
 
-function PostEditForm( { postType, postId } ) {
+function PostEditForm( { postType, postId, settings } ) {
 	const ids = useMemo( () => postId.split( ',' ), [ postId ] );
 	const { record, hasFinishedResolution } = useSelect(
 		( select ) => {
@@ -147,19 +151,14 @@ function PostEditForm( { postType, postId } ) {
 		setMultiEdits( {} );
 	}, [ ids ] );
 
-	const { ExperimentalBlockEditorProvider } = unlock(
-		blockEditorPrivateApis
-	);
-	const settings = usePatternSettings();
-
 	/**
-	 * The template field depends on the block editor settings.
+	 * The template field and parent field depend on the block editor settings.
 	 * This is a workaround to ensure that the block editor settings are available.
 	 * For more information, see: https://github.com/WordPress/gutenberg/issues/67521
 	 */
 	const fieldsWithDependency = useMemo( () => {
 		return fields.map( ( field ) => {
-			if ( field.id === 'template' ) {
+			if ( field.id === 'template' || field.id === 'parent' ) {
 				return {
 					...field,
 					Edit: ( data ) => (
@@ -189,17 +188,33 @@ function PostEditForm( { postType, postId } ) {
 }
 
 export function PostEdit( { postType, postId } ) {
+	const baseSettings = usePatternSettings();
+	const openPostPicker = useOpenPostPicker();
+
+	const settings = useMemo( () => {
+		return {
+			...baseSettings,
+			[ postPickerKey ]: openPostPicker,
+		};
+	}, [ baseSettings, openPostPicker ] );
+
 	return (
-		<Page
-			className={ clsx( 'edit-site-post-edit', {
-				'is-empty': ! postId,
-			} ) }
-			label={ __( 'Post Edit' ) }
-		>
-			{ postId && (
-				<PostEditForm postType={ postType } postId={ postId } />
-			) }
-			{ ! postId && <p>{ __( 'Select a page to edit' ) }</p> }
-		</Page>
+		<ExperimentalBlockEditorProvider settings={ settings }>
+			<Page
+				className={ clsx( 'edit-site-post-edit', {
+					'is-empty': ! postId,
+				} ) }
+				label={ __( 'Post Edit' ) }
+			>
+				{ postId && (
+					<PostEditForm
+						postType={ postType }
+						postId={ postId }
+						settings={ settings }
+					/>
+				) }
+				{ ! postId && <p>{ __( 'Select a page to edit' ) }</p> }
+			</Page>
+		</ExperimentalBlockEditorProvider>
 	);
 }

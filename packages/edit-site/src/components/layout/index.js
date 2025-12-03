@@ -47,7 +47,8 @@ import SaveHub from '../save-hub';
 import SavePanel from '../save-panel';
 
 const { useLocation } = unlock( routerPrivateApis );
-const { useStyle } = unlock( editorPrivateApis );
+const { useStyle, PostPickerProvider, PostPickerModal } =
+	unlock( editorPrivateApis );
 
 const ANIMATION_DURATION = 0.3;
 
@@ -273,10 +274,13 @@ export default function LayoutWithGlobalStylesProvider( props ) {
 	}
 
 	return (
-		<SlotFillProvider>
-			{ /** This needs to be within the SlotFillProvider */ }
-			<PluginArea onError={ onPluginAreaError } />
-			<Layout { ...props } />
-		</SlotFillProvider>
+		<PostPickerProvider>
+			<SlotFillProvider>
+				{ /** This needs to be within the SlotFillProvider */ }
+				<PluginArea onError={ onPluginAreaError } />
+				<Layout { ...props } />
+				<PostPickerModal />
+			</SlotFillProvider>
+		</PostPickerProvider>
 	);
 }

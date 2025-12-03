@@ -37,6 +37,8 @@ import EditorKeyboardShortcuts from '../global-keyboard-shortcuts';
 import PatternRenameModal from '../pattern-rename-modal';
 import PatternDuplicateModal from '../pattern-duplicate-modal';
 import TemplatePartMenuItems from '../template-part-menu-items';
+import { PostPickerProvider } from '../post-picker-modal/context';
+import PostPickerModal from '../post-picker-modal';
 
 const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
 const { PatternsMenuItems } = unlock( editPatternsPrivateApis );
@@ -429,12 +431,15 @@ export const ExperimentalEditorProvider = withRegistryProvider(
  */
 export function EditorProvider( props ) {
 	return (
-		<ExperimentalEditorProvider
-			{ ...props }
-			BlockEditorProviderComponent={ BlockEditorProvider }
-		>
-			{ props.children }
-		</ExperimentalEditorProvider>
+		<PostPickerProvider>
+			<ExperimentalEditorProvider
+				{ ...props }
+				BlockEditorProviderComponent={ BlockEditorProvider }
+			>
+				{ props.children }
+				<PostPickerModal />
+			</ExperimentalEditorProvider>
+		</PostPickerProvider>
 	);
 }
 

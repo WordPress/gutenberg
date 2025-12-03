@@ -22,7 +22,11 @@ import {
 import { useSelect, useDispatch } from '@wordpress/data';
 import { decodeEntities } from '@wordpress/html-entities';
 import { store as coreStore } from '@wordpress/core-data';
-import { __experimentalInspectorPopoverHeader as InspectorPopoverHeader } from '@wordpress/block-editor';
+import {
+	__experimentalInspectorPopoverHeader as InspectorPopoverHeader,
+	privateApis as blockEditorPrivateApis,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
 import { filterURLForDisplay } from '@wordpress/url';
 
 /**
@@ -31,6 +35,9 @@ import { filterURLForDisplay } from '@wordpress/url';
 import PostPanelRow from '../post-panel-row';
 import { buildTermsTree } from '../../utils/terms';
 import { store as editorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
+
+const { postPickerKey } = unlock( blockEditorPrivateApis );
 
 function getTitle( post ) {
 	return post?.title?.rendered
@@ -67,6 +74,9 @@ export function PageAttributesParent() {
 		parentPostTitle,
 		pageItems,
 		isLoading,
+		postTypeSlug,
+		postId,
+		openPostPicker,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -77,15 +87,15 @@ export function PageAttributesParent() {
 			} = select( coreStore );
 			const { getCurrentPostId, getEditedPostAttribute } =
 				select( editorStore );
-			const postTypeSlug = getEditedPostAttribute( 'type' );
+			const postTypeSlugValue = getEditedPostAttribute( 'type' );
 			const pageId = getEditedPostAttribute( 'parent' );
-			const pType = getPostType( postTypeSlug );
-			const postId = getCurrentPostId();
+			const pType = getPostType( postTypeSlugValue );
+			const postIdValue = getCurrentPostId();
 			const postIsHierarchical = pType?.hierarchical ?? false;
 			const query = {
 				per_page: 100,
-				exclude: postId,
-				parent_exclude: postId,
+				exclude: postIdValue,
+				parent_exclude: postIdValue,
 				orderby: 'menu_order',
 				order: 'asc',
 				_fields: 'id,title,parent',
@@ -97,23 +107,36 @@ export function PageAttributesParent() {
 			}
 
 			const parentPost = pageId
-				? getEntityRecord( 'postType', postTypeSlug, pageId )
+				? getEntityRecord( 'postType', postTypeSlugValue, pageId )
 				: null;
+
+			// Get the openPostPicker function from block editor settings
+			let pickerFunction;
+			try {
+				const { getSettings } = select( blockEditorStore );
+				const blockEditorSettings = getSettings();
+				pickerFunction = blockEditorSettings?.[ postPickerKey ];
+			} catch ( e ) {
+				// blockEditorStore might not be available in all contexts
+			}
 
 			return {
 				isHierarchical: postIsHierarchical,
 				parentPostId: pageId,
 				parentPostTitle: parentPost ? getTitle( parentPost ) : '',
 				pageItems: postIsHierarchical
-					? getEntityRecords( 'postType', postTypeSlug, query )
+					? getEntityRecords( 'postType', postTypeSlugValue, query )
 					: null,
 				isLoading: postIsHierarchical
 					? isResolving( 'getEntityRecords', [
 							'postType',
-							postTypeSlug,
+							postTypeSlugValue,
 							query,
 					  ] )
 					: false,
+				postTypeSlug: postTypeSlugValue,
+				postId: postIdValue,
+				openPostPicker: pickerFunction,
 			};
 		},
 		[ fieldValue ]
@@ -191,20 +214,50 @@ export function PageAttributesParent() {
 		editPost( { parent: selectedPostId } );
 	};
 
+	const handlePostPickerSelect = ( selectedPostId ) => {
+		editPost( { parent: selectedPostId } );
+	};
+
+	// Use PostPicker with ComboBox if available, otherwise use ComboBox alone
 	return (
-		<ComboboxControl
-			__nextHasNoMarginBottom
-			__next40pxDefaultSize
-			className="editor-page-attributes__parent"
-			label={ __( 'Parent' ) }
-			help={ __( 'Choose a parent page.' ) }
-			value={ parentPostId }
-			options={ parentOptions }
-			onFilterValueChange={ debounce( handleKeydown, 300 ) }
-			onChange={ handleChange }
-			hideLabelFromVision
-			isLoading={ isLoading }
-		/>
+		<div>
+			<ComboboxControl
+				__nextHasNoMarginBottom
+				__next40pxDefaultSize
+				className="editor-page-attributes__parent"
+				label={ __( 'Parent' ) }
+				help={ __( 'Choose a parent page.' ) }
+				value={ parentPostId }
+				options={ parentOptions }
+				onFilterValueChange={ debounce( handleKeydown, 300 ) }
+				onChange={ handleChange }
+				hideLabelFromVision
+				isLoading={ isLoading }
+			/>
+			{ openPostPicker && (
+				<Button
+					variant="secondary"
+					onClick={ () =>
+						openPostPicker( {
+							postType: postTypeSlug,
+							excludePostId: postId,
+							onSelect: handlePostPickerSelect,
+							title: sprintf(
+								/* translators: %s: post type name */
+								__( 'Select Parent %s' ),
+								postTypeSlug
+							),
+						} )
+					}
+					__next40pxDefaultSize
+					style={ { marginTop: '8px', width: '100%' } }
+				>
+					{ parentPostId
+						? __( 'Change Parent' )
+						: __( 'Select Parent' ) }
+				</Button>
+			) }
+		</div>
 	);
 }
 

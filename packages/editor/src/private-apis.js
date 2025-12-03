@@ -18,6 +18,9 @@ import usePostFields from './components/post-fields';
 import ToolsMoreMenuGroup from './components/more-menu/tools-more-menu-group';
 import ViewMoreMenuGroup from './components/more-menu/view-more-menu-group';
 import ResizableEditor from './components/resizable-editor';
+import PostPickerModal from './components/post-picker-modal';
+import { PostPickerProvider } from './components/post-picker-modal/context';
+import { useOpenPostPicker } from './components/post-picker-modal/hook';
 import {
 	CreateTemplatePartModal,
 	patternTitleField,
@@ -48,6 +51,9 @@ lock( privateApis, {
 	ToolsMoreMenuGroup,
 	ViewMoreMenuGroup,
 	ResizableEditor,
+	PostPickerModal,
+	PostPickerProvider,
+	useOpenPostPicker,
 	registerCoreBlockBindingsSources,
 	getTemplateInfo,
 	// Global Styles
