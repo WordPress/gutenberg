@@ -1610,6 +1610,7 @@ export interface GlobalStylesRenderOptions {
 	disableLayoutStyles?: boolean;
 	disableRootPadding?: boolean;
 	getBlockStyles?: ( blockName: string ) => any[];
+	styleOptions?: Record< string, boolean >;
 }
 
 /**
@@ -1630,6 +1631,7 @@ export function generateGlobalStyles(
 		hasFallbackGapSupport: hasFallbackGapSupportOption,
 		disableLayoutStyles = false,
 		disableRootPadding = false,
+		styleOptions = {},
 	} = options;
 
 	// Use provided block types or fall back to getBlockTypes()
@@ -1655,7 +1657,8 @@ export function generateGlobalStyles(
 		hasBlockGapSupport,
 		hasFallbackGapSupport,
 		disableLayoutStyles,
-		disableRootPadding
+		disableRootPadding,
+		styleOptions
 	);
 	const svgs = generateSvgFilters( updatedConfig, blockSelectors );
 	const styles = [

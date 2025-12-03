@@ -26,6 +26,7 @@ import { formatLtr } from '@wordpress/icons';
  * Internal dependencies
  */
 import { useOnEnter } from './use-enter';
+import useDeprecatedAlign from './deprecated-attributes';
 
 function ParagraphRTLControl( { direction, setDirection } ) {
 	return (
@@ -110,6 +111,7 @@ function ParagraphBlock( {
 } ) {
 	const { content, direction, dropCap, placeholder, style } = attributes;
 	const textAlign = style?.typography?.textAlign;
+	useDeprecatedAlign( attributes.align, style, setAttributes );
 	const blockProps = useBlockProps( {
 		ref: useOnEnter( { clientId, content } ),
 		className: clsx( {

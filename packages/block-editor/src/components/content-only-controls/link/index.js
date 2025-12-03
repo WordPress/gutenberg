@@ -67,15 +67,15 @@ export function getUpdatedLinkAttributes( {
 	};
 }
 
-export default function Link( { data, field, config = {} } ) {
+export default function Link( { data, field, onChange, config = {} } ) {
 	const [ isLinkControlOpen, setIsLinkControlOpen ] = useState( false );
 	const { popoverProps } = useInspectorPopoverPlacement( {
 		isControl: true,
 	} );
-	const { clientId, updateBlockAttributes, fieldDef } = config;
+	const { fieldDef } = config;
 	const updateAttributes = ( newValue ) => {
 		const mappedChanges = field.setValue( { item: data, value: newValue } );
-		updateBlockAttributes( clientId, mappedChanges );
+		onChange( mappedChanges );
 	};
 
 	const value = field.getValue( { item: data } );

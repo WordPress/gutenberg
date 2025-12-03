@@ -93,7 +93,7 @@ Display a breadcrumb trail for hierarchical post types or based on taxonomy term
 -	**Experimental:** true
 -	**Category:** theme
 -	**Supports:** color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** prefersTaxonomy, separator, showHomeLink, showLastItem, showOnHomePage
+-	**Attributes:** prefersTaxonomy, separator, showCurrentItem, showHomeItem, showOnHomePage
 
 ## Button
 
@@ -495,7 +495,7 @@ Display mathematical notation using LaTeX. ([Source](https://github.com/WordPres
 
 -	**Name:** core/math
 -	**Category:** text
--	**Supports:** ~~html~~
+-	**Supports:** color (background, gradients, text), spacing (margin, padding), typography (fontSize), ~~html~~
 -	**Attributes:** latex, mathML
 
 ## Media & Text

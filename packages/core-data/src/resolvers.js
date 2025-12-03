@@ -23,6 +23,7 @@ import {
 	getUserPermissionsFromAllowHeader,
 	ALLOWED_RESOURCE_ACTIONS,
 	RECEIVE_INTERMEDIATE_RESULTS,
+	isNumericID,
 } from './utils';
 import { fetchBlockPatterns } from './fetch';
 
@@ -157,6 +158,7 @@ export const getEntityRecord =
 			if (
 				window.__experimentalEnableSync &&
 				entityConfig.syncConfig &&
+				isNumericID( key ) &&
 				! query
 			) {
 				if ( globalThis.IS_GUTENBERG_PLUGIN ) {
@@ -902,7 +904,12 @@ export const getDefaultTemplateId =
 		// Wait for the the entities config to be loaded, otherwise receiving
 		// the template as an entity will not work.
 		await resolveSelect.getEntitiesConfig( 'postType' );
-		const id = template?.wp_id || template?.id;
+		// When active_templates experiment is enabled, use numeric wp_id if it
+		// exists, otherwise fall back to string ID format (theme//slug) as the
+		// frontend expects string IDs for templates.
+		const id = window?.__experimentalTemplateActivate
+			? template?.wp_id || template?.id
+			: template?.id;
 		// Endpoint may return an empty object if no template is found.
 		if ( id ) {
 			template.id = id;

@@ -28,12 +28,11 @@ export const Default: Story = {
 		backgroundColor: 'info',
 		color: 'info',
 		padding: 'sm',
+		borderColor: 'brand',
+		borderRadius: 'md',
+		borderWidth: 'sm',
 	},
 	argTypes: {
-		p: {
-			control: 'select',
-			options: [ '2xs', 'xs', 'sm', 'md', 'lg', 1, 2, 3, 4 ],
-		},
 		padding: {
 			control: 'select',
 			options: [ '2xs', 'xs', 'sm', 'md', 'lg', 1, 2, 3, 4 ],

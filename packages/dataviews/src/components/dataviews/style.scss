@@ -14,7 +14,7 @@
 	flex-direction: column;
 	font-size: $default-font-size;
 	line-height: $default-line-height;
-	background-color: inherit;
+	background-color: var(--wp-dataviews-color-background, $white);
 }
 
 .dataviews__view-actions,

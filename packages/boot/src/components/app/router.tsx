@@ -18,9 +18,8 @@ import {
  * Internal dependencies
  */
 import Root from '../root';
-import type { CanvasData, Route, RouteLoaderContext } from '../../store/types';
+import type { Route, RouteLoaderContext } from '../../store/types';
 import { unlock } from '../../lock-unlock';
-import Canvas from '../canvas';
 
 const {
 	createLazyRoute,
@@ -30,7 +29,6 @@ const {
 	RouterProvider,
 	createBrowserHistory,
 	parseHref,
-	useMatches,
 } = unlock( routePrivateApis );
 
 // Not found component
@@ -47,20 +45,10 @@ function NotFoundComponent() {
 function RouteComponent( {
 	stage: Stage,
 	inspector: Inspector,
-	canvas: CustomCanvas,
 }: {
 	stage?: ComponentType;
 	inspector?: ComponentType;
-	canvas?: ComponentType;
 } ) {
-	// Get canvas data from the current route's loader
-	const matches = useMatches();
-	const currentMatch = matches[ matches.length - 1 ];
-	const canvasData = ( currentMatch?.loaderData as any )?.canvas as
-		| CanvasData
-		| null
-		| undefined;
-
 	return (
 		<>
 			{ Stage && (
@@ -71,18 +59,6 @@ function RouteComponent( {
 			{ Inspector && (
 				<div className="boot-layout__inspector">
 					<Inspector />
-				</div>
-			) }
-			{ /* Render custom canvas when canvas() returns null */ }
-			{ canvasData === null && CustomCanvas && (
-				<div className="boot-layout__canvas">
-					<CustomCanvas />
-				</div>
-			) }
-			{ /* Render default canvas when canvas() returns CanvasData */ }
-			{ canvasData && (
-				<div className="boot-layout__canvas">
-					<Canvas canvas={ canvasData } />
 				</div>
 			) }
 		</>
@@ -142,6 +118,8 @@ async function createRouteFromDefinition(
 			return {
 				...( loaderData as any ),
 				canvas: canvasData,
+				// Include content module path so Root can load custom canvas
+				routeContentModule: route.content_module,
 			};
 		},
 		loaderDeps: ( opts: any ) => opts.search,
@@ -159,7 +137,6 @@ async function createRouteFromDefinition(
 					<RouteComponent
 						stage={ module.stage }
 						inspector={ module.inspector }
-						canvas={ module.canvas }
 					/>
 				);
 			},
@@ -234,6 +211,7 @@ export default function Router( {
 					routeTree,
 					defaultPreload: 'intent',
 					defaultNotFoundComponent: NotFoundComponent,
+					defaultViewTransition: true,
 				} );
 				setRouter( newRouter );
 			}

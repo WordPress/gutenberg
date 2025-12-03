@@ -10,6 +10,7 @@
 	flex-direction: column;
 	gap: $grid-unit-40;
 	container-type: inline-size;
+	margin-bottom: auto;
 
 	@media not (prefers-reduced-motion) {
 		transition: padding ease-out 0.1s;

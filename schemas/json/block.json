@@ -377,6 +377,11 @@
 					"type": "boolean",
 					"default": true
 				},
+				"visibility": {
+					"description": "By default, a block can be hidden by a user from the block 'Options' dropdown. To disable this behavior, set visibility to false.",
+					"type": "boolean",
+					"default": true
+				},
 				"layout": {
 					"description": "This value only applies to blocks that are containers for inner blocks. If set to `true` the layout type will be `flow`. For other layout types it's necessary to set the `type` explicitly inside the `default` object.",
 					"oneOf": [

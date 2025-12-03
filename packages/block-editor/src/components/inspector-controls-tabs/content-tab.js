@@ -15,14 +15,18 @@ const ContentTab = ( { rootClientId, contentClientIds } ) => {
 		return null;
 	}
 
+	const shouldShowContentOnlyControls =
+		window?.__experimentalContentOnlyPatternInsertion &&
+		window?.__experimentalContentOnlyInspectorFields;
+
 	return (
 		<>
-			{ ! window?.__experimentalContentOnlyPatternInsertion && (
+			{ ! shouldShowContentOnlyControls && (
 				<PanelBody title={ __( 'Content' ) }>
 					<BlockQuickNavigation clientIds={ contentClientIds } />
 				</PanelBody>
 			) }
-			{ window?.__experimentalContentOnlyPatternInsertion && (
+			{ shouldShowContentOnlyControls && (
 				<ContentOnlyControls rootClientId={ rootClientId } />
 			) }
 		</>

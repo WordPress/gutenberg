@@ -23,15 +23,16 @@ export default function RichTextControl( {
 	data,
 	field,
 	hideLabelFromVision,
+	onChange,
 	config = {},
 } ) {
 	const registry = useRegistry();
 	const attrValue = field.getValue( { item: data } );
 	const fieldConfig = field.config || {};
-	const { clientId, updateBlockAttributes } = config;
+	const { clientId } = config;
 	const updateAttributes = ( html ) => {
 		const mappedChanges = field.setValue( { item: data, value: html } );
-		updateBlockAttributes( clientId, mappedChanges );
+		onChange( mappedChanges );
 	};
 	const [ selection, setSelection ] = useState( {
 		start: undefined,

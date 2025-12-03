@@ -8,15 +8,13 @@ import { dateI18n, getDate, getSettings } from '@wordpress/date';
  */
 import type {
 	DataViewRenderFieldProps,
-	DayString,
 	Field,
 	FormatDate,
-	NormalizedField,
-	Operator,
-	Rules,
 	SortDirection,
 } from '../types';
+import type { FieldType } from '../types/private';
 import RenderFromElements from './utils/render-from-elements';
+import isValidElements from './utils/is-valid-elements';
 import {
 	OPERATOR_ON,
 	OPERATOR_NOT_ON,
@@ -27,26 +25,23 @@ import {
 	OPERATOR_IN_THE_PAST,
 	OPERATOR_OVER,
 	OPERATOR_BETWEEN,
+	DAYS_OF_WEEK,
 } from '../constants';
-import { DAYS_OF_WEEK, numberToWeekStartsOn } from './utils/week-starts-on';
-import { getControl } from '../dataform-controls';
-import hasElements from './utils/has-elements';
-import getValueFromId from './utils/get-value-from-id';
-import setValueFromId from './utils/set-value-from-id';
-import getFilterBy from './utils/get-filter-by';
+import isValidRequired from './utils/is-valid-required';
 
-function getFormat( field: Field< any > ): Required< FormatDate > {
+function getFormat< Item >( field: Field< Item > ): Required< FormatDate > {
+	const fieldFormat = field.format as FormatDate | undefined;
 	return {
 		date:
-			field.format?.date !== undefined &&
-			typeof field.format.date === 'string'
-				? field.format.date
+			fieldFormat?.date !== undefined &&
+			typeof fieldFormat.date === 'string'
+				? fieldFormat.date
 				: getSettings().formats.date,
 		weekStartsOn:
-			field.format?.weekStartsOn !== undefined &&
-			DAYS_OF_WEEK.includes( field.format?.weekStartsOn as DayString )
-				? field.format.weekStartsOn
-				: numberToWeekStartsOn( getSettings().l10n.startOfWeek ),
+			fieldFormat?.weekStartsOn !== undefined &&
+			DAYS_OF_WEEK.includes( fieldFormat?.weekStartsOn )
+				? fieldFormat.weekStartsOn
+				: getSettings().l10n.startOfWeek,
 	};
 }
 
@@ -67,34 +62,29 @@ function render( { item, field }: DataViewRenderFieldProps< any > ) {
 	// but TypeScript is unable to infer this, hence the type assertion.
 	let format: Required< FormatDate >;
 	if ( field.type !== 'date' ) {
-		format = getFormat( field as Field< any > );
+		format = getFormat( {} as Field< any > );
 	} else {
 		format = field.format as Required< FormatDate >;
 	}
 
-	return dateI18n( format.weekStartsOn, getDate( value ) );
+	return dateI18n( format.date, getDate( value ) );
 }
 
-export default function normalizeField< Item >(
-	field: Field< Item >
-): NormalizedField< Item > {
-	const getValue = field.getValue || getValueFromId( field.id );
-	const setValue = field.setValue || setValueFromId( field.id );
-	const isValid: Rules< Item > = {
-		elements: true,
-		custom: () => null,
-	};
+const sort = ( a: any, b: any, direction: SortDirection ) => {
+	const timeA = new Date( a ).getTime();
+	const timeB = new Date( b ).getTime();
 
-	const sort = ( a: Item, b: Item, direction: SortDirection ) => {
-		const valueA = getValue( { item: a } );
-		const valueB = getValue( { item: b } );
-		const timeA = new Date( valueA ).getTime();
-		const timeB = new Date( valueB ).getTime();
+	return direction === 'asc' ? timeA - timeB : timeB - timeA;
+};
 
-		return direction === 'asc' ? timeA - timeB : timeB - timeA;
-	};
-
-	const defaultOperators: Operator[] = [
+export default {
+	type: 'date',
+	render,
+	Edit: 'date',
+	sort,
+	enableSorting: true,
+	enableGlobalSearch: false,
+	defaultOperators: [
 		OPERATOR_ON,
 		OPERATOR_NOT_ON,
 		OPERATOR_BEFORE,
@@ -104,9 +94,8 @@ export default function normalizeField< Item >(
 		OPERATOR_IN_THE_PAST,
 		OPERATOR_OVER,
 		OPERATOR_BETWEEN,
-	];
-
-	const validOperators: Operator[] = [
+	],
+	validOperators: [
 		OPERATOR_ON,
 		OPERATOR_NOT_ON,
 		OPERATOR_BEFORE,
@@ -116,33 +105,10 @@ export default function normalizeField< Item >(
 		OPERATOR_IN_THE_PAST,
 		OPERATOR_OVER,
 		OPERATOR_BETWEEN,
-	];
-
-	return {
-		id: field.id,
-		type: 'date',
-		label: field.label || field.id,
-		header: field.header || field.label || field.id,
-		description: field.description,
-		placeholder: field.placeholder,
-		getValue,
-		setValue,
-		elements: field.elements,
-		getElements: field.getElements,
-		hasElements: hasElements( field ),
-		render: field.render ?? render,
-		Edit: getControl( field, 'date' ),
-		sort: field.sort ?? sort,
-		isValid: {
-			...isValid,
-			...field.isValid,
-		},
-		isVisible: field.isVisible,
-		enableSorting: field.enableSorting ?? true,
-		enableGlobalSearch: field.enableGlobalSearch ?? false,
-		enableHiding: field.enableHiding ?? true,
-		readOnly: field.readOnly ?? false,
-		filterBy: getFilterBy( field, defaultOperators, validOperators ),
-		format: getFormat( field ),
-	};
-}
+	],
+	getFormat,
+	validate: {
+		required: isValidRequired,
+		elements: isValidElements,
+	},
+} satisfies FieldType< any >;

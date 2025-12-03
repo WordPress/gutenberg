@@ -25,6 +25,7 @@ import type {
 	FontFamilyPreset,
 	GlobalStylesConfig,
 } from '@wordpress/global-styles-engine';
+import type { FontFamily } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -40,14 +41,12 @@ import {
 	getDisplaySrcFromFontFace,
 } from './utils';
 import { useSetting } from '../hooks';
-import type { FontFamily } from './types';
 
 function InstalledFonts() {
 	const {
 		baseCustomFonts,
 		libraryFontSelected,
 		handleSetLibraryFontSelected,
-		refreshLibrary,
 		uninstallFontFamily,
 		isResolvingLibrary,
 		isInstalling,
@@ -176,7 +175,6 @@ function InstalledFonts() {
 
 	useEffect( () => {
 		handleSetLibraryFontSelected( libraryFontSelected );
-		refreshLibrary();
 	}, [] );
 
 	// Get activated fonts count.

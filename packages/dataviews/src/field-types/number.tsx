@@ -9,11 +9,10 @@ import { __ } from '@wordpress/i18n';
 import type {
 	DataViewRenderFieldProps,
 	Field,
+	FormatNumber,
 	NormalizedField,
-	Operator,
-	Rules,
-	SortDirection,
 } from '../types';
+import type { FieldType } from '../types/private';
 import {
 	OPERATOR_IS,
 	OPERATOR_IS_NOT,
@@ -28,11 +27,53 @@ import {
 	OPERATOR_BETWEEN,
 } from '../constants';
 import RenderFromElements from './utils/render-from-elements';
-import { getControl } from '../dataform-controls';
-import hasElements from './utils/has-elements';
-import getValueFromId from './utils/get-value-from-id';
-import setValueFromId from './utils/set-value-from-id';
-import getFilterBy from './utils/get-filter-by';
+import sort from './utils/sort-number';
+import isValidRequired from './utils/is-valid-required';
+import isValidMin from './utils/is-valid-min';
+import isValidMax from './utils/is-valid-max';
+import isValidElements from './utils/is-valid-elements';
+
+function getFormat< Item >( field: Field< Item > ): Required< FormatNumber > {
+	const fieldFormat = field.format as FormatNumber | undefined;
+	return {
+		separatorThousand:
+			fieldFormat?.separatorThousand !== undefined &&
+			typeof fieldFormat.separatorThousand === 'string'
+				? fieldFormat.separatorThousand
+				: ',',
+		separatorDecimal:
+			fieldFormat?.separatorDecimal !== undefined &&
+			typeof fieldFormat.separatorDecimal === 'string'
+				? fieldFormat.separatorDecimal
+				: '.',
+		decimals:
+			fieldFormat?.decimals !== undefined &&
+			typeof fieldFormat.decimals === 'number' &&
+			fieldFormat.decimals >= 0 &&
+			fieldFormat.decimals <= 100 &&
+			Number.isInteger( fieldFormat.decimals )
+				? fieldFormat.decimals
+				: 2,
+	};
+}
+
+export function formatNumber(
+	value: number,
+	format: Required< FormatNumber >
+): string {
+	if ( ! Number.isFinite( value ) ) {
+		return String( value );
+	}
+	const { separatorThousand, separatorDecimal, decimals } = format;
+	const fixedValue = value.toFixed( decimals );
+	const [ integerPart, decimalPart ] = fixedValue.split( '.' );
+	const formattedInteger = separatorThousand
+		? integerPart.replace( /\B(?=(\d{3})+(?!\d))/g, separatorThousand )
+		: integerPart;
+	return decimals === 0
+		? formattedInteger
+		: formattedInteger + separatorDecimal + decimalPart;
+}
 
 function isEmpty( value: unknown ): value is '' | undefined | null {
 	return value === '' || value === undefined || value === null;
@@ -44,38 +85,43 @@ function render( { item, field }: DataViewRenderFieldProps< any > ) {
 	}
 
 	const value = field.getValue( { item } );
-	if ( ! [ null, undefined ].includes( value ) ) {
-		return Number( value ).toFixed( 2 );
+	if ( [ null, undefined ].includes( value ) ) {
+		return '';
+	}
+
+	// If the field type is number, we've already normalized the format,
+	// and so it's safe to tell TypeScript to trust us ("as Required<FormatNumber>").
+	//
+	// There're no runtime paths where this render function is called with a non-number field,
+	// but TypeScript is unable to infer this, hence the type assertion.
+	let format: Required< FormatNumber >;
+	if ( field.type !== 'number' ) {
+		format = getFormat( field as Field< any > );
+	} else {
+		format = field.format as Required< FormatNumber >;
+	}
+
+	return formatNumber( Number( value ), format );
+}
+
+function isValidCustom< Item >( item: Item, field: NormalizedField< Item > ) {
+	const value = field.getValue( { item } );
+
+	if ( ! isEmpty( value ) && ! Number.isFinite( value ) ) {
+		return __( 'Value must be a number.' );
 	}
 
 	return null;
 }
 
-export default function normalizeField< Item >(
-	field: Field< Item >
-): NormalizedField< Item > {
-	const getValue = field.getValue || getValueFromId( field.id );
-	const setValue = field.setValue || setValueFromId( field.id );
-	const isValid: Rules< Item > = {
-		elements: true,
-		custom: ( item: any, normalizedField ) => {
-			const value = normalizedField.getValue( { item } );
-
-			if ( ! isEmpty( value ) && ! Number.isFinite( value ) ) {
-				return __( 'Value must be a number.' );
-			}
-
-			return null;
-		},
-	};
-
-	const sort = ( a: Item, b: Item, direction: SortDirection ) => {
-		const valueA = getValue( { item: a } );
-		const valueB = getValue( { item: b } );
-		return direction === 'asc' ? valueA - valueB : valueB - valueA;
-	};
-
-	const defaultOperators: Operator[] = [
+export default {
+	type: 'number',
+	render,
+	Edit: 'number',
+	sort,
+	enableSorting: true,
+	enableGlobalSearch: false,
+	defaultOperators: [
 		OPERATOR_IS,
 		OPERATOR_IS_NOT,
 		OPERATOR_LESS_THAN,
@@ -83,9 +129,8 @@ export default function normalizeField< Item >(
 		OPERATOR_LESS_THAN_OR_EQUAL,
 		OPERATOR_GREATER_THAN_OR_EQUAL,
 		OPERATOR_BETWEEN,
-	];
-
-	const validOperators: Operator[] = [
+	],
+	validOperators: [
 		// Single-selection
 		OPERATOR_IS,
 		OPERATOR_IS_NOT,
@@ -99,33 +144,13 @@ export default function normalizeField< Item >(
 		OPERATOR_IS_NONE,
 		OPERATOR_IS_ALL,
 		OPERATOR_IS_NOT_ALL,
-	];
-
-	return {
-		id: field.id,
-		type: 'number',
-		label: field.label || field.id,
-		header: field.header || field.label || field.id,
-		description: field.description,
-		placeholder: field.placeholder,
-		getValue,
-		setValue,
-		elements: field.elements,
-		getElements: field.getElements,
-		hasElements: hasElements( field ),
-		render: field.render ?? render,
-		Edit: getControl( field, 'number' ),
-		sort: field.sort ?? sort,
-		isValid: {
-			...isValid,
-			...field.isValid,
-		},
-		isVisible: field.isVisible,
-		enableSorting: field.enableSorting ?? true,
-		enableGlobalSearch: field.enableGlobalSearch ?? false,
-		enableHiding: field.enableHiding ?? true,
-		readOnly: field.readOnly ?? false,
-		filterBy: getFilterBy( field, defaultOperators, validOperators ),
-		format: {},
-	};
-}
+	],
+	getFormat,
+	validate: {
+		required: isValidRequired,
+		min: isValidMin,
+		max: isValidMax,
+		elements: isValidElements,
+		custom: isValidCustom,
+	},
+} satisfies FieldType< any >;
