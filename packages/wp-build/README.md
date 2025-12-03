@@ -58,13 +58,19 @@ Configure your `package.json` with the following optional fields:
 
 ### `wpScript`
 
-Set to `true` to bundle the package as a WordPress script/module:
+Controls whether the package is exposed as a bundled WordPress script/module and accessible via the configured global variable.
+
+- **`true`**: The package will be bundled and exposed as a WordPress script. It will be available in WordPress as part of the configured global (e.g., `wp.blockEditor`, `wp.data`, or a custom global name if configured differently).
+
+- **Omitted or `false` (default)**: The package will not be exposed as a WordPress script. Use this for packages designed solely as dependencies for other packages. The package can still be used as a dependency via npm imports by other packages.
 
 ```json
 {
 	"wpScript": true
 }
 ```
+
+For more details on when to omit or set this to `false`, see the [package guidelines](../README.md#when-to-omit-or-set-wpscript-to-false).
 
 ### `wpScriptModuleExports`
 

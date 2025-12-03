@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Code Quality
+
+- DataViews: Remove extra wrapper for GridItem. [#73665](https://github.com/WordPress/gutenberg/pull/73665)
+
 ### Bug Fixes
 
 - Fix sticky footer in DataViews grid view. [#73661](https://github.com/WordPress/gutenberg/pull/73661)
