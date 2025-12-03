@@ -7,7 +7,11 @@ import fastDeepEqual from 'fast-deep-equal/es6';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { getBlockBindingsSources, getBlockType } from '@wordpress/blocks';
+import {
+	getBlockBindingsSource,
+	getBlockType,
+	store as blockStore,
+} from '@wordpress/blocks';
 import {
 	__experimentalItemGroup as ItemGroup,
 	__experimentalItem as Item,
@@ -15,11 +19,10 @@ import {
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 	__experimentalVStack as VStack,
-	Modal,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
-import { useContext, useState } from '@wordpress/element';
+import { useContext } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
 
 /**
@@ -33,8 +36,6 @@ import { useBlockEditContext } from '../components/block-edit';
 import { store as blockEditorStore } from '../store';
 
 const { Menu } = unlock( componentsPrivateApis );
-
-const EMPTY_OBJECT = {};
 
 /**
  * Get the normalized attribute type for block bindings.
@@ -63,12 +64,7 @@ const useToolsPanelDropdownMenuProps = () => {
 		: {};
 };
 
-function BlockBindingsPanelMenuContent( {
-	attribute,
-	binding,
-	sources,
-	onOpenModal,
-} ) {
+function BlockBindingsPanelMenuContent( { attribute, binding, sources } ) {
 	const { clientId } = useBlockEditContext();
 	const { updateBlockBindings } = useBlockBindingsUtils();
 	const isMobile = useViewportMatch( 'medium', '<' );
@@ -86,10 +82,10 @@ function BlockBindingsPanelMenuContent( {
 	);
 	return (
 		<Menu placement={ isMobile ? 'bottom-start' : 'left-start' }>
-			{ Object.entries( sources ).map( ( [ sourceKey, source ] ) => {
+			{ Object.entries( sources ).map( ( [ sourceKey, data ] ) => {
 				// Only show sources that have compatible data for this specific attribute.
-				const sourceDataItems = source.data?.filter(
-					( item ) => item?.type === attributeType
+				const sourceDataItems = data.filter(
+					( item ) => item.type === attributeType
 				);
 
 				const noItemsAvailable =
@@ -99,105 +95,91 @@ function BlockBindingsPanelMenuContent( {
 					return null;
 				}
 
-				if ( source.mode === 'dropdown' ) {
-					return (
-						<Menu
-							key={ sourceKey }
-							placement={
-								isMobile ? 'bottom-start' : 'left-start'
-							}
-						>
-							<Menu.SubmenuTriggerItem>
-								<Menu.ItemLabel>
-									{ source.label }
-								</Menu.ItemLabel>
-							</Menu.SubmenuTriggerItem>
-							<Menu.Popover gutter={ 8 }>
-								<Menu.Group>
-									{ sourceDataItems.map( ( item ) => {
-										const itemBindings = {
-											source: sourceKey,
-											args: item?.args || {
-												key: item.key,
-											},
-										};
-										const values = source.getValues( {
+				const source = getBlockBindingsSource( sourceKey );
+
+				return (
+					<Menu
+						key={ sourceKey }
+						placement={ isMobile ? 'bottom-start' : 'left-start' }
+					>
+						<Menu.SubmenuTriggerItem>
+							<Menu.ItemLabel>{ source.label }</Menu.ItemLabel>
+						</Menu.SubmenuTriggerItem>
+						<Menu.Popover gutter={ 8 }>
+							<Menu.Group>
+								{ sourceDataItems.map( ( item ) => {
+									const itemBindings = {
+										source: sourceKey,
+										args: item.args || {
+											key: item.key,
+										},
+									};
+									let values = {};
+									try {
+										values = source.getValues( {
 											select,
 											context: blockContext,
 											bindings: {
 												[ attribute ]: itemBindings,
 											},
 										} );
-										return (
-											<Menu.CheckboxItem
-												key={
-													sourceKey +
-														JSON.stringify(
-															item.args
-														) || item.key
-												}
-												onChange={ () => {
-													const isCurrentlySelected =
-														fastDeepEqual(
-															binding?.args,
-															item.args
-														) ??
-														// Deprecate key dependency in 7.0.
-														item.key ===
-															binding?.args?.key;
+									} catch ( e ) {}
 
-													if ( isCurrentlySelected ) {
-														// Unset if the same item is selected again.
-														updateBlockBindings( {
-															[ attribute ]:
-																undefined,
-														} );
-													} else {
-														updateBlockBindings( {
-															[ attribute ]:
-																itemBindings,
-														} );
-													}
-												} }
-												name={ attribute + '-binding' }
-												value={ values[ attribute ] }
-												checked={
+									return (
+										<Menu.CheckboxItem
+											key={
+												sourceKey +
+													JSON.stringify(
+														item.args
+													) || item.key
+											}
+											onChange={ () => {
+												const isCurrentlySelected =
 													fastDeepEqual(
 														binding?.args,
 														item.args
 													) ??
 													// Deprecate key dependency in 7.0.
 													item.key ===
-														binding?.args?.key
+														binding?.args?.key;
+
+												if ( isCurrentlySelected ) {
+													// Unset if the same item is selected again.
+													updateBlockBindings( {
+														[ attribute ]:
+															undefined,
+													} );
+												} else {
+													updateBlockBindings( {
+														[ attribute ]:
+															itemBindings,
+													} );
 												}
-											>
-												<Menu.ItemLabel>
-													{ item?.label }
-												</Menu.ItemLabel>
-												<Menu.ItemHelpText>
-													{ values[ attribute ] }
-												</Menu.ItemHelpText>
-											</Menu.CheckboxItem>
-										);
-									} ) }
-								</Menu.Group>
-							</Menu.Popover>
-						</Menu>
-					);
-				}
-
-				if ( source.mode === 'modal' ) {
-					return (
-						<Menu.Item
-							key={ sourceKey }
-							onClick={ () => onOpenModal( { sourceKey } ) }
-						>
-							<Menu.ItemLabel>{ source.label }</Menu.ItemLabel>
-						</Menu.Item>
-					);
-				}
-
-				return null;
+											} }
+											name={ attribute + '-binding' }
+											value={ values[ attribute ] }
+											checked={
+												fastDeepEqual(
+													binding?.args,
+													item.args
+												) ??
+												// Deprecate key dependency in 7.0.
+												item.key === binding?.args?.key
+											}
+										>
+											<Menu.ItemLabel>
+												{ item.label }
+											</Menu.ItemLabel>
+											<Menu.ItemHelpText>
+												{ values[ attribute ] }
+											</Menu.ItemHelpText>
+										</Menu.CheckboxItem>
+									);
+								} ) }
+							</Menu.Group>
+						</Menu.Popover>
+					</Menu>
+				);
 			} ) }
 		</Menu>
 	);
@@ -205,7 +187,8 @@ function BlockBindingsPanelMenuContent( {
 
 function BlockBindingsAttribute( { attribute, binding, sources, blockName } ) {
 	const { source: sourceName, args } = binding || {};
-	const source = sources?.[ sourceName ];
+	const data = sources?.[ sourceName ];
+	const source = getBlockBindingsSource( sourceName );
 
 	let displayText;
 	let isValid = true;
@@ -215,8 +198,8 @@ function BlockBindingsAttribute( { attribute, binding, sources, blockName } ) {
 		// Check if there are any compatible sources for this attribute type.
 		const attributeType = getAttributeType( blockName, attribute );
 
-		const hasCompatibleSources = Object.values( sources ).some( ( src ) =>
-			src.data?.some( ( item ) => item?.type === attributeType )
+		const hasCompatibleSources = Object.values( sources ).some( ( items ) =>
+			items.some( ( item ) => item.type === attributeType )
 		);
 
 		if ( ! hasCompatibleSources ) {
@@ -229,14 +212,10 @@ function BlockBindingsAttribute( { attribute, binding, sources, blockName } ) {
 		// If there's a binding but the source is not found, it's invalid.
 		isValid = false;
 		displayText = __( 'Source not registered' );
-		if ( Object.keys( sources ).length === 0 ) {
-			displayText = __( 'No sources available' );
-		}
 	} else {
 		displayText =
-			source.data?.find( ( item ) => fastDeepEqual( item.args, args ) )
-				?.label ||
-			source.label ||
+			data?.find( ( item ) => fastDeepEqual( item.args, args ) )?.label ||
+			source?.label ||
 			sourceName;
 	}
 
@@ -282,15 +261,10 @@ function EditableBlockBindingsPanelItem( {
 	attribute,
 	binding,
 	sources,
-	setModalState,
 	blockName,
 } ) {
 	const { updateBlockBindings } = useBlockBindingsUtils();
 	const isMobile = useViewportMatch( 'medium', '<' );
-
-	const handleOpenModal = ( { sourceKey } ) => {
-		setModalState( { attribute, sourceKey } );
-	};
 
 	return (
 		<ToolsPanelItem
@@ -316,7 +290,6 @@ function EditableBlockBindingsPanelItem( {
 						attribute={ attribute }
 						binding={ binding }
 						sources={ sources }
-						onOpenModal={ handleOpenModal }
 					/>
 				</Menu.Popover>
 			</Menu>
@@ -328,101 +301,60 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 	const blockContext = useContext( BlockContext );
 	const { removeAllBlockBindings } = useBlockBindingsUtils();
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
-	const [ modalState, setModalState ] = useState( null );
-
-	const handleCloseModal = () => {
-		setModalState( null );
-	};
 
 	// Use useSelect to ensure sources are updated whenever there are updates in block context
 	// or when underlying data changes.
-	// Still needs a fix regarding _sources scope.
-	const _sources = {};
-	const { sources, canUpdateBlockBindings, bindableAttributes } = useSelect(
+	const { canUpdateBlockBindings, bindableAttributes } = useSelect(
 		( select ) => {
 			const { __experimentalBlockBindingsSupportedAttributes } =
 				select( blockEditorStore ).getSettings();
-			const _bindableAttributes =
-				__experimentalBlockBindingsSupportedAttributes?.[ blockName ];
-			if ( ! _bindableAttributes || _bindableAttributes.length === 0 ) {
-				return EMPTY_OBJECT;
-			}
 
-			const registeredSources = getBlockBindingsSources();
-			Object.entries( registeredSources ).forEach(
-				( [
-					sourceName,
-					{ editorUI, getFieldsList, usesContext, label, getValues },
-				] ) => {
-					// Populate context.
+			return {
+				canUpdateBlockBindings:
+					select( blockEditorStore ).getSettings()
+						.canUpdateBlockBindings,
+				bindableAttributes:
+					__experimentalBlockBindingsSupportedAttributes?.[
+						blockName
+					],
+			};
+		},
+		[ blockName ]
+	);
+
+	const sources = useSelect(
+		( select ) => {
+			const { getAllBlockBindingsSources } = unlock(
+				select( blockStore )
+			);
+			const data = {};
+			Object.entries( getAllBlockBindingsSources() ).forEach(
+				( [ sourceName, source ] ) => {
+					if ( ! source.getFieldsList ) {
+						return;
+					}
+
 					const context = {};
-					if ( usesContext?.length ) {
-						for ( const key of usesContext ) {
+					if ( source.usesContext?.length ) {
+						for ( const key of source.usesContext ) {
 							context[ key ] = blockContext[ key ];
 						}
 					}
 
-					if ( editorUI ) {
-						const editorUIResult = editorUI( {
-							select,
-							context,
-						} );
-
-						_sources[ sourceName ] = {
-							...editorUIResult,
-							label,
-							getValues,
-						};
-					} else if ( getFieldsList ) {
-						// Backward compatibility: Convert getFieldsList to editorUI format.
-						const fieldsListResult = getFieldsList( {
-							select,
-							context,
-						} );
-
-						if ( fieldsListResult ) {
-							const data = Object.entries( fieldsListResult ).map(
-								( [ key, field ] ) => ( {
-									label: field.label || key,
-									type: field.type || 'string',
-									args: { key },
-								} )
-							);
-
-							_sources[ sourceName ] = {
-								mode: 'dropdown', // Default mode for backward compatibility.
-								data,
-								label,
-								getValues,
-							};
-						}
-					} else {
-						/*
-						 * Include sources without editorUI if they are already used in a binding.
-						 * This allows them to be displayed in read-only mode.
-						 */
-						_sources[ sourceName ] = {
-							data: [],
-							label,
-							getValues,
-						};
+					const items = source.getFieldsList( {
+						select,
+						context,
+					} );
+					if ( items?.length ) {
+						data[ sourceName ] = items;
 					}
 				}
 			);
-
-			return {
-				sources:
-					Object.values( _sources ).length > 0
-						? _sources
-						: EMPTY_OBJECT,
-				canUpdateBlockBindings:
-					select( blockEditorStore ).getSettings()
-						.canUpdateBlockBindings,
-				bindableAttributes: _bindableAttributes,
-			};
+			return data;
 		},
-		[ blockContext, blockName ]
+		[ blockContext ]
 	);
+
 	// Return early if there are no bindable attributes.
 	if ( ! bindableAttributes || bindableAttributes.length === 0 ) {
 		return null;
@@ -430,16 +362,10 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 
 	const { bindings } = metadata || {};
 
-	// Check if all sources have empty data arrays.
-	const hasCompatibleData = Object.values( sources ).some(
-		( source ) => source.data && source.data.length > 0
-	);
+	const hasCompatibleData = Object.keys( sources ).length > 0;
 
 	// Lock the UI when the user can't update bindings or there are no fields to connect to.
 	const readOnly = ! canUpdateBlockBindings || ! hasCompatibleData;
-
-	const RenderModalContent =
-		sources[ modalState?.sourceKey ]?.renderModalContent;
 
 	if ( bindings === undefined && ! hasCompatibleData ) {
 		return null;
@@ -467,10 +393,8 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 
 						const hasCompatibleDataForAttribute = Object.values(
 							sources
-						).some( ( source ) =>
-							source.data?.some(
-								( item ) => item?.type === attributeType
-							)
+						).some( ( data ) =>
+							data.some( ( item ) => item.type === attributeType )
 						);
 
 						const isAttributeReadOnly =
@@ -490,7 +414,6 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 								attribute={ attribute }
 								binding={ binding }
 								sources={ sources }
-								setModalState={ setModalState }
 								blockName={ blockName }
 							/>
 						);
@@ -508,14 +431,6 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 					</p>
 				</Text>
 			</ToolsPanel>
-			{ RenderModalContent && (
-				<Modal onRequestClose={ handleCloseModal }>
-					<RenderModalContent
-						attribute={ modalState.attribute }
-						closeModal={ handleCloseModal }
-					/>
-				</Modal>
-			) }
 		</InspectorControls>
 	);
 };
@@ -523,7 +438,11 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 export default {
 	edit: BlockBindingsPanel,
 	attributeKeys: [ 'metadata' ],
-	hasSupport() {
-		return true;
+	hasSupport( name ) {
+		return ! [
+			'core/post-date',
+			'core/navigation-link',
+			'core/navigation-submenu',
+		].includes( name );
 	},
 };

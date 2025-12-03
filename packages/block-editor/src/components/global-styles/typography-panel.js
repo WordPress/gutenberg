@@ -6,9 +6,11 @@ import {
 	__experimentalNumberControl as NumberControl,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
+	Notice,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useCallback, useMemo, useEffect } from '@wordpress/element';
+import { getValueFromVariable } from '@wordpress/global-styles-engine';
 
 /**
  * Internal dependencies
@@ -21,7 +23,7 @@ import TextAlignmentControl from '../text-alignment-control';
 import TextTransformControl from '../text-transform-control';
 import TextDecorationControl from '../text-decoration-control';
 import WritingModeControl from '../writing-mode-control';
-import { getValueFromVariable, useToolsPanelDropdownMenuProps } from './utils';
+import { useToolsPanelDropdownMenuProps } from './utils';
 import { setImmutably } from '../../utils/object';
 import {
 	getMergedFontFamiliesAndFontFamilyFaces,
@@ -178,6 +180,7 @@ export default function TypographyPanel( {
 	settings,
 	panelId,
 	defaultControls = DEFAULT_CONTROLS,
+	fitText = false,
 } ) {
 	const decodeValue = ( rawValue ) =>
 		getValueFromVariable( { settings }, '', rawValue );
@@ -212,6 +215,30 @@ export default function TypographyPanel( {
 	const mergedFontSizes = getMergedFontSizes( settings );
 
 	const fontSize = decodeValue( inheritedValue?.typography?.fontSize );
+
+	// Extract the slug from the CSS custom property if it exists
+	const currentFontSizeSlug = ( () => {
+		const rawValue = inheritedValue?.typography?.fontSize;
+		if ( ! rawValue || typeof rawValue !== 'string' ) {
+			return undefined;
+		}
+
+		// Block supports use `var:preset` format.
+		if ( rawValue.startsWith( 'var:preset|font-size|' ) ) {
+			return rawValue.replace( 'var:preset|font-size|', '' );
+		}
+
+		// Global styles data uses `var(--wp--preset)` format.
+		const cssVarMatch = rawValue.match(
+			/^var\(--wp--preset--font-size--([^)]+)\)$/
+		);
+		if ( cssVarMatch ) {
+			return cssVarMatch[ 1 ];
+		}
+
+		return undefined;
+	} )();
+
 	const setFontSize = ( newValue, metadata ) => {
 		const actualValue = !! metadata?.slug
 			? `var:preset|font-size|${ metadata?.slug }`
@@ -419,11 +446,10 @@ export default function TypographyPanel( {
 						value={ fontFamily }
 						onChange={ setFontFamily }
 						size="__unstable-large"
-						__nextHasNoMarginBottom
 					/>
 				</ToolsPanelItem>
 			) }
-			{ hasFontSizeEnabled && (
+			{ hasFontSizeEnabled && ! fitText && (
 				<ToolsPanelItem
 					label={ __( 'Size' ) }
 					hasValue={ hasFontSize }
@@ -432,7 +458,8 @@ export default function TypographyPanel( {
 					panelId={ panelId }
 				>
 					<FontSizePicker
-						value={ fontSize }
+						value={ currentFontSizeSlug || fontSize }
+						valueMode={ currentFontSizeSlug ? 'slug' : 'literal' }
 						onChange={ setFontSize }
 						fontSizes={ mergedFontSizes }
 						disableCustomFontSizes={ disableCustomFontSizes }
@@ -582,9 +609,20 @@ export default function TypographyPanel( {
 					<TextAlignmentControl
 						value={ textAlign }
 						onChange={ setTextAlign }
+						options={ [ 'left', 'center', 'right', 'justify' ] }
 						size="__unstable-large"
 						__nextHasNoMarginBottom
 					/>
+
+					{ textAlign === 'justify' && (
+						<div>
+							<Notice status="warning" isDismissible={ false }>
+								{ __(
+									'Justified text can reduce readability. For better accessibility, use left-aligned text instead.'
+								) }
+							</Notice>
+						</div>
+					) }
 				</ToolsPanelItem>
 			) }
 		</Wrapper>

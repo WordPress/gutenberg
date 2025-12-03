@@ -106,12 +106,10 @@ function PrimaryActionGridCell< Item >( {
 					<Button
 						disabled={ !! primaryAction.disabled }
 						accessibleWhenDisabled
+						text={ label }
 						size="small"
 						onClick={ () => setIsModalOpen( true ) }
-						variant="link"
-					>
-						{ label }
-					</Button>
+					/>
 				}
 			>
 				{ isModalOpen && (
@@ -135,7 +133,6 @@ function PrimaryActionGridCell< Item >( {
 						onClick={ () => {
 							primaryAction.callback( [ item ], { registry } );
 						} }
-						variant="link"
 					>
 						{ label }
 					</Button>
@@ -525,8 +522,8 @@ export default function ViewList< Item >( props: ViewListProps< Item > ) {
 		);
 	}
 
-	const groupField = view.groupByField
-		? fields.find( ( field ) => field.id === view.groupByField )
+	const groupField = view.groupBy?.field
+		? fields.find( ( field ) => field.id === view.groupBy?.field )
 		: null;
 	const dataByGroup = groupField ? getDataByGroup( data, groupField ) : null;
 

@@ -17,14 +17,12 @@ export default function InheritControl( { value, onChange, label } ) {
 			onChange={ ( newValue ) => {
 				onChange( {
 					inherit: newValue === 'default',
-					// When enabling inherit, hierarchical is not supported.
-					...( newValue === 'default' ? { showNested: false } : {} ),
 				} );
 			} }
 			help={
 				value
 					? __(
-							'Display terms based on the current taxonomy archive. For hierarchical taxonomies, shows direct children of the current term. For non-hierarchical taxonomies, shows all terms.'
+							'Display terms based on the current taxonomy archive. For hierarchical taxonomies, shows children of the current term. For non-hierarchical taxonomies, shows all terms.'
 					  )
 					: __( 'Display terms based on specific criteria.' )
 			}

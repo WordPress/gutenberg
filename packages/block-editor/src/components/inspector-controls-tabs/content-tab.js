@@ -8,16 +8,28 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import BlockQuickNavigation from '../block-quick-navigation';
+import ContentOnlyControls from '../content-only-controls';
 
-const ContentTab = ( { contentClientIds } ) => {
+const ContentTab = ( { rootClientId, contentClientIds } ) => {
 	if ( ! contentClientIds || contentClientIds.length === 0 ) {
 		return null;
 	}
 
+	const shouldShowContentOnlyControls =
+		window?.__experimentalContentOnlyPatternInsertion &&
+		window?.__experimentalContentOnlyInspectorFields;
+
 	return (
-		<PanelBody title={ __( 'Content' ) }>
-			<BlockQuickNavigation clientIds={ contentClientIds } />
-		</PanelBody>
+		<>
+			{ ! shouldShowContentOnlyControls && (
+				<PanelBody title={ __( 'Content' ) }>
+					<BlockQuickNavigation clientIds={ contentClientIds } />
+				</PanelBody>
+			) }
+			{ shouldShowContentOnlyControls && (
+				<ContentOnlyControls rootClientId={ rootClientId } />
+			) }
+		</>
 	);
 };
 

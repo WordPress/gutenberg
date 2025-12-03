@@ -12,20 +12,20 @@ import {
 import { __ } from '@wordpress/i18n';
 import { useMemo } from '@wordpress/element';
 import { closeSmall } from '@wordpress/icons';
+import { useFocusOnMount } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import type {
 	FieldValidity,
-	Form,
-	FormField,
+	NormalizedForm,
+	NormalizedFormField,
 	FormValidity,
 	NormalizedField,
 } from '../../types';
 import { DataFormLayout } from '../data-form-layout';
-import { isCombinedField } from '../is-combined-field';
-import { DEFAULT_LAYOUT } from '../normalize-form-fields';
+import { DEFAULT_LAYOUT } from '../normalize-form';
 import SummaryButton from './summary-button';
 
 function DropdownHeader( {
@@ -71,7 +71,7 @@ function PanelDropdown< Item >( {
 	popoverAnchor,
 }: {
 	data: Item;
-	field: FormField;
+	field: NormalizedFormField;
 	onChange: ( value: any ) => void;
 	validity?: FieldValidity;
 	labelPosition: 'side' | 'top' | 'none';
@@ -79,17 +79,15 @@ function PanelDropdown< Item >( {
 	fieldDefinition: NormalizedField< Item >;
 	popoverAnchor: HTMLElement | null;
 } ) {
-	const fieldLabel = isCombinedField( field )
-		? field.label
-		: fieldDefinition?.label;
+	const fieldLabel = !! field.children ? field.label : fieldDefinition?.label;
 
-	const form: Form = useMemo(
-		(): Form => ( {
+	const form: NormalizedForm = useMemo(
+		() => ( {
 			layout: DEFAULT_LAYOUT,
-			fields: isCombinedField( field )
+			fields: !! field.children
 				? field.children
 				: // If not explicit children return the field id itself.
-				  [ { id: field.id } ],
+				  [ { id: field.id, layout: DEFAULT_LAYOUT } ],
 		} ),
 		[ field ]
 	);
@@ -98,7 +96,7 @@ function PanelDropdown< Item >( {
 			return undefined;
 		}
 
-		if ( isCombinedField( field ) ) {
+		if ( !! field.children ) {
 			return validity?.children;
 		}
 
@@ -118,11 +116,13 @@ function PanelDropdown< Item >( {
 		[ popoverAnchor ]
 	);
 
+	const focusOnMountRef = useFocusOnMount( 'firstInputElement' );
+
 	return (
 		<Dropdown
 			contentClassName="dataforms-layouts-panel__field-dropdown"
 			popoverProps={ popoverProps }
-			focusOnMount
+			focusOnMount={ false }
 			toggleProps={ {
 				size: 'compact',
 				variant: 'tertiary',
@@ -142,25 +142,31 @@ function PanelDropdown< Item >( {
 			renderContent={ ( { onClose } ) => (
 				<>
 					<DropdownHeader title={ fieldLabel } onClose={ onClose } />
-					<DataFormLayout
-						data={ data }
-						form={ form }
-						onChange={ onChange }
-						validity={ formValidity }
-					>
-						{ ( FieldLayout, childField, childFieldValidity ) => (
-							<FieldLayout
-								key={ childField.id }
-								data={ data }
-								field={ childField }
-								onChange={ onChange }
-								hideLabelFromVision={
-									( form?.fields ?? [] ).length < 2
-								}
-								validity={ childFieldValidity }
-							/>
-						) }
-					</DataFormLayout>
+					<div ref={ focusOnMountRef }>
+						<DataFormLayout
+							data={ data }
+							form={ form }
+							onChange={ onChange }
+							validity={ formValidity }
+						>
+							{ (
+								FieldLayout,
+								childField,
+								childFieldValidity
+							) => (
+								<FieldLayout
+									key={ childField.id }
+									data={ data }
+									field={ childField }
+									onChange={ onChange }
+									hideLabelFromVision={
+										( form?.fields ?? [] ).length < 2
+									}
+									validity={ childFieldValidity }
+								/>
+							) }
+						</DataFormLayout>
+					</div>
 				</>
 			) }
 		/>

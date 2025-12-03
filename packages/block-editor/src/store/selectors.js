@@ -37,13 +37,12 @@ import { unlock } from '../lock-unlock';
 
 import {
 	getContentLockingParent,
-	getTemporarilyEditingAsBlocks,
-	getTemporarilyEditingFocusModeToRevert,
+	getEditedContentOnlySection,
 	getSectionRootClientId,
 	isSectionBlock,
 	getParentSectionBlock,
 	isZoomOut,
-	isContainerInsertableToInWriteMode,
+	isContainerInsertableToInContentOnlyMode,
 } from './private-selectors';
 
 const { isContentBlock } = unlock( blocksPrivateApis );
@@ -788,7 +787,6 @@ export function getNextBlockClientId( state, startClientId ) {
 	return getAdjacentBlockClientId( state, startClientId, 1 );
 }
 
-/* eslint-disable jsdoc/valid-types */
 /**
  * Returns the initial caret position for the selected block.
  * This position is to used to position the caret properly when the selected block changes.
@@ -799,7 +797,6 @@ export function getNextBlockClientId( state, startClientId ) {
  * @return {0|-1|null} Initial position.
  */
 export function getSelectedBlocksInitialCaretPosition( state ) {
-	/* eslint-enable jsdoc/valid-types */
 	return state.initialPosition;
 }
 
@@ -1576,7 +1573,21 @@ export function getTemplateLock( state, rootClientId ) {
 		return state.settings.templateLock ?? false;
 	}
 
-	return getBlockListSettings( state, rootClientId )?.templateLock ?? false;
+	const blockListTemplateLock = getBlockListSettings(
+		state,
+		rootClientId
+	)?.templateLock;
+
+	// If this is a contentOnly template locked block that's in the process
+	// of being edited, consider the template lock as temporarily inactive.
+	if (
+		blockListTemplateLock === 'contentOnly' &&
+		state.editedContentOnlySection === rootClientId
+	) {
+		return false;
+	}
+
+	return blockListTemplateLock ?? false;
 }
 
 /**
@@ -1682,15 +1693,8 @@ const canInsertBlockTypeUnmemoized = (
 		blockType = getBlockType( blockName );
 	}
 
-	const isLocked = !! getTemplateLock( state, rootClientId );
-	if ( isLocked ) {
-		return false;
-	}
-	const isContentRoleBlock = isContentBlock( blockName );
-	const isParentSectionBlock = !! isSectionBlock( state, rootClientId );
-	// It shouldn't be possible to insert inside a section block unless in
-	// some cases when the block is a content block.
-	if ( isParentSectionBlock && ! isContentRoleBlock ) {
+	const rootTemplateLock = getTemplateLock( state, rootClientId );
+	if ( rootTemplateLock && rootTemplateLock !== 'contentOnly' ) {
 		return false;
 	}
 
@@ -1707,10 +1711,29 @@ const canInsertBlockTypeUnmemoized = (
 		return false;
 	}
 
-	// In write mode, check if this container allows insertion.
+	// It shouldn't be possible to insert inside a section block unless in
+	// some cases when the block is a content block.
+	const isContentRoleBlock = isContentBlock( blockName );
+	const isParentSectionBlock = !! isSectionBlock( state, rootClientId );
+	const isBlockWithinSection = !! getParentSectionBlock(
+		state,
+		rootClientId
+	);
 	if (
-		blockEditingMode === 'contentOnly' &&
-		! isContainerInsertableToInWriteMode( state, blockName, rootClientId )
+		( isParentSectionBlock || isBlockWithinSection ) &&
+		! isContentRoleBlock
+	) {
+		return false;
+	}
+
+	// In content only mode, check if this container allows insertion.
+	if (
+		( isParentSectionBlock || blockEditingMode === 'contentOnly' ) &&
+		! isContainerInsertableToInContentOnlyMode(
+			state,
+			blockName,
+			rootClientId
+		)
 	) {
 		return false;
 	}
@@ -1854,10 +1877,13 @@ export function canRemoveBlock( state, clientId ) {
 	}
 
 	const rootClientId = getBlockRootClientId( state, clientId );
-	if ( getTemplateLock( state, rootClientId ) ) {
+	const rootTemplateLock = getTemplateLock( state, rootClientId );
+	if ( rootTemplateLock && rootTemplateLock !== 'contentOnly' ) {
 		return false;
 	}
 
+	// It shouldn't be possible to move in a section block unless in
+	// some cases when the block is a content block.
 	const isBlockWithinSection = !! getParentSectionBlock( state, clientId );
 	const isContentRoleBlock = isContentBlock(
 		getBlockName( state, clientId )
@@ -1866,21 +1892,21 @@ export function canRemoveBlock( state, clientId ) {
 		return false;
 	}
 
-	const blockEditingMode = getBlockEditingMode( state, rootClientId );
-
-	// Check if the parent container allows insertion/removal in write mode
+	const isParentSectionBlock = !! isSectionBlock( state, rootClientId );
+	const rootBlockEditingMode = getBlockEditingMode( state, rootClientId );
+	// Check if the parent container allows insertion/removal in contentOnly mode
 	if (
-		blockEditingMode === 'contentOnly' &&
-		! isContainerInsertableToInWriteMode(
+		( isParentSectionBlock || rootBlockEditingMode === 'contentOnly' ) &&
+		! isContainerInsertableToInContentOnlyMode(
 			state,
-			getBlockName( state, rootClientId ),
+			getBlockName( state, clientId ),
 			rootClientId
 		)
 	) {
 		return false;
 	}
 
-	return blockEditingMode !== 'disabled';
+	return rootBlockEditingMode !== 'disabled';
 }
 
 /**
@@ -1913,9 +1939,34 @@ export function canMoveBlock( state, clientId ) {
 	}
 
 	const rootClientId = getBlockRootClientId( state, clientId );
-	if ( getTemplateLock( state, rootClientId ) === 'all' ) {
+	const rootTemplateLock = getTemplateLock( state, rootClientId );
+	if ( rootTemplateLock === 'all' ) {
 		return false;
 	}
+
+	const isBlockWithinSection = !! getParentSectionBlock( state, clientId );
+	const isContentRoleBlock = isContentBlock(
+		getBlockName( state, clientId )
+	);
+	if ( isBlockWithinSection && ! isContentRoleBlock ) {
+		return false;
+	}
+
+	// If the parent is a section or is `contentOnly`, then check is the inner block
+	// should be allowed to move.
+	const isParentSectionBlock = !! isSectionBlock( state, rootClientId );
+	const rootBlockEditingMode = getBlockEditingMode( state, rootClientId );
+	if (
+		( isParentSectionBlock || rootBlockEditingMode === 'contentOnly' ) &&
+		! isContainerInsertableToInContentOnlyMode(
+			state,
+			getBlockName( state, clientId ),
+			rootClientId
+		)
+	) {
+		return false;
+	}
+
 	return getBlockEditingMode( state, rootClientId ) !== 'disabled';
 }
 
@@ -2225,6 +2276,8 @@ export const getInserterItems = createRegistrySelector( ( select ) =>
 					} ) );
 			}
 
+			// Hardcode: Collect stretch variations separately to add at the end
+			const stretchVariations = [];
 			const items = blockTypeInserterItems.reduce(
 				( accumulator, item ) => {
 					const { variations = [] } = item;
@@ -2237,14 +2290,26 @@ export const getInserterItems = createRegistrySelector( ( select ) =>
 							state,
 							item
 						);
-						accumulator.push(
-							...variations.map( variationMapper )
-						);
+						variations
+							.map( variationMapper )
+							.forEach( ( variation ) => {
+								if (
+									variation.id ===
+										'core/paragraph/stretchy-paragraph' ||
+									variation.id ===
+										'core/heading/stretchy-heading'
+								) {
+									stretchVariations.push( variation );
+								} else {
+									accumulator.push( variation );
+								}
+							} );
 					}
 					return accumulator;
 				},
 				[]
 			);
+			items.push( ...stretchVariations );
 
 			// Ensure core blocks are prioritized in the returned results,
 			// because third party blocks can be registered earlier than
@@ -3077,6 +3142,7 @@ export function getBlockEditingMode( state, clientId = '' ) {
  * requirement of being the default grouping block.
  * Additionally a block can only be ungrouped if it has inner blocks and can
  * be removed.
+ * Section blocks are not ungroupable.
  *
  * @param {Object} state    Global application state.
  * @param {string} clientId Client Id of the block. If not passed the selected block's client id will be used.
@@ -3089,6 +3155,12 @@ export const isUngroupable = createRegistrySelector(
 			if ( ! _clientId ) {
 				return false;
 			}
+
+			// Section blocks should not be ungroupable.
+			if ( isSectionBlock( state, _clientId ) ) {
+				return false;
+			}
+
 			const { getGroupingBlockName } = select( blocksStore );
 			const block = getBlock( state, _clientId );
 			const groupingBlockName = getGroupingBlockName();
@@ -3172,25 +3244,5 @@ export function __unstableGetTemporarilyEditingAsBlocks( state ) {
 			version: '6.7',
 		}
 	);
-	return getTemporarilyEditingAsBlocks( state );
-}
-
-/**
- * DO-NOT-USE in production.
- * This selector is created for internal/experimental only usage and may be
- * removed anytime without any warning, causing breakage on any plugin or theme invoking it.
- *
- * @deprecated
- *
- * @param {Object} state Global application state.
- */
-export function __unstableGetTemporarilyEditingFocusModeToRevert( state ) {
-	deprecated(
-		"wp.data.select( 'core/block-editor' ).__unstableGetTemporarilyEditingFocusModeToRevert",
-		{
-			since: '6.5',
-			version: '6.7',
-		}
-	);
-	return getTemporarilyEditingFocusModeToRevert( state );
+	return getEditedContentOnlySection( state );
 }

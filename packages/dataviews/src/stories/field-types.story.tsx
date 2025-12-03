@@ -142,7 +142,7 @@ const data: DataType[] = [
 		booleanWithToggle: true,
 		booleanWithElements: true,
 		datetime: '2021-01-01T14:30:00Z',
-		datetimeWithElements: '2021-01-01T14:30:00Z',
+		datetimeWithElements: '1982-05-10T20:30:00Z',
 		date: '2021-01-01',
 		dateWithElements: '2021-01-01',
 		email: 'hi@example.com',
@@ -285,16 +285,16 @@ const fields: Field< DataType >[] = [
 		description: 'Help for datetime with elements.',
 		elements: [
 			{
-				value: '2021-01-01T14:30:00Z',
-				label: 'January 1st, 2021. 14:30UTC',
+				value: '1973-02-01T14:30:00Z',
+				label: 'February 1st, 1973. 14:30UTC',
 			},
 			{
-				value: '2021-02-01T14:30:00Z',
-				label: 'February 1st, 2021. 14:30UTC',
+				value: '1982-05-10T20:30:00Z',
+				label: 'May 10th, 1982. 20:30UTC',
 			},
 			{
-				value: '2021-03-01T14:30:00Z',
-				label: 'March 1st, 2021. 14:30UTC',
+				value: '1994-03-01T14:30:00Z',
+				label: 'March 1st, 1994. 14:30UTC',
 			},
 		],
 	},
@@ -733,14 +733,29 @@ export const IntegerComponent = ( {
 	type,
 	Edit,
 	asyncElements,
+	formatSeparatorThousand,
 }: {
 	type: PanelTypes;
 	Edit: ControlTypes;
 	asyncElements: boolean;
+	formatSeparatorThousand?: string;
 } ) => {
 	const integerFields = useMemo(
-		() => fields.filter( ( field ) => field.type === 'integer' ),
-		[]
+		() =>
+			fields
+				.filter( ( field ) => field.type === 'integer' )
+				.map( ( field ) => {
+					if ( formatSeparatorThousand !== undefined ) {
+						return {
+							...field,
+							format: {
+								separatorThousand: formatSeparatorThousand,
+							},
+						};
+					}
+					return field;
+				} ),
+		[ formatSeparatorThousand ]
 	);
 
 	return (
@@ -753,19 +768,64 @@ export const IntegerComponent = ( {
 	);
 };
 IntegerComponent.storyName = 'integer';
+IntegerComponent.args = {
+	formatSeparatorThousand: ',',
+};
+IntegerComponent.argTypes = {
+	formatSeparatorThousand: {
+		control: 'text',
+		description:
+			'Character used as thousand separator (e.g., "," for "1,234"). Default is ",".',
+	},
+};
 
 export const NumberComponent = ( {
 	type,
 	Edit,
 	asyncElements,
+	formatSeparatorThousand,
+	formatSeparatorDecimal,
+	formatDecimals,
 }: {
 	type: PanelTypes;
 	Edit: ControlTypes;
 	asyncElements: boolean;
+	formatSeparatorThousand?: string;
+	formatSeparatorDecimal?: string;
+	formatDecimals?: number;
 } ) => {
 	const numberFields = useMemo(
-		() => fields.filter( ( field ) => field.type === 'number' ),
-		[]
+		() =>
+			fields
+				.filter( ( field ) => field.type === 'number' )
+				.map( ( field ) => {
+					if (
+						formatSeparatorThousand !== undefined ||
+						formatSeparatorDecimal !== undefined ||
+						formatDecimals !== undefined
+					) {
+						const format: {
+							separatorThousand?: string;
+							separatorDecimal?: string;
+							decimals?: number;
+						} = {};
+						if ( formatSeparatorThousand !== undefined ) {
+							format.separatorThousand = formatSeparatorThousand;
+						}
+						if ( formatSeparatorDecimal !== undefined ) {
+							format.separatorDecimal = formatSeparatorDecimal;
+						}
+						if ( formatDecimals !== undefined ) {
+							format.decimals = formatDecimals;
+						}
+						return {
+							...field,
+							format,
+						};
+					}
+					return field;
+				} ),
+		[ formatSeparatorThousand, formatSeparatorDecimal, formatDecimals ]
 	);
 
 	return (
@@ -778,6 +838,28 @@ export const NumberComponent = ( {
 	);
 };
 NumberComponent.storyName = 'number';
+NumberComponent.args = {
+	formatSeparatorThousand: ',',
+	formatSeparatorDecimal: '.',
+	formatDecimals: 2,
+};
+NumberComponent.argTypes = {
+	formatSeparatorThousand: {
+		control: 'text',
+		description:
+			'Character used as thousand separator (e.g., "," for "1,234"). Default is ",".',
+	},
+	formatSeparatorDecimal: {
+		control: 'text',
+		description:
+			'Character used as decimal separator (e.g., "." for "1.23"). Default is ".".',
+	},
+	formatDecimals: {
+		control: { type: 'number', min: 0, max: 100, step: 1 },
+		description:
+			'Number of decimal places to display (0-100). Default is 2.',
+	},
+};
 
 export const BooleanComponent = ( {
 	type,
@@ -832,14 +914,39 @@ export const DateComponent = ( {
 	type,
 	Edit,
 	asyncElements,
+	formatDate,
+	formatWeekStartsOn,
 }: {
 	type: PanelTypes;
 	Edit: ControlTypes;
 	asyncElements: boolean;
+	formatDate?: string;
+	formatWeekStartsOn?: 0 | 1 | 2 | 3 | 4 | 5 | 6;
 } ) => {
 	const dateFields = useMemo(
-		() => fields.filter( ( field ) => field.type === 'date' ),
-		[]
+		() =>
+			fields
+				.filter( ( field ) => field.type === 'date' )
+				.map( ( field ) => {
+					if ( formatDate || formatWeekStartsOn !== undefined ) {
+						const format: {
+							date?: string;
+							weekStartsOn?: 0 | 1 | 2 | 3 | 4 | 5 | 6;
+						} = {};
+						if ( formatDate ) {
+							format.date = formatDate;
+						}
+						if ( formatWeekStartsOn !== undefined ) {
+							format.weekStartsOn = formatWeekStartsOn;
+						}
+						return {
+							...field,
+							format,
+						};
+					}
+					return field;
+				} ),
+		[ formatDate, formatWeekStartsOn ]
 	);
 
 	return (
@@ -852,6 +959,32 @@ export const DateComponent = ( {
 	);
 };
 DateComponent.storyName = 'date';
+DateComponent.args = {
+	formatDate: '',
+	formatWeekStartsOn: undefined,
+};
+DateComponent.argTypes = {
+	formatDate: {
+		control: 'text',
+		description:
+			'Custom PHP date format string (e.g., "F j, Y" for "November 6, 2010"). Leave empty to use WordPress default.',
+	},
+	formatWeekStartsOn: {
+		control: 'select',
+		options: {
+			Default: undefined,
+			Sunday: 0,
+			Monday: 1,
+			Tuesday: 2,
+			Wednesday: 3,
+			Thursday: 4,
+			Friday: 5,
+			Saturday: 6,
+		},
+		description:
+			'Day that the week starts on. Leave as Default to use WordPress default.',
+	},
+};
 
 export const EmailComponent = ( {
 	type,

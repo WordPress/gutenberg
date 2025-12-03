@@ -90,20 +90,6 @@ test.describe( 'Toolbar roving tabindex', () => {
 			'Table'
 		);
 
-		// ensures custom html block toolbar uses roving tabindex
-		await editor.insertBlock( { name: 'core/html' } );
-		await ToolbarRovingTabindexUtils.testBlockToolbarKeyboardNavigation(
-			'HTML',
-			'Custom HTML'
-		);
-		await ToolbarRovingTabindexUtils.wrapCurrentBlockWithGroup(
-			'Custom HTML'
-		);
-		await ToolbarRovingTabindexUtils.testGroupKeyboardNavigation(
-			'Block: Custom HTML',
-			'Custom HTML'
-		);
-
 		// ensures image block toolbar uses roving tabindex
 		// This also tests if shift + tab works as expected to move focus to the toolbar when the preceding block has a form element.
 		await editor.insertBlock( { name: 'core/image' } );

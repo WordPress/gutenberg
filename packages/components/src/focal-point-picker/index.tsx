@@ -2,6 +2,7 @@
  * External dependencies
  */
 import clsx from 'clsx';
+import type { KeyboardEventHandler } from 'react';
 
 /**
  * WordPress dependencies
@@ -10,19 +11,19 @@ import { __ } from '@wordpress/i18n';
 import { useEffect, useRef, useState } from '@wordpress/element';
 import {
 	__experimentalUseDragging as useDragging,
-	useInstanceId,
 	useIsomorphicLayoutEffect,
 } from '@wordpress/compose';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
  */
-import BaseControl from '../base-control';
 import Controls from './controls';
 import FocalPoint from './focal-point';
 import Grid from './grid';
 import Media from './media';
 import {
+	Container,
 	MediaWrapper,
 	MediaContainer,
 } from './styles/focal-point-picker-style';
@@ -33,7 +34,11 @@ import type {
 	FocalPoint as FocalPointType,
 	FocalPointPickerProps,
 } from './types';
-import type { KeyboardEventHandler } from 'react';
+import {
+	StyledLabel,
+	StyledHelp,
+} from '../base-control/styles/base-control-styles';
+import { VisuallyHidden } from '../visually-hidden';
 
 const GRID_OVERLAY_TIMEOUT = 600;
 
@@ -88,6 +93,7 @@ export function FocalPointPicker( {
 	autoPlay = true,
 	className,
 	help,
+	hideLabelFromVision,
 	label,
 	onChange,
 	onDrag,
@@ -103,6 +109,14 @@ export function FocalPointPicker( {
 }: WordPressComponentProps< FocalPointPickerProps, 'div', false > ) {
 	const [ point, setPoint ] = useState( valueProp );
 	const [ showGridOverlay, setShowGridOverlay ] = useState( false );
+
+	if ( ! __nextHasNoMarginBottom ) {
+		deprecated( 'Bottom margin styles for wp.components.FocalPointPicker', {
+			since: '6.7',
+			version: '7.0',
+			hint: 'Set the `__nextHasNoMarginBottom` prop to true to start opting into the new styles, which will become the default in a future version.',
+		} );
+	}
 
 	const { startDrag, endDrag, isDragging } = useDragging( {
 		onDragStart: ( event ) => {
@@ -233,9 +247,7 @@ export function FocalPointPicker( {
 	};
 
 	const classes = clsx( 'components-focal-point-picker-control', className );
-
-	const instanceId = useInstanceId( FocalPointPicker );
-	const id = `inspector-focal-point-picker-control-${ instanceId }`;
+	const Label = hideLabelFromVision ? VisuallyHidden : StyledLabel;
 
 	useUpdateEffect( () => {
 		setShowGridOverlay( true );
@@ -247,15 +259,8 @@ export function FocalPointPicker( {
 	}, [ x, y ] );
 
 	return (
-		<BaseControl
-			{ ...restProps }
-			__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
-			__associatedWPComponentName="FocalPointPicker"
-			label={ label }
-			id={ id }
-			help={ help }
-			className={ classes }
-		>
+		<Container { ...restProps } as="fieldset" className={ classes }>
+			{ !! label && <Label as="legend">{ label }</Label> }
 			<MediaWrapper className="components-focal-point-picker-wrapper">
 				<MediaContainer
 					className="components-focal-point-picker"
@@ -291,7 +296,12 @@ export function FocalPointPicker( {
 					onChange?.( getFinalValue( value ) );
 				} }
 			/>
-		</BaseControl>
+			{ !! help && (
+				<StyledHelp __nextHasNoMarginBottom={ __nextHasNoMarginBottom }>
+					{ help }
+				</StyledHelp>
+			) }
+		</Container>
 	);
 }
 

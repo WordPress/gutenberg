@@ -847,6 +847,10 @@ _Related_
 
 -   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/data/README.md#registerStore>
 
+### ToolSelector
+
+This component has been deprecated and no longer renders anything.
+
 ### transformStyles
 
 Applies a series of CSS rule transforms to wrap selectors inside a given class and/or rewrite URLs depending on the parameters passed.

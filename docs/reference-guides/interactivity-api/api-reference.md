@@ -283,7 +283,6 @@ This directive adds or removes inline style to an HTML element, depending on its
 	</button>
 	<p data-wp-style--color="context.color">Hello World!</p>
 </div>
->
 ```
 
 <details>

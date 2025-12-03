@@ -26,9 +26,9 @@ import type {
 	FieldValidity,
 	Form,
 	Layout,
+	NormalizedRules,
 	PanelLayout,
 	RegularLayout,
-	Rules,
 } from '../types';
 import { unlock } from '../lock-unlock';
 import DateControl from '../dataform-controls/date';
@@ -268,6 +268,19 @@ const fields: Field< SamplePost >[] = [
 		label: 'Seat',
 		type: 'text',
 	},
+	{
+		id: 'metadata_summary',
+		label: 'Metadata',
+		type: 'text',
+		render: ( { item } ) => {
+			return (
+				<span>
+					<>Metadata</>
+					{ item.filesize ? `, ${ item.filesize } KB` : '' }
+				</span>
+			);
+		},
+	},
 ];
 
 const LayoutRegularComponent = ( {
@@ -484,7 +497,7 @@ const LayoutPanelComponent = ( {
 };
 
 function getCustomValidity< Item >(
-	isValid: Rules< Item >,
+	isValid: NormalizedRules< Item >,
 	validity: FieldValidity | undefined
 ) {
 	let customValidity;
@@ -539,13 +552,15 @@ function CustomEditControl< Item >( {
 const ValidationComponent = ( {
 	required,
 	elements,
-	type,
 	custom,
+	pattern,
+	minMax,
 }: {
 	required: boolean;
 	elements: 'sync' | 'async' | 'none';
 	custom: 'sync' | 'async' | 'none';
-	type: 'regular' | 'panel';
+	pattern: boolean;
+	minMax: boolean;
 } ) => {
 	type ValidatedItem = {
 		text: string;
@@ -570,10 +585,6 @@ const ValidationComponent = ( {
 		datetime?: string;
 	};
 
-	const DateRangeEdit = ( props: DataFormControlProps< ValidatedItem > ) => {
-		return <DateControl { ...props } operator="between" />;
-	};
-
 	const [ post, setPost ] = useState< ValidatedItem >( {
 		text: 'Can have letters and spaces',
 		select: undefined,
@@ -596,184 +607,6 @@ const ValidationComponent = ( {
 		dateRange: undefined,
 		datetime: undefined,
 	} );
-
-	const makeAsync = ( rule: ( item: ValidatedItem ) => null | string ) => {
-		return async ( value: ValidatedItem ) => {
-			return await new Promise< string | null >( ( resolve ) => {
-				setTimeout( () => {
-					const validationResult = rule( value );
-					resolve( validationResult );
-				}, 2000 );
-			} );
-		};
-	};
-
-	const customTextRule = ( value: ValidatedItem ) => {
-		if ( ! /^[a-zA-Z ]+$/.test( value.text ) ) {
-			return 'Value must only contain letters and spaces.';
-		}
-
-		return null;
-	};
-
-	const customSelectRule = ( value: ValidatedItem ) => {
-		if ( value.select !== 'option1' ) {
-			return 'Value must be Option 1.';
-		}
-		return null;
-	};
-
-	const customTextRadioRule = ( value: ValidatedItem ) => {
-		if ( value.textWithRadio !== 'item1' ) {
-			return 'Value must be Item 1.';
-		}
-
-		return null;
-	};
-
-	const customTextareaRule = ( value: ValidatedItem ) => {
-		if ( ! /^[a-zA-Z ]+$/.test( value.textarea ) ) {
-			return 'Value must only contain letters and spaces.';
-		}
-
-		return null;
-	};
-	const customEmailRule = ( value: ValidatedItem ) => {
-		if ( ! /^[a-zA-Z0-9._%+-]+@example\.com$/.test( value.email ) ) {
-			return 'Email address must be from @example.com domain.';
-		}
-
-		return null;
-	};
-	const customTelephoneRule = ( value: ValidatedItem ) => {
-		if ( ! /^\+30\d{10}$/.test( value.telephone ) ) {
-			return 'Telephone number must start with +30 and have 10 digits after.';
-		}
-
-		return null;
-	};
-	const customUrlRule = ( value: ValidatedItem ) => {
-		if ( ! /^https:\/\/example\.com$/.test( value.url ) ) {
-			return 'URL must be from https://example.com domain.';
-		}
-
-		return null;
-	};
-	const customColorRule = ( value: ValidatedItem ) => {
-		if ( ! /^#[0-9A-Fa-f]{6}$/.test( value.color ) ) {
-			return 'Color must be a valid hex format (e.g., #ff6600).';
-		}
-
-		return null;
-	};
-	const customIntegerRule = ( value: ValidatedItem ) => {
-		if ( value.integer % 2 !== 0 ) {
-			return 'Integer must be an even number.';
-		}
-
-		return null;
-	};
-	const customNumberRule = ( value: ValidatedItem ) => {
-		if ( ! /^\d+\.\d{2}$/.test( value?.number?.toString() ) ) {
-			return 'Number must have exactly two decimal places.';
-		}
-
-		return null;
-	};
-	const customBooleanRule = ( value: ValidatedItem ) => {
-		if ( value.boolean !== true ) {
-			return 'Boolean must be active.';
-		}
-
-		return null;
-	};
-	const customToggleRule = ( value: ValidatedItem ) => {
-		if ( value.toggle !== true ) {
-			return 'Toggle must be checked.';
-		}
-
-		return null;
-	};
-	const customToggleGroupRule = ( value: ValidatedItem ) => {
-		if ( value.toggleGroup !== 'option1' ) {
-			return 'Value must be Option 1.';
-		}
-
-		return null;
-	};
-
-	const customPasswordRule = ( value: ValidatedItem ) => {
-		if ( value.password.length < 8 ) {
-			return 'Password must be at least 8 characters long.';
-		}
-		if ( ! /[A-Z]/.test( value.password ) ) {
-			return 'Password must contain at least one uppercase letter.';
-		}
-		if ( ! /[0-9]/.test( value.password ) ) {
-			return 'Password must contain at least one number.';
-		}
-
-		return null;
-	};
-
-	const customDateRule = ( value: ValidatedItem ) => {
-		if ( ! value.date ) {
-			return null;
-		}
-		const selectedDate = new Date( value.date );
-		const today = new Date();
-		today.setHours( 0, 0, 0, 0 );
-		if ( selectedDate < today ) {
-			return 'Date must not be in the past.';
-		}
-
-		return null;
-	};
-	const customDateTimeRule = ( value: ValidatedItem ) => {
-		if ( ! value.datetime ) {
-			return null;
-		}
-		const selectedDateTime = new Date( value.datetime );
-		const now = new Date();
-		if ( selectedDateTime < now ) {
-			return 'Date and time must not be in the past.';
-		}
-
-		return null;
-	};
-
-	const customDateRangeRule = ( value: ValidatedItem ) => {
-		if ( ! value.dateRange ) {
-			return null;
-		}
-		const [ fromDate, toDate ] = value.dateRange;
-		if ( ! fromDate || ! toDate ) {
-			return null;
-		}
-		const from = new Date( fromDate );
-		const to = new Date( toDate );
-		const daysDiff = Math.ceil(
-			( to.getTime() - from.getTime() ) / ( 1000 * 60 * 60 * 24 )
-		);
-		if ( daysDiff > 30 ) {
-			return 'Date range must not exceed 30 days.';
-		}
-		return null;
-	};
-
-	const maybeCustomRule = (
-		rule: ( item: ValidatedItem ) => null | string
-	) => {
-		if ( custom === 'sync' ) {
-			return rule;
-		}
-
-		if ( custom === 'async' ) {
-			return makeAsync( rule );
-		}
-
-		return undefined;
-	};
 
 	// Cache for getElements functions - ensures promises are only created once
 	const getElements = useMemo( () => {
@@ -810,8 +643,14 @@ const ValidationComponent = ( {
 							setTimeout(
 								() =>
 									resolve( [
-										{ value: 'item1', label: 'Item 1' },
-										{ value: 'item2', label: 'Item 2' },
+										{
+											value: 'item1',
+											label: 'Item 1',
+										},
+										{
+											value: 'item2',
+											label: 'Item 2',
+										},
 									] ),
 								3500
 							)
@@ -827,15 +666,27 @@ const ValidationComponent = ( {
 											value: 'us',
 											label: 'United States',
 										},
-										{ value: 'ca', label: 'Canada' },
+										{
+											value: 'ca',
+											label: 'Canada',
+										},
 										{
 											value: 'uk',
 											label: 'United Kingdom',
 										},
-										{ value: 'fr', label: 'France' },
-										{ value: 'de', label: 'Germany' },
+										{
+											value: 'fr',
+											label: 'France',
+										},
+										{
+											value: 'de',
+											label: 'Germany',
+										},
 										{ value: 'jp', label: 'Japan' },
-										{ value: 'au', label: 'Australia' },
+										{
+											value: 'au',
+											label: 'Australia',
+										},
 									] ),
 								3500
 							)
@@ -872,279 +723,621 @@ const ValidationComponent = ( {
 				return promiseCache[ fieldId ];
 			};
 		};
-	}, [ elements ] );
+	}, [] );
 
-	const _fields: Field< ValidatedItem >[] = [
-		{
-			id: 'text',
-			type: 'text',
-			label: 'Text',
-			isValid: {
-				required,
-				elements: elements !== 'none' ? true : false,
-				custom: maybeCustomRule( customTextRule ),
-			},
-		},
-		{
-			id: 'select',
-			type: 'text',
-			label: 'Select',
-			elements:
-				elements === 'async'
-					? undefined
-					: [
-							{ value: 'option1', label: 'Option 1' },
-							{ value: 'option2', label: 'Option 2' },
-					  ],
-			getElements:
-				elements === 'async' ? getElements( 'select' ) : undefined,
-			isValid: {
-				required,
-				elements: elements !== 'none' ? true : false,
-				custom: maybeCustomRule( customSelectRule ),
-			},
-		},
-		{
-			id: 'textWithRadio',
-			type: 'text',
-			Edit: 'radio',
-			label: 'Text with radio',
-			elements:
-				elements === 'async'
-					? undefined
-					: [
-							{ value: 'item1', label: 'Item 1' },
-							{ value: 'item2', label: 'Item 2' },
-					  ],
-			getElements:
-				elements === 'async'
-					? getElements( 'textWithRadio' )
-					: undefined,
-			isValid: {
-				required,
-				elements: elements !== 'none' ? true : false,
-				custom: maybeCustomRule( customTextRadioRule ),
-			},
-		},
-		{
-			id: 'textarea',
-			type: 'text',
-			Edit: 'textarea',
-			label: 'Textarea',
-			isValid: {
-				required,
-				elements: elements !== 'none' ? true : false,
-				custom: maybeCustomRule( customTextareaRule ),
-			},
-		},
-		{
-			id: 'email',
-			type: 'email',
-			label: 'e-mail',
-			isValid: {
-				required,
-				elements: elements !== 'none' ? true : false,
-				custom: maybeCustomRule( customEmailRule ),
-			},
-		},
-		{
-			id: 'telephone',
-			type: 'telephone',
-			label: 'telephone',
-			isValid: {
-				required,
-				elements: elements !== 'none' ? true : false,
-				custom: maybeCustomRule( customTelephoneRule ),
-			},
-		},
-		{
-			id: 'url',
-			type: 'url',
-			label: 'URL',
-			isValid: {
-				required,
-				elements: elements !== 'none' ? true : false,
-				custom: maybeCustomRule( customUrlRule ),
-			},
-		},
-		{
-			id: 'color',
-			type: 'color',
-			label: 'Color',
-			isValid: {
-				required,
-				elements: elements !== 'none' ? true : false,
-				custom: maybeCustomRule( customColorRule ),
-			},
-		},
-		{
-			id: 'integer',
-			type: 'integer',
-			label: 'Integer',
-			isValid: {
-				required,
-				elements: elements !== 'none' ? true : false,
-				custom: maybeCustomRule( customIntegerRule ),
-			},
-		},
-		{
-			id: 'number',
-			type: 'number',
-			label: 'Number',
-			isValid: {
-				required,
-				elements: elements !== 'none' ? true : false,
-				custom: maybeCustomRule( customNumberRule ),
-			},
-		},
-		{
-			id: 'boolean',
-			type: 'boolean',
-			label: 'Boolean',
-			isValid: {
-				required,
-				elements: elements !== 'none' ? true : false,
-				custom: maybeCustomRule( customBooleanRule ),
-			},
-		},
-		{
-			id: 'countries',
-			label: 'Countries Visited',
-			type: 'array' as const,
-			placeholder: 'Select countries',
-			description: 'Countries you have visited',
-			isValid: {
-				required,
-				elements: elements !== 'none' ? true : false,
-			},
-			elements:
-				elements === 'async'
-					? undefined
-					: [
-							{ value: 'us', label: 'United States' },
-							{ value: 'ca', label: 'Canada' },
-							{ value: 'uk', label: 'United Kingdom' },
-							{ value: 'fr', label: 'France' },
-							{ value: 'de', label: 'Germany' },
-							{ value: 'jp', label: 'Japan' },
-							{ value: 'au', label: 'Australia' },
-					  ],
-			getElements:
-				elements === 'async' ? getElements( 'countries' ) : undefined,
-		},
-		{
-			id: 'customEdit',
-			label: 'Custom Control',
-			Edit: CustomEditControl,
-			isValid: {
-				required,
-				elements: elements !== 'none' ? true : false,
-			},
-		},
-		{
-			id: 'password',
-			type: 'password',
-			label: 'Password',
-			isValid: {
-				required,
-				elements: elements !== 'none' ? true : false,
-				custom: maybeCustomRule( customPasswordRule ),
-			},
-		},
-		{
-			id: 'toggle',
-			type: 'boolean',
-			label: 'Toggle',
-			Edit: 'toggle',
-			isValid: {
-				required,
-				elements: elements !== 'none' ? true : false,
-				custom: maybeCustomRule( customToggleRule ),
-			},
-		},
-		{
-			id: 'toggleGroup',
-			type: 'text',
-			label: 'Toggle Group',
-			Edit: 'toggleGroup',
-			elements:
-				elements === 'async'
-					? undefined
-					: [
-							{ value: 'option1', label: 'Option 1' },
-							{ value: 'option2', label: 'Option 2' },
-							{ value: 'option3', label: 'Option 3' },
-					  ],
-			getElements:
-				elements === 'async' ? getElements( 'toggleGroup' ) : undefined,
-			isValid: {
-				required,
-				elements: elements !== 'none' ? true : false,
-				custom: maybeCustomRule( customToggleGroupRule ),
-			},
-		},
-		{
-			id: 'date',
-			type: 'date',
-			label: 'Date',
-			isValid: {
-				required,
-				elements: elements !== 'none' ? true : false,
-				custom: maybeCustomRule( customDateRule ),
-			},
-		},
-		{
-			id: 'dateRange',
-			type: 'date',
-			label: 'Date Range',
-			Edit: DateRangeEdit,
-			isValid: {
-				required,
-				elements: elements !== 'none' ? true : false,
-				custom: maybeCustomRule( customDateRangeRule ),
-			},
-		},
-		{
-			id: 'datetime',
-			type: 'datetime',
-			label: 'Date Time',
-			isValid: {
-				required,
-				elements: elements !== 'none' ? true : false,
-				custom: maybeCustomRule( customDateTimeRule ),
-			},
-		},
-	];
+	const _fields: Field< ValidatedItem >[] = useMemo( () => {
+		const DateRangeEdit = (
+			props: DataFormControlProps< ValidatedItem >
+		) => {
+			return <DateControl { ...props } operator="between" />;
+		};
+		const makeAsync = (
+			rule: ( item: ValidatedItem ) => null | string
+		) => {
+			return async ( value: ValidatedItem ) => {
+				return await new Promise< string | null >( ( resolve ) => {
+					setTimeout( () => {
+						const validationResult = rule( value );
+						resolve( validationResult );
+					}, 2000 );
+				} );
+			};
+		};
 
-	const form = {
-		layout: { type },
-		fields: [
-			// Use field object for testing purposes.
-			{ id: 'text' },
-			'select',
-			'textWithRadio',
-			'textarea',
-			'email',
-			'telephone',
-			'url',
-			'color',
-			'integer',
-			'number',
-			'boolean',
-			'categories',
-			'countries',
-			'toggle',
-			'toggleGroup',
-			'password',
-			'customEdit',
-			// Use field object with children for testing purposes.
+		const customTextRule = ( value: ValidatedItem ) => {
+			if ( ! /^[a-zA-Z ]+$/.test( value.text ) ) {
+				return 'Value must only contain letters and spaces.';
+			}
+
+			return null;
+		};
+
+		const customSelectRule = ( value: ValidatedItem ) => {
+			if ( value.select !== 'option1' ) {
+				return 'Value must be Option 1.';
+			}
+			return null;
+		};
+
+		const customTextRadioRule = ( value: ValidatedItem ) => {
+			if ( value.textWithRadio !== 'item1' ) {
+				return 'Value must be Item 1.';
+			}
+
+			return null;
+		};
+
+		const customTextareaRule = ( value: ValidatedItem ) => {
+			if ( ! /^[a-zA-Z ]+$/.test( value.textarea ) ) {
+				return 'Value must only contain letters and spaces.';
+			}
+
+			return null;
+		};
+		const customEmailRule = ( value: ValidatedItem ) => {
+			if ( ! /^[a-zA-Z0-9._%+-]+@example\.com$/.test( value.email ) ) {
+				return 'Email address must be from @example.com domain.';
+			}
+
+			return null;
+		};
+		const customTelephoneRule = ( value: ValidatedItem ) => {
+			if ( ! /^\+30\d{10}$/.test( value.telephone ) ) {
+				return 'Telephone number must start with +30 and have 10 digits after.';
+			}
+
+			return null;
+		};
+		const customUrlRule = ( value: ValidatedItem ) => {
+			if ( ! /^https:\/\/example\.com$/.test( value.url ) ) {
+				return 'URL must be from https://example.com domain.';
+			}
+
+			return null;
+		};
+		const customColorRule = ( value: ValidatedItem ) => {
+			if ( ! /^#[0-9A-Fa-f]{6}$/.test( value.color ) ) {
+				return 'Color must be a valid hex format (e.g., #ff6600).';
+			}
+
+			return null;
+		};
+		const customIntegerRule = ( value: ValidatedItem ) => {
+			if ( value.integer % 2 !== 0 ) {
+				return 'Integer must be an even number.';
+			}
+
+			return null;
+		};
+		const customNumberRule = ( value: ValidatedItem ) => {
+			if ( ! /^\d+\.\d{2}$/.test( value?.number?.toString() ) ) {
+				return 'Number must have exactly two decimal places.';
+			}
+
+			return null;
+		};
+		const customBooleanRule = ( value: ValidatedItem ) => {
+			if ( value.boolean !== true ) {
+				return 'Boolean must be active.';
+			}
+
+			return null;
+		};
+		const customToggleRule = ( value: ValidatedItem ) => {
+			if ( value.toggle !== true ) {
+				return 'Toggle must be checked.';
+			}
+
+			return null;
+		};
+		const customToggleGroupRule = ( value: ValidatedItem ) => {
+			if ( value.toggleGroup !== 'option1' ) {
+				return 'Value must be Option 1.';
+			}
+
+			return null;
+		};
+
+		const customPasswordRule = ( value: ValidatedItem ) => {
+			if ( value.password.length < 8 ) {
+				return 'Password must be at least 8 characters long.';
+			}
+			if ( ! /[A-Z]/.test( value.password ) ) {
+				return 'Password must contain at least one uppercase letter.';
+			}
+			if ( ! /[0-9]/.test( value.password ) ) {
+				return 'Password must contain at least one number.';
+			}
+
+			return null;
+		};
+
+		const customDateRule = ( value: ValidatedItem ) => {
+			if ( ! value.date ) {
+				return null;
+			}
+			const selectedDate = new Date( value.date );
+			const today = new Date();
+			today.setHours( 0, 0, 0, 0 );
+			if ( selectedDate < today ) {
+				return 'Date must not be in the past.';
+			}
+
+			return null;
+		};
+		const customDateTimeRule = ( value: ValidatedItem ) => {
+			if ( ! value.datetime ) {
+				return null;
+			}
+			const selectedDateTime = new Date( value.datetime );
+			const now = new Date();
+			if ( selectedDateTime < now ) {
+				return 'Date and time must not be in the past.';
+			}
+
+			return null;
+		};
+
+		const customDateRangeRule = ( value: ValidatedItem ) => {
+			if ( ! value.dateRange ) {
+				return null;
+			}
+			const [ fromDate, toDate ] = value.dateRange;
+			if ( ! fromDate || ! toDate ) {
+				return null;
+			}
+			const from = new Date( fromDate );
+			const to = new Date( toDate );
+			const daysDiff = Math.ceil(
+				( to.getTime() - from.getTime() ) / ( 1000 * 60 * 60 * 24 )
+			);
+			if ( daysDiff > 30 ) {
+				return 'Date range must not exceed 30 days.';
+			}
+			return null;
+		};
+
+		const maybeCustomRule = (
+			rule: ( item: ValidatedItem ) => null | string
+		) => {
+			if ( custom === 'sync' ) {
+				return rule;
+			}
+
+			if ( custom === 'async' ) {
+				return makeAsync( rule );
+			}
+
+			return undefined;
+		};
+
+		// Helper functions to avoid nested ternary expressions
+		const getValidationPlaceholder = (
+			basePattern: string,
+			baseMinMax: string,
+			bothPattern: string
+		) => {
+			if ( pattern && minMax ) {
+				return bothPattern;
+			}
+			if ( pattern ) {
+				return basePattern;
+			}
+			if ( minMax ) {
+				return baseMinMax;
+			}
+			return undefined;
+		};
+
+		const getValidationDescription = (
+			patternDesc: string,
+			minMaxDesc: string,
+			bothDesc: string
+		) => {
+			if ( pattern && minMax ) {
+				return bothDesc;
+			}
+			if ( pattern ) {
+				return patternDesc;
+			}
+			if ( minMax ) {
+				return minMaxDesc;
+			}
+			return undefined;
+		};
+
+		return [
 			{
-				id: 'dates',
-				label: 'Dates',
-				children: [ 'date', 'dateRange', 'datetime' ],
+				id: 'text',
+				type: 'text',
+				label: 'Text',
+				placeholder: getValidationPlaceholder(
+					'user_name (alphanumeric+underscore)',
+					'Min 5, max 20 characters',
+					'user_name (5-20 chars, alphanumeric+underscore)'
+				),
+				description: getValidationDescription(
+					'Must contain only letters, numbers, and underscores',
+					'Must be between 5 and 20 characters',
+					'Letters, numbers, underscores only AND 5-20 characters'
+				),
+				isValid: {
+					required,
+					elements: elements !== 'none' ? true : false,
+					custom: maybeCustomRule( customTextRule ),
+					pattern: pattern ? '^[a-zA-Z0-9_]+$' : undefined,
+					minLength: minMax ? 5 : undefined,
+					maxLength: minMax ? 20 : undefined,
+				},
 			},
-		],
-	};
+			{
+				id: 'select',
+				type: 'text',
+				label: 'Select',
+				elements:
+					elements === 'async'
+						? undefined
+						: [
+								{ value: 'option1', label: 'Option 1' },
+								{ value: 'option2', label: 'Option 2' },
+						  ],
+				getElements:
+					elements === 'async' ? getElements( 'select' ) : undefined,
+				isValid: {
+					required,
+					elements: elements !== 'none' ? true : false,
+					custom: maybeCustomRule( customSelectRule ),
+				},
+			},
+			{
+				id: 'textWithRadio',
+				type: 'text',
+				Edit: 'radio',
+				label: 'Text with radio',
+				elements:
+					elements === 'async'
+						? undefined
+						: [
+								{ value: 'item1', label: 'Item 1' },
+								{ value: 'item2', label: 'Item 2' },
+						  ],
+				getElements:
+					elements === 'async'
+						? getElements( 'textWithRadio' )
+						: undefined,
+				isValid: {
+					required,
+					elements: elements !== 'none' ? true : false,
+					custom: maybeCustomRule( customTextRadioRule ),
+				},
+			},
+			{
+				id: 'textarea',
+				type: 'text',
+				Edit: 'textarea',
+				label: 'Textarea',
+				placeholder: minMax ? 'Min 10, max 200 characters' : undefined,
+				description: minMax
+					? 'Must be between 10 and 200 characters'
+					: undefined,
+				isValid: {
+					required,
+					elements: elements !== 'none' ? true : false,
+					custom: maybeCustomRule( customTextareaRule ),
+					minLength: minMax ? 10 : undefined,
+					maxLength: minMax ? 200 : undefined,
+				},
+			},
+			{
+				id: 'email',
+				type: 'email',
+				label: 'e-mail',
+				placeholder: getValidationPlaceholder(
+					'user@company.com',
+					'Min 15, max 100 characters',
+					'user@company.com (15-100 chars)'
+				),
+				description: getValidationDescription(
+					'Email must be from @company.com domain',
+					'Must be between 15 and 100 characters',
+					'Must be @company.com domain AND 15-100 characters'
+				),
+				isValid: {
+					required,
+					elements: elements !== 'none' ? true : false,
+					custom: maybeCustomRule( customEmailRule ),
+					pattern: pattern
+						? '^[a-zA-Z0-9._%+-]+@company\\.com$'
+						: undefined,
+					minLength: minMax ? 15 : undefined,
+					maxLength: minMax ? 100 : undefined,
+				},
+			},
+			{
+				id: 'telephone',
+				type: 'telephone',
+				label: 'telephone',
+				placeholder: getValidationPlaceholder(
+					'+1-555-123-4567',
+					'Min 10, max 20 characters',
+					'+1-555-123-4567 (10-20 chars)'
+				),
+				description: getValidationDescription(
+					'US phone format with country code',
+					'Must be between 10 and 20 characters',
+					'US format +1-XXX... AND 10-20 characters'
+				),
+				isValid: {
+					required,
+					elements: elements !== 'none' ? true : false,
+					custom: maybeCustomRule( customTelephoneRule ),
+					pattern: pattern ? '^\\+1-\\d{3}-[0-9-]*$' : undefined,
+					minLength: minMax ? 10 : undefined,
+					maxLength: minMax ? 20 : undefined,
+				},
+			},
+			{
+				id: 'url',
+				type: 'url',
+				label: 'URL',
+				placeholder: getValidationPlaceholder(
+					'https://github.com/user/repo',
+					'Min 25, max 255 characters',
+					'https://github.com/user/repo (10-255 chars)'
+				),
+				description: getValidationDescription(
+					'Must be a GitHub repository URL',
+					'Must be between 25 and 255 characters',
+					'GitHub repository URL AND 25-255 characters'
+				),
+				isValid: {
+					required,
+					elements: elements !== 'none' ? true : false,
+					custom: maybeCustomRule( customUrlRule ),
+					pattern: pattern
+						? '^https:\\/\\/github\\.com\\/.+$'
+						: undefined,
+					minLength: minMax ? 25 : undefined,
+					maxLength: minMax ? 255 : undefined,
+				},
+			},
+			{
+				id: 'color',
+				type: 'color',
+				label: 'Color',
+				isValid: {
+					required,
+					elements: elements !== 'none' ? true : false,
+					custom: maybeCustomRule( customColorRule ),
+				},
+			},
+			{
+				id: 'integer',
+				type: 'integer',
+				label: 'Integer',
+				placeholder: minMax ? 'Min 10, max 100' : undefined,
+				description: minMax ? 'Must be between 10 and 100' : undefined,
+				isValid: {
+					required,
+					elements: elements !== 'none' ? true : false,
+					custom: maybeCustomRule( customIntegerRule ),
+					min: minMax ? 10 : undefined,
+					max: minMax ? 100 : undefined,
+				},
+			},
+			{
+				id: 'number',
+				type: 'number',
+				label: 'Number',
+				placeholder: minMax ? 'Min 10, max 100' : undefined,
+				description: minMax ? 'Must be between 0 and 100' : undefined,
+				isValid: {
+					required,
+					elements: elements !== 'none' ? true : false,
+					custom: maybeCustomRule( customNumberRule ),
+					min: minMax ? 10 : undefined,
+					max: minMax ? 100 : undefined,
+				},
+			},
+			{
+				id: 'boolean',
+				type: 'boolean',
+				label: 'Boolean',
+				isValid: {
+					required,
+					elements: elements !== 'none' ? true : false,
+					custom: maybeCustomRule( customBooleanRule ),
+				},
+			},
+			{
+				id: 'array',
+				label: 'Array',
+				type: 'array',
+				placeholder: 'Select countries',
+				description: 'Countries you have visited',
+				isValid: {
+					required,
+					elements: elements !== 'none' ? true : false,
+				},
+				elements:
+					elements === 'async'
+						? undefined
+						: [
+								{ value: 'us', label: 'United States' },
+								{ value: 'ca', label: 'Canada' },
+								{ value: 'uk', label: 'United Kingdom' },
+								{ value: 'fr', label: 'France' },
+								{ value: 'de', label: 'Germany' },
+								{ value: 'jp', label: 'Japan' },
+								{ value: 'au', label: 'Australia' },
+						  ],
+				getElements:
+					elements === 'async'
+						? getElements( 'countries' )
+						: undefined,
+			},
+			{
+				id: 'customEdit',
+				label: 'Custom Control',
+				Edit: CustomEditControl,
+				isValid: {
+					required,
+					elements: elements !== 'none' ? true : false,
+				},
+			},
+			{
+				id: 'password',
+				type: 'password',
+				label: 'Password',
+				placeholder: getValidationPlaceholder(
+					'Must be 8+ alphanumeric',
+					'Min 10, max 20 characters',
+					'abc12345 (10-20 chars alphanumeric)'
+				),
+				description: getValidationDescription(
+					'Must contain only letters and numbers (8+ chars)',
+					'Must be between 10 and 20 characters',
+					'alphanumeric chars AND 10-20 characters'
+				),
+				isValid: {
+					required,
+					elements: elements !== 'none' ? true : false,
+					custom: maybeCustomRule( customPasswordRule ),
+					pattern: pattern ? '^[a-zA-Z0-9]{8,}$' : undefined,
+					minLength: minMax ? 10 : undefined,
+					maxLength: minMax ? 20 : undefined,
+				},
+			},
+			{
+				id: 'toggle',
+				type: 'boolean',
+				label: 'Toggle',
+				Edit: 'toggle',
+				isValid: {
+					required,
+					elements: elements !== 'none' ? true : false,
+					custom: maybeCustomRule( customToggleRule ),
+				},
+			},
+			{
+				id: 'toggleGroup',
+				type: 'text',
+				label: 'Toggle Group',
+				Edit: 'toggleGroup',
+				elements:
+					elements === 'async'
+						? undefined
+						: [
+								{ value: 'option1', label: 'Option 1' },
+								{ value: 'option2', label: 'Option 2' },
+								{ value: 'option3', label: 'Option 3' },
+						  ],
+				getElements:
+					elements === 'async'
+						? getElements( 'toggleGroup' )
+						: undefined,
+				isValid: {
+					required,
+					elements: elements !== 'none' ? true : false,
+					custom: maybeCustomRule( customToggleGroupRule ),
+				},
+			},
+			{
+				id: 'date',
+				type: 'date',
+				label: 'Date',
+				isValid: {
+					required,
+					elements: elements !== 'none' ? true : false,
+					custom: maybeCustomRule( customDateRule ),
+				},
+			},
+			{
+				id: 'dateRange',
+				type: 'date',
+				label: 'Date Range',
+				Edit: DateRangeEdit,
+				isValid: {
+					required,
+					elements: elements !== 'none' ? true : false,
+					custom: maybeCustomRule( customDateRangeRule ),
+				},
+			},
+			{
+				id: 'datetime',
+				type: 'datetime',
+				label: 'Date Time',
+				isValid: {
+					required,
+					elements: elements !== 'none' ? true : false,
+					custom: maybeCustomRule( customDateTimeRule ),
+				},
+			},
+		];
+	}, [ elements, custom, required, pattern, minMax, getElements ] );
+
+	const form = useMemo(
+		() => ( {
+			fields: [
+				'text',
+				{ id: 'customEdit' },
+				{
+					id: 'level1Integer',
+					children: [ 'integer' ],
+				},
+				{
+					id: 'level1Number',
+					children: [
+						{ id: 'level2Number', children: [ 'number' ] },
+					],
+				},
+				{
+					id: 'level1Email',
+					children: [
+						{
+							id: 'level2Email',
+							children: [
+								{ id: 'level3Email', children: [ 'email' ] },
+							],
+						},
+					],
+				},
+				{
+					id: 'level1Telephone',
+					children: [
+						{
+							id: 'level2Telephone',
+							children: [
+								{
+									id: 'level3Telephone',
+									children: [
+										{
+											id: 'level4Telephone',
+											children: [ 'telephone' ],
+										},
+									],
+								},
+							],
+						},
+					],
+				},
+				'url',
+				'color',
+				'password',
+				'textarea',
+				'select',
+				'textWithRadio',
+				'boolean',
+				'toggle',
+				'toggleGroup',
+				'array',
+				'date',
+				'dateRange',
+				'datetime',
+			],
+		} ),
+		[]
+	);
 
 	const { validity, isValid } = useFormValidity( post, _fields, form );
 
@@ -1252,7 +1445,13 @@ const VisibilityComponent = () => {
 	);
 };
 
-const LayoutCardComponent = ( { withHeader }: { withHeader: boolean } ) => {
+const LayoutCardComponent = ( {
+	withHeader,
+	isCollapsible,
+}: {
+	withHeader: boolean;
+	isCollapsible: boolean;
+} ) => {
 	type Customer = {
 		name: string;
 		email: string;
@@ -1320,7 +1519,7 @@ const LayoutCardComponent = ( { withHeader }: { withHeader: boolean } ) => {
 			isVisible: ( item ) => item.displayPayments,
 			render: ( { item } ) => {
 				return (
-					<p>
+					<p style={ { margin: 0 } }>
 						The customer has made a total of { item.totalOrders }{ ' ' }
 						orders, amounting to { item.totalRevenue } dollars. The
 						average order value is { item.averageOrderValue }{ ' ' }
@@ -1376,14 +1575,14 @@ const LayoutCardComponent = ( { withHeader }: { withHeader: boolean } ) => {
 
 	const form: Form = useMemo(
 		() => ( {
-			layout: getLayoutFromStoryArgs( {
-				type: 'card',
-				withHeader,
-			} ),
 			fields: [
 				{
 					id: 'customerCard',
-					layout: { type: 'card', summary: 'plan-summary' },
+					layout: {
+						type: 'card',
+						summary: 'plan-summary',
+						withHeader,
+					},
 					label: 'Customer',
 					description:
 						'Enter your contact details, plan type, and addresses to complete your customer information.',
@@ -1448,12 +1647,13 @@ const LayoutCardComponent = ( { withHeader }: { withHeader: boolean } ) => {
 						type: 'card',
 						isOpened: false,
 						summary: [ { id: 'dueDate', visibility: 'always' } ],
+						isCollapsible,
 					},
 					children: [ 'vat', 'commission' ],
 				},
 			],
 		} ),
-		[ withHeader ]
+		[ withHeader, isCollapsible ]
 	);
 
 	return (
@@ -1785,6 +1985,73 @@ const LayoutRowComponent = ( {
 	);
 };
 
+const LayoutDetailsComponent = () => {
+	const [ post, setPost ] = useState< SamplePost >( {
+		title: 'Hello, World!',
+		order: 2,
+		author: 1,
+		status: 'draft',
+		reviewer: 'fulano',
+		date: '2021-01-01T12:00:00',
+		birthdate: '1950-02-23T12:00:00',
+		filesize: 1024,
+		dimensions: '1920x1080',
+		comment_status: 'open',
+		ping_status: true,
+		tags: [ 'photography' ],
+	} );
+
+	const form: Form = {
+		fields: [
+			{
+				id: 'discussion',
+				label: 'Discussion',
+				children: [ 'comment_status', 'ping_status' ],
+				layout: {
+					type: 'details',
+					summary: 'discussion',
+				},
+			},
+			{
+				id: 'metadata',
+				label: 'Metadata',
+				children: [ 'filesize', 'dimensions' ],
+				layout: {
+					type: 'details',
+					summary: 'metadata_summary',
+				},
+			},
+			{
+				id: 'categorization',
+				label: 'Categorization',
+				children: [ 'tags', 'description' ],
+				layout: { type: 'details' },
+			},
+			{
+				id: 'scheduling',
+				children: [ 'date', 'birthdate' ],
+				layout: {
+					type: 'details',
+				},
+			},
+		],
+	};
+
+	return (
+		<DataForm< SamplePost >
+			data={ post }
+			fields={ fields }
+			form={ form }
+			onChange={ ( edits ) =>
+				setPost( ( prev ) => ( {
+					...prev,
+					...edits,
+				} ) )
+			}
+		/>
+	);
+};
+
 const LayoutMixedComponent = () => {
 	const [ post, setPost ] = useState< SamplePost >( {
 		title: 'Hello, World!',
@@ -1799,6 +2066,7 @@ const LayoutMixedComponent = () => {
 	} );
 
 	const form: Form = {
+		layout: { type: 'card' },
 		fields: [
 			{
 				id: 'title-and-status',
@@ -1859,9 +2127,14 @@ export const LayoutCard = {
 			control: { type: 'boolean' },
 			description: 'Whether the card has a header.',
 		},
+		isCollapsible: {
+			control: { type: 'boolean' },
+			description: 'Whether the card can be collapsed/expanded.',
+		},
 	},
 	args: {
 		withHeader: true,
+		isCollapsible: true,
 	},
 };
 
@@ -1906,6 +2179,10 @@ export const LayoutRow = {
 	},
 };
 
+export const LayoutDetails = {
+	render: LayoutDetailsComponent,
+};
+
 export const LayoutMixed = {
 	render: LayoutMixedComponent,
 };
@@ -1929,17 +2206,23 @@ export const Validation = {
 			description: 'Whether or not the custom validation rule is active.',
 			options: [ 'sync', 'async', 'none' ],
 		},
-		type: {
-			control: { type: 'select' },
-			description: 'Chooses the layout type.',
-			options: [ 'regular', 'panel', 'card', 'row' ],
+		pattern: {
+			control: { type: 'boolean' },
+			description:
+				'Whether or not the pattern validation rule is active.',
+		},
+		minMax: {
+			control: { type: 'boolean' },
+			description:
+				'Whether or not the min/max validation rule is active.',
 		},
 	},
 	args: {
 		required: true,
 		elements: 'sync',
 		custom: 'sync',
-		type: 'regular',
+		pattern: false,
+		minMax: false,
 	},
 };
 
@@ -1994,6 +2277,21 @@ const DataAdapterComponent = () => {
 			id: 'user.profile.email',
 			label: 'User Email',
 			type: 'email',
+		},
+		{
+			id: 'user.profile.tags',
+			label: 'User Tags',
+			type: 'array',
+			placeholder: 'Enter comma-separated tags',
+			description:
+				'Add tags separated by commas (e.g., "tag1, tag2, tag3")',
+			elements: [
+				{ value: 'astronomy', label: 'Astronomy' },
+				{ value: 'book-review', label: 'Book review' },
+				{ value: 'event', label: 'Event' },
+				{ value: 'photography', label: 'Photography' },
+				{ value: 'travel', label: 'Travel' },
+			],
 		},
 		// Example of adapting a data value to a control value
 		// by providing getValue/setValue methods.
@@ -2051,7 +2349,11 @@ const DataAdapterComponent = () => {
 		// Edits will respect the shape of the data
 		// because fields provide the proper information
 		// (via field.id or via field.setValue).
-		setData( ( prev ) => deepMerge( prev, edits ) );
+		setData( ( prev ) =>
+			deepMerge( prev, edits, {
+				arrayMerge: ( target, source ) => source,
+			} )
+		);
 	}, [] );
 
 	return (
@@ -2092,6 +2394,7 @@ const DataAdapterComponent = () => {
 							children: [
 								'user.profile.name',
 								'user.profile.email',
+								'user.profile.tags',
 							],
 						},
 					],

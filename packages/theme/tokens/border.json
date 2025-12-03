@@ -1,0 +1,56 @@
+{
+	"border": {
+		"$type": "dimension",
+		"radius": {
+			"surface": {
+				"xs": {
+					"$value": { "value": 1, "unit": "px" },
+					"$description": "Extra small radius for surfaces"
+				},
+				"sm": {
+					"$value": { "value": 2, "unit": "px" },
+					"$description": "Small radius for surfaces"
+				},
+				"md": {
+					"$value": { "value": 4, "unit": "px" },
+					"$description": "Medium radius for surfaces"
+				},
+				"lg": {
+					"$value": { "value": 8, "unit": "px" },
+					"$description": "Large radius for surfaces"
+				}
+			}
+		},
+		"width": {
+			"surface": {
+				"xs": {
+					"$value": { "value": 1, "unit": "px" },
+					"$description": "Extra small width for surfaces"
+				},
+				"sm": {
+					"$value": { "value": 2, "unit": "px" },
+					"$description": "Small width for surfaces"
+				},
+				"md": {
+					"$value": { "value": 4, "unit": "px" },
+					"$description": "Medium width for surfaces"
+				},
+				"lg": {
+					"$value": { "value": 8, "unit": "px" },
+					"$description": "Large width for surfaces"
+				}
+			},
+			"interactive": {
+				"focus": {
+					"$value": { "value": 2, "unit": "px" },
+					"$description": "Border width for focus ring",
+					"$extensions": {
+						"mode": {
+							"high-dpi": { "value": 1.5, "unit": "px" }
+						}
+					}
+				}
+			}
+		}
+	}
+}

@@ -22,12 +22,16 @@ export interface CreatePostPayload {
  * Delete all posts using REST API.
  *
  * @param this
+ * @param postType The type of post to delete. Defaults to 'posts'.
  */
-export async function deleteAllPosts( this: RequestUtils ) {
+export async function deleteAllPosts(
+	this: RequestUtils,
+	postType: string = 'posts'
+) {
 	// List all posts.
 	// https://developer.wordpress.org/rest-api/reference/posts/#list-posts
 	const posts = await this.rest< Post[] >( {
-		path: '/wp/v2/posts',
+		path: `/wp/v2/${ postType }`,
 		params: {
 			per_page: 100,
 			// All possible statuses.
@@ -42,7 +46,7 @@ export async function deleteAllPosts( this: RequestUtils ) {
 		posts.map( ( post ) =>
 			this.rest( {
 				method: 'DELETE',
-				path: `/wp/v2/posts/${ post.id }`,
+				path: `/wp/v2/${ postType }/${ post.id }`,
 				params: {
 					force: true,
 				},

@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import {
 	useBlockProps,
 	store as blockEditorStore,
@@ -14,6 +14,7 @@ import {
 } from '@wordpress/components';
 import { useState, useEffect, useRef } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
+import { speak } from '@wordpress/a11y';
 
 /**
  * Internal dependencies
@@ -23,11 +24,11 @@ import { unlock } from '../lock-unlock';
 const { Badge } = unlock( componentsPrivateApis );
 
 export default function MathEdit( { attributes, setAttributes, isSelected } ) {
-	const { latex } = attributes;
+	const { latex, mathML } = attributes;
 	const [ blockRef, setBlockRef ] = useState();
 	const [ error, setError ] = useState( null );
 	const [ latexToMathML, setLatexToMathML ] = useState();
-	const initialLatex = useRef( attributes.latex );
+	const initialLatex = useRef( latex );
 	const { __unstableMarkNextChangeAsNotPersistent } =
 		useDispatch( blockEditorStore );
 
@@ -56,13 +57,13 @@ export default function MathEdit( { attributes, setAttributes, isSelected } ) {
 
 	return (
 		<div { ...blockProps }>
-			{ attributes.mathML ? (
+			{ mathML ? (
 				<math
 					// We can't spread block props on the math element because
 					// it only supports a limited amount of global attributes.
 					// For example, draggable will have no effect.
 					display="block"
-					dangerouslySetInnerHTML={ { __html: attributes.mathML } }
+					dangerouslySetInnerHTML={ { __html: mathML } }
 				/>
 			) : (
 				'\u200B'
@@ -72,7 +73,8 @@ export default function MathEdit( { attributes, setAttributes, isSelected } ) {
 					placement="bottom-start"
 					offset={ 8 }
 					anchor={ blockRef }
-					focusOnMount="firstContentElement"
+					focusOnMount={ false }
+					__unstableSlotName="__unstable-block-tools-after"
 				>
 					<div style={ { padding: '4px', minWidth: '300px' } }>
 						<VStack spacing={ 1 }>
@@ -82,22 +84,32 @@ export default function MathEdit( { attributes, setAttributes, isSelected } ) {
 								label={ __( 'LaTeX math syntax' ) }
 								hideLabelFromVision
 								value={ latex }
+								className="wp-block-math__textarea-control"
 								onChange={ ( newLatex ) => {
 									if ( ! latexToMathML ) {
 										setAttributes( { latex: newLatex } );
 										return;
 									}
-									let mathML = '';
+									let newMathML = '';
 									try {
-										mathML = latexToMathML( newLatex, {
+										newMathML = latexToMathML( newLatex, {
 											displayMode: true,
 										} );
 										setError( null );
 									} catch ( err ) {
 										setError( err.message );
+										speak(
+											sprintf(
+												/* translators: %s: error message returned when parsing LaTeX. */
+												__(
+													'Error parsing mathematical expression: %s'
+												),
+												err.message
+											)
+										);
 									}
 									setAttributes( {
-										mathML,
+										mathML: newMathML,
 										latex: newLatex,
 									} );
 								} }
@@ -109,7 +121,11 @@ export default function MathEdit( { attributes, setAttributes, isSelected } ) {
 										intent="error"
 										className="wp-block-math__error"
 									>
-										{ error }
+										{ sprintf(
+											/* translators: %s: error message returned when parsing LaTeX. */
+											__( 'Error: %s' ),
+											error
+										) }
 									</Badge>
 									<style children=".wp-block-math__error .components-badge__content{white-space:normal}" />
 								</>

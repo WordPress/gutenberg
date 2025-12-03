@@ -3,7 +3,9 @@
  */
 import { __ } from '@wordpress/i18n';
 import {
+	// @ts-ignore
 	BlockPreview,
+	// @ts-ignore
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import type { BasePost } from '@wordpress/fields';
@@ -14,11 +16,10 @@ import { useEntityBlockEditor, store as coreStore } from '@wordpress/core-data';
  * Internal dependencies
  */
 import { EditorProvider } from '../../../components/provider';
+import { useStyle } from '../../../components/global-styles';
 import { unlock } from '../../../lock-unlock';
 // @ts-ignore
 import { store as editorStore } from '../../../store';
-
-const { useGlobalStyle } = unlock( blockEditorPrivateApis );
 
 function PostPreviewContainer( {
 	template,
@@ -27,7 +28,7 @@ function PostPreviewContainer( {
 	template: any;
 	post: any;
 } ) {
-	const [ backgroundColor = 'white' ] = useGlobalStyle( 'color.background' );
+	const [ backgroundColor = 'white' ] = useStyle( 'color.background' );
 	const [ postBlocks ] = useEntityBlockEditor( 'postType', post.type, {
 		id: post.id,
 	} );

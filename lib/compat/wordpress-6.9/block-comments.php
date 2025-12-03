@@ -117,19 +117,34 @@ function gutenberg_filter_comment_count_query_exclude_block_comments( $query ) {
 add_filter( 'query', 'gutenberg_filter_comment_count_query_exclude_block_comments' );
 
 /**
- * Allows duplicate block comment.
+ * Adjusts the comments list table query so `comment_type=note` never displays.
  *
- * @since 6.9.0
- *
- * @param int $dupe_id The duplicate comment ID.
- * @param array $commentdata The comment data.
- *
- * @return int ID of the comment identified as a duplicate.
+ * @param array $args An array of get_comments() arguments.
+ * @return array Possibly modified arguments for get_comments().
  */
-function gutenberg_allow_duplicate_note_resolution( $dupe_id, $commentdata ) {
-	if ( isset( $commentdata['comment_type'] ) && 'note' === $commentdata['comment_type'] ) {
-		return false;
+function gutenberg_hide_note_from_comment_list_table( $args ) {
+	if ( ! empty( $_REQUEST['comment_type'] ) && 'note' === $_REQUEST['comment_type'] ) {
+		unset( $args['type'] );
 	}
-	return $dupe_id;
+	return $args;
 }
-add_filter( 'duplicate_comment_id', 'gutenberg_allow_duplicate_note_resolution', 10, 2 );
+add_filter( 'comments_list_table_query_args', 'gutenberg_hide_note_from_comment_list_table' );
+
+/**
+ * Override comment_count to exclude notes from the comment count.
+ *
+ * @param int|null $new     The new comment count. Default null.
+ * @param int      $old     The old comment count.
+ * @param int      $post_id Post ID.
+ * @return int|null The modified comment count.
+ */
+function gutenberg_exclude_notes_from_comment_count( $new_count, $old_count, $post_id ) {
+	global $wpdb;
+	// If another filter already set a count, respect it.
+	if ( null !== $new_count ) {
+		return $new_count;
+	}
+	$new_count = (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->comments WHERE comment_post_ID = %d AND comment_approved = '1' AND comment_type != 'note'", $post_id ) );
+	return $new_count;
+}
+add_filter( 'pre_wp_update_comment_count_now', 'gutenberg_exclude_notes_from_comment_count', 10, 3 );

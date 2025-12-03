@@ -96,6 +96,7 @@ const {
 	reusableBlocksSelectKey,
 	sectionRootClientIdKey,
 	mediaEditKey,
+	getMediaSelectKey,
 } = unlock( privateApis );
 
 /**
@@ -293,6 +294,13 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 			hasFixedToolbar,
 			isDistractionFree,
 			keepCaretInsideBlock,
+			[ getMediaSelectKey ]: ( select, attachmentId ) => {
+				return select( coreStore ).getEntityRecord(
+					'postType',
+					'attachment',
+					attachmentId
+				);
+			},
 			[ mediaEditKey ]: hasUploadPermissions
 				? editMediaEntity
 				: undefined,

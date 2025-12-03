@@ -40,7 +40,7 @@
 
 	h2 {
 		font-size: $default-font-size;
-		font-weight: 500;
+		font-weight: $font-weight-medium;
 		color: $gray-900;
 		margin-bottom: 1.5em;
 	}
@@ -49,7 +49,7 @@
 	h3 {
 		font-size: 11px;
 		text-transform: uppercase;
-		font-weight: 500;
+		font-weight: $font-weight-medium;
 		color: $gray-900;
 		margin-bottom: 1.5em;
 	}

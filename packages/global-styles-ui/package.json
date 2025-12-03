@@ -1,0 +1,66 @@
+{
+	"name": "@wordpress/global-styles-ui",
+	"version": "1.3.0",
+	"description": "Global Styles UI components for WordPress.",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"gutenberg",
+		"global-styles",
+		"design-system"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/global-styles-ui/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git",
+		"directory": "packages/global-styles-ui"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"engines": {
+		"node": ">=18.12.0",
+		"npm": ">=8.19.2"
+	},
+	"main": "build/index.js",
+	"module": "build-module/index.js",
+	"exports": {
+		".": {
+			"types": "./build-types/index.d.ts",
+			"import": "./build-module/index.js",
+			"default": "./build/index.js"
+		},
+		"./package.json": "./package.json",
+		"./build-style/": "./build-style/"
+	},
+	"react-native": "src/index",
+	"dependencies": {
+		"@wordpress/a11y": "file:../a11y",
+		"@wordpress/api-fetch": "file:../api-fetch",
+		"@wordpress/block-editor": "file:../block-editor",
+		"@wordpress/blocks": "file:../blocks",
+		"@wordpress/components": "file:../components",
+		"@wordpress/compose": "file:../compose",
+		"@wordpress/core-data": "file:../core-data",
+		"@wordpress/data": "file:../data",
+		"@wordpress/date": "file:../date",
+		"@wordpress/element": "file:../element",
+		"@wordpress/global-styles-engine": "file:../global-styles-engine",
+		"@wordpress/i18n": "file:../i18n",
+		"@wordpress/icons": "file:../icons",
+		"@wordpress/keycodes": "file:../keycodes",
+		"@wordpress/private-apis": "file:../private-apis",
+		"change-case": "^4.1.2",
+		"classnames": "^2.3.2",
+		"clsx": "^2.1.0",
+		"colord": "^2.7.0"
+	},
+	"peerDependencies": {
+		"react": "^18.0.0",
+		"react-dom": "^18.0.0"
+	},
+	"publishConfig": {
+		"access": "public"
+	}
+}

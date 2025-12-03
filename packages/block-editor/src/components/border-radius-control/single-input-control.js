@@ -74,6 +74,7 @@ export default function SingleInputControl( {
 	const onChangeUnit = ( next ) => {
 		const newUnits = { ...selectedUnits };
 		if ( corner === 'all' ) {
+			newUnits.flat = next;
 			newUnits.topLeft = next;
 			newUnits.topRight = next;
 			newUnits.bottomLeft = next;

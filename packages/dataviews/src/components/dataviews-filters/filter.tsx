@@ -19,9 +19,7 @@ import {
 import { __, sprintf } from '@wordpress/i18n';
 import { useRef, createInterpolateElement } from '@wordpress/element';
 import { closeSmall } from '@wordpress/icons';
-
-const ENTER = 'Enter';
-const SPACE = ' ';
+import { dateI18n, getDate } from '@wordpress/date';
 
 /**
  * Internal dependencies
@@ -56,12 +54,21 @@ import {
 import type {
 	Filter,
 	NormalizedField,
+	NormalizedFieldDate,
+	NormalizedFieldNumber,
+	NormalizedFieldInteger,
 	NormalizedFilter,
 	Operator,
 	Option,
 	View,
 } from '../../types';
 import useElements from '../../hooks/use-elements';
+import parseDateTime from '../../field-types/utils/parse-date-time';
+import { formatNumber } from '../../field-types/number';
+import { formatInteger } from '../../field-types/integer';
+
+const ENTER = 'Enter';
+const SPACE = ' ';
 
 interface FilterTextProps {
 	activeElements: Option[];
@@ -494,10 +501,42 @@ export default function Filter( {
 			return filterInView?.value?.includes( element.value );
 		} );
 	} else if ( filterInView?.value !== undefined ) {
+		const field = fields.find( ( f ) => f.id === filter.field );
+		let label = filterInView.value;
+
+		if ( field?.type === 'date' && typeof label === 'string' ) {
+			try {
+				const dateValue = parseDateTime( label );
+				if ( dateValue !== null ) {
+					label = dateI18n(
+						( field as NormalizedFieldDate< any > ).format.date,
+						getDate( label )
+					);
+				}
+			} catch ( e ) {
+				label = filterInView.value;
+			}
+		} else if ( field?.type === 'datetime' && typeof label === 'string' ) {
+			try {
+				const dateValue = parseDateTime( label );
+				if ( dateValue !== null ) {
+					label = dateValue.toLocaleString();
+				}
+			} catch ( e ) {
+				label = filterInView.value;
+			}
+		} else if ( field?.type === 'number' && typeof label === 'number' ) {
+			const numberField = field as NormalizedFieldNumber< any >;
+			label = formatNumber( label, numberField.format );
+		} else if ( field?.type === 'integer' && typeof label === 'number' ) {
+			const integerField = field as NormalizedFieldInteger< any >;
+			label = formatInteger( label, integerField.format );
+		}
+
 		activeElements = [
 			{
 				value: filterInView.value,
-				label: filterInView.value,
+				label,
 			},
 		];
 	}

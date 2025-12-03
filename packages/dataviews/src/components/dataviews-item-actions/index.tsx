@@ -16,6 +16,7 @@ import { __ } from '@wordpress/i18n';
 import { useMemo, useState } from '@wordpress/element';
 import { moreVertical } from '@wordpress/icons';
 import { useRegistry } from '@wordpress/data';
+import { useViewportMatch } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -30,6 +31,7 @@ export interface ActionTriggerProps< Item > {
 	onClick: MouseEventHandler;
 	isBusy?: boolean;
 	items: Item[];
+	variant?: 'primary' | 'secondary' | 'tertiary' | 'link';
 }
 
 export interface ActionModalProps< Item > {
@@ -62,12 +64,14 @@ interface PrimaryActionsProps< Item > {
 	item: Item;
 	actions: Action< Item >[];
 	registry: ReturnType< typeof useRegistry >;
+	buttonVariant?: 'primary' | 'secondary' | 'tertiary' | 'link';
 }
 
 function ButtonTrigger< Item >( {
 	action,
 	onClick,
 	items,
+	variant,
 }: ActionTriggerProps< Item > ) {
 	const label =
 		typeof action.label === 'string' ? action.label : action.label( items );
@@ -76,6 +80,7 @@ function ButtonTrigger< Item >( {
 			disabled={ !! action.disabled }
 			accessibleWhenDisabled
 			size="compact"
+			variant={ variant }
 			onClick={ onClick }
 		>
 			{ label }
@@ -131,22 +136,45 @@ export function ActionsMenuGroup< Item >( {
 	registry,
 	setActiveModalAction,
 }: ActionsMenuGroupProps< Item > ) {
+	const { primaryActions, regularActions } = useMemo( () => {
+		return actions.reduce(
+			( acc, action ) => {
+				( action.isPrimary
+					? acc.primaryActions
+					: acc.regularActions
+				).push( action );
+				return acc;
+			},
+			{
+				primaryActions: [] as Action< Item >[],
+				regularActions: [] as Action< Item >[],
+			}
+		);
+	}, [ actions ] );
+
+	const renderActionGroup = ( actionList: Action< Item >[] ) =>
+		actionList.map( ( action ) => (
+			<MenuItemTrigger
+				key={ action.id }
+				action={ action }
+				onClick={ () => {
+					if ( 'RenderModal' in action ) {
+						setActiveModalAction( action );
+						return;
+					}
+					action.callback( [ item ], { registry } );
+				} }
+				items={ [ item ] }
+			/>
+		) );
+
 	return (
 		<Menu.Group>
-			{ actions.map( ( action ) => (
-				<MenuItemTrigger
-					key={ action.id }
-					action={ action }
-					onClick={ () => {
-						if ( 'RenderModal' in action ) {
-							setActiveModalAction( action );
-							return;
-						}
-						action.callback( [ item ], { registry } );
-					} }
-					items={ [ item ] }
-				/>
-			) ) }
+			{ renderActionGroup( primaryActions ) }
+			{ primaryActions.length > 0 && regularActions.length > 0 && (
+				<Menu.Separator />
+			) }
+			{ renderActionGroup( regularActions ) }
 		</Menu.Group>
 	);
 }
@@ -253,12 +281,19 @@ function CompactItemActions< Item >( {
 	);
 }
 
-function PrimaryActions< Item >( {
+export function PrimaryActions< Item >( {
 	item,
 	actions,
 	registry,
+	buttonVariant,
 }: PrimaryActionsProps< Item > ) {
 	const [ activeModalAction, setActiveModalAction ] = useState( null as any );
+	const isMobileViewport = useViewportMatch( 'medium', '<' );
+
+	if ( isMobileViewport ) {
+		return null;
+	}
+
 	if ( ! Array.isArray( actions ) || actions.length === 0 ) {
 		return null;
 	}
@@ -276,6 +311,7 @@ function PrimaryActions< Item >( {
 						action.callback( [ item ], { registry } );
 					} }
 					items={ [ item ] }
+					variant={ buttonVariant }
 				/>
 			) ) }
 			{ !! activeModalAction && (

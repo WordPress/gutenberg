@@ -16,7 +16,6 @@ import {
  */
 import type { NormalizedField } from '../../types';
 import { ItemClickWrapper } from '../utils/item-click-wrapper';
-import { sprintf, __ } from '@wordpress/i18n';
 
 function ColumnPrimary< Item >( {
 	item,
@@ -51,12 +50,10 @@ function ColumnPrimary< Item >( {
 					renderItemLink={ renderItemLink }
 					className="dataviews-view-table__cell-content-wrapper dataviews-column-primary__media"
 					aria-label={
-						titleField
-							? sprintf(
-									// translators: %s is the item title.
-									__( 'Click item: %s' ),
-									titleField.getValue?.( { item } )
-							  )
+						isItemClickable( item ) &&
+						( !! onClickItem || !! renderItemLink ) &&
+						!! titleField
+							? titleField.getValue?.( { item } )
 							: undefined
 					}
 				>

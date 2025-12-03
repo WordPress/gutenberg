@@ -70,28 +70,33 @@ test.describe( 'getServerState()', () => {
 	} ) => {
 		const prop = page.getByTestId( 'prop' );
 		const nestedProp = page.getByTestId( 'nested.prop' );
+		const objCopiedFromServer = page.getByTestId( 'objCopiedFromServer' );
 
 		await expect( page ).toHaveTitle( /main/ );
 		await expect( prop ).toHaveText( 'main' );
 		await expect( nestedProp ).toHaveText( 'main' );
+		await expect( objCopiedFromServer ).toHaveText( 'main' );
 
 		await page.getByTestId( 'link 1' ).click();
 		await expect( page ).toHaveTitle( /link 1/ );
 
 		await expect( prop ).toHaveText( 'link 1' );
 		await expect( nestedProp ).toHaveText( 'link 1' );
+		await expect( objCopiedFromServer ).toHaveText( 'link 1' );
 
 		await page.goBack();
 		await expect( page ).toHaveTitle( /main/ );
 
 		await expect( prop ).toHaveText( 'main' );
 		await expect( nestedProp ).toHaveText( 'main' );
+		await expect( objCopiedFromServer ).toHaveText( 'main' );
 
 		await page.getByTestId( 'link 2' ).click();
 		await expect( page ).toHaveTitle( /link 2/ );
 
 		await expect( prop ).toHaveText( 'link 2' );
 		await expect( nestedProp ).toHaveText( 'link 2' );
+		await expect( objCopiedFromServer ).toHaveText( 'link 2' );
 	} );
 
 	test( 'should add new state props and keep them on navigation', async ( {
