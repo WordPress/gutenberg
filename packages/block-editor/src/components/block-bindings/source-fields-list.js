@@ -6,7 +6,7 @@ import fastDeepEqual from 'fast-deep-equal/es6';
 /**
  * WordPress dependencies
  */
-import { getBlockBindingsSource } from '@wordpress/blocks';
+import { store as blocksStore } from '@wordpress/blocks';
 import { privateApis as componentsPrivateApis } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { useContext } from '@wordpress/element';
@@ -85,17 +85,46 @@ function BlockBindingsSourceFieldsListItem( {
 export default function BlockBindingsSourceFieldsList( {
 	args,
 	attribute,
+	blockName,
 	sourceKey,
-	fields,
 } ) {
 	const isMobile = useViewportMatch( 'medium', '<' );
 
+	const blockContext = useContext( BlockContext );
+	const { attributeType, source, fields } = useSelect(
+		( select ) => {
+			const {
+				getBlockBindingsSource,
+				getBlockBindingsSourceFieldsList,
+				getBlockType,
+			} = unlock( select( blocksStore ) );
+
+			const _attributeType =
+				getBlockType( blockName ).attributes?.[ attribute ]?.type;
+
+			const _source = getBlockBindingsSource( sourceKey );
+			const fieldsList = getBlockBindingsSourceFieldsList(
+				_source,
+				blockContext
+			);
+			return {
+				attributeType:
+					_attributeType === 'rich-text' ? 'string' : _attributeType,
+				fields: fieldsList?.length ? fieldsList : [],
+				source: _source,
+			};
+		},
+		[ attribute, blockName, blockContext, sourceKey ]
+	);
+
+	const compatibleFields = fields.filter(
+		( field ) => field.type === attributeType
+	);
+
 	// Only render source if it has compatible fields.
-	if ( ! fields || fields.length === 0 ) {
+	if ( ! compatibleFields.length ) {
 		return null;
 	}
-
-	const source = getBlockBindingsSource( sourceKey );
 
 	return (
 		<Menu
@@ -107,7 +136,7 @@ export default function BlockBindingsSourceFieldsList( {
 			</Menu.SubmenuTriggerItem>
 			<Menu.Popover gutter={ 8 }>
 				<Menu.Group>
-					{ fields.map( ( field ) => (
+					{ compatibleFields.map( ( field ) => (
 						<BlockBindingsSourceFieldsListItem
 							key={
 								sourceKey + JSON.stringify( field.args ) ||
