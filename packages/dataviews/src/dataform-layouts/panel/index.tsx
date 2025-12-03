@@ -41,13 +41,23 @@ function getFirstValidationError(
 		if ( key === 'children' ) {
 			continue;
 		}
-		if ( validation?.type === 'invalid' ) {
+		if (
+			validation &&
+			typeof validation === 'object' &&
+			'type' in validation &&
+			validation.type === 'invalid'
+		) {
 			// Provide default message for required validation (message is optional)
 			if ( key === 'required' ) {
-				return validation.message || 'A required field is empty';
+				return (
+					( 'message' in validation &&
+						typeof validation.message === 'string' &&
+						validation.message ) ||
+					'A required field is empty'
+				);
 			}
-			if ( validation.message ) {
-				return validation.message;
+			if ( 'message' in validation && validation.message ) {
+				return validation.message as string;
 			}
 		}
 	}
