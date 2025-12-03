@@ -4,22 +4,21 @@
 import {
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
-	Button,
 	CheckboxControl,
 	TextControl,
 	TextareaControl,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { useRef, useEffect, useState } from '@wordpress/element';
-import { useInstanceId } from '@wordpress/compose';
+import {
+	useInstanceId,
+	__experimentalUseDialog as useDialog,
+} from '@wordpress/compose';
 import { safeDecodeURI } from '@wordpress/url';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
-import { linkOff as unlinkIcon } from '@wordpress/icons';
-import { useDispatch } from '@wordpress/data';
-import {
-	store as blockEditorStore,
-	__experimentalLinkControlSearchInput as LinkControlSearchInput,
-} from '@wordpress/block-editor';
+import { __experimentalLinkControlSearchInput as LinkControlSearchInput } from '@wordpress/block-editor';
+import { useSelect } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -27,6 +26,7 @@ import {
 import { useToolsPanelDropdownMenuProps } from '../../utils/hooks';
 import { updateAttributes } from './update-attributes';
 import { useEntityBinding } from './use-entity-binding';
+import { LinkPreviewButton } from './link-preview-button';
 
 /**
  * Given the Link block's type attribute, return the query params for link suggestions.
@@ -103,19 +103,25 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 	const { label, url, description, rel, opensInNewTab } = attributes;
 	const lastURLRef = useRef( url );
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
-	const shouldFocusURLInputRef = useRef( false );
 	const shouldFocusUnsyncButtonRef = useRef( false );
 	const linkContainerRef = useRef();
-	const unsyncButtonRef = useRef();
 	const inputId = useInstanceId( Controls, 'link-input' );
 	const helpTextId = `${ inputId }__help`;
 
 	// Local state to control the input value
 	const [ inputValue, setInputValue ] = useState( url );
 
-	// Track focus state to control suggestion visibility
-	const [ isInputFocused, setIsInputFocused ] = useState( false );
-	const blurTimeoutRef = useRef();
+	// Track editing state to toggle between preview button and input
+	const [ isEditing, setIsEditing ] = useState( ! url );
+	const previewButtonRef = useRef();
+
+	// Get dialog props for proper accessibility
+	const [ dialogRef, dialogProps ] = useDialog( {
+		focusOnMount: 'firstElement',
+		onClose: () => {
+			setIsEditing( false );
+		},
+	} );
 
 	// Sync local state when url prop changes (e.g., from undo/redo or external updates)
 	useEffect( () => {
@@ -124,63 +130,55 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 	}, [ url ] );
 
 	// Use the entity binding hook internally
-	const {
-		hasUrlBinding,
-		isBoundEntityAvailable,
-		clearBinding,
-		createBinding,
-	} = useEntityBinding( {
-		clientId,
-		attributes,
-	} );
-
-	// Get direct store dispatch to bypass setBoundAttributes wrapper
-	const { updateBlockAttributes } = useDispatch( blockEditorStore );
-
-	const unsyncBoundLink = () => {
-		// Clear the binding first
-		clearBinding();
-
-		// Use direct store dispatch to bypass block bindings safeguards
-		// which prevent updates to bound attributes when calling setAttributes.
-		// setAttributes is actually setBoundAttributes, a wrapper function that
-		// processes attributes through the binding system.
-		// See: packages/block-editor/src/components/block-edit/edit.js
-		updateBlockAttributes( clientId, {
-			url: lastURLRef.current, // set the lastURLRef as the new editable value so we avoid bugs from empty link states
-			id: undefined,
+	const { hasUrlBinding, isBoundEntityAvailable, createBinding } =
+		useEntityBinding( {
+			clientId,
+			attributes,
 		} );
-	};
 
-	// Focus the input field after unsyncing
-	useEffect( () => {
-		if ( ! hasUrlBinding && shouldFocusURLInputRef.current ) {
-			// Query for the input within the link container since
-			// ref is not available on LinkControlSearchInput experimental export
-			const input =
-				linkContainerRef.current?.querySelector( 'input[type="text"]' );
-			input?.focus();
-			input?.select();
-		}
-		shouldFocusURLInputRef.current = false;
-	}, [ hasUrlBinding ] );
-
-	// Focus the unsync button after creating a binding
-	useEffect( () => {
-		if ( hasUrlBinding && shouldFocusUnsyncButtonRef.current ) {
-			unsyncButtonRef.current?.focus();
-		}
-		shouldFocusUnsyncButtonRef.current = false;
-	}, [ hasUrlBinding ] );
-
-	// Cleanup blur timeout on unmount
-	useEffect( () => {
-		return () => {
-			if ( blurTimeoutRef.current ) {
-				clearTimeout( blurTimeoutRef.current );
+	// Fetch featured image for post-type entities
+	const featuredImage = useSelect(
+		( select ) => {
+			// Only fetch for post-type entities with an ID
+			if (
+				! attributes.id ||
+				attributes.kind !== 'post-type' ||
+				! attributes.type
+			) {
+				return null;
 			}
-		};
-	}, [] );
+
+			const { getEntityRecord } = select( coreStore );
+
+			// Get the post/page entity
+			const entity = getEntityRecord(
+				'postType',
+				attributes.type,
+				attributes.id
+			);
+
+			// If no entity or no featured media, return null
+			if ( ! entity || ! entity.featured_media ) {
+				return null;
+			}
+
+			// Get the media entity to fetch the image URL
+			const media = getEntityRecord(
+				'postType',
+				'attachment',
+				entity.featured_media
+			);
+
+			// Return the thumbnail or medium size URL, fallback to source_url
+			return (
+				media?.media_details?.sizes?.thumbnail?.source_url ||
+				media?.media_details?.sizes?.medium?.source_url ||
+				media?.source_url ||
+				null
+			);
+		},
+		[ attributes.id, attributes.kind, attributes.type ]
+	);
 
 	return (
 		<ToolsPanel
@@ -217,125 +215,89 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 			<ToolsPanelItem
 				ref={ linkContainerRef }
 				hasValue={ () => !! url }
-				label={ __( 'Link' ) }
+				label={ __( 'Link to' ) }
 				onDeselect={ () => setAttributes( { url: '' } ) }
 				isShownByDefault
 			>
-				<div
-					onFocus={ () => {
-						// Clear any pending blur timeout
-						if ( blurTimeoutRef.current ) {
-							clearTimeout( blurTimeoutRef.current );
-						}
-						setIsInputFocused( true );
-					} }
-					onBlur={ () => {
-						// Delay hiding suggestions to allow clicking on them
-						blurTimeoutRef.current = setTimeout( () => {
-							setIsInputFocused( false );
-						}, 150 );
-					} }
-				>
-					<LinkControlSearchInput
-						className="navigation-link-control__search-input"
-						value={ inputValue ? safeDecodeURI( inputValue ) : '' }
-						currentLink={
-							// When not focused, set currentLink.url to match the decoded value
-							// to trigger disableSuggestions in URLInput
-							! isInputFocused
-								? {
-										url: inputValue
-											? safeDecodeURI( inputValue )
-											: '',
-										title: label && stripHTML( label ),
-										kind: attributes.kind,
-										type: attributes.type,
-										id: attributes.id,
-								  }
-								: {
-										url,
-										title: label && stripHTML( label ),
-										kind: attributes.kind,
-										type: attributes.type,
-										id: attributes.id,
-								  }
-						}
-						suggestionsQuery={ getSuggestionsQuery(
-							attributes.type,
-							attributes.kind
-						) }
-						onChange={ ( newValue ) => {
-							// Update local input state when typing
-							setInputValue( newValue );
+				{ url && (
+					<LinkPreviewButton
+						buttonRef={ previewButtonRef }
+						link={ attributes }
+						featuredImage={ featuredImage }
+						onClick={ () => {
+							setInputValue( '' );
+							setIsEditing( true );
 						} }
-						onSelect={ ( suggestion ) => {
-							// When a suggestion is selected (or Enter pressed)
-							if ( suggestion ) {
-								const attrs = {
-									url: suggestion.url,
-									kind: suggestion.kind,
-									type: suggestion.type,
-									id: suggestion.id,
-									title: suggestion.title,
-								};
-								updateAttributes(
-									attrs,
-									setAttributes,
-									attributes
-								);
-								// Create entity binding if we have entity data
-								if ( suggestion.id ) {
-									createBinding( attrs );
-									shouldFocusUnsyncButtonRef.current = true;
-								}
-							} else if ( inputValue ) {
-								// Freeform URL entry
-								updateAttributes(
-									{ url: inputValue },
-									setAttributes,
-									attributes
-								);
-							}
-						} }
-						allowDirectEntry={ ! hasUrlBinding }
-						showSuggestions={ isInputFocused }
-						showInitialSuggestions={ isInputFocused }
-						isEntity={ hasUrlBinding }
-						suffix={
-							hasUrlBinding && (
-								<Button
-									ref={ unsyncButtonRef }
-									icon={ unlinkIcon }
-									onClick={ () => {
-										unsyncBoundLink();
-										shouldFocusURLInputRef.current = true;
-									} }
-									aria-describedby={ helpTextId }
-									showTooltip
-									label={ __( 'Unsync and edit' ) }
-									__next40pxDefaultSize
-									className={
-										hasUrlBinding &&
-										! isBoundEntityAvailable
-											? 'navigation-link-control__error-suffix-button'
-											: undefined
-									}
-								/>
-							)
-						}
+						aria-haspopup="dialog"
+						aria-expanded={ isEditing }
 					/>
-				</div>
+				) }
+				{ isEditing && (
+					<div ref={ dialogRef } { ...dialogProps }>
+						<LinkControlSearchInput
+							className="navigation-link-control__search-input"
+							value={
+								inputValue ? safeDecodeURI( inputValue ) : ''
+							}
+							currentLink={ {
+								url,
+								title: label && stripHTML( label ),
+								kind: attributes.kind,
+								type: attributes.type,
+								id: attributes.id,
+							} }
+							suggestionsQuery={ getSuggestionsQuery(
+								attributes.type,
+								attributes.kind
+							) }
+							onChange={ ( newValue ) => {
+								// Update local input state when typing
+								setInputValue( newValue );
+							} }
+							onSelect={ ( suggestion ) => {
+								// When a suggestion is selected (or Enter pressed)
+								if ( suggestion ) {
+									const attrs = {
+										url: suggestion.url,
+										kind: suggestion.kind,
+										type: suggestion.type,
+										id: suggestion.id,
+										title: suggestion.title,
+									};
+									updateAttributes(
+										attrs,
+										setAttributes,
+										attributes
+									);
+									// Create entity binding if we have entity data
+									if ( suggestion.id ) {
+										createBinding( attrs );
+										shouldFocusUnsyncButtonRef.current = true;
+									}
+									// Exit edit mode and focus preview button
+									setIsEditing( false );
+								} else if ( inputValue ) {
+									// Freeform URL entry
+									updateAttributes(
+										{ url: inputValue },
+										setAttributes,
+										attributes
+									);
+									// Exit edit mode and focus preview button
+									setIsEditing( false );
+								}
+
+								// focus the preview button
+								previewButtonRef.current?.focus();
+							} }
+							showInitialSuggestions
+							showSuggestions
+						/>
+					</div>
+				) }
 				{ hasUrlBinding && ! isBoundEntityAvailable && (
 					<p id={ helpTextId }>
 						<MissingEntityHelpText
-							type={ attributes.type }
-							kind={ attributes.kind }
-						/>
-					</p>
-				) }
-				{ isBoundEntityAvailable && (
-					<p>
-						<BindingHelpText
 							type={ attributes.type }
 							kind={ attributes.kind }
 						/>
