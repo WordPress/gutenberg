@@ -5,22 +5,13 @@ import { __ } from '@wordpress/i18n';
 import { Notice } from '@wordpress/components';
 import { speak } from '@wordpress/a11y';
 
-const MIN_FONT_SIZE_FOR_WARNING = 6;
-
 /**
  * Component that checks if the fit text computed font size is below a minimum
  * threshold and displays a warning notice.
  *
- * @param {Object} props          Component props.
- * @param {number} props.fontSize The computed font size in pixels.
- *
  * @return {Element|null} Warning notice element or null.
  */
-export default function FitTextSizeChecker( { fontSize } ) {
-	if ( fontSize === null || fontSize >= MIN_FONT_SIZE_FOR_WARNING ) {
-		return null;
-	}
-
+export default function FitTextSizeWarning() {
 	const message = __(
 		'The text may be too small to read. Consider using a larger container or less text.'
 	);
@@ -31,7 +22,7 @@ export default function FitTextSizeChecker( { fontSize } ) {
 	speak( message );
 
 	return (
-		<div className="block-editor-fit-text-size-checker">
+		<div className="block-editor-fit-text-size-warning">
 			<Notice
 				spokenMessage={ null }
 				status="warning"

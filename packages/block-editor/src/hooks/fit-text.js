@@ -10,8 +10,10 @@ import {
 	ToggleControl,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
+import { createHigherOrderComponent } from '@wordpress/compose';
 
 const EMPTY_OBJECT = {};
+const MIN_FONT_SIZE_FOR_WARNING = 6;
 
 /**
  * Internal dependencies
@@ -20,7 +22,7 @@ import { optimizeFitText } from '../utils/fit-text-utils';
 import { store as blockEditorStore } from '../store';
 import { useBlockElement } from '../components/block-list/use-block-props/use-block-refs';
 import InspectorControls from '../components/inspector-controls';
-import FitTextSizeChecker from '../components/fit-text-size-checker';
+import FitTextSizeWarning from '../components/fit-text-size-warning';
 import InspectorControls from '../components/inspector-controls';
 
 export const FIT_TEXT_SUPPORT_KEY = 'typography.fitText';
@@ -316,12 +318,14 @@ function addSaveProps( props, blockType, attributes ) {
 /**
  * Override props applied to the block element in the editor.
  *
- * @param {Object}  props         Component props including block attributes.
- * @param {string}  props.name    Block name.
- * @param {boolean} props.fitText Whether fit text is enabled.
+ * @param {Object}  props          Component props including block attributes.
+ * @param {string}  props.name     Block name.
+ * @param {boolean} props.fitText  Whether fit text is enabled.
+ * @param {string}  props.clientId Block client ID.
  * @return {Object} Filtered props applied to the block element.
  */
-function useBlockProps( { name, fitText } ) {
+function useBlockProps( { name, fitText, clientId } ) {
+	useFitText( { fitText, name, clientId } );
 	if ( ! fitText || ! hasBlockSupport( name, FIT_TEXT_SUPPORT_KEY ) ) {
 		return {};
 	}
@@ -340,30 +344,51 @@ const hasFitTextSupport = ( blockNameOrType ) => {
 	return hasBlockSupport( blockNameOrType, FIT_TEXT_SUPPORT_KEY );
 };
 
-/**
- * Inspector control component for fit text.
- * Displays a warning if the computed font size is too small.
- *
- * @param {Object}  props          Component props.
- * @param {string}  props.clientId Block client ID.
- * @param {string}  props.name     Block name.
- * @param {boolean} props.fitText  Whether fit text is enabled.
- *
- * @return {Element|null} Inspector controls element or null.
- */
-function FitTextEdit( { clientId, name, fitText } ) {
+function FitTextEdit( props ) {
+	const { name, attributes, clientId, isSelected } = props;
+	const { fitText } = attributes;
 	const { fontSize } = useFitText( { fitText, name, clientId } );
-
-	if ( ! fitText || ! hasBlockSupport( name, FIT_TEXT_SUPPORT_KEY ) ) {
-		return null;
-	}
-
 	return (
-		<InspectorControls group="styles">
-			<FitTextSizeChecker fontSize={ fontSize } />
-		</InspectorControls>
+		isSelected &&
+		fontSize < MIN_FONT_SIZE_FOR_WARNING && (
+			<InspectorControls group="styles">
+				<FitTextSizeWarning fontSize={ fontSize } />
+			</InspectorControls>
+		)
 	);
 }
+
+/**
+ * Higher-order component that adds fit text warning to blocks with fit text support.
+ * Shows a warning in the inspector controls when the computed font size is too small.
+ */
+const withFitTextEdit = createHigherOrderComponent( ( BlockEdit ) => {
+	return ( props ) => {
+		const { name, attributes, clientId, isSelected } = props;
+		const { fitText } = attributes;
+		const supportsFitText = hasBlockSupport( name, FIT_TEXT_SUPPORT_KEY );
+
+		return (
+			<>
+				<BlockEdit { ...props } />
+				{ fitText && supportsFitText && (
+					<FitTextEdit
+						name={ name }
+						attributes={ attributes }
+						clientId={ clientId }
+						isSelected={ isSelected }
+					/>
+				) }
+			</>
+		);
+	};
+}, 'withFitTextEdit' );
+
+addFilter(
+	'editor.BlockEdit',
+	'core/fit-text/with-fit-text-edit',
+	withFitTextEdit
+);
 
 export default {
 	useBlockProps,
