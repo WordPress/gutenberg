@@ -4,6 +4,7 @@
 import {
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
+	BaseControl,
 	CheckboxControl,
 	TextControl,
 	TextareaControl,
@@ -220,17 +221,24 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 				isShownByDefault
 			>
 				{ url && (
-					<LinkPreviewButton
-						buttonRef={ previewButtonRef }
-						link={ attributes }
-						featuredImage={ featuredImage }
-						onClick={ () => {
-							setInputValue( '' );
-							setIsEditing( true );
-						} }
-						aria-haspopup="dialog"
-						aria-expanded={ isEditing }
-					/>
+					<BaseControl
+						label={ __( 'Link to' ) }
+						id={ `${ inputId }-button` }
+						__nextHasNoMarginBottom
+					>
+						<LinkPreviewButton
+							buttonRef={ previewButtonRef }
+							link={ attributes }
+							featuredImage={ featuredImage }
+							onClick={ () => {
+								setInputValue( '' );
+								setIsEditing( true );
+							} }
+							aria-haspopup="dialog"
+							aria-expanded={ isEditing }
+							id={ `${ inputId }-button` }
+						/>
+					</BaseControl>
 				) }
 				{ isEditing && (
 					<div ref={ dialogRef } { ...dialogProps }>
