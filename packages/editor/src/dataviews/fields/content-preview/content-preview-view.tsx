@@ -5,7 +5,6 @@ import { __ } from '@wordpress/i18n';
 import {
 	BlockPreview,
 	privateApis as blockEditorPrivateApis,
-	// @ts-ignore
 } from '@wordpress/block-editor';
 import type { BasePost } from '@wordpress/fields';
 import { useSelect } from '@wordpress/data';

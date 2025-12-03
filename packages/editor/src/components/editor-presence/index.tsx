@@ -3,7 +3,7 @@
  */
 import { createSlotFill } from '@wordpress/components';
 
-const { Fill, Slot } = createSlotFill( 'EditorPresence' );
+const { Fill, Slot } = createSlotFill( Symbol( 'EditorPresence' ) );
 
 /**
  * Renders the SlotFill for editor presence.

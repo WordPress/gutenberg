@@ -20,7 +20,7 @@ import { useBlockCommands } from '../use-block-commands';
 import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
-export const BlockCanvasCover = createSlotFill( 'BlockCanvasCover' );
+export const BlockCanvasCover = createSlotFill( Symbol( 'BlockCanvasCover' ) );
 
 // EditorStyles is a memoized component, so avoid passing a new
 // object reference on each render.
