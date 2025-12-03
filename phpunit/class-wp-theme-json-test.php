@@ -5848,6 +5848,14 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 				'selector' => '.wp:where(.something):is(.test:not(.nothing p)):has(div[style]) .content, .wp:where(.nothing):not(.test:is(.something div)):has(span[style]) .inner',
 				'expected' => '.wp.is-style-custom:where(.something):is(.test:not(.nothing p)):has(div[style]) .content, .wp.is-style-custom:where(.nothing):not(.test:is(.something div)):has(span[style]) .inner',
 			),
+			'child selector' => array(
+				'selector' => '.wp-block-list > li',
+				'expected' => '.wp-block-list > li.is-style-custom',
+			),
+			'block element selector' => array(
+				'selector' => '.wp-block-list:not(.wp-block-list .wp-block-list) > li',
+				'expected' => '.wp-block-list:not(.wp-block-list .wp-block-list) > li.is-style-custom',
+			),
 		);
 	}
 

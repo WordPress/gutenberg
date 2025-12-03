@@ -1220,19 +1220,21 @@ class WP_Theme_JSON_Gutenberg {
 			 * Update block metadata for any new block style variations.
 			 */
 			$registered_styles = $style_registry->get_all_registered();
-			foreach ( static::$blocks_metadata as $block_name => $block_metadata ) {
-				if ( ! empty( $registered_styles[ $block_name ] ) ) {
-					$style_selectors = $block_metadata['styleVariations'] ?? array();
+				foreach ( static::$blocks_metadata as $block_name => $block_metadata ) {
+					if ( ! empty( $registered_styles[ $block_name ] ) ) {
+						$style_selectors = $block_metadata['styleVariations'] ?? array();
+						// Get blockElement from block metadata if available.
+						$block_element = $block_metadata['blockElement'] ?? null;
 
-					foreach ( $registered_styles[ $block_name ] as $block_style ) {
-						if ( ! isset( $style_selectors[ $block_style['name'] ] ) ) {
-							$style_selectors[ $block_style['name'] ] = static::get_block_style_variation_selector( $block_style['name'], $block_metadata['selector'] );
+						foreach ( $registered_styles[ $block_name ] as $block_style ) {
+							if ( ! isset( $style_selectors[ $block_style['name'] ] ) ) {
+								$style_selectors[ $block_style['name'] ] = static::get_block_style_variation_selector( $block_style['name'], $block_metadata['selector'], $block_element );
+							}
 						}
-					}
 
-					static::$blocks_metadata[ $block_name ]['styleVariations'] = $style_selectors;
+						static::$blocks_metadata[ $block_name ]['styleVariations'] = $style_selectors;
+					}
 				}
-			}
 			return static::$blocks_metadata;
 		}
 
@@ -1241,6 +1243,11 @@ class WP_Theme_JSON_Gutenberg {
 
 			static::$blocks_metadata[ $block_name ]['selector']  = $root_selector;
 			static::$blocks_metadata[ $block_name ]['selectors'] = static::get_block_selectors( $block_type, $root_selector );
+
+			// Store blockElement from block.json if available.
+			if ( isset( $block_type->selectors->blockElement ) ) {
+				static::$blocks_metadata[ $block_name ]['blockElement'] = $block_type->selectors->blockElement;
+			}
 
 			$elements = static::get_block_element_selectors( $root_selector );
 			if ( ! empty( $elements ) ) {
@@ -1266,16 +1273,18 @@ class WP_Theme_JSON_Gutenberg {
 
 			// If the block has style variations, append their selectors to the block metadata.
 			$style_selectors = array();
+			// Get blockElement from block.json selectors if available.
+			$block_element = isset( $block_type->selectors->blockElement ) ? $block_type->selectors->blockElement : null;
 			if ( ! empty( $block_type->styles ) ) {
 				foreach ( $block_type->styles as $style ) {
-					$style_selectors[ $style['name'] ] = static::get_block_style_variation_selector( $style['name'], static::$blocks_metadata[ $block_name ]['selector'] );
+					$style_selectors[ $style['name'] ] = static::get_block_style_variation_selector( $style['name'], static::$blocks_metadata[ $block_name ]['selector'], $block_element );
 				}
 			}
 
 			// Block style variations can be registered through the WP_Block_Styles_Registry as well as block.json.
 			$registered_styles = $style_registry->get_registered_styles_for_block( $block_name );
 			foreach ( $registered_styles as $style ) {
-				$style_selectors[ $style['name'] ] = static::get_block_style_variation_selector( $style['name'], static::$blocks_metadata[ $block_name ]['selector'] );
+				$style_selectors[ $style['name'] ] = static::get_block_style_variation_selector( $style['name'], static::$blocks_metadata[ $block_name ]['selector'], $block_element );
 			}
 
 			if ( ! empty( $style_selectors ) ) {
@@ -4707,12 +4716,15 @@ class WP_Theme_JSON_Gutenberg {
 	/**
 	 * Generates a selector for a block style variation.
 	 *
-	 * @param string $variation_name Name of the block style variation.
-	 * @param string $block_selector CSS selector for the block.
+	 * @param string      $variation_name Name of the block style variation.
+	 * @param string      $block_selector CSS selector for the block.
+	 * @param string|null $variation_target Optional. The variation target selector fragment (e.g., ">li" or "li").
+	 *                                      If provided, the variation class will be added to this element.
+	 *                                      If null, uses heuristic based on combinators.
 	 *
 	 * @return string Block selector with block style variation selector added to it.
 	 */
-	protected static function get_block_style_variation_selector( $variation_name, $block_selector ) {
+	protected static function get_block_style_variation_selector( $variation_name, $block_selector, $variation_target = null ) {
 		$variation_class = ".is-style-$variation_name";
 
 		if ( ! $block_selector ) {
@@ -4724,17 +4736,132 @@ class WP_Theme_JSON_Gutenberg {
 		$result         = array();
 
 		foreach ( $selector_parts as $part ) {
-			$result[] = preg_replace_callback(
-				'/((?::\([^)]+\))?\s*)([^\s:]+)/',
-				function ( $matches ) use ( $variation_class ) {
-					return $matches[1] . $matches[2] . $variation_class;
-				},
-				$part,
-				$limit
-			);
+			if ( $variation_target ) {
+				// Use explicit variation target if provided.
+				$result[] = static::add_variation_class_to_block_element( $part, $variation_class, $variation_target );
+			} else {
+				// Fallback to heuristic: detect combinators and add to appropriate element.
+				// If selector contains child/sibling combinators (>, +, ~), add to last selector.
+				// Otherwise, add to first selector (backwards compatible).
+				if ( preg_match( '/\s*[>+~]\s*/', $part ) ) {
+					// Split by combinators while preserving them.
+					$parts = preg_split( '/(\s*[>+~]\s*)/', $part, -1, PREG_SPLIT_DELIM_CAPTURE );
+					if ( count( $parts ) > 1 ) {
+						// Get the last part (the target selector).
+						$last_index = count( $parts ) - 1;
+						$last_part  = $parts[ $last_index ];
+						// Add variation class to the first simple selector in the last part.
+						$last_part = preg_replace_callback(
+							'/((?::\([^)]+\))?\s*)([^\s:]+)/',
+							function ( $matches ) use ( $variation_class ) {
+								return $matches[1] . $matches[2] . $variation_class;
+							},
+							$last_part,
+							$limit
+						);
+						$parts[ $last_index ] = $last_part;
+						$result[]             = implode( '', $parts );
+					} else {
+						// Fallback to original behavior if split didn't work.
+						$result[] = preg_replace_callback(
+							'/((?::\([^)]+\))?\s*)([^\s:]+)/',
+							function ( $matches ) use ( $variation_class ) {
+								return $matches[1] . $matches[2] . $variation_class;
+							},
+							$part,
+							$limit
+						);
+					}
+				} else {
+					// Original behavior: add to first simple selector (for descendant combinator).
+					$result[] = preg_replace_callback(
+						'/((?::\([^)]+\))?\s*)([^\s:]+)/',
+						function ( $matches ) use ( $variation_class ) {
+							return $matches[1] . $matches[2] . $variation_class;
+						},
+						$part,
+						$limit
+					);
+				}
+			}
 		}
 
 		return implode( ',', $result );
+	}
+
+	/**
+	 * Adds variation class to a specific block element in a selector.
+	 *
+	 * @param string $selector_part   A single selector part (not comma-separated).
+	 * @param string $variation_class The variation class to add (e.g., ".is-style-custom").
+	 * @param string $block_element   The block element selector fragment (e.g., ">li" or "li").
+	 *
+	 * @return string The selector with variation class added to the block element.
+	 */
+	protected static function add_variation_class_to_block_element( $selector_part, $variation_class, $block_element ) {
+		$block_element = trim( $block_element );
+
+		// Check if block_element starts with a combinator.
+		if ( preg_match( '/^[>+~\s]+/', $block_element ) ) {
+			// Block element includes combinator (e.g., ">li", "+ .sibling").
+			// Find the last occurrence of this pattern in the selector.
+			// Use a more reliable approach: split by combinators and match in the last part.
+			$parts = preg_split( '/([>+~])/', $selector_part, -1, PREG_SPLIT_DELIM_CAPTURE );
+			if ( count( $parts ) > 1 ) {
+				// Get the last part (after last combinator).
+				$last_index = count( $parts ) - 1;
+				$last_part  = trim( $parts[ $last_index ] );
+				// Extract just the element part from block_element (remove combinator).
+				$element_part = preg_replace( '/^[>+~\s]+/', '', $block_element );
+				// Check if the last part matches the element.
+				if ( strpos( $last_part, $element_part ) !== false ) {
+					// Replace the element in the last part with element + variation class.
+					$last_part = preg_replace(
+						'/' . preg_quote( $element_part, '/' ) . '(?![^\s:])/',
+						$element_part . $variation_class,
+						$last_part,
+						1
+					);
+					$parts[ $last_index ] = $last_part;
+					return implode( '', $parts );
+				}
+			}
+			// Fallback: try direct replacement.
+			$element_part = preg_replace( '/^[>+~\s]+/', '', $block_element );
+			return preg_replace(
+				'/' . preg_quote( $block_element, '/' ) . '(?![^>+~]*[>+~])/',
+				$block_element . $variation_class,
+				$selector_part,
+				1
+			);
+		}
+
+		// Block element is just a selector fragment (e.g., "li", ".class").
+		// Find the last occurrence after the last combinator.
+		// Split by combinators to get parts.
+		$parts = preg_split( '/([>+~])/', $selector_part, -1, PREG_SPLIT_DELIM_CAPTURE );
+		if ( count( $parts ) > 1 ) {
+			// Get the last part (after last combinator).
+			$last_index = count( $parts ) - 1;
+			$last_part  = trim( $parts[ $last_index ] );
+			// Find and replace the block element in the last part.
+			$last_part = preg_replace(
+				'/' . preg_quote( $block_element, '/' ) . '(?![^\s:])/',
+				$block_element . $variation_class,
+				$last_part,
+				1
+			);
+			$parts[ $last_index ] = $last_part;
+			return implode( '', $parts );
+		}
+
+		// No combinators found, just replace the element directly.
+		return preg_replace(
+			'/' . preg_quote( $block_element, '/' ) . '(?![^\s:])/',
+			$block_element . $variation_class,
+			$selector_part,
+			1
+		);
 	}
 
 	/**
