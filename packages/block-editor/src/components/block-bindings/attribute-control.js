@@ -170,17 +170,17 @@ export default function BlockBindingsAttributeControl( {
 								isMobile ? 'bottom-start' : 'left-start'
 							}
 						>
-							{ Object.keys( compatibleFieldsForAttribute ).map(
-								( sourceKey ) => (
-									<BlockBindingsSourceFieldsList
-										key={ sourceKey }
-										args={ binding?.args }
-										attribute={ attribute }
-										blockName={ blockName }
-										sourceKey={ sourceKey }
-									/>
-								)
-							) }
+							{ Object.entries(
+								compatibleFieldsForAttribute
+							).map( ( [ sourceKey, fields ] ) => (
+								<BlockBindingsSourceFieldsList
+									key={ sourceKey }
+									args={ binding?.args }
+									attribute={ attribute }
+									sourceKey={ sourceKey }
+									fields={ fields }
+								/>
+							) ) }
 						</Menu>
 					</Menu.Popover>
 				) }
