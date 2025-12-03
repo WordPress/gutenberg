@@ -36,7 +36,10 @@ const PostTitle = forwardRef( ( _, forwardedRef ) => {
 
 		const { getCollaboratorMode } = select( coreDataStore );
 
-		return { placeholder: titlePlaceholder, collaboratorMode: getCollaboratorMode() };
+		return {
+			placeholder: titlePlaceholder,
+			collaboratorMode: getCollaboratorMode(),
+		};
 	}, [] );
 
 	const [ isSelected, setIsSelected ] = useState( false );
