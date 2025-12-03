@@ -359,8 +359,11 @@ function FitTextEdit( props ) {
 }
 
 /**
- * Higher-order component that adds fit text warning to blocks with fit text support.
- * Shows a warning in the inspector controls when the computed font size is too small.
+ * Higher-order component that when fit text is enabled,
+ * adds the FitTextEdit component to the block's edit interface.
+ * We could not use the expored edit component because, we need
+ * this to added even when the block is not selected to ensure
+ * the fit text calculations are done.
  */
 const withFitTextEdit = createHigherOrderComponent( ( BlockEdit ) => {
 	return ( props ) => {
