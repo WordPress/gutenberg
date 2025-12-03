@@ -52,7 +52,6 @@ const normalizeParsedBlocks = ( blocks ) =>
 	} ) );
 
 describe( 'full post content fixture', () => {
-	let originalEnableFormBlocks;
 	beforeAll( () => {
 		const blockMetadataFiles = glob.sync(
 			'packages/block-library/src/*/block.json'
@@ -66,7 +65,6 @@ describe( 'full post content fixture', () => {
 		unstable__bootstrapServerSideBlockDefinitions( blockDefinitions );
 		// Form-related blocks will not be registered unless they are opted
 		// in on the experimental settings page.
-		originalEnableFormBlocks = window.__experimentalEnableFormBlocks;
 		window.__experimentalEnableFormBlocks = true;
 		registerCoreBlocks();
 
@@ -75,10 +73,6 @@ describe( 'full post content fixture', () => {
 				enableFSEBlocks: true,
 			} );
 		}
-	} );
-
-	afterAll( () => {
-		window.__experimentalEnableFormBlocks = originalEnableFormBlocks;
 	} );
 
 	let spacer = 4;
