@@ -37,9 +37,9 @@ export const settings = {
 		// If the menu label is empty, fall back to the default label.
 		if (
 			( context === 'list-view' || context === 'breadcrumb' ) &&
-			( customName || label )
+			customName
 		) {
-			return customName || label;
+			return customName;
 		}
 
 		return label;
