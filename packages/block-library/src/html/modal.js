@@ -48,6 +48,8 @@ export default function HTMLEditModal( {
 		};
 	}, [] );
 
+	// Show CSS tab if user has permission OR if block contains CSS
+	const shouldShowCssTab = canUserUseUnfilteredHTML || css.trim() !== '';
 	// Show JS tab if user has permission OR if block contains JavaScript
 	const shouldShowJsTab = canUserUseUnfilteredHTML || js.trim() !== '';
 
@@ -130,7 +132,9 @@ export default function HTMLEditModal( {
 							<div>
 								<Tabs.TabList>
 									<Tabs.Tab tabId="html">HTML</Tabs.Tab>
-									<Tabs.Tab tabId="css">CSS</Tabs.Tab>
+									{ shouldShowCssTab && (
+										<Tabs.Tab tabId="css">CSS</Tabs.Tab>
+									) }
 									{ shouldShowJsTab && (
 										<Tabs.Tab tabId="js">
 											{ __( 'JavaScript' ) }
@@ -168,19 +172,21 @@ export default function HTMLEditModal( {
 										className="block-library-html__modal-editor"
 									/>
 								</Tabs.TabPanel>
-								<Tabs.TabPanel
-									tabId="css"
-									focusable={ false }
-									className="block-library-html__modal-tab"
-								>
-									<PlainText
-										value={ editedCss }
-										onChange={ handleCssChange }
-										placeholder={ __( 'Write CSS…' ) }
-										aria-label={ __( 'CSS' ) }
-										className="block-library-html__modal-editor"
-									/>
-								</Tabs.TabPanel>
+								{ shouldShowCssTab && (
+									<Tabs.TabPanel
+										tabId="css"
+										focusable={ false }
+										className="block-library-html__modal-tab"
+									>
+										<PlainText
+											value={ editedCss }
+											onChange={ handleCssChange }
+											placeholder={ __( 'Write CSS…' ) }
+											aria-label={ __( 'CSS' ) }
+											className="block-library-html__modal-editor"
+										/>
+									</Tabs.TabPanel>
+								) }
 								{ shouldShowJsTab && (
 									<Tabs.TabPanel
 										tabId="js"
