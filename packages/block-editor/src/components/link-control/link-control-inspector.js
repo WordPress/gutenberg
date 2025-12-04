@@ -20,6 +20,7 @@ import LinkControl from './index';
  *
  * @param {Object}   props                        - Component props
  * @param {Object}   props.link                   - Link object with label, url, type, kind, id
+ * @param {string}   props.title                  - Title to display (defaults to rich URL data)
  * @param {string}   props.featuredImage          - Featured image URL (optional)
  * @param {boolean}  props.hasEntityBinding       - Whether the link has an entity binding
  * @param {boolean}  props.isBoundEntityAvailable - Whether the bound entity is available
@@ -32,6 +33,7 @@ import LinkControl from './index';
  */
 export function LinkControlInspector( {
 	link,
+	title,
 	featuredImage,
 	hasEntityBinding,
 	isBoundEntityAvailable,
@@ -69,6 +71,7 @@ export function LinkControlInspector( {
 				<LinkPreviewButton
 					buttonRef={ toggleButtonRef }
 					link={ link }
+					title={ title }
 					featuredImage={ featuredImage }
 					hasEntityBinding={ hasEntityBinding }
 					onClick={ () => setIsOpen( true ) }

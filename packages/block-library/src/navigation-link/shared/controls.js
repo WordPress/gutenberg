@@ -106,43 +106,42 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 	const helpTextId = `${ inputId }__help`;
 
 	// Use the entity binding hook internally
-	const { hasUrlBinding, isBoundEntityAvailable, createBinding } =
-		useEntityBinding( {
-			clientId,
-			attributes,
-		} );
+	const {
+		hasUrlBinding,
+		isBoundEntityAvailable,
+		entityRecord,
+		createBinding,
+	} = useEntityBinding( {
+		clientId,
+		attributes,
+	} );
+
+	// Extract title from entity record
+	const title =
+		entityRecord?.title?.rendered ||
+		entityRecord?.title ||
+		entityRecord?.name ||
+		null;
 
 	// Fetch featured image for post-type entities
 	const featuredImage = useSelect(
 		( select ) => {
-			// Only fetch for post-type entities with an ID
+			// Only fetch for post-type entities with featured media
 			if (
-				! attributes.id ||
+				! entityRecord ||
 				attributes.kind !== 'post-type' ||
-				! attributes.type
+				! entityRecord.featured_media
 			) {
 				return null;
 			}
 
 			const { getEntityRecord } = select( coreStore );
 
-			// Get the post/page entity
-			const entity = getEntityRecord(
-				'postType',
-				attributes.type,
-				attributes.id
-			);
-
-			// If no entity or no featured media, return null
-			if ( ! entity || ! entity.featured_media ) {
-				return null;
-			}
-
 			// Get the media entity to fetch the image URL
 			const media = getEntityRecord(
 				'postType',
 				'attachment',
-				entity.featured_media
+				entityRecord.featured_media
 			);
 
 			// Return the thumbnail or medium size URL, fallback to source_url
@@ -153,7 +152,7 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 				null
 			);
 		},
-		[ attributes.id, attributes.kind, attributes.type ]
+		[ entityRecord, attributes.kind ]
 	);
 
 	return (
@@ -203,6 +202,7 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 						type: attributes.type,
 						id: attributes.id,
 					} }
+					title={ title }
 					featuredImage={ featuredImage }
 					hasEntityBinding={ hasUrlBinding }
 					isBoundEntityAvailable={ isBoundEntityAvailable }

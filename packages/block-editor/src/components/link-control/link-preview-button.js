@@ -10,7 +10,6 @@ import {
 } from '@wordpress/components';
 import { Icon, chevronDown } from '@wordpress/icons';
 import { safeDecodeURI } from '@wordpress/url';
-import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 
 /**
  * Internal dependencies
@@ -23,6 +22,7 @@ import useRichUrlData from './use-rich-url-data';
  *
  * @param {Object}   props                  - Component props
  * @param {Object}   props.link             - Link object with label, url, type, kind, id
+ * @param {string}   props.title            - Title to display (defaults to rich URL data title)
  * @param {string}   props.featuredImage    - Featured image URL (optional)
  * @param {boolean}  props.hasEntityBinding - Whether the link has an entity binding
  * @param {Function} props.onClick          - Click handler
@@ -31,26 +31,20 @@ import useRichUrlData from './use-rich-url-data';
  */
 export function LinkPreviewButton( {
 	link,
+	title,
 	featuredImage,
 	hasEntityBinding,
 	onClick,
 	buttonRef,
 	...props
 } ) {
-	const { label, url } = link;
+	const { url } = link;
 
 	// Fetch rich URL data for custom/external URLs (only if not entity-bound)
 	const { richData } = useRichUrlData( hasEntityBinding ? null : url );
 
-	// Get display title - prioritize richData.title for custom URLs
-	let title;
-	if ( richData?.title ) {
-		title = richData.title;
-	} else if ( label ) {
-		title = stripHTML( label );
-	} else {
-		title = safeDecodeURI( url );
-	}
+	// Get display title - use provided title, fallback to rich data, or URL
+	const displayTitle = title || richData?.title || safeDecodeURI( url );
 
 	// Get image - use featuredImage for entities, richData.icon for custom URLs
 	const imageUrl = featuredImage || richData?.icon;
@@ -104,7 +98,7 @@ export function LinkPreviewButton( {
 								numberOfLines={ 1 }
 								className="link-control-preview-button__title"
 							>
-								{ title }
+								{ displayTitle }
 							</Truncate>
 							<Truncate
 								numberOfLines={ 1 }
