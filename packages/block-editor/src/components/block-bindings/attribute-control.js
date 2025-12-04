@@ -27,7 +27,7 @@ import { useViewportMatch } from '@wordpress/compose';
  */
 import BlockContext from '../block-context';
 import BlockBindingsSourceFieldsList from './source-fields-list';
-import { useBlockBindingsUtils } from '../../utils/block-bindings';
+import useBlockBindingsUtils from './use-block-bindings-utils';
 import { unlock } from '../../lock-unlock';
 import { store as blockEditorStore } from '../../store';
 

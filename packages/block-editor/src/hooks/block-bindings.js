@@ -15,8 +15,10 @@ import { useViewportMatch } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import { BlockBindingsAttributeControl } from '../components/block-bindings';
-import { useBlockBindingsUtils } from '../utils/block-bindings';
+import {
+	BlockBindingsAttributeControl,
+	useBlockBindingsUtils,
+} from '../components/block-bindings';
 import { unlock } from '../lock-unlock';
 import InspectorControls from '../components/inspector-controls';
 import BlockContext from '../components/block-context';
