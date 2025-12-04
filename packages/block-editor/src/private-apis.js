@@ -58,6 +58,7 @@ import {
 	useBlockElementRef,
 	useBlockElement,
 } from './components/block-list/use-block-props/use-block-refs';
+import { LinkControlInspector } from './components/link-control/link-control-inspector';
 
 /**
  * Private @wordpress/block-editor APIs.
@@ -112,4 +113,5 @@ lock( privateApis, {
 	essentialFormatKey,
 	useBlockElement,
 	useBlockElementRef,
+	LinkControlInspector,
 } );

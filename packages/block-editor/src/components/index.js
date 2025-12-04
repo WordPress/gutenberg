@@ -70,7 +70,6 @@ export {
 export {
 	default as LinkControl,
 	DeprecatedExperimentalLinkControl as __experimentalLinkControl,
-	LinkControlInspector,
 } from './link-control';
 export { __experimentalLinkControlSearchInput } from './link-control/search-input';
 export { __experimentalLinkControlSearchResults } from './link-control/search-results';

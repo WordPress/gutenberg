@@ -12,7 +12,7 @@ import { __, sprintf } from '@wordpress/i18n';
 import { useRef } from '@wordpress/element';
 import { useInstanceId } from '@wordpress/compose';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
-import { LinkControlInspector } from '@wordpress/block-editor';
+import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 
@@ -22,6 +22,9 @@ import { store as coreStore } from '@wordpress/core-data';
 import { useToolsPanelDropdownMenuProps } from '../../utils/hooks';
 import { updateAttributes } from './update-attributes';
 import { useEntityBinding } from './use-entity-binding';
+import { unlock } from '../../lock-unlock';
+
+const { LinkControlInspector } = unlock( blockEditorPrivateApis );
 
 /**
  * Given the Link block's type attribute, return the query params for link suggestions.
@@ -211,7 +214,6 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 								kind: suggestion.kind,
 								type: suggestion.type,
 								id: suggestion.id,
-								title: suggestion.title,
 							};
 							updateAttributes(
 								attrs,
@@ -229,7 +231,6 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 						attributes.type,
 						attributes.kind
 					) }
-					className="navigation-link-control__search-input"
 					label={ __( 'Link to' ) }
 					inputId={ inputId }
 					helpTextId={ helpTextId }

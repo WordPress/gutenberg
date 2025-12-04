@@ -1,20 +1,22 @@
 /**
  * WordPress dependencies
  */
-import { BaseControl } from '@wordpress/components';
-import { useRef, useEffect, useState } from '@wordpress/element';
-import { __experimentalUseDialog as useDialog } from '@wordpress/compose';
-import { safeDecodeURI } from '@wordpress/url';
+import {
+	BaseControl,
+	Dropdown,
+	__experimentalDropdownContentWrapper as DropdownContentWrapper,
+} from '@wordpress/components';
+import { useRef, useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import { LinkPreviewButton } from './link-preview-button';
-import LinkControlSearchInput from './search-input';
+import LinkControl from './index';
 
 /**
  * LinkControlInspector component that combines the preview button and search input.
- * Shows a preview button when a link exists, and toggles to a search input when editing.
+ * Shows a preview button as a trigger, and opens a popover with search input when clicked.
  *
  * @param {Object}   props                        - Component props
  * @param {Object}   props.link                   - Link object with label, url, type, kind, id
@@ -22,9 +24,7 @@ import LinkControlSearchInput from './search-input';
  * @param {boolean}  props.hasEntityBinding       - Whether the link has an entity binding
  * @param {boolean}  props.isBoundEntityAvailable - Whether the bound entity is available
  * @param {Function} props.onSelect               - Callback when a suggestion is selected
- * @param {Function} props.onChange               - Callback when input value changes
  * @param {Object}   props.suggestionsQuery       - Query parameters for suggestions
- * @param {string}   props.className              - Additional CSS class for the search input
  * @param {string}   props.label                  - Label for the control
  * @param {string}   props.inputId                - ID for the input element
  * @param {string}   props.helpTextId             - ID for the help text element
@@ -36,104 +36,84 @@ export function LinkControlInspector( {
 	hasEntityBinding,
 	isBoundEntityAvailable,
 	onSelect,
-	onChange,
 	suggestionsQuery,
-	className,
 	label,
 	inputId,
 	helpTextId,
 	helpText,
 } ) {
 	const { url } = link || {};
+	const [ isOpen, setIsOpen ] = useState( false );
+	const toggleButtonRef = useRef();
 
-	// Local state to control the input value
-	const [ inputValue, setInputValue ] = useState( url );
+	const handleChange = ( newValue ) => {
+		// Close the popover immediately
+		setIsOpen( false );
 
-	// Track editing state to toggle between preview button and input
-	const [ isEditing, setIsEditing ] = useState( ! url );
-	const previewButtonRef = useRef();
-
-	// Get dialog props for proper accessibility
-	const [ dialogRef, dialogProps ] = useDialog( {
-		focusOnMount: 'firstElement',
-		onClose: () => {
-			setIsEditing( false );
-		},
-	} );
-
-	// Sync local state when url prop changes (e.g., from undo/redo or external updates)
-	useEffect( () => {
-		setInputValue( url );
-	}, [ url ] );
-
-	const handleInputChange = ( newValue ) => {
-		// Update local input state when typing
-		setInputValue( newValue );
-		if ( onChange ) {
-			onChange( newValue );
-		}
-	};
-
-	const handleSelect = ( suggestion ) => {
-		// When a suggestion is selected (or Enter pressed)
-		if ( suggestion ) {
+		// When a link is selected in LinkControl
+		if ( newValue ) {
+			const suggestion = {
+				url: newValue.url,
+				kind: newValue.kind,
+				type: newValue.type,
+				id: newValue.id,
+				title: newValue.title,
+			};
 			onSelect( suggestion );
-			// Exit edit mode and focus preview button
-			setIsEditing( false );
-			// Focus the preview button after state update
-			setTimeout( () => {
-				previewButtonRef.current?.focus();
-			}, 0 );
-		} else if ( inputValue ) {
-			// Freeform URL entry
-			onSelect( { url: inputValue } );
-			// Exit edit mode and focus preview button
-			setIsEditing( false );
-			// Focus the preview button after state update
-			setTimeout( () => {
-				previewButtonRef.current?.focus();
-			}, 0 );
 		}
 	};
+
+	const renderToggle = () => {
+		return (
+			url && (
+				<LinkPreviewButton
+					buttonRef={ toggleButtonRef }
+					link={ link }
+					featuredImage={ featuredImage }
+					hasEntityBinding={ hasEntityBinding }
+					onClick={ () => setIsOpen( true ) }
+					aria-haspopup="dialog"
+					aria-expanded={ isOpen }
+					id={ `${ inputId }-button` }
+				/>
+			)
+		);
+	};
+
+	const renderContent = () => (
+		<DropdownContentWrapper paddingSize="none">
+			<LinkControl
+				key={ isOpen ? 'open' : 'closed' }
+				value={ null }
+				onChange={ handleChange }
+				suggestionsQuery={ suggestionsQuery }
+				showInitialSuggestions
+				forceIsEditingLink
+				settings={ [] }
+			/>
+		</DropdownContentWrapper>
+	);
 
 	return (
 		<>
-			{ url && (
-				<BaseControl
-					label={ label }
-					id={ `${ inputId }-button` }
-					__nextHasNoMarginBottom
-				>
-					<LinkPreviewButton
-						buttonRef={ previewButtonRef }
-						link={ link }
-						featuredImage={ featuredImage }
-						hasEntityBinding={ hasEntityBinding }
-						onClick={ () => {
-							// Open it
-							setInputValue( '' );
-							setIsEditing( true );
-						} }
-						aria-haspopup="dialog"
-						aria-expanded={ isEditing }
-						id={ `${ inputId }-button` }
-					/>
-				</BaseControl>
-			) }
-			{ isEditing && (
-				<div ref={ dialogRef } { ...dialogProps }>
-					<LinkControlSearchInput
-						className={ className }
-						value={ inputValue ? safeDecodeURI( inputValue ) : '' }
-						currentLink={ link }
-						suggestionsQuery={ suggestionsQuery }
-						onChange={ handleInputChange }
-						onSelect={ handleSelect }
-						showInitialSuggestions
-						showSuggestions
-					/>
-				</div>
-			) }
+			<BaseControl
+				label={ label }
+				id={ `${ inputId }-button` }
+				__nextHasNoMarginBottom
+			>
+				<Dropdown
+					className="link-control-inspector__dropdown"
+					open={ isOpen }
+					onToggle={ () => setIsOpen( ! isOpen ) }
+					popoverProps={ {
+						placement: 'left-start',
+						offset: 36,
+						shift: true,
+					} }
+					renderToggle={ renderToggle }
+					renderContent={ renderContent }
+				/>
+			</BaseControl>
 			{ hasEntityBinding && ! isBoundEntityAvailable && helpText && (
 				<p id={ helpTextId }>{ helpText }</p>
 			) }

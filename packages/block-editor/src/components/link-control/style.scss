@@ -444,6 +444,10 @@ $block-editor-link-control-number-of-actions: 1;
  * Link Preview Button
  */
 
+.link-control-inspector__dropdown {
+	width: 100%;
+}
+
 .components-button.link-control-preview-button {
 	width: 100%;
 	height: auto;
