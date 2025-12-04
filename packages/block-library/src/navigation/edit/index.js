@@ -64,6 +64,7 @@ import NavigationMenuDeleteControl from './navigation-menu-delete-control';
 import useNavigationNotice from './use-navigation-notice';
 import OverlayMenuIcon from './overlay-menu-icon';
 import OverlayMenuPreview from './overlay-menu-preview';
+import OverlayPanel from './overlay-panel';
 import useConvertClassicToBlockMenu, {
 	CLASSIC_MENU_CONVERSION_ERROR,
 	CLASSIC_MENU_CONVERSION_PENDING,
@@ -263,6 +264,7 @@ function Navigation( {
 	const {
 		openSubmenusOnClick,
 		overlayMenu,
+		overlayTemplatePart,
 		showSubmenuIcon,
 		templateLock,
 		layout: {
@@ -287,6 +289,21 @@ function Navigation( {
 	const hasAlreadyRendered = useHasRecursion( recursionId );
 
 	const blockEditingMode = useBlockEditingMode();
+
+	// Get onNavigateToEntityRecord from block editor settings
+	const { onNavigateToEntityRecord } = useSelect( ( select ) => {
+		const { getSettings } = select( blockEditorStore );
+		const settings = getSettings();
+		return {
+			onNavigateToEntityRecord: settings?.onNavigateToEntityRecord,
+		};
+	}, [] );
+
+	// Check if the customizable navigation overlays experiment is enabled
+	// The experiment sets window.__experimentalNavigationOverlays = true
+	const isOverlayExperimentEnabled =
+		typeof window !== 'undefined' &&
+		window.__experimentalNavigationOverlays === true;
 
 	// Preload classic menus, so that they don't suddenly pop-in when viewing
 	// the Select Menu dropdown.
@@ -815,6 +832,16 @@ function Navigation( {
 					</ToolsPanel>
 				) }
 			</InspectorControls>
+			{ isOverlayExperimentEnabled && (
+				<InspectorControls>
+					<OverlayPanel
+						overlayMenu={ overlayMenu }
+						overlayTemplatePart={ overlayTemplatePart }
+						setAttributes={ setAttributes }
+						onNavigateToEntityRecord={ onNavigateToEntityRecord }
+					/>
+				</InspectorControls>
+			) }
 			<InspectorControls group="color">
 				{ /*
 				 * Avoid useMultipleOriginColorsAndGradients and detectColors
