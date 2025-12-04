@@ -27,8 +27,11 @@ function gutenberg_render_block_visibility_breakpoints_support(
 		return $block_content;
 	}
 
-	$breakpoint_visibility =
-		$block['attrs']['metadata']['blockVisibilityBreakpoints'] ?? null;
+	if ( ! isset( $block['attrs']['metadata']['blockVisibilityBreakpoints'] ) ) {
+		return $block_content;
+	}
+
+	$breakpoint_visibility = $block['attrs']['metadata']['blockVisibilityBreakpoints'];
 
 	if ( ! $breakpoint_visibility ) {
 		return $block_content;
@@ -99,4 +102,3 @@ add_action(
 	'wp_enqueue_scripts',
 	'gutenberg_enqueue_block_visibility_breakpoints_styles'
 );
-
