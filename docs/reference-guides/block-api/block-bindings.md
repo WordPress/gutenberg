@@ -133,6 +133,26 @@ function wpmovies_format_visualization_date( $value, $name ) {
 add_filter( 'block_bindings_source_value', 'wpmovies_format_visualization_date', 10, 2 );
 ```
 
+#### Customizing supported attributes filter
+
+_**Note:** Since WordPress 6.9._
+
+The `block_bindings_supported_attributes_{$block_type}` filter allows developers to customize which of a block's attributes can be connected to a Block Bindings source.
+
+This filter provides a way to extend or restrict which attributes of a specific block type can be bound to dynamic sources.
+
+Example:
+
+```php
+// Allow binding the 'className' attribute for paragraph blocks
+add_filter( 'block_bindings_supported_attributes_core/paragraph', function( $attributes ) {
+    $attributes['className'] = array(
+        'type' => 'string',
+    );
+    return $attributes;
+} );
+```
+
 #### Server registration Core examples
 
 There are a few examples in Core that can be used as reference.
@@ -157,6 +177,7 @@ The function to register a custom source is `registerBlockBindingsSource( args )
     - `getValues`: `function` that retrieves the values from the source. (optional)
     - `setValues`: `function` that allows updating the values connected to the source. (optional)
     - `canUserEditValue`: `function` to determine if the user can edit the value. The user won't be able to edit by default. (optional)
+    - `getFieldsList`: `function` that returns available fields for the UI dropdown selector. (_Since WordPress 6.9_) (optional)
 
 
 This example will show a custom post meta date in the editor and, if it doesn't exist, it will show today's date. The user can edit the value of the date. (Caution: This example does not format the user input as a date—it's only for educational purposes.)
@@ -232,6 +253,60 @@ The `setValues` function updates all the values of the source of the block bound
 - `dispatch` returns an `object` of the store's action creators. [More about dispatch](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-data/#dispatch).
 - `select` returns an `object` of a given store's selectors. [More info in their docs.](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-data/#select).
 
+#### getFieldsList
+
+_**Note:** Since WordPress 6.9._
+
+The `getFieldsList` function enables custom sources to appear in the Block Bindings UI dropdown selector. When a user selects an option from the dropdown, the source is automatically bound to the block attribute with the corresponding `args` from the selected field. This function must return an array of field objects that define the available binding options.
+
+Each field object in the array should have the following properties:
+
+- `label`: `string` that defines the label shown in the dropdown selector. Defaults to the source label if not provided.
+- `type`: `string` that defines the attribute value type. It must match the attribute type it binds to; otherwise, it won't appear in the UI. For example, an `id` attribute that accepts only numbers should only display fields that return numeric values.
+- `args`: `object` that defines the source arguments that are applied when a user selects the field from the dropdown.
+
+Example:
+
+```js
+registerBlockBindingsSource( {
+    name: 'my-plugin/custom-fields',
+    label: 'Custom Fields',
+    getFieldsList() {
+        return [
+            {
+                label: 'Author Name',
+                type: 'string',
+                args: {
+                    field: 'author_name',
+                },
+            },
+            {
+                label: 'Publication Year',
+                type: 'string',
+                args: {
+                    field: 'publication_year',
+                },
+            },
+            {
+                label: 'Page Count',
+                type: 'number',
+                args: {
+                    field: 'page_count',
+                },
+            },
+        ];
+    },
+    getValues( { bindings } ) {
+        // Implementation to retrieve values based on args.field
+    },
+} );
+```
+
+With this implementation, users will see "Author Name", "Publication Year", and "Page Count" as options in the Block Bindings UI dropdown when binding block attributes to your custom source.
+
+<div class="callout callout-info">
+Check the <a href="https://github.com/WordPress/block-development-examples/tree/trunk/plugins/editor-bindings">Editor Bindings</a> example from the <a href="https://github.com/WordPress/block-development-examples/">Block Development Examples</a> repo
+</div>
 
 #### Editor registration Core examples
 
@@ -239,6 +314,8 @@ There are a few examples in Core that can be used as reference.
 
 - Post Meta. [Source code](https://github.com/WordPress/gutenberg/blob/5afd6c27bfba2be2e06b502257753fbfff1ae9f0/packages/editor/src/bindings/post-meta.js#L74-L146)
 - Pattern overrides. [Source code](https://github.com/WordPress/gutenberg/blob/5afd6c27bfba2be2e06b502257753fbfff1ae9f0/packages/editor/src/bindings/pattern-overrides.js#L8-L100)
+
+
 
 ## Unregistering a source
 
