@@ -152,11 +152,13 @@ function UploadFonts() {
 		const fontObj: Font & {
 			onload?: ( val: { detail: { font: any } } ) => void;
 		} = new Font( 'Uploaded Font' );
-		fontObj.fromDataBuffer( buffer, fontFile.name );
-		// Assuming that fromDataBuffer triggers onload event and returning a Promise
-		const onloadEvent: { detail: { font: any } } = await new Promise(
+		// Set up the onload handler before calling fromDataBuffer
+		const onloadPromise = new Promise< { detail: { font: any } } >(
 			( resolve ) => ( fontObj.onload = resolve )
 		);
+		await fontObj.fromDataBuffer( buffer, fontFile.name );
+		// Wait for the onload event to be dispatched
+		const onloadEvent = await onloadPromise;
 		const font = onloadEvent.detail.font;
 		const { name } = font.opentype.tables;
 		const fontName = name.get( 16 ) || name.get( 1 );
