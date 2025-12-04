@@ -15,13 +15,7 @@ const { useHistory, useLocation } = unlock( routerPrivateApis );
 
 export default function useNavigateToEntityRecord() {
 	const history = useHistory();
-	const { getSelectedBlockClientId } = useSelect( ( select ) => {
-		const { getSelectedBlockClientId: getSelected } =
-			select( blockEditorStore );
-		return {
-			getSelectedBlockClientId: getSelected,
-		};
-	}, [] );
+	const { getSelectedBlockClientId } = useSelect( blockEditorStore );
 
 	const onNavigateToEntityRecord = useCallback(
 		( params ) => {
