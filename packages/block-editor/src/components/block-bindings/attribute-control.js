@@ -8,7 +8,6 @@ import fastDeepEqual from 'fast-deep-equal/es6';
  */
 import { __ } from '@wordpress/i18n';
 import {
-	getBlockType,
 	getBlockBindingsSource,
 	store as blocksStore,
 } from '@wordpress/blocks';
@@ -34,20 +33,6 @@ import { store as blockEditorStore } from '../../store';
 
 const { Menu } = unlock( componentsPrivateApis );
 
-/**
- * Get the normalized attribute type for block bindings.
- * Converts 'rich-text' to 'string' since rich-text is stored as string.
- *
- * @param {string} blockName The block name.
- * @param {string} attribute The attribute name.
- * @return {string} The normalized attribute type.
- */
-const getAttributeType = ( blockName, attribute ) => {
-	const _attributeType =
-		getBlockType( blockName ).attributes?.[ attribute ]?.type;
-	return _attributeType === 'rich-text' ? 'string' : _attributeType;
-};
-
 export default function BlockBindingsAttributeControl( {
 	attribute,
 	binding,
@@ -57,12 +42,19 @@ export default function BlockBindingsAttributeControl( {
 	const isMobile = useViewportMatch( 'medium', '<' );
 
 	const blockContext = useContext( BlockContext );
-	const sources = useSelect(
+	const compatibleFields = useSelect(
 		( select ) => {
 			const {
 				getAllBlockBindingsSources,
 				getBlockBindingsSourceFieldsList,
+				getBlockType,
 			} = unlock( select( blocksStore ) );
+
+			const _attributeType =
+				getBlockType( blockName ).attributes?.[ attribute ]?.type;
+			const attributeType =
+				_attributeType === 'rich-text' ? 'string' : _attributeType;
+
 			const sourceFields = {};
 			Object.entries( getAllBlockBindingsSources() ).forEach(
 				( [ sourceName, source ] ) => {
@@ -70,14 +62,20 @@ export default function BlockBindingsAttributeControl( {
 						source,
 						blockContext
 					);
-					if ( fieldsList?.length ) {
-						sourceFields[ sourceName ] = fieldsList;
+					if ( ! fieldsList?.length ) {
+						return;
+					}
+					const compatibleFieldsList = fieldsList.filter(
+						( field ) => field.type === attributeType
+					);
+					if ( compatibleFieldsList.length ) {
+						sourceFields[ sourceName ] = compatibleFieldsList;
 					}
 				}
 			);
 			return sourceFields;
 		},
-		[ blockContext ]
+		[ attribute, blockName, blockContext ]
 	);
 
 	const { canUpdateBlockBindings } = useSelect( ( select ) => ( {
@@ -85,21 +83,7 @@ export default function BlockBindingsAttributeControl( {
 			select( blockEditorStore ).getSettings().canUpdateBlockBindings,
 	} ) );
 
-	// Check if this attribute has compatible fields from any source.
-	const attributeType = getAttributeType( blockName, attribute );
-
-	const compatibleFieldsForAttribute = {};
-	for ( const sourceKey in sources ) {
-		const fields = sources[ sourceKey ].filter(
-			( field ) => field.type === attributeType
-		);
-		if ( fields.length ) {
-			compatibleFieldsForAttribute[ sourceKey ] = fields;
-		}
-	}
-
-	const hasCompatibleFields =
-		Object.keys( compatibleFieldsForAttribute ).length > 0;
+	const hasCompatibleFields = Object.keys( compatibleFields ).length > 0;
 
 	// Lock the UI when the user can't update bindings or there are no fields to connect to.
 	const isAttributeReadOnly =
@@ -124,8 +108,8 @@ export default function BlockBindingsAttributeControl( {
 		displayText = __( 'Source not registered' );
 	} else {
 		displayText =
-			compatibleFieldsForAttribute?.[ boundSourceName ]?.find(
-				( field ) => fastDeepEqual( field.args, args )
+			compatibleFields?.[ boundSourceName ]?.find( ( field ) =>
+				fastDeepEqual( field.args, args )
 			)?.label ||
 			source?.label ||
 			boundSourceName;
@@ -170,17 +154,17 @@ export default function BlockBindingsAttributeControl( {
 								isMobile ? 'bottom-start' : 'left-start'
 							}
 						>
-							{ Object.entries(
-								compatibleFieldsForAttribute
-							).map( ( [ sourceKey, fields ] ) => (
-								<BlockBindingsSourceFieldsList
-									key={ sourceKey }
-									args={ binding?.args }
-									attribute={ attribute }
-									sourceKey={ sourceKey }
-									fields={ fields }
-								/>
-							) ) }
+							{ Object.entries( compatibleFields ).map(
+								( [ sourceKey, fields ] ) => (
+									<BlockBindingsSourceFieldsList
+										key={ sourceKey }
+										args={ binding?.args }
+										attribute={ attribute }
+										sourceKey={ sourceKey }
+										fields={ fields }
+									/>
+								)
+							) }
 						</Menu>
 					</Menu.Popover>
 				) }
