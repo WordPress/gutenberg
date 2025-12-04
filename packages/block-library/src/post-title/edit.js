@@ -86,7 +86,7 @@ export default function PostTitleEdit( {
 		titleElement = userCanEdit ? (
 			<PlainText
 				tagName={ TagName }
-				placeholder={ __( 'No title' ) }
+				placeholder={ __( '(no title)' ) }
 				value={ rawTitle }
 				onChange={ setTitle }
 				__experimentalVersion={ 2 }
@@ -96,7 +96,9 @@ export default function PostTitleEdit( {
 		) : (
 			<TagName
 				{ ...blockProps }
-				dangerouslySetInnerHTML={ { __html: fullTitle?.rendered } }
+				dangerouslySetInnerHTML={ {
+					__html: fullTitle?.rendered || __( '(no title)' ),
+				} }
 			/>
 		);
 	}
@@ -109,7 +111,9 @@ export default function PostTitleEdit( {
 					href={ link }
 					target={ linkTarget }
 					rel={ rel }
-					placeholder={ ! rawTitle.length ? __( 'No title' ) : null }
+					placeholder={
+						! rawTitle.length ? __( '(no title)' ) : null
+					}
 					value={ rawTitle }
 					onChange={ setTitle }
 					__experimentalVersion={ 2 }
@@ -124,7 +128,7 @@ export default function PostTitleEdit( {
 					rel={ rel }
 					onClick={ ( event ) => event.preventDefault() }
 					dangerouslySetInnerHTML={ {
-						__html: fullTitle?.rendered,
+						__html: fullTitle?.rendered || __( '(no title)' ),
 					} }
 				/>
 			</TagName>
