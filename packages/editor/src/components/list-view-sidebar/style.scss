@@ -24,16 +24,14 @@
 	scrollbar-gutter: auto;
 }
 
-// The table cells use an extra pixels of space left and right. We compensate for that here.
+// The table cells use a few extra pixels of horizontal space.
+// Apply compensating padding for the List View panel.
 .editor-list-view-sidebar__list-view-panel-content {
-	// Keep the original padding for the List View panel so its spacing matches trunk.
 	padding: $grid-unit-05;
 }
 
-// Apply the new padding only to the Document Outline panel.
+// Match the Outline panel’s padding with the surrounding panels.
 .editor-list-view-sidebar__list-view-container > .document-outline {
-	// Override the global top margin (20px) so it doesn’t stack with the new padding.
-	margin-top: 0;
 	padding: $grid-unit-20;
 }
 
