@@ -119,9 +119,6 @@ export default function TemplatePartEdit( {
 } ) {
 	const { createSuccessNotice } = useDispatch( noticesStore );
 	const { editEntityRecord } = useDispatch( coreStore );
-	const { editContentOnlySection, stopEditingContentOnlySection } = unlock(
-		useDispatch( blockEditorStore )
-	);
 	const { currentTheme, editedContentOnlySection } = useSelect(
 		( select ) => {
 			return {
@@ -262,20 +259,7 @@ export default function TemplatePartEdit( {
 						<BlockControls group="other">
 							<ToolbarButton
 								onClick={ () => {
-									if (
-										window?.__experimentalContentOnlyPatternInsertion
-									) {
-										if (
-											editedContentOnlySection !==
-											clientId
-										) {
-											editContentOnlySection( clientId );
-										} else {
-											stopEditingContentOnlySection();
-										}
-										return;
-									}
-
+									// Template parts always navigate to isolated editor
 									onNavigateToEntityRecord( {
 										postId: templatePartId,
 										postType: 'wp_template_part',
