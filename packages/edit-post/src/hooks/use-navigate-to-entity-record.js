@@ -26,9 +26,15 @@ export default function useNavigateToEntityRecord(
 	defaultRenderingMode
 ) {
 	const [ postHistory, dispatch ] = useReducer(
-		( historyState, { type, post, previousRenderingMode } ) => {
+		(
+			historyState,
+			{ type, post, previousRenderingMode, scrollPosition }
+		) => {
 			if ( type === 'push' ) {
-				return [ ...historyState, { post, previousRenderingMode } ];
+				return [
+					...historyState,
+					{ post, previousRenderingMode, scrollPosition },
+				];
 			}
 			if ( type === 'pop' ) {
 				// Try to leave one item in the history.
@@ -45,7 +51,7 @@ export default function useNavigateToEntityRecord(
 		]
 	);
 
-	const { post, previousRenderingMode } =
+	const { post, previousRenderingMode, scrollPosition } =
 		postHistory[ postHistory.length - 1 ];
 
 	const { getRenderingMode } = useSelect( editorStore );
@@ -53,11 +59,24 @@ export default function useNavigateToEntityRecord(
 
 	const onNavigateToEntityRecord = useCallback(
 		( params ) => {
+			// Capture current scroll position from the editor canvas iframe
+			const iframe = document.querySelector(
+				'iframe[name="editor-canvas"]'
+			);
+			const iframeDocument =
+				iframe?.contentDocument || iframe?.contentWindow?.document;
+			const scrollElement = iframeDocument?.documentElement;
+
+			const currentScrollPosition = scrollElement
+				? { x: scrollElement.scrollLeft, y: scrollElement.scrollTop }
+				: { x: window.scrollX, y: window.scrollY };
+
 			dispatch( {
 				type: 'push',
 				post: { postId: params.postId, postType: params.postType },
 				// Save the current rendering mode so we can restore it when navigating back.
 				previousRenderingMode: getRenderingMode(),
+				scrollPosition: currentScrollPosition,
 			} );
 			setRenderingMode( defaultRenderingMode );
 		},
@@ -69,7 +88,35 @@ export default function useNavigateToEntityRecord(
 		if ( previousRenderingMode ) {
 			setRenderingMode( previousRenderingMode );
 		}
-	}, [ setRenderingMode, previousRenderingMode ] );
+		// Restore scroll position after a short delay to allow rendering to complete
+		if ( scrollPosition && typeof window !== 'undefined' ) {
+			const restoreScroll = () => {
+				// The editor canvas is inside an iframe
+				const iframe = document.querySelector(
+					'iframe[name="editor-canvas"]'
+				);
+				const iframeWindow = iframe?.contentWindow;
+
+				if ( iframeWindow ) {
+					// Use a small delay to ensure content is rendered
+					setTimeout( () => {
+						iframeWindow.scrollTo(
+							scrollPosition.x,
+							scrollPosition.y
+						);
+					}, 100 );
+				} else {
+					window.scrollTo( scrollPosition.x, scrollPosition.y );
+				}
+			};
+
+			if ( typeof window.requestAnimationFrame !== 'undefined' ) {
+				window.requestAnimationFrame( restoreScroll );
+			} else {
+				restoreScroll();
+			}
+		}
+	}, [ setRenderingMode, previousRenderingMode, scrollPosition ] );
 
 	return {
 		currentPost: post,

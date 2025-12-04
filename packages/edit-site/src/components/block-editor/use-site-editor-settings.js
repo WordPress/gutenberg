@@ -12,7 +12,9 @@ import { store as editorStore } from '@wordpress/editor';
  */
 import { store as editSiteStore } from '../../store';
 import { unlock } from '../../lock-unlock';
-import useNavigateToEntityRecord from './use-navigate-to-entity-record';
+import useNavigateToEntityRecord, {
+	useRestoreScrollPosition,
+} from './use-navigate-to-entity-record';
 import { FOCUSABLE_ENTITIES } from '../../utils/constants';
 
 const { useLocation, useHistory } = unlock( routerPrivateApis );
@@ -21,6 +23,7 @@ function useNavigateToPreviousEntityRecord() {
 	const location = useLocation();
 	const previousCanvas = usePrevious( location.query.canvas );
 	const history = useHistory();
+
 	const goBack = useMemo( () => {
 		const isFocusMode =
 			location.query.focusMode ||
@@ -28,7 +31,37 @@ function useNavigateToPreviousEntityRecord() {
 				FOCUSABLE_ENTITIES.includes( location?.params?.postType ) );
 		const didComeFromEditorCanvas = previousCanvas === 'edit';
 		const showBackButton = isFocusMode && didComeFromEditorCanvas;
-		return showBackButton ? () => history.back() : undefined;
+
+		if ( ! showBackButton ) {
+			return undefined;
+		}
+
+		return () => {
+			// Capture current scroll position before navigating back
+			const iframe = document.querySelector(
+				'iframe[name="editor-canvas"]'
+			);
+			const iframeDocument =
+				iframe?.contentDocument || iframe?.contentWindow?.document;
+			const scrollElement = iframeDocument?.documentElement;
+
+			const currentScrollPosition = scrollElement
+				? { x: scrollElement.scrollLeft, y: scrollElement.scrollTop }
+				: { x: window.scrollX, y: window.scrollY };
+
+			// Store scroll position for current location
+			const currentPath =
+				window.location.pathname + window.location.search;
+			window.sessionStorage?.setItem(
+				`gutenberg_scroll_${ currentPath }`,
+				JSON.stringify( currentScrollPosition )
+			);
+
+			history.back();
+		};
+		// `previousLocation` changes when the component updates for any reason, not
+		// just when location changes. Until this is fixed we can't add it to deps. See
+		// https://github.com/WordPress/gutenberg/pull/58710#discussion_r1479219465.
 	}, [ location, history, previousCanvas ] );
 	return goBack;
 }
@@ -37,6 +70,10 @@ export function useSpecificEditorSettings() {
 	const { query } = useLocation();
 	const { canvas = 'view' } = query;
 	const onNavigateToEntityRecord = useNavigateToEntityRecord();
+
+	// Restore scroll position when navigating
+	useRestoreScrollPosition();
+
 	const { settings, currentPostIsTrashed } = useSelect( ( select ) => {
 		const { getSettings } = select( editSiteStore );
 		const { getCurrentPostAttribute } = select( editorStore );
