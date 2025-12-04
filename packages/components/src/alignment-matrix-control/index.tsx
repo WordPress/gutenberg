@@ -51,7 +51,7 @@ function UnforwardedAlignmentMatrixControl( {
 
 	const classes = clsx(
 		'component-alignment-matrix-control',
-		styles.gridContainer,
+		styles[ 'grid-container' ],
 		className
 	);
 
@@ -74,7 +74,9 @@ function UnforwardedAlignmentMatrixControl( {
 		>
 			{ GRID.map( ( cells, index ) => (
 				<Composite.Row
-					render={ <div className={ styles.gridRow } role="row" /> }
+					render={
+						<div className={ styles[ 'grid-row' ] } role="row" />
+					}
 					key={ index }
 				>
 					{ cells.map( ( cell ) => (

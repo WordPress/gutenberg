@@ -2,7 +2,7 @@
 @use "../utils/theme-variables" as *;
 
 /* Grid structure */
-.gridContainer {
+.grid-container {
 	direction: ltr;
 
 	display: grid;
@@ -19,7 +19,7 @@
 	cursor: pointer;
 }
 
-.gridRow {
+.grid-row {
 	grid-column: 1 / -1;
 
 	box-sizing: border-box;
@@ -60,27 +60,25 @@
 	/* Use border instead of background color so that the point shows
 	in Windows High Contrast Mode */
 	border: 3px solid currentColor;
-}
 
-/* Highlight active item */
-.cell[data-active-item] .point {
-	color: $components-color-foreground;
-	transform: scale(calc(5 / 3));
-}
+	/* Highlight active item */
+	.cell[data-active-item] & {
+		color: $components-color-foreground;
+		transform: scale(calc(5 / 3));
+	}
 
-/* Hover styles for non-active items */
-.cell:not([data-active-item]):hover .point {
-	color: $components-color-accent;
-}
+	/* Hover styles for non-active items */
+	.cell:not([data-active-item]):hover & {
+		color: $components-color-accent;
+	}
 
-/* Show an outline only when interacting with keyboard */
-.cell[data-focus-visible] .point {
-	outline: 1px solid $components-color-accent;
-	outline-offset: 1px;
-}
+	/* Show an outline only when interacting with keyboard */
+	.cell[data-focus-visible] & {
+		outline: 1px solid $components-color-accent;
+		outline-offset: 1px;
+	}
 
-@media not (prefers-reduced-motion) {
-	.point {
+	@media not (prefers-reduced-motion) {
 		transition-property: color, transform;
 		transition-duration: 120ms;
 		transition-timing-function: linear;
