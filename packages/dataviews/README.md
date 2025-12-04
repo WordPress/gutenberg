@@ -1808,6 +1808,7 @@ Or multi-selection operators:
 	}
 }
 ```
+#### Available Operators
 
 The next table lists all available operators:
 
@@ -1838,7 +1839,9 @@ The next table lists all available operators:
 
 Some operators are single-selection: `is`, `isNot`, `on`, `notOn`, `lessThan`, `greaterThan`, `lessThanOrEqual`, `greaterThanOrEqual`, `before`, `after`, `beforeInc`, `afterInc`, `contains`, `notContains`, and `startsWith`. Others are multi-selection: `isAny`, `isNone`, `isAll`, and `isNotAll`. A filter cannot mix single-selection & multi-selection operators; if a single-selection operator is present in the list of valid operators, the multi-selection ones will be discarded, and the filter won't allow selecting more than one item.
 
-Valid operators per field type:
+#### Valid operators per field type
+
+Each type of data supports a default set of filter operators, depending on its nature:
 
 - array: `isAny`, `isNone`, `isAll`, `isNotAll`.
 - boolean: `is`, `isNot`.
@@ -1854,6 +1857,24 @@ Valid operators per field type:
 - text: `is`, `isNot`, `contains`, `notContains`, `startsWith`, `isAny`, `isNone`, `isAll`, `isNotAll`.
 - url: `is`, `isNot`, `contains`, `notContains`, `startsWith`, `isAny`, `isNone`, `isAll`, `isNotAll`.
 - fields with no type: any operator.
+
+#### Filter Operators by Field Type  
+  
+Different field types enable by default different filter operators based on the type of data they represent:  
+  
+- **Fields with `type: 'integer'` or `type: 'number'`** provide numeric comparison operators:  `is`, `isNot`, `lessThan`, `greaterThan`, `lessThanOrEqual`, `greaterThanOrEqual`, `between`
+
+- **Fields with `type: 'date'` or `type: 'datetime'`** provide date-specific operators:  
+  `on`, `notOn`, `before`, `after`, `beforeInc`, `afterInc`, `inThePast`, `over`, `between`
+
+- **Fields with `type: 'text'`** provide text matching operators:  
+  `is`, `isNot`, `contains`, `startsWith`
+
+- **Fields that define an `elements` array** (for select/radio-style fields) support multi-selection operators:  
+  `is`, `isNot`, `isAny`, `isNone`, `isAll`, `isNotAll`
+  
+You can customize the available operators by specifying `filterBy.operators` on your field definition, or disable filtering entirely with `filterBy: false`.
+
 
 ### `format`
 
