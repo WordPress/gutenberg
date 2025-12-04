@@ -230,7 +230,9 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 							buttonRef={ previewButtonRef }
 							link={ attributes }
 							featuredImage={ featuredImage }
+							hasEntityBinding={ hasUrlBinding }
 							onClick={ () => {
+								// Open it
 								setInputValue( '' );
 								setIsEditing( true );
 							} }

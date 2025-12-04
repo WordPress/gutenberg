@@ -11,29 +11,45 @@ import {
 import { Icon, chevronDown } from '@wordpress/icons';
 import { safeDecodeURI } from '@wordpress/url';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
+import { __experimentalUseRemoteUrlData as useRemoteUrlData } from '@wordpress/block-editor';
 
 /**
  * Link preview button component that displays the current link information.
  * Clicking this button reveals the LinkControlSearchInput.
  *
- * @param {Object}   props               - Component props
- * @param {Object}   props.link          - Link object with label, url, type, kind
- * @param {string}   props.featuredImage - Featured image URL (optional)
- * @param {Function} props.onClick       - Click handler
- * @param {Object}   props.buttonRef     - Ref to attach to button
- * @param {Object}   props.props         - Additional props to pass to the button
+ * @param {Object}   props                  - Component props
+ * @param {Object}   props.link             - Link object with label, url, type, kind, id
+ * @param {string}   props.featuredImage    - Featured image URL (optional)
+ * @param {boolean}  props.hasEntityBinding - Whether the link has an entity binding
+ * @param {Function} props.onClick          - Click handler
+ * @param {Object}   props.buttonRef        - Ref to attach to button
+ * @param {Object}   props.props            - Additional props to pass to the button
  */
 export function LinkPreviewButton( {
 	link,
 	featuredImage,
+	hasEntityBinding,
 	onClick,
 	buttonRef,
 	...props
 } ) {
 	const { label, url } = link;
 
-	// Get display title
-	const title = label ? stripHTML( label ) : safeDecodeURI( url );
+	// Fetch rich URL data for custom/external URLs (only if not entity-bound)
+	const { richData } = useRemoteUrlData( hasEntityBinding ? null : url );
+
+	// Get display title - prioritize richData.title for custom URLs
+	let title;
+	if ( richData?.title ) {
+		title = richData.title;
+	} else if ( label ) {
+		title = stripHTML( label );
+	} else {
+		title = safeDecodeURI( url );
+	}
+
+	// Get image - use featuredImage for entities, richData.icon for custom URLs
+	const imageUrl = featuredImage || richData?.icon;
 
 	// Get display URL - strip site URL if it matches current site
 	let displayUrl = safeDecodeURI( url || '' );
@@ -66,11 +82,11 @@ export function LinkPreviewButton( {
 			<HStack justify="space-between" alignment="top">
 				<FlexItem className="link-control-preview-button__content">
 					<HStack alignment="top">
-						{ featuredImage && (
+						{ imageUrl && (
 							<FlexItem className="link-control-preview-button__image-container">
 								<img
 									className="link-control-preview-button__image"
-									src={ featuredImage }
+									src={ imageUrl }
 									alt=""
 								/>
 							</FlexItem>

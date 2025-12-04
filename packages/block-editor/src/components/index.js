@@ -74,6 +74,7 @@ export {
 export { __experimentalLinkControlSearchInput } from './link-control/search-input';
 export { __experimentalLinkControlSearchResults } from './link-control/search-results';
 export { __experimentalLinkControlSearchItem } from './link-control/search-item';
+export { default as __experimentalUseRemoteUrlData } from './link-control/use-rich-url-data';
 export { default as LineHeightControl } from './line-height-control';
 export { default as __experimentalListView } from './list-view';
 export { default as MediaReplaceFlow } from './media-replace-flow';
