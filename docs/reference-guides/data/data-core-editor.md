@@ -1725,15 +1725,7 @@ _Related_
 
 ### updateEditorSettings
 
-Returns an action object used in signalling that the post editor settings have been updated.
-
-_Parameters_
-
--   _settings_ `Object`: Updated settings
-
-_Returns_
-
--   `Object`: Action object
+Undocumented declaration.
 
 ### updatePost
 
