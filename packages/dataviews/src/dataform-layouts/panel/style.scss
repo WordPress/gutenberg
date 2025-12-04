@@ -7,6 +7,10 @@
 	min-height: $grid-unit-40;
 	justify-content: flex-start !important;
 	align-items: flex-start !important;
+
+	&--label-position-none {
+		align-items: center !important;
+	}
 }
 
 .dataforms-layouts-panel__field-label {

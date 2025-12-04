@@ -229,7 +229,7 @@ export default function FormPanelField< Item >( {
 
 	if ( labelPosition === 'none' ) {
 		return (
-			<HStack className="dataforms-layouts-panel__field">
+			<HStack className="dataforms-layouts-panel__field dataforms-layouts-panel__field--label-position-none">
 				{ showError && (
 					<Tooltip text={ errorMessage } placement="top">
 						<span className="dataforms-layouts-panel__field-error-indicator">
