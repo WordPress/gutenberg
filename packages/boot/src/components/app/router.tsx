@@ -18,7 +18,7 @@ import {
  * Internal dependencies
  */
 import Root from '../root';
-import type { Route, RouteLoaderContext } from '../../store/types';
+import type { Route, RouteConfig, RouteLoaderContext } from '../../store/types';
 import { unlock } from '../../lock-unlock';
 
 const {
@@ -43,34 +43,6 @@ function NotFoundComponent() {
 	);
 }
 
-function RouteComponent( {
-	stage: Stage,
-	inspector: Inspector,
-	routePath,
-}: {
-	stage?: ComponentType;
-	inspector?: ComponentType;
-	routePath: string;
-} ) {
-	const { inspector: showInspector } =
-		useLoaderData( { from: routePath } ) ?? {};
-
-	return (
-		<>
-			{ Stage && (
-				<div className="boot-layout__stage">
-					<Stage />
-				</div>
-			) }
-			{ Inspector && showInspector && (
-				<div className="boot-layout__inspector">
-					<Inspector />
-				</div>
-			) }
-		</>
-	);
-}
-
 /**
  * Creates a TanStack route from a Route definition.
  *
@@ -82,14 +54,7 @@ async function createRouteFromDefinition(
 	route: Route,
 	parentRoute: AnyRoute
 ) {
-	let routeConfig: {
-		beforeLoad?: ( context: RouteLoaderContext ) => void | Promise< void >;
-		loader?: ( context: RouteLoaderContext ) => Promise< unknown >;
-		canvas?: ( context: RouteLoaderContext ) => Promise< any >;
-		inspector?: (
-			context: RouteLoaderContext
-		) => boolean | Promise< boolean >;
-	} = {};
+	let routeConfig: RouteConfig = {};
 
 	if ( route.route_module ) {
 		const module = await import( route.route_module );
@@ -143,14 +108,27 @@ async function createRouteFromDefinition(
 			? await import( route.content_module )
 			: {};
 
+		const Stage = module.stage;
+		const Inspector = module.inspector;
+
 		return createLazyRoute( route.path )( {
-			component: function Component() {
+			component: function RouteComponent() {
+				const { inspector: showInspector } =
+					useLoaderData( { from: route.path } ) ?? {};
+
 				return (
-					<RouteComponent
-						stage={ module.stage }
-						inspector={ module.inspector }
-						routePath={ route.path }
-					/>
+					<>
+						{ Stage && (
+							<div className="boot-layout__stage">
+								<Stage />
+							</div>
+						) }
+						{ Inspector && showInspector && (
+							<div className="boot-layout__inspector">
+								<Inspector />
+							</div>
+						) }
+					</>
 				);
 			},
 		} );
