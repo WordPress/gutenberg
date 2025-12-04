@@ -108,7 +108,6 @@ module.exports = {
 						test: /\.scss$/,
 						exclude: /\.lazy\.scss$/,
 						use: scssLoaders( { isLazy: false } ),
-						include: path.resolve( __dirname ),
 					},
 					{
 						test: /\.lazy\.scss$/,

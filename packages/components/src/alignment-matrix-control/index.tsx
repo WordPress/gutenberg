@@ -19,7 +19,7 @@ import AlignmentMatrixControlIcon from './icon';
 import { GRID, getItemId, getItemValue } from './utils';
 import type { WordPressComponentProps } from '../context';
 import type { AlignmentMatrixControlProps } from './types';
-import styles from './style.module.css';
+import styles from './style.module.scss';
 
 function UnforwardedAlignmentMatrixControl( {
 	className,

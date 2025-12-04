@@ -16,7 +16,7 @@ import { VisuallyHidden } from '../visually-hidden';
 import { ALIGNMENT_LABEL } from './utils';
 import type { AlignmentMatrixControlCellProps } from './types';
 import type { WordPressComponentProps } from '../context';
-import styles from './style.module.css';
+import styles from './style.module.scss';
 
 export default function Cell( {
 	id,
