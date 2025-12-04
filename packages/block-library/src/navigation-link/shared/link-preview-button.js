@@ -2,13 +2,11 @@
  * WordPress dependencies
  */
 import {
-	Button,
 	__experimentalTruncate as Truncate,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 	FlexItem,
 } from '@wordpress/components';
-import { Icon, chevronDown } from '@wordpress/icons';
 import { safeDecodeURI } from '@wordpress/url';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { __experimentalUseRemoteUrlData as useRemoteUrlData } from '@wordpress/block-editor';
@@ -25,7 +23,7 @@ import { __experimentalUseRemoteUrlData as useRemoteUrlData } from '@wordpress/b
  * @param {Object}   props.buttonRef        - Ref to attach to button
  * @param {Object}   props.props            - Additional props to pass to the button
  */
-export function LinkPreviewButton( {
+export function NavigationLinkPreview( {
 	link,
 	featuredImage,
 	hasEntityBinding,
@@ -71,21 +69,20 @@ export function LinkPreviewButton( {
 	}
 
 	return (
-		<Button
+		<div
 			ref={ buttonRef }
-			className="link-control-preview-button"
-			onClick={ onClick }
+			className="navigation-link-control-preview"
 			variant="secondary"
 			__next40pxDefaultSize
 			{ ...props }
 		>
 			<HStack justify="space-between" alignment="top">
-				<FlexItem className="link-control-preview-button__content">
+				<FlexItem className="navigation-link-control-preview__content">
 					<HStack alignment="top">
 						{ imageUrl && (
-							<FlexItem className="link-control-preview-button__image-container">
+							<FlexItem className="navigation-link-control-preview__image-container">
 								<img
-									className="link-control-preview-button__image"
+									className="navigation-link-control-preview__image"
 									src={ imageUrl }
 									alt=""
 								/>
@@ -93,29 +90,25 @@ export function LinkPreviewButton( {
 						) }
 
 						<VStack
-							className="link-control-preview-button__details"
+							className="navigation-link-control-preview__details"
 							alignment="topLeft"
 						>
 							<Truncate
 								numberOfLines={ 1 }
-								className="link-control-preview-button__title"
+								className="navigation-link-control-preview__title"
 							>
-								{ title }
+								<a href={ url }>{ title }</a>
 							</Truncate>
 							<Truncate
 								numberOfLines={ 1 }
-								className="link-control-preview-button__url"
+								className="navigation-link-control-preview__url"
 							>
 								{ displayUrl }
 							</Truncate>
 						</VStack>
 					</HStack>
 				</FlexItem>
-				<Icon
-					icon={ chevronDown }
-					className="link-control-preview-button__icon"
-				/>
 			</HStack>
-		</Button>
+		</div>
 	);
 }

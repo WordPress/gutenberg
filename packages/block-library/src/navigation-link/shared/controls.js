@@ -11,10 +11,7 @@ import {
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { useRef, useEffect, useState } from '@wordpress/element';
-import {
-	useInstanceId,
-	__experimentalUseDialog as useDialog,
-} from '@wordpress/compose';
+import { useInstanceId } from '@wordpress/compose';
 import { safeDecodeURI } from '@wordpress/url';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { __experimentalLinkControlSearchInput as LinkControlSearchInput } from '@wordpress/block-editor';
@@ -27,7 +24,7 @@ import { store as coreStore } from '@wordpress/core-data';
 import { useToolsPanelDropdownMenuProps } from '../../utils/hooks';
 import { updateAttributes } from './update-attributes';
 import { useEntityBinding } from './use-entity-binding';
-import { LinkPreviewButton } from './link-preview-button';
+import { NavigationLinkPreview } from './link-preview-button';
 
 /**
  * Given the Link block's type attribute, return the query params for link suggestions.
@@ -111,18 +108,6 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 
 	// Local state to control the input value
 	const [ inputValue, setInputValue ] = useState( url );
-
-	// Track editing state to toggle between preview button and input
-	const [ isEditing, setIsEditing ] = useState( ! url );
-	const previewButtonRef = useRef();
-
-	// Get dialog props for proper accessibility
-	const [ dialogRef, dialogProps ] = useDialog( {
-		focusOnMount: 'firstElement',
-		onClose: () => {
-			setIsEditing( false );
-		},
-	} );
 
 	// Sync local state when url prop changes (e.g., from undo/redo or external updates)
 	useEffect( () => {
@@ -226,85 +211,63 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 						id={ `${ inputId }-button` }
 						__nextHasNoMarginBottom
 					>
-						<LinkPreviewButton
-							buttonRef={ previewButtonRef }
+						<NavigationLinkPreview
 							link={ attributes }
 							featuredImage={ featuredImage }
 							hasEntityBinding={ hasUrlBinding }
-							onClick={ () => {
-								// Open it
-								setInputValue( '' );
-								setIsEditing( true );
-							} }
-							aria-haspopup="dialog"
-							aria-expanded={ isEditing }
-							id={ `${ inputId }-button` }
 						/>
 					</BaseControl>
 				) }
-				{ isEditing && (
-					<div ref={ dialogRef } { ...dialogProps }>
-						<LinkControlSearchInput
-							className="navigation-link-control__search-input"
-							value={
-								inputValue ? safeDecodeURI( inputValue ) : ''
+				<LinkControlSearchInput
+					className="navigation-link-control__search-input"
+					value={ inputValue ? safeDecodeURI( inputValue ) : '' }
+					currentLink={ {
+						url,
+						title: label && stripHTML( label ),
+						kind: attributes.kind,
+						type: attributes.type,
+						id: attributes.id,
+					} }
+					suggestionsQuery={ getSuggestionsQuery(
+						attributes.type,
+						attributes.kind
+					) }
+					onChange={ ( newValue ) => {
+						// Update local input state when typing
+						setInputValue( newValue );
+					} }
+					onSelect={ ( suggestion ) => {
+						// When a suggestion is selected (or Enter pressed)
+						if ( suggestion ) {
+							const attrs = {
+								url: suggestion.url,
+								kind: suggestion.kind,
+								type: suggestion.type,
+								id: suggestion.id,
+								title: suggestion.title,
+							};
+							updateAttributes(
+								attrs,
+								setAttributes,
+								attributes
+							);
+							// Create entity binding if we have entity data
+							if ( suggestion.id ) {
+								createBinding( attrs );
+								shouldFocusUnsyncButtonRef.current = true;
 							}
-							currentLink={ {
-								url,
-								title: label && stripHTML( label ),
-								kind: attributes.kind,
-								type: attributes.type,
-								id: attributes.id,
-							} }
-							suggestionsQuery={ getSuggestionsQuery(
-								attributes.type,
-								attributes.kind
-							) }
-							onChange={ ( newValue ) => {
-								// Update local input state when typing
-								setInputValue( newValue );
-							} }
-							onSelect={ ( suggestion ) => {
-								// When a suggestion is selected (or Enter pressed)
-								if ( suggestion ) {
-									const attrs = {
-										url: suggestion.url,
-										kind: suggestion.kind,
-										type: suggestion.type,
-										id: suggestion.id,
-										title: suggestion.title,
-									};
-									updateAttributes(
-										attrs,
-										setAttributes,
-										attributes
-									);
-									// Create entity binding if we have entity data
-									if ( suggestion.id ) {
-										createBinding( attrs );
-										shouldFocusUnsyncButtonRef.current = true;
-									}
-									// Exit edit mode and focus preview button
-									setIsEditing( false );
-								} else if ( inputValue ) {
-									// Freeform URL entry
-									updateAttributes(
-										{ url: inputValue },
-										setAttributes,
-										attributes
-									);
-									// Exit edit mode and focus preview button
-									setIsEditing( false );
-								}
-
-								// focus the preview button
-								previewButtonRef.current?.focus();
-							} }
-							showInitialSuggestions
-							showSuggestions
-						/>
-					</div>
-				) }
+						} else if ( inputValue ) {
+							// Freeform URL entry
+							updateAttributes(
+								{ url: inputValue },
+								setAttributes,
+								attributes
+							);
+						}
+					} }
+					showInitialSuggestions
+					showSuggestions
+				/>
 				{ hasUrlBinding && ! isBoundEntityAvailable && (
 					<p id={ helpTextId }>
 						<MissingEntityHelpText
