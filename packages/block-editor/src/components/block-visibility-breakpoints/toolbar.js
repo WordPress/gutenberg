@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useState } from '@wordpress/element';
 import { ToolbarButton, ToolbarGroup } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { hasBlockSupport } from '@wordpress/blocks';
@@ -12,11 +11,9 @@ import { seen, unseen } from '@wordpress/icons';
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
-import BlockVisibilityBreakpointsModal from './modal';
+import { openBreakpointsModal } from './modal-manager';
 
-export default function BlockVisibilityBreakpointsToolbar( {
-	clientIds,
-} ) {
+export default function BlockVisibilityBreakpointsToolbar( { clientIds } ) {
 	const { blocks, canToggleBlockVisibility } = useSelect(
 		( select ) => {
 			const { getBlockName, getBlocksByClientId } =
@@ -36,8 +33,6 @@ export default function BlockVisibilityBreakpointsToolbar( {
 		[ clientIds ]
 	);
 
-	const [ isModalOpen, setIsModalOpen ] = useState( false );
-
 	const hasBreakpointVisibility = blocks.some(
 		( block ) =>
 			block.attributes.metadata?.blockVisibilityBreakpoints &&
@@ -46,30 +41,27 @@ export default function BlockVisibilityBreakpointsToolbar( {
 				block.attributes.metadata.blockVisibilityBreakpoints.desktop )
 	);
 
+	const hasHiddenEverywhere = blocks.some(
+		( block ) => block.attributes.metadata?.blockVisibility === false
+	);
+
+	const hasAnyVisibility = hasBreakpointVisibility || hasHiddenEverywhere;
+
 	if ( ! canToggleBlockVisibility ) {
 		return null;
 	}
 
 	return (
-		<>
-			<ToolbarGroup className="block-editor-block-visibility-breakpoints-toolbar">
-				<ToolbarButton
-					icon={ hasBreakpointVisibility ? unseen : seen }
-					label={
-						hasBreakpointVisibility
-							? __( 'Breakpoint visibility set' )
-							: __( 'Set breakpoint visibility' )
-					}
-					onClick={ () => setIsModalOpen( true ) }
-				/>
-			</ToolbarGroup>
-			{ isModalOpen && (
-				<BlockVisibilityBreakpointsModal
-					clientIds={ clientIds }
-					onClose={ () => setIsModalOpen( false ) }
-				/>
-			) }
-		</>
+		<ToolbarGroup className="block-editor-block-visibility-breakpoints-toolbar">
+			<ToolbarButton
+				icon={ hasAnyVisibility ? unseen : seen }
+				label={
+					hasAnyVisibility
+						? __( 'Breakpoint visibility set' )
+						: __( 'Set breakpoint visibility' )
+				}
+				onClick={ () => openBreakpointsModal( clientIds ) }
+			/>
+		</ToolbarGroup>
 	);
 }
-

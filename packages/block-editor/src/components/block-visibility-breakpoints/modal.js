@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { useEffect, useState, useMemo } from '@wordpress/element';
 import {
 	Button,
@@ -13,6 +13,7 @@ import {
 } from '@wordpress/components';
 import { desktop, tablet, mobile } from '@wordpress/icons';
 import { useDispatch, useSelect } from '@wordpress/data';
+import { store as blocksStore } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -25,9 +26,18 @@ export default function BlockVisibilityBreakpointsModal( {
 	clientIds,
 	onClose,
 } ) {
-	const blocks = useSelect(
+	const { blocks, blockType } = useSelect(
 		( select ) => {
-			return select( blockEditorStore ).getBlocksByClientId( clientIds );
+			const _blocks =
+				select( blockEditorStore ).getBlocksByClientId( clientIds );
+			const firstBlock = _blocks[ 0 ];
+			const _blockType = firstBlock
+				? select( blocksStore ).getBlockType( firstBlock.name )
+				: null;
+			return {
+				blocks: _blocks,
+				blockType: _blockType,
+			};
 		},
 		[ clientIds ]
 	);
@@ -71,6 +81,49 @@ export default function BlockVisibilityBreakpointsModal( {
 		setHideEverywhere( initialHideEverywhere );
 	}, [ initialBreakpoints, initialHideEverywhere ] );
 
+	// Handle "Hide everywhere" toggle
+	const handleHideEverywhereChange = ( newValue ) => {
+		setHideEverywhere( newValue );
+		if ( newValue ) {
+			// If checking "Hide everywhere", check all breakpoints
+			setBreakpoints( {
+				mobile: true,
+				tablet: true,
+				desktop: true,
+			} );
+		} else {
+			// If unchecking "Hide everywhere", uncheck all breakpoints
+			setBreakpoints( {
+				mobile: false,
+				tablet: false,
+				desktop: false,
+			} );
+		}
+	};
+
+	// Handle individual breakpoint toggle
+	const handleBreakpointChange = ( breakpoint, value ) => {
+		const newBreakpoints = {
+			...breakpoints,
+			[ breakpoint ]: value,
+		};
+		setBreakpoints( newBreakpoints );
+
+		// Check if all breakpoints are now selected
+		const allSelected =
+			newBreakpoints.mobile &&
+			newBreakpoints.tablet &&
+			newBreakpoints.desktop;
+
+		// If all breakpoints are selected, check "Hide everywhere"
+		// If any breakpoint is unchecked and "Hide everywhere" is checked, uncheck it
+		if ( allSelected ) {
+			setHideEverywhere( true );
+		} else if ( hideEverywhere ) {
+			setHideEverywhere( false );
+		}
+	};
+
 	const handleSubmit = ( event ) => {
 		event.preventDefault();
 
@@ -103,9 +156,17 @@ export default function BlockVisibilityBreakpointsModal( {
 		onClose();
 	};
 
+	const modalTitle = blockType?.title
+		? sprintf(
+				/* translators: %s: Block type title (e.g., "Image", "Paragraph") */
+				__( 'Hide %s' ),
+				blockType.title
+		  )
+		: __( 'Hide block' );
+
 	return (
 		<Modal
-			title={ __( 'Hide block' ) }
+			title={ modalTitle }
 			onRequestClose={ onClose }
 			overlayClassName="block-editor-block-visibility-breakpoints-modal"
 			size="small"
@@ -115,43 +176,64 @@ export default function BlockVisibilityBreakpointsModal( {
 				<fieldset className="block-editor-block-visibility-breakpoints-modal__options">
 					<CheckboxControl
 						__nextHasNoMarginBottom
-						label={ __( 'Hide everywhere' ) }
+						label={
+							<span className="block-editor-block-visibility-breakpoints-modal__hide-everywhere">
+								{ __( 'Hide everywhere' ) }
+							</span>
+						}
 						checked={ hideEverywhere }
-						onChange={ setHideEverywhere }
+						onChange={ handleHideEverywhereChange }
 					/>
-					<CheckboxControl
-						__nextHasNoMarginBottom
-						label={ __( 'Hide on mobile' ) }
-						checked={ breakpoints.mobile }
-						onChange={ ( mobile ) =>
-							setBreakpoints( ( prev ) => ( {
-								...prev,
-								mobile,
-							} ) )
-						}
-					/>
-					<CheckboxControl
-						__nextHasNoMarginBottom
-						label={ __( 'Hide on tablet' ) }
-						checked={ breakpoints.tablet }
-						onChange={ ( tablet ) =>
-							setBreakpoints( ( prev ) => ( {
-								...prev,
-								tablet,
-							} ) )
-						}
-					/>
-					<CheckboxControl
-						__nextHasNoMarginBottom
-						label={ __( 'Hide on desktop' ) }
-						checked={ breakpoints.desktop }
-						onChange={ ( desktop ) =>
-							setBreakpoints( ( prev ) => ( {
-								...prev,
-								desktop,
-							} ) )
-						}
-					/>
+					<div className="block-editor-block-visibility-breakpoints-modal__breakpoints">
+						<CheckboxControl
+							__nextHasNoMarginBottom
+							label={
+								<span className="block-editor-block-visibility-breakpoints-modal__label">
+									{ __( 'Hide on desktop' ) }
+									<Icon
+										icon={ desktop }
+										className="block-editor-block-visibility-breakpoints-modal__icon"
+									/>
+								</span>
+							}
+							checked={ breakpoints.desktop }
+							onChange={ ( value ) =>
+								handleBreakpointChange( 'desktop', value )
+							}
+						/>
+						<CheckboxControl
+							__nextHasNoMarginBottom
+							label={
+								<span className="block-editor-block-visibility-breakpoints-modal__label">
+									{ __( 'Hide on tablet' ) }
+									<Icon
+										icon={ tablet }
+										className="block-editor-block-visibility-breakpoints-modal__icon"
+									/>
+								</span>
+							}
+							checked={ breakpoints.tablet }
+							onChange={ ( value ) =>
+								handleBreakpointChange( 'tablet', value )
+							}
+						/>
+						<CheckboxControl
+							__nextHasNoMarginBottom
+							label={
+								<span className="block-editor-block-visibility-breakpoints-modal__label">
+									{ __( 'Hide on mobile' ) }
+									<Icon
+										icon={ mobile }
+										className="block-editor-block-visibility-breakpoints-modal__icon"
+									/>
+								</span>
+							}
+							checked={ breakpoints.mobile }
+							onChange={ ( value ) =>
+								handleBreakpointChange( 'mobile', value )
+							}
+						/>
+					</div>
 				</fieldset>
 				<Flex
 					className="block-editor-block-visibility-breakpoints-modal__actions"
