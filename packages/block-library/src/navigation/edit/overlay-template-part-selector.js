@@ -39,8 +39,8 @@ function parseTemplatePartId( templatePartId ) {
  *
  * @param {Object}   props                          Component props.
  * @param {string}   props.overlayTemplatePart       Currently selected overlay template part ID.
- * @param {Function} props.setAttributes            Function to update block attributes.
- * @param {Function} props.onNavigateToEntityRecord Function to navigate to template part editor.
+ * @param {Function} props.setAttributes             Function to update block attributes.
+ * @param {Function} props.onNavigateToEntityRecord  Function to navigate to template part editor.
  * @return {JSX.Element} The overlay template part selector component.
  */
 export default function OverlayTemplatePartSelector( {
@@ -132,7 +132,7 @@ export default function OverlayTemplatePartSelector( {
 		return (
 			<div>
 				<Spinner />
-				<p>{ __( 'Loading overlay template parts…' ) }</p>
+				<p>{ __( 'Loading overlays…' ) }</p>
 			</div>
 		);
 	}
@@ -142,7 +142,7 @@ export default function OverlayTemplatePartSelector( {
 			<SelectControl
 				__next40pxDefaultSize
 				__nextHasNoMarginBottom
-				label={ __( 'Overlay Template Part' ) }
+				label={ __( 'Overlay' ) }
 				value={ overlayTemplatePart || '' }
 				options={ options }
 				onChange={ handleSelectChange }
@@ -151,11 +151,9 @@ export default function OverlayTemplatePartSelector( {
 				help={
 					overlayTemplateParts.length === 0 && hasResolved
 						? __(
-								'No overlay template parts available. Create one in the Site Editor.'
+								'No overlays available. Create one in the Site Editor.'
 						  )
-						: __(
-								'Select a template part to use as the navigation overlay.'
-						  )
+						: __( 'Select an overlay to use for the navigation.' )
 				}
 			/>
 			<Button
@@ -167,11 +165,11 @@ export default function OverlayTemplatePartSelector( {
 				aria-label={
 					parsedTemplatePart
 						? sprintf(
-								/* translators: %s: Template part title or slug. */
-								__( 'Edit overlay template part: %s' ),
+								/* translators: %s: Overlay title or slug. */
+								__( 'Edit overlay: %s' ),
 								overlayTemplatePart
 						  )
-						: __( 'Edit overlay template part' )
+						: __( 'Edit overlay' )
 				}
 				style={ { marginTop: '8px', width: '100%' } }
 			>
@@ -180,4 +178,3 @@ export default function OverlayTemplatePartSelector( {
 		</div>
 	);
 }
-

@@ -88,7 +88,7 @@ describe( 'OverlayTemplatePartSelector', () => {
 
 			render( <OverlayTemplatePartSelector { ...defaultProps } /> );
 
-			expect( screen.getByText( 'Loading overlay template parts…' ) ).toBeInTheDocument();
+			expect( screen.getByText( 'Loading overlays…' ) ).toBeInTheDocument();
 		} );
 	} );
 
@@ -103,7 +103,7 @@ describe( 'OverlayTemplatePartSelector', () => {
 			render( <OverlayTemplatePartSelector { ...defaultProps } /> );
 
 			const select = screen.getByRole( 'combobox', {
-				name: 'Overlay Template Part',
+				name: 'Overlay',
 			} );
 			expect( select ).toBeInTheDocument();
 			expect( select ).toHaveValue( '' );
@@ -125,7 +125,7 @@ describe( 'OverlayTemplatePartSelector', () => {
 				name: 'Overlay Template Part',
 			} );
 
-			// Should have None + 2 overlay template parts (not the header one)
+			// Should have None + 2 overlays (not the header one)
 			const options = screen.getAllByRole( 'option' );
 			expect( options ).toHaveLength( 3 ); // None + 2 overlay parts
 
@@ -171,7 +171,7 @@ describe( 'OverlayTemplatePartSelector', () => {
 			render( <OverlayTemplatePartSelector { ...defaultProps } /> );
 
 			const select = screen.getByRole( 'combobox', {
-				name: 'Overlay Template Part',
+				name: 'Overlay',
 			} );
 
 			await user.selectOptions( select, 'twentytwentyfive//my-overlay' );
@@ -198,7 +198,7 @@ describe( 'OverlayTemplatePartSelector', () => {
 			);
 
 			const select = screen.getByRole( 'combobox', {
-				name: 'Overlay Template Part',
+				name: 'Overlay',
 			} );
 
 			await user.selectOptions( select, '' );
@@ -223,7 +223,7 @@ describe( 'OverlayTemplatePartSelector', () => {
 			);
 
 			const select = screen.getByRole( 'combobox', {
-				name: 'Overlay Template Part',
+				name: 'Overlay',
 			} );
 
 			expect( select ).toHaveValue( 'twentytwentyfive//my-overlay' );
@@ -241,7 +241,7 @@ describe( 'OverlayTemplatePartSelector', () => {
 			render( <OverlayTemplatePartSelector { ...defaultProps } /> );
 
 			const editButton = screen.getByRole( 'button', {
-				name: 'Edit overlay template part',
+				name: 'Edit overlay',
 			} );
 
 			expect( editButton ).toBeDisabled();
@@ -262,7 +262,7 @@ describe( 'OverlayTemplatePartSelector', () => {
 			);
 
 			const editButton = screen.getByRole( 'button', {
-				name: 'Edit overlay template part',
+				name: 'Edit overlay',
 			} );
 
 			expect( editButton ).toBeDisabled();
@@ -283,7 +283,7 @@ describe( 'OverlayTemplatePartSelector', () => {
 			);
 
 			const editButton = screen.getByRole( 'button', {
-				name: 'Edit overlay template part',
+				name: 'Edit overlay',
 			} );
 
 			expect( editButton ).toBeEnabled();
@@ -305,7 +305,7 @@ describe( 'OverlayTemplatePartSelector', () => {
 			);
 
 			const editButton = screen.getByRole( 'button', {
-				name: 'Edit overlay template part',
+				name: 'Edit overlay',
 			} );
 
 			expect( editButton ).toBeDisabled();
@@ -328,7 +328,7 @@ describe( 'OverlayTemplatePartSelector', () => {
 			);
 
 			const editButton = screen.getByRole( 'button', {
-				name: 'Edit overlay template part',
+				name: 'Edit overlay',
 			} );
 
 			await user.click( editButton );
@@ -352,7 +352,7 @@ describe( 'OverlayTemplatePartSelector', () => {
 			render( <OverlayTemplatePartSelector { ...defaultProps } /> );
 
 			const editButton = screen.getByRole( 'button', {
-				name: 'Edit overlay template part',
+				name: 'Edit overlay',
 			} );
 
 			// Button should be disabled, but try clicking anyway
@@ -365,7 +365,7 @@ describe( 'OverlayTemplatePartSelector', () => {
 	} );
 
 	describe( 'Help text', () => {
-		it( 'should show help text when no overlay template parts are available', () => {
+		it( 'should show help text when no overlays are available', () => {
 			useEntityRecords.mockReturnValue( {
 				records: [],
 				isResolving: false,
@@ -376,12 +376,12 @@ describe( 'OverlayTemplatePartSelector', () => {
 
 			expect(
 				screen.getByText(
-					'No overlay template parts available. Create one in the Site Editor.'
+					'No overlays available. Create one in the Site Editor.'
 				)
 			).toBeInTheDocument();
 		} );
 
-		it( 'should show default help text when overlay template parts are available', () => {
+		it( 'should show default help text when overlays are available', () => {
 			useEntityRecords.mockReturnValue( {
 				records: [ templatePart1 ],
 				isResolving: false,
@@ -392,7 +392,7 @@ describe( 'OverlayTemplatePartSelector', () => {
 
 			expect(
 				screen.getByText(
-					'Select a template part to use as the navigation overlay.'
+					'Select an overlay to use for the navigation.'
 				)
 			).toBeInTheDocument();
 		} );
@@ -414,7 +414,7 @@ describe( 'OverlayTemplatePartSelector', () => {
 			);
 
 			const editButton = screen.getByRole( 'button', {
-				name: /Edit overlay template part/,
+				name: /Edit overlay/,
 			} );
 
 			expect( editButton ).toHaveAccessibleName();
@@ -430,7 +430,7 @@ describe( 'OverlayTemplatePartSelector', () => {
 			render( <OverlayTemplatePartSelector { ...defaultProps } /> );
 
 			const select = screen.getByRole( 'combobox', {
-				name: 'Overlay Template Part',
+				name: 'Overlay',
 			} );
 
 			expect( select ).toBeDisabled();
