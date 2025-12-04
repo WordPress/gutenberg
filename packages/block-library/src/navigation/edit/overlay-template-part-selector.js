@@ -111,14 +111,13 @@ export default function OverlayTemplatePartSelector( {
 	};
 
 	const handleEditClick = () => {
-		if ( ! parsedTemplatePart || ! onNavigateToEntityRecord ) {
+		if ( ! overlayTemplatePart || ! onNavigateToEntityRecord ) {
 			return;
 		}
 
 		onNavigateToEntityRecord( {
-			kind: 'postType',
-			name: 'wp_template_part',
 			postId: overlayTemplatePart,
+			postType: 'wp_template_part',
 		} );
 	};
 
