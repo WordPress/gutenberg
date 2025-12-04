@@ -714,7 +714,26 @@ export const isBlockHidden = ( state, clientId ) => {
 		return false;
 	}
 	const attributes = state.blocks.attributes.get( clientId );
-	return attributes?.metadata?.blockVisibility === false;
+	const blockVisibility = attributes?.metadata?.blockVisibility;
+	const breakpointVisibility =
+		attributes?.metadata?.blockVisibilityBreakpoints;
+
+	// Block is hidden if it's hidden everywhere
+	if ( blockVisibility === false ) {
+		return true;
+	}
+
+	// Block is hidden if it has any breakpoint visibility set
+	if (
+		breakpointVisibility &&
+		( breakpointVisibility.mobile ||
+			breakpointVisibility.tablet ||
+			breakpointVisibility.desktop )
+	) {
+		return true;
+	}
+
+	return false;
 };
 
 /**
