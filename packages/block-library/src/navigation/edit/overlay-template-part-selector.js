@@ -156,25 +156,27 @@ export default function OverlayTemplatePartSelector( {
 						: __( 'Select an overlay to use for the navigation.' )
 				}
 			/>
-			<Button
-				__next40pxDefaultSize
-				variant="secondary"
-				onClick={ handleEditClick }
-				disabled={ isEditButtonDisabled }
-				accessibleWhenDisabled
-				aria-label={
-					parsedTemplatePart
-						? sprintf(
-								/* translators: %s: Overlay title or slug. */
-								__( 'Edit overlay: %s' ),
-								overlayTemplatePart
-						  )
-						: __( 'Edit overlay' )
-				}
-				style={ { marginTop: '8px', width: '100%' } }
-			>
-				{ __( 'Edit' ) }
-			</Button>
+			{ overlayTemplatePart && (
+				<Button
+					__next40pxDefaultSize
+					variant="secondary"
+					onClick={ handleEditClick }
+					disabled={ isEditButtonDisabled }
+					accessibleWhenDisabled
+					aria-label={
+						parsedTemplatePart
+							? sprintf(
+									/* translators: %s: Overlay title or slug. */
+									__( 'Edit overlay: %s' ),
+									overlayTemplatePart
+							  )
+							: __( 'Edit overlay' )
+					}
+					className="wp-block-navigation__overlay-edit-button"
+				>
+					{ __( 'Edit' ) }
+				</Button>
+			) }
 		</div>
 	);
 }
