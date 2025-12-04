@@ -9,7 +9,7 @@ import fastDeepEqual from 'fast-deep-equal/es6';
 import { getBlockBindingsSource } from '@wordpress/blocks';
 import { privateApis as componentsPrivateApis } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
-import { useContext } from '@wordpress/element';
+import { useContext, useMemo } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
 
 /**
@@ -28,12 +28,15 @@ function BlockBindingsSourceFieldsListItem( {
 	source,
 	sourceKey,
 } ) {
-	const itemBindings = {
-		source: sourceKey,
-		args: field.args || {
-			key: field.key,
-		},
-	};
+	const itemBindings = useMemo(
+		() => ( {
+			source: sourceKey,
+			args: field.args || {
+				key: field.key,
+			},
+		} ),
+		[ field.args, field.key, sourceKey ]
+	);
 
 	const blockContext = useContext( BlockContext );
 	const values = useSelect(
