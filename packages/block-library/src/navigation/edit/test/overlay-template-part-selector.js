@@ -103,7 +103,7 @@ describe( 'OverlayTemplatePartSelector', () => {
 			render( <OverlayTemplatePartSelector { ...defaultProps } /> );
 
 			const select = screen.getByRole( 'combobox', {
-				name: 'Overlay',
+				name: 'Overlay template',
 			} );
 			expect( select ).toBeInTheDocument();
 			expect( select ).toHaveValue( '' );
@@ -171,7 +171,7 @@ describe( 'OverlayTemplatePartSelector', () => {
 			render( <OverlayTemplatePartSelector { ...defaultProps } /> );
 
 			const select = screen.getByRole( 'combobox', {
-				name: 'Overlay',
+				name: 'Overlay template',
 			} );
 
 			await user.selectOptions( select, 'twentytwentyfive//my-overlay' );
@@ -198,7 +198,7 @@ describe( 'OverlayTemplatePartSelector', () => {
 			);
 
 			const select = screen.getByRole( 'combobox', {
-				name: 'Overlay',
+				name: 'Overlay template',
 			} );
 
 			await user.selectOptions( select, '' );
@@ -223,7 +223,7 @@ describe( 'OverlayTemplatePartSelector', () => {
 			);
 
 			const select = screen.getByRole( 'combobox', {
-				name: 'Overlay',
+				name: 'Overlay template',
 			} );
 
 			expect( select ).toHaveValue( 'twentytwentyfive//my-overlay' );
@@ -428,7 +428,7 @@ describe( 'OverlayTemplatePartSelector', () => {
 			render( <OverlayTemplatePartSelector { ...defaultProps } /> );
 
 			const select = screen.getByRole( 'combobox', {
-				name: 'Overlay',
+				name: 'Overlay template',
 			} );
 
 			expect( select ).toBeDisabled();

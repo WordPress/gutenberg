@@ -675,88 +675,114 @@ function Navigation( {
 						} }
 						dropdownMenuProps={ dropdownMenuProps }
 					>
-						{ isResponsive && (
+						{ ! isOverlayExperimentEnabled && (
 							<>
-								<Button
-									__next40pxDefaultSize
-									className={ overlayMenuPreviewClasses }
-									onClick={ () => {
-										setOverlayMenuPreview(
-											! overlayMenuPreview
-										);
-									} }
-									aria-label={ __( 'Overlay menu controls' ) }
-									aria-controls={ overlayMenuPreviewId }
-									aria-expanded={ overlayMenuPreview }
-								>
-									{ hasIcon && (
-										<>
-											<OverlayMenuIcon icon={ icon } />
-											<Icon icon={ close } />
-										</>
-									) }
-									{ ! hasIcon && (
-										<>
-											<span>{ __( 'Menu' ) }</span>
-											<span>{ __( 'Close' ) }</span>
-										</>
-									) }
-								</Button>
-								{ overlayMenuPreview && (
-									<VStack
-										id={ overlayMenuPreviewId }
-										spacing={ 4 }
-										style={ {
-											gridColumn: 'span 2',
-										} }
-									>
-										<OverlayMenuPreview
-											setAttributes={ setAttributes }
-											hasIcon={ hasIcon }
-											icon={ icon }
-											hidden={ ! overlayMenuPreview }
-										/>
-									</VStack>
+								{ isResponsive && (
+									<>
+										<Button
+											__next40pxDefaultSize
+											className={
+												overlayMenuPreviewClasses
+											}
+											onClick={ () => {
+												setOverlayMenuPreview(
+													! overlayMenuPreview
+												);
+											} }
+											aria-label={ __(
+												'Overlay menu controls'
+											) }
+											aria-controls={
+												overlayMenuPreviewId
+											}
+											aria-expanded={ overlayMenuPreview }
+										>
+											{ hasIcon && (
+												<>
+													<OverlayMenuIcon
+														icon={ icon }
+													/>
+													<Icon icon={ close } />
+												</>
+											) }
+											{ ! hasIcon && (
+												<>
+													<span>
+														{ __( 'Menu' ) }
+													</span>
+													<span>
+														{ __( 'Close' ) }
+													</span>
+												</>
+											) }
+										</Button>
+										{ overlayMenuPreview && (
+											<VStack
+												id={ overlayMenuPreviewId }
+												spacing={ 4 }
+												style={ {
+													gridColumn: 'span 2',
+												} }
+											>
+												<OverlayMenuPreview
+													setAttributes={
+														setAttributes
+													}
+													hasIcon={ hasIcon }
+													icon={ icon }
+													hidden={
+														! overlayMenuPreview
+													}
+												/>
+											</VStack>
+										) }
+									</>
 								) }
+
+								<ToolsPanelItem
+									hasValue={ () => overlayMenu !== 'mobile' }
+									label={ __( 'Overlay Visibility' ) }
+									onDeselect={ () =>
+										setAttributes( {
+											overlayMenu: 'mobile',
+										} )
+									}
+									isShownByDefault
+								>
+									<ToggleGroupControl
+										__next40pxDefaultSize
+										__nextHasNoMarginBottom
+										label={ __( 'Overlay Visibility' ) }
+										aria-label={ __(
+											'Configure overlay visibility'
+										) }
+										value={ overlayMenu }
+										help={ __(
+											'Collapses the navigation options in a menu icon opening an overlay.'
+										) }
+										onChange={ ( value ) =>
+											setAttributes( {
+												overlayMenu: value,
+											} )
+										}
+										isBlock
+									>
+										<ToggleGroupControlOption
+											value="never"
+											label={ __( 'Off' ) }
+										/>
+										<ToggleGroupControlOption
+											value="mobile"
+											label={ __( 'Mobile' ) }
+										/>
+										<ToggleGroupControlOption
+											value="always"
+											label={ __( 'Always' ) }
+										/>
+									</ToggleGroupControl>
+								</ToolsPanelItem>
 							</>
 						) }
-
-						<ToolsPanelItem
-							hasValue={ () => overlayMenu !== 'mobile' }
-							label={ __( 'Overlay Menu' ) }
-							onDeselect={ () =>
-								setAttributes( { overlayMenu: 'mobile' } )
-							}
-							isShownByDefault
-						>
-							<ToggleGroupControl
-								__next40pxDefaultSize
-								__nextHasNoMarginBottom
-								label={ __( 'Overlay Menu' ) }
-								aria-label={ __( 'Configure overlay menu' ) }
-								value={ overlayMenu }
-								help={ __(
-									'Collapses the navigation options in a menu icon opening an overlay.'
-								) }
-								onChange={ ( value ) =>
-									setAttributes( { overlayMenu: value } )
-								}
-								isBlock
-							>
-								<ToggleGroupControlOption
-									value="never"
-									label={ __( 'Off' ) }
-								/>
-								<ToggleGroupControlOption
-									value="mobile"
-									label={ __( 'Mobile' ) }
-								/>
-								<ToggleGroupControlOption
-									value="always"
-									label={ __( 'Always' ) }
-								/>
-							</ToggleGroupControl>
-						</ToolsPanelItem>
 
 						{ hasSubmenus && (
 							<>
@@ -839,6 +865,13 @@ function Navigation( {
 						overlayTemplatePart={ overlayTemplatePart }
 						setAttributes={ setAttributes }
 						onNavigateToEntityRecord={ onNavigateToEntityRecord }
+						overlayMenuPreview={ overlayMenuPreview }
+						setOverlayMenuPreview={ setOverlayMenuPreview }
+						hasIcon={ hasIcon }
+						icon={ icon }
+						overlayMenuPreviewClasses={ overlayMenuPreviewClasses }
+						overlayMenuPreviewId={ overlayMenuPreviewId }
+						isResponsive={ isResponsive }
 					/>
 				</InspectorControls>
 			) }
