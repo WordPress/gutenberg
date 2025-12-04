@@ -196,6 +196,10 @@ export default function FormPanelField< Item >( {
 				summaryFields={ summaryFields }
 				fieldDefinition={ fieldDefinition }
 				onOpen={ handleOpen }
+				showError={ labelPosition === 'none' ? showError : false }
+				errorMessage={
+					labelPosition === 'none' ? errorMessage : undefined
+				}
 			/>
 		) : (
 			<PanelDropdown
@@ -208,6 +212,10 @@ export default function FormPanelField< Item >( {
 				fieldDefinition={ fieldDefinition }
 				popoverAnchor={ popoverAnchor }
 				onOpen={ handleOpen }
+				showError={ labelPosition === 'none' ? showError : false }
+				errorMessage={
+					labelPosition === 'none' ? errorMessage : undefined
+				}
 			/>
 		);
 
@@ -230,7 +238,9 @@ export default function FormPanelField< Item >( {
 	if ( labelPosition === 'none' ) {
 		return (
 			<div className="dataforms-layouts-panel__field">
-				{ renderedControl }
+				<div className="dataforms-layouts-panel__field-control">
+					{ renderedControl }
+				</div>
 			</div>
 		);
 	}
