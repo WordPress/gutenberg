@@ -152,8 +152,6 @@ function PanelModal< Item >( {
 	summaryFields,
 	fieldDefinition,
 	onOpen,
-	showError,
-	errorMessage,
 }: {
 	data: Item;
 	field: NormalizedFormField;
@@ -162,8 +160,6 @@ function PanelModal< Item >( {
 	summaryFields: NormalizedField< Item >[];
 	fieldDefinition: NormalizedField< Item >;
 	onOpen?: () => void;
-	showError?: boolean;
-	errorMessage?: string;
 } ) {
 	const [ isOpen, setIsOpen ] = useState( false );
 
@@ -184,8 +180,6 @@ function PanelModal< Item >( {
 					setIsOpen( true );
 				} }
 				aria-expanded={ isOpen }
-				showError={ showError }
-				errorMessage={ errorMessage }
 			/>
 			{ isOpen && (
 				<ModalContent

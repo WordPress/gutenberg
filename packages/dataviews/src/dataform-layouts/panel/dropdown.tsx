@@ -70,8 +70,6 @@ function PanelDropdown< Item >( {
 	fieldDefinition,
 	popoverAnchor,
 	onOpen,
-	showError,
-	errorMessage,
 }: {
 	data: Item;
 	field: NormalizedFormField;
@@ -82,8 +80,6 @@ function PanelDropdown< Item >( {
 	fieldDefinition: NormalizedField< Item >;
 	popoverAnchor: HTMLElement | null;
 	onOpen?: () => void;
-	showError?: boolean;
-	errorMessage?: string;
 } ) {
 	const fieldLabel = !! field.children ? field.label : fieldDefinition?.label;
 
@@ -148,8 +144,6 @@ function PanelDropdown< Item >( {
 						onToggle();
 					} }
 					aria-expanded={ isOpen }
-					showError={ showError }
-					errorMessage={ errorMessage }
 				/>
 			) }
 			renderContent={ ( { onClose } ) => (

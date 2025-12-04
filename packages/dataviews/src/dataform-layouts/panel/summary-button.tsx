@@ -1,9 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { Button, Icon, Tooltip } from '@wordpress/components';
+import { Button } from '@wordpress/components';
 import { sprintf, _x } from '@wordpress/i18n';
-import { error as errorIcon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -18,8 +17,6 @@ function SummaryButton< Item >( {
 	disabled,
 	onClick,
 	'aria-expanded': ariaExpanded,
-	showError,
-	errorMessage,
 }: {
 	summaryFields: NormalizedField< Item >[];
 	data: Item;
@@ -28,8 +25,6 @@ function SummaryButton< Item >( {
 	disabled?: boolean;
 	onClick: () => void;
 	'aria-expanded'?: boolean;
-	showError?: boolean;
-	errorMessage?: string;
 } ) {
 	return (
 		<Button
@@ -59,13 +54,6 @@ function SummaryButton< Item >( {
 					: undefined
 			}
 		>
-			{ showError && (
-				<Tooltip text={ errorMessage } placement="top">
-					<span className="dataforms-layouts-panel__field-error-indicator">
-						<Icon icon={ errorIcon } size={ 20 } />
-					</span>
-				</Tooltip>
-			) }
 			{ summaryFields.length > 1 ? (
 				<div
 					style={ {
