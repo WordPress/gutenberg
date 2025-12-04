@@ -179,6 +179,7 @@ const transforms = {
 						createBlock( 'core/image', {
 							id: imageId,
 							...( size && { sizeSlug: size } ),
+							initFromId: true,
 						} )
 					)
 				);

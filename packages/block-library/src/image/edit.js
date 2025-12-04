@@ -24,6 +24,7 @@ import { __, sprintf } from '@wordpress/i18n';
 import { image as icon, plugins as pluginsIcon } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
 import { useResizeObserver } from '@wordpress/compose';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -108,6 +109,7 @@ export function ImageEdit( {
 		scale,
 		align,
 		metadata,
+		initFromId,
 	} = attributes;
 
 	const [ temporaryURL, setTemporaryURL ] = useState( attributes.blob );
@@ -133,6 +135,40 @@ export function ImageEdit( {
 
 	const { __unstableMarkNextChangeAsNotPersistent, replaceBlock } =
 		useDispatch( blockEditorStore );
+
+	// Fetch the image from the media library when initFromId is set.
+	// This is used to populate the caption when converting from gallery shortcode.
+	const imageForInit = useSelect(
+		( select ) => {
+			if ( ! initFromId || ! id ) {
+				return null;
+			}
+			return select( coreStore ).getMedia( id, { context: 'view' } );
+		},
+		[ id, initFromId ]
+	);
+
+	// Once we have fetched the image data, update the block attributes
+	// with the caption from the media library.
+	useEffect( () => {
+		if ( ! initFromId || ! imageForInit ) {
+			return;
+		}
+
+		const mediaCaption = imageForInit.caption?.raw;
+
+		// Set the caption from the media library and clear the initFromId flag.
+		__unstableMarkNextChangeAsNotPersistent();
+		setAttributes( {
+			caption: mediaCaption,
+			initFromId: undefined,
+		} );
+	}, [
+		initFromId,
+		imageForInit,
+		__unstableMarkNextChangeAsNotPersistent,
+		setAttributes,
+	] );
 
 	useEffect( () => {
 		if ( [ 'wide', 'full' ].includes( align ) ) {
