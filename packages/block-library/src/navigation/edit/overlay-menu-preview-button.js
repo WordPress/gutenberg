@@ -71,9 +71,9 @@ export default function OverlayMenuPreviewButton( {
 					style={ containerStyle }
 				>
 					<OverlayMenuPreviewControls
-						setAttributes={ setAttributes }
 						hasIcon={ hasIcon }
 						icon={ icon }
+						setAttributes={ setAttributes }
 					/>
 				</VStack>
 			) }
