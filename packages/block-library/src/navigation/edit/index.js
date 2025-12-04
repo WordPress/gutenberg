@@ -62,9 +62,10 @@ import NavigationMenuNameControl from './navigation-menu-name-control';
 import UnsavedInnerBlocks from './unsaved-inner-blocks';
 import NavigationMenuDeleteControl from './navigation-menu-delete-control';
 import useNavigationNotice from './use-navigation-notice';
-import OverlayMenuIcon from './overlay-menu-icon';
 import OverlayMenuPreview from './overlay-menu-preview';
 import OverlayPanel from './overlay-panel';
+import OverlayVisibilityControl from './overlay-visibility-control';
+import OverlayMenuPreviewButton from './overlay-menu-preview-button';
 import useConvertClassicToBlockMenu, {
 	CLASSIC_MENU_CONVERSION_ERROR,
 	CLASSIC_MENU_CONVERSION_PENDING,
@@ -678,65 +679,27 @@ function Navigation( {
 						{ ! isOverlayExperimentEnabled && (
 							<>
 								{ isResponsive && (
-									<>
-										<Button
-											__next40pxDefaultSize
-											className={
-												overlayMenuPreviewClasses
-											}
-											onClick={ () => {
-												setOverlayMenuPreview(
-													! overlayMenuPreview
-												);
-											} }
-											aria-label={ __(
-												'Overlay menu controls'
-											) }
-											aria-controls={
-												overlayMenuPreviewId
-											}
-											aria-expanded={ overlayMenuPreview }
-										>
-											{ hasIcon && (
-												<>
-													<OverlayMenuIcon
-														icon={ icon }
-													/>
-													<Icon icon={ close } />
-												</>
-											) }
-											{ ! hasIcon && (
-												<>
-													<span>
-														{ __( 'Menu' ) }
-													</span>
-													<span>
-														{ __( 'Close' ) }
-													</span>
-												</>
-											) }
-										</Button>
-										{ overlayMenuPreview && (
-											<VStack
-												id={ overlayMenuPreviewId }
-												spacing={ 4 }
-												style={ {
-													gridColumn: 'span 2',
-												} }
-											>
-												<OverlayMenuPreview
-													setAttributes={
-														setAttributes
-													}
-													hasIcon={ hasIcon }
-													icon={ icon }
-													hidden={
-														! overlayMenuPreview
-													}
-												/>
-											</VStack>
-										) }
-									</>
+									<OverlayMenuPreviewButton
+										isResponsive={ isResponsive }
+										overlayMenuPreview={
+											overlayMenuPreview
+										}
+										setOverlayMenuPreview={
+											setOverlayMenuPreview
+										}
+										hasIcon={ hasIcon }
+										icon={ icon }
+										setAttributes={ setAttributes }
+										overlayMenuPreviewClasses={
+											overlayMenuPreviewClasses
+										}
+										overlayMenuPreviewId={
+											overlayMenuPreviewId
+										}
+										containerStyle={ {
+											gridColumn: 'span 2',
+										} }
+									/>
 								) }
 
 								<ToolsPanelItem
@@ -749,37 +712,10 @@ function Navigation( {
 									}
 									isShownByDefault
 								>
-									<ToggleGroupControl
-										__next40pxDefaultSize
-										__nextHasNoMarginBottom
-										label={ __( 'Overlay Visibility' ) }
-										aria-label={ __(
-											'Configure overlay visibility'
-										) }
-										value={ overlayMenu }
-										help={ __(
-											'Collapses the navigation options in a menu icon opening an overlay.'
-										) }
-										onChange={ ( value ) =>
-											setAttributes( {
-												overlayMenu: value,
-											} )
-										}
-										isBlock
-									>
-										<ToggleGroupControlOption
-											value="never"
-											label={ __( 'Off' ) }
-										/>
-										<ToggleGroupControlOption
-											value="mobile"
-											label={ __( 'Mobile' ) }
-										/>
-										<ToggleGroupControlOption
-											value="always"
-											label={ __( 'Always' ) }
-										/>
-									</ToggleGroupControl>
+									<OverlayVisibilityControl
+										overlayMenu={ overlayMenu }
+										setAttributes={ setAttributes }
+									/>
 								</ToolsPanelItem>
 							</>
 						) }
