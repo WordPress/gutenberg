@@ -295,19 +295,13 @@ function BlockFields( { clientId } ) {
 				field.Edit = createConfiguredControl( {
 					control: fieldDef.type,
 					clientId,
-					updateBlockAttributes,
 					fieldDef,
 				} );
 			}
 
 			return field;
 		} );
-	}, [
-		blockTypeFields,
-		blockType?.attributes,
-		clientId,
-		updateBlockAttributes,
-	] );
+	}, [ blockTypeFields, blockType?.attributes, clientId ] );
 
 	const handleToggleField = ( fieldId ) => {
 		setForm( ( prev ) => {
@@ -351,26 +345,7 @@ function BlockFields( { clientId } ) {
 				fields={ dataFormFields }
 				form={ form }
 				onChange={ ( changes ) => {
-					// Map field values to block attributes using field.setValue
-					const mappedChanges = {};
-					Object.entries( changes ).forEach(
-						( [ fieldId, fieldValue ] ) => {
-							const field = dataFormFields.find(
-								( f ) => f.id === fieldId
-							);
-							if ( field && field.setValue ) {
-								const updates = field.setValue( {
-									item: attributes,
-									value: fieldValue,
-								} );
-								Object.assign( mappedChanges, updates );
-							} else {
-								// For fields without setValue, use the value directly
-								mappedChanges[ fieldId ] = fieldValue;
-							}
-						}
-					);
-					updateBlockAttributes( clientId, mappedChanges );
+					updateBlockAttributes( clientId, changes );
 				} }
 			/>
 		</div>

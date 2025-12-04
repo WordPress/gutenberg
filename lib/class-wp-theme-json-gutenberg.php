@@ -1292,6 +1292,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * It is recursive and modifies the input in-place.
 	 *
 	 * @since 5.8.0
+	 * @since 7.0.0 Added type validation for boolean values.
 	 *
 	 * @param array $tree   Input to process.
 	 * @param array $schema Schema to adhere to.
@@ -3821,10 +3822,10 @@ class WP_Theme_JSON_Gutenberg {
 	 *
 	 * @since 7.0.0
 	 *
-	 * @param array $input  Input settings to process.
-	 * @param array $output Output settings array (passed by reference).
-	 * @param array $schema Schema to validate against (typically VALID_SETTINGS).
-	 * @param array $path   Current path in the schema (for recursive calls).
+	 * @param array             $input  Input settings to process.
+	 * @param array             $output Output settings array (passed by reference).
+	 * @param array             $schema Schema to validate against (typically VALID_SETTINGS).
+	 * @param array<string|int> $path   Current path in the schema (for recursive calls).
 	 */
 	private static function preserve_valid_typed_settings( $input, &$output, $schema, $path = array() ) {
 		foreach ( $schema as $key => $schema_value ) {
@@ -3837,7 +3838,7 @@ class WP_Theme_JSON_Gutenberg {
 					_wp_array_set( $output, $current_path, $value ); // Preserve boolean value.
 				}
 			} elseif ( is_array( $schema_value ) ) {
-				static::preserve_valid_typed_settings( $input, $output, $schema_value, $current_path ); // Recurse into nested structure.
+				self::preserve_valid_typed_settings( $input, $output, $schema_value, $current_path ); // Recurse into nested structure.
 			}
 		}
 	}
@@ -3902,7 +3903,7 @@ class WP_Theme_JSON_Gutenberg {
 		static::remove_indirect_properties( $input, $output );
 
 		// Preserve all valid settings that have type markers in VALID_SETTINGS.
-		static::preserve_valid_typed_settings( $input, $output, static::VALID_SETTINGS );
+		self::preserve_valid_typed_settings( $input, $output, static::VALID_SETTINGS );
 
 		return $output;
 	}

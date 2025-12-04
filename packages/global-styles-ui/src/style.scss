@@ -277,6 +277,10 @@
 	}
 }
 
+.global-styles-ui-screen-root__active-style-tile-preview {
+	clip-path: border-box;
+}
+
 .global-styles-ui-color-palette-panel,
 .global-styles-ui-gradient-palette-panel {
 	padding: variables.$grid-unit-20;

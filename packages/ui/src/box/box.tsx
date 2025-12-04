@@ -84,9 +84,9 @@ export const Box = forwardRef< HTMLDivElement, BoxProps >( function Box(
 		backgroundColor,
 		color,
 		padding,
-		bg = backgroundColor,
-		fg = color,
-		p = padding,
+		borderRadius,
+		borderWidth,
+		borderColor,
 		render = DEFAULT_RENDER,
 		...props
 	},
@@ -94,19 +94,32 @@ export const Box = forwardRef< HTMLDivElement, BoxProps >( function Box(
 ) {
 	const style: React.CSSProperties = {};
 
-	if ( bg ) {
-		style.backgroundColor = `var(--wpds-color-bg-${ target }-${ bg }, var(--wpds-color-bg-surface-${ bg }))`;
+	if ( backgroundColor ) {
+		style.backgroundColor = `var(--wpds-color-bg-${ target }-${ backgroundColor }, var(--wpds-color-bg-surface-${ backgroundColor }))`;
 	}
 
-	if ( fg ) {
-		style.color = `var(--wpds-color-fg-${ target }-${ fg }, var(--wpds-color-fg-content-${ fg }))`;
+	if ( color ) {
+		style.color = `var(--wpds-color-fg-${ target }-${ color }, var(--wpds-color-fg-content-${ color }))`;
 	}
 
-	if ( p ) {
+	if ( padding ) {
 		Object.assign(
 			style,
-			getDimensionVariantStyles( 'padding', target, p )
+			getDimensionVariantStyles( 'padding', target, padding )
 		);
+	}
+
+	if ( borderRadius ) {
+		style.borderRadius = `var(--wpds-border-radius-${ target }-${ borderRadius }, var(--wpds-border-radius-surface-${ borderRadius }))`;
+	}
+
+	if ( borderWidth ) {
+		style.borderWidth = `var(--wpds-border-width-${ target }-${ borderWidth }, var(--wpds-border-width-surface-${ borderWidth }))`;
+		style.borderStyle = 'solid';
+	}
+
+	if ( borderColor ) {
+		style.borderColor = `var(--wpds-color-stroke-${ target }-${ borderColor }, var(--wpds-color-stroke-surface-${ borderColor }))`;
 	}
 
 	return renderElement< 'div' >( render, { style, ...props }, ref );

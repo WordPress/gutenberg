@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { toDate } from 'date-fns';
+import { UTCDateMini } from '@date-fns/utc';
 
 /**
  * Internal dependencies
@@ -11,14 +12,22 @@ import type { InputAction } from '../input-control/reducer/actions';
 import { COMMIT, PRESS_DOWN, PRESS_UP } from '../input-control/reducer/actions';
 
 /**
- * Like date-fn's toDate, but tries to guess the format when a string is
- * given.
+ * Like date-fns's toDate, but tries to guess the format when a string is
+ * given. For timezoneless strings, parse it as UTC using `@date-fns/utc` to
+ * ensure calendar dates remain consistent across different browser timezones.
  *
  * @param input Value to turn into a date.
  */
 export function inputToDate( input: Date | string | number ): Date {
 	if ( typeof input === 'string' ) {
-		return new Date( input );
+		// Strings without timezone indicators are parsed as UTC to prevent day-
+		// shift bugs across browser timezones. Note that JavaScript doesn't
+		// fully support ISO-8601 time strings, so the behavior of passing these
+		// through to the Date constructor is non-deterministic.
+		//
+		// See: https://tc39.es/ecma262/#sec-date-time-string-format
+		const hasTimezone = /Z|[+-]\d{2}(:?\d{2})?$/.test( input );
+		return hasTimezone ? new Date( input ) : new UTCDateMini( input + 'Z' );
 	}
 	return toDate( input );
 }

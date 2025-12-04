@@ -30,7 +30,7 @@ import DataViewsViewConfig, {
 	DataviewsViewConfigDropdown,
 	ViewTypeMenu,
 } from '../dataviews-view-config';
-import normalizeFields from '../../field-types/utils/normalize-fields';
+import normalizeFields from '../../field-types';
 import type { Action, Field, View, SupportedLayouts } from '../../types';
 import type { SelectionOrUpdater } from '../../types/private';
 type ItemWithId = { id: string };

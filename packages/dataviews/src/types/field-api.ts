@@ -61,7 +61,7 @@ export type Operator =
 	| 'inThePast'
 	| 'over';
 
-export type FieldType =
+export type FieldTypeName =
 	| 'text'
 	| 'integer'
 	| 'number'
@@ -80,12 +80,44 @@ export type Rules< Item > = {
 	required?: boolean;
 	elements?: boolean;
 	pattern?: string;
+	minLength?: number;
+	maxLength?: number;
+	min?: number;
+	max?: number;
 	custom?:
 		| ( ( item: Item, field: NormalizedField< Item > ) => null | string )
 		| ( (
 				item: Item,
 				field: NormalizedField< Item >
 		  ) => Promise< null | string > );
+};
+
+export type Validator< Item > = (
+	item: Item,
+	field: NormalizedField< Item >
+) => boolean;
+
+export type CustomValidator< Item > =
+	| ( ( item: Item, field: NormalizedField< Item > ) => null | string )
+	| ( (
+			item: Item,
+			field: NormalizedField< Item >
+	  ) => Promise< null | string > );
+
+type NormalizedRule< Item, ConstraintType > = {
+	constraint: ConstraintType;
+	validate: Validator< Item >;
+};
+
+export type NormalizedRules< Item > = {
+	required?: NormalizedRule< Item, boolean >;
+	elements?: NormalizedRule< Item, boolean >;
+	pattern?: NormalizedRule< Item, string >;
+	minLength?: NormalizedRule< Item, number >;
+	maxLength?: NormalizedRule< Item, number >;
+	min?: NormalizedRule< Item, number >;
+	max?: NormalizedRule< Item, number >;
+	custom?: CustomValidator< Item >;
 };
 
 /**
@@ -118,7 +150,7 @@ export type EditConfigText = {
  * Edit configuration for other control types (excluding 'text' and 'textarea').
  */
 export type EditConfigGeneric = {
-	control: Exclude< FieldType, 'text' | 'textarea' >;
+	control: Exclude< FieldTypeName, 'text' | 'textarea' >;
 };
 
 /**
@@ -137,7 +169,7 @@ export type Field< Item > = {
 	/**
 	 * Type of the fields.
 	 */
-	type?: FieldType;
+	type?: FieldTypeName;
 
 	/**
 	 * The unique identifier of the field.
@@ -241,10 +273,8 @@ export type Field< Item > = {
 	/**
 	 * Display format configuration for fields.
 	 */
-	format?: FormatDate;
+	format?: FormatDate | FormatNumber | FormatInteger;
 };
-
-export type NormalizedFormat = Required< FormatDate > | {};
 
 /**
  * Format for date fields:
@@ -260,7 +290,33 @@ export type FormatDate = {
 };
 export type DayNumber = 0 | 1 | 2 | 3 | 4 | 5 | 6;
 
-type NormalizedFieldBase< Item > = Omit< Field< Item >, 'Edit' > & {
+/**
+ * Format for number fields:
+ *
+ * - separatorThousand: character to use for thousand separators (e.g., ',')
+ * - separatorDecimal: character to use for decimal point (e.g., '.')
+ * - decimals: number of decimal places to display (e.g., 2)
+ *
+ * If not provided, defaults to ',' for thousands, '.' for decimal, 2 decimals.
+ */
+export type FormatNumber = {
+	separatorThousand?: string;
+	separatorDecimal?: string;
+	decimals?: number;
+};
+
+/**
+ * Format for integer fields:
+ *
+ * - separatorThousand: character to use for thousand separators (e.g., ',')
+ *
+ * If not provided, defaults to ',' for thousands.
+ */
+export type FormatInteger = {
+	separatorThousand?: string;
+};
+
+type NormalizedFieldBase< Item > = Omit< Field< Item >, 'Edit' | 'isValid' > & {
 	label: string;
 	header: string | ReactElement;
 	getValue: ( args: { item: Item } ) => any;
@@ -269,7 +325,7 @@ type NormalizedFieldBase< Item > = Omit< Field< Item >, 'Edit' > & {
 	Edit: ComponentType< DataFormControlProps< Item > > | null;
 	hasElements: boolean;
 	sort: ( a: Item, b: Item, direction: SortDirection ) => number;
-	isValid: Rules< Item >;
+	isValid: NormalizedRules< Item >;
 	enableHiding: boolean;
 	enableSorting: boolean;
 	filterBy: Required< FilterByConfig > | false;
@@ -282,9 +338,21 @@ export type NormalizedFieldDate< Item > = NormalizedFieldBase< Item > & {
 	format: Required< FormatDate >;
 };
 
+export type NormalizedFieldNumber< Item > = NormalizedFieldBase< Item > & {
+	type: 'number';
+	format: Required< FormatNumber >;
+};
+
+export type NormalizedFieldInteger< Item > = NormalizedFieldBase< Item > & {
+	type: 'integer';
+	format: Required< FormatInteger >;
+};
+
 export type NormalizedField< Item > =
 	| NormalizedFieldBase< Item >
-	| NormalizedFieldDate< Item >;
+	| NormalizedFieldDate< Item >
+	| NormalizedFieldNumber< Item >
+	| NormalizedFieldInteger< Item >;
 
 /**
  * A collection of dataview fields for a data type.
@@ -297,6 +365,22 @@ export type FieldValidity = {
 		message?: string;
 	};
 	pattern?: {
+		type: 'valid' | 'invalid' | 'validating';
+		message: string;
+	};
+	min?: {
+		type: 'valid' | 'invalid' | 'validating';
+		message: string;
+	};
+	max?: {
+		type: 'valid' | 'invalid' | 'validating';
+		message: string;
+	};
+	minLength?: {
+		type: 'valid' | 'invalid' | 'validating';
+		message: string;
+	};
+	maxLength?: {
 		type: 'valid' | 'invalid' | 'validating';
 		message: string;
 	};

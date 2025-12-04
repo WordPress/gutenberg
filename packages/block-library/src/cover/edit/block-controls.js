@@ -107,7 +107,6 @@ export default function CoverBlockControls( {
 					mediaId={ id }
 					mediaURL={ url }
 					allowedTypes={ ALLOWED_MEDIA_TYPES }
-					accept="image/*,video/*"
 					onSelect={ onSelectMedia }
 					onToggleFeaturedImage={ toggleUseFeaturedImage }
 					useFeaturedImage={ useFeaturedImage }

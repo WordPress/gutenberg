@@ -2,66 +2,15 @@
  * WordPress dependencies
  */
 import type { FontFamilyPreset } from '@wordpress/global-styles-engine';
+import type { FontFamily, FontFace } from '@wordpress/core-data';
 
-export interface CollectionFontFace {
-	id: string;
-	font_face_settings: FontFace;
-}
-
-export interface FontFace {
-	fontFamily: string;
-	fontStyle?: string;
-	fontWeight?: string | number;
-	src?: string | string[];
-	preview?: string;
+export type FontFaceToUpload = FontFace & {
 	file?: File | File[];
-	fake?: boolean;
-	id?: string;
-	fontDisplay?: string;
-	fontStretch?: string;
-	fontVariant?: string;
-	fontFeatureSettings?: string;
-	fontVariationSettings?: string;
-	unicodeRange?: string;
-}
+};
 
-export interface CollectionFontFamily {
-	id: string;
-	font_family_settings: FontFamily;
-	categories?: string[];
-	_embedded?: {
-		font_faces?: CollectionFontFace[];
-	};
-}
-
-export interface FontFamily {
-	name: string;
-	slug: string;
-	fontFamily: string;
-	fontFace?: FontFace[];
-	preview?: string;
-	id?: string;
-	source?: string;
-	version?: string;
-	author?: string;
-	license?: string;
-	description?: string;
-	tags?: string[];
-	variants?: FontFace[];
-	category?: string;
-}
-
-export interface FontCollection {
-	id: string;
-	slug: string;
-	name: string;
-	description?: string;
-	font_families?: CollectionFontFamily[];
-	categories?: {
-		slug: string;
-		name: string;
-	}[];
-}
+export type FontFamilyToUpload = Omit< FontFamily, 'fontFace' > & {
+	fontFace?: FontFaceToUpload[];
+};
 
 export interface FontLibraryState {
 	isInstalling: boolean;
@@ -75,7 +24,6 @@ export interface FontLibraryState {
 	uninstallFontFamily: ( fontFamily: FontFamily ) => Promise< {
 		deleted: boolean;
 	} >;
-	refreshLibrary: () => void;
 	// Additional properties found in the codebase
 	baseCustomFonts: FontFamily[];
 	modalTabOpen: string;
@@ -100,8 +48,6 @@ export interface FontLibraryState {
 			| undefined
 	) => Promise< void >;
 	isResolvingLibrary: boolean;
-	collections: FontCollection[];
-	getFontCollection: ( slug: string ) => Promise< FontCollection | void >;
 }
 
 export interface FontDemoProps {
