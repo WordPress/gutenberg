@@ -577,11 +577,12 @@ describe( 'rawHandler', () => {
 		expect( blocks[ 0 ].name ).toBe( 'core/gallery' );
 		expect( blocks[ 0 ].attributes.columns ).toBe( 2 );
 		expect( blocks[ 0 ].attributes.sizeSlug ).toBe( 'medium' );
-		// Check inner image blocks also have the size
+		// Check inner image blocks also have the size and initFromId flag
 		expect( blocks[ 0 ].innerBlocks ).toHaveLength( 3 );
 		blocks[ 0 ].innerBlocks.forEach( ( innerBlock ) => {
 			expect( innerBlock.name ).toBe( 'core/image' );
 			expect( innerBlock.attributes.sizeSlug ).toBe( 'medium' );
+			expect( innerBlock.attributes.initFromId ).toBe( true );
 		} );
 	} );
 
@@ -593,12 +594,13 @@ describe( 'rawHandler', () => {
 		expect( blocks[ 0 ].attributes.columns ).toBe( 3 );
 		// sizeSlug defaults to 'large' when not provided (per block.json)
 		expect( blocks[ 0 ].attributes.sizeSlug ).toBe( 'large' );
-		// Inner blocks should not have sizeSlug explicitly set
+		// Inner blocks should not have sizeSlug explicitly set but should have initFromId
 		expect( blocks[ 0 ].innerBlocks ).toHaveLength( 3 );
 		blocks[ 0 ].innerBlocks.forEach( ( innerBlock ) => {
 			expect( innerBlock.name ).toBe( 'core/image' );
 			// Image blocks don't have a default sizeSlug, so when not provided it should be undefined
 			expect( innerBlock.attributes.sizeSlug ).toBeUndefined();
+			expect( innerBlock.attributes.initFromId ).toBe( true );
 		} );
 	} );
 } );
