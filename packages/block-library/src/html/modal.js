@@ -50,9 +50,8 @@ export default function HTMLEditModal( {
 
 	// Show CSS/JS tabs only if user has unfiltered_html capability
 	// This prevents users from adding CSS/JS they can't actually save
-	const canShowAdvancedTabs = canUserUseUnfilteredHTML;
-	const shouldShowCssTab = canShowAdvancedTabs;
-	const shouldShowJsTab = canShowAdvancedTabs;
+	const shouldShowCssTab = canUserUseUnfilteredHTML;
+	const shouldShowJsTab = canUserUseUnfilteredHTML;
 
 	if ( ! isOpen ) {
 		return null;
