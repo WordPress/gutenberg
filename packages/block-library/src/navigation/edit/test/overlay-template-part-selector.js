@@ -88,7 +88,9 @@ describe( 'OverlayTemplatePartSelector', () => {
 
 			render( <OverlayTemplatePartSelector { ...defaultProps } /> );
 
-			expect( screen.getByText( 'Loading overlays…' ) ).toBeInTheDocument();
+			expect(
+				screen.getByText( 'Loading overlays…' )
+			).toBeInTheDocument();
 		} );
 	} );
 
@@ -109,7 +111,9 @@ describe( 'OverlayTemplatePartSelector', () => {
 			expect( select ).toHaveValue( '' );
 
 			// Check for "None (default)" option
-			expect( screen.getByRole( 'option', { name: 'None (default)' } ) ).toBeInTheDocument();
+			expect(
+				screen.getByRole( 'option', { name: 'None (default)' } )
+			).toBeInTheDocument();
 		} );
 
 		it( 'should filter template parts by overlay area', () => {
@@ -122,7 +126,7 @@ describe( 'OverlayTemplatePartSelector', () => {
 			render( <OverlayTemplatePartSelector { ...defaultProps } /> );
 
 			screen.getByRole( 'combobox', {
-				name: 'Overlay Template Part',
+				name: 'Overlay template',
 			} );
 
 			// Should have None + 2 overlays (not the header one)
@@ -231,7 +235,7 @@ describe( 'OverlayTemplatePartSelector', () => {
 	} );
 
 	describe( 'Edit button', () => {
-		it( 'should be disabled when no template part is selected', () => {
+		it( 'should not render when no template part is selected', () => {
 			useEntityRecords.mockReturnValue( {
 				records: [ templatePart1 ],
 				isResolving: false,
@@ -240,14 +244,14 @@ describe( 'OverlayTemplatePartSelector', () => {
 
 			render( <OverlayTemplatePartSelector { ...defaultProps } /> );
 
-			const editButton = screen.getByRole( 'button', {
+			const editButton = screen.queryByRole( 'button', {
 				name: 'Edit overlay',
 			} );
 
-			expect( editButton ).toBeDisabled();
+			expect( editButton ).not.toBeInTheDocument();
 		} );
 
-		it( 'should be disabled when template parts are loading', () => {
+		it( 'should not render button when template parts are initially loading', () => {
 			useEntityRecords.mockReturnValue( {
 				records: [ templatePart1 ],
 				isResolving: true,
@@ -261,11 +265,15 @@ describe( 'OverlayTemplatePartSelector', () => {
 				/>
 			);
 
-			const editButton = screen.getByRole( 'button', {
-				name: 'Edit overlay',
-			} );
-
-			expect( editButton ).toBeDisabled();
+			// Component shows spinner when initially loading, button doesn't render
+			expect(
+				screen.getByText( 'Loading overlays…' )
+			).toBeInTheDocument();
+			expect(
+				screen.queryByRole( 'button', {
+					name: /Edit overlay/,
+				} )
+			).not.toBeInTheDocument();
 		} );
 
 		it( 'should be enabled when a valid template part is selected', () => {
@@ -283,7 +291,8 @@ describe( 'OverlayTemplatePartSelector', () => {
 			);
 
 			const editButton = screen.getByRole( 'button', {
-				name: 'Edit overlay',
+				name: ( accessibleName ) =>
+					accessibleName.startsWith( 'Edit overlay' ),
 			} );
 
 			expect( editButton ).toBeEnabled();
@@ -305,10 +314,12 @@ describe( 'OverlayTemplatePartSelector', () => {
 			);
 
 			const editButton = screen.getByRole( 'button', {
-				name: 'Edit overlay',
+				name: ( accessibleName ) =>
+					accessibleName.startsWith( 'Edit overlay' ),
 			} );
 
-			expect( editButton ).toBeDisabled();
+			// Button uses accessibleWhenDisabled, so it has aria-disabled instead of disabled
+			expect( editButton ).toHaveAttribute( 'aria-disabled', 'true' );
 		} );
 
 		it( 'should call onNavigateToEntityRecord when edit button is clicked', async () => {
@@ -328,15 +339,15 @@ describe( 'OverlayTemplatePartSelector', () => {
 			);
 
 			const editButton = screen.getByRole( 'button', {
-				name: 'Edit overlay',
+				name: ( accessibleName ) =>
+					accessibleName.startsWith( 'Edit overlay' ),
 			} );
 
 			await user.click( editButton );
 
 			expect( mockOnNavigateToEntityRecord ).toHaveBeenCalledWith( {
-				kind: 'postType',
-				name: 'wp_template_part',
 				postId: 'twentytwentyfive//my-overlay',
+				postType: 'wp_template_part',
 			} );
 		} );
 
@@ -349,15 +360,23 @@ describe( 'OverlayTemplatePartSelector', () => {
 				hasResolved: true,
 			} );
 
-			render( <OverlayTemplatePartSelector { ...defaultProps } /> );
+			render(
+				<OverlayTemplatePartSelector
+					{ ...defaultProps }
+					overlayTemplatePart="twentytwentyfive//my-overlay"
+					onNavigateToEntityRecord={ undefined }
+				/>
+			);
 
 			const editButton = screen.getByRole( 'button', {
-				name: 'Edit overlay',
+				name: ( accessibleName ) =>
+					accessibleName.startsWith( 'Edit overlay' ),
 			} );
 
-			// Button should be disabled, but try clicking anyway
-			expect( editButton ).toBeDisabled();
+			// Button uses accessibleWhenDisabled, so it has aria-disabled instead of disabled
+			expect( editButton ).toHaveAttribute( 'aria-disabled', 'true' );
 
+			// Even if clicked, the handler checks for onNavigateToEntityRecord and won't call it
 			await user.click( editButton );
 
 			expect( mockOnNavigateToEntityRecord ).not.toHaveBeenCalled();
@@ -412,27 +431,31 @@ describe( 'OverlayTemplatePartSelector', () => {
 			);
 
 			const editButton = screen.getByRole( 'button', {
-				name: /Edit overlay/,
+				name: ( accessibleName ) =>
+					accessibleName.startsWith( 'Edit overlay' ),
 			} );
 
 			expect( editButton ).toHaveAccessibleName();
 		} );
 
-		it( 'should disable select control when loading', () => {
+		it( 'should show loading spinner instead of select control when initially loading', () => {
 			useEntityRecords.mockReturnValue( {
-				records: [ templatePart1 ],
+				records: null,
 				isResolving: true,
 				hasResolved: false,
 			} );
 
 			render( <OverlayTemplatePartSelector { ...defaultProps } /> );
 
-			const select = screen.getByRole( 'combobox', {
-				name: 'Overlay template',
-			} );
-
-			expect( select ).toBeDisabled();
+			// Should show loading spinner, not the select control
+			expect(
+				screen.getByText( 'Loading overlays…' )
+			).toBeInTheDocument();
+			expect(
+				screen.queryByRole( 'combobox', {
+					name: 'Overlay template',
+				} )
+			).not.toBeInTheDocument();
 		} );
 	} );
 } );
-
