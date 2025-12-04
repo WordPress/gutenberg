@@ -6,6 +6,7 @@ import { useMemo } from '@wordpress/element';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { usePrevious } from '@wordpress/compose';
 import { store as editorStore } from '@wordpress/editor';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -13,7 +14,7 @@ import { store as editorStore } from '@wordpress/editor';
 import { store as editSiteStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import useNavigateToEntityRecord, {
-	useRestoreScrollPosition,
+	useRestoreBlockSelection,
 } from './use-navigate-to-entity-record';
 import { FOCUSABLE_ENTITIES } from '../../utils/constants';
 
@@ -23,6 +24,7 @@ function useNavigateToPreviousEntityRecord() {
 	const location = useLocation();
 	const previousCanvas = usePrevious( location.query.canvas );
 	const history = useHistory();
+	const { getSelectedBlockClientId } = useSelect( blockEditorStore );
 
 	const goBack = useMemo( () => {
 		const isFocusMode =
@@ -37,32 +39,25 @@ function useNavigateToPreviousEntityRecord() {
 		}
 
 		return () => {
-			// Capture current scroll position before navigating back
-			const iframe = document.querySelector(
-				'iframe[name="editor-canvas"]'
-			);
-			const iframeDocument =
-				iframe?.contentDocument || iframe?.contentWindow?.document;
-			const scrollElement = iframeDocument?.documentElement;
+			// Capture currently selected block before navigating back
+			const currentSelectedBlockClientId = getSelectedBlockClientId();
 
-			const currentScrollPosition = scrollElement
-				? { x: scrollElement.scrollLeft, y: scrollElement.scrollTop }
-				: { x: window.scrollX, y: window.scrollY };
-
-			// Store scroll position for current location
+			// Store selected block for current location
 			const currentPath =
 				window.location.pathname + window.location.search;
-			window.sessionStorage?.setItem(
-				`gutenberg_scroll_${ currentPath }`,
-				JSON.stringify( currentScrollPosition )
-			);
+			if ( currentSelectedBlockClientId ) {
+				window.sessionStorage?.setItem(
+					`gutenberg_selected_block_${ currentPath }`,
+					currentSelectedBlockClientId
+				);
+			}
 
 			history.back();
 		};
 		// `previousLocation` changes when the component updates for any reason, not
 		// just when location changes. Until this is fixed we can't add it to deps. See
 		// https://github.com/WordPress/gutenberg/pull/58710#discussion_r1479219465.
-	}, [ location, history, previousCanvas ] );
+	}, [ location, history, previousCanvas, getSelectedBlockClientId ] );
 	return goBack;
 }
 
@@ -71,8 +66,8 @@ export function useSpecificEditorSettings() {
 	const { canvas = 'view' } = query;
 	const onNavigateToEntityRecord = useNavigateToEntityRecord();
 
-	// Restore scroll position when navigating
-	useRestoreScrollPosition();
+	// Restore block selection when navigating
+	useRestoreBlockSelection();
 
 	const { settings, currentPostIsTrashed } = useSelect( ( select ) => {
 		const { getSettings } = select( editSiteStore );

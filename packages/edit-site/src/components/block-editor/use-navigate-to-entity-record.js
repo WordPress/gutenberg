@@ -3,6 +3,8 @@
  */
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { useCallback, useEffect } from '@wordpress/element';
+import { useSelect, useDispatch } from '@wordpress/data';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -13,75 +15,63 @@ const { useHistory, useLocation } = unlock( routerPrivateApis );
 
 export default function useNavigateToEntityRecord() {
 	const history = useHistory();
+	const { getSelectedBlockClientId } = useSelect( ( select ) => {
+		const { getSelectedBlockClientId: getSelected } =
+			select( blockEditorStore );
+		return {
+			getSelectedBlockClientId: getSelected,
+		};
+	}, [] );
 
 	const onNavigateToEntityRecord = useCallback(
 		( params ) => {
-			// Capture current scroll position before navigating
-			const iframe = document.querySelector(
-				'iframe[name="editor-canvas"]'
-			);
-			const iframeDocument =
-				iframe?.contentDocument || iframe?.contentWindow?.document;
-			const scrollElement = iframeDocument?.documentElement;
+			// Capture currently selected block before navigating
+			const currentSelectedBlockClientId = getSelectedBlockClientId();
 
-			const currentScrollPosition = scrollElement
-				? { x: scrollElement.scrollLeft, y: scrollElement.scrollTop }
-				: { x: window.scrollX, y: window.scrollY };
-
-			// Store scroll position for current location
+			// Store selected block for current location
 			const currentPath =
 				window.location.pathname + window.location.search;
-			window.sessionStorage?.setItem(
-				`gutenberg_scroll_${ currentPath }`,
-				JSON.stringify( currentScrollPosition )
-			);
+			if ( currentSelectedBlockClientId ) {
+				window.sessionStorage?.setItem(
+					`gutenberg_selected_block_${ currentPath }`,
+					currentSelectedBlockClientId
+				);
+			}
 
 			history.navigate(
 				`/${ params.postType }/${ params.postId }?canvas=edit&focusMode=true`
 			);
 		},
-		[ history ]
+		[ history, getSelectedBlockClientId ]
 	);
 
 	return onNavigateToEntityRecord;
 }
 
-export function useRestoreScrollPosition() {
+export function useRestoreBlockSelection() {
 	const location = useLocation();
+	const { selectBlock } = useDispatch( blockEditorStore );
 
 	useEffect( () => {
-		// Restore scroll position when location changes
+		// Restore block selection when location changes
 		const currentPath = window.location.pathname + window.location.search;
-		const storedPosition = window.sessionStorage?.getItem(
-			`gutenberg_scroll_${ currentPath }`
+		const storedBlockClientId = window.sessionStorage?.getItem(
+			`gutenberg_selected_block_${ currentPath }`
 		);
 
-		if ( storedPosition && typeof window !== 'undefined' ) {
-			const scrollPosition = JSON.parse( storedPosition );
-
-			const restoreScroll = () => {
-				const iframe = document.querySelector(
-					'iframe[name="editor-canvas"]'
-				);
-				const iframeWindow = iframe?.contentWindow;
-
-				if ( iframeWindow ) {
-					setTimeout( () => {
-						iframeWindow.scrollTo(
-							scrollPosition.x,
-							scrollPosition.y
-						);
-					}, 100 );
-				} else {
-					window.scrollTo( scrollPosition.x, scrollPosition.y );
-				}
+		if ( storedBlockClientId && typeof window !== 'undefined' ) {
+			const restoreSelection = () => {
+				// Use a small delay to ensure content is rendered
+				setTimeout( () => {
+					selectBlock( storedBlockClientId );
+				}, 100 );
 			};
 
 			if ( typeof window.requestAnimationFrame !== 'undefined' ) {
-				window.requestAnimationFrame( restoreScroll );
+				window.requestAnimationFrame( restoreSelection );
 			} else {
-				restoreScroll();
+				restoreSelection();
 			}
 		}
-	}, [ location ] );
+	}, [ location, selectBlock ] );
 }

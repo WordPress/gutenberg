@@ -4,6 +4,7 @@
 import { useCallback, useReducer } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as editorStore } from '@wordpress/editor';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
  * A hook that records the 'entity' history in the post editor as a user
@@ -28,12 +29,12 @@ export default function useNavigateToEntityRecord(
 	const [ postHistory, dispatch ] = useReducer(
 		(
 			historyState,
-			{ type, post, previousRenderingMode, scrollPosition }
+			{ type, post, previousRenderingMode, selectedBlockClientId }
 		) => {
 			if ( type === 'push' ) {
 				return [
 					...historyState,
-					{ post, previousRenderingMode, scrollPosition },
+					{ post, previousRenderingMode, selectedBlockClientId },
 				];
 			}
 			if ( type === 'pop' ) {
@@ -51,36 +52,33 @@ export default function useNavigateToEntityRecord(
 		]
 	);
 
-	const { post, previousRenderingMode, scrollPosition } =
+	const { post, previousRenderingMode, selectedBlockClientId } =
 		postHistory[ postHistory.length - 1 ];
-
 	const { getRenderingMode } = useSelect( editorStore );
 	const { setRenderingMode } = useDispatch( editorStore );
+	const { getSelectedBlockClientId } = useSelect( blockEditorStore );
+	const { selectBlock } = useDispatch( blockEditorStore );
 
 	const onNavigateToEntityRecord = useCallback(
 		( params ) => {
-			// Capture current scroll position from the editor canvas iframe
-			const iframe = document.querySelector(
-				'iframe[name="editor-canvas"]'
-			);
-			const iframeDocument =
-				iframe?.contentDocument || iframe?.contentWindow?.document;
-			const scrollElement = iframeDocument?.documentElement;
-
-			const currentScrollPosition = scrollElement
-				? { x: scrollElement.scrollLeft, y: scrollElement.scrollTop }
-				: { x: window.scrollX, y: window.scrollY };
+			// Capture currently selected block before navigating
+			const currentSelectedBlockClientId = getSelectedBlockClientId();
 
 			dispatch( {
 				type: 'push',
 				post: { postId: params.postId, postType: params.postType },
 				// Save the current rendering mode so we can restore it when navigating back.
 				previousRenderingMode: getRenderingMode(),
-				scrollPosition: currentScrollPosition,
+				selectedBlockClientId: currentSelectedBlockClientId,
 			} );
 			setRenderingMode( defaultRenderingMode );
 		},
-		[ getRenderingMode, setRenderingMode, defaultRenderingMode ]
+		[
+			getRenderingMode,
+			setRenderingMode,
+			defaultRenderingMode,
+			getSelectedBlockClientId,
+		]
 	);
 
 	const onNavigateToPreviousEntityRecord = useCallback( () => {
@@ -88,35 +86,27 @@ export default function useNavigateToEntityRecord(
 		if ( previousRenderingMode ) {
 			setRenderingMode( previousRenderingMode );
 		}
-		// Restore scroll position after a short delay to allow rendering to complete
-		if ( scrollPosition && typeof window !== 'undefined' ) {
-			const restoreScroll = () => {
-				// The editor canvas is inside an iframe
-				const iframe = document.querySelector(
-					'iframe[name="editor-canvas"]'
-				);
-				const iframeWindow = iframe?.contentWindow;
-
-				if ( iframeWindow ) {
-					// Use a small delay to ensure content is rendered
-					setTimeout( () => {
-						iframeWindow.scrollTo(
-							scrollPosition.x,
-							scrollPosition.y
-						);
-					}, 100 );
-				} else {
-					window.scrollTo( scrollPosition.x, scrollPosition.y );
-				}
+		// Restore block selection and focus after a short delay to allow rendering to complete
+		if ( selectedBlockClientId && typeof window !== 'undefined' ) {
+			const restoreSelection = () => {
+				// Use a small delay to ensure content is rendered
+				setTimeout( () => {
+					selectBlock( selectedBlockClientId );
+				}, 100 );
 			};
 
 			if ( typeof window.requestAnimationFrame !== 'undefined' ) {
-				window.requestAnimationFrame( restoreScroll );
+				window.requestAnimationFrame( restoreSelection );
 			} else {
-				restoreScroll();
+				restoreSelection();
 			}
 		}
-	}, [ setRenderingMode, previousRenderingMode, scrollPosition ] );
+	}, [
+		setRenderingMode,
+		previousRenderingMode,
+		selectedBlockClientId,
+		selectBlock,
+	] );
 
 	return {
 		currentPost: post,
