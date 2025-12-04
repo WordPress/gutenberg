@@ -15,7 +15,7 @@
 function gutenberg_render_block_visibility_support( $block_content, $block ) {
 	$block_type = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
 
-	if ( ! $block_type || ! block_has_support( $block_type, 'blockVisibility', true ) ) {
+	if ( ! $block_type || ! block_has_support( $block_type, 'visibility', true ) ) {
 		return $block_content;
 	}
 

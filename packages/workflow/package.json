@@ -1,0 +1,62 @@
+{
+	"name": "@wordpress/workflow",
+	"version": "0.1.0",
+	"private": true,
+	"description": "Workflow palette for running abilities in WordPress.",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"gutenberg",
+		"workflow",
+		"abilities",
+		"palette"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/workflow/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git",
+		"directory": "packages/workflow"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"engines": {
+		"node": ">=18.12.0",
+		"npm": ">=8.19.2"
+	},
+	"main": "build/index.js",
+	"module": "build-module/index.js",
+	"exports": {
+		".": {
+			"import": "./build-module/index.js",
+			"require": "./build/index.js"
+		},
+		"./package.json": "./package.json",
+		"./build-style/": "./build-style/"
+	},
+	"react-native": "src/index",
+	"wpScriptModuleExports": {
+		".": "./build-module/index.js"
+	},
+	"dependencies": {
+		"@wordpress/abilities": "file:../abilities",
+		"@wordpress/base-styles": "file:../base-styles",
+		"@wordpress/components": "file:../components",
+		"@wordpress/data": "file:../data",
+		"@wordpress/element": "file:../element",
+		"@wordpress/i18n": "file:../i18n",
+		"@wordpress/icons": "file:../icons",
+		"@wordpress/keyboard-shortcuts": "file:../keyboard-shortcuts",
+		"@wordpress/private-apis": "file:../private-apis",
+		"clsx": "^2.1.1",
+		"cmdk": "^1.0.0"
+	},
+	"peerDependencies": {
+		"react": "^18.0.0",
+		"react-dom": "^18.0.0"
+	},
+	"publishConfig": {
+		"access": "public"
+	}
+}

@@ -21,9 +21,6 @@ import { useRef, createInterpolateElement } from '@wordpress/element';
 import { closeSmall } from '@wordpress/icons';
 import { dateI18n, getDate } from '@wordpress/date';
 
-const ENTER = 'Enter';
-const SPACE = ' ';
-
 /**
  * Internal dependencies
  */
@@ -57,6 +54,9 @@ import {
 import type {
 	Filter,
 	NormalizedField,
+	NormalizedFieldDate,
+	NormalizedFieldNumber,
+	NormalizedFieldInteger,
 	NormalizedFilter,
 	Operator,
 	Option,
@@ -64,6 +64,11 @@ import type {
 } from '../../types';
 import useElements from '../../hooks/use-elements';
 import parseDateTime from '../../field-types/utils/parse-date-time';
+import { formatNumber } from '../../field-types/number';
+import { formatInteger } from '../../field-types/integer';
+
+const ENTER = 'Enter';
+const SPACE = ' ';
 
 interface FilterTextProps {
 	activeElements: Option[];
@@ -503,7 +508,10 @@ export default function Filter( {
 			try {
 				const dateValue = parseDateTime( label );
 				if ( dateValue !== null ) {
-					label = dateI18n( field.format.date, getDate( label ) );
+					label = dateI18n(
+						( field as NormalizedFieldDate< any > ).format.date,
+						getDate( label )
+					);
 				}
 			} catch ( e ) {
 				label = filterInView.value;
@@ -517,6 +525,12 @@ export default function Filter( {
 			} catch ( e ) {
 				label = filterInView.value;
 			}
+		} else if ( field?.type === 'number' && typeof label === 'number' ) {
+			const numberField = field as NormalizedFieldNumber< any >;
+			label = formatNumber( label, numberField.format );
+		} else if ( field?.type === 'integer' && typeof label === 'number' ) {
+			const integerField = field as NormalizedFieldInteger< any >;
+			label = formatInteger( label, integerField.format );
 		}
 
 		activeElements = [

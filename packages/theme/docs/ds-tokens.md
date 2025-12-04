@@ -9,13 +9,17 @@ Do not edit directly.
 
 ### Border
 
-| Variable name                  | Description                 |
-| ------------------------------ | --------------------------- |
-| `--wpds-border-radius-x-small` | Extra small radius          |
-| `--wpds-border-radius-small`   | Small radius                |
-| `--wpds-border-radius-medium`  | Medium radius               |
-| `--wpds-border-radius-large`   | Large radius                |
-| `--wpds-border-width-focus`    | Border width for focus ring |
+| Variable name                           | Description                     |
+| --------------------------------------- | ------------------------------- |
+| `--wpds-border-radius-surface-xs`       | Extra small radius for surfaces |
+| `--wpds-border-radius-surface-sm`       | Small radius for surfaces       |
+| `--wpds-border-radius-surface-md`       | Medium radius for surfaces      |
+| `--wpds-border-radius-surface-lg`       | Large radius for surfaces       |
+| `--wpds-border-width-surface-xs`        | Extra small width for surfaces  |
+| `--wpds-border-width-surface-sm`        | Small width for surfaces        |
+| `--wpds-border-width-surface-md`        | Medium width for surfaces       |
+| `--wpds-border-width-surface-lg`        | Large width for surfaces        |
+| `--wpds-border-width-interactive-focus` | Border width for focus ring     |
 
 ### Color
 
@@ -111,13 +115,14 @@ Do not edit directly.
 
 ### Dimension
 
-| Variable name                              | Description                      |
-| ------------------------------------------ | -------------------------------- |
-| `--wpds-dimension-base`                    | Base dimension unit              |
-| `--wpds-dimension-padding-surface-x-small` | Extra small spacing for surfaces |
-| `--wpds-dimension-padding-surface-small`   | Small spacing for surfaces       |
-| `--wpds-dimension-padding-surface-medium`  | Medium spacing for surfaces      |
-| `--wpds-dimension-padding-surface-large`   | Large spacing for surfaces       |
+| Variable name                          | Description                         |
+| -------------------------------------- | ----------------------------------- |
+| `--wpds-dimension-base`                | Base dimension unit                 |
+| `--wpds-dimension-padding-surface-2xs` | 2x extra small spacing for surfaces |
+| `--wpds-dimension-padding-surface-xs`  | Extra small spacing for surfaces    |
+| `--wpds-dimension-padding-surface-sm`  | Small spacing for surfaces          |
+| `--wpds-dimension-padding-surface-md`  | Medium spacing for surfaces         |
+| `--wpds-dimension-padding-surface-lg`  | Large spacing for surfaces          |
 
 ### Elevation
 

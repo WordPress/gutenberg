@@ -1428,6 +1428,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/abilities",
+		"slug": "packages-abilities",
+		"markdown_source": "../packages/abilities/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/admin-ui",
 		"slug": "packages-admin-ui",
 		"markdown_source": "../packages/admin-ui/README.md",
@@ -1755,6 +1761,12 @@
 		"title": "@wordpress/icons",
 		"slug": "packages-icons",
 		"markdown_source": "../packages/icons/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/image-cropper",
+		"slug": "packages-image-cropper",
+		"markdown_source": "../packages/image-cropper/README.md",
 		"parent": "packages"
 	},
 	{

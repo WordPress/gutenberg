@@ -1,20 +1,20 @@
 /**
  * Internal dependencies
  */
-import type { FieldTypeDefinition } from '../types';
-
-function sort() {
-	return 0;
-}
+import type { FieldType } from '../types/private';
 
 export default {
-	sort,
-	isValid: {
-		elements: true,
-		custom: () => null,
-	},
-	Edit: null,
+	type: 'media',
 	render: () => null,
+	Edit: null,
+	sort: () => 0,
 	enableSorting: false,
-	filterBy: false,
-} satisfies FieldTypeDefinition< any >;
+	enableGlobalSearch: false,
+	defaultOperators: [],
+	validOperators: [],
+	getFormat: () => ( {} ),
+	// cannot validate any constraint, so
+	// the only available validation for the field author
+	// would be providing a custom validator.
+	validate: {},
+} satisfies FieldType< any >;

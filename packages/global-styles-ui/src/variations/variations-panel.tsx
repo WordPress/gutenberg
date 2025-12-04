@@ -10,7 +10,7 @@ import { __experimentalItemGroup as ItemGroup } from '@wordpress/components';
  * Internal dependencies
  */
 import { NavigationButtonAsItem } from '../navigation-button';
-import { useSetting } from '../hooks';
+import { useStyle } from '../hooks';
 
 interface BlockStyle {
 	name: string;
@@ -45,7 +45,7 @@ export function useBlockVariations( name: string ): BlockStyle[] {
 		},
 		[ name ]
 	);
-	const [ variations ] = useSetting( 'variations', name );
+	const [ variations ] = useStyle( 'variations', name );
 	const variationNames = Object.keys( variations ?? {} );
 
 	return getFilteredBlockStyles( blockStyles, variationNames );

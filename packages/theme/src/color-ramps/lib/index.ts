@@ -15,10 +15,9 @@ import {
  * Internal dependencies
  */
 import './register-color-spaces';
-import { getContrast, getColorString } from './color-utils';
+import { clampToGamut, getContrast, getColorString } from './color-utils';
 import { findColorMeetingRequirements } from './find-color-with-constraints';
 import {
-	clampToGamut,
 	sortByDependency,
 	computeBetterFgColorDirection,
 	adjustContrastTarget,
@@ -57,7 +56,7 @@ function calculateRamp( {
 	oppDir,
 	pinLightness,
 }: {
-	seed: ColorTypes;
+	seed: PlainColorObject;
 	sortedSteps: ( keyof Ramp )[];
 	config: RampConfig;
 	mainDir: RampDirection;
@@ -75,7 +74,7 @@ function calculateRamp( {
 
 	// Keep track of the calculated colors, as they are going to be useful
 	// when other colors reference them.
-	const calculatedColors = new Map< keyof Ramp | 'seed', ColorTypes >();
+	const calculatedColors = new Map< keyof Ramp | 'seed', PlainColorObject >();
 	calculatedColors.set( 'seed', seed );
 
 	for ( const stepName of sortedSteps ) {
@@ -268,11 +267,11 @@ export function buildRamp(
 	if ( maxDeficit > CONTRAST_EPSILON && rescaleToFitContrastTargets ) {
 		const iterSteps = stepsForStep( maxDeficitStep!, config );
 
-		function getSeedForL( l: number ): ColorTypes {
+		function getSeedForL( l: number ): PlainColorObject {
 			return clampToGamut( set( clone( seed ), [ OKLCH, 'l' ], l ) );
 		}
 
-		function getDeficitForSeed( s: ColorTypes ): number {
+		function getDeficitForSeed( s: PlainColorObject ): number {
 			const iterationResults = calculateRamp( {
 				seed: s,
 				sortedSteps: iterSteps,

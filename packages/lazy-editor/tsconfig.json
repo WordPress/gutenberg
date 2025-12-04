@@ -13,6 +13,7 @@
 		{ "path": "../element" },
 		{ "path": "../editor" },
 		{ "path": "../global-styles-engine" },
+		{ "path": "../i18n" },
 		{ "path": "../private-apis" }
 	]
 }

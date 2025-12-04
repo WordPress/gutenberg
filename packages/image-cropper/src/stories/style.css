@@ -1,0 +1,17 @@
+.image-cropper__container-wrapper-story {
+    background: rgba( 0, 0, 0, 0.1 ) !important;
+    height: 500px;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+}
+.image-cropper__container-story {
+    position: relative;
+    height: 100%;
+    width: 100%;
+}
+.image-cropper__crop-area {
+    box-shadow: unset !important;
+}

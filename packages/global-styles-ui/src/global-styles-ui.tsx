@@ -133,8 +133,13 @@ export function GlobalStylesUI( {
 		return mergeGlobalStyles( baseValue, value );
 	}, [ baseValue, value ] );
 
-	const [ globalStylesCSS, globalSettings ] =
-		generateGlobalStyles( mergedValue );
+	const [ globalStylesCSS, globalSettings ] = generateGlobalStyles(
+		mergedValue,
+		[],
+		{
+			styleOptions: { variationStyles: true },
+		}
+	);
 	const styles = useMemo(
 		() => [ ...( serverCSS ?? [] ), ...( globalStylesCSS ?? [] ) ],
 		[ serverCSS, globalStylesCSS ]

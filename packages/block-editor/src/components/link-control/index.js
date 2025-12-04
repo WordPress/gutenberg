@@ -15,7 +15,7 @@ import {
 	__experimentalInputControlSuffixWrapper as InputControlSuffixWrapper,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
-import { useRef, useState, useEffect } from '@wordpress/element';
+import { useRef, useState, useEffect, useMemo } from '@wordpress/element';
 import { useInstanceId } from '@wordpress/compose';
 import { focus } from '@wordpress/dom';
 import { ENTER } from '@wordpress/keycodes';
@@ -187,7 +187,15 @@ function LinkControl( {
 	const wrapperNode = useRef();
 	const textInputRef = useRef();
 	const searchInputRef = useRef();
-	const isEndingEditWithFocusRef = useRef( false );
+	// TODO: Remove entityUrlFallbackRef and previewValue in favor of value prop after taxonomy entity binding
+	// is stable and returns the correct URL instead of null while resolving when creating the entity.
+	//
+	// Preserve the URL from entity suggestions before binding overrides it
+	// This is due to entity binding not being available immediately after the suggestion is selected.
+	// The URL can return null, especially for taxonomy entities, while entity binding is being resolved.
+	// To avoid unnecessary rerenders and focus loss, we preserve the URL from the suggestion and use it
+	// as a fallback until the entity binding is available.
+	const entityUrlFallbackRef = useRef();
 
 	const settingsKeys = settings.map( ( { id } ) => id );
 
@@ -244,8 +252,6 @@ function LinkControl( {
 			wrapperNode.current;
 
 		nextFocusTarget.focus();
-
-		isEndingEditWithFocusRef.current = false;
 	}, [ isEditingLink, isCreatingPage ] );
 
 	// The component mounting reference is maintained separately
@@ -261,18 +267,18 @@ function LinkControl( {
 	const hasLinkValue = value?.url?.trim()?.length > 0;
 
 	/**
-	 * Cancels editing state and marks that focus may need to be restored after
-	 * the next render, if focus was within the wrapper when editing finished.
+	 * Cancels editing state.
 	 */
 	const stopEditing = () => {
-		isEndingEditWithFocusRef.current = !! wrapperNode.current?.contains(
-			wrapperNode.current.ownerDocument.activeElement
-		);
-
 		setIsEditingLink( false );
 	};
 
 	const handleSelectSuggestion = ( updatedValue ) => {
+		// Preserve the URL for taxonomy entities before binding overrides it
+		if ( updatedValue?.kind === 'taxonomy' && updatedValue?.url ) {
+			entityUrlFallbackRef.current = updatedValue.url;
+		}
+
 		// Suggestions may contains "settings" values (e.g. `opensInNewTab`)
 		// which should not override any existing settings values set by the
 		// user. This filters out any settings values from the suggestion.
@@ -396,6 +402,24 @@ function LinkControl( {
 	const isDisabled = ! valueHasChanges || currentInputIsEmpty;
 	const showSettings = !! settings?.length && isEditingLink && hasLinkValue;
 
+	const previewValue = useMemo( () => {
+		// There is a chance that the value is not yet set from the entity binding, so we use the preserved URL.
+		if (
+			value?.kind === 'taxonomy' &&
+			! value?.url &&
+			entityUrlFallbackRef.current
+		) {
+			// combine the value prop with the preserved URL from the suggestion
+			return {
+				...value,
+				url: entityUrlFallbackRef.current,
+			};
+		}
+
+		// If we don't have a fallback URL, use the value prop.
+		return value;
+	}, [ value ] );
+
 	return (
 		<div
 			tabIndex={ -1 }
@@ -487,8 +511,8 @@ function LinkControl( {
 
 			{ value && ! isEditingLink && ! isCreatingPage && (
 				<LinkPreview
-					key={ value?.url } // force remount when URL changes to avoid race conditions for rich previews
-					value={ value }
+					key={ previewValue?.url } // force remount when URL changes to avoid race conditions for rich previews
+					value={ previewValue }
 					onEditClick={ () => setIsEditingLink( true ) }
 					hasRichPreviews={ hasRichPreviews }
 					hasUnlinkControl={ shownUnlinkControl }

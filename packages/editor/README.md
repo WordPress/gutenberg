@@ -442,11 +442,11 @@ getDerivedStateFromError is used to render a fallback UI after an error has been
 
 ### getTemplatePartIcon
 
-Helper function to retrieve the corresponding icon by name.
+Helper function to retrieve the corresponding icon by area name or icon name.
 
 _Parameters_
 
--   _iconName_ `string`: The name of the icon.
+-   _areaOrIconName_ `string`: The area name (e.g., 'header', 'overlay') or icon name (e.g., 'menu').
 
 _Returns_
 

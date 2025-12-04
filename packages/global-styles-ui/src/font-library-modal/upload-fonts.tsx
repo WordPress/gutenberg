@@ -14,6 +14,7 @@ import {
 	ProgressBar,
 } from '@wordpress/components';
 import { useContext, useState } from '@wordpress/element';
+import type { FontFace } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -23,7 +24,6 @@ import { FontLibraryContext } from './context';
 import { Font } from './lib/lib-font.browser';
 import makeFamiliesFromFaces from './utils/make-families-from-faces';
 import { loadFontFaceInBrowser } from './utils';
-import type { FontFace } from './types';
 
 function UploadFonts() {
 	const { installFonts } = useContext( FontLibraryContext );

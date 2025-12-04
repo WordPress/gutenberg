@@ -42,9 +42,25 @@ export interface RouteLoaderContext {
  * Canvas data returned by route's canvas function.
  */
 export interface CanvasData {
+	/**
+	 * Post type to render in the canvas.
+	 */
 	postType: string;
+
+	/**
+	 * Post ID to render in the canvas.
+	 */
 	postId: string;
+
+	/**
+	 * Indicates if the canvas is in preview mode.
+	 */
 	isPreview?: boolean;
+	/**
+	 * Optional edit link for click-to-edit navigation.
+	 * When provided with isPreview: true, clicking the canvas navigates to this URL.
+	 */
+	editLink?: string;
 }
 
 /**

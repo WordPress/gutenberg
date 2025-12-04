@@ -2,6 +2,7 @@
  * External dependencies
  */
 import type { Meta, StoryFn } from '@storybook/react';
+import { fn } from '@storybook/test';
 
 /**
  * Internal dependencies
@@ -15,8 +16,11 @@ const meta: Meta< typeof TabbableContainer > = {
 	argTypes: {
 		children: { control: false },
 	},
+	args: {
+		onKeyDown: fn(),
+		onNavigate: fn(),
+	},
 	parameters: {
-		actions: { argTypesRegex: '^on.*' },
 		controls: {
 			expanded: true,
 		},

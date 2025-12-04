@@ -28,7 +28,6 @@ const meta: Meta< typeof Text > = {
 	},
 	tags: [ 'status-experimental' ],
 	parameters: {
-		actions: { argTypesRegex: '^on.*' },
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
 	},
