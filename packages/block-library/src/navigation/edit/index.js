@@ -940,6 +940,8 @@ function Navigation( {
 					isHiddenByDefault={ isHiddenByDefault }
 					overlayBackgroundColor={ overlayBackgroundColor }
 					overlayTextColor={ overlayTextColor }
+					overlayTemplatePart={ overlayTemplatePart }
+					onNavigateToEntityRecord={ onNavigateToEntityRecord }
 				>
 					<UnsavedInnerBlocks
 						createNavigationMenu={ createNavigationMenu }
@@ -1102,6 +1104,10 @@ function Navigation( {
 									overlayBackgroundColor
 								}
 								overlayTextColor={ overlayTextColor }
+								overlayTemplatePart={ overlayTemplatePart }
+								onNavigateToEntityRecord={
+									onNavigateToEntityRecord
+								}
 							>
 								{ isEntityAvailable && (
 									<NavigationInnerBlocks
