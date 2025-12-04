@@ -20,7 +20,6 @@
 	max-width: 100%;
 	display: block;
 	width: 100%;
-	clip-path: border-box;
 }
 
 .global-styles-ui-typography-preview {
@@ -276,6 +275,10 @@
 	&#{&} .global-styles-ui-screen-root__active-style-tile-preview {
 		border-radius: 2px;
 	}
+}
+
+.global-styles-ui-screen-root__active-style-tile-preview {
+	clip-path: border-box;
 }
 
 .global-styles-ui-color-palette-panel,
