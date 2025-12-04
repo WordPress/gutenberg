@@ -1399,6 +1399,7 @@ const PanelValidationSection = ( {
 		url: string;
 		foregroundColor: string;
 		backgroundColor: string;
+		notes: string;
 	};
 
 	const [ data, setData ] = useState< PanelItem >( {
@@ -1412,6 +1413,7 @@ const PanelValidationSection = ( {
 		url: 'https://example.com',
 		foregroundColor: '#ffffff',
 		backgroundColor: '#ff6600',
+		notes: 'Some notes here',
 	} );
 
 	const panelFields: Field< PanelItem >[] = useMemo( () => {
@@ -1499,6 +1501,21 @@ const PanelValidationSection = ( {
 				return 'Color must be a valid hex format (e.g., #ff6600).';
 			}
 			return null;
+		};
+
+		const customNotesRule = ( item: PanelItem ) => {
+			if ( item.notes && item.notes.startsWith( ' ' ) ) {
+				return 'Notes cannot start with a space.';
+			}
+			return null;
+		};
+
+		const asyncCustomNotesRule = async ( item: PanelItem ) => {
+			return await new Promise< string | null >( ( resolve ) => {
+				setTimeout( () => {
+					resolve( customNotesRule( item ) );
+				}, 2000 );
+			} );
 		};
 
 		const maybeCustomRule = < T, >(
@@ -1778,6 +1795,26 @@ const PanelValidationSection = ( {
 							: undefined,
 				},
 			},
+			{
+				id: 'notes',
+				label: 'Notes',
+				type: 'text',
+				description: getDescription(
+					'Only alphanumeric characters and spaces',
+					'Between 5 and 100 characters',
+					'Cannot start with a space'
+				),
+				isValid: {
+					required,
+					pattern: pattern ? '^[a-zA-Z0-9 ]+$' : undefined,
+					minLength: minMax ? 5 : undefined,
+					maxLength: minMax ? 100 : undefined,
+					custom: maybeCustomRule(
+						customNotesRule,
+						asyncCustomNotesRule
+					),
+				},
+			},
 		];
 	}, [ required, elements, custom, pattern, minMax ] );
 
@@ -1807,6 +1844,7 @@ const PanelValidationSection = ( {
 					summary: [ 'foregroundColor', 'backgroundColor' ],
 				},
 			},
+			{ id: 'notes', layout: { type: 'panel', labelPosition: 'none' } },
 		],
 	};
 
