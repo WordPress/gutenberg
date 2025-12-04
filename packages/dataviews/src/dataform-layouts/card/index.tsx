@@ -71,9 +71,15 @@ const CardHeader = ( {
 	}, [ isOpen, isCollapsible ] );
 
 	return (
-		<OriginalCardHeader isBorderless className={ className }>
+		<OriginalCardHeader
+			isBorderless
+			className={ className }
+			style={ { cursor: isCollapsible ? 'pointer' : 'default' } }
+			onClick={ isCollapsible ? onToggle : undefined }
+		>
 			<div
 				style={ {
+					height: isCollapsible ? undefined : '40px',
 					width: '100%',
 					display: 'flex',
 					justifyContent: 'space-between',
@@ -81,24 +87,23 @@ const CardHeader = ( {
 				} }
 			>
 				{ children }
-				{ isCollapsible && (
-					<Button
-						ref={ buttonRef }
-						type="button"
-						__next40pxDefaultSize
-						variant="tertiary"
-						icon={ isOpen ? chevronUp : chevronDown }
-						aria-expanded={ isOpen }
-						aria-controls={ isOpen ? controlsId : undefined }
-						aria-label={
-							isOpen ? __( 'Collapse' ) : __( 'Expand' )
-						}
-						onClick={ ( e: MouseEvent< HTMLButtonElement > ) => {
-							e.stopPropagation();
-							onToggle();
-						} }
-					/>
-				) }
+				<Button
+					ref={ buttonRef }
+					type="button"
+					__next40pxDefaultSize
+					variant="tertiary"
+					icon={ isOpen ? chevronUp : chevronDown }
+					aria-expanded={ isOpen }
+					aria-controls={ isOpen ? controlsId : undefined }
+					aria-label={ isOpen ? __( 'Collapse' ) : __( 'Expand' ) }
+					onClick={ ( e: MouseEvent< HTMLButtonElement > ) => {
+						e.stopPropagation();
+						onToggle();
+					} }
+					style={ {
+						visibility: isCollapsible ? 'visible' : 'hidden',
+					} }
+				/>
 			</div>
 		</OriginalCardHeader>
 	);
