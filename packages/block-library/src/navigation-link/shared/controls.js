@@ -12,8 +12,11 @@ import { __, sprintf } from '@wordpress/i18n';
 import { useRef } from '@wordpress/element';
 import { useInstanceId } from '@wordpress/compose';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
-import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
-import { useSelect } from '@wordpress/data';
+import {
+	privateApis as blockEditorPrivateApis,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 
 /**
@@ -111,10 +114,14 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 		isBoundEntityAvailable,
 		entityRecord,
 		createBinding,
+		clearBinding,
 	} = useEntityBinding( {
 		clientId,
 		attributes,
 	} );
+
+	// Get direct store dispatch to bypass setBoundAttributes wrapper
+	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 
 	// Extract title from entity record
 	const title =
@@ -215,15 +222,36 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 								type: suggestion.type,
 								id: suggestion.id,
 							};
-							updateAttributes(
-								attrs,
-								setAttributes,
-								attributes
-							);
-							// Create entity binding if we have entity data
-							if ( suggestion.id ) {
-								createBinding( attrs );
-								shouldFocusUnsyncButtonRef.current = true;
+
+							// Check if transitioning from entity to custom link
+							const willBeCustomLink =
+								! suggestion.id && hasUrlBinding;
+
+							if ( willBeCustomLink ) {
+								// Clear the binding first
+								clearBinding();
+
+								// Use direct store dispatch to bypass setBoundAttributes wrapper
+								// which prevents updates to bound attributes.
+								updateBlockAttributes( clientId, {
+									url: suggestion.url,
+									kind: 'custom',
+									type: 'custom',
+									id: undefined,
+								} );
+							} else {
+								// Normal flow for entity links or unbound custom links
+								updateAttributes(
+									attrs,
+									setAttributes,
+									attributes
+								);
+
+								// Create entity binding if we have entity data
+								if ( suggestion.id ) {
+									createBinding( attrs );
+									shouldFocusUnsyncButtonRef.current = true;
+								}
 							}
 						}
 					} }
