@@ -40,8 +40,10 @@
 .dataforms-layouts-panel__field-error-indicator {
 	display: inline-flex;
 	align-items: center;
+	flex-shrink: 0;
 	color: $alert-red;
 	margin-right: $grid-unit-05;
+	cursor: help;
 
 	svg {
 		fill: currentColor;
