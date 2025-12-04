@@ -2,14 +2,16 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useEffect, useState } from '@wordpress/element';
+import { useEffect, useState, useMemo } from '@wordpress/element';
 import {
 	Button,
 	CheckboxControl,
 	Flex,
 	FlexItem,
+	Icon,
 	Modal,
 } from '@wordpress/components';
+import { desktop, tablet, mobile } from '@wordpress/icons';
 import { useDispatch, useSelect } from '@wordpress/data';
 
 /**
@@ -17,6 +19,7 @@ import { useDispatch, useSelect } from '@wordpress/data';
  */
 import { store as blockEditorStore } from '../../store';
 import { cleanEmptyObject } from '../../hooks/utils';
+import './style.scss';
 
 export default function BlockVisibilityBreakpointsModal( {
 	clientIds,
@@ -29,12 +32,13 @@ export default function BlockVisibilityBreakpointsModal( {
 		[ clientIds ]
 	);
 
+	const { updateBlockAttributes } = useDispatch( blockEditorStore );
+
 	// Get initial breakpoint visibility state from blocks
-	const getInitialBreakpoints = () => {
+	const initialBreakpoints = useMemo( () => {
 		const breakpoints = { mobile: false, tablet: false, desktop: false };
 		const hasBreakpoints = blocks.some(
-			( block ) =>
-				block.attributes.metadata?.blockVisibilityBreakpoints
+			( block ) => block.attributes.metadata?.blockVisibilityBreakpoints
 		);
 
 		if ( hasBreakpoints ) {
@@ -49,19 +53,23 @@ export default function BlockVisibilityBreakpointsModal( {
 		}
 
 		return breakpoints;
-	};
+	}, [ blocks ] );
 
-	const [ breakpoints, setBreakpoints ] = useState( getInitialBreakpoints );
-	const { updateBlockAttributes } = useDispatch( blockEditorStore );
+	const initialHideEverywhere = useMemo( () => {
+		return blocks.some(
+			( block ) => block.attributes.metadata?.blockVisibility === false
+		);
+	}, [ blocks ] );
 
-	// Check if any block is hidden everywhere
-	const hasHiddenEverywhere = blocks.some(
-		( block ) => block.attributes.metadata?.blockVisibility === false
+	const [ breakpoints, setBreakpoints ] = useState( initialBreakpoints );
+	const [ hideEverywhere, setHideEverywhere ] = useState(
+		initialHideEverywhere
 	);
 
 	useEffect( () => {
-		setBreakpoints( getInitialBreakpoints() );
-	}, [ clientIds ] );
+		setBreakpoints( initialBreakpoints );
+		setHideEverywhere( initialHideEverywhere );
+	}, [ initialBreakpoints, initialHideEverywhere ] );
 
 	const handleSubmit = ( event ) => {
 		event.preventDefault();
@@ -72,6 +80,7 @@ export default function BlockVisibilityBreakpointsModal( {
 				{
 					metadata: cleanEmptyObject( {
 						...attributes?.metadata,
+						blockVisibility: hideEverywhere ? false : undefined,
 						blockVisibilityBreakpoints:
 							breakpoints.mobile ||
 							breakpoints.tablet ||
@@ -94,8 +103,6 @@ export default function BlockVisibilityBreakpointsModal( {
 		onClose();
 	};
 
-	const hasAnyBreakpoint = Object.values( breakpoints ).some( Boolean );
-
 	return (
 		<Modal
 			title={ __( 'Hide block' ) }
@@ -109,18 +116,18 @@ export default function BlockVisibilityBreakpointsModal( {
 					<CheckboxControl
 						__nextHasNoMarginBottom
 						label={ __( 'Hide everywhere' ) }
-						checked={ hasHiddenEverywhere }
-						disabled
-						help={ __(
-							'This option is managed separately in the block visibility settings.'
-						) }
+						checked={ hideEverywhere }
+						onChange={ setHideEverywhere }
 					/>
 					<CheckboxControl
 						__nextHasNoMarginBottom
 						label={ __( 'Hide on mobile' ) }
 						checked={ breakpoints.mobile }
 						onChange={ ( mobile ) =>
-							setBreakpoints( ( prev ) => ( { ...prev, mobile } ) )
+							setBreakpoints( ( prev ) => ( {
+								...prev,
+								mobile,
+							} ) )
 						}
 					/>
 					<CheckboxControl
@@ -128,7 +135,10 @@ export default function BlockVisibilityBreakpointsModal( {
 						label={ __( 'Hide on tablet' ) }
 						checked={ breakpoints.tablet }
 						onChange={ ( tablet ) =>
-							setBreakpoints( ( prev ) => ( { ...prev, tablet } ) )
+							setBreakpoints( ( prev ) => ( {
+								...prev,
+								tablet,
+							} ) )
 						}
 					/>
 					<CheckboxControl
@@ -136,7 +146,10 @@ export default function BlockVisibilityBreakpointsModal( {
 						label={ __( 'Hide on desktop' ) }
 						checked={ breakpoints.desktop }
 						onChange={ ( desktop ) =>
-							setBreakpoints( ( prev ) => ( { ...prev, desktop } ) )
+							setBreakpoints( ( prev ) => ( {
+								...prev,
+								desktop,
+							} ) )
 						}
 					/>
 				</fieldset>
@@ -168,4 +181,3 @@ export default function BlockVisibilityBreakpointsModal( {
 		</Modal>
 	);
 }
-
