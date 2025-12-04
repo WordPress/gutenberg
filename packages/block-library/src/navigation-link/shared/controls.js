@@ -4,23 +4,15 @@
 import {
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
-	BaseControl,
 	CheckboxControl,
 	TextControl,
 	TextareaControl,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
-import { useRef, useEffect, useState } from '@wordpress/element';
-import {
-	useInstanceId,
-	__experimentalUseDialog as useDialog,
-} from '@wordpress/compose';
-import { safeDecodeURI } from '@wordpress/url';
+import { useRef } from '@wordpress/element';
+import { useInstanceId } from '@wordpress/compose';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
-import {
-	__experimentalLinkControlSearchInput as LinkControlSearchInput,
-	LinkPreviewButton,
-} from '@wordpress/block-editor';
+import { LinkControlInspector } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 
@@ -104,33 +96,11 @@ function getEntityTypeName( type, kind ) {
  */
 export function Controls( { attributes, setAttributes, clientId } ) {
 	const { label, url, description, rel, opensInNewTab } = attributes;
-	const lastURLRef = useRef( url );
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 	const shouldFocusUnsyncButtonRef = useRef( false );
 	const linkContainerRef = useRef();
 	const inputId = useInstanceId( Controls, 'link-input' );
 	const helpTextId = `${ inputId }__help`;
-
-	// Local state to control the input value
-	const [ inputValue, setInputValue ] = useState( url );
-
-	// Track editing state to toggle between preview button and input
-	const [ isEditing, setIsEditing ] = useState( ! url );
-	const previewButtonRef = useRef();
-
-	// Get dialog props for proper accessibility
-	const [ dialogRef, dialogProps ] = useDialog( {
-		focusOnMount: 'firstElement',
-		onClose: () => {
-			setIsEditing( false );
-		},
-	} );
-
-	// Sync local state when url prop changes (e.g., from undo/redo or external updates)
-	useEffect( () => {
-		setInputValue( url );
-		lastURLRef.current = url;
-	}, [ url ] );
 
 	// Use the entity binding hook internally
 	const { hasUrlBinding, isBoundEntityAvailable, createBinding } =
@@ -222,99 +192,54 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 				onDeselect={ () => setAttributes( { url: '' } ) }
 				isShownByDefault
 			>
-				{ url && (
-					<BaseControl
-						label={ __( 'Link to' ) }
-						id={ `${ inputId }-button` }
-						__nextHasNoMarginBottom
-					>
-						<LinkPreviewButton
-							buttonRef={ previewButtonRef }
-							link={ attributes }
-							featuredImage={ featuredImage }
-							hasEntityBinding={ hasUrlBinding }
-							onClick={ () => {
-								// Open it
-								setInputValue( '' );
-								setIsEditing( true );
-							} }
-							aria-haspopup="dialog"
-							aria-expanded={ isEditing }
-							id={ `${ inputId }-button` }
-						/>
-					</BaseControl>
-				) }
-				{ isEditing && (
-					<div ref={ dialogRef } { ...dialogProps }>
-						<LinkControlSearchInput
-							className="navigation-link-control__search-input"
-							value={
-								inputValue ? safeDecodeURI( inputValue ) : ''
+				<LinkControlInspector
+					link={ {
+						url,
+						label,
+						kind: attributes.kind,
+						type: attributes.type,
+						id: attributes.id,
+					} }
+					featuredImage={ featuredImage }
+					hasEntityBinding={ hasUrlBinding }
+					isBoundEntityAvailable={ isBoundEntityAvailable }
+					onSelect={ ( suggestion ) => {
+						// When a suggestion is selected (or Enter pressed)
+						if ( suggestion ) {
+							const attrs = {
+								url: suggestion.url,
+								kind: suggestion.kind,
+								type: suggestion.type,
+								id: suggestion.id,
+								title: suggestion.title,
+							};
+							updateAttributes(
+								attrs,
+								setAttributes,
+								attributes
+							);
+							// Create entity binding if we have entity data
+							if ( suggestion.id ) {
+								createBinding( attrs );
+								shouldFocusUnsyncButtonRef.current = true;
 							}
-							currentLink={ {
-								url,
-								title: label && stripHTML( label ),
-								kind: attributes.kind,
-								type: attributes.type,
-								id: attributes.id,
-							} }
-							suggestionsQuery={ getSuggestionsQuery(
-								attributes.type,
-								attributes.kind
-							) }
-							onChange={ ( newValue ) => {
-								// Update local input state when typing
-								setInputValue( newValue );
-							} }
-							onSelect={ ( suggestion ) => {
-								// When a suggestion is selected (or Enter pressed)
-								if ( suggestion ) {
-									const attrs = {
-										url: suggestion.url,
-										kind: suggestion.kind,
-										type: suggestion.type,
-										id: suggestion.id,
-										title: suggestion.title,
-									};
-									updateAttributes(
-										attrs,
-										setAttributes,
-										attributes
-									);
-									// Create entity binding if we have entity data
-									if ( suggestion.id ) {
-										createBinding( attrs );
-										shouldFocusUnsyncButtonRef.current = true;
-									}
-									// Exit edit mode and focus preview button
-									setIsEditing( false );
-								} else if ( inputValue ) {
-									// Freeform URL entry
-									updateAttributes(
-										{ url: inputValue },
-										setAttributes,
-										attributes
-									);
-									// Exit edit mode and focus preview button
-									setIsEditing( false );
-								}
-
-								// focus the preview button
-								previewButtonRef.current?.focus();
-							} }
-							showInitialSuggestions
-							showSuggestions
-						/>
-					</div>
-				) }
-				{ hasUrlBinding && ! isBoundEntityAvailable && (
-					<p id={ helpTextId }>
+						}
+					} }
+					suggestionsQuery={ getSuggestionsQuery(
+						attributes.type,
+						attributes.kind
+					) }
+					className="navigation-link-control__search-input"
+					label={ __( 'Link to' ) }
+					inputId={ inputId }
+					helpTextId={ helpTextId }
+					helpText={
 						<MissingEntityHelpText
 							type={ attributes.type }
 							kind={ attributes.kind }
 						/>
-					</p>
-				) }
+					}
+				/>
 			</ToolsPanelItem>
 
 			<ToolsPanelItem
