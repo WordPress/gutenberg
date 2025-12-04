@@ -211,6 +211,15 @@ export function getBlockBindingsSource( state, sourceName ) {
 	return state.blockBindingsSources[ sourceName ];
 }
 
+/**
+ * Compute the fields list for a specific block bindings source.
+ *
+ * @param {Object} state        Data state.
+ * @param {Object} source       Block bindings source.
+ * @param {Object} blockContext Block context.
+ *
+ * @return {Array} List of fields for the specific source.
+ */
 export const getBlockBindingsSourceFieldsList = createRegistrySelector(
 	( select ) =>
 		createSelector(
