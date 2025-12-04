@@ -70,7 +70,7 @@ export default function OverlayTemplatePartSelector( {
 	const options = useMemo( () => {
 		const baseOptions = [
 			{
-				label: __( 'None' ),
+				label: __( 'None (default)' ),
 				value: '',
 			},
 		];
@@ -149,9 +149,7 @@ export default function OverlayTemplatePartSelector( {
 				accessibleWhenDisabled
 				help={
 					overlayTemplateParts.length === 0 && hasResolved
-						? __(
-								'No overlays available. Create one in the Site Editor.'
-						  )
+						? __( 'No overlays found. Create one?' )
 						: __( 'Select an overlay to use for the navigation.' )
 				}
 			/>

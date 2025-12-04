@@ -93,7 +93,7 @@ describe( 'OverlayTemplatePartSelector', () => {
 	} );
 
 	describe( 'Template part selection', () => {
-		it( 'should show selector with "None" option when no template parts are available', () => {
+		it( 'should show selector with "None (default)" option when no template parts are available', () => {
 			useEntityRecords.mockReturnValue( {
 				records: [],
 				isResolving: false,
@@ -108,8 +108,8 @@ describe( 'OverlayTemplatePartSelector', () => {
 			expect( select ).toBeInTheDocument();
 			expect( select ).toHaveValue( '' );
 
-			// Check for "None" option
-			expect( screen.getByRole( 'option', { name: 'None' } ) ).toBeInTheDocument();
+			// Check for "None (default)" option
+			expect( screen.getByRole( 'option', { name: 'None (default)' } ) ).toBeInTheDocument();
 		} );
 
 		it( 'should filter template parts by overlay area', () => {
@@ -181,7 +181,7 @@ describe( 'OverlayTemplatePartSelector', () => {
 			} );
 		} );
 
-		it( 'should call setAttributes with undefined when "None" is selected', async () => {
+		it( 'should call setAttributes with undefined when "None (default)" is selected', async () => {
 			const user = userEvent.setup();
 
 			useEntityRecords.mockReturnValue( {
@@ -375,9 +375,7 @@ describe( 'OverlayTemplatePartSelector', () => {
 			render( <OverlayTemplatePartSelector { ...defaultProps } /> );
 
 			expect(
-				screen.getByText(
-					'No overlays available. Create one in the Site Editor.'
-				)
+				screen.getByText( 'No overlays found. Create one?' )
 			).toBeInTheDocument();
 		} );
 
