@@ -8,6 +8,7 @@ import {
 	Modal,
 	Button,
 	Flex,
+	Notice,
 	privateApis as componentsPrivateApis,
 	__experimentalHStack as HStack,
 	__experimentalGrid as Grid,
@@ -47,6 +48,10 @@ export default function HTMLEditModal( {
 				settings.__experimentalCanUserUseUnfilteredHTML,
 		};
 	}, [] );
+
+	// Determine if we should show a warning about CSS/JS content being stripped
+	const hasRestrictedContent =
+		! canUserUseUnfilteredHTML && ( css.trim() || js.trim() );
 
 	if ( ! isOpen ) {
 		return null;
@@ -149,6 +154,17 @@ export default function HTMLEditModal( {
 								/>
 							</div>
 						</HStack>
+						{ hasRestrictedContent && (
+							<Notice
+								status="warning"
+								isDismissible={ false }
+								className="block-library-html__modal-notice"
+							>
+								{ __(
+									'This block contains CSS or JavaScript that will be removed when you save because you do not have permission to use unfiltered HTML.'
+								) }
+							</Notice>
+						) }
 						<HStack
 							alignment="stretch"
 							justify="flex-start"
