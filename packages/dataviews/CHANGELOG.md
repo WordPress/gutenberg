@@ -2,7 +2,12 @@
 
 ## Unreleased
 
+<<<<<<< HEAD
 - Fixed focus loss when collapsing cards in DataForm view. ([#73242](https://github.com/WordPress/gutenberg/pull/73723))
+=======
+### Bug Fixes
+- DataViews: Preserve focus when collapsing cards in DataForm view. ([#73583](https://github.com/WordPress/gutenberg/pull/73583))
+>>>>>>> 76cabd4e48 (Upating Changelog.md file and maintain code)
 
 ### Enhancements
 
