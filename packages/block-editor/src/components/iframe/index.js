@@ -115,7 +115,11 @@ function Iframe( {
 			isPreviewMode: settings.isPreviewMode,
 		};
 	}, [] );
-	const { styles = '', scripts = '' } = resolvedAssets;
+	const {
+		styles = '',
+		scripts = '',
+		script_modules: scriptModules = '',
+	} = resolvedAssets;
 	/** @type {[Document, import('react').Dispatch<Document>]} */
 	const [ iframeDocument, setIframeDocument ] = useState();
 	const [ bodyClasses, setBodyClasses ] = useState( [] );
@@ -272,6 +276,7 @@ function Iframe( {
 		</style>
 		${ styles }
 		${ scripts }
+		${ scriptModules }
 	</head>
 	<body>
 		<script>document.currentScript.parentElement.remove()</script>
