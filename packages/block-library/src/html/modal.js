@@ -48,11 +48,6 @@ export default function HTMLEditModal( {
 		};
 	}, [] );
 
-	// Show CSS/JS tabs only if user has unfiltered_html capability
-	// This prevents users from adding CSS/JS they can't actually save
-	const shouldShowCssTab = canUserUseUnfilteredHTML;
-	const shouldShowJsTab = canUserUseUnfilteredHTML;
-
 	if ( ! isOpen ) {
 		return null;
 	}
@@ -134,10 +129,10 @@ export default function HTMLEditModal( {
 							<div>
 								<Tabs.TabList>
 									<Tabs.Tab tabId="html">HTML</Tabs.Tab>
-									{ shouldShowCssTab && (
+									{ canUserUseUnfilteredHTML && (
 										<Tabs.Tab tabId="css">CSS</Tabs.Tab>
 									) }
-									{ shouldShowJsTab && (
+									{ canUserUseUnfilteredHTML && (
 										<Tabs.Tab tabId="js">
 											{ __( 'JavaScript' ) }
 										</Tabs.Tab>
@@ -174,7 +169,7 @@ export default function HTMLEditModal( {
 										className="block-library-html__modal-editor"
 									/>
 								</Tabs.TabPanel>
-								{ shouldShowCssTab && (
+								{ canUserUseUnfilteredHTML && (
 									<Tabs.TabPanel
 										tabId="css"
 										focusable={ false }
@@ -189,7 +184,7 @@ export default function HTMLEditModal( {
 										/>
 									</Tabs.TabPanel>
 								) }
-								{ shouldShowJsTab && (
+								{ canUserUseUnfilteredHTML && (
 									<Tabs.TabPanel
 										tabId="js"
 										focusable={ false }
