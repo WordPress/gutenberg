@@ -17,8 +17,6 @@ import {
 	useContext,
 	useMemo,
 	useState,
-	useRef,
-	useLayoutEffect,
 	useEffect,
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
@@ -59,17 +57,6 @@ const CardHeader = ( {
 	controlsId,
 	className,
 }: CardHeaderProps ) => {
-	const buttonRef = useRef< HTMLButtonElement >( null );
-	const prevIsOpenRef = useRef( isOpen );
-
-	// Focus BEFORE paint to avoid flicker
-	useLayoutEffect( () => {
-		if ( isCollapsible && prevIsOpenRef.current !== isOpen ) {
-			buttonRef.current?.focus();
-		}
-		prevIsOpenRef.current = isOpen;
-	}, [ isOpen, isCollapsible ] );
-
 	return (
 		<OriginalCardHeader
 			isBorderless
@@ -88,7 +75,6 @@ const CardHeader = ( {
 			>
 				{ children }
 				<Button
-					ref={ buttonRef }
 					type="button"
 					__next40pxDefaultSize
 					variant="tertiary"
