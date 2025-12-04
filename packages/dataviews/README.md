@@ -1858,9 +1858,9 @@ Each type of data supports a default set of filter operators, depending on its n
 - url: `is`, `isNot`, `contains`, `notContains`, `startsWith`, `isAny`, `isNone`, `isAll`, `isNotAll`.
 - fields with no type: any operator.
 
-#### Filter Operators by Field Type  
+#### Default Filter Operators by Field Type
   
-Different field types enable by default different filter operators based on the type of data they represent:  
+Some field types automatically enable the filter operators that make sense for the type of data they represent:  
   
 - **Fields with `type: 'integer'` or `type: 'number'`** provide numeric comparison operators:  `is`, `isNot`, `lessThan`, `greaterThan`, `lessThanOrEqual`, `greaterThanOrEqual`, `between`
 
