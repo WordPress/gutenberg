@@ -48,10 +48,12 @@ export default function HTMLEditModal( {
 		};
 	}, [] );
 
-	// Show CSS tab if user has permission OR if block contains CSS
-	const shouldShowCssTab = canUserUseUnfilteredHTML || css.trim() !== '';
-	// Show JS tab if user has permission OR if block contains JavaScript
-	const shouldShowJsTab = canUserUseUnfilteredHTML || js.trim() !== '';
+	// Show CSS tab only if user has unfiltered_html capability
+	// This prevents users from adding CSS they can't actually save
+	const shouldShowCssTab = canUserUseUnfilteredHTML;
+	// Show JS tab only if user has unfiltered_html capability
+	// This prevents users from adding JS they can't actually save
+	const shouldShowJsTab = canUserUseUnfilteredHTML;
 
 	if ( ! isOpen ) {
 		return null;
@@ -70,11 +72,17 @@ export default function HTMLEditModal( {
 		setIsDirty( true );
 	};
 	const handleUpdate = () => {
+		// For users without unfiltered_html capability, strip CSS and JS content
+		// to prevent kses from leaving broken content
+		const htmlToSave = editedHtml;
+		const cssToSave = canUserUseUnfilteredHTML ? editedCss : '';
+		const jsToSave = canUserUseUnfilteredHTML ? editedJs : '';
+
 		setAttributes( {
 			content: serializeContent( {
-				html: editedHtml,
-				css: editedCss,
-				js: editedJs,
+				html: htmlToSave,
+				css: cssToSave,
+				js: jsToSave,
 			} ),
 		} );
 		setIsDirty( false );
