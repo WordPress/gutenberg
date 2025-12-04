@@ -38,9 +38,9 @@ function parseTemplatePartId( templatePartId ) {
  * Overlay Template Part Selector component.
  *
  * @param {Object}   props                          Component props.
- * @param {string}   props.overlayTemplatePart       Currently selected overlay template part ID.
- * @param {Function} props.setAttributes             Function to update block attributes.
- * @param {Function} props.onNavigateToEntityRecord  Function to navigate to template part editor.
+ * @param {string}   props.overlayTemplatePart      Currently selected overlay template part ID.
+ * @param {Function} props.setAttributes            Function to update block attributes.
+ * @param {Function} props.onNavigateToEntityRecord Function to navigate to template part editor.
  * @return {JSX.Element} The overlay template part selector component.
  */
 export default function OverlayTemplatePartSelector( {

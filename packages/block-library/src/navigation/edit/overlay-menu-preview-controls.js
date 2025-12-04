@@ -18,11 +18,11 @@ import OverlayMenuIcon from './overlay-menu-icon';
  * Overlay Menu Preview Controls component.
  * Used within PanelBody context (not ToolsPanel).
  *
- * @param {Object}   props              Component props.
- * @param {boolean}  props.hasIcon      Whether the overlay menu has an icon.
- * @param {string}   props.icon         Icon type for overlay menu.
+ * @param {Object}   props               Component props.
+ * @param {boolean}  props.hasIcon       Whether the overlay menu has an icon.
+ * @param {string}   props.icon          Icon type for overlay menu.
  * @param {Function} props.setAttributes Function to update block attributes.
- * @return {JSX.Element} The overlay menu preview controls.
+ * @return {JSX.Element}                The overlay menu preview controls.
  */
 export default function OverlayMenuPreviewControls( {
 	hasIcon,
@@ -37,9 +37,7 @@ export default function OverlayMenuPreviewControls( {
 				help={ __(
 					'Configure the visual appearance of the button that toggles the overlay menu.'
 				) }
-				onChange={ ( value ) =>
-					setAttributes( { hasIcon: value } )
-				}
+				onChange={ ( value ) => setAttributes( { hasIcon: value } ) }
 				checked={ hasIcon }
 			/>
 			<ToggleGroupControl
@@ -65,4 +63,3 @@ export default function OverlayMenuPreviewControls( {
 		</VStack>
 	);
 }
-

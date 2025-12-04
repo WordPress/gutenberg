@@ -17,19 +17,19 @@ import OverlayMenuPreviewButton from './overlay-menu-preview-button';
 /**
  * Overlay Panel component for Navigation block.
  *
- * @param {Object}   props                          Component props.
- * @param {string}   props.overlayMenu              Overlay menu setting ('never', 'mobile', 'always').
- * @param {string}   props.overlayTemplatePart      Currently selected overlay template part ID.
- * @param {Function} props.setAttributes            Function to update block attributes.
- * @param {Function} props.onNavigateToEntityRecord Function to navigate to template part editor.
- * @param {boolean}  props.overlayMenuPreview       Whether overlay menu preview is open.
- * @param {Function} props.setOverlayMenuPreview    Function to toggle overlay menu preview.
- * @param {boolean}  props.hasIcon                  Whether the overlay menu has an icon.
- * @param {string}   props.icon                     Icon type for overlay menu.
+ * @param {Object}   props                           Component props.
+ * @param {string}   props.overlayMenu               Overlay menu setting ('never', 'mobile', 'always').
+ * @param {string}   props.overlayTemplatePart       Currently selected overlay template part ID.
+ * @param {Function} props.setAttributes             Function to update block attributes.
+ * @param {Function} props.onNavigateToEntityRecord  Function to navigate to template part editor.
+ * @param {boolean}  props.overlayMenuPreview        Whether overlay menu preview is open.
+ * @param {Function} props.setOverlayMenuPreview     Function to toggle overlay menu preview.
+ * @param {boolean}  props.hasIcon                   Whether the overlay menu has an icon.
+ * @param {string}   props.icon                      Icon type for overlay menu.
  * @param {string}   props.overlayMenuPreviewClasses CSS classes for overlay menu preview button.
- * @param {string}   props.overlayMenuPreviewId     ID for overlay menu preview.
- * @param {boolean}  props.isResponsive             Whether overlay menu is responsive.
- * @return {JSX.Element|null} The overlay panel component or null if overlay is disabled.
+ * @param {string}   props.overlayMenuPreviewId      ID for overlay menu preview.
+ * @param {boolean}  props.isResponsive              Whether overlay menu is responsive.
+ * @return {JSX.Element|null}                       The overlay panel component or null if overlay is disabled.
  */
 export default function OverlayPanel( {
 	overlayMenu,
