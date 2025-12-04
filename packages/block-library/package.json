@@ -32,7 +32,11 @@
 		"./babel-plugin": "./babel-plugin.js",
 		"./build-module/*": "./build-module/*",
 		"./build-style/*": "./build-style/*",
-		"./package.json": "./package.json"
+		"./package.json": "./package.json",
+		"./*": {
+			"import": "./build-module/*",
+			"require": "./build/*"
+		}
 	},
 	"react-native": "src/index",
 	"wpScript": true,

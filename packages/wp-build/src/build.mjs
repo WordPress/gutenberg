@@ -1001,6 +1001,30 @@ async function transpilePackage( packageName ) {
 		}
 	}
 
+	// Add `index` and `init` scripts for each block.
+	if ( packageName === 'block-library' ) {
+		const blockJsonFiles = glob.sync(
+			normalizePath( path.join( packageDir, 'src/*/block.json' ) )
+		);
+
+		// Block name is the folder name.
+		for ( const blockJsonFile of blockJsonFiles ) {
+			const blockName = path.basename( path.dirname( blockJsonFile ) );
+
+			// Add index.js and init.js as entry points for each block
+			for ( const entry of [ 'index.js', 'init.js' ] ) {
+				addBuildPath(
+					cjsEntryPoints,
+					`./build/${ blockName }/${ entry }`
+				);
+				addBuildPath(
+					moduleEntryPoints,
+					`./build-module/${ blockName }/${ entry }`
+				);
+			}
+		}
+	}
+
 	// Add the `wpScriptModuleExports` exports as entrypoints, module only.
 	if ( packageJson.wpScriptModuleExports ) {
 		const exports =
