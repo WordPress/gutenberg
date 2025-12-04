@@ -45,28 +45,44 @@ export default function BlockVisibilityBreakpointsModal( {
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 
 	// Get initial breakpoint visibility state from blocks
+	// Only show a value as checked if ALL blocks have that value set
 	const initialBreakpoints = useMemo( () => {
 		const breakpoints = { mobile: false, tablet: false, desktop: false };
-		const hasBreakpoints = blocks.some(
-			( block ) => block.attributes.metadata?.blockVisibilityBreakpoints
+
+		if ( blocks.length === 0 ) {
+			return breakpoints;
+		}
+
+		// Check if all blocks have the same value for each breakpoint
+		const allBlocksHaveMobile = blocks.every(
+			( block ) =>
+				block.attributes.metadata?.blockVisibilityBreakpoints
+					?.mobile === true
+		);
+		const allBlocksHaveTablet = blocks.every(
+			( block ) =>
+				block.attributes.metadata?.blockVisibilityBreakpoints
+					?.tablet === true
+		);
+		const allBlocksHaveDesktop = blocks.every(
+			( block ) =>
+				block.attributes.metadata?.blockVisibilityBreakpoints
+					?.desktop === true
 		);
 
-		if ( hasBreakpoints ) {
-			// If any block has breakpoints, check if all have the same values
-			const firstBlockBreakpoints =
-				blocks[ 0 ]?.attributes.metadata?.blockVisibilityBreakpoints;
-			if ( firstBlockBreakpoints ) {
-				breakpoints.mobile = firstBlockBreakpoints.mobile || false;
-				breakpoints.tablet = firstBlockBreakpoints.tablet || false;
-				breakpoints.desktop = firstBlockBreakpoints.desktop || false;
-			}
-		}
+		breakpoints.mobile = allBlocksHaveMobile;
+		breakpoints.tablet = allBlocksHaveTablet;
+		breakpoints.desktop = allBlocksHaveDesktop;
 
 		return breakpoints;
 	}, [ blocks ] );
 
+	// Only show "Hide everywhere" as checked if ALL blocks have it set
 	const initialHideEverywhere = useMemo( () => {
-		return blocks.some(
+		if ( blocks.length === 0 ) {
+			return false;
+		}
+		return blocks.every(
 			( block ) => block.attributes.metadata?.blockVisibility === false
 		);
 	}, [ blocks ] );
