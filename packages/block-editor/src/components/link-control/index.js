@@ -37,6 +37,8 @@ import { ViewerFill } from './viewer-slot';
 import { DEFAULT_LINK_SETTINGS } from './constants';
 import deprecated from '@wordpress/deprecated';
 
+export { LinkPreviewButton } from './link-preview-button';
+
 /**
  * Default properties associated with a link control value.
  *

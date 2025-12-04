@@ -17,7 +17,10 @@ import {
 } from '@wordpress/compose';
 import { safeDecodeURI } from '@wordpress/url';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
-import { __experimentalLinkControlSearchInput as LinkControlSearchInput } from '@wordpress/block-editor';
+import {
+	__experimentalLinkControlSearchInput as LinkControlSearchInput,
+	LinkPreviewButton,
+} from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 
@@ -27,7 +30,6 @@ import { store as coreStore } from '@wordpress/core-data';
 import { useToolsPanelDropdownMenuProps } from '../../utils/hooks';
 import { updateAttributes } from './update-attributes';
 import { useEntityBinding } from './use-entity-binding';
-import { LinkPreviewButton } from './link-preview-button';
 
 /**
  * Given the Link block's type attribute, return the query params for link suggestions.

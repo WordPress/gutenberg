@@ -11,7 +11,11 @@ import {
 import { Icon, chevronDown } from '@wordpress/icons';
 import { safeDecodeURI } from '@wordpress/url';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
-import { __experimentalUseRemoteUrlData as useRemoteUrlData } from '@wordpress/block-editor';
+
+/**
+ * Internal dependencies
+ */
+import useRichUrlData from './use-rich-url-data';
 
 /**
  * Link preview button component that displays the current link information.
@@ -36,7 +40,7 @@ export function LinkPreviewButton( {
 	const { label, url } = link;
 
 	// Fetch rich URL data for custom/external URLs (only if not entity-bound)
-	const { richData } = useRemoteUrlData( hasEntityBinding ? null : url );
+	const { richData } = useRichUrlData( hasEntityBinding ? null : url );
 
 	// Get display title - prioritize richData.title for custom URLs
 	let title;

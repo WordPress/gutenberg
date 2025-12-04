@@ -439,3 +439,67 @@ $block-editor-link-control-number-of-actions: 1;
 	top: calc(50% + #{$spinner-size} / 4); // Add top spacing because this input has a visual label.
 	right: $grid-unit-15;
 }
+
+/**
+ * Link Preview Button
+ */
+
+.components-button.link-control-preview-button {
+	width: 100%;
+	height: auto;
+	padding: $grid-unit-15;
+	box-shadow: inset 0 0 0 1px $gray-600;
+	border-color: $gray-600;
+}
+
+.link-control-preview-button__image-container {
+	width: $grid-unit-30;
+	height: $grid-unit-30;
+	flex-shrink: 0;
+}
+
+.link-control-preview-button__image {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	border-radius: $radius-small;
+}
+
+// Fix truncation in flex layout
+.link-control-preview-button__content {
+	min-width: 0;
+	flex: 1;
+}
+
+.link-control-preview-button__details {
+	min-width: 0;
+	flex: 1;
+}
+
+.link-control-preview-button__title,
+.link-control-preview-button__url {
+	min-width: 0;
+	display: block;
+	width: 100%;
+	text-align: left;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.link-control-preview-button__title {
+	margin-top: $grid-unit-05;
+	font-weight: 500;
+	color: $gray-900;
+	display: block;
+}
+
+.link-control-preview-button__url {
+	font-size: $helptext-font-size;
+	color: $gray-700;
+	font-weight: 400;
+}
+
+.link-control-preview-button__icon {
+	color: $gray-900;
+}
