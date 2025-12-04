@@ -23,7 +23,8 @@ interface ElementItemProps {
 }
 
 function ElementItem( { parentMenu, element, label }: ElementItemProps ) {
-	const prefix = ! element ? '' : `elements.${ element }.`;
+	const prefix =
+		element === 'text' || ! element ? '' : `elements.${ element }.`;
 	const extraStyles =
 		element === 'link'
 			? {
