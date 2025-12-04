@@ -157,10 +157,12 @@ export function ImageEdit( {
 
 		const mediaCaption = imageForInit.caption?.raw;
 
-		// Set the caption from the media library and clear the initFromId flag.
+		// Set the caption from the media library if available.
+		// Clear the initFromId flag in all cases.
 		__unstableMarkNextChangeAsNotPersistent();
 		setAttributes( {
-			caption: mediaCaption,
+			// Only set caption if the media has one.
+			...( mediaCaption && { caption: mediaCaption } ),
 			initFromId: undefined,
 		} );
 	}, [
