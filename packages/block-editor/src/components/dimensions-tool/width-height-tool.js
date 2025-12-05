@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import styled from '@emotion/styled';
-
-/**
  * WordPress dependencies
  */
 import {
@@ -12,9 +7,10 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
-const SingleColumnToolsPanelItem = styled( ToolsPanelItem )`
-	grid-column: span 1;
-`;
+/**
+ * Internal dependencies
+ */
+import styles from './style.module.css';
 
 /**
  * @typedef {import('@wordpress/components/build-types/unit-control/types').WPUnitControlUnit} WPUnitControlUnit
@@ -72,7 +68,8 @@ export default function WidthHeightTool( {
 
 	return (
 		<>
-			<SingleColumnToolsPanelItem
+			<ToolsPanelItem
+				className={ styles[ 'single-column' ] }
 				label={ __( 'Width' ) }
 				isShownByDefault={ isShownByDefault }
 				hasValue={ () => width !== '' }
@@ -89,8 +86,9 @@ export default function WidthHeightTool( {
 					onChange={ onDimensionChange( 'width' ) }
 					size="__unstable-large"
 				/>
-			</SingleColumnToolsPanelItem>
-			<SingleColumnToolsPanelItem
+			</ToolsPanelItem>
+			<ToolsPanelItem
+				className={ styles[ 'single-column' ] }
 				label={ __( 'Height' ) }
 				isShownByDefault={ isShownByDefault }
 				hasValue={ () => height !== '' }
@@ -107,7 +105,7 @@ export default function WidthHeightTool( {
 					onChange={ onDimensionChange( 'height' ) }
 					size="__unstable-large"
 				/>
-			</SingleColumnToolsPanelItem>
+			</ToolsPanelItem>
 		</>
 	);
 }
