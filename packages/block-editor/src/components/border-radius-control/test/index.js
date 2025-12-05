@@ -202,9 +202,7 @@ describe( 'BorderRadiusControl', () => {
 			);
 
 			// Need to switch to custom mode first to get spinbutton input
-			const customToggle = screen.getByLabelText(
-				'Set custom border radius'
-			);
+			const customToggle = screen.getByLabelText( 'Set custom value' );
 			await user.click( customToggle );
 
 			const input = screen.getByRole( 'spinbutton' );
@@ -231,9 +229,7 @@ describe( 'BorderRadiusControl', () => {
 			);
 
 			// Need to switch to custom mode first to get unit controls
-			const customToggle = screen.getByLabelText(
-				'Set custom border radius'
-			);
+			const customToggle = screen.getByLabelText( 'Set custom value' );
 			await user.click( customToggle );
 
 			// Find and change the unit dropdown
@@ -256,9 +252,7 @@ describe( 'BorderRadiusControl', () => {
 			);
 
 			// Need to switch to custom mode first to get spinbutton input
-			const customToggle = screen.getByLabelText(
-				'Set custom border radius'
-			);
+			const customToggle = screen.getByLabelText( 'Set custom value' );
 			await user.click( customToggle );
 
 			const input = screen.getByRole( 'spinbutton' );
@@ -301,13 +295,14 @@ describe( 'BorderRadiusControl', () => {
 
 			// Need to switch to custom mode first to get spinbutton inputs
 			// Find and click the custom toggle for the top-left corner specifically
-			const customToggles = screen.getAllByLabelText(
-				'Set custom border radius'
-			);
+			const customToggles =
+				screen.getAllByLabelText( 'Set custom value' );
 			await user.click( customToggles[ 0 ] ); // Click first corner's custom toggle
 
-			// Find the top-left input specifically by its aria-label
-			const topLeftInput = screen.getByLabelText( 'Top left' );
+			// Find the top-left input specifically by its role and aria-label
+			const topLeftInput = screen.getByRole( 'spinbutton', {
+				name: 'Top left',
+			} );
 
 			// Ensure we have a spinbutton input for top-left corner
 			expect( topLeftInput ).toHaveAttribute( 'type', 'number' );
@@ -348,13 +343,17 @@ describe( 'BorderRadiusControl', () => {
 			expect( sliders ).toHaveLength( 4 );
 
 			// Each corner should have its own control
-			expect( screen.getByLabelText( 'Top left' ) ).toBeInTheDocument();
-			expect( screen.getByLabelText( 'Top right' ) ).toBeInTheDocument();
 			expect(
-				screen.getByLabelText( 'Bottom left' )
+				screen.getByRole( 'slider', { name: 'Top left' } )
 			).toBeInTheDocument();
 			expect(
-				screen.getByLabelText( 'Bottom right' )
+				screen.getByRole( 'slider', { name: 'Top right' } )
+			).toBeInTheDocument();
+			expect(
+				screen.getByRole( 'slider', { name: 'Bottom left' } )
+			).toBeInTheDocument();
+			expect(
+				screen.getByRole( 'slider', { name: 'Bottom right' } )
 			).toBeInTheDocument();
 		} );
 	} );
@@ -405,9 +404,7 @@ describe( 'BorderRadiusControl', () => {
 			);
 
 			// Should show the settings/custom toggle button
-			const customToggle = screen.getByLabelText(
-				'Set custom border radius'
-			);
+			const customToggle = screen.getByLabelText( 'Set custom value' );
 			expect( customToggle ).toBeInTheDocument();
 		} );
 
@@ -422,9 +419,7 @@ describe( 'BorderRadiusControl', () => {
 				/>
 			);
 
-			const customToggle = screen.getByLabelText(
-				'Set custom border radius'
-			);
+			const customToggle = screen.getByLabelText( 'Set custom value' );
 
 			// Initially should show preset controls (range slider)
 			expect( screen.getByRole( 'slider' ) ).toBeInTheDocument();
@@ -509,9 +504,9 @@ describe( 'BorderRadiusControl', () => {
 			const combobox = screen.getByRole( 'combobox' );
 			await user.click( combobox );
 
-			// Should show custom option in the dropdown
+			// Should show preset options in the dropdown
 			await waitFor( () => {
-				expect( screen.getByText( 'Custom' ) ).toBeInTheDocument();
+				expect( screen.getByText( 'Size 1' ) ).toBeInTheDocument();
 			} );
 		} );
 	} );
@@ -644,13 +639,17 @@ describe( 'BorderRadiusControl', () => {
 			);
 
 			// Check that individual corner controls have proper labels (sliders with presets)
-			expect( screen.getByLabelText( 'Top left' ) ).toBeInTheDocument();
-			expect( screen.getByLabelText( 'Top right' ) ).toBeInTheDocument();
 			expect(
-				screen.getByLabelText( 'Bottom left' )
+				screen.getByRole( 'slider', { name: 'Top left' } )
 			).toBeInTheDocument();
 			expect(
-				screen.getByLabelText( 'Bottom right' )
+				screen.getByRole( 'slider', { name: 'Top right' } )
+			).toBeInTheDocument();
+			expect(
+				screen.getByRole( 'slider', { name: 'Bottom left' } )
+			).toBeInTheDocument();
+			expect(
+				screen.getByRole( 'slider', { name: 'Bottom right' } )
 			).toBeInTheDocument();
 		} );
 
