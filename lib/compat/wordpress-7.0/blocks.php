@@ -121,3 +121,55 @@ if ( ! function_exists( 'gutenberg_resolve_pattern_blocks' ) ) {
 		return $blocks;
 	}
 }
+
+/**
+ * Adds update `taxQuery` args to handle exclusion of taxonomy terms.
+ *
+ * @see 'query_loop_block_query_vars'
+ *
+ * @param array    $query The query vars.
+ * @param WP_Block $block Block instance.
+ * @return array   The filtered query vars.
+ */
+function gutenberg_update_tax_query_of_query_loop_block( $query, $block ) {
+	$tax_query_input = $block->context['query']['taxQuery'];
+	if ( empty( $tax_query_input ) ) {
+		return $query;
+	}
+
+	// Helper function to build tax_query conditions from taxonomy terms.
+	$build_conditions = static function ( $terms, $operator = 'IN' ) {
+		$conditions = array();
+		foreach ( $terms as $taxonomy => $terms ) {
+			if ( is_taxonomy_viewable( $taxonomy ) && ! empty( $terms ) ) {
+				$conditions[] = array(
+					'taxonomy'         => $taxonomy,
+					'terms'            => array_filter( array_map( 'intval', $terms ) ),
+					'operator'         => $operator,
+					'include_children' => false,
+				);
+			}
+		}
+		return $conditions;
+	};
+	// Separate excludeTerms from include terms.
+	$exclude_terms = isset( $tax_query_input['excludeTerms'] ) && is_array( $tax_query_input['excludeTerms'] )
+		? $tax_query_input['excludeTerms']
+		: array();
+	$include_terms = array_diff_key( $tax_query_input, array( 'excludeTerms' => '' ) );
+
+	$tax_query = array_merge(
+		$build_conditions( $include_terms ),
+		$build_conditions( $exclude_terms, 'NOT IN' )
+	);
+
+	if ( ! empty( $tax_query ) ) {
+		// Merge with existing `tax_query` like core does, because
+		// of the deprecated `categoryIds` and `tagIds` props.
+		$query['tax_query'] = array_merge( $query['tax_query'], $tax_query );
+	}
+
+	return $query;
+}
+
+add_filter( 'query_loop_block_query_vars', 'gutenberg_update_tax_query_of_query_loop_block', 10, 2 );

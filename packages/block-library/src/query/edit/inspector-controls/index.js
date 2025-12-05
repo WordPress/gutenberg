@@ -70,18 +70,31 @@ export default function QueryInspectorControls( props ) {
 		// We need to dynamically update the `taxQuery` property,
 		// by removing any not supported taxonomy from the query.
 		const supportedTaxonomies = postTypesTaxonomiesMap[ newValue ];
-		const updatedTaxQuery = Object.entries( taxQuery || {} ).reduce(
-			( accumulator, [ taxonomySlug, terms ] ) => {
-				if ( supportedTaxonomies.includes( taxonomySlug ) ) {
-					accumulator[ taxonomySlug ] = terms;
+		if ( !! supportedTaxonomies?.length ) {
+			// Shared utility to build taxQuery based on supported taxonomies.
+			const buildTaxQuery = ( _taxQuery ) => {
+				return Object.entries( _taxQuery || {} ).reduce(
+					( accumulator, [ taxonomy, terms ] ) => {
+						if ( supportedTaxonomies.includes( taxonomy ) ) {
+							accumulator[ taxonomy ] = terms;
 				}
 				return accumulator;
 			},
 			{}
 		);
+			};
+			const { excludeTerms, ...includeTaxQuery } = taxQuery || {};
+			const updatedTaxQuery = buildTaxQuery( includeTaxQuery );
+			if ( excludeTerms ) {
+				const builtExcludeTaxQuery = buildTaxQuery( excludeTerms );
+				if ( !! Object.keys( builtExcludeTaxQuery ).length ) {
+					updatedTaxQuery.excludeTerms = builtExcludeTaxQuery;
+				}
+			}
 		updateQuery.taxQuery = !! Object.keys( updatedTaxQuery ).length
 			? updatedTaxQuery
 			: undefined;
+		}
 
 		if ( newValue !== 'post' ) {
 			updateQuery.sticky = '';
@@ -384,8 +397,19 @@ export default function QueryInspectorControls( props ) {
 						<ToolsPanelItem
 							label={ __( 'Taxonomies' ) }
 							hasValue={ () =>
-								Object.values( taxQuery || {} ).some(
-									( terms ) => !! terms.length
+								Object.entries( taxQuery || {} ).some(
+									( [ key, value ] ) => {
+										// `excludeTerms` is an object similar to taxQuery taxonomy inclusion: ex: { category: [ 1,2 ], excludeTerms: { tag: [3] } }.
+										if ( key === 'excludeTerms' ) {
+											return Object.values(
+												value || {}
+											).some(
+												( excludeTermIds ) =>
+													!! excludeTermIds.length
+											);
+										}
+										return !! value.length;
+									}
 								)
 							}
 							onDeselect={ () => setQuery( { taxQuery: null } ) }

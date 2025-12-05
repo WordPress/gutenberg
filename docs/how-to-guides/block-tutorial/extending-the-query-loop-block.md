@@ -183,7 +183,7 @@ As of Gutenberg version 14.2, the following controls are available:
 -   `postType` - Shows a dropdown of available post types.
 -   `order` - Shows a dropdown to select the order of the query.
 -   `sticky` - Shows a dropdown to select how to handle sticky posts.
--   `taxQuery` - Shows available taxonomies filters for the currently selected post type.
+-   `taxQuery` - Shows available taxonomies filters for the currently selected post type, including both inclusion and exclusion controls for each taxonomy.
 -   `author` - Shows an input field to filter the query by author.
 -   `search` - Shows an input field to filter the query by keywords.
 -   `format` - Shows an input field to filter the query by array/collection of [formats](https://developer.wordpress.org/advanced-administration/wordpress/post-formats/#supported-formats).
@@ -201,6 +201,27 @@ In our case, the property would look like this:
 If you want to hide all the above available controls, you can set an empty array as a value of `allowedControls`.
 
 Notice that we have also disabled the `postType` control. When the user selects our variation, why show them a confusing dropdown to change the post type? On top of that it might break the block as we can implement custom controls, as we'll see shortly.
+
+### Understanding the `taxQuery` structure
+
+The `taxQuery` attribute supports both inclusion and exclusion of taxonomy terms. The structure looks like this:
+
+```js
+{
+	query: {
+		taxQuery: {
+			category: [1, 2, 3], // Include posts with these category IDs.
+			post_tag: [10, 20], // Include posts with these tag IDs.
+			excludeTerms: { // Exclude posts with specific terms.
+				category: [5, 6],
+				post_tag: [15]
+			}
+		}
+	}
+}
+```
+
+When you use the `taxQuery` control in your variation, users will see both "Include: [Taxonomy]" and "Exclude: [Taxonomy]" controls for each applicable taxonomy. The inclusion and exclusion are mutually exclusive in the UI - terms selected in one won't appear as suggestions in the other.
 
 ### Adding additional controls
 
@@ -267,6 +288,8 @@ if( 'my-plugin/books-list' === $block[ 'attrs' ][ 'namespace' ] ) {
 ```
 
 (In the code above, we assume you have some way to access the block, for example within a [`pre_render_block`](https://developer.wordpress.org/reference/hooks/pre_render_block/) filter, but the specific solution can be different depending on the use-case, so this is not a firm recommendation).
+
+**Note:** The Query Loop block's `taxQuery` attribute is automatically processed by the `build_query_vars_from_query_block` function. Both inclusion and exclusion are handled using WordPress's tax_query with `IN` and `NOT IN` operators respectively. If you're adding custom taxonomy filtering, you can follow the same pattern.
 
 ### Making your custom query work on the editor side
 
