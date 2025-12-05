@@ -132,10 +132,11 @@ if ( ! function_exists( 'gutenberg_resolve_pattern_blocks' ) ) {
  * @return array   The filtered query vars.
  */
 function gutenberg_update_tax_query_of_query_loop_block( $query, $block ) {
-	$tax_query_input = $block->context['query']['taxQuery'];
-	if ( empty( $tax_query_input ) ) {
+	if ( empty( $block->context['query']['taxQuery'] ) ) {
 		return $query;
 	}
+
+	$tax_query_input = $block->context['query']['taxQuery'];
 
 	// Helper function to build tax_query conditions from taxonomy terms.
 	$build_conditions = static function ( $terms, $operator = 'IN' ) {
