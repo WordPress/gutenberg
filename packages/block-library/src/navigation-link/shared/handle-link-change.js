@@ -42,6 +42,12 @@ export function useHandleLinkChange( { clientId, attributes, setAttributes } ) {
 				id: updatedLink.id,
 			};
 
+			// Only include title when creating a new link (not updating existing)
+			// This preserves user-customized labels when updating links
+			if ( ! attributes.url || ! attributes.label ) {
+				attrs.title = updatedLink.title;
+			}
+
 			// Check if transitioning from entity to custom link
 			const willBeCustomLink = ! updatedLink.id && hasUrlBinding;
 
