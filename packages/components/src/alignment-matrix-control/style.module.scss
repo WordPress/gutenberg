@@ -1,7 +1,6 @@
 @use "@wordpress/base-styles/variables" as *;
 @use "../utils/theme-variables" as *;
 
-/* Grid structure */
 .grid-container {
 	direction: ltr;
 
@@ -27,7 +26,6 @@
 	grid-template-columns: repeat(3, 1fr);
 }
 
-/* Cell */
 .cell {
 	position: relative;
 
@@ -44,7 +42,6 @@
 	outline: none;
 }
 
-/* Point */
 .point {
 	display: block;
 	contain: strict;
