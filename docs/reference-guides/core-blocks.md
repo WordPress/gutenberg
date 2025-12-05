@@ -92,7 +92,7 @@ Display a breadcrumb trail for hierarchical post types or based on taxonomy term
 -	**Name:** core/breadcrumbs
 -	**Experimental:** true
 -	**Category:** theme
--	**Supports:** color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** align, color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** prefersTaxonomy, separator, showCurrentItem, showHomeItem, showOnHomePage
 
 ## Button
