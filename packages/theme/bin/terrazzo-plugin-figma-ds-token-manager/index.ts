@@ -2,6 +2,7 @@
  * External dependencies
  */
 import type { Plugin, TokenNormalized } from '@terrazzo/parser';
+import { kebabCase } from '@terrazzo/token-tools';
 import { transformCSSValue } from '@terrazzo/token-tools/css';
 import {
 	parse,
@@ -16,80 +17,36 @@ import {
  */
 import '../../src/color-ramps/lib/register-color-spaces';
 import { FORMAT_JSON_ID } from './lib';
+import { publicTokenId } from '../../src/token-id';
 
-const TONES = new Set( [
-	'neutral',
-	'brand',
-	'success',
-	'info',
-	'warning',
-	'caution',
-	'error',
-] );
+/**
+ * Transforms a token ID to a Figma variable name including folders.
+ *
+ * Token IDs are transformed to match the CSS variable naming convention
+ * (`--wpds-<type>-<property>-<target>[-<modifier>]`) but using `/` as
+ * folder separators for the first 3 segments (type, property, target),
+ * with remaining segments joined by dashes.
+ *
+ * Examples:
+ * - `color.bg.surface.info.weak` → `wpds-color/bg/surface/info-weak`
+ * - `dimension.padding.surface.sm` → `wpds-dimension/padding/surface/sm`
+ * - `font.lineHeight.small` → `wpds-font/line-height/small`
+ *
+ * @param options    Options object.
+ * @param options.id The token ID to transform.
+ * @return The transformed token name.
+ */
+function transformTokenName( { id }: { id: string } ): string {
+	const [ type, property, target, ...modifiers ] =
+		publicTokenId( id ).split( '.' );
 
-function titleCase( str: string ) {
-	return str[ 0 ].toUpperCase() + str.slice( 1 );
-}
-
-function kebabToCamel( str: string ) {
-	return str.replace( /-([a-z])/g, ( _, letter ) => letter.toUpperCase() );
-}
-
-function transformTokenName( { id }: { id: string } ) {
-	return (
-		id
-			// Capitalize first segment
-			.replace( /^(\w+)\./g, ( _, g1 ) => `${ titleCase( g1 ) }/` )
-			// Capitalize
-			.replace( /semantic\./g, '' )
-			// Transform tokens:
-			// - Add extra folder matching top-level grouping
-			// - Prefix property name with top-level grouping
-			// - Shift color tones to extra folder
-			// - Keep last part of the token name with dots (eg no folders)
-			.replace(
-				/(Dimension|Color)\/(\w+)\.(\w+)\.(.*)/g,
-				( _, prefix, property, target, modifier ) => {
-					let extraFolder = '';
-					let propertyName = property + '-' + target;
-
-					switch ( property ) {
-						case 'bg':
-							extraFolder = 'Background/';
-							break;
-						case 'fg':
-							extraFolder = 'Foreground/';
-							break;
-						case 'stroke':
-							extraFolder = 'Stroke/';
-							break;
-						case 'padding':
-							extraFolder = 'Padding/';
-							propertyName = 'pad-' + target;
-							break;
-					}
-
-					const [ tone, ...remaining ] = modifier.split( '.' );
-					if ( tone && TONES.has( tone ) ) {
-						extraFolder = extraFolder + titleCase( tone ) + '/';
-						modifier = remaining.join( '.' );
-					}
-
-					return `${ prefix }/${ extraFolder }${ kebabToCamel(
-						propertyName
-					) }.${ modifier }`;
-				}
-			)
-			// Remove default emphasis and state variants from variable name
-			.replace( /normal\./g, '' )
-			.replace( /resting/g, '' )
-			// Remove double dots
-			.replace( /\.{2,}/g, '.' )
-			// Remove trailing dot
-			.replace( /\.$/g, '' )
-			// Replace remaining dots with dashes
-			.replace( /\./g, '-' )
-	);
+	return [
+		`wpds-${ type }/${ kebabCase( property ) }`,
+		target && kebabCase( target ),
+		modifiers.map( kebabCase ).join( '-' ),
+	]
+		.filter( Boolean )
+		.join( '/' );
 }
 
 function transformColorToken(

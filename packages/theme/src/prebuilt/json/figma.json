@@ -1,564 +1,564 @@
 {
-	"Border/radius-x-small": {
+	"wpds-border/radius/x-small": {
 		"value": {
 			".": "1px"
 		},
 		"description": "Extra small radius"
 	},
-	"Border/radius-small": {
+	"wpds-border/radius/small": {
 		"value": {
 			".": "2px"
 		},
 		"description": "Small radius"
 	},
-	"Border/radius-medium": {
+	"wpds-border/radius/medium": {
 		"value": {
 			".": "4px"
 		},
 		"description": "Medium radius"
 	},
-	"Border/radius-large": {
+	"wpds-border/radius/large": {
 		"value": {
 			".": "8px"
 		},
 		"description": "Large radius"
 	},
-	"Border/width-focus": {
+	"wpds-border/width/focus": {
 		"value": {
 			".": "2px",
 			"high-dpi": "1.5px"
 		},
 		"description": "Border width for focus ring"
 	},
-	"Color/Background/Neutral/bgSurface": {
+	"wpds-color/bg/surface/neutral": {
 		"value": {
 			".": "#f8f8f8"
 		},
 		"description": "Background color for surfaces with normal emphasis."
 	},
-	"Color/Background/Neutral/bgSurface-strong": {
+	"wpds-color/bg/surface/neutral-strong": {
 		"value": {
 			".": "#fff"
 		},
 		"description": "Background color for surfaces with strong emphasis."
 	},
-	"Color/Background/Neutral/bgSurface-weak": {
+	"wpds-color/bg/surface/neutral-weak": {
 		"value": {
 			".": "#f0f0f0"
 		},
 		"description": "Background color for surfaces with weak emphasis."
 	},
-	"Color/Background/Brand/bgSurface": {
+	"wpds-color/bg/surface/brand": {
 		"value": {
 			".": "#ecf0f9"
 		},
 		"description": "Background color for surfaces with brand tone and normal emphasis."
 	},
-	"Color/Background/Success/bgSurface": {
+	"wpds-color/bg/surface/success": {
 		"value": {
 			".": "#cbf5d1"
 		},
 		"description": "Background color for surfaces with success tone and normal emphasis."
 	},
-	"Color/Background/Success/bgSurface-weak": {
+	"wpds-color/bg/surface/success-weak": {
 		"value": {
 			".": "#f0fcf2"
 		},
 		"description": "Background color for surfaces with success tone and weak emphasis."
 	},
-	"Color/Background/Info/bgSurface": {
+	"wpds-color/bg/surface/info": {
 		"value": {
 			".": "#dfebf8"
 		},
 		"description": "Background color for surfaces with info tone and normal emphasis."
 	},
-	"Color/Background/Info/bgSurface-weak": {
+	"wpds-color/bg/surface/info-weak": {
 		"value": {
 			".": "#f5f9fd"
 		},
 		"description": "Background color for surfaces with info tone and weak emphasis."
 	},
-	"Color/Background/Warning/bgSurface": {
+	"wpds-color/bg/surface/warning": {
 		"value": {
 			".": "#f8e8cc"
 		},
 		"description": "Background color for surfaces with warning tone and normal emphasis."
 	},
-	"Color/Background/Warning/bgSurface-weak": {
+	"wpds-color/bg/surface/warning-weak": {
 		"value": {
 			".": "#fdf7ee"
 		},
 		"description": "Background color for surfaces with warning tone and weak emphasis."
 	},
-	"Color/Background/Caution/bgSurface": {
+	"wpds-color/bg/surface/caution": {
 		"value": {
 			".": "#f7eab3"
 		},
 		"description": "Background color for surfaces with caution tone and normal emphasis."
 	},
-	"Color/Background/Caution/bgSurface-weak": {
+	"wpds-color/bg/surface/caution-weak": {
 		"value": {
 			".": "#fdf9e7"
 		},
 		"description": "Background color for surfaces with caution tone and weak emphasis."
 	},
-	"Color/Background/Error/bgSurface": {
+	"wpds-color/bg/surface/error": {
 		"value": {
 			".": "#fae4e1"
 		},
 		"description": "Background color for surfaces with error tone and normal emphasis."
 	},
-	"Color/Background/Error/bgSurface-weak": {
+	"wpds-color/bg/surface/error-weak": {
 		"value": {
 			".": "#fdf6f5"
 		},
 		"description": "Background color for surfaces with error tone and weak emphasis."
 	},
-	"Color/Background/Neutral/bgInteractive": {
+	"wpds-color/bg/interactive/neutral": {
 		"value": {
 			".": "#0000"
 		},
 		"description": "Background color for interactive elements with neutral tone and normal emphasis."
 	},
-	"Color/Background/Neutral/bgInteractive-active": {
+	"wpds-color/bg/interactive/neutral-active": {
 		"value": {
 			".": "#eaeaea"
 		},
 		"description": "Background color for interactive elements with neutral tone and normal emphasis that are hovered, focused, or active."
 	},
-	"Color/Background/Neutral/bgInteractive-disabled": {
+	"wpds-color/bg/interactive/neutral-disabled": {
 		"value": {
 			".": "#e2e2e2"
 		},
 		"description": "Background color for interactive elements with neutral tone and normal emphasis, in their disabled state."
 	},
-	"Color/Background/Neutral/bgInteractive-strong": {
+	"wpds-color/bg/interactive/neutral-strong": {
 		"value": {
 			".": "#2d2d2d"
 		},
 		"description": "Background color for interactive elements with neutral tone and strong emphasis."
 	},
-	"Color/Background/Neutral/bgInteractive-strong-active": {
+	"wpds-color/bg/interactive/neutral-strong-active": {
 		"value": {
 			".": "#1e1e1e"
 		},
 		"description": "Background color for interactive elements with neutral tone and strong emphasis that are hovered, focused, or active."
 	},
-	"Color/Background/Neutral/bgInteractive-strong-disabled": {
+	"wpds-color/bg/interactive/neutral-strong-disabled": {
 		"value": {
 			".": "#d2d2d2"
 		},
 		"description": "Background color for interactive elements with neutral tone and strong emphasis, in their disabled state."
 	},
-	"Color/Background/Neutral/bgInteractive-weak": {
+	"wpds-color/bg/interactive/neutral-weak": {
 		"value": {
 			".": "#0000"
 		},
 		"description": "Background color for interactive elements with neutral tone and weak emphasis."
 	},
-	"Color/Background/Neutral/bgInteractive-weak-active": {
+	"wpds-color/bg/interactive/neutral-weak-active": {
 		"value": {
 			".": "#eaeaea"
 		},
 		"description": "Background color for interactive elements with neutral tone and weak emphasis that are hovered, focused, or active."
 	},
-	"Color/Background/Neutral/bgInteractive-weak-disabled": {
+	"wpds-color/bg/interactive/neutral-weak-disabled": {
 		"value": {
 			".": "#e2e2e2"
 		},
 		"description": "Background color for interactive elements with neutral tone and weak emphasis, in their disabled state."
 	},
-	"Color/Background/Brand/bgInteractive": {
+	"wpds-color/bg/interactive/brand": {
 		"value": {
 			".": "#0000"
 		},
 		"description": "Background color for interactive elements with brand tone and normal emphasis."
 	},
-	"Color/Background/Brand/bgInteractive-active": {
+	"wpds-color/bg/interactive/brand-active": {
 		"value": {
 			".": "#f6f8fc"
 		},
 		"description": "Background color for interactive elements with brand tone and normal emphasis that are hovered, focused, or active."
 	},
-	"Color/Background/Brand/bgInteractive-disabled": {
+	"wpds-color/bg/interactive/brand-disabled": {
 		"value": {
 			".": "#e2e2e2"
 		},
 		"description": "Background color for interactive elements with brand tone and normal emphasis, in their disabled state."
 	},
-	"Color/Background/Brand/bgInteractive-strong": {
+	"wpds-color/bg/interactive/brand-strong": {
 		"value": {
 			".": "#3858e9"
 		},
 		"description": "Background color for interactive elements with brand tone and strong emphasis."
 	},
-	"Color/Background/Brand/bgInteractive-strong-active": {
+	"wpds-color/bg/interactive/brand-strong-active": {
 		"value": {
 			".": "#2e49d9"
 		},
 		"description": "Background color for interactive elements with brand tone and strong emphasis that are hovered, focused, or active."
 	},
-	"Color/Background/Brand/bgInteractive-strong-disabled": {
+	"wpds-color/bg/interactive/brand-strong-disabled": {
 		"value": {
 			".": "#d2d2d2"
 		},
 		"description": "Background color for interactive elements with brand tone and strong emphasis, in their disabled state."
 	},
-	"Color/Background/Brand/bgInteractive-weak": {
+	"wpds-color/bg/interactive/brand-weak": {
 		"value": {
 			".": "#0000"
 		},
 		"description": "Background color for interactive elements with brand tone and weak emphasis."
 	},
-	"Color/Background/Brand/bgInteractive-weak-active": {
+	"wpds-color/bg/interactive/brand-weak-active": {
 		"value": {
 			".": "#e4eaf7"
 		},
 		"description": "Background color for interactive elements with brand tone and weak emphasis that are hovered, focused, or active."
 	},
-	"Color/Background/Brand/bgInteractive-weak-disabled": {
+	"wpds-color/bg/interactive/brand-weak-disabled": {
 		"value": {
 			".": "#e2e2e2"
 		},
 		"description": "Background color for interactive elements with brand tone and weak emphasis, in their disabled state."
 	},
-	"Color/Background/Neutral/bgTrack-weak": {
+	"wpds-color/bg/track/neutral-weak": {
 		"value": {
 			".": "#e0e0e0"
 		},
 		"description": "Background color for tracks with a neutral tone and weak emphasis (eg. scrollbar track)."
 	},
-	"Color/Background/Neutral/bgTrack": {
+	"wpds-color/bg/track/neutral": {
 		"value": {
 			".": "#d8d8d8"
 		},
 		"description": "Background color for tracks with a neutral tone and normal emphasis (eg. slider or progressbar track)."
 	},
-	"Color/Background/Neutral/bgThumb-weak": {
+	"wpds-color/bg/thumb/neutral-weak": {
 		"value": {
 			".": "#8a8a8a"
 		},
 		"description": "Background color for thumbs with a neutral tone and weak emphasis (eg. scrollbar thumb)."
 	},
-	"Color/Background/Neutral/bgThumb-weak-active": {
+	"wpds-color/bg/thumb/neutral-weak-active": {
 		"value": {
 			".": "#6c6c6c"
 		},
 		"description": "Background color for thumbs with a neutral tone and weak emphasis (eg. scrollbar thumb) that are hovered, focused, or active."
 	},
-	"Color/Background/Brand/bgThumb": {
+	"wpds-color/bg/thumb/brand": {
 		"value": {
 			".": "#3858e9"
 		},
 		"description": "Background color for thumbs with a brand tone and normal emphasis (eg. slider thumb and filled track)."
 	},
-	"Color/Background/Brand/bgThumb-active": {
+	"wpds-color/bg/thumb/brand-active": {
 		"value": {
 			".": "#3858e9"
 		},
 		"description": "Background color for thumbs with a brand tone and normal emphasis (eg. slider thumb and filled track) that are hovered, focused, or active."
 	},
-	"Color/Background/Brand/bgThumb-disabled": {
+	"wpds-color/bg/thumb/brand-disabled": {
 		"value": {
 			".": "#d8d8d8"
 		},
 		"description": "Background color for thumbs with a brand tone and normal emphasis (eg. slider thumb and filled track), in their disabled state."
 	},
-	"Color/Foreground/Neutral/fgContent": {
+	"wpds-color/fg/content/neutral": {
 		"value": {
 			".": "#1e1e1e"
 		},
 		"description": "Foreground color for content like text with normal emphasis."
 	},
-	"Color/Foreground/Neutral/fgContent-weak": {
+	"wpds-color/fg/content/neutral-weak": {
 		"value": {
 			".": "#6d6d6d"
 		},
 		"description": "Foreground color for content like text with weak emphasis."
 	},
-	"Color/Foreground/Success/fgContent": {
+	"wpds-color/fg/content/success": {
 		"value": {
 			".": "#002900"
 		},
 		"description": "Foreground color for content like text with success tone and normal emphasis."
 	},
-	"Color/Foreground/Success/fgContent-weak": {
+	"wpds-color/fg/content/success-weak": {
 		"value": {
 			".": "#007f30"
 		},
 		"description": "Foreground color for content like text with success tone and weak emphasis."
 	},
-	"Color/Foreground/Info/fgContent": {
+	"wpds-color/fg/content/info": {
 		"value": {
 			".": "#001b4f"
 		},
 		"description": "Foreground color for content like text with info tone and normal emphasis."
 	},
-	"Color/Foreground/Info/fgContent-weak": {
+	"wpds-color/fg/content/info-weak": {
 		"value": {
 			".": "#006bd7"
 		},
 		"description": "Foreground color for content like text with info tone and weak emphasis."
 	},
-	"Color/Foreground/Warning/fgContent": {
+	"wpds-color/fg/content/warning": {
 		"value": {
 			".": "#2e1900"
 		},
 		"description": "Foreground color for content like text with warning tone and normal emphasis."
 	},
-	"Color/Foreground/Warning/fgContent-weak": {
+	"wpds-color/fg/content/warning-weak": {
 		"value": {
 			".": "#936400"
 		},
 		"description": "Foreground color for content like text with warning tone and weak emphasis."
 	},
-	"Color/Foreground/Caution/fgContent": {
+	"wpds-color/fg/content/caution": {
 		"value": {
 			".": "#281d00"
 		},
 		"description": "Foreground color for content like text with caution tone and normal emphasis."
 	},
-	"Color/Foreground/Caution/fgContent-weak": {
+	"wpds-color/fg/content/caution-weak": {
 		"value": {
 			".": "#836b00"
 		},
 		"description": "Foreground color for content like text with caution tone and weak emphasis."
 	},
-	"Color/Foreground/Error/fgContent": {
+	"wpds-color/fg/content/error": {
 		"value": {
 			".": "#470000"
 		},
 		"description": "Foreground color for content like text with error tone and normal emphasis."
 	},
-	"Color/Foreground/Error/fgContent-weak": {
+	"wpds-color/fg/content/error-weak": {
 		"value": {
 			".": "#cc1818"
 		},
 		"description": "Foreground color for content like text with error tone and weak emphasis."
 	},
-	"Color/Foreground/Neutral/fgInteractive": {
+	"wpds-color/fg/interactive/neutral": {
 		"value": {
 			".": "#1e1e1e"
 		},
 		"description": "Foreground color for interactive elements with neutral tone and normal emphasis."
 	},
-	"Color/Foreground/Neutral/fgInteractive-active": {
+	"wpds-color/fg/interactive/neutral-active": {
 		"value": {
 			".": "#1e1e1e"
 		},
 		"description": "Foreground color for interactive elements with neutral tone and normal emphasis that are hovered, focused, or active."
 	},
-	"Color/Foreground/Neutral/fgInteractive-disabled": {
+	"wpds-color/fg/interactive/neutral-disabled": {
 		"value": {
 			".": "#8a8a8a"
 		},
 		"description": "Foreground color for interactive elements with neutral tone and normal emphasis, in their disabled state."
 	},
-	"Color/Foreground/Neutral/fgInteractive-strong": {
+	"wpds-color/fg/interactive/neutral-strong": {
 		"value": {
 			".": "#f0f0f0"
 		},
 		"description": "Foreground color for interactive elements with neutral tone and strong emphasis."
 	},
-	"Color/Foreground/Neutral/fgInteractive-strong-active": {
+	"wpds-color/fg/interactive/neutral-strong-active": {
 		"value": {
 			".": "#f0f0f0"
 		},
 		"description": "Foreground color for interactive elements with neutral tone and strong emphasis that are hovered, focused, or active."
 	},
-	"Color/Foreground/Neutral/fgInteractive-strong-disabled": {
+	"wpds-color/fg/interactive/neutral-strong-disabled": {
 		"value": {
 			".": "#6d6d6d"
 		},
 		"description": "Foreground color for interactive elements with neutral tone and strong emphasis, in their disabled state."
 	},
-	"Color/Foreground/Neutral/fgInteractive-weak": {
+	"wpds-color/fg/interactive/neutral-weak": {
 		"value": {
 			".": "#6d6d6d"
 		},
 		"description": "Foreground color for interactive elements with neutral tone and weak emphasis."
 	},
-	"Color/Foreground/Neutral/fgInteractive-weak-disabled": {
+	"wpds-color/fg/interactive/neutral-weak-disabled": {
 		"value": {
 			".": "#8a8a8a"
 		},
 		"description": "Foreground color for interactive elements with neutral tone and weak emphasis, in their disabled state."
 	},
-	"Color/Foreground/Brand/fgInteractive": {
+	"wpds-color/fg/interactive/brand": {
 		"value": {
 			".": "#3858e9"
 		},
 		"description": "Foreground color for interactive elements with brand tone and normal emphasis."
 	},
-	"Color/Foreground/Brand/fgInteractive-active": {
+	"wpds-color/fg/interactive/brand-active": {
 		"value": {
 			".": "#3858e9"
 		},
 		"description": "Foreground color for interactive elements with brand tone and normal emphasis that are hovered, focused, or active."
 	},
-	"Color/Foreground/Brand/fgInteractive-disabled": {
+	"wpds-color/fg/interactive/brand-disabled": {
 		"value": {
 			".": "#8a8a8a"
 		},
 		"description": "Foreground color for interactive elements with brand tone and normal emphasis, in their disabled state."
 	},
-	"Color/Foreground/Brand/fgInteractive-strong": {
+	"wpds-color/fg/interactive/brand-strong": {
 		"value": {
 			".": "#eff0f2"
 		},
 		"description": "Foreground color for interactive elements with brand tone and strong emphasis."
 	},
-	"Color/Foreground/Brand/fgInteractive-strong-active": {
+	"wpds-color/fg/interactive/brand-strong-active": {
 		"value": {
 			".": "#eff0f2"
 		},
 		"description": "Foreground color for interactive elements with brand tone and strong emphasis that are hovered, focused, or active."
 	},
-	"Color/Foreground/Brand/fgInteractive-strong-disabled": {
+	"wpds-color/fg/interactive/brand-strong-disabled": {
 		"value": {
 			".": "#6d6d6d"
 		},
 		"description": "Foreground color for interactive elements with brand tone and strong emphasis, in their disabled state."
 	},
-	"Color/Stroke/Neutral/strokeSurface": {
+	"wpds-color/stroke/surface/neutral": {
 		"value": {
 			".": "#d8d8d8"
 		},
 		"description": "Decorative stroke color used to define neutrally-toned surface boundaries with normal emphasis."
 	},
-	"Color/Stroke/Neutral/strokeSurface-weak": {
+	"wpds-color/stroke/surface/neutral-weak": {
 		"value": {
 			".": "#e0e0e0"
 		},
 		"description": "Decorative stroke color used to define neutrally-toned surface boundaries with weak emphasis."
 	},
-	"Color/Stroke/Neutral/strokeSurface-strong": {
+	"wpds-color/stroke/surface/neutral-strong": {
 		"value": {
 			".": "#8a8a8a"
 		},
 		"description": "Decorative stroke color used to define neutrally-toned surface boundaries with strong emphasis."
 	},
-	"Color/Stroke/Brand/strokeSurface": {
+	"wpds-color/stroke/surface/brand": {
 		"value": {
 			".": "#a2b1d6"
 		},
 		"description": "Decorative stroke color used to define brand-toned surface boundaries with normal emphasis."
 	},
-	"Color/Stroke/Brand/strokeSurface-strong": {
+	"wpds-color/stroke/surface/brand-strong": {
 		"value": {
 			".": "#3858e9"
 		},
 		"description": "Decorative stroke color used to define neutrally-toned surface boundaries with strong emphasis."
 	},
-	"Color/Stroke/Success/strokeSurface": {
+	"wpds-color/stroke/surface/success": {
 		"value": {
 			".": "#82c98f"
 		},
 		"description": "Decorative stroke color used to define success-toned surface boundaries with normal emphasis."
 	},
-	"Color/Stroke/Success/strokeSurface-strong": {
+	"wpds-color/stroke/surface/success-strong": {
 		"value": {
 			".": "#007f30"
 		},
 		"description": "Decorative stroke color used to define success-toned surface boundaries with strong emphasis."
 	},
-	"Color/Stroke/Info/strokeSurface": {
+	"wpds-color/stroke/surface/info": {
 		"value": {
 			".": "#9fbcdd"
 		},
 		"description": "Decorative stroke color used to define info-toned surface boundaries with normal emphasis."
 	},
-	"Color/Stroke/Info/strokeSurface-strong": {
+	"wpds-color/stroke/surface/info-strong": {
 		"value": {
 			".": "#006bd7"
 		},
 		"description": "Decorative stroke color used to define info-toned surface boundaries with strong emphasis."
 	},
-	"Color/Stroke/Warning/strokeSurface": {
+	"wpds-color/stroke/surface/warning": {
 		"value": {
 			".": "#d2b581"
 		},
 		"description": "Decorative stroke color used to define warning-toned surface boundaries with normal emphasis."
 	},
-	"Color/Stroke/Warning/strokeSurface-strong": {
+	"wpds-color/stroke/surface/warning-strong": {
 		"value": {
 			".": "#936400"
 		},
 		"description": "Decorative stroke color used to define warning-toned surface boundaries with strong emphasis."
 	},
-	"Color/Stroke/Error/strokeSurface": {
+	"wpds-color/stroke/surface/error": {
 		"value": {
 			".": "#e1a198"
 		},
 		"description": "Decorative stroke color used to define error-toned surface boundaries with normal emphasis."
 	},
-	"Color/Stroke/Error/strokeSurface-strong": {
+	"wpds-color/stroke/surface/error-strong": {
 		"value": {
 			".": "#cc1818"
 		},
 		"description": "Decorative stroke color used to define error-toned surface boundaries with strong emphasis."
 	},
-	"Color/Stroke/Neutral/strokeInteractive": {
+	"wpds-color/stroke/interactive/neutral": {
 		"value": {
 			".": "#8a8a8a"
 		},
 		"description": "Accessible stroke color used for interactive neutrally-toned elements with normal emphasis."
 	},
-	"Color/Stroke/Neutral/strokeInteractive-active": {
+	"wpds-color/stroke/interactive/neutral-active": {
 		"value": {
 			".": "#6c6c6c"
 		},
 		"description": "Accessible stroke color used for interactive neutrally-toned elements with normal emphasis that are hovered, focused, or active."
 	},
-	"Color/Stroke/Neutral/strokeInteractive-disabled": {
+	"wpds-color/stroke/interactive/neutral-disabled": {
 		"value": {
 			".": "#d8d8d8"
 		},
 		"description": "Accessible stroke color used for interactive neutrally-toned elements with normal emphasis, in their disabled state."
 	},
-	"Color/Stroke/Neutral/strokeInteractive-strong": {
+	"wpds-color/stroke/interactive/neutral-strong": {
 		"value": {
 			".": "#6c6c6c"
 		},
 		"description": "Accessible stroke color used for interactive neutrally-toned elements with strong emphasis."
 	},
-	"Color/Stroke/Brand/strokeInteractive": {
+	"wpds-color/stroke/interactive/brand": {
 		"value": {
 			".": "#3858e9"
 		},
 		"description": "Accessible stroke color used for interactive brand-toned elements with normal emphasis."
 	},
-	"Color/Stroke/Brand/strokeInteractive-active": {
+	"wpds-color/stroke/interactive/brand-active": {
 		"value": {
 			".": "#2337c8"
 		},
 		"description": "Accessible stroke color used for interactive brand-toned elements with normal emphasis that are hovered, focused, or active."
 	},
-	"Color/Stroke/Brand/strokeInteractive-disabled": {
+	"wpds-color/stroke/interactive/brand-disabled": {
 		"value": {
 			".": "#d8d8d8"
 		},
 		"description": "Accessible stroke color used for interactive brand-toned elements with normal emphasis, in their disabled state."
 	},
-	"Color/Stroke/Error/strokeInteractive-strong": {
+	"wpds-color/stroke/interactive/error-strong": {
 		"value": {
 			".": "#cc1818"
 		},
 		"description": "Accessible stroke color used for interactive error-toned elements with strong emphasis."
 	},
-	"Color/Stroke/Brand/strokeFocus": {
+	"wpds-color/stroke/focus/brand": {
 		"value": {
 			".": "#3858e9"
 		},
 		"description": "Accessible stroke color applied to focus rings."
 	},
-	"Dimension/base": {
+	"wpds-dimension/base": {
 		"value": {
 			".": "4px"
 		},
 		"description": "Base dimension unit"
 	},
-	"Dimension/Padding/padSurface-2xs": {
+	"wpds-dimension/padding/surface/2xs": {
 		"value": {
 			".": "4px",
 			"compact": "4px",
@@ -566,7 +566,7 @@
 		},
 		"description": "2x extra small spacing for surfaces"
 	},
-	"Dimension/Padding/padSurface-xs": {
+	"wpds-dimension/padding/surface/xs": {
 		"value": {
 			".": "8px",
 			"compact": "4px",
@@ -574,7 +574,7 @@
 		},
 		"description": "Extra small spacing for surfaces"
 	},
-	"Dimension/Padding/padSurface-sm": {
+	"wpds-dimension/padding/surface/sm": {
 		"value": {
 			".": "16px",
 			"compact": "12px",
@@ -582,7 +582,7 @@
 		},
 		"description": "Small spacing for surfaces"
 	},
-	"Dimension/Padding/padSurface-md": {
+	"wpds-dimension/padding/surface/md": {
 		"value": {
 			".": "24px",
 			"compact": "20px",
@@ -590,7 +590,7 @@
 		},
 		"description": "Medium spacing for surfaces"
 	},
-	"Dimension/Padding/padSurface-lg": {
+	"wpds-dimension/padding/surface/lg": {
 		"value": {
 			".": "32px",
 			"compact": "24px",
@@ -598,115 +598,115 @@
 		},
 		"description": "Large spacing for surfaces"
 	},
-	"Elevation/x-small": {
+	"wpds-elevation/x-small": {
 		"value": {
 			".": "0 1px 1px 0 color(srgb 0 0 0 / 0.03), 0 1px 2px 0 color(srgb 0 0 0 / 0.02), 0 3px 3px 0 color(srgb 0 0 0 / 0.02), 0 4px 4px 0 color(srgb 0 0 0 / 0.01)"
 		},
 		"description": "For sections and containers that group related content and controls, which may overlap other content. Example: Preview Frame."
 	},
-	"Elevation/small": {
+	"wpds-elevation/small": {
 		"value": {
 			".": "0 1px 2px 0 color(srgb 0 0 0 / 0.05), 0 2px 3px 0 color(srgb 0 0 0 / 0.04), 0 6px 6px 0 color(srgb 0 0 0 / 0.03), 0 8px 8px 0 color(srgb 0 0 0 / 0.02)"
 		},
 		"description": "For components that provide contextual feedback without being intrusive. Generally non-interruptive. Example: Tooltips, Snackbar."
 	},
-	"Elevation/medium": {
+	"wpds-elevation/medium": {
 		"value": {
 			".": "0 2px 3px 0 color(srgb 0 0 0 / 0.05), 0 4px 5px 0 color(srgb 0 0 0 / 0.04), 0 12px 12px 0 color(srgb 0 0 0 / 0.03), 0 16px 16px 0 color(srgb 0 0 0 / 0.02)"
 		},
 		"description": "For components that offer additional actions. Example: Menus, Command Palette"
 	},
-	"Elevation/large": {
+	"wpds-elevation/large": {
 		"value": {
 			".": "0 5px 15px 0 color(srgb 0 0 0 / 0.08), 0 15px 27px 0 color(srgb 0 0 0 / 0.07), 0 30px 36px 0 color(srgb 0 0 0 / 0.04), 0 50px 43px 0 color(srgb 0 0 0 / 0.02)"
 		},
 		"description": "For components that confirm decisions or handle necessary interruptions. Example: Modals."
 	},
-	"Font/family-heading": {
+	"wpds-font/family/heading": {
 		"value": {
 			".": "-apple-system, system-ui, \"Segoe UI\", \"Roboto\", \"Oxygen-Sans\", \"Ubuntu\", \"Cantarell\", \"Helvetica Neue\", sans-serif"
 		},
 		"description": "Headings font family"
 	},
-	"Font/family-body": {
+	"wpds-font/family/body": {
 		"value": {
 			".": "-apple-system, system-ui, \"Segoe UI\", \"Roboto\", \"Oxygen-Sans\", \"Ubuntu\", \"Cantarell\", \"Helvetica Neue\", sans-serif"
 		},
 		"description": "Body font family"
 	},
-	"Font/family-mono": {
+	"wpds-font/family/mono": {
 		"value": {
 			".": "\"Menlo\", \"Consolas\", monaco, monospace"
 		},
 		"description": "Monospace font family"
 	},
-	"Font/size-x-small": {
+	"wpds-font/size/x-small": {
 		"value": {
 			".": "11px"
 		},
 		"description": "Extra small font size"
 	},
-	"Font/size-small": {
+	"wpds-font/size/small": {
 		"value": {
 			".": "12px"
 		},
 		"description": "Small font size"
 	},
-	"Font/size-medium": {
+	"wpds-font/size/medium": {
 		"value": {
 			".": "13px"
 		},
 		"description": "Medium font size"
 	},
-	"Font/size-large": {
+	"wpds-font/size/large": {
 		"value": {
 			".": "15px"
 		},
 		"description": "Large font size"
 	},
-	"Font/size-x-large": {
+	"wpds-font/size/x-large": {
 		"value": {
 			".": "20px"
 		},
 		"description": "Extra large font size"
 	},
-	"Font/size-2x-large": {
+	"wpds-font/size/2x-large": {
 		"value": {
 			".": "32px"
 		},
 		"description": "2X large font size"
 	},
-	"Font/lineHeight-x-small": {
+	"wpds-font/line-height/x-small": {
 		"value": {
 			".": "16px"
 		},
 		"description": "Extra small line height"
 	},
-	"Font/lineHeight-small": {
+	"wpds-font/line-height/small": {
 		"value": {
 			".": "20px"
 		},
 		"description": "Small line height"
 	},
-	"Font/lineHeight-medium": {
+	"wpds-font/line-height/medium": {
 		"value": {
 			".": "24px"
 		},
 		"description": "Medium line height"
 	},
-	"Font/lineHeight-large": {
+	"wpds-font/line-height/large": {
 		"value": {
 			".": "28px"
 		},
 		"description": "Large line height"
 	},
-	"Font/lineHeight-x-large": {
+	"wpds-font/line-height/x-large": {
 		"value": {
 			".": "32px"
 		},
 		"description": "Extra large line height"
 	},
-	"Font/lineHeight-2x-large": {
+	"wpds-font/line-height/2x-large": {
 		"value": {
 			".": "40px"
 		},
