@@ -7,6 +7,7 @@ import {
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 	FlexItem,
+	VisuallyHidden,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { Icon, chevronDown } from '@wordpress/icons';
@@ -43,6 +44,7 @@ function capitalize( str ) {
  * @param {boolean}  props.hasBinding        - Whether link has entity binding
  * @param {boolean}  props.isEntityAvailable - Whether bound entity is available
  * @param {Function} props.onClick           - Click handler
+ * @param {string}   props.label             - Label for the button (e.g. "Link to")
  * @param {Object}   props.props             - Additional props to pass to the button
  */
 export function LinkPreviewButton( {
@@ -53,6 +55,7 @@ export function LinkPreviewButton( {
 	hasBinding,
 	isEntityAvailable,
 	onClick,
+	label,
 	...props
 } ) {
 	const { url, type } = link;
@@ -123,6 +126,7 @@ export function LinkPreviewButton( {
 			__next40pxDefaultSize
 			{ ...props }
 		>
+			{ label && <VisuallyHidden>{ label }:</VisuallyHidden> }
 			<HStack justify="space-between" alignment="top">
 				<FlexItem className="link-control-preview-button__content">
 					<HStack alignment="top">

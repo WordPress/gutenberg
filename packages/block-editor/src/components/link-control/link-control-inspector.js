@@ -44,10 +44,6 @@ export function LinkControlInspector( {
 	help,
 } ) {
 	const [ isOpen, setIsOpen ] = useState( false );
-	const inputId = useInstanceId(
-		LinkControlInspector,
-		'link-control-inspector'
-	);
 	const helpId = useInstanceId(
 		LinkControlInspector,
 		'link-control-inspector-help'
@@ -83,7 +79,7 @@ export function LinkControlInspector( {
 				aria-haspopup="dialog"
 				aria-expanded={ isOpen }
 				aria-describedby={ help ? helpId : undefined }
-				id={ inputId }
+				label={ label }
 			/>
 		);
 	};
@@ -104,14 +100,13 @@ export function LinkControlInspector( {
 
 	return (
 		<BaseControl
-			label={ label }
-			id={ inputId }
-			help={ help }
 			__nextHasNoMarginBottom
+			help={ help }
 			__associatedWPComponentProps={ {
 				helpId,
 			} }
 		>
+			<BaseControl.VisualLabel>{ label }</BaseControl.VisualLabel>
 			<Dropdown
 				className="link-control-inspector__dropdown"
 				open={ isOpen }
