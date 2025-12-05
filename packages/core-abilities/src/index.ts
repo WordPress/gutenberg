@@ -69,20 +69,12 @@ async function initializeCategories(): Promise< void > {
 
 		if ( categories && Array.isArray( categories ) ) {
 			for ( const category of categories ) {
-				const meta: Record< string, any > =
-					! category.meta ||
-					( Array.isArray( category.meta ) &&
-						category.meta.length === 0 )
-						? {}
-						: category.meta;
-				meta.annotations = {
-					...meta.annotations,
-					serverRegistered: true,
-				};
 				registerAbilityCategory( category.slug, {
 					label: category.label,
 					description: category.description,
-					meta,
+					meta: {
+						annotations: { serverRegistered: true },
+					},
 				} );
 			}
 		}
