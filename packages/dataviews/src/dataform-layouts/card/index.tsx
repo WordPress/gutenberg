@@ -9,6 +9,7 @@ import {
 } from '@wordpress/components';
 import { useCallback, useContext, useMemo, useState } from '@wordpress/element';
 import { chevronDown, chevronUp } from '@wordpress/icons';
+import { sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -47,13 +48,33 @@ const NonCollapsibleCardHeader = ( {
 	</OriginalCardHeader>
 );
 
-export function useCardHeader( layout: NormalizedCardLayout ) {
+export function useCardHeader(
+	layout: NormalizedCardLayout,
+	cardLabel: string | undefined,
+	customAriaLabel?: string
+) {
 	const { isOpened, isCollapsible } = layout;
 	const [ isOpen, setIsOpen ] = useState( isOpened );
-
 	const toggle = useCallback( () => {
 		setIsOpen( ( prev ) => ! prev );
 	}, [] );
+
+	const defaultAriaLabel = useMemo( () => {
+		const actionText = isOpen ? 'Collapse' : 'Expand';
+
+		if ( ! cardLabel ) {
+			return actionText;
+		}
+
+		return sprintf(
+			/* translators: %1$s: The action (Expand or Collapse). %2$s: The title of the card being expanded or collapsed, e.g. "Visibility", "SEO Settings". */
+			'%1$s %2$s',
+			actionText,
+			cardLabel
+		);
+	}, [ isOpen, cardLabel ] );
+
+	const ariaLabel = customAriaLabel || defaultAriaLabel;
 
 	const CollapsibleCardHeader = useCallback(
 		( {
@@ -91,7 +112,7 @@ export function useCardHeader( layout: NormalizedCardLayout ) {
 				/>
 			</OriginalCardHeader>
 		),
-		[ toggle, isOpen ]
+		[ toggle, isOpen, ariaLabel ]
 	);
 
 	const effectiveIsOpen = isCollapsible ? isOpen : true;
