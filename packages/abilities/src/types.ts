@@ -80,8 +80,8 @@ export interface Ability {
 	 */
 	meta?: {
 		annotations?: {
-			clientRegistered?: boolean;
-			serverRegistered?: boolean;
+			clientRegistered?: boolean | null;
+			serverRegistered?: boolean | null;
 			readonly?: boolean | null;
 			destructive?: boolean | null;
 			idempotent?: boolean | null;
@@ -127,9 +127,13 @@ export interface AbilityCategory {
 
 	/**
 	 * Metadata about the category.
-	 * @see WP_Ability_Category::get_meta()
 	 */
-	meta?: Record< string, any >;
+	meta?: {
+		annotations?: {
+			clientRegistered?: boolean | null;
+			serverRegistered?: boolean | null;
+		};
+	};
 }
 
 /**
