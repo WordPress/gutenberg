@@ -12,6 +12,8 @@ import {
 	UNREGISTER_ABILITY,
 	REGISTER_ABILITY_CATEGORY,
 	UNREGISTER_ABILITY_CATEGORY,
+	ABILITY_NAME_PATTERN,
+	CATEGORY_SLUG_PATTERN,
 } from './constants';
 
 type AbilityAnnotations = NonNullable< Ability[ 'meta' ] >[ 'annotations' ];
@@ -57,7 +59,7 @@ export function registerAbility( ability: Ability ) {
 		}
 
 		// Validate name format matches server implementation
-		if ( ! /^[a-z0-9-]+\/[a-z0-9-]+$/.test( ability.name ) ) {
+		if ( ! ABILITY_NAME_PATTERN.test( ability.name ) ) {
 			throw new Error(
 				'Ability name must be a string containing a namespace prefix, i.e. "my-plugin/my-ability". It can only contain lowercase alphanumeric characters, dashes and the forward slash.'
 			);
@@ -82,7 +84,7 @@ export function registerAbility( ability: Ability ) {
 		}
 
 		// Validate category format
-		if ( ! /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test( ability.category ) ) {
+		if ( ! CATEGORY_SLUG_PATTERN.test( ability.category ) ) {
 			throw new Error(
 				sprintf(
 					'Ability "%1$s" has an invalid category. Category must be lowercase alphanumeric with dashes only. Got: "%2$s"',
@@ -185,7 +187,7 @@ export function registerAbilityCategory(
 		}
 
 		// Validate slug format matches server implementation
-		if ( ! /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test( slug ) ) {
+		if ( ! CATEGORY_SLUG_PATTERN.test( slug ) ) {
 			throw new Error(
 				'Category slug must contain only lowercase alphanumeric characters and dashes.'
 			);
