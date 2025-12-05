@@ -16,8 +16,9 @@ import { isRTL, __ } from '@wordpress/i18n';
 import { Flex, FlexBlock } from '../flex';
 import { Spacer } from '../spacer';
 import NumberControl from '../number-control';
+import { Text } from '../text';
 import AngleCircle from './angle-circle';
-import { UnitText } from './styles/angle-picker-control-styles';
+import styles from './style.module.scss';
 
 import type { WordPressComponentProps } from '../context';
 import type { AnglePickerControlProps } from './types';
@@ -48,7 +49,7 @@ function UnforwardedAnglePickerControl(
 
 	const classes = clsx( 'components-angle-picker-control', className );
 
-	const unitText = <UnitText>°</UnitText>;
+	const unitText = <Text className={ styles[ 'unit-text' ] }>°</Text>;
 	const [ prefixedUnitText, suffixedUnitText ] = isRTL()
 		? [ unitText, null ]
 		: [ null, unitText ];
