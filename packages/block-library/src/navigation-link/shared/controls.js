@@ -27,6 +27,7 @@ import { getSuggestionsQuery } from '../link-ui';
 import { unlock } from '../../lock-unlock';
 
 const { LinkControlInspector } = unlock( blockEditorPrivateApis );
+
 /**
  * Get a human-readable entity type name.
  *
@@ -131,56 +132,6 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 		[ entityRecord ]
 	);
 
-	// Determine badge status
-	const getLinkBadge = () => {
-		if ( ! url ) {
-			return {
-				label: __( 'No link selected' ),
-				intent: 'warning',
-			};
-		}
-
-		// Check if entity is deleted/missing
-		if ( hasUrlBinding && ! isBoundEntityAvailable ) {
-			return {
-				label: __( 'Deleted' ),
-				intent: 'error',
-			};
-		}
-
-		// Check if it's an external link
-		try {
-			const linkUrl = new URL( url );
-			const siteUrl = window.location.origin;
-			if ( linkUrl.origin !== siteUrl ) {
-				return {
-					label: __( 'External link' ),
-					intent: 'default',
-				};
-			}
-		} catch ( e ) {
-			// Invalid URL, no badge
-			return null;
-		}
-
-		// Show status for bound entities
-		if ( entityRecord?.status ) {
-			const statusMap = {
-				publish: { label: __( 'Published' ), intent: 'success' },
-				future: { label: __( 'Scheduled' ), intent: 'info' },
-				draft: { label: __( 'Draft' ), intent: 'default' },
-				pending: { label: __( 'Pending' ), intent: 'warning' },
-				private: { label: __( 'Private' ), intent: 'default' },
-				trash: { label: __( 'Trash' ), intent: 'error' },
-			};
-			return statusMap[ entityRecord.status ] || null;
-		}
-
-		return null;
-	};
-
-	const linkBadge = getLinkBadge();
-
 	return (
 		<ToolsPanel
 			label={ __( 'Settings' ) }
@@ -229,7 +180,9 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 					} }
 					title={ linkTitle }
 					image={ linkImage }
-					badge={ linkBadge }
+					entityStatus={ entityRecord?.status }
+					hasBinding={ hasUrlBinding }
+					isEntityAvailable={ isBoundEntityAvailable }
 					onSelect={ ( suggestion ) => {
 						// When a suggestion is selected (or Enter pressed)
 						if ( suggestion ) {
