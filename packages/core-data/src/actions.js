@@ -384,7 +384,6 @@ export const editEntityRecord =
 				`The entity being edited (${ kind }, ${ name }) does not have a loaded config.`
 			);
 		}
-
 		const { mergedEdits = {} } = entityConfig;
 		const record = select.getRawEntityRecord( kind, name, recordId );
 		const editedRecord = select.getEditedEntityRecord(
