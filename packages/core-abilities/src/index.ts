@@ -48,7 +48,7 @@ function createServerCallback(
 		}
 
 		// Input and output validation happens on the server side for these abilities.
-		return await apiFetch< AbilityOutput >( {
+		return apiFetch< AbilityOutput >( {
 			path,
 			...options,
 		} );
