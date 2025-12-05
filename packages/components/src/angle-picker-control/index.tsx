@@ -49,6 +49,8 @@ function UnforwardedAnglePickerControl(
 
 	const classes = clsx( 'components-angle-picker-control', className );
 
+	// Override the default behavior and position the degree symbol to the
+	// right of the number, regardless of the language direction.
 	const prefixOrSuffixProp = isRTL()
 		? { prefix: <InputControlPrefixWrapper>°</InputControlPrefixWrapper> }
 		: { suffix: <InputControlSuffixWrapper>°</InputControlSuffixWrapper> };
