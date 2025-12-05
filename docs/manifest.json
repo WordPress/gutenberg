@@ -362,8 +362,14 @@
 	{
 		"title": "API Versions",
 		"slug": "block-api-versions",
-		"markdown_source": "../docs/reference-guides/block-api/block-api-versions.md",
+		"markdown_source": "../docs/reference-guides/block-api/block-api-versions/README.md",
 		"parent": "block-api"
+	},
+	{
+		"title": "Migrating Blocks for iframe Editor Compatibility",
+		"slug": "block-migration-for-iframe-editor-compatibility",
+		"markdown_source": "../docs/reference-guides/block-api/block-api-versions/block-migration-for-iframe-editor-compatibility.md",
+		"parent": "block-api-versions"
 	},
 	{
 		"title": "Attributes",
