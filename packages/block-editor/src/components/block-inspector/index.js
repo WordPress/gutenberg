@@ -377,6 +377,13 @@ const BlockInspectorSingleBlock = ( {
 							showListControls
 						/>
 					) }
+					{ isSectionBlock && isBlockSynced && (
+						<>
+							<InspectorControls.Slot />
+							{ /* Allow AdvancedControls so users can adjust local attributes (e.g. additional CSS classes, HTML element). */ }
+							<AdvancedControls />
+						</>
+					) }
 				</>
 			) }
 			<SkipToSelectedBlock key="back" />
