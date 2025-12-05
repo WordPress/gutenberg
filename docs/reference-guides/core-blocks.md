@@ -546,6 +546,15 @@ Add a page, link, or another item to your navigation. ([Source](https://github.c
 -	**Supports:** interactivity (clientNavigation), typography (fontSize, lineHeight), ~~html~~, ~~renaming~~, ~~reusable~~
 -	**Attributes:** description, id, isTopLevelLink, kind, label, opensInNewTab, rel, title, type, url
 
+## Navigation Overlay Close
+
+A customizable button to close overlays. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/navigation-overlay-close))
+
+-	**Name:** core/navigation-overlay-close
+-	**Category:** design
+-	**Supports:** anchor, color (background, text, ~~gradients~~), spacing (padding), typography (fontSize, lineHeight)
+-	**Attributes:** displayMode, text
+
 ## Submenu
 
 Add a submenu to your navigation. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/navigation-submenu))
@@ -564,15 +573,6 @@ Separate your content into a multi-page experience. ([Source](https://github.com
 -	**Category:** design
 -	**Parent:** core/post-content
 -	**Supports:** interactivity (clientNavigation), ~~className~~, ~~customClassName~~, ~~html~~
-
-## Overlay Close
-
-A customizable button to close overlays. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/overlay-close))
-
--	**Name:** core/overlay-close
--	**Category:** design
--	**Supports:** anchor, color (background, text, ~~gradients~~), spacing (padding), typography (fontSize, lineHeight)
--	**Attributes:** displayMode, text
 
 ## Page List
 

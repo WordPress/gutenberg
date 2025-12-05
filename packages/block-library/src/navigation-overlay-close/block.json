@@ -1,8 +1,8 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 3,
-	"name": "core/overlay-close",
-	"title": "Overlay Close",
+	"name": "core/navigation-overlay-close",
+	"title": "Navigation Overlay Close",
 	"category": "design",
 	"description": "A customizable button to close overlays.",
 	"keywords": [ "close", "overlay", "navigation", "menu" ],
