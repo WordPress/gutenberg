@@ -40,10 +40,18 @@ function createServerCallback(
 			method,
 		};
 
-		if ( [ 'GET', 'DELETE' ].includes( method ) && input !== null ) {
+		if (
+			[ 'GET', 'DELETE' ].includes( method ) &&
+			input !== null &&
+			input !== undefined
+		) {
 			// For GET and DELETE requests, pass the input as query parameters.
 			path = addQueryArgs( path, { input } );
-		} else if ( method === 'POST' && input !== null ) {
+		} else if (
+			method === 'POST' &&
+			input !== null &&
+			input !== undefined
+		) {
 			options.data = { input };
 		}
 
