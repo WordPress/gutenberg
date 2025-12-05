@@ -779,11 +779,11 @@ export function areOnlyAttributeDifferences( validationIssues ) {
 		// Accept direct attribute-related messages:
 		// - "Expected attribute `X` of value Y, saw Z"
 		// - "Expected attributes Array(X), saw Array(Y)"
-		// - "Unexpected attribute `X`"
+		// - "Encountered unexpected attribute `X`"
 		const isDirectAttributeIssue =
 			message.includes( 'Expected attribute' ) ||
 			message.includes( 'Expected attributes' ) ||
-			message.includes( 'Unexpected attribute' );
+			message.includes( 'unexpected attribute' );
 
 		if ( isDirectAttributeIssue ) {
 			return true;
@@ -837,33 +837,6 @@ export function areOnlyAttributeDifferences( validationIssues ) {
 		// All other issue types (missing elements, extra content, etc.) are structural.
 		return false;
 	} );
-}
-
-/**
- * Creates a validation result object with the specified level.
- *
- * @param {number}            validationLevel       The validation level (0-5).
- * @param {Array<LoggerItem>} [validationIssues=[]] Array of validation issues.
- *
- * @return {Object} Validation result with isValid computed property.
- */
-export function createValidationResult(
-	validationLevel,
-	validationIssues = []
-) {
-	return {
-		validationLevel,
-		validationIssues,
-		/**
-		 * Returns whether the block is considered valid.
-		 * All levels are valid except INVALID_BLOCK.
-		 *
-		 * @return {boolean} Whether the block is considered valid.
-		 */
-		get isValid() {
-			return this.validationLevel < VALIDATION_LEVEL.INVALID_BLOCK;
-		},
-	};
 }
 
 /**
@@ -1027,9 +1000,13 @@ export function validateBlock(
 
 		// Pass Level 3 when both have content, both are empty, or when
 		// the original is empty but generated has content (adding generated classes/structure).
-		const contentIsReasonable = hasGeneratedContent || ! hasOriginalContent;
+		//
+		// Exclude cases where the original source has content but generated output is empty.
+		// This happens when attributes can't produce output (e.g., deprecated schema, corrupted
+		// attributes). Regenerating would discard user content, so we fail to Level 4 instead.
+		const canSafelyRegenerate = hasGeneratedContent || ! hasOriginalContent;
 
-		if ( contentIsReasonable ) {
+		if ( canSafelyRegenerate ) {
 			// Log regeneration for visibility and debugging.
 			if ( log ) {
 				// eslint-disable-next-line no-console

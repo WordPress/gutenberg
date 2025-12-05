@@ -20,7 +20,6 @@ import {
 	validateBlock,
 	isClosedByToken,
 	VALIDATION_LEVEL,
-	createValidationResult,
 } from '../validation';
 import {
 	registerBlockType,
@@ -879,52 +878,6 @@ describe( 'validation', () => {
 			// Conservative approach: only accept specific attribute messages
 			// Everything else is rejected to avoid false positives
 			expect( result ).toBe( false );
-		} );
-	} );
-
-	describe( 'createValidationResult()', () => {
-		it( 'should create result with validationLevel and isValid getter', () => {
-			const result = createValidationResult(
-				VALIDATION_LEVEL.VALID_BLOCK
-			);
-
-			expect( result.validationLevel ).toBe( 0 );
-			expect( result.isValid ).toBe( true );
-			expect( result.validationIssues ).toEqual( [] );
-		} );
-
-		it( 'should mark INVALID_BLOCK as not valid', () => {
-			const result = createValidationResult(
-				VALIDATION_LEVEL.INVALID_BLOCK
-			);
-
-			expect( result.validationLevel ).toBe( 4 );
-			expect( result.isValid ).toBe( false );
-		} );
-
-		it( 'should mark all other levels as valid', () => {
-			const levels = [
-				VALIDATION_LEVEL.VALID_BLOCK,
-				VALIDATION_LEVEL.MIGRATED_BLOCK,
-				VALIDATION_LEVEL.RECONSTRUCTED_BLOCK,
-				VALIDATION_LEVEL.REGENERATED_BLOCK,
-			];
-
-			levels.forEach( ( level ) => {
-				const result = createValidationResult( level );
-				expect( result.isValid ).toBe( true );
-			} );
-		} );
-
-		it( 'should include validation issues if provided', () => {
-			const mockLog = jest.fn();
-			const issues = [ { log: mockLog, args: [ 'Test error' ] } ];
-			const result = createValidationResult(
-				VALIDATION_LEVEL.INVALID_BLOCK,
-				issues
-			);
-
-			expect( result.validationIssues ).toEqual( issues );
 		} );
 	} );
 
