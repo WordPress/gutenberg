@@ -26,8 +26,8 @@ type AbilityAnnotations = NonNullable< Ability[ 'meta' ] >[ 'annotations' ];
 function filterAnnotations< K extends keyof NonNullable< AbilityAnnotations > >(
 	sourceAnnotations: Record< string, boolean > | undefined,
 	allowedKeys: readonly K[]
-): AbilityAnnotations {
-	const annotations: AbilityAnnotations = {};
+): NonNullable< AbilityAnnotations > {
+	const annotations: NonNullable< AbilityAnnotations > = {};
 
 	if ( sourceAnnotations ) {
 		for ( const key of allowedKeys ) {
