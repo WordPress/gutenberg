@@ -292,9 +292,15 @@ function LinkControl( {
 			{}
 		);
 
+		// When selecting a custom URL (no id and no kind), explicitly clear
+		// entity metadata (type/kind) to avoid preserving them from previous links
+		const isCustomLink = ! updatedValue?.id && ! updatedValue?.kind;
+
 		onChange( {
 			...internalControlValue,
 			...nonSettingsChanges,
+			// Explicitly set type and kind to undefined for custom links
+			...( isCustomLink && { type: undefined, kind: undefined } ),
 			// As title is not a setting, it must be manually applied
 			// in such a way as to preserve the users changes over
 			// any "title" value provided by the "suggestion".
