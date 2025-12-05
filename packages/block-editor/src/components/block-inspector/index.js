@@ -320,6 +320,10 @@ const BlockInspectorSingleBlock = ( {
 	hasBlockStyles,
 	editedContentOnlySection,
 } ) => {
+	const selectedBlockClientId = useSelect( ( select ) => {
+		const { getSelectedBlockClientId } = select( blockEditorStore );
+		return getSelectedBlockClientId();
+	}, [] );
 	const hasMultipleTabs = availableTabs?.length > 1;
 	const hasParentChildBlockCards =
 		window?.__experimentalContentOnlyPatternInsertion &&
@@ -331,6 +335,9 @@ const BlockInspectorSingleBlock = ( {
 	const blockInformation = useBlockDisplayInformation( clientId );
 	const isBlockSynced = blockInformation.isSynced;
 	const shouldShowTabs = ! isBlockSynced && hasMultipleTabs;
+	const isSectionBlockSelected =
+		window?.__experimentalContentOnlyPatternInsertion &&
+		selectedBlockClientId === clientId;
 
 	return (
 		<div className="block-editor-block-inspector">
@@ -377,13 +384,15 @@ const BlockInspectorSingleBlock = ( {
 							showListControls
 						/>
 					) }
-					{ isSectionBlock && isBlockSynced && (
-						<>
-							<InspectorControls.Slot />
-							{ /* Allow AdvancedControls so users can adjust local attributes (e.g. additional CSS classes, HTML element). */ }
-							<AdvancedControls />
-						</>
-					) }
+					{ isSectionBlock &&
+						isBlockSynced &&
+						isSectionBlockSelected && (
+							<>
+								<InspectorControls.Slot />
+								{ /* Allow AdvancedControls so users can adjust local attributes (e.g. additional CSS classes, HTML element). */ }
+								<AdvancedControls />
+							</>
+						) }
 				</>
 			) }
 			<SkipToSelectedBlock key="back" />
