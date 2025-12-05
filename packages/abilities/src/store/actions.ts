@@ -135,7 +135,7 @@ export function registerAbility( ability: Ability ) {
 			'clientRegistered',
 		] );
 
-		if ( ! annotations?.serverRegistered ) {
+		if ( ! annotations.serverRegistered ) {
 			annotations.clientRegistered = true;
 		}
 
@@ -229,7 +229,7 @@ export function registerAbilityCategory(
 			'clientRegistered',
 		] );
 
-		if ( ! annotations?.serverRegistered ) {
+		if ( ! annotations.serverRegistered ) {
 			annotations.clientRegistered = true;
 		}
 
