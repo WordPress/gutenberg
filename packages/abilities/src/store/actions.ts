@@ -18,7 +18,6 @@ type AbilityAnnotations = NonNullable< Ability[ 'meta' ] >[ 'annotations' ];
 
 /**
  * Filters annotations to only include allowed keys with non-null values.
- * Defaults clientRegistered to true if not server-registered.
  *
  * @param sourceAnnotations The source annotations object to filter.
  * @param allowedKeys       Array of annotation keys to include.
@@ -126,16 +125,15 @@ export function registerAbility( ability: Ability ) {
 			);
 		}
 
-		const annotations =
-			filterAnnotations( ability.meta?.annotations, [
-				'readonly',
-				'destructive',
-				'idempotent',
-				'serverRegistered',
-				'clientRegistered',
-			] ) || {};
+		const annotations = filterAnnotations( ability.meta?.annotations, [
+			'readonly',
+			'destructive',
+			'idempotent',
+			'serverRegistered',
+			'clientRegistered',
+		] );
 
-		if ( annotations?.serverRegistered ) {
+		if ( ! annotations?.serverRegistered ) {
 			annotations.clientRegistered = true;
 		}
 
@@ -224,13 +222,12 @@ export function registerAbilityCategory(
 			);
 		}
 
-		const annotations =
-			filterAnnotations( args.meta?.annotations, [
-				'serverRegistered',
-				'clientRegistered',
-			] ) || {};
+		const annotations = filterAnnotations( args.meta?.annotations, [
+			'serverRegistered',
+			'clientRegistered',
+		] );
 
-		if ( annotations?.serverRegistered ) {
+		if ( ! annotations?.serverRegistered ) {
 			annotations.clientRegistered = true;
 		}
 
