@@ -75,41 +75,40 @@ export function applyBlockDeprecatedVersions( block, rawBlock, blockType ) {
 			),
 		};
 
-		// Ignore the deprecation if it produces a block which is not valid.
-		// Suppress logging during deprecation validation checks.
-		let validationResult = validateBlock(
+		// Deprecations require a perfect match. Unlike parsing where automated
+		// reconstruction is acceptable, deprecations are explicit author instructions
+		// that should only apply when the old save() output matches the stored
+		// content exactly.
+		let [ , , metadata ] = validateBlock(
 			migratedBlock,
 			deprecatedBlockType,
-			{ log: false }
+			{
+				log: false,
+			}
 		);
-		let [ isValid, , validationMeta ] = validationResult;
+		let isValidDeprecation =
+			metadata?.validationLevel === VALIDATION_LEVEL.VALID_BLOCK;
 
 		// If the migrated block is not valid initially, try the built-in fixes.
-		if ( ! isValid ) {
+		if ( ! isValidDeprecation ) {
 			migratedBlock = applyBuiltInValidationFixes(
 				migratedBlock,
 				deprecatedBlockType
 			);
-			validationResult = validateBlock(
+			[ , , metadata ] = validateBlock(
 				migratedBlock,
 				deprecatedBlockType,
-				{ log: false }
+				{
+					log: false,
+				}
 			);
-			[ isValid, , validationMeta ] = validationResult;
+			isValidDeprecation =
+				metadata?.validationLevel === VALIDATION_LEVEL.VALID_BLOCK;
 		}
 
-		// An invalid block does not imply incorrect HTML but the fact block
-		// source information could be lost on re-serialization.
-		if ( ! isValid ) {
-			continue;
-		}
-
-		// Deprecations should only apply when the content actually matches
-		// the deprecated save output (validation levels 0-2). If it only
-		// passes via Level 3 regeneration, the content doesn't truly match
-		// this deprecated version.
-		const { validationLevel } = validationMeta || {};
-		if ( validationLevel === VALIDATION_LEVEL.REGENERATED_BLOCK ) {
+		// An invalid deprecation means this deprecated version doesn't match
+		// the stored content - try the next deprecation.
+		if ( ! isValidDeprecation ) {
 			continue;
 		}
 
