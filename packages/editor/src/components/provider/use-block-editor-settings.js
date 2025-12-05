@@ -97,6 +97,7 @@ const {
 	sectionRootClientIdKey,
 	mediaEditKey,
 	getMediaSelectKey,
+	isIsolatedEditorKey,
 } = unlock( privateApis );
 
 /**
@@ -349,6 +350,15 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 					? 'edit'
 					: undefined,
 		};
+
+		// When editing template parts, patterns, or navigation directly,
+		// we're in an isolated editing context (focused on that entity alone).
+		const isIsolatedEditor = [
+			'wp_template_part',
+			'wp_block',
+			'wp_navigation',
+		].includes( postType );
+		blockEditorSettings[ isIsolatedEditorKey ] = isIsolatedEditor;
 
 		return blockEditorSettings;
 	}, [
