@@ -2,7 +2,7 @@
  * Internal dependencies
  */
 import { DEPRECATED_ENTRY_KEYS } from '../constants';
-import { validateBlock } from '../validation';
+import { validateBlock, VALIDATION_LEVEL } from '../validation';
 import { getBlockAttributes } from './get-block-attributes';
 import { applyBuiltInValidationFixes } from './apply-built-in-validation-fixes';
 import { omit } from '../utils';
@@ -45,8 +45,8 @@ export function applyBlockDeprecatedVersions( block, rawBlock, blockType ) {
 	// matched successfully with any of the registered deprecation definitions.
 	for ( let i = 0; i < deprecatedDefinitions.length; i++ ) {
 		// A block can opt into a migration even if the block is valid by
-		// defining `isEligible` on its deprecation. If the block is both valid
-		// and does not opt to migrate, skip.
+		// defining `isEligible` on its deprecation. If the block is valid
+		// (Level 0 perfect match) and does not opt to migrate, skip.
 		const { isEligible = stubFalse } = deprecatedDefinitions[ i ];
 		if (
 			block.isValid &&
@@ -109,8 +109,7 @@ export function applyBlockDeprecatedVersions( block, rawBlock, blockType ) {
 		// passes via Level 3 regeneration, the content doesn't truly match
 		// this deprecated version.
 		const { validationLevel } = validationMeta || {};
-		if ( validationLevel === 3 ) {
-			// VALIDATION_LEVEL.REGENERATED_BLOCK
+		if ( validationLevel === VALIDATION_LEVEL.REGENERATED_BLOCK ) {
 			continue;
 		}
 
