@@ -147,11 +147,13 @@ export default function TemplatePartEdit( {
 		onNavigateToEntityRecord,
 		title,
 		canUserEdit,
+		selectedBlockClientId,
 	} = useSelect(
 		( select ) => {
 			const { getEditedEntityRecord, hasFinishedResolution } =
 				select( coreStore );
-			const { getBlockCount, getSettings } = select( blockEditorStore );
+			const { getBlockCount, getSettings, getSelectedBlockClientId } =
+				select( blockEditorStore );
 
 			const getEntityArgs = [
 				'postType',
@@ -189,6 +191,7 @@ export default function TemplatePartEdit( {
 					getSettings().onNavigateToEntityRecord,
 				title: entityRecord?.title,
 				canUserEdit: !! _canUserEdit,
+				selectedBlockClientId: getSelectedBlockClientId(),
 			};
 		},
 		[ templatePartId, attributes.area, clientId ]
@@ -279,6 +282,7 @@ export default function TemplatePartEdit( {
 									onNavigateToEntityRecord( {
 										postId: templatePartId,
 										postType: 'wp_template_part',
+										selectedBlockClientId,
 									} );
 								} }
 							>

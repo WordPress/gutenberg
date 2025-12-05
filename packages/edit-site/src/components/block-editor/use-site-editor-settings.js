@@ -13,9 +13,7 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
  */
 import { store as editSiteStore } from '../../store';
 import { unlock } from '../../lock-unlock';
-import useNavigateToEntityRecord, {
-	useRestoreBlockSelection,
-} from './use-navigate-to-entity-record';
+import useNavigateToEntityRecord from './use-navigate-to-entity-record';
 import { FOCUSABLE_ENTITIES } from '../../utils/constants';
 
 const { useLocation, useHistory } = unlock( routerPrivateApis );
@@ -64,10 +62,8 @@ function useNavigateToPreviousEntityRecord() {
 export function useSpecificEditorSettings() {
 	const { query } = useLocation();
 	const { canvas = 'view' } = query;
-	const onNavigateToEntityRecord = useNavigateToEntityRecord();
-
-	// Restore block selection when navigating
-	useRestoreBlockSelection();
+	const [ onNavigateToEntityRecord, initialBlockSelection ] =
+		useNavigateToEntityRecord();
 
 	const { settings, currentPostIsTrashed } = useSelect( ( select ) => {
 		const { getSettings } = select( editSiteStore );
@@ -105,6 +101,7 @@ export function useSpecificEditorSettings() {
 			onNavigateToEntityRecord,
 			onNavigateToPreviousEntityRecord,
 			isPreviewMode: canvas === 'view',
+			initialBlockSelection,
 		};
 	}, [
 		settings,
@@ -112,6 +109,7 @@ export function useSpecificEditorSettings() {
 		currentPostIsTrashed,
 		onNavigateToEntityRecord,
 		onNavigateToPreviousEntityRecord,
+		initialBlockSelection,
 	] );
 
 	return defaultEditorSettings;

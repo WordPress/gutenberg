@@ -10,6 +10,7 @@ import { useEntityRecord, store as coreStore } from '@wordpress/core-data';
 import { check } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as preferencesStore } from '@wordpress/preferences';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -32,12 +33,14 @@ export default function BlockThemeControl( { id } ) {
 		getEditorSettings,
 		hasGoBack,
 		hasSpecificTemplate,
+		selectedBlockClientId,
 	} = useSelect( ( select ) => {
 		const {
 			getRenderingMode,
 			getEditorSettings: _getEditorSettings,
 			getCurrentPost,
 		} = unlock( select( editorStore ) );
+		const { getSelectedBlockClientId } = select( blockEditorStore );
 		const editorSettings = _getEditorSettings();
 		const currentPost = getCurrentPost();
 		return {
@@ -48,6 +51,7 @@ export default function BlockThemeControl( { id } ) {
 				'onNavigateToPreviousEntityRecord'
 			),
 			hasSpecificTemplate: !! currentPost.template,
+			selectedBlockClientId: getSelectedBlockClientId(),
 		};
 	}, [] );
 
@@ -138,6 +142,7 @@ export default function BlockThemeControl( { id } ) {
 										onNavigateToEntityRecord( {
 											postId: template.id,
 											postType: 'wp_template',
+											selectedBlockClientId,
 										} );
 										// When editing a global template,
 										// activate the auto-draft. This is not

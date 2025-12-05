@@ -168,20 +168,22 @@ function ReusableBlockEdit( {
 	const { __unstableMarkLastChangeAsPersistent } =
 		useDispatch( blockEditorStore );
 
-	const { onNavigateToEntityRecord, hasPatternOverridesSource } = useSelect(
-		( select ) => {
-			const { getSettings } = select( blockEditorStore );
-			// For editing link to the site editor if the theme and user permissions support it.
-			return {
-				onNavigateToEntityRecord:
-					getSettings().onNavigateToEntityRecord,
-				hasPatternOverridesSource: !! getBlockBindingsSource(
-					'core/pattern-overrides'
-				),
-			};
-		},
-		[]
-	);
+	const {
+		onNavigateToEntityRecord,
+		hasPatternOverridesSource,
+		selectedBlockClientId,
+	} = useSelect( ( select ) => {
+		const { getSettings, getSelectedBlockClientId } =
+			select( blockEditorStore );
+		// For editing link to the site editor if the theme and user permissions support it.
+		return {
+			onNavigateToEntityRecord: getSettings().onNavigateToEntityRecord,
+			hasPatternOverridesSource: !! getBlockBindingsSource(
+				'core/pattern-overrides'
+			),
+			selectedBlockClientId: getSelectedBlockClientId(),
+		};
+	}, [] );
 
 	const canOverrideBlocks = useMemo(
 		() => hasPatternOverridesSource && hasOverridableBlocks( blocks ),
@@ -213,6 +215,7 @@ function ReusableBlockEdit( {
 		onNavigateToEntityRecord( {
 			postId: ref,
 			postType: 'wp_block',
+			selectedBlockClientId,
 		} );
 	};
 

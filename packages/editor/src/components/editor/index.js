@@ -1,10 +1,12 @@
 /**
  * WordPress dependencies
  */
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { Notice } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { useEffect, useRef } from '@wordpress/element';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -25,6 +27,7 @@ function Editor( {
 	settings,
 	children,
 	initialEdits,
+	initialSelection,
 
 	// This could be part of the settings.
 	onActionPerformed,
@@ -94,6 +97,30 @@ function Editor( {
 		[ postType, postId, templateId ]
 	);
 
+	const { selectBlock } = useDispatch( blockEditorStore );
+	const hasRestoredSelectionRef = useRef( false );
+
+	// Restore initial block selection if provided (e.g., from navigation)
+	useEffect( () => {
+		if (
+			! initialSelection ||
+			! hasLoadedPost ||
+			! post ||
+			hasRestoredSelectionRef.current
+		) {
+			return;
+		}
+
+		hasRestoredSelectionRef.current = true;
+
+		// Use setTimeout to ensure blocks are fully rendered before selecting
+		const timeoutId = setTimeout( () => {
+			selectBlock( initialSelection );
+		}, 0 );
+
+		return () => clearTimeout( timeoutId );
+	}, [ initialSelection, hasLoadedPost, post, selectBlock ] );
+
 	return (
 		<>
 			{ hasLoadedPost && ! post && (
@@ -115,6 +142,7 @@ function Editor( {
 					settings={ settings }
 					initialEdits={ initialEdits }
 					useSubRegistry={ false }
+					initialSelection={ initialSelection }
 				>
 					<EditorInterface { ...props }>
 						{ extraContent }
