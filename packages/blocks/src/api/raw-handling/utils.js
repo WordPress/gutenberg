@@ -128,28 +128,23 @@ export function isPlain( HTML ) {
 	const doc = document.implementation.createHTMLDocument( '' );
 	doc.body.innerHTML = HTML;
 
-	// Check if there's exactly one top-level element
 	if ( doc.body.children.length !== 1 ) {
 		return false;
 	}
 
 	const wrapper = doc.body.children.item( 0 );
-	const tagName = wrapper.tagName.toLowerCase();
 
-	// Only consider non-semantic wrapper tags
-	if ( tagName !== 'span' ) {
-		return false;
-	}
-
-	// Check if the wrapper contains only text nodes and <br> tags
-	// (no other semantic elements)
-	const descendants = element.getElementsByTagName( '*' );
+	const descendants = wrapper.getElementsByTagName( '*' );
 	for ( let i = 0; i < descendants.length; i++ ) {
 		if ( descendants.item( i ).tagName !== 'BR' ) {
 			return false;
 		}
 	}
-	
+
+	if ( wrapper.tagName !== 'SPAN' ) {
+		return false;
+	}
+
 	return true;
 }
 
