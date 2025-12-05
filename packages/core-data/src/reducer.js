@@ -70,23 +70,6 @@ export function currentUser( state = {}, action ) {
 }
 
 /**
- * Reducer managing the current collaborator mode.
- *
- * @param {Object} state  Current state.
- * @param {Object} action Dispatched action.
- *
- * @return {Object} Updated state.
- */
-export function collaboratorMode( state = 'edit', action ) {
-	switch ( action.type ) {
-		case 'SET_COLLABORATOR_MODE':
-			return action.collaboratorMode;
-	}
-
-	return state;
-}
-
-/**
  * Reducer managing the current theme.
  *
  * @param {string|undefined} state  Current state.
@@ -650,7 +633,6 @@ export default combineReducers( {
 	currentTheme,
 	currentGlobalStylesId,
 	currentUser,
-	collaboratorMode,
 	themeGlobalStyleVariations,
 	themeBaseGlobalStyles,
 	themeGlobalStyleRevisions,

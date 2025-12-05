@@ -50,7 +50,6 @@ export interface State {
 	userPatternCategories: Array< UserPatternCategory >;
 	defaultTemplates: Record< string, string >;
 	registeredPostMeta: Record< string, Object >;
-	collaboratorMode: CollaboratorMode;
 }
 
 type EntityRecordKey = string | number;
@@ -191,24 +190,6 @@ export function getAuthors(
  */
 export function getCurrentUser( state: State ): ET.User< 'view' > {
 	return state.currentUser;
-}
-
-/**
- * Returns the current collaborator mode.
- *
- * @param  state Data state.
- *
- * @return {'view' | 'edit'} Collaborator mode.
- */
-export function getCollaboratorMode( state: State ): CollaboratorMode {
-	if ( window.__experimentalEnableSync ) {
-		if ( globalThis.IS_GUTENBERG_PLUGIN ) {
-			return state.collaboratorMode;
-		}
-	}
-
-	// Default to edit mode if sync is not enabled, or if it is not a Gutenberg plugin.
-	return 'edit';
 }
 
 /**

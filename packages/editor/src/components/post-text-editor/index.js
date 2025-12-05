@@ -28,9 +28,9 @@ export default function PostTextEditor() {
 	const instanceId = useInstanceId( PostTextEditor );
 	const { content, blocks, type, id, collaboratorMode } = useSelect(
 		( select ) => {
-			const { getEditedEntityRecord, getCollaboratorMode } =
+			const { getEditedEntityRecord } =
 				select( coreStore );
-			const { getCurrentPostType, getCurrentPostId } =
+			const { getCurrentPostType, getCurrentPostId, getCollaboratorMode } =
 				select( editorStore );
 			const _type = getCurrentPostType();
 			const _id = getCurrentPostId();

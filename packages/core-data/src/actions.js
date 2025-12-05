@@ -59,20 +59,6 @@ export function receiveCurrentUser( currentUser ) {
 }
 
 /**
- * Returns an action object used in signalling that the collaborator mode has been set.
- *
- * @param {'view' | 'edit'} collaboratorMode The collaborator mode.
- *
- * @return {Object} Action object.
- */
-export function setCollaboratorMode( collaboratorMode ) {
-	return {
-		type: 'SET_COLLABORATOR_MODE',
-		collaboratorMode,
-	};
-}
-
-/**
  * Returns an action object used in adding new entities.
  *
  * @param {Array} entities Entities received.
@@ -319,17 +305,6 @@ export const deleteEntityRecord =
 		);
 
 		try {
-			if ( window.__experimentalEnableSync && entityConfig.syncConfig ) {
-				if ( globalThis.IS_GUTENBERG_PLUGIN ) {
-					const collaboratorMode =
-						resolveSelect.getCollaboratorMode();
-
-					if ( collaboratorMode === 'view' ) {
-						return;
-					}
-				}
-			}
-
 			dispatch( {
 				type: 'DELETE_ENTITY_RECORD_START',
 				kind,
@@ -417,20 +392,6 @@ export const editEntityRecord =
 			name,
 			recordId
 		);
-
-		if ( window.__experimentalEnableSync && entityConfig.syncConfig ) {
-			if ( globalThis.IS_GUTENBERG_PLUGIN ) {
-				const collaboratorMode = select.getCollaboratorMode();
-
-				if ( collaboratorMode === 'view' && edits ) {
-					if ( 'selection' in edits ) {
-						edits = { selection: edits.selection };
-					} else {
-						edits = {};
-					}
-				}
-			}
-		}
 
 		const edit = {
 			kind,
@@ -575,16 +536,6 @@ export const saveEntityRecord =
 			[ 'entities', 'records', kind, name, recordId || uuid() ],
 			{ exclusive: true }
 		);
-
-		if ( window.__experimentalEnableSync && entityConfig.syncConfig ) {
-			if ( globalThis.IS_GUTENBERG_PLUGIN ) {
-				const collaboratorMode = select.getCollaboratorMode();
-
-				if ( collaboratorMode === 'view' ) {
-					return;
-				}
-			}
-		}
 
 		try {
 			// Evaluate optimized edits.

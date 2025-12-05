@@ -28,13 +28,14 @@ import { DEFAULT_CLASSNAMES, REGEXP_NEWLINES } from './constants';
 import usePostTitleFocus from './use-post-title-focus';
 import usePostTitle from './use-post-title';
 import PostTypeSupportCheck from '../post-type-support-check';
+import { store as editorStore } from '../../store';
 
 const PostTitle = forwardRef( ( _, forwardedRef ) => {
 	const { placeholder, collaboratorMode } = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
 		const { titlePlaceholder } = getSettings();
 
-		const { getCollaboratorMode } = select( coreDataStore );
+		const { getCollaboratorMode } = select( editorStore );
 
 		return {
 			placeholder: titlePlaceholder,

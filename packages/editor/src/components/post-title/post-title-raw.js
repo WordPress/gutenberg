@@ -20,6 +20,7 @@ import { store as coreDataStore } from '@wordpress/core-data';
 import { DEFAULT_CLASSNAMES, REGEXP_NEWLINES } from './constants';
 import usePostTitleFocus from './use-post-title-focus';
 import usePostTitle from './use-post-title';
+import { store as editorStore } from '../../store';
 
 /**
  * Renders a raw post title input field.
@@ -34,7 +35,7 @@ function PostTitleRaw( _, forwardedRef ) {
 		const { getSettings } = select( blockEditorStore );
 		const { titlePlaceholder } = getSettings();
 
-		const { getCollaboratorMode } = select( coreDataStore );
+		const { getCollaboratorMode } = select( editorStore );
 
 		return {
 			placeholder: titlePlaceholder,
