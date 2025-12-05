@@ -30,7 +30,7 @@ export const getAbilities = createSelector(
 		}
 		return abilities;
 	},
-	( state: AbilitiesState, category?: string ) => [
+	( state: AbilitiesState, { category }: AbilitiesQueryArgs = {} ) => [
 		state.abilitiesByName,
 		category,
 	]
