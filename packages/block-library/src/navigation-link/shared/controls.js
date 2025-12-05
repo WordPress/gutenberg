@@ -10,18 +10,15 @@ import {
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
-import {
-	privateApis as blockEditorPrivateApis,
-	store as blockEditorStore,
-} from '@wordpress/block-editor';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
+import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
  */
 import { useToolsPanelDropdownMenuProps } from '../../utils/hooks';
-import { updateAttributes } from './update-attributes';
+import { useHandleLinkChange } from './handle-link-change';
 import { useEntityBinding } from './use-entity-binding';
 import { getSuggestionsQuery } from '../link-ui';
 import { unlock } from '../../lock-unlock';
@@ -74,17 +71,12 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 	const { label, url, description, rel, opensInNewTab } = attributes;
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
-	// Use the entity binding hook internally
-	const {
-		hasUrlBinding,
-		isBoundEntityAvailable,
-		entityRecord,
-		createBinding,
-		clearBinding,
-	} = useEntityBinding( {
-		clientId,
-		attributes,
-	} );
+	// Use the entity binding hook for UI state (help text, link preview, etc.)
+	const { hasUrlBinding, isBoundEntityAvailable, entityRecord } =
+		useEntityBinding( {
+			clientId,
+			attributes,
+		} );
 
 	const needsHelpText = hasUrlBinding;
 	const helpText = isBoundEntityAvailable
@@ -97,8 +89,12 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 				kind: attributes.kind,
 		  } );
 
-	// Get direct store dispatch to bypass setBoundAttributes wrapper
-	const { updateBlockAttributes } = useDispatch( blockEditorStore );
+	// Get the link change handler with built-in binding management
+	const handleLinkChange = useHandleLinkChange( {
+		clientId,
+		attributes,
+		setAttributes,
+	} );
 
 	const linkTitle =
 		entityRecord?.title?.rendered ||
@@ -183,47 +179,7 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 					entityStatus={ entityRecord?.status }
 					hasBinding={ hasUrlBinding }
 					isEntityAvailable={ isBoundEntityAvailable }
-					onSelect={ ( suggestion ) => {
-						// When a suggestion is selected (or Enter pressed)
-						if ( suggestion ) {
-							const attrs = {
-								url: suggestion.url,
-								kind: suggestion.kind,
-								type: suggestion.type,
-								id: suggestion.id,
-							};
-
-							// Check if transitioning from entity to custom link
-							const willBeCustomLink =
-								! suggestion.id && hasUrlBinding;
-
-							if ( willBeCustomLink ) {
-								// Clear the binding first
-								clearBinding();
-
-								// Use direct store dispatch to bypass setBoundAttributes wrapper
-								// which prevents updates to bound attributes.
-								updateBlockAttributes( clientId, {
-									url: suggestion.url,
-									kind: 'custom',
-									type: 'custom',
-									id: undefined,
-								} );
-							} else {
-								// Normal flow for entity links or unbound custom links
-								updateAttributes(
-									attrs,
-									setAttributes,
-									attributes
-								);
-
-								// Create entity binding if we have entity data
-								if ( suggestion.id ) {
-									createBinding( attrs );
-								}
-							}
-						}
-					} }
+					onSelect={ handleLinkChange }
 					suggestionsQuery={ getSuggestionsQuery(
 						attributes.type,
 						attributes.kind

@@ -39,10 +39,10 @@ import { getColors } from '../navigation/edit/utils';
 import {
 	Controls,
 	LinkUI,
-	updateAttributes,
 	useEntityBinding,
 	MissingEntityHelpText,
 } from './shared';
+import { useHandleLinkChange } from './shared/handle-link-change';
 
 const DEFAULT_BLOCK = { name: 'core/navigation-link' };
 const NESTING_BLOCK_NAMES = [
@@ -279,14 +279,15 @@ export default function NavigationLinkEdit( {
 	const { getBlocks } = useSelect( blockEditorStore );
 
 	// URL binding logic
-	const {
-		clearBinding,
-		createBinding,
-		hasUrlBinding,
-		isBoundEntityAvailable,
-	} = useEntityBinding( {
+	const { hasUrlBinding, isBoundEntityAvailable } = useEntityBinding( {
 		clientId,
 		attributes,
+	} );
+
+	const handleLinkChange = useHandleLinkChange( {
+		clientId,
+		attributes,
+		setAttributes,
 	} );
 
 	const [ isInvalid, isDraft ] = useIsInvalidLink(
@@ -642,25 +643,7 @@ export default function NavigationLinkEdit( {
 							} }
 							anchor={ popoverAnchor }
 							onRemove={ removeLink }
-							onChange={ ( updatedValue ) => {
-								const {
-									isEntityLink,
-									attributes: updatedAttributes,
-								} = updateAttributes(
-									updatedValue,
-									setAttributes,
-									attributes
-								);
-
-								// Handle URL binding based on the final computed state
-								// Only create bindings for entity links (posts, pages, taxonomies)
-								// Never create bindings for custom links (manual URLs)
-								if ( isEntityLink ) {
-									createBinding( updatedAttributes );
-								} else {
-									clearBinding();
-								}
-							} }
+							onChange={ handleLinkChange }
 						/>
 					) }
 				</a>
