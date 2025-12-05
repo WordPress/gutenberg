@@ -481,17 +481,20 @@ describe( 'Store Actions', () => {
 			} );
 		} );
 
-		it( 'should register a category with meta', () => {
+		it( 'should register a category with meta and filter to only annotations', () => {
 			const slug = 'test-category';
 			const args: AbilityCategoryArgs = {
 				label: 'Test Category',
 				description: 'A test category',
-				meta: { foo: 'bar', nested: { key: 'value' } },
+				meta: {
+					annotations: { serverRegistered: true },
+				},
 			};
 
 			const action = registerAbilityCategory( slug, args );
 			action( { select: mockSelect, dispatch: mockDispatch } );
 
+			// Should only keep annotations, not add clientRegistered since serverRegistered is true
 			expect( mockDispatch ).toHaveBeenCalledWith( {
 				type: REGISTER_ABILITY_CATEGORY,
 				category: {
@@ -499,8 +502,7 @@ describe( 'Store Actions', () => {
 					label: args.label,
 					description: args.description,
 					meta: {
-						...args.meta,
-						annotations: { clientRegistered: true },
+						annotations: { serverRegistered: true },
 					},
 				},
 			} );

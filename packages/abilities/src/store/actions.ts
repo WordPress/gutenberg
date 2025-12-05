@@ -100,16 +100,37 @@ export function registerAbility( ability: Ability ) {
 			);
 		}
 
-		// Add clientRegistered to meta.annotations if not server-registered
-		const meta = ability.meta || {};
-		const annotations = meta.annotations || {};
+		// Build filtered annotations with only allowed keys
+		const sourceAnnotations = ability.meta?.annotations;
+		const annotations: Record< string, boolean | null > = {};
+
+		// Copy only allowed annotation keys
+		if ( sourceAnnotations ) {
+			for ( const key of [
+				'readonly',
+				'destructive',
+				'idempotent',
+				'serverRegistered',
+				'clientRegistered',
+			] as const ) {
+				if (
+					sourceAnnotations[ key ] !== undefined &&
+					sourceAnnotations[ key ] !== null
+				) {
+					annotations[ key ] = sourceAnnotations[ key ];
+				}
+			}
+		}
+
+		// Add clientRegistered if not server-registered
 		if (
 			! annotations.serverRegistered &&
 			annotations.clientRegistered === undefined
 		) {
 			annotations.clientRegistered = true;
 		}
-		meta.annotations = annotations;
+
+		const meta = { annotations };
 
 		// All validation passed, dispatch the registration action
 		dispatch( {
@@ -193,12 +214,32 @@ export function registerAbilityCategory(
 				'The category properties should provide a valid `meta` object.'
 			);
 		}
-		const meta: Record< string, any > = args.meta || {};
-		const annotations = meta.annotations || {};
+
+		// Build filtered annotations with only allowed keys
+		const sourceAnnotations = args.meta?.annotations;
+		const annotations: Record< string, boolean | null > = {};
+
+		// Copy only allowed annotation keys for categories
+		if ( sourceAnnotations ) {
+			for ( const key of [
+				'serverRegistered',
+				'clientRegistered',
+			] as const ) {
+				if (
+					sourceAnnotations[ key ] !== undefined &&
+					sourceAnnotations[ key ] !== null
+				) {
+					annotations[ key ] = sourceAnnotations[ key ];
+				}
+			}
+		}
+
+		// Add clientRegistered if not server-registered
 		if ( ! annotations.serverRegistered ) {
 			annotations.clientRegistered = true;
 		}
-		meta.annotations = annotations;
+
+		const meta = { annotations };
 		const category: AbilityCategory = {
 			slug,
 			label: args.label,

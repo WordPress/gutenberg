@@ -98,30 +98,17 @@ async function initializeAbilities(): Promise< void > {
 
 		if ( abilities && Array.isArray( abilities ) ) {
 			for ( const ability of abilities ) {
-				const sourceAnnotations = ability?.meta?.annotations;
-				const annotations: Record< string, boolean | null > = {
-					serverRegistered: true,
-				};
-				if ( sourceAnnotations ) {
-					for ( const key of [
-						'readonly',
-						'destructive',
-						'idempotent',
-					] as const ) {
-						if (
-							sourceAnnotations[ key ] !== undefined &&
-							sourceAnnotations[ key ] !== null
-						) {
-							annotations[ key ] = sourceAnnotations[ key ];
-						}
-					}
-				}
-
 				// Register the ability with a callback
+				// The abilities package filters annotations to allowed keys
 				registerAbility( {
 					...ability,
 					callback: createServerCallback( ability ),
-					meta: { annotations },
+					meta: {
+						annotations: {
+							...ability.meta?.annotations,
+							serverRegistered: true,
+						},
+					},
 				} );
 			}
 		}
