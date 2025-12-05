@@ -481,7 +481,7 @@ $block-editor-link-control-number-of-actions: 1;
 }
 
 .link-control-preview-button__title,
-.link-control-preview-button__url {
+.link-control-preview-button__hint {
 	min-width: 0;
 	display: block;
 	width: 100%;
@@ -498,7 +498,7 @@ $block-editor-link-control-number-of-actions: 1;
 	display: block;
 }
 
-.link-control-preview-button__url {
+.link-control-preview-button__hint {
 	font-size: $helptext-font-size;
 	color: $gray-700;
 	font-weight: 400;

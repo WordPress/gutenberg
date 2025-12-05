@@ -37,7 +37,6 @@ export function LinkControlInspector( {
 	label,
 	ariaDescribedby = undefined,
 } ) {
-	const { url } = link || {};
 	const [ isOpen, setIsOpen ] = useState( false );
 	const inputId = useInstanceId(
 		LinkControlInspector,
@@ -63,18 +62,16 @@ export function LinkControlInspector( {
 
 	const renderToggle = () => {
 		return (
-			url && (
-				<LinkPreviewButton
-					link={ link }
-					title={ title }
-					image={ image }
-					onClick={ () => setIsOpen( true ) }
-					aria-haspopup="dialog"
-					aria-expanded={ isOpen }
-					aria-describedby={ ariaDescribedby }
-					id={ inputId }
-				/>
-			)
+			<LinkPreviewButton
+				link={ link }
+				title={ title }
+				image={ image }
+				onClick={ () => setIsOpen( true ) }
+				aria-haspopup="dialog"
+				aria-expanded={ isOpen }
+				aria-describedby={ ariaDescribedby }
+				id={ inputId }
+			/>
 		);
 	};
 

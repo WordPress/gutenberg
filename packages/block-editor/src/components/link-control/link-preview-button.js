@@ -35,7 +35,9 @@ export function LinkPreviewButton( { link, title, image, onClick, ...props } ) {
 	const { richData } = useRichUrlData( title ? null : url );
 
 	// Get display title - use provided title, fallback to rich data, or URL
-	const displayTitle = title || richData?.title || safeDecodeURI( url );
+	const displayTitle = url
+		? title || richData?.title || safeDecodeURI( url )
+		: 'Add link';
 
 	// Get display URL - strip site URL if it matches current site
 	let displayUrl = safeDecodeURI( url || '' );
@@ -87,12 +89,14 @@ export function LinkPreviewButton( { link, title, image, onClick, ...props } ) {
 							>
 								{ displayTitle }
 							</Truncate>
-							<Truncate
-								numberOfLines={ 1 }
-								className="link-control-preview-button__url"
-							>
-								{ displayUrl }
-							</Truncate>
+							{ displayUrl && (
+								<Truncate
+									numberOfLines={ 1 }
+									className="link-control-preview-button__hint"
+								>
+									{ displayUrl }
+								</Truncate>
+							) }
 						</VStack>
 					</HStack>
 				</FlexItem>
