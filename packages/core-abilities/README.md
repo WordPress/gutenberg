@@ -21,7 +21,7 @@ This package is designed to be loaded as a script module on WordPress admin page
 1. Fetches all ability categories from `/wp-abilities/v1/categories`
 2. Registers them with `@wordpress/abilities`
 3. Fetches all abilities from `/wp-abilities/v1/abilities`
-4. Registers them with a `serverCallback` that handles execution via REST API
+4. Registers them with a `callback` that handles execution via REST API
 
 Simply import the package to initialize the WordPress abilities:
 
