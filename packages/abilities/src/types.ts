@@ -80,11 +80,11 @@ export interface Ability {
 	 */
 	meta?: {
 		annotations?: {
-			clientRegistered?: boolean | null;
-			serverRegistered?: boolean | null;
-			readonly?: boolean | null;
-			destructive?: boolean | null;
-			idempotent?: boolean | null;
+			clientRegistered?: boolean;
+			serverRegistered?: boolean;
+			readonly?: boolean;
+			destructive?: boolean;
+			idempotent?: boolean;
 		};
 	};
 }
@@ -130,8 +130,8 @@ export interface AbilityCategory {
 	 */
 	meta?: {
 		annotations?: {
-			clientRegistered?: boolean | null;
-			serverRegistered?: boolean | null;
+			clientRegistered?: boolean;
+			serverRegistered?: boolean;
 		};
 	};
 }
