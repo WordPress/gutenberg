@@ -117,6 +117,9 @@ function abilitiesByName(
 ): Record< string, Ability > {
 	switch ( action.type ) {
 		case REGISTER_ABILITY: {
+			if ( ! action.ability ) {
+				return state;
+			}
 			return {
 				...state,
 				[ action.ability.name ]: sanitizeAbility( action.ability ),
@@ -149,6 +152,9 @@ function categoriesBySlug(
 ): Record< string, AbilityCategory > {
 	switch ( action.type ) {
 		case REGISTER_ABILITY_CATEGORY: {
+			if ( ! action.category ) {
+				return state;
+			}
 			return {
 				...state,
 				[ action.category.slug ]: sanitizeCategory( action.category ),
