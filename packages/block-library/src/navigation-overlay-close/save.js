@@ -14,7 +14,7 @@ import {
 	getTypographyClassesAndStyles,
 } from '@wordpress/block-editor';
 
-export default function overlayCloseSave( { attributes } ) {
+export default function navigationOverlayCloseSave( { attributes } ) {
 	const { displayMode, text } = attributes;
 	const colorProps = getColorClassesAndStyles( attributes );
 	const spacingProps = getSpacingClassesAndStyles( attributes );
@@ -27,7 +27,7 @@ export default function overlayCloseSave( { attributes } ) {
 		<button
 			{ ...useBlockProps.save( {
 				className: clsx(
-					'wp-block-overlay-close',
+					'wp-block-navigation-overlay-close',
 					colorProps.className,
 					spacingProps.className,
 					typographyProps.className
@@ -57,7 +57,7 @@ export default function overlayCloseSave( { attributes } ) {
 				<RichText.Content
 					tagName="span"
 					value={ text }
-					className="wp-block-overlay-close__text"
+					className="wp-block-navigation-overlay-close__text"
 				/>
 			) }
 		</button>

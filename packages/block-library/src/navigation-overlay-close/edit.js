@@ -24,7 +24,10 @@ import {
 import { __ } from '@wordpress/i18n';
 import { close as closeIcon } from '@wordpress/icons';
 
-export default function OverlayCloseEdit( { attributes, setAttributes } ) {
+export default function NavigationOverlayCloseEdit( {
+	attributes,
+	setAttributes,
+} ) {
 	const { displayMode, text } = attributes;
 	const colorProps = useColorProps( attributes );
 	const spacingProps = useSpacingProps( attributes );
@@ -41,7 +44,7 @@ export default function OverlayCloseEdit( { attributes, setAttributes } ) {
 		},
 	} );
 	const blockProps = useBlockProps( {
-		className: 'wp-block-overlay-close',
+		className: 'wp-block-navigation-overlay-close',
 	} );
 
 	const showIcon = displayMode === 'icon' || displayMode === 'both';
@@ -79,7 +82,7 @@ export default function OverlayCloseEdit( { attributes, setAttributes } ) {
 			<div { ...blockProps }>
 				<Button
 					className={ clsx(
-						'wp-block-overlay-close__button',
+						'wp-block-navigation-overlay-close__button',
 						colorProps.className,
 						spacingProps.className,
 						typographyProps.className
@@ -103,7 +106,7 @@ export default function OverlayCloseEdit( { attributes, setAttributes } ) {
 							allowedFormats={ [ 'core/bold', 'core/italic' ] }
 							withoutInteractiveFormatting
 							tagName="span"
-							className="wp-block-overlay-close__text"
+							className="wp-block-navigation-overlay-close__text"
 						/>
 					) }
 				</Button>

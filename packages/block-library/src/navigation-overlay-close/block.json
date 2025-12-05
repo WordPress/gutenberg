@@ -52,6 +52,6 @@
 			}
 		}
 	},
-	"editorStyle": "wp-block-overlay-close-editor",
-	"style": "wp-block-overlay-close"
+	"editorStyle": "wp-block-navigation-overlay-close-editor",
+	"style": "wp-block-navigation-overlay-close"
 }
