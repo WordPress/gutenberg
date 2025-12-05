@@ -22,8 +22,6 @@ import {
 import { store } from '../store';
 import type { Ability, AbilityCategory } from '../types';
 
-jest.mock( '@wordpress/api-fetch' );
-
 jest.mock( '../store', () => ( {
 	store: 'abilities-api/store',
 } ) );
