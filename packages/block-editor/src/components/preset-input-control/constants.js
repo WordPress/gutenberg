@@ -6,7 +6,7 @@ export const CUSTOM_VALUE_SETTINGS = {
 	vw: { max: 100, steps: 1 },
 	vh: { max: 100, steps: 1 },
 	em: { max: 10, steps: 0.1 },
-	rm: { max: 10, steps: 0.1 },
+	rem: { max: 10, steps: 0.1 },
 	svw: { max: 100, steps: 1 },
 	lvw: { max: 100, steps: 1 },
 	dvw: { max: 100, steps: 1 },
