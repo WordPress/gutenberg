@@ -25,39 +25,10 @@ import { store as coreStore } from '@wordpress/core-data';
 import { useToolsPanelDropdownMenuProps } from '../../utils/hooks';
 import { updateAttributes } from './update-attributes';
 import { useEntityBinding } from './use-entity-binding';
+import { getSuggestionsQuery } from '../link-ui';
 import { unlock } from '../../lock-unlock';
 
 const { LinkControlInspector } = unlock( blockEditorPrivateApis );
-
-/**
- * Given the Link block's type attribute, return the query params for link suggestions.
- *
- * @param {string} type - Link block's type attribute
- * @param {string} kind - Link block's entity kind (post-type|taxonomy)
- * @return {Object} Search query params
- */
-function getSuggestionsQuery( type, kind ) {
-	switch ( type ) {
-		case 'post':
-		case 'page':
-			return { type: 'post', subtype: type };
-		case 'category':
-			return { type: 'term', subtype: 'category' };
-		case 'tag':
-			return { type: 'term', subtype: 'post_tag' };
-		case 'post_format':
-			return { type: 'post-format' };
-		default:
-			if ( kind === 'taxonomy' ) {
-				return { type: 'term', subtype: type };
-			}
-			if ( kind === 'post-type' ) {
-				return { type: 'post', subtype: type };
-			}
-			return {};
-	}
-}
-
 /**
  * Get a human-readable entity type name.
  *
