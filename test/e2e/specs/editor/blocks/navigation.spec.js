@@ -737,14 +737,15 @@ test.describe( 'Navigation block', () => {
 					.filter( { hasText: /^Cat$/ } );
 				await catLinkText.click();
 
-				const linkInput = page
+				// With LinkControlInspector, check that link button shows the page info
+				const linkButton = page
 					.getByRole( 'tabpanel', { name: 'Settings' } )
-					.getByRole( 'textbox', {
-						name: 'Link',
-					} );
-				// Wait for the Cat link's URL to load
-				await expect( linkInput ).not.toHaveValue( '' );
-				await expect( linkInput ).toBeDisabled(); // Synced links have disabled Link field
+					.getByRole( 'button', { name: /Cat/i } );
+
+				// Wait for the Cat link to load in the button
+				await expect( linkButton ).toContainText( 'Cat' );
+				// Button is enabled even for synced links
+				await expect( linkButton ).toBeEnabled();
 			} );
 
 			await test.step( 'Popover closing from unsynced link to a synced link should not steal focus back to the previously selected (Cat) link', async () => {
@@ -1073,7 +1074,7 @@ test.describe( 'Navigation block', () => {
 			await test.step( 'Verify bound link displays correctly in sidebar', async () => {
 				// Check the Inspector controls for the Nav Link block
 				// to verify the Link field is:
-				// - disabled
+				// - enabled (button is clickable)
 				// - has the correct URL matching the page URL
 				// - has the correct help text (description)
 				await editor.openDocumentSettingsSidebar();
@@ -1083,13 +1084,22 @@ test.describe( 'Navigation block', () => {
 
 				await expect( settingsControls ).toBeVisible();
 
-				const linkInput = settingsControls.getByRole( 'textbox', {
-					name: 'Link',
-					description: 'Synced with the selected page',
+				const linkButton = settingsControls.getByRole( 'button', {
+					name: /Test Page 1/i,
 				} );
 
-				await expect( linkInput ).toBeDisabled();
-				await expect( linkInput ).toHaveValue( testPage1.link );
+				await expect( linkButton ).toBeEnabled();
+				const url = new URL( testPage1.link );
+				await expect( linkButton ).toContainText(
+					url.pathname.replace( /\/$/, '' )
+				);
+
+				// Verify help text
+				await expect(
+					settingsControls.getByText(
+						'Synced with the selected page.'
+					)
+				).toBeVisible();
 			} );
 
 			await test.step( 'Verify bound link works correctly on frontend', async () => {
@@ -1165,18 +1175,22 @@ test.describe( 'Navigation block', () => {
 				} );
 				await editor.selectBlocks( navLinkBlock );
 
-				// Check that the link input now shows the updated URL
+				// Check that the link button now shows the updated URL
 				await editor.openDocumentSettingsSidebar();
-				const updatedLinkInput = page
+				const settingsControls = page
 					.getByRole( 'region', { name: 'Editor settings' } )
-					.getByRole( 'tabpanel', { name: 'Settings' } )
-					.getByRole( 'textbox', {
-						name: 'Link',
-						description: 'Synced with the selected page',
-					} );
+					.getByRole( 'tabpanel', { name: 'Settings' } );
 
-				await expect( updatedLinkInput ).toHaveValue(
-					updatedPage.link
+				const updatedLinkButton = settingsControls.getByRole(
+					'button',
+					{
+						name: /Test Page 1/i,
+					}
+				);
+
+				const updatedUrl = new URL( updatedPage.link );
+				await expect( updatedLinkButton ).toContainText(
+					updatedUrl.pathname.replace( /\/$/, '' )
 				);
 			} );
 
@@ -1238,31 +1252,6 @@ test.describe( 'Navigation block', () => {
 				await page.keyboard.press( 'Escape' );
 				await expect( linkPopover ).toBeHidden();
 			} );
-
-			await test.step( 'Verify unsync button works in sidebar', async () => {
-				// Get the sidebar controls
-				const settingsControls = page
-					.getByRole( 'region', { name: 'Editor settings' } )
-					.getByRole( 'tabpanel', { name: 'Settings' } );
-
-				const linkInput = settingsControls.getByRole( 'textbox', {
-					name: 'Link',
-					description: 'Synced with the selected page',
-				} );
-
-				// Find the button using its name and aria-describedby ID
-				// The button has aria-describedby pointing to the help text element
-				const helpTextId =
-					await linkInput.getAttribute( 'aria-describedby' );
-				const unlinkButton = settingsControls.getByRole( 'button', {
-					name: 'Unsync and edit',
-					description: helpTextId,
-				} );
-				await unlinkButton.click();
-				await expect( linkInput ).toBeEnabled();
-				await expect( linkInput ).toHaveValue( updatedPage.link );
-				await expect( linkInput ).toBeFocused();
-			} );
 		} );
 
 		test( 'existing links with id but no binding remain editable', async ( {
@@ -1301,7 +1290,7 @@ test.describe( 'Navigation block', () => {
 			await editor.selectBlocks( navLinkBlock );
 
 			// Check the Inspector controls for the Nav Link block
-			// to verify the Link field is enabled (not locked in entity mode)
+			// to verify the Link field is clickable (not locked in entity mode)
 			await editor.openDocumentSettingsSidebar();
 			const settingsControls = page
 				.getByRole( 'region', { name: 'Editor settings' } )
@@ -1309,13 +1298,14 @@ test.describe( 'Navigation block', () => {
 
 			await expect( settingsControls ).toBeVisible();
 
-			const linkInput = settingsControls.getByRole( 'textbox', {
-				name: 'Link',
+			// With LinkControlInspector, there's now a button instead of a textbox
+			const linkButton = settingsControls.getByRole( 'button', {
+				name: /test-page-1/i,
 			} );
 
-			// For existing links with id but no binding, the input should be enabled
-			await expect( linkInput ).toBeEnabled();
-			await expect( linkInput ).toHaveValue( testPage1.link );
+			// For existing links with id but no binding, the button should be enabled and show the URL
+			await expect( linkButton ).toBeEnabled();
+			await expect( linkButton ).toContainText( '/test-page-1' );
 		} );
 
 		test( 'Page List converts to Navigation Links with entity bindings', async ( {
@@ -1403,18 +1393,15 @@ test.describe( 'Navigation block', () => {
 
 			await expect( settingsControls ).toBeVisible();
 
-			// Verify Link field is disabled (indicating binding is active)
-			const linkInput = settingsControls.getByRole( 'textbox', {
-				name: 'Link',
-				description: 'Synced with the selected page',
+			// With LinkControlInspector, synced links show a button with the URL
+			const linkButton = settingsControls.getByRole( 'button', {
+				name: /Test Page 1/i,
 			} );
 
-			await expect( linkInput ).toBeDisabled();
-
-			// Verify help text is present
-			await expect(
-				settingsControls.getByText( 'Synced with the selected page.' )
-			).toBeVisible();
+			// Button is enabled (clickable) even for synced links - clicking opens the search
+			await expect( linkButton ).toBeEnabled();
+			// Button displays the page title and status - verify it's not empty/showing error
+			await expect( linkButton ).toContainText( 'Test Page 1' );
 		} );
 
 		test( 'handles unavailable entity binding', async ( {
@@ -1534,86 +1521,59 @@ test.describe( 'Navigation block', () => {
 
 				await expect( settingsControls ).toBeVisible();
 
-				// Verify Link input field shows error state
-				const linkInput = settingsControls.getByRole( 'textbox', {
-					name: 'Link',
+				// With LinkControlInspector, unavailable entities show a button with error badge
+				const linkButton = settingsControls.getByRole( 'button', {
+					name: /No link selected/i,
 				} );
 
-				// Verify input is disabled when entity is unavailable
-				await expect( linkInput ).toBeDisabled();
+				// Button is enabled (can click to fix the link)
+				await expect( linkButton ).toBeEnabled();
 
-				// Verify input shows empty value (error state)
-				await expect( linkInput ).toHaveValue( '' );
-
-				// Verify input has aria-invalid="true"
-				await expect( linkInput ).toHaveAttribute(
-					'aria-invalid',
-					'true'
-				);
-
-				// Verify help text shows error message
-				await expect(
-					settingsControls.getByText(
-						'Synced page is missing. Please update or remove this link.'
-					)
-				).toBeVisible();
-
-				// Verify unsync button is visible
-				const helpTextId =
-					await linkInput.getAttribute( 'aria-describedby' );
-				const unlinkButton = settingsControls.getByRole( 'button', {
-					name: 'Unsync and edit',
-					description: helpTextId,
-				} );
-				await expect( unlinkButton ).toBeVisible();
+				// Button should show "No link selected" for unavailable entity
+				await expect( linkButton ).toContainText( 'No link selected' );
 			} );
 
-			await test.step( 'Verify unlocking and amending resolves error states', async () => {
+			await test.step( 'Verify clicking button with error opens link control for fixing', async () => {
 				const settingsControls = page
 					.getByRole( 'region', { name: 'Editor settings' } )
 					.getByRole( 'tabpanel', { name: 'Settings' } );
 
-				const linkInput = settingsControls.getByRole( 'textbox', {
-					name: 'Link',
+				const linkButton = settingsControls.getByRole( 'button', {
+					name: /No link selected/i,
 				} );
 
-				// Get the unsync button
-				const helpTextId =
-					await linkInput.getAttribute( 'aria-describedby' );
-				const unlinkButton = settingsControls.getByRole( 'button', {
-					name: 'Unsync and edit',
-					description: helpTextId,
+				// Click the button to open the link control and fix the link
+				await linkButton.click();
+
+				// Verify link control popover opens
+				const linkPopover = navigation.getLinkPopover();
+				await expect( linkPopover ).toBeVisible();
+
+				// Verify search input is focused and ready for input
+				const searchInput = linkPopover.getByRole( 'combobox', {
+					name: 'Search or type URL',
 				} );
+				await expect( searchInput ).toBeFocused();
 
-				// Click "Unsync and edit" button
-				await unlinkButton.click();
+				// Enter a valid URL
+				await page.keyboard.type( 'https://example.com', {
+					delay: 50,
+				} );
+				await page.keyboard.press( 'Enter' );
 
-				// Verify Link input becomes enabled
-				await expect( linkInput ).toBeEnabled();
+				// Wait for link control to close
+				await expect( linkPopover ).toBeHidden();
 
-				// Update URL to a valid value
-				await linkInput.fill( 'https://example.com' );
-				await linkInput.blur();
-
-				// Verify error states are cleared
-				// Wait for error help text to disappear (state updates asynchronously)
-				await expect(
-					settingsControls.getByText(
-						'Synced page is missing. Please update or remove this link.'
-					)
-				).toBeHidden();
-
-				// Verify input no longer has aria-invalid
-				await expect( linkInput ).not.toHaveAttribute(
-					'aria-invalid',
-					'true'
+				// Verify button now shows the new URL
+				const updatedLinkButton = settingsControls.getByRole(
+					'button',
+					{
+						name: /example\.com/i,
+					}
 				);
-
-				// Verify input has the new URL value
-				await expect( linkInput ).toHaveValue( 'https://example.com' );
-
-				// Verify link works normally (no error styling)
-				await expect( linkInput ).toBeEnabled();
+				await expect( updatedLinkButton ).toContainText(
+					'example.com'
+				);
 			} );
 		} );
 	} );
