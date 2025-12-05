@@ -133,7 +133,7 @@ describe( 'API functions', () => {
 			const result = getAbility( 'non-existent' );
 
 			expect( mockGetAbility ).toHaveBeenCalledWith( 'non-existent' );
-			expect( result ).toBeNull();
+			expect( result ).toBeUndefined();
 		} );
 	} );
 
