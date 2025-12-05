@@ -12,6 +12,13 @@ import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
 
 /**
+ * API endpoint constants.
+ */
+const API_BASE = '/wp-abilities/v1';
+const ABILITIES_ENDPOINT = `${ API_BASE }/abilities`;
+const CATEGORIES_ENDPOINT = `${ API_BASE }/categories`;
+
+/**
  * Creates a serverCallback function for a WordPress REST API ability.
  *
  * @param ability The ability to create a callback for.
@@ -32,7 +39,7 @@ function createServerCallback(
 			method = 'DELETE';
 		}
 
-		let path = `/wp-abilities/v1/abilities/${ ability.name }/run`;
+		let path = `${ ABILITIES_ENDPOINT }/${ ability.name }/run`;
 		const options: {
 			method: string;
 			data?: { input: AbilityInput };
@@ -69,7 +76,7 @@ function createServerCallback(
 async function initializeCategories(): Promise< void > {
 	try {
 		const categories = await apiFetch< AbilityCategory[] >( {
-			path: addQueryArgs( '/wp-abilities/v1/categories', {
+			path: addQueryArgs( CATEGORIES_ENDPOINT, {
 				per_page: -1,
 				context: 'edit',
 			} ),
@@ -98,7 +105,7 @@ async function initializeCategories(): Promise< void > {
 async function initializeAbilities(): Promise< void > {
 	try {
 		const abilities = await apiFetch< Ability[] >( {
-			path: addQueryArgs( '/wp-abilities/v1/abilities', {
+			path: addQueryArgs( ABILITIES_ENDPOINT, {
 				per_page: -1,
 				context: 'edit',
 			} ),
