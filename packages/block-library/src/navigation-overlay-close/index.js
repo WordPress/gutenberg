@@ -1,4 +1,11 @@
 /**
+ * WordPress dependencies
+ */
+import { addFilter } from '@wordpress/hooks';
+import { select } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
+
+/**
  * Internal dependencies
  */
 import initBlock from '../utils/init-block';
@@ -17,4 +24,47 @@ export const settings = {
 	save,
 };
 
-export const init = () => initBlock( { name, metadata, settings } );
+function isWithinOverlay() {
+	// @wordpress/block-library should not depend on @wordpress/editor.
+	// Blocks can be loaded into a *non-post* block editor, so to avoid
+	// declaring @wordpress/editor as a dependency, we must access its
+	// store by string.
+	// eslint-disable-next-line @wordpress/data-no-store-string-literals
+	const { getCurrentPostType, getCurrentPostId } = select( 'core/editor' );
+	const { getEditedEntityRecord } = select( coreStore );
+
+	const postType = getCurrentPostType();
+	const postId = getCurrentPostId();
+
+	if ( postType === 'wp_template_part' && postId ) {
+		const templatePartEntity = getEditedEntityRecord(
+			'postType',
+			'wp_template_part',
+			postId
+		);
+
+		return templatePartEntity?.area === 'overlay';
+	}
+
+	return false;
+}
+
+export const init = () => {
+	addFilter(
+		'blockEditor.__unstableCanInsertBlockType',
+		'core/navigation-overlay-close/restrict-to-overlay-template-parts',
+		( canInsert, blockType ) => {
+			if ( blockType.name !== 'core/navigation-overlay-close' ) {
+				return canInsert;
+			}
+
+			if ( ! canInsert ) {
+				return canInsert;
+			}
+
+			return isWithinOverlay();
+		}
+	);
+
+	return initBlock( { name, metadata, settings } );
+};
