@@ -192,39 +192,35 @@ export async function executeAbility(
 			)
 		);
 	}
-
-	// Only validate for client-side abilities
-	if ( ability.meta?._clientRegistered ) {
-		// Check permission callback if defined
-		if ( ability.permissionCallback ) {
-			const hasPermission = await ability.permissionCallback( input );
-			if ( ! hasPermission ) {
-				const error = new Error(
-					sprintf( 'Permission denied for ability: %s', ability.name )
-				);
-				( error as any ).code = 'ability_permission_denied';
-				throw error;
-			}
-		}
-
-		// Validate input
-		if ( ability.input_schema ) {
-			const inputValidation = validateValueFromSchema(
-				input,
-				ability.input_schema,
-				'input'
+	// Check permission callback if defined
+	if ( ability.permissionCallback ) {
+		const hasPermission = await ability.permissionCallback( input );
+		if ( ! hasPermission ) {
+			const error = new Error(
+				sprintf( 'Permission denied for ability: %s', ability.name )
 			);
-			if ( inputValidation !== true ) {
-				const error = new Error(
-					sprintf(
-						'Ability "%1$s" has invalid input. Reason: %2$s',
-						ability.name,
-						inputValidation
-					)
-				);
-				( error as any ).code = 'ability_invalid_input';
-				throw error;
-			}
+			( error as any ).code = 'ability_permission_denied';
+			throw error;
+		}
+	}
+
+	// Validate input
+	if ( ability.input_schema ) {
+		const inputValidation = validateValueFromSchema(
+			input,
+			ability.input_schema,
+			'input'
+		);
+		if ( inputValidation !== true ) {
+			const error = new Error(
+				sprintf(
+					'Ability "%1$s" has invalid input. Reason: %2$s',
+					ability.name,
+					inputValidation
+				)
+			);
+			( error as any ).code = 'ability_invalid_input';
+			throw error;
 		}
 	}
 
@@ -238,8 +234,8 @@ export async function executeAbility(
 		throw error;
 	}
 
-	// Only validate output for client-side abilities
-	if ( ability.meta?._clientRegistered && ability.output_schema ) {
+	// Validate output
+	if ( ability.output_schema ) {
 		const outputValidation = validateValueFromSchema(
 			result,
 			ability.output_schema,

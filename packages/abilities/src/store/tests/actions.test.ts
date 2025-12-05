@@ -95,7 +95,7 @@ describe( 'Store Actions', () => {
 				type: REGISTER_ABILITY,
 				ability: {
 					...ability,
-					meta: { _clientRegistered: true },
+					meta: { annotations: { clientRegistered: true } },
 				},
 			} );
 		} );
@@ -117,7 +117,7 @@ describe( 'Store Actions', () => {
 				type: REGISTER_ABILITY,
 				ability: {
 					...ability,
-					meta: { _clientRegistered: true },
+					meta: { annotations: { clientRegistered: true } },
 				},
 			} );
 		} );
@@ -303,7 +303,7 @@ describe( 'Store Actions', () => {
 					type: REGISTER_ABILITY,
 					ability: {
 						...ability,
-						meta: { _clientRegistered: true },
+						meta: { annotations: { clientRegistered: true } },
 					},
 				} );
 			}
@@ -374,7 +374,7 @@ describe( 'Store Actions', () => {
 				type: REGISTER_ABILITY,
 				ability: {
 					...ability,
-					meta: { _clientRegistered: true },
+					meta: { annotations: { clientRegistered: true } },
 				},
 			} );
 		} );
@@ -476,7 +476,7 @@ describe( 'Store Actions', () => {
 					slug,
 					label: args.label,
 					description: args.description,
-					meta: { _clientRegistered: true },
+					meta: { annotations: { clientRegistered: true } },
 				},
 			} );
 		} );
@@ -498,7 +498,10 @@ describe( 'Store Actions', () => {
 					slug,
 					label: args.label,
 					description: args.description,
-					meta: args.meta,
+					meta: {
+						...args.meta,
+						annotations: { clientRegistered: true },
+					},
 				},
 			} );
 		} );
@@ -577,7 +580,7 @@ describe( 'Store Actions', () => {
 						slug: validSlug,
 						label: args.label,
 						description: args.description,
-						meta: { _clientRegistered: true },
+						meta: { annotations: { clientRegistered: true } },
 					},
 				} );
 			}
@@ -733,7 +736,7 @@ describe( 'Store Actions', () => {
 					slug: categorySlug,
 					label: categoryArgs.label,
 					description: categoryArgs.description,
-					meta: { _clientRegistered: true },
+					meta: { annotations: { clientRegistered: true } },
 				},
 			} );
 
@@ -771,7 +774,7 @@ describe( 'Store Actions', () => {
 				type: REGISTER_ABILITY,
 				ability: {
 					...ability,
-					meta: { _clientRegistered: true },
+					meta: { annotations: { clientRegistered: true } },
 				},
 			} );
 		} );

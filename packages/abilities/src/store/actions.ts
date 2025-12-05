@@ -100,14 +100,16 @@ export function registerAbility( ability: Ability ) {
 			);
 		}
 
-		// Add _clientRegistered to meta if not server-registered
+		// Add clientRegistered to meta.annotations if not server-registered
 		const meta = ability.meta || {};
+		const annotations = meta.annotations || {};
 		if (
-			! meta._serverRegistered &&
-			meta._clientRegistered === undefined
+			! annotations.serverRegistered &&
+			annotations.clientRegistered === undefined
 		) {
-			meta._clientRegistered = true;
+			annotations.clientRegistered = true;
 		}
+		meta.annotations = annotations;
 
 		// All validation passed, dispatch the registration action
 		dispatch( {
@@ -191,10 +193,12 @@ export function registerAbilityCategory(
 				'The category properties should provide a valid `meta` object.'
 			);
 		}
-		const meta = args.meta || {};
-		if ( ! meta._serverRegistered ) {
-			meta._clientRegistered = true;
+		const meta: Record< string, any > = args.meta || {};
+		const annotations = meta.annotations || {};
+		if ( ! annotations.serverRegistered ) {
+			annotations.clientRegistered = true;
 		}
+		meta.annotations = annotations;
 		const category: AbilityCategory = {
 			slug,
 			label: args.label,

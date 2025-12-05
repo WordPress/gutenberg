@@ -208,7 +208,7 @@ describe( 'API functions', () => {
 				},
 				output_schema: { type: 'object' },
 				callback: mockServerCallback,
-				meta: { _serverRegistered: true },
+				meta: { annotations: { serverRegistered: true } },
 			};
 
 			const mockGetAbility = jest.fn().mockReturnValue( mockAbility );
@@ -238,7 +238,7 @@ describe( 'API functions', () => {
 				input_schema: { type: 'object' },
 				output_schema: { type: 'object' },
 				callback: mockCallback,
-				meta: { _clientRegistered: true },
+				meta: { annotations: { clientRegistered: true } },
 			};
 
 			const mockGetAbility = jest.fn().mockReturnValue( mockAbility );
@@ -283,7 +283,7 @@ describe( 'API functions', () => {
 				},
 				output_schema: { type: 'object' },
 				callback: mockCallback,
-				meta: { _clientRegistered: true },
+				meta: { annotations: { clientRegistered: true } },
 			};
 
 			const mockGetAbility = jest.fn().mockReturnValue( mockAbility );
@@ -314,8 +314,7 @@ describe( 'API functions', () => {
 				},
 				output_schema: { type: 'object' },
 				meta: {
-					_serverRegistered: true,
-					annotations: { readonly: true },
+					annotations: { serverRegistered: true, readonly: true },
 				},
 				callback: mockServerCallback,
 			};
@@ -344,8 +343,7 @@ describe( 'API functions', () => {
 				input_schema: { type: 'object' },
 				output_schema: { type: 'object' },
 				meta: {
-					_serverRegistered: true,
-					annotations: { readonly: true },
+					annotations: { serverRegistered: true, readonly: true },
 				},
 				callback: mockServerCallback,
 			};
@@ -379,8 +377,8 @@ describe( 'API functions', () => {
 				},
 				output_schema: { type: 'string' },
 				meta: {
-					_serverRegistered: true,
 					annotations: {
+						serverRegistered: true,
 						destructive: true,
 						idempotent: true,
 					},
@@ -415,7 +413,7 @@ describe( 'API functions', () => {
 				input_schema: { type: 'object' },
 				output_schema: { type: 'object' },
 				callback: mockCallback,
-				meta: { _clientRegistered: true },
+				meta: { annotations: { clientRegistered: true } },
 			};
 
 			const mockGetAbility = jest.fn().mockReturnValue( mockAbility );
@@ -452,7 +450,7 @@ describe( 'API functions', () => {
 				input_schema: { type: 'object' },
 				output_schema: { type: 'object' },
 				callback: mockServerCallback,
-				meta: { _serverRegistered: true },
+				meta: { annotations: { serverRegistered: true } },
 			};
 
 			const mockGetAbility = jest.fn().mockReturnValue( mockAbility );
@@ -485,7 +483,7 @@ describe( 'API functions', () => {
 				output_schema: { type: 'object' },
 				// Server ability - should execute without client validation
 				callback: mockServerCallback,
-				meta: { _serverRegistered: true },
+				meta: { annotations: { serverRegistered: true } },
 			};
 
 			const mockGetAbility = jest.fn().mockReturnValue( mockAbility );
@@ -521,7 +519,7 @@ describe( 'API functions', () => {
 					required: [ 'result' ],
 				},
 				callback: mockCallback,
-				meta: { _clientRegistered: true },
+				meta: { annotations: { clientRegistered: true } },
 			};
 
 			const mockGetAbility = jest.fn().mockReturnValue( mockAbility );

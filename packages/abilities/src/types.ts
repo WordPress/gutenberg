@@ -77,18 +77,15 @@ export interface Ability {
 
 	/**
 	 * Metadata about the ability.
-	 *
-	 * @see WP_Ability::get_meta()
 	 */
 	meta?: {
-		_clientRegistered?: boolean;
-		_serverRegistered?: boolean;
 		annotations?: {
+			clientRegistered?: boolean;
+			serverRegistered?: boolean;
 			readonly?: boolean | null;
 			destructive?: boolean | null;
 			idempotent?: boolean | null;
 		};
-		[ key: string ]: any;
 	};
 }
 
