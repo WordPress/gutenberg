@@ -558,7 +558,8 @@ describe( 'SpacingSizesControl', () => {
 			expect( screen.getByLabelText( 'Link sides' ) ).toBeInTheDocument();
 
 			// Switch to custom mode to access inputs
-			const customToggles = screen.getAllByLabelText( 'Set custom size' );
+			const customToggles =
+				screen.getAllByLabelText( 'Set custom value' );
 			await user.click( customToggles[ 0 ] ); // Click first side's custom toggle
 
 			// Find and change the top input
@@ -615,7 +616,7 @@ describe( 'SpacingSizesControl', () => {
 			).toBeInTheDocument();
 
 			// Switch to custom mode and change value
-			const customToggle = screen.getByLabelText( 'Set custom size' );
+			const customToggle = screen.getByLabelText( 'Set custom value' );
 			await user.click( customToggle );
 
 			const input = screen.getByRole( 'spinbutton', {
@@ -678,7 +679,7 @@ describe( 'SpacingSizesControl', () => {
 
 			// Should show the settings/custom toggle button
 			const customToggle =
-				screen.getAllByLabelText( 'Set custom size' )[ 0 ];
+				screen.getAllByLabelText( 'Set custom value' )[ 0 ];
 			expect( customToggle ).toBeInTheDocument();
 		} );
 
@@ -690,7 +691,7 @@ describe( 'SpacingSizesControl', () => {
 			);
 
 			const customToggle =
-				screen.getAllByLabelText( 'Set custom size' )[ 0 ];
+				screen.getAllByLabelText( 'Set custom value' )[ 0 ];
 
 			// Initially should show preset controls (range slider)
 			expect( screen.getAllByRole( 'slider' ) ).toHaveLength( 2 );
@@ -866,7 +867,7 @@ describe( 'SpacingSizesControl', () => {
 
 			// Switch to custom mode to access input
 			const customToggle =
-				screen.getAllByLabelText( 'Set custom size' )[ 0 ];
+				screen.getAllByLabelText( 'Set custom value' )[ 0 ];
 			await user.click( customToggle );
 
 			const input = screen.getAllByRole( 'spinbutton' )[ 0 ];
@@ -892,7 +893,7 @@ describe( 'SpacingSizesControl', () => {
 
 			// Switch to custom mode to access input
 			const customToggle =
-				screen.getAllByLabelText( 'Set custom size' )[ 0 ];
+				screen.getAllByLabelText( 'Set custom value' )[ 0 ];
 			await user.click( customToggle );
 
 			const input = screen.getAllByRole( 'spinbutton' )[ 0 ];
@@ -1078,7 +1079,7 @@ describe( 'SpacingSizesControl', () => {
 
 			// Should not show custom toggle when custom sizes are disabled
 			expect(
-				screen.queryByLabelText( 'Set custom size' )
+				screen.queryByLabelText( 'Set custom value' )
 			).not.toBeInTheDocument();
 		} );
 
@@ -1091,7 +1092,7 @@ describe( 'SpacingSizesControl', () => {
 
 			// Should show custom toggle when custom sizes are enabled
 			expect(
-				screen.getAllByLabelText( 'Set custom size' )[ 0 ]
+				screen.getAllByLabelText( 'Set custom value' )[ 0 ]
 			).toBeInTheDocument();
 		} );
 	} );
