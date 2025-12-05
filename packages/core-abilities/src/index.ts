@@ -75,7 +75,10 @@ async function initializeCategories(): Promise< void > {
 						category.meta.length === 0 )
 						? {}
 						: category.meta;
-				meta._serverRegistered = true;
+				meta.annotations = {
+					...meta.annotations,
+					serverRegistered: true,
+				};
 				registerAbilityCategory( category.slug, {
 					label: category.label,
 					description: category.description,
@@ -109,7 +112,10 @@ async function initializeAbilities(): Promise< void > {
 						ability.meta.length === 0 )
 						? {}
 						: ability.meta;
-				meta._serverRegistered = true;
+				meta.annotations = {
+					...meta.annotations,
+					serverRegistered: true,
+				};
 
 				// Register the ability with a callback
 				registerAbility( {
