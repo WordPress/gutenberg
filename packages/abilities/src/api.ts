@@ -192,6 +192,7 @@ export async function executeAbility(
 			)
 		);
 	}
+
 	// Check permission callback if defined
 	if ( ability.permissionCallback ) {
 		const hasPermission = await ability.permissionCallback( input );

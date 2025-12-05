@@ -14,6 +14,32 @@ import {
 	UNREGISTER_ABILITY_CATEGORY,
 } from './constants';
 
+type AbilityAnnotations = NonNullable< Ability[ 'meta' ] >[ 'annotations' ];
+
+/**
+ * Filters annotations to only include allowed keys with non-null values.
+ * Defaults clientRegistered to true if not server-registered.
+ *
+ * @param sourceAnnotations The source annotations object to filter.
+ * @param allowedKeys       Array of annotation keys to include.
+ * @return Filtered annotations object.
+ */
+function filterAnnotations< K extends keyof NonNullable< AbilityAnnotations > >(
+	sourceAnnotations: Record< string, boolean > | undefined,
+	allowedKeys: readonly K[]
+): AbilityAnnotations {
+	const annotations: AbilityAnnotations = {};
+
+	if ( sourceAnnotations ) {
+		for ( const key of allowedKeys ) {
+			if ( sourceAnnotations[ key ] !== undefined ) {
+				annotations[ key ] = sourceAnnotations[ key ];
+			}
+		}
+	}
+	return annotations;
+}
+
 /**
  * Registers an ability in the store.
  *
@@ -100,33 +126,16 @@ export function registerAbility( ability: Ability ) {
 			);
 		}
 
-		// Build filtered annotations with only allowed keys
-		const sourceAnnotations = ability.meta?.annotations;
-		const annotations: Record< string, boolean | null > = {};
-
-		// Copy only allowed annotation keys
-		if ( sourceAnnotations ) {
-			for ( const key of [
+		const annotations =
+			filterAnnotations( ability.meta?.annotations, [
 				'readonly',
 				'destructive',
 				'idempotent',
 				'serverRegistered',
 				'clientRegistered',
-			] as const ) {
-				if (
-					sourceAnnotations[ key ] !== undefined &&
-					sourceAnnotations[ key ] !== null
-				) {
-					annotations[ key ] = sourceAnnotations[ key ];
-				}
-			}
-		}
+			] ) || {};
 
-		// Add clientRegistered if not server-registered
-		if (
-			! annotations.serverRegistered &&
-			annotations.clientRegistered === undefined
-		) {
+		if ( annotations?.serverRegistered ) {
 			annotations.clientRegistered = true;
 		}
 
@@ -215,27 +224,13 @@ export function registerAbilityCategory(
 			);
 		}
 
-		// Build filtered annotations with only allowed keys
-		const sourceAnnotations = args.meta?.annotations;
-		const annotations: Record< string, boolean | null > = {};
-
-		// Copy only allowed annotation keys for categories
-		if ( sourceAnnotations ) {
-			for ( const key of [
+		const annotations =
+			filterAnnotations( args.meta?.annotations, [
 				'serverRegistered',
 				'clientRegistered',
-			] as const ) {
-				if (
-					sourceAnnotations[ key ] !== undefined &&
-					sourceAnnotations[ key ] !== null
-				) {
-					annotations[ key ] = sourceAnnotations[ key ];
-				}
-			}
-		}
+			] ) || {};
 
-		// Add clientRegistered if not server-registered
-		if ( ! annotations.serverRegistered ) {
+		if ( annotations?.serverRegistered ) {
 			annotations.clientRegistered = true;
 		}
 
