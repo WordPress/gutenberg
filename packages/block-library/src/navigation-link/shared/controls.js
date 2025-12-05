@@ -9,7 +9,6 @@ import {
 	TextareaControl,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
-import { useRef } from '@wordpress/element';
 import { useInstanceId } from '@wordpress/compose';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import {
@@ -74,10 +73,7 @@ function getEntityTypeName( type, kind ) {
 export function Controls( { attributes, setAttributes, clientId } ) {
 	const { label, url, description, rel, opensInNewTab } = attributes;
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
-	const shouldFocusUnsyncButtonRef = useRef( false );
-	const linkContainerRef = useRef();
-	const inputId = useInstanceId( Controls, 'link-input' );
-	const helpTextId = `${ inputId }__help`;
+	const helpTextId = useInstanceId( Controls, 'link-help-text' );
 
 	// Use the entity binding hook internally
 	const {
@@ -91,25 +87,20 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 		attributes,
 	} );
 
+	const needsHelpText = hasUrlBinding && ! isBoundEntityAvailable;
+
 	// Get direct store dispatch to bypass setBoundAttributes wrapper
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 
-	// Extract title from entity record
-	const title =
+	const linkTitle =
 		entityRecord?.title?.rendered ||
 		entityRecord?.title ||
-		entityRecord?.name ||
-		null;
+		entityRecord?.name;
 
-	// Fetch featured image for post-type entities
-	const featuredImage = useSelect(
+	const linkImage = useSelect(
 		( select ) => {
 			// Only fetch for post-type entities with featured media
-			if (
-				! entityRecord ||
-				attributes.kind !== 'post-type' ||
-				! entityRecord.featured_media
-			) {
+			if ( ! entityRecord || ! entityRecord.featured_media ) {
 				return null;
 			}
 
@@ -166,7 +157,6 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 			</ToolsPanelItem>
 
 			<ToolsPanelItem
-				ref={ linkContainerRef }
 				hasValue={ () => !! url }
 				label={ __( 'Link to' ) }
 				onDeselect={ () => setAttributes( { url: '' } ) }
@@ -180,10 +170,8 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 						type: attributes.type,
 						id: attributes.id,
 					} }
-					title={ title }
-					featuredImage={ featuredImage }
-					hasEntityBinding={ hasUrlBinding }
-					isBoundEntityAvailable={ isBoundEntityAvailable }
+					title={ linkTitle }
+					image={ linkImage }
 					onSelect={ ( suggestion ) => {
 						// When a suggestion is selected (or Enter pressed)
 						if ( suggestion ) {
@@ -221,7 +209,6 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 								// Create entity binding if we have entity data
 								if ( suggestion.id ) {
 									createBinding( attrs );
-									shouldFocusUnsyncButtonRef.current = true;
 								}
 							}
 						}
@@ -231,15 +218,16 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 						attributes.kind
 					) }
 					label={ __( 'Link to' ) }
-					inputId={ inputId }
-					helpTextId={ helpTextId }
-					helpText={
+					ariaDescribedby={ needsHelpText ? helpTextId : undefined }
+				/>
+				{ needsHelpText && helpTextId && (
+					<p id={ helpTextId }>
 						<MissingEntityHelpText
 							type={ attributes.type }
 							kind={ attributes.kind }
 						/>
-					}
-				/>
+					</p>
+				) }
 			</ToolsPanelItem>
 
 			<ToolsPanelItem

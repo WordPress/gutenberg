@@ -6,7 +6,8 @@ import {
 	Dropdown,
 	__experimentalDropdownContentWrapper as DropdownContentWrapper,
 } from '@wordpress/components';
-import { useRef, useState } from '@wordpress/element';
+import { useState } from '@wordpress/element';
+import { useInstanceId } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -18,35 +19,30 @@ import LinkControl from './index';
  * LinkControlInspector component that combines the preview button and search input.
  * Shows a preview button as a trigger, and opens a popover with search input when clicked.
  *
- * @param {Object}   props                        - Component props
- * @param {Object}   props.link                   - Link object with label, url, type, kind, id
- * @param {string}   props.title                  - Title to display (defaults to rich URL data)
- * @param {string}   props.featuredImage          - Featured image URL (optional)
- * @param {boolean}  props.hasEntityBinding       - Whether the link has an entity binding
- * @param {boolean}  props.isBoundEntityAvailable - Whether the bound entity is available
- * @param {Function} props.onSelect               - Callback when a suggestion is selected
- * @param {Object}   props.suggestionsQuery       - Query parameters for suggestions
- * @param {string}   props.label                  - Label for the control
- * @param {string}   props.inputId                - ID for the input element
- * @param {string}   props.helpTextId             - ID for the help text element
- * @param {Node}     props.helpText               - Help text to display (optional)
+ * @param {Object}   props                  - Component props
+ * @param {Object}   props.link             - Link object with label, url, type, kind, id
+ * @param {string}   props.title            - Title to display (defaults to rich URL data)
+ * @param {string}   props.image            - Image URL (optional)
+ * @param {Function} props.onSelect         - Callback when a suggestion is selected
+ * @param {Object}   props.suggestionsQuery - Query parameters for suggestions
+ * @param {string}   props.label            - Label for the control
+ * @param {string}   props.ariaDescribedby  - ID for the aria-describedby attribute (optional)
  */
 export function LinkControlInspector( {
 	link,
 	title,
-	featuredImage,
-	hasEntityBinding,
-	isBoundEntityAvailable,
+	image,
 	onSelect,
 	suggestionsQuery,
 	label,
-	inputId,
-	helpTextId,
-	helpText,
+	ariaDescribedby = undefined,
 } ) {
 	const { url } = link || {};
 	const [ isOpen, setIsOpen ] = useState( false );
-	const toggleButtonRef = useRef();
+	const inputId = useInstanceId(
+		LinkControlInspector,
+		'link-control-inspector'
+	);
 
 	const handleChange = ( newValue ) => {
 		// Close the popover immediately
@@ -69,15 +65,14 @@ export function LinkControlInspector( {
 		return (
 			url && (
 				<LinkPreviewButton
-					buttonRef={ toggleButtonRef }
 					link={ link }
 					title={ title }
-					featuredImage={ featuredImage }
-					hasEntityBinding={ hasEntityBinding }
+					image={ image }
 					onClick={ () => setIsOpen( true ) }
 					aria-haspopup="dialog"
 					aria-expanded={ isOpen }
-					id={ `${ inputId }-button` }
+					aria-describedby={ ariaDescribedby }
+					id={ inputId }
 				/>
 			)
 		);
@@ -99,11 +94,7 @@ export function LinkControlInspector( {
 
 	return (
 		<>
-			<BaseControl
-				label={ label }
-				id={ `${ inputId }-button` }
-				__nextHasNoMarginBottom
-			>
+			<BaseControl label={ label } id={ inputId } __nextHasNoMarginBottom>
 				<Dropdown
 					className="link-control-inspector__dropdown"
 					open={ isOpen }
@@ -117,9 +108,6 @@ export function LinkControlInspector( {
 					renderContent={ renderContent }
 				/>
 			</BaseControl>
-			{ hasEntityBinding && ! isBoundEntityAvailable && helpText && (
-				<p id={ helpTextId }>{ helpText }</p>
-			) }
 		</>
 	);
 }
