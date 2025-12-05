@@ -60,7 +60,7 @@ export function registerAbility( ability: Ability ) {
 		if ( ! /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test( ability.category ) ) {
 			throw new Error(
 				sprintf(
-					'Ability "%1$s" has an invalid category. Category must be lowercase alphanumeric with dashes only Got: "%2$s"',
+					'Ability "%1$s" has an invalid category. Category must be lowercase alphanumeric with dashes only. Got: "%2$s"',
 					ability.name,
 					ability.category
 				)
