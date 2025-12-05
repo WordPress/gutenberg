@@ -14,7 +14,7 @@ export default function useResizeCanvas( deviceType ) {
 	const [ actualWidth, updateActualWidth ] = useState( window.innerWidth );
 
 	useEffect( () => {
-		if ( deviceType === 'Desktop' ) {
+		if ( deviceType === 'Desktop' || deviceType === 'Responsive' ) {
 			return;
 		}
 
@@ -49,6 +49,8 @@ export default function useResizeCanvas( deviceType ) {
 		const marginHorizontal = 'auto';
 
 		switch ( device ) {
+			case 'Responsive':
+				return {};
 			case 'Tablet':
 			case 'Mobile':
 				return {

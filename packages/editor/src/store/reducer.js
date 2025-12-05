@@ -8,6 +8,11 @@ import { combineReducers } from '@wordpress/data';
  */
 import { EDITOR_SETTINGS_DEFAULTS } from './defaults';
 import dataviewsReducer from '../dataviews/store/reducer';
+import {
+	PATTERN_POST_TYPE,
+	TEMPLATE_PART_POST_TYPE,
+	NAVIGATION_POST_TYPE,
+} from './constants';
 
 /**
  * Returns a post attribute value, flattening nested rendered content using its
@@ -288,6 +293,17 @@ export function deviceType( state = 'Desktop', action ) {
 	switch ( action.type ) {
 		case 'SET_DEVICE_TYPE':
 			return action.deviceType;
+		case 'SET_EDITED_POST':
+			if (
+				[
+					PATTERN_POST_TYPE,
+					TEMPLATE_PART_POST_TYPE,
+					NAVIGATION_POST_TYPE,
+				].includes( action.postType )
+			) {
+				return 'Responsive';
+			}
+			return 'Desktop';
 	}
 
 	return state;

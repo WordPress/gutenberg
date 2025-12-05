@@ -32,9 +32,7 @@ import EditTemplateBlocksNotification from './edit-template-blocks-notification'
 import ResizableEditor from '../resizable-editor';
 import useSelectNearestEditableBlock from './use-select-nearest-editable-block';
 import {
-	NAVIGATION_POST_TYPE,
 	PATTERN_POST_TYPE,
-	TEMPLATE_PART_POST_TYPE,
 	TEMPLATE_POST_TYPE,
 	DESIGN_POST_TYPES,
 } from '../../store/constants';
@@ -108,7 +106,6 @@ function VisualEditor( {
 		deviceType,
 		isFocusedEntity,
 		isDesignPostType,
-		postType,
 		isPreview,
 		styles,
 		canvasMinHeight,
@@ -321,11 +318,7 @@ function VisualEditor( {
 		.is-root-container.alignfull:where(.is-layout-flow) > :not(.alignleft):not(.alignright) { max-width: none;}`;
 
 	const enableResizing =
-		[
-			NAVIGATION_POST_TYPE,
-			TEMPLATE_PART_POST_TYPE,
-			PATTERN_POST_TYPE,
-		].includes( postType ) &&
+		deviceType === 'Responsive' &&
 		// Disable in previews / view mode.
 		! isPreview &&
 		// Disable resizing in mobile viewport.
