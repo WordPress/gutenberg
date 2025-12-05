@@ -23,6 +23,7 @@ import LinkControl from './index';
  * @param {Object}   props.link             - Link object with label, url, type, kind, id
  * @param {string}   props.title            - Title to display (defaults to rich URL data)
  * @param {string}   props.image            - Image URL (optional)
+ * @param {Object}   props.badge            - Badge config with label and intent
  * @param {Function} props.onSelect         - Callback when a suggestion is selected
  * @param {Object}   props.suggestionsQuery - Query parameters for suggestions
  * @param {string}   props.label            - Label for the control
@@ -32,6 +33,7 @@ export function LinkControlInspector( {
 	link,
 	title,
 	image,
+	badge,
 	onSelect,
 	suggestionsQuery,
 	label,
@@ -70,6 +72,7 @@ export function LinkControlInspector( {
 				link={ link }
 				title={ title }
 				image={ image }
+				badge={ badge }
 				onClick={ () => setIsOpen( true ) }
 				aria-haspopup="dialog"
 				aria-expanded={ isOpen }

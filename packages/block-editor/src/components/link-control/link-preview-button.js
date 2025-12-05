@@ -7,6 +7,7 @@ import {
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 	FlexItem,
+	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { Icon, chevronDown } from '@wordpress/icons';
 import { safeDecodeURI } from '@wordpress/url';
@@ -15,6 +16,9 @@ import { safeDecodeURI } from '@wordpress/url';
  * Internal dependencies
  */
 import useRichUrlData from './use-rich-url-data';
+import { unlock } from '../../lock-unlock';
+
+const { Badge } = unlock( componentsPrivateApis );
 
 /**
  * Link preview button component that displays the current link information.
@@ -24,11 +28,18 @@ import useRichUrlData from './use-rich-url-data';
  * @param {Object}   props.link    - Link object with label, url, type, kind, id
  * @param {boolean}  props.title   - Title to display
  * @param {boolean}  props.image   - Image to display
- * @param {string}   props.inputId - ID for the input element
+ * @param {Object}   props.badge   - Badge config with label and intent
  * @param {Function} props.onClick - Click handler
  * @param {Object}   props.props   - Additional props to pass to the button
  */
-export function LinkPreviewButton( { link, title, image, onClick, ...props } ) {
+export function LinkPreviewButton( {
+	link,
+	title,
+	image,
+	badge,
+	onClick,
+	...props
+} ) {
 	const { url } = link;
 
 	// Fetch rich URL data if we don't have a title. Internal links should have passed a title.
@@ -96,6 +107,11 @@ export function LinkPreviewButton( { link, title, image, onClick, ...props } ) {
 								>
 									{ displayUrl }
 								</Truncate>
+							) }
+							{ badge && (
+								<Badge intent={ badge.intent }>
+									{ badge.label }
+								</Badge>
 							) }
 						</VStack>
 					</HStack>
