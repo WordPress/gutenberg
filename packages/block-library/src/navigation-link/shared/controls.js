@@ -9,7 +9,6 @@ import {
 	TextareaControl,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
-import { useInstanceId } from '@wordpress/compose';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import {
 	privateApis as blockEditorPrivateApis,
@@ -73,7 +72,6 @@ function getEntityTypeName( type, kind ) {
 export function Controls( { attributes, setAttributes, clientId } ) {
 	const { label, url, description, rel, opensInNewTab } = attributes;
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
-	const helpTextId = useInstanceId( Controls, 'link-help-text' );
 
 	// Use the entity binding hook internally
 	const {
@@ -87,7 +85,16 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 		attributes,
 	} );
 
-	const needsHelpText = hasUrlBinding && ! isBoundEntityAvailable;
+	const needsHelpText = hasUrlBinding;
+	const helpText = isBoundEntityAvailable
+		? BindingHelpText( {
+				type: attributes.type,
+				kind: attributes.kind,
+		  } )
+		: MissingEntityHelpText( {
+				type: attributes.type,
+				kind: attributes.kind,
+		  } );
 
 	// Get direct store dispatch to bypass setBoundAttributes wrapper
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
@@ -121,7 +128,7 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 				null
 			);
 		},
-		[ entityRecord, attributes.kind ]
+		[ entityRecord ]
 	);
 
 	return (
@@ -218,16 +225,8 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 						attributes.kind
 					) }
 					label={ __( 'Link to' ) }
-					ariaDescribedby={ needsHelpText ? helpTextId : undefined }
+					help={ needsHelpText ? helpText : undefined }
 				/>
-				{ needsHelpText && helpTextId && (
-					<p id={ helpTextId }>
-						<MissingEntityHelpText
-							type={ attributes.type }
-							kind={ attributes.kind }
-						/>
-					</p>
-				) }
 			</ToolsPanelItem>
 
 			<ToolsPanelItem

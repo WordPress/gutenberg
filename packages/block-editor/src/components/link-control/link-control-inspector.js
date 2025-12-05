@@ -26,7 +26,7 @@ import LinkControl from './index';
  * @param {Function} props.onSelect         - Callback when a suggestion is selected
  * @param {Object}   props.suggestionsQuery - Query parameters for suggestions
  * @param {string}   props.label            - Label for the control
- * @param {string}   props.ariaDescribedby  - ID for the aria-describedby attribute (optional)
+ * @param {string}   props.help             - Help text for the control
  */
 export function LinkControlInspector( {
 	link,
@@ -35,12 +35,16 @@ export function LinkControlInspector( {
 	onSelect,
 	suggestionsQuery,
 	label,
-	ariaDescribedby = undefined,
+	help,
 } ) {
 	const [ isOpen, setIsOpen ] = useState( false );
 	const inputId = useInstanceId(
 		LinkControlInspector,
 		'link-control-inspector'
+	);
+	const helpId = useInstanceId(
+		LinkControlInspector,
+		'link-control-inspector-help'
 	);
 
 	const handleChange = ( newValue ) => {
@@ -69,7 +73,7 @@ export function LinkControlInspector( {
 				onClick={ () => setIsOpen( true ) }
 				aria-haspopup="dialog"
 				aria-expanded={ isOpen }
-				aria-describedby={ ariaDescribedby }
+				aria-describedby={ help ? helpId : undefined }
 				id={ inputId }
 			/>
 		);
@@ -90,21 +94,27 @@ export function LinkControlInspector( {
 	);
 
 	return (
-		<>
-			<BaseControl label={ label } id={ inputId } __nextHasNoMarginBottom>
-				<Dropdown
-					className="link-control-inspector__dropdown"
-					open={ isOpen }
-					onToggle={ () => setIsOpen( ! isOpen ) }
-					popoverProps={ {
-						placement: 'left-start',
-						offset: 36,
-						shift: true,
-					} }
-					renderToggle={ renderToggle }
-					renderContent={ renderContent }
-				/>
-			</BaseControl>
-		</>
+		<BaseControl
+			label={ label }
+			id={ inputId }
+			help={ help }
+			__nextHasNoMarginBottom
+			__associatedWPComponentProps={ {
+				helpId,
+			} }
+		>
+			<Dropdown
+				className="link-control-inspector__dropdown"
+				open={ isOpen }
+				onToggle={ () => setIsOpen( ! isOpen ) }
+				popoverProps={ {
+					placement: 'left-start',
+					offset: 36,
+					shift: true,
+				} }
+				renderToggle={ renderToggle }
+				renderContent={ renderContent }
+			/>
+		</BaseControl>
 	);
 }
