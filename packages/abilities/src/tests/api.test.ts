@@ -22,13 +22,6 @@ import {
 import { store } from '../store';
 import type { Ability, AbilityCategory } from '../types';
 
-// Mock WordPress dependencies
-jest.mock( '@wordpress/data', () => ( {
-	dispatch: jest.fn(),
-	select: jest.fn(),
-	resolveSelect: jest.fn(),
-} ) );
-
 jest.mock( '@wordpress/api-fetch' );
 
 jest.mock( '../store', () => ( {
