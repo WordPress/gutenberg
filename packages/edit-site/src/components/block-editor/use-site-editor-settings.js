@@ -6,7 +6,6 @@ import { useMemo } from '@wordpress/element';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { usePrevious } from '@wordpress/compose';
 import { store as editorStore } from '@wordpress/editor';
-import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -22,8 +21,6 @@ function useNavigateToPreviousEntityRecord() {
 	const location = useLocation();
 	const previousCanvas = usePrevious( location.query.canvas );
 	const history = useHistory();
-	const { getSelectedBlockClientId } = useSelect( blockEditorStore );
-
 	const goBack = useMemo( () => {
 		const isFocusMode =
 			location.query.focusMode ||
@@ -31,31 +28,8 @@ function useNavigateToPreviousEntityRecord() {
 				FOCUSABLE_ENTITIES.includes( location?.params?.postType ) );
 		const didComeFromEditorCanvas = previousCanvas === 'edit';
 		const showBackButton = isFocusMode && didComeFromEditorCanvas;
-
-		if ( ! showBackButton ) {
-			return undefined;
-		}
-
-		return () => {
-			// Capture currently selected block before navigating back
-			const currentSelectedBlockClientId = getSelectedBlockClientId();
-
-			// Store selected block for current location
-			const currentPath =
-				window.location.pathname + window.location.search;
-			if ( currentSelectedBlockClientId ) {
-				window.sessionStorage?.setItem(
-					`gutenberg_selected_block_${ currentPath }`,
-					currentSelectedBlockClientId
-				);
-			}
-
-			history.back();
-		};
-		// `previousLocation` changes when the component updates for any reason, not
-		// just when location changes. Until this is fixed we can't add it to deps. See
-		// https://github.com/WordPress/gutenberg/pull/58710#discussion_r1479219465.
-	}, [ location, history, previousCanvas, getSelectedBlockClientId ] );
+		return showBackButton ? () => history.back() : undefined;
+	}, [ location, history, previousCanvas ] );
 	return goBack;
 }
 
