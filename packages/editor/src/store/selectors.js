@@ -1360,7 +1360,7 @@ export const getDeviceType = createRegistrySelector(
 /**
  * Returns the current collaborator mode.
  *
- * @param  state Data state.
+ * @param {Object} state Editor state.
  *
  * @return {'view' | 'edit'} Collaborator mode.
  */

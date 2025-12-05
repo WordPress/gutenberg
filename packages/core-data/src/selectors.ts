@@ -102,8 +102,6 @@ type TemplateQuery = {
 	ignore_empty?: boolean;
 };
 
-type CollaboratorMode = 'view' | 'edit';
-
 export interface UserPatternCategory {
 	id: number;
 	name: string;

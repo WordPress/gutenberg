@@ -411,7 +411,6 @@ export const editEntityRecord =
 				return acc;
 			}, {} ),
 		};
-
 		if ( window.__experimentalEnableSync && entityConfig.syncConfig ) {
 			if ( globalThis.IS_GUTENBERG_PLUGIN ) {
 				const objectType = `${ kind }/${ name }`;
@@ -690,7 +689,6 @@ export const saveEntityRecord =
 							),
 						};
 					}
-
 					updatedRecord = await __unstableFetch( {
 						path,
 						method: recordId ? 'PUT' : 'POST',

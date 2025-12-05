@@ -19,7 +19,6 @@ import {
 } from '@wordpress/rich-text';
 import { useMergeRefs } from '@wordpress/compose';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
-import { store as coreDataStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies

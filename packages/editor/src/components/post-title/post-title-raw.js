@@ -12,7 +12,6 @@ import { decodeEntities } from '@wordpress/html-entities';
 import { useSelect } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { useState, forwardRef } from '@wordpress/element';
-import { store as coreDataStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
