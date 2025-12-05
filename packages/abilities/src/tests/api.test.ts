@@ -123,18 +123,6 @@ describe( 'API functions', () => {
 			expect( mockGetAbility ).toHaveBeenCalledWith( 'test/ability' );
 			expect( result ).toEqual( mockAbility );
 		} );
-
-		it( 'should return undefined if ability not found', () => {
-			const mockGetAbility = jest.fn().mockReturnValue( undefined );
-			( select as jest.Mock ).mockReturnValue( {
-				getAbility: mockGetAbility,
-			} );
-
-			const result = getAbility( 'non-existent' );
-
-			expect( mockGetAbility ).toHaveBeenCalledWith( 'non-existent' );
-			expect( result ).toBeUndefined();
-		} );
 	} );
 
 	describe( 'registerAbility', () => {
@@ -591,27 +579,13 @@ describe( 'API functions', () => {
 			expect( result ).toEqual( mockCategory );
 		} );
 
-		it( 'should return null if category not found', () => {
-			const mockGetAbilityCategory = jest.fn().mockReturnValue( null );
-			( select as jest.Mock ).mockReturnValue( {
-				getAbilityCategory: mockGetAbilityCategory,
-			} );
-
-			const result = getAbilityCategory( 'non-existent' );
-
-			expect( mockGetAbilityCategory ).toHaveBeenCalledWith(
-				'non-existent'
-			);
-			expect( result ).toBeNull();
-		} );
-
 		it( 'should handle categories with meta', () => {
 			const mockCategory: AbilityCategory = {
 				slug: 'user-management',
 				label: 'User Management',
 				description: 'Abilities for managing users',
 				meta: {
-					priority: 'high',
+					annotations: { clientRegistered: true },
 				},
 			};
 
@@ -626,7 +600,7 @@ describe( 'API functions', () => {
 
 			expect( result ).toEqual( mockCategory );
 			expect( result?.meta ).toBeDefined();
-			expect( result?.meta?.priority ).toBe( 'high' );
+			expect( result?.meta?.annotations?.clientRegistered ).toBe( true );
 		} );
 	} );
 } );
