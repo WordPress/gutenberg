@@ -124,8 +124,8 @@ describe( 'API functions', () => {
 			expect( result ).toEqual( mockAbility );
 		} );
 
-		it( 'should return null if ability not found', () => {
-			const mockGetAbility = jest.fn().mockReturnValue( null );
+		it( 'should return undefined if ability not found', () => {
+			const mockGetAbility = jest.fn().mockReturnValue( undefined );
 			( select as jest.Mock ).mockReturnValue( {
 				getAbility: mockGetAbility,
 			} );
