@@ -1,0 +1,71 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
+
+.block-editor-block-validation-indicator {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	padding: 0;
+	min-width: 24px;
+	height: 24px;
+	background: transparent;
+	border: none;
+	cursor: var(--wpds-cursor-control);
+
+	&:hover,
+	&:focus {
+		background: rgba(0, 0, 0, 0.05);
+		border-radius: 2px;
+	}
+}
+
+.block-editor-block-validation-indicator__dot {
+	display: block;
+	width: 8px;
+	height: 8px;
+	border-radius: 50%;
+	background: $alert-yellow;
+	box-shadow: 0 0 0 2px rgba($alert-yellow, 0.2);
+}
+
+.block-editor-block-validation-modal__description {
+	margin-bottom: $grid-unit-30;
+	color: $gray-700;
+}
+
+.block-editor-block-validation-modal__comparison {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: $grid-unit-20;
+}
+
+.block-editor-block-validation-modal__column {
+	h3 {
+		font-size: 13px;
+		font-weight: 600;
+		margin-bottom: $grid-unit-10;
+		color: $gray-900;
+	}
+}
+
+.block-editor-block-validation-modal__code {
+	background: $gray-100;
+	border: 1px solid $gray-300;
+	border-radius: 2px;
+	padding: $grid-unit-15;
+	font-family: $editor-html-font;
+	font-size: 12px;
+	line-height: 1.5;
+	overflow-x: auto;
+	white-space: pre-wrap;
+	overflow-wrap: break-word;
+	max-height: 400px;
+	overflow-y: auto;
+	margin: 0;
+
+	&--updated {
+		background: #ccf6da;
+		color: #053e18;
+		border-color: $alert-green;
+	}
+}

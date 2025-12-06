@@ -72,6 +72,7 @@
 @use "./hooks/typography.scss" as *;
 
 @use "./components/block-toolbar/style.scss" as *;
+@use "./components/block-validation-indicator/style.scss" as *;
 @use "./components/inserter/style.scss" as *;
 @use "./components/spacing-sizes-control/style.scss" as *;
 @use "./components/block-visibility/style.scss" as *;
