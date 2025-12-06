@@ -1,0 +1,13 @@
+.wp-block-term-permalink {
+	display: block;
+	width: fit-content;
+
+	&:where(:not([style*="text-decoration"])) {
+		text-decoration: none;
+
+		&:focus,
+		&:active {
+			text-decoration: none;
+		}
+	}
+}

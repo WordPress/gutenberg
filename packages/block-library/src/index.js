@@ -134,6 +134,7 @@ import * as templatePart from './template-part';
 import * as termCount from './term-count';
 import * as termDescription from './term-description';
 import * as termName from './term-name';
+import * as termPermalink from './term-permalink';
 import * as termsQuery from './terms-query';
 import * as termTemplate from './term-template';
 import * as textColumns from './text-columns';
@@ -257,6 +258,7 @@ const getAllBlocks = () => {
 		termCount,
 		termDescription,
 		termName,
+		termPermalink,
 		termsQuery,
 		termTemplate,
 		queryTitle,

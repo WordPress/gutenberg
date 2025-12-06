@@ -1041,6 +1041,16 @@ Displays the name of a taxonomy term. ([Source](https://github.com/WordPress/gut
 -	**Supports:** align (full, wide), color (background, gradients, link, text), interactivity (clientNavigation), spacing (padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** isLink, level, levelOptions, textAlign
 
+## Term Permalink
+
+Displays a link to the current term's archive page. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/term-permalink))
+
+-	**Name:** core/term-permalink
+-	**Category:** theme
+-	**Ancestor:** core/term-template
+-	**Supports:** color (background, gradients, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
+-	**Attributes:** content, linkTarget
+
 ## Term Template
 
 Contains the block elements used to render a taxonomy term, like the name, description, and more. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/term-template))
