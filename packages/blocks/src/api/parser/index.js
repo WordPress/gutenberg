@@ -196,8 +196,9 @@ function applyBlockValidation( unvalidatedBlock, blockType ) {
 		{ log: false }
 	);
 
-	// After fixes, only accept Level 0 as valid. Level 2/3 determination
-	// happens in parseRawBlock after deprecations have been tried.
+	// After fixes, only accept a perfect match as valid. Automated
+	// reconstruction is determined in `parseRawBlock` after deprecations
+	// have been tried.
 	if ( fixedMetadata?.validationLevel === VALIDATION_LEVEL.VALID_BLOCK ) {
 		return {
 			...fixedBlock,
@@ -208,7 +209,7 @@ function applyBlockValidation( unvalidatedBlock, blockType ) {
 	}
 
 	// Return as invalid - deprecations will be tried next, and if they fail,
-	// parseRawBlock will check for Level 2/3 eligibility.
+	// `parseRawBlock` will check for reconstruction eligibility.
 	return {
 		...fixedBlock,
 		isValid: false,
@@ -293,7 +294,7 @@ export function parseRawBlock( rawBlock, options ) {
 
 	// If still invalid after deprecations, check if it qualifies for reconstruction.
 	// This ensures deprecations (explicit author instructions) take priority over
-	// implicit reconstruction.
+	// automated block reconstruction.
 	if ( ! updatedBlock.isValid ) {
 		const [ canReconstruct, , reconstructMeta ] = validateBlock(
 			updatedBlock,

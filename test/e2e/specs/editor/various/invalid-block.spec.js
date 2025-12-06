@@ -63,7 +63,6 @@ test.describe( 'Invalid blocks', () => {
 			editor.canvas.getByRole( 'document', { name: 'Block: Paragraph' } )
 		).toBeVisible();
 
-		// Verify no malicious script was executed.
 		expect( hasAlert ).toBe( false );
 	} );
 

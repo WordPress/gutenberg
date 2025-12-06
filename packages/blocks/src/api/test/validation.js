@@ -26,6 +26,7 @@ import {
 	unregisterBlockType,
 	getBlockTypes,
 	getFreeformContentHandlerName,
+	getUnregisteredTypeHandlerName,
 } from '../registration';
 
 describe( 'validation', () => {
@@ -1154,8 +1155,8 @@ describe( 'validation', () => {
 			);
 		} );
 
-		it( 'should handle freeform blocks', () => {
-			// Freeform blocks should pass as RegeneratedBlock
+		it( 'should handle freeform blocks as valid', () => {
+			// Freeform blocks preserve raw HTML unchanged, so they're always valid
 			const freeformName = getFreeformContentHandlerName();
 			const [ isValid, , metadata ] = validateBlock( {
 				name: freeformName,
@@ -1165,12 +1166,36 @@ describe( 'validation', () => {
 
 			expect( isValid ).toBe( true );
 			expect( metadata.validationLevel ).toBe(
-				VALIDATION_LEVEL.REGENERATED_BLOCK
+				VALIDATION_LEVEL.VALID_BLOCK
 			);
 		} );
 
-		it( 'should handle unregistered block types as invalid', () => {
-			// Block type that doesn't exist should fail validation
+		it( 'should handle missing block handler as valid', () => {
+			// The missing block handler wraps unknown blocks and preserves content.
+			// In normal parsing, unknown blocks are wrapped by the parser before
+			// validation, so they arrive as the missing handler type.
+			const missingHandlerName = getUnregisteredTypeHandlerName();
+			const [ isValid, , metadata ] = validateBlock( {
+				name: missingHandlerName,
+				attributes: {
+					originalName: 'plugin/unknown-block',
+					originalContent: '<p>Content from unknown block</p>',
+				},
+				originalContent: '<p>Content from unknown block</p>',
+			} );
+
+			expect( isValid ).toBe( true );
+			expect( metadata.validationLevel ).toBe(
+				VALIDATION_LEVEL.VALID_BLOCK
+			);
+		} );
+	} );
+
+	describe( 'Validation Levels - Level 4: InvalidBlock', () => {
+		it( 'should invalidate when block type is not registered (direct API call)', () => {
+			// Direct validateBlock call with non-existent type.
+			// In normal parsing, the parser wraps unknown blocks in the
+			// missing block handler first. This tests direct API usage.
 			const [ isValid, issues, metadata ] = validateBlock( {
 				name: 'core/nonexistent-block',
 				attributes: {},
@@ -1183,9 +1208,7 @@ describe( 'validation', () => {
 			);
 			expect( issues.length ).toBeGreaterThan( 0 );
 		} );
-	} );
 
-	describe( 'Validation Levels - Level 4: InvalidBlock', () => {
 		it( 'should invalidate completely different content', () => {
 			registerBlockType( 'core/test-block', {
 				...defaultBlockSettings,
@@ -1282,6 +1305,58 @@ describe( 'validation', () => {
 
 			expect( isValid ).toBe( false );
 			expect( issues.length ).toBeGreaterThan( 0 );
+		} );
+
+		it( 'should invalidate when content size difference exceeds threshold', () => {
+			registerBlockType( 'core/threshold-block', {
+				...defaultBlockSettings,
+				attributes: {
+					content: { type: 'string' },
+				},
+				save: ( { attributes } ) => <p>{ attributes.content }</p>,
+			} );
+
+			// Original content is much larger than what save() produces
+			// Generated: <p>Short</p> (~12 chars)
+			// Original: ~200 chars
+			// Generated < Original * 0.5 → significant content loss
+			const [ isValid, , metadata ] = validateBlock( {
+				name: 'core/threshold-block',
+				attributes: { content: 'Short' },
+				originalContent:
+					'<p>This is a very long piece of content that is much much longer than what the save function would produce from the attributes. It contains lots of extra text that would be lost during reconstruction.</p>',
+			} );
+
+			expect( isValid ).toBe( false );
+			expect( metadata.validationLevel ).toBe(
+				VALIDATION_LEVEL.INVALID_BLOCK
+			);
+		} );
+
+		it( 'should invalidate when generated content is empty but original has content', () => {
+			registerBlockType( 'core/empty-block', {
+				...defaultBlockSettings,
+				attributes: {
+					content: { type: 'string' },
+				},
+				// save() produces empty output when content is missing
+				save: ( { attributes } ) =>
+					attributes.content ? <p>{ attributes.content }</p> : null,
+			} );
+
+			// Attributes don't contain content, so save() returns null
+			// But original has substantial content that would be lost
+			const [ isValid, , metadata ] = validateBlock( {
+				name: 'core/empty-block',
+				attributes: {},
+				originalContent:
+					'<p>This content exists in the original but cannot be regenerated because the content attribute is missing.</p>',
+			} );
+
+			expect( isValid ).toBe( false );
+			expect( metadata.validationLevel ).toBe(
+				VALIDATION_LEVEL.INVALID_BLOCK
+			);
 		} );
 	} );
 

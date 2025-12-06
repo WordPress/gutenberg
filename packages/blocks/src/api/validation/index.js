@@ -877,21 +877,20 @@ export function validateBlock(
 	options = {}
 ) {
 	const { log = true } = options;
-	const isFallbackBlock =
-		block.name === getFreeformContentHandlerName() ||
-		block.name === getUnregisteredTypeHandlerName();
 
-	// Shortcut: Fallback blocks (freeform/unregistered) always use Level 3.
-	// These blocks have no save() function to compare against, so we trust
-	// the content as-is and mark them as regenerated.
-	if ( isFallbackBlock ) {
+	// Freeform blocks and missing block handler both preserve
+	// raw HTML unchanged so we treat them as valid blocks.
+	if (
+		block.name === getFreeformContentHandlerName() ||
+		block.name === getUnregisteredTypeHandlerName()
+	) {
 		return [
 			true,
 			[],
 			{
-				validationLevel: VALIDATION_LEVEL.REGENERATED_BLOCK,
+				validationLevel: VALIDATION_LEVEL.VALID_BLOCK,
 				originalContent: block.originalContent,
-				generatedContent: block.originalContent, // No regeneration for fallback blocks
+				generatedContent: block.originalContent,
 			},
 		];
 	}
@@ -899,7 +898,7 @@ export function validateBlock(
 	const logger = createQueuedLogger();
 	const blockType = normalizeBlockType( blockTypeOrName );
 
-	// If block type doesn't exist (unregistered), treat as invalid
+	// If block type still doesn't exist (unregistered), then treat as invalid
 	if ( ! blockType ) {
 		logger.error(
 			'Block type `%s` is not registered.',
@@ -920,8 +919,12 @@ export function validateBlock(
 
 	let generatedBlockContent;
 	try {
+		// Run the block's `save()` function with current attributes to generate
+		// the expected HTML. This is compared against the original content stored
+		// in the post to determine if the block is valid.
 		generatedBlockContent = getSaveContent( blockType, block.attributes );
 	} catch ( error ) {
+		// If `save()` throws it means the block cannot be validated and is marked invalid.
 		logger.error(
 			'Block validation failed because an error occurred while generating block content:\n\n%s',
 			error.toString()
@@ -938,7 +941,12 @@ export function validateBlock(
 		];
 	}
 
-	// Level 0: ValidBlock - Perfect match (idempotent save operation)
+	// We now have the generated content from save(). Compare it against the
+	// original content to determine the validation level.
+
+	// Level 0 (ValidBlock): Check for a perfect match. A valid block is one
+	// where save() produces identical HTML to what's stored in the post,
+	// meaning the save operation is idempotent.
 	const isValid = isEquivalentHTML(
 		block.originalContent,
 		generatedBlockContent,
@@ -958,18 +966,27 @@ export function validateBlock(
 		];
 	}
 
-	// Level 2: ReconstructedBlock - Conservative reconstruction
-	// Only attribute-level differences (missing classes, different attribute values).
-	// This level is always safe and doesn't check allowsReconstruction.
-	// Structural differences (wrong tags, text content) will skip to Level 3.
+	// Level 2 (ReconstructedBlock): Check for attribute-only differences. This
+	// handles cases where the HTML structure matches but attributes differ, such
+	// as missing classes or changed attribute values. This is considered safe
+	// because we're only restoring attribute values, not changing the structure.
+	// Structural differences (wrong tags, extra content) fall through to the next level.
 	if ( block.attributes ) {
 		// Get validation issues from logger to check if they're only attribute-related
 		const validationIssues = logger.getItems();
 
-		// Pass Level 2 if differences are purely attribute-related
-		// (missing classes, different attribute values, etc.)
-		// Structural issues (wrong tags, wrong content) move to Level 3
-		if ( areOnlyAttributeDifferences( validationIssues ) ) {
+		// Check for significant content loss (generated < 50% of original).
+		// This catches cases where extra content isn't logged as validation issues,
+		// e.g., original: `<p>Text</p><p>Extra</p>` vs generated: `<p>Text</p>`.
+		const originalLength = block.originalContent?.trim().length || 0;
+		const generatedLength = generatedBlockContent?.trim().length || 0;
+		const wouldLoseContent =
+			originalLength > 0 && generatedLength < originalLength * 0.5;
+
+		if (
+			areOnlyAttributeDifferences( validationIssues ) &&
+			! wouldLoseContent
+		) {
 			return [
 				true,
 				[],
@@ -982,32 +999,27 @@ export function validateBlock(
 		}
 	}
 
-	// Level 3: RegeneratedBlock - Content regenerated from attributes
-	// Requires allowsReconstruction !== false (default is true).
-	// Accepts any differences including structural ones (wrong tags, different text).
-	// At this level, we trust that attributes contain enough information to regenerate
-	// the block correctly, even if the HTML is completely different.
+	// Level 3 (RegeneratedBlock): Trust attributes and regenerate the block's HTML.
+	// This accepts any differences including structural ones (wrong tags, different
+	// text) as long as the block type allows reconstruction. At this level we trust
+	// that the attributes contain enough information to regenerate the block correctly,
+	// even if the stored HTML is completely different from what save() produces.
 	const allowsReconstruction = blockType.allowsReconstruction !== false;
 
+	// Blocks can opt out of reconstruction by setting `allowsReconstruction` to `false`.
 	if ( allowsReconstruction && block.attributes ) {
-		// Verify generated content is reasonable.
-		// If original content exists but generated is empty, this may be
-		// a deprecated block with the wrong attribute schema.
-		const hasOriginalContent =
-			block.originalContent && block.originalContent.trim().length > 0;
-		const hasGeneratedContent =
-			generatedBlockContent && generatedBlockContent.trim().length > 0;
+		const originalContent = block.originalContent?.trim() || '';
+		const generatedContent = generatedBlockContent?.trim() || '';
 
-		// Pass Level 3 when both have content, both are empty, or when
-		// the original is empty but generated has content (adding generated classes/structure).
-		//
-		// Exclude cases where the original source has content but generated output is empty.
-		// This happens when attributes can't produce output (e.g., deprecated schema, corrupted
-		// attributes). Regenerating would discard user content, so we fail to Level 4 instead.
-		const canSafelyRegenerate = hasGeneratedContent || ! hasOriginalContent;
+		// Reconstruction is safe if there's no original content to lose, or if
+		// generated content is at least 50% of the original (content gain from
+		// added classes is fine, but significant content loss is not).
+		const safeToReconstruct =
+			originalContent.length === 0 ||
+			generatedContent.length >= originalContent.length * 0.5;
 
-		if ( canSafelyRegenerate ) {
-			// Log regeneration for visibility and debugging.
+		if ( safeToReconstruct ) {
+			// Log reconstruction for visibility.
 			if ( log ) {
 				// eslint-disable-next-line no-console
 				console.log(
@@ -1031,7 +1043,10 @@ export function validateBlock(
 		}
 	}
 
-	// Set validation level to invalid.
+	// Level 4 (InvalidBlock): The block failed all validation levels. This happens
+	// when the HTML doesn't match, reconstruction isn't allowed or would lose too
+	// much content, and no deprecation was able to migrate it. The block is marked
+	// invalid and the original HTML is preserved to prevent data loss.
 	logger.error(
 		'Block validation failed for `%s` (%o).\n\nContent generated by `save` function:\n\n%s\n\nContent retrieved from post body:\n\n%s',
 		blockType.name,
