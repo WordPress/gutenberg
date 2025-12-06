@@ -1004,6 +1004,14 @@ _Returns_
 
 -   `[boolean, Array<LoggerItem>, Object]`: Validation results tuple: - isValid: boolean indicating if block is valid - issues: array of validation issues - metadata: object containing validationLevel, originalContent, generatedContent
 
+### VALIDATION_LEVEL
+
+Validation level constants ordered by decreasing certainty over content integrity. Lower numbers indicate higher confidence in content preservation.
+
+_Type_
+
+-   `Object`
+
 ### withBlockContentContext
 
 > **Deprecated**

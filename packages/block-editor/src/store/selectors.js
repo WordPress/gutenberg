@@ -171,6 +171,20 @@ export function getBlock( state, clientId ) {
 	return state.blocks.tree.get( clientId );
 }
 
+/**
+ * Returns the validation level of a block given its client ID.
+ * Validation levels indicate the confidence level in block content preservation.
+ *
+ * @param {Object} state    Editor state.
+ * @param {string} clientId Block client ID.
+ *
+ * @return {number|null} Validation level (0-4) or null if block doesn't exist.
+ */
+export function getBlockValidationLevel( state, clientId ) {
+	const block = state.blocks.byClientId.get( clientId );
+	return block?.validationLevel ?? null;
+}
+
 export const __unstableGetBlockWithoutInnerBlocks = createSelector(
 	( state, clientId ) => {
 		const block = state.blocks.byClientId.get( clientId );

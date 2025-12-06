@@ -39,6 +39,7 @@ import ChangeDesign from './change-design';
 import SwitchSectionStyle from './switch-section-style';
 import { unlock } from '../../lock-unlock';
 import BlockToolbarIcon from './block-toolbar-icon';
+import BlockValidationIndicator from '../block-validation-indicator';
 
 /**
  * Renders the block toolbar.
@@ -208,6 +209,11 @@ export function PrivateBlockToolbar( {
 								clientIds={ blockClientIds }
 								isSynced={ isSynced }
 							/>
+							{ ! isMultiToolbar && (
+								<BlockValidationIndicator
+									clientId={ blockClientId }
+								/>
+							) }
 							{ isDefaultEditingMode &&
 								showBlockVisibilityButton && (
 									<BlockVisibilityToolbar

@@ -95,7 +95,11 @@ export {
 // they will be run for all valid and invalid blocks alike. However, once a
 // block is detected as invalid -- failing the three first steps -- it is
 // adequate to spend more time determining validity before throwing a conflict.
-export { isValidBlockContent, validateBlock } from './validation';
+export {
+	isValidBlockContent,
+	validateBlock,
+	VALIDATION_LEVEL,
+} from './validation';
 export { getCategories, setCategories, updateCategory } from './categories';
 
 // Blocks are inherently indifferent about where the data they operate with ends

@@ -475,6 +475,19 @@ _Properties_
 -   _isDisabled_ `boolean`: Whether or not the user should be prevented from inserting this item.
 -   _frecency_ `number`: Heuristic that combines frequency and recency.
 
+### getBlockValidationLevel
+
+Returns the validation level of a block given its client ID. Validation levels indicate the confidence level in block content preservation.
+
+_Parameters_
+
+-   _state_ `Object`: Editor state.
+-   _clientId_ `string`: Block client ID.
+
+_Returns_
+
+-   `number|null`: Validation level (0-4) or null if block doesn't exist.
+
 ### getClientIdsOfDescendants
 
 Returns an array containing the clientIds of all descendants of the blocks given. Returned ids are ordered first by the order of the ids given, then by the order that they appear in the editor.
