@@ -77,7 +77,7 @@ export function applyBlockDeprecatedVersions( block, rawBlock, blockType ) {
 
 		// Deprecations require a perfect match. Unlike parsing where automated
 		// reconstruction is acceptable, deprecations are explicit author instructions
-		// that should only apply when the old save() output matches the stored
+		// that should only apply when the old `save()` output matches the stored
 		// content exactly.
 		let [ , , metadata ] = validateBlock(
 			migratedBlock,
@@ -106,8 +106,9 @@ export function applyBlockDeprecatedVersions( block, rawBlock, blockType ) {
 				metadata?.validationLevel === VALIDATION_LEVEL.VALID_BLOCK;
 		}
 
-		// An invalid deprecation means this deprecated version doesn't match
-		// the stored content - try the next deprecation.
+		// An invalid block does not imply incorrect HTML but the fact block
+		// source information could be lost on re-serialization. We continue to
+		// the next deprecation to see if the block becomes valid.
 		if ( ! isValidDeprecation ) {
 			continue;
 		}
