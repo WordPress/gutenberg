@@ -183,6 +183,18 @@ _Related_
 
 -   getClientIdsWithDescendants in core/block-editor store.
 
+### getCollaboratorMode
+
+Returns the current collaborator mode.
+
+_Parameters_
+
+-   _state_ `Object`: Editor state.
+
+_Returns_
+
+-   `'view' | 'edit'`: Collaborator mode.
+
 ### getCurrentPost
 
 Returns the post currently being edited in its last known saved state, not including unsaved edits. Returns an object containing relevant default post values if the post has not yet been saved.
@@ -1469,6 +1481,18 @@ _Parameters_
 _Related_
 
 -   selectBlock in core/block-editor store.
+
+### setCollaboratorMode
+
+Returns an action object used in signalling that the collaborator mode has been set.
+
+_Parameters_
+
+-   _collaboratorMode_ `'view' | 'edit'`: The collaborator mode.
+
+_Returns_
+
+-   `Object`: Action object.
 
 ### setDeviceType
 

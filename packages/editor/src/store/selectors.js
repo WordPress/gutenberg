@@ -1358,6 +1358,25 @@ export const getDeviceType = createRegistrySelector(
 );
 
 /**
+ * Returns the current collaborator mode.
+ *
+ * @param {Object} state Editor state.
+ *
+ * @return {'view' | 'edit'} Collaborator mode.
+ */
+export function getCollaboratorMode( state ) {
+	if ( window.__experimentalEnableSync ) {
+		if ( globalThis.IS_GUTENBERG_PLUGIN ) {
+			return state.collaboratorMode;
+		}
+	}
+
+	// Default to edit mode if the collaboration experiment is not enabled, or
+	// if the Gutenberg plugin is not being used.
+	return 'edit';
+}
+
+/**
  * Returns true if the list view is opened.
  *
  * @param {Object} state Global application state.

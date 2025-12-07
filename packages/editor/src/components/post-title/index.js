@@ -27,14 +27,18 @@ import { DEFAULT_CLASSNAMES, REGEXP_NEWLINES } from './constants';
 import usePostTitleFocus from './use-post-title-focus';
 import usePostTitle from './use-post-title';
 import PostTypeSupportCheck from '../post-type-support-check';
+import { store as editorStore } from '../../store';
 
 const PostTitle = forwardRef( ( _, forwardedRef ) => {
-	const { placeholder } = useSelect( ( select ) => {
+	const { placeholder, collaboratorMode } = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
 		const { titlePlaceholder } = getSettings();
 
+		const { getCollaboratorMode } = select( editorStore );
+
 		return {
 			placeholder: titlePlaceholder,
+			collaboratorMode: getCollaboratorMode(),
 		};
 	}, [] );
 
@@ -173,11 +177,12 @@ const PostTitle = forwardRef( ( _, forwardedRef ) => {
 		/* eslint-disable jsx-a11y/heading-has-content, jsx-a11y/no-noninteractive-element-to-interactive-role */
 		<h1
 			ref={ useMergeRefs( [ richTextRef, focusRef ] ) }
-			contentEditable
+			contentEditable={ collaboratorMode === 'edit' }
 			className={ className }
 			aria-label={ decodedPlaceholder }
 			role="textbox"
 			aria-multiline="true"
+			readOnly={ collaboratorMode === 'view' }
 			onFocus={ onSelect }
 			onBlur={ onUnselect }
 			onKeyDown={ onKeyDown }
