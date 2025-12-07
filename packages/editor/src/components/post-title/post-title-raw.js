@@ -19,6 +19,7 @@ import { useState, forwardRef } from '@wordpress/element';
 import { DEFAULT_CLASSNAMES, REGEXP_NEWLINES } from './constants';
 import usePostTitleFocus from './use-post-title-focus';
 import usePostTitle from './use-post-title';
+import { store as editorStore } from '../../store';
 
 /**
  * Renders a raw post title input field.
@@ -29,12 +30,15 @@ import usePostTitle from './use-post-title';
  * @return {React.ReactNode} The rendered component.
  */
 function PostTitleRaw( _, forwardedRef ) {
-	const { placeholder } = useSelect( ( select ) => {
+	const { placeholder, collaboratorMode } = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
 		const { titlePlaceholder } = getSettings();
 
+		const { getCollaboratorMode } = select( editorStore );
+
 		return {
 			placeholder: titlePlaceholder,
+			collaboratorMode: getCollaboratorMode(),
 		};
 	}, [] );
 
@@ -67,6 +71,8 @@ function PostTitleRaw( _, forwardedRef ) {
 
 	return (
 		<TextareaControl
+			readOnly={ collaboratorMode === 'view' }
+			contentEditable={ collaboratorMode === 'edit' }
 			ref={ focusRef }
 			value={ title }
 			onChange={ onChange }

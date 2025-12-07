@@ -294,6 +294,23 @@ export function deviceType( state = 'Desktop', action ) {
 }
 
 /**
+ * Reducer managing the current collaborator mode.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+export function collaboratorMode( state = 'edit', action ) {
+	switch ( action.type ) {
+		case 'SET_COLLABORATOR_MODE':
+			return action.collaboratorMode;
+	}
+
+	return state;
+}
+
+/**
  * Reducer storing the list of all programmatically removed panels.
  *
  * @param {Array}  state  Current state.
@@ -412,6 +429,7 @@ export default combineReducers( {
 	postAutosavingLock,
 	renderingMode,
 	deviceType,
+	collaboratorMode,
 	removedPanels,
 	blockInserterPanel,
 	inserterSidebarToggleRef,
