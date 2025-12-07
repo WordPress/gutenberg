@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+-   Fix Social Link Block: Custom classes should be added to block main element (`li`) in editor and not the button in the editor.
+-   Fix Social Link Block: The `id` and other attrs for defining the main element of block should be added to `li` and not the button in the editor.
+
+
 ## 9.36.0 (2025-11-26)
 
 ## 9.35.0 (2025-11-12)
