@@ -1,0 +1,4 @@
+:where(.wp-block-comments-pagination-numbers) {
+    // This block has customizable padding, border-box makes that more predictable.
+    box-sizing: border-box;
+}
