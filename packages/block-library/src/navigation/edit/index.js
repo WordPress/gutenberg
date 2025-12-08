@@ -26,7 +26,8 @@ import {
 	__experimentalColorGradientSettingsDropdown as ColorGradientSettingsDropdown,
 	__experimentalUseMultipleOriginColorsAndGradients as useMultipleOriginColorsAndGradients,
 	useBlockEditingMode,
-	BlockControls,
+	Inserter,
+	__unstableBlockToolbarLastItem as BlockToolbarLastItem,
 } from '@wordpress/block-editor';
 import { EntityProvider, store as coreStore } from '@wordpress/core-data';
 
@@ -44,10 +45,9 @@ import {
 	ToolbarButton,
 	ToolbarGroup,
 } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
-import { close, Icon, page } from '@wordpress/icons';
-import { createBlock } from '@wordpress/blocks';
+import { close, Icon } from '@wordpress/icons';
 import { useInstanceId } from '@wordpress/compose';
 
 /**
@@ -89,35 +89,39 @@ import { DEFAULT_BLOCK } from '../constants';
  * @return {JSX.Element|null} The Add page button component or null if not applicable.
  */
 function NavigationAddPageButton( { clientId } ) {
-	const { insertBlock } = useDispatch( blockEditorStore );
-	const { getBlockCount } = useSelect( blockEditorStore );
-
-	const onAddPage = useCallback( () => {
-		// Get the current number of blocks to insert at the end
-		const blockCount = getBlockCount( clientId );
-
-		// Create a new navigation link block (default block)
-		const newBlock = createBlock( DEFAULT_BLOCK.name, {
+	// Hardcode directInsertBlock for simplicity
+	const directInsertBlock = {
+		name: DEFAULT_BLOCK.name,
+		attributes: {
 			kind: DEFAULT_BLOCK.attributes.kind,
 			type: DEFAULT_BLOCK.attributes.type,
-		} );
-
-		// Insert the block at the end of the navigation
-		insertBlock( newBlock, blockCount, clientId );
-	}, [ clientId, insertBlock, getBlockCount ] );
+		},
+	};
 
 	return (
-		<BlockControls>
-			<ToolbarGroup>
-				<ToolbarButton
-					name="add-page"
-					icon={ page }
-					onClick={ onAddPage }
-				>
-					{ __( 'Add page' ) }
-				</ToolbarButton>
+		<BlockToolbarLastItem>
+			<ToolbarGroup className="wp-block-navigation__toolbar-inserter-group">
+				<VStack alignment="center">
+					<Inserter
+						rootClientId={ clientId }
+						directInsertBlock={ directInsertBlock }
+						isAppender
+						toggleProps={ {
+							as: ToolbarButton,
+							name: 'add-block',
+							label: sprintf(
+								// translators: %s: The type of navigation link (e.g., "page", "post")
+								__( 'Add %s' ),
+								DEFAULT_BLOCK.attributes.type
+							),
+							showTooltip: true,
+							className:
+								'wp-block-navigation__toolbar-inserter-button',
+						} }
+					/>
+				</VStack>
 			</ToolbarGroup>
-		</BlockControls>
+		</BlockToolbarLastItem>
 	);
 }
 
@@ -982,7 +986,7 @@ function Navigation( {
 					blockEditingMode={ blockEditingMode }
 				/>
 				{ blockEditingMode === 'default' && stylingInspectorControls }
-				{ blockEditingMode === 'contentOnly' && isEntityAvailable && (
+				{ isEntityAvailable && (
 					<NavigationAddPageButton clientId={ clientId } />
 				) }
 				{ blockEditingMode === 'default' && isEntityAvailable && (
