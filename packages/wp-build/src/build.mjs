@@ -3,7 +3,14 @@
 /**
  * External dependencies
  */
-import { readFile, writeFile, copyFile, mkdir, unlink } from 'fs/promises';
+import {
+	readFile,
+	writeFile,
+	copyFile,
+	mkdir,
+	unlink,
+	stat,
+} from 'fs/promises';
 import path from 'path';
 import { parseArgs } from 'node:util';
 import esbuild from 'esbuild';
@@ -136,6 +143,18 @@ const styleBundlingPlugins = [
  */
 function normalizePath( p ) {
 	return p.replace( /\\/g, '/' );
+}
+
+function pathIsFile( p ) {
+	return stat( p )
+		.then( ( s ) => s.isFile() )
+		.catch( () => false );
+}
+
+function pathIsDirectory( p ) {
+	return stat( p )
+		.then( ( s ) => s.isDirectory() )
+		.catch( () => false );
 }
 
 function transformPhpContent( content, transforms ) {
@@ -1022,7 +1041,7 @@ async function transpilePackage( packageName ) {
 		name: 'externalize-except-css',
 		setup( build ) {
 			// Externalize all non-CSS imports
-			build.onResolve( { filter: /.*/ }, ( args ) => {
+			build.onResolve( { filter: /.*/ }, async ( args ) => {
 				// Skip entry points
 				if ( args.kind === 'entry-point' ) {
 					return null;
@@ -1031,6 +1050,33 @@ async function transpilePackage( packageName ) {
 				// Let CSS/SCSS files be processed by sassPlugin
 				if ( args.path.match( /\.(css|scss)$/ ) ) {
 					return null;
+				}
+
+				// Fully resolve local dependencies without file extension.
+				if (
+					( args.path.startsWith( '.' ) ||
+						path.isAbsolute( args.path ) ) &&
+					! args.path.endsWith( '.js' )
+				) {
+					const baseDir = path.dirname( args.importer );
+					for ( const ext of [ '.js', '.jsx', '.ts', '.tsx' ] ) {
+						const isFile = await pathIsFile(
+							path.resolve( baseDir, args.path + ext )
+						);
+						if ( isFile ) {
+							return { path: args.path + '.js', external: true };
+						}
+					}
+
+					const isDir = await pathIsDirectory(
+						path.resolve( baseDir, args.path )
+					);
+					if ( isDir ) {
+						return {
+							path: args.path + '/index.js',
+							external: true,
+						};
+					}
 				}
 
 				// Externalize everything else (keep imports as-is)
