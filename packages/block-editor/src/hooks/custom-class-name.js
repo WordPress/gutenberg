@@ -7,7 +7,7 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import { addFilter } from '@wordpress/hooks';
-import { TextControl } from '@wordpress/components';
+import { TextareaControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { hasBlockSupport } from '@wordpress/blocks';
 
@@ -46,7 +46,7 @@ function CustomClassNameControlsPure( { className, setAttributes } ) {
 
 	return (
 		<InspectorControls group="advanced">
-			<TextControl
+			<TextareaControl
 				__nextHasNoMarginBottom
 				__next40pxDefaultSize
 				autoComplete="off"
@@ -88,10 +88,12 @@ export function addSaveProps( extraProps, blockType, attributes ) {
 		hasBlockSupport( blockType, 'customClassName', true ) &&
 		attributes.className
 	) {
-		extraProps.className = clsx(
-			extraProps.className,
-			attributes.className
-		);
+		// Sanitize the className here by removing newlines, tabs, and extra spaces
+		const sanitizedClassName = attributes.className
+			.replace( /[\n\t]/g, ' ' ) // Replace newlines and tabs with spaces
+			.replace( /\s+/g, ' ' ) // Collapse multiple spaces into one
+			.trim(); // Remove leading/trailing spaces
+		extraProps.className = clsx( extraProps.className, sanitizedClassName );
 	}
 
 	return extraProps;
