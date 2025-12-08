@@ -46,6 +46,15 @@
 			"source": "attribute",
 			"selector": "audio",
 			"attribute": "preload"
+		},
+		"isRecording": {
+			"type": "boolean",
+			"default": false,
+			"role": "local"
+		},
+		"recordingBlob": {
+			"type": "string",
+			"role": "local"
 		}
 	},
 	"supports": {

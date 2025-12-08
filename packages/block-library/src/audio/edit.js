@@ -39,6 +39,10 @@ import {
 	useToolsPanelDropdownMenuProps,
 } from '../utils/hooks';
 import { Caption } from '../utils/caption';
+import AudioRecorder from './audio-recorder';
+/* eslint-disable import/no-extraneous-dependencies */
+import { uploadMedia } from '@wordpress/media-utils';
+/* eslint-enable import/no-extraneous-dependencies */
 
 const ALLOWED_MEDIA_TYPES = [ 'audio' ];
 
@@ -126,6 +130,47 @@ function AudioEdit( {
 		setTemporaryURL();
 	}
 
+	const handleRecordingComplete = async ( blob ) => {
+		try {
+			const timestamp = new Date().getTime();
+			const extension = blob.type === 'audio/webm' ? 'webm' : 'mp4';
+			const filename = `recording-${ timestamp }.${ extension }`;
+
+			const file = new File( [ blob ], filename, { type: blob.type } );
+
+			const blobURL = URL.createObjectURL( file );
+			setTemporaryURL( blobURL );
+
+			await uploadMedia( {
+				filesList: [ file ],
+				onFileChange: ( [ media ] ) => {
+					if ( media ) {
+						onSelectAudio( {
+							id: media.id,
+							url: media.url,
+							caption: '',
+						} );
+						URL.revokeObjectURL( blobURL );
+					}
+				},
+				onError: ( message ) => {
+					onUploadError( message );
+					setTemporaryURL( null );
+					URL.revokeObjectURL( blobURL );
+				},
+			} );
+		} catch ( error ) {
+			onUploadError(
+				__( 'Failed to upload recording. Please try again.' )
+			);
+			setTemporaryURL( null );
+		}
+	};
+
+	const handleRecordingError = ( error ) => {
+		onUploadError( error );
+	};
+
 	const classes = clsx( className, {
 		'is-transient': !! temporaryURL,
 	} );
@@ -146,7 +191,14 @@ function AudioEdit( {
 					allowedTypes={ ALLOWED_MEDIA_TYPES }
 					value={ attributes }
 					onError={ onUploadError }
-				/>
+				>
+					<div className="wp-block-audio__recorder-container">
+						<AudioRecorder
+							onRecordingComplete={ handleRecordingComplete }
+							onError={ handleRecordingError }
+						/>
+					</div>
+				</MediaPlaceholder>
 			</div>
 		);
 	}
@@ -164,7 +216,12 @@ function AudioEdit( {
 						onSelectURL={ onSelectURL }
 						onError={ onUploadError }
 						onReset={ () => onSelectAudio( undefined ) }
-					/>
+					>
+						<AudioRecorder
+							onRecordingComplete={ handleRecordingComplete }
+							onError={ handleRecordingError }
+						/>
+					</MediaReplaceFlow>
 				</BlockControls>
 			) }
 			<InspectorControls>
