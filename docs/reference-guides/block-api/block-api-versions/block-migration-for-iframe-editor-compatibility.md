@@ -131,7 +131,7 @@ export default function Edit() {
 	const ref = useRefEffect( ( element ) => {
 		jQuery( element ).masonry( … );
 		return () => {
-			defaultView.jQuery( element ).masonry( 'destroy' );
+			jQuery( element ).masonry( 'destroy' );
 		}
 	}, [] );
 
