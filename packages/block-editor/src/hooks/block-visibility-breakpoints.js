@@ -30,23 +30,12 @@ function addSaveProps( extraProps, blockType, attributes ) {
 		return extraProps;
 	}
 
-	const breakpointClasses = [];
-	if ( breakpointVisibility.mobile ) {
-		breakpointClasses.push( 'wp-block-hidden-mobile' );
-	}
-	if ( breakpointVisibility.tablet ) {
-		breakpointClasses.push( 'wp-block-hidden-tablet' );
-	}
-	if ( breakpointVisibility.desktop ) {
-		breakpointClasses.push( 'wp-block-hidden-desktop' );
-	}
-
-	if ( breakpointClasses.length > 0 ) {
-		extraProps.className = clsx(
-			extraProps.className,
-			...breakpointClasses
-		);
-	}
+	extraProps.className = clsx(
+		extraProps.className,
+		breakpointVisibility.mobile && 'wp-block-hidden-mobile',
+		breakpointVisibility.tablet && 'wp-block-hidden-tablet',
+		breakpointVisibility.desktop && 'wp-block-hidden-desktop'
+	);
 
 	return extraProps;
 }
@@ -56,4 +45,3 @@ addFilter(
 	'core/block-editor/block-visibility-breakpoints',
 	addSaveProps
 );
-

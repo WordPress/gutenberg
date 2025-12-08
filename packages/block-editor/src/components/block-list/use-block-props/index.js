@@ -161,18 +161,16 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 	const isDesktopViewport = isLargeOrLarger; // >= 960px
 
 	// Determine which breakpoint classes to apply
-	const breakpointClasses = {};
-	if ( breakpointVisibility ) {
-		if ( breakpointVisibility.mobile && isMobileViewport ) {
-			breakpointClasses[ 'wp-block-hidden-mobile' ] = true;
-		}
-		if ( breakpointVisibility.tablet && isTabletViewport ) {
-			breakpointClasses[ 'wp-block-hidden-tablet' ] = true;
-		}
-		if ( breakpointVisibility.desktop && isDesktopViewport ) {
-			breakpointClasses[ 'wp-block-hidden-desktop' ] = true;
-		}
-	}
+	const breakpointClasses = breakpointVisibility
+		? {
+				'wp-block-hidden-mobile':
+					breakpointVisibility.mobile && isMobileViewport,
+				'wp-block-hidden-tablet':
+					breakpointVisibility.tablet && isTabletViewport,
+				'wp-block-hidden-desktop':
+					breakpointVisibility.desktop && isDesktopViewport,
+		  }
+		: {};
 
 	// Ensures it warns only inside the `edit` implementation for the block.
 	if ( blockApiVersion < 2 && clientId === blockEditContext.clientId ) {

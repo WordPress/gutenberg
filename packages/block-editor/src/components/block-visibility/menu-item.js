@@ -11,6 +11,7 @@ import { useSelect } from '@wordpress/data';
  */
 import { store as blockEditorStore } from '../../store';
 import { openBreakpointsModal } from '../block-visibility-breakpoints/modal-manager';
+import { hasAnyBreakpointVisibility } from '../block-visibility-breakpoints/constants';
 
 export default function BlockVisibilityMenuItem( { clientIds, onClose } ) {
 	const blocks = useSelect(
@@ -24,12 +25,10 @@ export default function BlockVisibilityMenuItem( { clientIds, onClose } ) {
 		( block ) => block.attributes.metadata?.blockVisibility === false
 	);
 
-	const hasBreakpointVisibility = blocks.some(
-		( block ) =>
-			block.attributes.metadata?.blockVisibilityBreakpoints &&
-			( block.attributes.metadata.blockVisibilityBreakpoints.mobile ||
-				block.attributes.metadata.blockVisibilityBreakpoints.tablet ||
-				block.attributes.metadata.blockVisibilityBreakpoints.desktop )
+	const hasBreakpointVisibility = blocks.some( ( block ) =>
+		hasAnyBreakpointVisibility(
+			block.attributes.metadata?.blockVisibilityBreakpoints
+		)
 	);
 
 	const handleClick = () => {

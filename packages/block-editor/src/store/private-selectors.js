@@ -36,6 +36,7 @@ import {
 	reusableBlocksSelectKey,
 	sectionRootClientIdKey,
 } from './private-keys';
+import { hasAnyBreakpointVisibility } from '../components/block-visibility-breakpoints/constants';
 
 const { isContentBlock } = unlock( blocksPrivateApis );
 
@@ -719,26 +720,13 @@ export const isBlockHidden = ( state, clientId ) => {
 		return false;
 	}
 	const attributes = state.blocks.attributes.get( clientId );
-	const blockVisibility = attributes?.metadata?.blockVisibility;
-	const breakpointVisibility =
-		attributes?.metadata?.blockVisibilityBreakpoints;
+	const metadata = attributes?.metadata;
 
-	// Block is hidden if it's hidden everywhere
-	if ( blockVisibility === false ) {
-		return true;
-	}
-
-	// Block is hidden if it has any breakpoint visibility set
-	if (
-		breakpointVisibility &&
-		( breakpointVisibility.mobile ||
-			breakpointVisibility.tablet ||
-			breakpointVisibility.desktop )
-	) {
-		return true;
-	}
-
-	return false;
+	// Block is hidden if it's hidden everywhere or has any breakpoint visibility set
+	return (
+		metadata?.blockVisibility === false ||
+		hasAnyBreakpointVisibility( metadata?.blockVisibilityBreakpoints )
+	);
 };
 
 /**

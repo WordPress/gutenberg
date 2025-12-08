@@ -123,21 +123,11 @@ export default function BlockVisibilityBreakpointsModal( {
 	// Handle "Hide everywhere" toggle
 	const handleHideEverywhereChange = ( newValue ) => {
 		setHideEverywhere( newValue );
-		if ( newValue ) {
-			// If checking "Hide everywhere", check all breakpoints
-			setBreakpoints( {
-				[ BREAKPOINT_NAMES.MOBILE ]: true,
-				[ BREAKPOINT_NAMES.TABLET ]: true,
-				[ BREAKPOINT_NAMES.DESKTOP ]: true,
-			} );
-		} else {
-			// If unchecking "Hide everywhere", uncheck all breakpoints
-			setBreakpoints( {
-				[ BREAKPOINT_NAMES.MOBILE ]: false,
-				[ BREAKPOINT_NAMES.TABLET ]: false,
-				[ BREAKPOINT_NAMES.DESKTOP ]: false,
-			} );
-		}
+		setBreakpoints( {
+			[ BREAKPOINT_NAMES.MOBILE ]: newValue,
+			[ BREAKPOINT_NAMES.TABLET ]: newValue,
+			[ BREAKPOINT_NAMES.DESKTOP ]: newValue,
+		} );
 	};
 
 	// Handle individual breakpoint toggle
