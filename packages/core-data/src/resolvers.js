@@ -9,13 +9,6 @@ import { camelCase } from 'change-case';
 import { addQueryArgs } from '@wordpress/url';
 import { decodeEntities } from '@wordpress/html-entities';
 import apiFetch from '@wordpress/api-fetch';
-import { store as blockEditorStore } from '@wordpress/block-editor';
-import {
-	select as dataSelect,
-	dispatch as dataDispatch,
-	subscribe,
-} from '@wordpress/data';
-
 /**
  * Internal dependencies
  */
@@ -32,7 +25,10 @@ import {
 	isNumericID,
 } from './utils';
 import { fetchBlockPatterns } from './fetch';
-import { areSelectionsEqual } from './utils/selection';
+import {
+	getSelectionHistoryMeta,
+	findSelectionFromHistory,
+} from './utils/crdt';
 
 /**
  * Requests authors from the REST API.
@@ -181,6 +177,23 @@ export const getEntityRecord =
 								transientConfig.read( recordWithTransients );
 						} );
 
+					const editRecord = ( edits ) => {
+						if ( ! Object.keys( edits ).length ) {
+							return;
+						}
+
+						dispatch( {
+							type: 'EDIT_ENTITY_RECORD',
+							kind,
+							name,
+							recordId: key,
+							edits,
+							meta: {
+								undo: undefined,
+							},
+						} );
+					};
+
 					// Load the entity record for syncing.
 					await getSyncManager()?.load(
 						entityConfig.syncConfig,
@@ -188,22 +201,17 @@ export const getEntityRecord =
 						objectId,
 						recordWithTransients,
 						{
-							// Handle edits sourced from the sync manager.
-							editRecord: ( edits ) => {
-								if ( ! Object.keys( edits ).length ) {
-									return;
-								}
-
-								dispatch( {
-									type: 'EDIT_ENTITY_RECORD',
+							// Directly handle edits sourced from the sync manager.
+							editRecord,
+							// Handle entity record edits that require processing
+							// before being saved.
+							editEntityRecord: ( edits ) => {
+								dispatch.editEntityRecord(
 									kind,
 									name,
-									recordId: key,
-									edits,
-									meta: {
-										undo: undefined,
-									},
-								} );
+									key,
+									edits
+								);
 							},
 							// Get the current entity record (with edits)
 							getEditedRecord: async () =>
@@ -229,67 +237,48 @@ export const getEntityRecord =
 									key
 								);
 							},
-							// Get the current selection. This is used by the
-							// sync manager to save selection position on the
-							// undo stack.
-							subscribeToSelectionChange: ( callback ) => {
-								const { getSelectionStart, getSelectionEnd } =
-									dataSelect( blockEditorStore );
+							addUndoMeta: ( ydoc, meta ) => {
+								const selectionHistory =
+									getSelectionHistoryMeta( ydoc );
 
-								let currentSelection = {
-									selectionStart: getSelectionStart(),
-									selectionEnd: getSelectionEnd(),
-								};
-
-								callback( currentSelection );
-
-								subscribe( () => {
-									const newSelection = {
-										selectionStart: getSelectionStart(),
-										selectionEnd: getSelectionEnd(),
-									};
-
-									const isSelectionUpdated =
-										! areSelectionsEqual(
-											newSelection,
-											currentSelection
-										);
-
-									// Only update if selection actually changed
-									if ( isSelectionUpdated ) {
-										callback( newSelection );
-										currentSelection = newSelection;
-									}
-								}, blockEditorStore );
-							},
-							// Set the current selection. This is used by the
-							// sync manager to restore selection position when
-							// triggering an undo.
-							// Support block-level selection with just a clientId,
-							// and offset-based selection with additional parameters.
-							resetSelection: (
-								selectionStart,
-								selectionEnd
-							) => {
-								if (
-									areSelectionsEqual(
-										selectionStart,
-										selectionEnd
-									) &&
-									! selectionStart.attributeKey
-								) {
-									// Use selectBlock() for individual block selection.
-									dataDispatch(
-										blockEditorStore
-									).selectBlock( selectionStart.clientId );
-								} else {
-									dataDispatch(
-										blockEditorStore
-									).resetSelection(
-										selectionStart,
-										selectionEnd,
-										null /* initialPosition */
+								if ( selectionHistory ) {
+									console.log(
+										'Adding undo selection history meta:',
+										selectionHistory
 									);
+									meta.set(
+										'selectionHistory',
+										selectionHistory
+									);
+								}
+							},
+							restoreUndoMeta: ( ydoc, meta ) => {
+								const selectionHistoryMeta =
+									meta.get( 'selectionHistory' );
+
+								if ( selectionHistoryMeta ) {
+									const selection = findSelectionFromHistory(
+										ydoc,
+										selectionHistoryMeta
+									);
+
+									if ( selection ) {
+										const { selectionStart, selectionEnd } =
+											selection;
+
+										const changes = {
+											selection: {
+												selectionStart,
+												selectionEnd,
+												initialPosition: null,
+											},
+										};
+										console.log(
+											'Sending editRecord with changes:',
+											changes
+										);
+										editRecord( changes );
+									}
 								}
 							},
 						}

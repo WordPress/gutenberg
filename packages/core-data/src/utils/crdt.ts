@@ -32,7 +32,7 @@ import {
 	CRDT_RECORD_MAP_KEY,
 	WORDPRESS_META_KEY_FOR_CRDT_DOC_PERSISTENCE,
 } from '../sync';
-import type { WPSelection } from '../types';
+import type { WPBlockSelection, WPSelection } from '../types';
 import {
 	createYMap,
 	getRootMap,
@@ -40,7 +40,17 @@ import {
 	type YMapRecord,
 	type YMapWrap,
 } from './crdt-utils';
-import { BlockSelectionHistory } from './block-selection-history';
+import type {
+	YFullSelection,
+	YSelection,
+	YSelectionHistory,
+} from './block-selection-history';
+import {
+	BlockSelectionHistory,
+	SELECTION_HISTORY_DEFAULT_SIZE,
+	YSelectionType,
+} from './block-selection-history';
+import { restoreSelection } from './selection';
 
 // Changes that can be applied to a post entity record.
 export type PostChanges = Partial< Post > & {
@@ -95,31 +105,6 @@ const disallowedPostMetaKeys = new Set< string >( [
 	WORDPRESS_META_KEY_FOR_CRDT_DOC_PERSISTENCE,
 ] );
 
-enum PositionType {
-	RelativeSelection = 'RelativeSelection',
-	BlockSelection = 'BlockSelection',
-}
-
-interface RelativePosition {
-	type: PositionType.RelativeSelection;
-	attributeKey: string;
-	relativePosition: Y.RelativePosition;
-	clientId: string;
-	offset: number;
-}
-
-interface BlockPosition {
-	type: PositionType.BlockSelection;
-	clientId: string;
-}
-
-type Position = RelativePosition | BlockPosition;
-
-interface PositionMeta {
-	position: Position;
-	backupPositions?: Position[];
-}
-
 /**
  * Given a set of local changes to a generic entity record, apply those changes
  * to the local Y.Doc.
@@ -165,7 +150,7 @@ export function applyPostChangesToCRDTDoc(
 	changes: PostChanges,
 	_postType: Type // eslint-disable-line @typescript-eslint/no-unused-vars
 ): void {
-	console.log( 'applyPostChangesToCRDTDoc() with changes:', changes );
+	// console.log( 'applyPostChangesToCRDTDoc() with changes:', changes );
 
 	const ymap = getRootMap< YPostRecord >( ydoc, CRDT_RECORD_MAP_KEY );
 
@@ -281,54 +266,8 @@ export function applyPostChangesToCRDTDoc(
 
 	if ( changes.selection ) {
 		// Keep track of selection history for the undo/redo stack.
-		const selectionHistory = getSelectionHistory( ydoc );
+		const selectionHistory = getBlockSelectionHistory( ydoc );
 		selectionHistory.updateSelection( changes.selection );
-	}
-
-	if ( changes[ 'undo-manager-event' ] ) {
-		const {
-			eventType,
-			meta,
-		}: { eventType: string; meta: Map< string, any > } = // alecg: This should be a shared type.
-			changes[ 'undo-manager-event' ];
-
-		if ( eventType === 'stack-item-added' ) {
-			const selectionHistory = getSelectionHistory( ydoc );
-
-			let positionToStore = selectionHistory.getCurrentPosition();
-			const backupPositions = selectionHistory.getBlockHistory( 3 );
-
-			if ( positionToStore === null && backupPositions.length === 0 ) {
-				// If we don't have a last selection and no backup positions, then don't save anything extra
-				return;
-			} else if ( positionToStore === null ) {
-				// If positionToStore is null for some reason, use a backup position
-				positionToStore = backupPositions[ 0 ];
-			}
-
-			const positionMeta: PositionMeta = {
-				position: positionToStore,
-				backupPositions,
-			};
-
-			console.log( 'Setting undo position meta:', positionMeta );
-			meta.set( 'position', positionMeta );
-		}
-
-		if ( eventType === 'stack-item-popped' ) {
-			const positionMeta: PositionMeta | undefined =
-				meta.get( 'position' );
-
-			if ( ! positionMeta ) {
-				return;
-			}
-
-			const { position, backupPositions } = positionMeta;
-			console.log(
-				'applyPostChangesToCRDTDoc() received stack-item-popped event with:',
-				{ position, backupPositions }
-			);
-		}
 	}
 }
 
@@ -546,7 +485,7 @@ const selectionHistoryMap = new WeakMap< CRDTDoc, BlockSelectionHistory >();
  * @param ydoc The Y.Doc to get the selection history for
  * @return The BlockSelectionHistory instance
  */
-function getSelectionHistory( ydoc: CRDTDoc ): BlockSelectionHistory {
+function getBlockSelectionHistory( ydoc: CRDTDoc ): BlockSelectionHistory {
 	let history = selectionHistoryMap.get( ydoc );
 
 	if ( ! history ) {
@@ -555,4 +494,151 @@ function getSelectionHistory( ydoc: CRDTDoc ): BlockSelectionHistory {
 	}
 
 	return history;
+}
+
+export function getSelectionHistoryMeta(
+	ydoc: CRDTDoc
+): YSelectionHistory | null {
+	const selectionHistory = getBlockSelectionHistory( ydoc );
+
+	let selectionToStore = selectionHistory.getCurrentSelection();
+	console.log(
+		'getSelectionHistoryMeta() selectionToStore:',
+		selectionToStore
+	);
+	const backupSelections = selectionHistory.getSelectionHistory(
+		SELECTION_HISTORY_DEFAULT_SIZE
+	);
+	const firstBackupSelection = backupSelections[ 0 ];
+
+	if ( selectionToStore === null ) {
+		if ( firstBackupSelection === undefined ) {
+			// If we don't have any selection to restore, don't return anything
+			return null;
+		}
+
+		// Use the first backup selection if available
+		selectionToStore = firstBackupSelection;
+		backupSelections.shift();
+	}
+
+	return {
+		selection: selectionToStore,
+		backupSelections,
+	};
+}
+
+export function findSelectionFromHistory(
+	ydoc: Y.Doc,
+	selectionHistory: YSelectionHistory
+): WPSelection | null {
+	const { selection, backupSelections } = selectionHistory;
+
+	// Build a stack of positions to try, starting with the primary position
+	const positionsToTry: YFullSelection[] = [ selection ];
+	if ( backupSelections ) {
+		positionsToTry.push( ...backupSelections );
+	}
+
+	// Try each position until we find one that exists in the document
+	for ( const positionToTry of positionsToTry ) {
+		const { start, end } = positionToTry;
+		const startBlock = findBlockByClientIdInDoc( start.clientId, ydoc );
+		const endBlock = findBlockByClientIdInDoc( end.clientId, ydoc );
+
+		if ( ! startBlock || ! endBlock ) {
+			// This block no longer exists, skip it.
+			continue;
+		}
+
+		const startBlockSelection = convertYSelectionToBlockSelection(
+			start,
+			ydoc
+		);
+		const endBlockSelection = convertYSelectionToBlockSelection(
+			end,
+			ydoc
+		);
+
+		if ( startBlockSelection === null || endBlockSelection === null ) {
+			continue;
+		}
+
+		return {
+			selectionStart: startBlockSelection,
+			selectionEnd: endBlockSelection,
+		};
+	}
+
+	return null;
+}
+
+function convertYSelectionToBlockSelection(
+	ySelection: YSelection,
+	ydoc: Y.Doc
+): WPBlockSelection | null {
+	if ( ySelection.type === YSelectionType.RelativeSelection ) {
+		const { relativePosition, attributeKey, clientId } = ySelection;
+
+		const absolutePosition = Y.createAbsolutePositionFromRelativePosition(
+			relativePosition,
+			ydoc
+		);
+
+		if ( absolutePosition ) {
+			return {
+				clientId,
+				attributeKey,
+				offset: absolutePosition.index,
+			};
+		}
+	} else if ( ySelection.type === YSelectionType.BlockSelection ) {
+		return {
+			clientId: ySelection.clientId,
+			attributeKey: undefined,
+			offset: undefined,
+		};
+	}
+
+	return null;
+}
+
+export function findBlockByClientIdInDoc(
+	blockId: string,
+	ydoc: Y.Doc
+): YBlock | null {
+	const ymap = getRootMap< YPostRecord >( ydoc, CRDT_RECORD_MAP_KEY );
+	const blocks = ymap.get( 'blocks' );
+
+	if ( ! ( blocks instanceof Y.Array ) ) {
+		return null;
+	}
+
+	return findBlockByClientIdInBlocks( blockId, blocks );
+}
+
+function findBlockByClientIdInBlocks(
+	blockId: string,
+	blocks: YBlocks
+): YBlock | null {
+	for ( const block of blocks ) {
+		if ( block.get( 'clientId' ) === blockId ) {
+			return block;
+		}
+
+		const innerBlocks = block.get( 'innerBlocks' );
+
+		if ( innerBlocks && innerBlocks.length > 0 ) {
+			const innerBlock = findBlockByClientIdInBlocks(
+				blockId,
+				innerBlocks
+			);
+
+			if ( innerBlock ) {
+				return innerBlock;
+			}
+		}
+	}
+
+	return null;
 }

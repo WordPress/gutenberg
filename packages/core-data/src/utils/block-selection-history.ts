@@ -4,82 +4,44 @@
 /**
  * WordPress dependencies
  */
-import { CRDT_RECORD_MAP_KEY, Y } from '@wordpress/sync';
+import { Y } from '@wordpress/sync';
 
 /**
  * Internal dependencies
  */
-import { getRootMap } from './crdt-utils';
-import type { YPostRecord } from './crdt';
-import type { WPSelection } from '../types';
-import type { YBlock, YBlocks } from './crdt-blocks';
+import { findBlockByClientIdInDoc } from './crdt';
+import type { WPBlockSelection, WPSelection } from '../types';
 
-export enum PositionType {
+export const SELECTION_HISTORY_DEFAULT_SIZE = 5;
+
+export enum YSelectionType {
 	RelativeSelection = 'RelativeSelection',
 	BlockSelection = 'BlockSelection',
 }
 
-export interface RelativePosition {
-	type: PositionType.RelativeSelection;
+export interface YRelativeSelection {
+	type: YSelectionType.RelativeSelection;
 	attributeKey: string;
 	relativePosition: Y.RelativePosition;
 	clientId: string;
 	offset: number;
 }
 
-export interface BlockPosition {
-	type: PositionType.BlockSelection;
+export interface YBlockSelection {
+	type: YSelectionType.BlockSelection;
 	clientId: string;
 }
 
-export type Position = RelativePosition | BlockPosition;
+export type YSelection = YRelativeSelection | YBlockSelection;
 
-// Convenience types to manage block values with a clientId, attributes, and innerBlocks.
-type BlockClientId = string;
-type BlockAttributes = Y.Map< Y.Text >;
-type BlockInnerBlocks = Y.Array< SelectableBlock >;
-export type SelectableBlock = Y.Map<
-	BlockClientId | BlockAttributes | BlockInnerBlocks
->;
+export type YFullSelection = {
+	start: YSelection;
+	end: YSelection;
+};
 
-function findBlockByClientIdInDoc(
-	blockId: string,
-	ydoc: Y.Doc
-): YBlock | null {
-	const ymap = getRootMap< YPostRecord >( ydoc, CRDT_RECORD_MAP_KEY );
-	const blocks = ymap.get( 'blocks' );
-
-	if ( ! ( blocks instanceof Y.Array ) ) {
-		return null;
-	}
-
-	return findBlockByClientIdInBlocks( blockId, blocks );
-}
-
-function findBlockByClientIdInBlocks(
-	blockId: string,
-	blocks: YBlocks
-): YBlock | null {
-	for ( const block of blocks ) {
-		if ( block.get( 'clientId' ) === blockId ) {
-			return block;
-		}
-
-		const innerBlocks = block.get( 'innerBlocks' );
-
-		if ( innerBlocks && innerBlocks.length > 0 ) {
-			const innerBlock = findBlockByClientIdInBlocks(
-				blockId,
-				innerBlocks
-			);
-
-			if ( innerBlock ) {
-				return innerBlock;
-			}
-		}
-	}
-
-	return null;
+export interface YSelectionHistory {
+	selection: YFullSelection;
+	backupSelections?: YFullSelection[];
 }
 
 /**
@@ -96,11 +58,14 @@ function findBlockByClientIdInBlocks(
  */
 export class BlockSelectionHistory {
 	private historySize: number;
-	private history: Position[] = [];
-	private currentSelection: Position | null = null;
+	private history: YFullSelection[] = [];
+	private currentSelection: YFullSelection | null = null;
 	private ydoc: Y.Doc;
 
-	constructor( ydoc: Y.Doc, historySize: number = 10 ) {
+	constructor(
+		ydoc: Y.Doc,
+		historySize: number = SELECTION_HISTORY_DEFAULT_SIZE
+	) {
 		this.ydoc = ydoc;
 		this.historySize = historySize;
 		this.history = [];
@@ -111,17 +76,17 @@ export class BlockSelectionHistory {
 	 * @param selection
 	 * @return Position or null if conversion fails
 	 */
-	private convertSelectionToPosition(
-		selection: WPSelection
-	): Position | null {
-		const clientId = selection.selectionStart.clientId;
+	private convertSelectionToPositionPart(
+		selection: WPBlockSelection
+	): YSelection {
+		const clientId = selection.clientId;
 		const block = findBlockByClientIdInDoc( clientId, this.ydoc );
 
 		const attributes = block?.get( 'attributes' ) as
 			| Y.Map< Y.Text >
 			| undefined;
 
-		const attributeKey = selection.selectionStart.attributeKey;
+		const attributeKey = selection.attributeKey;
 
 		const changedYText = attributeKey
 			? attributes?.get( attributeKey )
@@ -135,19 +100,19 @@ export class BlockSelectionHistory {
 			// been passed a selection that's just a block clientId.
 			// Store as BlockSelection.
 			return {
-				type: PositionType.BlockSelection,
+				type: YSelectionType.BlockSelection,
 				clientId,
 			};
 		}
 
-		const offset = selection.selectionStart?.offset ?? 0;
+		const offset = selection.offset ?? 0;
 		const relativePosition = Y.createRelativePositionFromTypeIndex(
 			changedYText,
 			offset
 		);
 
 		return {
-			type: PositionType.RelativeSelection,
+			type: YSelectionType.RelativeSelection,
 			attributeKey,
 			relativePosition,
 			clientId,
@@ -157,41 +122,53 @@ export class BlockSelectionHistory {
 
 	/**
 	 * Update the selection history with a new selection.
-	 * If selection is in a new block, move currentSelection to history.
 	 * @param newSelection
 	 */
 	public updateSelection( newSelection: WPSelection ): void {
-		if ( ! newSelection || ! newSelection.selectionStart?.clientId ) {
+		if (
+			! newSelection ||
+			! newSelection.selectionStart?.clientId ||
+			! newSelection.selectionEnd?.clientId
+		) {
 			return;
 		}
 
-		const position = this.convertSelectionToPosition( newSelection );
-		if ( ! position ) {
-			return;
+		const { selectionStart, selectionEnd } = newSelection;
+		const start = this.convertSelectionToPositionPart( selectionStart );
+		const end = this.convertSelectionToPositionPart( selectionEnd );
+
+		const ySelection: YFullSelection = {
+			start,
+			end,
+		};
+
+		// Check if the new selection has the same start and end block combination as current
+		const isSameBlockCombination =
+			this.currentSelection &&
+			start.clientId === this.currentSelection.start.clientId &&
+			end.clientId === this.currentSelection.end.clientId;
+
+		if ( this.currentSelection && ! isSameBlockCombination ) {
+			// Only add to history if we're moving to a different block combination
+			this.addToHistory( this.currentSelection );
 		}
 
-		const newClientId = newSelection.selectionStart.clientId;
-		const isNewBlock = this.currentSelection?.clientId !== newClientId;
+		this.currentSelection = ySelection;
 
-		if ( isNewBlock ) {
-			// Remove the new block from history if it already exists (we're revisiting it)
-			this.history = this.history.filter(
-				( p ) => p.clientId !== newClientId
-			);
+		console.log( '--- Updated selection history:' );
+		const currentSelection = this.getCurrentSelection();
+		const selectionHistory = this.getSelectionHistory(
+			SELECTION_HISTORY_DEFAULT_SIZE
+		);
 
-			// Moving to a new block: push current selection to history
-			if ( this.currentSelection ) {
-				this.addToHistory( this.currentSelection );
-			}
-		}
-
-		this.currentSelection = position;
+		console.log( 'Current selection:', currentSelection );
+		console.log( 'Selection history:', selectionHistory );
 	}
 
 	/**
 	 * Get the current position (most recent selection in the current block).
 	 */
-	public getCurrentPosition(): Position | null {
+	public getCurrentSelection(): YFullSelection | null {
 		return this.currentSelection;
 	}
 
@@ -199,23 +176,31 @@ export class BlockSelectionHistory {
 	 * Get the block history (previous blocks only, not current or last selection).
 	 * @param count Number of positions to retrieve
 	 */
-	public getBlockHistory( count: number ): Position[] {
+	public getSelectionHistory( count: number ): YFullSelection[] {
 		return this.history.slice( 0, count );
 	}
 
 	/**
-	 * Add a position to the history, maintaining only the last N unique blocks.
-	 * New positions are added to the front, and if a block already exists, it's removed first.
-	 * @param position
+	 * Add a position to the history, maintaining only the last `historySize` unique selections.
+	 * New positions are added to the front.
+	 * Removes any existing entries with the same start and end block combination.
+	 * @param yFullSelection
 	 */
-	private addToHistory( position: Position ): void {
-		const clientId = position.clientId;
+	private addToHistory( yFullSelection: YFullSelection ): void {
+		// Remove any existing entries with the same start and end block combination
+		const startClientId = yFullSelection.start.clientId;
+		const endClientId = yFullSelection.end.clientId;
 
-		// Remove any existing entry for this block
-		this.history = this.history.filter( ( p ) => p.clientId !== clientId );
+		this.history = this.history.filter( ( entry ) => {
+			const isSameBlockCombination =
+				entry.start.clientId === startClientId &&
+				entry.end.clientId === endClientId;
+
+			return ! isSameBlockCombination;
+		} );
 
 		// Add the new position to the front
-		this.history.unshift( position );
+		this.history.unshift( yFullSelection );
 
 		// Trim to max size (remove oldest entries from the back)
 		if ( this.history.length > this.historySize ) {

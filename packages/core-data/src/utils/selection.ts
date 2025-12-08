@@ -3,6 +3,32 @@
  */
 import type { WPBlockSelection, WPSelection } from '../types';
 
+// Set the current selection. This is used by the
+// sync manager to restore selection position when
+// triggering an undo.
+// Support block-level selection with just a clientId,
+// and offset-based selection with additional parameters.
+export function restoreSelection(
+	selectionStart: WPBlockSelection,
+	selectionEnd: WPBlockSelection
+): void {
+	console.log( 'In resetSelection with position:', selectionStart );
+	// if (
+	// 	areBlockSelectionsEqual( selectionStart, selectionEnd ) &&
+	// 	! selectionStart.attributeKey
+	// ) {
+	// 	// Because selection doesn't have an attributeKey, it's a whole-block selection.
+	// 	dispatch( blockEditorStore ).selectBlock( selectionStart.clientId );
+	// } else {
+	// 	// This selection has an attributeKey, so it's an offset-based selection.
+	// 	dispatch( blockEditorStore ).resetSelection(
+	// 		selectionStart,
+	// 		selectionEnd,
+	// 		null /* initialPosition */
+	// 	);
+	// }
+}
+
 /**
  * Compare two selection objects by their attributes.
  *

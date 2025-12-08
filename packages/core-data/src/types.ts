@@ -11,8 +11,8 @@ export interface AnyFunction {
 // Avoid a circular dependency with @wordpress/editor
 export interface WPBlockSelection {
 	clientId: string;
-	attributeKey: string;
-	offset: number;
+	attributeKey?: string;
+	offset?: number;
 }
 
 export interface WPSelection {

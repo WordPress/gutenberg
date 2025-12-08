@@ -66,66 +66,6 @@ export function createUndoManager(): SyncUndoManager {
 	// 	event.stackItem.meta.set( 'position', positionMeta );
 	// }
 
-	// function restorePosition( event: StackItemEvent ): void {
-	// 	const positionMeta: PositionMeta | undefined =
-	// 		event.stackItem.meta.get( 'position' );
-
-	// 	if ( ! positionMeta ) {
-	// 		// No position meta stored with this item, do nothing.
-	// 		return;
-	// 	}
-
-	// 	const { position } = positionMeta;
-
-	// 	// Build a stack of positions to try, starting with the primary position
-	// 	const positionsToTry: Position[] = [ position ];
-	// 	if ( positionMeta.backupPositions ) {
-	// 		positionsToTry.push( ...positionMeta.backupPositions );
-	// 	}
-
-	// 	// Try each position until we find one that exists in the document
-	// 	for ( const positionToTry of positionsToTry ) {
-	// 		const block = findBlockByClientIdInDoc(
-	// 			positionToTry.clientId,
-	// 			event.ydoc
-	// 		);
-
-	// 		if ( ! block ) {
-	// 			// This block no longer exists, skip it.
-	// 			continue;
-	// 		}
-
-	// 		if ( positionToTry.type === PositionType.RelativeSelection ) {
-	// 			const { relativePosition, attributeKey, clientId } =
-	// 				positionToTry;
-
-	// 			const absolutePosition =
-	// 				Y.createAbsolutePositionFromRelativePosition(
-	// 					relativePosition,
-	// 					event.ydoc
-	// 				);
-
-	// 			if ( absolutePosition ) {
-	// 				const selectionStart = {
-	// 					clientId,
-	// 					attributeKey,
-	// 					offset: absolutePosition.index,
-	// 				};
-
-	// 				// resetSelection( selectionStart, selectionStart );
-	// 				break;
-	// 			}
-	// 		} else if ( positionToTry.type === PositionType.BlockSelection ) {
-	// 			const selectionStart = {
-	// 				clientId: positionToTry.clientId,
-	// 			};
-
-	// 			// resetSelection( selectionStart, selectionStart );
-	// 			break;
-	// 		}
-	// 	}
-	// }
-
 	// yUndoManager.on( 'stack-item-added', ( event: StackItemEvent ) => {
 	// 	updatePositionMeta( event );
 	// } );
@@ -157,62 +97,36 @@ export function createUndoManager(): SyncUndoManager {
 		/**
 		 * Add a Yjs map to the scope of the undo manager.
 		 *
-		 * @param {Y.Map< any >} ymap                      The Yjs map to add to the scope.
+		 * @param {Y.Map< any >} ymap                     The Yjs map to add to the scope.
 		 * @param                handlers
-		 * @param                handlers.editEntityRecord
+		 * @param                handlers.addUndoMeta
+		 * @param                handlers.restoreUndoMeta
 		 */
 		addToScope(
 			ymap: Y.Map< any >,
 			handlers: {
-				editEntityRecord: RecordHandlers[ 'editEntityRecord' ];
+				addUndoMeta?: RecordHandlers[ 'addUndoMeta' ];
+				restoreUndoMeta?: RecordHandlers[ 'restoreUndoMeta' ];
 			}
 		): void {
 			yUndoManager.addToScope( ymap );
 
-			if ( ! ymap.doc ) {
+			const ydoc = ymap.doc;
+
+			if ( ydoc === null ) {
 				// Necessary for a type check, but this shouldn't happen.
 				return;
 			}
-			const { editEntityRecord } = handlers;
+
+			const { addUndoMeta, restoreUndoMeta } = handlers;
 
 			yUndoManager.on( 'stack-item-added', ( event: StackItemEvent ) => {
-				console.log( 'Sending stack-item-added editRecord update' );
-				editEntityRecord( {
-					'undo-manager-event': {
-						eventType: 'stack-item-added',
-						meta: event.stackItem.meta,
-					},
-				} );
+				addUndoMeta?.( ydoc, event.stackItem.meta );
 			} );
 
 			yUndoManager.on( 'stack-item-popped', ( event: StackItemEvent ) => {
-				console.log( 'Sending stack-item-popped editRecord update' );
-				editEntityRecord( {
-					'undo-manager-event': {
-						eventType: 'stack-item-popped',
-						meta: event.stackItem.meta,
-					},
-				} );
+				restoreUndoMeta?.( ydoc, event.stackItem.meta );
 			} );
-
-			// const existingSelectionHistory = selectionHistoryMap.get(
-			// 	ymap.doc.guid
-			// );
-
-			// if ( ! existingSelectionHistory ) {
-			// 	// Setup a selection history once per document.
-			// 	const selectionHistory = new BlockSelectionHistory( ymap.doc );
-			// 	selectionHistoryMap.set( ymap.doc.guid, selectionHistory );
-
-			// 	handlers.subscribeToSelectionChange( ( newSelection ) => {
-			// 		// Selection updates occur before the underlying Y.Text data is updated,
-			// 		// so wait until the current event loop has completed so that a valid
-			// 		// relative position can be calculated.
-			// 		setTimeout( () => {
-			// 			selectionHistory.updateSelection( newSelection );
-			// 		}, 0 );
-			// 	} );
-			// }
 		},
 
 		/**
