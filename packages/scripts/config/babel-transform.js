@@ -3,7 +3,7 @@
  */
 const babelJest = require( 'babel-jest' );
 
-// Remove this workaround when https://github.com/facebook/jest/issues/11444 gets resolved in Jest.
+// TODO: this was resolved so remove this workaround https://github.com/facebook/jest/issues/11444
 const babelJestInterop = babelJest.__esModule ? babelJest.default : babelJest;
 
 module.exports = babelJestInterop.createTransformer( {

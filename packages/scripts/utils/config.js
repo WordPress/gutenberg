@@ -55,7 +55,7 @@ const hasCssnanoConfig = () =>
  *
  * @param {"e2e"|"unit"} suffix Suffix of configuration file to accept.
  *
- * @return {string= | undefined} Override or fallback configuration file path.
+ * @return {string | undefined} Override or fallback configuration file path.
  */
 function getJestOverrideConfigFile( suffix ) {
 	if ( hasArgInCLI( '-c' ) || hasArgInCLI( '--config' ) ) {
