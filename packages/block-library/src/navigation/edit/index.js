@@ -130,6 +130,10 @@ function ColorTools( {
 	setOverlayTextColor,
 	overlayBackgroundColor,
 	setOverlayBackgroundColor,
+	submenuTextColor,
+	setSubmenuTextColor,
+	submenuBackgroundColor,
+	setSubmenuBackgroundColor,
 	clientId,
 	navRef,
 } ) {
@@ -203,7 +207,7 @@ function ColorTools( {
 					},
 					{
 						colorValue: overlayTextColor.color,
-						label: __( 'Submenu & overlay text' ),
+						label: __( 'Overlay text' ),
 						onColorChange: setOverlayTextColor,
 						resetAllFilter: () => setOverlayTextColor(),
 						clearable: true,
@@ -211,9 +215,25 @@ function ColorTools( {
 					},
 					{
 						colorValue: overlayBackgroundColor.color,
-						label: __( 'Submenu & overlay background' ),
+						label: __( 'Overlay background' ),
 						onColorChange: setOverlayBackgroundColor,
 						resetAllFilter: () => setOverlayBackgroundColor(),
+						clearable: true,
+						enableAlpha: true,
+					},
+					{
+						colorValue: submenuTextColor.color,
+						label: __( 'Submenu text' ),
+						onColorChange: setSubmenuTextColor,
+						resetAllFilter: () => setSubmenuTextColor(),
+						clearable: true,
+						enableAlpha: true,
+					},
+					{
+						colorValue: submenuBackgroundColor.color,
+						label: __( 'Submenu background' ),
+						onColorChange: setSubmenuBackgroundColor,
+						resetAllFilter: () => setSubmenuBackgroundColor(),
 						clearable: true,
 						enableAlpha: true,
 					},
@@ -253,6 +273,10 @@ function Navigation( {
 	setOverlayBackgroundColor,
 	overlayTextColor,
 	setOverlayTextColor,
+	submenuBackgroundColor,
+	setSubmenuBackgroundColor,
+	submenuTextColor,
+	setSubmenuTextColor,
 
 	// These props are used by the navigation editor to override specific
 	// navigation block settings.
@@ -830,6 +854,10 @@ function Navigation( {
 					setOverlayTextColor={ setOverlayTextColor }
 					overlayBackgroundColor={ overlayBackgroundColor }
 					setOverlayBackgroundColor={ setOverlayBackgroundColor }
+					submenuTextColor={ submenuTextColor }
+					setSubmenuTextColor={ setSubmenuTextColor }
+					submenuBackgroundColor={ submenuBackgroundColor }
+					setSubmenuBackgroundColor={ setSubmenuBackgroundColor }
 					clientId={ clientId }
 					navRef={ navRef }
 				/>
@@ -1066,5 +1094,7 @@ export default withColors(
 	{ textColor: 'color' },
 	{ backgroundColor: 'color' },
 	{ overlayBackgroundColor: 'color' },
-	{ overlayTextColor: 'color' }
+	{ overlayTextColor: 'color' },
+	{ submenuBackgroundColor: 'color' },
+	{ submenuTextColor: 'color' }
 )( Navigation );

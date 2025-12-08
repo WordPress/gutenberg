@@ -222,16 +222,25 @@ function render_block_core_navigation_submenu( $attributes, $content, $block ) {
 	if ( $has_submenu ) {
 		// Copy some attributes from the parent block to this one.
 		// Ideally this would happen in the client when the block is created.
-		if ( array_key_exists( 'overlayTextColor', $block->context ) ) {
+		// Check for submenu colors first (new blocks), fall back to overlay colors (legacy blocks).
+		if ( array_key_exists( 'submenuTextColor', $block->context ) ) {
+			$attributes['textColor'] = $block->context['submenuTextColor'];
+		} elseif ( array_key_exists( 'overlayTextColor', $block->context ) ) {
 			$attributes['textColor'] = $block->context['overlayTextColor'];
 		}
-		if ( array_key_exists( 'overlayBackgroundColor', $block->context ) ) {
+		if ( array_key_exists( 'submenuBackgroundColor', $block->context ) ) {
+			$attributes['backgroundColor'] = $block->context['submenuBackgroundColor'];
+		} elseif ( array_key_exists( 'overlayBackgroundColor', $block->context ) ) {
 			$attributes['backgroundColor'] = $block->context['overlayBackgroundColor'];
 		}
-		if ( array_key_exists( 'customOverlayTextColor', $block->context ) ) {
+		if ( array_key_exists( 'customSubmenuTextColor', $block->context ) ) {
+			$attributes['style']['color']['text'] = $block->context['customSubmenuTextColor'];
+		} elseif ( array_key_exists( 'customOverlayTextColor', $block->context ) ) {
 			$attributes['style']['color']['text'] = $block->context['customOverlayTextColor'];
 		}
-		if ( array_key_exists( 'customOverlayBackgroundColor', $block->context ) ) {
+		if ( array_key_exists( 'customSubmenuBackgroundColor', $block->context ) ) {
+			$attributes['style']['color']['background'] = $block->context['customSubmenuBackgroundColor'];
+		} elseif ( array_key_exists( 'customOverlayBackgroundColor', $block->context ) ) {
 			$attributes['style']['color']['background'] = $block->context['customOverlayBackgroundColor'];
 		}
 

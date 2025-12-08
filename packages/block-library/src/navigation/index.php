@@ -873,10 +873,12 @@ function block_core_navigation_add_directives_to_submenu( $tags, $block_attribut
  */
 function block_core_navigation_build_css_colors( $attributes ) {
 	$colors = array(
-		'css_classes'           => array(),
-		'inline_styles'         => '',
-		'overlay_css_classes'   => array(),
-		'overlay_inline_styles' => '',
+		'css_classes'             => array(),
+		'inline_styles'           => '',
+		'overlay_css_classes'     => array(),
+		'overlay_inline_styles'   => '',
+		'submenu_css_classes'     => array(),
+		'submenu_inline_styles'   => '',
 	);
 
 	// Text color.
@@ -949,6 +951,66 @@ function block_core_navigation_build_css_colors( $attributes ) {
 	} elseif ( $has_custom_overlay_background_color ) {
 		// Add the custom overlay background-color inline style.
 		$colors['overlay_inline_styles'] .= sprintf( 'background-color: %s;', $attributes['customOverlayBackgroundColor'] );
+	}
+
+	// Detect legacy blocks: check if submenu color attributes are absent.
+	$is_legacy_block = ! array_key_exists( 'submenuTextColor', $attributes ) &&
+		! array_key_exists( 'customSubmenuTextColor', $attributes ) &&
+		! array_key_exists( 'submenuBackgroundColor', $attributes ) &&
+		! array_key_exists( 'customSubmenuBackgroundColor', $attributes );
+
+	// Submenu text color.
+	if ( $is_legacy_block ) {
+		// For legacy blocks, use overlay colors for submenus.
+		if ( $has_custom_overlay_text_color || $has_named_overlay_text_color ) {
+			$colors['submenu_css_classes'][] = 'has-text-color';
+		}
+		if ( $has_named_overlay_text_color ) {
+			$colors['submenu_css_classes'][] = sprintf( 'has-%s-color', $attributes['overlayTextColor'] );
+		} elseif ( $has_custom_overlay_text_color ) {
+			$colors['submenu_inline_styles'] .= sprintf( 'color: %s;', $attributes['customOverlayTextColor'] );
+		}
+	} else {
+		// For new blocks, use submenu colors.
+		$has_named_submenu_text_color  = array_key_exists( 'submenuTextColor', $attributes );
+		$has_custom_submenu_text_color = array_key_exists( 'customSubmenuTextColor', $attributes );
+
+		if ( $has_custom_submenu_text_color || $has_named_submenu_text_color ) {
+			$colors['submenu_css_classes'][] = 'has-text-color';
+		}
+
+		if ( $has_named_submenu_text_color ) {
+			$colors['submenu_css_classes'][] = sprintf( 'has-%s-color', $attributes['submenuTextColor'] );
+		} elseif ( $has_custom_submenu_text_color ) {
+			$colors['submenu_inline_styles'] .= sprintf( 'color: %s;', $attributes['customSubmenuTextColor'] );
+		}
+	}
+
+	// Submenu background color.
+	if ( $is_legacy_block ) {
+		// For legacy blocks, use overlay colors for submenus.
+		if ( $has_custom_overlay_background_color || $has_named_overlay_background_color ) {
+			$colors['submenu_css_classes'][] = 'has-background';
+		}
+		if ( $has_named_overlay_background_color ) {
+			$colors['submenu_css_classes'][] = sprintf( 'has-%s-background-color', $attributes['overlayBackgroundColor'] );
+		} elseif ( $has_custom_overlay_background_color ) {
+			$colors['submenu_inline_styles'] .= sprintf( 'background-color: %s;', $attributes['customOverlayBackgroundColor'] );
+		}
+	} else {
+		// For new blocks, use submenu colors.
+		$has_named_submenu_background_color  = array_key_exists( 'submenuBackgroundColor', $attributes );
+		$has_custom_submenu_background_color = array_key_exists( 'customSubmenuBackgroundColor', $attributes );
+
+		if ( $has_custom_submenu_background_color || $has_named_submenu_background_color ) {
+			$colors['submenu_css_classes'][] = 'has-background';
+		}
+
+		if ( $has_named_submenu_background_color ) {
+			$colors['submenu_css_classes'][] = sprintf( 'has-%s-background-color', $attributes['submenuBackgroundColor'] );
+		} elseif ( $has_custom_submenu_background_color ) {
+			$colors['submenu_inline_styles'] .= sprintf( 'background-color: %s;', $attributes['customSubmenuBackgroundColor'] );
+		}
 	}
 
 	return $colors;

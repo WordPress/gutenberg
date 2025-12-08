@@ -46,6 +46,25 @@ const migrateWithLayout = ( attributes ) => {
 	return updatedAttributes;
 };
 
+const migrateOverlayToSubmenuColors = ( attributes ) => {
+	return {
+		...attributes,
+		...( attributes.overlayTextColor && {
+			submenuTextColor: attributes.overlayTextColor,
+		} ),
+		...( attributes.customOverlayTextColor && {
+			customSubmenuTextColor: attributes.customOverlayTextColor,
+		} ),
+		...( attributes.overlayBackgroundColor && {
+			submenuBackgroundColor: attributes.overlayBackgroundColor,
+		} ),
+		...( attributes.customOverlayBackgroundColor && {
+			customSubmenuBackgroundColor:
+				attributes.customOverlayBackgroundColor,
+		} ),
+	};
+};
+
 const v6 = {
 	attributes: {
 		navigationMenuId: {
@@ -348,7 +367,129 @@ const migrateTypographyPresets = function ( attributes ) {
 	};
 };
 
+const v7 = {
+	attributes: {
+		ref: {
+			type: 'number',
+		},
+		textColor: {
+			type: 'string',
+		},
+		customTextColor: {
+			type: 'string',
+		},
+		rgbTextColor: {
+			type: 'string',
+		},
+		backgroundColor: {
+			type: 'string',
+		},
+		customBackgroundColor: {
+			type: 'string',
+		},
+		rgbBackgroundColor: {
+			type: 'string',
+		},
+		showSubmenuIcon: {
+			type: 'boolean',
+			default: true,
+		},
+		openSubmenusOnClick: {
+			type: 'boolean',
+			default: false,
+		},
+		overlayMenu: {
+			type: 'string',
+			default: 'mobile',
+		},
+		icon: {
+			type: 'string',
+			default: 'handle',
+		},
+		hasIcon: {
+			type: 'boolean',
+			default: true,
+		},
+		__unstableLocation: {
+			type: 'string',
+		},
+		overlayBackgroundColor: {
+			type: 'string',
+		},
+		customOverlayBackgroundColor: {
+			type: 'string',
+		},
+		overlayTextColor: {
+			type: 'string',
+		},
+		customOverlayTextColor: {
+			type: 'string',
+		},
+		maxNestingLevel: {
+			type: 'number',
+			default: 5,
+		},
+		templateLock: {
+			type: [ 'string', 'boolean' ],
+			enum: [ 'all', 'insert', 'contentOnly', false ],
+		},
+	},
+	supports: {
+		align: [ 'wide', 'full' ],
+		ariaLabel: true,
+		contentRole: true,
+		html: false,
+		inserter: true,
+		typography: {
+			fontSize: true,
+			lineHeight: true,
+			__experimentalFontStyle: true,
+			__experimentalFontWeight: true,
+			__experimentalTextTransform: true,
+			__experimentalFontFamily: true,
+			__experimentalLetterSpacing: true,
+			__experimentalTextDecoration: true,
+			__experimentalSkipSerialization: [ 'textDecoration' ],
+			__experimentalDefaultControls: {
+				fontSize: true,
+			},
+		},
+		spacing: {
+			blockGap: true,
+			units: [ 'px', 'em', 'rem', 'vh', 'vw' ],
+			__experimentalDefaultControls: {
+				blockGap: true,
+			},
+		},
+		layout: {
+			allowSwitching: false,
+			allowInheriting: false,
+			allowVerticalAlignment: false,
+			allowSizingOnChildren: true,
+			default: {
+				type: 'flex',
+			},
+		},
+		interactivity: true,
+		renaming: false,
+	},
+	save() {
+		return <InnerBlocks.Content />;
+	},
+	isEligible: ( attributes ) => {
+		// Check if submenu color attributes are absent (legacy block).
+		return (
+			! attributes.submenuTextColor &&
+			! attributes.customSubmenuTextColor &&
+			! attributes.submenuBackgroundColor &&
+			! attributes.customSubmenuBackgroundColor
+		);
+	},
+	migrate: migrateOverlayToSubmenuColors,
+};
+
 const deprecated = [
+	v7,
 	v6,
 	v5,
 	v4,

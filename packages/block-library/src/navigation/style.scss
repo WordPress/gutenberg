@@ -160,7 +160,6 @@ $navigation-icon-size: 24px;
 // These are separated out with reduced specificity to allow better inheritance from Global Styles.
 .wp-block-navigation .has-child {
 	.wp-block-navigation__submenu-container {
-		background-color: inherit;
 		color: inherit;
 		position: absolute;
 		z-index: 2;
@@ -425,9 +424,14 @@ button.wp-block-navigation-item__content {
 }
 
 // If we do have a background color selected, inherit it from the navigation block
+// But only if the submenu container doesn't have its own background color.
 .wp-block-navigation.has-background {
 	.wp-block-navigation__submenu-container {
-		background-color: inherit;
+		// Only inherit if submenu container doesn't have its own background.
+		// This allows submenu-specific colors to override the main navigation background.
+		&:not(.has-background):not([style*="background-color"]) {
+			background-color: inherit;
+		}
 	}
 }
 

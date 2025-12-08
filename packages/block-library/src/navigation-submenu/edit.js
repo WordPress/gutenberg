@@ -305,7 +305,7 @@ export default function NavigationSubmenuEdit( {
 		onKeyDown,
 	} );
 
-	// Always use overlay colors for submenus.
+	// Use submenu colors for submenus (with overlay fallback for legacy blocks).
 	const innerBlocksColors = getColors( context, true );
 
 	const allowedBlocks =
