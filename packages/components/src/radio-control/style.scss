@@ -12,8 +12,21 @@
 	font-size: $default-font-size;
 }
 
-.components-radio-control__group-wrapper.has-help {
-	margin-block-end: $grid-unit-15;
+.components-radio-control__label {
+	margin-bottom: $grid-unit-05;
+	font-size: $font-size-medium;
+	font-style: normal;
+	color: $gray-900;
+}
+
+.components-radio-control__help {
+	font-size: $helptext-font-size;
+	font-style: normal;
+	color: $gray-700;
+}
+
+.components-radio-control__group-wrapper {
+	margin-top: $grid-unit-20;
 }
 
 .components-radio-control__option {
@@ -51,7 +64,7 @@
 	}
 }
 
-.components-radio-control__label {
+.components-radio-control__option-label {
 	grid-column: 2;
 	grid-row: 1;
 

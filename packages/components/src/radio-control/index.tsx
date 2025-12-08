@@ -12,7 +12,6 @@ import { useInstanceId } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import BaseControl from '../base-control';
 import type { WordPressComponentProps } from '../context';
 import type { RadioControlProps } from './types';
 import { VStack } from '../v-stack';
@@ -93,16 +92,23 @@ export function RadioControl(
 			{ hideLabelFromVision ? (
 				<VisuallyHidden as="legend">{ label }</VisuallyHidden>
 			) : (
-				<BaseControl.VisualLabel as="legend">
+				<legend className="components-radio-control__label">
 					{ label }
-				</BaseControl.VisualLabel>
+				</legend>
+			) }
+
+			{ !! help && (
+				<div
+					id={ generateHelpId( id ) }
+					className="components-radio-control__help"
+				>
+					{ help }
+				</div>
 			) }
 
 			<VStack
 				spacing={ 3 }
-				className={ clsx( 'components-radio-control__group-wrapper', {
-					'has-help': !! help,
-				} ) }
+				className="components-radio-control__group-wrapper"
 			>
 				{ options.map( ( option, index ) => (
 					<div
@@ -131,7 +137,7 @@ export function RadioControl(
 							{ ...additionalProps }
 						/>
 						<label
-							className="components-radio-control__label"
+							className="components-radio-control__option-label"
 							htmlFor={ generateOptionId( id, index ) }
 						>
 							{ option.label }
@@ -148,15 +154,6 @@ export function RadioControl(
 					</div>
 				) ) }
 			</VStack>
-			{ !! help && (
-				<StyledHelp
-					__nextHasNoMarginBottom
-					id={ generateHelpId( id ) }
-					className="components-base-control__help"
-				>
-					{ help }
-				</StyledHelp>
-			) }
 		</fieldset>
 	);
 }
