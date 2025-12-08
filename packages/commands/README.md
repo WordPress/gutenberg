@@ -122,7 +122,8 @@ Attach a command loader to the command palette. Used for dynamic commands.
 _Usage_
 
 ```js
-import { registerPlugin } from '@wordpress/plugins';
+import { __ } from '@wordpress/i18n';
+import { addQueryArgs } from '@wordpress/url';
 import { useCommandLoader } from '@wordpress/commands';
 import { page } from '@wordpress/icons';
 import { useSelect } from '@wordpress/data';
@@ -161,16 +162,15 @@ function usePageSearchCommandLoader( { search } ) {
 				icon: page,
 				callback: ( { close } ) => {
 					const args = {
-						postType,
+						p: '/page',
 						postId: record.id,
-						...extraArgs,
 					};
 					document.location = addQueryArgs( 'site-editor.php', args );
 					close();
 				},
 			};
 		} );
-	}, [ records, history ] );
+	}, [ records ] );
 
 	return {
 		commands,

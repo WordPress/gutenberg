@@ -16,7 +16,8 @@ import { store as commandsStore } from '../store';
  *
  * @example
  * ```js
- * import { registerPlugin } from '@wordpress/plugins';
+ * import { __ } from '@wordpress/i18n';
+ * import { addQueryArgs } from '@wordpress/url';
  * import { useCommandLoader } from '@wordpress/commands';
  * import { page } from '@wordpress/icons';
  * import { useSelect } from '@wordpress/data';
@@ -55,16 +56,15 @@ import { store as commandsStore } from '../store';
  *                 icon: page,
  *                 callback: ( { close } ) => {
  *                     const args = {
- *                         postType,
- *                         postId: record.id,
- *                         ...extraArgs,
+ * 							p: '/page',
+ * 							postId: record.id,
  *                     };
  *                     document.location = addQueryArgs( 'site-editor.php', args );
  *                     close();
  *                 },
  *             };
  *         } );
- *     }, [ records, history ] );
+ *     }, [ records ] );
  *
  *     return {
  *         commands,
