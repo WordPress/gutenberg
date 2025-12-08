@@ -35,11 +35,10 @@ In summary, if you haven't been able to fully test your blocks in the iframe edi
 
 Ahead of this, to encourage developers to test in the iframe editor, WordPress 6.9 introduces the following developer warnings and schema changes:
 
--   **Browser console warnings**: When `SCRIPT_DEBUG` is enabled and blocks are registered with `apiVersion` 2 or lower, WordPress displays the following message in the browser console:
+-   **Browser console warnings**: When blocks are registered with `apiVersion` 2 or lower, WordPress displays the following message in the browser console:
   ```
-  The block "my-plugin/my-block" is registered with API version 2 or lower. This means that the post editor may work as a non-iframe editor.
-  Since all editors are planned to work as iframes in the future, set the `apiVersion` field to 3 and test the block inside the iframe editor.
-  See: https://developer.wordpress.org/block-editor/r
+  Block with API version 2 or lower is deprecated since version 6.9. See: https://developer.wordpress.org/block-editor/reference-guides/block-api/block-api-versions/block-migration-for-iframe-editor-compatibility/
+	Note: The block "my-plugin/my-block" is registered with API version 2. This means that the post editor may work as a non-iframe editor. Since all editors are planned to work as iframes in the future, set the `apiVersion` field to 3 and test the block inside the iframe editor.
   ```
 -   **block.json schema update**: The [block.json schema](https://github.com/WordPress/gutenberg/blob/trunk/schemas/json/block.json) has been updated to only allow `apiVersion: 3` for new or updated blocks. Older versions (`1` or `2`) will no longer pass schema validation.
 
