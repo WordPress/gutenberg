@@ -622,6 +622,54 @@
 		},
 		"description": "Large spacing for surfaces"
 	},
+	"Dimension/Semantic/gap-2xs": {
+		"value": {
+			".": "4px",
+			"compact": "4px",
+			"comfortable": "8px"
+		},
+		"description": "2x extra small gap"
+	},
+	"Dimension/Semantic/gap-xs": {
+		"value": {
+			".": "8px",
+			"compact": "4px",
+			"comfortable": "12px"
+		},
+		"description": "Extra small gap"
+	},
+	"Dimension/Semantic/gap-sm": {
+		"value": {
+			".": "12px",
+			"compact": "8px",
+			"comfortable": "16px"
+		},
+		"description": "Small gap"
+	},
+	"Dimension/Semantic/gap-md": {
+		"value": {
+			".": "16px",
+			"compact": "12px",
+			"comfortable": "20px"
+		},
+		"description": "Medium gap"
+	},
+	"Dimension/Semantic/gap-lg": {
+		"value": {
+			".": "24px",
+			"compact": "20px",
+			"comfortable": "32px"
+		},
+		"description": "Large gap"
+	},
+	"Dimension/Semantic/gap-xl": {
+		"value": {
+			".": "40px",
+			"compact": "32px",
+			"comfortable": "48px"
+		},
+		"description": "Extra large gap"
+	},
 	"Elevation/x-small": {
 		"value": {
 			".": "0 1px 1px 0 color(srgb 0 0 0 / 0.03), 0 1px 2px 0 color(srgb 0 0 0 / 0.02), 0 3px 3px 0 color(srgb 0 0 0 / 0.02), 0 4px 4px 0 color(srgb 0 0 0 / 0.01)"

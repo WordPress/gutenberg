@@ -103,6 +103,68 @@
 						}
 					}
 				}
+			},
+			"gap": {
+				"2xs": {
+					"$value": "{dimension.primitive.space.10}",
+					"$description": "2x extra small gap",
+					"$extensions": {
+						"mode": {
+							"compact": "{dimension.primitive.space.10}",
+							"comfortable": "{dimension.primitive.space.20}"
+						}
+					}
+				},
+				"xs": {
+					"$value": "{dimension.primitive.space.20}",
+					"$description": "Extra small gap",
+					"$extensions": {
+						"mode": {
+							"compact": "{dimension.primitive.space.10}",
+							"comfortable": "{dimension.primitive.space.30}"
+						}
+					}
+				},
+				"sm": {
+					"$value": "{dimension.primitive.space.30}",
+					"$description": "Small gap",
+					"$extensions": {
+						"mode": {
+							"compact": "{dimension.primitive.space.20}",
+							"comfortable": "{dimension.primitive.space.40}"
+						}
+					}
+				},
+				"md": {
+					"$value": "{dimension.primitive.space.40}",
+					"$description": "Medium gap",
+					"$extensions": {
+						"mode": {
+							"compact": "{dimension.primitive.space.30}",
+							"comfortable": "{dimension.primitive.space.50}"
+						}
+					}
+				},
+				"lg": {
+					"$value": "{dimension.primitive.space.60}",
+					"$description": "Large gap",
+					"$extensions": {
+						"mode": {
+							"compact": "{dimension.primitive.space.50}",
+							"comfortable": "{dimension.primitive.space.70}"
+						}
+					}
+				},
+				"xl": {
+					"$value": "{dimension.primitive.space.80}",
+					"$description": "Extra large gap",
+					"$extensions": {
+						"mode": {
+							"compact": "{dimension.primitive.space.70}",
+							"comfortable": "{dimension.primitive.space.90}"
+						}
+					}
+				}
 			}
 		}
 	}

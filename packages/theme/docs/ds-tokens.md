@@ -123,6 +123,12 @@ Do not edit directly.
 | `--wpds-dimension-padding-surface-sm`  | Small spacing for surfaces          |
 | `--wpds-dimension-padding-surface-md`  | Medium spacing for surfaces         |
 | `--wpds-dimension-padding-surface-lg`  | Large spacing for surfaces          |
+| `--wpds-dimension-gap-2xs`             | 2x extra small gap                  |
+| `--wpds-dimension-gap-xs`              | Extra small gap                     |
+| `--wpds-dimension-gap-sm`              | Small gap                           |
+| `--wpds-dimension-gap-md`              | Medium gap                          |
+| `--wpds-dimension-gap-lg`              | Large gap                           |
+| `--wpds-dimension-gap-xl`              | Extra large gap                     |
 
 ### Elevation
 

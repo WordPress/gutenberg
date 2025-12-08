@@ -334,11 +334,17 @@ export const registerCoreBlocks = (
 			const bootstrappedBlockType = unlock(
 				select( blocksStore )
 			).getBootstrappedBlockType( blockName );
-			const bootstrappedApiVersion = bootstrappedBlockType.apiVersion;
 
 			registerBlockType( blockName, {
-				title: blockName,
-				...( bootstrappedApiVersion < 3 && { apiVersion: 3 } ),
+				// Use all metadata from PHP registration,
+				// but fall back title to block name if not provided,
+				// ensure minimum apiVersion 3 for block wrapper support,
+				// and override with a ServerSideRender-based edit function.
+				...bootstrappedBlockType,
+				title: bootstrappedBlockType?.title || blockName,
+				...( ( bootstrappedBlockType?.apiVersion ?? 0 ) < 3 && {
+					apiVersion: 3,
+				} ),
 				edit: function Edit( { attributes } ) {
 					const blockProps = useBlockProps();
 					const { content, status, error } = useServerSideRender( {

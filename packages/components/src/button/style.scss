@@ -29,7 +29,7 @@
 	height: $button-size;
 	align-items: center;
 	box-sizing: border-box;
-	padding: 6px 12px;
+	padding: 4px 12px; // Allows 32px min-height.
 	border-radius: $radius-small;
 	color: $components-color-foreground;
 

@@ -414,3 +414,8 @@ add_action( 'enqueue_block_editor_assets', 'gutenberg_enqueue_latex_to_mathml_lo
 function gutenberg_enqueue_latex_to_mathml_loader() {
 	wp_enqueue_script_module( '@wordpress/latex-to-mathml/loader' );
 }
+
+add_action( 'admin_enqueue_scripts', 'gutenberg_enqueue_core_abilities' );
+function gutenberg_enqueue_core_abilities() {
+	wp_enqueue_script_module( '@wordpress/core-abilities' );
+}

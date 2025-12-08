@@ -2,54 +2,50 @@
  * WordPress dependencies
  */
 import { sprintf } from '@wordpress/i18n';
-import { resolveSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import type { Ability, AbilityCategory, AbilityCategoryArgs } from '../types';
 import {
-	RECEIVE_ABILITIES,
 	REGISTER_ABILITY,
 	UNREGISTER_ABILITY,
-	RECEIVE_CATEGORIES,
 	REGISTER_ABILITY_CATEGORY,
 	UNREGISTER_ABILITY_CATEGORY,
-	STORE_NAME,
+	ABILITY_NAME_PATTERN,
+	CATEGORY_SLUG_PATTERN,
 } from './constants';
 
-/**
- * Returns an action object used to receive abilities into the store.
- *
- * @param abilities Array of abilities to store.
- * @return Action object.
- */
-export function receiveAbilities( abilities: Ability[] ) {
-	return {
-		type: RECEIVE_ABILITIES,
-		abilities,
-	};
-}
+type AbilityAnnotations = NonNullable< Ability[ 'meta' ] >[ 'annotations' ];
 
 /**
- * Returns an action object used to receive categories into the store.
+ * Filters annotations to only include allowed keys with non-null values.
  *
- * @param categories Array of categories to store.
- * @return Action object.
+ * @param sourceAnnotations The source annotations object to filter.
+ * @param allowedKeys       Array of annotation keys to include.
+ * @return Filtered annotations object.
  */
-export function receiveCategories( categories: AbilityCategory[] ) {
-	return {
-		type: RECEIVE_CATEGORIES,
-		categories,
-	};
+function filterAnnotations< K extends keyof NonNullable< AbilityAnnotations > >(
+	sourceAnnotations: Record< string, boolean > | undefined,
+	allowedKeys: readonly K[]
+): NonNullable< AbilityAnnotations > {
+	const annotations: NonNullable< AbilityAnnotations > = {};
+
+	if ( sourceAnnotations ) {
+		for ( const key of allowedKeys ) {
+			if ( sourceAnnotations[ key ] !== undefined ) {
+				annotations[ key ] = sourceAnnotations[ key ];
+			}
+		}
+	}
+	return annotations;
 }
 
 /**
  * Registers an ability in the store.
  *
  * This action validates the ability before registration. If validation fails,
- * an error will be thrown. Categories will be automatically fetched from the
- * REST API if they haven't been loaded yet.
+ * an error will be thrown.
  *
  * @param  ability The ability to register.
  * @return Action object or function.
@@ -57,13 +53,13 @@ export function receiveCategories( categories: AbilityCategory[] ) {
  */
 export function registerAbility( ability: Ability ) {
 	// @ts-expect-error - registry types are not yet available
-	return async ( { select, dispatch } ) => {
+	return ( { select, dispatch } ) => {
 		if ( ! ability.name ) {
 			throw new Error( 'Ability name is required' );
 		}
 
 		// Validate name format matches server implementation
-		if ( ! /^[a-z0-9-]+\/[a-z0-9-]+$/.test( ability.name ) ) {
+		if ( ! ABILITY_NAME_PATTERN.test( ability.name ) ) {
 			throw new Error(
 				'Ability name must be a string containing a namespace prefix, i.e. "my-plugin/my-ability". It can only contain lowercase alphanumeric characters, dashes and the forward slash.'
 			);
@@ -88,19 +84,18 @@ export function registerAbility( ability: Ability ) {
 		}
 
 		// Validate category format
-		if ( ! /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test( ability.category ) ) {
+		if ( ! CATEGORY_SLUG_PATTERN.test( ability.category ) ) {
 			throw new Error(
 				sprintf(
-					'Ability "%1$s" has an invalid category. Category must be lowercase alphanumeric with dashes only Got: "%2$s"',
+					'Ability "%1$s" has an invalid category. Category must be lowercase alphanumeric with dashes only. Got: "%2$s"',
 					ability.name,
 					ability.category
 				)
 			);
 		}
 
-		// Ensure categories are loaded before validating
-		const categories =
-			await resolveSelect( STORE_NAME ).getAbilityCategories();
+		// Check that the category exists
+		const categories = select.getAbilityCategories();
 		const existingCategory = categories.find(
 			( cat: AbilityCategory ) => cat.slug === ability.category
 		);
@@ -132,10 +127,27 @@ export function registerAbility( ability: Ability ) {
 			);
 		}
 
+		const annotations = filterAnnotations( ability.meta?.annotations, [
+			'readonly',
+			'destructive',
+			'idempotent',
+			'serverRegistered',
+			'clientRegistered',
+		] );
+
+		if ( ! annotations.serverRegistered ) {
+			annotations.clientRegistered = true;
+		}
+
+		const meta = { annotations };
+
 		// All validation passed, dispatch the registration action
 		dispatch( {
 			type: REGISTER_ABILITY,
-			ability,
+			ability: {
+				...ability,
+				meta,
+			},
 		} );
 	};
 }
@@ -157,8 +169,7 @@ export function unregisterAbility( name: string ) {
  * Registers a client-side ability category in the store.
  *
  * This action validates the category before registration. If validation fails,
- * an error will be thrown. Categories will be automatically fetched from the
- * REST API if they haven't been loaded yet to check for duplicates.
+ * an error will be thrown.
  *
  * @param  slug The unique category slug identifier.
  * @param  args Category arguments (label, description, optional meta).
@@ -170,20 +181,19 @@ export function registerAbilityCategory(
 	args: AbilityCategoryArgs
 ) {
 	// @ts-expect-error - registry types are not yet available
-	return async ( { select, dispatch } ) => {
+	return ( { select, dispatch } ) => {
 		if ( ! slug ) {
 			throw new Error( 'Category slug is required' );
 		}
 
 		// Validate slug format matches server implementation
-		if ( ! /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test( slug ) ) {
+		if ( ! CATEGORY_SLUG_PATTERN.test( slug ) ) {
 			throw new Error(
 				'Category slug must contain only lowercase alphanumeric characters and dashes.'
 			);
 		}
 
-		// Ensure categories are loaded before checking for duplicates
-		await resolveSelect( STORE_NAME ).getAbilityCategories();
+		// Check for duplicates
 		const existingCategory = select.getAbilityCategory( slug );
 		if ( existingCategory ) {
 			throw new Error(
@@ -214,16 +224,21 @@ export function registerAbilityCategory(
 			);
 		}
 
+		const annotations = filterAnnotations( args.meta?.annotations, [
+			'serverRegistered',
+			'clientRegistered',
+		] );
+
+		if ( ! annotations.serverRegistered ) {
+			annotations.clientRegistered = true;
+		}
+
+		const meta = { annotations };
 		const category: AbilityCategory = {
 			slug,
 			label: args.label,
 			description: args.description,
-			meta: {
-				...( args.meta || {} ),
-				// Internal implementation note: Client-registered categories will have `meta._clientRegistered` set to `true` to differentiate them from server-fetched categories.
-				// This is used internally by the resolver to determine whether to fetch categories from the server.
-				_clientRegistered: true,
-			},
+			meta,
 		};
 
 		dispatch( {

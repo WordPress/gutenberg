@@ -268,7 +268,7 @@ Displays a list of page numbers for comments pagination. ([Source](https://githu
 -	**Name:** core/comments-pagination-numbers
 -	**Category:** theme
 -	**Parent:** core/comments-pagination
--	**Supports:** color (background, gradients, ~~text~~), interactivity (clientNavigation), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
+-	**Supports:** color (background, gradients, ~~text~~), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
 
 ## Comments Previous Page
 

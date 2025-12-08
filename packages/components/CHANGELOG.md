@@ -6,17 +6,27 @@
 
 -   Validated form controls (private API): Removed `onValidate` prop (use `onChange` to set `customValidity` messages, or add conditionals directly inside the `customValidity` prop instead) ([#73559](https://github.com/WordPress/gutenberg/pull/73559)).
 
+### Enhancements
+
+-   `Menu` and othr menu items: change default size to be 32px tall rather than 40px to improve menu density. ([#73429](https://github.com/WordPress/gutenberg/pull/73429)).
+-   Unify padding using for DataViews, Modals and other container components. ([#73334](https://github.com/WordPress/gutenberg/pull/73334))
+
 ### Bug Fixes
 
+-   `Modal`: Fix vertical scroll issue by reducing style specificity to allow overrides. ([#73739](https://github.com/WordPress/gutenberg/pull/73739))
 -   `Notice`: Fix notice component spacing issue when actions are present. ([#69430](https://github.com/WordPress/gutenberg/pull/69430))
+
+### Internal
+
+-   `AlignmentMatrixControl`: Migrate styles from Emotion to a CSS module ([#73714](https://github.com/WordPress/gutenberg/pull/73714) and [#73757](https://github.com/WordPress/gutenberg/pull/73757)).
 
 ## 30.9.0 (2025-11-26)
 
 ### Bug Fixes
 
--   `ExternalLink`: Fix arrow direction for RTL languages. The external link arrow now correctly points to the top-left (↖) instead of top-right (↗) in RTL layouts. ([#73400](https://github.com/WordPress/gutenberg/pull/73400))
--   Fixed an issue where the `Guide` component’s close button became invisible on hover when used on light backgrounds. The component's close button now relies on the default button hover effect, and the custom hover color is applied only within `welcome-guide` implementations to maintain consistency. ([#73220](https://github.com/WordPress/gutenberg/pull/73220))
--   `DateTimePicker`: Fixed timezone handling when selecting specific dates around changes in daylight savings time when browser and server timezone settings are not in sync, which would cause an incorrect date to be selected. ([#73444](https://github.com/WordPress/gutenberg/pull/73444))
+-   `ExternalLink`: Fix arrow direction for RTL languages. The external link arrow now correctly points to the top-left (↖) instead of top-right (↗) in RTL layouts. ([#73400](https://github.com/WordPress/gutenberg/pull/73400)).
+-   Fixed an issue where the `Guide` component’s close button became invisible on hover when used on light backgrounds. The component's close button now relies on the default button hover effect, and the custom hover color is applied only within `welcome-guide` implementations to maintain consistency. ([#73220](https://github.com/WordPress/gutenberg/pull/73220)).
+-   `DateTimePicker`: Fixed timezone handling when selecting specific dates around changes in daylight savings time when browser and server timezone settings are not in sync, which would cause an incorrect date to be selected. ([#73444](https://github.com/WordPress/gutenberg/pull/73444)).
 
 ## 30.8.0 (2025-11-12)
 

@@ -79,7 +79,9 @@
 	"sideEffects": [
 		"build-style/**",
 		"src/**/*.scss",
-		"{src,build,build-module}/*/init.js"
+		"src/*/init.js",
+		"build/*/init.js",
+		"build-module/*/init.js"
 	],
 	"dependencies": {
 		"@wordpress/a11y": "file:../a11y",
