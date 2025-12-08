@@ -53,6 +53,8 @@ const RANGE_CONTROL_CUSTOM_SETTINGS = {
 /**
  * HeightControl renders a linked unit control and range control for adjusting the height of a block.
  *
+ * @deprecated Use DimensionControl instead.
+ *
  * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/height-control/README.md
  *
  * @param {Object}                     props

@@ -298,7 +298,7 @@ module.exports = {
 						'Button',
 						'ComboboxControl',
 						'CustomSelectControl',
-						'DimensionControl',
+
 						'FontAppearanceControl',
 						'FontFamilyControl',
 						'FontSizePicker',
