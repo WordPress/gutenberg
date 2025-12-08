@@ -253,7 +253,7 @@ function ListItem< Item >( {
 								/>
 							}
 						/>
-						<Menu.Popover>
+						<Menu.Popover modal={ false }>
 							<ActionsMenuGroup
 								actions={ eligibleActions }
 								item={ item }
