@@ -6,3 +6,7 @@
 		white-space: pre-wrap;
 	}
 }
+.wp-block-post-terms__prefix,
+.wp-block-post-terms__suffix {
+	align-self: center !important;
+}

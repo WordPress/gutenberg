@@ -46,17 +46,30 @@ function render_block_core_post_terms( $attributes, $content, $block ) {
 		$suffix = '<span class="wp-block-post-terms__suffix">' . $attributes['suffix'] . '</span>' . $suffix;
 	}
 
-	$post_terms = get_the_term_list(
-		$block->context['postId'],
-		$attributes['term'],
-		wp_kses_post( $prefix ),
-		'<span class="wp-block-post-terms__separator">' . esc_html( $separator ) . '</span>',
-		wp_kses_post( $suffix )
-	);
+	$terms = get_the_terms( $block->context['postId'], $attributes['term'] );
 
-	if ( is_wp_error( $post_terms ) || empty( $post_terms ) ) {
+	if ( is_wp_error( $terms ) || empty( $terms ) ) {
 		return '';
 	}
+
+	$term_links = array();
+	foreach ( $terms as $index => $term ) {
+		$term_html  = '<span>';
+		$term_html .= sprintf(
+			'<a href="%s" rel="tag">%s</a>',
+			esc_url( get_term_link( $term ) ),
+			esc_html( $term->name )
+		);
+		// Add separator if not the last term
+		if ( $index < count( $terms ) - 1 ) {
+			$term_html .= '<span class="wp-block-post-terms__separator">' . esc_html( $separator ) . '</span>';
+		}
+
+		$term_html   .= '</span>';
+		$term_links[] = $term_html;
+	}
+
+	$post_terms = wp_kses_post( $prefix ) . implode( '', $term_links ) . wp_kses_post( $suffix );
 
 	return $post_terms;
 }

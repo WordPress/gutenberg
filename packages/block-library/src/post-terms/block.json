@@ -45,7 +45,8 @@
 		},
 		"spacing": {
 			"margin": true,
-			"padding": true
+			"padding": true,
+			"blockGap": [ "horizontal", "vertical" ]
 		},
 		"typography": {
 			"fontSize": true,
@@ -62,6 +63,14 @@
 		},
 		"interactivity": {
 			"clientNavigation": true
+		},
+		"layout": {
+			"allowSwitching": false,
+			"allowEditing": false,
+			"default": {
+				"type": "flex",
+				"verticalAlignment": "center"
+			}
 		},
 		"__experimentalBorder": {
 			"radius": true,
