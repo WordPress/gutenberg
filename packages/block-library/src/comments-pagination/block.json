@@ -4,7 +4,9 @@
 	"name": "core/comments-pagination",
 	"title": "Comments Pagination",
 	"category": "theme",
-	"parent": [ "core/comments" ],
+	"parent": [
+		"core/comments"
+	],
 	"allowedBlocks": [
 		"core/comments-pagination-previous",
 		"core/comments-pagination-numbers",
@@ -58,6 +60,20 @@
 			"__experimentalDefaultControls": {
 				"fontSize": true
 			}
+		},
+		"spacing": {
+			"margin": true,
+			"padding": true,
+			"__experimentalDefaultControls": {
+				"padding": false,
+				"margin": false
+			}
+		},
+		"__experimentalBorder": {
+			"radius": true,
+			"color": true,
+			"width": true,
+			"style": true
 		},
 		"interactivity": {
 			"clientNavigation": true
