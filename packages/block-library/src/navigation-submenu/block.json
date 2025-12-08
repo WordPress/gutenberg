@@ -61,6 +61,7 @@
 	"supports": {
 		"reusable": false,
 		"html": false,
+		"layout": true,
 		"typography": {
 			"fontSize": true,
 			"lineHeight": true,
