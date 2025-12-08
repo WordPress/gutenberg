@@ -58,6 +58,15 @@ export const wrapperHeight = ( size?: 'default' | '__unstable-large' ) => {
 export const borderControlDropdown = css`
 	background: #fff;
 
+	&.full-width {
+		flex: 1;
+		${ rtl( { marginRight: space( 3 ) } )() }
+
+		> button {
+			width: 100%;
+		}
+	}
+
 	&& > button {
 		aspect-ratio: 1;
 		padding: 0;

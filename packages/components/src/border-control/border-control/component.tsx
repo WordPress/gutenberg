@@ -64,6 +64,8 @@ const UnconnectedBorderControl = (
 		widthValue,
 		withSlider,
 		__experimentalIsRenderedInSidebar,
+		showWidthControl,
+		showColorControl,
 		...otherProps
 	} = useBorderControl( props );
 
@@ -74,43 +76,68 @@ const UnconnectedBorderControl = (
 				hideLabelFromVision={ hideLabelFromVision }
 			/>
 			<HStack spacing={ 4 } className={ innerWrapperClassName }>
-				<UnitControl
-					__next40pxDefaultSize={ __next40pxDefaultSize }
-					__shouldNotWarnDeprecated36pxSize
-					prefix={
-						<Spacer marginRight={ 1 } marginBottom={ 0 }>
-							<BorderControlDropdown
-								border={ border }
-								colors={ colors }
-								__unstablePopoverProps={
-									__unstablePopoverProps
-								}
-								disableCustomColors={ disableCustomColors }
-								enableAlpha={ enableAlpha }
-								enableStyle={ enableStyle }
-								isStyleSettable={ isStyleSettable }
-								onChange={ onBorderChange }
-								previousStyleSelection={
-									previousStyleSelection
-								}
-								__experimentalIsRenderedInSidebar={
-									__experimentalIsRenderedInSidebar
-								}
-								size={ size }
-							/>
-						</Spacer>
-					}
-					label={ __( 'Border width' ) }
-					hideLabelFromVision
-					min={ 0 }
-					onChange={ onWidthChange }
-					value={ border?.width || '' }
-					placeholder={ placeholder }
-					disableUnits={ disableUnits }
-					__unstableInputWidth={ inputWidth }
-					size={ size }
-				/>
-				{ withSlider && (
+				{ showColorControl && ! showWidthControl && (
+					<BorderControlDropdown
+						border={ border }
+						colors={ colors }
+						__unstablePopoverProps={ __unstablePopoverProps }
+						disableCustomColors={ disableCustomColors }
+						enableAlpha={ enableAlpha }
+						enableStyle={ enableStyle }
+						isStyleSettable={ isStyleSettable }
+						onChange={ onBorderChange }
+						previousStyleSelection={ previousStyleSelection }
+						__experimentalIsRenderedInSidebar={
+							__experimentalIsRenderedInSidebar
+						}
+						size={ size }
+						className={ withSlider ? 'full-width' : '' }
+					/>
+				) }
+				{ showWidthControl && (
+					<UnitControl
+						__next40pxDefaultSize={ __next40pxDefaultSize }
+						__shouldNotWarnDeprecated36pxSize
+						prefix={
+							showColorControl && (
+								<Spacer marginRight={ 1 } marginBottom={ 0 }>
+									<BorderControlDropdown
+										border={ border }
+										colors={ colors }
+										__unstablePopoverProps={
+											__unstablePopoverProps
+										}
+										disableCustomColors={
+											disableCustomColors
+										}
+										enableAlpha={ enableAlpha }
+										enableStyle={ enableStyle }
+										isStyleSettable={ isStyleSettable }
+										onChange={ onBorderChange }
+										previousStyleSelection={
+											previousStyleSelection
+										}
+										__experimentalIsRenderedInSidebar={
+											__experimentalIsRenderedInSidebar
+										}
+										size={ size }
+									/>
+								</Spacer>
+							)
+						}
+						label={ __( 'Border width' ) }
+						hideLabelFromVision
+						min={ 0 }
+						onChange={ onWidthChange }
+						value={ border?.width || '' }
+						placeholder={ placeholder }
+						disableUnits={ disableUnits }
+						className="some-input-control"
+						__unstableInputWidth={ inputWidth }
+						size={ size }
+					/>
+				) }
+				{ showWidthControl && withSlider && (
 					<RangeControl
 						__nextHasNoMarginBottom
 						label={ __( 'Border width' ) }

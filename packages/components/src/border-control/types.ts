@@ -123,6 +123,14 @@ export type BorderControlProps = ColorProps &
 		 * @ignore
 		 */
 		__shouldNotWarnDeprecated36pxSize?: boolean;
+		/**
+		 * Whether to show the width input (UnitControl and RangeControl)
+		 */
+		showWidthControl?: boolean;
+		/**
+		 * Whether to show the color picker dropdown
+		 */
+		showColorControl?: boolean;
 	};
 
 export type DropdownProps = ColorProps &

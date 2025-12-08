@@ -64,6 +64,8 @@ const UnconnectedBorderBoxControl = (
 		toggleLinked,
 		wrapperClassName,
 		__experimentalIsRenderedInSidebar,
+		showWidthControl,
+		showColorControl,
 		...otherProps
 	} = useBorderBoxControl( props );
 
@@ -99,6 +101,8 @@ const UnconnectedBorderBoxControl = (
 				{ isLinked ? (
 					<BorderControl
 						className={ linkedControlClassName }
+						showWidthControl={ showWidthControl }
+						showColorControl={ showColorControl }
 						colors={ colors }
 						disableUnits={ disableUnits }
 						disableCustomColors={ disableCustomColors }
@@ -123,6 +127,8 @@ const UnconnectedBorderBoxControl = (
 					/>
 				) : (
 					<BorderBoxControlSplitControls
+						showWidthControl={ showWidthControl }
+						showColorControl={ showColorControl }
 						colors={ colors }
 						disableCustomColors={ disableCustomColors }
 						enableAlpha={ enableAlpha }

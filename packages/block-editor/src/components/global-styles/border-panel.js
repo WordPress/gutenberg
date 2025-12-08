@@ -272,6 +272,8 @@ export default function BorderPanel( {
 						colors={ colors }
 						enableAlpha
 						enableStyle={ showBorderStyle }
+						showWidthControl={ showBorderWidth }
+						showColorControl={ showBorderColor }
 						onChange={ onBorderChange }
 						popoverOffset={ 40 }
 						popoverPlacement="left-start"

@@ -35,6 +35,8 @@ const BorderBoxControlSplitControls = (
 		size = 'default',
 		value,
 		__experimentalIsRenderedInSidebar,
+		showWidthControl,
+		showColorControl,
 		...otherProps
 	} = useBorderBoxControlSplitControls( props );
 
@@ -77,6 +79,8 @@ const BorderBoxControlSplitControls = (
 			<BorderBoxControlVisualizer value={ value } size={ size } />
 			<BorderControl
 				className={ centeredClassName }
+				showWidthControl={ showWidthControl }
+				showColorControl={ showColorControl }
 				hideLabelFromVision
 				label={ __( 'Top border' ) }
 				onChange={ ( newBorder ) => onChange( newBorder, 'top' ) }
@@ -85,6 +89,8 @@ const BorderBoxControlSplitControls = (
 				{ ...sharedBorderControlProps }
 			/>
 			<BorderControl
+				showWidthControl={ showWidthControl }
+				showColorControl={ showColorControl }
 				hideLabelFromVision
 				label={ __( 'Left border' ) }
 				onChange={ ( newBorder ) => onChange( newBorder, 'left' ) }
@@ -93,6 +99,8 @@ const BorderBoxControlSplitControls = (
 				{ ...sharedBorderControlProps }
 			/>
 			<BorderControl
+				showWidthControl={ showWidthControl }
+				showColorControl={ showColorControl }
 				className={ rightAlignedClassName }
 				hideLabelFromVision
 				label={ __( 'Right border' ) }
@@ -102,6 +110,8 @@ const BorderBoxControlSplitControls = (
 				{ ...sharedBorderControlProps }
 			/>
 			<BorderControl
+				showWidthControl={ showWidthControl }
+				showColorControl={ showColorControl }
 				className={ centeredClassName }
 				hideLabelFromVision
 				label={ __( 'Bottom border' ) }

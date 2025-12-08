@@ -66,6 +66,7 @@ export const borderBoxControlVisualizer = (
 		${ rtl( {
 			borderRight: borderBoxStyleWithFallback( borders?.right ),
 		} )() }
+		z-index: -1;
 	`;
 };
 

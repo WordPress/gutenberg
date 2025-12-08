@@ -51,6 +51,14 @@ export type BorderBoxControlProps = ColorProps &
 		 * @default false
 		 */
 		__next40pxDefaultSize?: boolean;
+		/**
+		 * Whether to show the width control.
+		 */
+		showWidthControl?: boolean;
+		/**
+		 * Whether to show the color control.
+		 */
+		showColorControl?: boolean;
 	};
 
 export type LinkedButtonProps = Pick< BorderBoxControlProps, 'size' > & {
@@ -98,4 +106,12 @@ export type SplitControlsProps = ColorProps &
 		 * color, style, and width.
 		 */
 		value?: Borders;
+		/**
+		 * Whether to show the width control.
+		 */
+		showWidthControl?: boolean;
+		/**
+		 * Whether to show the color control.
+		 */
+		showColorControl?: boolean;
 	};

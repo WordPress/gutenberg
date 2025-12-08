@@ -38,6 +38,8 @@ function createProps( customProps ) {
 		} ),
 		value: defaultBorder,
 		__next40pxDefaultSize: true,
+		showWidthControl: true,
+		showColorControl: true,
 		...customProps,
 	};
 	return props;
@@ -98,6 +100,38 @@ describe( 'BorderControl', () => {
 			expect( widthInput ).toBeInTheDocument();
 			expect( unitSelect ).toBeInTheDocument();
 			expect( slider ).not.toBeInTheDocument();
+		} );
+
+		it( 'should render only color control when showWidthControl is false', () => {
+			const props = createProps( { showWidthControl: false } );
+			render( <BorderControl { ...props } /> );
+
+			const colorButton = screen.getByLabelText( toggleLabelRegex );
+			const widthInput = screen.queryByRole( 'spinbutton', {
+				name: 'Border width',
+			} );
+			const unitSelect = screen.queryByRole( 'combobox', {
+				name: 'Select unit',
+			} );
+
+			expect( colorButton ).toBeInTheDocument();
+			expect( widthInput ).not.toBeInTheDocument();
+			expect( unitSelect ).not.toBeInTheDocument();
+		} );
+
+		it( 'should render only width control when showColorControl is false', () => {
+			const props = createProps( { showColorControl: false } );
+			render( <BorderControl { ...props } /> );
+
+			const colorButton = screen.queryByLabelText( toggleLabelRegex );
+			const widthInput = getWidthInput();
+			const unitSelect = screen.getByRole( 'combobox', {
+				name: 'Select unit',
+			} );
+
+			expect( colorButton ).not.toBeInTheDocument();
+			expect( widthInput ).toBeInTheDocument();
+			expect( unitSelect ).toBeInTheDocument();
 		} );
 
 		it( 'should hide label', () => {
