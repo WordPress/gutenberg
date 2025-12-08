@@ -44,10 +44,6 @@
 	color: #757575;
 }
 
-.global-styles-ui-screen {
-	margin: 12px 16px 16px;
-}
-
 .global-styles-ui-screen-typography__indicator {
 	height: 24px;
 	width: 24px;
@@ -79,13 +75,17 @@
 	row-gap: calc(4px * 3);
 }
 
-.global-styles-ui-header__description {
-	padding: 0 16px;
+.global-styles-ui-screen-header {
+	margin-bottom: variables.$grid-unit-15;
 }
 
 .global-styles-ui-header {
 	// Need to override the too specific bottom margin for complementary areas.
 	margin-bottom: 0 !important;
+}
+
+.global-styles-ui-header__description {
+	margin: variables.$grid-unit-15 0 !important;
 }
 
 .global-styles-ui-subtitle {
@@ -248,10 +248,12 @@
 	height: 100%;
 }
 
-.global-styles-ui-sidebar__navigator-screen {
+.global-styles-ui-sidebar__navigator-screen.components-navigator-screen {
 	display: flex;
 	flex-direction: column;
 	height: 100%;
+	padding: variables.$grid-unit-30;
+	outline: none;
 }
 
 .global-styles-ui-sidebar__navigator-screen .single-column {
