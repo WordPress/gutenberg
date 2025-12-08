@@ -147,10 +147,15 @@ export const usePostTypes = () => {
 /**
  * Hook that returns the taxonomies associated with a specific post type.
  *
- * @param {string} postType The post type from which to retrieve the associated taxonomies.
+ * @param {string}  postType                               The post type from which to retrieve the associated taxonomies.
+ * @param {Object?} options                                Configuration options for the hook.
+ * @param {boolean} [options.allowPubliclyQueryable=false] Whether to filter taxonomies by publicly_queryable.
  * @return {Object[]} An array of the associated taxonomies.
  */
-export const useTaxonomies = ( postType ) => {
+export const useTaxonomies = (
+	postType,
+	options = { allowPubliclyQueryable: false }
+) => {
 	const taxonomies = useSelect(
 		( select ) => {
 			const { getTaxonomies, getPostType } = select( coreStore );
@@ -165,11 +170,14 @@ export const useTaxonomies = ( postType ) => {
 		},
 		[ postType ]
 	);
+
 	return useMemo( () => {
-		return taxonomies?.filter(
-			( { visibility } ) => !! visibility?.publicly_queryable
+		return taxonomies?.filter( ( { visibility } ) =>
+			options.allowPubliclyQueryable
+				? true
+				: !! visibility?.publicly_queryable
 		);
-	}, [ taxonomies ] );
+	}, [ options.allowPubliclyQueryable, taxonomies ] );
 };
 
 /**

@@ -50,7 +50,9 @@ const getTermIdByTermValue = ( terms, termValue ) => {
 export function TaxonomyControls( { onChange, query } ) {
 	const { postType, taxQuery } = query;
 
-	const taxonomies = useTaxonomies( postType );
+	const taxonomies = useTaxonomies( postType, {
+		allowPubliclyQueryable: true,
+	} );
 	if ( ! taxonomies || taxonomies.length === 0 ) {
 		return null;
 	}
