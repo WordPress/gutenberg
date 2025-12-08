@@ -264,8 +264,8 @@ export function applyPostChangesToCRDTDoc(
 		const selection = changes.selection;
 
 		// Persist selection changes at the end of the current event loop.
-		// This allows undo meta to be saved with the prior selection before
-		// it is overwritten by the new selection from document changes.
+		// This allows undo meta to be saved with the actual current selection before
+		// it is overwritten by the new selection from CRDT document changes.
 		setTimeout( () => {
 			const selectionHistory = getBlockSelectionHistory( ydoc );
 			selectionHistory.updateSelection( selection );

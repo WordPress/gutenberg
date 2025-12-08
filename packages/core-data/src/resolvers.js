@@ -29,6 +29,7 @@ import {
 	getSelectionHistoryMeta,
 	findSelectionFromHistory,
 } from './utils/crdt';
+import { restoreSelection } from './utils/selection';
 
 /**
  * Requests authors from the REST API.
@@ -266,18 +267,42 @@ export const getEntityRecord =
 										const { selectionStart, selectionEnd } =
 											selection;
 
-										const changes = {
-											selection: {
-												selectionStart,
-												selectionEnd,
-												initialPosition: null,
-											},
-										};
 										console.log(
-											'Sending editRecord with changes:',
-											changes
+											'Sending restoreSelection with:',
+											{ selectionStart, selectionEnd }
 										);
-										editRecord( changes );
+
+										// If selectionStart and selectionEnd are in the same block,
+										// we can restore the selection immediately.
+										if (
+											selectionStart.clientId ===
+											selectionEnd.clientId
+										) {
+											editRecord( {
+												selection: {
+													selectionStart,
+													selectionEnd,
+													initialPosition: null,
+												},
+											} );
+										} else {
+											// In selection is across multiple blocks,
+											// one or more intermediate blocks may have changed.
+											// We need to wait until the undo restoration is complete
+											// after the current event loop is finished, and then
+											// restore the selection with a call to the block editor.
+
+											// We can't reuse editRecord() within the setTimeout
+											// because selection changes will not be reflected
+											// by calling editRecord() itself, it only applies visually
+											// when applied alongside block updates.
+											setTimeout( () => {
+												restoreSelection(
+													selectionStart,
+													selectionEnd
+												);
+											}, 0 );
+										}
 									}
 								}
 							},

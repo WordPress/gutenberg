@@ -1,32 +1,37 @@
 /**
+ * WordPress dependencies
+ */
+import { dispatch } from '@wordpress/data';
+import { store as blockEditorStore } from '@wordpress/block-editor';
+
+/**
  * Internal dependencies
  */
 import type { WPBlockSelection, WPSelection } from '../types';
 
-// Set the current selection. This is used by the
-// sync manager to restore selection position when
-// triggering an undo.
-// Support block-level selection with just a clientId,
-// and offset-based selection with additional parameters.
+// Set the current selection. This is used by the sync manager in async contexts
+// to restore selection position when triggering an undo.
 export function restoreSelection(
 	selectionStart: WPBlockSelection,
 	selectionEnd: WPBlockSelection
 ): void {
-	console.log( 'In resetSelection with position:', selectionStart );
-	// if (
-	// 	areBlockSelectionsEqual( selectionStart, selectionEnd ) &&
-	// 	! selectionStart.attributeKey
-	// ) {
-	// 	// Because selection doesn't have an attributeKey, it's a whole-block selection.
-	// 	dispatch( blockEditorStore ).selectBlock( selectionStart.clientId );
-	// } else {
-	// 	// This selection has an attributeKey, so it's an offset-based selection.
-	// 	dispatch( blockEditorStore ).resetSelection(
-	// 		selectionStart,
-	// 		selectionEnd,
-	// 		null /* initialPosition */
-	// 	);
-	// }
+	const { resetSelection } = dispatch( blockEditorStore );
+	if ( selectionStart.clientId === selectionEnd.clientId ) {
+		// Selection within the same block works as expected.
+		resetSelection(
+			selectionStart,
+			selectionEnd,
+			null // initialPosition
+		);
+	} else {
+		// resetSelection() does not work if the selection is across multiple blocks.
+		// In this case, just put the caret at the start of the selection.
+		resetSelection(
+			selectionStart,
+			selectionStart,
+			null // initialPosition
+		);
+	}
 }
 
 /**
