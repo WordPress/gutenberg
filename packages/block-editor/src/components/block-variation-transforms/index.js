@@ -12,6 +12,14 @@ import {
 } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
+import {
+	headingLevel1,
+	headingLevel2,
+	headingLevel3,
+	headingLevel4,
+	headingLevel5,
+	headingLevel6,
+} from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -229,17 +237,25 @@ function __experimentalBlockVariationTransforms( { blockClientId } ) {
 				( v ) => v.name !== 'stretchy-paragraph'
 			);
 		} else if ( blockName === 'core/heading' ) {
-			if (
-				activeBlockVariation?.name === 'stretchy-heading' ||
-				unfilteredVariations.every( ( v ) =>
-					[ 'heading', 'stretchy-heading' ].includes( v.name )
-				)
-			) {
+			// Hide variations picker when stretchy-heading is active.
+			if ( activeBlockVariation?.name === 'stretchy-heading' ) {
 				return [];
 			}
-			return unfilteredVariations.filter(
-				( v ) => v.name !== 'stretchy-heading'
-			);
+			// Filter out stretchy-heading, showing only h1-h6 with level-specific icons.
+			const HEADING_LEVEL_ICONS = {
+				h1: headingLevel1,
+				h2: headingLevel2,
+				h3: headingLevel3,
+				h4: headingLevel4,
+				h5: headingLevel5,
+				h6: headingLevel6,
+			};
+			return unfilteredVariations
+				.filter( ( v ) => v.name !== 'stretchy-heading' )
+				.map( ( v ) => ( {
+					...v,
+					icon: HEADING_LEVEL_ICONS[ v.name ] || v.icon,
+				} ) );
 		}
 		return unfilteredVariations;
 	}, [ activeBlockVariation?.name, blockName, unfilteredVariations ] );
