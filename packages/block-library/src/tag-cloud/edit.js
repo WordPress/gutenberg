@@ -13,6 +13,7 @@ import {
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 	Disabled,
+	TextControl,
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
@@ -53,6 +54,7 @@ function TagCloudEdit( { attributes, setAttributes } ) {
 		numberOfTags,
 		smallestFontSize,
 		largestFontSize,
+		ariaLabel,
 	} = attributes;
 
 	const [ availableUnits ] = useSettings( 'spacing.units' );
@@ -123,125 +125,143 @@ function TagCloudEdit( { attributes, setAttributes } ) {
 	};
 
 	const inspectorControls = (
-		<InspectorControls>
-			<ToolsPanel
-				label={ __( 'Settings' ) }
-				resetAll={ () => {
-					setAttributes( {
-						taxonomy: 'post_tag',
-						showTagCounts: false,
-						numberOfTags: 45,
-						smallestFontSize: '8pt',
-						largestFontSize: '22pt',
-					} );
-				} }
-				dropdownMenuProps={ dropdownMenuProps }
-			>
-				<ToolsPanelItem
-					hasValue={ () => taxonomy !== 'post_tag' }
-					label={ __( 'Taxonomy' ) }
-					onDeselect={ () =>
-						setAttributes( { taxonomy: 'post_tag' } )
-					}
-					isShownByDefault
-				>
-					<SelectControl
-						__nextHasNoMarginBottom
-						__next40pxDefaultSize
-						label={ __( 'Taxonomy' ) }
-						options={ getTaxonomyOptions() }
-						value={ taxonomy }
-						onChange={ ( selectedTaxonomy ) =>
-							setAttributes( { taxonomy: selectedTaxonomy } )
-						}
-					/>
-				</ToolsPanelItem>
-				<ToolsPanelItem
-					hasValue={ () =>
-						smallestFontSize !== '8pt' || largestFontSize !== '22pt'
-					}
-					label={ __( 'Font size' ) }
-					onDeselect={ () =>
+		<>
+			<InspectorControls>
+				<ToolsPanel
+					label={ __( 'Settings' ) }
+					resetAll={ () => {
 						setAttributes( {
+							taxonomy: 'post_tag',
+							showTagCounts: false,
+							numberOfTags: 45,
 							smallestFontSize: '8pt',
 							largestFontSize: '22pt',
-						} )
-					}
-					isShownByDefault
+						} );
+					} }
+					dropdownMenuProps={ dropdownMenuProps }
 				>
-					<Flex gap={ 4 }>
-						<FlexItem isBlock>
-							<UnitControl
-								label={ __( 'Smallest size' ) }
-								value={ smallestFontSize }
-								onChange={ ( value ) => {
-									onFontSizeChange(
-										'smallestFontSize',
-										value
-									);
-								} }
-								units={ units }
-								min={ MIN_FONT_SIZE }
-								max={ MAX_FONT_SIZE }
-								size="__unstable-large"
-							/>
-						</FlexItem>
-						<FlexItem isBlock>
-							<UnitControl
-								label={ __( 'Largest size' ) }
-								value={ largestFontSize }
-								onChange={ ( value ) => {
-									onFontSizeChange(
-										'largestFontSize',
-										value
-									);
-								} }
-								units={ units }
-								min={ MIN_FONT_SIZE }
-								max={ MAX_FONT_SIZE }
-								size="__unstable-large"
-							/>
-						</FlexItem>
-					</Flex>
-				</ToolsPanelItem>
-				<ToolsPanelItem
-					hasValue={ () => numberOfTags !== 45 }
-					label={ __( 'Number of tags' ) }
-					onDeselect={ () => setAttributes( { numberOfTags: 45 } ) }
-					isShownByDefault
-				>
-					<RangeControl
-						__nextHasNoMarginBottom
-						__next40pxDefaultSize
+					<ToolsPanelItem
+						hasValue={ () => taxonomy !== 'post_tag' }
+						label={ __( 'Taxonomy' ) }
+						onDeselect={ () =>
+							setAttributes( { taxonomy: 'post_tag' } )
+						}
+						isShownByDefault
+					>
+						<SelectControl
+							__nextHasNoMarginBottom
+							__next40pxDefaultSize
+							label={ __( 'Taxonomy' ) }
+							options={ getTaxonomyOptions() }
+							value={ taxonomy }
+							onChange={ ( selectedTaxonomy ) =>
+								setAttributes( { taxonomy: selectedTaxonomy } )
+							}
+						/>
+					</ToolsPanelItem>
+					<ToolsPanelItem
+						hasValue={ () =>
+							smallestFontSize !== '8pt' ||
+							largestFontSize !== '22pt'
+						}
+						label={ __( 'Font size' ) }
+						onDeselect={ () =>
+							setAttributes( {
+								smallestFontSize: '8pt',
+								largestFontSize: '22pt',
+							} )
+						}
+						isShownByDefault
+					>
+						<Flex gap={ 4 }>
+							<FlexItem isBlock>
+								<UnitControl
+									label={ __( 'Smallest size' ) }
+									value={ smallestFontSize }
+									onChange={ ( value ) => {
+										onFontSizeChange(
+											'smallestFontSize',
+											value
+										);
+									} }
+									units={ units }
+									min={ MIN_FONT_SIZE }
+									max={ MAX_FONT_SIZE }
+									size="__unstable-large"
+								/>
+							</FlexItem>
+							<FlexItem isBlock>
+								<UnitControl
+									label={ __( 'Largest size' ) }
+									value={ largestFontSize }
+									onChange={ ( value ) => {
+										onFontSizeChange(
+											'largestFontSize',
+											value
+										);
+									} }
+									units={ units }
+									min={ MIN_FONT_SIZE }
+									max={ MAX_FONT_SIZE }
+									size="__unstable-large"
+								/>
+							</FlexItem>
+						</Flex>
+					</ToolsPanelItem>
+					<ToolsPanelItem
+						hasValue={ () => numberOfTags !== 45 }
 						label={ __( 'Number of tags' ) }
-						value={ numberOfTags }
-						onChange={ ( value ) =>
-							setAttributes( { numberOfTags: value } )
+						onDeselect={ () =>
+							setAttributes( { numberOfTags: 45 } )
 						}
-						min={ MIN_TAGS }
-						max={ MAX_TAGS }
-						required
-					/>
-				</ToolsPanelItem>
-				<ToolsPanelItem
-					hasValue={ () => showTagCounts !== false }
-					label={ __( 'Show tag counts' ) }
-					onDeselect={ () =>
-						setAttributes( { showTagCounts: false } )
-					}
-					isShownByDefault
-				>
-					<ToggleControl
-						__nextHasNoMarginBottom
+						isShownByDefault
+					>
+						<RangeControl
+							__nextHasNoMarginBottom
+							__next40pxDefaultSize
+							label={ __( 'Number of tags' ) }
+							value={ numberOfTags }
+							onChange={ ( value ) =>
+								setAttributes( { numberOfTags: value } )
+							}
+							min={ MIN_TAGS }
+							max={ MAX_TAGS }
+							required
+						/>
+					</ToolsPanelItem>
+					<ToolsPanelItem
+						hasValue={ () => showTagCounts !== false }
 						label={ __( 'Show tag counts' ) }
-						checked={ showTagCounts }
-						onChange={ () =>
-							setAttributes( { showTagCounts: ! showTagCounts } )
+						onDeselect={ () =>
+							setAttributes( { showTagCounts: false } )
 						}
-					/>
-				</ToolsPanelItem>
-			</ToolsPanel>
-		</InspectorControls>
+						isShownByDefault
+					>
+						<ToggleControl
+							__nextHasNoMarginBottom
+							label={ __( 'Show tag counts' ) }
+							checked={ showTagCounts }
+							onChange={ () =>
+								setAttributes( {
+									showTagCounts: ! showTagCounts,
+								} )
+							}
+						/>
+					</ToolsPanelItem>
+				</ToolsPanel>
+			</InspectorControls>
+			<InspectorControls group="advanced">
+				<TextControl
+					__next40pxDefaultSize
+					__nextHasNoMarginBottom
+					label={ __( 'Tag Cloud name' ) }
+					value={ ariaLabel || '' }
+					onChange={ ( value ) => {
+						setAttributes( { ariaLabel: value } );
+					} }
+				/>
+			</InspectorControls>
+		</>
 	);
 
 	return (

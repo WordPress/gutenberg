@@ -17,6 +17,7 @@
 function render_block_core_tag_cloud( $attributes ) {
 	$smallest_font_size = $attributes['smallestFontSize'];
 	$unit               = ( preg_match( '/^[0-9.]+(?P<unit>[a-z%]+)$/i', $smallest_font_size, $m ) ? $m['unit'] : 'pt' );
+	$aria_label         = isset( $attributes['ariaLabel'] ) ? $attributes['ariaLabel'] : __( 'Tag Cloud' );
 
 	$args      = array(
 		'echo'       => false,
@@ -38,10 +39,10 @@ function render_block_core_tag_cloud( $attributes ) {
 		}
 	}
 
-	$wrapper_attributes = get_block_wrapper_attributes();
+	$wrapper_attributes = get_block_wrapper_attributes( array( 'aria-label' => $aria_label ) );
 
 	return sprintf(
-		'<p %1$s>%2$s</p>',
+		'<nav %1$s>%2$s</nav>',
 		$wrapper_attributes,
 		$tag_cloud
 	);

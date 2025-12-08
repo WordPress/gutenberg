@@ -52,6 +52,7 @@
 		"interactivity": {
 			"clientNavigation": true
 		},
+		"ariaLabel": true,
 		"__experimentalBorder": {
 			"radius": true,
 			"color": true,
