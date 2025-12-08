@@ -38,6 +38,12 @@
 			"type": "boolean",
 			"default": true,
 			"role": "content"
+		},
+		"width": {
+			"type": "string"
+		},
+		"height": {
+			"type": "string"
 		}
 	},
 	"supports": {

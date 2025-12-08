@@ -13,7 +13,7 @@ import {
 } from '@wordpress/block-editor';
 
 export default function save( { attributes } ) {
-	const { url, caption, type, providerNameSlug } = attributes;
+	const { url, caption, type, providerNameSlug, width } = attributes;
 
 	if ( ! url ) {
 		return null;
@@ -23,10 +23,18 @@ export default function save( { attributes } ) {
 		[ `is-type-${ type }` ]: type,
 		[ `is-provider-${ providerNameSlug }` ]: providerNameSlug,
 		[ `wp-block-embed-${ providerNameSlug }` ]: providerNameSlug,
+		'has-custom-width': !! width,
 	} );
 
 	return (
-		<figure { ...useBlockProps.save( { className } ) }>
+		<figure
+			{ ...useBlockProps.save( {
+				className,
+				style: {
+					width: width || undefined,
+				},
+			} ) }
+		>
 			<div className="wp-block-embed__wrapper">
 				{ `\n${ url }\n` /* URL needs to be on its own line. */ }
 			</div>

@@ -13,7 +13,8 @@ import EmbedControls from './embed-controls';
 import { embedContentIcon } from './icons';
 import EmbedLoading from './embed-loading';
 import EmbedPlaceholder from './embed-placeholder';
-import EmbedPreview from './embed-preview';
+import ResizableEmbedPreview from './resizable-embed-preview';
+import { useMaxWidthObserver } from './use-max-width-observer';
 
 /**
  * External dependencies
@@ -58,6 +59,7 @@ const EmbedEdit = ( props ) => {
 	const [ url, setURL ] = useState( attributesUrl );
 	const [ isEditingURL, setIsEditingURL ] = useState( false );
 	const { invalidateResolution } = useDispatch( coreStore );
+	const [ maxWidthObserver ] = useMaxWidthObserver();
 
 	const {
 		preview,
@@ -249,12 +251,14 @@ const EmbedEdit = ( props ) => {
 	// that `getMergedAttributes` uses is memoized so that we're not
 	// calculating them on every render.
 	const {
-		caption,
 		type,
 		allowResponsive,
 		className: classFromPreview,
+		width,
 	} = getMergedAttributes();
-	const className = clsx( classFromPreview, props.className );
+	const className = clsx( classFromPreview, props.className, {
+		'has-custom-width': !! width,
+	} );
 
 	return (
 		<>
@@ -274,21 +278,21 @@ const EmbedEdit = ( props ) => {
 					[ `wp-block-embed-${ providerNameSlug }` ]:
 						providerNameSlug,
 				} ) }
+				style={ {
+					...blockProps.style,
+					width: width || undefined,
+				} }
 			>
-				<EmbedPreview
+				{ maxWidthObserver }
+				<ResizableEmbedPreview
 					preview={ preview }
 					previewable={ previewable }
 					className={ className }
 					url={ url }
 					type={ type }
-					caption={ caption }
-					onCaptionChange={ ( value ) =>
-						setAttributes( { caption: value } )
-					}
 					isSelected={ isSelected }
 					icon={ icon }
 					label={ label }
-					insertBlocksAfter={ insertBlocksAfter }
 					attributes={ attributes }
 					setAttributes={ setAttributes }
 				/>

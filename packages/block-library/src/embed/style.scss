@@ -42,6 +42,15 @@
 	iframe {
 		max-width: 100%;
 	}
+
+	// Support custom width set by resizing
+	&.has-custom-width {
+		width: fit-content;
+
+		.wp-block-embed__wrapper {
+			max-width: 100%;
+		}
+	}
 }
 
 .wp-block-embed__wrapper {

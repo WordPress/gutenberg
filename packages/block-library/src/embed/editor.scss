@@ -41,9 +41,46 @@
 	opacity: 0;
 }
 
+// Resizable embed styles
+.wp-block-embed.is-selected {
+	.wp-block-embed__wrapper {
+		// Ensure the wrapper takes full size when resizing
+		width: 100% !important;
+		height: 100% !important;
+
+		// Maintain proper iframe sizing
+		iframe {
+			width: 100%;
+			height: 100%;
+		}
+	}
+
+	// Style the ResizableBox component
+	.react-resizable {
+		position: relative !important;
+
+		// Ensure resize handles are visible and properly positioned
+		.react-resizable-handle {
+			opacity: 1;
+			z-index: 10;
+
+			&.react-resizable-handle-e {
+				right: -5px;
+				cursor: col-resize;
+				background: var(--wp-admin-theme-color);
+				border-radius: 2px;
+
+				&:hover {
+					background: var(--wp-admin-theme-color-darker-10);
+				}
+			}
+		}
+	}
+}
+
 .wp-block[data-align="left"],
 .wp-block[data-align="right"] {
-	> .wp-block-embed {
+	>.wp-block-embed {
 		max-width: 360px;
 		width: 100%;
 
