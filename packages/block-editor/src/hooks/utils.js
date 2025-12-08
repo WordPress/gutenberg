@@ -218,6 +218,7 @@ export function usePrivateStyleOverride( {
 		setStyleOverride,
 		deleteStyleOverride,
 		registry,
+		variation,
 	] );
 }
 
@@ -264,6 +265,7 @@ export function useBlockSettings( name, parentLayout ) {
 		aspectRatio,
 		minHeight,
 		width,
+		dimensionSizes,
 		layout,
 		borderColor,
 		borderRadius,
@@ -323,6 +325,7 @@ export function useBlockSettings( name, parentLayout ) {
 		'dimensions.aspectRatio',
 		'dimensions.minHeight',
 		'dimensions.width',
+		'dimensions.dimensionSizes',
 		'layout',
 		'border.color',
 		'border.radius',
@@ -433,6 +436,7 @@ export function useBlockSettings( name, parentLayout ) {
 				aspectRatio,
 				minHeight,
 				width,
+				dimensionSizes,
 			},
 			layout,
 			parentLayout,
@@ -470,6 +474,7 @@ export function useBlockSettings( name, parentLayout ) {
 		aspectRatio,
 		minHeight,
 		width,
+		dimensionSizes,
 		layout,
 		parentLayout,
 		borderColor,
