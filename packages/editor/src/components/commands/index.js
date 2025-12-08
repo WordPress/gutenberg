@@ -455,7 +455,6 @@ export default function useCommands() {
 	useCommandLoader( {
 		name: 'core/editor/edit-ui',
 		hook: getEditorCommandLoader(),
-		context: 'entity-edit',
 	} );
 
 	useCommandLoader( {
