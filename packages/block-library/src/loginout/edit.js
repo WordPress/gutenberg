@@ -14,7 +14,8 @@ import { __ } from '@wordpress/i18n';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
 export default function LoginOutEdit( { attributes, setAttributes } ) {
-	const { displayLoginAsForm, redirectToCurrent } = attributes;
+	const { displayLoginAsForm, redirectToCurrent, combineLoginLogout } =
+		attributes;
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
 	return (
@@ -68,6 +69,27 @@ export default function LoginOutEdit( { attributes, setAttributes } ) {
 							}
 						/>
 					</ToolsPanelItem>
+					<ToolsPanelItem
+						label={ __(
+							'Use "Login" and "Logout" instead of "Log in" and "Log out"'
+						) }
+						isShownByDefault
+						hasValue={ () => combineLoginLogout }
+						onDeselect={ () =>
+							setAttributes( { combineLoginLogout: false } )
+						}
+					>
+						<ToggleControl
+							__nextHasNoMarginBottom
+							label={ __( 'Use single words' ) }
+							checked={ combineLoginLogout }
+							onChange={ () =>
+								setAttributes( {
+									combineLoginLogout: ! combineLoginLogout,
+								} )
+							}
+						/>
+					</ToolsPanelItem>
 				</ToolsPanel>
 			</InspectorControls>
 			<div
@@ -75,7 +97,9 @@ export default function LoginOutEdit( { attributes, setAttributes } ) {
 					className: 'logged-in',
 				} ) }
 			>
-				<a href="#login-pseudo-link">{ __( 'Log out' ) }</a>
+				<a href="#login-pseudo-link">
+					{ combineLoginLogout ? __( 'Logout' ) : __( 'Log out' ) }
+				</a>
 			</div>
 		</>
 	);

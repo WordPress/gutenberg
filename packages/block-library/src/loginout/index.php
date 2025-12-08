@@ -40,6 +40,11 @@ function render_block_core_loginout( $attributes ) {
 		$contents = wp_login_form( array( 'echo' => false ) );
 	}
 
+	if ( ! empty( $attributes['combineLoginLogout'] ) ) {
+		$contents = str_replace( 'Log in', 'Login', $contents );
+		$contents = str_replace( 'Log out', 'Logout', $contents );
+	}
+
 	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $classes ) );
 
 	return '<div ' . $wrapper_attributes . '>' . $contents . '</div>';

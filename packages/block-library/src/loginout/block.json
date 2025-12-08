@@ -15,6 +15,10 @@
 		"redirectToCurrent": {
 			"type": "boolean",
 			"default": true
+		},
+		"combineLoginLogout": {
+			"type": "boolean",
+			"default": false
 		}
 	},
 	"example": {

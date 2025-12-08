@@ -487,7 +487,7 @@ Show login & logout links. ([Source](https://github.com/WordPress/gutenberg/tree
 -	**Name:** core/loginout
 -	**Category:** theme
 -	**Supports:** className, color (background, gradients, link, ~~text~~), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight)
--	**Attributes:** displayLoginAsForm, redirectToCurrent
+-	**Attributes:** combineLoginLogout, displayLoginAsForm, redirectToCurrent
 
 ## Math
 
