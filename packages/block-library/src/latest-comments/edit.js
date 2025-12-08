@@ -32,7 +32,7 @@ const MIN_COMMENTS = 1;
 const MAX_COMMENTS = 100;
 
 export default function LatestComments( { attributes, setAttributes } ) {
-	const { commentsToShow, displayAvatar, displayDate, displayContent } =
+	const { commentsToShow, displayAvatar, displayDate, displayContent, excludePostAuthor } =
 		attributes;
 
 	const serverSideAttributes = {
@@ -56,6 +56,7 @@ export default function LatestComments( { attributes, setAttributes } ) {
 							displayAvatar: true,
 							displayDate: true,
 							displayContent: 'excerpt',
+							excludePostAuthor: false,
 						} );
 					} }
 					dropdownMenuProps={ dropdownMenuProps }
@@ -121,6 +122,27 @@ export default function LatestComments( { attributes, setAttributes } ) {
 									displayContent: value,
 								} )
 							}
+						/>
+					</ToolsPanelItem>
+
+					<ToolsPanelItem
+						hasValue={ () => excludePostAuthor }
+						label={ __( 'Exclude post author' ) }
+						onDeselect={ () =>
+							setAttributes( { excludePostAuthor: false } )
+						}
+						isShownByDefault
+					>
+						<ToggleControl
+							__nextHasNoMarginBottom
+							label={ __( 'Exclude post author' ) }
+							checked={ excludePostAuthor }
+							onChange={ () =>
+								setAttributes( {
+									excludePostAuthor: ! excludePostAuthor,
+								} )
+							}
+							help={ __( 'Hide comments from the post author.' ) }
 						/>
 					</ToolsPanelItem>
 

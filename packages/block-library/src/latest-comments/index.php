@@ -50,6 +50,8 @@ function render_block_core_latest_comments( $attributes ) {
 		$display_content = isset( $attributes['displayContent'] ) ? $attributes['displayContent'] : 'excerpt';
 	}
 
+	$exclude_post_author = isset( $attributes['excludePostAuthor'] ) ? $attributes['excludePostAuthor'] : false;
+
 	$comments = get_comments(
 		/** This filter is documented in wp-includes/widgets/class-wp-widget-recent-comments.php */
 		apply_filters(
@@ -62,6 +64,23 @@ function render_block_core_latest_comments( $attributes ) {
 			array()
 		)
 	);
+
+	if ( $exclude_post_author && ! empty( $comments ) ) {
+		$comments = array_filter(
+			$comments,
+			function ( $comment ) {
+				$post = get_post( $comment->comment_post_ID );
+				if ( ! $post ) {
+					return true;
+				}
+				$post_author_id = (int) $post->post_author;
+
+				$comment_author_id = (int) $comment->user_id;
+
+				return $comment_author_id === 0 || $comment_author_id !== $post_author_id;
+			}
+		);
+	}
 
 	$list_items_markup = '';
 	if ( ! empty( $comments ) ) {
