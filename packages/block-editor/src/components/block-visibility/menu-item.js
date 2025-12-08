@@ -5,15 +5,18 @@ import { __ } from '@wordpress/i18n';
 import { MenuItem } from '@wordpress/components';
 import { seen, unseen } from '@wordpress/icons';
 import { useSelect } from '@wordpress/data';
+import { useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
-import { openBreakpointsModal } from '../block-visibility-breakpoints/modal-manager';
 import { hasAnyBreakpointVisibility } from '../block-visibility-breakpoints/constants';
+import BlockVisibilityBreakpointsModal from '../block-visibility-breakpoints/modal';
 
-export default function BlockVisibilityMenuItem( { clientIds, onClose } ) {
+export default function BlockVisibilityMenuItem( { clientIds } ) {
+	const [ isModalOpen, setIsModalOpen ] = useState( false );
+
 	const blocks = useSelect(
 		( select ) => {
 			return select( blockEditorStore ).getBlocksByClientId( clientIds );
@@ -32,21 +35,29 @@ export default function BlockVisibilityMenuItem( { clientIds, onClose } ) {
 	);
 
 	const handleClick = () => {
-		openBreakpointsModal( clientIds );
-		if ( onClose ) {
-			onClose();
-		}
+		setIsModalOpen( true );
 	};
 
 	return (
-		<MenuItem
-			icon={ hasHiddenBlock || hasBreakpointVisibility ? seen : unseen }
-			onClick={ handleClick }
-			aria-haspopup="dialog"
-		>
-			{ hasHiddenBlock || hasBreakpointVisibility
-				? __( 'Show' )
-				: __( 'Hide' ) }
-		</MenuItem>
+		<>
+			<MenuItem
+				icon={
+					hasHiddenBlock || hasBreakpointVisibility ? seen : unseen
+				}
+				onClick={ handleClick }
+				aria-expanded={ isModalOpen }
+				aria-haspopup="dialog"
+			>
+				{ hasHiddenBlock || hasBreakpointVisibility
+					? __( 'Show' )
+					: __( 'Hide' ) }
+			</MenuItem>
+			{ isModalOpen && (
+				<BlockVisibilityBreakpointsModal
+					clientIds={ clientIds }
+					onClose={ () => setIsModalOpen( false ) }
+				/>
+			) }
+		</>
 	);
 }

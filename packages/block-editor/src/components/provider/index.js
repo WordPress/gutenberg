@@ -19,7 +19,6 @@ import { BlockRefsProvider } from './block-refs-provider';
 import { unlock } from '../../lock-unlock';
 import KeyboardShortcuts from '../keyboard-shortcuts';
 import useMediaUploadSettings from './use-media-upload-settings';
-import BlockVisibilityBreakpointsModalManager from '../block-visibility-breakpoints/modal-manager';
 
 /** @typedef {import('@wordpress/data').WPDataRegistry} WPDataRegistry */
 
@@ -112,7 +111,6 @@ export const ExperimentalBlockEditorProvider = withRegistryProvider(
 			<SlotFillProvider passthrough>
 				{ ! settings?.isPreviewMode && <KeyboardShortcuts.Register /> }
 				<BlockRefsProvider>{ props.children }</BlockRefsProvider>
-				<BlockVisibilityBreakpointsModalManager />
 			</SlotFillProvider>
 		);
 

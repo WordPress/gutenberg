@@ -3,6 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { ToolbarButton, ToolbarGroup } from '@wordpress/components';
+import { useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { hasBlockSupport } from '@wordpress/blocks';
 import { seen, unseen } from '@wordpress/icons';
@@ -11,7 +12,7 @@ import { seen, unseen } from '@wordpress/icons';
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
-import { openBreakpointsModal } from './modal-manager';
+import BlockVisibilityBreakpointsModal from './modal';
 import { hasAnyBreakpointVisibility } from './constants';
 
 /**
@@ -25,6 +26,8 @@ import { hasAnyBreakpointVisibility } from './constants';
  * @return {JSX.Element|null} The toolbar button or null if visibility is not supported.
  */
 export default function BlockVisibilityBreakpointsToolbar( { clientIds } ) {
+	const [ isModalOpen, setIsModalOpen ] = useState( false );
+
 	const { blocks, canToggleBlockVisibility } = useSelect(
 		( select ) => {
 			const { getBlockName, getBlocksByClientId } =
@@ -66,16 +69,26 @@ export default function BlockVisibilityBreakpointsToolbar( { clientIds } ) {
 	}
 
 	return (
-		<ToolbarGroup className="block-editor-block-visibility-breakpoints-toolbar">
-			<ToolbarButton
-				icon={ hasAnyVisibility ? unseen : seen }
-				label={
-					hasAnyVisibility
-						? __( 'Breakpoint visibility set' )
-						: __( 'Set breakpoint visibility' )
-				}
-				onClick={ () => openBreakpointsModal( clientIds ) }
-			/>
-		</ToolbarGroup>
+		<>
+			<ToolbarGroup className="block-editor-block-visibility-breakpoints-toolbar">
+				<ToolbarButton
+					icon={ hasAnyVisibility ? unseen : seen }
+					label={
+						hasAnyVisibility
+							? __( 'Breakpoint visibility set' )
+							: __( 'Set breakpoint visibility' )
+					}
+					onClick={ () => setIsModalOpen( true ) }
+					aria-expanded={ isModalOpen }
+					aria-haspopup="dialog"
+				/>
+			</ToolbarGroup>
+			{ isModalOpen && (
+				<BlockVisibilityBreakpointsModal
+					clientIds={ clientIds }
+					onClose={ () => setIsModalOpen( false ) }
+				/>
+			) }
+		</>
 	);
 }

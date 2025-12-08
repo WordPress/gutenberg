@@ -21,8 +21,8 @@ import { store as blockEditorStore } from '../../store';
 import BlockModeToggle from '../block-settings-menu/block-mode-toggle';
 import { ModifyContentOnlySectionMenuItem } from '../content-lock';
 import { BlockRenameControl, useBlockRename } from '../block-rename';
-import { BlockVisibilityMenuItem } from '../block-visibility';
 import { EditSectionMenuItem } from './edit-section-menu-item';
+import { BlockVisibilityMenuItem } from '../block-visibility';
 
 const { Fill, Slot } = createSlotFill( 'BlockSettingsMenuControls' );
 
@@ -35,22 +35,23 @@ const BlockSettingsMenuControlsSlot = ( { fillProps, clientIds = null } ) => {
 	} = useSelect(
 		( select ) => {
 			const {
-				getBlocksByClientId,
 				getBlockNamesByClientId,
 				getSelectedBlockClientIds,
 				getBlockEditingMode,
+				getBlockName,
 			} = select( blockEditorStore );
 			const ids =
 				clientIds !== null ? clientIds : getSelectedBlockClientIds();
+			const blocks = ids.map( ( id ) => getBlockName( id ) );
 			return {
 				selectedBlocks: getBlockNamesByClientId( ids ),
 				selectedClientIds: ids,
 				isContentOnly:
 					getBlockEditingMode( ids[ 0 ] ) === 'contentOnly',
-				canToggleSelectedBlocksVisibility: getBlocksByClientId(
-					ids
-				).every( ( block ) =>
-					hasBlockSupport( block.name, 'visibility', true )
+				canToggleSelectedBlocksVisibility: blocks.every(
+					( blockName ) =>
+						blockName &&
+						hasBlockSupport( blockName, 'visibility', true )
 				),
 			};
 		},

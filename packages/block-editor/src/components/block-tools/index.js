@@ -10,7 +10,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { isTextField } from '@wordpress/dom';
 import { Popover } from '@wordpress/components';
 import { __unstableUseShortcutEventMatch as useShortcutEventMatch } from '@wordpress/keyboard-shortcuts';
-import { useRef } from '@wordpress/element';
+import { useRef, useState } from '@wordpress/element';
 import {
 	switchToBlockType,
 	store as blocksStore,
@@ -33,8 +33,8 @@ import usePopoverScroll from '../block-popover/use-popover-scroll';
 import ZoomOutModeInserters from './zoom-out-mode-inserters';
 import { useShowBlockTools } from './use-show-block-tools';
 import { unlock } from '../../lock-unlock';
-import { cleanEmptyObject } from '../../hooks/utils';
 import usePasteStyles from '../use-paste-styles';
+import BlockVisibilityBreakpointsModal from '../block-visibility-breakpoints/modal';
 
 function selector( select ) {
 	const {
@@ -75,6 +75,9 @@ export default function BlockTools( {
 	const { clientId, hasFixedToolbar, isTyping, isZoomOutMode, isDragging } =
 		useSelect( selector, [] );
 
+	const [ visibilityModalClientIds, setVisibilityModalClientIds ] =
+		useState( null );
+
 	const isMatch = useShortcutEventMatch();
 	const {
 		getBlocksByClientId,
@@ -99,7 +102,6 @@ export default function BlockTools( {
 		moveBlocksUp,
 		moveBlocksDown,
 		expandBlock,
-		updateBlockAttributes,
 		stopEditingContentOnlySection,
 	} = unlock( useDispatch( blockEditorStore ) );
 
@@ -221,36 +223,20 @@ export default function BlockTools( {
 			if ( clientIds.length ) {
 				event.preventDefault();
 				const blocks = getBlocksByClientId( clientIds );
-				const canToggleBlockVisibility = blocks.every( ( block ) =>
-					hasBlockSupport(
-						getBlockName( block.clientId ),
-						'visibility',
-						true
-					)
+				const canToggleBlockVisibility = blocks.every(
+					( block, index ) =>
+						block &&
+						hasBlockSupport(
+							getBlockName( clientIds[ index ] ),
+							'visibility',
+							true
+						)
 				);
 				if ( ! canToggleBlockVisibility ) {
 					return;
 				}
-				const hasHiddenBlock = blocks.some(
-					( block ) =>
-						block.attributes.metadata?.blockVisibility === false
-				);
-				const attributesByClientId = Object.fromEntries(
-					blocks.map( ( { clientId: mapClientId, attributes } ) => [
-						mapClientId,
-						{
-							metadata: cleanEmptyObject( {
-								...attributes?.metadata,
-								blockVisibility: hasHiddenBlock
-									? undefined
-									: false,
-							} ),
-						},
-					] )
-				);
-				updateBlockAttributes( clientIds, attributesByClientId, {
-					uniqueByBlock: true,
-				} );
+				// Open the visibility breakpoints modal
+				setVisibilityModalClientIds( clientIds );
 			}
 		}
 
@@ -317,6 +303,12 @@ export default function BlockTools( {
 					/>
 				) }
 			</InsertionPointOpenRef.Provider>
+			{ visibilityModalClientIds && (
+				<BlockVisibilityBreakpointsModal
+					clientIds={ visibilityModalClientIds }
+					onClose={ () => setVisibilityModalClientIds( null ) }
+				/>
+			) }
 		</div>
 	);
 }
