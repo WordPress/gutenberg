@@ -37,13 +37,13 @@ function gutenberg_render_block_visibility_support( $block_content, $block ) {
 		if ( $breakpoint_visibility && is_array( $breakpoint_visibility ) ) {
 			// Build array of classes to add.
 			$classes = array();
-			if ( ! empty( $breakpoint_visibility['mobile'] ) ) {
+			if ( true === $breakpoint_visibility['mobile'] ) {
 				$classes[] = 'wp-block-hidden-mobile';
 			}
-			if ( ! empty( $breakpoint_visibility['tablet'] ) ) {
+			if ( true === $breakpoint_visibility['tablet'] ) {
 				$classes[] = 'wp-block-hidden-tablet';
 			}
-			if ( ! empty( $breakpoint_visibility['desktop'] ) ) {
+			if ( true === $breakpoint_visibility['desktop'] ) {
 				$classes[] = 'wp-block-hidden-desktop';
 			}
 
