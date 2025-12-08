@@ -5,12 +5,6 @@ import { __, sprintf } from '@wordpress/i18n';
 import { Path, SVG } from '@wordpress/primitives';
 import { heading } from '@wordpress/icons';
 
-const defined = ( x ) => x !== undefined && x !== null;
-
-const HEADING_DESCRIPTION = __(
-	'Introduce new sections and organize content to help visitors (and search engines) understand the structure of your content.'
-);
-
 const variations = [
 	...[ 1, 2, 3, 4, 5, 6 ].map( ( level ) => ( {
 		name: `h${ level }`,
@@ -19,14 +13,15 @@ const variations = [
 			__( 'Heading %d' ),
 			level
 		),
-		description: HEADING_DESCRIPTION,
+		description: __(
+			'Introduce new sections and organize content to help visitors (and search engines) understand the structure of your content.'
+		),
 		icon: heading,
 		attributes: { level },
 		scope: [ 'block', 'transform' ],
 		keywords: [ `h${ level }` ],
 		isActive: ( blockAttributes ) =>
-			! defined( blockAttributes.fitText ) &&
-			blockAttributes.level === level,
+			! blockAttributes.fitText && blockAttributes.level === level,
 	} ) ),
 	// There is a hardcoded workaround in packages/block-editor/src/store/selectors.js
 	// to make Stretchy variations appear as the last of their sections in the inserter.
