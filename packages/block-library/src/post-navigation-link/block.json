@@ -30,6 +30,10 @@
 			"type": "string",
 			"default": "none"
 		},
+		"showLabel": {
+			"type": "boolean",
+			"default": true
+		},
 		"taxonomy": {
 			"type": "string",
 			"default": ""

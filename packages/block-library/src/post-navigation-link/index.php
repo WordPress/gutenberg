@@ -37,8 +37,14 @@ function render_block_core_post_navigation_link( $attributes, $content ) {
 	);
 	// Set default values.
 	$format = '%link';
-	$link   = 'next' === $navigation_type ? _x( 'Next', 'label for next post link' ) : _x( 'Previous', 'label for previous post link' );
+	$link   = '';
 	$label  = '';
+
+	$show_label = ! isset( $attributes['showLabel'] ) || $attributes['showLabel'] || 'none' === $attributes['arrow'] || $attributes['showTitle'];
+
+	if ( $show_label ) {
+		$link = 'next' === $navigation_type ? _x( 'Next', 'label for next post link' ) : _x( 'Previous', 'label for previous post link' );
+	}
 
 	// Only use hardcoded values here, otherwise we need to add escaping where these values are used.
 	$arrow_map = array(
@@ -94,10 +100,26 @@ function render_block_core_post_navigation_link( $attributes, $content ) {
 	if ( isset( $attributes['arrow'] ) && 'none' !== $attributes['arrow'] && isset( $arrow_map[ $attributes['arrow'] ] ) ) {
 		$arrow = $arrow_map[ $attributes['arrow'] ][ $navigation_type ];
 
-		if ( 'next' === $navigation_type ) {
-			$format = '%link<span class="wp-block-post-navigation-link__arrow-next is-arrow-' . $attributes['arrow'] . '" aria-hidden="true">' . $arrow . '</span>';
+		if ( $show_label ) {
+			if ( 'next' === $navigation_type ) {
+				$format = '%link<span class="wp-block-post-navigation-link__arrow-next is-arrow-' . $attributes['arrow'] . '" aria-hidden="true">' . $arrow . '</span>';
+			} else {
+				$format = '<span class="wp-block-post-navigation-link__arrow-previous is-arrow-' . $attributes['arrow'] . '" aria-hidden="true">' . $arrow . '</span>%link';
+			}
 		} else {
-			$format = '<span class="wp-block-post-navigation-link__arrow-previous is-arrow-' . $attributes['arrow'] . '" aria-hidden="true">' . $arrow . '</span>%link';
+			$aria_label = 'next' === $navigation_type
+				? _x( 'Next Post', 'aria label for next post link' )
+				: _x( 'Previous Post', 'aria label for previous post link' );
+
+			$format = '%link';
+			$link   = sprintf(
+				'<span class="wp-block-post-navigation-link__arrow-%1$s is-arrow-%2$s no-label" aria-label="%3$s">%4$s</span>',
+				esc_attr( $navigation_type ),
+				esc_attr( $attributes['arrow'] ),
+				esc_attr( $aria_label ),
+				$arrow
+			);
+
 		}
 	}
 
