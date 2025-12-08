@@ -154,15 +154,6 @@ export class BlockSelectionHistory {
 		}
 
 		this.currentSelection = ySelection;
-
-		console.log( '--- Updated selection history:' );
-		const currentSelection = this.getCurrentSelection();
-		const selectionHistory = this.getSelectionHistory(
-			SELECTION_HISTORY_DEFAULT_SIZE
-		);
-
-		console.log( 'Current selection:', currentSelection );
-		console.log( 'Selection history:', selectionHistory );
 	}
 
 	/**

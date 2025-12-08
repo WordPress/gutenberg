@@ -50,7 +50,6 @@ import {
 	SELECTION_HISTORY_DEFAULT_SIZE,
 	YSelectionType,
 } from './block-selection-history';
-import { restoreSelection } from './selection';
 
 // Changes that can be applied to a post entity record.
 export type PostChanges = Partial< Post > & {
@@ -150,8 +149,6 @@ export function applyPostChangesToCRDTDoc(
 	changes: PostChanges,
 	_postType: Type // eslint-disable-line @typescript-eslint/no-unused-vars
 ): void {
-	// console.log( 'applyPostChangesToCRDTDoc() with changes:', changes );
-
 	const ymap = getRootMap< YPostRecord >( ydoc, CRDT_RECORD_MAP_KEY );
 
 	Object.keys( changes ).forEach( ( key ) => {
@@ -263,11 +260,16 @@ export function applyPostChangesToCRDTDoc(
 	} );
 
 	// Process changes that we don't want to persist to the CRDT document.
-
 	if ( changes.selection ) {
-		// Keep track of selection history for the undo/redo stack.
-		const selectionHistory = getBlockSelectionHistory( ydoc );
-		selectionHistory.updateSelection( changes.selection );
+		const selection = changes.selection;
+
+		// Persist selection changes at the end of the current event loop.
+		// This allows undo meta to be saved with the prior selection before
+		// it is overwritten by the new selection from document changes.
+		setTimeout( () => {
+			const selectionHistory = getBlockSelectionHistory( ydoc );
+			selectionHistory.updateSelection( selection );
+		}, 0 );
 	}
 }
 
@@ -502,10 +504,6 @@ export function getSelectionHistoryMeta(
 	const selectionHistory = getBlockSelectionHistory( ydoc );
 
 	let selectionToStore = selectionHistory.getCurrentSelection();
-	console.log(
-		'getSelectionHistoryMeta() selectionToStore:',
-		selectionToStore
-	);
 	const backupSelections = selectionHistory.getSelectionHistory(
 		SELECTION_HISTORY_DEFAULT_SIZE
 	);
