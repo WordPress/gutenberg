@@ -37,8 +37,6 @@ const UnforwardedValidatedNumberControl = (
 			<NumberControl
 				__next40pxDefaultSize
 				ref={ mergedRefs }
-				// TODO: Upstream limitation - When form is submitted when value is undefined, it will
-				// automatically set a clamped value (as defined by `min` attribute, so 0 by default).
 				{ ...restProps }
 			/>
 		</ControlWithError>
