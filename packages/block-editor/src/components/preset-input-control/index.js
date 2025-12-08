@@ -181,11 +181,11 @@ export default function PresetInputControl( {
 		const newValue = parseInt( next, 10 );
 
 		if ( controlType === 'selectList' ) {
+			if ( newValue === 0 && presets[ 0 ]?.slug === '0' ) {
+				return '0';
+			}
 			if ( newValue === 0 ) {
 				return undefined;
-			}
-			if ( newValue === 1 ) {
-				return '0';
 			}
 		} else if ( newValue === 0 ) {
 			return '0';
