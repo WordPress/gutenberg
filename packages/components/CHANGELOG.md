@@ -10,6 +10,7 @@
 
 -   `Menu` and othr menu items: change default size to be 32px tall rather than 40px to improve menu density. ([#73429](https://github.com/WordPress/gutenberg/pull/73429)).
 -   Unify padding using for DataViews, Modals and other container components. ([#73334](https://github.com/WordPress/gutenberg/pull/73334))
+-   Validated form controls: Suppress native error popover ([#73471](https://github.com/WordPress/gutenberg/pull/73471)).
 
 ### Bug Fixes
 
