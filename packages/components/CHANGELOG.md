@@ -5,6 +5,7 @@
 ### Enhancements
 
 -   `Menu` and othr menu items: change default size to be 32px tall rather than 40px to improve menu density. ([#73429](https://github.com/WordPress/gutenberg/pull/73429)).
+-   `Snackbar`: Shorten timeout duration ([#73813](https://github.com/WordPress/gutenberg/pull/73813)).
 
 ### Bug Fixes
 
