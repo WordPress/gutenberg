@@ -266,14 +266,6 @@ export const WithModal = ( {
 			) }
 			{ isModalOpen && (
 				<>
-					<style>{ `
-						.components-modal__content {
-							padding: 0;
-						}
-						.components-modal__frame.is-full-screen .components-modal__content {
-							margin-bottom: 0;
-						}
-					` }</style>
 					<Modal
 						title="Select Items"
 						onRequestClose={ () => setIsModalOpen( false ) }

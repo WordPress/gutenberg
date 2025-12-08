@@ -4,8 +4,6 @@
 
 .dataviews-wrapper,
 .dataviews-picker-wrapper {
-	height: 100%;
-	overflow: auto;
 	box-sizing: border-box;
 	scroll-padding-bottom: $grid-unit-80;
 	/* stylelint-disable-next-line property-no-unknown -- '@container' not globally permitted */
@@ -15,12 +13,12 @@
 	font-size: $default-font-size;
 	line-height: $default-line-height;
 	background-color: var(--wp-dataviews-color-background, $white);
+	gap: $grid-unit-20;
 }
 
 .dataviews__view-actions,
 .dataviews-filters__container {
 	box-sizing: border-box;
-	padding: $grid-unit-20 $grid-unit-30;
 	flex-shrink: 0;
 	position: sticky;
 	left: 0;
@@ -46,13 +44,6 @@
 
 .dataviews-loading-more {
 	text-align: center;
-}
-
-@container (max-width: 430px) {
-	.dataviews__view-actions,
-	.dataviews-filters__container {
-		padding: $grid-unit-15 $grid-unit-30;
-	}
 }
 
 .dataviews-title-field {

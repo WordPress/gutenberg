@@ -61,12 +61,12 @@
 
 		td:first-child,
 		th:first-child {
-			padding-left: $grid-unit-30;
+			padding-left: 0;
 		}
 
 		td:last-child,
 		th:last-child {
-			padding-right: $grid-unit-30;
+			padding-right: 0;
 		}
 
 		&:last-child {
@@ -161,13 +161,11 @@
 			}
 
 			&:has(.dataviews-view-table-header-button):first-child {
-				// Table cell padding minus the header button padding.
-				padding-left: $grid-unit-50;
+				padding-left: 0;
 			}
 
 			&:has(.dataviews-view-table-header-button):last-child {
-				// Table cell padding minus the header button padding.
-				padding-right: $grid-unit-50;
+				padding-right: 0;
 			}
 		}
 	}
@@ -305,7 +303,7 @@
 .dataviews-view-table__group-header-row {
 	.dataviews-view-table__group-header-cell {
 		font-weight: $font-weight-medium;
-		padding: $grid-unit-15 $grid-unit-30;
+		padding: $grid-unit-15 0;
 		color: $gray-900;
 	}
 }

@@ -251,6 +251,7 @@ export default function PostList( { postType } ) {
 	return (
 		<Page
 			title={ labels?.name }
+			hasPadding
 			actions={
 				<>
 					{ isModified && (

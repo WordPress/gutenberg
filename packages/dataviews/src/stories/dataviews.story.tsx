@@ -603,7 +603,6 @@ export const InfiniteScroll = () => {
 			<style>{ `
 			.dataviews-wrapper {
 				height: 600px;
-				overflow: auto;
 			}
 		` }</style>
 			<Text
