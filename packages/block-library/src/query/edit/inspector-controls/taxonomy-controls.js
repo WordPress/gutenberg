@@ -96,10 +96,7 @@ export function TaxonomyControls( { onChange, query } ) {
 							termIds={ includeTermIds }
 							oppositeTermIds={ excludeTermIds }
 							onChange={ handleIncludeChange }
-							label={
-								/* translators: %s: taxonomy name */
-								sprintf( __( 'Include: %s' ), taxonomy.name )
-							}
+							label={ taxonomy.name }
 						/>
 						<TaxonomyItem
 							taxonomy={ taxonomy }
