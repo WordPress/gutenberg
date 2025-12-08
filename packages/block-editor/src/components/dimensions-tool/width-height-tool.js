@@ -8,11 +8,6 @@ import {
 import { __ } from '@wordpress/i18n';
 
 /**
- * Internal dependencies
- */
-import styles from './style.module.css';
-
-/**
  * @typedef {import('@wordpress/components/build-types/unit-control/types').WPUnitControlUnit} WPUnitControlUnit
  */
 
@@ -69,7 +64,7 @@ export default function WidthHeightTool( {
 	return (
 		<>
 			<ToolsPanelItem
-				className={ styles[ 'single-column' ] }
+				style={ { gridColumn: 'span 1' } }
 				label={ __( 'Width' ) }
 				isShownByDefault={ isShownByDefault }
 				hasValue={ () => width !== '' }
@@ -88,7 +83,7 @@ export default function WidthHeightTool( {
 				/>
 			</ToolsPanelItem>
 			<ToolsPanelItem
-				className={ styles[ 'single-column' ] }
+				style={ { gridColumn: 'span 1' } }
 				label={ __( 'Height' ) }
 				isShownByDefault={ isShownByDefault }
 				hasValue={ () => height !== '' }
