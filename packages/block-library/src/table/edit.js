@@ -78,6 +78,24 @@ const ALIGNMENT_CONTROLS = [
 	},
 ];
 
+const ALIGNMENT_CONTROLS_ALL_COLUMNS = [
+	{
+		icon: alignLeft,
+		title: __( 'Align all columns left' ),
+		align: 'left',
+	},
+	{
+		icon: alignCenter,
+		title: __( 'Align all columns center' ),
+		align: 'center',
+	},
+	{
+		icon: alignRight,
+		title: __( 'Align all columns right' ),
+		align: 'right',
+	},
+];
+
 const cellAriaLabel = {
 	head: __( 'Header cell text' ),
 	body: __( 'Body cell text' ),
@@ -345,6 +363,15 @@ function TableEdit( {
 		);
 	}
 
+	/**
+	 * Align text of all the columns.
+	 *
+	 * @param {string} align The new alignment to apply to the all columns.
+	 */
+	function onChangeAllColumnsAlignment( align ) {
+		setAttributes( { ...attributes, alignAllColumns: align } );
+	}
+
 	useEffect( () => {
 		if ( ! isSingleSelected ) {
 			setSelectedCell();
@@ -426,6 +453,9 @@ function TableEdit( {
 								rowSpan={ rowspan }
 								className={ clsx(
 									{
+										[ `has-text-align-${ attributes.alignAllColumns }` ]:
+											attributes.alignAllColumns &&
+											align === undefined,
 										[ `has-text-align-${ align }` ]: align,
 									},
 									'wp-block-table__cell-content'
@@ -474,6 +504,12 @@ function TableEdit( {
 							icon={ table }
 							label={ __( 'Edit table' ) }
 							controls={ tableControls }
+						/>
+						<AlignmentControl
+							label={ __( 'Change all columns alignment' ) }
+							alignmentControls={ ALIGNMENT_CONTROLS_ALL_COLUMNS }
+							value={ attributes.alignAllColumns }
+							onChange={ onChangeAllColumnsAlignment }
 						/>
 					</BlockControls>
 				</>
