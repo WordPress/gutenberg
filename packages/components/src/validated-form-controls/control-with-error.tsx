@@ -107,7 +107,7 @@ function UnforwardedControlWithError< C extends React.ReactElement >(
 
 		validityTarget?.addEventListener( 'invalid', handler );
 		return () => validityTarget?.removeEventListener( 'invalid', handler );
-	} );
+	}, [ getValidityTarget ] );
 
 	// Handle validity messages.
 	useEffect( () => {
