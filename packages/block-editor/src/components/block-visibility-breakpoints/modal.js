@@ -10,6 +10,7 @@ import {
 	FlexItem,
 	Icon,
 	Modal,
+	Notice,
 } from '@wordpress/components';
 import { desktop, tablet, mobile } from '@wordpress/icons';
 import { useDispatch, useSelect } from '@wordpress/data';
@@ -20,8 +21,21 @@ import { store as blocksStore } from '@wordpress/blocks';
  */
 import { store as blockEditorStore } from '../../store';
 import { cleanEmptyObject } from '../../hooks/utils';
+import { createDefaultBreakpoints, BREAKPOINT_NAMES } from './constants';
 import './style.scss';
 
+/**
+ * Modal component for configuring block visibility across responsive breakpoints.
+ *
+ * Allows users to hide blocks on specific viewport sizes (mobile, tablet, desktop)
+ * or hide them everywhere. When editing multiple blocks, checkboxes only show as
+ * checked if ALL selected blocks share the same setting to avoid ambiguity.
+ *
+ * @param {Object}   props           Component props.
+ * @param {string[]} props.clientIds Array of block client IDs to configure visibility for.
+ * @param {Function} props.onClose   Callback function invoked when the modal is closed.
+ * @return {JSX.Element} The modal component.
+ */
 export default function BlockVisibilityBreakpointsModal( {
 	clientIds,
 	onClose,
@@ -30,12 +44,13 @@ export default function BlockVisibilityBreakpointsModal( {
 		( select ) => {
 			const _blocks =
 				select( blockEditorStore ).getBlocksByClientId( clientIds );
-			const firstBlock = _blocks[ 0 ];
-			const _blockType = firstBlock
-				? select( blocksStore ).getBlockType( firstBlock.name )
-				: null;
+			const firstBlock = _blocks?.[ 0 ];
+			const _blockType =
+				firstBlock && firstBlock.name
+					? select( blocksStore ).getBlockType( firstBlock.name )
+					: null;
 			return {
-				blocks: _blocks,
+				blocks: _blocks || [],
 				blockType: _blockType,
 			};
 		},
@@ -47,7 +62,7 @@ export default function BlockVisibilityBreakpointsModal( {
 	// Get initial breakpoint visibility state from blocks
 	// Only show a value as checked if ALL blocks have that value set
 	const initialBreakpoints = useMemo( () => {
-		const breakpoints = { mobile: false, tablet: false, desktop: false };
+		const breakpoints = createDefaultBreakpoints();
 
 		if ( blocks.length === 0 ) {
 			return breakpoints;
@@ -56,23 +71,29 @@ export default function BlockVisibilityBreakpointsModal( {
 		// Check if all blocks have the same value for each breakpoint
 		const allBlocksHaveMobile = blocks.every(
 			( block ) =>
-				block.attributes.metadata?.blockVisibilityBreakpoints
-					?.mobile === true
+				block &&
+				block.attributes?.metadata?.blockVisibilityBreakpoints?.[
+					BREAKPOINT_NAMES.MOBILE
+				] === true
 		);
 		const allBlocksHaveTablet = blocks.every(
 			( block ) =>
-				block.attributes.metadata?.blockVisibilityBreakpoints
-					?.tablet === true
+				block &&
+				block.attributes?.metadata?.blockVisibilityBreakpoints?.[
+					BREAKPOINT_NAMES.TABLET
+				] === true
 		);
 		const allBlocksHaveDesktop = blocks.every(
 			( block ) =>
-				block.attributes.metadata?.blockVisibilityBreakpoints
-					?.desktop === true
+				block &&
+				block.attributes?.metadata?.blockVisibilityBreakpoints?.[
+					BREAKPOINT_NAMES.DESKTOP
+				] === true
 		);
 
-		breakpoints.mobile = allBlocksHaveMobile;
-		breakpoints.tablet = allBlocksHaveTablet;
-		breakpoints.desktop = allBlocksHaveDesktop;
+		breakpoints[ BREAKPOINT_NAMES.MOBILE ] = allBlocksHaveMobile;
+		breakpoints[ BREAKPOINT_NAMES.TABLET ] = allBlocksHaveTablet;
+		breakpoints[ BREAKPOINT_NAMES.DESKTOP ] = allBlocksHaveDesktop;
 
 		return breakpoints;
 	}, [ blocks ] );
@@ -83,7 +104,8 @@ export default function BlockVisibilityBreakpointsModal( {
 			return false;
 		}
 		return blocks.every(
-			( block ) => block.attributes.metadata?.blockVisibility === false
+			( block ) =>
+				block && block.attributes?.metadata?.blockVisibility === false
 		);
 	}, [ blocks ] );
 
@@ -91,6 +113,7 @@ export default function BlockVisibilityBreakpointsModal( {
 	const [ hideEverywhere, setHideEverywhere ] = useState(
 		initialHideEverywhere
 	);
+	const [ error, setError ] = useState( null );
 
 	useEffect( () => {
 		setBreakpoints( initialBreakpoints );
@@ -103,16 +126,16 @@ export default function BlockVisibilityBreakpointsModal( {
 		if ( newValue ) {
 			// If checking "Hide everywhere", check all breakpoints
 			setBreakpoints( {
-				mobile: true,
-				tablet: true,
-				desktop: true,
+				[ BREAKPOINT_NAMES.MOBILE ]: true,
+				[ BREAKPOINT_NAMES.TABLET ]: true,
+				[ BREAKPOINT_NAMES.DESKTOP ]: true,
 			} );
 		} else {
 			// If unchecking "Hide everywhere", uncheck all breakpoints
 			setBreakpoints( {
-				mobile: false,
-				tablet: false,
-				desktop: false,
+				[ BREAKPOINT_NAMES.MOBILE ]: false,
+				[ BREAKPOINT_NAMES.TABLET ]: false,
+				[ BREAKPOINT_NAMES.DESKTOP ]: false,
 			} );
 		}
 	};
@@ -127,9 +150,9 @@ export default function BlockVisibilityBreakpointsModal( {
 
 		// Check if all breakpoints are now selected
 		const allSelected =
-			newBreakpoints.mobile &&
-			newBreakpoints.tablet &&
-			newBreakpoints.desktop;
+			newBreakpoints[ BREAKPOINT_NAMES.MOBILE ] &&
+			newBreakpoints[ BREAKPOINT_NAMES.TABLET ] &&
+			newBreakpoints[ BREAKPOINT_NAMES.DESKTOP ];
 
 		// If all breakpoints are selected, check "Hide everywhere"
 		// If any breakpoint is unchecked and "Hide everywhere" is checked, uncheck it
@@ -143,33 +166,52 @@ export default function BlockVisibilityBreakpointsModal( {
 	const handleSubmit = ( event ) => {
 		event.preventDefault();
 
-		const attributesByClientId = Object.fromEntries(
-			blocks.map( ( { clientId, attributes } ) => [
-				clientId,
-				{
-					metadata: cleanEmptyObject( {
-						...attributes?.metadata,
-						blockVisibility: hideEverywhere ? false : undefined,
-						blockVisibilityBreakpoints:
-							breakpoints.mobile ||
-							breakpoints.tablet ||
-							breakpoints.desktop
-								? {
-										mobile: breakpoints.mobile || false,
-										tablet: breakpoints.tablet || false,
-										desktop: breakpoints.desktop || false,
-								  }
-								: undefined,
-					} ),
-				},
-			] )
-		);
+		try {
+			const attributesByClientId = Object.fromEntries(
+				blocks
+					.filter( ( block ) => block && block.clientId )
+					.map( ( { clientId, attributes } ) => [
+						clientId,
+						{
+							metadata: cleanEmptyObject( {
+								...attributes?.metadata,
+								blockVisibility: hideEverywhere
+									? false
+									: undefined,
+								blockVisibilityBreakpoints:
+									breakpoints[ BREAKPOINT_NAMES.MOBILE ] ||
+									breakpoints[ BREAKPOINT_NAMES.TABLET ] ||
+									breakpoints[ BREAKPOINT_NAMES.DESKTOP ]
+										? {
+												[ BREAKPOINT_NAMES.MOBILE ]:
+													breakpoints[
+														BREAKPOINT_NAMES.MOBILE
+													] || false,
+												[ BREAKPOINT_NAMES.TABLET ]:
+													breakpoints[
+														BREAKPOINT_NAMES.TABLET
+													] || false,
+												[ BREAKPOINT_NAMES.DESKTOP ]:
+													breakpoints[
+														BREAKPOINT_NAMES.DESKTOP
+													] || false,
+										  }
+										: undefined,
+							} ),
+						},
+					] )
+			);
 
-		updateBlockAttributes( clientIds, attributesByClientId, {
-			uniqueByBlock: true,
-		} );
+			updateBlockAttributes( clientIds, attributesByClientId, {
+				uniqueByBlock: true,
+			} );
 
-		onClose();
+			onClose();
+		} catch ( err ) {
+			setError(
+				__( 'Failed to save visibility settings. Please try again.' )
+			);
+		}
 	};
 
 	const modalTitle = blockType?.title
@@ -188,6 +230,11 @@ export default function BlockVisibilityBreakpointsModal( {
 			size="small"
 		>
 			<form onSubmit={ handleSubmit }>
+				{ error && (
+					<Notice status="error" isDismissible={ false }>
+						{ error }
+					</Notice>
+				) }
 				<p>{ __( 'Select options for hiding the block.' ) }</p>
 				<fieldset className="block-editor-block-visibility-breakpoints-modal__options">
 					<CheckboxControl
@@ -212,9 +259,12 @@ export default function BlockVisibilityBreakpointsModal( {
 									/>
 								</span>
 							}
-							checked={ breakpoints.desktop }
+							checked={ breakpoints[ BREAKPOINT_NAMES.DESKTOP ] }
 							onChange={ ( value ) =>
-								handleBreakpointChange( 'desktop', value )
+								handleBreakpointChange(
+									BREAKPOINT_NAMES.DESKTOP,
+									value
+								)
 							}
 						/>
 						<CheckboxControl
@@ -228,9 +278,12 @@ export default function BlockVisibilityBreakpointsModal( {
 									/>
 								</span>
 							}
-							checked={ breakpoints.tablet }
+							checked={ breakpoints[ BREAKPOINT_NAMES.TABLET ] }
 							onChange={ ( value ) =>
-								handleBreakpointChange( 'tablet', value )
+								handleBreakpointChange(
+									BREAKPOINT_NAMES.TABLET,
+									value
+								)
 							}
 						/>
 						<CheckboxControl
@@ -244,9 +297,12 @@ export default function BlockVisibilityBreakpointsModal( {
 									/>
 								</span>
 							}
-							checked={ breakpoints.mobile }
+							checked={ breakpoints[ BREAKPOINT_NAMES.MOBILE ] }
 							onChange={ ( value ) =>
-								handleBreakpointChange( 'mobile', value )
+								handleBreakpointChange(
+									BREAKPOINT_NAMES.MOBILE,
+									value
+								)
 							}
 						/>
 					</div>

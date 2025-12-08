@@ -701,12 +701,17 @@ export function getInsertionPoint( state ) {
 }
 
 /**
- * Returns true if the block is hidden, or false otherwise.
+ * Returns true if the block has visibility restrictions, or false otherwise.
+ *
+ * A block is considered to have visibility restrictions if it's hidden everywhere
+ * or has any breakpoint-specific visibility settings (mobile, tablet, or desktop).
+ * Note that a block with breakpoint visibility may still be visible in the editor
+ * depending on the current viewport.
  *
  * @param {Object} state    Global application state.
  * @param {string} clientId Client ID of the block.
  *
- * @return {boolean} Whether the block is hidden.
+ * @return {boolean} Whether the block has visibility restrictions.
  */
 export const isBlockHidden = ( state, clientId ) => {
 	const blockName = getBlockName( state, clientId );

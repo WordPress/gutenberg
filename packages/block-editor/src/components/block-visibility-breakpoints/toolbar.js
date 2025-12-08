@@ -12,7 +12,18 @@ import { seen, unseen } from '@wordpress/icons';
  */
 import { store as blockEditorStore } from '../../store';
 import { openBreakpointsModal } from './modal-manager';
+import { hasAnyBreakpointVisibility } from './constants';
 
+/**
+ * Toolbar button component for accessing block visibility breakpoints modal.
+ *
+ * Displays different icons (seen/unseen) based on whether visibility restrictions
+ * are set. Only renders if all selected blocks support the visibility feature.
+ *
+ * @param {Object}   props           Component props.
+ * @param {string[]} props.clientIds Array of block client IDs.
+ * @return {JSX.Element|null} The toolbar button or null if visibility is not supported.
+ */
 export default function BlockVisibilityBreakpointsToolbar( { clientIds } ) {
 	const { blocks, canToggleBlockVisibility } = useSelect(
 		( select ) => {
@@ -21,12 +32,14 @@ export default function BlockVisibilityBreakpointsToolbar( { clientIds } ) {
 			const _blocks = getBlocksByClientId( clientIds );
 			return {
 				blocks: _blocks,
-				canToggleBlockVisibility: _blocks.every( ( { clientId } ) =>
-					hasBlockSupport(
-						getBlockName( clientId ),
-						'visibility',
-						true
-					)
+				canToggleBlockVisibility: _blocks.every(
+					( block ) =>
+						block &&
+						hasBlockSupport(
+							getBlockName( block.clientId ),
+							'visibility',
+							true
+						)
 				),
 			};
 		},
@@ -35,14 +48,15 @@ export default function BlockVisibilityBreakpointsToolbar( { clientIds } ) {
 
 	const hasBreakpointVisibility = blocks.some(
 		( block ) =>
-			block.attributes.metadata?.blockVisibilityBreakpoints &&
-			( block.attributes.metadata.blockVisibilityBreakpoints.mobile ||
-				block.attributes.metadata.blockVisibilityBreakpoints.tablet ||
-				block.attributes.metadata.blockVisibilityBreakpoints.desktop )
+			block &&
+			hasAnyBreakpointVisibility(
+				block.attributes.metadata?.blockVisibilityBreakpoints
+			)
 	);
 
 	const hasHiddenEverywhere = blocks.some(
-		( block ) => block.attributes.metadata?.blockVisibility === false
+		( block ) =>
+			block && block.attributes.metadata?.blockVisibility === false
 	);
 
 	const hasAnyVisibility = hasBreakpointVisibility || hasHiddenEverywhere;
