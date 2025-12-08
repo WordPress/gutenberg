@@ -97,6 +97,14 @@ const transforms = {
 		{
 			type: 'block',
 			blocks: [ 'core/paragraph' ],
+			isMatch: ( { citation }, block ) => {
+				return (
+					! RichText.isEmpty( citation ) ||
+					block.innerBlocks.some(
+						( { name } ) => name === 'core/paragraph'
+					)
+				);
+			},
 			transform: ( { citation }, innerBlocks ) =>
 				RichText.isEmpty( citation )
 					? innerBlocks

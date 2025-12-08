@@ -767,7 +767,7 @@ export const __unstableDeleteSelection =
 				: switchToBlockType( followingBlock, targetBlockType.name );
 
 		// If the block types can not match, do nothing
-		if ( ! blocksWithTheSameType || ! blocksWithTheSameType.length ) {
+		if ( ! blocksWithTheSameType?.length ) {
 			return;
 		}
 
@@ -1318,7 +1318,7 @@ export const mergeBlocks =
 				: switchToBlockType( cloneB, blockA.name );
 
 		// If the block types can not match, do nothing.
-		if ( ! blocksWithTheSameType || ! blocksWithTheSameType.length ) {
+		if ( ! blocksWithTheSameType?.length ) {
 			return;
 		}
 

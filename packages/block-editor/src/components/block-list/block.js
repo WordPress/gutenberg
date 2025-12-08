@@ -311,7 +311,7 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, registry ) => {
 						block,
 						defaultBlockName
 					);
-					if ( replacement && replacement.length ) {
+					if ( replacement?.length ) {
 						replaceBlocks( clientId, replacement );
 					}
 				} else if ( isUnmodifiedDefaultBlock( block ) ) {
@@ -377,8 +377,7 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, registry ) => {
 							);
 
 							if (
-								replacement &&
-								replacement.length &&
+								replacement?.length &&
 								replacement.every( ( block ) =>
 									canInsertBlockType(
 										block.name,

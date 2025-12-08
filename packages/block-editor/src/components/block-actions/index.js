@@ -112,7 +112,7 @@ export default function BlockActions( {
 				groupingBlockName
 			);
 
-			if ( ! newBlocks ) {
+			if ( ! newBlocks?.length ) {
 				return;
 			}
 			replaceBlocks( clientIds, newBlocks );

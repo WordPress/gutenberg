@@ -364,6 +364,11 @@ function ListViewBlock( {
 					blocks,
 					groupingBlockName
 				);
+
+				if ( ! newBlocks?.length ) {
+					return;
+				}
+
 				replaceBlocks( blocksToUpdate, newBlocks );
 				speak( __( 'Selected blocks are grouped.' ) );
 				const newlySelectedBlocks = getSelectedBlockClientIds();

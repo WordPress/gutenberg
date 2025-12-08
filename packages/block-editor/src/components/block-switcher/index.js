@@ -89,6 +89,11 @@ function BlockSwitcherDropdownMenuContents( { onClose, clientIds } ) {
 	// Simple block transformation based on the `Block Transforms` API.
 	function onBlockTransform( name ) {
 		const newBlocks = switchToBlockType( blocks, name );
+
+		if ( ! newBlocks?.length ) {
+			return;
+		}
+
 		replaceBlocks( clientIds, newBlocks );
 		selectForMultipleBlocks( newBlocks );
 	}

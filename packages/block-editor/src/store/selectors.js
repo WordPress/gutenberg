@@ -1144,7 +1144,7 @@ export function __unstableIsSelectionMergeable( state, isForward ) {
 	// merged into the same type of block.
 	const blocksToMerge = switchToBlockType( blockToMerge, targetBlockName );
 
-	return blocksToMerge && blocksToMerge.length;
+	return blocksToMerge?.length;
 }
 
 /**

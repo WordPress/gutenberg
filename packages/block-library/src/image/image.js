@@ -521,10 +521,16 @@ export default function Image( {
 		! isContentOnlyMode;
 
 	function switchToCover() {
-		replaceBlocks(
-			clientId,
-			switchToBlockType( getBlock( clientId ), 'core/cover' )
+		const replacements = switchToBlockType(
+			getBlock( clientId ),
+			'core/cover'
 		);
+
+		if ( ! replacements?.length ) {
+			return;
+		}
+
+		replaceBlocks( clientId, replacements );
 	}
 
 	// TODO: Can allow more units after figuring out how they should interact

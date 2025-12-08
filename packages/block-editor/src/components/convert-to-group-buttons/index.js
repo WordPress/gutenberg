@@ -31,7 +31,7 @@ function ConvertToGroupButton( {
 			blocksSelection,
 			groupingBlockName
 		);
-		if ( newBlocks ) {
+		if ( newBlocks?.length ) {
 			replaceBlocks( clientIds, newBlocks );
 		}
 	};
