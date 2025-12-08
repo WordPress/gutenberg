@@ -95,17 +95,29 @@ function AngleCircle( {
 		<div
 			ref={ angleCircleRef }
 			onMouseDown={ startDrag }
-			className={ clsx( styles[ 'circle-root' ], className ) }
+			className={ clsx(
+				'components-angle-picker-control__angle-circle',
+				styles[ 'circle-root' ],
+				className
+			) }
 			{ ...props }
 		>
 			<div
 				style={
 					value ? { transform: `rotate(${ value }deg)` } : undefined
 				}
-				className={ styles[ 'circle-indicator-wrapper' ] }
+				className={ clsx(
+					'components-angle-picker-control__angle-circle-indicator-wrapper',
+					styles[ 'circle-indicator-wrapper' ]
+				) }
 				tabIndex={ -1 }
 			>
-				<div className={ styles[ 'circle-indicator' ] } />
+				<div
+					className={ clsx(
+						'components-angle-picker-control__angle-circle-indicator',
+						styles[ 'circle-indicator' ]
+					) }
+				/>
 			</div>
 		</div>
 	);
