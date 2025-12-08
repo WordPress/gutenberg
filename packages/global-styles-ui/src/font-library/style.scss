@@ -2,6 +2,8 @@
 @use "@wordpress/base-styles/variables";
 @use "@wordpress/base-styles/colors";
 
+$footer-height: 90px;
+
 .font-library-modal {
 	// @todo If a new prop is added to the Modal component that constrains
 	// the content width, we should use that prop instead of this style.
@@ -18,7 +20,7 @@
 
 	.components-modal__content {
 		padding: 0;
-		margin-bottom: 0 !important;
+		margin-bottom: $footer-height;
 	}
 
 	.font-library__subtitle {
@@ -65,12 +67,16 @@
 }
 
 .font-library__footer {
+	position: absolute;
+	width: 100%;
+	bottom: 0;
 	border-top: 1px solid colors.$gray-300;
 	padding: variables.$grid-unit-30;
 	background-color: colors.$white;
 	box-sizing: border-box;
 	flex-grow: 0 !important;
 	flex-shrink: 0;
+	height: $footer-height;
 }
 
 .font-library__page-selection {

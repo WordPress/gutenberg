@@ -1,1 +1,11 @@
 @use "@wordpress/global-styles-ui/build-style/style.css" as *;
+
+.font-library-page__tab-panel {
+	flex-grow: 1;
+	max-height: calc(100% - 110px); // Subtracting header + tabs
+	overflow: auto;
+
+	.admin-ui-page:has(.font-library__footer) & {
+		max-height: calc(100% - 198px); // Subtracting header + tabs + footer
+	}
+}
