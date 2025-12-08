@@ -20,6 +20,7 @@
 ### Internal
 
 -   `AlignmentMatrixControl`: Migrate styles from Emotion to a CSS module ([#73714](https://github.com/WordPress/gutenberg/pull/73714) and [#73757](https://github.com/WordPress/gutenberg/pull/73757)).
+-   `AnglePickerControl`: Migrate styles from Emotion to a CSS module ([#73786](https://github.com/WordPress/gutenberg/pull/73786)).
 
 ## 30.9.0 (2025-11-26)
 
