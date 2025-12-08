@@ -15,7 +15,7 @@ import {
 	HeadingLevelDropdown,
 } from '@wordpress/block-editor';
 import { __, _n, sprintf } from '@wordpress/i18n';
-import { useEntityProp } from '@wordpress/core-data';
+import { useEntityProp, store as coreStore } from '@wordpress/core-data';
 import {
 	ToggleControl,
 	__experimentalToolsPanel as ToolsPanel,
@@ -62,6 +62,15 @@ export default function Edit( {
 		return getSettings().__experimentalDiscussionSettings;
 	} );
 
+	// Get post type object to access the singular name.
+	const postTypeObject = useSelect(
+		( select ) => {
+			const { getPostType } = select( coreStore );
+			return postType ? getPostType( postType ) : null;
+		},
+		[ postType ]
+	);
+
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
 	useEffect( () => {
@@ -100,7 +109,14 @@ export default function Edit( {
 			.catch( () => {
 				setCommentsCount( 0 );
 			} );
-	}, [ postId ] );
+	}, [
+		commentsPerPage,
+		isSiteEditor,
+		pageComments,
+		postId,
+		threadComments,
+		threadCommentsDepth,
+	] );
 
 	const blockControls = (
 		<BlockControls group="block">
@@ -170,7 +186,18 @@ export default function Edit( {
 		</InspectorControls>
 	);
 
-	const postTitle = isSiteEditor ? __( '“Post Title”' ) : `"${ rawTitle }"`;
+	// Dynamically generate post title based on post type
+	const getPostTypeTitle = () => {
+		if ( isSiteEditor ) {
+			const postTypeName =
+				postTypeObject?.labels?.singular_name || __( 'Post' );
+			/* translators: %s: Post type name. */
+			return sprintf( __( '"%s Title"' ), postTypeName );
+		}
+		return `"${ rawTitle }"`;
+	};
+
+	const postTitle = getPostTypeTitle();
 
 	let placeholder;
 	if ( showCommentsCount && commentsCount !== undefined ) {
