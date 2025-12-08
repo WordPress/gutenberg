@@ -53,6 +53,11 @@
 		cursor: text;
 	}
 
+	.block-editor-block-list__layout {
+		border: none;
+		padding: 0 !important;
+	}
+
 	&.is-editing,
 	&.is-selected {
 		min-width: 20px;
