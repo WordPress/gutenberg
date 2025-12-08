@@ -31,16 +31,6 @@
 	height: $grid-unit-30;
 }
 
-.spacing-sizes-control__custom-select-control,
-.spacing-sizes-control__unit-control {
-	flex: 1;
-}
-
-.spacing-sizes-control__icon,
-.spacing-sizes-control__custom-toggle {
-	flex: 0 0 auto;
-}
-
-.spacing-sizes-control__icon {
+.spacing-sizes-control__wrapper .preset-input-control__icon {
 	margin-left: $grid-unit-05 * -1; // Aligns the icon to the control header.
 }

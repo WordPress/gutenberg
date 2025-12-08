@@ -196,7 +196,7 @@ export default function PresetInputControl( {
 	const renderCustomUnitControl = () => {
 		const unitControl = (
 			<UnitControl
-				className={ `${ className }__unit-control` }
+				className="preset-input-control__unit-control"
 				disableUnits={ isMixed }
 				hideLabelFromVision
 				label={ ariaLabel }
@@ -232,7 +232,7 @@ export default function PresetInputControl( {
 		if ( showTooltip ) {
 			return (
 				<Tooltip text={ ariaLabel } placement="top">
-					<div className={ `${ className }__tooltip-wrapper` }>
+					<div className="preset-input-control__tooltip-wrapper">
 						{ unitControl }
 					</div>
 				</Tooltip>
@@ -243,10 +243,12 @@ export default function PresetInputControl( {
 	};
 
 	return (
-		<HStack className={ `${ className }__wrapper` }>
+		<HStack
+			className={ `preset-input-control__wrapper ${ className }__wrapper` }
+		>
 			{ icon && (
 				<Icon
-					className={ `${ className }__icon` }
+					className="preset-input-control__icon"
 					icon={ icon }
 					size={ ICON_SIZE }
 				/>
@@ -255,7 +257,7 @@ export default function PresetInputControl( {
 				<>
 					{ renderCustomUnitControl() }
 					<RangeControl
-						className={ `${ className }__custom-value-range` }
+						className="preset-input-control__custom-value-range"
 						hideLabelFromVision
 						initialPosition={ 0 }
 						label={ ariaLabel }
@@ -278,7 +280,7 @@ export default function PresetInputControl( {
 				<RangeControl
 					aria-valuenow={ currentValue }
 					aria-valuetext={ presets[ currentValue ]?.name }
-					className={ `${ className }__preset-range` }
+					className="preset-input-control__preset-range"
 					hideLabelFromVision
 					initialPosition={ 0 }
 					label={ ariaLabel }
@@ -310,7 +312,7 @@ export default function PresetInputControl( {
 			) }
 			{ hasPresets && ! showRangeControl && ! showCustomValueControl && (
 				<CustomSelectControl
-					className={ `${ className }__custom-select-control` }
+					className="preset-input-control__custom-select-control"
 					hideLabelFromVision
 					label={ ariaLabel }
 					onBlur={ onMouseOut }
@@ -345,7 +347,7 @@ export default function PresetInputControl( {
 			) }
 			{ hasPresets && ! disableCustomValues && (
 				<Button
-					className={ `${ className }__custom-toggle` }
+					className="preset-input-control__custom-toggle"
 					icon={ settings }
 					iconSize={ ICON_SIZE }
 					isPressed={ showCustomValueControl }
