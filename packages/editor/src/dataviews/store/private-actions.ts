@@ -36,6 +36,15 @@ import {
 	patternTitleField,
 	notesField,
 } from '@wordpress/fields';
+import {
+	altTextField,
+	captionField,
+	descriptionField,
+	filenameField,
+	filesizeField,
+	mediaDimensionsField,
+	mimeTypeField,
+} from '@wordpress/media-fields';
 
 /**
  * Internal dependencies
@@ -48,6 +57,7 @@ import { unlock } from '../../lock-unlock';
 declare global {
 	interface Window {
 		__experimentalTemplateActivate?: boolean;
+		__experimentalMediaEditor?: boolean;
 	}
 }
 
@@ -63,6 +73,34 @@ function hasEditorNotesSupport( supports?: PostType[ 'supports' ] ): boolean {
 		return !! editor[ 0 ]?.notes;
 	}
 	return false;
+}
+
+/**
+ * Get fields for the attachment post type.
+ *
+ * Field order follows a logical grouping:
+ * 1. Metadata fields in panels (date, author, file info)
+ * 2. Core editable fields (title, alt text, caption, description)
+ *
+ * Note: media_thumbnail is not included as it's shown in the canvas preview
+ *
+ * @return Array of field configurations for attachments.
+ */
+function getAttachmentFields() {
+	return [
+		// Metadata in panels (collapsed by default)
+		dateField,
+		authorField,
+		filenameField,
+		mimeTypeField,
+		filesizeField,
+		mediaDimensionsField,
+		// Editable fields (always visible)
+		titleField,
+		altTextField,
+		captionField,
+		descriptionField,
+	].filter( Boolean );
 }
 
 export function registerEntityAction< Item >(
@@ -206,28 +244,35 @@ export const registerPostTypeSchema =
 			permanentlyDeletePost,
 		].filter( Boolean );
 
-		const fields = [
-			postTypeConfig.supports?.thumbnail &&
-				currentTheme?.theme_supports?.[ 'post-thumbnails' ] &&
-				featuredImageField,
-			postTypeConfig.supports?.author && authorField,
-			statusField,
-			! DESIGN_POST_TYPES.includes( postTypeConfig.slug ) && dateField,
-			slugField,
-			postTypeConfig.supports?.[ 'page-attributes' ] && parentField,
-			postTypeConfig.supports?.comments && commentStatusField,
-			postTypeConfig.supports?.trackbacks && pingStatusField,
-			( postTypeConfig.supports?.comments ||
-				postTypeConfig.supports?.trackbacks ) &&
-				discussionField,
-			templateField,
-			passwordField,
-			postTypeConfig.supports?.editor &&
-				postTypeConfig.viewable &&
-				postPreviewField,
-			hasEditorNotesSupport( postTypeConfig.supports ) && notesField,
-		].filter( Boolean );
-		if ( postTypeConfig.supports?.title ) {
+		// Handle attachment post type separately with media-specific fields
+		let fields;
+		if ( postType === 'attachment' && window?.__experimentalMediaEditor ) {
+			fields = getAttachmentFields();
+		} else {
+			fields = [
+				postTypeConfig.supports?.thumbnail &&
+					currentTheme?.theme_supports?.[ 'post-thumbnails' ] &&
+					featuredImageField,
+				postTypeConfig.supports?.author && authorField,
+				statusField,
+				! DESIGN_POST_TYPES.includes( postTypeConfig.slug ) &&
+					dateField,
+				slugField,
+				postTypeConfig.supports?.[ 'page-attributes' ] && parentField,
+				postTypeConfig.supports?.comments && commentStatusField,
+				postTypeConfig.supports?.trackbacks && pingStatusField,
+				( postTypeConfig.supports?.comments ||
+					postTypeConfig.supports?.trackbacks ) &&
+					discussionField,
+				templateField,
+				passwordField,
+				postTypeConfig.supports?.editor &&
+					postTypeConfig.viewable &&
+					postPreviewField,
+				hasEditorNotesSupport( postTypeConfig.supports ) && notesField,
+			].filter( Boolean );
+		}
+		if ( postTypeConfig.supports?.title && postType !== 'attachment' ) {
 			let _titleField;
 			if ( postType === 'page' ) {
 				_titleField = pageTitleField;

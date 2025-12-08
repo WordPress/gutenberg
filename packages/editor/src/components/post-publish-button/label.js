@@ -27,6 +27,7 @@ export default function PublishButtonLabel() {
 		hasNonPostEntityChanges,
 		postStatusHasChanged,
 		postStatus,
+		postType,
 	} = useSelect( ( select ) => {
 		const {
 			isCurrentPostPublished,
@@ -66,6 +67,10 @@ export default function PublishButtonLabel() {
 		return __( 'Saving…' );
 	}
 	if ( ! hasPublishAction ) {
+		// For attachments, always show "Save" since they don't have a publish workflow
+		if ( postType === 'attachment' && window?.__experimentalMediaEditor ) {
+			return __( 'Save' );
+		}
 		// TODO: this is because "Submit for review" string is too long in some languages.
 		// @see https://github.com/WordPress/gutenberg/issues/10475
 		return isSmallerThanMediumViewport

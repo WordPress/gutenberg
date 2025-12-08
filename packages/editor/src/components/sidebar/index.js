@@ -31,6 +31,7 @@ import PostTransformPanel from '../post-transform-panel';
 import SidebarHeader from './header';
 import TemplateContentPanel from '../template-content-panel';
 import TemplatePartContentPanel from '../template-part-content-panel';
+import MediaMetadataPanel from '../media-metadata-panel';
 import useAutoSwitchEditorSidebars from '../provider/use-auto-switch-editor-sidebars';
 import { sidebars } from './constants';
 import { unlock } from '../../lock-unlock';
@@ -59,6 +60,13 @@ const SidebarContent = ( {
 	// need to forward the `Tabs` context so it can be passed through the
 	// underlying slot/fill.
 	const tabsContextValue = useContext( Tabs.Context );
+
+	const isAttachment = useSelect(
+		( select ) =>
+			select( editorStore ).getCurrentPostType() === 'attachment' &&
+			window?.__experimentalMediaEditor,
+		[]
+	);
 
 	// This effect addresses a race condition caused by tabbing from the last
 	// block in the editor into the settings sidebar. Without this effect, the
@@ -111,18 +119,30 @@ const SidebarContent = ( {
 		>
 			<Tabs.Context.Provider value={ tabsContextValue }>
 				<Tabs.TabPanel tabId={ sidebars.document } focusable={ false }>
-					<PostSummary onActionPerformed={ onActionPerformed } />
-					<PluginDocumentSettingPanel.Slot />
-					<TemplateContentPanel />
-					<TemplatePartContentPanel />
-					<PostTransformPanel />
-					<PostTaxonomiesPanel />
-					<PatternOverridesPanel />
-					{ extraPanels }
+					{ isAttachment ? (
+						<MediaMetadataPanel
+							onActionPerformed={ onActionPerformed }
+						/>
+					) : (
+						<>
+							<PostSummary
+								onActionPerformed={ onActionPerformed }
+							/>
+							<PluginDocumentSettingPanel.Slot />
+							<TemplateContentPanel />
+							<TemplatePartContentPanel />
+							<PostTransformPanel />
+							<PostTaxonomiesPanel />
+							<PatternOverridesPanel />
+							{ extraPanels }
+						</>
+					) }
 				</Tabs.TabPanel>
-				<Tabs.TabPanel tabId={ sidebars.block } focusable={ false }>
-					<BlockInspector />
-				</Tabs.TabPanel>
+				{ ! isAttachment && (
+					<Tabs.TabPanel tabId={ sidebars.block } focusable={ false }>
+						<BlockInspector />
+					</Tabs.TabPanel>
+				) }
 			</Tabs.Context.Provider>
 		</PluginSidebar>
 	);

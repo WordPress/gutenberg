@@ -25,6 +25,7 @@ const postTypesWithoutParentTemplate = [
 	TEMPLATE_PART_POST_TYPE,
 	NAVIGATION_POST_TYPE,
 	PATTERN_TYPES.user,
+	...( window?.__experimentalMediaEditor ? [ 'attachment' ] : [] ),
 ];
 
 const authorizedPostTypes = [ 'page', 'post' ];
@@ -45,6 +46,11 @@ function getPostType( name ) {
 		postType = 'page';
 	} else if ( name === 'post-item' || name === 'posts' ) {
 		postType = 'post';
+	} else if (
+		name === 'attachment-item' &&
+		window?.__experimentalMediaEditor
+	) {
+		postType = 'attachment';
 	}
 
 	return postType;

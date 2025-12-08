@@ -35,6 +35,7 @@ function DocumentTools( { className, disableBlockTools = false } ) {
 		inserterSidebarToggleRef,
 		listViewToggleRef,
 		showIconLabels,
+		postType,
 	} = useSelect( ( select ) => {
 		const { get } = select( preferencesStore );
 		const {
@@ -42,6 +43,7 @@ function DocumentTools( { className, disableBlockTools = false } ) {
 			getEditorMode,
 			getInserterSidebarToggleRef,
 			getListViewToggleRef,
+			getCurrentPostType,
 		} = unlock( select( editorStore ) );
 		const { getShortcutRepresentation } = select( keyboardShortcutsStore );
 
@@ -56,6 +58,7 @@ function DocumentTools( { className, disableBlockTools = false } ) {
 			showIconLabels: get( 'core', 'showIconLabels' ),
 			isDistractionFree: get( 'core', 'distractionFree' ),
 			isVisualMode: getEditorMode() === 'visual',
+			postType: getCurrentPostType(),
 		};
 	}, [] );
 
@@ -73,6 +76,12 @@ function DocumentTools( { className, disableBlockTools = false } ) {
 	};
 
 	const isWideViewport = useViewportMatch( 'wide' );
+
+	// Determine if we should show block-related tools.
+	// For attachments, we hide these tools since there are no blocks.
+	// This condition can be easily modified if we want to show these tools for attachments in the future.
+	const shouldShowBlockTools =
+		postType !== 'attachment' || ! window?.__experimentalMediaEditor;
 
 	/* translators: accessibility text for the editor toolbar */
 	const toolbarAriaLabel = __( 'Document tools' );
@@ -109,7 +118,7 @@ function DocumentTools( { className, disableBlockTools = false } ) {
 			variant="unstyled"
 		>
 			<div className="editor-document-tools__left">
-				{ ! isDistractionFree && (
+				{ shouldShowBlockTools && ! isDistractionFree && (
 					<ToolbarButton
 						ref={ inserterSidebarToggleRef }
 						className="editor-document-tools__inserter-toggle"
@@ -124,40 +133,45 @@ function DocumentTools( { className, disableBlockTools = false } ) {
 						aria-expanded={ isInserterOpened }
 					/>
 				) }
-				{ ( isWideViewport || ! showIconLabels ) && (
-					<>
-						<ToolbarItem
-							as={ EditorHistoryUndo }
-							showTooltip={ ! showIconLabels }
-							variant={ showIconLabels ? 'tertiary' : undefined }
-							size="compact"
-						/>
-						<ToolbarItem
-							as={ EditorHistoryRedo }
-							showTooltip={ ! showIconLabels }
-							variant={ showIconLabels ? 'tertiary' : undefined }
-							size="compact"
-						/>
-						{ ! isDistractionFree && (
-							<ToolbarButton
-								className="editor-document-tools__document-overview-toggle"
-								icon={ listView }
-								disabled={ disableBlockTools }
-								isPressed={ isListViewOpen }
-								/* translators: button label text should, if possible, be under 16 characters. */
-								label={ __( 'Document Overview' ) }
-								onClick={ toggleListView }
-								shortcut={ listViewShortcut }
+				{ shouldShowBlockTools &&
+					( isWideViewport || ! showIconLabels ) && (
+						<>
+							<ToolbarItem
+								as={ EditorHistoryUndo }
 								showTooltip={ ! showIconLabels }
 								variant={
 									showIconLabels ? 'tertiary' : undefined
 								}
-								aria-expanded={ isListViewOpen }
-								ref={ listViewToggleRef }
+								size="compact"
 							/>
-						) }
-					</>
-				) }
+							<ToolbarItem
+								as={ EditorHistoryRedo }
+								showTooltip={ ! showIconLabels }
+								variant={
+									showIconLabels ? 'tertiary' : undefined
+								}
+								size="compact"
+							/>
+							{ ! isDistractionFree && (
+								<ToolbarButton
+									className="editor-document-tools__document-overview-toggle"
+									icon={ listView }
+									disabled={ disableBlockTools }
+									isPressed={ isListViewOpen }
+									/* translators: button label text should, if possible, be under 16 characters. */
+									label={ __( 'Document Overview' ) }
+									onClick={ toggleListView }
+									shortcut={ listViewShortcut }
+									showTooltip={ ! showIconLabels }
+									variant={
+										showIconLabels ? 'tertiary' : undefined
+									}
+									aria-expanded={ isListViewOpen }
+									ref={ listViewToggleRef }
+								/>
+							) }
+						</>
+					) }
 			</div>
 		</NavigableToolbar>
 	);
