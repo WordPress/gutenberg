@@ -778,28 +778,31 @@ Should there be any situation where you want to provide your own webpack config,
 
 To extend the provided webpack config, or replace subsections within the provided webpack config, you can provide your own `webpack.config.js` file, `require` the provided `webpack.config.js` file, and use the [`spread` operator](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Spread_syntax) to import all of or part of the provided configuration.
 
-In the example below, a `webpack.config.js` file is added to the root folder extending the provided webpack config to include custom logic to parse module’s source and convert it to a JavaScript object using [`toml`](https://www.npmjs.com/package/toml). It may be useful to import toml or other non-JSON files as JSON, without specific loaders:
+In the example below, a `webpack.config.js` file is added to the root folder to extend the default WordPress webpack configuration and support importing `.mp3` files as bundled assets. It also ensures compatibility with the `--experimental-modules` flag, which causes the base config to return an array of configurations.
 
 ```javascript
-const toml = require( 'toml' );
-const defaultConfig = require( '@wordpress/scripts/config/webpack.config' );
+const wpConfig = require("@wordpress/scripts/config/webpack.config");
 
-module.exports = {
-	...defaultConfig,
-	module: {
-		...defaultConfig.module,
-		rules: [
-			...defaultConfig.module.rules,
-			{
-				test: /.toml/,
-				type: 'json',
-				parser: {
-					parse: toml.parse,
-				},
-			},
-		],
-	},
-};
+// Normalize to array
+const configs = Array.isArray(wpConfig) ? wpConfig : [wpConfig];
+
+// Modify each config (if needed)
+const updatedConfigs = configs.map((config) => ({
+  ...config,
+  module: {
+    ...config.module,
+    rules: [
+      ...(config.module?.rules || []),
+      {
+        test: /\.mp3$/,
+        type: "asset/resource",
+      },
+    ],
+  },
+}));
+
+// Export back in original format
+module.exports = Array.isArray(wpConfig) ? updatedConfigs : updatedConfigs[0];
 ```
 
 If you follow this approach, please, be aware that:
