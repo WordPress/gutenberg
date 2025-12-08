@@ -11,6 +11,7 @@ import { getUpdatedLinkAttributes } from './get-updated-link-attributes';
 import removeAnchorTag from '../utils/remove-anchor-tag';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 import { unlock } from '../lock-unlock';
+import useDeprecatedTextAlign from '../utils/deprecated-text-align-attributes';
 
 /**
  * WordPress dependencies
@@ -194,6 +195,7 @@ function ButtonEdit( props ) {
 		width,
 		metadata,
 	} = attributes;
+	useDeprecatedTextAlign( props );
 
 	const TagName = tagName || 'a';
 
