@@ -27,7 +27,7 @@ const mockSetAttributes = jest.fn();
 const mockOnNavigateToEntityRecord = jest.fn();
 
 const defaultProps = {
-	overlayTemplatePart: undefined,
+	overlay: undefined,
 	setAttributes: mockSetAttributes,
 	onNavigateToEntityRecord: mockOnNavigateToEntityRecord,
 };
@@ -181,7 +181,7 @@ describe( 'OverlayTemplatePartSelector', () => {
 			await user.selectOptions( select, 'twentytwentyfive//my-overlay' );
 
 			expect( mockSetAttributes ).toHaveBeenCalledWith( {
-				overlayTemplatePart: 'twentytwentyfive//my-overlay',
+				overlay: 'twentytwentyfive//my-overlay',
 			} );
 		} );
 
@@ -197,7 +197,7 @@ describe( 'OverlayTemplatePartSelector', () => {
 			render(
 				<OverlayTemplatePartSelector
 					{ ...defaultProps }
-					overlayTemplatePart="twentytwentyfive//my-overlay"
+					overlay="twentytwentyfive//my-overlay"
 				/>
 			);
 
@@ -208,7 +208,7 @@ describe( 'OverlayTemplatePartSelector', () => {
 			await user.selectOptions( select, '' );
 
 			expect( mockSetAttributes ).toHaveBeenCalledWith( {
-				overlayTemplatePart: undefined,
+				overlay: undefined,
 			} );
 		} );
 
@@ -222,7 +222,7 @@ describe( 'OverlayTemplatePartSelector', () => {
 			render(
 				<OverlayTemplatePartSelector
 					{ ...defaultProps }
-					overlayTemplatePart="twentytwentyfive//my-overlay"
+					overlay="twentytwentyfive//my-overlay"
 				/>
 			);
 
@@ -261,7 +261,7 @@ describe( 'OverlayTemplatePartSelector', () => {
 			render(
 				<OverlayTemplatePartSelector
 					{ ...defaultProps }
-					overlayTemplatePart="twentytwentyfive//my-overlay"
+					overlay="twentytwentyfive//my-overlay"
 				/>
 			);
 
@@ -286,7 +286,7 @@ describe( 'OverlayTemplatePartSelector', () => {
 			render(
 				<OverlayTemplatePartSelector
 					{ ...defaultProps }
-					overlayTemplatePart="twentytwentyfive//my-overlay"
+					overlay="twentytwentyfive//my-overlay"
 				/>
 			);
 
@@ -308,7 +308,7 @@ describe( 'OverlayTemplatePartSelector', () => {
 			render(
 				<OverlayTemplatePartSelector
 					{ ...defaultProps }
-					overlayTemplatePart="twentytwentyfive//my-overlay"
+					overlay="twentytwentyfive//my-overlay"
 					onNavigateToEntityRecord={ undefined }
 				/>
 			);
@@ -334,7 +334,7 @@ describe( 'OverlayTemplatePartSelector', () => {
 			render(
 				<OverlayTemplatePartSelector
 					{ ...defaultProps }
-					overlayTemplatePart="twentytwentyfive//my-overlay"
+					overlay="twentytwentyfive//my-overlay"
 				/>
 			);
 
@@ -363,7 +363,7 @@ describe( 'OverlayTemplatePartSelector', () => {
 			render(
 				<OverlayTemplatePartSelector
 					{ ...defaultProps }
-					overlayTemplatePart="twentytwentyfive//my-overlay"
+					overlay="twentytwentyfive//my-overlay"
 					onNavigateToEntityRecord={ undefined }
 				/>
 			);
@@ -426,7 +426,7 @@ describe( 'OverlayTemplatePartSelector', () => {
 			render(
 				<OverlayTemplatePartSelector
 					{ ...defaultProps }
-					overlayTemplatePart="twentytwentyfive//my-overlay"
+					overlay="twentytwentyfive//my-overlay"
 				/>
 			);
 

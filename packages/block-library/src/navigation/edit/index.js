@@ -261,7 +261,7 @@ function Navigation( {
 	const {
 		openSubmenusOnClick,
 		overlayMenu,
-		overlayTemplatePart,
+		overlay,
 		showSubmenuIcon,
 		templateLock,
 		layout: {
@@ -287,7 +287,6 @@ function Navigation( {
 
 	const blockEditingMode = useBlockEditingMode();
 
-	// Get onNavigateToEntityRecord from block editor settings
 	const { onNavigateToEntityRecord } = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
 		const settings = getSettings();
@@ -296,8 +295,6 @@ function Navigation( {
 		};
 	}, [] );
 
-	// Check if the customizable navigation overlays experiment is enabled
-	// The experiment sets window.__experimentalNavigationOverlays = true
 	const isOverlayExperimentEnabled =
 		typeof window !== 'undefined' &&
 		window.__experimentalNavigationOverlays === true;
@@ -794,7 +791,7 @@ function Navigation( {
 				<InspectorControls>
 					<OverlayPanel
 						overlayMenu={ overlayMenu }
-						overlayTemplatePart={ overlayTemplatePart }
+						overlay={ overlay }
 						setAttributes={ setAttributes }
 						onNavigateToEntityRecord={ onNavigateToEntityRecord }
 						overlayMenuPreview={ overlayMenuPreview }
@@ -872,7 +869,7 @@ function Navigation( {
 					isHiddenByDefault={ isHiddenByDefault }
 					overlayBackgroundColor={ overlayBackgroundColor }
 					overlayTextColor={ overlayTextColor }
-					overlayTemplatePart={ overlayTemplatePart }
+					overlay={ overlay }
 					onNavigateToEntityRecord={ onNavigateToEntityRecord }
 				>
 					<UnsavedInnerBlocks
@@ -1036,7 +1033,7 @@ function Navigation( {
 									overlayBackgroundColor
 								}
 								overlayTextColor={ overlayTextColor }
-								overlayTemplatePart={ overlayTemplatePart }
+								overlay={ overlay }
 								onNavigateToEntityRecord={
 									onNavigateToEntityRecord
 								}

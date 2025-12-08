@@ -19,7 +19,7 @@ import OverlayMenuPreviewButton from './overlay-menu-preview-button';
  *
  * @param {Object}   props                           Component props.
  * @param {string}   props.overlayMenu               Overlay menu setting ('never', 'mobile', 'always').
- * @param {string}   props.overlayTemplatePart       Currently selected overlay template part ID.
+ * @param {string}   props.overlay                   Currently selected overlay template part ID.
  * @param {Function} props.setAttributes             Function to update block attributes.
  * @param {Function} props.onNavigateToEntityRecord  Function to navigate to template part editor.
  * @param {boolean}  props.overlayMenuPreview        Whether overlay menu preview is open.
@@ -33,7 +33,7 @@ import OverlayMenuPreviewButton from './overlay-menu-preview-button';
  */
 export default function OverlayPanel( {
 	overlayMenu,
-	overlayTemplatePart,
+	overlay,
 	setAttributes,
 	onNavigateToEntityRecord,
 	overlayMenuPreview,
@@ -67,7 +67,7 @@ export default function OverlayPanel( {
 
 				{ overlayMenu !== 'never' && (
 					<OverlayTemplatePartSelector
-						overlayTemplatePart={ overlayTemplatePart }
+						overlay={ overlay }
 						setAttributes={ setAttributes }
 						onNavigateToEntityRecord={ onNavigateToEntityRecord }
 					/>

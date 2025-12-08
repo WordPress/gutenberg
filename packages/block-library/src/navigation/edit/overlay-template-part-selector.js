@@ -38,13 +38,13 @@ function parseTemplatePartId( templatePartId ) {
  * Overlay Template Part Selector component.
  *
  * @param {Object}   props                          Component props.
- * @param {string}   props.overlayTemplatePart      Currently selected overlay template part ID.
+ * @param {string}   props.overlay                  Currently selected overlay template part ID.
  * @param {Function} props.setAttributes            Function to update block attributes.
  * @param {Function} props.onNavigateToEntityRecord Function to navigate to template part editor.
  * @return {JSX.Element} The overlay template part selector component.
  */
 export default function OverlayTemplatePartSelector( {
-	overlayTemplatePart,
+	overlay,
 	setAttributes,
 	onNavigateToEntityRecord,
 } ) {
@@ -101,35 +101,35 @@ export default function OverlayTemplatePartSelector( {
 
 	// Parse selected template part for navigation
 	const parsedTemplatePart = useMemo( () => {
-		return parseTemplatePartId( overlayTemplatePart );
-	}, [ overlayTemplatePart ] );
+		return parseTemplatePartId( overlay );
+	}, [ overlay ] );
 
 	const handleSelectChange = ( value ) => {
 		setAttributes( {
-			overlayTemplatePart: value || undefined,
+			overlay: value || undefined,
 		} );
 	};
 
 	const handleEditClick = () => {
-		if ( ! overlayTemplatePart || ! onNavigateToEntityRecord ) {
+		if ( ! overlay || ! onNavigateToEntityRecord ) {
 			return;
 		}
 
 		onNavigateToEntityRecord( {
-			postId: overlayTemplatePart,
+			postId: overlay,
 			postType: 'wp_template_part',
 		} );
 	};
 
 	const isEditButtonDisabled =
-		! overlayTemplatePart ||
+		! overlay ||
 		! parsedTemplatePart ||
 		! onNavigateToEntityRecord ||
 		isResolving;
 
 	if ( isResolving && ! hasResolved ) {
 		return (
-			<div>
+			<div className="wp-block-navigation__overlay-selector">
 				<Spinner />
 				<p>{ __( 'Loading overlays…' ) }</p>
 			</div>
@@ -137,12 +137,12 @@ export default function OverlayTemplatePartSelector( {
 	}
 
 	return (
-		<div className="wp-block-navigation__overlay-template-part-selector">
+		<div className="wp-block-navigation__overlay-selector">
 			<SelectControl
 				__next40pxDefaultSize
 				__nextHasNoMarginBottom
 				label={ __( 'Overlay template' ) }
-				value={ overlayTemplatePart || '' }
+				value={ overlay || '' }
 				options={ options }
 				onChange={ handleSelectChange }
 				disabled={ isResolving }
@@ -153,7 +153,7 @@ export default function OverlayTemplatePartSelector( {
 						: __( 'Select an overlay to use for the navigation.' )
 				}
 			/>
-			{ overlayTemplatePart && (
+			{ overlay && (
 				<Button
 					__next40pxDefaultSize
 					variant="secondary"
@@ -165,7 +165,7 @@ export default function OverlayTemplatePartSelector( {
 							? sprintf(
 									/* translators: %s: Overlay title or slug. */
 									__( 'Edit overlay: %s' ),
-									overlayTemplatePart
+									overlay
 							  )
 							: __( 'Edit overlay' )
 					}

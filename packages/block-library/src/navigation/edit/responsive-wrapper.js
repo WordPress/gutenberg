@@ -27,7 +27,7 @@ export default function ResponsiveWrapper( {
 	overlayTextColor,
 	hasIcon,
 	icon,
-	overlayTemplatePart,
+	overlay,
 	onNavigateToEntityRecord,
 } ) {
 	if ( ! isResponsive ) {
@@ -79,9 +79,9 @@ export default function ResponsiveWrapper( {
 
 	const handleToggleClick = () => {
 		// If an overlay template part is selected, navigate to it instead of toggling
-		if ( overlayTemplatePart && onNavigateToEntityRecord ) {
+		if ( overlay && onNavigateToEntityRecord ) {
 			onNavigateToEntityRecord( {
-				postId: overlayTemplatePart,
+				postId: overlay,
 				postType: 'wp_template_part',
 			} );
 			return;

@@ -54,7 +54,7 @@
 			"type": "string",
 			"default": "mobile"
 		},
-		"overlayTemplatePart": {
+		"overlay": {
 			"type": "string"
 		},
 		"icon": {
