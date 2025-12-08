@@ -34,7 +34,7 @@ function ScreenRoot() {
 
 	return (
 		<Card
-			size="small"
+			size="none"
 			isBorderless
 			className="global-styles-ui-screen-root"
 			isRounded={ false }
