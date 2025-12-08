@@ -22,7 +22,7 @@
  * @return string The content of the block being rendered.
  */
 function block_core_heading_render( $attributes, $content ) {
-	if ( ! $content ) {
+	if ( ! $content || '' === trim( strip_tags( $content ) ) ) {
 		return $content;
 	}
 
