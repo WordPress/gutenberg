@@ -23,6 +23,7 @@ import { isShallowEqualObjects } from '@wordpress/is-shallow-equal';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { keyboardReturn, linkOff } from '@wordpress/icons';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -34,8 +35,7 @@ import LinkSettings from './settings';
 import useCreatePage from './use-create-page';
 import useInternalValue from './use-internal-value';
 import { ViewerFill } from './viewer-slot';
-import { DEFAULT_LINK_SETTINGS } from './constants';
-import deprecated from '@wordpress/deprecated';
+import { DEFAULT_LINK_SETTINGS, LINK_ENTRY_TYPES } from './constants';
 
 /**
  * Default properties associated with a link control value.
@@ -207,8 +207,16 @@ function LinkControl( {
 		createSetInternalSettingValueHandler,
 	] = useInternalValue( value );
 
+	// Helper to check if a link value has a custom URL type (not an entity type)
+	const isCustomURLType = ( linkValue ) =>
+		LINK_ENTRY_TYPES.includes( linkValue?.type );
+
 	// Compute isEntity internally based on handleEntities prop and presence of ID
-	const isEntity = handleEntities && !! internalControlValue?.id;
+	// Exclude custom URLs which have id but type is 'link', 'mailto', 'tel', or 'internal'
+	const isEntity =
+		handleEntities &&
+		!! internalControlValue?.id &&
+		! isCustomURLType( internalControlValue );
 
 	// Generate help text ID for accessibility association
 	const baseId = useInstanceId( LinkControl, 'link-control' );
@@ -292,9 +300,9 @@ function LinkControl( {
 			{}
 		);
 
-		// When selecting a custom URL (no id and no kind), explicitly clear
-		// entity metadata (type/kind) to avoid preserving them from previous links
-		const isCustomLink = ! updatedValue?.id && ! updatedValue?.kind;
+		// When selecting a custom URL (not an entity), explicitly clear
+		// entity metadata (type/kind) to avoid preserving them from previous links.
+		const isCustomLink = isCustomURLType( updatedValue );
 
 		onChange( {
 			...internalControlValue,

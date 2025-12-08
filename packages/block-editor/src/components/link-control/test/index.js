@@ -2812,6 +2812,92 @@ describe( 'Entity handling', () => {
 		);
 	} );
 
+	it( 'should clear entity metadata (type/kind) when changing from page link to custom link via suggestion', async () => {
+		const user = userEvent.setup();
+
+		// Start with an entity link that has type and kind
+		const pageLink = {
+			id: 123,
+			url: 'https://example.com/page',
+			title: 'Test Page',
+			type: 'page',
+			kind: 'post-type',
+		};
+
+		const onChange = jest.fn();
+
+		// Mock search suggestions to return a custom URL
+		// URL suggestions have an id and type but no 'kind' (which indicates entity metadata)
+		mockFetchSearchSuggestions.mockImplementation( ( searchTerm ) => {
+			const suggestions = [
+				{
+					id: uniqueId(),
+					title: searchTerm,
+					url: searchTerm,
+					type: 'URL', // URL suggestions use uppercase 'URL'
+					// Importantly: no 'kind' property (entities have kind)
+				},
+			];
+			return Promise.resolve( suggestions );
+		} );
+
+		render(
+			<LinkControl
+				value={ pageLink }
+				handleEntities
+				forceIsEditingLink
+				onChange={ onChange }
+			/>
+		);
+
+		const searchInput = screen.getByRole( 'combobox', {
+			name: 'Search or type URL',
+		} );
+
+		// Initially should be disabled because it's an entity
+		expect( searchInput ).toBeDisabled();
+
+		// Click the unsync button to enable editing
+		const unlinkButton = screen.getByRole( 'button', {
+			name: 'Unsync and edit',
+		} );
+		await user.click( unlinkButton );
+
+		// Input should now be enabled and value should be cleared
+		expect( searchInput ).toBeEnabled();
+		expect( searchInput ).toHaveValue( '' );
+
+		// Type a custom URL
+		await user.type( searchInput, 'https://custom-url.com' );
+
+		// Wait for suggestions to appear
+		const suggestionsList = await screen.findByRole( 'listbox' );
+		expect( suggestionsList ).toBeVisible();
+
+		// Select the custom URL suggestion (not clicking Apply button)
+		const urlSuggestion = screen.getByRole( 'option', {
+			name: /https:\/\/custom-url\.com/,
+		} );
+		await user.click( urlSuggestion );
+
+		// Verify that onChange was called with type and kind explicitly set to undefined
+		// This is the critical fix - when selecting a custom URL suggestion after unlinking,
+		// entity metadata (type/kind) should be cleared (not just when using the Apply button)
+		// Note: id remains as the URL for custom links (this is historical behavior)
+		expect( onChange ).toHaveBeenCalledWith(
+			expect.objectContaining( {
+				url: 'https://custom-url.com',
+				type: undefined,
+				kind: undefined,
+			} )
+		);
+
+		// Verify id is set to the URL (custom links use URL as id)
+		const lastCall =
+			onChange.mock.calls[ onChange.mock.calls.length - 1 ][ 0 ];
+		expect( lastCall.id ).toBe( 'https://custom-url.com' );
+	} );
+
 	describe( 'Accessibility association for entity links', () => {
 		it( 'should associate unlink button with help text via aria-describedby', () => {
 			const entityLink = {
