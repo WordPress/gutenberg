@@ -221,12 +221,16 @@
  * Styles that are reused verbatim in a few places
  */
 
-// These are additional styles for all captions, when the theme opts in to block styles.
+// This style for captions is used in a few blocks and only loaded in style.scss,
+// which is loaded in the editor and in the theme.
 @mixin caption-style() {
 	margin-top: 0.5em;
 	margin-bottom: 1em;
 }
 
+// This style for captions is used in a few blocks and only loaded in theme.scss,
+// which is loaded in the editor and in the theme if the theme opts in to them by
+// adding theme support for 'wp-block-styles'. Not used for block themes.
 @mixin caption-style-theme() {
 	color: #555;
 	font-size: variables.$default-font-size;
@@ -282,6 +286,10 @@
 		@include input-style__focus($accent-color);
 	}
 
+	@include input-placeholder-color;
+}
+
+@mixin input-placeholder-color {
 	// Use opacity to work in various editor styles.
 	&::-webkit-input-placeholder {
 		color: colors.$dark-gray-placeholder;

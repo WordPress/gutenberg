@@ -140,10 +140,13 @@ export default function PostExcerptEditor( {
 			</div>
 		);
 	}
+
 	const readMoreLink = (
 		<RichText
 			identifier="moreText"
-			className="wp-block-post-excerpt__more-link"
+			className={ clsx( 'wp-block-post-excerpt__more-link', {
+				'is-placeholder-text': ! moreText,
+			} ) }
 			tagName="a"
 			aria-label={ __( '“Read more” link text' ) }
 			placeholder={ __( 'Add "read more" link text' ) }

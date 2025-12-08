@@ -7,21 +7,21 @@
 
 	[data-rich-text-placeholder]::after {
 		content: attr(data-rich-text-placeholder);
-		// Use opacity to work in various editor styles.
-		// We don't specify the color here, because blocks or editor styles might provide their own.
-		opacity: 0.62;
+		// The RichText placeholder is the equivalent of the HTML placeholder
+		// attribute. As such, its color should have a sufficient contrast ratio
+		// with the background. However, themes, blocks or editor styles might
+		// provide their own color for the text of the block where RichText is
+		// used. For this reason, the RichText placeholder color should resemble
+		// the text color. We assume the block text color is responsible for
+		// providing sufficient contrast and slightly dim the placeholder color.
+		color: currentColor;
+		opacity: 85%;
 	}
 
 	&:focus {
 		// Removes outline added by the browser.
 		outline: none;
 	}
-}
-
-// Captions may have lighter (gray) text, or be shown on a range of different background luminosites.
-// To ensure legibility, we increase the default placeholder opacity to ensure contrast.
-figcaption.block-editor-rich-text__editable [data-rich-text-placeholder]::before {
-	opacity: 0.8;
 }
 
 [data-rich-text-script] {

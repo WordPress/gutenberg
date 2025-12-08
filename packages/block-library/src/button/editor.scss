@@ -23,11 +23,6 @@
 		outline: 2px solid transparent;
 		outline-offset: -2px;
 	}
-
-	// Increase placeholder opacity to meet contrast ratios.
-	&[data-rich-text-placeholder]::after {
-		opacity: 0.8;
-	}
 }
 
 // Display "table" is used because the button container should only wrap the content and not takes the full width.

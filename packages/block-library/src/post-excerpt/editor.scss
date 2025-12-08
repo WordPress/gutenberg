@@ -2,4 +2,8 @@
 	.wp-block-post-excerpt__excerpt.is-inline {
 		display: inline;
 	}
+
+	.wp-block-post-excerpt__more-link.is-placeholder-text {
+		text-decoration: none;
+	}
 }
