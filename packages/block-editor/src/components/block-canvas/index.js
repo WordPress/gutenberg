@@ -32,7 +32,7 @@ export function ExperimentalBlockCanvas( {
 	children = <BlockList />,
 	styles,
 	contentRef: contentRefProp,
-	iframeProps,
+	iframeProps = {},
 } ) {
 	useBlockCommands();
 	const isTabletViewport = useViewportMatch( 'medium', '<' );
@@ -40,6 +40,8 @@ export function ExperimentalBlockCanvas( {
 	const clearerRef = useBlockSelectionClearer();
 	const localRef = useRef();
 	const contentRef = useMergeRefs( [ contentRefProp, clearerRef, localRef ] );
+	const { ref: iframeRefProp, ...restIframeProps } = iframeProps;
+	const iframeRef = useMergeRefs( [ iframeRefProp, resetTypingRef ] );
 	const zoomLevel = useSelect(
 		( select ) => unlock( select( blockEditorStore ) ).getZoomLevel(),
 		[]
@@ -84,9 +86,9 @@ export function ExperimentalBlockCanvas( {
 			style={ { height, display: 'flex' } }
 		>
 			<Iframe
-				{ ...iframeProps }
+				{ ...restIframeProps }
 				{ ...zoomOutIframeProps }
-				ref={ resetTypingRef }
+				ref={ iframeRef }
 				contentRef={ contentRef }
 				style={ {
 					...iframeProps?.style,

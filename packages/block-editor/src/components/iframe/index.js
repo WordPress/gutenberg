@@ -99,7 +99,7 @@ function useBubbleEvents( iframeDocument ) {
 function Iframe( {
 	contentRef,
 	children,
-	tabIndex = 0,
+	tabIndex,
 	scale = 1,
 	frameSize = 0,
 	readonly,
@@ -119,8 +119,6 @@ function Iframe( {
 	/** @type {[Document, import('react').Dispatch<Document>]} */
 	const [ iframeDocument, setIframeDocument ] = useState();
 	const [ bodyClasses, setBodyClasses ] = useState( [] );
-	const clearerRef = useBlockSelectionClearer();
-	const [ before, writingFlowRef, after ] = useWritingFlow();
 
 	const setRef = useRefEffect( ( node ) => {
 		node._load = () => {
@@ -189,13 +187,11 @@ function Iframe( {
 					compatStyle.cloneNode( true )
 				);
 
-				if ( ! isPreviewMode ) {
-					// eslint-disable-next-line no-console
-					console.warn(
-						`${ compatStyle.id } was added to the iframe incorrectly. Please use block.json or enqueue_block_assets to add styles to the iframe.`,
-						compatStyle
-					);
-				}
+				// eslint-disable-next-line no-console
+				console.warn(
+					`${ compatStyle.id } was added to the iframe incorrectly. Please use block.json or enqueue_block_assets to add styles to the iframe.`,
+					compatStyle
+				);
 			}
 
 			iFrameDocument.addEventListener(
@@ -239,15 +235,6 @@ function Iframe( {
 		iframeDocument,
 	} );
 
-	const disabledRef = useDisabled( { isDisabled: ! readonly } );
-	const bodyRef = useMergeRefs( [
-		useBubbleEvents( iframeDocument ),
-		contentRef,
-		clearerRef,
-		writingFlowRef,
-		disabledRef,
-	] );
-
 	// Correct doctype is required to enable rendering in standards
 	// mode. Also preload the styles to avoid a flash of unstyled
 	// content.
@@ -287,13 +274,24 @@ function Iframe( {
 
 	useEffect( () => cleanup, [ cleanup ] );
 
-	// Make sure to not render the before and after focusable div elements in view
-	// mode. They're only needed to capture focus in edit mode.
-	const shouldRenderFocusCaptureElements = tabIndex >= 0 && ! isPreviewMode;
+	const clearerRef = useBlockSelectionClearer();
+	const [ before, writingFlowRef, after ] = useWritingFlow();
+	const bubbleEventsRef = useBubbleEvents( iframeDocument );
+	// Some refs are only needed if editing is enabled.
+	const isEditable = ! ( isPreviewMode || readonly );
+	const bodyRef = useMergeRefs( [
+		contentRef,
+		useDisabled( { isDisabled: ! readonly } ),
+		isEditable ? bubbleEventsRef : null,
+		isEditable ? clearerRef : null,
+		isEditable ? writingFlowRef : null,
+	] );
+	// The before and after elements are only needed if editable.
+	const [ usedBefore, usedAfter ] = isEditable ? [ before, after ] : [];
 
 	const iframe = (
 		<>
-			{ shouldRenderFocusCaptureElements && before }
+			{ usedBefore }
 			{ /* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */ }
 			<iframe
 				{ ...props }
@@ -358,7 +356,7 @@ function Iframe( {
 						iframeDocument.documentElement
 					) }
 			</iframe>
-			{ shouldRenderFocusCaptureElements && after }
+			{ usedAfter }
 		</>
 	);
 

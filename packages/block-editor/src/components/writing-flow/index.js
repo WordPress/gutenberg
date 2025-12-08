@@ -67,6 +67,13 @@ export function useWritingFlow() {
 				},
 				[ hasMultiSelection ]
 			),
+			useRefEffect(
+				( node ) => () => {
+					node.removeAttribute( 'tabindex' );
+					node.removeAttribute( 'contenteditable' );
+				},
+				[]
+			),
 		] ),
 		after,
 	];

@@ -1,14 +1,9 @@
 /**
- * External dependencies
- */
-import clsx from 'clsx';
-
-/**
  * WordPress dependencies
  */
+import { useRefEffect } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 import { ENTER, SPACE } from '@wordpress/keycodes';
-import { useState, useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { store as editorStore } from '@wordpress/editor';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
@@ -31,13 +26,25 @@ export default function useEditorIframeProps() {
 			'trash'
 		);
 	}, [] );
-	const [ isFocused, setIsFocused ] = useState( false );
 
-	useEffect( () => {
-		if ( canvas === 'edit' ) {
-			setIsFocused( false );
-		}
-	}, [ canvas ] );
+	const isEdit = canvas === 'edit';
+
+	const effectFocus = useRefEffect(
+		( node ) => {
+			const toggleClass = ( { type } ) =>
+				node.classList.toggle( 'is-focused', type === 'focus' );
+			node.contentWindow.addEventListener( 'focus', toggleClass );
+			node.contentWindow.addEventListener( 'blur', toggleClass );
+			return () => {
+				node.contentWindow.removeEventListener( 'focus', toggleClass );
+				node.contentWindow.removeEventListener( 'blur', toggleClass );
+				if ( ! isEdit ) {
+					node.classList.remove( 'is-focused' );
+				}
+			};
+		},
+		[ isEdit ]
+	);
 
 	// In view mode, make the canvas iframe be perceived and behave as a button
 	// to switch to edit mode, with a meaningful label and no title attribute.
@@ -46,9 +53,6 @@ export default function useEditorIframeProps() {
 		'aria-disabled': currentPostIsTrashed,
 		title: null,
 		role: 'button',
-		tabIndex: 0,
-		onFocus: () => setIsFocused( true ),
-		onBlur: () => setIsFocused( false ),
 		onKeyDown: ( event ) => {
 			const { keyCode } = event;
 			if (
@@ -71,13 +75,12 @@ export default function useEditorIframeProps() {
 				event.stopPropagation();
 			}
 		},
+		ref: effectFocus,
 		readonly: true,
 	};
 
 	return {
-		className: clsx( 'edit-site-visual-editor__editor-canvas', {
-			'is-focused': isFocused && canvas === 'view',
-		} ),
+		className: 'edit-site-visual-editor__editor-canvas',
 		...( canvas === 'view' ? viewModeIframeProps : {} ),
 	};
 }
