@@ -4,7 +4,7 @@
 
 // Fixed height for the modal footer.
 // Ensures that the footer is always visible when the modal content is scrollable.
-$footer-height: 70px;
+$footer-height: 60px;
 
 .font-library-modal {
 	// @todo If a new prop is added to the Modal component that constrains
@@ -22,7 +22,7 @@ $footer-height: 70px;
 
 	.components-modal__content {
 		padding-top: 0;
-		margin-bottom: $footer-height;
+		margin-bottom: $footer-height !important;
 	}
 
 	.font-library-modal__subtitle {
@@ -38,7 +38,7 @@ $footer-height: 70px;
 }
 
 .font-library-modal__tabpanel-layout {
-	margin-top: variables.$grid-unit-40;
+	margin-top: variables.$grid-unit-30;
 
 	.font-library-modal__loading {
 		width: 100%;
@@ -59,10 +59,10 @@ $footer-height: 70px;
 
 .font-library-modal__footer {
 	border-top: 1px solid colors.$gray-300;
-	margin: 0 #{variables.$grid-unit-40 * -1} #{variables.$grid-unit-40 * -1};
-	padding: variables.$grid-unit-20 variables.$grid-unit-40;
+	margin: 0 #{variables.$grid-unit-30 * -1} #{variables.$grid-unit-30 * -1};
+	padding: variables.$grid-unit-20 variables.$grid-unit-30;
 	position: absolute;
-	bottom: variables.$grid-unit-40;
+	bottom: variables.$grid-unit-30;
 	width: 100%;
 	height: $footer-height;
 	background-color: colors.$white;
@@ -148,7 +148,7 @@ $footer-height: 70px;
 	top: 0;
 	border-bottom: 1px solid colors.$gray-300;
 	background: colors.$white;
-	margin: 0 #{variables.$grid-unit-40 * -1};
+	margin: 0 #{variables.$grid-unit-30 * -1};
 	padding: 0 variables.$grid-unit-20;
 	z-index: 1;
 
