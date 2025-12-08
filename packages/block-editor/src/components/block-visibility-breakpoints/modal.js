@@ -231,7 +231,7 @@ export default function BlockVisibilityBreakpointsModal( {
 						__nextHasNoMarginBottom
 						label={
 							<span className="block-editor-block-visibility-breakpoints-modal__hide-everywhere">
-								{ __( 'Hide everywhere' ) }
+								{ __( 'Hide from published document' ) }
 							</span>
 						}
 						checked={ hideEverywhere }
