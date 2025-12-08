@@ -27,14 +27,9 @@ function NavigationViewButton( { attributes } ) {
 	const { kind, id, type } = attributes;
 	const blockEditingMode = useBlockEditingMode();
 
-	const { onNavigateToEntityRecord, selectedBlockClientId } = useSelect(
-		( select ) => ( {
-			onNavigateToEntityRecord:
-				select( blockEditorStore ).getSettings()
-					.onNavigateToEntityRecord,
-			selectedBlockClientId:
-				select( blockEditorStore ).getSelectedBlockClientId(),
-		} ),
+	const onNavigateToEntityRecord = useSelect(
+		( select ) =>
+			select( blockEditorStore ).getSettings().onNavigateToEntityRecord,
 		[]
 	);
 
@@ -48,10 +43,9 @@ function NavigationViewButton( { attributes } ) {
 			onNavigateToEntityRecord( {
 				postId: id,
 				postType: type,
-				selectedBlockClientId,
 			} );
 		}
-	}, [ kind, id, type, onNavigateToEntityRecord, selectedBlockClientId ] );
+	}, [ kind, id, type, onNavigateToEntityRecord ] );
 
 	// Only show for page-type links, when navigation is available, and when in contentOnly mode.
 	if (

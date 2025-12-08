@@ -258,6 +258,27 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		[ saveEntityRecord, userCanCreatePages ]
 	);
 
+	const { getSelectedBlockClientId } = useSelect( blockEditorStore );
+
+	/**
+	 * Wraps onNavigateToEntityRecord to automatically include the currently selected block.
+	 * This ensures that navigation can restore the selection when returning to the previous entity.
+	 */
+	const wrappedOnNavigateToEntityRecord = useCallback(
+		( params ) => {
+			if ( ! settings.onNavigateToEntityRecord ) {
+				return;
+			}
+			const selectedBlockClientId = getSelectedBlockClientId();
+
+			return settings.onNavigateToEntityRecord( {
+				...params,
+				selectedBlockClientId,
+			} );
+		},
+		[ settings, getSelectedBlockClientId ]
+	);
+
 	const allowedBlockTypes = useMemo( () => {
 		// Omit hidden block types if exists and non-empty.
 		if ( hiddenBlockTypes && hiddenBlockTypes.length > 0 ) {
@@ -282,9 +303,12 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 	return useMemo( () => {
 		const blockEditorSettings = {
 			...Object.fromEntries(
-				Object.entries( settings ).filter( ( [ key ] ) =>
-					BLOCK_EDITOR_SETTINGS.includes( key )
-				)
+				Object.entries( settings )
+					.filter( ( [ key ] ) =>
+						BLOCK_EDITOR_SETTINGS.includes( key )
+					)
+					// Exclude onNavigateToEntityRecord since we're wrapping it
+					.filter( ( [ key ] ) => key !== 'onNavigateToEntityRecord' )
 			),
 			[ globalStylesDataKey ]: globalStylesData,
 			[ globalStylesLinksDataKey ]: globalStylesLinksData,
@@ -294,6 +318,9 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 			hasFixedToolbar,
 			isDistractionFree,
 			keepCaretInsideBlock,
+			onNavigateToEntityRecord: settings.onNavigateToEntityRecord
+				? wrappedOnNavigateToEntityRecord
+				: undefined,
 			[ getMediaSelectKey ]: ( select, attachmentId ) => {
 				return select( coreStore ).getEntityRecord(
 					'postType',
@@ -377,6 +404,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		globalStylesLinksData,
 		renderingMode,
 		editMediaEntity,
+		wrappedOnNavigateToEntityRecord,
 	] );
 }
 
