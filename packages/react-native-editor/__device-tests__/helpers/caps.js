@@ -13,6 +13,9 @@ const ios = {
 		args: [ 'uitesting' ],
 	},
 	autoLaunch: false,
+	usePrebuiltWDA: true,
+	simulatorStartupTimeout: 240,
+	reduceMotion: true,
 };
 
 exports.iosLocal = ( { iPadDevice = false } ) => ( {
@@ -24,15 +27,14 @@ exports.iosLocal = ( { iPadDevice = false } ) => ( {
 	pixelRatio: ! iPadDevice
 		? iOSConfig.pixelRatio.iPhone
 		: iOSConfig.pixelRatio.iPad,
-	usePrebuiltWDA: true,
 } );
 
 exports.iosServer = ( { iPadDevice = false } ) => ( {
 	...ios,
 	deviceName: ! iPadDevice
-		? iOSConfig.saucelabs.deviceName
-		: iOSConfig.saucelabs.deviceTabletName,
-	platformVersion: iOSConfig.local.platformVersion,
+		? iOSConfig.local.deviceName
+		: iOSConfig.local.deviceTabletName,
+	platformVersion: iOSConfig.buildkite.platformVersion,
 	pixelRatio: ! iPadDevice
 		? iOSConfig.pixelRatio.iPhone
 		: iOSConfig.pixelRatio.iPad,
@@ -40,18 +42,13 @@ exports.iosServer = ( { iPadDevice = false } ) => ( {
 
 exports.android = {
 	platformVersion: androidConfig.local.platformVersion,
-	deviceName: androidConfig.saucelabs.deviceName,
+	deviceName: androidConfig.local.deviceName,
 	automationName: 'UiAutomator2',
 	appPackage: 'com.gutenberg',
 	appActivity: 'com.gutenberg.MainActivity',
 	deviceOrientation: 'portrait',
 	disableWindowAnimation: true,
 	autoLaunch: false,
-};
-
-// SauceLabs config
-exports.sauceOptions = {
-	appiumVersion: '2.0.0',
 };
 
 exports.prefixKeysWithAppium = ( obj ) => {
