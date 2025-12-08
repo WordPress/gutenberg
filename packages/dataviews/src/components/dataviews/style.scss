@@ -13,7 +13,6 @@
 	font-size: $default-font-size;
 	line-height: $default-line-height;
 	background-color: var(--wp-dataviews-color-background, $white);
-	gap: $grid-unit-20;
 }
 
 .dataviews__view-actions,
@@ -23,6 +22,7 @@
 	position: sticky;
 	left: 0;
 	background-color: inherit;
+	padding-bottom: $grid-unit-15;
 
 	@media not (prefers-reduced-motion) {
 		transition: padding ease-out 0.1s;

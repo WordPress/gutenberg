@@ -9,12 +9,24 @@
 	background-color: inherit;
 	border-top: $border-width solid $gray-100;
 	flex-shrink: 0;
+	padding-top: $grid-unit-15;
 
 	@media not (prefers-reduced-motion) {
 		transition: padding ease-out 0.1s;
 	}
 
 	z-index: z-index(".dataviews-footer");
+
+	&::after {
+		content: "";
+		position: absolute;
+		top: 0;
+		left: -12px;
+		width: calc(100% + 24px);
+		height: 100%;
+		background-color: inherit;
+		z-index: -1;
+	}
 }
 
 @container (max-width: 560px) {
