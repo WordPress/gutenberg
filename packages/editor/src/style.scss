@@ -59,5 +59,6 @@
 @use "./components/table-of-contents/style.scss" as *;
 @use "./components/text-editor/style.scss" as *;
 @use "./components/visual-editor/style.scss" as *;
+@use "./components/revision-diff-viewer/style.scss" as *;
 @use "./dataviews/fields/content-preview/style.scss" as *;
 @use "./hooks/push-changes-to-global-styles/style.scss" as *;

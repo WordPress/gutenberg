@@ -17,6 +17,7 @@ import Sidebar from '../sidebar';
 import NotesSidebar from '../collab-sidebar';
 import GlobalStylesSidebar from '../global-styles-sidebar';
 import { GlobalStylesRenderer } from '../global-styles-renderer';
+import { RevisionDiffViewerSidebar } from '../revision-diff-viewer';
 
 function Editor( {
 	postType,
@@ -125,6 +126,7 @@ function Editor( {
 						extraPanels={ extraSidebarPanels }
 					/>
 					<NotesSidebar />
+					<RevisionDiffViewerSidebar />
 					{ isBlockTheme && <GlobalStylesRenderer /> }
 					{ showGlobalStyles && <GlobalStylesSidebar /> }
 				</ExperimentalEditorProvider>

@@ -100,6 +100,12 @@ export { default as WordCount } from './word-count';
 export { default as TimeToRead } from './time-to-read';
 export { default as CharacterCount } from './character-count';
 
+// Revision Diff Viewer.
+export {
+	RevisionDiffViewerSidebar,
+	RevisionDiffPanel,
+} from './revision-diff-viewer';
+
 // State Related Components.
 export { default as EditorProvider } from './provider';
 

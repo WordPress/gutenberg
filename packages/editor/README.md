@@ -1595,6 +1595,24 @@ _Parameters_
 -   _name_ `string`: Entity name.
 -   _config_ `Field`: Field configuration.
 
+### RevisionDiffPanel
+
+Main revision diff viewer panel component.
+
+_Returns_
+
+-   `JSX.Element`: The rendered component
+
+### RevisionDiffViewerSidebar
+
+Revision Diff Viewer Sidebar container component.
+
+Renders the block-aware revision diff viewer in the editor sidebar.
+
+_Returns_
+
+-   `JSX.Element|null`: The sidebar component or null
+
 ### RichText
 
 > **Deprecated** since 5.3, use `wp.blockEditor.RichText` instead.
