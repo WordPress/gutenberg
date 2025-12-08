@@ -16,7 +16,7 @@
 			"type": "string"
 		},
 		"apiVersion": {
-			"description": "The version of the Block API used by the block. If the block is registered with API version 2 or lower, the post editor may work as a non-iframe editor. Since all editors are planned to work as iframes in the future, it is recommended to set the `apiVersion` field to 3 and test the block inside the iframe editor.\n\nSee the API versions documentation at https://developer.wordpress.org/block-editor/reference-guides/block-api/block-api-versions/ for more details.",
+			"description": "The version of the Block API used by the block. If the block is registered with API version 2 or lower, the post editor may work as a non-iframe editor. Since all editors are planned to work as iframes in the future, it is recommended to set the `apiVersion` field to 3 and test the block inside the iframe editor.\n\nSee the API versions documentation at https://developer.wordpress.org/block-editor/reference-guides/block-api/block-api-versions/block-migration-for-iframe-editor-compatibility/ for more details.",
 			"type": "integer",
 			"const": 3
 		},
