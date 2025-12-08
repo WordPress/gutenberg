@@ -27,6 +27,7 @@ import { default as mediaSideload } from '../../utils/media-sideload';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import { useGlobalStylesContext } from '../global-styles-provider';
+import { useOpenPostPicker } from '../post-picker-modal/hook';
 
 const EMPTY_OBJECT = {};
 
@@ -97,6 +98,7 @@ const {
 	sectionRootClientIdKey,
 	mediaEditKey,
 	getMediaSelectKey,
+	postPickerKey,
 } = unlock( privateApis );
 
 /**
@@ -110,6 +112,7 @@ const {
  * @return {Object} Block Editor Settings.
  */
 function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
+	const openPostPicker = useOpenPostPicker();
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const {
 		allowRightClickOverrides,
@@ -344,6 +347,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 					: settings.template,
 			__experimentalSetIsInserterOpened: setIsInserterOpened,
 			[ sectionRootClientIdKey ]: sectionRootClientId,
+			[ postPickerKey ]: openPostPicker,
 			editorTool:
 				renderingMode === 'post-only' && postType !== 'wp_template'
 					? 'edit'
@@ -377,6 +381,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		globalStylesLinksData,
 		renderingMode,
 		editMediaEntity,
+		openPostPicker,
 	] );
 }
 

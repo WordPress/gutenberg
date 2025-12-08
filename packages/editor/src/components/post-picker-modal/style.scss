@@ -1,0 +1,7 @@
+@use "@wordpress/base-styles/z-index" as *;
+
+// When the post picker modal is open, increase the z-index of its screen overlay
+// so it appears above popovers (which have z-index of 1000000).
+.editor-post-picker-modal {
+	z-index: z-index(".editor-post-picker-modal");
+}

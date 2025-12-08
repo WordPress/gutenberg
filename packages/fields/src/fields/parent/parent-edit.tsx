@@ -6,7 +6,7 @@ import removeAccents from 'remove-accents';
 /**
  * WordPress dependencies
  */
-import { ComboboxControl, ExternalLink } from '@wordpress/components';
+import { ComboboxControl, ExternalLink, Button } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import {
 	createInterpolateElement,
@@ -16,6 +16,11 @@ import {
 } from '@wordpress/element';
 // @ts-ignore
 import { store as coreStore } from '@wordpress/core-data';
+// @ts-ignore
+import {
+	store as blockEditorStore,
+	privateApis as blockEditorPrivateApis,
+} from '@wordpress/block-editor';
 import type { DataFormControlProps } from '@wordpress/dataviews';
 import { debounce } from '@wordpress/compose';
 import { decodeEntities } from '@wordpress/html-entities';
@@ -27,6 +32,11 @@ import { filterURLForDisplay } from '@wordpress/url';
  */
 import type { BasePost } from '../../types';
 import { getTitleWithFallbackName } from './utils';
+// @ts-ignore
+import { unlock } from '../../lock-unlock';
+
+// Get the postPickerKey symbol from block editor private APIs
+const { postPickerKey } = unlock( blockEditorPrivateApis );
 
 type TreeBase = {
 	id: number;
@@ -119,6 +129,19 @@ export function PageAttributesParent( {
 	const pageId = data.parent;
 	const postId = data.id;
 	const postTypeSlug = data.type;
+
+	// Get the openPostPicker function from block editor settings
+	const openPostPicker = useSelect( ( select ) => {
+		try {
+			// Try to get from block editor store
+			const blockEditorSettings =
+				select( blockEditorStore ).getSettings();
+			return blockEditorSettings?.[ postPickerKey ];
+		} catch ( e ) {
+			// blockEditorStore might not be available in all contexts
+		}
+		return undefined;
+	}, [] );
 
 	const { parentPostTitle, pageItems, isHierarchical } = useSelect(
 		( select ) => {
@@ -236,10 +259,6 @@ export function PageAttributesParent( {
 		} ) );
 	}, [ pageItems, fieldValue, parentPostTitle, pageId ] );
 
-	if ( ! isHierarchical ) {
-		return null;
-	}
-
 	/**
 	 * Handle user input.
 	 *
@@ -262,21 +281,56 @@ export function PageAttributesParent( {
 		onChangeControl( 0 );
 	};
 
+	const handlePostPickerSelect = useCallback(
+		( selectedPostId: number ) => {
+			onChangeControl( selectedPostId );
+		},
+		[ onChangeControl ]
+	);
+
+	if ( ! isHierarchical ) {
+		return null;
+	}
+
+	// Use PostPicker with ComboBox if available, otherwise use ComboBox alone
 	return (
-		<ComboboxControl
-			__nextHasNoMarginBottom
-			__next40pxDefaultSize
-			label={ __( 'Parent' ) }
-			help={ __( 'Choose a parent page.' ) }
-			value={ pageId?.toString() }
-			options={ parentOptions }
-			onFilterValueChange={ debounce(
-				( value: unknown ) => handleKeydown( value as string ),
-				300
+		<div>
+			<ComboboxControl
+				__nextHasNoMarginBottom
+				__next40pxDefaultSize
+				label={ __( 'Parent' ) }
+				help={ __( 'Choose a parent page.' ) }
+				value={ pageId?.toString() }
+				options={ parentOptions }
+				onFilterValueChange={ debounce(
+					( value: unknown ) => handleKeydown( value as string ),
+					300
+				) }
+				onChange={ handleChange }
+				hideLabelFromVision
+			/>
+			{ openPostPicker && (
+				<Button
+					variant="secondary"
+					onClick={ () =>
+						openPostPicker( {
+							postType: postTypeSlug,
+							excludePostId: postId,
+							onSelect: handlePostPickerSelect,
+							title: sprintf(
+								/* translators: %s: post type name */
+								__( 'Select Parent %s' ),
+								postTypeSlug
+							),
+						} )
+					}
+					__next40pxDefaultSize
+					style={ { marginTop: '8px', width: '100%' } }
+				>
+					{ pageId ? __( 'Change Parent' ) : __( 'Select Parent' ) }
+				</Button>
 			) }
-			onChange={ handleChange }
-			hideLabelFromVision
-		/>
+		</div>
 	);
 }
 

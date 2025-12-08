@@ -13,6 +13,8 @@ import { store as editorStore } from '../../store';
 import { TEMPLATE_POST_TYPE } from '../../store/constants';
 import EditorInterface from '../editor-interface';
 import { ExperimentalEditorProvider } from '../provider';
+import { PostPickerProvider } from '../post-picker-modal/context';
+import PostPickerModal from '../post-picker-modal';
 import Sidebar from '../sidebar';
 import NotesSidebar from '../collab-sidebar';
 import GlobalStylesSidebar from '../global-styles-sidebar';
@@ -109,25 +111,28 @@ function Editor( {
 				</Notice>
 			) }
 			{ !! post && (
-				<ExperimentalEditorProvider
-					post={ post }
-					__unstableTemplate={ template }
-					settings={ settings }
-					initialEdits={ initialEdits }
-					useSubRegistry={ false }
-				>
-					<EditorInterface { ...props }>
-						{ extraContent }
-					</EditorInterface>
-					{ children }
-					<Sidebar
-						onActionPerformed={ onActionPerformed }
-						extraPanels={ extraSidebarPanels }
-					/>
-					<NotesSidebar />
-					{ isBlockTheme && <GlobalStylesRenderer /> }
-					{ showGlobalStyles && <GlobalStylesSidebar /> }
-				</ExperimentalEditorProvider>
+				<PostPickerProvider>
+					<ExperimentalEditorProvider
+						post={ post }
+						__unstableTemplate={ template }
+						settings={ settings }
+						initialEdits={ initialEdits }
+						useSubRegistry={ false }
+					>
+						<EditorInterface { ...props }>
+							{ extraContent }
+						</EditorInterface>
+						{ children }
+						<Sidebar
+							onActionPerformed={ onActionPerformed }
+							extraPanels={ extraSidebarPanels }
+						/>
+						<NotesSidebar />
+						{ isBlockTheme && <GlobalStylesRenderer /> }
+						{ showGlobalStyles && <GlobalStylesSidebar /> }
+						<PostPickerModal />
+					</ExperimentalEditorProvider>
+				</PostPickerProvider>
 			) }
 		</>
 	);
