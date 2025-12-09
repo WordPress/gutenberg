@@ -222,25 +222,44 @@ function render_block_core_navigation_submenu( $attributes, $content, $block ) {
 	if ( $has_submenu ) {
 		// Copy some attributes from the parent block to this one.
 		// Ideally this would happen in the client when the block is created.
-		// Check for submenu colors first (new blocks), fall back to overlay colors (legacy blocks).
+		// Check for submenu colors first (new blocks), then new overlay colors, then legacy overlay colors (unmigrated blocks).
+		// Legacy attributes (overlayTextColor/customOverlayTextColor) are deprecated and will be
+		// migrated to new attributes (defaultOverlayTextColor/customDefaultOverlayTextColor) when
+		// blocks are edited in the editor. We check new attributes first to support migrated blocks.
 		if ( array_key_exists( 'submenuTextColor', $block->context ) ) {
 			$attributes['textColor'] = $block->context['submenuTextColor'];
+		} elseif ( array_key_exists( 'defaultOverlayTextColor', $block->context ) ) {
+			// Fallback to new overlay colors (migrated blocks).
+			$attributes['textColor'] = $block->context['defaultOverlayTextColor'];
 		} elseif ( array_key_exists( 'overlayTextColor', $block->context ) ) {
+			// Fallback to legacy overlay colors (unmigrated blocks).
 			$attributes['textColor'] = $block->context['overlayTextColor'];
 		}
 		if ( array_key_exists( 'submenuBackgroundColor', $block->context ) ) {
 			$attributes['backgroundColor'] = $block->context['submenuBackgroundColor'];
+		} elseif ( array_key_exists( 'defaultOverlayBackgroundColor', $block->context ) ) {
+			// Fallback to new overlay colors (migrated blocks).
+			$attributes['backgroundColor'] = $block->context['defaultOverlayBackgroundColor'];
 		} elseif ( array_key_exists( 'overlayBackgroundColor', $block->context ) ) {
+			// Fallback to legacy overlay colors (unmigrated blocks).
 			$attributes['backgroundColor'] = $block->context['overlayBackgroundColor'];
 		}
 		if ( array_key_exists( 'customSubmenuTextColor', $block->context ) ) {
 			$attributes['style']['color']['text'] = $block->context['customSubmenuTextColor'];
+		} elseif ( array_key_exists( 'customDefaultOverlayTextColor', $block->context ) ) {
+			// Fallback to new overlay colors (migrated blocks).
+			$attributes['style']['color']['text'] = $block->context['customDefaultOverlayTextColor'];
 		} elseif ( array_key_exists( 'customOverlayTextColor', $block->context ) ) {
+			// Fallback to legacy overlay colors (unmigrated blocks).
 			$attributes['style']['color']['text'] = $block->context['customOverlayTextColor'];
 		}
 		if ( array_key_exists( 'customSubmenuBackgroundColor', $block->context ) ) {
 			$attributes['style']['color']['background'] = $block->context['customSubmenuBackgroundColor'];
+		} elseif ( array_key_exists( 'customDefaultOverlayBackgroundColor', $block->context ) ) {
+			// Fallback to new overlay colors (migrated blocks).
+			$attributes['style']['color']['background'] = $block->context['customDefaultOverlayBackgroundColor'];
 		} elseif ( array_key_exists( 'customOverlayBackgroundColor', $block->context ) ) {
+			// Fallback to legacy overlay colors (unmigrated blocks).
 			$attributes['style']['color']['background'] = $block->context['customOverlayBackgroundColor'];
 		}
 

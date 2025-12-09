@@ -46,23 +46,54 @@ const migrateWithLayout = ( attributes ) => {
 	return updatedAttributes;
 };
 
-const migrateOverlayToSubmenuColors = ( attributes ) => {
-	return {
-		...attributes,
-		...( attributes.overlayTextColor && {
-			submenuTextColor: attributes.overlayTextColor,
-		} ),
-		...( attributes.customOverlayTextColor && {
-			customSubmenuTextColor: attributes.customOverlayTextColor,
-		} ),
-		...( attributes.overlayBackgroundColor && {
-			submenuBackgroundColor: attributes.overlayBackgroundColor,
-		} ),
-		...( attributes.customOverlayBackgroundColor && {
-			customSubmenuBackgroundColor:
-				attributes.customOverlayBackgroundColor,
-		} ),
-	};
+/**
+ * Migrates legacy overlay color attributes to new separate overlay and submenu color attributes.
+ *
+ * This migration:
+ * 1. Copies old overlayTextColor/overlayBackgroundColor to both:
+ *    - New defaultOverlayTextColor/defaultOverlayBackgroundColor (for overlay)
+ *    - New submenuTextColor/submenuBackgroundColor (for submenu)
+ * 2. Unsets the old overlayTextColor/overlayBackgroundColor attributes
+ *
+ * This ensures backwards compatibility while allowing new blocks to have separate
+ * overlay and submenu colors. By unsetting the old attributes, we prevent fallback
+ * to legacy values when new attributes are cleared.
+ *
+ * @param {Object} attributes The block attributes to migrate.
+ * @return {Object} The migrated attributes.
+ */
+const migrateOverlayToSeparateColors = ( attributes ) => {
+	const migrated = { ...attributes };
+
+	// Copy overlay text color to both new overlay and submenu attributes.
+	if ( attributes.overlayTextColor ) {
+		migrated.defaultOverlayTextColor = attributes.overlayTextColor;
+		migrated.submenuTextColor = attributes.overlayTextColor;
+		migrated.overlayTextColor = undefined;
+	}
+	if ( attributes.customOverlayTextColor ) {
+		migrated.customDefaultOverlayTextColor =
+			attributes.customOverlayTextColor;
+		migrated.customSubmenuTextColor = attributes.customOverlayTextColor;
+		migrated.customOverlayTextColor = undefined;
+	}
+
+	// Copy overlay background color to both new overlay and submenu attributes.
+	if ( attributes.overlayBackgroundColor ) {
+		migrated.defaultOverlayBackgroundColor =
+			attributes.overlayBackgroundColor;
+		migrated.submenuBackgroundColor = attributes.overlayBackgroundColor;
+		migrated.overlayBackgroundColor = undefined;
+	}
+	if ( attributes.customOverlayBackgroundColor ) {
+		migrated.customDefaultOverlayBackgroundColor =
+			attributes.customOverlayBackgroundColor;
+		migrated.customSubmenuBackgroundColor =
+			attributes.customOverlayBackgroundColor;
+		migrated.customOverlayBackgroundColor = undefined;
+	}
+
+	return migrated;
 };
 
 const v6 = {
@@ -477,15 +508,25 @@ const v7 = {
 		return <InnerBlocks.Content />;
 	},
 	isEligible: ( attributes ) => {
-		// Check if submenu color attributes are absent (legacy block).
+		// Check if new color attributes are absent (legacy block).
+		// Legacy blocks have overlayTextColor/overlayBackgroundColor but not the new attributes.
 		return (
-			! attributes.submenuTextColor &&
-			! attributes.customSubmenuTextColor &&
-			! attributes.submenuBackgroundColor &&
-			! attributes.customSubmenuBackgroundColor
+			attributes.defaultOverlayTextColor === undefined &&
+			attributes.customDefaultOverlayTextColor === undefined &&
+			attributes.defaultOverlayBackgroundColor === undefined &&
+			attributes.customDefaultOverlayBackgroundColor === undefined &&
+			attributes.submenuTextColor === undefined &&
+			attributes.customSubmenuTextColor === undefined &&
+			attributes.submenuBackgroundColor === undefined &&
+			attributes.customSubmenuBackgroundColor === undefined &&
+			// Only migrate if old attributes exist.
+			( attributes.overlayTextColor !== undefined ||
+				attributes.customOverlayTextColor !== undefined ||
+				attributes.overlayBackgroundColor !== undefined ||
+				attributes.customOverlayBackgroundColor !== undefined )
 		);
 	},
-	migrate: migrateOverlayToSubmenuColors,
+	migrate: migrateOverlayToSeparateColors,
 };
 
 const deprecated = [

@@ -269,10 +269,10 @@ function Navigation( {
 	setBackgroundColor,
 	textColor,
 	setTextColor,
-	overlayBackgroundColor,
-	setOverlayBackgroundColor,
-	overlayTextColor,
-	setOverlayTextColor,
+	defaultOverlayBackgroundColor,
+	setDefaultOverlayBackgroundColor,
+	defaultOverlayTextColor,
+	setDefaultOverlayTextColor,
 	submenuBackgroundColor,
 	setSubmenuBackgroundColor,
 	submenuTextColor,
@@ -850,10 +850,12 @@ function Navigation( {
 					setTextColor={ setTextColor }
 					backgroundColor={ backgroundColor }
 					setBackgroundColor={ setBackgroundColor }
-					overlayTextColor={ overlayTextColor }
-					setOverlayTextColor={ setOverlayTextColor }
-					overlayBackgroundColor={ overlayBackgroundColor }
-					setOverlayBackgroundColor={ setOverlayBackgroundColor }
+					overlayTextColor={ defaultOverlayTextColor }
+					setOverlayTextColor={ setDefaultOverlayTextColor }
+					overlayBackgroundColor={ defaultOverlayBackgroundColor }
+					setOverlayBackgroundColor={
+						setDefaultOverlayBackgroundColor
+					}
 					submenuTextColor={ submenuTextColor }
 					setSubmenuTextColor={ setSubmenuTextColor }
 					submenuBackgroundColor={ submenuBackgroundColor }
@@ -906,8 +908,8 @@ function Navigation( {
 					icon={ icon }
 					isResponsive={ isResponsive }
 					isHiddenByDefault={ isHiddenByDefault }
-					overlayBackgroundColor={ overlayBackgroundColor }
-					overlayTextColor={ overlayTextColor }
+					overlayBackgroundColor={ defaultOverlayBackgroundColor }
+					overlayTextColor={ defaultOverlayTextColor }
 				>
 					<UnsavedInnerBlocks
 						createNavigationMenu={ createNavigationMenu }
@@ -1067,9 +1069,9 @@ function Navigation( {
 								isResponsive={ isResponsive }
 								isHiddenByDefault={ isHiddenByDefault }
 								overlayBackgroundColor={
-									overlayBackgroundColor
+									defaultOverlayBackgroundColor
 								}
-								overlayTextColor={ overlayTextColor }
+								overlayTextColor={ defaultOverlayTextColor }
 							>
 								{ isEntityAvailable && (
 									<NavigationInnerBlocks
@@ -1093,8 +1095,8 @@ function Navigation( {
 export default withColors(
 	{ textColor: 'color' },
 	{ backgroundColor: 'color' },
-	{ overlayBackgroundColor: 'color' },
-	{ overlayTextColor: 'color' },
+	{ defaultOverlayBackgroundColor: 'color' },
+	{ defaultOverlayTextColor: 'color' },
 	{ submenuBackgroundColor: 'color' },
 	{ submenuTextColor: 'color' }
 )( Navigation );

@@ -77,6 +77,12 @@
 		"customOverlayTextColor": {
 			"type": "string"
 		},
+		"defaultOverlayTextColor": {
+			"type": "string"
+		},
+		"customDefaultOverlayTextColor": {
+			"type": "string"
+		},
 		"submenuTextColor": {
 			"type": "string"
 		},
@@ -87,6 +93,12 @@
 			"type": "string"
 		},
 		"customSubmenuBackgroundColor": {
+			"type": "string"
+		},
+		"defaultOverlayBackgroundColor": {
+			"type": "string"
+		},
+		"customDefaultOverlayBackgroundColor": {
 			"type": "string"
 		},
 		"maxNestingLevel": {
@@ -107,6 +119,10 @@
 		"customOverlayTextColor": "customOverlayTextColor",
 		"overlayBackgroundColor": "overlayBackgroundColor",
 		"customOverlayBackgroundColor": "customOverlayBackgroundColor",
+		"defaultOverlayTextColor": "defaultOverlayTextColor",
+		"customDefaultOverlayTextColor": "customDefaultOverlayTextColor",
+		"defaultOverlayBackgroundColor": "defaultOverlayBackgroundColor",
+		"customDefaultOverlayBackgroundColor": "customDefaultOverlayBackgroundColor",
 		"submenuTextColor": "submenuTextColor",
 		"customSubmenuTextColor": "customSubmenuTextColor",
 		"submenuBackgroundColor": "submenuBackgroundColor",
