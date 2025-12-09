@@ -736,7 +736,7 @@ export default function DimensionsPanel( {
 					}
 					panelId={ panelId }
 				>
-					<HeightControl
+					<DimensionControl
 						label={ __( 'Height' ) }
 						value={ heightValue }
 						onChange={ setHeightValue }

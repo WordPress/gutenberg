@@ -220,7 +220,7 @@ class WP_Theme_JSON_Gutenberg {
 			'value_key'         => 'size',
 			'css_vars'          => '--wp--preset--dimension--$slug',
 			'classes'           => array(),
-			'properties'        => array( 'width', 'min-height' ),
+			'properties'        => array( 'width', 'height', 'min-height' ),
 		),
 	);
 
