@@ -26,7 +26,9 @@ const ContentTab = ( { contentClientIds } ) => {
 					<BlockQuickNavigation clientIds={ contentClientIds } />
 				</PanelBody>
 			) }
-			{ shouldShowContentOnlyControls && <BlockFieldsSlot /> }
+			{ shouldShowContentOnlyControls && (
+				<BlockFieldsSlot bubblesVirtually />
+			) }
 		</>
 	);
 };
