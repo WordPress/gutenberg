@@ -135,7 +135,11 @@ function OperatorSelector( {
 
 												const shouldResetValue =
 													currentOpSelectionModel !==
-													newOpSelectionModel;
+														newOpSelectionModel ||
+													[
+														currentOpSelectionModel,
+														newOpSelectionModel,
+													].includes( 'custom' );
 
 												return {
 													..._filter,
