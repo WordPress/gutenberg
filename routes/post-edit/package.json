@@ -8,6 +8,8 @@
 	},
 	"dependencies": {
 		"@wordpress/core-data": "file:../../packages/core-data",
-		"@wordpress/data": "file:../../packages/data"
+		"@wordpress/data": "file:../../packages/data",
+		"@wordpress/html-entities": "file:../html-entities",
+		"@wordpress/i18n": "file:../i18n"
 	}
 }

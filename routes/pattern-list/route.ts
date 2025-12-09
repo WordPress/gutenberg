@@ -3,11 +3,9 @@
  */
 import { __ } from '@wordpress/i18n';
 
+/**
+ * Route configuration for pattern list.
+ */
 export const route = {
-	title: () => __( 'Home' ),
-	async canvas() {
-		return {
-			isPreview: true,
-		};
-	},
+	title: () => __( 'Patterns' ),
 };

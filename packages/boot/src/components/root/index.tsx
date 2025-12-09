@@ -29,6 +29,7 @@ import { Page } from '@wordpress/admin-ui';
 import Sidebar from '../sidebar';
 import SavePanel from '../save-panel';
 import CanvasRenderer from '../canvas-renderer';
+import useRouteTitle from '../app/use-route-title';
 import { unlock } from '../../lock-unlock';
 import type { CanvasData } from '../../store/types';
 import './style.scss';
@@ -47,6 +48,8 @@ export default function Root() {
 	const routeContentModule = ( currentMatch?.loaderData as any )
 		?.routeContentModule as string | undefined;
 	const isFullScreen = canvas && ! canvas.isPreview;
+
+	useRouteTitle();
 
 	// Mobile sidebar state
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
