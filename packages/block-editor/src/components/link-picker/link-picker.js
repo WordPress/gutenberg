@@ -19,25 +19,15 @@ import { LinkPreviewButton } from './link-preview-button';
  * LinkPicker component that combines the preview button and search input.
  * Shows a preview button as a trigger, and opens a popover with search input when clicked.
  *
- * @param {Object}   props                   - Component props
- * @param {Object}   props.link              - Link object with label, url, type, kind, id
- * @param {string}   props.title             - Title to display (defaults to rich URL data)
- * @param {string}   props.image             - Image URL (optional)
- * @param {string}   props.entityStatus      - Entity status (publish, draft, etc.)
- * @param {boolean}  props.hasBinding        - Whether link has entity binding
- * @param {boolean}  props.isEntityAvailable - Whether bound entity is available
- * @param {Function} props.onSelect          - Callback when a suggestion is selected
- * @param {Object}   props.suggestionsQuery  - Query parameters for suggestions
- * @param {string}   props.label             - Label for the control
- * @param {string}   props.help              - Help text for the control
+ * @param {Object}   props                  - Component props
+ * @param {Object}   props.preview          - Preview data with title, url, image, badges
+ * @param {Function} props.onSelect         - Callback when a suggestion is selected
+ * @param {Object}   props.suggestionsQuery - Query parameters for suggestions
+ * @param {string}   props.label            - Label for the control
+ * @param {string}   props.help             - Help text for the control
  */
 export function LinkPicker( {
-	link,
-	title,
-	image,
-	entityStatus,
-	hasBinding,
-	isEntityAvailable,
+	preview = {},
 	onSelect,
 	suggestionsQuery,
 	label,
@@ -71,12 +61,7 @@ export function LinkPicker( {
 	const renderToggle = () => {
 		return (
 			<LinkPreviewButton
-				link={ link }
-				title={ title }
-				image={ image }
-				entityStatus={ entityStatus }
-				hasBinding={ hasBinding }
-				isEntityAvailable={ isEntityAvailable }
+				preview={ preview }
 				onClick={ () => setIsOpen( true ) }
 				aria-haspopup="dialog"
 				aria-expanded={ isOpen }

@@ -11,112 +11,30 @@ import {
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { Icon, chevronDown } from '@wordpress/icons';
-import { safeDecodeURI } from '@wordpress/url';
 import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
-import useRichUrlData from '../link-control/use-rich-url-data';
 import { unlock } from '../../lock-unlock';
 
 const { Badge } = unlock( componentsPrivateApis );
 
 /**
- * Capitalize the first letter of a string.
- *
- * @param {string} str - The string to capitalize
- * @return {string} Capitalized string
- */
-function capitalize( str ) {
-	return str.charAt( 0 ).toUpperCase() + str.slice( 1 );
-}
-
-/**
  * Link preview button component that displays the current link information.
  * Clicking this button reveals the LinkControlSearchInput.
  *
- * @param {Object}   props                   - Component props
- * @param {Object}   props.link              - Link object with label, url, type, kind, id
- * @param {boolean}  props.title             - Title to display
- * @param {boolean}  props.image             - Image to display
- * @param {string}   props.entityStatus      - Entity status (publish, draft, etc.)
- * @param {boolean}  props.hasBinding        - Whether link has entity binding
- * @param {boolean}  props.isEntityAvailable - Whether bound entity is available
- * @param {Function} props.onClick           - Click handler
- * @param {string}   props.label             - Label for the button (e.g. "Link to")
- * @param {Object}   props.props             - Additional props to pass to the button
+ * @param {Object}   props         - Component props
+ * @param {Object}   props.preview - Preview data with title, url, image, badges
+ * @param {Function} props.onClick - Click handler
+ * @param {string}   props.label   - Label for the button (e.g. "Link to")
+ * @param {Object}   props.props   - Additional props to pass to the button
  */
-export function LinkPreviewButton( {
-	link,
-	title,
-	image,
-	entityStatus,
-	hasBinding,
-	isEntityAvailable,
-	onClick,
-	label,
-	...props
-} ) {
-	const { url, type } = link;
+export function LinkPreviewButton( { preview, onClick, label, ...props } ) {
+	const { title, url: displayUrl, image, badges } = preview || {};
 
-	// Fetch rich URL data if we don't have a title. Internal links should have passed a title.
-	const { richData } = useRichUrlData( title ? null : url );
-
-	// Get display title - use provided title, fallback to rich data, or URL
-	const displayTitle = url
-		? title || richData?.title || safeDecodeURI( url )
-		: 'Add link';
-
-	// Get display URL - strip site URL if it matches current site
-	let displayUrl = safeDecodeURI( url || '' );
-	let isExternal = false;
-	try {
-		const linkUrl = new URL( url );
-		const siteUrl = window.location.origin;
-		if ( linkUrl.origin === siteUrl ) {
-			// Show only the pathname (and search/hash if present)
-			let path = linkUrl.pathname + linkUrl.search + linkUrl.hash;
-			// Remove trailing slash
-			if ( path.endsWith( '/' ) && path.length > 1 ) {
-				path = path.slice( 0, -1 );
-			}
-			displayUrl = path;
-		} else {
-			isExternal = true;
-		}
-	} catch ( e ) {
-		// If URL parsing fails, use the original URL
-		displayUrl = safeDecodeURI( url || '' );
-	}
-
-	// Determine kind badge
-	let kindBadge = null;
-	if ( url ) {
-		if ( isExternal ) {
-			kindBadge = { label: __( 'External link' ), intent: 'default' };
-		} else if ( type ) {
-			kindBadge = { label: capitalize( type ), intent: 'default' };
-		}
-	}
-
-	// Determine status badge
-	let statusBadge = null;
-	if ( ! url ) {
-		statusBadge = { label: __( 'No link selected' ), intent: 'error' };
-	} else if ( hasBinding && ! isEntityAvailable ) {
-		statusBadge = { label: __( 'Deleted' ), intent: 'error' };
-	} else if ( entityStatus ) {
-		const statusMap = {
-			publish: { label: __( 'Published' ), intent: 'success' },
-			future: { label: __( 'Scheduled' ), intent: 'warning' },
-			draft: { label: __( 'Draft' ), intent: 'warning' },
-			pending: { label: __( 'Pending' ), intent: 'warning' },
-			private: { label: __( 'Private' ), intent: 'default' },
-			trash: { label: __( 'Trash' ), intent: 'error' },
-		};
-		statusBadge = statusMap[ entityStatus ] || null;
-	}
+	// Fallback for missing title
+	const displayTitle = title || __( 'Add link' );
 
 	return (
 		<Button
@@ -158,21 +76,19 @@ export function LinkPreviewButton( {
 									{ displayUrl }
 								</Truncate>
 							) }
-							{ ( kindBadge || statusBadge ) && (
+							{ badges && badges.length > 0 && (
 								<HStack
 									className="link-preview-button__badges"
 									alignment="left"
 								>
-									{ kindBadge && (
-										<Badge intent={ kindBadge.intent }>
-											{ kindBadge.label }
+									{ badges.map( ( badge, index ) => (
+										<Badge
+											key={ index }
+											intent={ badge.intent }
+										>
+											{ badge.label }
 										</Badge>
-									) }
-									{ statusBadge && (
-										<Badge intent={ statusBadge.intent }>
-											{ statusBadge.label }
-										</Badge>
-									) }
+									) ) }
 								</HStack>
 							) }
 						</VStack>

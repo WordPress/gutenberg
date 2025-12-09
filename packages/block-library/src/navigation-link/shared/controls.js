@@ -21,6 +21,7 @@ import { useToolsPanelDropdownMenuProps } from '../../utils/hooks';
 import { useHandleLinkChange } from './use-handle-link-change';
 import { useEntityBinding } from './use-entity-binding';
 import { getSuggestionsQuery } from '../link-ui';
+import { useLinkPreview } from './use-link-preview';
 import { unlock } from '../../lock-unlock';
 
 const { LinkPicker } = unlock( blockEditorPrivateApis );
@@ -128,6 +129,17 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 		[ entityRecord ]
 	);
 
+	// Compute preview data using the hook
+	const preview = useLinkPreview( {
+		url,
+		title: linkTitle,
+		image: linkImage,
+		type: attributes.type,
+		entityStatus: entityRecord?.status,
+		hasBinding: hasUrlBinding,
+		isEntityAvailable: isBoundEntityAvailable,
+	} );
+
 	return (
 		<ToolsPanel
 			label={ __( 'Settings' ) }
@@ -166,18 +178,7 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 				isShownByDefault
 			>
 				<LinkPicker
-					link={ {
-						url,
-						label,
-						kind: attributes.kind,
-						type: attributes.type,
-						id: attributes.id,
-					} }
-					title={ linkTitle }
-					image={ linkImage }
-					entityStatus={ entityRecord?.status }
-					hasBinding={ hasUrlBinding }
-					isEntityAvailable={ isBoundEntityAvailable }
+					preview={ preview }
 					onSelect={ handleLinkChange }
 					suggestionsQuery={ getSuggestionsQuery(
 						attributes.type,

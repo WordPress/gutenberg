@@ -77,7 +77,10 @@ describe( 'LinkPicker', () => {
 		it( 'should render a button with URL when link is provided', () => {
 			render(
 				<LinkPicker
-					link={ { url: 'https://example.com' } }
+					preview={ {
+						url: 'example.com',
+						badges: [],
+					} }
 					onSelect={ jest.fn() }
 					label="Link"
 				/>
@@ -92,12 +95,11 @@ describe( 'LinkPicker', () => {
 		it( 'should render a button with title when provided', () => {
 			render(
 				<LinkPicker
-					link={ {
-						url: 'https://example.com',
-						type: 'page',
-						kind: 'post-type',
+					preview={ {
+						title: 'My Page',
+						url: 'example.com',
+						badges: [ { label: 'Page', intent: 'default' } ],
 					} }
-					title="My Page"
 					onSelect={ jest.fn() }
 					label="Link"
 				/>
@@ -112,13 +114,12 @@ describe( 'LinkPicker', () => {
 		it( 'should render featured image when provided', () => {
 			render(
 				<LinkPicker
-					link={ {
-						url: 'https://example.com',
-						type: 'page',
-						kind: 'post-type',
+					preview={ {
+						title: 'My Page',
+						url: 'example.com',
+						image: 'https://example.com/image.jpg',
+						badges: [ { label: 'Page', intent: 'default' } ],
 					} }
-					title="My Page"
-					image="https://example.com/image.jpg"
 					onSelect={ jest.fn() }
 					label="Link"
 				/>
