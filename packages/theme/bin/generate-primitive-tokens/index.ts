@@ -8,7 +8,6 @@ import {
 	parse,
 	to,
 	serialize,
-	OKLCH,
 	sRGB,
 	type PlainColorObject,
 } from 'colorjs.io/fn';
@@ -30,28 +29,24 @@ const __dirname = path.dirname( __filename );
 const colorJsonPath = path.join( __dirname, '../../tokens/color.json' );
 
 const transformColorStringToDTCGValue = ( color: string ) => {
-	if ( /oklch|p3/.test( color ) ) {
-		let parsed: PlainColorObject;
-		try {
-			parsed = to( parse( color ), OKLCH );
-		} catch {
-			return color;
-		}
-
-		const coords = parsed.coords;
-		return {
-			colorSpace: 'oklch',
-			components: [
-				Math.floor( 10000 * coords[ 0 ] ) / 10000, // l
-				coords[ 1 ], // c
-				isNaN( coords[ 2 ] ) ? 0 : coords[ 2 ], // h
-			],
-			...( parsed.alpha < 1 ? { alpha: parsed.alpha } : undefined ),
-			hex: serialize( to( parsed, sRGB ), { format: 'hex' } ),
-		};
+	let parsed: PlainColorObject;
+	try {
+		parsed = to( parse( color ), sRGB );
+	} catch {
+		return color;
 	}
 
-	return color;
+	// 3 decimal places is the minimum precision for lossless hex serialization.
+	// With 3 decimal places rounding to the nearest 0.001, the maximum rounding
+	// error is 0.0005. With 256 possible hex values, 0.0005 × 256 = 0.128,
+	// guaranteeing the rounded value stays within 0.5 of the original value.
+	const round = ( n: number ) => Math.round( n * 1000 ) / 1000;
+	return {
+		colorSpace: 'srgb',
+		components: parsed.coords.map( round ),
+		...( parsed.alpha < 1 ? { alpha: parsed.alpha } : undefined ),
+		hex: serialize( parsed, { format: 'hex' } ),
+	};
 };
 
 // Main function
