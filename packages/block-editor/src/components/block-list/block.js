@@ -655,6 +655,9 @@ function BlockListBlockProvider( props ) {
 				checkDeep
 			);
 			const blockEditingMode = getBlockEditingMode( clientId );
+			const sectionBlockClientId = _isSectionBlock( clientId )
+				? clientId
+				: getParentSectionBlock( clientId );
 
 			const multiple = hasBlockSupport( blockName, 'multiple', true );
 
@@ -673,9 +676,11 @@ function BlockListBlockProvider( props ) {
 				isSelectionEnabled: isSelectionEnabled(),
 				isLocked: !! getTemplateLock( rootClientId ),
 				isSectionBlock: _isSectionBlock( clientId ),
-				isWithinSectionBlock:
-					_isSectionBlock( clientId ) ||
-					!! getParentSectionBlock( clientId ),
+				isWithinSectionBlock: !! sectionBlockClientId,
+				isSelectionWithinCurrentSection:
+					isBlockSelected( sectionBlockClientId ) ||
+					hasSelectedInnerBlock( sectionBlockClientId, checkDeep ),
+				blockType,
 				canRemove,
 				canMove,
 				isSelected: _isSelected,
@@ -746,6 +751,7 @@ function BlockListBlockProvider( props ) {
 		mayDisplayParentControls,
 		index,
 		blockApiVersion,
+		blockType,
 		blockTitle,
 		isSubtreeDisabled,
 		hasOverlay,
@@ -758,6 +764,7 @@ function BlockListBlockProvider( props ) {
 		hasChildSelected,
 		isSectionBlock,
 		isWithinSectionBlock,
+		isSelectionWithinCurrentSection,
 		isEditingDisabled,
 		hasEditableOutline,
 		className,
@@ -791,6 +798,7 @@ function BlockListBlockProvider( props ) {
 		mode,
 		name,
 		blockApiVersion,
+		blockType,
 		blockTitle,
 		isSelected,
 		isSubtreeDisabled,
@@ -805,6 +813,7 @@ function BlockListBlockProvider( props ) {
 		hasChildSelected,
 		isSectionBlock,
 		isWithinSectionBlock,
+		isSelectionWithinCurrentSection,
 		isEditingDisabled,
 		hasEditableOutline,
 		isEditingContentOnlySection,
