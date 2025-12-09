@@ -4,6 +4,7 @@
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { useCallback } from '@wordpress/element';
 import { addQueryArgs } from '@wordpress/url';
+import { useGenerateBlockPath } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -17,24 +18,43 @@ const { useHistory, useLocation } = unlock( routerPrivateApis );
  *
  * @return {Array} A tuple containing:
  *   - onNavigateToEntityRecord: Function to navigate to an entity record
- *   - initialBlockSelection: The clientId of the block to select, or null if none stored
+ *   - initialBlockSelection: The block path or clientId to restore selection, or null if none stored
  */
 export default function useNavigateToEntityRecord() {
 	const history = useHistory();
 	const { query, path } = useLocation();
+	const generateBlockPath = useGenerateBlockPath();
 
-	// Get the selected block from URL parameters
-	const initialBlockSelection = query.selectedBlock || null;
+	// Get the selected block from URL parameters and decode the block path
+	let initialBlockSelection = null;
+	if ( query.selectedBlock ) {
+		try {
+			initialBlockSelection = JSON.parse(
+				decodeURIComponent( query.selectedBlock )
+			);
+		} catch ( e ) {
+			// Invalid JSON, ignore
+			initialBlockSelection = null;
+		}
+	}
 
 	const onNavigateToEntityRecord = useCallback(
 		( params ) => {
-			// First, update the current URL to include the selected block for when we navigate back
+			// First, update the current URL to include the selected block path for when we navigate back
 			if ( params.selectedBlockClientId ) {
-				const currentUrl = addQueryArgs( path, {
-					...query,
-					selectedBlock: params.selectedBlockClientId,
-				} );
-				history.navigate( currentUrl, { replace: true } );
+				const blockPath = generateBlockPath(
+					params.selectedBlockClientId
+				);
+				if ( blockPath ) {
+					// Encode the block path as JSON in the URL
+					const currentUrl = addQueryArgs( path, {
+						...query,
+						selectedBlock: encodeURIComponent(
+							JSON.stringify( blockPath )
+						),
+					} );
+					history.navigate( currentUrl, { replace: true } );
+				}
 			}
 
 			// Then navigate to the new entity record
@@ -48,7 +68,7 @@ export default function useNavigateToEntityRecord() {
 
 			history.navigate( url );
 		},
-		[ history, path, query ]
+		[ history, path, query, generateBlockPath ]
 	);
 
 	return [ onNavigateToEntityRecord, initialBlockSelection ];

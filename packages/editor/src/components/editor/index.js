@@ -13,6 +13,7 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
  */
 import { store as editorStore } from '../../store';
 import { TEMPLATE_POST_TYPE } from '../../store/constants';
+import { useRestoreBlockFromPath } from '../../utils';
 import EditorInterface from '../editor-interface';
 import { ExperimentalEditorProvider } from '../provider';
 import Sidebar from '../sidebar';
@@ -98,6 +99,7 @@ function Editor( {
 	);
 
 	const { selectBlock } = useDispatch( blockEditorStore );
+	const restoreBlockFromPath = useRestoreBlockFromPath();
 
 	// Restore initial block selection if provided (e.g., from navigation)
 	useEffect( () => {
@@ -107,11 +109,20 @@ function Editor( {
 
 		// Use setTimeout to ensure blocks are fully rendered before selecting
 		const timeoutId = setTimeout( () => {
-			selectBlock( initialSelection );
+			const clientId = restoreBlockFromPath( initialSelection );
+			if ( clientId ) {
+				selectBlock( clientId );
+			}
 		}, 0 );
 
 		return () => clearTimeout( timeoutId );
-	}, [ initialSelection, hasLoadedPost, post, selectBlock ] );
+	}, [
+		initialSelection,
+		hasLoadedPost,
+		post,
+		selectBlock,
+		restoreBlockFromPath,
+	] );
 
 	return (
 		<>
