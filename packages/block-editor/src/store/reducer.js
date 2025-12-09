@@ -2294,7 +2294,7 @@ function getDerivedBlockEditingModesForTree( state, treeClientId = '' ) {
 	);
 
 	// When in an isolated editing context (e.g., editing a template part or pattern directly),
-	// don't apply contentOnly mode to nested unsynced patterns.
+	// don't apply contentOnly mode to nested unsynced patterns or template parts.
 	const isIsolatedEditor = state.settings?.[ isIsolatedEditorKey ];
 
 	// Use array.from for better back compat. Older versions of the iterator returned
