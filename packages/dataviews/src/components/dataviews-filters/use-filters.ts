@@ -6,7 +6,10 @@ import { useMemo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { ALL_OPERATORS, SINGLE_SELECTION_OPERATORS } from '../../constants';
+import {
+	ALL_OPERATOR_NAMES,
+	SINGLE_SELECTION_OPERATOR_NAMES,
+} from '../../constants';
 import type { NormalizedFilter, NormalizedField, View } from '../../types';
 
 function useFilters( fields: NormalizedField< any >[], view: View ) {
@@ -33,7 +36,7 @@ function useFilters( fields: NormalizedField< any >[], view: View ) {
 				getElements: field.getElements,
 				hasElements: field.hasElements,
 				singleSelection: operators.some( ( op ) =>
-					SINGLE_SELECTION_OPERATORS.includes( op )
+					SINGLE_SELECTION_OPERATOR_NAMES.includes( op )
 				),
 				operators,
 				isVisible:
@@ -42,7 +45,7 @@ function useFilters( fields: NormalizedField< any >[], view: View ) {
 					!! view.filters?.some(
 						( f ) =>
 							f.field === field.id &&
-							ALL_OPERATORS.includes( f.operator )
+							ALL_OPERATOR_NAMES.includes( f.operator )
 					),
 				isPrimary,
 				isLocked,

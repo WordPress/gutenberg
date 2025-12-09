@@ -28,28 +28,9 @@ import SearchWidget from './search-widget';
 import InputWidget from './input-widget';
 import {
 	OPERATORS,
-	OPERATOR_IS,
-	OPERATOR_IS_NOT,
-	OPERATOR_IS_ANY,
-	OPERATOR_IS_NONE,
-	OPERATOR_IS_ALL,
-	OPERATOR_IS_NOT_ALL,
-	OPERATOR_LESS_THAN,
-	OPERATOR_GREATER_THAN,
-	OPERATOR_LESS_THAN_OR_EQUAL,
-	OPERATOR_GREATER_THAN_OR_EQUAL,
-	OPERATOR_CONTAINS,
-	OPERATOR_NOT_CONTAINS,
-	OPERATOR_STARTS_WITH,
-	OPERATOR_BEFORE,
-	OPERATOR_AFTER,
-	OPERATOR_BEFORE_INC,
-	OPERATOR_AFTER_INC,
-	OPERATOR_BETWEEN,
-	OPERATOR_ON,
-	OPERATOR_NOT_ON,
-	OPERATOR_IN_THE_PAST,
-	OPERATOR_OVER,
+	MULTI_SELECTION_OPERATOR_NAMES,
+	SINGLE_SELECTION_OPERATOR_NAMES,
+	CUSTOM_SELECTION_OPERATOR_NAMES,
 } from '../../constants';
 import type {
 	Filter,
@@ -104,22 +85,19 @@ const FilterText = ( {
 		),
 	};
 
+	const operator = OPERATORS.find(
+		( op ) => op.name === filterInView?.operator
+	);
 	if (
-		filterInView?.operator !== undefined &&
-		[
-			OPERATOR_IS_ANY,
-			OPERATOR_IS_NONE,
-			OPERATOR_IS_ALL,
-			OPERATOR_IS_NOT_ALL,
-		].includes( filterInView.operator )
+		operator !== undefined &&
+		MULTI_SELECTION_OPERATOR_NAMES.includes( operator.name )
 	) {
 		return createInterpolateElement(
 			sprintf(
 				/* translators: 1: Filter name. 2: Operator name. 3: Filter value. e.g.: "Author is any: Admin, Editor". */
 				__( '<Name>%1$s %2$s: </Name><Value>%3$s</Value>' ),
 				filter.name,
-				OPERATORS[ filterInView.operator ].display ??
-					OPERATORS[ filterInView.operator ].label.toLowerCase(),
+				operator.display ?? operator.label.toLowerCase(),
 				activeElements.map( ( element ) => element.label ).join( ', ' )
 			),
 			filterTextWrappers
@@ -127,34 +105,18 @@ const FilterText = ( {
 	}
 
 	if (
-		filterInView?.operator !== undefined &&
+		operator !== undefined &&
 		[
-			OPERATOR_IS,
-			OPERATOR_IS_NOT,
-			OPERATOR_LESS_THAN,
-			OPERATOR_GREATER_THAN,
-			OPERATOR_LESS_THAN_OR_EQUAL,
-			OPERATOR_GREATER_THAN_OR_EQUAL,
-			OPERATOR_CONTAINS,
-			OPERATOR_NOT_CONTAINS,
-			OPERATOR_STARTS_WITH,
-			OPERATOR_BEFORE,
-			OPERATOR_AFTER,
-			OPERATOR_BEFORE_INC,
-			OPERATOR_AFTER_INC,
-			OPERATOR_BETWEEN,
-			OPERATOR_ON,
-			OPERATOR_NOT_ON,
-			OPERATOR_IN_THE_PAST,
-		].includes( filterInView.operator )
+			...SINGLE_SELECTION_OPERATOR_NAMES,
+			...CUSTOM_SELECTION_OPERATOR_NAMES,
+		].includes( operator.name )
 	) {
 		return createInterpolateElement(
 			sprintf(
 				/* translators: 1: Filter name. 2: Operator name. 3: Filter value. e.g.: "Author starts with: Adm". */
 				__( '<Name>%1$s %2$s: </Name><Value>%3$s</Value>' ),
 				filter.name,
-				OPERATORS[ filterInView.operator ].display ??
-					OPERATORS[ filterInView.operator ].label.toLowerCase(),
+				operator.display ?? operator.label.toLowerCase(),
 				activeElements[ 0 ].label
 			),
 			filterTextWrappers
@@ -175,7 +137,8 @@ function OperatorSelector( {
 }: OperatorSelectorProps ) {
 	const operatorOptions = filter.operators?.map( ( operator ) => ( {
 		value: operator,
-		label: OPERATORS[ operator ]?.label,
+		label:
+			OPERATORS.find( ( op ) => op.name === operator )?.label || operator,
 	} ) );
 	const currentFilter = view.filters?.find(
 		( _filter ) => _filter.field === filter.field
@@ -198,7 +161,7 @@ function OperatorSelector( {
 					value={ value }
 					options={ operatorOptions }
 					onChange={ ( newValue ) => {
-						const operator = newValue as Operator;
+						const newOperator = newValue as Operator;
 						const currentOperator = currentFilter?.operator;
 						const newFilters = currentFilter
 							? [
@@ -207,28 +170,29 @@ function OperatorSelector( {
 											if (
 												_filter.field === filter.field
 											) {
-												// Reset the value only when switching between operators that have different value types.
-												const OPERATORS_SHOULD_RESET_VALUE =
-													[
-														OPERATOR_BETWEEN,
-														OPERATOR_IN_THE_PAST,
-														OPERATOR_OVER,
-													];
+												const currentOpSelectionModel =
+													OPERATORS.find(
+														( op ) =>
+															op.name ===
+															currentOperator
+													)?.selection;
+												const newOpSelectionModel =
+													OPERATORS.find(
+														( op ) =>
+															op.name ===
+															newOperator
+													)?.selection;
+
 												const shouldResetValue =
-													currentOperator &&
-													( OPERATORS_SHOULD_RESET_VALUE.includes(
-														currentOperator
-													) ||
-														OPERATORS_SHOULD_RESET_VALUE.includes(
-															operator
-														) );
+													currentOpSelectionModel !==
+													newOpSelectionModel;
 
 												return {
 													..._filter,
 													value: shouldResetValue
 														? undefined
 														: _filter.value,
-													operator,
+													operator: newOperator,
 												};
 											}
 											return _filter;
@@ -239,7 +203,7 @@ function OperatorSelector( {
 									...( view.filters ?? [] ),
 									{
 										field: filter.field,
-										operator,
+										operator: newOperator,
 										value: undefined,
 									},
 							  ];
