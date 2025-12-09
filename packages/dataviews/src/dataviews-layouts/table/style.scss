@@ -32,7 +32,7 @@
 		&.dataviews-view-table__actions-column--sticky {
 			position: sticky;
 			right: 0;
-			background-color: inherit;
+			background-color: var(--wp-dataviews-color-background, #fff);
 		}
 
 		&.dataviews-view-table__actions-column--stuck {
