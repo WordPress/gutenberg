@@ -39,17 +39,6 @@ import {
 	useAlternativeTemplateParts,
 	useTemplatePartArea,
 } from './utils/hooks';
-import { unlock } from '../../lock-unlock';
-
-function getTemplatePartEditButtonTitle( clientId, editedContentOnlySection ) {
-	if ( ! window?.__experimentalContentOnlyPatternInsertion ) {
-		return __( 'Edit' );
-	}
-
-	return editedContentOnlySection === clientId
-		? __( 'Exit section' )
-		: __( 'Edit section' );
-}
 
 function ReplaceButton( {
 	isEntityAvailable,
@@ -119,15 +108,8 @@ export default function TemplatePartEdit( {
 } ) {
 	const { createSuccessNotice } = useDispatch( noticesStore );
 	const { editEntityRecord } = useDispatch( coreStore );
-	const { currentTheme, editedContentOnlySection } = useSelect(
-		( select ) => {
-			return {
-				currentTheme: select( coreStore ).getCurrentTheme()?.stylesheet,
-				editedContentOnlySection: unlock(
-					select( blockEditorStore )
-				).getEditedContentOnlySection(),
-			};
-		},
+	const currentTheme = useSelect(
+		( select ) => select( coreStore ).getCurrentTheme()?.stylesheet,
 		[]
 	);
 	const { slug, theme = currentTheme, tagName, layout = {} } = attributes;
@@ -259,17 +241,15 @@ export default function TemplatePartEdit( {
 						<BlockControls group="other">
 							<ToolbarButton
 								onClick={ () => {
-									// Template parts always navigate to isolated editor
 									onNavigateToEntityRecord( {
 										postId: templatePartId,
 										postType: 'wp_template_part',
 									} );
 								} }
 							>
-								{ getTemplatePartEditButtonTitle(
-									clientId,
-									editedContentOnlySection
-								) }
+								{ window?.__experimentalContentOnlyPatternInsertion
+									? __( 'Edit section' )
+									: __( 'Edit' ) }
 							</ToolbarButton>
 						</BlockControls>
 					) }
