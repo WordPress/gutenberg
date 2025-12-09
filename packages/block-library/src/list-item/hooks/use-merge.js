@@ -150,8 +150,10 @@ export default function useMerge( clientId, onMerge ) {
 				isUnmodifiedBlock( getBlock( clientId ) ) &&
 				blockOrder.length > 0
 			) {
-				outdentListItem( getBlockOrder( blockOrder[ 0 ] ) );
-				removeBlock( clientId, true );
+				registry.batch( () => {
+					outdentListItem( getBlockOrder( blockOrder[ 0 ] ) );
+					removeBlock( clientId, true );
+				} );
 			} else {
 				onMerge( forward );
 			}
