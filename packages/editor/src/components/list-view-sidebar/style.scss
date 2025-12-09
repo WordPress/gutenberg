@@ -24,8 +24,6 @@
 	scrollbar-gutter: auto;
 }
 
-// The table cells use a few extra pixels of horizontal space.
-// Apply compensating padding for the List View panel.
 .editor-list-view-sidebar__list-view-panel-content {
 	padding: $grid-unit-05;
 }
