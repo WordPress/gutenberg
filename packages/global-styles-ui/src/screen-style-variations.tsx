@@ -21,7 +21,7 @@ function ScreenStyleVariations() {
 			/>
 
 			<Card
-				size="none"
+				size="small"
 				isBorderless
 				className="global-styles-ui-screen-style-variations"
 			>
