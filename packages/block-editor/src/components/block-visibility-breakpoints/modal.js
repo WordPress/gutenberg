@@ -15,6 +15,8 @@ import {
 import { desktop, tablet, mobile } from '@wordpress/icons';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as blocksStore } from '@wordpress/blocks';
+import { store as noticesStore } from '@wordpress/notices';
+import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 
 /**
  * Internal dependencies
@@ -40,6 +42,12 @@ export default function BlockVisibilityBreakpointsModal( {
 	clientIds,
 	onClose,
 } ) {
+	const { createSuccessNotice } = useDispatch( noticesStore );
+	const listViewShortcut = useSelect( ( select ) => {
+		return select( keyboardShortcutsStore ).getShortcutRepresentation(
+			'core/editor/toggle-list-view'
+		);
+	}, [] );
 	const { blocks, blockType } = useSelect(
 		( select ) => {
 			const _blocks =
@@ -195,6 +203,52 @@ export default function BlockVisibilityBreakpointsModal( {
 			updateBlockAttributes( clientIds, attributesByClientId, {
 				uniqueByBlock: true,
 			} );
+
+			if ( hideEverywhere ) {
+				if ( blocks.length > 1 ) {
+					createSuccessNotice(
+						sprintf(
+							// translators: %s: The shortcut key to access the List View.
+							__(
+								'Blocks hidden. You can access them via the List View (%s).'
+							),
+							listViewShortcut
+						),
+						{
+							id: 'block-visibility-hidden',
+							type: 'snackbar',
+						}
+					);
+				} else {
+					createSuccessNotice(
+						sprintf(
+							// translators: %s: The shortcut key to access the List View.
+							__(
+								'Block hidden. You can access it via the List View (%s).'
+							),
+							listViewShortcut
+						),
+						{
+							id: 'block-visibility-hidden',
+							type: 'snackbar',
+						}
+					);
+				}
+			} else {
+				createSuccessNotice(
+					sprintf(
+						// translators: %s: The shortcut key to access the List View.
+						__(
+							'Block visibility settings saved. You can access it via the List View (%s).'
+						),
+						listViewShortcut
+					),
+					{
+						id: 'block-visibility-breakpoints-saved',
+						type: 'snackbar',
+					}
+				);
+			}
 
 			onClose();
 		} catch ( err ) {
