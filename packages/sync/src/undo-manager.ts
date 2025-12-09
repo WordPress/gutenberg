@@ -41,42 +41,6 @@ export function createUndoManager(): SyncUndoManager {
 		trackedOrigins: new Set( [ LOCAL_EDITOR_ORIGIN ] ),
 	} );
 
-	// function updatePositionMeta( event: StackItemEvent ): void {
-	// 	const selectionHistory = selectionHistoryMap.get( event.ydoc.guid );
-	// 	if ( ! selectionHistory ) {
-	// 		return;
-	// 	}
-
-	// 	let positionToStore = selectionHistory.getCurrentPosition();
-	// 	const backupPositions = selectionHistory.getBlockHistory( 3 );
-
-	// 	if ( positionToStore === null && backupPositions.length === 0 ) {
-	// 		// If we don't have a last selection and no backup positions, then don't save anything extra
-	// 		return;
-	// 	} else if ( positionToStore === null ) {
-	// 		// If positionToStore is null for some reason, use a backup position
-	// 		positionToStore = backupPositions[ 0 ];
-	// 	}
-
-	// 	const positionMeta: PositionMeta = {
-	// 		position: positionToStore,
-	// 		backupPositions,
-	// 	};
-
-	// 	event.stackItem.meta.set( 'position', positionMeta );
-	// }
-
-	// yUndoManager.on( 'stack-item-added', ( event: StackItemEvent ) => {
-	// 	updatePositionMeta( event );
-	// } );
-
-	// stack-item-updated not necessary - we already have the starting position
-	// for the undo operation stored in stack-item-added
-
-	// yUndoManager.on( 'stack-item-popped', ( event: StackItemEvent ) => {
-	// 	restorePosition( event );
-	// } );
-
 	return {
 		/**
 		 * Record changes into the history.
