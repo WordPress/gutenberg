@@ -307,7 +307,7 @@ describe( 'filters', () => {
 		expect( result[ 7 ].name.title ).toBe( 'Uranus' );
 	} );
 
-	it( 'should search using IS NOT ALL filter', () => {
+	it( 'should search using IS NOT ALL filter (deprecated operator)', () => {
 		const { data: result } = filterSortAndPaginate(
 			data,
 			{
