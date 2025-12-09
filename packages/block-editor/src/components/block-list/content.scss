@@ -128,12 +128,9 @@ _::-webkit-full-page-media, _:future, :root [data-has-multi-selection="true"] .b
 		padding: 0 !important;
 	}
 
-	&.is-layout-flex:not(.is-vertical)
-		> .wp-block-hidden-mobile,
-	&.is-layout-flex:not(.is-vertical)
-		> .wp-block-hidden-tablet,
-	&.is-layout-flex:not(.is-vertical)
-		> .wp-block-hidden-desktop {
+	&.is-layout-flex:not(.is-vertical) > .wp-block-hidden-mobile,
+	&.is-layout-flex:not(.is-vertical) > .wp-block-hidden-tablet,
+	&.is-layout-flex:not(.is-vertical) > .wp-block-hidden-desktop {
 		width: 0;
 		height: auto;
 		align-self: stretch;
