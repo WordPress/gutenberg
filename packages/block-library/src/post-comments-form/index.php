@@ -36,7 +36,11 @@ function render_block_core_post_comments_form( $attributes, $content, $block ) {
 	add_filter( 'comment_form_defaults', 'post_comments_form_block_form_defaults' );
 
 	ob_start();
-	comment_form( array(), $block->context['postId'] );
+	$args = array();
+	if ( ! empty( $attributes['commentFormTitle'] ) ) {
+		$args['title_reply'] = $attributes['commentFormTitle'];
+	}
+	comment_form( $args, $block->context['postId'] );
 	$form = ob_get_clean();
 
 	remove_filter( 'comment_form_defaults', 'post_comments_form_block_form_defaults' );
