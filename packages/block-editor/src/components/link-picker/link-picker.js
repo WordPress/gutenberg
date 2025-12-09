@@ -27,7 +27,7 @@ import { LinkPreviewButton } from './link-preview-button';
  * @param {string}   props.help             - Help text for the control
  */
 export function LinkPicker( {
-	preview = {},
+	preview,
 	onSelect,
 	suggestionsQuery,
 	label,

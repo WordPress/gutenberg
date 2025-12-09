@@ -46,6 +46,21 @@ function createMockSuggestions( count = 3 ) {
 	} ) );
 }
 
+// Helper to create mock preview data
+function createMockPreview( {
+	title = '',
+	url = '',
+	image = null,
+	badges = [],
+} = {} ) {
+	return {
+		title,
+		url,
+		image,
+		badges,
+	};
+}
+
 beforeEach( () => {
 	mockFetchSearchSuggestions.mockImplementation( () =>
 		Promise.resolve( createMockSuggestions() )
@@ -61,7 +76,7 @@ describe( 'LinkPicker', () => {
 		it( 'should render a button with "Add link" text when no link is provided', () => {
 			render(
 				<LinkPicker
-					link={ { url: '' } }
+					preview={ createMockPreview() }
 					onSelect={ jest.fn() }
 					label="Link"
 				/>
@@ -137,7 +152,7 @@ describe( 'LinkPicker', () => {
 		it( 'should render label for the control', () => {
 			render(
 				<LinkPicker
-					link={ { url: 'https://example.com' } }
+					preview={ createMockPreview( { url: 'example.com' } ) }
 					onSelect={ jest.fn() }
 					label="Link to"
 				/>
@@ -149,7 +164,7 @@ describe( 'LinkPicker', () => {
 		it( 'should render help text when provided', () => {
 			render(
 				<LinkPicker
-					link={ { url: 'https://example.com' } }
+					preview={ createMockPreview( { url: 'example.com' } ) }
 					onSelect={ jest.fn() }
 					label="Link"
 					help="Synced with the selected page."
@@ -168,7 +183,7 @@ describe( 'LinkPicker', () => {
 
 			render(
 				<LinkPicker
-					link={ { url: 'https://example.com' } }
+					preview={ createMockPreview( { url: 'example.com' } ) }
 					onSelect={ jest.fn() }
 					label="Link"
 				/>
@@ -195,7 +210,7 @@ describe( 'LinkPicker', () => {
 
 			render(
 				<LinkPicker
-					link={ { url: 'https://example.com' } }
+					preview={ createMockPreview( { url: 'example.com' } ) }
 					onSelect={ jest.fn() }
 					label="Link"
 				/>
@@ -217,7 +232,7 @@ describe( 'LinkPicker', () => {
 		it( 'should display help text when provided', () => {
 			render(
 				<LinkPicker
-					link={ { url: 'https://example.com' } }
+					preview={ createMockPreview( { url: 'example.com' } ) }
 					onSelect={ jest.fn() }
 					label="Link"
 					help="This is help text"
@@ -238,7 +253,7 @@ describe( 'LinkPicker', () => {
 		it( 'should not have aria-describedby when help is not provided', () => {
 			render(
 				<LinkPicker
-					link={ { url: 'https://example.com' } }
+					preview={ createMockPreview( { url: 'example.com' } ) }
 					onSelect={ jest.fn() }
 					label="Link"
 				/>
@@ -258,7 +273,7 @@ describe( 'LinkPicker', () => {
 
 			render(
 				<LinkPicker
-					link={ { url: '' } }
+					preview={ createMockPreview() }
 					onSelect={ onSelect }
 					label="Link"
 				/>
@@ -302,7 +317,7 @@ describe( 'LinkPicker', () => {
 
 			render(
 				<LinkPicker
-					link={ { url: '' } }
+					preview={ createMockPreview() }
 					onSelect={ jest.fn() }
 					label="Link"
 				/>
@@ -346,7 +361,7 @@ describe( 'LinkPicker', () => {
 
 			render(
 				<LinkPicker
-					link={ { url: '' } }
+					preview={ createMockPreview() }
 					onSelect={ jest.fn() }
 					suggestionsQuery={ customQuery }
 					label="Link"
@@ -382,7 +397,7 @@ describe( 'LinkPicker', () => {
 
 			render(
 				<LinkPicker
-					link={ { url: '' } }
+					preview={ createMockPreview() }
 					onSelect={ onSelect }
 					label="Link"
 				/>

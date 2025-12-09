@@ -31,7 +31,7 @@ const { Badge } = unlock( componentsPrivateApis );
  * @param {Object}   props.props   - Additional props to pass to the button
  */
 export function LinkPreviewButton( { preview, onClick, label, ...props } ) {
-	const { title, url: displayUrl, image, badges } = preview || {};
+	const { title, url: displayUrl, image, badges } = preview;
 
 	// Fallback for missing title
 	const displayTitle = title || __( 'Add link' );
