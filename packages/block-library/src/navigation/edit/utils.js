@@ -77,24 +77,30 @@ export function getColors( context, isSubMenu ) {
 
 	const colors = {};
 
-	// Text color priority: submenu colors first, then new overlay colors, then legacy overlay colors, then main colors.
-	// Check for submenu colors first (new blocks), then fall back to overlay (legacy/unmigrated).
+	// Text color priority: submenu colors first, then legacy overlay colors (unmigrated only), then main colors.
+	// Check for submenu colors first. Only fall back to overlay colors for truly legacy blocks
+	// (those with legacy overlay colors but not new overlay colors). Migrated/new blocks that
+	// have new overlay colors should NOT fall back when submenu colors are cleared.
 	if ( isSubMenu ) {
 		if ( customSubmenuTextColor ) {
 			colors.customTextColor = customSubmenuTextColor;
 		} else if ( submenuTextColor ) {
 			colors.textColor = submenuTextColor;
-		} else if ( customDefaultOverlayTextColor ) {
-			// Fallback to new overlay colors (migrated blocks).
-			colors.customTextColor = customDefaultOverlayTextColor;
-		} else if ( defaultOverlayTextColor ) {
-			// Fallback to new overlay colors (migrated blocks).
-			colors.textColor = defaultOverlayTextColor;
-		} else if ( customOverlayTextColor ) {
-			// Fallback to legacy overlay colors (unmigrated blocks).
+		} else if (
+			// Only fall back to legacy overlay colors for unmigrated blocks.
+			// If new overlay colors exist, this is a migrated/new block and we should NOT fall back.
+			! defaultOverlayTextColor &&
+			! customDefaultOverlayTextColor &&
+			customOverlayTextColor
+		) {
+			// Fallback to legacy overlay colors (unmigrated blocks only).
 			colors.customTextColor = customOverlayTextColor;
-		} else if ( overlayTextColor ) {
-			// Fallback to legacy overlay colors (unmigrated blocks).
+		} else if (
+			! defaultOverlayTextColor &&
+			! customDefaultOverlayTextColor &&
+			overlayTextColor
+		) {
+			// Fallback to legacy overlay colors (unmigrated blocks only).
 			colors.textColor = overlayTextColor;
 		} else if ( customTextColor ) {
 			colors.customTextColor = customTextColor;
@@ -112,24 +118,30 @@ export function getColors( context, isSubMenu ) {
 		colors.customTextColor = style.color.text;
 	}
 
-	// Background color priority: submenu colors first, then new overlay colors, then legacy overlay colors, then main colors.
-	// Check for submenu colors first (new blocks), then fall back to overlay (legacy/unmigrated).
+	// Background color priority: submenu colors first, then legacy overlay colors (unmigrated only), then main colors.
+	// Check for submenu colors first. Only fall back to overlay colors for truly legacy blocks
+	// (those with legacy overlay colors but not new overlay colors). Migrated/new blocks that
+	// have new overlay colors should NOT fall back when submenu colors are cleared.
 	if ( isSubMenu ) {
 		if ( customSubmenuBackgroundColor ) {
 			colors.customBackgroundColor = customSubmenuBackgroundColor;
 		} else if ( submenuBackgroundColor ) {
 			colors.backgroundColor = submenuBackgroundColor;
-		} else if ( customDefaultOverlayBackgroundColor ) {
-			// Fallback to new overlay colors (migrated blocks).
-			colors.customBackgroundColor = customDefaultOverlayBackgroundColor;
-		} else if ( defaultOverlayBackgroundColor ) {
-			// Fallback to new overlay colors (migrated blocks).
-			colors.backgroundColor = defaultOverlayBackgroundColor;
-		} else if ( customOverlayBackgroundColor ) {
-			// Fallback to legacy overlay colors (unmigrated blocks).
+		} else if (
+			// Only fall back to legacy overlay colors for unmigrated blocks.
+			// If new overlay colors exist, this is a migrated/new block and we should NOT fall back.
+			! defaultOverlayBackgroundColor &&
+			! customDefaultOverlayBackgroundColor &&
+			customOverlayBackgroundColor
+		) {
+			// Fallback to legacy overlay colors (unmigrated blocks only).
 			colors.customBackgroundColor = customOverlayBackgroundColor;
-		} else if ( overlayBackgroundColor ) {
-			// Fallback to legacy overlay colors (unmigrated blocks).
+		} else if (
+			! defaultOverlayBackgroundColor &&
+			! customDefaultOverlayBackgroundColor &&
+			overlayBackgroundColor
+		) {
+			// Fallback to legacy overlay colors (unmigrated blocks only).
 			colors.backgroundColor = overlayBackgroundColor;
 		} else if ( customBackgroundColor ) {
 			colors.customBackgroundColor = customBackgroundColor;

@@ -34,17 +34,25 @@ function block_core_navigation_link_build_css_colors( $context, $attributes, $is
 		$custom_text_color = $context['customSubmenuTextColor'];
 	} elseif ( $is_sub_menu && array_key_exists( 'submenuTextColor', $context ) ) {
 		$named_text_color = $context['submenuTextColor'];
-	} elseif ( $is_sub_menu && array_key_exists( 'customDefaultOverlayTextColor', $context ) ) {
-		// Fallback to new overlay colors (migrated blocks).
-		$custom_text_color = $context['customDefaultOverlayTextColor'];
-	} elseif ( $is_sub_menu && array_key_exists( 'defaultOverlayTextColor', $context ) ) {
-		// Fallback to new overlay colors (migrated blocks).
-		$named_text_color = $context['defaultOverlayTextColor'];
-	} elseif ( $is_sub_menu && array_key_exists( 'customOverlayTextColor', $context ) ) {
-		// Fallback to legacy overlay colors (unmigrated blocks).
+	} elseif (
+		$is_sub_menu &&
+		// Only fall back to legacy overlay colors for unmigrated blocks.
+		// If new overlay colors exist, this is a migrated/new block and we should NOT fall back.
+		! array_key_exists( 'defaultOverlayTextColor', $context ) &&
+		! array_key_exists( 'customDefaultOverlayTextColor', $context ) &&
+		array_key_exists( 'customOverlayTextColor', $context )
+	) {
+		// Fallback to legacy overlay colors (unmigrated blocks only).
 		$custom_text_color = $context['customOverlayTextColor'];
-	} elseif ( $is_sub_menu && array_key_exists( 'overlayTextColor', $context ) ) {
-		// Fallback to legacy overlay colors (unmigrated blocks).
+	} elseif (
+		$is_sub_menu &&
+		// Only fall back to legacy overlay colors for unmigrated blocks.
+		// If new overlay colors exist, this is a migrated/new block and we should NOT fall back.
+		! array_key_exists( 'defaultOverlayTextColor', $context ) &&
+		! array_key_exists( 'customDefaultOverlayTextColor', $context ) &&
+		array_key_exists( 'overlayTextColor', $context )
+	) {
+		// Fallback to legacy overlay colors (unmigrated blocks only).
 		$named_text_color = $context['overlayTextColor'];
 	} elseif ( array_key_exists( 'customTextColor', $context ) ) {
 		$custom_text_color = $context['customTextColor'];
@@ -76,17 +84,25 @@ function block_core_navigation_link_build_css_colors( $context, $attributes, $is
 		$custom_background_color = $context['customSubmenuBackgroundColor'];
 	} elseif ( $is_sub_menu && array_key_exists( 'submenuBackgroundColor', $context ) ) {
 		$named_background_color = $context['submenuBackgroundColor'];
-	} elseif ( $is_sub_menu && array_key_exists( 'customDefaultOverlayBackgroundColor', $context ) ) {
-		// Fallback to new overlay colors (migrated blocks).
-		$custom_background_color = $context['customDefaultOverlayBackgroundColor'];
-	} elseif ( $is_sub_menu && array_key_exists( 'defaultOverlayBackgroundColor', $context ) ) {
-		// Fallback to new overlay colors (migrated blocks).
-		$named_background_color = $context['defaultOverlayBackgroundColor'];
-	} elseif ( $is_sub_menu && array_key_exists( 'customOverlayBackgroundColor', $context ) ) {
-		// Fallback to legacy overlay colors (unmigrated blocks).
+	} elseif (
+		$is_sub_menu &&
+		// Only fall back to legacy overlay colors for unmigrated blocks.
+		// If new overlay colors exist, this is a migrated/new block and we should NOT fall back.
+		! array_key_exists( 'defaultOverlayBackgroundColor', $context ) &&
+		! array_key_exists( 'customDefaultOverlayBackgroundColor', $context ) &&
+		array_key_exists( 'customOverlayBackgroundColor', $context )
+	) {
+		// Fallback to legacy overlay colors (unmigrated blocks only).
 		$custom_background_color = $context['customOverlayBackgroundColor'];
-	} elseif ( $is_sub_menu && array_key_exists( 'overlayBackgroundColor', $context ) ) {
-		// Fallback to legacy overlay colors (unmigrated blocks).
+	} elseif (
+		$is_sub_menu &&
+		// Only fall back to legacy overlay colors for unmigrated blocks.
+		// If new overlay colors exist, this is a migrated/new block and we should NOT fall back.
+		! array_key_exists( 'defaultOverlayBackgroundColor', $context ) &&
+		! array_key_exists( 'customDefaultOverlayBackgroundColor', $context ) &&
+		array_key_exists( 'overlayBackgroundColor', $context )
+	) {
+		// Fallback to legacy overlay colors (unmigrated blocks only).
 		$named_background_color = $context['overlayBackgroundColor'];
 	} elseif ( array_key_exists( 'customBackgroundColor', $context ) ) {
 		$custom_background_color = $context['customBackgroundColor'];

@@ -873,12 +873,12 @@ function block_core_navigation_add_directives_to_submenu( $tags, $block_attribut
  */
 function block_core_navigation_build_css_colors( $attributes ) {
 	$colors = array(
-		'css_classes'             => array(),
-		'inline_styles'           => '',
-		'overlay_css_classes'     => array(),
-		'overlay_inline_styles'   => '',
-		'submenu_css_classes'     => array(),
-		'submenu_inline_styles'   => '',
+		'css_classes'           => array(),
+		'inline_styles'         => '',
+		'overlay_css_classes'   => array(),
+		'overlay_inline_styles' => '',
+		'submenu_css_classes'   => array(),
+		'submenu_inline_styles' => '',
 	);
 
 	// Text color.
@@ -922,7 +922,7 @@ function block_core_navigation_build_css_colors( $attributes ) {
 	// Legacy attributes (overlayTextColor/customOverlayTextColor) are deprecated and will be
 	// migrated to new attributes (defaultOverlayTextColor/customDefaultOverlayTextColor) when
 	// blocks are edited in the editor. We check new attributes first to support migrated blocks.
-	$has_named_default_overlay_text_color = array_key_exists(
+	$has_named_default_overlay_text_color  = array_key_exists(
 		'defaultOverlayTextColor',
 		$attributes
 	);
@@ -931,7 +931,7 @@ function block_core_navigation_build_css_colors( $attributes ) {
 		$attributes
 	);
 	// Legacy attribute aliases for backwards compatibility with unmigrated blocks.
-	$legacy_overlay_text_color = array_key_exists( 'overlayTextColor', $attributes )
+	$legacy_overlay_text_color        = array_key_exists( 'overlayTextColor', $attributes )
 		? $attributes['overlayTextColor']
 		: null;
 	$legacy_custom_overlay_text_color = array_key_exists(
@@ -942,9 +942,9 @@ function block_core_navigation_build_css_colors( $attributes ) {
 		: null;
 
 	$has_named_overlay_text_color  = $has_named_default_overlay_text_color ||
-		( $legacy_overlay_text_color !== null );
+		( null !== $legacy_overlay_text_color );
 	$has_custom_overlay_text_color = $has_custom_default_overlay_text_color ||
-		( $legacy_custom_overlay_text_color !== null );
+		( null !== $legacy_custom_overlay_text_color );
 
 	// If has overlay text color.
 	if ( $has_custom_overlay_text_color || $has_named_overlay_text_color ) {
@@ -958,7 +958,7 @@ function block_core_navigation_build_css_colors( $attributes ) {
 			'has-%s-color',
 			$attributes['defaultOverlayTextColor']
 		);
-	} elseif ( $legacy_overlay_text_color !== null ) {
+	} elseif ( null !== $legacy_overlay_text_color ) {
 		// Fallback to legacy attribute for unmigrated blocks.
 		$colors['overlay_css_classes'][] = sprintf(
 			'has-%s-color',
@@ -970,7 +970,7 @@ function block_core_navigation_build_css_colors( $attributes ) {
 			'color: %s;',
 			$attributes['customDefaultOverlayTextColor']
 		);
-	} elseif ( $legacy_custom_overlay_text_color !== null ) {
+	} elseif ( null !== $legacy_custom_overlay_text_color ) {
 		// Fallback to legacy attribute for unmigrated blocks.
 		$colors['overlay_inline_styles'] .= sprintf(
 			'color: %s;',
@@ -983,7 +983,7 @@ function block_core_navigation_build_css_colors( $attributes ) {
 	// Legacy attributes (overlayBackgroundColor/customOverlayBackgroundColor) are deprecated and will be
 	// migrated to new attributes (defaultOverlayBackgroundColor/customDefaultOverlayBackgroundColor) when
 	// blocks are edited in the editor. We check new attributes first to support migrated blocks.
-	$has_named_default_overlay_background_color = array_key_exists(
+	$has_named_default_overlay_background_color  = array_key_exists(
 		'defaultOverlayBackgroundColor',
 		$attributes
 	);
@@ -992,7 +992,7 @@ function block_core_navigation_build_css_colors( $attributes ) {
 		$attributes
 	);
 	// Legacy attribute aliases for backwards compatibility with unmigrated blocks.
-	$legacy_overlay_background_color = array_key_exists(
+	$legacy_overlay_background_color        = array_key_exists(
 		'overlayBackgroundColor',
 		$attributes
 	)
@@ -1006,9 +1006,9 @@ function block_core_navigation_build_css_colors( $attributes ) {
 		: null;
 
 	$has_named_overlay_background_color  = $has_named_default_overlay_background_color ||
-		( $legacy_overlay_background_color !== null );
+		( null !== $legacy_overlay_background_color );
 	$has_custom_overlay_background_color = $has_custom_default_overlay_background_color ||
-		( $legacy_custom_overlay_background_color !== null );
+		( null !== $legacy_custom_overlay_background_color );
 
 	// If has overlay background color.
 	if ( $has_custom_overlay_background_color || $has_named_overlay_background_color ) {
@@ -1022,7 +1022,7 @@ function block_core_navigation_build_css_colors( $attributes ) {
 			'has-%s-background-color',
 			$attributes['defaultOverlayBackgroundColor']
 		);
-	} elseif ( $legacy_overlay_background_color !== null ) {
+	} elseif ( null !== $legacy_overlay_background_color ) {
 		// Fallback to legacy attribute for unmigrated blocks.
 		$colors['overlay_css_classes'][] = sprintf(
 			'has-%s-background-color',
@@ -1034,7 +1034,7 @@ function block_core_navigation_build_css_colors( $attributes ) {
 			'background-color: %s;',
 			$attributes['customDefaultOverlayBackgroundColor']
 		);
-	} elseif ( $legacy_custom_overlay_background_color !== null ) {
+	} elseif ( null !== $legacy_custom_overlay_background_color ) {
 		// Fallback to legacy attribute for unmigrated blocks.
 		$colors['overlay_inline_styles'] .= sprintf(
 			'background-color: %s;',
@@ -1044,8 +1044,9 @@ function block_core_navigation_build_css_colors( $attributes ) {
 
 	// Submenu text color.
 	// Check new submenu attributes first, then fallback to legacy overlay attributes for backwards compatibility.
-	// Legacy blocks (before migration) used overlayTextColor for submenus. After migration, submenuTextColor
-	// is set. We check new attributes first, then fallback to legacy overlay attributes for unmigrated blocks.
+	// Only fall back to overlay colors for truly legacy blocks (those with legacy overlay colors but not
+	// new overlay colors). Migrated/new blocks that have new overlay colors should NOT fall back when
+	// submenu colors are cleared.
 	$has_named_submenu_text_color  = array_key_exists( 'submenuTextColor', $attributes );
 	$has_custom_submenu_text_color = array_key_exists( 'customSubmenuTextColor', $attributes );
 
@@ -1063,28 +1064,24 @@ function block_core_navigation_build_css_colors( $attributes ) {
 			'color: %s;',
 			$attributes['customSubmenuTextColor']
 		);
-	} elseif ( $has_custom_overlay_text_color || $has_named_overlay_text_color ) {
-		// Fallback to legacy overlay colors for unmigrated blocks.
+	} elseif (
+		// Only fall back to legacy overlay colors for unmigrated blocks.
+		// If new overlay colors exist, this is a migrated/new block and we should NOT fall back.
+		! $has_named_default_overlay_text_color &&
+		! $has_custom_default_overlay_text_color &&
+		( $has_custom_overlay_text_color || $has_named_overlay_text_color )
+	) {
+		// Fallback to legacy overlay colors for unmigrated blocks only.
 		// Legacy blocks used overlayTextColor for both overlay and submenu.
 		if ( ! in_array( 'has-text-color', $colors['submenu_css_classes'], true ) ) {
 			$colors['submenu_css_classes'][] = 'has-text-color';
 		}
-		if ( $has_named_default_overlay_text_color ) {
-			$colors['submenu_css_classes'][] = sprintf(
-				'has-%s-color',
-				$attributes['defaultOverlayTextColor']
-			);
-		} elseif ( $legacy_overlay_text_color !== null ) {
+		if ( null !== $legacy_overlay_text_color ) {
 			$colors['submenu_css_classes'][] = sprintf(
 				'has-%s-color',
 				$legacy_overlay_text_color
 			);
-		} elseif ( $has_custom_default_overlay_text_color ) {
-			$colors['submenu_inline_styles'] .= sprintf(
-				'color: %s;',
-				$attributes['customDefaultOverlayTextColor']
-			);
-		} elseif ( $legacy_custom_overlay_text_color !== null ) {
+		} elseif ( null !== $legacy_custom_overlay_text_color ) {
 			$colors['submenu_inline_styles'] .= sprintf(
 				'color: %s;',
 				$legacy_custom_overlay_text_color
@@ -1094,8 +1091,9 @@ function block_core_navigation_build_css_colors( $attributes ) {
 
 	// Submenu background color.
 	// Check new submenu attributes first, then fallback to legacy overlay attributes for backwards compatibility.
-	// Legacy blocks (before migration) used overlayBackgroundColor for submenus. After migration, submenuBackgroundColor
-	// is set. We check new attributes first, then fallback to legacy overlay attributes for unmigrated blocks.
+	// Only fall back to overlay colors for truly legacy blocks (those with legacy overlay colors but not
+	// new overlay colors). Migrated/new blocks that have new overlay colors should NOT fall back when
+	// submenu colors are cleared.
 	$has_named_submenu_background_color  = array_key_exists(
 		'submenuBackgroundColor',
 		$attributes
@@ -1119,28 +1117,24 @@ function block_core_navigation_build_css_colors( $attributes ) {
 			'background-color: %s;',
 			$attributes['customSubmenuBackgroundColor']
 		);
-	} elseif ( $has_custom_overlay_background_color || $has_named_overlay_background_color ) {
-		// Fallback to legacy overlay colors for unmigrated blocks.
+	} elseif (
+		// Only fall back to legacy overlay colors for unmigrated blocks.
+		// If new overlay colors exist, this is a migrated/new block and we should NOT fall back.
+		! $has_named_default_overlay_background_color &&
+		! $has_custom_default_overlay_background_color &&
+		( $has_custom_overlay_background_color || $has_named_overlay_background_color )
+	) {
+		// Fallback to legacy overlay colors for unmigrated blocks only.
 		// Legacy blocks used overlayBackgroundColor for both overlay and submenu.
 		if ( ! in_array( 'has-background', $colors['submenu_css_classes'], true ) ) {
 			$colors['submenu_css_classes'][] = 'has-background';
 		}
-		if ( $has_named_default_overlay_background_color ) {
-			$colors['submenu_css_classes'][] = sprintf(
-				'has-%s-background-color',
-				$attributes['defaultOverlayBackgroundColor']
-			);
-		} elseif ( $legacy_overlay_background_color !== null ) {
+		if ( null !== $legacy_overlay_background_color ) {
 			$colors['submenu_css_classes'][] = sprintf(
 				'has-%s-background-color',
 				$legacy_overlay_background_color
 			);
-		} elseif ( $has_custom_default_overlay_background_color ) {
-			$colors['submenu_inline_styles'] .= sprintf(
-				'background-color: %s;',
-				$attributes['customDefaultOverlayBackgroundColor']
-			);
-		} elseif ( $legacy_custom_overlay_background_color !== null ) {
+		} elseif ( null !== $legacy_custom_overlay_background_color ) {
 			$colors['submenu_inline_styles'] .= sprintf(
 				'background-color: %s;',
 				$legacy_custom_overlay_background_color
