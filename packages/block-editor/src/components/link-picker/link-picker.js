@@ -63,7 +63,7 @@ export function LinkPicker( {
 		return (
 			<LinkPreviewButton
 				preview={ preview }
-				onClick={ () => setIsOpen( true ) }
+				onClick={ () => setIsOpen( ! isOpen ) }
 				aria-haspopup="dialog"
 				aria-expanded={ isOpen }
 				aria-describedby={ controlProps[ 'aria-describedby' ] }

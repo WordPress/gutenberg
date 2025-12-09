@@ -229,6 +229,45 @@ describe( 'LinkPicker', () => {
 			expect( button ).toHaveAttribute( 'aria-expanded', 'true' );
 		} );
 
+		it( 'should close dropdown when preview button is clicked again', async () => {
+			const user = userEvent.setup();
+
+			render(
+				<LinkPicker
+					preview={ createMockPreview( { url: 'example.com' } ) }
+					onSelect={ jest.fn() }
+					label="Link"
+				/>
+			);
+
+			const button = screen.getByRole( 'button' );
+
+			// Click to open
+			await user.click( button );
+			expect( button ).toHaveAttribute( 'aria-expanded', 'true' );
+
+			// Verify dropdown content is visible
+			const searchInput = await screen.findByRole( 'combobox', {
+				name: 'Search or type URL',
+			} );
+			expect( searchInput ).toBeVisible();
+
+			// Click the preview button again to close
+			await user.click( button );
+
+			// After clicking again, aria-expanded should be false
+			await waitFor( () => {
+				expect( button ).toHaveAttribute( 'aria-expanded', 'false' );
+			} );
+
+			// Search input should no longer be visible
+			expect(
+				screen.queryByRole( 'combobox', {
+					name: 'Search or type URL',
+				} )
+			).not.toBeInTheDocument();
+		} );
+
 		it( 'should display help text when provided', () => {
 			render(
 				<LinkPicker
