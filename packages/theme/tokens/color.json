@@ -1072,10 +1072,6 @@
 						"active": {
 							"$value": "{color.primitive.primary.stroke4}",
 							"$description": "Accessible stroke color used for interactive brand-toned elements with normal emphasis that are hovered, focused, or active."
-						},
-						"disabled": {
-							"$value": "{color.primitive.bg.stroke2}",
-							"$description": "Accessible stroke color used for interactive brand-toned elements with normal emphasis, in their disabled state."
 						}
 					}
 				},

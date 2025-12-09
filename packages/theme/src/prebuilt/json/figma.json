@@ -648,12 +648,6 @@
 		},
 		"description": "Accessible stroke color used for interactive brand-toned elements with normal emphasis that are hovered, focused, or active."
 	},
-	"Color/Semantic/Stroke/Brand/strokeInt-brand-disabled": {
-		"value": {
-			".": "#d8d8d8"
-		},
-		"description": "Accessible stroke color used for interactive brand-toned elements with normal emphasis, in their disabled state."
-	},
 	"Color/Semantic/Stroke/Error/strokeInt-error": {
 		"value": {
 			".": "#cc1818"

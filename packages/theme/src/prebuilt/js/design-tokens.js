@@ -112,7 +112,6 @@ export default [
 	'--wpds-color-stroke-interactive-neutral-strong',
 	'--wpds-color-stroke-interactive-brand',
 	'--wpds-color-stroke-interactive-brand-active',
-	'--wpds-color-stroke-interactive-brand-disabled',
 	'--wpds-color-stroke-interactive-error',
 	'--wpds-color-stroke-interactive-error-active',
 	'--wpds-color-stroke-interactive-error-strong',
