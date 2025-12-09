@@ -7,9 +7,9 @@ import { useMemo } from '@wordpress/element';
  * Internal dependencies
  */
 import {
-	ALL_OPERATOR_NAMES,
-	SINGLE_SELECTION_OPERATOR_NAMES,
-} from '../../constants';
+	isRegisteredOperator,
+	isSingleSelectionOperator,
+} from '../../utils/operators';
 import type { NormalizedFilter, NormalizedField, View } from '../../types';
 
 function useFilters( fields: NormalizedField< any >[], view: View ) {
@@ -36,7 +36,7 @@ function useFilters( fields: NormalizedField< any >[], view: View ) {
 				getElements: field.getElements,
 				hasElements: field.hasElements,
 				singleSelection: operators.some( ( op ) =>
-					SINGLE_SELECTION_OPERATOR_NAMES.includes( op )
+					isSingleSelectionOperator( op )
 				),
 				operators,
 				isVisible:
@@ -45,7 +45,7 @@ function useFilters( fields: NormalizedField< any >[], view: View ) {
 					!! view.filters?.some(
 						( f ) =>
 							f.field === field.id &&
-							ALL_OPERATOR_NAMES.includes( f.operator )
+							isRegisteredOperator( f.operator )
 					),
 				isPrimary,
 				isLocked,

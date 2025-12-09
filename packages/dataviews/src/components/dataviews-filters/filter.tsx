@@ -17,7 +17,7 @@ import {
 	Icon,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
-import { useRef, createInterpolateElement } from '@wordpress/element';
+import { useRef } from '@wordpress/element';
 import { closeSmall } from '@wordpress/icons';
 import { dateI18n, getDate } from '@wordpress/date';
 
@@ -26,12 +26,7 @@ import { dateI18n, getDate } from '@wordpress/date';
  */
 import SearchWidget from './search-widget';
 import InputWidget from './input-widget';
-import {
-	OPERATORS,
-	MULTI_SELECTION_OPERATOR_NAMES,
-	SINGLE_SELECTION_OPERATOR_NAMES,
-	CUSTOM_SELECTION_OPERATOR_NAMES,
-} from '../../constants';
+import { getOperatorByName } from '../../utils/operators';
 import type {
 	Filter,
 	NormalizedField,
@@ -78,49 +73,9 @@ const FilterText = ( {
 		return filter.name;
 	}
 
-	const filterTextWrappers = {
-		Name: <span className="dataviews-filters__summary-filter-text-name" />,
-		Value: (
-			<span className="dataviews-filters__summary-filter-text-value" />
-		),
-	};
-
-	const operator = OPERATORS.find(
-		( op ) => op.name === filterInView?.operator
-	);
-	if (
-		operator !== undefined &&
-		MULTI_SELECTION_OPERATOR_NAMES.includes( operator.name )
-	) {
-		return createInterpolateElement(
-			sprintf(
-				/* translators: 1: Filter name. 2: Operator name. 3: Filter value. e.g.: "Author is any: Admin, Editor". */
-				__( '<Name>%1$s %2$s: </Name><Value>%3$s</Value>' ),
-				filter.name,
-				operator.display ?? operator.label.toLowerCase(),
-				activeElements.map( ( element ) => element.label ).join( ', ' )
-			),
-			filterTextWrappers
-		);
-	}
-
-	if (
-		operator !== undefined &&
-		[
-			...SINGLE_SELECTION_OPERATOR_NAMES,
-			...CUSTOM_SELECTION_OPERATOR_NAMES,
-		].includes( operator.name )
-	) {
-		return createInterpolateElement(
-			sprintf(
-				/* translators: 1: Filter name. 2: Operator name. 3: Filter value. e.g.: "Author starts with: Adm". */
-				__( '<Name>%1$s %2$s: </Name><Value>%3$s</Value>' ),
-				filter.name,
-				operator.display ?? operator.label.toLowerCase(),
-				activeElements[ 0 ].label
-			),
-			filterTextWrappers
-		);
+	const operator = getOperatorByName( filterInView?.operator );
+	if ( operator !== undefined ) {
+		return operator.filterText( filter, activeElements );
 	}
 
 	return sprintf(
@@ -137,8 +92,7 @@ function OperatorSelector( {
 }: OperatorSelectorProps ) {
 	const operatorOptions = filter.operators?.map( ( operator ) => ( {
 		value: operator,
-		label:
-			OPERATORS.find( ( op ) => op.name === operator )?.label || operator,
+		label: getOperatorByName( operator )?.label || operator,
 	} ) );
 	const currentFilter = view.filters?.find(
 		( _filter ) => _filter.field === filter.field
@@ -171,16 +125,12 @@ function OperatorSelector( {
 												_filter.field === filter.field
 											) {
 												const currentOpSelectionModel =
-													OPERATORS.find(
-														( op ) =>
-															op.name ===
-															currentOperator
+													getOperatorByName(
+														currentOperator
 													)?.selection;
 												const newOpSelectionModel =
-													OPERATORS.find(
-														( op ) =>
-															op.name ===
-															newOperator
+													getOperatorByName(
+														newOperator
 													)?.selection;
 
 												const shouldResetValue =
