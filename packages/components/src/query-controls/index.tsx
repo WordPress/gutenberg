@@ -154,7 +154,6 @@ export function QueryControls( {
 					props.onCategoryChange && (
 						<FormTokenField
 							__next40pxDefaultSize
-							__nextHasNoMarginBottom
 							key="query-controls-categories-select"
 							label={ __( 'Categories' ) }
 							value={
