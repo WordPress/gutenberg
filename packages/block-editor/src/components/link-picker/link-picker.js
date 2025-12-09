@@ -7,7 +7,7 @@ import {
 	__experimentalDropdownContentWrapper as DropdownContentWrapper,
 	useBaseControlProps,
 } from '@wordpress/components';
-import { useState } from '@wordpress/element';
+import { useState, useId } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -34,6 +34,7 @@ export function LinkPicker( {
 	help,
 } ) {
 	const [ isOpen, setIsOpen ] = useState( false );
+	const instanceId = useId();
 
 	// Use the proper BaseControl pattern for associating help text
 	const { baseControlProps, controlProps } = useBaseControlProps( {
@@ -74,7 +75,7 @@ export function LinkPicker( {
 	const renderContent = () => (
 		<DropdownContentWrapper paddingSize="none">
 			<LinkControl
-				key={ isOpen ? 'open' : 'closed' }
+				key={ `${ instanceId }-${ isOpen ? 'open' : 'closed' }` }
 				value={ null }
 				onChange={ handleChange }
 				suggestionsQuery={ suggestionsQuery }
