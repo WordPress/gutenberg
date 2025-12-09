@@ -1648,7 +1648,7 @@ describe( 'Selecting links', () => {
 					id: '1',
 					title: 'https://www.wordpress.org',
 					url: 'https://www.wordpress.org',
-					type: 'URL',
+					type: 'link',
 				},
 			], // Url.
 		] )(
@@ -1710,7 +1710,7 @@ describe( 'Selecting links', () => {
 					id: '1',
 					title: 'https://www.wordpress.org',
 					url: 'https://www.wordpress.org',
-					type: 'URL',
+					type: 'link',
 				},
 			], // Url.
 		] )(
@@ -2162,7 +2162,7 @@ describe( 'Rich link previews', () => {
 		id: '1',
 		title: 'WordPress.org', // Customize this for differentiation in assertions.
 		url: 'https://www.wordpress.org',
-		type: 'URL',
+		type: 'link',
 	};
 
 	beforeAll( () => {
@@ -2861,7 +2861,7 @@ describe( 'Entity handling', () => {
 					id: uniqueId(),
 					title: searchTerm,
 					url: searchTerm,
-					type: 'URL', // URL suggestions use uppercase 'URL'
+					type: 'link', // URL suggestions have type 'link'
 					// Importantly: no 'kind' property (entities have kind)
 				},
 			];
@@ -2907,22 +2907,17 @@ describe( 'Entity handling', () => {
 		} );
 		await user.click( urlSuggestion );
 
-		// Verify that onChange was called with type and kind explicitly set to undefined
+		// Verify that onChange was called with id, type and kind explicitly set to undefined
 		// This is the critical fix - when selecting a custom URL suggestion after unlinking,
 		// entity metadata (type/kind) should be cleared (not just when using the Apply button)
-		// Note: id remains as the URL for custom links (this is historical behavior)
 		expect( onChange ).toHaveBeenCalledWith(
 			expect.objectContaining( {
 				url: 'https://custom-url.com',
 				type: undefined,
 				kind: undefined,
+				id: undefined,
 			} )
 		);
-
-		// Verify id is set to the URL (custom links use URL as id)
-		const lastCall =
-			onChange.mock.calls[ onChange.mock.calls.length - 1 ][ 0 ];
-		expect( lastCall.id ).toBe( 'https://custom-url.com' );
 	} );
 
 	it( 'should clear entity metadata when pressing Enter for direct entry (without clicking suggestion)', async () => {
