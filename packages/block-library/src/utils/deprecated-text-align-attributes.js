@@ -15,7 +15,7 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
  */
 export default function useDeprecatedTextAlign( props ) {
 	const { name, attributes, setAttributes } = props;
-	const { textAlign, style } = attributes;
+	const { textAlign } = attributes;
 	const { __unstableMarkNextChangeAsNotPersistent } =
 		useDispatch( blockEditorStore );
 	const updateStyleWithAlign = useEvent( () => {
@@ -24,15 +24,15 @@ export default function useDeprecatedTextAlign( props ) {
 			since: '7.0',
 		} );
 		__unstableMarkNextChangeAsNotPersistent();
-		setAttributes( {
+		setAttributes( ( currentAttr ) => ( {
 			style: {
-				...style,
+				...currentAttr.style,
 				typography: {
-					...style?.typography,
+					...currentAttr.style?.typography,
 					textAlign,
 				},
 			},
-		} );
+		} ) );
 	} );
 	const lastUpdatedAlignRef = useRef();
 	useEffect( () => {
