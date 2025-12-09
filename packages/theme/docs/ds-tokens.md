@@ -9,13 +9,17 @@ Do not edit directly.
 
 ### Border
 
-| Variable name                  | Description                 |
-| ------------------------------ | --------------------------- |
-| `--wpds-border-radius-x-small` | Extra small radius          |
-| `--wpds-border-radius-small`   | Small radius                |
-| `--wpds-border-radius-medium`  | Medium radius               |
-| `--wpds-border-radius-large`   | Large radius                |
-| `--wpds-border-width-focus`    | Border width for focus ring |
+| Variable name                           | Description                     |
+| --------------------------------------- | ------------------------------- |
+| `--wpds-border-radius-surface-xs`       | Extra small radius for surfaces |
+| `--wpds-border-radius-surface-sm`       | Small radius for surfaces       |
+| `--wpds-border-radius-surface-md`       | Medium radius for surfaces      |
+| `--wpds-border-radius-surface-lg`       | Large radius for surfaces       |
+| `--wpds-border-width-surface-xs`        | Extra small width for surfaces  |
+| `--wpds-border-width-surface-sm`        | Small width for surfaces        |
+| `--wpds-border-width-surface-md`        | Medium width for surfaces       |
+| `--wpds-border-width-surface-lg`        | Large width for surfaces        |
+| `--wpds-border-width-interactive-focus` | Border width for focus ring     |
 
 ### Color
 
@@ -119,6 +123,12 @@ Do not edit directly.
 | `--wpds-dimension-padding-surface-sm`  | Small spacing for surfaces          |
 | `--wpds-dimension-padding-surface-md`  | Medium spacing for surfaces         |
 | `--wpds-dimension-padding-surface-lg`  | Large spacing for surfaces          |
+| `--wpds-dimension-gap-2xs`             | 2x extra small gap                  |
+| `--wpds-dimension-gap-xs`              | Extra small gap                     |
+| `--wpds-dimension-gap-sm`              | Small gap                           |
+| `--wpds-dimension-gap-md`              | Medium gap                          |
+| `--wpds-dimension-gap-lg`              | Large gap                           |
+| `--wpds-dimension-gap-xl`              | Extra large gap                     |
 
 ### Elevation
 

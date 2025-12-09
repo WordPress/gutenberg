@@ -2,14 +2,16 @@
  * WordPress dependencies
  */
 import { privateApis as componentsPrivateApis } from '@wordpress/components';
+import type { FontFamily, FontFace } from '@wordpress/core-data';
+import type { DataRegistry } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import { FONT_WEIGHTS, FONT_STYLES } from './constants';
-import { fetchInstallFontFace } from '../resolvers';
+import { fetchInstallFontFace } from '../api';
 import { formatFontFaceName } from './preview-styles';
-import type { FontFamily, FontFace, FontUploadResult } from '../types';
+import type { FontFamilyToUpload, FontUploadResult } from '../types';
 import { unlock } from '../../lock-unlock';
 
 /**
@@ -221,7 +223,7 @@ export function makeFontFamilyFormData( fontFamily: FontFamily ): FormData {
 	return formData;
 }
 
-export function makeFontFacesFormData( font: FontFamily ): FormData[] {
+export function makeFontFacesFormData( font: FontFamilyToUpload ): FormData[] {
 	const fontFacesFormData = ( font?.fontFace ?? [] ).map(
 		( item, faceIndex ) => {
 			const face = { ...item };
@@ -257,7 +259,8 @@ export function makeFontFacesFormData( font: FontFamily ): FormData[] {
 
 export async function batchInstallFontFaces(
 	fontFamilyId: string,
-	fontFacesData: FormData[]
+	fontFacesData: FormData[],
+	registry: DataRegistry
 ): Promise< FontUploadResult > {
 	const responses: {
 		status: 'fulfilled' | 'rejected';
@@ -273,7 +276,8 @@ export async function batchInstallFontFaces(
 		try {
 			const response = await fetchInstallFontFace(
 				fontFamilyId,
-				faceData
+				faceData,
+				registry
 			);
 			responses.push( { status: 'fulfilled', value: response } );
 		} catch ( error ) {

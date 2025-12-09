@@ -772,7 +772,7 @@ const ParentProvidingRegistry = ( props ) => {
 
 _Returns_
 
--   `Function`: A custom react hook exposing the registry context value.
+-   `import('../../types').DataRegistry`: A custom react hook exposing the registry context value.
 
 ### useSelect
 

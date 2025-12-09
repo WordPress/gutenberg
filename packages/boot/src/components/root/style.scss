@@ -1,4 +1,5 @@
 @use "@wordpress/base-styles/variables";
+@use "@wordpress/base-styles/mixins";
 
 .boot-layout {
 	height: 100%;
@@ -10,37 +11,150 @@
 	background: var(--wpds-color-bg-surface-neutral-weak, #f0f0f0);
 }
 
+.boot-layout__sidebar-backdrop {
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background-color: rgba(0, 0, 0, 0.5);
+	z-index: 100002;
+	cursor: pointer;
+}
+
 .boot-layout__sidebar {
 	height: 100%;
 	flex-shrink: 0;
 	width: 240px;
 	position: relative;
 	overflow: hidden;
+
+	&.is-mobile {
+		position: fixed;
+		top: 0;
+		bottom: 0;
+		left: 0;
+		width: 300px;
+		max-width: 85vw;
+		background: var(--wpds-color-bg-surface-neutral-weak, #f0f0f0);
+		z-index: 100003;
+		box-shadow: 2px 0 8px rgba(0, 0, 0, 0.2);
+	}
+}
+
+.boot-layout__mobile-sidebar-drawer {
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	z-index: 3;
+	background: var(--wpds-color-bg-surface-neutral, #fff);
+	padding: variables.$grid-unit-20;
+	border-bottom: 1px solid var(--wpds-color-stroke-surface-neutral-weak, #ddd);
+	display: flex;
+	justify-content: flex-start;
+	align-items: center;
+}
+
+.boot-layout__canvas.has-mobile-drawer {
+	position: relative;
+	padding-top: 65px;
 }
 
 .boot-layout__surfaces {
 	display: flex;
 	flex-grow: 1;
-	margin: variables.$grid-unit-10;
+	margin: 0;
 	gap: variables.$grid-unit-10;
+
+	@include mixins.break-medium {
+		margin: variables.$grid-unit-10;
+	}
 }
 
 .boot-layout__stage,
-.boot-layout__inspector,
+.boot-layout__inspector {
+	flex: 1;
+	overflow-y: auto;
+	background: var(--wpds-color-bg-surface-neutral, #fff);
+	color: var(--wpds-color-fg-content-neutral, #1e1e1e);
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+	border: 1px solid var(--wpds-color-stroke-surface-neutral-weak, #ddd);
+	position: relative;
+
+	// Mobile-first: surfaces take full screen with fixed positioning
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	width: 100vw;
+	height: 100vh;
+	border-radius: 0;
+	margin: 0;
+
+	// Desktop: restore original styles
+	@include mixins.break-medium {
+		position: static;
+		width: auto;
+		height: auto;
+		border-radius: 8px;
+		margin: 0;
+	}
+}
+
+.boot-layout__stage {
+	z-index: 2; // Highest surface priority on mobile
+
+	@include mixins.break-medium {
+		z-index: auto;
+	}
+}
+
+.boot-layout__inspector {
+	z-index: 3; // Medium surface priority on mobile
+
+	@include mixins.break-medium {
+		z-index: auto;
+	}
+}
+
 .boot-layout__canvas {
 	flex: 1;
 	overflow-y: auto;
 	background: var(--wpds-color-bg-surface-neutral, #fff);
 	color: var(--wpds-color-fg-content-neutral, #1e1e1e);
-	border-radius: 8px;
 	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 	border: 1px solid var(--wpds-color-stroke-surface-neutral-weak, #ddd);
 	position: relative;
+
+	// Mobile-first: full screen with lowest priority
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	width: 100vw;
+	height: 100vh;
+	z-index: 1; // Lowest surface priority
+	border-radius: 0;
+	margin: 0;
+
+	// Desktop: restore original styles
+	@include mixins.break-medium {
+		position: static;
+		width: auto;
+		height: auto;
+		border-radius: 8px;
+		z-index: auto;
+	}
 }
 
 .boot-layout.has-canvas .boot-layout__stage,
 .boot-layout__inspector {
-	max-width: 400px;
+	@include mixins.break-medium {
+		max-width: 400px;
+	}
 }
 
 .boot-layout__canvas .interface-interface-skeleton {

@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { useState, useEffect } from '@wordpress/element';
 import { insertObject, useAnchor } from '@wordpress/rich-text';
 import { RichTextToolbarButton } from '@wordpress/block-editor';
@@ -53,7 +53,13 @@ function InlineUI( {
 				setError( null );
 			} catch ( err ) {
 				setError( err.message );
-				speak( err.message );
+				speak(
+					sprintf(
+						/* translators: %s: error message returned when parsing LaTeX. */
+						__( 'Error parsing mathematical expression: %s' ),
+						err.message
+					)
+				);
 				return;
 			}
 		}
@@ -100,7 +106,11 @@ function InlineUI( {
 								intent="error"
 								className="wp-block-math__error"
 							>
-								{ error }
+								{ sprintf(
+									/* translators: %s: error message returned when parsing LaTeX. */
+									__( 'Error: %s' ),
+									error
+								) }
 							</Badge>
 							<style children=".wp-block-math__error .components-badge__content{white-space:normal}" />
 						</>

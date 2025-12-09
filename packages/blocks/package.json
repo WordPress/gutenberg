@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/blocks",
-	"version": "15.9.1-next.8b30e05b0.0",
+	"version": "15.9.0",
 	"description": "Block API for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -34,7 +34,12 @@
 	"react-native": "src/index",
 	"wpScript": true,
 	"sideEffects": [
-		"{src,build,build-module}/{index.js,store/index.js}"
+		"src/index.js",
+		"src/store/index.js",
+		"build/index.js",
+		"build/store/index.js",
+		"build-module/index.js",
+		"build-module/store/index.js"
 	],
 	"dependencies": {
 		"@wordpress/autop": "file:../autop",

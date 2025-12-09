@@ -10,12 +10,22 @@ import {
 import { resolveSelect } from '@wordpress/data';
 import { Modal, DropZone, FormFileUpload, Button } from '@wordpress/components';
 import { upload as uploadIcon } from '@wordpress/icons';
+import { DataViewsPicker } from '@wordpress/dataviews';
+import type { View, Field, ActionButton } from '@wordpress/dataviews';
+import {
+	altTextField,
+	captionField,
+	descriptionField,
+	filenameField,
+	filesizeField,
+	mediaDimensionsField,
+	mediaThumbnailField,
+	mimeTypeField,
+} from '@wordpress/media-fields';
 
 /**
  * Internal dependencies
  */
-import { DataViewsPicker } from '@wordpress/dataviews';
-import type { View, Field, ActionButton } from '@wordpress/dataviews';
 import type { Attachment, RestAttachment } from '../../utils/types';
 import { transformAttachment } from '../../utils/transform-attachment';
 import { uploadMedia } from '../../utils/upload-media';
@@ -151,8 +161,9 @@ export function MediaUploadModal( {
 	const [ view, setView ] = useState< View >( () => ( {
 		type: LAYOUT_PICKER_GRID,
 		fields: [],
+		showTitle: false,
 		titleField: 'title',
-		mediaField: 'url',
+		mediaField: 'media_thumbnail',
 		search: '',
 		page: 1,
 		perPage: 20,
@@ -212,23 +223,6 @@ export function MediaUploadModal( {
 	const fields: Field< RestAttachment >[] = useMemo(
 		() => [
 			{
-				id: 'url',
-				type: 'media' as const,
-				label: __( 'Media' ),
-				render: ( { item }: { item: RestAttachment } ) => (
-					<img
-						src={ item.source_url }
-						alt={ item.alt_text }
-						style={ {
-							width: '100%',
-							height: '100%',
-							objectFit: 'cover',
-							borderRadius: '4px',
-						} }
-					/>
-				),
-			},
-			{
 				id: 'title',
 				type: 'text' as const,
 				label: __( 'Title' ),
@@ -237,13 +231,16 @@ export function MediaUploadModal( {
 					return titleValue || __( '(no title)' );
 				},
 			},
-			{
-				id: 'alt',
-				type: 'text' as const,
-				label: __( 'Alt text' ),
-				getValue: ( { item }: { item: RestAttachment } ) =>
-					item.alt_text,
-			},
+			// Media field definitions from @wordpress/media-fields
+			// Cast is safe because RestAttachment has the same properties as Attachment
+			mediaThumbnailField as Field< RestAttachment >,
+			altTextField as Field< RestAttachment >,
+			captionField as Field< RestAttachment >,
+			descriptionField as Field< RestAttachment >,
+			filenameField as Field< RestAttachment >,
+			filesizeField as Field< RestAttachment >,
+			mediaDimensionsField as Field< RestAttachment >,
+			mimeTypeField as Field< RestAttachment >,
 		],
 		[]
 	);
@@ -319,8 +316,14 @@ export function MediaUploadModal( {
 
 	const defaultLayouts = useMemo(
 		() => ( {
-			[ LAYOUT_PICKER_GRID ]: {},
-			[ LAYOUT_PICKER_TABLE ]: {},
+			[ LAYOUT_PICKER_GRID ]: {
+				fields: [],
+				showTitle: false,
+			},
+			[ LAYOUT_PICKER_TABLE ]: {
+				fields: [ 'filename', 'filesize', 'media_dimensions' ],
+				showTitle: true,
+			},
 		} ),
 		[]
 	);

@@ -16,11 +16,11 @@
 			"type": "string",
 			"default": "/"
 		},
-		"showHomeLink": {
+		"showHomeItem": {
 			"type": "boolean",
 			"default": true
 		},
-		"showLastItem": {
+		"showCurrentItem": {
 			"type": "boolean",
 			"default": true
 		},
@@ -32,6 +32,7 @@
 	"usesContext": [ "postId", "postType", "templateSlug" ],
 	"supports": {
 		"html": false,
+		"align": [ "wide", "full" ],
 		"spacing": {
 			"margin": true,
 			"padding": true

@@ -10,8 +10,8 @@
 		flex: 1;
 	}
 
-	.components-navigator-screen {
-		padding: 0;
+	.global-styles-ui-sidebar__navigator-screen.components-navigator-screen {
+		padding: $grid-unit-15;
 	}
 }
 

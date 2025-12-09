@@ -30,6 +30,36 @@ describe( 'isPlain', () => {
 		expect( isPlain( '<strong>test<br></strong>' ) ).toBe( false );
 		expect( isPlain( 'test<br-custom>test' ) ).toBe( false );
 	} );
+
+	it( 'should return true for single non-semantic wrapper elements with only text', () => {
+		expect( isPlain( '<span>test</span>' ) ).toBe( true );
+	} );
+
+	it( 'should return true for single wrapper with styled content but no semantic tags', () => {
+		expect( isPlain( '<span style="color: red;">test</span>' ) ).toBe(
+			true
+		);
+	} );
+
+	it( 'should return true for single wrapper with line breaks', () => {
+		expect( isPlain( '<span>test<br>test</span>' ) ).toBe( true );
+	} );
+
+	it( 'should return false for wrapper with semantic child elements', () => {
+		expect( isPlain( '<div><strong>test</strong></div>' ) ).toBe( false );
+		expect( isPlain( '<span><em>test</em></span>' ) ).toBe( false );
+		expect( isPlain( '<p>Some <a href="#">link</a></p>' ) ).toBe( false );
+	} );
+
+	it( 'should return false for multiple wrapper elements', () => {
+		expect( isPlain( '<span>test</span><span>test</span>' ) ).toBe( false );
+	} );
+
+	it( 'should return false for semantic wrapper elements', () => {
+		expect( isPlain( '<h1>test</h1>' ) ).toBe( false );
+		expect( isPlain( '<ul><li>test</li></ul>' ) ).toBe( false );
+		expect( isPlain( '<article>test</article>' ) ).toBe( false );
+	} );
 } );
 
 describe( 'getBlockContentSchema', () => {

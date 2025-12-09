@@ -1,9 +1,3 @@
-.wp-block-accordion-heading {
-	// Some classic themes apply default margins to heading elements,
-	// so those styles need to be reset.
-	margin: 0;
-}
-
 .wp-block-accordion-heading__toggle {
 	font-family: inherit;
 	font-size: inherit;
@@ -14,7 +8,9 @@
 	text-decoration: inherit;
 	word-spacing: inherit;
 	font-style: inherit;
+	background: none;
 	border: none;
+	color: inherit;
 	padding: var(--wp--preset--spacing--20, 1em) 0;
 	cursor: pointer;
 	overflow: hidden;
@@ -23,32 +19,8 @@
 	text-align: inherit;
 	width: 100%;
 
-	// Some themes may apply colors to button elements with a particularly
-	// high CSS specificity. Since it's impossible to predict this specificity,
-	// we reset the colors using `!important`.
-	background-color: inherit !important;
-	color: inherit !important;
-
 	&:not(:focus-visible) {
 		outline: none;
-	}
-
-	&:hover,
-	&:focus {
-		// Some themes may apply styles when a button element is hovered
-		// over or focused. This is not intended for accordion toggle
-		// buttons, so we reset it here.
-		text-decoration: none;
-		background-color: inherit !important;
-		box-shadow: none;
-		color: inherit;
-		border: none;
-		padding: var(--wp--preset--spacing--20, 1em) 0;
-	}
-
-	&:focus-visible {
-		outline: auto;
-		outline-offset: 0;
 	}
 
 	&:hover .wp-block-accordion-heading__toggle-title {

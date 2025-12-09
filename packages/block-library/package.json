@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/block-library",
-	"version": "9.36.1-next.8b30e05b0.0",
+	"version": "9.36.0",
 	"description": "Block library for the WordPress editor.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -79,7 +79,9 @@
 	"sideEffects": [
 		"build-style/**",
 		"src/**/*.scss",
-		"{src,build,build-module}/*/init.js"
+		"src/*/init.js",
+		"build/*/init.js",
+		"build-module/*/init.js"
 	],
 	"dependencies": {
 		"@wordpress/a11y": "file:../a11y",

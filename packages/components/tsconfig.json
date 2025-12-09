@@ -5,6 +5,7 @@
 		"types": [
 			"gutenberg-env",
 			"gutenberg-test-env",
+			"css-modules",
 			"jest",
 			"@testing-library/jest-dom"
 		]

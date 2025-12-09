@@ -18,7 +18,7 @@ import {
  * Internal dependencies
  */
 import Root from '../root';
-import type { Route, RouteLoaderContext } from '../../store/types';
+import type { Route, RouteConfig, RouteLoaderContext } from '../../store/types';
 import { unlock } from '../../lock-unlock';
 
 const {
@@ -29,6 +29,7 @@ const {
 	RouterProvider,
 	createBrowserHistory,
 	parseHref,
+	useLoaderData,
 } = unlock( routePrivateApis );
 
 // Not found component
@@ -39,29 +40,6 @@ function NotFoundComponent() {
 				{ __( "The page you're looking for does not exist" ) }
 			</Page>
 		</div>
-	);
-}
-
-function RouteComponent( {
-	stage: Stage,
-	inspector: Inspector,
-}: {
-	stage?: ComponentType;
-	inspector?: ComponentType;
-} ) {
-	return (
-		<>
-			{ Stage && (
-				<div className="boot-layout__stage">
-					<Stage />
-				</div>
-			) }
-			{ Inspector && (
-				<div className="boot-layout__inspector">
-					<Inspector />
-				</div>
-			) }
-		</>
 	);
 }
 
@@ -76,12 +54,7 @@ async function createRouteFromDefinition(
 	route: Route,
 	parentRoute: AnyRoute
 ) {
-	// Load route module for lifecycle functions if specified
-	let routeConfig: {
-		beforeLoad?: ( context: RouteLoaderContext ) => void | Promise< void >;
-		loader?: ( context: RouteLoaderContext ) => Promise< unknown >;
-		canvas?: ( context: RouteLoaderContext ) => Promise< any >;
-	} = {};
+	let routeConfig: RouteConfig = {};
 
 	if ( route.route_module ) {
 		const module = await import( route.route_module );
@@ -105,7 +78,6 @@ async function createRouteFromDefinition(
 				search: opts.deps || {},
 			};
 
-			// Call both loader and canvas functions if they exist
 			const [ loaderData, canvasData ] = await Promise.all( [
 				routeConfig.loader
 					? routeConfig.loader( context )
@@ -115,10 +87,15 @@ async function createRouteFromDefinition(
 					: Promise.resolve( undefined ),
 			] );
 
+			let inspector = true;
+			if ( routeConfig.inspector ) {
+				inspector = await routeConfig.inspector( context );
+			}
+
 			return {
 				...( loaderData as any ),
 				canvas: canvasData,
-				// Include content module path so Root can load custom canvas
+				inspector,
 				routeContentModule: route.content_module,
 			};
 		},
@@ -131,13 +108,27 @@ async function createRouteFromDefinition(
 			? await import( route.content_module )
 			: {};
 
+		const Stage = module.stage;
+		const Inspector = module.inspector;
+
 		return createLazyRoute( route.path )( {
-			component: function Component() {
+			component: function RouteComponent() {
+				const { inspector: showInspector } =
+					useLoaderData( { from: route.path } ) ?? {};
+
 				return (
-					<RouteComponent
-						stage={ module.stage }
-						inspector={ module.inspector }
-					/>
+					<>
+						{ Stage && (
+							<div className="boot-layout__stage">
+								<Stage />
+							</div>
+						) }
+						{ Inspector && showInspector && (
+							<div className="boot-layout__inspector">
+								<Inspector />
+							</div>
+						) }
+					</>
 				);
 			},
 		} );

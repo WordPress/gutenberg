@@ -46,6 +46,9 @@ test.describe( 'Preload', () => {
 
 		// To do: these should all be removed or preloaded.
 		expect( requests ).toEqual( [
+			// Abilities system initialization.
+			'/wp-abilities/v1/categories?per_page=100&context=edit',
+			'/wp-abilities/v1/abilities?per_page=100&context=edit',
 			// Seems to be coming from `enableComplementaryArea`.
 			'/wp/v2/users/me',
 			// There are two separate settings OPTIONS requests. We should fix
