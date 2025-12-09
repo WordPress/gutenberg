@@ -12,6 +12,77 @@ import { isReusableBlock, isTemplatePart } from '@wordpress/blocks';
 import useContentOnlySectionEdit from '../../hooks/use-content-only-section-edit';
 import { store as blockEditorStore } from '../../store';
 
+function IsolatedEditButton( {
+	block,
+	onNavigateToEntityRecord,
+	isSyncedPattern,
+	isTemplatePartBlock,
+} ) {
+	const blockAttributes = block?.attributes || {};
+
+	const handleClick = () => {
+		if ( isSyncedPattern ) {
+			onNavigateToEntityRecord( {
+				postId: blockAttributes.ref,
+				postType: 'wp_block',
+			} );
+		} else if ( isTemplatePartBlock ) {
+			const { theme, slug } = blockAttributes;
+			const templatePartId =
+				theme && slug ? `${ theme }//${ slug }` : null;
+			if ( templatePartId ) {
+				onNavigateToEntityRecord( {
+					postId: templatePartId,
+					postType: 'wp_template_part',
+				} );
+			}
+		}
+	};
+
+	return (
+		<VStack className="block-editor-block-inspector-edit-contents" expanded>
+			<Button
+				className="block-editor-block-inspector-edit-contents__button"
+				__next40pxDefaultSize
+				variant="secondary"
+				onClick={ handleClick }
+			>
+				{ __( 'Edit section' ) }
+			</Button>
+		</VStack>
+	);
+}
+
+function InlineEditButton( {
+	clientId,
+	editedContentOnlySection,
+	editContentOnlySection,
+	stopEditingContentOnlySection,
+} ) {
+	const handleClick = () => {
+		if ( ! editedContentOnlySection ) {
+			editContentOnlySection( clientId );
+		} else {
+			stopEditingContentOnlySection();
+		}
+	};
+
+	return (
+		<VStack className="block-editor-block-inspector-edit-contents" expanded>
+			<Button
+				className="block-editor-block-inspector-edit-contents__button"
+				__next40pxDefaultSize
+				variant="secondary"
+				onClick={ handleClick }
+			>
+				{ editedContentOnlySection
+					? __( 'Exit section' )
+					: __( 'Edit section' ) }
+			</Button>
+		</VStack>
+	);
+}
+
 export default function EditContents( { clientId } ) {
 	const {
 		isWithinSection,
@@ -37,55 +108,28 @@ export default function EditContents( { clientId } ) {
 		return null;
 	}
 
-	const blockAttributes = block?.attributes || {};
-
-	// Synced patterns and template parts should navigate to the isolated editor
 	const isSyncedPattern = isReusableBlock( block );
 	const isTemplatePartBlock = isTemplatePart( block );
-	const shouldNavigateToIsolatedEditor =
+	const shouldUseIsolatedEditor =
 		( isSyncedPattern || isTemplatePartBlock ) && onNavigateToEntityRecord;
 
-	const handleClick = () => {
-		if ( ! editedContentOnlySection ) {
-			if ( shouldNavigateToIsolatedEditor ) {
-				// Navigate to isolated editor for synced patterns and template parts
-				if ( isSyncedPattern ) {
-					onNavigateToEntityRecord( {
-						postId: blockAttributes.ref,
-						postType: 'wp_block',
-					} );
-				} else if ( isTemplatePartBlock ) {
-					const { theme, slug } = blockAttributes;
-					const templatePartId =
-						theme && slug ? `${ theme }//${ slug }` : null;
-					if ( templatePartId ) {
-						onNavigateToEntityRecord( {
-							postId: templatePartId,
-							postType: 'wp_template_part',
-						} );
-					}
-				}
-			} else {
-				// Use spotlight mode for unsynced patterns
-				editContentOnlySection( clientId );
-			}
-		} else {
-			stopEditingContentOnlySection();
-		}
-	};
+	if ( shouldUseIsolatedEditor ) {
+		return (
+			<IsolatedEditButton
+				block={ block }
+				onNavigateToEntityRecord={ onNavigateToEntityRecord }
+				isSyncedPattern={ isSyncedPattern }
+				isTemplatePartBlock={ isTemplatePartBlock }
+			/>
+		);
+	}
 
 	return (
-		<VStack className="block-editor-block-inspector-edit-contents" expanded>
-			<Button
-				className="block-editor-block-inspector-edit-contents__button"
-				__next40pxDefaultSize
-				variant="secondary"
-				onClick={ handleClick }
-			>
-				{ editedContentOnlySection
-					? __( 'Exit section' )
-					: __( 'Edit section' ) }
-			</Button>
-		</VStack>
+		<InlineEditButton
+			clientId={ clientId }
+			editedContentOnlySection={ editedContentOnlySection }
+			editContentOnlySection={ editContentOnlySection }
+			stopEditingContentOnlySection={ stopEditingContentOnlySection }
+		/>
 	);
 }
