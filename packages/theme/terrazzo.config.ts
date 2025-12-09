@@ -8,6 +8,7 @@ import { makeCSSVar } from '@terrazzo/token-tools/css';
 /**
  * Internal dependencies
  */
+import pluginModeOverrides from './bin/terrazzo-plugin-mode-overrides/index';
 import pluginKnownWpdsCssVariables from './bin/terrazzo-plugin-known-wpds-css-variables/index';
 import pluginDsTokenDocs from './bin/terrazzo-plugin-ds-tokens-docs/index';
 import inlineAliasValues from './bin/terrazzo-plugin-inline-alias-values/index';
@@ -74,6 +75,7 @@ export default defineConfig( {
 		pluginDsTokenDocs( {
 			filename: '../../docs/ds-tokens.md',
 		} ),
+		pluginModeOverrides(),
 	],
 
 	// Linter rules current error when multiple entry files are used

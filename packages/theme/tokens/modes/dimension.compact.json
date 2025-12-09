@@ -1,0 +1,43 @@
+{
+	"wpds-dimension": {
+		"padding": {
+			"surface": {
+				"2xs": {
+					"$value": "{wpds-dimension.primitive.space.10}"
+				},
+				"xs": {
+					"$value": "{wpds-dimension.primitive.space.10}"
+				},
+				"sm": {
+					"$value": "{wpds-dimension.primitive.space.30}"
+				},
+				"md": {
+					"$value": "{wpds-dimension.primitive.space.50}"
+				},
+				"lg": {
+					"$value": "{wpds-dimension.primitive.space.60}"
+				}
+			}
+		},
+		"gap": {
+			"2xs": {
+				"$value": "{wpds-dimension.primitive.space.10}"
+			},
+			"xs": {
+				"$value": "{wpds-dimension.primitive.space.10}"
+			},
+			"sm": {
+				"$value": "{wpds-dimension.primitive.space.20}"
+			},
+			"md": {
+				"$value": "{wpds-dimension.primitive.space.30}"
+			},
+			"lg": {
+				"$value": "{wpds-dimension.primitive.space.50}"
+			},
+			"xl": {
+				"$value": "{wpds-dimension.primitive.space.70}"
+			}
+		}
+	}
+}
