@@ -262,10 +262,11 @@ export function applyPostChangesToCRDTDoc(
 	// Process changes that we don't want to persist to the CRDT document.
 	if ( changes.selection ) {
 		const selection = changes.selection;
-
 		// Persist selection changes at the end of the current event loop.
-		// This allows undo meta to be saved with the actual current selection before
-		// it is overwritten by the new selection from CRDT document changes.
+		// This allows undo meta to be saved with the current selection before
+		// it is overwritten by the new selection from Gutenberg.
+		// Without this, selection history will already contain the latest
+		// selection (after this change) when the undo stack is saved.
 		setTimeout( () => {
 			const selectionHistory = getBlockSelectionHistory( ydoc );
 			selectionHistory.updateSelection( selection );
@@ -491,6 +492,12 @@ function getBlockSelectionHistory( ydoc: CRDTDoc ): BlockSelectionHistory {
 	return history;
 }
 
+/**
+ * Given a Y.Doc, find the associated BlockSelectionHistory instance
+ * and return the current selection history.
+ * @param ydoc The Y.Doc to get the selection history meta for
+ * @return The current selection history.
+ */
 export function getSelectionHistoryMeta(
 	ydoc: CRDTDoc
 ): YSelectionHistory | null {
@@ -519,6 +526,13 @@ export function getSelectionHistoryMeta(
 	};
 }
 
+/**
+ * Given a Y.Doc and a selection history, find the most recent selection
+ * that exists in the document. Skip any selections that are not in the document.
+ * @param ydoc             The Y.Doc to find the selection in
+ * @param selectionHistory The selection history to check
+ * @return The most recent selection that exists in the document, or null if no selection exists.
+ */
 export function findSelectionFromHistory(
 	ydoc: Y.Doc,
 	selectionHistory: YSelectionHistory
@@ -564,6 +578,12 @@ export function findSelectionFromHistory(
 	return null;
 }
 
+/**
+ * Convert a YSelection to a WPBlockSelection.
+ * @param ySelection The YSelection (relative) to convert
+ * @param ydoc       The Y.Doc to convert the selection to a block selection for
+ * @return The converted WPBlockSelection, or null if the conversion fails
+ */
 export function convertYSelectionToBlockSelection(
 	ySelection: YSelection,
 	ydoc: Y.Doc
@@ -594,6 +614,12 @@ export function convertYSelectionToBlockSelection(
 	return null;
 }
 
+/**
+ * Given a block ID and a Y.Doc, find the block in the document.
+ * @param blockId The block ID to find
+ * @param ydoc    The Y.Doc to find the block in
+ * @return The block, or null if the block is not found
+ */
 export function findBlockByClientIdInDoc(
 	blockId: string,
 	ydoc: Y.Doc
