@@ -3,6 +3,7 @@
  */
 import { forwardRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -11,7 +12,6 @@ import { URLInput } from '../';
 import LinkControlSearchResults from './search-results';
 import { CREATE_TYPE } from './constants';
 import useSearchHandler from './use-search-handler';
-import deprecated from '@wordpress/deprecated';
 
 // Must be a function as otherwise URLInput will default
 // to the fetchLinkSuggestions passed in block editor settings
@@ -106,7 +106,8 @@ const LinkControlSearchInput = forwardRef(
 				allowDirectEntry ||
 				( suggestion && Object.keys( suggestion ).length >= 1 )
 			) {
-				const { id, url, ...restLinkProps } = currentLink ?? {};
+				const { id, url, kind, type, ...restLinkProps } =
+					currentLink ?? {};
 				onSelect(
 					// Some direct entries don't have types or IDs, and we still need to clear the previous ones.
 					{ ...restLinkProps, ...suggestion },

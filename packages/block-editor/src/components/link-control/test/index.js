@@ -731,6 +731,33 @@ describe( 'Manual link entry', () => {
 		}
 	);
 
+	it( 'should return undefined kind and type when submitting a custom URL', async () => {
+		const user = userEvent.setup();
+		const onChange = jest.fn();
+
+		render( <LinkControl onChange={ onChange } /> );
+
+		const searchInput = screen.getByRole( 'combobox', {
+			name: 'Search or type URL',
+		} );
+
+		// Type a custom URL
+		await user.type( searchInput, 'https://custom.com' );
+
+		// Wait for and click the URL suggestion
+		const urlSuggestion = await screen.findByRole( 'option' );
+		await user.click( urlSuggestion );
+
+		// Verify onChange was called with undefined kind and type (not page/post-type)
+		expect( onChange ).toHaveBeenCalledWith(
+			expect.objectContaining( {
+				url: 'https://custom.com',
+				type: undefined,
+				kind: undefined,
+			} )
+		);
+	} );
+
 	describe( 'Handling of empty values', () => {
 		const testTable = [
 			[ 'containing only spaces', '        ' ],
@@ -2896,6 +2923,62 @@ describe( 'Entity handling', () => {
 		const lastCall =
 			onChange.mock.calls[ onChange.mock.calls.length - 1 ][ 0 ];
 		expect( lastCall.id ).toBe( 'https://custom-url.com' );
+	} );
+
+	it( 'should clear entity metadata when pressing Enter for direct entry (without clicking suggestion)', async () => {
+		const user = userEvent.setup();
+		const onChange = jest.fn();
+
+		const pageLink = {
+			id: 123,
+			url: 'https://example.com/page',
+			title: 'Test Page',
+			type: 'page',
+			kind: 'post-type',
+		};
+
+		render(
+			<LinkControl
+				value={ pageLink }
+				handleEntities
+				forceIsEditingLink
+				onChange={ onChange }
+			/>
+		);
+
+		const searchInput = screen.getByRole( 'combobox', {
+			name: 'Search or type URL',
+		} );
+
+		// Initially should be disabled because it's an entity
+		expect( searchInput ).toBeDisabled();
+
+		// Click the unsync button to enable editing
+		const unlinkButton = screen.getByRole( 'button', {
+			name: 'Unsync and edit',
+		} );
+		await user.click( unlinkButton );
+
+		// Input should now be enabled and value should be cleared
+		expect( searchInput ).toBeEnabled();
+		expect( searchInput ).toHaveValue( '' );
+
+		// Type a custom URL
+		await user.type( searchInput, 'https://direct-entry.com' );
+
+		// Press Enter WITHOUT clicking the suggestion (direct entry path)
+		triggerEnter( searchInput );
+
+		// Verify that onChange was called with type and kind explicitly set to undefined
+		// This tests the direct entry path in onSubmit (lines 157-165 in search-input.js)
+		// where the user types a URL and presses Enter without selecting from suggestions
+		expect( onChange ).toHaveBeenCalledWith(
+			expect.objectContaining( {
+				url: 'https://direct-entry.com',
+				type: undefined,
+				kind: undefined,
+			} )
+		);
 	} );
 
 	describe( 'Accessibility association for entity links', () => {
