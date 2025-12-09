@@ -977,21 +977,15 @@ export const switchEditorMode =
 		const collaboratorMode = select.getCollaboratorMode();
 		const editedRecord = getEditedEntityRecord( 'postType', _type, _id );
 
-		// If the edited record is not the current user and the enforced mode is codeEditor, set the collaborator mode to view
+		console.log( editedRecord.enforcedModeOwner, currentUser.id, collaboratorMode );
+
 		if (
-			mode !== 'visual' &&
-			editedRecord &&
-			editedRecord.enforcedModeOwner !== currentUser.id &&
-			editedRecord.enforcedMode === 'codeEditor' &&
-			collaboratorMode === 'edit'
-		) {
-			dispatch.setCollaboratorMode( 'view' );
-		} else if (
 			mode === 'visual' &&
 			editedRecord &&
 			editedRecord.enforcedModeOwner === currentUser.id &&
 			editedRecord.enforcedMode === 'codeEditor'
 		) {
+			console.log( 'Reset the enforced mode' );
 			editEntityRecord( 'postType', _type, _id, {
 				enforcedMode: undefined,
 				enforcedModeOwner: undefined,
@@ -1002,6 +996,7 @@ export const switchEditorMode =
 			editedRecord.enforcedMode !== 'codeEditor' &&
 			collaboratorMode === 'edit'
 		) {
+			console.log( 'Set the enforced mode to code editor' );
 			editEntityRecord( 'postType', _type, _id, {
 				enforcedMode: 'codeEditor',
 				enforcedModeOwner: currentUser.id,
