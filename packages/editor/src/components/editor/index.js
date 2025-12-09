@@ -134,7 +134,6 @@ function Editor( {
 					settings={ settings }
 					initialEdits={ initialEdits }
 					useSubRegistry={ false }
-					initialSelection={ initialSelection }
 				>
 					<EditorInterface { ...props }>
 						{ extraContent }
