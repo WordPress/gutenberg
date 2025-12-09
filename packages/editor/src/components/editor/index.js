@@ -100,6 +100,11 @@ function Editor( {
 	const { selectBlock } = useDispatch( blockEditorStore );
 	const hasRestoredSelectionRef = useRef( false );
 
+	// Reset the restoration flag when initialSelection changes (e.g., on navigation)
+	useEffect( () => {
+		hasRestoredSelectionRef.current = false;
+	}, [ initialSelection ] );
+
 	// Restore initial block selection if provided (e.g., from navigation)
 	useEffect( () => {
 		if (
