@@ -300,7 +300,7 @@ class Block_Library_Navigation_Link_Test extends WP_UnitTestCase {
 	 * @covers ::gutenberg_block_core_navigation_link_build_css_colors
 	 */
 	public function test_should_apply_submenu_colors_from_context() {
-		$context = array(
+		$context    = array(
 			'submenuTextColor'       => 'purple',
 			'submenuBackgroundColor' => 'yellow',
 		);
@@ -320,7 +320,7 @@ class Block_Library_Navigation_Link_Test extends WP_UnitTestCase {
 	 */
 	public function test_should_fallback_to_legacy_overlay_colors_for_unmigrated_blocks() {
 		// Unmigrated block - only has legacy overlay attributes, no new attributes.
-		$context = array(
+		$context    = array(
 			'overlayTextColor'       => 'purple',
 			'overlayBackgroundColor' => 'yellow',
 		);

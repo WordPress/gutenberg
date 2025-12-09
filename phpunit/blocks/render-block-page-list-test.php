@@ -114,4 +114,3 @@ class Render_Block_Page_List_Test extends WP_UnitTestCase {
 		$this->assertArrayNotHasKey( 'overlay_inline_styles', $colors );
 	}
 }
-
