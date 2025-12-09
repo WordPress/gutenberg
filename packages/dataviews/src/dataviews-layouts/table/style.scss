@@ -80,13 +80,14 @@
 			&::after {
 				content: "";
 				position: absolute;
-				top: 0.5px;
-				bottom: 0.5px;
-				left: -8px;
-				width: calc(100% + 16px);
+				top: -0.5px;
+				bottom: -0.5px;
+				left: -12px;
+				width: calc(100% + 24px);
 				background-color: #f8f8f8;
 				z-index: 0;
-				border-radius: $radius-medium;
+				border-radius: $radius-large;
+				border: 1px solid $gray-100;
 			}
 
 			.dataviews-view-table__actions-column--sticky {
@@ -111,13 +112,14 @@
 			&::after {
 				content: "";
 				position: absolute;
-				top: 0.5px;
-				bottom: 0.5px;
+				top: -0.5px;
+				bottom: -0.5px;
 				left: -12px;
 				width: calc(100% + 24px);
 				background-color: color-mix(in srgb, rgb(var(--wp-admin-theme-color--rgb)) 4%, $white);
 				z-index: 0;
-				border-radius: $radius-medium;
+				border-radius: $radius-large;
+				border: 1px solid rgba(var(--wp-admin-theme-color--rgb), 0.12);
 			}
 
 			&,
@@ -150,12 +152,14 @@
 					&::after {
 						content: "";
 						position: absolute;
-						top: 0.5px;
-						bottom: 0.5px;
+						top: -0.5px;
+						bottom: -0.5px;
 						left: -12px;
 						width: calc(100% + 24px);
 						background-color: #f8f8f8;
 						z-index: 0;
+						border-radius: $radius-large;
+						border: 1px solid $gray-100;
 					}
 
 					.dataviews-view-table__actions-column--sticky {
