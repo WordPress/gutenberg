@@ -308,7 +308,11 @@ function LinkControl( {
 			...internalControlValue,
 			...nonSettingsChanges,
 			// Explicitly set type and kind to undefined for custom links
-			...( isCustomLink && { type: undefined, kind: undefined } ),
+			...( isCustomLink && {
+				id: undefined,
+				type: undefined,
+				kind: undefined,
+			} ),
 			// As title is not a setting, it must be manually applied
 			// in such a way as to preserve the users changes over
 			// any "title" value provided by the "suggestion".
