@@ -25,10 +25,7 @@ import {
 	isNumericID,
 } from './utils';
 import { fetchBlockPatterns } from './fetch';
-import {
-	getSelectionHistoryMeta,
-	findSelectionFromHistory,
-} from './utils/crdt';
+import { getSelectionHistoryMeta } from './utils/crdt';
 import { restoreSelection } from './utils/selection';
 
 /**
@@ -243,10 +240,6 @@ export const getEntityRecord =
 									getSelectionHistoryMeta( ydoc );
 
 								if ( selectionHistory ) {
-									console.log(
-										'Adding undo selection history meta:',
-										selectionHistory
-									);
 									meta.set(
 										'selectionHistory',
 										selectionHistory
@@ -258,52 +251,11 @@ export const getEntityRecord =
 									meta.get( 'selectionHistory' );
 
 								if ( selectionHistoryMeta ) {
-									const selection = findSelectionFromHistory(
+									restoreSelection(
+										selectionHistoryMeta,
 										ydoc,
-										selectionHistoryMeta
+										editRecord
 									);
-
-									if ( selection ) {
-										const { selectionStart, selectionEnd } =
-											selection;
-
-										console.log(
-											'Sending restoreSelection with:',
-											{ selectionStart, selectionEnd }
-										);
-
-										// If selectionStart and selectionEnd are in the same block,
-										// we can restore the selection immediately.
-										if (
-											selectionStart.clientId ===
-											selectionEnd.clientId
-										) {
-											editRecord( {
-												selection: {
-													selectionStart,
-													selectionEnd,
-													initialPosition: null,
-												},
-											} );
-										} else {
-											// In selection is across multiple blocks,
-											// one or more intermediate blocks may have changed.
-											// We need to wait until the undo restoration is complete
-											// after the current event loop is finished, and then
-											// restore the selection with a call to the block editor.
-
-											// We can't reuse editRecord() within the setTimeout
-											// because selection changes will not be reflected
-											// by calling editRecord() itself, it only applies visually
-											// when applied alongside block updates.
-											setTimeout( () => {
-												restoreSelection(
-													selectionStart,
-													selectionEnd
-												);
-											}, 0 );
-										}
-									}
 								}
 							},
 						}

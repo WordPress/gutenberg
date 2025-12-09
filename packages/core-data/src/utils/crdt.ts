@@ -285,22 +285,15 @@ function defaultGetChangesFromCRDTDoc( crdtDoc: CRDTDoc ): ObjectData {
  * @param {CRDTDoc} ydoc
  * @param {Post}    editedRecord
  * @param {Type}    _postType
- * @param {any}     origin
+ * @param {Origin}  _origin
  * @return {Partial<PostChanges>} The changes that should be applied to the local record.
  */
 export function getPostChangesFromCRDTDoc(
 	ydoc: CRDTDoc,
 	editedRecord: Post,
 	_postType: Type, // eslint-disable-line @typescript-eslint/no-unused-vars
-	origin: Origin
+	_origin: Origin // eslint-disable-line @typescript-eslint/no-unused-vars
 ): PostChanges {
-	console.log(
-		'getPostChangesFromCRDTDoc() from',
-		origin instanceof Y.UndoManager ? 'undo-manager' : origin,
-		'with editedRecord:',
-		editedRecord
-	);
-
 	const ymap = getRootMap< YPostRecord >( ydoc, CRDT_RECORD_MAP_KEY );
 
 	let allowedMetaChanges: Post[ 'meta' ] = {};
@@ -571,7 +564,7 @@ export function findSelectionFromHistory(
 	return null;
 }
 
-function convertYSelectionToBlockSelection(
+export function convertYSelectionToBlockSelection(
 	ySelection: YSelection,
 	ydoc: Y.Doc
 ): WPBlockSelection | null {

@@ -139,7 +139,6 @@ export function createUndoManager(): SyncUndoManager {
 			}
 
 			// Perform the undo operation
-			// console.log( 'DEBUG: skipping yUndoManager.undo() call' );
 			yUndoManager.undo();
 
 			// Intentionally return an empty array, because the SyncProvider will update
@@ -156,7 +155,6 @@ export function createUndoManager(): SyncUndoManager {
 			}
 
 			// Perform the redo operation
-			// console.log( 'DEBUG: skipping yUndoManager.redo() call' );
 			yUndoManager.redo();
 
 			// Intentionally return an empty array, because the SyncProvider will update
