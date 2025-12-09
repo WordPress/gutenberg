@@ -5,7 +5,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { Notice } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useEffect, useRef } from '@wordpress/element';
+import { useEffect } from '@wordpress/element';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
@@ -98,25 +98,12 @@ function Editor( {
 	);
 
 	const { selectBlock } = useDispatch( blockEditorStore );
-	const hasRestoredSelectionRef = useRef( false );
-
-	// Reset the restoration flag when initialSelection changes (e.g., on navigation)
-	useEffect( () => {
-		hasRestoredSelectionRef.current = false;
-	}, [ initialSelection ] );
 
 	// Restore initial block selection if provided (e.g., from navigation)
 	useEffect( () => {
-		if (
-			! initialSelection ||
-			! hasLoadedPost ||
-			! post ||
-			hasRestoredSelectionRef.current
-		) {
+		if ( ! initialSelection || ! hasLoadedPost || ! post ) {
 			return;
 		}
-
-		hasRestoredSelectionRef.current = true;
 
 		// Use setTimeout to ensure blocks are fully rendered before selecting
 		const timeoutId = setTimeout( () => {
