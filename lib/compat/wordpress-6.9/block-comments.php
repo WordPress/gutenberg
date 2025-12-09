@@ -241,14 +241,14 @@ function gutenberg_new_comment_via_rest_notify_postauthor( $comment ) {
 
 if ( has_action( 'rest_insert_comment', 'wp_new_comment_via_rest_notify_postauthor' ) ) {
 	remove_action( 'rest_insert_comment', 'wp_new_comment_via_rest_notify_postauthor' );
-	add_action( 'rest_insert_comment', 'gutenberg_new_comment_via_rest_notify_postauthor', 10, 1 );
+	add_action( 'rest_insert_comment', 'gutenberg_new_comment_via_rest_notify_postauthor' );
 }
 
 /**
  * Filters the note notification text.
  *
  * @param string $notify_message The comment notification email text.
- * @param string $comment_id                Comment ID as a numeric string.
+ * @param string $comment_id     Comment ID as a numeric string.
  *
  * @return string The filtered notification text.
  */
