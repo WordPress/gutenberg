@@ -958,7 +958,7 @@ export const toggleTopToolbar =
  */
 export const switchEditorMode =
 	( mode ) =>
-	( { dispatch, registry } ) => {
+	( { select, dispatch, registry } ) => {
 		registry.dispatch( preferencesStore ).set( 'core', 'editorMode', mode );
 
 		if ( mode !== 'visual' ) {
@@ -966,6 +966,46 @@ export const switchEditorMode =
 			registry.dispatch( blockEditorStore ).clearSelectedBlock();
 			// Exit zoom out state when switching to a non visual mode.
 			unlock( registry.dispatch( blockEditorStore ) ).resetZoomLevel();
+		}
+
+		const { getEditedEntityRecord, getCurrentUser } =
+			registry.select( coreStore );
+		const { editEntityRecord } = registry.dispatch( coreStore );
+		const currentUser = getCurrentUser();
+		const _type = select.getCurrentPostType();
+		const _id = select.getCurrentPostId();
+		const collaboratorMode = select.getCollaboratorMode();
+		const editedRecord = getEditedEntityRecord( 'postType', _type, _id );
+
+		// If the edited record is not the current user and the enforced mode is codeEditor, set the collaborator mode to view
+		if (
+			mode !== 'visual' &&
+			editedRecord &&
+			editedRecord.enforcedModeOwner !== currentUser.id &&
+			editedRecord.enforcedMode === 'codeEditor' &&
+			collaboratorMode === 'edit'
+		) {
+			dispatch.setCollaboratorMode( 'view' );
+		} else if (
+			mode === 'visual' &&
+			editedRecord &&
+			editedRecord.enforcedModeOwner === currentUser.id &&
+			editedRecord.enforcedMode === 'codeEditor'
+		) {
+			editEntityRecord( 'postType', _type, _id, {
+				enforcedMode: undefined,
+				enforcedModeOwner: undefined,
+			} );
+		} else if (
+			mode !== 'visual' &&
+			editedRecord &&
+			editedRecord.enforcedMode !== 'codeEditor' &&
+			collaboratorMode === 'edit'
+		) {
+			editEntityRecord( 'postType', _type, _id, {
+				enforcedMode: 'codeEditor',
+				enforcedModeOwner: currentUser.id,
+			} );
 		}
 
 		if ( mode === 'visual' ) {

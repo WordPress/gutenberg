@@ -26,32 +26,28 @@ import { store as editorStore } from '../../store';
  */
 export default function PostTextEditor() {
 	const instanceId = useInstanceId( PostTextEditor );
-	const { content, blocks, type, id, collaboratorMode } = useSelect(
-		( select ) => {
-			const { getEditedEntityRecord } = select( coreStore );
-			const {
-				getCurrentPostType,
-				getCurrentPostId,
-				getCollaboratorMode,
-			} = select( editorStore );
-			const _type = getCurrentPostType();
-			const _id = getCurrentPostId();
-			const editedRecord = getEditedEntityRecord(
-				'postType',
-				_type,
-				_id
-			);
+	const {
+		content,
+		blocks,
+		type,
+		id,
+		collaboratorMode,
+	} = useSelect( ( select ) => {
+		const { getEditedEntityRecord } = select( coreStore );
+		const { getCurrentPostType, getCurrentPostId, getCollaboratorMode } =
+			select( editorStore );
+		const _type = getCurrentPostType();
+		const _id = getCurrentPostId();
+		const editedRecord = getEditedEntityRecord( 'postType', _type, _id );
 
-			return {
-				content: editedRecord?.content,
-				blocks: editedRecord?.blocks,
-				type: _type,
-				id: _id,
-				collaboratorMode: getCollaboratorMode(),
-			};
-		},
-		[]
-	);
+		return {
+			content: editedRecord?.content,
+			blocks: editedRecord?.blocks,
+			type: _type,
+			id: _id,
+			collaboratorMode: getCollaboratorMode(),
+		};
+	}, [] );
 	const { editEntityRecord } = useDispatch( coreStore );
 	// Replicates the logic found in getEditedPostContent().
 	const value = useMemo( () => {

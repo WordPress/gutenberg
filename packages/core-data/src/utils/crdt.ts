@@ -87,6 +87,8 @@ const allowedPostProperties = new Set< string >( [
 	'tags',
 	'template',
 	'title',
+	'enforcedMode',
+	'enforcedModeOwner',
 ] );
 
 // Post meta keys that should *not* be synced.
