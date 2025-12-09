@@ -5,9 +5,9 @@ import {
 	BaseControl,
 	Dropdown,
 	__experimentalDropdownContentWrapper as DropdownContentWrapper,
+	useBaseControlProps,
 } from '@wordpress/components';
 import { useState } from '@wordpress/element';
-import { useInstanceId } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -44,7 +44,12 @@ export function LinkPicker( {
 	help,
 } ) {
 	const [ isOpen, setIsOpen ] = useState( false );
-	const helpId = useInstanceId( LinkPicker, 'link-picker-help' );
+
+	// Use the proper BaseControl pattern for associating help text
+	const { baseControlProps, controlProps } = useBaseControlProps( {
+		help,
+		__nextHasNoMarginBottom: true,
+	} );
 
 	const handleChange = ( newValue ) => {
 		// Close the popover immediately
@@ -75,7 +80,7 @@ export function LinkPicker( {
 				onClick={ () => setIsOpen( true ) }
 				aria-haspopup="dialog"
 				aria-expanded={ isOpen }
-				aria-describedby={ help ? helpId : undefined }
+				aria-describedby={ controlProps[ 'aria-describedby' ] }
 				label={ label }
 			/>
 		);
@@ -96,13 +101,7 @@ export function LinkPicker( {
 	);
 
 	return (
-		<BaseControl
-			__nextHasNoMarginBottom
-			help={ help }
-			__associatedWPComponentProps={ {
-				helpId,
-			} }
-		>
+		<BaseControl { ...baseControlProps } __nextHasNoMarginBottom>
 			<BaseControl.VisualLabel>{ label }</BaseControl.VisualLabel>
 			<Dropdown
 				className="link-picker__dropdown"
