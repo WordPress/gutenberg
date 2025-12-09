@@ -3,16 +3,14 @@
  */
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { useCallback } from '@wordpress/element';
+import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
  */
 import { unlock } from '../../lock-unlock';
 
-const { useHistory } = unlock( routerPrivateApis );
-
-// Store selected blocks per path in memory (not persisted across page reloads)
-const selectedBlocksByPath = new Map();
+const { useHistory, useLocation } = unlock( routerPrivateApis );
 
 /**
  * Hook to handle navigation to entity records and retrieve initial block selection.
@@ -23,23 +21,34 @@ const selectedBlocksByPath = new Map();
  */
 export default function useNavigateToEntityRecord() {
 	const history = useHistory();
-	const currentPath = window.location.pathname + window.location.search;
-	const initialBlockSelection =
-		selectedBlocksByPath.get( currentPath ) || null;
+	const { query, path } = useLocation();
+
+	// Get the selected block from URL parameters
+	const initialBlockSelection = query.selectedBlock || null;
 
 	const onNavigateToEntityRecord = useCallback(
 		( params ) => {
-			// Store selected block for current location if provided
-			const path = window.location.pathname + window.location.search;
+			// First, update the current URL to include the selected block for when we navigate back
 			if ( params.selectedBlockClientId ) {
-				selectedBlocksByPath.set( path, params.selectedBlockClientId );
+				const currentUrl = addQueryArgs( path, {
+					...query,
+					selectedBlock: params.selectedBlockClientId,
+				} );
+				history.navigate( currentUrl, { replace: true } );
 			}
 
-			history.navigate(
-				`/${ params.postType }/${ params.postId }?canvas=edit&focusMode=true`
+			// Then navigate to the new entity record
+			const url = addQueryArgs(
+				`/${ params.postType }/${ params.postId }`,
+				{
+					canvas: 'edit',
+					focusMode: true,
+				}
 			);
+
+			history.navigate( url );
 		},
-		[ history ]
+		[ history, path, query ]
 	);
 
 	return [ onNavigateToEntityRecord, initialBlockSelection ];
