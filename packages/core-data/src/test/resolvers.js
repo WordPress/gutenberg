@@ -177,8 +177,8 @@ describe( 'getEntityRecord', () => {
 				getEditedRecord: expect.any( Function ),
 				refetchRecord: expect.any( Function ),
 				saveRecord: expect.any( Function ),
-				subscribeToSelectionChange: expect.any( Function ),
-				resetSelection: expect.any( Function ),
+				addUndoMeta: expect.any( Function ),
+				restoreUndoMeta: expect.any( Function ),
 			}
 		);
 	} );
@@ -234,8 +234,8 @@ describe( 'getEntityRecord', () => {
 				getEditedRecord: expect.any( Function ),
 				refetchRecord: expect.any( Function ),
 				saveRecord: expect.any( Function ),
-				subscribeToSelectionChange: expect.any( Function ),
-				resetSelection: expect.any( Function ),
+				addUndoMeta: expect.any( Function ),
+				restoreUndoMeta: expect.any( Function ),
 			}
 		);
 	} );

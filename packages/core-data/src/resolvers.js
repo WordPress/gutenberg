@@ -201,16 +201,6 @@ export const getEntityRecord =
 						{
 							// Directly handle edits sourced from the sync manager.
 							editRecord,
-							// Handle entity record edits that require processing
-							// before being saved.
-							editEntityRecord: ( edits ) => {
-								dispatch.editEntityRecord(
-									kind,
-									name,
-									key,
-									edits
-								);
-							},
 							// Get the current entity record (with edits)
 							getEditedRecord: async () =>
 								await resolveSelect.getEditedEntityRecord(
