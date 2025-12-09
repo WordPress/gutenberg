@@ -970,7 +970,7 @@ The user facing description of the action.
 
 ```js
 {
-	label: Trash;
+	label: 'Trash'
 }
 ```
 
