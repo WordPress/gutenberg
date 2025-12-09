@@ -14,7 +14,7 @@ import {
 	type SyncConfig,
 	Y,
 } from '@wordpress/sync';
-import { dispatch, select, subscribe } from '@wordpress/data';
+import { dispatch, select } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -429,8 +429,6 @@ export function getPostChangesFromCRDTDoc(
 			...allowedMetaChanges,
 		};
 	}
-
-	console.log( changes );
 
 	return changes;
 }

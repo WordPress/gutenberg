@@ -35,19 +35,6 @@ export const CRDT_RECORD_METADATA_SAVED_AT_KEY = 'savedAt';
 export const CRDT_RECORD_METADATA_SAVED_BY_KEY = 'savedBy';
 
 /**
-  + * Y.Map key representing the enforced mode currently in effect among all the
-  + * peers.
-  +
- */
-export const CRDT_RECORD_METADATA_ENFORCED_MODE_KEY = 'enforcedMode';
-
-/**
-  + * Y.Map key representing the owner of the enforced mode.
-  +
- */
-export const CRDT_RECORD_METADATA_ENFORCED_MODE_OWNER_KEY = 'enforcedModeOwner';
-
-/**
  * Root-level key for the map that holds the state information about the CRDT
  * document itself. It should not contain information related to the entity
  * record.
