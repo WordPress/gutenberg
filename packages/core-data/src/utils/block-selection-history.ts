@@ -143,15 +143,24 @@ export class BlockSelectionHistory {
 		};
 
 		// Check if the new selection has the same start and end block combination as current
-		const isSameBlockCombination =
+		const isSameBlockCombinationAsCurrent =
 			this.currentSelection &&
 			start.clientId === this.currentSelection.start.clientId &&
 			end.clientId === this.currentSelection.end.clientId;
 
-		if ( this.currentSelection && ! isSameBlockCombination ) {
+		if ( this.currentSelection && ! isSameBlockCombinationAsCurrent ) {
 			// Only add to history if we're moving to a different block combination
 			this.addToHistory( this.currentSelection );
 		}
+
+		// Remove the new selection from history if it exists there (since it's now current)
+		this.history = this.history.filter( ( entry ) => {
+			const isSameBlockCombination =
+				entry.start.clientId === start.clientId &&
+				entry.end.clientId === end.clientId;
+
+			return ! isSameBlockCombination;
+		} );
 
 		this.currentSelection = ySelection;
 	}
