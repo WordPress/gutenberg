@@ -78,104 +78,82 @@ export const SINGLE_SELECTION_OPERATORS: Operator[] = [
 
 export const OPERATORS: Record<
 	Operator,
-	{ key: string; label: string; display?: string }
+	{ label: string; display?: string }
 > = {
 	[ OPERATOR_IS ]: {
-		key: 'is-filter',
 		label: __( 'Is' ),
 	},
 	[ OPERATOR_IS_NOT ]: {
-		key: 'is-not-filter',
 		label: __( 'Is not' ),
 	},
 	[ OPERATOR_IS_ANY ]: {
-		key: 'is-any-filter',
 		label: __( 'Includes' ),
 	},
 	[ OPERATOR_IS_NONE ]: {
-		key: 'is-none-filter',
 		label: __( 'Is none of' ),
 	},
 	[ OPERATOR_IS_ALL ]: {
-		key: 'is-all-filter',
 		label: __( 'Includes all' ),
 	},
 	[ OPERATOR_IS_NOT_ALL ]: {
-		key: 'is-not-all-filter',
 		label: __( 'Is none of' ),
 	},
 	[ OPERATOR_LESS_THAN ]: {
-		key: 'less-than-filter',
 		label: __( 'Less than' ),
 	},
 	[ OPERATOR_GREATER_THAN ]: {
-		key: 'greater-than-filter',
 		label: __( 'Greater than' ),
 		display: __( 'is greater than' ),
 	},
 	[ OPERATOR_LESS_THAN_OR_EQUAL ]: {
-		key: 'less-than-or-equal-filter',
 		label: __( 'Less than or equal' ),
 		display: __( 'is less than or equal to' ),
 	},
 	[ OPERATOR_GREATER_THAN_OR_EQUAL ]: {
-		key: 'greater-than-or-equal-filter',
 		label: __( 'Greater than or equal' ),
 		display: __( 'is greater than or equal to' ),
 	},
 	[ OPERATOR_BEFORE ]: {
-		key: 'before-filter',
 		label: __( 'Before' ),
 		display: __( 'is before' ),
 	},
 	[ OPERATOR_AFTER ]: {
-		key: 'after-filter',
 		label: __( 'After' ),
 		display: __( 'is after' ),
 	},
 	[ OPERATOR_BEFORE_INC ]: {
-		key: 'before-inc-filter',
 		label: __( 'Before (inc)' ),
 		display: __( 'is on or before' ),
 	},
 	[ OPERATOR_AFTER_INC ]: {
-		key: 'after-inc-filter',
 		label: __( 'After (inc)' ),
 		display: __( 'is on or after' ),
 	},
 	[ OPERATOR_CONTAINS ]: {
-		key: 'contains-filter',
 		label: __( 'Contains' ),
 	},
 	[ OPERATOR_NOT_CONTAINS ]: {
-		key: 'not-contains-filter',
 		label: __( "Doesn't contain" ),
 	},
 	[ OPERATOR_STARTS_WITH ]: {
-		key: 'starts-with-filter',
 		label: __( 'Starts with' ),
 	},
 	[ OPERATOR_BETWEEN ]: {
-		key: 'between-filter',
 		label: __( 'Between (inc)' ),
 	},
 	[ OPERATOR_ON ]: {
-		key: 'on-filter',
 		label: __( 'On' ),
 		display: __( 'is' ),
 	},
 	[ OPERATOR_NOT_ON ]: {
-		key: 'not-on-filter',
 		label: __( 'Not on' ),
 		display: __( 'is not' ),
 	},
 	[ OPERATOR_IN_THE_PAST ]: {
-		key: 'in-the-past-filter',
 		label: __( 'In the past' ),
 		display: __( 'is in the past' ),
 	},
 	[ OPERATOR_OVER ]: {
-		key: 'over-filter',
 		label: __( 'Over' ),
 		display: __( 'is over' ),
 	},
