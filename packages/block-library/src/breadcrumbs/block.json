@@ -32,7 +32,7 @@
 	"usesContext": [ "postId", "postType", "templateSlug" ],
 	"supports": {
 		"html": false,
-		"align": true,
+		"align": [ "wide", "full" ],
 		"spacing": {
 			"margin": true,
 			"padding": true
