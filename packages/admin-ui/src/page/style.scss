@@ -15,10 +15,9 @@
 
 .admin-ui-page__header {
 	padding: $grid-unit-20 $grid-unit-30;
-	border-bottom: 1px solid $gray-100;
 	background: $white;
-	position: sticky;
-	top: 0;
+	border-bottom: 1px solid $gray-100;
+	z-index: 2;
 }
 
 .admin-ui-page__sidebar-toggle-slot:empty {
@@ -38,8 +37,12 @@
 	display: flex;
 	flex-direction: column;
 
+	.admin-ui-page__content-child {
+		margin: $grid-unit-30 0 0;
+	}
+
 	&.has-padding {
-		padding: $grid-unit-30;
+		padding: 0 $grid-unit-30;
 	}
 }
 

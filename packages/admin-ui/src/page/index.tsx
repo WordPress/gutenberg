@@ -47,7 +47,9 @@ function Page( {
 			) }
 			{ hasPadding ? (
 				<div className="admin-ui-page__content has-padding">
-					{ children }
+					<div className="admin-ui-page__content-child">
+						{ children }
+					</div>
 				</div>
 			) : (
 				children
