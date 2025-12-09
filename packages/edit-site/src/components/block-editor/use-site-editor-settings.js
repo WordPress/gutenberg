@@ -6,7 +6,6 @@ import { useMemo } from '@wordpress/element';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { usePrevious } from '@wordpress/compose';
 import { store as editorStore } from '@wordpress/editor';
-import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -17,7 +16,6 @@ import useNavigateToEntityRecord from './use-navigate-to-entity-record';
 import { FOCUSABLE_ENTITIES } from '../../utils/constants';
 
 const { useLocation, useHistory } = unlock( routerPrivateApis );
-const { isIsolatedEditorKey } = unlock( blockEditorPrivateApis );
 
 function useNavigateToPreviousEntityRecord() {
 	const location = useLocation();
@@ -36,7 +34,7 @@ function useNavigateToPreviousEntityRecord() {
 }
 
 export function useSpecificEditorSettings() {
-	const { query, params } = useLocation();
+	const { query } = useLocation();
 	const { canvas = 'view' } = query;
 	const onNavigateToEntityRecord = useNavigateToEntityRecord();
 	const { settings, currentPostIsTrashed } = useSelect( ( select ) => {
@@ -51,11 +49,6 @@ export function useSpecificEditorSettings() {
 
 	const onNavigateToPreviousEntityRecord =
 		useNavigateToPreviousEntityRecord();
-
-	// When editing template parts, patterns, or navigation in the isolated editor,
-	// we're in an isolated editing context (focused on that entity alone).
-	const isIsolatedEditor =
-		params?.postId && FOCUSABLE_ENTITIES.includes( params?.postType );
 
 	const defaultEditorSettings = useMemo( () => {
 		return {
@@ -81,7 +74,6 @@ export function useSpecificEditorSettings() {
 			onNavigateToEntityRecord,
 			onNavigateToPreviousEntityRecord,
 			isPreviewMode: canvas === 'view',
-			[ isIsolatedEditorKey ]: isIsolatedEditor,
 		};
 	}, [
 		settings,
@@ -89,7 +81,6 @@ export function useSpecificEditorSettings() {
 		currentPostIsTrashed,
 		onNavigateToEntityRecord,
 		onNavigateToPreviousEntityRecord,
-		isIsolatedEditor,
 	] );
 
 	return defaultEditorSettings;

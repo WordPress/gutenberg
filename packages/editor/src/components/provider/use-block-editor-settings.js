@@ -349,16 +349,14 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 				renderingMode === 'post-only' && postType !== 'wp_template'
 					? 'edit'
 					: undefined,
+			// When editing template parts, patterns, or navigation directly,
+			// we're in an isolated editing context (focused on that entity alone).
+			[ isIsolatedEditorKey ]: [
+				'wp_template_part',
+				'wp_block',
+				'wp_navigation',
+			].includes( postType ),
 		};
-
-		// When editing template parts, patterns, or navigation directly,
-		// we're in an isolated editing context (focused on that entity alone).
-		const isIsolatedEditor = [
-			'wp_template_part',
-			'wp_block',
-			'wp_navigation',
-		].includes( postType );
-		blockEditorSettings[ isIsolatedEditorKey ] = isIsolatedEditor;
 
 		return blockEditorSettings;
 	}, [
