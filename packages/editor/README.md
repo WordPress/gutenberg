@@ -1729,14 +1729,6 @@ _Returns_
 
 -   `Object`: An object containing the following properties: - dirtyEntityRecords: An array of dirty entity records. - isDirty: A boolean indicating if there are any dirty entity records. - setUnselectedEntities: A function to set the unselected entities. - unselectedEntities: An array of unselected entities.
 
-### useGenerateBlockPath
-
-Hook that returns a function to generate a block path for a given block clientId. The path is an array of steps from root to the target block, where each step contains the block name and index within its parent.
-
-_Returns_
-
--   `Function`: Function that takes a clientId and returns the block path or null.
-
 ### usePostScheduleLabel
 
 Custom hook to get the label for post schedule.
@@ -1773,14 +1765,6 @@ A user mentions completer.
 _Type_
 
 -   `Object`
-
-### useRestoreBlockFromPath
-
-Hook that returns a function to restore a block selection using a previously generated block path. Walks the path from root to target, matching block name and index at each level.
-
-_Returns_
-
--   `Function`: Function that takes a path and returns the clientId or null.
 
 ### VisualEditorGlobalKeyboardShortcuts
 

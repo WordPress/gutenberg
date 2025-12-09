@@ -3,7 +3,14 @@
  */
 import { useCallback, useReducer } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { store as editorStore, useGenerateBlockPath } from '@wordpress/editor';
+import { store as editorStore, privateApis } from '@wordpress/editor';
+
+/**
+ * Internal dependencies
+ */
+import { unlock } from '../lock-unlock';
+
+const { useGenerateBlockPath } = unlock( privateApis );
 
 /**
  * A hook that records the 'entity' history in the post editor as a user

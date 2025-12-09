@@ -13,7 +13,7 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
  */
 import { store as editorStore } from '../../store';
 import { TEMPLATE_POST_TYPE } from '../../store/constants';
-import { useRestoreBlockFromPath } from '../../utils';
+import { useRestoreBlockFromPath } from '../../utils/block-selection-path';
 import EditorInterface from '../editor-interface';
 import { ExperimentalEditorProvider } from '../provider';
 import Sidebar from '../sidebar';

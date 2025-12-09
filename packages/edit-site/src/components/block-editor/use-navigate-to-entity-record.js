@@ -4,7 +4,7 @@
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { useCallback } from '@wordpress/element';
 import { addQueryArgs } from '@wordpress/url';
-import { useGenerateBlockPath } from '@wordpress/editor';
+import { privateApis as editorPrivateApis } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -12,6 +12,7 @@ import { useGenerateBlockPath } from '@wordpress/editor';
 import { unlock } from '../../lock-unlock';
 
 const { useHistory, useLocation } = unlock( routerPrivateApis );
+const { useGenerateBlockPath } = unlock( editorPrivateApis );
 
 /**
  * Hook to handle navigation to entity records and retrieve initial block selection.
