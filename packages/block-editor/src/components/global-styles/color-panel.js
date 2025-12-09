@@ -157,8 +157,12 @@ const popoverProps = {
 	placement: 'left-start',
 	offset: 36,
 	shift: true,
-	flip: true,
-	resize: false,
+	style: {
+		// Set minimum height to prevent content from being squashed when
+		// the popover is triggered near the bottom of the page, and flip
+		// the position accordingly.
+		minHeight: '160px',
+	},
 };
 
 const { Tabs } = unlock( componentsPrivateApis );
