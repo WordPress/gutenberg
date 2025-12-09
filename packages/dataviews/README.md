@@ -1961,7 +1961,8 @@ For example:
 
 -   `type`: `panel`. Required.
 -   `labelPosition`: one of `side`, `top`, or `none`. Optional. `top` by default.
--   `summary`: Summary field configuration. Optional. Specifies which field(s) to display in the panel header. Can be: - A string (single field ID)
+-   `summary`: Summary field configuration. Optional. Specifies which field(s) to display in the panel header. Can be:
+    -   A string (single field ID)
     -   An array of strings (multiple field IDs)
 
 When no summary fields are explicitly configured, the panel automatically determines which fields to display using this priority:
