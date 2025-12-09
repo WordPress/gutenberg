@@ -8,11 +8,9 @@ import { makeCSSVar } from '@terrazzo/token-tools/css';
 /**
  * Internal dependencies
  */
-import pluginFigmaDsTokenManager from './bin/terrazzo-plugin-figma-ds-token-manager/index';
 import pluginKnownWpdsCssVariables from './bin/terrazzo-plugin-known-wpds-css-variables/index';
 import pluginDsTokenDocs from './bin/terrazzo-plugin-ds-tokens-docs/index';
 import inlineAliasValues from './bin/terrazzo-plugin-inline-alias-values/index';
-import { publicTokenId } from './src/token-id.ts';
 
 export default defineConfig( {
 	tokens: [
@@ -26,36 +24,36 @@ export default defineConfig( {
 
 	plugins: [
 		inlineAliasValues( {
-			pattern: /^color\.primitive\./,
+			pattern: /^wpds-color\.primitive\./,
 			filename: 'ts/color-tokens.ts',
 			tokenId: ( tokenId ) =>
-				publicTokenId( tokenId )
-					.replace( /^color\./, '' )
+				tokenId
+					.replace( /\.primitive/, '' )
+					.replace( /^wpds-color\./, '' )
 					.replace( /\./g, '-' ),
 		} ),
-		inlineAliasValues( { pattern: /^dimension\.primitive\./ } ),
+		inlineAliasValues( { pattern: /^wpds-dimension\.primitive\./ } ),
 		pluginCSS( {
 			filename: 'css/design-tokens.css',
-			variableName: ( token ) =>
-				makeCSSVar( `wpds.${ publicTokenId( token.id ) }` ),
+			variableName: ( token ) => makeCSSVar( token.id ),
 			baseSelector: ':root',
 			modeSelectors: [
 				{
-					tokens: [ 'dimension.*' ],
+					tokens: [ 'wpds-dimension.*' ],
 					mode: '.',
 					selectors: [
 						"[data-wpds-theme-provider-id][data-wpds-density='default']",
 					],
 				},
 				{
-					tokens: [ 'dimension.*' ],
+					tokens: [ 'wpds-dimension.*' ],
 					mode: 'compact',
 					selectors: [
 						"[data-wpds-theme-provider-id][data-wpds-density='compact']",
 					],
 				},
 				{
-					tokens: [ 'dimension.*' ],
+					tokens: [ 'wpds-dimension.*' ],
 					mode: 'comfortable',
 					selectors: [
 						"[data-wpds-theme-provider-id][data-wpds-density='comfortable']",
@@ -69,9 +67,6 @@ export default defineConfig( {
 				},
 			],
 			legacyHex: true,
-		} ),
-		pluginFigmaDsTokenManager( {
-			filename: 'json/figma.json',
 		} ),
 		pluginKnownWpdsCssVariables( {
 			filename: 'js/design-tokens.js',

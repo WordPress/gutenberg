@@ -13,27 +13,91 @@ A theming package that's part of the WordPress Design System. It has two parts:
 
 In the **[Design Tokens Reference](docs/ds-tokens.md)** document there is a complete reference of all available design tokens including colors, spacing, typography, and more.
 
-### Color Tokens
+### Architecture
 
-The design system defines color tokens using the following naming scheme:
+Internally, the design system uses a tiered token architecture:
+
+- **Primitive tokens**: Raw values like hex colors or pixel dimensions which are what the browsers eventually interpret. These live in the `/tokens` directory as JSON source files and are an internal implementation detail.
+- **Semantic tokens**: Purpose-driven tokens with meaningful names that reference primitives and describe their intended use. These are what get exported as CSS custom properties.
+
+This separation allows the design system to maintain consistency while providing flexibility, since primitive values can be updated without changing the semantic token names that developers use in their code.
+
+### Design Tokens
+
+Design tokens are the visual design atoms of a design system. They are named entities that store visual design attributes like colors, spacing, typography, and shadows. They serve as a single source of truth that bridges design and development, ensuring consistency across platforms and making it easy to maintain and evolve the visual language of an application.
+
+Rather than hardcoding values like `#3858e9` or `16px` throughout your code, tokens provide semantic names like `--wpds-color-bg-interactive-brand-strong` or `--wpds-dimension-padding-surface-md` that describe the purpose and context of the value. This makes code more maintainable and allows the design system to evolve. When a token's value changes, all components using that token automatically reflect the update.
+
+#### Structure
+
+The design system follows the [Design Tokens Community Group (DTCG)](https://design-tokens.github.io/community-group/format/) specification and organizes tokens into distinct types based on what kind of visual property they represent. Token definitions are stored as JSON files in the `/tokens` directory:
+
+| File              | Description                                                                                                                      |
+| ----------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| `color.json`      | Color palettes including primitive color ramps and semantic color tokens for backgrounds, foregrounds, strokes, and focus states |
+| `dimension.json`  | Spacing scale and semantic spacing tokens for padding, margins, and sizing                                                       |
+| `typography.json` | Font family stacks, font sizes, and line heights                                                                                 |
+| `border.json`     | Border radius and width values                                                                                                   |
+| `elevation.json`  | Shadow definitions for creating depth and layering                                                                               |
+
+Each JSON file contains both primitive and semantic token definitions in a hierarchical structure. These files are the source of truth for the design system and are processed during the build step to generate CSS custom properties and other output formats in `/src/prebuilt`.
+
+#### Token Naming
+
+Semantic tokens follow a consistent naming pattern:
 
 ```
---wpds-<element>-<tone>[-<emphasis>][-<state>]
+--wpds-<type>-<property>-<target>[-<modifier>]
 ```
 
-**Element** specifies what the color is applied to.
+**Type** indicates what kind of value it represents, usually mapping to a DTCG token type.
 
-| Value                | Description                                                                                 |
-| -------------------- | ------------------------------------------------------------------------------------------- |
-| `bg-surface`         | Backgrounds of layout or container surfaces.                                                |
-| `bg-interactive`     | Backgrounds of interactive elements such as buttons, inputs, and toggles.                   |
-| `bg-track`           | Backgrounds of track components like scrollbars and slider tracks.                          |
-| `bg-thumb`           | Backgrounds of thumb components like scrollbar thumbs and slider thumbs.                    |
-| `fg-content`         | Foreground color for text and icons in static content.                                      |
-| `fg-interactive`     | Foreground color for text and icons in interactive elements such as links and buttons.      |
-| `stroke-surface`     | Decorative borders and dividers for non-interactive surfaces.                               |
-| `stroke-interactive` | Accessible borders for interactive controls.                                                |
-| `stroke-focus`       | Stroke color specifically for focus rings.                                                  |
+| Value       | Description                                                                    |
+| ----------- | ------------------------------------------------------------------------------ |
+| `color`     | Color values for backgrounds, foregrounds, and strokes                         |
+| `dimension` | Spacing, sizing, and other measurable lengths (e.g., padding, margins, widths) |
+| `border`    | Border properties like radius and width                                        |
+| `elevation` | Shadow definitions for layering and depth                                      |
+| `font`      | Typography properties like family, size, and line-height                       |
+
+**Property** is the specific design property being defined.
+
+| Value    | Description                        |
+| -------- | ---------------------------------- |
+| `bg`     | Background color                   |
+| `fg`     | Foreground color (text and icons)  |
+| `stroke` | Border and outline color           |
+| `padding`| Internal spacing within an element |
+| `gap`    | Spacing between elements           |
+| `radius` | Border radius for rounded corners  |
+| `width`  | Border width                       |
+| `size`   | Font size                          |
+| `family` | Font family                        |
+
+**Target** is the component or element type the token applies to.
+
+| Value         | Description                                                  |
+| ------------- | ------------------------------------------------------------ |
+| `surface`     | Container or layout backgrounds and borders                  |
+| `interactive` | Interactive elements like buttons, inputs, and controls      |
+| `content`     | Static content like text and icons                           |
+| `track`       | Track components like scrollbars and slider tracks           |
+| `thumb`       | Thumb components like scrollbar thumbs and slider handles    |
+| `focus`       | Focus indicators and rings                                   |
+
+**Modifier** is an optional size or intensity modifier.
+
+| Value                               | Description          |
+| ----------------------------------- | -------------------- |
+| `2xs`, `xs`, `sm`, `md`, `lg`, `xl` | Size scale modifiers |
+
+#### Color Token Modifiers
+
+Color tokens extend the base pattern with additional modifiers for tone, emphasis, and state:
+
+```
+--wpds-color-<property>-<target>-<tone>[-<emphasis>][-<state>]
+```
 
 **Tone** defines the semantic intent of the color.
 
@@ -53,9 +117,9 @@ The design system defines color tokens using the following naming scheme:
 
 **Emphasis** adjusts color strength relative to the base tone, if specified. The default is a normal emphasis.
 
-| Value                | Description                                 |
-| -------------------- | ------------------------------------------- |
-| `strong`             | Higher contrast and/or elevated emphasis.   |
+| Value                | Description                                     |
+| -------------------- | ----------------------------------------------- |
+| `strong`             | Higher contrast and/or elevated emphasis.       |
 | `weak`               | Subtle variant for secondary or muted elements. |
 
 **State** represents the interactive state of the element, if specified. The default is an idle state.

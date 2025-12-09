@@ -74,13 +74,14 @@ function generatePrimitiveColorTokens() {
 			},
 			...accentRamps,
 		].forEach( ( { scaleName, ramp } ) => {
-			colorJson.color.primitive[ scaleName ] = {};
+			colorJson[ 'wpds-color' ].primitive[ scaleName ] = {};
 			for ( const [ tokenName, tokenValue ] of Object.entries(
 				ramp.ramp
 			) ) {
-				colorJson.color.primitive[ scaleName ][ tokenName ] = {
-					$value: transformColorStringToDTCGValue( tokenValue ),
-				};
+				colorJson[ 'wpds-color' ].primitive[ scaleName ][ tokenName ] =
+					{
+						$value: transformColorStringToDTCGValue( tokenValue ),
+					};
 			}
 		} );
 
