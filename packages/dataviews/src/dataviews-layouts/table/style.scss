@@ -80,10 +80,10 @@
 			&::after {
 				content: "";
 				position: absolute;
-				top: 0;
+				top: 0.5px;
+				bottom: 0.5px;
 				left: -8px;
 				width: calc(100% + 16px);
-				height: 100%;
 				background-color: #f8f8f8;
 				z-index: 0;
 				border-radius: $radius-medium;
@@ -111,10 +111,10 @@
 			&::after {
 				content: "";
 				position: absolute;
-				top: 0;
+				top: 0.5px;
+				bottom: 0.5px;
 				left: -12px;
 				width: calc(100% + 24px);
-				height: 100%;
 				background-color: color-mix(in srgb, rgb(var(--wp-admin-theme-color--rgb)) 4%, $white);
 				z-index: 0;
 				border-radius: $radius-medium;
@@ -150,10 +150,10 @@
 					&::after {
 						content: "";
 						position: absolute;
-						top: 0;
+						top: 0.5px;
+						bottom: 0.5px;
 						left: -12px;
 						width: calc(100% + 24px);
-						height: 100%;
 						background-color: #f8f8f8;
 						z-index: 0;
 					}
@@ -184,10 +184,10 @@
 		&::after {
 			content: "";
 			position: absolute;
-			top: 0;
+			top: 0.5px;
+			bottom: 0.5px;
 			left: -12px;
 			width: calc(100% + 24px);
-			height: 100%;
 			background-color: inherit;
 			z-index: 0;
 		}

@@ -12,10 +12,12 @@ div.dataviews-view-list {
 	div[role="article"] {
 		margin: 0;
 		border-top: 1px solid $gray-100;
+		position: relative;
 
 		.dataviews-view-list__item-wrapper {
 			position: relative;
 			box-sizing: border-box;
+			padding: $grid-unit-15 0;
 		}
 
 		.dataviews-view-list__item-actions {
@@ -77,6 +79,18 @@ div.dataviews-view-list {
 				color: var(--wp-admin-theme-color);
 				background-color: #f8f8f8;
 
+				&::after {
+					content: "";
+					position: absolute;
+					top: 0;
+					left: -12px;
+					width: calc(100% + 24px);
+					height: 100%;
+					background-color: #f8f8f8;
+					border-radius: $radius-medium;
+					z-index: -1;
+				}
+
 				.dataviews-view-list__title-field,
 				.dataviews-view-list__fields {
 					color: var(--wp-admin-theme-color);
@@ -91,13 +105,23 @@ div.dataviews-view-list {
 	div[role="article"].is-selected,
 	div[role="article"].is-selected:focus-within {
 		.dataviews-view-list__item-wrapper {
-			background-color: rgba(var(--wp-admin-theme-color--rgb), 0.04);
 			color: $gray-900;
 
 			.dataviews-view-list__title-field,
 			.dataviews-view-list__fields {
 				color: var(--wp-admin-theme-color);
 			}
+		}
+
+		&::after {
+			content: "";
+			position: absolute;
+			top: 0;
+			left: -12px;
+			width: calc(100% + 24px);
+			height: 100%;
+			background-color: rgba(var(--wp-admin-theme-color--rgb), 0.04);
+			border-radius: $radius-medium;
 		}
 	}
 
