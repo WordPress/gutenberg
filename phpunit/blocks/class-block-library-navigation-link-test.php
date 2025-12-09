@@ -294,4 +294,64 @@ class Block_Library_Navigation_Link_Test extends WP_UnitTestCase {
 			) !== false
 		);
 	}
+
+	/**
+	 * @group navigation-link-colors
+	 * @covers ::gutenberg_block_core_navigation_link_build_css_colors
+	 */
+	public function test_should_apply_submenu_colors_from_context() {
+		$context = array(
+			'submenuTextColor'       => 'purple',
+			'submenuBackgroundColor' => 'yellow',
+		);
+		$attributes = array();
+
+		$colors = gutenberg_block_core_navigation_link_build_css_colors( $context, $attributes, true );
+
+		$this->assertContains( 'has-text-color', $colors['css_classes'] );
+		$this->assertContains( 'has-purple-color', $colors['css_classes'] );
+		$this->assertContains( 'has-background', $colors['css_classes'] );
+		$this->assertContains( 'has-yellow-background-color', $colors['css_classes'] );
+	}
+
+	/**
+	 * @group navigation-link-colors
+	 * @covers ::gutenberg_block_core_navigation_link_build_css_colors
+	 */
+	public function test_should_fallback_to_legacy_overlay_colors_for_unmigrated_blocks() {
+		// Unmigrated block - only has legacy overlay attributes, no new attributes.
+		$context = array(
+			'overlayTextColor'       => 'purple',
+			'overlayBackgroundColor' => 'yellow',
+		);
+		$attributes = array();
+
+		$colors = gutenberg_block_core_navigation_link_build_css_colors( $context, $attributes, true );
+
+		// Submenu should fall back to legacy overlay colors.
+		$this->assertContains( 'has-text-color', $colors['css_classes'] );
+		$this->assertContains( 'has-purple-color', $colors['css_classes'] );
+		$this->assertContains( 'has-background', $colors['css_classes'] );
+		$this->assertContains( 'has-yellow-background-color', $colors['css_classes'] );
+	}
+
+	/**
+	 * @group navigation-link-colors
+	 * @covers ::gutenberg_block_core_navigation_link_build_css_colors
+	 */
+	public function test_should_not_fallback_to_overlay_colors_when_submenu_colors_cleared_in_migrated_block() {
+		// Migrated block - has new overlay attributes but submenu colors are not set.
+		$context = array(
+			'defaultOverlayTextColor'       => 'purple',
+			'defaultOverlayBackgroundColor' => 'yellow',
+			// submenuTextColor and submenuBackgroundColor are intentionally not set.
+		);
+		$attributes = array();
+
+		$colors = gutenberg_block_core_navigation_link_build_css_colors( $context, $attributes, true );
+
+		// Should not have submenu color classes since submenu colors are not set and we shouldn't fall back.
+		$this->assertNotContains( 'has-purple-color', $colors['css_classes'] );
+		$this->assertNotContains( 'has-yellow-background-color', $colors['css_classes'] );
+	}
 }

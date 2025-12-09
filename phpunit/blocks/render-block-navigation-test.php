@@ -85,4 +85,102 @@ class Render_Block_Navigation_Test extends WP_UnitTestCase {
 		$inner_blocks  = new WP_Block_List( $parsed_blocks );
 		$this->assertFalse( block_core_navigation_block_contains_core_navigation( $inner_blocks ) );
 	}
+
+	/**
+	 * @group navigation-colors
+	 * @covers ::gutenberg_block_core_navigation_build_css_colors
+	 */
+	public function test_block_core_navigation_build_css_colors_uses_new_overlay_attributes() {
+		$attributes = array(
+			'defaultOverlayTextColor'       => 'purple',
+			'defaultOverlayBackgroundColor' => 'yellow',
+		);
+
+		$colors = gutenberg_block_core_navigation_build_css_colors( $attributes );
+
+		$this->assertArrayHasKey( 'overlay_css_classes', $colors );
+		$this->assertContains( 'has-text-color', $colors['overlay_css_classes'] );
+		$this->assertContains( 'has-purple-color', $colors['overlay_css_classes'] );
+		$this->assertContains( 'has-background', $colors['overlay_css_classes'] );
+		$this->assertContains( 'has-yellow-background-color', $colors['overlay_css_classes'] );
+	}
+
+	/**
+	 * @group navigation-colors
+	 * @covers ::gutenberg_block_core_navigation_build_css_colors
+	 */
+	public function test_block_core_navigation_build_css_colors_falls_back_to_legacy_overlay_attributes() {
+		$attributes = array(
+			'overlayTextColor'       => 'purple',
+			'overlayBackgroundColor' => 'yellow',
+		);
+
+		$colors = gutenberg_block_core_navigation_build_css_colors( $attributes );
+
+		$this->assertContains( 'has-text-color', $colors['overlay_css_classes'] );
+		$this->assertContains( 'has-purple-color', $colors['overlay_css_classes'] );
+		$this->assertContains( 'has-background', $colors['overlay_css_classes'] );
+		$this->assertContains( 'has-yellow-background-color', $colors['overlay_css_classes'] );
+	}
+
+	/**
+	 * @group navigation-colors
+	 * @covers ::gutenberg_block_core_navigation_build_css_colors
+	 */
+	public function test_block_core_navigation_build_css_colors_uses_submenu_attributes() {
+		$attributes = array(
+			'submenuTextColor'       => 'green',
+			'submenuBackgroundColor' => 'blue',
+		);
+
+		$colors = gutenberg_block_core_navigation_build_css_colors( $attributes );
+
+		$this->assertArrayHasKey( 'submenu_css_classes', $colors );
+		$this->assertContains( 'has-text-color', $colors['submenu_css_classes'] );
+		$this->assertContains( 'has-green-color', $colors['submenu_css_classes'] );
+		$this->assertContains( 'has-background', $colors['submenu_css_classes'] );
+		$this->assertContains( 'has-blue-background-color', $colors['submenu_css_classes'] );
+	}
+
+	/**
+	 * @group navigation-colors
+	 * @covers ::gutenberg_block_core_navigation_build_css_colors
+	 */
+	public function test_block_core_navigation_build_css_colors_submenu_falls_back_to_legacy_overlay_for_unmigrated_blocks() {
+		// Unmigrated block - only has legacy overlay attributes, no new attributes.
+		$attributes = array(
+			'overlayTextColor'       => 'purple',
+			'overlayBackgroundColor' => 'yellow',
+		);
+
+		$colors = gutenberg_block_core_navigation_build_css_colors( $attributes );
+
+		// Submenu should fall back to legacy overlay colors.
+		$this->assertArrayHasKey( 'submenu_css_classes', $colors );
+		$this->assertContains( 'has-text-color', $colors['submenu_css_classes'] );
+		$this->assertContains( 'has-purple-color', $colors['submenu_css_classes'] );
+		$this->assertContains( 'has-background', $colors['submenu_css_classes'] );
+		$this->assertContains( 'has-yellow-background-color', $colors['submenu_css_classes'] );
+	}
+
+	/**
+	 * @group navigation-colors
+	 * @covers ::gutenberg_block_core_navigation_build_css_colors
+	 */
+	public function test_block_core_navigation_build_css_colors_submenu_does_not_fallback_when_cleared_in_migrated_block() {
+		// Migrated block - has new overlay attributes but submenu colors are not set.
+		$attributes = array(
+			'defaultOverlayTextColor'       => 'purple',
+			'defaultOverlayBackgroundColor' => 'yellow',
+			// submenuTextColor and submenuBackgroundColor are intentionally not set.
+		);
+
+		$colors = gutenberg_block_core_navigation_build_css_colors( $attributes );
+
+		// Submenu should not have color classes since submenu colors are not set and we shouldn't fall back.
+		$this->assertArrayHasKey( 'submenu_css_classes', $colors );
+		$this->assertArrayHasKey( 'submenu_inline_styles', $colors );
+		$this->assertEmpty( $colors['submenu_css_classes'] );
+		$this->assertEmpty( $colors['submenu_inline_styles'] );
+	}
 }
