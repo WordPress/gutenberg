@@ -19,7 +19,6 @@ const meta: Meta< typeof TabPanel > = {
 	id: 'components-tabpanel',
 	component: TabPanel,
 	parameters: {
-		actions: { argTypesRegex: '^on.*' },
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
 	},

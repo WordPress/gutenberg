@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/block-editor",
-	"version": "15.5.0",
+	"version": "15.9.0",
 	"description": "Generic block editor.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -27,9 +27,8 @@
 	"module": "build-module/index.js",
 	"exports": {
 		".": {
-			"types": "./build-types/index.d.ts",
 			"import": "./build-module/index.js",
-			"default": "./build/index.js"
+			"require": "./build/index.js"
 		},
 		"./package.json": "./package.json",
 		"./build-style/": "./build-style/"
@@ -66,15 +65,19 @@
 		"@wordpress/components": "file:../components",
 		"@wordpress/compose": "file:../compose",
 		"@wordpress/data": "file:../data",
+		"@wordpress/dataviews": "file:../dataviews",
 		"@wordpress/date": "file:../date",
 		"@wordpress/deprecated": "file:../deprecated",
 		"@wordpress/dom": "file:../dom",
 		"@wordpress/element": "file:../element",
 		"@wordpress/escape-html": "file:../escape-html",
+		"@wordpress/global-styles-engine": "file:../global-styles-engine",
 		"@wordpress/hooks": "file:../hooks",
 		"@wordpress/html-entities": "file:../html-entities",
 		"@wordpress/i18n": "file:../i18n",
 		"@wordpress/icons": "file:../icons",
+		"@wordpress/image-cropper": "file:../image-cropper",
+		"@wordpress/interactivity": "file:../interactivity",
 		"@wordpress/is-shallow-equal": "file:../is-shallow-equal",
 		"@wordpress/keyboard-shortcuts": "file:../keyboard-shortcuts",
 		"@wordpress/keycodes": "file:../keycodes",

@@ -14,6 +14,11 @@ export function sanitizeCommentString( str ) {
 }
 
 /**
+ * A no-operation function that does nothing.
+ */
+export function noop() {}
+
+/**
  * These colors are picked from the WordPress.org design library.
  * @see https://www.figma.com/design/HOJTpCFfa3tR0EccUlu0CM/WordPress.org-Design-Library?node-id=1-2193&t=M6WdRvTpt0mh8n6T-1
  */
@@ -104,8 +109,8 @@ export function focusCommentThread( commentId, container, additionalSelector ) {
 
 	// A thread without a commentId is a new comment thread.
 	const threadSelector = commentId
-		? `[role=listitem][id="comment-thread-${ commentId }"]`
-		: '[role=listitem]:not([id])';
+		? `[role=treeitem][id="comment-thread-${ commentId }"]`
+		: '[role=treeitem]:not([id])';
 	const selector = additionalSelector
 		? `${ threadSelector } ${ additionalSelector }`
 		: threadSelector;
@@ -124,6 +129,7 @@ export function focusCommentThread( commentId, container, additionalSelector ) {
 				resolve( container.querySelector( selector ) );
 			}
 		} );
+
 		observer.observe( container, {
 			childList: true,
 			subtree: true,

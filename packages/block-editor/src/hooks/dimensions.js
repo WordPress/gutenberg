@@ -71,10 +71,17 @@ function DimensionsInspectorControl( { children, resetAllFilter } ) {
 export function DimensionsPanel( { clientId, name, setAttributes, settings } ) {
 	const isEnabled = useHasDimensionsPanel( settings );
 	const value = useSelect(
-		( select ) =>
-			select( blockEditorStore ).getBlockAttributes( clientId )?.style,
-		[ clientId ]
+		( select ) => {
+			// Early return to avoid subscription when disabled
+			if ( ! isEnabled ) {
+				return undefined;
+			}
+			return select( blockEditorStore ).getBlockAttributes( clientId )
+				?.style;
+		},
+		[ clientId, isEnabled ]
 	);
+
 	const [ visualizedProperty, setVisualizedProperty ] = useVisualizer();
 	const onChange = ( newStyle ) => {
 		setAttributes( {
@@ -110,20 +117,22 @@ export function DimensionsPanel( { clientId, name, setAttributes, settings } ) {
 				defaultControls={ defaultControls }
 				onVisualize={ setVisualizedProperty }
 			/>
-			{ !! settings?.spacing?.padding && (
-				<PaddingVisualizer
-					forceShow={ visualizedProperty === 'padding' }
-					clientId={ clientId }
-					value={ value }
-				/>
-			) }
-			{ !! settings?.spacing?.margin && (
-				<MarginVisualizer
-					forceShow={ visualizedProperty === 'margin' }
-					clientId={ clientId }
-					value={ value }
-				/>
-			) }
+			{ !! settings?.spacing?.padding &&
+				visualizedProperty === 'padding' && (
+					<PaddingVisualizer
+						forceShow={ visualizedProperty === 'padding' }
+						clientId={ clientId }
+						value={ value }
+					/>
+				) }
+			{ !! settings?.spacing?.margin &&
+				visualizedProperty === 'margin' && (
+					<MarginVisualizer
+						forceShow={ visualizedProperty === 'margin' }
+						clientId={ clientId }
+						value={ value }
+					/>
+				) }
 		</>
 	);
 }
@@ -148,7 +157,11 @@ export function hasDimensionsSupport( blockName, feature = 'any' ) {
 	}
 
 	if ( feature === 'any' ) {
-		return !! ( support?.aspectRatio || !! support?.minHeight );
+		return !! (
+			support?.aspectRatio ||
+			!! support?.minHeight ||
+			!! support?.width
+		);
 	}
 
 	return !! support?.[ feature ];
@@ -156,9 +169,9 @@ export function hasDimensionsSupport( blockName, feature = 'any' ) {
 
 export default {
 	useBlockProps,
-	attributeKeys: [ 'minHeight', 'style' ],
+	attributeKeys: [ 'minHeight', 'width', 'style' ],
 	hasSupport( name ) {
-		return hasDimensionsSupport( name, 'aspectRatio' );
+		return hasDimensionsSupport( name );
 	},
 };
 

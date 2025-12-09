@@ -104,10 +104,9 @@ function PrimaryActionGridCell< Item >( {
 				id={ compositeItemId }
 				render={
 					<Button
-						label={ label }
 						disabled={ !! primaryAction.disabled }
 						accessibleWhenDisabled
-						icon={ primaryAction.icon }
+						text={ label }
 						size="small"
 						onClick={ () => setIsModalOpen( true ) }
 					/>
@@ -128,15 +127,15 @@ function PrimaryActionGridCell< Item >( {
 				id={ compositeItemId }
 				render={
 					<Button
-						label={ label }
 						disabled={ !! primaryAction.disabled }
 						accessibleWhenDisabled
-						icon={ primaryAction.icon }
 						size="small"
 						onClick={ () => {
 							primaryAction.callback( [ item ], { registry } );
 						} }
-					/>
+					>
+						{ label }
+					</Button>
 				}
 			/>
 		</div>
@@ -195,7 +194,7 @@ function ListItem< Item >( {
 			( action ) => ! action.isEligible || action.isEligible( item )
 		);
 		const _primaryActions = _eligibleActions.filter(
-			( action ) => action.isPrimary && !! action.icon
+			( action ) => action.isPrimary
 		);
 		return {
 			primaryAction: _primaryActions[ 0 ],
@@ -523,8 +522,8 @@ export default function ViewList< Item >( props: ViewListProps< Item > ) {
 		);
 	}
 
-	const groupField = view.groupByField
-		? fields.find( ( field ) => field.id === view.groupByField )
+	const groupField = view.groupBy?.field
+		? fields.find( ( field ) => field.id === view.groupBy?.field )
 		: null;
 	const dataByGroup = groupField ? getDataByGroup( data, groupField ) : null;
 

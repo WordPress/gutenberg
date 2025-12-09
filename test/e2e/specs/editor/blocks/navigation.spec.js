@@ -296,13 +296,15 @@ test.describe( 'Navigation block', () => {
 	} );
 
 	test.describe( 'Focus management', () => {
+		let catPage, dogPage;
+
 		test.beforeAll( async ( { requestUtils } ) => {
 			// We need pages to be published so the Link Control can return pages
-			await requestUtils.createPage( {
+			catPage = await requestUtils.createPage( {
 				title: 'Cat',
 				status: 'publish',
 			} );
-			await requestUtils.createPage( {
+			dogPage = await requestUtils.createPage( {
 				title: 'Dog',
 				status: 'publish',
 			} );
@@ -353,6 +355,7 @@ test.describe( 'Navigation block', () => {
 				await pageUtils.pressKeys( 'ArrowDown' );
 				await navigation.useBlockInserter();
 				await navigation.addPage( 'Cat' );
+				await pageUtils.pressKeys( 'ArrowLeft', { times: 2 } );
 			} );
 
 			await test.step( 'can use the shortcut to open the preview with the keyboard and escape keypress sends focus back to the navigation link block', async () => {
@@ -381,6 +384,8 @@ test.describe( 'Navigation block', () => {
 				await navigation.useBlockInserter();
 				await navigation.addCustomURL( 'https://example.com' );
 				await navigation.expectToHaveTextSelected( 'example.com' );
+				// The link UI should be closed when creating a custom link
+				await expect( navigation.getLinkPopover() ).toBeHidden();
 			} );
 
 			await test.step( 'we can open and close the preview with the keyboard and escape buttons from a top-level nav link with a url-like label using both the shortcut and toolbar', async () => {
@@ -420,7 +425,9 @@ test.describe( 'Navigation block', () => {
 				// TODO: Use Enter after that bug is resolved
 				await navigation.useLinkShortcut();
 
-				await navigation.addPage( 'Dog' );
+				await navigation.addSubmenuPage( 'Dog' );
+				await pageUtils.pressKeys( 'ArrowUp' );
+				await pageUtils.pressKeys( 'ArrowRight' );
 			} );
 
 			await test.step( 'can use the shortcut to open the preview with the keyboard and escape keypress sends focus back to the navigation link block in the submenu', async () => {
@@ -533,8 +540,6 @@ test.describe( 'Navigation block', () => {
 			await pageUtils.pressKeys( 'ArrowDown' );
 			await navigation.useBlockInserter();
 			await navigation.addPage( 'Cat' );
-			await pageUtils.pressKeys( 'ArrowDown' );
-			await pageUtils.pressKeys( 'ArrowRight', { times: 2 } );
 			await navigation.useBlockInserter();
 			await navigation.addCustomURL( 'https://example.com' );
 			await navigation.expectToHaveTextSelected( 'example.com' );
@@ -550,8 +555,6 @@ test.describe( 'Navigation block', () => {
 			// TODO: Use Enter after that bug is resolved
 			await navigation.useLinkShortcut();
 			await navigation.addPage( 'Dog' );
-			await page.keyboard.press( 'End' );
-			await pageUtils.pressKeys( 'ArrowRight', { times: 2 } );
 			await navigation.useBlockInserter();
 			await navigation.addCustomURL( 'https://wordpress.org' );
 			await navigation.expectToHaveTextSelected( 'wordpress.org' );
@@ -683,6 +686,193 @@ test.describe( 'Navigation block', () => {
 
 			expect( focusIsInSidebar ).toBe( true );
 		} );
+
+		test( 'Selecting a new block from another link with a popover open should respect the new block selection', async ( {
+			editor,
+			page,
+			pageUtils,
+			navigation,
+			requestUtils,
+		} ) => {
+			let inspectorNavigationLabel,
+				catLinkText,
+				dogLinkText,
+				linkPopover,
+				unavailableLinkText;
+
+			// Test setup step
+			await test.step( 'Test setup', async () => {
+				const nonExistentPageId = 99999;
+				// Create a menu with three links:
+				// 1. Invalid synced link (deleted page)
+				// 2. Valid synced link (Cat page)
+				// 3. Valid synced link (Dog page)
+				// 4. Custom URL link (example.com)
+				const menu = await requestUtils.createNavigationMenu( {
+					title: 'Test Menu with Unavailable Entity, Synced Cat Page, and Custom URL',
+					content: `<!-- wp:navigation-link {"label":"Unavailable Page","type":"page","id":${ nonExistentPageId },"kind":"post-type","metadata":{"bindings":{"url":{"source":"core/post-data","args":{"field":"link"}}}}} /-->
+<!-- wp:navigation-link {"label":"Cat","type":"page","id":${ catPage.id },"url":"${ catPage.link }","kind":"post-type","metadata":{"bindings":{"url":{"source":"core/post-data","args":{"field":"link"}}}}} /-->
+<!-- wp:navigation-link {"label":"Dog","type":"page","id":${ dogPage.id },"url":"${ dogPage.link }","kind":"post-type","metadata":{"bindings":{"url":{"source":"core/post-data","args":{"field":"link"}}}}} /-->
+<!-- wp:navigation-link {"label":"example.com","url":"http://example.com","kind":"custom","isTopLevelLink":true} /-->`,
+				} );
+
+				await editor.insertBlock( {
+					name: 'core/navigation',
+					attributes: {
+						ref: menu.id,
+					},
+				} );
+
+				// Open the insepctor sidebar, as this is the easiest way to visually see block selection
+				await editor.openDocumentSettingsSidebar();
+
+				// CRITICAL: Wait for synced link entities to load BEFORE interacting with them
+				// Synced links load their URLs asynchronously. If we click them before the URLs
+				// are loaded, the popover opens in edit mode (url: null) instead of preview mode.
+				// Select the Cat link temporarily to check if its URL is loaded in the sidebar.
+				catLinkText = editor.canvas
+					.getByRole( 'textbox', {
+						name: 'Navigation link text',
+					} )
+					.filter( { hasText: /^Cat$/ } );
+				await catLinkText.click();
+
+				const linkInput = page
+					.getByRole( 'tabpanel', { name: 'Settings' } )
+					.getByRole( 'textbox', {
+						name: 'Link',
+					} );
+				// Wait for the Cat link's URL to load
+				await expect( linkInput ).not.toHaveValue( '' );
+				await expect( linkInput ).toBeDisabled(); // Synced links have disabled Link field
+			} );
+
+			await test.step( 'Popover closing from unsynced link to a synced link should not steal focus back to the previously selected (Cat) link', async () => {
+				// Cat link is already selected from setup step, with entity loaded
+				// Verify sidebar shows Cat
+				inspectorNavigationLabel = page
+					.getByRole( 'tabpanel', { name: 'Settings' } )
+					.getByRole( 'textbox', {
+						name: 'Text',
+					} );
+				await expect( inspectorNavigationLabel ).toHaveValue( 'Cat' );
+
+				await pageUtils.pressKeys( 'primary+k' );
+				linkPopover = navigation.getLinkPopover();
+				await expect( linkPopover ).toBeVisible();
+				const catPopoverLink = navigation.getLinkControlLink( 'Cat' );
+				await expect( catPopoverLink ).toBeVisible();
+
+				// Check that the popover has focus on the Cat link
+				await expect( catPopoverLink ).toBeFocused();
+
+				dogLinkText = editor.canvas
+					.getByRole( 'textbox', {
+						name: 'Navigation link text',
+					} )
+					.filter( { hasText: 'Dog' } );
+				await dogLinkText.click();
+
+				// Verify the popover is closed
+				await expect( linkPopover ).toBeHidden();
+				// Check that the Label in the inspector sidebar is Dog
+				await expect( inspectorNavigationLabel ).toHaveValue( 'Dog' );
+			} );
+
+			await test.step( 'Popover closing from synced (Dog) link to an unsynced link should not steal focus back to the previously selected (Dog) link', async () => {
+				await pageUtils.pressKeys( 'primary+k' );
+				await expect( linkPopover ).toBeVisible();
+
+				const dogPopoverLink = navigation.getLinkControlLink( 'Dog' );
+				await expect( dogPopoverLink ).toBeVisible();
+
+				// Check that the popover has focus on the Cat link
+				await expect( dogPopoverLink ).toBeFocused();
+
+				unavailableLinkText = editor.canvas
+					.locator( 'a' )
+					.filter( { hasText: 'Unavailable Page (Invalid)' } );
+				await unavailableLinkText.click();
+
+				// Check that the Label in the inspector sidebar is Unavailable Page
+				await expect( inspectorNavigationLabel ).toHaveValue(
+					'Unavailable Page'
+				);
+			} );
+
+			await test.step( 'Selecting a new block from a invalid synced link with a popover open should respect the new block selection', async () => {
+				// Verify the popover is visible (we want the invalid link click to have opened the popover)
+				await expect( linkPopover ).toBeVisible();
+				await expect(
+					linkPopover.getByRole( 'combobox', {
+						name: 'Search or type URL',
+					} )
+				).toBeFocused();
+				// Check that the popover has focus in the editable link state
+
+				await catLinkText.click();
+
+				// Verify the popover is closed
+				await expect( linkPopover ).toBeHidden();
+				// Check that the Label in the inspector sidebar is Cat
+				await expect( inspectorNavigationLabel ).toHaveValue( 'Cat' );
+			} );
+
+			await test.step( 'Creating a new category link should respect new block selection', async () => {
+				// Use the block inserter to add a new category link
+				await editor.canvas
+					.getByRole( 'button', { name: 'Add block' } )
+					.click();
+
+				// Verify the popover is visible (we want the invalid link click to have opened the popover)
+				await expect( linkPopover ).toBeVisible();
+				await expect(
+					linkPopover.getByRole( 'combobox', {
+						name: 'Search or type URL',
+					} )
+				).toBeFocused();
+
+				await linkPopover
+					.getByRole( 'button', { name: 'Add block' } )
+					.click();
+
+				const addBlockDialog = page.getByRole( 'dialog', {
+					name: 'Add block',
+				} );
+
+				await expect( addBlockDialog ).toBeVisible();
+
+				await expect(
+					addBlockDialog.getByRole( 'button', { name: 'Back' } )
+				).toBeFocused();
+
+				await addBlockDialog
+					.getByRole( 'option', { name: 'Custom Link' } )
+					.click();
+
+				await navigation.useLinkControlSearch( 'Uncategorized' );
+
+				// expect the sidebar to show 'Uncategorized' as the label
+				await expect( inspectorNavigationLabel ).toHaveValue(
+					'Uncategorized'
+				);
+
+				await expect(
+					navigation.getLinkControlLink( 'Uncategorized' )
+				).toBeVisible();
+
+				await expect(
+					navigation.getLinkControlLink( 'Uncategorized' )
+				).toBeFocused();
+
+				await catLinkText.click();
+
+				// Verify the popover is closed
+				await expect( linkPopover ).toBeHidden();
+				// Check that the Label in the inspector sidebar is Cat
+				await expect( inspectorNavigationLabel ).toHaveValue( 'Cat' );
+			} );
+		} );
 	} );
 
 	test( 'Adding new links to a navigation block with existing inner blocks triggers creation of a single Navigation Menu', async ( {
@@ -753,7 +943,29 @@ test.describe( 'Navigation block', () => {
 		// eslint-disable-next-line no-unused-vars
 		let testPage1, testPage2, testPage3;
 
-		test.beforeEach( async ( { requestUtils } ) => {
+		test.beforeEach( async ( { admin, page, requestUtils } ) => {
+			// Enable pretty permalinks by navigating to Settings > Permalinks
+			// TODO: Encapsulate permalink setup in an admin.setPermalinks( '/%postname%/' ) style util
+			// We need to run this in beforeEach instead of beforeAll since we don't have page context
+			// in beforeAll
+			await admin.visitAdminPage( 'options-permalink.php' );
+
+			// Select the Post name permalink structure (/%postname%/)
+			await page.click( '#permalink-input-post-name' );
+
+			// Click Save Changes
+			await page.click( '#submit' );
+
+			// Wait for settings to be saved
+			await page.waitForSelector( '.notice-success' );
+
+			// Force re-discovery of REST API root URL after enabling pretty permalinks.
+			// When permalinks change from plain to pretty, the REST API URL changes
+			// from /?rest_route=/ to /wp-json/. We need to refresh the cached URL
+			// to prevent 404 errors.
+			await requestUtils.setupRest();
+
+			// Create test pages
 			testPage1 = await requestUtils.createPage( {
 				title: 'Test Page 1',
 				status: 'publish',
@@ -770,8 +982,29 @@ test.describe( 'Navigation block', () => {
 			} );
 		} );
 
-		test.afterEach( async ( { requestUtils } ) => {
+		test.afterEach( async ( { admin, page, requestUtils } ) => {
 			await requestUtils.deleteAllPages();
+
+			// Restore plain permalinks
+			// TODO: Encapsulate permalink teardown in an admin.setPermalinks( '' ) style util
+			// We need to run this in afterEach instead of afterAll since we don't have page context
+			// in afterAll
+			await admin.visitAdminPage( 'options-permalink.php' );
+
+			// Select Plain permalinks
+			await page.click( '#permalink-input-plain' );
+
+			// Click Save Changes
+			await page.click( '#submit' );
+
+			// Wait for settings to be saved
+			await page.waitForSelector( '.notice-success' );
+
+			// Force re-discovery of REST API root URL after disabling pretty permalinks.
+			// When permalinks change from pretty to plain, the REST API URL changes
+			// from /wp-json/ back to /?rest_route=/. We need to refresh the cached URL
+			// to prevent 404 errors.
+			await requestUtils.setupRest();
 		} );
 
 		test( 'can bind to a page', async ( {
@@ -782,129 +1015,254 @@ test.describe( 'Navigation block', () => {
 			requestUtils,
 			pageUtils,
 		} ) => {
-			await admin.createNewPost();
+			let postId, updatedPage;
 
-			// create an empty menu for use - avoids Page List block
-			const menu = await requestUtils.createNavigationMenu( {
-				title: 'Test Menu',
-				content: '',
+			await test.step( 'Setup - Create menu and navigation block with bound page link', async () => {
+				await admin.createNewPost();
+
+				// create an empty menu for use - avoids Page List block
+				const menu = await requestUtils.createNavigationMenu( {
+					title: 'Test Menu',
+					content: '',
+				} );
+
+				await editor.insertBlock( {
+					name: 'core/navigation',
+					attributes: {
+						ref: menu.id,
+					},
+				} );
+
+				// Insert a link to a Page
+				await expect( navigation.getNavBlockInserter() ).toBeVisible();
+				await pageUtils.pressKeys( 'ArrowDown' );
+				await navigation.useBlockInserter();
+				await navigation.addPage( 'Test Page 1' );
+				await pageUtils.pressKeys( 'ArrowLeft', { times: 2 } );
 			} );
 
-			await editor.insertBlock( {
-				name: 'core/navigation',
-				attributes: {
-					ref: menu.id,
-				},
+			await test.step( 'Verify bound link displays correctly in Link UI popover', async () => {
+				// Open Link UI via keyboard shortcut
+				await pageUtils.pressKeys( 'primary+k' );
+
+				const linkPopover = navigation.getLinkPopover();
+				await expect( linkPopover ).toBeVisible();
+
+				// Click Edit button to see form fields
+				await linkPopover
+					.getByRole( 'button', { name: 'Edit' } )
+					.click();
+
+				// Check Link field is disabled with correct URL
+				const linkInput = linkPopover.getByRole( 'combobox', {
+					name: 'Link',
+				} );
+				await expect( linkInput ).toBeDisabled();
+				await expect( linkInput ).toHaveValue( testPage1.link );
+
+				// Check help text
+				await expect(
+					linkPopover.getByText( 'Synced with the selected page.' )
+				).toBeVisible();
+
+				// Close Link UI
+				await page.keyboard.press( 'Escape' );
+				await expect( linkPopover ).toBeHidden();
 			} );
 
-			// Insert a link to a Page
-			await expect( navigation.getNavBlockInserter() ).toBeVisible();
-			await pageUtils.pressKeys( 'ArrowDown' );
-			await navigation.useBlockInserter();
-			await navigation.addPage( 'Test Page 1' );
+			await test.step( 'Verify bound link displays correctly in sidebar', async () => {
+				// Check the Inspector controls for the Nav Link block
+				// to verify the Link field is:
+				// - disabled
+				// - has the correct URL matching the page URL
+				// - has the correct help text (description)
+				await editor.openDocumentSettingsSidebar();
+				const settingsControls = page
+					.getByRole( 'region', { name: 'Editor settings' } )
+					.getByRole( 'tabpanel', { name: 'Settings' } );
 
-			// Select the Nav Link block we just inserted
-			// await editor.selectBlocks( navBlock );
+				await expect( settingsControls ).toBeVisible();
 
-			// Check the Inspector controls for the Nav Link block
-			// to verify the Link field is:
-			// - disabled
-			// - has the correct URL matching the page URL
-			// - has the correct help text (description)
-			await editor.openDocumentSettingsSidebar();
-			const settingsControls = page
-				.getByRole( 'region', { name: 'Editor settings' } )
-				.getByRole( 'tabpanel', { name: 'Settings' } );
-
-			await expect( settingsControls ).toBeVisible();
-
-			const linkInput = settingsControls.getByRole( 'textbox', {
-				name: 'Link',
-				description: 'Synced with the selected page',
-			} );
-
-			await expect( linkInput ).toBeDisabled();
-			await expect( linkInput ).toHaveValue( testPage1.link );
-
-			// Save the Post and check frontend
-			const postId = await editor.publishPost();
-
-			// Navigate to the frontend post page
-			await page.goto( `/?p=${ postId }` );
-
-			// Verify the navigation link on the frontend has the correct URL
-			const frontendLink = page.getByRole( 'link', {
-				name: 'Test Page 1',
-			} );
-			await expect( frontendLink ).toHaveAttribute(
-				'href',
-				testPage1.link
-			);
-
-			// Update the page slug via REST API
-			const updatedPage = await requestUtils.rest( {
-				method: 'PUT',
-				path: `/wp/v2/pages/${ testPage1.id }`,
-				data: {
-					slug: 'page-1-changed',
-				},
-			} );
-
-			// Check that the frontend immediately shows the updated URL
-			await page.goto( `/?p=${ postId }` );
-
-			const updatedFrontendLink = page.getByRole( 'link', {
-				name: 'Test Page 1',
-			} );
-			await expect( updatedFrontendLink ).toHaveAttribute(
-				'href',
-				updatedPage.link
-			);
-
-			// Now check that the editor also shows the updated URL
-			await admin.editPost( postId );
-
-			// Wait for and select the Navigation block first
-			const navBlock = navigation.getNavBlock();
-			await expect( navBlock ).toBeVisible();
-			await editor.selectBlocks( navBlock );
-
-			// Then select the Navigation Link block
-			const navLinkBlock = navBlock
-				.getByRole( 'document', {
-					name: 'Block: Page Link',
-				} )
-				.first(); // there is a draggable ghost block so we need to select the actual block!
-
-			await expect( navLinkBlock ).toBeVisible( {
-				// Wait for the Navigation Link block to be available
-				timeout: 10000,
-			} );
-			await editor.selectBlocks( navLinkBlock );
-
-			// Check that the link input now shows the updated URL
-			await editor.openDocumentSettingsSidebar();
-			const updatedLinkInput = page
-				.getByRole( 'region', { name: 'Editor settings' } )
-				.getByRole( 'tabpanel', { name: 'Settings' } )
-				.getByRole( 'textbox', {
+				const linkInput = settingsControls.getByRole( 'textbox', {
 					name: 'Link',
 					description: 'Synced with the selected page',
 				} );
 
-			await expect( updatedLinkInput ).toHaveValue( updatedPage.link );
-
-			// Find the button using its name and aria-describedby ID
-			// The button has aria-describedby pointing to the help text element
-			const helpTextId =
-				await linkInput.getAttribute( 'aria-describedby' );
-			const unlinkButton = settingsControls.getByRole( 'button', {
-				name: 'Unsync and edit',
-				description: helpTextId,
+				await expect( linkInput ).toBeDisabled();
+				await expect( linkInput ).toHaveValue( testPage1.link );
 			} );
-			await unlinkButton.click();
-			await expect( linkInput ).toBeEnabled();
-			await expect( linkInput ).toHaveValue( '' );
+
+			await test.step( 'Verify bound link works correctly on frontend', async () => {
+				// Save the Post and check frontend
+				postId = await editor.publishPost();
+
+				// Navigate to the frontend post page
+				await page.goto( `/?p=${ postId }` );
+
+				// Verify the navigation link on the frontend has the correct URL
+				const frontendLink = page.getByRole( 'link', {
+					name: 'Test Page 1',
+				} );
+				await expect( frontendLink ).toHaveAttribute(
+					'href',
+					testPage1.link
+				);
+			} );
+
+			await test.step( 'Update page slug and verify frontend reflects change', async () => {
+				const updatedPageSlug = 'page-1-changed';
+				// Update the page slug via REST API
+				updatedPage = await requestUtils.rest( {
+					method: 'PUT',
+					path: `/wp/v2/pages/${ testPage1.id }`,
+					data: {
+						slug: updatedPageSlug,
+					},
+				} );
+
+				expect( updatedPage.link ).toContain( `/${ updatedPageSlug }` );
+
+				// Check that the frontend immediately shows the updated URL
+				await page.goto( `/?p=${ postId }` );
+
+				const updatedFrontendLink = page.getByRole( 'link', {
+					name: 'Test Page 1',
+				} );
+				await expect( updatedFrontendLink ).toHaveAttribute(
+					'href',
+					updatedPage.link
+				);
+
+				// Verify the link goes to the correct page
+				await updatedFrontendLink.click();
+				await expect( page ).toHaveURL( updatedPage.link );
+
+				// Verify the page content is correct
+				await expect(
+					page.getByRole( 'heading', { name: 'Test Page 1' } )
+				).toBeVisible();
+			} );
+
+			await test.step( 'Verify editor sidebar reflects updated page URL', async () => {
+				// Now check that the editor also shows the updated URL
+				await admin.editPost( postId );
+
+				// Wait for and select the Navigation block first
+				const navBlock = navigation.getNavBlock();
+				await expect( navBlock ).toBeVisible();
+				await editor.selectBlocks( navBlock );
+
+				// Then select the Navigation Link block
+				const navLinkBlock = navBlock
+					.getByRole( 'document', {
+						name: 'Block: Page Link',
+					} )
+					.first(); // there is a draggable ghost block so we need to select the actual block!
+
+				await expect( navLinkBlock ).toBeVisible( {
+					// Wait for the Navigation Link block to be available
+					timeout: 1000,
+				} );
+				await editor.selectBlocks( navLinkBlock );
+
+				// Check that the link input now shows the updated URL
+				await editor.openDocumentSettingsSidebar();
+				const updatedLinkInput = page
+					.getByRole( 'region', { name: 'Editor settings' } )
+					.getByRole( 'tabpanel', { name: 'Settings' } )
+					.getByRole( 'textbox', {
+						name: 'Link',
+						description: 'Synced with the selected page',
+					} );
+
+				await expect( updatedLinkInput ).toHaveValue(
+					updatedPage.link
+				);
+			} );
+
+			await test.step( 'Verify Link UI popover also reflects updated page URL', async () => {
+				// Open Link UI via keyboard shortcut
+				await pageUtils.pressKeys( 'primary+k' );
+
+				const linkPopover = navigation.getLinkPopover();
+				await expect( linkPopover ).toBeVisible();
+
+				// Click Edit button to see form fields
+				await linkPopover
+					.getByRole( 'button', { name: 'Edit' } )
+					.click();
+
+				// Check Link field shows updated URL
+				const linkInput = linkPopover.getByRole( 'combobox', {
+					name: 'Link',
+				} );
+				await expect( linkInput ).toBeDisabled();
+				await expect( linkInput ).toHaveValue( updatedPage.link );
+
+				// Close Link UI
+				await page.keyboard.press( 'Escape' );
+				await expect( linkPopover ).toBeHidden();
+			} );
+
+			await test.step( 'Verify unsync button works in Link UI popover', async () => {
+				// Open Link UI via keyboard shortcut
+				await pageUtils.pressKeys( 'primary+k' );
+
+				const linkPopover = navigation.getLinkPopover();
+				await expect( linkPopover ).toBeVisible();
+
+				// Click Edit button
+				await linkPopover
+					.getByRole( 'button', { name: 'Edit' } )
+					.click();
+
+				const linkInput = linkPopover.getByRole( 'combobox', {
+					name: 'Link',
+				} );
+
+				// Find and click unsync button
+				const unsyncButton = linkPopover.getByRole( 'button', {
+					name: 'Unsync and edit',
+				} );
+				await unsyncButton.click();
+
+				// Verify Link field becomes enabled
+				await expect( linkInput ).toBeEnabled();
+
+				// Cancel to preserve bound state for sidebar tests
+				await linkPopover
+					.getByRole( 'button', { name: 'Cancel' } )
+					.click();
+
+				// Pressing Escape closes the popover
+				await page.keyboard.press( 'Escape' );
+				await expect( linkPopover ).toBeHidden();
+			} );
+
+			await test.step( 'Verify unsync button works in sidebar', async () => {
+				// Get the sidebar controls
+				const settingsControls = page
+					.getByRole( 'region', { name: 'Editor settings' } )
+					.getByRole( 'tabpanel', { name: 'Settings' } );
+
+				const linkInput = settingsControls.getByRole( 'textbox', {
+					name: 'Link',
+					description: 'Synced with the selected page',
+				} );
+
+				// Find the button using its name and aria-describedby ID
+				// The button has aria-describedby pointing to the help text element
+				const helpTextId =
+					await linkInput.getAttribute( 'aria-describedby' );
+				const unlinkButton = settingsControls.getByRole( 'button', {
+					name: 'Unsync and edit',
+					description: helpTextId,
+				} );
+				await unlinkButton.click();
+				await expect( linkInput ).toBeEnabled();
+				await expect( linkInput ).toHaveValue( updatedPage.link );
+				await expect( linkInput ).toBeFocused();
+			} );
 		} );
 
 		test( 'existing links with id but no binding remain editable', async ( {
@@ -959,6 +1317,305 @@ test.describe( 'Navigation block', () => {
 			await expect( linkInput ).toBeEnabled();
 			await expect( linkInput ).toHaveValue( testPage1.link );
 		} );
+
+		test( 'Page List converts to Navigation Links with entity bindings', async ( {
+			editor,
+			page,
+			admin,
+			requestUtils,
+		} ) => {
+			// Step 1: Create menu with Page List block
+			const menu = await requestUtils.createNavigationMenu( {
+				title: 'Test Menu with Page List',
+				content: '<!-- wp:page-list /-->',
+			} );
+
+			// Step 2: Insert Navigation block
+			await admin.createNewPost();
+
+			await editor.insertBlock( {
+				name: 'core/navigation',
+				attributes: {
+					ref: menu.id,
+				},
+			} );
+
+			// Step 3: Verify Page List is present
+			const pageListBlock = editor.canvas.getByRole( 'document', {
+				name: 'Block: Page List',
+			} );
+			await expect( pageListBlock ).toBeVisible();
+
+			// Verify pages are shown in the list
+			const pageItems = pageListBlock.locator( 'li' );
+
+			// Wait for Page List to load pages
+			await pageItems.first().waitFor( { state: 'visible' } );
+			const itemCount = await pageItems.count();
+			expect( itemCount ).toBeGreaterThan( 0 );
+
+			// Step 4: Convert Page List using Edit button
+			// Select the Page List block
+			await editor.selectBlocks( pageListBlock );
+
+			// Try using the toolbar Edit button instead
+			const editButton = page
+				.getByRole( 'button', { name: 'Edit' } )
+				.first();
+			await expect( editButton ).toBeVisible();
+
+			await editButton.click();
+
+			// Wait for modal and approve conversion
+			await expect(
+				page.getByRole( 'dialog', { name: 'Edit Page List' } )
+			).toBeVisible();
+
+			await page.getByRole( 'button', { name: 'Edit' } ).last().click();
+
+			// Wait for conversion - check that Page List is gone
+			await expect( pageListBlock ).toBeHidden();
+
+			// Step 5: Verify conversion to entity links
+
+			// Get Navigation block
+			const navBlock = editor.canvas.getByRole( 'document', {
+				name: 'Block: Navigation',
+			} );
+
+			// Should have Navigation Link blocks
+			const navLinkBlocks = navBlock.getByRole( 'document', {
+				name: 'Block: Page Link',
+			} );
+
+			const linkCount = await navLinkBlocks.count();
+			expect( linkCount ).toBeGreaterThan( 0 );
+
+			// Select first link and verify binding
+			const navLinkBlock = navLinkBlocks.first();
+			await editor.selectBlocks( navLinkBlock );
+
+			// Open sidebar to check Link field
+			await editor.openDocumentSettingsSidebar();
+			const settingsControls = page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'tabpanel', { name: 'Settings' } );
+
+			await expect( settingsControls ).toBeVisible();
+
+			// Verify Link field is disabled (indicating binding is active)
+			const linkInput = settingsControls.getByRole( 'textbox', {
+				name: 'Link',
+				description: 'Synced with the selected page',
+			} );
+
+			await expect( linkInput ).toBeDisabled();
+
+			// Verify help text is present
+			await expect(
+				settingsControls.getByText( 'Synced with the selected page.' )
+			).toBeVisible();
+		} );
+
+		test( 'handles unavailable entity binding', async ( {
+			editor,
+			page,
+			admin,
+			navigation,
+			requestUtils,
+		} ) => {
+			await test.step( 'Setup - Create menu with binding to non-existent entity', async () => {
+				await admin.createNewPost();
+
+				// Use a non-existent page ID to simulate a deleted/unavailable entity
+				// This is simpler than creating and deleting a page, and tests the same behavior
+				const nonExistentPageId = 99999;
+
+				// Create a menu with a navigation-link that has a binding to the non-existent page
+				const menu = await requestUtils.createNavigationMenu( {
+					title: 'Test Menu with Unavailable Entity',
+					content: `<!-- wp:navigation-link {"label":"Unavailable Page","type":"page","id":${ nonExistentPageId },"kind":"post-type","metadata":{"bindings":{"url":{"source":"core/post-data","args":{"field":"link"}}}}} /-->`,
+				} );
+
+				await editor.insertBlock( {
+					name: 'core/navigation',
+					attributes: {
+						ref: menu.id,
+					},
+				} );
+			} );
+
+			await test.step( 'Verify Nav Link shows "Invalid" suffix', async () => {
+				// Select the Navigation Link block
+				const navBlock = navigation.getNavBlock();
+				await editor.selectBlocks( navBlock );
+
+				const navLinkBlock = navBlock
+					.getByRole( 'document', {
+						name: 'Block: Page Link',
+					} )
+					.first();
+
+				await editor.selectBlocks( navLinkBlock );
+
+				// Check that the link displays with "(Invalid)" placeholder text
+				// When invalid, it shows a div with placeholder-text class, not a textbox
+				const placeholderText = navLinkBlock.locator(
+					'.wp-block-navigation-link__placeholder-text'
+				);
+				await expect( placeholderText ).toBeVisible();
+				await expect( placeholderText ).toContainText( '(Invalid)' );
+			} );
+
+			await test.step( 'Verify clicking link auto-opens Link UI', async () => {
+				// Click on the navigation link in canvas
+				const navLinkBlock = navigation
+					.getNavBlock()
+					.getByRole( 'document', {
+						name: 'Block: Page Link',
+					} )
+					.first();
+
+				await navLinkBlock.click();
+
+				// Verify Link UI popover opens automatically
+				const linkPopover = navigation.getLinkPopover();
+				await expect( linkPopover ).toBeVisible();
+
+				// Verify search field is empty and ready for input
+				const searchInput = linkPopover.getByRole( 'combobox', {
+					name: 'Search or type URL',
+				} );
+				await expect( searchInput ).toBeVisible();
+				await expect( searchInput ).toBeEnabled();
+				await expect( searchInput ).toHaveValue( '' );
+
+				// Verify "Unsync and edit" button is NOT shown in Link UI popover
+				const unsyncButton = linkPopover.getByRole( 'button', {
+					name: 'Unsync and edit',
+				} );
+				await expect( unsyncButton ).toBeHidden();
+
+				// Close the popover
+				await page.keyboard.press( 'Escape' );
+				await expect( linkPopover ).toBeHidden();
+			} );
+
+			await test.step( 'Verify link block is not auto-removed after closing Link UI', async () => {
+				// Verify the link block is NOT auto-removed after closing
+				// This ensures the user can see they have a broken link to fix
+				const navLinkBlockAfterClose = navigation
+					.getNavBlock()
+					.getByRole( 'document', {
+						name: 'Block: Page Link',
+					} )
+					.first();
+				await expect( navLinkBlockAfterClose ).toBeVisible();
+			} );
+
+			await test.step( 'Verify sidebar shows error state help text', async () => {
+				// Select the Navigation Link block
+				const navBlock = navigation.getNavBlock();
+				await editor.selectBlocks( navBlock );
+
+				const navLinkBlock = navBlock
+					.getByRole( 'document', {
+						name: 'Block: Page Link',
+					} )
+					.first();
+
+				await editor.selectBlocks( navLinkBlock );
+
+				// Open document settings sidebar
+				await editor.openDocumentSettingsSidebar();
+				const settingsControls = page
+					.getByRole( 'region', { name: 'Editor settings' } )
+					.getByRole( 'tabpanel', { name: 'Settings' } );
+
+				await expect( settingsControls ).toBeVisible();
+
+				// Verify Link input field shows error state
+				const linkInput = settingsControls.getByRole( 'textbox', {
+					name: 'Link',
+				} );
+
+				// Verify input is disabled when entity is unavailable
+				await expect( linkInput ).toBeDisabled();
+
+				// Verify input shows empty value (error state)
+				await expect( linkInput ).toHaveValue( '' );
+
+				// Verify input has aria-invalid="true"
+				await expect( linkInput ).toHaveAttribute(
+					'aria-invalid',
+					'true'
+				);
+
+				// Verify help text shows error message
+				await expect(
+					settingsControls.getByText(
+						'Synced page is missing. Please update or remove this link.'
+					)
+				).toBeVisible();
+
+				// Verify unsync button is visible
+				const helpTextId =
+					await linkInput.getAttribute( 'aria-describedby' );
+				const unlinkButton = settingsControls.getByRole( 'button', {
+					name: 'Unsync and edit',
+					description: helpTextId,
+				} );
+				await expect( unlinkButton ).toBeVisible();
+			} );
+
+			await test.step( 'Verify unlocking and amending resolves error states', async () => {
+				const settingsControls = page
+					.getByRole( 'region', { name: 'Editor settings' } )
+					.getByRole( 'tabpanel', { name: 'Settings' } );
+
+				const linkInput = settingsControls.getByRole( 'textbox', {
+					name: 'Link',
+				} );
+
+				// Get the unsync button
+				const helpTextId =
+					await linkInput.getAttribute( 'aria-describedby' );
+				const unlinkButton = settingsControls.getByRole( 'button', {
+					name: 'Unsync and edit',
+					description: helpTextId,
+				} );
+
+				// Click "Unsync and edit" button
+				await unlinkButton.click();
+
+				// Verify Link input becomes enabled
+				await expect( linkInput ).toBeEnabled();
+
+				// Update URL to a valid value
+				await linkInput.fill( 'https://example.com' );
+				await linkInput.blur();
+
+				// Verify error states are cleared
+				// Wait for error help text to disappear (state updates asynchronously)
+				await expect(
+					settingsControls.getByText(
+						'Synced page is missing. Please update or remove this link.'
+					)
+				).toBeHidden();
+
+				// Verify input no longer has aria-invalid
+				await expect( linkInput ).not.toHaveAttribute(
+					'aria-invalid',
+					'true'
+				);
+
+				// Verify input has the new URL value
+				await expect( linkInput ).toHaveValue( 'https://example.com' );
+
+				// Verify link works normally (no error styling)
+				await expect( linkInput ).toBeEnabled();
+			} );
+		} );
 	} );
 } );
 
@@ -984,6 +1641,12 @@ class Navigation {
 
 	getNavBlockInserter() {
 		return this.getNavBlock().getByLabel( 'Add block' ).first();
+	}
+
+	getSubmenuBlockInserter() {
+		return this.editor.canvas
+			.getByRole( 'document', { name: 'Block: Submenu' } )
+			.getByLabel( 'Add block' );
 	}
 
 	getLinkControlSearch() {
@@ -1037,12 +1700,35 @@ class Navigation {
 	 * Usage:
 	 * - Open the new link control however you'd like (block appender, command+k on Add link label...)
 	 *
-	 * @param {string} label Text of page you want added. Must be a part of the pages added in the beforeAll in this test suite.
+	 * @param {string}  label   Text of page you want added. Must be a part of the pages added in the beforeAll in this test suite.
+	 * @param {boolean} submenu Whether the page is being added to a submenu.
 	 */
-	async addPage( label ) {
-		const linkControlSearch = this.page.getByRole( 'combobox', {
-			name: 'Search or type URL',
-		} );
+	async addPage( label, submenu = false ) {
+		await this.useLinkControlSearch( label );
+
+		const linkControlLink = await this.getLinkControlLink( label );
+
+		await expect( linkControlLink ).toBeVisible();
+		await expect( linkControlLink ).toBeFocused();
+
+		await this.page.keyboard.press( 'Escape' );
+		await expect( this.getLinkControlSearch() ).toBeHidden();
+
+		// Check appender has focus
+		if ( submenu ) {
+			// chec for the submenu appender
+			await expect( this.getSubmenuBlockInserter() ).toBeFocused();
+		} else {
+			await expect( this.getNavBlockInserter() ).toBeFocused();
+		}
+	}
+
+	async addSubmenuPage( label ) {
+		await this.addPage( label, true );
+	}
+
+	async useLinkControlSearch( label ) {
+		const linkControlSearch = this.getLinkControlSearch();
 
 		await expect( linkControlSearch ).toBeFocused();
 
@@ -1058,15 +1744,6 @@ class Navigation {
 		await this.pageUtils.pressKeys( 'ArrowDown' );
 
 		await this.page.keyboard.press( 'Enter' );
-
-		const linkControlLink = await this.getLinkControlLink( label );
-		await expect( linkControlLink ).toBeFocused();
-
-		await this.page.keyboard.press( 'Escape' );
-
-		await expect( linkControlSearch ).toBeHidden();
-
-		await this.checkLabelFocus( label );
 	}
 
 	/**

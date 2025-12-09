@@ -718,7 +718,6 @@ export default function Image( {
 					mediaId={ id }
 					mediaURL={ url }
 					allowedTypes={ ALLOWED_MEDIA_TYPES }
-					accept="image/*"
 					onSelect={ onSelectImage }
 					onSelectURL={ onSelectURL }
 					onError={ onUploadError }
@@ -911,9 +910,6 @@ export default function Image( {
 				<Spinner />
 			</Placeholder>
 		) : (
-			// Disable reason: Image itself is not meant to be interactive, but
-			// should direct focus to block.
-			/* eslint-disable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/click-events-have-key-events */
 			<>
 				<img
 					src={ temporaryURL || url }
@@ -940,7 +936,6 @@ export default function Image( {
 				/>
 				{ temporaryURL && <Spinner /> }
 			</>
-			/* eslint-enable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/click-events-have-key-events */
 		);
 
 	if ( canEditImage && isEditingImage ) {

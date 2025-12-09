@@ -1,0 +1,28 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
+
+.routes-styles__page {
+	.global-styles-ui-screen-root {
+		box-shadow: none;
+		& > div > hr {
+			display: none;
+		}
+	}
+	.global-styles-ui-sidebar__navigator-provider {
+		.components-tools-panel {
+			border-top: none;
+		}
+		overflow-y: auto;
+		padding-left: 0;
+		padding-right: 0;
+
+		.global-styles-ui-sidebar__navigator-screen {
+			padding-top: $grid-unit-15;
+			padding-left: $grid-unit-15;
+			padding-right: $grid-unit-15;
+			padding-bottom: $grid-unit-15;
+			outline: none;
+		}
+	}
+}
+

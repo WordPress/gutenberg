@@ -183,7 +183,7 @@ export function SocialLinksEdit( props ) {
 						<SelectControl
 							__next40pxDefaultSize
 							__nextHasNoMarginBottom
-							label={ __( 'Icon Size' ) }
+							label={ __( 'Icon size' ) }
 							onChange={ ( newSize ) => {
 								setAttributes( {
 									size: newSize === '' ? undefined : newSize,

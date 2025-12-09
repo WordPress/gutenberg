@@ -18,6 +18,7 @@ export default function Telephone< Item >( {
 	field,
 	onChange,
 	hideLabelFromVision,
+	validity,
 }: DataFormControlProps< Item > ) {
 	return (
 		<ValidatedText
@@ -26,6 +27,7 @@ export default function Telephone< Item >( {
 				field,
 				onChange,
 				hideLabelFromVision,
+				validity,
 				type: 'tel',
 				prefix: (
 					<InputControlPrefixWrapper variant="icon">

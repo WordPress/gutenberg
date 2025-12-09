@@ -13,34 +13,70 @@ import {
 	Modal,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useState, useMemo } from '@wordpress/element';
+import { useContext, useState, useMemo } from '@wordpress/element';
+import { useFocusOnMount } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
-import type { Form, FormField, NormalizedField } from '../../types';
+import type {
+	Field,
+	NormalizedForm,
+	NormalizedFormField,
+	NormalizedField,
+} from '../../types';
 import { DataFormLayout } from '../data-form-layout';
-import { isCombinedField } from '../is-combined-field';
-import { DEFAULT_LAYOUT } from '../normalize-form-fields';
+import { DEFAULT_LAYOUT } from '../normalize-form';
 import SummaryButton from './summary-button';
+import useFormValidity from '../../hooks/use-form-validity';
+import DataFormContext from '../../components/dataform-context';
 
 function ModalContent< Item >( {
 	data,
-	form,
-	fieldLabel,
+	field,
 	onChange,
+	fieldLabel,
 	onClose,
 }: {
 	data: Item;
-	form: Form;
-	fieldLabel: string;
+	field: NormalizedFormField;
 	onChange: ( data: Partial< Item > ) => void;
 	onClose: () => void;
+	fieldLabel: string;
 } ) {
+	const { fields } = useContext( DataFormContext );
 	const [ changes, setChanges ] = useState< Partial< Item > >( {} );
 	const modalData = useMemo( () => {
-		return deepMerge( data, changes );
+		return deepMerge( data, changes, {
+			arrayMerge: ( target, source ) => source,
+		} );
 	}, [ data, changes ] );
+
+	const form: NormalizedForm = useMemo(
+		() => ( {
+			layout: DEFAULT_LAYOUT,
+			fields: !! field.children
+				? field.children
+				: // If not explicit children return the field id itself.
+				  [ { id: field.id, layout: DEFAULT_LAYOUT } ],
+		} ),
+		[ field ]
+	);
+
+	const fieldsAsFieldType: Field< Item >[] = fields.map( ( f ) => ( {
+		...f,
+		Edit: f.Edit === null ? undefined : f.Edit,
+		isValid: {
+			required: f.isValid.required?.constraint,
+			elements: f.isValid.elements?.constraint,
+			min: f.isValid.min?.constraint,
+			max: f.isValid.max?.constraint,
+			pattern: f.isValid.pattern?.constraint,
+			minLength: f.isValid.minLength?.constraint,
+			maxLength: f.isValid.maxLength?.constraint,
+		},
+	} ) );
+	const { validity } = useFormValidity( modalData, fieldsAsFieldType, form );
 
 	const onApply = () => {
 		onChange( changes );
@@ -48,8 +84,14 @@ function ModalContent< Item >( {
 	};
 
 	const handleOnChange = ( newValue: Partial< Item > ) => {
-		setChanges( ( prev ) => deepMerge( prev, newValue ) );
+		setChanges( ( prev ) =>
+			deepMerge( prev, newValue, {
+				arrayMerge: ( target, source ) => source,
+			} )
+		);
 	};
+
+	const focusOnMountRef = useFocusOnMount( 'firstInputElement' );
 
 	return (
 		<Modal
@@ -59,23 +101,25 @@ function ModalContent< Item >( {
 			title={ fieldLabel }
 			size="medium"
 		>
-			<DataFormLayout
-				data={ modalData }
-				form={ form }
-				onChange={ handleOnChange }
-			>
-				{ ( FieldLayout, nestedField ) => (
-					<FieldLayout
-						key={ nestedField.id }
-						data={ modalData }
-						field={ nestedField }
-						onChange={ handleOnChange }
-						hideLabelFromVision={
-							( form?.fields ?? [] ).length < 2
-						}
-					/>
-				) }
-			</DataFormLayout>
+			<div ref={ focusOnMountRef }>
+				<DataFormLayout
+					data={ modalData }
+					form={ form }
+					onChange={ handleOnChange }
+					validity={ validity }
+				>
+					{ ( FieldLayout, childField, childFieldValidity ) => (
+						<FieldLayout
+							key={ childField.id }
+							data={ modalData }
+							field={ childField }
+							onChange={ handleOnChange }
+							hideLabelFromVision={ form.fields.length < 2 }
+							validity={ childFieldValidity }
+						/>
+					) }
+				</DataFormLayout>
+			</div>
 			<HStack
 				className="dataforms-layouts-panel__modal-footer"
 				spacing={ 3 }
@@ -101,36 +145,23 @@ function ModalContent< Item >( {
 }
 
 function PanelModal< Item >( {
-	fieldDefinition,
-	summaryFields,
-	labelPosition,
 	data,
-	onChange,
 	field,
+	onChange,
+	labelPosition,
+	summaryFields,
+	fieldDefinition,
 }: {
-	fieldDefinition: NormalizedField< Item >;
-	summaryFields: NormalizedField< Item >[];
-	labelPosition: 'side' | 'top' | 'none';
 	data: Item;
+	field: NormalizedFormField;
 	onChange: ( value: any ) => void;
-	field: FormField;
+	labelPosition: 'side' | 'top' | 'none';
+	summaryFields: NormalizedField< Item >[];
+	fieldDefinition: NormalizedField< Item >;
 } ) {
 	const [ isOpen, setIsOpen ] = useState( false );
 
-	const fieldLabel = isCombinedField( field )
-		? field.label
-		: fieldDefinition?.label;
-
-	const form: Form = useMemo(
-		(): Form => ( {
-			layout: DEFAULT_LAYOUT,
-			fields: isCombinedField( field )
-				? field.children
-				: // If not explicit children return the field id itself.
-				  [ { id: field.id } ],
-		} ),
-		[ field ]
-	);
+	const fieldLabel = !! field.children ? field.label : fieldDefinition?.label;
 
 	return (
 		<>
@@ -146,9 +177,9 @@ function PanelModal< Item >( {
 			{ isOpen && (
 				<ModalContent
 					data={ data }
-					form={ form as Form }
-					fieldLabel={ fieldLabel ?? '' }
+					field={ field }
 					onChange={ onChange }
+					fieldLabel={ fieldLabel ?? '' }
 					onClose={ () => setIsOpen( false ) }
 				/>
 			) }

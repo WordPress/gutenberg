@@ -178,7 +178,6 @@ function setupSignalEventHandlers( signalCon, url ) {
  */
 function setupHttpSignal( httpClient ) {
 	if ( httpClient.shouldConnect && httpClient.ws === null ) {
-		// eslint-disable-next-line no-restricted-syntax
 		const subscriberId = Math.floor( 100000 + Math.random() * 900000 );
 		const url = httpClient.url;
 		const eventSource = new window.EventSource(

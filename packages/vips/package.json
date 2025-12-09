@@ -25,7 +25,14 @@
 	},
 	"main": "build/index.js",
 	"module": "build-module/index.js",
-	"wpScript": true,
+	"exports": {
+		".": {
+			"types": "./build-types/index.d.ts",
+			"import": "./build-module/index.js",
+			"default": "./build/index.js"
+		},
+		"./package.json": "./package.json"
+	},
 	"types": "build-types",
 	"dependencies": {
 		"wasm-vips": "^0.0.10"

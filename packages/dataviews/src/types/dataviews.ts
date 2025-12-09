@@ -58,7 +58,17 @@ export interface NormalizedFilter {
 	/**
 	 * The list of options to pick from when using the field as a filter.
 	 */
-	elements: Option[];
+	elements?: Option[];
+
+	/**
+	 * Retrieval function to get the elements.
+	 */
+	getElements?: () => Promise< Option[] >;
+
+	/**
+	 * Whether the filter has elements.
+	 */
+	hasElements: boolean;
 
 	/**
 	 * Is a single selection filter.
@@ -168,9 +178,19 @@ interface ViewBase {
 	showLevels?: boolean;
 
 	/**
-	 * The field to group by.
+	 * The grouping configuration.
 	 */
-	groupByField?: string;
+	groupBy?: {
+		/**
+		 * The field to group by.
+		 */
+		field: string;
+
+		/**
+		 * The direction to sort by.
+		 */
+		direction: SortDirection;
+	};
 
 	/**
 	 * Whether infinite scroll is enabled.
@@ -227,6 +247,17 @@ export interface ViewList extends ViewBase {
 	type: 'list';
 }
 
+export interface ViewActivity extends ViewBase {
+	type: 'activity';
+
+	layout?: {
+		/**
+		 * The density of the view.
+		 */
+		density?: Density;
+	};
+}
+
 export interface ViewGrid extends ViewBase {
 	type: 'grid';
 
@@ -259,7 +290,34 @@ export interface ViewPickerGrid extends ViewBase {
 	};
 }
 
-export type View = ViewList | ViewGrid | ViewTable | ViewPickerGrid;
+export interface ViewPickerTable extends ViewBase {
+	type: 'pickerTable';
+
+	layout?: {
+		/**
+		 * The styles for the columns.
+		 */
+		styles?: Record< string, ColumnStyle >;
+
+		/**
+		 * The density of the view.
+		 */
+		density?: Density;
+
+		/**
+		 * Whether the view allows column moving.
+		 */
+		enableMoving?: boolean;
+	};
+}
+
+export type View =
+	| ViewList
+	| ViewGrid
+	| ViewTable
+	| ViewPickerGrid
+	| ViewPickerTable
+	| ViewActivity;
 
 interface ActionBase< Item > {
 	/**
@@ -332,7 +390,7 @@ export interface ActionModal< Item > extends ActionBase< Item > {
 	/**
 	 * The header of the modal.
 	 */
-	modalHeader?: string;
+	modalHeader?: string | ( ( items: Item[] ) => string );
 
 	/**
 	 * The size of the modal.
@@ -409,6 +467,10 @@ export interface ViewListProps< Item > extends ViewBaseProps< Item > {
 	view: ViewList;
 }
 
+export interface ViewActivityProps< Item > extends ViewBaseProps< Item > {
+	view: ViewActivity;
+}
+
 export interface ViewGridProps< Item > extends ViewBaseProps< Item > {
 	view: ViewGrid;
 }
@@ -418,16 +480,26 @@ export interface ViewPickerGridProps< Item >
 	view: ViewPickerGrid;
 }
 
+export interface ViewPickerTableProps< Item >
+	extends Omit< ViewPickerBaseProps< Item >, 'view' > {
+	view: ViewPickerTable;
+}
+
 export type ViewProps< Item > =
 	| ViewTableProps< Item >
 	| ViewGridProps< Item >
-	| ViewListProps< Item >;
+	| ViewListProps< Item >
+	| ViewActivityProps< Item >;
 
-export type ViewPickerProps< Item > = ViewPickerGridProps< Item >;
+export type ViewPickerProps< Item > =
+	| ViewPickerGridProps< Item >
+	| ViewPickerTableProps< Item >;
 
 export interface SupportedLayouts {
 	list?: Omit< ViewList, 'type' >;
 	grid?: Omit< ViewGrid, 'type' >;
 	table?: Omit< ViewTable, 'type' >;
+	activity?: Omit< ViewActivity, 'type' >;
 	pickerGrid?: Omit< ViewPickerGrid, 'type' >;
+	pickerTable?: Omit< ViewPickerTable, 'type' >;
 }

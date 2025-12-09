@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/upload-media",
-	"version": "0.17.0",
+	"version": "0.21.0",
 	"description": "Core media upload logic.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -27,10 +27,10 @@
 		".": {
 			"types": "./build-types/index.d.ts",
 			"import": "./build-module/index.js",
-			"default": "./build/index.js"
-		}
+			"require": "./build/index.js"
+		},
+		"./package.json": "./package.json"
 	},
-	"wpScript": true,
 	"types": "build-types",
 	"sideEffects": false,
 	"dependencies": {

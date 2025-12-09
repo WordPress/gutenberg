@@ -2,6 +2,7 @@
  * External dependencies
  */
 import type { Meta, StoryFn } from '@storybook/react';
+import { fn } from '@storybook/test';
 
 /**
  * WordPress dependencies
@@ -46,8 +47,14 @@ const meta: Meta< typeof RangeControl > = {
 		type: { control: { type: 'check' }, options: [ 'stepper' ] },
 		value: { control: false },
 	},
+	args: {
+		onBlur: fn(),
+		onChange: fn(),
+		onFocus: fn(),
+		onMouseLeave: fn(),
+		onMouseMove: fn(),
+	},
 	parameters: {
-		actions: { argTypesRegex: '^on.*' },
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
 	},

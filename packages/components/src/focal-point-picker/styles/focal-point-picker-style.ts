@@ -9,9 +9,19 @@ import styled from '@emotion/styled';
  */
 import { Flex } from '../../flex';
 import UnitControl from '../../unit-control';
-import { COLORS, CONFIG } from '../../utils';
+import { View } from '../../view';
+import { COLORS, CONFIG, boxSizingReset, font } from '../../utils';
 import type { FocalPointPickerControlsProps } from '../types';
 import { INITIAL_BOUNDS } from '../utils';
+
+export const Container = styled( View )`
+	border: 0;
+	padding: 0;
+	margin: 0;
+	font-family: ${ font( 'default.fontFamily' ) };
+	font-size: ${ font( 'default.fontSize' ) };
+	${ boxSizingReset }
+`;
 
 export const MediaWrapper = styled.div`
 	background-color: transparent;

@@ -21,7 +21,6 @@ import {
 } from '@wordpress/compose';
 import { __, sprintf } from '@wordpress/i18n';
 import { useState, useRef, useEffect } from '@wordpress/element';
-import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import {
 	EditorSnackbars,
 	UnsavedChangesWarning,
@@ -47,9 +46,8 @@ import { SidebarContent, SidebarNavigationProvider } from '../sidebar';
 import SaveHub from '../save-hub';
 import SavePanel from '../save-panel';
 
-const { useGlobalStyle } = unlock( blockEditorPrivateApis );
-const { GlobalStylesProvider } = unlock( editorPrivateApis );
 const { useLocation } = unlock( routerPrivateApis );
+const { useStyle } = unlock( editorPrivateApis );
 
 const ANIMATION_DURATION = 0.3;
 
@@ -77,8 +75,8 @@ function Layout() {
 		};
 	} );
 
-	const [ backgroundColor ] = useGlobalStyle( 'color.background' );
-	const [ gradientValue ] = useGlobalStyle( 'color.gradient' );
+	const backgroundColor = useStyle( 'color.background' );
+	const gradientValue = useStyle( 'color.gradient' );
 	const previousCanvaMode = usePrevious( canvas );
 	useEffect( () => {
 		if ( previousCanvaMode === 'edit' ) {
@@ -276,11 +274,9 @@ export default function LayoutWithGlobalStylesProvider( props ) {
 
 	return (
 		<SlotFillProvider>
-			<GlobalStylesProvider>
-				{ /** This needs to be within the SlotFillProvider */ }
-				<PluginArea onError={ onPluginAreaError } />
-				<Layout { ...props } />
-			</GlobalStylesProvider>
+			{ /** This needs to be within the SlotFillProvider */ }
+			<PluginArea onError={ onPluginAreaError } />
+			<Layout { ...props } />
 		</SlotFillProvider>
 	);
 }

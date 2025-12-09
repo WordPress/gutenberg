@@ -2,6 +2,24 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Updated recommended ruleset to enforce [`import/no-unresolved`](https://github.com/import-js/eslint-plugin-import/blob/main/docs/rules/no-unresolved.md) for `@wordpress/` packages. These packages were previously exempted from the rule. ([#72978](https://github.com/WordPress/gutenberg/pull/72978))
+-   Removed default configuration of [`import/internal-regex`](https://github.com/import-js/eslint-plugin-import/tree/main?tab=readme-ov-file#importinternal-regex) to classify `@wordpress/` packages as internal. From the perspective of an external consumer of this package, `@wordpress/` packages should be considered external. ([#72978](https://github.com/WordPress/gutenberg/pull/72978))
+
+## 22.22.0 (2025-11-26)
+
+## 22.21.0 (2025-11-12)
+
+### Enhancements
+
+-   Disabled `import/no-unresolved`, `import/default`, and `import/named` checks for TypeScript files when TypeScript is installed, since these issues are [already checked by TypeScript](https://typescript-eslint.io/troubleshooting/typed-linting/performance/).
+-   Improved resolution behavior to support modern package export semantics by updating default import resolver to [`eslint-import-resolver-typescript`](https://www.npmjs.com/package/eslint-import-resolver-typescript), including for non-TypeScript files.
+
+## 22.20.0 (2025-10-29)
+
+## 22.19.0 (2025-10-17)
+
 ## 22.18.0 (2025-10-01)
 
 ## 22.17.0 (2025-09-17)
@@ -16,9 +34,9 @@
 
 ### Enhancements
 
-- Added stricter ESLint checks for translator comments.
-- Supports unnamed (%s, %d, %f), positional (%1$s, etc.) and named placeholders.
-- Flags missing and extra/outdated placeholders.
+-   Added stricter ESLint checks for translator comments.
+-   Supports unnamed (%s, %d, %f), positional (%1$s, etc.) and named placeholders.
+-   Flags missing and extra/outdated placeholders.
 
 ## 22.12.0 (2025-06-25)
 

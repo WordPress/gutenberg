@@ -32,4 +32,18 @@ describe( 'getLayoutStyle', () => {
 
 		expect( result ).toBe( expected );
 	} );
+	it( 'should return `grid-template-columns` with max() function if both minimumColumnWidth and columnCount are provided', () => {
+		const expected = `.my-container { grid-template-columns: repeat(auto-fill, minmax(max(12rem, ( 100% - (1.2rem*2) ) / 3), 1fr)); container-type: inline-size; }`;
+
+		const result = grid.getLayoutStyle( {
+			selector: '.my-container',
+			layout: { minimumColumnWidth: '12rem', columnCount: 3 },
+			style: {},
+			blockName: 'test-block',
+			hasBlockGapSupport: false,
+			layoutDefinitions: undefined,
+		} );
+
+		expect( result ).toBe( expected );
+	} );
 } );

@@ -5,11 +5,8 @@ import { addFilter } from '@wordpress/hooks';
 import { hasBlockSupport } from '@wordpress/blocks';
 import { useEffect, useCallback } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
-import { __ } from '@wordpress/i18n';
-import {
-	ToggleControl,
-	__experimentalToolsPanelItem as ToolsPanelItem,
-} from '@wordpress/components';
+
+const EMPTY_OBJECT = {};
 
 /**
  * Internal dependencies
@@ -17,7 +14,6 @@ import {
 import { optimizeFitText } from '../utils/fit-text-utils';
 import { store as blockEditorStore } from '../store';
 import { useBlockElement } from '../components/block-list/use-block-props/use-block-refs';
-import InspectorControls from '../components/inspector-controls';
 
 export const FIT_TEXT_SUPPORT_KEY = 'typography.fitText';
 
@@ -62,16 +58,21 @@ function useFitText( { fitText, name, clientId } ) {
 	const hasFitTextSupport = hasBlockSupport( name, FIT_TEXT_SUPPORT_KEY );
 	const blockElement = useBlockElement( clientId );
 
-	// Monitor block attribute changes
-	// Any attribute may change the available space.
-	const blockAttributes = useSelect(
+	// Monitor block attribute changes, and parent changes.
+	// Any attribute or parent change may change the available space.
+	const { blockAttributes, parentId } = useSelect(
 		( select ) => {
-			if ( ! clientId ) {
-				return;
+			if ( ! clientId || ! hasFitTextSupport || ! fitText ) {
+				return EMPTY_OBJECT;
 			}
-			return select( blockEditorStore ).getBlockAttributes( clientId );
+			return {
+				blockAttributes:
+					select( blockEditorStore ).getBlockAttributes( clientId ),
+				parentId:
+					select( blockEditorStore ).getBlockRootClientId( clientId ),
+			};
 		},
-		[ clientId ]
+		[ clientId, hasFitTextSupport, fitText ]
 	);
 
 	const applyFitText = useCallback( () => {
@@ -90,11 +91,15 @@ function useFitText( { fitText, name, clientId } ) {
 
 		const blockSelector = `#block-${ clientId }`;
 
-		const applyStylesFn = ( css ) => {
-			styleElement.textContent = css;
+		const applyFontSize = ( fontSize ) => {
+			if ( fontSize === 0 ) {
+				styleElement.textContent = '';
+			} else {
+				styleElement.textContent = `${ blockSelector } { font-size: ${ fontSize }px !important; }`;
+			}
 		};
 
-		optimizeFitText( blockElement, blockSelector, applyStylesFn );
+		optimizeFitText( blockElement, applyFontSize );
 	}, [ blockElement, clientId, hasFitTextSupport, fitText ] );
 
 	useEffect( () => {
@@ -107,21 +112,54 @@ function useFitText( { fitText, name, clientId } ) {
 			return;
 		}
 
-		// Apply initially
-		applyFitText();
-
 		// Store current element value for cleanup
 		const currentElement = blockElement;
+		const previousVisibility = currentElement.style.visibility;
+
+		// Store IDs for cleanup
+		let hideFrameId = null;
+		let calculateFrameId = null;
+		let showTimeoutId = null;
+
+		// We are hiding the element doing the calculation of fit text
+		// and then showing it again to avoid the user noticing a flash of potentially
+		// big fitText while the binary search is happening.
+		hideFrameId = window.requestAnimationFrame( () => {
+			currentElement.style.visibility = 'hidden';
+			// Wait for browser to render the hidden state
+			calculateFrameId = window.requestAnimationFrame( () => {
+				applyFitText();
+
+				// Using a timeout instead of requestAnimationFrame, because
+				// with requestAnimationFrame a flash of very high size
+				// can still occur although rare.
+				showTimeoutId = setTimeout( () => {
+					currentElement.style.visibility = previousVisibility;
+				}, 10 );
+			} );
+		} );
 
 		// Watch for size changes
 		let resizeObserver;
 		if ( window.ResizeObserver && currentElement.parentElement ) {
 			resizeObserver = new window.ResizeObserver( applyFitText );
 			resizeObserver.observe( currentElement.parentElement );
+			resizeObserver.observe( currentElement );
 		}
 
 		// Cleanup function
 		return () => {
+			// Cancel pending async operations
+			if ( hideFrameId !== null ) {
+				window.cancelAnimationFrame( hideFrameId );
+			}
+			if ( calculateFrameId !== null ) {
+				window.cancelAnimationFrame( calculateFrameId );
+			}
+			if ( showTimeoutId !== null ) {
+				clearTimeout( showTimeoutId );
+			}
+
 			if ( resizeObserver ) {
 				resizeObserver.disconnect();
 			}
@@ -133,19 +171,26 @@ function useFitText( { fitText, name, clientId } ) {
 				styleElement.remove();
 			}
 		};
-	}, [ fitText, clientId, applyFitText, blockElement, hasFitTextSupport ] );
+	}, [
+		fitText,
+		clientId,
+		parentId,
+		applyFitText,
+		blockElement,
+		hasFitTextSupport,
+	] );
 
 	// Trigger fit text recalculation when content changes
 	useEffect( () => {
 		if ( fitText && blockElement && hasFitTextSupport ) {
-			// Small delay to ensure DOM has updated after content changes
-			const timer = setTimeout( () => {
+			// Wait for next frame to ensure DOM has updated after content changes
+			const frameId = window.requestAnimationFrame( () => {
 				if ( blockElement ) {
 					applyFitText();
 				}
-			}, 1000 );
+			} );
 
-			return () => clearTimeout( timer );
+			return () => window.cancelAnimationFrame( frameId );
 		}
 	}, [
 		blockAttributes,
@@ -154,51 +199,6 @@ function useFitText( { fitText, name, clientId } ) {
 		blockElement,
 		hasFitTextSupport,
 	] );
-}
-
-/**
- * Fit text control component for the typography panel.
- *
- * @param {Object}   props               Component props.
- * @param {string}   props.clientId      Block client ID.
- * @param {Function} props.setAttributes Function to set block attributes.
- * @param {string}   props.name          Block name.
- * @param {boolean}  props.fitText       Whether fit text is enabled.
- */
-export function FitTextControl( {
-	clientId,
-	fitText = false,
-	setAttributes,
-	name,
-} ) {
-	if ( ! hasBlockSupport( name, FIT_TEXT_SUPPORT_KEY ) ) {
-		return null;
-	}
-	return (
-		<InspectorControls group="typography">
-			<ToolsPanelItem
-				hasValue={ () => fitText }
-				label={ __( 'Fit text' ) }
-				onDeselect={ () => setAttributes( { fitText: undefined } ) }
-				resetAllFilter={ () => ( { fitText: undefined } ) }
-				panelId={ clientId }
-			>
-				<ToggleControl
-					__nextHasNoMarginBottom
-					label={ __( 'Fit text' ) }
-					checked={ fitText }
-					onChange={ () =>
-						setAttributes( { fitText: ! fitText || undefined } )
-					}
-					help={
-						fitText
-							? __( 'Text will resize to fit its container.' )
-							: __( 'Resize text to fit its container.' )
-					}
-				/>
-			</ToolsPanelItem>
-		</InspectorControls>
-	);
 }
 
 /**
@@ -264,5 +264,5 @@ export default {
 	addSaveProps,
 	attributeKeys: [ 'fitText' ],
 	hasSupport: hasFitTextSupport,
-	edit: FitTextControl,
+	edit: () => null,
 };

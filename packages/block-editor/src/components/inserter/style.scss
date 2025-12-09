@@ -151,7 +151,7 @@ $block-inserter-tabs-height: 44px;
 	color: $gray-700;
 	text-transform: uppercase;
 	font-size: 11px;
-	font-weight: 500;
+	font-weight: $font-weight-medium;
 }
 
 .block-editor-inserter__panel-dropdown select.components-select-control__input.components-select-control__input.components-select-control__input {
@@ -440,7 +440,7 @@ $block-inserter-tabs-height: 44px;
 }
 
 .components-heading.block-editor-inserter__patterns-category-panel-title {
-	font-weight: 500;
+	font-weight: $font-weight-medium;
 }
 
 .block-editor-inserter__patterns-explore-button,

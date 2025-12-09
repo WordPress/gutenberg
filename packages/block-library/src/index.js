@@ -72,6 +72,7 @@ import * as image from './image';
 import * as latestComments from './latest-comments';
 import * as latestPosts from './latest-posts';
 import * as list from './list';
+import * as math from './math';
 import * as listItem from './list-item';
 import * as logInOut from './loginout';
 import * as mediaText from './media-text';
@@ -124,8 +125,10 @@ import * as siteTitle from './site-title';
 import * as socialLink from './social-link';
 import * as socialLinks from './social-links';
 import * as spacer from './spacer';
+import * as tab from './tab';
 import * as table from './table';
 import * as tableOfContents from './table-of-contents';
+import * as tabs from './tabs';
 import * as tagCloud from './tag-cloud';
 import * as templatePart from './template-part';
 import * as termCount from './term-count';
@@ -163,7 +166,6 @@ const getAllBlocks = () => {
 		accordionPanel,
 		archives,
 		audio,
-		breadcrumbs,
 		button,
 		buttons,
 		calendar,
@@ -178,6 +180,7 @@ const getAllBlocks = () => {
 		file,
 		group,
 		html,
+		math,
 		latestComments,
 		latestPosts,
 		mediaText,
@@ -254,13 +257,16 @@ const getAllBlocks = () => {
 		termCount,
 		termDescription,
 		termName,
+		termsQuery,
+		termTemplate,
 		queryTitle,
 		postAuthorBiography,
 	];
 
 	if ( window?.__experimentalEnableBlockExperiments ) {
-		blocks.push( termsQuery );
-		blocks.push( termTemplate );
+		blocks.push( breadcrumbs );
+		blocks.push( tab );
+		blocks.push( tabs );
 	}
 
 	if ( window?.__experimentalEnableFormBlocks ) {
@@ -328,11 +334,17 @@ export const registerCoreBlocks = (
 			const bootstrappedBlockType = unlock(
 				select( blocksStore )
 			).getBootstrappedBlockType( blockName );
-			const bootstrappedApiVersion = bootstrappedBlockType.apiVersion;
 
 			registerBlockType( blockName, {
-				title: blockName,
-				...( bootstrappedApiVersion < 3 && { apiVersion: 3 } ),
+				// Use all metadata from PHP registration,
+				// but fall back title to block name if not provided,
+				// ensure minimum apiVersion 3 for block wrapper support,
+				// and override with a ServerSideRender-based edit function.
+				...bootstrappedBlockType,
+				title: bootstrappedBlockType?.title || blockName,
+				...( ( bootstrappedBlockType?.apiVersion ?? 0 ) < 3 && {
+					apiVersion: 3,
+				} ),
 				edit: function Edit( { attributes } ) {
 					const blockProps = useBlockProps();
 					const { content, status, error } = useServerSideRender( {

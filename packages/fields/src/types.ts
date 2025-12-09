@@ -24,6 +24,7 @@ interface Links {
 }
 
 interface Author {
+	id: number;
 	name: string;
 	avatar_urls: Record< string, string >;
 }
@@ -111,6 +112,10 @@ export type PostWithPermissions = Post & {
 	};
 };
 
+interface EditorSupport {
+	notes?: boolean;
+}
+
 export interface PostType {
 	slug: string;
 	viewable: boolean;
@@ -121,7 +126,7 @@ export interface PostType {
 		author?: string;
 		thumbnail?: string;
 		comments?: string;
-		editor?: boolean;
+		editor?: boolean | [ EditorSupport ];
 		trackbacks?: boolean;
 	};
 }

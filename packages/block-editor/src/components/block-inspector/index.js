@@ -13,7 +13,7 @@ import { useSelect } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import EditContentsButton from './edit-contents-button';
+import EditContents from './edit-contents';
 import SkipToSelectedBlock from '../skip-to-selected-block';
 import BlockCard from '../block-card';
 import MultiSelectionInspector from '../multi-selection-inspector';
@@ -29,7 +29,6 @@ import PositionControls from '../inspector-controls-tabs/position-controls-panel
 import useBlockInspectorAnimationSettings from './useBlockInspectorAnimationSettings';
 import { useBorderPanelLabel } from '../../hooks/border';
 import ContentTab from '../inspector-controls-tabs/content-tab';
-
 import { unlock } from '../../lock-unlock';
 
 function BlockStylesPanel( { clientId } ) {
@@ -93,6 +92,7 @@ function BlockInspector() {
 		isSectionBlock,
 		isSectionBlockInSelection,
 		hasBlockStyles,
+		editedContentOnlySection,
 	} = useSelect( ( select ) => {
 		const {
 			getSelectedBlockClientId,
@@ -101,12 +101,18 @@ function BlockInspector() {
 			getBlockName,
 			getParentSectionBlock,
 			isSectionBlock: _isSectionBlock,
+			getEditedContentOnlySection,
+			isWithinEditedContentOnlySection,
 		} = unlock( select( blockEditorStore ) );
 		const { getBlockStyles } = select( blocksStore );
 		const _selectedBlockClientId = getSelectedBlockClientId();
-		const renderedBlockClientId =
-			getParentSectionBlock( _selectedBlockClientId ) ||
-			_selectedBlockClientId;
+		const isWithinEditedSection = isWithinEditedContentOnlySection(
+			_selectedBlockClientId
+		);
+		const renderedBlockClientId = isWithinEditedSection
+			? _selectedBlockClientId
+			: getParentSectionBlock( _selectedBlockClientId ) ||
+			  _selectedBlockClientId;
 		const _selectedBlockName =
 			renderedBlockClientId && getBlockName( renderedBlockClientId );
 		const _blockType =
@@ -115,7 +121,6 @@ function BlockInspector() {
 		const _isSectionBlockInSelection = selectedBlockClientIds.some(
 			( id ) => _isSectionBlock( id )
 		);
-
 		const blockStyles =
 			_selectedBlockName && getBlockStyles( _selectedBlockName );
 		const _hasBlockStyles = blockStyles && blockStyles.length > 0;
@@ -128,6 +133,7 @@ function BlockInspector() {
 			isSectionBlockInSelection: _isSectionBlockInSelection,
 			isSectionBlock: _isSectionBlock( renderedBlockClientId ),
 			hasBlockStyles: _hasBlockStyles,
+			editedContentOnlySection: getEditedContentOnlySection(),
 		};
 	}, [] );
 
@@ -263,6 +269,7 @@ function BlockInspector() {
 				availableTabs={ availableTabs }
 				contentClientIds={ contentClientIds }
 				hasBlockStyles={ hasBlockStyles }
+				editedContentOnlySection={ editedContentOnlySection }
 			/>
 		</BlockInspectorSingleBlockWrapper>
 	);
@@ -311,25 +318,39 @@ const BlockInspectorSingleBlock = ( {
 	availableTabs,
 	contentClientIds,
 	hasBlockStyles,
+	editedContentOnlySection,
 } ) => {
 	const hasMultipleTabs = availableTabs?.length > 1;
-
+	const hasParentChildBlockCards =
+		window?.__experimentalContentOnlyPatternInsertion &&
+		editedContentOnlySection &&
+		editedContentOnlySection !== clientId;
+	const parentBlockInformation = useBlockDisplayInformation(
+		editedContentOnlySection
+	);
 	const blockInformation = useBlockDisplayInformation( clientId );
 	const isBlockSynced = blockInformation.isSynced;
-
 	const shouldShowTabs = ! isBlockSynced && hasMultipleTabs;
 
 	return (
 		<div className="block-editor-block-inspector">
+			{ hasParentChildBlockCards && (
+				<BlockCard
+					{ ...parentBlockInformation }
+					className={ parentBlockInformation.isSynced && 'is-synced' }
+					parentClientId={ editedContentOnlySection }
+				/>
+			) }
 			<BlockCard
 				{ ...blockInformation }
-				className={ isBlockSynced && 'is-synced' }
 				allowParentNavigation
-			>
-				{ window?.__experimentalContentOnlyPatternInsertion && (
-					<EditContentsButton clientId={ clientId } />
-				) }
-			</BlockCard>
+				className={ isBlockSynced && 'is-synced' }
+				isChild={ hasParentChildBlockCards }
+				clientId={ clientId }
+			/>
+			{ window?.__experimentalContentOnlyPatternInsertion && (
+				<EditContents clientId={ clientId } />
+			) }
 			<BlockVariationTransforms blockClientId={ clientId } />
 			{ shouldShowTabs && (
 				<InspectorControlsTabs
@@ -346,7 +367,10 @@ const BlockInspectorSingleBlock = ( {
 					{ hasBlockStyles && (
 						<BlockStylesPanel clientId={ clientId } />
 					) }
-					<ContentTab contentClientIds={ contentClientIds } />
+					<ContentTab
+						rootClientId={ clientId }
+						contentClientIds={ contentClientIds }
+					/>
 					{ ! isSectionBlock && (
 						<StyleInspectorSlots
 							blockName={ blockName }

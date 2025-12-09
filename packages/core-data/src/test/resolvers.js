@@ -6,13 +6,11 @@ import triggerFetch from '@wordpress/api-fetch';
 /**
  * Internal dependencies
  */
-import { syncManager } from '../sync';
+import { getSyncManager } from '../sync';
 
 jest.mock( '@wordpress/api-fetch' );
 jest.mock( '../sync', () => ( {
-	syncManager: {
-		load: jest.fn(),
-	},
+	getSyncManager: jest.fn(),
 } ) );
 
 /**
@@ -26,6 +24,7 @@ import {
 	getAutosaves,
 	getCurrentUser,
 } from '../resolvers';
+import { RECEIVE_INTERMEDIATE_RESULTS } from '../utils';
 
 describe( 'getEntityRecord', () => {
 	const POST_TYPE = { slug: 'post' };
@@ -42,6 +41,8 @@ describe( 'getEntityRecord', () => {
 	const resolveSelect = { getEntitiesConfig: jest.fn( () => ENTITIES ) };
 
 	let dispatch;
+	let syncManager;
+
 	beforeEach( async () => {
 		dispatch = Object.assign( jest.fn(), {
 			receiveEntityRecords: jest.fn(),
@@ -51,7 +52,11 @@ describe( 'getEntityRecord', () => {
 			finishResolutions: jest.fn(),
 		} );
 		triggerFetch.mockReset();
-		syncManager.load.mockClear();
+
+		syncManager = {
+			load: jest.fn(),
+		};
+		getSyncManager.mockImplementation( () => syncManager );
 	} );
 
 	afterEach( () => {
@@ -168,7 +173,11 @@ describe( 'getEntityRecord', () => {
 			'postType/post',
 			1,
 			POST_RECORD,
-			{ editRecord: expect.any( Function ) }
+			{
+				editRecord: expect.any( Function ),
+				getEditedRecord: expect.any( Function ),
+				saveRecord: expect.any( Function ),
+			}
 		);
 	} );
 
@@ -218,7 +227,11 @@ describe( 'getEntityRecord', () => {
 			'postType/post',
 			1,
 			{ ...POST_RECORD, foo: 'bar' },
-			{ editRecord: expect.any( Function ) }
+			{
+				editRecord: expect.any( Function ),
+				getEditedRecord: expect.any( Function ),
+				saveRecord: expect.any( Function ),
+			}
 		);
 	} );
 
@@ -313,6 +326,11 @@ describe( 'getEntityRecords', () => {
 			kind: 'postType',
 			baseURL: '/wp/v2/posts',
 			baseURLParams: { context: 'edit' },
+		},
+		{
+			name: 'attachment',
+			kind: 'postType',
+			supportsPagination: true,
 		},
 	];
 	const registry = { batch: ( callback ) => callback() };
@@ -502,6 +520,78 @@ describe( 'getEntityRecords', () => {
 		expect( finishResolutions ).toHaveBeenCalledWith(
 			'getEntityRecord',
 			expect.any( Array )
+		);
+	} );
+
+	it( 'provides pagination metadata and progressive loading during intermediate results fetching', async () => {
+		const dispatch = Object.assign( jest.fn(), {
+			receiveEntityRecords: jest.fn(),
+			__unstableAcquireStoreLock: jest.fn(),
+			__unstableReleaseStoreLock: jest.fn(),
+			finishResolutions: jest.fn(),
+		} );
+
+		const mockPages = [
+			[ { id: 1 }, { id: 2 } ],
+			[ { id: 3 }, { id: 4 } ],
+			[ { id: 5 } ],
+		];
+
+		let callCount = 0;
+		triggerFetch.mockImplementation( () => {
+			const data = mockPages[ callCount % mockPages.length ];
+			callCount++;
+			return Promise.resolve( {
+				json: () => Promise.resolve( data ),
+				headers: new Map( [
+					[ 'X-WP-Total', '5' ],
+					[ 'X-WP-TotalPages', '3' ],
+				] ),
+			} );
+		} );
+
+		await getEntityRecords( 'postType', 'attachment', {
+			per_page: -1,
+			[ RECEIVE_INTERMEDIATE_RESULTS ]: true,
+		} )( { dispatch, registry, resolveSelect } );
+
+		// 3 calls for intermediate results (one per page), plus 1 final call with complete records
+		expect( dispatch.receiveEntityRecords ).toHaveBeenCalledTimes( 4 );
+
+		// Check that the first call already includes pagination metadata
+		expect( dispatch.receiveEntityRecords ).toHaveBeenCalledWith(
+			'postType',
+			'attachment',
+			expect.any( Array ),
+			{ per_page: -1, [ RECEIVE_INTERMEDIATE_RESULTS ]: true },
+			false,
+			undefined,
+			expect.objectContaining( { totalItems: 5, totalPages: 1 } )
+		);
+
+		// Check that all calls include pagination metadata
+		dispatch.receiveEntityRecords.mock.calls.forEach( ( call ) => {
+			// 7th parameter is the pagination metadata
+			expect( call[ 6 ] ).toEqual(
+				expect.objectContaining( { totalItems: 5, totalPages: 1 } )
+			);
+		} );
+
+		// Should process all the data from the 3 mock pages (2+2+1=5 records total)
+		expect( dispatch.receiveEntityRecords ).toHaveBeenLastCalledWith(
+			'postType',
+			'attachment',
+			expect.arrayContaining( [
+				expect.objectContaining( { id: 1 } ),
+				expect.objectContaining( { id: 2 } ),
+				expect.objectContaining( { id: 3 } ),
+				expect.objectContaining( { id: 4 } ),
+				expect.objectContaining( { id: 5 } ),
+			] ),
+			{ per_page: -1, [ RECEIVE_INTERMEDIATE_RESULTS ]: true },
+			false,
+			undefined,
+			expect.objectContaining( { totalItems: 5, totalPages: 1 } )
 		);
 	} );
 } );
