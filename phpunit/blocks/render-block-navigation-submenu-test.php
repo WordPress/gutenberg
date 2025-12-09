@@ -204,8 +204,8 @@ class Render_Block_Navigation_Submenu_Test extends WP_UnitTestCase {
 		);
 
 		$this->assertStringNotContainsString(
-			$actual,
 			'has-text-color has-background',
+			$actual,
 			'Submenu block should not apply "has-*" color classes if missing from context'
 		);
 	}
@@ -291,13 +291,13 @@ class Render_Block_Navigation_Submenu_Test extends WP_UnitTestCase {
 
 		// Should not have submenu color classes since submenu colors are not set.
 		$this->assertStringNotContainsString(
-			$rendered_html,
 			'has-purple-color',
+			$rendered_html,
 			'Submenu should not use overlay colors when submenu colors are cleared in migrated block'
 		);
 		$this->assertStringNotContainsString(
-			$rendered_html,
 			'has-yellow-background-color',
+			$rendered_html,
 			'Submenu should not use overlay background colors when submenu colors are cleared in migrated block'
 		);
 	}
