@@ -100,6 +100,12 @@
 	--wpds-color-stroke-surface-warning: #d0b381; /* Decorative stroke color used to define warning-toned surface boundaries with normal emphasis. */
 	--wpds-color-stroke-surface-warning-strong: #926300; /* Decorative stroke color used to define warning-toned surface boundaries with strong emphasis. */
 	--wpds-dimension-base: 4px; /* Base dimension unit */
+	--wpds-dimension-gap-2xs: 4px; /* 2x extra small gap */
+	--wpds-dimension-gap-lg: 24px; /* Large gap */
+	--wpds-dimension-gap-md: 16px; /* Medium gap */
+	--wpds-dimension-gap-sm: 12px; /* Small gap */
+	--wpds-dimension-gap-xl: 40px; /* Extra large gap */
+	--wpds-dimension-gap-xs: 8px; /* Extra small gap */
 	--wpds-dimension-padding-surface-2xs: 4px; /* 2x extra small spacing for surfaces */
 	--wpds-dimension-padding-surface-lg: 32px; /* Large spacing for surfaces */
 	--wpds-dimension-padding-surface-md: 24px; /* Medium spacing for surfaces */
@@ -134,6 +140,12 @@
 
 [data-wpds-theme-provider-id][data-wpds-density='default'] {
 	--wpds-dimension-base: 4px; /* Base dimension unit */
+	--wpds-dimension-gap-2xs: 4px; /* 2x extra small gap */
+	--wpds-dimension-gap-lg: 24px; /* Large gap */
+	--wpds-dimension-gap-md: 16px; /* Medium gap */
+	--wpds-dimension-gap-sm: 12px; /* Small gap */
+	--wpds-dimension-gap-xl: 40px; /* Extra large gap */
+	--wpds-dimension-gap-xs: 8px; /* Extra small gap */
 	--wpds-dimension-padding-surface-2xs: 4px; /* 2x extra small spacing for surfaces */
 	--wpds-dimension-padding-surface-lg: 32px; /* Large spacing for surfaces */
 	--wpds-dimension-padding-surface-md: 24px; /* Medium spacing for surfaces */
@@ -142,6 +154,12 @@
 }
 
 [data-wpds-theme-provider-id][data-wpds-density='compact'] {
+	--wpds-dimension-gap-2xs: 4px; /* 2x extra small gap */
+	--wpds-dimension-gap-lg: 20px; /* Large gap */
+	--wpds-dimension-gap-md: 12px; /* Medium gap */
+	--wpds-dimension-gap-sm: 8px; /* Small gap */
+	--wpds-dimension-gap-xl: 32px; /* Extra large gap */
+	--wpds-dimension-gap-xs: 4px; /* Extra small gap */
 	--wpds-dimension-padding-surface-2xs: 4px; /* 2x extra small spacing for surfaces */
 	--wpds-dimension-padding-surface-lg: 24px; /* Large spacing for surfaces */
 	--wpds-dimension-padding-surface-md: 20px; /* Medium spacing for surfaces */
@@ -150,6 +168,12 @@
 }
 
 [data-wpds-theme-provider-id][data-wpds-density='comfortable'] {
+	--wpds-dimension-gap-2xs: 8px; /* 2x extra small gap */
+	--wpds-dimension-gap-lg: 32px; /* Large gap */
+	--wpds-dimension-gap-md: 20px; /* Medium gap */
+	--wpds-dimension-gap-sm: 16px; /* Small gap */
+	--wpds-dimension-gap-xl: 48px; /* Extra large gap */
+	--wpds-dimension-gap-xs: 12px; /* Extra small gap */
 	--wpds-dimension-padding-surface-2xs: 8px; /* 2x extra small spacing for surfaces */
 	--wpds-dimension-padding-surface-lg: 40px; /* Large spacing for surfaces */
 	--wpds-dimension-padding-surface-md: 32px; /* Medium spacing for surfaces */

@@ -34,7 +34,12 @@
 	"react-native": "src/index",
 	"wpScript": true,
 	"sideEffects": [
-		"{src,build,build-module}/{index.js,store/index.js}"
+		"src/index.js",
+		"src/store/index.js",
+		"build/index.js",
+		"build/store/index.js",
+		"build-module/index.js",
+		"build-module/store/index.js"
 	],
 	"dependencies": {
 		"@wordpress/base-styles": "file:../base-styles",

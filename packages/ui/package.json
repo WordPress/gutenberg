@@ -34,7 +34,8 @@
 	"sideEffects": false,
 	"dependencies": {
 		"@wordpress/element": "file:../element",
-		"@wordpress/private-apis": "file:../private-apis"
+		"@wordpress/private-apis": "file:../private-apis",
+		"clsx": "^2.1.1"
 	},
 	"devDependencies": {
 		"@wordpress/theme": "file:../theme"

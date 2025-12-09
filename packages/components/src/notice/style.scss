@@ -41,20 +41,9 @@
 .components-notice__actions {
 	display: flex;
 	flex-wrap: wrap;
-}
-
-.components-notice__action.components-button {
-	&,
-	&.is-link {
-		margin-left: $grid-unit-15;
-	}
-	&.is-secondary {
-		vertical-align: initial;
-	}
-
-	// When it has better support, this can be replaced
-	// with column-gap since these are flex items.
-	margin-right: $grid-unit-10;
+	align-items: center;
+	gap: $grid-unit-15;
+	margin-top: $grid-unit-15;
 }
 
 .components-notice__dismiss {
@@ -85,11 +74,5 @@
 		margin-top: $grid-unit-15;
 		margin-bottom: $grid-unit-15;
 		line-height: 2;
-	}
-
-	.components-notice__action.components-button {
-		display: block;
-		margin-left: 0;
-		margin-top: $grid-unit-10;
 	}
 }

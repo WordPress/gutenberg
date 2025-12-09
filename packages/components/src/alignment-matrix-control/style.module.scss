@@ -1,0 +1,84 @@
+@use "@wordpress/base-styles/variables" as *;
+@use "../utils/theme-variables" as *;
+
+.grid-container {
+	direction: ltr;
+
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	grid-template-rows: repeat(3, 1fr);
+
+	box-sizing: border-box;
+	aspect-ratio: 1;
+
+	border: 1px solid transparent;
+	border-radius: $radius-medium;
+	outline: none;
+
+	cursor: pointer;
+}
+
+.grid-row {
+	grid-column: 1 / -1;
+
+	box-sizing: border-box;
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+}
+
+.cell {
+	position: relative;
+
+	display: flex;
+	align-items: center;
+	justify-content: center;
+
+	box-sizing: border-box;
+	margin: 0;
+	padding: 0;
+
+	appearance: none;
+	border: none;
+	outline: none;
+}
+
+.point {
+	display: block;
+	contain: strict;
+
+	box-sizing: border-box;
+	width: 6px;
+	aspect-ratio: 1;
+
+	margin: auto;
+
+	color: $components-color-gray-400;
+
+	/* Use border instead of background color so that the point shows
+	in Windows High Contrast Mode */
+	border: 3px solid currentColor;
+
+	/* Highlight active item */
+	.cell[data-active-item] & {
+		color: $components-color-foreground;
+		transform: scale(calc(5 / 3));
+	}
+
+	/* Hover styles for non-active items */
+	.cell:not([data-active-item]):hover & {
+		color: $components-color-accent;
+	}
+
+	/* Show an outline only when interacting with keyboard */
+	.cell[data-focus-visible] & {
+		outline: 1px solid $components-color-accent;
+		outline-offset: 1px;
+	}
+
+	@media not (prefers-reduced-motion) {
+		transition-property: color, transform;
+		transition-duration: 120ms;
+		transition-timing-function: linear;
+	}
+}
+

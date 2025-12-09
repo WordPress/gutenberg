@@ -7,7 +7,7 @@ import { getBlockTypes, store as blocksStore } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
 // @ts-expect-error: Not typed yet.
 import { BlockEditorProvider } from '@wordpress/block-editor';
-import { useMemo, useEffect } from '@wordpress/element';
+import { useMemo, useEffect, Fragment } from '@wordpress/element';
 import { usePrevious } from '@wordpress/compose';
 import {
 	generateGlobalStyles,
@@ -84,22 +84,16 @@ function ContextScreens( { name, parentMenu = '' }: ContextScreensProps ) {
 		[ name ]
 	);
 
-	return (
-		<>
-			<GlobalStylesNavigationScreen
-				path={ parentMenu + '/colors/palette' }
-			>
-				<ScreenColorPalette name={ name } />
-			</GlobalStylesNavigationScreen>
+	if ( ! blockStyleVariations?.length ) {
+		return null;
+	}
 
-			{ !! blockStyleVariations?.length && (
-				<BlockStylesNavigationScreens
-					parentMenu={ parentMenu }
-					blockStyles={ blockStyleVariations }
-					blockName={ name || '' }
-				/>
-			) }
-		</>
+	return (
+		<BlockStylesNavigationScreens
+			parentMenu={ parentMenu }
+			blockStyles={ blockStyleVariations }
+			blockName={ name || '' }
+		/>
 	);
 }
 
@@ -235,26 +229,23 @@ export function GlobalStylesUI( {
 						<ScreenBlockList />
 					</GlobalStylesNavigationScreen>
 					{ blocks.map( ( block: BlockType ) => (
-						<GlobalStylesNavigationScreen
-							key={ 'menu-block-' + block.name }
-							path={
-								'/blocks/' + encodeURIComponent( block.name )
-							}
-						>
-							<ScreenBlock name={ block.name } />
-						</GlobalStylesNavigationScreen>
-					) ) }
-
-					<ContextScreens />
-
-					{ blocks.map( ( block: BlockType ) => (
-						<ContextScreens
-							key={ 'screens-block-' + block.name }
-							name={ block.name }
-							parentMenu={
-								'/blocks/' + encodeURIComponent( block.name )
-							}
-						/>
+						<Fragment key={ block.name }>
+							<GlobalStylesNavigationScreen
+								path={
+									'/blocks/' +
+									encodeURIComponent( block.name )
+								}
+							>
+								<ScreenBlock name={ block.name } />
+							</GlobalStylesNavigationScreen>
+							<ContextScreens
+								name={ block.name }
+								parentMenu={
+									'/blocks/' +
+									encodeURIComponent( block.name )
+								}
+							/>
+						</Fragment>
 					) ) }
 				</Navigator>
 			</BlockEditorProvider>

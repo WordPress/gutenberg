@@ -89,7 +89,7 @@ WithActions.args = {
 };
 
 export const NoticeListSubcomponent: StoryFn< typeof NoticeList > = () => {
-	const exampleNotices = [
+	const exampleNotices: NoticeListProps[ 'notices' ] = [
 		{
 			id: 'second-notice',
 			content: 'second notice content',
@@ -97,6 +97,22 @@ export const NoticeListSubcomponent: StoryFn< typeof NoticeList > = () => {
 		{
 			id: 'first-notice',
 			content: 'first notice content',
+			actions: [
+				{
+					label: 'Click me!',
+					onClick: () => {},
+					variant: 'primary',
+				},
+				{
+					label: 'Or click me instead!',
+					onClick: () => {},
+				},
+				{
+					label: 'Or visit a link for more info',
+					url: 'https://wordpress.org',
+					variant: 'link',
+				},
+			],
 		},
 	];
 	const [ notices, setNotices ] = useState( exampleNotices );

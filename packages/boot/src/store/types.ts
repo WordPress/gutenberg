@@ -64,6 +64,51 @@ export interface CanvasData {
 }
 
 /**
+ * Route lifecycle configuration exported from route_module.
+ * The module should export a named `route` object with these optional functions.
+ */
+export interface RouteConfig {
+	/**
+	 * Pre-navigation hook for authentication, validation, or redirects.
+	 * Called before the route is loaded.
+	 */
+	beforeLoad?: ( context: RouteLoaderContext ) => void | Promise< void >;
+
+	/**
+	 * Data preloading function.
+	 * Called when the route is being loaded.
+	 */
+	loader?: ( context: RouteLoaderContext ) => Promise< unknown >;
+
+	/**
+	 * Function that returns canvas data for rendering.
+	 * - Returns CanvasData to use default editor canvas
+	 * - Returns null to use custom canvas component from content_module
+	 * - Returns undefined to show no canvas
+	 */
+	canvas?: (
+		context: RouteLoaderContext
+	) => Promise< CanvasData | null | undefined >;
+
+	/**
+	 * Function that determines whether to show the inspector panel.
+	 * When not defined, defaults to true (always show inspector if component exists).
+	 * When it returns false, the inspector is hidden even if an inspector component is exported.
+	 *
+	 * @example
+	 * ```tsx
+	 * export const route = {
+	 *   inspector: ({ search }) => {
+	 *     // Only show inspector when items are selected
+	 *     return search.selectedIds?.length > 0;
+	 *   },
+	 * };
+	 * ```
+	 */
+	inspector?: ( context: RouteLoaderContext ) => boolean | Promise< boolean >;
+}
+
+/**
  * Route configuration interface.
  * Routes specify content_module for surfaces and optionally route_module for lifecycle functions.
  */
@@ -85,13 +130,8 @@ export interface Route {
 
 	/**
 	 * Module path for route lifecycle functions.
-	 * The module should export a named export `route` containing:
-	 * - beforeLoad?: Pre-navigation hook (authentication, validation, redirects)
-	 * - loader?: Data preloading function
-	 * - canvas?: Function that returns canvas data for rendering
-	 *   - Returns CanvasData to use default editor canvas
-	 *   - Returns null to use custom canvas component from content_module
-	 *   - Returns undefined to show no canvas
+	 * The module should export a named `route` object implementing RouteConfig.
+	 * @see RouteConfig for available lifecycle functions.
 	 */
 	route_module?: string;
 }
