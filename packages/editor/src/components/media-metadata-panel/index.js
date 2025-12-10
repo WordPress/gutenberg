@@ -4,6 +4,7 @@
 import { DataForm } from '@wordpress/dataviews';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { Spinner, __experimentalVStack as VStack } from '@wordpress/components';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -16,12 +17,18 @@ import PostPanelSection from '../post-panel-section';
 export default function MediaMetadataPanel( { onActionPerformed } ) {
 	const { editedPost, isLoading, postType, postId } = useSelect(
 		( select ) => {
-			const currentPost = select( editorStore ).getCurrentPost();
+			const _postType = select( editorStore ).getCurrentPostType();
+			const _postId = select( editorStore ).getCurrentPostId();
+			const currentPost = select( coreStore ).getEditedEntityRecord(
+				'postType',
+				_postType,
+				_postId
+			);
 			return {
 				editedPost: currentPost,
 				isLoading: ! currentPost,
-				postType: select( editorStore ).getCurrentPostType(),
-				postId: select( editorStore ).getCurrentPostId(),
+				postType: _postType,
+				postId: _postId,
 			};
 		},
 		[]
