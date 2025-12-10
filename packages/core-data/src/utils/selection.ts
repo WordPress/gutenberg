@@ -9,88 +9,48 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
  * Internal dependencies
  */
 import type { WPBlockSelection, WPSelection } from '../types';
-import type { ObjectData, Y } from '@wordpress/sync';
-import {
-	convertYSelectionToBlockSelection,
-	findBlockByClientIdInDoc,
-	findSelectionFromHistory,
-} from './crdt';
+import type { Y } from '@wordpress/sync';
+import { findSelectionFromHistory } from './crdt';
 import type { YSelectionHistory } from './block-selection-history';
 
-// Set the current selection. This is used to restore selection position
-// when triggering an undo/redo.
+/**
+ * Restore the selection to the most recent selection in history that is
+ * available in the document.
+ * @param selectionHistory The selection history to restore
+ * @param ydoc             The Y.Doc where blocks are stored
+ */
 export function restoreSelection(
 	selectionHistory: YSelectionHistory,
-	ydoc: Y.Doc,
-	editRecord: ( data: Partial< ObjectData > ) => void
+	ydoc: Y.Doc
 ): void {
-	const { selection } = selectionHistory;
+	// Find the most recent selection in history that is available in
+	// the document.
+	const selectionToRestore = findSelectionFromHistory(
+		ydoc,
+		selectionHistory
+	);
 
-	const isSelectionInASingleBlockAndAvailable =
-		findBlockByClientIdInDoc( selection.start.clientId, ydoc ) !== null &&
-		selection.start.clientId === selection.end.clientId;
+	if ( selectionToRestore === null ) {
+		// Case 1: No blocks in history are available for restoration.
+		// Do nothing.
+		return;
+	}
 
-	if ( isSelectionInASingleBlockAndAvailable ) {
-		// Case 1: Restore selection to a block that's already available,
-		// with a simple selection.
-		const selectionStart = convertYSelectionToBlockSelection(
-			selection.start,
-			ydoc
-		);
-		const selectionEnd = convertYSelectionToBlockSelection(
-			selection.end,
-			ydoc
-		);
+	const { resetSelection } = dispatch( blockEditorStore );
+	const { selectionStart, selectionEnd } = selectionToRestore;
+	const isSelectionInSameBlock =
+		selectionStart.clientId === selectionEnd.clientId;
 
-		// Because this block is available, we can restore the selection
-		// immediately using editRecord().
-		editRecord( {
-			selection: {
-				selectionStart,
-				selectionEnd,
-				initialPosition: null,
-			},
-		} );
+	if ( isSelectionInSameBlock ) {
+		// Case 2: After content is restored, the selection is available
+		// within the same block
+		resetSelection( selectionStart, selectionEnd, null );
 	} else {
-		// In any other scenario, use setTimeout() to wait until content
-		// is restored, and then run selection logic using resetSelection().
-		//
-		// Note that we can only use editRecord() to change the visual selection
-		// if it is run immediately. Within a deferred call, editRecord() with
-		// a selection property will not cause a visual selection change unless
-		// a block change event fires as well.
-
-		setTimeout( () => {
-			// After content is updated, find the most recent selection in
-			// history that is available in the document.
-			const selectionToRestore = findSelectionFromHistory(
-				ydoc,
-				selectionHistory
-			);
-
-			if ( selectionToRestore === null ) {
-				// Case 2: No blocks in history are available for restoration.
-				// Do nothing.
-				return;
-			}
-
-			const { resetSelection } = dispatch( blockEditorStore );
-			const { selectionStart, selectionEnd } = selectionToRestore;
-			const isSelectionInSameBlock =
-				selectionStart.clientId === selectionEnd.clientId;
-
-			if ( isSelectionInSameBlock ) {
-				// Case 3: After content is restored, the selection is available
-				// within the same block
-				resetSelection( selectionStart, selectionEnd, null );
-			} else {
-				// Case 4: A multi-block selection was made. resetSelection() can only
-				// restore selections within the same block.
-				// When a multi-block selection is made, selectionEnd represents
-				// where the user's cursor ended.
-				resetSelection( selectionEnd, selectionEnd, null );
-			}
-		} );
+		// Case 3: A multi-block selection was made. resetSelection() can only
+		// restore selections within the same block.
+		// When a multi-block selection is made, selectionEnd represents
+		// where the user's cursor ended.
+		resetSelection( selectionEnd, selectionEnd, null );
 	}
 }
 

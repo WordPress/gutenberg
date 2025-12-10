@@ -176,23 +176,6 @@ export const getEntityRecord =
 								transientConfig.read( recordWithTransients );
 						} );
 
-					const editRecord = ( edits ) => {
-						if ( ! Object.keys( edits ).length ) {
-							return;
-						}
-
-						dispatch( {
-							type: 'EDIT_ENTITY_RECORD',
-							kind,
-							name,
-							recordId: key,
-							edits,
-							meta: {
-								undo: undefined,
-							},
-						} );
-					};
-
 					// Load the entity record for syncing.
 					await getSyncManager()?.load(
 						entityConfig.syncConfig,
@@ -201,7 +184,22 @@ export const getEntityRecord =
 						recordWithTransients,
 						{
 							// Directly handle edits sourced from the sync manager.
-							editRecord,
+							editRecord: ( edits ) => {
+								if ( ! Object.keys( edits ).length ) {
+									return;
+								}
+
+								dispatch( {
+									type: 'EDIT_ENTITY_RECORD',
+									kind,
+									name,
+									recordId: key,
+									edits,
+									meta: {
+										undo: undefined,
+									},
+								} );
+							},
 							// Get the current entity record (with edits)
 							getEditedRecord: async () =>
 								await resolveSelect.getEditedEntityRecord(
@@ -242,11 +240,18 @@ export const getEntityRecord =
 									meta.get( 'selectionHistory' );
 
 								if ( selectionHistoryMeta ) {
-									restoreSelection(
-										selectionHistoryMeta,
-										ydoc,
-										editRecord
-									);
+									// Because Yjs initiates an undo, we need to
+									// wait until the content is restored before
+									// we can update the selection.
+									// Use queueMicrotask() to wait until content is
+									// finished updating, and then set the correct
+									// selection.
+									setTimeout( () => {
+										restoreSelection(
+											selectionHistoryMeta,
+											ydoc
+										);
+									}, 0 );
 								}
 							},
 						}
