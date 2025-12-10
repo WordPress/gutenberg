@@ -119,17 +119,11 @@ function UnforwardedControlWithError< C extends React.ReactElement >(
 			event.preventDefault();
 
 			const target = event.target as ValidityTarget;
+			const firstErrorInForm = Array.from(
+				target.form?.elements ?? []
+			).find( ( el ) => ! ( el as ValidityTarget ).validity.valid );
 
-			if ( ! target.form ) {
-				target.focus();
-				return;
-			}
-
-			const firstErrorInForm = Array.from( target.form.elements ).find(
-				( el ) => ! ( el as ValidityTarget ).validity.valid
-			);
-
-			if ( firstErrorInForm === target ) {
+			if ( ! target.form || firstErrorInForm === target ) {
 				target.focus();
 			}
 		};
