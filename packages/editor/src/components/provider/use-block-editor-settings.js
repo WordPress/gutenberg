@@ -97,6 +97,7 @@ const {
 	sectionRootClientIdKey,
 	mediaEditKey,
 	getMediaSelectKey,
+	deviceTypeKey,
 } = unlock( privateApis );
 
 /**
@@ -127,6 +128,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		userPatternCategories,
 		restBlockPatternCategories,
 		sectionRootClientId,
+		deviceType,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -140,6 +142,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 			const { getBlockTypes } = select( blocksStore );
 			const { getBlocksByName, getBlockAttributes } =
 				select( blockEditorStore );
+			const { getDeviceType } = unlock( select( editorStore ) );
 			const siteSettings = canUser( 'read', {
 				kind: 'root',
 				name: 'site',
@@ -191,6 +194,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 				userPatternCategories: getUserPatternCategories(),
 				restBlockPatternCategories: getBlockPatternCategories(),
 				sectionRootClientId: getSectionRootBlock(),
+				deviceType: getDeviceType(),
 			};
 		},
 		[ postType, postId, isLargeViewport, renderingMode ]
@@ -344,6 +348,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 					: settings.template,
 			__experimentalSetIsInserterOpened: setIsInserterOpened,
 			[ sectionRootClientIdKey ]: sectionRootClientId,
+			[ deviceTypeKey ]: deviceType,
 			editorTool:
 				renderingMode === 'post-only' && postType !== 'wp_template'
 					? 'edit'
@@ -373,6 +378,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		postType,
 		setIsInserterOpened,
 		sectionRootClientId,
+		deviceType,
 		globalStylesData,
 		globalStylesLinksData,
 		renderingMode,
