@@ -15,7 +15,7 @@ import {
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 
-export default function navigationOverlayCloseSave( { attributes } ) {
+export default function NavigationOverlayCloseSave( { attributes } ) {
 	const { displayMode, text } = attributes;
 	const colorProps = getColorClassesAndStyles( attributes );
 	const spacingProps = getSpacingClassesAndStyles( attributes );
@@ -24,24 +24,22 @@ export default function navigationOverlayCloseSave( { attributes } ) {
 	const showIcon = displayMode === 'icon' || displayMode === 'both';
 	const showText = displayMode === 'text' || displayMode === 'both';
 
+	const blockProps = useBlockProps.save( {
+		className: clsx(
+			'wp-block-navigation-overlay-close',
+			colorProps.className,
+			spacingProps.className,
+			typographyProps.className
+		),
+		style: {
+			...colorProps.style,
+			...spacingProps.style,
+			...typographyProps.style,
+		},
+	} );
+
 	return (
-		<button
-			{ ...useBlockProps.save( {
-				className: clsx(
-					'wp-block-navigation-overlay-close',
-					colorProps.className,
-					spacingProps.className,
-					typographyProps.className
-				),
-				style: {
-					...colorProps.style,
-					...spacingProps.style,
-					...typographyProps.style,
-				},
-				type: 'button',
-				'aria-label': __( 'Close' ),
-			} ) }
-		>
+		<button { ...blockProps } type="button" aria-label={ __( 'Close' ) }>
 			{ showIcon && (
 				<svg
 					xmlns="http://www.w3.org/2000/svg"
