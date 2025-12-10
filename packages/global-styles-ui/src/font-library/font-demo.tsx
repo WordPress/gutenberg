@@ -106,12 +106,12 @@ function FontDemo( { font, text }: FontDemoProps ) {
 					src={ previewUrl }
 					loading="lazy"
 					alt={ text }
-					className="font-library-modal__font-variant_demo-image"
+					className="font-library__font-variant_demo-image"
 				/>
 			) : (
 				<Text
 					style={ textDemoStyle }
-					className="font-library-modal__font-variant_demo-text"
+					className="font-library__font-variant_demo-text"
 				>
 					{ text }
 				</Text>

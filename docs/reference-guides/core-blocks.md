@@ -92,7 +92,7 @@ Display a breadcrumb trail for hierarchical post types or based on taxonomy term
 -	**Name:** core/breadcrumbs
 -	**Experimental:** true
 -	**Category:** theme
--	**Supports:** color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** align (full, wide), color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** prefersTaxonomy, separator, showCurrentItem, showHomeItem, showOnHomePage
 
 ## Button
@@ -102,8 +102,8 @@ Prompt visitors to take action with a button-style link. ([Source](https://githu
 -	**Name:** core/button
 -	**Category:** design
 -	**Parent:** core/buttons
--	**Supports:** anchor, color (background, gradients, text), interactivity (clientNavigation), shadow (), spacing (padding), splitting, typography (fontSize, lineHeight), ~~alignWide~~, ~~align~~, ~~reusable~~
--	**Attributes:** backgroundColor, gradient, linkTarget, placeholder, rel, tagName, text, textAlign, textColor, title, type, url, width
+-	**Supports:** anchor, color (background, gradients, text), interactivity (clientNavigation), shadow (), spacing (padding), splitting, typography (fontSize, lineHeight, textAlign), ~~alignWide~~, ~~align~~, ~~reusable~~
+-	**Attributes:** backgroundColor, gradient, linkTarget, placeholder, rel, tagName, text, textColor, title, type, url, width
 
 ## Buttons
 
@@ -382,7 +382,7 @@ Use the classic WordPress editor. ([Source](https://github.com/WordPress/gutenbe
 
 -	**Name:** core/freeform
 -	**Category:** text
--	**Supports:** ~~className~~, ~~customClassName~~, ~~html~~, ~~lock~~, ~~renaming~~, ~~reusable~~, ~~visibility~~
+-	**Supports:** ~~className~~, ~~customClassName~~, ~~lock~~, ~~renaming~~, ~~reusable~~, ~~visibility~~
 -	**Attributes:** content
 
 ## Gallery

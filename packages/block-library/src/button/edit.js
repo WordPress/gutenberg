@@ -11,6 +11,7 @@ import { getUpdatedLinkAttributes } from './get-updated-link-attributes';
 import removeAnchorTag from '../utils/remove-anchor-tag';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 import { unlock } from '../lock-unlock';
+import useDeprecatedTextAlign from '../utils/deprecated-text-align-attributes';
 
 /**
  * WordPress dependencies
@@ -34,7 +35,6 @@ import {
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 } from '@wordpress/components';
 import {
-	AlignmentControl,
 	BlockControls,
 	InspectorControls,
 	RichText,
@@ -186,7 +186,6 @@ function ButtonEdit( props ) {
 	} = props;
 	const {
 		tagName,
-		textAlign,
 		linkTarget,
 		placeholder,
 		rel,
@@ -196,6 +195,7 @@ function ButtonEdit( props ) {
 		width,
 		metadata,
 	} = attributes;
+	useDeprecatedTextAlign( props );
 
 	const TagName = tagName || 'a';
 
@@ -361,7 +361,6 @@ function ButtonEdit( props ) {
 						borderProps.className,
 						typographyProps.className,
 						{
-							[ `has-text-align-${ textAlign }` ]: textAlign,
 							// For backwards compatibility add style that isn't
 							// provided via block support.
 							'no-border-radius': style?.border?.radius === 0,
@@ -385,14 +384,6 @@ function ButtonEdit( props ) {
 			</div>
 			{ hasBlockControls && (
 				<BlockControls group="block">
-					{ hasNonContentControls && (
-						<AlignmentControl
-							value={ textAlign }
-							onChange={ ( nextAlign ) => {
-								setAttributes( { textAlign: nextAlign } );
-							} }
-						/>
-					) }
 					{ isLinkTag && ! lockUrlControls && (
 						<ToolbarButton
 							name="link"

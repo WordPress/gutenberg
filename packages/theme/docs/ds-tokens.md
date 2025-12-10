@@ -57,6 +57,15 @@ Do not edit directly.
 | `--wpds-color-bg-interactive-brand-weak`              | Background color for interactive elements with brand tone and weak emphasis.                                                                |
 | `--wpds-color-bg-interactive-brand-weak-active`       | Background color for interactive elements with brand tone and weak emphasis that are hovered, focused, or active.                           |
 | `--wpds-color-bg-interactive-brand-weak-disabled`     | Background color for interactive elements with brand tone and weak emphasis, in their disabled state.                                       |
+| `--wpds-color-bg-interactive-error`                   | Background color for interactive elements with error tone and normal emphasis.                                                              |
+| `--wpds-color-bg-interactive-error-active`            | Background color for interactive elements with error tone and normal emphasis that are hovered, focused, or active.                         |
+| `--wpds-color-bg-interactive-error-disabled`          | Background color for interactive elements with error tone and normal emphasis, in their disabled state.                                     |
+| `--wpds-color-bg-interactive-error-strong`            | Background color for interactive elements with error tone and strong emphasis.                                                              |
+| `--wpds-color-bg-interactive-error-strong-active`     | Background color for interactive elements with error tone and strong emphasis that are hovered, focused, or active.                         |
+| `--wpds-color-bg-interactive-error-strong-disabled`   | Background color for interactive elements with error tone and strong emphasis, in their disabled state.                                     |
+| `--wpds-color-bg-interactive-error-weak`              | Background color for interactive elements with error tone and weak emphasis.                                                                |
+| `--wpds-color-bg-interactive-error-weak-active`       | Background color for interactive elements with error tone and weak emphasis that are hovered, focused, or active.                           |
+| `--wpds-color-bg-interactive-error-weak-disabled`     | Background color for interactive elements with error tone and weak emphasis, in their disabled state.                                       |
 | `--wpds-color-bg-track-neutral-weak`                  | Background color for tracks with a neutral tone and weak emphasis (eg. scrollbar track).                                                    |
 | `--wpds-color-bg-track-neutral`                       | Background color for tracks with a neutral tone and normal emphasis (eg. slider or progressbar track).                                      |
 | `--wpds-color-bg-thumb-neutral-weak`                  | Background color for thumbs with a neutral tone and weak emphasis (eg. scrollbar thumb).                                                    |
@@ -90,6 +99,12 @@ Do not edit directly.
 | `--wpds-color-fg-interactive-brand-strong`            | Foreground color for interactive elements with brand tone and strong emphasis.                                                              |
 | `--wpds-color-fg-interactive-brand-strong-active`     | Foreground color for interactive elements with brand tone and strong emphasis that are hovered, focused, or active.                         |
 | `--wpds-color-fg-interactive-brand-strong-disabled`   | Foreground color for interactive elements with brand tone and strong emphasis, in their disabled state.                                     |
+| `--wpds-color-fg-interactive-error`                   | Foreground color for interactive elements with error tone and normal emphasis.                                                              |
+| `--wpds-color-fg-interactive-error-active`            | Foreground color for interactive elements with error tone and normal emphasis that are hovered, focused, or active.                         |
+| `--wpds-color-fg-interactive-error-disabled`          | Foreground color for interactive elements with error tone and normal emphasis, in their disabled state.                                     |
+| `--wpds-color-fg-interactive-error-strong`            | Foreground color for interactive elements with error tone and strong emphasis.                                                              |
+| `--wpds-color-fg-interactive-error-strong-active`     | Foreground color for interactive elements with error tone and strong emphasis that are hovered, focused, or active.                         |
+| `--wpds-color-fg-interactive-error-strong-disabled`   | Foreground color for interactive elements with error tone and strong emphasis, in their disabled state.                                     |
 | `--wpds-color-stroke-surface-neutral`                 | Decorative stroke color used to define neutrally-toned surface boundaries with normal emphasis.                                             |
 | `--wpds-color-stroke-surface-neutral-weak`            | Decorative stroke color used to define neutrally-toned surface boundaries with weak emphasis.                                               |
 | `--wpds-color-stroke-surface-neutral-strong`          | Decorative stroke color used to define neutrally-toned surface boundaries with strong emphasis.                                             |
@@ -109,7 +124,8 @@ Do not edit directly.
 | `--wpds-color-stroke-interactive-neutral-strong`      | Accessible stroke color used for interactive neutrally-toned elements with strong emphasis.                                                 |
 | `--wpds-color-stroke-interactive-brand`               | Accessible stroke color used for interactive brand-toned elements with normal emphasis.                                                     |
 | `--wpds-color-stroke-interactive-brand-active`        | Accessible stroke color used for interactive brand-toned elements with normal emphasis that are hovered, focused, or active.                |
-| `--wpds-color-stroke-interactive-brand-disabled`      | Accessible stroke color used for interactive brand-toned elements with normal emphasis, in their disabled state.                            |
+| `--wpds-color-stroke-interactive-error`               | Accessible stroke color used for interactive error-toned elements with normal emphasis.                                                     |
+| `--wpds-color-stroke-interactive-error-active`        | Accessible stroke color used for interactive error-toned elements with normal emphasis that are hovered, focused, or active.                |
 | `--wpds-color-stroke-interactive-error-strong`        | Accessible stroke color used for interactive error-toned elements with strong emphasis.                                                     |
 | `--wpds-color-stroke-focus-brand`                     | Accessible stroke color applied to focus rings.                                                                                             |
 

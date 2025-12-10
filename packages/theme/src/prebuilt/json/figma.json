@@ -246,6 +246,60 @@
 		},
 		"description": "Background color for interactive elements with brand tone and weak emphasis, in their disabled state."
 	},
+	"Color/Semantic/Background/Error/bgInt-error": {
+		"value": {
+			".": "#0000"
+		},
+		"description": "Background color for interactive elements with error tone and normal emphasis."
+	},
+	"Color/Semantic/Background/Error/bgInt-error-active": {
+		"value": {
+			".": "#fff6f4"
+		},
+		"description": "Background color for interactive elements with error tone and normal emphasis that are hovered, focused, or active."
+	},
+	"Color/Semantic/Background/Error/bgInt-error-disabled": {
+		"value": {
+			".": "#e2e2e2"
+		},
+		"description": "Background color for interactive elements with error tone and normal emphasis, in their disabled state."
+	},
+	"Color/Semantic/Background/Error/bgInt-error-strong": {
+		"value": {
+			".": "#cc1818"
+		},
+		"description": "Background color for interactive elements with error tone and strong emphasis."
+	},
+	"Color/Semantic/Background/Error/bgInt-error-strong-active": {
+		"value": {
+			".": "#b90000"
+		},
+		"description": "Background color for interactive elements with error tone and strong emphasis that are hovered, focused, or active."
+	},
+	"Color/Semantic/Background/Error/bgInt-error-strong-disabled": {
+		"value": {
+			".": "#d2d2d2"
+		},
+		"description": "Background color for interactive elements with error tone and strong emphasis, in their disabled state."
+	},
+	"Color/Semantic/Background/Error/bgInt-error-weak": {
+		"value": {
+			".": "#0000"
+		},
+		"description": "Background color for interactive elements with error tone and weak emphasis."
+	},
+	"Color/Semantic/Background/Error/bgInt-error-weak-active": {
+		"value": {
+			".": "#f6e6e3"
+		},
+		"description": "Background color for interactive elements with error tone and weak emphasis that are hovered, focused, or active."
+	},
+	"Color/Semantic/Background/Error/bgInt-error-weak-disabled": {
+		"value": {
+			".": "#e2e2e2"
+		},
+		"description": "Background color for interactive elements with error tone and weak emphasis, in their disabled state."
+	},
 	"Color/Semantic/Background/Neutral/bgTra-neutral-weak": {
 		"value": {
 			".": "#e0e0e0"
@@ -444,6 +498,42 @@
 		},
 		"description": "Foreground color for interactive elements with brand tone and strong emphasis, in their disabled state."
 	},
+	"Color/Semantic/Foreground/Error/fgInt-error": {
+		"value": {
+			".": "#cc1818"
+		},
+		"description": "Foreground color for interactive elements with error tone and normal emphasis."
+	},
+	"Color/Semantic/Foreground/Error/fgInt-error-active": {
+		"value": {
+			".": "#cc1818"
+		},
+		"description": "Foreground color for interactive elements with error tone and normal emphasis that are hovered, focused, or active."
+	},
+	"Color/Semantic/Foreground/Error/fgInt-error-disabled": {
+		"value": {
+			".": "#8a8a8a"
+		},
+		"description": "Foreground color for interactive elements with error tone and normal emphasis, in their disabled state."
+	},
+	"Color/Semantic/Foreground/Error/fgInt-error-strong": {
+		"value": {
+			".": "#f2efef"
+		},
+		"description": "Foreground color for interactive elements with error tone and strong emphasis."
+	},
+	"Color/Semantic/Foreground/Error/fgInt-error-strong-active": {
+		"value": {
+			".": "#f2efef"
+		},
+		"description": "Foreground color for interactive elements with error tone and strong emphasis that are hovered, focused, or active."
+	},
+	"Color/Semantic/Foreground/Error/fgInt-error-strong-disabled": {
+		"value": {
+			".": "#6d6d6d"
+		},
+		"description": "Foreground color for interactive elements with error tone and strong emphasis, in their disabled state."
+	},
 	"Color/Semantic/Stroke/Neutral/strokeSur-neutral": {
 		"value": {
 			".": "#d8d8d8"
@@ -558,11 +648,17 @@
 		},
 		"description": "Accessible stroke color used for interactive brand-toned elements with normal emphasis that are hovered, focused, or active."
 	},
-	"Color/Semantic/Stroke/Brand/strokeInt-brand-disabled": {
+	"Color/Semantic/Stroke/Error/strokeInt-error": {
 		"value": {
-			".": "#d8d8d8"
+			".": "#cc1818"
 		},
-		"description": "Accessible stroke color used for interactive brand-toned elements with normal emphasis, in their disabled state."
+		"description": "Accessible stroke color used for interactive error-toned elements with normal emphasis."
+	},
+	"Color/Semantic/Stroke/Error/strokeInt-error-active": {
+		"value": {
+			".": "#9d0000"
+		},
+		"description": "Accessible stroke color used for interactive error-toned elements with normal emphasis that are hovered, focused, or active."
 	},
 	"Color/Semantic/Stroke/Error/strokeInt-error-strong": {
 		"value": {

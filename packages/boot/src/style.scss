@@ -11,6 +11,7 @@
 body:has(.boot-layout-container) {
 	background: #1d2327; // Same as WP-Admin sidebar
 	overflow: hidden;
+	@include wp-admin-reset( ".boot-layout-container" );
 }
 
 #wpcontent {

@@ -5,6 +5,7 @@
 		"checkJs": false
 	},
 	"references": [
+		{ "path": "../a11y" },
 		{ "path": "../admin-ui" },
 		{ "path": "../components" },
 		{ "path": "../compose" },

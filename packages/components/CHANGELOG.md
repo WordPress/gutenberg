@@ -5,12 +5,14 @@
 ### Breaking Changes
 
 -   Validated form controls (private API): Removed `onValidate` prop (use `onChange` to set `customValidity` messages, or add conditionals directly inside the `customValidity` prop instead) ([#73559](https://github.com/WordPress/gutenberg/pull/73559)).
+-   `FormTokenField`: Remove deprecated `__nextHasNoMarginBottom` prop and promote to default behavior ([#73846](https://github.com/WordPress/gutenberg/pull/73846)).
 
 ### Enhancements
 
 -   `Menu` and othr menu items: change default size to be 32px tall rather than 40px to improve menu density. ([#73429](https://github.com/WordPress/gutenberg/pull/73429)).
 -   Unify padding using for DataViews, Modals and other container components. ([#73334](https://github.com/WordPress/gutenberg/pull/73334))
 -   Validated form controls: Suppress native error popover ([#73471](https://github.com/WordPress/gutenberg/pull/73471)).
+-   `Snackbar`: Shorten timeout duration ([#73814](https://github.com/WordPress/gutenberg/pull/73814)).
 
 ### Bug Fixes
 
@@ -20,6 +22,7 @@
 ### Internal
 
 -   `AlignmentMatrixControl`: Migrate styles from Emotion to a CSS module ([#73714](https://github.com/WordPress/gutenberg/pull/73714) and [#73757](https://github.com/WordPress/gutenberg/pull/73757)).
+-   `AnglePickerControl`: Migrate styles from Emotion to a CSS module ([#73786](https://github.com/WordPress/gutenberg/pull/73786)).
 
 ## 30.9.0 (2025-11-26)
 

@@ -668,6 +668,50 @@
 							"$description": "Background color for interactive elements with brand tone and weak emphasis, in their disabled state."
 						}
 					}
+				},
+				"error": {
+					"normal": {
+						"resting": {
+							"$value": "transparent",
+							"$description": "Background color for interactive elements with error tone and normal emphasis."
+						},
+						"active": {
+							"$value": "{color.primitive.error.surface2}",
+							"$description": "Background color for interactive elements with error tone and normal emphasis that are hovered, focused, or active."
+						},
+						"disabled": {
+							"$value": "{color.primitive.bg.surface5}",
+							"$description": "Background color for interactive elements with error tone and normal emphasis, in their disabled state."
+						}
+					},
+					"strong": {
+						"resting": {
+							"$value": "{color.primitive.error.bgFill1}",
+							"$description": "Background color for interactive elements with error tone and strong emphasis."
+						},
+						"active": {
+							"$value": "{color.primitive.error.bgFill2}",
+							"$description": "Background color for interactive elements with error tone and strong emphasis that are hovered, focused, or active."
+						},
+						"disabled": {
+							"$value": "{color.primitive.bg.surface6}",
+							"$description": "Background color for interactive elements with error tone and strong emphasis, in their disabled state."
+						}
+					},
+					"weak": {
+						"resting": {
+							"$value": "transparent",
+							"$description": "Background color for interactive elements with error tone and weak emphasis."
+						},
+						"active": {
+							"$value": "{color.primitive.error.surface4}",
+							"$description": "Background color for interactive elements with error tone and weak emphasis that are hovered, focused, or active."
+						},
+						"disabled": {
+							"$value": "{color.primitive.bg.surface5}",
+							"$description": "Background color for interactive elements with error tone and weak emphasis, in their disabled state."
+						}
+					}
 				}
 			},
 			"bg-track": {
@@ -872,6 +916,36 @@
 							"$description": "Foreground color for interactive elements with brand tone and strong emphasis, in their disabled state."
 						}
 					}
+				},
+				"error": {
+					"normal": {
+						"resting": {
+							"$value": "{color.primitive.error.fgSurface3}",
+							"$description": "Foreground color for interactive elements with error tone and normal emphasis."
+						},
+						"active": {
+							"$value": "{color.primitive.error.fgSurface3}",
+							"$description": "Foreground color for interactive elements with error tone and normal emphasis that are hovered, focused, or active."
+						},
+						"disabled": {
+							"$value": "{color.primitive.bg.fgSurface2}",
+							"$description": "Foreground color for interactive elements with error tone and normal emphasis, in their disabled state."
+						}
+					},
+					"strong": {
+						"resting": {
+							"$value": "{color.primitive.error.fgFill}",
+							"$description": "Foreground color for interactive elements with error tone and strong emphasis."
+						},
+						"active": {
+							"$value": "{color.primitive.error.fgFill}",
+							"$description": "Foreground color for interactive elements with error tone and strong emphasis that are hovered, focused, or active."
+						},
+						"disabled": {
+							"$value": "{color.primitive.bg.fgSurface3}",
+							"$description": "Foreground color for interactive elements with error tone and strong emphasis, in their disabled state."
+						}
+					}
 				}
 			},
 			"stroke-surface": {
@@ -998,14 +1072,20 @@
 						"active": {
 							"$value": "{color.primitive.primary.stroke4}",
 							"$description": "Accessible stroke color used for interactive brand-toned elements with normal emphasis that are hovered, focused, or active."
-						},
-						"disabled": {
-							"$value": "{color.primitive.bg.stroke2}",
-							"$description": "Accessible stroke color used for interactive brand-toned elements with normal emphasis, in their disabled state."
 						}
 					}
 				},
 				"error": {
+					"normal": {
+						"resting": {
+							"$value": "{color.primitive.error.stroke3}",
+							"$description": "Accessible stroke color used for interactive error-toned elements with normal emphasis."
+						},
+						"active": {
+							"$value": "{color.primitive.error.stroke4}",
+							"$description": "Accessible stroke color used for interactive error-toned elements with normal emphasis that are hovered, focused, or active."
+						}
+					},
 					"strong": {
 						"resting": {
 							"$value": "{color.primitive.error.stroke3}",
