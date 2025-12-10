@@ -24,6 +24,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { keyboardReturn, linkOff } from '@wordpress/icons';
 import deprecated from '@wordpress/deprecated';
+import { isURL, prependHTTP } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -35,7 +36,7 @@ import LinkSettings from './settings';
 import useCreatePage from './use-create-page';
 import useInternalValue from './use-internal-value';
 import { ViewerFill } from './viewer-slot';
-import { DEFAULT_LINK_SETTINGS } from './constants';
+import { DEFAULT_LINK_SETTINGS, LINK_ENTRY_TYPES } from './constants';
 import isURLLike from './is-url-like';
 
 /**
@@ -335,7 +336,29 @@ function LinkControl( {
 		}
 
 		const trimmedValue = currentUrlInputValue.trim();
-		if ( trimmedValue && ! isURLLike( trimmedValue ) ) {
+
+		// First check if it looks like a URL (for UX - we only validate URL-like strings)
+		if ( ! trimmedValue || ! isURLLike( trimmedValue ) ) {
+			setCustomValidity( {
+				type: 'invalid',
+				message: __( 'Please enter a valid URL.' ),
+			} );
+			// Trigger the invalid event to show the error message immediately
+			// even if the field hasn't been blurred.
+			triggerValidationDisplay();
+			return false;
+		}
+
+		// Perform URL validation using the native URL constructor as the authoritative source.
+		// The native URL constructor is the standard for URL validity - if it accepts a URL,
+		// we should allow it. For URLs without a protocol (e.g., "www.wordpress.org"),
+		// prepend "http://" before validating, as the URL constructor requires a protocol.
+		//
+		// Note: We rely on the native URL constructor rather than implementing custom TLD
+		// validation to avoid blocking valid URLs. If a URL passes the native constructor,
+		// it's technically valid according to web standards.
+		const urlToValidate = prependHTTP( trimmedValue );
+		if ( ! isURL( urlToValidate ) ) {
 			setCustomValidity( {
 				type: 'invalid',
 				message: __( 'Please enter a valid URL.' ),
@@ -368,16 +391,22 @@ function LinkControl( {
 	// Handle submission from URLInput (Enter key or submit button)
 	// Validates before calling handleSelectSuggestion when there's no actual suggestion
 	const handleURLInputSubmit = ( suggestion, event ) => {
-		// If there's a real suggestion (has id, type, or other suggestion properties),
-		// it was selected from the dropdown - no validation needed
-		if ( suggestion && ( suggestion.id || suggestion.type ) ) {
-			// Real suggestion selected - no validation needed
+		// If there's a real entity suggestion (post, page, category, etc.), it was selected
+		// from the dropdown - no validation needed for entity links as they come from the database.
+		// However, URL suggestions (created from user input with types like 'link', 'mailto', etc.)
+		// still need validation as they may contain invalid URLs like "www.wordp".
+		if (
+			suggestion &&
+			suggestion.id &&
+			suggestion.type &&
+			! LINK_ENTRY_TYPES.includes( suggestion.type )
+		) {
+			// Real entity suggestion selected (post, page, category, etc.) - no validation needed
 			handleSelectSuggestion( suggestion );
 			return;
 		}
 
-		// No suggestion - this is a manually entered URL
-		// Validate before submitting
+		// URL suggestion (link, mailto, tel, internal) or manually entered URL - validate before submitting
 		if ( ! validateAndSetValidity() ) {
 			event?.preventDefault();
 			return;

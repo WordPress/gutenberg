@@ -149,6 +149,11 @@ const LinkControlSearchInput = forwardRef(
 						showInitialSuggestions
 					}
 					customValidity={ customValidityProp }
+					// Suppress the "(Required)" indicator that appears when validation
+					// is triggered. The field is still required for validation purposes,
+					// but we don't want to show the indicator as it looks cluttered
+					// in the link control UI.
+					markWhenOptional
 					onSubmit={
 						onSubmitProp ||
 						( ( suggestion, event ) => {

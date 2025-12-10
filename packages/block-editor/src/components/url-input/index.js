@@ -443,6 +443,7 @@ class URLInput extends Component {
 			disabled = false,
 			onValidate,
 			customValidity,
+			markWhenOptional,
 		} = this.props;
 
 		const {
@@ -496,6 +497,12 @@ class URLInput extends Component {
 			? {
 					...( onValidate && { onValidate } ),
 					...( customValidity && { customValidity } ),
+					// Suppress the "(Required)" indicator in the label.
+					// The field is still required for validation, but we don't want
+					// to show the indicator as it looks cluttered in the link control UI.
+					...( markWhenOptional !== undefined && {
+						markWhenOptional,
+					} ),
 			  }
 			: {};
 
