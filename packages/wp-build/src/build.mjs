@@ -3,14 +3,7 @@
 /**
  * External dependencies
  */
-import {
-	readFile,
-	writeFile,
-	copyFile,
-	mkdir,
-	unlink,
-	stat,
-} from 'fs/promises';
+import { readFile, writeFile, copyFile, mkdir, unlink } from 'fs/promises';
 import path from 'path';
 import { parseArgs } from 'node:util';
 import esbuild from 'esbuild';
@@ -143,18 +136,6 @@ const styleBundlingPlugins = [
  */
 function normalizePath( p ) {
 	return p.replace( /\\/g, '/' );
-}
-
-function pathIsFile( p ) {
-	return stat( p )
-		.then( ( s ) => s.isFile() )
-		.catch( () => false );
-}
-
-function pathIsDirectory( p ) {
-	return stat( p )
-		.then( ( s ) => s.isDirectory() )
-		.catch( () => false );
 }
 
 function transformPhpContent( content, transforms ) {
@@ -1042,6 +1023,11 @@ async function transpilePackage( packageName ) {
 		setup( build ) {
 			// Externalize all non-CSS imports
 			build.onResolve( { filter: /.*/ }, async ( args ) => {
+				// Skip recursive calls.
+				if ( args.pluginData?.__fromExternalize ) {
+					return null;
+				}
+
 				// Skip entry points
 				if ( args.kind === 'entry-point' ) {
 					return null;
@@ -1052,31 +1038,45 @@ async function transpilePackage( packageName ) {
 					return null;
 				}
 
-				// Fully resolve local dependencies without file extension.
-				if (
-					( args.path.startsWith( '.' ) ||
-						path.isAbsolute( args.path ) ) &&
-					! args.path.endsWith( '.js' )
-				) {
-					const baseDir = path.dirname( args.importer );
-					for ( const ext of [ '.js', '.jsx', '.ts', '.tsx' ] ) {
-						const isFile = await pathIsFile(
-							path.resolve( baseDir, args.path + ext )
-						);
-						if ( isFile ) {
-							return { path: args.path + '.js', external: true };
+				// Fully resolve local dependencies without file extension
+				// and replace the extension with the target extension.
+				if ( args.path.startsWith( '.' ) ) {
+					const resolved = await build.resolve( args.path, {
+						namespace: args.namespace,
+						importer: args.importer,
+						kind: args.kind,
+						resolveDir: args.resolveDir,
+						pluginData: { __fromExternalize: true },
+					} );
+
+					if ( resolved.errors.length > 0 ) {
+						return resolved;
+					}
+
+					// Relativize path: make it relative to resolveDir with leading ./
+					let relativePath = normalizePath(
+						path.relative( args.resolveDir, resolved.path )
+					);
+					if ( ! relativePath.startsWith( '.' ) ) {
+						relativePath = './' + relativePath;
+					}
+
+					// Replace extension: if path ends with one of the extensions, replace it
+					const exts = [ '.js', '.jsx', '.ts', '.tsx' ];
+					const newExt =
+						build.initialOptions.format === 'cjs' ? '.cjs' : '.js';
+					for ( const ext of exts ) {
+						if ( relativePath.endsWith( ext ) ) {
+							relativePath =
+								relativePath.slice( 0, -ext.length ) + newExt;
+							break;
 						}
 					}
 
-					const isDir = await pathIsDirectory(
-						path.resolve( baseDir, args.path )
-					);
-					if ( isDir ) {
-						return {
-							path: args.path + '/index.js',
-							external: true,
-						};
-					}
+					return {
+						path: relativePath,
+						external: true,
+					};
 				}
 
 				// Externalize everything else (keep imports as-is)
@@ -1096,6 +1096,7 @@ async function transpilePackage( packageName ) {
 				entryPoints: srcFiles,
 				outdir: buildDir,
 				outbase: srcDir,
+				outExtension: { '.js': '.cjs' },
 				bundle: true,
 				platform: 'node',
 				format: 'cjs',
@@ -1103,9 +1104,7 @@ async function transpilePackage( packageName ) {
 				target,
 				jsx: 'automatic',
 				jsxImportSource: 'react',
-				loader: {
-					'.js': 'jsx',
-				},
+				loader: { '.js': 'jsx' },
 				plugins,
 			} )
 		);
@@ -1135,9 +1134,7 @@ async function transpilePackage( packageName ) {
 				target,
 				jsx: 'automatic',
 				jsxImportSource: 'react',
-				loader: {
-					'.js': 'jsx',
-				},
+				loader: { '.js': 'jsx' },
 				plugins,
 			} )
 		);
