@@ -4,13 +4,7 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import {
-	parse,
-	to,
-	serialize,
-	sRGB,
-	type PlainColorObject,
-} from 'colorjs.io/fn';
+import { parse, to, serialize, sRGB } from 'colorjs.io/fn';
 
 /**
  * Internal dependencies
@@ -29,12 +23,7 @@ const __dirname = path.dirname( __filename );
 const colorJsonPath = path.join( __dirname, '../../tokens/color.json' );
 
 const transformColorStringToDTCGValue = ( color: string ) => {
-	let parsed: PlainColorObject;
-	try {
-		parsed = to( parse( color ), sRGB );
-	} catch {
-		return color;
-	}
+	const parsed = to( parse( color ), sRGB );
 
 	// 3 decimal places is the minimum precision for lossless hex serialization.
 	// With 3 decimal places rounding to the nearest 0.001, the maximum rounding
