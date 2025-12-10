@@ -19,7 +19,6 @@ import { useState, useCallback } from '@wordpress/element';
  */
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
-import ResponsiveEditingNotice from '../responsive-editing-notice';
 import EditorNotices from '../editor-notices';
 import Header from '../header';
 import InserterSidebar from '../inserter-sidebar';
@@ -185,7 +184,6 @@ export default function EditorInterface( {
 							{ children }
 						</>
 					) }
-					{ ! isPreviewMode && <ResponsiveEditingNotice /> }
 				</>
 			}
 			footer={
