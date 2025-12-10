@@ -135,7 +135,8 @@ function UnforwardedControlWithError< C extends React.ReactElement >(
 		};
 
 		// Radio inputs need special handling because all radio inputs with the
-		// same `name` will be marked as invalid.
+		// same `name` will be marked as invalid. Without this handling, the last radio option
+		// will be focused with an unsuppressed native popover.
 		const radioSibilings =
 			validityTarget?.type === 'radio' && validityTarget?.name
 				? Array.from(
