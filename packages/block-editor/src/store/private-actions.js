@@ -4,7 +4,9 @@
 import { Platform } from '@wordpress/element';
 import deprecated from '@wordpress/deprecated';
 import { speak } from '@wordpress/a11y';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
+import { store as noticesStore } from '@wordpress/notices';
+import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 
 const castArray = ( maybeArray ) =>
 	Array.isArray( maybeArray ) ? maybeArray : [ maybeArray ];
@@ -112,6 +114,30 @@ export function showBlockInterface() {
  *                                         bypassing any checks for certain
  *                                         block types.
  */
+/**
+ * Helper to clean empty objects recursively.
+ *
+ * @param {Object} object The object to clean.
+ * @return {Object|undefined} Cleaned object or undefined if empty.
+ */
+function cleanEmptyObject( object ) {
+	if (
+		object === null ||
+		typeof object !== 'object' ||
+		Array.isArray( object )
+	) {
+		return object;
+	}
+	const cleanedNestedObjects = Object.fromEntries(
+		Object.entries( object )
+			.map( ( [ key, value ] ) => [ key, cleanEmptyObject( value ) ] )
+			.filter( ( [ , value ] ) => value !== undefined )
+	);
+	return Object.keys( cleanedNestedObjects ).length > 0
+		? cleanedNestedObjects
+		: undefined;
+}
+
 export const privateRemoveBlocks =
 	( clientIds, selectPrevious = true, forceRemove = false ) =>
 	( { select, dispatch, registry } ) => {
@@ -123,6 +149,99 @@ export const privateRemoveBlocks =
 		const canRemoveBlocks = select.canRemoveBlocks( clientIds );
 
 		if ( ! canRemoveBlocks ) {
+			return;
+		}
+
+		// When responsive editing is enabled, hide blocks instead of removing them.
+		const settings = select.getSettings();
+		const responsiveEditing =
+			settings.__experimentalResponsiveEditing ?? false;
+		const deviceType = settings.__experimentalDeviceType ?? 'Desktop';
+
+		if ( responsiveEditing && ! forceRemove ) {
+			const deviceKey = deviceType.toLowerCase();
+
+			// Hide blocks on the current device instead of removing them.
+			const blocks = clientIds.map( ( clientId ) =>
+				select.getBlock( clientId )
+			);
+
+			blocks.forEach( ( block ) => {
+				if ( ! block ) {
+					return;
+				}
+
+				const currentVisibility =
+					block.attributes?.metadata?.blockVisibility;
+
+				let newVisibility;
+				if ( typeof currentVisibility === 'object' ) {
+					newVisibility = {
+						...currentVisibility,
+						[ deviceKey ]: false,
+					};
+				} else {
+					newVisibility = { [ deviceKey ]: false };
+				}
+
+				// If all devices are now hidden, simplify to `false`.
+				if (
+					newVisibility.desktop === false &&
+					newVisibility.tablet === false &&
+					newVisibility.mobile === false
+				) {
+					newVisibility = false;
+				}
+
+				dispatch.updateBlockAttributes( block.clientId, {
+					metadata: cleanEmptyObject( {
+						...block.attributes?.metadata,
+						blockVisibility: newVisibility,
+					} ),
+				} );
+			} );
+
+			if ( selectPrevious ) {
+				dispatch.selectPreviousBlock( clientIds[ 0 ], selectPrevious );
+			}
+
+			// Show a notice explaining the block was hidden, not deleted.
+			const DEVICE_LABELS = {
+				Desktop: __( 'Desktop' ),
+				Tablet: __( 'Tablet' ),
+				Mobile: __( 'Mobile' ),
+			};
+
+			const listViewShortcut = registry
+				.select( keyboardShortcutsStore )
+				.getShortcutRepresentation( 'core/editor/toggle-list-view' );
+
+			const noticeMessage =
+				clientIds.length > 1
+					? sprintf(
+							// translators: 1: Device name, 2: The shortcut key to access the List View.
+							__(
+								'Blocks hidden on %1$s. Access via List View (%2$s).'
+							),
+							DEVICE_LABELS[ deviceType ],
+							listViewShortcut
+					  )
+					: sprintf(
+							// translators: 1: Device name, 2: The shortcut key to access the List View.
+							__(
+								'Block hidden on %1$s. Access via List View (%2$s).'
+							),
+							DEVICE_LABELS[ deviceType ],
+							listViewShortcut
+					  );
+
+			registry
+				.dispatch( noticesStore )
+				.createSuccessNotice( noticeMessage, {
+					id: 'block-visibility-hidden',
+					type: 'snackbar',
+				} );
+
 			return;
 		}
 
