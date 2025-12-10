@@ -122,6 +122,24 @@ function Iframe( {
 	const clearerRef = useBlockSelectionClearer();
 	const [ before, writingFlowRef, after ] = useWritingFlow();
 
+	// Inject styles into iframe after it loads to avoid duplicate network requests.
+	// This prevents each iframe from making its own requests (about:srcdoc initiator).
+	useEffect( () => {
+		if ( ! iframeDocument || ! styles ) {
+			return;
+		}
+
+		const tempDiv = document.createElement( 'div' );
+		tempDiv.innerHTML = styles;
+		const styleElements = tempDiv.querySelectorAll( 'link, style' );
+
+		// Inject styles into iframe head
+		styleElements.forEach( ( element ) => {
+			const clonedElement = element.cloneNode( true );
+			iframeDocument.head.appendChild( clonedElement );
+		} );
+	}, [ iframeDocument, styles ] );
+
 	const setRef = useRefEffect( ( node ) => {
 		node._load = () => {
 			setIframeDocument( node.contentDocument );
@@ -140,18 +158,18 @@ function Iframe( {
 				event.target.getAttribute( 'href' )?.startsWith( '#' )
 			) {
 				event.preventDefault();
-				// Manually handle link fragment navigation within the iframe. The iframe's
-				// location is a blob URL, which can't be used to resolve relative links like
-				// `#hash`. The relative link would be resolved against the iframe's base URL
-				// or the parent frame's URL, causing the iframe to navigate to a completely
-				// different page. Setting the `location.hash` works because it really sets the
-				// blob URL's hash.
+				// Manually handle link fragment navigation within the iframe.
+				// With srcDoc, the iframe shares the parent's location (via polyfill),
+				// but we still intercept to scroll to the anchor within the iframe
+				// without affecting the parent page.
 				//
 				// Links with fragments are used for example with footnotes. Clicking on these
 				// links will scroll smoothly to the anchors in the editor canvas.
-				iFrameDocument.defaultView.location.hash = event.target
-					.getAttribute( 'href' )
-					.slice( 1 );
+				const targetId = event.target.getAttribute( 'href' ).slice( 1 );
+				const targetElement = iFrameDocument.getElementById( targetId );
+				if ( targetElement ) {
+					targetElement.scrollIntoView( { behavior: 'smooth' } );
+				}
 			}
 		}
 
@@ -248,14 +266,14 @@ function Iframe( {
 		disabledRef,
 	] );
 
-	// Correct doctype is required to enable rendering in standards
-	// mode. Also preload the styles to avoid a flash of unstyled
-	// content.
-	const html = `<!doctype html>
+	// Correct doctype is required to enable rendering in standards mode.
+	// Styles are injected after load to avoid duplicate requests from each iframe.
+	const srcDoc = useMemo(
+		() => `<!doctype html>
 <html>
 	<head>
 		<meta charset="utf-8">
-		<base href="${ window.location.origin }">
+		<base href="${ window.location.href }">
 		<script>window.frameElement._load()</script>
 		<style>
 			html{
@@ -270,22 +288,14 @@ function Iframe( {
 				background-color: white;
 			}
 		</style>
-		${ styles }
 		${ scripts }
 	</head>
 	<body>
 		<script>document.currentScript.parentElement.remove()</script>
 	</body>
-</html>`;
-
-	const [ src, cleanup ] = useMemo( () => {
-		const _src = URL.createObjectURL(
-			new window.Blob( [ html ], { type: 'text/html' } )
-		);
-		return [ _src, () => URL.revokeObjectURL( _src ) ];
-	}, [ html ] );
-
-	useEffect( () => cleanup, [ cleanup ] );
+</html>`,
+		[ scripts ]
+	);
 
 	// Make sure to not render the before and after focusable div elements in view
 	// mode. They're only needed to capture focus in edit mode.
@@ -304,10 +314,11 @@ function Iframe( {
 				} }
 				ref={ useMergeRefs( [ ref, setRef ] ) }
 				tabIndex={ tabIndex }
-				// Correct doctype is required to enable rendering in standards
-				// mode. Also preload the styles to avoid a flash of unstyled
-				// content.
-				src={ src }
+				// Using srcDoc instead of blob URL (src) enables browser caching
+				// across multiple iframes, dramatically improving performance.
+				// Hash links work via manual interception (see interceptLinkClicks)
+				// and the <base> tag ensures proper URL resolution.
+				srcDoc={ srcDoc }
 				title={ title }
 				onKeyDown={ ( event ) => {
 					if ( props.onKeyDown ) {
