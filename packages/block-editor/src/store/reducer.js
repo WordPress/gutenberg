@@ -2331,6 +2331,12 @@ function getDerivedBlockEditingModesForTree( state, treeClientId = '' ) {
 				derivedBlockEditingModes.set( clientId, 'default' );
 				return;
 			}
+
+			// For the content only pattern experiment, disable blocks that are outside of the edited section.
+			if ( window?.__experimentalContentOnlyPatternInsertion ) {
+				derivedBlockEditingModes.set( clientId, 'disabled' );
+				return;
+			}
 		}
 
 		// If the block already has an explicit block editing mode set,

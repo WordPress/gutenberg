@@ -20,3 +20,41 @@
 	background: #32373c;
 	color: $white;
 }
+
+// These rules are needed to enforce the default styling of
+// the Accordion Heading block in the classic theme.
+.wp-block-accordion-heading {
+	// Heading elements may have default margins applied, so those
+	// styles need to be reset.
+	margin: 0;
+}
+
+.wp-block-accordion-heading__toggle {
+	// Button elements can have colors applied with high CSS specificity,
+	// and since this specificity is impossible to predict, we use
+	// `!important` to reset the color.
+	background-color: inherit !important;
+	color: inherit !important;
+
+	&:not(:focus-visible) {
+		outline: none;
+	}
+
+	&:hover,
+	&:focus {
+		// Sometimes styles are applied when the button element is
+		// hovered over or focused. This isn't expected for accordion
+		// toggle buttons, so reset those styles here.
+		text-decoration: none;
+		background-color: inherit !important;
+		box-shadow: none;
+		color: inherit;
+		border: none;
+		padding: var(--wp--preset--spacing--20, 1em) 0;
+	}
+
+	&:focus-visible {
+		outline-offset: 0;
+		outline: auto;
+	}
+}

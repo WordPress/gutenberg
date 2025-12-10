@@ -12,9 +12,11 @@ import type { Ramp } from './types';
 export const WHITE = to( 'white', OKLCH );
 export const BLACK = to( 'black', OKLCH );
 
-// Margin added to target contrasts to counter for algorithm approximations
-// and rounding errors.
-export const UNIVERSAL_CONTRAST_TOPUP = 0.05;
+// Margin added to target contrasts to counter for algorithm approximations and rounding errors.
+// - the `CONTRAST_EPSILON` value is 0.004, so the real contrast can be lower by this amount.
+// - the max contrast between adjacent RGB values is 1.016, so 0.016 is the maximum total rounding error between two values.
+// - the sum is 0.02: the margin we add to ensure that the target contrast is met after all the rounding.
+export const UNIVERSAL_CONTRAST_TOPUP = 0.02;
 
 // When enabling "lighter direction" bias, this is the amount by which
 // black text contrast needs to be greater than white text contrast.
@@ -33,8 +35,8 @@ export const ACCENT_SCALE_BASE_LIGHTNESS_THRESHOLDS = {
 	darker: { min: 0.75, max: 0.98 },
 } as const;
 
-// Lightness precision we aim for. Approximately 1/256, resolution of an 8-bit number.
-export const LIGHTNESS_EPSILON = 4e-3;
+// Contrast precision we aim for. Approximately 1/256, resolution of an 8-bit number.
+export const CONTRAST_EPSILON = 4e-3;
 
 export const MAX_BISECTION_ITERATIONS = 10;
 

@@ -1,0 +1,57 @@
+{
+	"name": "@wordpress/lazy-editor",
+	"version": "1.2.0",
+	"description": "Lazy-loading editor component with automatic asset and settings management.",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"gutenberg",
+		"editor",
+		"lazy-loading",
+		"assets"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/lazy-editor/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git",
+		"directory": "packages/lazy-editor"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"engines": {
+		"node": ">=18.12.0",
+		"npm": ">=8.19.2"
+	},
+	"main": "build/index.js",
+	"module": "build-module/index.js",
+	"exports": {
+		".": {
+			"types": "./build-types/index.d.ts",
+			"import": "./build-module/index.js",
+			"default": "./build/index.js"
+		},
+		"./package.json": "./package.json"
+	},
+	"react-native": "src/index",
+	"wpScriptModuleExports": "./build-module/index.js",
+	"types": "build-types",
+	"dependencies": {
+		"@wordpress/asset-loader": "file:../asset-loader",
+		"@wordpress/base-styles": "file:../base-styles",
+		"@wordpress/block-editor": "file:../block-editor",
+		"@wordpress/blocks": "file:../blocks",
+		"@wordpress/components": "file:../components",
+		"@wordpress/core-data": "file:../core-data",
+		"@wordpress/data": "file:../data",
+		"@wordpress/editor": "file:../editor",
+		"@wordpress/element": "file:../element",
+		"@wordpress/global-styles-engine": "file:../global-styles-engine",
+		"@wordpress/i18n": "file:../i18n",
+		"@wordpress/private-apis": "file:../private-apis"
+	},
+	"publishConfig": {
+		"access": "public"
+	}
+}

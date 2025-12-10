@@ -2,4 +2,6 @@
  * Internal dependencies
  */
 import './style.scss';
-export { init } from './components/app';
+import './view-transitions.scss';
+export { init, initSinglePage } from './components/app';
+export { store } from './store';

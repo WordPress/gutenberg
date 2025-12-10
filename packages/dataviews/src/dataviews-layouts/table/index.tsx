@@ -8,7 +8,7 @@ import type { ComponentProps, ReactElement } from 'react';
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
-import { Spinner } from '@wordpress/components';
+import { Spinner, Popover } from '@wordpress/components';
 import {
 	useContext,
 	useEffect,
@@ -41,6 +41,7 @@ import ColumnHeaderMenu from './column-header-menu';
 import ColumnPrimary from './column-primary';
 import { useIsHorizontalScrollEnd } from './use-is-horizontal-scroll-end';
 import getDataByGroup from '../utils/get-data-by-group';
+import { PropertiesSection } from '../../components/dataviews-view-config/properties-section';
 
 interface TableColumnFieldProps< Item > {
 	fields: NormalizedField< Item >[];
@@ -296,6 +297,9 @@ function ViewTable< Item >( {
 	const [ nextHeaderMenuToFocus, setNextHeaderMenuToFocus ] =
 		useState< HTMLButtonElement >();
 	const hasBulkActions = useSomeItemHasAPossibleBulkAction( actions, data );
+	const [ contextMenuAnchor, setContextMenuAnchor ] = useState< {
+		getBoundingClientRect: () => DOMRect;
+	} | null >( null );
 
 	useEffect( () => {
 		if ( headerMenuToFocusRef.current ) {
@@ -329,6 +333,27 @@ function ViewTable< Item >( {
 		setNextHeaderMenuToFocus( fallback?.node );
 	};
 
+	const handleHeaderContextMenu = ( event: React.MouseEvent ) => {
+		event.preventDefault();
+		event.stopPropagation();
+		const virtualAnchor = {
+			getBoundingClientRect: () => ( {
+				x: event.clientX,
+				y: event.clientY,
+				top: event.clientY,
+				left: event.clientX,
+				right: event.clientX,
+				bottom: event.clientY,
+				width: 0,
+				height: 0,
+				toJSON: () => ( {} ),
+			} ),
+		};
+		window.requestAnimationFrame( () => {
+			setContextMenuAnchor( virtualAnchor );
+		} );
+	};
+
 	const hasData = !! data?.length;
 
 	const titleField = fields.find( ( field ) => field.id === view.titleField );
@@ -337,8 +362,8 @@ function ViewTable< Item >( {
 		( field ) => field.id === view.descriptionField
 	);
 
-	const groupField = view.groupByField
-		? fields.find( ( f ) => f.id === view.groupByField )
+	const groupField = view.groupBy?.field
+		? fields.find( ( f ) => f.id === view.groupBy?.field )
 		: null;
 	const dataByGroup = groupField ? getDataByGroup( data, groupField ) : null;
 	const { showTitle = true, showMedia = true, showDescription = true } = view;
@@ -369,17 +394,51 @@ function ViewTable< Item >( {
 						[ 'compact', 'comfortable' ].includes(
 							view.layout.density
 						),
+					'has-bulk-actions': hasBulkActions,
 				} ) }
 				aria-busy={ isLoading }
 				aria-describedby={ tableNoticeId }
 				role={ isInfiniteScroll ? 'feed' : undefined }
 			>
-				<thead>
+				<colgroup>
+					{ hasBulkActions && (
+						<col className="dataviews-view-table__col-checkbox" />
+					) }
+					{ hasPrimaryColumn && (
+						<col className="dataviews-view-table__col-first-data" />
+					) }
+					{ columns.map( ( column, index ) => (
+						<col
+							key={ `col-${ column }` }
+							className={ clsx(
+								`dataviews-view-table__col-${ column }`,
+								{
+									'dataviews-view-table__col-first-data':
+										! hasPrimaryColumn && index === 0,
+								}
+							) }
+						/>
+					) ) }
+					{ !! actions?.length && (
+						<col className="dataviews-view-table__col-actions" />
+					) }
+				</colgroup>
+				{ contextMenuAnchor && (
+					<Popover
+						anchor={ contextMenuAnchor }
+						onClose={ () => setContextMenuAnchor( null ) }
+						placement="bottom-start"
+					>
+						<PropertiesSection showLabel={ false } />
+					</Popover>
+				) }
+				<thead onContextMenu={ handleHeaderContextMenu }>
 					<tr className="dataviews-view-table__row">
 						{ hasBulkActions && (
 							<th
 								className="dataviews-view-table__checkbox-column"
 								scope="col"
+								onContextMenu={ handleHeaderContextMenu }
 							>
 								<BulkSelectionCheckbox
 									selection={ selection }
@@ -405,6 +464,10 @@ function ViewTable< Item >( {
 										onHide={ onHide }
 										setOpenedFilter={ setOpenedFilter }
 										canMove={ false }
+										canInsertLeft={ false }
+										canInsertRight={
+											view.layout?.enableMoving ?? true
+										}
 									/>
 								) }
 							</th>
@@ -413,6 +476,8 @@ function ViewTable< Item >( {
 							// Explicit picks the supported styles.
 							const { width, maxWidth, minWidth, align } =
 								view.layout?.styles?.[ column ] ?? {};
+							const canInsertOrMove =
+								view.layout?.enableMoving ?? true;
 							return (
 								<th
 									key={ column }
@@ -438,9 +503,9 @@ function ViewTable< Item >( {
 										onChangeView={ onChangeView }
 										onHide={ onHide }
 										setOpenedFilter={ setOpenedFilter }
-										canMove={
-											view.layout?.enableMoving ?? true
-										}
+										canMove={ canInsertOrMove }
+										canInsertLeft={ canInsertOrMove }
+										canInsertRight={ canInsertOrMove }
 									/>
 								</th>
 							);
@@ -464,7 +529,7 @@ function ViewTable< Item >( {
 						) }
 					</tr>
 				</thead>
-				{ /* Render grouped data if groupByField is specified */ }
+				{ /* Render grouped data if groupBy is specified */ }
 				{ hasData && groupField && dataByGroup ? (
 					Array.from( dataByGroup.entries() ).map(
 						( [ groupName, groupItems ] ) => (

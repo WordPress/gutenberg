@@ -19,19 +19,14 @@ export default function InitPatternModal() {
 	const [ syncType, setSyncType ] = useState( undefined );
 	const [ title, setTitle ] = useState( '' );
 
-	const { postType, isNewPost } = useSelect( ( select ) => {
-		const { getEditedPostAttribute, isCleanNewPost } =
-			select( editorStore );
-		return {
-			postType: getEditedPostAttribute( 'type' ),
-			isNewPost: isCleanNewPost(),
-		};
-	}, [] );
-	const [ isModalOpen, setIsModalOpen ] = useState(
-		() => isNewPost && postType === 'wp_block'
+	const isNewPost = useSelect(
+		( select ) => select( editorStore ).isCleanNewPost(),
+		[]
 	);
 
-	if ( postType !== 'wp_block' || ! isNewPost ) {
+	const [ isModalOpen, setIsModalOpen ] = useState( () => isNewPost );
+
+	if ( ! isNewPost ) {
 		return null;
 	}
 

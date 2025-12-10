@@ -26,9 +26,9 @@ import type {
 	FieldValidity,
 	Form,
 	Layout,
+	NormalizedRules,
 	PanelLayout,
 	RegularLayout,
-	Rules,
 } from '../types';
 import { unlock } from '../lock-unlock';
 import DateControl from '../dataform-controls/date';
@@ -268,6 +268,19 @@ const fields: Field< SamplePost >[] = [
 		label: 'Seat',
 		type: 'text',
 	},
+	{
+		id: 'metadata_summary',
+		label: 'Metadata',
+		type: 'text',
+		render: ( { item } ) => {
+			return (
+				<span>
+					<>Metadata</>
+					{ item.filesize ? `, ${ item.filesize } KB` : '' }
+				</span>
+			);
+		},
+	},
 ];
 
 const LayoutRegularComponent = ( {
@@ -484,7 +497,7 @@ const LayoutPanelComponent = ( {
 };
 
 function getCustomValidity< Item >(
-	isValid: Rules< Item >,
+	isValid: NormalizedRules< Item >,
 	validity: FieldValidity | undefined
 ) {
 	let customValidity;
@@ -540,10 +553,14 @@ const ValidationComponent = ( {
 	required,
 	elements,
 	custom,
+	pattern,
+	minMax,
 }: {
 	required: boolean;
 	elements: 'sync' | 'async' | 'none';
 	custom: 'sync' | 'async' | 'none';
+	pattern: boolean;
+	minMax: boolean;
 } ) => {
 	type ValidatedItem = {
 		text: string;
@@ -894,15 +911,63 @@ const ValidationComponent = ( {
 			return undefined;
 		};
 
+		// Helper functions to avoid nested ternary expressions
+		const getValidationPlaceholder = (
+			basePattern: string,
+			baseMinMax: string,
+			bothPattern: string
+		) => {
+			if ( pattern && minMax ) {
+				return bothPattern;
+			}
+			if ( pattern ) {
+				return basePattern;
+			}
+			if ( minMax ) {
+				return baseMinMax;
+			}
+			return undefined;
+		};
+
+		const getValidationDescription = (
+			patternDesc: string,
+			minMaxDesc: string,
+			bothDesc: string
+		) => {
+			if ( pattern && minMax ) {
+				return bothDesc;
+			}
+			if ( pattern ) {
+				return patternDesc;
+			}
+			if ( minMax ) {
+				return minMaxDesc;
+			}
+			return undefined;
+		};
+
 		return [
 			{
 				id: 'text',
 				type: 'text',
 				label: 'Text',
+				placeholder: getValidationPlaceholder(
+					'user_name (alphanumeric+underscore)',
+					'Min 5, max 20 characters',
+					'user_name (5-20 chars, alphanumeric+underscore)'
+				),
+				description: getValidationDescription(
+					'Must contain only letters, numbers, and underscores',
+					'Must be between 5 and 20 characters',
+					'Letters, numbers, underscores only AND 5-20 characters'
+				),
 				isValid: {
 					required,
 					elements: elements !== 'none' ? true : false,
 					custom: maybeCustomRule( customTextRule ),
+					pattern: pattern ? '^[a-zA-Z0-9_]+$' : undefined,
+					minLength: minMax ? 5 : undefined,
+					maxLength: minMax ? 20 : undefined,
 				},
 			},
 			{
@@ -951,40 +1016,89 @@ const ValidationComponent = ( {
 				type: 'text',
 				Edit: 'textarea',
 				label: 'Textarea',
+				placeholder: minMax ? 'Min 10, max 200 characters' : undefined,
+				description: minMax
+					? 'Must be between 10 and 200 characters'
+					: undefined,
 				isValid: {
 					required,
 					elements: elements !== 'none' ? true : false,
 					custom: maybeCustomRule( customTextareaRule ),
+					minLength: minMax ? 10 : undefined,
+					maxLength: minMax ? 200 : undefined,
 				},
 			},
 			{
 				id: 'email',
 				type: 'email',
 				label: 'e-mail',
+				placeholder: getValidationPlaceholder(
+					'user@company.com',
+					'Min 15, max 100 characters',
+					'user@company.com (15-100 chars)'
+				),
+				description: getValidationDescription(
+					'Email must be from @company.com domain',
+					'Must be between 15 and 100 characters',
+					'Must be @company.com domain AND 15-100 characters'
+				),
 				isValid: {
 					required,
 					elements: elements !== 'none' ? true : false,
 					custom: maybeCustomRule( customEmailRule ),
+					pattern: pattern
+						? '^[a-zA-Z0-9._%+-]+@company\\.com$'
+						: undefined,
+					minLength: minMax ? 15 : undefined,
+					maxLength: minMax ? 100 : undefined,
 				},
 			},
 			{
 				id: 'telephone',
 				type: 'telephone',
 				label: 'telephone',
+				placeholder: getValidationPlaceholder(
+					'+1-555-123-4567',
+					'Min 10, max 20 characters',
+					'+1-555-123-4567 (10-20 chars)'
+				),
+				description: getValidationDescription(
+					'US phone format with country code',
+					'Must be between 10 and 20 characters',
+					'US format +1-XXX... AND 10-20 characters'
+				),
 				isValid: {
 					required,
 					elements: elements !== 'none' ? true : false,
 					custom: maybeCustomRule( customTelephoneRule ),
+					pattern: pattern ? '^\\+1-\\d{3}-[0-9-]*$' : undefined,
+					minLength: minMax ? 10 : undefined,
+					maxLength: minMax ? 20 : undefined,
 				},
 			},
 			{
 				id: 'url',
 				type: 'url',
 				label: 'URL',
+				placeholder: getValidationPlaceholder(
+					'https://github.com/user/repo',
+					'Min 25, max 255 characters',
+					'https://github.com/user/repo (10-255 chars)'
+				),
+				description: getValidationDescription(
+					'Must be a GitHub repository URL',
+					'Must be between 25 and 255 characters',
+					'GitHub repository URL AND 25-255 characters'
+				),
 				isValid: {
 					required,
 					elements: elements !== 'none' ? true : false,
 					custom: maybeCustomRule( customUrlRule ),
+					pattern: pattern
+						? '^https:\\/\\/github\\.com\\/.+$'
+						: undefined,
+					minLength: minMax ? 25 : undefined,
+					maxLength: minMax ? 255 : undefined,
 				},
 			},
 			{
@@ -1001,20 +1115,28 @@ const ValidationComponent = ( {
 				id: 'integer',
 				type: 'integer',
 				label: 'Integer',
+				placeholder: minMax ? 'Min 10, max 100' : undefined,
+				description: minMax ? 'Must be between 10 and 100' : undefined,
 				isValid: {
 					required,
 					elements: elements !== 'none' ? true : false,
 					custom: maybeCustomRule( customIntegerRule ),
+					min: minMax ? 10 : undefined,
+					max: minMax ? 100 : undefined,
 				},
 			},
 			{
 				id: 'number',
 				type: 'number',
 				label: 'Number',
+				placeholder: minMax ? 'Min 10, max 100' : undefined,
+				description: minMax ? 'Must be between 0 and 100' : undefined,
 				isValid: {
 					required,
 					elements: elements !== 'none' ? true : false,
 					custom: maybeCustomRule( customNumberRule ),
+					min: minMax ? 10 : undefined,
+					max: minMax ? 100 : undefined,
 				},
 			},
 			{
@@ -1067,10 +1189,23 @@ const ValidationComponent = ( {
 				id: 'password',
 				type: 'password',
 				label: 'Password',
+				placeholder: getValidationPlaceholder(
+					'Must be 8+ alphanumeric',
+					'Min 10, max 20 characters',
+					'abc12345 (10-20 chars alphanumeric)'
+				),
+				description: getValidationDescription(
+					'Must contain only letters and numbers (8+ chars)',
+					'Must be between 10 and 20 characters',
+					'alphanumeric chars AND 10-20 characters'
+				),
 				isValid: {
 					required,
 					elements: elements !== 'none' ? true : false,
 					custom: maybeCustomRule( customPasswordRule ),
+					pattern: pattern ? '^[a-zA-Z0-9]{8,}$' : undefined,
+					minLength: minMax ? 10 : undefined,
+					maxLength: minMax ? 20 : undefined,
 				},
 			},
 			{
@@ -1139,7 +1274,7 @@ const ValidationComponent = ( {
 				},
 			},
 		];
-	}, [ elements, custom, required, getElements ] );
+	}, [ elements, custom, required, pattern, minMax, getElements ] );
 
 	const form = useMemo(
 		() => ( {
@@ -1850,6 +1985,73 @@ const LayoutRowComponent = ( {
 	);
 };
 
+const LayoutDetailsComponent = () => {
+	const [ post, setPost ] = useState< SamplePost >( {
+		title: 'Hello, World!',
+		order: 2,
+		author: 1,
+		status: 'draft',
+		reviewer: 'fulano',
+		date: '2021-01-01T12:00:00',
+		birthdate: '1950-02-23T12:00:00',
+		filesize: 1024,
+		dimensions: '1920x1080',
+		comment_status: 'open',
+		ping_status: true,
+		tags: [ 'photography' ],
+	} );
+
+	const form: Form = {
+		fields: [
+			{
+				id: 'discussion',
+				label: 'Discussion',
+				children: [ 'comment_status', 'ping_status' ],
+				layout: {
+					type: 'details',
+					summary: 'discussion',
+				},
+			},
+			{
+				id: 'metadata',
+				label: 'Metadata',
+				children: [ 'filesize', 'dimensions' ],
+				layout: {
+					type: 'details',
+					summary: 'metadata_summary',
+				},
+			},
+			{
+				id: 'categorization',
+				label: 'Categorization',
+				children: [ 'tags', 'description' ],
+				layout: { type: 'details' },
+			},
+			{
+				id: 'scheduling',
+				children: [ 'date', 'birthdate' ],
+				layout: {
+					type: 'details',
+				},
+			},
+		],
+	};
+
+	return (
+		<DataForm< SamplePost >
+			data={ post }
+			fields={ fields }
+			form={ form }
+			onChange={ ( edits ) =>
+				setPost( ( prev ) => ( {
+					...prev,
+					...edits,
+				} ) )
+			}
+		/>
+	);
+};
+
 const LayoutMixedComponent = () => {
 	const [ post, setPost ] = useState< SamplePost >( {
 		title: 'Hello, World!',
@@ -1977,6 +2179,10 @@ export const LayoutRow = {
 	},
 };
 
+export const LayoutDetails = {
+	render: LayoutDetailsComponent,
+};
+
 export const LayoutMixed = {
 	render: LayoutMixedComponent,
 };
@@ -2000,11 +2206,23 @@ export const Validation = {
 			description: 'Whether or not the custom validation rule is active.',
 			options: [ 'sync', 'async', 'none' ],
 		},
+		pattern: {
+			control: { type: 'boolean' },
+			description:
+				'Whether or not the pattern validation rule is active.',
+		},
+		minMax: {
+			control: { type: 'boolean' },
+			description:
+				'Whether or not the min/max validation rule is active.',
+		},
 	},
 	args: {
 		required: true,
 		elements: 'sync',
 		custom: 'sync',
+		pattern: false,
+		minMax: false,
 	},
 };
 
@@ -2059,6 +2277,21 @@ const DataAdapterComponent = () => {
 			id: 'user.profile.email',
 			label: 'User Email',
 			type: 'email',
+		},
+		{
+			id: 'user.profile.tags',
+			label: 'User Tags',
+			type: 'array',
+			placeholder: 'Enter comma-separated tags',
+			description:
+				'Add tags separated by commas (e.g., "tag1, tag2, tag3")',
+			elements: [
+				{ value: 'astronomy', label: 'Astronomy' },
+				{ value: 'book-review', label: 'Book review' },
+				{ value: 'event', label: 'Event' },
+				{ value: 'photography', label: 'Photography' },
+				{ value: 'travel', label: 'Travel' },
+			],
 		},
 		// Example of adapting a data value to a control value
 		// by providing getValue/setValue methods.
@@ -2116,7 +2349,11 @@ const DataAdapterComponent = () => {
 		// Edits will respect the shape of the data
 		// because fields provide the proper information
 		// (via field.id or via field.setValue).
-		setData( ( prev ) => deepMerge( prev, edits ) );
+		setData( ( prev ) =>
+			deepMerge( prev, edits, {
+				arrayMerge: ( target, source ) => source,
+			} )
+		);
 	}, [] );
 
 	return (
@@ -2157,6 +2394,7 @@ const DataAdapterComponent = () => {
 							children: [
 								'user.profile.name',
 								'user.profile.email',
+								'user.profile.tags',
 							],
 						},
 					],

@@ -36,8 +36,11 @@ import {
 	PATTERN_POST_TYPE,
 	TEMPLATE_PART_POST_TYPE,
 	TEMPLATE_POST_TYPE,
+	DESIGN_POST_TYPES,
 } from '../../store/constants';
 import { useZoomOutModeExit } from './use-zoom-out-mode-exit';
+import { usePaddingAppender } from './use-padding-appender';
+import { useEditContentOnlySectionExit } from './use-edit-content-only-section-exit';
 
 const {
 	LayoutStyle,
@@ -51,12 +54,6 @@ const {
  * These post types have a special editor where they don't allow you to fill the title
  * and they don't apply the layout styles.
  */
-const DESIGN_POST_TYPES = [
-	PATTERN_POST_TYPE,
-	TEMPLATE_POST_TYPE,
-	NAVIGATION_POST_TYPE,
-	TEMPLATE_PART_POST_TYPE,
-];
 
 /**
  * Given an array of nested blocks, find the first Post Content
@@ -350,6 +347,10 @@ function VisualEditor( {
 		return canvasMinHeight + scrollTop;
 	}, [ canvasMinHeight ] );
 
+	const [ paddingAppenderRef, paddingStyle ] = usePaddingAppender(
+		! isPreview && renderingMode === 'post-only' && ! isDesignPostType
+	);
+
 	const iframeStyles = useMemo( () => {
 		return [
 			...( styles ?? [] ),
@@ -366,6 +367,7 @@ function VisualEditor( {
 					// which isn't a requirement in auto resize mode.
 					enableResizing ? 'min-height:0!important;' : ''
 				}}
+				${ paddingStyle ? paddingStyle : '' }
 				${
 					enableResizing
 						? `.block-editor-iframe__html{background:var(--wp-editor-canvas-background);display:flex;align-items:center;justify-content:center;min-height:100vh;}.block-editor-iframe__body{width:100%;}`
@@ -375,7 +377,7 @@ function VisualEditor( {
 				// color to the iframe HTML element to match the background color of the editor canvas.
 			},
 		];
-	}, [ styles, enableResizing, calculatedMinHeight ] );
+	}, [ styles, enableResizing, calculatedMinHeight, paddingStyle ] );
 
 	const typewriterRef = useTypewriter();
 	contentRef = useMergeRefs( [
@@ -389,6 +391,8 @@ function VisualEditor( {
 			isEnabled: renderingMode === 'template-locked',
 		} ),
 		useZoomOutModeExit(),
+		paddingAppenderRef,
+		useEditContentOnlySectionExit(),
 	] );
 
 	return (

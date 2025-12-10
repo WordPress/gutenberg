@@ -148,7 +148,10 @@ export default function BlockThemeControl( { id } ) {
 										// duplication explicit, so there
 										// wouldn't be an "edit" button for
 										// static theme templates.
-										if ( ! hasSpecificTemplate ) {
+										if (
+											! hasSpecificTemplate &&
+											window?.__experimentalTemplateActivate
+										) {
 											const activeTemplates =
 												await getEntityRecord(
 													'root',

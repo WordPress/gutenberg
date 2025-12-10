@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/build",
-	"version": "0.2.0",
+	"version": "0.4.0",
 	"description": "Build tool for WordPress plugins.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -50,6 +50,26 @@
 		"postcss-modules": "6.0.1",
 		"rtlcss": "4.3.0",
 		"toposort": "2.0.2"
+	},
+	"peerDependencies": {
+		"@wordpress/boot": "^0.3.0",
+		"@wordpress/private-apis": "^1.0.0",
+		"@wordpress/route": "^0.2.0",
+		"@wordpress/theme": "^0.3.0"
+	},
+	"peerDependenciesMeta": {
+		"@wordpress/boot": {
+			"optional": true
+		},
+		"@wordpress/private-apis": {
+			"optional": true
+		},
+		"@wordpress/route": {
+			"optional": true
+		},
+		"@wordpress/theme": {
+			"optional": true
+		}
 	},
 	"publishConfig": {
 		"access": "public"

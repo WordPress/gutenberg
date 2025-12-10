@@ -25,7 +25,7 @@ const ANIMATION_PARAMS = {
 };
 
 const CONTENT_WRAPPER_PADDING = space( 1 );
-const ITEM_PADDING_BLOCK = space( 2 );
+const ITEM_PADDING_BLOCK = space( 1 );
 const ITEM_PADDING_INLINE = space( 3 );
 
 // TODO:
@@ -152,7 +152,7 @@ const baseItem = css`
 	all: unset;
 
 	position: relative;
-	min-height: ${ space( 10 ) };
+	min-height: ${ space( 8 ) };
 	box-sizing: border-box;
 
 	/* Occupy the width of all grid columns (ie. full width) */

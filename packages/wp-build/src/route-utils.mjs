@@ -5,6 +5,11 @@ import { readdirSync } from 'fs';
 import path from 'path';
 
 /**
+ * Internal dependencies
+ */
+import { getPackageInfoFromFile } from './package-utils.mjs';
+
+/**
  * Get all route names from the routes directory.
  *
  * @param {string} rootDir Root directory of the project.
@@ -24,10 +29,44 @@ export function getAllRoutes( rootDir ) {
 }
 
 /**
+ * @typedef {Object} RouteMetadata
+ * @property {string}      name Route name.
+ * @property {string}      path Route path.
+ * @property {string|null} page Page slug this route belongs to.
+ */
+
+/**
+ * Get route metadata from package.json.
+ *
+ * @param {string} rootDir   Root directory of the project.
+ * @param {string} routeName Route name.
+ * @return {RouteMetadata|null} Route metadata object or null if not found.
+ */
+export function getRouteMetadata( rootDir, routeName ) {
+	const routePackageJson =
+		/** @type {import('./package-utils.mjs').RoutePackageJson|null} */ (
+			getPackageInfoFromFile(
+				path.join( rootDir, 'routes', routeName, 'package.json' )
+			)
+		);
+
+	if ( ! routePackageJson || ! routePackageJson.route ) {
+		return null;
+	}
+
+	return {
+		name: routeName,
+		path: routePackageJson.route.path,
+		page: routePackageJson.route.page || null,
+	};
+}
+
+/**
  * @typedef {Object} RouteFiles
  * @property {boolean} hasRoute     Whether route file exists.
  * @property {boolean} hasStage     Whether stage file exists.
  * @property {boolean} hasInspector Whether inspector file exists.
+ * @property {boolean} hasCanvas    Whether canvas file exists.
  * @property {boolean} hasStyle     Whether style file exists.
  */
 
@@ -43,6 +82,7 @@ export function getRouteFiles( routeDirectory ) {
 		hasRoute: false,
 		hasStage: false,
 		hasInspector: false,
+		hasCanvas: false,
 		hasStyle: false,
 	};
 
@@ -58,6 +98,9 @@ export function getRouteFiles( routeDirectory ) {
 		if ( entries.includes( `inspector.${ ext }` ) ) {
 			files.hasInspector = true;
 		}
+		if ( entries.includes( `canvas.${ ext }` ) ) {
+			files.hasCanvas = true;
+		}
 	}
 
 	if ( entries.includes( 'route.scss' ) ) {
@@ -69,7 +112,7 @@ export function getRouteFiles( routeDirectory ) {
 
 /**
  * Generate a synthetic content entry point for a route.
- * This creates a module that imports and re-exports stage and inspector components.
+ * This creates a module that imports and re-exports stage, inspector, and canvas components.
  *
  * @param {RouteFiles} files Route files information.
  * @return {string} Generated entry point code.
@@ -85,7 +128,11 @@ export function generateContentEntryPoint( files ) {
 		lines.push( "export { inspector } from './inspector';" );
 	}
 
-	// If neither stage nor inspector exists, export empty object
+	if ( files.hasCanvas ) {
+		lines.push( "export { canvas } from './canvas';" );
+	}
+
+	// If no components exist, export empty object
 	if ( lines.length === 0 ) {
 		lines.push( 'export {};' );
 	}

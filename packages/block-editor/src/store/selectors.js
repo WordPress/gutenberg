@@ -1693,7 +1693,8 @@ const canInsertBlockTypeUnmemoized = (
 		blockType = getBlockType( blockName );
 	}
 
-	if ( getTemplateLock( state, rootClientId ) ) {
+	const rootTemplateLock = getTemplateLock( state, rootClientId );
+	if ( rootTemplateLock && rootTemplateLock !== 'contentOnly' ) {
 		return false;
 	}
 
@@ -1876,7 +1877,8 @@ export function canRemoveBlock( state, clientId ) {
 	}
 
 	const rootClientId = getBlockRootClientId( state, clientId );
-	if ( getTemplateLock( state, rootClientId ) ) {
+	const rootTemplateLock = getTemplateLock( state, rootClientId );
+	if ( rootTemplateLock && rootTemplateLock !== 'contentOnly' ) {
 		return false;
 	}
 
@@ -1937,8 +1939,8 @@ export function canMoveBlock( state, clientId ) {
 	}
 
 	const rootClientId = getBlockRootClientId( state, clientId );
-	const templateLock = getTemplateLock( state, rootClientId );
-	if ( templateLock === 'all' || templateLock === 'contentOnly' ) {
+	const rootTemplateLock = getTemplateLock( state, rootClientId );
+	if ( rootTemplateLock === 'all' ) {
 		return false;
 	}
 
@@ -2274,6 +2276,8 @@ export const getInserterItems = createRegistrySelector( ( select ) =>
 					} ) );
 			}
 
+			// Hardcode: Collect stretch variations separately to add at the end
+			const stretchVariations = [];
 			const items = blockTypeInserterItems.reduce(
 				( accumulator, item ) => {
 					const { variations = [] } = item;
@@ -2286,14 +2290,26 @@ export const getInserterItems = createRegistrySelector( ( select ) =>
 							state,
 							item
 						);
-						accumulator.push(
-							...variations.map( variationMapper )
-						);
+						variations
+							.map( variationMapper )
+							.forEach( ( variation ) => {
+								if (
+									variation.id ===
+										'core/paragraph/stretchy-paragraph' ||
+									variation.id ===
+										'core/heading/stretchy-heading'
+								) {
+									stretchVariations.push( variation );
+								} else {
+									accumulator.push( variation );
+								}
+							} );
 					}
 					return accumulator;
 				},
 				[]
 			);
+			items.push( ...stretchVariations );
 
 			// Ensure core blocks are prioritized in the returned results,
 			// because third party blocks can be registered earlier than
@@ -3126,6 +3142,7 @@ export function getBlockEditingMode( state, clientId = '' ) {
  * requirement of being the default grouping block.
  * Additionally a block can only be ungrouped if it has inner blocks and can
  * be removed.
+ * Section blocks are not ungroupable.
  *
  * @param {Object} state    Global application state.
  * @param {string} clientId Client Id of the block. If not passed the selected block's client id will be used.
@@ -3138,6 +3155,12 @@ export const isUngroupable = createRegistrySelector(
 			if ( ! _clientId ) {
 				return false;
 			}
+
+			// Section blocks should not be ungroupable.
+			if ( isSectionBlock( state, _clientId ) ) {
+				return false;
+			}
+
 			const { getGroupingBlockName } = select( blocksStore );
 			const block = getBlock( state, _clientId );
 			const groupingBlockName = getGroupingBlockName();

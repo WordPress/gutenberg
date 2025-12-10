@@ -224,7 +224,7 @@ const getQuickActionsCommands = () =>
 		const canRemove = canRemoveBlocks( clientIds );
 
 		const canToggleBlockVisibility = blocks.every( ( { clientId } ) =>
-			hasBlockSupport( getBlockName( clientId ), 'blockVisibility', true )
+			hasBlockSupport( getBlockName( clientId ), 'visibility', true )
 		);
 
 		const commands = [];

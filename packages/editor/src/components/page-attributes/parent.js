@@ -91,9 +91,10 @@ export function PageAttributesParent() {
 				_fields: 'id,title,parent',
 			};
 
-			// Perform a search when the field is changed.
+			// Perform a search by relevance when the field is changed.
 			if ( !! fieldValue ) {
 				query.search = fieldValue;
+				query.orderby = 'relevance';
 			}
 
 			const parentPost = pageId

@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 31.1.0 (2025-11-26)
+
+## 31.0.0 (2025-11-12)
+
 ### Breaking Changes
 
 -   The `lint-js` script now includes `.cjs`, `.mjs`, `.cts`, and `.mts` as default extensions to lint. This is considered a breaking change because the script may now surface lint errors in your project which would not have been previously identified.

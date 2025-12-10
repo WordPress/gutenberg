@@ -7,7 +7,7 @@ import { getBlockTypes, store as blocksStore } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
 // @ts-expect-error: Not typed yet.
 import { BlockEditorProvider } from '@wordpress/block-editor';
-import { useMemo, useEffect } from '@wordpress/element';
+import { useMemo, useEffect, Fragment } from '@wordpress/element';
 import { usePrevious } from '@wordpress/compose';
 import {
 	generateGlobalStyles,
@@ -67,6 +67,11 @@ interface ContextScreensProps {
 	parentMenu?: string;
 }
 
+interface GlobalStylesNavigationScreenProps {
+	path: string;
+	children: React.ReactNode;
+}
+
 function ContextScreens( { name, parentMenu = '' }: ContextScreensProps ) {
 	const blockStyleVariations = useSelect(
 		( select ) => {
@@ -79,20 +84,16 @@ function ContextScreens( { name, parentMenu = '' }: ContextScreensProps ) {
 		[ name ]
 	);
 
-	return (
-		<>
-			<Navigator.Screen path={ parentMenu + '/colors/palette' }>
-				<ScreenColorPalette name={ name } />
-			</Navigator.Screen>
+	if ( ! blockStyleVariations?.length ) {
+		return null;
+	}
 
-			{ !! blockStyleVariations?.length && (
-				<BlockStylesNavigationScreens
-					parentMenu={ parentMenu }
-					blockStyles={ blockStyleVariations }
-					blockName={ name || '' }
-				/>
-			) }
-		</>
+	return (
+		<BlockStylesNavigationScreens
+			parentMenu={ parentMenu }
+			blockStyles={ blockStyleVariations }
+			blockName={ name || '' }
+		/>
 	);
 }
 
@@ -132,8 +133,13 @@ export function GlobalStylesUI( {
 		return mergeGlobalStyles( baseValue, value );
 	}, [ baseValue, value ] );
 
-	const [ globalStylesCSS, globalSettings ] =
-		generateGlobalStyles( mergedValue );
+	const [ globalStylesCSS, globalSettings ] = generateGlobalStyles(
+		mergedValue,
+		[],
+		{
+			styleOptions: { variationStyles: true },
+		}
+	);
 	const styles = useMemo(
 		() => [ ...( serverCSS ?? [] ), ...( globalStylesCSS ?? [] ) ],
 		[ serverCSS, globalStylesCSS ]
@@ -165,88 +171,99 @@ export function GlobalStylesUI( {
 							onPathChange={ onPathChange }
 						/>
 					) }
-					<Navigator.Screen path="/">
+					<GlobalStylesNavigationScreen path="/">
 						<ScreenRoot />
-					</Navigator.Screen>
-					<Navigator.Screen path="/colors">
+					</GlobalStylesNavigationScreen>
+					<GlobalStylesNavigationScreen path="/colors">
 						<ScreenColors />
-					</Navigator.Screen>
-					<Navigator.Screen path="/typography">
+					</GlobalStylesNavigationScreen>
+					<GlobalStylesNavigationScreen path="/typography">
 						<ScreenTypography />
-					</Navigator.Screen>
-					<Navigator.Screen path="/typography/font-sizes">
+					</GlobalStylesNavigationScreen>
+					<GlobalStylesNavigationScreen path="/typography/font-sizes">
 						<FontSizes />
-					</Navigator.Screen>
-					<Navigator.Screen path="/typography/font-sizes/:origin/:slug">
+					</GlobalStylesNavigationScreen>
+					<GlobalStylesNavigationScreen path="/typography/font-sizes/:origin/:slug">
 						<FontSize />
-					</Navigator.Screen>
-					<Navigator.Screen path="/layout">
+					</GlobalStylesNavigationScreen>
+					<GlobalStylesNavigationScreen path="/layout">
 						<ScreenLayout />
-					</Navigator.Screen>
-					<Navigator.Screen path="/colors/palette">
+					</GlobalStylesNavigationScreen>
+					<GlobalStylesNavigationScreen path="/colors/palette">
 						<ScreenColorPalette />
-					</Navigator.Screen>
-					<Navigator.Screen path="/variations">
+					</GlobalStylesNavigationScreen>
+					<GlobalStylesNavigationScreen path="/variations">
 						<ScreenStyleVariations />
-					</Navigator.Screen>
-					<Navigator.Screen path="/css">
+					</GlobalStylesNavigationScreen>
+					<GlobalStylesNavigationScreen path="/css">
 						<ScreenCSS />
-					</Navigator.Screen>
-					<Navigator.Screen path="/revisions/:revisionId?">
+					</GlobalStylesNavigationScreen>
+					<GlobalStylesNavigationScreen path="/revisions/:revisionId?">
 						<ScreenRevisions />
-					</Navigator.Screen>
-					<Navigator.Screen path="/shadows">
+					</GlobalStylesNavigationScreen>
+					<GlobalStylesNavigationScreen path="/shadows">
 						<ScreenShadows />
-					</Navigator.Screen>
-					<Navigator.Screen path="/shadows/edit/:category/:slug">
+					</GlobalStylesNavigationScreen>
+					<GlobalStylesNavigationScreen path="/shadows/edit/:category/:slug">
 						<ScreenShadowsEdit />
-					</Navigator.Screen>
-					<Navigator.Screen path="/background">
+					</GlobalStylesNavigationScreen>
+					<GlobalStylesNavigationScreen path="/background">
 						<ScreenBackground />
-					</Navigator.Screen>
-					<Navigator.Screen path="/typography/text">
+					</GlobalStylesNavigationScreen>
+					<GlobalStylesNavigationScreen path="/typography/text">
 						<ScreenTypographyElement element="text" />
-					</Navigator.Screen>
-					<Navigator.Screen path="/typography/link">
+					</GlobalStylesNavigationScreen>
+					<GlobalStylesNavigationScreen path="/typography/link">
 						<ScreenTypographyElement element="link" />
-					</Navigator.Screen>
-					<Navigator.Screen path="/typography/heading">
+					</GlobalStylesNavigationScreen>
+					<GlobalStylesNavigationScreen path="/typography/heading">
 						<ScreenTypographyElement element="heading" />
-					</Navigator.Screen>
-					<Navigator.Screen path="/typography/caption">
+					</GlobalStylesNavigationScreen>
+					<GlobalStylesNavigationScreen path="/typography/caption">
 						<ScreenTypographyElement element="caption" />
-					</Navigator.Screen>
-					<Navigator.Screen path="/typography/button">
+					</GlobalStylesNavigationScreen>
+					<GlobalStylesNavigationScreen path="/typography/button">
 						<ScreenTypographyElement element="button" />
-					</Navigator.Screen>
-					<Navigator.Screen path="/blocks">
+					</GlobalStylesNavigationScreen>
+					<GlobalStylesNavigationScreen path="/blocks">
 						<ScreenBlockList />
-					</Navigator.Screen>
+					</GlobalStylesNavigationScreen>
 					{ blocks.map( ( block: BlockType ) => (
-						<Navigator.Screen
-							key={ 'menu-block-' + block.name }
-							path={
-								'/blocks/' + encodeURIComponent( block.name )
-							}
-						>
-							<ScreenBlock name={ block.name } />
-						</Navigator.Screen>
-					) ) }
-
-					<ContextScreens />
-
-					{ blocks.map( ( block: BlockType ) => (
-						<ContextScreens
-							key={ 'screens-block-' + block.name }
-							name={ block.name }
-							parentMenu={
-								'/blocks/' + encodeURIComponent( block.name )
-							}
-						/>
+						<Fragment key={ block.name }>
+							<GlobalStylesNavigationScreen
+								path={
+									'/blocks/' +
+									encodeURIComponent( block.name )
+								}
+							>
+								<ScreenBlock name={ block.name } />
+							</GlobalStylesNavigationScreen>
+							<ContextScreens
+								name={ block.name }
+								parentMenu={
+									'/blocks/' +
+									encodeURIComponent( block.name )
+								}
+							/>
+						</Fragment>
 					) ) }
 				</Navigator>
 			</BlockEditorProvider>
 		</GlobalStylesProvider>
+	);
+}
+
+function GlobalStylesNavigationScreen( {
+	path,
+	children,
+}: GlobalStylesNavigationScreenProps ) {
+	return (
+		<Navigator.Screen
+			className="global-styles-ui-sidebar__navigator-screen"
+			path={ path }
+		>
+			{ children }
+		</Navigator.Screen>
 	);
 }
 

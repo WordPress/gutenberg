@@ -630,6 +630,7 @@ _**Note:** Since WordPress 6.2._
 -   Default value: null
 -   Subproperties:
     -   `minHeight`: type `boolean`, default value `false`
+    -   `width`: type `boolean`, default value `false`
 
 This value signals that a block supports some of the CSS style properties related to dimensions. When it does, the block editor will show UI controls for the user to set their values if [the theme declares support](/docs/how-to-guides/themes/global-settings-and-styles.md#opt-in-into-ui-controls).
 
@@ -638,20 +639,22 @@ supports: {
 	dimensions: {
 		aspectRatio: true // Enable aspect ratio control.
 		minHeight: true // Enable min height control.
+		width: true // Enable width control.
 	}
 }
 ```
 
 When a block declares support for a specific dimensions property, its attributes definition is extended to include the `style` attribute.
 
--   `style`: an attribute of `object` type with no default assigned. This is added when `aspectRatio` or `minHeight` support is declared. It stores the custom values set by the user. For example:
+-   `style`: an attribute of `object` type with no default assigned. This is added when `aspectRatio`, `minHeight`, or `width` support is declared. It stores the custom values set by the user. For example:
 
 ```js
 attributes: {
     style: {
         dimensions: {
             aspectRatio: "16/9",
-            minHeight: "50vh"
+            minHeight: "50vh",
+            width: "400px",
         }
     }
 }
@@ -1169,3 +1172,18 @@ is only meant for simple text blocks such as paragraphs and headings with a
 single `RichText` field. RichText in the `edit` function _must_ have an
 `identifier` prop that matches the attribute key of the text, so that it updates
 the selection correctly and we know where to split.
+
+## visibility
+
+_**Note:** Since WordPress 6.9._
+
+-   Type: `boolean`
+-   Default value: `true`
+
+By default, a block can be hidden by a user from the block 'Options' dropdown. To disable this behavior, set visibility to false.
+
+```js
+supports: {
+	visibility: false,
+}
+```

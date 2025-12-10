@@ -14,6 +14,7 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useContext, useState, useMemo } from '@wordpress/element';
+import { useFocusOnMount } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -46,7 +47,9 @@ function ModalContent< Item >( {
 	const { fields } = useContext( DataFormContext );
 	const [ changes, setChanges ] = useState< Partial< Item > >( {} );
 	const modalData = useMemo( () => {
-		return deepMerge( data, changes );
+		return deepMerge( data, changes, {
+			arrayMerge: ( target, source ) => source,
+		} );
 	}, [ data, changes ] );
 
 	const form: NormalizedForm = useMemo(
@@ -60,11 +63,20 @@ function ModalContent< Item >( {
 		[ field ]
 	);
 
-	const { validity } = useFormValidity(
-		modalData,
-		fields as Field< any >[],
-		form
-	);
+	const fieldsAsFieldType: Field< Item >[] = fields.map( ( f ) => ( {
+		...f,
+		Edit: f.Edit === null ? undefined : f.Edit,
+		isValid: {
+			required: f.isValid.required?.constraint,
+			elements: f.isValid.elements?.constraint,
+			min: f.isValid.min?.constraint,
+			max: f.isValid.max?.constraint,
+			pattern: f.isValid.pattern?.constraint,
+			minLength: f.isValid.minLength?.constraint,
+			maxLength: f.isValid.maxLength?.constraint,
+		},
+	} ) );
+	const { validity } = useFormValidity( modalData, fieldsAsFieldType, form );
 
 	const onApply = () => {
 		onChange( changes );
@@ -72,8 +84,14 @@ function ModalContent< Item >( {
 	};
 
 	const handleOnChange = ( newValue: Partial< Item > ) => {
-		setChanges( ( prev ) => deepMerge( prev, newValue ) );
+		setChanges( ( prev ) =>
+			deepMerge( prev, newValue, {
+				arrayMerge: ( target, source ) => source,
+			} )
+		);
 	};
+
+	const focusOnMountRef = useFocusOnMount( 'firstInputElement' );
 
 	return (
 		<Modal
@@ -83,23 +101,25 @@ function ModalContent< Item >( {
 			title={ fieldLabel }
 			size="medium"
 		>
-			<DataFormLayout
-				data={ modalData }
-				form={ form }
-				onChange={ handleOnChange }
-				validity={ validity }
-			>
-				{ ( FieldLayout, childField, childFieldValidity ) => (
-					<FieldLayout
-						key={ childField.id }
-						data={ modalData }
-						field={ childField }
-						onChange={ handleOnChange }
-						hideLabelFromVision={ form.fields.length < 2 }
-						validity={ childFieldValidity }
-					/>
-				) }
-			</DataFormLayout>
+			<div ref={ focusOnMountRef }>
+				<DataFormLayout
+					data={ modalData }
+					form={ form }
+					onChange={ handleOnChange }
+					validity={ validity }
+				>
+					{ ( FieldLayout, childField, childFieldValidity ) => (
+						<FieldLayout
+							key={ childField.id }
+							data={ modalData }
+							field={ childField }
+							onChange={ handleOnChange }
+							hideLabelFromVision={ form.fields.length < 2 }
+							validity={ childFieldValidity }
+						/>
+					) }
+				</DataFormLayout>
+			</div>
 			<HStack
 				className="dataforms-layouts-panel__modal-footer"
 				spacing={ 3 }

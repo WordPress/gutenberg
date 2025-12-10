@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+## 6.36.0 (2025-11-26)
+
+### Internal
+
+-   Updated the `welcome-guide` implementation to specify its own close-button hover color, matching previous behavior after changes in the `Guide` component.
+
+## 6.35.0 (2025-11-12)
+
 ## 6.34.0 (2025-10-29)
 
 ## 6.33.0 (2025-10-17)

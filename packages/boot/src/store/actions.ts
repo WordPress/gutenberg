@@ -11,6 +11,14 @@ export function registerMenuItem( id: string, menuItem: MenuItem ) {
 	};
 }
 
+export function updateMenuItem( id: string, updates: Partial< MenuItem > ) {
+	return {
+		type: 'UPDATE_MENU_ITEM' as const,
+		id,
+		updates,
+	};
+}
+
 export function registerRoute( route: Route ) {
 	return {
 		type: 'REGISTER_ROUTE' as const,
@@ -20,4 +28,5 @@ export function registerRoute( route: Route ) {
 
 export type Action =
 	| ReturnType< typeof registerMenuItem >
+	| ReturnType< typeof updateMenuItem >
 	| ReturnType< typeof registerRoute >;

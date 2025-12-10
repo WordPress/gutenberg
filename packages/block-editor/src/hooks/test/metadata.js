@@ -254,7 +254,7 @@ describe( 'metadata', () => {
 			registerBlockType( 'core/bar', {
 				title: 'Bar',
 				supports: {
-					blockVisibility: false,
+					visibility: false,
 				},
 			} );
 
