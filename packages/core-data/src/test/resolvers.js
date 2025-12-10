@@ -173,12 +173,12 @@ describe( 'getEntityRecord', () => {
 			1,
 			POST_RECORD,
 			{
+				addUndoMeta: expect.any( Function ),
 				editRecord: expect.any( Function ),
 				getEditedRecord: expect.any( Function ),
 				refetchRecord: expect.any( Function ),
-				saveRecord: expect.any( Function ),
-				addUndoMeta: expect.any( Function ),
 				restoreUndoMeta: expect.any( Function ),
+				saveRecord: expect.any( Function ),
 			}
 		);
 	} );
@@ -230,12 +230,12 @@ describe( 'getEntityRecord', () => {
 			1,
 			{ ...POST_RECORD, foo: 'bar' },
 			{
+				addUndoMeta: expect.any( Function ),
 				editRecord: expect.any( Function ),
 				getEditedRecord: expect.any( Function ),
 				refetchRecord: expect.any( Function ),
-				saveRecord: expect.any( Function ),
-				addUndoMeta: expect.any( Function ),
 				restoreUndoMeta: expect.any( Function ),
+				saveRecord: expect.any( Function ),
 			}
 		);
 	} );

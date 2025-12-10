@@ -76,13 +76,12 @@ export interface WPSelection {
 }
 
 export interface RecordHandlers {
+	addUndoMeta: ( ydoc: Y.Doc, meta: Map< string, any > ) => void;
 	editRecord: ( data: Partial< ObjectData > ) => void;
 	getEditedRecord: () => Promise< ObjectData >;
 	refetchRecord: () => Promise< void >;
+	restoreUndoMeta: ( ydoc: Y.Doc, meta: Map< string, any > ) => void;
 	saveRecord: () => Promise< void >;
-
-	addUndoMeta?: ( ydoc: Y.Doc, meta: Map< string, any > ) => void;
-	restoreUndoMeta?: ( ydoc: Y.Doc, meta: Map< string, any > ) => void;
 }
 
 export interface SyncConfig {
@@ -128,9 +127,6 @@ export interface SyncManager {
 export interface SyncUndoManager extends WPUndoManager< ObjectData > {
 	addToScope: (
 		ymap: Y.Map< any >,
-		handlers: {
-			addUndoMeta?: RecordHandlers[ 'addUndoMeta' ];
-			restoreUndoMeta?: RecordHandlers[ 'restoreUndoMeta' ];
-		}
+		handlers: Pick< RecordHandlers, 'addUndoMeta' | 'restoreUndoMeta' >
 	) => void;
 }

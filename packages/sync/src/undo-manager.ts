@@ -68,10 +68,7 @@ export function createUndoManager(): SyncUndoManager {
 		 */
 		addToScope(
 			ymap: Y.Map< any >,
-			handlers: {
-				addUndoMeta?: RecordHandlers[ 'addUndoMeta' ];
-				restoreUndoMeta?: RecordHandlers[ 'restoreUndoMeta' ];
-			}
+			handlers: Pick< RecordHandlers, 'addUndoMeta' | 'restoreUndoMeta' >
 		): void {
 			yUndoManager.addToScope( ymap );
 
@@ -85,11 +82,11 @@ export function createUndoManager(): SyncUndoManager {
 			const { addUndoMeta, restoreUndoMeta } = handlers;
 
 			yUndoManager.on( 'stack-item-added', ( event: StackItemEvent ) => {
-				addUndoMeta?.( ydoc, event.stackItem.meta );
+				addUndoMeta( ydoc, event.stackItem.meta );
 			} );
 
 			yUndoManager.on( 'stack-item-popped', ( event: StackItemEvent ) => {
-				restoreUndoMeta?.( ydoc, event.stackItem.meta );
+				restoreUndoMeta( ydoc, event.stackItem.meta );
 			} );
 		},
 
