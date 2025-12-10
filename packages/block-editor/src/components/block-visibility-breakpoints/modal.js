@@ -2,12 +2,12 @@
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
-import { useEffect, useState, useMemo } from '@wordpress/element';
+import { useEffect, useState, useMemo, useCallback } from '@wordpress/element';
 import {
 	Button,
 	CheckboxControl,
-	Flex,
-	FlexItem,
+	__experimentalHStack as HStack,
+	__experimentalVStack as VStack,
 	Icon,
 	Modal,
 	Notice,
@@ -129,14 +129,14 @@ export default function BlockVisibilityBreakpointsModal( {
 	}, [ initialBreakpoints, initialHideEverywhere ] );
 
 	// Handle "Hide everywhere" toggle
-	const handleHideEverywhereChange = ( newValue ) => {
-		setHideEverywhere( newValue );
+	const handleHideEverywhereChange = useCallback( () => {
+		setHideEverywhere( ! hideEverywhere );
 		setBreakpoints( {
-			[ BREAKPOINT_NAMES.MOBILE ]: newValue,
-			[ BREAKPOINT_NAMES.TABLET ]: newValue,
-			[ BREAKPOINT_NAMES.DESKTOP ]: newValue,
+			[ BREAKPOINT_NAMES.MOBILE ]: ! hideEverywhere,
+			[ BREAKPOINT_NAMES.TABLET ]: ! hideEverywhere,
+			[ BREAKPOINT_NAMES.DESKTOP ]: ! hideEverywhere,
 		} );
-	};
+	}, [ hideEverywhere ] );
 
 	// Handle individual breakpoint toggle
 	const handleBreakpointChange = ( breakpoint, value ) => {
@@ -274,89 +274,100 @@ export default function BlockVisibilityBreakpointsModal( {
 			size="small"
 		>
 			<form onSubmit={ handleSubmit }>
-				{ error && (
-					<Notice status="error" isDismissible={ false }>
-						{ error }
-					</Notice>
-				) }
-				<p>{ __( 'Select options for hiding the block.' ) }</p>
-				<fieldset className="block-editor-block-visibility-breakpoints-modal__options">
-					<CheckboxControl
-						__nextHasNoMarginBottom
-						label={
-							<span className="block-editor-block-visibility-breakpoints-modal__hide-everywhere">
-								{ __( 'Hide from published document' ) }
-							</span>
-						}
-						checked={ hideEverywhere }
-						onChange={ handleHideEverywhereChange }
-					/>
-					<div className="block-editor-block-visibility-breakpoints-modal__breakpoints">
-						<CheckboxControl
-							__nextHasNoMarginBottom
-							label={
-								<span className="block-editor-block-visibility-breakpoints-modal__label">
-									{ __( 'Hide on desktop' ) }
-									<Icon
-										icon={ desktop }
-										className="block-editor-block-visibility-breakpoints-modal__icon"
-									/>
-								</span>
-							}
-							checked={ breakpoints[ BREAKPOINT_NAMES.DESKTOP ] }
-							onChange={ ( value ) =>
-								handleBreakpointChange(
-									BREAKPOINT_NAMES.DESKTOP,
-									value
-								)
-							}
-						/>
-						<CheckboxControl
-							__nextHasNoMarginBottom
-							label={
-								<span className="block-editor-block-visibility-breakpoints-modal__label">
-									{ __( 'Hide on tablet' ) }
-									<Icon
-										icon={ tablet }
-										className="block-editor-block-visibility-breakpoints-modal__icon"
-									/>
-								</span>
-							}
-							checked={ breakpoints[ BREAKPOINT_NAMES.TABLET ] }
-							onChange={ ( value ) =>
-								handleBreakpointChange(
-									BREAKPOINT_NAMES.TABLET,
-									value
-								)
-							}
-						/>
-						<CheckboxControl
-							__nextHasNoMarginBottom
-							label={
-								<span className="block-editor-block-visibility-breakpoints-modal__label">
-									{ __( 'Hide on mobile' ) }
-									<Icon
-										icon={ mobile }
-										className="block-editor-block-visibility-breakpoints-modal__icon"
-									/>
-								</span>
-							}
-							checked={ breakpoints[ BREAKPOINT_NAMES.MOBILE ] }
-							onChange={ ( value ) =>
-								handleBreakpointChange(
-									BREAKPOINT_NAMES.MOBILE,
-									value
-								)
-							}
-						/>
-					</div>
-				</fieldset>
-				<Flex
-					className="block-editor-block-visibility-breakpoints-modal__actions"
-					justify="flex-end"
-					expanded={ false }
-				>
-					<FlexItem>
+				<VStack spacing={ 4 }>
+					{ error && (
+						<Notice status="error" isDismissible={ false }>
+							{ error }
+						</Notice>
+					) }
+					<p>{ __( 'Select options for hiding the block.' ) }</p>
+					<fieldset className="block-editor-block-visibility-breakpoints-modal__options">
+						<VStack spacing={ 3 }>
+							<CheckboxControl
+								className="block-editor-block-visibility-breakpoints-modal__checkbox"
+								__nextHasNoMarginBottom
+								label={
+									<span className="block-editor-block-visibility-breakpoints-modal__hide-everywhere">
+										{ __( 'Hide from published document' ) }
+									</span>
+								}
+								checked={ hideEverywhere }
+								onChange={ handleHideEverywhereChange }
+							/>
+							<VStack
+								spacing={ 3 }
+								className="block-editor-block-visibility-breakpoints-modal__breakpoints"
+							>
+								<CheckboxControl
+									className="block-editor-block-visibility-breakpoints-modal__checkbox"
+									__nextHasNoMarginBottom
+									label={
+										<span className="block-editor-block-visibility-breakpoints-modal__label">
+											{ __( 'Hide on desktop' ) }
+											<Icon
+												icon={ desktop }
+												className="block-editor-block-visibility-breakpoints-modal__icon"
+											/>
+										</span>
+									}
+									checked={
+										breakpoints[ BREAKPOINT_NAMES.DESKTOP ]
+									}
+									onChange={ ( value ) =>
+										handleBreakpointChange(
+											BREAKPOINT_NAMES.DESKTOP,
+											value
+										)
+									}
+								/>
+								<CheckboxControl
+									className="block-editor-block-visibility-breakpoints-modal__checkbox"
+									__nextHasNoMarginBottom
+									label={
+										<span className="block-editor-block-visibility-breakpoints-modal__label">
+											{ __( 'Hide on tablet' ) }
+											<Icon
+												icon={ tablet }
+												className="block-editor-block-visibility-breakpoints-modal__icon"
+											/>
+										</span>
+									}
+									checked={
+										breakpoints[ BREAKPOINT_NAMES.TABLET ]
+									}
+									onChange={ ( value ) =>
+										handleBreakpointChange(
+											BREAKPOINT_NAMES.TABLET,
+											value
+										)
+									}
+								/>
+								<CheckboxControl
+									className="block-editor-block-visibility-breakpoints-modal__checkbox"
+									__nextHasNoMarginBottom
+									label={
+										<span className="block-editor-block-visibility-breakpoints-modal__label">
+											{ __( 'Hide on mobile' ) }
+											<Icon
+												icon={ mobile }
+												className="block-editor-block-visibility-breakpoints-modal__icon"
+											/>
+										</span>
+									}
+									checked={
+										breakpoints[ BREAKPOINT_NAMES.MOBILE ]
+									}
+									onChange={ ( value ) =>
+										handleBreakpointChange(
+											BREAKPOINT_NAMES.MOBILE,
+											value
+										)
+									}
+								/>
+							</VStack>
+						</VStack>
+					</fieldset>
+					<HStack justify="flex-end">
 						<Button
 							variant="tertiary"
 							onClick={ onClose }
@@ -364,8 +375,6 @@ export default function BlockVisibilityBreakpointsModal( {
 						>
 							{ __( 'Cancel' ) }
 						</Button>
-					</FlexItem>
-					<FlexItem>
 						<Button
 							variant="primary"
 							type="submit"
@@ -373,8 +382,8 @@ export default function BlockVisibilityBreakpointsModal( {
 						>
 							{ __( 'Apply' ) }
 						</Button>
-					</FlexItem>
-				</Flex>
+					</HStack>
+				</VStack>
 			</form>
 		</Modal>
 	);
