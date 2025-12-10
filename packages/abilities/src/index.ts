@@ -18,6 +18,7 @@ export {
 	getAbilityCategory,
 	executeAbility,
 	registerAbility,
+	registerAbilityCallback,
 	unregisterAbility,
 	registerAbilityCategory,
 	unregisterAbilityCategory,

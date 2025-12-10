@@ -10,6 +10,7 @@ import { sprintf } from '@wordpress/i18n';
 import { store } from './store';
 import type {
 	Ability,
+	AbilityCallback,
 	AbilityCategory,
 	AbilityCategoryArgs,
 	AbilitiesQueryArgs,
@@ -106,6 +107,33 @@ export function registerAbility( ability: Ability ): void {
  */
 export function unregisterAbility( name: string ): void {
 	dispatch( store ).unregisterAbility( name );
+}
+
+/**
+ * Register a callback for an existing ability.
+ *
+ * This function allows updating the callback of an already registered ability,
+ * which is useful for hybrid abilities that are registered on the server
+ * but need client-side execution callbacks.
+ *
+ * @param  name     The ability name to update.
+ * @param  callback The callback function to register.
+ * @throws {Error} If the ability is not registered or callback is invalid.
+ *
+ * @example
+ * ```js
+ * // Register a callback for a server-registered ability
+ * registerAbilityCallback('my-plugin/server-ability', async (input) => {
+ *   // Client-side implementation
+ *   return { success: true };
+ * });
+ * ```
+ */
+export function registerAbilityCallback(
+	name: string,
+	callback: AbilityCallback
+): void {
+	dispatch( store ).registerAbilityCallback( name, callback );
 }
 
 /**

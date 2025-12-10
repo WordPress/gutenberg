@@ -6,7 +6,12 @@ import { sprintf } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import type { Ability, AbilityCategory, AbilityCategoryArgs } from '../types';
+import type {
+	Ability,
+	AbilityCategory,
+	AbilityCategoryArgs,
+	AbilityCallback,
+} from '../types';
 import {
 	REGISTER_ABILITY,
 	UNREGISTER_ABILITY,
@@ -122,9 +127,83 @@ export function registerAbility( ability: Ability ) {
 		// Check if ability is already registered
 		const existingAbility = select.getAbility( ability.name );
 		if ( existingAbility ) {
-			throw new Error(
-				sprintf( 'Ability "%s" is already registered', ability.name )
-			);
+			// Check if this is a valid hybrid registration scenario
+			const existingAnnotations = existingAbility.meta?.annotations;
+			const newAnnotations = ability.meta?.annotations;
+
+			// Condition 1: Existing ability must be server-registered
+			if ( ! existingAnnotations?.serverRegistered ) {
+				throw new Error(
+					sprintf(
+						'Ability "%s" is already registered',
+						ability.name
+					)
+				);
+			}
+
+			// Condition 2: New ability must not explicitly set clientRegistered to false
+			if ( newAnnotations?.clientRegistered === false ) {
+				throw new Error(
+					sprintf(
+						'Ability "%s" is already registered',
+						ability.name
+					)
+				);
+			}
+
+			// Condition 3: New ability must not set serverRegistered to true
+			if ( newAnnotations?.serverRegistered === true ) {
+				throw new Error(
+					sprintf(
+						'Ability "%s" is already registered',
+						ability.name
+					)
+				);
+			}
+
+			// Condition 4: Only callback change is allowed - all other props must match
+			const propsToCompare = [
+				'name',
+				'label',
+				'description',
+				'category',
+				'input_schema',
+				'output_schema',
+			] as const;
+			for ( const prop of propsToCompare ) {
+				const existingValue = existingAbility[ prop ];
+				const newValue = ability[ prop ];
+				// Deep comparison for objects (schemas)
+				if (
+					JSON.stringify( existingValue ) !==
+					JSON.stringify( newValue )
+				) {
+					throw new Error(
+						sprintf(
+							'Cannot update ability "%1$s": only callback changes are allowed for hybrid abilities. Property "%2$s" differs.',
+							ability.name,
+							prop
+						)
+					);
+				}
+			}
+
+			// Valid hybrid registration - update with callback and set clientRegistered
+			const updatedAnnotations = {
+				...existingAnnotations,
+				clientRegistered: true,
+			};
+
+			dispatch( {
+				type: REGISTER_ABILITY,
+				ability: {
+					...existingAbility,
+					callback: ability.callback,
+					permissionCallback: ability.permissionCallback,
+					meta: { annotations: updatedAnnotations },
+				},
+			} );
+			return;
 		}
 
 		const annotations = filterAnnotations( ability.meta?.annotations, [
@@ -162,6 +241,58 @@ export function unregisterAbility( name: string ) {
 	return {
 		type: UNREGISTER_ABILITY,
 		name,
+	};
+}
+
+/**
+ * Registers a callback for an existing ability.
+ *
+ * This action allows updating the callback of an already registered ability,
+ * which is useful for hybrid abilities that are registered on the server
+ * but need client-side execution callbacks.
+ *
+ * @param  name     The name of the ability to update.
+ * @param  callback The callback function to register.
+ * @return Action object or function.
+ * @throws {Error} If the ability is not registered or callback is invalid.
+ */
+export function registerAbilityCallback(
+	name: string,
+	callback: AbilityCallback
+) {
+	// @ts-expect-error - registry types are not yet available
+	return ( { select, dispatch } ) => {
+		// Validate ability exists
+		const existingAbility = select.getAbility( name );
+		if ( ! existingAbility ) {
+			throw new Error(
+				sprintf( 'Ability "%s" is not registered', name )
+			);
+		}
+
+		// Validate callback is a function
+		if ( typeof callback !== 'function' ) {
+			throw new Error(
+				sprintf( 'Callback for ability "%s" must be a function', name )
+			);
+		}
+
+		// Update annotations to include clientRegistered
+		const existingAnnotations = existingAbility.meta?.annotations || {};
+		const annotations = {
+			...existingAnnotations,
+			clientRegistered: true,
+		};
+
+		// Dispatch update with callback and updated annotations
+		dispatch( {
+			type: REGISTER_ABILITY,
+			ability: {
+				...existingAbility,
+				callback,
+				meta: { annotations },
+			},
+		} );
 	};
 }
 

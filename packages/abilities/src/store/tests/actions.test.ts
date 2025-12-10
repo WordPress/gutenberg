@@ -7,6 +7,7 @@
  */
 import {
 	registerAbility,
+	registerAbilityCallback,
 	unregisterAbility,
 	registerAbilityCategory,
 	unregisterAbilityCategory,
@@ -443,6 +444,449 @@ describe( 'Store Actions', () => {
 			expect( action ).toEqual( {
 				type: UNREGISTER_ABILITY,
 				name: abilityName,
+			} );
+		} );
+	} );
+
+	describe( 'registerAbilityCallback', () => {
+		let mockSelect: any;
+		let mockDispatch: jest.Mock;
+
+		beforeEach( () => {
+			jest.clearAllMocks();
+			mockSelect = {
+				getAbility: jest.fn().mockReturnValue( null ),
+			};
+			mockDispatch = jest.fn();
+		} );
+
+		it( 'should update callback on an existing ability', () => {
+			const existingAbility: Ability = {
+				name: 'test/ability',
+				label: 'Test Ability',
+				description: 'Test description',
+				category: 'test-category',
+				meta: {
+					annotations: { serverRegistered: true },
+				},
+			};
+			mockSelect.getAbility.mockReturnValue( existingAbility );
+
+			const newCallback = jest.fn();
+			const action = registerAbilityCallback(
+				'test/ability',
+				newCallback
+			);
+			action( { select: mockSelect, dispatch: mockDispatch } );
+
+			expect( mockDispatch ).toHaveBeenCalledWith( {
+				type: REGISTER_ABILITY,
+				ability: {
+					...existingAbility,
+					callback: newCallback,
+					meta: {
+						annotations: {
+							serverRegistered: true,
+							clientRegistered: true,
+						},
+					},
+				},
+			} );
+		} );
+
+		it( 'should throw error when ability does not exist', () => {
+			mockSelect.getAbility.mockReturnValue( null );
+
+			const action = registerAbilityCallback( 'test/ability', jest.fn() );
+
+			expect( () =>
+				action( { select: mockSelect, dispatch: mockDispatch } )
+			).toThrow( 'Ability "test/ability" is not registered' );
+			expect( mockDispatch ).not.toHaveBeenCalled();
+		} );
+
+		it( 'should throw error when callback is not a function', () => {
+			const existingAbility: Ability = {
+				name: 'test/ability',
+				label: 'Test Ability',
+				description: 'Test description',
+				category: 'test-category',
+			};
+			mockSelect.getAbility.mockReturnValue( existingAbility );
+
+			const action = registerAbilityCallback(
+				'test/ability',
+				'not a function' as any
+			);
+
+			expect( () =>
+				action( { select: mockSelect, dispatch: mockDispatch } )
+			).toThrow(
+				'Callback for ability "test/ability" must be a function'
+			);
+			expect( mockDispatch ).not.toHaveBeenCalled();
+		} );
+
+		it( 'should set clientRegistered to true', () => {
+			const existingAbility: Ability = {
+				name: 'test/ability',
+				label: 'Test Ability',
+				description: 'Test description',
+				category: 'test-category',
+			};
+			mockSelect.getAbility.mockReturnValue( existingAbility );
+
+			const newCallback = jest.fn();
+			const action = registerAbilityCallback(
+				'test/ability',
+				newCallback
+			);
+			action( { select: mockSelect, dispatch: mockDispatch } );
+
+			expect( mockDispatch ).toHaveBeenCalledWith(
+				expect.objectContaining( {
+					ability: expect.objectContaining( {
+						meta: {
+							annotations: { clientRegistered: true },
+						},
+					} ),
+				} )
+			);
+		} );
+
+		it( 'should preserve existing annotations', () => {
+			const existingAbility: Ability = {
+				name: 'test/ability',
+				label: 'Test Ability',
+				description: 'Test description',
+				category: 'test-category',
+				meta: {
+					annotations: {
+						serverRegistered: true,
+						readonly: true,
+						destructive: false,
+					},
+				},
+			};
+			mockSelect.getAbility.mockReturnValue( existingAbility );
+
+			const newCallback = jest.fn();
+			const action = registerAbilityCallback(
+				'test/ability',
+				newCallback
+			);
+			action( { select: mockSelect, dispatch: mockDispatch } );
+
+			expect( mockDispatch ).toHaveBeenCalledWith( {
+				type: REGISTER_ABILITY,
+				ability: {
+					...existingAbility,
+					callback: newCallback,
+					meta: {
+						annotations: {
+							serverRegistered: true,
+							readonly: true,
+							destructive: false,
+							clientRegistered: true,
+						},
+					},
+				},
+			} );
+		} );
+	} );
+
+	describe( 'registerAbility - hybrid abilities', () => {
+		let mockSelect: any;
+		let mockDispatch: jest.Mock;
+
+		beforeEach( () => {
+			jest.clearAllMocks();
+			const defaultCategories = [
+				{
+					slug: 'test-category',
+					label: 'Test Category',
+					description: 'Test category for testing',
+				},
+			];
+
+			mockSelect = {
+				getAbility: jest.fn().mockReturnValue( null ),
+				getAbilityCategories: jest
+					.fn()
+					.mockReturnValue( defaultCategories ),
+			};
+			mockDispatch = jest.fn();
+		} );
+
+		it( 'should allow re-registration of server-registered ability with callback', () => {
+			const existingAbility: Ability = {
+				name: 'test/ability',
+				label: 'Test Ability',
+				description: 'Test description',
+				category: 'test-category',
+				input_schema: { type: 'object' },
+				output_schema: { type: 'object' },
+				meta: {
+					annotations: { serverRegistered: true },
+				},
+			};
+			mockSelect.getAbility.mockReturnValue( existingAbility );
+
+			const newCallback = jest.fn();
+			const newAbility: Ability = {
+				name: 'test/ability',
+				label: 'Test Ability',
+				description: 'Test description',
+				category: 'test-category',
+				input_schema: { type: 'object' },
+				output_schema: { type: 'object' },
+				callback: newCallback,
+			};
+
+			const action = registerAbility( newAbility );
+			action( { select: mockSelect, dispatch: mockDispatch } );
+
+			expect( mockDispatch ).toHaveBeenCalledWith( {
+				type: REGISTER_ABILITY,
+				ability: {
+					...existingAbility,
+					callback: newCallback,
+					permissionCallback: undefined,
+					meta: {
+						annotations: {
+							serverRegistered: true,
+							clientRegistered: true,
+						},
+					},
+				},
+			} );
+		} );
+
+		it( 'should throw error when existing ability is not server-registered', () => {
+			const existingAbility: Ability = {
+				name: 'test/ability',
+				label: 'Test Ability',
+				description: 'Test description',
+				category: 'test-category',
+				meta: {
+					annotations: { clientRegistered: true },
+				},
+			};
+			mockSelect.getAbility.mockReturnValue( existingAbility );
+
+			const newAbility: Ability = {
+				name: 'test/ability',
+				label: 'Test Ability',
+				description: 'Test description',
+				category: 'test-category',
+				callback: jest.fn(),
+			};
+
+			const action = registerAbility( newAbility );
+
+			expect( () =>
+				action( { select: mockSelect, dispatch: mockDispatch } )
+			).toThrow( 'Ability "test/ability" is already registered' );
+			expect( mockDispatch ).not.toHaveBeenCalled();
+		} );
+
+		it( 'should throw error when new ability sets clientRegistered to false', () => {
+			const existingAbility: Ability = {
+				name: 'test/ability',
+				label: 'Test Ability',
+				description: 'Test description',
+				category: 'test-category',
+				meta: {
+					annotations: { serverRegistered: true },
+				},
+			};
+			mockSelect.getAbility.mockReturnValue( existingAbility );
+
+			const newAbility: Ability = {
+				name: 'test/ability',
+				label: 'Test Ability',
+				description: 'Test description',
+				category: 'test-category',
+				callback: jest.fn(),
+				meta: {
+					annotations: { clientRegistered: false },
+				},
+			};
+
+			const action = registerAbility( newAbility );
+
+			expect( () =>
+				action( { select: mockSelect, dispatch: mockDispatch } )
+			).toThrow( 'Ability "test/ability" is already registered' );
+			expect( mockDispatch ).not.toHaveBeenCalled();
+		} );
+
+		it( 'should throw error when new ability sets serverRegistered to true', () => {
+			const existingAbility: Ability = {
+				name: 'test/ability',
+				label: 'Test Ability',
+				description: 'Test description',
+				category: 'test-category',
+				meta: {
+					annotations: { serverRegistered: true },
+				},
+			};
+			mockSelect.getAbility.mockReturnValue( existingAbility );
+
+			const newAbility: Ability = {
+				name: 'test/ability',
+				label: 'Test Ability',
+				description: 'Test description',
+				category: 'test-category',
+				callback: jest.fn(),
+				meta: {
+					annotations: { serverRegistered: true },
+				},
+			};
+
+			const action = registerAbility( newAbility );
+
+			expect( () =>
+				action( { select: mockSelect, dispatch: mockDispatch } )
+			).toThrow( 'Ability "test/ability" is already registered' );
+			expect( mockDispatch ).not.toHaveBeenCalled();
+		} );
+
+		it( 'should throw error when properties other than callback differ', () => {
+			const existingAbility: Ability = {
+				name: 'test/ability',
+				label: 'Test Ability',
+				description: 'Test description',
+				category: 'test-category',
+				meta: {
+					annotations: { serverRegistered: true },
+				},
+			};
+			mockSelect.getAbility.mockReturnValue( existingAbility );
+
+			const newAbility: Ability = {
+				name: 'test/ability',
+				label: 'Different Label',
+				description: 'Test description',
+				category: 'test-category',
+				callback: jest.fn(),
+			};
+
+			const action = registerAbility( newAbility );
+
+			expect( () =>
+				action( { select: mockSelect, dispatch: mockDispatch } )
+			).toThrow(
+				'Cannot update ability "test/ability": only callback changes are allowed for hybrid abilities. Property "label" differs.'
+			);
+			expect( mockDispatch ).not.toHaveBeenCalled();
+		} );
+
+		it( 'should throw error when input_schema differs', () => {
+			const existingAbility: Ability = {
+				name: 'test/ability',
+				label: 'Test Ability',
+				description: 'Test description',
+				category: 'test-category',
+				input_schema: { type: 'object' },
+				meta: {
+					annotations: { serverRegistered: true },
+				},
+			};
+			mockSelect.getAbility.mockReturnValue( existingAbility );
+
+			const newAbility: Ability = {
+				name: 'test/ability',
+				label: 'Test Ability',
+				description: 'Test description',
+				category: 'test-category',
+				input_schema: { type: 'string' },
+				callback: jest.fn(),
+			};
+
+			const action = registerAbility( newAbility );
+
+			expect( () =>
+				action( { select: mockSelect, dispatch: mockDispatch } )
+			).toThrow(
+				'Cannot update ability "test/ability": only callback changes are allowed for hybrid abilities. Property "input_schema" differs.'
+			);
+			expect( mockDispatch ).not.toHaveBeenCalled();
+		} );
+
+		it( 'should preserve serverRegistered and add clientRegistered on successful hybrid registration', () => {
+			const existingAbility: Ability = {
+				name: 'test/ability',
+				label: 'Test Ability',
+				description: 'Test description',
+				category: 'test-category',
+				meta: {
+					annotations: {
+						serverRegistered: true,
+						readonly: true,
+					},
+				},
+			};
+			mockSelect.getAbility.mockReturnValue( existingAbility );
+
+			const newCallback = jest.fn();
+			const newAbility: Ability = {
+				name: 'test/ability',
+				label: 'Test Ability',
+				description: 'Test description',
+				category: 'test-category',
+				callback: newCallback,
+			};
+
+			const action = registerAbility( newAbility );
+			action( { select: mockSelect, dispatch: mockDispatch } );
+
+			expect( mockDispatch ).toHaveBeenCalledWith( {
+				type: REGISTER_ABILITY,
+				ability: expect.objectContaining( {
+					meta: {
+						annotations: {
+							serverRegistered: true,
+							readonly: true,
+							clientRegistered: true,
+						},
+					},
+				} ),
+			} );
+		} );
+
+		it( 'should also update permissionCallback for hybrid abilities', () => {
+			const existingAbility: Ability = {
+				name: 'test/ability',
+				label: 'Test Ability',
+				description: 'Test description',
+				category: 'test-category',
+				meta: {
+					annotations: { serverRegistered: true },
+				},
+			};
+			mockSelect.getAbility.mockReturnValue( existingAbility );
+
+			const newCallback = jest.fn();
+			const newPermissionCallback = jest.fn();
+			const newAbility: Ability = {
+				name: 'test/ability',
+				label: 'Test Ability',
+				description: 'Test description',
+				category: 'test-category',
+				callback: newCallback,
+				permissionCallback: newPermissionCallback,
+			};
+
+			const action = registerAbility( newAbility );
+			action( { select: mockSelect, dispatch: mockDispatch } );
+
+			expect( mockDispatch ).toHaveBeenCalledWith( {
+				type: REGISTER_ABILITY,
+				ability: expect.objectContaining( {
+					callback: newCallback,
+					permissionCallback: newPermissionCallback,
+				} ),
 			} );
 		} );
 	} );
