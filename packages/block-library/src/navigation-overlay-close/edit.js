@@ -98,6 +98,7 @@ export default function NavigationOverlayCloseEdit( {
 				>
 					{ showText && (
 						<RichText
+							identifier="text"
 							value={ text }
 							onChange={ ( value ) =>
 								setAttributes( { text: value } )
