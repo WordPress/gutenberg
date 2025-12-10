@@ -7,29 +7,21 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import Editor from '../editor';
-import DataViewsSidebarContent from '../sidebar-dataviews';
 import SidebarNavigationScreen from '../sidebar-navigation-screen';
 
 export const attachmentItemRoute = {
 	name: 'attachment-item',
 	path: '/attachment/:postId',
 	areas: {
-		sidebar() {
-			return (
-				<SidebarNavigationScreen
-					title={ __( 'Media' ) }
-					backPath="/"
-					content={
-						<DataViewsSidebarContent postType="attachment" />
-					}
-				/>
-			);
-		},
-		mobile() {
-			return <Editor />;
-		},
-		preview() {
-			return <Editor />;
-		},
+		sidebar: (
+			<SidebarNavigationScreen
+				title={ __( 'Media' ) }
+				backPath="/"
+				// Empty content - no sidebar list needed for attachments
+				content={ null }
+			/>
+		),
+		mobile: <Editor />,
+		preview: <Editor />,
 	},
 };

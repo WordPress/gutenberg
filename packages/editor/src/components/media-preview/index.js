@@ -37,9 +37,10 @@ function getMediaTypeFromMimeType( mimeType ) {
  * MediaPreview component displays the media file in the editor canvas.
  * Supports images, videos, audio files, and generic file displays.
  *
+ * @param {Object} props - Component props including click handlers and accessibility attributes.
  * @return {Element} The MediaPreview component.
  */
-export default function MediaPreview() {
+export default function MediaPreview( props ) {
 	const [ hasError, setHasError ] = useState( false );
 
 	const { mediaUrl, mimeType, altText, title, isLoading } = useSelect(
@@ -87,7 +88,10 @@ export default function MediaPreview() {
 	switch ( mediaType.type ) {
 		case 'image':
 			return (
-				<div className="editor-media-preview editor-media-preview--image">
+				<div
+					{ ...props }
+					className="editor-media-preview editor-media-preview--image"
+				>
 					<img
 						src={ mediaUrl }
 						alt={ altText || '' }
@@ -97,7 +101,10 @@ export default function MediaPreview() {
 			);
 		case 'video':
 			return (
-				<div className="editor-media-preview editor-media-preview--video">
+				<div
+					{ ...props }
+					className="editor-media-preview editor-media-preview--video"
+				>
 					<video
 						src={ mediaUrl }
 						controls
@@ -109,7 +116,10 @@ export default function MediaPreview() {
 			);
 		case 'audio':
 			return (
-				<div className="editor-media-preview editor-media-preview--audio">
+				<div
+					{ ...props }
+					className="editor-media-preview editor-media-preview--audio"
+				>
 					<audio
 						src={ mediaUrl }
 						controls
@@ -121,7 +131,10 @@ export default function MediaPreview() {
 			);
 		default:
 			return (
-				<div className="editor-media-preview editor-media-preview--file">
+				<div
+					{ ...props }
+					className="editor-media-preview editor-media-preview--file"
+				>
 					<div className="editor-media-preview__file-info">
 						<p className="editor-media-preview__file-name">
 							{ title }
