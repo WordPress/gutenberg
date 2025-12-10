@@ -12,7 +12,6 @@ import {
 	type CRDTDoc,
 	type ObjectData,
 	type SyncConfig,
-	type Origin,
 	Y,
 } from '@wordpress/sync';
 
@@ -286,14 +285,12 @@ function defaultGetChangesFromCRDTDoc( crdtDoc: CRDTDoc ): ObjectData {
  * @param {CRDTDoc} ydoc
  * @param {Post}    editedRecord
  * @param {Type}    _postType
- * @param {Origin}  _origin
  * @return {Partial<PostChanges>} The changes that should be applied to the local record.
  */
 export function getPostChangesFromCRDTDoc(
 	ydoc: CRDTDoc,
 	editedRecord: Post,
-	_postType: Type, // eslint-disable-line @typescript-eslint/no-unused-vars
-	_origin: Origin // eslint-disable-line @typescript-eslint/no-unused-vars
+	_postType: Type // eslint-disable-line @typescript-eslint/no-unused-vars
 ): PostChanges {
 	const ymap = getRootMap< YPostRecord >( ydoc, CRDT_RECORD_MAP_KEY );
 

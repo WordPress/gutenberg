@@ -92,8 +92,7 @@ export interface SyncConfig {
 	) => void;
 	getChangesFromCRDTDoc: (
 		ydoc: Y.Doc,
-		editedRecord: ObjectData,
-		origin: Origin
+		editedRecord: ObjectData
 	) => ObjectData;
 	supports?: Record< string, true >;
 }

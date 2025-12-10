@@ -19,7 +19,6 @@ import {
 import { createSyncManager } from '../manager';
 import {
 	CRDT_RECORD_MAP_KEY,
-	LOCAL_SYNC_MANAGER_ORIGIN,
 	CRDT_RECORD_METADATA_MAP_KEY as RECORD_METADATA_MAP_KEY,
 	CRDT_RECORD_METADATA_SAVED_AT_KEY as SAVED_AT_KEY,
 	CRDT_RECORD_METADATA_SAVED_BY_KEY as SAVED_BY_KEY,
@@ -327,11 +326,7 @@ describe( 'SyncManager', () => {
 				).toHaveBeenCalledTimes( 1 );
 				expect(
 					mockSyncConfig.getChangesFromCRDTDoc
-				).toHaveBeenCalledWith(
-					expect.any( Y.Doc ),
-					record,
-					LOCAL_SYNC_MANAGER_ORIGIN
-				);
+				).toHaveBeenCalledWith( expect.any( Y.Doc ), record );
 
 				// Verify no save operation occurred
 				expect( mockHandlers.editRecord ).not.toHaveBeenCalled();
@@ -382,11 +377,7 @@ describe( 'SyncManager', () => {
 				).toHaveBeenCalledTimes( 1 );
 				expect(
 					mockSyncConfig.getChangesFromCRDTDoc
-				).toHaveBeenCalledWith(
-					expect.any( Y.Doc ),
-					record,
-					LOCAL_SYNC_MANAGER_ORIGIN
-				);
+				).toHaveBeenCalledWith( expect.any( Y.Doc ), record );
 
 				// Verify a save operation occurred.
 				expect( mockHandlers.saveRecord ).toHaveBeenCalledTimes( 1 );
