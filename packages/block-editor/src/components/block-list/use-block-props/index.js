@@ -108,7 +108,6 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		isSectionBlock,
 		isWithinSectionBlock,
 		canMove,
-		isBlockHidden,
 	} = useContext( PrivateBlockContext );
 
 	// translators: %s: Type of block (i.e. Text, Image etc)
@@ -144,11 +143,15 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		  }
 		: {};
 
-	// Get breakpoint visibility settings from block attributes
-	const breakpointVisibility = useSelect(
+	// Get visibility settings from block attributes
+	const { blockVisibility, breakpointVisibility } = useSelect(
 		( select ) => {
 			const block = select( blockEditorStore ).getBlock( clientId );
-			return block?.attributes?.metadata?.blockVisibilityBreakpoints;
+			const metadata = block?.attributes?.metadata;
+			return {
+				blockVisibility: metadata?.blockVisibility,
+				breakpointVisibility: metadata?.blockVisibilityBreakpoints,
+			};
 		},
 		[ clientId ]
 	);
@@ -160,7 +163,11 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 	const isTabletViewport = isSmallOrLarger && ! isLargeOrLarger; // 600px - 960px
 	const isDesktopViewport = isLargeOrLarger; // >= 960px
 
-	// Determine which breakpoint classes to apply
+	// Only apply is-block-hidden class if hidden everywhere (not for breakpoint visibility)
+	// Breakpoint visibility is handled by specific classes below
+	const isHiddenEverywhere = blockVisibility === false;
+
+	// Determine which breakpoint classes to apply based on current viewport
 	const breakpointClasses = breakpointVisibility
 		? {
 				'wp-block-hidden-mobile':
@@ -219,7 +226,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 				'has-editable-outline': hasEditableOutline,
 				'has-negative-margin': hasNegativeMargin,
 				'is-editing-content-only-section': isEditingContentOnlySection,
-				'is-block-hidden': isBlockHidden,
+				'is-block-hidden': isHiddenEverywhere,
 				...breakpointClasses,
 			},
 			className,
