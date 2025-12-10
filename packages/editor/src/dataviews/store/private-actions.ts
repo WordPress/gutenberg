@@ -8,6 +8,7 @@ import type { PostType } from '@wordpress/fields';
 import {
 	viewPost,
 	viewPostRevisions,
+	resetTemplate,
 	duplicatePost,
 	duplicatePattern,
 	reorderPage,
@@ -199,6 +200,7 @@ export const registerPostTypeSchema =
 				? reorderPage
 				: undefined,
 			postTypeConfig.slug === 'wp_block' ? exportPattern : undefined,
+			postTypeConfig.slug === 'page' ? resetTemplate : undefined,
 			restorePost,
 			resetPost,
 			deletePost,

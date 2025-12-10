@@ -6,6 +6,7 @@ export { default as resetPost } from './reset-post';
 export { default as duplicatePattern } from './duplicate-pattern';
 export { default as exportPattern } from './export-pattern';
 export { default as viewPostRevisions } from './view-post-revisions';
+export { default as resetTemplate } from './reset-template';
 export { default as permanentlyDeletePost } from './permanently-delete-post';
 export { default as restorePost } from './restore-post';
 export { default as trashPost } from './trash-post';

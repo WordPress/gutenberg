@@ -123,6 +123,10 @@ Reorder action for BasePost.
 
 Reset action for Template and TemplatePart.
 
+### resetTemplate
+
+Reset template action for Post.
+
 ### restorePost
 
 Restore action for PostWithPermissions.

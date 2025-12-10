@@ -13,13 +13,7 @@ import type { DataFormControlProps } from '@wordpress/dataviews';
  */
 // @ts-expect-error block-editor is not typed correctly.
 import { __experimentalBlockPatternsList as BlockPatternsList } from '@wordpress/block-editor';
-import {
-	Button,
-	Dropdown,
-	MenuGroup,
-	MenuItem,
-	Modal,
-} from '@wordpress/components';
+import { Button, Modal } from '@wordpress/components';
 import { useAsyncList } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 import { decodeEntities } from '@wordpress/html-entities';
@@ -146,46 +140,14 @@ export const TemplateEdit = ( {
 
 	return (
 		<fieldset className="fields-controls__template">
-			<Dropdown
-				popoverProps={ { placement: 'bottom-start' } }
-				renderToggle={ ( { onToggle } ) => (
-					<Button
-						__next40pxDefaultSize
-						variant="tertiary"
-						size="compact"
-						onClick={ onToggle }
-					>
-						{ currentTemplate
-							? getItemTitle( currentTemplate )
-							: '' }
-					</Button>
-				) }
-				renderContent={ ( { onToggle } ) => (
-					<MenuGroup>
-						<MenuItem
-							onClick={ () => {
-								setShowModal( true );
-								onToggle();
-							} }
-						>
-							{ __( 'Change template' ) }
-						</MenuItem>
-						{
-							// The default template in a post is indicated by an empty string
-							value !== '' && (
-								<MenuItem
-									onClick={ () => {
-										onChangeControl( '' );
-										onToggle();
-									} }
-								>
-									{ __( 'Use default template' ) }
-								</MenuItem>
-							)
-						}
-					</MenuGroup>
-				) }
-			/>
+			<Button
+				__next40pxDefaultSize
+				variant="tertiary"
+				size="compact"
+				onClick={ () => setShowModal( true ) }
+			>
+				{ currentTemplate ? getItemTitle( currentTemplate ) : '' }
+			</Button>
 			{ showModal && (
 				<Modal
 					title={ __( 'Choose a template' ) }
