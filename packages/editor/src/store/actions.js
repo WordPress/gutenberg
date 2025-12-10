@@ -977,29 +977,36 @@ export const switchEditorMode =
 		const collaboratorMode = select.getCollaboratorMode();
 		const editedRecord = getEditedEntityRecord( 'postType', _type, _id );
 
-		console.log( editedRecord.enforcedModeOwner, currentUser.id, collaboratorMode );
-
 		if (
 			mode === 'visual' &&
 			editedRecord &&
-			editedRecord.enforcedModeOwner === currentUser.id &&
-			editedRecord.enforcedMode === 'codeEditor'
+			editedRecord.meta?.rtc?.enforcedModeOwner === currentUser.id &&
+			editedRecord.meta?.rtc?.enforcedMode === 'codeEditor'
 		) {
-			console.log( 'Reset the enforced mode' );
 			editEntityRecord( 'postType', _type, _id, {
-				enforcedMode: undefined,
-				enforcedModeOwner: undefined,
+				meta: {
+					...editedRecord.meta,
+					rtc: {
+						enforcedMode: undefined,
+						enforcedModeOwner: undefined,
+					}
+				},
 			} );
 		} else if (
 			mode !== 'visual' &&
 			editedRecord &&
-			editedRecord.enforcedMode !== 'codeEditor' &&
+			! editedRecord.meta?.rtc?.enforcedMode &&
+			! editedRecord.meta?.rtc?.enforcedModeOwner &&
 			collaboratorMode === 'edit'
 		) {
-			console.log( 'Set the enforced mode to code editor' );
 			editEntityRecord( 'postType', _type, _id, {
-				enforcedMode: 'codeEditor',
-				enforcedModeOwner: currentUser.id,
+				meta: {
+					...editedRecord.meta,
+					rtc: {
+						enforcedMode: 'codeEditor',
+						enforcedModeOwner: currentUser.id,
+					}
+				},
 			} );
 		}
 

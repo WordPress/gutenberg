@@ -361,6 +361,29 @@ export function getPostChangesFromCRDTDoc(
 						)
 					);
 
+					// The enforced mode has been set to code editor.
+					// @ts-ignore
+					if ( allowedMetaChanges.rtc?.enforcedMode === 'codeEditor' ) {
+						const { getCurrentUser } = select( STORE_NAME );
+
+						// The current user is not the owner of the enforced mode, set the collaborator mode to view.
+						// @ts-ignore
+						if ( getCurrentUser().id !== allowedMetaChanges.rtc?.enforcedModeOwner ) {
+							// @ts-ignore
+							dispatch( 'core/editor').setCollaboratorMode( 'view' );
+						// The current user is the owner of the enforced mode, set the collaborator mode to edit.
+						// @ts-ignore
+						} else if ( getCurrentUser().id === allowedMetaChanges.rtc?.enforcedModeOwner ) {
+							// @ts-ignore
+							dispatch( 'core/editor').setCollaboratorMode( 'edit' );
+						}
+					// The ''sffssenforced mode has been removed, set the collaborator mode to edit.
+					// @ts-ignore
+					} else if ( allowedMetaChanges.rtc && ! allowedMetaChanges.rtc.enforcedMode && ! allowedMetaChanges.rtc.enforcedModeOwner ) {
+						// @ts-ignore
+						dispatch( 'core/editor').setCollaboratorMode( 'edit' );
+					}
+
 					// Merge the allowed meta changes with the current meta values since
 					// not all meta properties are synced.
 					const mergedValue = {
@@ -388,21 +411,6 @@ export function getPostChangesFromCRDTDoc(
 					);
 				}
 
-				case 'enforcedModeOwner': {
-					// @ts-ignore
-					const { getCurrentUser } = select( STORE_NAME );
-
-					console.log( currentValue, newValue );
-
-					if ( ! currentValue && getCurrentUser().id !== newValue ) {
-						console.log( 'Set the collaborator mode to view' );
-						// @ts-ignore
-						dispatch( 'core/editor').setCollaboratorMode( 'view' );
-					}
-
-					return true;
-				}
-
 				// Add support for additional data types here.
 
 				default: {
@@ -411,15 +419,6 @@ export function getPostChangesFromCRDTDoc(
 			}
 		} )
 	);
-
-	// @ts-ignore
-	if ( editedRecord.enforcedModeOwner && ! ymap.has( 'enforcedModeOwner' ) ) {
-		console.log( 'Reset the collaborator mode' );
-		// @ts-ignore
-		dispatch( 'core/editor').setCollaboratorMode( 'edit' );
-		changes.enforcedModeOwner = undefined;
-		changes.enforcedMode = undefined;
-	}
 
 	// Meta changes must be merged with the edited record since not all meta
 	// properties are synced.
