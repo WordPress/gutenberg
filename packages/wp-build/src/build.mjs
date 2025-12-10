@@ -1448,21 +1448,21 @@ async function buildAll() {
 	// Use flatMap to expand routes with multiple pages into separate entries
 	const routes = getAllRoutes( ROOT_DIR ).flatMap( ( routeName ) => {
 		const metadata = getRouteMetadata( ROOT_DIR, routeName );
-		const routeFiles = getRouteFiles(
-			path.join( ROOT_DIR, 'routes', routeName )
-		);
 
 		// Skip routes without pages
 		if ( ! metadata || ! metadata.pages || metadata.pages.length === 0 ) {
 			return [];
 		}
+		const routeFiles = getRouteFiles(
+			path.join( ROOT_DIR, 'routes', routeName )
+		);
 
 		// Create a route entry for each page
 		return metadata.pages.map( ( page ) => {
 			return {
 				name: routeName,
 				path: metadata.path,
-				page: page,
+				page,
 				hasRoute: routeFiles.hasRoute,
 				hasContent: routeFiles.hasStage || routeFiles.hasInspector,
 			};
