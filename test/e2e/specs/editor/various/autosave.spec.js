@@ -270,7 +270,9 @@ test.describe( 'Autosave', () => {
 
 		await expect(
 			page.locator( '.components-notice__content' )
-		).toContainText( 'Updating failed because you were offline.' );
+		).toContainText(
+			'Updating failed because you were offline. Please, verify your connection and try again.'
+		);
 		expect(
 			await page.evaluate( () => window.sessionStorage.length )
 		).toBe( 1 );
