@@ -61,8 +61,6 @@ class URLInput extends Component {
 			this.updateSuggestions.bind( this ),
 			200
 		);
-		// Track current value for validation
-		this.valueRef = { current: props.value || '' };
 
 		this.suggestionNodes = [];
 
@@ -82,11 +80,6 @@ class URLInput extends Component {
 		const { showSuggestions, selectedSuggestion } = this.state;
 		const { value, __experimentalShowInitialSuggestions = false } =
 			this.props;
-
-		// Sync valueRef when props.value changes
-		if ( prevProps.value !== value ) {
-			this.valueRef.current = value || '';
-		}
 
 		// Only have to worry about scrolling selected suggestion into view
 		// when already expanded.
@@ -247,8 +240,6 @@ class URLInput extends Component {
 	}
 
 	onChange( newValue ) {
-		// Track current value for validation
-		this.valueRef.current = newValue || '';
 		this.props.onChange( newValue );
 	}
 
@@ -377,8 +368,6 @@ class URLInput extends Component {
 	}
 
 	selectLink( suggestion ) {
-		// Update valueRef for validation
-		this.valueRef.current = suggestion.url || '';
 		this.props.onChange( suggestion.url, suggestion );
 		this.setState( {
 			selectedSuggestion: null,
@@ -498,8 +487,8 @@ class URLInput extends Component {
 					...( onValidate && { onValidate } ),
 					...( customValidity && { customValidity } ),
 					// Suppress the "(Required)" indicator in the label.
-					// The field is still required for validation, but we don't want
-					// to show the indicator as it looks cluttered in the link control UI.
+					// The field is still required for validation, but the indicator
+					// can be hidden when markWhenOptional is set to true.
 					...( markWhenOptional !== undefined && {
 						markWhenOptional,
 					} ),
