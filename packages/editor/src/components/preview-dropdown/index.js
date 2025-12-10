@@ -14,6 +14,9 @@ import {
 	MenuItemsChoice,
 	VisuallyHidden,
 	Icon,
+	ToggleControl,
+	__experimentalText as Text,
+	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { desktop, mobile, tablet, external, check } from '@wordpress/icons';
@@ -21,12 +24,12 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { ActionItem } from '@wordpress/interface';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
 import { store as editorStore } from '../../store';
-import { store as blockEditorStore } from '@wordpress/block-editor';
 import PostPreviewButton from '../post-preview-button';
 import { unlock } from '../../lock-unlock';
 
@@ -39,12 +42,14 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 		showIconLabels,
 		isTemplateHidden,
 		templateId,
+		responsiveEditing,
 	} = useSelect( ( select ) => {
 		const {
 			getDeviceType,
 			getCurrentPostType,
 			getCurrentTemplateId,
 			getRenderingMode,
+			isResponsiveEditing,
 		} = select( editorStore );
 		const { getEntityRecord, getPostType } = select( coreStore );
 		const { get } = select( preferencesStore );
@@ -57,11 +62,15 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 			showIconLabels: get( 'core', 'showIconLabels' ),
 			isTemplateHidden: getRenderingMode() === 'post-only',
 			templateId: getCurrentTemplateId(),
+			responsiveEditing: isResponsiveEditing(),
 		};
 	}, [] );
-	const { setDeviceType, setRenderingMode, setDefaultRenderingMode } = unlock(
-		useDispatch( editorStore )
-	);
+	const {
+		setDeviceType,
+		setRenderingMode,
+		setDefaultRenderingMode,
+		setResponsiveEditing,
+	} = unlock( useDispatch( editorStore ) );
 	const { resetZoomLevel } = unlock( useDispatch( blockEditorStore ) );
 
 	const handleDevicePreviewChange = ( newDeviceType ) => {
@@ -122,7 +131,8 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 		<DropdownMenu
 			className={ clsx(
 				'editor-preview-dropdown',
-				`editor-preview-dropdown--${ deviceType.toLowerCase() }`
+				`editor-preview-dropdown--${ deviceType.toLowerCase() }`,
+				{ 'is-responsive-editing': responsiveEditing }
 			) }
 			popoverProps={ popoverProps }
 			toggleProps={ toggleProps }
@@ -133,12 +143,32 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 		>
 			{ ( { onClose } ) => (
 				<>
-					<MenuGroup>
+					<MenuGroup label={ __( 'View' ) }>
 						<MenuItemsChoice
 							choices={ choices }
 							value={ deviceType }
 							onSelect={ handleDevicePreviewChange }
 						/>
+					</MenuGroup>
+					<MenuGroup>
+						<VStack
+							className="editor-preview-dropdown__responsive-editing"
+							spacing={ 2 }
+						>
+							<ToggleControl
+								__nextHasNoMarginBottom
+								label={ __( 'Responsive editing' ) }
+								checked={ responsiveEditing }
+								onChange={ setResponsiveEditing }
+							/>
+							{ responsiveEditing && (
+								<Text variant="muted">
+									{ __(
+										'Hiding or removing blocks affects the current viewport only.'
+									) }
+								</Text>
+							) }
+						</VStack>
 					</MenuGroup>
 					{ isTemplate && (
 						<MenuGroup>
