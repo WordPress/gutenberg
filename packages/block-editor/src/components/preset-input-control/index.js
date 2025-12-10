@@ -14,7 +14,7 @@ import {
 import { usePrevious } from '@wordpress/compose';
 import { __, sprintf } from '@wordpress/i18n';
 import { settings } from '@wordpress/icons';
-import { useState } from '@wordpress/element';
+import { useMemo, useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -68,7 +68,7 @@ export default function PresetInputControl( {
 	disableCustomValues,
 	icon,
 	isMixed,
-	value,
+	value: valueProp,
 	minimumCustomValue,
 	onChange,
 	onMouseOut,
@@ -80,8 +80,10 @@ export default function PresetInputControl( {
 	showTooltip,
 	units,
 } ) {
-	// Treat value as a preset value if the passed in value matches the value of one of the presets.
-	value = getPresetValueFromCustomValue( value, presets, presetType );
+	const value = useMemo(
+		() => getPresetValueFromCustomValue( valueProp, presets, presetType ),
+		[ valueProp, presets, presetType ]
+	);
 
 	const className = classNameProp ?? 'preset-input-control';
 
