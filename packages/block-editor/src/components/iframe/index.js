@@ -34,6 +34,35 @@ let stylesFetchPromise = null;
 let compatStylesCache = null;
 let compatStylesFetchPromise = null;
 
+// Convert relative URLs in CSS to absolute URLs
+function makeUrlsAbsolute( css, baseUrl ) {
+	// Match url() in CSS and make them absolute
+	return css.replace(
+		/url\(\s*(['"]?)([^'")\s]+)\1\s*\)/g,
+		( match, quote, url ) => {
+			// Skip data URIs, absolute URLs, and root-relative URLs
+			if (
+				url.startsWith( 'data:' ) ||
+				url.startsWith( 'http:' ) ||
+				url.startsWith( 'https:' ) ||
+				url.startsWith( '//' ) ||
+				url.startsWith( '/' )
+			) {
+				return match;
+			}
+
+			// Convert relative URL to absolute
+			try {
+				const absoluteUrl = new URL( url, baseUrl ).href;
+				return `url(${ quote }${ absoluteUrl }${ quote })`;
+			} catch ( e ) {
+				// If URL parsing fails, return original
+				return match;
+			}
+		}
+	);
+}
+
 // Fetch compatibility styles once and convert to inline CSS
 async function fetchCompatibilityStyles() {
 	if ( compatStylesCache ) {
@@ -61,7 +90,7 @@ async function fetchCompatibilityStyles() {
 				.then( ( response ) => response.text() )
 				.then( ( css ) => ( {
 					id: element.id,
-					css,
+					css: makeUrlsAbsolute( css, href ),
 				} ) )
 				.catch( () => ( {
 					id: element.id,
@@ -221,7 +250,7 @@ function Iframe( {
 						.then( ( css ) => ( {
 							type: 'external',
 							href,
-							css,
+							css: makeUrlsAbsolute( css, href ),
 							media: link.getAttribute( 'media' ) || 'all',
 							id: link.getAttribute( 'id' ),
 						} ) )
