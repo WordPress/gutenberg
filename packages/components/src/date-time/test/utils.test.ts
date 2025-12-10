@@ -9,6 +9,10 @@ import timezoneMock from 'timezone-mock';
 import { inputToDate } from '../utils';
 
 describe( 'inputToDate', () => {
+	afterEach( () => {
+		timezoneMock.unregister();
+	} );
+
 	describe( 'timezoneless strings parsed as UTC', () => {
 		describe.each( [
 			{
@@ -26,10 +30,6 @@ describe( 'inputToDate', () => {
 		] )( 'in $description', ( { timezone } ) => {
 			beforeEach( () => {
 				timezoneMock.register( timezone );
-			} );
-
-			afterEach( () => {
-				timezoneMock.unregister();
 			} );
 
 			it( 'should parse midnight as UTC midnight, preventing day shifts', () => {
@@ -124,6 +124,10 @@ describe( 'inputToDate', () => {
 
 	describe( 'timestamps', () => {
 		it( 'should preserve the UTC moment exactly', () => {
+			// Ensure we're using a different timezone from UTC (the tests use
+			// UTC by default).
+			timezoneMock.register( 'US/Pacific' );
+
 			const timestamp = Date.UTC( 2025, 10, 1, 15, 30, 45 );
 			const result = inputToDate( timestamp );
 
