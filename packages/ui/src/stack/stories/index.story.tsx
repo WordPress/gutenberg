@@ -109,7 +109,7 @@ export const Nested: Story = {
 					<DemoBox />
 				</Stack>
 				<DemoBox variant="lg" />
-				<Stack gap="2xs" direction="column">
+				<Stack direction="column">
 					<DemoBox />
 					<DemoBox />
 				</Stack>
