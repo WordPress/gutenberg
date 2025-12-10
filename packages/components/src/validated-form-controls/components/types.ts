@@ -25,11 +25,5 @@ export type ValidatedControlProps = {
 	customValidity?: {
 		type: 'validating' | 'valid' | 'invalid';
 		message: string;
-		/**
-		 * Force the validation error to be displayed even if the field hasn't been touched.
-		 * Useful for showing validation errors on form submission before the user has blurred the field.
-		 * @default false
-		 */
-		force?: boolean;
 	};
 };
