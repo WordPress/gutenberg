@@ -6,10 +6,8 @@ import {
 	CustomSelectControl,
 	Icon,
 	RangeControl,
-	Tooltip,
 	__experimentalHStack as HStack,
 	__experimentalParseQuantityAndUnitFromRawValue as parseQuantityAndUnitFromRawValue,
-	__experimentalUnitControl as UnitControl,
 } from '@wordpress/components';
 import { usePrevious } from '@wordpress/compose';
 import { __, sprintf } from '@wordpress/i18n';
@@ -30,6 +28,7 @@ import {
 	getSliderValueFromPreset,
 	isValuePreset,
 } from './utils';
+import CustomValueControls from './custom-value-controls';
 
 /**
  * PresetInputControl component for selecting preset values or entering custom values.
@@ -198,55 +197,6 @@ export default function PresetInputControl( {
 		return `var:preset|${ presetType }|${ presets[ next ]?.slug }`;
 	};
 
-	const renderCustomUnitControl = () => {
-		const unitControl = (
-			<UnitControl
-				className="preset-input-control__unit-control"
-				disableUnits={ isMixed }
-				hideLabelFromVision
-				label={ ariaLabel }
-				min={ minValue }
-				onChange={ handleCustomValueChange }
-				onUnitChange={ onUnitChange }
-				onBlur={ onMouseOut }
-				onFocus={ onMouseOver }
-				onMouseOut={ onMouseOut }
-				onMouseOver={ onMouseOver }
-				size="__unstable-large"
-				units={ units }
-				value={ [ parsedQuantity, computedUnit ].join( '' ) }
-				placeholder={ allPlaceholder }
-				onDragStart={ () => {
-					if ( allowNegativeOnDrag && value?.charAt( 0 ) === '-' ) {
-						setMinValue( 0 );
-					}
-				} }
-				onDrag={ () => {
-					if ( allowNegativeOnDrag && value?.charAt( 0 ) === '-' ) {
-						setMinValue( 0 );
-					}
-				} }
-				onDragEnd={ () => {
-					if ( allowNegativeOnDrag ) {
-						setMinValue( minimumCustomValue );
-					}
-				} }
-			/>
-		);
-
-		if ( showTooltip ) {
-			return (
-				<Tooltip text={ ariaLabel } placement="top">
-					<div className="preset-input-control__tooltip-wrapper">
-						{ unitControl }
-					</div>
-				</Tooltip>
-			);
-		}
-
-		return unitControl;
-	};
-
 	return (
 		<HStack
 			className={ `preset-input-control__wrapper ${ className }__wrapper` }
@@ -259,27 +209,27 @@ export default function PresetInputControl( {
 				/>
 			) }
 			{ ( ! hasPresets || showCustomValueControl ) && (
-				<>
-					{ renderCustomUnitControl() }
-					<RangeControl
-						className="preset-input-control__custom-value-range"
-						hideLabelFromVision
-						initialPosition={ 0 }
-						label={ ariaLabel }
-						max={ max }
-						min={ 0 }
-						onBlur={ onMouseOut }
-						onChange={ handleCustomValueSliderChange }
-						onFocus={ onMouseOver }
-						onMouseOut={ onMouseOut }
-						onMouseOver={ onMouseOver }
-						step={ step }
-						value={ parsedQuantity }
-						withInputField={ false }
-						__next40pxDefaultSize
-						__nextHasNoMarginBottom
-					/>
-				</>
+				<CustomValueControls
+					allowNegativeOnDrag={ allowNegativeOnDrag }
+					ariaLabel={ ariaLabel }
+					allPlaceholder={ allPlaceholder }
+					minValue={ minValue }
+					parsedQuantity={ parsedQuantity }
+					computedUnit={ computedUnit }
+					units={ units }
+					isMixed={ isMixed }
+					step={ step }
+					max={ max }
+					showTooltip={ showTooltip }
+					value={ value }
+					minimumCustomValue={ minimumCustomValue }
+					onCustomValueChange={ handleCustomValueChange }
+					onCustomValueSliderChange={ handleCustomValueSliderChange }
+					onUnitChange={ onUnitChange }
+					onMouseOut={ onMouseOut }
+					onMouseOver={ onMouseOver }
+					setMinValue={ setMinValue }
+				/>
 			) }
 			{ hasPresets && showRangeControl && ! showCustomValueControl && (
 				<RangeControl
