@@ -296,6 +296,53 @@ function LinkControl( {
 	};
 
 	const handleSelectSuggestion = ( updatedValue ) => {
+		// If there's a real entity suggestion (post, page, category, etc.), it was selected
+		// from the dropdown - no validation needed for entity links as they come from the database.
+		// However, URL suggestions (created from user input with types like 'link', 'mailto', etc.)
+		// still need validation as they may contain invalid URLs like "www.wordp".
+		if (
+			updatedValue &&
+			updatedValue.id &&
+			updatedValue.type &&
+			! LINK_ENTRY_TYPES.includes( updatedValue.type )
+		) {
+			// Real entity suggestion selected (post, page, category, etc.) - no validation needed
+			// Proceed with selection
+		} else {
+			// URL suggestion (link, mailto, tel, internal) or manually entered URL - validate before submitting
+			// Use the URL from the suggestion, or fall back to currentUrlInputValue
+			const urlToValidate = updatedValue?.url || currentUrlInputValue;
+
+			// If empty, validation will fail
+			if ( ! urlToValidate?.trim()?.length ) {
+				return;
+			}
+
+			// Perform validation using the same logic as validateAndSetValidity
+			const trimmedValue = urlToValidate.trim();
+
+			// First check if it looks like a URL (for UX - we only validate URL-like strings)
+			if ( ! trimmedValue || ! isURLLike( trimmedValue ) ) {
+				setCustomValidity( {
+					type: 'invalid',
+					message: __( 'Please enter a valid URL.' ),
+				} );
+				triggerValidationDisplay();
+				return;
+			}
+
+			// Perform URL validation using the native URL constructor as the authoritative source.
+			const urlToCheck = prependHTTP( trimmedValue );
+			if ( ! isURL( urlToCheck ) ) {
+				setCustomValidity( {
+					type: 'invalid',
+					message: __( 'Please enter a valid URL.' ),
+				} );
+				triggerValidationDisplay();
+				return;
+			}
+		}
+
 		// Preserve the URL for taxonomy entities before binding overrides it
 		if ( updatedValue?.kind === 'taxonomy' && updatedValue?.url ) {
 			entityUrlFallbackRef.current = updatedValue.url;
@@ -386,34 +433,6 @@ function LinkControl( {
 		}
 		stopEditing();
 		setCustomValidity( undefined );
-	};
-
-	// Handle submission from URLInput (Enter key or submit button)
-	// Validates before calling handleSelectSuggestion when there's no actual suggestion
-	const handleURLInputSubmit = ( suggestion, event ) => {
-		// If there's a real entity suggestion (post, page, category, etc.), it was selected
-		// from the dropdown - no validation needed for entity links as they come from the database.
-		// However, URL suggestions (created from user input with types like 'link', 'mailto', etc.)
-		// still need validation as they may contain invalid URLs like "www.wordp".
-		if (
-			suggestion &&
-			suggestion.id &&
-			suggestion.type &&
-			! LINK_ENTRY_TYPES.includes( suggestion.type )
-		) {
-			// Real entity suggestion selected (post, page, category, etc.) - no validation needed
-			handleSelectSuggestion( suggestion );
-			return;
-		}
-
-		// URL suggestion (link, mailto, tel, internal) or manually entered URL - validate before submitting
-		if ( ! validateAndSetValidity() ) {
-			event?.preventDefault();
-			return;
-		}
-
-		// Validation passed - proceed with submission
-		handleSelectSuggestion( suggestion || { url: currentUrlInputValue } );
 	};
 
 	const handleSubmit = () => {
@@ -580,7 +599,6 @@ function LinkControl( {
 							onCreateSuggestion={ createPage }
 							onChange={ setInternalURLInputValue }
 							onSelect={ handleSelectSuggestion }
-							onSubmit={ handleURLInputSubmit }
 							showInitialSuggestions={ showInitialSuggestions }
 							allowDirectEntry={ ! noDirectEntry }
 							showSuggestions={ showSuggestions }

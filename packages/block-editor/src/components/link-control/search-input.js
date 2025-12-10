@@ -32,7 +32,6 @@ const LinkControlSearchInput = forwardRef(
 			onCreateSuggestion = noop,
 			onChange = noop,
 			onSelect = noop,
-			onSubmit: onSubmitProp,
 			showSuggestions = true,
 			renderSuggestions = ( props ) => (
 				<LinkControlSearchResults { ...props } />
@@ -154,23 +153,19 @@ const LinkControlSearchInput = forwardRef(
 					// but we don't want to show the indicator as it looks cluttered
 					// in the link control UI.
 					markWhenOptional
-					onSubmit={
-						onSubmitProp ||
-						( ( suggestion, event ) => {
-							const hasSuggestion =
-								suggestion || focusedSuggestion;
+					onSubmit={ ( suggestion, event ) => {
+						const hasSuggestion = suggestion || focusedSuggestion;
 
-							// If there is no suggestion and the value (ie: any manually entered URL) is empty
-							// then don't allow submission otherwise we get empty links.
-							if ( ! hasSuggestion && ! value?.trim()?.length ) {
-								event.preventDefault();
-							} else {
-								onSuggestionSelected(
-									hasSuggestion || { url: value }
-								);
-							}
-						} )
-					}
+						// If there is no suggestion and the value (ie: any manually entered URL) is empty
+						// then don't allow submission otherwise we get empty links.
+						if ( ! hasSuggestion && ! value?.trim()?.length ) {
+							event.preventDefault();
+						} else {
+							onSuggestionSelected(
+								hasSuggestion || { url: value }
+							);
+						}
+					} }
 					inputRef={ ref }
 					suffix={ suffix }
 					disabled={ isEntity }
