@@ -731,33 +731,6 @@ describe( 'Manual link entry', () => {
 		}
 	);
 
-	it( 'should return undefined kind and type when submitting a custom URL', async () => {
-		const user = userEvent.setup();
-		const onChange = jest.fn();
-
-		render( <LinkControl onChange={ onChange } /> );
-
-		const searchInput = screen.getByRole( 'combobox', {
-			name: 'Search or type URL',
-		} );
-
-		// Type a custom URL
-		await user.type( searchInput, 'https://custom.com' );
-
-		// Wait for and click the URL suggestion
-		const urlSuggestion = await screen.findByRole( 'option' );
-		await user.click( urlSuggestion );
-
-		// Verify onChange was called with undefined kind and type (not page/post-type)
-		expect( onChange ).toHaveBeenCalledWith(
-			expect.objectContaining( {
-				url: 'https://custom.com',
-				type: undefined,
-				kind: undefined,
-			} )
-		);
-	} );
-
 	describe( 'Handling of empty values', () => {
 		const testTable = [
 			[ 'containing only spaces', '        ' ],
@@ -2827,14 +2800,17 @@ describe( 'Entity handling', () => {
 		} );
 		await user.click( applyButton );
 
-		// Verify that onChange was called with the entity link severed
-		// id, kind, and type should be undefined to indicate it's no longer an entity
+		// Verify that onChange was called with entity metadata cleared.
+		// Kind should be undefined (no longer an entity).
+		// Note: Currently when clicking Apply (vs selecting a suggestion),
+		// type and id are also undefined - that's a separate issue with the
+		// TODO: Apply button handler not processing URLs through handleDirectEntry,
+		// so the shape of the data for a custom link can be different depending on
+		// how it was submitted.
 		expect( onChange ).toHaveBeenCalledWith(
 			expect.objectContaining( {
-				url: customUrl,
-				id: undefined,
+				url: 'www.wordpress.org',
 				kind: undefined,
-				type: undefined,
 			} )
 		);
 	} );
@@ -2913,9 +2889,8 @@ describe( 'Entity handling', () => {
 		expect( onChange ).toHaveBeenCalledWith(
 			expect.objectContaining( {
 				url: 'https://custom-url.com',
-				type: undefined,
+				type: 'link',
 				kind: undefined,
-				id: undefined,
 			} )
 		);
 	} );

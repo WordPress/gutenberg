@@ -35,7 +35,7 @@ import LinkSettings from './settings';
 import useCreatePage from './use-create-page';
 import useInternalValue from './use-internal-value';
 import { ViewerFill } from './viewer-slot';
-import { DEFAULT_LINK_SETTINGS, LINK_ENTRY_TYPES } from './constants';
+import { DEFAULT_LINK_SETTINGS } from './constants';
 
 /**
  * Default properties associated with a link control value.
@@ -207,16 +207,8 @@ function LinkControl( {
 		createSetInternalSettingValueHandler,
 	] = useInternalValue( value );
 
-	// Helper to check if a link value has a custom URL type (not an entity type)
-	const isCustomURLType = ( linkValue ) =>
-		LINK_ENTRY_TYPES.includes( linkValue?.type );
-
 	// Compute isEntity internally based on handleEntities prop and presence of ID
-	// Exclude custom URLs which have id but type is 'link', 'mailto', 'tel', or 'internal'
-	const isEntity =
-		handleEntities &&
-		!! internalControlValue?.id &&
-		! isCustomURLType( internalControlValue );
+	const isEntity = handleEntities && !! internalControlValue?.id;
 
 	// Generate help text ID for accessibility association
 	const baseId = useInstanceId( LinkControl, 'link-control' );
@@ -300,19 +292,9 @@ function LinkControl( {
 			{}
 		);
 
-		// When selecting a custom URL (not an entity), explicitly clear
-		// entity metadata (type/kind) to avoid preserving them from previous links.
-		const isCustomLink = isCustomURLType( updatedValue );
-
 		onChange( {
 			...internalControlValue,
 			...nonSettingsChanges,
-			// Explicitly set type and kind to undefined for custom links
-			...( isCustomLink && {
-				id: undefined,
-				type: undefined,
-				kind: undefined,
-			} ),
 			// As title is not a setting, it must be manually applied
 			// in such a way as to preserve the users changes over
 			// any "title" value provided by the "suggestion".
