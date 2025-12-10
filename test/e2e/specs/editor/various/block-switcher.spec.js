@@ -103,7 +103,7 @@ test.describe( 'Block Switcher', () => {
 		await pageUtils.pressKeys( 'alt+F10' );
 		const button = page
 			.getByRole( 'toolbar', { name: 'Block tools' } )
-			.getByRole( 'button', { name: 'Paragraph', exact: true } );
+			.getByRole( 'button', { name: 'Paragraph' } );
 		await expect( button ).toBeEnabled();
 
 		await editor.clickBlockOptionsMenuItem( 'Lock' );

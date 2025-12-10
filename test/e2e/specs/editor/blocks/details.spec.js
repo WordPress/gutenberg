@@ -123,7 +123,6 @@ test.describe( 'Details', () => {
 		await expect(
 			listView.getByRole( 'link', {
 				name: 'Paragraph',
-				exact: true,
 			} )
 		).toBeVisible();
 
@@ -132,7 +131,6 @@ test.describe( 'Details', () => {
 		await expect(
 			listView.getByRole( 'link', {
 				name: 'Paragraph',
-				exact: true,
 			} )
 		).toBeFocused();
 

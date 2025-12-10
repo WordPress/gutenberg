@@ -162,7 +162,6 @@ test.describe( 'Widgets screen', () => {
 
 		const paragraphBlock = inlineQuickInserter.getByRole( 'option', {
 			name: 'Paragraph',
-			exact: true,
 		} );
 		await paragraphBlock.click();
 
@@ -215,7 +214,7 @@ test.describe( 'Widgets screen', () => {
 		await page.keyboard.type( 'Heading' );
 
 		await inlineQuickInserter
-			.getByRole( 'option', { name: 'Heading', exact: true } )
+			.getByRole( 'option', { name: 'Heading' } )
 			.click();
 
 		await expect(
@@ -709,10 +708,7 @@ class WidgetsScreen {
 			} )
 			.fill( blockName );
 
-		return blockLibrary.getByRole( 'option', {
-			name: blockName,
-			exact: true,
-		} );
+		return blockLibrary.getByRole( 'option', { name: blockName } );
 	};
 
 	saveWidgets = async () => {

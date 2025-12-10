@@ -53,10 +53,7 @@ test.describe( 'Navigating the block hierarchy', () => {
 		await page.keyboard.press( 'Enter' );
 
 		// Add a paragraph in the first column.
-		const paragraph = page.getByRole( 'option', {
-			name: 'Paragraph',
-			exact: true,
-		} );
+		const paragraph = page.getByRole( 'option', { name: 'Paragraph' } );
 		await expect( paragraph ).toBeVisible();
 		await paragraph.click();
 		await page.keyboard.type( 'First column' );
@@ -111,10 +108,7 @@ test.describe( 'Navigating the block hierarchy', () => {
 		await page.keyboard.press( 'Enter' );
 
 		// Add a paragraph in the first column.
-		const paragraph = page.getByRole( 'option', {
-			name: 'Paragraph',
-			exact: true,
-		} );
+		const paragraph = page.getByRole( 'option', { name: 'Paragraph' } );
 		await expect( paragraph ).toBeVisible();
 		await paragraph.click();
 		await page.keyboard.type( 'First column' );
@@ -210,10 +204,7 @@ test.describe( 'Navigating the block hierarchy', () => {
 		await page.keyboard.press( 'Enter' );
 
 		// Add some random blocks.
-		const paragraph = page.getByRole( 'option', {
-			name: 'Paragraph',
-			exact: true,
-		} );
+		const paragraph = page.getByRole( 'option', { name: 'Paragraph' } );
 		await expect( paragraph ).toBeVisible();
 		await paragraph.click();
 		await page.keyboard.type( 'just a paragraph' );

@@ -140,7 +140,7 @@ test.describe( 'Block Toolbar', () => {
 		await expect(
 			page
 				.getByRole( 'toolbar', { name: 'Block Tools' } )
-				.getByRole( 'button', { name: 'Paragraph', exact: true } )
+				.getByRole( 'button', { name: 'Paragraph' } )
 		).toBeFocused();
 	} );
 
