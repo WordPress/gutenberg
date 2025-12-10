@@ -172,6 +172,9 @@ export default function useClipboardHandler() {
 						}, [] )
 						.flat();
 				} else {
+					// Allows us to ask for this information when we get a report.
+					window.console.log( 'Received HTML:\n\n', html );
+					window.console.log( 'Received plain text:\n\n', plainText );
 					blocks = pasteHandler( {
 						HTML: html,
 						plainText,
