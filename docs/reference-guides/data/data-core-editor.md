@@ -1140,6 +1140,18 @@ _Returns_
 
 -   `boolean`: Whether the publish sidebar is open.
 
+### isResponsiveEditing
+
+Returns whether device-specific editing mode is enabled. When enabled, changes to styles and block visibility apply only to the current device.
+
+_Parameters_
+
+-   _state_ `Object`: Global application state.
+
+_Returns_
+
+-   `boolean`: Whether device-specific editing is enabled.
+
 ### isSavingNonPostEntityChanges
 
 Returns true if non-post entities are currently being saved, or false otherwise.
@@ -1535,6 +1547,18 @@ Returns an action used to set the rendering mode of the post editor. We support 
 _Parameters_
 
 -   _mode_ `string`: Mode (one of 'post-only' or 'template-locked').
+
+### setResponsiveEditing
+
+Action that enables or disables device-specific editing mode. When enabled, changes to styles and block visibility apply only to the current device.
+
+_Parameters_
+
+-   _enabled_ `boolean`: Whether device-specific editing is enabled.
+
+_Returns_
+
+-   `Object`: Action object.
 
 ### setTemplateValidity
 
