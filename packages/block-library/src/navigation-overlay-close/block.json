@@ -21,7 +21,6 @@
 		}
 	},
 	"supports": {
-		"anchor": true,
 		"color": {
 			"gradients": false,
 			"__experimentalDefaultControls": {
