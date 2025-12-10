@@ -14,7 +14,7 @@ import {
 import { usePrevious } from '@wordpress/compose';
 import { __, sprintf } from '@wordpress/i18n';
 import { settings } from '@wordpress/icons';
-import { useMemo, useState } from '@wordpress/element';
+import { useState, useEffect, useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -108,14 +108,17 @@ export default function PresetInputControl( {
 	let currentValue = null;
 
 	const previousValue = usePrevious( value );
-	if (
-		!! value &&
-		previousValue !== value &&
-		! isValuePreset( value, presetType ) &&
-		showCustomValueControl !== true
-	) {
-		setShowCustomValueControl( true );
-	}
+
+	useEffect( () => {
+		if (
+			!! value &&
+			previousValue !== value &&
+			! isValuePreset( value, presetType ) &&
+			showCustomValueControl !== true
+		) {
+			setShowCustomValueControl( true );
+		}
+	}, [ value, previousValue, presetType, showCustomValueControl ] );
 
 	const showCustomValueInSelectList =
 		! showRangeControl &&
