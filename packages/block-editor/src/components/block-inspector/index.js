@@ -1,13 +1,18 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import {
 	getBlockType,
 	getUnregisteredTypeHandlerName,
+	hasBlockSupport,
 	store as blocksStore,
 } from '@wordpress/blocks';
-import { PanelBody, __unstableMotion as motion } from '@wordpress/components';
+import {
+	Notice,
+	PanelBody,
+	__unstableMotion as motion,
+} from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 
 /**
@@ -332,6 +337,54 @@ const BlockInspectorSingleBlock = ( {
 	const isBlockSynced = blockInformation.isSynced;
 	const shouldShowTabs = ! isBlockSynced && hasMultipleTabs;
 
+	// Get block visibility information and current device type
+	const { canToggleBlockVisibility, blockVisibility, deviceType } = useSelect(
+		( select ) => {
+			const { getBlockName, getBlockAttributes, getSettings } =
+				select( blockEditorStore );
+			const blockAttributes = getBlockAttributes( clientId );
+			const settings = getSettings();
+			return {
+				canToggleBlockVisibility: hasBlockSupport(
+					getBlockName( clientId ),
+					'visibility',
+					true
+				),
+				blockVisibility: blockAttributes?.metadata?.blockVisibility,
+				deviceType: settings.__experimentalDeviceType || 'Desktop',
+			};
+		},
+		[ clientId ]
+	);
+
+	// Check if the block is hidden on the current device
+	const getVisibilityNotice = () => {
+		if ( ! canToggleBlockVisibility || blockVisibility === undefined ) {
+			return null;
+		}
+
+		// If hidden on all devices, show a general notice
+		if ( blockVisibility === false ) {
+			return __( 'This block is hidden.' );
+		}
+
+		// If hidden on a specific viewport, only show the notice when previewing that view
+		if ( typeof blockVisibility === 'object' ) {
+			const deviceKey = deviceType.toLowerCase();
+			if ( blockVisibility[ deviceKey ] === false ) {
+				return sprintf(
+					/* translators: %s: device type (Desktop, Tablet, or Mobile) */
+					__( 'Block is hidden on %s' ),
+					deviceKey
+				);
+			}
+		}
+
+		return null;
+	};
+
+	const visibilityNotice = getVisibilityNotice();
+
 	return (
 		<div className="block-editor-block-inspector">
 			{ hasParentChildBlockCards && (
@@ -348,6 +401,15 @@ const BlockInspectorSingleBlock = ( {
 				isChild={ hasParentChildBlockCards }
 				clientId={ clientId }
 			/>
+			{ visibilityNotice && (
+				<Notice
+					status="warning"
+					isDismissible={ false }
+					className="block-editor-block-inspector__visibility-notice"
+				>
+					{ visibilityNotice }
+				</Notice>
+			) }
 			{ window?.__experimentalContentOnlyPatternInsertion && (
 				<EditContents clientId={ clientId } />
 			) }

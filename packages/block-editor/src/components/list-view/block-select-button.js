@@ -9,6 +9,7 @@ import clsx from 'clsx';
 import {
 	__experimentalHStack as HStack,
 	__experimentalTruncate as Truncate,
+	Tooltip,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { forwardRef } from '@wordpress/element';
@@ -18,10 +19,14 @@ import {
 	pinSmall,
 	unseen,
 	symbol,
+	desktop,
+	tablet,
+	mobile,
 } from '@wordpress/icons';
 import { SPACE, ENTER } from '@wordpress/keycodes';
 import { useSelect } from '@wordpress/data';
 import { hasBlockSupport } from '@wordpress/blocks';
+import { __, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -34,6 +39,7 @@ import { useBlockLock } from '../block-lock';
 import useListViewImages from './use-list-view-images';
 import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
+import { hasAnyVisibilitySettings } from '../block-visibility/utils';
 
 const { Badge } = unlock( componentsPrivateApis );
 
@@ -61,14 +67,11 @@ function ListViewBlockSelectButton(
 		context: 'list-view',
 	} );
 	const { isLocked } = useBlockLock( clientId );
-	const { canToggleBlockVisibility, isBlockHidden, hasPatternName } =
+	const { canToggleBlockVisibility, hasPatternName, blockVisibility } =
 		useSelect(
 			( select ) => {
 				const { getBlockName, getBlockAttributes } =
 					select( blockEditorStore );
-				const { isBlockHidden: _isBlockHidden } = unlock(
-					select( blockEditorStore )
-				);
 				const blockAttributes = getBlockAttributes( clientId );
 				return {
 					canToggleBlockVisibility: hasBlockSupport(
@@ -76,15 +79,39 @@ function ListViewBlockSelectButton(
 						'visibility',
 						true
 					),
-					isBlockHidden: _isBlockHidden( clientId ),
 					hasPatternName: !! blockAttributes?.metadata?.patternName,
+					blockVisibility: blockAttributes?.metadata?.blockVisibility,
 				};
 			},
 			[ clientId ]
 		);
 	const shouldShowLockIcon = isLocked;
+	// Show visibility icon when block has any visibility settings (regardless of current viewport)
 	const shouldShowBlockVisibilityIcon =
-		canToggleBlockVisibility && isBlockHidden;
+		canToggleBlockVisibility && hasAnyVisibilitySettings( blockVisibility );
+
+	// Compute visibility tooltip text
+	const getVisibilityTooltip = () => {
+		if ( blockVisibility === false ) {
+			return __( 'Hidden' );
+		}
+		if ( typeof blockVisibility === 'object' ) {
+			const hiddenDevices = [
+				blockVisibility.desktop === false && __( 'Desktop' ),
+				blockVisibility.tablet === false && __( 'Tablet' ),
+				blockVisibility.mobile === false && __( 'Mobile' ),
+			].filter( Boolean );
+			if ( hiddenDevices.length ) {
+				return sprintf(
+					/* translators: %s: comma-separated list of device types */
+					__( 'Hidden on %s' ),
+					hiddenDevices.join( ', ' )
+				);
+			}
+		}
+		return __( 'Hidden' );
+	};
+
 	const isSticky = blockInformation?.positionType === 'sticky';
 	const images = useListViewImages( { clientId, isExpanded } );
 
@@ -171,9 +198,24 @@ function ListViewBlockSelectButton(
 					</span>
 				) : null }
 				{ shouldShowBlockVisibilityIcon && (
-					<span className="block-editor-list-view-block-select-button__block-visibility">
-						<Icon icon={ unseen } />
-					</span>
+					<Tooltip text={ getVisibilityTooltip() }>
+						<span className="block-editor-list-view-block-select-button__block-visibility">
+							<Icon icon={ unseen } />
+							{ typeof blockVisibility === 'object' && (
+								<span className="block-editor-list-view-block-select-button__block-visibility-devices">
+									{ blockVisibility.desktop === false && (
+										<Icon icon={ desktop } />
+									) }
+									{ blockVisibility.tablet === false && (
+										<Icon icon={ tablet } />
+									) }
+									{ blockVisibility.mobile === false && (
+										<Icon icon={ mobile } />
+									) }
+								</span>
+							) }
+						</span>
+					</Tooltip>
 				) }
 				{ shouldShowLockIcon && (
 					<span className="block-editor-list-view-block-select-button__lock">

@@ -89,6 +89,7 @@ export function BlockSettingsDropdown( {
 		openedBlockSettingsMenu,
 		isContentOnly,
 		isZoomOut,
+		responsiveEditing,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -100,6 +101,7 @@ export function BlockSettingsDropdown( {
 				getOpenedBlockSettingsMenu,
 				getBlockEditingMode,
 				isZoomOut: _isZoomOut,
+				getSettings,
 			} = unlock( select( blockEditorStore ) );
 
 			const { getActiveBlockVariation } = select( blocksStore );
@@ -108,6 +110,7 @@ export function BlockSettingsDropdown( {
 				getBlockRootClientId( firstBlockClientId );
 			const parentBlockName =
 				_firstParentClientId && getBlockName( _firstParentClientId );
+			const settings = getSettings();
 
 			return {
 				firstParentClientId: _firstParentClientId,
@@ -125,6 +128,8 @@ export function BlockSettingsDropdown( {
 				isContentOnly:
 					getBlockEditingMode( firstBlockClientId ) === 'contentOnly',
 				isZoomOut: _isZoomOut(),
+				responsiveEditing:
+					settings.__experimentalResponsiveEditing ?? false,
 			};
 		},
 		[ firstBlockClientId ]
@@ -371,7 +376,7 @@ export function BlockSettingsDropdown( {
 									: Children.map( ( child ) =>
 											cloneElement( child, { onClose } )
 									  ) }
-								{ canRemove && (
+								{ canRemove && ! responsiveEditing && (
 									<MenuGroup>
 										<MenuItem
 											onClick={ pipe(

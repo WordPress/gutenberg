@@ -25,7 +25,7 @@ import {
 	memo,
 } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { BACKSPACE, DELETE } from '@wordpress/keycodes';
 import isShallowEqual from '@wordpress/is-shallow-equal';
 import { __unstableUseShortcutEventMatch as useShortcutEventMatch } from '@wordpress/keyboard-shortcuts';
@@ -123,25 +123,32 @@ function ListViewBlock( {
 
 	const pasteStyles = usePasteStyles();
 
-	const { block, blockName, allowRightClickOverrides, isBlockHidden } =
-		useSelect(
-			( select ) => {
-				const { getBlock, getBlockName, getSettings } =
-					select( blockEditorStore );
-				const { isBlockHidden: _isBlockHidden } = unlock(
-					select( blockEditorStore )
-				);
+	const {
+		block,
+		blockName,
+		allowRightClickOverrides,
+		isBlockHidden,
+		blockVisibility,
+	} = useSelect(
+		( select ) => {
+			const { getBlock, getBlockName, getSettings, getBlockAttributes } =
+				select( blockEditorStore );
+			const { isBlockHidden: _isBlockHidden } = unlock(
+				select( blockEditorStore )
+			);
+			const attributes = getBlockAttributes( clientId );
 
-				return {
-					block: getBlock( clientId ),
-					blockName: getBlockName( clientId ),
-					allowRightClickOverrides:
-						getSettings().allowRightClickOverrides,
-					isBlockHidden: _isBlockHidden( clientId ),
-				};
-			},
-			[ clientId ]
-		);
+			return {
+				block: getBlock( clientId ),
+				blockName: getBlockName( clientId ),
+				allowRightClickOverrides:
+					getSettings().allowRightClickOverrides,
+				isBlockHidden: _isBlockHidden( clientId ),
+				blockVisibility: attributes?.metadata?.blockVisibility,
+			};
+		},
+		[ clientId ]
+	);
 
 	const showBlockActions =
 		// When a block hides its toolbar it also hides the block settings menu,
@@ -523,9 +530,31 @@ function ListViewBlock( {
 		isLocked
 	);
 
-	const blockVisibilityDescription = isBlockHidden
-		? __( 'Block is hidden.' )
-		: null;
+	// Generate responsive visibility description.
+	let blockVisibilityDescription = null;
+	if ( isBlockHidden ) {
+		if ( blockVisibility === false ) {
+			blockVisibilityDescription = __( 'Block is hidden.' );
+		} else if ( typeof blockVisibility === 'object' ) {
+			const hiddenDevices = [];
+			if ( blockVisibility.desktop === false ) {
+				hiddenDevices.push( __( 'Desktop' ) );
+			}
+			if ( blockVisibility.tablet === false ) {
+				hiddenDevices.push( __( 'Tablet' ) );
+			}
+			if ( blockVisibility.mobile === false ) {
+				hiddenDevices.push( __( 'Mobile' ) );
+			}
+			if ( hiddenDevices.length > 0 ) {
+				blockVisibilityDescription = sprintf(
+					/* translators: %s: comma-separated list of device types */
+					__( 'Block is hidden on: %s.' ),
+					hiddenDevices.join( ', ' )
+				);
+			}
+		}
+	}
 
 	const hasSiblings = siblingBlockCount > 0;
 	const hasRenderedMovers = showBlockMovers && hasSiblings;

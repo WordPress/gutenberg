@@ -617,6 +617,23 @@ function BlockListBlockProvider( props ) {
 				__experimentalBlockBindingsSupportedAttributes?.[ blockName ];
 
 			const hasLightBlockWrapper = blockType?.apiVersion > 1;
+
+			// Compute isBlockHidden based on current device preview
+			const blockVisibility = attributes?.metadata?.blockVisibility;
+			const settings = getSettings();
+			let computedIsBlockHidden = blockVisibility === false;
+
+			if (
+				! computedIsBlockHidden &&
+				typeof blockVisibility === 'object'
+			) {
+				const viewportType =
+					settings.__experimentalDeviceType ?? 'Desktop';
+				const viewportKey = viewportType.toLowerCase();
+				computedIsBlockHidden =
+					blockVisibility[ viewportKey ] === false;
+			}
+
 			const previewContext = {
 				isPreviewMode,
 				blockWithoutAttributes,
@@ -633,7 +650,7 @@ function BlockListBlockProvider( props ) {
 					? getBlockDefaultClassName( blockName )
 					: undefined,
 				blockTitle: blockType?.title,
-				isBlockHidden: attributes?.metadata?.blockVisibility === false,
+				isBlockHidden: computedIsBlockHidden,
 				bindableAttributes,
 			};
 

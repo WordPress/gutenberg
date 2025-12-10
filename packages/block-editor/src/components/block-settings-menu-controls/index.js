@@ -118,6 +118,7 @@ const BlockSettingsMenuControlsSlot = ( { fillProps, clientIds = null } ) => {
 						{ showVisibilityButton && (
 							<BlockVisibilityMenuItem
 								clientIds={ selectedClientIds }
+								onClose={ fillProps?.onClose }
 							/>
 						) }
 						{ fills }

@@ -423,6 +423,17 @@
 		line-height: 0;
 	}
 
+	.block-editor-list-view-block-select-button__block-visibility {
+		display: flex;
+		align-items: center;
+		gap: 2px;
+	}
+
+	.block-editor-list-view-block-select-button__block-visibility-devices {
+		display: flex;
+		align-items: center;
+	}
+
 	.block-editor-list-view-block-select-button__images {
 		display: flex;
 	}
