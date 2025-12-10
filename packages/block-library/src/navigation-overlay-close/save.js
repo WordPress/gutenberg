@@ -13,6 +13,7 @@ import {
 	__experimentalGetSpacingClassesAndStyles as getSpacingClassesAndStyles,
 	getTypographyClassesAndStyles,
 } from '@wordpress/block-editor';
+import { __ } from '@wordpress/i18n';
 
 export default function navigationOverlayCloseSave( { attributes } ) {
 	const { displayMode, text } = attributes;
@@ -38,7 +39,7 @@ export default function navigationOverlayCloseSave( { attributes } ) {
 					...typographyProps.style,
 				},
 				type: 'button',
-				'aria-label': 'Close',
+				'aria-label': __( 'Close' ),
 			} ) }
 		>
 			{ showIcon && (
