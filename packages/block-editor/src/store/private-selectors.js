@@ -703,6 +703,10 @@ export function getInsertionPoint( state ) {
 /**
  * Returns true if the block is hidden, or false otherwise.
  *
+ * A block is considered hidden if:
+ * - blockVisibility is false (hidden everywhere)
+ * - blockVisibility is an object with the current viewport set to false
+ *
  * @param {Object} state    Global application state.
  * @param {string} clientId Client ID of the block.
  *
@@ -714,7 +718,22 @@ export const isBlockHidden = ( state, clientId ) => {
 		return false;
 	}
 	const attributes = state.blocks.attributes.get( clientId );
-	return attributes?.metadata?.blockVisibility === false;
+	const blockVisibility = attributes?.metadata?.blockVisibility;
+
+	// Hidden on all viewports
+	if ( blockVisibility === false ) {
+		return true;
+	}
+
+	// Check viewport-specific hiding based on current device preview
+	if ( typeof blockVisibility === 'object' ) {
+		const settings = getSettings( state );
+		const viewportType = settings.__experimentalDeviceType ?? 'Desktop';
+		const viewportKey = viewportType.toLowerCase();
+		return blockVisibility[ viewportKey ] === false;
+	}
+
+	return false;
 };
 
 /**
