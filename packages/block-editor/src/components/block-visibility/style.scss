@@ -1,0 +1,91 @@
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/z-index" as *;
+
+.block-editor-block-visibility-modal {
+	z-index: z-index(".block-editor-block-lock-modal");
+}
+
+.block-editor-block-visibility-modal__description {
+	margin-top: 0;
+	margin-bottom: $grid-unit-20;
+}
+
+.block-editor-block-visibility-modal__options {
+	// Reset `fieldset` browser defaults.
+	border: 0;
+	padding: 0;
+	margin: 0;
+}
+
+.block-editor-block-visibility-modal__checklist {
+	// Reset `ul` browser defaults.
+	list-style: none;
+	padding: 0;
+	margin: 0;
+}
+
+.block-editor-block-visibility-modal__main-option {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: space-between;
+	align-items: center;
+	gap: $grid-unit-15;
+
+	.block-editor-block-visibility-modal__visibility-icon {
+		flex-shrink: 0;
+		margin-right: $grid-unit-15;
+	}
+
+	// Allow the nested checklist to take full width
+	> .block-editor-block-visibility-modal__checklist {
+		flex-basis: 100%;
+	}
+}
+
+.block-editor-block-visibility-modal__options-main {
+	padding: $grid-unit-15 0;
+
+	.components-checkbox-control__label {
+		font-weight: 600;
+	}
+}
+
+.block-editor-block-visibility-modal__checklist-item {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	gap: $grid-unit-15;
+	margin-bottom: 0;
+	padding: $grid-unit-15 0 $grid-unit-15 $grid-unit-40;
+
+	.block-editor-block-visibility-modal__device-icon {
+		flex-shrink: 0;
+		margin-right: $grid-unit-15;
+	}
+
+	&:hover {
+		background-color: $gray-100;
+		border-radius: $radius-small;
+	}
+}
+
+.block-editor-block-visibility-modal__explanation {
+	margin-top: $grid-unit-20;
+}
+
+.block-editor-block-visibility-modal__actions {
+	margin-top: $grid-unit-30;
+}
+
+// Toolbar icon styles
+.block-editor-block-visibility-toolbar__icon-group {
+	display: inline-flex;
+	align-items: center;
+}
+
+.block-editor-block-visibility-toolbar__devices {
+	display: inline-flex;
+	align-items: center;
+	margin-left: -4px;
+}

@@ -1,9 +1,10 @@
 /**
  * WordPress dependencies
  */
-import { __, sprintf } from '@wordpress/i18n';
+import { __, sprintf, _n } from '@wordpress/i18n';
 import { MenuItem } from '@wordpress/components';
 import { seen, unseen } from '@wordpress/icons';
+import { useState } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
@@ -11,18 +12,21 @@ import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 /**
  * Internal dependencies
  */
-import { cleanEmptyObject } from '../../hooks/utils';
-import { store as blockEditorStore } from '../../store';
+import BlockVisibilityModal from './modal';
+import useBlockVisibility from './use-block-visibility';
+import { VIEWPORT_LABELS } from './utils';
 
 export default function BlockVisibilityMenuItem( { clientIds } ) {
-	const { updateBlockAttributes } = useDispatch( blockEditorStore );
+	const [ isModalOpen, setIsModalOpen ] = useState( false );
 	const { createSuccessNotice } = useDispatch( noticesStore );
-	const blocks = useSelect(
-		( select ) => {
-			return select( blockEditorStore ).getBlocksByClientId( clientIds );
-		},
-		[ clientIds ]
-	);
+
+	const {
+		blocks,
+		isHidden,
+		viewportType,
+		responsiveEditing,
+		toggleVisibility,
+	} = useBlockVisibility( clientIds );
 
 	const listViewShortcut = useSelect( ( select ) => {
 		return select( keyboardShortcutsStore ).getShortcutRepresentation(
@@ -30,67 +34,81 @@ export default function BlockVisibilityMenuItem( { clientIds } ) {
 		);
 	}, [] );
 
-	const hasHiddenBlock = blocks.some(
-		( block ) => block.attributes.metadata?.blockVisibility === false
-	);
+	const handleToggle = () => {
+		toggleVisibility();
 
-	const toggleBlockVisibility = () => {
-		const isHiding = ! hasHiddenBlock;
+		// Show notice when hiding
+		if ( ! isHidden ) {
+			const viewportLabel = VIEWPORT_LABELS[ viewportType ];
+			const count = blocks.length;
 
-		const attributesByClientId = Object.fromEntries(
-			blocks?.map( ( { clientId, attributes } ) => [
-				clientId,
-				{
-					metadata: cleanEmptyObject( {
-						...attributes?.metadata,
-						blockVisibility: isHiding ? false : undefined,
-					} ),
-				},
-			] )
-		);
-		updateBlockAttributes( clientIds, attributesByClientId, {
-			uniqueByBlock: true,
-		} );
-
-		if ( isHiding ) {
-			if ( blocks.length > 1 ) {
-				createSuccessNotice(
-					sprintf(
-						// translators: %s: The shortcut key to access the List View.
-						__(
-							'Blocks hidden. You can access them via the List View (%s).'
-						),
-						listViewShortcut
+			let message;
+			if ( responsiveEditing ) {
+				message = sprintf(
+					/* translators: 1: Viewport name, 2: List View shortcut. */
+					_n(
+						'Block hidden on %1$s. Access it via List View (%2$s).',
+						'Blocks hidden on %1$s. Access them via List View (%2$s).',
+						count
 					),
-					{
-						id: 'block-visibility-hidden',
-						type: 'snackbar',
-					}
+					viewportLabel,
+					listViewShortcut
 				);
 			} else {
-				createSuccessNotice(
-					sprintf(
-						// translators: %s: The shortcut key to access the List View.
-						__(
-							'Block hidden. You can access it via the List View (%s).'
-						),
-						listViewShortcut
+				message = sprintf(
+					/* translators: %s: List View shortcut. */
+					_n(
+						'Block hidden. Access it via List View (%s).',
+						'Blocks hidden. Access them via List View (%s).',
+						count
 					),
-					{
-						id: 'block-visibility-hidden',
-						type: 'snackbar',
-					}
+					listViewShortcut
 				);
 			}
+
+			createSuccessNotice( message, {
+				id: 'block-visibility-hidden',
+				type: 'snackbar',
+			} );
 		}
 	};
 
+	const handleClick = () => {
+		if ( responsiveEditing ) {
+			handleToggle();
+		} else {
+			setIsModalOpen( true );
+		}
+	};
+
+	let menuLabel;
+	if ( responsiveEditing ) {
+		const labelTemplate = isHidden
+			? /* translators: %s: Viewport name (Desktop, Tablet, or Mobile) */
+			  __( 'Show on %s' )
+			: /* translators: %s: Viewport name (Desktop, Tablet, or Mobile) */
+			  __( 'Hide on %s' );
+		menuLabel = sprintf( labelTemplate, VIEWPORT_LABELS[ viewportType ] );
+	} else {
+		menuLabel = isHidden ? __( 'Show' ) : __( 'Hide' );
+	}
+
 	return (
-		<MenuItem
-			icon={ hasHiddenBlock ? seen : unseen }
-			onClick={ toggleBlockVisibility }
-		>
-			{ hasHiddenBlock ? __( 'Show' ) : __( 'Hide' ) }
-		</MenuItem>
+		<>
+			<MenuItem
+				icon={ isHidden ? seen : unseen }
+				onClick={ handleClick }
+				aria-expanded={ ! responsiveEditing ? isModalOpen : undefined }
+				aria-haspopup={ ! responsiveEditing ? 'dialog' : undefined }
+			>
+				{ menuLabel }
+			</MenuItem>
+			{ isModalOpen && (
+				<BlockVisibilityModal
+					clientId={ clientIds[ 0 ] }
+					onClose={ () => setIsModalOpen( false ) }
+				/>
+			) }
+		</>
 	);
 }
