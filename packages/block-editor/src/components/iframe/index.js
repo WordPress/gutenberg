@@ -27,6 +27,60 @@ import { getCompatibilityStyles } from './get-compatibility-styles';
 import { useScaleCanvas } from './use-scale-canvas';
 import { store as blockEditorStore } from '../../store';
 
+// Shared cache for fetched CSS across all iframe instances
+// This ensures we only fetch each stylesheet once, regardless of how many iframes exist
+const sharedStylesCache = new Map();
+let stylesFetchPromise = null;
+let compatStylesCache = null;
+let compatStylesFetchPromise = null;
+
+// Fetch compatibility styles once and convert to inline CSS
+async function fetchCompatibilityStyles() {
+	if ( compatStylesCache ) {
+		return compatStylesCache;
+	}
+
+	if ( compatStylesFetchPromise ) {
+		return compatStylesFetchPromise;
+	}
+
+	const compatStyles = getCompatibilityStyles();
+	const cssPromises = compatStyles.map( ( element ) => {
+		// If it's already an inline style, just return the CSS
+		if ( element.tagName === 'STYLE' ) {
+			return Promise.resolve( {
+				id: element.id,
+				css: element.textContent,
+			} );
+		}
+
+		// If it's a link, fetch the CSS
+		if ( element.tagName === 'LINK' ) {
+			const href = element.getAttribute( 'href' );
+			return fetch( href )
+				.then( ( response ) => response.text() )
+				.then( ( css ) => ( {
+					id: element.id,
+					css,
+				} ) )
+				.catch( () => ( {
+					id: element.id,
+					css: `/* Failed to load: ${ href } */`,
+				} ) );
+		}
+
+		return Promise.resolve( null );
+	} );
+
+	compatStylesFetchPromise = Promise.all( cssPromises ).then( ( styles ) => {
+		compatStylesCache = styles.filter( Boolean );
+		compatStylesFetchPromise = null;
+		return compatStylesCache;
+	} );
+
+	return compatStylesFetchPromise;
+}
+
 function bubbleEvent( event, Constructor, frame ) {
 	const init = {};
 
@@ -122,23 +176,107 @@ function Iframe( {
 	const clearerRef = useBlockSelectionClearer();
 	const [ before, writingFlowRef, after ] = useWritingFlow();
 
-	// Inject styles into iframe after it loads to avoid duplicate network requests.
-	// This prevents each iframe from making its own requests (about:srcdoc initiator).
+	// Local state to trigger re-render when shared cache is populated
+	const [ cachedStyles, setCachedStyles ] = useState( null );
+
+	// Fetch all stylesheets ONCE using shared cache
 	useEffect( () => {
-		if ( ! iframeDocument || ! styles ) {
+		if ( ! styles ) {
 			return;
 		}
 
+		const cacheKey = styles; // Use styles string as cache key
+
+		// Check if already cached
+		if ( sharedStylesCache.has( cacheKey ) ) {
+			setCachedStyles( sharedStylesCache.get( cacheKey ) );
+			return;
+		}
+
+		// If already fetching, wait for that promise
+		if ( stylesFetchPromise ) {
+			stylesFetchPromise.then( ( cssData ) => {
+				setCachedStyles( cssData );
+			} );
+			return;
+		}
+
+		// Start fetching
 		const tempDiv = document.createElement( 'div' );
 		tempDiv.innerHTML = styles;
-		const styleElements = tempDiv.querySelectorAll( 'link, style' );
+		const linkElements = tempDiv.querySelectorAll(
+			'link[rel="stylesheet"]'
+		);
+		const inlineStyles = tempDiv.querySelectorAll( 'style' );
 
-		// Inject styles into iframe head
-		styleElements.forEach( ( element ) => {
-			const clonedElement = element.cloneNode( true );
-			iframeDocument.head.appendChild( clonedElement );
+		const cssPromises = [];
+
+		// Fetch external stylesheets
+		linkElements.forEach( ( link ) => {
+			const href = link.getAttribute( 'href' );
+			if ( href ) {
+				cssPromises.push(
+					fetch( href )
+						.then( ( response ) => response.text() )
+						.then( ( css ) => ( {
+							type: 'external',
+							href,
+							css,
+							media: link.getAttribute( 'media' ) || 'all',
+							id: link.getAttribute( 'id' ),
+						} ) )
+						.catch( () => ( {
+							type: 'external',
+							href,
+							css: `/* Failed to load: ${ href } */`,
+							media: 'all',
+						} ) )
+				);
+			}
 		} );
-	}, [ iframeDocument, styles ] );
+
+		// Collect inline styles
+		inlineStyles.forEach( ( style ) => {
+			cssPromises.push(
+				Promise.resolve( {
+					type: 'inline',
+					css: style.textContent,
+					id: style.getAttribute( 'id' ),
+				} )
+			);
+		} );
+
+		// Store the promise so other instances can wait
+		stylesFetchPromise = Promise.all( cssPromises ).then( ( cssData ) => {
+			sharedStylesCache.set( cacheKey, cssData );
+			stylesFetchPromise = null;
+			return cssData;
+		} );
+
+		stylesFetchPromise.then( ( cssData ) => {
+			setCachedStyles( cssData );
+		} );
+	}, [ styles ] );
+
+	// Inject cached CSS into each iframe as inline styles
+	useEffect( () => {
+		if ( ! iframeDocument || ! cachedStyles ) {
+			return;
+		}
+
+		// Inject all cached CSS as inline <style> tags
+		cachedStyles.forEach( ( styleData ) => {
+			const styleElement = iframeDocument.createElement( 'style' );
+			if ( styleData.id ) {
+				styleElement.id = styleData.id;
+			}
+			if ( styleData.media && styleData.media !== 'all' ) {
+				styleElement.media = styleData.media;
+			}
+			styleElement.textContent = styleData.css;
+			iframeDocument.head.appendChild( styleElement );
+		} );
+	}, [ iframeDocument, cachedStyles ] );
 
 	const setRef = useRefEffect( ( node ) => {
 		node._load = () => {
@@ -198,23 +336,28 @@ function Iframe( {
 
 			contentDocument.dir = ownerDocument.dir;
 
-			for ( const compatStyle of getCompatibilityStyles() ) {
-				if ( contentDocument.getElementById( compatStyle.id ) ) {
-					continue;
-				}
+			// Fetch and inject compatibility styles as inline CSS to avoid duplicate requests
+			fetchCompatibilityStyles().then( ( compatStyles ) => {
+				compatStyles.forEach( ( { id, css } ) => {
+					if ( contentDocument.getElementById( id ) ) {
+						return;
+					}
 
-				contentDocument.head.appendChild(
-					compatStyle.cloneNode( true )
-				);
+					const styleElement =
+						contentDocument.createElement( 'style' );
+					styleElement.id = id;
+					styleElement.textContent = css;
+					contentDocument.head.appendChild( styleElement );
 
-				if ( ! isPreviewMode ) {
-					// eslint-disable-next-line no-console
-					console.warn(
-						`${ compatStyle.id } was added to the iframe incorrectly. Please use block.json or enqueue_block_assets to add styles to the iframe.`,
-						compatStyle
-					);
-				}
-			}
+					if ( ! isPreviewMode ) {
+						// eslint-disable-next-line no-console
+						console.warn(
+							`${ id } was added to the iframe incorrectly. Please use block.json or enqueue_block_assets to add styles to the iframe.`,
+							styleElement
+						);
+					}
+				} );
+			} );
 
 			iFrameDocument.addEventListener(
 				'dragover',
