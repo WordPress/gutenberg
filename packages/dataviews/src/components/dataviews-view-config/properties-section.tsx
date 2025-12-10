@@ -124,22 +124,6 @@ export function PropertiesSection( {
 			) }
 			<VStack className="dataviews-view-config__properties" spacing={ 0 }>
 				<ItemGroup isBordered isSeparated size="medium">
-					{ visibleLockedFields.map( ( { field, isVisibleFlag } ) => {
-						return (
-							<FieldItem
-								key={ field.id }
-								field={ field }
-								isVisible
-								onToggleVisibility={ () => {
-									onChangeView( {
-										...view,
-										[ isVisibleFlag ]: false,
-									} );
-								} }
-							/>
-						);
-					} ) }
-
 					{ hiddenLockedFields.map( ( { field, isVisibleFlag } ) => {
 						return (
 							<FieldItem
