@@ -70,14 +70,13 @@ export function createUndoManager(): SyncUndoManager {
 			ymap: Y.Map< any >,
 			handlers: Pick< RecordHandlers, 'addUndoMeta' | 'restoreUndoMeta' >
 		): void {
-			yUndoManager.addToScope( ymap );
-
-			const ydoc = ymap.doc;
-
-			if ( ydoc === null ) {
+			if ( ymap.doc === null ) {
 				// Necessary for a type check, but this shouldn't happen.
 				return;
 			}
+
+			const ydoc = ymap.doc;
+			yUndoManager.addToScope( ymap );
 
 			const { addUndoMeta, restoreUndoMeta } = handlers;
 
