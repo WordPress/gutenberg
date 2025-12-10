@@ -62,15 +62,19 @@ function GridItemResizerInner( {
 			const rootBlockClientRect =
 				rootBlockElement.getBoundingClientRect();
 			setEnableSide( {
-				top: blockClientRect.top > rootBlockClientRect.top,
+				top:
+					!! isManualGrid &&
+					blockClientRect.top > rootBlockClientRect.top,
 				bottom: blockClientRect.bottom < rootBlockClientRect.bottom,
-				left: blockClientRect.left > rootBlockClientRect.left,
+				left:
+					!! isManualGrid &&
+					blockClientRect.left > rootBlockClientRect.left,
 				right: blockClientRect.right < rootBlockClientRect.right,
 			} );
 		} );
 		observer.observe( blockElement );
 		return () => observer.disconnect();
-	}, [ blockElement, rootBlockElement ] );
+	}, [ blockElement, rootBlockElement, isManualGrid ] );
 
 	const justification = {
 		right: 'left',
