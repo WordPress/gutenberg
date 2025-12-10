@@ -106,6 +106,11 @@ const LinkControlSearchInput = forwardRef(
 				allowDirectEntry ||
 				( suggestion && Object.keys( suggestion ).length >= 1 )
 			) {
+				// Strip out id, url, kind, and type from the current link to prevent
+				// entity metadata from persisting when switching to a different link type.
+				// For example, when changing from an entity link (kind: 'post-type', type: 'page')
+				// to a custom URL (type: 'link', no kind), we need to ensure the old 'kind'
+				// doesn't carry over. We do want to preserve other properites like title, though.
 				const { id, url, kind, type, ...restLinkProps } =
 					currentLink ?? {};
 				onSelect(
