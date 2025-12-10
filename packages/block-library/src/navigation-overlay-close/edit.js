@@ -43,12 +43,22 @@ export default function NavigationOverlayCloseEdit( {
 			wideSize: layout?.wideSize,
 		},
 	} );
-	const blockProps = useBlockProps( {
-		className: 'wp-block-navigation-overlay-close',
-	} );
-
 	const showIcon = displayMode === 'icon' || displayMode === 'both';
 	const showText = displayMode === 'text' || displayMode === 'both';
+
+	const blockProps = useBlockProps( {
+		className: clsx(
+			'wp-block-navigation-overlay-close',
+			colorProps.className,
+			spacingProps.className,
+			typographyProps.className
+		),
+		style: {
+			...colorProps.style,
+			...spacingProps.style,
+			...typographyProps.style,
+		},
+	} );
 
 	return (
 		<>
@@ -79,39 +89,27 @@ export default function NavigationOverlayCloseEdit( {
 					</ToggleGroupControl>
 				</PanelBody>
 			</InspectorControls>
-			<div { ...blockProps }>
-				<Button
-					className={ clsx(
-						'wp-block-navigation-overlay-close__button',
-						colorProps.className,
-						spacingProps.className,
-						typographyProps.className
-					) }
-					style={ {
-						...colorProps.style,
-						...spacingProps.style,
-						...typographyProps.style,
-					} }
-					icon={ showIcon ? closeIcon : undefined }
-					aria-label={ __( 'Close' ) }
-					__next40pxDefaultSize
-				>
-					{ showText && (
-						<RichText
-							identifier="text"
-							value={ text }
-							onChange={ ( value ) =>
-								setAttributes( { text: value } )
-							}
-							placeholder={ __( 'Close' ) }
-							allowedFormats={ [ 'core/bold', 'core/italic' ] }
-							withoutInteractiveFormatting
-							tagName="span"
-							className="wp-block-navigation-overlay-close__text"
-						/>
-					) }
-				</Button>
-			</div>
+			<Button
+				{ ...blockProps }
+				icon={ showIcon ? closeIcon : undefined }
+				aria-label={ __( 'Close' ) }
+				__next40pxDefaultSize
+			>
+				{ showText && (
+					<RichText
+						identifier="text"
+						value={ text }
+						onChange={ ( value ) =>
+							setAttributes( { text: value } )
+						}
+						placeholder={ __( 'Close' ) }
+						allowedFormats={ [ 'core/bold', 'core/italic' ] }
+						withoutInteractiveFormatting
+						tagName="span"
+						className="wp-block-navigation-overlay-close__text"
+					/>
+				) }
+			</Button>
 		</>
 	);
 }
