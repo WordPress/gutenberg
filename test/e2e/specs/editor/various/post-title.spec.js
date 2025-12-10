@@ -469,7 +469,8 @@ test.describe( 'Post title', () => {
 			} );
 
 			// Type a title
-			await pageTitleField.fill( 'My Title' );
+			const originalTitle = 'My Title';
+			await pageTitleField.fill( originalTitle );
 
 			// Press Enter twice to create an empty block
 			await page.keyboard.press( 'Enter' );
@@ -479,14 +480,17 @@ test.describe( 'Post title', () => {
 			// Focus back on the title in the middle
 			await pageTitleField.focus();
 			await page.keyboard.press( 'Home' );
+			// Move cursor 2 positions to the right (after "My")
 			await page.keyboard.press( 'ArrowRight' );
 			await page.keyboard.press( 'ArrowRight' );
 
 			// Press Delete key (cursor is in middle of "My Title", not at end)
+			// This should delete the space character
 			await page.keyboard.press( 'Delete' );
 
-			// Should just delete a character in title, not affect blocks
-			await expect( pageTitleField ).toHaveText( 'MyTitle' );
+			// Should just delete the space character in title, not affect blocks
+			const expectedTitle = 'MyTitle'; // "My Title" with space removed
+			await expect( pageTitleField ).toHaveText( expectedTitle );
 			await expect.poll( editor.getBlocks ).toMatchObject( [
 				{
 					name: 'core/paragraph',

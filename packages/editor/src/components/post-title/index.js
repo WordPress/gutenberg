@@ -110,6 +110,24 @@ const PostTitle = forwardRef( ( _, forwardedRef ) => {
 		insertDefaultBlock( undefined, undefined, 0 );
 	}
 
+	function handleDeleteAtEndOfTitle() {
+		if ( ! firstBlock ) {
+			return false;
+		}
+
+		// If the first block is an empty default block, remove it.
+		// We don't pass a role parameter to isUnmodifiedDefaultBlock because we want
+		// to check if the block is truly unmodified across all attributes.
+		if ( isUnmodifiedDefaultBlock( firstBlock ) ) {
+			removeBlock( firstBlock.clientId, false );
+			return true;
+		}
+
+		// For now, we only handle the empty default block case.
+		// Future enhancement: merge content from non-empty blocks into title.
+		return false;
+	}
+
 	function onKeyDown( event ) {
 		if ( event.keyCode === ENTER ) {
 			event.preventDefault();
@@ -121,14 +139,8 @@ const PostTitle = forwardRef( ( _, forwardedRef ) => {
 			const { start, end, text } = value;
 			const isAtEnd = start === end && end === text.length;
 
-			if ( isAtEnd && firstBlock ) {
-				// If the first block is an empty default block, remove it
-				if ( isUnmodifiedDefaultBlock( firstBlock ) ) {
-					event.preventDefault();
-					removeBlock( firstBlock.clientId, false );
-				}
-				// For now, we only handle the empty default block case
-				// Future enhancement: merge content from non-empty blocks into title
+			if ( isAtEnd && handleDeleteAtEndOfTitle() ) {
+				event.preventDefault();
 			}
 		}
 	}
