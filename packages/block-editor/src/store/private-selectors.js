@@ -36,7 +36,6 @@ import {
 	reusableBlocksSelectKey,
 	sectionRootClientIdKey,
 } from './private-keys';
-import { hasAnyBreakpointVisibility } from '../components/block-visibility-breakpoints/constants';
 
 const { isContentBlock } = unlock( blocksPrivateApis );
 
@@ -722,11 +721,9 @@ export const isBlockHidden = ( state, clientId ) => {
 	const attributes = state.blocks.attributes.get( clientId );
 	const metadata = attributes?.metadata;
 
-	// Block is hidden if it's hidden everywhere or has any breakpoint visibility set
-	return (
-		metadata?.blockVisibility === false ||
-		hasAnyBreakpointVisibility( metadata?.blockVisibilityBreakpoints )
-	);
+	// Block is hidden only if hidden everywhere (blockVisibility === false)
+	// Breakpoint visibility is handled by CSS classes, not by removing from DOM
+	return metadata?.blockVisibility === false;
 };
 
 /**
