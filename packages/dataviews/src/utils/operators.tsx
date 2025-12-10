@@ -100,7 +100,7 @@ const OPERATORS: {
 		filterText: ( filter: NormalizedFilter, activeElements: Option[] ) => (
 			<FilterText
 				filter={ filter.name }
-				operator="includes"
+				operator={ __( 'includes' ) }
 				value={ activeElements
 					.map( ( element ) => element.label )
 					.join( ', ' ) }
@@ -115,7 +115,7 @@ const OPERATORS: {
 		filterText: ( filter: NormalizedFilter, activeElements: Option[] ) => (
 			<FilterText
 				filter={ filter.name }
-				operator="is none of"
+				operator={ __( 'is none of' ) }
 				value={ activeElements
 					.map( ( element ) => element.label )
 					.join( ', ' ) }
@@ -130,7 +130,7 @@ const OPERATORS: {
 		filterText: ( filter: NormalizedFilter, activeElements: Option[] ) => (
 			<FilterText
 				filter={ filter.name }
-				operator="includes all"
+				operator={ __( 'includes all' ) }
 				value={ activeElements
 					.map( ( element ) => element.label )
 					.join( ', ' ) }
@@ -145,7 +145,7 @@ const OPERATORS: {
 		filterText: ( filter: NormalizedFilter, activeElements: Option[] ) => (
 			<FilterText
 				filter={ filter.name }
-				operator="is none of"
+				operator={ __( 'is none of' ) }
 				value={ activeElements
 					.map( ( element ) => element.label )
 					.join( ', ' ) }
@@ -160,7 +160,7 @@ const OPERATORS: {
 		filterText: ( filter: NormalizedFilter, activeElements: Option[] ) => (
 			<FilterTextBetween
 				filter={ filter.name }
-				operator="between (inc)"
+				operator={ __( 'between (inc)' ) }
 				valueMin={ activeElements[ 0 ].label[ 0 ] }
 				valueMax={ activeElements[ 0 ].label[ 1 ] }
 			/>
@@ -174,7 +174,7 @@ const OPERATORS: {
 		filterText: ( filter: NormalizedFilter, activeElements: Option[] ) => (
 			<FilterText
 				filter={ filter.name }
-				operator="is in the past"
+				operator={ __( 'is in the past' ) }
 				value={ `${ activeElements[ 0 ].value.value } ${ activeElements[ 0 ].value.unit }` }
 			/>
 		),
@@ -187,7 +187,7 @@ const OPERATORS: {
 		filterText: ( filter: NormalizedFilter, activeElements: Option[] ) => (
 			<FilterText
 				filter={ filter.name }
-				operator="is over"
+				operator={ __( 'is over' ) }
 				value={ `${ activeElements[ 0 ].value.value } ${ activeElements[ 0 ].value.unit }` }
 			/>
 		),
@@ -200,7 +200,7 @@ const OPERATORS: {
 		filterText: ( filter: NormalizedFilter, activeElements: Option[] ) => (
 			<FilterText
 				filter={ filter.name }
-				operator="is"
+				operator={ __( 'is' ) }
 				value={ activeElements[ 0 ].label }
 			/>
 		),
@@ -213,7 +213,7 @@ const OPERATORS: {
 		filterText: ( filter: NormalizedFilter, activeElements: Option[] ) => (
 			<FilterText
 				filter={ filter.name }
-				operator="is not"
+				operator={ __( 'is not' ) }
 				value={ activeElements[ 0 ].label }
 			/>
 		),
@@ -226,7 +226,7 @@ const OPERATORS: {
 		filterText: ( filter: NormalizedFilter, activeElements: Option[] ) => (
 			<FilterText
 				filter={ filter.name }
-				operator="is less than"
+				operator={ __( 'is less than' ) }
 				value={ activeElements[ 0 ].label }
 			/>
 		),
@@ -239,7 +239,7 @@ const OPERATORS: {
 		filterText: ( filter: NormalizedFilter, activeElements: Option[] ) => (
 			<FilterText
 				filter={ filter.name }
-				operator="is greater than"
+				operator={ __( 'is greater than' ) }
 				value={ activeElements[ 0 ].label }
 			/>
 		),
@@ -252,7 +252,7 @@ const OPERATORS: {
 		filterText: ( filter: NormalizedFilter, activeElements: Option[] ) => (
 			<FilterText
 				filter={ filter.name }
-				operator="is less than or equal to"
+				operator={ __( 'is less than or equal to' ) }
 				value={ activeElements[ 0 ].label }
 			/>
 		),
@@ -265,7 +265,7 @@ const OPERATORS: {
 		filterText: ( filter: NormalizedFilter, activeElements: Option[] ) => (
 			<FilterText
 				filter={ filter.name }
-				operator="is greater than or equal to"
+				operator={ __( 'is greater than or equal to' ) }
 				value={ activeElements[ 0 ].label }
 			/>
 		),
@@ -278,7 +278,7 @@ const OPERATORS: {
 		filterText: ( filter: NormalizedFilter, activeElements: Option[] ) => (
 			<FilterText
 				filter={ filter.name }
-				operator="is before"
+				operator={ __( 'is before' ) }
 				value={ activeElements[ 0 ].label }
 			/>
 		),
@@ -291,7 +291,7 @@ const OPERATORS: {
 		filterText: ( filter: NormalizedFilter, activeElements: Option[] ) => (
 			<FilterText
 				filter={ filter.name }
-				operator="is after"
+				operator={ __( 'is after' ) }
 				value={ activeElements[ 0 ].label }
 			/>
 		),
@@ -304,7 +304,7 @@ const OPERATORS: {
 		filterText: ( filter: NormalizedFilter, activeElements: Option[] ) => (
 			<FilterText
 				filter={ filter.name }
-				operator="is on or before"
+				operator={ __( 'is on or before' ) }
 				value={ activeElements[ 0 ].label }
 			/>
 		),
@@ -317,7 +317,7 @@ const OPERATORS: {
 		filterText: ( filter: NormalizedFilter, activeElements: Option[] ) => (
 			<FilterText
 				filter={ filter.name }
-				operator="is on or after"
+				operator={ __( 'is on or after' ) }
 				value={ activeElements[ 0 ].label }
 			/>
 		),
@@ -330,7 +330,7 @@ const OPERATORS: {
 		filterText: ( filter: NormalizedFilter, activeElements: Option[] ) => (
 			<FilterText
 				filter={ filter.name }
-				operator="contains"
+				operator={ __( 'contains' ) }
 				value={ activeElements[ 0 ].label }
 			/>
 		),
@@ -343,7 +343,7 @@ const OPERATORS: {
 		filterText: ( filter: NormalizedFilter, activeElements: Option[] ) => (
 			<FilterText
 				filter={ filter.name }
-				operator="doesn't contain"
+				operator={ __( "doesn't contain" ) }
 				value={ activeElements[ 0 ].label }
 			/>
 		),
@@ -356,7 +356,7 @@ const OPERATORS: {
 		filterText: ( filter: NormalizedFilter, activeElements: Option[] ) => (
 			<FilterText
 				filter={ filter.name }
-				operator="starts with"
+				operator={ __( 'starts with' ) }
 				value={ activeElements[ 0 ].label }
 			/>
 		),
@@ -369,7 +369,7 @@ const OPERATORS: {
 		filterText: ( filter: NormalizedFilter, activeElements: Option[] ) => (
 			<FilterText
 				filter={ filter.name }
-				operator="is"
+				operator={ __( 'is' ) }
 				value={ activeElements[ 0 ].label }
 			/>
 		),
@@ -382,7 +382,7 @@ const OPERATORS: {
 		filterText: ( filter: NormalizedFilter, activeElements: Option[] ) => (
 			<FilterText
 				filter={ filter.name }
-				operator="is not"
+				operator={ __( 'is not' ) }
 				value={ activeElements[ 0 ].label }
 			/>
 		),
