@@ -31,6 +31,7 @@ import {
 } from './utils';
 import { STORE_NAME } from './constants';
 import { unlock } from '../lock-unlock';
+import { hasAnyBreakpointVisibility } from '../components/block-visibility-breakpoints/constants';
 import {
 	selectBlockPatternsKey,
 	reusableBlocksSelectKey,
@@ -721,9 +722,12 @@ export const isBlockHidden = ( state, clientId ) => {
 	const attributes = state.blocks.attributes.get( clientId );
 	const metadata = attributes?.metadata;
 
-	// Block is hidden only if hidden everywhere (blockVisibility === false)
-	// Breakpoint visibility is handled by CSS classes, not by removing from DOM
-	return metadata?.blockVisibility === false;
+	// Block has visibility restrictions if it's hidden everywhere OR has any breakpoint visibility set
+	// This is used for the list view icon
+	return (
+		metadata?.blockVisibility === false ||
+		hasAnyBreakpointVisibility( metadata?.blockVisibilityBreakpoints )
+	);
 };
 
 /**

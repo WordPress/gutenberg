@@ -821,8 +821,12 @@ function BlockListBlockProvider( props ) {
 		bindableAttributes,
 	};
 
+	// Only remove blocks from DOM if hidden everywhere (not for breakpoint visibility)
+	// Breakpoint visibility is handled by CSS classes
+	const isHiddenEverywhere = attributes?.metadata?.blockVisibility === false;
+
 	if (
-		isBlockHidden &&
+		isHiddenEverywhere &&
 		! isSelected &&
 		! isMultiSelected &&
 		! hasChildSelected
