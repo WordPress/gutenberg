@@ -9,12 +9,7 @@ import clsx from 'clsx';
 import { useContext } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { __unstableGetBlockProps as getBlockProps } from '@wordpress/blocks';
-import {
-	useMergeRefs,
-	useDisabled,
-	useViewportMatch,
-} from '@wordpress/compose';
-import { useSelect } from '@wordpress/data';
+import { useMergeRefs, useDisabled } from '@wordpress/compose';
 import warning from '@wordpress/warning';
 
 /**
@@ -35,7 +30,7 @@ import { useIntersectionObserver } from './use-intersection-observer';
 import { useScrollIntoView } from './use-scroll-into-view';
 import { useFlashEditableBlocks } from '../../use-flash-editable-blocks';
 import { useFirefoxDraggableCompatibility } from './use-firefox-draggable-compatibility';
-import { store as blockEditorStore } from '../../../store';
+import { usePreviewBreakpoint } from './use-preview-breakpoint';
 
 /**
  * This hook is used to lightly mark an element as a block element. The element
@@ -143,41 +138,9 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		  }
 		: {};
 
-	// Get visibility settings from block attributes
-	const { blockVisibility, breakpointVisibility } = useSelect(
-		( select ) => {
-			const block = select( blockEditorStore ).getBlock( clientId );
-			const metadata = block?.attributes?.metadata;
-			return {
-				blockVisibility: metadata?.blockVisibility,
-				breakpointVisibility: metadata?.blockVisibilityBreakpoints,
-			};
-		},
-		[ clientId ]
-	);
-
-	// Detect current viewport - all hooks must be called unconditionally
-	const isSmallOrLarger = useViewportMatch( 'small', '>=' ); // >= 600px
-	const isLargeOrLarger = useViewportMatch( 'large', '>=' ); // >= 960px
-	const isMobileViewport = ! isSmallOrLarger; // < 600px
-	const isTabletViewport = isSmallOrLarger && ! isLargeOrLarger; // 600px - 960px
-	const isDesktopViewport = isLargeOrLarger; // >= 960px
-
-	// Only apply is-block-hidden class if hidden everywhere (not for breakpoint visibility)
-	// Breakpoint visibility is handled by specific classes below
-	const isHiddenEverywhere = blockVisibility === false;
-
-	// Determine which breakpoint classes to apply based on current viewport
-	const breakpointClasses = breakpointVisibility
-		? {
-				'wp-block-hidden-mobile':
-					breakpointVisibility.mobile && isMobileViewport,
-				'wp-block-hidden-tablet':
-					breakpointVisibility.tablet && isTabletViewport,
-				'wp-block-hidden-desktop':
-					breakpointVisibility.desktop && isDesktopViewport,
-		  }
-		: {};
+	// Get visibility classes and state based on breakpoint visibility settings
+	const { breakpointClasses, isHiddenEverywhere } =
+		usePreviewBreakpoint( clientId );
 
 	// Ensures it warns only inside the `edit` implementation for the block.
 	if ( blockApiVersion < 2 && clientId === blockEditContext.clientId ) {
