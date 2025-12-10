@@ -45,7 +45,8 @@ type DTCGDocument = Record< string, DTCGGroup >;
 
 interface ModeOverride {
 	path: string[];
-	value: DTCGValue;
+	$value: DTCGValue;
+	$type?: string;
 }
 
 /**
@@ -90,13 +91,18 @@ function setNestedValue(
  *
  * @param object      - The DTCG group to extract from.
  * @param currentPath - The current path in the token tree.
+ * @param currentType - The $type inherited from parent groups.
  * @return A map of mode names to their token overrides.
  */
-function extractModeOverrides(
+function getModeOverrides(
 	object: DTCGGroup,
-	currentPath: string[] = []
+	currentPath: string[] = [],
+	currentType?: string
 ): Map< string, ModeOverride[] > {
 	const modeOverrides = new Map< string, ModeOverride[] >();
+
+	// Check if this group defines a $type that should be inherited by children
+	const groupType = object.$type ?? currentType;
 
 	for ( const [ key, value ] of Object.entries( object ) ) {
 		// Skip DTCG metadata keys
@@ -115,17 +121,20 @@ function extractModeOverrides(
 						...( modeOverrides.get( mode ) ?? [] ),
 						{
 							path: [ ...currentPath, key ],
-							value: modeValue,
+							$value: modeValue,
+							$type: node.$type ?? groupType,
 						},
 					] );
 				}
 			}
 		} else {
-			// Recurse into nested groups
-			const childOverrides = extractModeOverrides( node, [
-				...currentPath,
-				key,
-			] );
+			// Recurse into nested groups, passing down the type
+			const nextPath = [ ...currentPath, key ];
+			const childOverrides = getModeOverrides(
+				node,
+				nextPath,
+				groupType
+			);
 
 			// Merge child results
 			for ( const [ mode, overrides ] of childOverrides ) {
@@ -168,14 +177,15 @@ export default function pluginModeOverrides(): Plugin {
 				}
 
 				// Extract mode overrides from this file
-				const fileOverrides = extractModeOverrides( document );
+				const fileOverrides = getModeOverrides( document );
 
 				// Generate a DTCG file for each mode found in this source file
 				for ( const [ mode, overrides ] of fileOverrides ) {
 					const output: Record< string, unknown > = {};
 
-					for ( const { path: tokenPath, value } of overrides ) {
-						setNestedValue( output, tokenPath, { $value: value } );
+					for ( const override of overrides ) {
+						const { path, $value, $type } = override;
+						setNestedValue( output, path, { $type, $value } );
 					}
 
 					// Output as {basename}.{mode}.json (e.g., dimension.compact.json)
