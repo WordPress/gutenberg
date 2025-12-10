@@ -29,7 +29,7 @@
 			"import": "./build-module/index.js",
 			"require": "./build/index.js"
 		},
-		"./babel-plugin": "./babel-plugin.js",
+		"./babel-plugin": "./babel-plugin.cjs",
 		"./build-module/*": "./build-module/*",
 		"./build-style/*": "./build-style/*",
 		"./package.json": "./package.json"

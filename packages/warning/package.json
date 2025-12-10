@@ -31,7 +31,7 @@
 			"require": "./build/index.js"
 		},
 		"./package.json": "./package.json",
-		"./babel-plugin": "./babel-plugin.js"
+		"./babel-plugin": "./babel-plugin.cjs"
 	},
 	"react-native": "src/index",
 	"wpScript": true,
