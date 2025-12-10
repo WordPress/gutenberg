@@ -8,7 +8,7 @@
 /**
  * Registers the navigation overlay close block.
  *
- * @since X.X.X
+ * @since 7.0.0
  */
 function register_block_core_navigation_overlay_close() {
 	register_block_type_from_metadata(
