@@ -1521,7 +1521,7 @@
 				},
 				"neutral-disabled": {
 					"$value": "{wpds-color.primitive.bg.stroke2}",
-					"$description": "Accessible stroke color used for interactive neutrally-toned elements with normal emphasis, in their disabled state."
+					"$description": "Accessible stroke color used for interactive neutrally-toned elements with normal emphasis, in their disabled state"
 				},
 				"neutral-strong": {
 					"$value": "{wpds-color.primitive.bg.stroke4}",
