@@ -1,19 +1,10 @@
 /**
- * External dependencies
- */
-import clsx from 'clsx';
-
-/**
  * WordPress dependencies
  */
 import {
 	InspectorControls,
 	useBlockProps,
 	RichText,
-	__experimentalUseColorProps as useColorProps,
-	__experimentalGetSpacingClassesAndStyles as useSpacingProps,
-	getTypographyClassesAndStyles as useTypographyProps,
-	useSettings,
 } from '@wordpress/block-editor';
 import {
 	PanelBody,
@@ -29,35 +20,11 @@ export default function NavigationOverlayCloseEdit( {
 	setAttributes,
 } ) {
 	const { displayMode, text } = attributes;
-	const colorProps = useColorProps( attributes );
-	const spacingProps = useSpacingProps( attributes );
-	const [ fluidTypographySettings, layout ] = useSettings(
-		'typography.fluid',
-		'layout'
-	);
-	const typographyProps = useTypographyProps( attributes, {
-		typography: {
-			fluid: fluidTypographySettings,
-		},
-		layout: {
-			wideSize: layout?.wideSize,
-		},
-	} );
 	const showIcon = displayMode === 'icon' || displayMode === 'both';
 	const showText = displayMode === 'text' || displayMode === 'both';
 
 	const blockProps = useBlockProps( {
-		className: clsx(
-			'wp-block-navigation-overlay-close',
-			colorProps.className,
-			spacingProps.className,
-			typographyProps.className
-		),
-		style: {
-			...colorProps.style,
-			...spacingProps.style,
-			...typographyProps.style,
-		},
+		className: 'wp-block-navigation-overlay-close',
 	} );
 
 	return (

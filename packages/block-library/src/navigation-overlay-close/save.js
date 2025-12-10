@@ -1,41 +1,17 @@
 /**
- * External dependencies
- */
-import clsx from 'clsx';
-
-/**
  * WordPress dependencies
  */
-import {
-	useBlockProps,
-	RichText,
-	__experimentalGetColorClassesAndStyles as getColorClassesAndStyles,
-	__experimentalGetSpacingClassesAndStyles as getSpacingClassesAndStyles,
-	getTypographyClassesAndStyles,
-} from '@wordpress/block-editor';
+import { useBlockProps, RichText } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 
 export default function NavigationOverlayCloseSave( { attributes } ) {
 	const { displayMode, text } = attributes;
-	const colorProps = getColorClassesAndStyles( attributes );
-	const spacingProps = getSpacingClassesAndStyles( attributes );
-	const typographyProps = getTypographyClassesAndStyles( attributes );
-
 	const showIcon = displayMode === 'icon' || displayMode === 'both';
 	const showText = displayMode === 'text' || displayMode === 'both';
 
+	// eslint-disable-next-line react-compiler/react-compiler
 	const blockProps = useBlockProps.save( {
-		className: clsx(
-			'wp-block-navigation-overlay-close',
-			colorProps.className,
-			spacingProps.className,
-			typographyProps.className
-		),
-		style: {
-			...colorProps.style,
-			...spacingProps.style,
-			...typographyProps.style,
-		},
+		className: 'wp-block-navigation-overlay-close',
 	} );
 
 	return (

@@ -23,7 +23,6 @@
 	"supports": {
 		"anchor": true,
 		"color": {
-			"__experimentalSkipSerialization": true,
 			"gradients": false,
 			"__experimentalDefaultControls": {
 				"background": true,
@@ -31,14 +30,12 @@
 			}
 		},
 		"spacing": {
-			"__experimentalSkipSerialization": true,
 			"padding": true,
 			"__experimentalDefaultControls": {
 				"padding": true
 			}
 		},
 		"typography": {
-			"__experimentalSkipSerialization": true,
 			"fontSize": true,
 			"lineHeight": true,
 			"__experimentalFontFamily": true,
