@@ -394,7 +394,7 @@ describe( 'OverlayTemplatePartSelector', () => {
 			render( <OverlayTemplatePartSelector { ...defaultProps } /> );
 
 			expect(
-				screen.getByText( 'No overlays found. Create one?' )
+				screen.getByText( 'No overlays found.' )
 			).toBeInTheDocument();
 		} );
 

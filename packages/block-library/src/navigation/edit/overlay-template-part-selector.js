@@ -104,6 +104,20 @@ export default function OverlayTemplatePartSelector( {
 		return parseTemplatePartId( overlay );
 	}, [ overlay ] );
 
+	// Find the selected template part to get its title
+	const selectedTemplatePart = useMemo( () => {
+		if ( ! overlay || ! overlayTemplateParts ) {
+			return null;
+		}
+		return overlayTemplateParts.find( ( templatePart ) => {
+			const templatePartId = createTemplatePartId(
+				templatePart.theme,
+				templatePart.slug
+			);
+			return templatePartId === overlay;
+		} );
+	}, [ overlay, overlayTemplateParts ] );
+
 	const handleSelectChange = ( value ) => {
 		setAttributes( {
 			overlay: value || undefined,
@@ -149,7 +163,7 @@ export default function OverlayTemplatePartSelector( {
 				accessibleWhenDisabled
 				help={
 					overlayTemplateParts.length === 0 && hasResolved
-						? __( 'No overlays found. Create one?' )
+						? __( 'No overlays found.' )
 						: __( 'Select an overlay to use for the navigation.' )
 				}
 			/>
@@ -161,11 +175,16 @@ export default function OverlayTemplatePartSelector( {
 					disabled={ isEditButtonDisabled }
 					accessibleWhenDisabled
 					aria-label={
-						parsedTemplatePart
+						selectedTemplatePart
 							? sprintf(
-									/* translators: %s: Overlay title or slug. */
+									/* translators: %s: Overlay title. */
 									__( 'Edit overlay: %s' ),
-									overlay
+									selectedTemplatePart.title?.rendered
+										? decodeEntities(
+												selectedTemplatePart.title
+													.rendered
+										  )
+										: selectedTemplatePart.slug
 							  )
 							: __( 'Edit overlay' )
 					}
