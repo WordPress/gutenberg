@@ -315,7 +315,12 @@ const AnimatedContainer = ( {
 };
 
 const BlockInspectorSingleBlock = ( {
+	// The block that is displayed in the inspector. This is the block whose
+	// controls and information are shown to the user.
 	renderedBlockClientId,
+	// The actual block that is selected in the editor. This may or may not
+	// be the same as the rendered block (e.g., when a child block is selected
+	// but its parent section block is the main one rendered in the inspector).
 	selectedBlockClientId,
 	blockName,
 	isSectionBlock,
