@@ -34,6 +34,43 @@ let stylesFetchPromise = null;
 let compatStylesCache = null;
 let compatStylesFetchPromise = null;
 
+// URL-level cache to prevent fetching the same CSS file twice
+// even if it appears in both resolvedAssets and compatibility styles
+const cssUrlCache = new Map();
+const cssUrlFetchPromises = new Map();
+
+// Fetch a single CSS file with caching
+function fetchCssFile( href ) {
+	// Check if already cached
+	if ( cssUrlCache.has( href ) ) {
+		return Promise.resolve( cssUrlCache.get( href ) );
+	}
+
+	// Check if already fetching
+	if ( cssUrlFetchPromises.has( href ) ) {
+		return cssUrlFetchPromises.get( href );
+	}
+
+	// Start fetching
+	const fetchPromise = fetch( href )
+		.then( ( response ) => response.text() )
+		.then( ( css ) => {
+			const processedCss = makeUrlsAbsolute( css, href );
+			cssUrlCache.set( href, processedCss );
+			cssUrlFetchPromises.delete( href );
+			return processedCss;
+		} )
+		.catch( () => {
+			const fallbackCss = `/* Failed to load: ${ href } */`;
+			cssUrlCache.set( href, fallbackCss );
+			cssUrlFetchPromises.delete( href );
+			return fallbackCss;
+		} );
+
+	cssUrlFetchPromises.set( href, fetchPromise );
+	return fetchPromise;
+}
+
 // Convert relative URLs in CSS to absolute URLs
 function makeUrlsAbsolute( css, baseUrl ) {
 	// Match url() in CSS and make them absolute
@@ -83,19 +120,13 @@ async function fetchCompatibilityStyles() {
 			} );
 		}
 
-		// If it's a link, fetch the CSS
+		// If it's a link, fetch the CSS using shared cache
 		if ( element.tagName === 'LINK' ) {
 			const href = element.getAttribute( 'href' );
-			return fetch( href )
-				.then( ( response ) => response.text() )
-				.then( ( css ) => ( {
-					id: element.id,
-					css: makeUrlsAbsolute( css, href ),
-				} ) )
-				.catch( () => ( {
-					id: element.id,
-					css: `/* Failed to load: ${ href } */`,
-				} ) );
+			return fetchCssFile( href ).then( ( css ) => ( {
+				id: element.id,
+				css,
+			} ) );
 		}
 
 		return Promise.resolve( null );
@@ -240,26 +271,18 @@ function Iframe( {
 
 		const cssPromises = [];
 
-		// Fetch external stylesheets
+		// Fetch external stylesheets using shared cache
 		linkElements.forEach( ( link ) => {
 			const href = link.getAttribute( 'href' );
 			if ( href ) {
 				cssPromises.push(
-					fetch( href )
-						.then( ( response ) => response.text() )
-						.then( ( css ) => ( {
-							type: 'external',
-							href,
-							css: makeUrlsAbsolute( css, href ),
-							media: link.getAttribute( 'media' ) || 'all',
-							id: link.getAttribute( 'id' ),
-						} ) )
-						.catch( () => ( {
-							type: 'external',
-							href,
-							css: `/* Failed to load: ${ href } */`,
-							media: 'all',
-						} ) )
+					fetchCssFile( href ).then( ( css ) => ( {
+						type: 'external',
+						href,
+						css,
+						media: link.getAttribute( 'media' ) || 'all',
+						id: link.getAttribute( 'id' ),
+					} ) )
 				);
 			}
 		} );
