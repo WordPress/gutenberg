@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { RichText } from '@wordpress/block-editor';
-import { createBlock } from '@wordpress/blocks';
+import { createBlock, switchToBlockType } from '@wordpress/blocks';
 
 const transforms = {
 	from: [
@@ -132,51 +132,32 @@ const transforms = {
 			type: 'block',
 			blocks: [ 'core/verse' ],
 			isMatch: ( {}, block ) => {
-				return block.innerBlocks.every(
-					( { name } ) =>
-						name === 'core/paragraph' ||
-						name === 'core/heading' ||
-						name === 'core/list' ||
-						name === 'core/verse'
-				);
+				return block.innerBlocks.every( ( innerBlock ) => {
+					// Paragraphs are already in the target format
+					if ( innerBlock.name === 'core/paragraph' ) {
+						return true;
+					}
+					// Check if other blocks can be converted to paragraphs
+					const converted = switchToBlockType(
+						innerBlock,
+						'core/paragraph'
+					);
+					return converted !== null;
+				} );
 			},
 			transform: ( {}, innerBlocks ) => {
-				// Helper function to extract content from list items
-				const getListContent = ( listItemBlocks ) => {
-					return listItemBlocks.flatMap(
-						( {
-							name,
-							attributes,
-							innerBlocks: nestedBlocks = [],
-						} ) => {
-							if ( name === 'core/list-item' ) {
-								return [
-									attributes.content,
-									...getListContent( nestedBlocks ),
-								];
-							}
-							return getListContent( nestedBlocks );
-						}
+				const paragraphs = innerBlocks.flatMap( ( innerBlock ) => {
+					// If already a paragraph, use it directly
+					if ( innerBlock.name === 'core/paragraph' ) {
+						return innerBlock;
+					}
+					// Otherwise convert to paragraph
+					return (
+						switchToBlockType( innerBlock, 'core/paragraph' ) || []
 					);
-				};
-
-				const content = innerBlocks
-					.map(
-						( {
-							attributes,
-							name,
-							innerBlocks: childBlocks = [],
-						} ) => {
-							// Handle list blocks - extract text from list items
-							if ( name === 'core/list' ) {
-								return getListContent( childBlocks )
-									.filter( Boolean )
-									.join( '<br>' );
-							}
-							// Handle paragraph, heading, and verse blocks
-							return attributes.content || '';
-						}
-					)
+				} );
+				const content = paragraphs
+					.map( ( { attributes } ) => attributes.content || '' )
 					.filter( Boolean )
 					.join( '<br>' );
 				return createBlock( 'core/verse', { content } );

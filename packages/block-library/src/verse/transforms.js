@@ -20,15 +20,6 @@ const transforms = {
 			transform: ( attributes ) =>
 				createBlock( 'core/paragraph', attributes ),
 		},
-		{
-			type: 'block',
-			blocks: [ 'core/quote' ],
-			priority: 10,
-			transform: ( { content } ) =>
-				createBlock( 'core/quote', {}, [
-					createBlock( 'core/paragraph', { content } ),
-				] ),
-		},
 	],
 };
 
