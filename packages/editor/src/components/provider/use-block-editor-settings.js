@@ -127,6 +127,8 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		userPatternCategories,
 		restBlockPatternCategories,
 		sectionRootClientId,
+		deviceType,
+		responsiveEditing,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -140,6 +142,8 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 			const { getBlockTypes } = select( blocksStore );
 			const { getBlocksByName, getBlockAttributes } =
 				select( blockEditorStore );
+			const { getDeviceType, isResponsiveEditing } =
+				select( editorStore );
 			const siteSettings = canUser( 'read', {
 				kind: 'root',
 				name: 'site',
@@ -191,6 +195,8 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 				userPatternCategories: getUserPatternCategories(),
 				restBlockPatternCategories: getBlockPatternCategories(),
 				sectionRootClientId: getSectionRootBlock(),
+				deviceType: getDeviceType(),
+				responsiveEditing: isResponsiveEditing(),
 			};
 		},
 		[ postType, postId, isLargeViewport, renderingMode ]
@@ -348,6 +354,8 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 				renderingMode === 'post-only' && postType !== 'wp_template'
 					? 'edit'
 					: undefined,
+			__experimentalDeviceType: deviceType,
+			__experimentalResponsiveEditing: responsiveEditing,
 		};
 
 		return blockEditorSettings;
@@ -377,6 +385,8 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		globalStylesLinksData,
 		renderingMode,
 		editMediaEntity,
+		deviceType,
+		responsiveEditing,
 	] );
 }
 

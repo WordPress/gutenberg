@@ -1358,6 +1358,18 @@ export const getDeviceType = createRegistrySelector(
 );
 
 /**
+ * Returns whether device-specific editing mode is enabled.
+ * When enabled, changes to styles and block visibility apply only to the current device.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} Whether device-specific editing is enabled.
+ */
+export function isResponsiveEditing( state ) {
+	return state.responsiveEditing;
+}
+
+/**
  * Returns true if the list view is opened.
  *
  * @param {Object} state Global application state.

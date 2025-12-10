@@ -774,6 +774,21 @@ export function setDeviceType( deviceType ) {
 }
 
 /**
+ * Action that enables or disables device-specific editing mode.
+ * When enabled, changes to styles and block visibility apply only to the current device.
+ *
+ * @param {boolean} enabled Whether device-specific editing is enabled.
+ *
+ * @return {Object} Action object.
+ */
+export function setResponsiveEditing( enabled ) {
+	return {
+		type: 'SET_RESPONSIVE_EDITING',
+		enabled,
+	};
+}
+
+/**
  * Returns an action object used to enable or disable a panel in the editor.
  *
  * @param {string} panelName A string that identifies the panel to enable or disable.

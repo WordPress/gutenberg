@@ -294,6 +294,24 @@ export function deviceType( state = 'Desktop', action ) {
 }
 
 /**
+ * Reducer returning whether device-specific editing mode is enabled.
+ * When enabled, changes to styles and block visibility apply only to the current device.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {boolean} Updated state.
+ */
+export function responsiveEditing( state = false, action ) {
+	switch ( action.type ) {
+		case 'SET_RESPONSIVE_EDITING':
+			return action.enabled;
+	}
+
+	return state;
+}
+
+/**
  * Reducer storing the list of all programmatically removed panels.
  *
  * @param {Array}  state  Current state.
@@ -446,6 +464,7 @@ export default combineReducers( {
 	postAutosavingLock,
 	renderingMode,
 	deviceType,
+	responsiveEditing,
 	removedPanels,
 	blockInserterPanel,
 	inserterSidebarToggleRef,
