@@ -69,8 +69,6 @@ export interface YPostRecord extends YMapRecord {
 	tags: number[];
 	template: string;
 	title: string;
-	enforcedMode: string;
-	enforcedModeOwner: number;
 }
 
 // Properties that are allowed to be synced for a post.
