@@ -429,7 +429,7 @@ const getGlobalStylesOpenCssCommands = () =>
 			return [
 				{
 					name: 'core/open-styles-css',
-					label: __( 'Open custom CSS' ),
+					label: __( 'Open Additional CSS' ),
 					icon: brush,
 					callback: ( { close } ) => {
 						close();
@@ -446,6 +446,7 @@ const getGlobalStylesOpenCssCommands = () =>
 							);
 						}
 					},
+					keywords: [ __( 'Custom CSS' ) ],
 				},
 			];
 		}, [ history, canEditCSS, isSiteEditor ] );
