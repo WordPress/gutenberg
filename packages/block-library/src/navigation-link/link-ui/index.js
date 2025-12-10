@@ -154,6 +154,7 @@ function UnforwardedLinkUI( props, ref ) {
 						onRemove={ props.onRemove }
 						onCancel={ props.onCancel }
 						handleEntities={ isBoundEntityAvailable }
+						forceIsEditingLink={ link?.url ? false : undefined }
 						renderControlBottom={ () => {
 							// Don't show the tools when there is submitted link (preview state).
 							if ( link?.url?.length ) {
