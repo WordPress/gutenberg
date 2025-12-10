@@ -433,6 +433,7 @@ class WP_Theme_JSON_Gutenberg {
 			'button'           => null,
 			'caption'          => null,
 			'palette'          => null,
+			'paragraph'        => null,
 			'text'             => null,
 		),
 		'custom'                        => null,
@@ -631,7 +632,7 @@ class WP_Theme_JSON_Gutenberg {
 	 *
 	 * @since 5.8.0
 	 * @since 6.1.0 Added `heading`, `button`, and `caption` elements.
-	 * @since 7.0.0 Added `text` property.
+	 * @since 7.X.0 Added `paragraph` element.
 	 * @var string[]
 	 */
 	const ELEMENTS = array(
@@ -648,6 +649,7 @@ class WP_Theme_JSON_Gutenberg {
 		// The block classes are necessary to target older content that won't use the new class names.
 		'caption'   => '.wp-element-caption, .wp-block-audio figcaption, .wp-block-embed figcaption, .wp-block-gallery figcaption, .wp-block-image figcaption, .wp-block-table figcaption, .wp-block-video figcaption',
 		'cite'      => 'cite',
+		'paragraph' => 'p',
 		'select'    => 'select',
 		'textInput' => 'textarea, input:where([type=email],[type=number],[type=password],[type=search],[type=text],[type=tel],[type=url])',
 	);
@@ -3127,12 +3129,12 @@ class WP_Theme_JSON_Gutenberg {
 			$declarations = static::update_separator_declarations( $declarations );
 		}
 
-		// Handle text-indent for paragraph blocks and text element: extract it and generate p + p selector.
+		// Handle text-indent for paragraph blocks and paragraph element: extract it and generate p + p selector.
 		$text_indent_declarations = array();
 		$is_processing_element    = in_array( 'elements', $block_metadata['path'], true );
 		$current_element          = $is_processing_element ? $block_metadata['path'][ count( $block_metadata['path'] ) - 1 ] : null;
 		$should_use_p_plus_p      = ( ! empty( $block_metadata['name'] ) && 'core/paragraph' === $block_metadata['name'] ) ||
-									( 'text' === $current_element );
+									( 'paragraph' === $current_element );
 
 		if ( $should_use_p_plus_p ) {
 			foreach ( $declarations as $index => $declaration ) {
@@ -3173,7 +3175,7 @@ class WP_Theme_JSON_Gutenberg {
 			$block_rules .= static::to_ruleset( $block_metadata['duotone'], $declarations_duotone );
 		}
 
-		// 3a. Generate and append text-indent rules for paragraph blocks using p + p selector.
+		// 3a. Generate and append text-indent rules for paragraph blocks and paragraph element using p + p selector.
 		if ( ! empty( $text_indent_declarations ) ) {
 			$block_rules .= static::to_ruleset( 'p + p', $text_indent_declarations );
 		}

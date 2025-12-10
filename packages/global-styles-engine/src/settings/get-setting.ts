@@ -32,6 +32,7 @@ const VALID_SETTINGS = [
 	'color.heading',
 	'color.link',
 	'color.palette',
+	'color.paragraph',
 	'color.text',
 	'custom',
 	'dimensions.aspectRatio',

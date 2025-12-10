@@ -6704,4 +6704,219 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$this->assertSame( 'string-value', $settings['appearanceTools'] );
 		$this->assertSame( array( 'nested' => 'value' ), $settings['custom'] );
 	}
+
+	/**
+	 * Test that the paragraph element generates the correct p + p selector for text-indent.
+	 *
+	 * @covers WP_Theme_JSON_Gutenberg::get_styles_for_block
+	 */
+	public function test_paragraph_element_generates_p_plus_p_selector_for_text_indent() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'  => array(
+					'elements' => array(
+						'paragraph' => array(
+							'typography' => array(
+								'textIndent' => '2em',
+							),
+							'color' => array(
+								'text' => 'blue',
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$paragraph_node = array(
+			'path'     => array( 'styles', 'elements', 'paragraph' ),
+			'selector' => 'p',
+		);
+
+		$expected = 'p{color: blue;}p + p{text-indent: 2em;}';
+		$actual   = $theme_json->get_styles_for_block( $paragraph_node );
+
+		$this->assertSameCSS( $expected, $actual );
+	}
+
+	/**
+	 * Test that the paragraph element handles non-text-indent properties normally.
+	 *
+	 * @covers WP_Theme_JSON_Gutenberg::get_styles_for_block
+	 */
+	public function test_paragraph_element_handles_non_text_indent_properties_normally() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'  => array(
+					'elements' => array(
+						'paragraph' => array(
+							'color' => array(
+								'text'       => 'red',
+								'background' => 'yellow',
+							),
+							'typography' => array(
+								'fontSize'   => '1.2em',
+								'fontWeight' => 'bold',
+							),
+							'spacing' => array(
+								'margin' => '1em 0',
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$paragraph_node = array(
+			'path'     => array( 'styles', 'elements', 'paragraph' ),
+			'selector' => 'p',
+		);
+
+		$expected = 'p{background-color: yellow;color: red;font-size: 1.2em;font-weight: bold;margin: 1em 0;}';
+		$actual   = $theme_json->get_styles_for_block( $paragraph_node );
+
+		$this->assertSameCSS( $expected, $actual );
+	}
+
+	/**
+	 * Test that core/paragraph blocks still generate p + p selector for text-indent.
+	 *
+	 * @covers WP_Theme_JSON_Gutenberg::get_styles_for_block
+	 */
+	public function test_core_paragraph_block_generates_p_plus_p_selector_for_text_indent() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'  => array(
+					'blocks' => array(
+						'core/paragraph' => array(
+							'typography' => array(
+								'textIndent' => '1.5em',
+							),
+							'color' => array(
+								'text' => 'green',
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$paragraph_block_node = array(
+			'path'     => array( 'styles', 'blocks', 'core/paragraph' ),
+			'selector' => '.wp-block-paragraph',
+			'name'     => 'core/paragraph',
+		);
+
+		$expected = ':root :where(.wp-block-paragraph){color: green;}p + p{text-indent: 1.5em;}';
+		$actual   = $theme_json->get_styles_for_block( $paragraph_block_node );
+
+		$this->assertSameCSS( $expected, $actual );
+	}
+
+	/**
+	 * Test that paragraph element and core/paragraph both generate separate p + p rules for text-indent.
+	 *
+	 * @covers WP_Theme_JSON_Gutenberg::get_styles_for_block
+	 */
+	public function test_paragraph_element_and_core_paragraph_both_generate_p_plus_p() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'  => array(
+					'elements' => array(
+						'paragraph' => array(
+							'typography' => array(
+								'textIndent' => '2em',
+							),
+						),
+					),
+					'blocks' => array(
+						'core/paragraph' => array(
+							'typography' => array(
+								'textIndent' => '1em',
+							),
+						),
+					),
+				),
+			)
+		);
+
+		// Test paragraph element
+		$paragraph_element_node = array(
+			'path'     => array( 'styles', 'elements', 'paragraph' ),
+			'selector' => 'p',
+		);
+
+		$element_expected = 'p + p{text-indent: 2em;}';
+		$element_actual   = $theme_json->get_styles_for_block( $paragraph_element_node );
+		$this->assertSameCSS( $element_expected, $element_actual );
+
+		// Test core/paragraph block
+		$paragraph_block_node = array(
+			'path'     => array( 'styles', 'blocks', 'core/paragraph' ),
+			'selector' => '.wp-block-paragraph',
+			'name'     => 'core/paragraph',
+		);
+
+		$block_expected = 'p + p{text-indent: 1em;}';
+		$block_actual   = $theme_json->get_styles_for_block( $paragraph_block_node );
+		$this->assertSameCSS( $block_expected, $block_actual );
+	}
+
+	/**
+	 * Test that paragraph element is included in the ELEMENTS array.
+	 *
+	 * @covers WP_Theme_JSON_Gutenberg::ELEMENTS
+	 */
+	public function test_paragraph_element_exists_in_elements_array() {
+		$elements = WP_Theme_JSON_Gutenberg::ELEMENTS;
+
+		$this->assertArrayHasKey( 'paragraph', $elements );
+		$this->assertSame( 'p', $elements['paragraph'] );
+	}
+
+	/**
+	 * Test that mixed properties with text-indent are handled correctly for paragraph element.
+	 *
+	 * @covers WP_Theme_JSON_Gutenberg::get_styles_for_block
+	 */
+	public function test_paragraph_element_mixed_properties_with_text_indent() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'  => array(
+					'elements' => array(
+						'paragraph' => array(
+							'typography' => array(
+								'textIndent'    => '2em',
+								'fontSize'      => '16px',
+								'lineHeight'    => '1.6',
+								'textTransform' => 'lowercase',
+							),
+							'color' => array(
+								'text' => 'purple',
+							),
+							'spacing' => array(
+								'marginBottom' => '1em',
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$paragraph_node = array(
+			'path'     => array( 'styles', 'elements', 'paragraph' ),
+			'selector' => 'p',
+		);
+
+		// text-indent should be in separate p + p rule, other properties in main rule
+		$expected = 'p{color: purple;font-size: 16px;line-height: 1.6;margin-bottom: 1em;text-transform: lowercase;}p + p{text-indent: 2em;}';
+		$actual   = $theme_json->get_styles_for_block( $paragraph_node );
+
+		$this->assertSameCSS( $expected, $actual );
+	}
 }

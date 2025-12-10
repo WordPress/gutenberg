@@ -213,6 +213,9 @@ export function GlobalStylesUI( {
 					<GlobalStylesNavigationScreen path="/typography/text">
 						<ScreenTypographyElement element="text" />
 					</GlobalStylesNavigationScreen>
+					<GlobalStylesNavigationScreen path="/typography/paragraph">
+						<ScreenTypographyElement element="paragraph" />
+					</GlobalStylesNavigationScreen>
 					<GlobalStylesNavigationScreen path="/typography/link">
 						<ScreenTypographyElement element="link" />
 					</GlobalStylesNavigationScreen>

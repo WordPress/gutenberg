@@ -19,9 +19,10 @@ import {
 	Button,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
-import { useCallback, useRef } from '@wordpress/element';
+import { useCallback, useMemo, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { getValueFromVariable } from '@wordpress/global-styles-engine';
+import { reset as resetIcon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -31,13 +32,13 @@ import { useColorsPerOrigin, useGradientsPerOrigin } from './hooks';
 import { useToolsPanelDropdownMenuProps } from './utils';
 import { setImmutably } from '../../utils/object';
 import { unlock } from '../../lock-unlock';
-import { reset as resetIcon } from '@wordpress/icons';
 
 export function useHasColorPanel( settings ) {
 	const hasTextPanel = useHasTextPanel( settings );
 	const hasBackgroundPanel = useHasBackgroundColorPanel( settings );
 	const hasLinkPanel = useHasLinkPanel( settings );
 	const hasHeadingPanel = useHasHeadingPanel( settings );
+	const hasParagraphPanel = useHasParagraphPanel( settings );
 	const hasButtonPanel = useHasButtonPanel( settings );
 	const hasCaptionPanel = useHasCaptionPanel( settings );
 
@@ -46,6 +47,7 @@ export function useHasColorPanel( settings ) {
 		hasBackgroundPanel ||
 		hasLinkPanel ||
 		hasHeadingPanel ||
+		hasParagraphPanel ||
 		hasButtonPanel ||
 		hasCaptionPanel
 	);
@@ -84,6 +86,17 @@ export function useHasHeadingPanel( settings ) {
 			settings?.color?.custom ||
 			gradients?.length > 0 ||
 			settings?.color?.customGradient )
+	);
+}
+
+export function useHasParagraphPanel( settings ) {
+	const colors = useColorsPerOrigin( settings );
+	const gradients = useGradientsPerOrigin( settings );
+	return (
+		( settings?.color?.paragraph && colors?.length > 0 ) ||
+		settings?.color?.custom ||
+		gradients?.length > 0 ||
+		settings?.color?.customGradient
 	);
 }
 
@@ -462,54 +475,73 @@ export default function ColorPanel( {
 	};
 	const resetTextColor = () => setTextColor( undefined );
 
+	// Elements panel visibility
+	const showCaptionPanel = useHasCaptionPanel( settings );
+	const showButtonPanel = useHasButtonPanel( settings );
+	const showHeadingPanel = useHasHeadingPanel( settings );
+	const showParagraphPanel = useHasParagraphPanel( settings );
+
 	// Elements
-	const elements = [
-		{
-			name: 'caption',
-			label: __( 'Captions' ),
-			showPanel: useHasCaptionPanel( settings ),
-		},
-		{
-			name: 'button',
-			label: __( 'Button' ),
-			showPanel: useHasButtonPanel( settings ),
-		},
-		{
-			name: 'heading',
-			label: __( 'Heading' ),
-			showPanel: useHasHeadingPanel( settings ),
-		},
-		{
-			name: 'h1',
-			label: __( 'H1' ),
-			showPanel: useHasHeadingPanel( settings ),
-		},
-		{
-			name: 'h2',
-			label: __( 'H2' ),
-			showPanel: useHasHeadingPanel( settings ),
-		},
-		{
-			name: 'h3',
-			label: __( 'H3' ),
-			showPanel: useHasHeadingPanel( settings ),
-		},
-		{
-			name: 'h4',
-			label: __( 'H4' ),
-			showPanel: useHasHeadingPanel( settings ),
-		},
-		{
-			name: 'h5',
-			label: __( 'H5' ),
-			showPanel: useHasHeadingPanel( settings ),
-		},
-		{
-			name: 'h6',
-			label: __( 'H6' ),
-			showPanel: useHasHeadingPanel( settings ),
-		},
-	];
+	const elements = useMemo(
+		() => [
+			{
+				name: 'caption',
+				label: __( 'Captions' ),
+				showPanel: showCaptionPanel,
+			},
+			{
+				name: 'button',
+				label: __( 'Button' ),
+				showPanel: showButtonPanel,
+			},
+			{
+				name: 'heading',
+				label: __( 'Heading' ),
+				showPanel: showHeadingPanel,
+			},
+			{
+				name: 'paragraph',
+				label: __( 'Paragraph' ),
+				showPanel: showParagraphPanel,
+			},
+			{
+				name: 'h1',
+				label: __( 'H1' ),
+				showPanel: showHeadingPanel,
+			},
+			{
+				name: 'h2',
+				label: __( 'H2' ),
+				showPanel: showHeadingPanel,
+			},
+			{
+				name: 'h3',
+				label: __( 'H3' ),
+				showPanel: showHeadingPanel,
+			},
+			{
+				name: 'h4',
+				label: __( 'H4' ),
+				showPanel: showHeadingPanel,
+			},
+			{
+				name: 'h5',
+				label: __( 'H5' ),
+				showPanel: showHeadingPanel,
+			},
+			{
+				name: 'h6',
+				label: __( 'H6' ),
+				showPanel: showHeadingPanel,
+			},
+		],
+		[
+			showCaptionPanel,
+			showButtonPanel,
+			showHeadingPanel,
+			showParagraphPanel,
+		]
+	);
 
 	const resetAllFilter = useCallback(
 		( previousValue ) => {

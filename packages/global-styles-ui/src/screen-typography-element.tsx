@@ -21,6 +21,12 @@ const elements = {
 		description: __( 'Manage the fonts used on the site.' ),
 		title: __( 'Text' ),
 	},
+	paragraph: {
+		description: __(
+			'Manage the fonts and typography used on paragraphs.'
+		),
+		title: __( 'Paragraphs' ),
+	},
 	link: {
 		description: __( 'Manage the fonts and typography used on the links.' ),
 		title: __( 'Links' ),

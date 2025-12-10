@@ -87,6 +87,11 @@ function TypographyElements() {
 				/>
 				<ElementItem
 					parentMenu={ parentMenu }
+					element="paragraph"
+					label={ __( 'Paragraphs' ) }
+				/>
+				<ElementItem
+					parentMenu={ parentMenu }
 					element="link"
 					label={ __( 'Links' ) }
 				/>
