@@ -296,19 +296,17 @@ function LinkControl( {
 	};
 
 	const handleSelectSuggestion = ( updatedValue ) => {
-		// If there's a real entity suggestion (post, page, category, etc.), it was selected
-		// from the dropdown - no validation needed for entity links as they come from the database.
+		// Validate URL suggestions (link, mailto, tel, internal) or manually entered URLs.
+		// Entity suggestions (post, page, category, etc.) don't need validation as they come from the database.
 		// However, URL suggestions (created from user input with types like 'link', 'mailto', etc.)
 		// still need validation as they may contain invalid URLs like "www.wordp".
-		if (
+		const isEntitySuggestion =
 			updatedValue &&
 			updatedValue.id &&
 			updatedValue.type &&
-			! LINK_ENTRY_TYPES.includes( updatedValue.type )
-		) {
-			// Real entity suggestion selected (post, page, category, etc.) - no validation needed
-			// Proceed with selection
-		} else {
+			! LINK_ENTRY_TYPES.includes( updatedValue.type );
+
+		if ( ! isEntitySuggestion ) {
 			// URL suggestion (link, mailto, tel, internal) or manually entered URL - validate before submitting
 			// Use the URL from the suggestion, or fall back to currentUrlInputValue
 			const urlToValidate = updatedValue?.url || currentUrlInputValue;
