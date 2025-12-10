@@ -115,7 +115,7 @@ function UnforwardedControlWithError< C extends React.ReactElement >(
 	useEffect( () => {
 		const validityTarget = getValidityTarget();
 
-		const supressNativePopover = ( event: Event ) => {
+		const suppressNativePopover = ( event: Event ) => {
 			event.preventDefault();
 
 			const target = event.target as ValidityTarget;
@@ -147,18 +147,18 @@ function UnforwardedControlWithError< C extends React.ReactElement >(
 				  ).filter( ( sibling ) => sibling !== validityTarget )
 				: [];
 
-		validityTarget?.addEventListener( 'invalid', supressNativePopover );
+		validityTarget?.addEventListener( 'invalid', suppressNativePopover );
 		radioSibilings.forEach( ( sibling ) =>
-			sibling.addEventListener( 'invalid', supressNativePopover )
+			sibling.addEventListener( 'invalid', suppressNativePopover )
 		);
 
 		return () => {
 			validityTarget?.removeEventListener(
 				'invalid',
-				supressNativePopover
+				suppressNativePopover
 			);
 			radioSibilings.forEach( ( sibling ) =>
-				sibling.removeEventListener( 'invalid', supressNativePopover )
+				sibling.removeEventListener( 'invalid', suppressNativePopover )
 			);
 		};
 	}, [ getValidityTarget ] );
