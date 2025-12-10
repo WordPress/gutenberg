@@ -24,7 +24,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { keyboardReturn, linkOff } from '@wordpress/icons';
 import deprecated from '@wordpress/deprecated';
-import { isURL, prependHTTP } from '@wordpress/url';
+import { isURL, prependHTTP, isValidFragment } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -329,15 +329,22 @@ function LinkControl( {
 				return;
 			}
 
-			// Perform URL validation using the native URL constructor as the authoritative source.
-			const urlToCheck = prependHTTP( trimmedValue );
-			if ( ! isURL( urlToCheck ) ) {
-				setCustomValidity( {
-					type: 'invalid',
-					message: __( 'Please enter a valid URL.' ),
-				} );
-				triggerValidationDisplay();
-				return;
+			// Hash links (internal anchor links like #section) are valid and don't need
+			// URL constructor validation. They're already validated by isURLLike.
+			const isHashLink =
+				trimmedValue.startsWith( '#' ) &&
+				isValidFragment( trimmedValue );
+			if ( ! isHashLink ) {
+				// Perform URL validation using the native URL constructor as the authoritative source.
+				const urlToCheck = prependHTTP( trimmedValue );
+				if ( ! isURL( urlToCheck ) ) {
+					setCustomValidity( {
+						type: 'invalid',
+						message: __( 'Please enter a valid URL.' ),
+					} );
+					triggerValidationDisplay();
+					return;
+				}
 			}
 		}
 
@@ -394,24 +401,30 @@ function LinkControl( {
 			return false;
 		}
 
-		// Perform URL validation using the native URL constructor as the authoritative source.
-		// The native URL constructor is the standard for URL validity - if it accepts a URL,
-		// we should allow it. For URLs without a protocol (e.g., "www.wordpress.org"),
-		// prepend "http://" before validating, as the URL constructor requires a protocol.
-		//
-		// Note: We rely on the native URL constructor rather than implementing custom TLD
-		// validation to avoid blocking valid URLs. If a URL passes the native constructor,
-		// it's technically valid according to web standards.
-		const urlToValidate = prependHTTP( trimmedValue );
-		if ( ! isURL( urlToValidate ) ) {
-			setCustomValidity( {
-				type: 'invalid',
-				message: __( 'Please enter a valid URL.' ),
-			} );
-			// Trigger the invalid event to show the error message immediately
-			// even if the field hasn't been blurred.
-			triggerValidationDisplay();
-			return false;
+		// Hash links (internal anchor links like #section) are valid and don't need
+		// URL constructor validation. They're already validated by isURLLike.
+		const isHashLink =
+			trimmedValue.startsWith( '#' ) && isValidFragment( trimmedValue );
+		if ( ! isHashLink ) {
+			// Perform URL validation using the native URL constructor as the authoritative source.
+			// The native URL constructor is the standard for URL validity - if it accepts a URL,
+			// we should allow it. For URLs without a protocol (e.g., "www.wordpress.org"),
+			// prepend "http://" before validating, as the URL constructor requires a protocol.
+			//
+			// Note: We rely on the native URL constructor rather than implementing custom TLD
+			// validation to avoid blocking valid URLs. If a URL passes the native constructor,
+			// it's technically valid according to web standards.
+			const urlToValidate = prependHTTP( trimmedValue );
+			if ( ! isURL( urlToValidate ) ) {
+				setCustomValidity( {
+					type: 'invalid',
+					message: __( 'Please enter a valid URL.' ),
+				} );
+				// Trigger the invalid event to show the error message immediately
+				// even if the field hasn't been blurred.
+				triggerValidationDisplay();
+				return false;
+			}
 		}
 
 		setCustomValidity( undefined );
