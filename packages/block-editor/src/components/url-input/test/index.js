@@ -42,7 +42,7 @@ jest.mock( '@wordpress/components', () => {
 } );
 
 describe( 'URLInput with validation', () => {
-	it( 'should show validation error when onValidate returns invalid state', async () => {
+	it( 'should show validation error when customValidity is set to invalid', async () => {
 		const user = userEvent.setup();
 		const onChangeMock = jest.fn();
 
@@ -56,9 +56,8 @@ describe( 'URLInput with validation', () => {
 					onChange={ ( newUrl ) => {
 						setUrl( newUrl );
 						onChangeMock( newUrl );
-					} }
-					onValidate={ ( value ) => {
-						if ( value?.toLowerCase() === 'error' ) {
+						// Set validation based on value
+						if ( newUrl?.toLowerCase() === 'error' ) {
 							setCustomValidity( {
 								type: 'invalid',
 								message: 'The word "error" is not allowed.',
@@ -104,9 +103,8 @@ describe( 'URLInput with validation', () => {
 					onChange={ ( newUrl ) => {
 						setUrl( newUrl );
 						onChangeMock( newUrl );
-					} }
-					onValidate={ ( value ) => {
-						if ( value?.toLowerCase() === 'error' ) {
+						// Set validation based on value
+						if ( newUrl?.toLowerCase() === 'error' ) {
 							setCustomValidity( {
 								type: 'invalid',
 								message: 'The word "error" is not allowed.',

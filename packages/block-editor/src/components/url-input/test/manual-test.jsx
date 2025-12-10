@@ -24,20 +24,21 @@ export default function URLInputValidationTest() {
 		<div style={ { padding: '20px', maxWidth: '600px' } }>
 			<h2>URLInput Validation Test</h2>
 			<p>
-				Try typing "error" in the field below to see validation in
-				action.
+				Try typing &quot;error&quot; in the field below to see
+				validation in action.
 			</p>
 			<URLInput
 				label={ __( 'URL' ) }
 				value={ url }
-				onChange={ ( newUrl ) => setUrl( newUrl ) }
-				onValidate={ ( value ) => {
-					if ( value?.toLowerCase() === 'error' ) {
+				onChange={ ( newUrl ) => {
+					setUrl( newUrl );
+					// Set validation based on value
+					if ( newUrl?.toLowerCase() === 'error' ) {
 						setCustomValidity( {
 							type: 'invalid',
 							message: 'The word "error" is not allowed.',
 						} );
-					} else if ( value && ! value.startsWith( 'http' ) ) {
+					} else if ( newUrl && ! newUrl.startsWith( 'http' ) ) {
 						setCustomValidity( {
 							type: 'invalid',
 							message: 'URL must start with http:// or https://',
