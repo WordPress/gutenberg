@@ -275,6 +275,25 @@ function LinkControl( {
 		setIsEditingLink( false );
 	};
 
+	/**
+	 * Triggers the invalid event on the search input to force display of
+	 * validation errors, even if the field hasn't been blurred.
+	 * This is useful when validation needs to be shown immediately (e.g., on submit).
+	 */
+	const triggerValidationDisplay = () => {
+		// Use requestAnimationFrame to ensure the custom validity has been
+		// set on the input element by React before calling reportValidity().
+		window.requestAnimationFrame( () => {
+			const inputElement = searchInputRef.current;
+			if (
+				inputElement &&
+				typeof inputElement.reportValidity === 'function'
+			) {
+				inputElement.reportValidity();
+			}
+		} );
+	};
+
 	const handleSelectSuggestion = ( updatedValue ) => {
 		// Preserve the URL for taxonomy entities before binding overrides it
 		if ( updatedValue?.kind === 'taxonomy' && updatedValue?.url ) {
@@ -320,8 +339,10 @@ function LinkControl( {
 			setCustomValidity( {
 				type: 'invalid',
 				message: __( 'Please enter a valid URL.' ),
-				force: true, // Force display on submit even if field hasn't been blurred
 			} );
+			// Trigger the invalid event to show the error message immediately
+			// even if the field hasn't been blurred.
+			triggerValidationDisplay();
 			return false;
 		}
 
