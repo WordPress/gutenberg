@@ -64,17 +64,6 @@ export interface CollectionHandlers {
 	refetchRecords: () => Promise< void >;
 }
 
-interface WPBlockSelection {
-	clientId: string;
-	attributeKey: string;
-	offset: number;
-}
-
-export interface WPSelection {
-	selectionEnd: WPBlockSelection;
-	selectionStart: WPBlockSelection;
-}
-
 export interface RecordHandlers {
 	addUndoMeta: ( ydoc: Y.Doc, meta: Map< string, any > ) => void;
 	editRecord: ( data: Partial< ObjectData > ) => void;
