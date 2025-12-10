@@ -46,7 +46,6 @@ import type {
 } from './block-selection-history';
 import {
 	BlockSelectionHistory,
-	SELECTION_HISTORY_DEFAULT_SIZE,
 	YSelectionType,
 } from './block-selection-history';
 
@@ -501,9 +500,7 @@ export function getSelectionHistoryMeta(
 	const selectionHistory = getBlockSelectionHistory( ydoc );
 
 	let selectionToStore = selectionHistory.getCurrentSelection();
-	const backupSelections = selectionHistory.getSelectionHistory(
-		SELECTION_HISTORY_DEFAULT_SIZE
-	);
+	const backupSelections = selectionHistory.getSelectionHistory();
 	const firstBackupSelection = backupSelections[ 0 ];
 
 	if ( selectionToStore === null ) {

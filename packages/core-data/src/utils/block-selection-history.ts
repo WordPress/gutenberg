@@ -12,7 +12,7 @@ import { Y } from '@wordpress/sync';
 import { findBlockByClientIdInDoc } from './crdt';
 import type { WPBlockSelection, WPSelection } from '../types';
 
-export const SELECTION_HISTORY_DEFAULT_SIZE = 5;
+const SELECTION_HISTORY_DEFAULT_SIZE = 5;
 
 export enum YSelectionType {
 	RelativeSelection = 'RelativeSelection',
@@ -59,7 +59,6 @@ export interface YSelectionHistory {
 export class BlockSelectionHistory {
 	private historySize: number;
 	private history: YFullSelection[] = [];
-	private currentSelection: YFullSelection | null = null;
 	private ydoc: Y.Doc;
 
 	constructor(
@@ -74,18 +73,13 @@ export class BlockSelectionHistory {
 	/**
 	 * Convert a WPSelection to a Position (relative position or block position).
 	 * @param selection
-	 * @return Position or null if conversion fails
 	 */
-	private convertSelectionToPositionPart(
+	private convertSelectionToPosition(
 		selection: WPBlockSelection
 	): YSelection {
 		const clientId = selection.clientId;
 		const block = findBlockByClientIdInDoc( clientId, this.ydoc );
-
-		const attributes = block?.get( 'attributes' ) as
-			| Y.Map< Y.Text >
-			| undefined;
-
+		const attributes = block?.get( 'attributes' );
 		const attributeKey = selection.attributeKey;
 
 		const changedYText = attributeKey
@@ -126,50 +120,24 @@ export class BlockSelectionHistory {
 	 */
 	public updateSelection( newSelection: WPSelection ): void {
 		if (
-			! newSelection ||
-			! newSelection.selectionStart?.clientId ||
-			! newSelection.selectionEnd?.clientId
+			! newSelection?.selectionStart?.clientId ||
+			! newSelection?.selectionEnd?.clientId
 		) {
 			return;
 		}
 
 		const { selectionStart, selectionEnd } = newSelection;
-		const start = this.convertSelectionToPositionPart( selectionStart );
-		const end = this.convertSelectionToPositionPart( selectionEnd );
+		const start = this.convertSelectionToPosition( selectionStart );
+		const end = this.convertSelectionToPosition( selectionEnd );
 
-		const ySelection: YFullSelection = {
-			start,
-			end,
-		};
-
-		// Check if the new selection has the same start and end block combination as current
-		const isSameBlockCombinationAsCurrent =
-			this.currentSelection &&
-			start.clientId === this.currentSelection.start.clientId &&
-			end.clientId === this.currentSelection.end.clientId;
-
-		if ( this.currentSelection && ! isSameBlockCombinationAsCurrent ) {
-			// Only add to history if we're moving to a different block combination
-			this.addToHistory( this.currentSelection );
-		}
-
-		// Remove the new selection from history if it exists there (since it's now current)
-		this.history = this.history.filter( ( entry ) => {
-			const isSameBlockCombination =
-				entry.start.clientId === start.clientId &&
-				entry.end.clientId === end.clientId;
-
-			return ! isSameBlockCombination;
-		} );
-
-		this.currentSelection = ySelection;
+		this.addToHistory( { start, end } );
 	}
 
 	/**
 	 * Get the current position (most recent selection in the current block).
 	 */
 	public getCurrentSelection(): YFullSelection | null {
-		return this.currentSelection;
+		return this.history[ 0 ] ?? null;
 	}
 
 	/**
@@ -177,7 +145,7 @@ export class BlockSelectionHistory {
 	 * @param count Number of positions to retrieve
 	 */
 	public getSelectionHistory( count: number ): YFullSelection[] {
-		return this.history.slice( 0, count );
+		return this.history.slice( 1, count + 1 );
 	}
 
 	/**
@@ -203,8 +171,8 @@ export class BlockSelectionHistory {
 		this.history.unshift( yFullSelection );
 
 		// Trim to max size (remove oldest entries from the back)
-		if ( this.history.length > this.historySize ) {
-			this.history = this.history.slice( 0, this.historySize );
+		if ( this.history.length > this.historySize + 1 ) {
+			this.history = this.history.slice( 0, this.historySize + 1 );
 		}
 	}
 }
