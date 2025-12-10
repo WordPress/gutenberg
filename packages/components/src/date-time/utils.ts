@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { toDate } from 'date-fns';
 import { UTCDateMini } from '@date-fns/utc';
 
 /**
@@ -12,9 +11,8 @@ import type { InputAction } from '../input-control/reducer/actions';
 import { COMMIT, PRESS_DOWN, PRESS_UP } from '../input-control/reducer/actions';
 
 /**
- * Like date-fns's toDate, but tries to guess the format when a string is
- * given. For timezoneless strings, parse it as UTC using `@date-fns/utc` to
- * ensure calendar dates remain consistent across different browser timezones.
+ * Converts a date input to a UTC-normalized date for consistent date
+ * manipulation.
  *
  * @param input Value to turn into a date.
  */
@@ -27,9 +25,13 @@ export function inputToDate( input: Date | string | number ): Date {
 		//
 		// See: https://tc39.es/ecma262/#sec-date-time-string-format
 		const hasTimezone = /Z|[+-]\d{2}(:?\d{2})?$/.test( input );
-		return hasTimezone ? new Date( input ) : new UTCDateMini( input + 'Z' );
+		return new UTCDateMini( hasTimezone ? new Date( input ) : input + 'Z' );
 	}
-	return toDate( input );
+
+	// Date objects and number timestamps represent specific UTC moments.
+	// Convert to milliseconds since epoch for consistent UTC handling.
+	const time = input instanceof Date ? input.getTime() : input;
+	return new UTCDateMini( time );
 }
 
 /**

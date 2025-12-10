@@ -106,23 +106,33 @@ describe( 'inputToDate', () => {
 		} );
 	} );
 
-	describe( 'non-string inputs', () => {
-		it( 'should handle Date objects', () => {
-			const input = new Date( '2025-11-01T00:00:00Z' );
+	describe( 'Date objects', () => {
+		it( 'should extract the UTC timestamp from Date objects', () => {
+			const timestamp = Date.UTC( 2025, 10, 1, 15, 30, 45 );
+			const input = new Date( timestamp );
 			const result = inputToDate( input );
 
+			// Should preserve the exact UTC moment, not local time components
 			expect( result.getUTCFullYear() ).toBe( 2025 );
-			expect( result.getUTCMonth() ).toBe( 10 );
+			expect( result.getUTCMonth() ).toBe( 10 ); // November
 			expect( result.getUTCDate() ).toBe( 1 );
+			expect( result.getUTCHours() ).toBe( 15 );
+			expect( result.getUTCMinutes() ).toBe( 30 );
+			expect( result.getUTCSeconds() ).toBe( 45 );
 		} );
+	} );
 
-		it( 'should convert timestamps to Date', () => {
-			const timestamp = Date.UTC( 2025, 10, 1, 0, 0, 0 );
+	describe( 'timestamps', () => {
+		it( 'should preserve the UTC moment exactly', () => {
+			const timestamp = Date.UTC( 2025, 10, 1, 15, 30, 45 );
 			const result = inputToDate( timestamp );
 
 			expect( result.getUTCFullYear() ).toBe( 2025 );
-			expect( result.getUTCMonth() ).toBe( 10 );
+			expect( result.getUTCMonth() ).toBe( 10 ); // November
 			expect( result.getUTCDate() ).toBe( 1 );
+			expect( result.getUTCHours() ).toBe( 15 );
+			expect( result.getUTCMinutes() ).toBe( 30 );
+			expect( result.getUTCSeconds() ).toBe( 45 );
 		} );
 	} );
 } );

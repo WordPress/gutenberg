@@ -184,6 +184,71 @@ describe( 'DateTimePicker', () => {
 		} );
 	} );
 
+	describe( 'different input types', () => {
+		describe.each( [
+			{
+				type: 'timezoneless string',
+				initialDate: '2025-11-15T14:30:00',
+			},
+			{
+				type: 'Date object',
+				initialDate: new Date( Date.UTC( 2025, 10, 15, 14, 30, 0 ) ),
+			},
+			{
+				type: 'timestamp',
+				initialDate: Date.UTC( 2025, 10, 15, 14, 30, 0 ),
+			},
+		] )( '$type', ( { initialDate } ) => {
+			it( 'should display and select dates correctly', async () => {
+				const user = userEvent.setup();
+				const onChange = jest.fn();
+
+				timezoneMock.register( 'US/Pacific' );
+
+				const { rerender } = render(
+					<DateTimePicker
+						currentDate={ initialDate }
+						onChange={ onChange }
+					/>
+				);
+
+				// Should display the correct initial date and time using time
+				// components from the initial date.
+				expect(
+					screen.getByRole( 'button', {
+						name: 'November 15, 2025. Selected',
+					} )
+				).toBeVisible();
+				expect( screen.getByLabelText( 'Hours' ) ).toHaveValue( 14 );
+				expect( screen.getByLabelText( 'Minutes' ) ).toHaveValue( 30 );
+
+				onChange.mockImplementation( ( newDate ) => {
+					rerender(
+						<DateTimePicker
+							currentDate={ newDate }
+							onChange={ onChange }
+						/>
+					);
+				} );
+
+				await user.click(
+					screen.getByRole( 'button', { name: 'November 20, 2025' } )
+				);
+
+				// Changing date should preserve the time, calling onChange with
+				// a timezoneless string.
+				expect( onChange ).toHaveBeenCalledWith(
+					'2025-11-20T14:30:00'
+				);
+				expect(
+					screen.getByRole( 'button', {
+						name: 'November 20, 2025. Selected',
+					} )
+				).toBeVisible();
+			} );
+		} );
+	} );
+
 	it( 'should preserve time when changing date', async () => {
 		const user = userEvent.setup();
 		const onChange = jest.fn();
