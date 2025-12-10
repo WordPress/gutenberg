@@ -78,9 +78,8 @@ div.dataviews-view-list {
 				color: var(--wp-admin-theme-color);
 				background-color: #f8f8f8;
 
-				.dataviews-view-list__title-field,
 				.dataviews-view-list__fields {
-					color: var(--wp-admin-theme-color);
+					color: $gray-900;
 				}
 			}
 		}
