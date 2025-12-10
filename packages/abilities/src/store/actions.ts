@@ -139,7 +139,10 @@ export function registerAbility( ability: Ability ) {
 			annotations.clientRegistered = true;
 		}
 
-		const meta = { annotations };
+		const meta = {
+			...( ability.meta || {} ),
+			annotations,
+		};
 
 		// All validation passed, dispatch the registration action
 		dispatch( {
@@ -233,7 +236,10 @@ export function registerAbilityCategory(
 			annotations.clientRegistered = true;
 		}
 
-		const meta = { annotations };
+		const meta = {
+			...( args.meta || {} ),
+			annotations,
+		};
 		const category: AbilityCategory = {
 			slug,
 			label: args.label,
