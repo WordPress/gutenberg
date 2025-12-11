@@ -371,6 +371,8 @@ export const ShowingErrorsAtArbitraryTimes: StoryObj<
 export const ValidateInModal: StoryObj< typeof ValidatedInputControl > = {
 	render: function Template( { ...args } ) {
 		const [ isOpen, setIsOpen ] = useState( false );
+		const [ text, setText ] = useState< string | undefined >( '' );
+
 		return (
 			<>
 				<Button
@@ -385,6 +387,7 @@ export const ValidateInModal: StoryObj< typeof ValidatedInputControl > = {
 						title="Dialog title"
 						onRequestClose={ () => setIsOpen( false ) }
 						shouldCloseOnClickOutside={ false }
+						shouldCloseOnEsc={ false }
 						isDismissible={ false }
 					>
 						<form
@@ -394,7 +397,20 @@ export const ValidateInModal: StoryObj< typeof ValidatedInputControl > = {
 							} }
 						>
 							<VStack spacing={ 2 }>
-								<ValidatedInputControl { ...args } />
+								<ValidatedInputControl
+									{ ...args }
+									value={ text }
+									onChange={ setText }
+									customValidity={
+										text === 'error'
+											? {
+													type: 'invalid',
+													message:
+														'The word "error" is not allowed.',
+											  }
+											: undefined
+									}
+								/>
 
 								<HStack justify="flex-end" spacing={ 2 }>
 									<Button
@@ -422,6 +438,7 @@ export const ValidateInModal: StoryObj< typeof ValidatedInputControl > = {
 	args: {
 		label: 'Text',
 		required: true,
+		help: 'The word "error" will trigger an error.',
 	},
 };
 
@@ -435,13 +452,7 @@ export const ValidateOnPopoverClose: StoryObj< typeof ValidatedInputControl > =
 		render: function Template( { ...args } ) {
 			const [ isOpen, setIsOpen ] = useState( false );
 			const formRef = useRef< HTMLFormElement >( null );
-			const [ text, setText ] = useState( '' );
-			const [ customValidity, setCustomValidity ] =
-				useState<
-					React.ComponentProps<
-						typeof ValidatedInputControl
-					>[ 'customValidity' ]
-				>( undefined );
+			const [ text, setText ] = useState< string | undefined >( '' );
 
 			return (
 				<Dropdown
@@ -466,21 +477,16 @@ export const ValidateOnPopoverClose: StoryObj< typeof ValidatedInputControl > =
 							<ValidatedInputControl
 								{ ...args }
 								value={ text }
-								onChange={ ( newValue ) => {
-									setText( newValue ?? '' );
-								} }
-								onValidate={ ( value ) => {
-									if ( value?.toLowerCase() === 'error' ) {
-										setCustomValidity( {
-											type: 'invalid',
-											message:
-												'The word "error" is not allowed.',
-										} );
-									} else {
-										setCustomValidity( undefined );
-									}
-								} }
-								customValidity={ customValidity }
+								onChange={ setText }
+								customValidity={
+									text === 'error'
+										? {
+												type: 'invalid',
+												message:
+													'The word "error" is not allowed.',
+										  }
+										: undefined
+								}
 							/>
 						</form>
 					) }
