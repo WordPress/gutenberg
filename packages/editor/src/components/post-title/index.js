@@ -10,6 +10,7 @@ import { forwardRef, useState } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
+import { store as coreStore } from '@wordpress/core-data';
 import { ENTER } from '@wordpress/keycodes';
 import { pasteHandler } from '@wordpress/blocks';
 import {
@@ -27,14 +28,13 @@ import { DEFAULT_CLASSNAMES, REGEXP_NEWLINES } from './constants';
 import usePostTitleFocus from './use-post-title-focus';
 import usePostTitle from './use-post-title';
 import PostTypeSupportCheck from '../post-type-support-check';
-import { store as editorStore } from '../../store';
 
 const PostTitle = forwardRef( ( _, forwardedRef ) => {
 	const { placeholder, collaboratorMode } = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
 		const { titlePlaceholder } = getSettings();
 
-		const { getCollaboratorMode } = select( editorStore );
+		const { getCollaboratorMode } = select( coreStore );
 
 		return {
 			placeholder: titlePlaceholder,

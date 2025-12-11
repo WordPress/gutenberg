@@ -22,6 +22,21 @@ import { STORE_NAME } from './name';
 import { LOCAL_EDITOR_ORIGIN, getSyncManager } from './sync';
 import logEntityDeprecation from './utils/log-entity-deprecation';
 
+
+/**
+ * Returns an action object used in signalling that the collaborator mode has been set.
+ *
+ * @param {'view' | 'edit'} collaboratorMode The collaborator mode.
+ *
+ * @return {Object} Action object.
+ */
+export function setCollaboratorMode( collaboratorMode ) {
+	return {
+		type: 'SET_COLLABORATOR_MODE',
+		collaboratorMode,
+	};
+}
+
 /**
  * Returns an action object used in signalling that authors have been received.
  * Ignored from documentation as it's internal to the data store.

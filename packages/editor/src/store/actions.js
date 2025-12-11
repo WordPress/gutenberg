@@ -667,20 +667,6 @@ export function setDeviceType( deviceType ) {
 }
 
 /**
- * Returns an action object used in signalling that the collaborator mode has been set.
- *
- * @param {'view' | 'edit'} collaboratorMode The collaborator mode.
- *
- * @return {Object} Action object.
- */
-export function setCollaboratorMode( collaboratorMode ) {
-	return {
-		type: 'SET_COLLABORATOR_MODE',
-		collaboratorMode,
-	};
-}
-
-/**
  * Returns an action object used to enable or disable a panel in the editor.
  *
  * @param {string} panelName A string that identifies the panel to enable or disable.
@@ -968,13 +954,13 @@ export const switchEditorMode =
 			unlock( registry.dispatch( blockEditorStore ) ).resetZoomLevel();
 		}
 
-		const { getEditedEntityRecord, getCurrentUser } =
+		const { getEditedEntityRecord, getCurrentUser, getCollaboratorMode } =
 			registry.select( coreStore );
 		const { editEntityRecord } = registry.dispatch( coreStore );
 		const currentUser = getCurrentUser();
 		const _type = select.getCurrentPostType();
 		const _id = select.getCurrentPostId();
-		const collaboratorMode = select.getCollaboratorMode();
+		const collaboratorMode = getCollaboratorMode();
 		const editedRecord = getEditedEntityRecord( 'postType', _type, _id );
 
 		if (

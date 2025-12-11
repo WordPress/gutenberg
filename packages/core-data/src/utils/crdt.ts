@@ -19,6 +19,7 @@ import { dispatch, select } from '@wordpress/data';
 /**
  * Internal dependencies
  */
+import { store as coreStore } from '../';
 import {
 	mergeCrdtBlocks,
 	type Block,
@@ -41,7 +42,6 @@ import {
 	type YMapRecord,
 	type YMapWrap,
 } from './crdt-utils';
-import { STORE_NAME } from '../name';
 
 // Changes that can be applied to a post entity record.
 export type PostChanges = Partial< Post > & {
@@ -50,6 +50,12 @@ export type PostChanges = Partial< Post > & {
 	selection?: WPSelection;
 	title?: Post[ 'title' ] | string;
 };
+
+// RTC meta structure for enforced collaboration mode.
+interface RtcMeta {
+	enforcedMode?: 'codeEditor' | null;
+	enforcedModeOwner?: number | null;
+}
 
 // A post record as represented in the CRDT document (Y.Map).
 export interface YPostRecord extends YMapRecord {
@@ -359,27 +365,22 @@ export function getPostChangesFromCRDTDoc(
 						)
 					);
 
+					const rtcMeta = allowedMetaChanges.rtc as RtcMeta | undefined;
+
 					// The enforced mode has been set to code editor.
-					// @ts-ignore
-					if ( allowedMetaChanges.rtc?.enforcedMode === 'codeEditor' ) {
-						const { getCurrentUser } = select( STORE_NAME );
+					if ( rtcMeta?.enforcedMode === 'codeEditor' ) {
+						const currenUser = select( coreStore ).getCurrentUser();
 
 						// The current user is not the owner of the enforced mode, set the collaborator mode to view.
-						// @ts-ignore
-						if ( getCurrentUser().id !== allowedMetaChanges.rtc?.enforcedModeOwner ) {
-							// @ts-ignore
-							dispatch( 'core/editor').setCollaboratorMode( 'view' );
+						if ( currenUser.id !== rtcMeta.enforcedModeOwner ) {
+							dispatch( coreStore ).setCollaboratorMode( 'view' );
 						// The current user is the owner of the enforced mode, set the collaborator mode to edit.
-						// @ts-ignore
-						} else if ( getCurrentUser().id === allowedMetaChanges.rtc?.enforcedModeOwner ) {
-							// @ts-ignore
-							dispatch( 'core/editor').setCollaboratorMode( 'edit' );
+						} else {
+							dispatch( coreStore ).setCollaboratorMode( 'edit' );
 						}
-					// The ''sffssenforced mode has been removed, set the collaborator mode to edit.
-					// @ts-ignore
-					} else if ( allowedMetaChanges.rtc && ! allowedMetaChanges.rtc.enforcedMode && ! allowedMetaChanges.rtc.enforcedModeOwner ) {
-						// @ts-ignore
-						dispatch( 'core/editor').setCollaboratorMode( 'edit' );
+					// The enforced mode has been removed, set the collaborator mode to edit.
+					} else if ( rtcMeta && ! rtcMeta.enforcedMode && ! rtcMeta.enforcedModeOwner ) {
+						dispatch( coreStore ).setCollaboratorMode( 'edit' );
 					}
 
 					// Merge the allowed meta changes with the current meta values since

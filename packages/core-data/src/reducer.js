@@ -20,6 +20,23 @@ import { rootEntitiesConfig, DEFAULT_ENTITY_KEY } from './entities';
 /** @typedef {import('./types').AnyFunction} AnyFunction */
 
 /**
+ * Reducer managing the current collaborator mode.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+export function collaboratorMode( state = 'edit', action ) {
+	switch ( action.type ) {
+		case 'SET_COLLABORATOR_MODE':
+			return action.collaboratorMode;
+	}
+
+	return state;
+}
+
+/**
  * Reducer managing authors state. Keyed by id.
  *
  * @param {Object} state  Current state.
@@ -629,6 +646,7 @@ export function registeredPostMeta( state = {}, action ) {
 }
 
 export default combineReducers( {
+	collaboratorMode,
 	users,
 	currentTheme,
 	currentGlobalStylesId,

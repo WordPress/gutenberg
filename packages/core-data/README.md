@@ -315,6 +315,18 @@ _Parameters_
 -   _options.\_\_unstableFetch_ `[Function]`: Internal use only. Function to call instead of `apiFetch()`. Must return a promise.
 -   _options.throwOnError_ `[boolean]`: If false, this action suppresses all the exceptions. Defaults to false.
 
+### setCollaboratorMode
+
+Returns an action object used in signalling that the collaborator mode has been set.
+
+_Parameters_
+
+-   _collaboratorMode_ `'view' | 'edit'`: The collaborator mode.
+
+_Returns_
+
+-   `Object`: Action object.
+
 ### undo
 
 Action triggered to undo the last edit to an entity record, if any.
@@ -434,6 +446,18 @@ _Parameters_
 _Returns_
 
 -   `Array< any >`: Block pattern list.
+
+### getCollaboratorMode
+
+Returns the current collaborator mode.
+
+_Parameters_
+
+-   _state_ `Object`: Data state.
+
+_Returns_
+
+-   `CollaboratorMode`: Collaborator mode.
 
 ### getCurrentTheme
 

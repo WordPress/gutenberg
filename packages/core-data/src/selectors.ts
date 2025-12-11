@@ -50,6 +50,7 @@ export interface State {
 	userPatternCategories: Array< UserPatternCategory >;
 	defaultTemplates: Record< string, string >;
 	registeredPostMeta: Record< string, Object >;
+	collaboratorMode: CollaboratorMode;
 }
 
 type EntityRecordKey = string | number;
@@ -112,6 +113,8 @@ export interface UserPatternCategory {
 
 type Optional< T > = T | undefined;
 
+type CollaboratorMode = 'view' | 'edit';
+
 /**
  * HTTP Query parameters sent with the API request to fetch the entity records.
  */
@@ -134,6 +137,25 @@ type EntityResource = { kind: string; name: string; id?: EntityRecordKey };
  * maintained by the reducer result in state.
  */
 const EMPTY_OBJECT = {};
+
+/**
+ * Returns the current collaborator mode.
+ *
+ * @param {Object} state Data state.
+ *
+ * @return {CollaboratorMode} Collaborator mode.
+ */
+export function getCollaboratorMode( state: State ): CollaboratorMode {
+	if ( window.__experimentalEnableSync ) {
+		if ( globalThis.IS_GUTENBERG_PLUGIN ) {
+			return state.collaboratorMode;
+		}
+	}
+
+	// Default to edit mode if the collaboration experiment is not enabled, or
+	// if the Gutenberg plugin is not being used.
+	return 'edit';
+}
 
 /**
  * Returns true if a request is in progress for embed preview data, or false
