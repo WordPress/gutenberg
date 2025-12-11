@@ -265,13 +265,21 @@ export const WithModal = ( {
 				</p>
 			) }
 			{ isModalOpen && (
-				<Modal
-					title="Select Items"
-					onRequestClose={ () => setIsModalOpen( false ) }
-					isFullScreen={ false }
-					size="fill"
-				>
-					<div style={ { padding: '16px' } }>
+				<>
+					<style>{ `
+						.components-modal__content {
+							padding: 0;
+						}
+						.components-modal__frame.is-full-screen .components-modal__content {
+							margin-bottom: 0;
+						}
+					` }</style>
+					<Modal
+						title="Select Items"
+						onRequestClose={ () => setIsModalOpen( false ) }
+						isFullScreen={ false }
+						size="fill"
+					>
 						<DataViewsPickerContent
 							perPageSizes={ perPageSizes }
 							isMultiselectable={ isMultiselectable }
@@ -282,8 +290,8 @@ export const WithModal = ( {
 								String( item.id )
 							) }
 						/>
-					</div>
-				</Modal>
+					</Modal>
+				</>
 			) }
 		</>
 	);

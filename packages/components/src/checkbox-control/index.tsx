@@ -31,7 +31,6 @@ import type { WordPressComponentProps } from '../context';
  *   const [ isChecked, setChecked ] = useState( true );
  *   return (
  *     <CheckboxControl
- *       __nextHasNoMarginBottom
  *       label="Is author"
  *       help="Is the user a author or not?"
  *       checked={ isChecked }
@@ -45,7 +44,6 @@ export function CheckboxControl(
 	props: WordPressComponentProps< CheckboxControlProps, 'input', false >
 ) {
 	const {
-		__nextHasNoMarginBottom,
 		label,
 		className,
 		heading,
@@ -95,8 +93,7 @@ export function CheckboxControl(
 
 	return (
 		<BaseControl
-			__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
-			__associatedWPComponentName="CheckboxControl"
+			__nextHasNoMarginBottom
 			label={ heading }
 			id={ id }
 			help={

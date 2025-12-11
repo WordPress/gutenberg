@@ -58,13 +58,19 @@ Configure your `package.json` with the following optional fields:
 
 ### `wpScript`
 
-Set to `true` to bundle the package as a WordPress script/module:
+Controls whether the package is exposed as a bundled WordPress script/module and accessible via the configured global variable.
+
+- **`true`**: The package will be bundled and exposed as a WordPress script. It will be available in WordPress as part of the configured global (e.g., `wp.blockEditor`, `wp.data`, or a custom global name if configured differently).
+
+- **Omitted or `false` (default)**: The package will not be exposed as a WordPress script. Use this for packages designed solely as dependencies for other packages. The package can still be used as a dependency via npm imports by other packages.
 
 ```json
 {
 	"wpScript": true
 }
 ```
+
+For more details on when to omit or set this to `false`, see the [package guidelines](../README.md#when-to-omit-or-set-wpscript-to-false).
 
 ### `wpScriptModuleExports`
 
@@ -205,7 +211,7 @@ If `handlePrefix` is omitted, it defaults to the namespace key (e.g., `"woo"` â†
 
 Define admin pages that support routes. Each page gets generated PHP functions for route registration and can be extended by other plugins.
 
-Pages can be defined as simple strings or as objects with initialization modules:
+Pages can be defined as simple strings or as objects with initialization modules and titles:
 
 ```json
 {
@@ -214,7 +220,8 @@ Pages can be defined as simple strings or as objects with initialization modules
 			"my-admin-page",
 			{
 				"id": "my-other-page",
-				"init": ["@my-plugin/my-page-init"]
+				"init": ["@my-plugin/my-page-init"],
+				"title": "My Page Title"
 			}
 		]
 	}
@@ -223,7 +230,10 @@ Pages can be defined as simple strings or as objects with initialization modules
 
 **Page Configuration:**
 - **String format**: `"my-admin-page"` - Simple page with no init modules
-- **Object format**: `{ "id": "page-slug", "init": ["@scope/package"] }` - Page with init modules
+- **Object format**: `{ "id": "page-slug", "init": ["@scope/package"], "title": "Page Title" }` - Page with optional init modules and title
+  - **`id`** (required): The page slug used in WordPress admin URLs
+  - **`init`** (optional): Array of script module IDs to execute during page initialization
+  - **`title`** (optional): Default page title used in the auto-generated admin page registration (`add_submenu_page`). The title is automatically wrapped in translation functions (`__()`) in the generated PHP. If omitted, defaults to the page ID.
 
 **Generated Files:**
 
@@ -365,7 +375,24 @@ In `routes/{route-name}/package.json`:
 }
 ```
 
-The `page` field must match one of the pages defined in `wpPlugin.pages` in your root `package.json`. This tells the build system which page this route belongs to. It can also map to an existing page registered by another plugin.
+For routes that should appear on multiple pages:
+
+```json
+{
+	"route": {
+		"path": "/settings",
+		"page": ["my-admin-page", "other-page"]
+	}
+}
+```
+
+The `page` field can be either:
+- **String**: Route belongs to a single page
+- **Array**: Route appears on multiple pages (the build system will register the route for each page)
+
+Each page ID must match one of the pages defined in `wpPlugin.pages` in your root `package.json`. This tells the build system which page(s) this route belongs to. It can also map to existing pages registered by other plugins.
+
+Multi-page routes are useful for shared functionality across different admin pages, such as settings routes accessible from both a main page and a dedicated settings page.
 
 ### Components
 

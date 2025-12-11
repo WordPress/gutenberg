@@ -39,6 +39,7 @@ export function useHasDimensionsPanel( settings ) {
 	const hasMargin = useHasMargin( settings );
 	const hasGap = useHasGap( settings );
 	const hasMinHeight = useHasMinHeight( settings );
+	const hasWidth = useHasWidth( settings );
 	const hasAspectRatio = useHasAspectRatio( settings );
 	const hasChildLayout = useHasChildLayout( settings );
 
@@ -50,6 +51,7 @@ export function useHasDimensionsPanel( settings ) {
 			hasMargin ||
 			hasGap ||
 			hasMinHeight ||
+			hasWidth ||
 			hasAspectRatio ||
 			hasChildLayout )
 	);
@@ -77,6 +79,10 @@ function useHasGap( settings ) {
 
 function useHasMinHeight( settings ) {
 	return settings?.dimensions?.minHeight;
+}
+
+function useHasWidth( settings ) {
+	return settings?.dimensions?.width;
 }
 
 function useHasAspectRatio( settings ) {
@@ -206,6 +212,7 @@ const DEFAULT_CONTROLS = {
 	margin: true,
 	blockGap: true,
 	minHeight: true,
+	width: true,
 	aspectRatio: true,
 	childLayout: true,
 };
@@ -384,6 +391,17 @@ export default function DimensionsPanel( {
 	};
 	const hasMinHeightValue = () => !! value?.dimensions?.minHeight;
 
+	// Width
+	const showWidthControl = useHasWidth( settings );
+	const widthValue = decodeValue( inheritedValue?.dimensions?.width );
+	const setWidthValue = ( newValue ) => {
+		onChange( setImmutably( value, [ 'dimensions', 'width' ], newValue ) );
+	};
+	const resetWidthValue = () => {
+		setWidthValue( undefined );
+	};
+	const hasWidthValue = () => !! value?.dimensions?.width;
+
 	// Aspect Ratio
 	const showAspectRatioControl = useHasAspectRatio( settings );
 	const aspectRatioValue = decodeValue(
@@ -439,6 +457,7 @@ export default function DimensionsPanel( {
 				...previousValue?.dimensions,
 				minHeight: undefined,
 				aspectRatio: undefined,
+				width: undefined,
 			},
 		};
 	}, [] );
@@ -685,6 +704,23 @@ export default function DimensionsPanel( {
 						label={ __( 'Minimum height' ) }
 						value={ minHeightValue }
 						onChange={ setMinHeightValue }
+					/>
+				</ToolsPanelItem>
+			) }
+			{ showWidthControl && (
+				<ToolsPanelItem
+					hasValue={ hasWidthValue }
+					label={ __( 'Width' ) }
+					onDeselect={ resetWidthValue }
+					isShownByDefault={
+						defaultControls.width ?? DEFAULT_CONTROLS.width
+					}
+					panelId={ panelId }
+				>
+					<HeightControl
+						label={ __( 'Width' ) }
+						value={ widthValue }
+						onChange={ setWidthValue }
 					/>
 				</ToolsPanelItem>
 			) }

@@ -1,8 +1,5 @@
-/**
- * External dependencies
- */
-const glob = require( 'glob' ).sync;
 const { join } = require( 'path' );
+const glob = require( 'glob' ).sync;
 
 /**
  * The list of patterns matching files used only for development purposes.
@@ -71,14 +68,6 @@ const restrictedImports = [
 ];
 
 const restrictedSyntax = [
-	// NOTE: We can't include the forward slash in our regex or
-	// we'll get a `SyntaxError` (Invalid regular expression: \ at end of pattern)
-	// here. That's why we use \\u002F in the regexes below.
-	{
-		selector:
-			'ImportDeclaration[source.value=/^@wordpress\\u002F.+\\u002F/]:not([source.value=/^@wordpress\\u002F.+\\u002Fbuild-types\\u002F/])',
-		message: 'Path access on WordPress dependencies is not allowed.',
-	},
 	{
 		selector:
 			'CallExpression[callee.object.name="page"][callee.property.name="waitFor"]',
@@ -145,7 +134,6 @@ module.exports = {
 		jsdoc: {
 			mode: 'typescript',
 		},
-		'import/internal-regex': null,
 		'import/resolver': require.resolve( './tools/eslint/import-resolver' ),
 	},
 	rules: {
@@ -155,7 +143,6 @@ module.exports = {
 			'error',
 			{ props: 'never', children: 'never' },
 		],
-		'@wordpress/dependency-group': 'error',
 		'@wordpress/wp-global-usage': 'error',
 		'@wordpress/react-no-unsafe-timeout': 'error',
 		'@wordpress/i18n-hyphenated-range': 'error',
@@ -291,7 +278,6 @@ module.exports = {
 					// Temporary rules until we're ready to officially deprecate the bottom margins.
 					...[
 						'BaseControl',
-						'CheckboxControl',
 						'ComboboxControl',
 						'DimensionControl',
 						'FocalPointPicker',
@@ -440,9 +426,24 @@ module.exports = {
 				'jsdoc/valid-types': 'off',
 			},
 		},
+		// Progressively opting in to stricter rules for enforcing file
+		// extensions matching the presence of JSX syntax. This should be
+		// expanded and eventually enforced on all files.
 		{
 			files: [
-				'**/@(storybook|stories)/*',
+				'**/@(storybook|stories)/**',
+				'packages/components/src/**/*.tsx',
+			],
+			rules: {
+				'react/jsx-filename-extension': [
+					'error',
+					{ extensions: [ '.jsx', '.tsx' ] },
+				],
+			},
+		},
+		{
+			files: [
+				'**/@(storybook|stories)/**',
 				'packages/components/src/**/*.tsx',
 			],
 			rules: {

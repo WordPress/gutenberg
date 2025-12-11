@@ -15,6 +15,7 @@ import {
 	getQueriedTotalPages,
 } from './queried-data';
 import { DEFAULT_ENTITY_KEY } from './entities';
+import { getUndoManager } from './private-selectors';
 import {
 	getNormalizedCommaSeparable,
 	isRawAttribute,
@@ -1127,7 +1128,7 @@ export function getRedoEdit( state: State ): Optional< any > {
  * @return Whether there is a previous edit or not.
  */
 export function hasUndo( state: State ): boolean {
-	return state.undoManager.hasUndo();
+	return getUndoManager( state ).hasUndo();
 }
 
 /**
@@ -1139,7 +1140,7 @@ export function hasUndo( state: State ): boolean {
  * @return Whether there is a next edit or not.
  */
 export function hasRedo( state: State ): boolean {
-	return state.undoManager.hasRedo();
+	return getUndoManager( state ).hasRedo();
 }
 
 /**

@@ -267,7 +267,6 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 				isShownByDefault
 			>
 				<CheckboxControl
-					__nextHasNoMarginBottom
 					label={ __( 'Open in new tab' ) }
 					checked={ opensInNewTab }
 					onChange={ ( value ) =>

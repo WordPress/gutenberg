@@ -290,7 +290,10 @@ export default function GalleryEdit( props ) {
 			...newLinkTarget,
 			className: newClassName,
 			sizeSlug,
-			caption: imageAttributes.caption || image.caption?.raw,
+			caption:
+				imageAttributes.caption.length > 0
+					? imageAttributes.caption
+					: image.caption?.raw,
 			alt: imageAttributes.alt || image.alt_text,
 			aspectRatio: aspectRatio === 'auto' ? undefined : aspectRatio,
 		};
@@ -596,7 +599,6 @@ export default function GalleryEdit( props ) {
 				instructions: PLACEHOLDER_TEXT,
 			} }
 			onSelect={ updateImages }
-			accept="image/*"
 			allowedTypes={ ALLOWED_MEDIA_TYPES }
 			multiple
 			onError={ onUploadError }
@@ -910,7 +912,6 @@ export default function GalleryEdit( props ) {
 						<BlockControls group="other">
 							<MediaReplaceFlow
 								allowedTypes={ ALLOWED_MEDIA_TYPES }
-								accept="image/*"
 								handleUpload={ false }
 								onSelect={ updateImages }
 								name={ __( 'Add' ) }

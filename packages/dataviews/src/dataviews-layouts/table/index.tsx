@@ -405,12 +405,18 @@ function ViewTable< Item >( {
 						<col className="dataviews-view-table__col-checkbox" />
 					) }
 					{ hasPrimaryColumn && (
-						<col className="dataviews-view-table__col-primary" />
+						<col className="dataviews-view-table__col-first-data" />
 					) }
-					{ columns.map( ( column ) => (
+					{ columns.map( ( column, index ) => (
 						<col
 							key={ `col-${ column }` }
-							className={ `dataviews-view-table__col-${ column }` }
+							className={ clsx(
+								`dataviews-view-table__col-${ column }`,
+								{
+									'dataviews-view-table__col-first-data':
+										! hasPrimaryColumn && index === 0,
+								}
+							) }
 						/>
 					) ) }
 					{ !! actions?.length && (
@@ -458,6 +464,10 @@ function ViewTable< Item >( {
 										onHide={ onHide }
 										setOpenedFilter={ setOpenedFilter }
 										canMove={ false }
+										canInsertLeft={ false }
+										canInsertRight={
+											view.layout?.enableMoving ?? true
+										}
 									/>
 								) }
 							</th>
@@ -466,6 +476,8 @@ function ViewTable< Item >( {
 							// Explicit picks the supported styles.
 							const { width, maxWidth, minWidth, align } =
 								view.layout?.styles?.[ column ] ?? {};
+							const canInsertOrMove =
+								view.layout?.enableMoving ?? true;
 							return (
 								<th
 									key={ column }
@@ -491,9 +503,9 @@ function ViewTable< Item >( {
 										onChangeView={ onChangeView }
 										onHide={ onHide }
 										setOpenedFilter={ setOpenedFilter }
-										canMove={
-											view.layout?.enableMoving ?? true
-										}
+										canMove={ canInsertOrMove }
+										canInsertLeft={ canInsertOrMove }
+										canInsertRight={ canInsertOrMove }
 									/>
 								</th>
 							);

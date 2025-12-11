@@ -34,12 +34,14 @@ import {
 	templateTitleField,
 	pageTitleField,
 	patternTitleField,
+	notesField,
 } from '@wordpress/fields';
 
 /**
  * Internal dependencies
  */
 import { store as editorStore } from '../../store';
+import { DESIGN_POST_TYPES } from '../../store/constants';
 import postPreviewField from '../fields/content-preview';
 import { unlock } from '../../lock-unlock';
 
@@ -47,6 +49,20 @@ declare global {
 	interface Window {
 		__experimentalTemplateActivate?: boolean;
 	}
+}
+
+/**
+ * Check if a post type supports editor notes.
+ *
+ * @param supports The post type supports object.
+ * @return Whether editor notes are supported.
+ */
+function hasEditorNotesSupport( supports?: PostType[ 'supports' ] ): boolean {
+	const editor = supports?.editor;
+	if ( Array.isArray( editor ) ) {
+		return !! editor[ 0 ]?.notes;
+	}
+	return false;
 }
 
 export function registerEntityAction< Item >(
@@ -196,7 +212,7 @@ export const registerPostTypeSchema =
 				featuredImageField,
 			postTypeConfig.supports?.author && authorField,
 			statusField,
-			dateField,
+			! DESIGN_POST_TYPES.includes( postTypeConfig.slug ) && dateField,
 			slugField,
 			postTypeConfig.supports?.[ 'page-attributes' ] && parentField,
 			postTypeConfig.supports?.comments && commentStatusField,
@@ -209,6 +225,7 @@ export const registerPostTypeSchema =
 			postTypeConfig.supports?.editor &&
 				postTypeConfig.viewable &&
 				postPreviewField,
+			hasEditorNotesSupport( postTypeConfig.supports ) && notesField,
 		].filter( Boolean );
 		if ( postTypeConfig.supports?.title ) {
 			let _titleField;

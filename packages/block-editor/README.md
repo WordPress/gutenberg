@@ -100,6 +100,14 @@ _Related_
 
 -   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-alignment-control/README.md>
 
+### BlockBindingsAttributeControl
+
+Internal dependencies
+
+### BlockBindingsSourceFieldsList
+
+Undocumented declaration.
+
 ### BlockBreadcrumb
 
 Block breadcrumb component, displaying the hierarchy of the current block selection as a breadcrumb.
@@ -846,6 +854,10 @@ Block editor data store configuration.
 _Related_
 
 -   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/data/README.md#registerStore>
+
+### ToolSelector
+
+This component has been deprecated and no longer renders anything.
 
 ### transformStyles
 

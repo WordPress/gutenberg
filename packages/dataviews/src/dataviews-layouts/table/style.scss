@@ -59,22 +59,14 @@
 		border-top: 1px solid $gray-100;
 		background-color: inherit;
 
-		.dataviews-view-table-header-button {
-			gap: $grid-unit-05;
-		}
-
 		td:first-child,
 		th:first-child {
-			padding-left: $grid-unit-60;
-
-			.dataviews-view-table-header-button {
-				margin-left: - #{$grid-unit-10};
-			}
+			padding-left: $grid-unit-30;
 		}
 
 		td:last-child,
 		th:last-child {
-			padding-right: $grid-unit-60;
+			padding-right: $grid-unit-30;
 		}
 
 		&:last-child {
@@ -155,13 +147,27 @@
 			background-color: inherit;
 			padding-top: $grid-unit-10;
 			padding-bottom: $grid-unit-10;
-			padding-left: $grid-unit-15;
 			font-size: 11px;
 			text-transform: uppercase;
 			font-weight: $font-weight-medium;
 
-			&:has(.dataviews-view-table-header-button):not(:first-child) {
+			&:has(.dataviews-view-table-header-button) {
 				padding-left: $grid-unit-05;
+				padding-right: $grid-unit-05;
+
+				.dataviews-view-table-header-button {
+					gap: $grid-unit-05;
+				}
+			}
+
+			&:has(.dataviews-view-table-header-button):first-child {
+				// Table cell padding minus the header button padding.
+				padding-left: $grid-unit-50;
+			}
+
+			&:has(.dataviews-view-table-header-button):last-child {
+				// Table cell padding minus the header button padding.
+				padding-right: $grid-unit-50;
 			}
 		}
 	}
@@ -224,6 +230,10 @@
 				&:has(.dataviews-view-table-header-button):not(:first-child) {
 					padding-left: 0;
 				}
+
+				&:has(.dataviews-view-table-header-button):not(:last-child) {
+					padding-right: 0;
+				}
 			}
 		}
 		td,
@@ -250,17 +260,6 @@
 	}
 }
 
-@container (max-width: 430px) {
-	.dataviews-view-table tr td:first-child,
-	.dataviews-view-table tr th:first-child {
-		padding-left: $grid-unit-30;
-	}
-
-	.dataviews-view-table tr td:last-child,
-	.dataviews-view-table tr th:last-child {
-		padding-right: $grid-unit-30;
-	}
-}
 
 .dataviews-view-table-selection-checkbox {
 	--checkbox-input-size: 24px;
@@ -306,12 +305,12 @@
 .dataviews-view-table__group-header-row {
 	.dataviews-view-table__group-header-cell {
 		font-weight: $font-weight-medium;
-		padding: $grid-unit-15 $grid-unit-60;
+		padding: $grid-unit-15 $grid-unit-30;
 		color: $gray-900;
 	}
 }
 
 /* Column width intents via colgroup: make non-primary columns shrink-to-fit */
-.dataviews-view-table col[class^="dataviews-view-table__col-"]:not(.dataviews-view-table__col-primary) {
+.dataviews-view-table col[class^="dataviews-view-table__col-"]:not(.dataviews-view-table__col-first-data) {
 	width: 1%;
 }

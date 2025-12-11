@@ -4,6 +4,7 @@
 import { __ } from '@wordpress/i18n';
 import { listItem as icon } from '@wordpress/icons';
 import { privateApis } from '@wordpress/block-editor';
+import { privateApis as blocksPrivateApis } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -14,6 +15,8 @@ import edit from './edit';
 import save from './save';
 import transforms from './transforms';
 import { unlock } from '../lock-unlock';
+
+const { fieldsKey, formKey } = unlock( blocksPrivateApis );
 
 const { name } = metadata;
 
@@ -33,17 +36,17 @@ export const settings = {
 	[ unlock( privateApis ).requiresWrapperOnCopy ]: true,
 };
 
-if ( window.__experimentalContentOnlyPatternInsertion ) {
-	settings.fields = [
+if ( window.__experimentalContentOnlyInspectorFields ) {
+	settings[ fieldsKey ] = [
 		{
+			id: 'content',
 			label: __( 'Content' ),
-			type: 'RichText',
-			shownByDefault: true,
-			mapping: {
-				value: 'content',
-			},
+			type: 'richtext',
 		},
 	];
+	settings[ formKey ] = {
+		fields: [ 'content' ],
+	};
 }
 
 export const init = () => initBlock( { name, metadata, settings } );

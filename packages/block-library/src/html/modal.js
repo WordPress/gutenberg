@@ -8,9 +8,10 @@ import {
 	Modal,
 	Button,
 	Flex,
+	Notice,
 	privateApis as componentsPrivateApis,
 	__experimentalHStack as HStack,
-	__experimentalVStack as VStack,
+	__experimentalGrid as Grid,
 } from '@wordpress/components';
 import { PlainText, store as blockEditorStore } from '@wordpress/block-editor';
 import { fullscreen, square } from '@wordpress/icons';
@@ -48,8 +49,9 @@ export default function HTMLEditModal( {
 		};
 	}, [] );
 
-	// Show JS tab if user has permission OR if block contains JavaScript
-	const shouldShowJsTab = canUserUseUnfilteredHTML || js.trim() !== '';
+	// Determine if we should show a warning about CSS/JS content being stripped
+	const hasRestrictedContent =
+		! canUserUseUnfilteredHTML && ( css.trim() || js.trim() );
 
 	if ( ! isOpen ) {
 		return null;
@@ -68,11 +70,13 @@ export default function HTMLEditModal( {
 		setIsDirty( true );
 	};
 	const handleUpdate = () => {
+		// For users without unfiltered_html capability, strip CSS and JS content
+		// to prevent kses from leaving broken content
 		setAttributes( {
 			content: serializeContent( {
 				html: editedHtml,
-				css: editedCss,
-				js: editedJs,
+				css: canUserUseUnfilteredHTML ? editedCss : '',
+				js: canUserUseUnfilteredHTML ? editedJs : '',
 			} ),
 		} );
 		setIsDirty( false );
@@ -117,13 +121,23 @@ export default function HTMLEditModal( {
 				__experimentalHideHeader
 			>
 				<Tabs orientation="horizontal" defaultTabId="html">
-					<VStack spacing={ 4 } style={ { height: '100%' } }>
-						<HStack justify="space-between">
+					<Grid
+						columns={ 1 }
+						templateRows="auto 1fr auto"
+						gap={ 4 }
+						style={ { height: '100%' } }
+					>
+						<HStack
+							justify="space-between"
+							className="block-library-html__modal-header"
+						>
 							<div>
 								<Tabs.TabList>
 									<Tabs.Tab tabId="html">HTML</Tabs.Tab>
-									<Tabs.Tab tabId="css">CSS</Tabs.Tab>
-									{ shouldShowJsTab && (
+									{ canUserUseUnfilteredHTML && (
+										<Tabs.Tab tabId="css">CSS</Tabs.Tab>
+									) }
+									{ canUserUseUnfilteredHTML && (
 										<Tabs.Tab tabId="js">
 											{ __( 'JavaScript' ) }
 										</Tabs.Tab>
@@ -140,14 +154,24 @@ export default function HTMLEditModal( {
 								/>
 							</div>
 						</HStack>
+						{ hasRestrictedContent && (
+							<Notice
+								status="warning"
+								isDismissible={ false }
+								className="block-library-html__modal-notice"
+							>
+								{ __(
+									'This block contains CSS or JavaScript that will be removed when you save because you do not have permission to use unfiltered HTML.'
+								) }
+							</Notice>
+						) }
 						<HStack
 							alignment="stretch"
 							justify="flex-start"
 							spacing={ 4 }
 							className="block-library-html__modal-tabs"
-							style={ { flexGrow: 1 } }
 						>
-							<div style={ { flexGrow: 1 } }>
+							<div className="block-library-html__modal-content">
 								<Tabs.TabPanel
 									tabId="html"
 									focusable={ false }
@@ -161,20 +185,22 @@ export default function HTMLEditModal( {
 										className="block-library-html__modal-editor"
 									/>
 								</Tabs.TabPanel>
-								<Tabs.TabPanel
-									tabId="css"
-									focusable={ false }
-									className="block-library-html__modal-tab"
-								>
-									<PlainText
-										value={ editedCss }
-										onChange={ handleCssChange }
-										placeholder={ __( 'Write CSS…' ) }
-										aria-label={ __( 'CSS' ) }
-										className="block-library-html__modal-editor"
-									/>
-								</Tabs.TabPanel>
-								{ shouldShowJsTab && (
+								{ canUserUseUnfilteredHTML && (
+									<Tabs.TabPanel
+										tabId="css"
+										focusable={ false }
+										className="block-library-html__modal-tab"
+									>
+										<PlainText
+											value={ editedCss }
+											onChange={ handleCssChange }
+											placeholder={ __( 'Write CSS…' ) }
+											aria-label={ __( 'CSS' ) }
+											className="block-library-html__modal-editor"
+										/>
+									</Tabs.TabPanel>
+								) }
+								{ canUserUseUnfilteredHTML && (
 									<Tabs.TabPanel
 										tabId="js"
 										focusable={ false }
@@ -192,10 +218,7 @@ export default function HTMLEditModal( {
 									</Tabs.TabPanel>
 								) }
 							</div>
-							<div
-								className="block-library-html__preview"
-								style={ { width: '50%' } }
-							>
+							<div className="block-library-html__preview">
 								<Preview
 									content={ serializeContent( {
 										html: editedHtml,
@@ -209,6 +232,7 @@ export default function HTMLEditModal( {
 							alignment="center"
 							justify="flex-end"
 							spacing={ 4 }
+							className="block-library-html__modal-footer"
 						>
 							<Button
 								__next40pxDefaultSize
@@ -225,7 +249,7 @@ export default function HTMLEditModal( {
 								{ __( 'Update' ) }
 							</Button>
 						</HStack>
-					</VStack>
+					</Grid>
 				</Tabs>
 			</Modal>
 

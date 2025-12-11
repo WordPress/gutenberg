@@ -11,6 +11,7 @@
 body:has(.boot-layout-container) {
 	background: #1d2327; // Same as WP-Admin sidebar
 	overflow: hidden;
+	@include wp-admin-reset( ".boot-layout-container" );
 }
 
 #wpcontent {
@@ -42,4 +43,12 @@ body:has(.boot-layout.has-full-canvas) {
 			margin-left: 0;
 		}
 	}
+}
+
+.boot-layout .components-editor-notices__snackbar {
+	position: fixed;
+	right: 0;
+	bottom: 16px;
+	padding-left: 16px;
+	padding-right: 16px;
 }

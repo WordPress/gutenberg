@@ -238,12 +238,12 @@ if ( ! function_exists( '{{PAGE_SLUG_UNDERSCORE}}_wp_admin_register_page' ) ) {
 	 */
 	function {{PAGE_SLUG_UNDERSCORE}}_wp_admin_register_page() {
 		add_submenu_page(
-			'nothing-{{PAGE_SLUG}}',                        // Hidden page (no parent)
-			__( '{{PAGE_SLUG}} (WP Admin)', '{{PREFIX}}' ), // Page title
-			__( '{{PAGE_SLUG}} (WP Admin)', '{{PREFIX}}' ), // Menu title (not visible)
-			'read',                                          // Minimum capability
-			'{{PAGE_SLUG}}-wp-admin',                       // Menu slug for URL routing
-			'{{PAGE_SLUG_UNDERSCORE}}_wp_admin_render_page' // Callback function
+			'nothing-{{PAGE_SLUG}}',                                 // Hidden page (no parent)
+			__( '{{PAGE_DEFAULT_TITLE}}', '{{PREFIX}}' ),           // Page title
+			__( '{{PAGE_DEFAULT_TITLE}}', '{{PREFIX}}' ),           // Menu title (not visible)
+			'read',                                                   // Minimum capability
+			'{{PAGE_SLUG}}-wp-admin',                                // Menu slug for URL routing
+			'{{PAGE_SLUG_UNDERSCORE}}_wp_admin_render_page'          // Callback function
 		);
 	}
 }
