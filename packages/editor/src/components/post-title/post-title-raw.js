@@ -12,6 +12,7 @@ import { decodeEntities } from '@wordpress/html-entities';
 import { useSelect } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { useState, forwardRef } from '@wordpress/element';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -19,7 +20,6 @@ import { useState, forwardRef } from '@wordpress/element';
 import { DEFAULT_CLASSNAMES, REGEXP_NEWLINES } from './constants';
 import usePostTitleFocus from './use-post-title-focus';
 import usePostTitle from './use-post-title';
-import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Renders a raw post title input field.
