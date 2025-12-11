@@ -4,13 +4,14 @@
 import { useBlockProps, RichText } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 
+const saveBlockProps = useBlockProps.save;
+
 export default function NavigationOverlayCloseSave( { attributes } ) {
 	const { displayMode, text } = attributes;
 	const showIcon = displayMode === 'icon' || displayMode === 'both';
 	const showText = displayMode === 'text' || displayMode === 'both';
 
-	// eslint-disable-next-line react-compiler/react-compiler
-	const blockProps = useBlockProps.save( {
+	const blockProps = saveBlockProps( {
 		className: 'wp-block-navigation-overlay-close',
 	} );
 
