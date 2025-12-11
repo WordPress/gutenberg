@@ -1,16 +1,4 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryObj } from '@storybook/react';
-
-/**
- * WordPress dependencies
- */
-import '@wordpress/theme/design-tokens.css';
-
-/**
- * Internal dependencies
- */
 import { Stack } from '../index';
 import { Box } from '../../box';
 
