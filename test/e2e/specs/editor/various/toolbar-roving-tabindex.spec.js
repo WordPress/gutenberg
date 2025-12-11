@@ -45,14 +45,14 @@ test.describe( 'Toolbar roving tabindex', () => {
 		await editor.insertBlock( { name: 'core/heading' } );
 		await page.keyboard.type( 'Heading' );
 		await ToolbarRovingTabindexUtils.testBlockToolbarKeyboardNavigation(
-			'Block: Heading',
+			'Block: Heading 2',
 			'Heading 2'
 		);
 		await ToolbarRovingTabindexUtils.wrapCurrentBlockWithGroup(
 			'Heading 2'
 		);
 		await ToolbarRovingTabindexUtils.testGroupKeyboardNavigation(
-			'Block: Heading',
+			'Block: Heading 2',
 			'Heading 2'
 		);
 

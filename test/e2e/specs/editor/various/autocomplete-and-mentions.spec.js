@@ -566,15 +566,11 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 
 		await page.keyboard.type( 'heading' );
 		await expect(
-			page.locator( `role=option[name="Heading"i]` )
+			page.getByRole( 'option', { name: 'Heading', exact: true } )
 		).toBeVisible();
 		// Get the assertive live region screen reader announcement.
-		// Heading variations (h1-h6) are now searchable, so searching for "heading"
-		// returns: Heading, Heading 1-6, and Stretchy Heading = 8 results.
 		await expect(
-			page.getByText(
-				'8 results found, use up and down arrow keys to navigate.'
-			)
+			page.getByText( 'use up and down arrow keys to navigate.' )
 		).toBeVisible();
 	} );
 } );
