@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import fastDeepEqual from 'fast-deep-equal/es6';
+
+/**
  * WordPress dependencies
  */
 import { sprintf } from '@wordpress/i18n';
@@ -159,10 +164,7 @@ export function registerAbility( ability: Ability ) {
 				const existingValue = existingAbility[ prop ];
 				const newValue = ability[ prop ];
 				// Deep comparison for objects (schemas)
-				if (
-					JSON.stringify( existingValue ) !==
-					JSON.stringify( newValue )
-				) {
+				if ( ! fastDeepEqual( existingValue, newValue ) ) {
 					throw new Error(
 						sprintf(
 							'Cannot update ability "%1$s": only callback changes are allowed for hybrid abilities. Property "%2$s" differs.',
