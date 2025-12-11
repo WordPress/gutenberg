@@ -7,13 +7,19 @@ import {
 	RichText,
 } from '@wordpress/block-editor';
 import {
-	PanelBody,
+	__experimentalToolsPanel as ToolsPanel,
+	__experimentalToolsPanelItem as ToolsPanelItem,
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 	Button,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { close as closeIcon } from '@wordpress/icons';
+
+/**
+ * Internal dependencies
+ */
+import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
 export default function NavigationOverlayCloseEdit( {
 	attributes,
@@ -27,34 +33,49 @@ export default function NavigationOverlayCloseEdit( {
 		className: 'wp-block-navigation-overlay-close',
 	} );
 
+	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
+
 	return (
 		<>
 			<InspectorControls>
-				<PanelBody title={ __( 'Display Settings' ) }>
-					<ToggleGroupControl
+				<ToolsPanel
+					label={ __( 'Settings' ) }
+					resetAll={ () => setAttributes( { displayMode: 'icon' } ) }
+					dropdownMenuProps={ dropdownMenuProps }
+				>
+					<ToolsPanelItem
 						label={ __( 'Display Mode' ) }
-						value={ displayMode }
-						onChange={ ( value ) =>
-							setAttributes( { displayMode: value } )
+						isShownByDefault
+						hasValue={ () => displayMode !== 'icon' }
+						onDeselect={ () =>
+							setAttributes( { displayMode: 'icon' } )
 						}
-						isBlock
-						__next40pxDefaultSize
-						__nextHasNoMarginBottom
 					>
-						<ToggleGroupControlOption
-							value="icon"
-							label={ __( 'Icon' ) }
-						/>
-						<ToggleGroupControlOption
-							value="text"
-							label={ __( 'Text' ) }
-						/>
-						<ToggleGroupControlOption
-							value="both"
-							label={ __( 'Both' ) }
-						/>
-					</ToggleGroupControl>
-				</PanelBody>
+						<ToggleGroupControl
+							label={ __( 'Display Mode' ) }
+							value={ displayMode }
+							onChange={ ( value ) =>
+								setAttributes( { displayMode: value } )
+							}
+							isBlock
+							__next40pxDefaultSize
+							__nextHasNoMarginBottom
+						>
+							<ToggleGroupControlOption
+								value="icon"
+								label={ __( 'Icon' ) }
+							/>
+							<ToggleGroupControlOption
+								value="text"
+								label={ __( 'Text' ) }
+							/>
+							<ToggleGroupControlOption
+								value="both"
+								label={ __( 'Both' ) }
+							/>
+						</ToggleGroupControl>
+					</ToolsPanelItem>
+				</ToolsPanel>
 			</InspectorControls>
 			<Button
 				{ ...blockProps }
