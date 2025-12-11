@@ -44,6 +44,8 @@ export function CheckboxControl(
 	props: WordPressComponentProps< CheckboxControlProps, 'input', false >
 ) {
 	const {
+		// @ts-expect-error - Prevent passing this to `input`.
+		__nextHasNoMarginBottom: _,
 		label,
 		className,
 		heading,
