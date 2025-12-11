@@ -298,6 +298,7 @@ describe( 'OverlayTemplatePartSelector', () => {
 			} );
 
 			expect( editButton ).toBeEnabled();
+			expect( editButton ).toHaveAccessibleName();
 		} );
 
 		it( 'should be disabled when navigation to focused overlay editor is notavailable', () => {
@@ -414,47 +415,6 @@ describe( 'OverlayTemplatePartSelector', () => {
 					'Select an overlay to use for the navigation.'
 				)
 			).toBeInTheDocument();
-		} );
-	} );
-
-	describe( 'Accessibility', () => {
-		it( 'should have proper ARIA labels on edit button', () => {
-			useEntityRecords.mockReturnValue( {
-				records: [ templatePart1 ],
-				isResolving: false,
-				hasResolved: true,
-			} );
-
-			render(
-				<OverlayTemplatePartSelector
-					{ ...defaultProps }
-					overlay="twentytwentyfive//my-overlay"
-				/>
-			);
-
-			const editButton = screen.getByRole( 'button', {
-				name: ( accessibleName ) =>
-					accessibleName.startsWith( 'Edit overlay' ),
-			} );
-
-			expect( editButton ).toHaveAccessibleName();
-		} );
-
-		it( 'should show disabled select control when initially loading', () => {
-			useEntityRecords.mockReturnValue( {
-				records: null,
-				isResolving: true,
-				hasResolved: false,
-			} );
-
-			render( <OverlayTemplatePartSelector { ...defaultProps } /> );
-
-			// Should show disabled select control instead of spinner
-			const select = screen.getByRole( 'combobox', {
-				name: 'Overlay template',
-			} );
-			expect( select ).toBeInTheDocument();
-			expect( select ).toBeDisabled();
 		} );
 	} );
 } );
