@@ -9,7 +9,7 @@ import {
 } from '@wordpress/element';
 import { useEntityRecords, store as coreStore } from '@wordpress/core-data';
 import { useDispatch } from '@wordpress/data';
-import { SelectControl, Spinner, Button } from '@wordpress/components';
+import { SelectControl, Button } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { decodeEntities } from '@wordpress/html-entities';
 import { store as noticesStore } from '@wordpress/notices';
@@ -190,9 +190,7 @@ export default function OverlayTemplatePartSelector( {
 				error.message &&
 				error.code !== 'unknown_error'
 					? error.message
-					: __(
-							'An error occurred while creating the overlay template part.'
-					  );
+					: __( 'An error occurred while creating the overlay.' );
 
 			createErrorNotice( errorMessage, { type: 'snackbar' } );
 		} finally {
@@ -251,15 +249,6 @@ export default function OverlayTemplatePartSelector( {
 		isCreating,
 		handleCreateOverlay,
 	] );
-
-	if ( isResolving && ! hasResolved ) {
-		return (
-			<div className="wp-block-navigation__overlay-selector">
-				<Spinner />
-				<p>{ __( 'Loading overlays…' ) }</p>
-			</div>
-		);
-	}
 
 	return (
 		<div className="wp-block-navigation__overlay-selector">
