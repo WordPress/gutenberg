@@ -102,7 +102,9 @@
 	// Show interactive elements on focus
 	&.has-bulk-actions {
 		tr {
-			&:focus-within {
+			&:focus-within,
+			&.is-hovered,
+			&:hover {
 				.dataviews-item-actions .components-button:not(.dataviews-all-actions-button) {
 					opacity: 1;
 				}
