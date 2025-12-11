@@ -52,7 +52,7 @@ const FilterTextBetween = ( {
 } ): ReactElement => {
 	return createInterpolateElement(
 		sprintf(
-			/* translators: 1: Filter name. 2: Operator string. 3: Filter value min. 4: Filter value max. e.g.: "Item count between: 10 and 180". */
+			/* translators: 1: Filter name (e.g. "Item count"). 2: Operator string (e.g. "between"). 3: Filter value min. 4: Filter value max. e.g.: "Item count between: 10 and 180". */
 			__( '<Name>%1$s %2$s: </Name><Value>%3$s and %4$s</Value>' ),
 			filter,
 			operator,
