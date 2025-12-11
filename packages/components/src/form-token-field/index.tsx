@@ -11,7 +11,7 @@ import { useEffect, useRef, useState } from '@wordpress/element';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { useDebounce, useInstanceId, usePrevious } from '@wordpress/compose';
 import { speak } from '@wordpress/a11y';
-import isShallowEqual from '@wordpress/is-shallow-equal';
+import { isShallowEqual } from '@wordpress/is-shallow-equal';
 
 /**
  * Internal dependencies
