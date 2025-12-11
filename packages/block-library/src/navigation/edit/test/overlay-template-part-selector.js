@@ -95,8 +95,8 @@ describe( 'OverlayTemplatePartSelector', () => {
 		} );
 	} );
 
-	describe( 'Template part selection', () => {
-		it( 'should show selector with "None (default)" option when no template parts are available', () => {
+	describe( 'Overlay selection', () => {
+		it( 'should show selector with "None (default)" option when no overlays are available', () => {
 			useEntityRecords.mockReturnValue( {
 				records: [],
 				isResolving: false,
@@ -117,7 +117,7 @@ describe( 'OverlayTemplatePartSelector', () => {
 			).toBeInTheDocument();
 		} );
 
-		it( 'should filter template parts by overlay area', () => {
+		it( 'should only show overlay (template parts) in the selector', () => {
 			useEntityRecords.mockReturnValue( {
 				records: allTemplateParts,
 				isResolving: false,
@@ -145,7 +145,7 @@ describe( 'OverlayTemplatePartSelector', () => {
 			).not.toBeInTheDocument();
 		} );
 
-		it( 'should display template part slug when title is missing', () => {
+		it( 'should display overlay slug when title is missing', () => {
 			const templatePartNoTitle = {
 				...templatePart1,
 				title: null,
@@ -164,7 +164,7 @@ describe( 'OverlayTemplatePartSelector', () => {
 			).toBeInTheDocument();
 		} );
 
-		it( 'should call setAttributes when a template part is selected', async () => {
+		it( 'should call set the overlay attribute when an overlay is selected', async () => {
 			const user = userEvent.setup();
 
 			useEntityRecords.mockReturnValue( {
@@ -213,7 +213,7 @@ describe( 'OverlayTemplatePartSelector', () => {
 			} );
 		} );
 
-		it( 'should display selected template part', () => {
+		it( 'should display selected overlay', () => {
 			useEntityRecords.mockReturnValue( {
 				records: [ templatePart1 ],
 				isResolving: false,
@@ -236,7 +236,7 @@ describe( 'OverlayTemplatePartSelector', () => {
 	} );
 
 	describe( 'Edit button', () => {
-		it( 'should not render when no template part is selected', () => {
+		it( 'should not render when no overlay is selected', () => {
 			useEntityRecords.mockReturnValue( {
 				records: [ templatePart1 ],
 				isResolving: false,
@@ -252,7 +252,7 @@ describe( 'OverlayTemplatePartSelector', () => {
 			expect( editButton ).not.toBeInTheDocument();
 		} );
 
-		it( 'should disable button when template parts are initially loading', () => {
+		it( 'should disable button when overlays are initially loading', () => {
 			useEntityRecords.mockReturnValue( {
 				records: [ templatePart1 ],
 				isResolving: true,
@@ -301,7 +301,7 @@ describe( 'OverlayTemplatePartSelector', () => {
 			expect( editButton ).toHaveAccessibleName();
 		} );
 
-		it( 'should be disabled when navigation to focused overlay editor is notavailable', () => {
+		it( 'should be disabled when navigation to focused overlay editor is not available', () => {
 			useEntityRecords.mockReturnValue( {
 				records: [ templatePart1 ],
 				isResolving: false,
