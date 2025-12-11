@@ -22,7 +22,6 @@ import { STORE_NAME } from './name';
 import { LOCAL_EDITOR_ORIGIN, getSyncManager } from './sync';
 import logEntityDeprecation from './utils/log-entity-deprecation';
 
-
 /**
  * Returns an action object used in signalling that the collaborator mode has been set.
  *

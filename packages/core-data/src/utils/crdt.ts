@@ -365,7 +365,9 @@ export function getPostChangesFromCRDTDoc(
 						)
 					);
 
-					const rtcMeta = allowedMetaChanges.rtc as RtcMeta | undefined;
+					const rtcMeta = allowedMetaChanges.rtc as
+						| RtcMeta
+						| undefined;
 
 					// The enforced mode has been set to code editor.
 					if ( rtcMeta?.enforcedMode === 'codeEditor' ) {
@@ -374,12 +376,16 @@ export function getPostChangesFromCRDTDoc(
 						// The current user is not the owner of the enforced mode, set the collaborator mode to view.
 						if ( currenUser.id !== rtcMeta.enforcedModeOwner ) {
 							dispatch( coreStore ).setCollaboratorMode( 'view' );
-						// The current user is the owner of the enforced mode, set the collaborator mode to edit.
+							// The current user is the owner of the enforced mode, set the collaborator mode to edit.
 						} else {
 							dispatch( coreStore ).setCollaboratorMode( 'edit' );
 						}
-					// The enforced mode has been removed, set the collaborator mode to edit.
-					} else if ( rtcMeta && ! rtcMeta.enforcedMode && ! rtcMeta.enforcedModeOwner ) {
+						// The enforced mode has been removed, set the collaborator mode to edit.
+					} else if (
+						rtcMeta &&
+						! rtcMeta.enforcedMode &&
+						! rtcMeta.enforcedModeOwner
+					) {
 						dispatch( coreStore ).setCollaboratorMode( 'edit' );
 					}
 

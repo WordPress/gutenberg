@@ -28,11 +28,10 @@ export default function PostTextEditor() {
 	const instanceId = useInstanceId( PostTextEditor );
 	const { content, blocks, type, id, collaboratorMode } = useSelect(
 		( select ) => {
-			const { getEditedEntityRecord, getCollaboratorMode } = select( coreStore );
-			const {
-				getCurrentPostType,
-				getCurrentPostId,
-			} = select( editorStore );
+			const { getEditedEntityRecord, getCollaboratorMode } =
+				select( coreStore );
+			const { getCurrentPostType, getCurrentPostId } =
+				select( editorStore );
 			const _type = getCurrentPostType();
 			const _id = getCurrentPostId();
 			const editedRecord = getEditedEntityRecord(

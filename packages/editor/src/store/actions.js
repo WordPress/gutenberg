@@ -975,7 +975,7 @@ export const switchEditorMode =
 					rtc: {
 						enforcedMode: undefined,
 						enforcedModeOwner: undefined,
-					}
+					},
 				},
 			} );
 		} else if (
@@ -991,7 +991,7 @@ export const switchEditorMode =
 					rtc: {
 						enforcedMode: 'codeEditor',
 						enforcedModeOwner: currentUser.id,
-					}
+					},
 				},
 			} );
 		}
