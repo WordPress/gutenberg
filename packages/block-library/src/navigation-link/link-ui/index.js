@@ -73,10 +73,10 @@ function UnforwardedLinkUI( props, ref ) {
 
 	const [ addingBlock, setAddingBlock ] = useState( false );
 	const [ addingPage, setAddingPage ] = useState( false );
-	const [ focusAddBlockButton, setFocusAddBlockButton ] = useState( false );
-	const [ focusAddPageButton, setFocusAddPageButton ] = useState( false );
+	const [ shouldFocusPane, setShouldFocusPane ] = useState( null );
 	const linkControlWrapperRef = useRef();
-	const shouldFocusAfterPageCreation = useRef( false );
+	const addPageButtonRef = useRef();
+	const addBlockButtonRef = useRef();
 	const permissions = useResourcePermissions( {
 		kind: 'postType',
 		name: postType,
@@ -105,10 +105,9 @@ function UnforwardedLinkUI( props, ref ) {
 	const handlePageCreated = ( pageLink ) => {
 		// Set the new page as the current link
 		props.onChange( pageLink );
-		// Return to main Link UI
+		// Return to main Link UI and focus the first focusable element
 		setAddingPage( false );
-		// Request focus after the LinkControl remounts in preview mode
-		shouldFocusAfterPageCreation.current = true;
+		setShouldFocusPane( true );
 	};
 
 	const dialogTitleId = useInstanceId(
@@ -120,23 +119,26 @@ function UnforwardedLinkUI( props, ref ) {
 		'link-ui-link-control__description'
 	);
 
-	// Focus the LinkControl after page creation
+	// Focus management when transitioning between panes
 	useEffect( () => {
-		if (
-			! addingPage &&
-			shouldFocusAfterPageCreation.current &&
-			linkControlWrapperRef.current
-		) {
-			const nextFocusTarget =
-				focus.focusable.find( linkControlWrapperRef.current )[ 0 ] ||
-				linkControlWrapperRef.current;
-			nextFocusTarget.focus();
-			// Reset the flag after focusing. We could avoid this eslint rule by
-			// using a state instead of a ref, but it would cause an unnecessary re-render.
-			// eslint-disable-next-line react-compiler/react-compiler
-			shouldFocusAfterPageCreation.current = false;
+		if ( shouldFocusPane && linkControlWrapperRef.current ) {
+			// If we have a specific element to focus, focus it
+			if ( shouldFocusPane?.current ) {
+				// Focus the specific element passed
+				shouldFocusPane.current.focus();
+			} else {
+				// Focus the first focusable element
+				const nextFocusTarget =
+					focus.focusable.find(
+						linkControlWrapperRef.current
+					)[ 0 ] || linkControlWrapperRef.current;
+				nextFocusTarget.focus();
+			}
+
+			// Reset the state
+			setShouldFocusPane( false );
 		}
-	}, [ addingPage ] );
+	}, [ shouldFocusPane ] );
 
 	const blockEditingMode = useBlockEditingMode();
 
@@ -186,15 +188,13 @@ function UnforwardedLinkUI( props, ref ) {
 
 							return (
 								<LinkUITools
-									focusAddBlockButton={ focusAddBlockButton }
-									focusAddPageButton={ focusAddPageButton }
+									addPageButtonRef={ addPageButtonRef }
+									addBlockButtonRef={ addBlockButtonRef }
 									setAddingBlock={ () => {
 										setAddingBlock( true );
-										setFocusAddBlockButton( false );
 									} }
 									setAddingPage={ () => {
 										setAddingPage( true );
-										setFocusAddPageButton( false );
 									} }
 									canAddPage={
 										permissions?.canCreate &&
@@ -215,8 +215,7 @@ function UnforwardedLinkUI( props, ref ) {
 					clientId={ props.clientId }
 					onBack={ () => {
 						setAddingBlock( false );
-						setFocusAddBlockButton( true );
-						setFocusAddPageButton( false );
+						setShouldFocusPane( addBlockButtonRef );
 					} }
 					onBlockInsert={ props?.onBlockInsert }
 				/>
@@ -227,8 +226,7 @@ function UnforwardedLinkUI( props, ref ) {
 					postType={ postType }
 					onBack={ () => {
 						setAddingPage( false );
-						setFocusAddPageButton( true );
-						setFocusAddBlockButton( false );
+						setShouldFocusPane( addPageButtonRef );
 					} }
 					onPageCreated={ handlePageCreated }
 					initialTitle={ link?.url || '' }
@@ -241,30 +239,14 @@ function UnforwardedLinkUI( props, ref ) {
 export const LinkUI = forwardRef( UnforwardedLinkUI );
 
 const LinkUITools = ( {
+	addPageButtonRef,
+	addBlockButtonRef,
 	setAddingBlock,
 	setAddingPage,
-	focusAddBlockButton,
-	focusAddPageButton,
 	canAddPage,
 	canAddBlock,
 } ) => {
 	const blockInserterAriaRole = 'listbox';
-	const addBlockButtonRef = useRef();
-	const addPageButtonRef = useRef();
-
-	// Focus the add block button when the popover is opened.
-	useEffect( () => {
-		if ( focusAddBlockButton ) {
-			addBlockButtonRef.current?.focus();
-		}
-	}, [ focusAddBlockButton ] );
-
-	// Focus the add page button when the popover is opened.
-	useEffect( () => {
-		if ( focusAddPageButton ) {
-			addPageButtonRef.current?.focus();
-		}
-	}, [ focusAddPageButton ] );
 
 	// Don't render anything if neither button should be shown
 	if ( ! canAddPage && ! canAddBlock ) {
