@@ -19,6 +19,9 @@
 					"$value": { "value": 8, "unit": "px" },
 					"$description": "Large radius for surfaces"
 				}
+			},
+			"$extensions": {
+				"com.figma.scopes": [ "CORNER_RADIUS" ]
 			}
 		},
 		"width": {
@@ -50,6 +53,9 @@
 						}
 					}
 				}
+			},
+			"$extensions": {
+				"com.figma.scopes": [ "STROKE_FLOAT" ]
 			}
 		}
 	}

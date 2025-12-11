@@ -163,6 +163,9 @@
 						"comfortable": "{wpds-dimension.primitive.space.90}"
 					}
 				}
+			},
+			"$extensions": {
+				"com.figma.scopes": [ "GAP" ]
 			}
 		}
 	}
