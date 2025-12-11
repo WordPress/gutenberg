@@ -1,14 +1,19 @@
 /**
  * WordPress dependencies
  */
-import { useMemo, useState, useEffect } from '@wordpress/element';
+import {
+	useMemo,
+	useState,
+	useEffect,
+	useCallback,
+	createInterpolateElement,
+} from '@wordpress/element';
 import { useEntityRecords, store as coreStore } from '@wordpress/core-data';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { SelectControl, Spinner, Button } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { decodeEntities } from '@wordpress/html-entities';
 import { serialize } from '@wordpress/blocks';
-import { plus } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
 
 /**
@@ -151,7 +156,7 @@ export default function OverlayTemplatePartSelector( {
 		} );
 	};
 
-	const handleCreateOverlay = async () => {
+	const handleCreateOverlay = useCallback( async () => {
 		try {
 			// Generate unique name using only overlay area template parts
 			// Filter to only include template parts with titles for uniqueness check
@@ -217,7 +222,14 @@ export default function OverlayTemplatePartSelector( {
 			createErrorNotice( errorMessage, { type: 'snackbar' } );
 			setCreatingRecordId( null );
 		}
-	};
+	}, [
+		overlayTemplateParts,
+		saveEntityRecord,
+		setAttributes,
+		onNavigateToEntityRecord,
+		invalidateResolution,
+		createErrorNotice,
+	] );
 
 	const isEditButtonDisabled =
 		! overlay ||
@@ -226,6 +238,45 @@ export default function OverlayTemplatePartSelector( {
 		isResolving;
 
 	const isCreateButtonDisabled = isResolving || isSavingNewRecord;
+
+	// Build help text with create button using createInterpolateElement
+	// Must be called before early return to follow Rules of Hooks
+	const helpText = useMemo( () => {
+		const createButton = (
+			<Button
+				__next40pxDefaultSize
+				variant="link"
+				onClick={ handleCreateOverlay }
+				disabled={ isCreateButtonDisabled }
+				accessibleWhenDisabled
+				isBusy={ isSavingNewRecord }
+				className="wp-block-navigation__overlay-create-link"
+			>
+				{ __( 'Create new?' ) }
+			</Button>
+		);
+
+		if ( overlayTemplateParts.length === 0 && hasResolved ) {
+			return createInterpolateElement(
+				__( 'No overlays found. <button />' ),
+				{
+					button: createButton,
+				}
+			);
+		}
+		return createInterpolateElement(
+			__( 'Select an overlay to use for the navigation. <button />' ),
+			{
+				button: createButton,
+			}
+		);
+	}, [
+		overlayTemplateParts.length,
+		hasResolved,
+		isCreateButtonDisabled,
+		isSavingNewRecord,
+		handleCreateOverlay,
+	] );
 
 	if ( isResolving && ! hasResolved ) {
 		return (
@@ -247,24 +298,8 @@ export default function OverlayTemplatePartSelector( {
 				onChange={ handleSelectChange }
 				disabled={ isResolving }
 				accessibleWhenDisabled
-				help={
-					overlayTemplateParts.length === 0 && hasResolved
-						? __( 'No overlays found.' )
-						: __( 'Select an overlay to use for the navigation.' )
-				}
+				help={ helpText }
 			/>
-			<Button
-				__next40pxDefaultSize
-				variant="secondary"
-				onClick={ handleCreateOverlay }
-				disabled={ isCreateButtonDisabled }
-				accessibleWhenDisabled
-				isBusy={ isSavingNewRecord }
-				icon={ plus }
-				className="wp-block-navigation__overlay-create-button"
-			>
-				{ __( 'Create new overlay' ) }
-			</Button>
 			{ overlay && (
 				<Button
 					__next40pxDefaultSize
