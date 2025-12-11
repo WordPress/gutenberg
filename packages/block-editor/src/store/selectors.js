@@ -2169,6 +2169,9 @@ const buildBlockTypeItem =
 				.map( ( variation ) => ( {
 					...variation,
 					isSearchOnly: true,
+					// Block-scope `isDefault` is for the placeholder picker,
+					// not for the inserter, so don't carry it over.
+					isDefault: false,
 				} ) ),
 		];
 		return {
@@ -2302,15 +2305,7 @@ export const getInserterItems = createRegistrySelector( ( select ) =>
 				( accumulator, item ) => {
 					const { variations = [] } = item;
 					// Exclude any block type item that is to be replaced by a default variation.
-					// Only consider non-search-only variations ("inserter" scope) for this check.
-					// "block" scope variations marked as `isSearchOnly` should not cause the base
-					// block to be excluded.
-					if (
-						! variations.some(
-							( variation ) =>
-								! variation.isSearchOnly && variation.isDefault
-						)
-					) {
+					if ( ! variations.some( ( { isDefault } ) => isDefault ) ) {
 						accumulator.push( item );
 					}
 					if ( variations.length ) {
