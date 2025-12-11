@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import { useBlockProps, RichText } from '@wordpress/block-editor';
-import { __ } from '@wordpress/i18n';
 
 const saveBlockProps = useBlockProps.save;
 
@@ -19,7 +18,7 @@ export default function NavigationOverlayCloseSave( { attributes } ) {
 		<button
 			{ ...blockProps }
 			type="button"
-			aria-label={ ! showText ? __( 'Close' ) : undefined }
+			aria-label={ ! showText ? 'Close' : undefined }
 		>
 			{ showIcon && (
 				<svg
