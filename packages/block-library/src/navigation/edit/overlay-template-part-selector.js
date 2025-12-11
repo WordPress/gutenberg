@@ -12,7 +12,6 @@ import { useDispatch } from '@wordpress/data';
 import { SelectControl, Spinner, Button } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { decodeEntities } from '@wordpress/html-entities';
-import { serialize } from '@wordpress/blocks';
 import { store as noticesStore } from '@wordpress/notices';
 
 /**
@@ -154,7 +153,6 @@ export default function OverlayTemplatePartSelector( {
 				{
 					slug: cleanSlug,
 					title: uniqueTitle,
-					content: serialize( [] ),
 					area: 'overlay',
 				},
 				{ throwOnError: true }
