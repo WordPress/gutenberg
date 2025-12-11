@@ -31,7 +31,7 @@ import PostTransformPanel from '../post-transform-panel';
 import SidebarHeader from './header';
 import TemplateContentPanel from '../template-content-panel';
 import TemplatePartContentPanel from '../template-part-content-panel';
-import MediaMetadataPanel from '../media-metadata-panel';
+import { MediaMetadataPanel } from '../media';
 import useAutoSwitchEditorSidebars from '../provider/use-auto-switch-editor-sidebars';
 import { sidebars } from './constants';
 import { unlock } from '../../lock-unlock';
