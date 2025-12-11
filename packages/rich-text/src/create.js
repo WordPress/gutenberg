@@ -610,10 +610,22 @@ function createFromElement( { element, range, isEditableTree } ) {
 					return mergeFormats.newFormats;
 				}
 
-				// If the child already has the same format as the parent at
-				// the outermost level, don't nest it. This prevents
-				// redundant wrapping of formats like nested <mark> elements
-				// with identical attributes when copy/pasting.
+				// Root cause: When parsing HTML like <mark class="A"><mark class="A">text</mark></mark>,
+				// createFromElement processes elements recursively. The inner mark creates
+				// a format array [markA]. Then for the outer mark, this function is called
+				// to wrap the child's formats by prepending the parent format, resulting in
+				// [markA, markA]. This happens because the original logic always prepends
+				// the parent format without checking if it already exists.
+				//
+				// This nesting occurs when:
+				// 1. User copies text with a mark element: <mark class="A">text</mark>
+				// 2. Pastes into another block that also has mark formatting with class A
+				// 3. The pasted HTML already contains <mark class="A">...</mark>
+				// 4. The destination context wraps it in another <mark class="A">...</mark>
+				// 5. createFromElement processes both marks, creating redundant nesting
+				//
+				// Fix: Check if the child's outermost format equals the parent format.
+				// If so, skip adding the parent to prevent duplication.
 				// See: https://github.com/WordPress/gutenberg/issues/58806
 				if (
 					formats &&
