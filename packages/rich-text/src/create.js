@@ -12,6 +12,7 @@ import { mergePair } from './concat';
 import { OBJECT_REPLACEMENT_CHARACTER, ZWNBSP } from './special-characters';
 import { toHTMLString } from './to-html-string';
 import { getTextContent } from './get-text-content';
+import { isFormatEqual } from './is-format-equal';
 
 /** @typedef {import('./types').RichTextValue} RichTextValue */
 
@@ -607,6 +608,22 @@ function createFromElement( { element, range, isEditableTree } ) {
 			function mergeFormats( formats ) {
 				if ( mergeFormats.formats === formats ) {
 					return mergeFormats.newFormats;
+				}
+
+				// If the child already has the same format as the parent at
+				// the outermost level, don't nest it. This prevents
+				// redundant wrapping of formats like nested <mark> elements
+				// with identical attributes when copy/pasting.
+				// See: https://github.com/WordPress/gutenberg/issues/58806
+				if (
+					formats &&
+					formats.length > 0 &&
+					formats[ 0 ] &&
+					isFormatEqual( formats[ 0 ], format )
+				) {
+					mergeFormats.formats = formats;
+					mergeFormats.newFormats = formats;
+					return formats;
 				}
 
 				const newFormats = formats
