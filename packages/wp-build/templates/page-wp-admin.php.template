@@ -226,6 +226,76 @@ if ( ! function_exists( '{{PAGE_SLUG_UNDERSCORE}}_wp_admin_render_page' ) ) {
 // Hook the enqueue function to admin_enqueue_scripts
 add_action( 'admin_enqueue_scripts', '{{PAGE_SLUG_UNDERSCORE}}_wp_admin_enqueue_scripts' );
 
+// Hook menu highlighting fixes early, before menu is rendered
+add_action( 'admin_init', '{{PAGE_SLUG_UNDERSCORE}}_wp_admin_register_menu_fixes' );
+
+if ( ! function_exists( '{{PAGE_SLUG_UNDERSCORE}}_wp_admin_register_menu_fixes' ) ) {
+	/**
+	 * Register menu highlighting filters early.
+	 * Must run before WordPress renders the menu.
+	 */
+	function {{PAGE_SLUG_UNDERSCORE}}_wp_admin_register_menu_fixes() {
+		global $title;
+
+		// Only run on our page
+		if ( ! isset( $_GET['page'] ) || '{{PAGE_SLUG}}-wp-admin' !== $_GET['page'] ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			return;
+		}
+
+		// Only register filters if we have a route parameter
+		if ( isset( $_GET['p'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			// Set title early so get_admin_page_title() doesn't need to search $submenu
+			$title = __( '{{PAGE_DEFAULT_TITLE}}', '{{PREFIX}}' );
+
+			add_filter( 'parent_file', '{{PAGE_SLUG_UNDERSCORE}}_wp_admin_fix_parent_file' );
+			add_filter( 'submenu_file', '{{PAGE_SLUG_UNDERSCORE}}_wp_admin_fix_submenu_file' );
+		}
+	}
+}
+
+if ( ! function_exists( '{{PAGE_SLUG_UNDERSCORE}}_wp_admin_fix_parent_file' ) ) {
+	/**
+	 * Fix parent menu highlighting for {{PAGE_SLUG}}-wp-admin pages.
+	 * This needs to run before WordPress renders the menu.
+	 *
+	 * @param string $parent_file The current parent file.
+	 * @return string The corrected parent file.
+	 */
+	function {{PAGE_SLUG_UNDERSCORE}}_wp_admin_fix_parent_file( $parent_file ) {
+		global $submenu;
+
+		// Construct the full URL that matches how the menu item was registered
+		$target_url = admin_url( 'admin.php?page={{PAGE_SLUG}}-wp-admin&p=' . urlencode( $_GET['p'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+
+		// Find the parent menu by introspecting the submenu array
+		if ( ! empty( $submenu ) ) {
+			foreach ( $submenu as $parent => $items ) {
+				foreach ( $items as $item ) {
+					// Menu item structure: [0] => title, [1] => capability, [2] => slug
+					if ( isset( $item[2] ) && $item[2] === $target_url ) {
+						return $parent;
+					}
+				}
+			}
+		}
+
+		return $parent_file;
+	}
+}
+
+if ( ! function_exists( '{{PAGE_SLUG_UNDERSCORE}}_wp_admin_fix_submenu_file' ) ) {
+	/**
+	 * Fix submenu item highlighting for {{PAGE_SLUG}}-wp-admin pages.
+	 *
+	 * @param string $submenu_file The current submenu file.
+	 * @return string The corrected submenu file.
+	 */
+	function {{PAGE_SLUG_UNDERSCORE}}_wp_admin_fix_submenu_file( $submenu_file ) {
+		// Construct the full URL that matches how the menu item was registered
+		return admin_url( 'admin.php?page={{PAGE_SLUG}}-wp-admin&p=' . urlencode( $_GET['p'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+	}
+}
+
 if ( ! function_exists( '{{PAGE_SLUG_UNDERSCORE}}_wp_admin_register_page' ) ) {
 	/**
 	 * Register the {{PAGE_SLUG}}-wp-admin base page handler.
@@ -237,6 +307,8 @@ if ( ! function_exists( '{{PAGE_SLUG_UNDERSCORE}}_wp_admin_register_page' ) ) {
 	 * add_menu_page( 'Title', 'Menu', 'capability', $url, '', 'icon', 10 );
 	 */
 	function {{PAGE_SLUG_UNDERSCORE}}_wp_admin_register_page() {
+		global $submenu;
+
 		add_submenu_page(
 			'nothing-{{PAGE_SLUG}}',                                 // Hidden page (no parent)
 			__( '{{PAGE_DEFAULT_TITLE}}', '{{PREFIX}}' ),           // Page title
@@ -245,6 +317,12 @@ if ( ! function_exists( '{{PAGE_SLUG_UNDERSCORE}}_wp_admin_register_page' ) ) {
 			'{{PAGE_SLUG}}-wp-admin',                                // Menu slug for URL routing
 			'{{PAGE_SLUG_UNDERSCORE}}_wp_admin_render_page'          // Callback function
 		);
+
+		// Remove from submenu array to prevent get_admin_page_parent() from finding it
+		// WordPress has already registered the callback, so the page will still work
+		if ( isset( $submenu['nothing-{{PAGE_SLUG}}'] ) ) {
+			unset( $submenu['nothing-{{PAGE_SLUG}}'] );
+		}
 	}
 }
 
