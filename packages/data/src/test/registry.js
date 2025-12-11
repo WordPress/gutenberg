@@ -467,6 +467,41 @@ describe( 'createRegistry', () => {
 			expect( fulfill ).toHaveBeenCalledTimes( 1 ); // Still only called once
 		} );
 
+		it( 'should mark resolution as failed when isFulfilled throws an error', async () => {
+			const fulfill = jest.fn().mockImplementation( () => ( {
+				type: 'SET_DATA',
+				data: 'resolved data',
+			} ) );
+			const isFulfilled = jest.fn( () => {
+				throw new Error( 'isFulfilled error' );
+			} );
+
+			registry.registerStore( 'demo', {
+				reducer: ( state = { hasData: false }, action ) => {
+					if ( action.type === 'SET_DATA' ) {
+						return { hasData: true, data: action.data };
+					}
+					return state;
+				},
+				selectors: {
+					getData: ( state ) => state.data,
+				},
+				resolvers: {
+					getData: { fulfill, isFulfilled },
+				},
+			} );
+
+			const promise = registry.resolveSelect( 'demo' ).getData();
+			jest.runAllTimers();
+			await expect( promise ).rejects.toThrow( 'isFulfilled error' );
+
+			expect( isFulfilled ).toHaveBeenCalledTimes( 1 );
+			expect( fulfill ).not.toHaveBeenCalled();
+			expect(
+				registry.select( 'demo' ).hasResolutionFailed( 'getData' )
+			).toBe( true );
+		} );
+
 		it( 'should resolve action to dispatch', () => {
 			registry.registerStore( 'demo', {
 				reducer: ( state = 'NOTOK', action ) => {
