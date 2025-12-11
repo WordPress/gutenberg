@@ -8,11 +8,6 @@
 	background: transparent;
 	cursor: pointer;
 	text-decoration: none;
-	transition: opacity 0.2s;
-
-	&:hover {
-		opacity: 0.8;
-	}
 
 	&:focus {
 		outline: 2px solid currentColor;
@@ -23,10 +18,13 @@
 		width: 1.5em;
 		height: 1.5em;
 		fill: currentColor;
+		display: block;
+		flex-shrink: 0;
 	}
 
-	span {
-		display: inline-block;
+	.wp-block-navigation-overlay-close__text {
+		display: inline-flex;
+		align-items: center;
 	}
 }
 

@@ -11,10 +11,9 @@ import {
 	__experimentalToolsPanelItem as ToolsPanelItem,
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
-	Button,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { close as closeIcon } from '@wordpress/icons';
+import { Icon, close } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -77,12 +76,12 @@ export default function NavigationOverlayCloseEdit( {
 					</ToolsPanelItem>
 				</ToolsPanel>
 			</InspectorControls>
-			<Button
+			<button
 				{ ...blockProps }
-				icon={ showIcon ? closeIcon : undefined }
+				type="button"
 				aria-label={ ! showText ? __( 'Close' ) : undefined }
-				__next40pxDefaultSize
 			>
+				{ showIcon && <Icon icon={ close } /> }
 				{ showText && (
 					<RichText
 						identifier="text"
@@ -93,10 +92,11 @@ export default function NavigationOverlayCloseEdit( {
 						placeholder={ __( 'Close' ) }
 						withoutInteractiveFormatting
 						tagName="span"
+						className="wp-block-navigation-overlay-close__text"
 						allowedFormats={ [ 'core/bold', 'core/italic' ] }
 					/>
 				) }
-			</Button>
+			</button>
 		</>
 	);
 }
