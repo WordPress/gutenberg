@@ -123,4 +123,78 @@ describe( 'create', () => {
 			)
 		).toEqual( 'test' );
 	} );
+
+	it( 'should not nest identical mark elements', () => {
+		// Test case for https://github.com/WordPress/gutenberg/issues/58806
+		// When pasting highlighted text, identical mark elements should not be nested
+		const mark = {
+			type: 'mark',
+			attributes: {
+				style: 'background-color:rgba(0, 0, 0, 0)',
+				class: 'has-inline-color has-accent-4-color',
+			},
+		};
+
+		// HTML representing nested mark elements with identical attributes
+		// This simulates what happens when you copy/paste highlighted text
+		const html =
+			'<mark style="background-color:rgba(0, 0, 0, 0)" class="has-inline-color has-accent-4-color">' +
+			'<mark style="background-color:rgba(0, 0, 0, 0)" class="has-inline-color has-accent-4-color">' +
+			'test' +
+			'</mark>' +
+			'</mark>';
+
+		const value = create( { html } );
+
+		// Should have only one mark format per character, not two nested identical marks
+		expect( value ).toEqual( {
+			formats: [ [ mark ], [ mark ], [ mark ], [ mark ] ],
+			replacements: [ , , , , ],
+			text: 'test',
+		} );
+
+		// All format arrays should reference the same mark object
+		expect( value.formats[ 0 ][ 0 ] ).toBe( value.formats[ 1 ][ 0 ] );
+		expect( value.formats[ 0 ][ 0 ] ).toBe( value.formats[ 2 ][ 0 ] );
+		expect( value.formats[ 0 ][ 0 ] ).toBe( value.formats[ 3 ][ 0 ] );
+	} );
+
+	it( 'should nest different mark elements', () => {
+		// When marks have different attributes, they should still be nested
+		const mark1 = {
+			type: 'mark',
+			attributes: {
+				style: 'background-color:rgba(0, 0, 0, 0)',
+				class: 'has-inline-color has-accent-4-color',
+			},
+		};
+		const mark2 = {
+			type: 'mark',
+			attributes: {
+				style: 'background-color:rgba(0, 0, 0, 0)',
+				class: 'has-inline-color has-accent-2-color',
+			},
+		};
+
+		const html =
+			'<mark style="background-color:rgba(0, 0, 0, 0)" class="has-inline-color has-accent-4-color">' +
+			'<mark style="background-color:rgba(0, 0, 0, 0)" class="has-inline-color has-accent-2-color">' +
+			'test' +
+			'</mark>' +
+			'</mark>';
+
+		const value = create( { html } );
+
+		// Should have two different marks nested
+		expect( value ).toEqual( {
+			formats: [
+				[ mark1, mark2 ],
+				[ mark1, mark2 ],
+				[ mark1, mark2 ],
+				[ mark1, mark2 ],
+			],
+			replacements: [ , , , , ],
+			text: 'test',
+		} );
+	} );
 } );
