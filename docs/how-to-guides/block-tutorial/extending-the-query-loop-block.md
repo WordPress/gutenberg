@@ -210,18 +210,20 @@ The `taxQuery` attribute supports both inclusion and exclusion of taxonomy terms
 {
 	query: {
 		taxQuery: {
-			category: [1, 2, 3], // Include posts with these category IDs.
-			post_tag: [10, 20], // Include posts with these tag IDs.
-			excludeTerms: { // Exclude posts with specific terms.
-				category: [5, 6],
-				post_tag: [15]
+			include: {
+				category: [1, 2, 3], // Include posts with these category IDs.
+				post_tag: [10, 20] // Include posts with these tag IDs.
+			},
+			exclude: {
+				category: [5, 6], // Exclude posts with these category IDs.
+				post_tag: [15] // Exclude posts with these tag IDs.
 			}
 		}
 	}
 }
 ```
 
-When you use the `taxQuery` control in your variation, users will see both "Include: [Taxonomy]" and "Exclude: [Taxonomy]" controls for each applicable taxonomy. The inclusion and exclusion are mutually exclusive in the UI - terms selected in one won't appear as suggestions in the other.
+When you use the `taxQuery` control in your variation, users will see both "[Taxonomy]" (inclusion) and "Exclude: [Taxonomy]" controls for each applicable taxonomy. The inclusion and exclusion are mutually exclusive in the UI - terms selected in one won't appear as suggestions in the other.
 
 ### Adding additional controls
 

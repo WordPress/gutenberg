@@ -70,7 +70,7 @@ export default function QueryInspectorControls( props ) {
 		// We need to dynamically update the `taxQuery` property,
 		// by removing any not supported taxonomy from the query.
 		const supportedTaxonomies = postTypesTaxonomiesMap[ newValue ];
-		if ( !! supportedTaxonomies?.length ) {
+		if ( !! supportedTaxonomies?.length && !! taxQuery ) {
 			// Shared utility to build taxQuery based on supported taxonomies.
 			const buildTaxQuery = ( _taxQuery ) => {
 				return Object.entries( _taxQuery || {} ).reduce(
@@ -83,13 +83,14 @@ export default function QueryInspectorControls( props ) {
 			{}
 		);
 			};
-			const { excludeTerms, ...includeTaxQuery } = taxQuery || {};
-			const updatedTaxQuery = buildTaxQuery( includeTaxQuery );
-			if ( excludeTerms ) {
-				const builtExcludeTaxQuery = buildTaxQuery( excludeTerms );
+			const updatedTaxQuery = {};
+			const builtIncludeTaxQuery = buildTaxQuery( taxQuery.include );
+			if ( !! Object.keys( builtIncludeTaxQuery ).length ) {
+				updatedTaxQuery.include = builtIncludeTaxQuery;
+			}
+			const builtExcludeTaxQuery = buildTaxQuery( taxQuery.exclude );
 				if ( !! Object.keys( builtExcludeTaxQuery ).length ) {
-					updatedTaxQuery.excludeTerms = builtExcludeTaxQuery;
-				}
+				updatedTaxQuery.exclude = builtExcludeTaxQuery;
 			}
 		updateQuery.taxQuery = !! Object.keys( updatedTaxQuery ).length
 			? updatedTaxQuery
@@ -397,19 +398,11 @@ export default function QueryInspectorControls( props ) {
 						<ToolsPanelItem
 							label={ __( 'Taxonomies' ) }
 							hasValue={ () =>
-								Object.entries( taxQuery || {} ).some(
-									( [ key, value ] ) => {
-										// `excludeTerms` is an object similar to taxQuery taxonomy inclusion: ex: { category: [ 1,2 ], excludeTerms: { tag: [3] } }.
-										if ( key === 'excludeTerms' ) {
-											return Object.values(
-												value || {}
-											).some(
-												( excludeTermIds ) =>
-													!! excludeTermIds.length
-											);
-										}
-										return !! value.length;
-									}
+								Object.values( taxQuery || {} ).some(
+									( value ) =>
+										Object.values( value || {} ).some(
+											( termIds ) => !! termIds?.length
+										)
 								)
 							}
 							onDeselect={ () => setQuery( { taxQuery: null } ) }

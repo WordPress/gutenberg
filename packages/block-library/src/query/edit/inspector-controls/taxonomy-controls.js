@@ -52,41 +52,39 @@ export function TaxonomyControls( { onChange, query } ) {
 	const { postType, taxQuery } = query;
 
 	const taxonomies = useTaxonomies( postType );
-	if ( ! taxonomies || taxonomies.length === 0 ) {
+	if ( ! taxonomies?.length ) {
 		return null;
 	}
 
 	return (
 		<VStack spacing={ 4 }>
 			{ taxonomies.map( ( taxonomy ) => {
-				const includeTermIds = taxQuery?.[ taxonomy.slug ] || [];
+				const includeTermIds =
+					taxQuery?.include?.[ taxonomy.slug ] || [];
 				const excludeTermIds =
-					taxQuery?.excludeTerms?.[ taxonomy.slug ] || [];
-
-				const handleIncludeChange = ( newTermIds ) =>
-					onChange( {
-						taxQuery: {
-							...taxQuery,
-							[ taxonomy.slug ]: newTermIds,
-						},
-					} );
-
-				const handleExcludeChange = ( newTermIds ) => {
-					const newExclude = {
-						...taxQuery?.excludeTerms,
+					taxQuery?.exclude?.[ taxonomy.slug ] || [];
+				const onChangeTaxQuery = ( newTermIds, key ) => {
+					const newPartialTaxQuery = {
+						...taxQuery?.[ key ],
 						[ taxonomy.slug ]: newTermIds,
 					};
-					// Remove empty arrays from excludeTerms.
-					if ( newTermIds.length === 0 ) {
-						delete newExclude[ taxonomy.slug ];
+					// Remove empty arrays from the partial `taxQuery` (include|exclude).
+					if ( ! newTermIds.length ) {
+						delete newPartialTaxQuery[ taxonomy.slug ];
 					}
+					const newTaxQuery = {
+						...taxQuery,
+						[ key ]: !! Object.keys( newPartialTaxQuery ).length
+							? newPartialTaxQuery
+							: undefined,
+					};
 					onChange( {
-						taxQuery: {
-							...taxQuery,
-							excludeTerms: !! Object.keys( newExclude ).length
-								? newExclude
-								: undefined,
-						},
+						// Clean up `taxQuery` if all filters are removed.
+						taxQuery: Object.values( newTaxQuery ).every(
+							( value ) => ! value
+						)
+							? undefined
+							: newTaxQuery,
 					} );
 				};
 				return (
@@ -95,14 +93,18 @@ export function TaxonomyControls( { onChange, query } ) {
 							taxonomy={ taxonomy }
 							termIds={ includeTermIds }
 							oppositeTermIds={ excludeTermIds }
-							onChange={ handleIncludeChange }
+							onChange={ ( value ) =>
+								onChangeTaxQuery( value, 'include' )
+							}
 							label={ taxonomy.name }
 						/>
 						<TaxonomyItem
 							taxonomy={ taxonomy }
 							termIds={ excludeTermIds }
 							oppositeTermIds={ includeTermIds }
-							onChange={ handleExcludeChange }
+							onChange={ ( value ) =>
+								onChangeTaxQuery( value, 'exclude' )
+							}
 							label={
 								/* translators: %s: taxonomy name */
 								sprintf( __( 'Exclude: %s' ), taxonomy.name )

@@ -154,7 +154,7 @@ export default function PostTemplateEdit( {
 				} );
 				// Shared utility to build REST API parameters from taxonomy terms.
 				const buildTaxQuery = ( terms, suffix = '' ) => {
-					return Object.entries( terms ).reduce(
+					return Object.entries( terms || {} ).reduce(
 						( accumulator, [ taxonomySlug, termIds ] ) => {
 							const taxonomy = taxonomies?.find(
 								( { slug } ) => slug === taxonomySlug
@@ -168,12 +168,11 @@ export default function PostTemplateEdit( {
 						{}
 					);
 				};
-				const { excludeTerms, ...includeTaxQuery } = taxQuery;
-				const builtTaxQuery = buildTaxQuery( includeTaxQuery );
-				if ( excludeTerms ) {
+				const builtTaxQuery = buildTaxQuery( taxQuery.include );
+				if ( taxQuery.exclude ) {
 					Object.assign(
 						builtTaxQuery,
-						buildTaxQuery( excludeTerms, '_exclude' )
+						buildTaxQuery( taxQuery.exclude, '_exclude' )
 					);
 				}
 

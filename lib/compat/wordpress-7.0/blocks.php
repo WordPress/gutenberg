@@ -132,10 +132,17 @@ if ( ! function_exists( 'gutenberg_resolve_pattern_blocks' ) ) {
  * @return array   The filtered query vars.
  */
 function gutenberg_update_tax_query_of_query_loop_block( $query, $block ) {
-	if ( empty( $block->context['query']['taxQuery'] ) ) {
+	if ( empty( $block->context['query']['taxQuery'] ) || ! is_array( $block->context['query']['taxQuery'] ) ) {
 		return $query;
 	}
 
+	// If there are keys other than include/exclude, it's the old
+	// format and has been handled already.
+	if ( ! empty( array_diff( array_keys( $block->context['query']['taxQuery'] ), array( 'include', 'exclude' ) ) ) ) {
+		return $query;
+	}
+
+	// Build with the new structure.
 	$tax_query_input = $block->context['query']['taxQuery'];
 
 	// Helper function to build tax_query conditions from taxonomy terms.
@@ -153,11 +160,13 @@ function gutenberg_update_tax_query_of_query_loop_block( $query, $block ) {
 		}
 		return $conditions;
 	};
-	// Separate excludeTerms from include terms.
-	$exclude_terms = isset( $tax_query_input['excludeTerms'] ) && is_array( $tax_query_input['excludeTerms'] )
-		? $tax_query_input['excludeTerms']
+	// Separate exclude from include terms.
+	$exclude_terms = isset( $tax_query_input['exclude'] ) && is_array( $tax_query_input['exclude'] )
+		? $tax_query_input['exclude']
 		: array();
-	$include_terms = array_diff_key( $tax_query_input, array( 'excludeTerms' => '' ) );
+	$include_terms = isset( $tax_query_input['include'] ) && is_array( $tax_query_input['include'] )
+		? $tax_query_input['include']
+		: array();
 
 	$tax_query = array_merge(
 		$build_conditions( $include_terms ),

@@ -3,9 +3,9 @@
 		"name": "core/query",
 		"isValid": true,
 		"attributes": {
-			"queryId": 19,
+			"queryId": 3,
 			"query": {
-				"perPage": 3,
+				"perPage": 1,
 				"pages": 0,
 				"offset": 0,
 				"postType": "post",
@@ -16,24 +16,23 @@
 				"exclude": [],
 				"sticky": "",
 				"inherit": false,
+				"parents": [],
+				"format": [],
 				"taxQuery": {
 					"include": {
-						"category": [ 3, 5 ],
-						"post_tag": [ 6 ]
+						"category": [ 5 ],
+						"post_tag": [ 27 ]
 					}
 				}
 			},
-			"tagName": "div"
+			"tagName": "div",
+			"enhancedPagination": false
 		},
 		"innerBlocks": [
 			{
 				"name": "core/post-template",
 				"isValid": true,
-				"attributes": {
-					"layout": {
-						"type": "default"
-					}
-				},
+				"attributes": {},
 				"innerBlocks": [
 					{
 						"name": "core/post-title",
