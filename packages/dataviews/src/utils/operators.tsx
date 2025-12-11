@@ -39,51 +39,6 @@ const filterTextWrappers = {
 	Value: <span className="dataviews-filters__summary-filter-text-value" />,
 };
 
-const FilterTextBetween = ( {
-	filter,
-	operator,
-	valueMin,
-	valueMax,
-}: {
-	filter: string;
-	operator: string;
-	valueMin: string;
-	valueMax: string;
-} ): ReactElement => {
-	return createInterpolateElement(
-		sprintf(
-			/* translators: 1: Filter name (e.g. "Item count"). 2: Operator string (e.g. "between"). 3: Filter value min. 4: Filter value max. e.g.: "Item count between: 10 and 180". */
-			__( '<Name>%1$s %2$s: </Name><Value>%3$s and %4$s</Value>' ),
-			filter,
-			operator,
-			valueMin,
-			valueMax
-		),
-		filterTextWrappers
-	);
-};
-
-const FilterText = ( {
-	filter,
-	operator,
-	value,
-}: {
-	filter: string;
-	operator: string;
-	value: string;
-} ): ReactElement => {
-	return createInterpolateElement(
-		sprintf(
-			/* translators: 1: Filter name (e.g. "Author"). 2: Operator string (e.g. "is any"). 3: Filter value (e.g. "Admin"): "Author is any: Admin, Editor". */
-			__( '<Name>%1$s %2$s: </Name><Value>%3$s</Value>' ),
-			filter,
-			operator,
-			value
-		),
-		filterTextWrappers
-	);
-};
-
 const OPERATORS: {
 	name: Operator;
 	label: string;
@@ -97,295 +52,377 @@ const OPERATORS: {
 		name: OPERATOR_IS_ANY,
 		/* translators: DataViews operator name */
 		label: __( 'Includes' ),
-		filterText: ( filter: NormalizedFilter, activeElements: Option[] ) => (
-			<FilterText
-				filter={ filter.name }
-				operator={ __( 'includes' ) }
-				value={ activeElements
-					.map( ( element ) => element.label )
-					.join( ', ' ) }
-			/>
-		),
+		filterText: ( filter: NormalizedFilter, activeElements: Option[] ) =>
+			createInterpolateElement(
+				sprintf(
+					/* translators: 1: Filter name (e.g. "Author"). 2: Filter value (e.g. "Admin"): "Author is any: Admin, Editor". */
+					__( '<Name>%1$s includes: </Name><Value>%2$s</Value>' ),
+					filter.name,
+					activeElements
+						.map( ( element ) => element.label )
+						.join( ', ' )
+				),
+				filterTextWrappers
+			),
 		selection: 'multi',
 	},
 	{
 		name: OPERATOR_IS_NONE,
 		/* translators: DataViews operator name */
 		label: __( 'Is none of' ),
-		filterText: ( filter: NormalizedFilter, activeElements: Option[] ) => (
-			<FilterText
-				filter={ filter.name }
-				operator={ __( 'is none of' ) }
-				value={ activeElements
-					.map( ( element ) => element.label )
-					.join( ', ' ) }
-			/>
-		),
+		filterText: ( filter: NormalizedFilter, activeElements: Option[] ) =>
+			createInterpolateElement(
+				sprintf(
+					/* translators: 1: Filter name (e.g. "Author"). 2: Filter value (e.g. "Admin"): "Author is none of: Admin, Editor". */
+					__( '<Name>%1$s is none of: </Name><Value>%2$s</Value>' ),
+					filter.name,
+					activeElements
+						.map( ( element ) => element.label )
+						.join( ', ' )
+				),
+				filterTextWrappers
+			),
 		selection: 'multi',
 	},
 	{
 		name: OPERATOR_IS_ALL,
 		/* translators: DataViews operator name */
 		label: __( 'Includes all' ),
-		filterText: ( filter: NormalizedFilter, activeElements: Option[] ) => (
-			<FilterText
-				filter={ filter.name }
-				operator={ __( 'includes all' ) }
-				value={ activeElements
-					.map( ( element ) => element.label )
-					.join( ', ' ) }
-			/>
-		),
+		filterText: ( filter: NormalizedFilter, activeElements: Option[] ) =>
+			createInterpolateElement(
+				sprintf(
+					/* translators: 1: Filter name (e.g. "Author"). 2: Filter value (e.g. "Admin"): "Author includes all: Admin, Editor". */
+					__( '<Name>%1$s includes all: </Name><Value>%2$s</Value>' ),
+					filter.name,
+					activeElements
+						.map( ( element ) => element.label )
+						.join( ', ' )
+				),
+				filterTextWrappers
+			),
 		selection: 'multi',
 	},
 	{
 		name: OPERATOR_IS_NOT_ALL,
 		/* translators: DataViews operator name */
 		label: __( 'Is none of' ),
-		filterText: ( filter: NormalizedFilter, activeElements: Option[] ) => (
-			<FilterText
-				filter={ filter.name }
-				operator={ __( 'is none of' ) }
-				value={ activeElements
-					.map( ( element ) => element.label )
-					.join( ', ' ) }
-			/>
-		),
+		filterText: ( filter: NormalizedFilter, activeElements: Option[] ) =>
+			createInterpolateElement(
+				sprintf(
+					/* translators: 1: Filter name (e.g. "Author"). 2: Filter value (e.g. "Admin"): "Author is none of: Admin, Editor". */
+					__( '<Name>%1$s is none of: </Name><Value>%2$s</Value>' ),
+					filter.name,
+					activeElements
+						.map( ( element ) => element.label )
+						.join( ', ' )
+				),
+				filterTextWrappers
+			),
 		selection: 'multi',
 	},
 	{
 		name: OPERATOR_BETWEEN,
 		/* translators: DataViews operator name */
 		label: __( 'Between (inc)' ),
-		filterText: ( filter: NormalizedFilter, activeElements: Option[] ) => (
-			<FilterTextBetween
-				filter={ filter.name }
-				operator={ __( 'between (inc)' ) }
-				valueMin={ activeElements[ 0 ].label[ 0 ] }
-				valueMax={ activeElements[ 0 ].label[ 1 ] }
-			/>
-		),
+		filterText: ( filter: NormalizedFilter, activeElements: Option[] ) =>
+			createInterpolateElement(
+				sprintf(
+					/* translators: 1: Filter name (e.g. "Item count"). 2: Filter value min. 3: Filter value max. e.g.: "Item count between (inc): 10 and 180". */
+					__(
+						'<Name>%1$s between (inc): </Name><Value>%2$s and %3$s</Value>'
+					),
+					filter.name,
+					activeElements[ 0 ].label[ 0 ],
+					activeElements[ 0 ].label[ 1 ]
+				),
+				filterTextWrappers
+			),
 		selection: 'custom',
 	},
 	{
 		name: OPERATOR_IN_THE_PAST,
 		/* translators: DataViews operator name */
 		label: __( 'In the past' ),
-		filterText: ( filter: NormalizedFilter, activeElements: Option[] ) => (
-			<FilterText
-				filter={ filter.name }
-				operator={ __( 'is in the past' ) }
-				value={ `${ activeElements[ 0 ].value.value } ${ activeElements[ 0 ].value.unit }` }
-			/>
-		),
+		filterText: ( filter: NormalizedFilter, activeElements: Option[] ) =>
+			createInterpolateElement(
+				sprintf(
+					/* translators: 1: Filter name (e.g. "Date"). 2: Filter value (e.g. "7 days"): "Date is in the past: 7 days". */
+					__(
+						'<Name>%1$s is in the past: </Name><Value>%2$s</Value>'
+					),
+					filter.name,
+					`${ activeElements[ 0 ].value.value } ${ activeElements[ 0 ].value.unit }`
+				),
+				filterTextWrappers
+			),
 		selection: 'custom',
 	},
 	{
 		name: OPERATOR_OVER,
 		/* translators: DataViews operator name */
 		label: __( 'Over' ),
-		filterText: ( filter: NormalizedFilter, activeElements: Option[] ) => (
-			<FilterText
-				filter={ filter.name }
-				operator={ __( 'is over' ) }
-				value={ `${ activeElements[ 0 ].value.value } ${ activeElements[ 0 ].value.unit }` }
-			/>
-		),
+		filterText: ( filter: NormalizedFilter, activeElements: Option[] ) =>
+			createInterpolateElement(
+				sprintf(
+					/* translators: 1: Filter name (e.g. "Date"). 2: Filter value (e.g. "7 days"): "Date is over: 7 days". */
+					__( '<Name>%1$s is over: </Name><Value>%2$s</Value>' ),
+					filter.name,
+					`${ activeElements[ 0 ].value.value } ${ activeElements[ 0 ].value.unit }`
+				),
+				filterTextWrappers
+			),
 		selection: 'custom',
 	},
 	{
 		name: OPERATOR_IS,
 		/* translators: DataViews operator name */
 		label: __( 'Is' ),
-		filterText: ( filter: NormalizedFilter, activeElements: Option[] ) => (
-			<FilterText
-				filter={ filter.name }
-				operator={ __( 'is' ) }
-				value={ activeElements[ 0 ].label }
-			/>
-		),
+		filterText: ( filter: NormalizedFilter, activeElements: Option[] ) =>
+			createInterpolateElement(
+				sprintf(
+					/* translators: 1: Filter name (e.g. "Author"). 2: Filter value (e.g. "Admin"): "Author is: Admin". */
+					__( '<Name>%1$s is: </Name><Value>%2$s</Value>' ),
+					filter.name,
+					activeElements[ 0 ].label
+				),
+				filterTextWrappers
+			),
 		selection: 'single',
 	},
 	{
 		name: OPERATOR_IS_NOT,
 		/* translators: DataViews operator name */
 		label: __( 'Is not' ),
-		filterText: ( filter: NormalizedFilter, activeElements: Option[] ) => (
-			<FilterText
-				filter={ filter.name }
-				operator={ __( 'is not' ) }
-				value={ activeElements[ 0 ].label }
-			/>
-		),
+		filterText: ( filter: NormalizedFilter, activeElements: Option[] ) =>
+			createInterpolateElement(
+				sprintf(
+					/* translators: 1: Filter name (e.g. "Author"). 2: Filter value (e.g. "Admin"): "Author is not: Admin". */
+					__( '<Name>%1$s is not: </Name><Value>%2$s</Value>' ),
+					filter.name,
+					activeElements[ 0 ].label
+				),
+				filterTextWrappers
+			),
 		selection: 'single',
 	},
 	{
 		name: OPERATOR_LESS_THAN,
 		/* translators: DataViews operator name */
 		label: __( 'Less than' ),
-		filterText: ( filter: NormalizedFilter, activeElements: Option[] ) => (
-			<FilterText
-				filter={ filter.name }
-				operator={ __( 'is less than' ) }
-				value={ activeElements[ 0 ].label }
-			/>
-		),
+		filterText: ( filter: NormalizedFilter, activeElements: Option[] ) =>
+			createInterpolateElement(
+				sprintf(
+					/* translators: 1: Filter name (e.g. "Count"). 2: Filter value (e.g. "10"): "Count is less than: 10". */
+					__( '<Name>%1$s is less than: </Name><Value>%2$s</Value>' ),
+					filter.name,
+					activeElements[ 0 ].label
+				),
+				filterTextWrappers
+			),
 		selection: 'single',
 	},
 	{
 		name: OPERATOR_GREATER_THAN,
 		/* translators: DataViews operator name */
 		label: __( 'Greater than' ),
-		filterText: ( filter: NormalizedFilter, activeElements: Option[] ) => (
-			<FilterText
-				filter={ filter.name }
-				operator={ __( 'is greater than' ) }
-				value={ activeElements[ 0 ].label }
-			/>
-		),
+		filterText: ( filter: NormalizedFilter, activeElements: Option[] ) =>
+			createInterpolateElement(
+				sprintf(
+					/* translators: 1: Filter name (e.g. "Count"). 2: Filter value (e.g. "10"): "Count is greater than: 10". */
+					__(
+						'<Name>%1$s is greater than: </Name><Value>%2$s</Value>'
+					),
+					filter.name,
+					activeElements[ 0 ].label
+				),
+				filterTextWrappers
+			),
 		selection: 'single',
 	},
 	{
 		name: OPERATOR_LESS_THAN_OR_EQUAL,
 		/* translators: DataViews operator name */
 		label: __( 'Less than or equal' ),
-		filterText: ( filter: NormalizedFilter, activeElements: Option[] ) => (
-			<FilterText
-				filter={ filter.name }
-				operator={ __( 'is less than or equal to' ) }
-				value={ activeElements[ 0 ].label }
-			/>
-		),
+		filterText: ( filter: NormalizedFilter, activeElements: Option[] ) =>
+			createInterpolateElement(
+				sprintf(
+					/* translators: 1: Filter name (e.g. "Count"). 2: Filter value (e.g. "10"): "Count is less than or equal to: 10". */
+					__(
+						'<Name>%1$s is less than or equal to: </Name><Value>%2$s</Value>'
+					),
+					filter.name,
+					activeElements[ 0 ].label
+				),
+				filterTextWrappers
+			),
 		selection: 'single',
 	},
 	{
 		name: OPERATOR_GREATER_THAN_OR_EQUAL,
 		/* translators: DataViews operator name */
 		label: __( 'Greater than or equal' ),
-		filterText: ( filter: NormalizedFilter, activeElements: Option[] ) => (
-			<FilterText
-				filter={ filter.name }
-				operator={ __( 'is greater than or equal to' ) }
-				value={ activeElements[ 0 ].label }
-			/>
-		),
+		filterText: ( filter: NormalizedFilter, activeElements: Option[] ) =>
+			createInterpolateElement(
+				sprintf(
+					/* translators: 1: Filter name (e.g. "Count"). 2: Filter value (e.g. "10"): "Count is greater than or equal to: 10". */
+					__(
+						'<Name>%1$s is greater than or equal to: </Name><Value>%2$s</Value>'
+					),
+					filter.name,
+					activeElements[ 0 ].label
+				),
+				filterTextWrappers
+			),
 		selection: 'single',
 	},
 	{
 		name: OPERATOR_BEFORE,
 		/* translators: DataViews operator name */
 		label: __( 'Before' ),
-		filterText: ( filter: NormalizedFilter, activeElements: Option[] ) => (
-			<FilterText
-				filter={ filter.name }
-				operator={ __( 'is before' ) }
-				value={ activeElements[ 0 ].label }
-			/>
-		),
+		filterText: ( filter: NormalizedFilter, activeElements: Option[] ) =>
+			createInterpolateElement(
+				sprintf(
+					/* translators: 1: Filter name (e.g. "Date"). 2: Filter value (e.g. "2024-01-01"): "Date is before: 2024-01-01". */
+					__( '<Name>%1$s is before: </Name><Value>%2$s</Value>' ),
+					filter.name,
+					activeElements[ 0 ].label
+				),
+				filterTextWrappers
+			),
 		selection: 'single',
 	},
 	{
 		name: OPERATOR_AFTER,
 		/* translators: DataViews operator name */
 		label: __( 'After' ),
-		filterText: ( filter: NormalizedFilter, activeElements: Option[] ) => (
-			<FilterText
-				filter={ filter.name }
-				operator={ __( 'is after' ) }
-				value={ activeElements[ 0 ].label }
-			/>
-		),
+		filterText: ( filter: NormalizedFilter, activeElements: Option[] ) =>
+			createInterpolateElement(
+				sprintf(
+					/* translators: 1: Filter name (e.g. "Date"). 2: Filter value (e.g. "2024-01-01"): "Date is after: 2024-01-01". */
+					__( '<Name>%1$s is after: </Name><Value>%2$s</Value>' ),
+					filter.name,
+					activeElements[ 0 ].label
+				),
+				filterTextWrappers
+			),
 		selection: 'single',
 	},
 	{
 		name: OPERATOR_BEFORE_INC,
 		/* translators: DataViews operator name */
 		label: __( 'Before (inc)' ),
-		filterText: ( filter: NormalizedFilter, activeElements: Option[] ) => (
-			<FilterText
-				filter={ filter.name }
-				operator={ __( 'is on or before' ) }
-				value={ activeElements[ 0 ].label }
-			/>
-		),
+		filterText: ( filter: NormalizedFilter, activeElements: Option[] ) =>
+			createInterpolateElement(
+				sprintf(
+					/* translators: 1: Filter name (e.g. "Date"). 2: Filter value (e.g. "2024-01-01"): "Date is on or before: 2024-01-01". */
+					__(
+						'<Name>%1$s is on or before: </Name><Value>%2$s</Value>'
+					),
+					filter.name,
+					activeElements[ 0 ].label
+				),
+				filterTextWrappers
+			),
 		selection: 'single',
 	},
 	{
 		name: OPERATOR_AFTER_INC,
 		/* translators: DataViews operator name */
 		label: __( 'After (inc)' ),
-		filterText: ( filter: NormalizedFilter, activeElements: Option[] ) => (
-			<FilterText
-				filter={ filter.name }
-				operator={ __( 'is on or after' ) }
-				value={ activeElements[ 0 ].label }
-			/>
-		),
+		filterText: ( filter: NormalizedFilter, activeElements: Option[] ) =>
+			createInterpolateElement(
+				sprintf(
+					/* translators: 1: Filter name (e.g. "Date"). 2: Filter value (e.g. "2024-01-01"): "Date is on or after: 2024-01-01". */
+					__(
+						'<Name>%1$s is on or after: </Name><Value>%2$s</Value>'
+					),
+					filter.name,
+					activeElements[ 0 ].label
+				),
+				filterTextWrappers
+			),
 		selection: 'single',
 	},
 	{
 		name: OPERATOR_CONTAINS,
 		/* translators: DataViews operator name */
 		label: __( 'Contains' ),
-		filterText: ( filter: NormalizedFilter, activeElements: Option[] ) => (
-			<FilterText
-				filter={ filter.name }
-				operator={ __( 'contains' ) }
-				value={ activeElements[ 0 ].label }
-			/>
-		),
+		filterText: ( filter: NormalizedFilter, activeElements: Option[] ) =>
+			createInterpolateElement(
+				sprintf(
+					/* translators: 1: Filter name (e.g. "Title"). 2: Filter value (e.g. "Hello"): "Title contains: Hello". */
+					__( '<Name>%1$s contains: </Name><Value>%2$s</Value>' ),
+					filter.name,
+					activeElements[ 0 ].label
+				),
+				filterTextWrappers
+			),
 		selection: 'single',
 	},
 	{
 		name: OPERATOR_NOT_CONTAINS,
 		/* translators: DataViews operator name */
 		label: __( "Doesn't contain" ),
-		filterText: ( filter: NormalizedFilter, activeElements: Option[] ) => (
-			<FilterText
-				filter={ filter.name }
-				operator={ __( "doesn't contain" ) }
-				value={ activeElements[ 0 ].label }
-			/>
-		),
+		filterText: ( filter: NormalizedFilter, activeElements: Option[] ) =>
+			createInterpolateElement(
+				sprintf(
+					/* translators: 1: Filter name (e.g. "Title"). 2: Filter value (e.g. "Hello"): "Title doesn't contain: Hello". */
+					__(
+						"<Name>%1$s doesn't contain: </Name><Value>%2$s</Value>"
+					),
+					filter.name,
+					activeElements[ 0 ].label
+				),
+				filterTextWrappers
+			),
 		selection: 'single',
 	},
 	{
 		name: OPERATOR_STARTS_WITH,
 		/* translators: DataViews operator name */
 		label: __( 'Starts with' ),
-		filterText: ( filter: NormalizedFilter, activeElements: Option[] ) => (
-			<FilterText
-				filter={ filter.name }
-				operator={ __( 'starts with' ) }
-				value={ activeElements[ 0 ].label }
-			/>
-		),
+		filterText: ( filter: NormalizedFilter, activeElements: Option[] ) =>
+			createInterpolateElement(
+				sprintf(
+					/* translators: 1: Filter name (e.g. "Title"). 2: Filter value (e.g. "Hello"): "Title starts with: Hello". */
+					__( '<Name>%1$s starts with: </Name><Value>%2$s</Value>' ),
+					filter.name,
+					activeElements[ 0 ].label
+				),
+				filterTextWrappers
+			),
 		selection: 'single',
 	},
 	{
 		name: OPERATOR_ON,
 		/* translators: DataViews operator name */
 		label: __( 'On' ),
-		filterText: ( filter: NormalizedFilter, activeElements: Option[] ) => (
-			<FilterText
-				filter={ filter.name }
-				operator={ __( 'is' ) }
-				value={ activeElements[ 0 ].label }
-			/>
-		),
+		filterText: ( filter: NormalizedFilter, activeElements: Option[] ) =>
+			createInterpolateElement(
+				sprintf(
+					/* translators: 1: Filter name (e.g. "Date"). 2: Filter value (e.g. "2024-01-01"): "Date is: 2024-01-01". */
+					__( '<Name>%1$s is: </Name><Value>%2$s</Value>' ),
+					filter.name,
+					activeElements[ 0 ].label
+				),
+				filterTextWrappers
+			),
 		selection: 'single',
 	},
 	{
 		name: OPERATOR_NOT_ON,
 		/* translators: DataViews operator name */
 		label: __( 'Not on' ),
-		filterText: ( filter: NormalizedFilter, activeElements: Option[] ) => (
-			<FilterText
-				filter={ filter.name }
-				operator={ __( 'is not' ) }
-				value={ activeElements[ 0 ].label }
-			/>
-		),
+		filterText: ( filter: NormalizedFilter, activeElements: Option[] ) =>
+			createInterpolateElement(
+				sprintf(
+					/* translators: 1: Filter name (e.g. "Date"). 2: Filter value (e.g. "2024-01-01"): "Date is not: 2024-01-01". */
+					__( '<Name>%1$s is not: </Name><Value>%2$s</Value>' ),
+					filter.name,
+					activeElements[ 0 ].label
+				),
+				filterTextWrappers
+			),
 		selection: 'single',
 	},
 ];
