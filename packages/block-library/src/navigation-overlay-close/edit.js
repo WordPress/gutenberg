@@ -59,7 +59,7 @@ export default function NavigationOverlayCloseEdit( {
 			<Button
 				{ ...blockProps }
 				icon={ showIcon ? closeIcon : undefined }
-				aria-label={ __( 'Close' ) }
+				aria-label={ ! showText ? __( 'Close' ) : undefined }
 				__next40pxDefaultSize
 			>
 				{ showText && (
