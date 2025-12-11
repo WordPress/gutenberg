@@ -218,7 +218,6 @@ export default function PostStatus() {
 											className="editor-change-status__password-fieldset"
 										>
 											<CheckboxControl
-												__nextHasNoMarginBottom
 												label={ __(
 													'Password protected'
 												) }

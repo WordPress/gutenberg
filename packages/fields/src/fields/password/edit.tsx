@@ -38,7 +38,6 @@ function PasswordEdit( {
 			className="fields-controls__password"
 		>
 			<CheckboxControl
-				__nextHasNoMarginBottom
 				label={ __( 'Password protected' ) }
 				help={ __( 'Only visible to those who know the password' ) }
 				checked={ showPassword }
