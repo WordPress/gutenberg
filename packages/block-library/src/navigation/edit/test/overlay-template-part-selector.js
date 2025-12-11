@@ -186,7 +186,7 @@ describe( 'OverlayTemplatePartSelector', () => {
 			} );
 		} );
 
-		it( 'should call setAttributes with undefined when "None (default)" is selected', async () => {
+		it( 'unsets custom overlay when "None (default)" is selected', async () => {
 			const user = userEvent.setup();
 
 			useEntityRecords.mockReturnValue( {
@@ -278,7 +278,7 @@ describe( 'OverlayTemplatePartSelector', () => {
 			expect( editButton ).toHaveAttribute( 'aria-disabled', 'true' );
 		} );
 
-		it( 'should be enabled when a valid template part is selected', () => {
+		it( 'should be enabled when a valid overlay is selected', () => {
 			useEntityRecords.mockReturnValue( {
 				records: [ templatePart1 ],
 				isResolving: false,
@@ -300,7 +300,7 @@ describe( 'OverlayTemplatePartSelector', () => {
 			expect( editButton ).toBeEnabled();
 		} );
 
-		it( 'should be disabled when onNavigateToEntityRecord is not available', () => {
+		it( 'should be disabled when navigation to focused overlay editor is notavailable', () => {
 			useEntityRecords.mockReturnValue( {
 				records: [ templatePart1 ],
 				isResolving: false,
@@ -324,7 +324,7 @@ describe( 'OverlayTemplatePartSelector', () => {
 			expect( editButton ).toHaveAttribute( 'aria-disabled', 'true' );
 		} );
 
-		it( 'should call onNavigateToEntityRecord when edit button is clicked', async () => {
+		it( 'should navigate to focused overlay editor when edit button is clicked', async () => {
 			const user = userEvent.setup();
 
 			useEntityRecords.mockReturnValue( {
@@ -353,7 +353,7 @@ describe( 'OverlayTemplatePartSelector', () => {
 			} );
 		} );
 
-		it( 'should not call onNavigateToEntityRecord when button is disabled', async () => {
+		it( 'should not navigate to focused overlay editor when button is disabled', async () => {
 			const user = userEvent.setup();
 
 			useEntityRecords.mockReturnValue( {
