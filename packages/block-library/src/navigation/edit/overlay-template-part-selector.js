@@ -46,7 +46,7 @@ export default function OverlayTemplatePartSelector( {
 		per_page: -1,
 	} );
 
-	const { saveEntityRecord, invalidateResolution } = useDispatch( coreStore );
+	const { saveEntityRecord } = useDispatch( coreStore );
 	const { createErrorNotice } = useDispatch( noticesStore );
 
 	// Track if we're currently creating a new overlay
@@ -156,15 +156,8 @@ export default function OverlayTemplatePartSelector( {
 			{ throwOnError: true }
 		);
 
-		// Invalidate the template parts resolution cache to refresh the list
-		invalidateResolution( 'getEntityRecords', [
-			'postType',
-			'wp_template_part',
-			{ per_page: -1 },
-		] );
-
 		return templatePart;
-	}, [ overlayTemplateParts, saveEntityRecord, invalidateResolution ] );
+	}, [ overlayTemplateParts, saveEntityRecord ] );
 
 	const handleCreateOverlay = useCallback( async () => {
 		try {
