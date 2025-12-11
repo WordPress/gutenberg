@@ -76,34 +76,30 @@ const getIntentStyles = (
  * A badge component for displaying labels with semantic intent.
  * Built on the Box primitive for consistent theming and accessibility.
  */
-export const Badge = forwardRef< HTMLSpanElement, BadgeProps >( function Badge(
+export const Badge = forwardRef< HTMLDivElement, BadgeProps >( function Badge(
 	{ children, intent = 'none', render = DEFAULT_RENDER, ...props },
 	ref
 ) {
 	const intentStyles = getIntentStyles( intent );
-	const boxProps = {
-		...props,
-		...intentStyles,
-		padding: { inline: 'xs' } as const,
-		borderRadius: 'lg' as const,
-		render,
-		style: {
-			display: 'inline-flex',
-			alignItems: 'center',
-			minHeight: 'calc(6 * var(--wpds-dimension-base))',
-			fontFamily: 'var(--wpds-font-family-body)',
-			fontSize: 'var(--wpds-font-size-small)',
-			fontWeight: 'var(--wpds-font-weight-regular)',
-			lineHeight: 'var(--wpds-font-line-height-small)',
-			boxSizing: 'border-box',
-			...props.style,
-		},
-	} as BoxProps;
 
 	return (
 		<Box
-			{ ...boxProps }
-			ref={ ref as React.ForwardedRef< HTMLDivElement > }
+			{ ...intentStyles }
+			padding={ { inline: 'xs' } }
+			borderRadius="lg"
+			render={ render }
+			style={ {
+				display: 'inline-flex',
+				alignItems: 'center',
+				minHeight: 'calc(6 * var(--wpds-dimension-base))',
+				fontFamily: 'var(--wpds-font-family-body)',
+				fontSize: 'var(--wpds-font-size-small)',
+				fontWeight: 'var(--wpds-font-weight-regular)',
+				lineHeight: 'var(--wpds-font-line-height-small)',
+				boxSizing: 'border-box',
+				...props.style,
+			} }
+			ref={ ref }
 		>
 			{ children }
 		</Box>
