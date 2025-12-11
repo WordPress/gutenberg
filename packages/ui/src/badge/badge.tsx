@@ -33,41 +33,41 @@ const getIntentStyles = (
 	switch ( intent ) {
 		case 'high':
 			return {
-				backgroundColor: 'error' as const,
-				color: 'error' as const,
+				backgroundColor: 'error',
+				color: 'error',
 			};
 		case 'medium':
 			return {
-				backgroundColor: 'warning' as const,
-				color: 'warning' as const,
+				backgroundColor: 'warning',
+				color: 'warning',
 			};
 		case 'low':
 			return {
-				backgroundColor: 'caution' as const,
-				color: 'caution' as const,
+				backgroundColor: 'caution',
+				color: 'caution',
 			};
 		case 'stable':
 			return {
-				backgroundColor: 'success' as const,
-				color: 'success' as const,
+				backgroundColor: 'success',
+				color: 'success',
 			};
 		case 'informational':
 			return {
-				backgroundColor: 'info' as const,
-				color: 'info' as const,
+				backgroundColor: 'info',
+				color: 'info',
 			};
 		case 'draft':
 			return {
-				backgroundColor: 'neutral-weak' as const,
-				color: 'neutral' as const,
+				backgroundColor: 'neutral-weak',
+				color: 'neutral',
 			};
 		case 'none':
 		default:
 			return {
-				backgroundColor: 'neutral-strong' as const,
-				color: 'neutral' as const,
-				borderColor: 'neutral' as const,
-				borderWidth: 'xs' as const,
+				backgroundColor: 'neutral-strong',
+				color: 'neutral',
+				borderColor: 'neutral',
+				borderWidth: 'xs',
 			};
 	}
 };
