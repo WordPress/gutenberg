@@ -62,7 +62,7 @@
 				"$description": "2X large font size"
 			}
 		},
-		"lineHeight": {
+		"line-height": {
 			"$type": "dimension",
 			"x-small": {
 				"$value": { "value": 16, "unit": "px" },
