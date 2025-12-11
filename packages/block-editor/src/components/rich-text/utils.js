@@ -11,7 +11,7 @@ export function addActiveFormats( value, activeFormats ) {
 
 		while ( index-- ) {
 			const existingFormats = value.formats[ index ] || [];
-			
+
 			// Filter out active formats that already exist in the value's formats
 			// to prevent redundant nesting (e.g., nested identical <mark> elements).
 			// This is the root cause fix for: https://github.com/WordPress/gutenberg/issues/58806
@@ -21,7 +21,7 @@ export function addActiveFormats( value, activeFormats ) {
 						isFormatEqual( activeFormat, existingFormat )
 					)
 			);
-			
+
 			value.formats[ index ] = [
 				...formatsToAdd,
 				...existingFormats,
