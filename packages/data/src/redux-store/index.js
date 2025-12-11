@@ -700,31 +700,14 @@ function mapSelectorWithResolver(
 	boundMetadataSelectors
 ) {
 	function fulfillSelector( args ) {
-		if ( resolversCache.isRunning( selectorName, args ) ) {
-			return;
-		}
-
 		if (
+			resolversCache.isRunning( selectorName, args ) ||
 			boundMetadataSelectors.hasStartedResolution( selectorName, args )
 		) {
 			return;
 		}
 
 		const state = store.getState();
-
-		if (
-			typeof resolver.isFulfilled === 'function' &&
-			resolver.isFulfilled( state, ...args )
-		) {
-			setTimeout( async () => {
-				resolversCache.clear( selectorName, args );
-				store.dispatch(
-					metadataActions.finishResolution( selectorName, args )
-				);
-			}, 0 );
-
-			return;
-		}
 
 		resolversCache.markAsRunning( selectorName, args );
 
@@ -734,9 +717,14 @@ function mapSelectorWithResolver(
 				metadataActions.startResolution( selectorName, args )
 			);
 			try {
-				const action = resolver.fulfill( ...args );
-				if ( action ) {
-					await store.dispatch( action );
+				const isFulfilled =
+					typeof resolver.isFulfilled === 'function' &&
+					resolver.isFulfilled( state, ...args );
+				if ( ! isFulfilled ) {
+					const action = resolver.fulfill( ...args );
+					if ( action ) {
+						await store.dispatch( action );
+					}
 				}
 				store.dispatch(
 					metadataActions.finishResolution( selectorName, args )
