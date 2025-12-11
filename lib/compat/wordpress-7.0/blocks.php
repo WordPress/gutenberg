@@ -174,9 +174,7 @@ function gutenberg_update_tax_query_of_query_loop_block( $query, $block ) {
 	);
 
 	if ( ! empty( $tax_query ) ) {
-		// Merge with existing `tax_query` like core does, because
-		// of the deprecated `categoryIds` and `tagIds` props.
-		$query['tax_query'] = array_merge( $query['tax_query'], $tax_query );
+		$query['tax_query'] = $tax_query;
 	}
 
 	return $query;
