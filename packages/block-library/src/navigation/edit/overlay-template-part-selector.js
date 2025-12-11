@@ -4,12 +4,11 @@
 import {
 	useMemo,
 	useState,
-	useEffect,
 	useCallback,
 	createInterpolateElement,
 } from '@wordpress/element';
 import { useEntityRecords, store as coreStore } from '@wordpress/core-data';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useDispatch } from '@wordpress/data';
 import { SelectControl, Spinner, Button } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { decodeEntities } from '@wordpress/html-entities';
@@ -51,31 +50,8 @@ export default function OverlayTemplatePartSelector( {
 	const { saveEntityRecord, invalidateResolution } = useDispatch( coreStore );
 	const { createErrorNotice } = useDispatch( noticesStore );
 
-	// Track newly created record ID to check saving state from store
-	const [ creatingRecordId, setCreatingRecordId ] = useState( null );
-
-	// Check if the newly created record is currently saving
-	const isSavingNewRecord = useSelect(
-		( select ) => {
-			if ( ! creatingRecordId ) {
-				return false;
-			}
-			const { isSavingEntityRecord } = select( coreStore );
-			return isSavingEntityRecord(
-				'postType',
-				'wp_template_part',
-				creatingRecordId
-			);
-		},
-		[ creatingRecordId ]
-	);
-
-	// Clear the creating record ID when saving completes
-	useEffect( () => {
-		if ( creatingRecordId && ! isSavingNewRecord ) {
-			setCreatingRecordId( null );
-		}
-	}, [ creatingRecordId, isSavingNewRecord ] );
+	// Track if we're currently creating a new overlay
+	const [ isCreating, setIsCreating ] = useState( false );
 
 	// Filter template parts by overlay area
 	const overlayTemplateParts = useMemo( () => {
@@ -158,6 +134,8 @@ export default function OverlayTemplatePartSelector( {
 
 	const handleCreateOverlay = useCallback( async () => {
 		try {
+			setIsCreating( true );
+
 			// Generate unique name using only overlay area template parts
 			// Filter to only include template parts with titles for uniqueness check
 			const templatePartsWithTitles = overlayTemplateParts.filter(
@@ -181,9 +159,6 @@ export default function OverlayTemplatePartSelector( {
 				},
 				{ throwOnError: true }
 			);
-
-			// Track the new record ID to check saving state
-			setCreatingRecordId( templatePart.id );
 
 			// Invalidate the template parts resolution cache to refresh the list
 			invalidateResolution( 'getEntityRecords', [
@@ -220,7 +195,8 @@ export default function OverlayTemplatePartSelector( {
 					  );
 
 			createErrorNotice( errorMessage, { type: 'snackbar' } );
-			setCreatingRecordId( null );
+		} finally {
+			setIsCreating( false );
 		}
 	}, [
 		overlayTemplateParts,
@@ -237,7 +213,7 @@ export default function OverlayTemplatePartSelector( {
 		! onNavigateToEntityRecord ||
 		isResolving;
 
-	const isCreateButtonDisabled = isResolving || isSavingNewRecord;
+	const isCreateButtonDisabled = isResolving || isCreating;
 
 	// Build help text with create button using createInterpolateElement
 	// Must be called before early return to follow Rules of Hooks
@@ -249,7 +225,7 @@ export default function OverlayTemplatePartSelector( {
 				onClick={ handleCreateOverlay }
 				disabled={ isCreateButtonDisabled }
 				accessibleWhenDisabled
-				isBusy={ isSavingNewRecord }
+				isBusy={ isCreating }
 				className="wp-block-navigation__overlay-create-link"
 			>
 				{ __( 'Create new?' ) }
@@ -274,7 +250,7 @@ export default function OverlayTemplatePartSelector( {
 		overlayTemplateParts.length,
 		hasResolved,
 		isCreateButtonDisabled,
-		isSavingNewRecord,
+		isCreating,
 		handleCreateOverlay,
 	] );
 
