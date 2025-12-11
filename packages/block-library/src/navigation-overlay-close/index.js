@@ -30,7 +30,14 @@ function isWithinOverlay() {
 	// declaring @wordpress/editor as a dependency, we must access its
 	// store by string.
 	// eslint-disable-next-line @wordpress/data-no-store-string-literals
-	const { getCurrentPostType, getCurrentPostId } = select( 'core/editor' );
+	const editorStore = select( 'core/editor' );
+
+	// Return false if the editor store is not available.
+	if ( ! editorStore ) {
+		return false;
+	}
+
+	const { getCurrentPostType, getCurrentPostId } = editorStore;
 	const { getEditedEntityRecord } = select( coreStore );
 
 	const postType = getCurrentPostType();
