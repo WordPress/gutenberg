@@ -14,7 +14,7 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { OPERATOR_BETWEEN } from '../../constants';
-import type { DataFormControlProps } from '../../types';
+import type { DataFormControlProps, FormatNumber } from '../../types';
 import { unlock } from '../../lock-unlock';
 import getCustomValidity from './get-custom-validity';
 
@@ -83,23 +83,15 @@ function BetweenControls( {
 	);
 }
 
-export type DataFormValidatedNumberControlProps< Item > =
-	DataFormControlProps< Item > & {
-		/**
-		 * Number of decimals, acceps non-negative integer.
-		 */
-		decimals: number;
-	};
-
 export default function ValidatedNumber< Item >( {
 	data,
 	field,
 	onChange,
 	hideLabelFromVision,
 	operator,
-	decimals,
 	validity,
-}: DataFormValidatedNumberControlProps< Item > ) {
+}: DataFormControlProps< Item > ) {
+	const decimals = ( field.format as FormatNumber )?.decimals ?? 0;
 	const step = Math.pow( 10, Math.abs( decimals ) * -1 );
 	const { label, description, getValue, setValue, isValid } = field;
 	const value = getValue( { item: data } ) ?? '';

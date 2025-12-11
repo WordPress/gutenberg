@@ -273,7 +273,18 @@ export type Field< Item > = {
 	/**
 	 * Display format configuration for fields.
 	 */
-	format?: FormatDate | FormatDatetime | FormatNumber | FormatInteger;
+	format?: FormatDatetime | FormatDate | FormatNumber | FormatInteger;
+
+	/**
+	 * Callback used to format the value of the field for display.
+	 */
+	getValueFormatted?: ( {
+		item,
+		field,
+	}: {
+		item: Item;
+		field: NormalizedField< Item >;
+	} ) => string;
 };
 
 /**
@@ -329,7 +340,10 @@ export type FormatInteger = {
 	separatorThousand?: string;
 };
 
-type NormalizedFieldBase< Item > = Omit< Field< Item >, 'Edit' | 'isValid' > & {
+export type NormalizedField< Item > = Omit<
+	Field< Item >,
+	'Edit' | 'isValid'
+> & {
 	label: string;
 	header: string | ReactElement;
 	getValue: ( args: { item: Item } ) => any;
@@ -343,35 +357,19 @@ type NormalizedFieldBase< Item > = Omit< Field< Item >, 'Edit' | 'isValid' > & {
 	enableSorting: boolean;
 	filterBy: Required< FilterByConfig > | false;
 	readOnly: boolean;
-	format: {};
+	format:
+		| {}
+		| Required< FormatDate >
+		| Required< FormatInteger >
+		| Required< FormatNumber >;
+	getValueFormatted: ( {
+		item,
+		field,
+	}: {
+		item: Item;
+		field: NormalizedField< Item >;
+	} ) => string;
 };
-
-export type NormalizedFieldDatetime< Item > = NormalizedFieldBase< Item > & {
-	type: 'datetime';
-	format: Required< FormatDatetime >;
-};
-
-export type NormalizedFieldDate< Item > = NormalizedFieldBase< Item > & {
-	type: 'date';
-	format: Required< FormatDate >;
-};
-
-export type NormalizedFieldNumber< Item > = NormalizedFieldBase< Item > & {
-	type: 'number';
-	format: Required< FormatNumber >;
-};
-
-export type NormalizedFieldInteger< Item > = NormalizedFieldBase< Item > & {
-	type: 'integer';
-	format: Required< FormatInteger >;
-};
-
-export type NormalizedField< Item > =
-	| NormalizedFieldBase< Item >
-	| NormalizedFieldDate< Item >
-	| NormalizedFieldDatetime< Item >
-	| NormalizedFieldNumber< Item >
-	| NormalizedFieldInteger< Item >;
 
 /**
  * A collection of dataview fields for a data type.

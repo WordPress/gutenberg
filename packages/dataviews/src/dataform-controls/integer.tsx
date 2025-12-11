@@ -4,6 +4,6 @@
 import type { DataFormControlProps } from '../types';
 import ValidatedNumber from './utils/validated-number';
 
-export default function Number< Item >( props: DataFormControlProps< Item > ) {
-	return <ValidatedNumber { ...props } decimals={ 0 } />;
+export default function Integer< Item >( props: DataFormControlProps< Item > ) {
+	return <ValidatedNumber { ...props } />;
 }
