@@ -12,7 +12,6 @@ import { mergePair } from './concat';
 import { OBJECT_REPLACEMENT_CHARACTER, ZWNBSP } from './special-characters';
 import { toHTMLString } from './to-html-string';
 import { getTextContent } from './get-text-content';
-import { isFormatEqual } from './is-format-equal';
 
 /** @typedef {import('./types').RichTextValue} RichTextValue */
 
@@ -608,34 +607,6 @@ function createFromElement( { element, range, isEditableTree } ) {
 			function mergeFormats( formats ) {
 				if ( mergeFormats.formats === formats ) {
 					return mergeFormats.newFormats;
-				}
-
-				// Root cause: When parsing HTML like <mark class="A"><mark class="A">text</mark></mark>,
-				// createFromElement processes elements recursively. The inner mark creates
-				// a format array [markA]. Then for the outer mark, this function is called
-				// to wrap the child's formats by prepending the parent format, resulting in
-				// [markA, markA]. This happens because the original logic always prepends
-				// the parent format without checking if it already exists.
-				//
-				// This nesting occurs when:
-				// 1. User copies text with a mark element: <mark class="A">text</mark>
-				// 2. Pastes into another block that also has mark formatting with class A
-				// 3. The pasted HTML already contains <mark class="A">...</mark>
-				// 4. The destination context wraps it in another <mark class="A">...</mark>
-				// 5. createFromElement processes both marks, creating redundant nesting
-				//
-				// Fix: Check if the child's outermost format equals the parent format.
-				// If so, skip adding the parent to prevent duplication.
-				// See: https://github.com/WordPress/gutenberg/issues/58806
-				if (
-					formats &&
-					formats.length > 0 &&
-					formats[ 0 ] &&
-					isFormatEqual( formats[ 0 ], format )
-				) {
-					mergeFormats.formats = formats;
-					mergeFormats.newFormats = formats;
-					return formats;
 				}
 
 				const newFormats = formats
