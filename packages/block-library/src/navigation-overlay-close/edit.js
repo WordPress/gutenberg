@@ -93,6 +93,7 @@ export default function NavigationOverlayCloseEdit( {
 						placeholder={ __( 'Close' ) }
 						withoutInteractiveFormatting
 						tagName="span"
+						allowedFormats={ [ 'core/bold', 'core/italic' ] }
 					/>
 				) }
 			</Button>
