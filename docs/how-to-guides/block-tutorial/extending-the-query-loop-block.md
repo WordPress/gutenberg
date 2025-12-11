@@ -291,8 +291,6 @@ if( 'my-plugin/books-list' === $block[ 'attrs' ][ 'namespace' ] ) {
 
 (In the code above, we assume you have some way to access the block, for example within a [`pre_render_block`](https://developer.wordpress.org/reference/hooks/pre_render_block/) filter, but the specific solution can be different depending on the use-case, so this is not a firm recommendation).
 
-**Note:** The Query Loop block's `taxQuery` attribute is automatically processed by the `build_query_vars_from_query_block` function. Both inclusion and exclusion are handled using WordPress's tax_query with `IN` and `NOT IN` operators respectively. If you're adding custom taxonomy filtering, you can follow the same pattern.
-
 ### Making your custom query work on the editor side
 
 To finish up our custom variation, we might want the editor to react to changes in our custom query and display an appropriate preview accordingly. This is not required for a functioning block, but it enables a fully integrated user experience for the consumers of your block.
