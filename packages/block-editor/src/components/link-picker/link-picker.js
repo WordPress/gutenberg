@@ -10,6 +10,7 @@ import {
 	useBaseControlProps,
 } from '@wordpress/components';
 import { useState, useId } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -18,15 +19,25 @@ import LinkControl from '../link-control';
 import { LinkPreview } from './link-preview';
 
 /**
+ * @typedef {Object} LinkPickerPreview
+ * @property {string}        title           - Display title for the link
+ * @property {string}        url             - Display URL for the link
+ * @property {string}        [image]         - Optional image URL for the link preview
+ * @property {Array<Object>} [badges]        - Optional array of badge objects with label and intent
+ * @property {string}        badges[].label  - Badge label text
+ * @property {string}        badges[].intent - Badge intent/style
+ */
+
+/**
  * LinkPicker component that combines the preview button and search input.
  * Shows a preview button as a trigger, and opens a popover with search input when clicked.
  *
- * @param {Object}   props                  - Component props
- * @param {Object}   props.preview          - Preview data with title, url, image, badges
- * @param {Function} props.onSelect         - Callback when a suggestion is selected
- * @param {Object}   props.suggestionsQuery - Query parameters for suggestions
- * @param {string}   props.label            - Label for the control
- * @param {string}   props.help             - Help text for the control
+ * @param {Object}            props                  - Component props
+ * @param {LinkPickerPreview} props.preview          - Preview data object
+ * @param {Function}          props.onSelect         - Callback when a suggestion is selected
+ * @param {Object}            props.suggestionsQuery - Query parameters for suggestions
+ * @param {string}            props.label            - Label for the control
+ * @param {string}            props.help             - Help text for the control
  */
 export function LinkPicker( {
 	preview,
@@ -74,7 +85,7 @@ export function LinkPicker( {
 			>
 				{ label && <VisuallyHidden>{ label }:</VisuallyHidden> }
 				<LinkPreview
-					title={ preview.title }
+					title={ preview.title || __( 'Add link' ) }
 					url={ preview.url }
 					image={ preview.image }
 					badges={ preview.badges }

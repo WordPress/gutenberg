@@ -9,7 +9,6 @@ import {
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { Icon, chevronDown } from '@wordpress/icons';
-import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -29,9 +28,6 @@ const { Badge } = unlock( componentsPrivateApis );
  * @param {Array<Object>} props.badges - Optional array of badge objects with label and intent
  */
 export function LinkPreview( { title, url, image, badges } ) {
-	// Fallback for missing title
-	const displayTitle = title || __( 'Add link' );
-
 	return (
 		<HStack justify="space-between" alignment="top">
 			<FlexItem className="link-preview-button__content">
@@ -54,7 +50,7 @@ export function LinkPreview( { title, url, image, badges } ) {
 							numberOfLines={ 1 }
 							className="link-preview-button__title"
 						>
-							{ displayTitle }
+							{ title }
 						</Truncate>
 						{ url && (
 							<Truncate
