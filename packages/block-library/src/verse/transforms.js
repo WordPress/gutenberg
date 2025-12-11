@@ -16,7 +16,6 @@ const transforms = {
 		{
 			type: 'block',
 			blocks: [ 'core/paragraph' ],
-			priority: 10,
 			transform: ( attributes ) =>
 				createBlock( 'core/paragraph', attributes ),
 		},
