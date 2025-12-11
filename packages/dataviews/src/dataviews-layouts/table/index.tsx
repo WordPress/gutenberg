@@ -16,6 +16,7 @@ import {
 	useRef,
 	useState,
 } from '@wordpress/element';
+import { isAppleOS } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
@@ -127,6 +128,10 @@ function TableRow< Item >( {
 		showDescription = true,
 		infiniteScrollEnabled,
 	} = view;
+	// Will be set to true if `onTouchStart` fires. This happens before
+	// `onClick` and can be used to exclude touchscreen devices from certain
+	// behaviours.
+	const isTouchDeviceRef = useRef( false );
 	const columns = view.fields ?? [];
 	const hasPrimaryColumn =
 		( titleField && showTitle ) ||
@@ -139,11 +144,37 @@ function TableRow< Item >( {
 				'is-selected': hasPossibleBulkAction && isSelected,
 				'has-bulk-actions': hasPossibleBulkAction,
 			} ) }
+			onTouchStart={ () => {
+				isTouchDeviceRef.current = true;
+			} }
 			aria-setsize={
 				infiniteScrollEnabled ? paginationInfo.totalItems : undefined
 			}
 			aria-posinset={ posinset }
 			role={ infiniteScrollEnabled ? 'article' : undefined }
+			onClick={ ( event ) => {
+				if ( ! hasPossibleBulkAction ) {
+					return;
+				}
+
+				// Only handle Ctrl/Cmd+Click for multi-selection
+				const isModifierKeyPressed = isAppleOS()
+					? event.metaKey
+					: event.ctrlKey;
+
+				if (
+					isModifierKeyPressed &&
+					! isTouchDeviceRef.current &&
+					document.getSelection()?.type !== 'Range'
+				) {
+					// Handle non-consecutive selection with Ctrl/Cmd+Click
+					onChangeSelection(
+						selection.includes( id )
+							? selection.filter( ( itemId ) => id !== itemId )
+							: [ ...selection, id ]
+					);
+				}
+			} }
 		>
 			{ hasBulkActions && (
 				<td className="dataviews-view-table__checkbox-column">
