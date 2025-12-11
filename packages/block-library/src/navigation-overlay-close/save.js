@@ -16,7 +16,11 @@ export default function NavigationOverlayCloseSave( { attributes } ) {
 	} );
 
 	return (
-		<button { ...blockProps } type="button" aria-label={ __( 'Close' ) }>
+		<button
+			{ ...blockProps }
+			type="button"
+			aria-label={ ! showText ? __( 'Close' ) : undefined }
+		>
 			{ showIcon && (
 				<svg
 					xmlns="http://www.w3.org/2000/svg"
