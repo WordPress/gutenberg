@@ -74,7 +74,7 @@ const FilterText = ( {
 } ): ReactElement => {
 	return createInterpolateElement(
 		sprintf(
-			/* translators: 1: Filter name. 2: Operator string. 3: Filter value. e.g.: "Author is any: Admin, Editor". */
+			/* translators: 1: Filter name (e.g. "Author"). 2: Operator string (e.g. "is any"). 3: Filter value (e.g. "Admin"): "Author is any: Admin, Editor". */
 			__( '<Name>%1$s %2$s: </Name><Value>%3$s</Value>' ),
 			filter,
 			operator,
