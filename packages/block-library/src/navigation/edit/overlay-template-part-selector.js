@@ -18,11 +18,7 @@ import { store as noticesStore } from '@wordpress/notices';
  * Internal dependencies
  */
 import { createTemplatePartId } from '../../template-part/edit/utils/create-template-part-id';
-import {
-	parseTemplatePartId,
-	getUniqueTemplatePartTitle,
-	getCleanTemplatePartSlug,
-} from './utils';
+import { getUniqueTemplatePartTitle, getCleanTemplatePartSlug } from './utils';
 
 /**
  * Overlay Template Part Selector component.
@@ -94,11 +90,6 @@ export default function OverlayTemplatePartSelector( {
 
 		return [ ...baseOptions, ...templatePartOptions ];
 	}, [ overlayTemplateParts, hasResolved, isResolving ] );
-
-	// Parse selected template part for navigation
-	const parsedTemplatePart = useMemo( () => {
-		return parseTemplatePartId( overlay );
-	}, [ overlay ] );
 
 	// Find the selected template part to get its title
 	const selectedTemplatePart = useMemo( () => {
@@ -197,10 +188,7 @@ export default function OverlayTemplatePartSelector( {
 	] );
 
 	const isEditButtonDisabled =
-		! overlay ||
-		! parsedTemplatePart ||
-		! onNavigateToEntityRecord ||
-		isResolving;
+		! overlay || ! onNavigateToEntityRecord || isResolving;
 
 	const isCreateButtonDisabled = isResolving || isCreating;
 

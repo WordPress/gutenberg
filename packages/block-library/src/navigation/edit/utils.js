@@ -113,31 +113,6 @@ export function getNavigationChildBlockProps( innerBlocksColors ) {
 }
 
 /**
- * Parses a template part ID into theme and slug components.
- *
- * This is the inverse of createTemplatePartId from:
- * packages/block-library/src/template-part/edit/utils/create-template-part-id.js
- *
- * @param {string} templatePartId Template part ID in format "theme//slug".
- * @return {{theme: string, slug: string}|null} Parsed components or null if invalid.
- */
-export const parseTemplatePartId = ( templatePartId ) => {
-	if ( ! templatePartId || typeof templatePartId !== 'string' ) {
-		return null;
-	}
-
-	const parts = templatePartId.split( '//' );
-	if ( parts.length !== 2 ) {
-		return null;
-	}
-
-	return {
-		theme: parts[ 0 ],
-		slug: parts[ 1 ],
-	};
-};
-
-/**
  * Return a unique template part title based on
  * the given title and existing template parts.
  *
