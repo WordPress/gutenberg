@@ -13,7 +13,7 @@
 
 ### Enhancements
 
-- DataViews table layout: remove row click-to-select behavior and hover styles. Selection is now only possible via checkboxes. [#73873](https://github.com/WordPress/gutenberg/pull/73873)
+- DataViews table layout: remove row click-to-select behavior and hover styles. Selection is now only possible via checkboxes, or by ctrl/cmd clicking. [#73873](https://github.com/WordPress/gutenberg/pull/73873)
 - Field API: move validation to the field type. [#73642](https://github.com/WordPress/gutenberg/pull/73642)
 - DataForm: add support for `min`/`max` and `minLength`/`maxLength` validation for relevant controls. [#73465](https://github.com/WordPress/gutenberg/pull/73465)
 - Field API: display formats for `number` and `integer` types. [#73644](https://github.com/WordPress/gutenberg/pull/73644)
