@@ -1,8 +1,10 @@
 /**
  * External dependencies
  */
-// eslint-disable-next-line no-restricted-imports
-import type { combineReducers as reduxCombineReducers, AnyAction } from 'redux';
+import type {
+	combineReducers as reduxCombineReducers, // eslint-disable-line no-restricted-imports
+	UnknownAction,
+} from 'redux';
 
 /**
  * Internal dependencies
@@ -267,7 +269,7 @@ type SelectorsOf< Config extends AnyConfig > = Config extends ReduxStoreConfig<
  * Used to type the arguments passed to a thunk function.
  */
 export type ThunkArgs<
-	Action extends AnyAction,
+	Action extends UnknownAction,
 	S extends StoreDescriptor< AnyConfig >,
 > = {
 	/**
@@ -290,7 +292,7 @@ export type ThunkArgs<
 };
 
 export type Thunk<
-	A extends AnyAction,
+	A extends UnknownAction,
 	S extends StoreDescriptor< AnyConfig >,
 	T extends unknown = void,
 > = T extends Awaited< infer R >
