@@ -906,7 +906,6 @@ async function generatePagesPhp( pageData, replacements ) {
 			'{{PREFIX}}': prefixUnderscore,
 			'{{INIT_MODULES_PHP_ARRAY}}': initModulesPhp,
 			'{{INIT_MODULES_JSON}}': JSON.stringify( page.initModules ),
-			'{{PAGE_DEFAULT_TITLE}}': page.title || '',
 		};
 
 		// Generate both page.php and page-wp-admin.php
