@@ -238,7 +238,7 @@ function LinkControl( {
 		// We don't auto focus into the Link UI on mount
 		// because otherwise using the keyboard to select text
 		// *within* the link format is not possible.
-		if ( isMountingRef.current && isEditingLink ) {
+		if ( isMountingRef.current ) {
 			return;
 		}
 

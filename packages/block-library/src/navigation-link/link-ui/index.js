@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
+import { __unstableStripHTML as stripHTML, focus } from '@wordpress/dom';
 import {
 	Popover,
 	Button,
@@ -75,6 +75,8 @@ function UnforwardedLinkUI( props, ref ) {
 	const [ addingPage, setAddingPage ] = useState( false );
 	const [ focusAddBlockButton, setFocusAddBlockButton ] = useState( false );
 	const [ focusAddPageButton, setFocusAddPageButton ] = useState( false );
+	const linkControlWrapperRef = useRef();
+	const shouldFocusAfterPageCreation = useRef( false );
 	const permissions = useResourcePermissions( {
 		kind: 'postType',
 		name: postType,
@@ -105,6 +107,8 @@ function UnforwardedLinkUI( props, ref ) {
 		props.onChange( pageLink );
 		// Return to main Link UI
 		setAddingPage( false );
+		// Request focus after the LinkControl remounts in preview mode
+		shouldFocusAfterPageCreation.current = true;
 	};
 
 	const dialogTitleId = useInstanceId(
@@ -115,6 +119,24 @@ function UnforwardedLinkUI( props, ref ) {
 		LinkUI,
 		'link-ui-link-control__description'
 	);
+
+	// Focus the LinkControl after page creation
+	useEffect( () => {
+		if (
+			! addingPage &&
+			shouldFocusAfterPageCreation.current &&
+			linkControlWrapperRef.current
+		) {
+			const nextFocusTarget =
+				focus.focusable.find( linkControlWrapperRef.current )[ 0 ] ||
+				linkControlWrapperRef.current;
+			nextFocusTarget.focus();
+			// Reset the flag after focusing. We could avoid this eslint rule by
+			// using a state instead of a ref, but it would cause an unnecessary re-render.
+			// eslint-disable-next-line react-compiler/react-compiler
+			shouldFocusAfterPageCreation.current = false;
+		}
+	}, [ addingPage ] );
 
 	const blockEditingMode = useBlockEditingMode();
 
@@ -128,6 +150,7 @@ function UnforwardedLinkUI( props, ref ) {
 		>
 			{ ! addingBlock && ! addingPage && (
 				<div
+					ref={ linkControlWrapperRef }
 					role="dialog"
 					aria-labelledby={ dialogTitleId }
 					aria-describedby={ dialogDescriptionId }
