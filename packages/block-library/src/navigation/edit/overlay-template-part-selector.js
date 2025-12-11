@@ -166,18 +166,15 @@ export default function OverlayTemplatePartSelector( {
 			] );
 
 			// Set the newly created overlay as selected
-			const templatePartId = createTemplatePartId(
-				templatePart.theme,
-				templatePart.slug
-			);
+			// templatePart.id is already in the format "theme//slug"
 			setAttributes( {
-				overlay: templatePartId,
+				overlay: templatePart.id,
 			} );
 
 			// Optionally navigate to the new overlay for editing
 			if ( onNavigateToEntityRecord ) {
 				onNavigateToEntityRecord( {
-					postId: templatePartId,
+					postId: templatePart.id,
 					postType: 'wp_template_part',
 				} );
 			}
