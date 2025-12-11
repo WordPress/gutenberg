@@ -131,47 +131,52 @@ export default function OverlayTemplatePartSelector( {
 		} );
 	};
 
+	// Create a new overlay template part
+	const createOverlayTemplatePart = useCallback( async () => {
+		// Generate unique name using only overlay area template parts
+		// Filter to only include template parts with titles for uniqueness check
+		const templatePartsWithTitles = overlayTemplateParts.filter(
+			( templatePart ) => templatePart.title?.rendered
+		);
+		const uniqueTitle = getUniqueTemplatePartTitle(
+			__( 'Overlay' ),
+			templatePartsWithTitles
+		);
+		const cleanSlug = getCleanTemplatePartSlug( uniqueTitle );
+
+		// Create the template part
+		const templatePart = await saveEntityRecord(
+			'postType',
+			'wp_template_part',
+			{
+				slug: cleanSlug,
+				title: uniqueTitle,
+				area: 'overlay',
+			},
+			{ throwOnError: true }
+		);
+
+		// Invalidate the template parts resolution cache to refresh the list
+		invalidateResolution( 'getEntityRecords', [
+			'postType',
+			'wp_template_part',
+			{ per_page: -1 },
+		] );
+
+		return templatePart;
+	}, [ overlayTemplateParts, saveEntityRecord, invalidateResolution ] );
+
 	const handleCreateOverlay = useCallback( async () => {
 		try {
 			setIsCreating( true );
 
-			// Generate unique name using only overlay area template parts
-			// Filter to only include template parts with titles for uniqueness check
-			const templatePartsWithTitles = overlayTemplateParts.filter(
-				( templatePart ) => templatePart.title?.rendered
-			);
-			const uniqueTitle = getUniqueTemplatePartTitle(
-				__( 'Overlay' ),
-				templatePartsWithTitles
-			);
-			const cleanSlug = getCleanTemplatePartSlug( uniqueTitle );
+			const templatePart = await createOverlayTemplatePart();
 
-			// Create the template part
-			const templatePart = await saveEntityRecord(
-				'postType',
-				'wp_template_part',
-				{
-					slug: cleanSlug,
-					title: uniqueTitle,
-					area: 'overlay',
-				},
-				{ throwOnError: true }
-			);
-
-			// Invalidate the template parts resolution cache to refresh the list
-			invalidateResolution( 'getEntityRecords', [
-				'postType',
-				'wp_template_part',
-				{ per_page: -1 },
-			] );
-
-			// Set the newly created overlay as selected
-			// templatePart.id is already in the format "theme//slug"
 			setAttributes( {
 				overlay: templatePart.id,
 			} );
 
-			// Optionally navigate to the new overlay for editing
+			// Navigate to the new overlay for editing
 			if ( onNavigateToEntityRecord ) {
 				onNavigateToEntityRecord( {
 					postId: templatePart.id,
@@ -194,11 +199,9 @@ export default function OverlayTemplatePartSelector( {
 			setIsCreating( false );
 		}
 	}, [
-		overlayTemplateParts,
-		saveEntityRecord,
+		createOverlayTemplatePart,
 		setAttributes,
 		onNavigateToEntityRecord,
-		invalidateResolution,
 		createErrorNotice,
 	] );
 
