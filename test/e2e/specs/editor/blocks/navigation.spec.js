@@ -969,14 +969,13 @@ test.describe( 'Navigation block', () => {
 				await expect( linkPopover ).toBeVisible();
 
 				// The link preview should show the newly created page
-				const linkPreview =
+				const previewLink =
 					navigation.getLinkControlLink( 'Newly Created Page' );
-				await expect( linkPreview ).toBeVisible();
+				await expect( previewLink ).toBeVisible();
 
 				// Focus should be on the link preview
-				await expect( linkPreview ).toBeFocused();
+				await expect( previewLink ).toBeFocused();
 
-				// Click outside the link preview to close it
 				await page.keyboard.press( 'Escape' );
 				await expect( linkPopover ).toBeHidden();
 				await expect( navigation.getNavBlockInserter() ).toBeVisible();

@@ -127,11 +127,12 @@ function UnforwardedLinkUI( props, ref ) {
 				// Focus the specific element passed
 				shouldFocusPane.current.focus();
 			} else {
-				// Focus the first focusable element
+				// Focus the first tabbable element (keyboard-accessible, excluding tabindex="-1")
+				const tabbableElements = focus.tabbable.find(
+					linkControlWrapperRef.current
+				);
 				const nextFocusTarget =
-					focus.focusable.find(
-						linkControlWrapperRef.current
-					)[ 0 ] || linkControlWrapperRef.current;
+					tabbableElements[ 0 ] || linkControlWrapperRef.current;
 				nextFocusTarget.focus();
 			}
 
