@@ -46,12 +46,14 @@ test.describe( 'Toolbar roving tabindex', () => {
 		await page.keyboard.type( 'Heading' );
 		await ToolbarRovingTabindexUtils.testBlockToolbarKeyboardNavigation(
 			'Block: Heading',
-			'Heading'
+			'Heading 2'
 		);
-		await ToolbarRovingTabindexUtils.wrapCurrentBlockWithGroup( 'Heading' );
+		await ToolbarRovingTabindexUtils.wrapCurrentBlockWithGroup(
+			'Heading 2'
+		);
 		await ToolbarRovingTabindexUtils.testGroupKeyboardNavigation(
 			'Block: Heading',
-			'Heading'
+			'Heading 2'
 		);
 
 		// ensures list block toolbar uses roving tabindex

@@ -2302,7 +2302,15 @@ export const getInserterItems = createRegistrySelector( ( select ) =>
 				( accumulator, item ) => {
 					const { variations = [] } = item;
 					// Exclude any block type item that is to be replaced by a default variation.
-					if ( ! variations.some( ( { isDefault } ) => isDefault ) ) {
+					// Only consider non-search-only variations ("inserter" scope) for this check.
+					// "block" scope variations marked as `isSearchOnly` should not cause the base
+					// block to be excluded.
+					if (
+						! variations.some(
+							( variation ) =>
+								! variation.isSearchOnly && variation.isDefault
+						)
+					) {
 						accumulator.push( item );
 					}
 					if ( variations.length ) {

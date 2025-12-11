@@ -20,7 +20,7 @@ test.describe( 'Keep styles on block transforms', () => {
 		await page.click( 'role=button[name="Text"i]' );
 		await page.click( 'role=option[name="Luminous vivid orange"i]' );
 
-		await page.click( 'role=button[name="Heading"i]' );
+		await page.click( 'role=button[name="Heading 2"i]' );
 		await page.click( 'role=menuitem[name="Paragraph"i]' );
 
 		await expect.poll( editor.getBlocks ).toMatchObject( [
