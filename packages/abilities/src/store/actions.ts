@@ -151,17 +151,7 @@ export function registerAbility( ability: Ability ) {
 				);
 			}
 
-			// Condition 3: New ability must not set serverRegistered to true
-			if ( newAnnotations?.serverRegistered === true ) {
-				throw new Error(
-					sprintf(
-						'Ability "%s" is already registered',
-						ability.name
-					)
-				);
-			}
-
-			// Condition 4: Only callback change is allowed - all other props must match
+			// Condition 3: Only callback change is allowed - all other props must match
 			const propsToCompare = [
 				'name',
 				'label',
