@@ -9,6 +9,8 @@ import {
 	useBlockEditingMode,
 	store as blockEditorStore,
 	HeadingLevelDropdown,
+	MediaUpload,
+	MediaUploadCheck,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import {
@@ -19,6 +21,7 @@ import {
 	__experimentalToolsPanelItem as ToolsPanelItem,
 	ToolbarButton,
 	ToolbarGroup,
+	Button,
 } from '@wordpress/components';
 import { useDispatch, useSelect, useRegistry } from '@wordpress/data';
 import { createBlock } from '@wordpress/blocks';
@@ -41,6 +44,10 @@ export default function Edit( {
 		showIcon,
 		headingLevel,
 		levelOptions,
+		expandIconId,
+		expandIconUrl,
+		collapseIconId,
+		collapseIconUrl,
 	},
 	clientId,
 	setAttributes,
@@ -98,6 +105,27 @@ export default function Edit( {
 			} );
 		} );
 	};
+
+	const onSelectExpandIcon = ( media ) =>
+		setAttributes( {
+			expandIconId: media.id,
+			expandIconUrl: media.sizes?.thumbnail?.url || media.url,
+		} );
+	const onRemoveExpandIcon = () =>
+		setAttributes( {
+			expandIconId: undefined,
+			expandIconUrl: undefined,
+		} );
+	const onSelectCollapseIcon = ( media ) =>
+		setAttributes( {
+			collapseIconId: media.id,
+			collapseIconUrl: media.sizes?.thumbnail?.url || media.url,
+		} );
+	const onRemoveCollapseIcon = () =>
+		setAttributes( {
+			collapseIconId: undefined,
+			collapseIconUrl: undefined,
+		} );
 
 	return (
 		<>
@@ -179,34 +207,138 @@ export default function Edit( {
 						/>
 					</ToolsPanelItem>
 					{ showIcon && (
-						<ToolsPanelItem
-							label={ __( 'Icon Position' ) }
-							isShownByDefault
-							hasValue={ () => iconPosition !== 'right' }
-							onDeselect={ () =>
-								setAttributes( { iconPosition: 'right' } )
-							}
-						>
-							<ToggleGroupControl
-								__nextHasNoMarginBottom
-								__next40pxDefaultSize
-								isBlock
+						<>
+							<ToolsPanelItem
 								label={ __( 'Icon Position' ) }
-								value={ iconPosition }
-								onChange={ ( value ) => {
-									setAttributes( { iconPosition: value } );
+								isShownByDefault
+								hasValue={ () => iconPosition !== 'right' }
+								onDeselect={ () =>
+									setAttributes( { iconPosition: 'right' } )
+								}
+							>
+								<ToggleGroupControl
+									__nextHasNoMarginBottom
+									__next40pxDefaultSize
+									isBlock
+									label={ __( 'Icon Position' ) }
+									value={ iconPosition }
+									onChange={ ( value ) => {
+										setAttributes( {
+											iconPosition: value,
+										} );
+									} }
+								>
+									<ToggleGroupControlOption
+										label={ __( 'Left' ) }
+										value="left"
+									/>
+									<ToggleGroupControlOption
+										label={ __( 'Right' ) }
+										value="right"
+									/>
+								</ToggleGroupControl>
+							</ToolsPanelItem>
+							<ToolsPanelItem
+								label={ __( 'Custom Icons' ) }
+								isShownByDefault
+								hasValue={ () =>
+									!! ( expandIconId || collapseIconId )
+								}
+								onDeselect={ () => {
+									onRemoveExpandIcon();
+									onRemoveCollapseIcon();
 								} }
 							>
-								<ToggleGroupControlOption
-									label={ __( 'Left' ) }
-									value="left"
-								/>
-								<ToggleGroupControlOption
-									label={ __( 'Right' ) }
-									value="right"
-								/>
-							</ToggleGroupControl>
-						</ToolsPanelItem>
+								<div>
+									<h3> { __( 'Custom Icons' ) }</h3>
+									<p> { __( 'Expand Icon' ) }</p>
+									<MediaUploadCheck>
+										<MediaUpload
+											onSelect={ onSelectExpandIcon }
+											allowedTypes={ [ 'image' ] }
+											value={ expandIconId }
+											render={ ( { open } ) => (
+												<Button
+													__next40pxDefaultSize
+													onClick={ open }
+													variant="secondary"
+													className="editor-post-featured-image__toggle"
+												>
+													{ ! expandIconId ? (
+														__( 'Upload' )
+													) : (
+														<img
+															src={
+																expandIconUrl
+															}
+															alt={ __(
+																'Expand icon'
+															) }
+															width="40"
+														/>
+													) }
+												</Button>
+											) }
+										/>
+									</MediaUploadCheck>
+									{ !! expandIconId && (
+										<Button
+											__next40pxDefaultSize
+											onClick={ onRemoveExpandIcon }
+											variant="link"
+											isDestructive
+										>
+											{ __( 'Remove' ) }
+										</Button>
+									) }
+								</div>
+
+								<br />
+
+								<div>
+									<p> { __( 'Collapse Icon' ) }</p>
+									<MediaUploadCheck>
+										<MediaUpload
+											onSelect={ onSelectCollapseIcon }
+											allowedTypes={ [ 'image' ] }
+											value={ collapseIconId }
+											render={ ( { open } ) => (
+												<Button
+													__next40pxDefaultSize
+													onClick={ open }
+													variant="secondary"
+													className="editor-post-featured-image__toggle"
+												>
+													{ ! collapseIconId ? (
+														__( 'Upload' )
+													) : (
+														<img
+															src={
+																collapseIconUrl
+															}
+															alt={ __(
+																'Collapse icon'
+															) }
+															width="40"
+														/>
+													) }
+												</Button>
+											) }
+										/>
+									</MediaUploadCheck>
+									{ !! collapseIconId && (
+										<Button
+											__next40pxDefaultSize
+											onClick={ onRemoveCollapseIcon }
+											variant="link"
+											isDestructive
+										>
+											{ __( 'Remove' ) }
+										</Button>
+									) }
+								</div>
+							</ToolsPanelItem>
+						</>
 					) }
 				</ToolsPanel>
 			</InspectorControls>

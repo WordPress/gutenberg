@@ -76,12 +76,26 @@
 		},
 		"levelOptions": {
 			"type": "array"
+		},
+		"expandIconId": {
+			"type": "number"
+		},
+		"expandIconUrl": {
+			"type": "string"
+		},
+		"collapseIconId": {
+			"type": "number"
+		},
+		"collapseIconUrl": {
+			"type": "string"
 		}
 	},
 	"providesContext": {
 		"core/accordion-icon-position": "iconPosition",
 		"core/accordion-show-icon": "showIcon",
-		"core/accordion-heading-level": "headingLevel"
+		"core/accordion-heading-level": "headingLevel",
+		"core/accordion-expand-icon-url": "expandIconUrl",
+		"core/accordion-collapse-icon-url": "collapseIconUrl"
 	},
 	"allowedBlocks": [ "core/accordion-item" ],
 	"textdomain": "default",

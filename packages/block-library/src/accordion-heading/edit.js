@@ -17,18 +17,39 @@ export default function Edit( { attributes, setAttributes, context } ) {
 		'core/accordion-icon-position': iconPosition,
 		'core/accordion-show-icon': showIcon,
 		'core/accordion-heading-level': headingLevel,
+		'core/accordion-expand-icon-url': expandIconUrl,
+		'core/accordion-collapse-icon-url': collapseIconUrl,
 	} = context;
 	const TagName = 'h' + headingLevel;
 
 	// Set icon attributes.
 	useEffect( () => {
-		if ( iconPosition !== undefined && showIcon !== undefined ) {
-			setAttributes( {
-				iconPosition,
-				showIcon,
-			} );
+		const newAttrs = {};
+		if ( iconPosition !== undefined ) {
+			newAttrs.iconPosition = iconPosition;
 		}
-	}, [ iconPosition, showIcon, setAttributes ] );
+		if ( showIcon !== undefined ) {
+			newAttrs.showIcon = showIcon;
+		}
+		if ( expandIconUrl !== attributes.expandIconUrl ) {
+			newAttrs.expandIconUrl = expandIconUrl;
+		}
+		if ( collapseIconUrl !== attributes.collapseIconUrl ) {
+			newAttrs.collapseIconUrl = collapseIconUrl;
+		}
+
+		if ( Object.keys( newAttrs ).length > 0 ) {
+			setAttributes( newAttrs );
+		}
+	}, [
+		iconPosition,
+		showIcon,
+		expandIconUrl,
+		collapseIconUrl,
+		attributes.expandIconUrl,
+		attributes.collapseIconUrl,
+		setAttributes,
+	] );
 
 	const [ fluidTypographySettings, layout ] = useSettings(
 		'typography.fluid',
@@ -46,6 +67,25 @@ export default function Edit( { attributes, setAttributes, context } ) {
 	const blockProps = useBlockProps();
 	const spacingProps = useSpacingProps( attributes );
 
+	const renderIcon = () => (
+		<span
+			className="wp-block-accordion-heading__toggle-icon"
+			aria-hidden="true"
+		>
+			{ expandIconUrl && collapseIconUrl ? (
+				<img
+					src={ expandIconUrl }
+					alt={ __( 'Expand icon' ) }
+					className="wp-block-accordion-heading__icon-expand"
+				/>
+			) : (
+				<span className="wp-block-accordion-heading__icon-expand">
+					+
+				</span>
+			) }
+		</span>
+	);
+
 	return (
 		<TagName { ...blockProps }>
 			<button
@@ -53,14 +93,7 @@ export default function Edit( { attributes, setAttributes, context } ) {
 				style={ spacingProps.style }
 				tabIndex="-1"
 			>
-				{ showIcon && iconPosition === 'left' && (
-					<span
-						className="wp-block-accordion-heading__toggle-icon"
-						aria-hidden="true"
-					>
-						+
-					</span>
-				) }
+				{ showIcon && iconPosition === 'left' && renderIcon() }
 				<RichText
 					withoutInteractiveFormatting
 					disableLineBreaks
@@ -76,14 +109,7 @@ export default function Edit( { attributes, setAttributes, context } ) {
 						textDecoration: typographyProps.style.textDecoration,
 					} }
 				/>
-				{ showIcon && iconPosition === 'right' && (
-					<span
-						className="wp-block-accordion-heading__toggle-icon"
-						aria-hidden="true"
-					>
-						+
-					</span>
-				) }
+				{ showIcon && iconPosition === 'right' && renderIcon() }
 			</button>
 		</TagName>
 	);

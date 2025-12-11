@@ -9,7 +9,9 @@
 	"usesContext": [
 		"core/accordion-icon-position",
 		"core/accordion-show-icon",
-		"core/accordion-heading-level"
+		"core/accordion-heading-level",
+		"core/accordion-expand-icon-url",
+		"core/accordion-collapse-icon-url"
 	],
 	"supports": {
 		"anchor": true,
@@ -88,6 +90,12 @@
 		"showIcon": {
 			"type": "boolean",
 			"default": true
+		},
+		"expandIconUrl": {
+			"type": "string"
+		},
+		"collapseIconUrl": {
+			"type": "string"
 		}
 	},
 	"textdomain": "default"
