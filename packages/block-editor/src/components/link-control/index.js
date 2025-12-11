@@ -334,8 +334,11 @@ function LinkControl( {
 			const isHashLink =
 				trimmedValue.startsWith( '#' ) &&
 				isValidFragment( trimmedValue );
+
 			if ( ! isHashLink ) {
 				// Perform URL validation using the native URL constructor as the authoritative source.
+				// Protocol URLs (mailto:, tel:, etc.) are also validated by the native
+				// URL constructor, so we don't need special handling for them.
 				const urlToCheck = prependHTTP( trimmedValue );
 				if ( ! isURL( urlToCheck ) ) {
 					setCustomValidity( {
@@ -389,6 +392,23 @@ function LinkControl( {
 
 		const trimmedValue = currentUrlInputValue.trim();
 
+		// If the current value is an entity link (has id and type not in LINK_ENTRY_TYPES)
+		// and the URL hasn't changed from the original value, skip validation.
+		// This allows entity links with permalink formats like "?p=2" to work without
+		// requiring URL validation when only settings are being changed.
+		const isEntityLink =
+			internalControlValue &&
+			internalControlValue.id &&
+			internalControlValue.type &&
+			! LINK_ENTRY_TYPES.includes( internalControlValue.type );
+		const urlUnchanged = value?.url === trimmedValue;
+
+		if ( isEntityLink && urlUnchanged ) {
+			// Entity link with unchanged URL - skip validation
+			setCustomValidity( undefined );
+			return true;
+		}
+
 		// First check if it looks like a URL (for UX - we only validate URL-like strings)
 		if ( ! trimmedValue || ! isURLLike( trimmedValue ) ) {
 			setCustomValidity( {
@@ -405,11 +425,15 @@ function LinkControl( {
 		// URL constructor validation. They're already validated by isURLLike.
 		const isHashLink =
 			trimmedValue.startsWith( '#' ) && isValidFragment( trimmedValue );
+
 		if ( ! isHashLink ) {
 			// Perform URL validation using the native URL constructor as the authoritative source.
 			// The native URL constructor is the standard for URL validity - if it accepts a URL,
 			// we should allow it. For URLs without a protocol (e.g., "www.wordpress.org"),
 			// prepend "http://" before validating, as the URL constructor requires a protocol.
+			//
+			// Note: Protocol URLs (mailto:, tel:, etc.) are also validated by the native
+			// URL constructor, so we don't need special handling for them.
 			//
 			// Note: We rely on the native URL constructor rather than implementing custom TLD
 			// validation to avoid blocking valid URLs. If a URL passes the native constructor,
