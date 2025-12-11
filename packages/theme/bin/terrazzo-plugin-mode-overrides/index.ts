@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { basename, join, dirname } from 'node:path';
+import { basename, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import type { Plugin } from '@terrazzo/parser';
 
@@ -155,9 +155,13 @@ function getModeOverrides(
  * For each mode found in tokens (via $extensions.mode), generates a separate
  * JSON file per source file containing tokens that have values for that mode.
  *
+ * @param options          Plugin options.
+ * @param options.filePath Output path relative to outDir (default: 'modes').
  * @return A Terrazzo plugin that generates mode-specific DTCG override files.
  */
-export default function pluginModeOverrides(): Plugin {
+export default function pluginModeOverrides( {
+	filePath = 'modes',
+} = {} ): Plugin {
 	return {
 		name: '@wordpress/terrazzo-plugin-mode-overrides',
 		async build( { outputFile, sources } ) {
@@ -189,13 +193,20 @@ export default function pluginModeOverrides(): Plugin {
 					}
 
 					// Output as {basename}.{mode}.json (e.g., dimension.compact.json)
-					const filePath = fileURLToPath( filename );
-					const outFile = join(
-						dirname( filePath ),
-						'modes',
-						`${ basename( filePath, '.json' ) }.${ mode }.json`
+					const jsonFileName = `${ basename(
+						fileURLToPath( filename ),
+						'.json'
+					) }.${ mode }.json`;
+
+					const outputFilePath = join(
+						filePath,
+						jsonFileName
+					).replace( /\\/g, '/' );
+
+					outputFile(
+						outputFilePath,
+						JSON.stringify( output, null, '\t' )
 					);
-					outputFile( outFile, JSON.stringify( output, null, '\t' ) );
 				}
 			}
 		},

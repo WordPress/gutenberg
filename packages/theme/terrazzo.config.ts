@@ -75,7 +75,9 @@ export default defineConfig( {
 		pluginDsTokenDocs( {
 			filename: '../../docs/ds-tokens.md',
 		} ),
-		pluginModeOverrides(),
+		pluginModeOverrides( {
+			filePath: '../../tokens/modes',
+		} ),
 	],
 
 	// Linter rules current error when multiple entry files are used
