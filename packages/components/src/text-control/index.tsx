@@ -23,7 +23,8 @@ function UnforwardedTextControl(
 	ref: ForwardedRef< HTMLInputElement >
 ) {
 	const {
-		__nextHasNoMarginBottom,
+		// @ts-expect-error - Prevent passing this to `input`.
+		__nextHasNoMarginBottom: _,
 		__next40pxDefaultSize = false,
 		label,
 		hideLabelFromVision,
@@ -47,8 +48,7 @@ function UnforwardedTextControl(
 
 	return (
 		<BaseControl
-			__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
-			__associatedWPComponentName="TextControl"
+			__nextHasNoMarginBottom
 			label={ label }
 			hideLabelFromVision={ hideLabelFromVision }
 			id={ id }
@@ -83,7 +83,6 @@ function UnforwardedTextControl(
  *
  *   return (
  *     <TextControl
- *       __nextHasNoMarginBottom
  *       __next40pxDefaultSize
  *       label="Additional CSS Class"
  *       value={ className }
