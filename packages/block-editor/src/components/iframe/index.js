@@ -339,29 +339,6 @@ function Iframe( {
 		function preventFileDropDefault( event ) {
 			event.preventDefault();
 		}
-		// Prevent clicks on link fragments from navigating away. Note that links
-		// inside `contenteditable` are already disabled by the browser, so
-		// this is for links in blocks outside of `contenteditable`.
-		function interceptLinkClicks( event ) {
-			if (
-				event.target.tagName === 'A' &&
-				event.target.getAttribute( 'href' )?.startsWith( '#' )
-			) {
-				event.preventDefault();
-				// Manually handle link fragment navigation within the iframe.
-				// With srcDoc, the iframe shares the parent's location (via polyfill),
-				// but we still intercept to scroll to the anchor within the iframe
-				// without affecting the parent page.
-				//
-				// Links with fragments are used for example with footnotes. Clicking on these
-				// links will scroll smoothly to the anchors in the editor canvas.
-				const targetId = event.target.getAttribute( 'href' ).slice( 1 );
-				const targetElement = iFrameDocument.getElementById( targetId );
-				if ( targetElement ) {
-					targetElement.scrollIntoView( { behavior: 'smooth' } );
-				}
-			}
-		}
 
 		const { ownerDocument } = node;
 
@@ -421,7 +398,6 @@ function Iframe( {
 				preventFileDropDefault,
 				false
 			);
-			iFrameDocument.addEventListener( 'click', interceptLinkClicks );
 		}
 
 		node.addEventListener( 'load', onLoad );
@@ -437,7 +413,6 @@ function Iframe( {
 				'drop',
 				preventFileDropDefault
 			);
-			iFrameDocument?.removeEventListener( 'click', interceptLinkClicks );
 		};
 	}, [] );
 
@@ -463,7 +438,8 @@ function Iframe( {
 
 	// Correct doctype is required to enable rendering in standards mode.
 	// Styles are injected after load to avoid duplicate requests from each iframe.
-	const srcDoc = useMemo(
+	// Using blob URL to get proper window.location for hash links.
+	const html = useMemo(
 		() => `<!doctype html>
 <html>
 	<head>
@@ -492,6 +468,14 @@ function Iframe( {
 		[ scripts ]
 	);
 
+	const [ src, cleanup ] = useMemo( () => {
+		const blob = new window.Blob( [ html ], { type: 'text/html' } );
+		const _src = URL.createObjectURL( blob );
+		return [ _src, () => URL.revokeObjectURL( _src ) ];
+	}, [ html ] );
+
+	useEffect( () => cleanup, [ cleanup ] );
+
 	// Make sure to not render the before and after focusable div elements in view
 	// mode. They're only needed to capture focus in edit mode.
 	const shouldRenderFocusCaptureElements = tabIndex >= 0 && ! isPreviewMode;
@@ -509,11 +493,10 @@ function Iframe( {
 				} }
 				ref={ useMergeRefs( [ ref, setRef ] ) }
 				tabIndex={ tabIndex }
-				// Using srcDoc instead of blob URL (src) enables browser caching
-				// across multiple iframes, dramatically improving performance.
-				// Hash links work via manual interception (see interceptLinkClicks)
-				// and the <base> tag ensures proper URL resolution.
-				srcDoc={ srcDoc }
+				// Using blob URL with inline CSS injection to avoid duplicate requests.
+				// Blob URL gives us proper window.location for hash links.
+				// CSS is fetched once and injected as inline styles via JavaScript.
+				src={ src }
 				title={ title }
 				onKeyDown={ ( event ) => {
 					if ( props.onKeyDown ) {
@@ -595,10 +578,9 @@ function IframeIfReady( props, ref ) {
 	);
 
 	// We shouldn't render the iframe until the editor settings are initialised.
-	// The initial settings are needed to get the styles for the srcDoc, which
-	// cannot be changed after the iframe is mounted. srcDoc is used to to set
-	// the initial iframe HTML, which is required to avoid a flash of unstyled
-	// content.
+	// The initial settings are needed to get the styles for the iframe, which
+	// are injected after the iframe is mounted. Using blob URL with inline CSS
+	// injection avoids duplicate requests while maintaining proper window.location.
 	if ( ! isInitialised ) {
 		return null;
 	}
