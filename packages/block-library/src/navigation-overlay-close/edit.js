@@ -91,10 +91,8 @@ export default function NavigationOverlayCloseEdit( {
 							setAttributes( { text: value } )
 						}
 						placeholder={ __( 'Close' ) }
-						allowedFormats={ [ 'core/bold', 'core/italic' ] }
 						withoutInteractiveFormatting
 						tagName="span"
-						className="wp-block-navigation-overlay-close__text"
 					/>
 				) }
 			</Button>
