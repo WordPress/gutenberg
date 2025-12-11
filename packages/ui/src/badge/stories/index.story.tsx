@@ -18,28 +18,6 @@ const meta: Meta< typeof Badge > = {
 	title: 'Design System/Components/Badge',
 	component: Badge,
 	tags: [ 'status-experimental' ],
-	argTypes: {
-		intent: {
-			control: {
-				type: 'radio',
-			},
-			options: [
-				'high',
-				'medium',
-				'low',
-				'stable',
-				'informational',
-				'draft',
-				'none',
-			],
-			table: {
-				type: {
-					summary:
-						'"high" | "medium" | "low" | "stable" | "informational" | "draft" | "none"',
-				},
-			},
-		},
-	},
 };
 export default meta;
 
