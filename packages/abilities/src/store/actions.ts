@@ -249,7 +249,6 @@ export function registerAbilityCallback(
 ) {
 	// @ts-expect-error - registry types are not yet available
 	return ( { select, dispatch } ) => {
-		// Validate ability exists
 		const existingAbility = select.getAbility( name );
 		if ( ! existingAbility ) {
 			throw new Error(
@@ -257,21 +256,27 @@ export function registerAbilityCallback(
 			);
 		}
 
-		// Validate callback is a function
+		if ( existingAbility.meta?.annotations?.clientRegistered ) {
+			throw new Error(
+				sprintf(
+					'Ability "%s" is already registered as a client-side ability',
+					name
+				)
+			);
+		}
+
 		if ( typeof callback !== 'function' ) {
 			throw new Error(
 				sprintf( 'Callback for ability "%s" must be a function', name )
 			);
 		}
 
-		// Update annotations to include clientRegistered
 		const existingAnnotations = existingAbility.meta?.annotations || {};
 		const annotations = {
 			...existingAnnotations,
 			clientRegistered: true,
 		};
 
-		// Dispatch update with callback and updated annotations
 		dispatch( {
 			type: REGISTER_ABILITY,
 			ability: {
