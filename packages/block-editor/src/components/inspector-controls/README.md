@@ -96,7 +96,6 @@ registerBlockType( 'my-plugin/inspector-controls-example', {
 				<InspectorControls>
 					<PanelBody title={ __( 'Settings' ) }>
 						<CheckboxControl
-							__nextHasNoMarginBottom
 							heading="Checkbox Field"
 							label="Tick Me"
 							help="Additional help text"

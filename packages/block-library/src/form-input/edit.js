@@ -68,7 +68,6 @@ function InputFieldBlock( { attributes, setAttributes, className } ) {
 								isShownByDefault
 							>
 								<CheckboxControl
-									__nextHasNoMarginBottom
 									label={ __( 'Inline label' ) }
 									checked={ inlineLabel }
 									onChange={ ( newVal ) => {
@@ -89,7 +88,6 @@ function InputFieldBlock( { attributes, setAttributes, className } ) {
 							isShownByDefault
 						>
 							<CheckboxControl
-								__nextHasNoMarginBottom
 								label={ __( 'Required' ) }
 								checked={ required }
 								onChange={ ( newVal ) => {

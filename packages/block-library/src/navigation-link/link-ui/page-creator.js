@@ -137,7 +137,6 @@ export function LinkUIPageCreator( {
 						/>
 
 						<CheckboxControl
-							__nextHasNoMarginBottom
 							label={ __( 'Publish immediately' ) }
 							help={ __(
 								'If unchecked, the page will be created as a draft.'
