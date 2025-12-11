@@ -79,7 +79,7 @@ describe( 'OverlayTemplatePartSelector', () => {
 	} );
 
 	describe( 'Loading state', () => {
-		it( 'should show loading spinner when template parts are resolving', () => {
+		it( 'should disable select control when template parts are resolving', () => {
 			useEntityRecords.mockReturnValue( {
 				records: null,
 				isResolving: true,
@@ -88,9 +88,10 @@ describe( 'OverlayTemplatePartSelector', () => {
 
 			render( <OverlayTemplatePartSelector { ...defaultProps } /> );
 
-			expect(
-				screen.getByText( 'Loading overlays…' )
-			).toBeInTheDocument();
+			const select = screen.getByRole( 'combobox', {
+				name: 'Overlay template',
+			} );
+			expect( select ).toBeDisabled();
 		} );
 	} );
 
@@ -251,7 +252,7 @@ describe( 'OverlayTemplatePartSelector', () => {
 			expect( editButton ).not.toBeInTheDocument();
 		} );
 
-		it( 'should not render button when template parts are initially loading', () => {
+		it( 'should disable button when template parts are initially loading', () => {
 			useEntityRecords.mockReturnValue( {
 				records: [ templatePart1 ],
 				isResolving: true,
@@ -265,15 +266,16 @@ describe( 'OverlayTemplatePartSelector', () => {
 				/>
 			);
 
-			// Component shows spinner when initially loading, button doesn't render
-			expect(
-				screen.getByText( 'Loading overlays…' )
-			).toBeInTheDocument();
-			expect(
-				screen.queryByRole( 'button', {
-					name: /Edit overlay/,
-				} )
-			).not.toBeInTheDocument();
+			// Component shows disabled select and disabled button when loading
+			const select = screen.getByRole( 'combobox', {
+				name: 'Overlay template',
+			} );
+			expect( select ).toBeDisabled();
+
+			const editButton = screen.getByRole( 'button', {
+				name: /Edit overlay/,
+			} );
+			expect( editButton ).toHaveAttribute( 'aria-disabled', 'true' );
 		} );
 
 		it( 'should be enabled when a valid template part is selected', () => {
@@ -438,7 +440,7 @@ describe( 'OverlayTemplatePartSelector', () => {
 			expect( editButton ).toHaveAccessibleName();
 		} );
 
-		it( 'should show loading spinner instead of select control when initially loading', () => {
+		it( 'should show disabled select control when initially loading', () => {
 			useEntityRecords.mockReturnValue( {
 				records: null,
 				isResolving: true,
@@ -447,15 +449,12 @@ describe( 'OverlayTemplatePartSelector', () => {
 
 			render( <OverlayTemplatePartSelector { ...defaultProps } /> );
 
-			// Should show loading spinner, not the select control
-			expect(
-				screen.getByText( 'Loading overlays…' )
-			).toBeInTheDocument();
-			expect(
-				screen.queryByRole( 'combobox', {
-					name: 'Overlay template',
-				} )
-			).not.toBeInTheDocument();
+			// Should show disabled select control instead of spinner
+			const select = screen.getByRole( 'combobox', {
+				name: 'Overlay template',
+			} );
+			expect( select ).toBeInTheDocument();
+			expect( select ).toBeDisabled();
 		} );
 	} );
 } );
