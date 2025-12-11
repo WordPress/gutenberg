@@ -257,21 +257,10 @@ export function ImageEdit( {
 
 		// If a caption text was meanwhile written by the user,
 		// make sure the text is not overwritten by empty captions.
-		// However, if caption is bound (e.g., with pattern overrides), we need
-		// to explicitly set it to clear the previous value.
-		const isCaptionBound =
-			metadata?.bindings?.caption ||
-			metadata?.bindings?.__default?.source === 'core/pattern-overrides';
 		if ( captionRef.current && ! mediaAttributes.caption ) {
-			if ( isCaptionBound ) {
-				// Explicitly set caption to undefined to clear it when bound.
-				mediaAttributes.caption = undefined;
-			} else {
-				// For non-bound captions, omit the caption key to preserve existing value.
-				const { caption: omittedCaption, ...restMediaAttributes } =
-					mediaAttributes;
-				mediaAttributes = restMediaAttributes;
-			}
+			const { caption: omittedCaption, ...restMediaAttributes } =
+				mediaAttributes;
+			mediaAttributes = restMediaAttributes;
 		}
 
 		let additionalAttributes;
