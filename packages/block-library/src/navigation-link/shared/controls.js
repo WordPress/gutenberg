@@ -105,7 +105,7 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 	const linkImage = useSelect(
 		( select ) => {
 			// Only fetch for post-type entities with featured media
-			if ( ! entityRecord || ! entityRecord.featured_media ) {
+			if ( ! entityRecord?.featured_media ) {
 				return null;
 			}
 
@@ -126,10 +126,9 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 				null
 			);
 		},
-		[ entityRecord ]
+		[ entityRecord?.featured_media ]
 	);
 
-	// Compute preview data using the hook
 	const preview = useLinkPreview( {
 		url,
 		title: linkTitle,

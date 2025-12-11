@@ -3,7 +3,9 @@
  */
 import {
 	BaseControl,
+	Button,
 	Dropdown,
+	VisuallyHidden,
 	__experimentalDropdownContentWrapper as DropdownContentWrapper,
 	useBaseControlProps,
 } from '@wordpress/components';
@@ -13,7 +15,7 @@ import { useState, useId } from '@wordpress/element';
  * Internal dependencies
  */
 import LinkControl from '../link-control';
-import { LinkPreviewButton } from './link-preview-button';
+import { LinkPreview } from './link-preview';
 
 /**
  * LinkPicker component that combines the preview button and search input.
@@ -59,16 +61,25 @@ export function LinkPicker( {
 		}
 	};
 
-	const renderToggle = () => {
+	const renderToggle = ( { isOpen: dropdownIsOpen, onToggle } ) => {
 		return (
-			<LinkPreviewButton
-				preview={ preview }
-				onClick={ () => setIsOpen( ! isOpen ) }
+			<Button
+				onClick={ onToggle }
 				aria-haspopup="dialog"
-				aria-expanded={ isOpen }
+				aria-expanded={ dropdownIsOpen }
 				aria-describedby={ controlProps[ 'aria-describedby' ] }
-				label={ label }
-			/>
+				variant="secondary"
+				__next40pxDefaultSize
+				className="link-preview-button"
+			>
+				{ label && <VisuallyHidden>{ label }:</VisuallyHidden> }
+				<LinkPreview
+					title={ preview.title }
+					url={ preview.url }
+					image={ preview.image }
+					badges={ preview.badges }
+				/>
+			</Button>
 		);
 	};
 
