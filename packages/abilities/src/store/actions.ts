@@ -131,8 +131,13 @@ export function registerAbility( ability: Ability ) {
 			const existingAnnotations = existingAbility.meta?.annotations;
 			const newAnnotations = ability.meta?.annotations;
 
-			// Condition 1: Existing ability must be server-registered
-			if ( ! existingAnnotations?.serverRegistered ) {
+			// Existing ability must be server-registered (not client-only or hybrid)
+			// and the new ability must not be server-registered only.
+			if (
+				! existingAnnotations?.serverRegistered ||
+				existingAnnotations?.clientRegistered ||
+				newAnnotations?.clientRegistered === false
+			) {
 				throw new Error(
 					sprintf(
 						'Ability "%s" is already registered',
@@ -141,17 +146,7 @@ export function registerAbility( ability: Ability ) {
 				);
 			}
 
-			// Condition 2: New ability must not explicitly set clientRegistered to false
-			if ( newAnnotations?.clientRegistered === false ) {
-				throw new Error(
-					sprintf(
-						'Ability "%s" is already registered',
-						ability.name
-					)
-				);
-			}
-
-			// Condition 3: Only callback change is allowed - all other props must match
+			// Only callback change is allowed - all other props must match
 			const propsToCompare = [
 				'name',
 				'label',
