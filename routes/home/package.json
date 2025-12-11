@@ -2,5 +2,8 @@
 	"route": {
 		"path": "/",
 		"page": "gutenberg-boot"
+	},
+	"dependencies": {
+		"@wordpress/i18n": "file:../i18n"
 	}
 }

@@ -2,9 +2,7 @@
 @use "@wordpress/base-styles/variables";
 @use "@wordpress/base-styles/colors";
 
-// Fixed height for the modal footer.
-// Ensures that the footer is always visible when the modal content is scrollable.
-$footer-height: 60px;
+$footer-height: 90px;
 
 .font-library-modal {
 	// @todo If a new prop is added to the Modal component that constrains
@@ -21,26 +19,31 @@ $footer-height: 60px;
 	}
 
 	.components-modal__content {
-		padding-top: 0;
-		margin-bottom: $footer-height !important;
+		padding: 0;
+		margin-bottom: $footer-height;
 	}
 
-	.font-library-modal__subtitle {
+	.font-library__subtitle {
 		text-transform: uppercase;
 		font-weight: variables.$font-weight-medium;
 		font-size: 11px;
 	}
-
-	// Add padding so the focus state outline (box-shadow) of font list items is visible
-	.components-navigator-screen {
-		padding: 3px;
-	}
 }
 
-.font-library-modal__tabpanel-layout {
-	margin-top: variables.$grid-unit-30;
+.font-library-modal__tab-panel {
+	height: calc(100% - 50px); // Subtracting header and tab heights
+}
 
-	.font-library-modal__loading {
+.font-library__tabpanel-layout {
+	height: 100%;
+	display: flex;
+	flex-direction: column;
+
+	> div {
+		flex-grow: 1;
+	}
+
+	.font-library__loading {
 		width: 100%;
 		height: 100%;
 		display: flex;
@@ -54,34 +57,42 @@ $footer-height: 60px;
 		padding-top:
 			variables.$header-height + variables.$grid-unit-15 +
 			variables.$grid-unit-60;
+		box-sizing: border-box;
+	}
+
+	.components-navigator-screen {
+		padding: variables.$grid-unit-30;
+		width: 100%;
 	}
 }
 
-.font-library-modal__footer {
-	border-top: 1px solid colors.$gray-300;
-	margin: 0 #{variables.$grid-unit-30 * -1} #{variables.$grid-unit-30 * -1};
-	padding: variables.$grid-unit-20 variables.$grid-unit-30;
+.font-library__footer {
 	position: absolute;
-	bottom: variables.$grid-unit-30;
 	width: 100%;
-	height: $footer-height;
+	bottom: 0;
+	border-top: 1px solid colors.$gray-300;
+	padding: variables.$grid-unit-30;
 	background-color: colors.$white;
+	box-sizing: border-box;
+	flex-grow: 0 !important;
+	flex-shrink: 0;
+	height: $footer-height;
 }
 
-.font-library-modal__page-selection {
+.font-library__page-selection {
 	font-size: 11px;
 	font-weight: variables.$font-weight-medium;
 	text-transform: uppercase;
 
 	@include mixins.break-small() {
-		.font-library-modal__page-selection-trigger {
+		.font-library__page-selection-trigger {
 			font-size: 11px !important;
 			font-weight: variables.$font-weight-medium;
 		}
 	}
 }
 
-.font-library-modal__fonts-title {
+.font-library__fonts-title {
 	text-transform: uppercase;
 	font-size: 11px;
 	font-weight: 600;
@@ -89,18 +100,19 @@ $footer-height: 60px;
 	margin-bottom: 0;
 }
 
-.font-library-modal__fonts-list {
+.font-library__fonts-list {
 	list-style: none;
 	padding: 0;
 	margin-top: 0;
 	margin-bottom: 0;
 }
 
-.font-library-modal__fonts-list-item {
+.font-library__fonts-list-item {
 	margin-bottom: 0;
 }
 
-.font-library-modal__font-card {
+.font-library__font-card {
+	box-sizing: border-box;
 	border: variables.$border-width solid colors.$gray-300;
 	width: 100%;
 
@@ -119,21 +131,21 @@ $footer-height: 60px;
 		position: relative;
 	}
 
-	.font-library-modal__font-card__name {
+	.font-library__font-card__name {
 		font-weight: bold;
 	}
 
-	.font-library-modal__font-card__count {
+	.font-library__font-card__count {
 		color: colors.$gray-700;
 	}
 
-	.font-library-modal__font-variant_demo-image {
+	.font-library__font-variant_demo-image {
 		display: block;
 		height: variables.$grid-unit-30;
 		width: auto;
 	}
 
-	.font-library-modal__font-variant_demo-text {
+	.font-library__font-variant_demo-text {
 		white-space: nowrap;
 		flex-shrink: 0;
 
@@ -148,16 +160,10 @@ $footer-height: 60px;
 	top: 0;
 	border-bottom: 1px solid colors.$gray-300;
 	background: colors.$white;
-	margin: 0 #{variables.$grid-unit-30 * -1};
-	padding: 0 variables.$grid-unit-20;
 	z-index: 1;
-
-	[role="tablist"] {
-		margin-bottom: -1px;
-	}
 }
 
-.font-library-modal__upload-area {
+.font-library__upload-area {
 	align-items: center;
 	display: flex;
 	justify-content: center;
@@ -169,15 +175,15 @@ $footer-height: 60px;
 	width: 100%;
 }
 
-button.font-library-modal__upload-area {
+button.font-library__upload-area {
 	background-color: colors.$gray-100;
 }
 
-.font-library-modal__local-fonts {
-	margin: 0 auto;
+.font-library__local-fonts {
+	margin: variables.$grid-unit-30 auto;
 	width: 80%;
 
-	.font-library-modal__upload-area__text {
+	.font-library__upload-area__text {
 		color: colors.$gray-700;
 	}
 }
@@ -208,7 +214,7 @@ button.font-library-modal__upload-area {
 	}
 }
 
-.font-library-modal__select-all {
+.font-library__select-all {
 	padding:
 		variables.$grid-unit-20 variables.$grid-unit-20
 		variables.$grid-unit-20 variables.$grid-unit-20 +

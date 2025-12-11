@@ -9,7 +9,7 @@ import { _x } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { GlobalStylesContext } from './context';
-import { getFamilyPreviewStyle } from './font-library-modal/utils/preview-styles';
+import { getFamilyPreviewStyle } from './font-library/utils/preview-styles';
 import { getFontFamilies } from './utils';
 import { useStyle } from './hooks';
 

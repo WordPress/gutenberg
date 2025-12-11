@@ -63,7 +63,6 @@ export const Default: StoryFn< typeof FormTokenField > = DefaultTemplate.bind(
 Default.args = {
 	label: 'Type a continent',
 	suggestions: continents,
-	__nextHasNoMarginBottom: true,
 	__next40pxDefaultSize: true,
 };
 
@@ -102,7 +101,6 @@ export const Async: StoryFn< typeof FormTokenField > = ( {
 Async.args = {
 	label: 'Type a continent',
 	suggestions: continents,
-	__nextHasNoMarginBottom: true,
 	__next40pxDefaultSize: true,
 };
 

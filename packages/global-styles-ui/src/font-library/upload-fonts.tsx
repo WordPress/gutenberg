@@ -210,9 +210,9 @@ function UploadFonts() {
 	};
 
 	return (
-		<div className="font-library-modal__tabpanel-layout">
+		<div className="font-library__tabpanel-layout">
 			<DropZone onFilesDrop={ handleDropZone } />
-			<VStack className="font-library-modal__local-fonts">
+			<VStack className="font-library__local-fonts">
 				{ notice && (
 					<Notice
 						status={ notice.type }
@@ -231,7 +231,7 @@ function UploadFonts() {
 				) }
 				{ isUploading && (
 					<FlexItem>
-						<div className="font-library-modal__upload-area">
+						<div className="font-library__upload-area">
 							<ProgressBar />
 						</div>
 					</FlexItem>
@@ -246,7 +246,7 @@ function UploadFonts() {
 						render={ ( { openFileDialog } ) => (
 							<Button
 								__next40pxDefaultSize
-								className="font-library-modal__upload-area"
+								className="font-library__upload-area"
 								onClick={ openFileDialog }
 							>
 								{ __( 'Upload font' ) }
@@ -255,7 +255,7 @@ function UploadFonts() {
 					/>
 				) }
 				<Spacer margin={ 2 } />
-				<Text className="font-library-modal__upload-area__text">
+				<Text className="font-library__upload-area__text">
 					{ __(
 						'Uploaded fonts appear in your library and can be used in your theme. Supported formats: .ttf, .otf, .woff, and .woff2.'
 					) }

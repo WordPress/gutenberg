@@ -279,9 +279,9 @@ function FontCollection( { slug }: { slug: string } ) {
 	};
 
 	return (
-		<div className="font-library-modal__tabpanel-layout">
+		<div className="font-library__tabpanel-layout">
 			{ isLoading && (
-				<div className="font-library-modal__loading">
+				<div className="font-library__loading">
 					<ProgressBar />
 				</div>
 			) }
@@ -290,7 +290,7 @@ function FontCollection( { slug }: { slug: string } ) {
 				<>
 					<Navigator
 						initialPath="/"
-						className="font-library-modal__tabpanel-layout"
+						className="font-library__tabpanel-layout"
 					>
 						<Navigator.Screen path="/">
 							<HStack justify="space-between">
@@ -344,7 +344,7 @@ function FontCollection( { slug }: { slug: string } ) {
 									</Text>
 								) }
 
-							<div className="font-library-modal__fonts-grid__main">
+							<div className="font-library__fonts-grid__main">
 								{ /*
 								 * Disable reason: The `list` ARIA role is redundant but
 								 * Safari+VoiceOver won't announce the list otherwise.
@@ -352,14 +352,14 @@ function FontCollection( { slug }: { slug: string } ) {
 								/* eslint-disable jsx-a11y/no-redundant-roles */ }
 								<ul
 									role="list"
-									className="font-library-modal__fonts-list"
+									className="font-library__fonts-list"
 								>
 									{ items.map( ( font ) => (
 										<li
 											key={
 												font.font_family_settings.slug
 											}
-											className="font-library-modal__fonts-list-item"
+											className="font-library__fonts-list-item"
 										>
 											<FontCard
 												font={
@@ -418,7 +418,7 @@ function FontCollection( { slug }: { slug: string } ) {
 							</Text>
 							<Spacer margin={ 4 } />
 							<CheckboxControl
-								className="font-library-modal__select-all"
+								className="font-library__select-all"
 								label={ __( 'Select all' ) }
 								checked={ isSelectAllChecked }
 								onChange={ toggleSelectAll }
@@ -433,14 +433,14 @@ function FontCollection( { slug }: { slug: string } ) {
 								/* eslint-disable jsx-a11y/no-redundant-roles */ }
 								<ul
 									role="list"
-									className="font-library-modal__fonts-list"
+									className="font-library__fonts-list"
 								>
 									{ selectedFont &&
 										getSortedFontFaces( selectedFont ).map(
 											( face, i ) => (
 												<li
 													key={ `face${ i }` }
-													className="font-library-modal__fonts-list-item"
+													className="font-library__fonts-list-item"
 												>
 													<CollectionFontVariant
 														font={ selectedFont }
@@ -469,7 +469,7 @@ function FontCollection( { slug }: { slug: string } ) {
 					{ selectedFont && (
 						<Flex
 							justify="flex-end"
-							className="font-library-modal__footer"
+							className="font-library__footer"
 						>
 							<Button
 								__next40pxDefaultSize
@@ -489,7 +489,7 @@ function FontCollection( { slug }: { slug: string } ) {
 					{ ! selectedFont && (
 						<HStack
 							expanded={ false }
-							className="font-library-modal__footer"
+							className="font-library__footer"
 							justify="end"
 							spacing={ 6 }
 						>
@@ -497,7 +497,7 @@ function FontCollection( { slug }: { slug: string } ) {
 								justify="flex-start"
 								expanded={ false }
 								spacing={ 1 }
-								className="font-library-modal__page-selection"
+								className="font-library__page-selection"
 							>
 								{ createInterpolateElement(
 									sprintf(

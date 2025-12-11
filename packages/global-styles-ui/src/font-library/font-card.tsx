@@ -46,13 +46,13 @@ function FontCard( {
 				}
 			} }
 			style={ style }
-			className="font-library-modal__font-card"
+			className="font-library__font-card"
 		>
 			<Flex justify="space-between" wrap={ false }>
 				<FontDemo font={ font } />
 				<Flex justify="flex-end">
 					<FlexItem>
-						<Text className="font-library-modal__font-card__count">
+						<Text className="font-library__font-card__count">
 							{ variantsText ||
 								sprintf(
 									/* translators: %d: Number of font variants. */

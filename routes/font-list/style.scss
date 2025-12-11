@@ -1,0 +1,18 @@
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/global-styles-ui/build-style/style.css" as *;
+
+.font-library-page__tablist {
+	border-bottom: 1px solid $gray-100;
+	padding: 0 $grid-unit-30;
+}
+
+.font-library-page__tab-panel {
+	flex-grow: 1;
+	max-height: calc(100% - 110px); // Subtracting header + tabs
+	overflow: auto;
+
+	.admin-ui-page:has(.font-library__footer) & {
+		max-height: calc(100% - 198px); // Subtracting header + tabs + footer
+	}
+}

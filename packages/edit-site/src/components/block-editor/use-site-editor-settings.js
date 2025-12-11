@@ -49,6 +49,7 @@ export function useSpecificEditorSettings() {
 
 	const onNavigateToPreviousEntityRecord =
 		useNavigateToPreviousEntityRecord();
+
 	const defaultEditorSettings = useMemo( () => {
 		return {
 			...settings,

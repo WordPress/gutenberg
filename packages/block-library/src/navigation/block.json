@@ -54,6 +54,9 @@
 			"type": "string",
 			"default": "mobile"
 		},
+		"overlay": {
+			"type": "string"
+		},
 		"icon": {
 			"type": "string",
 			"default": "handle"
