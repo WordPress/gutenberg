@@ -284,7 +284,6 @@ module.exports = {
 						'RangeControl',
 						'SearchControl',
 						'SelectControl',
-						'TextControl',
 						'TextareaControl',
 						'ToggleControl',
 						'ToggleGroupControl',

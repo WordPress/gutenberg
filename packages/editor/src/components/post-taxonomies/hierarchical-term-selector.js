@@ -464,7 +464,6 @@ export function HierarchicalTermSelector( { slug } ) {
 					<Flex direction="column" gap="4">
 						<TextControl
 							__next40pxDefaultSize
-							__nextHasNoMarginBottom
 							className="editor-post-taxonomies__hierarchical-terms-input"
 							label={ newTermLabel }
 							value={ formName }

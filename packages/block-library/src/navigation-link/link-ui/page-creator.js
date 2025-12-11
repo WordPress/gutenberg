@@ -129,7 +129,6 @@ export function LinkUIPageCreator( {
 					<VStack spacing={ 4 }>
 						<TextControl
 							__next40pxDefaultSize
-							__nextHasNoMarginBottom
 							label={ __( 'Title' ) }
 							onChange={ setTitle }
 							placeholder={ __( 'No title' ) }

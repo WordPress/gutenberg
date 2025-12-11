@@ -56,7 +56,6 @@ function PasswordEdit( {
 						placeholder={ __( 'Use a secure password' ) }
 						type="text"
 						__next40pxDefaultSize
-						__nextHasNoMarginBottom
 						maxLength={ 255 }
 					/>
 				</div>

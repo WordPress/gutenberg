@@ -240,7 +240,6 @@ export default function BreadcrumbEdit( {
 						}
 					>
 						<TextControl
-							__nextHasNoMarginBottom
 							__next40pxDefaultSize
 							autoComplete="off"
 							label={ __( 'Separator' ) }

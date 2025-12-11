@@ -247,7 +247,6 @@ export default function PostStatus() {
 														type="text"
 														id={ passwordInputId }
 														__next40pxDefaultSize
-														__nextHasNoMarginBottom
 														maxLength={ 255 }
 													/>
 												</div>
