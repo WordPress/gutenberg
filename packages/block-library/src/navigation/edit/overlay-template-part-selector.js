@@ -16,31 +16,10 @@ import { store as noticesStore } from '@wordpress/notices';
  */
 import { createTemplatePartId } from '../../template-part/edit/utils/create-template-part-id';
 import {
+	parseTemplatePartId,
 	getUniqueTemplatePartTitle,
 	getCleanTemplatePartSlug,
-} from '../../../../fields/src/components/create-template-part-modal/utils';
-
-/**
- * Parses a template part ID into theme and slug components.
- *
- * @param {string} templatePartId Template part ID in format "theme//slug".
- * @return {{theme: string, slug: string}|null} Parsed components or null if invalid.
- */
-function parseTemplatePartId( templatePartId ) {
-	if ( ! templatePartId || typeof templatePartId !== 'string' ) {
-		return null;
-	}
-
-	const parts = templatePartId.split( '//' );
-	if ( parts.length !== 2 ) {
-		return null;
-	}
-
-	return {
-		theme: parts[ 0 ],
-		slug: parts[ 1 ],
-	};
-}
+} from './utils';
 
 /**
  * Overlay Template Part Selector component.
