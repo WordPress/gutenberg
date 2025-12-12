@@ -71,11 +71,7 @@ export function useSpecificEditorSettings() {
 		 * Exclude styles and __experimentalFeatures from base settings
 		 * since we're generating fresh ones from the merged config.
 		 */
-		const {
-			styles: _,
-			__experimentalFeatures: __,
-			...baseSettings
-		} = settings;
+		const { styles, __experimentalFeatures, ...baseSettings } = settings;
 
 		return {
 			...baseSettings,
