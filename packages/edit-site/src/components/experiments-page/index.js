@@ -4,12 +4,13 @@
 import {
 	Button,
 	Spinner,
+	__experimentalConfirmDialog as ConfirmDialog,
 	__experimentalHStack as HStack,
 } from '@wordpress/components';
 import { DataForm } from '@wordpress/dataviews';
 import { __, _x } from '@wordpress/i18n';
 import { useEntityRecord } from '@wordpress/core-data';
-import { useMemo } from '@wordpress/element';
+import { useMemo, useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -47,6 +48,7 @@ const GROUP_ORDER = [
 
 export default function ExperimentsPage() {
 	const experiments = useExperiments();
+	const [ isResetConfirmOpen, setIsResetConfirmOpen ] = useState( false );
 
 	const {
 		editedRecord: siteSettings,
@@ -194,52 +196,70 @@ export default function ExperimentsPage() {
 	}
 
 	return (
-		<Page
-			title={ __( 'Experimental settings' ) }
-			actions={
-				<HStack>
-					<Button
-						variant="tertiary"
-						isDestructive
-						onClick={ () => {
-							resetSettings();
+		<>
+			<Page
+				title={ __( 'Experimental settings' ) }
+				actions={
+					<HStack>
+						<Button
+							variant="tertiary"
+							isDestructive
+							onClick={ () => {
+								setIsResetConfirmOpen( true );
+							} }
+							__next40pxDefaultSize
+							disabled={ isSaving || allSettingsAreDisabled }
+							accessibleWhenDisabled
+							isBusy={ isSaving }
+						>
+							{ __( 'Reset to default' ) }
+						</Button>
+						<Button
+							variant="primary"
+							onClick={ () => {
+								saveSettings();
+							} }
+							__next40pxDefaultSize
+							disabled={ ! hasChanges || isSaving }
+							accessibleWhenDisabled
+							isBusy={ isSaving }
+						>
+							{ __( 'Save' ) }
+						</Button>
+					</HStack>
+				}
+			>
+				<div className="experiments-page__form">
+					<DataForm
+						data={ settings }
+						fields={ fields }
+						form={ {
+							fields: formFields,
+							labelPosition: 'side',
+							type: 'regular',
 						} }
-						__next40pxDefaultSize
-						disabled={ isSaving || allSettingsAreDisabled }
-						accessibleWhenDisabled
-						isBusy={ isSaving }
-					>
-						{ __( 'Reset to default' ) }
-					</Button>
-					<Button
-						variant="primary"
-						onClick={ () => {
-							saveSettings();
+						onChange={ ( values ) => {
+							setSettings( values );
 						} }
-						__next40pxDefaultSize
-						disabled={ ! hasChanges || isSaving }
-						accessibleWhenDisabled
-						isBusy={ isSaving }
-					>
-						{ __( 'Save' ) }
-					</Button>
-				</HStack>
-			}
-		>
-			<div className="experiments-page__form">
-				<DataForm
-					data={ settings }
-					fields={ fields }
-					form={ {
-						fields: formFields,
-						labelPosition: 'side',
-						type: 'regular',
-					} }
-					onChange={ ( values ) => {
-						setSettings( values );
-					} }
-				/>
-			</div>
-		</Page>
+					/>
+				</div>
+			</Page>
+			<ConfirmDialog
+				isOpen={ isResetConfirmOpen }
+				onConfirm={ () => {
+					resetSettings();
+					setIsResetConfirmOpen( false );
+				} }
+				onCancel={ () => {
+					setIsResetConfirmOpen( false );
+				} }
+				confirmButtonText={ __( 'Reset' ) }
+				cancelButtonText={ __( 'Cancel' ) }
+			>
+				{ __(
+					'Are you sure you want to reset all experimental settings to their defaults? This action cannot be undone.'
+				) }
+			</ConfirmDialog>
+		</>
 	);
 }
