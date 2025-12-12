@@ -28,13 +28,9 @@
 				"id": "gutenberg-boot",
 				"init": [
 					"@wordpress/edit-site-init"
-				],
-				"title": "Site Editor"
+				]
 			},
-			{
-				"id": "font-library",
-				"title": "Fonts"
-			}
+			"font-library"
 		]
 	},
 	"config": {

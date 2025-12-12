@@ -211,7 +211,7 @@ If `handlePrefix` is omitted, it defaults to the namespace key (e.g., `"woo"` â†
 
 Define admin pages that support routes. Each page gets generated PHP functions for route registration and can be extended by other plugins.
 
-Pages can be defined as simple strings or as objects with initialization modules and titles:
+Pages can be defined as simple strings or as objects with initialization modules:
 
 ```json
 {
@@ -220,8 +220,7 @@ Pages can be defined as simple strings or as objects with initialization modules
 			"my-admin-page",
 			{
 				"id": "my-other-page",
-				"init": ["@my-plugin/my-page-init"],
-				"title": "My Page Title"
+				"init": ["@my-plugin/my-page-init"]
 			}
 		]
 	}
@@ -230,10 +229,9 @@ Pages can be defined as simple strings or as objects with initialization modules
 
 **Page Configuration:**
 - **String format**: `"my-admin-page"` - Simple page with no init modules
-- **Object format**: `{ "id": "page-slug", "init": ["@scope/package"], "title": "Page Title" }` - Page with optional init modules and title
+- **Object format**: `{ "id": "page-slug", "init": ["@scope/package"] }` - Page with optional init modules
   - **`id`** (required): The page slug used in WordPress admin URLs
   - **`init`** (optional): Array of script module IDs to execute during page initialization
-  - **`title`** (optional): Default page title used in the auto-generated admin page registration (`add_submenu_page`). The title is automatically wrapped in translation functions (`__()`) in the generated PHP. If omitted, defaults to the page ID.
 
 **Generated Files:**
 
@@ -245,13 +243,36 @@ This generates two page modes:
 Each mode provides route/menu registration functions and a render callback. Routes are automatically registered for both modes.
 
 **Registering a menu item for WP-Admin mode:**
+
+WP-Admin mode integrates within the standard WordPress admin interface (keeping the sidebar and header). Menu items should be registered with a simple slug and callback:
+
 ```php
-// Build URL with initial route via 'p' query parameter
-$url = admin_url( 'admin.php?page=my-admin-page-wp-admin&p=' . urlencode( '/my/route' ) );
-add_menu_page( 'Title', 'Menu', 'capability', $url, '', 'icon', 20 );
+add_submenu_page(
+	'themes.php',                              // Parent menu
+	__( 'My Page', 'my-plugin' ),             // Page title
+	__( 'My Page', 'my-plugin' ),             // Menu title
+	'edit_theme_options',                      // Capability
+	'my-admin-page-wp-admin',                  // Menu slug (simple)
+	'my_admin_page_wp_admin_render_page'       // Callback from generated PHP
+);
 ```
 
+The page slug is `my-admin-page-wp-admin` (your page ID + `-wp-admin`). WordPress routes all requests to this callback, and the JavaScript router handles internal navigation.
+
+**Deep linking with the `p` query parameter:**
+
+Users and extensions can link directly to specific routes using the `p` query parameter:
+```php
+// Link to a specific route
+$url = admin_url( 'admin.php?page=my-admin-page-wp-admin&p=' . urlencode( '/settings' ) );
+```
+
+When the page loads, the JavaScript boot system reads the `p` parameter and navigates to that route automatically.
+
 **Registering a menu item for full-page mode:**
+
+Full-page mode takes over the entire admin screen with a custom sidebar:
+
 ```php
 add_menu_page( 'Title', 'Menu', 'capability', 'my-admin-page', 'my_admin_page_render_page', 'icon', 20 );
 ```
