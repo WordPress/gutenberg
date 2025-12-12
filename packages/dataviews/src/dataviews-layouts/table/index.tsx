@@ -169,6 +169,7 @@ function TableRow< Item >( {
 				// so this code prevents it.
 				const isMetaClick = isAppleOS() ? event.metaKey : event.ctrlKey;
 				if (
+					event.button === 0 &&
 					isMetaClick &&
 					window.navigator.userAgent
 						.toLowerCase()
