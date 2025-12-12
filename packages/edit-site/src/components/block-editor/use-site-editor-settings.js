@@ -5,7 +5,12 @@ import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { usePrevious } from '@wordpress/compose';
-import { store as editorStore } from '@wordpress/editor';
+import {
+	store as editorStore,
+	privateApis as editorPrivateApis,
+} from '@wordpress/editor';
+import { getBlockTypes } from '@wordpress/blocks';
+import { generateGlobalStyles } from '@wordpress/global-styles-engine';
 
 /**
  * Internal dependencies
@@ -16,6 +21,7 @@ import useNavigateToEntityRecord from './use-navigate-to-entity-record';
 import { FOCUSABLE_ENTITIES } from '../../utils/constants';
 
 const { useLocation, useHistory } = unlock( routerPrivateApis );
+const { useGlobalStyles } = unlock( editorPrivateApis );
 
 function useNavigateToPreviousEntityRecord() {
 	const location = useLocation();
@@ -39,6 +45,10 @@ export function useSpecificEditorSettings() {
 	const [ onNavigateToEntityRecord, initialBlockSelection ] =
 		useNavigateToEntityRecord();
 
+
+	// Get merged global styles config and generate styles directly
+	// This avoids reading from editorStore which causes infinite loops
+	const { merged: mergedConfig } = useGlobalStyles();
 	const { settings, currentPostIsTrashed } = useSelect( ( select ) => {
 		const { getSettings } = select( editSiteStore );
 		const { getCurrentPostAttribute } = select( editorStore );
@@ -52,11 +62,28 @@ export function useSpecificEditorSettings() {
 	const onNavigateToPreviousEntityRecord =
 		useNavigateToPreviousEntityRecord();
 
+	// Generate global styles from merged config.
+	const [ globalStyles, globalSettings ] = useMemo( () => {
+		if ( ! mergedConfig?.styles || ! mergedConfig?.settings ) {
+			return [ [], {} ];
+		}
+
+		const blockTypes = getBlockTypes();
+		return generateGlobalStyles( mergedConfig, blockTypes, {
+			disableRootPadding: false,
+		} );
+	}, [ mergedConfig ] );
+
 	const defaultEditorSettings = useMemo( () => {
+		// Filter out global styles from base settings and merge with generated global styles
+		const nonGlobalStyles = ( settings.styles ?? [] ).filter(
+			( style ) => ! style.isGlobalStyles
+		);
 		return {
 			...settings,
 			styles: [
-				...settings.styles,
+				...nonGlobalStyles,
+				...globalStyles,
 				{
 					// Forming a "block formatting context" to prevent margin collapsing.
 					// @see https://developer.mozilla.org/en-US/docs/Web/Guide/CSS/Block_formatting_context
@@ -70,6 +97,8 @@ export function useSpecificEditorSettings() {
 							: undefined,
 				},
 			],
+			__experimentalFeatures:
+				globalSettings || settings.__experimentalFeatures,
 			richEditingEnabled: true,
 			supportsTemplateMode: true,
 			focusMode: canvas !== 'view',
@@ -80,6 +109,8 @@ export function useSpecificEditorSettings() {
 		};
 	}, [
 		settings,
+		globalStyles,
+		globalSettings,
 		canvas,
 		currentPostIsTrashed,
 		onNavigateToEntityRecord,
