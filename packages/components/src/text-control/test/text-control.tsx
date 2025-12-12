@@ -9,13 +9,7 @@ import { render, screen } from '@testing-library/react';
 import _TextControl from '..';
 
 const TextControl = ( props: React.ComponentProps< typeof _TextControl > ) => {
-	return (
-		<_TextControl
-			{ ...props }
-			__nextHasNoMarginBottom
-			__next40pxDefaultSize
-		/>
-	);
+	return <_TextControl { ...props } __next40pxDefaultSize />;
 };
 
 const noop = () => {};

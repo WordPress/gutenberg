@@ -33,5 +33,6 @@ function gutenberg_boot_register_default_menu_items() {
 	}
 	register_gutenberg_boot_menu_item( 'templateParts', __( 'Template Parts', 'gutenberg' ), '/template-parts', '' );
 	register_gutenberg_boot_menu_item( 'patterns', __( 'Patterns', 'gutenberg' ), '/patterns', '' );
+	register_gutenberg_boot_menu_item( 'fontList', __( 'Fonts', 'gutenberg' ), '/font-list', '' );
 }
 add_action( 'gutenberg-boot_init', 'gutenberg_boot_register_default_menu_items', 5 );

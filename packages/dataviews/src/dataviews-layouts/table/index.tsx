@@ -163,6 +163,21 @@ function TableRow< Item >( {
 			}
 			aria-posinset={ posinset }
 			role={ infiniteScrollEnabled ? 'article' : undefined }
+			onMouseDown={ ( event ) => {
+				// Firefox has a unique feature where ctrl/cmd + click selects a
+				// table cell. This interferes with the bulk selection behavior,
+				// so this code prevents it.
+				const isMetaClick = isAppleOS() ? event.metaKey : event.ctrlKey;
+				if (
+					event.button === 0 &&
+					isMetaClick &&
+					window.navigator.userAgent
+						.toLowerCase()
+						.includes( 'firefox' )
+				) {
+					event?.preventDefault();
+				}
+			} }
 			onClick={ ( event ) => {
 				if ( ! hasPossibleBulkAction ) {
 					return;

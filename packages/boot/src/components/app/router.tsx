@@ -13,6 +13,8 @@ import {
 	privateApis as routePrivateApis,
 	type AnyRoute,
 } from '@wordpress/route';
+import { resolveSelect } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -78,12 +80,19 @@ async function createRouteFromDefinition(
 				search: opts.deps || {},
 			};
 
-			const [ loaderData, canvasData ] = await Promise.all( [
+			const [ , loaderData, canvasData, titleData ] = await Promise.all( [
+				resolveSelect( coreStore ).getEntityRecord(
+					'root',
+					'__unstableBase'
+				),
 				routeConfig.loader
 					? routeConfig.loader( context )
 					: Promise.resolve( undefined ),
 				routeConfig.canvas
 					? routeConfig.canvas( context )
+					: Promise.resolve( undefined ),
+				routeConfig.title
+					? routeConfig.title( context )
 					: Promise.resolve( undefined ),
 			] );
 
@@ -96,6 +105,7 @@ async function createRouteFromDefinition(
 				...( loaderData as any ),
 				canvas: canvasData,
 				inspector,
+				title: titleData,
 				routeContentModule: route.content_module,
 			};
 		},

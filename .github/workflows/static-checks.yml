@@ -34,15 +34,13 @@ jobs:
                 node: ['20', '22', '24']
                 os: ['macos-15', 'ubuntu-24.04', 'windows-2025']
                 exclude:
-                    # On PRs: Only test Node 20 on Ubuntu
+                    # On PRs: Only test Node 20 on Ubuntu and Windows
                     - event: 'pull_request'
                       node: '22'
                     - event: 'pull_request'
                       node: '24'
                     - event: 'pull_request'
                       os: 'macos-15'
-                    - event: 'pull_request'
-                      os: 'windows-2025'
 
         steps:
             - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1

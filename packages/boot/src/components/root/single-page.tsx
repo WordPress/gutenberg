@@ -20,6 +20,7 @@ import CanvasRenderer from '../canvas-renderer';
 import { unlock } from '../../lock-unlock';
 import type { CanvasData } from '../../store/types';
 import './style.scss';
+import useRouteTitle from '../app/use-route-title';
 
 const { useMatches, Outlet } = unlock( routePrivateApis );
 const { ThemeProvider } = unlock( themePrivateApis );
@@ -38,6 +39,8 @@ export default function RootSinglePage() {
 	const routeContentModule = ( currentMatch?.loaderData as any )
 		?.routeContentModule as string | undefined;
 	const isFullScreen = canvas && ! canvas.isPreview;
+
+	useRouteTitle();
 
 	return (
 		<ThemeProvider isRoot color={ { bg: '#f8f8f8', primary: '#3858e9' } }>

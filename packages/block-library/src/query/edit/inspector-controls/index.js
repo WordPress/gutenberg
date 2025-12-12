@@ -418,7 +418,6 @@ export default function QueryInspectorControls( props ) {
 							} }
 						>
 							<TextControl
-								__nextHasNoMarginBottom
 								__next40pxDefaultSize
 								label={ __( 'Keyword' ) }
 								value={ querySearch }

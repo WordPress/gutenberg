@@ -307,7 +307,7 @@ describe( 'filters', () => {
 		expect( result[ 7 ].name.title ).toBe( 'Uranus' );
 	} );
 
-	it( 'should search using IS NOT ALL filter', () => {
+	it( 'should search using IS NOT ALL filter (deprecated operator)', () => {
 		const { data: result } = filterSortAndPaginate(
 			data,
 			{
@@ -321,6 +321,7 @@ describe( 'filters', () => {
 			},
 			fields
 		);
+		expect( console ).toHaveWarned();
 		expect( result ).toHaveLength( 10 );
 		expect( result[ 0 ].name.title ).toBe( 'Moon' );
 		expect( result[ 1 ].name.title ).toBe( 'Io' );

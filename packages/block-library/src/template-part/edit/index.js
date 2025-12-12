@@ -39,17 +39,6 @@ import {
 	useAlternativeTemplateParts,
 	useTemplatePartArea,
 } from './utils/hooks';
-import { unlock } from '../../lock-unlock';
-
-function getTemplatePartEditButtonTitle( clientId, editedContentOnlySection ) {
-	if ( ! window?.__experimentalContentOnlyPatternInsertion ) {
-		return __( 'Edit' );
-	}
-
-	return editedContentOnlySection === clientId
-		? __( 'Exit section' )
-		: __( 'Edit section' );
-}
 
 function ReplaceButton( {
 	isEntityAvailable,
@@ -119,18 +108,8 @@ export default function TemplatePartEdit( {
 } ) {
 	const { createSuccessNotice } = useDispatch( noticesStore );
 	const { editEntityRecord } = useDispatch( coreStore );
-	const { editContentOnlySection, stopEditingContentOnlySection } = unlock(
-		useDispatch( blockEditorStore )
-	);
-	const { currentTheme, editedContentOnlySection } = useSelect(
-		( select ) => {
-			return {
-				currentTheme: select( coreStore ).getCurrentTheme()?.stylesheet,
-				editedContentOnlySection: unlock(
-					select( blockEditorStore )
-				).getEditedContentOnlySection(),
-			};
-		},
+	const currentTheme = useSelect(
+		( select ) => select( coreStore ).getCurrentTheme()?.stylesheet,
 		[]
 	);
 	const { slug, theme = currentTheme, tagName, layout = {} } = attributes;
@@ -262,30 +241,15 @@ export default function TemplatePartEdit( {
 						<BlockControls group="other">
 							<ToolbarButton
 								onClick={ () => {
-									if (
-										window?.__experimentalContentOnlyPatternInsertion
-									) {
-										if (
-											editedContentOnlySection !==
-											clientId
-										) {
-											editContentOnlySection( clientId );
-										} else {
-											stopEditingContentOnlySection();
-										}
-										return;
-									}
-
 									onNavigateToEntityRecord( {
 										postId: templatePartId,
 										postType: 'wp_template_part',
 									} );
 								} }
 							>
-								{ getTemplatePartEditButtonTitle(
-									clientId,
-									editedContentOnlySection
-								) }
+								{ window?.__experimentalContentOnlyPatternInsertion
+									? __( 'Edit section' )
+									: __( 'Edit' ) }
 							</ToolbarButton>
 						</BlockControls>
 					) }

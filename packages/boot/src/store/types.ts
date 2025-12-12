@@ -106,6 +106,30 @@ export interface RouteConfig {
 	 * ```
 	 */
 	inspector?: ( context: RouteLoaderContext ) => boolean | Promise< boolean >;
+
+	/**
+	 * Function that returns the document title for the route.
+	 * The returned title will be formatted as: "{title} ‹ {siteTitle} — WordPress"
+	 * and announced to screen readers for accessibility.
+	 *
+	 * @param context Route context with params and search
+	 * @return The document title string or a Promise resolving to a string
+	 *
+	 * @example
+	 * ```tsx
+	 * export const route = {
+	 *   title: async ({ params }) => {
+	 *     const post = await resolveSelect(coreStore).getEntityRecord(
+	 *       'postType',
+	 *       params.type,
+	 *       params.id
+	 *     );
+	 *     return post?.title?.rendered || 'Edit Post';
+	 *   },
+	 * };
+	 * ```
+	 */
+	title?: ( context: RouteLoaderContext ) => string | Promise< string >;
 }
 
 /**

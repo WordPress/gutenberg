@@ -179,12 +179,6 @@ export interface FormTokenFieldProps
 	 */
 	__experimentalRenderItem?: ( args: { item: string } ) => ReactNode;
 	/**
-	 * Start opting into the new margin-free styles that will become the default in a future version.
-	 *
-	 * @default false
-	 */
-	__nextHasNoMarginBottom?: boolean;
-	/**
 	 * If true, add any incompleteTokenValue as a new token when the field loses focus.
 	 *
 	 * @default false

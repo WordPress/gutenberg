@@ -148,3 +148,166 @@ function gutenberg_exclude_notes_from_comment_count( $new_count, $old_count, $po
 	return $new_count;
 }
 add_filter( 'pre_wp_update_comment_count_now', 'gutenberg_exclude_notes_from_comment_count', 10, 3 );
+
+/**
+ * Registers the `wp_notes_notify` option and renders its UI on the Discussion screen.
+ *
+ * @return void
+ */
+function gutenberg_register_wp_notes_notify_setting() {
+	if ( is_wp_version_compatible( '6.9' ) ) {
+		return;
+	}
+
+	register_setting(
+		'discussion',
+		'wp_notes_notify',
+		array(
+			'type'              => 'boolean',
+			'description'       => __( 'Email me whenever anyone posts a note', 'gutenberg' ),
+			'sanitize_callback' => 'rest_sanitize_boolean',
+			'default'           => 1,
+		)
+	);
+
+	add_settings_field(
+		'wp_notes_notify',
+		__( 'Notes', 'gutenberg' ),
+		function () {
+			?>
+			<label for="wp_notes_notify">
+				<input name="wp_notes_notify" type="checkbox" id="wp_notes_notify" value="1" <?php checked( '1', get_option( 'wp_notes_notify', 1 ) ); ?>/>
+				<?php _e( 'Email me whenever anyone posts a note', 'gutenberg' ); ?>
+			</label>
+			<?php
+		},
+		'discussion'
+	);
+}
+add_action( 'admin_init', 'gutenberg_register_wp_notes_notify_setting' );
+
+/**
+ * Compatibility implementation of wp_new_comment_notify_postauthor() with notes support.
+ *
+ * @param int $comment_id The comment ID.
+ * @return bool True on success, false on failure.
+ */
+function gutenberg_new_comment_notify_postauthor( $comment_id ) {
+	$comment = get_comment( $comment_id );
+	$is_note = ( $comment && 'note' === $comment->comment_type );
+
+	$maybe_notify = $is_note ? get_option( 'wp_notes_notify', 1 ) : get_option( 'comments_notify' );
+
+	/**
+	 * Filters whether to send the post author new comment notification emails,
+	 * overriding the site setting.
+	 *
+	 * @since 4.4.0
+	 *
+	 * @param bool $maybe_notify Whether to notify the post author about the new comment.
+	 * @param int  $comment_id   The ID of the comment for the notification.
+	 */
+	$maybe_notify = apply_filters( 'notify_post_author', $maybe_notify, $comment_id );
+
+	/*
+	 * wp_notify_postauthor() checks if notifying the author of their own comment.
+	 * By default, it won't, but filters can override this.
+	 */
+	if ( ! $maybe_notify ) {
+		return false;
+	}
+
+	// Send notifications for approved comments and all notes.
+	if (
+		! isset( $comment->comment_approved ) ||
+		( '1' !== $comment->comment_approved && ! $is_note ) ) {
+			return false;
+	}
+
+	return wp_notify_postauthor( $comment_id );
+}
+
+/**
+ * Compatibility implementation of wp_new_comment_via_rest_notify_postauthor()
+ * function introduced in WordPress 6.9.
+ *
+ * @param WP_Comment $comment The comment object.
+ */
+function gutenberg_new_comment_via_rest_notify_postauthor( $comment ) {
+	if ( $comment instanceof WP_Comment && 'note' === $comment->comment_type ) {
+		gutenberg_new_comment_notify_postauthor( (int) $comment->comment_ID );
+	}
+}
+
+if ( has_action( 'rest_insert_comment', 'wp_new_comment_via_rest_notify_postauthor' ) ) {
+	remove_action( 'rest_insert_comment', 'wp_new_comment_via_rest_notify_postauthor' );
+	add_action( 'rest_insert_comment', 'gutenberg_new_comment_via_rest_notify_postauthor' );
+}
+
+/**
+ * Filters the note notification text.
+ *
+ * @param string $notify_message The comment notification email text.
+ * @param string $comment_id     Comment ID as a numeric string.
+ *
+ * @return string The filtered notification text.
+ */
+function gutenberg_filter_note_notification_text( $notify_message, $comment_id ) {
+	$comment = get_comment( $comment_id );
+	if ( ! $comment || 'note' !== $comment->comment_type ) {
+		return $notify_message;
+	}
+
+	$post = get_post( $comment->comment_post_ID );
+	if ( ! $post ) {
+		return $notify_message;
+	}
+
+	$comment_author_domain = '';
+	if ( WP_Http::is_ip_address( $comment->comment_author_IP ) ) {
+		$comment_author_domain = gethostbyaddr( $comment->comment_author_IP );
+	}
+
+	$comment_content = wp_specialchars_decode( $comment->comment_content );
+
+	/* translators: %s: Post title. */
+	$notify_message = sprintf( __( 'New note on your post "%s"', 'gutenberg' ), $post->post_title ) . "\r\n";
+	/* translators: 1: Note author's name, 2: Note author's IP address, 3: Note author's hostname. */
+	$notify_message .= sprintf( __( 'Author: %1$s (IP address: %2$s, %3$s)', 'gutenberg' ), $comment->comment_author, $comment->comment_author_IP, $comment_author_domain ) . "\r\n";
+	/* translators: %s: Note author email. */
+	$notify_message .= sprintf( __( 'Email: %s', 'gutenberg' ), $comment->comment_author_email ) . "\r\n";
+	/* translators: %s: Note text. */
+	$notify_message .= sprintf( __( 'Note: %s', 'gutenberg' ), "\r\n" . ( empty( $comment_content ) ? __( 'resolved/reopened' ) : $comment_content ) ) . "\r\n\r\n";
+	$notify_message .= __( 'You can see all notes on this post here:', 'gutenberg' ) . "\r\n";
+	$notify_message .= get_edit_post_link( $comment->comment_post_ID, 'url' ) . "\r\n";
+
+	return $notify_message;
+}
+add_filter( 'comment_notification_text', 'gutenberg_filter_note_notification_text', 10, 2 );
+
+/**
+ * Filters the note notification subject.
+ *
+ * @param string $subject    The comment notification email subject.
+ * @param string $comment_id Comment ID as a numeric string.
+ *
+ * @return string The filtered notification subject.
+ */
+function gutenberg_filter_note_notification_subject( $subject, $comment_id ) {
+	$comment = get_comment( $comment_id );
+	if ( ! $comment || 'note' !== $comment->comment_type ) {
+		return $subject;
+	}
+
+	$post = get_post( $comment->comment_post_ID );
+	if ( ! $post ) {
+		return $subject;
+	}
+
+	$blogname = wp_specialchars_decode( get_option( 'blogname' ), ENT_QUOTES );
+
+	/* translators: Note notification email subject. 1: Site title, 2: Post title. */
+	$subject = sprintf( __( '[%1$s] Note: "%2$s"', 'gutenberg' ), $blogname, $post->post_title );
+	return $subject;
+}
+add_filter( 'comment_notification_subject', 'gutenberg_filter_note_notification_subject', 10, 2 );
