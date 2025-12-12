@@ -93,7 +93,7 @@ export const Badge = forwardRef< HTMLDivElement, BadgeProps >( function Badge(
 				alignItems: 'center',
 				fontFamily: 'var(--wpds-font-family-body)',
 				fontSize: 'var(--wpds-font-size-small)',
-				fontWeight: 'var(--wpds-font-weight-regular)',
+				fontWeight: '400',
 				lineHeight: 'var(--wpds-font-line-height-small)',
 				boxSizing: 'border-box',
 				...props.style,
