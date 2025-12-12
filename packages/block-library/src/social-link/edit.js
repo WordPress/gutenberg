@@ -160,7 +160,7 @@ const SocialLinkEdit = ( {
 
 	const ref = useRef();
 	const blockProps = useBlockProps( {
-		className: 'wp-block-social-link-anchor',
+		className: wrapperClasses,
 		ref: useMergeRefs( [ setPopoverAnchor, ref ] ),
 		onClick: () => setPopover( true ),
 		onKeyDown: ( event ) => {
@@ -170,6 +170,34 @@ const SocialLinkEdit = ( {
 			}
 		},
 	} );
+
+	/**
+	 * This is the props that are passed to the wrapper element.
+	 */
+	const wrapperProps = {
+		id: blockProps.id,
+		'data-block': blockProps[ 'data-block' ],
+		'data-type': blockProps[ 'data-type' ],
+		// Set all classes from the blockProps to the wrapperProps to avoid
+		// losing the classes that are applied to the blockProps.
+		// Also by doing it custom classes from block attributes will be applied to the wrapper element (main block element).
+		className: blockProps.className,
+	};
+
+	/**
+	 * Reset the class name that is passed to the button element.
+	 * The `block-editor-block-list__block` class is important for editor styles
+	 * to make sure features like dragging works correctly.
+	 */
+	blockProps.className =
+		'wp-block-social-link-anchor block-editor-block-list__block';
+
+	// Remove the id, data-block, and data-type from the blockProps to avoid
+	// passing them to the button element.
+	// It's important to remove these props because they should be applied to the wrapper element (main element).
+	delete blockProps.id;
+	delete blockProps[ 'data-block' ];
+	delete blockProps[ 'data-type' ];
 
 	return (
 		<>
@@ -263,11 +291,11 @@ const SocialLinkEdit = ( {
 			 */ }
 			<li
 				role="presentation"
-				className={ wrapperClasses }
 				style={ {
 					color: iconColorValue,
 					backgroundColor: iconBackgroundColorValue,
 				} }
+				{ ...wrapperProps }
 			>
 				{ /*
 				 * Disable reason: The `button` ARIA role is redundant but
