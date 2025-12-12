@@ -42,6 +42,18 @@ class WP_Navigation_Block_Renderer {
 	private static $seen_menu_names = array();
 
 	/**
+	 * Returns whether the navigation overlay experiment is enabled.
+	 *
+	 * @since 6.5.0
+	 *
+	 * @return bool Returns whether the navigation overlay experiment is enabled.
+	 */
+	private static function is_overlay_experiment_enabled() {
+		$gutenberg_experiments = get_option( 'gutenberg-experiments' );
+		return $gutenberg_experiments && array_key_exists( 'gutenberg-customizable-navigation-overlays', $gutenberg_experiments );
+	}
+
+	/**
 	 * Returns whether or not this is responsive navigation.
 	 *
 	 * @since 6.5.0
@@ -712,14 +724,28 @@ class WP_Navigation_Block_Renderer {
 
 		// Build the content markup with desktop and overlay containers.
 		$content_markup = '';
+		$is_overlay_experiment_enabled = static::is_overlay_experiment_enabled();
+
 		if ( $has_overlay && ! empty( $overlay_blocks_html ) ) {
 			// Render both desktop and overlay blocks in separate containers.
-			$content_markup = sprintf(
-				'<div class="wp-block-navigation__desktop-container">%1$s</div>
-				<div class="wp-block-navigation__overlay-container" aria-hidden="true">%2$s</div>',
-				$inner_blocks_html,
-				$overlay_blocks_html
-			);
+			// IMPORTANT: The desktop container wrapper is gated behind the experiment to ensure
+			// backward compatibility. Without the experiment enabled, the desktop navigation
+			// should not be wrapped in a container div, maintaining the exact same markup structure
+			// as before this feature. This prevents any potential CSS or layout issues for users
+			// who don't have the experiment enabled.
+			if ( $is_overlay_experiment_enabled ) {
+				$content_markup = sprintf(
+					'<div class="wp-block-navigation__desktop-container">%1$s</div>
+					<div class="wp-block-navigation__overlay-container" aria-hidden="true">%2$s</div>',
+					$inner_blocks_html,
+					$overlay_blocks_html
+				);
+			} else {
+				// Experiment not enabled: Don't wrap desktop navigation to maintain backward compatibility.
+				// Render desktop blocks without wrapper (maintains exact same markup as before this feature).
+				// Note: UI prevents overlay selection when experiment is off, but handle gracefully if attribute exists.
+				$content_markup = $inner_blocks_html;
+			}
 		} else {
 			// No overlay selected, use existing behavior.
 			$content_markup = $inner_blocks_html;
