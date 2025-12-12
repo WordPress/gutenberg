@@ -44,8 +44,7 @@ export function useSpecificEditorSettings() {
 	const [ onNavigateToEntityRecord, initialBlockSelection ] =
 		useNavigateToEntityRecord();
 
-	// Get merged global styles config and generate styles directly
-	// This avoids reading from editorStore which causes infinite loops
+	// Get merged global styles config and generate styles directly.
 	const { merged: mergedConfig } = useGlobalStyles();
 	const { settings, currentPostIsTrashed } = useSelect( ( select ) => {
 		const { getSettings } = select( editSiteStore );

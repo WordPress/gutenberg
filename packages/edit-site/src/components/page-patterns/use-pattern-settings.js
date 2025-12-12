@@ -4,6 +4,8 @@
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
+import { privateApis as editorPrivateApis } from '@wordpress/editor';
+import { generateGlobalStyles } from '@wordpress/global-styles-engine';
 
 /**
  * Internal dependencies
@@ -12,7 +14,12 @@ import { unlock } from '../../lock-unlock';
 import { store as editSiteStore } from '../../store';
 import { filterOutDuplicatesByName } from './utils';
 
+const { useGlobalStyles } = unlock( editorPrivateApis );
+
 export default function usePatternSettings() {
+	// Get merged global styles config and generate styles directly.
+	const { merged: mergedConfig } = useGlobalStyles();
+
 	const storedSettings = useSelect( ( select ) => {
 		const { getSettings } = unlock( select( editSiteStore ) );
 		return getSettings();
@@ -36,16 +43,28 @@ export default function usePatternSettings() {
 		[ settingsBlockPatterns, restBlockPatterns ]
 	);
 
+	const [ globalStyles, globalSettings ] = useMemo( () => {
+		return generateGlobalStyles( mergedConfig, [], {
+			disableRootPadding: false,
+		} );
+	}, [ mergedConfig ] );
+
 	const settings = useMemo( () => {
-		const { __experimentalAdditionalBlockPatterns, ...restStoredSettings } =
-			storedSettings;
+		const {
+			__experimentalAdditionalBlockPatterns,
+			styles,
+			__experimentalFeatures,
+			...restStoredSettings
+		} = storedSettings;
 
 		return {
 			...restStoredSettings,
+			styles: globalStyles,
+			__experimentalFeatures: globalSettings,
 			__experimentalBlockPatterns: blockPatterns,
 			isPreviewMode: true,
 		};
-	}, [ storedSettings, blockPatterns ] );
+	}, [ storedSettings, blockPatterns, globalStyles, globalSettings ] );
 
 	return settings;
 }
