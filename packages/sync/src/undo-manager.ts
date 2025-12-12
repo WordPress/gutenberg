@@ -34,7 +34,9 @@ export function createUndoManager(): SyncUndoManager {
 	// const selectionHistoryMap = new Map< string, BlockSelectionHistory >();
 
 	const yUndoManager = new YMultiDocUndoManager( [], {
-		// Throttle undo/redo captures.
+		// Throttle undo/redo captures after 500ms of inactivity.
+		// 500 was selected from subjective local UX testing, shorter timeouts
+		// may cause mid-word undo stack items.
 		captureTimeout: 500,
 		// Ensure that we only scope the undo/redo to the current editor.
 		// The yjs document's clientID is added once it's available.
