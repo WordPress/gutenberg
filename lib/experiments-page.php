@@ -254,7 +254,7 @@ function gutenberg_initialize_experiments_settings() {
 		'gutenberg-experiments',
 		'gutenberg_experiments_section',
 		array(
-			'label' => __( 'Extends block visiblity block supports to hide blocks based on screen size.', 'gutenberg' ),
+			'label' => __( 'Extends block visibility block supports with responsive design controls for hiding blocks based on screen size.', 'gutenberg' ),
 			'id'    => 'gutenberg-hide-blocks-based-on-screen-size',
 		)
 	);
