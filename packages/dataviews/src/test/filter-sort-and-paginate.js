@@ -1136,6 +1136,30 @@ describe( 'sorting', () => {
 
 		expect( groupCount ).toBe( 5 );
 	} );
+
+	it( 'should NOT sort the data if the field is not sortable', () => {
+		const { data: result } = filterSortAndPaginate(
+			data,
+			{
+				sort: { field: 'description', direction: 'asc' },
+				filters: [
+					{
+						field: 'type',
+						operator: 'is',
+						value: 'Terrestrial',
+					},
+				],
+			},
+			fields
+		);
+
+		expect( result.map( ( r ) => r.name.description ) ).toEqual( [
+			'Terrestrial planet in the Solar system',
+			'La planète Vénus',
+			'Terrestrial planet in the Solar system',
+			'Terrestrial planet in the Solar system',
+		] );
+	} );
 } );
 
 describe( 'pagination', () => {
