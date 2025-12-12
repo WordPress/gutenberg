@@ -120,6 +120,13 @@ function gutenberg_get_experiments() {
 			'description' => __( 'Enables the Workflow Palette for running workflows composed of abilities, from a unified interface.', 'gutenberg' ),
 			'group'       => 'other',
 		),
+		array(
+			'id'             => 'active_templates',
+			'label'          => __( 'Template Activation', 'gutenberg' ),
+			'description'    => __( 'Allows multiple templates of the same type to be created, of which one can be active at a time. Warning: when you deactivate this experiment, it is best to delete all created templates except for the active ones.', 'gutenberg' ),
+			'group'          => 'templates',
+			'separateOption' => true,
+		),
 	);
 }
 
@@ -169,6 +176,10 @@ function gutenberg_initialize_experiments_settings() {
 	$properties  = array();
 
 	foreach ( $experiments as $experiment ) {
+		// Skip experiments that use separate options (like active_templates).
+		if ( ! empty( $experiment['separateOption'] ) ) {
+			continue;
+		}
 		$properties[ $experiment['id'] ] = array( 'type' => 'boolean' );
 	}
 
