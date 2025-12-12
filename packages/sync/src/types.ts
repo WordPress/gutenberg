@@ -67,12 +67,14 @@ export type ProviderCreator = (
 ) => Promise< ProviderCreatorResult >;
 
 export interface RecordHandlers {
+	addUndoMeta: ( ydoc: Y.Doc, meta: Map< string, any > ) => void;
 	editRecord: (
 		data: Partial< ObjectData >,
 		options?: { undoIgnore?: boolean }
 	) => void;
 	getEditedRecord: () => Promise< ObjectData >;
 	refetchRecord: () => Promise< void >;
+	restoreUndoMeta: ( ydoc: Y.Doc, meta: Map< string, any > ) => void;
 	saveRecord: () => Promise< void >;
 }
 
@@ -121,5 +123,8 @@ export interface SyncManager {
 }
 
 export interface SyncUndoManager extends WPUndoManager< ObjectData > {
-	addToScope: ( ymap: Y.Map< any > ) => void;
+	addToScope: (
+		ymap: Y.Map< any >,
+		handlers: Pick< RecordHandlers, 'addUndoMeta' | 'restoreUndoMeta' >
+	) => void;
 }

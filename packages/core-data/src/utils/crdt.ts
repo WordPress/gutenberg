@@ -27,6 +27,7 @@ import {
 	WORDPRESS_META_KEY_FOR_CRDT_DOC_PERSISTENCE,
 } from '../sync';
 import type { WPSelection } from '../types';
+import { updateSelectionHistory } from './crdt-selection';
 import {
 	createYMap,
 	getRootMap,
@@ -240,6 +241,19 @@ export function applyPostChangesToCRDTDoc(
 			}
 		}
 	} );
+
+	// Process changes that we don't want to persist to the CRDT document.
+	if ( changes.selection ) {
+		const selection = changes.selection;
+		// Persist selection changes at the end of the current event loop.
+		// This allows undo meta to be saved with the current selection before
+		// it is overwritten by the new selection from Gutenberg.
+		// Without this, selection history will already contain the latest
+		// selection (after this change) when the undo stack is saved.
+		setTimeout( () => {
+			updateSelectionHistory( ydoc, selection );
+		}, 0 );
+	}
 }
 
 export function defaultGetChangesFromCRDTDoc( crdtDoc: CRDTDoc ): ObjectData {
