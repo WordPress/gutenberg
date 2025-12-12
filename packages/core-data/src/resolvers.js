@@ -26,8 +26,7 @@ import {
 	isNumericID,
 } from './utils';
 import { fetchBlockPatterns } from './fetch';
-import { getSelectionHistory } from './utils/crdt';
-import { restoreSelection } from './utils/crdt-selection';
+import { restoreSelection, getSelectionHistory } from './utils/crdt-selection';
 
 /**
  * Requests authors from the REST API.
