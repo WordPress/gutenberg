@@ -65,10 +65,10 @@ The component automatically integrates with the theme's dimension size presets d
 
 When a preset is selected, the component returns values in the format:
 ```
-var:preset|dimension-sizes|{slug}
+var:preset|dimension|{slug}
 ```
 
-For example: `var:preset|dimension-sizes|medium`
+For example: `var:preset|dimension|medium`
 
 ### Theme Configuration
 
@@ -86,13 +86,13 @@ To provide dimension presets, add them to your theme's `theme.json`:
           "size": "16px"
         },
         {
-          "name": "Medium", 
+          "name": "Medium",
           "slug": "medium",
           "size": "32px"
         },
         {
           "name": "Large",
-          "slug": "large", 
+          "slug": "large",
           "size": "64px"
         }
       ]
