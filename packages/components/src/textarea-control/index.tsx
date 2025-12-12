@@ -22,7 +22,7 @@ function UnforwardedTextareaControl(
 	ref: React.ForwardedRef< HTMLTextAreaElement >
 ) {
 	const {
-		// @ts-expect-error - Prevent passing this to `textarea`.
+		// Prevent passing this to `textarea`.
 		__nextHasNoMarginBottom: _,
 		label,
 		hideLabelFromVision,

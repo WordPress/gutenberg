@@ -23,7 +23,7 @@ function UnforwardedTextControl(
 	ref: ForwardedRef< HTMLInputElement >
 ) {
 	const {
-		// @ts-expect-error - Prevent passing this to `input`.
+		// Prevent passing this to `input`.
 		__nextHasNoMarginBottom: _,
 		__next40pxDefaultSize = false,
 		label,
