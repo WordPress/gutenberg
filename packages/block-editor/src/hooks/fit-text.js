@@ -306,6 +306,7 @@ function addSaveProps( props, blockType, attributes ) {
 		className,
 	};
 }
+
 /**
  * Override props applied to the block element in the editor.
  *
