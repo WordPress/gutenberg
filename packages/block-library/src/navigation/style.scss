@@ -499,6 +499,32 @@ button.wp-block-navigation-item__content {
 		align-items: var(--navigation-layout-align, initial);
 	}
 
+	// Desktop and overlay container visibility.
+	// By default, show desktop container and hide overlay container.
+	.wp-block-navigation__desktop-container {
+		display: block;
+	}
+
+	.wp-block-navigation__overlay-container {
+		display: none;
+		width: 100%;
+		// Visually hidden and hidden from assistive tech by default.
+		// aria-hidden is set in the markup.
+	}
+
+	// When menu is closed (not open), show desktop container and hide overlay container.
+	&:not(.is-menu-open) {
+		.wp-block-navigation__responsive-container-content {
+			.wp-block-navigation__desktop-container {
+				display: block;
+			}
+
+			.wp-block-navigation__overlay-container {
+				display: none;
+			}
+		}
+	}
+
 	// If the responsive wrapper is present but overlay is not open,
 	// overlay styles shouldn't apply.
 	&:not(.is-menu-open.is-menu-open) {
@@ -550,6 +576,17 @@ button.wp-block-navigation-item__content {
 
 			// Inherit alignment settings from container.
 			align-items: var(--navigation-layout-justification-setting, inherit);
+
+			// When menu is open at mobile, show overlay container and hide desktop container.
+			.wp-block-navigation__desktop-container {
+				display: none;
+			}
+
+			.wp-block-navigation__overlay-container {
+				display: block;
+				width: 100%;
+				// Remove aria-hidden when visible (handled by JavaScript/Interactivity API).
+			}
 
 			// Always align the contents of the menu to the top.
 			&,
@@ -642,6 +679,17 @@ button.wp-block-navigation-item__content {
 			// Override breakpoint-inherited submenu rules.
 			.wp-block-navigation__submenu-container.wp-block-navigation__submenu-container.wp-block-navigation__submenu-container.wp-block-navigation__submenu-container {
 				left: 0;
+			}
+		}
+
+		// At desktop breakpoint, always show desktop container and hide overlay container.
+		.wp-block-navigation__responsive-container-content {
+			.wp-block-navigation__desktop-container {
+				display: block;
+			}
+
+			.wp-block-navigation__overlay-container {
+				display: none;
 			}
 		}
 	}

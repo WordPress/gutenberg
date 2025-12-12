@@ -159,6 +159,22 @@ class WP_Navigation_Block_Renderer {
 	}
 
 	/**
+	 * Returns the html for blocks from a template part (without navigation container wrapper).
+	 *
+	 * @since 6.5.0
+	 *
+	 * @param WP_Block_List $blocks The list of blocks to render.
+	 * @return string Returns the html for the template part blocks.
+	 */
+	private static function get_template_part_blocks_html( $blocks ) {
+		$html = '';
+		foreach ( $blocks as $block ) {
+			$html .= $block->render();
+		}
+		return $html;
+	}
+
+	/**
 	 * Returns the html for the inner blocks of the navigation block.
 	 *
 	 * @since 6.5.0
@@ -270,6 +286,86 @@ class WP_Navigation_Block_Renderer {
 		}
 
 		return new WP_Block_List( $fallback_blocks, $attributes );
+	}
+
+	/**
+	 * Gets the inner blocks for the navigation block from an overlay template part.
+	 *
+	 * @since 6.5.0
+	 *
+	 * @param string $overlay_template_part_id The overlay template part ID in format "theme//slug".
+	 * @param array  $attributes                The block attributes.
+	 * @return WP_Block_List Returns the inner blocks for the overlay template part.
+	 */
+	private static function get_overlay_blocks_from_template_part( $overlay_template_part_id, $attributes ) {
+		if ( empty( $overlay_template_part_id ) || ! is_string( $overlay_template_part_id ) ) {
+			return new WP_Block_List( array(), $attributes );
+		}
+
+		// Parse the template part ID (format: "theme//slug").
+		$parts = explode( '//', $overlay_template_part_id, 2 );
+		if ( count( $parts ) !== 2 ) {
+			return new WP_Block_List( array(), $attributes );
+		}
+
+		$theme = $parts[0];
+		$slug  = $parts[1];
+
+		// Only query for template parts from the active theme.
+		if ( get_stylesheet() !== $theme ) {
+			return new WP_Block_List( array(), $attributes );
+		}
+
+		// Query for the template part post.
+		$template_part_query = new WP_Query(
+			array(
+				'post_type'           => 'wp_template_part',
+				'post_status'         => 'publish',
+				'post_name__in'       => array( $slug ),
+				'tax_query'           => array(
+					array(
+						'taxonomy' => 'wp_theme',
+						'field'    => 'name',
+						'terms'    => $theme,
+					),
+				),
+				'posts_per_page'      => 1,
+				'no_found_rows'       => true,
+				'lazy_load_term_meta' => false, // Do not lazy load term meta, as template parts only have one term.
+			)
+		);
+
+		$template_part_post = $template_part_query->have_posts() ? $template_part_query->next_post() : null;
+
+		if ( ! $template_part_post ) {
+			// Try to get from theme file if not in database.
+			$block_template = get_block_file_template( $overlay_template_part_id, 'wp_template_part' );
+			if ( isset( $block_template->content ) ) {
+				$parsed_blocks = parse_blocks( $block_template->content );
+				$blocks        = block_core_navigation_filter_out_empty_blocks( $parsed_blocks );
+				return new WP_Block_List( $blocks, $attributes );
+			}
+			return new WP_Block_List( array(), $attributes );
+		}
+
+		// Get the template part content.
+		$block_template = _build_block_template_result_from_post( $template_part_post );
+		if ( ! isset( $block_template->content ) ) {
+			return new WP_Block_List( array(), $attributes );
+		}
+
+		$parsed_blocks = parse_blocks( $block_template->content );
+
+		// 'parse_blocks' includes a null block with '\n\n' as the content when
+		// it encounters whitespace. This code strips it.
+		$blocks = block_core_navigation_filter_out_empty_blocks( $parsed_blocks );
+
+		// Re-serialize, and run Block Hooks algorithm to inject hooked blocks.
+		$markup = serialize_blocks( $blocks );
+		$markup = apply_block_hooks_to_content_from_post_object( $markup, $template_part_post );
+		$blocks = parse_blocks( $markup );
+
+		return new WP_Block_List( $blocks, $attributes );
 	}
 
 	/**
@@ -523,6 +619,32 @@ class WP_Navigation_Block_Renderer {
 
 		$overlay_inline_styles = esc_attr( safecss_filter_attr( $colors['overlay_inline_styles'] ) );
 
+		// Check if an overlay template part is selected.
+		$has_overlay = ! empty( $attributes['overlay'] );
+		$overlay_blocks_html = '';
+
+		if ( $has_overlay ) {
+			// Get blocks from the overlay template part.
+			$overlay_blocks = static::get_overlay_blocks_from_template_part( $attributes['overlay'], $attributes );
+			// Render template part blocks directly without navigation container wrapper.
+			$overlay_blocks_html = static::get_template_part_blocks_html( $overlay_blocks );
+		}
+
+		// Build the content markup with desktop and overlay containers.
+		$content_markup = '';
+		if ( $has_overlay && ! empty( $overlay_blocks_html ) ) {
+			// Render both desktop and overlay blocks in separate containers.
+			$content_markup = sprintf(
+				'<div class="wp-block-navigation__desktop-container">%1$s</div>
+				<div class="wp-block-navigation__overlay-container" aria-hidden="true">%2$s</div>',
+				$inner_blocks_html,
+				$overlay_blocks_html
+			);
+		} else {
+			// No overlay selected, use existing behavior.
+			$content_markup = $inner_blocks_html;
+		}
+
 		return sprintf(
 			'<button aria-haspopup="dialog" %3$s class="%6$s" %10$s>%8$s</button>
 				<div class="%5$s" %7$s id="%1$s" %11$s>
@@ -536,7 +658,7 @@ class WP_Navigation_Block_Renderer {
 					</div>
 				</div>',
 			esc_attr( $modal_unique_id ),
-			$inner_blocks_html,
+			$content_markup,
 			$toggle_aria_label_open,
 			$toggle_aria_label_close,
 			esc_attr( trim( implode( ' ', $responsive_container_classes ) ) ),
