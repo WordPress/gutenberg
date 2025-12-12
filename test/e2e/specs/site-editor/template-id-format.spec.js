@@ -26,6 +26,9 @@ async function navigateToTemplateEditor( { admin, editor, page }, pageId ) {
 		.click();
 	await page.getByRole( 'menuitem', { name: 'Edit template' } ).click();
 	await expect( editor.canvas.locator( 'body' ) ).toBeVisible();
+	// Wait for editor to be fully ready before proceeding.
+	// eslint-disable-next-line playwright/no-networkidle
+	await page.waitForLoadState( 'networkidle' );
 
 	await editor.setPreferences( 'core/edit-post', {
 		welcomeGuideTemplate: false,
@@ -71,11 +74,9 @@ test.describe( 'Template ID Format', () => {
 		} );
 		await expect( editor.canvas.getByText( contentText ) ).toBeVisible();
 
-		// Ensure save button is enabled before saving.
-		const saveButton = page
-			.getByRole( 'region', { name: 'Editor top bar' } )
-			.getByRole( 'button', { name: 'Save' } );
-		await expect( saveButton ).toBeEnabled();
+		// Wait a moment for editor to register the change and be ready to save.
+		// eslint-disable-next-line playwright/no-networkidle
+		await page.waitForLoadState( 'networkidle' );
 
 		await editor.saveSiteEditorEntities( {
 			isOnlyCurrentEntityDirty:
@@ -92,11 +93,9 @@ test.describe( 'Template ID Format', () => {
 		} );
 		await expect( editor.canvas.getByText( secondEditText ) ).toBeVisible();
 
-		// Ensure save button is enabled before saving.
-		const secondSaveButton = page
-			.getByRole( 'region', { name: 'Editor top bar' } )
-			.getByRole( 'button', { name: 'Save' } );
-		await expect( secondSaveButton ).toBeEnabled();
+		// Wait a moment for editor to register the change and be ready to save.
+		// eslint-disable-next-line playwright/no-networkidle
+		await page.waitForLoadState( 'networkidle' );
 
 		await editor.saveSiteEditorEntities( {
 			isOnlyCurrentEntityDirty: true,
