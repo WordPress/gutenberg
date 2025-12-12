@@ -179,6 +179,19 @@ export default function OverlayTemplatePartSelector( {
 		return __( 'Select an overlay to use for the navigation.' );
 	}, [ overlayTemplateParts.length, hasResolved ] );
 
+	// Tooltip/aria-label text for the edit button
+	const editButtonLabel = useMemo( () => {
+		return selectedTemplatePart
+			? sprintf(
+					/* translators: %s: Overlay title. */
+					__( 'Edit overlay: %s' ),
+					selectedTemplatePart.title?.rendered
+						? decodeEntities( selectedTemplatePart.title.rendered )
+						: selectedTemplatePart.slug
+			  )
+			: __( 'Edit overlay' );
+	}, [ selectedTemplatePart ] );
+
 	return (
 		<div className="wp-block-navigation__overlay-selector">
 			<Button
@@ -209,23 +222,12 @@ export default function OverlayTemplatePartSelector( {
 					onClick={ handleEditClick }
 					disabled={ isEditButtonDisabled }
 					accessibleWhenDisabled
-					aria-label={
-						selectedTemplatePart
-							? sprintf(
-									/* translators: %s: Overlay title. */
-									__( 'Edit overlay: %s' ),
-									selectedTemplatePart.title?.rendered
-										? decodeEntities(
-												selectedTemplatePart.title
-													.rendered
-										  )
-										: selectedTemplatePart.slug
-							  )
-							: __( 'Edit overlay' )
-					}
+					aria-label={ editButtonLabel }
+					label={ editButtonLabel }
+					showTooltip
 					className="wp-block-navigation__overlay-edit-button"
 				>
-					[{ __( 'Edit' ) }]
+					{ __( 'Edit' ) }
 				</Button>
 			) }
 		</div>
