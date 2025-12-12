@@ -22,6 +22,16 @@
  * - Category is optional - if omitted, experiment goes under "Uncategorized"
  * - New categories are automatically created and displayed
  * - Description is optional but recommended for user clarity
+ *
+ * IMPORTANT: If you need to access the experiment status from the block editor client side,
+ * you also need to add the corresponding inline script to `gutenberg_enable_experiments()`
+ * in `lib/experimental/editor-settings.php. Example:
+ *
+ * ```php
+ * if ( $gutenberg_experiments && array_key_exists( 'my-experiment-id', $gutenberg_experiments ) ) {
+ *     wp_add_inline_script( 'wp-block-editor', 'window.__experimentalMyExperiment = true', 'before' );
+ * }
+ * ```
  */
 
 /**
@@ -139,21 +149,21 @@ if ( ! function_exists( 'the_gutenberg_experiments' ) ) {
 	 * The main entry point for the Gutenberg experiments page.
 	 */
 	function the_gutenberg_experiments() {
-		$experiments = gutenberg_get_experiment_definitions();
+		$experiments   = gutenberg_get_experiment_definitions();
 		$enabled_count = 0;
-		$total_count = count( $experiments );
-		$options = get_option( 'gutenberg-experiments', array() );
+		$total_count   = count( $experiments );
+		$options       = get_option( 'gutenberg-experiments', array() );
 
 		foreach ( $experiments as $experiment ) {
 			if ( isset( $options[ $experiment['id'] ] ) && $options[ $experiment['id'] ] ) {
-				$enabled_count++;
+				++$enabled_count;
 			}
 		}
 
 		// Count active_templates separately
 		if ( gutenberg_is_experiment_enabled( 'active_templates' ) ) {
-			$enabled_count++;
-			$total_count++;
+			++$enabled_count;
+			++$total_count;
 		}
 
 		?>
@@ -204,9 +214,9 @@ if ( ! function_exists( 'the_gutenberg_experiments' ) ) {
 				<?php settings_fields( 'gutenberg-experiments' ); ?>
 				<?php
 				// Render category sections manually to have proper control
-				$categories = gutenberg_get_experiment_categories();
+				$categories  = gutenberg_get_experiment_categories();
 				$definitions = gutenberg_get_experiment_definitions();
-				$options = get_option( 'gutenberg-experiments', array() );
+				$options     = get_option( 'gutenberg-experiments', array() );
 
 				// Group experiments by category
 				$experiments_by_category = array();
@@ -236,9 +246,9 @@ if ( ! function_exists( 'the_gutenberg_experiments' ) ) {
 						<div class="experiments-category-content">
 							<?php
 							foreach ( $experiments_by_category[ $category_id ] as $experiment ) {
-								$value = isset( $options[ $experiment['id'] ] ) ? 1 : 0;
-								$requires = isset( $experiment['requires'] ) ? $experiment['requires'] : '';
-								$description = isset( $experiment['description'] ) ? $experiment['description'] : '';
+								$value            = isset( $options[ $experiment['id'] ] ) ? 1 : 0;
+								$requires         = isset( $experiment['requires'] ) ? $experiment['requires'] : '';
+								$description      = isset( $experiment['description'] ) ? $experiment['description'] : '';
 								$required_enabled = false;
 								if ( $requires ) {
 									$required_enabled = isset( $options[ $requires ] ) && $options[ $requires ];
@@ -666,7 +676,7 @@ if ( ! function_exists( 'the_gutenberg_experiments' ) ) {
  */
 function gutenberg_get_experiment_categories() {
 	$definitions = gutenberg_get_experiment_definitions();
-	$categories = array(
+	$categories  = array(
 		'uncategorized' => __( 'Uncategorized', 'gutenberg' ),
 	);
 
@@ -706,23 +716,26 @@ function gutenberg_register_experiment( $id, $title, $args = array() ) {
 		'category'    => 'uncategorized',
 		'requires'    => '',
 	);
-	$args = wp_parse_args( $args, $defaults );
+	$args     = wp_parse_args( $args, $defaults );
 
 	$category_id = $args['category'];
-	$section_id = 'gutenberg_experiments_section_' . $category_id;
+	$section_id  = 'gutenberg_experiments_section_' . $category_id;
 
 	// Ensure the category section exists (in case it's a new category)
 	global $wp_settings_sections;
 	if ( ! isset( $wp_settings_sections['gutenberg-experiments'][ $section_id ] ) ) {
 		// Generate readable name from category ID
 		$category_name = ucwords( str_replace( array( '-', '_' ), ' ', $category_id ) );
-		
+
 		add_settings_section(
 			$section_id,
 			$category_name,
 			'gutenberg_display_experiment_category_section',
 			'gutenberg-experiments',
-			array( 'category_id' => $category_id, 'category_name' => $category_name )
+			array(
+				'category_id'   => $category_id,
+				'category_name' => $category_name,
+			)
 		);
 	}
 
@@ -734,11 +747,11 @@ function gutenberg_register_experiment( $id, $title, $args = array() ) {
 		'gutenberg-experiments',
 		$section_id,
 		array(
-			'id'          => $id,
-			'title'       => $title,
-			'label'       => $args['description'],
-			'category'    => $args['category'],
-			'requires'    => $args['requires'],
+			'id'       => $id,
+			'title'    => $title,
+			'label'    => $args['description'],
+			'category' => $args['category'],
+			'requires' => $args['requires'],
 		)
 	);
 }
@@ -758,7 +771,10 @@ function gutenberg_initialize_experiments_settings() {
 			$category_name,
 			'gutenberg_display_experiment_category_section',
 			'gutenberg-experiments',
-			array( 'category_id' => $category_id, 'category_name' => $category_name )
+			array(
+				'category_id'   => $category_id,
+				'category_name' => $category_name,
+			)
 		);
 	}
 
@@ -790,12 +806,12 @@ add_action( 'admin_init', 'gutenberg_initialize_experiments_settings' );
  * @param array $args Experiment arguments.
  */
 function gutenberg_display_experiment_field( $args ) {
-	$options = get_option( 'gutenberg-experiments', array() );
-	$value   = isset( $options[ $args['id'] ] ) ? 1 : 0;
+	$options                              = get_option( 'gutenberg-experiments', array() );
+	$value                                = isset( $options[ $args['id'] ] ) ? 1 : 0;
 								$category = isset( $args['category'] ) ? $args['category'] : 'uncategorized';
-	$title = isset( $args['title'] ) ? $args['title'] : $args['id'];
-	$description = isset( $args['label'] ) ? $args['label'] : ( isset( $args['description'] ) ? $args['description'] : '' );
-	$requires = isset( $args['requires'] ) ? $args['requires'] : '';
+	$title                                = isset( $args['title'] ) ? $args['title'] : $args['id'];
+	$description                          = isset( $args['label'] ) ? $args['label'] : ( isset( $args['description'] ) ? $args['description'] : '' );
+	$requires                             = isset( $args['requires'] ) ? $args['requires'] : '';
 
 	// Get required experiment title if dependency exists
 	$required_title = '';
@@ -863,11 +879,11 @@ function gutenberg_display_experiment_field( $args ) {
  * @param array $args Section arguments.
  */
 function gutenberg_display_experiment_category_section( $args ) {
-	$category_id = isset( $args['category_id'] ) ? $args['category_id'] : '';
+	$category_id   = isset( $args['category_id'] ) ? $args['category_id'] : '';
 	$category_name = isset( $args['category_name'] ) ? $args['category_name'] : '';
 	// Check if this is the first field in the section
 	static $section_opened = array();
-	$section_key = 'gutenberg_experiments_section_' . $category_id;
+	$section_key           = 'gutenberg_experiments_section_' . $category_id;
 
 	if ( ! isset( $section_opened[ $section_key ] ) ) {
 		$section_opened[ $section_key ] = true;
