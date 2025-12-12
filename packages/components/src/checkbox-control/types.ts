@@ -10,6 +10,15 @@ import type { BaseControlProps } from '../base-control/types';
 
 export type CheckboxControlProps = Pick< BaseControlProps, 'help' > & {
 	/**
+	 * Start opting into the new margin-free styles that will become the default in a future version.
+	 *
+	 * @deprecated Default behavior since WP 7.0. Prop can be safely removed.
+	 * @ignore
+	 *
+	 * @default false
+	 */
+	__nextHasNoMarginBottom?: boolean;
+	/**
 	 * A function that receives the checked state (boolean) as input.
 	 */
 	onChange: ( value: boolean ) => void;
