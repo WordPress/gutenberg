@@ -188,7 +188,6 @@ export default function Edit( {
 							}
 						>
 							<ToggleGroupControl
-								__nextHasNoMarginBottom
 								__next40pxDefaultSize
 								isBlock
 								label={ __( 'Icon Position' ) }

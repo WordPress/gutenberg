@@ -189,7 +189,6 @@ const DimensionControls = ( {
 				>
 					<ToggleGroupControl
 						__next40pxDefaultSize
-						__nextHasNoMarginBottom
 						label={ scaleLabel }
 						value={ scale }
 						help={ scaleHelp[ scale ] }

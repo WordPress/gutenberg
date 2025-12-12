@@ -323,7 +323,6 @@ function LayoutTypeSwitcher( { type, onChange } ) {
 			__next40pxDefaultSize
 			isBlock
 			label={ __( 'Layout type' ) }
-			__nextHasNoMarginBottom
 			hideLabelFromVision
 			isAdaptiveWidth
 			value={ type }

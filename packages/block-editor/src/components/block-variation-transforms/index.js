@@ -120,7 +120,6 @@ function VariationsToggleGroupControl( {
 				hideLabelFromVision
 				onChange={ onSelectVariation }
 				__next40pxDefaultSize
-				__nextHasNoMarginBottom
 			>
 				{ variations.map( ( variation ) => (
 					<ToggleGroupControlOptionIcon

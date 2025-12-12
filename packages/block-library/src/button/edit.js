@@ -152,7 +152,6 @@ function WidthPanel( { selectedWidth, setAttributes } ) {
 					}
 					isBlock
 					__next40pxDefaultSize
-					__nextHasNoMarginBottom
 				>
 					{ [ 25, 50, 75, 100 ].map( ( widthValue ) => {
 						return (

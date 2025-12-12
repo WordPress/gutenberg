@@ -42,7 +42,6 @@ export default function OverlayMenuPreviewControls( {
 			/>
 			<ToggleGroupControl
 				__next40pxDefaultSize
-				__nextHasNoMarginBottom
 				className="wp-block-navigation__overlay-menu-icon-toggle-group"
 				label={ __( 'Icon' ) }
 				value={ icon }

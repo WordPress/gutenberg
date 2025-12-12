@@ -419,7 +419,6 @@ function Controls( { attributes, setAttributes, postCount } ) {
 						>
 							<ToggleGroupControl
 								className="editor-latest-posts-image-alignment-control"
-								__nextHasNoMarginBottom
 								__next40pxDefaultSize
 								label={ __( 'Image alignment' ) }
 								value={ featuredImageAlign || 'none' }

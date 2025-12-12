@@ -298,7 +298,6 @@ function FlexLayoutJustifyContentControl( {
 	return (
 		<ToggleGroupControl
 			__next40pxDefaultSize
-			__nextHasNoMarginBottom
 			label={ __( 'Justification' ) }
 			value={ justifyContent }
 			onChange={ onJustificationChange }
@@ -344,7 +343,6 @@ function OrientationControl( { layout, onChange } ) {
 	return (
 		<ToggleGroupControl
 			__next40pxDefaultSize
-			__nextHasNoMarginBottom
 			className="block-editor-hooks__flex-layout-orientation-controls"
 			label={ __( 'Orientation' ) }
 			value={ orientation }

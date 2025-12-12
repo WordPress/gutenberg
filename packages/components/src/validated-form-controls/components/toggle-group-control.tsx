@@ -18,7 +18,7 @@ const UnforwardedValidatedToggleGroupControl = (
 		...restProps
 	}: Omit<
 		React.ComponentProps< typeof ToggleGroupControl >,
-		'__next40pxDefaultSize' | '__nextHasNoMarginBottom'
+		'__next40pxDefaultSize'
 	> &
 		ValidatedControlProps,
 	forwardedRef: React.ForwardedRef< HTMLInputElement >
@@ -36,7 +36,6 @@ const UnforwardedValidatedToggleGroupControl = (
 				getValidityTarget={ () => validityTargetRef.current }
 			>
 				<ToggleGroupControl
-					__nextHasNoMarginBottom
 					__next40pxDefaultSize
 					ref={ forwardedRef }
 					{ ...restProps }
