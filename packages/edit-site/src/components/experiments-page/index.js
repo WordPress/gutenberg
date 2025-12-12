@@ -127,19 +127,28 @@ export default function ExperimentsPage() {
 						},
 						{
 							Edit: 'checkbox',
-							id: 'gutenberg-media-processing',
-							label: __( 'Client-side media processing' ),
+							id: 'gutenberg-customizable-navigation-overlays',
+							label: __( 'Customizable Navigation Overlays' ),
 							description: __(
-								"Enables client-side media processing to leverage the browser's capabilities to handle tasks like image resizing and compression."
+								'Enables custom mobile overlay design and content control for Navigation blocks, allowing you to create flexible, professional menu experiences.'
 							),
 							type: 'boolean',
 						},
 						{
 							Edit: 'checkbox',
-							id: 'gutenberg-block-comments',
-							label: __( 'Add block level comments' ),
+							id: 'gutenberg-hide-blocks-based-on-screen-size',
+							label: __( 'Hide blocks based on screen size' ),
 							description: __(
-								'Enables multi-user block level commenting.'
+								'Extends block visibility block supports with responsive design controls for hiding blocks based on screen size.'
+							),
+							type: 'boolean',
+						},
+						{
+							Edit: 'checkbox',
+							id: 'gutenberg-media-processing',
+							label: __( 'Client-side media processing' ),
+							description: __(
+								"Enables client-side media processing to leverage the browser's capabilities to handle tasks like image resizing and compression."
 							),
 							type: 'boolean',
 						},
@@ -163,15 +172,6 @@ export default function ExperimentsPage() {
 						},
 						{
 							Edit: 'checkbox',
-							id: 'gutenberg-custom-dataviews',
-							label: __( 'Add Custom Views' ),
-							description: __(
-								'Enables the ability to add, edit, and save custom views when in the Site Editor.'
-							),
-							type: 'boolean',
-						},
-						{
-							Edit: 'checkbox',
 							id: 'gutenberg-new-posts-dashboard',
 							label: __( 'Enable for Posts' ),
 							description: __(
@@ -190,10 +190,10 @@ export default function ExperimentsPage() {
 						},
 						{
 							Edit: 'checkbox',
-							id: 'gutenberg-editor-write-mode',
-							label: __( 'Simplified site editing' ),
+							id: 'gutenberg-dataviews-media-modal',
+							label: __( 'New media modal' ),
 							description: __(
-								'Enables Write mode in the Site Editor for a simplified editing experience.'
+								'Enables a new media modal experience powered by Data Views for improved media library management.'
 							),
 							type: 'boolean',
 						},
@@ -203,6 +203,35 @@ export default function ExperimentsPage() {
 							label: __( 'Full-page client-side navigation' ),
 							description: __(
 								'Enables full-page client-side navigation, powered by the Interactivity API.'
+							),
+							type: 'boolean',
+						},
+						{
+							Edit: 'checkbox',
+							id: 'gutenberg-content-only-pattern-insertion',
+							label: __(
+								'Make patterns contentOnly by default upon insertion'
+							),
+							description: __(
+								'When patterns are inserted, default to a simplified content only mode for editing pattern content.'
+							),
+							type: 'boolean',
+						},
+						{
+							Edit: 'checkbox',
+							id: 'gutenberg-content-only-inspector-fields',
+							label: __( 'Enable editable inspector fields' ),
+							description: __(
+								'Enables editable inspector fields (media, links, alt text, etc.) in the content-only pattern editing interface. Requires "Make patterns contentOnly by default upon insertion" to be enabled.'
+							),
+							type: 'boolean',
+						},
+						{
+							Edit: 'checkbox',
+							id: 'gutenberg-workflow-palette',
+							label: __( 'Workflow Palette' ),
+							description: __(
+								'Enables the Workflow Palette for running workflows composed of abilities, from a unified interface.'
 							),
 							type: 'boolean',
 						},
@@ -219,6 +248,8 @@ export default function ExperimentsPage() {
 									'gutenberg-form-blocks',
 									'gutenberg-grid-interactivity',
 									'gutenberg-no-tinymce',
+									'gutenberg-customizable-navigation-overlays',
+									'gutenberg-hide-blocks-based-on-screen-size',
 								],
 							},
 							{
@@ -233,10 +264,7 @@ export default function ExperimentsPage() {
 								label: 'Collaboration',
 								type: 'group',
 								labelPosition: 'side',
-								children: [
-									'gutenberg-block-comments',
-									'gutenberg-sync-collaboration',
-								],
+								children: [ 'gutenberg-sync-collaboration' ],
 							},
 							{
 								id: 'gutenberg-experiments--data-views',
@@ -244,17 +272,10 @@ export default function ExperimentsPage() {
 								type: 'group',
 								labelPosition: 'side',
 								children: [
-									'gutenberg-custom-dataviews',
 									'gutenberg-new-posts-dashboard',
 									'gutenberg-quick-edit-dataviews',
+									'gutenberg-dataviews-media-modal',
 								],
-							},
-							{
-								id: 'gutenberg-experiments--editor',
-								label: 'Editor',
-								type: 'group',
-								labelPosition: 'side',
-								children: [ 'gutenberg-editor-write-mode' ],
 							},
 							{
 								id: 'gutenberg-experiments--interactivity',
@@ -266,11 +287,24 @@ export default function ExperimentsPage() {
 								],
 							},
 							{
+								id: 'gutenberg-experiments--content-only',
+								label: 'contentOnly',
+								type: 'group',
+								labelPosition: 'side',
+								children: [
+									'gutenberg-content-only-pattern-insertion',
+									'gutenberg-content-only-inspector-fields',
+								],
+							},
+							{
 								id: 'gutenberg-experiments--other',
 								label: 'Other',
 								type: 'group',
 								labelPosition: 'side',
-								children: [ 'gutenberg-color-randomizer' ],
+								children: [
+									'gutenberg-color-randomizer',
+									'gutenberg-workflow-palette',
+								],
 							},
 						],
 						labelPosition: 'side',
