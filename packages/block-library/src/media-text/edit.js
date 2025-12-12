@@ -396,7 +396,6 @@ function MediaTextEdit( {
 						}
 					>
 						<FocalPointPicker
-							__nextHasNoMarginBottom
 							label={ __( 'Focal point' ) }
 							url={
 								useFeaturedImage && featuredImageURL

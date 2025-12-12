@@ -279,7 +279,6 @@ module.exports = {
 					...[
 						'BaseControl',
 						'ComboboxControl',
-						'FocalPointPicker',
 						'RangeControl',
 						'SearchControl',
 						'SelectControl',

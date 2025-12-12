@@ -579,7 +579,6 @@ function BackgroundSizeControls( {
 	return (
 		<VStack spacing={ 3 } className="single-column">
 			<FocalPointPicker
-				__nextHasNoMarginBottom
 				label={ __( 'Focal point' ) }
 				url={ imageValue }
 				value={ backgroundPositionToCoords( backgroundPositionValue ) }
