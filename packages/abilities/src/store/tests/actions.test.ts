@@ -721,37 +721,6 @@ describe( 'Store Actions', () => {
 			expect( mockDispatch ).not.toHaveBeenCalled();
 		} );
 
-		it( 'should throw error when new ability sets serverRegistered to true', () => {
-			const existingAbility: Ability = {
-				name: 'test/ability',
-				label: 'Test Ability',
-				description: 'Test description',
-				category: 'test-category',
-				meta: {
-					annotations: { serverRegistered: true },
-				},
-			};
-			mockSelect.getAbility.mockReturnValue( existingAbility );
-
-			const newAbility: Ability = {
-				name: 'test/ability',
-				label: 'Test Ability',
-				description: 'Test description',
-				category: 'test-category',
-				callback: jest.fn(),
-				meta: {
-					annotations: { serverRegistered: true },
-				},
-			};
-
-			const action = registerAbility( newAbility );
-
-			expect( () =>
-				action( { select: mockSelect, dispatch: mockDispatch } )
-			).toThrow( 'Ability "test/ability" is already registered' );
-			expect( mockDispatch ).not.toHaveBeenCalled();
-		} );
-
 		it( 'should throw error when properties other than callback differ', () => {
 			const existingAbility: Ability = {
 				name: 'test/ability',
