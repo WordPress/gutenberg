@@ -318,6 +318,42 @@ class WP_Navigation_Block_Renderer {
 	}
 
 	/**
+	 * Recursively disables overlay menu for navigation blocks within overlay blocks.
+	 * Prevents nested overlays (inception).
+	 *
+	 * @since 6.5.0
+	 *
+	 * @param array $blocks Array of parsed block arrays.
+	 * @return array Modified blocks with overlayMenu set to 'never' for navigation blocks.
+	 */
+	private static function disable_overlay_menu_for_nested_navigation_blocks( $blocks ) {
+		if ( empty( $blocks ) || ! is_array( $blocks ) ) {
+			return $blocks;
+		}
+
+		foreach ( $blocks as &$block ) {
+			if ( ! isset( $block['blockName'] ) ) {
+				continue;
+			}
+
+			// If this is a navigation block, disable its overlay menu.
+			if ( 'core/navigation' === $block['blockName'] ) {
+				if ( ! isset( $block['attrs'] ) ) {
+					$block['attrs'] = array();
+				}
+				$block['attrs']['overlayMenu'] = 'never';
+			}
+
+			// Recursively process inner blocks.
+			if ( ! empty( $block['innerBlocks'] ) && is_array( $block['innerBlocks'] ) ) {
+				$block['innerBlocks'] = static::disable_overlay_menu_for_nested_navigation_blocks( $block['innerBlocks'] );
+			}
+		}
+
+		return $blocks;
+	}
+
+	/**
 	 * Gets the inner blocks for the navigation block from an overlay template part.
 	 *
 	 * @since 6.5.0
@@ -372,6 +408,8 @@ class WP_Navigation_Block_Renderer {
 			if ( isset( $block_template->content ) ) {
 				$parsed_blocks = parse_blocks( $block_template->content );
 				$blocks        = block_core_navigation_filter_out_empty_blocks( $parsed_blocks );
+				// Disable overlay menu for any navigation blocks within the overlay to prevent nested overlays.
+				$blocks = static::disable_overlay_menu_for_nested_navigation_blocks( $blocks );
 				return new WP_Block_List( $blocks, $attributes );
 			}
 			return new WP_Block_List( array(), $attributes );
@@ -393,6 +431,9 @@ class WP_Navigation_Block_Renderer {
 		$markup = serialize_blocks( $blocks );
 		$markup = apply_block_hooks_to_content_from_post_object( $markup, $template_part_post );
 		$blocks = parse_blocks( $markup );
+
+		// Disable overlay menu for any navigation blocks within the overlay to prevent nested overlays.
+		$blocks = static::disable_overlay_menu_for_nested_navigation_blocks( $blocks );
 
 		return new WP_Block_List( $blocks, $attributes );
 	}
