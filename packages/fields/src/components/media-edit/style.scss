@@ -1,90 +1,60 @@
 @use "@wordpress/base-styles/colors" as *;
 @use "@wordpress/base-styles/variables" as *;
 
-.fields-controls__media-placeholder {
-	border-radius: $radius-small;
-	box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.2);
-	display: inline-block;
-	padding: 0;
-	background:
-		$white
-		linear-gradient(-45deg, transparent 48%, $gray-300 48%, $gray-300 52%, transparent 52%);
-}
-
-.fields-controls__media-title {
-	width: 100%;
-	color: $gray-900;
-	white-space: nowrap;
-	text-overflow: ellipsis;
-	overflow: hidden;
-}
-
-.fields-controls__media-image {
-	width: 100%;
-	height: 100%;
-	border-radius: $radius-small;
-	align-self: center;
-}
-
-.fields-controls__media-container {
-	.fields-controls__media-placeholder {
-		margin: 0;
-	}
-
-	span {
-		margin-right: auto;
-	}
-}
-
 fieldset.fields-controls__media {
 	// Reset `fieldset` browser defaults.
 	border: 0;
 	padding: 0;
 	margin: 0;
 
-	.fields-controls__media-container {
-		border: $border-width solid $gray-300;
+	.fields-controls__media-picker-button-container {
+		border: $border-width dotted $gray-300;
 		border-radius: $radius-small;
-		padding: 8px 12px;
+		padding: calc(8px - #{$border-width});
 		cursor: pointer;
+
 		&:hover {
 			background-color: $gray-100;
 		}
-	}
 
-	.fields-controls__media-placeholder {
-		width: 24px;
-		height: 24px;
-	}
+		.fields-controls__media-title,
+		.fields-controls__media-placeholder {
+			width: 100%;
+			color: $gray-900;
+			white-space: nowrap;
+			text-overflow: ellipsis;
+			overflow: hidden;
+			align-self: center;
+			text-align: start;
+			margin-right: auto;
+		}
 
-	span {
-		align-self: center;
-		text-align: start;
-		white-space: nowrap;
-	}
+		.fields-controls__media-placeholder {
+			text-align: center;
+		}
 
-	.fields-controls__media-upload-button {
-		padding: 0;
-		height: fit-content;
-		&:hover,
-		&:focus {
-			border: 0;
-			color: unset;
+		.fields-controls__media-image {
+			width: 24px;
+			aspect-ratio: 1 / 1;
+			flex-shrink: 0;
+			border-radius: $radius-small;
+			align-self: center;
 		}
 	}
 
 	.fields-controls__media-remove-button {
 		place-self: end;
+		flex-shrink: 0;
+	}
+
+	.fields-controls__media-help-text {
+		color: $gray-600;
+		font-size: $helptext-font-size;
 	}
 }
 
 .dataforms-layouts-panel__field-control {
 	.fields-controls__media-image {
-		width: 16px;
-		height: 16px;
-	}
-
-	.fields-controls__media-placeholder {
 		width: 16px;
 		height: 16px;
 	}

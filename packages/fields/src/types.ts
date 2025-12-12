@@ -147,15 +147,13 @@ export interface MediaEditProps< Item > extends DataFormControlProps< Item > {
 	 */
 	allowedTypes?: string[];
 	/**
-	 * Title for the media picker modal.
-	 *
-	 * @default 'Select Media'
-	 */
-	title?: string;
-	/**
 	 * Placeholder text when no media is selected.
 	 *
-	 * @default 'Choose media…'
+	 * @default 'Choose file'
 	 */
 	placeholder?: string;
+	/**
+	 * Help text.
+	 */
+	help?: string;
 }

@@ -1,11 +1,12 @@
 /**
- * WordPress dependencies
- */
-const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
-/**
  * External dependencies
  */
 const path = require( 'path' );
+
+/**
+ * WordPress dependencies
+ */
+const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 const createPages = async ( requestUtils ) => {
 	await requestUtils.createPage( {
@@ -67,7 +68,7 @@ test.describe( 'Page List', () => {
 			featuredImage: {
 				performEdit: async ( page ) => {
 					const placeholder = page.getByRole( 'button', {
-						name: 'Choose featured image…',
+						name: 'Choose file',
 					} );
 					await placeholder.click();
 					const mediaLibrary = page.getByRole( 'dialog' );
@@ -92,16 +93,16 @@ test.describe( 'Page List', () => {
 						.click();
 				},
 				assertInitialState: async ( page ) => {
-					const el = page.getByText( 'Choose featured image…' );
+					const el = page.getByText( 'Choose file' );
 					const placeholder = page.getByRole( 'button', {
-						name: 'Choose featured image…',
+						name: 'Choose file',
 					} );
 					await expect( el ).toBeVisible();
 					await expect( placeholder ).toBeVisible();
 				},
 				assertEditedState: async ( page ) => {
 					const placeholder = page.getByRole( 'button', {
-						name: 'Choose featured image…',
+						name: 'Choose file',
 					} );
 					await expect( placeholder ).toBeHidden();
 					const img = page.locator( '.fields-controls__media-image' );

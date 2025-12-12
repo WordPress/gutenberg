@@ -89,8 +89,8 @@ const featuredImageField = {
 		<MediaEdit
 			{ ...props }
 			allowedTypes={ [ 'image' ] }
-			title="Select Featured Image"
 			placeholder="Choose featured image…"
+			help="Upload an image to represent this post"
 		/>
 	),
 };
@@ -103,8 +103,8 @@ _Parameters_
 -   _props.field_ `Object`: - The field configuration with getValue and setValue methods.
 -   _props.onChange_ `Function`: - Callback function when the media selection changes.
 -   _props.allowedTypes_ `[string[]]`: - Array of allowed media types.
--   _props.title_ `[string]`: - Title for the media picker modal.
 -   _props.placeholder_ `[string]`: - Placeholder text when no media is selected.
+-   _props.help_ `[string]`: - Help text.
 
 _Returns_
 
