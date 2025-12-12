@@ -93,7 +93,7 @@ describe( 'BlockSelectionHistory', () => {
 	describe( 'initialization', () => {
 		test( 'should initialize with empty history', () => {
 			expect( history.getCurrentSelection() ).toBeNull();
-			expect( history.getSelectionHistory( 5 ) ).toEqual( [] );
+			expect( history.getSelectionHistory() ).toEqual( [] );
 		} );
 	} );
 
@@ -154,7 +154,7 @@ describe( 'BlockSelectionHistory', () => {
 			expect( startPosition.offset ).toBe( 8 );
 
 			// Should have no positions in block history (still in same block)
-			expect( history.getSelectionHistory( 5 ).length ).toBe( 0 );
+			expect( history.getSelectionHistory().length ).toBe( 0 );
 		} );
 
 		test( 'should add new position when moving to different block', () => {
@@ -173,7 +173,7 @@ describe( 'BlockSelectionHistory', () => {
 			history.updateSelection( selection2 );
 
 			const currentSelection = history.getCurrentSelection();
-			const blockHistory = history.getSelectionHistory( 1 );
+			const blockHistory = history.getSelectionHistory();
 
 			expect( currentSelection?.start.clientId ).toBe( 'block-2' );
 			expect( currentSelection?.end.clientId ).toBe( 'block-2' );
@@ -300,7 +300,7 @@ describe( 'BlockSelectionHistory', () => {
 			expect( currentSelection?.start.clientId ).toBe( 'block-3' );
 			expect( currentSelection?.end.clientId ).toBe( 'block-3' );
 
-			const blockHistory = history.getSelectionHistory( 5 );
+			const blockHistory = history.getSelectionHistory();
 			expect( blockHistory.length ).toBe( 2 );
 			expect( blockHistory[ 0 ].start.clientId ).toBe( 'block-2' );
 			expect( blockHistory[ 0 ].end.clientId ).toBe( 'block-2' );
@@ -323,7 +323,7 @@ describe( 'BlockSelectionHistory', () => {
 
 			// Should only keep last 3 in block history
 			const currentSelection = smallHistory.getCurrentSelection();
-			const blockHistory = smallHistory.getSelectionHistory( 10 );
+			const blockHistory = smallHistory.getSelectionHistory();
 
 			expect( currentSelection?.start.clientId ).toBe( 'block-5' );
 			expect( currentSelection?.end.clientId ).toBe( 'block-5' );
@@ -366,7 +366,7 @@ describe( 'BlockSelectionHistory', () => {
 			);
 
 			const currentSelection = history.getCurrentSelection();
-			const blockHistory = history.getSelectionHistory( 5 );
+			const blockHistory = history.getSelectionHistory();
 
 			// block-1 should be current (most recent)
 			expect( currentSelection?.start.clientId ).toBe( 'block-1' );
@@ -385,32 +385,6 @@ describe( 'BlockSelectionHistory', () => {
 	} );
 
 	describe( 'getSelectionHistory', () => {
-		test( 'should return requested number of positions', () => {
-			const selections = [
-				createSelection( {
-					clientId: 'block-1',
-					attributeKey: 'content',
-					offset: 1,
-				} ),
-				createSelection( {
-					clientId: 'block-2',
-					attributeKey: 'content',
-					offset: 2,
-				} ),
-				createSelection( {
-					clientId: 'block-3',
-					attributeKey: 'value',
-					offset: 3,
-				} ),
-			];
-
-			selections.forEach( ( sel ) => history.updateSelection( sel ) );
-
-			expect( history.getSelectionHistory( 1 ).length ).toBe( 1 );
-			expect( history.getSelectionHistory( 2 ).length ).toBe( 2 );
-			expect( history.getSelectionHistory( 10 ).length ).toBe( 2 ); // Only 2 backup positions available
-		} );
-
 		test( 'should return empty array when no backup positions exist', () => {
 			history.updateSelection(
 				createSelection( {
@@ -419,7 +393,7 @@ describe( 'BlockSelectionHistory', () => {
 					offset: 1,
 				} )
 			);
-			expect( history.getSelectionHistory( 5 ) ).toEqual( [] );
+			expect( history.getSelectionHistory() ).toEqual( [] );
 		} );
 	} );
 
@@ -544,7 +518,7 @@ describe( 'BlockSelectionHistory', () => {
 			expect( startPosition.offset ).toBe( 9 );
 
 			// Should still be no positions in block history
-			expect( history.getSelectionHistory( 5 ).length ).toBe( 0 );
+			expect( history.getSelectionHistory().length ).toBe( 0 );
 		} );
 
 		test( 'should handle alternating between two blocks', () => {
@@ -578,7 +552,7 @@ describe( 'BlockSelectionHistory', () => {
 			);
 
 			const current = history.getCurrentSelection();
-			const blockHistory = history.getSelectionHistory( 5 );
+			const blockHistory = history.getSelectionHistory();
 
 			expect( current?.start.clientId ).toBe( 'block-2' );
 			expect( current?.end.clientId ).toBe( 'block-2' );
@@ -612,7 +586,7 @@ describe( 'BlockSelectionHistory', () => {
 			);
 
 			const current = history.getCurrentSelection();
-			const backupSelections = history.getSelectionHistory( 2 );
+			const backupSelections = history.getSelectionHistory();
 
 			expect( current?.start.type ).toBe(
 				YSelectionType.RelativeSelection
@@ -647,7 +621,7 @@ describe( 'BlockSelectionHistory', () => {
 			expect( current?.end.clientId ).toBe( 'block-1' );
 			expect( ( current?.start as YRelativeSelection ).offset ).toBe( 2 );
 			expect( ( current?.end as YRelativeSelection ).offset ).toBe( 10 );
-			expect( history.getSelectionHistory( 5 ).length ).toBe( 0 );
+			expect( history.getSelectionHistory().length ).toBe( 0 );
 		} );
 
 		test( 'should track cross-block selection spanning two blocks', () => {
@@ -691,7 +665,7 @@ describe( 'BlockSelectionHistory', () => {
 			);
 
 			const current = history.getCurrentSelection();
-			const blockHistory = history.getSelectionHistory( 5 );
+			const blockHistory = history.getSelectionHistory();
 
 			// Should have moved to different block combination
 			expect( current?.start.clientId ).toBe( 'block-1' );
@@ -719,7 +693,7 @@ describe( 'BlockSelectionHistory', () => {
 			);
 
 			const current = history.getCurrentSelection();
-			const blockHistory = history.getSelectionHistory( 5 );
+			const blockHistory = history.getSelectionHistory();
 
 			expect( current?.start.clientId ).toBe( 'block-2' );
 			expect( current?.end.clientId ).toBe( 'block-3' );
@@ -746,7 +720,7 @@ describe( 'BlockSelectionHistory', () => {
 			);
 
 			const current = history.getCurrentSelection();
-			const blockHistory = history.getSelectionHistory( 5 );
+			const blockHistory = history.getSelectionHistory();
 
 			expect( current?.start.clientId ).toBe( 'block-1' );
 			expect( current?.end.clientId ).toBe( 'block-2' );
