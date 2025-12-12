@@ -1401,7 +1401,8 @@ test.describe( 'Navigation block', () => {
 			// Button is enabled (clickable) even for synced links - clicking opens the search
 			await expect( linkButton ).toBeEnabled();
 			// Button displays the page title and status - verify it's not empty/showing error
-			await expect( linkButton ).toContainText( 'localhost' );
+			await expect( linkButton ).toContainText( 'test-page-1' );
+			await expect( linkButton ).toContainText( 'Published' );
 		} );
 
 		test( 'handles unavailable entity binding', async ( {
@@ -1756,7 +1757,7 @@ test.describe( 'Navigation block', () => {
 					} )
 					.first();
 
-				await expect( navLinkBlock ).toContainText( 'example.com' );
+				await expect( navLinkBlock ).toContainText( 'Test Page 1' );
 			} );
 		} );
 
