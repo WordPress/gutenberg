@@ -15,7 +15,8 @@ import { getUniqueTemplatePartTitle, getCleanTemplatePartSlug } from './utils';
  * Hook to create a new overlay template part.
  *
  * @param {Array} overlayTemplateParts Array of existing overlay template parts.
- * @return {Function} Function to create a new overlay template part.
+ * @return {function(): Promise<Object>} Function to create a new overlay template part.
+ *                                      The function returns a Promise that resolves to the created template part object.
  */
 export default function useCreateOverlayTemplatePart( overlayTemplateParts ) {
 	const { saveEntityRecord } = useDispatch( coreStore );

@@ -143,6 +143,10 @@ export default function OverlayTemplatePartSelector( {
 				} );
 			}
 		} catch ( error ) {
+			// Error handling pattern matches CreateTemplatePartModalContents.
+			// See: packages/fields/src/components/create-template-part-modal/index.tsx
+			// The 'unknown_error' code check ensures generic error codes don't show
+			// potentially confusing technical messages, instead showing a user-friendly fallback.
 			const errorMessage =
 				error instanceof Error &&
 				'code' in error &&
