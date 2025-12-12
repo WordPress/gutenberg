@@ -12,6 +12,7 @@ import { Y } from '@wordpress/sync';
 import { findBlockByClientIdInDoc } from './crdt';
 import type { WPBlockSelection, WPSelection } from '../types';
 
+// Default size for selection history (not including current selection)
 const SELECTION_HISTORY_DEFAULT_SIZE = 5;
 
 export enum YSelectionType {
@@ -45,7 +46,6 @@ export interface YSelectionHistory {
 }
 
 export interface BlockSelectionHistory {
-	getCurrentSelection: () => YFullSelection | null;
 	getSelectionHistory: () => YFullSelection[];
 	updateSelection: ( newSelection: WPSelection ) => void;
 }
@@ -66,17 +66,10 @@ export function createBlockSelectionHistory(
 	let history: YFullSelection[] = [];
 
 	/**
-	 * Get the current selection (most recent selection in the current block).
-	 */
-	const getCurrentSelection = (): YFullSelection | null => {
-		return history[ 0 ] ?? null;
-	};
-
-	/**
-	 * Get the block history (previous blocks only, not current or last selection).
+	 * Get the block history including current selection.
 	 */
 	const getSelectionHistory = (): YFullSelection[] => {
-		return history.slice( 1, historySize + 1 );
+		return history.slice( 0 );
 	};
 
 	/**
@@ -130,7 +123,6 @@ export function createBlockSelectionHistory(
 	};
 
 	return {
-		getCurrentSelection,
 		getSelectionHistory,
 		updateSelection,
 	};

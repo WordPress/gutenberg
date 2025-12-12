@@ -26,7 +26,7 @@ import {
 	isNumericID,
 } from './utils';
 import { fetchBlockPatterns } from './fetch';
-import { getSelectionHistoryMeta } from './utils/crdt';
+import { getSelectionHistory } from './utils/crdt';
 import { restoreSelection } from './utils/selection';
 
 /**
@@ -226,7 +226,7 @@ export const getEntityRecord =
 							},
 							addUndoMeta: ( ydoc, meta ) => {
 								const selectionHistory =
-									getSelectionHistoryMeta( ydoc );
+									getSelectionHistory( ydoc );
 
 								if ( selectionHistory ) {
 									meta.set(
@@ -236,10 +236,10 @@ export const getEntityRecord =
 								}
 							},
 							restoreUndoMeta: ( ydoc, meta ) => {
-								const selectionHistoryMeta =
+								const selectionHistory =
 									meta.get( 'selectionHistory' );
 
-								if ( selectionHistoryMeta ) {
+								if ( selectionHistory ) {
 									// Because Yjs initiates an undo, we need to
 									// wait until the content is restored before
 									// we can update the selection.
@@ -248,7 +248,7 @@ export const getEntityRecord =
 									// selection.
 									setTimeout( () => {
 										restoreSelection(
-											selectionHistoryMeta,
+											selectionHistory,
 											ydoc
 										);
 									}, 0 );

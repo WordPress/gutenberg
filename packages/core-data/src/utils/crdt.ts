@@ -45,7 +45,6 @@ import {
 	type BlockSelectionHistory,
 	type YFullSelection,
 	type YSelection,
-	type YSelectionHistory,
 } from './block-selection-history';
 
 // Changes that can be applied to a post entity record.
@@ -487,36 +486,8 @@ function getBlockSelectionHistory( ydoc: CRDTDoc ): BlockSelectionHistory {
 	return history;
 }
 
-/**
- * Given a Y.Doc, find the associated BlockSelectionHistory instance
- * and return the current selection history.
- * @param ydoc The Y.Doc to get the selection history meta for
- * @return The current selection history.
- */
-export function getSelectionHistoryMeta(
-	ydoc: CRDTDoc
-): YSelectionHistory | null {
-	const selectionHistory = getBlockSelectionHistory( ydoc );
-
-	let selectionToStore = selectionHistory.getCurrentSelection();
-	const backupSelections = selectionHistory.getSelectionHistory();
-	const firstBackupSelection = backupSelections[ 0 ];
-
-	if ( selectionToStore === null ) {
-		if ( firstBackupSelection === undefined ) {
-			// If we don't have any selection to restore, don't return anything
-			return null;
-		}
-
-		// Use the first backup selection if available
-		selectionToStore = firstBackupSelection;
-		backupSelections.shift();
-	}
-
-	return {
-		selection: selectionToStore,
-		backupSelections,
-	};
+export function getSelectionHistory( ydoc: CRDTDoc ): YFullSelection[] {
+	return getBlockSelectionHistory( ydoc ).getSelectionHistory();
 }
 
 /**
@@ -528,18 +499,10 @@ export function getSelectionHistoryMeta(
  */
 export function findSelectionFromHistory(
 	ydoc: Y.Doc,
-	selectionHistory: YSelectionHistory
+	selectionHistory: YFullSelection[]
 ): WPSelection | null {
-	const { selection, backupSelections } = selectionHistory;
-
-	// Build a stack of positions to try, starting with the primary position
-	const positionsToTry: YFullSelection[] = [ selection ];
-	if ( backupSelections ) {
-		positionsToTry.push( ...backupSelections );
-	}
-
 	// Try each position until we find one that exists in the document
-	for ( const positionToTry of positionsToTry ) {
+	for ( const positionToTry of selectionHistory ) {
 		const { start, end } = positionToTry;
 		const startBlock = findBlockByClientIdInDoc( start.clientId, ydoc );
 		const endBlock = findBlockByClientIdInDoc( end.clientId, ydoc );

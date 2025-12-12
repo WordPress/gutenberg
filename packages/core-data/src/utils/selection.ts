@@ -11,7 +11,7 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
 import type { WPBlockSelection, WPSelection } from '../types';
 import type { Y } from '@wordpress/sync';
 import { findSelectionFromHistory } from './crdt';
-import type { YSelectionHistory } from './block-selection-history';
+import type { YFullSelection } from './block-selection-history';
 
 /**
  * Restore the selection to the most recent selection in history that is
@@ -20,7 +20,7 @@ import type { YSelectionHistory } from './block-selection-history';
  * @param ydoc             The Y.Doc where blocks are stored
  */
 export function restoreSelection(
-	selectionHistory: YSelectionHistory,
+	selectionHistory: YFullSelection[],
 	ydoc: Y.Doc
 ): void {
 	// Find the most recent selection in history that is available in
