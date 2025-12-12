@@ -138,7 +138,7 @@ import { ThemeProvider } from '@wordpress/theme';
 
 function App() {
 	return (
-		<ThemeProvider color={ { primary: 'blue' } }>
+		<ThemeProvider color={ { primary: 'blue' } } density="compact">
 			{ /* Your app content */ }
 		</ThemeProvider>
 	);
@@ -152,6 +152,16 @@ The `color` prop accepts an object with the following optional properties:
 
 Both properties accept any valid CSS color value. The theme system automatically generates appropriate color ramps and determines light/dark mode based on these seed colors.
 
+The `density` prop controls the spacing scale throughout the UI:
+
+-   `'default'`: Standard spacing for general use
+-   `'compact'`: Reduced spacing for information-dense interfaces like data tables or dashboards
+-   `'comfortable'`: Increased spacing for focused experiences like modals, dialogs, or full-screen settings panels
+
+The density setting adjusts dimension tokens like gaps and paddings to maintain consistent spacing throughout the UI. Changing the density automatically updates spacing of all components that use these tokens.
+
+When the `color` or `density` prop is omitted, the theme inherits the density from the closest parent `ThemeProvider`, or uses the default value if none is inherited.
+
 ### Nesting Providers
 
 The provider can be used recursively to override or modify the theme for a specific subtree.
@@ -159,10 +169,10 @@ The provider can be used recursively to override or modify the theme for a speci
 ```tsx
 <ThemeProvider color={ { bg: 'white' } }>
 	{ /* light-themed UI components */ }
-	<ThemeProvider color={ { bg: '#1e1e1e' } }>
-		{ /* dark-themed UI components */ }
+	<ThemeProvider color={ { bg: '#1e1e1e' } } density="compact">
+		{ /* dark-themed UI components with compact spacing */ }
 		<ThemeProvider color={ { primary: 'red' } }>
-			{ /* dark-themed with red accent */ }
+			{ /* dark-themed with red accent, inheriting compact density */ }
 		</ThemeProvider>
 	</ThemeProvider>
 	{ /* light-themed UI components */ }
