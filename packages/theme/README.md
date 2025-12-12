@@ -160,7 +160,7 @@ The `density` prop controls the spacing scale throughout the UI:
 
 The density setting adjusts dimension tokens like gaps and paddings to maintain consistent spacing throughout the UI. Changing the density automatically updates spacing of all components that use these tokens.
 
-When the `color` or `density` prop is omitted, the theme inherits the density from the closest parent `ThemeProvider`, or uses the default value if none is inherited.
+When the `color` or `density` prop is omitted, the theme inherits the value from the closest parent `ThemeProvider`, or uses the default value if none is inherited.
 
 ### Nesting Providers
 
