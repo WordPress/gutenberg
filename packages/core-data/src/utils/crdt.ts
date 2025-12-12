@@ -39,15 +39,13 @@ import {
 	type YMapRecord,
 	type YMapWrap,
 } from './crdt-utils';
-import type {
-	BlockSelectionHistory,
-	YFullSelection,
-	YSelection,
-	YSelectionHistory,
-} from './block-selection-history';
 import {
 	createBlockSelectionHistory,
 	YSelectionType,
+	type BlockSelectionHistory,
+	type YFullSelection,
+	type YSelection,
+	type YSelectionHistory,
 } from './block-selection-history';
 
 // Changes that can be applied to a post entity record.

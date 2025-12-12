@@ -51,7 +51,7 @@ export interface BlockSelectionHistory {
 }
 
 /**
- * This class is used to track recent block selections to help in restoring
+ * This function is used to track recent block selections to help in restoring
  * a user's selection after an undo or redo operation.
  *
  * Maintains a history array for previous selections, which can be used for
@@ -68,14 +68,14 @@ export function createBlockSelectionHistory(
 	/**
 	 * Get the current selection (most recent selection in the current block).
 	 */
-	const getCurrentSelection = () => {
+	const getCurrentSelection = (): YFullSelection | null => {
 		return history[ 0 ] ?? null;
 	};
 
 	/**
 	 * Get the block history (previous blocks only, not current or last selection).
 	 */
-	const getSelectionHistory = () => {
+	const getSelectionHistory = (): YFullSelection[] => {
 		return history.slice( 1, historySize + 1 );
 	};
 
@@ -83,7 +83,7 @@ export function createBlockSelectionHistory(
 	 * Update the selection history with a new selection.
 	 * @param newSelection
 	 */
-	const updateSelection = ( newSelection: WPSelection ) => {
+	const updateSelection = ( newSelection: WPSelection ): void => {
 		if (
 			! newSelection?.selectionStart?.clientId ||
 			! newSelection?.selectionEnd?.clientId
@@ -107,7 +107,7 @@ export function createBlockSelectionHistory(
 	 * Removes any existing entries with the same start and end block combination.
 	 * @param yFullSelection
 	 */
-	const addToHistory = ( yFullSelection: YFullSelection ) => {
+	const addToHistory = ( yFullSelection: YFullSelection ): void => {
 		// Remove any existing entries with the same start and end block combination
 		const startClientId = yFullSelection.start.clientId;
 		const endClientId = yFullSelection.end.clientId;
