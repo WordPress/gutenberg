@@ -89,7 +89,6 @@ export const Badge = forwardRef< HTMLDivElement, BadgeProps >( function Badge(
 			borderRadius="lg"
 			render={ render }
 			style={ {
-				display: 'inline-flex',
 				fontFamily: 'var(--wpds-font-family-body)',
 				fontSize: 'var(--wpds-font-size-small)',
 				fontWeight: '400',
