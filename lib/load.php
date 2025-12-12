@@ -115,7 +115,7 @@ require __DIR__ . '/experimental/navigation-theme-opt-in.php';
 require __DIR__ . '/experimental/kses.php';
 require __DIR__ . '/experimental/synchronization.php';
 require __DIR__ . '/experimental/script-modules.php';
-require __DIR__ . '/experimental/pages/gutenberg-boot.php';
+require __DIR__ . '/experimental/pages/site-editor.php';
 require __DIR__ . '/experimental/fonts/load.php';
 
 if ( gutenberg_is_experiment_enabled( 'gutenberg-workflow-palette' ) ) {
