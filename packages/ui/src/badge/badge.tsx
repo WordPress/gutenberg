@@ -85,17 +85,15 @@ export const Badge = forwardRef< HTMLDivElement, BadgeProps >( function Badge(
 	return (
 		<Box
 			{ ...intentStyles }
-			padding={ { inline: '2xs' } }
-			borderRadius="md"
+			padding={ { inline: 'xs', block: '2xs' } }
+			borderRadius="lg"
 			render={ render }
 			style={ {
 				display: 'inline-flex',
-				alignItems: 'center',
 				fontFamily: 'var(--wpds-font-family-body)',
 				fontSize: 'var(--wpds-font-size-small)',
 				fontWeight: '400',
-				lineHeight: 'var(--wpds-font-line-height-small)',
-				boxSizing: 'border-box',
+				lineHeight: 'var(--wpds-font-line-height-x-small)',
 				...props.style,
 			} }
 			ref={ ref }
