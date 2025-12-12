@@ -27,5 +27,30 @@
 	.edit-site-sidebar-button {
 		color: $gray-900;
 	}
+
+	&__style-variation-info {
+		padding: $grid-unit-15 $grid-unit-20;
+		margin: 0;
+		font-size: $helptext-font-size;
+		color: var(--wp-block-synced-color);
+		background: color-mix(in srgb, var(--wp-block-synced-color) 5%, transparent);
+		border-bottom: $border-width solid $gray-200;
+	}
+}
+
+// Style variation selector button - purple styling when a non-main style is selected.
+.is-style-variation-selected.components-button {
+	background: color-mix(in srgb, var(--wp-block-synced-color) 10%, transparent);
+	color: var(--wp-block-synced-color);
+
+	&:hover,
+	&:focus {
+		background: color-mix(in srgb, var(--wp-block-synced-color) 20%, transparent);
+		color: var(--wp-block-synced-color);
+	}
+
+	svg {
+		fill: var(--wp-block-synced-color);
+	}
 }
 

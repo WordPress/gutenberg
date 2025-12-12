@@ -252,9 +252,20 @@ function StyleBook(
 		showTabs = true,
 		userConfig = {},
 		path = '',
+		styleVariationId = 0,
 	},
 	ref
 ) {
+	// Get styles from the selected style variation (or main styles if styleVariationId is 0).
+	const { user: styleVariationConfig, base: baseConfig } =
+		useGlobalStyles( styleVariationId );
+
+	// Use the style variation's config if available, otherwise fall back to passed userConfig.
+	const effectiveUserConfig =
+		styleVariationId && ! isObjectEmpty( styleVariationConfig )
+			? styleVariationConfig
+			: userConfig;
+
 	const textColor = useStyle( 'color.text' );
 	const backgroundColor = useStyle( 'color.background' );
 	const colors = useMultiOriginPalettes();
@@ -271,15 +282,17 @@ function StyleBook(
 
 	const examplesForSinglePageUse = getExamplesForSinglePageUse( examples );
 
-	const { base: baseConfig } = useGlobalStyles();
 	const goTo = getStyleBookNavigationFromPath( path );
 
 	const mergedConfig = useMemo( () => {
-		if ( ! isObjectEmpty( userConfig ) && ! isObjectEmpty( baseConfig ) ) {
-			return mergeGlobalStyles( baseConfig, userConfig );
+		if (
+			! isObjectEmpty( effectiveUserConfig ) &&
+			! isObjectEmpty( baseConfig )
+		) {
+			return mergeGlobalStyles( baseConfig, effectiveUserConfig );
 		}
 		return {};
-	}, [ baseConfig, userConfig ] );
+	}, [ baseConfig, effectiveUserConfig ] );
 
 	const originalSettings = useSelect(
 		( select ) => select( blockEditorStore ).getSettings(),
@@ -291,12 +304,13 @@ function StyleBook(
 		() => ( {
 			...originalSettings,
 			styles:
-				! isObjectEmpty( globalStyles ) && ! isObjectEmpty( userConfig )
+				! isObjectEmpty( globalStyles ) &&
+				! isObjectEmpty( effectiveUserConfig )
 					? globalStyles
 					: originalSettings.styles,
 			isPreviewMode: true,
 		} ),
-		[ globalStyles, originalSettings, userConfig ]
+		[ globalStyles, originalSettings, effectiveUserConfig ]
 	);
 
 	return (
