@@ -3,19 +3,6 @@
 @use "@wordpress/base-styles/mixins" as *;
 @use "@wordpress/base-styles/variables" as *;
 
-// Fix issue with wp-admin menu not scrolling between 170% and 200% zoom.
-#wpwrap {
-	background: var(--wpds-color-fg-content-neutral, #1e1e1e);
-	overflow-y: auto;
-	@include break-medium() {
-		overflow-y: initial;
-	}
-}
-
-body:has(.boot-layout-container) {
-	@include wp-admin-reset( ".boot-layout-container" );
-}
-
 .boot-layout-container .boot-layout {
 	// On mobile the main content area has to scroll, otherwise you can invoke
 	// the overscroll bounce on the non-scrolling container, for a bad experience.

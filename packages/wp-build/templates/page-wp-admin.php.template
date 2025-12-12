@@ -218,6 +218,59 @@ if ( ! function_exists( '{{PAGE_SLUG_UNDERSCORE}}_wp_admin_render_page' ) ) {
 	 */
 	function {{PAGE_SLUG_UNDERSCORE}}_wp_admin_render_page() {
 		?>
+		<style>
+			/* Critical styles to prevent layout shifts - inlined for immediate application */
+
+			/* Background colors */
+			#wpwrap {
+				background: var(--wpds-color-fg-content-neutral, #1e1e1e);
+				overflow-y: auto;
+			}
+			body {
+				background: #fff;
+			}
+
+			/* Reset wp-admin padding */
+			#wpcontent {
+				padding-left: 0;
+			}
+			#wpbody-content {
+				padding-bottom: 0;
+			}
+
+			/* Hide legacy admin elements */
+			#wpbody-content > div:not(.boot-layout-container):not(#screen-meta) {
+				display: none;
+			}
+			#wpfooter {
+				display: none;
+			}
+
+			/* Accessibility regions */
+			.a11y-speak-region {
+				left: -1px;
+				top: -1px;
+			}
+
+			/* Admin menu indicators */
+			ul#adminmenu a.wp-has-current-submenu::after,
+			ul#adminmenu > li.current > a.current::after {
+				border-right-color: #fff;
+			}
+
+			/* Media frame fix */
+			.media-frame select.attachment-filters:last-of-type {
+				width: auto;
+				max-width: 100%;
+			}
+
+			/* Responsive overflow fix for #wpwrap */
+			@media (min-width: 782px) {
+				#wpwrap {
+					overflow-y: initial;
+				}
+			}
+		</style>
 		<div id="{{PAGE_SLUG}}-wp-admin-app" class="boot-layout-container"></div>
 		<?php
 	}
