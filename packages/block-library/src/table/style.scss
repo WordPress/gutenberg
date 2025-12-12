@@ -7,7 +7,32 @@
 	$subtle-pale-blue: #e7f5fe;
 	$subtle-pale-pink: #fcf0ef;
 
+	// Allow scrolling overflow, with visual cue.
 	overflow-x: auto;
+	animation: scroll-shadow linear;
+	animation-timeline: scroll(self inline);
+
+	--scroll-shadow-color: color-mix(in srgb, currentColor 15%, transparent);
+	--scroll-shadow-width: 6px;
+	--scroll-shadow-height: min(96px, 80%);
+
+	@keyframes scroll-shadow {
+		// Leftmost - only right shadow.
+		0% {
+			background: radial-gradient(farthest-side at right, var(--scroll-shadow-color), transparent) right center / var(--scroll-shadow-width) var(--scroll-shadow-height) no-repeat;
+		}
+		0.1%,
+		99.9% {
+			// Middle - both shadows.
+			background:
+				radial-gradient(farthest-side at left, var(--scroll-shadow-color), transparent) left center / var(--scroll-shadow-width) var(--scroll-shadow-height) no-repeat,
+				radial-gradient(farthest-side at right, var(--scroll-shadow-color), transparent) right center / var(--scroll-shadow-width) var(--scroll-shadow-height) no-repeat;
+		}
+		// Rightmost - only left shadow.
+		100% {
+			background: radial-gradient(farthest-side at left, var(--scroll-shadow-color), transparent) left center / var(--scroll-shadow-width) var(--scroll-shadow-height) no-repeat;
+		}
+	}
 
 	table {
 		border-collapse: collapse;
