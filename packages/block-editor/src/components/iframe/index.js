@@ -118,8 +118,9 @@ function Iframe( {
 	const {
 		styles = '',
 		scripts = '',
-		script_modules: scriptModules = '',
+		html: assetsHTML = null,
 	} = resolvedAssets;
+
 	/** @type {[Document, import('react').Dispatch<Document>]} */
 	const [ iframeDocument, setIframeDocument ] = useState();
 	const [ bodyClasses, setBodyClasses ] = useState( [] );
@@ -274,9 +275,7 @@ function Iframe( {
 				background-color: white;
 			}
 		</style>
-		${ styles }
-		${ scripts }
-		${ scriptModules }
+		${ assetsHTML ?? styles + scripts }
 	</head>
 	<body>
 		<script>document.currentScript.parentElement.remove()</script>
