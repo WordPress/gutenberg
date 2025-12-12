@@ -24,19 +24,19 @@
 	scrollbar-gutter: auto;
 }
 
+// The table cells use an extra pixels of space left and right. We compensate for that here.
 .editor-list-view-sidebar__list-view-panel-content {
 	padding: $grid-unit-05;
-}
-
-// Match the Outline panel’s padding with the surrounding panels.
-.editor-list-view-sidebar__list-view-container > .document-outline {
-	padding: $grid-unit-20;
 }
 
 .editor-list-view-sidebar__list-view-container {
 	display: flex;
 	flex-direction: column;
 	height: 100%;
+
+	> .document-outline {
+		padding: $grid-unit-20;
+	}
 }
 
 .editor-list-view-sidebar__tab-panel {
