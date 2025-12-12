@@ -9,7 +9,6 @@ import {
 	store as editorStore,
 	privateApis as editorPrivateApis,
 } from '@wordpress/editor';
-import { getBlockTypes } from '@wordpress/blocks';
 import { generateGlobalStyles } from '@wordpress/global-styles-engine';
 
 /**
@@ -62,27 +61,24 @@ export function useSpecificEditorSettings() {
 	const onNavigateToPreviousEntityRecord =
 		useNavigateToPreviousEntityRecord();
 
-	// Generate global styles from merged config.
 	const [ globalStyles, globalSettings ] = useMemo( () => {
-		if ( ! mergedConfig?.styles || ! mergedConfig?.settings ) {
-			return [ [], {} ];
-		}
-
-		const blockTypes = getBlockTypes();
-		return generateGlobalStyles( mergedConfig, blockTypes, {
+		return generateGlobalStyles( mergedConfig, [], {
 			disableRootPadding: false,
 		} );
 	}, [ mergedConfig ] );
 
 	const defaultEditorSettings = useMemo( () => {
-		// Filter out global styles from base settings and merge with generated global styles
-		const nonGlobalStyles = ( settings.styles ?? [] ).filter(
-			( style ) => ! style.isGlobalStyles
-		);
+		// Exclude styles and __experimentalFeatures from base settings
+		// since we're generating fresh ones from the merged config
+		const {
+			styles: _,
+			__experimentalFeatures: __,
+			...baseSettings
+		} = settings;
+
 		return {
-			...settings,
+			...baseSettings,
 			styles: [
-				...nonGlobalStyles,
 				...globalStyles,
 				{
 					// Forming a "block formatting context" to prevent margin collapsing.
@@ -97,8 +93,7 @@ export function useSpecificEditorSettings() {
 							: undefined,
 				},
 			],
-			__experimentalFeatures:
-				globalSettings || settings.__experimentalFeatures,
+			__experimentalFeatures: globalSettings,
 			richEditingEnabled: true,
 			supportsTemplateMode: true,
 			focusMode: canvas !== 'view',
