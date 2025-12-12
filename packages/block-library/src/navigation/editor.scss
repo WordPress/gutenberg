@@ -650,9 +650,16 @@ body.editor-styles-wrapper .wp-block-navigation__responsive-container.is-menu-op
 	grid-column: span 2;
 }
 
+.wp-block-navigation__overlay-selector {
+	position: relative;
+}
+
 .wp-block-navigation__overlay-edit-button {
 	margin-top: $grid-unit-10;
 	width: fit-content;
+	position: absolute;
+	right: 0;
+	top: 0;
 }
 
 .wp-block-navigation__overlay-selector {

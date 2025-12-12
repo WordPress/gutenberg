@@ -205,7 +205,7 @@ export default function OverlayTemplatePartSelector( {
 			{ overlay && ( ! hasResolved || selectedTemplatePart ) && (
 				<Button
 					__next40pxDefaultSize
-					variant="secondary"
+					variant="link"
 					onClick={ handleEditClick }
 					disabled={ isEditButtonDisabled }
 					accessibleWhenDisabled
@@ -225,7 +225,7 @@ export default function OverlayTemplatePartSelector( {
 					}
 					className="wp-block-navigation__overlay-edit-button"
 				>
-					{ __( 'Edit' ) }
+					[{ __( 'Edit' ) }]
 				</Button>
 			) }
 		</div>
