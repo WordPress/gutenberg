@@ -22,13 +22,6 @@ if ( ! function_exists( 'the_gutenberg_experiments' ) ) {
 	 * @since 6.3.0
 	 */
 	function the_gutenberg_experiments() {
-		$block_editor_context = new WP_Block_Editor_Context( array( 'name' => 'core/edit-site' ) );
-		$custom_settings      = array(
-			'siteUrl' => site_url(),
-		);
-
-		$editor_settings = get_block_editor_settings( $custom_settings, $block_editor_context );
-
 		wp_register_style(
 			'wp-gutenberg-experiments',
 			gutenberg_url( 'build/edit-site/experiments.css' ),
@@ -37,12 +30,9 @@ if ( ! function_exists( 'the_gutenberg_experiments' ) ) {
 		wp_enqueue_style( 'wp-gutenberg-experiments' );
 		wp_add_inline_script(
 			'wp-edit-site',
-			sprintf(
-				'wp.domReady( function() {
-					wp.editSite.initializeExperiments( "gutenberg-experiments", %s );
-				} );',
-				wp_json_encode( $editor_settings )
-			)
+			'wp.domReady( function() {
+				wp.editSite.initializeExperiments( "gutenberg-experiments" );
+			} );',
 		);
 		wp_enqueue_script( 'wp-edit-site' );
 		wp_enqueue_media();
