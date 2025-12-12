@@ -44,7 +44,6 @@ export function useSpecificEditorSettings() {
 	const [ onNavigateToEntityRecord, initialBlockSelection ] =
 		useNavigateToEntityRecord();
 
-
 	// Get merged global styles config and generate styles directly
 	// This avoids reading from editorStore which causes infinite loops
 	const { merged: mergedConfig } = useGlobalStyles();
@@ -68,8 +67,10 @@ export function useSpecificEditorSettings() {
 	}, [ mergedConfig ] );
 
 	const defaultEditorSettings = useMemo( () => {
-		// Exclude styles and __experimentalFeatures from base settings
-		// since we're generating fresh ones from the merged config
+		/*
+		 * Exclude styles and __experimentalFeatures from base settings
+		 * since we're generating fresh ones from the merged config.
+		 */
 		const {
 			styles: _,
 			__experimentalFeatures: __,
