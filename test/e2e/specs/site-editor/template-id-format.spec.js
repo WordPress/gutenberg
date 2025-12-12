@@ -71,6 +71,12 @@ test.describe( 'Template ID Format', () => {
 		} );
 		await expect( editor.canvas.getByText( contentText ) ).toBeVisible();
 
+		// Ensure save button is enabled before saving.
+		const saveButton = page
+			.getByRole( 'region', { name: 'Editor top bar' } )
+			.getByRole( 'button', { name: 'Save' } );
+		await expect( saveButton ).toBeEnabled();
+
 		await editor.saveSiteEditorEntities( {
 			isOnlyCurrentEntityDirty:
 				! experiments.includes( 'active_templates' ),
@@ -85,6 +91,12 @@ test.describe( 'Template ID Format', () => {
 			attributes: { content: secondEditText },
 		} );
 		await expect( editor.canvas.getByText( secondEditText ) ).toBeVisible();
+
+		// Ensure save button is enabled before saving.
+		const secondSaveButton = page
+			.getByRole( 'region', { name: 'Editor top bar' } )
+			.getByRole( 'button', { name: 'Save' } );
+		await expect( secondSaveButton ).toBeEnabled();
 
 		await editor.saveSiteEditorEntities( {
 			isOnlyCurrentEntityDirty: true,
