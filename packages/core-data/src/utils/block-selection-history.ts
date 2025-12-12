@@ -9,7 +9,7 @@ import { Y } from '@wordpress/sync';
 /**
  * Internal dependencies
  */
-import { findBlockByClientIdInDoc } from './crdt';
+import { findBlockByClientIdInDoc } from './crdt-utils';
 import type { WPBlockSelection, WPSelection } from '../types';
 
 // Default size for selection history (not including current selection)

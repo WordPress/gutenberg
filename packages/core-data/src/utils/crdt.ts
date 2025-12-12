@@ -31,7 +31,8 @@ import {
 	CRDT_RECORD_MAP_KEY,
 	WORDPRESS_META_KEY_FOR_CRDT_DOC_PERSISTENCE,
 } from '../sync';
-import type { WPBlockSelection, WPSelection } from '../types';
+import type { WPSelection } from '../types';
+import { updateSelectionHistory } from './crdt-selection';
 import {
 	createYMap,
 	getRootMap,
@@ -39,13 +40,6 @@ import {
 	type YMapRecord,
 	type YMapWrap,
 } from './crdt-utils';
-import {
-	createBlockSelectionHistory,
-	YSelectionType,
-	type BlockSelectionHistory,
-	type YFullSelection,
-	type YSelection,
-} from './block-selection-history';
 
 // Changes that can be applied to a post entity record.
 export type PostChanges = Partial< Post > & {
@@ -264,8 +258,7 @@ export function applyPostChangesToCRDTDoc(
 		// Without this, selection history will already contain the latest
 		// selection (after this change) when the undo stack is saved.
 		setTimeout( () => {
-			const selectionHistory = getBlockSelectionHistory( ydoc );
-			selectionHistory.updateSelection( selection );
+			updateSelectionHistory( ydoc, selection );
 		}, 0 );
 	}
 }
@@ -465,153 +458,4 @@ function updateMapValue< T extends YMapRecord, K extends keyof T >(
 	if ( haveValuesChanged< T[ K ] >( currentValue, newValue ) ) {
 		map.set( key, newValue );
 	}
-}
-
-// WeakMap to store BlockSelectionHistory instances per Y.Doc
-const selectionHistoryMap = new WeakMap< CRDTDoc, BlockSelectionHistory >();
-
-/**
- * Get or create a BlockSelectionHistory instance for a given Y.Doc.
- * @param ydoc The Y.Doc to get the selection history for
- * @return The BlockSelectionHistory instance
- */
-function getBlockSelectionHistory( ydoc: CRDTDoc ): BlockSelectionHistory {
-	let history = selectionHistoryMap.get( ydoc );
-
-	if ( ! history ) {
-		history = createBlockSelectionHistory( ydoc );
-		selectionHistoryMap.set( ydoc, history );
-	}
-
-	return history;
-}
-
-export function getSelectionHistory( ydoc: CRDTDoc ): YFullSelection[] {
-	return getBlockSelectionHistory( ydoc ).getSelectionHistory();
-}
-
-/**
- * Given a Y.Doc and a selection history, find the most recent selection
- * that exists in the document. Skip any selections that are not in the document.
- * @param ydoc             The Y.Doc to find the selection in
- * @param selectionHistory The selection history to check
- * @return The most recent selection that exists in the document, or null if no selection exists.
- */
-export function findSelectionFromHistory(
-	ydoc: Y.Doc,
-	selectionHistory: YFullSelection[]
-): WPSelection | null {
-	// Try each position until we find one that exists in the document
-	for ( const positionToTry of selectionHistory ) {
-		const { start, end } = positionToTry;
-		const startBlock = findBlockByClientIdInDoc( start.clientId, ydoc );
-		const endBlock = findBlockByClientIdInDoc( end.clientId, ydoc );
-
-		if ( ! startBlock || ! endBlock ) {
-			// This block no longer exists, skip it.
-			continue;
-		}
-
-		const startBlockSelection = convertYSelectionToBlockSelection(
-			start,
-			ydoc
-		);
-		const endBlockSelection = convertYSelectionToBlockSelection(
-			end,
-			ydoc
-		);
-
-		if ( startBlockSelection === null || endBlockSelection === null ) {
-			continue;
-		}
-
-		return {
-			selectionStart: startBlockSelection,
-			selectionEnd: endBlockSelection,
-		};
-	}
-
-	return null;
-}
-
-/**
- * Convert a YSelection to a WPBlockSelection.
- * @param ySelection The YSelection (relative) to convert
- * @param ydoc       The Y.Doc to convert the selection to a block selection for
- * @return The converted WPBlockSelection, or null if the conversion fails
- */
-export function convertYSelectionToBlockSelection(
-	ySelection: YSelection,
-	ydoc: Y.Doc
-): WPBlockSelection | null {
-	if ( ySelection.type === YSelectionType.RelativeSelection ) {
-		const { relativePosition, attributeKey, clientId } = ySelection;
-
-		const absolutePosition = Y.createAbsolutePositionFromRelativePosition(
-			relativePosition,
-			ydoc
-		);
-
-		if ( absolutePosition ) {
-			return {
-				clientId,
-				attributeKey,
-				offset: absolutePosition.index,
-			};
-		}
-	} else if ( ySelection.type === YSelectionType.BlockSelection ) {
-		return {
-			clientId: ySelection.clientId,
-			attributeKey: undefined,
-			offset: undefined,
-		};
-	}
-
-	return null;
-}
-
-/**
- * Given a block ID and a Y.Doc, find the block in the document.
- * @param blockId The block ID to find
- * @param ydoc    The Y.Doc to find the block in
- * @return The block, or null if the block is not found
- */
-export function findBlockByClientIdInDoc(
-	blockId: string,
-	ydoc: Y.Doc
-): YBlock | null {
-	const ymap = getRootMap< YPostRecord >( ydoc, CRDT_RECORD_MAP_KEY );
-	const blocks = ymap.get( 'blocks' );
-
-	if ( ! ( blocks instanceof Y.Array ) ) {
-		return null;
-	}
-
-	return findBlockByClientIdInBlocks( blockId, blocks );
-}
-
-function findBlockByClientIdInBlocks(
-	blockId: string,
-	blocks: YBlocks
-): YBlock | null {
-	for ( const block of blocks ) {
-		if ( block.get( 'clientId' ) === blockId ) {
-			return block;
-		}
-
-		const innerBlocks = block.get( 'innerBlocks' );
-
-		if ( innerBlocks && innerBlocks.length > 0 ) {
-			const innerBlock = findBlockByClientIdInBlocks(
-				blockId,
-				innerBlocks
-			);
-
-			if ( innerBlock ) {
-				return innerBlock;
-			}
-		}
-	}
-
-	return null;
 }

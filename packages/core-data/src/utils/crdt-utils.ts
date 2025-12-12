@@ -4,6 +4,13 @@
 import { Y } from '@wordpress/sync';
 
 /**
+ * Internal dependencies
+ */
+import type { YBlock, YBlocks } from './crdt-blocks';
+import type { YPostRecord } from './crdt';
+import { CRDT_RECORD_MAP_KEY } from '../sync';
+
+/**
  * A YMapRecord represents the shape of the data stored in a Y.Map.
  */
 export type YMapRecord = Record< string, unknown >;
@@ -74,4 +81,51 @@ export function isYMap< T extends YMapRecord >(
 	value: YMapWrap< T > | undefined
 ): value is YMapWrap< T > {
 	return value instanceof Y.Map;
+}
+
+/**
+ * Given a block ID and a Y.Doc, find the block in the document.
+ *
+ * @param blockId The block ID to find
+ * @param ydoc    The Y.Doc to find the block in
+ * @return The block, or null if the block is not found
+ */
+export function findBlockByClientIdInDoc(
+	blockId: string,
+	ydoc: Y.Doc
+): YBlock | null {
+	const ymap = getRootMap< YPostRecord >( ydoc, CRDT_RECORD_MAP_KEY );
+	const blocks = ymap.get( 'blocks' );
+
+	if ( ! ( blocks instanceof Y.Array ) ) {
+		return null;
+	}
+
+	return findBlockByClientIdInBlocks( blockId, blocks );
+}
+
+function findBlockByClientIdInBlocks(
+	blockId: string,
+	blocks: YBlocks
+): YBlock | null {
+	for ( const block of blocks ) {
+		if ( block.get( 'clientId' ) === blockId ) {
+			return block;
+		}
+
+		const innerBlocks = block.get( 'innerBlocks' );
+
+		if ( innerBlocks && innerBlocks.length > 0 ) {
+			const innerBlock = findBlockByClientIdInBlocks(
+				blockId,
+				innerBlocks
+			);
+
+			if ( innerBlock ) {
+				return innerBlock;
+			}
+		}
+	}
+
+	return null;
 }
