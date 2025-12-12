@@ -161,7 +161,12 @@ export function createSyncManager(): SyncManager {
 		if ( ! undoManager ) {
 			undoManager = createUndoManager();
 		}
-		undoManager.addToScope( recordMap );
+
+		const { addUndoMeta, restoreUndoMeta } = handlers;
+		undoManager.addToScope( recordMap, {
+			addUndoMeta,
+			restoreUndoMeta,
+		} );
 
 		const entityState: EntityState = {
 			handlers,
