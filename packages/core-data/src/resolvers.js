@@ -26,6 +26,7 @@ import {
 	isNumericID,
 } from './utils';
 import { fetchBlockPatterns } from './fetch';
+import { restoreSelection, getSelectionHistory } from './utils/crdt-selection';
 
 /**
  * Requests authors from the REST API.
@@ -191,7 +192,7 @@ export const getEntityRecord =
 						objectId,
 						recordWithTransients,
 						{
-							// Handle edits sourced from the sync manager.
+							// Directly handle edits sourced from the sync manager.
 							editRecord: ( edits ) => {
 								if ( ! Object.keys( edits ).length ) {
 									return;
@@ -231,6 +232,36 @@ export const getEntityRecord =
 									name,
 									key
 								);
+							},
+							addUndoMeta: ( ydoc, meta ) => {
+								const selectionHistory =
+									getSelectionHistory( ydoc );
+
+								if ( selectionHistory ) {
+									meta.set(
+										'selectionHistory',
+										selectionHistory
+									);
+								}
+							},
+							restoreUndoMeta: ( ydoc, meta ) => {
+								const selectionHistory =
+									meta.get( 'selectionHistory' );
+
+								if ( selectionHistory ) {
+									// Because Yjs initiates an undo, we need to
+									// wait until the content is restored before
+									// we can update the selection.
+									// Use queueMicrotask() to wait until content is
+									// finished updating, and then set the correct
+									// selection.
+									setTimeout( () => {
+										restoreSelection(
+											selectionHistory,
+											ydoc
+										);
+									}, 0 );
+								}
 							},
 						}
 					);
