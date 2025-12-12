@@ -118,6 +118,7 @@ export default function LinkPreview( {
 			<Flex gap={ 0 }>
 				<Flex
 					className="block-editor-link-control__link-information"
+					role="figure"
 					aria-label={
 						/* translators: Accessibility text for the link preview when editing a link. */
 						__( 'Link information' )
