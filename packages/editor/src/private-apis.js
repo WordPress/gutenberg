@@ -2,6 +2,11 @@
  * WordPress dependencies
  */
 import * as interfaceApis from '@wordpress/interface';
+import {
+	CreateTemplatePartModal,
+	patternTitleField,
+	templateTitleField,
+} from '@wordpress/fields';
 
 /**
  * Internal dependencies
@@ -18,17 +23,16 @@ import usePostFields from './components/post-fields';
 import ToolsMoreMenuGroup from './components/more-menu/tools-more-menu-group';
 import ViewMoreMenuGroup from './components/more-menu/view-more-menu-group';
 import ResizableEditor from './components/resizable-editor';
-import {
-	CreateTemplatePartModal,
-	patternTitleField,
-	templateTitleField,
-} from '@wordpress/fields';
 import { registerCoreBlockBindingsSources } from './bindings/api';
 import { getTemplateInfo } from './utils/get-template-info';
 import GlobalStylesUIWrapper from './components/global-styles';
 import { StyleBookPreview } from './components/style-book';
 import { useGlobalStyles, useStyle } from './components/global-styles/hooks';
 import { GlobalStylesActionMenu } from './components/global-styles/menu';
+import {
+	StyleVariationSelector,
+	useStyleVariations,
+} from './components/global-styles/style-variation-selector';
 import {
 	useGenerateBlockPath,
 	useRestoreBlockFromPath,
@@ -57,6 +61,8 @@ lock( privateApis, {
 	// Global Styles
 	GlobalStylesUIWrapper,
 	GlobalStylesActionMenu,
+	StyleVariationSelector,
+	useStyleVariations,
 	StyleBookPreview,
 	useGlobalStyles,
 	useStyle,
