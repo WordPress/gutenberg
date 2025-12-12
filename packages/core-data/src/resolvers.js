@@ -27,7 +27,7 @@ import {
 } from './utils';
 import { fetchBlockPatterns } from './fetch';
 import { getSelectionHistory } from './utils/crdt';
-import { restoreSelection } from './utils/selection';
+import { restoreSelection } from './utils/crdt-selection';
 
 /**
  * Requests authors from the REST API.
