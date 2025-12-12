@@ -147,7 +147,7 @@ export default function useMerge( clientId, onMerge ) {
 
 			const blockOrder = getBlockOrder( clientId );
 			if (
-				isUnmodifiedBlock( getBlock( clientId ) ) &&
+				isUnmodifiedBlock( getBlock( clientId ), 'content' ) &&
 				blockOrder.length > 0
 			) {
 				registry.batch( () => {
