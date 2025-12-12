@@ -123,6 +123,7 @@ export default function LinkPreview( {
 						/* translators: Accessibility text for the link preview when editing a link. */
 						__( 'Link information' )
 					}
+					justify="start"
 				>
 					<Flex
 						className={ clsx(
