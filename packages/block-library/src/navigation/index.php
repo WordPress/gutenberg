@@ -662,6 +662,11 @@ class WP_Navigation_Block_Renderer {
 			$has_overlay_close_block = static::has_navigation_overlay_close_block( $overlay_blocks );
 			// Render template part blocks directly without navigation container wrapper.
 			$overlay_blocks_html = static::get_template_part_blocks_html( $overlay_blocks );
+			// Add Interactivity API directives to the overlay close block if present.
+			if ( $has_overlay_close_block && $is_interactive ) {
+				$tags              = new WP_HTML_Tag_Processor( $overlay_blocks_html );
+				$overlay_blocks_html = block_core_navigation_add_directives_to_overlay_close( $tags );
+			}
 		}
 
 		// Build the content markup with desktop and overlay containers.
@@ -963,6 +968,29 @@ if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
 		$parsed_blocks           = block_core_navigation_parse_blocks_from_menu_items( $menu_items_by_parent_id[0], $menu_items_by_parent_id );
 		return new WP_Block_List( $parsed_blocks, $attributes );
 	}
+}
+
+/**
+ * Add Interactivity API directives to the navigation-overlay-close block
+ * markup using the Tag Processor.
+ *
+ * @since 6.5.0
+ *
+ * @param WP_HTML_Tag_Processor $tags Markup of the navigation block.
+ * @return string Overlay close markup with the directives injected.
+ */
+function block_core_navigation_add_directives_to_overlay_close( $tags ) {
+	// Find the navigation-overlay-close button.
+	if ( $tags->next_tag(
+		array(
+			'tag_name'   => 'BUTTON',
+			'class_name' => 'wp-block-navigation-overlay-close',
+		)
+	) ) {
+		// Add the same close directive as the default close button.
+		$tags->set_attribute( 'data-wp-on--click', 'actions.closeMenuOnClick' );
+	}
+	return $tags->get_updated_html();
 }
 
 /**
