@@ -40,12 +40,13 @@ import {
 	type YMapWrap,
 } from './crdt-utils';
 import type {
+	BlockSelectionHistory,
 	YFullSelection,
 	YSelection,
 	YSelectionHistory,
 } from './block-selection-history';
 import {
-	BlockSelectionHistory,
+	createBlockSelectionHistory,
 	YSelectionType,
 } from './block-selection-history';
 
@@ -481,7 +482,7 @@ function getBlockSelectionHistory( ydoc: CRDTDoc ): BlockSelectionHistory {
 	let history = selectionHistoryMap.get( ydoc );
 
 	if ( ! history ) {
-		history = new BlockSelectionHistory( ydoc );
+		history = createBlockSelectionHistory( ydoc );
 		selectionHistoryMap.set( ydoc, history );
 	}
 

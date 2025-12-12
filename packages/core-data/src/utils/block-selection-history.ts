@@ -44,32 +44,46 @@ export interface YSelectionHistory {
 	backupSelections?: YFullSelection[];
 }
 
+export interface BlockSelectionHistory {
+	getCurrentSelection: () => YFullSelection | null;
+	getSelectionHistory: () => YFullSelection[];
+	updateSelection: ( newSelection: WPSelection ) => void;
+}
+
 /**
  * This class is used to track recent block selections to help in restoring
  * a user's selection after an undo or redo operation.
  *
  * Maintains a history array for previous selections, which can be used for
  * backup restoration locations.
+ * @param ydoc
+ * @param historySize
  */
-export class BlockSelectionHistory {
-	private historySize: number;
-	private history: YFullSelection[] = [];
-	private ydoc: Y.Doc;
+export function createBlockSelectionHistory(
+	ydoc: Y.Doc,
+	historySize: number = SELECTION_HISTORY_DEFAULT_SIZE
+): BlockSelectionHistory {
+	let history: YFullSelection[] = [];
 
-	constructor(
-		ydoc: Y.Doc,
-		historySize: number = SELECTION_HISTORY_DEFAULT_SIZE
-	) {
-		this.ydoc = ydoc;
-		this.historySize = historySize;
-		this.history = [];
-	}
+	/**
+	 * Get the current selection (most recent selection in the current block).
+	 */
+	const getCurrentSelection = () => {
+		return history[ 0 ] ?? null;
+	};
+
+	/**
+	 * Get the block history (previous blocks only, not current or last selection).
+	 */
+	const getSelectionHistory = () => {
+		return history.slice( 1, historySize + 1 );
+	};
 
 	/**
 	 * Update the selection history with a new selection.
 	 * @param newSelection
 	 */
-	public updateSelection( newSelection: WPSelection ): void {
+	const updateSelection = ( newSelection: WPSelection ) => {
 		if (
 			! newSelection?.selectionStart?.clientId ||
 			! newSelection?.selectionEnd?.clientId
@@ -78,25 +92,14 @@ export class BlockSelectionHistory {
 		}
 
 		const { selectionStart, selectionEnd } = newSelection;
-		const start = this.convertWPBlockSelectionToSelection( selectionStart );
-		const end = this.convertWPBlockSelectionToSelection( selectionEnd );
+		const start = convertWPBlockSelectionToSelection(
+			selectionStart,
+			ydoc
+		);
+		const end = convertWPBlockSelectionToSelection( selectionEnd, ydoc );
 
-		this.addToHistory( { start, end } );
-	}
-
-	/**
-	 * Get the current selection (most recent selection in the current block).
-	 */
-	public getCurrentSelection(): YFullSelection | null {
-		return this.history[ 0 ] ?? null;
-	}
-
-	/**
-	 * Get the block history (previous blocks only, not current or last selection).
-	 */
-	public getSelectionHistory(): YFullSelection[] {
-		return this.history.slice( 1, this.historySize + 1 );
-	}
+		addToHistory( { start, end } );
+	};
 
 	/**
 	 * Add a selection to the history, maintaining only the last `historySize` unique selections.
@@ -104,12 +107,12 @@ export class BlockSelectionHistory {
 	 * Removes any existing entries with the same start and end block combination.
 	 * @param yFullSelection
 	 */
-	private addToHistory( yFullSelection: YFullSelection ): void {
+	const addToHistory = ( yFullSelection: YFullSelection ) => {
 		// Remove any existing entries with the same start and end block combination
 		const startClientId = yFullSelection.start.clientId;
 		const endClientId = yFullSelection.end.clientId;
 
-		this.history = this.history.filter( ( entry ) => {
+		history = history.filter( ( entry ) => {
 			const isSameBlockCombination =
 				entry.start.clientId === startClientId &&
 				entry.end.clientId === endClientId;
@@ -118,56 +121,64 @@ export class BlockSelectionHistory {
 		} );
 
 		// Add the new selection to the front
-		this.history.unshift( yFullSelection );
+		history.unshift( yFullSelection );
 
 		// Trim to max size (remove oldest entries from the back)
-		if ( this.history.length > this.historySize + 1 ) {
-			this.history = this.history.slice( 0, this.historySize + 1 );
+		if ( history.length > historySize + 1 ) {
+			history = history.slice( 0, historySize + 1 );
 		}
-	}
+	};
 
-	/**
-	 * Convert a WPBlockSelection to a YSelection.
-	 * @param selection
-	 * @return A YSelection object.
-	 */
-	private convertWPBlockSelectionToSelection(
-		selection: WPBlockSelection
-	): YSelection {
-		const clientId = selection.clientId;
-		const block = findBlockByClientIdInDoc( clientId, this.ydoc );
-		const attributes = block?.get( 'attributes' );
-		const attributeKey = selection.attributeKey;
+	return {
+		getCurrentSelection,
+		getSelectionHistory,
+		updateSelection,
+	};
+}
 
-		const changedYText = attributeKey
-			? attributes?.get( attributeKey )
-			: undefined;
+/**
+ * Convert a WPBlockSelection to a YSelection.
+ * @param selection
+ * @param ydoc
+ * @return A YSelection object.
+ */
+function convertWPBlockSelectionToSelection(
+	selection: WPBlockSelection,
+	ydoc: Y.Doc
+): YSelection {
+	const clientId = selection.clientId;
+	const block = findBlockByClientIdInDoc( clientId, ydoc );
+	const attributes = block?.get( 'attributes' );
+	const attributeKey = selection.attributeKey;
 
-		const isYText = changedYText instanceof Y.Text;
-		const isFullyDefinedSelection = attributeKey && clientId;
+	const changedYText = attributeKey
+		? attributes?.get( attributeKey )
+		: undefined;
 
-		if ( ! isYText || ! isFullyDefinedSelection ) {
-			// We either don't have a valid YText (it's been deleted) or we've
-			// been passed a selection that's just a block clientId.
-			// Store as BlockSelection.
-			return {
-				type: YSelectionType.BlockSelection,
-				clientId,
-			};
-		}
+	const isYText = changedYText instanceof Y.Text;
+	const isFullyDefinedSelection = attributeKey && clientId;
 
-		const offset = selection.offset ?? 0;
-		const relativePosition = Y.createRelativePositionFromTypeIndex(
-			changedYText,
-			offset
-		);
-
+	if ( ! isYText || ! isFullyDefinedSelection ) {
+		// We either don't have a valid YText (it's been deleted) or we've
+		// been passed a selection that's just a block clientId.
+		// Store as BlockSelection.
 		return {
-			type: YSelectionType.RelativeSelection,
-			attributeKey,
-			relativePosition,
+			type: YSelectionType.BlockSelection,
 			clientId,
-			offset,
 		};
 	}
+
+	const offset = selection.offset ?? 0;
+	const relativePosition = Y.createRelativePositionFromTypeIndex(
+		changedYText,
+		offset
+	);
+
+	return {
+		type: YSelectionType.RelativeSelection,
+		attributeKey,
+		relativePosition,
+		clientId,
+		offset,
+	};
 }

@@ -7,9 +7,10 @@ import * as Y from 'yjs';
  * Internal dependencies
  */
 import {
-	BlockSelectionHistory,
+	createBlockSelectionHistory,
 	YSelectionType,
 	type YRelativeSelection,
+	type BlockSelectionHistory,
 } from '../block-selection-history';
 import { CRDT_RECORD_MAP_KEY } from '../../sync';
 import type { WPSelection } from '../../types';
@@ -83,7 +84,7 @@ describe( 'BlockSelectionHistory', () => {
 
 	beforeEach( () => {
 		ydoc = createTestDoc();
-		history = new BlockSelectionHistory( ydoc, 5 );
+		history = createBlockSelectionHistory( ydoc, 5 );
 	} );
 
 	afterEach( () => {
@@ -309,7 +310,7 @@ describe( 'BlockSelectionHistory', () => {
 		} );
 
 		test( 'should respect history size limit', () => {
-			const smallHistory = new BlockSelectionHistory( ydoc, 3 );
+			const smallHistory = createBlockSelectionHistory( ydoc, 3 );
 
 			// Add more selections than history size
 			for ( let i = 1; i <= 5; i++ ) {
