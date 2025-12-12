@@ -135,7 +135,11 @@ export function createSyncManager(): SyncManager {
 			} );
 		};
 
-		undoManager.addToScope( recordMap );
+		const { addUndoMeta, restoreUndoMeta } = handlers;
+		undoManager.addToScope( recordMap, {
+			addUndoMeta,
+			restoreUndoMeta,
+		} );
 
 		const entityState: EntityState = {
 			handlers,
