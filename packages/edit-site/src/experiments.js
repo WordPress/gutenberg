@@ -16,7 +16,7 @@ import { store as editSiteStore } from './store';
 import ExperimentsApp from './components/experiments-app';
 
 /**
- * Initializes the "Posts Dashboard"
+ * Initializes the "Experiments Dashboard"
  * @param {string} id       ID of the root element to render the screen in.
  * @param {Object} settings Editor settings.
  */
