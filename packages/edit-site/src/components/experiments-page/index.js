@@ -7,15 +7,45 @@ import {
 	__experimentalHStack as HStack,
 } from '@wordpress/components';
 import { DataForm } from '@wordpress/dataviews';
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { useEntityRecord } from '@wordpress/core-data';
+import { useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import { Page } from '@wordpress/admin-ui';
+import { useExperiments } from '../experiments-context';
+
+/**
+ * Group labels for experiment categories.
+ */
+const GROUP_LABELS = {
+	blocks: _x( 'Blocks', 'experiment group' ),
+	media: _x( 'Media', 'experiment group' ),
+	collaboration: _x( 'Collaboration', 'experiment group' ),
+	'data-views': _x( 'Data Views', 'experiment group' ),
+	interactivity: _x( 'Interactivity', 'experiment group' ),
+	'content-only': _x( 'contentOnly', 'experiment group' ),
+	other: _x( 'Other', 'experiment group' ),
+};
+
+/**
+ * Order in which groups should appear.
+ */
+const GROUP_ORDER = [
+	'blocks',
+	'media',
+	'collaboration',
+	'data-views',
+	'interactivity',
+	'content-only',
+	'other',
+];
 
 export default function ExperimentsPage() {
+	const experiments = useExperiments();
+
 	const {
 		editedRecord: siteSettings,
 		save: saveSettings,
@@ -47,6 +77,48 @@ export default function ExperimentsPage() {
 	const allSettingsAreDisabled = Object.values( settings ).every(
 		( value ) => value === false
 	);
+
+	// Generate fields from experiments passed from PHP.
+	const fields = useMemo( () => {
+		if ( ! experiments || ! experiments.length ) {
+			return [];
+		}
+		return experiments.map( ( experiment ) => ( {
+			Edit: 'checkbox',
+			id: experiment.id,
+			label: experiment.label,
+			description: experiment.description,
+			type: 'boolean',
+		} ) );
+	}, [ experiments ] );
+
+	// Generate form groups from experiments.
+	const formFields = useMemo( () => {
+		if ( ! experiments || ! experiments.length ) {
+			return [];
+		}
+
+		// Group experiments by their group property.
+		const groupedExperiments = {};
+		experiments.forEach( ( experiment ) => {
+			const group = experiment.group || 'other';
+			if ( ! groupedExperiments[ group ] ) {
+				groupedExperiments[ group ] = [];
+			}
+			groupedExperiments[ group ].push( experiment.id );
+		} );
+
+		// Create form field groups in the defined order.
+		return GROUP_ORDER.filter(
+			( groupId ) => groupedExperiments[ groupId ]
+		).map( ( groupId ) => ( {
+			id: `gutenberg-experiments--${ groupId }`,
+			label: GROUP_LABELS[ groupId ] || groupId,
+			type: 'group',
+			labelPosition: 'side',
+			children: groupedExperiments[ groupId ],
+		} ) );
+	}, [ experiments ] );
 
 	if ( ! settings ) {
 		return <Spinner />;
@@ -88,225 +160,9 @@ export default function ExperimentsPage() {
 			<div className="experiments-page__form">
 				<DataForm
 					data={ settings }
-					fields={ [
-						{
-							Edit: 'checkbox',
-							id: 'gutenberg-block-experiments',
-							label: __( 'Add experimental blocks' ),
-							description: __(
-								'Enables experimental blocks on a rolling basis as they are developed. (Warning: these blocks may have significant changes during development that cause validation errors and display issues.)'
-							),
-							type: 'boolean',
-						},
-						{
-							Edit: 'checkbox',
-							id: 'gutenberg-form-blocks',
-							label: __( 'Add Form and input blocks' ),
-							description: __(
-								'Enables new blocks to allow building forms. You are likely to experience UX issues that are being addressed.'
-							),
-							type: 'boolean',
-						},
-						{
-							Edit: 'checkbox',
-							id: 'gutenberg-grid-interactivity',
-							label: __( 'Add Grid interactivity' ),
-							description: __(
-								'Enables enhancements to the Grid block that let you move and resize items in the editor canvas.'
-							),
-							type: 'boolean',
-						},
-						{
-							Edit: 'checkbox',
-							id: 'gutenberg-no-tinymce',
-							label: __( 'Disable TinyMCE and Classic block' ),
-							description: __(
-								'Disables the TinyMCE and Classic block.'
-							),
-							type: 'boolean',
-						},
-						{
-							Edit: 'checkbox',
-							id: 'gutenberg-customizable-navigation-overlays',
-							label: __( 'Customizable Navigation Overlays' ),
-							description: __(
-								'Enables custom mobile overlay design and content control for Navigation blocks, allowing you to create flexible, professional menu experiences.'
-							),
-							type: 'boolean',
-						},
-						{
-							Edit: 'checkbox',
-							id: 'gutenberg-hide-blocks-based-on-screen-size',
-							label: __( 'Hide blocks based on screen size' ),
-							description: __(
-								'Extends block visibility block supports with responsive design controls for hiding blocks based on screen size.'
-							),
-							type: 'boolean',
-						},
-						{
-							Edit: 'checkbox',
-							id: 'gutenberg-media-processing',
-							label: __( 'Client-side media processing' ),
-							description: __(
-								"Enables client-side media processing to leverage the browser's capabilities to handle tasks like image resizing and compression."
-							),
-							type: 'boolean',
-						},
-						{
-							Edit: 'checkbox',
-							id: 'gutenberg-sync-collaboration',
-							label: __( 'Add real time editing' ),
-							description: __(
-								'Enables live collaboration and offline persistence between peers.'
-							),
-							type: 'boolean',
-						},
-						{
-							Edit: 'checkbox',
-							id: 'gutenberg-color-randomizer',
-							label: __( 'Color randomizer' ),
-							description: __(
-								'Enables the Global Styles color randomizer in the Site Editor; a utility that lets you mix the current color palette pseudo-randomly.'
-							),
-							type: 'boolean',
-						},
-						{
-							Edit: 'checkbox',
-							id: 'gutenberg-new-posts-dashboard',
-							label: __( 'Enable for Posts' ),
-							description: __(
-								'Enables a redesigned posts dashboard accessible through a submenu item in the Gutenberg plugin.'
-							),
-							type: 'boolean',
-						},
-						{
-							Edit: 'checkbox',
-							id: 'gutenberg-quick-edit-dataviews',
-							label: __( 'Add Quick Edit' ),
-							description: __(
-								'Enables access to a Quick Edit panel in the Site Editor Pages experience.'
-							),
-							type: 'boolean',
-						},
-						{
-							Edit: 'checkbox',
-							id: 'gutenberg-dataviews-media-modal',
-							label: __( 'New media modal' ),
-							description: __(
-								'Enables a new media modal experience powered by Data Views for improved media library management.'
-							),
-							type: 'boolean',
-						},
-						{
-							Edit: 'checkbox',
-							id: 'gutenberg-full-page-client-side-navigation',
-							label: __( 'Full-page client-side navigation' ),
-							description: __(
-								'Enables full-page client-side navigation, powered by the Interactivity API.'
-							),
-							type: 'boolean',
-						},
-						{
-							Edit: 'checkbox',
-							id: 'gutenberg-content-only-pattern-insertion',
-							label: __(
-								'Make patterns contentOnly by default upon insertion'
-							),
-							description: __(
-								'When patterns are inserted, default to a simplified content only mode for editing pattern content.'
-							),
-							type: 'boolean',
-						},
-						{
-							Edit: 'checkbox',
-							id: 'gutenberg-content-only-inspector-fields',
-							label: __( 'Enable editable inspector fields' ),
-							description: __(
-								'Enables editable inspector fields (media, links, alt text, etc.) in the content-only pattern editing interface. Requires "Make patterns contentOnly by default upon insertion" to be enabled.'
-							),
-							type: 'boolean',
-						},
-						{
-							Edit: 'checkbox',
-							id: 'gutenberg-workflow-palette',
-							label: __( 'Workflow Palette' ),
-							description: __(
-								'Enables the Workflow Palette for running workflows composed of abilities, from a unified interface.'
-							),
-							type: 'boolean',
-						},
-					] }
+					fields={ fields }
 					form={ {
-						fields: [
-							{
-								id: 'gutenberg-experiments--blocks',
-								label: 'Blocks',
-								type: 'group',
-								labelPosition: 'side',
-								children: [
-									'gutenberg-block-experiments',
-									'gutenberg-form-blocks',
-									'gutenberg-grid-interactivity',
-									'gutenberg-no-tinymce',
-									'gutenberg-customizable-navigation-overlays',
-									'gutenberg-hide-blocks-based-on-screen-size',
-								],
-							},
-							{
-								id: 'gutenberg-experiments--media',
-								label: 'Media',
-								type: 'group',
-								labelPosition: 'side',
-								children: [ 'gutenberg-media-processing' ],
-							},
-							{
-								id: 'gutenberg-experiments--collaboration',
-								label: 'Collaboration',
-								type: 'group',
-								labelPosition: 'side',
-								children: [ 'gutenberg-sync-collaboration' ],
-							},
-							{
-								id: 'gutenberg-experiments--data-views',
-								label: 'Data Views',
-								type: 'group',
-								labelPosition: 'side',
-								children: [
-									'gutenberg-new-posts-dashboard',
-									'gutenberg-quick-edit-dataviews',
-									'gutenberg-dataviews-media-modal',
-								],
-							},
-							{
-								id: 'gutenberg-experiments--interactivity',
-								label: 'Interactivity',
-								type: 'group',
-								labelPosition: 'side',
-								children: [
-									'gutenberg-full-page-client-side-navigation',
-								],
-							},
-							{
-								id: 'gutenberg-experiments--content-only',
-								label: 'contentOnly',
-								type: 'group',
-								labelPosition: 'side',
-								children: [
-									'gutenberg-content-only-pattern-insertion',
-									'gutenberg-content-only-inspector-fields',
-								],
-							},
-							{
-								id: 'gutenberg-experiments--other',
-								label: 'Other',
-								type: 'group',
-								labelPosition: 'side',
-								children: [
-									'gutenberg-color-randomizer',
-									'gutenberg-workflow-palette',
-								],
-							},
-						],
+						fields: formFields,
 						labelPosition: 'side',
 						type: 'regular',
 					} }

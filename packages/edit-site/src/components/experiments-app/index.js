@@ -11,17 +11,20 @@ import Layout from '../layout';
 import { useRegisterExperimentsAppRoutes } from '../experiments-app-routes';
 import { unlock } from '../../lock-unlock';
 import { store as editSiteStore } from '../../store';
+import { ExperimentsProvider } from '../experiments-context';
 
 const { RouterProvider } = unlock( routerPrivateApis );
 
-export default function ExperimentsApp() {
+export default function ExperimentsApp( { experiments } ) {
 	useRegisterExperimentsAppRoutes();
 	const routes = useSelect( ( select ) => {
 		return unlock( select( editSiteStore ) ).getRoutes();
 	}, [] );
 	return (
-		<RouterProvider routes={ routes }>
-			<Layout />
-		</RouterProvider>
+		<ExperimentsProvider value={ experiments }>
+			<RouterProvider routes={ routes }>
+				<Layout />
+			</RouterProvider>
+		</ExperimentsProvider>
 	);
 }

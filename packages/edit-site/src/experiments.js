@@ -10,9 +10,10 @@ import ExperimentsApp from './components/experiments-app';
 
 /**
  * Initializes the "Experiments Dashboard"
- * @param {string} id ID of the root element to render the screen in.
+ * @param {string} id          ID of the root element to render the screen in.
+ * @param {Array}  experiments Array of experiment definitions from PHP.
  */
-export function initializeExperiments( id ) {
+export function initializeExperiments( id, experiments ) {
 	if ( ! globalThis.IS_GUTENBERG_PLUGIN ) {
 		return;
 	}
@@ -21,7 +22,7 @@ export function initializeExperiments( id ) {
 
 	root.render(
 		<StrictMode>
-			<ExperimentsApp />
+			<ExperimentsApp experiments={ experiments } />
 		</StrictMode>
 	);
 
