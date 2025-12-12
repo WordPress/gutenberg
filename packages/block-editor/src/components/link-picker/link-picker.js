@@ -80,6 +80,7 @@ export function LinkPicker( {
 			<Button
 				ref={ anchorRef }
 				onClick={ () => setIsOpen( ! isOpen ) }
+				aria-haspopup="dialog"
 				aria-expanded={ isOpen }
 				aria-describedby={ controlProps[ 'aria-describedby' ] }
 				variant="secondary"
