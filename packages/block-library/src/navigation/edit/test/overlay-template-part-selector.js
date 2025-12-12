@@ -8,20 +8,41 @@ import userEvent from '@testing-library/user-event';
  * WordPress dependencies
  */
 import { useEntityRecords } from '@wordpress/core-data';
+import { useDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import OverlayTemplatePartSelector from '../overlay-template-part-selector';
+import useCreateOverlayTemplatePart from '../use-create-overlay';
 
 // Mock useEntityRecords
-jest.mock( '@wordpress/core-data', () => {
-	const actual = jest.requireActual( '@wordpress/core-data' );
-	return {
-		...actual,
-		useEntityRecords: jest.fn(),
-	};
-} );
+jest.mock( '@wordpress/core-data', () => ( {
+	useEntityRecords: jest.fn(),
+	store: {},
+} ) );
+
+// Mock useCreateOverlayTemplatePart hook
+jest.mock( '../use-create-overlay', () => ( {
+	__esModule: true,
+	default: jest.fn(),
+} ) );
+
+// Mock useDispatch specifically to avoid needing to set up full data store
+jest.mock( '@wordpress/data', () => ( {
+	useDispatch: jest.fn(),
+	createSelector: jest.fn( ( fn ) => fn ),
+	createRegistrySelector: jest.fn( ( fn ) => fn ),
+	createReduxStore: jest.fn( () => ( {} ) ),
+	combineReducers: jest.fn( ( reducers ) => ( state = {}, action ) => {
+		const newState = {};
+		Object.keys( reducers ).forEach( ( key ) => {
+			newState[ key ] = reducers[ key ]( state[ key ], action );
+		} );
+		return newState;
+	} ),
+	register: jest.fn(),
+} ) );
 
 const mockSetAttributes = jest.fn();
 const mockOnNavigateToEntityRecord = jest.fn();
@@ -69,12 +90,22 @@ const allTemplateParts = [
 ];
 
 describe( 'OverlayTemplatePartSelector', () => {
+	const mockCreateOverlayTemplatePart = jest.fn();
+	const mockCreateErrorNotice = jest.fn();
+
 	beforeEach( () => {
 		jest.clearAllMocks();
 		useEntityRecords.mockReturnValue( {
 			records: [],
 			isResolving: false,
 			hasResolved: false,
+		} );
+		useCreateOverlayTemplatePart.mockReturnValue(
+			mockCreateOverlayTemplatePart
+		);
+		// Mock useDispatch to return createErrorNotice for noticesStore
+		useDispatch.mockReturnValue( {
+			createErrorNotice: mockCreateErrorNotice,
 		} );
 	} );
 
@@ -399,6 +430,9 @@ describe( 'OverlayTemplatePartSelector', () => {
 			expect(
 				screen.getByText( 'No overlays found.' )
 			).toBeInTheDocument();
+			expect(
+				screen.getByRole( 'button', { name: 'Create new?' } )
+			).toBeInTheDocument();
 		} );
 
 		it( 'should show default help text when overlays are available', () => {
@@ -415,6 +449,98 @@ describe( 'OverlayTemplatePartSelector', () => {
 					'Select an overlay to use for the navigation.'
 				)
 			).toBeInTheDocument();
+			expect(
+				screen.getByRole( 'button', { name: 'Create new?' } )
+			).toBeInTheDocument();
+		} );
+	} );
+
+	describe( 'Create overlay', () => {
+		it( 'should call createOverlayTemplatePart when create button is clicked', async () => {
+			const user = userEvent.setup();
+			const newOverlay = {
+				id: 'twentytwentyfive//overlay',
+				theme: 'twentytwentyfive',
+				slug: 'overlay',
+				title: {
+					rendered: 'Overlay',
+				},
+				area: 'overlay',
+			};
+
+			mockCreateOverlayTemplatePart.mockResolvedValue( newOverlay );
+
+			useEntityRecords.mockReturnValue( {
+				records: [],
+				isResolving: false,
+				hasResolved: true,
+			} );
+
+			render( <OverlayTemplatePartSelector { ...defaultProps } /> );
+
+			const createButton = screen.getByRole( 'button', {
+				name: 'Create new?',
+			} );
+
+			await user.click( createButton );
+
+			expect( mockCreateOverlayTemplatePart ).toHaveBeenCalled();
+			expect( mockSetAttributes ).toHaveBeenCalledWith( {
+				overlay: 'twentytwentyfive//overlay',
+			} );
+			expect( mockOnNavigateToEntityRecord ).toHaveBeenCalledWith( {
+				postId: 'twentytwentyfive//overlay',
+				postType: 'wp_template_part',
+			} );
+		} );
+
+		it( 'should show error notice when creation fails', async () => {
+			const user = userEvent.setup();
+
+			const error = new Error( 'Failed to create overlay' );
+			error.code = 'create_error';
+
+			mockCreateOverlayTemplatePart.mockRejectedValue( error );
+
+			useEntityRecords.mockReturnValue( {
+				records: [],
+				isResolving: false,
+				hasResolved: true,
+			} );
+
+			render( <OverlayTemplatePartSelector { ...defaultProps } /> );
+
+			const createButton = screen.getByRole( 'button', {
+				name: 'Create new?',
+			} );
+
+			await user.click( createButton );
+
+			// Wait for async operations
+			await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
+
+			expect( mockCreateErrorNotice ).toHaveBeenCalledWith(
+				'Failed to create overlay',
+				{ type: 'snackbar' }
+			);
+			expect( mockSetAttributes ).not.toHaveBeenCalled();
+			expect( mockOnNavigateToEntityRecord ).not.toHaveBeenCalled();
+		} );
+
+		it( 'should disable create button when overlays are resolving', () => {
+			useEntityRecords.mockReturnValue( {
+				records: [],
+				isResolving: true,
+				hasResolved: false,
+			} );
+
+			render( <OverlayTemplatePartSelector { ...defaultProps } /> );
+
+			const createButton = screen.getByRole( 'button', {
+				name: 'Create new?',
+			} );
+
+			expect( createButton ).toHaveAttribute( 'aria-disabled', 'true' );
 		} );
 	} );
 } );

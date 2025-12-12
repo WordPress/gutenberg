@@ -7,7 +7,7 @@ import {
 	useCallback,
 	createInterpolateElement,
 } from '@wordpress/element';
-import { useEntityRecords, store as coreStore } from '@wordpress/core-data';
+import { useEntityRecords } from '@wordpress/core-data';
 import { useDispatch } from '@wordpress/data';
 import { SelectControl, Button } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
@@ -18,7 +18,7 @@ import { store as noticesStore } from '@wordpress/notices';
  * Internal dependencies
  */
 import { createTemplatePartId } from '../../template-part/edit/utils/create-template-part-id';
-import { getUniqueTemplatePartTitle, getCleanTemplatePartSlug } from './utils';
+import useCreateOverlayTemplatePart from './use-create-overlay';
 
 /**
  * Overlay Template Part Selector component.
@@ -42,7 +42,6 @@ export default function OverlayTemplatePartSelector( {
 		per_page: -1,
 	} );
 
-	const { saveEntityRecord } = useDispatch( coreStore );
 	const { createErrorNotice } = useDispatch( noticesStore );
 
 	// Track if we're currently creating a new overlay
@@ -57,6 +56,10 @@ export default function OverlayTemplatePartSelector( {
 			( templatePart ) => templatePart.area === 'overlay'
 		);
 	}, [ templateParts ] );
+
+	// Hook to create overlay template part
+	const createOverlayTemplatePart =
+		useCreateOverlayTemplatePart( overlayTemplateParts );
 
 	// Build options for SelectControl
 	const options = useMemo( () => {
@@ -121,34 +124,6 @@ export default function OverlayTemplatePartSelector( {
 			postType: 'wp_template_part',
 		} );
 	};
-
-	// Create a new overlay template part
-	const createOverlayTemplatePart = useCallback( async () => {
-		// Generate unique name using only overlay area template parts
-		// Filter to only include template parts with titles for uniqueness check
-		const templatePartsWithTitles = overlayTemplateParts.filter(
-			( templatePart ) => templatePart.title?.rendered
-		);
-		const uniqueTitle = getUniqueTemplatePartTitle(
-			__( 'Overlay' ),
-			templatePartsWithTitles
-		);
-		const cleanSlug = getCleanTemplatePartSlug( uniqueTitle );
-
-		// Create the template part
-		const templatePart = await saveEntityRecord(
-			'postType',
-			'wp_template_part',
-			{
-				slug: cleanSlug,
-				title: uniqueTitle,
-				area: 'overlay',
-			},
-			{ throwOnError: true }
-		);
-
-		return templatePart;
-	}, [ overlayTemplateParts, saveEntityRecord ] );
 
 	const handleCreateOverlay = useCallback( async () => {
 		try {
