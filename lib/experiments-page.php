@@ -6,7 +6,7 @@
  *
  * ## Creating a New Experiment
  *
- * To add a new experiment, simply add it to the array in `gutenberg_get_experiment_definitions()`:
+ * To add a new experiment, add it to the array in `gutenberg_get_experiment_definitions()`:
  *
  * ```php
  * array(
@@ -35,12 +35,12 @@
  */
 
 /**
- * Get all experiment definitions.
+ * Get all experiment definitions. Add your new experiments here.
  *
  * @return array Array of experiment definitions.
  */
 function gutenberg_get_experiment_definitions() {
-	$definitions = array(
+	return array(
 		array(
 			'id'          => 'gutenberg-block-experiments',
 			'title'       => __( 'Blocks: add experimental blocks', 'gutenberg' ),
@@ -133,16 +133,12 @@ function gutenberg_get_experiment_definitions() {
 			'category'    => 'styling',
 		),
 	);
-
-	/**
-	 * Filter experiment definitions.
-	 *
-	 * Allows external plugins to add experiments.
-	 *
-	 * @param array $definitions Array of experiment definitions.
-	 */
-	return apply_filters( 'gutenberg_experiment_definitions', $definitions );
 }
+
+/*
+ * END CONFIGURATION.
+ * If you're not adding new experiments, you can stop here.
+ */
 
 if ( ! function_exists( 'the_gutenberg_experiments' ) ) {
 	/**
@@ -897,6 +893,9 @@ function gutenberg_display_experiment_category_section( $args ) {
 	}
 }
 
+/**
+ * CUSTOM FILTERS AND ACTIONS.
+ */
 add_action( 'admin_init', 'gutenberg_handle_template_activate_setting_submission' );
 function gutenberg_handle_template_activate_setting_submission() {
 	if ( ! isset( $_POST['option_page'] ) || 'gutenberg-experiments' !== $_POST['option_page'] ) {
