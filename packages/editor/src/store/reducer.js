@@ -433,6 +433,24 @@ export function canvasMinHeight( state = 0, action ) {
 	return state;
 }
 
+/**
+ * Reducer for the currently selected style variation ID.
+ * When 0, the main global styles are being edited.
+ *
+ * @param {number} state  Current state.
+ * @param {Object} action Dispatched action.
+ * @return {number} Updated state.
+ */
+export function selectedStyleVariationId( state = 0, action ) {
+	switch ( action.type ) {
+		case 'SET_SELECTED_STYLE_VARIATION_ID':
+			return action.id;
+		case 'RESET_STYLES_NAVIGATION':
+			return 0;
+	}
+	return state;
+}
+
 export default combineReducers( {
 	postId,
 	postType,
@@ -455,5 +473,6 @@ export default combineReducers( {
 	stylesPath,
 	showStylebook,
 	canvasMinHeight,
+	selectedStyleVariationId,
 	dataviews: dataviewsReducer,
 } );
