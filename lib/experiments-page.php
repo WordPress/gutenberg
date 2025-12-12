@@ -32,7 +32,7 @@ if ( ! function_exists( 'the_gutenberg_experiments' ) ) {
 			'wp-edit-site',
 			'wp.domReady( function() {
 				wp.editSite.initializeExperiments( "gutenberg-experiments" );
-			} );',
+			} );'
 		);
 		wp_enqueue_script( 'wp-edit-site' );
 		wp_enqueue_media();
