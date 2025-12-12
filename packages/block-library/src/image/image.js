@@ -200,7 +200,6 @@ function ContentOnlyControls( {
 									</>
 								)
 							}
-							__nextHasNoMarginBottom
 						/>
 					</div>
 				</Popover>
@@ -832,7 +831,6 @@ export default function Image( {
 										</>
 									)
 								}
-								__nextHasNoMarginBottom
 							/>
 						</ToolsPanelItem>
 					) }
