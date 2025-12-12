@@ -7,7 +7,6 @@ import { createRoot, StrictMode } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import './hooks';
 import { store as editSiteStore } from './store';
 
 /**

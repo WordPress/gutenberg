@@ -13,7 +13,7 @@ import { useEntityRecord } from '@wordpress/core-data';
 /**
  * Internal dependencies
  */
-import Page from '../page';
+import { Page } from '@wordpress/admin-ui';
 
 export default function ExperimentsPage() {
 	const {
