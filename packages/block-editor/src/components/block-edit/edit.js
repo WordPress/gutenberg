@@ -100,10 +100,10 @@ const EditWithGeneratedProps = ( props ) => {
 			),
 		};
 	}, [
-		name,
 		blockType?.usesContext,
 		blockContext,
 		attributes?.metadata?.bindings,
+		bindableAttributes,
 		registeredSources,
 	] );
 
@@ -180,7 +180,6 @@ const EditWithGeneratedProps = ( props ) => {
 			blockBindings,
 			clientId,
 			context,
-			name,
 			registeredSources,
 		]
 	);
@@ -262,7 +261,6 @@ const EditWithGeneratedProps = ( props ) => {
 			hasPatternOverrides,
 			setAttributes,
 			registeredSources,
-			name,
 			registry,
 		]
 	);

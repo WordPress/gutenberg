@@ -163,6 +163,21 @@ function TableRow< Item >( {
 			}
 			aria-posinset={ posinset }
 			role={ infiniteScrollEnabled ? 'article' : undefined }
+			onMouseDown={ ( event ) => {
+				// Firefox has a unique feature where ctrl/cmd + click selects a
+				// table cell. This interferes with the bulk selection behavior,
+				// so this code prevents it.
+				const isMetaClick = isAppleOS() ? event.metaKey : event.ctrlKey;
+				if (
+					event.button === 0 &&
+					isMetaClick &&
+					window.navigator.userAgent
+						.toLowerCase()
+						.includes( 'firefox' )
+				) {
+					event?.preventDefault();
+				}
+			} }
 			onClick={ ( event ) => {
 				if ( ! hasPossibleBulkAction ) {
 					return;
@@ -405,12 +420,18 @@ function ViewTable< Item >( {
 						<col className="dataviews-view-table__col-checkbox" />
 					) }
 					{ hasPrimaryColumn && (
-						<col className="dataviews-view-table__col-primary" />
+						<col className="dataviews-view-table__col-first-data" />
 					) }
-					{ columns.map( ( column ) => (
+					{ columns.map( ( column, index ) => (
 						<col
 							key={ `col-${ column }` }
-							className={ `dataviews-view-table__col-${ column }` }
+							className={ clsx(
+								`dataviews-view-table__col-${ column }`,
+								{
+									'dataviews-view-table__col-first-data':
+										! hasPrimaryColumn && index === 0,
+								}
+							) }
 						/>
 					) ) }
 					{ !! actions?.length && (

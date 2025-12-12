@@ -2,7 +2,7 @@
  * External dependencies
  */
 import clsx from 'clsx';
-import type { ComponentProps, ReactElement } from 'react';
+import type { ComponentProps, ReactElement, HTMLAttributes } from 'react';
 
 /**
  * WordPress dependencies
@@ -19,7 +19,7 @@ import {
 import { __, sprintf } from '@wordpress/i18n';
 import { useInstanceId } from '@wordpress/compose';
 import { isAppleOS } from '@wordpress/keycodes';
-import { useContext } from '@wordpress/element';
+import { useContext, forwardRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -50,7 +50,7 @@ function chunk< T >( array: T[], size: number ): T[][] {
 	return chunks;
 }
 
-interface GridItemProps< Item > {
+interface GridItemProps< Item > extends HTMLAttributes< HTMLDivElement > {
 	view: ViewGridType;
 	selection: string[];
 	onChangeSelection: SetSelection;
@@ -75,24 +75,28 @@ interface GridItemProps< Item > {
 	};
 }
 
-function GridItem< Item >( {
-	view,
-	selection,
-	onChangeSelection,
-	onClickItem,
-	isItemClickable,
-	renderItemLink,
-	getItemId,
-	item,
-	actions,
-	mediaField,
-	titleField,
-	descriptionField,
-	regularFields,
-	badgeFields,
-	hasBulkActions,
-	config,
-}: GridItemProps< Item > ) {
+const GridItem = forwardRef( function GridItem< Item >(
+	{
+		view,
+		selection,
+		onChangeSelection,
+		onClickItem,
+		isItemClickable,
+		renderItemLink,
+		getItemId,
+		item,
+		actions,
+		mediaField,
+		titleField,
+		descriptionField,
+		regularFields,
+		badgeFields,
+		hasBulkActions,
+		config,
+		...props
+	}: GridItemProps< Item >,
+	ref: React.ForwardedRef< HTMLDivElement >
+) {
 	const { showTitle = true, showMedia = true, showDescription = true } = view;
 	const hasBulkAction = useHasAPossibleBulkAction( actions, item );
 	const id = getItemId( item );
@@ -129,12 +133,19 @@ function GridItem< Item >( {
 	}
 	return (
 		<VStack
+			{ ...props }
+			ref={ ref }
 			spacing={ 0 }
-			key={ id }
-			className={ clsx( 'dataviews-view-grid__card', {
-				'is-selected': hasBulkAction && isSelected,
-			} ) }
+			className={ clsx(
+				props.className,
+				'dataviews-view-grid__row__gridcell',
+				'dataviews-view-grid__card',
+				{
+					'is-selected': hasBulkAction && isSelected,
+				}
+			) }
 			onClickCapture={ ( event ) => {
+				props.onClickCapture?.( event );
 				if ( isAppleOS() ? event.metaKey : event.ctrlKey ) {
 					event.stopPropagation();
 					event.preventDefault();
@@ -270,7 +281,11 @@ function GridItem< Item >( {
 			</VStack>
 		</VStack>
 	);
-}
+} ) as < Item >(
+	props: GridItemProps< Item > & {
+		ref?: React.ForwardedRef< HTMLDivElement >;
+	}
+) => JSX.Element;
 
 interface CompositeGridProps< Item > {
 	data: Item[];
@@ -383,10 +398,9 @@ export default function CompositeGrid< Item >( {
 						return (
 							<Composite.Item
 								key={ getItemId( item ) }
-								render={
-									<div
-										id={ getItemId( item ) }
-										className="dataviews-view-grid__row__gridcell"
+								render={ ( props ) => (
+									<GridItem
+										{ ...props }
 										role={
 											isInfiniteScroll
 												? 'article'
@@ -402,33 +416,26 @@ export default function CompositeGrid< Item >( {
 												? index + 1
 												: undefined
 										}
-									>
-										<GridItem
-											view={ view }
-											selection={ selection }
-											onChangeSelection={
-												onChangeSelection
-											}
-											onClickItem={ onClickItem }
-											isItemClickable={ isItemClickable }
-											renderItemLink={ renderItemLink }
-											getItemId={ getItemId }
-											item={ item }
-											actions={ actions }
-											mediaField={ mediaField }
-											titleField={ titleField }
-											descriptionField={
-												descriptionField
-											}
-											regularFields={ regularFields }
-											badgeFields={ badgeFields }
-											hasBulkActions={ hasBulkActions }
-											config={ {
-												sizes: size,
-											} }
-										/>
-									</div>
-								}
+										view={ view }
+										selection={ selection }
+										onChangeSelection={ onChangeSelection }
+										onClickItem={ onClickItem }
+										isItemClickable={ isItemClickable }
+										renderItemLink={ renderItemLink }
+										getItemId={ getItemId }
+										item={ item }
+										actions={ actions }
+										mediaField={ mediaField }
+										titleField={ titleField }
+										descriptionField={ descriptionField }
+										regularFields={ regularFields }
+										badgeFields={ badgeFields }
+										hasBulkActions={ hasBulkActions }
+										config={ {
+											sizes: size,
+										} }
+									/>
+								) }
 							/>
 						);
 					} ) }

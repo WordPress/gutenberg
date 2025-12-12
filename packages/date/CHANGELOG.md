@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 5.36.0 (2025-11-26)
+
 ### Bug Fixes
 
 -   Fixed incorrect TypeScript types for `TimezoneConfig`'s `offset` type (was incorrectly `string`, now `number`)

@@ -1265,6 +1265,115 @@ test.describe( 'Navigation block', () => {
 			} );
 		} );
 
+		test( 'can unsync a bound link and edit it via canvas link editing', async ( {
+			editor,
+			page,
+			admin,
+			navigation,
+			requestUtils,
+			pageUtils,
+		} ) => {
+			await test.step( 'Setup - Create menu and navigation block with bound page link', async () => {
+				await admin.createNewPost();
+
+				// Create an empty menu for use - avoids Page List block
+				const menu = await requestUtils.createNavigationMenu( {
+					title: 'Test Menu',
+					content: '',
+				} );
+
+				await editor.insertBlock( {
+					name: 'core/navigation',
+					attributes: {
+						ref: menu.id,
+					},
+				} );
+
+				// Insert a link to a Page
+				await expect( navigation.getNavBlockInserter() ).toBeVisible();
+				await pageUtils.pressKeys( 'ArrowDown' );
+				await navigation.useBlockInserter();
+				await navigation.addPage( 'Test Page 1' );
+				await pageUtils.pressKeys( 'ArrowLeft', { times: 2 } );
+			} );
+
+			await test.step( 'Verify link starts as Page Link block type', async () => {
+				// Verify the block is a "Page Link" block type
+				const navLinkBlock = navigation
+					.getNavBlock()
+					.getByRole( 'document', {
+						name: 'Block: Page Link',
+					} )
+					.first();
+
+				await expect( navLinkBlock ).toBeVisible();
+			} );
+
+			await test.step( 'Unsync link and change to custom URL via canvas link editing', async () => {
+				// Open Link UI via keyboard shortcut
+				await pageUtils.pressKeys( 'primary+k' );
+
+				const linkPopover = navigation.getLinkPopover();
+				await expect( linkPopover ).toBeVisible();
+
+				// Click Edit button to see form fields
+				await linkPopover
+					.getByRole( 'button', { name: 'Edit' } )
+					.click();
+
+				// Verify link is initially disabled (synced to page)
+				const linkInput = linkPopover.getByRole( 'combobox', {
+					name: 'Link',
+				} );
+				await expect( linkInput ).toBeDisabled();
+
+				// Click "Unsync and edit" button
+				const unsyncButton = linkPopover.getByRole( 'button', {
+					name: 'Unsync and edit',
+				} );
+				await unsyncButton.click();
+
+				// Verify Link field becomes enabled
+				await expect( linkInput ).toBeEnabled();
+
+				// Clear and type a custom URL
+				await linkInput.clear();
+				await linkInput.fill( 'https://example.com' );
+
+				// Click Apply button
+				await linkPopover
+					.getByRole( 'button', { name: 'Apply' } )
+					.click();
+
+				// Verify the link popover preview uses the custom URL
+				await expect( linkPopover ).toContainText( 'example.com' );
+
+				// Close popover with Escape
+				await page.keyboard.press( 'Escape' );
+			} );
+
+			await test.step( 'Verify link is now Custom Link block type', async () => {
+				// Verify the block is now a "Custom Link" block type
+				const customLinkBlock = navigation
+					.getNavBlock()
+					.getByRole( 'document', {
+						name: 'Block: Custom Link',
+					} )
+					.first();
+
+				await expect( customLinkBlock ).toBeVisible();
+
+				// Verify "Page Link" block is no longer present
+				const pageLinkBlock = navigation
+					.getNavBlock()
+					.getByRole( 'document', {
+						name: 'Block: Page Link',
+					} );
+
+				await expect( pageLinkBlock ).toBeHidden();
+			} );
+		} );
+
 		test( 'existing links with id but no binding remain editable', async ( {
 			editor,
 			page,

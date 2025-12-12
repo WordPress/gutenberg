@@ -102,7 +102,7 @@ export default function PostCardPanel( {
 			<HStack
 				spacing={ 2 }
 				className="editor-post-card-panel__header"
-				align="flex-start"
+				alignment="flex-start"
 			>
 				<Icon className="editor-post-card-panel__icon" icon={ icon } />
 				<Text

@@ -480,7 +480,6 @@ export default function Edit( { attributes, setAttributes } ) {
 			<InspectorControls>
 				<PanelBody title={ __( 'Settings', 'copyright-date-block' ) }>
 					<TextControl
-					    __nextHasNoMarginBottom
 						__next40pxDefaultSize
 						label={ __(
 							'Starting year',
@@ -542,7 +541,6 @@ export default function Edit( { attributes, setAttributes } ) {
 					/>
 					{ showStartingYear && (
 						<TextControl
-							__nextHasNoMarginBottom
 							__next40pxDefaultSize
 							label={ __(
 								'Starting year',

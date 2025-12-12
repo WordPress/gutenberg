@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 6.36.0 (2025-11-26)
+
 ### Bug Fixes
 
 -   Return a deep-clone object from `getServerState` and `getServerContext` functions. ([#73437](https://github.com/WordPress/gutenberg/pull/73437))

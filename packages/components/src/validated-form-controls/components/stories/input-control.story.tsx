@@ -42,16 +42,7 @@ export default meta;
 
 export const Default: StoryObj< typeof ValidatedInputControl > = {
 	render: function Template( { onChange, ...args } ) {
-		const [ value, setValue ] =
-			useState<
-				React.ComponentProps< typeof ValidatedInputControl >[ 'value' ]
-			>( '' );
-		const [ customValidity, setCustomValidity ] =
-			useState<
-				React.ComponentProps<
-					typeof ValidatedInputControl
-				>[ 'customValidity' ]
-			>( undefined );
+		const [ value, setValue ] = useState< string | undefined >( '' );
 
 		return (
 			<ValidatedInputControl
@@ -61,17 +52,14 @@ export const Default: StoryObj< typeof ValidatedInputControl > = {
 					setValue( newValue );
 					onChange?.( newValue, ...rest );
 				} }
-				onValidate={ ( v ) => {
-					if ( v?.toLowerCase() === 'error' ) {
-						setCustomValidity( {
-							type: 'invalid',
-							message: 'The word "error" is not allowed.',
-						} );
-					} else {
-						setCustomValidity( undefined );
-					}
-				} }
-				customValidity={ customValidity }
+				customValidity={
+					value?.toLowerCase() === 'error'
+						? {
+								type: 'invalid',
+								message: 'The word "error" is not allowed.',
+						  }
+						: undefined
+				}
 			/>
 		);
 	},
@@ -89,17 +77,8 @@ Default.args = {
  */
 export const Password: StoryObj< typeof ValidatedInputControl > = {
 	render: function Template( { onChange, ...args } ) {
-		const [ value, setValue ] =
-			useState<
-				React.ComponentProps< typeof ValidatedInputControl >[ 'value' ]
-			>( '' );
+		const [ value, setValue ] = useState< string | undefined >( '' );
 		const [ visible, setVisible ] = useState( false );
-		const [ customValidity, setCustomValidity ] =
-			useState<
-				React.ComponentProps<
-					typeof ValidatedInputControl
-				>[ 'customValidity' ]
-			>( undefined );
 
 		return (
 			<ValidatedInputControl
@@ -122,34 +101,30 @@ export const Password: StoryObj< typeof ValidatedInputControl > = {
 					setValue( newValue );
 					onChange?.( newValue, ...rest );
 				} }
-				onValidate={ ( v ) => {
-					if ( ! /\d/.test( v ?? '' ) ) {
-						setCustomValidity( {
-							type: 'invalid',
+				customValidity={ ( () => {
+					if ( ! /\d/.test( value ?? '' ) ) {
+						return {
+							type: 'invalid' as const,
 							message:
 								'Password must include at least one number.',
-						} );
-						return;
+						};
 					}
-					if ( ! /[A-Z]/.test( v ?? '' ) ) {
-						setCustomValidity( {
-							type: 'invalid',
+					if ( ! /[A-Z]/.test( value ?? '' ) ) {
+						return {
+							type: 'invalid' as const,
 							message:
 								'Password must include at least one capital letter.',
-						} );
-						return;
+						};
 					}
-					if ( ! /[!@£$%^&*#]/.test( v ?? '' ) ) {
-						setCustomValidity( {
-							type: 'invalid',
+					if ( ! /[!@£$%^&*#]/.test( value ?? '' ) ) {
+						return {
+							type: 'invalid' as const,
 							message:
 								'Password must include at least one symbol.',
-						} );
-						return;
+						};
 					}
-					setCustomValidity( undefined );
-				} }
-				customValidity={ customValidity }
+					return undefined;
+				} )() }
 			/>
 		);
 	},

@@ -8,10 +8,8 @@ import { combineReducers } from '@wordpress/data';
  */
 import type { Ability, AbilityCategory } from '../types';
 import {
-	RECEIVE_ABILITIES,
 	REGISTER_ABILITY,
 	UNREGISTER_ABILITY,
-	RECEIVE_CATEGORIES,
 	REGISTER_ABILITY_CATEGORY,
 	UNREGISTER_ABILITY_CATEGORY,
 } from './constants';
@@ -78,15 +76,31 @@ function sanitizeCategory( category: any ): AbilityCategory {
 		);
 }
 
-interface AbilitiesAction {
-	type: string;
-	abilities?: Ability[];
-	ability?: Ability;
-	categories?: AbilityCategory[];
-	category?: AbilityCategory;
-	name?: string;
-	slug?: string;
+interface RegisterAbilityAction {
+	type: typeof REGISTER_ABILITY;
+	ability: Ability;
 }
+
+interface UnregisterAbilityAction {
+	type: typeof UNREGISTER_ABILITY;
+	name: string;
+}
+
+interface RegisterAbilityCategoryAction {
+	type: typeof REGISTER_ABILITY_CATEGORY;
+	category: AbilityCategory;
+}
+
+interface UnregisterAbilityCategoryAction {
+	type: typeof UNREGISTER_ABILITY_CATEGORY;
+	slug: string;
+}
+
+type AbilitiesAction = RegisterAbilityAction | UnregisterAbilityAction;
+
+type AbilitiesCategoryAction =
+	| RegisterAbilityCategoryAction
+	| UnregisterAbilityCategoryAction;
 
 const DEFAULT_STATE: Record< string, Ability > = {};
 
@@ -102,16 +116,6 @@ function abilitiesByName(
 	action: AbilitiesAction
 ): Record< string, Ability > {
 	switch ( action.type ) {
-		case RECEIVE_ABILITIES: {
-			if ( ! action.abilities ) {
-				return state;
-			}
-			const newState: Record< string, Ability > = {};
-			action.abilities.forEach( ( ability ) => {
-				newState[ ability.name ] = sanitizeAbility( ability );
-			} );
-			return newState;
-		}
 		case REGISTER_ABILITY: {
 			if ( ! action.ability ) {
 				return state;
@@ -122,7 +126,7 @@ function abilitiesByName(
 			};
 		}
 		case UNREGISTER_ABILITY: {
-			if ( ! action.name || ! state[ action.name ] ) {
+			if ( ! state[ action.name ] ) {
 				return state;
 			}
 			const { [ action.name ]: _, ...newState } = state;
@@ -144,19 +148,9 @@ const DEFAULT_CATEGORIES_STATE: Record< string, AbilityCategory > = {};
  */
 function categoriesBySlug(
 	state: Record< string, AbilityCategory > = DEFAULT_CATEGORIES_STATE,
-	action: AbilitiesAction
+	action: AbilitiesCategoryAction
 ): Record< string, AbilityCategory > {
 	switch ( action.type ) {
-		case RECEIVE_CATEGORIES: {
-			if ( ! action.categories ) {
-				return state;
-			}
-			const newState: Record< string, AbilityCategory > = {};
-			action.categories.forEach( ( category ) => {
-				newState[ category.slug ] = sanitizeCategory( category );
-			} );
-			return newState;
-		}
 		case REGISTER_ABILITY_CATEGORY: {
 			if ( ! action.category ) {
 				return state;
@@ -167,7 +161,7 @@ function categoriesBySlug(
 			};
 		}
 		case UNREGISTER_ABILITY_CATEGORY: {
-			if ( ! action.slug || ! state[ action.slug ] ) {
+			if ( ! state[ action.slug ] ) {
 				return state;
 			}
 			const { [ action.slug ]: _, ...newState } = state;

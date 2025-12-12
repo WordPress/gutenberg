@@ -3,12 +3,11 @@
  */
 import {
 	get,
-	inGamut,
+	toGamut,
 	OKLCH,
-	P3,
 	sRGB,
-	type ColorTypes,
-	type ColorObject,
+	type PlainColorObject,
+	type ColorSpace,
 } from 'colorjs.io/fn';
 
 /**
@@ -17,7 +16,7 @@ import {
 import './register-color-spaces';
 
 export interface TaperChromaOptions {
-	gamut?: 'p3' | 'srgb'; // target gamut (default "p3")
+	gamut?: ColorSpace; // target gamut (default `sRGB`)
 	alpha?: number; // base fraction of Cmax at target (default 0.62)
 	carry?: number; // seed vividness carry exponent β in [0..1] (default 0.5)
 	cUpperBound?: number; // hard search cap for C (default 0.45)
@@ -41,12 +40,11 @@ export interface TaperChromaOptions {
  * @param options
  */
 export function taperChroma(
-	seed: ColorTypes, // already OKLCH
+	seed: PlainColorObject, // already OKLCH
 	lTarget: number, // [0..1]
 	options: TaperChromaOptions = {}
-): { l: number; c: number } | ColorObject {
-	const gamut = options.gamut ?? 'p3';
-	const gamutSpace = gamut === 'p3' ? P3 : sRGB;
+): { l: number; c: number } | PlainColorObject {
+	const gamut = options.gamut ?? sRGB;
 	const alpha = options.alpha ?? 0.65; // 0.7-0.8 works well for accent surface
 	const carry = options.carry ?? 0.5;
 	const cUpperBound = options.cUpperBound ?? 0.45;
@@ -68,24 +66,20 @@ export function taperChroma(
 		} else {
 			// Respect achromatic intent: grayscale at target L
 			return {
-				spaceId: 'oklch',
+				space: OKLCH,
 				coords: [ clamp01( lTarget ), 0, 0 ],
+				alpha: 1,
 			};
 		}
 	}
 
 	// Capacity at seed and target
 	const lSeed = clamp01( get( seed, [ OKLCH, 'l' ] ) );
-	const cmaxSeed = getCachedMaxChromaAtLH(
-		lSeed,
-		hSeed,
-		gamutSpace,
-		cUpperBound
-	);
+	const cmaxSeed = getCachedMaxChromaAtLH( lSeed, hSeed, gamut, cUpperBound );
 	const cmaxTarget = getCachedMaxChromaAtLH(
 		clamp01( lTarget ),
 		hSeed,
-		gamutSpace,
+		gamut,
 		cUpperBound
 	);
 
@@ -106,20 +100,10 @@ export function taperChroma(
 		kLight,
 		kDark,
 	} );
-	let cPlanned = cWithCarry * t;
+	const cPlanned = cWithCarry * t;
 
 	// Downward-only clamp (preserve L & H)
 	const lOut = clamp01( lTarget );
-	const candidate: ColorTypes = {
-		spaceId: 'oklch',
-		coords: [ lOut, cPlanned, hSeed ],
-	};
-	if ( ! inGamut( candidate, gamutSpace ) ) {
-		const cap = Math.min( cPlanned, cUpperBound );
-		cPlanned = getCachedMaxChromaAtLH( lOut, hSeed, gamutSpace, cap );
-	}
-
-	cPlanned = Math.min( cPlanned, cSeed );
 
 	return { l: lOut, c: cPlanned };
 }
@@ -181,19 +165,14 @@ function continuousTaper(
 /* ---- chroma-capacity queries with small caches ---- */
 
 const maxChromaCache = new Map< string, number >();
-
-function keyMax(
-	l: number,
-	h: number,
-	gamut: 'p3' | 'srgb',
-	cap: number
-): string {
+function keyMax( l: number, h: number, gamut: string, cap: number ): string {
 	// Quantize to keep cache compact
-	const lq = quantize( l, 1e-3 );
-	const hq = quantize( normalizeHue( h ), 1e-1 );
-	const cq = quantize( cap, 1e-3 );
+	const lq = quantize( l, 0.05 );
+	const hq = quantize( normalizeHue( h ), 10 );
+	const cq = quantize( cap, 0.05 );
 	return `${ gamut }|L:${ lq }|H:${ hq }|cap:${ cq }`;
 }
+
 function quantize( x: number, step: number ): number {
 	const k = Math.round( x / step );
 	return k * step;
@@ -202,10 +181,10 @@ function quantize( x: number, step: number ): number {
 function getCachedMaxChromaAtLH(
 	l: number,
 	h: number,
-	gamutSpace: typeof P3 | typeof sRGB,
+	gamutSpace: ColorSpace,
 	cap: number
 ): number {
-	const gamut = gamutSpace === P3 ? 'p3' : 'srgb';
+	const gamut = gamutSpace.id;
 	const key = keyMax( l, h, gamut, cap );
 	const hit = maxChromaCache.get( key );
 	if ( typeof hit === 'number' ) {
@@ -218,7 +197,7 @@ function getCachedMaxChromaAtLH(
 }
 
 /**
- * Binary-search the max in-gamut chroma at fixed (L,H) in the target gamut
+ * Find the max in-gamut chroma at fixed (L,H) in the target gamut
  * @param l
  * @param h
  * @param gamutSpace
@@ -227,28 +206,18 @@ function getCachedMaxChromaAtLH(
 function maxInGamutChromaAtLH(
 	l: number,
 	h: number,
-	gamutSpace: typeof P3 | typeof sRGB,
+	gamutSpace: ColorSpace,
 	cap: number
 ): number {
-	let lo = 0;
-	let hi = cap;
-	let ok = 0;
+	// Construct a color with maximum chroma.
+	const probe: PlainColorObject = {
+		space: OKLCH,
+		coords: [ l, cap, h ],
+		alpha: 1,
+	};
 
-	const lFixed = clamp01( l );
-	const hFixed = normalizeHue( h );
+	// Let `toGamut` reduce the chroma to the gamut maximum.
+	const clamped = toGamut( probe, { space: gamutSpace, method: 'css' } );
 
-	for ( let i = 0; i < 18; i++ ) {
-		const mid = ( lo + hi ) / 2;
-		const probe: ColorTypes = {
-			spaceId: 'oklch',
-			coords: [ lFixed, mid, hFixed ],
-		};
-		if ( inGamut( probe, gamutSpace ) ) {
-			ok = mid;
-			lo = mid;
-		} else {
-			hi = mid;
-		}
-	}
-	return ok;
+	return get( clamped, [ OKLCH, 'c' ] );
 }

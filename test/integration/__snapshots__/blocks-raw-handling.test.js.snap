@@ -20,6 +20,8 @@ exports[`Blocks raw handling pasteHandler google-docs-table-with-rowspan 1`] = `
 
 exports[`Blocks raw handling pasteHandler google-docs-with-comments 1`] = `"This is a <strong>title</strong><br><br>This is a <em>heading</em><br><br>Formatting test: <strong>bold</strong>, <em>italic</em>, <a href="https://w.org/">link</a>, <s>strikethrough</s>, <sup>superscript</sup>, <sub>subscript</sub>, <strong><em>nested</em></strong>.<br><br>A<br>Bulleted<br>Indented<br>List<br><br>One<br>Two<br>Three<br><br><br><br><br>One<br>Two<br>Three<br>1<br>2<br>3<br>I<br>II<br>III<br><br><br><br><br><br>An image:<br><br><img src="https://lh4.googleusercontent.com/ID" width="544" height="184"><br><br>"`;
 
+exports[`Blocks raw handling pasteHandler grok-markdown 1`] = `"Heading<br>This is a paragraph with <strong>bold text</strong> and <em>italic text</em>.<br>Subheading<br>Another paragraph with a <a href="https://example.com">link</a>."`;
+
 exports[`Blocks raw handling pasteHandler gutenberg 1`] = `"Test"`;
 
 exports[`Blocks raw handling pasteHandler iframe-embed 1`] = `""`;

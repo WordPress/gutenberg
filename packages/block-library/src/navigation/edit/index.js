@@ -34,11 +34,7 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import {
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
-	__experimentalToggleGroupControl as ToggleGroupControl,
-	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
-	__experimentalVStack as VStack,
 	ToggleControl,
-	Button,
 	Spinner,
 	Notice,
 	ToolbarButton,
@@ -46,7 +42,7 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
-import { close, Icon, page } from '@wordpress/icons';
+import { page } from '@wordpress/icons';
 import { createBlock } from '@wordpress/blocks';
 import { useInstanceId } from '@wordpress/compose';
 
@@ -62,8 +58,10 @@ import NavigationMenuNameControl from './navigation-menu-name-control';
 import UnsavedInnerBlocks from './unsaved-inner-blocks';
 import NavigationMenuDeleteControl from './navigation-menu-delete-control';
 import useNavigationNotice from './use-navigation-notice';
-import OverlayMenuIcon from './overlay-menu-icon';
 import OverlayMenuPreview from './overlay-menu-preview';
+import OverlayPanel from './overlay-panel';
+import OverlayVisibilityControl from './overlay-visibility-control';
+import OverlayMenuPreviewButton from './overlay-menu-preview-button';
 import useConvertClassicToBlockMenu, {
 	CLASSIC_MENU_CONVERSION_ERROR,
 	CLASSIC_MENU_CONVERSION_PENDING,
@@ -263,6 +261,7 @@ function Navigation( {
 	const {
 		openSubmenusOnClick,
 		overlayMenu,
+		overlay,
 		showSubmenuIcon,
 		templateLock,
 		layout: {
@@ -287,6 +286,18 @@ function Navigation( {
 	const hasAlreadyRendered = useHasRecursion( recursionId );
 
 	const blockEditingMode = useBlockEditingMode();
+
+	const { onNavigateToEntityRecord } = useSelect( ( select ) => {
+		const { getSettings } = select( blockEditorStore );
+		const settings = getSettings();
+		return {
+			onNavigateToEntityRecord: settings?.onNavigateToEntityRecord,
+		};
+	}, [] );
+
+	const isOverlayExperimentEnabled =
+		typeof window !== 'undefined' &&
+		window.__experimentalNavigationOverlays === true;
 
 	// Preload classic menus, so that they don't suddenly pop-in when viewing
 	// the Select Menu dropdown.
@@ -658,88 +669,49 @@ function Navigation( {
 						} }
 						dropdownMenuProps={ dropdownMenuProps }
 					>
-						{ isResponsive && (
+						{ ! isOverlayExperimentEnabled && (
 							<>
-								<Button
-									__next40pxDefaultSize
-									className={ overlayMenuPreviewClasses }
-									onClick={ () => {
-										setOverlayMenuPreview(
-											! overlayMenuPreview
-										);
-									} }
-									aria-label={ __( 'Overlay menu controls' ) }
-									aria-controls={ overlayMenuPreviewId }
-									aria-expanded={ overlayMenuPreview }
-								>
-									{ hasIcon && (
-										<>
-											<OverlayMenuIcon icon={ icon } />
-											<Icon icon={ close } />
-										</>
-									) }
-									{ ! hasIcon && (
-										<>
-											<span>{ __( 'Menu' ) }</span>
-											<span>{ __( 'Close' ) }</span>
-										</>
-									) }
-								</Button>
-								{ overlayMenuPreview && (
-									<VStack
-										id={ overlayMenuPreviewId }
-										spacing={ 4 }
-										style={ {
+								{ isResponsive && (
+									<OverlayMenuPreviewButton
+										isResponsive={ isResponsive }
+										overlayMenuPreview={
+											overlayMenuPreview
+										}
+										setOverlayMenuPreview={
+											setOverlayMenuPreview
+										}
+										hasIcon={ hasIcon }
+										icon={ icon }
+										setAttributes={ setAttributes }
+										overlayMenuPreviewClasses={
+											overlayMenuPreviewClasses
+										}
+										overlayMenuPreviewId={
+											overlayMenuPreviewId
+										}
+										containerStyle={ {
 											gridColumn: 'span 2',
 										} }
-									>
-										<OverlayMenuPreview
-											setAttributes={ setAttributes }
-											hasIcon={ hasIcon }
-											icon={ icon }
-											hidden={ ! overlayMenuPreview }
-										/>
-									</VStack>
+									/>
 								) }
+
+								<ToolsPanelItem
+									hasValue={ () => overlayMenu !== 'mobile' }
+									label={ __( 'Overlay Visibility' ) }
+									onDeselect={ () =>
+										setAttributes( {
+											overlayMenu: 'mobile',
+										} )
+									}
+									isShownByDefault
+								>
+									<OverlayVisibilityControl
+										overlayMenu={ overlayMenu }
+										setAttributes={ setAttributes }
+									/>
+								</ToolsPanelItem>
 							</>
 						) }
-
-						<ToolsPanelItem
-							hasValue={ () => overlayMenu !== 'mobile' }
-							label={ __( 'Overlay Menu' ) }
-							onDeselect={ () =>
-								setAttributes( { overlayMenu: 'mobile' } )
-							}
-							isShownByDefault
-						>
-							<ToggleGroupControl
-								__next40pxDefaultSize
-								__nextHasNoMarginBottom
-								label={ __( 'Overlay Menu' ) }
-								aria-label={ __( 'Configure overlay menu' ) }
-								value={ overlayMenu }
-								help={ __(
-									'Collapses the navigation options in a menu icon opening an overlay.'
-								) }
-								onChange={ ( value ) =>
-									setAttributes( { overlayMenu: value } )
-								}
-								isBlock
-							>
-								<ToggleGroupControlOption
-									value="never"
-									label={ __( 'Off' ) }
-								/>
-								<ToggleGroupControlOption
-									value="mobile"
-									label={ __( 'Mobile' ) }
-								/>
-								<ToggleGroupControlOption
-									value="always"
-									label={ __( 'Always' ) }
-								/>
-							</ToggleGroupControl>
-						</ToolsPanelItem>
 
 						{ hasSubmenus && (
 							<>
@@ -815,6 +787,23 @@ function Navigation( {
 					</ToolsPanel>
 				) }
 			</InspectorControls>
+			{ isOverlayExperimentEnabled && (
+				<InspectorControls>
+					<OverlayPanel
+						overlayMenu={ overlayMenu }
+						overlay={ overlay }
+						setAttributes={ setAttributes }
+						onNavigateToEntityRecord={ onNavigateToEntityRecord }
+						overlayMenuPreview={ overlayMenuPreview }
+						setOverlayMenuPreview={ setOverlayMenuPreview }
+						hasIcon={ hasIcon }
+						icon={ icon }
+						overlayMenuPreviewClasses={ overlayMenuPreviewClasses }
+						overlayMenuPreviewId={ overlayMenuPreviewId }
+						isResponsive={ isResponsive }
+					/>
+				</InspectorControls>
+			) }
 			<InspectorControls group="color">
 				{ /*
 				 * Avoid useMultipleOriginColorsAndGradients and detectColors
@@ -880,6 +869,8 @@ function Navigation( {
 					isHiddenByDefault={ isHiddenByDefault }
 					overlayBackgroundColor={ overlayBackgroundColor }
 					overlayTextColor={ overlayTextColor }
+					overlay={ overlay }
+					onNavigateToEntityRecord={ onNavigateToEntityRecord }
 				>
 					<UnsavedInnerBlocks
 						createNavigationMenu={ createNavigationMenu }
@@ -1042,6 +1033,10 @@ function Navigation( {
 									overlayBackgroundColor
 								}
 								overlayTextColor={ overlayTextColor }
+								overlay={ overlay }
+								onNavigateToEntityRecord={
+									onNavigateToEntityRecord
+								}
 							>
 								{ isEntityAvailable && (
 									<NavigationInnerBlocks

@@ -121,7 +121,6 @@ function SingleTrackEditor( {
 			<Grid columns={ 2 } gap={ 4 }>
 				<TextControl
 					__next40pxDefaultSize
-					__nextHasNoMarginBottom
 					onChange={ ( newLabel ) =>
 						setTrackState( ( prevTrackState ) => ( {
 							...prevTrackState,
@@ -134,7 +133,6 @@ function SingleTrackEditor( {
 				/>
 				<TextControl
 					__next40pxDefaultSize
-					__nextHasNoMarginBottom
 					onChange={ ( newSrcLang ) =>
 						setTrackState( ( prevTrackState ) => ( {
 							...prevTrackState,

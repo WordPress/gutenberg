@@ -82,6 +82,7 @@ import * as navigation from './navigation';
 import * as navigationLink from './navigation-link';
 import * as navigationSubmenu from './navigation-submenu';
 import * as nextpage from './nextpage';
+import * as navigationOverlayClose from './navigation-overlay-close';
 import * as pattern from './pattern';
 import * as pageList from './page-list';
 import * as pageListItem from './page-list-item';
@@ -276,6 +277,10 @@ const getAllBlocks = () => {
 		blocks.push( formSubmissionNotification );
 	}
 
+	if ( window?.__experimentalNavigationOverlays ) {
+		blocks.push( navigationOverlayClose );
+	}
+
 	// When in a WordPress context, conditionally
 	// add the classic block and TinyMCE editor
 	// under any of the following conditions:
@@ -334,11 +339,17 @@ export const registerCoreBlocks = (
 			const bootstrappedBlockType = unlock(
 				select( blocksStore )
 			).getBootstrappedBlockType( blockName );
-			const bootstrappedApiVersion = bootstrappedBlockType.apiVersion;
 
 			registerBlockType( blockName, {
-				title: blockName,
-				...( bootstrappedApiVersion < 3 && { apiVersion: 3 } ),
+				// Use all metadata from PHP registration,
+				// but fall back title to block name if not provided,
+				// ensure minimum apiVersion 3 for block wrapper support,
+				// and override with a ServerSideRender-based edit function.
+				...bootstrappedBlockType,
+				title: bootstrappedBlockType?.title || blockName,
+				...( ( bootstrappedBlockType?.apiVersion ?? 0 ) < 3 && {
+					apiVersion: 3,
+				} ),
 				edit: function Edit( { attributes } ) {
 					const blockProps = useBlockProps();
 					const { content, status, error } = useServerSideRender( {

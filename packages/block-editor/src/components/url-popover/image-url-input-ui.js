@@ -235,7 +235,6 @@ const ImageURLInputUI = ( {
 			/>
 			<TextControl
 				__next40pxDefaultSize
-				__nextHasNoMarginBottom
 				label={ __( 'Link relation' ) }
 				value={ rel ?? '' }
 				onChange={ onSetLinkRel }
@@ -252,7 +251,6 @@ const ImageURLInputUI = ( {
 			/>
 			<TextControl
 				__next40pxDefaultSize
-				__nextHasNoMarginBottom
 				label={ __( 'Link CSS class' ) }
 				value={ linkClass || '' }
 				onChange={ onSetLinkClass }

@@ -25,7 +25,7 @@ import { Box } from '@wordpress/ui';
 
 function MyComponent() {
 	return (
-		<Box background="neutral" padding="small">
+		<Box background="neutral" padding="sm">
 			Hello World
 		</Box>
 	);

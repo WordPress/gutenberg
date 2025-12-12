@@ -1,0 +1,60 @@
+{
+	"name": "@wordpress/media-fields",
+	"version": "0.1.0",
+	"description": "Reusable field definitions for displaying and editing media attachment properties in WordPress.",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"gutenberg",
+		"media",
+		"fields",
+		"dataviews"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/media-fields/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git",
+		"directory": "packages/media-fields"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"engines": {
+		"node": ">=18.12.0",
+		"npm": ">=8.19.2"
+	},
+	"main": "build/index.js",
+	"module": "build-module/index.js",
+	"exports": {
+		".": {
+			"types": "./build-types/index.d.ts",
+			"import": "./build-module/index.js",
+			"require": "./build/index.js"
+		},
+		"./package.json": "./package.json"
+	},
+	"react-native": "src/index",
+	"types": "build-types",
+	"sideEffects": [
+		"build-style/**",
+		"src/**/*.scss"
+	],
+	"dependencies": {
+		"@wordpress/components": "file:../components",
+		"@wordpress/core-data": "file:../core-data",
+		"@wordpress/data": "file:../data",
+		"@wordpress/dataviews": "file:../dataviews",
+		"@wordpress/element": "file:../element",
+		"@wordpress/i18n": "file:../i18n",
+		"@wordpress/icons": "file:../icons",
+		"@wordpress/primitives": "file:../primitives",
+		"@wordpress/url": "file:../url"
+	},
+	"peerDependencies": {
+		"react": "^18.0.0"
+	},
+	"publishConfig": {
+		"access": "public"
+	}
+}
