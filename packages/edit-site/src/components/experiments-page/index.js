@@ -74,8 +74,22 @@ export default function ExperimentsPage() {
 
 	// Build the combined settings object for the form.
 	// This merges gutenberg-experiments with separate option values.
+	// Ensure all experiments have explicit boolean values to avoid
+	// uncontrolled to controlled input warnings.
 	const settings = useMemo( () => {
-		const combined = { ...gutenbergExperiments };
+		const combined = {};
+
+		// Initialize all experiments with false, then override with actual values.
+		if ( experiments ) {
+			for ( const exp of experiments ) {
+				combined[ exp.id ] = false;
+			}
+		}
+
+		// Override with actual saved values from gutenberg-experiments.
+		for ( const [ key, value ] of Object.entries( gutenbergExperiments ) ) {
+			combined[ key ] = Boolean( value );
+		}
 
 		// Add separate option experiments to the combined settings.
 		for ( const exp of separateOptionExperiments ) {
@@ -88,7 +102,12 @@ export default function ExperimentsPage() {
 		}
 
 		return combined;
-	}, [ gutenbergExperiments, separateOptionExperiments, siteSettings ] );
+	}, [
+		experiments,
+		gutenbergExperiments,
+		separateOptionExperiments,
+		siteSettings,
+	] );
 
 	const setSettings = ( values ) => {
 		const regularUpdates = {};
