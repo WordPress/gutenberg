@@ -151,7 +151,16 @@ function gutenberg_register_packages_styles( $styles ) {
 	// wp-customize-widgets: add wp-edit-blocks (custom handle not auto-inferred)
 	$styles->query( 'wp-customize-widgets', 'registered' )->deps[] = 'wp-edit-blocks';
 
-	// add wp-base-styles to the already registered wp-admin stylesheet
+	// Register wp-base-styles and add it to the already registered wp-admin stylesheet
+	gutenberg_override_style(
+		$styles,
+		'wp-base-styles',
+		gutenberg_url( 'build/styles/base-styles/admin-schemes.css' ),
+		array(),
+		$version
+	);
+	$styles->add_data( 'wp-base-styles', 'rtl', 'replace' );
+	$styles->add_data( 'wp-base-styles', 'path', gutenberg_dir_path() . 'build/styles/base-styles/admin-schemes.css' );
 	$styles->query( 'wp-admin', 'registered' )->deps[] = 'wp-base-styles';
 
 	gutenberg_override_style(

@@ -107,8 +107,6 @@ require __DIR__ . '/compat/wordpress-6.9/client-assets.php';
 require __DIR__ . '/compat/wordpress-7.0/preload.php';
 require __DIR__ . '/compat/wordpress-7.0/php-only-blocks.php';
 require __DIR__ . '/compat/wordpress-7.0/blocks.php';
-require __DIR__ . '/compat/wordpress-7.0/script-loader.php';
-
 
 // Experimental features.
 require __DIR__ . '/experimental/block-editor-settings-mobile.php';
