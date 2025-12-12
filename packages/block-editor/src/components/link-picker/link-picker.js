@@ -4,12 +4,11 @@
 import {
 	BaseControl,
 	Button,
-	Dropdown,
+	Popover,
 	VisuallyHidden,
-	__experimentalDropdownContentWrapper as DropdownContentWrapper,
 	useBaseControlProps,
 } from '@wordpress/components';
-import { useState, useId } from '@wordpress/element';
+import { useState, useId, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -48,6 +47,9 @@ export function LinkPicker( {
 } ) {
 	const [ isOpen, setIsOpen ] = useState( false );
 	const instanceId = useId();
+	const dialogTitleId = `link-picker-title-${ instanceId }`;
+	const dialogDescriptionId = `link-picker-description-${ instanceId }`;
+	const anchorRef = useRef( null );
 
 	// Use the proper BaseControl pattern for associating help text
 	const { baseControlProps, controlProps } = useBaseControlProps( {
@@ -72,12 +74,13 @@ export function LinkPicker( {
 		}
 	};
 
-	const renderToggle = ( { isOpen: dropdownIsOpen, onToggle } ) => {
-		return (
+	return (
+		<BaseControl { ...baseControlProps } __nextHasNoMarginBottom>
+			<BaseControl.VisualLabel>{ label }</BaseControl.VisualLabel>
 			<Button
-				onClick={ onToggle }
-				aria-haspopup="dialog"
-				aria-expanded={ dropdownIsOpen }
+				ref={ anchorRef }
+				onClick={ () => setIsOpen( ! isOpen ) }
+				aria-expanded={ isOpen }
 				aria-describedby={ controlProps[ 'aria-describedby' ] }
 				variant="secondary"
 				__next40pxDefaultSize
@@ -91,38 +94,43 @@ export function LinkPicker( {
 					badges={ preview.badges }
 				/>
 			</Button>
-		);
-	};
-
-	const renderContent = () => (
-		<DropdownContentWrapper paddingSize="none">
-			<LinkControl
-				key={ `${ instanceId }-${ isOpen ? 'open' : 'closed' }` }
-				value={ null }
-				onChange={ handleChange }
-				suggestionsQuery={ suggestionsQuery }
-				showInitialSuggestions
-				forceIsEditingLink
-				settings={ [] }
-			/>
-		</DropdownContentWrapper>
-	);
-
-	return (
-		<BaseControl { ...baseControlProps } __nextHasNoMarginBottom>
-			<BaseControl.VisualLabel>{ label }</BaseControl.VisualLabel>
-			<Dropdown
-				className="link-picker__dropdown"
-				open={ isOpen }
-				onToggle={ () => setIsOpen( ! isOpen ) }
-				popoverProps={ {
-					placement: 'left-start',
-					offset: 36,
-					shift: true,
-				} }
-				renderToggle={ renderToggle }
-				renderContent={ renderContent }
-			/>
+			{ isOpen && (
+				<Popover
+					anchor={ anchorRef.current }
+					onClose={ () => setIsOpen( false ) }
+					placement="left-start"
+					offset={ 36 }
+					shift
+				>
+					<div
+						role="dialog"
+						aria-labelledby={ dialogTitleId }
+						aria-describedby={ dialogDescriptionId }
+					>
+						<VisuallyHidden>
+							<h2 id={ dialogTitleId }>
+								{ __( 'Select a link' ) }
+							</h2>
+							<p id={ dialogDescriptionId }>
+								{ __(
+									'Search for and add a link to the navigation item.'
+								) }
+							</p>
+						</VisuallyHidden>
+						<LinkControl
+							key={ `${ instanceId }-${
+								isOpen ? 'open' : 'closed'
+							}` }
+							value={ null }
+							onChange={ handleChange }
+							suggestionsQuery={ suggestionsQuery }
+							showInitialSuggestions
+							forceIsEditingLink
+							settings={ [] }
+						/>
+					</div>
+				</Popover>
+			) }
 		</BaseControl>
 	);
 }
