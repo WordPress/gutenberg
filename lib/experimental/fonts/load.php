@@ -8,14 +8,14 @@
 add_action( 'admin_menu', 'gutenberg_register_fonts_menu_item' );
 
 /**
- * Registers the Fonts menu item under Appearance using the gutenberg-boot-wp-admin routing infrastructure.
+ * Registers the Fonts menu item under Appearance using the font-library page.
  */
 function gutenberg_register_fonts_menu_item() {
-	if ( ! wp_is_block_theme() ) {
+	if ( ! wp_is_block_theme() && ! wp_theme_has_theme_json() ) {
 		return;
 	}
 
-	$url = admin_url( 'admin.php?page=gutenberg-boot-wp-admin&p=' . urlencode( '/font-list' ) );
+	$url = admin_url( 'admin.php?page=font-library-wp-admin&p=' . urlencode( '/font-list' ) );
 
 	add_submenu_page(
 		'themes.php',

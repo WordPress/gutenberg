@@ -48,9 +48,9 @@ export function useBlockPatterns( clientId, attributes ) {
 	// so that a Query block is always replaced by another Query block.
 	const rootBlockPatterns = useMemo( () => {
 		return allPatterns.filter( ( pattern ) => {
-			return pattern.blocks?.[ 0 ]?.name === blockNameForPatterns;
+			return pattern.blocks?.[ 0 ]?.name === 'core/query';
 		} );
-	}, [ allPatterns, blockNameForPatterns ] );
+	}, [ allPatterns ] );
 
 	return rootBlockPatterns;
 }

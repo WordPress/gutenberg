@@ -91,7 +91,6 @@ export default function BlockManager( {
 						}
 					} }
 					indeterminate={ isIndeterminate }
-					__nextHasNoMarginBottom
 				/>
 			) }
 			<div

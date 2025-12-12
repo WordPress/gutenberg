@@ -906,6 +906,7 @@ async function generatePagesPhp( pageData, replacements ) {
 			'{{PREFIX}}': prefixUnderscore,
 			'{{INIT_MODULES_PHP_ARRAY}}': initModulesPhp,
 			'{{INIT_MODULES_JSON}}': JSON.stringify( page.initModules ),
+			'{{PAGE_DEFAULT_TITLE}}': page.title || '',
 		};
 
 		// Generate both page.php and page-wp-admin.php
@@ -1444,26 +1445,40 @@ async function buildAll() {
 	await buildAllRoutes();
 
 	// Collect route and page data for PHP generation
-	const routes = getAllRoutes( ROOT_DIR ).map( ( routeName ) => {
+	// Use flatMap to expand routes with multiple pages into separate entries
+	const routes = getAllRoutes( ROOT_DIR ).flatMap( ( routeName ) => {
 		const metadata = getRouteMetadata( ROOT_DIR, routeName );
+
+		// Skip routes without pages
+		if ( ! metadata || ! metadata.pages || metadata.pages.length === 0 ) {
+			return [];
+		}
 		const routeFiles = getRouteFiles(
 			path.join( ROOT_DIR, 'routes', routeName )
 		);
-		return {
-			name: routeName,
-			path: metadata?.path,
-			page: metadata?.page,
-			hasRoute: routeFiles.hasRoute,
-			hasContent: routeFiles.hasStage || routeFiles.hasInspector,
-		};
+
+		// Create a route entry for each page
+		return metadata.pages.map( ( page ) => {
+			return {
+				name: routeName,
+				path: metadata.path,
+				page,
+				hasRoute: routeFiles.hasRoute,
+				hasContent: routeFiles.hasStage || routeFiles.hasInspector,
+			};
+		} );
 	} );
 
 	// Normalize PAGES config to support both string and object formats
 	const normalizedPages = PAGES.map( ( page ) => {
 		if ( typeof page === 'string' ) {
-			return { id: page, init: [] };
+			return { id: page, init: [], title: undefined };
 		}
-		return { id: page.id, init: page.init || [] };
+		return {
+			id: page.id,
+			init: page.init || [],
+			title: page.title || undefined,
+		};
 	} );
 
 	const pageData = normalizedPages.map( ( page ) => {
@@ -1472,6 +1487,7 @@ async function buildAll() {
 			slug: page.id,
 			routes: pageRoutes,
 			initModules: page.init,
+			title: page.title,
 		};
 	} );
 

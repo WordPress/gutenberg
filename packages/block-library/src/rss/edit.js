@@ -301,7 +301,6 @@ export default function RSSEdit( { attributes, setAttributes } ) {
 			<InspectorControls group="advanced">
 				<TextControl
 					__next40pxDefaultSize
-					__nextHasNoMarginBottom
 					label={ __( 'Link relation' ) }
 					help={ createInterpolateElement(
 						__(

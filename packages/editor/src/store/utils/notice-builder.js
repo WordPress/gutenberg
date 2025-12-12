@@ -93,16 +93,16 @@ export function getNotificationArgumentsForSaveFail( data ) {
 	if ( error.code === 'offline_error' ) {
 		const messages = {
 			publish: __(
-				'Publishing failed because you were offline. Please, verify your connection and try again.'
+				'Publishing failed because you were offline. Please verify your connection and try again.'
 			),
 			private: __(
-				'Publishing failed because you were offline. Please, verify your connection and try again.'
+				'Publishing failed because you were offline. Please verify your connection and try again.'
 			),
 			future: __(
-				'Scheduling failed because you were offline. Please, verify your connection and try again.'
+				'Scheduling failed because you were offline. Please verify your connection and try again.'
 			),
 			default: __(
-				'Updating failed because you were offline. Please, verify your connection and try again.'
+				'Updating failed because you were offline. Please verify your connection and try again.'
 			),
 		};
 
