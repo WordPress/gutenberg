@@ -9,6 +9,8 @@ import type {
 	StoreDescriptor,
 	ReduxStoreConfig,
 	combineReducers as CombineReducers,
+	AnyConfig,
+	CurriedSelectorsResolveOf,
 } from './types';
 
 // The runtime registry is created from the JavaScript implementation in `registry.js`.
@@ -110,11 +112,11 @@ export const combineReducers =
  *
  * @return {Object} Object containing the store's promise-wrapped selectors.
  */
-export const resolveSelect = (
-	storeNameOrDescriptor:
-		| string
-		| StoreDescriptor< ReduxStoreConfig< any, any, any > >
-): any => defaultRegistry.resolveSelect( storeNameOrDescriptor );
+export function resolveSelect< T extends StoreDescriptor< AnyConfig > >(
+	storeNameOrDescriptor: T | string
+): CurriedSelectorsResolveOf< T > {
+	return defaultRegistry.resolveSelect( storeNameOrDescriptor );
+}
 
 /**
  * Given a store descriptor, returns an object containing the store's selectors pre-bound to state

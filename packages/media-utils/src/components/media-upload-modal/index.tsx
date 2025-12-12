@@ -264,21 +264,22 @@ export function MediaUploadModal( {
 
 					const selectedPosts = await resolveSelect(
 						coreStore
-					).getEntityRecords(
+					).getEntityRecords< RestAttachment >(
 						'postType',
 						'attachment',
 						selectedPostsQuery
 					);
 
 					// Transform the selected posts to the expected Attachment format
-					const transformedPosts =
-						selectedPosts?.map( transformAttachment );
+					const transformedPosts = selectedPosts
+						?.map( transformAttachment )
+						.filter( Boolean );
 
 					const selectedItems = multiple
 						? transformedPosts
 						: transformedPosts?.[ 0 ];
 
-					onSelect( selectedItems );
+					onSelect( selectedItems ?? [] );
 				},
 			},
 		],
