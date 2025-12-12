@@ -41,6 +41,7 @@ import { useState, useMemo, useEffect, useRef } from '@wordpress/element';
  */
 import { Subtitle } from './subtitle';
 import { ScreenHeader } from './screen-header';
+import { ScreenBody } from './screen-body';
 import { defaultShadow } from './shadows-panel';
 import {
 	getShadowParts,
@@ -199,13 +200,13 @@ export default function ShadowsEditPanel() {
 					</Spacer>
 				</FlexItem>
 			</HStack>
-			<div className="global-styles-ui-screen">
+			<ScreenBody>
 				<ShadowsPreview shadow={ selectedShadow.shadow } />
 				<ShadowEditor
 					shadow={ selectedShadow.shadow }
 					onChange={ onShadowChange }
 				/>
-			</div>
+			</ScreenBody>
 			{ isConfirmDialogVisible && (
 				<ConfirmDialog
 					isOpen

@@ -832,9 +832,11 @@ test.describe( 'Navigation block', () => {
 					} )
 				).toBeFocused();
 
-				await linkPopover
-					.getByRole( 'button', { name: 'Add block' } )
-					.click();
+				const addBlockPopoverButton = linkPopover.getByRole( 'button', {
+					name: 'Add block',
+				} );
+
+				await addBlockPopoverButton.click();
 
 				const addBlockDialog = page.getByRole( 'dialog', {
 					name: 'Add block',
@@ -842,9 +844,22 @@ test.describe( 'Navigation block', () => {
 
 				await expect( addBlockDialog ).toBeVisible();
 
-				await expect(
-					addBlockDialog.getByRole( 'button', { name: 'Back' } )
-				).toBeFocused();
+				const addBlockDialogBackButton = addBlockDialog.getByRole(
+					'button',
+					{ name: 'Back' }
+				);
+
+				await expect( addBlockDialogBackButton ).toBeFocused();
+
+				// Step: Verify we can go back to the main Link UI and focus the add block button
+				await page.keyboard.press( 'Enter' );
+
+				// Expect focus to be on the add block button
+				await expect( addBlockPopoverButton ).toBeFocused();
+
+				await page.keyboard.press( 'Enter' );
+
+				await expect( addBlockDialogBackButton ).toBeFocused();
 
 				await addBlockDialog
 					.getByRole( 'option', { name: 'Custom Link' } )
@@ -871,6 +886,100 @@ test.describe( 'Navigation block', () => {
 				await expect( linkPopover ).toBeHidden();
 				// Check that the Label in the inspector sidebar is Cat
 				await expect( inspectorNavigationLabel ).toHaveValue( 'Cat' );
+			} );
+		} );
+
+		test( 'Can create a new page using the navigation block appender', async ( {
+			page,
+			pageUtils,
+			navigation,
+		} ) => {
+			await test.step( 'Open link control', async () => {
+				await pageUtils.pressKeys( 'ArrowDown' );
+				await navigation.useBlockInserter();
+				const linkControlSearch = navigation.getLinkControlSearch();
+				await expect( linkControlSearch ).toBeFocused();
+			} );
+
+			await test.step( 'Click Create Page button', async () => {
+				// Find and click the "Create page" button
+				const createPageButton = page.getByRole( 'button', {
+					name: 'Create page',
+				} );
+				await expect( createPageButton ).toBeVisible();
+				// Press tab twice to reach the "Create page" button
+				await pageUtils.pressKeys( 'Tab', { times: 2 } );
+				// expect the "Create page" button to be focused
+				await expect( createPageButton ).toBeFocused();
+				await page.keyboard.press( 'Enter' );
+			} );
+
+			await test.step( 'Verify Back button returns focus to Create page button', async () => {
+				const backButton = page.getByRole( 'button', { name: 'Back' } );
+				await expect( backButton ).toBeVisible();
+				await expect( backButton ).toBeFocused();
+
+				// Click Back button
+				await backButton.click();
+
+				// Verify focus returns to the "Create page" button
+				const createPageButton = page.getByRole( 'button', {
+					name: 'Create page',
+				} );
+				await expect( createPageButton ).toBeVisible();
+				await expect( createPageButton ).toBeFocused();
+
+				// Re-open the Create page dialog
+				await createPageButton.click();
+				await expect( backButton ).toBeVisible();
+				await expect( backButton ).toBeFocused();
+			} );
+
+			await test.step( 'Create the page', async () => {
+				// Tab to the title field
+				await page.keyboard.press( 'Tab' );
+
+				await expect(
+					page.getByRole( 'textbox', { name: 'Title' } )
+				).toBeFocused();
+				await page.keyboard.type( 'Newly Created Page' );
+				const createPageButton = page.getByRole( 'button', {
+					name: 'Create page',
+				} );
+				// Publish the page immediately
+				await page.keyboard.press( 'Tab' );
+				const publishCheckbox = page.getByRole( 'checkbox', {
+					name: 'Publish immediately',
+				} );
+				// expect to be on the checkbox
+				await expect( publishCheckbox ).toBeFocused();
+				await page.keyboard.press( 'Space' );
+				// expect the checkbox to be checked
+				await expect( publishCheckbox ).toBeChecked();
+				// Tab to the Create page button
+				await pageUtils.pressKeys( 'Tab', { times: 2 } );
+				await expect( createPageButton ).toBeFocused();
+				await page.keyboard.press( 'Enter' );
+			} );
+
+			await test.step( 'Verify focus is placed in the link preview', async () => {
+				// After page creation, the link control should show the preview
+				// and focus should be on the link
+				const linkPopover = navigation.getLinkPopover();
+				await expect( linkPopover ).toBeVisible();
+
+				// The link preview should show the newly created page
+				const previewLink =
+					navigation.getLinkControlLink( 'Newly Created Page' );
+				await expect( previewLink ).toBeVisible();
+
+				// Focus should be on the link preview
+				await expect( previewLink ).toBeFocused();
+
+				await page.keyboard.press( 'Escape' );
+				await expect( linkPopover ).toBeHidden();
+				await expect( navigation.getNavBlockInserter() ).toBeVisible();
+				await expect( navigation.getNavBlockInserter() ).toBeFocused();
 			} );
 		} );
 	} );
@@ -1262,6 +1371,115 @@ test.describe( 'Navigation block', () => {
 				await expect( linkInput ).toBeEnabled();
 				await expect( linkInput ).toHaveValue( updatedPage.link );
 				await expect( linkInput ).toBeFocused();
+			} );
+		} );
+
+		test( 'can unsync a bound link and edit it via canvas link editing', async ( {
+			editor,
+			page,
+			admin,
+			navigation,
+			requestUtils,
+			pageUtils,
+		} ) => {
+			await test.step( 'Setup - Create menu and navigation block with bound page link', async () => {
+				await admin.createNewPost();
+
+				// Create an empty menu for use - avoids Page List block
+				const menu = await requestUtils.createNavigationMenu( {
+					title: 'Test Menu',
+					content: '',
+				} );
+
+				await editor.insertBlock( {
+					name: 'core/navigation',
+					attributes: {
+						ref: menu.id,
+					},
+				} );
+
+				// Insert a link to a Page
+				await expect( navigation.getNavBlockInserter() ).toBeVisible();
+				await pageUtils.pressKeys( 'ArrowDown' );
+				await navigation.useBlockInserter();
+				await navigation.addPage( 'Test Page 1' );
+				await pageUtils.pressKeys( 'ArrowLeft', { times: 2 } );
+			} );
+
+			await test.step( 'Verify link starts as Page Link block type', async () => {
+				// Verify the block is a "Page Link" block type
+				const navLinkBlock = navigation
+					.getNavBlock()
+					.getByRole( 'document', {
+						name: 'Block: Page Link',
+					} )
+					.first();
+
+				await expect( navLinkBlock ).toBeVisible();
+			} );
+
+			await test.step( 'Unsync link and change to custom URL via canvas link editing', async () => {
+				// Open Link UI via keyboard shortcut
+				await pageUtils.pressKeys( 'primary+k' );
+
+				const linkPopover = navigation.getLinkPopover();
+				await expect( linkPopover ).toBeVisible();
+
+				// Click Edit button to see form fields
+				await linkPopover
+					.getByRole( 'button', { name: 'Edit' } )
+					.click();
+
+				// Verify link is initially disabled (synced to page)
+				const linkInput = linkPopover.getByRole( 'combobox', {
+					name: 'Link',
+				} );
+				await expect( linkInput ).toBeDisabled();
+
+				// Click "Unsync and edit" button
+				const unsyncButton = linkPopover.getByRole( 'button', {
+					name: 'Unsync and edit',
+				} );
+				await unsyncButton.click();
+
+				// Verify Link field becomes enabled
+				await expect( linkInput ).toBeEnabled();
+
+				// Clear and type a custom URL
+				await linkInput.clear();
+				await linkInput.fill( 'https://example.com' );
+
+				// Click Apply button
+				await linkPopover
+					.getByRole( 'button', { name: 'Apply' } )
+					.click();
+
+				// Verify the link popover preview uses the custom URL
+				await expect( linkPopover ).toContainText( 'example.com' );
+
+				// Close popover with Escape
+				await page.keyboard.press( 'Escape' );
+			} );
+
+			await test.step( 'Verify link is now Custom Link block type', async () => {
+				// Verify the block is now a "Custom Link" block type
+				const customLinkBlock = navigation
+					.getNavBlock()
+					.getByRole( 'document', {
+						name: 'Block: Custom Link',
+					} )
+					.first();
+
+				await expect( customLinkBlock ).toBeVisible();
+
+				// Verify "Page Link" block is no longer present
+				const pageLinkBlock = navigation
+					.getNavBlock()
+					.getByRole( 'document', {
+						name: 'Block: Page Link',
+					} );
+
+				await expect( pageLinkBlock ).toBeHidden();
 			} );
 		} );
 

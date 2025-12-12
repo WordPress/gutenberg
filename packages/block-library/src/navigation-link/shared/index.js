@@ -12,3 +12,4 @@ export {
 	buildNavigationLinkEntityBinding,
 } from './use-entity-binding';
 export { LinkUI } from '../link-ui';
+export { useHandleLinkChange } from './use-handle-link-change';

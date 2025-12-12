@@ -151,7 +151,6 @@ const Edit = ( { attributes, setAttributes, clientId } ) => {
 							isShownByDefault
 						>
 							<TextControl
-								__nextHasNoMarginBottom
 								__next40pxDefaultSize
 								autoComplete="off"
 								label={ __( 'Email for form submissions' ) }
@@ -193,7 +192,6 @@ const Edit = ( { attributes, setAttributes, clientId } ) => {
 					/>
 					<TextControl
 						__next40pxDefaultSize
-						__nextHasNoMarginBottom
 						autoComplete="off"
 						label={ __( 'Form action' ) }
 						value={ action }

@@ -60,7 +60,6 @@ const OrderedListSettings = ( { setAttributes, reversed, start, type } ) => {
 					/>
 					<TextControl
 						__next40pxDefaultSize
-						__nextHasNoMarginBottom
 						label={ __( 'Start value' ) }
 						type="number"
 						onChange={ ( value ) => {
@@ -136,7 +135,6 @@ const OrderedListSettings = ( { setAttributes, reversed, start, type } ) => {
 					>
 						<TextControl
 							__next40pxDefaultSize
-							__nextHasNoMarginBottom
 							label={ __( 'Start value' ) }
 							type="number"
 							onChange={ ( value ) => {

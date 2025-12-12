@@ -143,6 +143,7 @@ export default function EditSiteEditor( { isHomeRoute = false } ) {
 	);
 
 	const settings = useSpecificEditorSettings();
+	const { initialBlockSelection, ...editorSettings } = settings;
 	const { resetZoomLevel } = unlock( useDispatch( blockEditorStore ) );
 	const { createSuccessNotice } = useDispatch( noticesStore );
 	const history = useHistory();
@@ -222,7 +223,8 @@ export default function EditSiteEditor( { isHomeRoute = false } ) {
 					postType={ postWithTemplate ? context.postType : postType }
 					postId={ postWithTemplate ? context.postId : postId }
 					templateId={ postWithTemplate ? postId : undefined }
-					settings={ settings }
+					settings={ editorSettings }
+					initialSelection={ initialBlockSelection }
 					className="edit-site-editor__editor-interface"
 					customSaveButton={
 						_isPreviewingTheme && <SaveButton size="compact" />

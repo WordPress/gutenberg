@@ -142,7 +142,6 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 				isShownByDefault
 			>
 				<TextControl
-					__nextHasNoMarginBottom
 					__next40pxDefaultSize
 					label={ __( 'Text' ) }
 					value={ label ? stripHTML( label ) : '' }
@@ -267,7 +266,6 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 				isShownByDefault
 			>
 				<CheckboxControl
-					__nextHasNoMarginBottom
 					label={ __( 'Open in new tab' ) }
 					checked={ opensInNewTab }
 					onChange={ ( value ) =>
@@ -302,7 +300,6 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 				isShownByDefault
 			>
 				<TextControl
-					__nextHasNoMarginBottom
 					__next40pxDefaultSize
 					label={ __( 'Rel attribute' ) }
 					value={ rel || '' }

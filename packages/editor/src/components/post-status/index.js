@@ -218,7 +218,6 @@ export default function PostStatus() {
 											className="editor-change-status__password-fieldset"
 										>
 											<CheckboxControl
-												__nextHasNoMarginBottom
 												label={ __(
 													'Password protected'
 												) }
@@ -248,7 +247,6 @@ export default function PostStatus() {
 														type="text"
 														id={ passwordInputId }
 														__next40pxDefaultSize
-														__nextHasNoMarginBottom
 														maxLength={ 255 }
 													/>
 												</div>

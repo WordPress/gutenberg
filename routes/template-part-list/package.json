@@ -4,7 +4,7 @@
 	"private": true,
 	"route": {
 		"path": "/template-parts/list/$area",
-		"page": "gutenberg-boot"
+		"page": "site-editor"
 	},
 	"dependencies": {
 		"@wordpress/admin-ui": "file:../../packages/admin-ui",

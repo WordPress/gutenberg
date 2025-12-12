@@ -3,7 +3,14 @@
  */
 import { useCallback, useReducer } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { store as editorStore } from '@wordpress/editor';
+import { store as editorStore, privateApis } from '@wordpress/editor';
+
+/**
+ * Internal dependencies
+ */
+import { unlock } from '../lock-unlock';
+
+const { useGenerateBlockPath } = unlock( privateApis );
 
 /**
  * A hook that records the 'entity' history in the post editor as a user
@@ -25,13 +32,24 @@ export default function useNavigateToEntityRecord(
 	initialPostType,
 	defaultRenderingMode
 ) {
+	const generateBlockPath = useGenerateBlockPath();
 	const [ postHistory, dispatch ] = useReducer(
-		( historyState, { type, post, previousRenderingMode } ) => {
+		(
+			historyState,
+			{ type, post, previousRenderingMode, selectedBlockPath }
+		) => {
 			if ( type === 'push' ) {
-				return [ ...historyState, { post, previousRenderingMode } ];
+				// Update the current item with the selected block path before pushing new item
+				const updatedHistory = [ ...historyState ];
+				const currentIndex = updatedHistory.length - 1;
+				updatedHistory[ currentIndex ] = {
+					...updatedHistory[ currentIndex ],
+					selectedBlockPath,
+				};
+				return [ ...updatedHistory, { post, previousRenderingMode } ];
 			}
 			if ( type === 'pop' ) {
-				// Try to leave one item in the history.
+				// Remove the current item from history
 				if ( historyState.length > 1 ) {
 					return historyState.slice( 0, -1 );
 				}
@@ -44,8 +62,7 @@ export default function useNavigateToEntityRecord(
 			},
 		]
 	);
-
-	const { post, previousRenderingMode } =
+	const { post, previousRenderingMode, selectedBlockPath } =
 		postHistory[ postHistory.length - 1 ];
 
 	const { getRenderingMode } = useSelect( editorStore );
@@ -53,19 +70,32 @@ export default function useNavigateToEntityRecord(
 
 	const onNavigateToEntityRecord = useCallback(
 		( params ) => {
+			// Generate block path from clientId if provided
+			const blockPath = params.selectedBlockClientId
+				? generateBlockPath( params.selectedBlockClientId )
+				: null;
+
 			dispatch( {
 				type: 'push',
 				post: { postId: params.postId, postType: params.postType },
 				// Save the current rendering mode so we can restore it when navigating back.
 				previousRenderingMode: getRenderingMode(),
+				selectedBlockPath: blockPath,
 			} );
 			setRenderingMode( defaultRenderingMode );
 		},
-		[ getRenderingMode, setRenderingMode, defaultRenderingMode ]
+		[
+			getRenderingMode,
+			setRenderingMode,
+			defaultRenderingMode,
+			generateBlockPath,
+		]
 	);
 
 	const onNavigateToPreviousEntityRecord = useCallback( () => {
-		dispatch( { type: 'pop' } );
+		dispatch( {
+			type: 'pop',
+		} );
 		if ( previousRenderingMode ) {
 			setRenderingMode( previousRenderingMode );
 		}
@@ -78,5 +108,7 @@ export default function useNavigateToEntityRecord(
 			postHistory.length > 1
 				? onNavigateToPreviousEntityRecord
 				: undefined,
+		// Return the selected block path from the current history item
+		previousSelectedBlockPath: selectedBlockPath,
 	};
 }

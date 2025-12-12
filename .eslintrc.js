@@ -278,14 +278,11 @@ module.exports = {
 					// Temporary rules until we're ready to officially deprecate the bottom margins.
 					...[
 						'BaseControl',
-						'CheckboxControl',
 						'ComboboxControl',
-						'DimensionControl',
 						'FocalPointPicker',
 						'RangeControl',
 						'SearchControl',
 						'SelectControl',
-						'TextControl',
 						'TextareaControl',
 						'ToggleControl',
 						'ToggleGroupControl',

@@ -597,12 +597,10 @@ export const StyleBookBody = ( {
 
 	const handleLoad = () => setHasIframeLoaded( true );
 	useLayoutEffect( () => {
-		if ( hasIframeLoaded && iframeRef?.current ) {
-			if ( goTo?.top ) {
-				scrollToSection( 'top', iframeRef?.current );
-			}
+		if ( hasIframeLoaded && iframeRef.current && goTo?.top ) {
+			scrollToSection( 'top', iframeRef.current );
 		}
-	}, [ iframeRef?.current, goTo, scrollToSection, hasIframeLoaded ] );
+	}, [ goTo?.top, hasIframeLoaded ] );
 
 	return (
 		<Iframe
