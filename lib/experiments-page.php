@@ -99,14 +99,14 @@ function gutenberg_get_experiment_definitions() {
 		),
 		array(
 			'id'          => 'gutenberg-content-only-pattern-insertion',
-			'title'       => __( 'contentOnly: Make patterns contentOnly by default upon insertion', 'gutenberg' ),
+			'title'       => __( 'Pattern editing: Make patterns "content only" by default upon insertion', 'gutenberg' ),
 			'description' => __( 'When patterns are inserted, default to a simplified content only mode for editing pattern content.', 'gutenberg' ),
 			'category'    => 'patterns',
 		),
 		array(
 			'id'          => 'gutenberg-content-only-inspector-fields',
-			'title'       => __( 'contentOnly: Enable editable inspector fields', 'gutenberg' ),
-			'description' => __( 'Enables editable inspector fields (media, links, alt text, etc.) in the content-only pattern editing interface. Requires "contentOnly: Make patterns contentOnly by default upon insertion" to be enabled.', 'gutenberg' ),
+			'title'       => __( 'Pattern editing: Enable editable inspector fields', 'gutenberg' ),
+			'description' => __( 'Enables editable inspector fields (media, links, alt text, etc.) in the "content only" pattern editing interface. Requires "Pattern editing: Make patterns "content only" by default upon insertion" to be enabled.', 'gutenberg' ),
 			'category'    => 'patterns',
 			'requires'    => 'gutenberg-content-only-pattern-insertion',
 		),
