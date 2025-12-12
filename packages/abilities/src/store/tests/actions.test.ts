@@ -527,6 +527,28 @@ describe( 'Store Actions', () => {
 			expect( mockDispatch ).not.toHaveBeenCalled();
 		} );
 
+		it( 'should throw error when ability is already client-registered', () => {
+			const existingAbility: Ability = {
+				name: 'test/ability',
+				label: 'Test Ability',
+				description: 'Test description',
+				category: 'test-category',
+				meta: {
+					annotations: { clientRegistered: true },
+				},
+			};
+			mockSelect.getAbility.mockReturnValue( existingAbility );
+
+			const action = registerAbilityCallback( 'test/ability', jest.fn() );
+
+			expect( () =>
+				action( { select: mockSelect, dispatch: mockDispatch } )
+			).toThrow(
+				'Ability "test/ability" is already registered as a client-side ability'
+			);
+			expect( mockDispatch ).not.toHaveBeenCalled();
+		} );
+
 		it( 'should set clientRegistered to true', () => {
 			const existingAbility: Ability = {
 				name: 'test/ability',
