@@ -7,7 +7,10 @@
 	$subtle-pale-blue: #e7f5fe;
 	$subtle-pale-pink: #fcf0ef;
 
+	// Allow scrolling overflow, with visual cue.
+	--scroll-cue: color-mix(in srgb, currentColor 20%, transparent);
 	overflow-x: auto;
+	box-shadow: inset 1px 0 0 0 var(--scroll-cue), inset -1px 0 0 0 var(--scroll-cue);
 
 	table {
 		border-collapse: collapse;
