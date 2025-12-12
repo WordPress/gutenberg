@@ -562,10 +562,12 @@ class WP_Navigation_Block_Renderer {
 		$modal_unique_id = wp_unique_id( 'modal-' );
 
 		$is_hidden_by_default = isset( $attributes['overlayMenu'] ) && 'always' === $attributes['overlayMenu'];
+		$has_custom_overlay   = ! empty( $attributes['overlay'] );
 
 		$responsive_container_classes = array(
 			'wp-block-navigation__responsive-container',
 			$is_hidden_by_default ? 'hidden-by-default' : '',
+			$has_custom_overlay ? 'has-custom-overlay' : '',
 			implode( ' ', $colors['overlay_css_classes'] ),
 		);
 		$open_button_classes          = array(
