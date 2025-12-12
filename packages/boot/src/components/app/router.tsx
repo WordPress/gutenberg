@@ -211,7 +211,15 @@ export default function Router( {
 			defaultPreload: 'intent',
 			defaultNotFoundComponent: NotFoundComponent,
 			defaultViewTransition: {
-				types: ( { fromLocation } ) => {
+				types: ( {
+					fromLocation,
+				}: {
+					fromLocation?: unknown;
+					toLocation: unknown;
+					pathChanged: boolean;
+					hrefChanged: boolean;
+					hashChanged: boolean;
+				} ) => {
 					// Disable view transition on initial navigation (no previous location)
 					if ( ! fromLocation ) {
 						return false;
