@@ -296,7 +296,6 @@ export default function CoverInspectorControls( {
 								}
 							>
 								<TextareaControl
-									__nextHasNoMarginBottom
 									label={ __( 'Alternative text' ) }
 									value={ alt }
 									onChange={ ( newAlt ) =>

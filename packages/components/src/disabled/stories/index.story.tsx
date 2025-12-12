@@ -47,7 +47,6 @@ const Form = () => {
 				onChange={ setTextControlValue }
 			/>
 			<TextareaControl
-				__nextHasNoMarginBottom
 				label="TextArea Control"
 				value={ textAreaValue }
 				onChange={ setTextAreaValue }

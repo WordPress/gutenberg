@@ -281,7 +281,6 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 				isShownByDefault
 			>
 				<TextareaControl
-					__nextHasNoMarginBottom
 					label={ __( 'Description' ) }
 					value={ description || '' }
 					onChange={ ( descriptionValue ) => {
