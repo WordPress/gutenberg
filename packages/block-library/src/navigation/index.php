@@ -159,6 +159,35 @@ class WP_Navigation_Block_Renderer {
 	}
 
 	/**
+	 * Checks if blocks contain a core/navigation-overlay-close block.
+	 *
+	 * @since 6.5.0
+	 *
+	 * @param WP_Block_List $blocks The list of blocks to check.
+	 * @return bool Returns true if a navigation-overlay-close block is found.
+	 */
+	private static function has_navigation_overlay_close_block( $blocks ) {
+		if ( empty( $blocks ) ) {
+			return false;
+		}
+
+		foreach ( $blocks as $block ) {
+			if ( 'core/navigation-overlay-close' === $block->name ) {
+				return true;
+			}
+
+			// Recursively check inner blocks, but skip navigation blocks.
+			if ( 'core/navigation' !== $block->name && ! empty( $block->inner_blocks ) ) {
+				if ( static::has_navigation_overlay_close_block( $block->inner_blocks ) ) {
+					return true;
+				}
+			}
+		}
+
+		return false;
+	}
+
+	/**
 	 * Returns the html for blocks from a template part (without navigation container wrapper).
 	 *
 	 * @since 6.5.0
@@ -624,10 +653,13 @@ class WP_Navigation_Block_Renderer {
 		// Check if an overlay template part is selected.
 		$has_overlay = ! empty( $attributes['overlay'] );
 		$overlay_blocks_html = '';
+		$has_overlay_close_block = false;
 
 		if ( $has_overlay ) {
 			// Get blocks from the overlay template part.
 			$overlay_blocks = static::get_overlay_blocks_from_template_part( $attributes['overlay'], $attributes );
+			// Check if overlay contains a navigation-overlay-close block.
+			$has_overlay_close_block = static::has_navigation_overlay_close_block( $overlay_blocks );
 			// Render template part blocks directly without navigation container wrapper.
 			$overlay_blocks_html = static::get_template_part_blocks_html( $overlay_blocks );
 		}
@@ -647,12 +679,23 @@ class WP_Navigation_Block_Renderer {
 			$content_markup = $inner_blocks_html;
 		}
 
+		// Conditionally show the default close button only if overlay doesn't have its own close block.
+		$close_button_markup = '';
+		if ( ! $has_overlay_close_block ) {
+			$close_button_markup = sprintf(
+				'<button %1$s class="wp-block-navigation__responsive-container-close" %2$s>%3$s</button>',
+				$toggle_aria_label_close,
+				$close_button_directives,
+				$toggle_close_button_content
+			);
+		}
+
 		return sprintf(
 			'<button aria-haspopup="dialog" %3$s class="%6$s" %10$s>%8$s</button>
 				<div class="%5$s" %7$s id="%1$s" %11$s>
 					<div class="wp-block-navigation__responsive-close" tabindex="-1">
 						<div class="wp-block-navigation__responsive-dialog" %12$s>
-							<button %4$s class="wp-block-navigation__responsive-container-close" %13$s>%9$s</button>
+							%13$s
 							<div class="wp-block-navigation__responsive-container-content" %14$s id="%1$s-content">
 								%2$s
 							</div>
@@ -671,7 +714,7 @@ class WP_Navigation_Block_Renderer {
 			$open_button_directives,
 			$responsive_container_directives,
 			$responsive_dialog_directives,
-			$close_button_directives,
+			$close_button_markup,
 			$responsive_container_content_directives
 		);
 	}
