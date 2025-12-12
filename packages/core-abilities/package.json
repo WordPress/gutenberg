@@ -1,0 +1,58 @@
+{
+	"name": "@wordpress/core-abilities",
+	"version": "0.1.0",
+	"description": "WordPress core abilities integration for the Abilities API.",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"abilities",
+		"api",
+		"core"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/core-abilities/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git",
+		"directory": "packages/core-abilities"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"engines": {
+		"node": ">=18.12.0",
+		"npm": ">=8.19.2"
+	},
+	"files": [
+		"build",
+		"build-module",
+		"build-types",
+		"src",
+		"*.md"
+	],
+	"main": "build/index.js",
+	"module": "build-module/index.js",
+	"exports": {
+		".": {
+			"types": "./build-types/index.d.ts",
+			"import": "./build-module/index.js",
+			"require": "./build/index.js"
+		},
+		"./package.json": "./package.json"
+	},
+	"wpScriptModuleExports": {
+		".": "./build-module/index.js"
+	},
+	"types": "build-types",
+	"sideEffects": [
+		"{src,build,build-module}/index.js"
+	],
+	"dependencies": {
+		"@wordpress/abilities": "file:../abilities",
+		"@wordpress/api-fetch": "file:../api-fetch",
+		"@wordpress/url": "file:../url"
+	},
+	"publishConfig": {
+		"access": "public"
+	}
+}

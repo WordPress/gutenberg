@@ -110,16 +110,52 @@
 </section>
 
 <div data-wp-interactive="router-regions">
-	<div data-wp-router-region="invalid-region-1">
-		<p data-testid="invalid-region-text-1">
+	<!-- Router region inside data-wp-interactive -->
+	<div
+		data-testid="valid-inside-interactive"
+		data-wp-interactive="router-regions"
+		data-wp-router-region="valid-inside-interactive"
+		data-wp-context='{ "counter": { "value": 0 } }'
+	>
+		<p data-testid="text-1">
 			content from page <?php echo $attributes['page']; ?>
 		</p>
+		<button
+			data-testid="valid-inside-interactive-counter"
+			data-wp-text="context.counter.value"
+			data-wp-on--click="actions.counter.increment"
+		>
+			NaN
+		</button>
+
+		<!-- Router region inside data-wp-router-region -->
+		<div
+			data-testid="valid-inside-router-region"
+			data-wp-interactive="router-regions"
+			data-wp-router-region="valid-inside-router-region"
+			data-wp-context='{ "counter": { "value": 0 } }'
+		>
+			<p data-testid="text-2">
+				content from page <?php echo $attributes['page']; ?>
+			</p>
+			<button
+				data-testid="valid-inside-router-region-counter"
+				data-wp-text="context.counter.value"
+				data-wp-on--click="actions.counter.increment"
+			>
+				NaN
+			</button>
+		</div>
 	</div>
-	<div data-wp-interactive="router-regions" data-wp-router-region="invalid-region-2">
-		<p data-testid="invalid-region-text-2">
-			content from page <?php echo $attributes['page']; ?>
-		</p>
-	</div>
+</div>
+
+<div
+	data-testid="invalid-outside-interactive"
+	data-wp-router-region="invalid-outside-interactive"
+>
+	<p data-testid="text-3">
+		content from page <?php echo $attributes['page']; ?>
+	</p>
 </div>
 
 <div id="regions-with-attach-to" data-testid="regions-with-attach-to">

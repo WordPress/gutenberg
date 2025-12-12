@@ -46,6 +46,7 @@ const UnforwardedFontSizePicker = (
 		size = 'default',
 		units: unitsProp = DEFAULT_UNITS,
 		value,
+		valueMode = 'literal',
 		withSlider = false,
 		withReset = true,
 	} = props;
@@ -59,14 +60,31 @@ const UnforwardedFontSizePicker = (
 		availableUnits: unitsProp,
 	} );
 
-	const selectedFontSize = fontSizes.find(
-		( fontSize ) => fontSize.size === value
-	);
+	const selectedFontSize = ( () => {
+		if ( ! value ) {
+			return undefined;
+		}
+
+		// If valueMode is 'slug', find by slug
+		if ( valueMode === 'slug' ) {
+			return fontSizes.find( ( fontSize ) => fontSize.slug === value );
+		}
+
+		// If valueMode is 'literal', find by size value
+		return fontSizes.find( ( fontSize ) => fontSize.size === value );
+	} )();
 	const isCustomValue = !! value && ! selectedFontSize;
 
 	// Initially request a custom picker if the value is not from the predef list.
 	const [ userRequestedCustom, setUserRequestedCustom ] =
 		useState( isCustomValue );
+
+	// Resolve the literal value to use in custom controls when operating in slug mode.
+	// When `valueMode` is 'slug', the `value` prop contains the slug of the
+	// selected preset. In that case, the custom input should reflect the preset's
+	// actual size value so it pre-populates correctly after clicking "Set custom size".
+	const resolvedValueForControls =
+		valueMode === 'slug' ? selectedFontSize?.size : value;
 
 	let currentPickerType;
 	if ( ! disableCustomFontSizes && userRequestedCustom ) {
@@ -88,10 +106,11 @@ const UnforwardedFontSizePicker = (
 	// operates in a legacy "unitless" mode where UnitControl can only be used
 	// to select px values and onChange() is always called with number values.
 	const hasUnits =
-		typeof value === 'string' || typeof fontSizes[ 0 ]?.size === 'string';
+		typeof resolvedValueForControls === 'string' ||
+		typeof fontSizes[ 0 ]?.size === 'string';
 
 	const [ valueQuantity, valueUnit ] = parseQuantityAndUnitFromRawValue(
-		value,
+		resolvedValueForControls,
 		units
 	);
 	const isValueUnitRelative =
@@ -139,18 +158,16 @@ const UnforwardedFontSizePicker = (
 						__next40pxDefaultSize={ __next40pxDefaultSize }
 						fontSizes={ fontSizes }
 						value={ value }
+						valueMode={ valueMode }
 						disableCustomFontSizes={ disableCustomFontSizes }
 						size={ size }
-						onChange={ ( newValue ) => {
+						onChange={ ( newValue, selectedItem ) => {
 							if ( newValue === undefined ) {
-								onChange?.( undefined );
+								onChange?.( undefined, selectedItem );
 							} else {
 								onChange?.(
 									hasUnits ? newValue : Number( newValue ),
-									fontSizes.find(
-										( fontSize ) =>
-											fontSize.size === newValue
-									)
+									selectedItem
 								);
 							}
 						} }
@@ -161,18 +178,16 @@ const UnforwardedFontSizePicker = (
 					<FontSizePickerToggleGroup
 						fontSizes={ fontSizes }
 						value={ value }
+						valueMode={ valueMode }
 						__next40pxDefaultSize={ __next40pxDefaultSize }
 						size={ size }
-						onChange={ ( newValue ) => {
+						onChange={ ( newValue, selectedItem ) => {
 							if ( newValue === undefined ) {
-								onChange?.( undefined );
+								onChange?.( undefined, selectedItem );
 							} else {
 								onChange?.(
 									hasUnits ? newValue : Number( newValue ),
-									fontSizes.find(
-										( fontSize ) =>
-											fontSize.size === newValue
-									)
+									selectedItem
 								);
 							}
 						} }
@@ -187,11 +202,21 @@ const UnforwardedFontSizePicker = (
 								label={ __( 'Font size' ) }
 								labelPosition="top"
 								hideLabelFromVision
-								value={ value }
+								value={
+									hasUnits
+										? `${ valueQuantity ?? '' }${
+												valueUnit ?? ''
+										  }`
+										: resolvedValueForControls
+								}
 								onChange={ ( newValue ) => {
 									setUserRequestedCustom( true );
 
-									if ( newValue === undefined ) {
+									// Treat clearing the input (empty string) as a reset
+									if (
+										newValue === undefined ||
+										newValue === ''
+									) {
 										onChange?.( undefined );
 									} else {
 										onChange?.(

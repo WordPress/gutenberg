@@ -18,7 +18,7 @@ import type {
 	SupportedLayouts,
 	NormalizedFilter,
 } from '../../types';
-import type { SetSelection } from '../../private-types';
+import type { SetSelection } from '../../types/private';
 import { LAYOUT_TABLE } from '../../constants';
 
 type DataViewsContextType< Item > = {

@@ -11,6 +11,7 @@ import { getUpdatedLinkAttributes } from './get-updated-link-attributes';
 import removeAnchorTag from '../utils/remove-anchor-tag';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 import { unlock } from '../lock-unlock';
+import useDeprecatedTextAlign from '../utils/deprecated-text-align-attributes';
 
 /**
  * WordPress dependencies
@@ -27,13 +28,13 @@ import {
 	TextControl,
 	ToolbarButton,
 	Popover,
+	ExternalLink,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 } from '@wordpress/components';
 import {
-	AlignmentControl,
 	BlockControls,
 	InspectorControls,
 	RichText,
@@ -185,7 +186,6 @@ function ButtonEdit( props ) {
 	} = props;
 	const {
 		tagName,
-		textAlign,
 		linkTarget,
 		placeholder,
 		rel,
@@ -195,6 +195,7 @@ function ButtonEdit( props ) {
 		width,
 		metadata,
 	} = attributes;
+	useDeprecatedTextAlign( props );
 
 	const TagName = tagName || 'a';
 
@@ -360,7 +361,6 @@ function ButtonEdit( props ) {
 						borderProps.className,
 						typographyProps.className,
 						{
-							[ `has-text-align-${ textAlign }` ]: textAlign,
 							// For backwards compatibility add style that isn't
 							// provided via block support.
 							'no-border-radius': style?.border?.radius === 0,
@@ -384,14 +384,6 @@ function ButtonEdit( props ) {
 			</div>
 			{ hasBlockControls && (
 				<BlockControls group="block">
-					{ hasNonContentControls && (
-						<AlignmentControl
-							value={ textAlign }
-							onChange={ ( nextAlign ) => {
-								setAttributes( { textAlign: nextAlign } );
-							} }
-						/>
-					) }
 					{ isLinkTag && ! lockUrlControls && (
 						<ToolbarButton
 							name="link"
@@ -473,8 +465,17 @@ function ButtonEdit( props ) {
 				{ isLinkTag && (
 					<TextControl
 						__next40pxDefaultSize
-						__nextHasNoMarginBottom
-						label={ __( 'Link rel' ) }
+						label={ __( 'Link relation' ) }
+						help={ createInterpolateElement(
+							__(
+								'The <a>Link Relation</a> attribute defines the relationship between a linked resource and the current document.'
+							),
+							{
+								a: (
+									<ExternalLink href="https://developer.mozilla.org/docs/Web/HTML/Attributes/rel" />
+								),
+							}
+						) }
 						value={ rel || '' }
 						onChange={ ( newRel ) =>
 							setAttributes( { rel: newRel } )

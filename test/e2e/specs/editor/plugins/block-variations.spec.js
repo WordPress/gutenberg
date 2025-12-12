@@ -77,7 +77,12 @@ test.describe( 'Block variations', () => {
 			page
 				.getByRole( 'listbox', { name: 'Blocks' } )
 				.getByRole( 'option' )
-		).toHaveText( [ 'Paragraph', 'Success Message', 'Warning Message' ] );
+		).toHaveText( [
+			'Paragraph',
+			'Success Message',
+			'Warning Message',
+			'Stretchy Paragraph',
+		] );
 	} );
 
 	test( 'Insert the Success Message block variation', async ( {
@@ -88,7 +93,9 @@ test.describe( 'Block variations', () => {
 			.locator( 'role=button[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '/Heading' );
-		await page.getByRole( 'option', { name: 'Heading' } ).click();
+		await page
+			.getByRole( 'option', { name: 'Heading', exact: true } )
+			.click();
 		await page.keyboard.type( '/Success Message' );
 		await page.getByRole( 'option', { name: 'Success Message' } ).click();
 
@@ -105,7 +112,9 @@ test.describe( 'Block variations', () => {
 			.locator( 'role=button[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '/Columns' );
-		await page.getByRole( 'option', { name: 'Columns' } ).click();
+		await page
+			.getByRole( 'option', { name: 'Columns', exact: true } )
+			.click();
 
 		await editor.canvas
 			.getByRole( 'list', { name: 'Block variations' } )
@@ -167,7 +176,9 @@ test.describe( 'Block variations', () => {
 			.locator( 'role=button[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '/Heading' );
-		await page.getByRole( 'option', { name: 'Heading' } ).click();
+		await page
+			.getByRole( 'option', { name: 'Heading', exact: true } )
+			.click();
 		await page.keyboard.type( '/Success Message' );
 		await page.getByRole( 'option', { name: 'Success Message' } ).click();
 
@@ -203,7 +214,9 @@ test.describe( 'Block variations', () => {
 			.locator( 'role=button[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '/Heading' );
-		await page.getByRole( 'option', { name: 'Heading' } ).click();
+		await page
+			.getByRole( 'option', { name: 'Heading', exact: true } )
+			.click();
 		await page.keyboard.type( '/Warning Message' );
 		await page.getByRole( 'option', { name: 'Warning Message' } ).click();
 

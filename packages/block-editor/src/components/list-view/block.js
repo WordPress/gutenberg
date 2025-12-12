@@ -53,6 +53,7 @@ import { useBlockLock } from '../block-lock';
 import AriaReferencedText from './aria-referenced-text';
 import { unlock } from '../../lock-unlock';
 import usePasteStyles from '../use-paste-styles';
+import { cleanEmptyObject } from '../../hooks/utils';
 
 function ListViewBlock( {
 	block: { clientId },
@@ -79,7 +80,7 @@ function ListViewBlock( {
 	const [ isHovered, setIsHovered ] = useState( false );
 	const [ settingsAnchorRect, setSettingsAnchorRect ] = useState();
 
-	const { isLocked, canEdit, canMove } = useBlockLock( clientId );
+	const { isLocked } = useBlockLock( clientId );
 
 	const isFirstSelectedBlock =
 		isSelected && selectedClientIds[ 0 ] === clientId;
@@ -96,6 +97,7 @@ function ListViewBlock( {
 		insertAfterBlock,
 		insertBeforeBlock,
 		setOpenedBlockSettingsMenu,
+		updateBlockAttributes,
 	} = unlock( useDispatch( blockEditorStore ) );
 	const debouncedToggleBlockHighlight = useDebounce(
 		toggleBlockHighlight,
@@ -110,6 +112,8 @@ function ListViewBlock( {
 		getBlockOrder,
 		getBlockParents,
 		getBlocksByClientId,
+		canEditBlock,
+		canMoveBlock,
 		canRemoveBlocks,
 		isGroupable,
 	} = useSelect( blockEditorStore );
@@ -119,20 +123,25 @@ function ListViewBlock( {
 
 	const pasteStyles = usePasteStyles();
 
-	const { block, blockName, allowRightClickOverrides } = useSelect(
-		( select ) => {
-			const { getBlock, getBlockName, getSettings } =
-				select( blockEditorStore );
+	const { block, blockName, allowRightClickOverrides, isBlockHidden } =
+		useSelect(
+			( select ) => {
+				const { getBlock, getBlockName, getSettings } =
+					select( blockEditorStore );
+				const { isBlockHidden: _isBlockHidden } = unlock(
+					select( blockEditorStore )
+				);
 
-			return {
-				block: getBlock( clientId ),
-				blockName: getBlockName( clientId ),
-				allowRightClickOverrides:
-					getSettings().allowRightClickOverrides,
-			};
-		},
-		[ clientId ]
-	);
+				return {
+					block: getBlock( clientId ),
+					blockName: getBlockName( clientId ),
+					allowRightClickOverrides:
+						getSettings().allowRightClickOverrides,
+					isBlockHidden: _isBlockHidden( clientId ),
+				};
+			},
+			[ clientId ]
+		);
 
 	const showBlockActions =
 		// When a block hides its toolbar it also hides the block settings menu,
@@ -362,6 +371,36 @@ function ListViewBlock( {
 				setOpenedBlockSettingsMenu( undefined );
 				updateFocusAndSelection( newlySelectedBlocks[ 0 ], false );
 			}
+		} else if (
+			isMatch( 'core/block-editor/toggle-block-visibility', event )
+		) {
+			event.preventDefault();
+			const { blocksToUpdate } = getBlocksToUpdate();
+			const blocks = getBlocksByClientId( blocksToUpdate );
+			const canToggleVisibility = blocks.every( ( blockToUpdate ) =>
+				hasBlockSupport( blockToUpdate.name, 'visibility', true )
+			);
+			if ( ! canToggleVisibility ) {
+				return;
+			}
+			const hasHiddenBlock = blocks.some(
+				( blockToUpdate ) =>
+					blockToUpdate.attributes.metadata?.blockVisibility === false
+			);
+			const attributesByClientId = Object.fromEntries(
+				blocks.map( ( { clientId: mapClientId, attributes } ) => [
+					mapClientId,
+					{
+						metadata: cleanEmptyObject( {
+							...attributes?.metadata,
+							blockVisibility: hasHiddenBlock ? undefined : false,
+						} ),
+					},
+				] )
+			);
+			updateBlockAttributes( blocksToUpdate, attributesByClientId, {
+				uniqueByBlock: true,
+			} );
 		}
 	}
 
@@ -484,6 +523,10 @@ function ListViewBlock( {
 		isLocked
 	);
 
+	const blockVisibilityDescription = isBlockHidden
+		? __( 'Block is hidden.' )
+		: null;
+
 	const hasSiblings = siblingBlockCount > 0;
 	const hasRenderedMovers = showBlockMovers && hasSiblings;
 	const moverCellClassName = clsx(
@@ -512,7 +555,7 @@ function ListViewBlock( {
 		'is-dragging': isDragged,
 		'has-single-cell': ! showBlockActions,
 		'is-synced': blockInformation?.isSynced,
-		'is-draggable': canMove,
+		'is-draggable': canMoveBlock,
 		'is-displacement-normal': displacement === 'normal',
 		'is-displacement-up': displacement === 'up',
 		'is-displacement-down': displacement === 'down',
@@ -547,7 +590,7 @@ function ListViewBlock( {
 			path={ path }
 			id={ `list-view-${ listViewInstanceId }-block-${ clientId }` }
 			data-block={ clientId }
-			data-expanded={ canEdit ? isExpanded : undefined }
+			data-expanded={ canEditBlock ? isExpanded : undefined }
 			ref={ rowRef }
 		>
 			<TreeGridCell
@@ -573,7 +616,7 @@ function ListViewBlock( {
 								currentlyEditingBlockInCanvas ? 0 : tabIndex
 							}
 							onFocus={ onFocus }
-							isExpanded={ canEdit ? isExpanded : undefined }
+							isExpanded={ canEditBlock ? isExpanded : undefined }
 							selectedClientIds={ selectedClientIds }
 							ariaDescribedBy={ descriptionId }
 						/>
@@ -581,6 +624,7 @@ function ListViewBlock( {
 							{ [
 								blockPositionDescription,
 								blockPropertiesDescription,
+								blockVisibilityDescription,
 							]
 								.filter( Boolean )
 								.join( ' ' ) }

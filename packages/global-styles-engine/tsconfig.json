@@ -1,0 +1,18 @@
+{
+	"$schema": "https://json.schemastore.org/tsconfig.json",
+	"extends": "../../tsconfig.base.json",
+	"compilerOptions": {
+		"checkJs": false,
+		"types": [
+			"gutenberg-env",
+			"gutenberg-test-env",
+			"jest",
+			"@testing-library/jest-dom"
+		]
+	},
+	"references": [
+		{ "path": "../data" },
+		{ "path": "../i18n" },
+		{ "path": "../style-engine" }
+	]
+}

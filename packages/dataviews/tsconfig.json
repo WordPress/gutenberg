@@ -14,6 +14,8 @@
 		{ "path": "../compose" },
 		{ "path": "../data" },
 		{ "path": "../date" },
+		{ "path": "../deprecated" },
+		{ "path": "../dom" },
 		{ "path": "../element" },
 		{ "path": "../i18n" },
 		{ "path": "../icons" },
@@ -28,7 +30,7 @@
 		"src/**/*.ios.js",
 		"src/**/*.native.js",
 		"src/**/react-native-*",
-		"src/**/stories/**/*.js", // only exclude js files, tsx files should be checked
+		"src/**/stories/**/*.jsx", // only exclude js files, tsx files should be checked
 		"src/**/test/**/*.js" // only exclude js files, ts{x} files should be checked
 	]
 }

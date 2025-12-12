@@ -1,8 +1,9 @@
-@import "./components/create-template-part-modal/style.scss";
-@import "./fields/slug/style.scss";
-@import "./fields/featured-image/style.scss";
-@import "./fields/parent/style.scss";
-@import "./fields/password/style.scss";
-@import "./fields/template/style.scss";
-@import "./fields/title/style.scss";
-@import "./fields/pattern-title/style.scss";
+@use "@wordpress/base-styles/default-custom-properties";
+@use "./components/create-template-part-modal/style.scss" as *;
+@use "./fields/slug/style.scss" as *;
+@use "./fields/featured-image/style.scss" as *;
+@use "./fields/parent/style.scss" as *;
+@use "./fields/password/style.scss" as *;
+@use "./fields/template/style.scss" as *;
+@use "./fields/title/style.scss" as *;
+@use "./fields/pattern-title/style.scss" as *;

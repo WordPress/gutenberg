@@ -1,65 +1,108 @@
 /**
  * WordPress dependencies
  */
-import { __experimentalVStack as VStack } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
-import { dateI18n, getSettings as getDateSettings } from '@wordpress/date';
-import { useEntityProp, store as coreStore } from '@wordpress/core-data';
+import { Tooltip, __experimentalVStack as VStack } from '@wordpress/components';
+import { __, _x } from '@wordpress/i18n';
+import {
+	dateI18n,
+	getSettings as getDateSettings,
+	humanTimeDiff,
+	getDate,
+} from '@wordpress/date';
+import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
- * Render author information for a comment.
- *
- * @param {Object} props        - Component properties.
- * @param {string} props.avatar - URL of the author's avatar.
- * @param {string} props.name   - Name of the author.
- * @param {string} props.date   - Date of the comment.
- *
- * @return {React.ReactNode} The JSX element representing the author's information.
+ * Internal dependencies
  */
-function CommentAuthorInfo( { avatar, name, date } ) {
+import { getAvatarBorderColor } from './utils';
+
+function CommentAuthorInfo( { avatar, name, date, userId } ) {
+	const hasAvatar = !! avatar;
 	const dateSettings = getDateSettings();
-	const [ dateTimeFormat = dateSettings.formats.time ] = useEntityProp(
-		'root',
-		'site',
-		'time_format'
+	const {
+		currentUserAvatar,
+		currentUserName,
+		currentUserId,
+		dateFormat = dateSettings.formats.date,
+	} = useSelect(
+		( select ) => {
+			const { canUser, getCurrentUser, getEntityRecord } =
+				select( coreStore );
+			const siteSettings = canUser( 'read', {
+				kind: 'root',
+				name: 'site',
+			} )
+				? getEntityRecord( 'root', 'site' )
+				: undefined;
+
+			if ( hasAvatar ) {
+				return {
+					dateFormat: siteSettings?.date_format,
+				};
+			}
+
+			const { getSettings } = select( blockEditorStore );
+			const { __experimentalDiscussionSettings } = getSettings();
+			const defaultAvatar = __experimentalDiscussionSettings?.avatarURL;
+			const userData = getCurrentUser();
+			return {
+				currentUserAvatar:
+					userData?.avatar_urls?.[ 48 ] ?? defaultAvatar,
+				currentUserName: userData?.name,
+				currentUserId: userData?.id,
+				dateFormat: siteSettings?.date_format,
+			};
+		},
+		[ hasAvatar ]
 	);
 
-	const { currentUserAvatar, currentUserName } = useSelect( ( select ) => {
-		const userData = select( coreStore ).getCurrentUser();
+	const commentDate = getDate( date );
+	const commentDateTime = dateI18n( 'c', commentDate );
+	const shouldShowHumanTimeDiff =
+		Math.floor( ( new Date() - commentDate ) / ( 1000 * 60 * 60 * 24 ) ) <
+		30;
 
-		const { getSettings } = select( blockEditorStore );
-		const { __experimentalDiscussionSettings } = getSettings();
-		const defaultAvatar = __experimentalDiscussionSettings?.avatarURL;
-		return {
-			currentUserAvatar: userData?.avatar_urls[ 48 ] ?? defaultAvatar,
-			currentUserName: userData?.name,
-		};
-	}, [] );
+	const commentDateText = shouldShowHumanTimeDiff
+		? humanTimeDiff( commentDate )
+		: dateI18n( dateFormat, commentDate );
 
-	const currentDate = new Date();
+	const tooltipText = dateI18n(
+		// translators: Use a non-breaking space between 'g:i' and 'a' if appropriate.
+		_x( 'F j, Y g:i\xa0a', 'Note date full date format' ),
+		date
+	);
 
 	return (
 		<>
 			<img
-				src={ avatar ?? currentUserAvatar }
+				src={ avatar || currentUserAvatar }
 				className="editor-collab-sidebar-panel__user-avatar"
 				// translators: alt text for user avatar image
 				alt={ __( 'User avatar' ) }
 				width={ 32 }
 				height={ 32 }
+				style={ {
+					borderColor: getAvatarBorderColor(
+						userId ?? currentUserId
+					),
+				} }
 			/>
 			<VStack spacing="0">
 				<span className="editor-collab-sidebar-panel__user-name">
 					{ name ?? currentUserName }
 				</span>
-				<time
-					dateTime={ dateI18n( 'c', date ?? currentDate ) }
-					className="editor-collab-sidebar-panel__user-time"
-				>
-					{ dateI18n( dateTimeFormat, date ?? currentDate ) }
-				</time>
+				{ date && (
+					<Tooltip text={ tooltipText }>
+						<time
+							dateTime={ commentDateTime }
+							className="editor-collab-sidebar-panel__user-time"
+						>
+							{ commentDateText }
+						</time>
+					</Tooltip>
+				) }
 			</VStack>
 		</>
 	);

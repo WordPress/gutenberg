@@ -16,12 +16,10 @@ import usePostContentBlocks from './use-post-content-blocks';
  */
 export default function DisableNonPageContentBlocks() {
 	const contentOnlyIds = usePostContentBlocks();
-	const { templateParts, isNavigationMode } = useSelect( ( select ) => {
-		const { getBlocksByName, isNavigationMode: _isNavigationMode } =
-			select( blockEditorStore );
+	const { templateParts } = useSelect( ( select ) => {
+		const { getBlocksByName } = select( blockEditorStore );
 		return {
 			templateParts: getBlocksByName( 'core/template-part' ),
-			isNavigationMode: _isNavigationMode(),
 		};
 	}, [] );
 	const disabledIds = useSelect(
@@ -79,23 +77,19 @@ export default function DisableNonPageContentBlocks() {
 			registry.dispatch( blockEditorStore );
 
 		registry.batch( () => {
-			if ( ! isNavigationMode ) {
-				for ( const clientId of templateParts ) {
-					setBlockEditingMode( clientId, 'contentOnly' );
-				}
+			for ( const clientId of templateParts ) {
+				setBlockEditingMode( clientId, 'contentOnly' );
 			}
 		} );
 
 		return () => {
 			registry.batch( () => {
-				if ( ! isNavigationMode ) {
-					for ( const clientId of templateParts ) {
-						unsetBlockEditingMode( clientId );
-					}
+				for ( const clientId of templateParts ) {
+					unsetBlockEditingMode( clientId );
 				}
 			} );
 		};
-	}, [ templateParts, isNavigationMode, registry ] );
+	}, [ templateParts, registry ] );
 
 	useEffect( () => {
 		const { setBlockEditingMode, unsetBlockEditingMode } =

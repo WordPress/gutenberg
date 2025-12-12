@@ -111,53 +111,60 @@ function Notice( {
 			<VisuallyHidden>{ getStatusLabel( status ) }</VisuallyHidden>
 			<div className="components-notice__content">
 				{ children }
-				<div className="components-notice__actions">
-					{ actions.map(
-						(
-							{
-								className: buttonCustomClasses,
-								label,
-								isPrimary,
-								variant,
-								noDefaultClasses = false,
-								onClick,
-								url,
-							}: NoticeAction &
-								// `isPrimary` is a legacy prop included for
-								// backcompat, but `variant` should be used
-								// instead.
-								Pick< DeprecatedButtonProps, 'isPrimary' >,
-							index
-						) => {
-							let computedVariant = variant;
-							if ( variant !== 'primary' && ! noDefaultClasses ) {
-								computedVariant = ! url ? 'secondary' : 'link';
-							}
-							if (
-								typeof computedVariant === 'undefined' &&
-								isPrimary
-							) {
-								computedVariant = 'primary';
-							}
+				{ actions.length > 0 && (
+					<div className="components-notice__actions">
+						{ actions.map(
+							(
+								{
+									className: buttonCustomClasses,
+									label,
+									isPrimary,
+									variant,
+									noDefaultClasses = false,
+									onClick,
+									url,
+								}: NoticeAction &
+									// `isPrimary` is a legacy prop included for
+									// backcompat, but `variant` should be used
+									// instead.
+									Pick< DeprecatedButtonProps, 'isPrimary' >,
+								index
+							) => {
+								let computedVariant = variant;
+								if (
+									variant !== 'primary' &&
+									! noDefaultClasses
+								) {
+									computedVariant = ! url
+										? 'secondary'
+										: 'link';
+								}
+								if (
+									typeof computedVariant === 'undefined' &&
+									isPrimary
+								) {
+									computedVariant = 'primary';
+								}
 
-							return (
-								<Button
-									__next40pxDefaultSize
-									key={ index }
-									href={ url }
-									variant={ computedVariant }
-									onClick={ url ? undefined : onClick }
-									className={ clsx(
-										'components-notice__action',
-										buttonCustomClasses
-									) }
-								>
-									{ label }
-								</Button>
-							);
-						}
-					) }
-				</div>
+								return (
+									<Button
+										__next40pxDefaultSize
+										key={ index }
+										href={ url }
+										variant={ computedVariant }
+										onClick={ url ? undefined : onClick }
+										className={ clsx(
+											'components-notice__action',
+											buttonCustomClasses
+										) }
+									>
+										{ label }
+									</Button>
+								);
+							}
+						) }
+					</div>
+				) }
 			</div>
 			{ isDismissible && (
 				<Button

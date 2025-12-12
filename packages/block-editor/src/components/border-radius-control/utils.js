@@ -60,9 +60,13 @@ export function getAllValue( values = {} ) {
 		return values;
 	}
 
-	const parsedQuantitiesAndUnits = Object.values( values ).map( ( value ) =>
-		parseQuantityAndUnitFromRawValue( value )
-	);
+	const parsedQuantitiesAndUnits = Object.values( values ).map( ( value ) => {
+		const newValue = parseQuantityAndUnitFromRawValue( value );
+		if ( typeof value === 'string' && newValue[ 0 ] === undefined ) {
+			return [ value, '' ];
+		}
+		return newValue;
+	} );
 
 	const allValues = parsedQuantitiesAndUnits.map(
 		( value ) => value[ 0 ] ?? ''
@@ -153,7 +157,7 @@ export function isValuePreset( value ) {
  *
  * @param {string} value Value to extract slug from.
  *
- * @return {string|undefined} The int value of the slug from given preset.
+ * @return {string|undefined} The value slug from given preset.
  */
 export function getPresetSlug( value ) {
 	if ( ! value ) {
@@ -234,6 +238,7 @@ export function getPresetValueFromControlValue(
 	} else if ( size === 0 ) {
 		return '0';
 	}
+
 	return `var:preset|border-radius|${ presets[ controlValue ]?.slug }`;
 }
 

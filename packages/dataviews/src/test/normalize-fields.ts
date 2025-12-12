@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { normalizeFields } from '../normalize-fields';
+import normalizeFields from '../field-types';
 import type { Field } from '../types';
 
 describe( 'normalizeFields: default getValue', () => {
@@ -42,6 +42,120 @@ describe( 'normalizeFields: default getValue', () => {
 			expect( result ).toBe( 'value' );
 		} );
 	} );
+	describe( 'setValue from ID', () => {
+		it( 'user', () => {
+			const item = { user: 'value', email: 'user@example.com' };
+			const fields: Field< {} >[] = [
+				{
+					id: 'user',
+				},
+				{
+					id: 'email',
+				},
+			];
+			const normalizedFields = normalizeFields( fields );
+			const result = normalizedFields[ 0 ].setValue( {
+				item,
+				value: 'newValue',
+			} );
+			expect( result ).toEqual( { user: 'newValue' } );
+		} );
+
+		it( 'user.name', () => {
+			const item = {
+				user: { name: 'value', email: 'user@example.com' },
+				date: '2023-01-01',
+			};
+			const fields: Field< {} >[] = [
+				{
+					id: 'user.name',
+				},
+				{
+					id: 'user.email',
+				},
+				{
+					id: 'date',
+				},
+			];
+			const normalizedFields = normalizeFields( fields );
+			const result = normalizedFields[ 0 ].setValue( {
+				item,
+				value: 'newValue',
+			} );
+			expect( result ).toEqual( { user: { name: 'newValue' } } );
+		} );
+
+		it( 'user.name.first', () => {
+			const item = {
+				user: {
+					name: { first: 'firstName', last: 'lastName' },
+					email: 'user@example.com',
+				},
+				date: '2023-01-01',
+			};
+			const fields: Field< {} >[] = [
+				{
+					id: 'user.name.first',
+				},
+				{
+					id: 'user.name.last',
+				},
+				{
+					id: 'user.email',
+				},
+				{
+					id: 'date',
+				},
+			];
+			const normalizedFields = normalizeFields( fields );
+			const result = normalizedFields[ 0 ].setValue( {
+				item,
+				value: 'newValue',
+			} );
+			expect( result ).toEqual( {
+				user: {
+					name: { first: 'newValue' },
+				},
+			} );
+		} );
+
+		it( 'returns null for null value', () => {
+			const item = { user: 'value', email: 'user@example.com' };
+			const fields: Field< {} >[] = [
+				{
+					id: 'user',
+				},
+				{
+					id: 'email',
+				},
+			];
+			const normalizedFields = normalizeFields( fields );
+			const result = normalizedFields[ 0 ].setValue( {
+				item,
+				value: null,
+			} );
+			expect( result ).toEqual( { user: null } );
+		} );
+
+		it( 'returns undefined for undefined value', () => {
+			const item = { user: 'value', email: 'user@example.com' };
+			const fields: Field< {} >[] = [
+				{
+					id: 'user',
+				},
+				{
+					id: 'email',
+				},
+			];
+			const normalizedFields = normalizeFields( fields );
+			const result = normalizedFields[ 0 ].setValue( {
+				item,
+				value: undefined,
+			} );
+			expect( result ).toEqual( { user: undefined } );
+		} );
+	} );
+
 	describe( 'filterBy', () => {
 		it( 'returns the default field type definition if undefined for untyped field', () => {
 			const fields: Field< {} >[] = [
@@ -51,7 +165,10 @@ describe( 'normalizeFields: default getValue', () => {
 			];
 			const normalizedFields = normalizeFields( fields );
 			const result = normalizedFields[ 0 ].filterBy;
-			expect( result ).toStrictEqual( { operators: [ 'is', 'isNot' ] } );
+			expect( result ).toStrictEqual( {
+				isPrimary: false,
+				operators: [ 'is', 'isNot' ],
+			} );
 		} );
 		it( 'returns the default field type definition if undefined for untyped field (for primary filters)', () => {
 			const fields: Field< {} >[] = [
@@ -80,6 +197,30 @@ describe( 'normalizeFields: default getValue', () => {
 			const normalizedFields = normalizeFields( fields );
 			const result = normalizedFields[ 0 ].filterBy;
 			expect( result ).toStrictEqual( {
+				isPrimary: false,
+				operators: [
+					'is',
+					'isNot',
+					'lessThan',
+					'greaterThan',
+					'lessThanOrEqual',
+					'greaterThanOrEqual',
+					'between',
+				],
+			} );
+		} );
+
+		it( 'returns the field type definition for number fields', () => {
+			const fields: Field< {} >[] = [
+				{
+					id: 'price',
+					type: 'number',
+				},
+			];
+			const normalizedFields = normalizeFields( fields );
+			const result = normalizedFields[ 0 ].filterBy;
+			expect( result ).toStrictEqual( {
+				isPrimary: false,
 				operators: [
 					'is',
 					'isNot',
@@ -194,6 +335,133 @@ describe( 'normalizeFields: default getValue', () => {
 			expect( result ).toStrictEqual( {
 				isPrimary: true,
 				operators: [ 'lessThan' ],
+			} );
+		} );
+	} );
+
+	describe( 'format normalization', () => {
+		it( 'applies default format when not provided for date fields', () => {
+			const fields: Field< {} >[] = [
+				{
+					id: 'publishDate',
+					type: 'date',
+				},
+			];
+			const normalizedFields = normalizeFields( fields );
+			expect( normalizedFields[ 0 ].format ).toEqual( {
+				date: expect.any( String ),
+				weekStartsOn: expect.any( Number ),
+			} );
+		} );
+
+		it( 'preserves custom format when provided', () => {
+			const fields: Field< {} >[] = [
+				{
+					id: 'publishDate',
+					type: 'date',
+					format: {
+						date: 'F j, Y',
+						weekStartsOn: 1,
+					},
+				},
+			];
+			const normalizedFields = normalizeFields( fields );
+			expect( normalizedFields[ 0 ].format ).toEqual( {
+				date: 'F j, Y',
+				weekStartsOn: 1,
+			} );
+		} );
+
+		it( 'adds empty format for non-date field types', () => {
+			const fields: Field< {} >[] = [
+				{
+					id: 'title',
+					type: 'text',
+				},
+			];
+			const normalizedFields = normalizeFields( fields );
+			expect( normalizedFields[ 0 ].format ).toEqual( {} );
+		} );
+
+		it( 'applies default format for number fields', () => {
+			const fields: Field< {} >[] = [
+				{
+					id: 'price',
+					type: 'number',
+				},
+			];
+			const normalizedFields = normalizeFields( fields );
+			expect( normalizedFields[ 0 ].format ).toEqual( {
+				separatorThousand: ',',
+				separatorDecimal: '.',
+				decimals: 2,
+			} );
+		} );
+
+		it( 'preserves custom format for number fields', () => {
+			const fields: Field< {} >[] = [
+				{
+					id: 'price',
+					type: 'number',
+					format: {
+						separatorThousand: ' ',
+						separatorDecimal: ',',
+						decimals: 3,
+					},
+				},
+			];
+			const normalizedFields = normalizeFields( fields );
+			expect( normalizedFields[ 0 ].format ).toEqual( {
+				separatorThousand: ' ',
+				separatorDecimal: ',',
+				decimals: 3,
+			} );
+		} );
+
+		it( 'applies partial custom format for number fields', () => {
+			const fields: Field< {} >[] = [
+				{
+					id: 'price',
+					type: 'number',
+					format: {
+						decimals: 0,
+					},
+				},
+			];
+			const normalizedFields = normalizeFields( fields );
+			expect( normalizedFields[ 0 ].format ).toEqual( {
+				separatorThousand: ',',
+				separatorDecimal: '.',
+				decimals: 0,
+			} );
+		} );
+
+		it( 'applies default format for integer fields', () => {
+			const fields: Field< {} >[] = [
+				{
+					id: 'count',
+					type: 'integer',
+				},
+			];
+			const normalizedFields = normalizeFields( fields );
+			expect( normalizedFields[ 0 ].format ).toEqual( {
+				separatorThousand: ',',
+			} );
+		} );
+
+		it( 'preserves custom format for integer fields', () => {
+			const fields: Field< {} >[] = [
+				{
+					id: 'count',
+					type: 'integer',
+					format: {
+						separatorThousand: '.',
+					},
+				},
+			];
+			const normalizedFields = normalizeFields( fields );
+			expect( normalizedFields[ 0 ].format ).toEqual( {
+				separatorThousand: '.',
 			} );
 		} );
 	} );

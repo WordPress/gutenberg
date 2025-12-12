@@ -77,11 +77,7 @@ function BlockAlignmentMatrixControl( props ) {
 				);
 			} }
 			renderContent={ () => (
-				<AlignmentMatrixControl
-					hasFocusBorder={ false }
-					onChange={ onChange }
-					value={ value }
-				/>
+				<AlignmentMatrixControl onChange={ onChange } value={ value } />
 			) }
 		/>
 	);

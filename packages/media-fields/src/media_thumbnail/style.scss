@@ -1,0 +1,49 @@
+@use "@wordpress/base-styles/mixins";
+@use "@wordpress/base-styles/colors";
+@use "@wordpress/base-styles/variables";
+
+.dataviews-media-field__media-thumbnail {
+	display: flex;
+	align-items: center;
+	position: relative;
+	height: 100%;
+}
+
+.dataviews-media-field__media-thumbnail--image {
+	display: block;
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+
+.dataviews-media-field__media-thumbnail__stack {
+	color: colors.$gray-700;
+	box-sizing: border-box;
+	width: 100%;
+	height: 100%;
+}
+
+.dataviews-media-field__media-thumbnail--icon {
+	color: colors.$gray-700;
+	fill: currentColor;
+}
+
+.dataviews-media-field__media-thumbnail__filename {
+	box-sizing: border-box;
+	text-align: center;
+	padding: 0 variables.$grid-unit-20;
+	width: 100%;
+	container-type: inline-size;
+	@include mixins.body-small();
+
+	&__truncate {
+		// Use a top margin instead of gap on the parent, as the text will not
+		// always be rendered. This ensures the icon is vertically centered in all contexts.
+		margin-top: variables.$grid-unit-05;
+
+		// Hide filename when previews are very small, as rendered in list views.
+		@container (max-width: 90px) {
+			display: none !important;
+		}
+	}
+}

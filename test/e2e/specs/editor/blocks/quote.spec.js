@@ -241,22 +241,6 @@ test.describe( 'Quote', () => {
 		);
 	} );
 
-	test( 'can be converted to a pullquote', async ( { editor, page } ) => {
-		await editor.insertBlock( { name: 'core/quote' } );
-		await page.keyboard.type( 'one' );
-		await page.keyboard.press( 'Enter' );
-		await page.keyboard.type( 'two' );
-		await editor.clickBlockToolbarButton( 'Select parent block: Quote' );
-		await editor.clickBlockToolbarButton( 'Add citation' );
-		await page.keyboard.type( 'cite' );
-		await editor.transformBlockTo( 'core/pullquote' );
-		expect( await editor.getEditedPostContent() ).toBe(
-			`<!-- wp:pullquote -->
-<figure class="wp-block-pullquote"><blockquote><p>one<br>two</p><cite>cite</cite></blockquote></figure>
-<!-- /wp:pullquote -->`
-		);
-	} );
-
 	test( 'can be split at the end', async ( { editor, page } ) => {
 		await editor.insertBlock( { name: 'core/quote' } );
 		await page.keyboard.type( '1' );

@@ -16,7 +16,15 @@ function SpacingVisualizer( { clientId, value, computeStyle, forceShow } ) {
 		computeStyle( blockElement )
 	);
 
-	// It's not sufficient to read the block’s computed style when `value` changes because
+	// Force style computation when forceShow becomes true (e.g., when hovering control)
+	// to ensure visualizer displays correct dimensions on first render.
+	useEffect( () => {
+		if ( blockElement && forceShow ) {
+			updateStyle();
+		}
+	}, [ blockElement, forceShow ] );
+
+	// It's not sufficient to read the block's computed style when `value` changes because
 	// the effect would run before the block’s style has updated. Thus observing mutations
 	// to the block’s attributes is used to trigger updates to the visualizer’s styles.
 	useEffect( () => {

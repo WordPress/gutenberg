@@ -18,6 +18,7 @@ import { useState, useCallback } from '@wordpress/element';
  * Internal dependencies
  */
 import { store as editorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
 import EditorNotices from '../editor-notices';
 import Header from '../header';
 import InserterSidebar from '../inserter-sidebar';
@@ -25,7 +26,7 @@ import ListViewSidebar from '../list-view-sidebar';
 import SavePublishPanels from '../save-publish-panels';
 import TextEditor from '../text-editor';
 import VisualEditor from '../visual-editor';
-import EditorContentSlotFill from './content-slot-fill';
+import StylesCanvas from '../styles-canvas';
 
 const interfaceLabels = {
 	/* translators: accessibility text for the editor top bar landmark region. */
@@ -42,7 +43,6 @@ const interfaceLabels = {
 
 export default function EditorInterface( {
 	className,
-	styles,
 	children,
 	forceIsDirty,
 	contentRef,
@@ -51,7 +51,6 @@ export default function EditorInterface( {
 	customSaveButton,
 	customSavePanel,
 	forceDisableBlockTools,
-	title,
 	iframeProps,
 } ) {
 	const {
@@ -62,9 +61,14 @@ export default function EditorInterface( {
 		isPreviewMode,
 		showBlockBreadcrumbs,
 		documentLabel,
+		stylesPath,
+		showStylebook,
 	} = useSelect( ( select ) => {
 		const { get } = select( preferencesStore );
 		const { getEditorSettings, getPostTypeLabel } = select( editorStore );
+		const { getStylesPath, getShowStylebook } = unlock(
+			select( editorStore )
+		);
 		const editorSettings = getEditorSettings();
 		const postTypeLabel = getPostTypeLabel();
 
@@ -86,12 +90,16 @@ export default function EditorInterface( {
 			documentLabel:
 				// translators: Default label for the Document in the Block Breadcrumb.
 				postTypeLabel || _x( 'Document', 'noun, breadcrumb' ),
+			stylesPath: getStylesPath(),
+			showStylebook: getShowStylebook(),
 		};
 	}, [] );
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const secondarySidebarLabel = isListViewOpened
 		? __( 'Document Overview' )
 		: __( 'Block Library' );
+	const shouldShowStylesCanvas =
+		showStylebook || stylesPath?.startsWith( '/revisions' );
 
 	// Local state for save panel.
 	// Note 'truthy' callback implies an open panel.
@@ -127,7 +135,6 @@ export default function EditorInterface( {
 						}
 						customSaveButton={ customSaveButton }
 						forceDisableBlockTools={ forceDisableBlockTools }
-						title={ title }
 					/>
 				)
 			}
@@ -148,41 +155,35 @@ export default function EditorInterface( {
 						<EditorNotices />
 					) }
 
-					<EditorContentSlotFill.Slot>
-						{ ( [ editorCanvasView ] ) =>
-							editorCanvasView ? (
-								editorCanvasView
-							) : (
-								<>
-									{ ! isPreviewMode && mode === 'text' && (
-										<TextEditor
-											// We should auto-focus the canvas (title) on load.
-											// eslint-disable-next-line jsx-a11y/no-autofocus
-											autoFocus={ autoFocus }
-										/>
-									) }
-									{ ! isPreviewMode &&
-										! isLargeViewport &&
-										mode === 'visual' && (
-											<BlockToolbar hideDragHandle />
-										) }
-									{ ( isPreviewMode ||
-										mode === 'visual' ) && (
-										<VisualEditor
-											styles={ styles }
-											contentRef={ contentRef }
-											disableIframe={ disableIframe }
-											// We should auto-focus the canvas (title) on load.
-											// eslint-disable-next-line jsx-a11y/no-autofocus
-											autoFocus={ autoFocus }
-											iframeProps={ iframeProps }
-										/>
-									) }
-									{ children }
-								</>
-							)
-						}
-					</EditorContentSlotFill.Slot>
+					{ shouldShowStylesCanvas ? (
+						<StylesCanvas />
+					) : (
+						<>
+							{ ! isPreviewMode && mode === 'text' && (
+								<TextEditor
+									// We should auto-focus the canvas (title) on load.
+									// eslint-disable-next-line jsx-a11y/no-autofocus
+									autoFocus={ autoFocus }
+								/>
+							) }
+							{ ! isPreviewMode &&
+								! isLargeViewport &&
+								mode === 'visual' && (
+									<BlockToolbar hideDragHandle />
+								) }
+							{ ( isPreviewMode || mode === 'visual' ) && (
+								<VisualEditor
+									contentRef={ contentRef }
+									disableIframe={ disableIframe }
+									// We should auto-focus the canvas (title) on load.
+									// eslint-disable-next-line jsx-a11y/no-autofocus
+									autoFocus={ autoFocus }
+									iframeProps={ iframeProps }
+								/>
+							) }
+							{ children }
+						</>
+					) }
 				</>
 			}
 			footer={

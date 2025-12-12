@@ -2,7 +2,7 @@
 /**
  * Test the aria-label block support.
  *
- * @package Gutenberg
+ * @package gutenberg
  */
 class WP_Block_Supports_Aria_Label_Test extends WP_UnitTestCase {
 	/**

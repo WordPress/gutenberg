@@ -27,7 +27,7 @@ if ( ! function_exists( 'the_gutenberg_experiments' ) ) {
 			'siteUrl' => site_url(),
 		);
 
-		$editor_settings         = get_block_editor_settings( $custom_settings, $block_editor_context );
+		$editor_settings = get_block_editor_settings( $custom_settings, $block_editor_context );
 
 		wp_register_style(
 			'wp-gutenberg-experiments',
@@ -66,19 +66,22 @@ function gutenberg_initialize_experiments_settings() {
 				'schema' => array(
 					'type'       => 'object',
 					'properties' => array(
-						'gutenberg-block-experiments'    => array( 'type' => 'boolean' ),
-						'gutenberg-form-blocks'          => array( 'type' => 'boolean' ),
-						'gutenberg-grid-interactivity'   => array( 'type' => 'boolean' ),
-						'gutenberg-no-tinymce'           => array( 'type' => 'boolean' ),
-						'gutenberg-media-processing'     => array( 'type' => 'boolean' ),
-						'gutenberg-block-comments'       => array( 'type' => 'boolean' ),
-						'gutenberg-sync-collaboration'   => array( 'type' => 'boolean' ),
-						'gutenberg-custom-dataviews'     => array( 'type' => 'boolean' ),
-						'gutenberg-new-posts-dashboard'  => array( 'type' => 'boolean' ),
-						'gutenberg-quick-edit-dataviews' => array( 'type' => 'boolean' ),
-						'gutenberg-editor-write-mode'    => array( 'type' => 'boolean' ),
+						'gutenberg-block-experiments'                => array( 'type' => 'boolean' ),
+						'gutenberg-form-blocks'                      => array( 'type' => 'boolean' ),
+						'gutenberg-grid-interactivity'               => array( 'type' => 'boolean' ),
+						'gutenberg-no-tinymce'                       => array( 'type' => 'boolean' ),
+						'gutenberg-customizable-navigation-overlays' => array( 'type' => 'boolean' ),
+						'gutenberg-hide-blocks-based-on-screen-size' => array( 'type' => 'boolean' ),
+						'gutenberg-media-processing'                 => array( 'type' => 'boolean' ),
+						'gutenberg-sync-collaboration'               => array( 'type' => 'boolean' ),
+						'gutenberg-color-randomizer'                 => array( 'type' => 'boolean' ),
+						'gutenberg-new-posts-dashboard'              => array( 'type' => 'boolean' ),
+						'gutenberg-quick-edit-dataviews'             => array( 'type' => 'boolean' ),
+						'gutenberg-dataviews-media-modal'            => array( 'type' => 'boolean' ),
 						'gutenberg-full-page-client-side-navigation' => array( 'type' => 'boolean' ),
-						'gutenberg-color-randomizer'     => array( 'type' => 'boolean' ),
+						'gutenberg-content-only-pattern-insertion'   => array( 'type' => 'boolean' ),
+						'gutenberg-content-only-inspector-fields'    => array( 'type' => 'boolean' ),
+						'gutenberg-workflow-palette'                 => array( 'type' => 'boolean' ),
 					),
 				),
 			),

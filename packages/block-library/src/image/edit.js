@@ -464,7 +464,6 @@ export function ImageEdit( {
 					onSelectURL={ onSelectURL }
 					onError={ onUploadError }
 					placeholder={ placeholder }
-					accept="image/*"
 					allowedTypes={ ALLOWED_MEDIA_TYPES }
 					handleUpload={ ( files ) => files.length === 1 }
 					value={ { id, src } }

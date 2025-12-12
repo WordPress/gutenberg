@@ -1,3 +1,7 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/variables" as *;
+
 /**
  * Editor only CSS.
  */
@@ -644,4 +648,9 @@ body.editor-styles-wrapper .wp-block-navigation__responsive-container.is-menu-op
 
 .wp-block-navigation__submenu-accessibility-notice {
 	grid-column: span 2;
+}
+
+.wp-block-navigation__overlay-edit-button {
+	margin-top: $grid-unit-10;
+	width: fit-content;
 }

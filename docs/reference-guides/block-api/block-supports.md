@@ -42,6 +42,34 @@ function render_block() {
 }
 ```
 
+## allowedBlocks
+
+_**Note:** Since WordPress 6.9._
+
+-   Type: `boolean`
+-   Default value: `false`
+
+This property adds UI controls which enable the user to select allowed child blocks for a block container. To use this feature, pass `attributes.allowedBlocks` as the `allowedBlocks` property in the options object of `useInnerBlocksProps`.
+
+```js
+supports: {
+	allowedBlocks: true
+}
+```
+
+```jsx
+import { useBlockProps, useInnerBlocksProps } from '@wordpress/block-editor';
+
+function Edit( { attributes } ) {
+	const { allowedBlocks } = attributes;
+	const blockProps = useBlockProps();
+	const innerBlocksProps = useInnerBlocksProps( blockProps, {
+		allowedBlocks
+	} );
+	return <div { ...innerBlocksProps } />;
+}
+```
+
 ## anchor
 
 -   Type: `boolean`
@@ -54,6 +82,29 @@ Anchors let you link directly to a specific block on a page. This property adds 
 supports: {
 	anchor: true
 }
+```
+
+## auto_register
+
+-   Type: `boolean`
+-   Default value: `false`
+
+Enables [PHP-only blocks](/docs/getting-started/fundamentals/registration-of-a-block.md#php-only-blocks-with-auto-registration) to automatically appear in the block editor without requiring JavaScript registration. When set to `true`, blocks registered on the server with a `render_callback` will automatically be registered in the editor and use `ServerSideRender`. These blocks default to block API version 3 and are automatically upgraded if they're using an older version.
+
+```php
+register_block_type( 'my-plugin/server-block', array(
+	'render_callback' => function( $attributes ) {
+		$wrapper_attributes = get_block_wrapper_attributes();
+
+		return sprintf(
+			'<div %1$s>Server content</div>',
+			$wrapper_attributes
+		);
+	},
+	'supports' => array(
+		'auto_register' => true,
+	),
+) );
 ```
 
 ## align
@@ -579,6 +630,7 @@ _**Note:** Since WordPress 6.2._
 -   Default value: null
 -   Subproperties:
     -   `minHeight`: type `boolean`, default value `false`
+    -   `width`: type `boolean`, default value `false`
 
 This value signals that a block supports some of the CSS style properties related to dimensions. When it does, the block editor will show UI controls for the user to set their values if [the theme declares support](/docs/how-to-guides/themes/global-settings-and-styles.md#opt-in-into-ui-controls).
 
@@ -587,20 +639,22 @@ supports: {
 	dimensions: {
 		aspectRatio: true // Enable aspect ratio control.
 		minHeight: true // Enable min height control.
+		width: true // Enable width control.
 	}
 }
 ```
 
 When a block declares support for a specific dimensions property, its attributes definition is extended to include the `style` attribute.
 
--   `style`: an attribute of `object` type with no default assigned. This is added when `aspectRatio` or `minHeight` support is declared. It stores the custom values set by the user. For example:
+-   `style`: an attribute of `object` type with no default assigned. This is added when `aspectRatio`, `minHeight`, or `width` support is declared. It stores the custom values set by the user. For example:
 
 ```js
 attributes: {
     style: {
         dimensions: {
             aspectRatio: "16/9",
-            minHeight: "50vh"
+            minHeight: "50vh",
+            width: "400px",
         }
     }
 }
@@ -1118,3 +1172,18 @@ is only meant for simple text blocks such as paragraphs and headings with a
 single `RichText` field. RichText in the `edit` function _must_ have an
 `identifier` prop that matches the attribute key of the text, so that it updates
 the selection correctly and we know where to split.
+
+## visibility
+
+_**Note:** Since WordPress 6.9._
+
+-   Type: `boolean`
+-   Default value: `true`
+
+By default, a block can be hidden by a user from the block 'Options' dropdown. To disable this behavior, set visibility to false.
+
+```js
+supports: {
+	visibility: false,
+}
+```

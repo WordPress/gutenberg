@@ -139,9 +139,45 @@ describe( 'DataForm component', () => {
 			expect( onChange ).toHaveBeenCalledTimes( newValue.length );
 			for ( let i = 0; i < newValue.length; i++ ) {
 				expect( onChange ).toHaveBeenNthCalledWith( i + 1, {
-					title: newValue[ i ],
+					title: newValue.slice( 0, i + 1 ),
 				} );
 			}
+		} );
+
+		it( 'should allow decimal input for number fields', async () => {
+			const onChange = jest.fn();
+			const fieldsWithNumber = [
+				...fields,
+				{
+					id: 'price',
+					label: 'Price',
+					type: 'number' as const,
+				},
+			];
+			const formWithNumber = {
+				...form,
+				fields: [ ...form.fields, 'price' ],
+			};
+			render(
+				<Dataform
+					onChange={ onChange }
+					fields={ fieldsWithNumber }
+					form={ formWithNumber }
+					data={ { ...data, price: 2.5 } }
+				/>
+			);
+
+			const priceInput = screen.getByRole( 'spinbutton', {
+				name: /price/i,
+			} );
+			expect( priceInput ).toHaveValue( 2.5 );
+
+			const user = userEvent.setup();
+			await user.clear( priceInput );
+			await user.type( priceInput, '3.75' );
+
+			expect( onChange ).toHaveBeenLastCalledWith( { price: 3.75 } );
+			expect( priceInput ).toHaveValue( 3.75 );
 		} );
 
 		it( 'should wrap fields in HStack when labelPosition is set to side', async () => {
@@ -408,7 +444,7 @@ describe( 'DataForm component', () => {
 			expect( onChange ).toHaveBeenCalledTimes( newValue.length );
 			for ( let i = 0; i < newValue.length; i++ ) {
 				expect( onChange ).toHaveBeenNthCalledWith( i + 1, {
-					title: newValue[ i ],
+					title: newValue.slice( 0, i + 1 ),
 				} );
 			}
 		} );

@@ -66,6 +66,10 @@ export function useUploadMediaFromBlobURL( args = {} ) {
 		const { url, allowedTypes, onChange, onError } = latestArgsRef.current;
 		const { mediaUpload } = getSettings();
 
+		if ( ! mediaUpload ) {
+			return;
+		}
+
 		hasUploadStartedRef.current = true;
 
 		mediaUpload( {
@@ -87,6 +91,15 @@ export function useUploadMediaFromBlobURL( args = {} ) {
 			},
 		} );
 	}, [ getSettings ] );
+}
+
+export function useDefaultAvatar() {
+	const { avatarURL: defaultAvatarUrl } = useSelect( ( select ) => {
+		const { getSettings } = select( blockEditorStore );
+		const { __experimentalDiscussionSettings } = getSettings();
+		return __experimentalDiscussionSettings;
+	} );
+	return defaultAvatarUrl;
 }
 
 export function useToolsPanelDropdownMenuProps() {

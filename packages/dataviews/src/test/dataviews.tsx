@@ -15,7 +15,7 @@ import { useMemo, useState } from '@wordpress/element';
 import DataViews from '../components/dataviews';
 import { LAYOUT_GRID, LAYOUT_LIST, LAYOUT_TABLE } from '../constants';
 import type { Action, View } from '../types';
-import { filterSortAndPaginate } from '../filter-and-sort-data-view';
+import filterSortAndPaginate from '../utils/filter-sort-and-paginate';
 
 type Data = {
 	id: number;
@@ -89,7 +89,6 @@ const actions: Action< Data >[] = [
 	{
 		id: 'delete',
 		label: 'Delete',
-		isDestructive: true,
 		supportsBulk: true,
 		RenderModal: () => <div>Modal Content</div>,
 	},
@@ -540,6 +539,7 @@ describe( 'DataViews component', () => {
 			await user.click( viewOptionsButton );
 
 			await user.tab();
+			await user.tab();
 
 			expect(
 				screen.getByRole( 'checkbox', { name: data[ 0 ].title } )
@@ -583,6 +583,7 @@ describe( 'DataViews component', () => {
 			// instead of a direct .focus() so that effects have time to complete.
 			await user.click( viewOptionsButton );
 			await user.click( viewOptionsButton );
+			await user.tab();
 			await user.tab();
 
 			expect(

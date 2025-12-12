@@ -1,0 +1,54 @@
+[
+	{
+		"name": "core/accordion",
+		"isValid": true,
+		"attributes": {
+			"iconPosition": "right",
+			"showIcon": true,
+			"autoclose": false,
+			"headingLevel": 3
+		},
+		"innerBlocks": [
+			{
+				"name": "core/accordion-item",
+				"isValid": true,
+				"attributes": {
+					"openByDefault": false
+				},
+				"innerBlocks": [
+					{
+						"name": "core/accordion-heading",
+						"isValid": true,
+						"attributes": {
+							"openByDefault": false,
+							"title": "Accordion Title",
+							"iconPosition": "right",
+							"showIcon": true
+						},
+						"innerBlocks": []
+					},
+					{
+						"name": "core/accordion-panel",
+						"isValid": true,
+						"attributes": {
+							"templateLock": false,
+							"openByDefault": false,
+							"isSelected": false
+						},
+						"innerBlocks": [
+							{
+								"name": "core/paragraph",
+								"isValid": true,
+								"attributes": {
+									"content": "Accordion  Panel Content",
+									"dropCap": false
+								},
+								"innerBlocks": []
+							}
+						]
+					}
+				]
+			}
+		]
+	}
+]

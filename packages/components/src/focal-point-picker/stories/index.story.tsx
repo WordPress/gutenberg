@@ -2,6 +2,7 @@
  * External dependencies
  */
 import type { Meta, StoryFn } from '@storybook/react';
+import { fn } from '@storybook/test';
 
 /**
  * WordPress dependencies
@@ -19,8 +20,13 @@ const meta: Meta< typeof FocalPointPicker > = {
 		help: { control: 'text' },
 		label: { control: 'text' },
 	},
+	args: {
+		onChange: fn(),
+		onDrag: fn(),
+		onDragEnd: fn(),
+		onDragStart: fn(),
+	},
 	parameters: {
-		actions: { argTypesRegex: '^on.*' },
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
 	},

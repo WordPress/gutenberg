@@ -7,7 +7,12 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useRef, createContext, useContext } from '@wordpress/element';
+import {
+	useRef,
+	createContext,
+	useContext,
+	useCallback,
+} from '@wordpress/element';
 import { __unstableMotion as motion } from '@wordpress/components';
 import { useReducedMotion } from '@wordpress/compose';
 
@@ -113,6 +118,18 @@ function InbetweenInsertionPointPopover( {
 		}
 	}
 
+	// Reset the insertion point reference when the Inserter unmounts,
+	// avoids stale references when `onSelectOrClose` is not called.
+	// See: https://github.com/WordPress/gutenberg/issues/65598#issuecomment-3249229264.
+	const maybeResetOpenRef = useCallback(
+		( node ) => {
+			if ( ! node && openRef.current ) {
+				openRef.current = false;
+			}
+		},
+		[ openRef ]
+	);
+
 	const lineVariants = {
 		// Initial position starts from the center and invisible.
 		start: {
@@ -203,6 +220,7 @@ function InbetweenInsertionPointPopover( {
 						) }
 					>
 						<Inserter
+							ref={ maybeResetOpenRef }
 							position="bottom center"
 							clientId={ nextClientId }
 							rootClientId={ rootClientId }
