@@ -6,7 +6,7 @@ import { render } from '@testing-library/react';
 /**
  * Internal dependencies
  */
-import { createElement, Fragment, Component } from '../react';
+import { createElement, Fragment } from '../react';
 import createInterpolateElement from '../create-interpolate-element';
 
 describe( 'createInterpolateElement', () => {
@@ -113,9 +113,9 @@ describe( 'createInterpolateElement', () => {
 		'returns expected output for a custom component with children ' +
 			'replacement',
 		() => {
-			const TestComponent = ( props ) => {
+			function TestComponent( props ) {
 				return <div { ...props }>{ props.children }</div>;
-			};
+			}
 			const testString =
 				'This is a string with a <TestComponent>Custom Component</TestComponent>';
 			const expectedElement = createElement(
@@ -134,9 +134,9 @@ describe( 'createInterpolateElement', () => {
 		}
 	);
 	it( 'returns expected output for self closing custom component', () => {
-		const TestComponent = ( props ) => {
+		function TestComponent( props ) {
 			return <div { ...props } />;
-		};
+		}
 		const testString =
 			'This is a string with a self closing custom component: <TestComponent/>';
 		const expectedElement = createElement(
@@ -161,10 +161,12 @@ describe( 'createInterpolateElement', () => {
 		expect( test ).toThrow( TypeError );
 	} );
 	it( 'returns expected output for complex replacement', () => {
-		class TestComponent extends Component {
-			render( props ) {
+		/** @param {any} props */
+		function TestComponent( props ) {
+			function renderContent() {
 				return <div { ...props } />;
 			}
+			return renderContent();
 		}
 		const testString =
 			'This is a complex string with ' +
@@ -194,7 +196,7 @@ describe( 'createInterpolateElement', () => {
 		).toEqual( JSON.stringify( expectedElement ) );
 	} );
 	it( 'renders expected components across renders for keys in use', () => {
-		const TestComponent = ( { switchKey } ) => {
+		function TestComponent( { switchKey } ) {
 			const elementConfig = switchKey
 				? { item: <em /> }
 				: { item: <strong /> };
@@ -206,7 +208,7 @@ describe( 'createInterpolateElement', () => {
 					) }
 				</div>
 			);
-		};
+		}
 		const { container, rerender } = render( <TestComponent switchKey /> );
 
 		expect( container ).toContainHTML( '<em>string!</em>' );

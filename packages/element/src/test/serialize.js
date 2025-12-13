@@ -21,7 +21,7 @@ import serialize, {
 	renderStyle,
 } from '../serialize';
 
-const noop = () => {};
+function noop() {}
 
 describe( 'serialize()', () => {
 	it( 'should allow only valid attribute names', () => {
@@ -62,10 +62,8 @@ describe( 'serialize()', () => {
 			return 'FunctionComponent: ' + context.greeting;
 		}
 
-		class ClassComponent extends Component {
-			render() {
-				return 'ClassComponent: ' + this.context.greeting;
-			}
+		function ClassComponent( props, context ) {
+			return 'ClassComponent: ' + context.greeting;
 		}
 
 		const result = serialize(
@@ -245,10 +243,8 @@ describe( 'renderElement()', () => {
 	} );
 
 	it( 'renders class component', () => {
-		class Greeting extends Component {
-			render() {
-				return <div className="greeting">Hello</div>;
-			}
+		function Greeting() {
+			return <div className="greeting">Hello</div>;
 		}
 
 		const result = renderElement( <Greeting /> );
