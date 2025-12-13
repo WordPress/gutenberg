@@ -23,6 +23,7 @@
 - Field API: display formats for `number` and `integer` types. [#73644](https://github.com/WordPress/gutenberg/pull/73644)
 - DataViews: Update padding to 24px for consistency. [#73334](https://github.com/WordPress/gutenberg/pull/73334)
 - DataViews: Simplify list layout field color styles. [#73884](https://github.com/WordPress/gutenberg/pull/73884)
+- DataViews: Add panel form layout validation. [#73700](https://github.com/WordPress/gutenberg/pull/73700)
 
 ## 11.0.0 (2025-11-26)
 
