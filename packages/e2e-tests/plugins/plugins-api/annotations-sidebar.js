@@ -5,86 +5,83 @@
 	const dispatch = wp.data.dispatch;
 	const Fragment = wp.element.Fragment;
 	const el = wp.element.createElement;
-	const Component = wp.element.Component;
+	const { useState } = wp.element;
 	const __ = wp.i18n.__;
 	const registerPlugin = wp.plugins.registerPlugin;
 	const PluginSidebar = wp.editor.PluginSidebar;
 	const PluginSidebarMoreMenuItem = wp.editor.PluginSidebarMoreMenuItem;
 
-	class SidebarContents extends Component {
-		constructor( props ) {
-			super( props );
+	function SidebarContents() {
+		const [ state, setState ] = useState( { start: 0, end: 0 } );
 
-			this.state = {
-				start: 0,
-				end: 0,
-			};
-		}
-
-		render() {
-			return el(
-				PanelBody,
-				{},
-				el( 'input', {
-					type: 'number',
-					id: 'annotations-tests-range-start',
-					onChange: ( reactEvent ) => {
-						this.setState( {
+		return el(
+			PanelBody,
+			{},
+			el( 'input', {
+				type: 'number',
+				id: 'annotations-tests-range-start',
+				onChange: ( reactEvent ) => {
+					setState( ( prev ) => ( {
+						...prev,
+						...{
 							start: reactEvent.target.value,
-						} );
-					},
-					value: this.state.start,
-				} ),
-				el( 'input', {
-					type: 'number',
-					id: 'annotations-tests-range-end',
-					onChange: ( reactEvent ) => {
-						this.setState( {
+						},
+					} ) );
+				},
+				value: state.start,
+			} ),
+			el( 'input', {
+				type: 'number',
+				id: 'annotations-tests-range-end',
+				onChange: ( reactEvent ) => {
+					setState( ( prev ) => ( {
+						...prev,
+						...{
 							end: reactEvent.target.value,
+						},
+					} ) );
+				},
+				value: state.end,
+			} ),
+			el(
+				Button,
+				{
+					variant: 'primary',
+					onClick: () => {
+						dispatch(
+							'core/annotations'
+						).__experimentalAddAnnotation( {
+							source: 'e2e-tests',
+							blockClientId:
+								select(
+									'core/block-editor'
+								).getBlockOrder()[ 0 ],
+							richTextIdentifier: 'content',
+							range: {
+								start: parseInt( state.start, 10 ),
+								end: parseInt( state.end, 10 ),
+							},
 						} );
 					},
-					value: this.state.end,
-				} ),
-				el(
-					Button,
-					{
-						variant: 'primary',
-						onClick: () => {
-							dispatch(
-								'core/annotations'
-							).__experimentalAddAnnotation( {
-								source: 'e2e-tests',
-								blockClientId:
-									select(
-										'core/block-editor'
-									).getBlockOrder()[ 0 ],
-								richTextIdentifier: 'content',
-								range: {
-									start: parseInt( this.state.start, 10 ),
-									end: parseInt( this.state.end, 10 ),
-								},
-							} );
-						},
+				},
+				__( 'Add annotation' )
+			),
+			el(
+				Button,
+				{
+					variant: 'primary',
+					onClick: () => {
+						dispatch(
+							'core/annotations'
+						).__experimentalRemoveAnnotationsBySource(
+							'e2e-tests'
+						);
 					},
-					__( 'Add annotation' )
-				),
-				el(
-					Button,
-					{
-						variant: 'primary',
-						onClick: () => {
-							dispatch(
-								'core/annotations'
-							).__experimentalRemoveAnnotationsBySource(
-								'e2e-tests'
-							);
-						},
-					},
+				},
 
-					__( 'Remove annotations' )
-				)
-			);
-		}
+				__( 'Remove annotations' )
+			)
+		);
 	}
 
 	function AnnotationsSidebar() {
