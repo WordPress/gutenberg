@@ -26,47 +26,17 @@ function SummaryButton< Item >( {
 	onClick: () => void;
 	'aria-expanded'?: boolean;
 } ) {
-	const isEmpty =
-		labelPosition === 'none' &&
-		summaryFields.every( ( summaryField ) => {
-			const value = summaryField.getValue( { item: data } );
-			return value === undefined || value === null || value === '';
-		} );
-
-	let summaryContent;
-	if ( isEmpty ) {
-		summaryContent = __( '(Empty field)' );
-	} else if ( summaryFields.length > 1 ) {
-		summaryContent = (
-			<div
-				style={ {
-					display: 'flex',
-					flexDirection: 'column',
-					alignItems: 'flex-start',
-					width: '100%',
-					gap: '2px',
-				} }
-			>
-				{ summaryFields.map( ( summaryField ) => (
-					<div key={ summaryField.id } style={ { width: '100%' } }>
-						<summaryField.render
-							item={ data }
-							field={ summaryField }
-						/>
-					</div>
-				) ) }
-			</div>
-		);
-	} else {
-		summaryContent = summaryFields.map( ( summaryField ) => (
-			<summaryField.render
-				key={ summaryField.id }
-				item={ data }
-				field={ summaryField }
-			/>
-		) );
+	let emptyPlaceholder: string = __( 'Empty' );
+	if ( fieldLabel ) {
+		emptyPlaceholder =
+			labelPosition === 'none'
+				? sprintf(
+						// translators: %s: Field label e.g: "Title".
+						__( '%s unset' ),
+						fieldLabel
+				  )
+				: fieldLabel;
 	}
-
 	return (
 		<Button
 			className="dataforms-layouts-panel__summary-button"
@@ -86,16 +56,51 @@ function SummaryButton< Item >( {
 			disabled={ disabled }
 			accessibleWhenDisabled
 			style={
-				summaryFields.length > 1
-					? {
-							minHeight: 'auto',
-							height: 'auto',
-							alignItems: 'flex-start',
-					  }
-					: undefined
+				{
+					'--empty-button-text': `"${ emptyPlaceholder }"`,
+					...( summaryFields.length > 1
+						? {
+								minHeight: 'auto',
+								height: 'auto',
+								alignItems: 'flex-start',
+						  }
+						: {} ),
+				} as React.CSSProperties
 			}
 		>
-			{ summaryContent }
+			<span className="dataforms-layouts-panel__summary-button-content">
+				{ summaryFields.length > 1 ? (
+					<div
+						style={ {
+							display: 'flex',
+							flexDirection: 'column',
+							alignItems: 'flex-start',
+							width: '100%',
+							gap: '2px',
+						} }
+					>
+						{ summaryFields.map( ( summaryField ) => (
+							<div
+								key={ summaryField.id }
+								style={ { width: '100%' } }
+							>
+								<summaryField.render
+									item={ data }
+									field={ summaryField }
+								/>
+							</div>
+						) ) }
+					</div>
+				) : (
+					summaryFields.map( ( summaryField ) => (
+						<summaryField.render
+							key={ summaryField.id }
+							item={ data }
+							field={ summaryField }
+						/>
+					) )
+				) }
+			</span>
 		</Button>
 	);
 }
