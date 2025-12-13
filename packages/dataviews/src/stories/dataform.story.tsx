@@ -1343,8 +1343,11 @@ const ValidationComponent = ( {
 
 		// Panel and card layouts share the same grouped structure
 		const groupedFields = [
-			{ id: 'text' },
-			{ id: 'customEdit' },
+			{
+				id: 'textFields',
+				label: 'Text Fields',
+				children: [ 'text', 'textarea', 'password', 'customEdit' ],
+			},
 			{
 				id: 'numberFields',
 				label: 'Number Fields',
@@ -1356,12 +1359,6 @@ const ValidationComponent = ( {
 				children: [ 'email', 'telephone', 'url' ],
 			},
 			{
-				id: 'styleFields',
-				label: 'Style Fields',
-				children: [ 'color', 'password' ],
-			},
-			{ id: 'textarea' },
-			{
 				id: 'selectFields',
 				label: 'Selection Fields',
 				children: [ 'select', 'textWithRadio' ],
@@ -1371,6 +1368,7 @@ const ValidationComponent = ( {
 				label: 'Boolean Fields',
 				children: [ 'boolean', 'toggle', 'toggleGroup' ],
 			},
+			{ id: 'color' },
 			{ id: 'array' },
 			{
 				id: 'dateFields',
