@@ -127,6 +127,7 @@ program
 						// Transforms slug to title as a fallback.
 						title: capitalCase( slug ),
 						...optionsValues,
+						variant,
 					};
 					await scaffold( projectTemplate, answers );
 				} else {

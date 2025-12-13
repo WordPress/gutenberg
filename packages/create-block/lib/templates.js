@@ -1,15 +1,14 @@
 /**
  * External dependencies
  */
+const { existsSync } = require( 'fs' );
+const { mkdtemp, readFile } = require( 'fs' ).promises;
+const { tmpdir } = require( 'os' );
+const { join, resolve } = require( 'path' );
 const inquirer = require( '@inquirer/prompts' );
 const { command } = require( 'execa' );
 const glob = require( 'fast-glob' );
-const { resolve } = require( 'path' );
-const { existsSync } = require( 'fs' );
-const { mkdtemp, readFile } = require( 'fs' ).promises;
 const npmPackageArg = require( 'npm-package-arg' );
-const { tmpdir } = require( 'os' );
-const { join } = require( 'path' );
 const rimraf = require( 'rimraf' ).sync;
 
 /**
@@ -153,6 +152,49 @@ const configToTemplate = async ( {
 			blockTemplatesPath || join( __dirname, 'templates', 'block' );
 	}
 
+	// Process variant-specific template paths
+	const variantTemplates = {};
+	for ( const [ variantName, variantConfig ] of Object.entries( variants ) ) {
+		if ( ! variantConfig ) {
+			continue;
+		}
+
+		const variantPluginTemplatesPath = variantConfig.pluginTemplatesPath;
+		const variantBlockTemplatesPath = variantConfig.blockTemplatesPath;
+		const variantAssetsPath = variantConfig.assetsPath;
+
+		let pluginOutputTemplates = null;
+		if ( variantPluginTemplatesPath === null ) {
+			pluginOutputTemplates = {};
+		} else if ( variantPluginTemplatesPath ) {
+			pluginOutputTemplates = await getOutputTemplates(
+				variantPluginTemplatesPath
+			);
+		}
+
+		let blockOutputTemplates = null;
+		if ( variantBlockTemplatesPath === null ) {
+			blockOutputTemplates = {};
+		} else if ( variantBlockTemplatesPath ) {
+			blockOutputTemplates = await getOutputTemplates(
+				variantBlockTemplatesPath
+			);
+		}
+
+		let outputAssets = null;
+		if ( variantAssetsPath === null ) {
+			outputAssets = {};
+		} else if ( variantAssetsPath ) {
+			outputAssets = await getOutputAssets( variantAssetsPath );
+		}
+
+		variantTemplates[ variantName ] = {
+			pluginOutputTemplates,
+			blockOutputTemplates,
+			outputAssets,
+		};
+	}
+
 	return {
 		blockOutputTemplates: blockTemplatesPath
 			? await getOutputTemplates( blockTemplatesPath )
@@ -161,6 +203,7 @@ const configToTemplate = async ( {
 		outputAssets: assetsPath ? await getOutputAssets( assetsPath ) : {},
 		defaultValues,
 		variants,
+		variantTemplates,
 	};
 };
 
