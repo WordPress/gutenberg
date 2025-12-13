@@ -9,7 +9,6 @@ import clsx from 'clsx';
 import { speak } from '@wordpress/a11y';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { Dropdown, Button } from '@wordpress/components';
-import { Component } from '@wordpress/element';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose, ifCondition } from '@wordpress/compose';
 import { createBlock, store as blocksStore } from '@wordpress/blocks';
@@ -22,14 +21,14 @@ import InserterMenu from './menu';
 import QuickInserter from './quick-inserter';
 import { store as blockEditorStore } from '../../store';
 
-const defaultRenderToggle = ( {
+function defaultRenderToggle( {
 	onToggle,
 	disabled,
 	isOpen,
 	blockTitle,
 	hasSingleBlockType,
 	toggleProps = {},
-} ) => {
+} ) {
 	const {
 		as: Wrapper = Button,
 		label: labelProp,
@@ -72,23 +71,16 @@ const defaultRenderToggle = ( {
 			{ ...rest }
 		/>
 	);
-};
+}
 
-class Inserter extends Component {
-	constructor() {
-		super( ...arguments );
-
-		this.onToggle = this.onToggle.bind( this );
-		this.renderToggle = this.renderToggle.bind( this );
-		this.renderContent = this.renderContent.bind( this );
-	}
-
-	onToggle( isOpen ) {
-		const { onToggle } = this.props;
+/** @param {any} props */
+function Inserter( props ) {
+	function onToggle( isOpen ) {
+		const { onToggle: onToggleProp } = props;
 
 		// Surface toggle callback to parent component.
-		if ( onToggle ) {
-			onToggle( isOpen );
+		if ( onToggleProp ) {
+			onToggleProp( isOpen );
 		}
 	}
 
@@ -102,7 +94,7 @@ class Inserter extends Component {
 	 *
 	 * @return {Element} Dropdown toggle element.
 	 */
-	renderToggle( { onToggle, isOpen } ) {
+	function renderToggle( { onToggle: toggleCallback, isOpen } ) {
 		const {
 			disabled,
 			blockTitle,
@@ -110,11 +102,11 @@ class Inserter extends Component {
 			directInsertBlock,
 			toggleProps,
 			hasItems,
-			renderToggle = defaultRenderToggle,
-		} = this.props;
+			renderToggle: renderToggleProp = defaultRenderToggle,
+		} = props;
 
-		return renderToggle( {
-			onToggle,
+		return renderToggleProp( {
+			onToggle: toggleCallback,
 			isOpen,
 			disabled: disabled || ! hasItems,
 			blockTitle,
@@ -133,7 +125,7 @@ class Inserter extends Component {
 	 *
 	 * @return {Element} Dropdown content element.
 	 */
-	renderContent( { onClose } ) {
+	function renderContent( { onClose } ) {
 		const {
 			rootClientId,
 			clientId,
@@ -145,7 +137,7 @@ class Inserter extends Component {
 			__experimentalIsQuick: isQuick,
 			onSelectOrClose,
 			selectBlockOnInsert,
-		} = this.props;
+		} = props;
 
 		if ( isQuick ) {
 			return (
@@ -184,7 +176,7 @@ class Inserter extends Component {
 		);
 	}
 
-	render() {
+	function render() {
 		const {
 			position,
 			hasSingleBlockType,
@@ -192,10 +184,10 @@ class Inserter extends Component {
 			insertOnlyAllowedBlock,
 			__experimentalIsQuick: isQuick,
 			onSelectOrClose,
-		} = this.props;
+		} = props;
 
 		if ( hasSingleBlockType || directInsertBlock ) {
-			return this.renderToggle( { onToggle: insertOnlyAllowedBlock } );
+			return renderToggle( { onToggle: insertOnlyAllowedBlock } );
 		}
 
 		return (
@@ -205,15 +197,16 @@ class Inserter extends Component {
 					'is-quick': isQuick,
 				} ) }
 				popoverProps={ { position, shift: true } }
-				onToggle={ this.onToggle }
+				onToggle={ onToggle }
 				expandOnMobile
 				headerTitle={ __( 'Add a block' ) }
-				renderToggle={ this.renderToggle }
-				renderContent={ this.renderContent }
+				renderToggle={ renderToggle }
+				renderContent={ renderContent }
 				onClose={ onSelectOrClose }
 			/>
 		);
 	}
+	return render();
 }
 
 export default compose( [
