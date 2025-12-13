@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
 import deprecated from '@wordpress/deprecated';
 import {
@@ -22,26 +22,20 @@ const { MediaUploadModal: MediaUploadModalComponent } = unlock(
  * Class component wrapper for MediaUploadModal to maintain compatibility
  * with the stable MediaUpload component API (render prop pattern).
  */
-class MediaUploadModalWrapper extends Component {
-	constructor( props ) {
-		super( props );
-		this.state = {
-			isOpen: false,
-		};
-		this.openModal = this.openModal.bind( this );
-		this.closeModal = this.closeModal.bind( this );
+/** @param {any} props */
+function MediaUploadModalWrapper( props ) {
+	const [ state, setState ] = useState( { isOpen: false } );
+
+	function openModal() {
+		setState( ( prev ) => ( { ...prev, isOpen: true } ) );
 	}
 
-	openModal() {
-		this.setState( { isOpen: true } );
+	function closeModal() {
+		setState( ( prev ) => ( { ...prev, isOpen: false } ) );
+		props.onClose?.();
 	}
 
-	closeModal() {
-		this.setState( { isOpen: false } );
-		this.props.onClose?.();
-	}
-
-	render() {
+	function render() {
 		const {
 			allowedTypes,
 			multiple,
@@ -49,22 +43,22 @@ class MediaUploadModalWrapper extends Component {
 			onSelect,
 			title,
 			modalClass,
-			render,
-		} = this.props;
-		const { isOpen } = this.state;
+			render: renderProp,
+		} = props;
+		const { isOpen } = state;
 
 		return (
 			<>
-				{ render( { open: this.openModal } ) }
+				{ renderProp( { open: openModal } ) }
 				<MediaUploadModalComponent
 					allowedTypes={ allowedTypes }
 					multiple={ multiple }
 					value={ value }
 					onSelect={ ( media ) => {
 						onSelect( media );
-						this.closeModal();
+						closeModal();
 					} }
-					onClose={ this.closeModal }
+					onClose={ closeModal }
 					title={ title }
 					isOpen={ isOpen }
 					modalClass={ modalClass }
@@ -72,6 +66,7 @@ class MediaUploadModalWrapper extends Component {
 			</>
 		);
 	}
+	return render();
 }
 
 if ( window.__experimentalDataViewsMediaModal ) {

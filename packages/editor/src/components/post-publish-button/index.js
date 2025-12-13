@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { Button } from '@wordpress/components';
-import { Component } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 
@@ -12,25 +12,17 @@ import { compose } from '@wordpress/compose';
 import PublishButtonLabel from './label';
 import { store as editorStore } from '../../store';
 
-const noop = () => {};
+function noop() {}
 
-export class PostPublishButton extends Component {
-	constructor( props ) {
-		super( props );
+export function PostPublishButton( props ) {
+	const [ state, setState ] = useState( {
+		entitiesSavedStatesCallback: false,
+	} );
 
-		this.createOnClick = this.createOnClick.bind( this );
-		this.closeEntitiesSavedStates =
-			this.closeEntitiesSavedStates.bind( this );
-
-		this.state = {
-			entitiesSavedStatesCallback: false,
-		};
-	}
-
-	createOnClick( callback ) {
+	function createOnClick( callback ) {
 		return ( ...args ) => {
 			const { hasNonPostEntityChanges, setEntitiesSavedStatesCallback } =
-				this.props;
+				props;
 			// If a post with non-post entities is published, but the user
 			// elects to not save changes to the non-post entities, those
 			// entities will still be dirty when the Publish button is clicked.
@@ -40,16 +32,19 @@ export class PostPublishButton extends Component {
 				// The modal for multiple entity saving will open,
 				// hold the callback for saving/publishing the post
 				// so that we can call it if the post entity is checked.
-				this.setState( {
-					entitiesSavedStatesCallback: () => callback( ...args ),
-				} );
+				setState( ( prev ) => ( {
+					...prev,
+					...{
+						entitiesSavedStatesCallback: () => callback( ...args ),
+					},
+				} ) );
 
 				// Open the save panel by setting its callback.
 				// To set a function on the useState hook, we must set it
 				// with another function (() => myFunction). Passing the
 				// function on its own will cause an error when called.
 				setEntitiesSavedStatesCallback(
-					() => this.closeEntitiesSavedStates
+					() => closeEntitiesSavedStates
 				);
 				return noop;
 			}
@@ -58,10 +53,14 @@ export class PostPublishButton extends Component {
 		};
 	}
 
-	closeEntitiesSavedStates( savedEntities ) {
-		const { postType, postId } = this.props;
-		const { entitiesSavedStatesCallback } = this.state;
-		this.setState( { entitiesSavedStatesCallback: false }, () => {
+	function closeEntitiesSavedStates( savedEntities ) {
+		const { postType, postId } = props;
+		const { entitiesSavedStatesCallback } = state;
+		setState( ( prev ) => ( {
+			...prev,
+			entitiesSavedStatesCallback: false,
+		} ) );
+		{
 			if (
 				savedEntities &&
 				savedEntities.some(
@@ -74,10 +73,10 @@ export class PostPublishButton extends Component {
 				// The post entity was checked, call the held callback from `createOnClick`.
 				entitiesSavedStatesCallback();
 			}
-		} );
+		}
 	}
 
-	render() {
+	function render() {
 		const {
 			forceIsDirty,
 			hasPublishAction,
@@ -98,7 +97,7 @@ export class PostPublishButton extends Component {
 			isSavingNonPostEntityChanges,
 			postStatus,
 			postStatusHasChanged,
-		} = this.props;
+		} = props;
 
 		const isButtonDisabled =
 			( isSaving ||
@@ -129,28 +128,28 @@ export class PostPublishButton extends Component {
 			publishStatus = 'future';
 		}
 
-		const onClickButton = () => {
+		function onClickButton() {
 			if ( isButtonDisabled ) {
 				return;
 			}
 			onSubmit();
 			savePostStatus( publishStatus );
-		};
+		}
 
 		// Callback to open the publish panel.
-		const onClickToggle = () => {
+		function onClickToggle() {
 			if ( isToggleDisabled ) {
 				return;
 			}
 			onToggle();
-		};
+		}
 
 		const buttonProps = {
 			'aria-disabled': isButtonDisabled,
 			className: 'editor-post-publish-button',
 			isBusy: ! isAutoSaving && isSaving,
 			variant: 'primary',
-			onClick: this.createOnClick( onClickButton ),
+			onClick: createOnClick( onClickButton ),
 			'aria-haspopup': hasNonPostEntityChanges ? 'dialog' : undefined,
 		};
 
@@ -161,7 +160,7 @@ export class PostPublishButton extends Component {
 			isBusy: isSaving && isPublished,
 			variant: 'primary',
 			size: 'compact',
-			onClick: this.createOnClick( onClickToggle ),
+			onClick: createOnClick( onClickToggle ),
 			'aria-haspopup': hasNonPostEntityChanges ? 'dialog' : undefined,
 		};
 		const componentProps = isToggle ? toggleProps : buttonProps;
@@ -177,6 +176,7 @@ export class PostPublishButton extends Component {
 			</>
 		);
 	}
+	return render();
 }
 
 /**

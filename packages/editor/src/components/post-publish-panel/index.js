@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Component, createRef } from '@wordpress/element';
+import { useEffect, useRef } from '@wordpress/element';
 import {
 	Button,
 	Spinner,
@@ -23,47 +23,47 @@ import PostPublishPanelPrepublish from './prepublish';
 import PostPublishPanelPostpublish from './postpublish';
 import { store as editorStore } from '../../store';
 
-export class PostPublishPanel extends Component {
-	constructor() {
-		super( ...arguments );
-		this.onSubmit = this.onSubmit.bind( this );
-		this.cancelButtonNode = createRef();
-	}
+export function PostPublishPanel( props ) {
+	/** @type {any} */
+	const timeoutIDRef = useRef( null );
+	const cancelButtonNode = useRef( null );
 
-	componentDidMount() {
-		// This timeout is necessary to make sure the `useEffect` hook of
-		// `useFocusReturn` gets the correct element (the button that opens the
-		// PostPublishPanel) otherwise it will get this button.
-		this.timeoutID = setTimeout( () => {
-			this.cancelButtonNode.current.focus();
+	useEffect( () => {
+		timeoutIDRef.current = setTimeout( () => {
+			cancelButtonNode.current.focus();
 		}, 0 );
-	}
+	}, [] );
 
-	componentWillUnmount() {
-		clearTimeout( this.timeoutID );
-	}
+	useEffect( () => {
+		return () => {
+			clearTimeout( timeoutIDRef.current );
+		};
+	}, [] );
 
-	componentDidUpdate( prevProps ) {
-		// Automatically collapse the publish sidebar when a post
-		// is published and the user makes an edit.
-		if (
-			( prevProps.isPublished &&
-				! this.props.isSaving &&
-				this.props.isDirty ) ||
-			this.props.currentPostId !== prevProps.currentPostId
-		) {
-			this.props.onClose();
+	const prevPropsRef = useRef();
+	useEffect( () => {
+		if ( prevPropsRef.current ) {
+			const prevProps = prevPropsRef.current;
+			if (
+				( prevProps.isPublished &&
+					! props.isSaving &&
+					props.isDirty ) ||
+				props.currentPostId !== prevProps.currentPostId
+			) {
+				props.onClose();
+			}
 		}
-	}
+		prevPropsRef.current = props;
+	} );
 
-	onSubmit() {
-		const { onClose, hasPublishAction, isPostTypeViewable } = this.props;
+	function onSubmit() {
+		const { onClose, hasPublishAction, isPostTypeViewable } = props;
 		if ( ! hasPublishAction || ! isPostTypeViewable ) {
 			onClose();
 		}
 	}
 
-	render() {
+	function render() {
 		const {
 			forceIsDirty,
 			isBeingScheduled,
@@ -78,7 +78,7 @@ export class PostPublishPanel extends Component {
 			PrePublishExtension,
 			currentPostId,
 			...additionalProps
-		} = this.props;
+		} = props;
 		const {
 			hasPublishAction,
 			isDirty,
@@ -103,7 +103,7 @@ export class PostPublishPanel extends Component {
 						<>
 							<div className="editor-post-publish-panel__header-cancel-button">
 								<Button
-									ref={ this.cancelButtonNode }
+									ref={ cancelButtonNode }
 									accessibleWhenDisabled
 									disabled={ isSavingNonPostEntityChanges }
 									onClick={ onClose }
@@ -115,7 +115,7 @@ export class PostPublishPanel extends Component {
 							</div>
 							<div className="editor-post-publish-panel__header-publish-button">
 								<PostPublishButton
-									onSubmit={ this.onSubmit }
+									onSubmit={ onSubmit }
 									forceIsDirty={ forceIsDirty }
 								/>
 							</div>
@@ -146,6 +146,7 @@ export class PostPublishPanel extends Component {
 			</div>
 		);
 	}
+	return render();
 }
 
 /**
