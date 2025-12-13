@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 import deprecated from '@wordpress/deprecated';
 
 /**
@@ -26,24 +26,16 @@ export default function withState( initialState = {} ) {
 	} );
 
 	return createHigherOrderComponent( ( OriginalComponent ) => {
-		return class WrappedComponent extends Component {
-			constructor( /** @type {any} */ props ) {
-				super( props );
+		return function WrappedComponent( props ) {
+			const [ state, setState ] = useState( initialState );
 
-				this.setState = this.setState.bind( this );
-
-				this.state = initialState;
-			}
-
-			render() {
-				return (
-					<OriginalComponent
-						{ ...this.props }
-						{ ...this.state }
-						setState={ this.setState }
-					/>
-				);
-			}
+			return (
+				<OriginalComponent
+					{ ...props }
+					{ ...state }
+					setState={ setState }
+				/>
+			);
 		};
 	}, 'withState' );
 }

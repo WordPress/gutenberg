@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -42,10 +41,8 @@ describe( 'createHigherOrderComponent', () => {
 	} );
 
 	it( 'should use component class name', () => {
-		class SomeAnotherComponent extends Component {
-			render() {
-				return <div />;
-			}
+		function SomeAnotherComponent() {
+			return <div />;
 		}
 		const TestComponent = createHigherOrderComponent(
 			( OriginalComponent ) => OriginalComponent,
@@ -58,10 +55,8 @@ describe( 'createHigherOrderComponent', () => {
 	} );
 
 	it( 'should use displayName property', () => {
-		class SomeYetAnotherComponent extends Component {
-			render() {
-				return <div />;
-			}
+		function SomeYetAnotherComponent() {
+			return <div />;
 		}
 		SomeYetAnotherComponent.displayName = 'CustomDisplayName';
 		const TestComponent = createHigherOrderComponent(
