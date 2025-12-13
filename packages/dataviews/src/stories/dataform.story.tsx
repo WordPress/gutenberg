@@ -1278,7 +1278,6 @@ const ValidationComponent = ( {
 	}, [ elements, custom, required, pattern, minMax, getElements ] );
 
 	const form = useMemo( () => {
-		// Regular layout with nested groupings for testing validation bubbling
 		if ( layout === 'regular' ) {
 			return {
 				fields: [
