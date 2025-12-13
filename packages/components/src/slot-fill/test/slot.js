@@ -5,35 +5,30 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 /**
+ * WordPress dependencies
+ */
+import { useState } from '@wordpress/element';
+
+/**
  * Internal dependencies
  */
 import { Slot, Fill, Provider } from '../';
 
-/**
- * WordPress dependencies
- */
-import { Component } from '@wordpress/element';
-
-class Filler extends Component {
-	constructor() {
-		super( ...arguments );
-
-		this.state = {
-			num: 1,
-		};
-	}
-	render() {
-		return [
-			<button
-				key="1"
-				type="button"
-				onClick={ () => this.setState( { num: this.state.num + 1 } ) }
-			/>,
-			<Fill name={ this.props.name } key="2">
-				{ this.props.text || this.state.num.toString() }
-			</Fill>,
-		];
-	}
+/** @param {any} props */
+function Filler( props ) {
+	const [ state, setState ] = useState( { num: 1 } );
+	return [
+		<button
+			key="1"
+			type="button"
+			onClick={ () =>
+				setState( ( prev ) => ( { ...prev, num: state.num + 1 } ) )
+			}
+		/>,
+		<Fill name={ props.name } key="2">
+			{ props.text || state.num.toString() }
+		</Fill>,
+	];
 }
 
 describe( 'Slot', () => {

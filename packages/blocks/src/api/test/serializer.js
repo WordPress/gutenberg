@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { createElement, Component } from '@wordpress/element';
+import { createElement } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -73,14 +73,12 @@ describe( 'block serializer', () => {
 			it( 'should return element as string', () => {
 				const saved = getSaveContent(
 					{
-						save: class extends Component {
-							render() {
-								return createElement(
-									'div',
-									null,
-									this.props.attributes.fruit
-								);
-							}
+						save: ( props ) => {
+							return createElement(
+								'div',
+								null,
+								props.attributes.fruit
+							);
 						},
 						name: 'core/fruit',
 					},
