@@ -16,6 +16,7 @@ import {
 	Spinner,
 	TextControl,
 	ExternalLink,
+	FocalPointPicker,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
@@ -35,6 +36,7 @@ import {
 	useMemo,
 	useEffect,
 	useState,
+	useRef,
 	createInterpolateElement,
 } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
@@ -53,6 +55,11 @@ import { unlock } from '../lock-unlock';
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
 const { ResolutionTool } = unlock( blockEditorPrivateApis );
 const DEFAULT_MEDIA_SIZE_SLUG = 'full';
+const DEFAULT_FOCAL_POINT = { x: 0.5, y: 0.5 };
+
+function mediaPosition( { x, y } = DEFAULT_FOCAL_POINT ) {
+	return `${ Math.round( x * 100 ) }% ${ Math.round( y * 100 ) }%`;
+}
 
 function FeaturedImageResolutionTool( { image, value, onChange } ) {
 	const { imageSizes } = useSelect( ( select ) => {
@@ -99,8 +106,10 @@ export default function PostFeaturedImageEdit( {
 		rel,
 		linkTarget,
 		useFirstImageFromPost,
+		focalPoint,
 	} = attributes;
 	const [ temporaryURL, setTemporaryURL ] = useState();
+	const imageElement = useRef();
 
 	const [ storedFeaturedImage, setFeaturedImage ] = useEntityProp(
 		'postType',
@@ -209,6 +218,7 @@ export default function PostFeaturedImageEdit( {
 			linkTarget: '_self',
 			rel: '',
 			sizeSlug: undefined,
+			focalPoint: undefined,
 		} );
 		setFeaturedImage( 0 );
 	};
@@ -224,6 +234,14 @@ export default function PostFeaturedImageEdit( {
 	const onUploadError = ( message ) => {
 		createErrorNotice( message, { type: 'snackbar' } );
 		setTemporaryURL();
+	};
+
+	const imperativeFocalPointPreview = ( value ) => {
+		if ( ! imageElement.current ) {
+			return;
+		}
+		// eslint-disable-next-line react-compiler/react-compiler
+		imageElement.current.style.objectPosition = mediaPosition( value );
 	};
 
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
@@ -255,6 +273,7 @@ export default function PostFeaturedImageEdit( {
 								linkTarget: '_self',
 								rel: '',
 								sizeSlug: DEFAULT_MEDIA_SIZE_SLUG,
+								focalPoint: undefined,
 							} );
 						} }
 						dropdownMenuProps={ dropdownMenuProps }
@@ -360,6 +379,28 @@ export default function PostFeaturedImageEdit( {
 								}
 							/>
 						) }
+						<ToolsPanelItem
+							label={ __( 'Focal point' ) }
+							isShownByDefault
+							hasValue={ () => !! focalPoint }
+							onDeselect={ () =>
+								setAttributes( { focalPoint: undefined } )
+							}
+						>
+							<FocalPointPicker
+								__nextHasNoMarginBottom
+								label={ __( 'Focal point' ) }
+								url={ mediaUrl }
+								value={ focalPoint }
+								onDragStart={ imperativeFocalPointPreview }
+								onDrag={ imperativeFocalPointPreview }
+								onChange={ ( newFocalPoint ) =>
+									setAttributes( {
+										focalPoint: newFocalPoint,
+									} )
+								}
+							/>
+						</ToolsPanelItem>
 					</ToolsPanel>
 				</InspectorControls>
 			) }
@@ -406,6 +447,7 @@ export default function PostFeaturedImageEdit( {
 		height: aspectRatio ? '100%' : height,
 		width: !! aspectRatio && '100%',
 		objectFit: !! ( height || aspectRatio ) && scale,
+		objectPosition: focalPoint ? mediaPosition( focalPoint ) : undefined,
 	};
 
 	/**
@@ -448,6 +490,7 @@ export default function PostFeaturedImageEdit( {
 			) : (
 				<>
 					<img
+						ref={ imageElement }
 						className={ borderProps.className }
 						src={ temporaryURL || mediaUrl }
 						alt={
