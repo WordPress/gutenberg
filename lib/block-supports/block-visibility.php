@@ -33,11 +33,38 @@ function gutenberg_render_block_visibility_support( $block_content, $block ) {
 
 	// If blockVisibility is an object with breakpoint settings, generate responsive styles.
 	if ( is_array( $block_visibility ) && ! empty( $block_visibility ) ) {
-		$breakpoint_queries = array(
-			'mobile'  => '@media (max-width: 599px)',
-			'tablet'  => '@media (min-width: 600px) and (max-width: 959px)',
-			'desktop' => '@media (min-width: 960px)',
+		// Matches a future JSON format.
+		$breakpoints = array(
+			'mobile'  => array(
+				'max' => '599px',
+			),
+			'tablet'  => array(
+				'min' => '600px',
+				'max' => '959px',
+			),
+			'desktop' => array(
+				'min' => '960px',
+			),
 		);
+
+		/*
+		 * Build media queries from breakpoint definitions.
+		 * Could be absorbed into the style engine,
+		 * as well as classname building, and declaration of the display property, if required.
+		 */
+		$breakpoint_queries = array();
+		foreach ( $breakpoints as $name => $values ) {
+			$query_parts = array();
+			if ( isset( $values['min'] ) ) {
+				$query_parts[] = '(min-width: ' . $values['min'] . ')';
+			}
+			if ( isset( $values['max'] ) ) {
+				$query_parts[] = '(max-width: ' . $values['max'] . ')';
+			}
+			if ( ! empty( $query_parts ) ) {
+				$breakpoint_queries[ $name ] = '@media ' . implode( ' and ', $query_parts );
+			}
+		}
 
 		$hidden_on = array();
 
