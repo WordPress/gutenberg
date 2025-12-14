@@ -68,9 +68,9 @@ function gutenberg_render_block_visibility_support( $block_content, $block ) {
 
 		$hidden_on = array();
 
-		// Collect which breakpoints the block is hidden on.
+		// Collect which breakpoints the block is hidden on (only known breakpoints).
 		foreach ( $block_visibility as $breakpoint => $is_visible ) {
-			if ( false === $is_visible ) {
+			if ( false === $is_visible && isset( $breakpoint_queries[ $breakpoint ] ) ) {
 				$hidden_on[] = $breakpoint;
 			}
 		}
@@ -87,7 +87,17 @@ function gutenberg_render_block_visibility_support( $block_content, $block ) {
 
 		// Generate a unique class name based on which breakpoints are hidden.
 		sort( $hidden_on );
-		$visibility_class = 'wp-block-hidden-' . implode( '-', $hidden_on );
+
+		// Sanitize breakpoint names for use in HTML class attribute.
+		$sanitized_hidden_on = array_map( 'sanitize_html_class', $hidden_on );
+		$sanitized_hidden_on = array_filter( $sanitized_hidden_on );
+
+		// If all breakpoint names were invalid after sanitization, return unchanged.
+		if ( empty( $sanitized_hidden_on ) ) {
+			return $block_content;
+		}
+
+		$visibility_class = 'wp-block-hidden-' . implode( '-', $sanitized_hidden_on );
 
 		// Generate CSS rules for each hidden breakpoint.
 		$css_rules = array();

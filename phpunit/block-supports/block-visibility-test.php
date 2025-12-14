@@ -122,7 +122,7 @@ class WP_Block_Supports_Block_Visibility_Test extends WP_UnitTestCase {
 		$block_content = '<div>Test content</div>';
 		$result        = gutenberg_render_block_visibility_support( $block_content, $block );
 
-		$this->assertEquals( '', $result );
+		$this->assertSame( '', $result );
 	}
 
 	public function test_block_visibility_true_shows_block() {
@@ -379,5 +379,150 @@ class WP_Block_Supports_Block_Visibility_Test extends WP_UnitTestCase {
 
 		// Empty visibility object should not modify content.
 		$this->assertEquals( $block_content, $result );
+	}
+
+	public function test_responsive_visibility_unknown_breakpoints_ignored() {
+		$this->enable_responsive_visibility_experiment();
+
+		self::register_block_with_visibility_support(
+			'test/responsive-unknown-breakpoints',
+			array( 'visibility' => true )
+		);
+
+		$block = array(
+			'blockName' => 'test/responsive-unknown-breakpoints',
+			'attrs'     => array(
+				'metadata' => array(
+					'blockVisibility' => array(
+						'mobile'       => false,
+						'unknownBreak' => false,
+						'largeScreen'  => false,
+					),
+				),
+			),
+		);
+
+		$block_content = '<div>Test content</div>';
+		$result        = gutenberg_render_block_visibility_support( $block_content, $block );
+
+		// Only the known 'mobile' breakpoint should be processed.
+		$this->assertStringContainsString( 'wp-block-hidden-mobile', $result );
+		// Unknown breakpoints should not appear in the class name.
+		$this->assertStringNotContainsString( 'unknownBreak', $result );
+		$this->assertStringNotContainsString( 'largeScreen', $result );
+	}
+
+	public function test_html_processor_fallback_with_empty_content() {
+		$this->enable_responsive_visibility_experiment();
+
+		self::register_block_with_visibility_support(
+			'test/empty-content',
+			array( 'visibility' => true )
+		);
+
+		$block = array(
+			'blockName' => 'test/empty-content',
+			'attrs'     => array(
+				'metadata' => array(
+					'blockVisibility' => array(
+						'mobile' => false,
+					),
+				),
+			),
+		);
+
+		$block_content = '';
+		$result        = gutenberg_render_block_visibility_support( $block_content, $block );
+
+		// Empty content should remain empty (WP_HTML_Tag_Processor fallback).
+		$this->assertSame( '', $result );
+	}
+
+	public function test_important_flag_in_generated_css() {
+		$this->enable_responsive_visibility_experiment();
+
+		self::register_block_with_visibility_support(
+			'test/important-css',
+			array( 'visibility' => true )
+		);
+
+		$block = array(
+			'blockName' => 'test/important-css',
+			'attrs'     => array(
+				'metadata' => array(
+					'blockVisibility' => array(
+						'mobile' => false,
+					),
+				),
+			),
+		);
+
+		$block_content = '<div>Test content</div>';
+		gutenberg_render_block_visibility_support( $block_content, $block );
+
+		// Get the generated stylesheet from the style engine context.
+		$stylesheet = gutenberg_style_engine_get_stylesheet_from_context( 'block-supports' );
+
+		// Verify the stylesheet contains !important flag.
+		$this->assertStringContainsString( '!important', $stylesheet, 'Stylesheet should contain !important flag' );
+		$this->assertStringContainsString( 'display:none!important', str_replace( ' ', '', $stylesheet ), 'display:none!important should be in the CSS' );
+	}
+
+	public function test_sanitize_breakpoint_names_in_class() {
+		$this->enable_responsive_visibility_experiment();
+
+		self::register_block_with_visibility_support(
+			'test/sanitize-class',
+			array( 'visibility' => true )
+		);
+
+		$block = array(
+			'blockName' => 'test/sanitize-class',
+			'attrs'     => array(
+				'metadata' => array(
+					'blockVisibility' => array(
+						'mobile'  => false,
+						'tablet'  => false,
+						'desktop' => false,
+					),
+				),
+			),
+		);
+
+		$block_content = '<div>Test content</div>';
+		$result        = gutenberg_render_block_visibility_support( $block_content, $block );
+
+		// Known breakpoints should be sanitized but remain valid.
+		// With all three hidden, block should be completely hidden (empty string).
+		$this->assertSame( '', $result );
+	}
+
+	public function test_breakpoint_names_remain_valid_after_sanitization() {
+		$this->enable_responsive_visibility_experiment();
+
+		self::register_block_with_visibility_support(
+			'test/valid-names',
+			array( 'visibility' => true )
+		);
+
+		$block = array(
+			'blockName' => 'test/valid-names',
+			'attrs'     => array(
+				'metadata' => array(
+					'blockVisibility' => array(
+						'mobile'  => false,
+						'desktop' => false,
+					),
+				),
+			),
+		);
+
+		$block_content = '<div>Test content</div>';
+		$result        = gutenberg_render_block_visibility_support( $block_content, $block );
+
+		// Verify that valid breakpoint names pass through sanitization correctly.
+		$this->assertStringContainsString( 'wp-block-hidden-desktop-mobile', $result );
+		// Ensure no unexpected characters were added or removed.
+		$this->assertStringNotContainsString( 'wp-block-hidden--', $result, 'Should not have double hyphens' );
 	}
 }
