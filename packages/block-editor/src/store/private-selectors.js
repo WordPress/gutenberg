@@ -36,6 +36,7 @@ import {
 	reusableBlocksSelectKey,
 	sectionRootClientIdKey,
 	isIsolatedEditorKey,
+	deviceTypeKey,
 } from './private-keys';
 
 const { isContentBlock } = unlock( blocksPrivateApis );
@@ -700,6 +701,10 @@ export function getInsertionPoint( state ) {
 /**
  * Returns true if the block is hidden, or false otherwise.
  *
+ * A block is considered hidden if:
+ * - blockVisibility is false (hidden everywhere)
+ * - blockVisibility is an object with the current device preview set to false
+ *
  * @param {Object} state    Global application state.
  * @param {string} clientId Client ID of the block.
  *
@@ -711,7 +716,67 @@ export const isBlockHidden = ( state, clientId ) => {
 		return false;
 	}
 	const attributes = state.blocks.attributes.get( clientId );
-	return attributes?.metadata?.blockVisibility === false;
+	const blockVisibility = attributes?.metadata?.blockVisibility;
+
+	if ( blockVisibility === false ) {
+		return true;
+	}
+
+	if ( ! window.__experimentalHideBlocksBasedOnScreenSize ) {
+		return false;
+	}
+
+	// Check viewport-specific hiding based on current device preview
+	// Only apply when a device is explicitly selected.
+	if ( typeof blockVisibility === 'object' && blockVisibility !== null ) {
+		const settings = getSettings( state );
+		const viewportType = settings[ deviceTypeKey ] ?? 'Desktop';
+		const viewportKey = viewportType.toLowerCase();
+		return blockVisibility?.[ viewportKey ] === false;
+	}
+
+	return false;
+};
+
+/**
+ * Returns true if the block is hidden on any device/viewport, or false otherwise.
+ *
+ * A block is considered to have visibility restrictions if it's hidden everywhere
+ * or has any breakpoint-specific visibility settings (mobile, tablet, or desktop).
+ *
+ * @param {Object} state    Global application state.
+ * @param {string} clientId Client ID of the block.
+ *
+ * @return {boolean} Whether the block has visibility restrictions.
+ */
+export const isHiddenInAnyDevice = ( state, clientId ) => {
+	// Gate behind experimental flag
+	if ( ! window.__experimentalHideBlocksBasedOnScreenSize ) {
+		return false;
+	}
+
+	const blockName = getBlockName( state, clientId );
+	if ( ! hasBlockSupport( state, blockName, 'visibility', true ) ) {
+		return false;
+	}
+	const attributes = state.blocks.attributes.get( clientId );
+	const blockVisibility = attributes?.metadata?.blockVisibility;
+
+	// Hidden everywhere
+	if ( blockVisibility === false ) {
+		return true;
+	}
+
+	// Check if any breakpoint has visibility set to false
+	if ( typeof blockVisibility === 'object' && blockVisibility !== null ) {
+		return (
+			blockVisibility.mobile === false ||
+			blockVisibility.tablet === false ||
+			blockVisibility.desktop === false
+		);
+	}
+
+	return false;
 };
 
 /**
