@@ -344,38 +344,4 @@ class WP_Block_Supports_Block_Visibility_Test extends WP_UnitTestCase {
 		// Empty visibility object should not modify content.
 		$this->assertEquals( $block_content, $result );
 	}
-
-	public function test_safe_style_css_without_experiment() {
-		$this->disable_responsive_visibility_experiment();
-
-		$original_styles = array( 'color', 'background-color' );
-		$result          = gutenberg_add_display_to_safe_style_css( $original_styles );
-
-		// Display should not be added without experiment.
-		$this->assertEquals( $original_styles, $result );
-		$this->assertNotContains( 'display', $result );
-	}
-
-	public function test_safe_style_css_with_experiment() {
-		$this->enable_responsive_visibility_experiment();
-
-		$original_styles = array( 'color', 'background-color' );
-		$result          = gutenberg_add_display_to_safe_style_css( $original_styles );
-
-		// Display should be added with experiment enabled.
-		$this->assertContains( 'display', $result );
-		$this->assertContains( 'color', $result );
-		$this->assertContains( 'background-color', $result );
-	}
-
-	public function test_safe_style_css_with_experiment_already_has_display() {
-		$this->enable_responsive_visibility_experiment();
-
-		$original_styles = array( 'color', 'display', 'background-color' );
-		$result          = gutenberg_add_display_to_safe_style_css( $original_styles );
-
-		// Display should not be duplicated.
-		$this->assertContains( 'display', $result );
-		$this->assertEquals( 3, count( $result ) );
-	}
 }

@@ -101,27 +101,7 @@ function gutenberg_render_block_visibility_support( $block_content, $block ) {
 	return $block_content;
 }
 
-/**
- * Add 'display' to the list of safe CSS properties.
- * This is needed for responsive visibility support.
- *
- * @param array $attr List of allowed CSS attributes.
- * @return array Modified list of allowed CSS attributes.
- */
-function gutenberg_add_display_to_safe_style_css( $attr ) {
-	if ( ! gutenberg_is_experiment_enabled( 'gutenberg-hide-blocks-based-on-screen-size' ) ) {
-		return $attr;
-	}
-
-	if ( ! in_array( 'display', $attr, true ) ) {
-		$attr[] = 'display';
-	}
-
-	return $attr;
-}
-
 if ( function_exists( 'wp_render_block_visibility_support' ) ) {
 	remove_filter( 'render_block', 'wp_render_block_visibility_support' );
 }
 add_filter( 'render_block', 'gutenberg_render_block_visibility_support', 10, 2 );
-add_filter( 'safe_style_css', 'gutenberg_add_display_to_safe_style_css' );
