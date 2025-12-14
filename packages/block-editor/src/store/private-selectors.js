@@ -43,6 +43,142 @@ import { BLOCK_VISIBILITY_VIEWPORTS } from '../components/block-visibility/const
 
 const { isContentBlock } = unlock( blocksPrivateApis );
 
+/**
+ * Walks up the block parent chain to find the first ancestor whose clientId
+ * is in the given list. Returns the matching ancestor clientId, or undefined.
+ *
+ * @param {Object}   state     Block editor state.
+ * @param {string}   clientId  Starting block clientId.
+ * @param {string[]} clientIds List of clientIds to match against.
+ * @return {string|undefined} The matching ancestor clientId, or undefined.
+ */
+function findParentInClientIdsList( state, clientId, clientIds ) {
+	if ( ! clientIds.length ) {
+		return;
+	}
+	let parent = state.blocks.parents.get( clientId );
+	while ( parent !== undefined ) {
+		if ( clientIds.includes( parent ) ) {
+			return parent;
+		}
+		parent = state.blocks.parents.get( parent );
+	}
+}
+
+/**
+ * Returns the set of block clientIds that should be visible in List View when
+ * a content-only section is being edited, even though they are 'disabled' for
+ * editing. Blocks that were already hidden before editing started (non-content
+ * blocks inside a contentOnly parent) are excluded.
+ *
+ * Returns null when no section is being edited.
+ *
+ * @param {Object} state Block editor state.
+ * @return {Set<string>|null} Set of visible-despite-disabled clientIds, or null.
+ */
+export const getListViewBlockVisibility = createSelector(
+	( state ) => {
+		if ( ! state.editedContentOnlySection ) {
+			return null;
+		}
+
+		// Compute contentOnly parents (same logic as getDerivedBlockEditingModesForTree).
+		const isIsolatedEditor = state.settings?.[ isIsolatedEditorKey ];
+		const disableContentOnlyForUnsyncedPatterns =
+			state.settings?.disableContentOnlyForUnsyncedPatterns;
+
+		const contentOnlyTemplateLockedClientIds = Object.keys(
+			state.blockListSettings ?? {}
+		).filter(
+			( clientId ) =>
+				state.blockListSettings[ clientId ]?.templateLock ===
+				'contentOnly'
+		);
+
+		const templatePartClientIds = [];
+		Object.keys( state.blocks.controlledInnerBlocks ?? {} ).forEach(
+			( clientId ) => {
+				if (
+					state.blocks.byClientId?.get( clientId )?.name ===
+					'core/template-part'
+				) {
+					templatePartClientIds.push( clientId );
+				}
+			}
+		);
+
+		const unsyncedPatternClientIds =
+			isIsolatedEditor || disableContentOnlyForUnsyncedPatterns
+				? []
+				: Array.from(
+						( state.blocks.attributes ?? new Map() ).keys()
+				  ).filter(
+						( clientId ) =>
+							state.blocks.attributes.get( clientId )?.metadata
+								?.patternName
+				  );
+
+		const contentOnlyParents = [
+			...contentOnlyTemplateLockedClientIds,
+			...unsyncedPatternClientIds,
+			...( isIsolatedEditor ? [] : templatePartClientIds ),
+		];
+
+		const visibility = new Set();
+
+		for ( const [ clientId, mode ] of state.derivedBlockEditingModes ) {
+			if ( mode !== 'disabled' ) {
+				continue;
+			}
+
+			// Blocks inside the edited section have 'default' mode, so any
+			// 'disabled' block here is outside the section. Skip the few that
+			// might be disabled for other reasons (e.g. disabled-ancestor
+			// inheritance within the section) by checking ancestry.
+			if (
+				clientId === state.editedContentOnlySection ||
+				!! findParentInClientIdsList( state, clientId, [
+					state.editedContentOnlySection,
+				] )
+			) {
+				continue;
+			}
+
+			// Non-content blocks inside a contentOnly parent were hidden before
+			// editing started — keep them hidden.
+			if ( contentOnlyParents.length ) {
+				const hasContentOnlyParent = !! findParentInClientIdsList(
+					state,
+					clientId,
+					contentOnlyParents
+				);
+				if (
+					hasContentOnlyParent &&
+					! isContentBlock(
+						state.blocks.byClientId.get( clientId )?.name
+					)
+				) {
+					continue;
+				}
+			}
+
+			visibility.add( clientId );
+		}
+
+		return visibility;
+	},
+	( state ) => [
+		state.editedContentOnlySection,
+		state.derivedBlockEditingModes,
+		state.blockListSettings,
+		state.blocks.attributes,
+		state.blocks.controlledInnerBlocks,
+		state.blocks.parents,
+		state.blocks.byClientId,
+		state.settings,
+	]
+);
+
 export { getBlockSettings } from './get-block-settings';
 
 /**
@@ -161,6 +297,7 @@ export const getClientIdsTree = createSelector(
 
 function getEnabledClientIdsTreeUnmemoized( state, rootClientId ) {
 	const blockOrder = getBlockOrder( state, rootClientId );
+	const listViewBlockVisibility = getListViewBlockVisibility( state );
 	const result = [];
 
 	for ( const clientId of blockOrder ) {
@@ -168,7 +305,17 @@ function getEnabledClientIdsTreeUnmemoized( state, rootClientId ) {
 			state,
 			clientId
 		);
-		if ( getBlockEditingMode( state, clientId ) !== 'disabled' ) {
+		const isDisabled =
+			getBlockEditingMode( state, clientId ) === 'disabled';
+
+		// When editing a content-only section, disabled blocks that were
+		// visible before editing still appear as nodes in List View — just
+		// faded. Blocks that were already hidden (non-content blocks inside
+		// other patterns) remain hidden.
+		const showDespiteDisabled =
+			isDisabled && listViewBlockVisibility?.has( clientId );
+
+		if ( ! isDisabled || showDespiteDisabled ) {
 			result.push( { clientId, innerBlocks } );
 		} else {
 			result.push( ...innerBlocks );
@@ -180,7 +327,8 @@ function getEnabledClientIdsTreeUnmemoized( state, rootClientId ) {
 
 /**
  * Returns a tree of block objects with only clientID and innerBlocks set.
- * Blocks with a 'disabled' editing mode are not included.
+ * Blocks with a 'disabled' editing mode are not included, unless a content-only
+ * section is being edited, in which case all blocks are included to show context.
  *
  * @param {Object}  state        Global application state.
  * @param {?string} rootClientId Optional root client ID of block list.
@@ -192,6 +340,7 @@ export const getEnabledClientIdsTree = createRegistrySelector( () =>
 		state.blocks.order,
 		state.derivedBlockEditingModes,
 		state.blocks.blockEditingModes,
+		getListViewBlockVisibility( state ),
 	] )
 );
 

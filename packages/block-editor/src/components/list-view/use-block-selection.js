@@ -13,10 +13,13 @@ import { store as blocksStore } from '@wordpress/blocks';
  */
 import { store as blockEditorStore } from '../../store';
 import { getCommonDepthClientIds } from './utils';
+import { unlock } from '../../lock-unlock';
 
 export default function useBlockSelection() {
-	const { clearSelectedBlock, multiSelect, selectBlock } =
-		useDispatch( blockEditorStore );
+	const blockEditorActions = useDispatch( blockEditorStore );
+	const { clearSelectedBlock, multiSelect, selectBlock } = blockEditorActions;
+	const { stopEditingContentOnlySection } = unlock( blockEditorActions );
+
 	const {
 		getBlockName,
 		getBlockParents,
@@ -24,7 +27,8 @@ export default function useBlockSelection() {
 		getSelectedBlockClientIds,
 		hasMultiSelection,
 		hasSelectedBlock,
-	} = useSelect( blockEditorStore );
+		getEditedContentOnlySection,
+	} = unlock( useSelect( blockEditorStore ) );
 
 	const { getBlockType } = useSelect( blocksStore );
 
@@ -47,6 +51,15 @@ export default function useBlockSelection() {
 					event.keyCode === DOWN ||
 					event.keyCode === HOME ||
 					event.keyCode === END );
+
+			// When Escape is pressed, exit the editing mode instead of just clearing selection.
+			if ( isOnlyDeselection ) {
+				const editedContentOnlySection = getEditedContentOnlySection();
+				if ( editedContentOnlySection ) {
+					stopEditingContentOnlySection();
+					return;
+				}
+			}
 
 			// Handle clicking on a block when no blocks are selected, and return early.
 			if (
@@ -164,6 +177,8 @@ export default function useBlockSelection() {
 			hasSelectedBlock,
 			multiSelect,
 			selectBlock,
+			getEditedContentOnlySection,
+			stopEditingContentOnlySection,
 		]
 	);
 

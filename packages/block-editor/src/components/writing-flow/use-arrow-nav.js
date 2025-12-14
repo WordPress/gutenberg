@@ -11,7 +11,7 @@ import {
 	isRTL,
 	isFormElement,
 } from '@wordpress/dom';
-import { UP, DOWN, LEFT, RIGHT } from '@wordpress/keycodes';
+import { UP, DOWN, LEFT, RIGHT, ESCAPE } from '@wordpress/keycodes';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useRefEffect } from '@wordpress/compose';
 
@@ -20,6 +20,7 @@ import { useRefEffect } from '@wordpress/compose';
  */
 import { getBlockClientId } from '../../utils/dom';
 import { store as blockEditorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
 
 /**
  * Returns true if the element should consider edge navigation upon a keyboard
@@ -170,8 +171,11 @@ export default function useArrowNav() {
 		getSettings,
 		hasMultiSelection,
 		__unstableIsFullySelected,
-	} = useSelect( blockEditorStore );
-	const { selectBlock } = useDispatch( blockEditorStore );
+		getEditedContentOnlySection,
+	} = unlock( useSelect( blockEditorStore ) );
+	const blockEditorActions = useDispatch( blockEditorStore );
+	const { selectBlock } = blockEditorActions;
+	const { stopEditingContentOnlySection } = unlock( blockEditorActions );
 	return useRefEffect( ( node ) => {
 		// Here a DOMRect is stored while moving the caret vertically so
 		// vertical position of the start position can be restored. This is to
@@ -212,6 +216,16 @@ export default function useArrowNav() {
 			const isNavEdge = isVertical ? isVerticalEdge : isHorizontalEdge;
 			const { ownerDocument } = node;
 			const { defaultView } = ownerDocument;
+
+			// Handle Escape key to exit content-only pattern editing mode.
+			if ( keyCode === ESCAPE ) {
+				const editedContentOnlySection = getEditedContentOnlySection();
+				if ( editedContentOnlySection ) {
+					event.preventDefault();
+					stopEditingContentOnlySection();
+					return;
+				}
+			}
 
 			if ( ! isNav ) {
 				return;
@@ -315,6 +329,7 @@ export default function useArrowNav() {
 					isReverseDir,
 					node
 				);
+
 				placeCaretAtHorizontalEdge( closestTabbable, isReverse );
 				event.preventDefault();
 			}

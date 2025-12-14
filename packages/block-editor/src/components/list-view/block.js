@@ -98,6 +98,7 @@ function ListViewBlock( {
 		insertAfterBlock,
 		insertBeforeBlock,
 		showViewportModal,
+		stopEditingContentOnlySection,
 	} = unlock( useDispatch( blockEditorStore ) );
 
 	const debouncedToggleBlockHighlight = useDebounce(
@@ -125,21 +126,46 @@ function ListViewBlock( {
 
 	const pasteStyles = usePasteStyles();
 
-	const { block, blockName, allowRightClickOverrides } = useSelect(
+	const {
+		block,
+		blockName,
+		allowRightClickOverrides,
+		isSpotlightActive,
+		editedSection,
+		isWithinEditedSection,
+	} = useSelect(
 		( select ) => {
-			const { getBlock, getBlockName, getSettings } = unlock(
-				select( blockEditorStore )
-			);
+			const {
+				getBlock,
+				getBlockName,
+				getSettings,
+				hasBlockSpotlight,
+				getEditedContentOnlySection,
+				isWithinEditedContentOnlySection,
+			} = unlock( select( blockEditorStore ) );
+			const editedContentOnlySection = getEditedContentOnlySection();
 
 			return {
 				block: getBlock( clientId ),
 				blockName: getBlockName( clientId ),
 				allowRightClickOverrides:
 					getSettings().allowRightClickOverrides,
+				isSpotlightActive: hasBlockSpotlight(),
+				editedSection: editedContentOnlySection,
+				isWithinEditedSection: editedContentOnlySection
+					? isWithinEditedContentOnlySection( clientId )
+					: false,
 			};
 		},
 		[ clientId ]
 	);
+
+	const shouldFadeInSpotlight = editedSection
+		? ! isWithinEditedSection
+		: isSpotlightActive && ! ( isSelected || isBranchSelected );
+	const shouldDisableInteractions =
+		!! editedSection && ! isWithinEditedSection;
+
 	const { canRename } = useBlockRename( blockName );
 
 	const showBlockActions =
@@ -405,16 +431,41 @@ function ListViewBlock( {
 	}
 
 	const onMouseEnter = useCallback( () => {
+		// Disable hover when section editing excludes this block.
+		if ( shouldDisableInteractions ) {
+			return;
+		}
 		setIsHovered( true );
 		debouncedToggleBlockHighlight( clientId, true );
-	}, [ clientId, setIsHovered, debouncedToggleBlockHighlight ] );
+	}, [
+		clientId,
+		setIsHovered,
+		debouncedToggleBlockHighlight,
+		shouldDisableInteractions,
+	] );
 	const onMouseLeave = useCallback( () => {
+		// Disable hover when section editing excludes this block.
+		if ( shouldDisableInteractions ) {
+			return;
+		}
 		setIsHovered( false );
 		debouncedToggleBlockHighlight( clientId, false );
-	}, [ clientId, setIsHovered, debouncedToggleBlockHighlight ] );
+	}, [
+		clientId,
+		setIsHovered,
+		debouncedToggleBlockHighlight,
+		shouldDisableInteractions,
+	] );
 
 	const selectEditorBlock = useCallback(
 		( event ) => {
+			// If we're editing a section and clicking outside it, exit section editing.
+			if ( shouldDisableInteractions ) {
+				stopEditingContentOnlySection();
+				event.preventDefault();
+				return;
+			}
+
 			// For keyboard activation (Enter/Space on a link), transfer focus
 			// to the canvas with the caret at the end of the block.
 			// For mouse clicks, keep focus in the list view so that subsequent
@@ -423,7 +474,12 @@ function ListViewBlock( {
 			selectBlock( event, clientId, isKeyboardActivation ? -1 : null );
 			event.preventDefault();
 		},
-		[ clientId, selectBlock ]
+		[
+			clientId,
+			selectBlock,
+			shouldDisableInteractions,
+			stopEditingContentOnlySection,
+		]
 	);
 
 	const updateFocusAndSelection = useCallback(
@@ -439,6 +495,12 @@ function ListViewBlock( {
 
 	const toggleExpanded = useCallback(
 		( event ) => {
+			// Prevent expanding/collapsing blocks outside the edited section.
+			if ( shouldDisableInteractions ) {
+				event.preventDefault();
+				event.stopPropagation();
+				return;
+			}
 			// Prevent shift+click from opening link in a new window when toggling.
 			event.preventDefault();
 			event.stopPropagation();
@@ -448,7 +510,7 @@ function ListViewBlock( {
 				expand( clientId );
 			}
 		},
-		[ clientId, expand, collapse, isExpanded ]
+		[ clientId, expand, collapse, isExpanded, shouldDisableInteractions ]
 	);
 
 	// Allow right-clicking an item in the List View to open up the block settings dropdown.
@@ -572,6 +634,7 @@ function ListViewBlock( {
 		'is-displacement-down': displacement === 'down',
 		'is-after-dragged-blocks': isAfterDraggedBlocks,
 		'is-nesting': isNesting,
+		'is-faded-in-spotlight': shouldFadeInSpotlight,
 	} );
 
 	// Only include all selected blocks if the currently clicked on block
@@ -609,6 +672,7 @@ function ListViewBlock( {
 				colSpan={ colSpan }
 				ref={ cellRef }
 				aria-selected={ !! isSelected }
+				aria-disabled={ shouldDisableInteractions ? 'true' : undefined }
 			>
 				{ ( { ref, tabIndex, onFocus } ) => (
 					<div className="block-editor-list-view-block__contents-container">
