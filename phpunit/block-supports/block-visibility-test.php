@@ -23,6 +23,9 @@ class WP_Block_Supports_Block_Visibility_Test extends WP_UnitTestCase {
 		parent::set_up();
 		$this->test_block_name      = null;
 		$this->original_experiments = get_option( 'gutenberg-experiments' );
+
+		// Clear the style engine store to avoid test pollution.
+		WP_Style_Engine_CSS_Rules_Store_Gutenberg::remove_all_stores();
 	}
 
 	public function tear_down() {
@@ -186,6 +189,39 @@ class WP_Block_Supports_Block_Visibility_Test extends WP_UnitTestCase {
 		$this->enable_responsive_visibility_experiment();
 		$this->assertTrue( gutenberg_is_experiment_enabled( 'gutenberg-hide-blocks-based-on-screen-size' ) );
 	}
+
+	public function test_css_with_display_none_is_generated() {
+		$this->enable_responsive_visibility_experiment();
+
+		self::register_block_with_visibility_support(
+			'test/css-generation',
+			array( 'visibility' => true )
+		);
+
+		$block = array(
+			'blockName' => 'test/css-generation',
+			'attrs'     => array(
+				'metadata' => array(
+					'blockVisibility' => array(
+						'mobile' => false,
+					),
+				),
+			),
+		);
+
+		$block_content = '<div>Test content</div>';
+		gutenberg_render_block_visibility_support( $block_content, $block );
+
+		// Get the generated stylesheet from the style engine context.
+		$stylesheet = gutenberg_style_engine_get_stylesheet_from_context( 'block-supports' );
+
+		// Verify the stylesheet contains display:none.
+		$this->assertStringContainsString( 'display', $stylesheet, 'Stylesheet should contain display property' );
+		$this->assertStringContainsString( 'none', $stylesheet, 'Stylesheet should contain none value' );
+		$this->assertStringContainsString( '.wp-block-hidden-mobile', $stylesheet, 'Stylesheet should contain the visibility class' );
+		$this->assertStringContainsString( '@media', $stylesheet, 'Stylesheet should contain media query' );
+	}
+
 
 	public function test_responsive_visibility_without_experiment() {
 		$this->disable_responsive_visibility_experiment();
