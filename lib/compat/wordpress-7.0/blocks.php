@@ -174,7 +174,8 @@ function gutenberg_update_tax_query_of_query_loop_block( $query, $block ) {
 	);
 
 	if ( ! empty( $tax_query ) ) {
-		$query['tax_query'] = $tax_query;
+		// Merge with any existing `tax_query` conditions.
+		$query['tax_query'] = array_merge( $query['tax_query'], $tax_query );
 	}
 
 	return $query;
