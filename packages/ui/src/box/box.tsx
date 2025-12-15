@@ -29,7 +29,7 @@ const capitalize = ( str: string ): string =>
 
 /**
  * Converts a size value to a CSS design token property reference (with
- * fallback) or a calculated value based on the base unit.
+ * fallback).
  *
  * @param property The CSS property name.
  * @param target   The design system token target.
@@ -41,9 +41,7 @@ const getSpacingValue = (
 	target: string,
 	value: number | string
 ): string =>
-	typeof value === 'number'
-		? `calc(var(--wpds-dimension-base) * ${ value })`
-		: `var(--wpds-dimension-${ property }-${ target }-${ value }, var(--wpds-dimension-${ property }-surface-${ value }))`;
+	`var(--wpds-dimension-${ property }-${ target }-${ value }, var(--wpds-dimension-${ property }-surface-${ value }))`;
 
 /**
  * Generates CSS styles for properties with optionally directional values,
