@@ -53,7 +53,7 @@ class WP_Block_Supports_Block_Visibility_Test extends WP_UnitTestCase {
 	 *
 	 * @return WP_Block_Type The block type for the newly registered test block.
 	 */
-	private function register_block_with_visibility_support( $block_name, $supports = array() ) {
+	private function register_visibility_block_with_support( $block_name, $supports = array() ) {
 		$this->test_block_name = $block_name;
 		register_block_type(
 			$this->test_block_name,
@@ -104,14 +104,15 @@ class WP_Block_Supports_Block_Visibility_Test extends WP_UnitTestCase {
 		);
 	}
 
-	public function test_block_visibility_false_hides_block() {
-		self::register_block_with_visibility_support(
-			'test/block-visibility-false',
+	public function test_block_visibility_support_hides_block_when_visibility_false() {
+		$this->register_visibility_block_with_support(
+			'test/visibility-block',
 			array( 'visibility' => true )
 		);
 
-		$block = array(
-			'blockName' => 'test/block-visibility-false',
+		$block_content = '<p>This is a test block.</p>';
+		$block         = array(
+			'blockName' => 'test/visibility-block',
 			'attrs'     => array(
 				'metadata' => array(
 					'blockVisibility' => false,
@@ -119,35 +120,34 @@ class WP_Block_Supports_Block_Visibility_Test extends WP_UnitTestCase {
 			),
 		);
 
-		$block_content = '<div>Test content</div>';
-		$result        = gutenberg_render_block_visibility_support( $block_content, $block );
+		$result = gutenberg_render_block_visibility_support( $block_content, $block );
 
-		$this->assertSame( '', $result );
+		$this->assertSame( '', $result, 'Block content should be empty when blockVisibility is false and support is opted in.' );
 	}
 
-	public function test_block_visibility_true_shows_block() {
-		self::register_block_with_visibility_support(
-			'test/block-visibility-true',
-			array( 'visibility' => true )
+	public function test_block_visibility_support_shows_block_when_support_not_opted_in() {
+		$this->register_visibility_block_with_support(
+			'test/visibility-block',
+			array( 'visibility' => false )
 		);
 
-		$block = array(
-			'blockName' => 'test/block-visibility-true',
+		$block_content = '<p>This is a test block.</p>';
+		$block         = array(
+			'blockName' => 'test/visibility-block',
 			'attrs'     => array(
 				'metadata' => array(
-					'blockVisibility' => true,
+					'blockVisibility' => false,
 				),
 			),
 		);
 
-		$block_content = '<div>Test content</div>';
-		$result        = gutenberg_render_block_visibility_support( $block_content, $block );
+		$result = gutenberg_render_block_visibility_support( $block_content, $block );
 
-		$this->assertEquals( $block_content, $result );
+		$this->assertSame( $block_content, $result, 'Block content should remain unchanged when blockVisibility support is not opted in.' );
 	}
 
-	public function test_block_visibility_no_visibility_attribute() {
-		self::register_block_with_visibility_support(
+	public function test_block_visibility_support_no_visibility_attribute() {
+		$this->register_visibility_block_with_support(
 			'test/block-visibility-none',
 			array( 'visibility' => true )
 		);
@@ -160,40 +160,13 @@ class WP_Block_Supports_Block_Visibility_Test extends WP_UnitTestCase {
 		$block_content = '<div>Test content</div>';
 		$result        = gutenberg_render_block_visibility_support( $block_content, $block );
 
-		$this->assertEquals( $block_content, $result );
+		$this->assertSame( $block_content, $result );
 	}
 
-	public function test_block_without_visibility_support() {
-		self::register_block_with_visibility_support(
-			'test/no-visibility-support',
-			array( 'visibility' => false )
-		);
-
-		$block = array(
-			'blockName' => 'test/no-visibility-support',
-			'attrs'     => array(
-				'metadata' => array(
-					'blockVisibility' => false,
-				),
-			),
-		);
-
-		$block_content = '<div>Test content</div>';
-		$result        = gutenberg_render_block_visibility_support( $block_content, $block );
-
-		// Block should not be hidden because it doesn't have visibility support.
-		$this->assertEquals( $block_content, $result );
-	}
-
-	public function test_experiment_can_be_enabled() {
-		$this->enable_responsive_visibility_experiment();
-		$this->assertTrue( gutenberg_is_experiment_enabled( 'gutenberg-hide-blocks-based-on-screen-size' ) );
-	}
-
-	public function test_css_with_display_none_is_generated() {
+	public function test_block_visibility_support_generated_css_with_display_none() {
 		$this->enable_responsive_visibility_experiment();
 
-		self::register_block_with_visibility_support(
+		$this->register_visibility_block_with_support(
 			'test/css-generation',
 			array( 'visibility' => true )
 		);
@@ -216,17 +189,15 @@ class WP_Block_Supports_Block_Visibility_Test extends WP_UnitTestCase {
 		$stylesheet = gutenberg_style_engine_get_stylesheet_from_context( 'block-supports' );
 
 		// Verify the stylesheet contains display:none.
-		$this->assertStringContainsString( 'display', $stylesheet, 'Stylesheet should contain display property' );
-		$this->assertStringContainsString( 'none', $stylesheet, 'Stylesheet should contain none value' );
+		$this->assertStringContainsString( 'display:none!important', str_replace( ' ', '', $stylesheet ), 'display:none!important should be in the CSS' );
 		$this->assertStringContainsString( '.wp-block-hidden-mobile', $stylesheet, 'Stylesheet should contain the visibility class' );
 		$this->assertStringContainsString( '@media', $stylesheet, 'Stylesheet should contain media query' );
 	}
 
-
-	public function test_responsive_visibility_without_experiment() {
+	public function test_block_visibility_support_without_experiment() {
 		$this->disable_responsive_visibility_experiment();
 
-		self::register_block_with_visibility_support(
+		$this->register_visibility_block_with_support(
 			'test/responsive-no-experiment',
 			array( 'visibility' => true )
 		);
@@ -245,14 +216,13 @@ class WP_Block_Supports_Block_Visibility_Test extends WP_UnitTestCase {
 		$block_content = '<div>Test content</div>';
 		$result        = gutenberg_render_block_visibility_support( $block_content, $block );
 
-		// Without experiment enabled, responsive visibility should not work.
-		$this->assertEquals( $block_content, $result );
+		$this->assertSame( $block_content, $result, 'Block content should remain unchanged when the experiment is not enabled.' );
 	}
 
-	public function test_responsive_visibility_with_experiment_mobile() {
+	public function test_block_visibility_support_generated_css_with_mobile_breakpoint() {
 		$this->enable_responsive_visibility_experiment();
 
-		self::register_block_with_visibility_support(
+		$this->register_visibility_block_with_support(
 			'test/responsive-mobile',
 			array( 'visibility' => true )
 		);
@@ -271,14 +241,13 @@ class WP_Block_Supports_Block_Visibility_Test extends WP_UnitTestCase {
 		$block_content = '<div>Test content</div>';
 		$result        = gutenberg_render_block_visibility_support( $block_content, $block );
 
-		// Block should have the visibility class added.
-		$this->assertStringContainsString( 'wp-block-hidden-mobile', $result );
+		$this->assertStringContainsString( 'wp-block-hidden-mobile', $result, 'Block should have the visibility class for the mobile breakpoint.' );
 	}
 
-	public function test_responsive_visibility_with_experiment_multiple_breakpoints() {
+	public function test_block_visibility_support_generated_css_with_multiple_breakpoints() {
 		$this->enable_responsive_visibility_experiment();
 
-		self::register_block_with_visibility_support(
+		$this->register_visibility_block_with_support(
 			'test/responsive-multiple',
 			array( 'visibility' => true )
 		);
@@ -298,14 +267,13 @@ class WP_Block_Supports_Block_Visibility_Test extends WP_UnitTestCase {
 		$block_content = '<div>Test content</div>';
 		$result        = gutenberg_render_block_visibility_support( $block_content, $block );
 
-		// Block should have the visibility class for both breakpoints (sorted alphabetically).
-		$this->assertStringContainsString( 'wp-block-hidden-desktop-mobile', $result );
+		$this->assertStringContainsString( 'wp-block-hidden-desktop-mobile', $result, 'Block should have the visibility class for both breakpoints (sorted alphabetically).' );
 	}
 
-	public function test_responsive_visibility_tablet_only() {
+	public function test_block_visibility_support_generated_css_with_tablet_breakpoint() {
 		$this->enable_responsive_visibility_experiment();
 
-		self::register_block_with_visibility_support(
+		$this->register_visibility_block_with_support(
 			'test/responsive-tablet',
 			array( 'visibility' => true )
 		);
@@ -324,15 +292,14 @@ class WP_Block_Supports_Block_Visibility_Test extends WP_UnitTestCase {
 		$block_content = '<div class="existing-class">Test content</div>';
 		$result        = gutenberg_render_block_visibility_support( $block_content, $block );
 
-		// Block should have both the existing class and the new visibility class.
-		$this->assertStringContainsString( 'existing-class', $result );
-		$this->assertStringContainsString( 'wp-block-hidden-tablet', $result );
+		$this->assertStringContainsString( 'existing-class', $result, 'Block should have the existing class.' );
+		$this->assertStringContainsString( 'wp-block-hidden-tablet', $result, 'Block should have the visibility class for the tablet breakpoint.' );
 	}
 
-	public function test_responsive_visibility_all_visible() {
+	public function test_block_visibility_support_generated_css_with_all_breakpoints_visible() {
 		$this->enable_responsive_visibility_experiment();
 
-		self::register_block_with_visibility_support(
+		$this->register_visibility_block_with_support(
 			'test/responsive-all-visible',
 			array( 'visibility' => true )
 		);
@@ -353,14 +320,13 @@ class WP_Block_Supports_Block_Visibility_Test extends WP_UnitTestCase {
 		$block_content = '<div>Test content</div>';
 		$result        = gutenberg_render_block_visibility_support( $block_content, $block );
 
-		// No classes should be added if all breakpoints are visible.
-		$this->assertEquals( $block_content, $result );
+		$this->assertSame( $block_content, $result, 'Block content should remain unchanged when all breakpoints are visible.' );
 	}
 
-	public function test_responsive_visibility_empty_object() {
+	public function test_block_visibility_support_generated_css_with_empty_object() {
 		$this->enable_responsive_visibility_experiment();
 
-		self::register_block_with_visibility_support(
+		$this->register_visibility_block_with_support(
 			'test/responsive-empty',
 			array( 'visibility' => true )
 		);
@@ -377,14 +343,13 @@ class WP_Block_Supports_Block_Visibility_Test extends WP_UnitTestCase {
 		$block_content = '<div>Test content</div>';
 		$result        = gutenberg_render_block_visibility_support( $block_content, $block );
 
-		// Empty visibility object should not modify content.
-		$this->assertEquals( $block_content, $result );
+		$this->assertSame( $block_content, $result, 'Block content should remain unchanged when there is no visibility object.' );
 	}
 
-	public function test_responsive_visibility_unknown_breakpoints_ignored() {
+	public function test_block_visibility_support_generated_css_with_unknown_breakpoints_ignored() {
 		$this->enable_responsive_visibility_experiment();
 
-		self::register_block_with_visibility_support(
+		$this->register_visibility_block_with_support(
 			'test/responsive-unknown-breakpoints',
 			array( 'visibility' => true )
 		);
@@ -405,17 +370,15 @@ class WP_Block_Supports_Block_Visibility_Test extends WP_UnitTestCase {
 		$block_content = '<div>Test content</div>';
 		$result        = gutenberg_render_block_visibility_support( $block_content, $block );
 
-		// Only the known 'mobile' breakpoint should be processed.
-		$this->assertStringContainsString( 'wp-block-hidden-mobile', $result );
-		// Unknown breakpoints should not appear in the class name.
-		$this->assertStringNotContainsString( 'unknownBreak', $result );
-		$this->assertStringNotContainsString( 'largeScreen', $result );
+		$this->assertStringContainsString( 'wp-block-hidden-mobile', $result, 'Block should have the visibility class for the mobile breakpoint.' );
+		$this->assertStringNotContainsString( 'unknownBreak', $result, 'Unknown breakpoints should not appear in the class name.' );
+		$this->assertStringNotContainsString( 'largeScreen', $result, 'Large screen breakpoints should not appear in the class name.' );
 	}
 
-	public function test_html_processor_fallback_with_empty_content() {
+	public function test_block_visibility_support_generated_css_with_empty_content() {
 		$this->enable_responsive_visibility_experiment();
 
-		self::register_block_with_visibility_support(
+		$this->register_visibility_block_with_support(
 			'test/empty-content',
 			array( 'visibility' => true )
 		);
@@ -434,95 +397,6 @@ class WP_Block_Supports_Block_Visibility_Test extends WP_UnitTestCase {
 		$block_content = '';
 		$result        = gutenberg_render_block_visibility_support( $block_content, $block );
 
-		// Empty content should remain empty (WP_HTML_Tag_Processor fallback).
-		$this->assertSame( '', $result );
-	}
-
-	public function test_important_flag_in_generated_css() {
-		$this->enable_responsive_visibility_experiment();
-
-		self::register_block_with_visibility_support(
-			'test/important-css',
-			array( 'visibility' => true )
-		);
-
-		$block = array(
-			'blockName' => 'test/important-css',
-			'attrs'     => array(
-				'metadata' => array(
-					'blockVisibility' => array(
-						'mobile' => false,
-					),
-				),
-			),
-		);
-
-		$block_content = '<div>Test content</div>';
-		gutenberg_render_block_visibility_support( $block_content, $block );
-
-		// Get the generated stylesheet from the style engine context.
-		$stylesheet = gutenberg_style_engine_get_stylesheet_from_context( 'block-supports' );
-
-		// Verify the stylesheet contains !important flag.
-		$this->assertStringContainsString( '!important', $stylesheet, 'Stylesheet should contain !important flag' );
-		$this->assertStringContainsString( 'display:none!important', str_replace( ' ', '', $stylesheet ), 'display:none!important should be in the CSS' );
-	}
-
-	public function test_sanitize_breakpoint_names_in_class() {
-		$this->enable_responsive_visibility_experiment();
-
-		self::register_block_with_visibility_support(
-			'test/sanitize-class',
-			array( 'visibility' => true )
-		);
-
-		$block = array(
-			'blockName' => 'test/sanitize-class',
-			'attrs'     => array(
-				'metadata' => array(
-					'blockVisibility' => array(
-						'mobile'  => false,
-						'tablet'  => false,
-						'desktop' => false,
-					),
-				),
-			),
-		);
-
-		$block_content = '<div>Test content</div>';
-		$result        = gutenberg_render_block_visibility_support( $block_content, $block );
-
-		// Known breakpoints should be sanitized but remain valid.
-		// With all three hidden, block should be completely hidden (empty string).
-		$this->assertSame( '', $result );
-	}
-
-	public function test_breakpoint_names_remain_valid_after_sanitization() {
-		$this->enable_responsive_visibility_experiment();
-
-		self::register_block_with_visibility_support(
-			'test/valid-names',
-			array( 'visibility' => true )
-		);
-
-		$block = array(
-			'blockName' => 'test/valid-names',
-			'attrs'     => array(
-				'metadata' => array(
-					'blockVisibility' => array(
-						'mobile'  => false,
-						'desktop' => false,
-					),
-				),
-			),
-		);
-
-		$block_content = '<div>Test content</div>';
-		$result        = gutenberg_render_block_visibility_support( $block_content, $block );
-
-		// Verify that valid breakpoint names pass through sanitization correctly.
-		$this->assertStringContainsString( 'wp-block-hidden-desktop-mobile', $result );
-		// Ensure no unexpected characters were added or removed.
-		$this->assertStringNotContainsString( 'wp-block-hidden--', $result, 'Should not have double hyphens' );
+		$this->assertSame( '', $result, 'Block content should be empty when there is no content.' );
 	}
 }

@@ -36,7 +36,8 @@ function gutenberg_render_block_visibility_support( $block_content, $block ) {
 		/*
 		 * Breakpoints definitions are in several places in WordPress packages.
 		 * The following are taken from: https://github.com/WordPress/gutenberg/blob/trunk/packages/base-styles/_breakpoints.scss
-		 * THe array is in a future, potential JSON format.
+		 * The array is in a future, potential JSON format, and will be centralized
+		 * as the feature is developed.
 		 */
 		$breakpoints = array(
 			'mobile'  => array(
