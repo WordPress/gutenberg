@@ -4,7 +4,7 @@
 
 ### Breaking Changes
 
--   Remove numeric multiplier option for spacing tokens from `Stack` and `Box` components. ([#73852](https://github.com/WordPress/gutenberg/pull/73852))
+-   Remove numeric multiplier option for spacing tokens from `Stack` and `Box` components. ([#73852](https://github.com/WordPress/gutenberg/pull/73852), [#74008](https://github.com/WordPress/gutenberg/pull/74008))
 
 ### New Features
 
