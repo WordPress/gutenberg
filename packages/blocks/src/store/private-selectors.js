@@ -87,8 +87,8 @@ function filterElementBlockSupports( blockSupports, name, element ) {
 			return false;
 		}
 
-		// Text indent is only available for the text element
-		if ( support === 'textIndent' && ! name && element !== 'text' ) {
+		// Text indent is only available for blocks, not elements
+		if ( support === 'textIndent' && ! name ) {
 			return false;
 		}
 
