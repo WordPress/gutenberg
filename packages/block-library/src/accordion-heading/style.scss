@@ -38,4 +38,34 @@
 	display: flex;
 	align-items: center;
 	justify-content: center;
+
+	img {
+		width: 100%;
+		height: 100%;
+		object-fit: contain;
+		display: block;
+	}
+
+	.wp-block-accordion-heading__icon-expand {
+		display: block;
+	}
+
+	.wp-block-accordion-heading__icon-collapse {
+		display: none;
+	}
+}
+
+.wp-block-accordion-heading__toggle[aria-expanded="true"] {
+	.wp-block-accordion-heading__toggle-icon {
+
+		transform: none !important;
+
+		.wp-block-accordion-heading__icon-expand {
+			display: none;
+		}
+
+		.wp-block-accordion-heading__icon-collapse {
+			display: block;
+		}
+	}
 }
