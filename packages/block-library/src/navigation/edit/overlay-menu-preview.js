@@ -42,14 +42,14 @@ export default function OverlayMenuPreview( { setAttributes, hasIcon, icon } ) {
 				hasValue={ () => icon !== 'handle' }
 				onDeselect={ () => setAttributes( { icon: 'handle' } ) }
 			>
-<ToggleGroupControl
-				__next40pxDefaultSize
-				className="wp-block-navigation__overlay-menu-icon-toggle-group"
-				label={ __( 'Icon' ) }
-				value={ icon }
-				onChange={ ( value ) => setAttributes( { icon: value } ) }
-				isBlock
-			>
+				<ToggleGroupControl
+					__next40pxDefaultSize
+					className="wp-block-navigation__overlay-menu-icon-toggle-group"
+					label={ __( 'Icon' ) }
+					value={ icon }
+					onChange={ ( value ) => setAttributes( { icon: value } ) }
+					isBlock
+				>
 					<ToggleGroupControlOption
 						value="handle"
 						aria-label={ __( 'handle' ) }

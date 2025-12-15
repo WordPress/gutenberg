@@ -264,11 +264,11 @@ export default function QueryInspectorControls( props ) {
 									help={ postTypeControlHelp }
 								/>
 							) : (
-<ToggleGroupControl
-								__next40pxDefaultSize
-								isBlock
-								value={ postType }
-								label={ postTypeControlLabel }
+								<ToggleGroupControl
+									__next40pxDefaultSize
+									isBlock
+									value={ postType }
+									label={ postTypeControlLabel }
 									onChange={ onPostTypeChange }
 									help={ postTypeControlHelp }
 								>
