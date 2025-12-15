@@ -76,14 +76,14 @@ Semantic tokens follow a consistent naming pattern:
 
 **Target** is the component or element type the token applies to.
 
-| Value         | Description                                                  |
-| ------------- | ------------------------------------------------------------ |
-| `surface`     | Container or layout backgrounds and borders                  |
-| `interactive` | Interactive elements like buttons, inputs, and controls      |
-| `content`     | Static content like text and icons                           |
-| `track`       | Track components like scrollbars and slider tracks           |
-| `thumb`       | Thumb components like scrollbar thumbs and slider handles    |
-| `focus`       | Focus indicators and rings                                   |
+| Value         | Description                                               |
+| ------------- | --------------------------------------------------------- |
+| `surface`     | Container or layout backgrounds and borders               |
+| `interactive` | Interactive elements like buttons, inputs, and controls   |
+| `content`     | Static content like text and icons                        |
+| `track`       | Track components like scrollbars and slider tracks        |
+| `thumb`       | Thumb components like scrollbar thumbs and slider handles |
+| `focus`       | Focus indicators and rings                                |
 
 **Modifier** is an optional size or intensity modifier.
 
@@ -101,13 +101,13 @@ Color tokens extend the base pattern with additional modifiers for tone, emphasi
 
 **Tone** defines the semantic intent of the color.
 
-| Value     | Description                                                                              |
-| --------- | ---------------------------------------------------------------------------------------- |
-| `neutral` | Neutrally toned UI elements                                                              |
-| `brand`   | Brand-accented or primary action colors                                                  |
-| `success` | Positive or completed states                                                             |
-| `info`    | Informational or system-generated context                                                |
-| `caution` | Heads-up or low-severity issues; “proceed carefully”                                     |
+| Value     | Description                                                                             |
+| --------- | --------------------------------------------------------------------------------------- |
+| `neutral` | Neutrally toned UI elements                                                             |
+| `brand`   | Brand-accented or primary action colors                                                 |
+| `success` | Positive or completed states                                                            |
+| `info`    | Informational or system-generated context                                               |
+| `caution` | Heads-up or low-severity issues; “proceed carefully”                                    |
 | `warning` | Higher-severity or time-sensitive issues that require user attention but are not errors |
 | `error`   | Blocking issues, validation failures, or destructive actions                            |
 
@@ -117,17 +117,17 @@ Color tokens extend the base pattern with additional modifiers for tone, emphasi
 
 **Emphasis** adjusts color strength relative to the base tone, if specified. The default is a normal emphasis.
 
-| Value                | Description                                     |
-| -------------------- | ----------------------------------------------- |
-| `strong`             | Higher contrast and/or elevated emphasis        |
-| `weak`               | Subtle variant for secondary or muted elements  |
+| Value                | Description                                    |
+| -------------------- | ---------------------------------------------- |
+| `strong`             | Higher contrast and/or elevated emphasis       |
+| `weak`               | Subtle variant for secondary or muted elements |
 
 **State** represents the interactive state of the element, if specified. The default is an idle state.
 
-| Value      | Description                              |
-| ---------- | ---------------------------------------- |
-| `active`   | Hovered, pressed, or selected state      |
-| `disabled` | Unavailable or inoperable state          |
+| Value      | Description                         |
+| ---------- | ----------------------------------- |
+| `active`   | Hovered, pressed, or selected state |
+| `disabled` | Unavailable or inoperable state     |
 
 ## Theme Provider
 
