@@ -15,13 +15,16 @@ import {
 } from './config';
 import type { CRDTDoc } from './types';
 
-interface DocumentMeta {
-	[ key: string ]: boolean | number | string;
-}
+// An object representation of CRDT document metadata.
+type DocumentMeta = Record< string, DocumentMetaValue >;
+type DocumentMetaValue = boolean | number | string;
 
 export function createYjsDoc( documentMeta: DocumentMeta = {} ): Y.Doc {
-	// Meta is not synced and does not get persisted with the document.
-	const metaMap = new Map< string, unknown >(
+	// Convert the object representation of CRDT document metadata to a map.
+	// Document metadata is passed to the Y.Doc constructor and stored in its
+	// `meta` property. It is not synced to peers or persisted with the document.
+	// It is just a place to store transient information about this doc instance.
+	const metaMap = new Map< string, DocumentMetaValue >(
 		Object.entries( documentMeta )
 	);
 
