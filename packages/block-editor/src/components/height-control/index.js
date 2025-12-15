@@ -13,6 +13,7 @@ import {
 	__experimentalParseQuantityAndUnitFromRawValue as parseQuantityAndUnitFromRawValue,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -69,6 +70,11 @@ export default function HeightControl( {
 	onChange,
 	value,
 } ) {
+	deprecated( 'wp.blockEditor.HeightControl', {
+		since: '7.0',
+		version: '7.2',
+		alternative: 'wp.blockEditor.DimensionControl',
+	} );
 	const customRangeValue = parseFloat( value );
 
 	const [ availableUnits ] = useSettings( 'spacing.units' );
