@@ -140,7 +140,7 @@
 	--wpds-font-family-heading: -apple-system, system-ui, 'Segoe UI', 'Roboto',
 		'Oxygen-Sans', 'Ubuntu', 'Cantarell', 'Helvetica Neue', sans-serif; /* Headings font family */
 	--wpds-font-family-mono: 'Menlo', 'Consolas', monaco, monospace; /* Monospace font family */
-	--wpds-font-line-height-2xs: 40px; /* 2X large line height */
+	--wpds-font-line-height-2xl: 40px; /* 2X large line height */
 	--wpds-font-line-height-lg: 28px; /* Large line height */
 	--wpds-font-line-height-md: 24px; /* Medium line height */
 	--wpds-font-line-height-sm: 20px; /* Small line height */

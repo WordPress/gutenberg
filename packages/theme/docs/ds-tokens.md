@@ -173,6 +173,6 @@ Do not edit directly.
 | `--wpds-font-line-height-md`  | Medium line height                           |
 | `--wpds-font-line-height-lg`  | Large line height                            |
 | `--wpds-font-line-height-xl`  | Extra large line height                      |
-| `--wpds-font-line-height-2xs` | 2X large line height                         |
+| `--wpds-font-line-height-2xl` | 2X large line height                         |
 | `--wpds-font-weight-regular`  | Regular font weight for body text            |
 | `--wpds-font-weight-medium`   | Medium font weight for emphasis and headings |

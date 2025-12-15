@@ -84,7 +84,7 @@
 				"$value": { "value": 32, "unit": "px" },
 				"$description": "Extra large line height"
 			},
-			"2xs": {
+			"2xl": {
 				"$value": { "value": 40, "unit": "px" },
 				"$description": "2X large line height"
 			}

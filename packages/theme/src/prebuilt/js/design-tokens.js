@@ -146,7 +146,7 @@ export default [
 	'--wpds-font-line-height-md',
 	'--wpds-font-line-height-lg',
 	'--wpds-font-line-height-xl',
-	'--wpds-font-line-height-2xs',
+	'--wpds-font-line-height-2xl',
 	'--wpds-font-weight-regular',
 	'--wpds-font-weight-medium',
 ];
