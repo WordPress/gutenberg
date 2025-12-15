@@ -215,14 +215,14 @@ export default function Edit( {
 
 	return (
 		<>
-			<Controls
-				attributes={ attributes }
-				setAttributes={ setAttributes }
-				tabsClientId={ tabsClientId }
-				blockIndex={ blockIndex }
-				isDefaultTab={ isDefaultTab }
-			/>
 			<div { ...blockProps }>
+				<Controls
+					attributes={ attributes }
+					setAttributes={ setAttributes }
+					tabsClientId={ tabsClientId }
+					blockIndex={ blockIndex }
+					isDefaultTab={ isDefaultTab }
+				/>
 				{ isSelectedTab && (
 					<>
 						<TabsList
