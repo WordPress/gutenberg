@@ -30,8 +30,7 @@ function UnconnectedToggleGroupControl(
 	forwardedRef: ForwardedRef< any >
 ) {
 	const {
-		// Prevent passing this to the internal component.
-		__nextHasNoMarginBottom: _,
+		__nextHasNoMarginBottom: _, // Prevent passing this to the internal component
 		__next40pxDefaultSize = false,
 		__shouldNotWarnDeprecated36pxSize,
 		className,
