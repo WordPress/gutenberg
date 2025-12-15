@@ -6720,7 +6720,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 							'typography' => array(
 								'textIndent' => '2em',
 							),
-							'color'      => array(
+							'color' => array(
 								'text' => 'blue',
 							),
 						),
@@ -6752,7 +6752,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 				'styles'  => array(
 					'elements' => array(
 						'paragraph' => array(
-							'color'      => array(
+							'color' => array(
 								'text'       => 'red',
 								'background' => 'yellow',
 							),
@@ -6760,7 +6760,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 								'fontSize'   => '1.2em',
 								'fontWeight' => 'bold',
 							),
-							'spacing'    => array(
+							'spacing' => array(
 								'margin' => '1em 0',
 							),
 						),
@@ -6795,7 +6795,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 							'typography' => array(
 								'textIndent' => '1.5em',
 							),
-							'color'      => array(
+							'color' => array(
 								'text' => 'green',
 							),
 						),
@@ -6833,7 +6833,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 							),
 						),
 					),
-					'blocks'   => array(
+					'blocks' => array(
 						'core/paragraph' => array(
 							'typography' => array(
 								'textIndent' => '1em',
@@ -6896,10 +6896,10 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 								'lineHeight'    => '1.6',
 								'textTransform' => 'lowercase',
 							),
-							'color'      => array(
+							'color' => array(
 								'text' => 'purple',
 							),
-							'spacing'    => array(
+							'spacing' => array(
 								'marginBottom' => '1em',
 							),
 						),
