@@ -90,7 +90,7 @@ export interface BoxProps extends ComponentProps< 'div' > {
 	/**
 	 * The surface border width design token.
 	 */
-	borderWidth?: Exclude< SizeToken, '2xs' >;
+	borderWidth?: Exclude< SizeToken, '2xs' | 'xs' | 'lg' >;
 
 	/**
 	 * The surface border stroke color design token.
