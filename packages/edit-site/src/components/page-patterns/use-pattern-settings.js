@@ -17,7 +17,12 @@ import { filterOutDuplicatesByName } from './utils';
 const { useGlobalStyles } = unlock( editorPrivateApis );
 
 export default function usePatternSettings() {
-	// Get merged global styles config and generate styles directly.
+	/*
+	 * Generate global styles directly because block previews use a separate
+	 * ExperimentalBlockEditorProvider and can't access GlobalStylesRenderer's output.
+	 * Reading config from useGlobalStyles and generating CSS directly keeps us in sync.
+	 * See: https://github.com/WordPress/gutenberg/issues/73350
+	 */
 	const { merged: mergedConfig } = useGlobalStyles();
 
 	const storedSettings = useSelect( ( select ) => {

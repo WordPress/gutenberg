@@ -44,8 +44,15 @@ export function useSpecificEditorSettings() {
 	const [ onNavigateToEntityRecord, initialBlockSelection ] =
 		useNavigateToEntityRecord();
 
-	// Get merged global styles config and generate styles directly.
+	/*
+	 * Generate global styles directly to avoid circular dependency with GlobalStylesRenderer
+	 * (which runs inside ExperimentalEditorProvider after this hook).
+	 * GlobalStylesRenderer updates editorStore, but reading from it here would cause infinite
+	 * loops. Reading config from useGlobalStyles and generating CSS directly keeps us in sync.
+	 * See: https://github.com/WordPress/gutenberg/issues/73350
+	 */
 	const { merged: mergedConfig } = useGlobalStyles();
+
 	const { settings, currentPostIsTrashed } = useSelect( ( select ) => {
 		const { getSettings } = select( editSiteStore );
 		const { getCurrentPostAttribute } = select( editorStore );
