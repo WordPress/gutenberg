@@ -73,14 +73,8 @@ export function useSpecificEditorSettings() {
 	}, [ mergedConfig ] );
 
 	const defaultEditorSettings = useMemo( () => {
-		/*
-		 * Exclude styles and __experimentalFeatures from base settings
-		 * since we're generating fresh ones from the merged config.
-		 */
-		const { styles, __experimentalFeatures, ...baseSettings } = settings;
-
 		return {
-			...baseSettings,
+			...settings,
 			styles: [
 				...globalStyles,
 				{
