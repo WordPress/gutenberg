@@ -19,7 +19,6 @@ const ROOT_BLOCK_SUPPORTS = [
 	'captionColor',
 	'buttonColor',
 	'headingColor',
-	'paragraphColor',
 	'fontFamily',
 	'fontSize',
 	'fontStyle',
@@ -56,7 +55,7 @@ function filterElementBlockSupports( blockSupports, name, element ) {
 			return false;
 		}
 
-		// This is only available for heading, button, caption, text and paragraph
+		// This is only available for heading, button, caption and text
 		if (
 			support === 'textTransform' &&
 			! name &&
@@ -66,14 +65,13 @@ function filterElementBlockSupports( blockSupports, name, element ) {
 				) ||
 				element === 'button' ||
 				element === 'caption' ||
-				element === 'text' ||
-				element === 'paragraph'
+				element === 'text'
 			)
 		) {
 			return false;
 		}
 
-		// This is only available for heading, button, caption, text and paragraph
+		// This is only available for heading, button, caption and text
 		if (
 			support === 'letterSpacing' &&
 			! name &&
@@ -83,15 +81,14 @@ function filterElementBlockSupports( blockSupports, name, element ) {
 				) ||
 				element === 'button' ||
 				element === 'caption' ||
-				element === 'text' ||
-				element === 'paragraph'
+				element === 'text'
 			)
 		) {
 			return false;
 		}
 
-		// Text indent is only available for the paragraph element
-		if ( support === 'textIndent' && ! name && element !== 'paragraph' ) {
+		// Text indent is only available for the text element
+		if ( support === 'textIndent' && ! name && element !== 'text' ) {
 			return false;
 		}
 

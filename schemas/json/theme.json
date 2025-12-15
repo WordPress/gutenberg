@@ -233,11 +233,6 @@
 							"type": "boolean",
 							"default": true
 						},
-						"paragraph": {
-							"description": "Allow users to set paragraph colors in a block.",
-							"type": "boolean",
-							"default": true
-						},
 						"button": {
 							"description": "Allow users to set button colors in a block.",
 							"type": "boolean",
@@ -1921,9 +1916,6 @@
 					]
 				},
 				"heading": {
-					"$ref": "#/definitions/stylesPropertiesComplete"
-				},
-				"paragraph": {
 					"$ref": "#/definitions/stylesPropertiesComplete"
 				},
 				"h1": {

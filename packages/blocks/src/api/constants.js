@@ -181,14 +181,6 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 		value: [ 'elements', 'heading', 'color', 'background' ],
 		support: [ 'color', 'heading' ],
 	},
-	paragraphColor: {
-		value: [ 'elements', 'paragraph', 'color', 'text' ],
-		support: [ 'color', 'paragraph' ],
-	},
-	paragraphBackgroundColor: {
-		value: [ 'elements', 'paragraph', 'color', 'background' ],
-		support: [ 'color', 'paragraph' ],
-	},
 	fontFamily: {
 		value: [ 'typography', 'fontFamily' ],
 		support: [ 'typography', '__experimentalFontFamily' ],
@@ -303,11 +295,11 @@ export const __EXPERIMENTAL_ELEMENTS = {
 	h4: 'h4',
 	h5: 'h5',
 	h6: 'h6',
+	text: 'p',
 	button: '.wp-element-button, .wp-block-button__link',
 	caption:
 		'.wp-element-caption, .wp-block-audio figcaption, .wp-block-embed figcaption, .wp-block-gallery figcaption, .wp-block-image figcaption, .wp-block-table figcaption, .wp-block-video figcaption',
 	cite: 'cite',
-	paragraph: 'p',
 	select: 'select',
 	textInput:
 		'textarea, input:where([type=email],[type=number],[type=password],[type=search],[type=tel],[type=text],[type=url])',

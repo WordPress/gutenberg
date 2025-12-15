@@ -72,9 +72,6 @@ export function useSettingsForBlockElement(
 			heading:
 				updatedSettings.color?.heading &&
 				supportedStyles.includes( 'headingColor' ),
-			paragraph:
-				updatedSettings.color?.paragraph &&
-				supportedStyles.includes( 'paragraphColor' ),
 			link:
 				updatedSettings.color?.link &&
 				supportedStyles.includes( 'linkColor' ),

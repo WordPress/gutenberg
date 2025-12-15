@@ -97,7 +97,6 @@ Settings related to colors.
 | palette | Color palette presets for the color picker. | `[ { name, slug, color } ]` |  |
 | text | Allow users to set text colors in a block. | `boolean` | `true` |
 | heading | Allow users to set heading colors in a block. | `boolean` | `true` |
-| paragraph | Allow users to set paragraph colors in a block. | `boolean` | `true` |
 | button | Allow users to set button colors in a block. | `boolean` | `true` |
 | caption | Allow users to set caption colors in a block. | `boolean` | `true` |
 
