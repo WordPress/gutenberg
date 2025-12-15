@@ -187,13 +187,8 @@ export function useSettingsForBlockElement(
 			? updatedSettings.shadow
 			: false;
 
-		// Text alignment is only available for blocks.
-		if ( element ) {
-			updatedSettings.typography.textAlign = false;
-		}
-
 		return updatedSettings;
-	}, [ parentSettings, supportedStyles, supports, element ] );
+	}, [ parentSettings, supportedStyles, supports ] );
 }
 
 export function useColorsPerOrigin( settings ) {

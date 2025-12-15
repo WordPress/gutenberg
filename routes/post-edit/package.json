@@ -4,7 +4,7 @@
 	"private": true,
 	"route": {
 		"path": "/types/$type/edit/$id",
-		"page": "gutenberg-boot"
+		"page": "site-editor"
 	},
 	"dependencies": {
 		"@wordpress/core-data": "file:../../packages/core-data",

@@ -15,12 +15,11 @@ export interface StackProps extends ComponentProps< 'div' > {
 	>;
 
 	/**
-	 * The amount of space between each child element. As a number, it is a
-	 * multiple of the design system grid spacing.
+	 * The amount of space between each child element using design system tokens.
 	 *
-	 * @default 'initial'
+	 * @default undefined
 	 */
-	gap?: number | SizeToken | React.CSSProperties[ 'gap' ];
+	gap?: SizeToken;
 
 	/**
 	 * The alignment of the stack items along the cross axis.

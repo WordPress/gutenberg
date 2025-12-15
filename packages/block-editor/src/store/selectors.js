@@ -2078,6 +2078,8 @@ const getItemFromVariation = ( state, item ) => ( variation ) => {
 		innerBlocks: variation.innerBlocks,
 		keywords: variation.keywords || item.keywords,
 		frecency: calculateFrecency( time, count ),
+		// Pass through search-only flag for block-scope variations.
+		isSearchOnly: variation.isSearchOnly,
 	};
 };
 
@@ -2151,6 +2153,27 @@ const buildBlockTypeItem =
 			blockType.name,
 			'inserter'
 		);
+		const blockVariations = getBlockVariations( blockType.name, 'block' );
+		// Combine inserter and block variations. Block-scope variations without
+		// inserter scope are searchable via slash commands but hidden from browse.
+		const inserterVariationNames = new Set(
+			inserterVariations.map( ( variation ) => variation.name )
+		);
+		const allVariations = [
+			...inserterVariations,
+			...blockVariations
+				.filter(
+					( variation ) =>
+						! inserterVariationNames.has( variation.name )
+				)
+				.map( ( variation ) => ( {
+					...variation,
+					isSearchOnly: true,
+					// Block-scope `isDefault` is for the placeholder picker,
+					// not for the inserter, so don't carry it over.
+					isDefault: false,
+				} ) ),
+		];
 		return {
 			...blockItemBase,
 			initialAttributes: {},
@@ -2159,7 +2182,7 @@ const buildBlockTypeItem =
 			keywords: blockType.keywords,
 			parent: blockType.parent,
 			ancestor: blockType.ancestor,
-			variations: inserterVariations,
+			variations: allVariations,
 			example: blockType.example,
 			utility: 1, // Deprecated.
 		};

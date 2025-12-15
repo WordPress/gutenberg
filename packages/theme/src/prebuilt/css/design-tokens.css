@@ -103,7 +103,7 @@
 	--wpds-color-stroke-interactive-neutral-disabled: #d8d8d8; /* Accessible stroke color used for interactive neutrally-toned elements with normal emphasis, in their disabled state. */
 	--wpds-color-stroke-interactive-neutral-strong: #6c6c6c; /* Accessible stroke color used for interactive neutrally-toned elements with strong emphasis. */
 	--wpds-color-stroke-surface-brand: #a3b1d4; /* Decorative stroke color used to define brand-toned surface boundaries with normal emphasis. */
-	--wpds-color-stroke-surface-brand-strong: #3858e9; /* Decorative stroke color used to define neutrally-toned surface boundaries with strong emphasis. */
+	--wpds-color-stroke-surface-brand-strong: #3858e9; /* Decorative stroke color used to define brand-toned surface boundaries with strong emphasis. */
 	--wpds-color-stroke-surface-error: #daa39b; /* Decorative stroke color used to define error-toned surface boundaries with normal emphasis. */
 	--wpds-color-stroke-surface-error-strong: #cc1818; /* Decorative stroke color used to define error-toned surface boundaries with strong emphasis. */
 	--wpds-color-stroke-surface-info: #9fbcdc; /* Decorative stroke color used to define info-toned surface boundaries with normal emphasis. */

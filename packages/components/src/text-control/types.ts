@@ -5,11 +5,7 @@ import type { BaseControlProps } from '../base-control/types';
 
 export type TextControlProps = Pick<
 	BaseControlProps,
-	| 'className'
-	| 'hideLabelFromVision'
-	| 'help'
-	| 'label'
-	| '__nextHasNoMarginBottom'
+	'className' | 'hideLabelFromVision' | 'help' | 'label'
 > & {
 	/**
 	 * A function that receives the value of the input.

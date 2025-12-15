@@ -30,9 +30,9 @@ export function getAllRoutes( rootDir ) {
 
 /**
  * @typedef {Object} RouteMetadata
- * @property {string}      name Route name.
- * @property {string}      path Route path.
- * @property {string|null} page Page slug this route belongs to.
+ * @property {string}   name  Route name.
+ * @property {string}   path  Route path.
+ * @property {string[]} pages Array of page slugs this route belongs to.
  */
 
 /**
@@ -54,10 +54,19 @@ export function getRouteMetadata( rootDir, routeName ) {
 		return null;
 	}
 
+	// Normalize page field to always be an array
+	// Supports both "page": "string" and "page": ["array"]
+	const pageField = routePackageJson.route.page;
+	/** @type {string[]} */
+	let pages = [];
+	if ( pageField ) {
+		pages = Array.isArray( pageField ) ? pageField : [ pageField ];
+	}
+
 	return {
 		name: routeName,
 		path: routePackageJson.route.path,
-		page: routePackageJson.route.page || null,
+		pages,
 	};
 }
 

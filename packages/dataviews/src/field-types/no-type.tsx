@@ -3,7 +3,8 @@
  */
 import type { SortDirection } from '../types';
 import type { FieldType } from '../types/private';
-import { ALL_OPERATORS, OPERATOR_IS, OPERATOR_IS_NOT } from '../constants';
+import { OPERATOR_IS, OPERATOR_IS_NOT } from '../constants';
+import { getAllOperatorNames } from '../utils/operators';
 import render from './utils/render-default';
 import sortText from './utils/sort-text';
 import sortNumber from './utils/sort-number';
@@ -26,7 +27,7 @@ export default {
 	enableSorting: true,
 	enableGlobalSearch: false,
 	defaultOperators: [ OPERATOR_IS, OPERATOR_IS_NOT ],
-	validOperators: ALL_OPERATORS,
+	validOperators: getAllOperatorNames(),
 	getFormat: () => ( {} ),
 	validate: {
 		required: isValidRequired,

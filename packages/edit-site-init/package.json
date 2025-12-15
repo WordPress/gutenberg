@@ -1,7 +1,7 @@
 {
 	"name": "@wordpress/edit-site-init",
 	"version": "1.0.0",
-	"description": "Initialization module for edit-site (gutenberg-boot) page.",
+	"description": "Initialization module for edit-site (site-editor) page.",
 	"private": true,
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
