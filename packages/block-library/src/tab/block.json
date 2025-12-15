@@ -17,6 +17,11 @@
 	"parent": [ "core/tabs" ],
 	"supports": {
 		"anchor": true,
+		"color": {
+			"text": true,
+			"background": true,
+			"gradients": true
+		},
 		"html": false,
 		"reusable": false,
 		"layout": {

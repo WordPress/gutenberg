@@ -963,7 +963,7 @@ Content for a tab in a tabbed interface. ([Source](https://github.com/WordPress/
 -	**Experimental:** true
 -	**Category:** design
 -	**Parent:** core/tabs
--	**Supports:** anchor, layout (allowJustification, allowOrientation, allowSizingOnChildren, allowSwitching, allowVerticalAlignment, ~~allowInheriting~~), spacing (blockGap, padding, ~~margin~~), typography (fontSize), ~~html~~, ~~reusable~~
+-	**Supports:** anchor, color (background, gradients, text), layout (allowJustification, allowOrientation, allowSizingOnChildren, allowSwitching, allowVerticalAlignment, ~~allowInheriting~~), spacing (blockGap, padding, ~~margin~~), typography (fontSize), ~~html~~, ~~reusable~~
 -	**Attributes:** label
 
 ## Table

@@ -184,6 +184,7 @@ export default function Edit( {
 
 	const tabItemColorProps = useColorProps( tabsAttributes );
 	const tabContentTypographyProps = useTypographyProps( attributes );
+	const tabContentColorProps = useColorProps( attributes );
 
 	const blockProps = useBlockProps( {
 		hidden: ! isSelectedTab,
@@ -198,11 +199,13 @@ export default function Edit( {
 			tabIndex: isSelectedTab ? 0 : -1,
 			className: clsx(
 				tabContentTypographyProps.className,
+				tabContentColorProps.className,
 				'tabs__tab-editor-content',
 				layoutClassNames
 			),
 			style: {
 				...tabContentTypographyProps.style,
+				...tabContentColorProps.style,
 			},
 		},
 		{
@@ -212,14 +215,14 @@ export default function Edit( {
 
 	return (
 		<>
+			<Controls
+				attributes={ attributes }
+				setAttributes={ setAttributes }
+				tabsClientId={ tabsClientId }
+				blockIndex={ blockIndex }
+				isDefaultTab={ isDefaultTab }
+			/>
 			<div { ...blockProps }>
-				<Controls
-					attributes={ attributes }
-					setAttributes={ setAttributes }
-					tabsClientId={ tabsClientId }
-					blockIndex={ blockIndex }
-					isDefaultTab={ isDefaultTab }
-				/>
 				{ isSelectedTab && (
 					<>
 						<TabsList
