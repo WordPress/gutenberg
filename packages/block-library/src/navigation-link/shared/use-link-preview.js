@@ -159,7 +159,7 @@ export function useLinkPreview( {
 	// Get display title - use provided title, fallback to rich data, or URL
 	const displayTitle = url
 		? title || richData?.title || safeDecodeURI( url )
-		: 'Add link';
+		: __( 'Add link' );
 
 	return {
 		title: displayTitle,
