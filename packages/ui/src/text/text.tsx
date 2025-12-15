@@ -13,10 +13,12 @@ const DEFAULT_RENDER = ( props: React.ComponentPropsWithoutRef< 'span' > ) => (
 
 /**
  * A typography primitive that provides an interface for applying design
- * token-based typography styles including font family, size, weight, and line height.
+ * token-based typography styles.
  */
 export const Text = forwardRef< HTMLSpanElement, TextProps >( function Text(
 	{
+		target = 'content',
+		color,
 		fontFamily,
 		fontSize,
 		fontWeight,
@@ -27,6 +29,10 @@ export const Text = forwardRef< HTMLSpanElement, TextProps >( function Text(
 	ref
 ) {
 	const style: React.CSSProperties = { ...props.style };
+
+	if ( color ) {
+		style.color = `var(--wpds-color-fg-${ target }-${ color }, var(--wpds-color-fg-content-${ color }))`;
+	}
 
 	if ( fontFamily ) {
 		style.fontFamily = `var(--wpds-font-family-${ fontFamily })`;

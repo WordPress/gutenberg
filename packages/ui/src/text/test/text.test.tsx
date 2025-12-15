@@ -33,6 +33,30 @@ describe( 'Text', () => {
 		} );
 	} );
 
+	it( 'applies color design tokens', () => {
+		render( <Text color="error">Content</Text> );
+
+		const text = screen.getByText( 'Content' );
+
+		expect( text ).toHaveStyle( {
+			color: 'var(--wpds-color-fg-content-error, var(--wpds-color-fg-content-error))',
+		} );
+	} );
+
+	it( 'applies color with custom target', () => {
+		render(
+			<Text target="interactive" color="brand">
+				Content
+			</Text>
+		);
+
+		const text = screen.getByText( 'Content' );
+
+		expect( text ).toHaveStyle( {
+			color: 'var(--wpds-color-fg-interactive-brand, var(--wpds-color-fg-content-brand))',
+		} );
+	} );
+
 	it( 'merges custom styles', () => {
 		render(
 			<Text
