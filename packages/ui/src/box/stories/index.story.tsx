@@ -30,12 +30,16 @@ export const Default: Story = {
 		padding: 'sm',
 		borderColor: 'brand',
 		borderRadius: 'md',
-		borderWidth: 'sm',
+		borderWidth: 'xs',
 	},
 	argTypes: {
 		padding: {
 			control: 'select',
 			options: [ '2xs', 'xs', 'sm', 'md', 'lg', 1, 2, 3, 4 ],
+		},
+		borderWidth: {
+			control: 'radio',
+			options: [ 'xs', 'sm' ],
 		},
 	},
 };
