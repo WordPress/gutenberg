@@ -1397,6 +1397,7 @@ class WP_Theme_JSON_Gutenberg {
 	 *                       - 'scope' that makes sure all style are scoped to a given selector
 	 *                       - `root_selector` which overwrites and forces a given selector to be used on the root node
 	 *                       - `skip_root_layout_styles` which omits root layout styles from the generated stylesheet.
+	 *                       - `base_layout_styles` which when true generates only base layout styles without alignment rules. Defaults to false.
 	 *                       - `include_block_style_variations` which includes CSS for block style variations.
 	 * @return string The resulting stylesheet.
 	 */
@@ -1451,7 +1452,7 @@ class WP_Theme_JSON_Gutenberg {
 
 		if ( in_array( 'styles', $types, true ) ) {
 			if ( false !== $root_style_key && empty( $options['skip_root_layout_styles'] ) ) {
-				$stylesheet .= $this->get_root_layout_rules( $style_nodes[ $root_style_key ]['selector'], $style_nodes[ $root_style_key ] );
+				$stylesheet .= $this->get_root_layout_rules( $style_nodes[ $root_style_key ]['selector'], $style_nodes[ $root_style_key ], $options );
 			}
 			$stylesheet .= $this->get_block_classes( $style_nodes );
 		}
@@ -1688,9 +1689,10 @@ class WP_Theme_JSON_Gutenberg {
 	 * @since 6.1.0
 	 *
 	 * @param array $block_metadata Metadata about the block to get styles for.
+	 * @param array $options        Optional. An array of options for now used for internal purposes only.
 	 * @return string Layout styles for the block.
 	 */
-	protected function get_layout_styles( $block_metadata ) {
+	protected function get_layout_styles( $block_metadata, $options = array() ) {
 		$block_rules = '';
 		$block_type  = null;
 
@@ -1836,9 +1838,9 @@ class WP_Theme_JSON_Gutenberg {
 					foreach ( $base_style_rules as $base_style_rule ) {
 						$declarations = array();
 
-						// Skip outputting base styles for flow and constrained layout types for classic themes without theme.json.
+						// Skip outputting base styles for flow and constrained layout types when base_layout_styles is enabled.
 						// These themes don't use .wp-site-blocks wrapper, so these layout-specific alignment styles aren't needed.
-						if ( ! wp_is_block_theme() && ! wp_theme_has_theme_json() && ( 'default' === $layout_definition['name'] || 'constrained' === $layout_definition['name'] ) ) {
+						if ( ! empty( $options['base_layout_styles'] ) && ( 'default' === $layout_definition['name'] || 'constrained' === $layout_definition['name'] ) ) {
 							continue;
 						}
 
@@ -3166,11 +3168,12 @@ class WP_Theme_JSON_Gutenberg {
 	 * @since 6.1.0
 	 * @since 6.6.0 Use `ROOT_CSS_PROPERTIES_SELECTOR` for CSS custom properties.
 	 *
-	 * @param string $selector The root node selector.
+	 * @param string $selector       The root node selector.
 	 * @param array  $block_metadata The metadata for the root block.
+	 * @param array  $options        Optional. An array of options. Default empty array.
 	 * @return string The additional root rules CSS.
 	 */
-	public function get_root_layout_rules( $selector, $block_metadata ) {
+	public function get_root_layout_rules( $selector, $block_metadata, $options = array() ) {
 		$css              = '';
 		$settings         = $this->theme_json['settings'] ?? array();
 		$use_root_padding = isset( $this->theme_json['settings']['useRootPaddingAwareAlignments'] ) && true === $this->theme_json['settings']['useRootPaddingAwareAlignments'];
@@ -3211,9 +3214,9 @@ class WP_Theme_JSON_Gutenberg {
 			$css .= '.has-global-padding :where(:not(.alignfull.is-layout-flow) > .has-global-padding:not(.wp-block-block, .alignfull)) > .alignfull { margin-left: 0; margin-right: 0; }';
 		}
 
-		// Skip outputting alignment styles for classic themes without theme.json.
+		// Skip outputting alignment styles when base_layout_styles is enabled.
 		// These styles target .wp-site-blocks which is only used by block themes.
-		if ( wp_is_block_theme() || wp_theme_has_theme_json() ) {
+		if ( empty( $options['base_layout_styles'] ) ) {
 			$css .= '.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }';
 			$css .= '.wp-site-blocks > .alignright { float: right; margin-left: 2em; }';
 			$css .= '.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }';
@@ -3229,7 +3232,7 @@ class WP_Theme_JSON_Gutenberg {
 			// For backwards compatibility, ensure the legacy block gap CSS variable is still available.
 			$css .= static::ROOT_CSS_PROPERTIES_SELECTOR . " { --wp--style--block-gap: $block_gap_value; }";
 		}
-		$css .= $this->get_layout_styles( $block_metadata );
+		$css .= $this->get_layout_styles( $block_metadata, $options );
 
 		return $css;
 	}

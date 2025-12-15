@@ -33,6 +33,15 @@ function gutenberg_get_global_stylesheet( $types = array() ) {
 	}
 
 	/*
+	 * Enable base layout styles only mode for classic themes without theme.json.
+	 * This skips alignment styles that target .wp-site-blocks which is only used by block themes.
+	 */
+	$options = array();
+	if ( ! wp_is_block_theme() && ! wp_theme_has_theme_json() ) {
+		$options['base_layout_styles'] = true;
+	}
+
+	/*
 	 * If variables are part of the stylesheet,
 	 * we add them.
 	 *
@@ -49,7 +58,7 @@ function gutenberg_get_global_stylesheet( $types = array() ) {
 		 * @see wp_add_global_styles_for_blocks
 		 */
 		$origins          = array( 'default', 'theme', 'custom' );
-		$styles_variables = $tree->get_stylesheet( array( 'variables' ), $origins );
+		$styles_variables = $tree->get_stylesheet( array( 'variables' ), $origins, $options );
 		$types            = array_diff( $types, array( 'variables' ) );
 	}
 
@@ -68,7 +77,7 @@ function gutenberg_get_global_stylesheet( $types = array() ) {
 		 * @see wp_add_global_styles_for_blocks
 		 */
 		$origins     = array( 'default', 'theme', 'custom' );
-		$styles_rest = $tree->get_stylesheet( $types, $origins );
+		$styles_rest = $tree->get_stylesheet( $types, $origins, $options );
 	}
 	$stylesheet = $styles_variables . $styles_rest;
 	if ( $can_use_cached ) {
