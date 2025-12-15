@@ -10,9 +10,7 @@
  *
  * @param array $types Types of styles to load. Optional.
  *                     See {@see 'WP_Theme_JSON::get_stylesheet'} for all valid types.
- *                     If empty, it'll load the following:
- *                     - for themes without theme.json: 'variables', 'presets', 'base-layout-styles'.
- *                     - for themes with theme.json: 'variables', 'presets', 'styles'.
+ *                     If empty, will load: 'variables', 'presets', 'styles'.
  *
  * @return string Stylesheet.
  */
