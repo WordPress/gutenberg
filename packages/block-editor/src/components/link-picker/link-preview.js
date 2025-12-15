@@ -65,9 +65,9 @@ export function LinkPreview( { title, url, image, badges } ) {
 								className="link-preview-button__badges"
 								alignment="left"
 							>
-								{ badges.map( ( badge, index ) => (
+								{ badges.map( ( badge ) => (
 									<Badge
-										key={ index }
+										key={ `${ badge.label }|${ badge.intent }` }
 										intent={ badge.intent }
 									>
 										{ badge.label }
