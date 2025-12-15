@@ -90,6 +90,58 @@ export default function DimensionControl( {
 		return unit || units[ 0 ]?.value || 'px';
 	} );
 
+	const handleUnitChange = ( newUnit ) => {
+		// Attempt to smooth over differences between currentUnit and newUnit.
+		// This should slightly improve the experience of switching between unit types.
+		const [ currentValue, currentUnit ] =
+			parseQuantityAndUnitFromRawValue( value );
+
+		if ( [ 'em', 'rem' ].includes( newUnit ) && currentUnit === 'px' ) {
+			// Convert pixel value to an approximate of the new unit, assuming a root size of 16px.
+			onChange( ( currentValue / 16 ).toFixed( 2 ) + newUnit );
+		} else if (
+			[ 'em', 'rem' ].includes( currentUnit ) &&
+			newUnit === 'px'
+		) {
+			// Convert to pixel value assuming a root size of 16px.
+			onChange( Math.round( currentValue * 16 ) + newUnit );
+		} else if (
+			[
+				'%',
+				'vw',
+				'svw',
+				'lvw',
+				'dvw',
+				'vh',
+				'svh',
+				'lvh',
+				'dvh',
+				'vi',
+				'svi',
+				'lvi',
+				'dvi',
+				'vb',
+				'svb',
+				'lvb',
+				'dvb',
+				'vmin',
+				'svmin',
+				'lvmin',
+				'dvmin',
+				'vmax',
+				'svmax',
+				'lvmax',
+				'dvmax',
+			].includes( newUnit ) &&
+			currentValue > 100
+		) {
+			// When converting to `%` or viewport-relative units, cap the new value at 100.
+			onChange( 100 + newUnit );
+		}
+
+		setSelectedUnit( newUnit );
+	};
+
 	return (
 		<fieldset className="block-editor-dimension-control">
 			<BaseControl.VisualLabel as="legend">
@@ -101,12 +153,11 @@ export default function DimensionControl( {
 				customValueSettings={ DIMENSION_CUSTOM_VALUE_SETTINGS }
 				minimumCustomValue={ 0 }
 				onChange={ onChange }
-				onUnitChange={ setSelectedUnit }
+				onUnitChange={ handleUnitChange }
 				presets={ options }
 				presetType="dimension"
 				selectedUnit={ selectedUnit }
 				showTooltip
-				smoothUnitConversions
 				units={ units }
 				value={ value }
 			/>
