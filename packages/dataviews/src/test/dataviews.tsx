@@ -469,7 +469,7 @@ describe( 'DataViews component', () => {
 			} );
 			const user = userEvent.setup();
 			await user.keyboard( '{Control>}' );
-			await user.click( firstItemCard, { ctrlKey: true } );
+			await user.click( firstItemCard );
 
 			// First item should be selected.
 			expect(
