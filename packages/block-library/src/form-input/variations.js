@@ -2,12 +2,21 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import {
+	envelope,
+	forms,
+	hash,
+	link,
+	paragraph,
+	pencil,
+	phone,
+} from '@wordpress/icons';
 
 const variations = [
 	{
 		name: 'text',
 		title: __( 'Text Input' ),
-		icon: 'edit-page',
+		icon: pencil,
 		description: __( 'A generic text input.' ),
 		attributes: { type: 'text' },
 		isDefault: true,
@@ -18,7 +27,7 @@ const variations = [
 	{
 		name: 'textarea',
 		title: __( 'Textarea Input' ),
-		icon: 'testimonial',
+		icon: paragraph,
 		description: __(
 			'A textarea input to allow entering multiple lines of text.'
 		),
@@ -31,7 +40,7 @@ const variations = [
 		name: 'checkbox',
 		title: __( 'Checkbox Input' ),
 		description: __( 'A simple checkbox input.' ),
-		icon: 'forms',
+		icon: forms,
 		attributes: { type: 'checkbox', inlineLabel: true },
 		isDefault: true,
 		scope: [ 'inserter', 'transform' ],
@@ -40,7 +49,7 @@ const variations = [
 	{
 		name: 'email',
 		title: __( 'Email Input' ),
-		icon: 'email',
+		icon: envelope,
 		description: __( 'Used for email addresses.' ),
 		attributes: { type: 'email' },
 		isDefault: true,
@@ -50,7 +59,7 @@ const variations = [
 	{
 		name: 'url',
 		title: __( 'URL Input' ),
-		icon: 'admin-site',
+		icon: link,
 		description: __( 'Used for URLs.' ),
 		attributes: { type: 'url' },
 		isDefault: true,
@@ -60,7 +69,7 @@ const variations = [
 	{
 		name: 'tel',
 		title: __( 'Telephone Input' ),
-		icon: 'phone',
+		icon: phone,
 		description: __( 'Used for phone numbers.' ),
 		attributes: { type: 'tel' },
 		isDefault: true,
@@ -70,7 +79,7 @@ const variations = [
 	{
 		name: 'number',
 		title: __( 'Number Input' ),
-		icon: 'edit-page',
+		icon: hash,
 		description: __( 'A numeric input.' ),
 		attributes: { type: 'number' },
 		isDefault: true,
