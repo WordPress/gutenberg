@@ -423,7 +423,6 @@ function FontCollection( { slug }: { slug: string } ) {
 								checked={ isSelectAllChecked }
 								onChange={ toggleSelectAll }
 								indeterminate={ isIndeterminate }
-								__nextHasNoMarginBottom
 							/>
 							<VStack spacing={ 0 }>
 								{ /*

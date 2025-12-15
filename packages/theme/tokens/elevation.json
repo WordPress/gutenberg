@@ -1,5 +1,5 @@
 {
-	"elevation": {
+	"wpds-elevation": {
 		"$type": "shadow",
 		"x-small": {
 			"$value": [

@@ -420,7 +420,6 @@ function MediaTextEdit( {
 					onDeselect={ () => setAttributes( { mediaAlt: '' } ) }
 				>
 					<TextareaControl
-						__nextHasNoMarginBottom
 						label={ __( 'Alternative text' ) }
 						value={ mediaAlt }
 						onChange={ onMediaAltChange }

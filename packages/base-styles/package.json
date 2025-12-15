@@ -24,6 +24,24 @@
 		"node": ">=18.12.0",
 		"npm": ">=8.19.2"
 	},
+	"main": "index.js",
+	"module": "index.js",
+	"exports": {
+		"./package.json": "./package.json",
+		"./build-style/": "./build-style/",
+		"./_*.scss": "./_*.scss",
+		"./animations": "./_animations.scss",
+		"./breakpoints": "./_breakpoints.scss",
+		"./colors": "./_colors.scss",
+		"./colors.native": "./_colors.native.scss",
+		"./default-custom-properties": "./_default-custom-properties.scss",
+		"./functions": "./_functions.scss",
+		"./long-content-fade": "./_long-content-fade.scss",
+		"./mixins": "./_mixins.scss",
+		"./variables": "./_variables.scss",
+		"./z-index": "./_z-index.scss"
+	},
+	"wpScript": true,
 	"publishConfig": {
 		"access": "public"
 	}

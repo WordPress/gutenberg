@@ -46,7 +46,6 @@ function BulkSelectionCheckbox< Item >( {
 	return (
 		<CheckboxControl
 			className="dataviews-view-table-selection-checkbox"
-			__nextHasNoMarginBottom
 			checked={ areAllSelected }
 			indeterminate={ ! areAllSelected && !! selectedItems.length }
 			onChange={ () => {

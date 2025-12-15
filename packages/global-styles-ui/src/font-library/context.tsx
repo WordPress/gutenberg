@@ -116,14 +116,14 @@ function FontLibraryProvider( { children }: { children: React.ReactNode } ) {
 		const updatedGlobalStyles = globalStyles.record;
 
 		// Updates the database version of global styles with the edited font families in the client.
-		setImmutably(
+		const finalGlobalStyles = setImmutably(
 			updatedGlobalStyles ?? {},
 			[ 'settings', 'typography', 'fontFamilies' ],
 			fonts
 		);
 
 		// Saves a new version of the global styles in the database.
-		await saveEntityRecord( 'root', 'globalStyles', updatedGlobalStyles );
+		await saveEntityRecord( 'root', 'globalStyles', finalGlobalStyles );
 	};
 
 	// Library Fonts

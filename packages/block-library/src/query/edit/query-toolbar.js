@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import {
-	ToolbarGroup,
 	ToolbarButton,
 	Dropdown,
 	__experimentalDropdownContentWrapper as DropdownContentWrapper,
@@ -29,31 +28,29 @@ export default function QueryToolbar( {
 		: __( 'Choose pattern' );
 
 	return (
-		<ToolbarGroup className="wp-block-template-part__block-control-group">
-			<DropdownContentWrapper>
-				<Dropdown
-					contentClassName="block-editor-block-settings-menu__popover"
-					focusOnMount="firstElement"
-					expandOnMobile
-					renderToggle={ ( { isOpen, onToggle } ) => (
-						<ToolbarButton
-							aria-haspopup="true"
-							aria-expanded={ isOpen }
-							onClick={ onToggle }
-						>
-							{ buttonLabel }
-						</ToolbarButton>
-					) }
-					renderContent={ () => (
-						<PatternSelection
-							clientId={ clientId }
-							attributes={ attributes }
-							showSearch={ false }
-							showTitlesAsTooltip
-						/>
-					) }
-				/>
-			</DropdownContentWrapper>
-		</ToolbarGroup>
+		<DropdownContentWrapper>
+			<Dropdown
+				contentClassName="block-editor-block-settings-menu__popover"
+				focusOnMount="firstElement"
+				expandOnMobile
+				renderToggle={ ( { isOpen, onToggle } ) => (
+					<ToolbarButton
+						aria-haspopup="true"
+						aria-expanded={ isOpen }
+						onClick={ onToggle }
+					>
+						{ buttonLabel }
+					</ToolbarButton>
+				) }
+				renderContent={ () => (
+					<PatternSelection
+						clientId={ clientId }
+						attributes={ attributes }
+						showSearch={ false }
+						showTitlesAsTooltip
+					/>
+				) }
+			/>
+		</DropdownContentWrapper>
 	);
 }

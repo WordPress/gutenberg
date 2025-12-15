@@ -4,7 +4,10 @@
 	"private": true,
 	"route": {
 		"path": "/font-list",
-		"page": "gutenberg-boot"
+		"page": [
+			"site-editor",
+			"font-library"
+		]
 	},
 	"dependencies": {
 		"@wordpress/admin-ui": "file:../../packages/admin-ui",

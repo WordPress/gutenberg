@@ -923,7 +923,7 @@ export const __unstableSplitSelection =
 			// If an unmodified default block is selected, replace it. We don't
 			// want to be converting into a default block.
 			if ( blocks.length ) {
-				if ( isUnmodifiedDefaultBlock( blockA ) ) {
+				if ( isUnmodifiedDefaultBlock( blockA, 'content' ) ) {
 					dispatch.replaceBlocks(
 						[ selectionA.clientId ],
 						blocks,

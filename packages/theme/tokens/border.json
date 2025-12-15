@@ -1,5 +1,5 @@
 {
-	"border": {
+	"wpds-border": {
 		"$type": "dimension",
 		"radius": {
 			"surface": {

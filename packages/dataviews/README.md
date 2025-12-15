@@ -225,34 +225,33 @@ Properties:
 
 | Props / Layout | `table` | `pickerTable` | `grid` | `pickerGrid` | `list` | `activity` |
 | -------------- | ------- | ------------- | ------ | ------------ | ------ | ---------- |
-| `density`      | ✓       | ✓             |        |	             |        | ✓          |
-| `enableMoving` | ✓       | ✓             |        |	             |        |            |
-| `styles`       | ✓       | ✓             |        |	             |        |            |
+| `density`      | ✓       | ✓             |        |              |        | ✓          |
+| `enableMoving` | ✓       | ✓             |        |              |        |            |
+| `styles`       | ✓       | ✓             |        |              |        |            |
 | `badgeFields`  |         |               | ✓      | ✓            |        |            |
 | `previewSize`  |         |               | ✓      | ✓            |        |            |
 
 `table` and `pickerTable` layouts:
 
-- `density`: one of `comfortable`, `balanced`, or `compact`. Configures the size and spacing of the layout.
-- `enableMoving`: whether the table columns should display moving controls.
-- `styles`: additional `width`, `maxWidth`, `minWidth`, `align` styles for each field column.
+-   `density`: one of `comfortable`, `balanced`, or `compact`. Configures the size and spacing of the layout.
+-   `enableMoving`: whether the table columns should display moving controls.
+-   `styles`: additional `width`, `maxWidth`, `minWidth`, `align` styles for each field column.
 
 **For column alignment (`align` property), follow these guidelines:**
 Right-align whenever the cell value is fundamentally quantitative—numbers, decimals, currency, percentages—so that digits and decimal points line up, aiding comparison and calculation. Otherwise, default to left-alignment for all other types (text, codes, labels, dates).
 
 `grid` and `pickerGrid` layout:
 
-- `badgeFields`: a list of field's `id` to render without label and styled as badges.
-- `previewSize`: a `number` representing the size of the preview.
+-   `badgeFields`: a list of field's `id` to render without label and styled as badges.
+-   `previewSize`: a `number` representing the size of the preview.
 
 `list` layout:
 
-- None
+-   None
 
 `activity` layout:
 
-- `density`: one of `comfortable`, `balanced`, or `compact`. Configures the size and spacing of the layout.
-
+-   `density`: one of `comfortable`, `balanced`, or `compact`. Configures the size and spacing of the layout.
 
 #### `onChangeView`: `function`
 
@@ -860,29 +859,29 @@ For example:
 
 ```json
 {
-  "title": {
-    "required": {
-      "type": "invalid"
-    }
-  },
-  "author": {
-    "elements": {
-      "type": "invalid",
-      "message": "Value must be one of the elements."
-    }
-  },
-  "publisher": {
-    "custom": {
-      "type": "validating",
-      "message": "Validating..."
-    }
-  },
-  "isbn": {
-    "custom": {
-      "type": "valid",
-      "message": "Valid."
-    }
-  }
+	"title": {
+		"required": {
+			"type": "invalid"
+		}
+	},
+	"author": {
+		"elements": {
+			"type": "invalid",
+			"message": "Value must be one of the elements."
+		}
+	},
+	"publisher": {
+		"custom": {
+			"type": "validating",
+			"message": "Validating..."
+		}
+	},
+	"isbn": {
+		"custom": {
+			"type": "valid",
+			"message": "Valid."
+		}
+	}
 }
 ```
 
@@ -892,11 +891,11 @@ The `message` is the text to be displayed in the UI controls. The message for th
 
 The `type` can be:
 
-- `validating`: when the value is being validated (e.g., custom async rule)
-- `invalid`: when the value is invalid according to the rule
-- `valid`: when the value _became_ valid after having been invalid (e.g., custom async rule)
+-   `validating`: when the value is being validated (e.g., custom async rule)
+-   `invalid`: when the value is invalid according to the rule
+-   `valid`: when the value _became_ valid after having been invalid (e.g., custom async rule)
 
-Note the `valid` status. This is useful for displaying a "Valid." message when the field transitions from invalid to valid.  The `useFormValidity` hook implements this only for the custom async validation.
+Note the `valid` status. This is useful for displaying a "Valid." message when the field transitions from invalid to valid. The `useFormValidity` hook implements this only for the custom async validation.
 
 ## Utilities
 
@@ -971,7 +970,7 @@ The user facing description of the action.
 
 ```js
 {
-	label: Trash
+	label: 'Trash'
 }
 ```
 
@@ -1402,7 +1401,7 @@ Field authors can override the default Edit control by providing a string that m
 
 Additionally, some of the bundled Edit controls are configurable via a config object:
 
-- `textarea` configuration:
+-   `textarea` configuration:
 
 ```js
 {
@@ -1416,7 +1415,7 @@ Additionally, some of the bundled Edit controls are configurable via a config ob
 }
 ```
 
-- `text` configuration:
+-   `text` configuration:
 
 ```js
 {
@@ -1496,9 +1495,9 @@ When the field declares a type, it gets a default sort function:
 
 The default sorting can be overriden by providing a custom sort function. It takes the following arguments:
 
-  -   `a`: the first item to compare
-  -   `b`: the second item to compare
-  -   `direction`: either `asc` (ascending) or `desc` (descending)
+-   `a`: the first item to compare
+-   `b`: the second item to compare
+-   `direction`: either `asc` (ascending) or `desc` (descending)
 
 It should return a number where:
 
@@ -1712,7 +1711,7 @@ Note this function may be called many times in the lifetime of the DataViews/Dat
 
 ### `filterBy`
 
-Configuration of the filters.  Set to `false` to opt the field out of filtering entirely.
+Configuration of the filters. Set to `false` to opt the field out of filtering entirely.
 
 -   Type: `object` | `boolean`.
 -   Optional.
@@ -1804,56 +1803,55 @@ Or multi-selection operators:
 		{ value: 'd', label: 'Product D' },
 	],
 	filterBy: {
-		operators: [ `isAny`, `isNone`, `isAll`, `isNotAll` ];
+		operators: [ `isAny`, `isNone`, `isAll` ];
 	}
 }
 ```
 
 The next table lists all available operators:
 
-| Operator             | Description                                                                                          | Example                                            |
-| -------------------- | ---------------------------------------------------------------------------------------------------- | -------------------------------------------------- |
-| `after`              | `AFTER`. The item's field is after a given date.                                                     | Date is after: 2024-01-01                          |
-| `afterInc`           | `AFTER (Inc)`. The item's field is after a given date, including the date.                           | Date is on or after: 2024-01-01                    |
-| `before`             | `BEFORE`. The item's field is before a given date.                                                   | Date is before: 2024-01-01                         |
-| `beforeInc`          | `BEFORE (Inc)`. The item's field is before a given date, including the date.                         | Date is on or before: 2024-01-01                   |
-| `between`            | `BETWEEN`. The item's field is between two values.                                                   | Count between (inc): 10 and 180                    |
-| `contains`           | `CONTAINS`. The item's field contains the given substring.                                           | Title contains: Mars                               |
-| `greaterThan`        | `GREATER THAN`. The item's field is numerically greater than a single value.                         | Age is greater than: 65                            |
-| `greaterThanOrEqual` | `GREATER THAN OR EQUAL TO`. The item's field is numerically greater than or equal to a single value. | Age is greater than or equal to: 65                |
-| `inThePast`          | `IN THE PAST`. The item's field is within the last N units (days, weeks, months, or years) from now. | Orders in the past: 7 days                         |
-| `isAll`              | `AND`. The item's field has all of the values in the list.                                           | Category is all: Book, Review, Science Fiction     |
-| `isAny`              | `OR`. The item's field is present in a list of values.                                               | Author is any: Admin, Editor                       |
-| `isNone`             | `NOT OR`. The item's field is not present in a list of values.                                       | Author is none: Admin, Editor                      |
-| `isNot`              | `NOT EQUAL TO`. The item's field is not equal to a single value.                                     | Author is not Admin                                |
-| `isNotAll`           | `NOT AND`. The item's field doesn't have all of the values in the list.                              | Category is not all: Book, Review, Science Fiction |
-| `is`                 | `EQUAL TO`. The item's field is equal to a single value.                                             | Author is: Admin                                   |
-| `lessThan`           | `LESS THAN`. The item's field is numerically less than a single value.                               | Age is less than: 18                               |
-| `lessThanOrEqual`    | `LESS THAN OR EQUAL TO`. The item's field is numerically less than or equal to a single value.       | Age is less than or equal to: 18                   |
-| `notContains`        | `NOT CONTAINS`. The item's field does not contain the given substring.                               | Description doesn't contain: photo                 |
-| `notOn`              | `NOT ON`. The item's field is not on a given date (date inequality using proper date parsing).       | Date is not: 2024-01-01                            |
-| `on`                 | `ON`. The item's field is on a given date (date equality using proper date parsing).                 | Date is: 2024-01-01                                |
-| `over`               | `OVER`. The item's field is older than N units (days, weeks, months, or years) from now.             | Orders over: 7 days ago                            |
-| `startsWith`         | `STARTS WITH`. The item's field starts with the given substring.                                     | Title starts with: Mar                             |
+| Operator             | Description                                                                     | Example                                              |
+| -------------------- | ------------------------------------------------------------------------------- | ---------------------------------------------------- |
+| `after`              | The result is after a given date.                                               | Date is after: 2024-01-01                            |
+| `afterInc`           | The result is after a given date, including the date.                           | Date is on or after: 2024-01-01                      |
+| `before`             | The result is before a given date.                                              | Date is before: 2024-01-01                           |
+| `beforeInc`          | The result is before a given date, including the date.                          | Date is on or before: 2024-01-01                     |
+| `between`            | The result is between two values.                                               | Count between (inc): 10 and 180                      |
+| `contains`           | The result contains the given substring.                                        | Title contains: Mars                                 |
+| `greaterThan`        | The result is numerically greater than a single value.                          | Age is greater than: 65                              |
+| `greaterThanOrEqual` | The result is numerically greater than or equal to a single value.              | Age is greater than or equal to: 65                  |
+| `inThePast`          | The result is within the last N units (days, weeks, months, or years) from now. | Orders in the past: 7 days                           |
+| `isAll`              | The result includes all values in the list.                                     | Category includes all: Book, Review, Science Fiction |
+| `isAny`              | The result includes some values in the list.                                    | Author includes: Admin, Editor                       |
+| `isNone`             | The result does not include some values in the list.                            | Author excludes: Admin, Editor                       |
+| `is`                 | The result is equal to a single value.                                          | Author is: Admin                                     |
+| `isNot`              | The result is not equal to a single value.                                      | Author is not: Admin                                 |
+| `lessThan`           | The result is numerically less than a single value.                             | Age is less than: 18                                 |
+| `lessThanOrEqual`    | The result is numerically less than or equal to a single value.                 | Age is less than or equal to: 18                     |
+| `notContains`        | The result does not contain the given substring.                                | Description doesn't contain: photo                   |
+| `notOn`              | The result is not on a given date (date inequality using proper date parsing).  | Date is not: 2024-01-01                              |
+| `on`                 | The result is on a given date (date equality using proper date parsing).        | Date is: 2024-01-01                                  |
+| `over`               | The result is older than N units (days, weeks, months, or years) from now.      | Orders over: 7 days ago                              |
+| `startsWith`         | The result starts with the given substring.                                     | Title starts with: Mar                               |
 
-Some operators are single-selection: `is`, `isNot`, `on`, `notOn`, `lessThan`, `greaterThan`, `lessThanOrEqual`, `greaterThanOrEqual`, `before`, `after`, `beforeInc`, `afterInc`, `contains`, `notContains`, and `startsWith`. Others are multi-selection: `isAny`, `isNone`, `isAll`, and `isNotAll`. A filter cannot mix single-selection & multi-selection operators; if a single-selection operator is present in the list of valid operators, the multi-selection ones will be discarded, and the filter won't allow selecting more than one item.
+Some operators are single-selection: `is`, `isNot`, `on`, `notOn`, `lessThan`, `greaterThan`, `lessThanOrEqual`, `greaterThanOrEqual`, `before`, `after`, `beforeInc`, `afterInc`, `contains`, `notContains`, and `startsWith`. Others are multi-selection: `isAny`, `isNone`, `isAll`. A filter cannot mix single-selection & multi-selection operators; if a single-selection operator is present in the list of valid operators, the multi-selection ones will be discarded, and the filter won't allow selecting more than one item.
 
 Valid operators per field type:
 
-- array: `isAny`, `isNone`, `isAll`, `isNotAll`.
-- boolean: `is`, `isNot`.
-- color: `is`, `isNot`, `isAny`, `isNone`.
-- date: `on`, `notOn`, `before`, `beforeInc`, `after`, `afterInc`, `inThePast`, `over`, `between`.
-- datetime: `on`, `notOn`, `before`, `beforeInc`, `after`, `afterInc`, `inThePast`, `over`.
-- email: `is`, `isNot`, `contains`, `notContains`, `startsWith`, `isAny`, `isNone`, `isAll`, `isNotAll`.
-- integer: `is`, `isNot`, `lessThan`, `greaterThan`, `lessThanOrEqual`, `greaterThanOrEqual`, `between`, `isAny`, `isNone`, `isAll`, `isNotAll`.
-- media: none.
-- number: `is`, `isNot`, `lessThan`, `greaterThan`, `lessThanOrEqual`, `greaterThanOrEqual`, `between`, `isAny`, `isNone`, `isAll`, `isNotAll`.
-- password: none.
-- email: `is`, `isNot`, `contains`, `notContains`, `startsWith`, `isAny`, `isNone`, `isAll`, `isNotAll`.
-- text: `is`, `isNot`, `contains`, `notContains`, `startsWith`, `isAny`, `isNone`, `isAll`, `isNotAll`.
-- url: `is`, `isNot`, `contains`, `notContains`, `startsWith`, `isAny`, `isNone`, `isAll`, `isNotAll`.
-- fields with no type: any operator.
+-   array: `isAny`, `isNone`, `isAll`.
+-   boolean: `is`, `isNot`.
+-   color: `is`, `isNot`, `isAny`, `isNone`.
+-   date: `on`, `notOn`, `before`, `beforeInc`, `after`, `afterInc`, `inThePast`, `over`, `between`.
+-   datetime: `on`, `notOn`, `before`, `beforeInc`, `after`, `afterInc`, `inThePast`, `over`.
+-   email: `is`, `isNot`, `contains`, `notContains`, `startsWith`, `isAny`, `isNone`, `isAll`.
+-   integer: `is`, `isNot`, `lessThan`, `greaterThan`, `lessThanOrEqual`, `greaterThanOrEqual`, `between`, `isAny`, `isNone`, `isAll`.
+-   media: none.
+-   number: `is`, `isNot`, `lessThan`, `greaterThan`, `lessThanOrEqual`, `greaterThanOrEqual`, `between`, `isAny`, `isNone`, `isAll`.
+-   password: none.
+-   email: `is`, `isNot`, `contains`, `notContains`, `startsWith`, `isAny`, `isNone`, `isAll`.
+-   text: `is`, `isNot`, `contains`, `notContains`, `startsWith`, `isAny`, `isNone`, `isAll`.
+-   url: `is`, `isNot`, `contains`, `notContains`, `startsWith`, `isAny`, `isNone`, `isAll`.
+-   fields with no type: any operator.
 
 ### `format`
 
@@ -1961,11 +1959,11 @@ For example:
 
 #### Panel
 
-- `type`: `panel`. Required.
-- `labelPosition`: one of `side`, `top`, or `none`. Optional. `top` by default.
-- `summary`: Summary field configuration. Optional. Specifies which field(s) to display in the panel header. Can be:
-   	- A string (single field ID)
-    - An array of strings (multiple field IDs)
+-   `type`: `panel`. Required.
+-   `labelPosition`: one of `side`, `top`, or `none`. Optional. `top` by default.
+-   `summary`: Summary field configuration. Optional. Specifies which field(s) to display in the panel header. Can be:
+    -   A string (single field ID)
+    -   An array of strings (multiple field IDs)
 
 When no summary fields are explicitly configured, the panel automatically determines which fields to display using this priority:
 

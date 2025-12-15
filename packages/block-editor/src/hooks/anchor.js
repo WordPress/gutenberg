@@ -63,7 +63,6 @@ function BlockEditAnchorControlPure( { anchor, setAttributes } ) {
 	return (
 		<InspectorControls group="advanced">
 			<TextControl
-				__nextHasNoMarginBottom
 				__next40pxDefaultSize
 				className="html-anchor-control"
 				label={ __( 'HTML anchor' ) }

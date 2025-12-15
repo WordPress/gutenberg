@@ -124,7 +124,6 @@ function StartPageOptionsModal( { onClose } ) {
 			>
 				<FlexItem>
 					<CheckboxControl
-						__nextHasNoMarginBottom
 						checked={ showStartPatterns }
 						label={ __(
 							'Always show starter patterns for new pages'

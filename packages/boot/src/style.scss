@@ -1,47 +1,45 @@
 @use "@wordpress/theme/src/prebuilt/css/design-tokens.css" as *;
 @use "@wordpress/admin-ui/build-style/style.css" as *;
 @use "@wordpress/base-styles/mixins" as *;
-@use "@wordpress/base-styles/variables";
+@use "@wordpress/base-styles/variables" as *;
 
-// Reset wp-admin layout styles when loaded inside wp-admin.
-.boot-layout-container .boot-layout {
-	height: calc(100vh - #{variables.$admin-bar-height});
+// Fix issue with wp-admin menu not scrolling between 170% and 200% zoom.
+#wpwrap {
+	background: var(--wpds-color-fg-content-neutral, #1e1e1e);
+	overflow-y: auto;
+	@include break-medium() {
+		overflow-y: initial;
+	}
 }
 
 body:has(.boot-layout-container) {
-	background: #1d2327; // Same as WP-Admin sidebar
-	overflow: hidden;
 	@include wp-admin-reset( ".boot-layout-container" );
 }
 
-#wpcontent {
-	padding-left: 0;
-}
+.boot-layout-container .boot-layout {
+	// On mobile the main content area has to scroll, otherwise you can invoke
+	// the overscroll bounce on the non-scrolling container, for a bad experience.
+	@include break-small {
+		position: absolute;
+		top: 0;
+		right: 0;
+		bottom: 0;
+		left: 0;
+		min-height: calc(100vh - #{$admin-bar-height-big});
+	}
 
-#wpbody-content {
-	padding-bottom: 0;
-}
-
-#wpfooter {
-	display: none;
-}
-
-body:has(.boot-layout.has-full-canvas) {
+	// The WP header height changes at this breakpoint.
 	@include break-medium {
-		// Reset the html.wp-topbar padding.
-		// Because this uses negative margins, we have to compensate for the height.
-		margin-top: - variables.$admin-bar-height;
-		height: calc(100% + #{ variables.$admin-bar-height });
+		min-height: calc(100vh - #{$admin-bar-height});
 
-		#adminmenumain,
-		#wpadminbar {
-			display: none;
+		body:has(.boot-layout.has-full-canvas) & {
+			min-height: 100vh;
 		}
+	}
 
-		#wpcontent,
-		#wpfooter {
-			margin-left: 0;
-		}
+	img {
+		max-width: 100%;
+		height: auto;
 	}
 }
 

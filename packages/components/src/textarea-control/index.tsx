@@ -22,7 +22,8 @@ function UnforwardedTextareaControl(
 	ref: React.ForwardedRef< HTMLTextAreaElement >
 ) {
 	const {
-		__nextHasNoMarginBottom,
+		// @ts-expect-error - Prevent passing this to `textarea`.
+		__nextHasNoMarginBottom: _,
 		label,
 		hideLabelFromVision,
 		value,
@@ -41,8 +42,7 @@ function UnforwardedTextareaControl(
 
 	return (
 		<BaseControl
-			__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
-			__associatedWPComponentName="TextareaControl"
+			__nextHasNoMarginBottom
 			label={ label }
 			hideLabelFromVision={ hideLabelFromVision }
 			id={ id }
@@ -77,7 +77,6 @@ function UnforwardedTextareaControl(
  *
  *   return (
  *     <TextareaControl
- *       __nextHasNoMarginBottom
  *       label="Text"
  *       help="Enter some text"
  *       value={ text }
