@@ -33,7 +33,11 @@ function gutenberg_render_block_visibility_support( $block_content, $block ) {
 
 	// If blockVisibility is an object with breakpoint settings, generate responsive styles.
 	if ( is_array( $block_visibility ) && ! empty( $block_visibility ) ) {
-		// Matches a future JSON format.
+		/*
+		 * Breakpoints definitions are in several places in WordPress packages.
+		 * The following are taken from: https://github.com/WordPress/gutenberg/blob/trunk/packages/base-styles/_breakpoints.scss
+		 * THe array is in a future, potential JSON format.
+		 */
 		$breakpoints = array(
 			'mobile'  => array(
 				'max' => '599px',
