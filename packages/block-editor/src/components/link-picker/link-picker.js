@@ -119,9 +119,6 @@ export function LinkPicker( {
 							</p>
 						</VisuallyHidden>
 						<LinkControl
-							key={ `${ instanceId }-${
-								isOpen ? 'open' : 'closed'
-							}` }
 							value={ null }
 							onChange={ handleChange }
 							suggestionsQuery={ suggestionsQuery }
