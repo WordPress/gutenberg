@@ -355,7 +355,6 @@ function MediaTextEdit( {
 				}
 			>
 				<ToggleControl
-					__nextHasNoMarginBottom
 					label={ __( 'Stack on mobile' ) }
 					checked={ isStackedOnMobile }
 					onChange={ () =>
@@ -373,7 +372,6 @@ function MediaTextEdit( {
 					onDeselect={ () => setAttributes( { imageFill: false } ) }
 				>
 					<ToggleControl
-						__nextHasNoMarginBottom
 						label={ __( 'Crop image to fill' ) }
 						checked={ !! imageFill }
 						onChange={ () =>

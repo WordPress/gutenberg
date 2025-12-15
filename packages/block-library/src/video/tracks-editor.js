@@ -161,7 +161,6 @@ function SingleTrackEditor( {
 				/>
 				<ToggleControl
 					__next40pxDefaultSize
-					__nextHasNoMarginBottom
 					label={ __( 'Set as default track' ) }
 					checked={ isDefaultTrack }
 					disabled={ ! allowSettingDefault }

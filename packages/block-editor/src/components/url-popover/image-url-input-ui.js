@@ -228,7 +228,6 @@ const ImageURLInputUI = ( {
 	const advancedOptions = (
 		<VStack spacing="3">
 			<ToggleControl
-				__nextHasNoMarginBottom
 				label={ __( 'Open in new tab' ) }
 				onChange={ onSetNewTab }
 				checked={ linkTarget === '_blank' }

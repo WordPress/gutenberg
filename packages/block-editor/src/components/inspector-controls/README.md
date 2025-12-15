@@ -122,7 +122,6 @@ registerBlockType( 'my-plugin/inspector-controls-example', {
 						/>
 
 						<ToggleControl
-							__nextHasNoMarginBottom
 							label="Toggle Field"
 							checked={ toggleField }
 							onChange={ onChangeToggleField }

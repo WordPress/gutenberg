@@ -253,7 +253,6 @@ export default function PostExcerptEditor( {
 						isShownByDefault
 					>
 						<ToggleControl
-							__nextHasNoMarginBottom
 							label={ __( 'Show link on new line' ) }
 							checked={ showMoreOnNewLine }
 							onChange={ ( newShowMoreOnNewLine ) =>

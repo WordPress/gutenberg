@@ -585,7 +585,6 @@ function BackgroundSizeControls( {
 				onChange={ updateBackgroundPosition }
 			/>
 			<ToggleControl
-				__nextHasNoMarginBottom
 				label={ __( 'Fixed background' ) }
 				checked={ attachmentValue === 'fixed' }
 				onChange={ toggleScrollWithPage }
@@ -640,7 +639,6 @@ function BackgroundSizeControls( {
 					}
 				/>
 				<ToggleControl
-					__nextHasNoMarginBottom
 					label={ __( 'Repeat' ) }
 					checked={ repeatCheckedValue }
 					onChange={ toggleIsRepeated }

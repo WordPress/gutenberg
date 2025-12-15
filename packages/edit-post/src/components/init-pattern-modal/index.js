@@ -62,7 +62,6 @@ export default function InitPatternModal() {
 								__next40pxDefaultSize
 							/>
 							<ToggleControl
-								__nextHasNoMarginBottom
 								label={ _x( 'Synced', 'pattern (singular)' ) }
 								help={ __(
 									'Sync this pattern across multiple locations.'

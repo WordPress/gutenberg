@@ -217,7 +217,6 @@ function Controls( { attributes, setAttributes, postCount } ) {
 					isShownByDefault
 				>
 					<ToggleControl
-						__nextHasNoMarginBottom
 						label={ __( 'Display post content' ) }
 						checked={ displayPostContent }
 						onChange={ ( value ) =>
@@ -301,7 +300,6 @@ function Controls( { attributes, setAttributes, postCount } ) {
 					isShownByDefault
 				>
 					<ToggleControl
-						__nextHasNoMarginBottom
 						label={ __( 'Display author name' ) }
 						checked={ displayAuthor }
 						onChange={ ( value ) =>
@@ -318,7 +316,6 @@ function Controls( { attributes, setAttributes, postCount } ) {
 					isShownByDefault
 				>
 					<ToggleControl
-						__nextHasNoMarginBottom
 						label={ __( 'Display post date' ) }
 						checked={ displayPostDate }
 						onChange={ ( value ) =>
@@ -350,7 +347,6 @@ function Controls( { attributes, setAttributes, postCount } ) {
 					isShownByDefault
 				>
 					<ToggleControl
-						__nextHasNoMarginBottom
 						label={ __( 'Display featured image' ) }
 						checked={ displayFeaturedImage }
 						onChange={ ( value ) =>
@@ -456,7 +452,6 @@ function Controls( { attributes, setAttributes, postCount } ) {
 							isShownByDefault
 						>
 							<ToggleControl
-								__nextHasNoMarginBottom
 								label={ __( 'Add link to featured image' ) }
 								checked={ addLinkToFeaturedImage }
 								onChange={ ( value ) =>

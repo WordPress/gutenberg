@@ -236,7 +236,6 @@ function LayoutPanelPure( {
 					{ showInheritToggle && (
 						<>
 							<ToggleControl
-								__nextHasNoMarginBottom
 								label={ __( 'Inner blocks use content width' ) }
 								checked={
 									layoutType?.name === 'constrained' ||

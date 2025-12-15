@@ -141,7 +141,6 @@ export default function Edit( {
 					>
 						<ToggleControl
 							isBlock
-							__nextHasNoMarginBottom
 							label={ __( 'Auto-close' ) }
 							onChange={ ( value ) => {
 								setAttributes( {
@@ -162,7 +161,6 @@ export default function Edit( {
 					>
 						<ToggleControl
 							isBlock
-							__nextHasNoMarginBottom
 							label={ __( 'Show icon' ) }
 							onChange={ ( value ) => {
 								setAttributes( {

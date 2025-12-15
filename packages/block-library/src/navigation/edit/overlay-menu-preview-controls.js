@@ -32,7 +32,6 @@ export default function OverlayMenuPreviewControls( {
 	return (
 		<VStack spacing={ 4 }>
 			<ToggleControl
-				__nextHasNoMarginBottom
 				label={ __( 'Show icon button' ) }
 				help={ __(
 					'Configure the visual appearance of the button that toggles the overlay menu.'

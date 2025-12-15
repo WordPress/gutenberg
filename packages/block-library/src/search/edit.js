@@ -367,7 +367,6 @@ export default function SearchEdit( {
 						isShownByDefault
 					>
 						<ToggleControl
-							__nextHasNoMarginBottom
 							checked={ showLabel }
 							label={ __( 'Show label' ) }
 							onChange={ ( value ) =>
@@ -415,7 +414,6 @@ export default function SearchEdit( {
 							isShownByDefault
 						>
 							<ToggleControl
-								__nextHasNoMarginBottom
 								checked={ buttonUseIcon }
 								label={ __( 'Use button with icon' ) }
 								onChange={ ( value ) =>
