@@ -26,7 +26,7 @@ test.describe( 'Child Blocks', () => {
 
 		await blockInserter.click();
 		await expect( blockLibrary ).toBeVisible();
-		expect( blockLibrary.getByRole( 'option' ) ).not.toContain( [
+		await expect( blockLibrary.getByRole( 'option' ) ).not.toContainText( [
 			'Child Blocks Child',
 		] );
 	} );

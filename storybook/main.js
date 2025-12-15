@@ -28,15 +28,20 @@ const scssLoaders = ( { isLazy } ) => [
 ];
 
 const stories = [
-	process.env.NODE_ENV !== 'test' && './stories/**/*.story.@(js|tsx)',
+	process.env.NODE_ENV !== 'test' && './stories/**/*.story.@(jsx|tsx)',
 	process.env.NODE_ENV !== 'test' && './stories/**/*.mdx',
-	'../packages/block-editor/src/**/stories/*.story.@(js|tsx|mdx)',
-	'../packages/components/src/**/stories/*.story.@(js|tsx)',
+	'../packages/block-editor/src/**/stories/*.story.@(js|jsx|tsx|mdx)',
+	'../packages/components/src/**/stories/*.story.@(jsx|tsx)',
 	'../packages/components/src/**/stories/*.mdx',
 	'../packages/icons/src/**/stories/*.story.@(js|tsx|mdx)',
 	'../packages/edit-site/src/**/stories/*.story.@(js|tsx|mdx)',
+	'../packages/global-styles-ui/src/**/stories/*.story.@(js|tsx|mdx)',
 	'../packages/dataviews/src/**/stories/*.story.@(js|tsx|mdx)',
 	'../packages/fields/src/**/stories/*.story.@(js|tsx|mdx)',
+	'../packages/image-cropper/src/**/stories/*.story.@(js|tsx|mdx)',
+	'../packages/media-fields/src/**/stories/*.story.@(js|tsx|mdx)',
+	'../packages/theme/src/**/stories/*.story.@(tsx|mdx)',
+	'../packages/ui/src/**/stories/*.story.@(ts|tsx)',
 ].filter( Boolean );
 
 module.exports = {
@@ -59,6 +64,7 @@ module.exports = {
 		'@storybook/addon-webpack5-compiler-babel',
 		'storybook-source-link',
 		'@geometricpanda/storybook-addon-badges',
+		'./addons/design-system-theme/register',
 	],
 	framework: {
 		name: '@storybook/react-webpack5',
@@ -69,12 +75,34 @@ module.exports = {
 		reactDocgen: 'react-docgen-typescript',
 	},
 	webpackFinal: async ( config ) => {
+		// Find the `babel-loader` rule added by `@storybook/addon-webpack5-compiler-babel`
+		// and add exclude for `packages/*/build-module` folders.
+		const rules = config.module.rules.map( ( rule ) => {
+			const usesBabelLoader =
+				Array.isArray( rule.use ) &&
+				rule.use.some(
+					( loader ) =>
+						typeof loader === 'object' &&
+						loader.loader &&
+						loader.loader.includes( 'babel-loader' )
+				);
+
+			// Add exclude for `build-module` folders
+			if ( usesBabelLoader && Array.isArray( rule.exclude ) ) {
+				return {
+					...rule,
+					exclude: [ ...rule.exclude, /build-module/ ],
+				};
+			}
+			return rule;
+		} );
+
 		return {
 			...config,
 			module: {
 				...config.module,
 				rules: [
-					...config.module.rules,
+					...rules,
 					{
 						test: /\.md$/,
 						type: 'asset/source',
@@ -103,7 +131,6 @@ module.exports = {
 						test: /\.scss$/,
 						exclude: /\.lazy\.scss$/,
 						use: scssLoaders( { isLazy: false } ),
-						include: path.resolve( __dirname ),
 					},
 					{
 						test: /\.lazy\.scss$/,

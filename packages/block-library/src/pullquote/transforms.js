@@ -2,39 +2,8 @@
  * WordPress dependencies
  */
 import { createBlock } from '@wordpress/blocks';
-import { create, join, toHTMLString } from '@wordpress/rich-text';
 
 const transforms = {
-	from: [
-		{
-			type: 'block',
-			isMultiBlock: true,
-			blocks: [ 'core/paragraph' ],
-			transform: ( attributes ) => {
-				return createBlock( 'core/pullquote', {
-					value: toHTMLString( {
-						value: join(
-							attributes.map( ( { content } ) =>
-								create( { html: content } )
-							),
-							'\n'
-						),
-					} ),
-					anchor: attributes.anchor,
-				} );
-			},
-		},
-		{
-			type: 'block',
-			blocks: [ 'core/heading' ],
-			transform: ( { content, anchor } ) => {
-				return createBlock( 'core/pullquote', {
-					value: content,
-					anchor,
-				} );
-			},
-		},
-	],
 	to: [
 		{
 			type: 'block',

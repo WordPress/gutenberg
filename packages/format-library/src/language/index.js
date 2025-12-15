@@ -99,7 +99,6 @@ function InlineLanguageUI( { value, contentRef, onChange, onClose } ) {
 			>
 				<TextControl
 					__next40pxDefaultSize
-					__nextHasNoMarginBottom
 					label={ title }
 					value={ lang }
 					onChange={ ( val ) => setLang( val ) }

@@ -16,6 +16,7 @@ import {
 	__experimentalGetSpacingClassesAndStyles as getSpacingClassesAndStyles,
 	__experimentalGetShadowClassesAndStyles as getShadowClassesAndStyles,
 	__experimentalGetElementClassName,
+	getTypographyClassesAndStyles,
 } from '@wordpress/block-editor';
 import { compose } from '@wordpress/compose';
 
@@ -23,6 +24,7 @@ import { compose } from '@wordpress/compose';
  * Internal dependencies
  */
 import migrateFontFamily from '../utils/migrate-font-family';
+import migrateTextAlign from '../utils/migrate-text-align';
 
 const migrateBorderRadius = ( attributes ) => {
 	const { borderRadius, ...newAttributes } = attributes;
@@ -132,6 +134,217 @@ const blockAttributes = {
 		source: 'html',
 		selector: 'a',
 	},
+};
+
+const v13 = {
+	attributes: {
+		tagName: {
+			type: 'string',
+			enum: [ 'a', 'button' ],
+			default: 'a',
+		},
+		type: {
+			type: 'string',
+			default: 'button',
+		},
+		textAlign: {
+			type: 'string',
+		},
+		url: {
+			type: 'string',
+			source: 'attribute',
+			selector: 'a',
+			attribute: 'href',
+			role: 'content',
+		},
+		title: {
+			type: 'string',
+			source: 'attribute',
+			selector: 'a,button',
+			attribute: 'title',
+			role: 'content',
+		},
+		text: {
+			type: 'rich-text',
+			source: 'rich-text',
+			selector: 'a,button',
+			role: 'content',
+		},
+		linkTarget: {
+			type: 'string',
+			source: 'attribute',
+			selector: 'a',
+			attribute: 'target',
+			role: 'content',
+		},
+		rel: {
+			type: 'string',
+			source: 'attribute',
+			selector: 'a',
+			attribute: 'rel',
+			role: 'content',
+		},
+		placeholder: {
+			type: 'string',
+		},
+		backgroundColor: {
+			type: 'string',
+		},
+		textColor: {
+			type: 'string',
+		},
+		gradient: {
+			type: 'string',
+		},
+		width: {
+			type: 'number',
+		},
+	},
+	supports: {
+		anchor: true,
+		align: true,
+		alignWide: false,
+		color: {
+			__experimentalSkipSerialization: true,
+			gradients: true,
+			__experimentalDefaultControls: {
+				background: true,
+				text: true,
+			},
+		},
+		typography: {
+			__experimentalSkipSerialization: [
+				'fontSize',
+				'lineHeight',
+				'fontFamily',
+				'fontWeight',
+				'fontStyle',
+				'textTransform',
+				'textDecoration',
+				'letterSpacing',
+			],
+			fontSize: true,
+			lineHeight: true,
+			__experimentalFontFamily: true,
+			__experimentalFontWeight: true,
+			__experimentalFontStyle: true,
+			__experimentalTextTransform: true,
+			__experimentalTextDecoration: true,
+			__experimentalLetterSpacing: true,
+			__experimentalWritingMode: true,
+			__experimentalDefaultControls: {
+				fontSize: true,
+			},
+		},
+		reusable: false,
+		shadow: {
+			__experimentalSkipSerialization: true,
+		},
+		spacing: {
+			__experimentalSkipSerialization: true,
+			padding: [ 'horizontal', 'vertical' ],
+			__experimentalDefaultControls: {
+				padding: true,
+			},
+		},
+		__experimentalBorder: {
+			color: true,
+			radius: true,
+			style: true,
+			width: true,
+			__experimentalSkipSerialization: true,
+			__experimentalDefaultControls: {
+				color: true,
+				radius: true,
+				style: true,
+				width: true,
+			},
+		},
+		interactivity: {
+			clientNavigation: true,
+		},
+	},
+	selectors: {
+		root: '.wp-block-button .wp-block-button__link',
+		typography: {
+			writingMode: '.wp-block-button',
+		},
+	},
+	save( { attributes, className } ) {
+		const {
+			tagName,
+			type,
+			textAlign,
+			fontSize,
+			linkTarget,
+			rel,
+			style,
+			text,
+			title,
+			url,
+			width,
+		} = attributes;
+
+		const TagName = tagName || 'a';
+		const isButtonTag = 'button' === TagName;
+		const buttonType = type || 'button';
+		const borderProps = getBorderClassesAndStyles( attributes );
+		const colorProps = getColorClassesAndStyles( attributes );
+		const spacingProps = getSpacingClassesAndStyles( attributes );
+		const shadowProps = getShadowClassesAndStyles( attributes );
+		const typographyProps = getTypographyClassesAndStyles( attributes );
+		const buttonClasses = clsx(
+			'wp-block-button__link',
+			colorProps.className,
+			borderProps.className,
+			typographyProps.className,
+			{
+				[ `has-text-align-${ textAlign }` ]: textAlign,
+				// For backwards compatibility add style that isn't provided via
+				// block support.
+				'no-border-radius': style?.border?.radius === 0,
+				[ `has-custom-font-size` ]:
+					fontSize || style?.typography?.fontSize,
+			},
+			__experimentalGetElementClassName( 'button' )
+		);
+		const buttonStyle = {
+			...borderProps.style,
+			...colorProps.style,
+			...spacingProps.style,
+			...shadowProps.style,
+			...typographyProps.style,
+			writingMode: undefined,
+		};
+
+		// The use of a `title` attribute here is soft-deprecated, but still applied
+		// if it had already been assigned, for the sake of backward-compatibility.
+		// A title will no longer be assigned for new or updated button block links.
+
+		const wrapperClasses = clsx( className, {
+			[ `has-custom-width wp-block-button__width-${ width }` ]: width,
+		} );
+
+		return (
+			<div { ...useBlockProps.save( { className: wrapperClasses } ) }>
+				<RichText.Content
+					tagName={ TagName }
+					type={ isButtonTag ? buttonType : null }
+					className={ buttonClasses }
+					href={ isButtonTag ? null : url }
+					title={ title }
+					style={ buttonStyle }
+					value={ text }
+					target={ isButtonTag ? null : linkTarget }
+					rel={ isButtonTag ? null : rel }
+				/>
+			</div>
+		);
+	},
+	isEligible( attributes ) {
+		return !! attributes.textAlign;
+	},
+	migrate: migrateTextAlign,
 };
 
 const v12 = {
@@ -587,6 +800,7 @@ const v10 = {
 };
 
 const deprecated = [
+	v13,
 	v12,
 	v11,
 	v10,

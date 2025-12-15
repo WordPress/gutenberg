@@ -119,7 +119,7 @@ describe( 'filters', () => {
 		);
 
 		// Should find items with "Planet" in categories (case-insensitive)
-		expect( result ).toHaveLength( 8 );
+		expect( result ).toHaveLength( 9 );
 		expect( result.map( ( r ) => r.name.title ) ).toContain( 'Neptune' );
 		expect( result.map( ( r ) => r.name.title ) ).toContain( 'Mercury' );
 		expect( result.map( ( r ) => r.name.title ) ).toContain( 'Earth' );
@@ -158,7 +158,7 @@ describe( 'filters', () => {
 			},
 			fields
 		);
-		expect( result ).toHaveLength( 16 );
+		expect( result ).toHaveLength( 17 );
 		expect( result[ 0 ].name.title ).toBe( 'Moon' );
 		expect( result[ 1 ].name.title ).toBe( 'Io' );
 		expect( result[ 2 ].name.title ).toBe( 'Europa' );
@@ -175,6 +175,9 @@ describe( 'filters', () => {
 		expect( result[ 13 ].name.title ).toBe( 'Mars' );
 		expect( result[ 14 ].name.title ).toBe( 'Jupiter' );
 		expect( result[ 15 ].name.title ).toBe( 'Saturn' );
+		expect( result[ 16 ].name.title ).toBe(
+			'Thessalonikopolymnianebuchodonossarinacharybdis'
+		);
 	} );
 
 	it( 'should search using IS ANY filter for STRING values', () => {
@@ -210,7 +213,7 @@ describe( 'filters', () => {
 			},
 			fields
 		);
-		expect( result ).toHaveLength( 10 );
+		expect( result ).toHaveLength( 11 );
 		expect( result[ 0 ].name.title ).toBe( 'Moon' );
 		expect( result[ 1 ].name.title ).toBe( 'Io' );
 		expect( result[ 2 ].name.title ).toBe( 'Europa' );
@@ -221,6 +224,9 @@ describe( 'filters', () => {
 		expect( result[ 7 ].name.title ).toBe( 'Triton' );
 		expect( result[ 8 ].name.title ).toBe( 'Nereid' );
 		expect( result[ 9 ].name.title ).toBe( 'Proteus' );
+		expect( result[ 10 ].name.title ).toBe(
+			'Thessalonikopolymnianebuchodonossarinacharybdis'
+		);
 	} );
 
 	it( 'should search using IS ANY filter for ARRAY values', () => {
@@ -256,7 +262,7 @@ describe( 'filters', () => {
 			},
 			fields
 		);
-		expect( result ).toHaveLength( 14 );
+		expect( result ).toHaveLength( 15 );
 		expect( result[ 0 ].name.title ).toBe( 'Moon' );
 		expect( result[ 1 ].name.title ).toBe( 'Io' );
 		expect( result[ 2 ].name.title ).toBe( 'Europa' );
@@ -271,6 +277,9 @@ describe( 'filters', () => {
 		expect( result[ 11 ].name.title ).toBe( 'Jupiter' );
 		expect( result[ 12 ].name.title ).toBe( 'Saturn' );
 		expect( result[ 13 ].name.title ).toBe( 'Uranus' );
+		expect( result[ 14 ].name.title ).toBe(
+			'Thessalonikopolymnianebuchodonossarinacharybdis'
+		);
 	} );
 
 	it( 'should search using IS ALL filter', () => {
@@ -298,7 +307,7 @@ describe( 'filters', () => {
 		expect( result[ 7 ].name.title ).toBe( 'Uranus' );
 	} );
 
-	it( 'should search using IS NOT ALL filter', () => {
+	it( 'should search using IS NOT ALL filter (deprecated operator)', () => {
 		const { data: result } = filterSortAndPaginate(
 			data,
 			{
@@ -312,6 +321,7 @@ describe( 'filters', () => {
 			},
 			fields
 		);
+		expect( console ).toHaveWarned();
 		expect( result ).toHaveLength( 10 );
 		expect( result[ 0 ].name.title ).toBe( 'Moon' );
 		expect( result[ 1 ].name.title ).toBe( 'Io' );
@@ -339,7 +349,7 @@ describe( 'filters', () => {
 			},
 			fields
 		);
-		expect( result ).toHaveLength( 18 );
+		expect( result ).toHaveLength( 19 );
 		expect( result[ 0 ].name.title ).toBe( 'Moon' );
 		expect( result[ 1 ].name.title ).toBe( 'Io' );
 		expect( result[ 2 ].name.title ).toBe( 'Europa' );
@@ -358,6 +368,9 @@ describe( 'filters', () => {
 		expect( result[ 15 ].name.title ).toBe( 'Jupiter' );
 		expect( result[ 16 ].name.title ).toBe( 'Saturn' );
 		expect( result[ 17 ].name.title ).toBe( 'Uranus' );
+		expect( result[ 18 ].name.title ).toBe(
+			'Thessalonikopolymnianebuchodonossarinacharybdis'
+		);
 	} );
 
 	it( 'should filter using LESS THAN operator for integer', () => {
@@ -463,7 +476,7 @@ describe( 'filters', () => {
 			fields
 		);
 		// Should return items that don't contain "Solar system" in description
-		expect( result ).toHaveLength( 11 );
+		expect( result ).toHaveLength( 12 );
 		expect(
 			result.filter( ( r ) =>
 				r.name.description.includes( 'Solar system' )
@@ -479,6 +492,7 @@ describe( 'filters', () => {
 			'Moon',
 			'Nereid',
 			'Proteus',
+			'Thessalonikopolymnianebuchodonossarinacharybdis',
 			'Triton',
 			'Venus',
 		] );
@@ -648,7 +662,7 @@ describe( 'filters', () => {
 			},
 			fields
 		);
-		expect( result.length ).toBe( 16 );
+		expect( result.length ).toBe( 17 );
 		expect( result.map( ( r ) => r.name.title ) ).not.toContain(
 			'Neptune'
 		);
@@ -887,17 +901,17 @@ describe( 'filters', () => {
 } );
 
 describe( 'sorting', () => {
-	it( 'should sort by groupByField first, then by sort.field', () => {
+	it( 'should sort by groupBy.field first, then by sort.field', () => {
 		const { data: result } = filterSortAndPaginate(
 			data,
 			{
 				sort: { field: 'title', direction: 'desc' },
-				groupByField: 'type',
+				groupBy: { field: 'type', direction: 'asc' },
 			},
 			fields
 		);
 
-		expect( result ).toHaveLength( 18 );
+		expect( result ).toHaveLength( 19 );
 
 		expect( result[ 0 ].type ).toBe( 'Gas giant' );
 		expect( result[ 0 ].name.title ).toBe( 'Saturn' );
@@ -936,6 +950,61 @@ describe( 'sorting', () => {
 		expect( terrestrialItems[ 3 ].name.title ).toBe( 'Earth' );
 	} );
 
+	it( 'should sort by groupBy.field in descending order first, then by sort.field', () => {
+		const { data: result } = filterSortAndPaginate(
+			data,
+			{
+				sort: { field: 'title', direction: 'desc' },
+				groupBy: { field: 'type', direction: 'desc' },
+			},
+			fields
+		);
+
+		expect( result ).toHaveLength( 19 );
+
+		// Terrestrial group should come first (reverse alphabetical: T)
+		expect( result[ 0 ].type ).toBe( 'Terrestrial' );
+		expect( result[ 0 ].name.title ).toBe( 'Venus' );
+		expect( result[ 1 ].type ).toBe( 'Terrestrial' );
+		expect( result[ 1 ].name.title ).toBe( 'Mercury' );
+		expect( result[ 2 ].type ).toBe( 'Terrestrial' );
+		expect( result[ 2 ].name.title ).toBe( 'Mars' );
+		expect( result[ 3 ].type ).toBe( 'Terrestrial' );
+		expect( result[ 3 ].name.title ).toBe( 'Earth' );
+
+		// Satellite group should come second (reverse alphabetical: S)
+		expect( result[ 4 ].type ).toBe( 'Satellite' );
+		expect( result[ 4 ].name.title ).toBe( 'Triton' );
+		expect( result[ 5 ].type ).toBe( 'Satellite' );
+		expect( result[ 5 ].name.title ).toBe( 'Proteus' );
+
+		// Verify all satellites are grouped together
+		const satelliteItems = result.filter(
+			( item ) => item.type === 'Satellite'
+		);
+		expect( satelliteItems ).toHaveLength( 10 );
+		expect( satelliteItems[ 0 ].name.title ).toBe( 'Triton' );
+		expect( satelliteItems[ 1 ].name.title ).toBe( 'Proteus' );
+		expect( satelliteItems[ 2 ].name.title ).toBe( 'Nereid' );
+		expect( satelliteItems[ 3 ].name.title ).toBe( 'Moon' );
+		expect( satelliteItems[ 4 ].name.title ).toBe( 'Io' );
+		expect( satelliteItems[ 5 ].name.title ).toBe( 'Himalia' );
+		expect( satelliteItems[ 6 ].name.title ).toBe( 'Ganymede' );
+		expect( satelliteItems[ 7 ].name.title ).toBe( 'Europa' );
+		expect( satelliteItems[ 8 ].name.title ).toBe( 'Callisto' );
+		expect( satelliteItems[ 9 ].name.title ).toBe( 'Amalthea' );
+
+		// Verify all terrestrial planets are grouped together
+		const terrestrialItems = result.filter(
+			( item ) => item.type === 'Terrestrial'
+		);
+		expect( terrestrialItems ).toHaveLength( 4 );
+		expect( terrestrialItems[ 0 ].name.title ).toBe( 'Venus' );
+		expect( terrestrialItems[ 1 ].name.title ).toBe( 'Mercury' );
+		expect( terrestrialItems[ 2 ].name.title ).toBe( 'Mars' );
+		expect( terrestrialItems[ 3 ].name.title ).toBe( 'Earth' );
+	} );
+
 	it( 'should sort integer field types', () => {
 		const { data: result } = filterSortAndPaginate(
 			data,
@@ -945,7 +1014,7 @@ describe( 'sorting', () => {
 			fields
 		);
 
-		expect( result ).toHaveLength( 18 );
+		expect( result ).toHaveLength( 19 );
 		expect( result[ 0 ].name.title ).toBe( 'Saturn' );
 		expect( result[ 1 ].name.title ).toBe( 'Jupiter' );
 		expect( result[ 2 ].name.title ).toBe( 'Uranus' );
@@ -979,7 +1048,7 @@ describe( 'sorting', () => {
 			},
 			fields
 		);
-		expect( resultDesc ).toHaveLength( 18 );
+		expect( resultDesc ).toHaveLength( 19 );
 		expect( resultDesc[ 0 ].name.title ).toBe( 'Europa' );
 		expect( resultDesc[ 1 ].name.title ).toBe( 'Earth' );
 		// Skip intermediate items
@@ -995,7 +1064,7 @@ describe( 'sorting', () => {
 			},
 			fields
 		);
-		expect( resultAsc ).toHaveLength( 18 );
+		expect( resultAsc ).toHaveLength( 19 );
 		expect( resultAsc[ 0 ].name.title ).toBe( 'Jupiter' );
 		expect( resultAsc[ 1 ].name.title ).toBe( 'Io' );
 		// Skip intermediate items
@@ -1017,7 +1086,7 @@ describe( 'sorting', () => {
 			)
 		);
 
-		expect( result ).toHaveLength( 18 );
+		expect( result ).toHaveLength( 19 );
 		expect( result[ 0 ].name.title ).toBe( 'Saturn' );
 		expect( result[ 1 ].name.title ).toBe( 'Jupiter' );
 		expect( result[ 2 ].name.title ).toBe( 'Uranus' );
@@ -1046,11 +1115,11 @@ describe( 'sorting', () => {
 		expect( result[ 1 ].name.title ).toBe( 'Neptune' );
 	} );
 
-	it( 'should sort only by groupByField when sort is not specified', () => {
+	it( 'should sort only by groupBy.field when sort is not specified', () => {
 		const { data: result } = filterSortAndPaginate(
 			data,
 			{
-				groupByField: 'type',
+				groupBy: { field: 'type', direction: 'asc' },
 			},
 			fields
 		);
@@ -1065,7 +1134,7 @@ describe( 'sorting', () => {
 			}
 		}
 
-		expect( groupCount ).toBe( 4 );
+		expect( groupCount ).toBe( 5 );
 	} );
 } );
 
@@ -1085,7 +1154,7 @@ describe( 'pagination', () => {
 		expect( result[ 1 ].name.title ).toBe( 'Ganymede' );
 		expect( paginationInfo ).toStrictEqual( {
 			totalItems: data.length,
-			totalPages: 9,
+			totalPages: 10,
 		} );
 	} );
 } );

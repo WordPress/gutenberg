@@ -200,7 +200,6 @@ function ContentOnlyControls( {
 									</>
 								)
 							}
-							__nextHasNoMarginBottom
 						/>
 					</div>
 				</Popover>
@@ -217,7 +216,6 @@ function ContentOnlyControls( {
 						<TextControl
 							__next40pxDefaultSize
 							className="wp-block-image__toolbar_content_textarea"
-							__nextHasNoMarginBottom
 							label={ __( 'Title attribute' ) }
 							value={ attributes.title || '' }
 							onChange={ ( value ) =>
@@ -718,7 +716,6 @@ export default function Image( {
 					mediaId={ id }
 					mediaURL={ url }
 					allowedTypes={ ALLOWED_MEDIA_TYPES }
-					accept="image/*"
 					onSelect={ onSelectImage }
 					onSelectURL={ onSelectURL }
 					onError={ onUploadError }
@@ -834,7 +831,6 @@ export default function Image( {
 										</>
 									)
 								}
-								__nextHasNoMarginBottom
 							/>
 						</ToolsPanelItem>
 					) }
@@ -851,7 +847,6 @@ export default function Image( {
 			</InspectorControls>
 			<InspectorControls group="advanced">
 				<TextControl
-					__nextHasNoMarginBottom
 					__next40pxDefaultSize
 					label={ __( 'Title attribute' ) }
 					value={ title || '' }
@@ -911,9 +906,6 @@ export default function Image( {
 				<Spinner />
 			</Placeholder>
 		) : (
-			// Disable reason: Image itself is not meant to be interactive, but
-			// should direct focus to block.
-			/* eslint-disable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/click-events-have-key-events */
 			<>
 				<img
 					src={ temporaryURL || url }
@@ -940,7 +932,6 @@ export default function Image( {
 				/>
 				{ temporaryURL && <Spinner /> }
 			</>
-			/* eslint-enable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/click-events-have-key-events */
 		);
 
 	if ( canEditImage && isEditingImage ) {

@@ -1,0 +1,44 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
+@use "./link/styles.scss" as *;
+@use "./media/styles.scss" as *;
+@use "./rich-text/styles.scss" as *;
+
+.block-editor-content-only-controls__screen {
+	&.components-navigator-screen {
+		padding: $grid-unit-10 0 $grid-unit-20 0;
+	}
+
+	// Add border for the entire content controls and remove the similar border
+	// for tools panel.
+	border-top: $border-width solid $gray-200;
+
+
+	.components-tools-panel {
+		border-top: none;
+
+		// Condense the tools panels more than normal.
+		padding-top: $grid-unit-10;
+	}
+}
+
+.block-editor-content-only-controls__button-panel {
+	padding: 4px;
+
+	// Match heading font weights for the tools panels.
+	font-weight: 500 !important;
+}
+
+.block-editor-content-only-controls__back-button,
+.block-editor-content-only-controls__drill-down-button {
+	width: 100%;
+}
+
+.block-editor-content-only-controls__fields-container {
+	padding: 0 $grid-unit-20;
+}
+
+.block-editor-content-only-controls__fields-header {
+	padding: $grid-unit-10 0;
+	margin-bottom: $grid-unit-05;
+}

@@ -4,7 +4,7 @@
 	"name": "core/accordion-panel",
 	"title": "Accordion Panel",
 	"category": "design",
-	"description": "Displays an accordion panel.",
+	"description": "Contains the hidden or revealed content beneath the heading.",
 	"parent": [ "core/accordion-item" ],
 	"supports": {
 		"html": false,
@@ -50,9 +50,10 @@
 		"layout": {
 			"allowEditing": false
 		},
-		"blockVisibility": false,
+		"visibility": false,
 		"contentRole": true,
-		"allowedBlocks": true
+		"allowedBlocks": true,
+		"lock": false
 	},
 	"attributes": {
 		"templateLock": {

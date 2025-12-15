@@ -29,13 +29,7 @@ export default meta;
 
 export const Default: StoryObj< typeof ValidatedSelectControl > = {
 	render: function Template( { onChange, ...args } ) {
-		const [ value, setValue ] = useState( '' );
-		const [ customValidity, setCustomValidity ] =
-			useState<
-				React.ComponentProps<
-					typeof ValidatedSelectControl
-				>[ 'customValidity' ]
-			>( undefined );
+		const [ value, setValue ] = useState< string | undefined >( '' );
 
 		return (
 			<ValidatedSelectControl
@@ -45,17 +39,14 @@ export const Default: StoryObj< typeof ValidatedSelectControl > = {
 					setValue( newValue );
 					onChange?.( newValue );
 				} }
-				onValidate={ ( v ) => {
-					if ( v === '1' ) {
-						setCustomValidity( {
-							type: 'invalid',
-							message: 'Option 1 is not allowed.',
-						} );
-					} else {
-						setCustomValidity( undefined );
-					}
-				} }
-				customValidity={ customValidity }
+				customValidity={
+					value === '1'
+						? {
+								type: 'invalid',
+								message: 'Option 1 is not allowed.',
+						  }
+						: undefined
+				}
 			/>
 		);
 	},

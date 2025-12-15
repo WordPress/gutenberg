@@ -1,4 +1,18 @@
 /**
+ * External dependencies
+ */
+import clsx from 'clsx';
+import {
+	format,
+	isValid as isValidDate,
+	subMonths,
+	subDays,
+	subYears,
+	startOfMonth,
+	startOfYear,
+} from 'date-fns';
+
+/**
  * WordPress dependencies
  */
 import {
@@ -22,34 +36,22 @@ import { getDate, getSettings } from '@wordpress/date';
 import { error as errorIcon } from '@wordpress/icons';
 
 /**
- * External dependencies
- */
-import clsx from 'clsx';
-import {
-	format,
-	isValid,
-	subMonths,
-	subDays,
-	subYears,
-	startOfMonth,
-	startOfYear,
-} from 'date-fns';
-import deepMerge from 'deepmerge';
-
-/**
  * Internal dependencies
  */
-import RelativeDateControl, {
-	TIME_UNITS_OPTIONS,
-	type DateRelative,
-} from './relative-date-control';
+import RelativeDateControl from './utils/relative-date-control';
 import {
 	OPERATOR_IN_THE_PAST,
 	OPERATOR_OVER,
 	OPERATOR_BETWEEN,
 } from '../constants';
 import { unlock } from '../lock-unlock';
-import type { DataFormControlProps } from '../types';
+import type {
+	DataFormControlProps,
+	FieldValidity,
+	FormatDate,
+	NormalizedField,
+} from '../types';
+import getCustomValidity from './utils/get-custom-validity';
 
 const { DateCalendar, DateRangeCalendar } = unlock( componentsPrivateApis );
 
@@ -139,7 +141,7 @@ const parseDate = ( dateString?: string ): Date | null => {
 		return null;
 	}
 	const parsed = getDate( dateString );
-	return parsed && isValid( parsed ) ? parsed : null;
+	return parsed && isValidDate( parsed ) ? parsed : null;
 };
 
 const formatDate = ( date?: Date | string ): string => {
@@ -150,19 +152,15 @@ const formatDate = ( date?: Date | string ): string => {
 };
 
 function ValidatedDateControl< Item >( {
-	value,
 	field,
-	data,
-	setValue,
+	validity,
 	inputRefs,
 	isTouched,
 	setIsTouched,
 	children,
 }: {
-	value: any;
-	field: any;
-	data: Item;
-	setValue: any;
+	field: NormalizedField< Item >;
+	validity?: FieldValidity;
 	inputRefs:
 		| React.RefObject< HTMLInputElement >
 		| React.RefObject< HTMLInputElement >[];
@@ -170,62 +168,43 @@ function ValidatedDateControl< Item >( {
 	setIsTouched: ( touched: boolean ) => void;
 	children: React.ReactNode;
 } ) {
+	const { isValid } = field;
 	const [ customValidity, setCustomValidity ] = useState<
-		{ type: 'invalid'; message: string } | undefined
+		| { type: 'valid' | 'validating' | 'invalid'; message?: string }
+		| undefined
 	>( undefined );
 
-	const onValidate = useCallback(
-		( newValue: any ) => {
-			// Check custom validation (only if value exists)
-			if ( newValue ) {
-				const customMessage = field.isValid?.custom?.(
-					deepMerge(
-						data,
-						setValue( {
-							item: data,
-							value: newValue,
-						} ) as Partial< Item >
-					),
-					field
-				);
-
-				if ( customMessage ) {
-					setCustomValidity( {
-						type: 'invalid',
-						message: customMessage,
-					} );
-					return;
-				}
+	const validateRefs = useCallback( () => {
+		// Check HTML5 validity on all refs
+		const refs = Array.isArray( inputRefs ) ? inputRefs : [ inputRefs ];
+		for ( const ref of refs ) {
+			const input = ref.current;
+			if ( input && ! input.validity.valid ) {
+				setCustomValidity( {
+					type: 'invalid',
+					message: input.validationMessage,
+				} );
+				return;
 			}
+		}
 
-			// Check HTML5 validity on all refs
-			const refs = Array.isArray( inputRefs ) ? inputRefs : [ inputRefs ];
-			for ( const ref of refs ) {
-				const input = ref.current;
-				if ( input && ! input.validity.valid ) {
-					setCustomValidity( {
-						type: 'invalid',
-						message: input.validationMessage,
-					} );
-					return;
-				}
-			}
-
-			// No errors
-			setCustomValidity( undefined );
-		},
-		[ data, field, setValue, inputRefs ]
-	);
+		// No errors
+		setCustomValidity( undefined );
+	}, [ inputRefs ] );
 
 	useEffect( () => {
 		if ( isTouched ) {
 			const timeoutId = setTimeout( () => {
-				onValidate( value );
+				if ( validity ) {
+					setCustomValidity( getCustomValidity( isValid, validity ) );
+				} else {
+					validateRefs();
+				}
 			}, 0 );
 			return () => clearTimeout( timeoutId );
 		}
 		return undefined;
-	}, [ isTouched, value, onValidate ] );
+	}, [ isTouched, isValid, validity, validateRefs ] );
 
 	const onBlur = ( event: React.FocusEvent< HTMLDivElement > ) => {
 		if ( isTouched ) {
@@ -250,7 +229,12 @@ function ValidatedDateControl< Item >( {
 					<p
 						className={ clsx(
 							'components-validated-control__indicator',
-							'is-invalid'
+							customValidity.type === 'invalid'
+								? 'is-invalid'
+								: undefined,
+							customValidity.type === 'valid'
+								? 'is-valid'
+								: undefined
 						) }
 					>
 						<Icon
@@ -272,11 +256,27 @@ function CalendarDateControl< Item >( {
 	field,
 	onChange,
 	hideLabelFromVision,
+	validity,
 }: DataFormControlProps< Item > ) {
-	const { id, label, setValue, getValue } = field;
+	const {
+		id,
+		type,
+		label,
+		setValue,
+		getValue,
+		isValid,
+		format: fieldFormat,
+	} = field;
 	const [ selectedPresetId, setSelectedPresetId ] = useState< string | null >(
 		null
 	);
+
+	let weekStartsOn = getSettings().l10n.startOfWeek;
+	if ( type === 'date' ) {
+		// If the field type is date, we've already normalized the format,
+		// and so it's safe to tell TypeScript to trust us ("as Required<Format>").
+		weekStartsOn = ( fieldFormat as Required< FormatDate > ).weekStartsOn;
+	}
 
 	const fieldValue = getValue( { item: data } );
 	const value = typeof fieldValue === 'string' ? fieldValue : undefined;
@@ -336,19 +336,16 @@ function CalendarDateControl< Item >( {
 
 	const {
 		timezone: { string: timezoneString },
-		l10n: { startOfWeek },
 	} = getSettings();
 
-	const displayLabel = field.isValid?.required
+	const displayLabel = isValid?.required
 		? `${ label } (${ __( 'Required' ) })`
 		: label;
 
 	return (
 		<ValidatedDateControl
-			value={ value }
 			field={ field }
-			data={ data }
-			setValue={ setValue }
+			validity={ validity }
 			inputRefs={ validityTargetRef }
 			isTouched={ isTouched }
 			setIsTouched={ setIsTouched }
@@ -414,7 +411,7 @@ function CalendarDateControl< Item >( {
 						month={ calendarMonth }
 						onMonthChange={ setCalendarMonth }
 						timeZone={ timezoneString || undefined }
-						weekStartsOn={ startOfWeek }
+						weekStartsOn={ weekStartsOn }
 					/>
 				</VStack>
 			</BaseControl>
@@ -427,8 +424,9 @@ function CalendarDateRangeControl< Item >( {
 	field,
 	onChange,
 	hideLabelFromVision,
+	validity,
 }: DataFormControlProps< Item > ) {
-	const { id, label, getValue, setValue } = field;
+	const { id, type, label, getValue, setValue, format: fieldFormat } = field;
 	let value: DateRange;
 	const fieldValue = getValue( { item: data } );
 	if (
@@ -437,6 +435,13 @@ function CalendarDateRangeControl< Item >( {
 		fieldValue.every( ( date ) => typeof date === 'string' )
 	) {
 		value = fieldValue as DateRange;
+	}
+
+	let weekStartsOn;
+	if ( type === 'date' ) {
+		// If the field type is date, we've already normalized the format,
+		// and so it's safe to tell TypeScript to trust us ("as Required<Format>").
+		weekStartsOn = ( fieldFormat as Required< FormatDate > ).weekStartsOn;
 	}
 
 	const onChangeCallback = useCallback(
@@ -538,7 +543,7 @@ function CalendarDateRangeControl< Item >( {
 		[ value, updateDateRange ]
 	);
 
-	const { timezone, l10n } = getSettings();
+	const { timezone } = getSettings();
 
 	const displayLabel = field.isValid?.required
 		? `${ label } (${ __( 'Required' ) })`
@@ -546,10 +551,8 @@ function CalendarDateRangeControl< Item >( {
 
 	return (
 		<ValidatedDateControl
-			value={ value }
 			field={ field }
-			data={ data }
-			setValue={ setValue }
+			validity={ validity }
 			inputRefs={ [ fromInputRef, toInputRef ] }
 			isTouched={ isTouched }
 			setIsTouched={ setIsTouched }
@@ -628,7 +631,7 @@ function CalendarDateRangeControl< Item >( {
 						month={ calendarMonth }
 						onMonthChange={ setCalendarMonth }
 						timeZone={ timezone.string || undefined }
-						weekStartsOn={ l10n.startOfWeek }
+						weekStartsOn={ weekStartsOn }
 					/>
 				</VStack>
 			</BaseControl>
@@ -642,27 +645,17 @@ export default function DateControl< Item >( {
 	onChange,
 	hideLabelFromVision,
 	operator,
+	validity,
 }: DataFormControlProps< Item > ) {
-	const { id, label, getValue, setValue } = field;
-	const value = getValue( { item: data } );
-
-	const onChangeRelativeDateControl = useCallback(
-		( newValue: DateRelative ) => {
-			onChange( setValue( { item: data, value: newValue } ) );
-		},
-		[ data, onChange, setValue ]
-	);
-
 	if ( operator === OPERATOR_IN_THE_PAST || operator === OPERATOR_OVER ) {
 		return (
 			<RelativeDateControl
 				className="dataviews-controls__date"
-				id={ id }
-				value={ value && typeof value === 'object' ? value : {} }
-				onChange={ onChangeRelativeDateControl }
-				label={ label }
+				data={ data }
+				field={ field }
+				onChange={ onChange }
 				hideLabelFromVision={ hideLabelFromVision }
-				options={ TIME_UNITS_OPTIONS[ operator ] }
+				operator={ operator }
 			/>
 		);
 	}
@@ -674,6 +667,7 @@ export default function DateControl< Item >( {
 				field={ field }
 				onChange={ onChange }
 				hideLabelFromVision={ hideLabelFromVision }
+				validity={ validity }
 			/>
 		);
 	}
@@ -684,6 +678,7 @@ export default function DateControl< Item >( {
 			field={ field }
 			onChange={ onChange }
 			hideLabelFromVision={ hideLabelFromVision }
+			validity={ validity }
 		/>
 	);
 }

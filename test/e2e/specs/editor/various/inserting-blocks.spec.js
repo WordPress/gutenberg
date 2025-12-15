@@ -41,13 +41,31 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 			},
 		} );
 
-		expect( await editor.getBlocks() ).toMatchObject( [
-			{ name: 'core/image' },
-			{ name: 'core/paragraph' },
-		] );
+		await expect
+			.poll( editor.getBlocks )
+			.toMatchObject( [
+				{ name: 'core/image' },
+				{ name: 'core/paragraph' },
+			] );
 
 		await expect(
 			editor.canvas.locator( '[data-type="core/paragraph"]' )
+		).toBeFocused();
+
+		// Clear block selection.
+		await editor.canvas
+			.getByRole( 'textbox', { name: 'Add title' } )
+			.focus();
+		await body.click( {
+			position: {
+				x: box.width / 2,
+				y: box.height - 10,
+			},
+		} );
+
+		await expect(
+			editor.canvas.locator( '[data-type="core/paragraph"]' ),
+			'should select and focus the newly inserted paragraph block on second click'
 		).toBeFocused();
 	} );
 

@@ -5,6 +5,7 @@ import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { usePrevious } from '@wordpress/compose';
+import { store as editorStore } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -18,53 +19,72 @@ const { useLocation, useHistory } = unlock( routerPrivateApis );
 
 function useNavigateToPreviousEntityRecord() {
 	const location = useLocation();
-	const previousLocation = usePrevious( location );
+	const previousCanvas = usePrevious( location.query.canvas );
 	const history = useHistory();
 	const goBack = useMemo( () => {
 		const isFocusMode =
 			location.query.focusMode ||
 			( location?.params?.postId &&
 				FOCUSABLE_ENTITIES.includes( location?.params?.postType ) );
-		const didComeFromEditorCanvas =
-			previousLocation?.query.canvas === 'edit';
+		const didComeFromEditorCanvas = previousCanvas === 'edit';
 		const showBackButton = isFocusMode && didComeFromEditorCanvas;
 		return showBackButton ? () => history.back() : undefined;
-		// `previousLocation` changes when the component updates for any reason, not
-		// just when location changes. Until this is fixed we can't add it to deps. See
-		// https://github.com/WordPress/gutenberg/pull/58710#discussion_r1479219465.
-	}, [ location, history ] );
+	}, [ location, history, previousCanvas ] );
 	return goBack;
 }
 
 export function useSpecificEditorSettings() {
 	const { query } = useLocation();
 	const { canvas = 'view' } = query;
-	const onNavigateToEntityRecord = useNavigateToEntityRecord();
-	const { settings } = useSelect( ( select ) => {
+	const [ onNavigateToEntityRecord, initialBlockSelection ] =
+		useNavigateToEntityRecord();
+
+	const { settings, currentPostIsTrashed } = useSelect( ( select ) => {
 		const { getSettings } = select( editSiteStore );
+		const { getCurrentPostAttribute } = select( editorStore );
 		return {
 			settings: getSettings(),
+			currentPostIsTrashed:
+				getCurrentPostAttribute( 'status' ) === 'trash',
 		};
 	}, [] );
 
 	const onNavigateToPreviousEntityRecord =
 		useNavigateToPreviousEntityRecord();
+
 	const defaultEditorSettings = useMemo( () => {
 		return {
 			...settings,
-
+			styles: [
+				...settings.styles,
+				{
+					// Forming a "block formatting context" to prevent margin collapsing.
+					// @see https://developer.mozilla.org/en-US/docs/Web/Guide/CSS/Block_formatting_context
+					css:
+						canvas === 'view'
+							? `body{min-height: 100vh; ${
+									currentPostIsTrashed
+										? ''
+										: 'cursor: pointer;'
+							  }}`
+							: undefined,
+				},
+			],
 			richEditingEnabled: true,
 			supportsTemplateMode: true,
 			focusMode: canvas !== 'view',
 			onNavigateToEntityRecord,
 			onNavigateToPreviousEntityRecord,
 			isPreviewMode: canvas === 'view',
+			initialBlockSelection,
 		};
 	}, [
 		settings,
 		canvas,
+		currentPostIsTrashed,
 		onNavigateToEntityRecord,
 		onNavigateToPreviousEntityRecord,
+		initialBlockSelection,
 	] );
 
 	return defaultEditorSettings;

@@ -7,6 +7,8 @@ import { parse as commentParser } from 'comment-parser';
 
 /**
  * Try to get subcomponent descriptions from the main component Object.assign() call.
+ * @param {string} filePath
+ * @param {string} mainComponentName
  */
 export async function getDescriptionsForSubcomponents(
 	filePath,

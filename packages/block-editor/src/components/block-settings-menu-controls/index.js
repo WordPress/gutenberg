@@ -19,9 +19,10 @@ import {
 import { BlockLockMenuItem, useBlockLock } from '../block-lock';
 import { store as blockEditorStore } from '../../store';
 import BlockModeToggle from '../block-settings-menu/block-mode-toggle';
-import { ModifyContentLockMenuItem } from '../content-lock';
+import { ModifyContentOnlySectionMenuItem } from '../content-lock';
 import { BlockRenameControl, useBlockRename } from '../block-rename';
 import { BlockVisibilityMenuItem } from '../block-visibility';
+import { EditSectionMenuItem } from './edit-section-menu-item';
 
 const { Fill, Slot } = createSlotFill( 'BlockSettingsMenuControls' );
 
@@ -49,7 +50,7 @@ const BlockSettingsMenuControlsSlot = ( { fillProps, clientIds = null } ) => {
 				canToggleSelectedBlocksVisibility: getBlocksByClientId(
 					ids
 				).every( ( block ) =>
-					hasBlockSupport( block.name, 'blockVisibility', true )
+					hasBlockSupport( block.name, 'visibility', true )
 				),
 			};
 		},
@@ -98,6 +99,12 @@ const BlockSettingsMenuControlsSlot = ( { fillProps, clientIds = null } ) => {
 								onClose={ fillProps?.onClose }
 							/>
 						) }
+						{ selectedClientIds.length === 1 && (
+							<EditSectionMenuItem
+								clientId={ selectedClientIds[ 0 ] }
+								onClose={ fillProps?.onClose }
+							/>
+						) }
 						{ showLockButton && (
 							<BlockLockMenuItem
 								clientId={ selectedClientIds[ 0 ] }
@@ -115,7 +122,7 @@ const BlockSettingsMenuControlsSlot = ( { fillProps, clientIds = null } ) => {
 						) }
 						{ fills }
 						{ selectedClientIds.length === 1 && (
-							<ModifyContentLockMenuItem
+							<ModifyContentOnlySectionMenuItem
 								clientId={ selectedClientIds[ 0 ] }
 								onClose={ fillProps?.onClose }
 							/>

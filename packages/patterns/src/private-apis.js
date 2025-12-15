@@ -17,7 +17,6 @@ import PatternsMenuItems from './components';
 import RenamePatternCategoryModal from './components/rename-pattern-category-modal';
 import PatternOverridesControls from './components/pattern-overrides-controls';
 import ResetOverridesControl from './components/reset-overrides-control';
-import PatternOverridesBlockControls from './components/pattern-overrides-block-controls';
 import { useAddPatternCategory } from './private-hooks';
 import {
 	PATTERN_TYPES,
@@ -42,7 +41,6 @@ lock( privateApis, {
 	RenamePatternCategoryModal,
 	PatternOverridesControls,
 	ResetOverridesControl,
-	PatternOverridesBlockControls,
 	useAddPatternCategory,
 	PATTERN_TYPES,
 	PATTERN_DEFAULT_CATEGORY,

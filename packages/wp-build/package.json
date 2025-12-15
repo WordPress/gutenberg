@@ -1,0 +1,77 @@
+{
+	"name": "@wordpress/build",
+	"version": "0.4.0",
+	"description": "Build tool for WordPress plugins.",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"build",
+		"esbuild",
+		"bundler"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/wp-build/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git",
+		"directory": "packages/wp-build"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"engines": {
+		"node": ">=20.10.0",
+		"npm": ">=10.2.3"
+	},
+	"type": "module",
+	"main": "./src/build.mjs",
+	"exports": {
+		".": {
+			"import": "./src/build.mjs"
+		},
+		"./package.json": "./package.json"
+	},
+	"bin": {
+		"wp-build": "./src/build.mjs"
+	},
+	"dependencies": {
+		"@emotion/babel-plugin": "11.11.0",
+		"@types/toposort": "2.0.7",
+		"autoprefixer": "10.4.21",
+		"browserslist-to-esbuild": "2.1.1",
+		"change-case": "4.1.2",
+		"chokidar": "^4.0.0",
+		"cssnano": "6.0.1",
+		"esbuild": "0.25.10",
+		"esbuild-plugin-babel": "0.2.3",
+		"esbuild-sass-plugin": "3.3.1",
+		"fast-glob": "^3.2.7",
+		"postcss": "8.4.38",
+		"postcss-modules": "6.0.1",
+		"rtlcss": "4.3.0",
+		"toposort": "2.0.2"
+	},
+	"peerDependencies": {
+		"@wordpress/boot": "^0.3.0",
+		"@wordpress/private-apis": "^1.0.0",
+		"@wordpress/route": "^0.2.0",
+		"@wordpress/theme": "^0.3.0"
+	},
+	"peerDependenciesMeta": {
+		"@wordpress/boot": {
+			"optional": true
+		},
+		"@wordpress/private-apis": {
+			"optional": true
+		},
+		"@wordpress/route": {
+			"optional": true
+		},
+		"@wordpress/theme": {
+			"optional": true
+		}
+	},
+	"publishConfig": {
+		"access": "public"
+	}
+}

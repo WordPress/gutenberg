@@ -15,7 +15,7 @@ test.describe( 'Site editor block removal prompt', () => {
 	test.beforeEach( async ( { admin } ) => {
 		await admin.visitSiteEditor( {
 			postId: 'emptytheme//index',
-			postType: 'wp_registered_template',
+			postType: 'wp_template',
 			canvas: 'edit',
 		} );
 	} );

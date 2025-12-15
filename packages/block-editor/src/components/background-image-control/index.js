@@ -33,11 +33,11 @@ import { useRef, useState, useEffect, useMemo } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { focus } from '@wordpress/dom';
 import { isBlobURL } from '@wordpress/blob';
+import { getResolvedValue } from '@wordpress/global-styles-engine';
 
 /**
  * Internal dependencies
  */
-import { getResolvedValue } from '../global-styles/utils';
 import { hasBackgroundImageValue } from '../global-styles/background-panel';
 import { setImmutably } from '../../utils/object';
 import MediaReplaceFlow from '../media-replace-flow';

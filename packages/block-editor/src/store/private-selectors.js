@@ -35,6 +35,7 @@ import {
 	selectBlockPatternsKey,
 	reusableBlocksSelectKey,
 	sectionRootClientIdKey,
+	isIsolatedEditorKey,
 } from './private-keys';
 
 const { isContentBlock } = unlock( blocksPrivateApis );
@@ -95,7 +96,7 @@ export const isBlockSubtreeDisabled = ( state, clientId ) => {
  * @param {string} rootClientId The client ID of the root container block.
  * @return {boolean} Whether the container allows insertion.
  */
-export function isContainerInsertableToInWriteMode(
+export function isContainerInsertableToInContentOnlyMode(
 	state,
 	blockName,
 	rootClientId
@@ -105,7 +106,7 @@ export function isContainerInsertableToInWriteMode(
 	const isContainerContentBlock = isContentBlock( rootBlockName );
 	const isRootBlockMain = getSectionRootClientId( state ) === rootClientId;
 
-	// In write mode, containers shouldn't be inserted into unless:
+	// In contentOnly mode, containers shouldn't be inserted into unless:
 	// 1. they are a section root;
 	// 2. they are a content block and the block to be inserted is also content.
 	return (
@@ -488,12 +489,15 @@ export const getContentLockingParent = ( state, clientId ) => {
  * @param {Object} state    Global application state.
  * @param {string} clientId Client Id of the block.
  *
- * @return {?string} Client ID of the ancestor block that is content locking the block.
+ * @return {?string} Client ID of the ancestor block that is a contentOnly section.
  */
 export const getParentSectionBlock = ( state, clientId ) => {
 	let current = clientId;
 	let result;
-	while ( ! result && ( current = state.blocks.parents.get( current ) ) ) {
+
+	// If sections are nested, return the top level section block.
+	// Don't return early.
+	while ( ( current = state.blocks.parents.get( current ) ) ) {
 		if ( isSectionBlock( state, current ) ) {
 			result = current;
 		}
@@ -502,55 +506,81 @@ export const getParentSectionBlock = ( state, clientId ) => {
 };
 
 /**
- * Retrieves the client ID is a content locking parent
+ * Returns whether the block is a contentOnly section.
  *
  * @param {Object} state    Global application state.
  * @param {string} clientId Client Id of the block.
  *
- * @return {boolean} Whether the block is a content locking parent.
+ * @return {boolean} Whether the block is a contentOnly section.
  */
 export function isSectionBlock( state, clientId ) {
+	if ( clientId === state.editedContentOnlySection ) {
+		return false;
+	}
+
 	const blockName = getBlockName( state, clientId );
-	if (
-		blockName === 'core/block' ||
-		getTemplateLock( state, clientId ) === 'contentOnly'
-	) {
+	if ( blockName === 'core/block' ) {
 		return true;
 	}
 
 	const attributes = getBlockAttributes( state, clientId );
 	const isTemplatePart = blockName === 'core/template-part';
+
+	// When in an isolated editing context (e.g., editing a template part or pattern directly),
+	// don't treat nested unsynced patterns as section blocks.
+	const isIsolatedEditor = state.settings?.[ isIsolatedEditorKey ];
+
 	if (
 		( attributes?.metadata?.patternName || isTemplatePart ) &&
-		!! window?.__experimentalContentOnlyPatternInsertion
+		!! window?.__experimentalContentOnlyPatternInsertion &&
+		! isIsolatedEditor
 	) {
 		return true;
 	}
+
+	// TemplateLock cascades to all inner parent blocks. Only the top-level
+	// block that's contentOnly templateLocked is the true contentLocker,
+	// all the others are mere imitators.
+	const hasContentOnlyTempateLock =
+		getTemplateLock( state, clientId ) === 'contentOnly';
+	const rootClientId = getBlockRootClientId( state, clientId );
+	const hasRootContentOnlyTemplateLock =
+		getTemplateLock( state, rootClientId ) === 'contentOnly';
+	if ( hasContentOnlyTempateLock && ! hasRootContentOnlyTemplateLock ) {
+		return true;
+	}
+
 	return false;
 }
 
 /**
- * Retrieves the client ID of the block that is content locked but is
- * currently being temporarily edited as a non-locked block.
+ * Retrieves the client ID of the block that is a contentOnly section but is
+ * currently being temporarily edited (contentOnly is deactivated).
  *
  * @param {Object} state Global application state.
  *
- * @return {?string} The client ID of the block being temporarily edited as a non-locked block.
+ * @return {?string} The client ID of the block being temporarily edited.
  */
-export function getTemporarilyEditingAsBlocks( state ) {
-	return state.temporarilyEditingAsBlocks;
+export function getEditedContentOnlySection( state ) {
+	return state.editedContentOnlySection;
 }
 
-/**
- * Returns the focus mode that should be reapplied when the user stops editing
- * a content locked blocks as a block without locking.
- *
- * @param {Object} state Global application state.
- *
- * @return {?string} The focus mode that should be re-set when temporarily editing as blocks stops.
- */
-export function getTemporarilyEditingFocusModeToRevert( state ) {
-	return state.temporarilyEditingFocusModeRevert;
+export function isWithinEditedContentOnlySection( state, clientId ) {
+	if ( ! state.editedContentOnlySection ) {
+		return false;
+	}
+
+	if ( state.editedContentOnlySection === clientId ) {
+		return true;
+	}
+
+	let current = clientId;
+	while ( ( current = state.blocks.parents.get( current ) ) ) {
+		if ( state.editedContentOnlySection === current ) {
+			return true;
+		}
+	}
+	return false;
 }
 
 /**
@@ -687,7 +717,7 @@ export function getInsertionPoint( state ) {
  */
 export const isBlockHidden = ( state, clientId ) => {
 	const blockName = getBlockName( state, clientId );
-	if ( ! hasBlockSupport( state, blockName, 'blockVisibility', true ) ) {
+	if ( ! hasBlockSupport( state, blockName, 'visibility', true ) ) {
 		return false;
 	}
 	const attributes = state.blocks.attributes.get( clientId );
@@ -695,12 +725,121 @@ export const isBlockHidden = ( state, clientId ) => {
 };
 
 /**
- * Returns true if the current spotlighted block matches the block clientId.
+ * Returns true if there is a spotlighted block.
+ *
+ * The spotlight is also active when a contentOnly section is being edited, the selector
+ * also returns true if this is the case.
  *
  * @param {Object} state Global application state.
  *
  * @return {boolean} Whether the block is currently spotlighted.
  */
 export function hasBlockSpotlight( state ) {
-	return !! state.hasBlockSpotlight;
+	return !! state.hasBlockSpotlight || !! state.editedContentOnlySection;
+}
+
+/**
+ * Returns whether a block is locked to prevent editing.
+ *
+ * This selector only reasons about block lock, not associated features
+ * like `blockEditingMode` that might prevent user modifications to a block.
+ * Currently there's also no way to prevent editing via `templateLock`.
+ *
+ * This distinction is important as this selector specifically drives the block lock UI
+ * that a user interacts with. `blockEditingModes` aren't included as a user can't change
+ * them.
+ *
+ * @param {Object} state    Global application state.
+ * @param {string} clientId ClientId of the block.
+ *
+ * @return {boolean} Whether the block is currently locked.
+ */
+export function isEditLockedBlock( state, clientId ) {
+	const attributes = getBlockAttributes( state, clientId );
+	return !! attributes?.lock?.edit;
+}
+
+/**
+ * Returns whether a block is locked to prevent moving.
+ *
+ * This selector only reasons about templateLock and block lock, not associated features
+ * like `blockEditingMode` that might prevent user modifications to a block.
+ *
+ * This distinction is important as this selector specifically drives the block lock UI
+ * that a user interacts with. `blockEditingModes` are excluded as a user can't change
+ * them.
+ *
+ * @param {Object} state    Global application state.
+ * @param {string} clientId ClientId of the block.
+ *
+ * @return {boolean} Whether the block is currently locked.
+ */
+export function isMoveLockedBlock( state, clientId ) {
+	const attributes = getBlockAttributes( state, clientId );
+	// If a block explicitly has `move` set to `false`, it turns off
+	// any locking that might be inherited from a parent.
+	if ( attributes?.lock?.move !== undefined ) {
+		return !! attributes?.lock?.move;
+	}
+
+	const rootClientId = getBlockRootClientId( state, clientId );
+	const templateLock = getTemplateLock( state, rootClientId );
+
+	// While `contentOnly` templateLock does sometimes prevent moving, a user can't modify
+	// this, so don't include it in this function. See the `canMoveBlock` selector
+	// as an alternative.
+	return templateLock === 'all';
+}
+
+/**
+ * Returns whether a block is locked to prevent removal.
+ *
+ * This selector only reasons about templateLock and block lock, not associated features
+ * like `blockEditingMode` that might prevent user modifications to a block.
+ *
+ * This distinction is important as this selector specifically drives the block lock UI
+ * that a user interacts with. `blockEditingModes` are excluded as a user can't change
+ * them.
+ *
+ * @param {Object} state    Global application state.
+ * @param {string} clientId ClientId of the block.
+ *
+ * @return {boolean} Whether the block is currently locked.
+ */
+export function isRemoveLockedBlock( state, clientId ) {
+	const attributes = getBlockAttributes( state, clientId );
+	if ( attributes?.lock?.remove !== undefined ) {
+		return !! attributes?.lock?.remove;
+	}
+
+	const rootClientId = getBlockRootClientId( state, clientId );
+	const templateLock = getTemplateLock( state, rootClientId );
+
+	// While `contentOnly` templateLock does sometimes prevent removal, a user can't modify
+	// this, so don't include it in this function. See the `canRemoveBlock` selector
+	// as an alternative.
+	return templateLock === 'all' || templateLock === 'insert';
+}
+
+/**
+ * Returns whether a block is locked.
+ *
+ * This selector only reasons about templateLock and block lock, not associated features
+ * like `blockEditingMode` that might prevent user modifications to a block.
+ *
+ * This distinction is important as this selector specifically drives the block lock UI
+ * that a user interacts with. `blockEditingModes` are excluded as a user can't change
+ * them.
+ *
+ * @param {Object} state    Global application state.
+ * @param {string} clientId ClientId of the block.
+ *
+ * @return {boolean} Whether the block is currently locked.
+ */
+export function isLockedBlock( state, clientId ) {
+	return (
+		isEditLockedBlock( state, clientId ) ||
+		isMoveLockedBlock( state, clientId ) ||
+		isRemoveLockedBlock( state, clientId )
+	);
 }

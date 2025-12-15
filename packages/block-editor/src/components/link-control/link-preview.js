@@ -11,6 +11,7 @@ import {
 	Button,
 	ExternalLink,
 	__experimentalTruncate as Truncate,
+	Flex,
 } from '@wordpress/components';
 import { useCopyToClipboard } from '@wordpress/compose';
 import { filterURLForDisplay, safeDecodeURI } from '@wordpress/url';
@@ -102,10 +103,10 @@ export default function LinkPreview( {
 	} );
 
 	return (
-		<div
+		<Flex
 			role="group"
 			aria-label={ __( 'Manage link' ) }
-			className={ clsx( 'block-editor-link-control__search-item', {
+			className={ clsx( 'block-editor-link-control__preview', {
 				'is-current': true,
 				'is-rich': hasRichData,
 				'is-fetching': !! isFetching,
@@ -114,30 +115,36 @@ export default function LinkPreview( {
 				'is-url-title': displayTitle === displayURL,
 			} ) }
 		>
-			<div className="block-editor-link-control__search-item-top">
-				<span
-					className="block-editor-link-control__search-item-header"
+			<Flex gap={ 0 }>
+				<Flex
+					className="block-editor-link-control__link-information"
 					role="figure"
 					aria-label={
 						/* translators: Accessibility text for the link preview when editing a link. */
 						__( 'Link information' )
 					}
+					justify="start"
 				>
-					<span
+					<Flex
 						className={ clsx(
-							'block-editor-link-control__search-item-icon',
+							'block-editor-link-control__preview-icon',
 							{
 								'is-image': richData?.icon,
 							}
 						) }
+						justify="center"
 					>
 						{ icon }
-					</span>
-					<span className="block-editor-link-control__search-item-details">
+					</Flex>
+					<Flex
+						className="block-editor-link-control__preview-details"
+						direction="column"
+						gap={ 1 }
+					>
 						{ ! isEmptyURL ? (
 							<>
 								<ExternalLink
-									className="block-editor-link-control__search-item-title"
+									className="block-editor-link-control__preview-title"
 									href={ value.url }
 								>
 									<Truncate numberOfLines={ 1 }>
@@ -145,7 +152,7 @@ export default function LinkPreview( {
 									</Truncate>
 								</ExternalLink>
 								{ ! isUrlRedundant && (
-									<span className="block-editor-link-control__search-item-info">
+									<span className="block-editor-link-control__preview-info">
 										<Truncate numberOfLines={ 1 }>
 											{ displayURL }
 										</Truncate>
@@ -153,12 +160,12 @@ export default function LinkPreview( {
 								) }
 							</>
 						) : (
-							<span className="block-editor-link-control__search-item-error-notice">
+							<span className="block-editor-link-control__preview-error-notice">
 								{ __( 'Link is empty' ) }
 							</span>
 						) }
-					</span>
-				</span>
+					</Flex>
+				</Flex>
 				<Button
 					icon={ pencil }
 					label={ __( 'Edit link' ) }
@@ -185,7 +192,7 @@ export default function LinkPreview( {
 					showTooltip={ ! showIconLabels }
 				/>
 				<ViewerSlot fillProps={ value } />
-			</div>
-		</div>
+			</Flex>
+		</Flex>
 	);
 }

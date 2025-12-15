@@ -391,9 +391,7 @@ export default function NavigationSubmenuEdit( {
 				/>
 			</InspectorControls>
 			<div { ...blockProps }>
-				{ /* eslint-disable jsx-a11y/anchor-is-valid */ }
 				<ParentElement className="wp-block-navigation-item__content">
-					{ /* eslint-enable */ }
 					<RichText
 						ref={ ref }
 						identifier="label"
@@ -432,7 +430,10 @@ export default function NavigationSubmenuEdit( {
 							} }
 							onChange={ ( updatedValue ) => {
 								// updateAttributes determines the final state and returns metadata
-								const { isEntityLink } = updateAttributes(
+								const {
+									isEntityLink,
+									attributes: updatedAttributes,
+								} = updateAttributes(
 									updatedValue,
 									setAttributes,
 									attributes
@@ -442,7 +443,7 @@ export default function NavigationSubmenuEdit( {
 								// Only create bindings for entity links (posts, pages, taxonomies)
 								// Never create bindings for custom links (manual URLs)
 								if ( isEntityLink ) {
-									createBinding();
+									createBinding( updatedAttributes );
 								} else {
 									clearBinding();
 								}

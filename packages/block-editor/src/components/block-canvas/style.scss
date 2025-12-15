@@ -1,3 +1,10 @@
+@use "sass:math";
+@use "@wordpress/base-styles/animations" as *;
+@use "@wordpress/base-styles/breakpoints" as *;
+@use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/colors" as *;
+
 iframe[name="editor-canvas"] {
 	box-sizing: border-box;
 	width: 100%;

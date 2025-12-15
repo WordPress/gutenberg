@@ -27,6 +27,7 @@
 		{ "path": "../icons" },
 		{ "path": "../interactivity" },
 		{ "path": "../interactivity-router" },
+		{ "path": "../latex-to-mathml" },
 		{ "path": "../notices" },
 		{ "path": "../keycodes" },
 		{ "path": "../primitives" },

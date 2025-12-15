@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { colord } from 'colord';
-import deepMerge from 'deepmerge';
 
 /**
  * WordPress dependencies
@@ -12,13 +11,14 @@ import {
 	privateApis,
 	__experimentalInputControlPrefixWrapper as InputControlPrefixWrapper,
 } from '@wordpress/components';
-import { useCallback, useState } from '@wordpress/element';
+import { useCallback } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import type { DataFormControlProps } from '../types';
 import { unlock } from '../lock-unlock';
+import getCustomValidity from './utils/get-custom-validity';
 
 const { ValidatedInputControl, Picker } = unlock( privateApis );
 
@@ -75,15 +75,10 @@ export default function Color< Item >( {
 	field,
 	onChange,
 	hideLabelFromVision,
+	validity,
 }: DataFormControlProps< Item > ) {
-	const { label, placeholder, description, setValue } = field;
+	const { label, placeholder, description, setValue, isValid } = field;
 	const value = field.getValue( { item: data } ) || '';
-	const [ customValidity, setCustomValidity ] =
-		useState<
-			React.ComponentProps<
-				typeof ValidatedInputControl
-			>[ 'customValidity' ]
-		>( undefined );
 
 	const handleColorChange = useCallback(
 		( colorObject: any ) => {
@@ -99,37 +94,10 @@ export default function Color< Item >( {
 		[ data, onChange, setValue ]
 	);
 
-	const onValidateControl = useCallback(
-		( newValue: any ) => {
-			const message = field.isValid?.custom?.(
-				deepMerge(
-					data,
-					setValue( {
-						item: data,
-						value: newValue,
-					} ) as Partial< Item >
-				),
-				field
-			);
-
-			if ( message ) {
-				setCustomValidity( {
-					type: 'invalid',
-					message,
-				} );
-				return;
-			}
-
-			setCustomValidity( undefined );
-		},
-		[ data, field, setValue ]
-	);
-
 	return (
 		<ValidatedInputControl
 			required={ !! field.isValid?.required }
-			onValidate={ onValidateControl }
-			customValidity={ customValidity }
+			customValidity={ getCustomValidity( isValid, validity ) }
 			label={ label }
 			placeholder={ placeholder }
 			value={ value }

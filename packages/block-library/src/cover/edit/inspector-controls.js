@@ -196,7 +196,7 @@ export default function CoverInspectorControls( {
 	return (
 		<>
 			<InspectorControls>
-				{ !! url && (
+				{ ( !! url || useFeaturedImage ) && (
 					<ToolsPanel
 						label={ __( 'Settings' ) }
 						resetAll={ () => {
@@ -297,7 +297,6 @@ export default function CoverInspectorControls( {
 								}
 							>
 								<TextareaControl
-									__nextHasNoMarginBottom
 									label={ __( 'Alternative text' ) }
 									value={ alt }
 									onChange={ ( newAlt ) =>

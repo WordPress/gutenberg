@@ -333,7 +333,6 @@ export default function PostFeaturedImageEdit( {
 							>
 								<TextControl
 									__next40pxDefaultSize
-									__nextHasNoMarginBottom
 									label={ __( 'Link relation' ) }
 									help={ createInterpolateElement(
 										__(

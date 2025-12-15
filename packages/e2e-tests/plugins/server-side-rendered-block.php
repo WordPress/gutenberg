@@ -48,6 +48,11 @@ add_action(
 		register_block_type(
 			'test/auto-register-block',
 			array(
+				'title'           => 'Auto Register Test Block',
+				'icon'            => 'admin-generic',
+				'category'        => 'widgets',
+				'description'     => 'A test block for auto-registration',
+				'keywords'        => array( 'serverblock', 'autotest' ),
 				'render_callback' => static function ( $attributes ) {
 					$wrapper_attributes = get_block_wrapper_attributes(
 						array(

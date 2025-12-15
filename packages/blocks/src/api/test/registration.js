@@ -1,5 +1,3 @@
-/* eslint-disable react/forbid-elements */
-
 /**
  * WordPress dependencies
  */
@@ -306,6 +304,46 @@ describe( 'blocks', () => {
 			} );
 		} );
 
+		it( 'should default to empty object when attributes is omitted and without warning', () => {
+			registerBlockType( 'core/test-block-omitted-attributes', {
+				title: 'block title',
+				category: 'text',
+				save: noop,
+			} );
+
+			// Verify no warning was shown (unlike when explicitly set to null/undefined)
+			expect( console ).not.toHaveWarned();
+
+			const blockType = getBlockType(
+				'core/test-block-omitted-attributes'
+			);
+			expect( blockType.attributes ).toEqual( {} );
+		} );
+
+		it.each( [
+			[ 'undefined', undefined ],
+			[ 'null', null ],
+		] )(
+			'should warn and default to empty object when attributes is %s',
+			( _label, value ) => {
+				registerBlockType( 'core/test-block-null-attributes', {
+					title: 'block title',
+					category: 'text',
+					save: noop,
+					attributes: value,
+				} );
+
+				expect( console ).toHaveWarnedWith(
+					'The block "core/test-block-null-attributes" is registering attributes as `null` or `undefined`. Use an empty object (`attributes: {}`) or exclude the `attributes` key.'
+				);
+
+				const blockType = getBlockType(
+					'core/test-block-null-attributes'
+				);
+				expect( blockType.attributes ).toEqual( {} );
+			}
+		);
+
 		it( 'should default to browser-initialized global attributes', () => {
 			const attributes = { ok: { type: 'boolean' } };
 			unstable__bootstrapServerSideBlockDefinitions( {
@@ -463,49 +501,6 @@ describe( 'blocks', () => {
 					{ name: 'bar', label: 'Bar' },
 				],
 				blockHooks: {},
-			} );
-		} );
-
-		// This test can be removed once the polyfill for blockHooks gets removed.
-		it( 'should polyfill blockHooks using metadata on the client when not set on the server', () => {
-			const blockName = 'tests/hooked-block';
-			unstable__bootstrapServerSideBlockDefinitions( {
-				[ blockName ]: {
-					category: 'widgets',
-				},
-			} );
-
-			const blockType = {
-				title: 'block title',
-			};
-			registerBlockType(
-				{
-					name: blockName,
-					blockHooks: {
-						'tests/block': 'firstChild',
-					},
-					category: 'ignored',
-				},
-				blockType
-			);
-			expect( getBlockType( blockName ) ).toEqual( {
-				apiVersion: 1,
-				name: blockName,
-				save: expect.any( Function ),
-				title: 'block title',
-				category: 'widgets',
-				icon: { src: BLOCK_ICON_DEFAULT },
-				attributes: {},
-				providesContext: {},
-				usesContext: [],
-				keywords: [],
-				selectors: {},
-				supports: {},
-				styles: [],
-				variations: [],
-				blockHooks: {
-					'tests/block': 'firstChild',
-				},
 			} );
 		} );
 
@@ -1730,184 +1725,6 @@ describe( 'blocks', () => {
 			expect( getBlockBindingsSource( 'core/testing' ) ).toBeUndefined();
 		} );
 
-		// Check EditorUI object validation
-		it( 'should reject EditorUI with invalid mode', () => {
-			registerBlockBindingsSource( {
-				name: 'core/testing',
-				label: 'testing',
-				editorUI: {
-					mode: 'invalid-mode',
-				},
-			} );
-			expect( console ).toHaveWarnedWith(
-				'EditorUI mode must be either "dropdown" or "modal"'
-			);
-			expect( getBlockBindingsSource( 'core/testing' ) ).toBeUndefined();
-		} );
-
-		it( 'should reject dropdown mode without data array', () => {
-			registerBlockBindingsSource( {
-				name: 'core/testing',
-				label: 'testing',
-				editorUI: {
-					mode: 'dropdown',
-					data: 'not-an-array',
-				},
-			} );
-			expect( console ).toHaveWarnedWith(
-				'EditorUI data must be an array of field objects for dropdown mode'
-			);
-			expect( getBlockBindingsSource( 'core/testing' ) ).toBeUndefined();
-		} );
-
-		it( 'should reject dropdown data with invalid field structure', () => {
-			registerBlockBindingsSource( {
-				name: 'core/testing',
-				label: 'testing',
-				editorUI: {
-					mode: 'dropdown',
-					data: [
-						{ label: 'Field 1' }, // missing 'args'
-					],
-				},
-			} );
-			expect( console ).toHaveWarnedWith(
-				'Each field must have "label" and "args" properties'
-			);
-			expect( getBlockBindingsSource( 'core/testing' ) ).toBeUndefined();
-		} );
-
-		it( 'should reject dropdown data with invalid type', () => {
-			registerBlockBindingsSource( {
-				name: 'core/testing',
-				label: 'testing',
-				editorUI: {
-					mode: 'dropdown',
-					data: [
-						{
-							label: 'Field 1',
-							args: { testArg: 'test' },
-							type: 'invalid-type',
-						},
-					],
-				},
-			} );
-			expect( console ).toHaveWarnedWith(
-				'Field "type" must be one of: null, boolean, object, array, string, integer, number'
-			);
-			expect( getBlockBindingsSource( 'core/testing' ) ).toBeUndefined();
-		} );
-
-		it( 'should reject dropdown data with invalid field type', () => {
-			registerBlockBindingsSource( {
-				name: 'core/testing',
-				label: 'testing',
-				editorUI: {
-					mode: 'dropdown',
-					data: [
-						{
-							label: 'Field 1',
-							args: { testArg: 'test' },
-							type: 'invalid-type',
-						},
-					],
-				},
-			} );
-			expect( console ).toHaveWarnedWith(
-				'Field "type" must be one of: null, boolean, object, array, string, integer, number'
-			);
-			expect( getBlockBindingsSource( 'core/testing' ) ).toBeUndefined();
-		} );
-
-		it( 'should accept valid dropdown data with type validation', () => {
-			registerBlockBindingsSource( {
-				name: 'core/testing',
-				label: 'testing',
-				editorUI: {
-					mode: 'dropdown',
-					data: [
-						{
-							label: 'String Field',
-							args: { exampleArg: 'example' },
-							type: 'string',
-						},
-						{
-							label: 'Number Field',
-							args: { exampleArg: 'numberExample' },
-							type: 'number',
-						},
-						{
-							label: 'Boolean Field',
-							args: { exampleArg: 'boolExample' },
-							type: 'boolean',
-						},
-					],
-				},
-			} );
-			expect( getBlockBindingsSource( 'core/testing' ) ).toBeDefined();
-			unregisterBlockBindingsSource( 'core/testing' );
-		} );
-
-		it( 'should reject modal mode without renderModalContent function', () => {
-			registerBlockBindingsSource( {
-				name: 'core/testing',
-				label: 'testing',
-				editorUI: {
-					mode: 'modal',
-				},
-			} );
-			expect( console ).toHaveWarnedWith(
-				'Modal mode requires renderModalContent function'
-			);
-			expect( getBlockBindingsSource( 'core/testing' ) ).toBeUndefined();
-		} );
-
-		it( 'should reject modal mode with invalid renderModalContent', () => {
-			registerBlockBindingsSource( {
-				name: 'core/testing',
-				label: 'testing',
-				editorUI: {
-					mode: 'modal',
-					renderModalContent: 'not-a-function',
-				},
-			} );
-			expect( console ).toHaveWarnedWith(
-				'renderModalContent must be a function'
-			);
-			expect( getBlockBindingsSource( 'core/testing' ) ).toBeUndefined();
-		} );
-
-		it( 'should successfully register valid dropdown mode source', () => {
-			registerBlockBindingsSource( {
-				name: 'core/testing',
-				label: 'testing',
-				editorUI: {
-					mode: 'dropdown',
-					data: [
-						{ label: 'Field 1', args: { testArg: 'abc' } },
-						{ label: 'Field 2', args: { testArg: 'def' } },
-					],
-				},
-			} );
-			expect( getBlockBindingsSource( 'core/testing' ) ).toBeDefined();
-			unregisterBlockBindingsSource( 'core/testing' );
-		} );
-
-		it( 'should successfully register valid modal mode source', () => {
-			registerBlockBindingsSource( {
-				name: 'core/testing',
-				label: 'testing',
-				editorUI: {
-					mode: 'modal',
-					renderModalContent: () => {
-						return 'mock-react-element';
-					},
-				},
-			} );
-			expect( getBlockBindingsSource( 'core/testing' ) ).toBeDefined();
-			unregisterBlockBindingsSource( 'core/testing' );
-		} );
-
 		// Check correct sources are registered as expected.
 		it( 'should register a valid source', () => {
 			const sourceProperties = {
@@ -1976,5 +1793,3 @@ describe( 'blocks', () => {
 		} );
 	} );
 } );
-
-/* eslint-enable react/forbid-elements */

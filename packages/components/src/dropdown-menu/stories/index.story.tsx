@@ -2,6 +2,7 @@
  * External dependencies
  */
 import type { Meta, StoryObj } from '@storybook/react';
+import { fn } from '@storybook/test';
 
 /**
  * Internal dependencies
@@ -27,9 +28,11 @@ const meta: Meta< typeof DropdownMenu > = {
 	component: DropdownMenu,
 	id: 'components-dropdownmenu',
 	parameters: {
-		actions: { argTypesRegex: '^on.*' },
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
+	},
+	args: {
+		onToggle: fn(),
 	},
 	argTypes: {
 		icon: {

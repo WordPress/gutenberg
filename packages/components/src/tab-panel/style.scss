@@ -21,7 +21,7 @@
 	cursor: pointer;
 	padding: 3px $grid-unit-20; // Use padding to offset the is-active border, this benefits Windows High Contrast mode
 	margin-left: 0;
-	font-weight: 500;
+	font-weight: $font-weight-regular;
 
 	&:focus:not(:disabled) {
 		position: relative;

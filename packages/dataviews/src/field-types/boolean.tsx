@@ -8,14 +8,45 @@ import { __ } from '@wordpress/i18n';
  */
 import type {
 	DataViewRenderFieldProps,
-	SortDirection,
-	FieldTypeDefinition,
 	NormalizedField,
+	SortDirection,
 } from '../types';
-import renderFromElements from './utils/render-from-elements';
+import type { FieldType } from '../types/private';
+import RenderFromElements from './utils/render-from-elements';
 import { OPERATOR_IS, OPERATOR_IS_NOT } from '../constants';
+import isValidElements from './utils/is-valid-elements';
+import isValidRequiredForBool from './utils/is-valid-required-for-bool';
 
-function sort( a: any, b: any, direction: SortDirection ) {
+function render( { item, field }: DataViewRenderFieldProps< any > ) {
+	if ( field.hasElements ) {
+		return <RenderFromElements item={ item } field={ field } />;
+	}
+
+	if ( field.getValue( { item } ) === true ) {
+		return __( 'True' );
+	}
+
+	if ( field.getValue( { item } ) === false ) {
+		return __( 'False' );
+	}
+
+	return null;
+}
+
+function isValidCustom< Item >( item: Item, field: NormalizedField< Item > ) {
+	const value = field.getValue( { item } );
+
+	if (
+		! [ undefined, '', null ].includes( value ) &&
+		! [ true, false ].includes( value )
+	) {
+		return __( 'Value must be true, false, or undefined' );
+	}
+
+	return null;
+}
+
+const sort = ( a: any, b: any, direction: SortDirection ) => {
 	const boolA = Boolean( a );
 	const boolB = Boolean( b );
 
@@ -30,43 +61,21 @@ function sort( a: any, b: any, direction: SortDirection ) {
 
 	// In descending order, true comes before false
 	return boolA ? -1 : 1;
-}
+};
 
 export default {
-	sort,
-	isValid: {
-		custom: ( item: any, field: NormalizedField< any > ) => {
-			const value = field.getValue( { item } );
-
-			if (
-				! [ undefined, '', null ].includes( value ) &&
-				! [ true, false ].includes( value )
-			) {
-				return __( 'Value must be true, false, or undefined' );
-			}
-
-			return null;
-		},
-	},
+	type: 'boolean',
+	render,
 	Edit: 'checkbox',
-	render: ( { item, field }: DataViewRenderFieldProps< any > ) => {
-		if ( field.elements ) {
-			return renderFromElements( { item, field } );
-		}
-
-		if ( field.getValue( { item } ) === true ) {
-			return __( 'True' );
-		}
-
-		if ( field.getValue( { item } ) === false ) {
-			return __( 'False' );
-		}
-
-		return null;
+	sort,
+	validate: {
+		required: isValidRequiredForBool,
+		elements: isValidElements,
+		custom: isValidCustom,
 	},
 	enableSorting: true,
-	filterBy: {
-		defaultOperators: [ OPERATOR_IS, OPERATOR_IS_NOT ],
-		validOperators: [ OPERATOR_IS, OPERATOR_IS_NOT ],
-	},
-} satisfies FieldTypeDefinition< any >;
+	enableGlobalSearch: false,
+	defaultOperators: [ OPERATOR_IS, OPERATOR_IS_NOT ],
+	validOperators: [ OPERATOR_IS, OPERATOR_IS_NOT ],
+	getFormat: () => ( {} ),
+} satisfies FieldType< any >;

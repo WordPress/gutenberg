@@ -1,10 +1,11 @@
 [
 	{
-		"name": "core/breadcrumbs",
+		"name": "core/missing",
 		"isValid": true,
 		"attributes": {
-			"separator": "/",
-			"showHomeLink": true
+			"originalName": "core/breadcrumbs",
+			"originalUndelimitedContent": "",
+			"originalContent": "<!-- wp:breadcrumbs /-->"
 		},
 		"innerBlocks": []
 	}
