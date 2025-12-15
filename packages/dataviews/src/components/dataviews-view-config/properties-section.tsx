@@ -106,15 +106,6 @@ export function PropertiesSection( {
 		}
 	}
 
-	const hiddenLockedFields = lockedFields.filter(
-		( { field, isVisibleFlag } ) =>
-			// @ts-expect-error
-			isDefined( field ) && ! ( view[ isVisibleFlag ] ?? true )
-	) as Array< {
-		field: NormalizedField< any >;
-		isVisibleFlag: string;
-	} >;
-
 	return (
 		<VStack className="dataviews-field-control" spacing={ 0 }>
 			{ showLabel && (
@@ -124,38 +115,6 @@ export function PropertiesSection( {
 			) }
 			<VStack className="dataviews-view-config__properties" spacing={ 0 }>
 				<ItemGroup isBordered isSeparated size="medium">
-					{ visibleLockedFields.map( ( { field, isVisibleFlag } ) => {
-						return (
-							<FieldItem
-								key={ field.id }
-								field={ field }
-								isVisible
-								onToggleVisibility={ () => {
-									onChangeView( {
-										...view,
-										[ isVisibleFlag ]: false,
-									} );
-								} }
-							/>
-						);
-					} ) }
-
-					{ hiddenLockedFields.map( ( { field, isVisibleFlag } ) => {
-						return (
-							<FieldItem
-								key={ field.id }
-								field={ field }
-								isVisible={ false }
-								onToggleVisibility={ () => {
-									onChangeView( {
-										...view,
-										[ isVisibleFlag ]: true,
-									} );
-								} }
-							/>
-						);
-					} ) }
-
 					{ regularFields.map( ( field ) => {
 						// Check if this is the last visible field to prevent hiding
 						const isVisible = visibleFieldIds.includes( field.id );
