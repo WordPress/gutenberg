@@ -31,44 +31,72 @@ const capitalize = ( str: string ): string =>
  * Converts a size value to a CSS design token property reference (with
  * fallback) or a calculated value based on the base unit.
  *
- * @param property The CSS property name.
- * @param target   The design system token target.
- * @param value    The size value, either a number (multiplier of base unit) or a string (token name).
- * @return A CSS value string with variable references.
+ * @param property    The CSS property name.
+ * @param target      The design system token target.
+ * @param value       The size value, either a number (multiplier of base unit) or a string (token name).
+ * @param offsetValue Optional CSS value to subtract (e.g., border width).
+ * @return            A CSS value string with variable references.
  */
 const getSpacingValue = (
 	property: string,
 	target: string,
-	value: number | string
+	value: number | string,
+	offsetValue?: string
+): string => {
+	const baseExpression =
+		typeof value === 'number'
+			? `var(--wpds-dimension-base) * ${ value }`
+			: `var(--wpds-dimension-${ property }-${ target }-${ value }, var(--wpds-dimension-${ property }-surface-${ value }))`;
+
+	if ( offsetValue ) {
+		return `calc(${ baseExpression } - ${ offsetValue })`;
+	}
+
+	return typeof value === 'number'
+		? `calc(${ baseExpression })`
+		: baseExpression;
+};
+
+const getBorderWidthValue = (
+	target: string,
+	borderWidth: Exclude< NonNullable< BoxProps[ 'borderWidth' ] >, number >
 ): string =>
-	typeof value === 'number'
-		? `calc(var(--wpds-dimension-base) * ${ value })`
-		: `var(--wpds-dimension-${ property }-${ target }-${ value }, var(--wpds-dimension-${ property }-surface-${ value }))`;
+	`var(--wpds-border-width-${ target }-${ borderWidth }, var(--wpds-border-width-surface-${ borderWidth }))`;
 
 /**
  * Generates CSS styles for properties with optionally directional values,
  * normalizing single values and objects with directional keys for logical
  * properties.
  *
- * @param property The CSS property name from BoxProps.
- * @param target   The design system token target.
- * @param value    The property value (single or object with directional keys).
- * @return A CSSProperties object with the computed styles.
+ * @param property    The CSS property name from BoxProps.
+ * @param target      The design system token target.
+ * @param value       The property value (single or object with directional keys).
+ * @param offsetValue Optional CSS value to subtract (e.g., border width).
+ * @return            A CSSProperties object with the computed styles.
  */
 const getDimensionVariantStyles = < T extends keyof BoxProps >(
 	property: T,
 	target: string,
-	value: NonNullable< BoxProps[ T ] >
+	value: NonNullable< BoxProps[ T ] >,
+	offsetValue?: string
 ): React.CSSProperties =>
 	typeof value !== 'object'
-		? { [ property ]: getSpacingValue( property, target, value ) }
+		? {
+				[ property ]: getSpacingValue(
+					property,
+					target,
+					value,
+					offsetValue
+				),
+		  }
 		: Object.keys( value ).reduce(
 				( result, key ) => ( {
 					...result,
 					[ property + capitalize( key ) ]: getSpacingValue(
 						property,
 						target,
-						value[ key ]
+						value[ key ],
+						offsetValue
 					),
 				} ),
 				{} as Record< string, string >
@@ -102,10 +130,18 @@ export const Box = forwardRef< HTMLDivElement, BoxProps >( function Box(
 		style.color = `var(--wpds-color-fg-${ target }-${ color }, var(--wpds-color-fg-content-${ color }))`;
 	}
 
+	const borderWidthValue =
+		borderWidth && getBorderWidthValue( target, borderWidth );
+
 	if ( padding ) {
 		Object.assign(
 			style,
-			getDimensionVariantStyles( 'padding', target, padding )
+			getDimensionVariantStyles(
+				'padding',
+				target,
+				padding,
+				borderWidthValue
+			)
 		);
 	}
 
@@ -113,8 +149,8 @@ export const Box = forwardRef< HTMLDivElement, BoxProps >( function Box(
 		style.borderRadius = `var(--wpds-border-radius-${ target }-${ borderRadius }, var(--wpds-border-radius-surface-${ borderRadius }))`;
 	}
 
-	if ( borderWidth ) {
-		style.borderWidth = `var(--wpds-border-width-${ target }-${ borderWidth }, var(--wpds-border-width-surface-${ borderWidth }))`;
+	if ( borderWidthValue ) {
+		style.borderWidth = borderWidthValue;
 		style.borderStyle = 'solid';
 	}
 
