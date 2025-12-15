@@ -6900,7 +6900,9 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 								'text' => 'purple',
 							),
 							'spacing'    => array(
-								'marginBottom' => '1em',
+								'margin' => array(
+									'bottom' => '1em',
+								),
 							),
 						),
 					),
