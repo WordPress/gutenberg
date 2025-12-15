@@ -10,16 +10,7 @@ import { decodeEntities } from '@wordpress/html-entities';
 import { SelectControl } from '../select-control';
 import type { TreeSelectProps, Tree, Truthy } from './types';
 import { useDeprecated36pxDefaultSizeProp } from '../utils/use-deprecated-props';
-import { ContextSystemProvider } from '../context';
 import { maybeWarnDeprecated36pxSize } from '../utils/deprecated-36px-size';
-
-const CONTEXT_VALUE = {
-	BaseControl: {
-		// Temporary during deprecation grace period: Overrides the underlying `__associatedWPComponentName`
-		// via the context system to override the value set by SelectControl.
-		_overrides: { __associatedWPComponentName: 'TreeSelect' },
-	},
-};
 
 function getSelectOptions(
 	tree: Tree[],
@@ -47,7 +38,6 @@ function getSelectOptions(
  *
  * 	return (
  * 		<TreeSelect
- * 			__nextHasNoMarginBottom
  * 			__next40pxDefaultSize
  * 			label="Parent page"
  * 			noOptionLabel="No parent page"
@@ -86,6 +76,7 @@ function getSelectOptions(
  */
 export function TreeSelect( props: TreeSelectProps ) {
 	const {
+		__nextHasNoMarginBottom: _, // Prevent passing to internal component
 		label,
 		noOptionLabel,
 		onChange,
@@ -108,14 +99,13 @@ export function TreeSelect( props: TreeSelectProps ) {
 	} );
 
 	return (
-		<ContextSystemProvider value={ CONTEXT_VALUE }>
-			<SelectControl
-				__shouldNotWarnDeprecated36pxSize
-				{ ...{ label, options, onChange } }
-				value={ selectedId }
-				{ ...restProps }
-			/>
-		</ContextSystemProvider>
+		<SelectControl
+			__shouldNotWarnDeprecated36pxSize
+			{ ...{ label, options, onChange } }
+			value={ selectedId }
+			{ ...restProps }
+			__nextHasNoMarginBottom
+		/>
 	);
 }
 
