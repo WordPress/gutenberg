@@ -152,7 +152,8 @@ export default function PostTemplateEdit( {
 					per_page: -1,
 					context: 'view',
 				} );
-				// Shared utility to build REST API parameters from taxonomy terms.
+				// Build REST API parameters from taxonomy terms, e.g.
+				// `category`, `tags_exclude`.
 				const buildTaxQuery = ( terms, suffix = '' ) => {
 					return Object.entries( terms || {} ).reduce(
 						( accumulator, [ taxonomySlug, termIds ] ) => {

@@ -63,7 +63,10 @@ export function TaxonomyControls( { onChange, query } ) {
 					taxQuery?.include?.[ taxonomy.slug ] || [];
 				const excludeTermIds =
 					taxQuery?.exclude?.[ taxonomy.slug ] || [];
-				const onChangeTaxQuery = ( newTermIds, key ) => {
+				const onChangeTaxQuery = (
+					newTermIds,
+					/** @type {'include'|'exclude'} */ key
+				) => {
 					const newPartialTaxQuery = {
 						...taxQuery?.[ key ],
 						[ taxonomy.slug ]: newTermIds,

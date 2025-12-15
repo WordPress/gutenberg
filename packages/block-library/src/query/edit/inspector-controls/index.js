@@ -77,11 +77,11 @@ export default function QueryInspectorControls( props ) {
 					( accumulator, [ taxonomy, terms ] ) => {
 						if ( supportedTaxonomies.includes( taxonomy ) ) {
 							accumulator[ taxonomy ] = terms;
-				}
-				return accumulator;
-			},
-			{}
-		);
+						}
+						return accumulator;
+					},
+					{}
+				);
 			};
 			const updatedTaxQuery = {};
 			const builtIncludeTaxQuery = buildTaxQuery( taxQuery.include );
@@ -89,12 +89,12 @@ export default function QueryInspectorControls( props ) {
 				updatedTaxQuery.include = builtIncludeTaxQuery;
 			}
 			const builtExcludeTaxQuery = buildTaxQuery( taxQuery.exclude );
-				if ( !! Object.keys( builtExcludeTaxQuery ).length ) {
+			if ( !! Object.keys( builtExcludeTaxQuery ).length ) {
 				updatedTaxQuery.exclude = builtExcludeTaxQuery;
 			}
-		updateQuery.taxQuery = !! Object.keys( updatedTaxQuery ).length
-			? updatedTaxQuery
-			: undefined;
+			updateQuery.taxQuery = !! Object.keys( updatedTaxQuery ).length
+				? updatedTaxQuery
+				: undefined;
 		}
 
 		if ( newValue !== 'post' ) {

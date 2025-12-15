@@ -123,7 +123,7 @@ if ( ! function_exists( 'gutenberg_resolve_pattern_blocks' ) ) {
 }
 
 /**
- * Adds update `taxQuery` args to handle exclusion of taxonomy terms.
+ * Update Query Loop's `taxQuery` prop to the new structure.
  *
  * @see 'query_loop_block_query_vars'
  *
@@ -132,13 +132,13 @@ if ( ! function_exists( 'gutenberg_resolve_pattern_blocks' ) ) {
  * @return array   The filtered query vars.
  */
 function gutenberg_update_tax_query_of_query_loop_block( $query, $block ) {
-	if ( empty( $block->context['query']['taxQuery'] ) || ! is_array( $block->context['query']['taxQuery'] ) ) {
+	if ( empty( $block->context['query']['taxQuery'] ) ) {
 		return $query;
 	}
 
 	// If there are keys other than include/exclude, it's the old
 	// format and has been handled already.
-	if ( ! empty( array_diff( array_keys( $block->context['query']['taxQuery'] ), array( 'include', 'exclude' ) ) ) ) {
+	if ( ! is_array( $block->context['query']['taxQuery'] ) || ! empty( array_diff( array_keys( $block->context['query']['taxQuery'] ), array( 'include', 'exclude' ) ) ) ) {
 		return $query;
 	}
 
@@ -149,7 +149,7 @@ function gutenberg_update_tax_query_of_query_loop_block( $query, $block ) {
 	$build_conditions = static function ( $terms, $operator = 'IN' ) {
 		$conditions = array();
 		foreach ( $terms as $taxonomy => $terms ) {
-			if ( is_taxonomy_viewable( $taxonomy ) && ! empty( $terms ) ) {
+			if ( ! empty( $terms ) && is_taxonomy_viewable( $taxonomy ) ) {
 				$conditions[] = array(
 					'taxonomy'         => $taxonomy,
 					'terms'            => array_filter( array_map( 'intval', $terms ) ),

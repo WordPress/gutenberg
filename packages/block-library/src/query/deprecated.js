@@ -19,6 +19,8 @@ const { cleanEmptyObject } = unlock( blockEditorPrivateApis );
 const migrateToTaxQuery = ( attributes ) => {
 	const { query } = attributes;
 	const { categoryIds, tagIds, taxQuery, ...newQuery } = query;
+	// First `taxQuery` migration that moves `categoryIds` and `tagIds`
+	// into `taxQuery` (v2 deprecation).
 	if ( !! categoryIds?.length || !! tagIds?.length ) {
 		newQuery.taxQuery = {
 			include: {
@@ -27,9 +29,10 @@ const migrateToTaxQuery = ( attributes ) => {
 			},
 		};
 	}
+	// Second `taxQuery` migration that changes the structure from
+	// taxQuery: { taxonomy: [ids] } to
+	// taxQuery: { include: { taxonomy: [ids] } } (v6 deprecation).
 	if ( !! Object.keys( taxQuery || {} ).length ) {
-		// Second taxQuery migration that changes the structure from
-		// taxQuery: { taxonomy: [ids] } to taxQuery: { include: { taxonomy: [ids] } }
 		newQuery.taxQuery = { include: taxQuery };
 	}
 	return {
