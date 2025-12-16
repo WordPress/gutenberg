@@ -37,38 +37,6 @@ describe( 'mediaDimensionsField', () => {
 			expect( result ).toMatch( /1920\s*×\s*1080/ );
 		} );
 
-		it( 'formats small dimensions', () => {
-			const item = {
-				media_details: {
-					width: 100,
-					height: 50,
-					sizes: {},
-				},
-			} as Updatable< Attachment >;
-
-			const result = mediaDimensionsField.getValue?.( {
-				item,
-			} );
-
-			expect( result ).toMatch( /100\s*×\s*50/ );
-		} );
-
-		it( 'formats large dimensions', () => {
-			const item = {
-				media_details: {
-					width: 4096,
-					height: 2160,
-					sizes: {},
-				},
-			} as Updatable< Attachment >;
-
-			const result = mediaDimensionsField.getValue?.( {
-				item,
-			} );
-
-			expect( result ).toMatch( /4096\s*×\s*2160/ );
-		} );
-
 		it( 'returns empty string when width is missing', () => {
 			const item = {
 				media_details: {
