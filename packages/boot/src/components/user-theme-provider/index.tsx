@@ -7,7 +7,7 @@ import { unlock } from '../../lock-unlock';
 const ThemeProvider: typeof ThemeProviderType =
 	unlock( themePrivateApis ).ThemeProvider;
 
-function getAdminThemePrimaryColor(): string | undefined {
+export function getAdminThemePrimaryColor(): string | undefined {
 	const theme =
 		document.body.className.match( /admin-color-([a-z]+)/ )?.[ 1 ];
 
