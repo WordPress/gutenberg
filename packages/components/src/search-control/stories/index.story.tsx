@@ -49,5 +49,4 @@ const Template: StoryFn< typeof SearchControl > = ( {
 export const Default = Template.bind( {} );
 Default.args = {
 	help: 'Help text to explain the input.',
-	__nextHasNoMarginBottom: true,
 };

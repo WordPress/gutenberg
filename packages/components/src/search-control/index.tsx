@@ -59,7 +59,7 @@ function SuffixItem( {
 
 function UnforwardedSearchControl(
 	{
-		__nextHasNoMarginBottom = false,
+		__nextHasNoMarginBottom: _, // Prevent passing to internal component
 		className,
 		onChange,
 		value,
@@ -89,14 +89,10 @@ function UnforwardedSearchControl(
 	const contextValue = useMemo(
 		() => ( {
 			BaseControl: {
-				// Overrides the underlying BaseControl `__nextHasNoMarginBottom` via the context system
-				// to provide backwards compatible margin for SearchControl.
-				// (In a standard InputControl, the BaseControl `__nextHasNoMarginBottom` is always set to true.)
-				_overrides: { __nextHasNoMarginBottom },
-				__associatedWPComponentName: 'SearchControl',
+				_overrides: { __nextHasNoMarginBottom: true },
 			},
 		} ),
-		[ __nextHasNoMarginBottom ]
+		[]
 	);
 
 	return (
@@ -147,7 +143,6 @@ function UnforwardedSearchControl(
  *
  *   return (
  *     <SearchControl
- *       __nextHasNoMarginBottom
  *       value={ searchInput }
  *       onChange={ setSearchInput }
  *     />
