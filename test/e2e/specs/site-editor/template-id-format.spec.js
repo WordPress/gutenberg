@@ -74,10 +74,6 @@ test.describe( 'Template ID Format', () => {
 		} );
 		await expect( editor.canvas.getByText( contentText ) ).toBeVisible();
 
-		// Wait a moment for editor to register the change and be ready to save.
-		// eslint-disable-next-line playwright/no-networkidle
-		await page.waitForLoadState( 'networkidle' );
-
 		await editor.saveSiteEditorEntities( {
 			isOnlyCurrentEntityDirty:
 				! experiments.includes( 'active_templates' ),
@@ -93,13 +89,20 @@ test.describe( 'Template ID Format', () => {
 		} );
 		await expect( editor.canvas.getByText( secondEditText ) ).toBeVisible();
 
-		// Wait a moment for editor to register the change and be ready to save.
-		// eslint-disable-next-line playwright/no-networkidle
-		await page.waitForLoadState( 'networkidle' );
-
-		await editor.saveSiteEditorEntities( {
-			isOnlyCurrentEntityDirty: true,
+		const editorTopBar = page.getByRole( 'region', {
+			name: 'Editor top bar',
 		} );
+		const saveButton = editorTopBar.getByRole( 'button', {
+			name: 'Save',
+			exact: true,
+		} );
+		await saveButton.click();
+
+		await page
+			.getByRole( 'button', { name: 'Dismiss this notice' } )
+			.getByText( /(updated|published)\./ )
+			.first()
+			.waitFor();
 	};
 
 	test( 'should open and edit templates correctly when active_templates experiment is enabled', async ( {
