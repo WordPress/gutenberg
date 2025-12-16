@@ -1929,7 +1929,7 @@ test.describe( 'Navigation block', () => {
 		} ) => {
 			await test.step( 'Select third navigation link (Empty Link)', async () => {
 				// Select the navigation
-				await navigation.getNavBlock().click();
+				await editor.selectBlocks( navigation.getNavBlock() );
 
 				// select the block via the inspector list view instead of the canvas, as that will
 				// open the link control in the canvas
