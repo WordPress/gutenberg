@@ -7,30 +7,22 @@ import { unlock } from '../../lock-unlock';
 const ThemeProvider: typeof ThemeProviderType =
 	unlock( themePrivateApis ).ThemeProvider;
 
+const THEME_PRIMARY_COLORS = new Map< string, string >( [
+	[ 'light', '#0085ba' ],
+	[ 'modern', '#3858e9' ],
+	[ 'blue', '#096484' ],
+	[ 'coffee', '#46403c' ],
+	[ 'ectoplasm', '#523f6d' ],
+	[ 'midnight', '#e14d43' ],
+	[ 'ocean', '#627c83' ],
+	[ 'sunrise', '#dd823b' ],
+] );
+
 export function getAdminThemePrimaryColor(): string | undefined {
 	const theme =
 		document.body.className.match( /admin-color-([a-z]+)/ )?.[ 1 ];
 
-	switch ( theme ) {
-		case 'light':
-			return '#0085ba';
-		case 'modern':
-			return '#3858e9';
-		case 'blue':
-			return '#096484';
-		case 'coffee':
-			return '#46403c';
-		case 'ectoplasm':
-			return '#523f6d';
-		case 'midnight':
-			return '#e14d43';
-		case 'ocean':
-			return '#627c83';
-		case 'sunrise':
-			return '#dd823b';
-	}
-
-	return undefined;
+	return theme && THEME_PRIMARY_COLORS.get( theme );
 }
 
 export function UserThemeProvider( {
