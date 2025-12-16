@@ -605,13 +605,11 @@ function buildMoment(
 ) {
 	const dateMoment = momentLib( dateValue );
 
-	if ( timezone && ! isUTCOffset( timezone ) ) {
-		// The ! isUTCOffset() check guarantees that timezone is a string.
-		return dateMoment.tz( timezone as string );
-	}
-
-	if ( timezone && isUTCOffset( timezone ) ) {
-		return dateMoment.utcOffset( timezone );
+	if ( timezone !== '' ) {
+		return isUTCOffset( timezone )
+			? dateMoment.utcOffset( timezone )
+			: // A false isUTCOffset() guarantees that timezone is a string.
+			  dateMoment.tz( timezone as string );
 	}
 
 	if ( settings.timezone.string ) {
