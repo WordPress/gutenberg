@@ -187,15 +187,13 @@ function CoverEdit( {
 	// what happens in onSelectMedia.
 	const hasImageBinding =
 		!! metadata?.bindings?.id || !! metadata?.bindings?.url;
-	const prevId = useRef();
-	const prevUrl = useRef();
+	const prevId = useRef( undefined );
+	const prevUrl = useRef( undefined );
 
 	useEffect( () => {
-		// Helper to check if image just became available (from undefined/null to a value)
+		// Helper to check if image just became available (from falsy to truthy value)
 		// We only want to trigger on the initial set, not when changing between values
-		const imageJustSet =
-			( prevId.current === undefined && id ) ||
-			( prevUrl.current === undefined && originalUrl );
+		const imageJustSet = ( ! prevId.current && id ) || ( ! prevUrl.current && originalUrl );
 
 		// Only adjust dimRatio if:
 		// 1. Image bindings are present
