@@ -41,6 +41,7 @@ import { getAllowedFormats } from './utils';
 import { Content, valueToHTMLString } from './content';
 import { withDeprecations } from './with-deprecations';
 import BlockContext from '../block-context';
+import { PrivateBlockContext } from '../block-list/private-block-context';
 
 export const keyboardShortcutContext = createContext();
 keyboardShortcutContext.displayName = 'keyboardShortcutContext';
@@ -49,8 +50,6 @@ export const inputEventContext = createContext();
 inputEventContext.displayName = 'inputEventContext';
 
 const instanceIdKey = Symbol( 'instanceId' );
-
-const EMPTY_OBJECT = {};
 
 /**
  * Removes props used for the native version of RichText so that they are not
@@ -129,8 +128,7 @@ export function RichTextWrapper(
 	const { clientId, isSelected: isBlockSelected } = context;
 	const blockBindings = context[ blockBindingsKey ];
 	const blockContext = useContext( BlockContext );
-	// const { bindableAttributes } = useContext( PrivateBlockContext );
-	const bindableAttributes = EMPTY_OBJECT;
+	const { bindableAttributes } = useContext( PrivateBlockContext );
 	const registry = useRegistry();
 	const selector = ( select ) => {
 		// Avoid subscribing to the block editor store if the block is not
