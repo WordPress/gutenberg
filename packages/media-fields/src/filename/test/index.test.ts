@@ -16,16 +16,41 @@ describe( 'filenameField', () => {
 		} );
 	} );
 
-	it( 'extracts filename from source_url', () => {
-		const item: Partial< MediaItem > = {
-			source_url: 'https://example.com/wp-content/uploads/2024/image.jpg',
-		};
+	describe( 'getValue', () => {
+		it( 'extracts filename from source_url', () => {
+			const item: Partial< MediaItem > = {
+				source_url:
+					'https://example.com/wp-content/uploads/2024/image.jpg',
+			};
 
-		const result = filenameField.getValue?.( {
-			item: item as MediaItem,
+			const result = filenameField.getValue?.( {
+				item: item as MediaItem,
+			} );
+
+			expect( result ).toBe( 'image.jpg' );
 		} );
 
-		expect( result ).toBe( 'image.jpg' );
+		it( 'returns undefined when source_url is undefined', () => {
+			const item: Partial< MediaItem > = {};
+
+			const result = filenameField.getValue?.( {
+				item: item as MediaItem,
+			} );
+
+			expect( result ).toBeUndefined();
+		} );
+
+		it( 'returns undefined when source_url is empty string', () => {
+			const item: Partial< MediaItem > = {
+				source_url: '',
+			};
+
+			const result = filenameField.getValue?.( {
+				item: item as MediaItem,
+			} );
+
+			expect( result ).toBeUndefined();
+		} );
 	} );
 
 	it( 'has a render function', () => {
