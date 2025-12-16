@@ -59,8 +59,8 @@ export default function Edit( {
 		pageComments,
 	} = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
-		return getSettings().__experimentalDiscussionSettings;
-	} );
+		return getSettings().__experimentalDiscussionSettings ?? {};
+	}, [] );
 
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 

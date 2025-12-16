@@ -38,7 +38,7 @@ export const useCommentQueryArgs = ( { postId } ) => {
 	} = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
 		const { __experimentalDiscussionSettings } = getSettings();
-		return __experimentalDiscussionSettings;
+		return __experimentalDiscussionSettings ?? {};
 	} );
 
 	// WP REST API doesn't allow fetching more than max items limit set per single page of data.
