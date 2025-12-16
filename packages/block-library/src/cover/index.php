@@ -170,11 +170,18 @@ function render_block_core_cover( $attributes, $content ) {
 		if ( $image_id ) {
 			$image = wp_get_attachment_image( $image_id, $attributes['sizeSlug'] ?? 'post-thumbnail', false, $attr );
 		} elseif ( $image_url ) {
-			$attr_string = '';
+			// Create an img tag using WP_HTML_Tag_Processor for safe attribute handling.
+			$processor = new WP_HTML_Tag_Processor( '<img />' );
+			$processor->next_tag( 'img' );
+			$processor->set_attribute( 'src', $image_url );
 			foreach ( $attr as $key => $value ) {
-				$attr_string .= ' ' . $key . '="' . esc_attr( $value ) . '"';
+				// Sanitize attribute names to prevent injection.
+				$safe_key = sanitize_key( $key );
+				if ( ! empty( $safe_key ) ) {
+					$processor->set_attribute( $safe_key, $value );
+				}
 			}
-			$image = '<img src="' . esc_url( $image_url ) . '"' . $attr_string . ' />';
+			$image = $processor->get_updated_html();
 		} else {
 			$image = '';
 		}
