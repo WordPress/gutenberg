@@ -17,7 +17,7 @@ describe( 'filesizeField', () => {
 	} );
 
 	describe( 'getValue - byte formatting logic', () => {
-		it( 'returns empty string for 0 bytes (handled by isVisible)', () => {
+		it( 'returns empty string for 0 bytes due to truthy check', () => {
 			const item = {
 				media_details: {
 					filesize: 0,
@@ -29,7 +29,8 @@ describe( 'filesizeField', () => {
 				item,
 			} );
 
-			// 0 bytes returns empty string because isVisible will hide it
+			// 0 bytes returns empty string because getValue uses a truthy check on filesize
+			// Note: formatFileSize would return "0 B" if called with 0, but it's never reached
 			expect( result ).toBe( '' );
 		} );
 
@@ -197,6 +198,14 @@ describe( 'filesizeField', () => {
 					sizes: {},
 				},
 			} as MediaItem;
+
+			const result = filesizeField.isVisible?.( item );
+
+			expect( result ).toBe( false );
+		} );
+
+		it( 'returns false when media_details is missing', () => {
+			const item = {} as MediaItem;
 
 			const result = filesizeField.isVisible?.( item );
 
