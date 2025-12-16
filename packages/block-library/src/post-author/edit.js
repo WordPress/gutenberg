@@ -98,7 +98,6 @@ function AuthorCombobox( { value, onChange } ) {
 	return (
 		<ComboboxControl
 			__next40pxDefaultSize
-			__nextHasNoMarginBottom
 			label={ __( 'Author' ) }
 			options={ authorOptions }
 			value={ value?.id }
