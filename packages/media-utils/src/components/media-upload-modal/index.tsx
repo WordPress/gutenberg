@@ -10,7 +10,7 @@ import {
 import { resolveSelect } from '@wordpress/data';
 import { Modal, DropZone, FormFileUpload, Button } from '@wordpress/components';
 import { upload as uploadIcon } from '@wordpress/icons';
-import { DataViewsPicker } from '@wordpress/dataviews';
+import { DataViewsPicker, useInfiniteScrollData } from '@wordpress/dataviews';
 import type { View, Field, ActionButton } from '@wordpress/dataviews';
 import {
 	altTextField,
@@ -168,6 +168,7 @@ export function MediaUploadModal( {
 		page: 1,
 		perPage: 20,
 		filters: [],
+		infiniteScrollEnabled: true,
 	} ) );
 
 	// Build query args based on view properties, similar to PostList
@@ -215,10 +216,25 @@ export function MediaUploadModal( {
 	// Fetch all media attachments using WordPress core data with permissions
 	const {
 		records: mediaRecords,
-		isResolving: isLoading,
-		totalItems,
-		totalPages,
+		isResolving: isLoadingRecords,
+		totalItems: totalItemsRaw,
+		totalPages: totalPagesRaw,
 	} = useEntityRecordsWithPermissions( 'postType', 'attachment', queryArgs );
+
+	// Use infinite scroll hook to manage data loading and visibility
+	const {
+		data: displayData,
+		paginationInfo: infiniteScrollPaginationInfo,
+		isLoadingMore,
+	} = useInfiniteScrollData( {
+		view,
+		setView,
+		data: ( mediaRecords || [] ) as ( RestAttachment & { id: number } )[],
+		getItemId: ( item: RestAttachment ) => String( item.id ),
+		totalDataLength: totalItemsRaw || 0,
+	} );
+
+	const isLoading = isLoadingRecords || isLoadingMore;
 
 	const fields: Field< RestAttachment >[] = useMemo(
 		() => [
@@ -308,10 +324,11 @@ export function MediaUploadModal( {
 
 	const paginationInfo = useMemo(
 		() => ( {
-			totalItems,
-			totalPages,
+			...infiniteScrollPaginationInfo,
+			totalItems: totalItemsRaw,
+			totalPages: totalPagesRaw,
 		} ),
-		[ totalItems, totalPages ]
+		[ infiniteScrollPaginationInfo, totalItemsRaw, totalPagesRaw ]
 	);
 
 	const defaultLayouts = useMemo(
@@ -392,7 +409,7 @@ export function MediaUploadModal( {
 				label={ __( 'Drop files to upload' ) }
 			/>
 			<DataViewsPicker
-				data={ mediaRecords || [] }
+				data={ displayData }
 				fields={ fields }
 				view={ view }
 				onChangeView={ setView }
