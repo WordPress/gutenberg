@@ -18,6 +18,7 @@ import edit from './edit';
 import metadata from './block.json';
 import save from './save';
 import transforms from './transforms';
+import variations from './variations';
 import { unlock } from '../lock-unlock';
 
 const { fieldsKey, formKey } = unlock( blocksPrivateApis );
@@ -73,6 +74,7 @@ export const settings = {
 	},
 	edit,
 	save,
+	variations,
 };
 
 if ( window.__experimentalContentOnlyInspectorFields ) {
