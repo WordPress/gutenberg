@@ -344,14 +344,7 @@ async function bundlePackage( packageName, options = {} ) {
 			};
 		}
 
-		const bundlePlugins = [
-			momentTimezoneAliasPlugin(),
-			wordpressExternalsPlugin(
-				'index.min',
-				'iife',
-				packageJson.wpScriptExtraDependencies || []
-			),
-		];
+		const baseBundlePlugins = [ momentTimezoneAliasPlugin() ];
 
 		builds.push(
 			esbuild.build( {
@@ -359,14 +352,30 @@ async function bundlePackage( packageName, options = {} ) {
 				outfile: path.join( outputDir, 'index.min.js' ),
 				minify: true,
 				define: getDefine( false ),
-				plugins: bundlePlugins,
+				plugins: [
+					...baseBundlePlugins,
+					wordpressExternalsPlugin(
+						'index.min',
+						'iife',
+						packageJson.wpScriptExtraDependencies || [],
+						true // Generate asset file for minified build
+					),
+				],
 			} ),
 			esbuild.build( {
 				...baseConfig,
 				outfile: path.join( outputDir, 'index.js' ),
 				minify: false,
 				define: getDefine( true ),
-				plugins: bundlePlugins,
+				plugins: [
+					...baseBundlePlugins,
+					wordpressExternalsPlugin(
+						'index.min',
+						'iife',
+						packageJson.wpScriptExtraDependencies || [],
+						false // Skip asset file for non-minified build
+					),
+				],
 			} )
 		);
 
@@ -397,9 +406,6 @@ async function bundlePackage( packageName, options = {} ) {
 					: exportName.replace( /^\.\//, '' );
 			const entryPoint = path.join( packageDir, exportPath );
 			const baseFileName = path.basename( fileName );
-			const modulePlugins = [
-				wordpressExternalsPlugin( `${ baseFileName }.min`, 'esm' ),
-			];
 
 			builds.push(
 				esbuild.build( {
@@ -415,7 +421,14 @@ async function bundlePackage( packageName, options = {} ) {
 					platform: 'browser',
 					minify: true,
 					define: getDefine( false ),
-					plugins: modulePlugins,
+					plugins: [
+						wordpressExternalsPlugin(
+							`${ baseFileName }.min`,
+							'esm',
+							[],
+							true // Generate asset file for minified build
+						),
+					],
 				} ),
 				esbuild.build( {
 					entryPoints: [ entryPoint ],
@@ -430,7 +443,14 @@ async function bundlePackage( packageName, options = {} ) {
 					platform: 'browser',
 					minify: false,
 					define: getDefine( true ),
-					plugins: modulePlugins,
+					plugins: [
+						wordpressExternalsPlugin(
+							`${ baseFileName }.min`,
+							'esm',
+							[],
+							false // Skip asset file for non-minified build
+						),
+					],
 				} )
 			);
 
@@ -1279,10 +1299,6 @@ async function buildRoute( routeName ) {
 		} );
 
 		if ( routeEntryPoints.length > 0 ) {
-			const routePlugins = [
-				wordpressExternalsPlugin( 'route.min', 'esm' ),
-			];
-
 			// Build both minified and non-minified versions in parallel
 			await Promise.all( [
 				esbuild.build( {
@@ -1293,7 +1309,14 @@ async function buildRoute( routeName ) {
 					target: browserslistToEsbuild(),
 					minify: true,
 					define: getDefine( false ),
-					plugins: routePlugins,
+					plugins: [
+						wordpressExternalsPlugin(
+							'route.min',
+							'esm',
+							[],
+							true // Generate asset file for minified build
+						),
+					],
 				} ),
 				esbuild.build( {
 					entryPoints: routeEntryPoints,
@@ -1303,7 +1326,14 @@ async function buildRoute( routeName ) {
 					target: browserslistToEsbuild(),
 					minify: false,
 					define: getDefine( true ),
-					plugins: routePlugins,
+					plugins: [
+						wordpressExternalsPlugin(
+							'route.min',
+							'esm',
+							[],
+							false // Skip asset file for non-minified build
+						),
+					],
 				} ),
 			] );
 		}
@@ -1318,11 +1348,6 @@ async function buildRoute( routeName ) {
 		// Write temporary entry file
 		await writeFile( tempEntryPath, syntheticEntry );
 
-		const contentPlugins = [
-			wordpressExternalsPlugin( 'content.min', 'esm' ),
-			...styleBundlingPlugins,
-		];
-
 		// Build both minified and non-minified versions in parallel
 		await Promise.all( [
 			esbuild.build( {
@@ -1333,7 +1358,15 @@ async function buildRoute( routeName ) {
 				target: browserslistToEsbuild(),
 				minify: true,
 				define: getDefine( false ),
-				plugins: contentPlugins,
+				plugins: [
+					wordpressExternalsPlugin(
+						'content.min',
+						'esm',
+						[],
+						true // Generate asset file for minified build
+					),
+					...styleBundlingPlugins,
+				],
 			} ),
 			esbuild.build( {
 				entryPoints: [ tempEntryPath ],
@@ -1343,7 +1376,15 @@ async function buildRoute( routeName ) {
 				target: browserslistToEsbuild(),
 				minify: false,
 				define: getDefine( true ),
-				plugins: contentPlugins,
+				plugins: [
+					wordpressExternalsPlugin(
+						'content.min',
+						'esm',
+						[],
+						false // Skip asset file for non-minified build
+					),
+					...styleBundlingPlugins,
+				],
 			} ),
 		] );
 

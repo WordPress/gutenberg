@@ -64,12 +64,14 @@ export function createWordpressExternalsPlugin(
 	 * @param {string}        assetName         Base name for the asset file (e.g., 'index.min').
 	 * @param {string}        buildFormat       Build format: 'iife' for classic scripts, 'esm' for modules.
 	 * @param {Array<string>} extraDependencies Additional dependencies to include in the asset file.
+	 * @param {boolean}       generateAssetFile Whether to generate the .asset.php file. Default true.
 	 * @return {Object} esbuild plugin object.
 	 */
 	return function wordpressExternalsPlugin(
 		assetName = 'index.min',
 		buildFormat = 'iife',
-		extraDependencies = []
+		extraDependencies = [],
+		generateAssetFile = true
 	) {
 		return {
 			name: 'wordpress-externals',
@@ -312,17 +314,6 @@ export function createWordpressExternalsPlugin(
 							return;
 						}
 
-						// Merge discovered dependencies with extra dependencies
-						const allDependencies = new Set( [
-							...dependencies,
-							...extraDependencies,
-						] );
-
-						const dependenciesString = Array.from( allDependencies )
-							.sort()
-							.map( ( dep ) => `'${ dep }'` )
-							.join( ', ' );
-
 						// Format module dependencies as array of arrays with 'id' and 'import' keys
 						const moduleDependenciesArray = Array.from(
 							moduleDependencies.entries()
@@ -337,6 +328,22 @@ export function createWordpressExternalsPlugin(
 							moduleDependenciesArray.length > 0
 								? moduleDependenciesArray.join( ', ' )
 								: '';
+
+						// Only generate asset file if requested
+						if ( ! generateAssetFile ) {
+							return;
+						}
+
+						// Merge discovered dependencies with extra dependencies
+						const allDependencies = new Set( [
+							...dependencies,
+							...extraDependencies,
+						] );
+
+						const dependenciesString = Array.from( allDependencies )
+							.sort()
+							.map( ( dep ) => `'${ dep }'` )
+							.join( ', ' );
 
 						// Determine output file path from build config
 						let outputFilePath;
