@@ -919,7 +919,7 @@ Save both the `block.json` and `save.js` files; you won't need to make any more 
 
 The `save()` function now uses the new `fallbackCurrentYear`, so it needs to be set somewhere. Let's use the `Edit()` function.
 
-Open the `edit.js` file and start by defining the `fallbackCurrentYear` variable at the top of the `Edit()` functional alongside the other attributes. Next, review what's happening in the function.
+Open the `edit.js` file and start by defining the `fallbackCurrentYear` variable at the top of the `Edit()` function alongside the other attributes. Next, review what's happening in the function.
 
 When the block loads in the Editor, the `currentYear` variable is defined. The function then uses this variable to set the content of the block.
 
