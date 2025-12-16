@@ -9,9 +9,7 @@ import type { Meta } from '@storybook/react';
 import {
 	useState,
 	useMemo,
-	useCallback,
 	useEffect,
-	useRef,
 	createInterpolateElement,
 } from '@wordpress/element';
 import {
@@ -49,6 +47,7 @@ import {
 	orderEventFields,
 	orderEventActions,
 } from './dataviews.fixtures';
+import { useInfiniteScrollData } from '../dataviews-layouts/utils/useInfiniteScrollData';
 
 import './dataviews.style.css';
 
@@ -532,235 +531,20 @@ export const InfiniteScroll = () => {
 		return filterSortAndPaginate( data, view, fields );
 	}, [ view ] );
 
-	// Custom pagination handler that simulates server-side pagination
-	const [ allLoadedRecords, setAllLoadedRecords ] = useState<
-		( SpaceObject | null )[]
-	>( [] );
-	const [ isLoadingMore, setIsLoadingMore ] = useState( false );
-	const [ scrollDirection, setScrollDirection ] = useState<
-		'up' | 'down' | undefined
-	>( undefined );
+	const getItemId = ( item: SpaceObject ) => item.id.toString();
 
-	const [ visibleEntries, setVisibleEntries ] = useState< number[] >( [] );
-
-	// Track the mapping of item IDs to their positions in the full dataset
-	const positionMapRef = useRef< Map< string, number > >( new Map() );
-
-	// Track the range of data we've loaded to maintain placeholders
-	const loadedRangeRef = useRef< { min: number; max: number } | null >(
-		null
-	);
-
-	const totalItems = data.length;
-	const totalPages = Math.ceil( totalItems / 6 ); // perPage is 6.
-	const currentPage = view.page || 1;
-	const hasMoreData = currentPage < totalPages;
-	const getItemId = ( item: {
-		id: any;
-		title?: string;
-		description?: string;
-		image?: string;
-		type?: string;
-		isPlanet?: boolean;
-		categories?: string[];
-		satellites?: number;
-		date?: string;
-		datetime?: string;
-		email?: string;
-	} ) => item.id.toString();
-
-	const infiniteScrollHandler = useCallback(
-		( direction: 'up' | 'down' ) => {
-			if ( isLoadingMore ) {
-				return;
-			}
-
-			// Handle scrolling down to load next page
-			if ( direction === 'down' && currentPage < totalPages ) {
-				setIsLoadingMore( true );
-				setScrollDirection( 'down' );
-				setView( {
-					...view,
-					page: currentPage + 1,
-				} );
-			}
-
-			// Handle scrolling up to load previous page
-			if ( direction === 'up' && currentPage > 1 ) {
-				setIsLoadingMore( true );
-				setScrollDirection( 'up' );
-				setView( {
-					...view,
-					page: currentPage - 1,
-				} );
-			}
-		},
-		[ isLoadingMore, currentPage, totalPages, view ]
-	);
-
-	// Initialize data on first load or when view changes significantly
-	useEffect( () => {
-		if (
-			( currentPage === 1 && ! allLoadedRecords.length ) ||
-			! view.infiniteScrollEnabled
-		) {
-			// First page - replace all data and initialize range
-			const startPosition = 1;
-			const records = shownData.map( ( record, index ) => {
-				const position = view.infiniteScrollEnabled
-					? startPosition + index
-					: undefined;
-				if ( position !== undefined ) {
-					positionMapRef.current.set( getItemId( record ), position );
-				}
-				return {
-					...record,
-					position,
-				};
-			} );
-			setAllLoadedRecords( records );
-
-			if ( records.length > 0 ) {
-				loadedRangeRef.current = {
-					min: Math.min( ...records.map( ( r ) => r.id ) ),
-					max: Math.max( ...records.map( ( r ) => r.id ) ),
-				};
-			}
-		} else {
-			// Subsequent pages - load more data with placeholders
-			setAllLoadedRecords( ( prev ) => {
-				const existingIds = new Set(
-					prev
-						.filter(
-							( item ): item is SpaceObject => item !== null
-						)
-						.map( getItemId )
-				);
-				// Calculate start position based on the highest position already tracked
-				let nextPosition =
-					positionMapRef.current.size > 0
-						? Math.max( ...positionMapRef.current.values() ) + 1
-						: 1;
-
-				const newRecords = shownData
-					.filter(
-						( record ) => ! existingIds.has( getItemId( record ) )
-					)
-					.map( ( record ) => {
-						const itemId = getItemId( record );
-						let position: number | undefined;
-
-						if ( view.infiniteScrollEnabled ) {
-							// Check if this record already has a position
-							const existingPosition =
-								positionMapRef.current.get( itemId );
-							if ( existingPosition !== undefined ) {
-								position = existingPosition;
-							} else {
-								// Assign new position and increment for next record
-								position = nextPosition;
-								positionMapRef.current.set( itemId, position );
-								nextPosition++;
-							}
-						}
-
-						return {
-							...record,
-							position,
-						};
-					} );
-
-				if ( newRecords.length === 0 ) {
-					return prev;
-				}
-
-				// Update the loaded range
-				const allRecords =
-					scrollDirection === 'up'
-						? [ ...newRecords, ...prev ]
-						: [ ...prev, ...newRecords ];
-
-				const allIds = allRecords
-					.filter( ( r ): r is SpaceObject => r !== null )
-					.map( ( r ) => r.id );
-				const newMin = Math.min( ...allIds );
-				const newMax = Math.max( ...allIds );
-
-				loadedRangeRef.current = {
-					min: newMin,
-					max: newMax,
-				};
-
-				// Create array with placeholders to maintain positions
-				const result: ( SpaceObject | null )[] = [];
-				for ( let id = newMin; id <= newMax; id++ ) {
-					const record = allRecords.find(
-						( r ) => r !== null && r.id === id
-					);
-					result.push( record || null );
-				}
-
-				// Filter to keep only records that should remain visible
-				// Keep items within a certain range of visible entries
-				if ( visibleEntries.length > 0 ) {
-					const visibleMin = Math.min( ...visibleEntries );
-					const visibleMax = Math.max( ...visibleEntries );
-					const buffer = 6;
-
-					const filtered = result
-						.map( ( record, index ) => {
-							const itemId = newMin + index;
-							// Keep records that are null (placeholders) or within the visible range
-							if ( record === null ) {
-								return record;
-							}
-							// Keep items within buffer range of visible items
-							if (
-								itemId >= visibleMin - buffer &&
-								itemId <= visibleMax + buffer
-							) {
-								return record;
-							}
-							// Replace with placeholder if outside buffer
-							return null;
-						} )
-						.filter(
-							( record, index ) =>
-								record !== null ||
-								( newMin + index >= visibleMin - buffer &&
-									newMin + index <= visibleMax + buffer )
-						);
-
-					return filtered;
-				}
-
-				return result.filter( ( r ) => r !== null );
-			} );
-		}
-		setIsLoadingMore( false );
-	}, [
-		shownData,
-		view.search,
-		view.filters,
-		view.perPage,
-		currentPage,
-		view.infiniteScrollEnabled,
-		allLoadedRecords.length,
-		scrollDirection,
-		visibleEntries,
-	] );
-
-	const paginationInfo = {
-		totalItems,
-		totalPages,
-		infiniteScrollHandler,
-		setVisibleEntries,
-	};
-
-	// Filter out null placeholders for display
-	const displayData = allLoadedRecords.filter(
-		( record ): record is SpaceObject => record !== null
-	);
+	const {
+		data: displayData,
+		paginationInfo,
+		isLoadingMore,
+		hasMoreData,
+	} = useInfiniteScrollData( {
+		view,
+		setView,
+		data: shownData,
+		getItemId,
+		totalDataLength: data.length,
+	} );
 
 	return (
 		<>
@@ -780,7 +564,7 @@ export const InfiniteScroll = () => {
 				} }
 			>
 				{ __( 'Infinite Scroll Demo' ) }: { displayData.length } of{ ' ' }
-				{ totalItems } items loaded.
+				{ data.length } items loaded.
 				{ isLoadingMore && __( 'Loading more…' ) }
 				{ ! hasMoreData && __( 'All items loaded!' ) }
 			</Text>
