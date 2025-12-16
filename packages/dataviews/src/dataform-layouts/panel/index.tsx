@@ -175,12 +175,13 @@ export default function FormPanelField< Item >( {
 
 	const labelContent = showError ? (
 		<Tooltip text={ errorMessage } placement="top">
-			<span className="dataforms-layouts-panel__field-label-content">
-				<span className="dataforms-layouts-panel__field-error-indicator">
-					<Icon icon={ errorIcon } size={ 16 } />
-				</span>
-				{ fieldLabel }
-			</span>
+			<HStack
+				className="dataforms-layouts-panel__field-label-error-content"
+				justify="flex-start"
+			>
+				<Icon icon={ errorIcon } size={ 16 } />
+				<>{ fieldLabel }</>
+			</HStack>
 		</Tooltip>
 	) : (
 		fieldLabel
@@ -232,9 +233,11 @@ export default function FormPanelField< Item >( {
 			<HStack className="dataforms-layouts-panel__field dataforms-layouts-panel__field--label-position-none">
 				{ showError && (
 					<Tooltip text={ errorMessage } placement="top">
-						<span className="dataforms-layouts-panel__field-error-indicator">
-							<Icon icon={ errorIcon } size={ 20 } />
-						</span>
+						<Icon
+							className="dataforms-layouts-panel__field-label-error-content"
+							icon={ errorIcon }
+							size={ 20 }
+						/>
 					</Tooltip>
 				) }
 				<div className="dataforms-layouts-panel__field-control">
