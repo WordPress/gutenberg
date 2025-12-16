@@ -704,7 +704,6 @@ export default function GalleryEdit( props ) {
 								}
 							>
 								<SelectControl
-									__nextHasNoMarginBottom
 									label={ __( 'Resolution' ) }
 									help={ __(
 										'Select the size of the source images.'
@@ -770,7 +769,6 @@ export default function GalleryEdit( props ) {
 							>
 								<SelectControl
 									__next40pxDefaultSize
-									__nextHasNoMarginBottom
 									label={ __( 'Aspect ratio' ) }
 									help={ __(
 										'Set a consistent aspect ratio for all images in the gallery.'
@@ -803,7 +801,6 @@ export default function GalleryEdit( props ) {
 						) }
 						{ imageSizeOptions?.length > 0 && (
 							<SelectControl
-								__nextHasNoMarginBottom
 								label={ __( 'Resolution' ) }
 								help={ __(
 									'Select the size of the source images.'
@@ -816,7 +813,6 @@ export default function GalleryEdit( props ) {
 							/>
 						) }
 						<SelectControl
-							__nextHasNoMarginBottom
 							label={ __( 'Link' ) }
 							value={ linkTo }
 							onChange={ setLinkTo }
@@ -843,7 +839,6 @@ export default function GalleryEdit( props ) {
 						) }
 						{ aspectRatioOptions.length > 1 && (
 							<SelectControl
-								__nextHasNoMarginBottom
 								label={ __( 'Aspect Ratio' ) }
 								help={ __(
 									'Set a consistent aspect ratio for all images in the gallery.'

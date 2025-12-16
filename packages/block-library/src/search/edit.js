@@ -390,7 +390,6 @@ export default function SearchEdit( {
 						<SelectControl
 							value={ buttonPosition }
 							__next40pxDefaultSize
-							__nextHasNoMarginBottom
 							label={ __( 'Button position' ) }
 							onChange={ ( value ) => {
 								setAttributes( {
@@ -490,7 +489,6 @@ export default function SearchEdit( {
 								} }
 								isBlock
 								__next40pxDefaultSize
-								__nextHasNoMarginBottom
 							>
 								{ PERCENTAGE_WIDTHS.map( ( widthValue ) => {
 									return (

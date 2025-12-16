@@ -128,7 +128,6 @@ registerBlockType( 'my-plugin/inspector-controls-example', {
 						/>
 
 						<SelectControl
-							__nextHasNoMarginBottom
 							label="Select Control"
 							value={ selectField }
 							options={ [

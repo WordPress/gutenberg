@@ -276,7 +276,7 @@ module.exports = {
 					...restrictedSyntax,
 					...restrictedSyntaxComponents,
 					// Temporary rules until we're ready to officially deprecate the bottom margins.
-					...[ 'BaseControl', 'SearchControl', 'SelectControl' ].map(
+					...[ 'BaseControl', 'SearchControl' ].map(
 						( componentName ) => ( {
 							selector: `JSXOpeningElement[name.name="${ componentName }"]:not(:has(JSXAttribute[name.name="__nextHasNoMarginBottom"]))`,
 							message:

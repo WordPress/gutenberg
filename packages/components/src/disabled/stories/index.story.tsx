@@ -52,7 +52,6 @@ const Form = () => {
 				onChange={ setTextAreaValue }
 			/>
 			<SelectControl
-				__nextHasNoMarginBottom
 				__next40pxDefaultSize
 				label="Select Control"
 				onChange={ () => {} }

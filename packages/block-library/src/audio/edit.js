@@ -224,7 +224,6 @@ function AudioEdit( {
 					>
 						<SelectControl
 							__next40pxDefaultSize
-							__nextHasNoMarginBottom
 							label={ _x(
 								'Preload',
 								'noun; Audio block parameter'

@@ -169,7 +169,6 @@ function OperatorSelector( {
 					} }
 					size="small"
 					variant="minimal"
-					__nextHasNoMarginBottom
 					hideLabelFromVision
 				/>
 			</HStack>

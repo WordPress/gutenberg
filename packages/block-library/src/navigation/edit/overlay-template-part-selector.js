@@ -194,7 +194,6 @@ export default function OverlayTemplatePartSelector( {
 			/>
 			<SelectControl
 				__next40pxDefaultSize
-				__nextHasNoMarginBottom
 				label={ __( 'Overlay template' ) }
 				value={ overlay || '' }
 				options={ options }
