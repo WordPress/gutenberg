@@ -21,9 +21,14 @@ export const LINE_HEIGHT_SUPPORT_KEY = 'typography.lineHeight';
  */
 export function LineHeightEdit( props ) {
 	const {
-		attributes: { style },
+		attributes: { style, fitText },
 		setAttributes,
 	} = props;
+
+	// Hide line height UI when fitText is enabled
+	if ( fitText ) {
+		return null;
+	}
 
 	const onChange = ( newLineHeightValue ) => {
 		const newStyle = {

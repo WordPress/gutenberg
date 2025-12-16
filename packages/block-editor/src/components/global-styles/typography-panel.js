@@ -511,7 +511,7 @@ export default function TypographyPanel( {
 					/>
 				</ToolsPanelItem>
 			) }
-			{ hasLineHeightEnabled && (
+			{ hasLineHeightEnabled && ! fitText && (
 				<ToolsPanelItem
 					className="single-column"
 					label={ __( 'Line height' ) }
