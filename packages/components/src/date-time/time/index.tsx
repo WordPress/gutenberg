@@ -1,13 +1,14 @@
 /**
  * External dependencies
  */
-import { startOfMinute, format, set, setMonth } from 'date-fns';
+import { startOfMinute, set, setMonth } from 'date-fns';
 
 /**
  * WordPress dependencies
  */
 import { useState, useMemo, useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { dateI18n } from '@wordpress/date';
 
 /**
  * Internal dependencies
@@ -96,15 +97,15 @@ export function TimePicker( {
 
 	const { day, month, year, minutes, hours } = useMemo(
 		() => ( {
-			day: format( date, 'dd' ),
-			month: format(
-				date,
-				'MM'
+			// Use dateI18n to display values in the configured timezone.
+			day: dateI18n( 'd', date ),
+			month: dateI18n(
+				'm',
+				date
 			) as ( typeof monthOptions )[ number ][ 'value' ],
-			year: format( date, 'yyyy' ),
-			minutes: format( date, 'mm' ),
-			hours: format( date, 'HH' ),
-			am: format( date, 'a' ),
+			year: dateI18n( 'Y', date ),
+			minutes: dateI18n( 'i', date ),
+			hours: dateI18n( 'H', date ),
 		} ),
 		[ date ]
 	);
@@ -120,7 +121,13 @@ export function TimePicker( {
 
 			const newDate = set( date, { [ method ]: numberValue } );
 			setDate( newDate );
-			onChange?.( format( newDate, TIMEZONELESS_FORMAT ) );
+			onChange?.(
+				dateI18n(
+					TIMEZONELESS_FORMAT,
+					newDate,
+					-newDate.getTimezoneOffset()
+				)
+			);
 		};
 		return callback;
 	};
@@ -134,7 +141,13 @@ export function TimePicker( {
 			minutes: newMinutes,
 		} );
 		setDate( newDate );
-		onChange?.( format( newDate, TIMEZONELESS_FORMAT ) );
+		onChange?.(
+			dateI18n(
+				TIMEZONELESS_FORMAT,
+				newDate,
+				-newDate.getTimezoneOffset()
+			)
+		);
 	};
 
 	const dayField = (
@@ -169,7 +182,13 @@ export function TimePicker( {
 				onChange={ ( value ) => {
 					const newDate = setMonth( date, Number( value ) - 1 );
 					setDate( newDate );
-					onChange?.( format( newDate, TIMEZONELESS_FORMAT ) );
+					onChange?.(
+						dateI18n(
+							TIMEZONELESS_FORMAT,
+							newDate,
+							-newDate.getTimezoneOffset()
+						)
+					);
 				} }
 			/>
 		</MonthSelectWrapper>
