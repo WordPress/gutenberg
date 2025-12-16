@@ -41,7 +41,6 @@ import { getAllowedFormats } from './utils';
 import { Content, valueToHTMLString } from './content';
 import { withDeprecations } from './with-deprecations';
 import BlockContext from '../block-context';
-import { PrivateBlockContext } from '../block-list/private-block-context';
 
 export const keyboardShortcutContext = createContext();
 keyboardShortcutContext.displayName = 'keyboardShortcutContext';
@@ -125,10 +124,9 @@ export function RichTextWrapper(
 	const instanceId = useInstanceId( RichTextWrapper );
 	const anchorRef = useRef();
 	const context = useBlockEditContext();
-	const { clientId, isSelected: isBlockSelected } = context;
+	const { clientId, isSelected: isBlockSelected, name: blockName } = context;
 	const blockBindings = context[ blockBindingsKey ];
 	const blockContext = useContext( BlockContext );
-	const { bindableAttributes } = useContext( PrivateBlockContext );
 	const registry = useRegistry();
 	const selector = ( select ) => {
 		// Avoid subscribing to the block editor store if the block is not
@@ -137,8 +135,12 @@ export function RichTextWrapper(
 			return { isSelected: false };
 		}
 
-		const { getSelectionStart, getSelectionEnd, getBlockEditingMode } =
-			select( blockEditorStore );
+		const {
+			getSelectionStart,
+			getSelectionEnd,
+			getBlockEditingMode,
+			getSettings,
+		} = select( blockEditorStore );
 		const selectionStart = getSelectionStart();
 		const selectionEnd = getSelectionEnd();
 
@@ -155,21 +157,32 @@ export function RichTextWrapper(
 			isSelected = selectionStart.clientId === clientId;
 		}
 
+		const { __experimentalBlockBindingsSupportedAttributes } =
+			getSettings();
+
 		return {
 			selectionStart: isSelected ? selectionStart.offset : undefined,
 			selectionEnd: isSelected ? selectionEnd.offset : undefined,
 			isSelected,
 			isContentOnly: getBlockEditingMode( clientId ) === 'contentOnly',
+			bindableAttributes:
+				__experimentalBlockBindingsSupportedAttributes?.[ blockName ],
 		};
 	};
-	const { selectionStart, selectionEnd, isSelected, isContentOnly } =
-		useSelect( selector, [
-			clientId,
-			identifier,
-			instanceId,
-			originalIsSelected,
-			isBlockSelected,
-		] );
+	const {
+		selectionStart,
+		selectionEnd,
+		isSelected,
+		isContentOnly,
+		bindableAttributes,
+	} = useSelect( selector, [
+		clientId,
+		blockName,
+		identifier,
+		instanceId,
+		originalIsSelected,
+		isBlockSelected,
+	] );
 
 	const { disableBoundBlock, bindingsPlaceholder, bindingsLabel } = useSelect(
 		( select ) => {
