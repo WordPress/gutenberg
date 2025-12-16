@@ -30,14 +30,6 @@
 				"sm": {
 					"$value": { "value": 2, "unit": "px" },
 					"$description": "Small width for surfaces"
-				},
-				"md": {
-					"$value": { "value": 4, "unit": "px" },
-					"$description": "Medium width for surfaces"
-				},
-				"lg": {
-					"$value": { "value": 8, "unit": "px" },
-					"$description": "Large width for surfaces"
 				}
 			},
 			"interactive": {

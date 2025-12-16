@@ -17,8 +17,6 @@ Do not edit directly.
 | `--wpds-border-radius-surface-lg`       | Large radius for surfaces       |
 | `--wpds-border-width-surface-xs`        | Extra small width for surfaces  |
 | `--wpds-border-width-surface-sm`        | Small width for surfaces        |
-| `--wpds-border-width-surface-md`        | Medium width for surfaces       |
-| `--wpds-border-width-surface-lg`        | Large width for surfaces        |
 | `--wpds-border-width-interactive-focus` | Border width for focus ring     |
 
 ### Color

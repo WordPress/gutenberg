@@ -8,8 +8,6 @@
 	--wpds-border-radius-surface-sm: 2px; /* Small radius for surfaces */
 	--wpds-border-radius-surface-xs: 1px; /* Extra small radius for surfaces */
 	--wpds-border-width-interactive-focus: 2px; /* Border width for focus ring */
-	--wpds-border-width-surface-lg: 8px; /* Large width for surfaces */
-	--wpds-border-width-surface-md: 4px; /* Medium width for surfaces */
 	--wpds-border-width-surface-sm: 2px; /* Small width for surfaces */
 	--wpds-border-width-surface-xs: 1px; /* Extra small width for surfaces */
 	--wpds-color-bg-interactive-brand: #00000000; /* Background color for interactive elements with brand tone and normal emphasis. */
