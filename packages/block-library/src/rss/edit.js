@@ -172,7 +172,6 @@ export default function RSSEdit( { attributes, setAttributes } ) {
 						isShownByDefault
 					>
 						<RangeControl
-							__nextHasNoMarginBottom
 							__next40pxDefaultSize
 							label={ __( 'Number of items' ) }
 							value={ itemsToShow }
@@ -240,7 +239,6 @@ export default function RSSEdit( { attributes, setAttributes } ) {
 							isShownByDefault
 						>
 							<RangeControl
-								__nextHasNoMarginBottom
 								__next40pxDefaultSize
 								label={ __( 'Max number of words in excerpt' ) }
 								value={ excerptLength }
@@ -262,7 +260,6 @@ export default function RSSEdit( { attributes, setAttributes } ) {
 							isShownByDefault
 						>
 							<RangeControl
-								__nextHasNoMarginBottom
 								__next40pxDefaultSize
 								label={ __( 'Columns' ) }
 								value={ columns }

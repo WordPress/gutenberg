@@ -673,7 +673,6 @@ export default function GalleryEdit( props ) {
 								}
 							>
 								<RangeControl
-									__nextHasNoMarginBottom
 									label={ __( 'Columns' ) }
 									value={
 										columns
@@ -788,7 +787,6 @@ export default function GalleryEdit( props ) {
 					<PanelBody title={ __( 'Settings' ) }>
 						{ images.length > 1 && (
 							<RangeControl
-								__nextHasNoMarginBottom
 								label={ __( 'Columns' ) }
 								value={
 									columns

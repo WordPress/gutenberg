@@ -50,7 +50,6 @@ export default function Edit( {
 		<InspectorControls>
 			<PanelBody title={ __( 'Settings' ) }>
 				<RangeControl
-					__nextHasNoMarginBottom
 					__next40pxDefaultSize
 					label={ __( 'Image size' ) }
 					onChange={ ( newWidth ) =>

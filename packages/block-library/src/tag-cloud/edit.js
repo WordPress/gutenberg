@@ -211,7 +211,6 @@ function TagCloudEdit( { attributes, setAttributes } ) {
 					isShownByDefault
 				>
 					<RangeControl
-						__nextHasNoMarginBottom
 						__next40pxDefaultSize
 						label={ __( 'Number of tags' ) }
 						value={ numberOfTags }

@@ -279,7 +279,6 @@ module.exports = {
 					...[
 						'BaseControl',
 						'ComboboxControl',
-						'RangeControl',
 						'SearchControl',
 						'SelectControl',
 					].map( ( componentName ) => ( {

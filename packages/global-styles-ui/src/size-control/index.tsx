@@ -75,7 +75,6 @@ function SizeControl( {
 					<Spacer marginX={ 2 } marginBottom={ 0 }>
 						<RangeControl
 							__next40pxDefaultSize
-							__nextHasNoMarginBottom
 							label={ label }
 							hideLabelFromVision
 							value={ valueQuantity }
