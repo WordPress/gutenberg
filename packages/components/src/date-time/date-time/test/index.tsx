@@ -185,21 +185,26 @@ describe( 'DateTimePicker', () => {
 	} );
 
 	describe( 'different input types', () => {
+		// Input types should be treated assuming the timezone offset configured
+		// through `@wordpress/date` settings, i.e. the site's timezone. Inputs
+		// representing the same site timezone time should display and output
+		// identically. The site timezone in these tests is UTC-5 (set in
+		// beforeAll), where 20:00 site time = 01:00 UTC the next day.
 		describe.each( [
 			{
-				type: 'timezoneless string',
-				initialDate: '2025-11-15T14:30:00',
+				type: 'timezoneless string (20:00 site time)',
+				initialDate: '2025-11-15T20:00:00',
 			},
 			{
-				type: 'Date object',
-				initialDate: new Date( Date.UTC( 2025, 10, 15, 14, 30, 0 ) ),
+				type: 'Date object (01:00 UTC Nov 16 = 20:00 site time Nov 15)',
+				initialDate: new Date( Date.UTC( 2025, 10, 16, 1, 0, 0 ) ),
 			},
 			{
-				type: 'timestamp',
-				initialDate: Date.UTC( 2025, 10, 15, 14, 30, 0 ),
+				type: 'timestamp (01:00 UTC Nov 16 = 20:00 site time Nov 15)',
+				initialDate: Date.UTC( 2025, 10, 16, 1, 0, 0 ),
 			},
 		] )( '$type', ( { initialDate } ) => {
-			it( 'should display and select dates correctly', async () => {
+			it( 'should display and select dates according to site timezone', async () => {
 				const user = userEvent.setup();
 				const onChange = jest.fn();
 
@@ -212,15 +217,16 @@ describe( 'DateTimePicker', () => {
 					/>
 				);
 
-				// Should display the correct initial date and time using time
-				// components from the initial date.
+				// Should display the correct initial date and time assuming
+				// settings for the current site. If incorrectly using UTC,
+				// this would show Nov 16 at 01:00 instead of Nov 15 at 20:00.
 				expect(
 					screen.getByRole( 'button', {
 						name: 'November 15, 2025. Selected',
 					} )
 				).toBeVisible();
-				expect( screen.getByLabelText( 'Hours' ) ).toHaveValue( 14 );
-				expect( screen.getByLabelText( 'Minutes' ) ).toHaveValue( 30 );
+				expect( screen.getByLabelText( 'Hours' ) ).toHaveValue( 20 );
+				expect( screen.getByLabelText( 'Minutes' ) ).toHaveValue( 0 );
 
 				onChange.mockImplementation( ( newDate ) => {
 					rerender(
@@ -236,9 +242,10 @@ describe( 'DateTimePicker', () => {
 				);
 
 				// Changing date should preserve the time, calling onChange with
-				// a timezoneless string.
+				// a timezoneless string. The timezoneless string is assumed to
+				// represent the site timezone.
 				expect( onChange ).toHaveBeenCalledWith(
-					'2025-11-20T14:30:00'
+					'2025-11-20T20:00:00'
 				);
 				expect(
 					screen.getByRole( 'button', {
@@ -267,5 +274,57 @@ describe( 'DateTimePicker', () => {
 		);
 
 		expect( onChange ).toHaveBeenCalledWith( '2025-11-20T14:30:00' );
+	} );
+
+	it( 'should be stable when onChange strings are converted to Date and passed back', async () => {
+		// When the site timezone is configured to match the browser timezone,
+		// converting onChange strings to Date objects (via new Date(string))
+		// and passing them back should produce stable results. This is a common
+		// pattern when the consumer wants to work with browser-local times.
+
+		const user = userEvent.setup();
+		const onChange = jest.fn();
+
+		// Configure site timezone to match browser
+		timezoneMock.register( 'US/Pacific' );
+		setSettings( {
+			...originalSettings,
+			timezone: {
+				offset: -8,
+				offsetFormatted: '-8',
+				string: 'America/Los_Angeles',
+				abbr: 'PST',
+			},
+		} );
+
+		let currentDate: string | Date = '2025-11-15T14:30:00';
+
+		const { rerender } = render(
+			<DateTimePicker currentDate={ currentDate } onChange={ onChange } />
+		);
+
+		// Simulate converting onChange string to Date and passing back
+		onChange.mockImplementation( ( newDateString: string ) => {
+			currentDate = new Date( newDateString );
+			rerender(
+				<DateTimePicker
+					currentDate={ currentDate }
+					onChange={ onChange }
+				/>
+			);
+		} );
+
+		await user.click(
+			screen.getByRole( 'button', { name: 'November 20, 2025' } )
+		);
+		expect( onChange ).toHaveBeenLastCalledWith( '2025-11-20T14:30:00' );
+
+		// Second interaction should produce identical output (no drift)
+		await user.click(
+			screen.getByRole( 'button', {
+				name: 'November 20, 2025. Selected',
+			} )
+		);
+		expect( onChange ).toHaveBeenLastCalledWith( '2025-11-20T14:30:00' );
 	} );
 } );
