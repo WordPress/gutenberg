@@ -650,16 +650,15 @@ body.editor-styles-wrapper .wp-block-navigation__responsive-container.is-menu-op
 	grid-column: span 2;
 }
 
-.wp-block-navigation__overlay-selector {
-	position: relative;
+// Nudge the edit button down to align with the select control input field.
+// The SelectControl has a label above it, so we need to offset the button
+// to align it with the input rather than the top of the control.
+.wp-block-navigation__overlay-edit-button {
+	margin-top: $grid-unit-30;
 }
 
 .wp-block-navigation__overlay-edit-button {
 	margin-top: $grid-unit-10;
-	width: fit-content;
-	position: absolute;
-	right: 0;
-	top: 0;
 }
 
 .wp-block-navigation__overlay-selector {
