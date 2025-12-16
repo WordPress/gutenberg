@@ -76,6 +76,12 @@
 			"clientNavigation": true
 		}
 	},
+	"selectors": {
+		"root": "p",
+		"typography": {
+			"textIndent": "p + p"
+		}
+	},
 	"editorStyle": "wp-block-paragraph-editor",
 	"style": "wp-block-paragraph"
 }
