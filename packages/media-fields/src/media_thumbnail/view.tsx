@@ -85,7 +85,9 @@ export default function MediaThumbnailView( {
 		imageError ||
 		getMediaTypeFromMimeType( featuredMedia.mime_type ).type !== 'image'
 	) {
-		return <FallbackView item={ item } filename={ filename || '' } />;
+		return (
+			<FallbackView item={ featuredMedia } filename={ filename || '' } />
+		);
 	}
 
 	return (
