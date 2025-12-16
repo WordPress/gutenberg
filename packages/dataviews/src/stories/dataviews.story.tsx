@@ -705,7 +705,7 @@ export const InfiniteScroll = () => {
 				if ( visibleEntries.length > 0 ) {
 					const visibleMin = Math.min( ...visibleEntries );
 					const visibleMax = Math.max( ...visibleEntries );
-					const buffer = 3;
+					const buffer = 6;
 
 					const filtered = result
 						.map( ( record, index ) => {
