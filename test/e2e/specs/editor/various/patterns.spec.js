@@ -602,34 +602,31 @@ test.describe( 'Synced pattern', () => {
 	} );
 
 	// Check for regressions of https://github.com/WordPress/gutenberg/issues/27243.
-	test( 'should allow a block with styles to be converted to a reusable block', async ( {
+	test( 'should allow a block to be converted to a reusable block', async ( {
 		editor,
 		page,
 	} ) => {
+		// Insert the Quote block
 		await editor.insertBlock( { name: 'core/quote' } );
 		await editor.saveDraft();
 		await page.reload();
 
+		// Open the document settings sidebar
 		await editor.openDocumentSettingsSidebar();
 		await editor.selectBlocks(
 			editor.canvas.getByRole( 'document', { name: 'Block: Quote' } )
 		);
 
-		// The quote block should have a visible preview in the sidebar for this test to be valid.
-		await expect(
-			page
-				.getByRole( 'region', { name: 'Editor settings' } )
-				.getByRole( 'button', { name: 'Styles', exact: true } )
-		).toBeVisible();
-
+		// Convert the block to a reusable block
 		await editor.clickBlockOptionsMenuItem( 'Create pattern' );
 
+		// Verify the "Create pattern" dialog is visible
 		const createPatternDialog = editor.page.getByRole( 'dialog', {
 			name: 'add pattern',
 		} );
 		await createPatternDialog
 			.getByRole( 'textbox', { name: 'Name' } )
-			.fill( 'Block with styles' );
+			.fill( 'Block without styles' );
 		await createPatternDialog
 			.getByRole( 'checkbox', { name: 'Synced' } )
 			.setChecked( true );
@@ -637,6 +634,7 @@ test.describe( 'Synced pattern', () => {
 			.getByRole( 'button', { name: 'Add' } )
 			.click();
 
+		// Verify the pattern block is visible
 		await expect(
 			editor.canvas.getByRole( 'document', { name: 'Block: Pattern' } )
 		).toBeVisible();

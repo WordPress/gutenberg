@@ -1061,35 +1061,6 @@ A block can have a "style variation," as defined in the [block.json specificatio
 
 Note that variations are a "block concept"—they only exist when bound to blocks. The `theme.json` specification respects this distinction by only allowing `variations` at the block level, not the top level. It’s also worth highlighting that only variations defined in the `block.json` file of the block or via `register_block_style` on the server are considered "registered" for `theme.json` styling purposes.
 
-For example, this is how to provide styles for the existing `plain` variation for the `core/quote` block:
-
-```json
-{
-	"version": 3,
-	"styles": {
-		"blocks": {
-			"core/quote": {
-				"variations": {
-					"plain": {
-						"color": {
-							"background": "red"
-						}
-					}
-				}
-			}
-		}
-	}
-}
-```
-
-The resulting CSS output is:
-
-```css
-.wp-block-quote.is-style-plain {
-	background-color: red;
-}
-```
-
 It is also possible for multiple block types to share the same variation styles. There are two recommended ways to define such shared styles:
 
 1. `theme.json` partial files

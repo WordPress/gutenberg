@@ -92,14 +92,6 @@
 		},
 		"allowedBlocks": true
 	},
-	"styles": [
-		{
-			"name": "default",
-			"label": "Default",
-			"isDefault": true
-		},
-		{ "name": "plain", "label": "Plain" }
-	],
 	"editorStyle": "wp-block-quote-editor",
 	"style": "wp-block-quote"
 }
