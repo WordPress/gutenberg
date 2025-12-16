@@ -26,9 +26,6 @@ async function navigateToTemplateEditor( { admin, editor, page }, pageId ) {
 		.click();
 	await page.getByRole( 'menuitem', { name: 'Edit template' } ).click();
 	await expect( editor.canvas.locator( 'body' ) ).toBeVisible();
-	// Wait for editor to be fully ready before proceeding.
-	// eslint-disable-next-line playwright/no-networkidle
-	await page.waitForLoadState( 'networkidle' );
 
 	await editor.setPreferences( 'core/edit-post', {
 		welcomeGuideTemplate: false,
