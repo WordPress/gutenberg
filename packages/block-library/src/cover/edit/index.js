@@ -187,11 +187,14 @@ function CoverEdit( {
 	// what happens in onSelectMedia.
 	const hasImageBinding =
 		!! metadata?.bindings?.id || !! metadata?.bindings?.url;
-	const prevHasImageBinding = useRef( hasImageBinding );
 	const prevId = useRef( id );
 	const prevUrl = useRef( originalUrl );
 
 	useEffect( () => {
+		// Helper to check if image just became available
+		const imageJustSet =
+			( ! prevId.current && id ) || ( ! prevUrl.current && originalUrl );
+
 		// Only adjust dimRatio if:
 		// 1. Image bindings are present
 		// 2. An id or url has been set (image is now available)
@@ -201,13 +204,12 @@ function CoverEdit( {
 			hasImageBinding &&
 			( id || originalUrl ) &&
 			dimRatio === 100 &&
-			( ( ! prevId.current && id ) ||
-				( ! prevUrl.current && originalUrl ) )
+			imageJustSet
 		) {
 			setAttributes( { dimRatio: 50 } );
 		}
 
-		prevHasImageBinding.current = hasImageBinding;
+		// Update refs for next comparison
 		prevId.current = id;
 		prevUrl.current = originalUrl;
 	}, [ hasImageBinding, id, originalUrl, dimRatio, setAttributes ] );
