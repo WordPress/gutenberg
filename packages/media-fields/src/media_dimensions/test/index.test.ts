@@ -176,5 +176,33 @@ describe( 'mediaDimensionsField', () => {
 
 			expect( result ).toBe( false );
 		} );
+
+		it( 'returns false when width is 0 (due to truthy check)', () => {
+			const item = {
+				media_details: {
+					width: 0,
+					height: 1080,
+					sizes: {},
+				},
+			} as Updatable< Attachment >;
+
+			const result = mediaDimensionsField.isVisible?.( item );
+
+			expect( result ).toBe( false );
+		} );
+
+		it( 'returns false when height is 0 (due to truthy check)', () => {
+			const item = {
+				media_details: {
+					width: 1920,
+					height: 0,
+					sizes: {},
+				},
+			} as Updatable< Attachment >;
+
+			const result = mediaDimensionsField.isVisible?.( item );
+
+			expect( result ).toBe( false );
+		} );
 	} );
 } );
