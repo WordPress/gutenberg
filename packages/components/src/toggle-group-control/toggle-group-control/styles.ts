@@ -46,14 +46,13 @@ export const toggleGroupControl = ( {
 		outline: 2px solid transparent;
 		outline-offset: -3px;
 
-		/* Using a large value to avoid antialiasing rounding issues
-			when scaling in the transform, see: https://stackoverflow.com/a/52159123 */
-		--antialiasing-factor: 100;
 		border-radius: ${ CONFIG.radiusSmall };
 		top: -1px;
-		bottom: -1px;
 		left: -2px;
-		width: calc( calc( var( --selected-width, 0 ) * 1px ) + 2px );
+		width: calc(
+			calc( var( --selected-width, 0 ) * 1px ) +
+				${ isBlock ? '3px' : '2px' }
+		);
 		height: calc( calc( var( --selected-height, 0 ) * 1px ) + 2px );
 		transform: translateX( calc( var( --selected-left, 0 ) * 1px ) );
 		/* Hide when dimensions are unset (0) */
