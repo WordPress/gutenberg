@@ -90,6 +90,54 @@ describe( 'mediaDimensionsField', () => {
 
 			expect( result ).toBe( '' );
 		} );
+
+		it( 'returns empty string when width is 0', () => {
+			const item = {
+				media_details: {
+					width: 0,
+					height: 1080,
+					sizes: {},
+				},
+			} as Updatable< Attachment >;
+
+			const result = mediaDimensionsField.getValue?.( {
+				item,
+			} );
+
+			expect( result ).toBe( '' );
+		} );
+
+		it( 'returns empty string when height is 0', () => {
+			const item = {
+				media_details: {
+					width: 1920,
+					height: 0,
+					sizes: {},
+				},
+			} as Updatable< Attachment >;
+
+			const result = mediaDimensionsField.getValue?.( {
+				item,
+			} );
+
+			expect( result ).toBe( '' );
+		} );
+
+		it( 'returns empty string when both width and height are 0', () => {
+			const item = {
+				media_details: {
+					width: 0,
+					height: 0,
+					sizes: {},
+				},
+			} as Updatable< Attachment >;
+
+			const result = mediaDimensionsField.getValue?.( {
+				item,
+			} );
+
+			expect( result ).toBe( '' );
+		} );
 	} );
 
 	describe( 'isVisible', () => {
@@ -163,6 +211,20 @@ describe( 'mediaDimensionsField', () => {
 			const item = {
 				media_details: {
 					width: 1920,
+					height: 0,
+					sizes: {},
+				},
+			} as Updatable< Attachment >;
+
+			const result = mediaDimensionsField.isVisible?.( item );
+
+			expect( result ).toBe( false );
+		} );
+
+		it( 'returns false when both width and height are 0', () => {
+			const item = {
+				media_details: {
+					width: 0,
 					height: 0,
 					sizes: {},
 				},
