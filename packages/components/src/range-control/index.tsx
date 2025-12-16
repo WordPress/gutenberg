@@ -66,7 +66,7 @@ function UnforwardedRangeControl(
 	forwardedRef: ForwardedRef< HTMLInputElement >
 ) {
 	const {
-		__nextHasNoMarginBottom = false,
+		__nextHasNoMarginBottom: _, // Prevent passing to internal component
 		afterIcon,
 		allowReset = false,
 		beforeIcon,
@@ -241,13 +241,12 @@ function UnforwardedRangeControl(
 
 	return (
 		<BaseControl
-			__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
-			__associatedWPComponentName="RangeControl"
 			className={ classes }
 			label={ label }
 			hideLabelFromVision={ hideLabelFromVision }
 			id={ `${ id }` }
 			help={ help }
+			__nextHasNoMarginBottom
 		>
 			<Root
 				className="components-range-control__root"
@@ -259,7 +258,6 @@ function UnforwardedRangeControl(
 					</BeforeIconWrapper>
 				) }
 				<Wrapper
-					__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
 					className={ wrapperClasses }
 					color={ colorProp }
 					marks={ !! marks }
@@ -394,7 +392,6 @@ function UnforwardedRangeControl(
  *   const [ value, setValue ] = useState();
  *   return (
  *     <RangeControl
- *       __nextHasNoMarginBottom
  *       __next40pxDefaultSize
  *       help="Please select how transparent you would like this."
  *       initialPosition={ 50 }
