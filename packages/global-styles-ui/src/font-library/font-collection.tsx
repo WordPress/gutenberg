@@ -311,7 +311,6 @@ function FontCollection( { slug }: { slug: string } ) {
 									placeholder={ __( 'Font name…' ) }
 									label={ __( 'Search' ) }
 									onChange={ debouncedUpdateSearchInput }
-									__nextHasNoMarginBottom
 									hideLabelFromVision={ false }
 								/>
 								<SelectControl
