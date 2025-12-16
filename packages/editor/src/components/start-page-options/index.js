@@ -151,12 +151,13 @@ export default function StartPageOptions() {
 			'core',
 			'enableChoosePatternModal'
 		);
+		const currentPostType = getCurrentPostType();
 		return {
 			postId: getCurrentPostId(),
 			enabled:
 				choosePatternModalEnabled &&
-				TEMPLATE_POST_TYPE !== getCurrentPostType() &&
-				TEMPLATE_PART_POST_TYPE !== getCurrentPostType(),
+				TEMPLATE_POST_TYPE !== currentPostType &&
+				TEMPLATE_PART_POST_TYPE !== currentPostType,
 		};
 	}, [] );
 
