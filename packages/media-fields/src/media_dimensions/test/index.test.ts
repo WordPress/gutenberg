@@ -225,7 +225,7 @@ describe( 'mediaDimensionsField', () => {
 			expect( result ).toBe( false );
 		} );
 
-		it( 'returns false when width is 0', () => {
+		it( 'returns false when width is 0 (due to truthy check)', () => {
 			const item = {
 				media_details: {
 					width: 0,
@@ -239,7 +239,7 @@ describe( 'mediaDimensionsField', () => {
 			expect( result ).toBe( false );
 		} );
 
-		it( 'returns false when height is 0', () => {
+		it( 'returns false when height is 0 (due to truthy check)', () => {
 			const item = {
 				media_details: {
 					width: 1920,
