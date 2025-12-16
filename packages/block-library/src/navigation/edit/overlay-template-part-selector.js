@@ -186,9 +186,10 @@ export default function OverlayTemplatePartSelector( {
 				disabled={ isCreateButtonDisabled }
 				accessibleWhenDisabled
 				isBusy={ isCreating }
+				aria-label={ __( 'Create new overlay template' ) }
 				className="wp-block-navigation__overlay-create-link"
 			>
-				{ __( 'Create new?' ) }
+				{ __( 'Create New Overlay Template' ) }
 			</Button>
 		);
 
@@ -227,7 +228,7 @@ export default function OverlayTemplatePartSelector( {
 				accessibleWhenDisabled
 				help={ helpText }
 			/>
-			{ overlay && hasResolved && selectedTemplatePart && (
+			{ overlay && ( ! hasResolved || selectedTemplatePart ) && (
 				<Button
 					__next40pxDefaultSize
 					variant="secondary"

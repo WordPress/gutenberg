@@ -431,7 +431,9 @@ describe( 'OverlayTemplatePartSelector', () => {
 				screen.getByText( 'No overlays found.' )
 			).toBeInTheDocument();
 			expect(
-				screen.getByRole( 'button', { name: 'Create new?' } )
+				screen.getByRole( 'button', {
+					name: 'Create new overlay template',
+				} )
 			).toBeInTheDocument();
 		} );
 
@@ -450,7 +452,9 @@ describe( 'OverlayTemplatePartSelector', () => {
 				)
 			).toBeInTheDocument();
 			expect(
-				screen.getByRole( 'button', { name: 'Create new?' } )
+				screen.getByRole( 'button', {
+					name: 'Create new overlay template',
+				} )
 			).toBeInTheDocument();
 		} );
 	} );
@@ -479,7 +483,7 @@ describe( 'OverlayTemplatePartSelector', () => {
 			render( <OverlayTemplatePartSelector { ...defaultProps } /> );
 
 			const createButton = screen.getByRole( 'button', {
-				name: 'Create new?',
+				name: 'Create new overlay template',
 			} );
 
 			await user.click( createButton );
@@ -511,7 +515,7 @@ describe( 'OverlayTemplatePartSelector', () => {
 			render( <OverlayTemplatePartSelector { ...defaultProps } /> );
 
 			const createButton = screen.getByRole( 'button', {
-				name: 'Create new?',
+				name: 'Create new overlay template',
 			} );
 
 			await user.click( createButton );
@@ -537,7 +541,7 @@ describe( 'OverlayTemplatePartSelector', () => {
 			render( <OverlayTemplatePartSelector { ...defaultProps } /> );
 
 			const createButton = screen.getByRole( 'button', {
-				name: 'Create new?',
+				name: 'Create new overlay template',
 			} );
 
 			expect( createButton ).toHaveAttribute( 'aria-disabled', 'true' );
