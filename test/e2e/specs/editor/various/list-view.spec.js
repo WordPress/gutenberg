@@ -1158,7 +1158,7 @@ test.describe( 'List View', () => {
 			window.wp.data.dispatch( 'core/block-editor' ).clearSelectedBlock()
 		);
 		await listView
-			.getByRole( 'gridcell', { name: 'Paragraph' } )
+			.getByRole( 'gridcell', { name: 'Paragraph', exact: true } )
 			.getByRole( 'link' )
 			.focus();
 		await expect
