@@ -282,7 +282,6 @@ module.exports = {
 						'RangeControl',
 						'SearchControl',
 						'SelectControl',
-						'TreeSelect',
 					].map( ( componentName ) => ( {
 						selector: `JSXOpeningElement[name.name="${ componentName }"]:not(:has(JSXAttribute[name.name="__nextHasNoMarginBottom"]))`,
 						message:
@@ -297,7 +296,7 @@ module.exports = {
 						'Button',
 						'ComboboxControl',
 						'CustomSelectControl',
-						'DimensionControl',
+
 						'FontAppearanceControl',
 						'FontFamilyControl',
 						'FontSizePicker',

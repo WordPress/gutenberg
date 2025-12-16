@@ -13,6 +13,7 @@ import {
 	__experimentalParseQuantityAndUnitFromRawValue as parseQuantityAndUnitFromRawValue,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -53,6 +54,8 @@ const RANGE_CONTROL_CUSTOM_SETTINGS = {
 /**
  * HeightControl renders a linked unit control and range control for adjusting the height of a block.
  *
+ * @deprecated Use DimensionControl instead.
+ *
  * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/height-control/README.md
  *
  * @param {Object}                     props
@@ -67,6 +70,11 @@ export default function HeightControl( {
 	onChange,
 	value,
 } ) {
+	deprecated( 'wp.blockEditor.HeightControl', {
+		since: '7.0',
+		version: '7.2',
+		alternative: 'wp.blockEditor.DimensionControl',
+	} );
 	const customRangeValue = parseFloat( value );
 
 	const [ availableUnits ] = useSettings( 'spacing.units' );
