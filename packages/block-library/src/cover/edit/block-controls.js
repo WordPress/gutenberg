@@ -129,14 +129,14 @@ export default function CoverBlockControls( {
 				</MediaReplaceFlow>
 			</BlockControls>
 		) }
-			{ isEmbedUrlInputOpen && (
-				<EmbedVideoUrlInput
-					onSubmit={ ( embedUrl ) => {
-						onSelectEmbedUrl( embedUrl );
-					} }
-					onClose={ () => setIsEmbedUrlInputOpen( false ) }
-				/>
-			) }
+		{ isEmbedUrlInputOpen && (
+			<EmbedVideoUrlInput
+				onSubmit={ ( embedUrl ) => {
+					onSelectEmbedUrl( embedUrl );
+				} }
+				onClose={ () => setIsEmbedUrlInputOpen( false ) }
+			/>
+		) }
 		</>
 	);
 }
