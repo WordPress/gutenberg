@@ -79,7 +79,8 @@ export const buttonView = ( {
 `;
 
 const pressed = css`
-	color: ${ COLORS.theme.foregroundInverted };
+	color: ${ COLORS.theme.foreground };
+	font-weight: ${ CONFIG.fontWeightMedium };
 
 	&:active {
 		background: transparent;
@@ -90,10 +91,8 @@ const deselectable = css`
 	color: ${ COLORS.theme.foreground };
 
 	&:focus {
-		box-shadow:
-			inset 0 0 0 1px ${ COLORS.ui.background },
-			0 0 0 ${ CONFIG.borderWidthFocus } ${ COLORS.theme.accent };
-		outline: 2px solid transparent;
+		outline: ${ CONFIG.borderWidthFocus } solid ${ COLORS.ui.borderFocus };
+		outline-offset: 2px;
 	}
 `;
 
@@ -108,7 +107,7 @@ const isIconStyles = ( {
 }: Pick< ToggleGroupControlProps, 'size' > ) => {
 	const iconButtonSizes = {
 		default: '30px',
-		'__unstable-large': '32px',
+		'__unstable-large': '40px',
 	};
 
 	return css`
