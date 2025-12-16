@@ -130,4 +130,4 @@ In summary, the block editor workflow parses the saved document to an in-memory 
 
 The workflow process relies on a serialization/parser pair to persist posts. Hypothetically, the post data structure could be stored using a plugin or retrieved from a remote JSON file to be converted to the block tree.
 
-Understanding this lifecycle is essential for developers extending or integrating with the block editor. Whether working with custom blocks, data stores, or transformations, all changes ultimately flow through this parse–edit–serialize cycle.
+Understanding this lifecycle is essential for developers extending or integrating with the block editor. Whether working with custom blocks, data stores, or transformations, all changes ultimately flow through this parse-edit-serialize cycle.
