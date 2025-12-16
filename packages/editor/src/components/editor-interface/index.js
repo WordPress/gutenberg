@@ -191,7 +191,11 @@ export default function EditorInterface( {
 				showBlockBreadcrumbs &&
 				mode === 'visual' && (
 					<BlockBreadcrumb
-						rootLabelText={ decodeEntities( postTypeLabel ) }
+						rootLabelText={
+							postTypeLabel
+								? decodeEntities( postTypeLabel )
+								: undefined
+						}
 					/>
 				)
 			}
