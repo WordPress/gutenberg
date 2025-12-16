@@ -167,7 +167,11 @@ export default function OverlayTemplatePartSelector( {
 	] );
 
 	const isEditButtonDisabled =
-		! overlay || ! onNavigateToEntityRecord || isResolving;
+		! overlay ||
+		! hasResolved ||
+		! selectedTemplatePart ||
+		! onNavigateToEntityRecord ||
+		isResolving;
 
 	const isCreateButtonDisabled = isResolving || isCreating;
 
@@ -223,7 +227,7 @@ export default function OverlayTemplatePartSelector( {
 				accessibleWhenDisabled
 				help={ helpText }
 			/>
-			{ overlay && (
+			{ overlay && hasResolved && selectedTemplatePart && (
 				<Button
 					__next40pxDefaultSize
 					variant="secondary"
