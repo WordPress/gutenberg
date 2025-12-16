@@ -175,6 +175,57 @@ const sampleMediaItemZip: MediaItem = {
 	missing_image_sizes: [],
 };
 
+// Sample data for a broken image (demonstrates error fallback)
+const sampleMediaItemBrokenImage: MediaItem = {
+	id: 124,
+	date: '2024-01-16T10:30:00',
+	date_gmt: '2024-01-16T10:30:00',
+	guid: {
+		raw: 'https://example.com/broken-image.jpg',
+		rendered: 'https://example.com/broken-image.jpg',
+	},
+	modified: '2024-01-16T10:30:00',
+	modified_gmt: '2024-01-16T10:30:00',
+	slug: 'broken-image',
+	status: 'publish',
+	type: 'attachment',
+	link: 'https://example.com/broken-image/',
+	title: {
+		raw: 'Broken Image',
+		rendered: 'Broken Image',
+	},
+	author: 1,
+	featured_media: 0,
+	comment_status: 'open',
+	ping_status: 'closed',
+	template: '',
+	meta: {},
+	permalink_template: 'https://example.com/?attachment_id=124',
+	generated_slug: 'broken-image',
+	class_list: [ 'post-124', 'attachment' ],
+	alt_text: 'This image will fail to load',
+	caption: {
+		raw: 'Image that demonstrates error handling',
+		rendered: '<p>Image that demonstrates error handling</p>\n',
+	},
+	description: {
+		raw: '',
+		rendered: '',
+	},
+	mime_type: 'image/jpeg',
+	media_type: 'image',
+	post: null,
+	source_url: 'https://example.com/this-image-does-not-exist.jpg',
+	media_details: {
+		file: 'broken-image.jpg',
+		width: 1920,
+		height: 1080,
+		filesize: 0,
+		sizes: {},
+	},
+	missing_image_sizes: [],
+};
+
 // Create a showcase of all media fields.
 const showcaseFields = [
 	mediaThumbnailField,
@@ -256,10 +307,11 @@ export const DataViewsPreview = () => {
 	const [ data ] = useState< MediaItem[] >( [
 		sampleMediaItem,
 		sampleMediaItemZip,
+		sampleMediaItemBrokenImage,
 	] );
 
 	const paginationInfo = {
-		totalItems: 2,
+		totalItems: 3,
 		totalPages: 1,
 	};
 
