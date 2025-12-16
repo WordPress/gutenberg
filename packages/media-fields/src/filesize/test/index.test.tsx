@@ -202,5 +202,13 @@ describe( 'filesizeField', () => {
 
 			expect( result ).toBe( false );
 		} );
+
+		it( 'returns false when media_details is missing', () => {
+			const item = {} as MediaItem;
+
+			const result = filesizeField.isVisible?.( item );
+
+			expect( result ).toBe( false );
+		} );
 	} );
 } );
