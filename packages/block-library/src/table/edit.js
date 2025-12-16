@@ -416,25 +416,32 @@ function TableEdit( {
 		<TSection name={ name } key={ name }>
 			{ attributes[ name ].map( ( { cells }, rowIndex ) => (
 				<tr key={ rowIndex }>
-					{ cells.map( ( cellProps, columnIndex ) => (
+					{ cells.map( ( cellProps, columnIndex ) => {
+						const isSelected =
+							selectedCell?.sectionName === name &&
+							selectedCell?.rowIndex === rowIndex &&
+							selectedCell?.columnIndex === columnIndex;
+
 						// Important - the Cell component is memoized to improve typing performance.
 						// ensure all props passed have stable references.
-						<Cell
-							key={ columnIndex }
-							name={ name }
-							rowIndex={ rowIndex }
-							columnIndex={ columnIndex }
-							onChange={
-								// Only pass the `onChange` handler to the selectedCell.
-								// Cell components are memoized, so it's best to avoid
-								// passing in a value that will cause all cells to re-render
-								// whenever it changes.
-								selectedCell === 'text' ? onChange : undefined
-							}
-							setSelectedCell={ setSelectedCell }
-							{ ...cellProps }
-						/>
-					) ) }
+						return (
+							<Cell
+								key={ columnIndex }
+								name={ name }
+								rowIndex={ rowIndex }
+								columnIndex={ columnIndex }
+								onChange={
+									// Only pass the `onChange` handler to the selectedCell.
+									// Cell components are memoized, so it's best to avoid
+									// passing in a value that will cause all cells to re-render
+									// whenever it changes.
+									isSelected ? onChange : undefined
+								}
+								setSelectedCell={ setSelectedCell }
+								{ ...cellProps }
+							/>
+						);
+					} ) }
 				</tr>
 			) ) }
 		</TSection>
