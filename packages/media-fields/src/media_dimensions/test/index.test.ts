@@ -176,5 +176,13 @@ describe( 'mediaDimensionsField', () => {
 
 			expect( result ).toBe( false );
 		} );
+
+		it( 'returns false when media_details is missing', () => {
+			const item = {} as Updatable< Attachment >;
+
+			const result = mediaDimensionsField.isVisible?.( item );
+
+			expect( result ).toBe( false );
+		} );
 	} );
 } );
