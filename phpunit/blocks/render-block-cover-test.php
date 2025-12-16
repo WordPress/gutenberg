@@ -128,4 +128,81 @@ class Tests_Blocks_Render_Cover extends WP_UnitTestCase {
 		$this->assertStringNotContainsString( 'background-image', $rendered );
 		$this->assertStringNotContainsString( 'min-height', $rendered );
 	}
+
+	/**
+	 * Test gutenberg_render_block_core_cover() with block bindings for id attribute.
+	 *
+	 * @covers ::gutenberg_render_block_core_cover
+	 */
+	public function test_gutenberg_render_block_core_cover_with_id_binding() {
+		global $wp_query;
+
+		// Fake being in the loop.
+		$wp_query->post  = self::$post;
+		$GLOBALS['post'] = self::$post;
+
+		// Test with id binding - should use the bound image ID.
+		$attributes = array(
+			'useFeaturedImage' => false,
+			'backgroundType'   => 'image',
+			'hasParallax'      => true,
+			'isRepeated'       => false,
+			'id'               => self::$attachment_id,
+			'metadata'         => array(
+				'bindings' => array(
+					'id' => array(
+						'source' => 'core/post-meta',
+						'args'   => array( 'key' => 'test_image_id' ),
+					),
+				),
+			),
+		);
+
+		$content  = '<div class="wp-block-cover"><span></span><div class="wp-block-cover__inner-container"></div></div>';
+		$rendered = gutenberg_render_block_core_cover( $attributes, $content );
+
+		// Should contain the bound image.
+		$this->assertStringContainsString( wp_get_attachment_image_url( self::$attachment_id, 'full' ), $rendered );
+		$this->assertStringContainsString( 'background-image', $rendered );
+		$this->assertStringContainsString( 'wp-image-' . self::$attachment_id, $rendered );
+	}
+
+	/**
+	 * Test gutenberg_render_block_core_cover() with block bindings for url attribute.
+	 *
+	 * @covers ::gutenberg_render_block_core_cover
+	 */
+	public function test_gutenberg_render_block_core_cover_with_url_binding() {
+		global $wp_query;
+
+		// Fake being in the loop.
+		$wp_query->post  = self::$post;
+		$GLOBALS['post'] = self::$post;
+
+		$test_url = 'https://example.com/test-image.jpg';
+
+		// Test with url binding - should use the bound URL.
+		$attributes = array(
+			'useFeaturedImage' => false,
+			'backgroundType'   => 'image',
+			'hasParallax'      => true,
+			'isRepeated'       => false,
+			'url'              => $test_url,
+			'metadata'         => array(
+				'bindings' => array(
+					'url' => array(
+						'source' => 'core/post-meta',
+						'args'   => array( 'key' => 'test_image_url' ),
+					),
+				),
+			),
+		);
+
+		$content  = '<div class="wp-block-cover"><span></span><div class="wp-block-cover__inner-container"></div></div>';
+		$rendered = gutenberg_render_block_core_cover( $attributes, $content );
+
+		// Should contain the bound URL.
+		$this->assertStringContainsString( $test_url, $rendered );
+		$this->assertStringContainsString( 'background-image', $rendered );
+	}
 }

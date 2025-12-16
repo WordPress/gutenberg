@@ -24,6 +24,14 @@ add_filter(
 		) {
 			$attributes[] = 'url';
 		}
+		if ( 'core/cover' === $block_type ) {
+			if ( ! in_array( 'id', $attributes, true ) ) {
+				$attributes[] = 'id';
+			}
+			if ( ! in_array( 'url', $attributes, true ) ) {
+				$attributes[] = 'url';
+			}
+		}
 		return $attributes;
 	},
 	10,

@@ -122,13 +122,38 @@ function render_block_core_cover( $attributes, $content ) {
 		return $content;
 	}
 
-	if ( 'image' !== $attributes['backgroundType'] || false === $attributes['useFeaturedImage'] ) {
+	// Check if block bindings exist for id or url.
+	$has_id_binding  = isset( $attributes['metadata']['bindings']['id'] ) && isset( $attributes['id'] );
+	$has_url_binding = isset( $attributes['metadata']['bindings']['url'] ) && isset( $attributes['url'] );
+
+	// Only process if we have an image background and either featured image is used OR block bindings are present.
+	if ( 'image' !== $attributes['backgroundType'] || ( false === $attributes['useFeaturedImage'] && ! $has_id_binding && ! $has_url_binding ) ) {
 		return $content;
 	}
 
 	$object_position = isset( $attributes['focalPoint'] )
 		? round( $attributes['focalPoint']['x'] * 100 ) . '% ' . round( $attributes['focalPoint']['y'] * 100 ) . '%'
 		: null;
+
+	// Determine which image ID to use: bound ID takes precedence over featured image.
+	if ( $has_id_binding ) {
+		$image_id = $attributes['id'];
+	} elseif ( $attributes['useFeaturedImage'] ) {
+		if ( in_the_loop() ) {
+			update_post_thumbnail_cache();
+		}
+		$image_id = get_post_thumbnail_id();
+	} else {
+		$image_id = null;
+	}
+
+	// If we have a URL binding but no ID, we'll use the URL directly later.
+	$image_url = $has_url_binding ? $attributes['url'] : null;
+
+	// If we don't have an image ID and no URL binding, return content as-is.
+	if ( ! $image_id && ! $image_url ) {
+		return $content;
+	}
 
 	if ( ! ( $attributes['hasParallax'] || $attributes['isRepeated'] ) ) {
 		$attr = array(
@@ -141,17 +166,33 @@ function render_block_core_cover( $attributes, $content ) {
 			$attr['style']                = 'object-position:' . $object_position . ';';
 		}
 
-		$image = get_the_post_thumbnail( null, $attributes['sizeSlug'] ?? 'post-thumbnail', $attr );
-	} else {
-		if ( in_the_loop() ) {
-			update_post_thumbnail_cache();
+		// Use the determined image ID, or if URL binding exists without ID, create an img tag.
+		if ( $image_id ) {
+			$image = wp_get_attachment_image( $image_id, $attributes['sizeSlug'] ?? 'post-thumbnail', false, $attr );
+		} elseif ( $image_url ) {
+			$attr_string = '';
+			foreach ( $attr as $key => $value ) {
+				$attr_string .= ' ' . $key . '="' . esc_attr( $value ) . '"';
+			}
+			$image = '<img src="' . esc_url( $image_url ) . '"' . $attr_string . ' />';
+		} else {
+			$image = '';
 		}
-		$current_featured_image = get_the_post_thumbnail_url( null, $attributes['sizeSlug'] ?? null );
+	} else {
+		// Get the image URL for parallax/repeated backgrounds.
+		if ( $image_id ) {
+			$current_featured_image = wp_get_attachment_image_url( $image_id, $attributes['sizeSlug'] ?? 'full' );
+		} elseif ( $image_url ) {
+			$current_featured_image = $image_url;
+		} else {
+			$current_featured_image = null;
+		}
+
 		if ( ! $current_featured_image ) {
 			return $content;
 		}
 
-		$current_thumbnail_id = get_post_thumbnail_id();
+		$current_thumbnail_id = $image_id;
 
 		$processor = new WP_HTML_Tag_Processor( '<div></div>' );
 		$processor->next_tag();
