@@ -33,13 +33,13 @@ const capitalize = ( str: string ): string =>
  *
  * @param property The CSS property name.
  * @param target   The design system token target.
- * @param value    The size value, either a number (multiplier of base unit) or a string (token name).
+ * @param value    The size token name.
  * @return A CSS value string with variable references.
  */
 const getSpacingValue = (
 	property: string,
 	target: string,
-	value: number | string
+	value: string
 ): string =>
 	`var(--wpds-dimension-${ property }-${ target }-${ value }, var(--wpds-dimension-${ property }-surface-${ value }))`;
 
