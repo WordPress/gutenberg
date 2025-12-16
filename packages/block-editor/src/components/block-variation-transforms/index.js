@@ -148,39 +148,39 @@ function __experimentalBlockVariationTransforms( { blockClientId } ) {
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 	const { activeBlockVariation, variations, isContentOnly, isSection } =
 		useSelect(
-		( select ) => {
-			const { getActiveBlockVariation, getBlockVariations } =
-				select( blocksStore );
+			( select ) => {
+				const { getActiveBlockVariation, getBlockVariations } =
+					select( blocksStore );
 
-			const {
-				getBlockName,
-				getBlockAttributes,
-				getBlockEditingMode,
-				isSectionBlock,
-			} = unlock( select( blockEditorStore ) );
+				const {
+					getBlockName,
+					getBlockAttributes,
+					getBlockEditingMode,
+					isSectionBlock,
+				} = unlock( select( blockEditorStore ) );
 
-			const name = blockClientId && getBlockName( blockClientId );
+				const name = blockClientId && getBlockName( blockClientId );
 
 				const { hasContentRoleAttribute } = unlock(
 					select( blocksStore )
 				);
-			const isContentBlock = hasContentRoleAttribute( name );
+				const isContentBlock = hasContentRoleAttribute( name );
 
-			return {
-				activeBlockVariation: getActiveBlockVariation(
-					name,
-					getBlockAttributes( blockClientId ),
-					'transform'
-				),
+				return {
+					activeBlockVariation: getActiveBlockVariation(
+						name,
+						getBlockAttributes( blockClientId ),
+						'transform'
+					),
 					variations: name && getBlockVariations( name, 'transform' ),
-				isContentOnly:
+					isContentOnly:
 						getBlockEditingMode( blockClientId ) ===
 							'contentOnly' && ! isContentBlock,
-				isSection: isSectionBlock( blockClientId ),
-			};
-		},
-		[ blockClientId ]
-	);
+					isSection: isSectionBlock( blockClientId ),
+				};
+			},
+			[ blockClientId ]
+		);
 
 	const selectedValue = activeBlockVariation?.name;
 
