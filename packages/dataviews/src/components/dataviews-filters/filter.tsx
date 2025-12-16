@@ -37,6 +37,7 @@ import type {
 	Operator,
 	Option,
 	View,
+	NormalizedFieldDatetime,
 } from '../../types';
 import useElements from '../../hooks/use-elements';
 import parseDateTime from '../../field-types/utils/parse-date-time';
@@ -223,7 +224,11 @@ export default function Filter( {
 			try {
 				const dateValue = parseDateTime( label );
 				if ( dateValue !== null ) {
-					label = dateValue.toLocaleString();
+					label = dateI18n(
+						( field as NormalizedFieldDatetime< any > ).format
+							.datetime,
+						getDate( label )
+					);
 				}
 			} catch ( e ) {
 				label = filterInView.value;
