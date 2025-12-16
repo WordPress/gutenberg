@@ -16,6 +16,9 @@
  * @return string Returns the cover block markup, if useFeaturedImage is true.
  */
 function render_block_core_cover( $attributes, $content ) {
+	$has_bindings_url    = isset( $attributes['metadata']['bindings']['url'] ) && ! empty( $attributes['metadata']['bindings']['url'] );
+	$uses_featured_image = false === $attributes['useFeaturedImage'] ? false : true;
+
 	// Handle embed video background.
 	if (
 		isset( $attributes['backgroundType'] ) &&
