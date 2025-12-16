@@ -654,3 +654,16 @@ body.editor-styles-wrapper .wp-block-navigation__responsive-container.is-menu-op
 	margin-top: $grid-unit-10;
 	width: fit-content;
 }
+
+.wp-block-navigation__overlay-selector {
+	position: relative;
+}
+
+.wp-block-navigation__overlay-create-button {
+	position: absolute;
+	// Align with SelectControl label by offsetting by button padding
+	// Small icon buttons have 0 padding, but we align with default button top padding (4px = $grid-unit-05)
+	top: -$grid-unit-05;
+	right: 0;
+	z-index: 1;
+}

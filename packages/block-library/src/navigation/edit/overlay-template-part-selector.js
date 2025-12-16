@@ -1,18 +1,14 @@
 /**
  * WordPress dependencies
  */
-import {
-	useMemo,
-	useState,
-	useCallback,
-	createInterpolateElement,
-} from '@wordpress/element';
+import { useMemo, useState, useCallback } from '@wordpress/element';
 import { useEntityRecords } from '@wordpress/core-data';
 import { useDispatch } from '@wordpress/data';
 import { SelectControl, Button } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { decodeEntities } from '@wordpress/html-entities';
 import { store as noticesStore } from '@wordpress/notices';
+import { plus } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -175,48 +171,27 @@ export default function OverlayTemplatePartSelector( {
 
 	const isCreateButtonDisabled = isResolving || isCreating;
 
-	// Build help text with create button using createInterpolateElement
-	// Must be called before early return to follow Rules of Hooks
+	// Build help text
 	const helpText = useMemo( () => {
-		const createButton = (
+		if ( overlayTemplateParts.length === 0 && hasResolved ) {
+			return __( 'No overlays found.' );
+		}
+		return __( 'Select an overlay to use for the navigation.' );
+	}, [ overlayTemplateParts.length, hasResolved ] );
+
+	return (
+		<div className="wp-block-navigation__overlay-selector">
 			<Button
-				__next40pxDefaultSize
-				variant="link"
+				size="small"
+				icon={ plus }
 				onClick={ handleCreateOverlay }
 				disabled={ isCreateButtonDisabled }
 				accessibleWhenDisabled
 				isBusy={ isCreating }
-				aria-label={ __( 'Create new overlay template' ) }
-				className="wp-block-navigation__overlay-create-link"
-			>
-				{ __( 'Create New Overlay Template' ) }
-			</Button>
-		);
-
-		if ( overlayTemplateParts.length === 0 && hasResolved ) {
-			return createInterpolateElement(
-				__( 'No overlays found. <button />' ),
-				{
-					button: createButton,
-				}
-			);
-		}
-		return createInterpolateElement(
-			__( 'Select an overlay to use for the navigation. <button />' ),
-			{
-				button: createButton,
-			}
-		);
-	}, [
-		overlayTemplateParts.length,
-		hasResolved,
-		isCreateButtonDisabled,
-		isCreating,
-		handleCreateOverlay,
-	] );
-
-	return (
-		<div className="wp-block-navigation__overlay-selector">
+				label={ __( 'Create new overlay template' ) }
+				showTooltip
+				className="wp-block-navigation__overlay-create-button"
+			/>
 			<SelectControl
 				__next40pxDefaultSize
 				__nextHasNoMarginBottom
