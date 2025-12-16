@@ -225,7 +225,7 @@ export default function OverlayTemplatePartSelector( {
 						help={ helpText }
 					/>
 				</FlexBlock>
-				{ overlay && ( ! hasResolved || selectedTemplatePart ) && (
+				{ overlay && hasResolved && selectedTemplatePart && (
 					<FlexItem>
 						<Button
 							__next40pxDefaultSize
