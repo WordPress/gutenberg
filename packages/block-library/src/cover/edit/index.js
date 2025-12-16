@@ -109,6 +109,7 @@ function CoverEdit( {
 		isUserOverlayColor,
 		sizeSlug,
 		poster,
+		metadata,
 	} = attributes;
 
 	const [ featuredImage ] = useEntityProp(
@@ -175,6 +176,41 @@ function CoverEdit( {
 		} )();
 		// Update the block only when the featured image changes.
 	}, [ mediaUrl ] );
+
+	// Check if pattern overrides are enabled.
+	const arePatternOverridesEnabled =
+		metadata?.bindings?.__default?.source === 'core/pattern-overrides';
+
+	// Handle dimRatio adjustment when image is set via bindings.
+	// When an image is added through bindings (not through the UI), we need to
+	// adjust dimRatio from 100 to 50 to make the image visible, similar to
+	// what happens in onSelectMedia.
+	const hasImageBinding =
+		!! metadata?.bindings?.id || !! metadata?.bindings?.url;
+	const prevHasImageBinding = useRef( hasImageBinding );
+	const prevId = useRef( id );
+	const prevUrl = useRef( originalUrl );
+
+	useEffect( () => {
+		// Only adjust dimRatio if:
+		// 1. Image bindings are present
+		// 2. An id or url has been set (image is now available)
+		// 3. dimRatio is still at the default 100
+		// 4. This is a new image (id or url changed from undefined/null)
+		if (
+			hasImageBinding &&
+			( id || originalUrl ) &&
+			dimRatio === 100 &&
+			( ( ! prevId.current && id ) ||
+				( ! prevUrl.current && originalUrl ) )
+		) {
+			setAttributes( { dimRatio: 50 } );
+		}
+
+		prevHasImageBinding.current = hasImageBinding;
+		prevId.current = id;
+		prevUrl.current = originalUrl;
+	}, [ hasImageBinding, id, originalUrl, dimRatio, setAttributes ] );
 
 	// instead of destructuring the attributes
 	// we define the url and background type
@@ -521,6 +557,7 @@ function CoverEdit( {
 			toggleUseFeaturedImage={ toggleUseFeaturedImage }
 			onClearMedia={ onClearMedia }
 			blockEditingMode={ blockEditingMode }
+			arePatternOverridesEnabled={ arePatternOverridesEnabled }
 		/>
 	);
 

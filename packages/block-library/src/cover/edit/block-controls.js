@@ -32,6 +32,7 @@ export default function CoverBlockControls( {
 	onClearMedia,
 	onSelectEmbedUrl,
 	blockEditingMode,
+	arePatternOverridesEnabled = false,
 } ) {
 	const { contentPosition, id, useFeaturedImage, minHeight, minHeightUnit } =
 		attributes;
@@ -102,6 +103,7 @@ export default function CoverBlockControls( {
 					/>
 				</BlockControls>
 			) }
+		{ ! arePatternOverridesEnabled && (
 			<BlockControls group="other">
 				<MediaReplaceFlow
 					mediaId={ id }
@@ -126,6 +128,7 @@ export default function CoverBlockControls( {
 					) }
 				</MediaReplaceFlow>
 			</BlockControls>
+		) }
 			{ isEmbedUrlInputOpen && (
 				<EmbedVideoUrlInput
 					onSubmit={ ( embedUrl ) => {
