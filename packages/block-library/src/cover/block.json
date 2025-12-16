@@ -16,7 +16,8 @@
 			"default": false
 		},
 		"id": {
-			"type": "number"
+			"type": "number",
+			"role": "content"
 		},
 		"alt": {
 			"type": "string",
