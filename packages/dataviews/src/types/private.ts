@@ -5,6 +5,7 @@ import type {
 	CustomValidator,
 	Field,
 	FormatDate,
+	FormatDatetime,
 	FormatInteger,
 	FormatNumber,
 	NormalizedField,
@@ -26,6 +27,7 @@ export type FieldType< Item > = Pick<
 	) =>
 		| Record< string, any >
 		| Required< FormatDate >
+		| Required< FormatDatetime >
 		| Required< FormatNumber >
 		| Required< FormatInteger >;
 	validate: {

@@ -18,7 +18,7 @@ import { getSettings } from '@wordpress/date';
 /**
  * Internal dependencies
  */
-import type { DataFormControlProps } from '../types';
+import type { DataFormControlProps, FormatDatetime } from '../types';
 import { OPERATOR_IN_THE_PAST, OPERATOR_OVER } from '../constants';
 import RelativeDateControl from './utils/relative-date-control';
 import getCustomValidity from './utils/get-custom-validity';
@@ -147,9 +147,12 @@ function CalendarDateTimeControl< Item >( {
 		[ onChangeCallback ]
 	);
 
+	const { format: fieldFormat } = field;
+	const weekStartsOn =
+		( fieldFormat as FormatDatetime ).weekStartsOn ??
+		getSettings().l10n.startOfWeek;
 	const {
 		timezone: { string: timezoneString },
-		l10n: { startOfWeek },
 	} = getSettings();
 
 	const displayLabel =
@@ -176,7 +179,7 @@ function CalendarDateTimeControl< Item >( {
 					month={ calendarMonth }
 					onMonthChange={ setCalendarMonth }
 					timeZone={ timezoneString || undefined }
-					weekStartsOn={ startOfWeek }
+					weekStartsOn={ weekStartsOn }
 				/>
 				{ /* Manual datetime input */ }
 				<ValidatedInputControl

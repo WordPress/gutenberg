@@ -890,13 +890,39 @@ export const DateTimeComponent = ( {
 	type,
 	Edit,
 	asyncElements,
+	formatDatetime,
+	formatWeekStartsOn,
 }: {
 	type: PanelTypes;
 	Edit: ControlTypes;
 	asyncElements: boolean;
+	formatDatetime?: string;
+	formatWeekStartsOn?: 0 | 1 | 2 | 3 | 4 | 5 | 6;
 } ) => {
-	const datetimeFields = fields.filter( ( field ) =>
-		field.id.startsWith( 'datetime' )
+	const datetimeFields = useMemo(
+		() =>
+			fields
+				.filter( ( field ) => field.id.startsWith( 'datetime' ) )
+				.map( ( field ) => {
+					if ( formatDatetime || formatWeekStartsOn !== undefined ) {
+						const format: {
+							datetime?: string;
+							weekStartsOn?: 0 | 1 | 2 | 3 | 4 | 5 | 6;
+						} = {};
+						if ( formatDatetime ) {
+							format.datetime = formatDatetime;
+						}
+						if ( formatWeekStartsOn !== undefined ) {
+							format.weekStartsOn = formatWeekStartsOn;
+						}
+						return {
+							...field,
+							format,
+						};
+					}
+					return field;
+				} ),
+		[ fields, formatDatetime, formatWeekStartsOn ]
 	);
 
 	return (
@@ -909,6 +935,32 @@ export const DateTimeComponent = ( {
 	);
 };
 DateTimeComponent.storyName = 'datetime';
+DateTimeComponent.args = {
+	formatDatetime: '',
+	formatWeekStartsOn: undefined,
+};
+DateTimeComponent.argTypes = {
+	formatDatetime: {
+		control: 'text',
+		description:
+			'Custom PHP date format string (e.g., "M j, Y g:i a" for "Jan 1, 2021 2:30 pm"). Leave empty to use WordPress default.',
+	},
+	formatWeekStartsOn: {
+		control: 'select',
+		options: {
+			Default: undefined,
+			Sunday: 0,
+			Monday: 1,
+			Tuesday: 2,
+			Wednesday: 3,
+			Thursday: 4,
+			Friday: 5,
+			Saturday: 6,
+		},
+		description:
+			'Day that the week starts on. Leave as Default to use WordPress default.',
+	},
+};
 
 export const DateComponent = ( {
 	type,

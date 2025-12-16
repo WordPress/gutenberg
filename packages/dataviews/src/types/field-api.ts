@@ -273,13 +273,26 @@ export type Field< Item > = {
 	/**
 	 * Display format configuration for fields.
 	 */
-	format?: FormatDate | FormatNumber | FormatInteger;
+	format?: FormatDate | FormatDatetime | FormatNumber | FormatInteger;
+};
+
+/**
+ * Format for datetime fields:
+ *
+ * - datetime: the format string (e.g., "M j, Y g:i a" for "Jan 1, 2021 2:30 pm").
+ * - weekStartsOn: to specify the first day of the week ('sunday', 'monday', etc.).
+ *
+ * If not provided, defaults to WordPress date format settings.
+ */
+export type FormatDatetime = {
+	datetime?: string;
+	weekStartsOn?: DayNumber;
 };
 
 /**
  * Format for date fields:
  *
- * - date: the format string (e.g., 'F j, Y' for WordPress default format like 'March 10, 2023')
+ * - date: the format string (e.g., 'F j, Y' for 'March 10, 2023')
  * - weekStartsOn: to specify the first day of the week ('sunday', 'monday', etc.).
  *
  * If not provided, defaults to WordPress date format settings.
@@ -333,6 +346,11 @@ type NormalizedFieldBase< Item > = Omit< Field< Item >, 'Edit' | 'isValid' > & {
 	format: {};
 };
 
+export type NormalizedFieldDatetime< Item > = NormalizedFieldBase< Item > & {
+	type: 'datetime';
+	format: Required< FormatDatetime >;
+};
+
 export type NormalizedFieldDate< Item > = NormalizedFieldBase< Item > & {
 	type: 'date';
 	format: Required< FormatDate >;
@@ -351,6 +369,7 @@ export type NormalizedFieldInteger< Item > = NormalizedFieldBase< Item > & {
 export type NormalizedField< Item > =
 	| NormalizedFieldBase< Item >
 	| NormalizedFieldDate< Item >
+	| NormalizedFieldDatetime< Item >
 	| NormalizedFieldNumber< Item >
 	| NormalizedFieldInteger< Item >;
 
