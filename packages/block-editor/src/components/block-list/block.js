@@ -208,36 +208,31 @@ function BlockListBlock( {
 	}
 
 	const { 'data-align': dataAlign, ...restWrapperProps } = wrapperProps ?? {};
+	const updatedWrapperProps = {
+		...restWrapperProps,
+		className: clsx(
+			restWrapperProps.className,
+			dataAlign && themeSupportsLayout && `align${ dataAlign }`,
+			! ( dataAlign && isSticky ) && className
+		),
+	};
 
 	// We set a new context with the adjusted and filtered wrapperProps (through
 	// `editor.BlockListBlock`), which the `BlockListBlockProvider` did not have
 	// access to.
-	const newPrivateBlockContext = useMemo(
-		() => ( {
-			wrapperProps: {
-				...restWrapperProps,
-				className: clsx(
-					restWrapperProps.className,
-					dataAlign && themeSupportsLayout && `align${ dataAlign }`,
-					! ( dataAlign && isSticky ) && className
-				),
-			},
-			isAligned,
-			...context,
-		} ),
-		[
-			className,
-			context,
-			dataAlign,
-			isAligned,
-			isSticky,
-			restWrapperProps,
-			themeSupportsLayout,
-		]
-	);
-
+	// Note that the context value doesn't have to be memoized in this case
+	// because when it changes, this component will be re-rendered anyway, and
+	// none of the consumers (BlockListBlock and useBlockProps) are memoized or
+	// "pure". This is different from the public BlockEditContext, where
+	// consumers might be memoized or "pure".
 	return (
-		<PrivateBlockContext.Provider value={ newPrivateBlockContext }>
+		<PrivateBlockContext.Provider
+			value={ {
+				wrapperProps: updatedWrapperProps,
+				isAligned,
+				...context,
+			} }
+		>
 			<BlockCrashBoundary
 				fallback={
 					<Block className="has-warning">
