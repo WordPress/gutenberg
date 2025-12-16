@@ -156,4 +156,10 @@ export interface MediaEditProps< Item > extends DataFormControlProps< Item > {
 	 * Help text.
 	 */
 	help?: string;
+	/**
+	 * Whether to allow multiple media selections.
+	 *
+	 * @default false
+	 */
+	multiple?: boolean;
 }

@@ -7,55 +7,56 @@ fieldset.fields-controls__media {
 	padding: 0;
 	margin: 0;
 
-	.fields-controls__media-picker-button-container {
+	.fields-controls__media-row {
+		display: grid;
+		grid-template-columns: 1fr auto;
+		gap: $grid-unit-15;
+		align-items: center;
+	}
+
+	.fields-controls__media-picker-button {
+		display: flex;
+		align-items: center;
+		gap: $grid-unit-15;
 		border: $border-width dotted $gray-300;
 		border-radius: $radius-small;
 		padding: calc(8px - #{$border-width});
 		cursor: pointer;
+		min-width: 0;
 
 		&:hover {
 			background-color: $gray-100;
 		}
 
-		.fields-controls__media-title,
-		.fields-controls__media-placeholder {
-			width: 100%;
-			color: $gray-900;
-			white-space: nowrap;
-			text-overflow: ellipsis;
-			overflow: hidden;
-			align-self: center;
-			text-align: start;
-			margin-right: auto;
-		}
-
-		.fields-controls__media-placeholder {
-			text-align: center;
-		}
-
-		.fields-controls__media-image {
-			width: 24px;
-			aspect-ratio: 1 / 1;
-			flex-shrink: 0;
-			border-radius: $radius-small;
-			align-self: center;
+		&:focus-visible {
+			box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+			outline: none;
 		}
 	}
 
-	.fields-controls__media-remove-button {
-		place-self: end;
+	.fields-controls__media-filename,
+	.fields-controls__media-placeholder {
+		flex: 1;
+		min-width: 0;
+		color: $gray-900;
+	}
+
+	.fields-controls__media-placeholder {
+		text-align: center;
+	}
+
+	.fields-controls__media-thumbnail {
+		width: 24px;
+		aspect-ratio: 1 / 1;
 		flex-shrink: 0;
-	}
-
-	.fields-controls__media-help-text {
-		color: $gray-600;
-		font-size: $helptext-font-size;
+		border-radius: $radius-small;
 	}
 }
 
-.dataforms-layouts-panel__field-control {
-	.fields-controls__media-image {
-		width: 16px;
-		height: 16px;
-	}
-}
+// TODO: do we need this?
+// .dataforms-layouts-panel__field-control {
+// 	.fields-controls__media-thumbnail {
+// 		width: 16px;
+// 		height: 16px;
+// 	}
+// }

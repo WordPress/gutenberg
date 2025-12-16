@@ -3,18 +3,20 @@
  */
 import {
 	Button,
+	Icon,
 	__experimentalText as Text,
-	__experimentalHStack as HStack,
+	__experimentalTruncate as Truncate,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
-import { store as coreStore } from '@wordpress/core-data';
+import { store as coreStore, type Attachment } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
-import { useCallback, useRef, useState } from '@wordpress/element';
+import { useCallback, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import {
 	privateApis as mediaUtilsPrivateApis,
 	MediaUpload,
 } from '@wordpress/media-utils';
+import { archive, audio, video, file } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -35,29 +37,106 @@ const { MediaUploadModal } = unlock( mediaUtilsPrivateApis );
  */
 function ConditionalMediaUpload( { render, ...props }: any ) {
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
-
 	if ( ( window as any ).__experimentalDataViewsMediaModal ) {
 		return (
 			<>
 				{ render && render( { open: () => setIsModalOpen( true ) } ) }
-				<MediaUploadModal
-					{ ...props }
-					isOpen={ isModalOpen }
-					onClose={ () => {
-						setIsModalOpen( false );
-						props.onClose?.();
-					} }
-					onSelect={ ( media: any ) => {
-						setIsModalOpen( false );
-						props.onSelect?.( media );
-					} }
-				/>
+				{ isModalOpen && (
+					<MediaUploadModal
+						{ ...props }
+						isOpen={ isModalOpen }
+						onClose={ () => {
+							setIsModalOpen( false );
+							props.onClose?.();
+						} }
+						onSelect={ ( media: any ) => {
+							setIsModalOpen( false );
+							props.onSelect?.( media );
+						} }
+					/>
+				) }
 			</>
 		);
 	}
-
-	// Fallback to media-utils MediaUpload when experiment is disabled
+	// Fallback to media-utils MediaUpload when experiment is disabled.
 	return <MediaUpload { ...props } render={ render } />;
+}
+
+function MediaPickerButton( {
+	open,
+	children,
+	label,
+}: {
+	open: () => void;
+	children: React.ReactNode;
+	label: string;
+} ) {
+	return (
+		<div
+			className="fields-controls__media-picker-button"
+			role="button"
+			tabIndex={ 0 }
+			onClick={ open }
+			onKeyDown={ ( event ) => {
+				if ( event.key === 'Enter' || event.key === ' ' ) {
+					event.preventDefault();
+					open();
+				}
+			} }
+			aria-label={ label }
+		>
+			{ children }
+		</div>
+	);
+}
+
+const archiveMimeTypes = [
+	'application/zip',
+	'application/x-zip-compressed',
+	'application/x-rar-compressed',
+	'application/x-7z-compressed',
+	'application/x-tar',
+	'application/x-gzip',
+];
+function MediaPreview( {
+	url,
+	attachment,
+}: {
+	url: string;
+	attachment: Attachment< 'view' > | null;
+} ) {
+	if ( ! attachment ) {
+		return null;
+	}
+	const attachmentTitle = attachment.title.rendered;
+	const mimeType = attachment.mime_type;
+	let preview: JSX.Element = <Icon icon={ file } />;
+	if ( mimeType.startsWith( 'image/' ) ) {
+		preview = (
+			<img
+				className="fields-controls__media-thumbnail"
+				alt={ attachment.alt_text || '' }
+				src={ url }
+			/>
+		);
+	} else if ( mimeType.startsWith( 'audio/' ) ) {
+		preview = <Icon icon={ audio } />;
+	} else if ( mimeType.startsWith( 'video/' ) ) {
+		preview = <Icon icon={ video } />;
+	} else if ( archiveMimeTypes.includes( mimeType ) ) {
+		preview = <Icon icon={ archive } />;
+	}
+	return (
+		<>
+			{ preview }
+			<Truncate
+				className="fields-controls__media-filename"
+				title={ attachmentTitle }
+			>
+				{ attachmentTitle }
+			</Truncate>
+		</>
+	);
 }
 
 /**
@@ -104,103 +183,104 @@ export default function MediaEdit< Item >( {
 	allowedTypes = [ 'image' ],
 	placeholder = __( 'Choose file' ),
 	help,
+	multiple,
 }: MediaEditProps< Item > ) {
 	const value = field.getValue( { item: data } );
-
-	const attachment = useSelect(
+	const attachments = useSelect(
 		( select ) => {
 			if ( ! value ) {
 				return null;
 			}
-			const { getEntityRecord } = select( coreStore );
-			return getEntityRecord( 'postType', 'attachment', value );
+			const normalizedValue = Array.isArray( value ) ? value : [ value ];
+			const { getEntityRecords } = select( coreStore );
+			return getEntityRecords( 'postType', 'attachment', {
+				include: normalizedValue,
+			} ) as Attachment< 'view' >[] | null;
 		},
 		[ value ]
 	);
-
 	const onChangeControl = useCallback(
-		( newValue: number ) =>
+		( newValue: number | number[] ) =>
 			onChange( field.setValue( { item: data, value: newValue } ) ),
 		[ data, field, onChange ]
 	);
-
-	const url = attachment?.source_url;
-	const attachmentTitle = attachment?.title?.rendered;
-	const ref = useRef( null );
-
+	const removeItem = ( itemId: number ) => {
+		const currentIds = Array.isArray( value ) ? value : [ value ];
+		const newIds = currentIds.filter( ( id ) => id !== itemId );
+		onChangeControl( newIds.length ? newIds : 0 );
+	};
 	return (
 		<fieldset className="fields-controls__media">
 			<ConditionalMediaUpload
 				onSelect={ ( selectedMedia: any ) => {
-					onChangeControl( selectedMedia.id );
+					if ( multiple ) {
+						const newIds = Array.isArray( selectedMedia )
+							? selectedMedia.map( ( m: any ) => m.id )
+							: [ selectedMedia.id ];
+						onChangeControl( newIds );
+					} else {
+						onChangeControl( selectedMedia.id );
+					}
 				} }
 				allowedTypes={ allowedTypes }
 				value={ value }
+				multiple={ multiple }
 				title={ field.label }
-				render={ ( { open }: any ) => (
-					<VStack>
-						<HStack spacing={ 2 } justify="space-between">
-							<HStack
-								spacing={ 3 }
-								justify="flex-start"
-								alignment="center"
-								className="fields-controls__media-picker-button-container"
-								ref={ ref }
-								role="button"
-								tabIndex={ -1 }
-								onClick={ open }
-								onKeyDown={ ( event ) => {
-									if (
-										event.key === 'Enter' ||
-										event.key === ' '
-									) {
-										event.preventDefault();
-										open();
-									}
-								} }
-							>
-								{ url && (
-									<>
-										<img
-											className="fields-controls__media-image"
-											alt=""
-											src={ url }
-										/>
-										<span className="fields-controls__media-title">
-											{ attachmentTitle }
-										</span>
-									</>
-								) }
-								{ ! url && (
-									<span className="fields-controls__media-placeholder">
-										{ placeholder }
-									</span>
-								) }
-							</HStack>
-							{ url && (
-								<>
-									<Button
-										__next40pxDefaultSize
-										className="fields-controls__media-remove-button"
-										text={ __( 'Remove' ) }
-										variant="secondary"
-										onClick={ (
-											event: React.MouseEvent< HTMLButtonElement >
-										) => {
-											event.stopPropagation();
-											onChangeControl( 0 );
-										} }
-									/>
-								</>
+				render={ ( { open }: any ) => {
+					const addButtonLabel = attachments?.length
+						? __( 'Add files' )
+						: placeholder;
+					return (
+						<VStack spacing={ 2 }>
+							{ !! attachments?.length && (
+								<VStack spacing={ 2 }>
+									{ attachments.map( ( attachment ) => (
+										<div
+											key={ attachment.id }
+											className="fields-controls__media-row"
+										>
+											<MediaPickerButton
+												open={ open }
+												label={ __( 'Replace' ) }
+											>
+												<MediaPreview
+													url={
+														attachment.source_url
+													}
+													attachment={ attachment }
+												/>
+											</MediaPickerButton>
+											<Button
+												__next40pxDefaultSize
+												className="fields-controls__media-remove"
+												text={ __( 'Remove' ) }
+												variant="secondary"
+												onClick={ (
+													event: React.MouseEvent< HTMLButtonElement >
+												) => {
+													event.stopPropagation();
+													removeItem( attachment.id );
+												} }
+											/>
+										</div>
+									) ) }
+								</VStack>
 							) }
-						</HStack>
-						{ help && (
-							<Text className="fields-controls__media-help-text">
-								{ help }
-							</Text>
-						) }
-					</VStack>
-				) }
+							{ ( multiple || ! attachments?.length ) && (
+								<MediaPickerButton
+									open={ open }
+									label={ addButtonLabel }
+								>
+									<span className="fields-controls__media-placeholder">
+										{ addButtonLabel }
+									</span>
+								</MediaPickerButton>
+							) }
+
+							{ help && <Text variant="muted">{ help }</Text> }
+						</VStack>
+					);
+				} }
 			/>
 		</fieldset>
 	);
