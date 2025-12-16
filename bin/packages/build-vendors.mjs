@@ -23,7 +23,11 @@ const VENDORS_DIR = path.join( BUILD_DIR, 'vendors' );
  * @param {number}   length    - Hash length (default: 20)
  * @return {Promise<string>} Content hash string
  */
-async function generateContentHash( filePaths, algorithm = 'sha256', length = 20 ) {
+async function generateContentHash(
+	filePaths,
+	algorithm = 'sha256',
+	length = 20
+) {
 	const hashBuilder = createHash( algorithm );
 
 	// Sort paths for deterministic ordering

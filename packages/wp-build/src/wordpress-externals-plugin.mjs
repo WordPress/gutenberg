@@ -20,7 +20,11 @@ import { getPackageInfo } from './package-utils.mjs';
  * @param {number}   length    - Hash length (default: 20)
  * @return {Promise<string>} Content hash string
  */
-async function generateContentHash( filePaths, algorithm = 'sha256', length = 20 ) {
+async function generateContentHash(
+	filePaths,
+	algorithm = 'sha256',
+	length = 20
+) {
 	const hashBuilder = createHash( algorithm );
 
 	// Sort paths for deterministic ordering
@@ -359,7 +363,8 @@ export function createWordpressExternalsPlugin(
 						}
 
 						// Generate content-based version hash
-						const version = await generateContentHash( filesToHash );
+						const version =
+							await generateContentHash( filesToHash );
 
 						const parts = [
 							`'dependencies' => array(${ dependenciesString })`,
