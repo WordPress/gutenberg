@@ -7,7 +7,7 @@
 
 /**
  * Add 'display' to the list of safe CSS properties.
- * This is needed for responsive visibility support.
+ * This is needed for viewport visibility support.
  *
  * @param array $attr List of allowed CSS attributes.
  * @return array Modified list of allowed CSS attributes.

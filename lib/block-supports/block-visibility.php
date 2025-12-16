@@ -6,7 +6,7 @@
  */
 
 /**
- * Render nothing if the block is hidden, or add responsive visibility styles.
+ * Render nothing if the block is hidden, or add viewport visibility styles.
  *
  * @param string $block_content Rendered block content.
  * @param array  $block         Block object.
@@ -21,17 +21,14 @@ function gutenberg_render_block_visibility_support( $block_content, $block ) {
 
 	$block_visibility = $block['attrs']['metadata']['blockVisibility'] ?? null;
 
-	// If blockVisibility is false, hide the block completely.
 	if ( false === $block_visibility ) {
 		return '';
 	}
 
-	// Check if the responsive breakpoint experiment is enabled.
 	if ( ! gutenberg_is_experiment_enabled( 'gutenberg-hide-blocks-based-on-screen-size' ) ) {
 		return $block_content;
 	}
 
-	// If blockVisibility is an object with breakpoint settings, generate responsive styles.
 	if ( is_array( $block_visibility ) && ! empty( $block_visibility ) ) {
 		/*
 		 * Breakpoints definitions are in several places in WordPress packages.
@@ -90,10 +87,9 @@ function gutenberg_render_block_visibility_support( $block_content, $block ) {
 			return '';
 		}
 
-		// Generate a unique class name based on which breakpoints are hidden.
+		// Maintain consistent order of breakpoints for class name generation.
 		sort( $hidden_on );
 
-		// Sanitize breakpoint names for use in HTML class attribute.
 		$sanitized_hidden_on = array_map( 'sanitize_html_class', $hidden_on );
 		$sanitized_hidden_on = array_filter( $sanitized_hidden_on );
 
@@ -103,9 +99,7 @@ function gutenberg_render_block_visibility_support( $block_content, $block ) {
 		}
 
 		$visibility_class = 'wp-block-hidden-' . implode( '-', $sanitized_hidden_on );
-
-		// Generate CSS rules for each hidden breakpoint.
-		$css_rules = array();
+		$css_rules        = array();
 
 		foreach ( $hidden_on as $breakpoint ) {
 			if ( isset( $breakpoint_queries[ $breakpoint ] ) ) {
@@ -119,7 +113,6 @@ function gutenberg_render_block_visibility_support( $block_content, $block ) {
 			}
 		}
 
-		// Use the style engine to enqueue the CSS.
 		if ( ! empty( $css_rules ) ) {
 			gutenberg_style_engine_get_stylesheet_from_css_rules(
 				$css_rules,
@@ -129,7 +122,6 @@ function gutenberg_render_block_visibility_support( $block_content, $block ) {
 				)
 			);
 
-			// Add the visibility class to the block content.
 			if ( ! empty( $block_content ) ) {
 				$processor = new WP_HTML_Tag_Processor( $block_content );
 				if ( $processor->next_tag() ) {

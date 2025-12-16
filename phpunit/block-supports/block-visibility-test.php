@@ -73,9 +73,9 @@ class WP_Block_Supports_Block_Visibility_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Enable the responsive visibility experiment.
+	 * Enable the viewport visibility experiment.
 	 */
-	private function enable_responsive_visibility_experiment() {
+	private function enable_viewport_visibility_experiment() {
 		add_filter(
 			'pre_option_gutenberg-experiments',
 			function ( $value ) {
@@ -89,9 +89,9 @@ class WP_Block_Supports_Block_Visibility_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Disable the responsive visibility experiment.
+	 * Disable the viewport visibility experiment.
 	 */
-	private function disable_responsive_visibility_experiment() {
+	private function disable_viewport_visibility_experiment() {
 		add_filter(
 			'pre_option_gutenberg-experiments',
 			function ( $value ) {
@@ -164,7 +164,7 @@ class WP_Block_Supports_Block_Visibility_Test extends WP_UnitTestCase {
 	}
 
 	public function test_block_visibility_support_generated_css_with_display_none() {
-		$this->enable_responsive_visibility_experiment();
+		$this->enable_viewport_visibility_experiment();
 
 		$this->register_visibility_block_with_support(
 			'test/css-generation',
@@ -195,15 +195,15 @@ class WP_Block_Supports_Block_Visibility_Test extends WP_UnitTestCase {
 	}
 
 	public function test_block_visibility_support_without_experiment() {
-		$this->disable_responsive_visibility_experiment();
+		$this->disable_viewport_visibility_experiment();
 
 		$this->register_visibility_block_with_support(
-			'test/responsive-no-experiment',
+			'test/viewport-no-experiment',
 			array( 'visibility' => true )
 		);
 
 		$block = array(
-			'blockName' => 'test/responsive-no-experiment',
+			'blockName' => 'test/viewport-no-experiment',
 			'attrs'     => array(
 				'metadata' => array(
 					'blockVisibility' => array(
@@ -220,15 +220,15 @@ class WP_Block_Supports_Block_Visibility_Test extends WP_UnitTestCase {
 	}
 
 	public function test_block_visibility_support_generated_css_with_mobile_breakpoint() {
-		$this->enable_responsive_visibility_experiment();
+		$this->enable_viewport_visibility_experiment();
 
 		$this->register_visibility_block_with_support(
-			'test/responsive-mobile',
+			'test/viewport-mobile',
 			array( 'visibility' => true )
 		);
 
 		$block = array(
-			'blockName' => 'test/responsive-mobile',
+			'blockName' => 'test/viewport-mobile',
 			'attrs'     => array(
 				'metadata' => array(
 					'blockVisibility' => array(
@@ -245,15 +245,15 @@ class WP_Block_Supports_Block_Visibility_Test extends WP_UnitTestCase {
 	}
 
 	public function test_block_visibility_support_generated_css_with_multiple_breakpoints() {
-		$this->enable_responsive_visibility_experiment();
+		$this->enable_viewport_visibility_experiment();
 
 		$this->register_visibility_block_with_support(
-			'test/responsive-multiple',
+			'test/viewport-multiple',
 			array( 'visibility' => true )
 		);
 
 		$block = array(
-			'blockName' => 'test/responsive-multiple',
+			'blockName' => 'test/viewport-multiple',
 			'attrs'     => array(
 				'metadata' => array(
 					'blockVisibility' => array(
@@ -271,15 +271,15 @@ class WP_Block_Supports_Block_Visibility_Test extends WP_UnitTestCase {
 	}
 
 	public function test_block_visibility_support_generated_css_with_tablet_breakpoint() {
-		$this->enable_responsive_visibility_experiment();
+		$this->enable_viewport_visibility_experiment();
 
 		$this->register_visibility_block_with_support(
-			'test/responsive-tablet',
+			'test/viewport-tablet',
 			array( 'visibility' => true )
 		);
 
 		$block = array(
-			'blockName' => 'test/responsive-tablet',
+			'blockName' => 'test/viewport-tablet',
 			'attrs'     => array(
 				'metadata' => array(
 					'blockVisibility' => array(
@@ -297,15 +297,15 @@ class WP_Block_Supports_Block_Visibility_Test extends WP_UnitTestCase {
 	}
 
 	public function test_block_visibility_support_generated_css_with_all_breakpoints_visible() {
-		$this->enable_responsive_visibility_experiment();
+		$this->enable_viewport_visibility_experiment();
 
 		$this->register_visibility_block_with_support(
-			'test/responsive-all-visible',
+			'test/viewport-all-visible',
 			array( 'visibility' => true )
 		);
 
 		$block = array(
-			'blockName' => 'test/responsive-all-visible',
+			'blockName' => 'test/viewport-all-visible',
 			'attrs'     => array(
 				'metadata' => array(
 					'blockVisibility' => array(
@@ -324,15 +324,15 @@ class WP_Block_Supports_Block_Visibility_Test extends WP_UnitTestCase {
 	}
 
 	public function test_block_visibility_support_generated_css_with_empty_object() {
-		$this->enable_responsive_visibility_experiment();
+		$this->enable_viewport_visibility_experiment();
 
 		$this->register_visibility_block_with_support(
-			'test/responsive-empty',
+			'test/viewport-empty',
 			array( 'visibility' => true )
 		);
 
 		$block = array(
-			'blockName' => 'test/responsive-empty',
+			'blockName' => 'test/viewport-empty',
 			'attrs'     => array(
 				'metadata' => array(
 					'blockVisibility' => array(),
@@ -347,15 +347,15 @@ class WP_Block_Supports_Block_Visibility_Test extends WP_UnitTestCase {
 	}
 
 	public function test_block_visibility_support_generated_css_with_unknown_breakpoints_ignored() {
-		$this->enable_responsive_visibility_experiment();
+		$this->enable_viewport_visibility_experiment();
 
 		$this->register_visibility_block_with_support(
-			'test/responsive-unknown-breakpoints',
+			'test/viewport-unknown-breakpoints',
 			array( 'visibility' => true )
 		);
 
 		$block = array(
-			'blockName' => 'test/responsive-unknown-breakpoints',
+			'blockName' => 'test/viewport-unknown-breakpoints',
 			'attrs'     => array(
 				'metadata' => array(
 					'blockVisibility' => array(
@@ -376,15 +376,15 @@ class WP_Block_Supports_Block_Visibility_Test extends WP_UnitTestCase {
 	}
 
 	public function test_block_visibility_support_generated_css_with_empty_content() {
-		$this->enable_responsive_visibility_experiment();
+		$this->enable_viewport_visibility_experiment();
 
 		$this->register_visibility_block_with_support(
-			'test/empty-content',
+			'test/viewport-empty-content',
 			array( 'visibility' => true )
 		);
 
 		$block = array(
-			'blockName' => 'test/empty-content',
+			'blockName' => 'test/viewport-empty-content',
 			'attrs'     => array(
 				'metadata' => array(
 					'blockVisibility' => array(
