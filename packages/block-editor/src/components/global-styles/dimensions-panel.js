@@ -402,7 +402,19 @@ export default function DimensionsPanel( {
 	const showHeightControl = useHasHeight( settings );
 	const heightValue = decodeValue( inheritedValue?.dimensions?.height );
 	const setHeightValue = ( newValue ) => {
-		onChange( setImmutably( value, [ 'dimensions', 'height' ], newValue ) );
+		const tempValue = setImmutably(
+			value,
+			[ 'dimensions', 'height' ],
+			newValue
+		);
+		// Apply height, while removing any applied aspect ratio.
+		onChange(
+			setImmutably(
+				tempValue,
+				[ 'dimensions', 'aspectRatio' ],
+				undefined
+			)
+		);
 	};
 	const resetHeightValue = () => {
 		setHeightValue( undefined );
