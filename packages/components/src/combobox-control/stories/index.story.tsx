@@ -82,7 +82,6 @@ const Template: StoryFn< typeof ComboboxControl > = ( {
 export const Default = Template.bind( {} );
 Default.args = {
 	__next40pxDefaultSize: true,
-	__nextHasNoMarginBottom: true,
 	label: 'Select a country',
 	options: countryOptions,
 };

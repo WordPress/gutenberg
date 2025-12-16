@@ -95,7 +95,6 @@ const getIndexOfMatchingSuggestion = (
  * 	return (
  * 		<ComboboxControl
  * 			__next40pxDefaultSize
- * 			__nextHasNoMarginBottom
  * 			label="Font Size"
  * 			value={ fontSize }
  * 			onChange={ setFontSize }
@@ -116,7 +115,6 @@ const getIndexOfMatchingSuggestion = (
  */
 function ComboboxControl( props: ComboboxControlProps ) {
 	const {
-		__nextHasNoMarginBottom = false,
 		__next40pxDefaultSize = false,
 		value: valueProp,
 		label,
@@ -330,8 +328,7 @@ function ComboboxControl( props: ComboboxControlProps ) {
 	return (
 		<DetectOutside onFocusOutside={ onFocusOutside }>
 			<BaseControl
-				__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
-				__associatedWPComponentName="ComboboxControl"
+				__nextHasNoMarginBottom
 				className={ clsx( className, 'components-combobox-control' ) }
 				label={ label }
 				id={ `components-form-token-input-${ instanceId }` }
