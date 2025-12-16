@@ -8,7 +8,7 @@ import {
 	TextControl,
 	TextareaControl,
 } from '@wordpress/components';
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
@@ -22,40 +22,10 @@ import { useHandleLinkChange } from './use-handle-link-change';
 import { useEntityBinding } from './use-entity-binding';
 import { getSuggestionsQuery } from '../link-ui';
 import { useLinkPreview } from './use-link-preview';
+import { useIsInvalidLink } from './use-is-invalid-link';
 import { unlock } from '../../lock-unlock';
 
 const { LinkPicker } = unlock( blockEditorPrivateApis );
-
-/**
- * Get a human-readable entity type name.
- *
- * @param {string} type - The entity type
- * @param {string} kind - The entity kind
- * @return {string} Human-readable entity type name
- */
-function getEntityTypeName( type, kind ) {
-	if ( kind === 'post-type' ) {
-		switch ( type ) {
-			case 'post':
-				return __( 'post' );
-			case 'page':
-				return __( 'page' );
-			default:
-				return type || __( 'post' );
-		}
-	}
-	if ( kind === 'taxonomy' ) {
-		switch ( type ) {
-			case 'category':
-				return __( 'category' );
-			case 'tag':
-				return __( 'tag' );
-			default:
-				return type || __( 'term' );
-		}
-	}
-	return type || __( 'item' );
-}
 
 /**
  * Shared Controls component for Navigation Link and Navigation Submenu blocks.
@@ -79,16 +49,17 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 			attributes,
 		} );
 
-	const needsHelpText = hasUrlBinding;
-	const helpText = isBoundEntityAvailable
-		? BindingHelpText( {
-				type: attributes.type,
-				kind: attributes.kind,
-		  } )
-		: MissingEntityHelpText( {
-				type: attributes.type,
-				kind: attributes.kind,
-		  } );
+	const [ isInvalid, isDraft ] = useIsInvalidLink(
+		attributes.kind,
+		attributes.type,
+		entityRecord?.id,
+		hasUrlBinding
+	);
+
+	const helpText = InvalidLinkHelpText( {
+		invalid: isInvalid || ( hasUrlBinding && ! isBoundEntityAvailable ),
+		draft: isDraft,
+	} );
 
 	// Get the link change handler with built-in binding management
 	const handleLinkChange = useHandleLinkChange( {
@@ -184,7 +155,7 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 						attributes.kind
 					) }
 					label={ __( 'Link to' ) }
-					help={ needsHelpText ? helpText : undefined }
+					help={ helpText ? helpText : undefined }
 				/>
 			</ToolsPanelItem>
 
@@ -243,37 +214,24 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 		</ToolsPanel>
 	);
 }
-
 /**
- * Component to display help text for bound URL attributes.
+ * Returns help text for invalid or draft navigation links.
  *
- * @param {Object} props      - Component props
- * @param {string} props.type - The entity type
- * @param {string} props.kind - The entity kind
- * @return {string} Help text for the bound URL
+ * @param {Object}  props         - Component props
+ * @param {boolean} props.invalid - Whether the link is invalid (deleted or trashed).
+ * @param {boolean} props.draft   - Whether the link is a draft.
+ * @return {string} Error help text string (empty string if valid).
  */
-export function BindingHelpText( { type, kind } ) {
-	const entityType = getEntityTypeName( type, kind );
-	return sprintf(
-		/* translators: %s is the entity type (e.g., "page", "post", "category") */
-		__( 'Synced with the selected %s.' ),
-		entityType
-	);
-}
+export function InvalidLinkHelpText( { invalid, draft } ) {
+	if ( invalid ) {
+		return __(
+			'This link is invalid and will not appear on your site. Please update the link.'
+		);
+	} else if ( draft ) {
+		return __(
+			'This link is to a draft page, and will not appear on your site until it is published.'
+		);
+	}
 
-/**
- * Component to display error help text for missing entity bindings.
- *
- * @param {Object} props      - Component props
- * @param {string} props.type - The entity type
- * @param {string} props.kind - The entity kind
- * @return {JSX.Element} Error help text component
- */
-export function MissingEntityHelpText( { type, kind } ) {
-	const entityType = getEntityTypeName( type, kind );
-	return sprintf(
-		/* translators: %s is the entity type (e.g., "page", "post", "category") */
-		__( 'Synced %s is missing. Please update or remove this link.' ),
-		entityType
-	);
+	return '';
 }
