@@ -174,11 +174,11 @@ function render_block_core_cover( $attributes, $content ) {
 			$processor = new WP_HTML_Tag_Processor( '<img />' );
 			$processor->next_tag( 'img' );
 			$processor->set_attribute( 'src', $image_url );
+			// Only set known safe attributes.
+			$allowed_attrs = array( 'class', 'data-object-fit', 'data-object-position', 'style' );
 			foreach ( $attr as $key => $value ) {
-				// Sanitize attribute names to prevent injection.
-				$safe_key = sanitize_key( $key );
-				if ( ! empty( $safe_key ) ) {
-					$processor->set_attribute( $safe_key, $value );
+				if ( in_array( $key, $allowed_attrs, true ) ) {
+					$processor->set_attribute( $key, $value );
 				}
 			}
 			$image = $processor->get_updated_html();
