@@ -10,6 +10,7 @@ import type { GlobalStylesSettings } from '@wordpress/global-styles-engine';
  * Internal dependencies
  */
 import { ScreenHeader } from './screen-header';
+import { ScreenBody } from './screen-body';
 import DimensionsPanel from './dimensions-panel';
 import SpacingsCount from './spacing/spacings-count';
 import { hasAvailableSpacingSizes } from './spacing/utils';
@@ -32,9 +33,9 @@ function ScreenLayout() {
 			<>
 				{ hasDimensionsPanel && <DimensionsPanel /> }
 				{ hasSpacingSizes && (
-					<div className="global-styles-ui-screen">
+					<ScreenBody>
 						<SpacingsCount />
-					</div>
+					</ScreenBody>
 				) }
 			</>
 		</>
