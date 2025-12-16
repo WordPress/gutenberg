@@ -53,6 +53,7 @@
 // Fit Text
 .has-fit-text {
 	white-space: nowrap !important;
+	line-height: unset !important;
 }
 
 // This tag marks the end of the styles that apply to editing canvas contents and need to be manipulated when we resize the editor.
