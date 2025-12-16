@@ -2,12 +2,14 @@
  * External dependencies
  */
 import type { ReactNode } from 'react';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
  */
 import { __experimentalHStack as HStack } from '@wordpress/components';
 import {
+	useContext,
 	useEffect,
 	useMemo,
 	useRef,
@@ -86,12 +88,17 @@ function DefaultUI( {
 	search = true,
 	searchLabel = undefined,
 }: DefaultUIProps ) {
+	const { view } = useContext( DataViewsContext );
+	const isInfiniteScroll = view.infiniteScrollEnabled;
 	return (
 		<>
 			<HStack
 				alignment="top"
 				justify="space-between"
-				className="dataviews__view-actions"
+				className={ clsx( 'dataviews__view-actions', {
+					'dataviews__view-actions--infinite-scroll':
+						isInfiniteScroll,
+				} ) }
 				spacing={ 1 }
 			>
 				<HStack
