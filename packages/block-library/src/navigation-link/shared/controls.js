@@ -261,6 +261,14 @@ export function InvalidLinkHelpText() {
 	);
 }
 
+/**
+ * Component to display draft help text
+ *
+ * @param {Object} props      - Component props
+ * @param {string} props.type - The entity type
+ * @param {string} props.kind - The entity kind
+ * @return {JSX.Element} Draft help text component
+ */
 function DraftHelpText( { type, kind } ) {
 	const entityType = getEntityTypeName( type, kind );
 	return sprintf(
