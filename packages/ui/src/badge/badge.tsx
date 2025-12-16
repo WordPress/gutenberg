@@ -64,10 +64,8 @@ const getIntentStyles = (
 		case 'none':
 		default:
 			return {
-				backgroundColor: 'neutral-strong',
-				color: 'neutral',
-				borderColor: 'neutral',
-				borderWidth: 'xs',
+				backgroundColor: 'neutral',
+				color: 'neutral-weak',
 			};
 	}
 };
