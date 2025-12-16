@@ -12,12 +12,15 @@ export type ComboboxControlOption = {
 
 export type ComboboxControlProps = Pick<
 	BaseControlProps,
-	| '__nextHasNoMarginBottom'
-	| 'className'
-	| 'label'
-	| 'hideLabelFromVision'
-	| 'help'
+	'className' | 'label' | 'hideLabelFromVision' | 'help'
 > & {
+	/**
+	 * Start opting into the new margin-free styles that will become the default in a future version.
+	 *
+	 * @deprecated Default behavior since WordPress 7.0. Prop can be safely removed.
+	 * @ignore
+	 */
+	__nextHasNoMarginBottom?: boolean;
 	/**
 	 * Custom renderer invoked for each option in the suggestion list.
 	 * The render prop receives as its argument an object containing, under the `item` key,

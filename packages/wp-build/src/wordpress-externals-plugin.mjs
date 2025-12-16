@@ -1,14 +1,45 @@
 /**
  * External dependencies
  */
-import { writeFile, mkdir } from 'fs/promises';
+import { writeFile, mkdir, readFile } from 'fs/promises';
 import path from 'path';
 import { camelCase } from 'change-case';
+import { createHash } from 'crypto';
 
 /**
  * Internal dependencies
  */
 import { getPackageInfo } from './package-utils.mjs';
+
+/**
+ * Generate a content hash from file contents.
+ * Uses SHA256 algorithm for broad compatibility across Node.js versions.
+ *
+ * @param {string[]} filePaths - Absolute paths to files to hash
+ * @param {string}   algorithm - Hash algorithm (default: 'sha256')
+ * @param {number}   length    - Hash length (default: 20)
+ * @return {Promise<string>} Content hash string
+ */
+async function generateContentHash(
+	filePaths,
+	algorithm = 'sha256',
+	length = 20
+) {
+	const hashBuilder = createHash( algorithm );
+
+	// Sort paths for deterministic ordering
+	const sortedPaths = [ ...filePaths ].sort();
+
+	// Read and hash each file
+	for ( const filePath of sortedPaths ) {
+		const content = await readFile( filePath );
+		hashBuilder.update( content );
+	}
+
+	// Generate hash as hex string and truncate
+	const fullHash = hashBuilder.digest( 'hex' );
+	return fullHash.slice( 0, length );
+}
 
 /**
  * Create WordPress externals plugin for esbuild.
@@ -307,7 +338,33 @@ export function createWordpressExternalsPlugin(
 								? moduleDependenciesArray.join( ', ' )
 								: '';
 
-						const version = Date.now();
+						// Determine output file path from build config
+						let outputFilePath;
+						if ( build.initialOptions.outfile ) {
+							outputFilePath = build.initialOptions.outfile;
+						} else if ( build.initialOptions.outdir ) {
+							// Construct expected output filename from assetName
+							// e.g., assetName='index.min' -> 'index.min.js'
+							outputFilePath = path.join(
+								build.initialOptions.outdir,
+								`${ assetName }.js`
+							);
+						}
+
+						// Collect files to hash
+						const filesToHash = [];
+						if ( outputFilePath ) {
+							filesToHash.push( outputFilePath );
+
+							// Include source map if enabled
+							if ( build.initialOptions.sourcemap ) {
+								filesToHash.push( `${ outputFilePath }.map` );
+							}
+						}
+
+						// Generate content-based version hash
+						const version =
+							await generateContentHash( filesToHash );
 
 						const parts = [
 							`'dependencies' => array(${ dependenciesString })`,

@@ -237,6 +237,7 @@ The settings section has the following structure:
 		"custom": {},
 		"dimensions": {
 			"aspectRatio": false,
+			"height": false,
 			"minHeight": false,
 			"width": false,
 		},
@@ -302,7 +303,7 @@ There's one special setting property, `appearanceTools`, which is a boolean and 
 - background: backgroundImage, backgroundSize
 - border: color, radius, style, width
 - color: link
-- dimensions: aspectRatio, minHeight, width
+- dimensions: aspectRatio, height, minHeight, width
 - position: sticky
 - spacing: blockGap, margin, padding
 - typography: lineHeight
@@ -772,6 +773,7 @@ Each block declares which style properties it exposes via the [block supports me
 		},
 		"dimensions": {
 			"aspectRatio": "value",
+			"height": "value"
 			"minHeight": "value"
 			"width": "value"
 		},

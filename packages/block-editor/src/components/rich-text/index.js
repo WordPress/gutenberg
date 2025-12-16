@@ -9,6 +9,7 @@ import fastDeepEqual from 'fast-deep-equal/es6';
  */
 import {
 	useRef,
+	useState,
 	useCallback,
 	forwardRef,
 	createContext,
@@ -124,6 +125,7 @@ export function RichTextWrapper(
 
 	const instanceId = useInstanceId( RichTextWrapper );
 	const anchorRef = useRef();
+	const [ anchorElement, setAnchorElement ] = useState( null );
 	const context = useBlockEditContext();
 	const { clientId, isSelected: isBlockSelected } = context;
 	const blockBindings = context[ blockBindingsKey ];
@@ -440,7 +442,7 @@ export function RichTextWrapper(
 			{ isSelected && hasFormats && (
 				<FormatToolbarContainer
 					inline={ inlineToolbar }
-					editableContentElement={ anchorRef.current }
+					editableContentElement={ anchorElement }
 				/>
 			) }
 			<TagName
@@ -491,6 +493,7 @@ export function RichTextWrapper(
 						inputEvents,
 					} ),
 					anchorRef,
+					setAnchorElement,
 				] ) }
 				contentEditable={ ! shouldDisableEditing }
 				suppressContentEditableWarning

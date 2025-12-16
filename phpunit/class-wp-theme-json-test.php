@@ -321,6 +321,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 			),
 			'dimensions' => array(
 				'aspectRatio' => true,
+				'height'      => true,
 				'minHeight'   => true,
 				'width'       => true,
 			),
@@ -361,6 +362,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 					),
 					'dimensions' => array(
 						'aspectRatio' => true,
+						'height'      => true,
 						'minHeight'   => true,
 						'width'       => true,
 					),

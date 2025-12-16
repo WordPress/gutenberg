@@ -122,20 +122,12 @@ function TableRow< Item >( {
 	const { paginationInfo } = useContext( DataViewsContext );
 	const hasPossibleBulkAction = useHasAPossibleBulkAction( actions, item );
 	const isSelected = hasPossibleBulkAction && selection.includes( id );
-	const [ isHovered, setIsHovered ] = useState( false );
 	const {
 		showTitle = true,
 		showMedia = true,
 		showDescription = true,
 		infiniteScrollEnabled,
 	} = view;
-	const handleMouseEnter = () => {
-		setIsHovered( true );
-	};
-	const handleMouseLeave = () => {
-		setIsHovered( false );
-	};
-
 	// Will be set to true if `onTouchStart` fires. This happens before
 	// `onClick` and can be used to exclude touchscreen devices from certain
 	// behaviours.
@@ -150,11 +142,8 @@ function TableRow< Item >( {
 		<tr
 			className={ clsx( 'dataviews-view-table__row', {
 				'is-selected': hasPossibleBulkAction && isSelected,
-				'is-hovered': isHovered,
 				'has-bulk-actions': hasPossibleBulkAction,
 			} ) }
-			onMouseEnter={ handleMouseEnter }
-			onMouseLeave={ handleMouseLeave }
 			onTouchStart={ () => {
 				isTouchDeviceRef.current = true;
 			} }
@@ -183,29 +172,22 @@ function TableRow< Item >( {
 					return;
 				}
 
+				// Only handle Ctrl/Cmd+Click for multi-selection
+				const isModifierKeyPressed = isAppleOS()
+					? event.metaKey
+					: event.ctrlKey;
+
 				if (
+					isModifierKeyPressed &&
 					! isTouchDeviceRef.current &&
 					document.getSelection()?.type !== 'Range'
 				) {
-					if ( isAppleOS() ? event.metaKey : event.ctrlKey ) {
-						// Handle non-consecutive selection.
-						onChangeSelection(
-							selection.includes( id )
-								? selection.filter(
-										( itemId ) => id !== itemId
-								  )
-								: [ ...selection, id ]
-						);
-					} else {
-						// Handle single selection
-						onChangeSelection(
-							selection.includes( id )
-								? selection.filter(
-										( itemId ) => id !== itemId
-								  )
-								: [ id ]
-						);
-					}
+					// Handle non-consecutive selection with Ctrl/Cmd+Click
+					onChangeSelection(
+						selection.includes( id )
+							? selection.filter( ( itemId ) => id !== itemId )
+							: [ ...selection, id ]
+					);
 				}
 			} }
 		>

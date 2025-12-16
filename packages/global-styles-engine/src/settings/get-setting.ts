@@ -35,6 +35,7 @@ const VALID_SETTINGS = [
 	'color.text',
 	'custom',
 	'dimensions.aspectRatio',
+	'dimensions.height',
 	'dimensions.minHeight',
 	'dimensions.width',
 	'dimensions.dimensionSizes',
