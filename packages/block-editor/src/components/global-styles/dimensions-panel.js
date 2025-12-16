@@ -24,7 +24,7 @@ import { getValueFromVariable } from '@wordpress/global-styles-engine';
  */
 import { useToolsPanelDropdownMenuProps } from './utils';
 import SpacingSizesControl from '../spacing-sizes-control';
-import HeightControl from '../height-control';
+import DimensionControl from '../dimension-control';
 import ChildLayoutControl from '../child-layout-control';
 import AspectRatioTool from '../dimensions-tool/aspect-ratio-tool';
 import { cleanEmptyObject } from '../../hooks/utils';
@@ -700,7 +700,7 @@ export default function DimensionsPanel( {
 					}
 					panelId={ panelId }
 				>
-					<HeightControl
+					<DimensionControl
 						label={ __( 'Minimum height' ) }
 						value={ minHeightValue }
 						onChange={ setMinHeightValue }
@@ -717,7 +717,7 @@ export default function DimensionsPanel( {
 					}
 					panelId={ panelId }
 				>
-					<HeightControl
+					<DimensionControl
 						label={ __( 'Width' ) }
 						value={ widthValue }
 						onChange={ setWidthValue }

@@ -60,7 +60,7 @@ test.describe( 'Styles', () => {
 
 		// Find the second padding control and change the padding value
 		await page
-			.getByRole( 'button', { name: 'Set custom size' } )
+			.getByRole( 'button', { name: 'Set custom value' } )
 			.nth( 1 )
 			.click();
 		await page.getByRole( 'spinbutton', { name: 'padding' } ).fill( '35' );

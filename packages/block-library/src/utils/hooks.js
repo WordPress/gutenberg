@@ -94,12 +94,12 @@ export function useUploadMediaFromBlobURL( args = {} ) {
 }
 
 export function useDefaultAvatar() {
-	const { avatarURL: defaultAvatarUrl } = useSelect( ( select ) => {
+	const avatarURL = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
 		const { __experimentalDiscussionSettings } = getSettings();
-		return __experimentalDiscussionSettings;
-	} );
-	return defaultAvatarUrl;
+		return __experimentalDiscussionSettings?.avatarURL ?? '';
+	}, [] );
+	return avatarURL;
 }
 
 export function useToolsPanelDropdownMenuProps() {

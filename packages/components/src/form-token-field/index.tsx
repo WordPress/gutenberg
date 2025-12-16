@@ -12,7 +12,6 @@ import { __, _n, sprintf } from '@wordpress/i18n';
 import { useDebounce, useInstanceId, usePrevious } from '@wordpress/compose';
 import { speak } from '@wordpress/a11y';
 import isShallowEqual from '@wordpress/is-shallow-equal';
-import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -27,7 +26,6 @@ import {
 	StyledHelp,
 	StyledLabel,
 } from '../base-control/styles/base-control-styles';
-import { Spacer } from '../spacer';
 import { useDeprecated36pxDefaultSizeProp } from '../utils/use-deprecated-props';
 import { withIgnoreIMEEvents } from '../utils/with-ignore-ime-events';
 import { maybeWarnDeprecated36pxSize } from '../utils/deprecated-36px-size';
@@ -75,17 +73,8 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 		__experimentalShowHowTo = true,
 		__next40pxDefaultSize = false,
 		__experimentalAutoSelectFirstMatch = false,
-		__nextHasNoMarginBottom = false,
 		tokenizeOnBlur = false,
 	} = useDeprecated36pxDefaultSizeProp< FormTokenFieldProps >( props );
-
-	if ( ! __nextHasNoMarginBottom ) {
-		deprecated( 'Bottom margin styles for wp.components.FormTokenField', {
-			since: '6.7',
-			version: '7.0',
-			hint: 'Set the `__nextHasNoMarginBottom` prop to true to start opting into the new styles, which will become the default in a future version.',
-		} );
-	}
 
 	maybeWarnDeprecated36pxSize( {
 		componentName: 'FormTokenField',
@@ -760,12 +749,11 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 					/>
 				) }
 			</div>
-			{ ! __nextHasNoMarginBottom && <Spacer marginBottom={ 2 } /> }
 			{ __experimentalShowHowTo && (
 				<StyledHelp
 					id={ `components-form-token-suggestions-howto-${ instanceId }` }
 					className="components-form-token-field__help"
-					__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
+					__nextHasNoMarginBottom
 				>
 					{ tokenizeOnSpace
 						? __(

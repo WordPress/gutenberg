@@ -7,6 +7,7 @@ import type { ForwardedRef } from 'react';
  * WordPress dependencies
  */
 import { useMemo, useState } from '@wordpress/element';
+import { useMergeRefs } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -21,7 +22,6 @@ import * as styles from './styles';
 import { ToggleGroupControlAsRadioGroup } from './as-radio-group';
 import { ToggleGroupControlAsButtonGroup } from './as-button-group';
 import { useTrackElementOffsetRect } from '../../utils/element-rect';
-import { useMergeRefs } from '@wordpress/compose';
 import { useAnimatedOffsetRect } from '../../utils/hooks/use-animated-offset-rect';
 import { maybeWarnDeprecated36pxSize } from '../../utils/deprecated-36px-size';
 
@@ -30,7 +30,7 @@ function UnconnectedToggleGroupControl(
 	forwardedRef: ForwardedRef< any >
 ) {
 	const {
-		__nextHasNoMarginBottom = false,
+		__nextHasNoMarginBottom: _, // Prevent passing this to the internal component
 		__next40pxDefaultSize = false,
 		__shouldNotWarnDeprecated36pxSize,
 		className,
@@ -91,11 +91,7 @@ function UnconnectedToggleGroupControl(
 	} );
 
 	return (
-		<BaseControl
-			help={ help }
-			__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
-			__associatedWPComponentName="ToggleGroupControl"
-		>
+		<BaseControl help={ help } __nextHasNoMarginBottom>
 			{ ! hideLabelFromVision && (
 				<VisualLabelWrapper>
 					<BaseControl.VisualLabel>{ label }</BaseControl.VisualLabel>
@@ -143,7 +139,6 @@ function UnconnectedToggleGroupControl(
  *       label="my label"
  *       value="vertical"
  *       isBlock
- *       __nextHasNoMarginBottom
  *       __next40pxDefaultSize
  *     >
  *       <ToggleGroupControlOption value="horizontal" label="Horizontal" />

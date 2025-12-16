@@ -120,7 +120,6 @@ function VariationsToggleGroupControl( {
 				hideLabelFromVision
 				onChange={ onSelectVariation }
 				__next40pxDefaultSize
-				__nextHasNoMarginBottom
 			>
 				{ variations.map( ( variation ) => (
 					<ToggleGroupControlOptionIcon
@@ -229,16 +228,13 @@ function __experimentalBlockVariationTransforms( { blockClientId } ) {
 				( v ) => v.name !== 'stretchy-paragraph'
 			);
 		} else if ( blockName === 'core/heading' ) {
-			if (
-				activeBlockVariation?.name === 'stretchy-heading' ||
-				unfilteredVariations.every( ( v ) =>
-					[ 'heading', 'stretchy-heading' ].includes( v.name )
-				)
-			) {
+			// Hide variations picker when stretchy-heading is active.
+			if ( activeBlockVariation?.name === 'stretchy-heading' ) {
 				return [];
 			}
+			// Filter out stretchy-heading.
 			return unfilteredVariations.filter(
-				( v ) => v.name !== 'stretchy-heading'
+				( variation ) => variation.name !== 'stretchy-heading'
 			);
 		}
 		return unfilteredVariations;

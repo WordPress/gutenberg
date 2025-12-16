@@ -2,12 +2,8 @@
 	"$schema": "https://json.schemastore.org/tsconfig.json",
 	"extends": "../../tsconfig.base.json",
 	"compilerOptions": {
-		"types": [ "node" ]
+		"types": [ "node", "jest", "@testing-library/jest-dom" ]
 	},
-	"references": [
-		{ "path": "../element" },
-		{ "path": "../private-apis" },
-		{ "path": "../theme" }
-	],
+	"references": [ { "path": "../element" }, { "path": "../theme" } ],
 	"exclude": []
 }

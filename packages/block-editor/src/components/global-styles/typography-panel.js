@@ -9,7 +9,7 @@ import {
 	Notice,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useCallback, useMemo, useEffect } from '@wordpress/element';
+import { useCallback, useMemo } from '@wordpress/element';
 import { getValueFromVariable } from '@wordpress/global-styles-engine';
 
 /**
@@ -29,6 +29,7 @@ import {
 	getMergedFontFamiliesAndFontFamilyFaces,
 	findNearestStyleAndWeight,
 } from './typography-utils';
+import { getFontStylesAndWeights } from '../../utils/get-font-styles-and-weights';
 
 const MIN_TEXT_COLUMNS = 1;
 const MAX_TEXT_COLUMNS = 6;
@@ -196,15 +197,57 @@ export default function TypographyPanel( {
 		const slug = fontFamilies?.find(
 			( { fontFamily: f } ) => f === newValue
 		)?.slug;
-		onChange(
-			setImmutably(
-				value,
-				[ 'typography', 'fontFamily' ],
-				slug
-					? `var:preset|font-family|${ slug }`
-					: newValue || undefined
-			)
+		let updatedValue = setImmutably(
+			value,
+			[ 'typography', 'fontFamily' ],
+			slug ? `var:preset|font-family|${ slug }` : newValue || undefined
 		);
+
+		// Check if current font style/weight are available in the new font family.
+		const newFontFamilyFaces =
+			fontFamilies?.find( ( { fontFamily: f } ) => f === newValue )
+				?.fontFace ?? [];
+		const { fontStyles, fontWeights } =
+			getFontStylesAndWeights( newFontFamilyFaces );
+		const hasFontStyle = fontStyles?.some(
+			( { value: fs } ) => fs === fontStyle
+		);
+		const hasFontWeight = fontWeights?.some(
+			( { value: fw } ) => fw?.toString() === fontWeight?.toString()
+		);
+
+		// Find the nearest available font style/weight if not available.
+		if ( ! hasFontStyle || ! hasFontWeight ) {
+			const { nearestFontStyle, nearestFontWeight } =
+				findNearestStyleAndWeight(
+					newFontFamilyFaces,
+					fontStyle,
+					fontWeight
+				);
+			if ( nearestFontStyle || nearestFontWeight ) {
+				// Update to the nearest available font style/weight in the new font family.
+				updatedValue = {
+					...updatedValue,
+					typography: {
+						...updatedValue?.typography,
+						fontStyle: nearestFontStyle || undefined,
+						fontWeight: nearestFontWeight || undefined,
+					},
+				};
+			} else if ( fontStyle || fontWeight ) {
+				// Reset if no available styles/weights found.
+				updatedValue = {
+					...updatedValue,
+					typography: {
+						...updatedValue?.typography,
+						fontStyle: undefined,
+						fontWeight: undefined,
+					},
+				};
+			}
+		}
+
+		onChange( updatedValue );
 	};
 	const hasFontFamily = () => !! value?.typography?.fontFamily;
 	const resetFontFamily = () => setFontFamily( undefined );
@@ -262,11 +305,6 @@ export default function TypographyPanel( {
 	const hasFontWeights = settings?.typography?.fontWeight;
 	const fontStyle = decodeValue( inheritedValue?.typography?.fontStyle );
 	const fontWeight = decodeValue( inheritedValue?.typography?.fontWeight );
-	const { nearestFontStyle, nearestFontWeight } = findNearestStyleAndWeight(
-		fontFamilyFaces,
-		fontStyle,
-		fontWeight
-	);
 	const setFontAppearance = useCallback(
 		( { fontStyle: newFontStyle, fontWeight: newFontWeight } ) => {
 			// Only update the font style and weight if they have changed.
@@ -288,24 +326,6 @@ export default function TypographyPanel( {
 	const resetFontAppearance = useCallback( () => {
 		setFontAppearance( {} );
 	}, [ setFontAppearance ] );
-
-	// Check if previous font style and weight values are available in the new font family.
-	useEffect( () => {
-		if ( nearestFontStyle && nearestFontWeight ) {
-			setFontAppearance( {
-				fontStyle: nearestFontStyle,
-				fontWeight: nearestFontWeight,
-			} );
-		} else {
-			// Reset font appearance if there are no available styles or weights.
-			resetFontAppearance();
-		}
-	}, [
-		nearestFontStyle,
-		nearestFontWeight,
-		resetFontAppearance,
-		setFontAppearance,
-	] );
 
 	// Line Height
 	const hasLineHeightEnabled = useHasLineHeightControl( settings );

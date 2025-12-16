@@ -69,7 +69,6 @@ const VideoSettings = ( { setAttributes, attributes } ) => {
 				} }
 			>
 				<ToggleControl
-					__nextHasNoMarginBottom
 					label={ __( 'Autoplay' ) }
 					onChange={ toggleFactory.autoplay }
 					checked={ !! autoplay }
@@ -85,7 +84,6 @@ const VideoSettings = ( { setAttributes, attributes } ) => {
 				} }
 			>
 				<ToggleControl
-					__nextHasNoMarginBottom
 					label={ __( 'Loop' ) }
 					onChange={ toggleFactory.loop }
 					checked={ !! loop }
@@ -100,7 +98,6 @@ const VideoSettings = ( { setAttributes, attributes } ) => {
 				} }
 			>
 				<ToggleControl
-					__nextHasNoMarginBottom
 					label={ __( 'Muted' ) }
 					onChange={ toggleFactory.muted }
 					checked={ !! muted }
@@ -119,7 +116,6 @@ const VideoSettings = ( { setAttributes, attributes } ) => {
 				} }
 			>
 				<ToggleControl
-					__nextHasNoMarginBottom
 					label={ __( 'Playback controls' ) }
 					onChange={ toggleFactory.controls }
 					checked={ !! controls }
@@ -134,7 +130,6 @@ const VideoSettings = ( { setAttributes, attributes } ) => {
 				} }
 			>
 				<ToggleControl
-					__nextHasNoMarginBottom
 					/* translators: Setting to play videos within the webpage on mobile browsers rather than opening in a fullscreen player. */
 					label={ __( 'Play inline' ) }
 					onChange={ toggleFactory.playsInline }

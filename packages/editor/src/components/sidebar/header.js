@@ -5,6 +5,7 @@ import { privateApis as componentsPrivateApis } from '@wordpress/components';
 import { __, _x } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { forwardRef } from '@wordpress/element';
+import { decodeEntities } from '@wordpress/html-entities';
 
 /**
  * Internal dependencies
@@ -16,15 +17,15 @@ import { sidebars } from './constants';
 const { Tabs } = unlock( componentsPrivateApis );
 
 const SidebarHeader = ( _, ref ) => {
-	const { documentLabel } = useSelect( ( select ) => {
-		const { getPostTypeLabel } = select( editorStore );
+	const postTypeLabel = useSelect(
+		( select ) => select( editorStore ).getPostTypeLabel(),
+		[]
+	);
 
-		return {
-			documentLabel:
-				// translators: Default label for the Document sidebar tab, not selected.
-				getPostTypeLabel() || _x( 'Document', 'noun, panel' ),
-		};
-	}, [] );
+	const documentLabel = postTypeLabel
+		? decodeEntities( postTypeLabel )
+		: // translators: Default label for the Document sidebar tab, not selected.
+		  _x( 'Document', 'noun, panel' );
 
 	return (
 		<Tabs.TabList ref={ ref }>

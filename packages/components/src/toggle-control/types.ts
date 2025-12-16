@@ -13,7 +13,14 @@ export type ToggleControlProps = Pick<
 	FormToggleProps,
 	'checked' | 'disabled'
 > &
-	Pick< BaseControlProps, '__nextHasNoMarginBottom' | 'className' > & {
+	Pick< BaseControlProps, 'className' > & {
+		/**
+		 * Start opting into the new margin-free styles that will become the default in a future version.
+		 *
+		 * @deprecated Default behavior since WordPress 7.0. Prop can be safely removed.
+		 * @ignore
+		 */
+		__nextHasNoMarginBottom?: boolean;
 		help?: ReactNode | ( ( checked: boolean ) => ReactNode );
 		/**
 		 * The label for the toggle.

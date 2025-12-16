@@ -192,7 +192,6 @@ const SocialLinkEdit = ( {
 						renderContent={ () => (
 							<TextControl
 								__next40pxDefaultSize
-								__nextHasNoMarginBottom
 								className="wp-block-social-link__toolbar_content_text"
 								label={ __( 'Text' ) }
 								help={ __(
@@ -226,7 +225,6 @@ const SocialLinkEdit = ( {
 					>
 						<TextControl
 							__next40pxDefaultSize
-							__nextHasNoMarginBottom
 							label={ __( 'Text' ) }
 							help={ __(
 								'The text is visible when enabled from the parent Social Icons block.'
@@ -243,7 +241,6 @@ const SocialLinkEdit = ( {
 			<InspectorControls group="advanced">
 				<TextControl
 					__next40pxDefaultSize
-					__nextHasNoMarginBottom
 					label={ __( 'Link relation' ) }
 					help={ createInterpolateElement(
 						__(

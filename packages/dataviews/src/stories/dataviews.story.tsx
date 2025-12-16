@@ -384,18 +384,22 @@ function PlanetOverview( { planets }: { planets: SpaceObject[] } ) {
 }
 
 /**
- * This is a basic example of using the DataViews component in
- * a free composition mode.
+ * Demonstrates how to build a custom layout using DataViews sub-components.
  *
- * Unlike the default usage where DataViews renders its own UI,
- * here we use it purely to provide context and handle data-related logic.
+ * Instead of using the default DataViews UI, this story shows how to:
+ * - Use `<DataViews>` as a context provider (wrapping custom children)
+ * - Compose your own layout with built-in sub-components:
+ *   - `<DataViews.Search />` - Search input
+ *   - `<DataViews.FiltersToggle />` - Button to show/hide filters
+ *   - `<DataViews.FiltersToggled />` - The filter UI itself
+ *   - `<DataViews.Pagination />` - Page navigation
+ *   - `<DataViews.ViewConfig />` - View settings (columns, density, etc.)
+ *   - `<DataViews.LayoutSwitcher />` - Switch between table/grid/list views
+ *   - `<DataViews.BulkActionToolbar />` - Actions for selected items
+ *   - `<DataViews.Layout />` - The data display (table, grid, etc.)
  *
- * The UI is fully custom and composed externally via the
- * `PlanetOverview` component.
- *
- * In future iterations, this story will showcase more advanced compositions
- * using built-in subcomponents like <Search />, filters,
- * or pagination controls.
+ * This pattern is useful when you need full control over the UI layout
+ * while still leveraging DataViews' data management and state handling.
  */
 export const FreeComposition = () => {
 	const [ view, setView ] = useState< View >( {

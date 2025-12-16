@@ -59,7 +59,6 @@ export default function FileBlockInspector( {
 							onDeselect={ () => changeDisplayPreview( true ) }
 						>
 							<ToggleControl
-								__nextHasNoMarginBottom
 								label={ __( 'Show inline embed' ) }
 								help={
 									displayPreview
@@ -127,7 +126,6 @@ export default function FileBlockInspector( {
 						onDeselect={ () => changeOpenInNewWindow( false ) }
 					>
 						<ToggleControl
-							__nextHasNoMarginBottom
 							label={ __( 'Open in new tab' ) }
 							checked={ openInNewWindow }
 							onChange={ changeOpenInNewWindow }
@@ -140,7 +138,6 @@ export default function FileBlockInspector( {
 						onDeselect={ () => changeShowDownloadButton( true ) }
 					>
 						<ToggleControl
-							__nextHasNoMarginBottom
 							label={ __( 'Show download button' ) }
 							checked={ showDownloadButton }
 							onChange={ changeShowDownloadButton }

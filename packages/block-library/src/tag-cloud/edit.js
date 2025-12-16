@@ -232,7 +232,6 @@ function TagCloudEdit( { attributes, setAttributes } ) {
 					isShownByDefault
 				>
 					<ToggleControl
-						__nextHasNoMarginBottom
 						label={ __( 'Show tag counts' ) }
 						checked={ showTagCounts }
 						onChange={ () =>

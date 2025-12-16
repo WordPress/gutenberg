@@ -66,7 +66,6 @@ export default function PostExcerpt( {
 	return (
 		<div className="editor-post-excerpt">
 			<TextareaControl
-				__nextHasNoMarginBottom
 				label={ label }
 				hideLabelFromVision={ hideLabelFromVision }
 				className="editor-post-excerpt__textarea"

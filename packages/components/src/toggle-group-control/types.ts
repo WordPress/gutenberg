@@ -70,10 +70,14 @@ export type WithToolTipProps = {
 	showTooltip?: boolean;
 };
 
-export type ToggleGroupControlProps = Pick<
-	BaseControlProps,
-	'help' | '__nextHasNoMarginBottom'
-> & {
+export type ToggleGroupControlProps = Pick< BaseControlProps, 'help' > & {
+	/**
+	 * Start opting into the new margin-free styles that will become the default in a future version.
+	 *
+	 * @deprecated Default behavior since WordPress 7.0. Prop can be safely removed.
+	 * @ignore
+	 */
+	__nextHasNoMarginBottom?: boolean;
 	/**
 	 * Label for the control.
 	 */

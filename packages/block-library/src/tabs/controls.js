@@ -156,7 +156,6 @@ export default function Controls( {
 										: 'vertical',
 							} )
 						}
-						__nextHasNoMarginBottom
 					/>
 					<TextControl
 						label={ __( 'Tabs Title' ) }

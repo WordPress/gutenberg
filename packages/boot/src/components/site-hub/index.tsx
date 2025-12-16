@@ -48,7 +48,12 @@ function SiteHub() {
 				href={ homeUrl ?? '/' }
 				className="boot-site-hub__title"
 			>
-				{ siteTitle && decodeEntities( siteTitle ) }
+				<div className="boot-site-hub__title-text">
+					{ siteTitle && decodeEntities( siteTitle ) }
+				</div>
+				<div className="boot-site-hub__url">
+					{ filterURLForDisplay( homeUrl ?? '' ) }
+				</div>
 			</ExternalLink>
 			<HStack className="boot-site-hub__actions">
 				<Button

@@ -39,7 +39,7 @@ $block-editor-link-control-number-of-actions: 1;
 			}
 		}
 
-		.block-editor-link-control__search-item-top {
+		.block-editor-link-control__preview {
 			gap: $grid-unit-05;
 			flex-wrap: wrap;
 
@@ -47,11 +47,11 @@ $block-editor-link-control-number-of-actions: 1;
 				width: auto;
 				padding: $grid-unit-05;
 			}
-		}
 
-		.is-preview .block-editor-link-control__search-item-header {
-			min-width: 100%;
-			margin-right: 0;
+			.block-editor-link-control_link-information {
+				min-width: 100%;
+				margin-right: 0;
+			}
 		}
 	}
 }
@@ -163,22 +163,15 @@ $block-editor-link-control-number-of-actions: 1;
 	&[aria-selected] {
 		background: $gray-100;
 	}
+}
 
-	&.is-current {
-		flex-direction: column; // allow for stacking.
-		background: transparent;
-		border: 0;
-		width: 100%;
-		cursor: default;
-		padding: $grid-unit-20;
-	}
+.block-editor-link-control__preview {
+	background: transparent;
+	border: 0;
+	padding: $grid-unit-20;
 
-	.block-editor-link-control__search-item-header {
-		display: block;
-		flex-direction: row;
-		align-items: center;
+	.block-editor-link-control__link-information {
 		margin-right: $grid-unit-10;
-		gap: $grid-unit-10;
 
 		// Force text to wrap to improve UX when encountering long lines
 		// of text, particular those with no spaces.
@@ -186,7 +179,7 @@ $block-editor-link-control-number-of-actions: 1;
 		white-space: pre-wrap;
 		overflow-wrap: break-word;
 
-		.block-editor-link-control__search-item-info {
+		.block-editor-link-control__preview-info {
 			color: $gray-700;
 			line-height: 1.1;
 			font-size: $helptext-font-size;
@@ -194,55 +187,32 @@ $block-editor-link-control-number-of-actions: 1;
 		}
 	}
 
-	&.is-preview .block-editor-link-control__search-item-header {
-		display: flex;
-		flex: 1; // Fill available space.
-	}
-
-	&.is-error .block-editor-link-control__search-item-header {
-		align-items: center;
-	}
-
-	&.is-url-title .block-editor-link-control__search-item-title {
+	&.is-url-title .block-editor-link-control__preview-title {
 		// To prevent overflow when the title is a URL
 		word-break: break-all;
 	}
 
-	.block-editor-link-control__search-item-details {
-		display: flex;
-		flex-direction: column;
-		justify-content: space-between;
-		gap: $grid-unit-05;
-	}
-
-	.block-editor-link-control__search-item-header .block-editor-link-control__search-item-icon {
+	.block-editor-link-control__preview-icon {
+		position: relative;
+		flex-shrink: 0;
 		background-color: $gray-100;
 		width: $grid-unit-40;
 		height: $grid-unit-40;
 		border-radius: $radius-small;
-	}
-
-	.block-editor-link-control__search-item-icon {
-		position: relative;
-		flex-shrink: 0;
-		display: flex;
-		justify-content: center;
-		align-items: center;
 
 		img {
 			width: $grid-unit-20; // favicons often have a source of 32px
 		}
 	}
 
-	&.is-error .block-editor-link-control__search-item-icon {
+	&.is-error .block-editor-link-control__preview-icon {
 		top: 0;
 		width: 32px;
 		max-height: 32px;
 	}
 
-	.block-editor-link-control__search-item-title {
+	.block-editor-link-control__preview-title {
 		line-height: 1.1;
-
 
 		&:focus {
 			box-shadow: none;
@@ -276,16 +246,9 @@ $block-editor-link-control-number-of-actions: 1;
 	}
 }
 
-.block-editor-link-control__search-item-top {
-	display: flex;
-	flex-direction: row;
-	width: 100%; // clip.
-	align-items: center;
-}
+.block-editor-link-control__preview.is-fetching {
 
-.block-editor-link-control__search-item.is-fetching {
-
-	.block-editor-link-control__search-item-icon {
+	.block-editor-link-control__preview-icon {
 		svg,
 		img {
 			opacity: 0;
@@ -339,7 +302,7 @@ $block-editor-link-control-number-of-actions: 1;
 .block-editor-link-control__search-create {
 	align-items: center; // align text with icon.
 
-	.block-editor-link-control__search-item-title {
+	.block-editor-link-control__preview-title {
 		margin-bottom: 0;
 	}
 

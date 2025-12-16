@@ -129,7 +129,6 @@ export default function ImageSizeControl( {
 						value={ selectedValue }
 						isBlock
 						__next40pxDefaultSize
-						__nextHasNoMarginBottom
 					>
 						{ IMAGE_SIZE_PRESETS.map( ( scale ) => {
 							return (

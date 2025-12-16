@@ -22,5 +22,5 @@
 		{ "path": "../private-apis" }
 	],
 	"include": [ "src/**/*" ],
-	"exclude": [ "src/font-library-modal/lib/**/*" ]
+	"exclude": [ "src/font-library/lib/**/*" ]
 }

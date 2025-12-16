@@ -13,7 +13,6 @@ import {
 	__experimentalUseDragging as useDragging,
 	useIsomorphicLayoutEffect,
 } from '@wordpress/compose';
-import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -75,7 +74,6 @@ const GRID_OVERLAY_TIMEOUT = 600;
  * 	return (
  * 		<>
  * 			<FocalPointPicker
- *        __nextHasNoMarginBottom
  * 				url={ url }
  * 				value={ focalPoint }
  * 				onDragStart={ setFocalPoint }
@@ -89,7 +87,8 @@ const GRID_OVERLAY_TIMEOUT = 600;
  * ```
  */
 export function FocalPointPicker( {
-	__nextHasNoMarginBottom,
+	// Prevent passing to internal component.
+	__nextHasNoMarginBottom: _,
 	autoPlay = true,
 	className,
 	help,
@@ -109,14 +108,6 @@ export function FocalPointPicker( {
 }: WordPressComponentProps< FocalPointPickerProps, 'div', false > ) {
 	const [ point, setPoint ] = useState( valueProp );
 	const [ showGridOverlay, setShowGridOverlay ] = useState( false );
-
-	if ( ! __nextHasNoMarginBottom ) {
-		deprecated( 'Bottom margin styles for wp.components.FocalPointPicker', {
-			since: '6.7',
-			version: '7.0',
-			hint: 'Set the `__nextHasNoMarginBottom` prop to true to start opting into the new styles, which will become the default in a future version.',
-		} );
-	}
 
 	const { startDrag, endDrag, isDragging } = useDragging( {
 		onDragStart: ( event ) => {
@@ -289,7 +280,6 @@ export function FocalPointPicker( {
 				</MediaContainer>
 			</MediaWrapper>
 			<Controls
-				__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
 				hasHelpText={ !! help }
 				point={ { x, y } }
 				onChange={ ( value ) => {
@@ -297,9 +287,7 @@ export function FocalPointPicker( {
 				} }
 			/>
 			{ !! help && (
-				<StyledHelp __nextHasNoMarginBottom={ __nextHasNoMarginBottom }>
-					{ help }
-				</StyledHelp>
+				<StyledHelp __nextHasNoMarginBottom>{ help }</StyledHelp>
 			) }
 		</Container>
 	);
