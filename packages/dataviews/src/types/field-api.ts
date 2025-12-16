@@ -280,7 +280,7 @@ export type Field< Item > = {
  * Format for datetime fields:
  *
  * - datetime: the format string (e.g., "M j, Y g:i a" for "Jan 1, 2021 2:30 pm").
- * - weekStartsOn: to specify the first day of the week ('sunday', 'monday', etc.).
+ * - weekStartsOn: to specify the first day of the week (0 for 'sunday', 1 for 'monday', etc.).
  *
  * If not provided, defaults to WordPress date format settings.
  */
@@ -293,7 +293,7 @@ export type FormatDatetime = {
  * Format for date fields:
  *
  * - date: the format string (e.g., 'F j, Y' for 'March 10, 2023')
- * - weekStartsOn: to specify the first day of the week ('sunday', 'monday', etc.).
+ * - weekStartsOn: to specify the first day of the week (0 for 'sunday', 1 for 'monday', etc.).
  *
  * If not provided, defaults to WordPress date format settings.
  */
