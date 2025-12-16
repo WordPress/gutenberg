@@ -29,7 +29,8 @@ describe( 'filesizeField', () => {
 				item,
 			} );
 
-			// 0 bytes returns empty string because the truthy check in getValue treats 0 as falsy
+			// 0 bytes returns empty string because getValue uses a truthy check on filesize
+			// Note: formatFileSize would return "0 B" if called with 0, but it's never reached
 			expect( result ).toBe( '' );
 		} );
 
