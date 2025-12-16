@@ -4,7 +4,7 @@
 import { privateApis as componentsPrivateApis } from '@wordpress/components';
 import { __, _x } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
-import { forwardRef, useMemo } from '@wordpress/element';
+import { forwardRef } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
 
 /**
@@ -22,14 +22,10 @@ const SidebarHeader = ( _, ref ) => {
 		[]
 	);
 
-	const documentLabel = useMemo(
-		() =>
-			postTypeLabel
-				? decodeEntities( postTypeLabel )
-				: // translators: Default label for the Document sidebar tab, not selected.
-				  _x( 'Document', 'noun, panel' ),
-		[ postTypeLabel ]
-	);
+	const documentLabel = postTypeLabel
+		? decodeEntities( postTypeLabel )
+		: // translators: Default label for the Document sidebar tab, not selected.
+		  _x( 'Document', 'noun, panel' );
 
 	return (
 		<Tabs.TabList ref={ ref }>
