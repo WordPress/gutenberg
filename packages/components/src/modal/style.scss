@@ -112,7 +112,7 @@
 		:where(.components-modal__content) {
 			display: flex;
 			// If this container is scrollable, bottom padding won't apply so we use margin instead.
-			margin-bottom: $grid-unit-40;
+			margin-bottom: $grid-unit-30;
 			padding-bottom: 0;
 
 			> :last-child {
@@ -152,7 +152,7 @@
 .components-modal__header {
 	box-sizing: border-box;
 	border-bottom: $border-width solid transparent;
-	padding: $grid-unit-30 $grid-unit-40 $grid-unit-10;
+	padding: $grid-unit-30;
 	display: flex;
 	flex-direction: row;
 	justify-content: space-between;
@@ -206,12 +206,12 @@
 	flex: 1;
 	margin-top: $header-height + $grid-unit-10;
 	// Small top padding required to avoid cutting off the visible outline when the first child element is focusable.
-	padding: $grid-unit-05 $grid-unit-40 $grid-unit-40;
+	padding: $grid-unit-05 $grid-unit-30 $grid-unit-30;
 	overflow: auto;
 
 	&.hide-header {
 		margin-top: 0;
-		padding-top: $grid-unit-40;
+		padding-top: $grid-unit-30;
 	}
 
 	&.is-scrollable:focus-visible {

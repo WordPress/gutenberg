@@ -11,7 +11,7 @@ import {
 	getAbilityCategories,
 	getAbilityCategory,
 } from '../selectors';
-import type { AbilitiesState } from '../../types';
+import type { AbilitiesState } from '../types';
 
 describe( 'Store Selectors', () => {
 	describe( 'getAbilities', () => {

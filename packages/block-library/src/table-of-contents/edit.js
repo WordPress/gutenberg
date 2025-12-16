@@ -165,7 +165,6 @@ export default function TableOfContentsEdit( {
 					isShownByDefault
 				>
 					<ToggleControl
-						__nextHasNoMarginBottom
 						label={ __( 'Only include current page' ) }
 						checked={ onlyIncludeCurrentPage }
 						onChange={ ( value ) =>

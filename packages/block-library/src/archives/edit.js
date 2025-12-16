@@ -46,7 +46,6 @@ export default function ArchivesEdit( { attributes, setAttributes } ) {
 						}
 					>
 						<ToggleControl
-							__nextHasNoMarginBottom
 							label={ __( 'Display as dropdown' ) }
 							checked={ displayAsDropdown }
 							onChange={ () =>
@@ -67,7 +66,6 @@ export default function ArchivesEdit( { attributes, setAttributes } ) {
 							}
 						>
 							<ToggleControl
-								__nextHasNoMarginBottom
 								label={ __( 'Show label' ) }
 								checked={ showLabel }
 								onChange={ () =>
@@ -88,7 +86,6 @@ export default function ArchivesEdit( { attributes, setAttributes } ) {
 						}
 					>
 						<ToggleControl
-							__nextHasNoMarginBottom
 							label={ __( 'Show post counts' ) }
 							checked={ showPostCounts }
 							onChange={ () =>

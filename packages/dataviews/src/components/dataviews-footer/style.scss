@@ -7,7 +7,7 @@
 	bottom: 0;
 	left: 0;
 	background-color: inherit;
-	padding: $grid-unit-15 $grid-unit-60;
+	padding: $grid-unit-15 $grid-unit-30;
 	border-top: $border-width solid $gray-100;
 	flex-shrink: 0;
 
@@ -16,12 +16,6 @@
 	}
 
 	z-index: z-index(".dataviews-footer");
-}
-
-@container (max-width: 430px) {
-	.dataviews-footer {
-		padding: $grid-unit-15 $grid-unit-30;
-	}
 }
 
 @container (max-width: 560px) {

@@ -113,6 +113,7 @@ Settings related to dimensions.
 | aspectRatios | Allow users to define aspect ratios for some blocks. | `[ { name, slug, ratio } ]` |  |
 | minHeight | Allow users to set custom minimum height. | `boolean` | `false` |
 | width | Allow users to set custom width. | `boolean` | `false` |
+| dimensionSizes | Dimension size presets for dimension block supports. | `[ { name, slug, size } ]` |  |
 
 ---
 

@@ -4,10 +4,6 @@
 	"compilerOptions": {
 		"types": [ "node", "jest", "@testing-library/jest-dom" ]
 	},
-	"references": [
-		{ "path": "../element" },
-		{ "path": "../private-apis" },
-		{ "path": "../theme" }
-	],
+	"references": [ { "path": "../element" }, { "path": "../theme" } ],
 	"exclude": []
 }

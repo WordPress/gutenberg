@@ -200,7 +200,6 @@ function ContentOnlyControls( {
 									</>
 								)
 							}
-							__nextHasNoMarginBottom
 						/>
 					</div>
 				</Popover>
@@ -217,7 +216,6 @@ function ContentOnlyControls( {
 						<TextControl
 							__next40pxDefaultSize
 							className="wp-block-image__toolbar_content_textarea"
-							__nextHasNoMarginBottom
 							label={ __( 'Title attribute' ) }
 							value={ attributes.title || '' }
 							onChange={ ( value ) =>
@@ -833,7 +831,6 @@ export default function Image( {
 										</>
 									)
 								}
-								__nextHasNoMarginBottom
 							/>
 						</ToolsPanelItem>
 					) }
@@ -850,7 +847,6 @@ export default function Image( {
 			</InspectorControls>
 			<InspectorControls group="advanced">
 				<TextControl
-					__nextHasNoMarginBottom
 					__next40pxDefaultSize
 					label={ __( 'Title attribute' ) }
 					value={ title || '' }

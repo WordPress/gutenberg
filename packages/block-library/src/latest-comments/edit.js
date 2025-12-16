@@ -69,7 +69,6 @@ export default function LatestComments( { attributes, setAttributes } ) {
 						isShownByDefault
 					>
 						<ToggleControl
-							__nextHasNoMarginBottom
 							label={ __( 'Display avatar' ) }
 							checked={ displayAvatar }
 							onChange={ () =>
@@ -89,7 +88,6 @@ export default function LatestComments( { attributes, setAttributes } ) {
 						isShownByDefault
 					>
 						<ToggleControl
-							__nextHasNoMarginBottom
 							label={ __( 'Display date' ) }
 							checked={ displayDate }
 							onChange={ () =>

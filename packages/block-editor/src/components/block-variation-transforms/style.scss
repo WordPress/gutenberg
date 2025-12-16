@@ -6,10 +6,10 @@
 	padding: 0 $grid-unit-20 $grid-unit-20 52px;
 
 	&:where(fieldset) {
-		// Reset `fieldset` browser defaults.
+		// Reset `fieldset` browser defaults, keeping intentional padding.
 		border: 0;
-		padding: 0;
 		margin: 0;
+		min-inline-size: 0;
 	}
 }
 

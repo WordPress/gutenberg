@@ -207,7 +207,7 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 					),
 					'path'          => array( 'dimensions', 'minHeight' ),
 					'css_vars'      => array(
-						'spacing' => '--wp--preset--spacing--$slug',
+						'dimension' => '--wp--preset--dimension--$slug',
 					),
 				),
 				'width'       => array(
@@ -215,6 +215,9 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 						'default' => 'width',
 					),
 					'path'          => array( 'dimensions', 'width' ),
+					'css_vars'      => array(
+						'dimension' => '--wp--preset--dimension--$slug',
+					),
 				),
 			),
 			'spacing'    => array(

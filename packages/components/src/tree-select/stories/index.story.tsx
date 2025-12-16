@@ -49,7 +49,6 @@ const TreeSelectWithState: StoryFn< typeof TreeSelect > = ( props ) => {
 
 export const Default = TreeSelectWithState.bind( {} );
 Default.args = {
-	__nextHasNoMarginBottom: true,
 	__next40pxDefaultSize: true,
 	label: 'Label Text',
 	noOptionLabel: 'No parent page',

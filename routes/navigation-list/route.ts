@@ -3,6 +3,7 @@
  */
 import { resolveSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
+import { __ } from '@wordpress/i18n';
 
 const NAVIGATION_POST_TYPE = 'wp_navigation';
 
@@ -14,6 +15,7 @@ const PRELOADED_NAVIGATION_MENUS_QUERY = {
 };
 
 export const route = {
+	title: () => __( 'Navigation' ),
 	canvas: async ( {
 		search,
 	}: {

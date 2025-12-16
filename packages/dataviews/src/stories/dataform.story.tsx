@@ -543,7 +543,6 @@ function CustomEditControl< Item >( {
 			help={ description }
 			onChange={ onChangeControl }
 			__next40pxDefaultSize
-			__nextHasNoMarginBottom
 			hideLabelFromVision={ hideLabelFromVision }
 		/>
 	);

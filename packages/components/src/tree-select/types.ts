@@ -18,8 +18,15 @@ export interface Tree {
 export interface TreeSelectProps
 	extends Omit<
 		SelectControlSingleSelectionProps,
-		'value' | 'multiple' | 'onChange'
+		'value' | 'multiple' | 'onChange' | '__nextHasNoMarginBottom'
 	> {
+	/**
+	 * Start opting into the new margin-free styles that will become the default in a future version.
+	 *
+	 * @deprecated Default behavior since WordPress 7.0. Prop can be safely removed.
+	 * @ignore
+	 */
+	__nextHasNoMarginBottom?: boolean;
 	/**
 	 * If this property is added, an option will be added with this label to represent empty selection.
 	 */

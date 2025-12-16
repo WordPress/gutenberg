@@ -499,7 +499,6 @@ function TableEdit( {
 						isShownByDefault
 					>
 						<ToggleControl
-							__nextHasNoMarginBottom
 							label={ __( 'Fixed width table cells' ) }
 							checked={ !! hasFixedLayout }
 							onChange={ onChangeFixedLayout }
@@ -516,7 +515,6 @@ function TableEdit( {
 								isShownByDefault
 							>
 								<ToggleControl
-									__nextHasNoMarginBottom
 									label={ __( 'Header section' ) }
 									checked={ !! ( head && head.length ) }
 									onChange={ onToggleHeaderSection }
@@ -531,7 +529,6 @@ function TableEdit( {
 								isShownByDefault
 							>
 								<ToggleControl
-									__nextHasNoMarginBottom
 									label={ __( 'Footer section' ) }
 									checked={ !! ( foot && foot.length ) }
 									onChange={ onToggleFooterSection }
@@ -572,7 +569,6 @@ function TableEdit( {
 						onSubmit={ onCreateTable }
 					>
 						<TextControl
-							__nextHasNoMarginBottom
 							__next40pxDefaultSize
 							type="number"
 							label={ __( 'Column count' ) }
@@ -582,7 +578,6 @@ function TableEdit( {
 							className="blocks-table__placeholder-input"
 						/>
 						<TextControl
-							__nextHasNoMarginBottom
 							__next40pxDefaultSize
 							type="number"
 							label={ __( 'Row count' ) }

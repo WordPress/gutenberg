@@ -24,7 +24,7 @@ const transforms = {
 			blocks: [ 'core/spacer' ], // Transform to Spacer.
 			transform: ( { anchor } ) => {
 				return createBlock( 'core/spacer', {
-					anchor: anchor || '',
+					anchor: anchor || undefined,
 				} );
 			},
 		},

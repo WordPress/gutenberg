@@ -365,8 +365,8 @@ test.describe( 'Heading', () => {
 
 		await expect(
 			headingListViewItem,
-			'should show default block name if the content is empty'
-		).toHaveText( 'Heading' );
+			'should show variation name if the content is empty'
+		).toHaveText( 'Heading 2' );
 
 		await editor.canvas
 			.getByRole( 'document', {

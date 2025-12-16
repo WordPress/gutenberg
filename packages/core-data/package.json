@@ -37,7 +37,9 @@
 	"wpScript": true,
 	"types": "build-types",
 	"sideEffects": [
-		"{src,build,build-module}/index.js"
+		"src/index.js",
+		"build/index.js",
+		"build-module/index.js"
 	],
 	"dependencies": {
 		"@wordpress/api-fetch": "file:../api-fetch",

@@ -1,8 +1,5 @@
-/**
- * External dependencies
- */
-const glob = require( 'glob' ).sync;
 const { join } = require( 'path' );
+const glob = require( 'glob' ).sync;
 
 /**
  * The list of patterns matching files used only for development purposes.
@@ -146,7 +143,6 @@ module.exports = {
 			'error',
 			{ props: 'never', children: 'never' },
 		],
-		'@wordpress/dependency-group': 'error',
 		'@wordpress/wp-global-usage': 'error',
 		'@wordpress/react-no-unsafe-timeout': 'error',
 		'@wordpress/i18n-hyphenated-range': 'error',
@@ -282,18 +278,10 @@ module.exports = {
 					// Temporary rules until we're ready to officially deprecate the bottom margins.
 					...[
 						'BaseControl',
-						'CheckboxControl',
 						'ComboboxControl',
-						'DimensionControl',
-						'FocalPointPicker',
 						'RangeControl',
 						'SearchControl',
 						'SelectControl',
-						'TextControl',
-						'TextareaControl',
-						'ToggleControl',
-						'ToggleGroupControl',
-						'TreeSelect',
 					].map( ( componentName ) => ( {
 						selector: `JSXOpeningElement[name.name="${ componentName }"]:not(:has(JSXAttribute[name.name="__nextHasNoMarginBottom"]))`,
 						message:
@@ -308,7 +296,7 @@ module.exports = {
 						'Button',
 						'ComboboxControl',
 						'CustomSelectControl',
-						'DimensionControl',
+
 						'FontAppearanceControl',
 						'FontFamilyControl',
 						'FontSizePicker',

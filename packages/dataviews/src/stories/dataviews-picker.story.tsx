@@ -265,23 +265,33 @@ export const WithModal = ( {
 				</p>
 			) }
 			{ isModalOpen && (
-				<Modal
-					title="Select Items"
-					onRequestClose={ () => setIsModalOpen( false ) }
-					isFullScreen={ false }
-					size="fill"
-				>
-					<DataViewsPickerContent
-						perPageSizes={ perPageSizes }
-						isMultiselectable={ isMultiselectable }
-						isGrouped={ isGrouped }
-						infiniteScrollEnabled={ infiniteScrollEnabled }
-						actions={ modalActions }
-						selection={ selectedItems.map( ( item ) =>
-							String( item.id )
-						) }
-					/>
-				</Modal>
+				<>
+					<style>{ `
+						.components-modal__content {
+							padding: 0;
+						}
+						.components-modal__frame.is-full-screen .components-modal__content {
+							margin-bottom: 0;
+						}
+					` }</style>
+					<Modal
+						title="Select Items"
+						onRequestClose={ () => setIsModalOpen( false ) }
+						isFullScreen={ false }
+						size="fill"
+					>
+						<DataViewsPickerContent
+							perPageSizes={ perPageSizes }
+							isMultiselectable={ isMultiselectable }
+							isGrouped={ isGrouped }
+							infiniteScrollEnabled={ infiniteScrollEnabled }
+							actions={ modalActions }
+							selection={ selectedItems.map( ( item ) =>
+								String( item.id )
+							) }
+						/>
+					</Modal>
+				</>
 			) }
 		</>
 	);

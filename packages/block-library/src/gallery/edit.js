@@ -727,7 +727,6 @@ export default function GalleryEdit( props ) {
 							}
 						>
 							<ToggleControl
-								__nextHasNoMarginBottom
 								label={ __( 'Crop images to fit' ) }
 								checked={ !! imageCrop }
 								onChange={ toggleImageCrop }
@@ -742,7 +741,6 @@ export default function GalleryEdit( props ) {
 							}
 						>
 							<ToggleControl
-								__nextHasNoMarginBottom
 								label={ __( 'Randomize order' ) }
 								checked={ !! randomOrder }
 								onChange={ toggleRandomOrder }
@@ -756,7 +754,6 @@ export default function GalleryEdit( props ) {
 								onDeselect={ () => toggleOpenInNewTab( false ) }
 							>
 								<ToggleControl
-									__nextHasNoMarginBottom
 									label={ __( 'Open images in new tab' ) }
 									checked={ linkTarget === '_blank' }
 									onChange={ toggleOpenInNewTab }
@@ -830,20 +827,17 @@ export default function GalleryEdit( props ) {
 							size="__unstable-large"
 						/>
 						<ToggleControl
-							__nextHasNoMarginBottom
 							label={ __( 'Crop images to fit' ) }
 							checked={ !! imageCrop }
 							onChange={ toggleImageCrop }
 						/>
 						<ToggleControl
-							__nextHasNoMarginBottom
 							label={ __( 'Randomize order' ) }
 							checked={ !! randomOrder }
 							onChange={ toggleRandomOrder }
 						/>
 						{ hasLinkTo && (
 							<ToggleControl
-								__nextHasNoMarginBottom
 								label={ __( 'Open images in new tab' ) }
 								checked={ linkTarget === '_blank' }
 								onChange={ toggleOpenInNewTab }

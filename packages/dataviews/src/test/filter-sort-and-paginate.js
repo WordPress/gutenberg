@@ -307,7 +307,7 @@ describe( 'filters', () => {
 		expect( result[ 7 ].name.title ).toBe( 'Uranus' );
 	} );
 
-	it( 'should search using IS NOT ALL filter', () => {
+	it( 'should search using IS NOT ALL filter (deprecated operator)', () => {
 		const { data: result } = filterSortAndPaginate(
 			data,
 			{
@@ -321,6 +321,7 @@ describe( 'filters', () => {
 			},
 			fields
 		);
+		expect( console ).toHaveWarned();
 		expect( result ).toHaveLength( 10 );
 		expect( result[ 0 ].name.title ).toBe( 'Moon' );
 		expect( result[ 1 ].name.title ).toBe( 'Io' );
@@ -1134,6 +1135,54 @@ describe( 'sorting', () => {
 		}
 
 		expect( groupCount ).toBe( 5 );
+	} );
+
+	it( 'should NOT sort the data if gropuBy.field is not sortable', () => {
+		const { data: result } = filterSortAndPaginate(
+			data,
+			{
+				groupBy: { field: 'description', direction: 'asc' },
+				filters: [
+					{
+						field: 'type',
+						operator: 'is',
+						value: 'Terrestrial',
+					},
+				],
+			},
+			fields
+		);
+
+		expect( result.map( ( r ) => r.name.description ) ).toEqual( [
+			'Terrestrial planet in the Solar system',
+			'La planète Vénus',
+			'Terrestrial planet in the Solar system',
+			'Terrestrial planet in the Solar system',
+		] );
+	} );
+
+	it( 'should NOT sort the data if sort.field is not sortable', () => {
+		const { data: result } = filterSortAndPaginate(
+			data,
+			{
+				sort: { field: 'description', direction: 'asc' },
+				filters: [
+					{
+						field: 'type',
+						operator: 'is',
+						value: 'Terrestrial',
+					},
+				],
+			},
+			fields
+		);
+
+		expect( result.map( ( r ) => r.name.description ) ).toEqual( [
+			'Terrestrial planet in the Solar system',
+			'La planète Vénus',
+			'Terrestrial planet in the Solar system',
+			'Terrestrial planet in the Solar system',
+		] );
 	} );
 } );
 

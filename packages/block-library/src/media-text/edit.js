@@ -355,7 +355,6 @@ function MediaTextEdit( {
 				}
 			>
 				<ToggleControl
-					__nextHasNoMarginBottom
 					label={ __( 'Stack on mobile' ) }
 					checked={ isStackedOnMobile }
 					onChange={ () =>
@@ -373,7 +372,6 @@ function MediaTextEdit( {
 					onDeselect={ () => setAttributes( { imageFill: false } ) }
 				>
 					<ToggleControl
-						__nextHasNoMarginBottom
 						label={ __( 'Crop image to fill' ) }
 						checked={ !! imageFill }
 						onChange={ () =>
@@ -396,7 +394,6 @@ function MediaTextEdit( {
 						}
 					>
 						<FocalPointPicker
-							__nextHasNoMarginBottom
 							label={ __( 'Focal point' ) }
 							url={
 								useFeaturedImage && featuredImageURL
@@ -420,7 +417,6 @@ function MediaTextEdit( {
 					onDeselect={ () => setAttributes( { mediaAlt: '' } ) }
 				>
 					<TextareaControl
-						__nextHasNoMarginBottom
 						label={ __( 'Alternative text' ) }
 						value={ mediaAlt }
 						onChange={ onMediaAltChange }

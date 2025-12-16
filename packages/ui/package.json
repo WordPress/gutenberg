@@ -22,6 +22,8 @@
 		"node": ">=20.10.0",
 		"npm": ">=10.2.3"
 	},
+	"main": "build/index.js",
+	"module": "build-module/index.js",
 	"exports": {
 		".": {
 			"types": "./build-types/index.d.ts",
@@ -31,10 +33,10 @@
 		"./package.json": "./package.json"
 	},
 	"wpScript": false,
+	"types": "build-types",
 	"sideEffects": false,
 	"dependencies": {
 		"@wordpress/element": "file:../element",
-		"@wordpress/private-apis": "file:../private-apis",
 		"clsx": "^2.1.1"
 	},
 	"devDependencies": {

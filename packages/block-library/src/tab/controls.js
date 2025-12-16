@@ -58,7 +58,6 @@ export default function Controls( {
 						help={ __(
 							'If toggled, this tab will be selected when the page loads.'
 						) }
-						__nextHasNoMarginBottom
 					/>
 				</PanelBody>
 			</InspectorControls>

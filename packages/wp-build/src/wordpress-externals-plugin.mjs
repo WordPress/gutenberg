@@ -220,6 +220,7 @@ export function createWordpressExternalsPlugin(
 								return {
 									path: args.path,
 									external: true,
+									sideEffects: !! packageJson.sideEffects,
 								};
 							}
 

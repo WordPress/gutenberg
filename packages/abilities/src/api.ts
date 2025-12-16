@@ -1,9 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { dispatch, resolveSelect } from '@wordpress/data';
-import apiFetch from '@wordpress/api-fetch';
-import { addQueryArgs } from '@wordpress/url';
+import { dispatch, select } from '@wordpress/data';
 import { sprintf } from '@wordpress/i18n';
 
 /**
@@ -24,43 +22,41 @@ import { validateValueFromSchema } from './validation';
  * Get all available abilities with optional filtering.
  *
  * @param args Optional query arguments to filter. Defaults to empty object.
- * @return Promise resolving to array of abilities.
+ * @return Array of abilities.
  */
-export async function getAbilities(
-	args: AbilitiesQueryArgs = {}
-): Promise< Ability[] > {
-	return await resolveSelect( store ).getAbilities( args );
+export function getAbilities( args: AbilitiesQueryArgs = {} ): Ability[] {
+	return select( store ).getAbilities( args );
 }
 
 /**
  * Get a specific ability by name.
  *
  * @param name The ability name.
- * @return Promise resolving to the ability or null if not found.
+ * @return The ability or undefined if not found.
  */
-export async function getAbility( name: string ): Promise< Ability | null > {
-	return await resolveSelect( store ).getAbility( name );
+export function getAbility( name: string ): Ability | undefined {
+	return select( store ).getAbility( name );
 }
 
 /**
  * Get all available ability categories.
  *
- * @return Promise resolving to array of categories.
+ * @return Array of categories.
  */
-export async function getAbilityCategories(): Promise< AbilityCategory[] > {
-	return await resolveSelect( store ).getAbilityCategories();
+export function getAbilityCategories(): AbilityCategory[] {
+	return select( store ).getAbilityCategories();
 }
 
 /**
  * Get a specific ability category by slug.
  *
  * @param slug The category slug.
- * @return Promise resolving to the category or null if not found.
+ * @return The category or undefined if not found.
  */
-export async function getAbilityCategory(
+export function getAbilityCategory(
 	slug: string
-): Promise< AbilityCategory | null > {
-	return await resolveSelect( store ).getAbilityCategory( slug );
+): AbilityCategory | undefined {
+	return select( store ).getAbilityCategory( slug );
 }
 
 /**
@@ -70,17 +66,14 @@ export async function getAbilityCategory(
  * a callback function. The ability will be validated by the store action,
  * and an error will be thrown if validation fails.
  *
- * Categories will be automatically fetched from the REST API if they
- * haven't been loaded yet, so you don't need to call getAbilityCategories()
- * before registering abilities.
+ * The category must already be registered before registering abilities.
  *
  * @param  ability The ability definition including callback.
- * @return Promise that resolves when registration is complete.
  * @throws {Error} If the ability fails validation.
  *
  * @example
  * ```js
- * await registerAbility({
+ * registerAbility({
  *   name: 'my-plugin/navigate',
  *   label: 'Navigate to URL',
  *   description: 'Navigates to a URL within WordPress admin',
@@ -99,8 +92,8 @@ export async function getAbilityCategory(
  * });
  * ```
  */
-export async function registerAbility( ability: Ability ): Promise< void > {
-	await dispatch( store ).registerAbility( ability );
+export function registerAbility( ability: Ability ): void {
+	dispatch( store ).registerAbility( ability );
 }
 
 /**
@@ -123,24 +116,20 @@ export function unregisterAbility( name: string ): void {
  * This is useful when registering client-side abilities that introduce new
  * categories not defined by the server.
  *
- * Categories will be automatically fetched from the REST API if they haven't been
- * loaded yet to check for duplicates against server-side categories.
- *
  * @param  slug Category slug (lowercase alphanumeric with dashes only).
  * @param  args Category arguments (label, description, optional meta).
- * @return Promise that resolves when registration is complete.
  * @throws {Error} If the category fails validation.
  *
  * @example
  * ```js
  * // Register a new category for block editor abilities
- * await registerAbilityCategory('block-editor', {
+ * registerAbilityCategory('block-editor', {
  *   label: 'Block Editor',
  *   description: 'Abilities for interacting with the WordPress block editor'
  * });
  *
  * // Then register abilities using this category
- * await registerAbility({
+ * registerAbility({
  *   name: 'my-plugin/insert-block',
  *   label: 'Insert Block',
  *   description: 'Inserts a block into the editor',
@@ -152,11 +141,11 @@ export function unregisterAbility( name: string ): void {
  * });
  * ```
  */
-export async function registerAbilityCategory(
+export function registerAbilityCategory(
 	slug: string,
 	args: AbilityCategoryArgs
-): Promise< void > {
-	await dispatch( store ).registerAbilityCategory( slug, args );
+): void {
+	dispatch( store ).registerAbilityCategory( slug, args );
 }
 
 /**
@@ -176,21 +165,29 @@ export function unregisterAbilityCategory( slug: string ): void {
 }
 
 /**
- * Execute a client-side ability.
+ * Execute an ability.
  *
- * @param ability The ability to execute.
- * @param input   Input parameters for the ability.
+ * Executes abilities with validation for client-side abilities only.
+ * Server abilities bypass validation as it's handled on the server.
+ *
+ * @param name  The ability name.
+ * @param input Optional input parameters for the ability.
  * @return Promise resolving to the ability execution result.
- * @throws Error if validation fails or execution errors.
+ * @throws Error if the ability is not found or execution fails.
  */
-async function executeClientAbility(
-	ability: Ability,
-	input: AbilityInput
+export async function executeAbility(
+	name: string,
+	input?: AbilityInput
 ): Promise< AbilityOutput > {
+	const ability = getAbility( name );
+	if ( ! ability ) {
+		throw new Error( sprintf( 'Ability not found: %s', name ) );
+	}
+
 	if ( ! ability.callback ) {
 		throw new Error(
 			sprintf(
-				'Client ability %s is missing callback function',
+				'Ability "%s" is missing callback. Please ensure the ability is properly registered.',
 				ability.name
 			)
 		);
@@ -208,6 +205,7 @@ async function executeClientAbility(
 		}
 	}
 
+	// Validate input
 	if ( ability.input_schema ) {
 		const inputValidation = validateValueFromSchema(
 			input,
@@ -227,18 +225,17 @@ async function executeClientAbility(
 		}
 	}
 
+	// Execute the ability
 	let result: AbilityOutput;
 	try {
 		result = await ability.callback( input );
 	} catch ( error ) {
 		// eslint-disable-next-line no-console
-		console.error(
-			`Error executing client ability ${ ability.name }:`,
-			error
-		);
+		console.error( `Error executing ability ${ ability.name }:`, error );
 		throw error;
 	}
 
+	// Validate output
 	if ( ability.output_schema ) {
 		const outputValidation = validateValueFromSchema(
 			result,
@@ -259,81 +256,4 @@ async function executeClientAbility(
 	}
 
 	return result;
-}
-
-/**
- * Execute a server-side ability.
- *
- * @param ability The ability to execute.
- * @param input   Input parameters for the ability.
- * @return Promise resolving to the ability execution result.
- * @throws Error if the API call fails.
- */
-async function executeServerAbility(
-	ability: Ability,
-	input: AbilityInput
-): Promise< AbilityOutput > {
-	let method = 'POST';
-	if ( !! ability.meta?.annotations?.readonly ) {
-		method = 'GET';
-	} else if (
-		!! ability.meta?.annotations?.destructive &&
-		!! ability.meta?.annotations?.idempotent
-	) {
-		method = 'DELETE';
-	}
-
-	let path = `/wp-abilities/v1/abilities/${ ability.name }/run`;
-	const options: {
-		method: string;
-		data?: { input: AbilityInput };
-	} = {
-		method,
-	};
-
-	if ( [ 'GET', 'DELETE' ].includes( method ) && input !== null ) {
-		// For GET and DELETE requests, pass the input directly.
-		path = addQueryArgs( path, { input } );
-	} else if ( method === 'POST' && input !== null ) {
-		options.data = { input };
-	}
-
-	// Note: Input and output validation happens on the server side for these abilities.
-	try {
-		return await apiFetch< AbilityOutput >( {
-			path,
-			...options,
-		} );
-	} catch ( error ) {
-		// eslint-disable-next-line no-console
-		console.error( `Error executing ability ${ ability.name }:`, error );
-		throw error;
-	}
-}
-
-/**
- * Execute an ability.
- *
- * Determines whether to execute locally (client abilities) or remotely (server abilities)
- * based on whether the ability has a callback function.
- *
- * @param name  The ability name.
- * @param input Optional input parameters for the ability.
- * @return Promise resolving to the ability execution result.
- * @throws Error if the ability is not found or execution fails.
- */
-export async function executeAbility(
-	name: string,
-	input?: AbilityInput
-): Promise< AbilityOutput > {
-	const ability = await getAbility( name );
-	if ( ! ability ) {
-		throw new Error( sprintf( 'Ability not found: %s', name ) );
-	}
-
-	if ( ability.callback ) {
-		return executeClientAbility( ability, input );
-	}
-
-	return executeServerAbility( ability, input );
 }

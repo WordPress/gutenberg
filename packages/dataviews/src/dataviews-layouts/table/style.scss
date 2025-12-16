@@ -61,12 +61,12 @@
 
 		td:first-child,
 		th:first-child {
-			padding-left: $grid-unit-60;
+			padding-left: $grid-unit-30;
 		}
 
 		td:last-child,
 		th:last-child {
-			padding-right: $grid-unit-60;
+			padding-right: $grid-unit-30;
 		}
 
 		&:last-child {
@@ -260,17 +260,6 @@
 	}
 }
 
-@container (max-width: 430px) {
-	.dataviews-view-table tr td:first-child,
-	.dataviews-view-table tr th:first-child {
-		padding-left: $grid-unit-30;
-	}
-
-	.dataviews-view-table tr td:last-child,
-	.dataviews-view-table tr th:last-child {
-		padding-right: $grid-unit-30;
-	}
-}
 
 .dataviews-view-table-selection-checkbox {
 	--checkbox-input-size: 24px;
@@ -316,7 +305,7 @@
 .dataviews-view-table__group-header-row {
 	.dataviews-view-table__group-header-cell {
 		font-weight: $font-weight-medium;
-		padding: $grid-unit-15 $grid-unit-60;
+		padding: $grid-unit-15 $grid-unit-30;
 		color: $gray-900;
 	}
 }
