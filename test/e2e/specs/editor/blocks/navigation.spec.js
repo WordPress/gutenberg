@@ -1931,14 +1931,23 @@ test.describe( 'Navigation block', () => {
 				// Select the navigation
 				await navigation.getNavBlock().click();
 
-				// select the block via the inspector list view instead of the canvas, as that will
-				// open the link control in the canvas
-				await page.getByRole( 'link', { name: 'Empty Link' } ).click();
-			} );
-
-			await test.step( 'Open inspector and verify LinkPicker shows "Add link" button', async () => {
+				// Open the inspector sidebar to access the list view
 				await editor.openDocumentSettingsSidebar();
 
+				// Get the list view treegrid in the inspector
+				const listView = page.getByRole( 'treegrid', {
+					name: 'Block navigation structure',
+					description: 'Structure for navigation menu: Test Menu',
+				} );
+
+				// select the block via the inspector list view instead of the canvas, as that will
+				// not open the link control in the canvas
+				await listView
+					.getByRole( 'link', { name: 'Empty Link' } )
+					.click();
+			} );
+
+			await test.step( 'Verify LinkPicker shows "Add link" button', async () => {
 				const settingsControls = navigation.getSettingsControls();
 				await expect( settingsControls ).toBeVisible();
 
