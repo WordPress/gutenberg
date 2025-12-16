@@ -400,10 +400,7 @@ export default function NavigationLinkEdit( {
 			<div { ...blockProps }>
 				{ hasMissingEntity && (
 					<VisuallyHidden id={ missingEntityDescriptionId }>
-						<InvalidLinkHelpText
-							invalid={ isInvalid }
-							draft={ isDraft }
-						/>
+						<InvalidLinkHelpText />
 					</VisuallyHidden>
 				) }
 				{ /* eslint-disable jsx-a11y/anchor-is-valid */ }
