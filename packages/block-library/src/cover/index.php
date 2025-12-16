@@ -197,14 +197,20 @@ function render_block_core_cover( $attributes, $content ) {
 		$processor = new WP_HTML_Tag_Processor( '<div></div>' );
 		$processor->next_tag();
 
-		$current_alt = trim( strip_tags( get_post_meta( $current_thumbnail_id, '_wp_attachment_image_alt', true ) ) );
-		if ( $current_alt ) {
-			$processor->set_attribute( 'role', 'img' );
-			$processor->set_attribute( 'aria-label', $current_alt );
+		// Only get alt text if we have an attachment ID.
+		if ( $current_thumbnail_id ) {
+			$current_alt = trim( strip_tags( get_post_meta( $current_thumbnail_id, '_wp_attachment_image_alt', true ) ) );
+			if ( $current_alt ) {
+				$processor->set_attribute( 'role', 'img' );
+				$processor->set_attribute( 'aria-label', $current_alt );
+			}
 		}
 
 		$processor->add_class( 'wp-block-cover__image-background' );
-		$processor->add_class( 'wp-image-' . $current_thumbnail_id );
+		// Only add wp-image class if we have an attachment ID.
+		if ( $current_thumbnail_id ) {
+			$processor->add_class( 'wp-image-' . $current_thumbnail_id );
+		}
 		if ( $attributes['hasParallax'] ) {
 			$processor->add_class( 'has-parallax' );
 		}
