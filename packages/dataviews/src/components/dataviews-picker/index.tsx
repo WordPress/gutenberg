@@ -7,7 +7,13 @@ import type { ReactNode } from 'react';
  * WordPress dependencies
  */
 import { __experimentalHStack as HStack } from '@wordpress/components';
-import { useEffect, useMemo, useRef, useState } from '@wordpress/element';
+import {
+	useEffect,
+	useMemo,
+	useRef,
+	useState,
+	useCallback,
+} from '@wordpress/element';
 import { useResizeObserver, throttle } from '@wordpress/compose';
 
 /**
@@ -52,7 +58,8 @@ type DataViewsPickerProps< Item > = {
 	paginationInfo: {
 		totalItems: number;
 		totalPages: number;
-		infiniteScrollHandler?: () => void;
+		infiniteScrollHandler?: ( direction: 'up' | 'down' ) => void;
+		setVisibleEntries?: React.Dispatch< React.SetStateAction< number[] > >;
 	};
 	defaultLayouts: SupportedLayouts;
 	selection: string[];
@@ -129,7 +136,7 @@ function DataViewsPicker< Item >( {
 	itemListLabel,
 	empty,
 }: DataViewsPickerProps< Item > ) {
-	const { infiniteScrollHandler } = paginationInfo;
+	const { infiniteScrollHandler, setVisibleEntries } = paginationInfo;
 	const containerRef = useRef< HTMLDivElement | null >( null );
 	const [ containerWidth, setContainerWidth ] = useState( 0 );
 	const resizeObserverRef = useResizeObserver(
@@ -150,6 +157,46 @@ function DataViewsPicker< Item >( {
 	}
 	const _fields = useMemo( () => normalizeFields( fields ), [ fields ] );
 	const filters = useFilters( _fields, view );
+
+	const intersectionObserverCallback: IntersectionObserverCallback =
+		useCallback(
+			( entries: IntersectionObserverEntry[] ) => {
+				// Calculate new visible entries outside of setState
+				if ( ! setVisibleEntries ) {
+					return;
+				}
+				setVisibleEntries( ( prev ) => {
+					const newVisibleEntries = new Set( prev );
+					let hasChanged = false;
+
+					entries.forEach( ( entry ) => {
+						const posInSet = Number(
+							entry.target?.attributes?.getNamedItem(
+								'aria-posinset'
+							)?.value
+						);
+						if ( isNaN( posInSet ) ) {
+							return;
+						}
+						if ( entry.isIntersecting ) {
+							if ( ! newVisibleEntries.has( posInSet ) ) {
+								newVisibleEntries.add( posInSet );
+								hasChanged = true;
+							}
+						} else if ( newVisibleEntries.has( posInSet ) ) {
+							newVisibleEntries.delete( posInSet );
+							hasChanged = true;
+						}
+					} );
+
+					// Only return new array if something actually changed
+					return hasChanged
+						? Array.from( newVisibleEntries ).sort()
+						: prev;
+				} );
+			},
+			[ setVisibleEntries ]
+		);
 	const hasPrimaryOrLockedFilters = useMemo(
 		() =>
 			( filters || [] ).some(
@@ -173,15 +220,29 @@ function DataViewsPicker< Item >( {
 			return;
 		}
 
+		let lastScrollTop = 0;
+
 		const handleScroll = throttle( ( event: unknown ) => {
 			const target = ( event as Event ).target as HTMLElement;
 			const scrollTop = target.scrollTop;
 			const scrollHeight = target.scrollHeight;
 			const clientHeight = target.clientHeight;
 
+			// Determine scroll direction
+			const scrollDirection = scrollTop > lastScrollTop ? 'down' : 'up';
+			lastScrollTop = scrollTop;
+
 			// Check if user has scrolled near the bottom
-			if ( scrollTop + clientHeight >= scrollHeight - 100 ) {
-				infiniteScrollHandler?.();
+			if (
+				scrollDirection === 'down' &&
+				scrollTop + clientHeight >= scrollHeight - 300
+			) {
+				infiniteScrollHandler?.( 'down' );
+			}
+
+			// Check if user has scrolled near the top
+			if ( scrollDirection === 'up' && scrollTop <= 300 ) {
+				infiniteScrollHandler?.( 'up' );
 			}
 		}, 100 ); // Throttle to 100ms
 
@@ -240,6 +301,7 @@ function DataViewsPicker< Item >( {
 				itemListLabel,
 				empty,
 				hasInfiniteScrollHandler: !! infiniteScrollHandler,
+				intersectionObserverCallback,
 			} }
 		>
 			<div className="dataviews-picker-wrapper" ref={ containerRef }>

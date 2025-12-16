@@ -18,7 +18,7 @@ import {
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { useInstanceId } from '@wordpress/compose';
-import { useContext } from '@wordpress/element';
+import { useContext, useRef, useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -74,7 +74,35 @@ function GridItem< Item >( {
 }: GridItemProps< Item > ) {
 	const { showTitle = true, showMedia = true, showDescription = true } = view;
 	const id = getItemId( item );
+	const elementRef = useRef< HTMLDivElement | null >( null );
+	const { intersectionObserverCallback } = useContext( DataViewsContext );
 	const isSelected = selection.includes( id );
+
+	// Set up IntersectionObserver for this item
+	useEffect( () => {
+		if (
+			! intersectionObserverCallback ||
+			! elementRef.current ||
+			posinset === undefined
+		) {
+			return;
+		}
+
+		const observer = new IntersectionObserver(
+			intersectionObserverCallback,
+			{
+				root: null,
+				rootMargin: '0px',
+				threshold: 0.1,
+			}
+		);
+
+		observer.observe( elementRef.current );
+
+		return () => {
+			observer.disconnect();
+		};
+	}, [ intersectionObserverCallback, posinset ] );
 	const renderedMediaField = mediaField?.render ? (
 		<mediaField.render
 			item={ item }
@@ -96,7 +124,12 @@ function GridItem< Item >( {
 			}
 			key={ id }
 			render={ ( { children, ...props } ) => (
-				<VStack spacing={ 0 } children={ children } { ...props } />
+				<VStack
+					ref={ elementRef }
+					spacing={ 0 }
+					children={ children }
+					{ ...props }
+				/>
 			) }
 			role="option"
 			aria-posinset={ posinset }
