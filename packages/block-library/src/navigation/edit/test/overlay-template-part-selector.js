@@ -447,9 +447,7 @@ describe( 'OverlayTemplatePartSelector', () => {
 			render( <OverlayTemplatePartSelector { ...defaultProps } /> );
 
 			expect(
-				screen.getByText(
-					'Select an overlay to use for the navigation.'
-				)
+				screen.getByText( 'Select an overlay for navigation.' )
 			).toBeInTheDocument();
 			expect(
 				screen.getByRole( 'button', {
