@@ -49,10 +49,7 @@ export const toggleGroupControl = ( {
 		border-radius: ${ CONFIG.radiusSmall };
 		top: -1px;
 		left: -2px;
-		width: calc(
-			calc( var( --selected-width, 0 ) * 1px ) +
-				${ isBlock ? '3px' : '2px' }
-		);
+		width: calc( calc( var( --selected-width, 0 ) * 1px ) + 2px );
 		height: calc( calc( var( --selected-height, 0 ) * 1px ) + 2px );
 		transform: translateX( calc( var( --selected-left, 0 ) * 1px ) );
 		/* Hide when dimensions are unset (0) */
