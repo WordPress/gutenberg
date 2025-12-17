@@ -83,7 +83,7 @@ function TemplatesList( { area, clientId, isEntityAvailable, onSelect } ) {
 	const canReplace =
 		isEntityAvailable &&
 		!! blockPatterns.length &&
-		( area === 'header' || area === 'footer' );
+		( area === 'header' || area === 'footer' || area === 'overlay' );
 
 	if ( ! canReplace ) {
 		return null;
