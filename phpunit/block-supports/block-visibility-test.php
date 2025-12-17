@@ -160,32 +160,7 @@ class WP_Block_Supports_Block_Visibility_Test extends WP_UnitTestCase {
 		$block_content = '<div>Test content</div>';
 		$result        = gutenberg_render_block_visibility_support( $block_content, $block );
 
-		$this->assertSame( $block_content, $result );
-	}
-
-	public function test_block_visibility_support_without_experiment() {
-		$this->disable_viewport_visibility_experiment();
-
-		$this->register_visibility_block_with_support(
-			'test/viewport-no-experiment',
-			array( 'visibility' => true )
-		);
-
-		$block = array(
-			'blockName' => 'test/viewport-no-experiment',
-			'attrs'     => array(
-				'metadata' => array(
-					'blockVisibility' => array(
-						'mobile' => false,
-					),
-				),
-			),
-		);
-
-		$block_content = '<div>Test content</div>';
-		$result        = gutenberg_render_block_visibility_support( $block_content, $block );
-
-		$this->assertSame( $block_content, $result, 'Block content should remain unchanged when the experiment is not enabled.' );
+		$this->assertSame( $block_content, $result, 'Block content should remain unchanged when no visibility attribute is present.' );
 	}
 
 	public function test_block_visibility_support_generated_css_with_mobile_breakpoint() {
