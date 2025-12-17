@@ -50,6 +50,14 @@ type StrokeColor =
 	| 'warning'
 	| 'warning-strong';
 
+type Target =
+	| 'surface'
+	| 'interactive'
+	| 'content'
+	| 'track'
+	| 'thumb'
+	| 'focus';
+
 type DimensionVariant< T > = {
 	block?: T;
 	blockStart?: T;
@@ -63,7 +71,7 @@ export interface BoxProps extends ComponentProps< 'div' > {
 	/**
 	 * The target rendering element design token grouping to use for the box.
 	 */
-	target?: string;
+	target?: Target;
 
 	/**
 	 * The surface background design token for box background color.
