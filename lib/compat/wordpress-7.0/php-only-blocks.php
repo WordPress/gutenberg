@@ -34,3 +34,38 @@ function gutenberg_register_auto_register_blocks() {
 }
 
 add_action( 'enqueue_block_editor_assets', 'gutenberg_register_auto_register_blocks', 5 );
+
+/**
+ * Mark user-defined attributes for auto-generated DataForm fields.
+ *
+ * This filter runs during block type registration, before the WP_Block_Type
+ * is instantiated. Block supports add their attributes AFTER the block type
+ * is created (via WP_Block_Supports::register_attributes()), so any attributes
+ * present at this stage are user-defined.
+ *
+ * This allows generateFieldsFromAttributes() to distinguish between
+ * user-defined attributes (which should get DataForm fields) and
+ * support-added attributes (which have their own UI controls).
+ *
+ * @param array $settings Array of block type arguments for registration.
+ * @return array Modified settings with marked attributes.
+ */
+function gutenberg_mark_auto_field_attributes( $settings ) {
+	if ( empty( $settings['attributes'] ) || ! is_array( $settings['attributes'] ) ) {
+		return $settings;
+	}
+
+	// Only process blocks with auto_register flag.
+	$has_auto_register = ! empty( $settings['supports']['auto_register'] );
+	if ( ! $has_auto_register ) {
+		return $settings;
+	}
+
+	foreach ( array_keys( $settings['attributes'] ) as $name ) {
+		$settings['attributes'][ $name ]['__experimentalAutoField'] = true;
+	}
+
+	return $settings;
+}
+
+add_filter( 'register_block_type_args', 'gutenberg_mark_auto_field_attributes', 5 );

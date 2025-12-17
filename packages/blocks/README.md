@@ -92,11 +92,11 @@ _Returns_
 
 Generates DataForm field definitions from block attributes.
 
-This utility enables PHP-only blocks to have auto-generated inspector controls by converting block.json attribute definitions into DataForm field definitions.
+This utility enables PHP-only blocks to have auto-generated inspector controls by converting block attribute definitions into DataForm field definitions.
 
 _Parameters_
 
--   _attributes_ `Object`: - Block type attributes from block.json
+-   _attributes_ `Object`: - Block type attributes from block registration
 
 _Returns_
 
