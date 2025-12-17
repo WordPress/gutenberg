@@ -233,7 +233,6 @@ export default function OverlayTemplatePartSelector( {
 							onClick={ handleEditClick }
 							disabled={ isEditButtonDisabled }
 							accessibleWhenDisabled
-							aria-label={ editButtonLabel }
 							label={ editButtonLabel }
 							showTooltip
 							className="wp-block-navigation__overlay-edit-button"
