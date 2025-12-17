@@ -1,16 +1,6 @@
-/**
- * External dependencies
- */
 import { type Meta, type StoryObj } from '@storybook/react';
-
-/**
- * WordPress dependencies
- */
+import { type PaddingSize } from '@wordpress/theme';
 import '@wordpress/theme/design-tokens.css';
-
-/**
- * Internal dependencies
- */
 import { Box } from '../box';
 
 const meta: Meta< typeof Box > = {
@@ -31,6 +21,12 @@ export const Default: Story = {
 		borderColor: 'brand',
 		borderRadius: 'md',
 		borderWidth: 'sm',
+	},
+	argTypes: {
+		padding: {
+			control: 'select',
+			options: [ '2xs', 'xs', 'sm', 'md', 'lg' ] satisfies PaddingSize[],
+		},
 	},
 };
 
