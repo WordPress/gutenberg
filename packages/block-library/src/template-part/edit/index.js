@@ -54,10 +54,15 @@ function ReplaceButton( {
 		templatePartId
 	);
 	const hasReplacements = !! templateParts.length;
+	const isOverlayExperimentEnabled =
+		typeof window !== 'undefined' &&
+		window.__experimentalNavigationOverlays === true;
+	const supportedAreas = [ 'header', 'footer' ];
+	if ( isOverlayExperimentEnabled ) {
+		supportedAreas.push( 'overlay' );
+	}
 	const canReplace =
-		isEntityAvailable &&
-		hasReplacements &&
-		( area === 'header' || area === 'footer' );
+		isEntityAvailable && hasReplacements && supportedAreas.includes( area );
 
 	if ( ! canReplace ) {
 		return null;
@@ -80,10 +85,17 @@ function TemplatesList( { area, clientId, isEntityAvailable, onSelect } ) {
 	// This hook fetches patterns, so don't run it unconditionally in the main
 	// edit function!
 	const blockPatterns = useAlternativeBlockPatterns( area, clientId );
+	const isOverlayExperimentEnabled =
+		typeof window !== 'undefined' &&
+		window.__experimentalNavigationOverlays === true;
+	const supportedAreas = [ 'header', 'footer' ];
+	if ( isOverlayExperimentEnabled ) {
+		supportedAreas.push( 'overlay' );
+	}
 	const canReplace =
 		isEntityAvailable &&
 		!! blockPatterns.length &&
-		( area === 'header' || area === 'footer' || area === 'overlay' );
+		supportedAreas.includes( area );
 
 	if ( ! canReplace ) {
 		return null;
