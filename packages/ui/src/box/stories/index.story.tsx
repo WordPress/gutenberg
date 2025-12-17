@@ -32,12 +32,6 @@ export const Default: Story = {
 		borderRadius: 'md',
 		borderWidth: 'sm',
 	},
-	argTypes: {
-		padding: {
-			control: 'select',
-			options: [ '2xs', 'xs', 'sm', 'md', 'lg', 1, 2, 3, 4 ],
-		},
-	},
 };
 
 export const DirectionalPadding: Story = {
