@@ -13,9 +13,9 @@ const TEST_IMAGE_FILE_PATH = path.resolve(
 	'../../assets/10x10_e2e_test_image_z9T8jK.png'
 );
 
-const TEST_AUDIO_FILE_PATH = path.resolve(
+const TEST_TEXT_FILE_PATH = path.resolve(
 	__dirname,
-	'../../assets/test-audio.mp3'
+	'../../assets/test-file.txt'
 );
 
 /**
@@ -96,7 +96,7 @@ async function openQuickEditForPage( page, admin, pageTitle ) {
 					data: { meta: { featured_media_test: [] } },
 				} ),
 				requestUtils.uploadMedia( TEST_IMAGE_FILE_PATH ),
-				requestUtils.uploadMedia( TEST_AUDIO_FILE_PATH ),
+				requestUtils.uploadMedia( TEST_TEXT_FILE_PATH ),
 			] );
 		} );
 

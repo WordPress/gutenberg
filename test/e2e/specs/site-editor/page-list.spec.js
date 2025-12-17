@@ -106,7 +106,7 @@ test.describe( 'Page List', () => {
 					} );
 					await expect( placeholder ).toBeHidden();
 					const img = page.locator(
-						'.fields-controls__media-thumbnail'
+						'.media-utils__media-edit-thumbnail'
 					);
 					await expect( img ).toBeVisible();
 				},
@@ -353,7 +353,7 @@ test.describe( 'Page List', () => {
 		} ) => {
 			const selectedItem = page.locator( '.is-selected' );
 			const imagePlaceholder = selectedItem.locator(
-				'.fields-controls__media-placeholder'
+				'.media-utils__media-edit-placeholder'
 			);
 			const status = selectedItem.getByRole( 'cell', {
 				name: 'Published',
@@ -398,7 +398,7 @@ test.describe( 'Page List', () => {
 		// 	expect( await selectedItems.all() ).toHaveLength( 2 );
 
 		// 	const imagePlaceholders = selectedItems.locator(
-		// 		'.fields-controls__media-placeholder',
+		// 		'.media-utils__media-edit-placeholder',
 		// 		{ strict: false }
 		// 	);
 

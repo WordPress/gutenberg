@@ -15,7 +15,7 @@
 		Edit: ( props ) =>
 			wp.element.createElement( MediaEdit, {
 				...props,
-				allowedTypes: [ 'image', 'audio' ],
+				allowedTypes: [],
 				placeholder: __( 'Add files…' ),
 				multiple: true,
 			} ),
