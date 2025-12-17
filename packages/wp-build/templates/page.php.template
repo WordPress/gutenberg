@@ -213,7 +213,7 @@ if ( ! function_exists( '{{PAGE_SLUG_UNDERSCORE}}_render_page' ) ) {
 			// Dummy script module to ensure dependencies are loaded
 			wp_register_script_module(
 				'{{PAGE_SLUG}}',
-				'data:text/javascript,',
+				{{BASE_URL}} . '/pages/{{PAGE_SLUG}}/loader.js',
 				$boot_dependencies
 			);
 

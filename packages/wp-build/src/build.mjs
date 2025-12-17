@@ -941,6 +941,12 @@ async function generatePagesPhp( pageData, replacements ) {
 				templateReplacements
 			),
 		] );
+
+		// Generate empty loader.js (dummy module for dependencies)
+		await writeFile(
+			path.join( BUILD_DIR, 'pages', page.slug, 'loader.js' ),
+			'// Empty module loader for page dependencies\n'
+		);
 	} );
 
 	await Promise.all( pageGenerationPromises );
