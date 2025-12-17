@@ -69,6 +69,10 @@ export const buttonView = ( {
 		cursor: default;
 	}
 
+	&:hover {
+		color: ${ COLORS.theme.gray[ 900 ] };
+	}
+
 	&:active {
 		background: ${ COLORS.ui.background };
 	}

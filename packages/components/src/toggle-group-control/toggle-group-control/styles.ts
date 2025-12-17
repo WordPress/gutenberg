@@ -39,7 +39,7 @@ export const toggleGroupControl = ( {
 		content: '';
 		position: absolute;
 		pointer-events: none;
-		background: ${ COLORS.theme.gray[ 100 ] };
+		background: ${ COLORS.theme.foregroundInverted };
 		border: 1px solid ${ COLORS.theme.gray[ 700 ] };
 
 		// Windows High Contrast mode will show this outline, but not the box-shadow.
@@ -65,14 +65,14 @@ export const toggleGroupControl = ( {
 
 const enclosingBorders = ( isBlock: ToggleGroupControlProps[ 'isBlock' ] ) => {
 	const enclosingBorder = css`
-		border-color: ${ COLORS.ui.border };
+		border-color: ${ COLORS.gray[ 300 ] };
 	`;
 
 	return css`
 		${ isBlock && enclosingBorder }
 
 		&:hover {
-			border-color: ${ COLORS.ui.borderHover };
+			border-color: ${ COLORS.gray[ 400 ] };
 		}
 
 		&:focus-within {
