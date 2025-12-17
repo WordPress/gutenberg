@@ -25,6 +25,7 @@ describe( 'block parser', () => {
 	};
 
 	const unknownBlockSettings = {
+		apiVersion: 3,
 		category: 'text',
 		title: 'unknown block',
 		attributes: {

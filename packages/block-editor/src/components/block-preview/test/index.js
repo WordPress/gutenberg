@@ -20,6 +20,7 @@ import { useBlockPreview } from '../';
 describe( 'useBlockPreview', () => {
 	beforeAll( () => {
 		registerBlockType( 'core/test-block', {
+			apiVersion: 3,
 			save: () => (
 				<div>
 					Test block save view

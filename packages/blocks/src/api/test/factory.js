@@ -1619,6 +1619,7 @@ describe( 'block factory', () => {
 				defaultBlockSettings
 			);
 			registerBlockType( 'core/text-block', {
+				apiVersion: 3,
 				attributes: {
 					value: {
 						type: 'string',
@@ -1678,6 +1679,7 @@ describe( 'block factory', () => {
 
 		it( 'should pass through inner blocks to transform', () => {
 			registerBlockType( 'core/updated-columns-block', {
+				apiVersion: 3,
 				attributes: {
 					value: {
 						type: 'string',

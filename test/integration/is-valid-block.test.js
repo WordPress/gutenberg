@@ -23,6 +23,7 @@ describe( 'validateBlock', () => {
 
 	it( 'should use the namespace in the classname for non-core blocks', () => {
 		registerBlockType( 'myplugin/fruit', {
+			apiVersion: 3,
 			save: ( { attributes } ) =>
 				createElement( 'div', null, attributes.fruit ),
 			name: 'myplugin/fruit',
@@ -44,6 +45,7 @@ describe( 'validateBlock', () => {
 
 	it( 'should include additional classes in block attributes', () => {
 		registerBlockType( 'muplugin/fruit', {
+			apiVersion: 3,
 			save: ( { attributes } ) =>
 				createElement(
 					'div',
@@ -69,6 +71,7 @@ describe( 'validateBlock', () => {
 
 	it( 'should not add a className if falsy', () => {
 		registerBlockType( 'myplugin/fruit', {
+			apiVersion: 3,
 			save: ( { attributes } ) =>
 				createElement( 'div', null, attributes.fruit ),
 			name: 'myplugin/fruit',

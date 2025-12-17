@@ -60,6 +60,7 @@ const {
 
 describe( 'actions', () => {
 	const defaultBlockSettings = {
+		apiVersion: 3,
 		attributes: {
 			content: {},
 		},
@@ -1004,6 +1005,7 @@ describe( 'actions', () => {
 				title: 'test block',
 			} );
 			registerBlockType( 'core/test-block-2', {
+				apiVersion: 3,
 				attributes: {
 					content2: {
 						type: 'string',
