@@ -105,7 +105,9 @@ test.describe( 'Page List', () => {
 						name: 'Choose file',
 					} );
 					await expect( placeholder ).toBeHidden();
-					const img = page.locator( '.fields-controls__media-image' );
+					const img = page.locator(
+						'.fields-controls__media-thumbnail'
+					);
 					await expect( img ).toBeVisible();
 				},
 			},
