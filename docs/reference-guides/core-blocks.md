@@ -179,8 +179,8 @@ Displays the name of the author of the comment. ([Source](https://github.com/Wor
 -	**Name:** core/comment-author-name
 -	**Category:** theme
 -	**Ancestor:** core/comment-template
--	**Supports:** color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** isLink, linkTarget, textAlign
+-	**Supports:** color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight, textAlign), ~~html~~
+-	**Attributes:** isLink, linkTarget
 
 ## Comment Content
 
