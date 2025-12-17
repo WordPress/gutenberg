@@ -110,8 +110,8 @@ const isIconStyles = ( {
 	size = 'default',
 }: Pick< ToggleGroupControlProps, 'size' > ) => {
 	const iconButtonSizes = {
-		default: '36px',
-		'__unstable-large': '40px',
+		default: '34px',
+		'__unstable-large': '38px',
 	};
 
 	return css`
