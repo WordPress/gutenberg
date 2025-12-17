@@ -76,13 +76,7 @@ const enclosingBorders = ( isBlock: ToggleGroupControlProps[ 'isBlock' ] ) => {
 		}
 
 		&:focus-within {
-			//border-color: ${ COLORS.ui.borderFocus };
-			//box-shadow: ${ CONFIG.controlBoxShadowFocus };
 			z-index: 1;
-			// Windows High Contrast mode will show this outline, but not the box-shadow.
-			//outline: 2px solid transparent;
-			//outline-offset: -2px;
-
 			outline: ${ CONFIG.borderWidthFocus } solid
 				${ COLORS.ui.borderFocus };
 			outline-offset: 1px;
