@@ -93,10 +93,7 @@ test.describe( 'Template ID Format', () => {
 		const topBarSaveButton = page
 			.getByRole( 'region', { name: 'Editor top bar' } )
 			.getByRole( 'button', { name: 'Save', exact: true } );
-		const saveButton = ( await publishSaveButton.isVisible() )
-			? publishSaveButton
-			: topBarSaveButton;
-		await saveButton.click();
+		await publishSaveButton.or( topBarSaveButton ).click();
 
 		await page
 			.getByRole( 'button', { name: 'Dismiss this notice' } )
