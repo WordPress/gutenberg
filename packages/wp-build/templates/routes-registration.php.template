@@ -41,7 +41,7 @@ $register_routes_callback = function ( $page_routes, $page_slug_underscore, $reg
 					$extension = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '.js' : '.min.js';
 					wp_register_script_module(
 						$content_handle,
-						plugins_url( 'build/routes/' . $route['name'] . '/content' . $extension, dirname( __FILE__ ) ),
+						{{BASE_URL}} . '/routes/' . $route['name'] . '/content' . $extension,
 						$content_asset['module_dependencies'] ?? array(),
 						$content_asset['version'] ?? false
 					);
@@ -57,7 +57,7 @@ $register_routes_callback = function ( $page_routes, $page_slug_underscore, $reg
 					$extension = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '.js' : '.min.js';
 					wp_register_script_module(
 						$route_handle,
-						plugins_url( 'build/routes/' . $route['name'] . '/route' . $extension, dirname( __FILE__ ) ),
+						{{BASE_URL}} . '/routes/' . $route['name'] . '/route' . $extension,
 						$route_asset['module_dependencies'] ?? array(),
 						$route_asset['version'] ?? false
 					);

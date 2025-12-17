@@ -198,7 +198,7 @@ if ( ! function_exists( '{{PAGE_SLUG_UNDERSCORE}}_wp_admin_enqueue_scripts' ) ) 
 			// Dummy script module to ensure dependencies are loaded
 			wp_register_script_module(
 				'{{PAGE_SLUG}}-wp-admin',
-				plugin_dir_url( __FILE__ ) . 'loader.js',
+				'data:text/javascript,',
 				$boot_dependencies
 			);
 
