@@ -164,9 +164,8 @@ require __DIR__ . '/class-wp-theme-json-gutenberg.php';
 require __DIR__ . '/class-wp-theme-json-resolver-gutenberg.php';
 require __DIR__ . '/class-wp-theme-json-schema-gutenberg.php';
 require __DIR__ . '/class-wp-duotone-gutenberg.php';
-require __DIR__ . '/blocks.php';
-require __DIR__ . '/block-patterns.php';
-require __DIR__ . '/block-editor-settings.php';
+	require __DIR__ . '/blocks.php';
+	require __DIR__ . '/block-editor-settings.php';
 require __DIR__ . '/client-assets.php';
 require __DIR__ . '/mathml-kses.php';
 require __DIR__ . '/demo.php';
@@ -211,4 +210,9 @@ if ( gutenberg_is_experiment_enabled( 'gutenberg-media-processing' ) ) {
 if ( gutenberg_is_experiment_enabled( 'gutenberg-full-page-client-side-navigation' ) ) {
 	require __DIR__ . '/experimental/interactivity-api/class-gutenberg-interactivity-api-full-page-navigation.php';
 	Gutenberg_Interactivity_API_Full_Page_Navigation::instance();
+}
+
+// Block patterns (only load when navigation overlays experiment is enabled).
+if ( gutenberg_is_experiment_enabled( 'gutenberg-customizable-navigation-overlays' ) ) {
+	require __DIR__ . '/block-patterns.php';
 }

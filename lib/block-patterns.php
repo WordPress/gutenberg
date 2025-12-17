@@ -14,7 +14,6 @@
  * @since 6.0.0
  */
 function gutenberg_register_core_block_patterns() {
-
 	register_block_pattern_category(
 		'navigation',
 		array(
@@ -40,5 +39,5 @@ function gutenberg_register_core_block_patterns() {
 		)
 	);
 }
-add_action( 'init', 'gutenberg_register_core_block_patterns', 20 );
 
+add_action( 'init', 'gutenberg_register_core_block_patterns', 20 );
