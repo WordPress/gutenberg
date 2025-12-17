@@ -362,11 +362,6 @@ export function createWordpressExternalsPlugin(
 						const filesToHash = [];
 						if ( outputFilePath ) {
 							filesToHash.push( outputFilePath );
-
-							// Include source map if enabled
-							if ( build.initialOptions.sourcemap ) {
-								filesToHash.push( `${ outputFilePath }.map` );
-							}
 						}
 
 						// Generate content-based version hash
