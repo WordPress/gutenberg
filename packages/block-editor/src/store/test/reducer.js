@@ -2994,6 +2994,7 @@ describe( 'state', () => {
 						blockAttributes?.fruit === variationAttributes.fruit,
 				} ) );
 				registerBlockType( blockWithVariations, {
+					apiVersion: 3,
 					save: noop,
 					edit: noop,
 					title: 'Fruit with variations',

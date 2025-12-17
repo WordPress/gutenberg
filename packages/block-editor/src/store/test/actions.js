@@ -864,6 +864,7 @@ describe( 'actions', () => {
 
 		it( 'should merge the blocks if blocks of the same type', () => {
 			registerBlockType( 'core/test-block', {
+				apiVersion: 3,
 				attributes: {
 					content: {},
 				},

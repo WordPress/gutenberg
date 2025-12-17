@@ -14,6 +14,7 @@ import serialize from '../../serializer';
 
 describe( 'block parser', () => {
 	const defaultBlockSettings = {
+		apiVersion: 3,
 		attributes: {
 			fruit: {
 				type: 'string',
@@ -466,6 +467,7 @@ describe( 'block parser', () => {
 
 		it( 'should parse with unicode escaped returned to original representation', () => {
 			registerBlockType( 'core/code', {
+				apiVersion: 3,
 				category: 'text',
 				title: 'Code Block',
 				attributes: {
