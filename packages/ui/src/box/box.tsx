@@ -28,7 +28,7 @@ const capitalize = ( str: string ): string =>
 	str.charAt( 0 ).toUpperCase() + str.slice( 1 );
 
 /**
- * Converts a size value to a CSS design token property reference (with
+ * Converts a size token name to a CSS design token property reference (with
  * fallback).
  *
  * @param property The CSS property name.
