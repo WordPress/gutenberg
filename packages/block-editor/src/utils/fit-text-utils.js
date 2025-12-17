@@ -4,7 +4,7 @@
  */
 
 /**
- * Find optimal font size using simple binary search between 5-600px.
+ * Find optimal font size using simple binary search between 0-2400px.
  *
  * @param {HTMLElement} textElement   The text element
  * @param {Function}    applyFontSize Function that receives font size in pixels
