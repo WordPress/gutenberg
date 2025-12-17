@@ -173,9 +173,9 @@ function TableEdit( {
 				return;
 			}
 
-			setAttributes(
+			setAttributes( ( currentAttributes ) =>
 				updateSelectedCell(
-					attributes,
+					currentAttributes,
 					selectedCell,
 					( cellAttributes ) => ( {
 						...cellAttributes,
@@ -184,7 +184,7 @@ function TableEdit( {
 				)
 			);
 		},
-		[ attributes, selectedCell, setAttributes ]
+		[ selectedCell, setAttributes ]
 	);
 
 	/**
