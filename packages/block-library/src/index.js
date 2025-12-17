@@ -8,11 +8,15 @@ import {
 	setGroupingBlockName,
 	registerBlockType,
 	store as blocksStore,
+	generateFieldsFromAttributes,
+	privateApis as blocksPrivateApis,
 } from '@wordpress/blocks';
 import { select } from '@wordpress/data';
-import { useBlockProps } from '@wordpress/block-editor';
+import { useBlockProps, InspectorControls } from '@wordpress/block-editor';
 import { useServerSideRender } from '@wordpress/server-side-render';
 import { __, sprintf } from '@wordpress/i18n';
+import { PanelBody } from '@wordpress/components';
+import { DataForm } from '@wordpress/dataviews';
 
 /**
  * Internal dependencies
@@ -144,6 +148,8 @@ import * as footnotes from './footnotes';
 
 import isBlockMetadataExperimental from './utils/is-block-metadata-experimental';
 import { unlock } from './lock-unlock';
+
+const { fieldsKey, formKey } = unlock( blocksPrivateApis );
 
 /**
  * Function to get all the block-library blocks in an array
@@ -340,6 +346,14 @@ export const registerCoreBlocks = (
 				select( blocksStore )
 			).getBootstrappedBlockType( blockName );
 
+			// Generate DataForm fields from block attributes for auto-generated inspector controls
+			const { fields, form: formDefinition } =
+				bootstrappedBlockType?.attributes
+					? generateFieldsFromAttributes(
+							bootstrappedBlockType.attributes
+					  )
+					: { fields: [], form: { fields: [] } };
+
 			registerBlockType( blockName, {
 				// Use all metadata from PHP registration,
 				// but fall back title to block name if not provided,
@@ -350,38 +364,65 @@ export const registerCoreBlocks = (
 				...( ( bootstrappedBlockType?.apiVersion ?? 0 ) < 3 && {
 					apiVersion: 3,
 				} ),
-				edit: function Edit( { attributes } ) {
+				// Store auto-generated fields for DataForm-based inspector controls
+				[ fieldsKey ]: fields,
+				[ formKey ]: formDefinition,
+				edit: function Edit( { attributes, setAttributes } ) {
 					const blockProps = useBlockProps();
 					const { content, status, error } = useServerSideRender( {
 						block: blockName,
 						attributes,
 					} );
 
+					const inspectorControls = fields.length > 0 && (
+						<InspectorControls>
+							<PanelBody title={ __( 'Settings' ) }>
+								<DataForm
+									data={ attributes }
+									fields={ fields }
+									form={ formDefinition }
+									onChange={ setAttributes }
+								/>
+							</PanelBody>
+						</InspectorControls>
+					);
+
 					if ( status === 'loading' ) {
 						return (
-							<div { ...blockProps }>{ __( 'Loading…' ) }</div>
+							<>
+								{ inspectorControls }
+								<div { ...blockProps }>
+									{ __( 'Loading…' ) }
+								</div>
+							</>
 						);
 					}
 
 					if ( status === 'error' ) {
 						return (
-							<div { ...blockProps }>
-								{ sprintf(
-									/* translators: %s: error message describing the problem */
-									__( 'Error loading block: %s' ),
-									error
-								) }
-							</div>
+							<>
+								{ inspectorControls }
+								<div { ...blockProps }>
+									{ sprintf(
+										/* translators: %s: error message describing the problem */
+										__( 'Error loading block: %s' ),
+										error
+									) }
+								</div>
+							</>
 						);
 					}
 
 					return (
-						<div
-							{ ...blockProps }
-							dangerouslySetInnerHTML={ {
-								__html: content || '',
-							} }
-						/>
+						<>
+							{ inspectorControls }
+							<div
+								{ ...blockProps }
+								dangerouslySetInnerHTML={ {
+									__html: content || '',
+								} }
+							/>
+						</>
 					);
 				},
 				save: () => null,

@@ -176,6 +176,8 @@ export {
 	__EXPERIMENTAL_PATHS_WITH_OVERRIDE,
 } from './constants';
 
+export { generateFieldsFromAttributes } from './generate-fields-from-attributes';
+
 // Allows blocks to declare private keys (fields form)
 // that we can use to generate UI controls for them via DataForm.
 const fieldsKey = Symbol( 'fields' );

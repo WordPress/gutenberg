@@ -88,6 +88,20 @@ _Returns_
 
 -   `?Object`: Highest-priority transform candidate.
 
+### generateFieldsFromAttributes
+
+Generates DataForm field definitions from block attributes.
+
+This utility enables PHP-only blocks to have auto-generated inspector controls by converting block.json attribute definitions into DataForm field definitions.
+
+_Parameters_
+
+-   _attributes_ `Object`: - Block type attributes from block.json
+
+_Returns_
+
+-   `{ fields: Array, form: Object }`: fieldsKey and formKey values
+
 ### getBlockAttributes
 
 Returns the block attributes of a registered block node given its type.
