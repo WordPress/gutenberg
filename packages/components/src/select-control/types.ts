@@ -22,14 +22,7 @@ type SelectControlBaseProps< V extends string > = Pick<
 	| 'size'
 	| 'suffix'
 > &
-	Pick< BaseControlProps, 'help' > & {
-		/**
-		 * Start opting into the new margin-free styles that will become the default in a future version.
-		 *
-		 * @deprecated Default behavior since WordPress 7.0. Prop can be safely removed.
-		 * @ignore
-		 */
-		__nextHasNoMarginBottom?: boolean;
+	Pick< BaseControlProps, '__nextHasNoMarginBottom' | 'help' > & {
 		/**
 		 * An array of option property objects to be rendered,
 		 * each with a `label` and `value` property, as well as any other
