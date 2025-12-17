@@ -37,6 +37,7 @@ describe( 'Edit', () => {
 		const edit = () => <div data-testid="foo-bar" />;
 
 		registerBlockType( 'core/test-block', {
+			apiVersion: 3,
 			save: noop,
 			category: 'text',
 			title: 'block title',
@@ -52,6 +53,7 @@ describe( 'Edit', () => {
 		const save = () => <div data-testid="foo-bar" />;
 
 		registerBlockType( 'core/test-block', {
+			apiVersion: 3,
 			save,
 			category: 'text',
 			title: 'block title',
@@ -71,6 +73,7 @@ describe( 'Edit', () => {
 		};
 
 		registerBlockType( 'core/test-block', {
+			apiVersion: 3,
 			edit,
 			save: noop,
 			category: 'text',
@@ -87,6 +90,7 @@ describe( 'Edit', () => {
 	it( 'should assign context', () => {
 		const edit = ( { context } ) => context.value;
 		registerBlockType( 'core/test-block', {
+			apiVersion: 3,
 			category: 'text',
 			title: 'block title',
 			usesContext: [ 'value' ],
