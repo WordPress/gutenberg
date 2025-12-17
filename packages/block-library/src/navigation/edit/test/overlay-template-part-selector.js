@@ -283,7 +283,7 @@ describe( 'OverlayTemplatePartSelector', () => {
 			expect( editButton ).not.toBeInTheDocument();
 		} );
 
-		it( 'should disable button when overlays are initially loading', () => {
+		it( 'should not display edit button while overlays templates are loading', () => {
 			useEntityRecords.mockReturnValue( {
 				records: [ templatePart1 ],
 				isResolving: true,
@@ -303,10 +303,13 @@ describe( 'OverlayTemplatePartSelector', () => {
 			} );
 			expect( select ).toBeDisabled();
 
-			const editButton = screen.getByRole( 'button', {
-				name: /Edit overlay/,
-			} );
-			expect( editButton ).toHaveAttribute( 'aria-disabled', 'true' );
+			// Expect Edit button to not be in the document
+			expect(
+				screen.queryByRole( 'button', {
+					name: ( accessibleName ) =>
+						accessibleName.startsWith( 'Edit overlay' ),
+				} )
+			).not.toBeInTheDocument();
 		} );
 
 		it( 'should be enabled when a valid overlay is selected', () => {

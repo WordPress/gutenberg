@@ -175,7 +175,7 @@ export default function OverlayTemplatePartSelector( {
 		if ( overlayTemplateParts.length === 0 && hasResolved ) {
 			return __( 'No overlays found.' );
 		}
-		return __( 'Select an overlay to use for the navigation.' );
+		return __( 'Select an overlay for navigation.' );
 	}, [ overlayTemplateParts.length, hasResolved ] );
 
 	// Tooltip/aria-label text for the edit button
