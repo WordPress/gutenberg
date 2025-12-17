@@ -89,10 +89,10 @@ export const toggleGroupControlSize = (
 ) => {
 	const styles = {
 		default: css`
-			min-height: 36px;
+			height: 36px;
 		`,
 		'__unstable-large': css`
-			min-height: 40px;
+			height: 40px;
 		`,
 	};
 
