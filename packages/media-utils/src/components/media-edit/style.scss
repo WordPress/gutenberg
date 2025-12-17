@@ -1,20 +1,20 @@
 @use "@wordpress/base-styles/colors" as *;
 @use "@wordpress/base-styles/variables" as *;
 
-fieldset.fields-controls__media {
+fieldset.media-utils__media-edit {
 	// Reset `fieldset` browser defaults.
 	border: 0;
 	padding: 0;
 	margin: 0;
 
-	.fields-controls__media-row {
+	.media-utils__media-edit-row {
 		display: grid;
 		grid-template-columns: 1fr auto;
 		gap: $grid-unit-10;
 		align-items: center;
 	}
 
-	.fields-controls__media-picker-button {
+	.media-utils__media-edit-picker-button {
 		display: flex;
 		align-items: center;
 		gap: $grid-unit-15;
@@ -34,18 +34,18 @@ fieldset.fields-controls__media {
 		}
 	}
 
-	.fields-controls__media-filename,
-	.fields-controls__media-placeholder {
+	.media-utils__media-edit-filename,
+	.media-utils__media-edit-placeholder {
 		flex: 1;
 		min-width: 0;
 		color: $gray-900;
 	}
 
-	.fields-controls__media-placeholder {
+	.media-utils__media-edit-placeholder {
 		text-align: center;
 	}
 
-	.fields-controls__media-thumbnail {
+	.media-utils__media-edit-thumbnail {
 		width: 24px;
 		aspect-ratio: 1 / 1;
 		flex-shrink: 0;
@@ -53,10 +53,3 @@ fieldset.fields-controls__media {
 	}
 }
 
-// TODO: do we need this?
-// .dataforms-layouts-panel__field-control {
-// 	.fields-controls__media-thumbnail {
-// 		width: 16px;
-// 		height: 16px;
-// 	}
-// }

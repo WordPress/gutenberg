@@ -15,7 +15,7 @@ const featuredImageField: Field< BasePostWithEmbeddedFeaturedMedia > = {
 	id: 'featured_media',
 	type: 'media',
 	label: __( 'Featured Image' ),
-	Edit: ( props ) => <MediaEdit { ...props } />,
+	Edit: MediaEdit,
 	render: FeaturedImageView,
 	enableSorting: false,
 	filterBy: false,

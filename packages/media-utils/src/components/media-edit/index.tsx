@@ -50,11 +50,12 @@ export interface MediaEditProps< Item > extends DataFormControlProps< Item > {
  * Conditional Media component that uses MediaUploadModal when experiment is enabled,
  * otherwise falls back to media-utils MediaUpload.
  *
- * @param root0        Component props.
- * @param root0.render Render prop function that receives { open } object.
+ * @param root0          Component props.
+ * @param root0.render   Render prop function that receives { open } object.
+ * @param root0.multiple Whether to allow multiple media selections.
  * @return The component.
  */
-function ConditionalMediaUpload( { render, ...props }: any ) {
+function ConditionalMediaUpload( { render, multiple, ...props }: any ) {
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
 	if ( ( window as any ).__experimentalDataViewsMediaModal ) {
 		return (
@@ -63,6 +64,7 @@ function ConditionalMediaUpload( { render, ...props }: any ) {
 				{ isModalOpen && (
 					<MediaUploadModal
 						{ ...props }
+						multiple={ multiple }
 						isOpen={ isModalOpen }
 						onClose={ () => {
 							setIsModalOpen( false );
@@ -78,7 +80,13 @@ function ConditionalMediaUpload( { render, ...props }: any ) {
 		);
 	}
 	// Fallback to media-utils MediaUpload when experiment is disabled.
-	return <MediaUpload { ...props } render={ render } />;
+	return (
+		<MediaUpload
+			{ ...props }
+			render={ render }
+			multiple={ multiple ? 'add' : undefined }
+		/>
+	);
 }
 
 function MediaPickerButton( {
@@ -92,7 +100,7 @@ function MediaPickerButton( {
 } ) {
 	return (
 		<div
-			className="fields-controls__media-picker-button"
+			className="media-utils__media-edit-picker-button"
 			role="button"
 			tabIndex={ 0 }
 			onClick={ open }
@@ -134,7 +142,7 @@ function MediaPreview( {
 	if ( mimeType.startsWith( 'image/' ) ) {
 		preview = (
 			<img
-				className="fields-controls__media-thumbnail"
+				className="media-utils__media-edit-thumbnail"
 				alt={ attachment.alt_text || '' }
 				src={ url }
 			/>
@@ -150,7 +158,7 @@ function MediaPreview( {
 		<>
 			{ preview }
 			<Truncate
-				className="fields-controls__media-filename"
+				className="media-utils__media-edit-filename"
 				title={ attachmentTitle }
 			>
 				{ attachmentTitle }
@@ -234,7 +242,10 @@ export default function MediaEdit< Item >( {
 		onChangeControl( newIds.length ? newIds : 0 );
 	};
 	return (
-		<fieldset className="fields-controls__media">
+		<fieldset
+			className="media-utils__media-edit"
+			data-field-id={ field.id }
+		>
 			<ConditionalMediaUpload
 				onSelect={ ( selectedMedia: any ) => {
 					if ( multiple ) {
@@ -261,7 +272,7 @@ export default function MediaEdit< Item >( {
 									{ attachments.map( ( attachment ) => (
 										<div
 											key={ attachment.id }
-											className="fields-controls__media-row"
+											className="media-utils__media-edit-row"
 										>
 											<MediaPickerButton
 												open={ open }
@@ -276,7 +287,7 @@ export default function MediaEdit< Item >( {
 											</MediaPickerButton>
 											<Button
 												__next40pxDefaultSize
-												className="fields-controls__media-remove"
+												className="media-utils__media-edit-remove"
 												text={ __( 'Remove' ) }
 												variant="secondary"
 												onClick={ (
@@ -295,7 +306,7 @@ export default function MediaEdit< Item >( {
 									open={ open }
 									label={ addButtonLabel }
 								>
-									<span className="fields-controls__media-placeholder">
+									<span className="media-utils__media-edit-placeholder">
 										{ addButtonLabel }
 									</span>
 								</MediaPickerButton>
