@@ -194,16 +194,21 @@ describe( 'DateTimePicker', () => {
 			{
 				type: 'timezoneless string (20:00 site time)',
 				initialDate: '2025-11-15T20:00:00',
+				transformOnChange: ( nextValue: string ) => nextValue,
 			},
 			{
 				type: 'Date object (01:00 UTC Nov 16 = 20:00 site time Nov 15)',
 				initialDate: new Date( Date.UTC( 2025, 10, 16, 1, 0, 0 ) ),
+				transformOnChange: ( nextValue: string ) =>
+					new Date( nextValue ),
 			},
 			{
 				type: 'timestamp (01:00 UTC Nov 16 = 20:00 site time Nov 15)',
 				initialDate: Date.UTC( 2025, 10, 16, 1, 0, 0 ),
+				transformOnChange: ( nextValue: string ) =>
+					new Date( nextValue ).getTime(),
 			},
-		] )( '$type', ( { initialDate } ) => {
+		] )( '$type', ( { initialDate, transformOnChange } ) => {
 			it( 'should display and select dates according to site timezone', async () => {
 				const user = userEvent.setup();
 				const onChange = jest.fn();
@@ -229,9 +234,14 @@ describe( 'DateTimePicker', () => {
 				expect( screen.getByLabelText( 'Minutes' ) ).toHaveValue( 0 );
 
 				onChange.mockImplementation( ( newDate ) => {
+					// Maintain the value in the same format as the initial date
+					// to ensure the next cycle will accurately treat that type
+					// as selected.
+					const nextCurrentDate = transformOnChange( newDate );
+
 					rerender(
 						<DateTimePicker
-							currentDate={ newDate }
+							currentDate={ nextCurrentDate }
 							onChange={ onChange }
 						/>
 					);
@@ -274,57 +284,5 @@ describe( 'DateTimePicker', () => {
 		);
 
 		expect( onChange ).toHaveBeenCalledWith( '2025-11-20T14:30:00' );
-	} );
-
-	it( 'should be stable when onChange strings are converted to Date and passed back', async () => {
-		// When the site timezone is configured to match the browser timezone,
-		// converting onChange strings to Date objects (via new Date(string))
-		// and passing them back should produce stable results. This is a common
-		// pattern when the consumer wants to work with browser-local times.
-
-		const user = userEvent.setup();
-		const onChange = jest.fn();
-
-		// Configure site timezone to match browser
-		timezoneMock.register( 'US/Pacific' );
-		setSettings( {
-			...originalSettings,
-			timezone: {
-				offset: -8,
-				offsetFormatted: '-8',
-				string: 'America/Los_Angeles',
-				abbr: 'PST',
-			},
-		} );
-
-		let currentDate: string | Date = '2025-11-15T14:30:00';
-
-		const { rerender } = render(
-			<DateTimePicker currentDate={ currentDate } onChange={ onChange } />
-		);
-
-		// Simulate converting onChange string to Date and passing back
-		onChange.mockImplementation( ( newDateString: string ) => {
-			currentDate = new Date( newDateString );
-			rerender(
-				<DateTimePicker
-					currentDate={ currentDate }
-					onChange={ onChange }
-				/>
-			);
-		} );
-
-		await user.click(
-			screen.getByRole( 'button', { name: 'November 20, 2025' } )
-		);
-		expect( onChange ).toHaveBeenLastCalledWith( '2025-11-20T14:30:00' );
-
-		// Second interaction should produce identical output (no drift)
-		await user.click(
-			screen.getByRole( 'button', {
-				name: 'November 20, 2025. Selected',
-			} )
-		);
-		expect( onChange ).toHaveBeenLastCalledWith( '2025-11-20T14:30:00' );
 	} );
 } );
