@@ -217,13 +217,14 @@ function useFitText( { fitText, name, clientId } ) {
 /**
  * Fit text control component for the typography panel.
  *
- * @param {Object}   props               Component props.
- * @param {string}   props.clientId      Block client ID.
- * @param {Function} props.setAttributes Function to set block attributes.
- * @param {string}   props.name          Block name.
- * @param {boolean}  props.fitText       Whether fit text is enabled.
- * @param {string}   props.fontSize      Font size slug.
- * @param {Object}   props.style         Block style object.
+ * @param {Object}      props               Component props.
+ * @param {string}      props.clientId      Block client ID.
+ * @param {Function}    props.setAttributes Function to set block attributes.
+ * @param {string}      props.name          Block name.
+ * @param {boolean}     props.fitText       Whether fit text is enabled.
+ * @param {string}      props.fontSize      Font size slug.
+ * @param {Object}      props.style         Block style object.
+ * @param {JSX.Element} props.warning       Warning component to display.
  */
 export function FitTextControl( {
 	clientId,
@@ -347,20 +348,24 @@ const hasFitTextSupport = ( blockNameOrType ) => {
 
 function FitTextEdit( props ) {
 	const { name, attributes, clientId, isSelected, setAttributes } = props;
-	const { fitText} = attributes;
+	const { fitText } = attributes;
 	const { fontSize } = useFitText( { fitText, name, clientId } );
-	
+
 	return (
 		isSelected && (
-				<FitTextControl
-					clientId={ clientId }
-					fitText={ fitText }
-					setAttributes={ setAttributes }
-					name={ name }
-					fontSize={ attributes.fontSize }
-					style={ attributes.style }
-					warning={ fontSize < MIN_FONT_SIZE_FOR_WARNING && <FitTextSizeWarning /> }
-				/>
+			<FitTextControl
+				clientId={ clientId }
+				fitText={ fitText }
+				setAttributes={ setAttributes }
+				name={ name }
+				fontSize={ attributes.fontSize }
+				style={ attributes.style }
+				warning={
+					fontSize < MIN_FONT_SIZE_FOR_WARNING && (
+						<FitTextSizeWarning />
+					)
+				}
+			/>
 		)
 	);
 }
@@ -393,18 +398,16 @@ const withFitTextEdit = createHigherOrderComponent( ( BlockEdit ) => {
 						isSelected={ isSelected }
 					/>
 				) }
-				{
-					! fitText && isSelected && (
-						<FitTextControl
-							clientId={ clientId }
-							fitText={ fitText }
-							setAttributes={ setAttributes }
-							name={ name }
-							fontSize={ attributes.fontSize }
-							style={ attributes.style }
-						/>
-					)
-				}
+				{ ! fitText && isSelected && (
+					<FitTextControl
+						clientId={ clientId }
+						fitText={ fitText }
+						setAttributes={ setAttributes }
+						name={ name }
+						fontSize={ attributes.fontSize }
+						style={ attributes.style }
+					/>
+				) }
 			</>
 		);
 	};
