@@ -707,8 +707,6 @@ function mapSelectorWithResolver(
 			return;
 		}
 
-		const state = store.getState();
-
 		resolversCache.markAsRunning( selectorName, args );
 
 		setTimeout( async () => {
@@ -719,7 +717,7 @@ function mapSelectorWithResolver(
 			try {
 				const isFulfilled =
 					typeof resolver.isFulfilled === 'function' &&
-					resolver.isFulfilled( state, ...args );
+					resolver.isFulfilled( store.getState(), ...args );
 				if ( ! isFulfilled ) {
 					const action = resolver.fulfill( ...args );
 					if ( action ) {
