@@ -4294,11 +4294,13 @@ describe( 'getInserterItems with core blocks prioritization', () => {
 			variations: [ { name: 'variation-a' }, { name: 'variation-b' } ],
 		} );
 		registerBlockType( 'core/block', {
+			apiVersion: 3,
 			save() {},
 			category: 'text',
 			title: 'Core Block A',
 		} );
 		registerBlockType( 'core/test-block-a', {
+			apiVersion: 3,
 			save: ( props ) => props.attributes.text,
 			category: 'design',
 			title: 'Core Block B',

@@ -295,6 +295,7 @@ describe( 'block parser', () => {
 		// Run the test cases using the PegJS defined parser.
 		it( 'should parse the post content, including block attributes', () => {
 			registerBlockType( 'core/test-block', {
+				apiVersion: 3,
 				attributes: {
 					content: {
 						type: 'string',

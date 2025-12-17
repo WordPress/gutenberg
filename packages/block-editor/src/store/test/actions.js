@@ -935,6 +935,7 @@ describe( 'actions', () => {
 
 		it( 'should not merge the blocks have different types without transformation', () => {
 			registerBlockType( 'core/test-block', {
+				apiVersion: 3,
 				attributes: {
 					content: {},
 				},
