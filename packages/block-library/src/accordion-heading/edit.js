@@ -18,7 +18,8 @@ export default function Edit( { attributes, setAttributes, context } ) {
 		'core/accordion-show-icon': showIcon,
 		'core/accordion-heading-level': headingLevel,
 	} = context;
-	const TagName = 'h' + headingLevel;
+	const TagName = headingLevel === 0 ? 'p' : 'h' + headingLevel;
+
 
 	// Set icon attributes.
 	useEffect( () => {
