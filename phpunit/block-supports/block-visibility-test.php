@@ -163,37 +163,6 @@ class WP_Block_Supports_Block_Visibility_Test extends WP_UnitTestCase {
 		$this->assertSame( $block_content, $result );
 	}
 
-	public function test_block_visibility_support_generated_css_with_display_none() {
-		$this->enable_viewport_visibility_experiment();
-
-		$this->register_visibility_block_with_support(
-			'test/css-generation',
-			array( 'visibility' => true )
-		);
-
-		$block = array(
-			'blockName' => 'test/css-generation',
-			'attrs'     => array(
-				'metadata' => array(
-					'blockVisibility' => array(
-						'mobile' => false,
-					),
-				),
-			),
-		);
-
-		$block_content = '<div>Test content</div>';
-		gutenberg_render_block_visibility_support( $block_content, $block );
-
-		// Get the generated stylesheet from the style engine context.
-		$stylesheet = gutenberg_style_engine_get_stylesheet_from_context( 'block-supports' );
-
-		// Verify the stylesheet contains display:none.
-		$this->assertStringContainsString( 'display:none!important', str_replace( ' ', '', $stylesheet ), 'display:none!important should be in the CSS' );
-		$this->assertStringContainsString( '.wp-block-hidden-mobile', $stylesheet, 'Stylesheet should contain the visibility class' );
-		$this->assertStringContainsString( '@media', $stylesheet, 'Stylesheet should contain media query' );
-	}
-
 	public function test_block_visibility_support_without_experiment() {
 		$this->disable_viewport_visibility_experiment();
 

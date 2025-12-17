@@ -82,7 +82,7 @@ function gutenberg_render_block_visibility_support( $block_content, $block ) {
 			return $block_content;
 		}
 
-		// If the block is hidden on all breakpoints, return empty string.
+		// If the block is hidden on all breakpoints, do not render the block.
 		if ( count( $hidden_on ) === count( $breakpoint_queries ) ) {
 			return '';
 		}
@@ -90,27 +90,17 @@ function gutenberg_render_block_visibility_support( $block_content, $block ) {
 		// Maintain consistent order of breakpoints for class name generation.
 		sort( $hidden_on );
 
-		$sanitized_hidden_on = array_map( 'sanitize_html_class', $hidden_on );
-		$sanitized_hidden_on = array_filter( $sanitized_hidden_on );
-
-		// If all breakpoint names were invalid after sanitization, return unchanged.
-		if ( empty( $sanitized_hidden_on ) ) {
-			return $block_content;
-		}
-
-		$visibility_class = 'wp-block-hidden-' . implode( '-', $sanitized_hidden_on );
+		$visibility_class = 'wp-block-hidden-' . implode( '-', $hidden_on );
 		$css_rules        = array();
 
 		foreach ( $hidden_on as $breakpoint ) {
-			if ( isset( $breakpoint_queries[ $breakpoint ] ) ) {
-				$css_rules[] = array(
-					'selector'     => '.' . $visibility_class,
-					'declarations' => array(
-						'display' => 'none !important',
-					),
-					'rules_group'  => $breakpoint_queries[ $breakpoint ],
-				);
-			}
+			$css_rules[] = array(
+				'selector'     => '.' . $visibility_class,
+				'declarations' => array(
+					'display' => 'none !important',
+				),
+				'rules_group'  => $breakpoint_queries[ $breakpoint ],
+			);
 		}
 
 		if ( ! empty( $css_rules ) ) {
