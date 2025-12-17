@@ -335,6 +335,7 @@ describe( 'block parser', () => {
 
 		it( 'should parse the post content, ignoring unknown blocks', () => {
 			registerBlockType( 'core/test-block', {
+				apiVersion: 3,
 				attributes: {
 					content: {
 						type: 'string',

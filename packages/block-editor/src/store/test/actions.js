@@ -989,6 +989,7 @@ describe( 'actions', () => {
 
 		it( 'should transform and merge the blocks', () => {
 			registerBlockType( 'core/test-block', {
+				apiVersion: 3,
 				attributes: {
 					content: {
 						type: 'string',
