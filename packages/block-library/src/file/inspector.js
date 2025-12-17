@@ -111,7 +111,6 @@ export default function FileBlockInspector( {
 					>
 						<SelectControl
 							__next40pxDefaultSize
-							__nextHasNoMarginBottom
 							label={ __( 'Link to' ) }
 							value={ textLinkHref }
 							options={ linkDestinationOptions }

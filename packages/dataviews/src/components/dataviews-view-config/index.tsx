@@ -128,7 +128,6 @@ function SortFieldControl() {
 
 	return (
 		<SelectControl
-			__nextHasNoMarginBottom
 			__next40pxDefaultSize
 			label={ __( 'Sort by' ) }
 			value={ view.sort?.field }

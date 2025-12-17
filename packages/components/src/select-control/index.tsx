@@ -65,7 +65,7 @@ function UnforwardedSelectControl< V extends string >(
 		suffix,
 		variant = 'default',
 		__next40pxDefaultSize = false,
-		__nextHasNoMarginBottom = false,
+		__nextHasNoMarginBottom: _, // Prevent passing to internal component
 		__shouldNotWarnDeprecated36pxSize,
 		...restProps
 	} = useDeprecated36pxDefaultSizeProp( props );
@@ -107,8 +107,7 @@ function UnforwardedSelectControl< V extends string >(
 			help={ help }
 			id={ id }
 			className={ classes }
-			__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
-			__associatedWPComponentName="SelectControl"
+			__nextHasNoMarginBottom
 		>
 			<StyledInputBase
 				disabled={ disabled }
@@ -163,7 +162,6 @@ function UnforwardedSelectControl< V extends string >(
  *   return (
  *     <SelectControl
  *       __next40pxDefaultSize
- *       __nextHasNoMarginBottom
  *       label="Size"
  *       value={ size }
  *       options={ [

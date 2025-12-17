@@ -105,7 +105,6 @@ export default function LatestComments( { attributes, setAttributes } ) {
 						isShownByDefault
 					>
 						<SelectControl
-							__nextHasNoMarginBottom
 							__next40pxDefaultSize
 							label={ __( 'Display content' ) }
 							value={ displayContent }

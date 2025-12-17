@@ -146,7 +146,6 @@ function TagCloudEdit( { attributes, setAttributes } ) {
 					isShownByDefault
 				>
 					<SelectControl
-						__nextHasNoMarginBottom
 						__next40pxDefaultSize
 						label={ __( 'Taxonomy' ) }
 						options={ getTaxonomyOptions() }

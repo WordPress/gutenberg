@@ -164,7 +164,6 @@ export function TimePicker( {
 				label={ __( 'Month' ) }
 				hideLabelFromVision
 				__next40pxDefaultSize
-				__nextHasNoMarginBottom
 				value={ month }
 				options={ monthOptions }
 				onChange={ ( value ) => {

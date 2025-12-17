@@ -314,7 +314,6 @@ function FontCollection( { slug }: { slug: string } ) {
 									hideLabelFromVision={ false }
 								/>
 								<SelectControl
-									__nextHasNoMarginBottom
 									__next40pxDefaultSize
 									label={ __( 'Category' ) }
 									value={ filters.category }
@@ -533,7 +532,6 @@ function FontCollection( { slug }: { slug: string } ) {
 													)
 												}
 												size="small"
-												__nextHasNoMarginBottom
 												variant="minimal"
 											/>
 										),
