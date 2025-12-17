@@ -21,6 +21,52 @@ _This package assumes that your code will run in an **ES2015+** environment. If 
 
 Undocumented declaration.
 
+### MediaEdit
+
+A media edit control component designed to be used with the Fields API (`@wordpress/dataviews`). Provides a media picker UI with upload functionality for selecting WordPress media attachments. Supports both the traditional WordPress media library and the experimental DataViews media modal.
+
+This component is intended to be used as the `Edit` property of a field definition when registering fields with `registerEntityField` from `@wordpress/editor`.
+
+_Usage_
+
+```tsx
+import { MediaEdit } from '@wordpress/media-utils';
+import type { MediaEditProps } from '@wordpress/media-utils';
+
+const featuredImageField = {
+	id: 'featured_media',
+	type: 'media',
+	label: 'Featured Image',
+	Edit: ( props: MediaEditProps< MyPostType > ) => (
+		<MediaEdit
+			{ ...props }
+			allowedTypes={ [ 'image' ] }
+			placeholder="Choose featured image…"
+			help="Upload an image to represent this post"
+		/>
+	),
+};
+```
+
+_Parameters_
+
+-   _props_ `MediaEditProps<Item>`: - The component props.
+-   _props.data_ `Item`: - The item being edited.
+-   _props.field_ `Object`: - The field configuration with getValue and setValue methods.
+-   _props.onChange_ `Function`: - Callback function when the media selection changes.
+-   _props.allowedTypes_ `[string[]]`: - Array of allowed media types. Default `['image']`.
+-   _props.placeholder_ `[string]`: - Placeholder text when no media is selected. Default `'Choose file'`.
+-   _props.multiple_ `[boolean]`: - Whether to allow multiple media selections. Default `false`.
+-   _props.help_ `[string]`: - Help text.
+
+_Returns_
+
+-   `JSX.Element`: The media edit control component.
+
+### MediaEditProps
+
+Undocumented declaration.
+
 ### MediaUpload
 
 Undocumented declaration.

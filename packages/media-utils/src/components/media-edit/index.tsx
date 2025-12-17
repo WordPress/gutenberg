@@ -10,30 +10,49 @@ import {
 } from '@wordpress/components';
 import { store as coreStore, type Attachment } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
+import type { DataFormControlProps } from '@wordpress/dataviews';
 import { useCallback, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import {
-	privateApis as mediaUtilsPrivateApis,
-	MediaUpload,
-} from '@wordpress/media-utils';
 import { archive, audio, video, file } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
-import { unlock } from '../../lock-unlock';
-import type { MediaEditProps } from '../../types';
+import MediaUpload from '../media-upload';
+import { MediaUploadModal } from '../media-upload-modal';
 
-const { MediaUploadModal } = unlock( mediaUtilsPrivateApis );
+export interface MediaEditProps< Item > extends DataFormControlProps< Item > {
+	/**
+	 * Array of allowed media types (e.g., ['image', 'video']).
+	 *
+	 * @default ['image']
+	 */
+	allowedTypes?: string[];
+	/**
+	 * Placeholder text when no media is selected.
+	 *
+	 * @default 'Choose file'
+	 */
+	placeholder?: string;
+	/**
+	 * Help text.
+	 */
+	help?: string;
+	/**
+	 * Whether to allow multiple media selections.
+	 *
+	 * @default false
+	 */
+	multiple?: boolean;
+}
 
 /**
  * Conditional Media component that uses MediaUploadModal when experiment is enabled,
  * otherwise falls back to media-utils MediaUpload.
  *
- * @param {Object}   root0        Component props.
- * @param {Function} root0.render Render prop function that receives { open } object.
- * @param {Object}   root0.props  Other props passed to the media upload component.
- * @return {JSX.Element} The component.
+ * @param root0        Component props.
+ * @param root0.render Render prop function that receives { open } object.
+ * @return The component.
  */
 function ConditionalMediaUpload( { render, ...props }: any ) {
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
@@ -98,6 +117,7 @@ const archiveMimeTypes = [
 	'application/x-tar',
 	'application/x-gzip',
 ];
+
 function MediaPreview( {
 	url,
 	attachment,
@@ -140,26 +160,30 @@ function MediaPreview( {
 }
 
 /**
- * A reusable media edit control component that can be used to edit WordPress media (attachments).
- * Renders a media picker with upload functionality, supporting both the traditional WordPress
- * media library and the experimental DataViews media modal.
+ * A media edit control component designed to be used with the Fields API (`@wordpress/dataviews`).
+ * Provides a media picker UI with upload functionality for selecting WordPress media attachments.
+ * Supports both the traditional WordPress media library and the experimental DataViews media modal.
+ *
+ * This component is intended to be used as the `Edit` property of a field definition when
+ * registering fields with `registerEntityField` from `@wordpress/editor`.
  *
  * @template Item - The type of the item being edited.
  *
- * @param {MediaEditProps<Item>} props                             - The component props.
- * @param {Item}                 props.data                        - The item being edited.
- * @param {Object}               props.field                       - The field configuration with getValue and setValue methods.
- * @param {Function}             props.onChange                    - Callback function when the media selection changes.
- * @param {string[]}             [props.allowedTypes=['image']]    - Array of allowed media types.
- * @param {string}               [props.placeholder='Choose file'] - Placeholder text when no media is selected.
- * @param {string}               [props.help]                      - Help text.
+ * @param {MediaEditProps<Item>} props                - The component props.
+ * @param {Item}                 props.data           - The item being edited.
+ * @param {Object}               props.field          - The field configuration with getValue and setValue methods.
+ * @param {Function}             props.onChange       - Callback function when the media selection changes.
+ * @param {string[]}             [props.allowedTypes] - Array of allowed media types. Default `['image']`.
+ * @param {string}               [props.placeholder]  - Placeholder text when no media is selected. Default `'Choose file'`.
+ * @param {boolean}              [props.multiple]     - Whether to allow multiple media selections. Default `false`.
+ * @param {string}               [props.help]         - Help text.
  *
  * @return {JSX.Element} The media edit control component.
  *
  * @example
  * ```tsx
- * import MediaEdit from '@wordpress/fields';
- * import type { MediaEditProps } from '@wordpress/fields';
+ * import { MediaEdit } from '@wordpress/media-utils';
+ * import type { MediaEditProps } from '@wordpress/media-utils';
  *
  * const featuredImageField = {
  *   id: 'featured_media',

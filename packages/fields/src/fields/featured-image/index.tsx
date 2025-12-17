@@ -3,12 +3,12 @@
  */
 import type { Field } from '@wordpress/dataviews';
 import { __ } from '@wordpress/i18n';
+import { MediaEdit } from '@wordpress/media-utils';
 
 /**
  * Internal dependencies
  */
 import type { BasePostWithEmbeddedFeaturedMedia } from '../../types';
-import MediaEdit from '../../components/media-edit';
 import { FeaturedImageView } from './featured-image-view';
 
 const featuredImageField: Field< BasePostWithEmbeddedFeaturedMedia > = {
