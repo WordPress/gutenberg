@@ -168,13 +168,6 @@ export default function OverlayTemplatePartSelector( {
 		createErrorNotice,
 	] );
 
-	const isEditButtonDisabled =
-		! overlay ||
-		! hasResolved ||
-		! selectedTemplatePart ||
-		! onNavigateToEntityRecord ||
-		isResolving;
-
 	const isCreateButtonDisabled = isResolving || isCreating;
 
 	// Build help text
@@ -231,7 +224,7 @@ export default function OverlayTemplatePartSelector( {
 							__next40pxDefaultSize
 							variant="secondary"
 							onClick={ handleEditClick }
-							disabled={ isEditButtonDisabled }
+							disabled={ ! onNavigateToEntityRecord }
 							accessibleWhenDisabled
 							label={ editButtonLabel }
 							showTooltip
