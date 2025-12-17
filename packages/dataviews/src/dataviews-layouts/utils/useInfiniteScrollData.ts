@@ -120,17 +120,24 @@ export function useInfiniteScrollData< Item extends { id: number } >( {
 				if ( position !== undefined ) {
 					positionMapRef.current.set( getItemId( record ), position );
 				}
-				return {
-					...record,
-					position,
-				};
+				return record;
 			} );
 			setAllLoadedRecords( records );
 
 			if ( records.length > 0 ) {
 				loadedRangeRef.current = {
-					min: Math.min( ...records.map( ( r ) => r.id ) ),
-					max: Math.max( ...records.map( ( r ) => r.id ) ),
+					min: Math.min(
+						...records.map(
+							( r ) =>
+								positionMapRef.current.get( getItemId( r ) )!
+						)
+					),
+					max: Math.max(
+						...records.map(
+							( r ) =>
+								positionMapRef.current.get( getItemId( r ) )!
+						)
+					),
 				};
 			}
 		} else {
@@ -153,26 +160,22 @@ export function useInfiniteScrollData< Item extends { id: number } >( {
 					)
 					.map( ( record ) => {
 						const itemId = getItemId( record );
-						let position: number | undefined;
 
 						if ( view.infiniteScrollEnabled ) {
 							// Check if this record already has a position
 							const existingPosition =
 								positionMapRef.current.get( itemId );
-							if ( existingPosition !== undefined ) {
-								position = existingPosition;
-							} else {
+							if ( existingPosition === undefined ) {
 								// Assign new position and increment for next record
-								position = nextPosition;
-								positionMapRef.current.set( itemId, position );
+								positionMapRef.current.set(
+									itemId,
+									nextPosition
+								);
 								nextPosition++;
 							}
 						}
 
-						return {
-							...record,
-							position,
-						};
+						return record;
 					} );
 
 				if ( newRecords.length === 0 ) {
@@ -185,11 +188,13 @@ export function useInfiniteScrollData< Item extends { id: number } >( {
 						? [ ...newRecords, ...prev ]
 						: [ ...prev, ...newRecords ];
 
-				const allIds = allRecords
+				const allPositions = allRecords
 					.filter( ( r ): r is Item => r !== null )
-					.map( ( r ) => r.id );
-				const newMin = Math.min( ...allIds );
-				const newMax = Math.max( ...allIds );
+					.map(
+						( r ) => positionMapRef.current.get( getItemId( r ) )!
+					);
+				const newMin = Math.min( ...allPositions );
+				const newMax = Math.max( ...allPositions );
 
 				loadedRangeRef.current = {
 					min: newMin,
@@ -198,9 +203,11 @@ export function useInfiniteScrollData< Item extends { id: number } >( {
 
 				// Create array with placeholders to maintain positions
 				const result: ( Item | null )[] = [];
-				for ( let id = newMin; id <= newMax; id++ ) {
+				for ( let pos = newMin; pos <= newMax; pos++ ) {
 					const record = allRecords.find(
-						( r ) => r !== null && r.id === id
+						( r ) =>
+							r !== null &&
+							positionMapRef.current.get( getItemId( r ) ) === pos
 					);
 					result.push( record || null );
 				}
@@ -214,15 +221,15 @@ export function useInfiniteScrollData< Item extends { id: number } >( {
 
 					const filtered = result
 						.map( ( record, index ) => {
-							const itemId = newMin + index;
+							const itemPosition = newMin + index;
 							// Keep records that are null (placeholders) or within the visible range
 							if ( record === null ) {
 								return record;
 							}
 							// Keep items within buffer range of visible items
 							if (
-								itemId >= visibleMin - buffer &&
-								itemId <= visibleMax + buffer
+								itemPosition >= visibleMin - buffer &&
+								itemPosition <= visibleMax + buffer
 							) {
 								return record;
 							}
