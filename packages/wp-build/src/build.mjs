@@ -1415,6 +1415,8 @@ async function buildAllRoutes() {
 
 /**
  * Main build function.
+ *
+ * @param {string?} baseUrlExpression
  */
 async function buildAll( baseUrlExpression ) {
 	console.log( '🔨 Building packages...\n' );
@@ -1571,7 +1573,10 @@ async function buildAll( baseUrlExpression ) {
 	}
 
 	console.log( '\n📄 Generating PHP registration files...\n' );
-	const phpReplacements = await getPhpReplacements( ROOT_DIR, baseUrlExpression );
+	const phpReplacements = await getPhpReplacements(
+		ROOT_DIR,
+		baseUrlExpression
+	);
 	await Promise.all( [
 		generateMainIndexPhp( phpReplacements ),
 		generateModuleRegistrationPhp( modules, phpReplacements ),
