@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { Notice } from '@wordpress/components';
 import { speak } from '@wordpress/a11y';
@@ -19,7 +20,9 @@ export default function FitTextSizeWarning() {
 	// Note: The `Notice` component can speak messages via its `spokenMessage`
 	// prop, but similar to the contrast checker, we use granular control over
 	// when the announcements are made.
-	speak( message );
+	useEffect( () => {
+		speak( message );
+	}, [ message ] );
 
 	return (
 		<div className="block-editor-fit-text-size-warning">
