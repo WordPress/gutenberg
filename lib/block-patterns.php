@@ -17,8 +17,8 @@ function gutenberg_register_core_block_patterns() {
 	register_block_pattern_category(
 		'navigation',
 		array(
-			'label'       => _x( 'Navigation', 'Block pattern category' ),
-			'description' => __( 'Display your website navigation.' ),
+			'label'       => _x( 'Navigation', 'Block pattern category', 'gutenberg' ),
+			'description' => _x( 'Display your website navigation.', 'Block pattern category', 'gutenberg' ),
 		)
 	);
 
