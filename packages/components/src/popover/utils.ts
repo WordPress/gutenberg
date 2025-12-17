@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { MotionProps } from 'framer-motion';
+import { cubicBezier, type MotionProps } from 'framer-motion';
 import type { Placement, ReferenceType } from '@floating-ui/react-dom';
 
 /**
@@ -129,11 +129,16 @@ export const placementToMotionAnimationProps = (
 		style: PLACEMENT_TO_ANIMATION_ORIGIN[ placement ],
 		initial: {
 			opacity: 0,
-			scale: 0,
-			[ translateProp ]: `${ 2 * translateDirection }em`,
+			[ translateProp ]: `${ 4 * translateDirection }px`,
 		},
-		animate: { opacity: 1, scale: 1, [ translateProp ]: 0 },
-		transition: { duration: 0.1, ease: [ 0, 0, 0.2, 1 ] },
+		animate: { opacity: 1, [ translateProp ]: 0 },
+		transition: {
+			opacity: { duration: 0.08, ease: 'linear' },
+			[ translateProp ]: {
+				duration: 0.3,
+				ease: cubicBezier( 0, 0, 0, 1 ),
+			},
+		},
 	};
 };
 
