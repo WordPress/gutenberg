@@ -8,6 +8,7 @@ import {
 	unregisterBlockType,
 	validateBlock,
 } from '@wordpress/blocks';
+import { useBlockProps } from '@wordpress/block-editor';
 
 describe( 'validateBlock', () => {
 	beforeAll( () => {
@@ -25,7 +26,7 @@ describe( 'validateBlock', () => {
 		registerBlockType( 'myplugin/fruit', {
 			apiVersion: 3,
 			save: ( { attributes } ) =>
-				createElement( 'div', null, attributes.fruit ),
+				createElement( 'div', useBlockProps.save(), attributes.fruit ),
 			name: 'myplugin/fruit',
 			category: 'text',
 			title: 'Fruit block',
@@ -49,9 +50,9 @@ describe( 'validateBlock', () => {
 			save: ( { attributes } ) =>
 				createElement(
 					'div',
-					{
+					useBlockProps.save( {
 						className: 'fruit',
-					},
+					} ),
 					attributes.fruit
 				),
 			name: 'myplugin/fruit',
@@ -73,7 +74,7 @@ describe( 'validateBlock', () => {
 		registerBlockType( 'myplugin/fruit', {
 			apiVersion: 3,
 			save: ( { attributes } ) =>
-				createElement( 'div', null, attributes.fruit ),
+				createElement( 'div', useBlockProps.save(), attributes.fruit ),
 			name: 'myplugin/fruit',
 			category: 'text',
 			title: 'Fruit block',

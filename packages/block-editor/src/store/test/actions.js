@@ -1086,6 +1086,7 @@ describe( 'actions', () => {
 
 		it( 'should not merge the blocks if blockB editing mode is `disabled`', () => {
 			registerBlockType( 'core/test-block', {
+				apiVersion: 3,
 				attributes: {
 					content: {},
 				},
