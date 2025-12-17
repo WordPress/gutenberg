@@ -185,6 +185,10 @@ describe( 'DateTimePicker', () => {
 	} );
 
 	describe( 'different input types', () => {
+		afterEach( () => {
+			jest.useRealTimers();
+		} );
+
 		// Input types should be treated assuming the timezone offset configured
 		// through `@wordpress/date` settings, i.e. the site's timezone. Inputs
 		// representing the same site timezone time should display and output
@@ -208,13 +212,30 @@ describe( 'DateTimePicker', () => {
 				transformOnChange: ( nextValue: string ) =>
 					new Date( nextValue ).getTime(),
 			},
+			{
+				type: 'undefined (defaults to current time)',
+				initialDate: undefined,
+				transformOnChange: ( nextValue: string ) => nextValue,
+			},
 		] )( '$type', ( { initialDate, transformOnChange } ) => {
 			it( 'should display and select dates according to site timezone', async () => {
-				const user = userEvent.setup();
-				const onChange = jest.fn();
-
 				timezoneMock.register( 'US/Pacific' );
 
+				// Normalize "current" time to the same time in November, so we
+				// can assert the same beahvior between undefined or explicitly
+				// set initial dates.
+				let user: ReturnType< typeof userEvent.setup >;
+				if ( initialDate === undefined ) {
+					jest.useFakeTimers();
+					jest.setSystemTime( Date.UTC( 2025, 10, 16, 1, 0, 0 ) );
+					user = userEvent.setup( {
+						advanceTimers: jest.advanceTimersByTime,
+					} );
+				} else {
+					user = userEvent.setup();
+				}
+
+				const onChange = jest.fn();
 				const { rerender } = render(
 					<DateTimePicker
 						currentDate={ initialDate }
@@ -248,7 +269,9 @@ describe( 'DateTimePicker', () => {
 				} );
 
 				await user.click(
-					screen.getByRole( 'button', { name: 'November 20, 2025' } )
+					screen.getByRole( 'button', {
+						name: 'November 20, 2025',
+					} )
 				);
 
 				// Changing date should preserve the time, calling onChange with

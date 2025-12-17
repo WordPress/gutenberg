@@ -69,7 +69,7 @@ export function DatePicker( {
 	onMonthPreviewed,
 	startOfWeek: weekStartsOn = 0,
 }: DatePickerProps ) {
-	const date = currentDate ? inputToDate( currentDate ) : new Date();
+	const date = inputToDate( currentDate ?? new Date() );
 
 	const {
 		calendar,

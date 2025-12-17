@@ -67,17 +67,13 @@ export function TimePicker( {
 }: TimePickerProps ) {
 	const [ date, setDate ] = useState( () =>
 		// Truncate the date at the minutes, see: #15495.
-		currentTime ? startOfMinute( inputToDate( currentTime ) ) : new Date()
+		startOfMinute( inputToDate( currentTime ?? new Date() ) )
 	);
 
 	// Reset the state when currentTime changed.
 	// TODO: useEffect() shouldn't be used like this, causes an unnecessary render
 	useEffect( () => {
-		setDate(
-			currentTime
-				? startOfMinute( inputToDate( currentTime ) )
-				: new Date()
-		);
+		setDate( startOfMinute( inputToDate( currentTime ?? new Date() ) ) );
 	}, [ currentTime ] );
 
 	const monthOptions = [
