@@ -182,7 +182,10 @@ export function DatePicker( {
 								isSelected={ isSelected( day ) }
 								isFocusable={ isEqual( day, focusable ) }
 								isFocusAllowed={ isFocusWithinCalendar }
-								isToday={ isSameDay( day, new Date() ) }
+								isToday={ isSameDay(
+									day,
+									startOfDayInConfiguredTimezone( new Date() )
+								) }
 								isInvalid={
 									isInvalidDate ? isInvalidDate( day ) : false
 								}
@@ -326,7 +329,7 @@ function Day( {
 			className="components-datetime__date__day" // Unused, for backwards compatibility.
 			disabled={ isInvalid }
 			tabIndex={ isFocusable ? 0 : -1 }
-			aria-label={ getDayLabel( day, isSelected, numEvents ) }
+			aria-label={ getDayLabel( day, isSelected, isToday, numEvents ) }
 			column={ column }
 			isSelected={ isSelected }
 			isToday={ isToday }
@@ -339,43 +342,40 @@ function Day( {
 	);
 }
 
-function getDayLabel( date: Date, isSelected: boolean, numEvents: number ) {
+function getDayLabel(
+	date: Date,
+	isSelected: boolean,
+	isToday: boolean,
+	numEvents: number
+) {
 	const { formats } = getSettings();
 	const localizedDate = dateI18n(
 		formats.date,
 		date,
 		-date.getTimezoneOffset()
 	);
-	if ( isSelected && numEvents > 0 ) {
-		return sprintf(
-			// translators: 1: The calendar date. 2: Number of events on the calendar date.
-			_n(
-				'%1$s. Selected. There is %2$d event',
-				'%1$s. Selected. There are %2$d events',
+
+	const parts = [ localizedDate ];
+
+	if ( isSelected ) {
+		parts.push( __( 'Selected' ) );
+	}
+
+	if ( isToday ) {
+		parts.push( __( 'Today' ) );
+	}
+
+	if ( numEvents > 0 ) {
+		parts.push(
+			sprintf(
+				// translators: %d: Number of events on the calendar date.
+				_n( 'There is %d event', 'There are %d events', numEvents ),
 				numEvents
-			),
-			localizedDate,
-			numEvents
-		);
-	} else if ( isSelected ) {
-		return sprintf(
-			// translators: 1: The calendar date.
-			__( '%1$s. Selected' ),
-			localizedDate
-		);
-	} else if ( numEvents > 0 ) {
-		return sprintf(
-			// translators: 1: The calendar date. 2: Number of events on the calendar date.
-			_n(
-				'%1$s. There is %2$d event',
-				'%1$s. There are %2$d events',
-				numEvents
-			),
-			localizedDate,
-			numEvents
+			)
 		);
 	}
-	return localizedDate;
+
+	return parts.join( '. ' );
 }
 
 export default DatePicker;

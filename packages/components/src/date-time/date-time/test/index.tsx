@@ -246,9 +246,16 @@ describe( 'DateTimePicker', () => {
 				// Should display the correct initial date and time assuming
 				// settings for the current site. If incorrectly using UTC,
 				// this would show Nov 16 at 01:00 instead of Nov 15 at 20:00.
+				//
+				// When initialDate is undefined, the fake time is set to
+				// Nov 16 01:00 UTC (Nov 15 20:00 site time), in which case the
+				// current date of Nov 15 is both "Selected" and "Today".
 				expect(
 					screen.getByRole( 'button', {
-						name: 'November 15, 2025. Selected',
+						name:
+							initialDate === undefined
+								? 'November 15, 2025. Selected. Today'
+								: 'November 15, 2025. Selected',
 					} )
 				).toBeVisible();
 				expect( screen.getByLabelText( 'Hours' ) ).toHaveValue( 20 );
