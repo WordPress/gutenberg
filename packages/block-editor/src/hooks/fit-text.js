@@ -23,7 +23,6 @@ import { store as blockEditorStore } from '../store';
 import { useBlockElement } from '../components/block-list/use-block-props/use-block-refs';
 import InspectorControls from '../components/inspector-controls';
 import FitTextSizeWarning from '../components/fit-text-size-warning';
-import InspectorControls from '../components/inspector-controls';
 
 export const FIT_TEXT_SUPPORT_KEY = 'typography.fitText';
 
@@ -233,6 +232,7 @@ export function FitTextControl( {
 	name,
 	fontSize,
 	style,
+	warning,
 } ) {
 	if ( ! hasBlockSupport( name, FIT_TEXT_SUPPORT_KEY ) ) {
 		return null;
@@ -280,6 +280,7 @@ export function FitTextControl( {
 							  )
 					}
 				/>
+				{ warning }
 			</ToolsPanelItem>
 		</InspectorControls>
 	);
@@ -345,15 +346,21 @@ const hasFitTextSupport = ( blockNameOrType ) => {
 };
 
 function FitTextEdit( props ) {
-	const { name, attributes, clientId, isSelected } = props;
-	const { fitText } = attributes;
+	const { name, attributes, clientId, isSelected, setAttributes } = props;
+	const { fitText} = attributes;
 	const { fontSize } = useFitText( { fitText, name, clientId } );
+	
 	return (
-		isSelected &&
-		fontSize < MIN_FONT_SIZE_FOR_WARNING && (
-			<InspectorControls group="styles">
-				<FitTextSizeWarning fontSize={ fontSize } />
-			</InspectorControls>
+		isSelected && (
+				<FitTextControl
+					clientId={ clientId }
+					fitText={ fitText }
+					setAttributes={ setAttributes }
+					name={ name }
+					fontSize={ attributes.fontSize }
+					style={ attributes.style }
+					warning={ fontSize < MIN_FONT_SIZE_FOR_WARNING && <FitTextSizeWarning /> }
+				/>
 		)
 	);
 }
@@ -367,21 +374,37 @@ function FitTextEdit( props ) {
  */
 const withFitTextEdit = createHigherOrderComponent( ( BlockEdit ) => {
 	return ( props ) => {
-		const { name, attributes, clientId, isSelected } = props;
+		const { name, attributes, clientId, isSelected, setAttributes } = props;
 		const { fitText } = attributes;
 		const supportsFitText = hasBlockSupport( name, FIT_TEXT_SUPPORT_KEY );
-
+		if ( ! supportsFitText ) {
+			return <BlockEdit { ...props } />;
+		}
 		return (
 			<>
 				<BlockEdit { ...props } />
-				{ fitText && supportsFitText && (
+				{ fitText && (
 					<FitTextEdit
+						clientId={ clientId }
+						fitText={ fitText }
+						setAttributes={ props.setAttributes }
 						name={ name }
 						attributes={ attributes }
-						clientId={ clientId }
 						isSelected={ isSelected }
 					/>
 				) }
+				{
+					! fitText && isSelected && (
+						<FitTextControl
+							clientId={ clientId }
+							fitText={ fitText }
+							setAttributes={ setAttributes }
+							name={ name }
+							fontSize={ attributes.fontSize }
+							style={ attributes.style }
+						/>
+					)
+				}
 			</>
 		);
 	};
@@ -398,5 +421,5 @@ export default {
 	addSaveProps,
 	attributeKeys: [ 'fitText', 'fontSize', 'style' ],
 	hasSupport: hasFitTextSupport,
-	edit: FitTextControl,
+	edit: () => null,
 };
