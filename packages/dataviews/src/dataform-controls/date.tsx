@@ -351,7 +351,6 @@ function CalendarDateControl< Item >( {
 			setIsTouched={ setIsTouched }
 		>
 			<BaseControl
-				__nextHasNoMarginBottom
 				id={ id }
 				className="dataviews-controls__date"
 				label={ displayLabel }
@@ -558,7 +557,6 @@ function CalendarDateRangeControl< Item >( {
 			setIsTouched={ setIsTouched }
 		>
 			<BaseControl
-				__nextHasNoMarginBottom
 				id={ id }
 				className="dataviews-controls__date"
 				label={ displayLabel }

@@ -54,7 +54,6 @@ export function LinkPicker( {
 	// Use the proper BaseControl pattern for associating help text
 	const { baseControlProps, controlProps } = useBaseControlProps( {
 		help,
-		__nextHasNoMarginBottom: true,
 	} );
 
 	const handleChange = ( newValue ) => {
@@ -75,7 +74,7 @@ export function LinkPicker( {
 	};
 
 	return (
-		<BaseControl { ...baseControlProps } __nextHasNoMarginBottom>
+		<BaseControl { ...baseControlProps }>
 			<BaseControl.VisualLabel>{ label }</BaseControl.VisualLabel>
 			<Button
 				ref={ anchorRef }

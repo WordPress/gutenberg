@@ -57,7 +57,6 @@ function BetweenControls( {
 
 	return (
 		<BaseControl
-			__nextHasNoMarginBottom
 			help={ __( 'The max. value must be greater than the min. value.' ) }
 		>
 			<Flex direction="row" gap={ 4 }>

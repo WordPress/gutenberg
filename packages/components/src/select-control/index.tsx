@@ -103,12 +103,7 @@ function UnforwardedSelectControl< V extends string >(
 	} );
 
 	return (
-		<BaseControl
-			help={ help }
-			id={ id }
-			className={ classes }
-			__nextHasNoMarginBottom
-		>
+		<BaseControl help={ help } id={ id } className={ classes }>
 			<StyledInputBase
 				disabled={ disabled }
 				hideLabelFromVision={ hideLabelFromVision }
