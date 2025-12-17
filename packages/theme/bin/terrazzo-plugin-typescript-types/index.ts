@@ -118,7 +118,6 @@ export default function typescriptTypes( {
 				);
 
 				const unionType = Array.from( values )
-					.sort()
 					.map( ( value ) => JSON.stringify( value ) )
 					.join( ' | ' );
 
