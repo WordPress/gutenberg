@@ -86,13 +86,16 @@ test.describe( 'Template ID Format', () => {
 		} );
 		await expect( editor.canvas.getByText( secondEditText ) ).toBeVisible();
 
-		const editorTopBar = page.getByRole( 'region', {
-			name: 'Editor top bar',
-		} );
-		const saveButton = editorTopBar.getByRole( 'button', {
-			name: 'Save',
-			exact: true,
-		} );
+		// Find the correct save button to click.
+		const publishSaveButton = page
+			.getByRole( 'region', { name: 'Editor publish' } )
+			.getByRole( 'button', { name: 'Save', exact: true } );
+		const topBarSaveButton = page
+			.getByRole( 'region', { name: 'Editor top bar' } )
+			.getByRole( 'button', { name: 'Save', exact: true } );
+		const saveButton = ( await publishSaveButton.isVisible() )
+			? publishSaveButton
+			: topBarSaveButton;
 		await saveButton.click();
 
 		await page
