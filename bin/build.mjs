@@ -123,7 +123,9 @@ async function build() {
 
 		// Step 7: Build packages
 		console.log( '\n📦 Building packages (production mode)...' );
-		await exec( 'wp-build', process.argv.slice( 2 ), {
+		const buildArgs = process.argv.slice( 2 );
+		await exec( 'wp-build', buildArgs, {
+			shell: false,
 			env: { ...process.env, NODE_ENV: 'production' },
 		} );
 
