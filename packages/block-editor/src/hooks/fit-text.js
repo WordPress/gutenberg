@@ -320,20 +320,18 @@ function addSaveProps( props, blockType, attributes ) {
 /**
  * Override props applied to the block element in the editor.
  *
- * @param {Object}  props          Component props including block attributes.
- * @param {string}  props.name     Block name.
- * @param {boolean} props.fitText  Whether fit text is enabled.
- * @param {string}  props.clientId Block client ID.
+ * @param {Object}  props         Component props including block attributes.
+ * @param {string}  props.name    Block name.
+ * @param {boolean} props.fitText Whether fit text is enabled.
  * @return {Object} Filtered props applied to the block element.
  */
-function useBlockProps( { name, fitText, clientId } ) {
-	useFitText( { fitText, name, clientId } );
-	if ( ! fitText || ! hasBlockSupport( name, FIT_TEXT_SUPPORT_KEY ) ) {
-		return {};
+function useBlockProps( { name, fitText } ) {
+	if ( fitText && hasBlockSupport( name, FIT_TEXT_SUPPORT_KEY ) ) {
+		return {
+			className: 'has-fit-text',
+		};
 	}
-	return {
-		className: 'has-fit-text',
-	};
+	return {};
 }
 
 addFilter(
