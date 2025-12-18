@@ -236,7 +236,7 @@ export default function FormPanelField< Item >( {
 						<Icon
 							className="dataforms-layouts-panel__field-label-error-content"
 							icon={ errorIcon }
-							size={ 20 }
+							size={ 16 }
 						/>
 					</Tooltip>
 				) }
