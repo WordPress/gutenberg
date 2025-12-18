@@ -4,7 +4,13 @@
 import { useMemo, useState, useCallback } from '@wordpress/element';
 import { useEntityRecords } from '@wordpress/core-data';
 import { useDispatch } from '@wordpress/data';
-import { SelectControl, Button } from '@wordpress/components';
+import {
+	SelectControl,
+	Button,
+	FlexBlock,
+	FlexItem,
+	__experimentalHStack as HStack,
+} from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { decodeEntities } from '@wordpress/html-entities';
 import { store as noticesStore } from '@wordpress/notices';
@@ -162,13 +168,6 @@ export default function OverlayTemplatePartSelector( {
 		createErrorNotice,
 	] );
 
-	const isEditButtonDisabled =
-		! overlay ||
-		! hasResolved ||
-		! selectedTemplatePart ||
-		! onNavigateToEntityRecord ||
-		isResolving;
-
 	const isCreateButtonDisabled = isResolving || isCreating;
 
 	// Build help text
@@ -176,8 +175,21 @@ export default function OverlayTemplatePartSelector( {
 		if ( overlayTemplateParts.length === 0 && hasResolved ) {
 			return __( 'No overlays found.' );
 		}
-		return __( 'Select an overlay to use for the navigation.' );
+		return __( 'Select an overlay for navigation.' );
 	}, [ overlayTemplateParts.length, hasResolved ] );
+
+	// Tooltip/aria-label text for the edit button
+	const editButtonLabel = useMemo( () => {
+		return selectedTemplatePart
+			? sprintf(
+					/* translators: %s: Overlay title. */
+					__( 'Edit overlay: %s' ),
+					selectedTemplatePart.title?.rendered
+						? decodeEntities( selectedTemplatePart.title.rendered )
+						: selectedTemplatePart.slug
+			  )
+			: __( 'Edit overlay' );
+	}, [ selectedTemplatePart ] );
 
 	return (
 		<div className="wp-block-navigation__overlay-selector">
@@ -192,42 +204,37 @@ export default function OverlayTemplatePartSelector( {
 				showTooltip
 				className="wp-block-navigation__overlay-create-button"
 			/>
-			<SelectControl
-				__next40pxDefaultSize
-				label={ __( 'Overlay template' ) }
-				value={ overlay || '' }
-				options={ options }
-				onChange={ handleSelectChange }
-				disabled={ isResolving }
-				accessibleWhenDisabled
-				help={ helpText }
-			/>
-			{ overlay && ( ! hasResolved || selectedTemplatePart ) && (
-				<Button
-					__next40pxDefaultSize
-					variant="secondary"
-					onClick={ handleEditClick }
-					disabled={ isEditButtonDisabled }
-					accessibleWhenDisabled
-					aria-label={
-						selectedTemplatePart
-							? sprintf(
-									/* translators: %s: Overlay title. */
-									__( 'Edit overlay: %s' ),
-									selectedTemplatePart.title?.rendered
-										? decodeEntities(
-												selectedTemplatePart.title
-													.rendered
-										  )
-										: selectedTemplatePart.slug
-							  )
-							: __( 'Edit overlay' )
-					}
-					className="wp-block-navigation__overlay-edit-button"
-				>
-					{ __( 'Edit' ) }
-				</Button>
-			) }
+			<HStack alignment="flex-start">
+				<FlexBlock>
+					<SelectControl
+						__next40pxDefaultSize
+						__nextHasNoMarginBottom
+						label={ __( 'Overlay template' ) }
+						value={ overlay || '' }
+						options={ options }
+						onChange={ handleSelectChange }
+						disabled={ isResolving }
+						accessibleWhenDisabled
+						help={ helpText }
+					/>
+				</FlexBlock>
+				{ overlay && hasResolved && selectedTemplatePart && (
+					<FlexItem>
+						<Button
+							__next40pxDefaultSize
+							variant="secondary"
+							onClick={ handleEditClick }
+							disabled={ ! onNavigateToEntityRecord }
+							accessibleWhenDisabled
+							label={ editButtonLabel }
+							showTooltip
+							className="wp-block-navigation__overlay-edit-button"
+						>
+							{ __( 'Edit' ) }
+						</Button>
+					</FlexItem>
+				) }
+			</HStack>
 		</div>
 	);
 }
