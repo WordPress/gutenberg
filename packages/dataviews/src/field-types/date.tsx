@@ -51,7 +51,7 @@ function render( { item, field }: DataViewRenderFieldProps< any > ) {
 	}
 
 	const value = field.getValue( { item } );
-	if ( ! value ) {
+	if ( [ '', undefined, null ].includes( value ) ) {
 		return '';
 	}
 
