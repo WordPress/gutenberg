@@ -1,12 +1,12 @@
 /**
  * WordPress dependencies
  */
-import { getBlockType, generateFieldsFromAttributes } from '@wordpress/blocks';
+import { getBlockType } from '@wordpress/blocks';
+import { PanelBody } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
+import { DataForm } from '@wordpress/dataviews';
 import { useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { PanelBody } from '@wordpress/components';
-import { DataForm } from '@wordpress/dataviews';
 
 /**
  * Internal dependencies
@@ -14,6 +14,7 @@ import { DataForm } from '@wordpress/dataviews';
 import InspectorControls from '../components/inspector-controls';
 import { useBlockEditingMode } from '../components/block-editing-mode';
 import { store as blockEditorStore } from '../store';
+import { generateFieldsFromAttributes } from './generate-fields-from-attributes';
 
 /**
  * Checks if a block has any attributes marked for auto-generated inspector controls.
