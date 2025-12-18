@@ -63,11 +63,15 @@ async function openQuickEditForPage( page, admin, pageTitle ) {
 		test.beforeAll( async ( { requestUtils } ) => {
 			await requestUtils.activateTheme( 'emptytheme' );
 			await requestUtils.activatePlugin( 'gutenberg-test-media-edit' );
-			await requestUtils.setGutenbergExperiments( [
-				'gutenberg-quick-edit-dataviews',
+			const experiments = [ 'gutenberg-quick-edit-dataviews' ];
+			if ( useExperimentalModal ) {
+				experiments.push( 'gutenberg-dataviews-media-modal' );
+			}
+			await requestUtils.setGutenbergExperiments( experiments );
+			await Promise.all( [
+				requestUtils.deleteAllMedia(),
+				requestUtils.deleteAllPages(),
 			] );
-			await requestUtils.deleteAllMedia();
-			await requestUtils.deleteAllPages();
 			const testPage = await requestUtils.createPage( {
 				title: 'Media Test Page',
 				status: 'publish',
@@ -76,18 +80,15 @@ async function openQuickEditForPage( page, admin, pageTitle ) {
 		} );
 
 		test.afterAll( async ( { requestUtils } ) => {
-			await requestUtils.setGutenbergExperiments( [] );
-			await requestUtils.deactivatePlugin( 'gutenberg-test-media-edit' );
-			await requestUtils.deleteAllPages();
-			await requestUtils.deleteAllMedia();
+			await Promise.all( [
+				requestUtils.setGutenbergExperiments( [] ),
+				requestUtils.deactivatePlugin( 'gutenberg-test-media-edit' ),
+				requestUtils.deleteAllMedia(),
+				requestUtils.deleteAllPages(),
+			] );
 		} );
 
-		test.beforeEach( async ( { requestUtils, page } ) => {
-			if ( useExperimentalModal ) {
-				await page.addInitScript( () => {
-					window.__experimentalDataViewsMediaModal = true;
-				} );
-			}
+		test.beforeEach( async ( { requestUtils } ) => {
 			await requestUtils.deleteAllMedia();
 			await Promise.all( [
 				requestUtils.rest( {
