@@ -37,28 +37,27 @@ function getFirstValidationError(
 		return undefined;
 	}
 
-	for ( const [ key, validation ] of Object.entries( validity ) ) {
-		if ( key === 'children' ) {
+	const validityRules = Object.keys( validity ).filter(
+		( key ) => key !== 'children'
+	);
+
+	for ( const key of validityRules ) {
+		const rule = validity[ key as keyof Omit< FieldValidity, 'children' > ];
+		if ( rule === undefined ) {
 			continue;
 		}
-		if (
-			validation &&
-			typeof validation === 'object' &&
-			'type' in validation &&
-			validation.type === 'invalid'
-		) {
+
+		if ( rule.type === 'invalid' ) {
+			if ( rule.message ) {
+				return rule.message;
+			}
+
 			// Provide default message for required validation (message is optional)
 			if ( key === 'required' ) {
-				return (
-					( 'message' in validation &&
-						typeof validation.message === 'string' &&
-						validation.message ) ||
-					'A required field is empty'
-				);
+				return 'A required field is empty';
 			}
-			if ( 'message' in validation && validation.message ) {
-				return validation.message as string;
-			}
+
+			return 'Unidentified validation error';
 		}
 	}
 
