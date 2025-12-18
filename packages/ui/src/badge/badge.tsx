@@ -26,10 +26,7 @@ const DEFAULT_RENDER = ( props: React.ComponentPropsWithoutRef< 'span' > ) => (
  */
 const getIntentStyles = (
 	intent: BadgeProps[ 'intent' ]
-): Pick<
-	BoxProps,
-	'backgroundColor' | 'color' | 'borderColor' | 'borderWidth'
-> => {
+): Partial< BoxProps > => {
 	switch ( intent ) {
 		case 'high':
 			return {
