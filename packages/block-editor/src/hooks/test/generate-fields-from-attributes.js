@@ -131,18 +131,7 @@ describe( 'generateFieldsFromAttributes', () => {
 				type: 'object',
 				default: {},
 			},
-		} );
-
-		const result = generateFieldsFromAttributes( attributes );
-
-		// Only string attribute should generate a field
-		expect( result.fields ).toHaveLength( 1 );
-		expect( result.fields[ 0 ].id ).toBe( 'message' );
-	} );
-
-	it( 'should handle union types by using the first type', () => {
-		const attributes = markForAutoInspectorControl( {
-			value: {
+			unionType: {
 				type: [ 'string', 'null' ],
 				default: null,
 			},
@@ -150,8 +139,9 @@ describe( 'generateFieldsFromAttributes', () => {
 
 		const result = generateFieldsFromAttributes( attributes );
 
+		// Only string attribute should generate a field
 		expect( result.fields ).toHaveLength( 1 );
-		expect( result.fields[ 0 ].type ).toBe( 'text' );
+		expect( result.fields[ 0 ].id ).toBe( 'message' );
 	} );
 
 	it( 'should humanize camelCase attribute names', () => {

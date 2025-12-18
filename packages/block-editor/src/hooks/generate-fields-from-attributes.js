@@ -37,10 +37,9 @@ export function generateFieldsFromAttributes( attributes ) {
  * @return {Object|null} DataForm field definition or null if type not supported
  */
 function createFieldFromAttribute( name, def ) {
-	// Handle union types (e.g., ["string", "null"]) by using the first type
-	const type = Array.isArray( def.type ) ? def.type[ 0 ] : def.type;
+	const type = def.type;
 
-	// Skip unsupported types (array, object, etc.)
+	// Skip unsupported types (object, union types, etc.)
 	// Supported: string→text, number, integer, boolean (1:1 with DataForm)
 	if ( ! [ 'string', 'number', 'integer', 'boolean' ].includes( type ) ) {
 		return null;
