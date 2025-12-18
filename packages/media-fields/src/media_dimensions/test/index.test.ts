@@ -59,12 +59,20 @@ describe( 'mediaDimensionsField', () => {
 				{ media_details: { width: 0, height: 0, sizes: {} } },
 				'when both width and height are 0',
 			],
-		] )( 'returns empty string %s', ( item ) => {
+		] )( 'returns empty string %s', ( item, description ) => {
 			const result = mediaDimensionsField.getValue?.( {
 				item: item as Updatable< Attachment >,
 			} );
 
-			expect( result ).toBe( '' );
+			try {
+				expect( result ).toBe( '' );
+			} catch ( error ) {
+				const message =
+					error instanceof Error ? error.message : String( error );
+				throw new Error(
+					`Failed getValue test (${ description }): ${ message }`
+				);
+			}
 		} );
 	} );
 
@@ -105,12 +113,20 @@ describe( 'mediaDimensionsField', () => {
 				false,
 				'when both width and height are 0',
 			],
-		] )( 'returns %s %s', ( item, expected ) => {
+		] )( 'returns %s %s', ( item, expected, description ) => {
 			const result = mediaDimensionsField.isVisible?.(
 				item as Updatable< Attachment >
 			);
 
-			expect( result ).toBe( expected );
+			try {
+				expect( result ).toBe( expected );
+			} catch ( error ) {
+				const message =
+					error instanceof Error ? error.message : String( error );
+				throw new Error(
+					`Failed isVisible test (${ description }): ${ message }`
+				);
+			}
 		} );
 	} );
 } );

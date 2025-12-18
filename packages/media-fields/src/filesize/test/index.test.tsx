@@ -44,30 +44,51 @@ describe( 'filesizeField', () => {
 				'fractional sizes with proper decimals',
 			],
 			[ 1024, /^1\s+KB$/, 'boundary value (exactly 1 KB)' ],
-		] )( 'formats %s bytes correctly: %s', ( filesize, expected ) => {
-			const item = {
-				media_details: {
-					filesize,
-					sizes: {},
-				},
-			} as MediaItem;
+		] )(
+			'formats %s bytes correctly: %s',
+			( filesize, expected, description ) => {
+				const item = {
+					media_details: {
+						filesize,
+						sizes: {},
+					},
+				} as MediaItem;
 
-			const result = filesizeField.getValue?.( {
-				item,
-			} );
+				const result = filesizeField.getValue?.( {
+					item,
+				} );
 
-			expect( result ).toMatch( expected );
-		} );
+				try {
+					expect( result ).toMatch( expected );
+				} catch ( error ) {
+					const message =
+						error instanceof Error
+							? error.message
+							: String( error );
+					throw new Error(
+						`Failed to format filesize (${ description }): ${ message }`
+					);
+				}
+			}
+		);
 
 		it.each( [
 			[ { media_details: { sizes: {} } }, 'when filesize is missing' ],
 			[ {}, 'when media_details is missing' ],
-		] )( 'returns empty string %s', ( item ) => {
+		] )( 'returns empty string %s', ( item, description ) => {
 			const result = filesizeField.getValue?.( {
 				item: item as MediaItem,
 			} );
 
-			expect( result ).toBe( '' );
+			try {
+				expect( result ).toBe( '' );
+			} catch ( error ) {
+				const message =
+					error instanceof Error ? error.message : String( error );
+				throw new Error(
+					`Failed getValue test (${ description }): ${ message }`
+				);
+			}
 		} );
 	} );
 
