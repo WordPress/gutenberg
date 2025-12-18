@@ -123,6 +123,8 @@ function Notice( {
 									noDefaultClasses = false,
 									onClick,
 									url,
+									openInNewTab,
+									...buttonProps
 								}: NoticeAction &
 									// `isPrimary` is a legacy prop included for
 									// backcompat, but `variant` should be used
@@ -148,11 +150,17 @@ function Notice( {
 
 								return (
 									<Button
+										{ ...buttonProps }
 										__next40pxDefaultSize
 										key={ index }
 										href={ url }
+										target={
+											url && openInNewTab
+												? '_blank'
+												: undefined
+										}
 										variant={ computedVariant }
-										onClick={ url ? undefined : onClick }
+										onClick={ onClick }
 										className={ clsx(
 											'components-notice__action',
 											buttonCustomClasses

@@ -3,19 +3,25 @@
  */
 import type { MouseEventHandler, ReactNode } from 'react';
 
-type CommonNoticeActionProps = {
-	label: string;
+/**
+ * Internal dependencies
+ */
+import type { ButtonAsButtonProps } from '../button/types';
+
+type CommonNoticeActionProps = Omit<
+	ButtonAsButtonProps,
+	// Omit props that are handled internally or don't apply to notice actions
+	'href' | 'target' | 'children' | 'className'
+> & {
 	className?: string;
 	noDefaultClasses?: boolean;
-	variant?: 'primary' | 'secondary' | 'link';
 };
-// `url` and `onClick` can both be provided, but `url` takes precedence. If
-// `url` is provided, the action's button will be rendered as an anchor and
-// `onClick` will be ignored.
+// `url` and `onClick` can both be provided. If `url` is provided, the action's
+// button will be rendered as an anchor and `onClick` will still be called.
 type NoticeActionWithURL = CommonNoticeActionProps & {
 	url: string;
 	openInNewTab?: boolean;
-	onClick?: never;
+	onClick?: MouseEventHandler< HTMLButtonElement | HTMLAnchorElement >;
 };
 type NoticeActionWithOnClick = CommonNoticeActionProps & {
 	url?: never;
