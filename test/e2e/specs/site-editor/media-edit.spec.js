@@ -8,16 +8,6 @@ const path = require( 'path' );
  */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
-const TEST_IMAGE_FILE_PATH = path.resolve(
-	__dirname,
-	'../../assets/10x10_e2e_test_image_z9T8jK.png'
-);
-
-const TEST_TEXT_FILE_PATH = path.resolve(
-	__dirname,
-	'../../assets/test-file.txt'
-);
-
 /**
  * Helper to select an existing file from the media library modal.
  *
@@ -96,8 +86,15 @@ async function openQuickEditForPage( page, admin, pageTitle ) {
 					method: 'POST',
 					data: { meta: { featured_media_test: [] } },
 				} ),
-				requestUtils.uploadMedia( TEST_IMAGE_FILE_PATH ),
-				requestUtils.uploadMedia( TEST_TEXT_FILE_PATH ),
+				requestUtils.uploadMedia(
+					path.join(
+						'./test/e2e/assets',
+						'10x10_e2e_test_image_z9T8jK.png'
+					)
+				),
+				requestUtils.uploadMedia(
+					path.join( './test/e2e/assets', 'test-file.txt' )
+				),
 			] );
 		} );
 
