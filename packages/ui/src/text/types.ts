@@ -1,43 +1,12 @@
+import {
+	type Target,
+	type FontFamily,
+	type FontSize,
+	type FontWeight,
+	type LineHeight,
+	type ForegroundColor,
+} from '@wordpress/theme';
 import { type ComponentProps } from '../utils/types';
-
-type FontFamily = 'heading' | 'body' | 'mono';
-
-type FontSize = '2xs' | 'xs' | 'sm' | 'md' | 'lg' | 'xl';
-
-type FontWeight = 'regular' | 'medium';
-
-type LineHeight = '2xs' | 'xs' | 'sm' | 'md' | 'lg' | 'xl';
-
-type ForegroundColor =
-	| 'neutral'
-	| 'neutral-weak'
-	| 'neutral-active'
-	| 'neutral-disabled'
-	| 'neutral-strong'
-	| 'neutral-strong-active'
-	| 'neutral-strong-disabled'
-	| 'neutral-weak-disabled'
-	| 'brand'
-	| 'brand-active'
-	| 'brand-disabled'
-	| 'brand-strong'
-	| 'brand-strong-active'
-	| 'brand-strong-disabled'
-	| 'success'
-	| 'success-weak'
-	| 'info'
-	| 'info-weak'
-	| 'warning'
-	| 'warning-weak'
-	| 'caution'
-	| 'caution-weak'
-	| 'error'
-	| 'error-weak'
-	| 'error-active'
-	| 'error-disabled'
-	| 'error-strong'
-	| 'error-strong-active'
-	| 'error-strong-disabled';
 
 export interface TextProps extends ComponentProps< 'span' > {
 	/**
@@ -45,7 +14,7 @@ export interface TextProps extends ComponentProps< 'span' > {
 	 *
 	 * @default 'content'
 	 */
-	target?: string;
+	target?: Target;
 
 	/**
 	 * The foreground design token for text color.
