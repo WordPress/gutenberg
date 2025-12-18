@@ -22,11 +22,19 @@ describe( 'isNavigationCandidate', () => {
 		elements.inputNumber = document.createElement( 'input' );
 		elements.inputNumber.setAttribute( 'type', 'number' );
 
+		elements.inputListBox = document.createElement( 'input' );
+		elements.inputListBox.setAttribute( 'type', 'text' );
+		elements.inputListBox.setAttribute( 'role', 'listbox' );
+
+		elements.inputCombobox = document.createElement( 'input' );
+		elements.inputCombobox.setAttribute( 'type', 'text' );
+		elements.inputCombobox.setAttribute( 'role', 'combobox' );
+
 		elements.contentEditable = document.createElement( 'p' );
 		elements.contentEditable.contentEditable = true;
 	} );
 
-	it( 'should return true if vertically navigating input without modifier', () => {
+	it( 'returns true if vertically navigating input without modifier', () => {
 		[ UP, DOWN ].forEach( ( keyCode ) => {
 			const result = isNavigationCandidate(
 				elements.inputText,
@@ -38,7 +46,7 @@ describe( 'isNavigationCandidate', () => {
 		} );
 	} );
 
-	it( 'should return false if vertically navigating input with modifier', () => {
+	it( 'returns false if vertically navigating input with modifier', () => {
 		[ UP, DOWN ].forEach( ( keyCode ) => {
 			const result = isNavigationCandidate(
 				elements.inputText,
@@ -50,7 +58,31 @@ describe( 'isNavigationCandidate', () => {
 		} );
 	} );
 
-	it( 'should return false if vertically navigating inputs with vertical support like number', () => {
+	it( 'returns false if vertically navigating inputs with the listbox role', () => {
+		[ UP, DOWN ].forEach( ( keyCode ) => {
+			const result = isNavigationCandidate(
+				elements.inputListBox,
+				keyCode,
+				false
+			);
+
+			expect( result ).toBe( false );
+		} );
+	} );
+
+	it( 'returns false if vertically navigating inputs with the combobox role', () => {
+		[ UP, DOWN ].forEach( ( keyCode ) => {
+			const result = isNavigationCandidate(
+				elements.inputCombobox,
+				keyCode,
+				false
+			);
+
+			expect( result ).toBe( false );
+		} );
+	} );
+
+	it( 'returns false if vertically navigating inputs with vertical support like number', () => {
 		[ UP, DOWN ].forEach( ( keyCode ) => {
 			const result = isNavigationCandidate(
 				elements.inputNumber,
@@ -62,7 +94,19 @@ describe( 'isNavigationCandidate', () => {
 		} );
 	} );
 
-	it( 'should return false if horizontally navigating input', () => {
+	it( 'returns false if horizontally navigating number inputs', () => {
+		[ LEFT, RIGHT ].forEach( ( keyCode ) => {
+			const result = isNavigationCandidate(
+				elements.inputNumber,
+				keyCode,
+				false
+			);
+
+			expect( result ).toBe( false );
+		} );
+	} );
+
+	it( 'returns false if horizontally navigating input', () => {
 		[ LEFT, RIGHT ].forEach( ( keyCode ) => {
 			const result = isNavigationCandidate(
 				elements.inputText,
@@ -74,7 +118,7 @@ describe( 'isNavigationCandidate', () => {
 		} );
 	} );
 
-	it( 'should return true if horizontally navigating simple inputs like checkboxes', () => {
+	it( 'returns true if horizontally navigating simple inputs like checkboxes', () => {
 		[ LEFT, RIGHT ].forEach( ( keyCode ) => {
 			const result = isNavigationCandidate(
 				elements.inputCheckbox,
@@ -86,7 +130,7 @@ describe( 'isNavigationCandidate', () => {
 		} );
 	} );
 
-	it( 'should return true if horizontally navigating non-input', () => {
+	it( 'returns true if horizontally navigating non-input', () => {
 		[ LEFT, RIGHT ].forEach( ( keyCode ) => {
 			const result = isNavigationCandidate(
 				elements.contentEditable,
