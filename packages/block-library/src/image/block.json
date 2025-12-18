@@ -18,14 +18,16 @@
 	"attributes": {
 		"blob": {
 			"type": "string",
-			"role": "local"
+			"role": "local",
+			"group": "content"
 		},
 		"url": {
 			"type": "string",
 			"source": "attribute",
 			"selector": "img",
 			"attribute": "src",
-			"role": "content"
+			"role": "content",
+			"group": "content"
 		},
 		"alt": {
 			"type": "string",
@@ -33,73 +35,88 @@
 			"selector": "img",
 			"attribute": "alt",
 			"default": "",
-			"role": "content"
+			"role": "content",
+			"group": "content"
 		},
 		"caption": {
 			"type": "rich-text",
 			"source": "rich-text",
 			"selector": "figcaption",
-			"role": "content"
+			"role": "content",
+			"group": "content"
 		},
 		"lightbox": {
 			"type": "object",
 			"enabled": {
 				"type": "boolean"
-			}
+			},
+			"group": "settings"
 		},
 		"title": {
 			"type": "string",
 			"source": "attribute",
 			"selector": "img",
 			"attribute": "title",
-			"role": "content"
+			"role": "content",
+			"group": "content"
 		},
 		"href": {
 			"type": "string",
 			"source": "attribute",
 			"selector": "figure > a",
 			"attribute": "href",
-			"role": "content"
+			"role": "content",
+			"group": "settings"
 		},
 		"rel": {
 			"type": "string",
 			"source": "attribute",
 			"selector": "figure > a",
-			"attribute": "rel"
+			"attribute": "rel",
+			"group": "settings"
 		},
 		"linkClass": {
 			"type": "string",
 			"source": "attribute",
 			"selector": "figure > a",
-			"attribute": "class"
+			"attribute": "class",
+			"group": "settings"
 		},
 		"id": {
 			"type": "number",
-			"role": "content"
+			"role": "content",
+			"group": "content"
 		},
 		"width": {
-			"type": "string"
+			"type": "string",
+			"group": "settings"
 		},
 		"height": {
-			"type": "string"
+			"type": "string",
+			"group": "settings"
 		},
 		"aspectRatio": {
-			"type": "string"
+			"type": "string",
+			"group": "settings"
 		},
 		"scale": {
-			"type": "string"
+			"type": "string",
+			"group": "settings"
 		},
 		"sizeSlug": {
-			"type": "string"
+			"type": "string",
+			"group": "settings"
 		},
 		"linkDestination": {
-			"type": "string"
+			"type": "string",
+			"group": "settings"
 		},
 		"linkTarget": {
 			"type": "string",
 			"source": "attribute",
 			"selector": "figure > a",
-			"attribute": "target"
+			"attribute": "target",
+			"group": "settings"
 		}
 	},
 	"supports": {

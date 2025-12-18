@@ -189,6 +189,11 @@
 							"type": "string",
 							"enum": [ "content", "local" ]
 						},
+						"group": {
+							"description": "Categorizes the attribute for UI organization.\n\nThe `content` value marks the attribute as user-editable data (text, media). The `list` value marks the attribute as related to inner blocks structure. The `settings` value marks the attribute as block configuration. The `styles` value marks the attribute as visual presentation.",
+							"type": "string",
+							"enum": [ "content", "list", "settings", "styles" ]
+						},
 						"default": {
 							"description": "A block attribute can contain a default value, which will be used if the type and source do not match anything within the block content.\n\nThe value is provided by the default field, and the value should match the expected format of the attribute."
 						}

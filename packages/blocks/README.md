@@ -102,6 +102,19 @@ _Returns_
 
 -   `Object`: All block attributes.
 
+### getBlockAttributesNamesByGroup
+
+Filter block attributes by `group` and return their names.
+
+_Parameters_
+
+-   _name_ `string`: Block attribute's name.
+-   _group_ `string`: The group of a block attribute ('content', 'list', 'settings', 'styles').
+
+_Returns_
+
+-   `string[]`: The attribute names that have the provided group.
+
 ### getBlockAttributesNamesByRole
 
 Filter block attributes by `role` and return their names.

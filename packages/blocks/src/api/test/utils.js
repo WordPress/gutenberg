@@ -16,6 +16,7 @@ import {
 	isBlockRegistered,
 	__experimentalSanitizeBlockAttributes,
 	getBlockAttributesNamesByRole,
+	getBlockAttributesNamesByGroup,
 	isContentBlock,
 } from '../utils';
 
@@ -396,6 +397,93 @@ describe( 'getBlockAttributesNamesByRole', () => {
 		// A block with no `role` in any attributes.
 		expect(
 			getBlockAttributesNamesByRole( 'core/test-block-2', 'content' )
+		).toEqual( [] );
+	} );
+} );
+
+describe( 'getBlockAttributesNamesByGroup', () => {
+	beforeAll( () => {
+		registerBlockType( 'core/test-block-group-1', {
+			attributes: {
+				url: {
+					type: 'string',
+					group: 'content',
+				},
+				alt: {
+					type: 'string',
+					group: 'content',
+				},
+				lightbox: {
+					type: 'object',
+					group: 'settings',
+				},
+				align: {
+					type: 'string',
+				},
+			},
+			save: noop,
+			category: 'media',
+			title: 'test block with groups',
+		} );
+		registerBlockType( 'core/test-block-group-2', {
+			attributes: {
+				content: { type: 'string' },
+				color: { type: 'string' },
+			},
+			save: noop,
+			category: 'text',
+			title: 'test block without groups',
+		} );
+		registerBlockType( 'core/test-block-group-3', {
+			save: noop,
+			category: 'text',
+			title: 'test block no attributes',
+		} );
+	} );
+	afterAll( () => {
+		[
+			'core/test-block-group-1',
+			'core/test-block-group-2',
+			'core/test-block-group-3',
+		].forEach( unregisterBlockType );
+	} );
+	it( 'should return empty array if block has no attributes', () => {
+		expect(
+			getBlockAttributesNamesByGroup( 'core/test-block-group-3' )
+		).toEqual( [] );
+	} );
+	it( 'should return all attribute names if no group is provided', () => {
+		expect(
+			getBlockAttributesNamesByGroup( 'core/test-block-group-1' )
+		).toEqual(
+			expect.arrayContaining( [ 'url', 'alt', 'lightbox', 'align' ] )
+		);
+	} );
+	it( 'should return proper results with existing attributes and provided group', () => {
+		expect(
+			getBlockAttributesNamesByGroup(
+				'core/test-block-group-1',
+				'content'
+			)
+		).toEqual( expect.arrayContaining( [ 'url', 'alt' ] ) );
+		expect(
+			getBlockAttributesNamesByGroup(
+				'core/test-block-group-1',
+				'settings'
+			)
+		).toEqual( [ 'lightbox' ] );
+		expect(
+			getBlockAttributesNamesByGroup(
+				'core/test-block-group-1',
+				'not-exists'
+			)
+		).toEqual( [] );
+		// A block with no `group` in any attributes.
+		expect(
+			getBlockAttributesNamesByGroup(
+				'core/test-block-group-2',
+				'content'
+			)
 		).toEqual( [] );
 	} );
 } );

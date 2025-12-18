@@ -9,19 +9,19 @@ import { __ } from '@wordpress/i18n';
  */
 import BlockQuickNavigation from '../block-quick-navigation';
 import ContentOnlyControls from '../content-only-controls';
+import InspectorControls from '../inspector-controls';
 
 const ContentTab = ( { rootClientId, contentClientIds } ) => {
-	if ( ! contentClientIds || contentClientIds.length === 0 ) {
-		return null;
-	}
+	const hasContentClientIds = contentClientIds && contentClientIds.length > 0;
 
 	const shouldShowContentOnlyControls =
+		hasContentClientIds &&
 		window?.__experimentalContentOnlyPatternInsertion &&
 		window?.__experimentalContentOnlyInspectorFields;
 
 	return (
 		<>
-			{ ! shouldShowContentOnlyControls && (
+			{ hasContentClientIds && ! shouldShowContentOnlyControls && (
 				<PanelBody title={ __( 'Content' ) }>
 					<BlockQuickNavigation clientIds={ contentClientIds } />
 				</PanelBody>
@@ -29,6 +29,7 @@ const ContentTab = ( { rootClientId, contentClientIds } ) => {
 			{ shouldShowContentOnlyControls && (
 				<ContentOnlyControls rootClientId={ rootClientId } />
 			) }
+			<InspectorControls.Slot group="content" />
 		</>
 	);
 };

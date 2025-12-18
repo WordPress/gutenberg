@@ -10,6 +10,11 @@ import deprecated from '@wordpress/deprecated';
 import { useEffect, useContext } from '@wordpress/element';
 
 /**
+ * WordPress dependencies
+ */
+import { getBlockType } from '@wordpress/blocks';
+
+/**
  * Internal dependencies
  */
 import {
@@ -18,12 +23,37 @@ import {
 } from '../block-edit/context';
 import groups from './groups';
 
+/**
+ * Resolves the group for inspector controls based on attribute metadata.
+ *
+ * @param {string} blockName     The block name.
+ * @param {string} attributeName The attribute name.
+ * @return {string} The resolved group.
+ */
+function getAttributeGroup( blockName, attributeName ) {
+	const blockType = getBlockType( blockName );
+	const attribute = blockType?.attributes?.[ attributeName ];
+
+	if ( attribute?.group ) {
+		return attribute.group;
+	}
+
+	if ( attribute?.role === 'content' ) {
+		return 'content';
+	}
+
+	return 'default';
+}
+
 export default function InspectorControlsFill( {
 	children,
-	group = 'default',
+	group,
+	attribute,
 	__experimentalGroup,
 	resetAllFilter,
 } ) {
+	const context = useBlockEditContext();
+
 	if ( __experimentalGroup ) {
 		deprecated(
 			'`__experimentalGroup` property in `InspectorControlsFill`',
@@ -33,13 +63,25 @@ export default function InspectorControlsFill( {
 				alternative: '`group`',
 			}
 		);
-		group = __experimentalGroup;
 	}
 
-	const context = useBlockEditContext();
-	const Fill = groups[ group ]?.Fill;
+	if ( group && attribute ) {
+		warning(
+			'InspectorControls: `group` and `attribute` props are mutually exclusive. Use one or the other.'
+		);
+	}
+
+	const resolvedGroup =
+		__experimentalGroup ??
+		group ??
+		( attribute ? getAttributeGroup( context.name, attribute ) : null ) ??
+		'default';
+
+	const Fill = groups[ resolvedGroup ]?.Fill;
 	if ( ! Fill ) {
-		warning( `Unknown InspectorControls group "${ group }" provided.` );
+		warning(
+			`Unknown InspectorControls group "${ resolvedGroup }" provided.`
+		);
 		return null;
 	}
 	if ( ! context[ mayDisplayControlsKey ] ) {

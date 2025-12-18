@@ -410,6 +410,29 @@ export const __experimentalGetBlockAttributesNamesByRole = ( ...args ) => {
 };
 
 /**
+ * Filter block attributes by `group` and return their names.
+ *
+ * @param {string} name  Block attribute's name.
+ * @param {string} group The group of a block attribute ('content', 'list', 'settings', 'styles').
+ *
+ * @return {string[]} The attribute names that have the provided group.
+ */
+export function getBlockAttributesNamesByGroup( name, group ) {
+	const attributes = getBlockType( name )?.attributes;
+	if ( ! attributes ) {
+		return [];
+	}
+	const attributesNames = Object.keys( attributes );
+	if ( ! group ) {
+		return attributesNames;
+	}
+
+	return attributesNames.filter(
+		( attributeName ) => attributes[ attributeName ]?.group === group
+	);
+}
+
+/**
  * Checks if a block is a content block by examining its attributes.
  * A block is considered a content block if it has at least one attribute
  * with a role of 'content'.

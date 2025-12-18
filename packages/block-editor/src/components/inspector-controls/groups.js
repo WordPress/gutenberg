@@ -11,6 +11,7 @@ const InspectorControlsBackground = createSlotFill(
 );
 const InspectorControlsBorder = createSlotFill( 'InspectorControlsBorder' );
 const InspectorControlsColor = createSlotFill( 'InspectorControlsColor' );
+const InspectorControlsContent = createSlotFill( 'InspectorControlsContent' );
 const InspectorControlsFilter = createSlotFill( 'InspectorControlsFilter' );
 const InspectorControlsDimensions = createSlotFill(
 	'InspectorControlsDimensions'
@@ -30,6 +31,7 @@ const groups = {
 	bindings: InspectorControlsBindings,
 	border: InspectorControlsBorder,
 	color: InspectorControlsColor,
+	content: InspectorControlsContent,
 	dimensions: InspectorControlsDimensions,
 	effects: InspectorControlsEffects,
 	filter: InspectorControlsFilter,

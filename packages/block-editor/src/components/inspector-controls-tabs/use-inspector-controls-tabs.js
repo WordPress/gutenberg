@@ -40,6 +40,7 @@ export default function useInspectorControlsTabs(
 		bindings: bindingsGroup,
 		border: borderGroup,
 		color: colorGroup,
+		content: contentGroup,
 		default: defaultGroup,
 		dimensions: dimensionsGroup,
 		list: listGroup,
@@ -81,9 +82,12 @@ export default function useInspectorControlsTabs(
 		...( hasListFills && hasStyleFills > 1 ? advancedFills : [] ),
 	];
 
-	const hasContentTab = !! (
-		contentClientIds && contentClientIds.length > 0
-	);
+	// Content Tab: Show if there are nested content blocks (contentClientIds)
+	// or if there are any fills for the content group.
+	const contentFills = useSlotFills( contentGroup.name );
+	const hasContentFills = !! contentFills && contentFills.length;
+	const hasContentTab =
+		( contentClientIds && contentClientIds.length > 0 ) || hasContentFills;
 
 	// Add the tabs in the order that they will default to if available.
 	// List View > Content > Settings > Styles.

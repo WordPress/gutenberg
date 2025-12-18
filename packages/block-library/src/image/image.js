@@ -787,10 +787,10 @@ export default function Image( {
 					/>
 				</BlockControls>
 			) }
-			<InspectorControls>
+			<InspectorControls attribute="alt">
 				<ToolsPanel
-					label={ __( 'Settings' ) }
-					resetAll={ resetAll }
+					label={ __( 'Content' ) }
+					resetAll={ () => setAttributes( { alt: undefined } ) }
 					dropdownMenuProps={ dropdownMenuProps }
 				>
 					{ isSingleSelected && (
@@ -834,6 +834,14 @@ export default function Image( {
 							/>
 						</ToolsPanelItem>
 					) }
+				</ToolsPanel>
+			</InspectorControls>
+			<InspectorControls>
+				<ToolsPanel
+					label={ __( 'Settings' ) }
+					resetAll={ resetAll }
+					dropdownMenuProps={ dropdownMenuProps }
+				>
 					{ dimensionsControl }
 					{ !! imageSizeOptions.length && (
 						<ResolutionTool
