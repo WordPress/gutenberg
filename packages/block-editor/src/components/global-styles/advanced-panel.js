@@ -18,6 +18,7 @@ export default function AdvancedPanel( {
 	value,
 	onChange,
 	inheritedValue = value,
+	help,
 } ) {
 	// Custom CSS
 	const [ cssError, setCSSError ] = useState( null );
@@ -69,12 +70,15 @@ export default function AdvancedPanel( {
 				</Notice>
 			) }
 			<TextareaControl
+				__nextHasNoMarginBottom
+				__next40pxDefaultSize
 				label={ __( 'Additional CSS' ) }
 				value={ customCSS }
 				onChange={ ( newValue ) => handleOnChange( newValue ) }
 				onBlur={ handleOnBlur }
 				className="block-editor-global-styles-advanced-panel__custom-css-input"
 				spellCheck={ false }
+				help={ help }
 			/>
 		</VStack>
 	);

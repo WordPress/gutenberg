@@ -347,19 +347,17 @@ function ScreenBlock( { name, variation }: ScreenBlockProps ) {
 
 			{ canEditCSS && (
 				<PanelBody title={ __( 'Advanced' ) } initialOpen={ false }>
-					<p>
-						{ sprintf(
+					<StylesAdvancedPanel
+						value={ style }
+						onChange={ setStyle }
+						inheritedValue={ inheritedStyle }
+						help={ sprintf(
 							// translators: %s: is the name of a block e.g., 'Image' or 'Table'.
 							__(
 								'Add your own CSS to customize the appearance of the %s block. You do not need to include a CSS selector, just add the property and value.'
 							),
 							blockType?.title
 						) }
-					</p>
-					<StylesAdvancedPanel
-						value={ style }
-						onChange={ setStyle }
-						inheritedValue={ inheritedStyle }
 					/>
 				</PanelBody>
 			) }

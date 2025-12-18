@@ -1153,7 +1153,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * @param string $to_append Selector to append.
 	 * @return string The new selector.
 	 */
-	protected static function append_to_selector( $selector, $to_append ) {
+	public static function append_to_selector( $selector, $to_append ) {
 		if ( ! str_contains( $selector, ',' ) ) {
 			return $selector . $to_append;
 		}
@@ -1494,7 +1494,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * @param string $selector The selector to nest.
 	 * @return string The processed CSS.
 	 */
-	protected function process_blocks_custom_css( $css, $selector ) {
+	public static function process_blocks_custom_css( $css, $selector ) {
 		$processed_css = '';
 
 		if ( empty( $css ) ) {
