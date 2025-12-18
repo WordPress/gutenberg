@@ -24,8 +24,8 @@ See [Developing with theme.json](/docs/how-to-guides/themes/global-settings-and-
 ## settings
 
 Settings for the block editor and individual blocks. These include things like:
-- Which customization options should be available to the user.
-- The default colors, font sizes... available to the user.
+- Which customization options should be available to the user. 
+- The default colors, font sizes... available to the user. 
 - CSS custom properties and class names used in styles.
 - And the default layout of the editor (widths and available alignments).
 
