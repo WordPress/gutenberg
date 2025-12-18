@@ -29,15 +29,25 @@ describe( 'filesizeField', () => {
 				item,
 			} );
 
-			// 0 bytes returns empty string because getValue uses a truthy check on filesize
-			// Note: formatFileSize would return "0 B" if called with 0, but it's never reached
 			expect( result ).toBe( '' );
 		} );
 
-		it( 'formats bytes (less than 1 KB)', () => {
+		it.each( [
+			[ 512, /^512\s+B$/, 'bytes (less than 1 KB)' ],
+			[ 1024 * 50, /^50\s+KB$/, '50 kilobytes' ],
+			[ 1024 * 1024 * 5, /^5\s+MB$/, '5 megabytes' ],
+			[ 1024 * 1024 * 1024 * 2.5, /^2\.5\s+GB$/, '2.5 gigabytes' ],
+			[ 1024 * 1024 * 1024 * 1024 * 1.5, /^1\.5\s+TB$/, '1.5 terabytes' ],
+			[
+				1024 * 1024 * 3.14159,
+				/^3\.14\s+MB$/,
+				'fractional sizes with proper decimals',
+			],
+			[ 1024, /^1\s+KB$/, 'boundary value (exactly 1 KB)' ],
+		] )( 'formats %s bytes correctly: %s', ( filesize, expected ) => {
 			const item = {
 				media_details: {
-					filesize: 512,
+					filesize,
 					sizes: {},
 				},
 			} as MediaItem;
@@ -46,119 +56,15 @@ describe( 'filesizeField', () => {
 				item,
 			} );
 
-			expect( result ).toMatch( /^512\s+B$/ );
+			expect( result ).toMatch( expected );
 		} );
 
-		it( 'formats kilobytes', () => {
-			const item = {
-				media_details: {
-					filesize: 1024 * 50, // 50 KB
-					sizes: {},
-				},
-			} as MediaItem;
-
+		it.each( [
+			[ { media_details: { sizes: {} } }, 'when filesize is missing' ],
+			[ {}, 'when media_details is missing' ],
+		] )( 'returns empty string %s', ( item ) => {
 			const result = filesizeField.getValue?.( {
-				item,
-			} );
-
-			expect( result ).toMatch( /^50\s+KB$/ );
-		} );
-
-		it( 'formats megabytes', () => {
-			const item = {
-				media_details: {
-					filesize: 1024 * 1024 * 5, // 5 MB
-					sizes: {},
-				},
-			} as MediaItem;
-
-			const result = filesizeField.getValue?.( {
-				item,
-			} );
-
-			expect( result ).toMatch( /^5\s+MB$/ );
-		} );
-
-		it( 'formats gigabytes', () => {
-			const item = {
-				media_details: {
-					filesize: 1024 * 1024 * 1024 * 2.5, // 2.5 GB
-					sizes: {},
-				},
-			} as MediaItem;
-
-			const result = filesizeField.getValue?.( {
-				item,
-			} );
-
-			expect( result ).toMatch( /^2\.5\s+GB$/ );
-		} );
-
-		it( 'formats terabytes', () => {
-			const item = {
-				media_details: {
-					filesize: 1024 * 1024 * 1024 * 1024 * 1.5, // 1.5 TB
-					sizes: {},
-				},
-			} as MediaItem;
-
-			const result = filesizeField.getValue?.( {
-				item,
-			} );
-
-			expect( result ).toMatch( /^1\.5\s+TB$/ );
-		} );
-
-		it( 'formats with proper decimals for fractional sizes', () => {
-			const item = {
-				media_details: {
-					filesize: 1024 * 1024 * 3.14159, // ~3.14 MB
-					sizes: {},
-				},
-			} as MediaItem;
-
-			const result = filesizeField.getValue?.( {
-				item,
-			} );
-
-			// Should have at most 2 decimal places
-			expect( result ).toMatch( /^3\.14\s+MB$/ );
-		} );
-
-		it( 'uses correct unit for boundary values', () => {
-			const item = {
-				media_details: {
-					filesize: 1024, // Exactly 1 KB
-					sizes: {},
-				},
-			} as MediaItem;
-
-			const result = filesizeField.getValue?.( {
-				item,
-			} );
-
-			expect( result ).toMatch( /^1\s+KB$/ );
-		} );
-
-		it( 'returns empty string when filesize is missing', () => {
-			const item = {
-				media_details: {
-					sizes: {},
-				},
-			} as MediaItem;
-
-			const result = filesizeField.getValue?.( {
-				item,
-			} );
-
-			expect( result ).toBe( '' );
-		} );
-
-		it( 'returns empty string when media_details is missing', () => {
-			const item = {} as MediaItem;
-
-			const result = filesizeField.getValue?.( {
-				item,
+				item: item as MediaItem,
 			} );
 
 			expect( result ).toBe( '' );
@@ -166,50 +72,15 @@ describe( 'filesizeField', () => {
 	} );
 
 	describe( 'isVisible', () => {
-		it( 'returns true when filesize exists', () => {
-			const item = {
-				media_details: {
-					filesize: 1024,
-					sizes: {},
-				},
-			} as MediaItem;
+		it.each( [
+			[ { media_details: { filesize: 1024, sizes: {} } }, true ],
+			[ { media_details: { filesize: 0, sizes: {} } }, false ],
+			[ { media_details: { sizes: {} } }, false ],
+			[ {}, false ],
+		] )( 'returns %s for item %#', ( item, expected ) => {
+			const result = filesizeField.isVisible?.( item as MediaItem );
 
-			const result = filesizeField.isVisible?.( item );
-
-			expect( result ).toBe( true );
-		} );
-
-		it( 'returns false when filesize is 0', () => {
-			const item = {
-				media_details: {
-					filesize: 0,
-					sizes: {},
-				},
-			} as MediaItem;
-
-			const result = filesizeField.isVisible?.( item );
-
-			expect( result ).toBe( false );
-		} );
-
-		it( 'returns false when filesize is missing', () => {
-			const item = {
-				media_details: {
-					sizes: {},
-				},
-			} as MediaItem;
-
-			const result = filesizeField.isVisible?.( item );
-
-			expect( result ).toBe( false );
-		} );
-
-		it( 'returns false when media_details is missing', () => {
-			const item = {} as MediaItem;
-
-			const result = filesizeField.isVisible?.( item );
-
-			expect( result ).toBe( false );
+			expect( result ).toBe( expected );
 		} );
 	} );
 } );
