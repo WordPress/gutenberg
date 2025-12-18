@@ -1350,7 +1350,7 @@ Function that formats the field value for display by computing it from the field
 
 -   Type: `function`.
 -   Optional.
--   Each field `type` provides a default implementation that formats values appropriately (e.g., dates consider the `format` settings, numbers get thousand separators, etc.).
+-   Each field `type` provides a default implementation that formats values appropriately (e.g., considers weekStartsOn for date, thousand separators for number, etc.).
 -   Args:
     -   `item`: the data item containing the value.
     -   `field`: the normalized field configuration.
