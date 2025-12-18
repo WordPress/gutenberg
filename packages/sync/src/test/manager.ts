@@ -146,10 +146,7 @@ describe( 'SyncManager', () => {
 			);
 
 			expect( mockProviderCreator ).toHaveBeenCalledTimes( 1 );
-			expect( mockProviderCreator ).toHaveBeenCalledWith(
-				'post',
-				'123'
-			);
+			expect( mockProviderCreator ).toHaveBeenCalledWith( 'post', '123' );
 		} );
 
 		it( 'does not load entity when no providers are available', async () => {
