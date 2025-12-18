@@ -15,6 +15,7 @@
 		{ "path": "../compose" },
 		{ "path": "../core-data" },
 		{ "path": "../data" },
+		{ "path": "../dataviews" },
 		{ "path": "../date" },
 		{ "path": "../deprecated" },
 		{ "path": "../dom" },
