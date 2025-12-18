@@ -214,5 +214,5 @@ if ( gutenberg_is_experiment_enabled( 'gutenberg-full-page-client-side-navigatio
 
 // Block patterns (only load when navigation overlays experiment is enabled).
 if ( gutenberg_is_experiment_enabled( 'gutenberg-customizable-navigation-overlays' ) ) {
-	require __DIR__ . '/block-patterns.php';
+	require __DIR__ . '/experimental/overlay-patterns.php';
 }

@@ -1,19 +1,20 @@
 <?php
 /**
- * Block patterns registration.
+ * Block patterns registration for navigation overlays.
  *
  * @package gutenberg
  */
 
 /**
- * Registers additional core block patterns for the Gutenberg plugin.
+ * Registers block patterns for navigation overlays.
  *
- * This function adds patterns that complement the existing WordPress core patterns.
- * It runs after core patterns are registered to ensure all patterns are available.
+ * This function adds patterns that are specific to the navigation overlays
+ * experiment. It runs after core patterns are registered to ensure all patterns
+ * are available.
  *
  * @since 6.0.0
  */
-function gutenberg_register_core_block_patterns() {
+function gutenberg_register_overlay_block_patterns() {
 	register_block_pattern_category(
 		'navigation',
 		array(
@@ -42,4 +43,5 @@ function gutenberg_register_core_block_patterns() {
 	);
 }
 
-add_action( 'init', 'gutenberg_register_core_block_patterns', 20 );
+add_action( 'init', 'gutenberg_register_overlay_block_patterns', 20 );
+
