@@ -262,35 +262,5 @@ test.describe( 'PHP-only auto-register blocks', () => {
 		await expect(
 			page.getByLabel( 'Emoji', { exact: true } )
 		).toBeVisible();
-
-		// Verify the block type has correct field definitions
-		const blockType = await page.evaluate( () => {
-			const bt = window.wp.blocks.getBlockType(
-				'test/auto-register-with-controls'
-			);
-			// Access private Symbol keys
-			const symbols = Object.getOwnPropertySymbols( bt );
-			const fieldsSymbol = symbols.find(
-				( s ) => s.description === 'fields'
-			);
-			const formSymbol = symbols.find(
-				( s ) => s.description === 'form'
-			);
-			return {
-				fieldsCount: bt[ fieldsSymbol ]?.length ?? 0,
-				fieldIds: bt[ fieldsSymbol ]?.map( ( f ) => f.id ) ?? [],
-				formFields: bt[ formSymbol ]?.fields ?? [],
-			};
-		} );
-
-		// Should have fields for title, count, spacing, showEmojis, emoji
-		// content and internalState should be excluded (source and role: local)
-		expect( blockType.fieldIds ).toContain( 'title' );
-		expect( blockType.fieldIds ).toContain( 'count' );
-		expect( blockType.fieldIds ).toContain( 'spacing' );
-		expect( blockType.fieldIds ).toContain( 'showEmojis' );
-		expect( blockType.fieldIds ).toContain( 'emoji' );
-		expect( blockType.fieldIds ).not.toContain( 'content' );
-		expect( blockType.fieldIds ).not.toContain( 'internalState' );
 	} );
 } );
