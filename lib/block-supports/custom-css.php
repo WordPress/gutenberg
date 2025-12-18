@@ -22,7 +22,7 @@ $gutenberg_block_custom_css = '';
  * @return string The custom CSS class name.
  */
 function gutenberg_get_custom_css_class_name( $block ) {
-	return 'wp-custom-css-' . md5( serialize( $block ) );
+	return wp_unique_id_from_values( $block, 'wp-custom-css-' );
 }
 
 /**
