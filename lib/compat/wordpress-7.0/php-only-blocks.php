@@ -43,9 +43,11 @@ add_action( 'enqueue_block_editor_assets', 'gutenberg_register_auto_register_blo
  * is created (via WP_Block_Supports::register_attributes()), so any attributes
  * present at this stage are user-defined.
  *
- * This allows generateFieldsFromAttributes() to distinguish between
- * user-defined attributes (which should get DataForm fields) and
- * support-added attributes (which have their own UI controls).
+ * The marker tells generateFieldsFromAttributes() which attributes should
+ * get DataForm inspector controls. Attributes are excluded if they:
+ * - Have a 'source' (HTML-derived, edited inline not via inspector)
+ * - Have role 'local' (internal state, not user-configurable)
+ * - Were added by block supports (added after this filter runs)
  *
  * @param array $settings Array of block type arguments for registration.
  * @return array Modified settings with marked attributes.
@@ -61,7 +63,15 @@ function gutenberg_mark_auto_field_attributes( $settings ) {
 		return $settings;
 	}
 
-	foreach ( array_keys( $settings['attributes'] ) as $name ) {
+	foreach ( $settings['attributes'] as $name => $def ) {
+		// Skip HTML-derived attributes (edited inline, not via inspector).
+		if ( ! empty( $def['source'] ) ) {
+			continue;
+		}
+		// Skip internal attributes (not user-configurable).
+		if ( isset( $def['role'] ) && 'local' === $def['role'] ) {
+			continue;
+		}
 		$settings['attributes'][ $name ]['__experimentalAutoField'] = true;
 	}
 

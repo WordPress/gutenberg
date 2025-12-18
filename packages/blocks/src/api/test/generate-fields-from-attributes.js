@@ -117,48 +117,6 @@ describe( 'generateFieldsFromAttributes', () => {
 		} );
 	} );
 
-	it( 'should exclude attributes with source property', () => {
-		const attributes = {
-			message: {
-				type: 'string',
-				default: 'Hello',
-				__experimentalAutoField: true,
-			},
-			content: {
-				type: 'string',
-				source: 'html',
-				__experimentalAutoField: true,
-			},
-		};
-
-		const result = generateFieldsFromAttributes( attributes );
-
-		expect( result.fields ).toHaveLength( 1 );
-		expect( result.fields[ 0 ].id ).toBe( 'message' );
-		expect( result.form.fields ).not.toContain( 'content' );
-	} );
-
-	it( 'should exclude attributes with role: local', () => {
-		const attributes = {
-			message: {
-				type: 'string',
-				default: 'Hello',
-				__experimentalAutoField: true,
-			},
-			internalState: {
-				type: 'string',
-				role: 'local',
-				__experimentalAutoField: true,
-			},
-		};
-
-		const result = generateFieldsFromAttributes( attributes );
-
-		expect( result.fields ).toHaveLength( 1 );
-		expect( result.fields[ 0 ].id ).toBe( 'message' );
-		expect( result.form.fields ).not.toContain( 'internalState' );
-	} );
-
 	it( 'should skip unsupported attribute types', () => {
 		const attributes = markForAutoField( {
 			message: {

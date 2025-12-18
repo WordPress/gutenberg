@@ -12,18 +12,7 @@ export function generateFieldsFromAttributes( attributes ) {
 	const fieldIds = [];
 
 	Object.entries( attributes ).forEach( ( [ name, def ] ) => {
-		// Only process attributes marked for auto-field generation.
-		// This marker is added before block supports add their attributes,
-		// ensuring only user-defined attributes get DataForm fields.
 		if ( ! def.__experimentalAutoField ) {
-			return;
-		}
-		// Skip HTML-derived attributes (edited inline, not via sidebar)
-		if ( def.source ) {
-			return;
-		}
-		// Skip internal attributes
-		if ( def.role === 'local' ) {
 			return;
 		}
 
