@@ -4,16 +4,45 @@
 import timezoneMock from 'timezone-mock';
 
 /**
+ * WordPress dependencies
+ */
+import { getSettings, setSettings, type DateSettings } from '@wordpress/date';
+
+/**
  * Internal dependencies
  */
 import { inputToDate } from '../utils';
 
 describe( 'inputToDate', () => {
+	let originalSettings: DateSettings;
+
+	beforeAll( () => {
+		originalSettings = getSettings();
+	} );
+
 	afterEach( () => {
 		timezoneMock.unregister();
 	} );
 
-	describe( 'timezoneless strings parsed as UTC', () => {
+	afterAll( () => {
+		setSettings( originalSettings );
+	} );
+
+	describe( 'timezoneless strings', () => {
+		beforeEach( () => {
+			// Default settings are UTC, but make it explicit so these tests
+			// don't depend on global settings state.
+			setSettings( {
+				...originalSettings,
+				timezone: {
+					offset: 0,
+					offsetFormatted: '0',
+					string: '',
+					abbr: '',
+				},
+			} );
+		} );
+
 		describe.each( [
 			{
 				timezone: 'US/Pacific' as const,
@@ -64,6 +93,55 @@ describe( 'inputToDate', () => {
 				expect( result.getUTCHours() ).toBe( 0 );
 				expect( result.getUTCMinutes() ).toBe( 0 );
 				expect( result.getUTCSeconds() ).toBe( 0 );
+			} );
+		} );
+	} );
+
+	describe( 'timezoneless strings with a site timezone string (DST-aware)', () => {
+		beforeEach( () => {
+			setSettings( {
+				...originalSettings,
+				timezone: {
+					offset: -5,
+					offsetFormatted: '-5',
+					string: 'America/New_York',
+					abbr: 'EST',
+				},
+			} );
+		} );
+
+		describe.each( [
+			{
+				timezone: 'US/Pacific' as const,
+				description: 'Pacific time (behind UTC)',
+			},
+			{
+				timezone: 'UTC' as const,
+				description: 'UTC (zero offset)',
+			},
+			{
+				timezone: 'Australia/Adelaide' as const,
+				description: 'Adelaide (ahead of UTC)',
+			},
+		] )( 'in $description', ( { timezone } ) => {
+			beforeEach( () => {
+				timezoneMock.register( timezone );
+			} );
+
+			it( 'should interpret midnight using site timezone (winter)', () => {
+				// Jan 10 is Eastern Standard Time in New York (UTC-5)
+				const result = inputToDate( '2025-01-10T00:00:00' );
+				expect( result.toISOString() ).toBe(
+					'2025-01-10T05:00:00.000Z'
+				);
+			} );
+
+			it( 'should interpret midnight using site timezone (summer/DST)', () => {
+				// Mar 10 is Eastern Daylight Time in New York (UTC-4)
+				const result = inputToDate( '2025-03-10T00:00:00' );
+				expect( result.toISOString() ).toBe(
+					'2025-03-10T04:00:00.000Z'
+				);
 			} );
 		} );
 	} );

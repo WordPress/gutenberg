@@ -8,7 +8,7 @@ import { startOfMinute } from 'date-fns';
  */
 import { useState, useMemo, useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { dateI18n, getSettings } from '@wordpress/date';
+import { date as formatDate } from '@wordpress/date';
 
 /**
  * Internal dependencies
@@ -92,23 +92,19 @@ export function TimePicker( {
 		{ value: '12', label: __( 'December' ) },
 	] as const;
 
-	const { day, month, year, minutes, hours } = useMemo( () => {
-		// Internal date is UTC-normalized, but should be displayed using
-		// configured timezone offset.
-		const { timezone } = getSettings();
-		const offsetMinutes = timezone.offset * 60;
-		return {
-			day: dateI18n( 'd', date, offsetMinutes ),
-			month: dateI18n(
+	const { day, month, year, minutes, hours } = useMemo(
+		() => ( {
+			day: formatDate( 'd', date ),
+			month: formatDate(
 				'm',
-				date,
-				offsetMinutes
+				date
 			) as ( typeof monthOptions )[ number ][ 'value' ],
-			year: dateI18n( 'Y', date, offsetMinutes ),
-			minutes: dateI18n( 'i', date, offsetMinutes ),
-			hours: dateI18n( 'H', date, offsetMinutes ),
-		};
-	}, [ date ] );
+			year: formatDate( 'Y', date ),
+			minutes: formatDate( 'i', date ),
+			hours: formatDate( 'H', date ),
+		} ),
+		[ date ]
+	);
 
 	const buildNumberControlChangeCallback = ( method: 'date' | 'year' ) => {
 		const callback: InputChangeCallback = ( value, { event } ) => {
@@ -125,12 +121,7 @@ export function TimePicker( {
 				[ method ]: numberValue,
 			} );
 			setDate( newDate );
-
-			// Format output using configured timezone offset
-			const { timezone } = getSettings();
-			onChange?.(
-				dateI18n( TIMEZONELESS_FORMAT, newDate, timezone.offset * 60 )
-			);
+			onChange?.( formatDate( TIMEZONELESS_FORMAT, newDate ) );
 		};
 		return callback;
 	};
@@ -146,12 +137,7 @@ export function TimePicker( {
 			minutes: newMinutes,
 		} );
 		setDate( newDate );
-
-		// Format output using configured timezone offset
-		const { timezone } = getSettings();
-		onChange?.(
-			dateI18n( TIMEZONELESS_FORMAT, newDate, timezone.offset * 60 )
-		);
+		onChange?.( formatDate( TIMEZONELESS_FORMAT, newDate ) );
 	};
 
 	const dayField = (
@@ -190,16 +176,7 @@ export function TimePicker( {
 						month: Number( value ) - 1,
 					} );
 					setDate( newDate );
-
-					// Format output using configured timezone offset
-					const { timezone } = getSettings();
-					onChange?.(
-						dateI18n(
-							TIMEZONELESS_FORMAT,
-							newDate,
-							timezone.offset * 60
-						)
-					);
+					onChange?.( formatDate( TIMEZONELESS_FORMAT, newDate ) );
 				} }
 			/>
 		</MonthSelectWrapper>

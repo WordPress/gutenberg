@@ -6,7 +6,7 @@ import { UTCDateMini } from '@date-fns/utc';
 /**
  * WordPress dependencies
  */
-import { getSettings } from '@wordpress/date';
+import { date as formatDate, getDate } from '@wordpress/date';
 
 /**
  * Internal dependencies
@@ -25,10 +25,9 @@ import { COMMIT, PRESS_DOWN, PRESS_UP } from '../input-control/reducer/actions';
  */
 export function inputToDate( input: Date | string | number ): Date {
 	if ( typeof input === 'string' ) {
-		// Strings without timezone indicators are parsed as UTC to prevent day-
-		// shift bugs across browser timezones. Note that JavaScript doesn't
-		// fully support ISO-8601 time strings, so the behavior of passing these
-		// through to the Date constructor is non-deterministic.
+		// Note that JavaScript doesn't fully support ISO-8601 time strings, so
+		// the behavior of passing these through to the Date constructor is
+		// non-deterministic.
 		//
 		// See: https://tc39.es/ecma262/#sec-date-time-string-format
 		const hasTimezone = /Z|[+-]\d{2}(:?\d{2})?$/.test( input );
@@ -38,10 +37,7 @@ export function inputToDate( input: Date | string | number ): Date {
 
 		// Strings without timezone indicators are interpreted using configured
 		// timezone offset, then converted to UTC for internal storage.
-		const { timezone } = getSettings();
-		const offsetMs = timezone.offset * 60 * 60 * 1000;
-		const inputUTC = new Date( input + 'Z' );
-		return new UTCDateMini( inputUTC.getTime() - offsetMs );
+		return new UTCDateMini( getDate( input ).getTime() );
 	}
 
 	// Date objects and number timestamps represent specific UTC moments.
@@ -64,21 +60,12 @@ export function inputToDate( input: Date | string | number ): Date {
  * @return A browser-local Date at midnight for the configured timezone date
  */
 export function startOfDayInConfiguredTimezone( date: Date ): Date {
-	const { timezone } = getSettings();
-	const offsetMs = timezone.offset * 60 * 60 * 1000;
-
-	// Convert UTC timestamp to configured timezone to determine the date,
-	// creating a browser-local Date at midnight for this calendar date.
-	const targetDate = new Date( date.getTime() + offsetMs );
-	return new Date(
-		targetDate.getUTCFullYear(),
-		targetDate.getUTCMonth(),
-		targetDate.getUTCDate(),
-		0,
-		0,
-		0,
-		0
-	);
+	// Determine the calendar day in the configured WordPress timezone and
+	// return a browser-local Date at midnight for that calendar day.
+	const year = Number( formatDate( 'Y', date ) );
+	const month = Number( formatDate( 'n', date ) ) - 1;
+	const day = Number( formatDate( 'j', date ) );
+	return new Date( year, month, day, 0, 0, 0, 0 );
 }
 
 /**
@@ -142,31 +129,26 @@ export function setInConfiguredTimezone(
 		seconds: number;
 	} >
 ): Date {
-	const { timezone } = getSettings();
-	const offsetMs = timezone.offset * 60 * 60 * 1000;
-
-	// Shift to configured timezone
-	const targetDate = new Date( date.getTime() + offsetMs );
 	const values = {
-		year: targetDate.getUTCFullYear(),
-		month: targetDate.getUTCMonth(),
-		date: targetDate.getUTCDate(),
-		hours: targetDate.getUTCHours(),
-		minutes: targetDate.getUTCMinutes(),
-		seconds: targetDate.getUTCSeconds(),
+		year: Number( formatDate( 'Y', date ) ),
+		month: Number( formatDate( 'n', date ) ) - 1,
+		date: Number( formatDate( 'j', date ) ),
+		hours: Number( formatDate( 'H', date ) ),
+		minutes: Number( formatDate( 'i', date ) ),
+		seconds: Number( formatDate( 's', date ) ),
 		...updates,
 	};
 
-	return new UTCDateMini(
-		Date.UTC(
-			values.year,
-			values.month,
-			values.date,
-			values.hours,
-			values.minutes,
-			values.seconds
-		) - offsetMs
-	);
+	const year = String( values.year );
+	const month = String( values.month + 1 ).padStart( 2, '0' );
+	const day = String( values.date ).padStart( 2, '0' );
+	const hours = String( values.hours ).padStart( 2, '0' );
+	const minutes = String( values.minutes ).padStart( 2, '0' );
+	const seconds = String( values.seconds ).padStart( 2, '0' );
+	const timezoneless = `${ year }-${ month }-${ day }T${ hours }:${ minutes }:${ seconds }`;
+
+	// Parse as WordPress-configured timezone time and convert to a UTC instant.
+	return new UTCDateMini( getDate( timezoneless ).getTime() );
 }
 
 /**

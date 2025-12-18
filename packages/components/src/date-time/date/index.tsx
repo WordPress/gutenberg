@@ -21,7 +21,7 @@ import type { KeyboardEventHandler } from 'react';
  */
 import { __, _n, sprintf, isRTL } from '@wordpress/i18n';
 import { arrowLeft, arrowRight } from '@wordpress/icons';
-import { dateI18n, getSettings } from '@wordpress/date';
+import { dateI18n, date as formatDate, getSettings } from '@wordpress/date';
 import { useState, useRef, useEffect } from '@wordpress/element';
 
 /**
@@ -39,7 +39,11 @@ import {
 	DayOfWeek,
 	DayButton,
 } from './styles';
-import { inputToDate, startOfDayInConfiguredTimezone } from '../utils';
+import {
+	inputToDate,
+	setInConfiguredTimezone,
+	startOfDayInConfiguredTimezone,
+} from '../utils';
 import { TIMEZONELESS_FORMAT } from '../constants';
 
 /**
@@ -202,27 +206,18 @@ export function DatePicker( {
 								onClick={ () => {
 									setSelected( [ day ] );
 									setFocusable( day );
-									// Combine clicked day with current time in configured timezone
-									const { timezone } = getSettings();
-									const offsetMs =
-										timezone.offset * 60 * 60 * 1000;
-									const shiftedDate = new Date(
-										date.getTime() + offsetMs
+									const newDate = setInConfiguredTimezone(
+										date,
+										{
+											year: day.getFullYear(),
+											month: day.getMonth(),
+											date: day.getDate(),
+										}
 									);
-									const combined = new Date(
-										day.getFullYear(),
-										day.getMonth(),
-										day.getDate(),
-										shiftedDate.getUTCHours(),
-										shiftedDate.getUTCMinutes(),
-										shiftedDate.getUTCSeconds()
-									);
-									// Format using browser offset since combined is browser-local
 									onChange?.(
-										dateI18n(
+										formatDate(
 											TIMEZONELESS_FORMAT,
-											combined,
-											-combined.getTimezoneOffset()
+											newDate
 										)
 									);
 								} }
