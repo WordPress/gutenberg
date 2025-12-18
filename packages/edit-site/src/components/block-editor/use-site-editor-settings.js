@@ -81,7 +81,6 @@ export function useSpecificEditorSettings() {
 		return {
 			...settings,
 			styles: [
-				...( settings?.defaultEditorStyles ?? [] ),
 				...nonGlobalStyles,
 				...globalStyles,
 				{
