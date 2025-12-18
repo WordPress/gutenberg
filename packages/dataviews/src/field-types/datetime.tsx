@@ -38,10 +38,10 @@ function render( { item, field }: DataViewRenderFieldProps< any > ) {
 		return null;
 	}
 
-	// If the field type is date, we've already normalized the format,
+	// If the field type is datetime, we've already normalized the format,
 	// and so it's safe to tell TypeScript to trust us ("as Required<Format>").
 	//
-	// There're no runtime paths where this render function is called with a non-date field,
+	// There're no runtime paths where this render function is called with a non-datetime field,
 	// but TypeScript is unable to infer this, hence the type assertion.
 	let format: Required< FormatDatetime >;
 	if ( field.type !== 'datetime' ) {
