@@ -21,7 +21,9 @@ async function selectMediaFromLibrary( page, index = 0, experimental = false ) {
 		const listbox = mediaLibrary.getByRole( 'listbox' );
 		await listbox.getByRole( 'option' ).nth( index ).click();
 	} else {
-		await mediaLibrary.locator( '.attachment' ).nth( index ).waitFor();
+		await mediaLibrary
+			.getByRole( 'tab', { name: 'Media Library' } )
+			.click();
 		await mediaLibrary.locator( '.attachment' ).nth( index ).click();
 	}
 	await mediaLibrary
