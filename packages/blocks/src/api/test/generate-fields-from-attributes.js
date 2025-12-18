@@ -3,14 +3,29 @@
  */
 import { generateFieldsFromAttributes } from '../generate-fields-from-attributes';
 
+/**
+ * Helper to mark attributes for auto-field generation.
+ * In production, this marker is added by PHP during block registration.
+ *
+ * @param {Object} attrs - Attributes object
+ * @return {Object} Attributes with __experimentalAutoField marker
+ */
+function markForAutoField( attrs ) {
+	const result = {};
+	for ( const [ name, def ] of Object.entries( attrs ) ) {
+		result[ name ] = { ...def, __experimentalAutoField: true };
+	}
+	return result;
+}
+
 describe( 'generateFieldsFromAttributes', () => {
 	it( 'should generate text field for string attribute', () => {
-		const attributes = {
+		const attributes = markForAutoField( {
 			message: {
 				type: 'string',
 				default: 'Hello',
 			},
-		};
+		} );
 
 		const result = generateFieldsFromAttributes( attributes );
 
@@ -24,12 +39,12 @@ describe( 'generateFieldsFromAttributes', () => {
 	} );
 
 	it( 'should generate number field for number attribute', () => {
-		const attributes = {
+		const attributes = markForAutoField( {
 			amount: {
 				type: 'number',
 				default: 10,
 			},
-		};
+		} );
 
 		const result = generateFieldsFromAttributes( attributes );
 
@@ -42,12 +57,12 @@ describe( 'generateFieldsFromAttributes', () => {
 	} );
 
 	it( 'should generate integer field for integer attribute', () => {
-		const attributes = {
+		const attributes = markForAutoField( {
 			count: {
 				type: 'integer',
 				default: 5,
 			},
-		};
+		} );
 
 		const result = generateFieldsFromAttributes( attributes );
 
@@ -60,12 +75,12 @@ describe( 'generateFieldsFromAttributes', () => {
 	} );
 
 	it( 'should generate boolean field for boolean attribute', () => {
-		const attributes = {
+		const attributes = markForAutoField( {
 			enabled: {
 				type: 'boolean',
 				default: true,
 			},
-		};
+		} );
 
 		const result = generateFieldsFromAttributes( attributes );
 
@@ -78,13 +93,13 @@ describe( 'generateFieldsFromAttributes', () => {
 	} );
 
 	it( 'should generate text field with elements for enum attribute', () => {
-		const attributes = {
+		const attributes = markForAutoField( {
 			size: {
 				type: 'string',
 				enum: [ 'small', 'medium', 'large' ],
 				default: 'medium',
 			},
-		};
+		} );
 
 		const result = generateFieldsFromAttributes( attributes );
 
@@ -107,10 +122,12 @@ describe( 'generateFieldsFromAttributes', () => {
 			message: {
 				type: 'string',
 				default: 'Hello',
+				__experimentalAutoField: true,
 			},
 			content: {
 				type: 'string',
 				source: 'html',
+				__experimentalAutoField: true,
 			},
 		};
 
@@ -126,10 +143,12 @@ describe( 'generateFieldsFromAttributes', () => {
 			message: {
 				type: 'string',
 				default: 'Hello',
+				__experimentalAutoField: true,
 			},
 			internalState: {
 				type: 'string',
 				role: 'local',
+				__experimentalAutoField: true,
 			},
 		};
 
@@ -141,7 +160,7 @@ describe( 'generateFieldsFromAttributes', () => {
 	} );
 
 	it( 'should skip unsupported attribute types', () => {
-		const attributes = {
+		const attributes = markForAutoField( {
 			message: {
 				type: 'string',
 				default: 'Hello',
@@ -154,7 +173,7 @@ describe( 'generateFieldsFromAttributes', () => {
 				type: 'object',
 				default: {},
 			},
-		};
+		} );
 
 		const result = generateFieldsFromAttributes( attributes );
 
@@ -164,12 +183,12 @@ describe( 'generateFieldsFromAttributes', () => {
 	} );
 
 	it( 'should handle union types by using the first type', () => {
-		const attributes = {
+		const attributes = markForAutoField( {
 			value: {
 				type: [ 'string', 'null' ],
 				default: null,
 			},
-		};
+		} );
 
 		const result = generateFieldsFromAttributes( attributes );
 
@@ -178,7 +197,7 @@ describe( 'generateFieldsFromAttributes', () => {
 	} );
 
 	it( 'should humanize camelCase attribute names', () => {
-		const attributes = {
+		const attributes = markForAutoField( {
 			backgroundColor: {
 				type: 'string',
 			},
@@ -188,7 +207,7 @@ describe( 'generateFieldsFromAttributes', () => {
 			itemCount: {
 				type: 'integer',
 			},
-		};
+		} );
 
 		const result = generateFieldsFromAttributes( attributes );
 
@@ -198,14 +217,14 @@ describe( 'generateFieldsFromAttributes', () => {
 	} );
 
 	it( 'should humanize snake_case attribute names', () => {
-		const attributes = {
+		const attributes = markForAutoField( {
 			background_color: {
 				type: 'string',
 			},
 			show_title: {
 				type: 'boolean',
 			},
-		};
+		} );
 
 		const result = generateFieldsFromAttributes( attributes );
 
@@ -220,8 +239,27 @@ describe( 'generateFieldsFromAttributes', () => {
 		expect( result.form.fields ).toHaveLength( 0 );
 	} );
 
-	it( 'should generate multiple fields for multiple attributes', () => {
+	it( 'should skip attributes without __experimentalAutoField marker', () => {
 		const attributes = {
+			userDefined: {
+				type: 'string',
+				__experimentalAutoField: true,
+			},
+			supportAdded: {
+				type: 'string',
+				// No marker = simulate attribute added by block supports
+			},
+		};
+
+		const result = generateFieldsFromAttributes( attributes );
+
+		expect( result.fields ).toHaveLength( 1 );
+		expect( result.fields[ 0 ].id ).toBe( 'userDefined' );
+		expect( result.form.fields ).not.toContain( 'supportAdded' );
+	} );
+
+	it( 'should generate multiple fields for multiple attributes', () => {
+		const attributes = markForAutoField( {
 			title: {
 				type: 'string',
 				default: '',
@@ -238,7 +276,7 @@ describe( 'generateFieldsFromAttributes', () => {
 				type: 'string',
 				enum: [ 'small', 'large' ],
 			},
-		};
+		} );
 
 		const result = generateFieldsFromAttributes( attributes );
 
