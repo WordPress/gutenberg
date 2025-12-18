@@ -29,7 +29,7 @@ const VERTICAL_INPUT_TYPES = [
 	'time',
 	'week',
 ];
-const VERTICAL_INPUT_ROLES = [ 'listbox', 'combobox' ];
+const VERTICAL_INPUT_ROLES = [ 'combobox' ];
 
 /**
  * Returns true if the element should consider edge navigation upon a keyboard

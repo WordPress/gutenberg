@@ -22,10 +22,6 @@ describe( 'isNavigationCandidate', () => {
 		elements.inputNumber = document.createElement( 'input' );
 		elements.inputNumber.setAttribute( 'type', 'number' );
 
-		elements.inputListBox = document.createElement( 'input' );
-		elements.inputListBox.setAttribute( 'type', 'text' );
-		elements.inputListBox.setAttribute( 'role', 'listbox' );
-
 		elements.inputCombobox = document.createElement( 'input' );
 		elements.inputCombobox.setAttribute( 'type', 'text' );
 		elements.inputCombobox.setAttribute( 'role', 'combobox' );
@@ -52,18 +48,6 @@ describe( 'isNavigationCandidate', () => {
 				elements.inputText,
 				keyCode,
 				true
-			);
-
-			expect( result ).toBe( false );
-		} );
-	} );
-
-	it( 'returns false if vertically navigating inputs with the listbox role', () => {
-		[ UP, DOWN ].forEach( ( keyCode ) => {
-			const result = isNavigationCandidate(
-				elements.inputListBox,
-				keyCode,
-				false
 			);
 
 			expect( result ).toBe( false );
