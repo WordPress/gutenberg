@@ -15,7 +15,7 @@ export const DROPDOWN_MOTION = Object.freeze( {
 
 const convertEasingToString = ( easing: {
 	function: string;
-	args?: number[];
+	args?: readonly [ number, number, number, number ];
 } ) => {
 	if ( easing.args?.length ) {
 		return `${ easing.function }(${ easing.args.join( ',' ) })`;
