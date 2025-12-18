@@ -1208,20 +1208,14 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 						'blockGap' => null,
 					),
 				),
-				'styles'   => array(
-					'spacing' => array(
-						'blockGap' => '1em',
-					),
-				),
 			),
 			'default'
 		);
-		// Set base_layout_styles to true to generate only base layout styles without alignment rules.
-		$stylesheet = $theme_json->get_stylesheet( array( 'styles' ), null, array( 'base_layout_styles' => true ) );
+		$stylesheet = $theme_json->get_stylesheet( array( 'base-layout-styles' ) );
 
-		// Verify that layout styles are still generated, but without .wp-site-blocks alignment rules and flow/constrained base styles.
+		// Note the `base-layout-styles` includes a fallback gap for the Columns block for backwards compatibility.
 		$this->assertSameCSS(
-			':where(body) { margin: 0; }:where(.is-layout-flex){gap: 0.5em;}:where(.is-layout-grid){gap: 0.5em;}body .is-layout-flex{display: flex;}.is-layout-flex{flex-wrap: wrap;align-items: center;}.is-layout-flex > :is(*, div){margin: 0;}body .is-layout-grid{display: grid;}.is-layout-grid > :is(*, div){margin: 0;}',
+			':where(.is-layout-flex){gap: 0.5em;}:where(.is-layout-grid){gap: 0.5em;}body .is-layout-flex{display: flex;}.is-layout-flex{flex-wrap: wrap;align-items: center;}.is-layout-flex > :is(*, div){margin: 0;}body .is-layout-grid{display: grid;}.is-layout-grid > :is(*, div){margin: 0;}:where(.wp-block-columns.is-layout-flex){gap: 2em;}:where(.wp-block-columns.is-layout-grid){gap: 2em;}:where(.wp-block-post-template.is-layout-flex){gap: 1.25em;}:where(.wp-block-post-template.is-layout-grid){gap: 1.25em;}',
 			$stylesheet
 		);
 	}
@@ -1239,10 +1233,10 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 			),
 			'default'
 		);
-		$stylesheet = $theme_json->get_stylesheet( array( 'styles' ), array( 'default' ) );
+		$stylesheet = $theme_json->get_stylesheet( array( 'base-layout-styles' ) );
 		remove_theme_support( 'disable-layout-styles' );
 
-		// All Layout styles should be skipped when disable-layout-styles theme support is added.
+		// All Layout styles should be skipped.
 		$this->assertSameCSS(
 			'',
 			$stylesheet
