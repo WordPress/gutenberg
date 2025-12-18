@@ -433,6 +433,31 @@ export function canvasMinHeight( state = 0, action ) {
 	return state;
 }
 
+/**
+ * Reducer for the revisions preview mode.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ * @return {Object} Updated state.
+ */
+export function revisionsMode(
+	state = { isActive: false, selectedRevisionId: null },
+	action
+) {
+	switch ( action.type ) {
+		case 'ENTER_REVISIONS_MODE':
+			return {
+				isActive: true,
+				selectedRevisionId: action.revisionId || null,
+			};
+		case 'EXIT_REVISIONS_MODE':
+			return { isActive: false, selectedRevisionId: null };
+		case 'SELECT_REVISION':
+			return { ...state, selectedRevisionId: action.revisionId };
+	}
+	return state;
+}
+
 export default combineReducers( {
 	postId,
 	postType,
@@ -455,5 +480,6 @@ export default combineReducers( {
 	stylesPath,
 	showStylebook,
 	canvasMinHeight,
+	revisionsMode,
 	dataviews: dataviewsReducer,
 } );

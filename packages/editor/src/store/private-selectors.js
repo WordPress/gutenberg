@@ -300,3 +300,23 @@ export function getShowStylebook( state ) {
 export function getCanvasMinHeight( state ) {
 	return state.canvasMinHeight;
 }
+
+/**
+ * Returns whether the editor is in revisions preview mode.
+ *
+ * @param {Object} state Global application state.
+ * @return {boolean} Whether revisions mode is active.
+ */
+export function isRevisionsMode( state ) {
+	return state.revisionsMode?.isActive ?? false;
+}
+
+/**
+ * Returns the currently selected revision ID in revisions mode.
+ *
+ * @param {Object} state Global application state.
+ * @return {number|null} The selected revision ID, or null if none selected.
+ */
+export function getSelectedRevisionId( state ) {
+	return state.revisionsMode?.selectedRevisionId ?? null;
+}

@@ -1,0 +1,29 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
+
+.editor-revisions-header__slider {
+	width: 100%;
+
+	.components-range-control__wrapper {
+		margin-left: 0;
+	}
+}
+
+.editor-revisions-header__no-revisions {
+	color: $gray-700;
+	font-size: $default-font-size;
+}
+
+.editor-revisions-canvas {
+	width: 100%;
+	height: 100%;
+	overflow: hidden; // BlockCanvas handles its own scrolling
+	background: $white;
+}
+
+.editor-revisions-canvas__loading {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	height: 100%;
+}

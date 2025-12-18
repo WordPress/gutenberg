@@ -7,13 +7,14 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import { InterfaceSkeleton, ComplementaryArea } from '@wordpress/interface';
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { BlockBreadcrumb, BlockToolbar } from '@wordpress/block-editor';
 import { useViewportMatch } from '@wordpress/compose';
-import { useState, useCallback } from '@wordpress/element';
+import { useState, useCallback, useMemo, useEffect } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
+import { ESCAPE } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
@@ -24,6 +25,11 @@ import EditorNotices from '../editor-notices';
 import Header from '../header';
 import InserterSidebar from '../inserter-sidebar';
 import ListViewSidebar from '../list-view-sidebar';
+import {
+	usePostRevisions,
+	RevisionsHeader,
+	RevisionsCanvas,
+} from '../post-revisions-preview';
 import SavePublishPanels from '../save-publish-panels';
 import TextEditor from '../text-editor';
 import VisualEditor from '../visual-editor';
@@ -66,13 +72,16 @@ export default function EditorInterface( {
 		postTypeLabel,
 		stylesPath,
 		showStylebook,
+		isRevisionsMode,
 	} = useSelect( ( select ) => {
 		const { get } = select( preferencesStore );
 		const { getEditorSettings, getPostTypeLabel, getCurrentPostType } =
 			select( editorStore );
-		const { getStylesPath, getShowStylebook } = unlock(
-			select( editorStore )
-		);
+		const {
+			getStylesPath,
+			getShowStylebook,
+			isRevisionsMode: _isRevisionsMode,
+		} = unlock( select( editorStore ) );
 		const editorSettings = getEditorSettings();
 
 		let _mode = select( editorStore ).getEditorMode();
@@ -96,6 +105,7 @@ export default function EditorInterface( {
 			isAttachment:
 				getCurrentPostType() === 'attachment' &&
 				window?.__experimentalMediaEditor,
+			isRevisionsMode: _isRevisionsMode(),
 		};
 	}, [] );
 	const isLargeViewport = useViewportMatch( 'medium' );
@@ -122,6 +132,62 @@ export default function EditorInterface( {
 		},
 		[ entitiesSavedStatesCallback ]
 	);
+
+	// Revisions mode state management.
+	const { revisions, isLoading: isRevisionsLoading } = usePostRevisions();
+	const [ selectedRevisionIndex, setSelectedRevisionIndex ] = useState( 0 );
+	const { exitRevisionsMode } = unlock( useDispatch( editorStore ) );
+
+	// Sort revisions by date (newest first) and memoize.
+	const sortedRevisions = useMemo( () => {
+		if ( ! revisions.length ) {
+			return [];
+		}
+		return [ ...revisions ].sort(
+			( a, b ) => new Date( b.date ) - new Date( a.date )
+		);
+	}, [ revisions ] );
+
+	const selectedRevision = sortedRevisions[ selectedRevisionIndex ] || null;
+
+	const handleSelectRevisionIndex = useCallback( ( index ) => {
+		setSelectedRevisionIndex( index );
+	}, [] );
+
+	// Handle Escape key to exit revisions mode.
+	useEffect( () => {
+		if ( ! isRevisionsMode ) {
+			return;
+		}
+		const handleKeyDown = ( event ) => {
+			if ( event.keyCode === ESCAPE && ! event.defaultPrevented ) {
+				event.preventDefault();
+				exitRevisionsMode();
+			}
+		};
+		document.addEventListener( 'keydown', handleKeyDown );
+		return () => document.removeEventListener( 'keydown', handleKeyDown );
+	}, [ isRevisionsMode, exitRevisionsMode ] );
+
+	// When in revisions mode, render with separate header and content.
+	if ( isRevisionsMode ) {
+		return (
+			<InterfaceSkeleton
+				className={ clsx( 'editor-editor-interface', className ) }
+				labels={ interfaceLabels }
+				header={
+					<RevisionsHeader
+						revisions={ sortedRevisions }
+						selectedRevision={ selectedRevision }
+						selectedIndex={ selectedRevisionIndex }
+						onSelectIndex={ handleSelectRevisionIndex }
+						isLoading={ isRevisionsLoading }
+					/>
+				}
+				content={ <RevisionsCanvas revision={ selectedRevision } /> }
+			/>
+		);
+	}
 
 	return (
 		<InterfaceSkeleton
