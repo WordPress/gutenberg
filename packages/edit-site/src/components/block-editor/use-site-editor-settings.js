@@ -38,11 +38,13 @@ function useNavigateToPreviousEntityRecord() {
 	return goBack;
 }
 
-export function useSpecificEditorSettings() {
+export function useSpecificEditorSettings( postType, postId ) {
 	const { query } = useLocation();
 	const { canvas = 'view' } = query;
-	const [ onNavigateToEntityRecord, initialBlockSelection ] =
-		useNavigateToEntityRecord();
+	const onNavigateToEntityRecord = useNavigateToEntityRecord(
+		postType,
+		postId
+	);
 
 	/*
 	 * Generate global styles directly to avoid circular dependency with GlobalStylesRenderer
@@ -97,7 +99,6 @@ export function useSpecificEditorSettings() {
 			onNavigateToEntityRecord,
 			onNavigateToPreviousEntityRecord,
 			isPreviewMode: canvas === 'view',
-			initialBlockSelection,
 		};
 	}, [
 		settings,
@@ -107,7 +108,6 @@ export function useSpecificEditorSettings() {
 		currentPostIsTrashed,
 		onNavigateToEntityRecord,
 		onNavigateToPreviousEntityRecord,
-		initialBlockSelection,
 	] );
 
 	return defaultEditorSettings;

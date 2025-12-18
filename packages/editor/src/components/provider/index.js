@@ -38,7 +38,7 @@ import EditorKeyboardShortcuts from '../global-keyboard-shortcuts';
 import PatternRenameModal from '../pattern-rename-modal';
 import PatternDuplicateModal from '../pattern-duplicate-modal';
 import TemplatePartMenuItems from '../template-part-menu-items';
-import { useRestoreBlockFromPath } from '../../utils/block-selection-path';
+import { useRestoreBlockSelectionFromSession } from '../../utils/block-selection-path';
 
 const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
 const { PatternsMenuItems } = unlock( editPatternsPrivateApis );
@@ -160,7 +160,6 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 		settings,
 		recovery,
 		initialEdits,
-		initialSelection,
 		children,
 		BlockEditorProviderComponent = ExperimentalBlockEditorProvider,
 		__unstableTemplate: template,
@@ -353,18 +352,27 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 		useCommands();
 
 		// Handle initial selection restoration from navigation (e.g., editor back button)
-		const restoreBlockFromPath = useRestoreBlockFromPath();
+		// Restore from sessionStorage using fast path (clientId) with fallback to block path
+		const restoreSelectionFromSession =
+			useRestoreBlockSelectionFromSession();
 		const { selectBlock } = useDispatch( blockEditorStore );
 		useEffect( () => {
-			if ( ! initialSelection || ! blocks || blocks.length === 0 ) {
+			if ( ! blocks || blocks.length === 0 ) {
 				return;
 			}
 
-			const clientId = restoreBlockFromPath( initialSelection );
+			// Try to restore selection from sessionStorage
+			const clientId = restoreSelectionFromSession( post.type, post.id );
 			if ( clientId ) {
 				selectBlock( clientId );
 			}
-		}, [ initialSelection, blocks, selectBlock, restoreBlockFromPath ] );
+		}, [
+			blocks,
+			post.type,
+			post.id,
+			restoreSelectionFromSession,
+			selectBlock,
+		] );
 
 		if ( ! isReady || ! mode ) {
 			return null;

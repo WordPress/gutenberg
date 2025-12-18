@@ -1,6 +1,11 @@
 /**
  * WordPress dependencies
  */
+import {
+	CreateTemplatePartModal,
+	patternTitleField,
+	templateTitleField,
+} from '@wordpress/fields';
 import * as interfaceApis from '@wordpress/interface';
 
 /**
@@ -18,11 +23,6 @@ import usePostFields from './components/post-fields';
 import ToolsMoreMenuGroup from './components/more-menu/tools-more-menu-group';
 import ViewMoreMenuGroup from './components/more-menu/view-more-menu-group';
 import ResizableEditor from './components/resizable-editor';
-import {
-	CreateTemplatePartModal,
-	patternTitleField,
-	templateTitleField,
-} from '@wordpress/fields';
 import { registerCoreBlockBindingsSources } from './bindings/api';
 import { getTemplateInfo } from './utils/get-template-info';
 import GlobalStylesUIWrapper from './components/global-styles';
@@ -32,6 +32,9 @@ import { GlobalStylesActionMenu } from './components/global-styles/menu';
 import {
 	useGenerateBlockPath,
 	useRestoreBlockFromPath,
+	saveBlockSelection,
+	getAndClearBlockSelection,
+	useRestoreBlockSelectionFromSession,
 } from './utils/block-selection-path';
 
 const { store: interfaceStore, ...remainingInterfaceApis } = interfaceApis;
@@ -63,6 +66,9 @@ lock( privateApis, {
 	// Block selection
 	useGenerateBlockPath,
 	useRestoreBlockFromPath,
+	saveBlockSelection,
+	getAndClearBlockSelection,
+	useRestoreBlockSelectionFromSession,
 	// This is a temporary private API while we're updating the site editor to use EditorProvider.
 	interfaceStore,
 	...remainingInterfaceApis,
