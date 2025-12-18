@@ -97,29 +97,29 @@ add_action(
 				'description'     => 'A test block for auto-generated inspector controls',
 				'keywords'        => array( 'autoregister', 'controls', 'dataform' ),
 				'attributes'      => array(
-					'title'   => array(
+					'title'         => array(
 						'type'    => 'string',
 						'default' => 'My Emoji Collection',
 					),
-					'count'   => array(
+					'count'         => array(
 						'type'    => 'integer',
 						'default' => 5,
 					),
-					'spacing' => array(
+					'spacing'       => array(
 						'type'    => 'number',
 						'default' => 0.1,
 					),
-					'showEmojis' => array(
+					'showEmojis'    => array(
 						'type'    => 'boolean',
 						'default' => true,
 					),
-					'emoji'   => array(
+					'emoji'         => array(
 						'type'    => 'string',
 						'enum'    => array( '⭐', '❤️', '🎉', '🚀', '🌈' ),
 						'default' => '⭐',
 					),
 					// Should NOT get a control (has source - HTML-derived)
-					'content' => array(
+					'content'       => array(
 						'type'   => 'string',
 						'source' => 'html',
 					),
