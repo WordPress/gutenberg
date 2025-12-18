@@ -13,6 +13,7 @@ import {
 	BlockEditorProvider,
 	BlockContextProvider,
 	privateApis as blockEditorPrivateApis,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { store as noticesStore } from '@wordpress/notices';
 import { privateApis as editPatternsPrivateApis } from '@wordpress/patterns';
@@ -37,6 +38,7 @@ import EditorKeyboardShortcuts from '../global-keyboard-shortcuts';
 import PatternRenameModal from '../pattern-rename-modal';
 import PatternDuplicateModal from '../pattern-duplicate-modal';
 import TemplatePartMenuItems from '../template-part-menu-items';
+import { useRestoreBlockFromPath } from '../../utils/block-selection-path';
 
 const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
 const { PatternsMenuItems } = unlock( editPatternsPrivateApis );
@@ -158,6 +160,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 		settings,
 		recovery,
 		initialEdits,
+		initialSelection,
 		children,
 		BlockEditorProviderComponent = ExperimentalBlockEditorProvider,
 		__unstableTemplate: template,
@@ -348,6 +351,20 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 
 		// Register the editor commands.
 		useCommands();
+
+		// Handle initial selection restoration from navigation (e.g., editor back button)
+		const restoreBlockFromPath = useRestoreBlockFromPath();
+		const { selectBlock } = useDispatch( blockEditorStore );
+		useEffect( () => {
+			if ( ! initialSelection || ! blocks || blocks.length === 0 ) {
+				return;
+			}
+
+			const clientId = restoreBlockFromPath( initialSelection );
+			if ( clientId ) {
+				selectBlock( clientId );
+			}
+		}, [ initialSelection, blocks, selectBlock, restoreBlockFromPath ] );
 
 		if ( ! isReady || ! mode ) {
 			return null;
