@@ -24,6 +24,7 @@ test.describe( 'Page List', () => {
 		// Activate a theme with permissions to access the site editor.
 		await requestUtils.activateTheme( 'emptytheme' );
 		await createPages( requestUtils );
+		await requestUtils.deleteAllMedia();
 	} );
 
 	test.afterAll( async ( { requestUtils } ) => {
@@ -31,6 +32,7 @@ test.describe( 'Page List', () => {
 		await Promise.all( [
 			requestUtils.activateTheme( 'twentytwentyone' ),
 			requestUtils.deleteAllPages(),
+			requestUtils.deleteAllMedia(),
 		] );
 	} );
 
