@@ -4,23 +4,23 @@
 import { generateFieldsFromAttributes } from '../generate-fields-from-attributes';
 
 /**
- * Helper to mark attributes for auto-field generation.
+ * Helper to mark attributes for auto-generated inspector controls.
  * In production, this marker is added by PHP during block registration.
  *
  * @param {Object} attrs - Attributes object
- * @return {Object} Attributes with __experimentalAutoField marker
+ * @return {Object} Attributes with __experimentalAutoInspectorControl marker
  */
-function markForAutoField( attrs ) {
+function markForAutoInspectorControl( attrs ) {
 	const result = {};
 	for ( const [ name, def ] of Object.entries( attrs ) ) {
-		result[ name ] = { ...def, __experimentalAutoField: true };
+		result[ name ] = { ...def, __experimentalAutoInspectorControl: true };
 	}
 	return result;
 }
 
 describe( 'generateFieldsFromAttributes', () => {
 	it( 'should generate text field for string attribute', () => {
-		const attributes = markForAutoField( {
+		const attributes = markForAutoInspectorControl( {
 			message: {
 				type: 'string',
 				default: 'Hello',
@@ -39,7 +39,7 @@ describe( 'generateFieldsFromAttributes', () => {
 	} );
 
 	it( 'should generate number field for number attribute', () => {
-		const attributes = markForAutoField( {
+		const attributes = markForAutoInspectorControl( {
 			amount: {
 				type: 'number',
 				default: 10,
@@ -57,7 +57,7 @@ describe( 'generateFieldsFromAttributes', () => {
 	} );
 
 	it( 'should generate integer field for integer attribute', () => {
-		const attributes = markForAutoField( {
+		const attributes = markForAutoInspectorControl( {
 			count: {
 				type: 'integer',
 				default: 5,
@@ -75,7 +75,7 @@ describe( 'generateFieldsFromAttributes', () => {
 	} );
 
 	it( 'should generate boolean field for boolean attribute', () => {
-		const attributes = markForAutoField( {
+		const attributes = markForAutoInspectorControl( {
 			enabled: {
 				type: 'boolean',
 				default: true,
@@ -93,7 +93,7 @@ describe( 'generateFieldsFromAttributes', () => {
 	} );
 
 	it( 'should generate text field with elements for enum attribute', () => {
-		const attributes = markForAutoField( {
+		const attributes = markForAutoInspectorControl( {
 			size: {
 				type: 'string',
 				enum: [ 'small', 'medium', 'large' ],
@@ -118,7 +118,7 @@ describe( 'generateFieldsFromAttributes', () => {
 	} );
 
 	it( 'should skip unsupported attribute types', () => {
-		const attributes = markForAutoField( {
+		const attributes = markForAutoInspectorControl( {
 			message: {
 				type: 'string',
 				default: 'Hello',
@@ -141,7 +141,7 @@ describe( 'generateFieldsFromAttributes', () => {
 	} );
 
 	it( 'should handle union types by using the first type', () => {
-		const attributes = markForAutoField( {
+		const attributes = markForAutoInspectorControl( {
 			value: {
 				type: [ 'string', 'null' ],
 				default: null,
@@ -155,7 +155,7 @@ describe( 'generateFieldsFromAttributes', () => {
 	} );
 
 	it( 'should humanize camelCase attribute names', () => {
-		const attributes = markForAutoField( {
+		const attributes = markForAutoInspectorControl( {
 			backgroundColor: {
 				type: 'string',
 			},
@@ -175,7 +175,7 @@ describe( 'generateFieldsFromAttributes', () => {
 	} );
 
 	it( 'should humanize snake_case attribute names', () => {
-		const attributes = markForAutoField( {
+		const attributes = markForAutoInspectorControl( {
 			background_color: {
 				type: 'string',
 			},
@@ -197,11 +197,11 @@ describe( 'generateFieldsFromAttributes', () => {
 		expect( result.form.fields ).toHaveLength( 0 );
 	} );
 
-	it( 'should skip attributes without __experimentalAutoField marker', () => {
+	it( 'should skip attributes without __experimentalAutoInspectorControl marker', () => {
 		const attributes = {
 			userDefined: {
 				type: 'string',
-				__experimentalAutoField: true,
+				__experimentalAutoInspectorControl: true,
 			},
 			supportAdded: {
 				type: 'string',
@@ -217,7 +217,7 @@ describe( 'generateFieldsFromAttributes', () => {
 	} );
 
 	it( 'should generate multiple fields for multiple attributes', () => {
-		const attributes = markForAutoField( {
+		const attributes = markForAutoInspectorControl( {
 			title: {
 				type: 'string',
 				default: '',

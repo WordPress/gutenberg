@@ -6,7 +6,7 @@
  */
 
 /**
- * Tests for gutenberg_mark_auto_field_attributes().
+ * Tests for gutenberg_mark_auto_inspector_control_attributes().
  *
  * @group blocks
  */
@@ -24,10 +24,10 @@ class Tests_Blocks_Auto_Register extends WP_UnitTestCase {
 			),
 		);
 
-		$result = gutenberg_mark_auto_field_attributes( $settings );
+		$result = gutenberg_mark_auto_inspector_control_attributes( $settings );
 
-		$this->assertTrue( $result['attributes']['title']['__experimentalAutoField'] );
-		$this->assertTrue( $result['attributes']['count']['__experimentalAutoField'] );
+		$this->assertTrue( $result['attributes']['title']['__experimentalAutoInspectorControl'] );
+		$this->assertTrue( $result['attributes']['count']['__experimentalAutoInspectorControl'] );
 	}
 
 	/**
@@ -40,9 +40,9 @@ class Tests_Blocks_Auto_Register extends WP_UnitTestCase {
 			),
 		);
 
-		$result = gutenberg_mark_auto_field_attributes( $settings );
+		$result = gutenberg_mark_auto_inspector_control_attributes( $settings );
 
-		$this->assertArrayNotHasKey( '__experimentalAutoField', $result['attributes']['title'] );
+		$this->assertArrayNotHasKey( '__experimentalAutoInspectorControl', $result['attributes']['title'] );
 	}
 
 	/**
@@ -60,10 +60,10 @@ class Tests_Blocks_Auto_Register extends WP_UnitTestCase {
 			),
 		);
 
-		$result = gutenberg_mark_auto_field_attributes( $settings );
+		$result = gutenberg_mark_auto_inspector_control_attributes( $settings );
 
-		$this->assertTrue( $result['attributes']['title']['__experimentalAutoField'] );
-		$this->assertArrayNotHasKey( '__experimentalAutoField', $result['attributes']['content'] );
+		$this->assertTrue( $result['attributes']['title']['__experimentalAutoInspectorControl'] );
+		$this->assertArrayNotHasKey( '__experimentalAutoInspectorControl', $result['attributes']['content'] );
 	}
 
 	/**
@@ -85,10 +85,10 @@ class Tests_Blocks_Auto_Register extends WP_UnitTestCase {
 			),
 		);
 
-		$result = gutenberg_mark_auto_field_attributes( $settings );
+		$result = gutenberg_mark_auto_inspector_control_attributes( $settings );
 
-		$this->assertTrue( $result['attributes']['title']['__experimentalAutoField'] );
-		$this->assertArrayNotHasKey( '__experimentalAutoField', $result['attributes']['blob'] );
+		$this->assertTrue( $result['attributes']['title']['__experimentalAutoInspectorControl'] );
+		$this->assertArrayNotHasKey( '__experimentalAutoInspectorControl', $result['attributes']['blob'] );
 	}
 
 	/**
@@ -99,7 +99,7 @@ class Tests_Blocks_Auto_Register extends WP_UnitTestCase {
 			'supports' => array( 'auto_register' => true ),
 		);
 
-		$result = gutenberg_mark_auto_field_attributes( $settings );
+		$result = gutenberg_mark_auto_inspector_control_attributes( $settings );
 
 		$this->assertSame( $settings, $result );
 	}

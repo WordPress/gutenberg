@@ -36,7 +36,7 @@ function gutenberg_register_auto_register_blocks() {
 add_action( 'enqueue_block_editor_assets', 'gutenberg_register_auto_register_blocks', 5 );
 
 /**
- * Mark user-defined attributes for auto-generated DataForm fields.
+ * Mark user-defined attributes for auto-generated inspector controls.
  *
  * This filter runs during block type registration, before the WP_Block_Type
  * is instantiated. Block supports add their attributes AFTER the block type
@@ -44,7 +44,7 @@ add_action( 'enqueue_block_editor_assets', 'gutenberg_register_auto_register_blo
  * present at this stage are user-defined.
  *
  * The marker tells generateFieldsFromAttributes() which attributes should
- * get DataForm inspector controls. Attributes are excluded if they:
+ * get auto-generated inspector controls. Attributes are excluded if they:
  * - Have a 'source' (HTML-derived, edited inline not via inspector)
  * - Have role 'local' (internal state, not user-configurable)
  * - Were added by block supports (added after this filter runs)
@@ -52,7 +52,7 @@ add_action( 'enqueue_block_editor_assets', 'gutenberg_register_auto_register_blo
  * @param array $settings Array of block type arguments for registration.
  * @return array Modified settings with marked attributes.
  */
-function gutenberg_mark_auto_field_attributes( $settings ) {
+function gutenberg_mark_auto_inspector_control_attributes( $settings ) {
 	if ( empty( $settings['attributes'] ) || ! is_array( $settings['attributes'] ) ) {
 		return $settings;
 	}
@@ -72,10 +72,10 @@ function gutenberg_mark_auto_field_attributes( $settings ) {
 		if ( isset( $def['role'] ) && 'local' === $def['role'] ) {
 			continue;
 		}
-		$settings['attributes'][ $name ]['__experimentalAutoField'] = true;
+		$settings['attributes'][ $name ]['__experimentalAutoInspectorControl'] = true;
 	}
 
 	return $settings;
 }
 
-add_filter( 'register_block_type_args', 'gutenberg_mark_auto_field_attributes', 5 );
+add_filter( 'register_block_type_args', 'gutenberg_mark_auto_inspector_control_attributes', 5 );
