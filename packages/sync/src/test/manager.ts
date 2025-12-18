@@ -95,11 +95,13 @@ describe( 'SyncManager', () => {
 		};
 
 		mockHandlers = {
+			addUndoMeta: jest.fn(),
 			editRecord: jest.fn(),
 			getEditedRecord: jest.fn( async () =>
 				Promise.resolve( mockRecord )
 			),
 			refetchRecord: jest.fn( async () => Promise.resolve() ),
+			restoreUndoMeta: jest.fn(),
 			saveRecord: jest.fn( async () => Promise.resolve() ),
 		};
 	} );
@@ -276,16 +278,6 @@ describe( 'SyncManager', () => {
 					mockSyncConfig.applyChangesToCRDTDoc
 				).toHaveBeenCalledWith( expect.any( Y.Doc ), mockRecord );
 
-				// Changes should be correctly applied.
-				const mockCall =
-					mockSyncConfig.applyChangesToCRDTDoc.mock.calls[ 0 ];
-				const targetDoc = mockCall[ 0 ] as Y.Doc;
-				const appliedChanges = mockCall[ 1 ] as ObjectData;
-				expect(
-					targetDoc.getMap( CRDT_RECORD_MAP_KEY ).get( 'title' )
-				).toBeUndefined();
-				expect( appliedChanges.title ).toStrictEqual( 'Test Post' );
-
 				// getChangesFromCRDTDoc should not be called since there was no persisted doc.
 				expect(
 					mockSyncConfig.getChangesFromCRDTDoc
@@ -295,7 +287,7 @@ describe( 'SyncManager', () => {
 				expect( mockHandlers.saveRecord ).toHaveBeenCalledTimes( 1 );
 			} );
 
-			it( 'applies a valid persisted CRDT doc without applying the current record', async () => {
+			it( 'accepts a valid persisted CRDT doc without applying changes', async () => {
 				const record = createRecordWithPersistedCRDTDoc( mockRecord );
 
 				mockSyncConfig = {
@@ -313,7 +305,7 @@ describe( 'SyncManager', () => {
 					mockHandlers
 				);
 
-				// Current record should NOT be applied since the persisted doc is valid.
+				// Changes should NOT be applied since the persisted doc is valid.
 				expect(
 					mockSyncConfig.applyChangesToCRDTDoc
 				).not.toHaveBeenCalled();
@@ -331,9 +323,10 @@ describe( 'SyncManager', () => {
 				expect( mockHandlers.saveRecord ).not.toHaveBeenCalled();
 			} );
 
-			it( 'applies an invalid persisted CRDT doc, then applies the current record', async () => {
+			it( 'applies an invalid CRDT doc, then applies changes', async () => {
 				const record = createRecordWithPersistedCRDTDoc( mockRecord, {
-					title: 'Title from persisted CRDT doc',
+					...mockRecord,
+					title: 'Invalidated title from persisted CRDT doc',
 				} );
 
 				mockSyncConfig = {
@@ -351,23 +344,17 @@ describe( 'SyncManager', () => {
 					mockHandlers
 				);
 
-				// Current record should be applied since the persisted doc is invalid.
+				// Changes should be applied for the invalidated properties.
+				const expectedChanges = {
+					title: mockRecord.title,
+				};
+
 				expect(
 					mockSyncConfig.applyChangesToCRDTDoc
 				).toHaveBeenCalledTimes( 1 );
 				expect(
 					mockSyncConfig.applyChangesToCRDTDoc
-				).toHaveBeenCalledWith( expect.any( Y.Doc ), record );
-
-				// Changes should be correctly applied.
-				const mockCall =
-					mockSyncConfig.applyChangesToCRDTDoc.mock.calls[ 0 ];
-				const targetDoc = mockCall[ 0 ] as Y.Doc;
-				const appliedChanges = mockCall[ 1 ] as ObjectData;
-				expect(
-					targetDoc.getMap( CRDT_RECORD_MAP_KEY ).get( 'title' )
-				).toStrictEqual( 'Title from persisted CRDT doc' );
-				expect( appliedChanges.title ).toStrictEqual( 'Test Post' );
+				).toHaveBeenCalledWith( expect.any( Y.Doc ), expectedChanges );
 
 				// getChangesFromCRDTDoc should be called with the persisted doc and record.
 				expect(
@@ -383,6 +370,7 @@ describe( 'SyncManager', () => {
 
 			it( 'ignores a persisted CRDT doc when CRDT persistence is not supported', async () => {
 				const record = createRecordWithPersistedCRDTDoc( mockRecord, {
+					...mockRecord,
 					title: 'Persisted Title',
 				} );
 
@@ -403,16 +391,6 @@ describe( 'SyncManager', () => {
 				expect(
 					mockSyncConfig.applyChangesToCRDTDoc
 				).toHaveBeenCalledWith( expect.any( Y.Doc ), record );
-
-				// Changes should be correctly applied.
-				const mockCall =
-					mockSyncConfig.applyChangesToCRDTDoc.mock.calls[ 0 ];
-				const targetDoc = mockCall[ 0 ] as Y.Doc;
-				const appliedChanges = mockCall[ 1 ] as ObjectData;
-				expect(
-					targetDoc.getMap( CRDT_RECORD_MAP_KEY ).get( 'title' )
-				).toBeUndefined();
-				expect( appliedChanges.title ).toStrictEqual( 'Test Post' );
 
 				// getChangesFromCRDTDoc should not be called since the persisted doc is igored.
 				expect(
