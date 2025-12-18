@@ -267,20 +267,18 @@ export const WithOnClickAndUrl: StoryFn< typeof Notice > = ( props ) => {
 	const [ clickCount, setClickCount ] = useState( 0 );
 
 	return (
-		<>
-			<Notice
-				{ ...props }
-				actions={ [
-					{
-						label: 'Visit WordPress.org',
-						url: 'https://wordpress.org',
-						onClick: () => setClickCount( ( c ) => c + 1 ),
-						openInNewTab: true,
-					},
-				] }
-			>
-				onClick now works with url. Click count: { clickCount }
-			</Notice>
-		</>
+		<Notice
+			{ ...props }
+			actions={ [
+				{
+					label: 'Visit WordPress.org',
+					url: 'https://wordpress.org',
+					onClick: () => setClickCount( ( c ) => c + 1 ),
+					openInNewTab: true,
+				},
+			] }
+		>
+			Click count: { clickCount }
+		</Notice>
 	);
 };
