@@ -62,6 +62,20 @@ async function openQuickEditForPage( page, admin, pageTitle ) {
 				requestUtils.deleteAllMedia(),
 				requestUtils.deleteAllPages(),
 			] );
+			await Promise.all( [
+				requestUtils.uploadMedia(
+					path.resolve(
+						process.cwd(),
+						'test/e2e/assets/10x10_e2e_test_image_z9T8jK.png'
+					)
+				),
+				requestUtils.uploadMedia(
+					path.resolve(
+						process.cwd(),
+						'test/e2e/assets/test-file.txt'
+					)
+				),
+			] );
 			const testPage = await requestUtils.createPage( {
 				title: 'Media Test Page',
 				status: 'publish',
@@ -79,23 +93,11 @@ async function openQuickEditForPage( page, admin, pageTitle ) {
 		} );
 
 		test.beforeEach( async ( { requestUtils } ) => {
-			await requestUtils.deleteAllMedia();
-			await Promise.all( [
-				requestUtils.rest( {
-					path: `/wp/v2/pages/${ testPageId }`,
-					method: 'POST',
-					data: { meta: { featured_media_test: [] } },
-				} ),
-				requestUtils.uploadMedia(
-					path.join(
-						'./test/e2e/assets',
-						'10x10_e2e_test_image_z9T8jK.png'
-					)
-				),
-				requestUtils.uploadMedia(
-					path.join( './test/e2e/assets', 'test-file.txt' )
-				),
-			] );
+			await requestUtils.rest( {
+				path: `/wp/v2/pages/${ testPageId }`,
+				method: 'POST',
+				data: { meta: { featured_media_test: [] } },
+			} );
 		} );
 
 		test( 'should add a file to featured image field', async ( {
