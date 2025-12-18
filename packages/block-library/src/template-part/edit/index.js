@@ -40,6 +40,8 @@ import {
 	useTemplatePartArea,
 } from './utils/hooks';
 
+const SUPPORTED_AREAS = [ 'header', 'footer' ];
+
 function ReplaceButton( {
 	isEntityAvailable,
 	area,
@@ -57,10 +59,9 @@ function ReplaceButton( {
 	const isOverlayExperimentEnabled =
 		typeof window !== 'undefined' &&
 		window.__experimentalNavigationOverlays === true;
-	const supportedAreas = [ 'header', 'footer' ];
-	if ( isOverlayExperimentEnabled ) {
-		supportedAreas.push( 'overlay' );
-	}
+	const supportedAreas = isOverlayExperimentEnabled
+		? [ ...SUPPORTED_AREAS, 'overlay' ]
+		: SUPPORTED_AREAS;
 	const canReplace =
 		isEntityAvailable && hasReplacements && supportedAreas.includes( area );
 
@@ -88,10 +89,9 @@ function TemplatesList( { area, clientId, isEntityAvailable, onSelect } ) {
 	const isOverlayExperimentEnabled =
 		typeof window !== 'undefined' &&
 		window.__experimentalNavigationOverlays === true;
-	const supportedAreas = [ 'header', 'footer' ];
-	if ( isOverlayExperimentEnabled ) {
-		supportedAreas.push( 'overlay' );
-	}
+	const supportedAreas = isOverlayExperimentEnabled
+		? [ ...SUPPORTED_AREAS, 'overlay' ]
+		: SUPPORTED_AREAS;
 	const canReplace =
 		isEntityAvailable &&
 		!! blockPatterns.length &&
