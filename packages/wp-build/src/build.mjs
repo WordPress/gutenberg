@@ -1061,17 +1061,10 @@ async function transpilePackage( packageName ) {
 						relativePath = './' + relativePath;
 					}
 
-					// Replace extension: if path ends with one of the extensions, replace it
-					const exts = [ '.js', '.jsx', '.ts', '.tsx' ];
+					// Replace extension: make sure that file extension is always `.js` or `.cjs`.
 					const newExt =
 						build.initialOptions.format === 'cjs' ? '.cjs' : '.js';
-					for ( const ext of exts ) {
-						if ( relativePath.endsWith( ext ) ) {
-							relativePath =
-								relativePath.slice( 0, -ext.length ) + newExt;
-							break;
-						}
-					}
+					relativePath = relativePath.replace( /\.[jt]sx?$/, newExt );
 
 					return {
 						path: relativePath,
