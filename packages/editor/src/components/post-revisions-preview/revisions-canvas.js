@@ -61,13 +61,13 @@ export default function RevisionsCanvas( { revision } ) {
 	}
 
 	return (
-		<div className="editor-revisions-canvas">
+		<>
 			<ExperimentalBlockEditorProvider
 				value={ blocks }
 				settings={ settings }
 			>
 				<VisualEditor />
 			</ExperimentalBlockEditorProvider>
-		</div>
+		</>
 	);
 }

@@ -3,7 +3,7 @@
  */
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useMediaQuery, useViewportMatch } from '@wordpress/compose';
+import { useViewportMatch } from '@wordpress/compose';
 import {
 	Button,
 	RangeControl,
@@ -11,22 +11,18 @@ import {
 	__unstableMotion as motion,
 } from '@wordpress/components';
 import { store as preferencesStore } from '@wordpress/preferences';
-import { useState } from '@wordpress/element';
 import { PinnedItems } from '@wordpress/interface';
 import { __ } from '@wordpress/i18n';
 import { closeSmall } from '@wordpress/icons';
+import { dateI18n, getSettings as getDateSettings } from '@wordpress/date';
 
 /**
  * Internal dependencies
  */
 import BackButton, { useHasBackButton } from '../header/back-button';
-import CollapsibleBlockToolbar from '../collapsible-block-toolbar';
-import DocumentTools from '../document-tools';
 import MoreMenu from '../more-menu';
 import PostPreviewButton from '../post-preview-button';
-import PostViewLink from '../post-view-link';
 import PreviewDropdown from '../preview-dropdown';
-import ZoomOutToggle from '../zoom-out-toggle';
 import { store as editorStore } from '../../store';
 import {
 	TEMPLATE_PART_POST_TYPE,
@@ -71,16 +67,7 @@ function RevisionsHeader( {
 	isLoading,
 } ) {
 	const isWideViewport = useViewportMatch( 'large' );
-	const isLargeViewport = useViewportMatch( 'medium' );
-	const isTooNarrowForDocumentBar = useMediaQuery( '(max-width: 403px)' );
-	const {
-		postType,
-		isTextEditor,
-		showIconLabels,
-		hasFixedToolbar,
-		hasBlockSelection,
-		hasSectionRootClientId,
-	} = useSelect( ( select ) => {
+	const { postType, showIconLabels } = useSelect( ( select ) => {
 		const { get: getPreference } = select( preferencesStore );
 		const { getEditorMode, getCurrentPostType } = select( editorStore );
 		const { getBlockSelectionStart, getSectionRootClientId } = unlock(
@@ -101,24 +88,12 @@ function RevisionsHeader( {
 		useDispatch( editorStore )
 	);
 
-	const canBeZoomedOut =
-		[ 'post', 'page', 'wp_template' ].includes( postType ) &&
-		hasSectionRootClientId;
-
 	const disablePreviewOption = [
 		NAVIGATION_POST_TYPE,
 		TEMPLATE_PART_POST_TYPE,
 		PATTERN_POST_TYPE,
 	].includes( postType );
 
-	const [ isBlockToolsCollapsed, setIsBlockToolsCollapsed ] =
-		useState( true );
-
-	const hasCenter =
-		! isTooNarrowForDocumentBar &&
-		( ! hasFixedToolbar ||
-			( hasFixedToolbar &&
-				( ! hasBlockSelection || isBlockToolsCollapsed ) ) );
 	const hasBackButton = useHasBackButton();
 
 	const hasRevisions = revisions.length > 0;
@@ -128,6 +103,16 @@ function RevisionsHeader( {
 		if ( selectedRevision ) {
 			restoreRevision( selectedRevision );
 		}
+	};
+
+	// Format date for tooltip.
+	const dateSettings = getDateSettings();
+	const renderTooltipContent = ( index ) => {
+		const revision = revisions[ index ];
+		if ( ! revision ) {
+			return index;
+		}
+		return dateI18n( dateSettings.formats.datetime, revision.date );
 	};
 
 	const renderCenterContent = () => {
@@ -144,7 +129,9 @@ function RevisionsHeader( {
 					label={ __( 'Revision' ) }
 					max={ revisions.length - 1 }
 					min={ 0 }
+					marks
 					onChange={ onSelectIndex }
+					renderTooltipContent={ renderTooltipContent }
 					value={ selectedIndex }
 					withInputField={ false }
 				/>
@@ -177,28 +164,6 @@ function RevisionsHeader( {
 				className="editor-header__toolbar"
 				transition={ { type: 'tween' } }
 			>
-				<DocumentTools disableBlockTools={ isTextEditor } />
-				{ hasFixedToolbar && isLargeViewport && (
-					<CollapsibleBlockToolbar
-						isCollapsed={ isBlockToolsCollapsed }
-						onToggle={ setIsBlockToolsCollapsed }
-					/>
-				) }
-			</motion.div>
-			{ hasCenter && (
-				<motion.div
-					className="editor-header__center"
-					variants={ toolbarVariations }
-					transition={ { type: 'tween' } }
-				>
-					{ renderCenterContent() }
-				</motion.div>
-			) }
-			<motion.div
-				variants={ toolbarVariations }
-				transition={ { type: 'tween' } }
-				className="editor-header__settings"
-			>
 				<Button
 					__next40pxDefaultSize
 					className="editor-revisions-header__close-button"
@@ -206,16 +171,21 @@ function RevisionsHeader( {
 					label={ __( 'Close revisions' ) }
 					onClick={ exitRevisionsMode }
 				/>
-
-				<PostViewLink />
-
+			</motion.div>
+			<div
+				className="editor-header__center"
+				style={ { clipPath: 'none' } }
+			>
+				{ renderCenterContent() }
+			</div>
+			<motion.div
+				variants={ toolbarVariations }
+				transition={ { type: 'tween' } }
+				className="editor-header__settings"
+			>
 				<PreviewDropdown disabled={ disablePreviewOption } />
 
 				<PostPreviewButton className="editor-header__post-preview-button" />
-
-				{ isWideViewport && canBeZoomedOut && (
-					<ZoomOutToggle disabled />
-				) }
 
 				{ ( isWideViewport || ! showIconLabels ) && (
 					<PinnedItems.Slot scope="core" />
@@ -225,6 +195,7 @@ function RevisionsHeader( {
 					__next40pxDefaultSize
 					accessibleWhenDisabled
 					variant="primary"
+					size="compact"
 					className="editor-revisions-header__restore-button"
 					disabled={ ! canRestore }
 					onClick={ handleRestore }
