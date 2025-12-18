@@ -117,11 +117,6 @@ export function useSettingsForBlockElement(
 				...updatedSettings.typography,
 				textIndent: updatedSettings.typography?.textIndent ?? true,
 			};
-		} else {
-			updatedSettings.typography = {
-				...updatedSettings.typography,
-				textIndent: false,
-			};
 		}
 
 		// The column-count style is named text column to reduce confusion with
