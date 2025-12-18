@@ -1,14 +1,14 @@
 /**
  * External dependencies
  */
-import { startOfMinute, set, setMonth } from 'date-fns';
+import { startOfMinute } from 'date-fns';
 
 /**
  * WordPress dependencies
  */
 import { useState, useMemo, useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { dateI18n } from '@wordpress/date';
+import { dateI18n, getSettings } from '@wordpress/date';
 
 /**
  * Internal dependencies
@@ -32,6 +32,7 @@ import {
 	inputToDate,
 	buildPadInputStateReducer,
 	validateInputElementTarget,
+	setInConfiguredTimezone,
 } from '../utils';
 import { TIMEZONELESS_FORMAT } from '../constants';
 import { TimeInput } from './time-input';
@@ -91,20 +92,23 @@ export function TimePicker( {
 		{ value: '12', label: __( 'December' ) },
 	] as const;
 
-	const { day, month, year, minutes, hours } = useMemo(
-		() => ( {
-			// Use dateI18n to display values in the configured timezone.
-			day: dateI18n( 'd', date ),
+	const { day, month, year, minutes, hours } = useMemo( () => {
+		// Internal date is UTC-normalized, but should be displayed using
+		// configured timezone offset.
+		const { timezone } = getSettings();
+		const offsetMinutes = timezone.offset * 60;
+		return {
+			day: dateI18n( 'd', date, offsetMinutes ),
 			month: dateI18n(
 				'm',
-				date
+				date,
+				offsetMinutes
 			) as ( typeof monthOptions )[ number ][ 'value' ],
-			year: dateI18n( 'Y', date ),
-			minutes: dateI18n( 'i', date ),
-			hours: dateI18n( 'H', date ),
-		} ),
-		[ date ]
-	);
+			year: dateI18n( 'Y', date, offsetMinutes ),
+			minutes: dateI18n( 'i', date, offsetMinutes ),
+			hours: dateI18n( 'H', date, offsetMinutes ),
+		};
+	}, [ date ] );
 
 	const buildNumberControlChangeCallback = ( method: 'date' | 'year' ) => {
 		const callback: InputChangeCallback = ( value, { event } ) => {
@@ -115,14 +119,17 @@ export function TimePicker( {
 			// We can safely assume value is a number if target is valid.
 			const numberValue = Number( value );
 
-			const newDate = set( date, { [ method ]: numberValue } );
+			// Internal date is UTC-normalized, but the field should be updated
+			// as if in the configured timezone.
+			const newDate = setInConfiguredTimezone( date, {
+				[ method ]: numberValue,
+			} );
 			setDate( newDate );
+
+			// Format output using configured timezone offset
+			const { timezone } = getSettings();
 			onChange?.(
-				dateI18n(
-					TIMEZONELESS_FORMAT,
-					newDate,
-					-newDate.getTimezoneOffset()
-				)
+				dateI18n( TIMEZONELESS_FORMAT, newDate, timezone.offset * 60 )
 			);
 		};
 		return callback;
@@ -132,17 +139,18 @@ export function TimePicker( {
 		hours: newHours,
 		minutes: newMinutes,
 	}: TimeInputValue ) => {
-		const newDate = set( date, {
+		// Internal date is UTC-normalized, but the field should be updated
+		// as if in the configured timezone.
+		const newDate = setInConfiguredTimezone( date, {
 			hours: newHours,
 			minutes: newMinutes,
 		} );
 		setDate( newDate );
+
+		// Format output using configured timezone offset
+		const { timezone } = getSettings();
 		onChange?.(
-			dateI18n(
-				TIMEZONELESS_FORMAT,
-				newDate,
-				-newDate.getTimezoneOffset()
-			)
+			dateI18n( TIMEZONELESS_FORMAT, newDate, timezone.offset * 60 )
 		);
 	};
 
@@ -176,13 +184,20 @@ export function TimePicker( {
 				value={ month }
 				options={ monthOptions }
 				onChange={ ( value ) => {
-					const newDate = setMonth( date, Number( value ) - 1 );
+					// Internal date is UTC-normalized, but the field should be updated
+					// as if in the configured timezone.
+					const newDate = setInConfiguredTimezone( date, {
+						month: Number( value ) - 1,
+					} );
 					setDate( newDate );
+
+					// Format output using configured timezone offset
+					const { timezone } = getSettings();
 					onChange?.(
 						dateI18n(
 							TIMEZONELESS_FORMAT,
 							newDate,
-							-newDate.getTimezoneOffset()
+							timezone.offset * 60
 						)
 					);
 				} }

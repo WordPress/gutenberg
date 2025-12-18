@@ -124,6 +124,52 @@ export function buildPadInputStateReducer( pad: number ) {
 }
 
 /**
+ * Updates specific date fields in the configured timezone and returns a new
+ * UTC date.
+ *
+ * @param date    A Date object
+ * @param updates Object with fields to update
+ * @return A Date object normalized to UTC with the updated values
+ */
+export function setInConfiguredTimezone(
+	date: Date,
+	updates: Partial< {
+		year: number;
+		month: number;
+		date: number;
+		hours: number;
+		minutes: number;
+		seconds: number;
+	} >
+): Date {
+	const { timezone } = getSettings();
+	const offsetMs = timezone.offset * 60 * 60 * 1000;
+
+	// Shift to configured timezone
+	const targetDate = new Date( date.getTime() + offsetMs );
+	const values = {
+		year: targetDate.getUTCFullYear(),
+		month: targetDate.getUTCMonth(),
+		date: targetDate.getUTCDate(),
+		hours: targetDate.getUTCHours(),
+		minutes: targetDate.getUTCMinutes(),
+		seconds: targetDate.getUTCSeconds(),
+		...updates,
+	};
+
+	return new UTCDateMini(
+		Date.UTC(
+			values.year,
+			values.month,
+			values.date,
+			values.hours,
+			values.minutes,
+			values.seconds
+		) - offsetMs
+	);
+}
+
+/**
  * Validates the target of a React event to ensure it is an input element and
  * that the input is valid.
  * @param event
