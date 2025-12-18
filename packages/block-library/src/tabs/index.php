@@ -140,25 +140,25 @@ function block_core_tabs_generate_tabs_list_from_innerblocks( array $innerblocks
  * @return string Inline CSS string.
  */
 function block_core_tabs_generate_border_styles( array $attributes ): string {
-    if ( empty( $attributes['style']['border']['radius'] ) ) {
-        return '';
-    }
+	if ( empty( $attributes['style']['border']['radius'] ) ) {
+		return '';
+	}
 
-    $radius = $attributes['style']['border']['radius'];
+	$radius = $attributes['style']['border']['radius'];
 
-    if ( is_array( $radius ) ) {
-        $radius_value = wp_sprintf(
-            '%s %s %s %s',
-            $radius['topLeft'] ?? '0',
-            $radius['topRight'] ?? '0',
-            $radius['bottomRight'] ?? '0',
-            $radius['bottomLeft'] ?? '0'
-        );
-    } else {
-        $radius_value = (string) $radius;
-    }
+	if ( is_array( $radius ) ) {
+		$radius_value = wp_sprintf(
+			'%s %s %s %s',
+			$radius['topLeft'] ?? '0',
+			$radius['topRight'] ?? '0',
+			$radius['bottomRight'] ?? '0',
+			$radius['bottomLeft'] ?? '0'
+		);
+	} else {
+		$radius_value = (string) $radius;
+	}
 
-    return wp_sprintf( '--tab-border-radius: %s;', $radius_value );
+	return wp_sprintf( '--tab-border-radius: %s;', $radius_value );
 }
 
 /**
