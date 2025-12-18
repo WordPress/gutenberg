@@ -94,6 +94,7 @@ export const AllIntents: Story = {
 				gridTemplateColumns: 'max-content min-content',
 				gap: '1rem',
 				color: 'var(--wpds-color-fg-content-neutral)',
+				backgroundColor: 'var(--wpds-color-bg-surface-neutral-strong)',
 			} }
 		>
 			{ (
