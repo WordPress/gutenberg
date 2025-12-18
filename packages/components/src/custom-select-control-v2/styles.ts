@@ -11,7 +11,7 @@ import { COLORS, CONFIG } from '../utils';
 import { space } from '../utils/space';
 import { chevronIconSize } from '../select-control/styles/select-control-styles';
 import { fontSizeStyles } from '../input-control/styles/input-control-styles';
-import { DROPDOWN_MOTION } from '../utils/style-mixins';
+import { DROPDOWN_MOTION_CSS } from '../utils/style-mixins';
 import type { CustomSelectButtonSize } from './types';
 
 const INLINE_PADDING = {
@@ -100,7 +100,7 @@ export const Select = styled( Ariakit.Select, {
 );
 
 const slideDown = keyframes( {
-	'0%': { transform: `translateY(-${ DROPDOWN_MOTION.SLIDE_DISTANCE })` },
+	'0%': { transform: `translateY(-${ DROPDOWN_MOTION_CSS.SLIDE_DISTANCE })` },
 	'100%': { transform: 'translateY(0)' },
 } );
 
@@ -132,10 +132,10 @@ export const SelectPopover = styled( Ariakit.SelectPopover )`
 	&[data-open] {
 		@media not ( prefers-reduced-motion ) {
 			animation-name: ${ slideDown }, ${ fadeIn };
-			animation-duration: ${ DROPDOWN_MOTION.SLIDE_DURATION },
-				${ DROPDOWN_MOTION.FADE_DURATION };
-			animation-timing-function: ${ DROPDOWN_MOTION.SLIDE_EASING },
-				${ DROPDOWN_MOTION.FADE_EASING };
+			animation-duration: ${ DROPDOWN_MOTION_CSS.SLIDE_DURATION },
+				${ DROPDOWN_MOTION_CSS.FADE_DURATION };
+			animation-timing-function: ${ DROPDOWN_MOTION_CSS.SLIDE_EASING },
+				${ DROPDOWN_MOTION_CSS.FADE_EASING };
 			will-change: transform, opacity;
 		}
 	}

@@ -8,7 +8,7 @@ import styled from '@emotion/styled';
 /**
  * Internal dependencies
  */
-import { COLORS, font, rtl, CONFIG, DROPDOWN_MOTION } from '../utils';
+import { COLORS, font, rtl, CONFIG, DROPDOWN_MOTION_CSS } from '../utils';
 import { space } from '../utils/space';
 import Icon from '../icon';
 import { Truncate } from '../truncate';
@@ -50,10 +50,10 @@ export const PopoverOuterWrapper = styled.div<
 	/* Open/close animation */
 	@media not ( prefers-reduced-motion ) {
 		transition-property: transform, opacity;
-		transition-duration: ${ DROPDOWN_MOTION.SLIDE_DURATION },
-			${ DROPDOWN_MOTION.FADE_DURATION };
-		transition-timing-function: ${ DROPDOWN_MOTION.SLIDE_EASING },
-			${ DROPDOWN_MOTION.FADE_EASING };
+		transition-duration: ${ DROPDOWN_MOTION_CSS.SLIDE_DURATION },
+			${ DROPDOWN_MOTION_CSS.FADE_DURATION };
+		transition-timing-function: ${ DROPDOWN_MOTION_CSS.SLIDE_EASING },
+			${ DROPDOWN_MOTION_CSS.FADE_EASING };
 		will-change: transform, opacity;
 
 		/* Regardless of the side, fade in and out. */
@@ -64,16 +64,16 @@ export const PopoverOuterWrapper = styled.div<
 
 		/* Slide in the direction the menu is opening. */
 		&:has( [data-side='bottom'] ) {
-			transform: translateY( -${ DROPDOWN_MOTION.SLIDE_DISTANCE } );
+			transform: translateY( -${ DROPDOWN_MOTION_CSS.SLIDE_DISTANCE } );
 		}
 		&:has( [data-side='top'] ) {
-			transform: translateY( ${ DROPDOWN_MOTION.SLIDE_DISTANCE } );
+			transform: translateY( ${ DROPDOWN_MOTION_CSS.SLIDE_DISTANCE } );
 		}
 		&:has( [data-side='left'] ) {
-			transform: translateX( ${ DROPDOWN_MOTION.SLIDE_DISTANCE } );
+			transform: translateX( ${ DROPDOWN_MOTION_CSS.SLIDE_DISTANCE } );
 		}
 		&:has( [data-side='right'] ) {
-			transform: translateX( -${ DROPDOWN_MOTION.SLIDE_DISTANCE } );
+			transform: translateX( -${ DROPDOWN_MOTION_CSS.SLIDE_DISTANCE } );
 		}
 		&:has( [data-enter][data-side='bottom'] ),
 		&:has( [data-enter][data-side='top'] ) {
