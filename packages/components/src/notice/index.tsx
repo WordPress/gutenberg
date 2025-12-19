@@ -123,6 +123,7 @@ function Notice( {
 									noDefaultClasses = false,
 									onClick,
 									url,
+									href,
 									...buttonProps
 								}: NoticeAction &
 									// `isPrimary` is a legacy prop included for
@@ -131,12 +132,13 @@ function Notice( {
 									Pick< DeprecatedButtonProps, 'isPrimary' >,
 								index
 							) => {
+								const actionHref = url || href;
 								let computedVariant = variant;
 								if (
 									variant !== 'primary' &&
 									! noDefaultClasses
 								) {
-									computedVariant = ! url
+									computedVariant = ! actionHref
 										? 'secondary'
 										: 'link';
 								}
@@ -152,7 +154,7 @@ function Notice( {
 										{ ...buttonProps }
 										__next40pxDefaultSize
 										key={ index }
-										href={ url }
+										href={ actionHref }
 										variant={ computedVariant }
 										onClick={ onClick }
 										className={ clsx(
