@@ -7,9 +7,6 @@
 					"$value": {
 						"value": 1.5,
 						"unit": "px"
-					},
-					"$extensions": {
-						"com.figma.scopes": [ "STROKE_FLOAT" ]
 					}
 				}
 			}
