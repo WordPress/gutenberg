@@ -233,7 +233,8 @@ WithOpenInNewTab.args = {
 		{
 			label: 'Documentation',
 			url: 'https://wordpress.org',
-			openInNewTab: true,
+			target: '_blank',
+			rel: 'noreferrer',
 			icon: external,
 			iconPosition: 'right',
 		},
@@ -274,7 +275,8 @@ export const WithOnClickAndUrl: StoryFn< typeof Notice > = ( props ) => {
 					label: 'Visit WordPress.org',
 					url: 'https://wordpress.org',
 					onClick: () => setClickCount( ( c ) => c + 1 ),
-					openInNewTab: true,
+					target: '_blank',
+					rel: 'noreferrer',
 				},
 			] }
 		>

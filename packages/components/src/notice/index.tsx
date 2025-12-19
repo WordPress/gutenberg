@@ -123,7 +123,6 @@ function Notice( {
 									noDefaultClasses = false,
 									onClick,
 									url,
-									openInNewTab,
 									...buttonProps
 								}: NoticeAction &
 									// `isPrimary` is a legacy prop included for
@@ -154,11 +153,6 @@ function Notice( {
 										__next40pxDefaultSize
 										key={ index }
 										href={ url }
-										target={
-											url && openInNewTab
-												? '_blank'
-												: undefined
-										}
 										variant={ computedVariant }
 										onClick={ onClick }
 										className={ clsx(

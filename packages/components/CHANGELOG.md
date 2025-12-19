@@ -31,7 +31,7 @@
 -   `Popover`: Update animation, also affecting `Autocomplete`, `BorderControl`, `CircularOptionPicker`, `ColorPalette`, `Dropdown`, `DropdownMenu`, and `PaletteEdit` ([#74082](https://github.com/WordPress/gutenberg/pull/74082)).
 -   `Autocomplete`: Add offset to popover ([#74084](https://github.com/WordPress/gutenberg/pull/74084)).
 -   `Button`: Hide focus style when `:active` ([#74106](https://github.com/WordPress/gutenberg/pull/74106)).
--   `Notice`: Enhance action buttons to support additional `Button` props like `disabled`, `icon`, `isBusy`, `size`, and `isDestructive`. Also implement `openInNewTab` and allow `onClick` to work alongside `url` ([#74094](https://github.com/WordPress/gutenberg/pull/74094)).
+-   `Notice`: Enhance action buttons to support additional `Button` props like `disabled`, `icon`, `isBusy`, `size`, `target`, and `rel`. Also allow `onClick` to work alongside `url` ([#74094](https://github.com/WordPress/gutenberg/pull/74094)).
 
 ### Bug Fixes
 

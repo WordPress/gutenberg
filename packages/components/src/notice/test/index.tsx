@@ -206,14 +206,15 @@ describe( 'Notice', () => {
 			expect( button ).toHaveClass( 'is-destructive' );
 		} );
 
-		it( 'should render a link with target="_blank" when openInNewTab is true', () => {
+		it( 'should render a link with target="_blank"', () => {
 			render(
 				<Notice
 					actions={ [
 						{
 							label: 'External link',
 							url: 'https://example.com',
-							openInNewTab: true,
+							target: '_blank',
+							rel: 'noreferrer',
 						},
 					] }
 				>
@@ -223,6 +224,7 @@ describe( 'Notice', () => {
 
 			const link = screen.getByRole( 'link', { name: 'External link' } );
 			expect( link ).toHaveAttribute( 'target', '_blank' );
+			expect( link ).toHaveAttribute( 'rel', 'noreferrer' );
 		} );
 
 		it( 'should call onClick when action with url is clicked', async () => {
