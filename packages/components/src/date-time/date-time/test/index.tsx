@@ -355,6 +355,26 @@ describe( 'DateTimePicker', () => {
 					expect( screen.getByLabelText( 'Minutes' ) ).toHaveValue(
 						0
 					);
+
+					// Ensure week boundaries keyboard navigation is calculated
+					// correctly in the configured timezone, not the browser's.
+					await user.click(
+						screen.getByRole( 'button', {
+							name: 'November 20, 2025. Selected',
+						} )
+					);
+					await user.keyboard( '{Home}' );
+					expect(
+						screen.getByRole( 'button', {
+							name: 'November 16, 2025',
+						} )
+					).toHaveFocus();
+					await user.keyboard( '{End}' );
+					expect(
+						screen.getByRole( 'button', {
+							name: 'November 22, 2025',
+						} )
+					).toHaveFocus();
 				} );
 			} );
 		} );

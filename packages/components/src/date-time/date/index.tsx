@@ -5,14 +5,12 @@ import {
 	isSameDay,
 	subMonths,
 	addMonths,
-	startOfDay,
 	isEqual,
 	addDays,
+	subDays,
 	subWeeks,
 	addWeeks,
 	isSameMonth,
-	startOfWeek,
-	endOfWeek,
 } from 'date-fns';
 import type { KeyboardEventHandler } from 'react';
 
@@ -248,11 +246,23 @@ export function DatePicker( {
 										nextFocusable = addMonths( day, 1 );
 									}
 									if ( event.key === 'Home' ) {
-										nextFocusable = startOfWeek( day );
+										const dayOfWeek = day.getDay();
+										const daysToSubtract =
+											( dayOfWeek - weekStartsOn + 7 ) %
+											7;
+										nextFocusable = subDays(
+											day,
+											daysToSubtract
+										);
 									}
 									if ( event.key === 'End' ) {
-										nextFocusable = startOfDay(
-											endOfWeek( day )
+										const dayOfWeek = day.getDay();
+										const daysToAdd =
+											( weekStartsOn + 6 - dayOfWeek ) %
+											7;
+										nextFocusable = addDays(
+											day,
+											daysToAdd
 										);
 									}
 									if ( nextFocusable ) {
