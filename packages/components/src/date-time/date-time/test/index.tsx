@@ -179,6 +179,27 @@ describe( 'DateTimePicker', () => {
 							} )
 						).toBeVisible();
 					} );
+
+					it( 'should display event indicators correctly', () => {
+						// Test event indicators, where Date objects constructed
+						// from timezoneless strings are passed to the component
+						// and thus are interpreted in browser timezone.
+
+						timezoneMock.register( timezone );
+
+						render(
+							<DateTimePicker
+								currentDate={ initialDate }
+								events={ [ { date: new Date( initialDate ) } ] }
+							/>
+						);
+
+						expect(
+							screen.getByRole( 'button', {
+								name: `${ initialButton }. There is 1 event`,
+							} )
+						).toBeVisible();
+					} );
 				}
 			);
 		} );
@@ -398,38 +419,5 @@ describe( 'DateTimePicker', () => {
 		);
 
 		expect( onChange ).toHaveBeenCalledWith( '2025-11-20T14:30:00' );
-	} );
-
-	it( 'should display event indicators based on site timezone', () => {
-		timezoneMock.register( 'US/Pacific' );
-
-		render(
-			<DateTimePicker
-				currentDate="2025-11-15T00:00:00"
-				events={ [
-					// Nov 20 10:00 site time
-					{ date: new Date( Date.UTC( 2025, 10, 20, 15, 0, 0 ) ) },
-					// Nov 20 23:00 site time
-					{ date: new Date( Date.UTC( 2025, 10, 21, 4, 0, 0 ) ) },
-					// Nov 21 01:00 site time
-					{ date: new Date( Date.UTC( 2025, 10, 21, 6, 0, 0 ) ) },
-				] }
-			/>
-		);
-		expect(
-			screen.getByRole( 'button', {
-				name: 'November 15, 2025. Selected',
-			} )
-		).toBeVisible();
-		expect(
-			screen.getByRole( 'button', {
-				name: 'November 20, 2025. There are 2 events',
-			} )
-		).toBeVisible();
-		expect(
-			screen.getByRole( 'button', {
-				name: 'November 21, 2025. There is 1 event',
-			} )
-		).toBeVisible();
 	} );
 } );
