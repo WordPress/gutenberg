@@ -473,6 +473,18 @@ describe( 'TimePicker', () => {
 				timezoneMock.register( timezone );
 			} );
 
+			function transformOnChangeToDate( nextValue: string ): Date {
+				// Timezoneless string represents site timezone. Convert to UTC
+				// instant in site timezone. In typical usage, consumers should
+				// align `@wordpress/date` settings to match their browser timezone
+				// when working with dates, to avoid having to manage this
+				// conversion themselves.
+				const settings = getSettings();
+				const offsetMs = settings.timezone.offset * 60 * 60 * 1000;
+				const asUTC = new Date( nextValue + 'Z' );
+				return new Date( asUTC.getTime() - offsetMs );
+			}
+
 			describe.each( [
 				{
 					type: 'timezoneless string',
@@ -480,42 +492,26 @@ describe( 'TimePicker', () => {
 					transformOnChange: ( nextValue: string ) => nextValue,
 				},
 				{
+					type: 'string with timezone',
+					initialTime: '2025-12-18T12:00:00Z',
+					transformOnChange: ( nextValue: string ) =>
+						transformOnChangeToDate( nextValue ).toISOString(),
+				},
+				{
 					type: 'Date object',
 					initialTime: new Date( Date.UTC( 2025, 11, 18, 12, 0, 0 ) ),
-					transformOnChange: ( nextValue: string ) => {
-						// Timezoneless string represents site timezone.
-						// Convert to UTC instant in site timezone.
-						const settings = getSettings();
-						const offsetMs =
-							settings.timezone.offset * 60 * 60 * 1000;
-						const asUTC = new Date( nextValue + 'Z' );
-						return new Date( asUTC.getTime() - offsetMs );
-					},
+					transformOnChange: transformOnChangeToDate,
 				},
 				{
 					type: 'timestamp',
 					initialTime: Date.UTC( 2025, 11, 18, 12, 0, 0 ),
-					transformOnChange: ( nextValue: string ) => {
-						// For timestamps, properly convert timezoneless string to UTC
-						const settings = getSettings();
-						const offsetMs =
-							settings.timezone.offset * 60 * 60 * 1000;
-						const asUTC = new Date( nextValue + 'Z' );
-						return asUTC.getTime() - offsetMs;
-					},
+					transformOnChange: ( nextValue: string ) =>
+						transformOnChangeToDate( nextValue ).getTime(),
 				},
 				{
 					type: 'undefined',
 					initialTime: undefined,
-					transformOnChange: ( nextValue: string ) => {
-						// Timezoneless string represents site timezone.
-						// Convert to UTC instant in site timezone.
-						const settings = getSettings();
-						const offsetMs =
-							settings.timezone.offset * 60 * 60 * 1000;
-						const asUTC = new Date( nextValue + 'Z' );
-						return new Date( asUTC.getTime() - offsetMs );
-					},
+					transformOnChange: ( nextValue: string ) => nextValue,
 				},
 			] )( 'with $type', ( { initialTime, transformOnChange } ) => {
 				it( 'should output timezoneless string matching displayed time', async () => {

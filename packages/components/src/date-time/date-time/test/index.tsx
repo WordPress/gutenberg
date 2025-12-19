@@ -228,6 +228,12 @@ describe( 'DateTimePicker', () => {
 					transformOnChange: ( nextValue: string ) => nextValue,
 				},
 				{
+					type: 'string with timezone',
+					initialDate: '2025-11-16T01:00:00Z',
+					transformOnChange: ( nextValue: string ) =>
+						transformOnChangeToDate( nextValue ).toISOString(),
+				},
+				{
 					type: 'Date object',
 					initialDate: new Date( Date.UTC( 2025, 10, 16, 1, 0, 0 ) ),
 					transformOnChange: transformOnChangeToDate,
