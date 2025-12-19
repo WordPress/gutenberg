@@ -24,7 +24,6 @@ import {
 	filenameField,
 	filesizeField,
 	mediaDimensionsField,
-	mediaThumbnailField,
 	mimeTypeField,
 } from '@wordpress/media-fields';
 import { MediaEditorProvider, MediaForm } from '@wordpress/media-editor';
@@ -39,14 +38,13 @@ import PostCardPanel from './post-card-panel';
 const { Tabs } = unlock( componentsPrivateApis );
 
 const MEDIA_FIELDS: Field< Media >[] = [
-	mediaThumbnailField,
-	altTextField,
-	captionField,
-	descriptionField,
 	filenameField,
 	filesizeField,
 	mediaDimensionsField,
 	mimeTypeField,
+	altTextField,
+	captionField,
+	descriptionField,
 ].filter( Boolean );
 
 const SIDEBAR_ACTIVE_BY_DEFAULT = Platform.select( {

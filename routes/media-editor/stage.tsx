@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { useParams } from '@wordpress/route';
+import { SlotFillProvider } from '@wordpress/components';
 import {
 	useEntityRecord,
 	EntityProvider,
@@ -26,7 +27,6 @@ import {
 	filenameField,
 	filesizeField,
 	mediaDimensionsField,
-	mediaThumbnailField,
 	mimeTypeField,
 } from '@wordpress/media-fields';
 import type { Field } from '@wordpress/media-editor';
@@ -39,14 +39,13 @@ import Sidebar from './components/sidebar';
 import './style.scss';
 
 const MEDIA_FIELDS: Field< Media >[] = [
-	mediaThumbnailField,
-	altTextField,
-	captionField,
-	descriptionField,
 	filenameField,
 	filesizeField,
 	mediaDimensionsField,
 	mimeTypeField,
+	altTextField,
+	captionField,
+	descriptionField,
 ].filter( Boolean );
 
 const interfaceLabels = {
@@ -88,35 +87,37 @@ function MediaEditorRoute() {
 	};
 
 	return (
-		<EntityProvider kind="postType" type="attachment" id={ postId }>
-			<div className="media-editor-layout">
-				<InterfaceSkeleton
-					labels={ interfaceLabels }
-					className="media-editor-interface"
-					header={ <Header postId={ postId } /> }
-					content={
-						<div className="media-editor-canvas">
-							<div className="media-editor-canvas__content">
-								<MediaEditorProvider
-									media={ editedMedia }
-									fields={ MEDIA_FIELDS }
-									onUpdate={ handleUpdate }
-									isLoading={ isResolving }
-								>
-									<MediaPreview />
-								</MediaEditorProvider>
+		<SlotFillProvider>
+			<EntityProvider kind="postType" type="attachment" id={ postId }>
+				<div className="media-editor-layout">
+					<InterfaceSkeleton
+						labels={ interfaceLabels }
+						className="media-editor-interface"
+						header={ <Header postId={ postId } /> }
+						content={
+							<div className="media-editor-canvas">
+								<div className="media-editor-canvas__content">
+									<MediaEditorProvider
+										media={ editedMedia }
+										fields={ MEDIA_FIELDS }
+										onUpdate={ handleUpdate }
+										isLoading={ isResolving }
+									>
+										<MediaPreview />
+									</MediaEditorProvider>
+								</div>
 							</div>
-						</div>
-					}
-					sidebar={
-						<ComplementaryArea.Slot scope="core/media-editor" />
-					}
-					secondarySidebar={ null }
-					footer={ null }
-				/>
-				<Sidebar postId={ postId } />
-			</div>
-		</EntityProvider>
+						}
+						sidebar={
+							<ComplementaryArea.Slot scope="core/media-editor" />
+						}
+						secondarySidebar={ null }
+						footer={ null }
+					/>
+					<Sidebar postId={ postId } />
+				</div>
+			</EntityProvider>
+		</SlotFillProvider>
 	);
 }
 
