@@ -29,16 +29,6 @@ export interface MediaEditProps< Item > extends DataFormControlProps< Item > {
 	 */
 	allowedTypes?: string[];
 	/**
-	 * Placeholder text when no media is selected.
-	 *
-	 * @default 'Choose file'
-	 */
-	placeholder?: string;
-	/**
-	 * Help text.
-	 */
-	help?: string;
-	/**
 	 * Whether to allow multiple media selections.
 	 *
 	 * @default false
@@ -182,9 +172,7 @@ function MediaPreview( {
  * @param {Object}               props.field          - The field configuration with getValue and setValue methods.
  * @param {Function}             props.onChange       - Callback function when the media selection changes.
  * @param {string[]}             [props.allowedTypes] - Array of allowed media types. Default `['image']`.
- * @param {string}               [props.placeholder]  - Placeholder text when no media is selected. Default `'Choose file'`.
  * @param {boolean}              [props.multiple]     - Whether to allow multiple media selections. Default `false`.
- * @param {string}               [props.help]         - Help text.
  *
  * @return {JSX.Element} The media edit control component.
  *
@@ -201,8 +189,6 @@ function MediaPreview( {
  *     <MediaEdit
  *       {...props}
  *       allowedTypes={['image']}
- *       placeholder="Choose featured image…"
- *       help="Upload an image to represent this post"
  *     />
  *   ),
  * };
@@ -213,8 +199,6 @@ export default function MediaEdit< Item >( {
 	field,
 	onChange,
 	allowedTypes = [ 'image' ],
-	placeholder = __( 'Choose file' ),
-	help,
 	multiple,
 }: MediaEditProps< Item > ) {
 	const value = field.getValue( { item: data } );
@@ -264,7 +248,7 @@ export default function MediaEdit< Item >( {
 				render={ ( { open }: any ) => {
 					const addButtonLabel = attachments?.length
 						? __( 'Add files' )
-						: placeholder;
+						: field.placeholder || __( 'Choose file' );
 					return (
 						<VStack spacing={ 2 }>
 							{ !! attachments?.length && (
@@ -312,7 +296,11 @@ export default function MediaEdit< Item >( {
 								</MediaPickerButton>
 							) }
 
-							{ help && <Text variant="muted">{ help }</Text> }
+							{ field.description && (
+								<Text variant="muted">
+									{ field.description }
+								</Text>
+							) }
 						</VStack>
 					);
 				} }
