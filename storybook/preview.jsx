@@ -6,7 +6,6 @@ import {
 	Subtitle,
 	Title,
 } from '@storybook/blocks';
-import '@wordpress/theme/design-tokens.css';
 import { WithGlobalCSS } from './decorators/with-global-css';
 import { WithMarginChecker } from './decorators/with-margin-checker';
 import { WithMaxWidthWrapper } from './decorators/with-max-width-wrapper';
