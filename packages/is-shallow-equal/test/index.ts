@@ -1,7 +1,8 @@
 /**
  * Internal dependencies
  */
-import isShallowEqual, {
+import {
+	isShallowEqual,
 	isShallowEqualArrays,
 	isShallowEqualObjects,
 } from '../src';

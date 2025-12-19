@@ -19,8 +19,12 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 		//
 		// See: https://github.com/WordPress/gutenberg/issues/3091
 		await editor.insertBlock( { name: 'core/heading' } );
-		await editor.clickBlockToolbarButton( 'Change level' );
-		await page.locator( 'role=menuitemradio[name="Heading 3"]' ).click();
+
+		// Open the block inspector sidebar and use variations to change level.
+		await editor.openDocumentSettingsSidebar();
+		await page
+			.getByRole( 'button', { name: 'Heading 3', exact: true } )
+			.click();
 
 		expect( await editor.getBlocks() ).toMatchObject( [
 			{

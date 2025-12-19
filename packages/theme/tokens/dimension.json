@@ -1,5 +1,5 @@
 {
-	"dimension": {
+	"wpds-dimension": {
 		"$type": "dimension",
 		"primitive": {
 			"space": {
@@ -45,124 +45,122 @@
 				}
 			}
 		},
-		"semantic": {
-			"base": {
-				"$value": "{dimension.primitive.space.10}",
-				"$description": "Base dimension unit"
-			},
-			"padding": {
-				"surface": {
-					"2xs": {
-						"$value": "{dimension.primitive.space.10}",
-						"$description": "2x extra small spacing for surfaces",
-						"$extensions": {
-							"mode": {
-								"compact": "{dimension.primitive.space.10}",
-								"comfortable": "{dimension.primitive.space.20}"
-							}
-						}
-					},
-					"xs": {
-						"$value": "{dimension.primitive.space.20}",
-						"$description": "Extra small spacing for surfaces",
-						"$extensions": {
-							"mode": {
-								"compact": "{dimension.primitive.space.10}",
-								"comfortable": "{dimension.primitive.space.30}"
-							}
-						}
-					},
-					"sm": {
-						"$value": "{dimension.primitive.space.40}",
-						"$description": "Small spacing for surfaces",
-						"$extensions": {
-							"mode": {
-								"compact": "{dimension.primitive.space.30}",
-								"comfortable": "{dimension.primitive.space.50}"
-							}
-						}
-					},
-					"md": {
-						"$value": "{dimension.primitive.space.60}",
-						"$description": "Medium spacing for surfaces",
-						"$extensions": {
-							"mode": {
-								"compact": "{dimension.primitive.space.50}",
-								"comfortable": "{dimension.primitive.space.70}"
-							}
-						}
-					},
-					"lg": {
-						"$value": "{dimension.primitive.space.70}",
-						"$description": "Large spacing for surfaces",
-						"$extensions": {
-							"mode": {
-								"compact": "{dimension.primitive.space.60}",
-								"comfortable": "{dimension.primitive.space.80}"
-							}
-						}
-					}
-				}
-			},
-			"gap": {
+		"base": {
+			"$value": "{wpds-dimension.primitive.space.10}",
+			"$description": "Base dimension unit"
+		},
+		"padding": {
+			"surface": {
 				"2xs": {
-					"$value": "{dimension.primitive.space.10}",
-					"$description": "2x extra small gap",
+					"$value": "{wpds-dimension.primitive.space.10}",
+					"$description": "2x extra small spacing for surfaces",
 					"$extensions": {
 						"mode": {
-							"compact": "{dimension.primitive.space.10}",
-							"comfortable": "{dimension.primitive.space.20}"
+							"compact": "{wpds-dimension.primitive.space.10}",
+							"comfortable": "{wpds-dimension.primitive.space.20}"
 						}
 					}
 				},
 				"xs": {
-					"$value": "{dimension.primitive.space.20}",
-					"$description": "Extra small gap",
+					"$value": "{wpds-dimension.primitive.space.20}",
+					"$description": "Extra small spacing for surfaces",
 					"$extensions": {
 						"mode": {
-							"compact": "{dimension.primitive.space.10}",
-							"comfortable": "{dimension.primitive.space.30}"
+							"compact": "{wpds-dimension.primitive.space.10}",
+							"comfortable": "{wpds-dimension.primitive.space.30}"
 						}
 					}
 				},
 				"sm": {
-					"$value": "{dimension.primitive.space.30}",
-					"$description": "Small gap",
+					"$value": "{wpds-dimension.primitive.space.40}",
+					"$description": "Small spacing for surfaces",
 					"$extensions": {
 						"mode": {
-							"compact": "{dimension.primitive.space.20}",
-							"comfortable": "{dimension.primitive.space.40}"
+							"compact": "{wpds-dimension.primitive.space.30}",
+							"comfortable": "{wpds-dimension.primitive.space.50}"
 						}
 					}
 				},
 				"md": {
-					"$value": "{dimension.primitive.space.40}",
-					"$description": "Medium gap",
+					"$value": "{wpds-dimension.primitive.space.60}",
+					"$description": "Medium spacing for surfaces",
 					"$extensions": {
 						"mode": {
-							"compact": "{dimension.primitive.space.30}",
-							"comfortable": "{dimension.primitive.space.50}"
+							"compact": "{wpds-dimension.primitive.space.50}",
+							"comfortable": "{wpds-dimension.primitive.space.70}"
 						}
 					}
 				},
 				"lg": {
-					"$value": "{dimension.primitive.space.60}",
-					"$description": "Large gap",
+					"$value": "{wpds-dimension.primitive.space.70}",
+					"$description": "Large spacing for surfaces",
 					"$extensions": {
 						"mode": {
-							"compact": "{dimension.primitive.space.50}",
-							"comfortable": "{dimension.primitive.space.70}"
+							"compact": "{wpds-dimension.primitive.space.60}",
+							"comfortable": "{wpds-dimension.primitive.space.80}"
 						}
 					}
-				},
-				"xl": {
-					"$value": "{dimension.primitive.space.80}",
-					"$description": "Extra large gap",
-					"$extensions": {
-						"mode": {
-							"compact": "{dimension.primitive.space.70}",
-							"comfortable": "{dimension.primitive.space.90}"
-						}
+				}
+			}
+		},
+		"gap": {
+			"2xs": {
+				"$value": "{wpds-dimension.primitive.space.10}",
+				"$description": "2x extra small gap",
+				"$extensions": {
+					"mode": {
+						"compact": "{wpds-dimension.primitive.space.10}",
+						"comfortable": "{wpds-dimension.primitive.space.20}"
+					}
+				}
+			},
+			"xs": {
+				"$value": "{wpds-dimension.primitive.space.20}",
+				"$description": "Extra small gap",
+				"$extensions": {
+					"mode": {
+						"compact": "{wpds-dimension.primitive.space.10}",
+						"comfortable": "{wpds-dimension.primitive.space.30}"
+					}
+				}
+			},
+			"sm": {
+				"$value": "{wpds-dimension.primitive.space.30}",
+				"$description": "Small gap",
+				"$extensions": {
+					"mode": {
+						"compact": "{wpds-dimension.primitive.space.20}",
+						"comfortable": "{wpds-dimension.primitive.space.40}"
+					}
+				}
+			},
+			"md": {
+				"$value": "{wpds-dimension.primitive.space.40}",
+				"$description": "Medium gap",
+				"$extensions": {
+					"mode": {
+						"compact": "{wpds-dimension.primitive.space.30}",
+						"comfortable": "{wpds-dimension.primitive.space.50}"
+					}
+				}
+			},
+			"lg": {
+				"$value": "{wpds-dimension.primitive.space.60}",
+				"$description": "Large gap",
+				"$extensions": {
+					"mode": {
+						"compact": "{wpds-dimension.primitive.space.50}",
+						"comfortable": "{wpds-dimension.primitive.space.70}"
+					}
+				}
+			},
+			"xl": {
+				"$value": "{wpds-dimension.primitive.space.80}",
+				"$description": "Extra large gap",
+				"$extensions": {
+					"mode": {
+						"compact": "{wpds-dimension.primitive.space.70}",
+						"comfortable": "{wpds-dimension.primitive.space.90}"
 					}
 				}
 			}

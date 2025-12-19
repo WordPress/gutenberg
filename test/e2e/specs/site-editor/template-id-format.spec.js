@@ -86,9 +86,20 @@ test.describe( 'Template ID Format', () => {
 		} );
 		await expect( editor.canvas.getByText( secondEditText ) ).toBeVisible();
 
-		await editor.saveSiteEditorEntities( {
-			isOnlyCurrentEntityDirty: true,
-		} );
+		// Find the correct save button to click.
+		const publishSaveButton = page
+			.getByRole( 'region', { name: 'Editor publish' } )
+			.getByRole( 'button', { name: 'Save', exact: true } );
+		const topBarSaveButton = page
+			.getByRole( 'region', { name: 'Editor top bar' } )
+			.getByRole( 'button', { name: 'Save', exact: true } );
+		await publishSaveButton.or( topBarSaveButton ).click();
+
+		await page
+			.getByRole( 'button', { name: 'Dismiss this notice' } )
+			.getByText( /(updated|published)\./ )
+			.first()
+			.waitFor();
 	};
 
 	test( 'should open and edit templates correctly when active_templates experiment is enabled', async ( {

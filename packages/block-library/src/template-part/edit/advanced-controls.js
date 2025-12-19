@@ -58,7 +58,6 @@ export function TemplatePartAdvancedControls( {
 				<>
 					<TextControl
 						__next40pxDefaultSize
-						__nextHasNoMarginBottom
 						label={ __( 'Title' ) }
 						value={ title }
 						onChange={ ( value ) => {
@@ -68,7 +67,6 @@ export function TemplatePartAdvancedControls( {
 					/>
 					<SelectControl
 						__next40pxDefaultSize
-						__nextHasNoMarginBottom
 						label={ __( 'Area' ) }
 						labelPosition="top"
 						options={ areaOptions }

@@ -49,7 +49,6 @@ export default function MoreEdit( {
 						}
 					>
 						<ToggleControl
-							__nextHasNoMarginBottom
 							label={ __(
 								'Hide the excerpt on the full content page'
 							) }

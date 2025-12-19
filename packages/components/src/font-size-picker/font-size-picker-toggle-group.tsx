@@ -56,7 +56,6 @@ const FontSizePickerToggleGroup = ( props: FontSizePickerToggleGroupProps ) => {
 
 	return (
 		<ToggleGroupControl
-			__nextHasNoMarginBottom
 			__next40pxDefaultSize={ __next40pxDefaultSize }
 			__shouldNotWarnDeprecated36pxSize
 			label={ __( 'Font size' ) }

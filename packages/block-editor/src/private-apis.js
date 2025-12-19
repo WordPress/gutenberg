@@ -42,6 +42,7 @@ import {
 	mediaEditKey,
 	getMediaSelectKey,
 	essentialFormatKey,
+	isIsolatedEditorKey,
 } from './store/private-keys';
 import { requiresWrapperOnCopy } from './components/writing-flow/utils';
 import { PrivateRichText } from './components/rich-text/';
@@ -58,6 +59,8 @@ import {
 	useBlockElementRef,
 	useBlockElement,
 } from './components/block-list/use-block-props/use-block-refs';
+import { LinkPicker } from './components/link-picker';
+import useRemoteUrlData from './components/link-control/use-rich-url-data';
 
 /**
  * Private @wordpress/block-editor APIs.
@@ -110,6 +113,9 @@ lock( privateApis, {
 	mediaEditKey,
 	getMediaSelectKey,
 	essentialFormatKey,
+	isIsolatedEditorKey,
 	useBlockElement,
 	useBlockElementRef,
+	LinkPicker,
+	useRemoteUrlData,
 } );

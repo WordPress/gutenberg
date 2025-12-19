@@ -28,7 +28,6 @@ export default function EnhancedPaginationControl( {
 	return (
 		<>
 			<ToggleControl
-				__nextHasNoMarginBottom
 				label={ __( 'Reload full page' ) }
 				help={ help }
 				checked={ ! enhancedPagination }

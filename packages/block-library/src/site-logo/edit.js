@@ -301,7 +301,6 @@ const SiteLogo = ( {
 						}
 					>
 						<RangeControl
-							__nextHasNoMarginBottom
 							__next40pxDefaultSize
 							label={ __( 'Image width' ) }
 							onChange={ ( newWidth ) =>
@@ -325,7 +324,6 @@ const SiteLogo = ( {
 						onDeselect={ () => setAttributes( { isLink: true } ) }
 					>
 						<ToggleControl
-							__nextHasNoMarginBottom
 							label={ __( 'Link image to home' ) }
 							onChange={ () =>
 								setAttributes( { isLink: ! isLink } )
@@ -344,7 +342,6 @@ const SiteLogo = ( {
 							}
 						>
 							<ToggleControl
-								__nextHasNoMarginBottom
 								label={ __( 'Open in new tab' ) }
 								onChange={ ( value ) =>
 									setAttributes( {
@@ -367,7 +364,6 @@ const SiteLogo = ( {
 							} }
 						>
 							<ToggleControl
-								__nextHasNoMarginBottom
 								label={ __( 'Use as Site Icon' ) }
 								onChange={ ( value ) => {
 									setAttributes( { shouldSyncIcon: value } );

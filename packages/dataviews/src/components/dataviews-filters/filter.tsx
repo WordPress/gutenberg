@@ -17,55 +17,24 @@ import {
 	Icon,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
-import { useRef, createInterpolateElement } from '@wordpress/element';
+import { useMemo, useRef } from '@wordpress/element';
 import { closeSmall } from '@wordpress/icons';
-import { dateI18n, getDate } from '@wordpress/date';
 
 /**
  * Internal dependencies
  */
 import SearchWidget from './search-widget';
 import InputWidget from './input-widget';
-import {
-	OPERATORS,
-	OPERATOR_IS,
-	OPERATOR_IS_NOT,
-	OPERATOR_IS_ANY,
-	OPERATOR_IS_NONE,
-	OPERATOR_IS_ALL,
-	OPERATOR_IS_NOT_ALL,
-	OPERATOR_LESS_THAN,
-	OPERATOR_GREATER_THAN,
-	OPERATOR_LESS_THAN_OR_EQUAL,
-	OPERATOR_GREATER_THAN_OR_EQUAL,
-	OPERATOR_CONTAINS,
-	OPERATOR_NOT_CONTAINS,
-	OPERATOR_STARTS_WITH,
-	OPERATOR_BEFORE,
-	OPERATOR_AFTER,
-	OPERATOR_BEFORE_INC,
-	OPERATOR_AFTER_INC,
-	OPERATOR_BETWEEN,
-	OPERATOR_ON,
-	OPERATOR_NOT_ON,
-	OPERATOR_IN_THE_PAST,
-	OPERATOR_OVER,
-} from '../../constants';
+import { getOperatorByName } from '../../utils/operators';
 import type {
 	Filter,
 	NormalizedField,
-	NormalizedFieldDate,
-	NormalizedFieldNumber,
-	NormalizedFieldInteger,
 	NormalizedFilter,
 	Operator,
 	Option,
 	View,
 } from '../../types';
 import useElements from '../../hooks/use-elements';
-import parseDateTime from '../../field-types/utils/parse-date-time';
-import { formatNumber } from '../../field-types/number';
-import { formatInteger } from '../../field-types/integer';
 
 const ENTER = 'Enter';
 const SPACE = ' ';
@@ -97,285 +66,11 @@ const FilterText = ( {
 		return filter.name;
 	}
 
-	const filterTextWrappers = {
-		Name: <span className="dataviews-filters__summary-filter-text-name" />,
-		Value: (
-			<span className="dataviews-filters__summary-filter-text-value" />
-		),
-	};
-
-	if ( filterInView?.operator === OPERATOR_IS_ANY ) {
-		return createInterpolateElement(
-			sprintf(
-				/* translators: 1: Filter name. 2: Filter value. e.g.: "Author is any: Admin, Editor". */
-				__( '<Name>%1$s is any: </Name><Value>%2$s</Value>' ),
-				filter.name,
-				activeElements.map( ( element ) => element.label ).join( ', ' )
-			),
-			filterTextWrappers
-		);
+	const operator = getOperatorByName( filterInView?.operator );
+	if ( operator !== undefined ) {
+		return operator.filterText( filter, activeElements );
 	}
 
-	if ( filterInView?.operator === OPERATOR_IS_NONE ) {
-		return createInterpolateElement(
-			sprintf(
-				/* translators: 1: Filter name. 2: Filter value. e.g.: "Author is none: Admin, Editor". */
-				__( '<Name>%1$s is none: </Name><Value>%2$s</Value>' ),
-				filter.name,
-				activeElements.map( ( element ) => element.label ).join( ', ' )
-			),
-			filterTextWrappers
-		);
-	}
-
-	if ( filterInView?.operator === OPERATOR_IS_ALL ) {
-		return createInterpolateElement(
-			sprintf(
-				/* translators: 1: Filter name. 2: Filter value. e.g.: "Author is all: Admin, Editor". */
-				__( '<Name>%1$s is all: </Name><Value>%2$s</Value>' ),
-				filter.name,
-				activeElements.map( ( element ) => element.label ).join( ', ' )
-			),
-			filterTextWrappers
-		);
-	}
-
-	if ( filterInView?.operator === OPERATOR_IS_NOT_ALL ) {
-		return createInterpolateElement(
-			sprintf(
-				/* translators: 1: Filter name. 2: Filter value. e.g.: "Author is not all: Admin, Editor". */
-				__( '<Name>%1$s is not all: </Name><Value>%2$s</Value>' ),
-				filter.name,
-				activeElements.map( ( element ) => element.label ).join( ', ' )
-			),
-			filterTextWrappers
-		);
-	}
-
-	if ( filterInView?.operator === OPERATOR_IS ) {
-		return createInterpolateElement(
-			sprintf(
-				/* translators: 1: Filter name. 2: Filter value. e.g.: "Author is: Admin". */
-				__( '<Name>%1$s is: </Name><Value>%2$s</Value>' ),
-				filter.name,
-				activeElements[ 0 ].label
-			),
-			filterTextWrappers
-		);
-	}
-
-	if ( filterInView?.operator === OPERATOR_IS_NOT ) {
-		return createInterpolateElement(
-			sprintf(
-				/* translators: 1: Filter name. 2: Filter value. e.g.: "Author is not: Admin". */
-				__( '<Name>%1$s is not: </Name><Value>%2$s</Value>' ),
-				filter.name,
-				activeElements[ 0 ].label
-			),
-			filterTextWrappers
-		);
-	}
-
-	if ( filterInView?.operator === OPERATOR_LESS_THAN ) {
-		return createInterpolateElement(
-			sprintf(
-				/* translators: 1: Filter name. 2: Filter value. e.g.: "Price is less than: 10". */
-				__( '<Name>%1$s is less than: </Name><Value>%2$s</Value>' ),
-				filter.name,
-				activeElements[ 0 ].label
-			),
-			filterTextWrappers
-		);
-	}
-
-	if ( filterInView?.operator === OPERATOR_GREATER_THAN ) {
-		return createInterpolateElement(
-			sprintf(
-				/* translators: 1: Filter name. 2: Filter value. e.g.: "Price is greater than: 10". */
-				__( '<Name>%1$s is greater than: </Name><Value>%2$s</Value>' ),
-				filter.name,
-				activeElements[ 0 ].label
-			),
-			filterTextWrappers
-		);
-	}
-
-	if ( filterInView?.operator === OPERATOR_LESS_THAN_OR_EQUAL ) {
-		return createInterpolateElement(
-			sprintf(
-				/* translators: 1: Filter name. 2: Filter value. e.g.: "Price is less than or equal to: 10". */
-				__(
-					'<Name>%1$s is less than or equal to: </Name><Value>%2$s</Value>'
-				),
-				filter.name,
-				activeElements[ 0 ].label
-			),
-			filterTextWrappers
-		);
-	}
-
-	if ( filterInView?.operator === OPERATOR_GREATER_THAN_OR_EQUAL ) {
-		return createInterpolateElement(
-			sprintf(
-				/* translators: 1: Filter name. 2: Filter value. e.g.: "Price is greater than or equal to: 10". */
-				__(
-					'<Name>%1$s is greater than or equal to: </Name><Value>%2$s</Value>'
-				),
-				filter.name,
-				activeElements[ 0 ].label
-			),
-			filterTextWrappers
-		);
-	}
-
-	if ( filterInView?.operator === OPERATOR_CONTAINS ) {
-		return createInterpolateElement(
-			sprintf(
-				/* translators: 1: Filter name. 2: Filter value. e.g.: "Title contains: Mars". */
-				__( '<Name>%1$s contains: </Name><Value>%2$s</Value>' ),
-				filter.name,
-				activeElements[ 0 ].label
-			),
-			filterTextWrappers
-		);
-	}
-
-	if ( filterInView?.operator === OPERATOR_NOT_CONTAINS ) {
-		return createInterpolateElement(
-			sprintf(
-				/* translators: 1: Filter name. 2: Filter value. e.g.: "Description doesn't contain: photo". */
-				__( "<Name>%1$s doesn't contain: </Name><Value>%2$s</Value>" ),
-				filter.name,
-				activeElements[ 0 ].label
-			),
-			filterTextWrappers
-		);
-	}
-
-	if ( filterInView?.operator === OPERATOR_STARTS_WITH ) {
-		return createInterpolateElement(
-			sprintf(
-				/* translators: 1: Filter name. 2: Filter value. e.g.: "Title starts with: Mar". */
-				__( '<Name>%1$s starts with: </Name><Value>%2$s</Value>' ),
-				filter.name,
-				activeElements[ 0 ].label
-			),
-			filterTextWrappers
-		);
-	}
-
-	if ( filterInView?.operator === OPERATOR_BEFORE ) {
-		return createInterpolateElement(
-			sprintf(
-				/* translators: 1: Filter name. 2: Filter value. e.g.: "Date is before: 2024-01-01". */
-				__( '<Name>%1$s is before: </Name><Value>%2$s</Value>' ),
-				filter.name,
-				activeElements[ 0 ].label
-			),
-			filterTextWrappers
-		);
-	}
-
-	if ( filterInView?.operator === OPERATOR_AFTER ) {
-		return createInterpolateElement(
-			sprintf(
-				/* translators: 1: Filter name. 2: Filter value. e.g.: "Date is after: 2024-01-01". */
-				__( '<Name>%1$s is after: </Name><Value>%2$s</Value>' ),
-				filter.name,
-				activeElements[ 0 ].label
-			),
-			filterTextWrappers
-		);
-	}
-
-	if ( filterInView?.operator === OPERATOR_BEFORE_INC ) {
-		return createInterpolateElement(
-			sprintf(
-				/* translators: 1: Filter name. 2: Filter value. e.g.: "Date is on or before: 2024-01-01". */
-				__( '<Name>%1$s is on or before: </Name><Value>%2$s</Value>' ),
-				filter.name,
-				activeElements[ 0 ].label
-			),
-			filterTextWrappers
-		);
-	}
-
-	if ( filterInView?.operator === OPERATOR_AFTER_INC ) {
-		return createInterpolateElement(
-			sprintf(
-				/* translators: 1: Filter name. 2: Filter value. e.g.: "Date is on or after: 2024-01-01". */
-				__( '<Name>%1$s is on or after: </Name><Value>%2$s</Value>' ),
-				filter.name,
-				activeElements[ 0 ].label
-			),
-			filterTextWrappers
-		);
-	}
-
-	if ( filterInView?.operator === OPERATOR_BETWEEN ) {
-		const { label } = activeElements[ 0 ];
-
-		return createInterpolateElement(
-			sprintf(
-				/* translators: 1: Filter name. 2: Min value. 3: Max value. e.g.: "Item count between (inc): 10 and 180". */
-				__(
-					'<Name>%1$s between (inc): </Name><Value>%2$s and %3$s</Value>'
-				),
-				filter.name,
-				label[ 0 ],
-				label[ 1 ]
-			),
-			filterTextWrappers
-		);
-	}
-
-	if ( filterInView?.operator === OPERATOR_ON ) {
-		return createInterpolateElement(
-			sprintf(
-				/* translators: 1: Filter name. 2: Filter value. e.g.: "Date is: 2024-01-01". */
-				__( '<Name>%1$s is: </Name><Value>%2$s</Value>' ),
-				filter.name,
-				activeElements[ 0 ].label
-			),
-			filterTextWrappers
-		);
-	}
-
-	if ( filterInView?.operator === OPERATOR_NOT_ON ) {
-		return createInterpolateElement(
-			sprintf(
-				/* translators: 1: Filter name. 2: Filter value. e.g.: "Date is not: 2024-01-01". */
-				__( '<Name>%1$s is not: </Name><Value>%2$s</Value>' ),
-				filter.name,
-				activeElements[ 0 ].label
-			),
-			filterTextWrappers
-		);
-	}
-
-	if ( filterInView?.operator === OPERATOR_IN_THE_PAST ) {
-		return createInterpolateElement(
-			sprintf(
-				/* translators: 1: Filter name. 2: Filter value. e.g.: "Date is in the past: 1 days". */
-				__( '<Name>%1$s is in the past: </Name><Value>%2$s</Value>' ),
-				filter.name,
-				`${ activeElements[ 0 ].value.value } ${ activeElements[ 0 ].value.unit }`
-			),
-			filterTextWrappers
-		);
-	}
-
-	if ( filterInView?.operator === OPERATOR_OVER ) {
-		return createInterpolateElement(
-			sprintf(
-				/* translators: 1: Filter name. 2: Filter value. e.g.: "Date is over: 1 days ago". */
-				__( '<Name>%1$s is over: </Name><Value>%2$s</Value> ago' ),
-				filter.name,
-				`${ activeElements[ 0 ].value.value } ${ activeElements[ 0 ].value.unit }`
-			),
-			filterTextWrappers
-		);
-	}
 	return sprintf(
 		/* translators: 1: Filter name e.g.: "Unknown status for Author". */
 		__( 'Unknown status for %1$s' ),
@@ -390,7 +85,7 @@ function OperatorSelector( {
 }: OperatorSelectorProps ) {
 	const operatorOptions = filter.operators?.map( ( operator ) => ( {
 		value: operator,
-		label: OPERATORS[ operator ]?.label,
+		label: getOperatorByName( operator )?.label || operator,
 	} ) );
 	const currentFilter = view.filters?.find(
 		( _filter ) => _filter.field === filter.field
@@ -413,7 +108,7 @@ function OperatorSelector( {
 					value={ value }
 					options={ operatorOptions }
 					onChange={ ( newValue ) => {
-						const operator = newValue as Operator;
+						const newOperator = newValue as Operator;
 						const currentOperator = currentFilter?.operator;
 						const newFilters = currentFilter
 							? [
@@ -422,28 +117,29 @@ function OperatorSelector( {
 											if (
 												_filter.field === filter.field
 											) {
-												// Reset the value only when switching between operators that have different value types.
-												const OPERATORS_SHOULD_RESET_VALUE =
-													[
-														OPERATOR_BETWEEN,
-														OPERATOR_IN_THE_PAST,
-														OPERATOR_OVER,
-													];
-												const shouldResetValue =
-													currentOperator &&
-													( OPERATORS_SHOULD_RESET_VALUE.includes(
+												const currentOpSelectionModel =
+													getOperatorByName(
 														currentOperator
-													) ||
-														OPERATORS_SHOULD_RESET_VALUE.includes(
-															operator
-														) );
+													)?.selection;
+												const newOpSelectionModel =
+													getOperatorByName(
+														newOperator
+													)?.selection;
+
+												const shouldResetValue =
+													currentOpSelectionModel !==
+														newOpSelectionModel ||
+													[
+														currentOpSelectionModel,
+														newOpSelectionModel,
+													].includes( 'custom' );
 
 												return {
 													..._filter,
 													value: shouldResetValue
 														? undefined
 														: _filter.value,
-													operator,
+													operator: newOperator,
 												};
 											}
 											return _filter;
@@ -454,7 +150,7 @@ function OperatorSelector( {
 									...( view.filters ?? [] ),
 									{
 										field: filter.field,
-										operator,
+										operator: newOperator,
 										value: undefined,
 									},
 							  ];
@@ -466,7 +162,6 @@ function OperatorSelector( {
 					} }
 					size="small"
 					variant="minimal"
-					__nextHasNoMarginBottom
 					hideLabelFromVision
 				/>
 			</HStack>
@@ -487,6 +182,20 @@ export default function Filter( {
 	);
 
 	let activeElements: Option[] = [];
+	const field = useMemo( () => {
+		const currentField = fields.find( ( f ) => f.id === filter.field );
+		if ( currentField ) {
+			return {
+				...currentField,
+				// Configure getValue as if Item was a plain object.
+				// See related input-widget.tsx
+				getValue: ( { item }: { item: any } ) =>
+					item[ currentField.id ],
+			};
+		}
+
+		return currentField;
+	}, [ fields, filter.field ] );
 
 	const { elements } = useElements( {
 		elements: filter.elements,
@@ -494,44 +203,46 @@ export default function Filter( {
 	} );
 
 	if ( elements.length > 0 ) {
+		// When there are elements, we favor those
 		activeElements = elements.filter( ( element ) => {
 			if ( filter.singleSelection ) {
 				return element.value === filterInView?.value;
 			}
 			return filterInView?.value?.includes( element.value );
 		} );
-	} else if ( filterInView?.value !== undefined ) {
-		const field = fields.find( ( f ) => f.id === filter.field );
-		let label = filterInView.value;
+	} else if ( Array.isArray( filterInView?.value ) ) {
+		// or, filterInView.value can also be array
+		// for the between operator, as in [ 1, 2 ]
+		const label = filterInView.value.map( ( v ) => {
+			const formattedValue = field?.getValueFormatted( {
+				item: { [ field.id ]: v },
+				field,
+			} );
+			return formattedValue || String( v );
+		} );
 
-		if ( field?.type === 'date' && typeof label === 'string' ) {
-			try {
-				const dateValue = parseDateTime( label );
-				if ( dateValue !== null ) {
-					label = dateI18n(
-						( field as NormalizedFieldDate< any > ).format.date,
-						getDate( label )
-					);
-				}
-			} catch ( e ) {
-				label = filterInView.value;
-			}
-		} else if ( field?.type === 'datetime' && typeof label === 'string' ) {
-			try {
-				const dateValue = parseDateTime( label );
-				if ( dateValue !== null ) {
-					label = dateValue.toLocaleString();
-				}
-			} catch ( e ) {
-				label = filterInView.value;
-			}
-		} else if ( field?.type === 'number' && typeof label === 'number' ) {
-			const numberField = field as NormalizedFieldNumber< any >;
-			label = formatNumber( label, numberField.format );
-		} else if ( field?.type === 'integer' && typeof label === 'number' ) {
-			const integerField = field as NormalizedFieldInteger< any >;
-			label = formatInteger( label, integerField.format );
-		}
+		activeElements = [
+			{
+				value: filterInView.value,
+				// @ts-ignore
+				label,
+			},
+		];
+	} else if ( typeof filterInView?.value === 'object' ) {
+		// or, it can also be object for the inThePast/over operators,
+		// as in { value: '1', units: 'days' }
+		activeElements = [
+			{ value: filterInView.value, label: filterInView.value },
+		];
+	} else if ( filterInView?.value !== undefined ) {
+		// otherwise, filterInView.value is a single value
+		const label =
+			field !== undefined
+				? field.getValueFormatted( {
+						item: { [ field.id ]: filterInView.value },
+						field,
+				  } )
+				: String( filterInView.value );
 
 		activeElements = [
 			{

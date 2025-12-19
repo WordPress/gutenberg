@@ -9,14 +9,18 @@ import clsx from 'clsx';
 import {
 	__experimentalVStack as VStack,
 	__experimentalHStack as HStack,
+	Icon,
+	Tooltip,
 } from '@wordpress/components';
 import { useState, useContext } from '@wordpress/element';
+import { error as errorIcon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import type {
 	FieldLayoutProps,
+	FieldValidity,
 	NormalizedField,
 	NormalizedFormField,
 	NormalizedPanelLayout,
@@ -25,6 +29,50 @@ import DataFormContext from '../../components/dataform-context';
 import PanelDropdown from './dropdown';
 import PanelModal from './modal';
 import { getSummaryFields } from '../get-summary-fields';
+
+function getFirstValidationError(
+	validity: FieldValidity | undefined
+): string | undefined {
+	if ( ! validity ) {
+		return undefined;
+	}
+
+	const validityRules = Object.keys( validity ).filter(
+		( key ) => key !== 'children'
+	);
+
+	for ( const key of validityRules ) {
+		const rule = validity[ key as keyof Omit< FieldValidity, 'children' > ];
+		if ( rule === undefined ) {
+			continue;
+		}
+
+		if ( rule.type === 'invalid' ) {
+			if ( rule.message ) {
+				return rule.message;
+			}
+
+			// Provide default message for required validation (message is optional)
+			if ( key === 'required' ) {
+				return 'A required field is empty';
+			}
+
+			return 'Unidentified validation error';
+		}
+	}
+
+	// Check children recursively
+	if ( validity.children ) {
+		for ( const childValidity of Object.values( validity.children ) ) {
+			const childError = getFirstValidationError( childValidity );
+			if ( childError ) {
+				return childError;
+			}
+		}
+	}
+
+	return undefined;
+}
 
 const getFieldDefinition = < Item, >(
 	field: NormalizedFormField,
@@ -103,6 +151,10 @@ export default function FormPanelField< Item >( {
 		null
 	);
 
+	// Track if the panel has been opened (touched) to only show errors after interaction.
+	const [ touched, setTouched ] = useState( false );
+	const handleOpen = () => setTouched( true );
+
 	const { fieldDefinition, summaryFields } =
 		getFieldDefinitionAndSummaryFields( layout, field, fields );
 
@@ -111,11 +163,28 @@ export default function FormPanelField< Item >( {
 	}
 
 	const labelPosition = layout.labelPosition;
+	const errorMessage = getFirstValidationError( validity );
+	const showError = touched && !! errorMessage;
 	const labelClassName = clsx(
 		'dataforms-layouts-panel__field-label',
-		`dataforms-layouts-panel__field-label--label-position-${ labelPosition }`
+		`dataforms-layouts-panel__field-label--label-position-${ labelPosition }`,
+		{ 'has-error': showError }
 	);
 	const fieldLabel = !! field.children ? field.label : fieldDefinition?.label;
+
+	const labelContent = showError ? (
+		<Tooltip text={ errorMessage } placement="top">
+			<HStack
+				className="dataforms-layouts-panel__field-label-error-content"
+				justify="flex-start"
+			>
+				<Icon icon={ errorIcon } size={ 16 } />
+				<>{ fieldLabel }</>
+			</HStack>
+		</Tooltip>
+	) : (
+		fieldLabel
+	);
 
 	const renderedControl =
 		layout.openAs === 'modal' ? (
@@ -126,6 +195,7 @@ export default function FormPanelField< Item >( {
 				labelPosition={ labelPosition }
 				summaryFields={ summaryFields }
 				fieldDefinition={ fieldDefinition }
+				onOpen={ handleOpen }
 			/>
 		) : (
 			<PanelDropdown
@@ -137,6 +207,7 @@ export default function FormPanelField< Item >( {
 				summaryFields={ summaryFields }
 				fieldDefinition={ fieldDefinition }
 				popoverAnchor={ popoverAnchor }
+				onOpen={ handleOpen }
 			/>
 		);
 
@@ -147,7 +218,7 @@ export default function FormPanelField< Item >( {
 					className={ labelClassName }
 					style={ { paddingBottom: 0 } }
 				>
-					{ fieldLabel }
+					{ labelContent }
 				</div>
 				<div className="dataforms-layouts-panel__field-control">
 					{ renderedControl }
@@ -158,9 +229,20 @@ export default function FormPanelField< Item >( {
 
 	if ( labelPosition === 'none' ) {
 		return (
-			<div className="dataforms-layouts-panel__field">
-				{ renderedControl }
-			</div>
+			<HStack className="dataforms-layouts-panel__field dataforms-layouts-panel__field--label-position-none">
+				{ showError && (
+					<Tooltip text={ errorMessage } placement="top">
+						<Icon
+							className="dataforms-layouts-panel__field-label-error-content"
+							icon={ errorIcon }
+							size={ 16 }
+						/>
+					</Tooltip>
+				) }
+				<div className="dataforms-layouts-panel__field-control">
+					{ renderedControl }
+				</div>
+			</HStack>
 		);
 	}
 
@@ -170,7 +252,7 @@ export default function FormPanelField< Item >( {
 			ref={ setPopoverAnchor }
 			className="dataforms-layouts-panel__field"
 		>
-			<div className={ labelClassName }>{ fieldLabel }</div>
+			<div className={ labelClassName }>{ labelContent }</div>
 			<div className="dataforms-layouts-panel__field-control">
 				{ renderedControl }
 			</div>

@@ -48,18 +48,6 @@ export const Default: Story = {
 		),
 	},
 	argTypes: {
-		gap: {
-			control: {
-				type: 'select',
-			},
-			options: [ 0, 1, 2, 3, 4, '2xs', 'xs', 'sm', 'md', 'lg', 'xl' ],
-			table: {
-				type: {
-					summary:
-						'number | "2xs" | "xs" | "sm" | "md" | "lg" | "xl"',
-				},
-			},
-		},
 		align: {
 			options: [
 				'center',
@@ -121,7 +109,7 @@ export const Nested: Story = {
 					<DemoBox />
 				</Stack>
 				<DemoBox variant="lg" />
-				<Stack gap={ 0 } direction="column">
+				<Stack direction="column">
 					<DemoBox />
 					<DemoBox />
 				</Stack>

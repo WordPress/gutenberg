@@ -125,7 +125,6 @@ export default function Edit( {
 					>
 						<ToggleControl
 							label={ __( 'Open by default' ) }
-							__nextHasNoMarginBottom
 							onChange={ ( value ) => {
 								setAttributes( {
 									openByDefault: value,

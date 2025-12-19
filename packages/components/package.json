@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/components",
-	"version": "31.0.1-next.6deb34194.0",
+	"version": "30.9.0",
 	"description": "UI components for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -22,13 +22,22 @@
 		"node": ">=18.12.0",
 		"npm": ">=8.19.2"
 	},
-	"main": "build/index.js",
+	"files": [
+		"src",
+		"build",
+		"build-module",
+		"build-style",
+		"build-types",
+		"*.md"
+	],
+	"type": "module",
+	"main": "build/index.cjs",
 	"module": "build-module/index.js",
 	"exports": {
 		".": {
 			"types": "./build-types/index.d.ts",
 			"import": "./build-module/index.js",
-			"require": "./build/index.js"
+			"require": "./build/index.cjs"
 		},
 		"./README.md": "./README.md",
 		"./CONTRIBUTING.md": "./CONTRIBUTING.md",
