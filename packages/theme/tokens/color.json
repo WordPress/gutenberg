@@ -1561,7 +1561,7 @@
 				}
 			},
 			"$extensions": {
-				"com.figma.scopes": [ "STROKE_COLOR", "EFFECT_COLOR" ]
+				"com.figma.scopes": [ "STROKE" ]
 			}
 		}
 	}
