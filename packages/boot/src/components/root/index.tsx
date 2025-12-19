@@ -144,40 +144,44 @@ export default function Root() {
 						<div className="boot-layout__surfaces">
 							<UserThemeProvider color={ { bg: '#ffffff' } }>
 								<Outlet />
+								{ /* Render Canvas in Root to prevent remounting on route changes */ }
+								{ ( canvas || canvas === null ) && (
+									<div
+										className={ clsx(
+											'boot-layout__canvas',
+											{
+												'has-mobile-drawer':
+													canvas?.isPreview &&
+													isMobileViewport,
+											}
+										) }
+									>
+										{ canvas?.isPreview &&
+											isMobileViewport && (
+												<div className="boot-layout__mobile-sidebar-drawer">
+													<Button
+														icon={ menu }
+														onClick={ () =>
+															setIsMobileSidebarOpen(
+																true
+															)
+														}
+														label={ __(
+															'Open navigation panel'
+														) }
+														size="compact"
+													/>
+												</div>
+											) }
+										<CanvasRenderer
+											canvas={ canvas }
+											routeContentModule={
+												routeContentModule
+											}
+										/>
+									</div>
+								) }
 							</UserThemeProvider>
-							{ /* Render Canvas in Root to prevent remounting on route changes */ }
-							{ ( canvas || canvas === null ) && (
-								<div
-									className={ clsx( 'boot-layout__canvas', {
-										'has-mobile-drawer':
-											canvas?.isPreview &&
-											isMobileViewport,
-									} ) }
-								>
-									{ canvas?.isPreview && isMobileViewport && (
-										<div className="boot-layout__mobile-sidebar-drawer">
-											<Button
-												icon={ menu }
-												onClick={ () =>
-													setIsMobileSidebarOpen(
-														true
-													)
-												}
-												label={ __(
-													'Open navigation panel'
-												) }
-												size="compact"
-											/>
-										</div>
-									) }
-									<CanvasRenderer
-										canvas={ canvas }
-										routeContentModule={
-											routeContentModule
-										}
-									/>
-								</div>
-							) }
 						</div>
 					</div>
 				</UserThemeProvider>
