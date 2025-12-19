@@ -46,7 +46,6 @@ interface ModeOverride {
 	path: string[];
 	$value: DTCGValue;
 	$type?: string;
-	$extensions?: Omit< DTCGExtensions, 'mode' >;
 }
 
 /**
@@ -87,29 +86,6 @@ function setNestedValue(
 }
 
 /**
- * Copies extensions from a token, excluding the 'mode' extension.
- *
- * @param extensions - The extensions object to copy.
- * @return A new extensions object without the 'mode' key.
- */
-function copyExtensionsWithoutMode(
-	extensions?: DTCGExtensions
-): Omit< DTCGExtensions, 'mode' > | undefined {
-	if ( ! extensions ) {
-		return undefined;
-	}
-
-	const { mode, ...otherExtensions } = extensions;
-
-	// Only return if there are other extensions besides mode
-	if ( Object.keys( otherExtensions ).length === 0 ) {
-		return undefined;
-	}
-
-	return otherExtensions;
-}
-
-/**
  * Recursively extracts mode overrides from a DTCG token tree.
  *
  * @param object      - The DTCG group to extract from.
@@ -139,11 +115,6 @@ function getModeOverrides(
 			// Extract mode-specific values from extensions
 			const modes = node.$extensions?.mode;
 			if ( modes ) {
-				// Preserve other extensions (like com.figma.scopes) but exclude mode
-				const preservedExtensions = copyExtensionsWithoutMode(
-					node.$extensions
-				);
-
 				for ( const [ mode, modeValue ] of Object.entries( modes ) ) {
 					modeOverrides.set( mode, [
 						...( modeOverrides.get( mode ) ?? [] ),
@@ -151,7 +122,6 @@ function getModeOverrides(
 							path: [ ...currentPath, key ],
 							$value: modeValue,
 							$type: node.$type ?? groupType,
-							$extensions: preservedExtensions,
 						},
 					] );
 				}
@@ -213,15 +183,8 @@ export default function pluginModeOverrides(): Plugin {
 					const output: Record< string, unknown > = {};
 
 					for ( const override of overrides ) {
-						const { path, $value, $type, $extensions } = override;
-						const token: Record< string, unknown > = {
-							$type,
-							$value,
-						};
-						if ( $extensions ) {
-							token.$extensions = $extensions;
-						}
-						setNestedValue( output, path, token );
+						const { path, $value, $type } = override;
+						setNestedValue( output, path, { $type, $value } );
 					}
 
 					// Output as {basename}.{mode}.json (e.g., dimension.compact.json)
