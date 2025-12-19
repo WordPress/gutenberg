@@ -74,9 +74,13 @@ function GridItem< Item >( {
 }: GridItemProps< Item > ) {
 	const { showTitle = true, showMedia = true, showDescription = true } = view;
 	const id = getItemId( item );
-	const elementRef = useRef< HTMLDivElement | null >( null );
+	const elementRef = useRef< HTMLElement | null >( null );
 	const { intersectionObserverCallback } = useContext( DataViewsContext );
 	const isSelected = selection.includes( id );
+
+	const setElementRef = ( element: HTMLElement | null ) => {
+		elementRef.current = element;
+	};
 
 	// Set up IntersectionObserver for this item
 	useEffect( () => {
@@ -117,6 +121,7 @@ function GridItem< Item >( {
 
 	return (
 		<Composite.Item
+			ref={ setElementRef }
 			aria-label={
 				titleField
 					? titleField.getValue( { item } ) || __( '(no title)' )
@@ -124,12 +129,7 @@ function GridItem< Item >( {
 			}
 			key={ id }
 			render={ ( { children, ...props } ) => (
-				<VStack
-					ref={ elementRef }
-					spacing={ 0 }
-					children={ children }
-					{ ...props }
-				/>
+				<VStack spacing={ 0 } children={ children } { ...props } />
 			) }
 			role="option"
 			aria-posinset={ posinset }
