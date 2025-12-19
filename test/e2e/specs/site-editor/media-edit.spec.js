@@ -108,12 +108,12 @@ async function openQuickEditForPage( page, admin, pageTitle ) {
 		} ) => {
 			await openQuickEditForPage( page, admin, 'Media Test Page' );
 			const featuredImageSection = page.locator(
-				'fieldset.media-utils__media-edit[data-field-id="featured_media"]'
+				'fieldset.fields__media-edit[data-field-id="featured_media"]'
 			);
-			await featuredImageSection.getByText( 'Add files…' ).click();
+			await featuredImageSection.getByText( 'Choose file' ).click();
 			await selectMediaFromLibrary( page, 0, useExperimentalModal );
 			await expect(
-				featuredImageSection.locator( '.media-utils__media-edit-row' )
+				featuredImageSection.locator( '.fields__media-edit-row' )
 			).toBeVisible();
 			await expect(
 				featuredImageSection.getByText( 'Add files' )
@@ -126,17 +126,17 @@ async function openQuickEditForPage( page, admin, pageTitle ) {
 		} ) => {
 			await openQuickEditForPage( page, admin, 'Media Test Page' );
 			const featuredImageSection = page.locator(
-				'fieldset.media-utils__media-edit[data-field-id="featured_media"]'
+				'fieldset.fields__media-edit[data-field-id="featured_media"]'
 			);
-			await featuredImageSection.getByText( 'Add files…' ).click();
+			await featuredImageSection.getByText( 'Choose file' ).click();
 			await selectMediaFromLibrary( page, 0, useExperimentalModal );
 			await expect(
-				featuredImageSection.locator( '.media-utils__media-edit-row' )
+				featuredImageSection.locator( '.fields__media-edit-row' )
 			).toHaveCount( 1 );
 			await featuredImageSection.getByText( 'Add files' ).click();
 			await selectMediaFromLibrary( page, 1, useExperimentalModal );
 			await expect(
-				featuredImageSection.locator( '.media-utils__media-edit-row' )
+				featuredImageSection.locator( '.fields__media-edit-row' )
 			).toHaveCount( 2 );
 		} );
 
@@ -146,21 +146,21 @@ async function openQuickEditForPage( page, admin, pageTitle ) {
 		} ) => {
 			await openQuickEditForPage( page, admin, 'Media Test Page' );
 			const featuredImageSection = page.locator(
-				'fieldset.media-utils__media-edit[data-field-id="featured_media"]'
+				'fieldset.fields__media-edit[data-field-id="featured_media"]'
 			);
-			await featuredImageSection.getByText( 'Add files…' ).click();
+			await featuredImageSection.getByText( 'Choose file' ).click();
 			await selectMediaFromLibrary( page, 0, useExperimentalModal );
 			await expect(
-				featuredImageSection.locator( '.media-utils__media-edit-row' )
+				featuredImageSection.locator( '.fields__media-edit-row' )
 			).toBeVisible();
 			await featuredImageSection
 				.getByRole( 'button', { name: 'Remove' } )
 				.click();
 			await expect(
-				featuredImageSection.locator( '.media-utils__media-edit-row' )
+				featuredImageSection.locator( '.fields__media-edit-row' )
 			).toBeHidden();
 			await expect(
-				featuredImageSection.getByText( 'Add files…' )
+				featuredImageSection.getByText( 'Choose file' )
 			).toBeVisible();
 		} );
 
@@ -170,14 +170,14 @@ async function openQuickEditForPage( page, admin, pageTitle ) {
 		} ) => {
 			await openQuickEditForPage( page, admin, 'Media Test Page' );
 			const featuredImageSection = page.locator(
-				'fieldset.media-utils__media-edit[data-field-id="featured_media"]'
+				'fieldset.fields__media-edit[data-field-id="featured_media"]'
 			);
-			await featuredImageSection.getByText( 'Add files…' ).click();
+			await featuredImageSection.getByText( 'Choose file' ).click();
 			await selectMediaFromLibrary( page, 0, useExperimentalModal );
 			await featuredImageSection.getByText( 'Add files' ).click();
 			await selectMediaFromLibrary( page, 1, useExperimentalModal );
 			await expect(
-				featuredImageSection.locator( '.media-utils__media-edit-row' )
+				featuredImageSection.locator( '.fields__media-edit-row' )
 			).toHaveCount( 2 );
 			const saveButton = page.getByRole( 'button', {
 				name: /Review.*change/i,
@@ -187,12 +187,10 @@ async function openQuickEditForPage( page, admin, pageTitle ) {
 			await expect( saveButton ).toBeHidden( { timeout: 10000 } );
 			await openQuickEditForPage( page, admin, 'Media Test Page' );
 			const featuredImageAfterRefresh = page.locator(
-				'fieldset.media-utils__media-edit[data-field-id="featured_media"]'
+				'fieldset.fields__media-edit[data-field-id="featured_media"]'
 			);
 			await expect(
-				featuredImageAfterRefresh.locator(
-					'.media-utils__media-edit-row'
-				)
+				featuredImageAfterRefresh.locator( '.fields__media-edit-row' )
 			).toHaveCount( 2 );
 		} );
 
@@ -202,22 +200,22 @@ async function openQuickEditForPage( page, admin, pageTitle ) {
 		} ) => {
 			await openQuickEditForPage( page, admin, 'Media Test Page' );
 			const featuredImageSection = page.locator(
-				'fieldset.media-utils__media-edit[data-field-id="featured_media"]'
+				'fieldset.fields__media-edit[data-field-id="featured_media"]'
 			);
-			await featuredImageSection.getByText( 'Add files…' ).click();
+			await featuredImageSection.getByText( 'Choose file' ).click();
 			await selectMediaFromLibrary( page, 0, useExperimentalModal );
 			await featuredImageSection.getByText( 'Add files' ).click();
 			await selectMediaFromLibrary( page, 1, useExperimentalModal );
 			await expect(
-				featuredImageSection.locator( '.media-utils__media-edit-row' )
+				featuredImageSection.locator( '.fields__media-edit-row' )
 			).toHaveCount( 2 );
 			await featuredImageSection
-				.locator( '.media-utils__media-edit-row' )
+				.locator( '.fields__media-edit-row' )
 				.first()
 				.getByRole( 'button', { name: 'Remove' } )
 				.click();
 			await expect(
-				featuredImageSection.locator( '.media-utils__media-edit-row' )
+				featuredImageSection.locator( '.fields__media-edit-row' )
 			).toHaveCount( 1 );
 			await expect(
 				featuredImageSection.getByText( 'Add files' )

@@ -10,31 +10,23 @@ import {
 } from '@wordpress/components';
 import { store as coreStore, type Attachment } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
-import type { DataFormControlProps } from '@wordpress/dataviews';
 import { useCallback, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { archive, audio, video, file } from '@wordpress/icons';
+import {
+	MediaUpload,
+	privateApis as mediaUtilsPrivateApis,
+} from '@wordpress/media-utils';
 
 /**
  * Internal dependencies
  */
-import MediaUpload from '../media-upload';
-import { MediaUploadModal } from '../media-upload-modal';
+import { unlock } from '../../lock-unlock';
+import type { MediaEditProps } from '../../types';
 
-export interface MediaEditProps< Item > extends DataFormControlProps< Item > {
-	/**
-	 * Array of allowed media types (e.g., ['image', 'video']).
-	 *
-	 * @default ['image']
-	 */
-	allowedTypes?: string[];
-	/**
-	 * Whether to allow multiple media selections.
-	 *
-	 * @default false
-	 */
-	multiple?: boolean;
-}
+export type { MediaEditProps };
+
+const { MediaUploadModal } = unlock( mediaUtilsPrivateApis );
 
 /**
  * Conditional Media component that uses MediaUploadModal when experiment is enabled,
@@ -90,7 +82,7 @@ function MediaPickerButton( {
 } ) {
 	return (
 		<div
-			className="media-utils__media-edit-picker-button"
+			className="fields__media-edit-picker-button"
 			role="button"
 			tabIndex={ 0 }
 			onClick={ open }
@@ -132,7 +124,7 @@ function MediaPreview( {
 	if ( mimeType.startsWith( 'image/' ) ) {
 		preview = (
 			<img
-				className="media-utils__media-edit-thumbnail"
+				className="fields__media-edit-thumbnail"
 				alt={ attachment.alt_text || '' }
 				src={ url }
 			/>
@@ -148,7 +140,7 @@ function MediaPreview( {
 		<>
 			{ preview }
 			<Truncate
-				className="media-utils__media-edit-filename"
+				className="fields__media-edit-filename"
 				title={ attachmentTitle }
 			>
 				{ attachmentTitle }
@@ -158,9 +150,9 @@ function MediaPreview( {
 }
 
 /**
- * A media edit control component designed to be used with the Fields API (`@wordpress/dataviews`).
- * Provides a media picker UI with upload functionality for selecting WordPress media attachments.
- * Supports both the traditional WordPress media library and the experimental DataViews media modal.
+ * A media edit control component that provides a media picker UI with upload functionality
+ * for selecting WordPress media attachments. Supports both the traditional WordPress media
+ * library and the experimental DataViews media modal.
  *
  * This component is intended to be used as the `Edit` property of a field definition when
  * registering fields with `registerEntityField` from `@wordpress/editor`.
@@ -178,8 +170,8 @@ function MediaPreview( {
  *
  * @example
  * ```tsx
- * import { MediaEdit } from '@wordpress/media-utils';
- * import type { MediaEditProps } from '@wordpress/media-utils';
+ * import { MediaEdit } from '@wordpress/fields';
+ * import type { MediaEditProps } from '@wordpress/fields';
  *
  * const featuredImageField = {
  *   id: 'featured_media',
@@ -226,10 +218,7 @@ export default function MediaEdit< Item >( {
 		onChangeControl( newIds.length ? newIds : 0 );
 	};
 	return (
-		<fieldset
-			className="media-utils__media-edit"
-			data-field-id={ field.id }
-		>
+		<fieldset className="fields__media-edit" data-field-id={ field.id }>
 			<ConditionalMediaUpload
 				onSelect={ ( selectedMedia: any ) => {
 					if ( multiple ) {
@@ -256,7 +245,7 @@ export default function MediaEdit< Item >( {
 									{ attachments.map( ( attachment ) => (
 										<div
 											key={ attachment.id }
-											className="media-utils__media-edit-row"
+											className="fields__media-edit-row"
 										>
 											<MediaPickerButton
 												open={ open }
@@ -271,7 +260,7 @@ export default function MediaEdit< Item >( {
 											</MediaPickerButton>
 											<Button
 												__next40pxDefaultSize
-												className="media-utils__media-edit-remove"
+												className="fields__media-edit-remove"
 												text={ __( 'Remove' ) }
 												variant="secondary"
 												onClick={ (
@@ -290,7 +279,7 @@ export default function MediaEdit< Item >( {
 									open={ open }
 									label={ addButtonLabel }
 								>
-									<span className="media-utils__media-edit-placeholder">
+									<span className="fields__media-edit-placeholder">
 										{ addButtonLabel }
 									</span>
 								</MediaPickerButton>

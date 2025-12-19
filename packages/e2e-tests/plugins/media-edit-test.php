@@ -38,7 +38,7 @@ function gutenberg_test_media_edit_enqueue_script() {
 	wp_enqueue_script(
 		'gutenberg-test-media-edit',
 		plugins_url( 'media-edit-test/index.js', __FILE__ ),
-		array( 'wp-hooks', 'wp-i18n', 'wp-media-utils', 'wp-element', 'wp-editor' ),
+		array( 'wp-hooks', 'wp-i18n', 'wp-element', 'wp-editor' ),
 		'1.0.0',
 		true
 	);

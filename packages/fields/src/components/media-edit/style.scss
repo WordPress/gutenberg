@@ -1,20 +1,20 @@
 @use "@wordpress/base-styles/colors" as *;
 @use "@wordpress/base-styles/variables" as *;
 
-fieldset.media-utils__media-edit {
+fieldset.fields__media-edit {
 	// Reset `fieldset` browser defaults.
 	border: 0;
 	padding: 0;
 	margin: 0;
 
-	.media-utils__media-edit-row {
+	.fields__media-edit-row {
 		display: grid;
 		grid-template-columns: 1fr auto;
 		gap: $grid-unit-10;
 		align-items: center;
 	}
 
-	.media-utils__media-edit-picker-button {
+	.fields__media-edit-picker-button {
 		display: flex;
 		align-items: center;
 		gap: $grid-unit-15;
@@ -34,22 +34,21 @@ fieldset.media-utils__media-edit {
 		}
 	}
 
-	.media-utils__media-edit-filename,
-	.media-utils__media-edit-placeholder {
+	.fields__media-edit-filename,
+	.fields__media-edit-placeholder {
 		flex: 1;
 		min-width: 0;
 		color: $gray-900;
 	}
 
-	.media-utils__media-edit-placeholder {
+	.fields__media-edit-placeholder {
 		text-align: center;
 	}
 
-	.media-utils__media-edit-thumbnail {
+	.fields__media-edit-thumbnail {
 		width: 24px;
 		aspect-ratio: 1 / 1;
 		flex-shrink: 0;
 		border-radius: $radius-small;
 	}
 }
-
