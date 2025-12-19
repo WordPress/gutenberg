@@ -185,16 +185,23 @@ describe( 'inputToDate', () => {
 	} );
 
 	describe( 'Date objects', () => {
-		it( 'should extract the UTC timestamp from Date objects', () => {
+		it( 'should extract the UTC timestamp, not local time components', () => {
+			// Mock Pacific timezone where local time differs from UTC.
+			// This ensures the test fails on trunk if we incorrectly preserve
+			// local components instead of extracting the UTC timestamp.
+			timezoneMock.register( 'US/Pacific' );
+
+			// Create Nov 1, 2025 at 15:30:45 UTC
 			const timestamp = Date.UTC( 2025, 10, 1, 15, 30, 45 );
 			const input = new Date( timestamp );
 			const result = inputToDate( input );
 
-			// Should preserve the exact UTC moment, not local time components
+			// Should preserve the exact UTC moment (15:30:45), not the local
+			// Pacific time components (7:30:45 or 8:30:45 depending on DST).
 			expect( result.getUTCFullYear() ).toBe( 2025 );
 			expect( result.getUTCMonth() ).toBe( 10 ); // November
 			expect( result.getUTCDate() ).toBe( 1 );
-			expect( result.getUTCHours() ).toBe( 15 );
+			expect( result.getUTCHours() ).toBe( 15 ); // UTC hour, not 7 or 8
 			expect( result.getUTCMinutes() ).toBe( 30 );
 			expect( result.getUTCSeconds() ).toBe( 45 );
 		} );
