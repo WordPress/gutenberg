@@ -139,7 +139,11 @@ export interface PostType {
 // Will be unnecessary after typescript 5.0 upgrade.
 export type CoreDataError = { message?: string; code?: string };
 
-export interface MediaEditProps< Item > extends DataFormControlProps< Item > {
+export interface MediaEditProps< Item >
+	extends Pick<
+		DataFormControlProps< Item >,
+		'data' | 'field' | 'onChange'
+	> {
 	/**
 	 * Array of allowed media types (e.g., ['image', 'video']).
 	 *

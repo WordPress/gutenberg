@@ -7,6 +7,7 @@ import {
 	__experimentalText as Text,
 	__experimentalTruncate as Truncate,
 	__experimentalVStack as VStack,
+	VisuallyHidden,
 } from '@wordpress/components';
 import { store as coreStore, type Attachment } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
@@ -23,8 +24,6 @@ import {
  */
 import { unlock } from '../../lock-unlock';
 import type { MediaEditProps } from '../../types';
-
-export type { MediaEditProps };
 
 const { MediaUploadModal } = unlock( mediaUtilsPrivateApis );
 
@@ -171,13 +170,13 @@ function MediaPreview( {
  * @example
  * ```tsx
  * import { MediaEdit } from '@wordpress/fields';
- * import type { MediaEditProps } from '@wordpress/fields';
+ * import type { DataFormControlProps } from '@wordpress/dataviews';
  *
  * const featuredImageField = {
  *   id: 'featured_media',
  *   type: 'media',
  *   label: 'Featured Image',
- *   Edit: (props: MediaEditProps<MyPostType>) => (
+ *   Edit: (props: DataFormControlProps<MyPostType>) => (
  *     <MediaEdit
  *       {...props}
  *       allowedTypes={['image']}
@@ -240,6 +239,9 @@ export default function MediaEdit< Item >( {
 						: field.placeholder || __( 'Choose file' );
 					return (
 						<VStack spacing={ 2 }>
+							<VisuallyHidden as="label">
+								{ field.label }
+							</VisuallyHidden>
 							{ !! attachments?.length && (
 								<VStack spacing={ 2 }>
 									{ attachments.map( ( attachment ) => (

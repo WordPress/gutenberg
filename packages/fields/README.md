@@ -81,13 +81,13 @@ _Usage_
 
 ```tsx
 import { MediaEdit } from '@wordpress/fields';
-import type { MediaEditProps } from '@wordpress/fields';
+import type { DataFormControlProps } from '@wordpress/dataviews';
 
 const featuredImageField = {
 	id: 'featured_media',
 	type: 'media',
 	label: 'Featured Image',
-	Edit: ( props: MediaEditProps< MyPostType > ) => (
+	Edit: ( props: DataFormControlProps< MyPostType > ) => (
 		<MediaEdit { ...props } allowedTypes={ [ 'image' ] } />
 	),
 };
