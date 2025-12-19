@@ -5,7 +5,7 @@
 	"title": "Poetry",
 	"category": "text",
 	"description": "Insert poetry. Use special spacing formats. Or quote song lyrics.",
-	"keywords": [ "poetry", "poem", "verse" ],
+	"keywords": [ "poetry", "poem", "verse", "stanza", "song", "lyrics" ],
 	"textdomain": "default",
 	"attributes": {
 		"content": {
