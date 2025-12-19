@@ -200,6 +200,9 @@ require __DIR__ . '/block-supports/block-visibility.php';
 require __DIR__ . '/block-supports/custom-css.php';
 require __DIR__ . '/block-supports/states.php';
 
+// New core abilities.
+require __DIR__ . '/abilities.php';
+
 // Client-side media processing.
 require_once __DIR__ . '/media/load.php';
 
