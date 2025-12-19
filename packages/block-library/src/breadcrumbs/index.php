@@ -440,7 +440,7 @@ function block_core_breadcrumbs_get_archive_breadcrumbs() {
 		if ( $post_type_object ) {
 			// Add post type (current if not paginated, link if paginated).
 			$breadcrumb_items[] = block_core_breadcrumbs_create_item(
-				$title || $post_type_object->labels->archives,
+				$title ? $title : $post_type_object->labels->archives,
 				$is_paged
 			);
 		}
