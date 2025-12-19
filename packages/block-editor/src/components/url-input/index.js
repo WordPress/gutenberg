@@ -476,7 +476,7 @@ class URLInput extends Component {
 		}
 
 		return (
-			<BaseControl __nextHasNoMarginBottom { ...controlProps }>
+			<BaseControl { ...controlProps }>
 				<InputControl { ...inputProps } __next40pxDefaultSize />
 				{ loading && <Spinner /> }
 			</BaseControl>

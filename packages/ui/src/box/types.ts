@@ -1,62 +1,13 @@
-/**
- * Internal dependencies
- */
+import {
+	type PaddingSize,
+	type BorderRadiusSize,
+	type BorderWidthSize,
+	type Target,
+	type SurfaceBackgroundColor,
+	type ContentForegroundColor,
+	type SurfaceStrokeColor,
+} from '@wordpress/theme';
 import { type ComponentProps } from '../utils/types';
-
-type Size = '2xs' | 'xs' | 'sm' | 'md' | 'lg';
-
-type BackgroundColor =
-	| 'neutral'
-	| 'neutral-strong'
-	| 'neutral-weak'
-	| 'brand'
-	| 'success'
-	| 'success-weak'
-	| 'info'
-	| 'info-weak'
-	| 'warning'
-	| 'warning-weak'
-	| 'caution'
-	| 'caution-weak'
-	| 'error'
-	| 'error-weak';
-
-type ForegroundColor =
-	| 'neutral'
-	| 'neutral-weak'
-	| 'success'
-	| 'success-weak'
-	| 'info'
-	| 'info-weak'
-	| 'warning'
-	| 'warning-weak'
-	| 'caution'
-	| 'caution-weak'
-	| 'error'
-	| 'error-weak';
-
-type StrokeColor =
-	| 'brand'
-	| 'brand-strong'
-	| 'error'
-	| 'error-strong'
-	| 'info'
-	| 'info-strong'
-	| 'neutral'
-	| 'neutral-strong'
-	| 'neutral-weak'
-	| 'success'
-	| 'success-strong'
-	| 'warning'
-	| 'warning-strong';
-
-type Target =
-	| 'surface'
-	| 'interactive'
-	| 'content'
-	| 'track'
-	| 'thumb'
-	| 'focus';
 
 type DimensionVariant< T > = {
 	block?: T;
@@ -76,32 +27,32 @@ export interface BoxProps extends ComponentProps< 'div' > {
 	/**
 	 * The surface background design token for box background color.
 	 */
-	backgroundColor?: BackgroundColor;
+	backgroundColor?: SurfaceBackgroundColor;
 
 	/**
 	 * The surface foreground design token for box text color.
 	 */
-	color?: ForegroundColor;
+	color?: ContentForegroundColor;
 
 	/**
 	 * The surface spacing design token or base unit multiplier for box padding.
 	 */
-	padding?: Size | DimensionVariant< Size >;
+	padding?: PaddingSize | DimensionVariant< PaddingSize >;
 
 	/**
 	 * The surface border radius design token.
 	 */
-	borderRadius?: Exclude< Size, '2xs' >;
+	borderRadius?: BorderRadiusSize;
 
 	/**
 	 * The surface border width design token.
 	 */
-	borderWidth?: Exclude< Size, '2xs' >;
+	borderWidth?: BorderWidthSize;
 
 	/**
 	 * The surface border stroke color design token.
 	 */
-	borderColor?: StrokeColor;
+	borderColor?: SurfaceStrokeColor;
 
 	/**
 	 * The content to be rendered inside the component.

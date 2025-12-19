@@ -1,21 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * Internal dependencies
- */
-import { NEW_TAB_TARGET, NOFOLLOW_REL } from './constants';
-import { getUpdatedLinkAttributes } from './get-updated-link-attributes';
-import removeAnchorTag from '../utils/remove-anchor-tag';
-import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
-import { unlock } from '../lock-unlock';
-import useDeprecatedTextAlign from '../utils/deprecated-text-align-attributes';
-
-/**
- * WordPress dependencies
- */
 import { __, sprintf } from '@wordpress/i18n';
 import {
 	useEffect,
@@ -61,6 +44,12 @@ import {
 } from '@wordpress/blocks';
 import { useMergeRefs, useRefEffect } from '@wordpress/compose';
 import { useSelect, useDispatch } from '@wordpress/data';
+import { NEW_TAB_TARGET, NOFOLLOW_REL } from './constants';
+import { getUpdatedLinkAttributes } from './get-updated-link-attributes';
+import removeAnchorTag from '../utils/remove-anchor-tag';
+import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
+import { unlock } from '../lock-unlock';
+import useDeprecatedTextAlign from '../utils/deprecated-text-align-attributes';
 
 const { HTMLElementControl } = unlock( blockEditorPrivateApis );
 
@@ -142,7 +131,6 @@ function WidthPanel( { selectedWidth, setAttributes } ) {
 				isShownByDefault
 				hasValue={ () => !! selectedWidth }
 				onDeselect={ () => setAttributes( { width: undefined } ) }
-				__nextHasNoMarginBottom
 			>
 				<ToggleGroupControl
 					label={ __( 'Width' ) }

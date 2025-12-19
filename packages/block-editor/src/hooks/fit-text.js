@@ -248,7 +248,6 @@ export function FitTextControl( {
 				panelId={ clientId }
 			>
 				<ToggleControl
-					__nextHasNoMarginBottom
 					label={ __( 'Fit text' ) }
 					checked={ fitText }
 					onChange={ () => {

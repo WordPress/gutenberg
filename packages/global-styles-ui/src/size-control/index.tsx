@@ -21,14 +21,9 @@ interface SizeControlProps {
 	fallbackValue?: number;
 	disabled?: boolean;
 	label?: string;
-	__nextHasNoMarginBottom?: boolean;
 }
 
-function SizeControl( {
-	// Do not allow manipulation of margin bottom
-	__nextHasNoMarginBottom,
-	...props
-}: SizeControlProps ) {
+function SizeControl( props: SizeControlProps ) {
 	const { baseControlProps } = useBaseControlProps( props );
 	const { value, onChange, fallbackValue, disabled, label } = props;
 
@@ -57,7 +52,7 @@ function SizeControl( {
 	};
 
 	return (
-		<BaseControl { ...baseControlProps } __nextHasNoMarginBottom>
+		<BaseControl { ...baseControlProps }>
 			<Flex>
 				<FlexItem isBlock>
 					<UnitControl

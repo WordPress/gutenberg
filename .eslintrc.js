@@ -275,13 +275,6 @@ module.exports = {
 					'error',
 					...restrictedSyntax,
 					...restrictedSyntaxComponents,
-					// Temporary rules until we're ready to officially deprecate the bottom margins.
-					...[ 'BaseControl' ].map( ( componentName ) => ( {
-						selector: `JSXOpeningElement[name.name="${ componentName }"]:not(:has(JSXAttribute[name.name="__nextHasNoMarginBottom"]))`,
-						message:
-							componentName +
-							' should have the `__nextHasNoMarginBottom` prop to opt-in to the new margin-free styles.',
-					} ) ),
 					// Temporary rules until we're ready to officially default to the new size.
 					...[
 						'BorderBoxControl',

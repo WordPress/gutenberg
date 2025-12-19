@@ -88,7 +88,6 @@ export default function RelativeDateControl< Item >( {
 	return (
 		<BaseControl
 			id={ id }
-			__nextHasNoMarginBottom
 			className={ clsx( className, 'dataviews-controls__relative-date' ) }
 			label={ label }
 			hideLabelFromVision={ hideLabelFromVision }

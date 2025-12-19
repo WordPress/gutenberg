@@ -69,6 +69,7 @@ function PanelDropdown< Item >( {
 	summaryFields,
 	fieldDefinition,
 	popoverAnchor,
+	onOpen,
 }: {
 	data: Item;
 	field: NormalizedFormField;
@@ -78,6 +79,7 @@ function PanelDropdown< Item >( {
 	summaryFields: NormalizedField< Item >[];
 	fieldDefinition: NormalizedField< Item >;
 	popoverAnchor: HTMLElement | null;
+	onOpen?: () => void;
 } ) {
 	const fieldLabel = !! field.children ? field.label : fieldDefinition?.label;
 
@@ -135,7 +137,12 @@ function PanelDropdown< Item >( {
 					labelPosition={ labelPosition }
 					fieldLabel={ fieldLabel }
 					disabled={ fieldDefinition.readOnly === true }
-					onClick={ onToggle }
+					onClick={ () => {
+						if ( ! isOpen && onOpen ) {
+							onOpen();
+						}
+						onToggle();
+					} }
 					aria-expanded={ isOpen }
 				/>
 			) }
