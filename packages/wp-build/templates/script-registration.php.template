@@ -75,7 +75,7 @@ if ( ! function_exists( '{{PREFIX}}_register_package_scripts' ) ) {
 			{{PREFIX}}_override_script(
 				$scripts,
 				$script_data['handle'],
-				plugins_url( 'build/scripts/' . $script_data['path'] . $extension, $plugin_dir ),
+				{{BASE_URL}} . '/scripts/' . $script_data['path'] . $extension,
 				$dependencies,
 				$version,
 				true

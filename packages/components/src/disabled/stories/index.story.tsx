@@ -47,13 +47,11 @@ const Form = () => {
 				onChange={ setTextControlValue }
 			/>
 			<TextareaControl
-				__nextHasNoMarginBottom
 				label="TextArea Control"
 				value={ textAreaValue }
 				onChange={ setTextAreaValue }
 			/>
 			<SelectControl
-				__nextHasNoMarginBottom
 				__next40pxDefaultSize
 				label="Select Control"
 				onChange={ () => {} }

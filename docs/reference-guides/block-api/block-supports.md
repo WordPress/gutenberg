@@ -629,6 +629,7 @@ _**Note:** Since WordPress 6.2._
 -   Type: `Object`
 -   Default value: null
 -   Subproperties:
+    -   `height`: type `boolean`, default value `false`
     -   `minHeight`: type `boolean`, default value `false`
     -   `width`: type `boolean`, default value `false`
 
@@ -638,6 +639,7 @@ This value signals that a block supports some of the CSS style properties relate
 supports: {
 	dimensions: {
 		aspectRatio: true // Enable aspect ratio control.
+		height: true // Enable height control.
 		minHeight: true // Enable min height control.
 		width: true // Enable width control.
 	}
@@ -646,13 +648,14 @@ supports: {
 
 When a block declares support for a specific dimensions property, its attributes definition is extended to include the `style` attribute.
 
--   `style`: an attribute of `object` type with no default assigned. This is added when `aspectRatio`, `minHeight`, or `width` support is declared. It stores the custom values set by the user. For example:
+-   `style`: an attribute of `object` type with no default assigned. This is added when `aspectRatio`, `height`, `minHeight`, or `width` support is declared. It stores the custom values set by the user. For example:
 
 ```js
 attributes: {
     style: {
         dimensions: {
             aspectRatio: "16/9",
+            height: "40vh",
             minHeight: "50vh",
             width: "400px",
         }

@@ -87,7 +87,6 @@ function DropCapControl( { clientId, attributes, setAttributes, name } ) {
 				panelId={ clientId }
 			>
 				<ToggleControl
-					__nextHasNoMarginBottom
 					label={ __( 'Drop cap' ) }
 					checked={ !! dropCap }
 					onChange={ () => setAttributes( { dropCap: ! dropCap } ) }

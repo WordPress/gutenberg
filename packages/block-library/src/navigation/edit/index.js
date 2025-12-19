@@ -730,7 +730,6 @@ function Navigation( {
 									isShownByDefault
 								>
 									<ToggleControl
-										__nextHasNoMarginBottom
 										checked={ openSubmenusOnClick }
 										onChange={ ( value ) => {
 											setAttributes( {
@@ -758,7 +757,6 @@ function Navigation( {
 									isShownByDefault
 								>
 									<ToggleControl
-										__nextHasNoMarginBottom
 										checked={ showSubmenuIcon }
 										onChange={ ( value ) => {
 											setAttributes( {

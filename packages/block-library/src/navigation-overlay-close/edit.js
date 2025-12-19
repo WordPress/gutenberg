@@ -58,7 +58,6 @@ export default function NavigationOverlayCloseEdit( {
 							}
 							isBlock
 							__next40pxDefaultSize
-							__nextHasNoMarginBottom
 						>
 							<ToggleGroupControlOption
 								value="icon"

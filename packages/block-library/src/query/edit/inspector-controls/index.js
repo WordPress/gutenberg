@@ -70,18 +70,32 @@ export default function QueryInspectorControls( props ) {
 		// We need to dynamically update the `taxQuery` property,
 		// by removing any not supported taxonomy from the query.
 		const supportedTaxonomies = postTypesTaxonomiesMap[ newValue ];
-		const updatedTaxQuery = Object.entries( taxQuery || {} ).reduce(
-			( accumulator, [ taxonomySlug, terms ] ) => {
-				if ( supportedTaxonomies.includes( taxonomySlug ) ) {
-					accumulator[ taxonomySlug ] = terms;
-				}
-				return accumulator;
-			},
-			{}
-		);
-		updateQuery.taxQuery = !! Object.keys( updatedTaxQuery ).length
-			? updatedTaxQuery
-			: undefined;
+		if ( !! supportedTaxonomies?.length && !! taxQuery ) {
+			// Shared utility to build taxQuery based on supported taxonomies.
+			const buildTaxQuery = ( _taxQuery ) => {
+				return Object.entries( _taxQuery || {} ).reduce(
+					( accumulator, [ taxonomy, terms ] ) => {
+						if ( supportedTaxonomies.includes( taxonomy ) ) {
+							accumulator[ taxonomy ] = terms;
+						}
+						return accumulator;
+					},
+					{}
+				);
+			};
+			const updatedTaxQuery = {};
+			const builtIncludeTaxQuery = buildTaxQuery( taxQuery.include );
+			if ( !! Object.keys( builtIncludeTaxQuery ).length ) {
+				updatedTaxQuery.include = builtIncludeTaxQuery;
+			}
+			const builtExcludeTaxQuery = buildTaxQuery( taxQuery.exclude );
+			if ( !! Object.keys( builtExcludeTaxQuery ).length ) {
+				updatedTaxQuery.exclude = builtExcludeTaxQuery;
+			}
+			updateQuery.taxQuery = !! Object.keys( updatedTaxQuery ).length
+				? updatedTaxQuery
+				: undefined;
+		}
 
 		if ( newValue !== 'post' ) {
 			updateQuery.sticky = '';
@@ -205,7 +219,6 @@ export default function QueryInspectorControls( props ) {
 							<VStack spacing={ 4 }>
 								<ToggleGroupControl
 									__next40pxDefaultSize
-									__nextHasNoMarginBottom
 									label={ __( 'Query type' ) }
 									isBlock
 									onChange={ ( value ) => {
@@ -256,7 +269,6 @@ export default function QueryInspectorControls( props ) {
 						>
 							{ postTypesSelectOptions.length > 2 ? (
 								<SelectControl
-									__nextHasNoMarginBottom
 									__next40pxDefaultSize
 									options={ postTypesSelectOptions }
 									value={ postType }
@@ -266,7 +278,6 @@ export default function QueryInspectorControls( props ) {
 								/>
 							) : (
 								<ToggleGroupControl
-									__nextHasNoMarginBottom
 									__next40pxDefaultSize
 									isBlock
 									value={ postType }
@@ -385,7 +396,10 @@ export default function QueryInspectorControls( props ) {
 							label={ __( 'Taxonomies' ) }
 							hasValue={ () =>
 								Object.values( taxQuery || {} ).some(
-									( terms ) => !! terms.length
+									( value ) =>
+										Object.values( value || {} ).some(
+											( termIds ) => !! termIds?.length
+										)
 								)
 							}
 							onDeselect={ () => setQuery( { taxQuery: null } ) }

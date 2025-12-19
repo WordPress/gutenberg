@@ -202,7 +202,6 @@ export default function BreadcrumbEdit( {
 						}
 					>
 						<ToggleControl
-							__nextHasNoMarginBottom
 							label={ __( 'Show home breadcrumb' ) }
 							onChange={ ( value ) =>
 								setAttributes( { showHomeItem: value } )
@@ -221,7 +220,6 @@ export default function BreadcrumbEdit( {
 						}
 					>
 						<ToggleControl
-							__nextHasNoMarginBottom
 							label={ __( 'Show current breadcrumb' ) }
 							onChange={ ( value ) =>
 								setAttributes( { showCurrentItem: value } )

@@ -47,7 +47,6 @@ export default function DateFormatPicker( {
 		>
 			<VisuallyHidden as="legend">{ __( 'Date format' ) }</VisuallyHidden>
 			<ToggleControl
-				__nextHasNoMarginBottom
 				label={ __( 'Default format' ) }
 				help={ `${ __( 'Example:' ) }  ${ dateI18n(
 					defaultFormat,

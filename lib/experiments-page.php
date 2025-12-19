@@ -150,18 +150,6 @@ function gutenberg_initialize_experiments_settings() {
 	);
 
 	add_settings_field(
-		'gutenberg-new-posts-dashboard',
-		__( 'Data Views: enable for Posts', 'gutenberg' ),
-		'gutenberg_display_experiment_field',
-		'gutenberg-experiments',
-		'gutenberg_experiments_section',
-		array(
-			'label' => __( 'Enables a redesigned posts dashboard accessible through a submenu item in the Gutenberg plugin.', 'gutenberg' ),
-			'id'    => 'gutenberg-new-posts-dashboard',
-		)
-	);
-
-	add_settings_field(
 		'gutenberg-quick-edit-dataviews',
 		__( 'Data Views: add Quick Edit', 'gutenberg' ),
 		'gutenberg_display_experiment_field',

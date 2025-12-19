@@ -260,7 +260,6 @@ function CalendarDateControl< Item >( {
 }: DataFormControlProps< Item > ) {
 	const {
 		id,
-		type,
 		label,
 		setValue,
 		getValue,
@@ -271,12 +270,9 @@ function CalendarDateControl< Item >( {
 		null
 	);
 
-	let weekStartsOn = getSettings().l10n.startOfWeek;
-	if ( type === 'date' ) {
-		// If the field type is date, we've already normalized the format,
-		// and so it's safe to tell TypeScript to trust us ("as Required<Format>").
-		weekStartsOn = ( fieldFormat as Required< FormatDate > ).weekStartsOn;
-	}
+	const weekStartsOn =
+		( fieldFormat as FormatDate ).weekStartsOn ??
+		getSettings().l10n.startOfWeek;
 
 	const fieldValue = getValue( { item: data } );
 	const value = typeof fieldValue === 'string' ? fieldValue : undefined;
@@ -351,7 +347,6 @@ function CalendarDateControl< Item >( {
 			setIsTouched={ setIsTouched }
 		>
 			<BaseControl
-				__nextHasNoMarginBottom
 				id={ id }
 				className="dataviews-controls__date"
 				label={ displayLabel }
@@ -426,7 +421,7 @@ function CalendarDateRangeControl< Item >( {
 	hideLabelFromVision,
 	validity,
 }: DataFormControlProps< Item > ) {
-	const { id, type, label, getValue, setValue, format: fieldFormat } = field;
+	const { id, label, getValue, setValue, format: fieldFormat } = field;
 	let value: DateRange;
 	const fieldValue = getValue( { item: data } );
 	if (
@@ -437,12 +432,9 @@ function CalendarDateRangeControl< Item >( {
 		value = fieldValue as DateRange;
 	}
 
-	let weekStartsOn;
-	if ( type === 'date' ) {
-		// If the field type is date, we've already normalized the format,
-		// and so it's safe to tell TypeScript to trust us ("as Required<Format>").
-		weekStartsOn = ( fieldFormat as Required< FormatDate > ).weekStartsOn;
-	}
+	const weekStartsOn =
+		( fieldFormat as FormatDate ).weekStartsOn ??
+		getSettings().l10n.startOfWeek;
 
 	const onChangeCallback = useCallback(
 		( newValue: DateRange ) => {
@@ -558,7 +550,6 @@ function CalendarDateRangeControl< Item >( {
 			setIsTouched={ setIsTouched }
 		>
 			<BaseControl
-				__nextHasNoMarginBottom
 				id={ id }
 				className="dataviews-controls__date"
 				label={ displayLabel }

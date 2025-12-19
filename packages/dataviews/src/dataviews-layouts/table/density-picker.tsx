@@ -19,7 +19,6 @@ export default function DensityPicker() {
 	const view = context.view as ViewTable;
 	return (
 		<ToggleGroupControl
-			__nextHasNoMarginBottom
 			size="__unstable-large"
 			label={ __( 'Density' ) }
 			value={ view.layout?.density || 'balanced' }

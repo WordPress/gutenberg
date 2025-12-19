@@ -6,7 +6,7 @@ import type { ComponentType, ComponentClass } from 'react';
 /**
  * WordPress dependencies
  */
-import isShallowEqual from '@wordpress/is-shallow-equal';
+import { isShallowEqual } from '@wordpress/is-shallow-equal';
 import { Component } from '@wordpress/element';
 
 /**

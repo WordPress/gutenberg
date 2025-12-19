@@ -6,8 +6,8 @@ This package is still experimental. “Experimental” means this is an early im
 
 A theming package that's part of the WordPress Design System. It has two parts:
 
--   **Design Tokens**: A comprehensive system of design tokens for colors, spacing, typography, and more
--   **Theme System**: A flexible theming provider for consistent theming across applications
+-   **Design Tokens**: A comprehensive system of design tokens for colors, spacing, typography, and more.
+-   **Theme System**: A flexible theming provider for consistent theming across applications.
 
 ## Design Tokens
 
@@ -76,14 +76,14 @@ Semantic tokens follow a consistent naming pattern:
 
 **Target** is the component or element type the token applies to.
 
-| Value         | Description                                                  |
-| ------------- | ------------------------------------------------------------ |
-| `surface`     | Container or layout backgrounds and borders                  |
-| `interactive` | Interactive elements like buttons, inputs, and controls      |
-| `content`     | Static content like text and icons                           |
-| `track`       | Track components like scrollbars and slider tracks           |
-| `thumb`       | Thumb components like scrollbar thumbs and slider handles    |
-| `focus`       | Focus indicators and rings                                   |
+| Value         | Description                                               |
+| ------------- | --------------------------------------------------------- |
+| `surface`     | Container or layout backgrounds and borders               |
+| `interactive` | Interactive elements like buttons, inputs, and controls   |
+| `content`     | Static content like text and icons                        |
+| `track`       | Track components like scrollbars and slider tracks        |
+| `thumb`       | Thumb components like scrollbar thumbs and slider handles |
+| `focus`       | Focus indicators and rings                                |
 
 **Modifier** is an optional size or intensity modifier.
 
@@ -101,15 +101,15 @@ Color tokens extend the base pattern with additional modifiers for tone, emphasi
 
 **Tone** defines the semantic intent of the color.
 
-| Value     | Description                                                                              |
-| --------- | ---------------------------------------------------------------------------------------- |
-| `neutral` | Neutrally toned UI elements.                                                             |
-| `brand`   | Brand-accented or primary action colors.                                                 |
-| `success` | Positive or completed states.                                                            |
-| `info`    | Informational or system-generated context.                                               |
-| `caution` | Heads-up or low-severity issues; “proceed carefully.”                                    |
-| `warning` | Higher-severity or time-sensitive issues that require user attention but are not errors. |
-| `error`   | Blocking issues, validation failures, or destructive actions.                            |
+| Value     | Description                                                                             |
+| --------- | --------------------------------------------------------------------------------------- |
+| `neutral` | Neutrally toned UI elements                                                             |
+| `brand`   | Brand-accented or primary action colors                                                 |
+| `success` | Positive or completed states                                                            |
+| `info`    | Informational or system-generated context                                               |
+| `caution` | Heads-up or low-severity issues; “proceed carefully”                                    |
+| `warning` | Higher-severity or time-sensitive issues that require user attention but are not errors |
+| `error`   | Blocking issues, validation failures, or destructive actions                            |
 
 > [!NOTE]
 > `caution` and `warning` represent two escalation levels of non-error severity.
@@ -117,17 +117,17 @@ Color tokens extend the base pattern with additional modifiers for tone, emphasi
 
 **Emphasis** adjusts color strength relative to the base tone, if specified. The default is a normal emphasis.
 
-| Value                | Description                                     |
-| -------------------- | ----------------------------------------------- |
-| `strong`             | Higher contrast and/or elevated emphasis.       |
-| `weak`               | Subtle variant for secondary or muted elements. |
+| Value                | Description                                    |
+| -------------------- | ---------------------------------------------- |
+| `strong`             | Higher contrast and/or elevated emphasis       |
+| `weak`               | Subtle variant for secondary or muted elements |
 
 **State** represents the interactive state of the element, if specified. The default is an idle state.
 
-| Value      | Description                              |
-| ---------- | ---------------------------------------- |
-| `active`   | Hovered, pressed, or selected state.     |
-| `disabled` | Unavailable or inoperable state.         |
+| Value      | Description                         |
+| ---------- | ----------------------------------- |
+| `active`   | Hovered, pressed, or selected state |
+| `disabled` | Unavailable or inoperable state     |
 
 ## Theme Provider
 
@@ -138,7 +138,7 @@ import { ThemeProvider } from '@wordpress/theme';
 
 function App() {
 	return (
-		<ThemeProvider color={ { primary: 'blue' } }>
+		<ThemeProvider color={ { primary: 'blue' } } density="compact">
 			{ /* Your app content */ }
 		</ThemeProvider>
 	);
@@ -147,10 +147,20 @@ function App() {
 
 The `color` prop accepts an object with the following optional properties:
 
--   `primary`: The primary/accent seed color (default: `'#3858e9'`)
--   `bg`: The background seed color (default: `'#f8f8f8'`)
+-   `primary`: The primary/accent seed color (default: `'#3858e9'`).
+-   `bg`: The background seed color (default: `'#f8f8f8'`).
 
 Both properties accept any valid CSS color value. The theme system automatically generates appropriate color ramps and determines light/dark mode based on these seed colors.
+
+The `density` prop controls the spacing scale throughout the UI:
+
+-   `'default'`: Standard spacing for general use.
+-   `'compact'`: Reduced spacing for information-dense interfaces like data tables or dashboards.
+-   `'comfortable'`: Increased spacing for focused experiences like modals, dialogs, or full-screen settings panels.
+
+The density setting adjusts dimension tokens like gaps and paddings to maintain consistent spacing throughout the UI. Changing the density automatically updates spacing of all components that use these tokens.
+
+When the `color` or `density` prop is omitted, the theme inherits the value from the closest parent `ThemeProvider`, or uses the default value if none is inherited.
 
 ### Nesting Providers
 
@@ -159,10 +169,10 @@ The provider can be used recursively to override or modify the theme for a speci
 ```tsx
 <ThemeProvider color={ { bg: 'white' } }>
 	{ /* light-themed UI components */ }
-	<ThemeProvider color={ { bg: '#1e1e1e' } }>
-		{ /* dark-themed UI components */ }
+	<ThemeProvider color={ { bg: '#1e1e1e' } } density="compact">
+		{ /* dark-themed UI components with compact spacing */ }
 		<ThemeProvider color={ { primary: 'red' } }>
-			{ /* dark-themed with red accent */ }
+			{ /* dark-themed with red accent, inheriting compact density */ }
 		</ThemeProvider>
 	</ThemeProvider>
 	{ /* light-themed UI components */ }

@@ -175,7 +175,6 @@ export default function PostTitleEdit( {
 								}
 							>
 								<ToggleControl
-									__nextHasNoMarginBottom
 									label={ __( 'Make title a link' ) }
 									onChange={ () =>
 										setAttributes( { isLink: ! isLink } )
@@ -198,7 +197,6 @@ export default function PostTitleEdit( {
 										}
 									>
 										<ToggleControl
-											__nextHasNoMarginBottom
 											label={ __( 'Open in new tab' ) }
 											onChange={ ( value ) =>
 												setAttributes( {

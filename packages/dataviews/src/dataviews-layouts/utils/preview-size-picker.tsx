@@ -63,7 +63,6 @@ export default function PreviewSizePicker() {
 
 	return (
 		<RangeControl
-			__nextHasNoMarginBottom
 			__next40pxDefaultSize
 			showTooltip={ false }
 			label={ __( 'Preview size' ) }
