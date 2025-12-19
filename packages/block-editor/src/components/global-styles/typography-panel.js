@@ -189,6 +189,7 @@ export default function TypographyPanel( {
 	settings,
 	panelId,
 	defaultControls = DEFAULT_CONTROLS,
+	isGlobalStyles = false,
 } ) {
 	const decodeValue = ( rawValue ) =>
 		getValueFromVariable( { settings }, '', rawValue );
@@ -580,9 +581,13 @@ export default function TypographyPanel( {
 						size="__unstable-large"
 						__unstableInputWidth="auto"
 						withSlider
-						help={ __(
-							'Indents the first line of each paragraph after the first one.'
-						) }
+						help={
+							isGlobalStyles
+								? __(
+										'Indents the first line of each paragraph after the first one.'
+								  )
+								: __( 'Indents the first line of text.' )
+						}
 					/>
 				</ToolsPanelItem>
 			) }
