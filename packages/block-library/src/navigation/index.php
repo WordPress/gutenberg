@@ -645,12 +645,14 @@ class WP_Navigation_Block_Renderer {
 
 		$is_hidden_by_default          = isset( $attributes['overlayMenu'] ) && 'always' === $attributes['overlayMenu'];
 
-		// Set-up variables for the custom overlay experiment. 
+		// Set-up variables for the custom overlay experiment.
 		// Values are set to "off" so they don't affect the default behavior.
 		$is_overlay_experiment_enabled = static::is_overlay_experiment_enabled();
 		$has_custom_overlay = false;
 		$close_button_markup = '';
 		$has_custom_overlay_close_block = false;
+		$overlay_blocks_html = '';
+		$custom_overlay_markup = '';
 
 		if( $is_overlay_experiment_enabled ) {
 			// Check if an overlay template part is selected and render it.
@@ -730,20 +732,12 @@ class WP_Navigation_Block_Renderer {
 
 		$overlay_inline_styles = esc_attr( safecss_filter_attr( $colors['overlay_inline_styles'] ) );
 
-		// Build the content markup with inline and overlay containers.
-		$content_markup = '';
-
+		
 		if ( $has_custom_overlay ) {
-			// Render both inline and overlay blocks in separate containers.
-			$content_markup = sprintf(
-				'<div class="wp-block-navigation__inline-container">%1$s</div>
-				<div class="wp-block-navigation__overlay-container" aria-hidden="true">%2$s</div>',
-				$inner_blocks_html,
+			$custom_overlay_markup = sprintf(
+				'<div class="wp-block-navigation__overlay-container" aria-hidden="true">%s</div>',
 				$overlay_blocks_html
 			);
-		} else {
-			// No overlay selected, use existing behavior.
-			$content_markup = $inner_blocks_html;
 		}
 
 		// Show default close button for all responsive navigation,
@@ -765,12 +759,13 @@ class WP_Navigation_Block_Renderer {
 							%13$s
 							<div class="wp-block-navigation__responsive-container-content" %14$s id="%1$s-content">
 								%2$s
+								%15$s
 							</div>
 						</div>
 					</div>
 				</div>',
 			esc_attr( $modal_unique_id ),
-			$content_markup,
+			$inner_blocks_html,
 			$toggle_aria_label_open,
 			$toggle_aria_label_close,
 			esc_attr( trim( implode( ' ', $responsive_container_classes ) ) ),
@@ -782,7 +777,8 @@ class WP_Navigation_Block_Renderer {
 			$responsive_container_directives,
 			$responsive_dialog_directives,
 			$close_button_markup,
-			$responsive_container_content_directives
+			$responsive_container_content_directives,
+			$has_custom_overlay ? $custom_overlay_markup : ''
 		);
 	}
 

@@ -353,8 +353,7 @@ button.wp-block-navigation-item__content {
 .wp-block-navigation__responsive-dialog,
 .wp-block-navigation .wp-block-page-list,
 .wp-block-navigation__container,
-.wp-block-navigation__responsive-container-content,
-.wp-block-navigation__inline-container {
+.wp-block-navigation__responsive-container-content {
 	gap: inherit;
 }
 
@@ -500,32 +499,6 @@ button.wp-block-navigation-item__content {
 		align-items: var(--navigation-layout-align, initial);
 	}
 
-	// Inline and overlay container visibility.
-	// By default, show inline container and hide overlay container.
-	.wp-block-navigation__inline-container {
-		display: block;
-	}
-
-	.wp-block-navigation__overlay-container {
-		display: none;
-		width: 100%;
-		// Visually hidden and hidden from assistive tech by default.
-		// aria-hidden is set in the markup.
-	}
-
-	// When menu is closed (not open), show inline container and hide overlay container.
-	&:not(.is-menu-open) {
-		.wp-block-navigation__responsive-container-content {
-			.wp-block-navigation__inline-container {
-				display: block;
-			}
-
-			.wp-block-navigation__overlay-container {
-				display: none;
-			}
-		}
-	}
-
 	// If the responsive wrapper is present but overlay is not open,
 	// overlay styles shouldn't apply.
 	&:not(.is-menu-open.is-menu-open) {
@@ -583,17 +556,6 @@ button.wp-block-navigation-item__content {
 
 			// Inherit alignment settings from container.
 			align-items: var(--navigation-layout-justification-setting, inherit);
-
-			// When menu is open at mobile, show overlay container and hide inline container.
-			.wp-block-navigation__inline-container {
-				display: none;
-			}
-
-			.wp-block-navigation__overlay-container {
-				display: block;
-				width: 100%;
-				// Remove aria-hidden when visible (handled by JavaScript/Interactivity API).
-			}
 
 			// Always align the contents of the menu to the top.
 			&,
@@ -667,6 +629,29 @@ button.wp-block-navigation-item__content {
 		}
 	}
 
+	// Custom overlay container visibility.
+	// When there's a custom overlay, by default hide overlay container.
+	&.disable-default-overlay {
+		.wp-block-navigation__overlay-container {
+			display: none;
+			width: 100%;
+		}
+
+		// When menu is open with custom overlay, hide default navigation and show overlay.
+		&.is-menu-open {
+			.wp-block-navigation__responsive-container-content {
+				// Hides the content of the non-overlay navigation.
+				> .wp-block-navigation__container {
+					display: none;
+				}
+
+				.wp-block-navigation__overlay-container {
+					display: block;
+				}
+			}
+		}
+	}
+
 	@include break-small() {
 		&:not(.hidden-by-default) {
 			&:not(.is-menu-open) {
@@ -686,17 +671,6 @@ button.wp-block-navigation-item__content {
 			// Override breakpoint-inherited submenu rules.
 			.wp-block-navigation__submenu-container.wp-block-navigation__submenu-container.wp-block-navigation__submenu-container.wp-block-navigation__submenu-container {
 				left: 0;
-			}
-		}
-
-		// At desktop breakpoint, always show inline container and hide overlay container.
-		.wp-block-navigation__responsive-container-content {
-			.wp-block-navigation__inline-container {
-				display: block;
-			}
-
-			.wp-block-navigation__overlay-container {
-				display: none;
 			}
 		}
 	}
