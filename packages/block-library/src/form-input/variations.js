@@ -9,7 +9,7 @@ import {
 	link,
 	paragraph,
 	pencil,
-	phone,
+	mobile as phone,
 } from '@wordpress/icons';
 
 const variations = [
