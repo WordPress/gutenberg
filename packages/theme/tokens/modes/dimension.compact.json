@@ -4,50 +4,83 @@
 			"surface": {
 				"2xs": {
 					"$type": "dimension",
-					"$value": "{wpds-dimension.primitive.space.10}"
+					"$value": "{wpds-dimension.primitive.space.10}",
+					"$extensions": {
+						"com.figma.scopes": [ "GAP" ]
+					}
 				},
 				"xs": {
 					"$type": "dimension",
-					"$value": "{wpds-dimension.primitive.space.10}"
+					"$value": "{wpds-dimension.primitive.space.10}",
+					"$extensions": {
+						"com.figma.scopes": [ "GAP" ]
+					}
 				},
 				"sm": {
 					"$type": "dimension",
-					"$value": "{wpds-dimension.primitive.space.30}"
+					"$value": "{wpds-dimension.primitive.space.30}",
+					"$extensions": {
+						"com.figma.scopes": [ "GAP" ]
+					}
 				},
 				"md": {
 					"$type": "dimension",
-					"$value": "{wpds-dimension.primitive.space.50}"
+					"$value": "{wpds-dimension.primitive.space.50}",
+					"$extensions": {
+						"com.figma.scopes": [ "GAP" ]
+					}
 				},
 				"lg": {
 					"$type": "dimension",
-					"$value": "{wpds-dimension.primitive.space.60}"
+					"$value": "{wpds-dimension.primitive.space.60}",
+					"$extensions": {
+						"com.figma.scopes": [ "GAP" ]
+					}
 				}
 			}
 		},
 		"gap": {
 			"2xs": {
 				"$type": "dimension",
-				"$value": "{wpds-dimension.primitive.space.10}"
+				"$value": "{wpds-dimension.primitive.space.10}",
+				"$extensions": {
+					"com.figma.scopes": [ "GAP" ]
+				}
 			},
 			"xs": {
 				"$type": "dimension",
-				"$value": "{wpds-dimension.primitive.space.10}"
+				"$value": "{wpds-dimension.primitive.space.10}",
+				"$extensions": {
+					"com.figma.scopes": [ "GAP" ]
+				}
 			},
 			"sm": {
 				"$type": "dimension",
-				"$value": "{wpds-dimension.primitive.space.20}"
+				"$value": "{wpds-dimension.primitive.space.20}",
+				"$extensions": {
+					"com.figma.scopes": [ "GAP" ]
+				}
 			},
 			"md": {
 				"$type": "dimension",
-				"$value": "{wpds-dimension.primitive.space.30}"
+				"$value": "{wpds-dimension.primitive.space.30}",
+				"$extensions": {
+					"com.figma.scopes": [ "GAP" ]
+				}
 			},
 			"lg": {
 				"$type": "dimension",
-				"$value": "{wpds-dimension.primitive.space.50}"
+				"$value": "{wpds-dimension.primitive.space.50}",
+				"$extensions": {
+					"com.figma.scopes": [ "GAP" ]
+				}
 			},
 			"xl": {
 				"$type": "dimension",
-				"$value": "{wpds-dimension.primitive.space.70}"
+				"$value": "{wpds-dimension.primitive.space.70}",
+				"$extensions": {
+					"com.figma.scopes": [ "GAP" ]
+				}
 			}
 		}
 	}
