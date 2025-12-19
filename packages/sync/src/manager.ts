@@ -301,6 +301,7 @@ export function createSyncManager(): SyncManager {
 
 		targetDoc.transact( () => {
 			if ( ! supports?.crdtPersistence ) {
+				// Apply the current record as changes.
 				applyChangesToCRDTDoc( targetDoc, record );
 				return;
 			}
@@ -309,8 +310,11 @@ export function createSyncManager(): SyncManager {
 			const tempDoc = getPersistedCrdtDoc( record );
 
 			if ( ! tempDoc ) {
+				// Apply the current record as changes and trigger a save, which will
+				// persist the CRDT document. (The entity should call `createEntityMeta`
+				// via its pre-persist hook.)
 				applyChangesToCRDTDoc( targetDoc, record );
-				handlers.saveRecord(); // persist the current CRDT document
+				handlers.saveRecord();
 				return;
 			}
 
@@ -322,9 +326,16 @@ export function createSyncManager(): SyncManager {
 			Y.applyUpdateV2( targetDoc, update );
 
 			// Compute the differences between the persisted doc and the current
-			// record. This can happen when there are "out-of-band" updates (e.g., a
-			// WP-CLI command or direct database update) or when unsaved changes are
-			// synced from a peer.
+			// record. This can happen when:
+			//
+			// 1. The server makes updates on save that mutate the entity. Example: On
+			//    initial save, the server adds the "Uncategorized" category to the
+			//    post.
+			// 2. An "out-of-band" update occurs. Example: a WP-CLI command or direct
+			//    database update mutates the entity.
+			// 3. Unsaved changes are synced from a peer _before_ this code runs. We
+			//    can't control when (or if) remote changes are synced, so this is a
+			//    race condition.
 			const invalidations = getChangesFromCRDTDoc( tempDoc, record );
 			const invalidatedKeys = Object.keys( invalidations );
 
@@ -332,7 +343,7 @@ export function createSyncManager(): SyncManager {
 			tempDoc.destroy();
 
 			if ( 0 === invalidatedKeys.length ) {
-				// No invalidations.
+				// The persisted CRDT document is valid. There are no updates to apply.
 				return;
 			}
 
@@ -345,10 +356,10 @@ export function createSyncManager(): SyncManager {
 				{}
 			);
 
+			// Apply the changes and trigger a save, which will persist the CRDT
+			// document. (The entity should call `createEntityMeta` via its pre-persist
+			// hook.)
 			applyChangesToCRDTDoc( targetDoc, changes );
-
-			// Trigger a save to update the persisted CRDT document. The entity should
-			// call `createEntityMeta` via its pre-persist hook.
 			handlers.saveRecord();
 		}, LOCAL_SYNC_MANAGER_ORIGIN );
 	}
