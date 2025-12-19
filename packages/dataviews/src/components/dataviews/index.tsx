@@ -41,6 +41,7 @@ import DataViewsViewConfig, {
 import normalizeFields from '../../field-types';
 import type { Action, Field, View, SupportedLayouts } from '../../types';
 import type { SelectionOrUpdater } from '../../types/private';
+import { useInfiniteScrollData } from '../../dataviews-layouts/utils/useInfiniteScrollData';
 type ItemWithId = { id: string };
 
 type DataViewsProps< Item > = {
@@ -55,8 +56,6 @@ type DataViewsProps< Item > = {
 	paginationInfo: {
 		totalItems: number;
 		totalPages: number;
-		infiniteScrollHandler?: ( direction: 'up' | 'down' ) => void;
-		setVisibleEntries?: React.Dispatch< React.SetStateAction< number[] > >;
 	};
 	defaultLayouts: SupportedLayouts;
 	selection?: string[];
@@ -157,7 +156,38 @@ function DataViews< Item >( {
 	config = { perPageSizes: [ 10, 20, 50, 100 ] },
 	empty,
 }: DataViewsProps< Item > ) {
-	const { infiniteScrollHandler, setVisibleEntries } = paginationInfo;
+	// Use infinite scroll hook internally when enabled
+	const {
+		data: infiniteScrollData,
+		paginationInfo: infiniteScrollPaginationInfo,
+		isLoadingMore,
+	} = useInfiniteScrollData( {
+		view,
+		setView: onChangeView,
+		data: data as any,
+		getItemId: getItemId as any,
+		totalDataLength: paginationInfo.totalItems,
+	} );
+
+	// Use infinite scroll data and pagination info when enabled, otherwise use the provided ones
+	const displayData = view.infiniteScrollEnabled
+		? ( infiniteScrollData as Item[] )
+		: data;
+	const displayIsLoading = view.infiniteScrollEnabled
+		? isLoadingMore
+		: isLoading;
+	const displayPaginationInfo: {
+		totalItems: number;
+		totalPages: number;
+		infiniteScrollHandler?: ( direction: 'up' | 'down' ) => void;
+		setVisibleEntries?: React.Dispatch< React.SetStateAction< number[] > >;
+	} = view.infiniteScrollEnabled
+		? {
+				...paginationInfo,
+				...infiniteScrollPaginationInfo,
+		  }
+		: paginationInfo;
+	const { infiniteScrollHandler, setVisibleEntries } = displayPaginationInfo;
 	const containerRef = useRef< HTMLDivElement | null >( null );
 	const [ containerWidth, setContainerWidth ] = useState( 0 );
 	const resizeObserverRef = useResizeObserver(
@@ -202,45 +232,46 @@ function DataViews< Item >( {
 		hasPrimaryOrLockedFilters
 	);
 
-	const intersectionObserverCallback: IntersectionObserverCallback =
-		useCallback(
-			( entries: IntersectionObserverEntry[] ) => {
-				// Calculate new visible entries outside of setState
-				if ( ! setVisibleEntries ) {
-					return;
-				}
-				setVisibleEntries( ( prev ) => {
-					const newVisibleEntries = new Set( prev );
-					let hasChanged = false;
+	const intersectionObserverCallback:
+		| IntersectionObserverCallback
+		| undefined = useCallback(
+		( entries: IntersectionObserverEntry[] ) => {
+			// Calculate new visible entries outside of setState
+			if ( ! setVisibleEntries ) {
+				return;
+			}
+			setVisibleEntries( ( prev: number[] ) => {
+				const newVisibleEntries = new Set( prev );
+				let hasChanged = false;
 
-					entries.forEach( ( entry ) => {
-						const posInSet = Number(
-							entry.target?.attributes?.getNamedItem(
-								'aria-posinset'
-							)?.value
-						);
-						if ( isNaN( posInSet ) ) {
-							return;
-						}
-						if ( entry.isIntersecting ) {
-							if ( ! newVisibleEntries.has( posInSet ) ) {
-								newVisibleEntries.add( posInSet );
-								hasChanged = true;
-							}
-						} else if ( newVisibleEntries.has( posInSet ) ) {
-							newVisibleEntries.delete( posInSet );
+				entries.forEach( ( entry ) => {
+					const posInSet = Number(
+						entry.target?.attributes?.getNamedItem(
+							'aria-posinset'
+						)?.value
+					);
+					if ( isNaN( posInSet ) ) {
+						return;
+					}
+					if ( entry.isIntersecting ) {
+						if ( ! newVisibleEntries.has( posInSet ) ) {
+							newVisibleEntries.add( posInSet );
 							hasChanged = true;
 						}
-					} );
-
-					// Only return new array if something actually changed
-					return hasChanged
-						? Array.from( newVisibleEntries ).sort()
-						: prev;
+					} else if ( newVisibleEntries.has( posInSet ) ) {
+						newVisibleEntries.delete( posInSet );
+						hasChanged = true;
+					}
 				} );
-			},
-			[ setVisibleEntries ]
-		);
+
+				// Only return new array if something actually changed
+				return hasChanged
+					? Array.from( newVisibleEntries ).sort()
+					: prev;
+			} );
+		},
+		[ setVisibleEntries ]
+	);
 
 	useEffect( () => {
 		if ( hasPrimaryOrLockedFilters && ! isShowingFilter ) {
@@ -266,6 +297,11 @@ function DataViews< Item >( {
 			const scrollDirection = scrollTop > lastScrollTop ? 'down' : 'up';
 			lastScrollTop = scrollTop;
 
+			// Don't trigger if already loading
+			if ( displayIsLoading ) {
+				return;
+			}
+
 			// Check if user has scrolled near the bottom
 			if (
 				scrollDirection === 'down' &&
@@ -287,7 +323,11 @@ function DataViews< Item >( {
 			container.removeEventListener( 'scroll', handleScroll );
 			handleScroll.cancel(); // Cancel any pending throttled calls
 		};
-	}, [ infiniteScrollHandler, view.infiniteScrollEnabled ] );
+	}, [
+		infiniteScrollHandler,
+		view.infiniteScrollEnabled,
+		displayIsLoading,
+	] );
 
 	// Filter out DataViewsPicker layouts.
 	const defaultLayouts = useMemo(
@@ -315,9 +355,9 @@ function DataViews< Item >( {
 				onChangeView,
 				fields: _fields,
 				actions,
-				data,
-				isLoading,
-				paginationInfo,
+				data: displayData,
+				isLoading: displayIsLoading,
+				paginationInfo: displayPaginationInfo,
 				selection: _selection,
 				onChangeSelection: setSelectionWithChange,
 				openedFilter,
@@ -337,7 +377,9 @@ function DataViews< Item >( {
 				config,
 				empty,
 				hasInfiniteScrollHandler: !! infiniteScrollHandler,
-				intersectionObserverCallback,
+				intersectionObserverCallback: view.infiniteScrollEnabled
+					? intersectionObserverCallback
+					: undefined,
 			} }
 		>
 			<div className="dataviews-wrapper" ref={ containerRef }>

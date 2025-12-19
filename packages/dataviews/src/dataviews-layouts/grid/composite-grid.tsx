@@ -373,23 +373,25 @@ export default function CompositeGrid< Item >( {
 	const totalRows = Math.ceil( data.length / gridColumns );
 
 	// Update item positions for infinite scroll
-	// Store positions from item metadata to ensure they remain stable
+	// Store positions based on the order items appear in the data array
 	useEffect( () => {
 		if ( ! isInfiniteScroll ) {
 			return;
 		}
 
-		data.forEach( ( item ) => {
+		data.forEach( ( item, index ) => {
 			const itemId = getItemId( item );
 			if ( ! itemPositions.current.has( itemId ) ) {
-				// Check if item has position metadata
-				const position = ( item as any ).position;
-				if ( position !== undefined ) {
-					itemPositions.current.set( itemId, position );
-				}
+				// Use 1-based indexing for aria-posinset (starts at 1, not 0)
+				// Calculate based on current page and per-page settings
+				const currentPage = view.page || 1;
+				const perPage = view.perPage || 20;
+				const positionInFullSet =
+					( currentPage - 1 ) * perPage + index + 1;
+				itemPositions.current.set( itemId, positionInFullSet );
 			}
 		} );
-	}, [ data, getItemId, isInfiniteScroll ] );
+	}, [ data, getItemId, isInfiniteScroll, view.page, view.perPage ] );
 
 	// Set up IntersectionObserver for infinite scroll
 	useEffect( () => {

@@ -21,7 +21,6 @@ import { LAYOUT_PICKER_GRID, LAYOUT_PICKER_TABLE } from '../constants';
 import filterSortAndPaginate from '../utils/filter-sort-and-paginate';
 import type { ActionButton, View } from '../types';
 import { data, fields, type SpaceObject } from './dataviews.fixtures';
-import { useInfiniteScrollData } from '../dataviews-layouts/utils/useInfiniteScrollData';
 
 const meta = {
 	title: 'DataViews/DataViewsPicker',
@@ -86,10 +85,9 @@ const DataViewsPickerContent = ( {
 		groupBy: isGrouped ? { field: 'type', direction: 'asc' } : undefined,
 		infiniteScrollEnabled,
 	} );
-	const { data: shownData, paginationInfo: normalPaginationInfo } =
-		useMemo( () => {
-			return filterSortAndPaginate( data, view, fields );
-		}, [ view ] );
+	const { data: shownData, paginationInfo } = useMemo( () => {
+		return filterSortAndPaginate( data, view, fields );
+	}, [ view ] );
 
 	useEffect( () => {
 		setView( ( prevView ) => ( {
@@ -133,18 +131,6 @@ const DataViewsPickerContent = ( {
 		},
 	];
 
-	const {
-		data: infiniteScrollData,
-		paginationInfo: infiniteScrollPaginationInfo,
-		isLoadingMore,
-	} = useInfiniteScroll( {
-		view,
-		setView,
-		data: shownData,
-		getItemId: ( item ) => item.id.toString(),
-		totalDataLength: data.length,
-	} );
-
 	return (
 		<>
 			{ infiniteScrollEnabled && (
@@ -162,13 +148,8 @@ const DataViewsPickerContent = ( {
 					setSelection( selectedIds );
 				} }
 				getItemId={ ( item ) => item.id.toString() }
-				paginationInfo={
-					infiniteScrollEnabled
-						? infiniteScrollPaginationInfo
-						: normalPaginationInfo
-				}
-				data={ infiniteScrollEnabled ? infiniteScrollData : shownData }
-				isLoading={ infiniteScrollEnabled ? isLoadingMore : undefined }
+				paginationInfo={ paginationInfo }
+				data={ shownData }
 				view={ view }
 				fields={ fields }
 				onChangeView={ setView }
@@ -300,25 +281,3 @@ export const WithModal = ( {
 
 WithModal.args = storyArgs;
 WithModal.argTypes = storyArgTypes;
-
-function useInfiniteScroll( {
-	view,
-	setView,
-	data: shownData,
-	getItemId,
-	totalDataLength,
-}: {
-	view: View;
-	setView: ( view: View ) => void;
-	data: SpaceObject[];
-	getItemId: ( item: SpaceObject ) => string;
-	totalDataLength: number;
-} ) {
-	return useInfiniteScrollData( {
-		view,
-		setView,
-		data: shownData,
-		getItemId,
-		totalDataLength,
-	} );
-}

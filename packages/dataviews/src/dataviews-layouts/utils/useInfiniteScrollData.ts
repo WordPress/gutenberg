@@ -217,7 +217,9 @@ export function useInfiniteScrollData< Item extends { id: number } >( {
 				if ( visibleEntries.length > 0 ) {
 					const visibleMin = Math.min( ...visibleEntries );
 					const visibleMax = Math.max( ...visibleEntries );
-					const buffer = 6;
+					// Buffer size balances allowing new items to render (when prepended
+					// during scroll up) while unloading items no longer on screen
+					const buffer = 9;
 
 					const filtered = result
 						.map( ( record, index ) => {
@@ -250,6 +252,10 @@ export function useInfiniteScrollData< Item extends { id: number } >( {
 			} );
 		}
 		setIsLoadingMore( false );
+		// Reset scroll direction after processing to allow filtering on next update
+		if ( scrollDirection !== undefined ) {
+			setScrollDirection( undefined );
+		}
 	}, [
 		shownData,
 		view.search,

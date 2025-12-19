@@ -40,6 +40,7 @@ import DataViewsViewConfig, {
 import normalizeFields from '../../field-types';
 import type { ActionButton, Field, View, SupportedLayouts } from '../../types';
 import type { SelectionOrUpdater } from '../../types/private';
+import { useInfiniteScrollData } from '../../dataviews-layouts/utils/useInfiniteScrollData';
 type ItemWithId = { id: string };
 
 const isItemClickable = () => false;
@@ -60,8 +61,6 @@ type DataViewsPickerProps< Item > = {
 	paginationInfo: {
 		totalItems: number;
 		totalPages: number;
-		infiniteScrollHandler?: ( direction: 'up' | 'down' ) => void;
-		setVisibleEntries?: React.Dispatch< React.SetStateAction< number[] > >;
 	};
 	defaultLayouts: SupportedLayouts;
 	selection: string[];
@@ -143,7 +142,39 @@ function DataViewsPicker< Item >( {
 	itemListLabel,
 	empty,
 }: DataViewsPickerProps< Item > ) {
-	const { infiniteScrollHandler, setVisibleEntries } = paginationInfo;
+	// Use infinite scroll hook internally when enabled
+	const {
+		data: infiniteScrollData,
+		paginationInfo: infiniteScrollPaginationInfo,
+		isLoadingMore,
+	} = useInfiniteScrollData( {
+		view,
+		setView: onChangeView,
+		data: data as any,
+		getItemId: getItemId as any,
+		totalDataLength: paginationInfo.totalItems,
+	} );
+
+	// Use infinite scroll data and pagination info when enabled, otherwise use the provided ones
+	const displayData = view.infiniteScrollEnabled
+		? ( infiniteScrollData as Item[] )
+		: data;
+	const displayIsLoading = view.infiniteScrollEnabled
+		? isLoadingMore
+		: isLoading;
+	const displayPaginationInfo: {
+		totalItems: number;
+		totalPages: number;
+		infiniteScrollHandler?: ( direction: 'up' | 'down' ) => void;
+		setVisibleEntries?: React.Dispatch< React.SetStateAction< number[] > >;
+	} = view.infiniteScrollEnabled
+		? {
+				...paginationInfo,
+				...infiniteScrollPaginationInfo,
+		  }
+		: paginationInfo;
+
+	const { infiniteScrollHandler, setVisibleEntries } = displayPaginationInfo;
 	const containerRef = useRef< HTMLDivElement | null >( null );
 	const [ containerWidth, setContainerWidth ] = useState( 0 );
 	const resizeObserverRef = useResizeObserver(
@@ -172,7 +203,7 @@ function DataViewsPicker< Item >( {
 				if ( ! setVisibleEntries ) {
 					return;
 				}
-				setVisibleEntries( ( prev ) => {
+				setVisibleEntries( ( prev: number[] ) => {
 					const newVisibleEntries = new Set( prev );
 					let hasChanged = false;
 
@@ -239,6 +270,11 @@ function DataViewsPicker< Item >( {
 			const scrollDirection = scrollTop > lastScrollTop ? 'down' : 'up';
 			lastScrollTop = scrollTop;
 
+			// Don't trigger if already loading
+			if ( displayIsLoading ) {
+				return;
+			}
+
 			// Check if user has scrolled near the bottom
 			if (
 				scrollDirection === 'down' &&
@@ -260,7 +296,11 @@ function DataViewsPicker< Item >( {
 			container.removeEventListener( 'scroll', handleScroll );
 			handleScroll.cancel(); // Cancel any pending throttled calls
 		};
-	}, [ infiniteScrollHandler, view.infiniteScrollEnabled ] );
+	}, [
+		infiniteScrollHandler,
+		view.infiniteScrollEnabled,
+		displayIsLoading,
+	] );
 
 	// Filter out DataViewsPicker layouts.
 	const defaultLayouts = useMemo(
@@ -288,9 +328,9 @@ function DataViewsPicker< Item >( {
 				onChangeView,
 				fields: _fields,
 				actions,
-				data,
-				isLoading,
-				paginationInfo,
+				data: displayData,
+				isLoading: displayIsLoading,
+				paginationInfo: displayPaginationInfo,
 				isItemClickable,
 				selection,
 				onChangeSelection: setSelectionWithChange,
@@ -308,7 +348,9 @@ function DataViewsPicker< Item >( {
 				itemListLabel,
 				empty,
 				hasInfiniteScrollHandler: !! infiniteScrollHandler,
-				intersectionObserverCallback,
+				intersectionObserverCallback: view.infiniteScrollEnabled
+					? intersectionObserverCallback
+					: undefined,
 			} }
 		>
 			<div className="dataviews-picker-wrapper" ref={ containerRef }>

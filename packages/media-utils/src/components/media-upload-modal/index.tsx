@@ -10,7 +10,7 @@ import {
 import { resolveSelect } from '@wordpress/data';
 import { Modal, DropZone, FormFileUpload, Button } from '@wordpress/components';
 import { upload as uploadIcon } from '@wordpress/icons';
-import { DataViewsPicker, useInfiniteScrollData } from '@wordpress/dataviews';
+import { DataViewsPicker } from '@wordpress/dataviews';
 import type { View, Field, ActionButton } from '@wordpress/dataviews';
 import {
 	altTextField,
@@ -221,20 +221,7 @@ export function MediaUploadModal( {
 		totalPages: totalPagesRaw,
 	} = useEntityRecordsWithPermissions( 'postType', 'attachment', queryArgs );
 
-	// Use infinite scroll hook to manage data loading and visibility
-	const {
-		data: displayData,
-		paginationInfo: infiniteScrollPaginationInfo,
-		isLoadingMore,
-	} = useInfiniteScrollData( {
-		view,
-		setView,
-		data: ( mediaRecords || [] ) as ( RestAttachment & { id: number } )[],
-		getItemId: ( item: RestAttachment ) => String( item.id ),
-		totalDataLength: totalItemsRaw || 0,
-	} );
-
-	const isLoading = isLoadingRecords || isLoadingMore;
+	const isLoading = isLoadingRecords;
 
 	const fields: Field< RestAttachment >[] = useMemo(
 		() => [
@@ -324,11 +311,10 @@ export function MediaUploadModal( {
 
 	const paginationInfo = useMemo(
 		() => ( {
-			...infiniteScrollPaginationInfo,
-			totalItems: totalItemsRaw,
-			totalPages: totalPagesRaw,
+			totalItems: totalItemsRaw || 0,
+			totalPages: totalPagesRaw || 0,
 		} ),
-		[ infiniteScrollPaginationInfo, totalItemsRaw, totalPagesRaw ]
+		[ totalItemsRaw, totalPagesRaw ]
 	);
 
 	const defaultLayouts = useMemo(
@@ -409,7 +395,11 @@ export function MediaUploadModal( {
 				label={ __( 'Drop files to upload' ) }
 			/>
 			<DataViewsPicker
-				data={ displayData }
+				data={
+					( mediaRecords || [] ) as ( RestAttachment & {
+						id: number;
+					} )[]
+				}
 				fields={ fields }
 				view={ view }
 				onChangeView={ setView }

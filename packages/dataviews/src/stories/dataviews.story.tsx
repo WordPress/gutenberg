@@ -47,7 +47,6 @@ import {
 	orderEventFields,
 	orderEventActions,
 } from './dataviews.fixtures';
-import { useInfiniteScrollData } from '../dataviews-layouts/utils/useInfiniteScrollData';
 
 import './dataviews.style.css';
 
@@ -527,24 +526,9 @@ export const InfiniteScroll = () => {
 		infiniteScrollEnabled: true, // Enable infinite scroll by default
 	} );
 
-	const { data: shownData } = useMemo( () => {
+	const { data: shownData, paginationInfo } = useMemo( () => {
 		return filterSortAndPaginate( data, view, fields );
 	}, [ view ] );
-
-	const getItemId = ( item: SpaceObject ) => item.id.toString();
-
-	const {
-		data: displayData,
-		paginationInfo,
-		isLoadingMore,
-		hasMoreData,
-	} = useInfiniteScrollData( {
-		view,
-		setView,
-		data: shownData,
-		getItemId,
-		totalDataLength: data.length,
-	} );
 
 	return (
 		<>
@@ -554,29 +538,14 @@ export const InfiniteScroll = () => {
 				overflow: auto;
 			}
 		` }</style>
-			<Text
-				style={ {
-					marginBottom: '16px',
-					padding: '8px',
-					background: '#f0f0f0',
-					borderRadius: '4px',
-					display: 'block',
-				} }
-			>
-				{ __( 'Infinite Scroll Demo' ) }: { displayData.length } of{ ' ' }
-				{ data.length } items loaded.
-				{ isLoadingMore && __( 'Loading more…' ) }
-				{ ! hasMoreData && __( 'All items loaded!' ) }
-			</Text>
 			<DataViews
 				getItemId={ ( item ) => item.id.toString() }
 				paginationInfo={ paginationInfo }
-				data={ displayData }
+				data={ shownData }
 				view={ view }
 				fields={ fields }
 				onChangeView={ setView }
 				actions={ actions }
-				isLoading={ isLoadingMore }
 				defaultLayouts={ defaultLayouts }
 			/>
 		</>
