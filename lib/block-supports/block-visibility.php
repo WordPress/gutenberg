@@ -73,7 +73,7 @@ function gutenberg_render_block_visibility_support( $block_content, $block ) {
 			// First item: max = size.
 			if ( 0 === $index ) {
 				$query_parts[] = '(max-width: ' . $size . ')';
-			} elseif ( $index === count( $breakpoints ) - 1 ) {
+			} elseif ( count( $breakpoints ) - 1 === $index ) {
 				// Last item: min = calc(previous size + 1px), no max.
 				$query_parts[] = '(min-width: ' . $previous_size . ')';
 			} else {
