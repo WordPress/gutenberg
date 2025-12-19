@@ -1,0 +1,24 @@
+{
+	"name": "@wordpress/media-editor-route",
+	"version": "1.0.0",
+	"private": true,
+	"route": {
+		"path": "/media/$postId",
+		"page": "media-library"
+	},
+	"dependencies": {
+		"@wordpress/components": "file:../../packages/components",
+		"@wordpress/core-data": "file:../../packages/core-data",
+		"@wordpress/data": "file:../../packages/data",
+		"@wordpress/element": "file:../../packages/element",
+		"@wordpress/html-entities": "file:../../packages/html-entities",
+		"@wordpress/i18n": "file:../../packages/i18n",
+		"@wordpress/icons": "file:../../packages/icons",
+		"@wordpress/interface": "file:../../packages/interface",
+		"@wordpress/media-editor": "file:../../packages/media-editor",
+		"@wordpress/media-fields": "file:../../packages/media-fields",
+		"@wordpress/notices": "file:../../packages/notices",
+		"@wordpress/private-apis": "file:../../packages/private-apis",
+		"@wordpress/route": "file:../../packages/route"
+	}
+}

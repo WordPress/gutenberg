@@ -1,0 +1,97 @@
+/**
+ * Media Editor Route Styles
+ */
+
+.media-editor-interface {
+	background: #fff;
+}
+
+/**
+ * Header
+ */
+.media-editor-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 0 16px;
+	height: 60px;
+	background: #fff;
+	// Note: InterfaceSkeleton's header already provides the bottom border
+
+	&__document-bar {
+		display: flex;
+		align-items: center;
+		gap: 12px;
+	}
+
+	&__title {
+		margin: 0;
+		font-size: 14px;
+		font-weight: 500;
+		line-height: 1.4;
+	}
+
+	&__actions {
+		display: flex;
+		gap: 8px;
+	}
+}
+
+/**
+ * Canvas
+ */
+.media-editor-canvas {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	width: 100%;
+	height: 100%;
+	background: #fff;
+	overflow: auto;
+
+	&__content {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		width: 100%;
+		height: 100%;
+		padding: 24px;
+		box-sizing: border-box;
+	}
+}
+
+/**
+ * Sidebar
+ */
+.media-editor-sidebar {
+	height: 100%;
+	overflow: hidden;
+	display: flex;
+	flex-direction: column;
+	width: 280px; // Match $sidebar-width from base-styles
+
+	&__header {
+		flex-shrink: 0;
+		// Match editor sidebar tabs header styling
+		padding-left: 0;
+		padding-right: 16px;
+		border-bottom: 1px solid #e0e0e0;
+	}
+
+	&__content {
+		flex: 1;
+		overflow-y: auto;
+		padding: 16px;
+	}
+
+	.components-panel__body {
+		border: none;
+		border-top: 1px solid #e0e0e0;
+
+		&:first-child {
+			border-top: none;
+		}
+	}
+}
