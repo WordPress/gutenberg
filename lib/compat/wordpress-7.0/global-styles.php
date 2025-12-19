@@ -64,13 +64,18 @@ function gutenberg_get_font_face_styles() {
 
 				// Convert relative font URLs to absolute theme URLs.
 				if ( ! empty( $font_face['src'] ) ) {
-					$srcs = (array) $font_face['src'];
-					foreach ( $srcs as $i => $src ) {
-						if ( ! wp_parse_url( $src, PHP_URL_HOST ) ) {
-							$srcs[ $i ] = get_theme_file_uri( wp_parse_url( $src, PHP_URL_PATH ) );
+					$src         = (array) $font_face['src'];
+					$placeholder = 'file:./';
+
+					foreach ( $src as $src_key => $src_url ) {
+						// Skip if the src doesn't start with the placeholder
+						if ( ! str_starts_with( $src_url, $placeholder ) ) {
+							continue;
 						}
+
+						$src_file        = str_replace( $placeholder, '', $src_url );
+						$src[ $src_key ] = get_theme_file_uri( $src_file );
 					}
-					$font_face['src'] = $srcs;
 				}
 
 				// Convert camelCase to kebab-case.
