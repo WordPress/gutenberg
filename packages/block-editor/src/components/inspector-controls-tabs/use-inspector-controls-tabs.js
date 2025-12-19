@@ -8,7 +8,6 @@ import { useSelect } from '@wordpress/data';
  * Internal dependencies
  */
 import InspectorControlsGroups from '../inspector-controls/groups';
-import useIsListViewTabDisabled from './use-is-list-view-tab-disabled';
 import { InspectorAdvancedControls } from '../inspector-controls';
 import { TAB_LIST_VIEW, TAB_SETTINGS, TAB_STYLES, TAB_CONTENT } from './utils';
 import { store as blockEditorStore } from '../../store';
@@ -50,9 +49,8 @@ export default function useInspectorControlsTabs(
 	} = InspectorControlsGroups;
 
 	// List View Tab: If there are any fills for the list group add that tab.
-	const listViewDisabled = useIsListViewTabDisabled( blockName );
 	const listFills = useSlotFills( listGroup.name );
-	const hasListFills = ! listViewDisabled && !! listFills && listFills.length;
+	const hasListFills = !! listFills && listFills.length;
 
 	// Styles Tab: Add this tab if there are any fills for block supports
 	// e.g. border, color, spacing, typography, etc.
