@@ -643,13 +643,40 @@ class WP_Navigation_Block_Renderer {
 		$colors          = block_core_navigation_build_css_colors( $attributes );
 		$modal_unique_id = wp_unique_id( 'modal-' );
 
-		$is_hidden_by_default = isset( $attributes['overlayMenu'] ) && 'always' === $attributes['overlayMenu'];
-		$has_custom_overlay   = ! empty( $attributes['overlay'] );
+		$is_hidden_by_default          = isset( $attributes['overlayMenu'] ) && 'always' === $attributes['overlayMenu'];
 
+		// Set-up variables for the custom overlay experiment. 
+		// Values are set to "off" so they don't affect the default behavior.
+		$is_overlay_experiment_enabled = static::is_overlay_experiment_enabled();
+		$has_custom_overlay = false;
+		$close_button_markup = '';
+		$has_custom_overlay_close_block = false;
+
+		if( $is_overlay_experiment_enabled ) {
+			// Check if an overlay template part is selected and render it.
+			// This needs to happen before building classes so we know if overlay blocks actually exist.
+			if ( ! empty( $attributes['overlay'] ) ) {
+				// Get blocks from the overlay template part.
+				$overlay_blocks = static::get_overlay_blocks_from_template_part( $attributes['overlay'], $attributes );
+				// Check if overlay contains a navigation-overlay-close block.
+				$has_custom_overlay_close_block = static::has_navigation_overlay_close_block( $overlay_blocks );
+				// Render template part blocks directly without navigation container wrapper.
+				$overlay_blocks_html = static::get_template_part_blocks_html( $overlay_blocks );
+				// Add Interactivity API directives to the overlay close block if present.
+				if ( $has_custom_overlay_close_block && $is_interactive ) {
+					$tags                = new WP_HTML_Tag_Processor( $overlay_blocks_html );
+					$overlay_blocks_html = block_core_navigation_add_directives_to_overlay_close( $tags );
+				}
+			}
+
+			$has_custom_overlay = ! empty( $overlay_blocks_html );
+		}
+
+		// Only add the disable-default-overlay class if experiment is enabled AND overlay blocks actually rendered.
 		$responsive_container_classes = array(
 			'wp-block-navigation__responsive-container',
 			$is_hidden_by_default ? 'hidden-by-default' : '',
-			$has_custom_overlay ? 'has-custom-overlay' : '',
+			$has_custom_overlay ? 'disable-default-overlay' : '',
 			implode( ' ', $colors['overlay_css_classes'] ),
 		);
 		$open_button_classes          = array(
@@ -703,57 +730,25 @@ class WP_Navigation_Block_Renderer {
 
 		$overlay_inline_styles = esc_attr( safecss_filter_attr( $colors['overlay_inline_styles'] ) );
 
-		// Check if an overlay template part is selected.
-		$has_overlay = ! empty( $attributes['overlay'] );
-		$overlay_blocks_html = '';
-		$has_overlay_close_block = false;
-
-		if ( $has_overlay ) {
-			// Get blocks from the overlay template part.
-			$overlay_blocks = static::get_overlay_blocks_from_template_part( $attributes['overlay'], $attributes );
-			// Check if overlay contains a navigation-overlay-close block.
-			$has_overlay_close_block = static::has_navigation_overlay_close_block( $overlay_blocks );
-			// Render template part blocks directly without navigation container wrapper.
-			$overlay_blocks_html = static::get_template_part_blocks_html( $overlay_blocks );
-			// Add Interactivity API directives to the overlay close block if present.
-			if ( $has_overlay_close_block && $is_interactive ) {
-				$tags              = new WP_HTML_Tag_Processor( $overlay_blocks_html );
-				$overlay_blocks_html = block_core_navigation_add_directives_to_overlay_close( $tags );
-			}
-		}
-
-		// Build the content markup with desktop and overlay containers.
+		// Build the content markup with inline and overlay containers.
 		$content_markup = '';
-		$is_overlay_experiment_enabled = static::is_overlay_experiment_enabled();
 
-		if ( $has_overlay && ! empty( $overlay_blocks_html ) ) {
-			// Render both desktop and overlay blocks in separate containers.
-			// IMPORTANT: The desktop container wrapper is gated behind the experiment to ensure
-			// backward compatibility. Without the experiment enabled, the desktop navigation
-			// should not be wrapped in a container div, maintaining the exact same markup structure
-			// as before this feature. This prevents any potential CSS or layout issues for users
-			// who don't have the experiment enabled.
-			if ( $is_overlay_experiment_enabled ) {
-				$content_markup = sprintf(
-					'<div class="wp-block-navigation__desktop-container">%1$s</div>
-					<div class="wp-block-navigation__overlay-container" aria-hidden="true">%2$s</div>',
-					$inner_blocks_html,
-					$overlay_blocks_html
-				);
-			} else {
-				// Experiment not enabled: Don't wrap desktop navigation to maintain backward compatibility.
-				// Render desktop blocks without wrapper (maintains exact same markup as before this feature).
-				// Note: UI prevents overlay selection when experiment is off, but handle gracefully if attribute exists.
-				$content_markup = $inner_blocks_html;
-			}
+		if ( $has_custom_overlay ) {
+			// Render both inline and overlay blocks in separate containers.
+			$content_markup = sprintf(
+				'<div class="wp-block-navigation__inline-container">%1$s</div>
+				<div class="wp-block-navigation__overlay-container" aria-hidden="true">%2$s</div>',
+				$inner_blocks_html,
+				$overlay_blocks_html
+			);
 		} else {
 			// No overlay selected, use existing behavior.
 			$content_markup = $inner_blocks_html;
 		}
 
-		// Conditionally show the default close button only if overlay doesn't have its own close block.
-		$close_button_markup = '';
-		if ( ! $has_overlay_close_block ) {
+		// Show default close button for all responsive navigation,
+		// unless custom overlay has its own close block.
+		if ( ! $has_custom_overlay_close_block ) {
 			$close_button_markup = sprintf(
 				'<button %1$s class="wp-block-navigation__responsive-container-close" %2$s>%3$s</button>',
 				$toggle_aria_label_close,
