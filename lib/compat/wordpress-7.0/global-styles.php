@@ -62,6 +62,17 @@ function gutenberg_get_font_face_styles() {
 				// Add the font-family property to the font-face.
 				$font_face['font-family'] = $font_family_name;
 
+				// Convert relative font URLs to absolute theme URLs.
+				if ( ! empty( $font_face['src'] ) ) {
+					$srcs = (array) $font_face['src'];
+					foreach ( $srcs as $i => $src ) {
+						if ( ! wp_parse_url( $src, PHP_URL_HOST ) ) {
+							$srcs[ $i ] = get_theme_file_uri( wp_parse_url( $src, PHP_URL_PATH ) );
+						}
+					}
+					$font_face['src'] = $srcs;
+				}
+
 				// Convert camelCase to kebab-case.
 				$converted_face = array();
 				foreach ( $font_face as $key => $value ) {
