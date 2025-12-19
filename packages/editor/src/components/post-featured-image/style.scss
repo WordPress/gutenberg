@@ -74,7 +74,7 @@
 		position: absolute;
 		inset: 0;
 		z-index: 0;
-		@include checkerboard-background();
+		@include checkerboard-background( 12px );
 	}
 
 	.editor-post-featured-image__preview-image {
