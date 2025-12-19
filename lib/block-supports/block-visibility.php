@@ -38,7 +38,7 @@ function gutenberg_render_block_visibility_support( $block_content, $block ) {
 		 *
 		 * Breakpoints as array items are defined sequentially. The first item's size is the max value.
 		 * Each subsequent item's min is calc(previous size + 1px), and its size is the max.
-		 * The last item's min is calc(previous size + 1px) with no max.
+		 * The last item's min is previous size with no max.
 		 */
 		$breakpoints = array(
 			array(
