@@ -1046,7 +1046,11 @@ async function transpilePackage( packageName ) {
 						importer: args.importer,
 						kind: args.kind,
 						resolveDir: args.resolveDir,
-						pluginData: { __fromExternalize: true },
+						with: args.with,
+						pluginData: {
+							...args.pluginData,
+							__fromExternalize: true,
+						},
 					} );
 
 					if ( resolved.errors.length > 0 ) {
