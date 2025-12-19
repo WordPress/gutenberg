@@ -211,7 +211,15 @@ class WP_Block_Supports_Block_Visibility_Test extends WP_UnitTestCase {
 		$block_content = '<div>Test content</div>';
 		$result        = gutenberg_render_block_visibility_support( $block_content, $block );
 
-		$this->assertStringContainsString( 'wp-block-hidden-desktop-mobile', $result, 'Block should have the visibility class for both breakpoints (sorted alphabetically).' );
+		$this->assertStringContainsString( 'wp-block-hidden-desktop wp-block-hidden-mobile', $result, 'Block should have the visibility class for both breakpoints (sorted alphabetically).' );
+
+		$actual_stylesheet = gutenberg_style_engine_get_stylesheet_from_context( 'block-supports' );
+		// Verify mobile breakpoint: max-width: 599px.
+		$this->assertStringContainsString(
+			'@media (min-width: 959px){.wp-block-hidden-desktop{display:none !important;}}@media (max-width: 599px){.wp-block-hidden-mobile{display:none !important;}}',
+			$actual_stylesheet,
+			'Correct CSS should be generated'
+		);
 	}
 
 	public function test_block_visibility_support_generated_css_with_tablet_breakpoint() {
