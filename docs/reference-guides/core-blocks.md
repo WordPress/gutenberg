@@ -1129,7 +1129,7 @@ This block is deprecated. Please use the Columns block instead. ([Source](https:
 -	**Supports:** interactivity (clientNavigation), ~~inserter~~
 -	**Attributes:** columns, content, width
 
-## Verse
+## Poetry
 
 Insert poetry. Use special spacing formats. Or quote song lyrics. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/verse))
 
