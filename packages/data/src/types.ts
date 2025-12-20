@@ -242,7 +242,10 @@ type SelectorsOf< Config extends AnyConfig > = Config extends ReduxStoreConfig<
 /**
  * A reducer function that takes state and action and returns the new state.
  */
-export type Reducer< S = any, A = any > = ( state: S | undefined, action: A ) => S;
+export type Reducer< S = any, A = any > = (
+	state: S | undefined,
+	action: A
+) => S;
 
 /**
  * An object whose values are reducer functions.
@@ -257,4 +260,6 @@ export type ReducersMapObject< S = any > = {
  * into a single state object, whose keys correspond to the keys of the passed
  * reducer functions.
  */
-export type combineReducers = < S >( reducers: ReducersMapObject< S > ) => Reducer< S >;
+export type combineReducers = < S >(
+	reducers: ReducersMapObject< S >
+) => Reducer< S >;

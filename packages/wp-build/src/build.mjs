@@ -155,7 +155,6 @@ function createStyleBundlingPlugins( packageDir ) {
 	];
 }
 
-
 /**
  * Normalize path separators for cross-platform compatibility.
  *
