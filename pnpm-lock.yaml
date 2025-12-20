@@ -4210,6 +4210,9 @@ importers:
       '@wordpress/admin-ui':
         specifier: workspace:../../packages/admin-ui
         version: link:../../packages/admin-ui
+      '@wordpress/base-styles':
+        specifier: workspace:../../packages/base-styles
+        version: link:../../packages/base-styles
       '@wordpress/components':
         specifier: workspace:../../packages/components
         version: link:../../packages/components
@@ -4306,6 +4309,9 @@ importers:
       '@wordpress/admin-ui':
         specifier: workspace:../../packages/admin-ui
         version: link:../../packages/admin-ui
+      '@wordpress/base-styles':
+        specifier: workspace:../../packages/base-styles
+        version: link:../../packages/base-styles
       '@wordpress/components':
         specifier: workspace:../../packages/components
         version: link:../../packages/components
@@ -4423,6 +4429,9 @@ importers:
       '@wordpress/admin-ui':
         specifier: workspace:../../packages/admin-ui
         version: link:../../packages/admin-ui
+      '@wordpress/base-styles':
+        specifier: workspace:../../packages/base-styles
+        version: link:../../packages/base-styles
       '@wordpress/block-editor':
         specifier: workspace:../../packages/block-editor
         version: link:../../packages/block-editor
@@ -4495,6 +4504,9 @@ importers:
       '@wordpress/admin-ui':
         specifier: workspace:../../packages/admin-ui
         version: link:../../packages/admin-ui
+      '@wordpress/base-styles':
+        specifier: workspace:../../packages/base-styles
+        version: link:../../packages/base-styles
       '@wordpress/components':
         specifier: workspace:../../packages/components
         version: link:../../packages/components
@@ -4537,6 +4549,9 @@ importers:
       '@wordpress/admin-ui':
         specifier: workspace:../../packages/admin-ui
         version: link:../../packages/admin-ui
+      '@wordpress/base-styles':
+        specifier: workspace:../../packages/base-styles
+        version: link:../../packages/base-styles
       '@wordpress/block-editor':
         specifier: workspace:../../packages/block-editor
         version: link:../../packages/block-editor
@@ -4618,6 +4633,9 @@ importers:
       '@wordpress/admin-ui':
         specifier: workspace:../../packages/admin-ui
         version: link:../../packages/admin-ui
+      '@wordpress/base-styles':
+        specifier: workspace:../../packages/base-styles
+        version: link:../../packages/base-styles
       '@wordpress/block-editor':
         specifier: workspace:../../packages/block-editor
         version: link:../../packages/block-editor

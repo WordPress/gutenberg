@@ -5,6 +5,7 @@
 	},
 	"dependencies": {
 		"@wordpress/admin-ui": "workspace:../../packages/admin-ui",
+		"@wordpress/base-styles": "workspace:../../packages/base-styles",
 		"@wordpress/components": "workspace:../../packages/components",
 		"@wordpress/compose": "workspace:../../packages/compose",
 		"@wordpress/data": "workspace:../../packages/data",

@@ -8,6 +8,7 @@
 	},
 	"dependencies": {
 		"@wordpress/admin-ui": "workspace:../../packages/admin-ui",
+		"@wordpress/base-styles": "workspace:../../packages/base-styles",
 		"@wordpress/block-editor": "workspace:../../packages/block-editor",
 		"@wordpress/components": "workspace:../../packages/components",
 		"@wordpress/compose": "workspace:../../packages/compose",
