@@ -341,7 +341,7 @@ async function runPerformanceTests( branches, options ) {
 
 	logAtIndent( 2, 'Installing dependencies and building' );
 	await runShellScript(
-		`bash -c "source $HOME/.nvm/nvm.sh && nvm install && pnpm install --frozen-lockfile && pnpm exec playwright install chromium --with-deps && pnpm run build"`,
+		`bash -c "source $HOME/.nvm/nvm.sh && nvm install && pnpm install --frozen-lockfile --config.auto-install-peers=false && pnpm exec playwright install chromium --with-deps && pnpm run build"`,
 		testRunnerDir
 	);
 
@@ -384,7 +384,7 @@ async function runPerformanceTests( branches, options ) {
 
 		logAtIndent( 3, 'Installing dependencies and building' );
 		await runShellScript(
-			`bash -c "source $HOME/.nvm/nvm.sh && nvm install && pnpm install --frozen-lockfile && pnpm run build"`,
+			`bash -c "source $HOME/.nvm/nvm.sh && nvm install && pnpm install --frozen-lockfile --config.auto-install-peers=false && pnpm run build"`,
 			buildDir
 		);
 

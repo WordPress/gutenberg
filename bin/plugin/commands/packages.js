@@ -353,7 +353,7 @@ async function publishPackagesToNpm( {
 	releaseType,
 } ) {
 	log( '>> Installing packages.' );
-	await command( 'pnpm install --frozen-lockfile', {
+	await command( 'pnpm install --frozen-lockfile --config.auto-install-peers=false', {
 		cwd: gitWorkingDirectoryPath,
 	} );
 

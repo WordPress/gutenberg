@@ -67,7 +67,7 @@ fi
 
 # Run the build.
 status "Installing dependencies... 📦"
-pnpm install --frozen-lockfile
+pnpm install --frozen-lockfile --config.auto-install-peers=false
 status "Generating build... 👷‍♀️"
 pnpm run build
 
