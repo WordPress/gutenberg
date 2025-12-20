@@ -70,7 +70,7 @@ jobs:
                   MAXWORKERS: ${{ steps.cpu-cores.outputs.count }}
                   SHARD: ${{ matrix.shard }}
               run: |
-                  npm run test:unit -- \
+                  pnpm run test:unit -- \
                     --ci \
                     --maxWorkers="$MAXWORKERS" \
                     --shard="$SHARD" \
@@ -119,7 +119,7 @@ jobs:
             - name: Run the date tests
               env:
                   MAXWORKERS: ${{ steps.cpu-cores.outputs.count }}
-              run: npm run test:unit:date -- --ci --maxWorkers="$MAXWORKERS" --cacheDirectory="$HOME/.jest-cache"
+              run: pnpm run test:unit:date -- --ci --maxWorkers="$MAXWORKERS" --cacheDirectory="$HOME/.jest-cache"
 
     compute-previous-wordpress-version:
         name: Compute previous WordPress version
@@ -163,7 +163,7 @@ jobs:
               uses: ./.github/setup-node
 
             - name: Run build scripts
-              run: npm run build
+              run: pnpm run build
 
             - name: Upload built JavaScript assets
               uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
@@ -262,39 +262,39 @@ jobs:
 
             - name: General debug information
               run: |
-                  npm --version
+                  pnpm --version
                   node --version
                   curl --version
                   git --version
                   locale -a
 
             - name: Start Docker environment
-              run: npm run wp-env start
+              run: pnpm run wp-env start
 
             - name: Log running Docker containers
               run: docker ps -a
 
             - name: Docker container debug information
               run: |
-                  npm run wp-env run tests-mysql mysql -- --version
-                  npm run wp-env run tests-wordpress php -- --version
-                  npm run wp-env run tests-wordpress php -m
-                  npm run wp-env run tests-wordpress php -i
-                  npm run wp-env run tests-wordpress /var/www/html/wp-content/plugins/gutenberg/vendor/bin/phpunit -- --version
-                  npm run wp-env run tests-wordpress locale -a
-                  npm run wp-env run tests-cli wp core version
+                  pnpm run wp-env run tests-mysql mysql -- --version
+                  pnpm run wp-env run tests-wordpress php -- --version
+                  pnpm run wp-env run tests-wordpress php -m
+                  pnpm run wp-env run tests-wordpress php -i
+                  pnpm run wp-env run tests-wordpress /var/www/html/wp-content/plugins/gutenberg/vendor/bin/phpunit -- --version
+                  pnpm run wp-env run tests-wordpress locale -a
+                  pnpm run wp-env run tests-cli wp core version
 
             - name: Running single site unit tests
               if: ${{ ! matrix.multisite }}
               run: |
                   set -o pipefail
-                  npm run test:unit:php | tee phpunit.log
+                  pnpm run test:unit:php | tee phpunit.log
 
             - name: Running multisite unit tests
               if: ${{ matrix.multisite }}
               run: |
                   set -o pipefail
-                  npm run test:unit:php:multisite | tee phpunit.log
+                  pnpm run test:unit:php:multisite | tee phpunit.log
 
             # Verifies that PHPUnit actually runs in the first place. We want visibility
             # into issues which can cause it to fail silently, so we check the output
@@ -424,4 +424,4 @@ jobs:
             - name: Running the tests
               env:
                   MAXWORKERS: ${{ steps.cpu-cores.outputs.count }}
-              run: npm run test:native -- --ci --maxWorkers="$MAXWORKERS" --cacheDirectory="$HOME/.jest-cache"
+              run: pnpm run test:native -- --ci --maxWorkers="$MAXWORKERS" --cacheDirectory="$HOME/.jest-cache"

@@ -58,13 +58,13 @@ jobs:
               with:
                   path: |
                       ~/.appium
-                  key: ${{ runner.os }}-tests-setup-${{ hashFiles('package-lock.json') }}
+                  key: ${{ runner.os }}-tests-setup-${{ hashFiles('pnpm-lock.yaml') }}
 
             - name: Prepare tests setup
-              run: npm run native test:e2e:setup
+              run: pnpm run native test:e2e:setup
 
             - name: Prepare build cache key
-              run: find package-lock.json packages/react-native-editor/ios packages/react-native-aztec/ios packages/react-native-bridge/ios -type f -print0 | sort -z | xargs -0 shasum | tee ios-checksums.txt
+              run: find pnpm-lock.yaml packages/react-native-editor/ios packages/react-native-aztec/ios packages/react-native-bridge/ios -type f -print0 | sort -z | xargs -0 shasum | tee ios-checksums.txt
 
             - name: Restore build cache
               uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
@@ -82,21 +82,21 @@ jobs:
                       ~/Library/Caches/CocoaPods
                       ~/.cocoapods/repos/trunk
                       packages/react-native-editor/ios/vendor
-                  key: ${{ runner.os }}-pods-${{ hashFiles('packages/react-native-editor/ios/Gemfile.lock') }}-${{ hashFiles('packages/react-native-editor/ios/Podfile.lock') }}-${{ hashFiles('package-lock.json') }}
+                  key: ${{ runner.os }}-pods-${{ hashFiles('packages/react-native-editor/ios/Gemfile.lock') }}-${{ hashFiles('packages/react-native-editor/ios/Podfile.lock') }}-${{ hashFiles('pnpm-lock.yaml') }}
 
             - name: Bundle iOS
-              run: npm run native test:e2e:bundle:ios
+              run: pnpm run native test:e2e:bundle:ios
 
             - name: Build (if needed)
-              run: test -e packages/react-native-editor/ios/build/GutenbergDemo/Build/Products/Release-iphonesimulator/GutenbergDemo.app/GutenbergDemo || npm run native test:e2e:build-app:ios
+              run: test -e packages/react-native-editor/ios/build/GutenbergDemo/Build/Products/Release-iphonesimulator/GutenbergDemo.app/GutenbergDemo || pnpm run native test:e2e:build-app:ios
 
             - name: Build Web Driver Agent (if needed)
-              run: test -d packages/react-native-editor/ios/build/WDA || npm run native test:e2e:build-wda
+              run: test -d packages/react-native-editor/ios/build/WDA || pnpm run native test:e2e:build-wda
 
             - name: Run iOS Device Tests
               env:
                   NATIVE_TEST_NAME: ${{ matrix.native-test-name }}
-              run: TEST_RN_PLATFORM=ios npm run native device-tests:local "$NATIVE_TEST_NAME"
+              run: TEST_RN_PLATFORM=ios pnpm run native device-tests:local "$NATIVE_TEST_NAME"
 
             - name: Prepare build cache
               run: |

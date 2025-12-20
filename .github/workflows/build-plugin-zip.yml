@@ -225,7 +225,7 @@ jobs:
               run: |
                   IFS='.' read -r -a VERSION_ARRAY <<< "${VERSION}"
                   MILESTONE="Gutenberg ${VERSION_ARRAY[0]}.${VERSION_ARRAY[1]}"
-                  npm run other:changelog -- --milestone="$MILESTONE" --unreleased > release-notes.txt
+                  pnpm run other:changelog -- --milestone="$MILESTONE" --unreleased > release-notes.txt
                   sed -ie '1,6d' release-notes.txt
                   if [[ "${VERSION}" != *"rc"* ]]; then
                     # Include previous RCs' release notes, if any
@@ -378,17 +378,24 @@ jobs:
                   git config user.name "Gutenberg Repository Automation"
                   git config user.email gutenberg@wordpress.org
 
+            - name: Install pnpm
+              uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda # v4.1.0
+              with:
+                  package_json_file: 'main/package.json'
+
             - name: Setup Node.js
               uses: actions/setup-node@395ad3262231945c25e8478fd5baf05154b1d79f # v6.1.0
               with:
                   node-version-file: 'main/.nvmrc'
                   registry-url: 'https://registry.npmjs.org'
                   check-latest: true
+                  cache: pnpm
+                  cache-dependency-path: 'main/pnpm-lock.yaml'
 
             - name: Publish packages to npm ("latest" dist-tag)
               run: |
                   cd main
-                  npm ci
+                  pnpm install --frozen-lockfile
                   ./bin/plugin/cli.js npm-latest --semver minor --ci --repository-path ../publish
               env:
                   NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
