@@ -207,6 +207,9 @@ importers:
       '@types/uuid':
         specifier: 8.3.1
         version: 8.3.1
+      '@wordpress/babel-preset-default':
+        specifier: workspace:./packages/babel-preset-default
+        version: link:packages/babel-preset-default
       '@wordpress/browserslist-config':
         specifier: workspace:./packages/browserslist-config
         version: link:packages/browserslist-config
