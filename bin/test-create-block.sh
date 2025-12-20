@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# This script validates whether `npm init @wordpress/block` works properly
+# This script validates whether `pnpm exec wp-create-block` works properly
 # with the latest changes applied to the `trunk` branch. It purposefully
 # avoids installing `@wordpress/scripts` package from npm when scaffolding
 # a test block and uses the local package by executing everything from the
@@ -29,7 +29,7 @@ trap cleanup EXIT
 # First test block
 
 status "Scaffolding Example Static (ES5) block..."
-npx wp-create-block example-static-es5 -t es5
+pnpm exec wp-create-block example-static-es5 -t es5
 cd example-static-es5
 
 status "Verifying project..."
@@ -45,7 +45,7 @@ cd ..
 # Second test block
 
 status "Scaffolding Example Static block..."
-npx wp-create-block example-static --no-wp-scripts
+pnpm exec wp-create-block example-static --no-wp-scripts
 cd example-static
 
 status "Verifying project..."

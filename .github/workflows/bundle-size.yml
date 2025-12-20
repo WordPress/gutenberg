@@ -67,4 +67,4 @@ jobs:
                   pattern: '{build/scripts/**/*.min.js,build/styles/**/*.css,build/modules/**/*.min.js}'
                   clean-script: 'distclean'
                   install-script: 'pnpm install --frozen-lockfile --config.auto-install-peers=false'
-                  build-script: 'pnpm run build'
+                  build-script: 'build'
