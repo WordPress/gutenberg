@@ -201,11 +201,15 @@ jobs:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
                   persist-credentials: false
 
+            - name: Install pnpm
+              uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda # v4.1.0
+
             - name: Use desired version of Node.js
               uses: actions/setup-node@395ad3262231945c25e8478fd5baf05154b1d79f # v6.1.0
               with:
                   node-version-file: '.nvmrc'
                   check-latest: true
+                  cache: pnpm
 
             - name: Build Gutenberg plugin ZIP file
               run: ./bin/build-plugin-zip.sh
@@ -395,7 +399,7 @@ jobs:
             - name: Publish packages to npm ("latest" dist-tag)
               run: |
                   cd main
-                  pnpm install --frozen-lockfile
+                  pnpm install --frozen-lockfile --config.auto-install-peers=false
                   ./bin/plugin/cli.js npm-latest --semver minor --ci --repository-path ../publish
               env:
                   NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

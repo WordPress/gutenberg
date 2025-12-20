@@ -111,7 +111,7 @@ jobs:
               if: ${{ github.event.inputs.release_type == 'development' }}
               run: |
                   cd cli
-                  pnpm install --frozen-lockfile
+                  pnpm install --frozen-lockfile --config.auto-install-peers=false
                   ./bin/plugin/cli.js npm-next --ci --repository-path ../publish
               env:
                   NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
@@ -120,7 +120,7 @@ jobs:
               if: ${{ github.event.inputs.release_type == 'latest' }}
               run: |
                   cd cli
-                  pnpm install --frozen-lockfile
+                  pnpm install --frozen-lockfile --config.auto-install-peers=false
                   ./bin/plugin/cli.js npm-latest --semver minor --ci --repository-path ../publish
               env:
                   NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
@@ -129,7 +129,7 @@ jobs:
               if: ${{ github.event.inputs.release_type == 'bugfix' }}
               run: |
                   cd cli
-                  pnpm install --frozen-lockfile
+                  pnpm install --frozen-lockfile --config.auto-install-peers=false
                   ./bin/plugin/cli.js npm-bugfix --ci --repository-path ../publish
               env:
                   NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
@@ -138,7 +138,7 @@ jobs:
               if: ${{ github.event.inputs.release_type == 'wp' && github.event.inputs.wp_version }}
               run: |
                   cd publish
-                  pnpm install --frozen-lockfile
+                  pnpm install --frozen-lockfile --config.auto-install-peers=false
                   pnpm exec lerna publish patch --dist-tag "wp-$WP_VERSION" --no-private --yes --no-verify-access
               env:
                   NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

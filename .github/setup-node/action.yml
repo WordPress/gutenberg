@@ -42,7 +42,7 @@ runs:
                   pnpm-store-${{ runner.os }}-${{ runner.arch }}-${{ steps.node-version.outputs.NODE_VERSION }}-
 
         - name: Install pnpm dependencies
-          run: pnpm install --frozen-lockfile
+          run: pnpm install --frozen-lockfile --config.auto-install-peers=false
           shell: bash
 
         - name: Upload pnpm logs as an artifact on failure
