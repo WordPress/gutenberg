@@ -49,6 +49,9 @@
 		"postcss-modules": "6.0.1",
 		"rtlcss": "4.3.0"
 	},
+	"devDependencies": {
+		"@types/node": "20.17.10"
+	},
 	"peerDependencies": {
 		"@wordpress/boot": "^0.3.0",
 		"@wordpress/private-apis": "^1.0.0",

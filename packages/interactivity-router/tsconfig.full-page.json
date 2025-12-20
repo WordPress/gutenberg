@@ -4,7 +4,11 @@
 	"compilerOptions": {
 		"allowJs": false,
 		"checkJs": false,
-		"strict": false
+		"strict": false,
+		"baseUrl": ".",
+		"paths": {
+			"@wordpress/interactivity-router": [ "./src/index.ts" ]
+		}
 	},
 	"references": [ { "path": "tsconfig.main.json" } ],
 	"files": [ "src/full-page.ts" ],

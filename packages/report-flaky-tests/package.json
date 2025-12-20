@@ -39,6 +39,9 @@
 		"@octokit/webhooks-types": "5.8.0",
 		"jest-message-util": "^29.6.2"
 	},
+	"devDependencies": {
+		"@types/jest": "^29.5.14"
+	},
 	"publishConfig": {
 		"access": "public"
 	}

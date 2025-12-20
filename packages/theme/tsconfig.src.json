@@ -3,7 +3,19 @@
 	"extends": "../../tsconfig.base.json",
 	"compilerOptions": {
 		"moduleResolution": "bundler",
-		"types": [ "css-modules", "jest", "@testing-library/jest-dom" ]
+		"typeRoots": [
+			"../../typings",
+			"./node_modules/@types",
+			// This is for the packages with in-built types.
+			"./node_modules"
+		],
+		"types": [
+			// From @types/*
+			"css-modules",
+			"jest",
+			// Inbuilt types
+			"@testing-library/jest-dom"
+		]
 	},
 	"references": [ { "path": "../element" }, { "path": "../private-apis" } ]
 }

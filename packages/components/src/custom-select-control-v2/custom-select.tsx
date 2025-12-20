@@ -80,7 +80,7 @@ const CustomSelectButton = ( {
 			hasCustomRenderProp={ !! renderSelectedValue }
 			store={ store }
 		>
-			{ computedRenderSelectedValue( currentValue ) }
+			{ computedRenderSelectedValue( currentValue as string | string[] ) }
 		</Styled.Select>
 	);
 };

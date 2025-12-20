@@ -42,6 +42,9 @@
 		"remark-parse": "6.0.3",
 		"unified": "7.1.0"
 	},
+	"devDependencies": {
+		"@types/babel__core": "^7.20.5"
+	},
 	"publishConfig": {
 		"access": "public"
 	}

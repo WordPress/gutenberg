@@ -1,9 +1,3 @@
-/**
- * External dependencies
- */
-// eslint-disable-next-line no-restricted-imports
-import type { combineReducers as reduxCombineReducers } from 'redux';
-
 type MapOf< T > = { [ name: string ]: T };
 
 export type ActionCreator = ( ...args: any[] ) => any | Generator;
@@ -245,4 +239,22 @@ type SelectorsOf< Config extends AnyConfig > = Config extends ReduxStoreConfig<
 	? { [ name in keyof Selectors ]: Function }
 	: never;
 
-export type combineReducers = typeof reduxCombineReducers;
+/**
+ * A reducer function that takes state and action and returns the new state.
+ */
+export type Reducer< S = any, A = any > = ( state: S | undefined, action: A ) => S;
+
+/**
+ * An object whose values are reducer functions.
+ */
+export type ReducersMapObject< S = any > = {
+	[ K in keyof S ]: Reducer< S[ K ] >;
+};
+
+/**
+ * Turns an object whose values are different reducer functions into a single
+ * reducer function. It will call every child reducer, and gather their results
+ * into a single state object, whose keys correspond to the keys of the passed
+ * reducer functions.
+ */
+export type combineReducers = < S >( reducers: ReducersMapObject< S > ) => Reducer< S >;

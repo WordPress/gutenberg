@@ -60,6 +60,10 @@
 		"@wordpress/primitives": "workspace:../primitives",
 		"@wordpress/url": "workspace:../url"
 	},
+	"devDependencies": {
+		"@testing-library/jest-dom": "^6.6.3",
+		"@types/jest": "^29.5.14"
+	},
 	"peerDependencies": {
 		"react": "^18.0.0"
 	},

@@ -5,6 +5,7 @@
 		"checkJs": false,
 		"noEmit": true,
 		"rootDir": ".",
+		"typeRoots": [ "../../typings", "../../node_modules/@types" ],
 		"types": [ "node" ]
 	},
 	"include": [ "." ],

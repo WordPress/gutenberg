@@ -45,7 +45,9 @@
 	"types": "build-types",
 	"sideEffects": false,
 	"dependencies": {
+		"@wordpress/components": "workspace:../components",
 		"@wordpress/element": "workspace:../element",
+		"@wordpress/i18n": "workspace:../i18n",
 		"clsx": "^2.1.1",
 		"dequal": "^2.0.3",
 		"react-easy-crop": "^5.4.2"

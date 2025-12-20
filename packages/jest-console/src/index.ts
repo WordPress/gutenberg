@@ -2,6 +2,7 @@
  * Internal dependencies
  */
 import './matchers';
+import './declarations';
 import supportedMatchers from './supported-matchers';
 import type { ExtendedMock } from './types';
 
@@ -29,7 +30,10 @@ const setConsoleMethodSpy = ( args: [ string, string ] ) => {
 	 */
 	function assertExpectedCalls() {
 		if ( spy.assertionsNumber === 0 && spy.mock.calls.length > 0 ) {
-			expect( console ).not[ matcherName ]();
+			// Using 'as' to satisfy TypeScript compiler about the matcher name.
+			const name = matcherName as 'toHaveErrored';
+
+			expect( console ).not[ name ]();
 		}
 	}
 
