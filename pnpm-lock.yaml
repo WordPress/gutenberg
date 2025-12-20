@@ -54,6 +54,9 @@ importers:
       '@babel/traverse':
         specifier: 7.25.7
         version: 7.25.7
+      '@emotion/babel-plugin':
+        specifier: 11.11.0
+        version: 11.11.0
       '@emotion/is-prop-valid':
         specifier: 1.2.2
         version: 1.2.2
