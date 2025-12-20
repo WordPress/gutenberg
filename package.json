@@ -62,6 +62,7 @@
 		"@types/sprintf-js": "1.1.2",
 		"@types/uuid": "8.3.1",
 		"@wordpress/babel-preset-default": "workspace:./packages/babel-preset-default",
+		"@wordpress/block-library": "workspace:./packages/block-library",
 		"@wordpress/browserslist-config": "workspace:./packages/browserslist-config",
 		"@wordpress/build": "workspace:./packages/wp-build",
 		"@wordpress/e2e-test-utils-playwright": "workspace:./packages/e2e-test-utils-playwright",
