@@ -85,6 +85,11 @@ export default function ModalEdit( props ) {
 	const [ isModalFullScreen, setIsModalFullScreen ] = useState( false );
 	const id = `editor-${ clientId }`;
 
+	const wasBlockJustInserted = useSelect(
+		( select ) => select( store ).wasBlockJustInserted( clientId ),
+		[ clientId ]
+	);
+
 	const onClose = () => ( content ? setOpen( false ) : onReplace( [] ) );
 
 	return (
@@ -97,7 +102,7 @@ export default function ModalEdit( props ) {
 				</ToolbarGroup>
 			</BlockControls>
 			{ content && <RawHTML>{ content }</RawHTML> }
-			{ ( isOpen || ! content ) && (
+			{ ( isOpen || wasBlockJustInserted ) && (
 				<Modal
 					title={ __( 'Classic Editor' ) }
 					onRequestClose={ onClose }
