@@ -2644,6 +2644,9 @@ importers:
       '@wordpress/a11y':
         specifier: workspace:../a11y
         version: link:../a11y
+      '@wordpress/base-styles':
+        specifier: workspace:../base-styles
+        version: link:../base-styles
       '@wordpress/block-editor':
         specifier: workspace:../block-editor
         version: link:../block-editor
