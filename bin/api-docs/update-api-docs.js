@@ -235,7 +235,7 @@ glob.stream( [
 					{ shell: true }
 				);
 			}
-			await execa( 'npm', [ 'run', 'format', output ], {
+			await execa( 'pnpm', [ 'run', 'format', output ], {
 				shell: true,
 			} );
 		} catch ( error ) {

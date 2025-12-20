@@ -43,9 +43,9 @@ SimpleGit()
 			console.error(
 				`There are local changes after running one or more of the following commands:
 
-- npm install
-- npm run docs:build
-- npm run --workspace @wordpress/theme build
+- pnpm install
+- pnpm run docs:build
+- pnpm run --filter @wordpress/theme build
 
 Run these commands in your local environment and commit the resulting changes to resolve the issue.
 `

@@ -67,10 +67,9 @@ fi
 
 # Run the build.
 status "Installing dependencies... 📦"
-npm cache verify
-npm ci
+pnpm install --frozen-lockfile
 status "Generating build... 👷‍♀️"
-npm run build
+pnpm run build
 
 # Generate the plugin zip file.
 status "Creating archive... 🎁"

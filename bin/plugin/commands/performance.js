@@ -159,7 +159,7 @@ function printStats( m, s ) {
  */
 async function runTestSuite( testSuite, testRunnerDir, runKey ) {
 	await runShellScript(
-		`npm run test:performance -- ${ testSuite }`,
+		`pnpm run test:performance -- ${ testSuite }`,
 		testRunnerDir,
 		{
 			...process.env,
@@ -341,7 +341,7 @@ async function runPerformanceTests( branches, options ) {
 
 	logAtIndent( 2, 'Installing dependencies and building' );
 	await runShellScript(
-		`bash -c "source $HOME/.nvm/nvm.sh && nvm install && npm ci && npx playwright install chromium --with-deps && npm run build"`,
+		`bash -c "source $HOME/.nvm/nvm.sh && nvm install && pnpm install --frozen-lockfile && pnpm exec playwright install chromium --with-deps && pnpm run build"`,
 		testRunnerDir
 	);
 
@@ -384,7 +384,7 @@ async function runPerformanceTests( branches, options ) {
 
 		logAtIndent( 3, 'Installing dependencies and building' );
 		await runShellScript(
-			`bash -c "source $HOME/.nvm/nvm.sh && nvm install && npm ci && npm run build"`,
+			`bash -c "source $HOME/.nvm/nvm.sh && nvm install && pnpm install --frozen-lockfile && pnpm run build"`,
 			buildDir
 		);
 
