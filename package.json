@@ -16,7 +16,7 @@
 	},
 	"engines": {
 		"node": ">=20.10.0",
-		"npm": ">=10.2.3"
+		"pnpm": ">=10.4.0"
 	},
 	"wpPlugin": {
 		"name": "gutenberg",
@@ -62,7 +62,9 @@
 		"@types/sprintf-js": "1.1.2",
 		"@types/uuid": "8.3.1",
 		"@wordpress/build": "workspace:./packages/wp-build",
+		"@wordpress/e2e-test-utils-playwright": "workspace:./packages/e2e-test-utils-playwright",
 		"@wordpress/prettier-config": "workspace:./packages/prettier-config",
+		"@wordpress/scripts": "workspace:./packages/scripts",
 		"ajv": "8.17.1",
 		"babel-jest": "29.7.0",
 		"babel-loader": "9.2.1",
@@ -103,7 +105,6 @@
 		"lint-staged": "10.0.2",
 		"node-fetch": "2.7.0",
 		"npm-run-all": "4.1.5",
-		"patch-package": "8.0.0",
 		"postcss": "8.5.6",
 		"postcss-loader": "6.2.1",
 		"prettier": "npm:wp-prettier@3.0.3",
@@ -180,7 +181,7 @@
 		"other:cherry-pick": "node ./bin/cherry-pick.mjs",
 		"other:generate-php-sync-issue": "node ./bin/generate-php-sync-issue.mjs",
 		"other:update-packages:php": "wp-env run --env-cwd='wp-content/plugins/gutenberg' cli composer update --no-interaction",
-		"postinstall": "patch-package && node ./patches/patch-xcode.js",
+		"postinstall": "node ./patches/patch-xcode.js",
 		"prepare": "husky install",
 		"prepublishOnly": "npm run build",
 		"start": "npm run dev",
@@ -255,5 +256,31 @@
 		"**/tsconfig.json": [
 			"npm run lint:tsconfig"
 		]
+	},
+	"packageManager": "pnpm@10.4.0",
+	"pnpm": {
+		"ignoredBuiltDependencies": [
+			"@parcel/watcher",
+			"appium",
+			"core-js",
+			"core-js-pure",
+			"edgedriver",
+			"esbuild",
+			"fsevents",
+			"geckodriver",
+			"husky",
+			"node-sass",
+			"nx",
+			"puppeteer",
+			"sharp",
+			"unrs-resolver"
+		],
+		"patchedDependencies": {
+			"lighthouse@12.8.2": "patches/lighthouse@12.8.2.patch",
+			"react-autosize-textarea@7.1.0": "patches/react-autosize-textarea@7.1.0.patch",
+			"react-devtools-core@4.28.5": "patches/react-devtools-core@4.28.5.patch",
+			"react-native@0.73.3": "patches/react-native@0.73.3.patch",
+			"wasm-vips@0.0.10": "patches/wasm-vips@0.0.10.patch"
+		}
 	}
 }

@@ -1,7 +1,7 @@
-diff --git a/node_modules/wasm-vips/package.json b/node_modules/wasm-vips/package.json
+diff --git a/package.json b/package.json
 index c20f052..b26a38a 100644
---- a/node_modules/wasm-vips/package.json
-+++ b/node_modules/wasm-vips/package.json
+--- a/package.json
++++ b/package.json
 @@ -15,10 +15,6 @@
    "type": "commonjs",
    "exports": {
