@@ -76,6 +76,8 @@ function gutenberg_get_font_face_styles() {
 						$src_file        = str_replace( $placeholder, '', $src_url );
 						$src[ $src_key ] = get_theme_file_uri( $src_file );
 					}
+
+					$font_face['src'] = $src;
 				}
 
 				// Convert camelCase to kebab-case.
