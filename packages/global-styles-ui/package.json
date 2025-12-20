@@ -47,6 +47,7 @@
 	"dependencies": {
 		"@wordpress/a11y": "workspace:../a11y",
 		"@wordpress/api-fetch": "workspace:../api-fetch",
+		"@wordpress/base-styles": "workspace:../base-styles",
 		"@wordpress/block-editor": "workspace:../block-editor",
 		"@wordpress/blocks": "workspace:../blocks",
 		"@wordpress/components": "workspace:../components",

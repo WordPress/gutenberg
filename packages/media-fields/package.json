@@ -50,6 +50,7 @@
 		"src/**/*.scss"
 	],
 	"dependencies": {
+		"@wordpress/base-styles": "workspace:../base-styles",
 		"@wordpress/components": "workspace:../components",
 		"@wordpress/core-data": "workspace:../core-data",
 		"@wordpress/data": "workspace:../data",

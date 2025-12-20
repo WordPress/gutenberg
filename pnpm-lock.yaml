@@ -1164,6 +1164,9 @@ importers:
       '@wordpress/admin-ui':
         specifier: workspace:../admin-ui
         version: link:../admin-ui
+      '@wordpress/base-styles':
+        specifier: workspace:../base-styles
+        version: link:../base-styles
       '@wordpress/commands':
         specifier: workspace:../commands
         version: link:../commands
@@ -2729,6 +2732,9 @@ importers:
       '@wordpress/api-fetch':
         specifier: workspace:../api-fetch
         version: link:../api-fetch
+      '@wordpress/base-styles':
+        specifier: workspace:../base-styles
+        version: link:../base-styles
       '@wordpress/block-editor':
         specifier: workspace:../block-editor
         version: link:../block-editor
@@ -3043,6 +3049,9 @@ importers:
 
   packages/media-fields:
     dependencies:
+      '@wordpress/base-styles':
+        specifier: workspace:../base-styles
+        version: link:../base-styles
       '@wordpress/components':
         specifier: workspace:../components
         version: link:../components

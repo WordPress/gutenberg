@@ -44,6 +44,7 @@
 	"dependencies": {
 		"@wordpress/a11y": "workspace:../a11y",
 		"@wordpress/admin-ui": "workspace:../admin-ui",
+		"@wordpress/base-styles": "workspace:../base-styles",
 		"@wordpress/commands": "workspace:../commands",
 		"@wordpress/components": "workspace:../components",
 		"@wordpress/compose": "workspace:../compose",
