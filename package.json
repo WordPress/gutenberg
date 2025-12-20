@@ -72,6 +72,7 @@
 		"@wordpress/eslint-plugin": "workspace:./packages/eslint-plugin",
 		"@wordpress/jest-preset-default": "workspace:./packages/jest-preset-default",
 		"@wordpress/npm-package-json-lint-config": "workspace:./packages/npm-package-json-lint-config",
+		"@wordpress/postcss-plugins-preset": "workspace:./packages/postcss-plugins-preset",
 		"@wordpress/prettier-config": "workspace:./packages/prettier-config",
 		"@wordpress/scripts": "workspace:./packages/scripts",
 		"@wordpress/stylelint-config": "workspace:./packages/stylelint-config",
