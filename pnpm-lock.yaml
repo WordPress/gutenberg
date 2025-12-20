@@ -231,6 +231,9 @@ importers:
       '@wordpress/e2e-test-utils-playwright':
         specifier: workspace:./packages/e2e-test-utils-playwright
         version: link:packages/e2e-test-utils-playwright
+      '@wordpress/env':
+        specifier: workspace:./packages/env
+        version: link:packages/env
       '@wordpress/eslint-plugin':
         specifier: workspace:./packages/eslint-plugin
         version: link:packages/eslint-plugin

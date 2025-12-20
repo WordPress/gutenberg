@@ -68,6 +68,7 @@
 		"@wordpress/browserslist-config": "workspace:./packages/browserslist-config",
 		"@wordpress/build": "workspace:./packages/wp-build",
 		"@wordpress/e2e-test-utils-playwright": "workspace:./packages/e2e-test-utils-playwright",
+		"@wordpress/env": "workspace:./packages/env",
 		"@wordpress/eslint-plugin": "workspace:./packages/eslint-plugin",
 		"@wordpress/jest-preset-default": "workspace:./packages/jest-preset-default",
 		"@wordpress/npm-package-json-lint-config": "workspace:./packages/npm-package-json-lint-config",
