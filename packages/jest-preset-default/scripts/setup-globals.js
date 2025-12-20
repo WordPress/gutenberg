@@ -1,3 +1,7 @@
+// Run all tests with development tools enabled.
+// eslint-disable-next-line @wordpress/wp-global-usage
+globalThis.SCRIPT_DEBUG = true;
+
 // These are necessary to load TinyMCE successfully.
 global.URL = window.URL;
 global.window.tinyMCEPreInit = {
@@ -13,7 +17,6 @@ global.window.setImmediate = function ( callback ) {
 global.window.requestAnimationFrame = function requestAnimationFrame(
 	callback
 ) {
-	// eslint-disable-next-line no-restricted-syntax
 	const randomDelay = Math.round( ( Math.random() * 1_000 ) / 60 );
 
 	return setTimeout( () => callback( Date.now() ), randomDelay );
@@ -48,13 +51,6 @@ global.window.matchMedia = () => ( {
 	removeListener: () => {},
 	removeEventListener: () => {},
 } );
-
-// Setup fake localStorage.
-const storage = {};
-global.window.localStorage = {
-	getItem: ( key ) => ( key in storage ? storage[ key ] : null ),
-	setItem: ( key, value ) => ( storage[ key ] = value ),
-};
 
 // UserSettings global.
 global.window.userSettings = { uid: 1 };

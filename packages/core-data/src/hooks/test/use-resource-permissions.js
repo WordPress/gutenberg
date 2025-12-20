@@ -9,7 +9,7 @@ jest.mock( '@wordpress/api-fetch' );
 /**
  * External dependencies
  */
-import { act, render } from '@testing-library/react';
+import { render, waitFor } from '@testing-library/react';
 
 /**
  * Internal dependencies
@@ -20,23 +20,14 @@ import useResourcePermissions from '../use-resource-permissions';
 describe( 'useResourcePermissions', () => {
 	let registry;
 	beforeEach( () => {
-		jest.useFakeTimers();
-
 		registry = createRegistry();
 		registry.register( coreDataStore );
 
 		triggerFetch.mockImplementation( () => ( {
-			headers: {
-				get: () => ( {
-					allow: 'POST',
-				} ),
-			},
+			headers: new Headers( {
+				allow: 'POST',
+			} ),
 		} ) );
-	} );
-
-	afterEach( () => {
-		jest.runOnlyPendingTimers();
-		jest.useRealTimers();
 	} );
 
 	it( 'retrieves the relevant permissions for a key-less resource', async () => {
@@ -58,18 +49,15 @@ describe( 'useResourcePermissions', () => {
 			canRead: false,
 		} );
 
-		// Required to make sure no updates happen outside of act()
-		await act( async () => {
-			jest.advanceTimersByTime( 1 );
-		} );
-
-		expect( data ).toEqual( {
-			status: 'SUCCESS',
-			isResolving: false,
-			hasResolved: true,
-			canCreate: true,
-			canRead: false,
-		} );
+		await waitFor( () =>
+			expect( data ).toEqual( {
+				status: 'SUCCESS',
+				isResolving: false,
+				hasResolved: true,
+				canCreate: true,
+				canRead: false,
+			} )
+		);
 	} );
 
 	it( 'retrieves the relevant permissions for a resource with a key', async () => {
@@ -93,19 +81,109 @@ describe( 'useResourcePermissions', () => {
 			canDelete: false,
 		} );
 
-		// Required to make sure no updates happen outside of act()
-		await act( async () => {
-			jest.advanceTimersByTime( 1 );
+		await waitFor( () =>
+			expect( data ).toEqual( {
+				status: 'SUCCESS',
+				isResolving: false,
+				hasResolved: true,
+				canCreate: true,
+				canRead: false,
+				canUpdate: false,
+				canDelete: false,
+			} )
+		);
+	} );
+
+	it( 'retrieves the relevant permissions for a id-less entity', async () => {
+		let data;
+		const TestComponent = () => {
+			data = useResourcePermissions( {
+				kind: 'root',
+				name: 'user',
+			} );
+			return <div />;
+		};
+		render(
+			<RegistryProvider value={ registry }>
+				<TestComponent />
+			</RegistryProvider>
+		);
+		expect( data ).toEqual( {
+			status: 'IDLE',
+			isResolving: false,
+			hasResolved: false,
+			canCreate: false,
+			canRead: false,
 		} );
 
+		await waitFor( () =>
+			expect( data ).toEqual( {
+				status: 'SUCCESS',
+				isResolving: false,
+				hasResolved: true,
+				canCreate: true,
+				canRead: false,
+			} )
+		);
+	} );
+
+	it( 'retrieves the relevant permissions for an entity', async () => {
+		let data;
+		const TestComponent = () => {
+			data = useResourcePermissions( {
+				kind: 'root',
+				name: 'user',
+				id: 1,
+			} );
+			return <div />;
+		};
+		render(
+			<RegistryProvider value={ registry }>
+				<TestComponent />
+			</RegistryProvider>
+		);
 		expect( data ).toEqual( {
-			status: 'SUCCESS',
+			status: 'IDLE',
 			isResolving: false,
-			hasResolved: true,
-			canCreate: true,
+			hasResolved: false,
+			canCreate: false,
 			canRead: false,
 			canUpdate: false,
 			canDelete: false,
 		} );
+
+		await waitFor( () =>
+			expect( data ).toEqual( {
+				status: 'SUCCESS',
+				isResolving: false,
+				hasResolved: true,
+				canCreate: true,
+				canRead: false,
+				canUpdate: false,
+				canDelete: false,
+			} )
+		);
+	} );
+
+	it( 'should warn when called with incorrect arguments signature', () => {
+		const TestComponent = () => {
+			useResourcePermissions(
+				{
+					kind: 'root',
+					name: 'user',
+				},
+				1
+			);
+			return null;
+		};
+		render(
+			<RegistryProvider value={ registry }>
+				<TestComponent />
+			</RegistryProvider>
+		);
+
+		expect( console ).toHaveWarnedWith(
+			`When 'resource' is an entity object, passing 'id' as a separate argument isn't supported.`
+		);
 	} );
 } );

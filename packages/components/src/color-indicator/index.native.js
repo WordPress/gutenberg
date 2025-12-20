@@ -6,12 +6,12 @@ import { View, Animated } from 'react-native';
  * WordPress dependencies
  */
 import { Icon, check } from '@wordpress/icons';
-import { Gradient } from '@wordpress/components';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
 import styles from './style.scss';
+import Gradient from '../mobile/gradient';
 import { colorsUtils } from '../mobile/color-settings/utils';
 
 function SelectedIcon( { opacity } ) {

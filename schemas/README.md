@@ -1,6 +1,6 @@
 # Schemas
 
-The collection of schemas used in WordPress, including the `theme.json` and `block.json` schemas.
+The collection of schemas used in WordPress, including the `theme.json`, `block.json` and `font-collection.json` schemas.
 
 JSON schemas are used by code editors to offer tooltips, autocomplete, and validation.
 
@@ -24,6 +24,14 @@ Or in your `theme.json`:
 }
 ```
 
+Or in your `font-collection.json`:
+
+```json
+{
+	"$schema": "https://schemas.wp.org/trunk/font-collection.json"
+}
+```
+
 For a specific version of the schema, replace `trunk` with `wp/X.X`:
 
 ```json
@@ -32,7 +40,7 @@ For a specific version of the schema, replace `trunk` with `wp/X.X`:
 }
 ```
 
-Visual Studio Code and PhpStorm are two popular editors that work out of the box. However, some editors require a plugin installed, and not all editors recognize the `$schema` property. Check your editor's documentation for details. Additionally, [SchemaStore.org](https://www.schemastore.org/) and [JSON Schema](https://json-schema.org/implementations.html#editors) have lists of editors known to have support if your current editor is unsupported.
+Visual Studio Code and PhpStorm are two popular editors that work out of the box. However, some editors require a plugin installed, and not all editors recognize the `$schema` property. Check your editor's documentation for details. Additionally, [SchemaStore.org](https://www.schemastore.org/) and [JSON Schema](https://json-schema.org/tools) have lists of editors known to have support if your current editor is unsupported.
 
 ## Local Development
 
@@ -56,8 +64,16 @@ To allow this you will need to:
 }
 ```
 
+-   update your font collections's `font-collection.json` to include:
+
+```json
+{
+	"$schema": "file://{{FULL_FILE_PATH}}/schemas/json/font-collection.json"
+}
+```
+
 Be sure to replace `{{FULL_FILE_PATH}}` with the full local path to your Gutenberg repo.
 
-With this in place you should now be able to edit either `schemas/json/theme .json` or `schemas/json/block.json` in order to see changes reflected in `theme.json` or `block.json` in your IDE.
+With this in place you should now be able to edit either `schemas/json/theme .json`, `schemas/json/block.json` or `schemas/json/font-collection.json` in order to see changes reflected in `theme.json`, `block.json` or `font-collection.json` in your IDE.
 
 <br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>

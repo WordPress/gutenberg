@@ -7,6 +7,7 @@ module.exports = {
 		'@wordpress/no-global-active-element': 'error',
 		'@wordpress/no-global-get-selection': 'error',
 		'@wordpress/no-unsafe-wp-apis': 'error',
+		'@wordpress/no-wp-process-env': 'error',
 	},
 	overrides: [
 		{
@@ -18,11 +19,7 @@ module.exports = {
 			},
 		},
 		{
-			files: [
-				'*.test.js',
-				'**/test/*.js',
-				'packages/e2e-test-utils/**/*.js',
-			],
+			files: [ '*.test.js', '**/test/*.js' ],
 			rules: {
 				'@wordpress/no-global-active-element': 'off',
 				'@wordpress/no-global-get-selection': 'off',

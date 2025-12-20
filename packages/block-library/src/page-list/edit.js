@@ -1,38 +1,119 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
  */
+import { createBlock } from '@wordpress/blocks';
 import {
 	InspectorControls,
 	BlockControls,
 	useBlockProps,
+	useInnerBlocksProps,
 	getColorClassName,
+	store as blockEditorStore,
+	Warning,
 } from '@wordpress/block-editor';
 import {
-	PanelBody,
 	ToolbarButton,
 	Spinner,
 	Notice,
 	ComboboxControl,
+	Button,
+	__experimentalToolsPanel as ToolsPanel,
+	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
-import { useMemo, useState, memo } from '@wordpress/element';
-import { useSelect } from '@wordpress/data';
-import { store as coreStore, useEntityRecords } from '@wordpress/core-data';
+import { __, sprintf } from '@wordpress/i18n';
+import { useMemo, useState, useEffect, useCallback } from '@wordpress/element';
+import { useEntityRecords } from '@wordpress/core-data';
+import { useSelect, useDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
-import ConvertToLinksModal from './convert-to-links-modal';
-import { ItemSubmenuIcon } from '../navigation-link/icons';
+import { useConvertToNavigationLinks } from './use-convert-to-navigation-links';
+import {
+	convertDescription,
+	ConvertToLinksModal,
+} from './convert-to-links-modal';
+import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
 // We only show the edit option when page count is <= MAX_PAGE_COUNT
 // Performance of Navigation Links is not good past this value.
 const MAX_PAGE_COUNT = 100;
+const NOOP = () => {};
+function BlockContent( {
+	blockProps,
+	innerBlocksProps,
+	hasResolvedPages,
+	blockList,
+	pages,
+	parentPageID,
+} ) {
+	if ( ! hasResolvedPages ) {
+		return (
+			<div { ...blockProps }>
+				<div className="wp-block-page-list__loading-indicator-container">
+					<Spinner className="wp-block-page-list__loading-indicator" />
+				</div>
+			</div>
+		);
+	}
+
+	if ( pages === null ) {
+		return (
+			<div { ...blockProps }>
+				<Notice status="warning" isDismissible={ false }>
+					{ __( 'Page List: Cannot retrieve Pages.' ) }
+				</Notice>
+			</div>
+		);
+	}
+
+	if ( pages.length === 0 ) {
+		return (
+			<div { ...blockProps }>
+				<Notice status="info" isDismissible={ false }>
+					{ __( 'Page List: Cannot retrieve Pages.' ) }
+				</Notice>
+			</div>
+		);
+	}
+
+	if ( blockList.length === 0 ) {
+		const parentPageDetails = pages.find(
+			( page ) => page.id === parentPageID
+		);
+
+		if ( parentPageDetails?.title?.rendered ) {
+			return (
+				<div { ...blockProps }>
+					<Warning>
+						{ sprintf(
+							// translators: %s: Page title.
+							__( 'Page List: "%s" page has no children.' ),
+							parentPageDetails.title.rendered
+						) }
+					</Warning>
+				</div>
+			);
+		}
+
+		return (
+			<div { ...blockProps }>
+				<Notice status="warning" isDismissible={ false }>
+					{ __( 'Page List: Cannot retrieve Pages.' ) }
+				</Notice>
+			</div>
+		);
+	}
+
+	if ( pages.length > 0 ) {
+		return <ul { ...innerBlocksProps }></ul>;
+	}
+}
 
 export default function PageListEdit( {
 	context,
@@ -41,18 +122,58 @@ export default function PageListEdit( {
 	setAttributes,
 } ) {
 	const { parentPageID } = attributes;
-	const { pagesByParentId, totalPages, hasResolvedPages } = usePageData();
-
-	const isNavigationChild = 'showSubmenuIcon' in context;
-	const allowConvertToLinks =
-		isNavigationChild && totalPages <= MAX_PAGE_COUNT;
-
 	const [ isOpen, setOpen ] = useState( false );
-	const openModal = () => setOpen( true );
+	const openModal = useCallback( () => setOpen( true ), [] );
 	const closeModal = () => setOpen( false );
+	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
+
+	const { records: pages, hasResolved: hasResolvedPages } = useEntityRecords(
+		'postType',
+		'page',
+		{
+			per_page: MAX_PAGE_COUNT,
+			_fields: [ 'id', 'link', 'menu_order', 'parent', 'title', 'type' ],
+			// TODO: When https://core.trac.wordpress.org/ticket/39037 REST API support for multiple orderby
+			// values is resolved, update 'orderby' to [ 'menu_order', 'post_title' ] to provide a consistent
+			// sort.
+			orderby: 'menu_order',
+			order: 'asc',
+		}
+	);
+
+	const allowConvertToLinks =
+		'showSubmenuIcon' in context &&
+		pages?.length > 0 &&
+		pages?.length <= MAX_PAGE_COUNT;
+
+	const pagesByParentId = useMemo( () => {
+		if ( pages === null ) {
+			return new Map();
+		}
+
+		// TODO: Once the REST API supports passing multiple values to
+		// 'orderby', this can be removed.
+		// https://core.trac.wordpress.org/ticket/39037
+		const sortedPages = pages.sort( ( a, b ) => {
+			if ( a.menu_order === b.menu_order ) {
+				return a.title.rendered.localeCompare( b.title.rendered );
+			}
+			return a.menu_order - b.menu_order;
+		} );
+
+		return sortedPages.reduce( ( accumulator, page ) => {
+			const { parent } = page;
+			if ( accumulator.has( parent ) ) {
+				accumulator.get( parent ).push( page );
+			} else {
+				accumulator.set( parent, [ page ] );
+			}
+			return accumulator;
+		}, new Map() );
+	}, [ pages ] );
 
 	const blockProps = useBlockProps( {
-		className: classnames( 'wp-block-page-list', {
+		className: clsx( 'wp-block-page-list', {
 			'has-text-color': !! context.textColor,
 			[ getColorClassName( 'color', context.textColor ) ]:
 				!! context.textColor,
@@ -65,248 +186,222 @@ export default function PageListEdit( {
 		style: { ...context.style?.color },
 	} );
 
-	const getBlockContent = () => {
-		if ( ! hasResolvedPages ) {
-			return (
-				<div { ...blockProps }>
-					<Spinner />
-				</div>
-			);
-		}
+	const pagesTree = useMemo(
+		function makePagesTree( parentId = 0, level = 0 ) {
+			const childPages = pagesByParentId.get( parentId );
 
-		if ( totalPages === null ) {
-			return (
-				<div { ...blockProps }>
-					<Notice status={ 'warning' } isDismissible={ false }>
-						{ __( 'Page List: Cannot retrieve Pages.' ) }
-					</Notice>
-				</div>
-			);
-		}
+			if ( ! childPages?.length ) {
+				return [];
+			}
 
-		if ( totalPages === 0 ) {
-			return (
-				<div { ...blockProps }>
-					<Notice status={ 'info' } isDismissible={ false }>
-						{ __( 'Page List: Cannot retrieve Pages.' ) }
-					</Notice>
-				</div>
-			);
-		}
+			return childPages.reduce( ( tree, page ) => {
+				const hasChildren = pagesByParentId.has( page.id );
+				const item = {
+					value: page.id,
+					label: '— '.repeat( level ) + page.title.rendered,
+					rawName: page.title.rendered,
+				};
+				tree.push( item );
+				if ( hasChildren ) {
+					tree.push( ...makePagesTree( page.id, level + 1 ) );
+				}
+				return tree;
+			}, [] );
+		},
+		[ pagesByParentId ]
+	);
 
-		if ( totalPages > 0 ) {
-			return (
-				<ul { ...blockProps }>
-					<PageItems
-						context={ context }
-						parentId={ parentPageID }
-						pagesByParentId={ pagesByParentId }
-					/>
-				</ul>
-			);
-		}
-	};
+	const blockList = useMemo(
+		function getBlockList( parentId = parentPageID ) {
+			const childPages = pagesByParentId.get( parentId );
 
-	const useParentOptions = () => {
-		const [ pages ] = useGetPages();
-		return pages?.reduce( ( accumulator, page ) => {
-			accumulator.push( {
-				value: page.id,
-				label: page.title.rendered,
-			} );
-			return accumulator;
-		}, [] );
-	};
+			if ( ! childPages?.length ) {
+				return [];
+			}
+
+			return childPages.reduce( ( template, page ) => {
+				const hasChildren = pagesByParentId.has( page.id );
+				const pageProps = {
+					id: page.id,
+					label:
+						// translators: displayed when a page has an empty title.
+						page.title?.rendered?.trim() !== ''
+							? page.title?.rendered
+							: __( '(no title)' ),
+					title:
+						// translators: displayed when a page has an empty title.
+						page.title?.rendered?.trim() !== ''
+							? page.title?.rendered
+							: __( '(no title)' ),
+					link: page.url,
+					hasChildren,
+				};
+				let item = null;
+				const children = getBlockList( page.id );
+				item = createBlock(
+					'core/page-list-item',
+					pageProps,
+					children
+				);
+				template.push( item );
+
+				return template;
+			}, [] );
+		},
+		[ pagesByParentId, parentPageID ]
+	);
+
+	const {
+		isNested,
+		hasSelectedChild,
+		parentClientId,
+		hasDraggedChild,
+		isChildOfNavigation,
+	} = useSelect(
+		( select ) => {
+			const {
+				getBlockParentsByBlockName,
+				hasSelectedInnerBlock,
+				hasDraggedInnerBlock,
+			} = select( blockEditorStore );
+			const blockParents = getBlockParentsByBlockName(
+				clientId,
+				'core/navigation-submenu',
+				true
+			);
+			const navigationBlockParents = getBlockParentsByBlockName(
+				clientId,
+				'core/navigation',
+				true
+			);
+			return {
+				isNested: blockParents.length > 0,
+				isChildOfNavigation: navigationBlockParents.length > 0,
+				hasSelectedChild: hasSelectedInnerBlock( clientId, true ),
+				hasDraggedChild: hasDraggedInnerBlock( clientId, true ),
+				parentClientId: navigationBlockParents[ 0 ],
+			};
+		},
+		[ clientId ]
+	);
+
+	const convertToNavigationLinks = useConvertToNavigationLinks( {
+		clientId,
+		pages,
+		parentClientId,
+		parentPageID,
+	} );
+
+	const innerBlocksProps = useInnerBlocksProps( blockProps, {
+		renderAppender: false,
+		__unstableDisableDropZone: true,
+		templateLock: isChildOfNavigation ? false : 'all',
+		onInput: NOOP,
+		onChange: NOOP,
+		value: blockList,
+	} );
+
+	const { selectBlock } = useDispatch( blockEditorStore );
+
+	useEffect( () => {
+		if ( hasSelectedChild || hasDraggedChild ) {
+			openModal();
+			selectBlock( parentClientId );
+		}
+	}, [
+		hasSelectedChild,
+		hasDraggedChild,
+		parentClientId,
+		selectBlock,
+		openModal,
+	] );
+
+	useEffect( () => {
+		setAttributes( { isNested } );
+	}, [ isNested, setAttributes ] );
 
 	return (
 		<>
-			<InspectorControls>
-				<PanelBody>
-					<ComboboxControl
-						className="editor-page-attributes__parent"
-						label={ __( 'Parent page' ) }
-						value={ parentPageID }
-						options={ useParentOptions() }
-						onChange={ ( value ) =>
-							setAttributes( { parentPageID: value ?? 0 } )
-						}
-						help={ __(
-							'Choose a page to show only its subpages.'
+			{ ( pagesTree.length > 0 || allowConvertToLinks ) && (
+				<InspectorControls>
+					<ToolsPanel
+						label={ __( 'Settings' ) }
+						resetAll={ () => {
+							setAttributes( { parentPageID: 0 } );
+						} }
+						dropdownMenuProps={ dropdownMenuProps }
+					>
+						{ pagesTree.length > 0 && (
+							<ToolsPanelItem
+								label={ __( 'Parent Page' ) }
+								hasValue={ () => parentPageID !== 0 }
+								onDeselect={ () =>
+									setAttributes( { parentPageID: 0 } )
+								}
+								isShownByDefault
+							>
+								<ComboboxControl
+									__next40pxDefaultSize
+									className="editor-page-attributes__parent"
+									label={ __( 'Parent' ) }
+									value={ parentPageID }
+									options={ pagesTree }
+									onChange={ ( value ) =>
+										setAttributes( {
+											parentPageID: value ?? 0,
+										} )
+									}
+									help={ __(
+										'Choose a page to show only its subpages.'
+									) }
+								/>
+							</ToolsPanelItem>
 						) }
-					/>
-				</PanelBody>
-			</InspectorControls>
-			{ allowConvertToLinks && (
-				<BlockControls group="other">
-					<ToolbarButton title={ __( 'Edit' ) } onClick={ openModal }>
-						{ __( 'Edit' ) }
-					</ToolbarButton>
-				</BlockControls>
-			) }
-			{ allowConvertToLinks && isOpen && (
-				<ConvertToLinksModal
-					onClose={ closeModal }
-					clientId={ clientId }
-				/>
-			) }
 
-			{ getBlockContent() }
+						{ allowConvertToLinks && (
+							<div style={ { gridColumn: '1 / -1' } }>
+								<p>{ convertDescription }</p>
+								<Button
+									__next40pxDefaultSize
+									variant="primary"
+									accessibleWhenDisabled
+									disabled={ ! hasResolvedPages }
+									onClick={ convertToNavigationLinks }
+								>
+									{ __( 'Edit' ) }
+								</Button>
+							</div>
+						) }
+					</ToolsPanel>
+				</InspectorControls>
+			) }
+			{ allowConvertToLinks && (
+				<>
+					<BlockControls group="other">
+						<ToolbarButton
+							title={ __( 'Edit' ) }
+							onClick={ openModal }
+						>
+							{ __( 'Edit' ) }
+						</ToolbarButton>
+					</BlockControls>
+					{ isOpen && (
+						<ConvertToLinksModal
+							onClick={ convertToNavigationLinks }
+							onClose={ closeModal }
+							disabled={ ! hasResolvedPages }
+						/>
+					) }
+				</>
+			) }
+			<BlockContent
+				blockProps={ blockProps }
+				innerBlocksProps={ innerBlocksProps }
+				hasResolvedPages={ hasResolvedPages }
+				blockList={ blockList }
+				pages={ pages }
+				parentPageID={ parentPageID }
+			/>
 		</>
 	);
 }
-
-function useFrontPageId() {
-	return useSelect( ( select ) => {
-		const canReadSettings = select( coreStore ).canUser(
-			'read',
-			'settings'
-		);
-		if ( ! canReadSettings ) {
-			return undefined;
-		}
-
-		const site = select( coreStore ).getEntityRecord( 'root', 'site' );
-		return site?.show_on_front === 'page' && site?.page_on_front;
-	}, [] );
-}
-
-function useGetPages() {
-	const { records: pages, hasResolved: hasResolvedPages } = useEntityRecords(
-		'postType',
-		'page',
-		{
-			orderby: 'menu_order',
-			order: 'asc',
-			_fields: [ 'id', 'link', 'parent', 'title', 'menu_order' ],
-			per_page: -1,
-			context: 'view',
-		}
-	);
-
-	return [ pages, hasResolvedPages ];
-}
-
-function usePageData( pageId = 0 ) {
-	const [ pages, hasResolvedPages ] = useGetPages();
-
-	return useMemo( () => {
-		// TODO: Once the REST API supports passing multiple values to
-		// 'orderby', this can be removed.
-		// https://core.trac.wordpress.org/ticket/39037
-
-		if ( pageId !== 0 ) {
-			return pages.find( ( page ) => page.id === pageId );
-		}
-
-		const sortedPages = [ ...( pages ?? [] ) ].sort( ( a, b ) => {
-			if ( a.menu_order === b.menu_order ) {
-				return a.title.rendered.localeCompare( b.title.rendered );
-			}
-			return a.menu_order - b.menu_order;
-		} );
-		const pagesByParentId = sortedPages.reduce( ( accumulator, page ) => {
-			const { parent } = page;
-			if ( accumulator.has( parent ) ) {
-				accumulator.get( parent ).push( page );
-			} else {
-				accumulator.set( parent, [ page ] );
-			}
-			return accumulator;
-		}, new Map() );
-
-		return {
-			pagesByParentId,
-			hasResolvedPages,
-			totalPages: pages?.length ?? null,
-		};
-	}, [ pageId, pages, hasResolvedPages ] );
-}
-
-const PageItems = memo( function PageItems( {
-	context,
-	pagesByParentId,
-	parentId = 0,
-	depth = 0,
-} ) {
-	const parentPage = usePageData( parentId );
-	const pages = pagesByParentId.get( parentId )
-		? pagesByParentId.get( parentId )
-		: [ parentPage ];
-	const frontPageId = useFrontPageId();
-
-	if ( ! pages?.length ) {
-		return [];
-	}
-
-	return pages.map( ( page ) => {
-		const hasChildren = pagesByParentId.has( page.id );
-		const isNavigationChild = 'showSubmenuIcon' in context;
-		return (
-			<li
-				key={ page.id }
-				className={ classnames( 'wp-block-pages-list__item', {
-					'has-child': hasChildren,
-					'wp-block-navigation-item': isNavigationChild,
-					'open-on-click': context.openSubmenusOnClick,
-					'open-on-hover-click':
-						! context.openSubmenusOnClick &&
-						context.showSubmenuIcon,
-					'menu-item-home': page.id === frontPageId,
-				} ) }
-			>
-				{ hasChildren && context.openSubmenusOnClick ? (
-					<>
-						<button
-							className="wp-block-navigation-item__content wp-block-navigation-submenu__toggle"
-							aria-expanded="false"
-						>
-							{ page.title?.rendered }
-						</button>
-						<span className="wp-block-page-list__submenu-icon wp-block-navigation__submenu-icon">
-							<ItemSubmenuIcon />
-						</span>
-					</>
-				) : (
-					<a
-						className={ classnames(
-							'wp-block-pages-list__item__link',
-							{
-								'wp-block-navigation-item__content':
-									isNavigationChild,
-							}
-						) }
-						href={ page.link }
-					>
-						{ page.title?.rendered }
-					</a>
-				) }
-				{ hasChildren && (
-					<>
-						{ ! context.openSubmenusOnClick &&
-							context.showSubmenuIcon && (
-								<button
-									className="wp-block-navigation-item__content wp-block-navigation-submenu__toggle wp-block-page-list__submenu-icon wp-block-navigation__submenu-icon"
-									aria-expanded="false"
-								>
-									<ItemSubmenuIcon />
-								</button>
-							) }
-						<ul
-							className={ classnames( 'submenu-container', {
-								'wp-block-navigation__submenu-container':
-									isNavigationChild,
-							} ) }
-						>
-							<PageItems
-								context={ context }
-								pagesByParentId={ pagesByParentId }
-								parentId={ page.id }
-								depth={ depth + 1 }
-							/>
-						</ul>
-					</>
-				) }
-			</li>
-		);
-	} );
-} );

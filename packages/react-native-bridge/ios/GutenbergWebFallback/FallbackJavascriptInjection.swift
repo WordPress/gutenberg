@@ -19,9 +19,10 @@ public struct FallbackJavascriptInjection {
     public let preventAutosavesScript: WKUserScript
     public let getHtmlContentScript = "window.getHTMLPostContent()".toJsScript()
     public let gutenbergObserverScript: WKUserScript
+    public let editorBehaviorScript: WKUserScript
 
     /// Init an instance of GutenbergWebJavascriptInjection or throws if any of the required sources doesn't exist.
-    /// This helps to cach early any possible error due to missing source files.
+    /// This helps to cache early any possible error due to missing source files.
     /// - Parameter blockHTML: The block HTML code to be injected.
     /// - Parameter userId: The id of the logged user.
     /// - Throws: Throws an error if any required source doesn't exist.
@@ -31,7 +32,7 @@ public struct FallbackJavascriptInjection {
         }
 
         func getInjectCssScript(with source: SourceFile) throws -> WKUserScript {
-            "window.injectCss(`\(try source.getContent())`)".toJsScript()
+            "window.injectCss(`\(try source.getContent())`, `\(source.getName())`)".toJsScript()
         }
 
         userContentScripts = [
@@ -44,6 +45,7 @@ public struct FallbackJavascriptInjection {
         injectEditorCssScript = try getInjectCssScript(with: .editorStyle)
         preventAutosavesScript = try script(with: .preventAutosaves)
         gutenbergObserverScript = try script(with: .gutenbergObserver)
+        editorBehaviorScript = try script(with: .editorBehavior)
 
         let localStorageJsonString = try SourceFile.localStorage.getContent().removingSpacesAndNewLines()
         let scriptString = String(format: injectLocalStorageScriptTemplate, userId, localStorageJsonString)

@@ -1,34 +1,23 @@
 /**
  * WordPress dependencies
  */
-import {
-	Button,
-	__unstableCompositeItem as CompositeItem,
-} from '@wordpress/components';
-import { forwardRef, useContext } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
-import InserterListboxContext from './context';
+import { Button, Composite } from '@wordpress/components';
+import { forwardRef } from '@wordpress/element';
 
 function InserterListboxItem(
 	{ isFirst, as: Component, children, ...props },
 	ref
 ) {
-	const state = useContext( InserterListboxContext );
 	return (
-		<CompositeItem
+		<Composite.Item
 			ref={ ref }
-			state={ state }
 			role="option"
-			// Use the CompositeItem `focusable` prop over Button's
-			// isFocusable. The latter was shown to cause an issue
-			// with tab order in the inserter list.
-			focusable
+			// Use the Composite.Item `accessibleWhenDisabled` prop
+			// over Button's `isFocusable`. The latter was shown to
+			// cause an issue with tab order in the inserter list.
+			accessibleWhenDisabled
 			{ ...props }
-		>
-			{ ( htmlProps ) => {
+			render={ ( htmlProps ) => {
 				const propsWithTabIndex = {
 					...htmlProps,
 					tabIndex: isFirst ? 0 : htmlProps.tabIndex,
@@ -43,9 +32,13 @@ function InserterListboxItem(
 				if ( typeof children === 'function' ) {
 					return children( propsWithTabIndex );
 				}
-				return <Button { ...propsWithTabIndex }>{ children }</Button>;
+				return (
+					<Button __next40pxDefaultSize { ...propsWithTabIndex }>
+						{ children }
+					</Button>
+				);
 			} }
-		</CompositeItem>
+		/>
 	);
 }
 

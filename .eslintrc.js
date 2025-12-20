@@ -1,23 +1,5 @@
-/**
- * External dependencies
- */
-const glob = require( 'glob' ).sync;
 const { join } = require( 'path' );
-
-/**
- * Internal dependencies
- */
-const { version } = require( './package' );
-
-/**
- * Regular expression string matching a SemVer string with equal major/minor to
- * the current package version. Used in identifying deprecations.
- *
- * @type {string}
- */
-const majorMinorRegExp =
-	version.replace( /\.\d+$/, '' ).replace( /[\\^$.*+?()[\]{}|]/g, '\\$&' ) +
-	'(\\.\\d+)?';
+const glob = require( 'glob' ).sync;
 
 /**
  * The list of patterns matching files used only for development purposes.
@@ -29,6 +11,8 @@ const developmentFiles = [
 	'**/@(__mocks__|__tests__|test)/**/*.[tj]s?(x)',
 	'**/@(storybook|stories)/**/*.[tj]s?(x)',
 	'packages/babel-preset-default/bin/**/*.js',
+	'packages/theme/bin/**/*.[tj]s?(x)',
+	'packages/theme/terrazzo.config.ts',
 ];
 
 // All files from packages that have types provided with TypeScript.
@@ -36,27 +20,133 @@ const typedFiles = glob( 'packages/*/package.json' )
 	.filter( ( fileName ) => require( join( __dirname, fileName ) ).types )
 	.map( ( fileName ) => fileName.replace( 'package.json', '**/*.js' ) );
 
+const restrictedImports = [
+	{
+		name: 'framer-motion',
+		message:
+			'Please use the Framer Motion API through `@wordpress/components` instead.',
+	},
+	{
+		name: 'lodash',
+		message: 'Please use native functionality instead.',
+	},
+	{
+		name: '@ariakit/react',
+		message:
+			'Please use Ariakit API through `@wordpress/components` instead.',
+	},
+	{
+		name: 'redux',
+		importNames: [ 'combineReducers' ],
+		message: 'Please use `combineReducers` from `@wordpress/data` instead.',
+	},
+	{
+		name: '@emotion/css',
+		message:
+			'Please use `@emotion/react` and `@emotion/styled` in order to maintain iframe support. As a replacement for the `cx` function, please use the `useCx` hook defined in `@wordpress/components` instead.',
+	},
+	{
+		name: '@wordpress/edit-post',
+		message:
+			"edit-post is a WordPress top level package that shouldn't be imported into other packages",
+	},
+	{
+		name: '@wordpress/edit-site',
+		message:
+			"edit-site is a WordPress top level package that shouldn't be imported into other packages",
+	},
+	{
+		name: '@wordpress/edit-widgets',
+		message:
+			"edit-widgets is a WordPress top level package that shouldn't be imported into other packages",
+	},
+	{
+		name: 'classnames',
+		message:
+			"Please use `clsx` instead. It's a lighter and faster drop-in replacement for `classnames`.",
+	},
+];
+
+const restrictedSyntax = [
+	{
+		selector:
+			'CallExpression[callee.object.name="page"][callee.property.name="waitFor"]',
+		message:
+			'This method is deprecated. You should use the more explicit API methods available.',
+	},
+	{
+		selector:
+			'CallExpression[callee.object.name="page"][callee.property.name="waitForTimeout"]',
+		message: 'Prefer page.waitForSelector instead.',
+	},
+	{
+		selector: 'JSXAttribute[name.name="id"][value.type="Literal"]',
+		message: 'Do not use string literals for IDs; use useId hook instead.',
+	},
+	{
+		selector:
+			'CallExpression[callee.name="withDispatch"] > :function > BlockStatement > :not(VariableDeclaration,ReturnStatement)',
+		message:
+			'withDispatch must return an object with consistent keys. Avoid performing logic in `mapDispatchToProps`.',
+	},
+	{
+		selector:
+			'LogicalExpression[operator="&&"][left.property.name="length"][right.type="JSXElement"]',
+		message:
+			'Avoid truthy checks on length property rendering, as zero length is rendered verbatim.',
+	},
+	{
+		selector:
+			'CallExpression[callee.name=/^(__|_x|_n|_nx)$/] > Literal[value=/toggle\\b/i]',
+		message: "Avoid using the verb 'Toggle' in translatable strings",
+	},
+	{
+		selector:
+			'CallExpression[callee.name=/^(__|_x|_n|_nx)$/] > Literal[value=/(?<![-\\w])sidebar(?![-\\w])/i]',
+		message:
+			"Avoid using the word 'sidebar' in translatable strings. Consider using 'panel' instead.",
+	},
+];
+
+/** `no-restricted-syntax` rules for components. */
+const restrictedSyntaxComponents = [
+	{
+		selector:
+			'JSXOpeningElement[name.name="Button"]:not(:has(JSXAttribute[name.name="accessibleWhenDisabled"])) JSXAttribute[name.name="disabled"]',
+		message:
+			'`disabled` used without the `accessibleWhenDisabled` prop. Disabling a control without maintaining focusability can cause accessibility issues, by hiding their presence from screen reader users, or preventing focus from returning to a trigger element. (Ignore this error if you truly mean to disable.)',
+	},
+];
+
 module.exports = {
 	root: true,
 	extends: [
 		'plugin:@wordpress/eslint-plugin/recommended',
 		'plugin:eslint-comments/recommended',
+		'plugin:storybook/recommended',
 	],
+	plugins: [ 'react-compiler' ],
 	globals: {
 		wp: 'off',
+		globalThis: 'readonly',
 	},
 	settings: {
 		jsdoc: {
 			mode: 'typescript',
 		},
-		'import/internal-regex': null,
 		'import/resolver': require.resolve( './tools/eslint/import-resolver' ),
 	},
 	rules: {
 		'jest/expect-expect': 'off',
-		'@wordpress/dependency-group': 'error',
-		'@wordpress/is-gutenberg-plugin': 'error',
+		'react/jsx-boolean-value': 'error',
+		'react/jsx-curly-brace-presence': [
+			'error',
+			{ props: 'never', children: 'never' },
+		],
+		'@wordpress/wp-global-usage': 'error',
 		'@wordpress/react-no-unsafe-timeout': 'error',
+		'@wordpress/i18n-hyphenated-range': 'error',
+		'@wordpress/i18n-no-flanking-whitespace': 'error',
 		'@wordpress/i18n-text-domain': [
 			'error',
 			{
@@ -65,142 +155,13 @@ module.exports = {
 		],
 		'@wordpress/no-unsafe-wp-apis': 'off',
 		'@wordpress/data-no-store-string-literals': 'error',
+		'eslint-comments/no-unused-disable': 'error',
 		'import/default': 'error',
 		'import/named': 'error',
 		'no-restricted-imports': [
 			'error',
 			{
-				paths: [
-					{
-						name: 'framer-motion',
-						message:
-							'Please use the Framer Motion API through `@wordpress/components` instead.',
-					},
-					{
-						name: 'lodash',
-						importNames: [
-							'camelCase',
-							'capitalize',
-							'castArray',
-							'chunk',
-							'clamp',
-							'cloneDeep',
-							'compact',
-							'concat',
-							'countBy',
-							'debounce',
-							'deburr',
-							'defaults',
-							'defaultTo',
-							'delay',
-							'difference',
-							'differenceWith',
-							'dropRight',
-							'each',
-							'escape',
-							'escapeRegExp',
-							'every',
-							'extend',
-							'findIndex',
-							'findKey',
-							'findLast',
-							'first',
-							'flatMap',
-							'flatten',
-							'flattenDeep',
-							'flow',
-							'flowRight',
-							'forEach',
-							'fromPairs',
-							'has',
-							'identity',
-							'includes',
-							'invoke',
-							'isArray',
-							'isBoolean',
-							'isFinite',
-							'isFunction',
-							'isMatch',
-							'isNil',
-							'isNumber',
-							'isObject',
-							'isObjectLike',
-							'isPlainObject',
-							'isString',
-							'isUndefined',
-							'keyBy',
-							'keys',
-							'last',
-							'lowerCase',
-							'mapKeys',
-							'maxBy',
-							'memoize',
-							'negate',
-							'noop',
-							'nth',
-							'omitBy',
-							'once',
-							'overEvery',
-							'partial',
-							'partialRight',
-							'random',
-							'reduce',
-							'reject',
-							'repeat',
-							'reverse',
-							'size',
-							'snakeCase',
-							'some',
-							'sortBy',
-							'startCase',
-							'startsWith',
-							'stubFalse',
-							'stubTrue',
-							'sum',
-							'sumBy',
-							'take',
-							'throttle',
-							'times',
-							'toString',
-							'trim',
-							'truncate',
-							'unionBy',
-							'uniq',
-							'uniqBy',
-							'uniqueId',
-							'uniqWith',
-							'upperFirst',
-							'values',
-							'without',
-							'words',
-							'xor',
-							'zip',
-						],
-						message:
-							'This Lodash method is not recommended. Please use native functionality instead. If using `memoize`, please use `memize` instead.',
-					},
-					{
-						name: 'reakit',
-						message:
-							'Please use Reakit API through `@wordpress/components` instead.',
-					},
-					{
-						name: 'redux',
-						importNames: [ 'combineReducers' ],
-						message:
-							'Please use `combineReducers` from `@wordpress/data` instead.',
-					},
-					{
-						name: 'puppeteer-testing-library',
-						message:
-							'`puppeteer-testing-library` is still experimental.',
-					},
-					{
-						name: '@emotion/css',
-						message:
-							'Please use `@emotion/react` and `@emotion/styled` in order to maintain iframe support. As a replacement for the `cx` function, please use the `useCx` hook defined in `@wordpress/components` instead.',
-					},
-				],
+				paths: restrictedImports,
 			},
 		],
 		'@typescript-eslint/no-restricted-imports': [
@@ -216,61 +177,27 @@ module.exports = {
 				],
 			},
 		],
-		'no-restricted-syntax': [
+		'@typescript-eslint/consistent-type-imports': [
 			'error',
-			// NOTE: We can't include the forward slash in our regex or
-			// we'll get a `SyntaxError` (Invalid regular expression: \ at end of pattern)
-			// here. That's why we use \\u002F in the regexes below.
 			{
-				selector:
-					'ImportDeclaration[source.value=/^@wordpress\\u002F.+\\u002F/]',
-				message:
-					'Path access on WordPress dependencies is not allowed.',
+				prefer: 'type-imports',
+				disallowTypeAnnotations: false,
 			},
+		],
+		'no-restricted-syntax': [ 'error', ...restrictedSyntax ],
+		'jsdoc/check-tag-names': [
+			'error',
 			{
-				selector:
-					'CallExpression[callee.name="deprecated"] Property[key.name="version"][value.value=/' +
-					majorMinorRegExp +
-					'/]',
-				message:
-					'Deprecated functions must be removed before releasing this version.',
+				definedTags: [ 'jest-environment' ],
 			},
+		],
+		'react-compiler/react-compiler': [
+			'error',
 			{
-				selector:
-					'CallExpression[callee.object.name="page"][callee.property.name="waitFor"]',
-				message:
-					'This method is deprecated. You should use the more explicit API methods available.',
-			},
-			{
-				selector:
-					'CallExpression[callee.object.name="page"][callee.property.name="waitForTimeout"]',
-				message: 'Prefer page.waitForSelector instead.',
-			},
-			{
-				selector: 'JSXAttribute[name.name="id"][value.type="Literal"]',
-				message:
-					'Do not use string literals for IDs; use withInstanceId instead.',
-			},
-			{
-				// Discourage the usage of `Math.random()` as it's a code smell
-				// for UUID generation, for which we already have a higher-order
-				// component: `withInstanceId`.
-				selector:
-					'CallExpression[callee.object.name="Math"][callee.property.name="random"]',
-				message:
-					'Do not use Math.random() to generate unique IDs; use withInstanceId instead. (If you’re not generating unique IDs: ignore this message.)',
-			},
-			{
-				selector:
-					'CallExpression[callee.name="withDispatch"] > :function > BlockStatement > :not(VariableDeclaration,ReturnStatement)',
-				message:
-					'withDispatch must return an object with consistent keys. Avoid performing logic in `mapDispatchToProps`.',
-			},
-			{
-				selector:
-					'LogicalExpression[operator="&&"][left.property.name="length"][right.type="JSXElement"]',
-				message:
-					'Avoid truthy checks on length property rendering, as zero length is rendered verbatim.',
+				environment: {
+					enableTreatRefLikeIdentifiersAsRefs: true,
+					validateRefAccessDuringRender: false,
+				},
 			},
 		],
 	},
@@ -287,6 +214,7 @@ module.exports = {
 				'import/no-unresolved': 'off',
 				'import/named': 'off',
 				'@wordpress/data-no-store-string-literals': 'off',
+				'react-compiler/react-compiler': 'off',
 			},
 		},
 		{
@@ -323,15 +251,72 @@ module.exports = {
 			},
 		},
 		{
-			files: [ 'packages/components/src/**/*.[tj]s?(x)' ],
-			excludedFiles: [ ...developmentFiles ],
+			files: [
+				'packages/*/src/**/*.[tj]s?(x)',
+				'storybook/stories/**/*.[tj]s?(x)',
+			],
+			excludedFiles: [ '**/*.native.js' ],
 			rules: {
-				'react-hooks/exhaustive-deps': 'error',
+				'no-restricted-syntax': [
+					'error',
+					...restrictedSyntax,
+					...restrictedSyntaxComponents,
+				],
+			},
+		},
+		{
+			files: [ 'packages/*/src/**/*.[tj]s?(x)' ],
+			excludedFiles: [
+				'packages/*/src/**/@(test|stories)/**',
+				'**/*.@(native|ios|android).js',
+			],
+			rules: {
+				'no-restricted-syntax': [
+					'error',
+					...restrictedSyntax,
+					...restrictedSyntaxComponents,
+					// Temporary rules until we're ready to officially default to the new size.
+					...[
+						'BorderBoxControl',
+						'BorderControl',
+						'BoxControl',
+						'Button',
+						'ComboboxControl',
+						'CustomSelectControl',
+
+						'FontAppearanceControl',
+						'FontFamilyControl',
+						'FontSizePicker',
+						'FormTokenField',
+						'InputControl',
+						'LetterSpacingControl',
+						'LineHeightControl',
+						'NumberControl',
+						'RangeControl',
+						'SelectControl',
+						'TextControl',
+						'ToggleGroupControl',
+						'UnitControl',
+					].map( ( componentName ) => ( {
+						// Falsy `__next40pxDefaultSize` without a non-default `size` prop.
+						selector: `JSXOpeningElement[name.name="${ componentName }"]:not(:has(JSXAttribute[name.name="__next40pxDefaultSize"][value.expression.value!=false])):not(:has(JSXAttribute[name.name="size"][value.value!="default"]))`,
+						message:
+							componentName +
+							' should have the `__next40pxDefaultSize` prop when using the default size.',
+					} ) ),
+					{
+						// Falsy `__next40pxDefaultSize` without a `render` prop.
+						selector:
+							'JSXOpeningElement[name.name="FormFileUpload"]:not(:has(JSXAttribute[name.name="__next40pxDefaultSize"][value.expression.value!=false])):not(:has(JSXAttribute[name.name="render"]))',
+						message:
+							'FormFileUpload should have the `__next40pxDefaultSize` prop to opt-in to the new default size.',
+					},
+				],
 			},
 		},
 		{
 			files: [ 'packages/jest*/**/*.js', '**/test/**/*.js' ],
-			excludedFiles: [ 'test/e2e/**/*.js' ],
+			excludedFiles: [ 'test/e2e/**/*.js', 'test/performance/**/*.js' ],
 			extends: [ 'plugin:@wordpress/eslint-plugin/test-unit' ],
 		},
 		{
@@ -341,15 +326,14 @@ module.exports = {
 				'packages/react-native-*/**/*.[tj]s?(x)',
 				'test/native/**/*.[tj]s?(x)',
 				'test/e2e/**/*.[tj]s?(x)',
+				'test/performance/**/*.[tj]s?(x)',
+				'test/storybook-playwright/**/*.[tj]s?(x)',
 			],
 			extends: [
 				'plugin:jest-dom/recommended',
 				'plugin:testing-library/react',
+				'plugin:jest/recommended',
 			],
-			rules: {
-				'testing-library/no-container': 'off',
-				'testing-library/no-node-access': 'off',
-			},
 		},
 		{
 			files: [ 'packages/e2e-test*/**/*.js' ],
@@ -362,9 +346,21 @@ module.exports = {
 		{
 			files: [
 				'test/e2e/**/*.[tj]s',
+				'test/performance/**/*.[tj]s',
 				'packages/e2e-test-utils-playwright/**/*.[tj]s',
 			],
-			extends: [ 'plugin:eslint-plugin-playwright/playwright-test' ],
+			extends: [
+				'plugin:@wordpress/eslint-plugin/test-playwright',
+				'plugin:@typescript-eslint/base',
+			],
+			parserOptions: {
+				tsconfigRootDir: __dirname,
+				project: [
+					'./test/e2e/tsconfig.json',
+					'./test/performance/tsconfig.json',
+					'./packages/e2e-test-utils-playwright/tsconfig.json',
+				],
+			},
 			rules: {
 				'@wordpress/no-global-active-element': 'off',
 				'@wordpress/no-global-get-selection': 'off',
@@ -386,10 +382,19 @@ module.exports = {
 						message: 'Prefer page.locator instead.',
 					},
 				],
+				'playwright/no-conditional-in-test': 'off',
+				'@typescript-eslint/await-thenable': 'error',
+				'@typescript-eslint/no-floating-promises': 'error',
+				'@typescript-eslint/no-misused-promises': 'error',
 			},
 		},
 		{
-			files: [ 'bin/**/*.js', 'bin/**/*.mjs', 'packages/env/**' ],
+			files: [
+				'bin/**/*.js',
+				'bin/**/*.mjs',
+				'packages/env/**',
+				'packages/theme/bin/**/*.[tj]s?(x)',
+			],
 			rules: {
 				'no-console': 'off',
 			},
@@ -401,9 +406,24 @@ module.exports = {
 				'jsdoc/valid-types': 'off',
 			},
 		},
+		// Progressively opting in to stricter rules for enforcing file
+		// extensions matching the presence of JSX syntax. This should be
+		// expanded and eventually enforced on all files.
 		{
 			files: [
-				'**/@(storybook|stories)/*',
+				'**/@(storybook|stories)/**',
+				'packages/components/src/**/*.tsx',
+			],
+			rules: {
+				'react/jsx-filename-extension': [
+					'error',
+					{ extensions: [ '.jsx', '.tsx' ] },
+				],
+			},
+		},
+		{
+			files: [
+				'**/@(storybook|stories)/**',
 				'packages/components/src/**/*.tsx',
 			],
 			rules: {
@@ -414,9 +434,104 @@ module.exports = {
 		},
 		{
 			files: [ 'packages/components/src/**' ],
+			excludedFiles: [
+				'packages/components/src/utils/colors-values.js',
+				'packages/components/src/theme/**',
+			],
+			rules: {
+				'no-restricted-syntax': [
+					'error',
+					...restrictedSyntax,
+					...restrictedSyntaxComponents,
+					{
+						selector:
+							':matches(Literal[value=/--wp-admin-theme-/],TemplateElement[value.cooked=/--wp-admin-theme-/])',
+						message:
+							'--wp-admin-theme-* variables do not support component theming. Use variables from the COLORS object in packages/components/src/utils/colors-values.js instead.',
+					},
+					{
+						selector:
+							// Allow overriding definitions, but not access with var()
+							':matches(Literal[value=/var\\(\\s*--wp-components-color-/],TemplateElement[value.cooked=/var\\(\\s*--wp-components-color-/])',
+						message:
+							'To ensure proper fallbacks, --wp-components-color-* variables should not be used directly. Use variables from the COLORS object in packages/components/src/utils/colors-values.js instead.',
+					},
+				],
+			},
+		},
+		{
+			files: [ 'packages/components/src/**' ],
 			excludedFiles: [ 'packages/components/src/**/@(test|stories)/**' ],
 			plugins: [ 'ssr-friendly' ],
 			extends: [ 'plugin:ssr-friendly/recommended' ],
+		},
+		{
+			files: [ 'packages/components/src/**' ],
+			rules: {
+				'no-restricted-imports': [
+					'error',
+					// The `ariakit` and `framer-motion` APIs are meant to be consumed via
+					// the `@wordpress/components` package, hence why importing those
+					// dependencies should be allowed in the components package.
+					{
+						paths: restrictedImports.filter(
+							( { name } ) =>
+								! [
+									'@ariakit/react',
+									'framer-motion',
+								].includes( name )
+						),
+					},
+				],
+			},
+		},
+		{
+			files: [ 'packages/block-editor/**' ],
+			rules: {
+				'no-restricted-imports': [
+					'error',
+					{
+						paths: [
+							...restrictedImports,
+							{
+								name: '@wordpress/api-fetch',
+								message:
+									"block-editor is a generic package that doesn't depend on a server or WordPress backend. To provide WordPress integration, consider passing settings to the BlockEditorProvider components.",
+							},
+							{
+								name: '@wordpress/core-data',
+								message:
+									"block-editor is a generic package that doesn't depend on a server or WordPress backend. To provide WordPress integration, consider passing settings to the BlockEditorProvider components.",
+							},
+						],
+					},
+				],
+			},
+		},
+		{
+			files: [ 'packages/edit-post/**', 'packages/edit-site/**' ],
+			rules: {
+				'no-restricted-imports': [
+					'error',
+					{
+						paths: [
+							...restrictedImports,
+							{
+								name: '@wordpress/interface',
+								message:
+									'The edit-post and edit-site package should not directly import the interface package. They should import them from the private APIs of the editor package instead.',
+							},
+						],
+					},
+				],
+			},
+		},
+		{
+			files: [ 'packages/interactivity*/src/**' ],
+			rules: {
+				'react-compiler/react-compiler': 'off',
+				'react/react-in-jsx-scope': 'error',
+			},
 		},
 	],
 };

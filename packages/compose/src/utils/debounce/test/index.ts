@@ -5,14 +5,6 @@ import { debounce } from '../index';
 
 const identity = ( value ) => value;
 
-beforeAll( () => {
-	jest.useRealTimers();
-} );
-
-afterAll( () => {
-	jest.useFakeTimers();
-} );
-
 describe( 'debounce', () => {
 	it( 'should debounce a function', () => {
 		return new Promise( ( done ) => {

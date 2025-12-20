@@ -8,7 +8,7 @@ const instanceMap = new WeakMap< object, number >();
 /**
  * Creates a new id for a given object.
  *
- * @param  object Object reference to create an id for.
+ * @param object Object reference to create an id for.
  * @return The instance id (index).
  */
 function createId( object: object ): number {
@@ -26,6 +26,8 @@ function createId( object: object ): number {
  * 1. When only object is given, the returned value is a number
  * 2. When object and prefix is given, the returned value is a string
  * 3. When preferredId is given, the returned value is the type of preferredId
+ *
+ * @param object Object reference to create an id for.
  */
 function useInstanceId( object: object ): number;
 function useInstanceId( object: object, prefix: string ): string;
@@ -38,9 +40,9 @@ function useInstanceId< T extends string | number >(
 /**
  * Provides a unique instance ID.
  *
- * @param  object        Object reference to create an id for.
- * @param  [prefix]      Prefix for the unique id.
- * @param  [preferredId] Default ID to use.
+ * @param object        Object reference to create an id for.
+ * @param [prefix]      Prefix for the unique id.
+ * @param [preferredId] Default ID to use.
  * @return The unique instance id.
  */
 function useInstanceId(
@@ -49,11 +51,13 @@ function useInstanceId(
 	preferredId?: string | number
 ): string | number {
 	return useMemo( () => {
-		if ( preferredId ) return preferredId;
+		if ( preferredId ) {
+			return preferredId;
+		}
 		const id = createId( object );
 
 		return prefix ? `${ prefix }-${ id }` : id;
-	}, [ object ] );
+	}, [ object, preferredId, prefix ] );
 }
 
 export default useInstanceId;

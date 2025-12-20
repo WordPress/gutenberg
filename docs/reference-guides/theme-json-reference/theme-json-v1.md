@@ -1,6 +1,24 @@
-# Version 1 Reference
+# Theme.json Version 1 Reference
 
-Theme.json version 2 has been released, see the [theme.json migration guide](/docs/reference-guides/theme-json-reference/theme-json-migrations.md#migrating-from-v1-to-v2) for updating to the latest version.
+> This is the specification for  **version 1** of `theme.json`. This version works with WordPress 5.8 or later.
+
+<div class="callout callout-alert">
+
+Theme.json version 2 has been released with WordPress 5.9. WordPress will continue to support theme.json version 1. However new features will only be added to [new versions](/docs/reference-guides/theme-json-reference/theme-json-living.md).
+
+When you are ready to upgrade, see the [theme.json migration guide](/docs/reference-guides/theme-json-reference/theme-json-migrations.md#migrating-from-v1-to-v2) for details on updating to the latest version.
+
+</div>
+
+This reference guide lists the settings and style properties defined in the `theme.json` schema. See the [theme.json how to guide](/docs/how-to-guides/themes/global-settings-and-styles.md) for examples and guidance on how to use the `theme.json` file in your theme.
+
+## JSON Schema
+
+The last schema for version 1 is available at `https://schemas.wp.org/wp/5.8/theme.json`.
+
+Theme.json schemas for each WordPress version are available at `https://schemas.wp.org/wp/{{version}}/theme.json`. For example a schema for WordPress 5.8 is available at `https://schemas.wp.org/wp/5.8/theme.json`.
+
+See [Developing with theme.json](/docs/how-to-guides/themes/global-settings-and-styles.md#developing-with-themejson) for how to use the JSON schema in your editor.
 
 ## Settings
 

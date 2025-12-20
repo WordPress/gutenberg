@@ -1,4 +1,4 @@
-/* stylelint-disable font-family-no-missing-generic-family-keyword */
+/* stylelint-disable font-family-no-missing-generic-family-keyword -- iOS will use the Menlo typeface and Android will use monospace, no need for a generic family keyword. */
 
 .blockCode {
 	font-family: $default-monospace-font;

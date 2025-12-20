@@ -4,7 +4,7 @@
 import { useMergeRefs, useFocusableIframe } from '@wordpress/compose';
 import { useRef, useEffect, useMemo } from '@wordpress/element';
 
-/** @typedef {import('@wordpress/element').WPSyntheticEvent} WPSyntheticEvent */
+/** @typedef {import('react').SyntheticEvent} SyntheticEvent */
 
 const attributeMap = {
 	class: 'className',
@@ -20,10 +20,14 @@ export default function WpEmbedPreview( { html } ) {
 		const iframe = doc.querySelector( 'iframe' );
 		const iframeProps = {};
 
-		if ( ! iframe ) return iframeProps;
+		if ( ! iframe ) {
+			return iframeProps;
+		}
 
 		Array.from( iframe.attributes ).forEach( ( { name, value } ) => {
-			if ( name === 'style' ) return;
+			if ( name === 'style' ) {
+				return;
+			}
 			iframeProps[ attributeMap[ name ] || name ] = value;
 		} );
 

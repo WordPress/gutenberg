@@ -5,22 +5,25 @@ Snapshot Diff:
 - Received styles
 + Base styles
 
-@@ -3,7 +3,8 @@
-      "color": "#1e1e1e",
+@@ -3,8 +3,9 @@
+      "color": "var(--wp-components-color-foreground, #1e1e1e)",
       "font-size": "calc((13 / 13) * 13px)",
       "font-weight": "normal",
-      "line-height": "1.2",
+      "line-height": "1.4",
       "margin": "0",
 +     "text-align": "center",
+      "text-wrap": "pretty",
     },
   ]
 `;
 
 exports[`Text should render highlighted words with highlightCaseSensitive 1`] = `
 .emotion-0 {
-  color: #1e1e1e;
-  line-height: 1.2;
+  color: var(--wp-components-color-foreground, #1e1e1e);
+  line-height: 1.4;
   margin: 0;
+  text-wrap: balance;
+  text-wrap: pretty;
   font-size: calc((13 / 13) * 13px);
   font-weight: normal;
 }
@@ -49,9 +52,11 @@ exports[`Text should render highlighted words with highlightCaseSensitive 1`] = 
 
 exports[`Text snapshot tests should render correctly 1`] = `
 .emotion-0 {
-  color: #1e1e1e;
-  line-height: 1.2;
+  color: var(--wp-components-color-foreground, #1e1e1e);
+  line-height: 1.4;
   margin: 0;
+  text-wrap: balance;
+  text-wrap: pretty;
   font-size: calc((13 / 13) * 13px);
   font-weight: normal;
 }

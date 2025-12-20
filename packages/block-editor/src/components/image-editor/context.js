@@ -10,6 +10,7 @@ import useSaveImage from './use-save-image';
 import useTransformImage from './use-transform-image';
 
 const ImageEditingContext = createContext( {} );
+ImageEditingContext.displayName = 'ImageEditingContext';
 
 export const useImageEditingContext = () => useContext( ImageEditingContext );
 
@@ -18,19 +19,15 @@ export default function ImageEditingProvider( {
 	url,
 	naturalWidth,
 	naturalHeight,
-	isEditing,
 	onFinishEditing,
 	onSaveImage,
 	children,
 } ) {
-	const transformImage = useTransformImage(
-		{
-			url,
-			naturalWidth,
-			naturalHeight,
-		},
-		isEditing
-	);
+	const transformImage = useTransformImage( {
+		url,
+		naturalWidth,
+		naturalHeight,
+	} );
 
 	const saveImage = useSaveImage( {
 		id,

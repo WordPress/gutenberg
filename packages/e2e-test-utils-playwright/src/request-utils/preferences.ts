@@ -6,7 +6,7 @@ import type { RequestUtils } from './index';
 /**
  * Reset user preferences
  *
- * @param {this} this Request utils.
+ * @param this Request utils.
  */
 export async function resetPreferences( this: RequestUtils ) {
 	await this.rest( {

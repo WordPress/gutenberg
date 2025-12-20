@@ -1,0 +1,63 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Notice should match snapshot 1`] = `
+<div>
+  <div
+    class="components-notice is-success is-dismissible"
+  >
+    <div
+      class="components-visually-hidden emotion-0 emotion-1"
+      data-wp-c16t="true"
+      data-wp-component="VisuallyHidden"
+      style="border: 0px; clip: rect(1px, 1px, 1px, 1px); clip-path: inset( 50% ); height: 1px; margin: -1px; overflow: hidden; padding: 0px; position: absolute; width: 1px; word-wrap: normal;"
+    >
+      Notice
+    </div>
+    <div
+      class="components-notice__content"
+    >
+      Example
+      <div
+        class="components-notice__actions"
+      >
+        <a
+          class="components-button components-notice__action is-next-40px-default-size is-link"
+          href="https://example.com"
+        >
+          More information
+        </a>
+        <button
+          class="components-button components-notice__action is-next-40px-default-size is-secondary"
+          type="button"
+        >
+          Cancel
+        </button>
+        <button
+          class="components-button components-notice__action is-next-40px-default-size is-primary"
+          type="button"
+        >
+          Submit
+        </button>
+      </div>
+    </div>
+    <button
+      aria-label="Close"
+      class="components-button components-notice__dismiss is-small has-icon"
+      type="button"
+    >
+      <svg
+        aria-hidden="true"
+        focusable="false"
+        height="24"
+        viewBox="0 0 24 24"
+        width="24"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          d="m13.06 12 6.47-6.47-1.06-1.06L12 10.94 5.53 4.47 4.47 5.53 10.94 12l-6.47 6.47 1.06 1.06L12 13.06l6.47 6.47 1.06-1.06L13.06 12Z"
+        />
+      </svg>
+    </button>
+  </div>
+</div>
+`;

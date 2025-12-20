@@ -14,6 +14,8 @@
 				"name": "core/button",
 				"isValid": true,
 				"attributes": {
+					"tagName": "a",
+					"type": "button",
 					"text": "My button 1"
 				},
 				"innerBlocks": []
@@ -22,7 +24,29 @@
 				"name": "core/button",
 				"isValid": true,
 				"attributes": {
+					"tagName": "a",
+					"type": "button",
 					"text": "My button 2"
+				},
+				"innerBlocks": []
+			},
+			{
+				"name": "core/button",
+				"isValid": true,
+				"attributes": {
+					"tagName": "a",
+					"type": "button",
+					"text": "My button 3"
+				},
+				"innerBlocks": []
+			},
+			{
+				"name": "core/button",
+				"isValid": true,
+				"attributes": {
+					"tagName": "button",
+					"type": "button",
+					"text": "My button 4"
 				},
 				"innerBlocks": []
 			}

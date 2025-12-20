@@ -1,5 +1,6 @@
 {
-	"apiVersion": 2,
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
 	"name": "test/iframed-multiple-stylesheets",
 	"title": "Iframed Multiple Stylesheets",
 	"category": "text",
@@ -11,5 +12,9 @@
 	"textdomain": "iframed-multiple-stylesheets",
 	"editorScript": "iframed-multiple-stylesheets-editor-script",
 	"editorStyle": "file:./editor.css",
-	"style": [ "iframed-multiple-stylesheets-style", "iframed-multiple-stylesheets-style2", "file:./style3.css" ]
+	"style": [
+		"iframed-multiple-stylesheets-style",
+		"iframed-multiple-stylesheets-style2",
+		"file:./style3.css"
+	]
 }

@@ -18,19 +18,40 @@ export * from './utils';
  * Note that for the block to be useful, any scripts required by a widget must
  * be loaded into the page.
  *
+ * @param {Object} supports Block support settings.
  * @see https://developer.wordpress.org/block-editor/how-to-guides/widgets/legacy-widget-block/
  */
-export function registerLegacyWidgetBlock() {
+export function registerLegacyWidgetBlock( supports = {} ) {
 	const { metadata, settings, name } = legacyWidget;
-	registerBlockType( { name, ...metadata }, settings );
+	registerBlockType(
+		{ name, ...metadata },
+		{
+			...settings,
+			supports: {
+				...settings.supports,
+				...supports,
+			},
+		}
+	);
 }
 
 /**
  * Registers the Widget Group block.
+ *
+ * @param {Object} supports Block support settings.
  */
-export function registerWidgetGroupBlock() {
+export function registerWidgetGroupBlock( supports = {} ) {
 	const { metadata, settings, name } = widgetGroup;
-	registerBlockType( { name, ...metadata }, settings );
+	registerBlockType(
+		{ name, ...metadata },
+		{
+			...settings,
+			supports: {
+				...settings.supports,
+				...supports,
+			},
+		}
+	);
 }
 
 export { default as registerLegacyWidgetVariations } from './register-legacy-widget-variations';

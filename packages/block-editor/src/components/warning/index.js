@@ -1,29 +1,28 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
  */
-import { Children } from '@wordpress/element';
 import { DropdownMenu, MenuGroup, MenuItem } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { moreHorizontal } from '@wordpress/icons';
+import { moreVertical } from '@wordpress/icons';
 
 function Warning( { className, actions, children, secondaryActions } ) {
 	return (
 		<div style={ { display: 'contents', all: 'initial' } }>
-			<div className={ classnames( className, 'block-editor-warning' ) }>
+			<div className={ clsx( className, 'block-editor-warning' ) }>
 				<div className="block-editor-warning__contents">
 					<p className="block-editor-warning__message">
 						{ children }
 					</p>
 
-					{ ( Children.count( actions ) > 0 || secondaryActions ) && (
+					{ ( actions?.length > 0 || secondaryActions ) && (
 						<div className="block-editor-warning__actions">
-							{ Children.count( actions ) > 0 &&
-								Children.map( actions, ( action, i ) => (
+							{ actions?.length > 0 &&
+								actions.map( ( action, i ) => (
 									<span
 										key={ i }
 										className="block-editor-warning__action"
@@ -34,10 +33,10 @@ function Warning( { className, actions, children, secondaryActions } ) {
 							{ secondaryActions && (
 								<DropdownMenu
 									className="block-editor-warning__secondary"
-									icon={ moreHorizontal }
+									icon={ moreVertical }
 									label={ __( 'More options' ) }
 									popoverProps={ {
-										position: 'bottom left',
+										placement: 'bottom-end',
 										className:
 											'block-editor-warning__dropdown',
 									} }

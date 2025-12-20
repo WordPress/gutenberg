@@ -8,6 +8,8 @@
 /**
  * Renders the `core/post-comments-link` block on the server.
  *
+ * @since 6.9.0
+ *
  * @param  array    $attributes Block attributes.
  * @param  string   $content    Block default content.
  * @param  WP_Block $block      Block instance.
@@ -22,8 +24,14 @@ function render_block_core_post_comments_link( $attributes, $content, $block ) {
 		return '';
 	}
 
-	$align_class_name   = empty( $attributes['textAlign'] ) ? '' : "has-text-align-{$attributes['textAlign']}";
-	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $align_class_name ) );
+	$classes = array();
+	if ( isset( $attributes['textAlign'] ) ) {
+		$classes[] = 'has-text-align-' . $attributes['textAlign'];
+	}
+	if ( isset( $attributes['style']['elements']['link']['color']['text'] ) ) {
+		$classes[] = 'has-link-color';
+	}
+	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => implode( ' ', $classes ) ) );
 	$comments_number    = (int) get_comments_number( $block->context['postId'] );
 	$comments_link      = get_comments_link( $block->context['postId'] );
 	$post_title         = get_the_title( $block->context['postId'] );
@@ -53,6 +61,8 @@ function render_block_core_post_comments_link( $attributes, $content, $block ) {
 
 /**
  * Registers the `core/post-comments-link` block on the server.
+ *
+ * @since 6.9.0
  */
 function register_block_core_post_comments_link() {
 	register_block_type_from_metadata(

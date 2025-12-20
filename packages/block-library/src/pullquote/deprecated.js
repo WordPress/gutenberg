@@ -1,8 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
-import { get } from 'lodash';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -15,12 +14,6 @@ import {
 	useBlockProps,
 } from '@wordpress/block-editor';
 import { select } from '@wordpress/data';
-import {
-	create,
-	replace,
-	toHTMLString,
-	__UNSTABLE_LINE_SEPARATOR,
-} from '@wordpress/rich-text';
 
 /**
  * Internal dependencies
@@ -65,13 +58,14 @@ function parseBorderColor( styleString ) {
 }
 
 function multilineToInline( value ) {
-	return toHTMLString( {
-		value: replace(
-			create( { html: value, multilineTag: 'p' } ),
-			new RegExp( __UNSTABLE_LINE_SEPARATOR, 'g' ),
-			'\n'
-		),
-	} );
+	value = value || `<p></p>`;
+	const padded = `</p>${ value }<p>`;
+	const values = padded.split( `</p><p>` );
+
+	values.shift();
+	values.pop();
+
+	return values.join( '<br>' );
 }
 
 const v5 = {
@@ -81,14 +75,14 @@ const v5 = {
 			source: 'html',
 			selector: 'blockquote',
 			multiline: 'p',
-			__experimentalRole: 'content',
+			role: 'content',
 		},
 		citation: {
 			type: 'string',
 			source: 'html',
 			selector: 'cite',
 			default: '',
-			__experimentalRole: 'content',
+			role: 'content',
 		},
 		textAlign: {
 			type: 'string',
@@ -101,7 +95,7 @@ const v5 = {
 		return (
 			<figure
 				{ ...useBlockProps.save( {
-					className: classnames( {
+					className: clsx( {
 						[ `has-text-align-${ textAlign }` ]: textAlign,
 					} ),
 				} ) }
@@ -151,7 +145,7 @@ const v4 = {
 				mainColor
 			);
 
-			figureClasses = classnames( {
+			figureClasses = clsx( {
 				'has-background': backgroundClass || customMainColor,
 				[ backgroundClass ]: backgroundClass,
 			} );
@@ -170,7 +164,7 @@ const v4 = {
 			'color',
 			textColor
 		);
-		const blockquoteClasses = classnames( {
+		const blockquoteClasses = clsx( {
 			'has-text-color': textColor || customTextColor,
 			[ blockquoteTextColorClass ]: blockquoteTextColorClass,
 		} );
@@ -281,7 +275,7 @@ const v3 = {
 				mainColor
 			);
 
-			figureClasses = classnames( {
+			figureClasses = clsx( {
 				'has-background': backgroundClass || customMainColor,
 				[ backgroundClass ]: backgroundClass,
 			} );
@@ -314,7 +308,7 @@ const v3 = {
 		);
 		const blockquoteClasses =
 			( textColor || customTextColor ) &&
-			classnames( 'has-text-color', {
+			clsx( 'has-text-color', {
 				[ blockquoteTextColorClass ]: blockquoteTextColorClass,
 			} );
 
@@ -435,11 +429,8 @@ const v2 = {
 			// Is normal style and a named color is being used, we need to retrieve the color value to set the style,
 			// as there is no expectation that themes create classes that set border colors.
 		} else if ( mainColor ) {
-			const colors = get(
-				select( blockEditorStore ).getSettings(),
-				[ 'colors' ],
-				[]
-			);
+			const colors =
+				select( blockEditorStore ).getSettings().colors ?? [];
 			const colorObject = getColorObjectByAttributeValues(
 				colors,
 				mainColor
@@ -455,7 +446,7 @@ const v2 = {
 		);
 		const blockquoteClasses =
 			textColor || customTextColor
-				? classnames( 'has-text-color', {
+				? clsx( 'has-text-color', {
 						[ blockquoteTextColorClass ]: blockquoteTextColorClass,
 				  } )
 				: undefined;

@@ -2,7 +2,7 @@
 
 Default [Babel](https://babeljs.io/) preset for WordPress development.
 
-The preset includes configuration which enable language features and syntax extensions targeted for support by WordPress. This includes [ECMAScript proposals](https://github.com/tc39/proposals) which have reached [Stage 4 ("Finished")](https://tc39.es/process-document/), as well as the [JSX syntax extension](https://reactjs.org/docs/introducing-jsx.html). For more information, refer to the [JavaScript Coding Guidelines](https://github.com/WordPress/gutenberg/blob/HEAD/docs/contributors/coding-guidelines.md#javascript).
+The preset includes configuration which enable language features and syntax extensions targeted for support by WordPress. This includes [ECMAScript proposals](https://github.com/tc39/proposals) which have reached [Stage 4 ("Finished")](https://tc39.es/process-document/), as well as the [JSX syntax extension](https://react.dev/learn/writing-markup-with-jsx). For more information, refer to the [JavaScript Coding Guidelines](https://github.com/WordPress/gutenberg/blob/HEAD/docs/contributors/code/coding-guidelines.md#javascript).
 
 ## Installation
 
@@ -12,7 +12,7 @@ Install the module
 npm install @wordpress/babel-preset-default --save-dev
 ```
 
-**Note**: This package requires Node.js 14.0.0 or later. It is not compatible with older versions.
+**Note**: This package requires Node.js version with long-term support status (check [Active LTS or Maintenance LTS releases](https://nodejs.org/en/about/previous-releases)). It is not compatible with older versions.
 
 ### Usage
 
@@ -35,7 +35,7 @@ For example, if you'd like to use a new language feature proposal which has not 
 ```json
 {
 	"presets": [ "@wordpress/babel-preset-default" ],
-	"plugins": [ "@babel/plugin-proposal-class-properties" ]
+	"plugins": [ "@babel/plugin-transform-class-properties" ]
 }
 ```
 
@@ -43,7 +43,7 @@ For example, if you'd like to use a new language feature proposal which has not 
 
 There is a complementary `build/polyfill.js` (minified version – `build/polyfill.min.js`) file available that polyfills ECMAScript features missing in the [browsers supported](https://make.wordpress.org/core/handbook/best-practices/browser-support/) by the WordPress project ([#31279](https://github.com/WordPress/gutenberg/pull/31279)). It's a drop-in replacement for the deprecated `@babel/polyfill` package, and it's also based on [`core-js`](https://github.com/zloirock/core-js) project.
 
-This needs to be included before all your compiled Babel code. You can either prepend it to your compiled code or include it in a `<script>` before it.
+This needs to be included in some cases, if the features being used require polyfills. You can either prepend it to your compiled code or include it in a `<script>` before it.
 
 #### TC39 Proposals
 

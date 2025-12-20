@@ -23,7 +23,7 @@ export const settings = {
 	icon,
 	variations,
 	example: {
-		viewportWidth: 600, // Columns collapse "@media (max-width: 599px)".
+		viewportWidth: 782, // Columns collapse "@media (max-width: 781px)".
 		innerBlocks: [
 			{
 				name: 'core/column',

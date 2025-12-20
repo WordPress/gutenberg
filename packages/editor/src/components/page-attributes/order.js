@@ -2,9 +2,12 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { TextControl } from '@wordpress/components';
-import { withSelect, withDispatch } from '@wordpress/data';
-import { compose } from '@wordpress/compose';
+import {
+	Flex,
+	FlexBlock,
+	__experimentalNumberControl as NumberControl,
+} from '@wordpress/components';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { useState } from '@wordpress/element';
 
 /**
@@ -13,51 +16,55 @@ import { useState } from '@wordpress/element';
 import PostTypeSupportCheck from '../post-type-support-check';
 import { store as editorStore } from '../../store';
 
-export const PageAttributesOrder = ( { onUpdateOrder, order = 0 } ) => {
+function PageAttributesOrder() {
+	const order = useSelect(
+		( select ) =>
+			select( editorStore ).getEditedPostAttribute( 'menu_order' ) ?? 0,
+		[]
+	);
+	const { editPost } = useDispatch( editorStore );
 	const [ orderInput, setOrderInput ] = useState( null );
 
 	const setUpdatedOrder = ( value ) => {
 		setOrderInput( value );
 		const newOrder = Number( value );
 		if ( Number.isInteger( newOrder ) && value.trim?.() !== '' ) {
-			onUpdateOrder( Number( value ) );
+			editPost( { menu_order: newOrder } );
 		}
 	};
-	const value = orderInput === null ? order : orderInput;
-	return (
-		<TextControl
-			className="editor-page-attributes__order"
-			type="number"
-			label={ __( 'Order' ) }
-			value={ value }
-			onChange={ setUpdatedOrder }
-			size={ 6 }
-			onBlur={ () => {
-				setOrderInput( null );
-			} }
-		/>
-	);
-};
 
-function PageAttributesOrderWithChecks( props ) {
+	const value = orderInput ?? order;
+
 	return (
-		<PostTypeSupportCheck supportKeys="page-attributes">
-			<PageAttributesOrder { ...props } />
-		</PostTypeSupportCheck>
+		<Flex>
+			<FlexBlock>
+				<NumberControl
+					__next40pxDefaultSize
+					label={ __( 'Order' ) }
+					help={ __( 'Set the page order.' ) }
+					value={ value }
+					onChange={ setUpdatedOrder }
+					hideLabelFromVision
+					onBlur={ () => {
+						setOrderInput( null );
+					} }
+				/>
+			</FlexBlock>
+		</Flex>
 	);
 }
 
-export default compose( [
-	withSelect( ( select ) => {
-		return {
-			order: select( editorStore ).getEditedPostAttribute( 'menu_order' ),
-		};
-	} ),
-	withDispatch( ( dispatch ) => ( {
-		onUpdateOrder( order ) {
-			dispatch( editorStore ).editPost( {
-				menu_order: order,
-			} );
-		},
-	} ) ),
-] )( PageAttributesOrderWithChecks );
+/**
+ * Renders the Page Attributes Order component. A number input in an editor interface
+ * for setting the order of a given page.
+ * The component is now not used in core but was kept for backward compatibility.
+ *
+ * @return {React.ReactNode} The rendered component.
+ */
+export default function PageAttributesOrderWithChecks() {
+	return (
+		<PostTypeSupportCheck supportKeys="page-attributes">
+			<PageAttributesOrder />
+		</PostTypeSupportCheck>
+	);
+}

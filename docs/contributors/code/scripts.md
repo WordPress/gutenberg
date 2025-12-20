@@ -2,7 +2,7 @@
 
 The editor provides several vendor and internal scripts to plugin developers. Script names, handles, and descriptions are documented in the table below.
 
-## WP Scripts
+## WordPress scripts
 
 The editor includes a number of packages to enable various pieces of functionality. Plugin developers can utilize them to create blocks, editor plugins, or generic plugins.
 
@@ -41,7 +41,7 @@ The editor includes a number of packages to enable various pieces of functionali
 | [Viewport](/packages/viewport/README.md)                                                     | wp-viewport                           | Module for responding to changes in the browser viewport size                                                                                                 |
 | [Wordcount](/packages/wordcount/README.md)                                                   | wp-wordcount                          | WordPress word count utility                                                                                                                                  |
 
-## Vendor Scripts
+## Vendor scripts
 
 The editor also uses some popular third-party packages and scripts. Plugin developers can use these scripts as well without bundling them in their code (and increasing file sizes).
 
@@ -52,9 +52,10 @@ The editor also uses some popular third-party packages and scripts. Plugin devel
 | [Moment](https://momentjs.com/)                      | moment    | Parse, validate, manipulate, and display dates and times in JavaScript                                |
 | [Lodash](https://lodash.com)                         | lodash    | Lodash is a JavaScript library which provides utility functions for common programming tasks          |
 
-## Polyfill Scripts
+## Polyfill scripts
 
 The editor also provides polyfills for certain features that may not be available in all modern browsers.
+
 It is recommended to use the main `wp-polyfill` script handle which takes care of loading all the below mentioned polyfills.
 
 | Script Name                                                               | Handle                      | Description                                                                                          |
@@ -63,17 +64,11 @@ It is recommended to use the main `wp-polyfill` script handle which takes care o
 | [Fetch Polyfill](https://www.npmjs.com/package/whatwg-fetch)              | wp-polyfill-fetch           | Polyfill that implements a subset of the standard Fetch specification                                |
 | [Promise Polyfill](https://www.npmjs.com/package/promise-polyfill)        | wp-polyfill-promise         | Lightweight ES6 Promise polyfill for the browser and node                                            |
 | [Formdata Polyfill](https://www.npmjs.com/package/formdata-polyfill)      | wp-polyfill-formdata        | Polyfill conditionally replaces the native implementation                                            |
-| [Node Contains Polyfill](https://polyfill.io)                             | wp-polyfill-node-contains   | Polyfill for Node.contains                                                                           |
+| [Node Contains Polyfill](https://www.npmjs.com/package/polyfill-library)  | wp-polyfill-node-contains   | Polyfill for Node.contains                                                                           |
 | [Element Closest Polyfill](https://www.npmjs.com/package/element-closest) | wp-polyfill-element-closest | Return the closest element matching a selector up the DOM tree                                       |
 
 ## Bundling and code sharing
 
-When using a JavaScript bundler like [webpack](https://webpack.js.org/), the scripts mentioned here
-can be excluded from the bundle and provided by WordPress in the form of script dependencies [(see
-`wp_enqueue_script`)][https://developer.wordpress.org/reference/functions/wp_enqueue_script/#default-scripts-included-and-registered-by-wordpress].
+When using a JavaScript bundler like [webpack](https://webpack.js.org/), the scripts mentioned here can be excluded from the bundle and provided by WordPress in the form of script dependencies see [`wp_enqueue_script`](https://developer.wordpress.org/reference/functions/wp_enqueue_script/#default-scripts-included-and-registered-by-wordpress).
 
-The
-[`@wordpress/dependency-extraction-webpack-plugin`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/dependency-extraction-webpack-plugin)
-provides a webpack plugin to help extract WordPress dependencies from bundles. `@wordpress/scripts`
-[`build`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/scripts#build) script includes
-the plugin by default.
+The [`@wordpress/dependency-extraction-webpack-plugin`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/dependency-extraction-webpack-plugin) provides a webpack plugin to help extract WordPress dependencies from bundles. The `@wordpress/scripts` [`build`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/scripts#build) script includes the plugin by default.

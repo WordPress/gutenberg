@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { View, Text, TouchableWithoutFeedback } from 'react-native';
+import { View, Text, TouchableOpacity } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -18,6 +18,8 @@ import { useRef } from '@wordpress/element';
 import styles from './styles.scss';
 import { noticeOutline } from '../../../components/src/mobile/gridicons';
 
+const hitSlop = { top: 22, bottom: 22, left: 22, right: 22 };
+
 const EmbedPlaceholder = ( {
 	icon,
 	isSelected,
@@ -28,10 +30,17 @@ const EmbedPlaceholder = ( {
 	tryAgain,
 	openEmbedLinkSettings,
 } ) => {
-	const containerStyle = usePreferredColorSchemeStyle(
-		styles.embed__container,
-		styles[ 'embed__container--dark' ]
+	const containerSelectedStyle = usePreferredColorSchemeStyle(
+		styles[ 'embed__container-selected' ],
+		styles[ 'embed__container-selected--dark' ]
 	);
+	const containerStyle = [
+		usePreferredColorSchemeStyle(
+			styles.embed__container,
+			styles[ 'embed__container--dark' ]
+		),
+		isSelected && containerSelectedStyle,
+	];
 	const labelStyle = usePreferredColorSchemeStyle(
 		styles.embed__label,
 		styles[ 'embed__label--dark' ]
@@ -43,6 +52,15 @@ const EmbedPlaceholder = ( {
 		styles[ 'embed__action--dark' ]
 	);
 	const embedIconErrorStyle = styles[ 'embed__icon--error' ];
+
+	const buttonStyles = usePreferredColorSchemeStyle(
+		styles.embed__button,
+		styles[ 'embed__button--dark' ]
+	);
+	const iconStyles = usePreferredColorSchemeStyle(
+		styles.embed__icon,
+		styles[ 'embed__icon--dark' ]
+	);
 
 	const cannotEmbedMenuPickerRef = useRef();
 
@@ -89,55 +107,70 @@ const EmbedPlaceholder = ( {
 
 	return (
 		<>
-			<TouchableWithoutFeedback
-				accessibilityRole={ 'button' }
-				accessibilityHint={
-					cannotEmbed
-						? __( 'Double tap to view embed options.' )
-						: __( 'Double tap to add a link.' )
-				}
-				onPress={ resolveOnPressEvent }
-				disabled={ ! isSelected }
-			>
-				<View style={ containerStyle }>
-					{ cannotEmbed ? (
-						<>
-							<Icon
-								icon={ noticeOutline }
-								fill={ embedIconErrorStyle.fill }
-								style={ embedIconErrorStyle }
-							/>
-							<Text
-								style={ [
-									descriptionStyle,
-									descriptionErrorStyle,
-								] }
-							>
-								{ __( 'Unable to embed media' ) }
-							</Text>
+			<View style={ containerStyle }>
+				{ cannotEmbed ? (
+					<>
+						<Icon
+							icon={ noticeOutline }
+							fill={ embedIconErrorStyle.fill }
+							style={ embedIconErrorStyle }
+						/>
+						<Text
+							style={ [
+								descriptionStyle,
+								descriptionErrorStyle,
+							] }
+						>
+							{ __( 'Unable to embed media' ) }
+						</Text>
+						<TouchableOpacity
+							activeOpacity={ 0.5 }
+							accessibilityRole="button"
+							accessibilityHint={ __(
+								'Double tap to view embed options.'
+							) }
+							style={ buttonStyles }
+							hitSlop={ hitSlop }
+							onPress={ resolveOnPressEvent }
+							disabled={ ! isSelected }
+						>
 							<Text style={ actionStyle }>
 								{ __( 'More options' ) }
 							</Text>
-							<Picker
-								title={ __( 'Embed options' ) }
-								ref={ cannotEmbedMenuPickerRef }
-								options={ options }
-								onChange={ onPickerSelect }
-								hideCancelButton
-								leftAlign
-							/>
-						</>
-					) : (
-						<>
-							<BlockIcon icon={ icon } />
+						</TouchableOpacity>
+						<Picker
+							title={ __( 'Embed options' ) }
+							ref={ cannotEmbedMenuPickerRef }
+							options={ options }
+							onChange={ onPickerSelect }
+							hideCancelButton
+							leftAlign
+						/>
+					</>
+				) : (
+					<>
+						<View style={ styles[ 'embed__placeholder-header' ] }>
+							<BlockIcon icon={ icon } fill={ iconStyles.fill } />
 							<Text style={ labelStyle }>{ label }</Text>
+						</View>
+						<TouchableOpacity
+							activeOpacity={ 0.5 }
+							accessibilityRole="button"
+							accessibilityHint={ __(
+								'Double tap to add a link.'
+							) }
+							style={ buttonStyles }
+							hitSlop={ hitSlop }
+							onPress={ resolveOnPressEvent }
+							disabled={ ! isSelected }
+						>
 							<Text style={ actionStyle }>
-								{ __( 'ADD LINK' ) }
+								{ __( 'Add link' ) }
 							</Text>
-						</>
-					) }
-				</View>
-			</TouchableWithoutFeedback>
+						</TouchableOpacity>
+					</>
+				) }
+			</View>
 		</>
 	);
 };

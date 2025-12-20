@@ -1,8 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
-import { isEmpty } from 'lodash';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -18,9 +17,7 @@ import { useInstanceId } from '@wordpress/compose';
  * Internal dependencies
  */
 import ColorGradientSettingsDropdown from './dropdown';
-import useSetting from '../use-setting';
-import useCommonSingleMultipleSelects from './use-common-single-multiple-selects';
-import useMultipleOriginColorsAndGradients from './use-multiple-origin-colors-and-gradients';
+import useColorsAndGradientsPalettes from './use-multiple-origin-colors-and-gradients';
 
 const colorsAndGradientKeys = [
 	'colors',
@@ -39,21 +36,20 @@ export const PanelColorGradientSettingsInner = ( {
 	settings,
 	title,
 	showTitle = true,
-	__experimentalHasMultipleOrigins,
 	__experimentalIsRenderedInSidebar,
 	enableAlpha,
 } ) => {
 	const panelId = useInstanceId( PanelColorGradientSettingsInner );
 	const { batch } = useRegistry();
 	if (
-		isEmpty( colors ) &&
-		isEmpty( gradients ) &&
+		( ! colors || colors.length === 0 ) &&
+		( ! gradients || gradients.length === 0 ) &&
 		disableCustomColors &&
 		disableCustomGradients &&
 		settings?.every(
 			( setting ) =>
-				isEmpty( setting.colors ) &&
-				isEmpty( setting.gradients ) &&
+				( ! setting.colors || setting.colors.length === 0 ) &&
+				( ! setting.gradients || setting.gradients.length === 0 ) &&
 				( setting.disableCustomColors === undefined ||
 					setting.disableCustomColors ) &&
 				( setting.disableCustomGradients === undefined ||
@@ -65,7 +61,7 @@ export const PanelColorGradientSettingsInner = ( {
 
 	return (
 		<ToolsPanel
-			className={ classnames(
+			className={ clsx(
 				'block-editor-panel-color-gradient-settings',
 				className
 			) }
@@ -100,7 +96,6 @@ export const PanelColorGradientSettingsInner = ( {
 					gradients,
 					disableCustomColors,
 					disableCustomGradients,
-					__experimentalHasMultipleOrigins,
 					__experimentalIsRenderedInSidebar,
 					enableAlpha,
 				} }
@@ -114,19 +109,8 @@ export const PanelColorGradientSettingsInner = ( {
 	);
 };
 
-const PanelColorGradientSettingsSingleSelect = ( props ) => {
-	const colorGradientSettings = useCommonSingleMultipleSelects();
-	colorGradientSettings.colors = useSetting( 'color.palette' );
-	colorGradientSettings.gradients = useSetting( 'color.gradients' );
-	return (
-		<PanelColorGradientSettingsInner
-			{ ...{ ...colorGradientSettings, ...props } }
-		/>
-	);
-};
-
-const PanelColorGradientSettingsMultipleSelect = ( props ) => {
-	const colorGradientSettings = useMultipleOriginColorsAndGradients();
+const PanelColorGradientSettingsSelect = ( props ) => {
+	const colorGradientSettings = useColorsAndGradientsPalettes();
 	return (
 		<PanelColorGradientSettingsInner
 			{ ...{ ...colorGradientSettings, ...props } }
@@ -140,10 +124,7 @@ const PanelColorGradientSettings = ( props ) => {
 	) {
 		return <PanelColorGradientSettingsInner { ...props } />;
 	}
-	if ( props.__experimentalHasMultipleOrigins ) {
-		return <PanelColorGradientSettingsMultipleSelect { ...props } />;
-	}
-	return <PanelColorGradientSettingsSingleSelect { ...props } />;
+	return <PanelColorGradientSettingsSelect { ...props } />;
 };
 
 export default PanelColorGradientSettings;

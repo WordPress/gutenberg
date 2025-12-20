@@ -11,9 +11,10 @@ import { useMemo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { useContextSystem, WordPressComponentProps } from '../ui/context';
+import type { WordPressComponentProps } from '../context';
+import { useContextSystem } from '../context';
 import { getAlignmentProps } from './utils';
-import { useResponsiveValue } from '../ui/utils/use-responsive-value';
+import { useResponsiveValue } from '../utils/use-responsive-value';
 import CONFIG from '../utils/config-values';
 import { useCx } from '../utils/hooks/use-cx';
 import type { GridProps } from './types';

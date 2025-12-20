@@ -1,28 +1,36 @@
 /**
  * WordPress dependencies
  */
-import { SelectControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { InspectorControls } from '@wordpress/block-editor';
+import {
+	InspectorControls,
+	privateApis as blockEditorPrivateApis,
+} from '@wordpress/block-editor';
+
+/**
+ * Internal dependencies
+ */
+import { unlock } from '../../lock-unlock';
+
+const { HTMLElementControl } = unlock( blockEditorPrivateApis );
 
 export default function CommentsInspectorControls( {
-	attributes: { TagName },
+	attributes: { tagName },
 	setAttributes,
 } ) {
 	return (
 		<InspectorControls>
-			<InspectorControls __experimentalGroup="advanced">
-				<SelectControl
-					label={ __( 'HTML element' ) }
+			<InspectorControls group="advanced">
+				<HTMLElementControl
+					tagName={ tagName }
+					onChange={ ( value ) =>
+						setAttributes( { tagName: value } )
+					}
 					options={ [
 						{ label: __( 'Default (<div>)' ), value: 'div' },
 						{ label: '<section>', value: 'section' },
 						{ label: '<aside>', value: 'aside' },
 					] }
-					value={ TagName }
-					onChange={ ( value ) =>
-						setAttributes( { tagName: value } )
-					}
 				/>
 			</InspectorControls>
 		</InspectorControls>

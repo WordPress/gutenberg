@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { get } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { RichText, useBlockProps } from '@wordpress/block-editor';
@@ -20,7 +15,7 @@ export default function save( { attributes } ) {
 				<div className="wp-block-column" key={ `column-${ index }` }>
 					<RichText.Content
 						tagName="p"
-						value={ get( content, [ index, 'children' ] ) }
+						value={ content?.[ index ]?.children }
 					/>
 				</div>
 			) ) }

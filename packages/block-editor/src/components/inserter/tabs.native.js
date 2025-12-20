@@ -142,7 +142,11 @@ InserterTabs.Control = TabsControl;
 
 InserterTabs.getTabs = () => [
 	{ name: 'blocks', title: __( 'Blocks' ), component: BlockTypesTab },
-	{ name: 'reusable', title: __( 'Reusable' ), component: ReusableBlocksTab },
+	{
+		name: 'reusable',
+		title: __( 'Synced patterns' ),
+		component: ReusableBlocksTab,
+	},
 ];
 
 export default InserterTabs;

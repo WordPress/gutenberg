@@ -4,6 +4,8 @@
 import { __, sprintf } from '@wordpress/i18n';
 import { Placeholder, Button, Spinner } from '@wordpress/components';
 import { useState } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -15,6 +17,7 @@ import {
 	useTemplatePartArea,
 } from './utils/hooks';
 import TitleModal from './title-modal';
+import { getTemplatePartIcon } from './utils/get-template-part-icon';
 
 export default function TemplatePartPlaceholder( {
 	area,
@@ -28,6 +31,21 @@ export default function TemplatePartPlaceholder( {
 		templatePartId
 	);
 	const blockPatterns = useAlternativeBlockPatterns( area, clientId );
+
+	const { isBlockBasedTheme, canCreateTemplatePart } = useSelect(
+		( select ) => {
+			const { getCurrentTheme, canUser } = select( coreStore );
+			return {
+				isBlockBasedTheme: getCurrentTheme()?.is_block_theme,
+				canCreateTemplatePart: canUser( 'create', {
+					kind: 'postType',
+					name: 'wp_template_part',
+				} ),
+			};
+		},
+		[]
+	);
+
 	const [ showTitleModal, setShowTitleModal ] = useState( false );
 	const areaObject = useTemplatePartArea( area );
 	const createFromBlocks = useCreateTemplatePartFromBlocks(
@@ -37,25 +55,38 @@ export default function TemplatePartPlaceholder( {
 
 	return (
 		<Placeholder
-			icon={ areaObject.icon }
+			icon={ getTemplatePartIcon( areaObject.icon ) }
 			label={ areaObject.label }
-			instructions={ sprintf(
-				// Translators: %s as template part area title ("Header", "Footer", etc.).
-				__( 'Choose an existing %s or create a new one.' ),
-				areaObject.label.toLowerCase()
-			) }
+			instructions={
+				isBlockBasedTheme
+					? sprintf(
+							// Translators: %s as template part area title ("Header", "Footer", etc.).
+							__( 'Choose an existing %s or create a new one.' ),
+							areaObject.label.toLowerCase()
+					  )
+					: sprintf(
+							// Translators: %s as template part area title ("Header", "Footer", etc.).
+							__( 'Choose an existing %s.' ),
+							areaObject.label.toLowerCase()
+					  )
+			}
 		>
 			{ isResolving && <Spinner /> }
 
 			{ ! isResolving &&
 				!! ( templateParts.length || blockPatterns.length ) && (
-					<Button variant="primary" onClick={ onOpenSelectionModal }>
+					<Button
+						__next40pxDefaultSize
+						variant="primary"
+						onClick={ onOpenSelectionModal }
+					>
 						{ __( 'Choose' ) }
 					</Button>
 				) }
 
-			{ ! isResolving && (
+			{ ! isResolving && isBlockBasedTheme && canCreateTemplatePart && (
 				<Button
+					__next40pxDefaultSize
 					variant="secondary"
 					onClick={ () => {
 						setShowTitleModal( true );

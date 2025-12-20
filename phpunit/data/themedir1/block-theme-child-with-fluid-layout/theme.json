@@ -1,0 +1,13 @@
+{
+	"$schema": "../../../../schemas/json/theme.json",
+	"version": 3,
+	"settings": {
+		"appearanceTools": true,
+		"layout": {
+			"wideSize": "clamp(1000px, 85vw, 2000px)"
+		},
+		"typography": {
+			"fluid": true
+		}
+	}
+}

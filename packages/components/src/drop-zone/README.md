@@ -5,8 +5,8 @@
 ## Usage
 
 ```jsx
+import { useState } from 'react';
 import { DropZone } from '@wordpress/components';
-import { useState } from '@wordpress/element';
 
 const MyDropZone = () => {
 	const [ hasDropped, setHasDropped ] = useState( false );

@@ -6,29 +6,8 @@ import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { cloneBlock } from '@wordpress/blocks';
 
-/**
- * Internal dependencies
- */
-import { name as listItemName } from '../block.json';
-
-export default function useOutdentListItem( clientId ) {
+export default function useOutdentListItem() {
 	const registry = useRegistry();
-	const { canOutdent } = useSelect(
-		( innerSelect ) => {
-			const { getBlockRootClientId, getBlockName } =
-				innerSelect( blockEditorStore );
-			const grandParentId = getBlockRootClientId(
-				getBlockRootClientId( clientId )
-			);
-			const grandParentName = getBlockName( grandParentId );
-			const isListItem = grandParentName === listItemName;
-
-			return {
-				canOutdent: isListItem,
-			};
-		},
-		[ clientId ]
-	);
 	const {
 		moveBlocksToPosition,
 		removeBlock,
@@ -48,73 +27,83 @@ export default function useOutdentListItem( clientId ) {
 	function getParentListItemId( id ) {
 		const listId = getBlockRootClientId( id );
 		const parentListItemId = getBlockRootClientId( listId );
-		if ( ! parentListItemId ) return;
-		if ( getBlockName( parentListItemId ) !== listItemName ) return;
+		if ( ! parentListItemId ) {
+			return;
+		}
+		if ( getBlockName( parentListItemId ) !== 'core/list-item' ) {
+			return;
+		}
 		return parentListItemId;
 	}
 
-	return [
-		canOutdent,
-		useCallback( ( clientIds = getSelectedBlockClientIds() ) => {
-			if ( ! Array.isArray( clientIds ) ) {
-				clientIds = [ clientIds ];
-			}
+	return useCallback( ( clientIds = getSelectedBlockClientIds() ) => {
+		if ( ! Array.isArray( clientIds ) ) {
+			clientIds = [ clientIds ];
+		}
 
-			if ( ! clientIds.length ) return;
+		if ( ! clientIds.length ) {
+			return;
+		}
 
-			const firstClientId = clientIds[ 0 ];
+		const firstClientId = clientIds[ 0 ];
 
-			// Can't outdent if it's not a list item.
-			if ( getBlockName( firstClientId ) !== listItemName ) return;
+		// Can't outdent if it's not a list item.
+		if ( getBlockName( firstClientId ) !== 'core/list-item' ) {
+			return;
+		}
 
-			const parentListItemId = getParentListItemId( firstClientId );
+		const parentListItemId = getParentListItemId( firstClientId );
 
-			// Can't outdent if it's at the top level.
-			if ( ! parentListItemId ) return;
+		// Can't outdent if it's at the top level.
+		if ( ! parentListItemId ) {
+			return;
+		}
 
-			const parentListId = getBlockRootClientId( firstClientId );
-			const lastClientId = clientIds[ clientIds.length - 1 ];
-			const order = getBlockOrder( parentListId );
-			const followingListItems = order.slice(
-				getBlockIndex( lastClientId ) + 1
-			);
+		const parentListId = getBlockRootClientId( firstClientId );
+		const lastClientId = clientIds[ clientIds.length - 1 ];
+		const order = getBlockOrder( parentListId );
+		const followingListItems = order.slice(
+			getBlockIndex( lastClientId ) + 1
+		);
 
-			registry.batch( () => {
-				if ( followingListItems.length ) {
-					let nestedListId = getBlockOrder( firstClientId )[ 0 ];
+		registry.batch( () => {
+			if ( followingListItems.length ) {
+				let nestedListId = getBlockOrder( firstClientId )[ 0 ];
 
-					if ( ! nestedListId ) {
-						const nestedListBlock = cloneBlock(
-							getBlock( parentListId ),
-							{},
-							[]
-						);
-						nestedListId = nestedListBlock.clientId;
-						insertBlock( nestedListBlock, 0, firstClientId, false );
-						// Immediately update the block list settings, otherwise
-						// blocks can't be moved here due to canInsert checks.
-						updateBlockListSettings(
-							nestedListId,
-							getBlockListSettings( parentListId )
-						);
-					}
-
-					moveBlocksToPosition(
-						followingListItems,
-						parentListId,
-						nestedListId
+				if ( ! nestedListId ) {
+					const nestedListBlock = cloneBlock(
+						getBlock( parentListId ),
+						{},
+						[]
+					);
+					nestedListId = nestedListBlock.clientId;
+					insertBlock( nestedListBlock, 0, firstClientId, false );
+					// Immediately update the block list settings, otherwise
+					// blocks can't be moved here due to canInsert checks.
+					updateBlockListSettings(
+						nestedListId,
+						getBlockListSettings( parentListId )
 					);
 				}
+
 				moveBlocksToPosition(
-					clientIds,
+					followingListItems,
 					parentListId,
-					getBlockRootClientId( parentListItemId ),
-					getBlockIndex( parentListItemId ) + 1
+					nestedListId
 				);
-				if ( ! getBlockOrder( parentListId ).length ) {
-					removeBlock( parentListId );
-				}
-			} );
-		}, [] ),
-	];
+			}
+			moveBlocksToPosition(
+				clientIds,
+				parentListId,
+				getBlockRootClientId( parentListItemId ),
+				getBlockIndex( parentListItemId ) + 1
+			);
+			if ( ! getBlockOrder( parentListId ).length ) {
+				const shouldSelectParent = false;
+				removeBlock( parentListId, shouldSelectParent );
+			}
+		} );
+
+		return true;
+	}, [] );
 }

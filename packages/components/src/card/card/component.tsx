@@ -12,11 +12,8 @@ import { useMemo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import {
-	contextConnect,
-	ContextSystemProvider,
-	WordPressComponentProps,
-} from '../../ui/context';
+import type { WordPressComponentProps } from '../../context';
+import { contextConnect, ContextSystemProvider } from '../../context';
 import { Elevation } from '../../elevation';
 import { View } from '../../view';
 import * as styles from '../styles';
@@ -37,7 +34,7 @@ function UnconnectedCard(
 		size,
 		...otherProps
 	} = useCard( props );
-	const elevationBorderRadius = isRounded ? CONFIG.cardBorderRadius : 0;
+	const elevationBorderRadius = isRounded ? CONFIG.radiusLarge : 0;
 
 	const cx = useCx();
 
@@ -88,15 +85,15 @@ function UnconnectedCard(
  *   CardHeader,
  *   CardBody,
  *   CardFooter,
- *   Text,
- *   Heading,
+ *   __experimentalText as Text,
+ *   __experimentalHeading as Heading,
  * } from `@wordpress/components`;
  *
  * function Example() {
  *   return (
  *     <Card>
  *       <CardHeader>
- *         <Heading size={ 4 }>Card Title</Heading>
+ *         <Heading level={ 4 }>Card Title</Heading>
  *       </CardHeader>
  *       <CardBody>
  *         <Text>Card Content</Text>

@@ -8,6 +8,8 @@
 /**
  * Renders the `core/tag-cloud` block on server.
  *
+ * @since 5.2.0
+ *
  * @param array $attributes The block attributes.
  *
  * @return string Returns the tag cloud for selected taxonomy.
@@ -27,8 +29,13 @@ function render_block_core_tag_cloud( $attributes ) {
 	);
 	$tag_cloud = wp_tag_cloud( $args );
 
-	if ( ! $tag_cloud ) {
-		$tag_cloud = __( 'There&#8217;s no content to show here yet.' );
+	if ( empty( $tag_cloud ) ) {
+		// Display placeholder content when there are no tags only in editor.
+		if ( wp_is_serving_rest_request() ) {
+			$tag_cloud = __( 'There&#8217;s no content to show here yet.' );
+		} else {
+			return '';
+		}
 	}
 
 	$wrapper_attributes = get_block_wrapper_attributes();
@@ -42,6 +49,8 @@ function render_block_core_tag_cloud( $attributes ) {
 
 /**
  * Registers the `core/tag-cloud` block on server.
+ *
+ * @since 5.2.0
  */
 function register_block_core_tag_cloud() {
 	register_block_type_from_metadata(

@@ -2,19 +2,17 @@
 /**
  * Plugin Name: Gutenberg
  * Plugin URI: https://github.com/WordPress/gutenberg
- * Description: Printing since 1440. This is the development plugin for the new block editor in core.
- * Requires at least: 5.9
- * Requires PHP: 5.6
- * Version: 14.6.0
+ * Description: Printing since 1440. This is the development plugin for the block editor, site editor, and other future WordPress core functionality.
+ * Requires at least: 6.7
+ * Requires PHP: 7.2
+ * Version: 22.3.0
  * Author: Gutenberg Team
  * Text Domain: gutenberg
  *
  * @package gutenberg
  */
 
-### BEGIN AUTO-GENERATED DEFINES
-defined( 'GUTENBERG_DEVELOPMENT_MODE' ) or define( 'GUTENBERG_DEVELOPMENT_MODE', true );
-### END AUTO-GENERATED DEFINES
+defined( 'GUTENBERG_MINIMUM_WP_VERSION' ) or define( 'GUTENBERG_MINIMUM_WP_VERSION', '6.7' );
 
 gutenberg_pre_init();
 
@@ -26,7 +24,7 @@ gutenberg_pre_init();
 function gutenberg_wordpress_version_notice() {
 	echo '<div class="error"><p>';
 	/* translators: %s: Minimum required version */
-	printf( __( 'Gutenberg requires WordPress %s or later to function properly. Please upgrade WordPress before activating Gutenberg.', 'gutenberg' ), '5.9' );
+	printf( __( 'Gutenberg requires WordPress %s or later to function properly. Please upgrade WordPress before activating Gutenberg.', 'gutenberg' ), GUTENBERG_MINIMUM_WP_VERSION );
 	echo '</p></div>';
 
 	deactivate_plugins( array( 'gutenberg/gutenberg.php' ) );
@@ -47,10 +45,13 @@ function gutenberg_build_files_notice() {
  * Verify that we can initialize the Gutenberg editor , then load it.
  *
  * @since 1.5.0
+ *
+ * @global string $wp_version             The WordPress version string.
+ *
  */
 function gutenberg_pre_init() {
 	global $wp_version;
-	if ( defined( 'GUTENBERG_DEVELOPMENT_MODE' ) && GUTENBERG_DEVELOPMENT_MODE && ! file_exists( __DIR__ . '/build/blocks' ) ) {
+	if ( ! file_exists( __DIR__ . '/build/scripts/blocks' ) ) {
 		add_action( 'admin_notices', 'gutenberg_build_files_notice' );
 		return;
 	}
@@ -64,7 +65,7 @@ function gutenberg_pre_init() {
 	// Compare against major release versions (X.Y) rather than minor (X.Y.Z)
 	// unless a minor release is the actual minimum requirement. WordPress reports
 	// X.Y for its major releases.
-	if ( version_compare( $version, '5.9', '<' ) ) {
+	if ( version_compare( $version, GUTENBERG_MINIMUM_WP_VERSION, '<' ) ) {
 		add_action( 'admin_notices', 'gutenberg_wordpress_version_notice' );
 		return;
 	}

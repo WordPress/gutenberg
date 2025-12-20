@@ -3,6 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { cover as icon } from '@wordpress/icons';
+import { privateApis as blocksPrivateApis } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -13,6 +14,10 @@ import edit from './edit';
 import metadata from './block.json';
 import save from './save';
 import transforms from './transforms';
+import variations from './variations';
+import { unlock } from '../lock-unlock';
+
+const { fieldsKey, formKey } = unlock( blocksPrivateApis );
 
 const { name } = metadata;
 
@@ -25,19 +30,23 @@ export const settings = {
 			customOverlayColor: '#065174',
 			dimRatio: 40,
 			url: 'https://s.w.org/images/core/5.3/Windbuchencom.jpg',
+			style: {
+				typography: {
+					fontSize: 48,
+				},
+				color: {
+					text: 'white',
+				},
+			},
 		},
 		innerBlocks: [
 			{
 				name: 'core/paragraph',
 				attributes: {
-					content: __( '<strong>Snow Patrol</strong>' ),
-					align: 'center',
+					content: `<strong>${ __( 'Snow Patrol' ) }</strong>`,
 					style: {
 						typography: {
-							fontSize: 48,
-						},
-						color: {
-							text: 'white',
+							textAlign: 'center',
 						},
 					},
 				},
@@ -48,6 +57,33 @@ export const settings = {
 	save,
 	edit,
 	deprecated,
+	variations,
 };
+
+if ( window.__experimentalContentOnlyInspectorFields ) {
+	settings[ fieldsKey ] = [
+		{
+			id: 'background',
+			label: __( 'Background' ),
+			type: 'media',
+			mapping: {
+				type: 'backgroundType',
+				id: 'id',
+				url: 'url',
+				alt: 'alt',
+				featuredImage: 'useFeaturedImage',
+			},
+			args: {
+				// TODO - How to support custom gradient?
+				// Build it into Media, or use a custom control?
+				allowedTypes: [ 'image', 'video' ],
+				multiple: false,
+			},
+		},
+	];
+	settings[ formKey ] = {
+		fields: [ 'background' ],
+	};
+}
 
 export const init = () => initBlock( { name, metadata, settings } );

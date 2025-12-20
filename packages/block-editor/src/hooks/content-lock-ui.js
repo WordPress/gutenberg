@@ -1,173 +1,76 @@
 /**
  * WordPress dependencies
  */
-import { ToolbarButton, MenuItem } from '@wordpress/components';
-import { createHigherOrderComponent } from '@wordpress/compose';
+import { ToolbarButton } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { addFilter } from '@wordpress/hooks';
 import { __ } from '@wordpress/i18n';
-import { useEffect, useRef, useCallback } from '@wordpress/element';
+import { useCallback } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../store';
-import { BlockControls, BlockSettingsMenuControls } from '../components';
-/**
- * External dependencies
- */
-import classnames from 'classnames';
+import { BlockControls } from '../components';
+import { unlock } from '../lock-unlock';
 
-function StopEditingAsBlocksOnOutsideSelect( {
-	clientId,
-	stopEditingAsBlock,
-} ) {
-	const isBlockOrDescendantSelected = useSelect(
-		( select ) => {
-			const { isBlockSelected, hasSelectedInnerBlock } =
-				select( blockEditorStore );
-			return (
-				isBlockSelected( clientId ) ||
-				hasSelectedInnerBlock( clientId, true )
-			);
-		},
-		[ clientId ]
-	);
-	useEffect( () => {
-		if ( ! isBlockOrDescendantSelected ) {
-			stopEditingAsBlock();
-		}
-	}, [ isBlockOrDescendantSelected ] );
-	return null;
-}
+// The implementation of content locking is mainly in this file, although the mechanism
+// to stop editing a content only section when an outside block is selected is in the component
+// `StopEditingContentOnlySectionOnOutsideSelect` at block-editor/src/components/block-list/index.js.
+// Besides the components on this file and the file referenced above the implementation
+// also includes artifacts on the store (actions, reducers, and selector).
 
-export const withBlockControls = createHigherOrderComponent(
-	( BlockEdit ) => ( props ) => {
-		const { getBlockListSettings, getSettings } =
-			useSelect( blockEditorStore );
-		const focusModeToRevert = useRef();
-		const { templateLock, isLockedByParent, isEditingAsBlocks } = useSelect(
+function ContentLockControlsPure( { clientId } ) {
+	const { templateLock, isLockedByParent, isEditingContentOnlySection } =
+		useSelect(
 			( select ) => {
 				const {
-					__unstableGetContentLockingParent,
+					getContentLockingParent,
 					getTemplateLock,
-					__unstableGetTemporarilyEditingAsBlocks,
-				} = select( blockEditorStore );
+					getEditedContentOnlySection,
+				} = unlock( select( blockEditorStore ) );
 				return {
-					templateLock: getTemplateLock( props.clientId ),
-					isLockedByParent: !! __unstableGetContentLockingParent(
-						props.clientId
-					),
-					isEditingAsBlocks:
-						__unstableGetTemporarilyEditingAsBlocks() ===
-						props.clientId,
+					templateLock: getTemplateLock( clientId ),
+					isLockedByParent: !! getContentLockingParent( clientId ),
+					isEditingContentOnlySection:
+						getEditedContentOnlySection() === clientId,
 				};
 			},
-			[ props.clientId ]
+			[ clientId ]
 		);
 
-		const {
-			updateSettings,
-			updateBlockListSettings,
-			__unstableSetTemporarilyEditingAsBlocks,
-		} = useDispatch( blockEditorStore );
-		const isContentLocked =
-			! isLockedByParent && templateLock === 'contentOnly';
-		const {
-			__unstableMarkNextChangeAsNotPersistent,
-			updateBlockAttributes,
-		} = useDispatch( blockEditorStore );
+	const { stopEditingContentOnlySection } = unlock(
+		useDispatch( blockEditorStore )
+	);
+	const isContentLocked =
+		! isLockedByParent && templateLock === 'contentOnly';
 
-		const stopEditingAsBlock = useCallback( () => {
-			__unstableMarkNextChangeAsNotPersistent();
-			updateBlockAttributes( props.clientId, {
-				templateLock: 'contentOnly',
-			} );
-			updateBlockListSettings( props.clientId, {
-				...getBlockListSettings( props.clientId ),
-				templateLock: 'contentOnly',
-			} );
-			updateSettings( { focusMode: focusModeToRevert.current } );
-			__unstableSetTemporarilyEditingAsBlocks();
-		}, [
-			props.clientId,
-			focusModeToRevert,
-			updateSettings,
-			updateBlockListSettings,
-			getBlockListSettings,
-			__unstableMarkNextChangeAsNotPersistent,
-			updateBlockAttributes,
-			__unstableSetTemporarilyEditingAsBlocks,
-		] );
+	const stopEditingAsBlockCallback = useCallback( () => {
+		stopEditingContentOnlySection();
+	}, [ stopEditingContentOnlySection ] );
 
-		if ( ! isContentLocked && ! isEditingAsBlocks ) {
-			return <BlockEdit { ...props } />;
-		}
+	// Hide the Done button when the content only pattern insertion experiment is active.
+	// This is replaced by an alternative UI in the experiment.
+	if (
+		window?.__experimentalContentOnlyPatternInsertion ||
+		( ! isContentLocked && ! isEditingContentOnlySection )
+	) {
+		return null;
+	}
 
-		return (
-			<>
-				{ isEditingAsBlocks && ! isContentLocked && (
-					<>
-						<StopEditingAsBlocksOnOutsideSelect
-							clientId={ props.clientId }
-							stopEditingAsBlock={ stopEditingAsBlock }
-						/>
-						<BlockControls group="other">
-							<ToolbarButton
-								onClick={ () => {
-									stopEditingAsBlock();
-								} }
-							>
-								{ __( 'Done' ) }
-							</ToolbarButton>
-						</BlockControls>
-					</>
-				) }
-				{ ! isEditingAsBlocks && isContentLocked && props.isSelected && (
-					<BlockSettingsMenuControls>
-						{ ( { onClose } ) => (
-							<MenuItem
-								onClick={ () => {
-									__unstableMarkNextChangeAsNotPersistent();
-									updateBlockAttributes( props.clientId, {
-										templateLock: undefined,
-									} );
-									updateBlockListSettings( props.clientId, {
-										...getBlockListSettings(
-											props.clientId
-										),
-										templateLock: false,
-									} );
-									focusModeToRevert.current =
-										getSettings().focusMode;
-									updateSettings( { focusMode: true } );
-									__unstableSetTemporarilyEditingAsBlocks(
-										props.clientId
-									);
-									onClose();
-								} }
-							>
-								{ __( 'Modify' ) }
-							</MenuItem>
-						) }
-					</BlockSettingsMenuControls>
-				) }
-				<BlockEdit
-					{ ...props }
-					className={ classnames(
-						props.className,
-						isEditingAsBlocks &&
-							'is-content-locked-editing-as-blocks'
-					) }
-				/>
-			</>
-		);
+	return (
+		isEditingContentOnlySection && (
+			<BlockControls group="other">
+				<ToolbarButton onClick={ stopEditingAsBlockCallback }>
+					{ __( 'Done' ) }
+				</ToolbarButton>
+			</BlockControls>
+		)
+	);
+}
+
+export default {
+	edit: ContentLockControlsPure,
+	hasSupport() {
+		return true;
 	},
-	'withToolbarControls'
-);
-
-addFilter(
-	'editor.BlockEdit',
-	'core/style/with-block-controls',
-	withBlockControls
-);
+};

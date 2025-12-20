@@ -3,12 +3,33 @@
     display: none;
 }
 
-/* Remove default block appender at the end of the post */
-.block-list-appender {
+/* Remove header toolbar */
+.editor-header__toolbar {
     display: none;
 }
 
-.edit-post-visual-editor__post-title-wrapper {
+/* Hide all children of editor-header__settings */
+.editor-header__settings > * {
+    display: none;
+}
+
+/* Show only the interface-pinned-items container */
+.editor-header__settings > .interface-pinned-items {
+    display: block;
+}
+
+.components-button.editor-post-publish-panel__toggle.is-primary{
+    display: none;
+}
+
+/* Remove default block appender at the end of the post */
+.block-list-appender, .block-list-appender__toggle,
+.block-editor-inserter, .components-autocomplete__popover {
+    display: none;
+}
+
+.edit-post-visual-editor__post-title-wrapper,
+.editor-editor-canvas__post-title-wrapper {
     display: none;
 }
 
@@ -17,14 +38,27 @@
     display: none;
 }
 
-/*
- Hiddes the top bar header by setting its height to 0
- We can\'t remove it since the block toolbar is a child of it.
- */
+/* Remove block inserter popover */
+.block-editor-block-popover {
+    display: none;
+}
+
+/* Right align post header children as we will only display one child */
 .edit-post-header {
-    height: 0px;
-    padding: 0px;
-    overflow: hidden;
+	justify-content: flex-end;
+}
+
+/* Hide post controls unrelated to editing a single block */
+.edit-post-header__toolbar,
+.edit-post-layout .edit-post-header .edit-post-header__settings > *,
+.interface-pinned-items > * {
+	display: none;
+}
+
+/* Display the sidebar toggle button whenever a block is selected */
+.edit-post-layout .edit-post-header .edit-post-header__settings .interface-pinned-items,
+.is-block-selected .edit-post-header__settings .interface-pinned-items > button:first-child {
+	display: flex;
 }
 
 /* Move the block toolbar to the top */
@@ -34,6 +68,11 @@
 
 .interface-interface-skeleton {
     top: 0px;
+}
+
+/* Hide block actions unrelated to editing a single block */
+.block-editor-block-settings-menu {
+	display: none;
 }
 
 /*
@@ -50,55 +89,23 @@
 }
 
 /* Remove tabs from sidebar panel, leaving the \'x\' button */
-.edit-post-sidebar__panel-tabs {
+.editor-sidebar__panel-tabs {
     display: none;
 }
 
 /* Remove \'(no-title)\' string from sidebar header */
-.edit-post-sidebar-header__title {
+.editor-sidebar-header__title {
     display: none;
 }
 
 /* Move \'x\' close button to the end on sidebar header */
-.edit-post-sidebar-header__small {
+.editor-sidebar-header__small {
     justify-content: flex-end;
 }
 
 /* Remove all buttons from the component menu group inside \'...\' button in block toolbar */
 .components-menu-group > div > button:not(:first-child) {
     display: none;
-}
-
-/* 
- Load second button in component menu group but hide it from view.
- This is to fix a Chrome-specific bug that occurs if this button is set to "display: none;" 
- For additional context, see: https://github.com/WordPress/gutenberg/pull/33740
-*/
-.components-dropdown-menu__menu
-	> .components-menu-group
-	> div
-	> button:nth-child( 2 ) {
-	display: block;
-	min-height: 0;
-	height: 0;
-	padding: 0;
-}
-
-.components-menu-group > div > button:nth-child( 2 ) > span {
-	display: none;
-}
-
-.components-button:focus:not( :disabled ) {
-	box-shadow: none;
-}
-
-/* Remove \'delete block\' button inside \'...\' button in block toolbar */
-.components-dropdown-menu__menu > div:not(:first-child) {
-    display: none;
-}
-
-.components-dropdown-menu__menu > div:first-child {
-	padding-bottom: 0;
 }
 
 /*

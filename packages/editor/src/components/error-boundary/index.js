@@ -3,9 +3,12 @@
  */
 import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { Button } from '@wordpress/components';
+import {
+	Button,
+	__experimentalHStack as HStack,
+	__experimentalText as Text,
+} from '@wordpress/components';
 import { select } from '@wordpress/data';
-import { Warning } from '@wordpress/block-editor';
 import { useCopyToClipboard } from '@wordpress/compose';
 import { doAction } from '@wordpress/hooks';
 
@@ -14,10 +17,22 @@ import { doAction } from '@wordpress/hooks';
  */
 import { store as editorStore } from '../../store';
 
-function CopyButton( { text, children } ) {
+function getContent() {
+	try {
+		// While `select` in a component is generally discouraged, it is
+		// used here because it (a) reduces the chance of data loss in the
+		// case of additional errors by performing a direct retrieval and
+		// (b) avoids the performance cost associated with unnecessary
+		// content serialization throughout the lifetime of a non-erroring
+		// application.
+		return select( editorStore ).getEditedPostContent();
+	} catch ( error ) {}
+}
+
+function CopyButton( { text, children, variant = 'secondary' } ) {
 	const ref = useCopyToClipboard( text );
 	return (
-		<Button variant="secondary" ref={ ref }>
+		<Button __next40pxDefaultSize variant={ variant } ref={ ref }>
 			{ children }
 		</Button>
 	);
@@ -27,65 +42,61 @@ class ErrorBoundary extends Component {
 	constructor() {
 		super( ...arguments );
 
-		this.reboot = this.reboot.bind( this );
-		this.getContent = this.getContent.bind( this );
-
 		this.state = {
 			error: null,
 		};
 	}
 
 	componentDidCatch( error ) {
-		this.setState( { error } );
-
 		doAction( 'editor.ErrorBoundary.errorLogged', error );
 	}
 
-	reboot() {
-		this.props.onError();
-	}
-
-	getContent() {
-		try {
-			// While `select` in a component is generally discouraged, it is
-			// used here because it (a) reduces the chance of data loss in the
-			// case of additional errors by performing a direct retrieval and
-			// (b) avoids the performance cost associated with unnecessary
-			// content serialization throughout the lifetime of a non-erroring
-			// application.
-			return select( editorStore ).getEditedPostContent();
-		} catch ( error ) {}
+	static getDerivedStateFromError( error ) {
+		return { error };
 	}
 
 	render() {
 		const { error } = this.state;
+		const { canCopyContent = false } = this.props;
 		if ( ! error ) {
 			return this.props.children;
 		}
 
 		return (
-			<Warning
+			<HStack
 				className="editor-error-boundary"
-				actions={ [
-					<Button
-						key="recovery"
-						onClick={ this.reboot }
-						variant="secondary"
-					>
-						{ __( 'Attempt Recovery' ) }
-					</Button>,
-					<CopyButton key="copy-post" text={ this.getContent }>
-						{ __( 'Copy Post Text' ) }
-					</CopyButton>,
-					<CopyButton key="copy-error" text={ error.stack }>
-						{ __( 'Copy Error' ) }
-					</CopyButton>,
-				] }
+				alignment="baseline"
+				spacing={ 4 }
+				justify="space-between"
+				expanded={ false }
+				wrap
 			>
-				{ __( 'The editor has encountered an unexpected error.' ) }
-			</Warning>
+				<Text as="p">
+					{ __( 'The editor has encountered an unexpected error.' ) }
+				</Text>
+				<HStack expanded={ false }>
+					{ canCopyContent && (
+						<CopyButton text={ getContent }>
+							{ __( 'Copy contents' ) }
+						</CopyButton>
+					) }
+					<CopyButton variant="primary" text={ error?.stack }>
+						{ __( 'Copy error' ) }
+					</CopyButton>
+				</HStack>
+			</HStack>
 		);
 	}
 }
 
+/**
+ * ErrorBoundary is used to catch JavaScript errors anywhere in a child component tree, log those errors, and display a fallback UI.
+ *
+ * It uses the lifecycle methods getDerivedStateFromError and componentDidCatch to catch errors in a child component tree.
+ *
+ * getDerivedStateFromError is used to render a fallback UI after an error has been thrown, and componentDidCatch is used to log error information.
+ *
+ * @class ErrorBoundary
+ * @augments Component
+ */
 export default ErrorBoundary;

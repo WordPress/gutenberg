@@ -1,24 +1,20 @@
 /**
- * External dependencies
- */
-import { find, kebabCase } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { addFilter } from '@wordpress/hooks';
 import { hasBlockSupport } from '@wordpress/blocks';
 import TokenList from '@wordpress/token-list';
+import { privateApis as componentsPrivateApis } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
-import useSetting from '../components/use-setting';
-import FontFamilyControl from '../components/font-family';
 import { shouldSkipSerialization } from './utils';
 import { TYPOGRAPHY_SUPPORT_KEY } from './typography';
+import { unlock } from '../lock-unlock';
 
 export const FONT_FAMILY_SUPPORT_KEY = 'typography.__experimentalFontFamily';
+const { kebabCase } = unlock( componentsPrivateApis );
 
 /**
  * Filters registered block settings, extending attributes to include
@@ -80,88 +76,18 @@ function addSaveProps( props, blockType, attributes ) {
 	return props;
 }
 
-/**
- * Filters registered block settings to expand the block edit wrapper
- * by applying the desired styles and classnames.
- *
- * @param {Object} settings Original block settings.
- *
- * @return {Object} Filtered block settings.
- */
-function addEditProps( settings ) {
-	if ( ! hasBlockSupport( settings, FONT_FAMILY_SUPPORT_KEY ) ) {
-		return settings;
-	}
-
-	const existingGetEditWrapperProps = settings.getEditWrapperProps;
-	settings.getEditWrapperProps = ( attributes ) => {
-		let props = {};
-		if ( existingGetEditWrapperProps ) {
-			props = existingGetEditWrapperProps( attributes );
-		}
-		return addSaveProps( props, settings, attributes );
-	};
-
-	return settings;
+function useBlockProps( { name, fontFamily } ) {
+	return addSaveProps( {}, name, { fontFamily } );
 }
 
-export function FontFamilyEdit( {
-	setAttributes,
-	attributes: { fontFamily },
-} ) {
-	const fontFamilies = useSetting( 'typography.fontFamilies' );
-
-	const value = find(
-		fontFamilies,
-		( { slug } ) => fontFamily === slug
-	)?.fontFamily;
-
-	function onChange( newValue ) {
-		const predefinedFontFamily = find(
-			fontFamilies,
-			( { fontFamily: f } ) => f === newValue
-		);
-		setAttributes( {
-			fontFamily: predefinedFontFamily?.slug,
-		} );
-	}
-
-	return (
-		<FontFamilyControl
-			className="block-editor-hooks-font-family-control"
-			fontFamilies={ fontFamilies }
-			value={ value }
-			onChange={ onChange }
-			size="__unstable-large"
-			__nextHasNoMarginBottom
-		/>
-	);
-}
-
-/**
- * Custom hook that checks if font-family functionality is disabled.
- *
- * @param {string} name The name of the block.
- * @return {boolean} Whether setting is disabled.
- */
-export function useIsFontFamilyDisabled( { name } ) {
-	const fontFamilies = useSetting( 'typography.fontFamilies' );
-	return (
-		! fontFamilies ||
-		fontFamilies.length === 0 ||
-		! hasBlockSupport( name, FONT_FAMILY_SUPPORT_KEY )
-	);
-}
-
-/**
- * Checks if there is a current value set for the font family block support.
- *
- * @param {Object} props Block props.
- * @return {boolean}     Whether or not the block has a font family value set.
- */
-export function hasFontFamilyValue( props ) {
-	return !! props.attributes.fontFamily;
-}
+export default {
+	useBlockProps,
+	addSaveProps,
+	attributeKeys: [ 'fontFamily' ],
+	hasSupport( name ) {
+		return hasBlockSupport( name, FONT_FAMILY_SUPPORT_KEY );
+	},
+};
 
 /**
  * Resets the font family block support attribute. This can be used when
@@ -179,16 +105,4 @@ addFilter(
 	'blocks.registerBlockType',
 	'core/fontFamily/addAttribute',
 	addAttributes
-);
-
-addFilter(
-	'blocks.getSaveContent.extraProps',
-	'core/fontFamily/addSaveProps',
-	addSaveProps
-);
-
-addFilter(
-	'blocks.registerBlockType',
-	'core/fontFamily/addEditProps',
-	addEditProps
 );

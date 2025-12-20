@@ -5,8 +5,8 @@
 import { insert } from './insert';
 import { OBJECT_REPLACEMENT_CHARACTER } from './special-characters';
 
-/** @typedef {import('./create').RichTextValue} RichTextValue */
-/** @typedef {import('./create').RichTextFormat} RichTextFormat */
+/** @typedef {import('./types').RichTextValue} RichTextValue */
+/** @typedef {import('./types').RichTextFormat} RichTextFormat */
 
 /**
  * Insert a format as an object into a Rich Text value at the given

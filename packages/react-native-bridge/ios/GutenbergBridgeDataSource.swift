@@ -1,6 +1,6 @@
 import Aztec
 
-public protocol GutenbergBridgeDataSource: class {
+public protocol GutenbergBridgeDataSource: AnyObject {
     /// Asks the data source for the initial html content to be presented by the editor.
     /// Return `nil` to show the example content.
     ///
@@ -82,9 +82,6 @@ public extension GutenbergBridgeDataSource {
 
 public protocol GutenbergEditorSettings {
     var isFSETheme: Bool { get }
-    var galleryWithImageBlocks: Bool { get }
-    var quoteBlockV2: Bool { get }
-    var listBlockV2: Bool { get }
     var rawStyles: String? { get }
     var rawFeatures: String? { get }
     var colors: [[String: String]]? { get }

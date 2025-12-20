@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { map } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import {
@@ -11,6 +6,7 @@ import {
 	MenuGroup,
 	__experimentalStyleProvider as StyleProvider,
 } from '@wordpress/components';
+import { hasBlockSupport } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
 
 /**
@@ -22,50 +18,66 @@ import {
 } from '../convert-to-group-buttons';
 import { BlockLockMenuItem, useBlockLock } from '../block-lock';
 import { store as blockEditorStore } from '../../store';
+import BlockModeToggle from '../block-settings-menu/block-mode-toggle';
+import { ModifyContentOnlySectionMenuItem } from '../content-lock';
+import { BlockRenameControl, useBlockRename } from '../block-rename';
+import { BlockVisibilityMenuItem } from '../block-visibility';
+import { EditSectionMenuItem } from './edit-section-menu-item';
 
 const { Fill, Slot } = createSlotFill( 'BlockSettingsMenuControls' );
 
-const BlockSettingsMenuControlsSlot = ( {
-	fillProps,
-	clientIds = null,
-	__unstableDisplayLocation,
-} ) => {
-	const { selectedBlocks, selectedClientIds, canRemove } = useSelect(
+const BlockSettingsMenuControlsSlot = ( { fillProps, clientIds = null } ) => {
+	const {
+		selectedBlocks,
+		selectedClientIds,
+		isContentOnly,
+		canToggleSelectedBlocksVisibility,
+	} = useSelect(
 		( select ) => {
 			const {
 				getBlocksByClientId,
+				getBlockNamesByClientId,
 				getSelectedBlockClientIds,
-				canRemoveBlocks,
+				getBlockEditingMode,
 			} = select( blockEditorStore );
 			const ids =
 				clientIds !== null ? clientIds : getSelectedBlockClientIds();
 			return {
-				selectedBlocks: map(
-					getBlocksByClientId( ids ).filter( Boolean ),
-					( block ) => block.name
-				),
+				selectedBlocks: getBlockNamesByClientId( ids ),
 				selectedClientIds: ids,
-				canRemove: canRemoveBlocks( ids ),
+				isContentOnly:
+					getBlockEditingMode( ids[ 0 ] ) === 'contentOnly',
+				canToggleSelectedBlocksVisibility: getBlocksByClientId(
+					ids
+				).every( ( block ) =>
+					hasBlockSupport( block.name, 'visibility', true )
+				),
 			};
 		},
 		[ clientIds ]
 	);
 
 	const { canLock } = useBlockLock( selectedClientIds[ 0 ] );
-	const showLockButton = selectedClientIds.length === 1 && canLock;
+	const { canRename } = useBlockRename( selectedBlocks[ 0 ] );
+	const showLockButton =
+		selectedClientIds.length === 1 && canLock && ! isContentOnly;
+	const showRenameButton =
+		selectedClientIds.length === 1 && canRename && ! isContentOnly;
+	const showVisibilityButton =
+		canToggleSelectedBlocksVisibility && ! isContentOnly;
 
 	// Check if current selection of blocks is Groupable or Ungroupable
 	// and pass this props down to ConvertToGroupButton.
-	const convertToGroupButtonProps = useConvertToGroupButtonProps();
+	const convertToGroupButtonProps =
+		useConvertToGroupButtonProps( selectedClientIds );
 	const { isGroupable, isUngroupable } = convertToGroupButtonProps;
 	const showConvertToGroupButton =
-		( isGroupable || isUngroupable ) && canRemove;
+		( isGroupable || isUngroupable ) && ! isContentOnly;
 
 	return (
 		<Slot
 			fillProps={ {
 				...fillProps,
-				__unstableDisplayLocation,
 				selectedBlocks,
 				selectedClientIds,
 			} }
@@ -81,16 +93,44 @@ const BlockSettingsMenuControlsSlot = ( {
 
 				return (
 					<MenuGroup>
+						{ showConvertToGroupButton && (
+							<ConvertToGroupButton
+								{ ...convertToGroupButtonProps }
+								onClose={ fillProps?.onClose }
+							/>
+						) }
+						{ selectedClientIds.length === 1 && (
+							<EditSectionMenuItem
+								clientId={ selectedClientIds[ 0 ] }
+								onClose={ fillProps?.onClose }
+							/>
+						) }
 						{ showLockButton && (
 							<BlockLockMenuItem
 								clientId={ selectedClientIds[ 0 ] }
 							/>
 						) }
+						{ showRenameButton && (
+							<BlockRenameControl
+								clientId={ selectedClientIds[ 0 ] }
+							/>
+						) }
+						{ showVisibilityButton && (
+							<BlockVisibilityMenuItem
+								clientIds={ selectedClientIds }
+							/>
+						) }
 						{ fills }
-						{ showConvertToGroupButton && (
-							<ConvertToGroupButton
-								{ ...convertToGroupButtonProps }
+						{ selectedClientIds.length === 1 && (
+							<ModifyContentOnlySectionMenuItem
+								clientId={ selectedClientIds[ 0 ] }
 								onClose={ fillProps?.onClose }
+							/>
+						) }
+						{ fillProps?.count === 1 && ! isContentOnly && (
+							<BlockModeToggle
+								clientId={ fillProps?.firstBlockClientId }
+								onToggle={ fillProps?.onClose }
 							/>
 						) }
 					</MenuGroup>
@@ -104,7 +144,7 @@ const BlockSettingsMenuControlsSlot = ( {
  * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-settings-menu-controls/README.md
  *
  * @param {Object} props Fill props.
- * @return {WPElement} Element.
+ * @return {Element} Element.
  */
 function BlockSettingsMenuControls( { ...props } ) {
 	return (

@@ -1,0 +1,16 @@
+[
+	{
+		"blockName": "core/block",
+		"attrs": {
+			"ref": 123,
+			"content": {
+				"Nice paragraph": {
+					"content": "Some value"
+				}
+			}
+		},
+		"innerBlocks": [],
+		"innerHTML": "",
+		"innerContent": []
+	}
+]

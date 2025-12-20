@@ -1,69 +1,87 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`flags warnings with invalid values css snapshot matches warnings 1`] = `
-Array [
-  Object {
+[
+  {
     "column": 16,
+    "endColumn": 17,
+    "endLine": 2,
     "line": 2,
-    "rule": "declaration-block-trailing-semicolon",
+    "rule": "@stylistic/declaration-block-trailing-semicolon",
     "severity": "error",
-    "text": "Expected a trailing semicolon (declaration-block-trailing-semicolon)",
+    "text": "Expected a trailing semicolon (@stylistic/declaration-block-trailing-semicolon)",
   },
-  Object {
+  {
     "column": 13,
+    "endColumn": 14,
+    "endLine": 2,
     "line": 2,
-    "rule": "declaration-colon-space-after",
+    "rule": "@stylistic/declaration-colon-space-after",
     "severity": "error",
-    "text": "Expected single space after \\":\\" with a single-line declaration (declaration-colon-space-after)",
+    "text": "Expected single space after ":" with a single-line declaration (@stylistic/declaration-colon-space-after)",
   },
-  Object {
+  {
     "column": 15,
+    "endColumn": 20,
+    "endLine": 12,
     "line": 12,
     "rule": "declaration-property-unit-allowed-list",
     "severity": "error",
-    "text": "Unexpected unit \\"em\\" for property \\"line-height\\" (declaration-property-unit-allowed-list)",
+    "text": "Unexpected unit "em" for property "line-height" (declaration-property-unit-allowed-list)",
   },
-  Object {
+  {
     "column": 15,
+    "endColumn": 30,
+    "endLine": 10,
     "line": 10,
     "rule": "font-family-name-quotes",
     "severity": "error",
-    "text": "Expected quotes around \\"Times New Roman\\" (font-family-name-quotes)",
+    "text": "Expected quotes around "Times New Roman" (font-family-name-quotes)",
   },
-  Object {
+  {
     "column": 15,
+    "endColumn": 19,
+    "endLine": 11,
     "line": 11,
     "rule": "font-weight-notation",
     "severity": "error",
-    "text": "Expected numeric font-weight notation (font-weight-notation)",
+    "text": "Expected "bold" to be "700" (font-weight-notation)",
   },
-  Object {
+  {
     "column": 11,
+    "endColumn": 13,
+    "endLine": 6,
     "line": 6,
     "rule": "length-zero-no-unit",
     "severity": "error",
     "text": "Unexpected unit (length-zero-no-unit)",
   },
-  Object {
+  {
     "column": 15,
+    "endColumn": 17,
+    "endLine": 6,
     "line": 6,
     "rule": "length-zero-no-unit",
     "severity": "error",
     "text": "Unexpected unit (length-zero-no-unit)",
   },
-  Object {
+  {
     "column": 24,
+    "endColumn": 26,
+    "endLine": 6,
     "line": 6,
     "rule": "length-zero-no-unit",
     "severity": "error",
     "text": "Unexpected unit (length-zero-no-unit)",
   },
-  Object {
+  {
     "column": 1,
+    "endColumn": 10,
+    "endLine": 15,
     "line": 15,
     "rule": "no-duplicate-selectors",
     "severity": "error",
-    "text": "Unexpected duplicate selector \\".selector\\", first used at line 1 (no-duplicate-selectors)",
+    "text": "Unexpected duplicate selector ".selector", first used at line 1 (no-duplicate-selectors)",
   },
 ]
 `;

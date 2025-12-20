@@ -1,0 +1,18 @@
+{
+	"version": 3,
+	"settings": {
+		"blocks": {
+			"core/paragraph": {
+				"color": {
+					"palette": [
+						{
+							"slug": "light",
+							"name": "Light",
+							"color": "#f2f2f2"
+						}
+					]
+				}
+			}
+		}
+	}
+}

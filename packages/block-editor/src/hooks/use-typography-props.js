@@ -1,51 +1,57 @@
 /**
  * External dependencies
  */
-import { kebabCase } from 'lodash';
-import classnames from 'classnames';
+import clsx from 'clsx';
+
+/**
+ * WordPress dependencies
+ */
+import { privateApis as componentsPrivateApis } from '@wordpress/components';
+import { getTypographyFontSizeValue } from '@wordpress/global-styles-engine';
 
 /**
  * Internal dependencies
  */
 import { getInlineStyles } from './style';
 import { getFontSizeClass } from '../components/font-sizes';
-import { getComputedFluidTypographyValue } from '../components/font-sizes/fluid-utils';
+import { unlock } from '../lock-unlock';
 
-// This utility is intended to assist where the serialization of the typography
-// block support is being skipped for a block but the typography related CSS
-// styles still need to be generated so they can be applied to inner elements.
+const { kebabCase } = unlock( componentsPrivateApis );
 
+/*
+ * This utility is intended to assist where the serialization of the typography
+ * block support is being skipped for a block but the typography related CSS
+ * styles still need to be generated so they can be applied to inner elements.
+ */
 /**
  * Provides the CSS class names and inline styles for a block's typography support
  * attributes.
  *
- * @param {Object}  attributes            Block attributes.
- * @param {boolean} isFluidFontSizeActive Whether the function should try to convert font sizes to fluid values.
+ * @param {Object}         attributes Block attributes.
+ * @param {Object|boolean} settings   Merged theme.json settings
  *
  * @return {Object} Typography block support derived CSS classes & styles.
  */
-export function getTypographyClassesAndStyles(
-	attributes,
-	isFluidFontSizeActive
-) {
+export function getTypographyClassesAndStyles( attributes, settings ) {
 	let typographyStyles = attributes?.style?.typography || {};
-
-	if ( isFluidFontSizeActive ) {
-		typographyStyles = {
-			...typographyStyles,
-			fontSize: getComputedFluidTypographyValue( {
-				fontSize: attributes?.style?.typography?.fontSize,
-			} ),
-		};
-	}
+	typographyStyles = {
+		...typographyStyles,
+		fontSize: getTypographyFontSizeValue(
+			{ size: attributes?.style?.typography?.fontSize },
+			settings
+		),
+	};
 
 	const style = getInlineStyles( { typography: typographyStyles } );
 	const fontFamilyClassName = !! attributes?.fontFamily
 		? `has-${ kebabCase( attributes.fontFamily ) }-font-family`
 		: '';
-
-	const className = classnames(
+	const textAlignClassName = !! attributes?.style?.typography?.textAlign
+		? `has-text-align-${ attributes?.style?.typography?.textAlign }`
+		: '';
+	const className = clsx(
 		fontFamilyClassName,
+		textAlignClassName,
 		getFontSizeClass( attributes?.fontSize )
 	);
 

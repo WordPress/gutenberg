@@ -11,6 +11,7 @@ import TextHighlight from '..';
 const getMarks = ( container: Element ) =>
 	// Use querySelectorAll because the `mark` role is not officially supported
 	// yet. This should be changed to `getByRole` when it is.
+	// eslint-disable-next-line testing-library/no-node-access
 	Array.from( container.querySelectorAll( 'mark' ) );
 
 const defaultText =
@@ -19,7 +20,7 @@ const defaultText =
 describe( 'TextHighlight', () => {
 	describe( 'Basic rendering', () => {
 		it.each( [ [ 'Gutenberg' ], [ 'media' ] ] )(
-			'should highlight the singular occurance of the text "%s" in the text if it exists',
+			'should highlight the singular occurrence of the text "%s" in the text if it exists',
 			( highlight ) => {
 				const { container } = render(
 					<TextHighlight
@@ -38,7 +39,7 @@ describe( 'TextHighlight', () => {
 			}
 		);
 
-		it( 'should highlight multiple occurances of the string every time it exists in the text', () => {
+		it( 'should highlight multiple occurrences of the string every time it exists in the text', () => {
 			const highlight = 'edit';
 
 			const { container } = render(
@@ -54,7 +55,7 @@ describe( 'TextHighlight', () => {
 			} );
 		} );
 
-		it( 'should highlight occurances of a string regardless of capitalisation', () => {
+		it( 'should highlight occurrences of a string regardless of capitalisation', () => {
 			// Note that `The` occurs twice in the default text, once in
 			// lowercase and once capitalized.
 			const highlight = 'The';

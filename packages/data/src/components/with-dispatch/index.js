@@ -8,6 +8,8 @@ import { createHigherOrderComponent } from '@wordpress/compose';
  */
 import { useDispatchWithMap } from '../use-dispatch';
 
+/** @typedef {import('react').ComponentType} ComponentType */
+
 /**
  * Higher-order component used to add dispatch props using registered action
  * creators.
@@ -87,7 +89,7 @@ import { useDispatchWithMap } from '../use-dispatch';
  * returns an object with the same keys. For example, it should not contain
  * conditions under which a different value would be returned.
  *
- * @return {WPComponent} Enhanced component with merged dispatcher props.
+ * @return {ComponentType} Enhanced component with merged dispatcher props.
  */
 const withDispatch = ( mapDispatchToProps ) =>
 	createHigherOrderComponent(

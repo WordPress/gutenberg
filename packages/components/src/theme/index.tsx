@@ -1,18 +1,16 @@
 /**
- * External dependencies
+ * WordPress dependencies
  */
-import { colord, extend } from 'colord';
-import a11yPlugin from 'colord/plugins/a11y';
-import namesPlugin from 'colord/plugins/names';
+import { useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import type { ThemeProps } from './types';
-import type { WordPressComponentProps } from '../ui/context';
-import { Wrapper } from './styles';
-
-extend( [ namesPlugin, a11yPlugin ] );
+import type { WordPressComponentProps } from '../context';
+import { colorVariables, Wrapper } from './styles';
+import { generateThemeVariables } from './color-algorithms';
+import { useCx } from '../utils';
 
 /**
  * `Theme` allows defining theme variables for components in the `@wordpress/components` package.
@@ -20,10 +18,7 @@ extend( [ namesPlugin, a11yPlugin ] );
  * Multiple `Theme` components can be nested in order to override specific theme variables.
  *
  *
- * @example
  * ```jsx
- * import { __experimentalTheme as Theme } from '@wordpress/components';
- *
  * const Example = () => {
  *   return (
  *     <Theme accent="red">
@@ -36,16 +31,25 @@ extend( [ namesPlugin, a11yPlugin ] );
  * };
  * ```
  */
-function Theme( props: WordPressComponentProps< ThemeProps, 'div', true > ) {
-	const { accent } = props;
-	if ( accent && ! colord( accent ).isValid() ) {
-		// eslint-disable-next-line no-console
-		console.warn(
-			`wp.components.Theme: "${ accent }" is not a valid color value for the 'accent' prop.`
-		);
-	}
+function Theme( {
+	accent,
+	background,
+	className,
+	...props
+}: WordPressComponentProps< ThemeProps, 'div', true > ) {
+	const cx = useCx();
+	const classes = useMemo(
+		() =>
+			cx(
+				...colorVariables(
+					generateThemeVariables( { accent, background } )
+				),
+				className
+			),
+		[ accent, background, className, cx ]
+	);
 
-	return <Wrapper { ...props } />;
+	return <Wrapper className={ classes } { ...props } />;
 }
 
 export default Theme;

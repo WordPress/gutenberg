@@ -7,17 +7,20 @@ import {
 	useBlockProps,
 	InspectorControls,
 	useInnerBlocksProps,
-	useSetting,
 	store as blockEditorStore,
+	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
-import { SelectControl } from '@wordpress/components';
+import { useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { useCallback } from '@wordpress/element';
+import { View } from '@wordpress/primitives';
 
 /**
  * Internal dependencies
  */
 import GroupPlaceHolder, { useShouldShowPlaceHolder } from './placeholder';
+import { unlock } from '../lock-unlock';
+
+const { HTMLElementControl } = unlock( blockEditorPrivateApis );
 
 /**
  * Render inspector controls for the Group block.
@@ -25,34 +28,17 @@ import GroupPlaceHolder, { useShouldShowPlaceHolder } from './placeholder';
  * @param {Object}   props                 Component props.
  * @param {string}   props.tagName         The HTML tag name.
  * @param {Function} props.onSelectTagName onChange function for the SelectControl.
+ * @param {string}   props.clientId        The client ID of the current block.
  *
  * @return {JSX.Element}                The control group.
  */
-function GroupEditControls( { tagName, onSelectTagName } ) {
-	const htmlElementMessages = {
-		header: __(
-			'The <header> element should represent introductory content, typically a group of introductory or navigational aids.'
-		),
-		main: __(
-			'The <main> element should be used for the primary content of your document only. '
-		),
-		section: __(
-			"The <section> element should represent a standalone portion of the document that can't be better represented by another element."
-		),
-		article: __(
-			'The <article> element should represent a self-contained, syndicatable portion of the document.'
-		),
-		aside: __(
-			"The <aside> element should represent a portion of a document whose content is only indirectly related to the document's main content."
-		),
-		footer: __(
-			'The <footer> element should represent a footer for its nearest sectioning element (e.g.: <section>, <article>, <main> etc.).'
-		),
-	};
+function GroupEditControls( { tagName, onSelectTagName, clientId } ) {
 	return (
-		<InspectorControls __experimentalGroup="advanced">
-			<SelectControl
-				label={ __( 'HTML element' ) }
+		<InspectorControls group="advanced">
+			<HTMLElementControl
+				tagName={ tagName }
+				onChange={ onSelectTagName }
+				clientId={ clientId }
 				options={ [
 					{ label: __( 'Default (<div>)' ), value: 'div' },
 					{ label: '<header>', value: 'header' },
@@ -62,21 +48,12 @@ function GroupEditControls( { tagName, onSelectTagName } ) {
 					{ label: '<aside>', value: 'aside' },
 					{ label: '<footer>', value: 'footer' },
 				] }
-				value={ tagName }
-				onChange={ onSelectTagName }
-				help={ htmlElementMessages[ tagName ] }
 			/>
 		</InspectorControls>
 	);
 }
 
-function GroupEdit( {
-	attributes,
-	name,
-	setAttributes,
-	clientId,
-	__unstableLayoutClassNames: layoutClassNames,
-} ) {
+function GroupEdit( { attributes, name, setAttributes, clientId } ) {
 	const { hasInnerBlocks, themeSupportsLayout } = useSelect(
 		( select ) => {
 			const { getBlock, getSettings } = select( blockEditorStore );
@@ -89,47 +66,59 @@ function GroupEdit( {
 		[ clientId ]
 	);
 
-	const { tagName: TagName = 'div', templateLock, layout = {} } = attributes;
+	const {
+		tagName: TagName = 'div',
+		templateLock,
+		allowedBlocks,
+		layout = {},
+	} = attributes;
 
 	// Layout settings.
-	const defaultLayout = useSetting( 'layout' ) || {};
-	const usedLayout = ! layout?.type
-		? { ...defaultLayout, ...layout, type: 'default' }
-		: { ...defaultLayout, ...layout };
-	const { type = 'default' } = usedLayout;
-	const layoutSupportEnabled = themeSupportsLayout || type === 'flex';
+	const { type = 'default' } = layout;
+	const layoutSupportEnabled =
+		themeSupportsLayout || type === 'flex' || type === 'grid';
 
 	// Hooks.
-	const blockProps = useBlockProps( {
-		className: ! layoutSupportEnabled ? layoutClassNames : null,
-	} );
+	const ref = useRef();
+	const blockProps = useBlockProps( { ref } );
+
 	const [ showPlaceholder, setShowPlaceholder ] = useShouldShowPlaceHolder( {
 		attributes,
-		usedLayoutType: usedLayout?.type,
+		usedLayoutType: type,
 		hasInnerBlocks,
 	} );
+
+	// Default to the regular appender being rendered.
+	let renderAppender;
+	if ( showPlaceholder ) {
+		// In the placeholder state, ensure the appender is not rendered.
+		// This is needed because `...innerBlocksProps` is used in the placeholder
+		// state so that blocks can dragged onto the placeholder area
+		// from both the list view and in the editor canvas.
+		renderAppender = false;
+	} else if ( ! hasInnerBlocks ) {
+		// When there is no placeholder, but the block is also empty,
+		// use the larger button appender.
+		renderAppender = InnerBlocks.ButtonBlockAppender;
+	}
+
 	const innerBlocksProps = useInnerBlocksProps(
 		layoutSupportEnabled
 			? blockProps
 			: { className: 'wp-block-group__inner-container' },
 		{
+			dropZoneElement: ref.current,
 			templateLock,
-			renderAppender: hasInnerBlocks
-				? undefined
-				: InnerBlocks.ButtonBlockAppender,
-			__experimentalLayout: layoutSupportEnabled ? usedLayout : undefined,
-			__unstableDisableLayoutClassNames: ! layoutSupportEnabled,
+			allowedBlocks,
+			renderAppender,
 		}
 	);
 
 	const { selectBlock } = useDispatch( blockEditorStore );
-	const updateSelection = useCallback(
-		( newClientId ) => selectBlock( newClientId, -1 ),
-		[ selectBlock ]
-	);
+
 	const selectVariation = ( nextVariation ) => {
 		setAttributes( nextVariation.attributes );
-		updateSelection( clientId );
+		selectBlock( clientId, -1 );
 		setShowPlaceholder( false );
 	};
 
@@ -140,13 +129,16 @@ function GroupEdit( {
 				onSelectTagName={ ( value ) =>
 					setAttributes( { tagName: value } )
 				}
+				clientId={ clientId }
 			/>
 			{ showPlaceholder && (
-				<GroupPlaceHolder
-					clientId={ clientId }
-					name={ name }
-					onSelect={ selectVariation }
-				/>
+				<View>
+					{ innerBlocksProps.children }
+					<GroupPlaceHolder
+						name={ name }
+						onSelect={ selectVariation }
+					/>
+				</View>
 			) }
 			{ layoutSupportEnabled && ! showPlaceholder && (
 				<TagName { ...innerBlocksProps } />

@@ -2,38 +2,49 @@
 
 `NavigableContainer` is a React component to render a container navigable using the keyboard. Only things that are focusable can be navigated to. It will currently always be a `div`.
 
-`NavigableContainer` is exported as two classes: `NavigableMenu` and `TabbableContainer`. `NavigableContainer` itself is **not** exported. `NavigableMenu` and `TabbableContainer` have the props listed below. Any other props will be passed through to the `div`.
+`NavigableContainer` is exported as two components: `NavigableMenu` and `TabbableContainer`. `NavigableContainer` itself is **not** exported. `NavigableMenu` and `TabbableContainer` have the props listed below. Any other props will be passed through to the `div`.
 
 ---
 
 ## Props
 
-These are the props that `NavigableMenu` and `TabbableContainer`. Any props which are specific to one class are labelled appropriately.
+These are the props that `NavigableMenu` and `TabbableContainer`. Any props which are specific to one component are labelled appropriately.
 
-### onNavigate
-
-A callback invoked when the menu navigates to one of its children passing the index and child as an argument
-
--   Type: `Function`
--   Required: No
-
-### cycle
+### `cycle`: `boolean`
 
 A boolean which tells the component whether or not to cycle from the end back to the beginning and vice versa.
 
--   Type: `Boolean`
 -   Required: No
--   default: true
+-   default: `true`
 
-### orientation (NavigableMenu only)
+### `eventToOffset`: `( event: KeyboardEvent ) => -1 | 0 | 1 | undefined`
 
-The orientation of the menu. It could be "vertical", "horizontal" or "both"
+(TabbableContainer only)
+Gets an offset, given an event.
 
--   Type: `String`
+-   Required: No
+
+### `onKeyDown`: `( event: KeyboardEvent ) => void`
+
+A callback invoked on the keydown event.
+
+-   Required: No
+
+### `onNavigate`: `( index: number, focusable: HTMLElement ) => void`
+
+A callback invoked when the menu navigates to one of its children passing the index and child as an argument
+
+-   Required: No
+
+### `orientation`: `'vertical' | 'horizontal' | 'both'`
+
+(NavigableMenu only)
+The orientation of the menu. It could be "vertical", "horizontal", or "both".
+
 -   Required: No
 -   Default: `"vertical"`
 
-## Classes
+## Components
 
 ### NavigableMenu
 

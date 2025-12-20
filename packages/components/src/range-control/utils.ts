@@ -14,9 +14,9 @@ import type { UseControlledRangeValueArgs } from './types';
 /**
  * A float supported clamp function for a specific value.
  *
- * @param  value The value to clamp.
- * @param  min   The minimum value.
- * @param  max   The maximum value.
+ * @param value The value to clamp.
+ * @param min   The minimum value.
+ * @param max   The maximum value.
  *
  * @return A (float) number
  */
@@ -31,7 +31,7 @@ export function floatClamp( value: number | null, min: number, max: number ) {
 /**
  * Hook to store a clamped value, derived from props.
  *
- * @param  settings
+ * @param settings
  * @return The controlled value and the value setter.
  */
 export function useControlledRangeValue(

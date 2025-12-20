@@ -85,10 +85,18 @@ export function isValidHref( href ) {
  * @param {string}  options.type             The type of the link.
  * @param {string}  options.id               The ID of the link.
  * @param {boolean} options.opensInNewWindow Whether this link will open in a new window.
- *
+ * @param {boolean} options.nofollow         Whether this link is marked as no follow relationship.
+ * @param {string}  options.cssClasses       The CSS classes to apply to the link.
  * @return {Object} The final format object.
  */
-export function createLinkFormat( { url, type, id, opensInNewWindow } ) {
+export function createLinkFormat( {
+	url,
+	type,
+	id,
+	opensInNewWindow,
+	nofollow,
+	cssClasses,
+} ) {
 	const format = {
 		type: 'core/link',
 		attributes: {
@@ -96,12 +104,30 @@ export function createLinkFormat( { url, type, id, opensInNewWindow } ) {
 		},
 	};
 
-	if ( type ) format.attributes.type = type;
-	if ( id ) format.attributes.id = id;
+	if ( type ) {
+		format.attributes.type = type;
+	}
+	if ( id ) {
+		format.attributes.id = id;
+	}
 
 	if ( opensInNewWindow ) {
 		format.attributes.target = '_blank';
-		format.attributes.rel = 'noreferrer noopener';
+		format.attributes.rel = format.attributes.rel
+			? format.attributes.rel + ' noreferrer noopener'
+			: 'noreferrer noopener';
+	}
+
+	if ( nofollow ) {
+		format.attributes.rel = format.attributes.rel
+			? format.attributes.rel + ' nofollow'
+			: 'nofollow';
+	}
+
+	const trimmedCssClasses = cssClasses?.trim();
+
+	if ( trimmedCssClasses?.length ) {
+		format.attributes.class = trimmedCssClasses;
 	}
 
 	return format;
@@ -184,7 +210,7 @@ export function getFormatBoundary(
 	// Safe guard: start index cannot be less than 0.
 	startIndex = startIndex < 0 ? 0 : startIndex;
 
-	// // Return the indicies of the "edges" as the boundaries.
+	// // Return the indices of the "edges" as the boundaries.
 	return {
 		start: startIndex,
 		end: endIndex,

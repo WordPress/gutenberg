@@ -1,11 +1,11 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
-	"apiVersion": 2,
+	"apiVersion": 3,
 	"name": "core/comments-title",
 	"title": "Comments Title",
 	"category": "theme",
 	"ancestor": [ "core/comments" ],
-	"description": "Displays a title with the number of comments",
+	"description": "Displays a title with the number of comments.",
 	"textdomain": "default",
 	"usesContext": [ "postId", "postType" ],
 	"attributes": {
@@ -23,6 +23,9 @@
 		"level": {
 			"type": "number",
 			"default": 2
+		},
+		"levelOptions": {
+			"type": "array"
 		}
 	},
 	"supports": {
@@ -61,6 +64,9 @@
 				"__experimentalFontStyle": true,
 				"__experimentalFontWeight": true
 			}
+		},
+		"interactivity": {
+			"clientNavigation": true
 		}
 	}
 }

@@ -22,8 +22,8 @@ export interface User {
 /**
  * Create new comment using the REST API.
  *
- * @param {} this    RequestUtils.
- * @param {} payload CreateCommentPayload.
+ * @param this
+ * @param payload
  */
 export async function createComment(
 	this: RequestUtils,
@@ -48,17 +48,18 @@ export async function createComment(
 /**
  * Delete all comments using the REST API.
  *
- * @param {} this RequestUtils.
+ * @param this
+ * @param type - Optional comment type to delete.
  */
-export async function deleteAllComments( this: RequestUtils ) {
+export async function deleteAllComments( this: RequestUtils, type?: string ) {
 	// List all comments.
 	// https://developer.wordpress.org/rest-api/reference/comments/#list-comments
 	const comments = await this.rest( {
 		path: '/wp/v2/comments',
 		params: {
 			per_page: 100,
-			// All possible statuses.
-			status: 'unapproved,approved,spam,trash',
+			status: 'all',
+			type: type || 'comment',
 		},
 	} );
 

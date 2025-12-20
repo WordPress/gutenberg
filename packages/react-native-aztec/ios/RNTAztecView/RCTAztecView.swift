@@ -72,18 +72,18 @@ class RCTAztecView: Aztec.TextView {
         return label
     }()
 
-    // RCTScrollViews are flipped horizontally on RTL. This messes up competelly horizontal layout contraints
+    // RCTScrollViews are flipped horizontally on RTL. This messes up competelly horizontal layout constraints
     // on views inserted after the transformation.
-    var placeholderPreferedHorizontalAnchor: NSLayoutXAxisAnchor {
+    var placeholderPreferredHorizontalAnchor: NSLayoutXAxisAnchor {
         return hasRTLLayout ? placeholderLabel.rightAnchor : placeholderLabel.leftAnchor
     }
 
-    // This constraint is created from the prefered horizontal anchor (analog to "leading")
+    // This constraint is created from the preferred horizontal anchor (analog to "leading")
     // but appending it always to left of its super view (Aztec).
     // This partially fixes the position issue originated from fliping the scroll view.
     // fixLabelPositionForRTLLayout() fixes the rest.
     private lazy var placeholderHorizontalConstraint: NSLayoutConstraint = {
-        return placeholderPreferedHorizontalAnchor.constraint(
+        return placeholderPreferredHorizontalAnchor.constraint(
             equalTo: leftAnchor,
             constant: leftTextInset
         )
@@ -95,13 +95,7 @@ class RCTAztecView: Aztec.TextView {
         let placeholderWidthInset = 2 * leftTextInset
         return placeholderLabel.widthAnchor.constraint(equalTo: widthAnchor, constant: -placeholderWidthInset)
     }()
-
-    /// If a dictation start with an empty UITextView,
-    /// the dictation engine refreshes the TextView with an empty string when the dictation finishes.
-    /// This helps to avoid propagating that unwanted empty string to RN. (Solving #606)
-    /// on `textViewDidChange` and `textViewDidChangeSelection`
-    private var isInsertingDictationResult = false
-
+    
     // MARK: - Font
 
     /// Flag to enable using the defaultFont in Aztec for specific blocks
@@ -175,7 +169,7 @@ class RCTAztecView: Aztec.TextView {
     /**
      This handles a bug introduced by iOS 13.0 (tested up to 13.2) where link interactions don't respect what the documentation says.
 
-     The documenatation for textView(_:shouldInteractWith:in:interaction:) says:
+     The documentation for textView(_:shouldInteractWith:in:interaction:) says:
 
      > Links in text views are interactive only if the text view is selectable but noneditable.
 
@@ -234,7 +228,10 @@ class RCTAztecView: Aztec.TextView {
         previousContentSize = newSize
 
         let body = packForRN(newSize, withName: "contentSize")
-        onContentSizeChange(body)
+        let caretData = packCaretDataForRN()
+        var result = body
+        result.merge(caretData) { (_, new) in new }
+        onContentSizeChange(result)
     }
 
     // MARK: - Paste handling
@@ -248,12 +245,8 @@ class RCTAztecView: Aztec.TextView {
     }
 
     private func readHTML(from pasteboard: UIPasteboard) -> String? {
-
         if let data = pasteboard.data(forPasteboardType: kUTTypeHTML as String), let html = String(data: data, encoding: .utf8) {
-            // Make sure we are not getting a full HTML DOC. We only want inner content
-            if !html.hasPrefix("<!DOCTYPE html") {
-                return html
-            }
+            return html
         }
 
         if let flatRTFDString = read(from: pasteboard, uti: kUTTypeFlatRTFD, documentType: DocumentType.rtfd) {
@@ -349,20 +342,7 @@ class RCTAztecView: Aztec.TextView {
 
         super.deleteBackward()
         updatePlaceholderVisibility()
-    }
-
-    // MARK: - Dictation
-
-    override func dictationRecordingDidEnd() {
-        isInsertingDictationResult = true
-    }
-
-    public override func insertDictationResult(_ dictationResult: [UIDictationPhrase]) {
-        let objectPlaceholder = "\u{FFFC}"
-        let dictationText = dictationResult.reduce("") { $0 + $1.text }
-        isInsertingDictationResult = false
-        self.text = self.text?.replacingOccurrences(of: objectPlaceholder, with: dictationText)
-    }
+    }    
 
     // MARK: - Custom Edit Intercepts
 
@@ -433,7 +413,7 @@ class RCTAztecView: Aztec.TextView {
         return text.isStartOfParagraph(at: currentLocation) && !(text.endIndex == currentLocation)
     }
     override var keyCommands: [UIKeyCommand]? {
-        // Remove defautls Tab and Shift+Tab commands, leaving just Shift+Enter command.
+        // Remove defaults Tab and Shift+Tab commands, leaving just Shift+Enter command.
         return [carriageReturnKeyCommand]
     }
 
@@ -479,6 +459,7 @@ class RCTAztecView: Aztec.TextView {
             if !(caretEndRect.isInfinite || caretEndRect.isNull) {
                 result["selectionEndCaretX"] = caretEndRect.origin.x
                 result["selectionEndCaretY"] = caretEndRect.origin.y
+                result["selectionEndCaretHeight"] = caretEndRect.size.height
             }
         }
 
@@ -648,13 +629,9 @@ class RCTAztecView: Aztec.TextView {
     ///
     private func applyFontConstraints(to baseFont: UIFont) -> UIFont {
         let oldDescriptor = baseFont.fontDescriptor
-        let newFontSize: CGFloat
+        let fontMetrics = UIFontMetrics(forTextStyle: .body)
 
-        if let fontSize = fontSize {
-            newFontSize = fontSize
-        } else {
-            newFontSize = baseFont.pointSize
-        }
+        let newFontSize = fontMetrics.scaledValue(for: fontSize ?? baseFont.pointSize)
 
         var newTraits = oldDescriptor.symbolicTraits
 
@@ -687,10 +664,16 @@ class RCTAztecView: Aztec.TextView {
     ///
     private func refreshFont() {
         let newFont = applyFontConstraints(to: defaultFont)
+        font = newFont
+        placeholderLabel.font = newFont
         defaultFont = newFont
+
+        if textStorage.length > 0 {
+            typingAttributes[NSAttributedString.Key.font] = newFont
+        }
     }
 
-    /// This method refreshes the font for the palceholder field and typing attributes.
+    /// This method refreshes the font for the placeholder field and typing attributes.
     /// This method should not be called directly.  Call `refreshFont()` instead.
     ///
     private func refreshTypingAttributesAndPlaceholderFont() {
@@ -730,7 +713,13 @@ class RCTAztecView: Aztec.TextView {
         case "bold": toggleBold(range: emptyRange)
         case "italic": toggleItalic(range: emptyRange)
         case "strikethrough": toggleStrikethrough(range: emptyRange)
-        case "mark": toggleMark(range: emptyRange)
+        case "mark":
+            // When there's a selection the formatting is applied from the RichText library.
+            // If not, it will toggle the active mark format if needed.
+            if selectedRange.length > 0 {
+                return
+            }
+            toggleMark(range: emptyRange, color: nil, resetColor: true)
         default: print("Format not recognized")
         }
     }
@@ -767,7 +756,7 @@ class RCTAztecView: Aztec.TextView {
 extension RCTAztecView: UITextViewDelegate {
 
     func textViewDidChangeSelection(_ textView: UITextView) {
-        guard isFirstResponder, isInsertingDictationResult == false else {
+        guard isFirstResponder else {
             return
         }
 
@@ -780,10 +769,6 @@ extension RCTAztecView: UITextViewDelegate {
     }
 
     func textViewDidChange(_ textView: UITextView) {
-        guard isInsertingDictationResult == false else {
-            return
-        }
-        
         propagateContentChanges()
         updatePlaceholderVisibility()
         //Necessary to send height information to JS after pasting text.
@@ -792,7 +777,8 @@ extension RCTAztecView: UITextViewDelegate {
 
     override func becomeFirstResponder() -> Bool {
         if !isFirstResponder && canBecomeFirstResponder {
-            onFocus?([:])
+            let caretData = packCaretDataForRN()
+            onFocus?(caretData)
         }
         return super.becomeFirstResponder()
     }

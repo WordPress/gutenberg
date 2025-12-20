@@ -14,25 +14,30 @@ const testIds = {
 const searchBlockHtml = `<!-- wp:search {"label":"","buttonText":""} /-->`;
 
 describe( 'Gutenberg Editor Search Block tests.', () => {
+	it( 'Able to add the Search Block.', async () => {
+		await editorPage.initializeEditor();
+		await editorPage.addNewBlock( blockNames.search );
+		const searchBlock = await editorPage.getBlockAtPosition(
+			blockNames.search
+		);
+		expect( searchBlock ).toBeTruthy();
+	} );
+
 	describe( 'Editing Search Block elements.', () => {
-		beforeAll( async () => {
+		beforeEach( async () => {
 			// Add a search block with all child elements having no text.
 			// This is important to get around test flakiness where sometimes
 			// the existing default text isn't replaced properly when entering
 			// new text during testing.
-			await editorPage.setHtmlContent( searchBlockHtml );
-		} );
+			await editorPage.initializeEditor( {
+				initialData: searchBlockHtml,
+			} );
 
-		beforeEach( async () => {
 			// Tap search block to ensure selected.
 			const searchBlock = await editorPage.getBlockAtPosition(
 				blockNames.search
 			);
 			await searchBlock.click();
-		} );
-
-		afterAll( async () => {
-			await removeSearchBlock();
 		} );
 
 		it( 'Able to customize label text', async () => {
@@ -73,17 +78,10 @@ describe( 'Gutenberg Editor Search Block tests.', () => {
 	} );
 
 	describe( 'Changing search block settings.', () => {
-		afterAll( async () => {
-			await removeSearchBlock();
-		} );
-
-		it( 'Able to add the Search Block.', async () => {
-			await editorPage.addNewBlock( blockNames.search );
-			const searchBlock = await editorPage.getBlockAtPosition(
-				blockNames.search
-			);
-
-			expect( searchBlock ).toBeTruthy();
+		beforeEach( async () => {
+			await editorPage.initializeEditor( {
+				initialData: searchBlockHtml,
+			} );
 		} );
 
 		it( 'Able to hide search block label', async () => {
@@ -92,7 +90,7 @@ describe( 'Gutenberg Editor Search Block tests.', () => {
 			);
 			await searchBlock.click();
 
-			await editorPage.toggleHideSearchLabelSetting( searchBlock );
+			await editorPage.toggleHideSearchLabelSetting();
 			await editorPage.dismissBottomSheet();
 
 			// Switch to html and verify.
@@ -106,7 +104,7 @@ describe( 'Gutenberg Editor Search Block tests.', () => {
 			);
 			await searchBlock.click();
 
-			await editorPage.toggleSearchIconOnlySetting( searchBlock );
+			await editorPage.toggleSearchIconOnlySetting();
 			await editorPage.dismissBottomSheet();
 
 			// Switch to html and verify.
@@ -121,7 +119,6 @@ describe( 'Gutenberg Editor Search Block tests.', () => {
 			await searchBlock.click();
 
 			await editorPage.changeSearchButtonPositionSetting(
-				searchBlock,
 				'Button inside'
 			);
 			await editorPage.isSearchSettingsVisible();
@@ -138,10 +135,7 @@ describe( 'Gutenberg Editor Search Block tests.', () => {
 			);
 			await searchBlock.click();
 
-			await editorPage.changeSearchButtonPositionSetting(
-				searchBlock,
-				'No button'
-			);
+			await editorPage.changeSearchButtonPositionSetting( 'No button' );
 			await editorPage.isSearchSettingsVisible();
 			await editorPage.dismissBottomSheet();
 
@@ -152,22 +146,12 @@ describe( 'Gutenberg Editor Search Block tests.', () => {
 	} );
 } );
 
-const removeSearchBlock = async () => {
-	const searchBlock = await editorPage.getBlockAtPosition(
-		blockNames.search
-	);
-	await searchBlock.click();
-
-	// Remove search block.
-	await editorPage.removeBlockAtPosition( blockNames.search );
-};
-
 const verifySearchElementText = async ( testId, expected ) => {
 	let actual;
 
 	if ( isAndroid() ) {
 		const input = await editorPage.getSearchBlockTextElement( testId );
-		const inputValue = await input.text();
+		const inputValue = await input.getText();
 		actual = inputValue.trim();
 	} else {
 		actual = await editorPage.getHtmlContent();

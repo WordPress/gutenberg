@@ -1,13 +1,14 @@
 buildscript {
     ext {
-        gradlePluginVersion = '7.2.1'
-        kotlinVersion = '1.5.32'
-        buildToolsVersion = "31.0.0"
-        minSdkVersion = 21
-        compileSdkVersion = 31
-        targetSdkVersion = 31
+        gradlePluginVersion = '8.5.1'
+        kotlinVersion = '1.8.0'
+        buildToolsVersion = "34.0.0"
+        minSdkVersion = 24
+        compileSdkVersion = 34
+        targetSdkVersion = 34
         supportLibVersion = '28.0.0'
-        ndkVersion = "21.4.7075529"
+
+        ndkVersion = "25.1.8937393"
     }
     repositories {
         google()
@@ -15,25 +16,34 @@ buildscript {
     }
     dependencies {
         classpath "com.android.tools.build:gradle:$gradlePluginVersion"
+        classpath("com.facebook.react:react-native-gradle-plugin")
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
+    }
+    // Fix AGP version to 8.1.0 until the main Android app upgrades to 8.1.1
+    configurations.all {
+        resolutionStrategy.eachDependency { DependencyResolveDetails details ->
+            if (details.requested.group == 'com.android.tools.build' && details.requested.name == 'gradle') {
+                details.useVersion gradlePluginVersion
+            }
+        }
     }
 }
 
 allprojects {
     repositories {
         mavenCentral()
-        mavenLocal()
         maven {
             url "https://a8c-libs.s3.amazonaws.com/android"
             content {
                 includeGroup "org.wordpress"
                 includeGroup "org.wordpress.aztec"
-                includeGroup "org.wordpress-mobile"
+                includeGroupByRegex "org.wordpress.react-native-libraries.*"
             }
         }
-        maven { url "https://a8c-libs.s3.amazonaws.com/android/react-native-mirror" }
-        maven { url "https://a8c-libs.s3.amazonaws.com/android/hermes-mirror" }
         maven { url 'https://www.jitpack.io' }
         google()
+        mavenLocal()
     }
 }
+
+apply plugin: "com.facebook.react.rootproject"

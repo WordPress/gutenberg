@@ -33,7 +33,9 @@ const minWidth = '1px';
 
 export function useDefaultStyle() {
 	return useCallback( ( element ) => {
-		if ( ! element ) return;
+		if ( ! element ) {
+			return;
+		}
 		element.style.whiteSpace = whiteSpace;
 		element.style.minWidth = minWidth;
 	}, [] );

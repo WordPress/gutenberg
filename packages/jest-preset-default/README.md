@@ -10,7 +10,7 @@ Install the module
 npm install @wordpress/jest-preset-default --save-dev
 ```
 
-**Note**: This package requires Node.js 14.0.0 or later. It is not compatible with older versions.
+**Note**: This package requires Node.js version with long-term support status (check [Active LTS or Maintenance LTS releases](https://nodejs.org/en/about/previous-releases)). It is not compatible with older versions.
 
 ## Setup
 
@@ -30,11 +30,10 @@ npm install @wordpress/jest-preset-default --save-dev
 -   `modulePaths` - the root dir of the project is used as a location to search when resolving modules.
 -   `setupFiles` - runs code before each test which sets up global variables required in the testing environment.
 -   `setupFilesAfterEnv` - runs code which adds improved support for `Console` object and `React` components to the testing framework before each test.
--   `snapshotSerializers` - makes it possible to use snapshot tests on `Enzyme` wrappers.
--   `testMatch`- includes `/test/` subfolder in addition to the glob patterns Jest uses to detect test files. It detects only test files containing `.js`, `.jsx`, `.ts` and `.tsx` suffix. It doesn't match files with `.spec.js` suffix.
--   `timers` - use of [fake timers](https://jestjs.io/docs/en/timer-mocks.html) for functions such as `setTimeout` is enabled.
+-   `testEnvironment` - enabled the `jsdom` environment for all tests by default.
+-   `testMatch` - searches for tests in `/test/` and `/__tests__/` subfolders, and also matches all files with a `.test.*` suffix. It detects test files with a `.js`, `.jsx`, `.ts` or `.tsx` suffix. Compared to default Jest configuration, it doesn't match files with the `.spec.*` suffix.
+-   `testPathIgnorePatterns` - excludes `node_modules` and `vendor` directories from searching for test files.
 -   `transform` - keeps the default [babel-jest](https://github.com/facebook/jest/tree/HEAD/packages/babel-jest) transformer.
--   `verbose` - each individual test won't be reported during the run.
 
 #### Using enzyme
 
@@ -90,7 +89,7 @@ Finally, you should add `enzyme-to-json/serializer` to the array of [`snapshotSe
 
 ```javascript
 {
-	snapshotSerializers: [ 'enzyme-to-json/serializer' ]
+	snapshotSerializers: [ 'enzyme-to-json/serializer' ];
 }
 ```
 

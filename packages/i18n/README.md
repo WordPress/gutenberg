@@ -33,13 +33,13 @@ Create an i18n instance
 
 _Parameters_
 
--   _initialData_ `[LocaleData]`: Locale data configuration.
--   _initialDomain_ `[string]`: Domain for which configuration applies.
+-   _initialData_ `[LocaleData< TextDomain >]`: Locale data configuration.
+-   _initialDomain_ `[TextDomain]`: Domain for which configuration applies.
 -   _hooks_ `[Hooks]`: Hooks implementation.
 
 _Returns_
 
--   `I18n`: I18n instance.
+-   `I18n< TextDomain >`: I18n instance.
 
 ### defaultI18n
 
@@ -55,7 +55,7 @@ _Related_
 
 _Parameters_
 
--   _domain_ `[string]`: Domain for which to get the data.
+-   _domain_ `[ string | undefined ]`: Domain for which to get the data.
 
 _Returns_
 
@@ -68,8 +68,8 @@ Check if there is a translation for a given string (in singular form).
 _Parameters_
 
 -   _single_ `string`: Singular form of the string to look up.
--   _context_ `[string]`: Context information for the translators.
--   _domain_ `[string]`: Domain to retrieve the translated text.
+-   _context_ `string`: Context information for the translators.
+-   _domain_ `string`: Domain to retrieve the translated text.
 
 _Returns_
 
@@ -79,10 +79,7 @@ _Returns_
 
 Check if current locale is RTL.
 
-**RTL (Right To Left)** is a locale property indicating that text is written from right to left.
-For example, the `he` locale (for Hebrew) specifies right-to-left. Arabic (ar) is another common
-language written RTL. The opposite of RTL, LTR (Left To Right) is used in other languages,
-including English (`en`, `en-US`, `en-GB`, etc.), Spanish (`es`), and French (`fr`).
+**RTL (Right To Left)** is a locale property indicating that text is written from right to left. For example, the `he` locale (for Hebrew) specifies right-to-left. Arabic (ar) is another common language written RTL. The opposite of RTL, LTR (Left To Right) is used in other languages, including English (`en`, `en-US`, `en-GB`, etc.), Spanish (`es`), and French (`fr`).
 
 _Returns_
 
@@ -90,8 +87,7 @@ _Returns_
 
 ### resetLocaleData
 
-Resets all current Tannin instance locale data and sets the specified
-locale data for the domain. Accepts data in a Jed-formatted JSON object shape.
+Resets all current Tannin instance locale data and sets the specified locale data for the domain. Accepts data in a Jed-formatted JSON object shape.
 
 _Related_
 
@@ -100,12 +96,11 @@ _Related_
 _Parameters_
 
 -   _data_ `[LocaleData]`: Locale data configuration.
--   _domain_ `[string]`: Domain for which configuration applies.
+-   _domain_ `[string | undefined]`: Domain for which configuration applies.
 
 ### setLocaleData
 
-Merges locale data into the Tannin instance by domain. Accepts data in a
-Jed-formatted JSON object shape.
+Merges locale data into the Tannin instance by domain. Accepts data in a Jed-formatted JSON object shape.
 
 _Related_
 
@@ -113,22 +108,21 @@ _Related_
 
 _Parameters_
 
--   _data_ `[LocaleData]`: Locale data configuration.
--   _domain_ `[string]`: Domain for which configuration applies.
+-   _data_ `[LocaleData ]`: Locale data configuration.
+-   _domain_ `[string | undefined]`: Domain for which configuration applies.
 
 ### sprintf
 
-Returns a formatted string. If an error occurs in applying the format, the
-original format string is returned.
+Returns a formatted string.
 
 _Related_
 
--   <https://www.npmjs.com/package/sprintf-js>
+-   <https://www.npmjs.com/package/@tannin/sprintf>
 
 _Parameters_
 
--   _format_ `string`: The format of the string to generate.
--   _args_ `...*`: Arguments to apply to the format.
+-   _format_ `T | TranslatableText< T >`: The format of the string to generate.
+-   _args_ `DistributeSprintfArgs< T >`: Arguments to apply to the format.
 
 _Returns_
 
@@ -148,8 +142,7 @@ _Returns_
 
 ### \_n
 
-Translates and retrieves the singular or plural form based on the supplied
-number.
+Translates and retrieves the singular or plural form based on the supplied number.
 
 _Related_
 
@@ -157,19 +150,18 @@ _Related_
 
 _Parameters_
 
--   _single_ `string`: The text to be used if the number is singular.
--   _plural_ `string`: The text to be used if the number is plural.
+-   _single_ `Single`: The text to be used if the number is singular.
+-   _plural_ `Plural`: The text to be used if the number is plural.
 -   _number_ `number`: The number to compare against to use either the singular or plural form.
--   _domain_ `[string]`: Domain to retrieve the translated text.
+-   _domain_ `string | undefined`: Domain to retrieve the translated text.
 
 _Returns_
 
--   `string`: The translated singular or plural form.
+-   `TranslatableText<Single | Plural>`: The translated singular or plural form.
 
 ### \_nx
 
-Translates and retrieves the singular or plural form based on the supplied
-number, with gettext context.
+Translates and retrieves the singular or plural form based on the supplied number, with gettext context.
 
 _Related_
 
@@ -177,15 +169,16 @@ _Related_
 
 _Parameters_
 
--   _single_ `string`: The text to be used if the number is singular.
--   _plural_ `string`: The text to be used if the number is plural.
+-   _single_ `Single`: The text to be used if the number is singular.
+-   _single_ `Single`: The text to be used if the number is singular.
+-   _plural_ `Plural`: The text to be used if the number is plural.
 -   _number_ `number`: The number to compare against to use either the singular or plural form.
 -   _context_ `string`: Context information for the translators.
--   _domain_ `[string]`: Domain to retrieve the translated text.
+-   _domain_ `[string | undefined]`: Domain to retrieve the translated text.
 
 _Returns_
 
--   `string`: The translated singular or plural form.
+-   `TranslatableText<Single | Plural>`: The translated singular or plural form.
 
 ### \_x
 
@@ -197,13 +190,13 @@ _Related_
 
 _Parameters_
 
--   _text_ `string`: Text to translate.
+-   _text_ `Text`: Text to translate.
 -   _context_ `string`: Context information for the translators.
--   _domain_ `[string]`: Domain to retrieve the translated text.
+-   _domain_ `string | undefined`: Domain to retrieve the translated text.
 
 _Returns_
 
--   `string`: Translated context string without pipe.
+-   `TranslatableText<Text>`: Translated context string without pipe.
 
 ### \_\_
 
@@ -215,12 +208,12 @@ _Related_
 
 _Parameters_
 
--   _text_ `string`: Text to translate.
--   _domain_ `[string]`: Domain to retrieve the translated text.
+-   _text_ `Text`: Text to translate.
+-   _domain_ `string | undefined`: Domain to retrieve the translated text.
 
 _Returns_
 
--   `string`: Translated text.
+-   `TranslatableText<Text>`: Translated text.
 
 <!-- END TOKEN(Autogenerated API docs) -->
 

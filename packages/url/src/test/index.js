@@ -2,30 +2,32 @@
  * Internal dependencies
  */
 import {
-	isURL,
-	isEmail,
-	getProtocol,
-	isValidProtocol,
-	getAuthority,
-	isValidAuthority,
-	getPath,
-	isValidPath,
-	getQueryString,
-	buildQueryString,
-	isValidQueryString,
-	getFragment,
-	isValidFragment,
 	addQueryArgs,
-	getQueryArg,
-	hasQueryArg,
-	removeQueryArgs,
-	prependHTTP,
-	safeDecodeURI,
-	filterURLForDisplay,
+	buildQueryString,
 	cleanForSlug,
-	getQueryArgs,
+	filterURLForDisplay,
+	getAuthority,
 	getFilename,
+	getFragment,
+	getPath,
+	getProtocol,
+	getQueryArg,
+	getQueryArgs,
+	getQueryString,
+	hasQueryArg,
+	isEmail,
+	isURL,
+	isPhoneNumber,
+	isValidAuthority,
+	isValidFragment,
+	isValidPath,
+	isValidProtocol,
+	isValidQueryString,
 	normalizePath,
+	prependHTTP,
+	prependHTTPS,
+	removeQueryArgs,
+	safeDecodeURI,
 } from '../';
 import wptData from './fixtures/wpt-data';
 
@@ -68,6 +70,52 @@ describe( 'isEmail', () => {
 		"returns false when given things that don't look like an email: %s",
 		( email ) => {
 			expect( isEmail( email ) ).toBe( false );
+		}
+	);
+} );
+
+describe( 'isPhoneNumber', () => {
+	it.each( [
+		'+1 (555) 123-4567',
+		'(555) 123-4567',
+		'555-123-4567',
+		'5551234567',
+		'+91 987 654 3210',
+		'123-456-7890',
+		'(123) 456-7890',
+		'123 456 7890',
+		'123.456.7890',
+		'+1 123 456 7890',
+		'1234567890',
+		'+44 791 112 3456',
+		'(123) 4567',
+		'+1 (123) 45678901',
+		'12-34-56',
+		'123456789012345',
+		'+12 3456789012345',
+		'tel:+1-123-456-7890',
+	] )(
+		'returns true when given things that look like a phone number: %s',
+		( phoneNumber ) => {
+			expect( isPhoneNumber( phoneNumber ) ).toBe( true );
+		}
+	);
+
+	it.each( [
+		'not a phone number',
+		'123',
+		'1234',
+		'12345',
+		'+91 123',
+		'abc-def-ghij',
+		'a123456789b',
+		'12-34-5',
+		'tel:911',
+		'tel:12345',
+	] )(
+		"returns false when given things that don't look like a phone number: %s",
+		( phoneNumber ) => {
+			expect( isPhoneNumber( phoneNumber ) ).toBe( false );
 		}
 	);
 } );
@@ -253,23 +301,20 @@ describe( 'isValidPath', () => {
 } );
 
 describe( 'getFilename', () => {
-	it( 'returns the filename part of the URL', () => {
-		expect( getFilename( 'https://wordpress.org/image.jpg' ) ).toBe(
-			'image.jpg'
-		);
-		expect(
-			getFilename( 'https://wordpress.org/image.jpg?query=test' )
-		).toBe( 'image.jpg' );
-		expect( getFilename( 'https://wordpress.org/image.jpg#anchor' ) ).toBe(
-			'image.jpg'
-		);
-		expect(
-			getFilename( 'http://localhost:8080/a/path/to/an/image.jpg' )
-		).toBe( 'image.jpg' );
-		expect( getFilename( '/path/to/an/image.jpg' ) ).toBe( 'image.jpg' );
-		expect( getFilename( 'path/to/an/image.jpg' ) ).toBe( 'image.jpg' );
-		expect( getFilename( '/image.jpg' ) ).toBe( 'image.jpg' );
-		expect( getFilename( 'image.jpg' ) ).toBe( 'image.jpg' );
+	it.each( [
+		[ 'https://wordpress.org/image.jpg', 'image.jpg' ],
+		[ 'https://wordpress.org/image.jpg?query=test', 'image.jpg' ],
+		[ 'https://wordpress.org/image.jpg#anchor', 'image.jpg' ],
+		[ 'http://localhost:8080/a/path/to/an/image.jpg', 'image.jpg' ],
+		[ '/path/to/an/image.jpg', 'image.jpg' ],
+		[ 'path/to/an/image.jpg', 'image.jpg' ],
+		[ '/image.jpg', 'image.jpg' ],
+		[ 'https://wordpress.org/file.pdf', 'file.pdf' ],
+		[ 'https://wordpress.org/image.webp?query=test', 'image.webp' ],
+		[ 'https://wordpress.org/video.mov#anchor', 'video.mov' ],
+		[ 'http://localhost:8080/a/path/to/audio.mp3', 'audio.mp3' ],
+	] )( 'returns the filename part of the URL: %s', ( url, filename ) => {
+		expect( getFilename( url ) ).toBe( filename );
 	} );
 
 	it( 'returns undefined when the provided value does not contain a filename', () => {
@@ -285,6 +330,8 @@ describe( 'getFilename', () => {
 		);
 		expect( getFilename( 'a/path/' ) ).toBe( undefined );
 		expect( getFilename( '/' ) ).toBe( undefined );
+		expect( getFilename( undefined ) ).toBe( undefined );
+		expect( getFilename( null ) ).toBe( undefined );
 	} );
 } );
 
@@ -447,12 +494,12 @@ describe( 'getPathAndQueryString', () => {
 	beforeAll( jest.resetModules );
 	afterAll( jest.resetModules );
 	it( 'combines the results of `getPath` and `getQueryString`', () => {
-		jest.doMock( '../get-path.js', () => ( {
+		jest.doMock( '../get-path', () => ( {
 			getPath( { path } = {} ) {
 				return path;
 			},
 		} ) );
-		jest.doMock( '../get-query-string.js', () => ( {
+		jest.doMock( '../get-query-string', () => ( {
 			getQueryString( { queryString } = {} ) {
 				return queryString;
 			},
@@ -589,7 +636,7 @@ describe( 'addQueryArgs', () => {
 		);
 	} );
 
-	it( 'should encodes spaces by RFC 3986', () => {
+	it( 'should encode spaces by RFC 3986', () => {
 		const url = 'https://andalouses.example/beach';
 		const args = { activity: 'fun in the sun' };
 
@@ -603,6 +650,15 @@ describe( 'addQueryArgs', () => {
 		const args = { sun: 'true' };
 
 		expect( addQueryArgs( url, args ) ).toBe( '?sun=true' );
+	} );
+
+	it( 'should add query args before the url fragment', () => {
+		const url = 'https://andalouses.example/beach/#fragment';
+		const args = { sun: 'true' };
+
+		expect( addQueryArgs( url, args ) ).toBe(
+			'https://andalouses.example/beach/?sun=true#fragment'
+		);
 	} );
 
 	it( 'should return URL argument unaffected if no query arguments to append', () => {
@@ -723,6 +779,16 @@ describe( 'getQueryArgs', () => {
 				)
 			).toEqual( data );
 		} );
+
+		it( 'should not blow up on malformed params', () => {
+			const url = 'https://andalouses.example/beach?foo=bar&baz=%E0%A4%A';
+
+			expect( () => getQueryArgs( url ) ).not.toThrow();
+			expect( getQueryArgs( url ) ).toEqual( {
+				baz: '%E0%A4%A',
+				foo: 'bar',
+			} );
+		} );
 	} );
 } );
 
@@ -739,7 +805,13 @@ describe( 'getQueryArg', () => {
 		expect( getQueryArg( url, 'baz' ) ).toBeUndefined();
 	} );
 
-	it( 'should get the value of an arry query arg', () => {
+	it( 'should not return what looks like a query arg after the url fragment', () => {
+		const url = 'https://andalouses.example/beach#fragment?foo=bar&bar=baz';
+
+		expect( getQueryArg( url, 'foo' ) ).toBeUndefined();
+	} );
+
+	it( 'should get the value of an array query arg', () => {
 		const url = 'https://andalouses.example/beach?foo[]=bar&foo[]=baz';
 
 		expect( getQueryArg( url, 'foo' ) ).toEqual( [ 'bar', 'baz' ] );
@@ -766,7 +838,13 @@ describe( 'hasQueryArg', () => {
 		expect( hasQueryArg( url, 'baz' ) ).toBeFalsy();
 	} );
 
-	it( 'should return true for an arry query arg', () => {
+	it( 'should return false if the query arg is after url fragment', () => {
+		const url = 'https://andalouses.example/beach#fragment?foo=bar&bar=baz';
+
+		expect( hasQueryArg( url, 'foo' ) ).toBeFalsy();
+	} );
+
+	it( 'should return true for an array query arg', () => {
 		const url = 'https://andalouses.example/beach?foo[]=bar&foo[]=baz';
 
 		expect( hasQueryArg( url, 'foo' ) ).toBeTruthy();
@@ -808,6 +886,23 @@ describe( 'removeQueryArgs', () => {
 
 		expect( removeQueryArgs( url, 'foo' ) ).toEqual(
 			'https://andalouses.example/beach?bar=foobar'
+		);
+	} );
+
+	it( 'should not remove the url fragment', () => {
+		const url =
+			'https://andalouses.example/beach?foo=bar&param=value#fragment';
+
+		expect( removeQueryArgs( url, 'foo' ) ).toEqual(
+			'https://andalouses.example/beach?param=value#fragment'
+		);
+	} );
+
+	it( 'should not remove what looks like a query arg after url fragment', () => {
+		const url = 'https://andalouses.example/beach#fragment?foo=bar';
+
+		expect( removeQueryArgs( url, 'foo' ) ).toEqual(
+			'https://andalouses.example/beach#fragment?foo=bar'
 		);
 	} );
 } );
@@ -880,6 +975,92 @@ describe( 'prependHTTP', () => {
 	} );
 } );
 
+describe( 'prependHTTPS', () => {
+	it( 'should prepend https to a domain', () => {
+		const url = 'wordpress.org';
+
+		expect( prependHTTPS( url ) ).toBe( 'https://' + url );
+	} );
+
+	it( 'should not prepend https to an email', () => {
+		const url = 'foo@wordpress.org';
+
+		expect( prependHTTPS( url ) ).toBe( url );
+	} );
+
+	it( 'should not prepend https to an absolute URL', () => {
+		const url = '/wordpress';
+
+		expect( prependHTTPS( url ) ).toBe( url );
+	} );
+
+	it( 'should not prepend https to a relative URL', () => {
+		const url = './wordpress';
+
+		expect( prependHTTPS( url ) ).toBe( url );
+	} );
+
+	it( 'should not prepend https to an anchor URL', () => {
+		const url = '#wordpress';
+
+		expect( prependHTTPS( url ) ).toBe( url );
+	} );
+
+	it( 'should not prepend https to a URL that already has https', () => {
+		const url = 'https://wordpress.org';
+
+		expect( prependHTTPS( url ) ).toBe( url );
+	} );
+
+	it( 'should not prepend https to a URL that already has http', () => {
+		const url = 'http://wordpress.org';
+
+		expect( prependHTTPS( url ) ).toBe( url );
+	} );
+
+	it( 'should not prepend https to a URL that already has ftp', () => {
+		const url = 'ftp://wordpress.org';
+
+		expect( prependHTTPS( url ) ).toBe( url );
+	} );
+
+	it( 'should not prepend https to a URL that already has mailto', () => {
+		const url = 'mailto:foo@wordpress.org';
+
+		expect( prependHTTPS( url ) ).toBe( url );
+	} );
+
+	it( 'should remove leading whitespace before prepending HTTPs', () => {
+		const url = ' wordpress.org';
+
+		expect( prependHTTPS( url ) ).toBe( 'https://wordpress.org' );
+	} );
+
+	it( 'should not have trailing whitespaces', () => {
+		const url = 'wordpress.org ';
+
+		expect( prependHTTPS( url ) ).toBe( 'https://wordpress.org' );
+	} );
+} );
+
+it( 'should prepend https to a domain with an anchor', () => {
+	const url = 'wordpress.org#something';
+
+	expect( prependHTTPS( url ) ).toBe( 'https://' + url );
+} );
+
+it( 'should prepend https to a domain with path', () => {
+	const url = 'wordpress.org/some/thing';
+
+	expect( prependHTTPS( url ) ).toBe( 'https://' + url );
+} );
+
+it( 'should prepend https to a domain with query arguments', () => {
+	const url = 'wordpress.org?foo=bar';
+
+	expect( prependHTTPS( url ) ).toBe( 'https://' + url );
+} );
+
 describe( 'safeDecodeURI', () => {
 	it( 'should decode URI if formed well', () => {
 		const encoded = 'https://mozilla.org/?x=%D1%88%D0%B5%D0%BB%D0%BB%D1%8B';
@@ -896,11 +1077,23 @@ describe( 'safeDecodeURI', () => {
 } );
 
 describe( 'filterURLForDisplay', () => {
+	it( 'should return an empty string if the url is empty or falsy', () => {
+		let url = filterURLForDisplay( '' );
+		expect( url ).toBe( '' );
+		url = filterURLForDisplay( null );
+		expect( url ).toBe( '' );
+	} );
 	it( 'should remove protocol', () => {
 		let url = filterURLForDisplay( 'http://wordpress.org' );
 		expect( url ).toBe( 'wordpress.org' );
 		url = filterURLForDisplay( 'https://wordpress.org' );
 		expect( url ).toBe( 'wordpress.org' );
+		url = filterURLForDisplay( 'file:///folder/file.txt' );
+		expect( url ).toBe( '/folder/file.txt' );
+		url = filterURLForDisplay( 'tel:0123456789' );
+		expect( url ).toBe( '0123456789' );
+		url = filterURLForDisplay( 'blob:data' );
+		expect( url ).toBe( 'data' );
 	} );
 	it( 'should remove www subdomain', () => {
 		const url = filterURLForDisplay( 'http://www.wordpress.org' );
@@ -1008,6 +1201,24 @@ describe( 'cleanForSlug', () => {
 	it( 'Should replace multiple hyphens with a single one', () => {
 		expect( cleanForSlug( 'the long - cat' ) ).toBe( 'the-long-cat' );
 		expect( cleanForSlug( 'the----long---cat' ) ).toBe( 'the-long-cat' );
+	} );
+
+	it( 'Should remove ampersands', () => {
+		expect( cleanForSlug( 'the long cat & dog' ) ).toBe(
+			'the-long-cat-dog'
+		);
+		expect(
+			cleanForSlug( 'the long cat &amp; a dog &amp;&amp; fish' )
+		).toBe( 'the-long-cat-a-dog-fish' );
+		expect( cleanForSlug( 'the long cat &amp;amp; dog' ) ).toBe(
+			'the-long-cat-amp-dog'
+		);
+	} );
+
+	it( 'Should remove HTML entities', () => {
+		expect(
+			cleanForSlug( 'No &nbsp; Entities> &ndash; Here &mdash;&lt;' )
+		).toBe( 'no-entities-here' );
 	} );
 } );
 

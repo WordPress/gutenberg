@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -9,13 +9,11 @@ import classnames from 'classnames';
 import {
 	AlignmentControl,
 	BlockControls,
-	Warning,
 	useBlockProps,
 } from '@wordpress/block-editor';
 import { useState, useEffect } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
-import { __ } from '@wordpress/i18n';
 
 export default function PostCommentsCountEdit( {
 	attributes,
@@ -26,7 +24,7 @@ export default function PostCommentsCountEdit( {
 	const { postId } = context;
 	const [ commentsCount, setCommentsCount ] = useState();
 	const blockProps = useBlockProps( {
-		className: classnames( {
+		className: clsx( {
 			[ `has-text-align-${ textAlign }` ]: textAlign,
 		} ),
 	} );
@@ -68,13 +66,7 @@ export default function PostCommentsCountEdit( {
 				/>
 			</BlockControls>
 			<div { ...blockProps } style={ blockStyles }>
-				{ hasPostAndComments ? (
-					commentsCount
-				) : (
-					<Warning>
-						{ __( 'Post Comments Count block: post not found.' ) }
-					</Warning>
-				) }
+				{ hasPostAndComments ? commentsCount : '0' }
 			</div>
 		</>
 	);

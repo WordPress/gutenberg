@@ -7,10 +7,10 @@ import domReady from '@wordpress/dom-ready';
  * Internal dependencies
  */
 import { setup, speak } from '../';
-import clear from '../clear';
-import filterMessage from '../filter-message';
+import clear from '../shared/clear';
+import filterMessage from '../shared/filter-message';
 
-jest.mock( '../clear', () => {
+jest.mock( '../shared/clear', () => {
 	return jest.fn();
 } );
 jest.mock( '@wordpress/dom-ready', () => {
@@ -18,7 +18,7 @@ jest.mock( '@wordpress/dom-ready', () => {
 		callback();
 	} );
 } );
-jest.mock( '../filter-message', () => {
+jest.mock( '../shared/filter-message', () => {
 	return jest.fn( ( message ) => {
 		return message;
 	} );

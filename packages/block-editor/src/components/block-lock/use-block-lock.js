@@ -7,6 +7,7 @@ import { useSelect } from '@wordpress/data';
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
 
 /**
  * Return details about the block lock status.
@@ -19,27 +20,20 @@ export default function useBlockLock( clientId ) {
 	return useSelect(
 		( select ) => {
 			const {
-				canEditBlock,
-				canMoveBlock,
-				canRemoveBlock,
 				canLockBlockType,
 				getBlockName,
-				getBlockRootClientId,
-				getTemplateLock,
-			} = select( blockEditorStore );
-			const rootClientId = getBlockRootClientId( clientId );
-
-			const canEdit = canEditBlock( clientId );
-			const canMove = canMoveBlock( clientId, rootClientId );
-			const canRemove = canRemoveBlock( clientId, rootClientId );
+				isEditLockedBlock,
+				isMoveLockedBlock,
+				isRemoveLockedBlock,
+				isLockedBlock,
+			} = unlock( select( blockEditorStore ) );
 
 			return {
-				canEdit,
-				canMove,
-				canRemove,
+				isEditLocked: isEditLockedBlock( clientId ),
+				isMoveLocked: isMoveLockedBlock( clientId ),
+				isRemoveLocked: isRemoveLockedBlock( clientId ),
 				canLock: canLockBlockType( getBlockName( clientId ) ),
-				isContentLocked: getTemplateLock( clientId ) === 'contentOnly',
-				isLocked: ! canEdit || ! canMove || ! canRemove,
+				isLocked: isLockedBlock( clientId ),
 			};
 		},
 		[ clientId ]

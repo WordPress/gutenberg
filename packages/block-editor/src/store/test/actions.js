@@ -27,7 +27,6 @@ const noop = () => {};
 
 const {
 	clearSelectedBlock,
-	__experimentalHideBlockInterface: hideBlockInterface,
 	insertBlock,
 	insertBlocks,
 	mergeBlocks,
@@ -40,7 +39,6 @@ const {
 	replaceInnerBlocks,
 	resetBlocks,
 	selectBlock,
-	__experimentalShowBlockInterface: showBlockInterface,
 	showInsertionPoint,
 	startMultiSelect,
 	startTyping,
@@ -55,6 +53,9 @@ const {
 	updateBlockListSettings,
 	updateSettings,
 	validateBlocksToTemplate,
+	registerInserterMediaCategory,
+	setBlockEditingMode,
+	unsetBlockEditingMode,
 } = actions;
 
 describe( 'actions', () => {
@@ -88,7 +89,7 @@ describe( 'actions', () => {
 				type: 'UPDATE_BLOCK_ATTRIBUTES',
 				clientIds: [ clientId ],
 				attributes,
-				uniqueByBlock: false,
+				options: { uniqueByBlock: false },
 			} );
 		} );
 
@@ -100,7 +101,19 @@ describe( 'actions', () => {
 				type: 'UPDATE_BLOCK_ATTRIBUTES',
 				clientIds,
 				attributes,
-				uniqueByBlock: false,
+				options: { uniqueByBlock: false },
+			} );
+		} );
+
+		it( 'should fold boolean uniqueByBlock option into an object', () => {
+			const clientId = 'myclientid';
+			const attributes = {};
+			const result = updateBlockAttributes( clientId, attributes, true );
+			expect( result ).toEqual( {
+				type: 'UPDATE_BLOCK_ATTRIBUTES',
+				clientIds: [ clientId ],
+				attributes,
+				options: { uniqueByBlock: true },
 			} );
 		} );
 	} );
@@ -217,8 +230,10 @@ describe( 'actions', () => {
 				getBlockCount: () => 1,
 			};
 			const dispatch = jest.fn();
+			dispatch.ensureDefaultBlock = jest.fn();
+			const registry = createRegistry();
 
-			replaceBlock( 'chicken', block )( { select, dispatch } );
+			replaceBlock( 'chicken', block )( { select, dispatch, registry } );
 
 			expect( dispatch ).toHaveBeenCalledWith( {
 				type: 'REPLACE_BLOCKS',
@@ -282,8 +297,13 @@ describe( 'actions', () => {
 				getBlockCount: () => 1,
 			};
 			const dispatch = jest.fn();
+			dispatch.ensureDefaultBlock = jest.fn();
+			const registry = createRegistry();
 
-			replaceBlocks( [ 'chicken' ], blocks )( { select, dispatch } );
+			replaceBlocks(
+				[ 'chicken' ],
+				blocks
+			)( { select, dispatch, registry } );
 
 			expect( dispatch ).toHaveBeenCalledWith( {
 				type: 'REPLACE_BLOCKS',
@@ -315,6 +335,8 @@ describe( 'actions', () => {
 				getBlockCount: () => 1,
 			};
 			const dispatch = jest.fn();
+			dispatch.ensureDefaultBlock = jest.fn();
+			const registry = createRegistry();
 
 			replaceBlocks(
 				[ 'chicken' ],
@@ -322,7 +344,7 @@ describe( 'actions', () => {
 				null,
 				null,
 				meta
-			)( { select, dispatch } );
+			)( { select, dispatch, registry } );
 
 			expect( dispatch ).toHaveBeenCalledWith( {
 				type: 'REPLACE_BLOCKS',
@@ -370,107 +392,6 @@ describe( 'actions', () => {
 	} );
 
 	describe( 'insertBlocks', () => {
-		it( 'should apply default styles to blocks if blocks do not contain a style', () => {
-			const ribsBlock = {
-				clientId: 'ribs',
-				name: 'core/test-ribs',
-			};
-			const chickenBlock = {
-				clientId: 'chicken',
-				name: 'core/test-chicken',
-			};
-			const chickenRibsBlock = {
-				clientId: 'chicken-ribs',
-				name: 'core/test-chicken-ribs',
-			};
-			const blocks = [ ribsBlock, chickenBlock, chickenRibsBlock ];
-
-			const select = {
-				getSettings: () => ( {
-					__experimentalPreferredStyleVariations: {
-						value: {
-							'core/test-ribs': 'squared',
-							'core/test-chicken-ribs': 'colorful',
-						},
-					},
-				} ),
-				canInsertBlockType: () => true,
-			};
-			const dispatch = jest.fn();
-
-			insertBlocks(
-				blocks,
-				5,
-				'testrootid',
-				false
-			)( { select, dispatch } );
-
-			expect( dispatch ).toHaveBeenCalledWith( {
-				type: 'INSERT_BLOCKS',
-				blocks: [
-					{
-						...ribsBlock,
-						attributes: { className: 'is-style-squared' },
-					},
-					chickenBlock,
-					{
-						...chickenRibsBlock,
-						attributes: { className: 'is-style-colorful' },
-					},
-				],
-				index: 5,
-				rootClientId: 'testrootid',
-				time: expect.any( Number ),
-				updateSelection: false,
-				initialPosition: null,
-			} );
-		} );
-
-		it( 'should keep styles explicitly set even if different from the default', () => {
-			const ribsWithStyleBlock = {
-				clientId: 'ribs',
-				name: 'core/test-ribs',
-				attributes: {
-					className: 'is-style-colorful',
-				},
-			};
-			const blocks = [ ribsWithStyleBlock ];
-
-			const select = {
-				getSettings: () => ( {
-					__experimentalPreferredStyleVariations: {
-						value: {
-							'core/test-ribs': 'squared',
-						},
-					},
-				} ),
-				canInsertBlockType: () => true,
-			};
-			const dispatch = jest.fn();
-
-			insertBlocks(
-				blocks,
-				5,
-				'testrootid',
-				false
-			)( { select, dispatch } );
-
-			expect( dispatch ).toHaveBeenCalledWith( {
-				type: 'INSERT_BLOCKS',
-				blocks: [
-					{
-						...ribsWithStyleBlock,
-						attributes: { className: 'is-style-colorful' },
-					},
-				],
-				index: 5,
-				rootClientId: 'testrootid',
-				time: expect.any( Number ),
-				updateSelection: false,
-				initialPosition: null,
-			} );
-		} );
-
 		it( 'should filter the allowed blocks in INSERT_BLOCKS action', () => {
 			const ribsBlock = {
 				clientId: 'ribs',
@@ -619,15 +540,18 @@ describe( 'actions', () => {
 			const select = {
 				getBlockRootClientId: () => undefined,
 				canRemoveBlocks: () => true,
+				getBlockRemovalRules: () => false,
 			};
 			const dispatch = Object.assign( jest.fn(), {
 				selectPreviousBlock: jest.fn(),
 			} );
+			const registry = createRegistry();
 
-			removeBlocks( clientIds )( { select, dispatch } );
+			removeBlocks( clientIds )( { select, dispatch, registry } );
 
 			expect( dispatch.selectPreviousBlock ).toHaveBeenCalledWith(
-				clientId
+				clientId,
+				true
 			);
 
 			expect( dispatch ).toHaveBeenCalledWith( {
@@ -728,15 +652,17 @@ describe( 'actions', () => {
 			const select = {
 				getBlockRootClientId: () => null,
 				canRemoveBlocks: () => true,
+				getBlockRemovalRules: () => false,
 			};
 			const dispatch = Object.assign( jest.fn(), {
 				selectPreviousBlock: jest.fn(),
 			} );
-
-			removeBlock( clientId )( { select, dispatch } );
+			const registry = createRegistry();
+			removeBlock( clientId )( { select, dispatch, registry } );
 
 			expect( dispatch.selectPreviousBlock ).toHaveBeenCalledWith(
-				clientId
+				clientId,
+				true
 			);
 
 			expect( dispatch ).toHaveBeenCalledWith( {
@@ -745,18 +671,23 @@ describe( 'actions', () => {
 			} );
 		} );
 
-		it( 'should dispatch REMOVE_BLOCKS action, opting out of select previous', () => {
+		it( 'should dispatch REMOVE_BLOCKS action, opting out of select previous', async () => {
 			const clientId = 'myclientid';
 
 			const select = {
 				getBlockRootClientId: () => null,
 				canRemoveBlocks: () => true,
+				getBlockRemovalRules: () => false,
 			};
 			const dispatch = Object.assign( jest.fn(), {
 				selectPreviousBlock: jest.fn(),
 			} );
 
-			removeBlocks( [ clientId ], false )( { select, dispatch } );
+			const registry = createRegistry();
+			removeBlocks(
+				[ clientId ],
+				false
+			)( { select, dispatch, registry } );
 
 			expect( dispatch.selectPreviousBlock ).not.toHaveBeenCalled();
 
@@ -773,22 +704,6 @@ describe( 'actions', () => {
 			expect( toggleBlockMode( clientId ) ).toEqual( {
 				type: 'TOGGLE_BLOCK_MODE',
 				clientId,
-			} );
-		} );
-	} );
-
-	describe( 'hideBlockInterface', () => {
-		it( 'should return the HIDE_BLOCK_INTERFACE action', () => {
-			expect( hideBlockInterface() ).toEqual( {
-				type: 'HIDE_BLOCK_INTERFACE',
-			} );
-		} );
-	} );
-
-	describe( 'showBlockInterface', () => {
-		it( 'should return the SHOW_BLOCK_INTERFACE action', () => {
-			expect( showBlockInterface() ).toEqual( {
-				type: 'SHOW_BLOCK_INTERFACE',
 			} );
 		} );
 	} );
@@ -905,8 +820,16 @@ describe( 'actions', () => {
 			} );
 		} );
 
-		it( 'should only focus the blockA if the blockA has no merge function', () => {
-			registerBlockType( 'core/test-block', defaultBlockSettings );
+		it( 'should only focus the blockA if the blockA has no merge function and the content of blockB is modified', () => {
+			registerBlockType( 'core/test-block', {
+				...defaultBlockSettings,
+				attributes: {
+					content: {
+						type: 'string',
+						role: 'content',
+					},
+				},
+			} );
 			const blockA = deepFreeze( {
 				clientId: 'chicken',
 				name: 'core/test-block',
@@ -914,14 +837,20 @@ describe( 'actions', () => {
 			const blockB = deepFreeze( {
 				clientId: 'ribs',
 				name: 'core/test-block',
+				attributes: {
+					content: 'Updated content',
+				},
 			} );
 
 			const select = {
 				getBlock: ( clientId ) =>
 					[ blockA, blockB ].find( ( b ) => b.clientId === clientId ),
+				getBlockEditingMode: () => 'default',
+				isBlockSelected: () => false,
 			};
 			const dispatch = Object.assign( jest.fn(), {
 				selectBlock: jest.fn(),
+				removeBlock: jest.fn(),
 			} );
 
 			mergeBlocks(
@@ -929,10 +858,6 @@ describe( 'actions', () => {
 				blockB.clientId
 			)( { select, dispatch } );
 
-			expect( dispatch ).toHaveBeenCalledWith( {
-				type: 'MERGE_BLOCKS',
-				blocks: [ blockA.clientId, blockB.clientId ],
-			} );
 			expect( dispatch.selectBlock ).toHaveBeenCalledWith( 'chicken' );
 		} );
 
@@ -974,6 +899,7 @@ describe( 'actions', () => {
 					attributeKey: 'content',
 					offset: 0,
 				} ),
+				getBlockEditingMode: () => 'default',
 			};
 			const dispatch = Object.assign( jest.fn(), {
 				replaceBlocks: jest.fn(),
@@ -1044,6 +970,7 @@ describe( 'actions', () => {
 					attributeKey: 'content',
 					offset: 0,
 				} ),
+				getBlockEditingMode: () => 'default',
 			};
 			const dispatch = Object.assign( jest.fn(), {
 				replaceBlocks: jest.fn(),
@@ -1120,6 +1047,7 @@ describe( 'actions', () => {
 					attributeKey: 'content2',
 					offset: 0,
 				} ),
+				getBlockEditingMode: () => 'default',
 			};
 			const dispatch = Object.assign( jest.fn(), {
 				replaceBlocks: jest.fn(),
@@ -1149,6 +1077,124 @@ describe( 'actions', () => {
 				],
 				0
 			);
+		} );
+
+		it( 'should not merge the blocks if blockB editing mode is `disabled`', () => {
+			registerBlockType( 'core/test-block', {
+				attributes: {
+					content: {},
+				},
+				merge( attributes, attributesToMerge ) {
+					return {
+						content:
+							attributes.content +
+							' ' +
+							attributesToMerge.content,
+					};
+				},
+				save: noop,
+				category: 'text',
+				title: 'test block',
+			} );
+			const blockA = deepFreeze( {
+				clientId: 'chicken',
+				name: 'core/test-block',
+				attributes: { content: 'chicken' },
+				innerBlocks: [],
+			} );
+			const blockB = deepFreeze( {
+				clientId: 'ribs',
+				name: 'core/test-block',
+				attributes: { content: 'ribs' },
+				innerBlocks: [],
+			} );
+
+			const modes = {
+				chicken: 'default',
+				ribs: 'disabled',
+			};
+
+			const select = {
+				getBlock: ( clientId ) =>
+					[ blockA, blockB ].find( ( b ) => b.clientId === clientId ),
+				getSelectionStart: () => ( {
+					clientId: blockB.clientId,
+					attributeKey: 'content',
+					offset: 0,
+				} ),
+				getBlockEditingMode: ( clientId ) => modes[ clientId ],
+			};
+			const dispatch = Object.assign( jest.fn(), {
+				replaceBlocks: jest.fn(),
+				selectionChange: jest.fn(),
+			} );
+
+			mergeBlocks(
+				blockA.clientId,
+				blockB.clientId
+			)( { select, dispatch } );
+
+			expect( dispatch.selectionChange ).not.toHaveBeenCalled();
+			expect( dispatch.replaceBlocks ).not.toHaveBeenCalled();
+		} );
+
+		it( 'should not merge the blocks if blockA editing mode is `disabled`', () => {
+			registerBlockType( 'core/test-block', {
+				attributes: {
+					content: {},
+				},
+				merge( attributes, attributesToMerge ) {
+					return {
+						content:
+							attributes.content +
+							' ' +
+							attributesToMerge.content,
+					};
+				},
+				save: noop,
+				category: 'text',
+				title: 'test block',
+			} );
+			const blockA = deepFreeze( {
+				clientId: 'chicken',
+				name: 'core/test-block',
+				attributes: { content: 'chicken' },
+				innerBlocks: [],
+			} );
+			const blockB = deepFreeze( {
+				clientId: 'ribs',
+				name: 'core/test-block',
+				attributes: { content: 'ribs' },
+				innerBlocks: [],
+			} );
+
+			const modes = {
+				chicken: 'disabled',
+				ribs: 'default',
+			};
+
+			const select = {
+				getBlock: ( clientId ) =>
+					[ blockA, blockB ].find( ( b ) => b.clientId === clientId ),
+				getSelectionStart: () => ( {
+					clientId: blockB.clientId,
+					attributeKey: 'content',
+					offset: 0,
+				} ),
+				getBlockEditingMode: ( clientId ) => modes[ clientId ],
+			};
+			const dispatch = Object.assign( jest.fn(), {
+				replaceBlocks: jest.fn(),
+				selectionChange: jest.fn(),
+			} );
+
+			mergeBlocks(
+				blockA.clientId,
+				blockB.clientId
+			)( { select, dispatch } );
+
+			expect( dispatch.selectionChange ).not.toHaveBeenCalled();
+			expect( dispatch.replaceBlocks ).not.toHaveBeenCalled();
 		} );
 	} );
 
@@ -1223,6 +1269,174 @@ describe( 'actions', () => {
 			);
 
 			expect( result ).toEqual( false );
+		} );
+	} );
+
+	describe( 'updateSettings', () => {
+		it( 'warns when setting the deprecated __unstableIsPreviewMode property and sets the stable property instead', () => {
+			const consoleWarn = jest
+				.spyOn( global.console, 'warn' )
+				.mockImplementation();
+
+			const store = createRegistry().registerStore(
+				blockEditorStoreName,
+				{
+					actions,
+					selectors,
+					reducer,
+				}
+			);
+
+			store.dispatch(
+				updateSettings( {
+					__unstableIsPreviewMode: true,
+				} )
+			);
+
+			expect( consoleWarn ).toHaveBeenCalledWith(
+				"__unstableIsPreviewMode argument in wp.data.dispatch('core/block-editor').updateSettings is deprecated since version 6.8. Please use isPreviewMode instead."
+			);
+
+			consoleWarn.mockClear();
+
+			expect( store.getState().settings.__unstableIsPreviewMode ).toBe(
+				true
+			);
+
+			expect( store.getState().settings.isPreviewMode ).toBe( true );
+
+			expect( consoleWarn ).toHaveBeenCalledWith(
+				'__unstableIsPreviewMode is deprecated since version 6.8. Please use isPreviewMode instead.'
+			);
+
+			consoleWarn.mockRestore();
+		} );
+	} );
+
+	describe( 'registerInserterMediaCategory', () => {
+		describe( 'should log errors when invalid', () => {
+			it( 'valid object', () => {
+				registerInserterMediaCategory()( {} );
+				expect( console ).toHaveErroredWith(
+					'Category should be an `InserterMediaCategory` object.'
+				);
+			} );
+			it( 'has name', () => {
+				registerInserterMediaCategory( {} )( {} );
+				expect( console ).toHaveErroredWith(
+					'Category should have a `name` that should be unique among all media categories.'
+				);
+			} );
+			it( 'has labels.name', () => {
+				registerInserterMediaCategory( { name: 'a' } )( {} );
+				expect( console ).toHaveErroredWith(
+					'Category should have a `labels.name`.'
+				);
+			} );
+			it( 'has proper media type', () => {
+				registerInserterMediaCategory( {
+					name: 'a',
+					labels: { name: 'a' },
+					mediaType: 'b',
+				} )( {} );
+				expect( console ).toHaveErroredWith(
+					'Category should have `mediaType` property that is one of `image|audio|video`.'
+				);
+			} );
+			it( 'has fetch function', () => {
+				registerInserterMediaCategory( {
+					name: 'a',
+					labels: { name: 'a' },
+					mediaType: 'image',
+					fetch: 'c',
+				} )( {} );
+				expect( console ).toHaveErroredWith(
+					'Category should have a `fetch` function defined with the following signature `(InserterMediaRequest) => Promise<InserterMediaItem[]>`.'
+				);
+			} );
+			it( 'has unique name', () => {
+				registerInserterMediaCategory( {
+					name: 'a',
+					labels: { name: 'a' },
+					mediaType: 'image',
+					fetch: () => {},
+				} )( {
+					select: {
+						getRegisteredInserterMediaCategories: () => [
+							{ name: 'a' },
+						],
+					},
+				} );
+				expect( console ).toHaveErroredWith(
+					'A category is already registered with the same name: "a".'
+				);
+			} );
+			it( 'has unique labels.name', () => {
+				registerInserterMediaCategory( {
+					name: 'a',
+					labels: { name: 'a' },
+					mediaType: 'image',
+					fetch: () => {},
+				} )( {
+					select: {
+						getRegisteredInserterMediaCategories: () => [
+							{ labels: { name: 'a' } },
+						],
+					},
+				} );
+				expect( console ).toHaveErroredWith(
+					'A category is already registered with the same labels.name: "a".'
+				);
+			} );
+		} );
+		it( 'should register a media category', () => {
+			const category = {
+				name: 'new',
+				labels: { name: 'new' },
+				mediaType: 'image',
+				fetch: () => {},
+			};
+			const inserterMediaCategories = [
+				{ name: 'a', labels: { name: 'a' } },
+			];
+			const dispatch = jest.fn();
+			registerInserterMediaCategory( category )( {
+				select: {
+					getRegisteredInserterMediaCategories: () =>
+						inserterMediaCategories,
+				},
+				dispatch,
+			} );
+			expect( dispatch ).toHaveBeenLastCalledWith( {
+				type: 'REGISTER_INSERTER_MEDIA_CATEGORY',
+				category: { ...category, isExternalResource: true },
+			} );
+		} );
+	} );
+
+	describe( 'setBlockEditingMode', () => {
+		it( 'should return the SET_BLOCK_EDITING_MODE action', () => {
+			expect(
+				setBlockEditingMode(
+					'14501cc2-90a6-4f52-aa36-ab6e896135d1',
+					'default'
+				)
+			).toEqual( {
+				type: 'SET_BLOCK_EDITING_MODE',
+				clientId: '14501cc2-90a6-4f52-aa36-ab6e896135d1',
+				mode: 'default',
+			} );
+		} );
+	} );
+
+	describe( 'unsetBlockEditingMode', () => {
+		it( 'should return the UNSET_BLOCK_EDITING_MODE action', () => {
+			expect(
+				unsetBlockEditingMode( '14501cc2-90a6-4f52-aa36-ab6e896135d1' )
+			).toEqual( {
+				type: 'UNSET_BLOCK_EDITING_MODE',
+				clientId: '14501cc2-90a6-4f52-aa36-ab6e896135d1',
+			} );
 		} );
 	} );
 } );

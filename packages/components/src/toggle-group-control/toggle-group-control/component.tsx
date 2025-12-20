@@ -2,20 +2,18 @@
  * External dependencies
  */
 import type { ForwardedRef } from 'react';
+
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
-import { useMemo } from '@wordpress/element';
+import { useMemo, useState } from '@wordpress/element';
+import { useMergeRefs } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
-import {
-	contextConnect,
-	useContextSystem,
-	WordPressComponentProps,
-} from '../../ui/context';
+import type { WordPressComponentProps } from '../../context';
+import { contextConnect, useContextSystem } from '../../context';
 import { useCx } from '../../utils/hooks';
 import BaseControl from '../../base-control';
 import type { ToggleGroupControlProps } from '../types';
@@ -23,15 +21,18 @@ import { VisualLabelWrapper } from './styles';
 import * as styles from './styles';
 import { ToggleGroupControlAsRadioGroup } from './as-radio-group';
 import { ToggleGroupControlAsButtonGroup } from './as-button-group';
-
-const noop = () => {};
+import { useTrackElementOffsetRect } from '../../utils/element-rect';
+import { useAnimatedOffsetRect } from '../../utils/hooks/use-animated-offset-rect';
+import { maybeWarnDeprecated36pxSize } from '../../utils/deprecated-36px-size';
 
 function UnconnectedToggleGroupControl(
 	props: WordPressComponentProps< ToggleGroupControlProps, 'div', false >,
 	forwardedRef: ForwardedRef< any >
 ) {
 	const {
-		__nextHasNoMarginBottom = false,
+		__nextHasNoMarginBottom: _, // Prevent passing this to the internal component
+		__next40pxDefaultSize = false,
+		__shouldNotWarnDeprecated36pxSize,
 		className,
 		isAdaptiveWidth = false,
 		isBlock = false,
@@ -39,33 +40,58 @@ function UnconnectedToggleGroupControl(
 		label,
 		hideLabelFromVision = false,
 		help,
-		onChange = noop,
+		onChange,
 		size = 'default',
 		value,
 		children,
 		...otherProps
 	} = useContextSystem( props, 'ToggleGroupControl' );
+
+	const normalizedSize =
+		__next40pxDefaultSize && size === 'default' ? '__unstable-large' : size;
+
+	const [ selectedElement, setSelectedElement ] = useState< HTMLElement >();
+	const [ controlElement, setControlElement ] = useState< HTMLElement >();
+	const refs = useMergeRefs( [ setControlElement, forwardedRef ] );
+	const selectedRect = useTrackElementOffsetRect(
+		value !== null && value !== undefined ? selectedElement : undefined
+	);
+	useAnimatedOffsetRect( controlElement, selectedRect, {
+		prefix: 'selected',
+		dataAttribute: 'indicator-animated',
+		transitionEndFilter: ( event ) => event.pseudoElement === '::before',
+		roundRect: true,
+	} );
+
 	const cx = useCx();
 
 	const classes = useMemo(
 		() =>
 			cx(
-				styles.ToggleGroupControl( { isBlock, isDeselectable, size } ),
+				styles.toggleGroupControl( {
+					isBlock,
+					isDeselectable,
+					size: normalizedSize,
+				} ),
 				isBlock && styles.block,
 				className
 			),
-		[ className, cx, isBlock, isDeselectable, size ]
+		[ className, cx, isBlock, isDeselectable, normalizedSize ]
 	);
 
 	const MainControl = isDeselectable
 		? ToggleGroupControlAsButtonGroup
 		: ToggleGroupControlAsRadioGroup;
 
+	maybeWarnDeprecated36pxSize( {
+		componentName: 'ToggleGroupControl',
+		size,
+		__next40pxDefaultSize,
+		__shouldNotWarnDeprecated36pxSize,
+	} );
+
 	return (
-		<BaseControl
-			help={ help }
-			__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
-		>
+		<BaseControl help={ help }>
 			{ ! hideLabelFromVision && (
 				<VisualLabelWrapper>
 					<BaseControl.VisualLabel>{ label }</BaseControl.VisualLabel>
@@ -73,15 +99,17 @@ function UnconnectedToggleGroupControl(
 			) }
 			<MainControl
 				{ ...otherProps }
-				children={ children }
+				setSelectedElement={ setSelectedElement }
 				className={ classes }
 				isAdaptiveWidth={ isAdaptiveWidth }
 				label={ label }
 				onChange={ onChange }
-				ref={ forwardedRef }
-				size={ size }
+				ref={ refs }
+				size={ normalizedSize }
 				value={ value }
-			/>
+			>
+				{ children }
+			</MainControl>
 		</BaseControl>
 	);
 }
@@ -107,7 +135,12 @@ function UnconnectedToggleGroupControl(
  *
  * function Example() {
  *   return (
- *     <ToggleGroupControl label="my label" value="vertical" isBlock>
+ *     <ToggleGroupControl
+ *       label="my label"
+ *       value="vertical"
+ *       isBlock
+ *       __next40pxDefaultSize
+ *     >
  *       <ToggleGroupControlOption value="horizontal" label="Horizontal" />
  *       <ToggleGroupControlOption value="vertical" label="Vertical" />
  *     </ToggleGroupControl>

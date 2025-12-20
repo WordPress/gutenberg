@@ -1,4 +1,6 @@
-.wp-block-audio figcaption {
+@use "@wordpress/base-styles/mixins" as *;
+
+.wp-block-audio :where(figcaption) {
 	@include caption-style-theme();
 }
 

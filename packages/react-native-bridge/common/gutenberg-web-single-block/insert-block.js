@@ -1,3 +1,3 @@
 if ( window.insertBlock && window.contentIncerted !== true ) {
-	window.insertBlock( `%@` );
+	window.insertBlock( String.raw`%@` );
 }

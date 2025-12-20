@@ -6,18 +6,7 @@ import { Dimensions } from 'react-native';
 /**
  * WordPress dependencies
  */
-import {
-	useContext,
-	useEffect,
-	useState,
-	useMemo,
-	useCallback,
-} from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
-import GlobalStylesContext from '../global-styles-context';
+import { useEffect, useState, useMemo, useCallback } from '@wordpress/element';
 
 const getValueAndUnit = ( value, unit ) => {
 	const regex = /(\d+\.?\d*)(.*)/;
@@ -63,8 +52,7 @@ const convertUnitToMobile = ( containerSize, globalStyles, value, unit ) => {
 	}
 };
 
-const useConvertUnitToMobile = ( value, unit ) => {
-	const { globalStyles: styles } = useContext( GlobalStylesContext );
+const useConvertUnitToMobile = ( value, unit, styles ) => {
 	const [ windowSizes, setWindowSizes ] = useState(
 		Dimensions.get( 'window' )
 	);
@@ -78,9 +66,7 @@ const useConvertUnitToMobile = ( value, unit ) => {
 		return () => {
 			dimensionsChangeSubscription.remove();
 		};
-		// Disable reason: deferring this refactor to the native team.
-		// see https://github.com/WordPress/gutenberg/pull/41166
-		// eslint-disable-next-line react-hooks/exhaustive-deps
+		// See https://github.com/WordPress/gutenberg/pull/41166
 	}, [] );
 
 	const onDimensionsChange = useCallback( ( { window } ) => {
@@ -97,9 +83,7 @@ const useConvertUnitToMobile = ( value, unit ) => {
 			valueToConvert,
 			valueUnit
 		);
-		// Disable reason: deferring this refactor to the native team.
-		// see https://github.com/WordPress/gutenberg/pull/41166
-		// eslint-disable-next-line react-hooks/exhaustive-deps
+		// See https://github.com/WordPress/gutenberg/pull/41166
 	}, [ windowSizes, value, unit ] );
 };
 

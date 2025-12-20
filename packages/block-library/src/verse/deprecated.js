@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -46,7 +46,7 @@ const v2 = {
 			selector: 'pre',
 			default: '',
 			__unstablePreserveWhiteSpace: true,
-			__experimentalRole: 'content',
+			role: 'content',
 		},
 		textAlign: {
 			type: 'string',
@@ -69,7 +69,7 @@ const v2 = {
 	save( { attributes } ) {
 		const { textAlign, content } = attributes;
 
-		const className = classnames( {
+		const className = clsx( {
 			[ `has-text-align-${ textAlign }` ]: textAlign,
 		} );
 

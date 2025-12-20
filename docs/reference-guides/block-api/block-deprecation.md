@@ -1,5 +1,7 @@
 # Deprecation
 
+> This page provides a comprehensive guide to the principles and usage of the Deprecation API. For an introduction check out the [tutorial on the basics of block deprecation](https://developer.wordpress.org/news/2023/03/block-deprecation-a-tutorial/) which can be found on the [Developer Blog](https://developer.wordpress.org/news/).
+
 When updating static blocks markup and attributes, block authors need to consider existing posts using the old versions of their block. To provide a good upgrade path, you can choose one of the following strategies:
 
 -   Do not deprecate the block and create a new one (a different name)
@@ -21,7 +23,7 @@ It is also important to note that if a deprecation's `save` method imports addit
 
 For blocks with multiple deprecations, it may be easier to save each deprecation to a constant with the version of the block it applies to, and then add each of these to the block's `deprecated` array. The deprecations in the array should be in reverse chronological order. This allows the block editor to attempt to apply the most recent and likely deprecations first, avoiding unnecessary and expensive processing.
 
-### Example:
+**Example**
 
 ```js
 const v1 = {};
@@ -37,15 +39,27 @@ Deprecations are defined on a block type as its `deprecated` property, an array 
 -   `attributes` (Object): The [attributes definition](/docs/reference-guides/block-api/block-attributes.md) of the deprecated form of the block.
 -   `supports` (Object): The [supports definition](/docs/reference-guides/block-api/block-registration.md) of the deprecated form of the block.
 -   `save` (Function): The [save implementation](/docs/reference-guides/block-api/block-edit-save.md) of the deprecated form of the block.
--   `migrate` (Function, Optional): A function which, given the old attributes and inner blocks is expected to return either the new attributes or a tuple array of `[ attributes, innerBlocks ]` compatible with the block. As mentioned above, a deprecation's `migrate` will not be run if its `save` function does not return a valid block so you will need to make sure your migrations are available in all the deprecations where they are relevant.
--   `isEligible` (Function, Optional): A function which, given the attributes and inner blocks of the parsed block, returns true if the deprecation can handle the block migration even if the block is valid. This is particularly useful in cases where a block is technically valid even once deprecated, but still requires updates to its attributes or inner blocks. This function is not called when the results of all previous deprecations' `save` functions were invalid.
+-   `migrate`: (Function, Optional). A function which, given the old attributes and inner blocks is expected to return either the new attributes or a tuple array of attributes and inner blocks compatible with the block. As mentioned above, a deprecation's `migrate` will not be run if its `save` function does not return a valid block so you will need to make sure your migrations are available in all the deprecations where they are relevant.
+	- _Parameters_
+		- `attributes`: The block's old attributes.
+		- `innerBlocks`: The block's old inner blocks.
+	- _Return_
+		- `Object | Array`: Either the updated block attributes or tuple array `[attributes, innerBlocks]`.
+-   `isEligible`: (Function, Optional). A function which returns `true` if the deprecation can handle the block migration even if the block is valid. It is particularly useful in cases where a block is technically valid even once deprecated, but still requires updates to its attributes or inner blocks. This function is **not** called when the results of all previous deprecations' save functions were invalid.
+	- _Parameters_
+		- `attributes`: The raw block attributes as parsed from the serialized HTML, and before the block type code is applied.
+		- `innerBlocks`: The block's current inner blocks.
+		- `data`: An object containing properties representing the block node and its resulting block object.
+			- `data.blockNode`: The raw form of the block as a result of parsing the serialized HTML.
+			- `data.block`: The block object, which is the result of applying the block type to the `blockNode`.
+	- _Return_
+		- `boolean`: Whether or not this otherwise valid block is eligible to be migrated by this deprecation.
 
-It's important to note that `attributes`, `supports`, and `save` are not automatically inherited from the current version, since they can impact parsing and serialization of a block, so they must be defined on the deprecated object in order to be processed during a migration.
+<div class="callout callout-alert">
+It's important to note that <code>attributes</code>, <code>supports</code>, and <code>save</code> are not automatically inherited from the current version, since they can impact parsing and serialization of a block, so they must be defined on the deprecated object in order to be processed during a migration.
+</div>
 
-### Example:
-
-{% codetabs %}
-{% JSX %}
+**Example**
 
 ```js
 const { registerBlockType } = wp.blocks;
@@ -63,7 +77,7 @@ registerBlockType( 'gutenberg/block-with-deprecated-version', {
 	// ... other block properties go here
 
 	attributes,
-	
+
 	supports,
 
 	save( props ) {
@@ -73,7 +87,7 @@ registerBlockType( 'gutenberg/block-with-deprecated-version', {
 	deprecated: [
 		{
 			attributes,
-			
+
 			supports,
 
 			save( props ) {
@@ -84,56 +98,14 @@ registerBlockType( 'gutenberg/block-with-deprecated-version', {
 } );
 ```
 
-{% Plain %}
-
-```js
-var el = wp.element.createElement,
-	registerBlockType = wp.blocks.registerBlockType,
-	attributes = {
-		text: {
-			type: 'string',
-			default: 'some random value',
-		},
-	},
-	supports = {
-		className: false,
-	};
-
-registerBlockType( 'gutenberg/block-with-deprecated-version', {
-	// ... other block properties go here
-
-	attributes: attributes,
-
-	supports: supports,
-
-	save: function ( props ) {
-		return el( 'div', {}, props.attributes.text );
-	},
-
-	deprecated: [
-		{
-			attributes: attributes,
-
-			save: function ( props ) {
-				return el( 'p', {}, props.attributes.text );
-			},
-		},
-	],
-} );
-```
-
-{% end %}
-
 In the example above we updated the markup of the block to use a `div` instead of `p`.
 
 ## Changing the attributes set
 
 Sometimes, you need to update the attributes set to rename or modify old attributes.
 
-### Example:
+**Example**
 
-{% codetabs %}
-{% JSX %}
 
 ```js
 const { registerBlockType } = wp.blocks;
@@ -175,50 +147,6 @@ registerBlockType( 'gutenberg/block-with-deprecated-version', {
 } );
 ```
 
-{% Plain %}
-
-```js
-var el = wp.element.createElement,
-	registerBlockType = wp.blocks.registerBlockType;
-
-registerBlockType( 'gutenberg/block-with-deprecated-version', {
-	// ... other block properties go here
-
-	attributes: {
-		content: {
-			type: 'string',
-			default: 'some random value',
-		},
-	},
-
-	save: function ( props ) {
-		return el( 'div', {}, props.attributes.content );
-	},
-
-	deprecated: [
-		{
-			attributes: {
-				text: {
-					type: 'string',
-					default: 'some random value',
-				},
-			},
-
-			migrate: function ( attributes ) {
-				return {
-					content: attributes.text,
-				};
-			},
-
-			save: function ( props ) {
-				return el( 'p', {}, props.attributes.text );
-			},
-		},
-	],
-} );
-```
-
-{% end %}
 
 In the example above we updated the markup of the block to use a `div` instead of `p` and rename the `text` attribute to `content`.
 
@@ -227,14 +155,10 @@ In the example above we updated the markup of the block to use a `div` instead o
 Situations may exist where when migrating the block we may need to add or remove innerBlocks.
 E.g: a block wants to migrate a title attribute to a paragraph innerBlock.
 
-### Example:
-
-{% codetabs %}
-{% JSX %}
+**Example**
 
 ```js
 const { registerBlockType } = wp.blocks;
-const { omit } = lodash;
 
 registerBlockType( 'gutenberg/block-with-deprecated-version', {
 	// ... block properties go here
@@ -254,8 +178,10 @@ registerBlockType( 'gutenberg/block-with-deprecated-version', {
 			},
 
 			migrate( attributes, innerBlocks ) {
+				const { title, ...restAttributes } = attributes;
+
 				return [
-					omit( attributes, 'title' ),
+					restAttributes,
 					[
 						createBlock( 'core/paragraph', {
 							content: attributes.title,
@@ -273,48 +199,6 @@ registerBlockType( 'gutenberg/block-with-deprecated-version', {
 	],
 } );
 ```
-
-{% Plain %}
-
-```js
-var el = wp.element.createElement,
-	registerBlockType = wp.blocks.registerBlockType,
-	omit = lodash.omit;
-
-registerBlockType( 'gutenberg/block-with-deprecated-version', {
-	// ... block properties go here
-
-	deprecated: [
-		{
-			attributes: {
-				title: {
-					type: 'string',
-					source: 'html',
-					selector: 'p',
-				},
-			},
-
-			migrate: function ( attributes, innerBlocks ) {
-				return [
-					omit( attributes, 'title' ),
-					[
-						createBlock( 'core/paragraph', {
-							content: attributes.title,
-							fontSize: 'large',
-						} ),
-					].concat( innerBlocks ),
-				];
-			},
-
-			save: function ( props ) {
-				return el( 'p', {}, props.attributes.title );
-			},
-		},
-	],
-} );
-```
-
-{% end %}
 
 In the example above we updated the block to use an inner Paragraph block with a title instead of a title attribute.
 

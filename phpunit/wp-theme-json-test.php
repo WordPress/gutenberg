@@ -2,10 +2,24 @@
 /**
  * Tests theme.json related public APIs.
  *
- * @package Gutenberg
+ * @package gutenberg
  */
 
 class WP_Theme_Json_Test extends WP_UnitTestCase {
+	/**
+	 * @var string|null
+	 */
+	private $theme_root;
+
+	/**
+	 * @var array|null
+	 */
+	private $orig_theme_dir;
+
+	/**
+	 * @var array|null
+	 */
+	private $queries;
 
 	public function set_up() {
 		parent::set_up();

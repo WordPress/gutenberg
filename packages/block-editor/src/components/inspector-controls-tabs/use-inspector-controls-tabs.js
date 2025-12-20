@@ -1,0 +1,112 @@
+/**
+ * WordPress dependencies
+ */
+import { __experimentalUseSlotFills as useSlotFills } from '@wordpress/components';
+import { useSelect } from '@wordpress/data';
+
+/**
+ * Internal dependencies
+ */
+import InspectorControlsGroups from '../inspector-controls/groups';
+import useIsListViewTabDisabled from './use-is-list-view-tab-disabled';
+import { InspectorAdvancedControls } from '../inspector-controls';
+import { TAB_LIST_VIEW, TAB_SETTINGS, TAB_STYLES, TAB_CONTENT } from './utils';
+import { store as blockEditorStore } from '../../store';
+
+const EMPTY_ARRAY = [];
+
+function getShowTabs( blockName, tabSettings = {} ) {
+	// Block specific setting takes precedence over generic default.
+	if ( tabSettings[ blockName ] !== undefined ) {
+		return tabSettings[ blockName ];
+	}
+
+	// Use generic default if set over the Gutenberg experiment option.
+	if ( tabSettings.default !== undefined ) {
+		return tabSettings.default;
+	}
+
+	return true;
+}
+
+export default function useInspectorControlsTabs(
+	blockName,
+	contentClientIds,
+	isSectionBlock,
+	hasBlockStyles
+) {
+	const tabs = [];
+	const {
+		bindings: bindingsGroup,
+		border: borderGroup,
+		color: colorGroup,
+		default: defaultGroup,
+		dimensions: dimensionsGroup,
+		list: listGroup,
+		position: positionGroup,
+		styles: stylesGroup,
+		typography: typographyGroup,
+		effects: effectsGroup,
+	} = InspectorControlsGroups;
+
+	// List View Tab: If there are any fills for the list group add that tab.
+	const listViewDisabled = useIsListViewTabDisabled( blockName );
+	const listFills = useSlotFills( listGroup.name );
+	const hasListFills = ! listViewDisabled && !! listFills && listFills.length;
+
+	// Styles Tab: Add this tab if there are any fills for block supports
+	// e.g. border, color, spacing, typography, etc.
+	const styleFills = [
+		...( useSlotFills( borderGroup.name ) || [] ),
+		...( useSlotFills( colorGroup.name ) || [] ),
+		...( useSlotFills( dimensionsGroup.name ) || [] ),
+		...( useSlotFills( stylesGroup.name ) || [] ),
+		...( useSlotFills( typographyGroup.name ) || [] ),
+		...( useSlotFills( effectsGroup.name ) || [] ),
+	];
+	const hasStyleFills = styleFills.length;
+
+	// Settings Tab: If we don't have multiple tabs to display
+	// (i.e. both list view and styles), check only the default and position
+	// InspectorControls slots. If we have multiple tabs, we'll need to check
+	// the advanced controls slot as well to ensure they are rendered.
+	const advancedFills = [
+		...( useSlotFills( InspectorAdvancedControls.slotName ) || [] ),
+		...( useSlotFills( bindingsGroup.name ) || [] ),
+	];
+
+	const settingsFills = [
+		...( useSlotFills( defaultGroup.name ) || [] ),
+		...( useSlotFills( positionGroup.name ) || [] ),
+		...( hasListFills && hasStyleFills > 1 ? advancedFills : [] ),
+	];
+
+	const hasContentTab = !! (
+		contentClientIds && contentClientIds.length > 0
+	);
+
+	// Add the tabs in the order that they will default to if available.
+	// List View > Content > Settings > Styles.
+	if ( hasListFills && ! isSectionBlock ) {
+		tabs.push( TAB_LIST_VIEW );
+	}
+
+	if ( hasContentTab ) {
+		tabs.push( TAB_CONTENT );
+	}
+
+	if ( settingsFills.length && ! isSectionBlock ) {
+		tabs.push( TAB_SETTINGS );
+	}
+
+	if ( hasBlockStyles || hasStyleFills ) {
+		tabs.push( TAB_STYLES );
+	}
+
+	const tabSettings = useSelect( ( select ) => {
+		return select( blockEditorStore ).getSettings().blockInspectorTabs;
+	}, [] );
+
+	const showTabs = getShowTabs( blockName, tabSettings );
+	return showTabs ? tabs : EMPTY_ARRAY;
+}

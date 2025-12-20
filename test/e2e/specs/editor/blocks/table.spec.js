@@ -15,7 +15,7 @@ test.describe( 'Table', () => {
 		await editor.insertBlock( { name: 'core/table' } );
 
 		// Check for existence of the column count field.
-		const columnCountInput = page.locator(
+		const columnCountInput = editor.canvas.locator(
 			'role=spinbutton[name="Column count"i]'
 		);
 		await expect( columnCountInput ).toBeVisible();
@@ -27,7 +27,7 @@ test.describe( 'Table', () => {
 		await page.keyboard.type( '5' );
 
 		// Check for existence of the row count field.
-		const rowCountInput = page.locator(
+		const rowCountInput = editor.canvas.locator(
 			'role=spinbutton[name="Row count"i]'
 		);
 		await expect( rowCountInput ).toBeVisible();
@@ -39,7 +39,9 @@ test.describe( 'Table', () => {
 		await page.keyboard.type( '10' );
 
 		// Create the table.
-		await page.click( 'role=button[name="Create Table"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Create Table"i]' )
+			.click();
 
 		// Expect the post content to have a correctly sized table.
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
@@ -49,10 +51,14 @@ test.describe( 'Table', () => {
 		await editor.insertBlock( { name: 'core/table' } );
 
 		// Create the table.
-		await page.click( 'role=button[name="Create Table"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Create Table"i]' )
+			.click();
 
 		// Click the first cell and add some text.
-		await page.click( 'role=textbox[name="Body cell text"i] >> nth=0' );
+		await editor.canvas
+			.locator( 'role=textbox[name="Body cell text"i] >> nth=0' )
+			.click();
 		await page.keyboard.type( 'This' );
 
 		// Navigate to the next cell and add some text.
@@ -90,9 +96,14 @@ test.describe( 'Table', () => {
 		await expect( footerSwitch ).toBeHidden();
 
 		// // Create the table.
-		await page.click( 'role=button[name="Create Table"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Create Table"i]' )
+			.click();
 
 		// Expect the header and footer switches to be present now that the table has been created.
+		await page.click(
+			`role=region[name="Editor settings"i] >> role=tab[name="Settings"i]`
+		);
 		await expect( headerSwitch ).toBeVisible();
 		await expect( footerSwitch ).toBeVisible();
 
@@ -100,19 +111,25 @@ test.describe( 'Table', () => {
 		await headerSwitch.check();
 		await footerSwitch.check();
 
-		await page.click(
-			'role=rowgroup >> nth=0 >> role=textbox[name="Header cell text"i] >> nth=0'
-		);
+		await editor.canvas
+			.locator(
+				'role=rowgroup >> nth=0 >> role=textbox[name="Header cell text"i] >> nth=0'
+			)
+			.click();
 		await page.keyboard.type( 'header' );
 
-		await page.click(
-			'role=rowgroup >> nth=1 >> role=textbox[name="Body cell text"i] >> nth=0'
-		);
+		await editor.canvas
+			.locator(
+				'role=rowgroup >> nth=1 >> role=textbox[name="Body cell text"i] >> nth=0'
+			)
+			.click();
 		await page.keyboard.type( 'body' );
 
-		await page.click(
-			'role=rowgroup >> nth=2 >> role=textbox[name="Footer cell text"i] >> nth=0'
-		);
+		await editor.canvas
+			.locator(
+				'role=rowgroup >> nth=2 >> role=textbox[name="Footer cell text"i] >> nth=0'
+			)
+			.click();
 		await page.keyboard.type( 'footer' );
 
 		// Expect the table to have a header, body and footer with written content.
@@ -134,12 +151,19 @@ test.describe( 'Table', () => {
 		await editor.openDocumentSettingsSidebar();
 
 		// Create the table.
-		await page.click( 'role=button[name="Create Table"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Create Table"i]' )
+			.click();
 
 		// Toggle on the switches and add some content.
+		await page.click(
+			`role=region[name="Editor settings"i] >> role=tab[name="Settings"i]`
+		);
 		await page.locator( 'role=checkbox[name="Header section"i]' ).check();
 		await page.locator( 'role=checkbox[name="Footer section"i]' ).check();
-		await page.click( 'role=textbox[name="Body cell text"i] >> nth=0' );
+		await editor.canvas
+			.locator( 'role=textbox[name="Body cell text"i] >> nth=0' )
+			.click();
 
 		// Add a column.
 		await editor.clickBlockToolbarButton( 'Edit table' );
@@ -148,7 +172,9 @@ test.describe( 'Table', () => {
 		// Expect the table to have 3 columns across the header, body and footer.
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
 
-		await page.click( 'role=textbox[name="Body cell text"i] >> nth=0' );
+		await editor.canvas
+			.locator( 'role=textbox[name="Body cell text"i] >> nth=0' )
+			.click();
 
 		// Delete a column.
 		await editor.clickBlockToolbarButton( 'Edit table' );
@@ -161,15 +187,21 @@ test.describe( 'Table', () => {
 	test( 'allows columns to be aligned', async ( { editor, page } ) => {
 		await editor.insertBlock( { name: 'core/table' } );
 
-		await page.click( 'role=spinbutton[name="Column count"i]' );
+		await editor.canvas
+			.locator( 'role=spinbutton[name="Column count"i]' )
+			.click();
 		await page.keyboard.press( 'Backspace' );
 		await page.keyboard.type( '4' );
 
 		// Create the table.
-		await page.click( 'role=button[name="Create Table"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Create Table"i]' )
+			.click();
 
 		// Click the first cell and add some text. Don't align.
-		const cells = page.locator( 'role=textbox[name="Body cell text"i]' );
+		const cells = editor.canvas.locator(
+			'role=textbox[name="Body cell text"i]'
+		);
 		await cells.nth( 0 ).click();
 		await page.keyboard.type( 'None' );
 
@@ -204,19 +236,26 @@ test.describe( 'Table', () => {
 		await editor.openDocumentSettingsSidebar();
 
 		// Create the table.
-		await page.click( 'role=button[name="Create Table"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Create Table"i]' )
+			.click();
 
-		// Enable fixed width as it exascerbates the amount of empty space around the RichText.
+		// Enable fixed width as it exacerbates the amount of empty space around the RichText.
+		await page.click(
+			`role=region[name="Editor settings"i] >> role=tab[name="Settings"i]`
+		);
 		await page
 			.locator( 'role=checkbox[name="Fixed width table cells"i]' )
 			.check();
 
 		// Add multiple new lines to the first cell to make it taller.
-		await page.click( 'role=textbox[name="Body cell text"i] >> nth=0' );
+		await editor.canvas
+			.locator( 'role=textbox[name="Body cell text"i] >> nth=0' )
+			.click();
 		await page.keyboard.type( '\n\n\n\n' );
 
 		// Get the bounding client rect for the second cell.
-		const { x: secondCellX, y: secondCellY } = await page
+		const { x: secondCellX, y: secondCellY } = await editor.canvas
 			.locator( 'role=textbox[name="Body cell text"] >> nth=1' )
 			.boundingBox();
 
@@ -232,10 +271,15 @@ test.describe( 'Table', () => {
 		await editor.insertBlock( { name: 'core/table' } );
 
 		// Create the table.
-		await page.click( 'role=button[name="Create Table"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Create Table"i]' )
+			.click();
 
-		// Click the first cell and add some text.
-		await page.click( 'role=document[name="Block: Table"i] >> figcaption' );
+		await editor.clickBlockToolbarButton( 'Add caption' );
+		const caption = editor.canvas.locator(
+			'role=textbox[name="Table caption text"i]'
+		);
+		await expect( caption ).toBeFocused();
 		await page.keyboard.type( 'Caption!' );
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
 	} );
@@ -243,7 +287,9 @@ test.describe( 'Table', () => {
 	test( 'up and down arrow navigation', async ( { editor, page } ) => {
 		await editor.insertBlock( { name: 'core/table' } );
 		// Create the table.
-		await page.click( 'role=button[name="Create Table"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Create Table"i]' )
+			.click();
 		await page.keyboard.type( '1' );
 		await page.keyboard.press( 'ArrowDown' );
 		await page.keyboard.type( '2' );
@@ -254,19 +300,20 @@ test.describe( 'Table', () => {
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
 	} );
 
-	test( 'should not have focus loss after creation', async ( {
-		editor,
-		page,
-	} ) => {
+	test( 'should not have focus loss after creation', async ( { editor } ) => {
 		// Insert table block.
 		await editor.insertBlock( { name: 'core/table' } );
 
 		// Create the table.
-		await page.click( 'role=button[name="Create Table"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Create Table"i]' )
+			.click();
 
 		// Focus should be in first td.
 		await expect(
-			page.locator( 'role=textbox[name="Body cell text"i] >> nth=0' )
+			editor.canvas.locator(
+				'role=textbox[name="Body cell text"i] >> nth=0'
+			)
 		).toBeFocused();
 	} );
 } );

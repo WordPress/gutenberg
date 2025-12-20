@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -20,7 +20,7 @@ import {
 	__experimentalGetGradientClass,
 	getGradientValueBySlug,
 } from '../components/gradients';
-import useSetting from '../components/use-setting';
+import { useSettings } from '../components/use-settings';
 
 // The code in this file has largely been lifted from the color block support
 // hook.
@@ -51,7 +51,7 @@ export function getColorClassesAndStyles( attributes ) {
 	const hasGradient = gradientClass || style?.color?.gradient;
 
 	// Determine color CSS class name list.
-	const className = classnames( textClass, gradientClass, {
+	const className = clsx( textClass, gradientClass, {
 		// Don't apply the background class if there's a gradient.
 		[ backgroundClass ]: ! hasGradient && !! backgroundClass,
 		'has-text-color': textColor || style?.color?.text,
@@ -73,8 +73,6 @@ export function getColorClassesAndStyles( attributes ) {
 	};
 }
 
-const EMPTY_OBJECT = {};
-
 /**
  * Determines the color related props for a block derived from its color block
  * support attributes.
@@ -89,13 +87,22 @@ const EMPTY_OBJECT = {};
 export function useColorProps( attributes ) {
 	const { backgroundColor, textColor, gradient } = attributes;
 
-	// Some color settings have a special handling for deprecated flags in `useSetting`,
-	// so we can't unwrap them by doing const { ... } = useSetting('color')
-	// until https://github.com/WordPress/gutenberg/issues/37094 is fixed.
-	const userPalette = useSetting( 'color.palette.custom' ) || [];
-	const themePalette = useSetting( 'color.palette.theme' ) || [];
-	const defaultPalette = useSetting( 'color.palette.default' ) || [];
-	const gradientsPerOrigin = useSetting( 'color.gradients' ) || EMPTY_OBJECT;
+	const [
+		userPalette,
+		themePalette,
+		defaultPalette,
+		userGradients,
+		themeGradients,
+		defaultGradients,
+	] = useSettings(
+		'color.palette.custom',
+		'color.palette.theme',
+		'color.palette.default',
+		'color.gradients.custom',
+		'color.gradients.theme',
+		'color.gradients.default'
+	);
+
 	const colors = useMemo(
 		() => [
 			...( userPalette || [] ),
@@ -106,11 +113,11 @@ export function useColorProps( attributes ) {
 	);
 	const gradients = useMemo(
 		() => [
-			...( gradientsPerOrigin?.custom || [] ),
-			...( gradientsPerOrigin?.theme || [] ),
-			...( gradientsPerOrigin?.default || [] ),
+			...( userGradients || [] ),
+			...( themeGradients || [] ),
+			...( defaultGradients || [] ),
 		],
-		[ gradientsPerOrigin ]
+		[ userGradients, themeGradients, defaultGradients ]
 	);
 
 	const colorProps = getColorClassesAndStyles( attributes );

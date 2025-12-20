@@ -8,10 +8,11 @@ import type { ForwardedRef } from 'react';
  */
 import type { ItemProps } from '../types';
 import { useItem } from './hook';
-import { contextConnect, WordPressComponentProps } from '../../ui/context';
+import type { WordPressComponentProps } from '../../context';
+import { contextConnect } from '../../context';
 import { View } from '../../view';
 
-function Item(
+function UnconnectedItem(
 	props: WordPressComponentProps< ItemProps, 'div' >,
 	forwardedRef: ForwardedRef< any >
 ) {
@@ -24,4 +25,27 @@ function Item(
 	);
 }
 
-export default contextConnect( Item, 'Item' );
+/**
+ * `Item` is used in combination with `ItemGroup` to display a list of items
+ * grouped and styled together.
+ *
+ * ```jsx
+ * import {
+ *   __experimentalItemGroup as ItemGroup,
+ *   __experimentalItem as Item,
+ * } from '@wordpress/components';
+ *
+ * function Example() {
+ *   return (
+ *     <ItemGroup>
+ *       <Item>Code</Item>
+ *       <Item>is</Item>
+ *       <Item>Poetry</Item>
+ *     </ItemGroup>
+ *   );
+ * }
+ * ```
+ */
+export const Item = contextConnect( UnconnectedItem, 'Item' );
+
+export default Item;

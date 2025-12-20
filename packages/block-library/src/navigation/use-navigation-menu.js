@@ -4,82 +4,79 @@
 import {
 	store as coreStore,
 	useResourcePermissions,
+	useEntityRecords,
 } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 
+/**
+ * Internal dependencies
+ */
+import { PRELOADED_NAVIGATION_MENUS_QUERY } from './constants';
+
 export default function useNavigationMenu( ref ) {
-	const permissions = useResourcePermissions( 'navigation', ref );
+	const permissions = useResourcePermissions( {
+		kind: 'postType',
+		name: 'wp_navigation',
+		id: ref,
+	} );
 
-	return useSelect(
+	const {
+		navigationMenu,
+		isNavigationMenuResolved,
+		isNavigationMenuMissing,
+	} = useSelect(
 		( select ) => {
-			const {
-				canCreate,
-				canUpdate,
-				canDelete,
-				isResolving,
-				hasResolved,
-			} = permissions;
-
-			const {
-				navigationMenus,
-				isResolvingNavigationMenus,
-				hasResolvedNavigationMenus,
-			} = selectNavigationMenus( select, ref );
-
-			const {
-				navigationMenu,
-				isNavigationMenuResolved,
-				isNavigationMenuMissing,
-			} = selectExistingMenu( select, ref );
-
-			return {
-				navigationMenus,
-				isResolvingNavigationMenus,
-				hasResolvedNavigationMenus,
-
-				navigationMenu,
-				isNavigationMenuResolved,
-				isNavigationMenuMissing,
-
-				canSwitchNavigationMenu: ref
-					? navigationMenus?.length > 1
-					: navigationMenus?.length > 0,
-
-				canUserCreateNavigationMenu: canCreate,
-				isResolvingCanUserCreateNavigationMenu: isResolving,
-				hasResolvedCanUserCreateNavigationMenu: hasResolved,
-
-				canUserUpdateNavigationMenu: canUpdate,
-				hasResolvedCanUserUpdateNavigationMenu: ref
-					? hasResolved
-					: undefined,
-
-				canUserDeleteNavigationMenu: canDelete,
-				hasResolvedCanUserDeleteNavigationMenu: ref
-					? hasResolved
-					: undefined,
-			};
+			return selectExistingMenu( select, ref );
 		},
-		[ ref, permissions ]
+		[ ref ]
 	);
-}
 
-function selectNavigationMenus( select ) {
-	const { getEntityRecords, hasFinishedResolution, isResolving } =
-		select( coreStore );
+	const {
+		// Can the user create navigation menus?
+		canCreate: canCreateNavigationMenus,
 
-	const args = [
+		// Can the user update the specific navigation menu with the given post ID?
+		canUpdate: canUpdateNavigationMenu,
+
+		// Can the user delete the specific navigation menu with the given post ID?
+		canDelete: canDeleteNavigationMenu,
+		isResolving: isResolvingPermissions,
+		hasResolved: hasResolvedPermissions,
+	} = permissions;
+
+	const {
+		records: navigationMenus,
+		isResolving: isResolvingNavigationMenus,
+		hasResolved: hasResolvedNavigationMenus,
+	} = useEntityRecords(
 		'postType',
-		'wp_navigation',
-		{ per_page: -1, status: [ 'publish', 'draft' ] },
-	];
+		`wp_navigation`,
+		PRELOADED_NAVIGATION_MENUS_QUERY
+	);
+
+	const canSwitchNavigationMenu = ref
+		? navigationMenus?.length > 1
+		: navigationMenus?.length > 0;
+
 	return {
-		navigationMenus: getEntityRecords( ...args ),
-		isResolvingNavigationMenus: isResolving( 'getEntityRecords', args ),
-		hasResolvedNavigationMenus: hasFinishedResolution(
-			'getEntityRecords',
-			args
-		),
+		navigationMenu,
+		isNavigationMenuResolved,
+		isNavigationMenuMissing,
+		navigationMenus,
+		isResolvingNavigationMenus,
+		hasResolvedNavigationMenus,
+		canSwitchNavigationMenu,
+		canUserCreateNavigationMenus: canCreateNavigationMenus,
+		isResolvingCanUserCreateNavigationMenus: isResolvingPermissions,
+		hasResolvedCanUserCreateNavigationMenus: hasResolvedPermissions,
+		canUserUpdateNavigationMenu: canUpdateNavigationMenu,
+		hasResolvedCanUserUpdateNavigationMenu: ref
+			? hasResolvedPermissions
+			: undefined,
+		canUserDeleteNavigationMenu: canDeleteNavigationMenu,
+		hasResolvedCanUserDeleteNavigationMenu: ref
+			? hasResolvedPermissions
+			: undefined,
 	};
 }
 

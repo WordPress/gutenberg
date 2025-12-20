@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -12,10 +12,15 @@ import {
 	useBlockProps,
 	InspectorControls,
 	store as blockEditorStore,
+	HeadingLevelDropdown,
 } from '@wordpress/block-editor';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { useEntityProp } from '@wordpress/core-data';
-import { PanelBody, ToggleControl } from '@wordpress/components';
+import {
+	ToggleControl,
+	__experimentalToolsPanel as ToolsPanel,
+	__experimentalToolsPanelItem as ToolsPanelItem,
+} from '@wordpress/components';
 import { useState, useEffect } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import apiFetch from '@wordpress/api-fetch';
@@ -24,10 +29,16 @@ import { addQueryArgs } from '@wordpress/url';
 /**
  * Internal dependencies
  */
-import HeadingLevelDropdown from '../heading/heading-level-dropdown';
+import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
 export default function Edit( {
-	attributes: { textAlign, showPostTitle, showCommentsCount, level },
+	attributes: {
+		textAlign,
+		showPostTitle,
+		showCommentsCount,
+		level,
+		levelOptions,
+	},
 	setAttributes,
 	context: { postType, postId },
 } ) {
@@ -36,7 +47,7 @@ export default function Edit( {
 	const [ rawTitle ] = useEntityProp( 'postType', postType, 'title', postId );
 	const isSiteEditor = typeof postId === 'undefined';
 	const blockProps = useBlockProps( {
-		className: classnames( {
+		className: clsx( {
 			[ `has-text-align-${ textAlign }` ]: textAlign,
 		} ),
 	} );
@@ -48,8 +59,10 @@ export default function Edit( {
 		pageComments,
 	} = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
-		return getSettings().__experimentalDiscussionSettings;
-	} );
+		return getSettings().__experimentalDiscussionSettings ?? {};
+	}, [] );
+
+	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
 	useEffect( () => {
 		if ( isSiteEditor ) {
@@ -98,7 +111,8 @@ export default function Edit( {
 				}
 			/>
 			<HeadingLevelDropdown
-				selectedLevel={ level }
+				value={ level }
+				options={ levelOptions }
 				onChange={ ( newLevel ) =>
 					setAttributes( { level: newLevel } )
 				}
@@ -108,22 +122,49 @@ export default function Edit( {
 
 	const inspectorControls = (
 		<InspectorControls>
-			<PanelBody title={ __( 'Settings' ) }>
-				<ToggleControl
+			<ToolsPanel
+				label={ __( 'Settings' ) }
+				resetAll={ () => {
+					setAttributes( {
+						showPostTitle: true,
+						showCommentsCount: true,
+					} );
+				} }
+				dropdownMenuProps={ dropdownMenuProps }
+			>
+				<ToolsPanelItem
 					label={ __( 'Show post title' ) }
-					checked={ showPostTitle }
-					onChange={ ( value ) =>
-						setAttributes( { showPostTitle: value } )
+					isShownByDefault
+					hasValue={ () => ! showPostTitle }
+					onDeselect={ () =>
+						setAttributes( { showPostTitle: true } )
 					}
-				/>
-				<ToggleControl
+				>
+					<ToggleControl
+						label={ __( 'Show post title' ) }
+						checked={ showPostTitle }
+						onChange={ ( value ) =>
+							setAttributes( { showPostTitle: value } )
+						}
+					/>
+				</ToolsPanelItem>
+				<ToolsPanelItem
 					label={ __( 'Show comments count' ) }
-					checked={ showCommentsCount }
-					onChange={ ( value ) =>
-						setAttributes( { showCommentsCount: value } )
+					isShownByDefault
+					hasValue={ () => ! showCommentsCount }
+					onDeselect={ () =>
+						setAttributes( { showCommentsCount: true } )
 					}
-				/>
-			</PanelBody>
+				>
+					<ToggleControl
+						label={ __( 'Show comments count' ) }
+						checked={ showCommentsCount }
+						onChange={ ( value ) =>
+							setAttributes( { showCommentsCount: value } )
+						}
+					/>
+				</ToolsPanelItem>
+			</ToolsPanel>
 		</InspectorControls>
 	);
 

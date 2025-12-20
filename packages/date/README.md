@@ -27,9 +27,9 @@ _Related_
 
 _Parameters_
 
--   _dateFormat_ `string`: PHP-style formatting string. See php.net/date.
--   _dateValue_ `Moment | Date | string | undefined`: Date object or string, parsable by moment.js.
--   _timezone_ `string | number | undefined`: Timezone to output result in or a UTC offset. Defaults to timezone from site.
+-   _dateFormat_ `string`: PHP-style formatting string. See [php.net/date](https://www.php.net/manual/en/function.date.php).
+-   _dateValue_ `Moment | Date | string | number`: Date object or string, parsable by moment.js.
+-   _timezone_ `string`: Timezone to output result in or a UTC offset. Defaults to timezone from site.
 
 _Returns_
 
@@ -39,8 +39,7 @@ _Returns_
 
 Formats a date (like `wp_date()` in PHP), translating it into site's locale.
 
-Backward Compatibility Notice: if `timezone` is set to `true`, the function
-behaves like `gmdateI18n`.
+Backward Compatibility Notice: if `timezone` is set to `true`, the function behaves like `gmdateI18n`.
 
 _Related_
 
@@ -49,13 +48,13 @@ _Related_
 
 _Parameters_
 
--   _dateFormat_ `string`: PHP-style formatting string. See php.net/date.
--   _dateValue_ `Moment | Date | string | undefined`: Date object or string, parsable by moment.js.
--   _timezone_ `string | number | boolean | undefined`: Timezone to output result in or a UTC offset. Defaults to timezone from site. Notice: `boolean` is effectively deprecated, but still supported for backward compatibility reasons.
+-   _dateFormat_ `string`: PHP-style formatting string. See [php.net/date](https://www.php.net/manual/en/function.date.php).
+-   _dateValue_ `Moment | Date | string | number`: Date object or string, parsable by moment.js.
+-   _timezone_ `string | number | boolean`: Timezone to output result in or a UTC offset. Defaults to timezone from site. Notice: `boolean` is effectively deprecated, but still supported for backward compatibility reasons.
 
 _Returns_
 
--   `string`: Formatted date.
+-   Formatted date.
 
 ### format
 
@@ -63,12 +62,12 @@ Formats a date. Does not alter the date's timezone.
 
 _Parameters_
 
--   _dateFormat_ `string`: PHP-style formatting string. See php.net/date.
--   _dateValue_ `Moment | Date | string | undefined`: Date object or string, parsable by moment.js.
+-   _dateFormat_ `string`: PHP-style formatting string. See [php.net/date](https://www.php.net/manual/en/function.date.php).
+-   _dateValue_ `Moment | Date | string | number`: Date object or string, parsable by moment.js.
 
 _Returns_
 
--   `string`: Formatted date.
+-   Formatted date.
 
 ### getDate
 
@@ -76,11 +75,11 @@ Create and return a JavaScript Date Object from a date string in the WP timezone
 
 _Parameters_
 
--   _dateString_ `string?`: Date formatted in the WP timezone.
+-   _dateString_ `string | null`: Date formatted in the WP timezone.
 
 _Returns_
 
--   `Date`: Date
+-   Date
 
 ### getSettings
 
@@ -96,26 +95,38 @@ Formats a date (like `date()` in PHP), in the UTC timezone.
 
 _Parameters_
 
--   _dateFormat_ `string`: PHP-style formatting string. See php.net/date.
--   _dateValue_ `Moment | Date | string | undefined`: Date object or string, parsable by moment.js.
+-   _dateFormat_ `string`: PHP-style formatting string. See [php.net/date](https://www.php.net/manual/en/function.date.php).
+-   _dateValue_ `Moment | Date | string | number`: Date object or string, parsable by moment.js.
 
 _Returns_
 
--   `string`: Formatted date in English.
+-   Formatted date in English.
 
 ### gmdateI18n
 
-Formats a date (like `wp_date()` in PHP), translating it into site's locale
-and using the UTC timezone.
+Formats a date (like `wp_date()` in PHP), translating it into site's locale and using the UTC timezone.
 
 _Parameters_
 
--   _dateFormat_ `string`: PHP-style formatting string. See php.net/date.
--   _dateValue_ `Moment | Date | string | undefined`: Date object or string, parsable by moment.js.
+-   _dateFormat_ `string`: PHP-style formatting string. See [php.net/date](https://www.php.net/manual/en/function.date.php).
+-   _dateValue_ `Moment | Date | string | number`: Date object or string, parsable by moment.js.
 
 _Returns_
 
--   `string`: Formatted date.
+-   Formatted date.
+
+### humanTimeDiff
+
+Returns a human-readable time difference between two dates, like human_time_diff() in PHP.
+
+_Parameters_
+
+-   _from_ `Moment | Date | string | number`: From date, in the WP timezone.
+-   _to_ `Moment | Date | string | number`: To date, formatted in the WP timezone.
+
+_Returns_
+
+-   Human-readable time difference.
 
 ### isInTheFuture
 
@@ -123,11 +134,11 @@ Check whether a date is considered in the future according to the WordPress sett
 
 _Parameters_
 
--   _dateValue_ `string`: Date String or Date object in the Defined WP Timezone.
+-   _dateValue_ `Date | string | number`: Date String or Date object in the Defined WP Timezone.
 
 _Returns_
 
--   `boolean`: Is in the future.
+-   Is in the future.
 
 ### setSettings
 

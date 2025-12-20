@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 import type { Ref, ForwardedRef } from 'react';
 
 /**
@@ -13,7 +13,8 @@ import { forwardRef } from '@wordpress/element';
  * Internal dependencies
  */
 import Label from './label';
-import { useResizeLabel, Axis, Position, POSITIONS } from './utils';
+import type { Axis, Position } from './utils';
+import { useResizeLabel, POSITIONS } from './utils';
 import { Root } from './styles/resize-tooltip.styles';
 
 type ResizeTooltipProps = React.ComponentProps< typeof Root > & {
@@ -54,9 +55,11 @@ function ResizeTooltip(
 		position,
 	} );
 
-	if ( ! isVisible ) return null;
+	if ( ! isVisible ) {
+		return null;
+	}
 
-	const classes = classnames( 'components-resize-tooltip', className );
+	const classes = clsx( 'components-resize-tooltip', className );
 
 	return (
 		<Root aria-hidden="true" className={ classes } ref={ ref } { ...props }>

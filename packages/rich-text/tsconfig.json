@@ -1,0 +1,19 @@
+{
+	"$schema": "https://json.schemastore.org/tsconfig.json",
+	"extends": "../../tsconfig.base.json",
+	"compilerOptions": {
+		"types": [ "gutenberg-env" ],
+		"checkJs": false
+	},
+	"references": [
+		{ "path": "../a11y" },
+		{ "path": "../compose" },
+		{ "path": "../data" },
+		{ "path": "../deprecated" },
+		{ "path": "../dom" },
+		{ "path": "../element" },
+		{ "path": "../escape-html" },
+		{ "path": "../i18n" },
+		{ "path": "../keycodes" }
+	]
+}

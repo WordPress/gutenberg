@@ -8,8 +8,7 @@ The `Autocomplete` component found in `@wordpress/block-editor` applies this fil
 
 Here is an example of using the `editor.Autocomplete.completers` filter to add an acronym completer. You can find full documentation for the autocompleter interface with the `Autocomplete` component in the `@wordpress/components` package.
 
-{% codetabs %}
-{% JSX %}
+
 
 ```jsx
 // Our completer
@@ -45,48 +44,3 @@ wp.hooks.addFilter(
 	appendAcronymCompleter
 );
 ```
-
-{% Plain %}
-
-```js
-// Our completer
-var acronymCompleter = {
-	name: 'acronyms',
-	triggerPrefix: '::',
-	options: [
-		{ letters: 'FYI', expansion: 'For Your Information' },
-		{ letters: 'AFAIK', expansion: 'As Far As I Know' },
-		{ letters: 'IIRC', expansion: 'If I Recall Correctly' },
-	],
-	getOptionKeywords: function ( abbr ) {
-		var expansionWords = abbr.expansion.split( /\s+/ );
-		return [ abbr.letters ].concat( expansionWords );
-	},
-	getOptionLabel: function ( acronym ) {
-		return acronym.letters;
-	},
-	getOptionCompletion: function ( abbr ) {
-		return wp.element.createElement(
-			'abbr',
-			{ title: abbr.expansion },
-			abbr.letters
-		);
-	},
-};
-
-// Our filter function
-function appendAcronymCompleter( completers, blockName ) {
-	return blockName === 'my-plugin/foo'
-		? completers.concat( acronymCompleter )
-		: completers;
-}
-
-// Adding the filter
-wp.hooks.addFilter(
-	'editor.Autocomplete.completers',
-	'my-plugin/autocompleters/acronyms',
-	appendAcronymCompleter
-);
-```
-
-{% end %}

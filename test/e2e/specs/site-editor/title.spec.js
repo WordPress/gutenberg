@@ -20,13 +20,15 @@ test.describe( 'Site editor title', () => {
 		await admin.visitSiteEditor( {
 			postId: 'emptytheme//index',
 			postType: 'wp_template',
+			canvas: 'edit',
 		} );
+		const title = page
+			.getByRole( 'region', { name: 'Editor top bar' } )
+			.getByRole( 'heading', {
+				name: 'Index',
+			} );
 
-		const title = await page.locator(
-			'role=region[name="Editor top bar"i] >> role=heading[level=1]'
-		);
-
-		await expect( title ).toHaveText( 'Editing template: Index' );
+		await expect( title ).toBeVisible();
 	} );
 
 	test( 'displays the selected template name in the title for the header template', async ( {
@@ -37,37 +39,14 @@ test.describe( 'Site editor title', () => {
 		await admin.visitSiteEditor( {
 			postId: 'emptytheme//header',
 			postType: 'wp_template_part',
+			canvas: 'edit',
 		} );
+		const title = page
+			.getByRole( 'region', { name: 'Editor top bar' } )
+			.getByRole( 'heading', {
+				name: 'header',
+			} );
 
-		const title = await page.locator(
-			'role=region[name="Editor top bar"i] >> role=heading[level=1]'
-		);
-
-		await expect( title ).toHaveText( 'Editing template part: header' );
-	} );
-
-	test( "displays the selected template part's name in the secondary title when a template part is selected from List View", async ( {
-		admin,
-		page,
-	} ) => {
-		await admin.visitSiteEditor( {
-			postId: 'emptytheme//index',
-			postType: 'wp_template',
-		} );
-
-		// Select the header template part via list view.
-		await page.click( 'role=button[name="List View"i]' );
-		const listView = await page.locator(
-			'role=treegrid[name="Block navigation structure"i]'
-		);
-		await listView.locator( 'role=gridcell >> text="header"' ).click();
-		await page.click( 'role=button[name="Close List View Sidebar"i]' );
-
-		// Evaluate the document settings secondary title.
-		const secondaryTitle = await page.locator(
-			'.edit-site-document-actions__secondary-item'
-		);
-
-		await expect( secondaryTitle ).toHaveText( 'header' );
+		await expect( title ).toBeVisible();
 	} );
 } );

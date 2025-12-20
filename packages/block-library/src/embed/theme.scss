@@ -1,4 +1,6 @@
-.wp-block-embed figcaption {
+@use "@wordpress/base-styles/mixins" as *;
+
+.wp-block-embed :where(figcaption) {
 	@include caption-style-theme();
 }
 

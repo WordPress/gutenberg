@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -20,7 +20,7 @@ import { store as editPostStore } from '../../../store';
  *
  * @param {Object} props          Component props.
  * @param {string} props.location metabox location.
- * @return {WPComponent} The component to be rendered.
+ * @return {Component} The component to be rendered.
  */
 function MetaBoxesArea( { location } ) {
 	const container = useRef( null );
@@ -48,13 +48,9 @@ function MetaBoxesArea( { location } ) {
 		return select( editPostStore ).isSavingMetaBoxes();
 	}, [] );
 
-	const classes = classnames(
-		'edit-post-meta-boxes-area',
-		`is-${ location }`,
-		{
-			'is-loading': isSaving,
-		}
-	);
+	const classes = clsx( 'edit-post-meta-boxes-area', `is-${ location }`, {
+		'is-loading': isSaving,
+	} );
 
 	return (
 		<div className={ classes }>

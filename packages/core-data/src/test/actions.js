@@ -38,14 +38,14 @@ describe( 'editEntityRecord', () => {
 		const select = {
 			getEntityConfig: jest.fn(),
 		};
-		const fulfillment = () =>
+		const fulfillment = async () =>
 			editEntityRecord(
 				entityConfig.kind,
 				entityConfig.name,
 				entityConfig.id,
 				{}
 			)( { select } );
-		expect( fulfillment ).toThrow(
+		await expect( fulfillment ).rejects.toThrow(
 			`The entity being edited (${ entityConfig.kind }, ${ entityConfig.name }) does not have a loaded config.`
 		);
 		expect( select.getEntityConfig ).toHaveBeenCalledTimes( 1 );
@@ -55,12 +55,6 @@ describe( 'editEntityRecord', () => {
 describe( 'deleteEntityRecord', () => {
 	beforeEach( async () => {
 		apiFetch.mockReset();
-		jest.useFakeTimers();
-	} );
-
-	afterEach( () => {
-		jest.runOnlyPendingTimers();
-		jest.useRealTimers();
 	} );
 
 	it( 'triggers a DELETE request for an existing record', async () => {
@@ -74,8 +68,7 @@ describe( 'deleteEntityRecord', () => {
 			__unstableAcquireStoreLock: jest.fn(),
 			__unstableReleaseStoreLock: jest.fn(),
 		} );
-		// Provide entities
-		dispatch.mockReturnValueOnce( configs );
+		const resolveSelect = { getEntitiesConfig: jest.fn( () => configs ) };
 
 		// Provide response
 		apiFetch.mockImplementation( () => deletedRecord );
@@ -84,7 +77,7 @@ describe( 'deleteEntityRecord', () => {
 			'postType',
 			'post',
 			deletedRecord.id
-		)( { dispatch } );
+		)( { dispatch, resolveSelect } );
 
 		expect( apiFetch ).toHaveBeenCalledTimes( 1 );
 		expect( apiFetch ).toHaveBeenCalledWith( {
@@ -92,7 +85,7 @@ describe( 'deleteEntityRecord', () => {
 			method: 'DELETE',
 		} );
 
-		expect( dispatch ).toHaveBeenCalledTimes( 4 );
+		expect( dispatch ).toHaveBeenCalledTimes( 3 );
 		expect( dispatch ).toHaveBeenCalledWith( {
 			type: 'DELETE_ENTITY_RECORD_START',
 			kind: 'postType',
@@ -126,8 +119,7 @@ describe( 'deleteEntityRecord', () => {
 			__unstableAcquireStoreLock: jest.fn(),
 			__unstableReleaseStoreLock: jest.fn(),
 		} );
-		// Provide entities
-		dispatch.mockReturnValueOnce( entities );
+		const resolveSelect = { getEntitiesConfig: jest.fn( () => entities ) };
 
 		// Provide response
 		apiFetch.mockImplementation( () => {
@@ -143,7 +135,7 @@ describe( 'deleteEntityRecord', () => {
 				{
 					throwOnError: true,
 				}
-			)( { dispatch } )
+			)( { dispatch, resolveSelect } )
 		).rejects.toEqual( new Error( 'API error' ) );
 	} );
 
@@ -157,8 +149,7 @@ describe( 'deleteEntityRecord', () => {
 			__unstableAcquireStoreLock: jest.fn(),
 			__unstableReleaseStoreLock: jest.fn(),
 		} );
-		// Provide entities
-		dispatch.mockReturnValueOnce( entities );
+		const resolveSelect = { getEntitiesConfig: jest.fn( () => entities ) };
 
 		// Provide response
 		apiFetch.mockImplementation( () => {
@@ -174,7 +165,7 @@ describe( 'deleteEntityRecord', () => {
 				{
 					throwOnError: false,
 				}
-			)( { dispatch } )
+			)( { dispatch, resolveSelect } )
 		).resolves.toBe( false );
 	} );
 } );
@@ -182,12 +173,6 @@ describe( 'deleteEntityRecord', () => {
 describe( 'saveEditedEntityRecord', () => {
 	beforeEach( async () => {
 		apiFetch.mockReset();
-		jest.useFakeTimers();
-	} );
-
-	afterEach( () => {
-		jest.runOnlyPendingTimers();
-		jest.useRealTimers();
 	} );
 
 	it( 'Uses "id" as a key when no entity key is provided', async () => {
@@ -207,8 +192,7 @@ describe( 'saveEditedEntityRecord', () => {
 		const dispatch = Object.assign( jest.fn(), {
 			saveEntityRecord: jest.fn(),
 		} );
-		// Provide entities
-		dispatch.mockReturnValueOnce( configs );
+		const resolveSelect = { getEntitiesConfig: jest.fn( () => configs ) };
 
 		// Provide response
 		const updatedRecord = { ...item, menu: 10 };
@@ -220,7 +204,7 @@ describe( 'saveEditedEntityRecord', () => {
 			'root',
 			'menuItem',
 			1
-		)( { dispatch, select } );
+		)( { dispatch, select, resolveSelect } );
 
 		expect( dispatch.saveEntityRecord ).toHaveBeenCalledWith(
 			'root',
@@ -248,8 +232,7 @@ describe( 'saveEditedEntityRecord', () => {
 		const dispatch = Object.assign( jest.fn(), {
 			saveEntityRecord: jest.fn(),
 		} );
-		// Provide entities
-		dispatch.mockReturnValueOnce( configs );
+		const resolveSelect = { getEntitiesConfig: jest.fn( () => configs ) };
 
 		// Provide response
 		const updatedRecord = { ...item, menu: 10 };
@@ -261,7 +244,7 @@ describe( 'saveEditedEntityRecord', () => {
 			'root',
 			'menuLocation',
 			'primary'
-		)( { dispatch, select } );
+		)( { dispatch, select, resolveSelect } );
 
 		expect( dispatch.saveEntityRecord ).toHaveBeenCalledWith(
 			'root',
@@ -277,17 +260,11 @@ describe( 'saveEntityRecord', () => {
 
 	beforeEach( async () => {
 		apiFetch.mockReset();
-		jest.useFakeTimers();
 		dispatch = Object.assign( jest.fn(), {
 			receiveEntityRecords: jest.fn(),
 			__unstableAcquireStoreLock: jest.fn(),
 			__unstableReleaseStoreLock: jest.fn(),
 		} );
-	} );
-
-	afterEach( () => {
-		jest.runOnlyPendingTimers();
-		jest.useRealTimers();
 	} );
 
 	it( 'triggers a POST request for a new record', async () => {
@@ -298,9 +275,7 @@ describe( 'saveEntityRecord', () => {
 		const select = {
 			getRawEntityRecord: () => post,
 		};
-
-		// Provide entities
-		dispatch.mockReturnValueOnce( configs );
+		const resolveSelect = { getEntitiesConfig: jest.fn( () => configs ) };
 
 		// Provide response
 		const updatedRecord = { ...post, id: 10 };
@@ -312,7 +287,7 @@ describe( 'saveEntityRecord', () => {
 			'postType',
 			'post',
 			post
-		)( { select, dispatch } );
+		)( { select, dispatch, resolveSelect } );
 
 		expect( apiFetch ).toHaveBeenCalledTimes( 1 );
 		expect( apiFetch ).toHaveBeenCalledWith( {
@@ -321,7 +296,7 @@ describe( 'saveEntityRecord', () => {
 			data: post,
 		} );
 
-		expect( dispatch ).toHaveBeenCalledTimes( 3 );
+		expect( dispatch ).toHaveBeenCalledTimes( 2 );
 		expect( dispatch ).toHaveBeenCalledWith( {
 			type: 'SAVE_ENTITY_RECORD_START',
 			kind: 'postType',
@@ -365,9 +340,7 @@ describe( 'saveEntityRecord', () => {
 		const select = {
 			getRawEntityRecord: () => post,
 		};
-
-		// Provide entities
-		dispatch.mockReturnValueOnce( entities );
+		const resolveSelect = { getEntitiesConfig: jest.fn( () => entities ) };
 
 		// Provide response
 		apiFetch.mockImplementation( () => {
@@ -377,7 +350,7 @@ describe( 'saveEntityRecord', () => {
 		await expect(
 			saveEntityRecord( 'postType', 'post', post, {
 				throwOnError: true,
-			} )( { select, dispatch } )
+			} )( { select, dispatch, resolveSelect } )
 		).rejects.toEqual( new Error( 'API error' ) );
 	} );
 
@@ -389,9 +362,7 @@ describe( 'saveEntityRecord', () => {
 		const select = {
 			getRawEntityRecord: () => post,
 		};
-
-		// Provide entities
-		dispatch.mockReturnValueOnce( entities );
+		const resolveSelect = { getEntitiesConfig: jest.fn( () => entities ) };
 
 		// Provide response
 		apiFetch.mockImplementation( () => {
@@ -401,7 +372,7 @@ describe( 'saveEntityRecord', () => {
 		await expect(
 			saveEntityRecord( 'postType', 'post', post, {
 				throwOnError: false,
-			} )( { select, dispatch } )
+			} )( { select, dispatch, resolveSelect } )
 		).resolves.toEqual( undefined );
 	} );
 
@@ -413,9 +384,7 @@ describe( 'saveEntityRecord', () => {
 		const select = {
 			getRawEntityRecord: () => post,
 		};
-
-		// Provide entities
-		dispatch.mockReturnValueOnce( configs );
+		const resolveSelect = { getEntitiesConfig: jest.fn( () => configs ) };
 
 		// Provide response
 		const updatedRecord = { ...post, id: 10 };
@@ -427,7 +396,7 @@ describe( 'saveEntityRecord', () => {
 			'postType',
 			'post',
 			post
-		)( { select, dispatch } );
+		)( { select, dispatch, resolveSelect } );
 
 		expect( apiFetch ).toHaveBeenCalledTimes( 1 );
 		expect( apiFetch ).toHaveBeenCalledWith( {
@@ -436,7 +405,7 @@ describe( 'saveEntityRecord', () => {
 			data: post,
 		} );
 
-		expect( dispatch ).toHaveBeenCalledTimes( 3 );
+		expect( dispatch ).toHaveBeenCalledTimes( 2 );
 		expect( dispatch ).toHaveBeenCalledWith( {
 			type: 'SAVE_ENTITY_RECORD_START',
 			kind: 'postType',
@@ -485,9 +454,7 @@ describe( 'saveEntityRecord', () => {
 		const select = {
 			getRawEntityRecord: () => ( {} ),
 		};
-
-		// Provide entities
-		dispatch.mockReturnValueOnce( configs );
+		const resolveSelect = { getEntitiesConfig: jest.fn( () => configs ) };
 
 		// Provide response
 		apiFetch.mockImplementation( () => postType );
@@ -496,7 +463,7 @@ describe( 'saveEntityRecord', () => {
 			'root',
 			'postType',
 			postType
-		)( { select, dispatch } );
+		)( { select, dispatch, resolveSelect } );
 
 		expect( apiFetch ).toHaveBeenCalledTimes( 1 );
 		expect( apiFetch ).toHaveBeenCalledWith( {
@@ -505,7 +472,7 @@ describe( 'saveEntityRecord', () => {
 			data: postType,
 		} );
 
-		expect( dispatch ).toHaveBeenCalledTimes( 3 );
+		expect( dispatch ).toHaveBeenCalledTimes( 2 );
 		expect( dispatch ).toHaveBeenCalledWith( {
 			type: 'SAVE_ENTITY_RECORD_START',
 			kind: 'root',

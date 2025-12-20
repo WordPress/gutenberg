@@ -16,8 +16,6 @@ import withDispatch from '../';
 import { createRegistry } from '../../../registry';
 import { RegistryProvider } from '../../registry-provider';
 
-jest.useRealTimers();
-
 describe( 'withDispatch', () => {
 	const storeOptions = {
 		reducer: ( state = 0, action ) => {
@@ -60,7 +58,9 @@ describe( 'withDispatch', () => {
 					} );
 				},
 			};
-		} )( ( props ) => <Button onClick={ props.increment } /> );
+		} )( ( props ) => (
+			<Button __next40pxDefaultSize onClick={ props.increment } />
+		) );
 
 		const { rerender } = render(
 			<RegistryProvider value={ registry }>
@@ -77,8 +77,8 @@ describe( 'withDispatch', () => {
 		);
 
 		// Function value reference should not have changed in props update.
-		// The spy method is only called during inital render.
-		expect( ButtonSpy ).toBeCalledTimes( 1 );
+		// The spy method is only called during initial render.
+		expect( ButtonSpy ).toHaveBeenCalledTimes( 1 );
 
 		await user.click( screen.getByRole( 'button' ) );
 		expect( registry.select( 'counter' ).getCount() ).toBe( 2 );

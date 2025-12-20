@@ -12,6 +12,7 @@
 			"dimRatio": 10,
 			"backgroundType": "image",
 			"isDark": false,
+			"tagName": "div",
 			"style": {
 				"color": {
 					"duotone": [ "#8c00b7", "#fcff41" ]
@@ -23,11 +24,15 @@
 				"name": "core/paragraph",
 				"isValid": true,
 				"attributes": {
-					"align": "center",
 					"content": "",
 					"dropCap": false,
 					"placeholder": "Write title…",
-					"fontSize": "large"
+					"fontSize": "large",
+					"style": {
+						"typography": {
+							"textAlign": "center"
+						}
+					}
 				},
 				"innerBlocks": []
 			}

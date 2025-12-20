@@ -4,7 +4,8 @@
 import { MenuItem } from '@wordpress/components';
 import { _x } from '@wordpress/i18n';
 import { switchToBlockType } from '@wordpress/blocks';
-import { useDispatch } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
+import { displayShortcut } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
@@ -17,10 +18,12 @@ function ConvertToGroupButton( {
 	clientIds,
 	isGroupable,
 	isUngroupable,
+	onUngroup,
 	blocksSelection,
 	groupingBlockName,
 	onClose = () => {},
 } ) {
+	const { getSelectedBlockClientIds } = useSelect( blockEditorStore );
 	const { replaceBlocks } = useDispatch( blockEditorStore );
 	const onConvertToGroup = () => {
 		// Activate the `transform` on the Grouping Block which does the conversion.
@@ -34,9 +37,15 @@ function ConvertToGroupButton( {
 	};
 
 	const onConvertFromGroup = () => {
-		const innerBlocks = blocksSelection[ 0 ].innerBlocks;
+		let innerBlocks = blocksSelection[ 0 ].innerBlocks;
 		if ( ! innerBlocks.length ) {
 			return;
+		}
+		if ( onUngroup ) {
+			innerBlocks = onUngroup(
+				blocksSelection[ 0 ].attributes,
+				blocksSelection[ 0 ].innerBlocks
+			);
 		}
 		replaceBlocks( clientIds, innerBlocks );
 	};
@@ -45,10 +54,17 @@ function ConvertToGroupButton( {
 		return null;
 	}
 
+	const selectedBlockClientIds = getSelectedBlockClientIds();
+
 	return (
 		<>
 			{ isGroupable && (
 				<MenuItem
+					shortcut={
+						selectedBlockClientIds.length > 1
+							? displayShortcut.primary( 'g' )
+							: undefined
+					}
 					onClick={ () => {
 						onConvertToGroup();
 						onClose();
@@ -66,7 +82,7 @@ function ConvertToGroupButton( {
 				>
 					{ _x(
 						'Ungroup',
-						'Ungrouping blocks from within a Group block back into individual blocks within the Editor '
+						'Ungrouping blocks from within a grouping block back into individual blocks within the Editor'
 					) }
 				</MenuItem>
 			) }

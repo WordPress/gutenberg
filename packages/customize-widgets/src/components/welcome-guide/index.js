@@ -43,7 +43,7 @@ export default function WelcomeGuide( { sidebar } ) {
 					  ) }
 			</p>
 			<Button
-				className="customize-widgets-welcome-guide__button"
+				size="compact"
 				variant="primary"
 				onClick={ () =>
 					toggle( 'core/customize-widgets', 'welcomeGuide' )
@@ -70,7 +70,7 @@ export default function WelcomeGuide( { sidebar } ) {
 				<br />
 				<ExternalLink
 					href={ __(
-						'https://wordpress.org/support/article/wordpress-editor/'
+						'https://wordpress.org/documentation/article/wordpress-block-editor/'
 					) }
 				>
 					{ __( "Here's a detailed guide." ) }

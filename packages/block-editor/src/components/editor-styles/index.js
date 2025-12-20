@@ -8,17 +8,20 @@ import a11yPlugin from 'colord/plugins/a11y';
 /**
  * WordPress dependencies
  */
-import { useCallback, useMemo } from '@wordpress/element';
+import { SVG } from '@wordpress/components';
+import { useCallback, useMemo, memo } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import transformStyles from '../../utils/transform-styles';
+import { store as blockEditorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
 
-const EDITOR_STYLES_SELECTOR = '.editor-styles-wrapper';
 extend( [ namesPlugin, a11yPlugin ] );
 
-function useDarkThemeBodyClassName( styles ) {
+function useDarkThemeBodyClassName( styles, scope ) {
 	return useCallback(
 		( node ) => {
 			if ( ! node ) {
@@ -27,9 +30,7 @@ function useDarkThemeBodyClassName( styles ) {
 
 			const { ownerDocument } = node;
 			const { defaultView, body } = ownerDocument;
-			const canvas = ownerDocument.querySelector(
-				EDITOR_STYLES_SELECTOR
-			);
+			const canvas = scope ? ownerDocument.querySelector( scope ) : body;
 
 			let backgroundColor;
 
@@ -42,13 +43,13 @@ function useDarkThemeBodyClassName( styles ) {
 				body.appendChild( tempCanvas );
 
 				backgroundColor = defaultView
-					.getComputedStyle( tempCanvas, null )
+					?.getComputedStyle( tempCanvas, null )
 					.getPropertyValue( 'background-color' );
 
 				body.removeChild( tempCanvas );
 			} else {
 				backgroundColor = defaultView
-					.getComputedStyle( canvas, null )
+					?.getComputedStyle( canvas, null )
 					.getPropertyValue( 'background-color' );
 			}
 			const colordBackgroundColor = colord( backgroundColor );
@@ -62,24 +63,67 @@ function useDarkThemeBodyClassName( styles ) {
 				body.classList.add( 'is-dark-theme' );
 			}
 		},
-		[ styles ]
+		[ styles, scope ]
 	);
 }
 
-export default function EditorStyles( { styles } ) {
-	const transformedStyles = useMemo(
-		() => transformStyles( styles, EDITOR_STYLES_SELECTOR ),
-		[ styles ]
+function EditorStyles( { styles, scope, transformOptions } ) {
+	const overrides = useSelect(
+		( select ) => unlock( select( blockEditorStore ) ).getStyleOverrides(),
+		[]
 	);
+	const [ transformedStyles, transformedSvgs ] = useMemo( () => {
+		const _styles = Object.values( styles ?? [] );
+
+		for ( const [ id, override ] of overrides ) {
+			const index = _styles.findIndex( ( { id: _id } ) => id === _id );
+			const overrideWithId = { ...override, id };
+			if ( index === -1 ) {
+				_styles.push( overrideWithId );
+			} else {
+				_styles[ index ] = overrideWithId;
+			}
+		}
+
+		return [
+			transformStyles(
+				_styles.filter( ( style ) => style?.css ),
+				scope,
+				transformOptions
+			),
+			_styles
+				.filter( ( style ) => style.__unstableType === 'svgs' )
+				.map( ( style ) => style.assets )
+				.join( '' ),
+		];
+	}, [ styles, overrides, scope, transformOptions ] );
 
 	return (
 		<>
 			{ /* Use an empty style element to have a document reference,
 			     but this could be any element. */ }
-			<style ref={ useDarkThemeBodyClassName( styles ) } />
+			<style
+				ref={ useDarkThemeBodyClassName( transformedStyles, scope ) }
+			/>
 			{ transformedStyles.map( ( css, index ) => (
 				<style key={ index }>{ css }</style>
 			) ) }
+			<SVG
+				xmlns="http://www.w3.org/2000/svg"
+				viewBox="0 0 0 0"
+				width="0"
+				height="0"
+				role="none"
+				style={ {
+					visibility: 'hidden',
+					position: 'absolute',
+					left: '-9999px',
+					overflow: 'hidden',
+				} }
+				dangerouslySetInnerHTML={ { __html: transformedSvgs } }
+			/>
 		</>
 	);
 }
+
+export default memo( EditorStyles );

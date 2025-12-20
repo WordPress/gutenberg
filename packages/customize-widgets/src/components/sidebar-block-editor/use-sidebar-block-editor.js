@@ -1,13 +1,13 @@
 /**
  * External dependencies
  */
-import { isEqual } from 'lodash';
+import fastDeepEqual from 'fast-deep-equal/es6';
 
 /**
  * WordPress dependencies
  */
 import { useState, useEffect, useCallback } from '@wordpress/element';
-import isShallowEqual from '@wordpress/is-shallow-equal';
+import { isShallowEqual } from '@wordpress/is-shallow-equal';
 import { getWidgetIdFromBlock, addWidgetIdToBlock } from '@wordpress/widgets';
 
 /**
@@ -82,7 +82,10 @@ export default function useSidebarBlockEditor( sidebar ) {
 
 						// Bail out updates by returning the previous widgets.
 						// Deep equality is necessary until the block editor's internals changes.
-						if ( isEqual( nextBlock, prevBlock ) && prevWidget ) {
+						if (
+							fastDeepEqual( nextBlock, prevBlock ) &&
+							prevWidget
+						) {
 							return prevWidget;
 						}
 

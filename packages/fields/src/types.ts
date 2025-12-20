@@ -1,0 +1,135 @@
+type PostStatus =
+	| 'publish'
+	| 'draft'
+	| 'pending'
+	| 'private'
+	| 'future'
+	| 'auto-draft'
+	| 'trash';
+
+export interface CommonPost {
+	status?: PostStatus;
+	title: string | { rendered: string } | { raw: string };
+	content: string | { raw: string; rendered: string };
+	type: string;
+	id: string | number;
+	blocks?: Object[];
+	_links?: Links;
+}
+
+interface Links {
+	'predecessor-version'?: { href: string; id: number }[];
+	'version-history'?: { href: string; count: number }[];
+	[ key: string ]: { href: string }[] | undefined;
+}
+
+interface Author {
+	id: number;
+	name: string;
+	avatar_urls: Record< string, string >;
+}
+
+interface EmbeddedAuthor {
+	author: Author[];
+}
+
+/**
+ * BasePost interface used for all post types.
+ */
+export interface BasePost extends CommonPost {
+	comment_status?: 'open' | 'closed';
+	excerpt?: string | { raw: string; rendered: string };
+	meta?: Record< string, any >;
+	parent?: number;
+	password?: string;
+	template?: string;
+	format?: string;
+	featured_media?: number;
+	menu_order?: number;
+	ping_status?: 'open' | 'closed';
+	link?: string;
+	slug?: string;
+	permalink_template?: string;
+	date?: string;
+	modified?: string;
+	author?: number;
+}
+
+export interface BasePostWithEmbeddedAuthor extends BasePost {
+	_embedded: EmbeddedAuthor;
+}
+
+interface FeaturedMedia {
+	title: {
+		rendered: string;
+	};
+	source_url: string;
+	media_details: {
+		sizes: Record< string, { width: number; source_url: string } >;
+	};
+}
+
+interface EmbeddedFeaturedMedia {
+	'wp:featuredmedia': FeaturedMedia[];
+}
+
+export interface BasePostWithEmbeddedFeaturedMedia extends BasePost {
+	_embedded: EmbeddedFeaturedMedia;
+}
+
+export interface Template extends CommonPost {
+	type: 'wp_template';
+	is_custom: boolean;
+	source: string;
+	origin: string;
+	plugin?: string;
+	has_theme_file: boolean;
+	id: string;
+}
+
+export interface TemplatePart extends CommonPost {
+	type: 'wp_template_part';
+	source: string;
+	origin: string;
+	has_theme_file: boolean;
+	id: string;
+	area: string;
+	plugin?: string;
+}
+
+export interface Pattern extends CommonPost {
+	slug: string;
+	title: { raw: string };
+	wp_pattern_sync_status: string;
+}
+
+export type Post = Template | TemplatePart | Pattern | BasePost;
+
+export type PostWithPermissions = Post & {
+	permissions: {
+		delete: boolean;
+		update: boolean;
+	};
+};
+
+interface EditorSupport {
+	notes?: boolean;
+}
+
+export interface PostType {
+	slug: string;
+	viewable: boolean;
+	supports?: {
+		'page-attributes'?: boolean;
+		title?: boolean;
+		revisions?: boolean;
+		author?: string;
+		thumbnail?: string;
+		comments?: string;
+		editor?: boolean | [ EditorSupport ];
+		trackbacks?: boolean;
+	};
+}
+
+// Will be unnecessary after typescript 5.0 upgrade.
+export type CoreDataError = { message?: string; code?: string };

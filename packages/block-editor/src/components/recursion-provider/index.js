@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { createContext, useContext, useMemo } from '@wordpress/element';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -9,6 +10,7 @@ import { createContext, useContext, useMemo } from '@wordpress/element';
 import { useBlockEditContext } from '../block-edit/context';
 
 const RenderedRefsContext = createContext( {} );
+RenderedRefsContext.displayName = 'RenderedRefsContext';
 
 /**
  * Immutably adds an unique identifier to a set scoped for a given block type.
@@ -82,3 +84,19 @@ export function useHasRecursion( uniqueId, blockName = '' ) {
 	blockName = blockName || name;
 	return Boolean( previouslyRenderedBlocks[ blockName ]?.has( uniqueId ) );
 }
+
+export const DeprecatedExperimentalRecursionProvider = ( props ) => {
+	deprecated( 'wp.blockEditor.__experimentalRecursionProvider', {
+		since: '6.5',
+		alternative: 'wp.blockEditor.RecursionProvider',
+	} );
+	return <RecursionProvider { ...props } />;
+};
+
+export const DeprecatedExperimentalUseHasRecursion = ( ...args ) => {
+	deprecated( 'wp.blockEditor.__experimentalUseHasRecursion', {
+		since: '6.5',
+		alternative: 'wp.blockEditor.useHasRecursion',
+	} );
+	return useHasRecursion( ...args );
+};

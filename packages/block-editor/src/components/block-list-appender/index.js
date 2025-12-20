@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -16,68 +16,54 @@ import DefaultBlockAppender from '../default-block-appender';
 import ButtonBlockAppender from '../button-block-appender';
 import { store as blockEditorStore } from '../../store';
 
-function BlockListAppender( {
+function DefaultAppender( { rootClientId } ) {
+	const canInsertDefaultBlock = useSelect( ( select ) =>
+		select( blockEditorStore ).canInsertBlockType(
+			getDefaultBlockName(),
+			rootClientId
+		)
+	);
+
+	if ( canInsertDefaultBlock ) {
+		// Render the default block appender if the context supports use
+		// of the default appender.
+		return <DefaultBlockAppender rootClientId={ rootClientId } />;
+	}
+
+	// Fallback in case the default block can't be inserted.
+	return (
+		<ButtonBlockAppender
+			rootClientId={ rootClientId }
+			className="block-list-appender__toggle"
+		/>
+	);
+}
+
+export default function BlockListAppender( {
 	rootClientId,
-	renderAppender: CustomAppender,
+	CustomAppender,
 	className,
 	tagName: TagName = 'div',
 } ) {
-	const { hideInserter, canInsertDefaultBlock, selectedBlockClientId } =
-		useSelect(
-			( select ) => {
-				const {
-					canInsertBlockType,
-					getTemplateLock,
-					getSelectedBlockClientId,
-					__unstableGetEditorMode,
-				} = select( blockEditorStore );
-
-				return {
-					hideInserter:
-						!! getTemplateLock( rootClientId ) ||
-						__unstableGetEditorMode() === 'zoom-out',
-					canInsertDefaultBlock: canInsertBlockType(
-						getDefaultBlockName(),
-						rootClientId
-					),
-					selectedBlockClientId: getSelectedBlockClientId(),
-				};
-			},
-			[ rootClientId ]
-		);
-
-	if ( hideInserter || CustomAppender === false ) {
-		return null;
-	}
-
-	let appender;
-	if ( CustomAppender ) {
-		// Prefer custom render prop if provided.
-		appender = <CustomAppender />;
-	} else {
-		const isParentSelected =
-			selectedBlockClientId === rootClientId ||
-			( ! rootClientId && ! selectedBlockClientId );
-
-		if ( ! isParentSelected ) {
-			return null;
-		}
-
-		if ( canInsertDefaultBlock ) {
-			// Render the default block appender when renderAppender has not been
-			// provided and the context supports use of the default appender.
-			appender = <DefaultBlockAppender rootClientId={ rootClientId } />;
-		} else {
-			// Fallback in the case no renderAppender has been provided and the
-			// default block can't be inserted.
-			appender = (
-				<ButtonBlockAppender
-					rootClientId={ rootClientId }
-					className="block-list-appender__toggle"
-				/>
+	const isDragOver = useSelect(
+		( select ) => {
+			const {
+				getBlockInsertionPoint,
+				isBlockInsertionPointVisible,
+				getBlockCount,
+			} = select( blockEditorStore );
+			const insertionPoint = getBlockInsertionPoint();
+			// Ideally we should also check for `isDragging` but currently it
+			// requires a lot more setup. We can revisit this once we refactor
+			// the DnD utility hooks.
+			return (
+				isBlockInsertionPointVisible() &&
+				rootClientId === insertionPoint?.rootClientId &&
+				getBlockCount( rootClientId ) === 0
 			);
-		}
-	}
+		},
+		[ rootClientId ]
+	);
 
 	return (
 		<TagName
@@ -90,10 +76,9 @@ function BlockListAppender( {
 			//
 			// See: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/button#Clicking_and_focus
 			tabIndex={ -1 }
-			className={ classnames(
-				'block-list-appender wp-block',
-				className
-			) }
+			className={ clsx( 'block-list-appender wp-block', className, {
+				'is-drag-over': isDragOver,
+			} ) }
 			// Needed in case the whole editor is content editable (for multi
 			// selection). It fixes an edge case where ArrowDown and ArrowRight
 			// should collapse the selection to the end of that selection and
@@ -108,9 +93,11 @@ function BlockListAppender( {
 			// have commonly targeted that attribute for margins.
 			data-block
 		>
-			{ appender }
+			{ CustomAppender ? (
+				<CustomAppender />
+			) : (
+				<DefaultAppender rootClientId={ rootClientId } />
+			) }
 		</TagName>
 	);
 }
-
-export default BlockListAppender;

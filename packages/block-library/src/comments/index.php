@@ -16,6 +16,10 @@
  * the block is in legacy mode. If not, the HTML generated in the editor is
  * returned instead.
  *
+ * @since 6.1.0
+ *
+ * @global WP_Post $post Global post object.
+ *
  * @param array    $attributes Block attributes.
  * @param string   $content    Block default content.
  * @param WP_Block $block      Block instance.
@@ -24,18 +28,13 @@
 function render_block_core_comments( $attributes, $content, $block ) {
 	global $post;
 
-	$post_id = $block->context['postId'];
-	if ( ! isset( $post_id ) ) {
+	if ( ! isset( $block->context['postId'] ) ) {
 		return '';
 	}
 
-	$comment_args = array(
-		'post_id' => $post_id,
-		'count'   => true,
-		'status'  => 'approve',
-	);
+	$post_id = $block->context['postId'];
 	// Return early if there are no comments and comments are closed.
-	if ( ! comments_open( $post_id ) && get_comments( $comment_args ) === 0 ) {
+	if ( ! comments_open( $post_id ) && (int) get_comments_number( $post_id ) === 0 ) {
 		return '';
 	}
 
@@ -88,6 +87,8 @@ function render_block_core_comments( $attributes, $content, $block ) {
 
 /**
  * Registers the `core/comments` block on the server.
+ *
+ * @since 6.1.0
  */
 function register_block_core_comments() {
 	register_block_type_from_metadata(
@@ -102,6 +103,8 @@ add_action( 'init', 'register_block_core_comments' );
 
 /**
  * Use the button block classes for the form-submit button.
+ *
+ * @since 6.1.0
  *
  * @param array $fields The default comment form arguments.
  *
@@ -120,6 +123,8 @@ add_filter( 'comment_form_defaults', 'comments_block_form_defaults' );
 /**
  * Enqueues styles from the legacy `core/post-comments` block. These styles are
  * required only by the block's fallback.
+ *
+ * @since 6.1.0
  *
  * @param string $block_name Name of the new block type.
  */
@@ -145,6 +150,8 @@ function enqueue_legacy_post_comments_block_styles( $block_name ) {
  *
  * The same approach was followed when core/query-loop was renamed to
  * core/post-template.
+ *
+ * @since 6.1.0
  *
  * @see https://github.com/WordPress/gutenberg/pull/41807
  * @see https://github.com/WordPress/gutenberg/pull/32514
@@ -202,7 +209,6 @@ function register_legacy_post_comments_block() {
 			'wp-block-buttons',
 			'wp-block-button',
 		),
-		'editorStyle'       => 'wp-block-post-comments-editor',
 		'render_callback'   => 'render_block_core_comments',
 		'skip_inner_blocks' => true,
 	);
@@ -213,6 +219,7 @@ function register_legacy_post_comments_block() {
 	 * like `_wp_multiple_block_styles`, which is required in this case because
 	 * the block has multiple styles.
 	 */
+	/** This filter is documented in wp-includes/blocks.php */
 	$metadata = apply_filters( 'block_type_metadata', $metadata );
 
 	register_block_type( 'core/post-comments', $metadata );

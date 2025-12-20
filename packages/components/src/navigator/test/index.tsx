@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ReactNode, ForwardedRef, ComponentPropsWithoutRef } from 'react';
+import type { ComponentPropsWithoutRef } from 'react';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
@@ -13,43 +13,23 @@ import { useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import {
-	NavigatorProvider,
-	NavigatorScreen,
-	NavigatorButton,
-	NavigatorBackButton,
-} from '..';
-
-jest.mock( 'framer-motion', () => {
-	const actual = jest.requireActual( 'framer-motion' );
-	return {
-		__esModule: true,
-		...actual,
-		AnimatePresence:
-			( { children }: { children?: ReactNode } ) =>
-			() =>
-				<div>{ children }</div>,
-		motion: {
-			...actual.motion,
-			div: require( 'react' ).forwardRef(
-				(
-					{ children }: { children?: ReactNode },
-					ref: ForwardedRef< HTMLDivElement >
-				) => <div ref={ ref }>{ children }</div>
-			),
-		},
-	};
-} );
+import Button from '../../button';
+import { Navigator, useNavigator } from '..';
+import { NavigatorToParentButton } from '../legacy';
+import type { NavigateOptions } from '../types';
 
 const INVALID_HTML_ATTRIBUTE = {
-	raw: ' "\'><=invalid_path',
-	escaped: " &quot;'&gt;<=invalid_path",
+	raw: '/ "\'><=invalid_path',
+	escaped: "/ &quot;'&gt;<=invalid_path",
 };
 
 const PATHS = {
 	HOME: '/',
 	CHILD: '/child',
 	NESTED: '/child/nested',
+	PRODUCT_PATTERN: '/product/:productId',
+	PRODUCT_1: '/product/1',
+	PRODUCT_2: '/product/2',
 	INVALID_HTML_ATTRIBUTE: INVALID_HTML_ATTRIBUTE.raw,
 	NOT_FOUND: '/not-found',
 };
@@ -58,6 +38,7 @@ const SCREEN_TEXT = {
 	home: 'This is the home screen.',
 	child: 'This is the child screen.',
 	nested: 'This is the nested screen.',
+	product: 'This is the product screen.',
 	invalidHtmlPath: 'This is the screen with an invalid HTML value as a path.',
 };
 
@@ -65,9 +46,13 @@ const BUTTON_TEXT = {
 	toNonExistingScreen: 'Navigate to non-existing screen.',
 	toChildScreen: 'Navigate to child screen.',
 	toNestedScreen: 'Navigate to nested screen.',
+	toProductScreen1: 'Navigate to product 1 screen.',
+	toProductScreen2: 'Navigate to product 2 screen.',
 	toInvalidHtmlPathScreen:
 		'Navigate to screen with an invalid HTML value as a path.',
 	back: 'Go back',
+	backUsingGoTo: 'Go back using goTo',
+	goToWithSkipFocus: 'Go to with skipFocus',
 };
 
 type CustomTestOnClickHandler = (
@@ -75,19 +60,22 @@ type CustomTestOnClickHandler = (
 		| {
 				type: 'goTo';
 				path: string;
+				options?: NavigateOptions;
 		  }
 		| { type: 'goBack' }
+		| { type: 'goToParent' }
 ) => void;
 
 function CustomNavigatorButton( {
 	path,
 	onClick,
 	...props
-}: Omit< ComponentPropsWithoutRef< typeof NavigatorButton >, 'onClick' > & {
+}: Omit< ComponentPropsWithoutRef< typeof Navigator.Button >, 'onClick' > & {
 	onClick?: CustomTestOnClickHandler;
 } ) {
 	return (
-		<NavigatorButton
+		<Navigator.Button
+			__next40pxDefaultSize
 			onClick={ () => {
 				// Used to spy on the values passed to `navigator.goTo`.
 				onClick?.( { type: 'goTo', path } );
@@ -98,20 +86,43 @@ function CustomNavigatorButton( {
 	);
 }
 
-function CustomNavigatorButtonWithFocusRestoration( {
+function CustomNavigatorGoToBackButton( {
 	path,
 	onClick,
 	...props
-}: Omit< ComponentPropsWithoutRef< typeof NavigatorButton >, 'onClick' > & {
+}: Omit< ComponentPropsWithoutRef< typeof Navigator.Button >, 'onClick' > & {
 	onClick?: CustomTestOnClickHandler;
 } ) {
+	const { goTo } = useNavigator();
 	return (
-		<NavigatorButton
+		<Button
+			__next40pxDefaultSize
 			onClick={ () => {
+				goTo( path, { isBack: true } );
 				// Used to spy on the values passed to `navigator.goTo`.
 				onClick?.( { type: 'goTo', path } );
 			} }
-			path={ path }
+			{ ...props }
+		/>
+	);
+}
+
+function CustomNavigatorGoToSkipFocusButton( {
+	path,
+	onClick,
+	...props
+}: Omit< ComponentPropsWithoutRef< typeof Navigator.Button >, 'onClick' > & {
+	onClick?: CustomTestOnClickHandler;
+} ) {
+	const { goTo } = useNavigator();
+	return (
+		<Button
+			__next40pxDefaultSize
+			onClick={ () => {
+				goTo( path, { skipFocus: true } );
+				// Used to spy on the values passed to `navigator.goTo`.
+				onClick?.( { type: 'goTo', path } );
+			} }
 			{ ...props }
 		/>
 	);
@@ -120,11 +131,15 @@ function CustomNavigatorButtonWithFocusRestoration( {
 function CustomNavigatorBackButton( {
 	onClick,
 	...props
-}: Omit< ComponentPropsWithoutRef< typeof NavigatorBackButton >, 'onClick' > & {
+}: Omit<
+	ComponentPropsWithoutRef< typeof Navigator.BackButton >,
+	'onClick'
+> & {
 	onClick?: CustomTestOnClickHandler;
 } ) {
 	return (
-		<NavigatorBackButton
+		<Navigator.BackButton
+			__next40pxDefaultSize
 			onClick={ () => {
 				// Used to spy on the values passed to `navigator.goBack`.
 				onClick?.( { type: 'goBack' } );
@@ -133,6 +148,65 @@ function CustomNavigatorBackButton( {
 		/>
 	);
 }
+
+function CustomNavigatorToParentButton( {
+	onClick,
+	...props
+}: Omit<
+	ComponentPropsWithoutRef< typeof Navigator.BackButton >,
+	'onClick'
+> & {
+	onClick?: CustomTestOnClickHandler;
+} ) {
+	return (
+		<NavigatorToParentButton
+			onClick={ () => {
+				// Used to spy on the values passed to `navigator.goBack`.
+				onClick?.( { type: 'goToParent' } );
+			} }
+			{ ...props }
+		/>
+	);
+}
+
+function CustomNavigatorToParentButtonAlternative( {
+	onClick,
+	children,
+}: {
+	children: React.ReactNode;
+	onClick?: CustomTestOnClickHandler;
+} ) {
+	const { goToParent } = useNavigator();
+	return (
+		<button
+			onClick={ () => {
+				goToParent();
+				// Used to spy on the values passed to `navigator.goBack`.
+				onClick?.( { type: 'goToParent' } );
+			} }
+		>
+			{ children }
+		</button>
+	);
+}
+
+const ProductScreen = ( {
+	onBackButtonClick,
+}: {
+	onBackButtonClick?: CustomTestOnClickHandler;
+} ) => {
+	const { params } = useNavigator();
+
+	return (
+		<Navigator.Screen path={ PATHS.PRODUCT_PATTERN }>
+			<p>{ SCREEN_TEXT.product }</p>
+			<p>Product ID is { params.productId }</p>
+			<CustomNavigatorBackButton onClick={ onBackButtonClick }>
+				{ BUTTON_TEXT.back }
+			</CustomNavigatorBackButton>
+		</Navigator.Screen>
+	);
+};
 
 const MyNavigation = ( {
 	initialPath = PATHS.HOME,
@@ -145,9 +219,15 @@ const MyNavigation = ( {
 	const [ outerInputValue, setOuterInputValue ] = useState( '' );
 	return (
 		<>
-			<NavigatorProvider initialPath={ initialPath }>
-				<NavigatorScreen path={ PATHS.HOME }>
+			<Navigator initialPath={ initialPath }>
+				<Navigator.Screen path={ PATHS.HOME }>
 					<p>{ SCREEN_TEXT.home }</p>
+					{ /*
+					 * A button useful to test focus restoration. This button is the first
+					 * tabbable item in the screen, but should not receive focus when
+					 * navigating to screen as a result of a backwards navigation.
+					 */ }
+					<button>First tabbable home screen button</button>
 					<CustomNavigatorButton
 						path={ PATHS.NOT_FOUND }
 						onClick={ onNavigatorButtonClick }
@@ -161,21 +241,39 @@ const MyNavigation = ( {
 						{ BUTTON_TEXT.toChildScreen }
 					</CustomNavigatorButton>
 					<CustomNavigatorButton
+						path={ PATHS.PRODUCT_1 }
+						onClick={ onNavigatorButtonClick }
+					>
+						{ BUTTON_TEXT.toProductScreen1 }
+					</CustomNavigatorButton>
+					<CustomNavigatorButton
+						path={ PATHS.PRODUCT_2 }
+						onClick={ onNavigatorButtonClick }
+					>
+						{ BUTTON_TEXT.toProductScreen2 }
+					</CustomNavigatorButton>
+					<CustomNavigatorButton
 						path={ PATHS.INVALID_HTML_ATTRIBUTE }
 						onClick={ onNavigatorButtonClick }
 					>
 						{ BUTTON_TEXT.toInvalidHtmlPathScreen }
 					</CustomNavigatorButton>
-				</NavigatorScreen>
+				</Navigator.Screen>
 
-				<NavigatorScreen path={ PATHS.CHILD }>
+				<Navigator.Screen path={ PATHS.CHILD }>
 					<p>{ SCREEN_TEXT.child }</p>
-					<CustomNavigatorButtonWithFocusRestoration
+					{ /*
+					 * A button useful to test focus restoration. This button is the first
+					 * tabbable item in the screen, but should not receive focus when
+					 * navigating to screen as a result of a backwards navigation.
+					 */ }
+					<button>First tabbable child screen button</button>
+					<CustomNavigatorButton
 						path={ PATHS.NESTED }
 						onClick={ onNavigatorButtonClick }
 					>
 						{ BUTTON_TEXT.toNestedScreen }
-					</CustomNavigatorButtonWithFocusRestoration>
+					</CustomNavigatorButton>
 					<CustomNavigatorBackButton
 						onClick={ onNavigatorButtonClick }
 					>
@@ -192,28 +290,30 @@ const MyNavigation = ( {
 						} }
 						value={ innerInputValue }
 					/>
-				</NavigatorScreen>
+				</Navigator.Screen>
 
-				<NavigatorScreen path={ PATHS.NESTED }>
+				<Navigator.Screen path={ PATHS.NESTED }>
 					<p>{ SCREEN_TEXT.nested }</p>
 					<CustomNavigatorBackButton
 						onClick={ onNavigatorButtonClick }
 					>
 						{ BUTTON_TEXT.back }
 					</CustomNavigatorBackButton>
-				</NavigatorScreen>
+				</Navigator.Screen>
 
-				<NavigatorScreen path={ PATHS.INVALID_HTML_ATTRIBUTE }>
+				<ProductScreen onBackButtonClick={ onNavigatorButtonClick } />
+
+				<Navigator.Screen path={ PATHS.INVALID_HTML_ATTRIBUTE }>
 					<p>{ SCREEN_TEXT.invalidHtmlPath }</p>
 					<CustomNavigatorBackButton
 						onClick={ onNavigatorButtonClick }
 					>
 						{ BUTTON_TEXT.back }
 					</CustomNavigatorBackButton>
-				</NavigatorScreen>
+				</Navigator.Screen>
 
-				{ /* A `NavigatorScreen` with `path={ PATHS.NOT_FOUND }` is purposefully not included. */ }
-			</NavigatorProvider>
+				{ /* A `Navigator.Screen` with `path={ PATHS.NOT_FOUND }` is purposefully not included. */ }
+			</Navigator>
 
 			<label htmlFor="test-input-outer">Outer input</label>
 			<input
@@ -225,6 +325,138 @@ const MyNavigation = ( {
 				} }
 				value={ outerInputValue }
 			/>
+		</>
+	);
+};
+
+const MyHierarchicalNavigation = ( {
+	initialPath = PATHS.HOME,
+	onNavigatorButtonClick,
+}: {
+	initialPath?: string;
+	onNavigatorButtonClick?: CustomTestOnClickHandler;
+} ) => {
+	return (
+		<>
+			<Navigator initialPath={ initialPath }>
+				<Navigator.Screen path={ PATHS.HOME }>
+					<p>{ SCREEN_TEXT.home }</p>
+					{ /*
+					 * A button useful to test focus restoration. This button is the first
+					 * tabbable item in the screen, but should not receive focus when
+					 * navigating to screen as a result of a backwards navigation.
+					 */ }
+					<button>First tabbable home screen button</button>
+					<CustomNavigatorButton
+						path={ PATHS.CHILD }
+						onClick={ onNavigatorButtonClick }
+					>
+						{ BUTTON_TEXT.toChildScreen }
+					</CustomNavigatorButton>
+				</Navigator.Screen>
+
+				<Navigator.Screen path={ PATHS.CHILD }>
+					<p>{ SCREEN_TEXT.child }</p>
+					{ /*
+					 * A button useful to test focus restoration. This button is the first
+					 * tabbable item in the screen, but should not receive focus when
+					 * navigating to screen as a result of a backwards navigation.
+					 */ }
+					<button>First tabbable child screen button</button>
+					<CustomNavigatorButton
+						path={ PATHS.NESTED }
+						onClick={ onNavigatorButtonClick }
+					>
+						{ BUTTON_TEXT.toNestedScreen }
+					</CustomNavigatorButton>
+					<CustomNavigatorBackButton
+						onClick={ onNavigatorButtonClick }
+					>
+						{ BUTTON_TEXT.back }
+					</CustomNavigatorBackButton>
+				</Navigator.Screen>
+
+				<Navigator.Screen path={ PATHS.NESTED }>
+					<p>{ SCREEN_TEXT.nested }</p>
+					<CustomNavigatorBackButton
+						onClick={ onNavigatorButtonClick }
+					>
+						{ BUTTON_TEXT.back }
+					</CustomNavigatorBackButton>
+					<CustomNavigatorGoToBackButton
+						path={ PATHS.CHILD }
+						onClick={ onNavigatorButtonClick }
+					>
+						{ BUTTON_TEXT.backUsingGoTo }
+					</CustomNavigatorGoToBackButton>
+				</Navigator.Screen>
+				<CustomNavigatorGoToSkipFocusButton
+					path={ PATHS.NESTED }
+					onClick={ onNavigatorButtonClick }
+				>
+					{ BUTTON_TEXT.goToWithSkipFocus }
+				</CustomNavigatorGoToSkipFocusButton>
+			</Navigator>
+		</>
+	);
+};
+
+const MyDeprecatedNavigation = ( {
+	initialPath = PATHS.HOME,
+	onNavigatorButtonClick,
+}: {
+	initialPath?: string;
+	onNavigatorButtonClick?: CustomTestOnClickHandler;
+} ) => {
+	return (
+		<>
+			<Navigator initialPath={ initialPath }>
+				<Navigator.Screen path={ PATHS.HOME }>
+					<p>{ SCREEN_TEXT.home }</p>
+					{ /*
+					 * A button useful to test focus restoration. This button is the first
+					 * tabbable item in the screen, but should not receive focus when
+					 * navigating to screen as a result of a backwards navigation.
+					 */ }
+					<button>First tabbable home screen button</button>
+					<CustomNavigatorButton
+						path={ PATHS.CHILD }
+						onClick={ onNavigatorButtonClick }
+					>
+						{ BUTTON_TEXT.toChildScreen }
+					</CustomNavigatorButton>
+				</Navigator.Screen>
+
+				<Navigator.Screen path={ PATHS.CHILD }>
+					<p>{ SCREEN_TEXT.child }</p>
+					{ /*
+					 * A button useful to test focus restoration. This button is the first
+					 * tabbable item in the screen, but should not receive focus when
+					 * navigating to screen as a result of a backwards navigation.
+					 */ }
+					<button>First tabbable child screen button</button>
+					<CustomNavigatorButton
+						path={ PATHS.NESTED }
+						onClick={ onNavigatorButtonClick }
+					>
+						{ BUTTON_TEXT.toNestedScreen }
+					</CustomNavigatorButton>
+					<CustomNavigatorToParentButton
+						onClick={ onNavigatorButtonClick }
+					>
+						{ BUTTON_TEXT.back }
+					</CustomNavigatorToParentButton>
+				</Navigator.Screen>
+
+				<Navigator.Screen path={ PATHS.NESTED }>
+					<p>{ SCREEN_TEXT.nested }</p>
+					<CustomNavigatorToParentButtonAlternative
+						onClick={ onNavigatorButtonClick }
+					>
+						{ BUTTON_TEXT.back }
+					</CustomNavigatorToParentButtonAlternative>
+				</Navigator.Screen>
+			</Navigator>
 		</>
 	);
 };
@@ -302,9 +534,7 @@ describe( 'Navigator', () => {
 	it( 'should navigate across screens', async () => {
 		const spy = jest.fn();
 
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 
 		render( <MyNavigation onNavigatorButtonClick={ spy } /> );
 
@@ -371,12 +601,10 @@ describe( 'Navigator', () => {
 		} );
 	} );
 
-	it( 'should not rended anything if the path does not match any available screen', async () => {
+	it( 'should not render anything if the path does not match any available screen', async () => {
 		const spy = jest.fn();
 
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 
 		render( <MyNavigation onNavigatorButtonClick={ spy } /> );
 
@@ -400,10 +628,6 @@ describe( 'Navigator', () => {
 	} );
 
 	it( 'should escape the value of the `path` prop', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
-
 		render( <MyNavigation /> );
 
 		expect( getScreen( 'home' ) ).toBeInTheDocument();
@@ -413,31 +637,55 @@ describe( 'Navigator', () => {
 
 		// The following line tests the implementation details, but it's necessary
 		// as this would be otherwise transparent to the user.
+		// A potential way would be to check if an invalid HTML attribute could
+		// be detected in the tests (by JSDom or any other plugin). We could then
+		// make sure that an invalid path would not error because it's escaped
+		// correctly.
 		expect(
 			getNavigationButton( 'toInvalidHtmlPathScreen' )
 		).toHaveAttribute( 'id', INVALID_HTML_ATTRIBUTE.escaped );
+	} );
 
-		// Navigate to screen with an invalid HTML value for its `path`.
-		await user.click( getNavigationButton( 'toInvalidHtmlPathScreen' ) );
+	it( 'should warn if the `path` prop does not follow the required format', () => {
+		render( <Navigator.Screen path="not-valid">Test</Navigator.Screen> );
 
-		expect( getScreen( 'invalidHtmlPath' ) ).toBeInTheDocument();
-		expect( getNavigationButton( 'back' ) ).toBeInTheDocument();
+		expect( console ).toHaveWarnedWith(
+			'wp.components.Navigator.Screen: the `path` should follow a URL-like scheme; it should start with and be separated by the `/` character.'
+		);
+	} );
 
-		// Navigate back to home screen, check that the focus restoration selector
-		// worked correctly despite the escaping.
+	it( 'should match correctly paths with named arguments', async () => {
+		const user = userEvent.setup();
+
+		render( <MyNavigation /> );
+
+		expect( getScreen( 'home' ) ).toBeInTheDocument();
+
+		// Navigate to Product 1 screen
+		await user.click( getNavigationButton( 'toProductScreen1' ) );
+
+		expect( getScreen( 'product' ) ).toBeInTheDocument();
+
+		// Check that named parameter is extracted correctly
+		expect( screen.getByText( 'Product ID is 1' ) ).toBeInTheDocument();
+
+		// Navigate back to home screen
 		await user.click( getNavigationButton( 'back' ) );
 
 		expect( getScreen( 'home' ) ).toBeInTheDocument();
-		expect(
-			getNavigationButton( 'toInvalidHtmlPathScreen' )
-		).toHaveFocus();
+
+		// Navigate to Product 2 screen
+		await user.click( getNavigationButton( 'toProductScreen2' ) );
+
+		expect( getScreen( 'product' ) ).toBeInTheDocument();
+
+		// Check that named parameter is extracted correctly
+		expect( screen.getByText( 'Product ID is 2' ) ).toBeInTheDocument();
 	} );
 
 	describe( 'focus management', () => {
 		it( 'should restore focus correctly', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			render( <MyNavigation /> );
 
@@ -445,7 +693,11 @@ describe( 'Navigator', () => {
 			await user.click( getNavigationButton( 'toChildScreen' ) );
 
 			// The first tabbable element receives focus.
-			expect( getNavigationButton( 'toNestedScreen' ) ).toHaveFocus();
+			expect(
+				screen.getByRole( 'button', {
+					name: 'First tabbable child screen button',
+				} )
+			).toHaveFocus();
 
 			// Navigate to nested screen.
 			await user.click( getNavigationButton( 'toNestedScreen' ) );
@@ -456,20 +708,33 @@ describe( 'Navigator', () => {
 			// Navigate back to child screen.
 			await user.click( getNavigationButton( 'back' ) );
 
-			// The first tabbable element receives focus.
+			// Focus is restored on the last element that had focus when the
+			// navigation away from the screen occurred.
 			expect( getNavigationButton( 'toNestedScreen' ) ).toHaveFocus();
 
-			// Navigate back to home screen, check that focus was correctly restored.
+			// Navigate back to home screen.
 			await user.click( getNavigationButton( 'back' ) );
 
-			// The first tabbable element receives focus.
+			// Focus is restored on the last element that had focus when the
+			// navigation away from the screen occurred.
 			expect( getNavigationButton( 'toChildScreen' ) ).toHaveFocus();
+
+			// Navigate to product screen for product 2
+			await user.click( getNavigationButton( 'toProductScreen2' ) );
+
+			// The first tabbable element receives focus.
+			expect( getNavigationButton( 'back' ) ).toHaveFocus();
+
+			// Navigate back to home screen.
+			await user.click( getNavigationButton( 'back' ) );
+
+			// Focus is restored on the last element that had focus when the
+			// navigation away from the screen occurred.
+			expect( getNavigationButton( 'toProductScreen2' ) ).toHaveFocus();
 		} );
 
 		it( 'should keep focus on an active element inside navigator, while re-rendering', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			render( <MyNavigation /> );
 
@@ -477,7 +742,11 @@ describe( 'Navigator', () => {
 			await user.click( getNavigationButton( 'toChildScreen' ) );
 
 			// The first tabbable element receives focus.
-			expect( getNavigationButton( 'toNestedScreen' ) ).toHaveFocus();
+			expect(
+				screen.getByRole( 'button', {
+					name: 'First tabbable child screen button',
+				} )
+			).toHaveFocus();
 
 			// Interact with the inner input.
 			// The focus should stay on the input element.
@@ -487,9 +756,7 @@ describe( 'Navigator', () => {
 		} );
 
 		it( 'should keep focus on an active element outside navigator, while re-rendering', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			render( <MyNavigation /> );
 
@@ -497,13 +764,151 @@ describe( 'Navigator', () => {
 			await user.click( getNavigationButton( 'toChildScreen' ) );
 
 			// The first tabbable element receives focus.
-			expect( getNavigationButton( 'toNestedScreen' ) ).toHaveFocus();
+			expect(
+				screen.getByRole( 'button', {
+					name: 'First tabbable child screen button',
+				} )
+			).toHaveFocus();
 
 			// Interact with the outer input.
 			// The focus should stay on the input element.
 			const outerInput = screen.getByLabelText( 'Outer input' );
 			await user.type( outerInput, 'd' );
 			expect( outerInput ).toHaveFocus();
+		} );
+
+		it( 'should restore focus correctly even when the `path` needs to be escaped', async () => {
+			const user = userEvent.setup();
+
+			render( <MyNavigation /> );
+
+			expect( getScreen( 'home' ) ).toBeInTheDocument();
+
+			// Navigate to screen with an invalid HTML value for its `path`.
+			await user.click(
+				getNavigationButton( 'toInvalidHtmlPathScreen' )
+			);
+
+			expect( getScreen( 'invalidHtmlPath' ) ).toBeInTheDocument();
+
+			// Navigate back to home screen, check that the focus restoration selector
+			// worked correctly despite the escaping.
+			await user.click( getNavigationButton( 'back' ) );
+
+			expect( getScreen( 'home' ) ).toBeInTheDocument();
+			expect(
+				getNavigationButton( 'toInvalidHtmlPathScreen' )
+			).toHaveFocus();
+		} );
+
+		it( 'should restore focus while using goTo and goToParent', async () => {
+			const user = userEvent.setup();
+
+			render( <MyHierarchicalNavigation /> );
+
+			expect( getScreen( 'home' ) ).toBeInTheDocument();
+
+			// Navigate to child screen.
+			await user.click( getNavigationButton( 'toChildScreen' ) );
+			expect( getScreen( 'child' ) ).toBeInTheDocument();
+
+			// Navigate to nested screen.
+			await user.click( getNavigationButton( 'toNestedScreen' ) );
+			expect( getScreen( 'nested' ) ).toBeInTheDocument();
+			expect( getNavigationButton( 'back' ) ).toBeInTheDocument();
+
+			// Navigate back to child screen using the back button.
+			await user.click( getNavigationButton( 'back' ) );
+			expect( getScreen( 'child' ) ).toBeInTheDocument();
+			expect( getNavigationButton( 'toNestedScreen' ) ).toHaveFocus();
+
+			// Re navigate to nested screen.
+			await user.click( getNavigationButton( 'toNestedScreen' ) );
+			expect( getScreen( 'nested' ) ).toBeInTheDocument();
+			expect(
+				getNavigationButton( 'backUsingGoTo' )
+			).toBeInTheDocument();
+
+			// Navigate back to child screen using the go to button.
+			await user.click( getNavigationButton( 'backUsingGoTo' ) );
+			expect( getScreen( 'child' ) ).toBeInTheDocument();
+			expect( getNavigationButton( 'toNestedScreen' ) ).toHaveFocus();
+
+			// Navigate back to home screen.
+			await user.click( getNavigationButton( 'back' ) );
+			expect( getNavigationButton( 'toChildScreen' ) ).toHaveFocus();
+		} );
+
+		it( 'should skip focus based on location `skipFocus` option', async () => {
+			const user = userEvent.setup();
+			render( <MyHierarchicalNavigation /> );
+
+			// Navigate to child screen with skipFocus.
+			await user.click( getNavigationButton( 'goToWithSkipFocus' ) );
+			expect( queryScreen( 'home' ) ).not.toBeInTheDocument();
+			expect( getScreen( 'nested' ) ).toBeInTheDocument();
+
+			// The clicked button should remain focused.
+			expect( getNavigationButton( 'goToWithSkipFocus' ) ).toHaveFocus();
+
+			// Navigate back to parent screen.
+			await user.click( getNavigationButton( 'back' ) );
+			expect( getScreen( 'child' ) ).toBeInTheDocument();
+			// The first tabbable element receives focus.
+			expect(
+				screen.getByRole( 'button', {
+					name: 'First tabbable child screen button',
+				} )
+			).toHaveFocus();
+		} );
+	} );
+
+	describe( 'deprecated APIs', () => {
+		it( 'should log a deprecation notice when using the NavigatorToParentButton component', async () => {
+			const user = userEvent.setup();
+
+			render( <MyDeprecatedNavigation initialPath={ PATHS.CHILD } /> );
+
+			expect( getScreen( 'child' ) ).toBeInTheDocument();
+
+			// Navigate back to home screen.
+			// The first tabbable element receives focus, since focus restoration
+			// it not possible (there was no forward navigation).
+			await user.click( getNavigationButton( 'back' ) );
+			expect( getScreen( 'home' ) ).toBeInTheDocument();
+			expect(
+				screen.getByRole( 'button', {
+					name: 'First tabbable home screen button',
+				} )
+			).toHaveFocus();
+
+			// Rendering `NavigatorToParentButton` logs a deprecation notice
+			expect( console ).toHaveWarnedWith(
+				'wp.components.NavigatorToParentButton is deprecated since version 6.7. Please use wp.components.Navigator.BackButton instead.'
+			);
+		} );
+
+		it( 'should log a deprecation notice when using the useNavigator().goToParent() function', async () => {
+			const user = userEvent.setup();
+
+			render( <MyDeprecatedNavigation initialPath={ PATHS.NESTED } /> );
+
+			expect( getScreen( 'nested' ) ).toBeInTheDocument();
+
+			// Navigate back to child screen using the back button.
+			// The first tabbable element receives focus, since focus restoration
+			// it not possible (there was no forward navigation).
+			await user.click( getNavigationButton( 'back' ) );
+			expect( getScreen( 'child' ) ).toBeInTheDocument();
+			expect(
+				screen.getByRole( 'button', {
+					name: 'First tabbable child screen button',
+				} )
+			).toHaveFocus();
+
+			expect( console ).toHaveWarnedWith(
+				'wp.components.useNavigator().goToParent is deprecated since version 6.7. Please use wp.components.useNavigator().goBack instead.'
+			);
 		} );
 	} );
 } );

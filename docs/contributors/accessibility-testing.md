@@ -2,11 +2,11 @@
 
 This is a guide on how to test accessibility on Gutenberg. This is a living document that can be improved over time with new approaches and techniques.
 
-## Getting Started
+## Getting started
 
 Make sure you have set up your local environment following the instructions on [Getting Started](/docs/contributors/code/getting-started-with-code-contribution.md).
 
-## Keyboard Testing
+## Keyboard testing
 
 In addition to mouse, make sure the interface is fully accessible for keyboard-only users. Try to interact with your changes using only the keyboard:
 
@@ -18,7 +18,7 @@ If the elements can be focused using arrow keys, but not <kbd>Tab</kbd> or <kbd>
 
 If the interaction is complex or confusing to you, consider that it's also going to impact keyboard-only users.
 
-## Screen Reader Testing
+## Screen reader testing
 
 According to the [WebAIM: Screen Reader User Survey #8 Results](https://webaim.org/projects/screenreadersurvey8/#usage), these are the most common screen reader and browser combinations:
 
@@ -34,7 +34,7 @@ According to the [WebAIM: Screen Reader User Survey #8 Results](https://webaim.o
 | NVDA with Internet Explorer | 14               | 1.2%             |
 | Other combinations          | 126              | 10.4%            |
 
-When testing with screen readers, try to use some of the combinations at the top of this list. For example, when testing with VoiceOver, it's preferrable to use Safari.
+When testing with screen readers, try to use some of the combinations at the top of this list. For example, when testing with VoiceOver, it's preferable to use Safari.
 
 ### NVDA with Firefox
 

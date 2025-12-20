@@ -3,33 +3,39 @@
  */
 import { _x } from '@wordpress/i18n';
 import { ToolbarGroup, ToolbarDropdownMenu } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
-import { alignTop, alignCenter, alignBottom } from './icons';
+import {
+	justifyTop,
+	justifyCenterVertical,
+	justifyBottom,
+	justifyStretchVertical,
+	justifySpaceBetweenVertical,
+} from '@wordpress/icons';
 
 const BLOCK_ALIGNMENTS_CONTROLS = {
 	top: {
-		icon: alignTop,
+		icon: justifyTop,
 		title: _x( 'Align top', 'Block vertical alignment setting' ),
 	},
 	center: {
-		icon: alignCenter,
+		icon: justifyCenterVertical,
 		title: _x( 'Align middle', 'Block vertical alignment setting' ),
 	},
 	bottom: {
-		icon: alignBottom,
+		icon: justifyBottom,
 		title: _x( 'Align bottom', 'Block vertical alignment setting' ),
+	},
+	stretch: {
+		icon: justifyStretchVertical,
+		title: _x( 'Stretch to fill', 'Block vertical alignment setting' ),
+	},
+	'space-between': {
+		icon: justifySpaceBetweenVertical,
+		title: _x( 'Space between', 'Block vertical alignment setting' ),
 	},
 };
 
 const DEFAULT_CONTROLS = [ 'top', 'center', 'bottom' ];
 const DEFAULT_CONTROL = 'top';
-
-const POPOVER_PROPS = {
-	variant: 'toolbar',
-};
 
 function BlockVerticalAlignmentUI( {
 	value,
@@ -47,9 +53,7 @@ function BlockVerticalAlignmentUI( {
 		BLOCK_ALIGNMENTS_CONTROLS[ DEFAULT_CONTROL ];
 
 	const UIComponent = isToolbar ? ToolbarGroup : ToolbarDropdownMenu;
-	const extraProps = isToolbar
-		? { isCollapsed }
-		: { popoverProps: { POPOVER_PROPS } };
+	const extraProps = isToolbar ? { isCollapsed } : {};
 
 	return (
 		<UIComponent

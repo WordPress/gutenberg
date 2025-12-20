@@ -1,20 +1,8 @@
 # Patterns
 
-Block Patterns are predefined block layouts, available from the patterns tab of the block inserter. Once inserted into content, the blocks are ready for additional or modified content and configuration.
+Block Patterns are predefined block layouts available from the patterns tab of the block inserter. Once inserted into content, the blocks are ready for additional or modified content and configuration.
 
-In this Document:
-- [Patterns](#patterns)
-	- [Block Patterns](#block-patterns)
-		- [register_block_pattern](#register_block_pattern)
-	- [Unregistering Block Patterns](#unregistering-block-patterns)
-		- [unregister_block_pattern](#unregister_block_pattern)
-	- [Block Pattern Categories](#block-pattern-categories)
-		- [register_block_pattern_category](#register_block_pattern_category)
-		- [unregister_block_pattern_category](#unregister_block_pattern_category)
-	- [Block patterns contextual to block types and pattern transformations](#block-patterns-contextual-to-block-types-and-pattern-transformations)
-	- [Semantic block patterns](#semantic-block-patterns)
-
-## Block Patterns
+## Block patterns
 
 ### register_block_pattern
 
@@ -33,10 +21,12 @@ The properties available for block patterns are:
 -   `keywords` (optional): An array of aliases or keywords that help users discover the pattern while searching.
 -   `viewportWidth` (optional): An integer specifying the intended width of the pattern to allow for a scaled preview of the pattern in the inserter.
 -   `blockTypes` (optional): An array of block types that the pattern is intended to be used with. Each value needs to be the declared block's `name`.
--   `postTypes` (optional): An array of post types that the pattern is restricted to be used with. The pattern will only be available when editing one of the post types passed on the array, for all the other post types the pattern is not available at all.
+-   `postTypes` (optional): An array of post types that the pattern is restricted to be used with. The pattern will only be available when editing one of the post types passed on the array. For all the other post types, the pattern is not available at all.
+-   `templateTypes` (optional): An array of template types where the pattern makes sense, for example, `404` if the pattern is for a 404 page, `single-post` if the pattern is for showing a single post.
 -   `inserter` (optional): By default, all patterns will appear in the inserter. To hide a pattern so that it can only be inserted programmatically, set the `inserter` to `false`.
+-   `source` (optional): A string that denotes the source of the pattern. For a plugin registering a pattern, pass the string `plugin`. For a theme, pass the string `theme`.
 
-The following code sample registers a block pattern named 'my-plugin/my-awesome-pattern':
+The following code sample registers a block pattern named `my-plugin/my-awesome-pattern`:
 
 ```php
 register_block_pattern(
@@ -49,9 +39,7 @@ register_block_pattern(
 );
 ```
 
-_Note:_
-
-`register_block_pattern()` should be called from a handler attached to the init hook.
+Note that `register_block_pattern()` should be called from a handler attached to the `init` hook.
 
 ```php
 function my_plugin_register_my_patterns() {
@@ -61,14 +49,15 @@ function my_plugin_register_my_patterns() {
 add_action( 'init', 'my_plugin_register_my_patterns' );
 ```
 
-## Unregistering Block Patterns
+## Unregistering block patterns
 
 ### unregister_block_pattern
 
-The `unregister_block_pattern` helper function allows for a previously registered block pattern to be unregistered from a theme or plugin and receives one argument.
+The `unregister_block_pattern` helper function allows a previously registered block pattern to be unregistered from a theme or plugin and receives one argument.
+
 -   `title`: The name of the block pattern to be unregistered.
 
-The following code sample unregisters the block pattern named 'my-plugin/my-awesome-pattern':
+The following code sample unregisters the block pattern named `my-plugin/my-awesome-pattern`:
 
 ```php
 unregister_block_pattern( 'my-plugin/my-awesome-pattern' );
@@ -86,13 +75,14 @@ function my_plugin_unregister_my_patterns() {
 add_action( 'init', 'my_plugin_unregister_my_patterns' );
 ```
 
-## Block Pattern Categories
+## Block pattern categories
 
 Block patterns can be grouped using categories. The block editor comes with bundled categories you can use on your custom block patterns. You can also register your own block pattern categories.
 
 ### register_block_pattern_category
 
 The `register_block_pattern_category` helper function receives two arguments.
+
 -   `title`: A machine-readable title for the block pattern category.
 -	`properties`: An array describing properties of the pattern category.
 
@@ -100,7 +90,7 @@ The properties of the pattern categories include:
 
 -   `label` (required): A human-readable label for the pattern category.
 
-The following code sample registers the category named 'hero':
+The following code sample registers the category named `hero`:
 
 ```php
 register_block_pattern_category(
@@ -113,6 +103,8 @@ _Note:_
 
 `register_block_pattern_category()` should be called from a handler attached to the init hook.
 
+The category will not show under Patterns unless a pattern has been assigned to that category.
+
 ```php
 function my_plugin_register_my_pattern_categories() {
   register_block_pattern_category( ... );
@@ -123,12 +115,11 @@ add_action( 'init', 'my_plugin_register_my_pattern_categories' );
 
 ### unregister_block_pattern_category
 
-`unregister_block_pattern_category` allows unregistering a pattern category.
-
 The `unregister_block_pattern_category` helper function allows for a previously registered block pattern category to be unregistered from a theme or plugin and receives one argument.
+
 -   `title`: The name of the block pattern category to be unregistered.
 
-The following code sample unregisters the category named 'hero':
+The following code sample unregisters the category named `hero`:
 
 ```php
 unregister_block_pattern_category( 'hero' );
@@ -150,7 +141,7 @@ add_action( 'init', 'my_plugin_unregister_my_pattern_categories' );
 
 It is possible to attach a block pattern to one or more block types. This adds the block pattern as an available transform for that block type.
 
-Currently these transformations are available only to simple blocks (blocks without inner blocks). In order for a pattern to be suggested, **every selected block must be present in the block pattern**.
+Currently, these transformations are available only to simple blocks (blocks without inner blocks). In order for a pattern to be suggested, **every selected block must be present in the block pattern**.
 
 For instance:
 
@@ -167,9 +158,9 @@ register_block_pattern(
 );
 ```
 
-The above code registers a block pattern named 'my-plugin/powered-by-wordpress' and also shows the pattern in the "transform menu" of paragraph blocks. The transformation result will be keeping the paragraph's existing content and also apply the other attributes - in this case the background and text color.
+The above code registers a block pattern named `my-plugin/powered-by-wordpress` and shows the pattern in the "transform menu" of paragraph blocks. The transformation result will keep the paragraph's existing content and apply the other attributes - in this case, the background and text color.
 
-As mentioned above pattern transformations for simple blocks can also work if we have selected multiple blocks and there are matching contextual patterns to these blocks. Let's see an example of a pattern where two block types are attached.
+As mentioned above, pattern transformations for simple blocks can also work if we have selected multiple blocks and there are matching contextual patterns to these blocks. Let's see an example of a pattern where two block types are attached.
 
 ```php
 register_block_pattern(
@@ -190,7 +181,7 @@ register_block_pattern(
 );
 ```
 
-In the above example if we select **one of the two** block types, either a paragraph or a heading block, this pattern will be suggested by transforming the selected block using its content and will also add the remaing blocks from the pattern. If on the other hand we multi select one paragraph and one heading block, both blocks will be transformed.
+In the above example, if we select **one of the two** block types, either a paragraph or a heading block, this pattern will be suggested by transforming the selected block using its content and will also add the remaining blocks from the pattern. If, on the other hand, we multi-select one paragraph and one heading block, both blocks will be transformed.
 
 Blocks can also use these contextual block patterns in other places. For instance, when inserting a new Query Loop block, the user is provided with a list of all patterns attached to the block.
 

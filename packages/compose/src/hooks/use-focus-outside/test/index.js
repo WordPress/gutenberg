@@ -27,9 +27,7 @@ const FocusOutsideComponent = ( { onFocusOutside: callback } ) => (
 describe( 'useFocusOutside', () => {
 	it( 'should not call handler if focus shifts to element within component', async () => {
 		const mockOnFocusOutside = jest.fn();
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 
 		render(
 			<FocusOutsideComponent onFocusOutside={ mockOnFocusOutside } />
@@ -50,9 +48,7 @@ describe( 'useFocusOutside', () => {
 
 	it( 'should not call handler if focus transitions via click to button', async () => {
 		const mockOnFocusOutside = jest.fn();
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 
 		render(
 			<FocusOutsideComponent onFocusOutside={ mockOnFocusOutside } />
@@ -69,9 +65,7 @@ describe( 'useFocusOutside', () => {
 
 	it( 'should call handler if focus shifts to element outside component', async () => {
 		const mockOnFocusOutside = jest.fn();
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 
 		render(
 			<FocusOutsideComponent onFocusOutside={ mockOnFocusOutside } />
@@ -99,9 +93,7 @@ describe( 'useFocusOutside', () => {
 			.spyOn( document, 'hasFocus' )
 			.mockImplementation( () => false );
 		const mockOnFocusOutside = jest.fn();
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 
 		render(
 			<FocusOutsideComponent onFocusOutside={ mockOnFocusOutside } />
@@ -124,11 +116,15 @@ describe( 'useFocusOutside', () => {
 		mockedDocumentHasFocus.mockRestore();
 	} );
 
-	it( 'should cancel check when unmounting while queued', async () => {
-		const mockOnFocusOutside = jest.fn();
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
+	it( 'should call handler when unmounting while queued', async () => {
+		let resolvePromise;
+		const promise = new Promise( ( resolve ) => {
+			resolvePromise = resolve;
 		} );
+		const mockOnFocusOutside = jest
+			.fn()
+			.mockImplementation( resolvePromise );
+		const user = userEvent.setup();
 
 		const { unmount } = render(
 			<FocusOutsideComponent onFocusOutside={ mockOnFocusOutside } />
@@ -140,13 +136,19 @@ describe( 'useFocusOutside', () => {
 		} );
 		await user.click( button );
 
-		// Simulate a blur event and the wrapper unmounting while the blur event
-		// handler is queued
-		button.blur();
+		// Click outside the wrapper to trigger a blur event and queue the callback
+		const outsideButton = screen.getByRole( 'button', {
+			name: 'Button outside the wrapper',
+		} );
+		await user.click( outsideButton );
+
+		// Immediately unmount the component while the blur event is queued
+		// The callback should still be called.
 		unmount();
 
-		jest.runAllTimers();
+		// Wait for the callback to be called
+		await promise;
 
-		expect( mockOnFocusOutside ).not.toHaveBeenCalled();
+		expect( mockOnFocusOutside ).toHaveBeenCalled();
 	} );
 } );

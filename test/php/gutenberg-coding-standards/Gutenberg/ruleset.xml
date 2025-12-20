@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<ruleset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" name="Gutenberg" namespace="GutenbergCS\Gutenberg" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/squizlabs/PHP_CodeSniffer/master/phpcs.xsd">
+
+	<description>Gutenberg Coding Standards</description>
+
+	<rule ref="Gutenberg.CodeAnalysis.GuardedFunctionAndClassNames"/>
+	<rule ref="Gutenberg.CodeAnalysis.ForbiddenFunctionsAndClasses"/>
+	<rule ref="Gutenberg.NamingConventions.ValidBlockLibraryFunctionName"/>
+	<rule ref="Gutenberg.Commenting.SinceTag"/>
+
+</ruleset>

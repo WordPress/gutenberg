@@ -1,5 +1,7 @@
 /** @format */
 
+@use "sass:color";
+
 // Hugo's new WordPress shades of gray, from http://codepen.io/hugobaeta/pen/grJjVp.
 $black: #000;
 $white: #fff;
@@ -31,31 +33,33 @@ $red-50: #d63638;
 // Primary Accent (Blues)
 $blue-wordpress: #0087be;
 $blue-medium: #00aadc;
+$blue-60: #055d9c;
 $blue-500: #016087;
 // Primary tint color (light)
 $blue-50: #2271b1;
+$blue-40: #1689db;
 // Primary tint color (dark)
 $blue-30: #5198d9;
 
 // Grays
 $gray: #87a6bc;
-$gray-light: lighten($gray, 33%); //#f3f6f8
-$gray-dark: darken($gray, 38%); //#2e4453
+$gray-light: color.adjust($gray, $lightness: 33%); //#f3f6f8
+$gray-dark: color.adjust($gray, $lightness: -38%); //#2e4453
 $gray-900: #1a1a1a;
 $gray-700: #757575;
 
 // $gray-text: ideal for standard, non placeholder text
 // $gray-text-min: minimum contrast needed for WCAG 2.0 AA on white background
 $gray-text: $gray-dark;
-$gray-text-min: darken($gray, 18%); //#537994
+$gray-text-min: color.adjust($gray, $lightness: -18%); //#537994
 
 // Shades of gray
-$gray-lighten-10: lighten($gray, 10%); // #a8bece
-$gray-lighten-20: lighten($gray, 20%); // #c8d7e1
-$gray-lighten-30: lighten($gray, 30%); // #e9eff3
-$gray-darken-10: darken($gray, 10%);
-$gray-darken-20: darken($gray, 20%); // #4f748e
-$gray-darken-30: darken($gray, 30%); // #3d596d
+$gray-lighten-10: color.adjust($gray, $lightness: 10%); // #a8bece
+$gray-lighten-20: color.adjust($gray, $lightness: 20%); // #c8d7e1
+$gray-lighten-30: color.adjust($gray, $lightness: 30%); // #e9eff3
+$gray-darken-10: color.adjust($gray, $lightness: -10%);
+$gray-darken-20: color.adjust($gray, $lightness: -20%); // #4f748e
+$gray-darken-30: color.adjust($gray, $lightness: -30%); // #3d596d
 
 // Custom
 $toolbar-button: #7b9ab1;
@@ -97,11 +101,13 @@ $dark-secondary: #fff9; //rgba(255, 255, 255, 0.6);
 $dark-tertiary: #ffffff6d; //rgba(255, 255, 255, 0.43);
 $dark-quaternary: #ffffff3f; //rgba(255, 255, 255, 0.25);
 $dark-ultra-dim: #ffffff14; //rgba(255, 255, 255, 0.08);
+$dark-dim: #ffffff1f; //rgba(255, 255, 255, 0.12)
 
 // Design Token colors
 $app-background: $white;
 $app-background-dark: $black;
 $app-background-dark-alt: $background-dark-elevated;
+$app-safe-area-background-dark: #141414;
 
 $modal-background: $white;
 $modal-background-dark: $background-dark-elevated;

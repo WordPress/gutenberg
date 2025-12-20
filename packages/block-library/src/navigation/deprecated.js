@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { mapValues } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { InnerBlocks } from '@wordpress/block-editor';
@@ -126,7 +121,7 @@ const v6 = {
 				blockGap: true,
 			},
 		},
-		__experimentalLayout: {
+		layout: {
 			allowSwitching: false,
 			allowInheriting: false,
 			default: {
@@ -331,22 +326,23 @@ const migrateTypographyPresets = function ( attributes ) {
 		...attributes,
 		style: {
 			...attributes.style,
-			typography: mapValues(
-				attributes.style.typography,
-				( value, key ) => {
-					const prefix = TYPOGRAPHY_PRESET_DEPRECATION_MAP[ key ];
-					if ( prefix && value.startsWith( prefix ) ) {
-						const newValue = value.slice( prefix.length );
-						if (
-							'textDecoration' === key &&
-							'strikethrough' === newValue
-						) {
-							return 'line-through';
+			typography: Object.fromEntries(
+				Object.entries( attributes.style.typography ?? {} ).map(
+					( [ key, value ] ) => {
+						const prefix = TYPOGRAPHY_PRESET_DEPRECATION_MAP[ key ];
+						if ( prefix && value.startsWith( prefix ) ) {
+							const newValue = value.slice( prefix.length );
+							if (
+								'textDecoration' === key &&
+								'strikethrough' === newValue
+							) {
+								return [ key, 'line-through' ];
+							}
+							return [ key, newValue ];
 						}
-						return newValue;
+						return [ key, value ];
 					}
-					return value;
-				}
+				)
 			),
 		},
 	};

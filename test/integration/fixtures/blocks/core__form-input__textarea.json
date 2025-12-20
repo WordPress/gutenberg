@@ -1,0 +1,15 @@
+[
+	{
+		"name": "core/form-input",
+		"isValid": true,
+		"attributes": {
+			"type": "textarea",
+			"label": "Label",
+			"inlineLabel": false,
+			"required": true,
+			"value": "",
+			"visibilityPermissions": "all"
+		},
+		"innerBlocks": []
+	}
+]

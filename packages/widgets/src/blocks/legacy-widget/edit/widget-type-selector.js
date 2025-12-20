@@ -27,7 +27,8 @@ export default function WidgetTypeSelector( { selectedId, onSelect } ) {
 
 	return (
 		<SelectControl
-			label={ __( 'Select a legacy widget to display:' ) }
+			__next40pxDefaultSize
+			label={ __( 'Legacy widget' ) }
 			value={ selectedId ?? '' }
 			options={ [
 				{ value: '', label: __( 'Select widget' ) },

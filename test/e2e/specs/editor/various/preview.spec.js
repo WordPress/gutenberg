@@ -22,15 +22,9 @@ test.describe( 'Preview', () => {
 	} ) => {
 		const editorPage = page;
 
-		// Disabled until content present.
-		await expect(
-			editorPage.locator( 'role=button[name="Preview"i]' )
-		).toBeDisabled();
-
-		await editorPage.type(
-			'role=textbox[name="Add title"i]',
-			'Hello World'
-		);
+		await editor.canvas
+			.locator( 'role=textbox[name="Add title"i]' )
+			.type( 'Hello World' );
 
 		const previewPage = await editor.openPreviewPage( editorPage );
 		const previewTitle = previewPage.locator( 'role=heading[level=1]' );
@@ -48,7 +42,9 @@ test.describe( 'Preview', () => {
 
 		// Return to editor to change title.
 		await editorPage.bringToFront();
-		await editorPage.type( 'role=textbox[name="Add title"i]', '!' );
+		await editor.canvas
+			.locator( 'role=textbox[name="Add title"i]' )
+			.type( '!' );
 		await previewUtils.waitForPreviewNavigation( previewPage );
 
 		// Title in preview should match updated input.
@@ -70,10 +66,9 @@ test.describe( 'Preview', () => {
 
 		// Return to editor to change title.
 		await editorPage.bringToFront();
-		await editorPage.fill(
-			'role=textbox[name="Add title"i]',
-			'Hello World! And more.'
-		);
+		await editor.canvas
+			.locator( 'role=textbox[name="Add title"i]' )
+			.fill( 'Hello World! And more.' );
 		await previewUtils.waitForPreviewNavigation( previewPage );
 
 		// Title in preview should match updated input.
@@ -104,10 +99,14 @@ test.describe( 'Preview', () => {
 		page,
 		previewUtils,
 	} ) => {
+		await editor.openDocumentSettingsSidebar();
+
 		const editorPage = page;
 
 		// Type aaaaa in the title field.
-		await editorPage.type( 'role=textbox[name="Add title"]', 'aaaaa' );
+		await editor.canvas
+			.locator( 'role=textbox[name="Add title"]' )
+			.type( 'aaaaa' );
 		await editorPage.keyboard.press( 'Tab' );
 
 		// Save the post as a draft.
@@ -127,10 +126,9 @@ test.describe( 'Preview', () => {
 		await editorPage.bringToFront();
 
 		// Append bbbbb to the title, and tab away from the title so blur event is triggered.
-		await editorPage.fill(
-			'role=textbox[name="Add title"i]',
-			'aaaaabbbbb'
-		);
+		await editor.canvas
+			.locator( 'role=textbox[name="Add title"i]' )
+			.fill( 'aaaaabbbbb' );
 		await editorPage.keyboard.press( 'Tab' );
 
 		// Save draft and open the preview page right after.
@@ -155,7 +153,10 @@ test.describe( 'Preview', () => {
 		const editorPage = page;
 
 		// Type Lorem in the title field.
-		await editorPage.type( 'role=textbox[name="Add title"i]', 'Lorem' );
+		await editor.canvas
+			.locator( 'role=textbox[name="Add title"i]' )
+			.type( 'Lorem' );
+		await editor.openDocumentSettingsSidebar();
 
 		// Open the preview page.
 		const previewPage = await editor.openPreviewPage( editorPage );
@@ -172,7 +173,9 @@ test.describe( 'Preview', () => {
 		await page.click( 'role=button[name="Close panel"i]' );
 
 		// Change the title and preview again.
-		await editorPage.type( 'role=textbox[name="Add title"i]', ' Ipsum' );
+		await editor.canvas
+			.locator( 'role=textbox[name="Add title"i]' )
+			.type( ' Ipsum' );
 		await previewUtils.waitForPreviewNavigation( previewPage );
 
 		// Title in preview should match updated input.
@@ -180,9 +183,15 @@ test.describe( 'Preview', () => {
 
 		// Return to editor and switch to Draft.
 		await editorPage.bringToFront();
-		await page.click( 'role=button[name="Switch to draft"i]' );
-		// FIXME: The confirmation dialog is not named yet.
-		await page.click( 'role=dialog >> role=button[name="OK"i]' );
+		await page.getByRole( 'button', { name: 'Change status:' } ).click();
+		await page.getByRole( 'radio', { name: 'Draft' } ).click();
+		await page
+			.getByRole( 'region', { name: 'Editor top bar' } )
+			.getByRole( 'button', {
+				name: 'Save',
+				exact: true,
+			} )
+			.click();
 
 		// Wait for the status change.
 		// @see https://github.com/WordPress/gutenberg/pull/43933
@@ -191,7 +200,9 @@ test.describe( 'Preview', () => {
 		).toBeVisible();
 
 		// Change the title.
-		await editorPage.type( 'role=textbox[name="Add title"i]', ' Draft' );
+		await editor.canvas
+			.locator( 'role=textbox[name="Add title"i]' )
+			.type( ' Draft' );
 
 		// Open the preview page.
 		await previewUtils.waitForPreviewNavigation( previewPage );
@@ -222,7 +233,9 @@ test.describe( 'Preview with Custom Fields enabled', () => {
 		const editorPage = page;
 
 		// Add an initial title and content.
-		await editorPage.type( 'role=textbox[name="Add title"i]', 'title 1' );
+		await editor.canvas
+			.locator( 'role=textbox[name="Add title"i]' )
+			.type( 'title 1' );
 		await editor.insertBlock( {
 			name: 'core/paragraph',
 			attributes: { content: 'content 1' },
@@ -246,11 +259,12 @@ test.describe( 'Preview with Custom Fields enabled', () => {
 
 		// Return to editor and modify the title and content.
 		await editorPage.bringToFront();
-		await editorPage.fill( 'role=textbox[name="Add title"i]', 'title 2' );
-		await editorPage.fill(
-			'role=document >> text="content 1"',
-			'content 2'
-		);
+		await editor.canvas
+			.locator( 'role=textbox[name="Add title"i]' )
+			.fill( 'title 2' );
+		await editor.canvas
+			.locator( 'role=document >> text="content 1"' )
+			.fill( 'content 2' );
 
 		// Open the preview page.
 		await previewUtils.waitForPreviewNavigation( previewPage );
@@ -279,14 +293,17 @@ test.describe( 'Preview with private custom post type', () => {
 		admin,
 		page,
 	} ) => {
-		await admin.createNewPost( { postType: 'not_public', title: 'aaaaa' } );
+		await admin.createNewPost( {
+			postType: 'not_public',
+			title: 'aaaaa',
+		} );
 
 		// Open the view menu.
-		await page.click( 'role=button[name="Preview"i]' );
+		await page.click( 'role=button[name="View"i]' );
 
 		await expect(
 			page.locator( 'role=menuitem[name="Preview in new tab"i]' )
-		).not.toBeVisible();
+		).toBeHidden();
 	} );
 } );
 
@@ -297,7 +314,7 @@ class PreviewUtils {
 
 	async waitForPreviewNavigation( previewPage ) {
 		const previewToggle = this.page.locator(
-			'role=button[name="Preview"i][expanded=false]'
+			'role=button[name="View"i][expanded=false]'
 		);
 		const isDropdownClosed = await previewToggle.isVisible();
 		if ( isDropdownClosed ) {
@@ -316,9 +333,9 @@ class PreviewUtils {
 		);
 		await this.page.click( 'role=menuitem[name="Preferences"i]' );
 
-		// Navigate to panels section.
+		// Navigate to general section.
 		await this.page.click(
-			'role=dialog[name="Preferences"i] >> role=tab[name="Panels"i]'
+			'role=dialog[name="Preferences"i] >> role=tab[name="General"i]'
 		);
 
 		// Find custom fields checkbox.
@@ -343,6 +360,8 @@ class PreviewUtils {
 			return;
 		}
 
-		await this.page.click( 'role=button[name="Close dialog"i]' );
+		await this.page.click(
+			'role=dialog[name="Preferences"i] >> role=button[name="Close"i]'
+		);
 	}
 }

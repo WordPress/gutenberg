@@ -18,9 +18,7 @@ _This package assumes that your code will run in an **ES2015+** environment. If 
 
 ### addQueryArgs
 
-Appends arguments as querystring to the provided URL. If the URL already
-includes query arguments, the arguments are merged with (and take precedent
-over) the existing set.
+Appends arguments as querystring to the provided URL. If the URL already includes query arguments, the arguments are merged with (and take precedent over) the existing set.
 
 _Usage_
 
@@ -30,8 +28,8 @@ const newURL = addQueryArgs( 'https://google.com', { q: 'test' } ); // https://g
 
 _Parameters_
 
--   _url_ `[string]`: URL to which arguments should be appended. If omitted, only the resulting querystring is returned.
--   _args_ `[Object]`: Query arguments to apply to URL.
+-   _url_ `string`: URL to which arguments should be appended. If omitted, only the resulting querystring is returned.
+-   _args_ `Record< string, unknown >`: Query arguments to apply to URL.
 
 _Returns_
 
@@ -41,8 +39,7 @@ _Returns_
 
 Generates URL-encoded query string using input query data.
 
-It is intended to behave equivalent as PHP's `http_build_query`, configured
-with encoding type PHP_QUERY_RFC3986 (spaces as `%20`).
+It is intended to behave equivalent as PHP's `http_build_query`, configured with encoding type PHP_QUERY_RFC3986 (spaces as `%20`).
 
 _Usage_
 
@@ -61,7 +58,7 @@ const queryString = buildQueryString( {
 
 _Parameters_
 
--   _data_ `Record<string,*>`: Data to encode.
+-   _data_ `Record< string, unknown >`: Data to encode.
 
 _Returns_
 
@@ -71,14 +68,9 @@ _Returns_
 
 Performs some basic cleanup of a string for use as a post slug.
 
-This replicates some of what `sanitize_title()` does in WordPress core, but
-is only designed to approximate what the slug will be.
+This replicates some of what `sanitize_title_with_dashes()` does in WordPress core, but is only designed to approximate what the slug will be.
 
-Converts Latin-1 Supplement and Latin Extended-A letters to basic Latin
-letters. Removes combining diacritical marks. Converts whitespace, periods,
-and forward slashes to hyphens. Removes any remaining non-word characters
-except hyphens. Converts remaining string to lowercase. It does not account
-for octets, HTML entities, or other encoded characters.
+Converts Latin-1 Supplement and Latin Extended-A letters to basic Latin letters. Removes combining diacritical marks. Converts whitespace, periods, and forward slashes to hyphens. Removes any remaining non-word characters except hyphens. Converts remaining string to lowercase. It does not account for octets, HTML entities, or other encoded characters.
 
 _Parameters_
 
@@ -107,7 +99,7 @@ const imageUrl = filterURLForDisplay(
 _Parameters_
 
 -   _url_ `string`: Original URL.
--   _maxLength_ `number|null`: URL length.
+-   _maxLength_ `number | null`: URL length.
 
 _Returns_
 
@@ -130,7 +122,7 @@ _Parameters_
 
 _Returns_
 
--   `string|void`: The authority part of the URL.
+-   `string | void`: The authority part of the URL.
 
 ### getFilename
 
@@ -149,7 +141,7 @@ _Parameters_
 
 _Returns_
 
--   `string|void`: The filename part of the URL.
+-   `string | void`: The filename part of the URL.
 
 ### getFragment
 
@@ -172,7 +164,7 @@ _Parameters_
 
 _Returns_
 
--   `string|void`: The fragment part of the URL.
+-   `string | void`: The fragment part of the URL.
 
 ### getPath
 
@@ -191,7 +183,7 @@ _Parameters_
 
 _Returns_
 
--   `string|void`: The path part of the URL.
+-   `string | void`: The path part of the URL.
 
 ### getPathAndQueryString
 
@@ -233,7 +225,7 @@ _Parameters_
 
 _Returns_
 
--   `string|void`: The protocol part of the URL.
+-   `string | void`: The protocol part of the URL.
 
 ### getQueryArg
 
@@ -252,12 +244,11 @@ _Parameters_
 
 _Returns_
 
--   `QueryArgParsed|void`: Query arg value.
+-   `QueryArgParsed | undefined`: Query arg value.
 
 ### getQueryArgs
 
-Returns an object of query arguments of the given URL. If the given URL is
-invalid or has no querystring, an empty object is returned.
+Returns an object of query arguments of the given URL. If the given URL is invalid or has no querystring, an empty object is returned.
 
 _Usage_
 
@@ -292,7 +283,7 @@ _Parameters_
 
 _Returns_
 
--   `string|void`: The query string part of the URL.
+-   `string | void`: The query string part of the URL.
 
 ### hasQueryArg
 
@@ -330,6 +321,24 @@ _Parameters_
 _Returns_
 
 -   `boolean`: Whether or not it looks like an email.
+
+### isPhoneNumber
+
+Determines whether the given string looks like a phone number.
+
+_Usage_
+
+```js
+const isPhoneNumber = isPhoneNumber( '+1 (555) 123-4567' ); // true
+```
+
+_Parameters_
+
+-   _phoneNumber_ `string`: The string to scrutinize.
+
+_Returns_
+
+-   `boolean`: Whether or not it looks like a phone number.
 
 ### isURL
 
@@ -451,9 +460,7 @@ _Returns_
 
 ### normalizePath
 
-Given a path, returns a normalized path where equal query parameter values
-will be treated as identical, regardless of order they appear in the original
-text.
+Given a path, returns a normalized path where equal query parameter values will be treated as identical, regardless of order they appear in the original text.
 
 _Parameters_
 
@@ -481,6 +488,26 @@ _Returns_
 
 -   `string`: The updated URL.
 
+### prependHTTPS
+
+Prepends "https\://" to a url, if it looks like something that is meant to be a TLD.
+
+Note: this will not replace "http\://" with "<https://">.
+
+_Usage_
+
+```js
+const actualURL = prependHTTPS( 'wordpress.org' ); // https://wordpress.org
+```
+
+_Parameters_
+
+-   _url_ `string`: The URL to test.
+
+_Returns_
+
+-   `string`: The updated URL.
+
 ### removeQueryArgs
 
 Removes arguments from the query string of the url
@@ -498,7 +525,7 @@ const newUrl = removeQueryArgs(
 _Parameters_
 
 -   _url_ `string`: URL.
--   _args_ `...string`: Query Args.
+-   _args_ `string[]`: Query Args.
 
 _Returns_
 
@@ -506,8 +533,7 @@ _Returns_
 
 ### safeDecodeURI
 
-Safely decodes a URI with `decodeURI`. Returns the URI unmodified if
-`decodeURI` throws an error.
+Safely decodes a URI with `decodeURI`. Returns the URI unmodified if `decodeURI` throws an error.
 
 _Usage_
 
@@ -525,8 +551,7 @@ _Returns_
 
 ### safeDecodeURIComponent
 
-Safely decodes a URI component with `decodeURIComponent`. Returns the URI component unmodified if
-`decodeURIComponent` throws an error.
+Safely decodes a URI component with `decodeURIComponent`. Returns the URI component unmodified if `decodeURIComponent` throws an error.
 
 _Parameters_
 

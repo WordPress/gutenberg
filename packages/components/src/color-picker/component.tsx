@@ -1,8 +1,9 @@
 /**
  * External dependencies
  */
-import type { ForwardedRef } from 'react';
-import { colord, extend, Colord } from 'colord';
+import type { ClipboardEvent, ForwardedRef } from 'react';
+import type { Colord } from 'colord';
+import { colord, extend, getFormat } from 'colord';
 import namesPlugin from 'colord/plugins/names';
 
 /**
@@ -15,11 +16,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import {
-	useContextSystem,
-	contextConnect,
-	WordPressComponentProps,
-} from '../ui/context';
+import { useContextSystem, contextConnect } from '../context';
 import {
 	ColorfulWrapper,
 	SelectControl,
@@ -32,17 +29,9 @@ import { ColorInput } from './color-input';
 import { Picker } from './picker';
 import { useControlledValue } from '../utils/hooks';
 
-import type { ColorType } from './types';
+import type { ColorPickerProps, ColorType } from './types';
 
 extend( [ namesPlugin ] );
-
-export interface ColorPickerProps {
-	enableAlpha?: boolean;
-	color?: string;
-	onChange?: ( color: string ) => void;
-	defaultValue?: string;
-	copyFormat?: ColorType;
-}
 
 const options = [
 	{ label: 'RGB', value: 'rgb' as const },
@@ -50,8 +39,8 @@ const options = [
 	{ label: 'Hex', value: 'hex' as const },
 ];
 
-const ColorPicker = (
-	props: WordPressComponentProps< ColorPickerProps, 'div', false >,
+const UnconnectedColorPicker = (
+	props: ColorPickerProps,
 	forwardedRef: ForwardedRef< any >
 ) => {
 	const {
@@ -87,8 +76,57 @@ const ColorPicker = (
 		copyFormat || 'hex'
 	);
 
+	/*
+	 * ! Listener intended for the CAPTURE phase
+	 *
+	 * Capture paste events over the entire color picker, looking for clipboard
+	 * data that could be parsed as a color. If not, let the paste event
+	 * propagate normally, so that individual input controls within the
+	 * component have a chance to handle it.
+	 */
+	const maybeHandlePaste = useCallback(
+		( event: ClipboardEvent ) => {
+			const pastedText = event.clipboardData?.getData( 'text' )?.trim();
+			if ( ! pastedText ) {
+				return;
+			}
+
+			const parsedColor = colord( pastedText );
+			if ( ! parsedColor.isValid() ) {
+				return;
+			}
+
+			// Apply all valid colors, even if the format isn't supported in
+			// the UI (e.g. names like "cyan" or, in the future color spaces
+			// like "lch" if we add the right colord plugins)
+			handleChange( parsedColor );
+
+			// This redundancy helps TypeScript and is safer than assertions
+			const supportedFormats: Record< string, ColorType | undefined > = {
+				hex: 'hex',
+				rgb: 'rgb',
+				hsl: 'hsl',
+			};
+
+			const detectedFormat = String( getFormat( pastedText ) );
+			const newColorType = supportedFormats[ detectedFormat ];
+			if ( newColorType ) {
+				setColorType( newColorType );
+			}
+
+			// Stop at capture phase; no bubbling
+			event.stopPropagation();
+			event.preventDefault();
+		},
+		[ handleChange, setColorType ]
+	);
+
 	return (
-		<ColorfulWrapper ref={ forwardedRef } { ...divProps }>
+		<ColorfulWrapper
+			ref={ forwardedRef }
+			{ ...divProps }
+			onPasteCapture={ maybeHandlePaste }
+		>
 			<Picker
 				onChange={ handleChange }
 				color={ safeColordColor }
@@ -97,6 +135,7 @@ const ColorPicker = (
 			<AuxiliaryColorArtefactWrapper>
 				<AuxiliaryColorArtefactHStackHeader justify="space-between">
 					<SelectControl
+						size="compact"
 						options={ options }
 						value={ colorType }
 						onChange={ ( nextColorType ) =>
@@ -104,6 +143,7 @@ const ColorPicker = (
 						}
 						label={ __( 'Color format' ) }
 						hideLabelFromVision
+						variant="minimal"
 					/>
 					<ColorCopyButton
 						color={ safeColordColor }
@@ -123,6 +163,9 @@ const ColorPicker = (
 	);
 };
 
-const ConnectedColorPicker = contextConnect( ColorPicker, 'ColorPicker' );
+export const ColorPicker = contextConnect(
+	UnconnectedColorPicker,
+	'ColorPicker'
+);
 
-export default ConnectedColorPicker;
+export default ColorPicker;

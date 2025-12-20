@@ -7,23 +7,31 @@ export interface Post {
 	id: number;
 	content: string;
 	status: 'publish' | 'future' | 'draft' | 'pending' | 'private';
+	link: string;
 }
 
 export interface CreatePostPayload {
-	content: string;
+	title?: string;
+	content?: string;
 	status: 'publish' | 'future' | 'draft' | 'pending' | 'private';
+	date?: string;
+	date_gmt: string;
 }
 
 /**
  * Delete all posts using REST API.
  *
- * @param {} this RequestUtils.
+ * @param this
+ * @param postType The type of post to delete. Defaults to 'posts'.
  */
-export async function deleteAllPosts( this: RequestUtils ) {
+export async function deleteAllPosts(
+	this: RequestUtils,
+	postType: string = 'posts'
+) {
 	// List all posts.
 	// https://developer.wordpress.org/rest-api/reference/posts/#list-posts
 	const posts = await this.rest< Post[] >( {
-		path: '/wp/v2/posts',
+		path: `/wp/v2/${ postType }`,
 		params: {
 			per_page: 100,
 			// All possible statuses.
@@ -38,7 +46,7 @@ export async function deleteAllPosts( this: RequestUtils ) {
 		posts.map( ( post ) =>
 			this.rest( {
 				method: 'DELETE',
-				path: `/wp/v2/posts/${ post.id }`,
+				path: `/wp/v2/${ postType }/${ post.id }`,
 				params: {
 					force: true,
 				},
@@ -50,8 +58,8 @@ export async function deleteAllPosts( this: RequestUtils ) {
 /**
  * Creates a new post using the REST API.
  *
- * @param {} this    RequestUtils.
- * @param {} payload Post attributes.
+ * @param this
+ * @param payload Post attributes.
  */
 export async function createPost(
 	this: RequestUtils,
@@ -60,7 +68,7 @@ export async function createPost(
 	const post = await this.rest< Post >( {
 		method: 'POST',
 		path: `/wp/v2/posts`,
-		params: { ...payload },
+		data: { ...payload },
 	} );
 
 	return post;

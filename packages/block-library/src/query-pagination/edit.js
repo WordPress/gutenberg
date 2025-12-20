@@ -8,73 +8,116 @@ import {
 	useInnerBlocksProps,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { useSelect } from '@wordpress/data';
-import { getBlockSupport } from '@wordpress/blocks';
-import { PanelBody } from '@wordpress/components';
+import { useDispatch, useSelect } from '@wordpress/data';
+import {
+	__experimentalToolsPanel as ToolsPanel,
+	__experimentalToolsPanelItem as ToolsPanelItem,
+} from '@wordpress/components';
+import { useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import { QueryPaginationArrowControls } from './query-pagination-arrow-controls';
+import { QueryPaginationLabelControl } from './query-pagination-label-control';
+import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
 const TEMPLATE = [
 	[ 'core/query-pagination-previous' ],
 	[ 'core/query-pagination-numbers' ],
 	[ 'core/query-pagination-next' ],
 ];
-const ALLOWED_BLOCKS = [
-	'core/query-pagination-previous',
-	'core/query-pagination-numbers',
-	'core/query-pagination-next',
-];
-
-const getDefaultBlockLayout = ( blockTypeOrName ) => {
-	const layoutBlockSupportConfig = getBlockSupport(
-		blockTypeOrName,
-		'__experimentalLayout'
-	);
-	return layoutBlockSupportConfig?.default;
-};
 
 export default function QueryPaginationEdit( {
-	attributes: { paginationArrow, layout },
+	attributes: { paginationArrow, showLabel },
 	setAttributes,
 	clientId,
-	name,
 } ) {
-	const usedLayout = layout || getDefaultBlockLayout( name );
-	const hasNextPreviousBlocks = useSelect( ( select ) => {
-		const { getBlocks } = select( blockEditorStore );
-		const innerBlocks = getBlocks( clientId );
-		/**
-		 * Show the `paginationArrow` control only if a
-		 * `QueryPaginationNext/Previous` block exists.
-		 */
-		return innerBlocks?.find( ( innerBlock ) => {
-			return [
-				'core/query-pagination-next',
-				'core/query-pagination-previous',
-			].includes( innerBlock.name );
-		} );
-	}, [] );
+	const hasNextPreviousBlocks = useSelect(
+		( select ) => {
+			const { getBlocks } = select( blockEditorStore );
+			const innerBlocks = getBlocks( clientId );
+			/**
+			 * Show the `paginationArrow` and `showLabel` controls only if a
+			 * `QueryPaginationNext/Previous` block exists.
+			 */
+			return innerBlocks?.find( ( innerBlock ) => {
+				return [
+					'core/query-pagination-next',
+					'core/query-pagination-previous',
+				].includes( innerBlock.name );
+			} );
+		},
+		[ clientId ]
+	);
+	const { __unstableMarkNextChangeAsNotPersistent } =
+		useDispatch( blockEditorStore );
+	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 	const blockProps = useBlockProps();
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		template: TEMPLATE,
-		allowedBlocks: ALLOWED_BLOCKS,
-		__experimentalLayout: usedLayout,
 	} );
+
+	// Always show label text if paginationArrow is set to 'none'.
+	useEffect( () => {
+		if ( paginationArrow === 'none' && ! showLabel ) {
+			__unstableMarkNextChangeAsNotPersistent();
+			setAttributes( { showLabel: true } );
+		}
+	}, [
+		paginationArrow,
+		setAttributes,
+		showLabel,
+		__unstableMarkNextChangeAsNotPersistent,
+	] );
+
 	return (
 		<>
 			{ hasNextPreviousBlocks && (
 				<InspectorControls>
-					<PanelBody title={ __( 'Settings' ) }>
-						<QueryPaginationArrowControls
-							value={ paginationArrow }
-							onChange={ ( value ) => {
-								setAttributes( { paginationArrow: value } );
-							} }
-						/>
-					</PanelBody>
+					<ToolsPanel
+						label={ __( 'Settings' ) }
+						resetAll={ () => {
+							setAttributes( {
+								paginationArrow: 'none',
+								showLabel: true,
+							} );
+						} }
+						dropdownMenuProps={ dropdownMenuProps }
+					>
+						<ToolsPanelItem
+							hasValue={ () => paginationArrow !== 'none' }
+							label={ __( 'Pagination arrow' ) }
+							onDeselect={ () =>
+								setAttributes( { paginationArrow: 'none' } )
+							}
+							isShownByDefault
+						>
+							<QueryPaginationArrowControls
+								value={ paginationArrow }
+								onChange={ ( value ) => {
+									setAttributes( { paginationArrow: value } );
+								} }
+							/>
+						</ToolsPanelItem>
+						{ paginationArrow !== 'none' && (
+							<ToolsPanelItem
+								hasValue={ () => ! showLabel }
+								label={ __( 'Show text' ) }
+								onDeselect={ () =>
+									setAttributes( { showLabel: true } )
+								}
+								isShownByDefault
+							>
+								<QueryPaginationLabelControl
+									value={ showLabel }
+									onChange={ ( value ) => {
+										setAttributes( { showLabel: value } );
+									} }
+								/>
+							</ToolsPanelItem>
+						) }
+					</ToolsPanel>
 				</InspectorControls>
 			) }
 			<nav { ...innerBlocksProps } />

@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+const path = require( 'path' );
+
+/**
  * WordPress dependencies
  */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
@@ -12,6 +17,14 @@ test.use( {
 		height: 1024,
 	},
 } );
+
+async function dragTo( page, x, y ) {
+	// Call the move function twice to make sure the `dragOver` event is sent.
+	// @see https://github.com/microsoft/playwright/issues/17153
+	for ( let i = 0; i < 2; i += 1 ) {
+		await page.mouse.move( x, y );
+	}
+}
 
 test.describe( 'Draggable block', () => {
 	test.beforeEach( async ( { admin } ) => {
@@ -37,7 +50,9 @@ test.describe( 'Draggable block', () => {
 <p>2</p>
 <!-- /wp:paragraph -->` );
 
-		await page.focus( 'role=document[name="Paragraph block"i] >> text=2' );
+		await editor.canvas
+			.locator( 'role=document[name="Block: Paragraph"i] >> text=2' )
+			.focus();
 		await editor.showBlockToolbar();
 
 		const dragHandle = page.locator(
@@ -49,18 +64,11 @@ test.describe( 'Draggable block', () => {
 		await page.mouse.down();
 
 		// Move to and hover on the upper half of the paragraph block to trigger the indicator.
-		const firstParagraph = page.locator(
-			'role=document[name="Paragraph block"i] >> text=1'
+		const firstParagraph = editor.canvas.locator(
+			'role=document[name="Block: Paragraph"i] >> text=1'
 		);
 		const firstParagraphBound = await firstParagraph.boundingBox();
-		// Call the move function twice to make sure the `dragOver` event is sent.
-		// @see https://github.com/microsoft/playwright/issues/17153
-		for ( let i = 0; i < 2; i += 1 ) {
-			await page.mouse.move(
-				firstParagraphBound.x,
-				firstParagraphBound.y
-			);
-		}
+		await dragTo( page, firstParagraphBound.x, firstParagraphBound.y );
 
 		await expect(
 			page.locator( 'data-testid=block-draggable-chip >> visible=true' )
@@ -107,7 +115,9 @@ test.describe( 'Draggable block', () => {
 <p>2</p>
 <!-- /wp:paragraph -->` );
 
-		await page.focus( 'role=document[name="Paragraph block"i] >> text=1' );
+		await editor.canvas
+			.locator( 'role=document[name="Block: Paragraph"i] >> text=1' )
+			.focus();
 		await editor.showBlockToolbar();
 
 		const dragHandle = page.locator(
@@ -119,18 +129,15 @@ test.describe( 'Draggable block', () => {
 		await page.mouse.down();
 
 		// Move to and hover on the bottom half of the paragraph block to trigger the indicator.
-		const secondParagraph = page.locator(
-			'role=document[name="Paragraph block"i] >> text=2'
+		const secondParagraph = editor.canvas.locator(
+			'role=document[name="Block: Paragraph"i] >> text=2'
 		);
 		const secondParagraphBound = await secondParagraph.boundingBox();
-		// Call the move function twice to make sure the `dragOver` event is sent.
-		// @see https://github.com/microsoft/playwright/issues/17153
-		for ( let i = 0; i < 2; i += 1 ) {
-			await page.mouse.move(
-				secondParagraphBound.x,
-				secondParagraphBound.y + secondParagraphBound.height * 0.75
-			);
-		}
+		await dragTo(
+			page,
+			secondParagraphBound.x + 32,
+			secondParagraphBound.y + secondParagraphBound.height * 0.75
+		);
 
 		await expect(
 			page.locator( 'data-testid=block-draggable-chip >> visible=true' )
@@ -188,7 +195,9 @@ test.describe( 'Draggable block', () => {
 			],
 		} );
 
-		await page.focus( 'role=document[name="Paragraph block"i] >> text=2' );
+		await editor.canvas
+			.locator( 'role=document[name="Block: Paragraph"i] >> text=2' )
+			.focus();
 		await editor.showBlockToolbar();
 
 		const dragHandle = page.locator(
@@ -200,18 +209,15 @@ test.describe( 'Draggable block', () => {
 		await page.mouse.down();
 
 		// Move to and hover on the left half of the paragraph block to trigger the indicator.
-		const firstParagraph = page.locator(
-			'role=document[name="Paragraph block"i] >> text=1'
+		const firstParagraph = editor.canvas.locator(
+			'role=document[name="Block: Paragraph"i] >> text=1'
 		);
 		const firstParagraphBound = await firstParagraph.boundingBox();
-		// Call the move function twice to make sure the `dragOver` event is sent.
-		// @see https://github.com/microsoft/playwright/issues/17153
-		for ( let i = 0; i < 2; i += 1 ) {
-			await page.mouse.move(
-				firstParagraphBound.x + firstParagraphBound.width * 0.25,
-				firstParagraphBound.y
-			);
-		}
+		await dragTo(
+			page,
+			firstParagraphBound.x + firstParagraphBound.width * 0.25,
+			firstParagraphBound.y
+		);
 
 		await expect(
 			page.locator( 'data-testid=block-draggable-chip >> visible=true' )
@@ -267,7 +273,9 @@ test.describe( 'Draggable block', () => {
 			],
 		} );
 
-		await page.focus( 'role=document[name="Paragraph block"i] >> text=1' );
+		await editor.canvas
+			.locator( 'role=document[name="Block: Paragraph"i] >> text=1' )
+			.focus();
 		await editor.showBlockToolbar();
 
 		const dragHandle = page.locator(
@@ -279,18 +287,15 @@ test.describe( 'Draggable block', () => {
 		await page.mouse.down();
 
 		// Move to and hover on the right half of the paragraph block to trigger the indicator.
-		const secondParagraph = page.locator(
-			'role=document[name="Paragraph block"i] >> text=2'
+		const secondParagraph = editor.canvas.locator(
+			'role=document[name="Block: Paragraph"i] >> text=2'
 		);
 		const secondParagraphBound = await secondParagraph.boundingBox();
-		// Call the move function twice to make sure the `dragOver` event is sent.
-		// @see https://github.com/microsoft/playwright/issues/17153
-		for ( let i = 0; i < 2; i += 1 ) {
-			await page.mouse.move(
-				secondParagraphBound.x + secondParagraphBound.width * 0.75,
-				secondParagraphBound.y
-			);
-		}
+		await dragTo(
+			page,
+			secondParagraphBound.x + secondParagraphBound.width * 0.75,
+			secondParagraphBound.y
+		);
 
 		await expect(
 			page.locator( 'data-testid=block-draggable-chip >> visible=true' )
@@ -322,5 +327,176 @@ test.describe( 'Draggable block', () => {
 <p>1</p>
 <!-- /wp:paragraph --></div>
 <!-- /wp:group -->` );
+	} );
+
+	test( 'can drag and drop to an empty parent block like Group or Columns', async ( {
+		page,
+		editor,
+		pageUtils,
+	} ) => {
+		// Insert a row.
+		await editor.insertBlock( {
+			name: 'core/group',
+			attributes: {
+				layout: { type: 'flex', flexWrap: 'nowrap' },
+			},
+		} );
+		await editor.insertBlock( {
+			name: 'core/columns',
+			innerBlocks: [
+				{
+					name: 'core/column',
+					innerBlocks: [
+						{
+							name: 'core/paragraph',
+							attributes: { content: '1' },
+						},
+					],
+				},
+				{ name: 'core/column' },
+				{
+					name: 'core/column',
+					innerBlocks: [
+						{
+							name: 'core/paragraph',
+							attributes: { content: '3' },
+						},
+					],
+				},
+			],
+		} );
+
+		// Deselect the block to hide the block toolbar.
+		await page.evaluate( () =>
+			window.wp.data.dispatch( 'core/block-editor' ).clearSelectedBlock()
+		);
+
+		const testImageName = '10x10_e2e_test_image_z9T8jK.png';
+		const testImagePath = path.join(
+			__dirname,
+			'../../../assets',
+			testImageName
+		);
+
+		{
+			const { dragOver, drop } =
+				await pageUtils.dragFiles( testImagePath );
+
+			const rowBlock = editor.canvas.getByRole( 'document', {
+				name: 'Block: Row',
+			} );
+			const rowAppender = rowBlock.getByRole( 'button', {
+				name: 'Add block',
+			} );
+
+			await dragOver( rowAppender );
+			// Expect to show the drop indicator blue background.
+			// This is technically an implementation detail but easier to test in this case.
+			await expect(
+				rowAppender,
+				'Dragging over the button block appender should show the blue background'
+			).toHaveCSS( 'background-color', 'rgb(0, 124, 186)' );
+
+			const { width: rowWidth } = await rowBlock.boundingBox();
+			await dragOver( rowBlock, { position: { x: rowWidth - 10 } } );
+			// Expect to show the drop indicator blue background.
+			// This is technically an implementation detail but easier to test in this case.
+			await expect(
+				rowAppender,
+				'Dragging over the empty group block but outside the appender should still show the blue background'
+			).toHaveCSS( 'background-color', 'rgb(0, 124, 186)' );
+
+			await drop();
+			await expect( rowAppender ).toBeHidden();
+			await expect.poll( editor.getBlocks ).toMatchObject( [
+				{
+					name: 'core/group',
+					innerBlocks: [ { name: 'core/image' } ],
+				},
+				{ name: 'core/columns' },
+			] );
+		}
+
+		{
+			const { dragOver, drop } =
+				await pageUtils.dragFiles( testImagePath );
+
+			const columnAppender = editor.canvas
+				.getByRole( 'document', {
+					name: 'Block: Column',
+				} )
+				.getByRole( 'button', {
+					name: 'Add block',
+					includeHidden: true,
+				} );
+
+			await dragOver( columnAppender );
+			// Expect to show the drop indicator blue background.
+			// This is technically an implementation detail but easier to test in this case.
+			await expect( columnAppender ).toHaveCSS(
+				'background-color',
+				'rgb(0, 124, 186)'
+			);
+
+			await drop();
+			await expect( columnAppender ).toBeHidden();
+			await expect.poll( editor.getBlocks ).toMatchObject( [
+				{ name: 'core/group' },
+				{
+					name: 'core/columns',
+					innerBlocks: [
+						{ name: 'core/column' },
+						{
+							name: 'core/column',
+							innerBlocks: [ { name: 'core/image' } ],
+						},
+						{ name: 'core/column' },
+					],
+				},
+			] );
+		}
+	} );
+
+	test( 'can directly drag an image', async ( { page, editor } ) => {
+		await editor.insertBlock( { name: 'core/image' } );
+		await editor.insertBlock( {
+			name: 'core/group',
+			attributes: { layout: { type: 'constrained' } },
+			innerBlocks: [ { name: 'core/paragraph' } ],
+		} );
+
+		const imageBlock = editor.canvas.getByRole( 'document', {
+			name: 'Block: Image',
+		} );
+
+		const groupBlock = editor.canvas.getByRole( 'document', {
+			name: 'Block: Group',
+		} );
+
+		await imageBlock.hover();
+		await page.mouse.down();
+		const groupBlockBox = await groupBlock.boundingBox();
+		await dragTo(
+			page,
+			groupBlockBox.x + groupBlockBox.width * 0.5,
+			groupBlockBox.y + groupBlockBox.height * 0.5
+		);
+		await page.mouse.up();
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/group',
+				attributes: {
+					tagName: 'div',
+					layout: { type: 'constrained' },
+				},
+				innerBlocks: [
+					{
+						name: 'core/image',
+						attributes: { alt: '', caption: '' },
+					},
+				],
+			},
+		] );
 	} );
 } );

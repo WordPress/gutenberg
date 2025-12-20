@@ -5,6 +5,11 @@ import { createBlock, parse } from '@wordpress/blocks';
 import { applyFilters } from '@wordpress/hooks';
 
 /**
+ * Internal dependencies
+ */
+import { buildNavigationLinkEntityBinding } from '../navigation-link/shared/use-entity-binding';
+
+/**
  * Convert a flat menu item structure to a nested blocks structure.
  *
  * @param {Object[]} menuItems An array of menu items.
@@ -97,8 +102,6 @@ function mapMenuItemsToBlocks( menuItems, level = 0 ) {
  * For more documentation on the individual fields present on a menu item please see:
  * https://core.trac.wordpress.org/browser/tags/5.7.1/src/wp-includes/nav-menu.php#L789
  *
- * Changes made here should also be mirrored in packages/edit-navigation/src/store/utils.js.
- *
  * @typedef WPNavMenuItem
  *
  * @property {Object} title       stores the raw and rendered versions of the title/label for this menu item.
@@ -147,12 +150,14 @@ function menuItemToBlockAttributes(
 		object = 'tag';
 	}
 
+	const inferredKind = menuItemTypeField?.replace( '_', '-' ) || 'custom';
+
 	return {
 		label: menuItemTitleField?.rendered || '',
 		...( object?.length && {
 			type: object,
 		} ),
-		kind: menuItemTypeField?.replace( '_', '-' ) || 'custom',
+		kind: inferredKind,
 		url: url || '',
 		...( xfn?.length &&
 			xfn.join( ' ' ).trim() && {
@@ -167,8 +172,11 @@ function menuItemToBlockAttributes(
 			title: attr_title,
 		} ),
 		...( object_id &&
-			'custom' !== object && {
+			( inferredKind === 'post-type' || inferredKind === 'taxonomy' ) && {
 				id: object_id,
+				metadata: {
+					bindings: buildNavigationLinkEntityBinding( inferredKind ),
+				},
 			} ),
 		/* eslint-enable camelcase */
 		...( description?.length && {

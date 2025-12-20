@@ -72,11 +72,12 @@ Value of Frame content default mode like 'browse', 'upload' etc.
 -   Required: No
 -   Default: false
 -   Platform: Web
+
 ### multiple
 
-Whether to allow multiple selections or not.
+Whether to allow multiple selection of files or not. This property will also accept a string with the value `add` to allow multiple selection of files without the need to use the `Shift` or `Ctrl`/`Cmd` keys.
 
--   Type: `Boolean`
+-   Type: `Boolean|String`
 -   Required: No
 -   Default: false
 -   Platform: Web
@@ -103,6 +104,8 @@ This is called both when media is selected and when the user closes the modal wi
 Callback called when the media modal is closed after media is selected.
 
 This is called subsequent to `onClose` when media is selected. The selected media are passed as an argument.
+
+The `image.sizes.full` resolution does always exist. Other defined sizes are only available when the image is larger and thus could be scaled down.
 
 -   Type: `Function`
 -   Required: Yes

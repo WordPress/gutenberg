@@ -1,0 +1,279 @@
+/**
+ * WordPress dependencies
+ */
+import { createSelector, createRegistrySelector } from '@wordpress/data';
+import deprecated from '@wordpress/deprecated';
+
+/**
+ * Internal dependencies
+ */
+import { getBlockType } from './selectors';
+import { getValueFromObjectPath } from './utils';
+import { __EXPERIMENTAL_STYLE_PROPERTY as STYLE_PROPERTY } from '../api/constants';
+
+const ROOT_BLOCK_SUPPORTS = [
+	'background',
+	'backgroundColor',
+	'color',
+	'linkColor',
+	'captionColor',
+	'buttonColor',
+	'headingColor',
+	'fontFamily',
+	'fontSize',
+	'fontStyle',
+	'fontWeight',
+	'lineHeight',
+	'padding',
+	'contentSize',
+	'wideSize',
+	'blockGap',
+	'textAlign',
+	'textDecoration',
+	'textTransform',
+	'letterSpacing',
+];
+
+/**
+ * Filters the list of supported styles for a given element.
+ *
+ * @param {string[]}         blockSupports list of supported styles.
+ * @param {string|undefined} name          block name.
+ * @param {string|undefined} element       element name.
+ *
+ * @return {string[]} filtered list of supported styles.
+ */
+function filterElementBlockSupports( blockSupports, name, element ) {
+	return blockSupports.filter( ( support ) => {
+		if ( support === 'fontSize' && element === 'heading' ) {
+			return false;
+		}
+
+		// This is only available for links
+		if ( support === 'textDecoration' && ! name && element !== 'link' ) {
+			return false;
+		}
+
+		// This is only available for heading, button, caption and text
+		if (
+			support === 'textTransform' &&
+			! name &&
+			! (
+				[ 'heading', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6' ].includes(
+					element
+				) ||
+				element === 'button' ||
+				element === 'caption' ||
+				element === 'text'
+			)
+		) {
+			return false;
+		}
+
+		// This is only available for heading, button, caption and text
+		if (
+			support === 'letterSpacing' &&
+			! name &&
+			! (
+				[ 'heading', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6' ].includes(
+					element
+				) ||
+				element === 'button' ||
+				element === 'caption' ||
+				element === 'text'
+			)
+		) {
+			return false;
+		}
+
+		// Text columns is only available for blocks.
+		if ( support === 'textColumns' && ! name ) {
+			return false;
+		}
+
+		return true;
+	} );
+}
+
+/**
+ * Returns the list of supported styles for a given block name and element.
+ */
+export const getSupportedStyles = createSelector(
+	( state, name, element ) => {
+		if ( ! name ) {
+			return filterElementBlockSupports(
+				ROOT_BLOCK_SUPPORTS,
+				name,
+				element
+			);
+		}
+
+		const blockType = getBlockType( state, name );
+
+		if ( ! blockType ) {
+			return [];
+		}
+
+		const supportKeys = [];
+
+		// Check for blockGap support.
+		// Block spacing support doesn't map directly to a single style property, so needs to be handled separately.
+		if ( blockType?.supports?.spacing?.blockGap ) {
+			supportKeys.push( 'blockGap' );
+		}
+
+		// check for shadow support
+		if ( blockType?.supports?.shadow ) {
+			supportKeys.push( 'shadow' );
+		}
+
+		Object.keys( STYLE_PROPERTY ).forEach( ( styleName ) => {
+			if ( ! STYLE_PROPERTY[ styleName ].support ) {
+				return;
+			}
+
+			// Opting out means that, for certain support keys like background color,
+			// blocks have to explicitly set the support value false. If the key is
+			// unset, we still enable it.
+			if ( STYLE_PROPERTY[ styleName ].requiresOptOut ) {
+				if (
+					STYLE_PROPERTY[ styleName ].support[ 0 ] in
+						blockType.supports &&
+					getValueFromObjectPath(
+						blockType.supports,
+						STYLE_PROPERTY[ styleName ].support
+					) !== false
+				) {
+					supportKeys.push( styleName );
+					return;
+				}
+			}
+
+			if (
+				getValueFromObjectPath(
+					blockType.supports,
+					STYLE_PROPERTY[ styleName ].support,
+					false
+				)
+			) {
+				supportKeys.push( styleName );
+			}
+		} );
+
+		return filterElementBlockSupports( supportKeys, name, element );
+	},
+	( state, name ) => [ state.blockTypes[ name ] ]
+);
+
+/**
+ * Returns the bootstrapped block type metadata for a give block name.
+ *
+ * @param {Object} state Data state.
+ * @param {string} name  Block name.
+ *
+ * @return {Object} Bootstrapped block type metadata for a block.
+ */
+export function getBootstrappedBlockType( state, name ) {
+	return state.bootstrappedBlockTypes[ name ];
+}
+
+/**
+ * Returns all the unprocessed (before applying the `registerBlockType` filter)
+ * block type settings as passed during block registration.
+ *
+ * @param {Object} state Data state.
+ *
+ * @return {Array} Unprocessed block type settings for all blocks.
+ */
+export function getUnprocessedBlockTypes( state ) {
+	return state.unprocessedBlockTypes;
+}
+
+/**
+ * Returns all the block bindings sources registered.
+ *
+ * @param {Object} state Data state.
+ *
+ * @return {Object} All the registered sources and their properties.
+ */
+export function getAllBlockBindingsSources( state ) {
+	return state.blockBindingsSources;
+}
+
+/**
+ * Returns a specific block bindings source.
+ *
+ * @param {Object} state      Data state.
+ * @param {string} sourceName Name of the source to get.
+ *
+ * @return {Object} The specific block binding source and its properties.
+ */
+export function getBlockBindingsSource( state, sourceName ) {
+	return state.blockBindingsSources[ sourceName ];
+}
+
+/**
+ * Compute the fields list for a specific block bindings source.
+ *
+ * @param {Object} state        Data state.
+ * @param {Object} source       Block bindings source.
+ * @param {Object} blockContext Block context.
+ *
+ * @return {Array} List of fields for the specific source.
+ */
+export const getBlockBindingsSourceFieldsList = createRegistrySelector(
+	( select ) =>
+		createSelector(
+			( state, source, blockContext ) => {
+				if ( ! source.getFieldsList ) {
+					return [];
+				}
+
+				const context = {};
+				if ( source?.usesContext?.length ) {
+					for ( const key of source.usesContext ) {
+						context[ key ] = blockContext[ key ];
+					}
+				}
+				return source.getFieldsList( { select, context } );
+			},
+			( state, source, blockContext ) => [
+				source.getFieldsList,
+				source.usesContext,
+				blockContext,
+			]
+		)
+);
+
+/**
+ * Determines if any of the block type's attributes have
+ * the content role attribute.
+ *
+ * @param {Object} state         Data state.
+ * @param {string} blockTypeName Block type name.
+ * @return {boolean} Whether block type has content role attribute.
+ */
+export const hasContentRoleAttribute = ( state, blockTypeName ) => {
+	const blockType = getBlockType( state, blockTypeName );
+	if ( ! blockType ) {
+		return false;
+	}
+
+	return Object.values( blockType.attributes ).some(
+		( { role, __experimentalRole } ) => {
+			if ( role === 'content' ) {
+				return true;
+			}
+			if ( __experimentalRole === 'content' ) {
+				deprecated( '__experimentalRole attribute', {
+					since: '6.7',
+					version: '6.8',
+					alternative: 'role attribute',
+					hint: `Check the block.json of the ${ blockTypeName } block.`,
+				} );
+				return true;
+			}
+			return false;
+		}
+	);
+};

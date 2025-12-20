@@ -51,7 +51,7 @@ const IntroToBlocks = () => {
 					) }
 				/>
 				<HelpDetailImage
-					accessible={ true }
+					accessible
 					accessibilityLabel={ __(
 						'Text formatting controls are located within the toolbar positioned above the keyboard while editing a text block'
 					) }
@@ -71,7 +71,7 @@ const IntroToBlocks = () => {
 				<HelpDetailSectionHeadingText text={ __( 'Build layouts' ) } />
 				<HelpDetailBodyText
 					text={ __(
-						'Arrange your content into columns, add Call to Action buttons, and overlay images with text.'
+						'Arrange your content into columns, add Call to action buttons, and overlay images with text.'
 					) }
 				/>
 				<HelpDetailImage

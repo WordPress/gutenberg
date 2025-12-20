@@ -34,7 +34,7 @@ exports[`formatTestErrorMessage should format test error message for jest-circus
     expect(jest.fn()).not.toHaveErrored(expected)
 
     Expected mock function not to be called but it was called with:
-    [\\"TypeError: Cannot read properties of null (reading 'frameElement')
+    ["TypeError: Cannot read properties of null (reading 'frameElement')
 
       at Vo (../../http:/localhost:8889/wp-content/plugins/gutenberg/build/block-editor/index.min.js?ver=dfd3a79ce1dc54c31b6ed591bcb0d55a:3:21925)
       at ft (../../http:/localhost:8889/wp-content/plugins/gutenberg/build/vendors/react-dom.min.js?ver=6.1-alpha-53362:1:43451)
@@ -45,7 +45,7 @@ exports[`formatTestErrorMessage should format test error message for jest-circus
       at Rr (../../http:/localhost:8889/wp-content/plugins/gutenberg/build/vendors/react-dom.min.js?ver=6.1-alpha-53362:1:77549)
       at Nr (../../http:/localhost:8889/wp-content/plugins/gutenberg/build/vendors/react-dom.min.js?ver=6.1-alpha-53362:1:74544)
       at ../../http:/localhost:8889/wp-content/plugins/gutenberg/build/vendors/react-dom.min.js?ver=6.1-alpha-53362:1:30170
-      at unstable_runWithPriority (../../http:/localhost:8889/wp-content/plugins/gutenberg/build/vendors/react.min.js?ver=6.1-alpha-53362:1:7430)\\"]
+      at unstable_runWithPriority (../../http:/localhost:8889/wp-content/plugins/gutenberg/build/vendors/react.min.js?ver=6.1-alpha-53362:1:7430)"]
           at runMicrotasks (<anonymous>)
 
   ● Template Part › Template part block › Template part placeholder › Should insert new template part on creation
@@ -53,7 +53,7 @@ exports[`formatTestErrorMessage should format test error message for jest-circus
     expect(jest.fn()).not.toHaveErrored(expected)
 
     Expected mock function not to be called but it was called with:
-    [\\"TypeError: Cannot read properties of null (reading 'frameElement')
+    ["TypeError: Cannot read properties of null (reading 'frameElement')
 
       at Vo (../../http:/localhost:8889/wp-content/plugins/gutenberg/build/block-editor/index.min.js?ver=dfd3a79ce1dc54c31b6ed591bcb0d55a:3:21925)
       at ft (../../http:/localhost:8889/wp-content/plugins/gutenberg/build/vendors/react-dom.min.js?ver=6.1-alpha-53362:1:43451)
@@ -64,13 +64,13 @@ exports[`formatTestErrorMessage should format test error message for jest-circus
       at Rr (../../http:/localhost:8889/wp-content/plugins/gutenberg/build/vendors/react-dom.min.js?ver=6.1-alpha-53362:1:77549)
       at Nr (../../http:/localhost:8889/wp-content/plugins/gutenberg/build/vendors/react-dom.min.js?ver=6.1-alpha-53362:1:74544)
       at ../../http:/localhost:8889/wp-content/plugins/gutenberg/build/vendors/react-dom.min.js?ver=6.1-alpha-53362:1:30170
-      at unstable_runWithPriority (../../http:/localhost:8889/wp-content/plugins/gutenberg/build/vendors/react.min.js?ver=6.1-alpha-53362:1:7430)\\"]
+      at unstable_runWithPriority (../../http:/localhost:8889/wp-content/plugins/gutenberg/build/vendors/react.min.js?ver=6.1-alpha-53362:1:7430)"]
           at runMicrotasks (<anonymous>)
 "
 `;
 
 exports[`parseIssueBody should parse issue body 1`] = `
-"<!-- __META_DATA__:{\\"failedTimes\\":5,\\"totalCommits\\":95} -->
+"<!-- __META_DATA__:{"failedTimes":5,"totalCommits":95} -->
 **Flaky test detected. This is an auto-generated issue by GitHub Actions. Please do NOT edit this manually.**
 
 ## Test title
@@ -81,10 +81,10 @@ Test title
 
 ## Errors
 <!-- __TEST_RESULTS_LIST__ -->
-<!-- __TEST_RESULT__ --><time datetime=\\"2020-08-01T00:00:00.000Z\\"><code>[2020-08-01T00:00:00.000Z]</code></time> Test passed after 1 failed attempt on <a href=\\"https://github.com/WordPress/gutenberg/actions/runs/2282393879\\"><code>trunk</code></a>.<!-- /__TEST_RESULT__ -->
+<!-- __TEST_RESULT__ --><time datetime="2020-08-01T00:00:00.000Z"><code>[2020-08-01T00:00:00.000Z]</code></time> Test passed after 1 failed attempt on <a href="https://github.com/WordPress/gutenberg/actions/runs/2282393879"><code>trunk</code></a>.<!-- /__TEST_RESULT__ -->
 <!-- __TEST_RESULT__ --><details>
 <summary>
-	<time datetime=\\"2020-05-10T00:00:00.000Z\\"><code>[2020-05-10T00:00:00.000Z]</code></time> Test passed after 2 failed attempts on <a href=\\"https://github.com/WordPress/gutenberg/actions/runs/2297863316\\"><code>try/some-branch</code></a>.
+	<time datetime="2020-05-10T00:00:00.000Z"><code>[2020-05-10T00:00:00.000Z]</code></time> Test passed after 2 failed attempts on <a href="https://github.com/WordPress/gutenberg/actions/runs/2297863316"><code>try/some-branch</code></a>.
 </summary>
 
 \`\`\`

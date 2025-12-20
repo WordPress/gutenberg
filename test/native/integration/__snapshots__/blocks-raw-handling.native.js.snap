@@ -1,0 +1,212 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+/*
+exports[`Blocks raw handling pasteHandler apple 1`] = `"<strong>This is a </strong>title<br><br><br><strong>This is a <em>heading</em></strong><br><br><br>This is a <strong>paragraph</strong> with a <a href="https://w.org">link</a>.<br><br><br>A<br>Bulleted<br>Indented<br>List<br><br><br>One<br>Two<br>Three<br><br><br>One<br>Two<br>Three<br>1<br>2<br>3<br>I<br>II<br>III<br><br><br>An image:<br>"`;
+
+exports[`Blocks raw handling pasteHandler classic 1`] = `"First paragraph<br><br>Second paragraph<br>Third paragraph<br>Fourth paragraph<br>Fifth paragraph<br>Sixth paragraph"`;
+
+exports[`Blocks raw handling pasteHandler evernote 1`] = `"This is a <em>paragraph</em>.<br><br><br>This is a <a href="https://w.org">link</a>.<br><br><br>An<br>Unordered<br>Indented<br>List<br><br><br>One<br>Two<br>Indented<br>Three<br><br><br><br><br><br><br>One<br>Two<br>Three<br>Four<br>Five<br>Six<br><img src="data:image/jpeg;base64,###">"`;
+
+exports[`Blocks raw handling pasteHandler google-docs 1`] = `"This is a <strong>title</strong><br><br>This is a <em>heading</em><br><br>Formatting test: <strong>bold</strong>, <em>italic</em>, <a href="https://w.org/">link</a>, <s>strikethrough</s>, <sup>superscript</sup>, <sub>subscript</sub>, <strong><em>nested</em></strong>.<br><br>A<br>Bulleted<br>Indented<br>List<br><br>One<br>Two<br>Three<br><br><br><br><br>One<br>Two<br>Three<br>1<br>2<br>3<br>I<br>II<br>III<br><br><br><br><br><br>An image:<br><br><img src="https://lh4.googleusercontent.com/ID" width="544" height="184"><br>"`;
+
+exports[`Blocks raw handling pasteHandler google-docs-list-only 1`] = `"My first list item<br>A sub list item<br>A second sub list item<br>My second list item<br>My third list item"`;
+
+exports[`Blocks raw handling pasteHandler google-docs-table 1`] = `"<br><br><br><br>One<br>Two<br>Three<br>1<br>2<br>3<br>I<br>II<br>III"`;
+
+exports[`Blocks raw handling pasteHandler google-docs-table-with-colspan 1`] = `"<br><br>Test colspan<br><br>"`;
+
+exports[`Blocks raw handling pasteHandler google-docs-table-with-comments 1`] = `"<br><br><br><br>One<br>Two<br>Three<br>1<br>2<br>3<br>I<br>II<br>III"`;
+
+exports[`Blocks raw handling pasteHandler google-docs-table-with-rowspan 1`] = `"<br><br>Test rowspan<br><br>"`;
+
+exports[`Blocks raw handling pasteHandler google-docs-with-comments 1`] = `"This is a <strong>title</strong><br><br>This is a <em>heading</em><br><br>Formatting test: <strong>bold</strong>, <em>italic</em>, <a href="https://w.org/">link</a>, <s>strikethrough</s>, <sup>superscript</sup>, <sub>subscript</sub>, <strong><em>nested</em></strong>.<br><br>A<br>Bulleted<br>Indented<br>List<br><br>One<br>Two<br>Three<br><br><br><br><br>One<br>Two<br>Three<br>1<br>2<br>3<br>I<br>II<br>III<br><br><br><br><br><br>An image:<br><br><img src="https://lh4.googleusercontent.com/ID" width="544" height="184"><br><br>"`;
+*/
+
+exports[`Blocks raw handling pasteHandler gutenberg 1`] = `"Test"`;
+
+exports[`Blocks raw handling pasteHandler iframe-embed 1`] = `""`;
+
+/*
+exports[`Blocks raw handling pasteHandler markdown 1`] = `"This is a heading with <em>italic</em><br>This is a paragraph with a <a href="https://w.org/">link</a>, <strong>bold</strong>, and <del>strikethrough</del>.<br>Preserve<br>line breaks please.<br>Lists<br>A<br>Bulleted Indented<br>List<br>One<br>Two<br>Three<br>Table<br>First Header<br>Second Header<br>Content from cell 1<br>Content from cell 2<br>Content in the first column<br>Content in the second column<br><br><br><br>Table with empty cells.<br>Quote<br>First<br>Second<br>Code<br>Inline <code>code</code> tags should work.<br><code>This is a code block.</code>"`;
+
+exports[`Blocks raw handling pasteHandler ms-word 1`] = `"This is a title<br>&nbsp;<br>This is a subtitle<br>&nbsp;<br>This is a heading level 1<br>&nbsp;<br>This is a heading level 2<br>&nbsp;<br>This is a <strong>paragraph</strong> with a <a href="https://w.org/">link</a>.<br>&nbsp;<br>A<br>Bulleted<br>Indented<br>List<br>&nbsp;<br>One<br>Two<br>Three<br>&nbsp;<br>One<br>Two<br>Three<br>1<br>2<br>3<br>I<br>II<br>III<br>&nbsp;<br>An image:<br>&nbsp;<br><img width="451" height="338" src="file:LOW-RES.png"><br><a href="#anchor">This is an anchor link</a> that leads to the next paragraph.<br><a id="anchor">This is the paragraph with the anchor.</a><br><a href="#nowhere">This is an anchor link</a> that leads nowhere.<br><a>This is a paragraph with an anchor with no link pointing to it.</a><br>This is a reference to a footnote<a href="#_ftn1" id="_ftnref1">[1]</a>.<br>This is a reference to an endnote<a href="#_edn1" id="_ednref1">[i]</a>.<br><br><br><a href="#_ftnref1" id="_ftn1">[1]</a> This is a footnote.<br><br><br><a href="#_ednref1" id="_edn1">[i]</a> This is an endnote."`;
+
+exports[`Blocks raw handling pasteHandler ms-word-list 1`] = `"<a>This is a headline?</a><br>This is a text:<br>One<br>Two<br>Three<br><a>Lorem Ipsum.</a><br>&nbsp;"`;
+
+exports[`Blocks raw handling pasteHandler ms-word-online 1`] = `"This is a <em>heading</em>&nbsp;<br>This is a <strong>paragraph </strong>with a <a href="https://w.org/" target="_blank" rel="noreferrer noopener">link</a>.&nbsp;<br>A&nbsp;<br>Bulleted&nbsp;<br>Indented&nbsp;<br>List&nbsp;<br>&nbsp;<br>One&nbsp;<br>Two&nbsp;<br>Three&nbsp;<br><br>One&nbsp;<br>Two&nbsp;<br>Three&nbsp;<br>1&nbsp;<br>2&nbsp;<br>3&nbsp;<br>I&nbsp;<br>II&nbsp;<br>III&nbsp;<br>&nbsp;<br>An image:&nbsp;<br><img src="data:image/jpeg;base64,###">&nbsp;"`;
+
+exports[`Blocks raw handling pasteHandler ms-word-styled 1`] = `"<br><strong>Lorem ipsum dolor sit amet, consectetur adipiscing elit&nbsp;</strong><br><br><br>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque aliquet hendrerit auctor. Nam lobortis, est vel lacinia tincidunt, purus tellus vehicula ex, nec pharetra justo dui sed lorem. Nam congue laoreet massa, quis varius est tincidunt ut."`;
+
+exports[`Blocks raw handling pasteHandler nested-divs 1`] = `"First paragraph<br><br>Second paragraph<br>Third paragraph<br>Fourth paragraph<br>Fifth paragraph<br>Sixth paragraph"`;
+
+exports[`Blocks raw handling pasteHandler one-image 1`] = `"<img src="http://localhost/wp-content/uploads/2018/01/Dec-08-2017-15-12-24-17-300x137.gif" alt="" width="300" height="137">"`;
+
+exports[`Blocks raw handling pasteHandler plain 1`] = `"test<br>test<br><br>test"`;
+
+exports[`Blocks raw handling pasteHandler shortcode-matching 1`] = `"[gallery ids="40,41,42"]<br>[gallery ids="1000"]<br>[gallery ids="42"]"`;
+*/
+
+exports[`Blocks raw handling pasteHandler should remove extra blank lines 1`] = `
+"<!-- wp:paragraph -->
+<p>1</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>2</p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`Blocks raw handling pasteHandler should strip HTML formatting space from inline text 1`] = `"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent a elit eget tortor molestie egestas. Donec pretium urna vitae mattis imperdiet. Praesent et lorem iaculis, volutpat odio vitae, ornare lacus. Donec ut felis tristique, pharetra erat id, viverra justo. Integer sit amet elementum arcu, eget pharetra felis. In malesuada enim est, sed placerat nulla feugiat at. Vestibulum feugiat vitae elit sit amet tincidunt. Pellentesque finibus sed dolor non facilisis. Curabitur accumsan ante ac hendrerit vestibulum."`;
+
+exports[`Blocks raw handling pasteHandler should strip some text-level elements 1`] = `
+"<!-- wp:paragraph -->
+<p>This is ncorect</p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`Blocks raw handling pasteHandler should strip windows data 1`] = `
+"<!-- wp:heading -->
+<h2 class="wp-block-heading">Heading Win</h2>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>Paragraph Win</p>
+<!-- /wp:paragraph -->"
+`;
+
+/*
+exports[`Blocks raw handling pasteHandler slack-paragraphs 1`] = `"test with&nbsp;<a target="_blank" href="http://w.org/" rel="noreferrer noopener">link</a><br>a new line<br><br>a new paragraph<br>another new line<br><br>another paragraph"`;
+
+exports[`Blocks raw handling pasteHandler slack-quote 1`] = `"Test with&nbsp;<a target="_blank" href="http://w.org/" rel="noreferrer noopener">link</a>."`;
+
+exports[`Blocks raw handling pasteHandler two-images 1`] = `"<img src="http://localhost/wp-content/uploads/2018/01/Dec-08-2017-15-12-24-17-300x137.gif" alt="" width="300" height="137"> <img src="http://localhost/wp-content/uploads/2018/01/Dec-05-2017-17-52-09-9-300x248.gif" alt="" width="300" height="248">"`;
+
+exports[`Blocks raw handling pasteHandler wordpress 1`] = `"Howdy<br>This is a paragraph.<br>More tag<br><br>Shortcode<br>[gallery ids="1"]<br><img src="block.png" alt=""><br><img src="aligned.png" alt=""> test<br><img src="not-aligned.png" alt=""> test"`;
+*/
+
+exports[`Blocks raw handling should correctly handle quotes with mixed content 1`] = `
+"<!-- wp:quote -->
+<blockquote class="wp-block-quote"><!-- wp:heading {"level":1,"className":"wp-block-heading"} -->
+<h1 class="wp-block-heading">chicken</h1>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>ribs</p>
+<!-- /wp:paragraph --></blockquote>
+<!-- /wp:quote -->"
+`;
+
+exports[`rawHandler should convert HTML post to blocks with minimal content changes 1`] = `
+"<!-- wp:heading -->
+<h2 class="wp-block-heading">Howdy</h2>
+<!-- /wp:heading -->
+
+<!-- wp:image -->
+<figure class="wp-block-image"><img src="https://w.org" alt=""/></figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>This is a paragraph.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Preserve <span style="color:red">me</span>!</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading {"level":3} -->
+<h3 class="wp-block-heading">More tag</h3>
+<!-- /wp:heading -->
+
+<!-- wp:more -->
+<!--more-->
+<!-- /wp:more -->
+
+<!-- wp:heading {"level":3} -->
+<h3 class="wp-block-heading">Shortcode</h3>
+<!-- /wp:heading -->
+
+<!-- wp:gallery {"columns":3,"linkTo":"none"} -->
+<figure class="wp-block-gallery has-nested-images columns-3 is-cropped"><!-- wp:image {"id":1} -->
+<figure class="wp-block-image"><img alt="" class="wp-image-1"/></figure>
+<!-- /wp:image --></figure>
+<!-- /wp:gallery -->
+
+<!-- wp:html -->
+<dl>
+	<dt>Term</dt>
+	<dd>
+		Description.
+	</dd>
+</dl>
+<!-- /wp:html -->
+
+<!-- wp:list {"ordered":true} -->
+<ol><!-- wp:list-item -->
+<li>Item</li>
+<!-- /wp:list-item --></ol>
+<!-- /wp:list -->
+
+<!-- wp:quote -->
+<blockquote class="wp-block-quote"><!-- wp:paragraph -->
+<p>Text.</p>
+<!-- /wp:paragraph --></blockquote>
+<!-- /wp:quote -->
+
+<!-- wp:quote -->
+<blockquote class="wp-block-quote"><!-- wp:heading {"level":1} -->
+<h1 class="wp-block-heading">Heading</h1>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>Text.</p>
+<!-- /wp:paragraph --></blockquote>
+<!-- /wp:quote -->"
+`;
+
+exports[`rawHandler should convert a caption shortcode 1`] = `
+"<!-- wp:image {"id":122,"align":"none","className":"size-medium wp-image-122"} -->
+<figure class="wp-block-image alignnone size-medium wp-image-122"><img src="image.png" alt="" class="wp-image-122"/><figcaption class="wp-element-caption">test</figcaption></figure>
+<!-- /wp:image -->"
+`;
+
+exports[`rawHandler should convert a caption shortcode with caption 1`] = `
+"<!-- wp:image {"id":122,"align":"none","className":"size-medium wp-image-122"} -->
+<figure class="wp-block-image alignnone size-medium wp-image-122"><img src="image.png" alt="" class="wp-image-122"/><figcaption class="wp-element-caption"><a href="https://w.org">test</a></figcaption></figure>
+<!-- /wp:image -->"
+`;
+
+exports[`rawHandler should convert a caption shortcode with link 1`] = `
+"<!-- wp:image {"id":754,"align":"none"} -->
+<figure class="wp-block-image alignnone"><a href="http://build.wordpress-develop.test/wp-content/uploads/2011/07/100_5478.jpg"><img src="http://build.wordpress-develop.test/wp-content/uploads/2011/07/100_5478.jpg?w=604" alt="Bell on Wharf" class="wp-image-754"/></a><figcaption class="wp-element-caption">Bell on wharf in San Francisco</figcaption></figure>
+<!-- /wp:image -->"
+`;
+
+exports[`rawHandler should convert a list with attributes 1`] = `
+"<!-- wp:list {"ordered":true,"type":"lower-roman","start":2,"reversed":true} -->
+<ol reversed start="2" style="list-style-type:lower-roman"><!-- wp:list-item -->
+<li>1<!-- wp:list {"ordered":true,"type":"lower-roman","start":2,"reversed":true} -->
+<ol reversed start="2" style="list-style-type:lower-roman"><!-- wp:list-item -->
+<li>1</li>
+<!-- /wp:list-item --></ol>
+<!-- /wp:list --></li>
+<!-- /wp:list-item --></ol>
+<!-- /wp:list -->"
+`;
+
+exports[`rawHandler should convert to unsupported HTML block when no transformation is available 1`] = `
+"<!-- wp:html -->
+<div><p>Hello world!</p></div>
+<!-- /wp:html -->"
+`;
+
+exports[`rawHandler should not strip any text-level elements 1`] = `
+"<!-- wp:paragraph -->
+<p>This is <u>ncorect</u></p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`rawHandler should preserve alignment 1`] = `
+"<!-- wp:paragraph {"align":"center"} -->
+<p class="has-text-align-center">center</p>
+<!-- /wp:paragraph -->"
+`;

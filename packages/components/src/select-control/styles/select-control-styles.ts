@@ -7,61 +7,79 @@ import styled from '@emotion/styled';
 /**
  * Internal dependencies
  */
-import { COLORS, rtl } from '../../utils';
-import { space } from '../../ui/utils/space';
+import { COLORS, rtl, CONFIG } from '../../utils';
+import { space } from '../../utils/space';
 import type { SelectControlProps } from '../types';
 import InputControlSuffixWrapper from '../../input-control/input-suffix-wrapper';
+import { fontSizeStyles } from '../../input-control/styles/input-control-styles';
+import InputBase from '../../input-control/input-base';
 
 interface SelectProps
-	extends Pick< SelectControlProps, '__next36pxDefaultSize' | 'disabled' > {
+	extends Pick<
+		SelectControlProps,
+		'__next40pxDefaultSize' | 'disabled' | 'multiple' | 'variant'
+	> {
 	// Using `selectSize` instead of `size` to avoid a type conflict with the
 	// `size` HTML attribute of the `select` element.
 	selectSize?: SelectControlProps[ 'size' ];
 }
 
 const disabledStyles = ( { disabled }: SelectProps ) => {
-	if ( ! disabled ) return '';
-
-	return css( {
-		color: COLORS.ui.textDisabled,
-	} );
-};
-
-const fontSizeStyles = ( { selectSize = 'default' }: SelectProps ) => {
-	const sizes = {
-		default: '13px',
-		small: '11px',
-		'__unstable-large': '13px',
-	};
-
-	const fontSize = sizes[ selectSize ];
-	const fontSizeMobile = '16px';
-
-	if ( ! fontSize ) return '';
+	if ( ! disabled ) {
+		return '';
+	}
 
 	return css`
-		font-size: ${ fontSizeMobile };
-
-		@media ( min-width: 600px ) {
-			font-size: ${ fontSize };
-		}
+		color: ${ COLORS.ui.textDisabled };
+		cursor: default;
 	`;
 };
 
+const inputBaseVariantStyles = ( { variant }: SelectProps ) => {
+	if ( variant === 'minimal' ) {
+		return css`
+			display: inline-flex;
+		`;
+	}
+
+	return '';
+};
+
+export const StyledInputBase = styled( InputBase )`
+	color: ${ COLORS.theme.foreground };
+	cursor: pointer;
+
+	${ disabledStyles }
+	${ inputBaseVariantStyles }
+`;
+
 const sizeStyles = ( {
-	__next36pxDefaultSize,
+	__next40pxDefaultSize,
+	multiple,
 	selectSize = 'default',
 }: SelectProps ) => {
+	if ( multiple ) {
+		// When `multiple`, just use the native browser styles
+		// without setting explicit height.
+		return;
+	}
+
 	const sizes = {
 		default: {
-			height: 36,
-			minHeight: 36,
+			height: 40,
+			minHeight: 40,
 			paddingTop: 0,
 			paddingBottom: 0,
 		},
 		small: {
 			height: 24,
 			minHeight: 24,
+			paddingTop: 0,
+			paddingBottom: 0,
+		},
+		compact: {
+			height: 32,
+			minHeight: 32,
 			paddingTop: 0,
 			paddingBottom: 0,
 		},
@@ -73,13 +91,8 @@ const sizeStyles = ( {
 		},
 	};
 
-	if ( ! __next36pxDefaultSize ) {
-		sizes.default = {
-			height: 30,
-			minHeight: 30,
-			paddingTop: 0,
-			paddingBottom: 0,
-		};
+	if ( ! __next40pxDefaultSize ) {
+		sizes.default = sizes.compact;
 	}
 
 	const style = sizes[ selectSize ] || sizes.default;
@@ -90,34 +103,49 @@ const sizeStyles = ( {
 export const chevronIconSize = 18;
 
 const sizePaddings = ( {
-	__next36pxDefaultSize,
+	__next40pxDefaultSize,
+	multiple,
 	selectSize = 'default',
 }: SelectProps ) => {
-	const iconWidth = chevronIconSize;
-
-	const sizes = {
-		default: {
-			paddingLeft: 16,
-			paddingRight: 16 + iconWidth,
-		},
-		small: {
-			paddingLeft: 8,
-			paddingRight: 8 + iconWidth,
-		},
-		'__unstable-large': {
-			paddingLeft: 16,
-			paddingRight: 16 + iconWidth,
-		},
+	const padding = {
+		default: CONFIG.controlPaddingX,
+		small: CONFIG.controlPaddingXSmall,
+		compact: CONFIG.controlPaddingXSmall,
+		'__unstable-large': CONFIG.controlPaddingX,
 	};
 
-	if ( ! __next36pxDefaultSize ) {
-		sizes.default = {
-			paddingLeft: 8,
-			paddingRight: 8 + iconWidth,
-		};
+	if ( ! __next40pxDefaultSize ) {
+		padding.default = padding.compact;
 	}
 
-	return rtl( sizes[ selectSize ] || sizes.default );
+	const selectedPadding = padding[ selectSize ] || padding.default;
+
+	return rtl( {
+		paddingLeft: selectedPadding,
+		paddingRight: selectedPadding + chevronIconSize,
+		...( multiple
+			? {
+					paddingTop: selectedPadding,
+					paddingBottom: selectedPadding,
+			  }
+			: {} ),
+	} );
+};
+
+const overflowStyles = ( { multiple }: SelectProps ) => {
+	return {
+		overflow: multiple ? 'auto' : 'hidden',
+	};
+};
+
+const variantStyles = ( { variant }: SelectProps ) => {
+	if ( variant === 'minimal' ) {
+		return css( {
+			fieldSizing: 'content',
+		} );
+	}
+
+	return '';
 };
 
 // TODO: Resolve need to use &&& to increase specificity
@@ -130,27 +158,31 @@ export const Select = styled.select< SelectProps >`
 		box-sizing: border-box;
 		border: none;
 		box-shadow: none !important;
-		color: ${ COLORS.gray[ 900 ] };
+		color: currentColor; // Overrides hover/focus styles in forms.css
+		cursor: inherit;
 		display: block;
 		font-family: inherit;
 		margin: 0;
 		width: 100%;
 		max-width: none;
-		cursor: pointer;
-		overflow: hidden;
 		white-space: nowrap;
 		text-overflow: ellipsis;
 
-		${ disabledStyles };
 		${ fontSizeStyles };
 		${ sizeStyles };
 		${ sizePaddings };
+		${ overflowStyles }
+		${ variantStyles }
 	}
 `;
 
 export const DownArrowWrapper = styled.div`
 	margin-inline-end: ${ space( -1 ) }; // optically adjust the icon
 	line-height: 0;
+
+	path {
+		fill: currentColor;
+	}
 `;
 
 export const InputControlSuffixWrapperWithClickThrough = styled(

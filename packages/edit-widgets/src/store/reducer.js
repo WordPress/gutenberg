@@ -68,8 +68,58 @@ export function listViewPanel( state = false, action ) {
 	return state;
 }
 
+/**
+ * This reducer does nothing aside initializing a ref to the list view toggle.
+ * We will have a unique ref per "editor" instance.
+ *
+ * @param {Object} state
+ * @return {Object} Reference to the list view toggle button.
+ */
+export function listViewToggleRef( state = { current: null } ) {
+	return state;
+}
+
+/**
+ * This reducer does nothing aside initializing a ref to the inserter sidebar toggle.
+ * We will have a unique ref per "editor" instance.
+ *
+ * @param {Object} state
+ * @return {Object} Reference to the inserter sidebar toggle button.
+ */
+export function inserterSidebarToggleRef( state = { current: null } ) {
+	return state;
+}
+
+/**
+ * Widget saving lock.
+ *
+ * When widget saving is locked, the widget cannot be updated.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+export function widgetSavingLock( state = {}, action ) {
+	switch ( action.type ) {
+		case 'LOCK_WIDGET_SAVING':
+			return { ...state, [ action.lockName ]: true };
+
+		case 'UNLOCK_WIDGET_SAVING': {
+			const { [ action.lockName ]: removedLockName, ...restState } =
+				state;
+			return restState;
+		}
+	}
+
+	return state;
+}
+
 export default combineReducers( {
 	blockInserterPanel,
+	inserterSidebarToggleRef,
 	listViewPanel,
+	listViewToggleRef,
 	widgetAreasOpenState,
+	widgetSavingLock,
 } );

@@ -4,11 +4,7 @@
 
 import { getActiveFormats } from './get-active-formats';
 import { getFormatType } from './get-format-type';
-import {
-	LINE_SEPARATOR,
-	OBJECT_REPLACEMENT_CHARACTER,
-	ZWNBSP,
-} from './special-characters';
+import { OBJECT_REPLACEMENT_CHARACTER, ZWNBSP } from './special-characters';
 
 function restoreOnAttributes( attributes, isEditableTree ) {
 	if ( isEditableTree ) {
@@ -35,6 +31,7 @@ function restoreOnAttributes( attributes, isEditableTree ) {
  *
  * @param {Object}  $1                        Named parameters.
  * @param {string}  $1.type                   The format type.
+ * @param {string}  $1.tagName                The tag name.
  * @param {Object}  $1.attributes             The format attributes.
  * @param {Object}  $1.unregisteredAttributes The unregistered format
  *                                            attributes.
@@ -48,6 +45,7 @@ function restoreOnAttributes( attributes, isEditableTree ) {
  */
 function fromFormat( {
 	type,
+	tagName,
 	attributes,
 	unregisteredAttributes,
 	object,
@@ -58,7 +56,7 @@ function fromFormat( {
 
 	let elementAttributes = {};
 
-	if ( boundaryClass ) {
+	if ( boundaryClass && isEditableTree ) {
 		elementAttributes[ 'data-rich-text-format-boundary' ] = 'true';
 	}
 
@@ -100,7 +98,7 @@ function fromFormat( {
 	}
 
 	return {
-		type: formatType.tagName,
+		type: tagName || formatType.tagName,
 		object: formatType.object,
 		attributes: restoreOnAttributes( elementAttributes, isEditableTree ),
 	};
@@ -125,7 +123,6 @@ function isEqualUntil( a, b, index ) {
 
 export function toTree( {
 	value,
-	multilineTag,
 	preserveWhiteSpace,
 	createEmpty,
 	append,
@@ -143,21 +140,13 @@ export function toTree( {
 	const { formats, replacements, text, start, end } = value;
 	const formatsLength = formats.length + 1;
 	const tree = createEmpty();
-	const multilineFormat = { type: multilineTag };
 	const activeFormats = getActiveFormats( value );
 	const deepestActiveFormat = activeFormats[ activeFormats.length - 1 ];
 
-	let lastSeparatorFormats;
 	let lastCharacterFormats;
 	let lastCharacter;
 
-	// If we're building a multiline tree, start off with a multiline element.
-	if ( multilineTag ) {
-		append( append( tree, { type: multilineTag } ), '' );
-		lastCharacterFormats = lastSeparatorFormats = [ multilineFormat ];
-	} else {
-		append( tree, '' );
-	}
+	append( tree, '' );
 
 	for ( let i = 0; i < formatsLength; i++ ) {
 		const character = text.charAt( i );
@@ -165,61 +154,12 @@ export function toTree( {
 			isEditableTree &&
 			// Pad the line if the line is empty.
 			( ! lastCharacter ||
-				lastCharacter === LINE_SEPARATOR ||
 				// Pad the line if the previous character is a line break, otherwise
 				// the line break won't be visible.
 				lastCharacter === '\n' );
 
-		let characterFormats = formats[ i ];
-
-		// Set multiline tags in queue for building the tree.
-		if ( multilineTag ) {
-			if ( character === LINE_SEPARATOR ) {
-				characterFormats = lastSeparatorFormats = (
-					replacements[ i ] || []
-				).reduce(
-					( accumulator, format ) => {
-						accumulator.push( format, multilineFormat );
-						return accumulator;
-					},
-					[ multilineFormat ]
-				);
-			} else {
-				characterFormats = [
-					...lastSeparatorFormats,
-					...( characterFormats || [] ),
-				];
-			}
-		}
-
+		const characterFormats = formats[ i ];
 		let pointer = getLastChild( tree );
-
-		if ( shouldInsertPadding && character === LINE_SEPARATOR ) {
-			let node = pointer;
-
-			while ( ! isText( node ) ) {
-				node = getLastChild( node );
-			}
-
-			append( getParent( node ), ZWNBSP );
-		}
-
-		// Set selection for the start of line.
-		if ( lastCharacter === LINE_SEPARATOR ) {
-			let node = pointer;
-
-			while ( ! isText( node ) ) {
-				node = getLastChild( node );
-			}
-
-			if ( onStartIndex && start === i ) {
-				onStartIndex( tree, node );
-			}
-
-			if ( onEndIndex && end === i ) {
-				onEndIndex( tree, node );
-			}
-		}
 
 		if ( characterFormats ) {
 			characterFormats.forEach( ( format, formatIndex ) => {
@@ -231,28 +171,24 @@ export function toTree( {
 						characterFormats,
 						lastCharacterFormats,
 						formatIndex
-					) &&
-					// Do not reuse the last element if the character is a
-					// line separator.
-					( character !== LINE_SEPARATOR ||
-						characterFormats.length - 1 !== formatIndex )
+					)
 				) {
 					pointer = getLastChild( pointer );
 					return;
 				}
 
-				const { type, attributes, unregisteredAttributes } = format;
+				const { type, tagName, attributes, unregisteredAttributes } =
+					format;
 
 				const boundaryClass =
-					isEditableTree &&
-					character !== LINE_SEPARATOR &&
-					format === deepestActiveFormat;
+					isEditableTree && format === deepestActiveFormat;
 
 				const parent = getParent( pointer );
 				const newNode = append(
 					parent,
 					fromFormat( {
 						type,
+						tagName,
 						attributes,
 						unregisteredAttributes,
 						boundaryClass,
@@ -268,13 +204,6 @@ export function toTree( {
 			} );
 		}
 
-		// No need for further processing if the character is a line separator.
-		if ( character === LINE_SEPARATOR ) {
-			lastCharacterFormats = characterFormats;
-			lastCharacter = character;
-			continue;
-		}
-
 		// If there is selection at 0, handle it before characters are inserted.
 		if ( i === 0 ) {
 			if ( onStartIndex && start === 0 ) {
@@ -287,7 +216,27 @@ export function toTree( {
 		}
 
 		if ( character === OBJECT_REPLACEMENT_CHARACTER ) {
-			if ( ! isEditableTree && replacements[ i ]?.type === 'script' ) {
+			const replacement = replacements[ i ];
+			if ( ! replacement ) {
+				continue;
+			}
+			const { type, attributes, innerHTML } = replacement;
+			const formatType = getFormatType( type );
+
+			if ( isEditableTree && type === '#comment' ) {
+				pointer = append( getParent( pointer ), {
+					type: 'span',
+					attributes: {
+						contenteditable: 'false',
+						'data-rich-text-comment':
+							attributes[ 'data-rich-text-comment' ],
+					},
+				} );
+				append(
+					append( pointer, { type: 'span' } ),
+					attributes[ 'data-rich-text-comment' ].trim()
+				);
+			} else if ( ! isEditableTree && type === 'script' ) {
 				pointer = append(
 					getParent( pointer ),
 					fromFormat( {
@@ -297,14 +246,51 @@ export function toTree( {
 				);
 				append( pointer, {
 					html: decodeURIComponent(
-						replacements[ i ].attributes[ 'data-rich-text-script' ]
+						attributes[ 'data-rich-text-script' ]
 					),
 				} );
+			} else if ( formatType?.contentEditable === false ) {
+				if ( innerHTML || isEditableTree ) {
+					pointer = getParent( pointer );
+					// For non editable formats, render the stored inner HTML.
+					if ( isEditableTree ) {
+						const attrs = {
+							contenteditable: 'false',
+							'data-rich-text-bogus': true,
+						};
+						if ( start === i && end === i + 1 ) {
+							attrs[ 'data-rich-text-format-boundary' ] = true;
+						}
+						pointer = append( pointer, {
+							type: 'span',
+							attributes: attrs,
+						} );
+						// Some browsers like Safari and Firefox have issues placing
+						// the caret after a non-editable element when it's at the
+						// end of the field, so help them a little by providing a
+						// text element. Similar to `insertPadding` above.
+						if ( isEditableTree && i + 1 === text.length ) {
+							append( getParent( pointer ), ZWNBSP );
+						}
+					}
+					pointer = append(
+						pointer,
+						fromFormat( {
+							...replacement,
+							isEditableTree,
+						} )
+					);
+					if ( innerHTML ) {
+						append( pointer, {
+							html: innerHTML,
+						} );
+					}
+				}
 			} else {
 				pointer = append(
 					getParent( pointer ),
 					fromFormat( {
-						...replacements[ i ],
+						...replacement,
 						object: true,
 						isEditableTree,
 					} )
@@ -341,15 +327,15 @@ export function toTree( {
 		if ( shouldInsertPadding && i === text.length ) {
 			append( getParent( pointer ), ZWNBSP );
 
+			// We CANNOT use CSS to add a placeholder with pseudo elements on
+			// the main block wrappers because that could clash with theme CSS.
 			if ( placeholder && text.length === 0 ) {
 				append( getParent( pointer ), {
 					type: 'span',
 					attributes: {
 						'data-rich-text-placeholder': placeholder,
 						// Necessary to prevent the placeholder from catching
-						// selection. The placeholder is also not editable after
-						// all.
-						contenteditable: 'false',
+						// selection and being editable.
 						style: 'pointer-events:none;user-select:none;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;',
 					},
 				} );

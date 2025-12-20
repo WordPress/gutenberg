@@ -1,10 +1,12 @@
 pluginManagement {
-    gradle.ext.kotlinVersion = '1.5.32'
+    gradle.ext.kotlinVersion = '1.8.0'
+    gradle.ext.agpVersion = '8.5.1'
+    gradle.ext.automatticPublishToS3Version = '0.8.0'
 
     plugins {
-        id "com.android.library" version "7.2.1"
+        id "com.android.library" version gradle.ext.agpVersion
         id "org.jetbrains.kotlin.android" version gradle.ext.kotlinVersion
-        id "com.automattic.android.publish-to-s3" version "0.7.0"
+        id "com.automattic.android.publish-to-s3" version gradle.ext.automatticPublishToS3Version
     }
     repositories {
         maven {
@@ -22,11 +24,10 @@ pluginManagement {
 rootProject.name = '@wordpress_react-native-bridge'
 
 include ':react-native-bridge'
-include ':@wordpress_react-native-aztec'
-project(':@wordpress_react-native-aztec').projectDir = new File(rootProject.projectDir, '../../react-native-aztec/android')
-include ':react-native-aztec'
-project(':react-native-aztec').projectDir = new File(rootProject.projectDir, '../../../packages/react-native-aztec/android')
 
 if (hasProperty("willPublishReactNativeBridgeBinary")) {
     assert file("./react-native-bridge/build/assets/index.android.bundle").exists() : "index.android.bundle is necessary to publish a new version!"
+} else {
+    include ':@wordpress_react-native-aztec'
+    project(':@wordpress_react-native-aztec').projectDir = new File(rootProject.projectDir, '../../react-native-aztec/android')
 }

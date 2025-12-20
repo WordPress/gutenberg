@@ -18,8 +18,8 @@ export default function NavigationPlaceholder( {
 	isSelected,
 	currentMenuId,
 	clientId,
-	canUserCreateNavigationMenu = false,
-	isResolvingCanUserCreateNavigationMenu,
+	canUserCreateNavigationMenus = false,
+	isResolvingCanUserCreateNavigationMenus,
 	onSelectNavigationMenu,
 	onSelectClassicMenu,
 	onCreateEmpty,
@@ -32,16 +32,16 @@ export default function NavigationPlaceholder( {
 		}
 
 		if ( isResolvingMenus ) {
-			speak( __( 'Loading Navigation block setup options.' ) );
+			speak( __( 'Loading navigation block setup options…' ) );
 		}
 
 		if ( hasResolvedMenus ) {
 			speak( __( 'Navigation block setup options ready.' ) );
 		}
-	}, [ isResolvingMenus, isSelected ] );
+	}, [ hasResolvedMenus, isResolvingMenus, isSelected ] );
 
 	const isResolvingActions =
-		isResolvingMenus && isResolvingCanUserCreateNavigationMenu;
+		isResolvingMenus && isResolvingCanUserCreateNavigationMenus;
 
 	return (
 		<>
@@ -70,18 +70,13 @@ export default function NavigationPlaceholder( {
 							clientId={ clientId }
 							onSelectNavigationMenu={ onSelectNavigationMenu }
 							onSelectClassicMenu={ onSelectClassicMenu }
-							toggleProps={ {
-								variant: 'tertiary',
-								iconPosition: 'right',
-								className:
-									'wp-block-navigation-placeholder__actions__dropdown',
-							} }
 						/>
 
 						<hr />
 
-						{ canUserCreateNavigationMenu && (
+						{ canUserCreateNavigationMenus && (
 							<Button
+								__next40pxDefaultSize
 								variant="tertiary"
 								onClick={ onCreateEmpty }
 							>

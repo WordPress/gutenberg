@@ -70,9 +70,7 @@ displayShortcut.primary( 'm' );
 // "⌘M"
 ```
 
-_Type_
-
--   `WPModifierHandler<WPKeyHandler<string>>`Keyed map of functions to display shortcuts.
+Keyed map of functions to display shortcuts.
 
 ### displayShortcutList
 
@@ -86,9 +84,7 @@ displayShortcutList.primary( 'm' );
 // [ "⌘", "M" ]
 ```
 
-_Type_
-
--   `WPModifierHandler<WPKeyHandler<string[]>>`Keyed map of functions to shortcut sequences.
+Keyed map of functions to shortcut sequences.
 
 ### DOWN
 
@@ -120,7 +116,7 @@ Return true if platform is MacOS.
 
 _Parameters_
 
--   _\_window_ `Window?`: window object by default; used for DI testing.
+-   _\_window_ `Window`: window object by default; used for DI testing.
 
 _Returns_
 
@@ -128,8 +124,7 @@ _Returns_
 
 ### isKeyboardEvent
 
-An object that contains functions to check if a keyboard event matches a
-predefined shortcut combination.
+An object that contains functions to check if a keyboard event matches a predefined shortcut combination.
 
 _Usage_
 
@@ -139,9 +134,7 @@ isKeyboardEvent.primary( event, 'm' );
 // true
 ```
 
-_Type_
-
--   `WPModifierHandler<WPEventKeyHandler>`Keyed map of functions to match events.
+Keyed map of functions to match events.
 
 ### LEFT
 
@@ -149,12 +142,11 @@ Keycode for LEFT key.
 
 ### modifiers
 
-Object that contains functions that return the available modifier
-depending on platform.
+Object that contains functions that return the available modifier depending on platform.
 
 _Type_
 
--   `WPModifierHandler< ( isApple: () => boolean ) => WPModifierPart[]>`
+-   `WPModifierHandler< WPModifier >`
 
 ### PAGEDOWN
 
@@ -178,10 +170,6 @@ rawShortcut.primary( 'm' );
 // "meta+m""
 ```
 
-_Type_
-
--   `WPModifierHandler<WPKeyHandler<string>>`Keyed map of functions to raw shortcuts.
-
 ### RIGHT
 
 Keycode for RIGHT key.
@@ -192,8 +180,7 @@ Keycode for SHIFT key.
 
 ### shortcutAriaLabel
 
-An object that contains functions to return an aria label for a keyboard
-shortcut.
+An object that contains functions to return an aria label for a keyboard shortcut.
 
 _Usage_
 
@@ -203,9 +190,7 @@ shortcutAriaLabel.primary( '.' );
 // "Command + Period"
 ```
 
-_Type_
-
--   `WPModifierHandler<WPKeyHandler<string>>`Keyed map of functions to shortcut ARIA labels.
+Keyed map of functions to shortcut ARIA labels.
 
 ### SPACE
 

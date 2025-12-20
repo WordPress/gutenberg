@@ -1,3 +1,5 @@
+/* eslint jest/expect-expect: ["warn", { "assertFunctionNames": ["expect", "subscribeUntil"] }] */
+
 /**
  * Internal dependencies
  */
@@ -6,14 +8,7 @@ import { createRegistrySelector } from '../factory';
 import createReduxStore from '../redux-store';
 import coreDataStore from '../store';
 
-beforeEach( () => {
-	jest.useFakeTimers( 'legacy' );
-} );
-
-afterEach( () => {
-	jest.runOnlyPendingTimers();
-	jest.useRealTimers();
-} );
+jest.useFakeTimers( { legacyFakeTimers: true } );
 
 describe( 'createRegistry', () => {
 	let registry;
@@ -486,40 +481,49 @@ describe( 'createRegistry', () => {
 	} );
 
 	describe( 'register', () => {
+		const store = createReduxStore( 'demo', {
+			reducer( state = 'OK', action ) {
+				if ( action.type === 'UPDATE' ) {
+					return 'UPDATED';
+				}
+				return state;
+			},
+			actions: {
+				update: () => ( { type: 'UPDATE' } ),
+			},
+			selectors: {
+				getValue: ( state ) => state,
+			},
+		} );
+
 		it( 'should work with the store descriptor as param for select', () => {
-			const store = createReduxStore( 'demo', {
-				reducer: ( state = 'OK' ) => state,
-				selectors: {
-					getValue: ( state ) => state,
-				},
-			} );
 			registry.register( store );
 
 			expect( registry.select( store ).getValue() ).toBe( 'OK' );
 		} );
 
 		it( 'should work with the store descriptor as param for dispatch', async () => {
-			const store = createReduxStore( 'demo', {
-				reducer( state = 'OK', action ) {
-					if ( action.type === 'UPDATE' ) {
-						return 'UPDATED';
-					}
-					return state;
-				},
-				actions: {
-					update() {
-						return { type: 'UPDATE' };
-					},
-				},
-				selectors: {
-					getValue: ( state ) => state,
-				},
-			} );
 			registry.register( store );
 
 			expect( registry.select( store ).getValue() ).toBe( 'OK' );
 			await registry.dispatch( store ).update();
 			expect( registry.select( store ).getValue() ).toBe( 'UPDATED' );
+		} );
+
+		it( 'should keep the existing store instance on duplicate registration', async () => {
+			registry.register( store );
+
+			await registry.dispatch( store ).update();
+			expect( registry.select( store ).getValue() ).toBe( 'UPDATED' );
+
+			registry.register( store );
+
+			// check that the state hasn't been reset back to `OK`, as a re-registration would do
+			expect( registry.select( store ).getValue() ).toBe( 'UPDATED' );
+
+			expect( console ).toHaveErroredWith(
+				'Store "demo" is already registered.'
+			);
 		} );
 	} );
 
@@ -719,23 +723,66 @@ describe( 'createRegistry', () => {
 			const listener2 = jest.fn();
 			// useSelect subscribes to the stores differently,
 			// This test ensures batching works in this case as well.
-			const unsubscribe = registry.__unstableSubscribeStore(
-				'myAwesomeReducer',
-				listener2
+			const unsubscribe = registry.subscribe(
+				listener2,
+				'myAwesomeReducer'
 			);
 			registry.batch( () => {
 				store.dispatch( { type: 'dummy' } );
 				store.dispatch( { type: 'dummy' } );
 			} );
 			unsubscribe();
-
 			expect( listener2 ).toHaveBeenCalledTimes( 1 );
+		} );
+
+		it( 'should support nested batches', () => {
+			const store = registry.registerStore( 'myAwesomeReducer', {
+				reducer: ( state = 0 ) => state + 1,
+			} );
+			const listener = jest.fn();
+			subscribeWithUnsubscribe( listener );
+
+			registry.batch( () => {} );
+			expect( listener ).not.toHaveBeenCalled();
+
+			registry.batch( () => {
+				store.dispatch( { type: 'dummy' } );
+				registry.batch( () => {
+					store.dispatch( { type: 'dummy' } );
+					store.dispatch( { type: 'dummy' } );
+				} );
+				store.dispatch( { type: 'dummy' } );
+			} );
+			expect( listener ).toHaveBeenCalledTimes( 1 );
+		} );
+
+		it( 'should handle errors', () => {
+			const store = registry.registerStore( 'myAwesomeReducer', {
+				reducer: ( state = 0 ) => state + 1,
+			} );
+			const listener = jest.fn();
+			const error = new Error( 'Whoops' );
+			subscribeWithUnsubscribe( listener );
+
+			expect( () => {
+				registry.batch( () => {
+					throw error;
+				} );
+			} ).toThrow( error );
+			expect( listener ).not.toHaveBeenCalled();
+
+			registry.batch( () => {
+				store.dispatch( { type: 'dummy' } );
+				store.dispatch( { type: 'dummy' } );
+			} );
+			expect( listener ).toHaveBeenCalledTimes( 1 );
 		} );
 	} );
 
 	describe( 'use', () => {
 		it( 'should pass through options object to plugin', () => {
 			const expectedOptions = {};
+			const anyObject = expect.any( Object );
 			let actualOptions;
 
 			function plugin( _registry, options ) {
@@ -747,7 +794,7 @@ describe( 'createRegistry', () => {
 					Object.fromEntries(
 						Object.entries( registry ).map( ( [ key ] ) => {
 							if ( key === 'stores' ) {
-								return [ key, expect.any( Object ) ];
+								return [ key, anyObject ];
 							}
 							// TODO: Remove this after namsespaces is removed.
 							if ( key === 'namespaces' ) {

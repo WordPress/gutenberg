@@ -3,17 +3,15 @@
  */
 import { __ } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
-import { useInstanceId } from '@wordpress/compose';
+import { useInstanceId, useViewportMatch } from '@wordpress/compose';
 import { chevronRight } from '@wordpress/icons';
 
 import {
+	Composite,
 	MenuGroup,
 	MenuItem,
 	Popover,
 	VisuallyHidden,
-	__unstableComposite as Composite,
-	__unstableUseCompositeState as useCompositeState,
-	__unstableCompositeItem as CompositeItem,
 } from '@wordpress/components';
 
 /**
@@ -29,7 +27,10 @@ function PatternTransformationsMenu( {
 } ) {
 	const [ showTransforms, setShowTransforms ] = useState( false );
 	const patterns = useTransformedPatterns( statePatterns, blocks );
-	if ( ! patterns.length ) return null;
+
+	if ( ! patterns.length ) {
+		return null;
+	}
 
 	return (
 		<MenuGroup className="block-editor-block-switcher__pattern__transforms__menugroup">
@@ -53,33 +54,29 @@ function PatternTransformationsMenu( {
 }
 
 function PreviewPatternsPopover( { patterns, onSelect } ) {
+	const isMobile = useViewportMatch( 'medium', '<' );
+
 	return (
-		<div className="block-editor-block-switcher__popover__preview__parent">
-			<div className="block-editor-block-switcher__popover__preview__container">
-				<Popover
-					className="block-editor-block-switcher__preview__popover"
-					position="bottom right"
-				>
-					<div className="block-editor-block-switcher__preview">
-						<div className="block-editor-block-switcher__preview-title">
-							{ __( 'Preview' ) }
-						</div>
-						<BlockPatternsList
-							patterns={ patterns }
-							onSelect={ onSelect }
-						/>
-					</div>
-				</Popover>
-			</div>
+		<div className="block-editor-block-switcher__popover-preview-container">
+			<Popover
+				className="block-editor-block-switcher__popover-preview"
+				placement={ isMobile ? 'bottom' : 'right-start' }
+				offset={ 16 }
+			>
+				<div className="block-editor-block-switcher__preview is-pattern-list-preview">
+					<BlockPatternsList
+						patterns={ patterns }
+						onSelect={ onSelect }
+					/>
+				</div>
+			</Popover>
 		</div>
 	);
 }
 
 function BlockPatternsList( { patterns, onSelect } ) {
-	const composite = useCompositeState();
 	return (
 		<Composite
-			{ ...composite }
 			role="listbox"
 			className="block-editor-block-switcher__preview-patterns-container"
 			aria-label={ __( 'Patterns list' ) }
@@ -89,14 +86,13 @@ function BlockPatternsList( { patterns, onSelect } ) {
 					key={ pattern.name }
 					pattern={ pattern }
 					onSelect={ onSelect }
-					composite={ composite }
 				/>
 			) ) }
 		</Composite>
 	);
 }
 
-function BlockPattern( { pattern, onSelect, composite } ) {
+function BlockPattern( { pattern, onSelect } ) {
 	// TODO check pattern/preview width...
 	const baseClassName =
 		'block-editor-block-switcher__preview-patterns-container';
@@ -105,16 +101,18 @@ function BlockPattern( { pattern, onSelect, composite } ) {
 		`${ baseClassName }-list__item-description`
 	);
 	return (
-		<div
-			className={ `${ baseClassName }-list__list-item` }
-			aria-label={ pattern.title }
-			aria-describedby={ pattern.description ? descriptionId : undefined }
-		>
-			<CompositeItem
-				role="option"
-				as="div"
-				{ ...composite }
-				className={ `${ baseClassName }-list__item` }
+		<div className={ `${ baseClassName }-list__list-item` }>
+			<Composite.Item
+				render={
+					<div
+						role="option"
+						aria-label={ pattern.title }
+						aria-describedby={
+							pattern.description ? descriptionId : undefined
+						}
+						className={ `${ baseClassName }-list__item` }
+					/>
+				}
 				onClick={ () => onSelect( pattern.transformedBlocks ) }
 			>
 				<BlockPreview
@@ -124,7 +122,7 @@ function BlockPattern( { pattern, onSelect, composite } ) {
 				<div className={ `${ baseClassName }-list__item-title` }>
 					{ pattern.title }
 				</div>
-			</CompositeItem>
+			</Composite.Item>
 			{ !! pattern.description && (
 				<VisuallyHidden id={ descriptionId }>
 					{ pattern.description }

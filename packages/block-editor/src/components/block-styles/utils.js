@@ -1,8 +1,4 @@
 /**
- * External dependencies
- */
-import { find } from 'lodash';
-/**
  * WordPress dependencies
  */
 import TokenList from '@wordpress/token-list';
@@ -14,7 +10,7 @@ import { _x } from '@wordpress/i18n';
  * @param {Array}  styles    Block styles.
  * @param {string} className Class name
  *
- * @return {Object?} The active style.
+ * @return {?Object} The active style.
  */
 export function getActiveStyle( styles, className ) {
 	for ( const style of new TokenList( className ).values() ) {
@@ -23,20 +19,22 @@ export function getActiveStyle( styles, className ) {
 		}
 
 		const potentialStyleName = style.substring( 9 );
-		const activeStyle = find( styles, { name: potentialStyleName } );
+		const activeStyle = styles?.find(
+			( { name } ) => name === potentialStyleName
+		);
 		if ( activeStyle ) {
 			return activeStyle;
 		}
 	}
 
-	return find( styles, 'isDefault' );
+	return getDefaultStyle( styles );
 }
 
 /**
  * Replaces the active style in the block's className.
  *
  * @param {string}  className   Class name.
- * @param {Object?} activeStyle The replaced style.
+ * @param {?Object} activeStyle The replaced style.
  * @param {Object}  newStyle    The replacing style.
  *
  * @return {string} The updated className.
@@ -85,8 +83,8 @@ export function getRenderedStyles( styles ) {
  *
  * @param {Array} styles Block styles.
  *
- * @return {Object?}        The default style object, if found.
+ * @return {?Object}        The default style object, if found.
  */
 export function getDefaultStyle( styles ) {
-	return find( styles, 'isDefault' );
+	return styles?.find( ( style ) => style.isDefault );
 }

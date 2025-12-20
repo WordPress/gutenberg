@@ -16,7 +16,7 @@ The CSS display property of `FlexItem`.
 
 ### `isBlock`: `boolean`
 
-Determins if `FlexItem` should render as an adaptive full-width block.
+Determines if `FlexItem` should render as an adaptive full-width block.
 
 -   Required: No
 -   Default: `false`

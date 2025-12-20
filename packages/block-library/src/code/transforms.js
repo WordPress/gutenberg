@@ -2,6 +2,12 @@
  * WordPress dependencies
  */
 import { createBlock } from '@wordpress/blocks';
+import { create, toHTMLString } from '@wordpress/rich-text';
+
+/**
+ * Internal dependencies
+ */
+import { getTransformedAttributes } from '../utils/get-transformed-attributes';
 
 const transforms = {
 	from: [
@@ -12,10 +18,27 @@ const transforms = {
 		},
 		{
 			type: 'block',
-			blocks: [ 'core/html', 'core/paragraph' ],
-			transform: ( { content } ) => {
+			blocks: [ 'core/paragraph' ],
+			transform: ( attributes ) => {
+				const { content } = attributes;
 				return createBlock( 'core/code', {
+					...attributes,
+					...getTransformedAttributes( attributes, 'core/code' ),
 					content,
+				} );
+			},
+		},
+		{
+			type: 'block',
+			blocks: [ 'core/html' ],
+			transform: ( attributes ) => {
+				const { content: text } = attributes;
+				return createBlock( 'core/code', {
+					...attributes,
+					...getTransformedAttributes( attributes, 'core/code' ),
+					// The HTML is plain text (with plain line breaks), so
+					// convert it to rich text.
+					content: toHTMLString( { value: create( { text } ) } ),
 				} );
 			},
 		},
@@ -42,8 +65,12 @@ const transforms = {
 		{
 			type: 'block',
 			blocks: [ 'core/paragraph' ],
-			transform: ( { content } ) => {
-				return createBlock( 'core/paragraph', { content } );
+			transform: ( attributes ) => {
+				const { content } = attributes;
+				return createBlock( 'core/paragraph', {
+					...getTransformedAttributes( attributes, 'core/paragraph' ),
+					content,
+				} );
 			},
 		},
 	],

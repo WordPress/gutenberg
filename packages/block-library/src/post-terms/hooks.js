@@ -16,9 +16,9 @@ export default function enhanceVariations( settings, name ) {
 	}
 	const variations = settings.variations.map( ( variation ) => ( {
 		...variation,
-		...( variationIconMap[ variation.name ] && {
-			icon: variationIconMap[ variation.name ],
-		} ),
+		...{
+			icon: variationIconMap[ variation.name ] ?? postCategories,
+		},
 	} ) );
 	return {
 		...settings,

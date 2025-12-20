@@ -19,7 +19,7 @@ import { debounce } from '../../utils/debounce';
  * including the function to debounce, so please wrap functions created on
  * render in components in `useCallback`.
  *
- * @see https://docs-lodash.com/v4/debounce/
+ * @see https://lodash.com/docs/4#debounce
  *
  * @template {(...args: any[]) => void} TFunc
  *
@@ -31,7 +31,7 @@ import { debounce } from '../../utils/debounce';
 export default function useDebounce( fn, wait, options ) {
 	const debounced = useMemoOne(
 		() => debounce( fn, wait ?? 0, options ),
-		[ fn, wait, options ]
+		[ fn, wait, options?.leading, options?.trailing, options?.maxWait ]
 	);
 	useEffect( () => () => debounced.cancel(), [ debounced ] );
 	return debounced;

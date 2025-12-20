@@ -1,20 +1,14 @@
+@use "@wordpress/base-styles/mixins" as *;
+
 .wp-block-table {
 	margin: 0 0 1em 0;
-
-	thead {
-		border-bottom: 3px solid;
-	}
-
-	tfoot {
-		border-top: 3px solid;
-	}
 
 	td,
 	th {
 		word-break: normal;
 	}
 
-	figcaption {
+	:where(figcaption) {
 		@include caption-style-theme();
 	}
 }

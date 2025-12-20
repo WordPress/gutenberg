@@ -395,7 +395,7 @@ export const moveBlockToWidgetArea =
 	async ( { dispatch, select, registry } ) => {
 		const sourceRootClientId = registry
 			.select( blockEditorStore )
-			.getBlockRootClientId( [ clientId ] );
+			.getBlockRootClientId( clientId );
 
 		// Search the top level blocks (widget areas) for the one with the matching
 		// id attribute. Makes the assumption that all top-level blocks are widget
@@ -431,3 +431,61 @@ export const moveBlockToWidgetArea =
 				destinationIndex
 			);
 	};
+
+/**
+ * Returns an action object used to signal that widget saving is unlocked.
+ *
+ * @param {string} lockName The lock name.
+ *
+ * @example
+ * ```js
+ * import { store as widgetStore } from '@wordpress/edit-widgets';
+ * import { useDispatch } from '@wordpress/data';
+ *
+ * const ExampleComponent = () => {
+ * 	const { unlockWidgetSaving } = useDispatch( widgetStore );
+ * 	return (
+ * 		<Button onClick={ () => unlockWidgetSaving( 'lockName' ) }>
+ * 			{ __( 'Unlock Widget Saving' ) }
+ * 		</Button>
+ * 	);
+ * };
+ * ```
+ *
+ * @return {Object} Action object
+ */
+export function unlockWidgetSaving( lockName ) {
+	return {
+		type: 'UNLOCK_WIDGET_SAVING',
+		lockName,
+	};
+}
+
+/**
+ * Returns an action object used to signal that widget saving is locked.
+ *
+ * @param {string} lockName The lock name.
+ *
+ * @example
+ * ```js
+ * import { store as widgetStore } from '@wordpress/edit-widgets';
+ * import { useDispatch } from '@wordpress/data';
+ *
+ * const ExampleComponent = () => {
+ * 	const { lockWidgetSaving } = useDispatch( widgetStore );
+ * 	return (
+ * 		<Button onClick={ () => lockWidgetSaving( 'lockName' ) }>
+ * 			{ __( 'Lock Widget Saving' ) }
+ * 		</Button>
+ * 	);
+ * };
+ * ```
+ *
+ * @return {Object} Action object
+ */
+export function lockWidgetSaving( lockName ) {
+	return {
+		type: 'LOCK_WIDGET_SAVING',
+		lockName,
+	};
+}

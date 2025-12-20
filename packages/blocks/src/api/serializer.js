@@ -8,8 +8,9 @@ import {
 	RawHTML,
 } from '@wordpress/element';
 import { hasFilter, applyFilters } from '@wordpress/hooks';
-import isShallowEqual from '@wordpress/is-shallow-equal';
+import { isShallowEqual } from '@wordpress/is-shallow-equal';
 import { removep } from '@wordpress/autop';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -81,12 +82,14 @@ const innerBlocksPropsProvider = {};
  */
 export function getBlockProps( props = {} ) {
 	const { blockType, attributes } = blockPropsProvider;
-	return applyFilters(
-		'blocks.getSaveContent.extraProps',
-		{ ...props },
-		blockType,
-		attributes
-	);
+	return getBlockProps.skipFilters
+		? props
+		: applyFilters(
+				'blocks.getSaveContent.extraProps',
+				{ ...props },
+				blockType,
+				attributes
+		  );
 }
 
 /**
@@ -96,6 +99,11 @@ export function getBlockProps( props = {} ) {
  */
 export function getInnerBlocksProps( props = {} ) {
 	const { innerBlocks } = innerBlocksPropsProvider;
+	// Allow a different component to be passed to getSaveElement to handle
+	// inner blocks, bypassing the default serialisation.
+	if ( ! Array.isArray( innerBlocks ) ) {
+		return { ...props, children: innerBlocks };
+	}
 	// Value is an array of blocks, so defer to block serializer.
 	const html = serialize( innerBlocks, { isInnerBlocks: true } );
 	// Use special-cased raw HTML tag to avoid default escaping.
@@ -120,6 +128,11 @@ export function getSaveElement(
 	innerBlocks = []
 ) {
 	const blockType = normalizeBlockType( blockTypeOrName );
+
+	if ( ! blockType?.save ) {
+		return null;
+	}
+
 	let { save } = blockType;
 
 	// Component classes are unsupported for save since serialization must
@@ -164,9 +177,9 @@ export function getSaveElement(
 	/**
 	 * Filters the save result of a block during serialization.
 	 *
-	 * @param {WPElement} element    Block save result.
-	 * @param {WPBlock}   blockType  Block type definition.
-	 * @param {Object}    attributes Block attributes.
+	 * @param {Element} element    Block save result.
+	 * @param {WPBlock} blockType  Block type definition.
+	 * @param {Object}  attributes Block attributes.
 	 */
 	return applyFilters(
 		'blocks.getSaveElement',
@@ -225,10 +238,26 @@ export function getCommentAttributes( blockType, attributes ) {
 				return accumulator;
 			}
 
+			// Ignore all local attributes
+			if ( attributeSchema.role === 'local' ) {
+				return accumulator;
+			}
+
+			if ( attributeSchema.__experimentalRole === 'local' ) {
+				deprecated( '__experimentalRole attribute', {
+					since: '6.7',
+					version: '6.8',
+					alternative: 'role attribute',
+					hint: `Check the block.json of the ${ blockType?.name } block.`,
+				} );
+				return accumulator;
+			}
+
 			// Ignore default value.
 			if (
 				'default' in attributeSchema &&
-				attributeSchema.default === value
+				JSON.stringify( attributeSchema.default ) ===
+					JSON.stringify( value )
 			) {
 				return accumulator;
 			}
@@ -252,19 +281,21 @@ export function getCommentAttributes( blockType, attributes ) {
 export function serializeAttributes( attributes ) {
 	return (
 		JSON.stringify( attributes )
+			// Replace escaped `\` characters with the unicode escape sequence.
+			.replaceAll( '\\\\', '\\u005c' )
+
 			// Don't break HTML comments.
-			.replace( /--/g, '\\u002d\\u002d' )
+			.replaceAll( '--', '\\u002d\\u002d' )
 
 			// Don't break non-standard-compliant tools.
-			.replace( /</g, '\\u003c' )
-			.replace( />/g, '\\u003e' )
-			.replace( /&/g, '\\u0026' )
+			.replaceAll( '<', '\\u003c' )
+			.replaceAll( '>', '\\u003e' )
+			.replaceAll( '&', '\\u0026' )
 
-			// Bypass server stripslashes behavior which would unescape stringify's
-			// escaping of quotation mark.
-			//
-			// See: https://developer.wordpress.org/reference/functions/wp_kses_stripslashes/
-			.replace( /\\"/g, '\\u0022' )
+			// Replace escaped quotes (`\"`) to prevent problems with wp_kses_stripsplashes.
+			// This simple replacement is safe because `\\` has already been replaced.
+			// `\"` is not a JSON string quote like `"\\"`.
+			.replaceAll( '\\"', '\\u0022' )
 	);
 }
 
@@ -379,7 +410,8 @@ export function __unstableSerializeAndClean( blocks ) {
 	// pre-block-editor removep'd content formatting.
 	if (
 		blocks.length === 1 &&
-		blocks[ 0 ].name === getFreeformContentHandlerName()
+		blocks[ 0 ].name === getFreeformContentHandlerName() &&
+		blocks[ 0 ].name === 'core/freeform'
 	) {
 		content = removep( content );
 	}

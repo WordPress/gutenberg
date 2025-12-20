@@ -9,13 +9,13 @@ This feature is still experimental. “Experimental” means this is an early im
 ## Usage
 
 ```jsx
+import { useState } from 'react';
 import { __experimentalUnitControl as UnitControl } from '@wordpress/components';
-import { useState } from '@wordpress/element';
 
 const Example = () => {
 	const [ value, setValue ] = useState( '10px' );
 
-	return <UnitControl onChange={ setValue } value={ value } />;
+	return <UnitControl __next40pxDefaultSize onChange={ setValue } value={ value } />;
 };
 ```
 
@@ -67,6 +67,12 @@ Callback invoked when either the quantity or unit inputs fire the `blur` event.
 
 -   Required: No
 
+### `onFocus`: `FocusEventHandler< HTMLInputElement | HTMLSelectElement >`
+
+Callback invoked when either the quantity or unit inputs fire the `focus` event.
+
+-   Required: No
+
 ### `onChange`: `UnitControlOnChangeCallback`
 
 Callback when the `value` changes.
@@ -109,8 +115,8 @@ Collection of available units.
 Example:
 
 ```jsx
+import { useState } from 'react';
 import { __experimentalUnitControl as UnitControl } from '@wordpress/components';
-import { useState } from '@wordpress/element';
 
 const Example = () => {
 	const [ value, setValue ] = useState( '10px' );
@@ -121,7 +127,9 @@ const Example = () => {
 		{ value: 'em', label: 'em', default: 0 },
 	];
 
-	return <UnitControl onChange={ setValue } value={ value } units={units} />;
+	return (
+		<UnitControl __next40pxDefaultSize onChange={ setValue } value={ value } units={ units } />
+	);
 };
 ```
 
@@ -135,7 +143,14 @@ For example, a `value` of `50%` will set the current unit to `%`.
 Example:
 
 ```jsx
-<UnitControl value="50%" />
+<UnitControl __next40pxDefaultSize value="50%" />
 ```
 
 -   Required: No
+
+### `__next40pxDefaultSize`: `boolean`
+
+Start opting into the larger default height that will become the default size in a future version.
+
+-   Required: No
+-   Default: `false`

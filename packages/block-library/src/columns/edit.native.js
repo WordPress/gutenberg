@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { View, Dimensions } from 'react-native';
-import { map } from 'lodash';
+
 /**
  * WordPress dependencies
  */
@@ -13,7 +13,6 @@ import {
 	FooterMessageControl,
 	UnitControl,
 	getValueAndUnit,
-	GlobalStylesContext,
 	alignmentHelpers,
 	__experimentalUseCustomUnits as useCustomUnits,
 } from '@wordpress/components';
@@ -23,14 +22,14 @@ import {
 	BlockControls,
 	BlockVerticalAlignmentToolbar,
 	BlockVariationPicker,
-	useSetting,
+	useSettings,
 	store as blockEditorStore,
+	useGlobalStyles,
 } from '@wordpress/block-editor';
 import { withDispatch, useSelect } from '@wordpress/data';
 import {
 	useEffect,
 	useState,
-	useContext,
 	useMemo,
 	useCallback,
 	memo,
@@ -58,17 +57,6 @@ import {
 	getContentWidths,
 } from './columnCalculations.native';
 import ColumnsPreview from '../column/column-preview';
-
-/**
- * Allowed blocks constant is passed to InnerBlocks precisely as specified here.
- * The contents of the array should never change.
- * The array should contain the name of each block that is allowed.
- * In columns block, the only block we allow is 'core/column'.
- *
- * @constant
- * @type {string[]}
- */
-const ALLOWED_BLOCKS = [ 'core/column' ];
 
 /**
  * Number of columns to assume for template in case the user opts to skip
@@ -101,19 +89,14 @@ function ColumnsEditContainer( {
 	const [ resizeListener, sizes ] = useResizeObserver();
 	const [ columnsInRow, setColumnsInRow ] = useState( MIN_COLUMNS_NUM );
 	const screenWidth = Math.floor( Dimensions.get( 'window' ).width );
-	const globalStyles = useContext( GlobalStylesContext );
+	const globalStyles = useGlobalStyles();
 
 	const { verticalAlignment, align } = attributes;
 	const { width } = sizes || {};
 
+	const [ availableUnits ] = useSettings( 'spacing.units' );
 	const units = useCustomUnits( {
-		availableUnits: useSetting( 'spacing.units' ) || [
-			'%',
-			'px',
-			'em',
-			'rem',
-			'vw',
-		],
+		availableUnits: availableUnits || [ '%', 'px', 'em', 'rem', 'vw' ],
 	} );
 
 	useEffect( () => {
@@ -198,7 +181,7 @@ function ColumnsEditContainer( {
 			return (
 				<UnitControl
 					label={ label }
-					settingLabel="Width"
+					settingLabel={ __( 'Width' ) }
 					key={ `${ column.clientId }-${
 						getWidths( innerWidths ).length
 					}` }
@@ -280,7 +263,6 @@ function ColumnsEditContainer( {
 							columnsInRow > 1 ? 'horizontal' : undefined
 						}
 						horizontal={ columnsInRow > 1 }
-						allowedBlocks={ ALLOWED_BLOCKS }
 						contentResizeMode="stretch"
 						onAddBlock={ onAddBlock }
 						onDeleteBlock={
@@ -305,7 +287,7 @@ const ColumnsEditContainerWrapper = withDispatch(
 		/**
 		 * Update all child Column blocks with a new vertical alignment setting
 		 * based on whatever alignment is passed in. This allows change to parent
-		 * to overide anything set on a individual column basis.
+		 * to override anything set on a individual column basis.
 		 *
 		 * @param {string} verticalAlignment the vertical alignment setting
 		 */
@@ -331,11 +313,6 @@ const ColumnsEditContainerWrapper = withDispatch(
 			updateBlockAttributes( columnId, {
 				width: value,
 			} );
-		},
-		updateBlockSettings( settings ) {
-			const { clientId } = ownProps;
-			const { updateBlockListSettings } = dispatch( blockEditorStore );
-			updateBlockListSettings( clientId, settings );
 		},
 		/**
 		 * Updates the column columnCount, including necessary revisions to child Column
@@ -450,7 +427,7 @@ const ColumnsEdit = ( props ) => {
 	const {
 		columnCount,
 		isDefaultColumns,
-		innerWidths = [],
+		innerBlocks,
 		hasParents,
 		parentBlockAlignment,
 		editorSidebarOpened,
@@ -463,24 +440,20 @@ const ColumnsEdit = ( props ) => {
 				getBlockAttributes,
 			} = select( blockEditorStore );
 			const { isEditorSidebarOpened } = select( 'core/edit-post' );
-			const innerBlocks = getBlocks( clientId );
 
-			const isContentEmpty = map(
-				innerBlocks,
-				( innerBlock ) => innerBlock.innerBlocks.length
+			const innerBlocksList = getBlocks( clientId );
+
+			const isContentEmpty = innerBlocksList.every(
+				( innerBlock ) => innerBlock.innerBlocks.length === 0
 			);
 
-			const innerColumnsWidths = innerBlocks.map( ( inn ) => ( {
-				clientId: inn.clientId,
-				attributes: { width: inn.attributes.width },
-			} ) );
 			const parents = getBlockParents( clientId, true );
 
 			return {
 				columnCount: getBlockCount( clientId ),
-				isDefaultColumns: ! isContentEmpty.filter( Boolean ).length,
-				innerWidths: innerColumnsWidths,
-				hasParents: !! parents.length,
+				isDefaultColumns: isContentEmpty,
+				innerBlocks: innerBlocksList,
+				hasParents: parents.length > 0,
 				parentBlockAlignment: getBlockAttributes( parents[ 0 ] )?.align,
 				editorSidebarOpened: isSelected && isEditorSidebarOpened(),
 			};
@@ -488,13 +461,14 @@ const ColumnsEdit = ( props ) => {
 		[ clientId, isSelected ]
 	);
 
-	const memoizedInnerWidths = useMemo( () => {
-		return innerWidths;
-	}, [
-		// The JSON.stringify is used because innerWidth is always a new reference.
-		// The innerBlocks is a new reference after each attribute change of any nested block.
-		JSON.stringify( innerWidths ),
-	] );
+	const innerWidths = useMemo(
+		() =>
+			innerBlocks.map( ( inn ) => ( {
+				clientId: inn.clientId,
+				attributes: { width: inn.attributes.width },
+			} ) ),
+		[ innerBlocks ]
+	);
 
 	const [ isVisible, setIsVisible ] = useState( false );
 
@@ -514,7 +488,7 @@ const ColumnsEdit = ( props ) => {
 		<View style={ style }>
 			<ColumnsEditContainerWrapper
 				columnCount={ columnCount }
-				innerWidths={ memoizedInnerWidths }
+				innerWidths={ innerWidths }
 				hasParents={ hasParents }
 				parentBlockAlignment={ parentBlockAlignment }
 				editorSidebarOpened={ editorSidebarOpened }

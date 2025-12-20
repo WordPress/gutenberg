@@ -18,36 +18,36 @@ const VELOCITY_MULTIPLIER =
  *                      and `onDragEnd` events respectively.
  */
 export default function useScrollWhenDragging() {
-	const dragStartY = useRef( null );
-	const velocityY = useRef( null );
-	const scrollParentY = useRef( null );
-	const scrollEditorInterval = useRef( null );
+	const dragStartYRef = useRef( null );
+	const velocityYRef = useRef( null );
+	const scrollParentYRef = useRef( null );
+	const scrollEditorIntervalRef = useRef( null );
 
 	// Clear interval when unmounting.
 	useEffect(
 		() => () => {
-			if ( scrollEditorInterval.current ) {
-				clearInterval( scrollEditorInterval.current );
-				scrollEditorInterval.current = null;
+			if ( scrollEditorIntervalRef.current ) {
+				clearInterval( scrollEditorIntervalRef.current );
+				scrollEditorIntervalRef.current = null;
 			}
 		},
 		[]
 	);
 
 	const startScrolling = useCallback( ( event ) => {
-		dragStartY.current = event.clientY;
+		dragStartYRef.current = event.clientY;
 
 		// Find nearest parent(s) to scroll.
-		scrollParentY.current = getScrollContainer( event.target );
+		scrollParentYRef.current = getScrollContainer( event.target );
 
-		scrollEditorInterval.current = setInterval( () => {
-			if ( scrollParentY.current && velocityY.current ) {
+		scrollEditorIntervalRef.current = setInterval( () => {
+			if ( scrollParentYRef.current && velocityYRef.current ) {
 				const newTop =
-					scrollParentY.current.scrollTop + velocityY.current;
+					scrollParentYRef.current.scrollTop + velocityYRef.current;
 
 				// Setting `behavior: 'smooth'` as a scroll property seems to hurt performance.
 				// Better to use a small scroll interval.
-				scrollParentY.current.scroll( {
+				scrollParentYRef.current.scroll( {
 					top: newTop,
 				} );
 			}
@@ -55,14 +55,14 @@ export default function useScrollWhenDragging() {
 	}, [] );
 
 	const scrollOnDragOver = useCallback( ( event ) => {
-		if ( ! scrollParentY.current ) {
+		if ( ! scrollParentYRef.current ) {
 			return;
 		}
-		const scrollParentHeight = scrollParentY.current.offsetHeight;
+		const scrollParentHeight = scrollParentYRef.current.offsetHeight;
 		const offsetDragStartPosition =
-			dragStartY.current - scrollParentY.current.offsetTop;
+			dragStartYRef.current - scrollParentYRef.current.offsetTop;
 		const offsetDragPosition =
-			event.clientY - scrollParentY.current.offsetTop;
+			event.clientY - scrollParentYRef.current.offsetTop;
 
 		if ( event.clientY > offsetDragStartPosition ) {
 			// User is dragging downwards.
@@ -78,8 +78,11 @@ export default function useScrollWhenDragging() {
 					SCROLL_INACTIVE_DISTANCE_PX,
 				0
 			);
-			const distancePercentage = dragDistance / moveableDistance;
-			velocityY.current = VELOCITY_MULTIPLIER * distancePercentage;
+			const distancePercentage =
+				moveableDistance === 0 || dragDistance === 0
+					? 0
+					: dragDistance / moveableDistance;
+			velocityYRef.current = VELOCITY_MULTIPLIER * distancePercentage;
 		} else if ( event.clientY < offsetDragStartPosition ) {
 			// User is dragging upwards.
 			const moveableDistance = Math.max(
@@ -92,20 +95,23 @@ export default function useScrollWhenDragging() {
 					SCROLL_INACTIVE_DISTANCE_PX,
 				0
 			);
-			const distancePercentage = dragDistance / moveableDistance;
-			velocityY.current = -VELOCITY_MULTIPLIER * distancePercentage;
+			const distancePercentage =
+				moveableDistance === 0 || dragDistance === 0
+					? 0
+					: dragDistance / moveableDistance;
+			velocityYRef.current = -VELOCITY_MULTIPLIER * distancePercentage;
 		} else {
-			velocityY.current = 0;
+			velocityYRef.current = 0;
 		}
 	}, [] );
 
 	const stopScrolling = () => {
-		dragStartY.current = null;
-		scrollParentY.current = null;
+		dragStartYRef.current = null;
+		scrollParentYRef.current = null;
 
-		if ( scrollEditorInterval.current ) {
-			clearInterval( scrollEditorInterval.current );
-			scrollEditorInterval.current = null;
+		if ( scrollEditorIntervalRef.current ) {
+			clearInterval( scrollEditorIntervalRef.current );
+			scrollEditorIntervalRef.current = null;
 		}
 	};
 

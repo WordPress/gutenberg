@@ -8,14 +8,24 @@
 /**
  * Renders the `core/term-description` block on the server.
  *
- * @param array $attributes Block attributes.
+ * @since 5.9.0
+ *
+ * @param array    $attributes Block attributes.
+ * @param string   $content    Block default content.
+ * @param WP_Block $block      Block instance.
  *
  * @return string Returns the description of the current taxonomy term, if available
  */
-function render_block_core_term_description( $attributes ) {
+function render_block_core_term_description( $attributes, $content, $block ) {
 	$term_description = '';
 
-	if ( is_category() || is_tag() || is_tax() ) {
+	// Get term from context or from the current query.
+	if ( isset( $block->context['termId'] ) && isset( $block->context['taxonomy'] ) ) {
+		$term = get_term( $block->context['termId'], $block->context['taxonomy'] );
+		if ( $term && ! is_wp_error( $term ) ) {
+			$term_description = $term->description;
+		}
+	} elseif ( is_category() || is_tag() || is_tax() ) {
 		$term_description = term_description();
 	}
 
@@ -23,16 +33,22 @@ function render_block_core_term_description( $attributes ) {
 		return '';
 	}
 
-	$extra_attributes   = ( isset( $attributes['textAlign'] ) )
-		? array( 'class' => 'has-text-align-' . $attributes['textAlign'] )
-		: array();
-	$wrapper_attributes = get_block_wrapper_attributes( $extra_attributes );
+	$classes = array();
+	if ( isset( $attributes['textAlign'] ) ) {
+		$classes[] = 'has-text-align-' . $attributes['textAlign'];
+	}
+	if ( isset( $attributes['style']['elements']['link']['color']['text'] ) ) {
+		$classes[] = 'has-link-color';
+	}
+	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => implode( ' ', $classes ) ) );
 
 	return '<div ' . $wrapper_attributes . '>' . $term_description . '</div>';
 }
 
 /**
  * Registers the `core/term-description` block on the server.
+ *
+ * @since 5.9.0
  */
 function register_block_core_term_description() {
 	register_block_type_from_metadata(

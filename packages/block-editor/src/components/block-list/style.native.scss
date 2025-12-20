@@ -66,12 +66,12 @@
 }
 
 .defaultBlock {
-	margin: $block-edge-to-content;
+	margin: $block-edge-to-content * 0.5 $block-edge-to-content;
 }
 
 .defaultAppender {
-	margin-top: $block-edge-to-content;
-	margin-bottom: $block-edge-to-content;
+	margin-top: $grid-unit;
+	margin-bottom: $grid-unit;
 	width: 100%;
 }
 

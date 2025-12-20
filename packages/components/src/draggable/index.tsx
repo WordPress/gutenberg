@@ -63,6 +63,7 @@ export function Draggable( {
 	onDragStart,
 	onDragOver,
 	onDragEnd,
+	appendToOwnerDocument = false,
 	cloneClassname,
 	elementId,
 	transferData,
@@ -70,16 +71,16 @@ export function Draggable( {
 	__experimentalDragComponent: dragComponent,
 }: DraggableProps ) {
 	const dragComponentRef = useRef< HTMLDivElement >( null );
-	const cleanup = useRef( () => {} );
+	const cleanupRef = useRef( () => {} );
 
 	/**
 	 * Removes the element clone, resets cursor, and removes drag listener.
 	 *
-	 * @param  event The non-custom DragEvent.
+	 * @param event The non-custom DragEvent.
 	 */
 	function end( event: DragEvent ) {
 		event.preventDefault();
-		cleanup.current();
+		cleanupRef.current();
 
 		if ( onDragEnd ) {
 			onDragEnd( event );
@@ -94,7 +95,7 @@ export function Draggable( {
 	 * - Sets transfer data.
 	 * - Adds dragover listener.
 	 *
-	 * @param  event The non-custom DragEvent.
+	 * @param event The non-custom DragEvent.
 	 */
 	function start( event: DragEvent ) {
 		const { ownerDocument } = event.target as HTMLElement;
@@ -173,7 +174,11 @@ export function Draggable( {
 			cloneWrapper.appendChild( clone );
 
 			// Inject the cloneWrapper into the DOM.
-			elementWrapper?.appendChild( cloneWrapper );
+			if ( appendToOwnerDocument ) {
+				ownerDocument.body.appendChild( cloneWrapper );
+			} else {
+				elementWrapper?.appendChild( cloneWrapper );
+			}
 		}
 
 		// Mark the current cursor coordinates.
@@ -207,17 +212,11 @@ export function Draggable( {
 		// Update cursor to 'grabbing', document wide.
 		ownerDocument.body.classList.add( bodyClass );
 
-		// Allow the Synthetic Event to be accessed from asynchronous code.
-		// https://reactjs.org/docs/events.html#event-pooling
-		event.persist();
-
-		let timerId: number | undefined;
-
 		if ( onDragStart ) {
-			timerId = setTimeout( () => onDragStart( event ) );
+			onDragStart( event );
 		}
 
-		cleanup.current = () => {
+		cleanupRef.current = () => {
 			// Remove drag clone.
 			if ( cloneWrapper && cloneWrapper.parentNode ) {
 				cloneWrapper.parentNode.removeChild( cloneWrapper );
@@ -231,14 +230,12 @@ export function Draggable( {
 			ownerDocument.body.classList.remove( bodyClass );
 
 			ownerDocument.removeEventListener( 'dragover', throttledDragOver );
-
-			clearTimeout( timerId );
 		};
 	}
 
 	useEffect(
 		() => () => {
-			cleanup.current();
+			cleanupRef.current();
 		},
 		[]
 	);

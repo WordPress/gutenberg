@@ -1,6 +1,6 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
-	"apiVersion": 2,
+	"apiVersion": 3,
 	"name": "core/read-more",
 	"title": "Read More",
 	"category": "theme",
@@ -8,7 +8,8 @@
 	"textdomain": "default",
 	"attributes": {
 		"content": {
-			"type": "string"
+			"type": "string",
+			"role": "content"
 		},
 		"linkTarget": {
 			"type": "string",
@@ -50,6 +51,9 @@
 			"__experimentalDefaultControls": {
 				"width": true
 			}
+		},
+		"interactivity": {
+			"clientNavigation": true
 		}
 	},
 	"style": "wp-block-read-more"

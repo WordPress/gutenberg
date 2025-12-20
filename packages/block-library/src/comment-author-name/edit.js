@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -15,7 +15,16 @@ import {
 	useBlockProps,
 } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
-import { PanelBody, ToggleControl } from '@wordpress/components';
+import {
+	ToggleControl,
+	__experimentalToolsPanel as ToolsPanel,
+	__experimentalToolsPanelItem as ToolsPanelItem,
+} from '@wordpress/components';
+
+/**
+ * Internal dependencies
+ */
+import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
 /**
  * Renders the `core/comment-author-name` block on the editor.
@@ -36,8 +45,9 @@ export default function Edit( {
 	context: { commentId },
 	setAttributes,
 } ) {
+	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 	const blockProps = useBlockProps( {
-		className: classnames( {
+		className: clsx( {
 			[ `has-text-align-${ textAlign }` ]: textAlign,
 		} ),
 	} );
@@ -46,7 +56,7 @@ export default function Edit( {
 			const { getEntityRecord } = select( coreStore );
 
 			const comment = getEntityRecord( 'root', 'comment', commentId );
-			const authorName = comment?.author_name; // eslint-disable-line camelcase
+			const authorName = comment?.author_name;
 
 			if ( comment && ! authorName ) {
 				const user = getEntityRecord( 'root', 'user', comment.author );
@@ -70,24 +80,55 @@ export default function Edit( {
 
 	const inspectorControls = (
 		<InspectorControls>
-			<PanelBody title={ __( 'Link settings' ) }>
-				<ToggleControl
+			<ToolsPanel
+				label={ __( 'Settings' ) }
+				resetAll={ () => {
+					setAttributes( {
+						isLink: true,
+						linkTarget: '_self',
+					} );
+				} }
+				dropdownMenuProps={ dropdownMenuProps }
+			>
+				<ToolsPanelItem
 					label={ __( 'Link to authors URL' ) }
-					onChange={ () => setAttributes( { isLink: ! isLink } ) }
-					checked={ isLink }
-				/>
-				{ isLink && (
+					isShownByDefault
+					hasValue={ () => ! isLink }
+					onDeselect={ () =>
+						setAttributes( {
+							isLink: true,
+						} )
+					}
+				>
 					<ToggleControl
+						label={ __( 'Link to authors URL' ) }
+						onChange={ () => setAttributes( { isLink: ! isLink } ) }
+						checked={ isLink }
+					/>
+				</ToolsPanelItem>
+				{ isLink && (
+					<ToolsPanelItem
 						label={ __( 'Open in new tab' ) }
-						onChange={ ( value ) =>
+						isShownByDefault
+						hasValue={ () => linkTarget !== '_self' }
+						onDeselect={ () =>
 							setAttributes( {
-								linkTarget: value ? '_blank' : '_self',
+								linkTarget: '_self',
 							} )
 						}
-						checked={ linkTarget === '_blank' }
-					/>
+					>
+						<ToggleControl
+							label={ __( 'Open in new tab' ) }
+							onChange={ ( value ) =>
+								setAttributes( {
+									linkTarget: value ? '_blank' : '_self',
+								} )
+							}
+							checked={ linkTarget === '_blank' }
+						/>
+					</ToolsPanelItem>
 				) }
-			</PanelBody>
+			</ToolsPanel>
 		</InspectorControls>
 	);
 

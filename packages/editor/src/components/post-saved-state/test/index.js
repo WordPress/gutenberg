@@ -47,11 +47,14 @@ describe( 'PostSavedState', () => {
 			isNew: true,
 			isSaveable: false,
 			isSaving: true,
+			postStatus: 'draft',
 		} ) );
 
 		render( <PostSavedState /> );
 
-		expect( screen.getByText( 'Saving' ) ).toBeVisible();
+		expect(
+			screen.getByRole( 'button', { name: /Saving/i } )
+		).toBeVisible();
 	} );
 
 	it( 'returns a disabled button if the post is not saveable', () => {
@@ -60,16 +63,7 @@ describe( 'PostSavedState', () => {
 			isNew: true,
 			isSaveable: false,
 			isSaving: false,
-		} ) );
-
-		render( <PostSavedState /> );
-
-		expect( screen.getByRole( 'button' ) ).toMatchSnapshot();
-	} );
-
-	it( 'returns a switch to draft link if the post is published', () => {
-		useSelect.mockImplementation( () => ( {
-			isPublished: true,
+			postStatus: 'draft',
 		} ) );
 
 		render( <PostSavedState /> );
@@ -83,6 +77,7 @@ describe( 'PostSavedState', () => {
 			isNew: false,
 			isSaveable: true,
 			isSaving: false,
+			postStatus: 'draft',
 		} ) );
 
 		render( <PostSavedState /> );
@@ -94,15 +89,14 @@ describe( 'PostSavedState', () => {
 	} );
 
 	it( 'should return Save button if edits to be saved', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 
 		useSelect.mockImplementation( () => ( {
 			isDirty: true,
 			isNew: false,
 			isSaveable: true,
 			isSaving: false,
+			postStatus: 'draft',
 		} ) );
 
 		// Simulate the viewport being considered large.

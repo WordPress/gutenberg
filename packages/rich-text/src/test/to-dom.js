@@ -1,19 +1,9 @@
 /**
- * External dependencies
- */
-
-import { JSDOM } from 'jsdom';
-
-/**
  * Internal dependencies
  */
-
 import { toDom, applyValue } from '../to-dom';
 import { createElement } from '../create-element';
 import { spec } from './helpers';
-
-const { window } = new JSDOM();
-const { document } = window;
 
 describe( 'recordToDom', () => {
 	beforeAll( () => {
@@ -21,19 +11,16 @@ describe( 'recordToDom', () => {
 		require( '../store' );
 	} );
 
-	spec.forEach(
-		( { description, multilineTag, record, startPath, endPath } ) => {
-			// eslint-disable-next-line jest/valid-title
-			it( description, () => {
-				const { body, selection } = toDom( {
-					value: record,
-					multilineTag,
-				} );
-				expect( body ).toMatchSnapshot();
-				expect( selection ).toEqual( { startPath, endPath } );
+	spec.forEach( ( { description, record, startPath, endPath } ) => {
+		// eslint-disable-next-line jest/valid-title
+		it( description, () => {
+			const { body, selection } = toDom( {
+				value: record,
 			} );
-		}
-	);
+			expect( body ).toMatchSnapshot();
+			expect( selection ).toEqual( { startPath, endPath } );
+		} );
+	} );
 } );
 
 describe( 'applyValue', () => {
@@ -91,6 +78,24 @@ describe( 'applyValue', () => {
 			future: '<span data-1="ii" data-2="i">a</span>',
 			movedCount: 0,
 			description: 'should update attributes',
+		},
+		{
+			current: '<math><mi>x</mi></math>',
+			future: '<math><mi>y</mi></math>',
+			movedCount: 0,
+			description: 'should update MathML content',
+		},
+		{
+			current: '<math><mfrac><mi>a</mi><mi>b</mi></mfrac></math>',
+			future: '<math><mfrac><mi>x</mi><mi>y</mi></mfrac></math>',
+			movedCount: 0,
+			description: 'should update MathML fraction',
+		},
+		{
+			current: '<math><mtext><strong>bold</strong></mtext></math>',
+			future: '<math><mtext><em>italic</em></mtext></math>',
+			movedCount: 0,
+			description: 'should update HTML elements within MathML mtext',
 		},
 	];
 

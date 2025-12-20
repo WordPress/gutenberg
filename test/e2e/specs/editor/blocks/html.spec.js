@@ -10,17 +10,27 @@ test.describe( 'HTML block', () => {
 
 	test( 'can be created by typing "/html"', async ( { editor, page } ) => {
 		// Create a Custom HTML block with the slash shortcut.
-		await page.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas
+			.getByRole( 'button', { name: 'Add default block' } )
+			.click();
 		await page.keyboard.type( '/html' );
 		await expect(
 			page.locator( 'role=option[name="Custom HTML"i][selected]' )
 		).toBeVisible();
 		await page.keyboard.press( 'Enter' );
+		await editor.canvas
+			.getByRole( 'button', { name: 'Edit HTML' } )
+			.click();
+		await page.getByRole( 'dialog' ).getByRole( 'textbox' ).click();
 		await page.keyboard.type( '<p>Pythagorean theorem: ' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type(
 			'<var>a</var><sup>2</sup> + <var>b</var><sup>2</sup> = <var>c</var><sup>2</sup> </p>'
 		);
+		await page
+			.getByRole( 'dialog' )
+			.getByRole( 'button', { name: 'Update' } )
+			.click();
 		// Check the content.
 		const content = await editor.getEditedPostContent();
 		expect( content ).toBe(
@@ -29,5 +39,31 @@ test.describe( 'HTML block', () => {
 <var>a</var><sup>2</sup> + <var>b</var><sup>2</sup> = <var>c</var><sup>2</sup> </p>
 <!-- /wp:html -->`
 		);
+	} );
+
+	test( 'should not encode <', async ( { editor, page } ) => {
+		// Create a Custom HTML block with the slash shortcut.
+		await editor.canvas
+			.getByRole( 'button', { name: 'Add default block' } )
+			.click();
+		await page.keyboard.type( '/html' );
+		await expect(
+			page.locator( 'role=option[name="Custom HTML"i][selected]' )
+		).toBeVisible();
+		await page.keyboard.press( 'Enter' );
+		await editor.canvas
+			.getByRole( 'button', { name: 'Edit HTML' } )
+			.click();
+		await page.getByRole( 'dialog' ).getByRole( 'textbox' ).click();
+		await page.keyboard.type( '1 < 2' );
+		await page
+			.getByRole( 'dialog' )
+			.getByRole( 'button', { name: 'Update' } )
+			.click();
+		await editor.publishPost();
+		await page.reload();
+		await expect(
+			editor.canvas.locator( '[data-type="core/html"] iframe' )
+		).toBeVisible();
 	} );
 } );

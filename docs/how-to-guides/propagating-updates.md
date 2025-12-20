@@ -22,7 +22,7 @@ How to manage block updates depends on the nature of the block itself. If the bl
 
 ### Patterns
 
-**For content that you want updated later on, do not use patterns and instead rely on reusable blocks or template parts.** Patterns cannot be updated after you insert one into your site. For context, you can think of Patterns as more like sample/example/starter content. While Patterns exposed in the Inserter might evolve over time, those changes won't be automatically applied to any current useage of the pattern. Once inserted, patterns become completely detached from the original pattern unlike Reusable block or Template Part block.
+**For content that you want updated later on, do not use patterns and instead rely on reusable blocks or template parts.** Patterns cannot be updated after you insert one into your site. For context, you can think of Patterns as more like sample/example/starter content. While Patterns exposed in the Inserter might evolve over time, those changes won't be automatically applied to any current usage of the pattern. Once inserted, patterns become completely detached from the original pattern unlike Reusable block or Template Part block.
 
 If needed, one potential workaround for patterns with custom styles is to add a class name to the wrapping block for a pattern. For example, the following adds a themeslug-special class to a Group block:
 
@@ -36,11 +36,11 @@ If needed, one potential workaround for patterns with custom styles is to add a 
 
 It is not fool-proof because users can modify the class via the editor UI.  However, because this setting is under the "Advanced" panel it is likely to stay intact in most instances. This gives theme authors some CSS control for some pattern types, allowing them to update existing uses. However, it does not prevent users from making massive alterations that cannot be updated.
 
-### Reusable blocks
+### Synced Patterns
 
-As the name suggests, these blocks are inherently synced across your site. Keep in mind that there are currently limitations with relying on reusable blocks to handle certain updates since content, HTML structure, and styles will all stay in sync when updates happen. If you require more nuance than that, this is a key element to factor in and a dynamic block might be a better approach.
+As the name suggests, these patterns are inherently synced across your site. Keep in mind that there are currently limitations with relying on synced patterns to handle certain updates since content, HTML structure, and styles will all stay in sync when updates happen. If you require more nuance than that, this is a key element to factor in and a dynamic block might be a better approach.
 
-### Template Parts and Templates
+### Template parts and templates
 
 Because block themes allow users to directly edit templates and template parts, how changes are managed need to be adjusted in light of the greater access given to users. For context, when templates or template parts are changed by the user, the updated templates from the theme update don’t show for the user. Only new users of the theme or users who have not yet edited a template are experiencing the updated template. If users haven’t modified the files then the changes you make on the file system will be reflected on the user’s sites – you just need to update the files and they’ll get the changes. However if they have made changes to their templates then the only way you can update their templates is to:
 
@@ -55,7 +55,7 @@ Likewise, it is generally poor practice to delete template parts in theme update
 
 ### Resources
 
-- [Comparing Patterns, Template Parts, and Reusable Blocks](https://wordpress.org/support/article/comparing-patterns-template-parts-and-reusable-blocks/)
+- [Comparing Patterns, Template Parts, and Reusable Blocks](https://wordpress.org/documentation/article/comparing-patterns-template-parts-and-reusable-blocks/)
 - [Block deprecation](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-deprecation/)
 - [Create Block tool](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-create-block/)
 

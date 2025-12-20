@@ -5,6 +5,7 @@
 		convertErrorsToExceptions="true"
 		convertNoticesToExceptions="true"
 		convertWarningsToExceptions="true"
+		convertDeprecationsToExceptions="true"
 >
 	<php>
 		<env name="WP_MULTISITE" value="1" />
@@ -13,11 +14,13 @@
 	<testsuites>
 		<testsuite name="default">
 			<directory suffix="-test.php">./</directory>
+			<directory suffix=".php">./tests/</directory>
 		</testsuite>
 	</testsuites>
 	<groups>
 		<exclude>
 			<group>ms-excluded</group>
+			<group>fontsapi</group>
 		</exclude>
 	</groups>
 </phpunit>

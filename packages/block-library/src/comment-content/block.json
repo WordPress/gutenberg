@@ -1,6 +1,6 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
-	"apiVersion": 2,
+	"apiVersion": 3,
 	"name": "core/comment-content",
 	"title": "Comment Content",
 	"category": "theme",
@@ -35,6 +35,18 @@
 				"fontSize": true
 			}
 		},
+		"__experimentalBorder": {
+			"radius": true,
+			"color": true,
+			"width": true,
+			"style": true,
+			"__experimentalDefaultControls": {
+				"radius": true,
+				"color": true,
+				"width": true,
+				"style": true
+			}
+		},
 		"spacing": {
 			"padding": [ "horizontal", "vertical" ],
 			"__experimentalDefaultControls": {
@@ -42,5 +54,6 @@
 			}
 		},
 		"html": false
-	}
+	},
+	"style": "wp-block-comment-content"
 }

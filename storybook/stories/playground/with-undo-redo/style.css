@@ -1,0 +1,14 @@
+.editor-with-undo-redo {
+	border: 1px solid #ddd;
+}
+
+.editor-with-undo-redo__toolbar {
+	display: flex;
+	align-items: center;
+	border-bottom: 1px solid #ddd;
+	height: 46px;
+}
+
+.editor-with-undo-redo__toolbar .components-accessible-toolbar.block-editor-block-contextual-toolbar {
+	border-bottom: none;
+}

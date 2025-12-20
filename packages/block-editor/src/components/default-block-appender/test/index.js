@@ -7,28 +7,36 @@ import userEvent from '@testing-library/user-event';
 /**
  * Internal dependencies
  */
-import { DefaultBlockAppender, ZWNBSP } from '../';
+import DefaultBlockAppender, { ZWNBSP } from '../';
+import * as blockEditorActions from '../../../store/actions';
+import * as blockEditorSelectors from '../../../store/selectors';
+jest.mock( '../../../store/actions', () => {
+	const actions = jest.requireActual( '../../../store/actions' );
+	return {
+		...actions,
+		startTyping: jest.fn( actions.startTyping ),
+	};
+} );
+jest.mock( '../../../store/selectors', () => {
+	const selectors = jest.requireActual( '../../../store/selectors' );
+	return {
+		...selectors,
+		getBlockCount: jest.fn( selectors.getBlockCount ),
+	};
+} );
 
 describe( 'DefaultBlockAppender', () => {
 	it( 'should match snapshot', () => {
-		const onAppend = jest.fn();
-
-		const { container } = render(
-			<DefaultBlockAppender onAppend={ onAppend } showPrompt />
-		);
+		const { container } = render( <DefaultBlockAppender /> );
 
 		expect( container ).toMatchSnapshot();
 	} );
 
 	it( 'should append a default block when input focused', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
-		const onAppend = jest.fn();
+		const startTyping = jest.spyOn( blockEditorActions, 'startTyping' );
+		const user = userEvent.setup();
 
-		const { container } = render(
-			<DefaultBlockAppender onAppend={ onAppend } showPrompt />
-		);
+		const { container } = render( <DefaultBlockAppender /> );
 
 		await user.click(
 			screen.getByRole( 'button', { name: 'Add default block' } )
@@ -37,19 +45,15 @@ describe( 'DefaultBlockAppender', () => {
 		expect( container ).toMatchSnapshot();
 
 		// Called once for focusing and once for clicking.
-		expect( onAppend ).toHaveBeenCalledTimes( 2 );
-		expect( onAppend ).toHaveBeenCalledWith();
+		expect( startTyping ).toHaveBeenCalledTimes( 2 );
+		expect( startTyping ).toHaveBeenCalledWith();
 	} );
 
 	it( 'should optionally show without prompt', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
-		const onAppend = jest.fn();
+		blockEditorSelectors.getBlockCount.mockImplementation( () => 1 );
+		const user = userEvent.setup();
 
-		const { container } = render(
-			<DefaultBlockAppender onAppend={ onAppend } showPrompt={ false } />
-		);
+		const { container } = render( <DefaultBlockAppender /> );
 
 		const appender = screen.getByRole( 'button', {
 			name: 'Add default block',

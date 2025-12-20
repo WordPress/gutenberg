@@ -1,4 +1,5 @@
 {
+	"$schema": "https://json.schemastore.org/tsconfig.json",
 	"extends": "../../tsconfig.base.json",
 	"compilerOptions": {
 		"rootDir": "src",
@@ -6,11 +7,13 @@
 		"types": [ "gutenberg-env" ]
 	},
 	"references": [
-		{ "path": "../element" },
-		{ "path": "../priority-queue" },
+		{ "path": "../deprecated" },
 		{ "path": "../dom" },
+		{ "path": "../element" },
 		{ "path": "../is-shallow-equal" },
-		{ "path": "../keycodes" }
+		{ "path": "../keycodes" },
+		{ "path": "../priority-queue" },
+		{ "path": "../undo-manager" }
 	],
 	"include": [ "src/**/*" ]
 }

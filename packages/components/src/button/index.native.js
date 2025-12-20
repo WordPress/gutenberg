@@ -24,6 +24,7 @@ import {
  */
 import Tooltip from '../tooltip';
 import Icon from '../icon';
+import style from './style.scss';
 
 const isAndroid = Platform.OS === 'android';
 const marginBottom = isAndroid ? -0.5 : 0;
@@ -51,8 +52,6 @@ const styles = StyleSheet.create( {
 		justifyContent: 'center',
 		alignItems: 'center',
 		borderRadius: 6,
-		borderColor: '#2e4453',
-		backgroundColor: '#2e4453',
 	},
 	subscriptInactive: {
 		color: '#7b9ab1', // $toolbar-button.
@@ -95,6 +94,7 @@ export function Button( props ) {
 		tooltipPosition,
 		isActiveStyle,
 		customContainerStyles,
+		hitSlop,
 	} = props;
 	const preferredColorScheme = usePreferredColorScheme();
 
@@ -105,10 +105,16 @@ export function Button( props ) {
 		customContainerStyles && { ...customContainerStyles },
 	];
 
+	const buttonActiveColorStyles = usePreferredColorSchemeStyle(
+		style[ 'components-button-light--active' ],
+		style[ 'components-button-dark--active' ]
+	);
+
 	const buttonViewStyle = {
 		opacity: isDisabled ? 0.3 : 1,
 		...( fixedRatio && styles.fixedRatio ),
 		...( isPressed ? styles.buttonActive : styles.buttonInactive ),
+		...( isPressed ? buttonActiveColorStyles : {} ),
 		...( isPressed &&
 			isActiveStyle?.borderRadius && {
 				borderRadius: isActiveStyle.borderRadius,
@@ -158,7 +164,6 @@ export function Button( props ) {
 
 	const newIcon = icon
 		? cloneElement( <Icon icon={ icon } size={ iconSize } />, {
-				colorScheme: preferredColorScheme,
 				isPressed,
 		  } )
 		: null;
@@ -175,15 +180,16 @@ export function Button( props ) {
 	const element = (
 		<TouchableOpacity
 			activeOpacity={ 0.7 }
-			accessible={ true }
+			accessible
 			accessibilityLabel={ label }
 			accessibilityStates={ states }
-			accessibilityRole={ 'button' }
+			accessibilityRole="button"
 			accessibilityHint={ hint }
 			onPress={ onClick }
 			style={ containerStyle }
 			disabled={ isDisabled }
 			testID={ testID }
+			hitSlop={ hitSlop }
 		>
 			<LongPressGestureHandler
 				minDurationMs={ 500 }

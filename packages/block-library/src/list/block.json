@@ -1,26 +1,26 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
-	"apiVersion": 2,
+	"apiVersion": 3,
 	"name": "core/list",
 	"title": "List",
 	"category": "text",
-	"description": "Create a bulleted or numbered list.",
+	"allowedBlocks": [ "core/list-item" ],
+	"description": "An organized collection of items displayed in a specific order.",
 	"keywords": [ "bullet list", "ordered list", "numbered list" ],
 	"textdomain": "default",
 	"attributes": {
 		"ordered": {
 			"type": "boolean",
 			"default": false,
-			"__experimentalRole": "content"
+			"role": "content"
 		},
 		"values": {
 			"type": "string",
 			"source": "html",
 			"selector": "ol,ul",
 			"multiline": "li",
-			"__unstableMultilineWrapperTags": [ "ol", "ul" ],
 			"default": "",
-			"__experimentalRole": "content"
+			"role": "content"
 		},
 		"type": {
 			"type": "string"
@@ -37,7 +37,13 @@
 	},
 	"supports": {
 		"anchor": true,
-		"className": false,
+		"html": false,
+		"__experimentalBorder": {
+			"color": true,
+			"radius": true,
+			"style": true,
+			"width": true
+		},
 		"typography": {
 			"fontSize": true,
 			"lineHeight": true,
@@ -61,11 +67,21 @@
 		},
 		"spacing": {
 			"margin": true,
-			"padding": true
+			"padding": true,
+			"__experimentalDefaultControls": {
+				"margin": false,
+				"padding": false
+			}
 		},
 		"__unstablePasteTextInline": true,
-		"__experimentalSelector": "ol,ul",
-		"__experimentalSlashInserter": true
+		"__experimentalOnMerge": true,
+		"__experimentalSlashInserter": true,
+		"interactivity": {
+			"clientNavigation": true
+		}
+	},
+	"selectors": {
+		"border": ".wp-block-list:not(.wp-block-list .wp-block-list)"
 	},
 	"editorStyle": "wp-block-list-editor",
 	"style": "wp-block-list"

@@ -18,14 +18,15 @@ export type FocalPointAxis = 'x' | 'y';
 
 export type FocalPointPickerProps = Pick<
 	BaseControlProps,
-	'help' | 'hideLabelFromVision' | 'label'
+	'__nextHasNoMarginBottom' | 'help' | 'hideLabelFromVision' | 'label'
 > & {
 	/**
-	 * Start opting into the new margin-free styles that will become the default in a future version.
+	 * Start opting into the larger default height that will become the default size in a future version.
 	 *
-	 * @default false
+	 * @deprecated Default behavior since WP 6.7. Prop can be safely removed.
+	 * @ignore
 	 */
-	__nextHasNoMarginBottom?: boolean;
+	__next40pxDefaultSize?: boolean;
 	/**
 	 * Autoplays HTML5 video. This only applies to video sources (`url`).
 	 *
@@ -61,7 +62,6 @@ export type FocalPointPickerProps = Pick<
 };
 
 export type FocalPointPickerControlsProps = {
-	__nextHasNoMarginBottom?: boolean;
 	/**
 	 * A bit of extra bottom margin will be added if a `help` text
 	 * needs to be rendered under it.

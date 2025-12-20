@@ -1,44 +1,56 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`flags warnings with invalid selectors scss snapshot matches warnings 1`] = `
-Array [
-  Object {
+[
+  {
     "column": 2,
+    "endColumn": 3,
+    "endLine": 3,
     "line": 3,
     "rule": "scss/selector-no-redundant-nesting-selector",
     "severity": "error",
     "text": "Unnecessary nesting selector (&) (scss/selector-no-redundant-nesting-selector)",
   },
-  Object {
+  {
     "column": 2,
+    "endColumn": 3,
+    "endLine": 10,
     "line": 10,
     "rule": "scss/selector-no-redundant-nesting-selector",
     "severity": "error",
     "text": "Unnecessary nesting selector (&) (scss/selector-no-redundant-nesting-selector)",
   },
-  Object {
+  {
     "column": 2,
+    "endColumn": 3,
+    "endLine": 17,
     "line": 17,
     "rule": "scss/selector-no-redundant-nesting-selector",
     "severity": "error",
     "text": "Unnecessary nesting selector (&) (scss/selector-no-redundant-nesting-selector)",
   },
-  Object {
+  {
     "column": 2,
+    "endColumn": 3,
+    "endLine": 24,
     "line": 24,
     "rule": "scss/selector-no-redundant-nesting-selector",
     "severity": "error",
     "text": "Unnecessary nesting selector (&) (scss/selector-no-redundant-nesting-selector)",
   },
-  Object {
+  {
     "column": 2,
+    "endColumn": 3,
+    "endLine": 31,
     "line": 31,
     "rule": "scss/selector-no-redundant-nesting-selector",
     "severity": "error",
     "text": "Unnecessary nesting selector (&) (scss/selector-no-redundant-nesting-selector)",
   },
-  Object {
+  {
     "column": 10,
+    "endColumn": 11,
+    "endLine": 31,
     "line": 31,
     "rule": "selector-pseudo-element-colon-notation",
     "severity": "error",

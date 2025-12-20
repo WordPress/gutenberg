@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -11,13 +11,11 @@ import {
 	BlockControls,
 	InspectorControls,
 	BlockIcon,
-	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { Spinner, Placeholder } from '@wordpress/components';
+import { Flex, FlexBlock, Spinner, Placeholder } from '@wordpress/components';
 import { brush as brushIcon } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 import { useState, useCallback } from '@wordpress/element';
-import { useSelect } from '@wordpress/data';
 import { useEntityRecord } from '@wordpress/core-data';
 
 /**
@@ -35,7 +33,7 @@ export default function Edit( props ) {
 	const { isWide = false } = props;
 
 	const blockProps = useBlockProps( {
-		className: classnames( {
+		className: clsx( {
 			'is-wide-widget': isWide,
 		} ),
 	} );
@@ -57,30 +55,34 @@ function Empty( { attributes: { id, idBase }, setAttributes } ) {
 			icon={ <BlockIcon icon={ brushIcon } /> }
 			label={ __( 'Legacy Widget' ) }
 		>
-			<WidgetTypeSelector
-				selectedId={ id ?? idBase }
-				onSelect={ ( { selectedId, isMulti } ) => {
-					if ( ! selectedId ) {
-						setAttributes( {
-							id: null,
-							idBase: null,
-							instance: null,
-						} );
-					} else if ( isMulti ) {
-						setAttributes( {
-							id: null,
-							idBase: selectedId,
-							instance: {},
-						} );
-					} else {
-						setAttributes( {
-							id: selectedId,
-							idBase: null,
-							instance: null,
-						} );
-					}
-				} }
-			/>
+			<Flex>
+				<FlexBlock>
+					<WidgetTypeSelector
+						selectedId={ id ?? idBase }
+						onSelect={ ( { selectedId, isMulti } ) => {
+							if ( ! selectedId ) {
+								setAttributes( {
+									id: null,
+									idBase: null,
+									instance: null,
+								} );
+							} else if ( isMulti ) {
+								setAttributes( {
+									id: null,
+									idBase: selectedId,
+									instance: {},
+								} );
+							} else {
+								setAttributes( {
+									id: selectedId,
+									idBase: null,
+									instance: null,
+								} );
+							}
+						} }
+					/>
+				</FlexBlock>
+			</Flex>
 		</Placeholder>
 	);
 }
@@ -97,11 +99,6 @@ function NotEmpty( {
 	const widgetTypeId = id ?? idBase;
 	const { record: widgetType, hasResolved: hasResolvedWidgetType } =
 		useEntityRecord( 'root', 'widgetType', widgetTypeId );
-
-	const isNavigationMode = useSelect(
-		( select ) => select( blockEditorStore ).isNavigationMode(),
-		[]
-	);
 
 	const setInstance = useCallback( ( nextInstance ) => {
 		setAttributes( { instance: nextInstance } );
@@ -126,8 +123,7 @@ function NotEmpty( {
 		);
 	}
 
-	const mode =
-		idBase && ( isNavigationMode || ! isSelected ) ? 'preview' : 'edit';
+	const mode = idBase && ! isSelected ? 'preview' : 'edit';
 
 	return (
 		<>

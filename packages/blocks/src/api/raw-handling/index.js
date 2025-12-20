@@ -38,7 +38,13 @@ export function deprecatedGetPhrasingContentSchema( context ) {
 export function rawHandler( { HTML = '' } ) {
 	// If we detect block delimiters, parse entirely as blocks.
 	if ( HTML.indexOf( '<!-- wp:' ) !== -1 ) {
-		return parse( HTML );
+		const parseResult = parse( HTML );
+		const isSingleFreeFormBlock =
+			parseResult.length === 1 &&
+			parseResult[ 0 ].name === 'core/freeform';
+		if ( ! isSingleFreeFormBlock ) {
+			return parseResult;
+		}
 	}
 
 	// An array of HTML strings and block objects. The blocks replace matched
@@ -65,11 +71,11 @@ export function rawHandler( { HTML = '' } ) {
 				figureContentReducer,
 				// Needed to create the quote block, which cannot handle text
 				// without wrapper paragraphs.
-				blockquoteNormaliser,
+				blockquoteNormaliser( { raw: true } ),
 			];
 
 			piece = deepFilterHTML( piece, filters, blockContentSchema );
-			piece = normaliseBlocks( piece );
+			piece = normaliseBlocks( piece, { raw: true } );
 
 			return htmlToBlocks( piece, rawHandler );
 		} )

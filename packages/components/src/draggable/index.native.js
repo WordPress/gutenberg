@@ -63,7 +63,7 @@ const Draggable = ( {
 	useAnimatedReaction(
 		() => isDragging.value,
 		( result, previous ) => {
-			if ( result === previous || previous === null ) {
+			if ( result === previous ) {
 				return;
 			}
 
@@ -75,7 +75,7 @@ const Draggable = ( {
 						id: draggingId.value,
 					} );
 				}
-			} else if ( onDragEnd ) {
+			} else if ( previous !== null && onDragEnd ) {
 				onDragEnd( {
 					x: lastPosition.x.value,
 					y: lastPosition.y.value,

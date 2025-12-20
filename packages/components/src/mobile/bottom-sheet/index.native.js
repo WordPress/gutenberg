@@ -19,7 +19,10 @@ import SafeArea from 'react-native-safe-area';
 /**
  * WordPress dependencies
  */
-import { subscribeAndroidModalClosed } from '@wordpress/react-native-bridge';
+import {
+	subscribeAndroidModalClosed,
+	showAndroidSoftKeyboard,
+} from '@wordpress/react-native-bridge';
 import { Component } from '@wordpress/element';
 import { withPreferredColorScheme } from '@wordpress/compose';
 
@@ -215,6 +218,11 @@ class BottomSheet extends Component {
 		if ( this.androidModalClosedSubscription ) {
 			this.androidModalClosedSubscription.remove();
 		}
+
+		if ( this.props.isVisible ) {
+			showAndroidSoftKeyboard();
+		}
+
 		if ( this.safeAreaEventSubscription === null ) {
 			return;
 		}
@@ -315,6 +323,9 @@ class BottomSheet extends Component {
 	onDismiss() {
 		const { onDismiss } = this.props;
 
+		// Restore Keyboard Visibility
+		showAndroidSoftKeyboard();
+
 		if ( onDismiss ) {
 			onDismiss();
 		}
@@ -368,6 +379,7 @@ class BottomSheet extends Component {
 	onHardwareButtonPress() {
 		const { onClose } = this.props;
 		const { handleHardwareButtonPress } = this.state;
+
 		if ( handleHardwareButtonPress && handleHardwareButtonPress() ) {
 			return;
 		}
@@ -527,6 +539,9 @@ class BottomSheet extends Component {
 					panResponder.panHandlers.onMoveShouldSetResponderCapture
 				}
 				onAccessibilityEscape={ this.onCloseBottomSheet }
+				testID="bottom-sheet"
+				hardwareAccelerated
+				useNativeDriverForBackdrop
 				{ ...rest }
 			>
 				<KeyboardAvoidingView
@@ -575,6 +590,8 @@ class BottomSheet extends Component {
 								listProps,
 								setIsFullScreen: this.setIsFullScreen,
 								safeAreaBottomInset,
+								maxHeight,
+								isMaxHeightSet,
 							} }
 						>
 							{ hasNavigation ? (

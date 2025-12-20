@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { TouchableWithoutFeedback, View, Text } from 'react-native';
-import { isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -63,9 +62,7 @@ class LatestPostsEdit extends Component {
 			.then( ( categoriesList ) => {
 				if ( this.isStillMounted ) {
 					this.setState( {
-						categoriesList: isEmpty( categoriesList )
-							? []
-							: categoriesList,
+						categoriesList,
 					} );
 				}
 			} )
@@ -160,7 +157,7 @@ class LatestPostsEdit extends Component {
 
 		return (
 			<InspectorControls>
-				<PanelBody title={ __( 'Post content settings' ) }>
+				<PanelBody title={ __( 'Post content' ) }>
 					<ToggleControl
 						label={ __( 'Show post content' ) }
 						checked={ displayPostContent }
@@ -184,7 +181,7 @@ class LatestPostsEdit extends Component {
 					) }
 				</PanelBody>
 
-				<PanelBody title={ __( 'Post meta settings' ) }>
+				<PanelBody title={ __( 'Post meta' ) }>
 					<ToggleControl
 						label={ __( 'Display post date' ) }
 						checked={ displayPostDate }
@@ -192,7 +189,7 @@ class LatestPostsEdit extends Component {
 					/>
 				</PanelBody>
 
-				<PanelBody title={ __( 'Featured image settings' ) }>
+				<PanelBody title={ __( 'Featured image' ) }>
 					<ToggleControl
 						label={ __( 'Display featured image' ) }
 						checked={ displayFeaturedImage }
@@ -204,13 +201,13 @@ class LatestPostsEdit extends Component {
 								value={ featuredImageAlign }
 								onChange={ this.onSetFeaturedImageAlign }
 								controls={ [ 'left', 'center', 'right' ] }
-								isBottomSheetControl={ true }
+								isBottomSheetControl
 							/>
 							<ToggleControl
 								label={ __( 'Add link to featured image' ) }
 								checked={ addLinkToFeaturedImage }
 								onChange={ this.onSetAddLinkToFeaturedImage }
-								separatorType={ 'topFullWidth' }
+								separatorType="topFullWidth"
 							/>
 						</>
 					) }

@@ -8,15 +8,8 @@
  */
 
 add_action(
-	'setup_theme',
-	function() {
-		add_theme_support( 'block-templates' );
-	}
-);
-
-add_action(
 	'init',
-	function() {
+	static function () {
 		wp_register_script(
 			'iframed-multiple-stylesheets-editor-script',
 			plugin_dir_url( __FILE__ ) . 'iframed-multiple-stylesheets/editor.js',

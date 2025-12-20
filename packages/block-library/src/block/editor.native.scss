@@ -19,8 +19,8 @@
 	background-color: $light-gray-400;
 	height: 1px;
 	position: absolute;
-	left: -$block-selected-to-content + $block-selected-border-width;
-	right: -$block-selected-to-content + $block-selected-border-width;
+	left: -$grid-unit-05;
+	right: -$grid-unit-05;
 	bottom: 16;
 }
 

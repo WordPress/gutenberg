@@ -43,23 +43,30 @@ export default function useResizeCanvas( deviceType ) {
 		return deviceWidth < actualWidth ? deviceWidth : actualWidth;
 	};
 
-	const marginValue = () => ( window.innerHeight < 800 ? 36 : 72 );
-
 	const contentInlineStyles = ( device ) => {
 		const height = device === 'Mobile' ? '768px' : '1024px';
+		const marginVertical = '40px';
+		const marginHorizontal = 'auto';
+
 		switch ( device ) {
 			case 'Tablet':
 			case 'Mobile':
 				return {
 					width: getCanvasWidth( device ),
-					margin: marginValue() + 'px auto',
+					// Keeping margin styles separate to avoid warnings
+					// when those props get overridden in the iframe component
+					marginTop: marginVertical,
+					marginBottom: marginVertical,
+					marginLeft: marginHorizontal,
+					marginRight: marginHorizontal,
 					height,
-					borderRadius: '2px 2px 2px 2px',
-					border: '1px solid #ddd',
 					overflowY: 'auto',
 				};
 			default:
-				return null;
+				return {
+					marginLeft: marginHorizontal,
+					marginRight: marginHorizontal,
+				};
 		}
 	};
 

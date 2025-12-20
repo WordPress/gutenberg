@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { find } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { useCallback, useMemo } from '@wordpress/element';
@@ -13,7 +8,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
  * Internal dependencies
  */
 import { useBlockEditContext } from '../block-edit';
-import useSetting from '../use-setting';
+import { useSettings } from '../use-settings';
 import { store as blockEditorStore } from '../../store';
 
 export function __experimentalGetGradientClass( gradientSlug ) {
@@ -32,7 +27,7 @@ export function __experimentalGetGradientClass( gradientSlug ) {
  * @return {string} Gradient value.
  */
 export function getGradientValueBySlug( gradients, slug ) {
-	const gradient = find( gradients, [ 'slug', slug ] );
+	const gradient = gradients?.find( ( g ) => g.slug === slug );
 	return gradient && gradient.gradient;
 }
 
@@ -40,7 +35,7 @@ export function __experimentalGetGradientObjectByGradientValue(
 	gradients,
 	value
 ) {
-	const gradient = find( gradients, [ 'gradient', value ] );
+	const gradient = gradients?.find( ( g ) => g.gradient === value );
 	return gradient;
 }
 
@@ -65,9 +60,15 @@ export function __experimentalUseGradient( {
 } = {} ) {
 	const { clientId } = useBlockEditContext();
 
-	const userGradientPalette = useSetting( 'color.gradients.custom' );
-	const themeGradientPalette = useSetting( 'color.gradients.theme' );
-	const defaultGradientPalette = useSetting( 'color.gradients.default' );
+	const [
+		userGradientPalette,
+		themeGradientPalette,
+		defaultGradientPalette,
+	] = useSettings(
+		'color.gradients.custom',
+		'color.gradients.theme',
+		'color.gradients.default'
+	);
 	const allGradients = useMemo(
 		() => [
 			...( userGradientPalette || [] ),

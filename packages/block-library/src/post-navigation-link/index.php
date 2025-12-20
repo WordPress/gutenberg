@@ -8,6 +8,8 @@
 /**
  * Renders the `core/post-navigation-link` block on the server.
  *
+ * @since 5.9.0
+ *
  * @param array  $attributes Block attributes.
  * @param string $content    Block default content.
  *
@@ -28,12 +30,17 @@ function render_block_core_post_navigation_link( $attributes, $content ) {
 	if ( isset( $attributes['textAlign'] ) ) {
 		$classes .= " has-text-align-{$attributes['textAlign']}";
 	}
-	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $classes ) );
+	$wrapper_attributes = get_block_wrapper_attributes(
+		array(
+			'class' => $classes,
+		)
+	);
 	// Set default values.
 	$format = '%link';
 	$link   = 'next' === $navigation_type ? _x( 'Next', 'label for next post link' ) : _x( 'Previous', 'label for previous post link' );
 	$label  = '';
 
+	// Only use hardcoded values here, otherwise we need to add escaping where these values are used.
 	$arrow_map = array(
 		'none'    => '',
 		'arrow'   => array(
@@ -84,20 +91,31 @@ function render_block_core_post_navigation_link( $attributes, $content ) {
 	}
 
 	// Display arrows.
-	if ( isset( $attributes['arrow'] ) && ! empty( $attributes['arrow'] ) && 'none' !== $attributes['arrow'] ) {
+	if ( isset( $attributes['arrow'] ) && 'none' !== $attributes['arrow'] && isset( $arrow_map[ $attributes['arrow'] ] ) ) {
 		$arrow = $arrow_map[ $attributes['arrow'] ][ $navigation_type ];
 
 		if ( 'next' === $navigation_type ) {
-			$format = '%link <span class="wp-block-post-navigation-link__arrow-next is-arrow-' . $attributes['arrow'] . '" aria-hidden="true">' . $arrow . '</span>';
+			$format = '%link<span class="wp-block-post-navigation-link__arrow-next is-arrow-' . $attributes['arrow'] . '" aria-hidden="true">' . $arrow . '</span>';
 		} else {
-			$format = '<span class="wp-block-post-navigation-link__arrow-previous is-arrow-' . $attributes['arrow'] . '" aria-hidden="true">' . $arrow . '</span> %link';
+			$format = '<span class="wp-block-post-navigation-link__arrow-previous is-arrow-' . $attributes['arrow'] . '" aria-hidden="true">' . $arrow . '</span>%link';
 		}
 	}
 
-	// The dynamic portion of the function name, `$navigation_type`,
-	// refers to the type of adjacency, 'next' or 'previous'.
+	/*
+	 * The dynamic portion of the function name, `$navigation_type`,
+	 * Refers to the type of adjacency, 'next' or 'previous'.
+	 *
+	 * @see https://developer.wordpress.org/reference/functions/get_previous_post_link/
+	 * @see https://developer.wordpress.org/reference/functions/get_next_post_link/
+	 */
 	$get_link_function = "get_{$navigation_type}_post_link";
-	$content           = $get_link_function( $format, $link );
+
+	if ( ! empty( $attributes['taxonomy'] ) ) {
+		$content = $get_link_function( $format, $link, true, '', $attributes['taxonomy'] );
+	} else {
+		$content = $get_link_function( $format, $link );
+	}
+
 	return sprintf(
 		'<div %1$s>%2$s</div>',
 		$wrapper_attributes,
@@ -107,6 +125,8 @@ function render_block_core_post_navigation_link( $attributes, $content ) {
 
 /**
  * Registers the `core/post-navigation-link` block on the server.
+ *
+ * @since 5.9.0
  */
 function register_block_core_post_navigation_link() {
 	register_block_type_from_metadata(

@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { get } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -25,6 +20,7 @@ import MaybeTagsPanel from './maybe-tags-panel';
 import MaybePostFormatPanel from './maybe-post-format-panel';
 import { store as editorStore } from '../../store';
 import MaybeCategoryPanel from './maybe-category-panel';
+import MaybeUploadMedia from './maybe-upload-media';
 
 function PostPublishPanelPrepublish( { children } ) {
 	const {
@@ -42,11 +38,8 @@ function PostPublishPanelPrepublish( { children } ) {
 			getEntityRecord( 'root', '__unstableBase', undefined ) || {};
 
 		return {
-			hasPublishAction: get(
-				getCurrentPost(),
-				[ '_links', 'wp:action-publish' ],
-				false
-			),
+			hasPublishAction:
+				getCurrentPost()._links?.[ 'wp:action-publish' ] ?? false,
 			isBeingScheduled: isEditedPostBeingScheduled(),
 			isRequestingSiteIcon: isResolving( 'getEntityRecord', [
 				'root',
@@ -82,7 +75,7 @@ function PostPublishPanelPrepublish( { children } ) {
 	if ( ! hasPublishAction ) {
 		prePublishTitle = __( 'Are you ready to submit for review?' );
 		prePublishBodyText = __(
-			'When you’re ready, submit your work for review, and an Editor will be able to approve it for you.'
+			'Your work will be reviewed and then approved.'
 		);
 	} else if ( isBeingScheduled ) {
 		prePublishTitle = __( 'Are you ready to schedule?' );
@@ -111,6 +104,7 @@ function PostPublishPanelPrepublish( { children } ) {
 					<span className="components-site-home">{ siteHome }</span>
 				</div>
 			</div>
+			<MaybeUploadMedia />
 			{ hasPublishAction && (
 				<>
 					<PanelBody

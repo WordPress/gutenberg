@@ -26,11 +26,11 @@ class EmptyParser {
   }
 }
 
-function my_plugin_select_empty_parser( $prev_parser_class ) {
+function wpdocs_select_empty_parser( $prev_parser_class ) {
     return 'EmptyParser';
 }
 
-add_filter( 'block_parser_class', 'my_plugin_select_empty_parser', 10, 1 );
+add_filter( 'block_parser_class', 'wpdocs_select_empty_parser', 10, 1 );
 ```
 
 > **Note**: At the present time it's not possible to replace the client-side parser.

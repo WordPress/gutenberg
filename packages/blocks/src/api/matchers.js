@@ -4,6 +4,11 @@
 export { attr, prop, text, query } from 'hpq';
 
 /**
+ * WordPress dependencies
+ */
+import { RichTextData } from '@wordpress/rich-text';
+
+/**
  * Internal dependencies
  */
 export { matcher as node } from './node';
@@ -41,3 +46,10 @@ export function html( selector, multilineTag ) {
 		return match.innerHTML;
 	};
 }
+
+export const richText = ( selector, preserveWhiteSpace ) => ( el ) => {
+	const target = selector ? el.querySelector( selector ) : el;
+	return target
+		? RichTextData.fromHTMLElement( target, { preserveWhiteSpace } )
+		: RichTextData.empty();
+};

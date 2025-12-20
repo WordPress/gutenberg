@@ -81,7 +81,10 @@ export class HTMLTextInput extends Component {
 			title,
 		} = this.props;
 		const titleStyle = [
-			styles.htmlViewTitle,
+			getStylesFromColorScheme(
+				styles.htmlViewTitle,
+				styles.htmlViewTitleDark
+			),
 			style?.text && { color: style.text },
 		];
 		const htmlStyle = [

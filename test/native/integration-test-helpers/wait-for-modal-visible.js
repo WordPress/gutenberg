@@ -1,13 +1,15 @@
 /**
- * Internal dependencies
+ * External dependencies
  */
-import { waitFor } from './wait-for';
+import { waitFor } from '@testing-library/react-native';
 
 /**
  * Waits for a modal to be visible.
  *
- * @param {import('react-test-renderer').ReactTestInstance} modalInstance Modal test instance.
+ * @param {ReturnType<import('@testing-library/react-native').RenderAPI['getByTestId']>} modalInstance Modal test instance.
  */
 export const waitForModalVisible = async ( modalInstance ) => {
-	return waitFor( () => modalInstance.props.isVisible );
+	return waitFor( () =>
+		expect( modalInstance.props.isVisible ).toBe( true )
+	);
 };

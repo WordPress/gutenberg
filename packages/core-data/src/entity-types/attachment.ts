@@ -14,6 +14,86 @@ import type {
 
 import type { BaseEntityRecords as _BaseEntityRecords } from './base-entity-records';
 
+interface MediaDetails {
+	width?: number;
+	height?: number;
+	file?: string;
+	filesize?: number;
+	sizes: { [ key: string ]: Size };
+	image_meta?: ImageMeta;
+	original_image?: string;
+	// Audio/video metadata
+	bitrate?: number;
+	mime_type?: string;
+	length?: number;
+	length_formatted?: string;
+	fileformat?: string;
+	dataformat?: string;
+	// Audio-specific
+	channels?: number;
+	sample_rate?: number;
+	codec?: string;
+	encoder?: string;
+	lossless?: boolean;
+	encoder_options?: string;
+	compression_ratio?: number;
+	channelmode?: string;
+	bitrate_mode?: string;
+	// Video-specific
+	audio?: {
+		dataformat?: string;
+		bitrate?: number;
+		codec?: string;
+		sample_rate?: number;
+		channels?: number;
+		bits_per_sample?: number;
+		lossless?: boolean;
+		channelmode?: string;
+		compression_ratio?: number;
+	};
+	created_timestamp?: number;
+	// Audio metadata fields
+	title?: string;
+	artist?: string;
+	track_number?: string;
+	album?: string;
+	recording_time?: string;
+	genre?: string;
+	date?: string;
+	comment?: string;
+	band?: string;
+	year?: string;
+	image?: {
+		mime?: string;
+		width?: number;
+		height?: number;
+	};
+}
+interface ImageMeta {
+	aperture: string;
+	credit: string;
+	camera: string;
+	caption: string;
+	created_timestamp: string;
+	copyright: string;
+	focal_length: string;
+	iso: string;
+	shutter_speed: string;
+	title: string;
+	orientation: string;
+	keywords: any[];
+}
+
+interface Size {
+	file: string;
+	width: number;
+	height: number;
+	filesize?: number;
+	mime_type: string;
+	source_url: string;
+	uncropped?: boolean;
+}
+
 declare module './base-entity-records' {
 	export namespace BaseEntityRecords {
 		export interface Attachment< C extends Context > {
@@ -89,7 +169,7 @@ declare module './base-entity-records' {
 			 * Meta fields.
 			 */
 			meta: ContextualField<
-				Record< string, string >,
+				Record< string, unknown > | [],
 				'view' | 'edit',
 				C
 			>;
@@ -104,7 +184,7 @@ declare module './base-entity-records' {
 			/**
 			 * The attachment caption.
 			 */
-			caption: ContextualField< string, 'edit', C >;
+			caption: ContextualField< RenderedText< C >, 'edit', C >;
 			/**
 			 * The attachment description.
 			 */
@@ -124,11 +204,11 @@ declare module './base-entity-records' {
 			/**
 			 * Details about the media file, specific to its type.
 			 */
-			media_details: Record< string, string >;
+			media_details: MediaDetails;
 			/**
 			 * The ID for the associated post of the attachment.
 			 */
-			post: ContextualField< number, 'view' | 'edit', C >;
+			post: ContextualField< number | null, 'view' | 'edit', C >;
 			/**
 			 * URL to the original attachment file.
 			 */
@@ -137,6 +217,18 @@ declare module './base-entity-records' {
 			 * List of the missing image sizes of the attachment.
 			 */
 			missing_image_sizes: ContextualField< string[], 'edit', C >;
+			/**
+			 * The ID of the featured media of the attachment.
+			 */
+			featured_media: number;
+			/**
+			 * An array of class names for the post.
+			 */
+			class_list: string[];
+			/**
+			 * Links to related resources.
+			 */
+			_links?: Record< string, unknown >;
 		}
 	}
 }

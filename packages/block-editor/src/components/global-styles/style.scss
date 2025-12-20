@@ -1,0 +1,130 @@
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/colors" as *;
+
+.block-editor-global-styles__toggle-icon {
+	fill: currentColor;
+}
+
+// @todo Ideally, popover, swatch size, and gap values should be CSS variables
+// to apply precise grid layouts.
+// https://github.com/WordPress/gutenberg/blob/954ecae571abbddc113d3a4bd8e1a72230180554/packages/block-editor/src/components/duotone-control/style.scss#L3-L9
+.block-editor-global-styles__shadow-popover-container {
+	width: 230px;
+}
+
+.block-editor-global-styles__shadow__list {
+	display: flex;
+	gap: 12px;
+	flex-wrap: wrap;
+	padding-bottom: $grid-unit-10;
+}
+
+.block-editor-global-styles__clear-shadow {
+	text-align: right;
+}
+
+.block-editor-global-styles-filters-panel__dropdown,
+.block-editor-global-styles__shadow-dropdown {
+	display: block;
+	padding: 0;
+	position: relative;
+	border: 1px solid $gray-300;
+	border-radius: $radius-small;
+}
+
+.block-editor-global-styles-filters-panel__dropdown-toggle,
+.block-editor-global-styles__shadow-dropdown-toggle {
+	width: 100%;
+	padding: $grid-unit-10;
+
+	&.is-open {
+		background-color: $gray-100;
+	}
+}
+
+.block-editor-global-styles__shadow-editor__remove-button {
+	position: absolute;
+	right: 0;
+	top: $grid-unit;
+	margin: auto $grid-unit auto;
+	opacity: 0;
+	@media not (prefers-reduced-motion) {
+		transition: opacity 0.1s ease-in-out;
+	}
+
+	.block-editor-global-styles__shadow-dropdown:hover &,
+	&:focus,
+	&:hover {
+		opacity: 1;
+	}
+
+	@media (hover: none) {
+		// Show reset button on devices that do not support hover.
+		opacity: 1;
+	}
+}
+
+// These styles are similar to the color palette.
+.block-editor-global-styles__shadow-indicator {
+	appearance: none;
+	background: none;
+	color: $gray-800;
+	border: $gray-200 $border-width solid;
+	border-radius: $radius-small;
+	cursor: pointer;
+	display: inline-flex;
+	align-items: center;
+
+	padding: 0;
+
+	height: $button-size-small + 2 * $border-width;
+	width: $button-size-small + 2 * $border-width;
+	box-sizing: border-box;
+
+	transform: scale(1);
+	@media not ( prefers-reduced-motion ) {
+		transition: transform 0.1s ease;
+	}
+	will-change: transform;
+
+	&:focus {
+		border: #{ $border-width * 2 } solid $gray-700;
+	}
+
+	&:hover {
+		transform: scale(1.2);
+	}
+
+	&.unset {
+		background: linear-gradient(-45deg, transparent 48%, $gray-300 48%, $gray-300 52%, transparent 52%);
+	}
+}
+
+.block-editor-global-styles-advanced-panel__custom-css-input textarea {
+	font-family: $editor_html_font;
+	// CSS input is always LTR regardless of language.
+	/*rtl:ignore*/
+	direction: ltr;
+}
+
+.block-editor-panel-duotone-settings__reset {
+	position: absolute;
+	right: 0;
+	top: $grid-unit;
+	margin: auto $grid-unit auto;
+	opacity: 0;
+	@media not (prefers-reduced-motion) {
+		transition: opacity 0.1s ease-in-out;
+	}
+
+	.block-editor-global-styles-filters-panel__dropdown:hover &,
+	&:focus,
+	&:hover {
+		opacity: 1;
+	}
+
+	@media (hover: none) {
+		// Show reset button on devices that do not support hover.
+		opacity: 1;
+	}
+}

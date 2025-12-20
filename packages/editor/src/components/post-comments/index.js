@@ -1,42 +1,66 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
-import { CheckboxControl } from '@wordpress/components';
-import { compose } from '@wordpress/compose';
-import { withSelect, withDispatch } from '@wordpress/data';
+import { __, _x } from '@wordpress/i18n';
+import {
+	RadioControl,
+	__experimentalVStack as VStack,
+} from '@wordpress/components';
+import { useDispatch, useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import { store as editorStore } from '../../store';
 
-function PostComments( { commentStatus = 'open', ...props } ) {
-	const onToggleComments = () =>
-		props.editPost( {
-			comment_status: commentStatus === 'open' ? 'closed' : 'open',
+const COMMENT_OPTIONS = [
+	{
+		label: _x( 'Open', 'Adjective: e.g. "Comments are open"' ),
+		value: 'open',
+		description: __( 'Visitors can add new comments and replies.' ),
+	},
+	{
+		label: __( 'Closed' ),
+		value: 'closed',
+		description: [
+			__( 'Visitors cannot add new comments or replies.' ),
+			__( 'Existing comments remain visible.' ),
+		].join( ' ' ),
+	},
+];
+
+function PostComments() {
+	const commentStatus = useSelect(
+		( select ) =>
+			select( editorStore ).getEditedPostAttribute( 'comment_status' ) ??
+			'open',
+		[]
+	);
+	const { editPost } = useDispatch( editorStore );
+	const handleStatus = ( newCommentStatus ) =>
+		editPost( {
+			comment_status: newCommentStatus,
 		} );
 
 	return (
-		<CheckboxControl
-			__nextHasNoMarginBottom
-			label={ __( 'Allow comments' ) }
-			checked={ commentStatus === 'open' }
-			onChange={ onToggleComments }
-		/>
+		<form>
+			<VStack spacing={ 4 }>
+				<RadioControl
+					className="editor-change-status__options"
+					hideLabelFromVision
+					label={ __( 'Comment status' ) }
+					options={ COMMENT_OPTIONS }
+					onChange={ handleStatus }
+					selected={ commentStatus }
+				/>
+			</VStack>
+		</form>
 	);
 }
 
-export default compose( [
-	withSelect( ( select ) => {
-		return {
-			commentStatus:
-				select( editorStore ).getEditedPostAttribute(
-					'comment_status'
-				),
-		};
-	} ),
-	withDispatch( ( dispatch ) => ( {
-		editPost: dispatch( editorStore ).editPost,
-	} ) ),
-] )( PostComments );
+/**
+ * A form for managing comment status.
+ *
+ * @return {React.ReactNode} The rendered PostComments component.
+ */
+export default PostComments;

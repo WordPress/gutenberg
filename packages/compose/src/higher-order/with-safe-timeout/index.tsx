@@ -6,11 +6,11 @@ import { Component } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import {
-	createHigherOrderComponent,
+import type {
 	WithInjectedProps,
 	WithoutInjectedProps,
 } from '../../utils/create-higher-order-component';
+import { createHigherOrderComponent } from '../../utils/create-higher-order-component';
 
 /**
  * We cannot use the `Window['setTimeout']` and `Window['clearTimeout']`
@@ -59,7 +59,9 @@ const withSafeTimeout = createHigherOrderComponent(
 
 			clearTimeout( id: number ) {
 				clearTimeout( id );
-				this.timeouts.filter( ( timeoutId ) => timeoutId !== id );
+				this.timeouts = this.timeouts.filter(
+					( timeoutId ) => timeoutId !== id
+				);
 			}
 
 			render() {

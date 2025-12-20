@@ -11,11 +11,12 @@ import { store as coreStore } from '@wordpress/core-data';
 import useBlockEditorSettings from './use-block-editor-settings.js';
 import { store as editorStore } from '../../store';
 
-function useNativeBlockEditorSettings( settings, hasTemplate ) {
-	const capabilities = settings.capabilities ?? {};
-	const editorSettings = useBlockEditorSettings( settings, hasTemplate );
+const EMPTY_BLOCKS_LIST = [];
 
-	const supportReusableBlock = capabilities.reusableBlock === true;
+function useNativeBlockEditorSettings( settings, postType, postId ) {
+	const editorSettings = useBlockEditorSettings( settings, postType, postId );
+	const supportReusableBlock = settings.capabilities?.reusableBlock === true;
+
 	const { reusableBlocks, isTitleSelected } = useSelect(
 		( select ) => {
 			return {
@@ -27,7 +28,7 @@ function useNativeBlockEditorSettings( settings, hasTemplate ) {
 							// Related issue: https://github.com/wordpress-mobile/gutenberg-mobile/issues/2661
 							{ per_page: 100 }
 					  )
-					: [],
+					: EMPTY_BLOCKS_LIST,
 				isTitleSelected: select( editorStore ).isPostTitleSelected(),
 			};
 		},

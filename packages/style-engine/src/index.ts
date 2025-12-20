@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { groupBy, kebabCase } from 'lodash';
+import { paramCase as kebabCase } from 'change-case';
 
 /**
  * Internal dependencies
@@ -19,8 +19,8 @@ import { styleDefinitions } from './styles';
  *
  * @since 6.1.0 Introduced in WordPress core.
  *
- * @param  style   Style object, for example, the value of a block's attributes.style object or the top level styles in theme.json
- * @param  options Options object with settings to adjust how the styles are generated.
+ * @param style   Style object, for example, the value of a block's attributes.style object or the top level styles in theme.json
+ * @param options Options object with settings to adjust how the styles are generated.
  *
  * @return A generated stylesheet or inline style declarations.
  */
@@ -36,7 +36,20 @@ export function compileCSS( style: Style, options: StyleOptions = {} ): string {
 		return inlineRules.join( ' ' );
 	}
 
-	const groupedRules = groupBy( rules, 'selector' );
+	const groupedRules = rules.reduce(
+		( acc: Record< string, GeneratedCSSRule[] >, rule ) => {
+			const { selector } = rule;
+			if ( ! selector ) {
+				return acc;
+			}
+			if ( ! acc[ selector ] ) {
+				acc[ selector ] = [];
+			}
+			acc[ selector ].push( rule );
+			return acc;
+		},
+		{}
+	);
 	const selectorRules = Object.keys( groupedRules ).reduce(
 		( acc: string[], subSelector: string ) => {
 			acc.push(
@@ -60,8 +73,8 @@ export function compileCSS( style: Style, options: StyleOptions = {} ): string {
  *
  * @since 6.1.0 Introduced in WordPress core.
  *
- * @param  style   Style object, for example, the value of a block's attributes.style object or the top level styles in theme.json
- * @param  options Options object with settings to adjust how the styles are generated.
+ * @param style   Style object, for example, the value of a block's attributes.style object or the top level styles in theme.json
+ * @param options Options object with settings to adjust how the styles are generated.
  *
  * @return A collection of objects containing the selector, if any, the CSS property key (camelcase) and parsed CSS value.
  */
@@ -78,3 +91,6 @@ export function getCSSRules(
 
 	return rules;
 }
+
+// Export style utils.
+export { getCSSValueFromRawStyle } from './styles/utils';

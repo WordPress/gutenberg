@@ -1,14 +1,14 @@
 /**
  * External dependencies
  */
-import { map, groupBy, isEqual, get } from 'lodash';
+import fastDeepEqual from 'fast-deep-equal/es6';
 
 /**
  * WordPress dependencies
  */
 import { compose } from '@wordpress/compose';
 import { combineReducers } from '@wordpress/data';
-import isShallowEqual from '@wordpress/is-shallow-equal';
+import { createUndoManager } from '@wordpress/undo-manager';
 
 /**
  * Internal dependencies
@@ -18,29 +18,6 @@ import { reducer as queriedDataReducer } from './queried-data';
 import { rootEntitiesConfig, DEFAULT_ENTITY_KEY } from './entities';
 
 /** @typedef {import('./types').AnyFunction} AnyFunction */
-
-/**
- * Reducer managing terms state. Keyed by taxonomy slug, the value is either
- * undefined (if no request has been made for given taxonomy), null (if a
- * request is in-flight for given taxonomy), or the array of terms for the
- * taxonomy.
- *
- * @param {Object} state  Current state.
- * @param {Object} action Dispatched action.
- *
- * @return {Object} Updated state.
- */
-export function terms( state = {}, action ) {
-	switch ( action.type ) {
-		case 'RECEIVE_TERMS':
-			return {
-				...state,
-				[ action.taxonomy ]: action.terms,
-			};
-	}
-
-	return state;
-}
 
 /**
  * Reducer managing authors state. Keyed by id.
@@ -67,10 +44,7 @@ export function users( state = { byId: {}, queries: {} }, action ) {
 				},
 				queries: {
 					...state.queries,
-					[ action.queryID ]: map(
-						action.users,
-						( user ) => user.id
-					),
+					[ action.queryID ]: action.users.map( ( user ) => user.id ),
 				},
 			};
 	}
@@ -90,23 +64,6 @@ export function currentUser( state = {}, action ) {
 	switch ( action.type ) {
 		case 'RECEIVE_CURRENT_USER':
 			return action.currentUser;
-	}
-
-	return state;
-}
-
-/**
- * Reducer managing taxonomies.
- *
- * @param {Object} state  Current state.
- * @param {Object} action Dispatched action.
- *
- * @return {Object} Updated state.
- */
-export function taxonomies( state = [], action ) {
-	switch ( action.type ) {
-		case 'RECEIVE_TAXONOMIES':
-			return action.taxonomies;
 	}
 
 	return state;
@@ -186,6 +143,33 @@ export function themeGlobalStyleVariations( state = {}, action ) {
 	return state;
 }
 
+const withMultiEntityRecordEdits = ( reducer ) => ( state, action ) => {
+	if ( action.type === 'UNDO' || action.type === 'REDO' ) {
+		const { record } = action;
+
+		let newState = state;
+		record.forEach( ( { id: { kind, name, recordId }, changes } ) => {
+			newState = reducer( newState, {
+				type: 'EDIT_ENTITY_RECORD',
+				kind,
+				name,
+				recordId,
+				edits: Object.entries( changes ).reduce(
+					( acc, [ key, value ] ) => {
+						acc[ key ] =
+							action.type === 'UNDO' ? value.from : value.to;
+						return acc;
+					},
+					{}
+				),
+			} );
+		} );
+		return newState;
+	}
+
+	return reducer( state, action );
+};
+
 /**
  * Higher Order Reducer for a given entity config. It supports:
  *
@@ -199,6 +183,8 @@ export function themeGlobalStyleVariations( state = {}, action ) {
  */
 function entity( entityConfig ) {
 	return compose( [
+		withMultiEntityRecordEdits,
+
 		// Limit to matching action type so we don't attempt to replace action on
 		// an unhandled action.
 		ifMatchingAction(
@@ -212,14 +198,13 @@ function entity( entityConfig ) {
 		// Inject the entity config into the action.
 		replaceAction( ( action ) => {
 			return {
-				...action,
 				key: entityConfig.key || DEFAULT_ENTITY_KEY,
+				...action,
 			};
 		} ),
 	] )(
 		combineReducers( {
 			queriedData: queriedDataReducer,
-
 			edits: ( state = {}, action ) => {
 				switch ( action.type ) {
 					case 'RECEIVE_ITEMS':
@@ -231,7 +216,7 @@ function entity( entityConfig ) {
 						const nextState = { ...state };
 
 						for ( const record of action.items ) {
-							const recordId = record[ action.key ];
+							const recordId = record?.[ action.key ];
 							const edits = nextState[ recordId ];
 							if ( ! edits ) {
 								continue;
@@ -245,18 +230,14 @@ function entity( entityConfig ) {
 										// Edits are the "raw" attribute values, but records may have
 										// objects with more properties, so we use `get` here for the
 										// comparison.
-										! isEqual(
+										! fastDeepEqual(
 											edits[ key ],
-											get(
-												record[ key ],
-												'raw',
-												record[ key ]
-											)
+											record[ key ]?.raw ?? record[ key ]
 										) &&
 										// Sometimes the server alters the sent value which means
 										// we need to also remove the edits before the api request.
 										( ! action.persistedEdits ||
-											! isEqual(
+											! fastDeepEqual(
 												edits[ key ],
 												action.persistedEdits[ key ]
 											) )
@@ -333,6 +314,38 @@ function entity( entityConfig ) {
 
 				return state;
 			},
+
+			revisions: ( state = {}, action ) => {
+				// Use the same queriedDataReducer shape for revisions.
+				if ( action.type === 'RECEIVE_ITEM_REVISIONS' ) {
+					const recordKey = action.recordKey;
+					delete action.recordKey;
+					const newState = queriedDataReducer( state[ recordKey ], {
+						...action,
+						type: 'RECEIVE_ITEMS',
+					} );
+					return {
+						...state,
+						[ recordKey ]: newState,
+					};
+				}
+
+				if ( action.type === 'REMOVE_ITEMS' ) {
+					return Object.fromEntries(
+						Object.entries( state ).filter(
+							( [ id ] ) =>
+								! action.itemIds.some( ( itemId ) => {
+									if ( Number.isInteger( itemId ) ) {
+										return itemId === +id;
+									}
+									return itemId === id;
+								} )
+						)
+					);
+				}
+
+				return state;
+			},
 		} )
 	);
 }
@@ -365,27 +378,56 @@ export function entitiesConfig( state = rootEntitiesConfig, action ) {
 export const entities = ( state = {}, action ) => {
 	const newConfig = entitiesConfig( state.config, action );
 
-	// Generates a dynamic reducer for the entities.
+	// Generates a reducer for the entities nested by `kind` and `name`.
+	// A config array with shape:
+	// ```
+	// [
+	//   { kind: 'taxonomy', name: 'category' },
+	//   { kind: 'taxonomy', name: 'post_tag' },
+	//   { kind: 'postType', name: 'post' },
+	//   { kind: 'postType', name: 'page' },
+	// ]
+	// ```
+	// generates a reducer for state tree with shape:
+	// ```
+	// {
+	//   taxonomy: {
+	//     category,
+	//     post_tag,
+	//   },
+	//   postType: {
+	//     post,
+	//     page,
+	//   },
+	// }
+	// ```
 	let entitiesDataReducer = state.reducer;
 	if ( ! entitiesDataReducer || newConfig !== state.config ) {
-		const entitiesByKind = groupBy( newConfig, 'kind' );
-		entitiesDataReducer = combineReducers(
-			Object.entries( entitiesByKind ).reduce(
-				( memo, [ kind, subEntities ] ) => {
-					const kindReducer = combineReducers(
-						subEntities.reduce(
-							( kindMemo, entityConfig ) => ( {
-								...kindMemo,
-								[ entityConfig.name ]: entity( entityConfig ),
-							} ),
-							{}
-						)
-					);
+		const entitiesByKind = newConfig.reduce( ( acc, record ) => {
+			const { kind } = record;
+			if ( ! acc[ kind ] ) {
+				acc[ kind ] = [];
+			}
+			acc[ kind ].push( record );
+			return acc;
+		}, {} );
 
-					memo[ kind ] = kindReducer;
-					return memo;
-				},
-				{}
+		entitiesDataReducer = combineReducers(
+			Object.fromEntries(
+				Object.entries( entitiesByKind ).map(
+					( [ kind, subEntities ] ) => {
+						const kindReducer = combineReducers(
+							Object.fromEntries(
+								subEntities.map( ( entityConfig ) => [
+									entityConfig.name,
+									entity( entityConfig ),
+								] )
+							)
+						);
+
+						return [ kind, kindReducer ];
+					}
+				)
 			)
 		);
 	}
@@ -408,155 +450,19 @@ export const entities = ( state = {}, action ) => {
 };
 
 /**
- * @typedef {Object} UndoStateMeta
- *
- * @property {number} offset          Where in the undo stack we are.
- * @property {Object} [flattenedUndo] Flattened form of undo stack.
+ * @type {UndoManager}
  */
+export function undoManager( state = createUndoManager() ) {
+	return state;
+}
 
-/** @typedef {Array<Object> & UndoStateMeta} UndoState */
-
-/**
- * @type {UndoState}
- *
- * @todo Given how we use this we might want to make a custom class for it.
- */
-const UNDO_INITIAL_STATE = Object.assign( [], { offset: 0 } );
-
-/** @type {Object} */
-let lastEditAction;
-
-/**
- * Reducer keeping track of entity edit undo history.
- *
- * @param {UndoState} state  Current state.
- * @param {Object}    action Dispatched action.
- *
- * @return {UndoState} Updated state.
- */
-export function undo( state = UNDO_INITIAL_STATE, action ) {
+export function editsReference( state = {}, action ) {
 	switch ( action.type ) {
 		case 'EDIT_ENTITY_RECORD':
-		case 'CREATE_UNDO_LEVEL':
-			let isCreateUndoLevel = action.type === 'CREATE_UNDO_LEVEL';
-			const isUndoOrRedo =
-				! isCreateUndoLevel &&
-				( action.meta.isUndo || action.meta.isRedo );
-			if ( isCreateUndoLevel ) {
-				action = lastEditAction;
-			} else if ( ! isUndoOrRedo ) {
-				// Don't lose the last edit cache if the new one only has transient edits.
-				// Transient edits don't create new levels so updating the cache would make
-				// us skip an edit later when creating levels explicitly.
-				if (
-					Object.keys( action.edits ).some(
-						( key ) => ! action.transientEdits[ key ]
-					)
-				) {
-					lastEditAction = action;
-				} else {
-					lastEditAction = {
-						...action,
-						edits: {
-							...( lastEditAction && lastEditAction.edits ),
-							...action.edits,
-						},
-					};
-				}
-			}
-
-			/** @type {UndoState} */
-			let nextState;
-
-			if ( isUndoOrRedo ) {
-				// @ts-ignore we might consider using Object.assign({}, state)
-				nextState = [ ...state ];
-				nextState.offset =
-					state.offset + ( action.meta.isUndo ? -1 : 1 );
-
-				if ( state.flattenedUndo ) {
-					// The first undo in a sequence of undos might happen while we have
-					// flattened undos in state. If this is the case, we want execution
-					// to continue as if we were creating an explicit undo level. This
-					// will result in an extra undo level being appended with the flattened
-					// undo values.
-					// We also have to take into account if the `lastEditAction` had opted out
-					// of being tracked in undo history, like the action that persists the latest
-					// content right before saving. In that case we have to update the `lastEditAction`
-					// to avoid returning early before applying the existing flattened undos.
-					isCreateUndoLevel = true;
-					if ( ! lastEditAction.meta.undo ) {
-						lastEditAction.meta.undo = {
-							edits: {},
-						};
-					}
-					action = lastEditAction;
-				} else {
-					return nextState;
-				}
-			}
-
-			if ( ! action.meta.undo ) {
-				return state;
-			}
-
-			// Transient edits don't create an undo level, but are
-			// reachable in the next meaningful edit to which they
-			// are merged. They are defined in the entity's config.
-			if (
-				! isCreateUndoLevel &&
-				! Object.keys( action.edits ).some(
-					( key ) => ! action.transientEdits[ key ]
-				)
-			) {
-				// @ts-ignore we might consider using Object.assign({}, state)
-				nextState = [ ...state ];
-				nextState.flattenedUndo = {
-					...state.flattenedUndo,
-					...action.edits,
-				};
-				nextState.offset = state.offset;
-				return nextState;
-			}
-
-			// Clear potential redos, because this only supports linear history.
-			nextState =
-				// @ts-ignore this needs additional cleanup, probably involving code-level changes
-				nextState || state.slice( 0, state.offset || undefined );
-			nextState.offset = nextState.offset || 0;
-			nextState.pop();
-			if ( ! isCreateUndoLevel ) {
-				nextState.push( {
-					kind: action.meta.undo.kind,
-					name: action.meta.undo.name,
-					recordId: action.meta.undo.recordId,
-					edits: {
-						...state.flattenedUndo,
-						...action.meta.undo.edits,
-					},
-				} );
-			}
-			// When an edit is a function it's an optimization to avoid running some expensive operation.
-			// We can't rely on the function references being the same so we opt out of comparing them here.
-			const comparisonUndoEdits = Object.values(
-				action.meta.undo.edits
-			).filter( ( edit ) => typeof edit !== 'function' );
-			const comparisonEdits = Object.values( action.edits ).filter(
-				( edit ) => typeof edit !== 'function'
-			);
-			if ( ! isShallowEqual( comparisonUndoEdits, comparisonEdits ) ) {
-				nextState.push( {
-					kind: action.kind,
-					name: action.name,
-					recordId: action.recordId,
-					edits: isCreateUndoLevel
-						? { ...state.flattenedUndo, ...action.edits }
-						: action.edits,
-				} );
-			}
-			return nextState;
+		case 'UNDO':
+		case 'REDO':
+			return {};
 	}
-
 	return state;
 }
 
@@ -595,6 +501,11 @@ export function userPermissions( state = {}, action ) {
 			return {
 				...state,
 				[ action.key ]: action.isAllowed,
+			};
+		case 'RECEIVE_USER_PERMISSIONS':
+			return {
+				...state,
+				...action.permissions,
 			};
 	}
 
@@ -641,20 +552,134 @@ export function blockPatternCategories( state = [], action ) {
 	return state;
 }
 
+export function userPatternCategories( state = [], action ) {
+	switch ( action.type ) {
+		case 'RECEIVE_USER_PATTERN_CATEGORIES':
+			return action.patternCategories;
+	}
+	return state;
+}
+
+export function navigationFallbackId( state = null, action ) {
+	switch ( action.type ) {
+		case 'RECEIVE_NAVIGATION_FALLBACK_ID':
+			return action.fallbackId;
+	}
+
+	return state;
+}
+
+/**
+ * Reducer managing the theme global styles revisions.
+ *
+ * @param {Record<string, object>} state  Current state.
+ * @param {Object}                 action Dispatched action.
+ *
+ * @return {Record<string, object>} Updated state.
+ */
+export function themeGlobalStyleRevisions( state = {}, action ) {
+	switch ( action.type ) {
+		case 'RECEIVE_THEME_GLOBAL_STYLE_REVISIONS':
+			return {
+				...state,
+				[ action.currentId ]: action.revisions,
+			};
+	}
+
+	return state;
+}
+
+/**
+ * Reducer managing the template lookup per query.
+ *
+ * @param {Record<string, string>} state  Current state.
+ * @param {Object}                 action Dispatched action.
+ *
+ * @return {Record<string, string>} Updated state.
+ */
+export function defaultTemplates( state = {}, action ) {
+	switch ( action.type ) {
+		case 'RECEIVE_DEFAULT_TEMPLATE':
+			return {
+				...state,
+				[ JSON.stringify( action.query ) ]: action.templateId,
+			};
+	}
+
+	return state;
+}
+
+/**
+ * Reducer returning an object of registered post meta.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+export function registeredPostMeta( state = {}, action ) {
+	switch ( action.type ) {
+		case 'RECEIVE_REGISTERED_POST_META':
+			return {
+				...state,
+				[ action.postType ]: action.registeredPostMeta,
+			};
+	}
+	return state;
+}
+
+/**
+ * Reducer managing editor settings.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Action object.
+ *
+ * @return {Object} Updated state.
+ */
+export function editorSettings( state = null, action ) {
+	switch ( action.type ) {
+		case 'RECEIVE_EDITOR_SETTINGS':
+			return action.settings;
+	}
+	return state;
+}
+
+/**
+ * Reducer managing editor assets.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Action object.
+ *
+ * @return {Object} Updated state.
+ */
+export function editorAssets( state = null, action ) {
+	switch ( action.type ) {
+		case 'RECEIVE_EDITOR_ASSETS':
+			return action.assets;
+	}
+	return state;
+}
+
 export default combineReducers( {
-	terms,
 	users,
 	currentTheme,
 	currentGlobalStylesId,
 	currentUser,
 	themeGlobalStyleVariations,
 	themeBaseGlobalStyles,
-	taxonomies,
+	themeGlobalStyleRevisions,
 	entities,
-	undo,
+	editsReference,
+	undoManager,
 	embedPreviews,
 	userPermissions,
 	autosaves,
 	blockPatterns,
 	blockPatternCategories,
+	userPatternCategories,
+	navigationFallbackId,
+	defaultTemplates,
+	registeredPostMeta,
+	editorSettings,
+	editorAssets,
 } );

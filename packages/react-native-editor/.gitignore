@@ -28,6 +28,11 @@ bundle/
 .gradle/
 android/app/src/main/assets/
 android/app/src/main/res/raw/
+android/app/src/main/res/drawable-hdpi/
+android/app/src/main/res/drawable-mdpi/
+android/app/src/main/res/drawable-xhdpi/
+android/app/src/main/res/drawable-xxhdpi/
+android/app/src/main/res/drawable-xxxhdpi/
 
 # iOS builds
 *.app.zip
@@ -46,7 +51,7 @@ build.log
 # Local configuration file (sdk path, etc)
 local.properties
 
-# XCode
+# Xcode
 build/
 *.pbxuser
 !default.pbxuser
@@ -61,6 +66,7 @@ xcuserdata
 *.moved-aside
 DerivedData
 *.xcuserstatee
+ios/.xcode.env.local
 
 # Android/IntelliJ
 #
@@ -89,9 +95,10 @@ buck-out/
 # For more information about the recommended setup visit:
 # https://docs.fastlane.tools/best-practices/source-control/
 
-*/fastlane/report.xml
-*/fastlane/Preview.html
-*/fastlane/screenshots
+**/fastlane/report.xml
+**/fastlane/Preview.html
+**/fastlane/screenshots
+**/fastlane/test_output
 
 # Bundle artifact
 *.jsbundle
@@ -115,7 +122,7 @@ bin/wp-cli.phar
 # Report generated from jest-junit
 /junit.xml
 
-# Cocoapods
+# Ruby / CocoaPods
 
 ios/Pods
-ios/vendor
+/vendor/bundle/

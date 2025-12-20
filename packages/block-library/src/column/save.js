@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -11,7 +11,7 @@ import { useInnerBlocksProps, useBlockProps } from '@wordpress/block-editor';
 export default function save( { attributes } ) {
 	const { verticalAlignment, width } = attributes;
 
-	const wrapperClasses = classnames( {
+	const wrapperClasses = clsx( {
 		[ `is-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
 	} );
 

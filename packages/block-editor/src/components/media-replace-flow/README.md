@@ -65,10 +65,11 @@ Callback called when an upload error happens and receives an error message as an
 
 ### name
 
-The label of the replace button.
+A `string` value will be used as the label of the replace button. It can also accept `Phrasing content` elements(ex. `span`).
 
--   Type: `string`
+-   Type: `string|Element`
 -   Required: No
+-   Default: `Replace`
 
 ### createNotice
 
@@ -90,3 +91,17 @@ Removes a media replace notice.
 -   Required: No
 
 If passed, children are rendered inside the dropdown.
+
+### children
+
+-   Type: `Element | func`
+-   Required: No
+
+If passed, children are rendered inside the dropdown. If a function is provided for this prop, it will receive an object with the `onClose` prop as an argument.
+
+### renderToggle
+
+-   Type: `func`
+-   Required: No
+
+If passed, it will be used to render the provided button instead of the default one. It should accept and pass through `button` props to a `button` element.

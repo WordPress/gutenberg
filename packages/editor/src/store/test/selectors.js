@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import deepFreeze from 'deep-freeze';
+
+/**
  * WordPress dependencies
  */
 import {
@@ -11,7 +16,6 @@ import {
 	getBlockTypes,
 } from '@wordpress/blocks';
 import { RawHTML } from '@wordpress/element';
-import { layout, footer, header } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -75,10 +79,6 @@ selectorNames.forEach( ( name ) => {
 				};
 			},
 
-			isSavingEntityRecord() {
-				return state.saving && state.saving.requesting;
-			},
-
 			getLastEntitySaveError() {
 				const saving = state.saving;
 				const successful = saving && saving.successful;
@@ -124,7 +124,14 @@ selectorNames.forEach( ( name ) => {
 					labels: {
 						singular_name: postTypeLabel,
 					},
+					supports: {
+						autosave: state.postType !== 'without-autosave',
+					},
 				};
+			},
+
+			getBlocks() {
+				return state.getBlocks && state.getBlocks();
 			},
 		} );
 
@@ -183,39 +190,10 @@ const {
 	isPostAutosavingLocked,
 	canUserUseUnfilteredHTML,
 	getPostTypeLabel,
-	__experimentalGetDefaultTemplateType,
-	__experimentalGetDefaultTemplateTypes,
-	__experimentalGetTemplateInfo,
-	__experimentalGetDefaultTemplatePartAreas,
+	isEditorPanelRemoved,
+	isInserterOpened,
+	isListViewOpened,
 } = selectors;
-
-const defaultTemplateTypes = [
-	{
-		title: 'Default (Index)',
-		description: 'Main template',
-		slug: 'index',
-	},
-	{
-		title: '404 (Not Found)',
-		description: 'Applied when content cannot be found',
-		slug: '404',
-	},
-];
-
-const defaultTemplatePartAreas = [
-	{
-		area: 'header',
-		label: 'Header',
-		description: 'Some description of a header',
-		icon: 'header',
-	},
-	{
-		area: 'footer',
-		label: 'Footer',
-		description: 'Some description of a footer',
-		icon: 'footer',
-	},
-];
 
 describe( 'selectors', () => {
 	let cachedSelectors;
@@ -264,7 +242,7 @@ describe( 'selectors', () => {
 			parent: [ 'core/test-block-b' ],
 		} );
 
-		registerBlockType( 'core/test-freeform', {
+		registerBlockType( 'core/freeform', {
 			save: ( props ) => <RawHTML>{ props.attributes.content }</RawHTML>,
 			category: 'text',
 			title: 'Test Freeform Content Handler',
@@ -291,7 +269,7 @@ describe( 'selectors', () => {
 			save: () => null,
 		} );
 
-		setFreeformContentHandlerName( 'core/test-freeform' );
+		setFreeformContentHandlerName( 'core/freeform' );
 		setDefaultBlockName( 'core/test-default' );
 
 		cachedSelectors.forEach( ( { clear } ) => clear() );
@@ -302,7 +280,7 @@ describe( 'selectors', () => {
 		unregisterBlockType( 'core/test-block-a' );
 		unregisterBlockType( 'core/test-block-b' );
 		unregisterBlockType( 'core/test-block-c' );
-		unregisterBlockType( 'core/test-freeform' );
+		unregisterBlockType( 'core/freeform' );
 		unregisterBlockType( 'core/test-default' );
 
 		setFreeformContentHandlerName( undefined );
@@ -728,6 +706,31 @@ describe( 'selectors', () => {
 				a: 1,
 				b: 2,
 			} );
+		} );
+
+		it( 'should return the same value for mergeable properties when called multiple times', () => {
+			const state = {
+				currentPost: {
+					meta: {
+						a: 1,
+						b: 1,
+					},
+				},
+				editor: {
+					present: {
+						edits: {
+							meta: {
+								b: 2,
+							},
+						},
+					},
+				},
+				initialEdits: {},
+			};
+
+			expect( getEditedPostAttribute( state, 'meta' ) ).toBe(
+				getEditedPostAttribute( state, 'meta' )
+			);
 		} );
 	} );
 
@@ -1254,7 +1257,7 @@ describe( 'selectors', () => {
 					title: 'sassel',
 				},
 				saving: {
-					requesting: true,
+					pending: true,
 				},
 			};
 
@@ -1320,7 +1323,9 @@ describe( 'selectors', () => {
 								},
 							],
 						},
-						edits: {},
+						edits: {
+							content: () => {},
+						},
 					},
 				},
 				initialEdits: {},
@@ -1339,7 +1344,7 @@ describe( 'selectors', () => {
 							value: [
 								{
 									clientId: 123,
-									name: 'core/test-freeform',
+									name: 'core/freeform',
 									isValid: true,
 									attributes: {
 										content: '',
@@ -1366,7 +1371,7 @@ describe( 'selectors', () => {
 							value: [
 								{
 									clientId: 123,
-									name: 'core/test-freeform',
+									name: 'core/freeform',
 									isValid: true,
 									attributes: {
 										content: '',
@@ -1403,9 +1408,8 @@ describe( 'selectors', () => {
 				currentPost: {
 					title: 'sassel',
 				},
-				saving: {
-					requesting: true,
-				},
+				postAutosavingLock: {},
+				saving: {},
 				getCurrentUser() {},
 				hasFetchedAutosaves() {
 					return false;
@@ -1434,9 +1438,8 @@ describe( 'selectors', () => {
 				currentPost: {
 					title: 'sassel',
 				},
-				saving: {
-					requesting: true,
-				},
+				postAutosavingLock: {},
+				saving: {},
 				getCurrentUser() {},
 				hasFetchedAutosaves() {
 					return true;
@@ -1590,10 +1593,8 @@ describe( 'selectors', () => {
 
 			expect( isEditedPostAutosaveable( state ) ).toBe( false );
 		} );
-	} );
 
-	describe( 'isEditedPostEmpty', () => {
-		it( 'should return true if no blocks and no content', () => {
+		it( 'should return false if post type does not support autosave', () => {
 			const state = {
 				editor: {
 					present: {
@@ -1604,7 +1605,35 @@ describe( 'selectors', () => {
 					},
 				},
 				initialEdits: {},
-				currentPost: {},
+				currentPost: {
+					title: 'sassel',
+				},
+				saving: {},
+				getCurrentUser() {},
+				hasFetchedAutosaves() {
+					return true;
+				},
+				getAutosave() {},
+				postAutosavingLock: {},
+				postType: 'without-autosave',
+			};
+
+			expect( isEditedPostAutosaveable( state ) ).toBe( false );
+		} );
+	} );
+
+	describe( 'isEditedPostEmpty', () => {
+		it( 'should return true if no blocks and no content', () => {
+			const state = {
+				editor: {
+					present: {
+						edits: {},
+					},
+				},
+				initialEdits: {},
+				currentPost: {
+					content: '',
+				},
 			};
 
 			expect( isEditedPostEmpty( state ) ).toBe( true );
@@ -1626,7 +1655,9 @@ describe( 'selectors', () => {
 								},
 							],
 						},
-						edits: {},
+						edits: {
+							content: () => {},
+						},
 					},
 				},
 				initialEdits: {},
@@ -1656,7 +1687,9 @@ describe( 'selectors', () => {
 								},
 							],
 						},
-						edits: {},
+						edits: {
+							content: () => {},
+						},
 					},
 				},
 				initialEdits: {},
@@ -1666,7 +1699,7 @@ describe( 'selectors', () => {
 			expect( isEditedPostEmpty( state ) ).toBe( true );
 		} );
 
-		it( 'should return false if blocks, but empty content edit', () => {
+		it( 'should return true if blocks, but empty content edit', () => {
 			const state = {
 				editor: {
 					present: {
@@ -1693,7 +1726,7 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( isEditedPostEmpty( state ) ).toBe( false );
+			expect( isEditedPostEmpty( state ) ).toBe( true );
 		} );
 
 		it( 'should return true if the post has an empty content property', () => {
@@ -1715,7 +1748,7 @@ describe( 'selectors', () => {
 			expect( isEditedPostEmpty( state ) ).toBe( true );
 		} );
 
-		it( 'should return true if edits include a non-empty content property, but blocks are empty', () => {
+		it( 'should return false if edits include a non-empty content property', () => {
 			const state = {
 				editor: {
 					present: {
@@ -1731,7 +1764,7 @@ describe( 'selectors', () => {
 				currentPost: {},
 			};
 
-			expect( isEditedPostEmpty( state ) ).toBe( true );
+			expect( isEditedPostEmpty( state ) ).toBe( false );
 		} );
 
 		it( 'should return true if empty classic block', () => {
@@ -1742,7 +1775,7 @@ describe( 'selectors', () => {
 							value: [
 								{
 									clientId: 123,
-									name: 'core/test-freeform',
+									name: 'core/freeform',
 									isValid: true,
 									attributes: {
 										content: '',
@@ -1750,7 +1783,9 @@ describe( 'selectors', () => {
 								},
 							],
 						},
-						edits: {},
+						edits: {
+							content: () => {},
+						},
 					},
 				},
 				initialEdits: {},
@@ -1768,7 +1803,7 @@ describe( 'selectors', () => {
 							value: [
 								{
 									clientId: 123,
-									name: 'core/test-freeform',
+									name: 'core/freeform',
 									isValid: true,
 									attributes: {
 										content: '',
@@ -1796,7 +1831,7 @@ describe( 'selectors', () => {
 							value: [
 								{
 									clientId: 123,
-									name: 'core/test-freeform',
+									name: 'core/freeform',
 									isValid: true,
 									attributes: {
 										content: 'Test Data',
@@ -1824,7 +1859,7 @@ describe( 'selectors', () => {
 							value: [
 								{
 									clientId: 123,
-									name: 'core/test-freeform',
+									name: 'core/freeform',
 									isValid: true,
 									attributes: {
 										content: '',
@@ -1832,7 +1867,7 @@ describe( 'selectors', () => {
 								},
 								{
 									clientId: 456,
-									name: 'core/test-freeform',
+									name: 'core/freeform',
 									isValid: true,
 									attributes: {
 										content: '',
@@ -2017,7 +2052,7 @@ describe( 'selectors', () => {
 		it( 'should return true if the post is currently being saved', () => {
 			const state = {
 				saving: {
-					requesting: true,
+					pending: true,
 				},
 			};
 
@@ -2027,7 +2062,7 @@ describe( 'selectors', () => {
 		it( 'should return false if the post is not currently being saved', () => {
 			const state = {
 				saving: {
-					requesting: false,
+					pending: false,
 				},
 			};
 
@@ -2129,16 +2164,9 @@ describe( 'selectors', () => {
 	describe( 'getSuggestedPostFormat', () => {
 		it( 'returns null if cannot be determined', () => {
 			const state = {
-				editor: {
-					present: {
-						blocks: {
-							value: [],
-						},
-						edits: {},
-					},
+				getBlocks() {
+					return [];
 				},
-				initialEdits: {},
-				currentPost: {},
 			};
 
 			expect( getSuggestedPostFormat( state ) ).toBeNull();
@@ -2146,73 +2174,56 @@ describe( 'selectors', () => {
 
 		it( 'return null if only one block of type `core/embed` and provider not matched', () => {
 			const state = {
-				editor: {
-					present: {
-						blocks: {
-							value: [
-								{
-									clientId: 567,
-									name: 'core/embed',
-									attributes: {
-										providerNameSlug: 'instagram',
-									},
-								},
-							],
+				getBlocks() {
+					return [
+						{
+							clientId: 567,
+							name: 'core/embed',
+							attributes: {
+								providerNameSlug: 'instagram',
+							},
+							innerBlocks: [],
 						},
-						edits: {},
-					},
+					];
 				},
-				initialEdits: {},
-				currentPost: {},
 			};
 			expect( getSuggestedPostFormat( state ) ).toBeNull();
 		} );
 
 		it( 'return null if only one block of type `core/embed` and provider not exists', () => {
 			const state = {
-				editor: {
-					present: {
-						blocks: {
-							value: [
-								{
-									clientId: 567,
-									name: 'core/embed',
-									attributes: {},
-								},
-							],
+				getBlocks() {
+					return [
+						{
+							clientId: 567,
+							name: 'core/embed',
+							attributes: {},
+							innerBlocks: [],
 						},
-						edits: {},
-					},
+					];
 				},
-				initialEdits: {},
-				currentPost: {},
 			};
 			expect( getSuggestedPostFormat( state ) ).toBeNull();
 		} );
 
 		it( 'returns null if there is more than one block in the post', () => {
 			const state = {
-				editor: {
-					present: {
-						blocks: {
-							value: [
-								{
-									clientId: 123,
-									name: 'core/image',
-									attributes: {},
-								},
-								{
-									clientId: 456,
-									name: 'core/quote',
-									attributes: {},
-								},
-							],
+				getBlocks() {
+					return [
+						{
+							clientId: 123,
+							name: 'core/image',
+							attributes: {},
+							innerBlocks: [],
 						},
-						edits: {},
-					},
+						{
+							clientId: 456,
+							name: 'core/quote',
+							attributes: {},
+							innerBlocks: [],
+						},
+					];
 				},
-				initialEdits: {},
-				currentPost: {},
 			};
 
 			expect( getSuggestedPostFormat( state ) ).toBeNull();
@@ -2220,22 +2231,16 @@ describe( 'selectors', () => {
 
 		it( 'returns Image if the first block is of type `core/image`', () => {
 			const state = {
-				editor: {
-					present: {
-						blocks: {
-							value: [
-								{
-									clientId: 123,
-									name: 'core/image',
-									attributes: {},
-								},
-							],
+				getBlocks() {
+					return [
+						{
+							clientId: 123,
+							name: 'core/image',
+							attributes: {},
+							innerBlocks: [],
 						},
-						edits: {},
-					},
+					];
 				},
-				initialEdits: {},
-				currentPost: {},
 			};
 
 			expect( getSuggestedPostFormat( state ) ).toBe( 'image' );
@@ -2243,22 +2248,16 @@ describe( 'selectors', () => {
 
 		it( 'returns Quote if the first block is of type `core/quote`', () => {
 			const state = {
-				editor: {
-					present: {
-						blocks: {
-							value: [
-								{
-									clientId: 456,
-									name: 'core/quote',
-									attributes: {},
-								},
-							],
+				getBlocks() {
+					return [
+						{
+							clientId: 456,
+							name: 'core/quote',
+							attributes: {},
+							innerBlocks: [],
 						},
-						edits: {},
-					},
+					];
 				},
-				initialEdits: {},
-				currentPost: {},
 			};
 
 			expect( getSuggestedPostFormat( state ) ).toBe( 'quote' );
@@ -2266,24 +2265,18 @@ describe( 'selectors', () => {
 
 		it( 'returns Video if the first block is of type `core/embed from youtube`', () => {
 			const state = {
-				editor: {
-					present: {
-						blocks: {
-							value: [
-								{
-									clientId: 567,
-									name: 'core/embed',
-									attributes: {
-										providerNameSlug: 'youtube',
-									},
-								},
-							],
+				getBlocks() {
+					return [
+						{
+							clientId: 567,
+							name: 'core/embed',
+							attributes: {
+								providerNameSlug: 'youtube',
+							},
+							innerBlocks: [],
 						},
-						edits: {},
-					},
+					];
 				},
-				initialEdits: {},
-				currentPost: {},
 			};
 
 			expect( getSuggestedPostFormat( state ) ).toBe( 'video' );
@@ -2291,24 +2284,18 @@ describe( 'selectors', () => {
 
 		it( 'returns Audio if the first block is of type `core/embed from soundcloud`', () => {
 			const state = {
-				editor: {
-					present: {
-						blocks: {
-							value: [
-								{
-									clientId: 567,
-									name: 'core/embed',
-									attributes: {
-										providerNameSlug: 'soundcloud',
-									},
-								},
-							],
+				getBlocks() {
+					return [
+						{
+							clientId: 567,
+							name: 'core/embed',
+							attributes: {
+								providerNameSlug: 'soundcloud',
+							},
+							innerBlocks: [],
 						},
-						edits: {},
-					},
+					];
 				},
-				initialEdits: {},
-				currentPost: {},
 			};
 
 			expect( getSuggestedPostFormat( state ) ).toBe( 'audio' );
@@ -2316,27 +2303,22 @@ describe( 'selectors', () => {
 
 		it( 'returns Quote if the first block is of type `core/quote` and second is of type `core/paragraph`', () => {
 			const state = {
-				editor: {
-					present: {
-						blocks: {
-							value: [
-								{
-									clientId: 456,
-									name: 'core/quote',
-									attributes: {},
-								},
-								{
-									clientId: 789,
-									name: 'core/paragraph',
-									attributes: {},
-								},
-							],
+				getBlocks() {
+					return [
+						{
+							clientId: 456,
+							name: 'core/quote',
+							attributes: {},
+							innerBlocks: [],
 						},
-						edits: {},
-					},
+						{
+							clientId: 789,
+							name: 'core/paragraph',
+							attributes: {},
+							innerBlocks: [],
+						},
+					];
 				},
-				initialEdits: {},
-				currentPost: {},
 			};
 
 			expect( getSuggestedPostFormat( state ) ).toBe( 'quote' );
@@ -2415,7 +2397,7 @@ describe( 'selectors', () => {
 		} );
 
 		it( "returns removep'd serialization of blocks for single unknown", () => {
-			const unknownBlock = createBlock( 'core/test-freeform', {
+			const unknownBlock = createBlock( 'core/freeform', {
 				content: '<p>foo</p>',
 			} );
 			const state = {
@@ -2437,10 +2419,10 @@ describe( 'selectors', () => {
 		} );
 
 		it( "returns non-removep'd serialization of blocks for multiple unknown", () => {
-			const firstUnknown = createBlock( 'core/test-freeform', {
+			const firstUnknown = createBlock( 'core/freeform', {
 				content: '<p>foo</p>',
 			} );
-			const secondUnknown = createBlock( 'core/test-freeform', {
+			const secondUnknown = createBlock( 'core/freeform', {
 				content: '<p>bar</p>',
 			} );
 			const state = {
@@ -2781,228 +2763,6 @@ describe( 'selectors', () => {
 		} );
 	} );
 
-	describe( '__experimentalGetDefaultTemplateTypes', () => {
-		const state = { editorSettings: { defaultTemplateTypes } };
-
-		it( 'returns undefined if there are no default template types', () => {
-			const emptyState = { editorSettings: {} };
-			expect(
-				__experimentalGetDefaultTemplateTypes( emptyState )
-			).toBeUndefined();
-		} );
-
-		it( 'returns a list of default template types if present in state', () => {
-			expect(
-				__experimentalGetDefaultTemplateTypes( state )
-			).toHaveLength( 2 );
-		} );
-	} );
-
-	describe( '__experimentalGetDefaultTemplatePartAreas', () => {
-		const state = { editorSettings: { defaultTemplatePartAreas } };
-
-		it( 'returns empty array if there are no default template part areas', () => {
-			const emptyState = { editorSettings: {} };
-			expect(
-				__experimentalGetDefaultTemplatePartAreas( emptyState )
-			).toHaveLength( 0 );
-		} );
-
-		it( 'returns a list of default template part areas if present in state', () => {
-			expect(
-				__experimentalGetDefaultTemplatePartAreas( state )
-			).toHaveLength( 2 );
-		} );
-
-		it( 'assigns an icon to each area', () => {
-			const templatePartAreas =
-				__experimentalGetDefaultTemplatePartAreas( state );
-			templatePartAreas.forEach( ( area ) =>
-				expect( area.icon ).not.toBeNull()
-			);
-		} );
-	} );
-
-	describe( '__experimentalGetDefaultTemplateType', () => {
-		const state = { editorSettings: { defaultTemplateTypes } };
-
-		it( 'returns an empty object if there are no default template types', () => {
-			const emptyState = { editorSettings: {} };
-			expect(
-				__experimentalGetDefaultTemplateType( emptyState, 'slug' )
-			).toEqual( {} );
-		} );
-
-		it( 'returns an empty object if the requested slug is not found', () => {
-			expect(
-				__experimentalGetDefaultTemplateType( state, 'foobar' )
-			).toEqual( {} );
-		} );
-
-		it( 'returns the requested default template type', () => {
-			expect(
-				__experimentalGetDefaultTemplateType( state, 'index' )
-			).toEqual( {
-				title: 'Default (Index)',
-				description: 'Main template',
-				slug: 'index',
-			} );
-		} );
-
-		it( 'returns the requested default template type even when the slug is numeric', () => {
-			expect(
-				__experimentalGetDefaultTemplateType( state, '404' )
-			).toEqual( {
-				title: '404 (Not Found)',
-				description: 'Applied when content cannot be found',
-				slug: '404',
-			} );
-		} );
-	} );
-
-	describe( '__experimentalGetTemplateInfo', () => {
-		const state = {
-			editorSettings: { defaultTemplateTypes, defaultTemplatePartAreas },
-		};
-
-		it( 'should return an empty object if no template is passed', () => {
-			expect( __experimentalGetTemplateInfo( state, null ) ).toEqual(
-				{}
-			);
-			expect( __experimentalGetTemplateInfo( state, undefined ) ).toEqual(
-				{}
-			);
-			expect( __experimentalGetTemplateInfo( state, false ) ).toEqual(
-				{}
-			);
-		} );
-
-		it( 'should return the default title if none is defined on the template', () => {
-			expect(
-				__experimentalGetTemplateInfo( state, { slug: 'index' } ).title
-			).toEqual( 'Default (Index)' );
-		} );
-
-		it( 'should return the rendered title if defined on the template', () => {
-			expect(
-				__experimentalGetTemplateInfo( state, {
-					slug: 'index',
-					title: { rendered: 'test title' },
-				} ).title
-			).toEqual( 'test title' );
-		} );
-
-		it( 'should return the slug if no title is found', () => {
-			expect(
-				__experimentalGetTemplateInfo( state, {
-					slug: 'not a real template',
-				} ).title
-			).toEqual( 'not a real template' );
-		} );
-
-		it( 'should return the default description if none is defined on the template', () => {
-			expect(
-				__experimentalGetTemplateInfo( state, { slug: 'index' } )
-					.description
-			).toEqual( 'Main template' );
-		} );
-
-		it( 'should return the raw excerpt as description if defined on the template', () => {
-			expect(
-				__experimentalGetTemplateInfo( state, {
-					slug: 'index',
-					description: { raw: 'test description' },
-				} ).description
-			).toEqual( 'test description' );
-		} );
-
-		it( 'should return a title, description, and icon', () => {
-			expect(
-				__experimentalGetTemplateInfo( state, { slug: 'index' } )
-			).toEqual( {
-				title: 'Default (Index)',
-				description: 'Main template',
-				icon: layout,
-			} );
-
-			expect(
-				__experimentalGetTemplateInfo( state, {
-					slug: 'index',
-					title: { rendered: 'test title' },
-				} )
-			).toEqual( {
-				title: 'test title',
-				description: 'Main template',
-				icon: layout,
-			} );
-
-			expect(
-				__experimentalGetTemplateInfo( state, {
-					slug: 'index',
-					description: { raw: 'test description' },
-				} )
-			).toEqual( {
-				title: 'Default (Index)',
-				description: 'test description',
-				icon: layout,
-			} );
-
-			expect(
-				__experimentalGetTemplateInfo( state, {
-					slug: 'index',
-					title: { rendered: 'test title' },
-					description: { raw: 'test description' },
-				} )
-			).toEqual( {
-				title: 'test title',
-				description: 'test description',
-				icon: layout,
-			} );
-		} );
-
-		it( 'should return correct icon based on area', () => {
-			expect(
-				__experimentalGetTemplateInfo( state, {
-					slug: 'template part, area = uncategorized',
-					area: 'uncategorized',
-				} )
-			).toEqual( {
-				title: 'template part, area = uncategorized',
-				icon: layout,
-			} );
-
-			expect(
-				__experimentalGetTemplateInfo( state, {
-					slug: 'template part, area = invalid',
-					area: 'invalid',
-				} )
-			).toEqual( {
-				title: 'template part, area = invalid',
-				icon: layout,
-			} );
-
-			expect(
-				__experimentalGetTemplateInfo( state, {
-					slug: 'template part, area = header',
-					area: 'header',
-				} )
-			).toEqual( {
-				title: 'template part, area = header',
-				icon: header,
-			} );
-
-			expect(
-				__experimentalGetTemplateInfo( state, {
-					slug: 'template part, area = footer',
-					area: 'footer',
-				} )
-			).toEqual( {
-				title: 'template part, area = footer',
-				icon: footer,
-			} );
-		} );
-	} );
-
 	describe( 'getPostTypeLabel', () => {
 		it( 'should return the correct label for the current post type', () => {
 			const postTypes = [
@@ -3031,6 +2791,47 @@ describe( 'selectors', () => {
 			postTypes.forEach( ( state ) =>
 				expect( getPostTypeLabel( state ) ).toBeUndefined()
 			);
+		} );
+	} );
+	describe( 'isEditorPanelRemoved', () => {
+		it( 'should return false by default', () => {
+			const state = deepFreeze( {
+				removedPanels: [],
+			} );
+
+			expect( isEditorPanelRemoved( state, 'post-status' ) ).toBe(
+				false
+			);
+		} );
+
+		it( 'should return true when panel was removed', () => {
+			const state = deepFreeze( {
+				removedPanels: [ 'post-status' ],
+			} );
+
+			expect( isEditorPanelRemoved( state, 'post-status' ) ).toBe( true );
+		} );
+	} );
+
+	describe( 'isInserterOpened', () => {
+		it( 'returns the block inserter panel isOpened state', () => {
+			const state = {
+				blockInserterPanel: true,
+			};
+			expect( isInserterOpened( state ) ).toBe( true );
+			state.blockInserterPanel = false;
+			expect( isInserterOpened( state ) ).toBe( false );
+		} );
+	} );
+
+	describe( 'isListViewOpened', () => {
+		it( 'returns the list view panel isOpened state', () => {
+			const state = {
+				listViewPanel: true,
+			};
+			expect( isListViewOpened( state ) ).toBe( true );
+			state.listViewPanel = false;
+			expect( isListViewOpened( state ) ).toBe( false );
 		} );
 	} );
 } );

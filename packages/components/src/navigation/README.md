@@ -1,6 +1,10 @@
 # Navigation
 
 <div class="callout callout-alert">
+This component is deprecated. Consider using `Navigator` instead.
+</div>
+
+<div class="callout callout-alert">
 This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
 </div>
 
@@ -122,7 +126,7 @@ The unique identifier of the menu. The root menu can omit this, and it will defa
 
 ### onSearch
 
--   Type: `function`
+-   Type: `( searchString: string ) => void;`
 -   Required: No
 
 When `hasSearch` is active, this function handles the search input's `onChange` event, making it controlled from the outside. It requires setting the `search` prop as well.
@@ -161,6 +165,13 @@ Indicates whether the menu is empty or not. Used together with the `hideIfTarget
 -   Required: No
 
 The menu title. It's also the field used by the menu search function.
+
+### `titleAction`
+
+-   Type: `React.ReactNode`
+-   Required: No
+
+Use this prop to render additional actions in the menu title.
 
 ## Navigation Group Props
 
@@ -205,6 +216,13 @@ Optional className for the `NavigationItem` component.
 
 If provided, renders `a` instead of `button`.
 
+### `icon`
+
+-   Type: `JSX.Element`
+-   Required: No
+
+If no `children` are passed, this prop allows to specify a custom icon for the menu item.
+
 ### `item`
 
 -   Type: `string`
@@ -228,7 +246,7 @@ Indicates whether this item should be hidden if the menu specified in `navigateT
 
 ### `onClick`
 
--   Type: `function`
+-   Type: `React.MouseEventHandler`
 -   Required: No
 
 A callback to handle clicking on a menu item.

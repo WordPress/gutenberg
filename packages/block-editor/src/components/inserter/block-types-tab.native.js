@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { useMemo } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -17,7 +18,8 @@ const getBlockNamespace = ( item ) => item.name.split( '/' )[ 0 ];
 function BlockTypesTab( { onSelect, rootClientId, listProps } ) {
 	const [ rawBlockTypes, , collections ] = useBlockTypesState(
 		rootClientId,
-		onSelect
+		onSelect,
+		true
 	);
 	const clipboardBlock = useClipboardBlock( rootClientId );
 	const filteredBlockTypes = filterInserterItems( rawBlockTypes );
@@ -66,6 +68,7 @@ function BlockTypesTab( { onSelect, rootClientId, listProps } ) {
 			sections={ sections }
 			onSelect={ handleSelect }
 			listProps={ listProps }
+			label={ __( 'Blocks menu' ) }
 		/>
 	);
 }

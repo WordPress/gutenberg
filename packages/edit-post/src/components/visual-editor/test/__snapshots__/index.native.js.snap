@@ -1,0 +1,15 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`when nothing is selected media buttons and picker display correctly 1`] = `
+"<!-- wp:paragraph -->
+<p>First example paragraph.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Second example paragraph.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:gallery {"linkTo":"none"} -->
+<figure class="wp-block-gallery has-nested-images columns-default is-cropped"></figure>
+<!-- /wp:gallery -->"
+`;

@@ -13,15 +13,13 @@ import { forwardRef } from '@wordpress/element';
  */
 import useDisabled from '../';
 
-jest.useRealTimers();
-
 describe( 'useDisabled', () => {
 	const Form = forwardRef( ( { showButton }, ref ) => {
 		return (
 			<form ref={ ref }>
 				<input />
 				<a href="https://wordpress.org/">A link</a>
-				<p role="document" contentEditable={ true } tabIndex="0"></p>
+				<p role="document" contentEditable tabIndex="0"></p>
 				{ showButton && <button>Button</button> }
 			</form>
 		);
@@ -50,7 +48,7 @@ describe( 'useDisabled', () => {
 		);
 
 		expect( screen.queryByText( 'Button' ) ).not.toBeInTheDocument();
-		rerender( <DisabledComponent showButton={ true } /> );
+		rerender( <DisabledComponent showButton /> );
 
 		const button = screen.getByText( 'Button' );
 		await waitFor( () => {

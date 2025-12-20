@@ -46,7 +46,8 @@ function alterParameters( properties, componentPath ) {
 
 	if ( ! parameters ) {
 		parameters = babel.types.objectProperty(
-			babel.types.identifier( 'parameters' )
+			babel.types.identifier( 'parameters' ),
+			babel.types.objectExpression( [] )
 		);
 		properties.push( parameters );
 	}
@@ -57,10 +58,10 @@ function alterParameters( properties, componentPath ) {
 	];
 }
 
-module.exports = function ( source, { sources } ) {
+module.exports = function ( source ) {
 	const output = babel.transform( source, {
 		plugins: [ addSourceLinkPlugin ],
-		filename: sources[ 0 ],
+		filename: this.resourcePath,
 		sourceType: 'module',
 	} );
 	return output.code;

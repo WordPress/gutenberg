@@ -1,6 +1,3 @@
-// Exclude bundled WordPress packages from the list.
-const wpPackagesRegExp = '^@wordpress/(?!(icons|interface|style-engine))';
-
 const config = {
 	extends: [
 		require.resolve( './jsx-a11y.js' ),
@@ -16,11 +13,14 @@ const config = {
 	globals: {
 		window: true,
 		document: true,
+		SCRIPT_DEBUG: 'readonly',
 		wp: 'readonly',
 	},
 	settings: {
-		'import/internal-regex': wpPackagesRegExp,
 		'import/extensions': [ '.js', '.jsx' ],
+		'import/resolver': {
+			typescript: true,
+		},
 	},
 	rules: {
 		'import/no-extraneous-dependencies': [
@@ -29,12 +29,7 @@ const config = {
 				peerDependencies: true,
 			},
 		],
-		'import/no-unresolved': [
-			'error',
-			{
-				ignore: [ wpPackagesRegExp ],
-			},
-		],
+		'import/no-unresolved': 'error',
 		'import/default': 'warn',
 		'import/named': 'warn',
 	},

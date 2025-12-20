@@ -1,6 +1,5 @@
-export default `
-<!-- wp:heading -->
-<h2 id="this-is-an-anchor">What is Gutenberg?</h2>
+export const textBlocks = `<!-- wp:heading -->
+<h2 class="wp-block-heading" id="this-is-an-anchor">What is Gutenberg?</h2>
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
@@ -8,11 +7,11 @@ export default `
 <!-- /wp:paragraph -->
 
 <!-- wp:heading {"textAlign":"left","level":4,"className":"has-primary-background-color has-background","style":{"typography":{"lineHeight":"2.5"}}} -->
-<h4 class="has-text-align-left has-primary-background-color has-background" style="line-height:2.5">Heading with line-height set</h4>
+<h4 class="wp-block-heading has-text-align-left has-primary-background-color has-background" style="line-height:2.5">Heading with line-height set</h4>
 <!-- /wp:heading -->
 
 <!-- wp:list -->
-<ul><!-- wp:list-item -->
+<ul class="wp-block-list"><!-- wp:list-item -->
 <li>First Item</li>
 <!-- /wp:list-item -->
 
@@ -53,9 +52,9 @@ else:
 
 <!-- wp:verse {"textAlign":"center"} -->
 <pre class="wp-block-verse has-text-align-center">Come<br>Home.</pre>
-<!-- /wp:verse -->
+<!-- /wp:verse -->`;
 
-<!-- wp:image -->
+export const mediaBlocks = `<!-- wp:image -->
 <figure class="wp-block-image"><img alt=""/></figure>
 <!-- /wp:image -->
 
@@ -145,6 +144,20 @@ else:
 <!-- /wp:image --></figure>
 <!-- /wp:gallery -->
 
+<!-- wp:media-text {"isStackedOnMobile":false,"className":"is-stacked-on-mobile"} -->
+<div class="wp-block-media-text alignwide is-stacked-on-mobile"><figure class="wp-block-media-text__media"></figure><div class="wp-block-media-text__content"><!-- wp:paragraph {"className":"has-large-font-size"} -->
+<p class="has-large-font-size"></p>
+<!-- /wp:paragraph --></div></div>
+<!-- /wp:media-text -->
+
+<!-- wp:cover {"url":"https://cldup.com/cXyG__fTLN.jpg","id":890,"dimRatio":20,"overlayColor":"luminous-vivid-orange","focalPoint":{"x":"0.63","y":"0.83"},"minHeight":219} -->
+<div class="wp-block-cover" style="min-height:219px"><span aria-hidden="true" class="wp-block-cover__background has-luminous-vivid-orange-background-color has-background-dim-20 has-background-dim"></span><img class="wp-block-cover__image-background wp-image-890" alt="" src="https://cldup.com/cXyG__fTLN.jpg" style="object-position:63% 83%" data-object-fit="cover" data-object-position="63% 83%"/><div class="wp-block-cover__inner-container"><!-- wp:paragraph {"align":"center","placeholder":"Write title…","className":"has-text-color has-very-light-gray-color","fontSize":"large"} -->
+<p class="has-text-align-center has-text-color has-very-light-gray-color has-large-font-size">Cool cover</p>
+<!-- /wp:paragraph --></div></div>
+<!-- /wp:cover -->
+`;
+
+export const otherBlocks = `
 <!-- wp:nextpage -->
 <!--nextpage-->
 <!-- /wp:nextpage -->
@@ -201,18 +214,6 @@ else:
 <!-- /wp:column --></div>
 <!-- /wp:columns -->
 
-<!-- wp:media-text {"isStackedOnMobile":false,"className":"is-stacked-on-mobile"} -->
-<div class="wp-block-media-text alignwide is-stacked-on-mobile"><figure class="wp-block-media-text__media"></figure><div class="wp-block-media-text__content"><!-- wp:paragraph {"className":"has-large-font-size"} -->
-<p class="has-large-font-size"></p>
-<!-- /wp:paragraph --></div></div>
-<!-- /wp:media-text -->
-
-<!-- wp:cover {"url":"https://cldup.com/cXyG__fTLN.jpg","id":890,"dimRatio":20,"overlayColor":"luminous-vivid-orange","focalPoint":{"x":"0.63","y":"0.83"},"minHeight":219} -->
-<div class="wp-block-cover" style="min-height:219px"><span aria-hidden="true" class="wp-block-cover__background has-luminous-vivid-orange-background-color has-background-dim-20 has-background-dim"></span><img class="wp-block-cover__image-background wp-image-890" alt="" src="https://cldup.com/cXyG__fTLN.jpg" style="object-position:63% 83%" data-object-fit="cover" data-object-position="63% 83%"/><div class="wp-block-cover__inner-container"><!-- wp:paragraph {"align":"center","placeholder":"Write title…","className":"has-text-color has-very-light-gray-color","fontSize":"large"} -->
-<p class="has-text-align-center has-text-color has-very-light-gray-color has-large-font-size">Cool cover</p>
-<!-- /wp:paragraph --></div></div>
-<!-- /wp:cover -->
-
 <!-- wp:latest-posts {"displayPostContent":true,"displayPostDate":true} /-->
 
 <!-- wp:buttons -->
@@ -230,8 +231,6 @@ else:
 <!-- /wp:shortcode -->
 
 <!-- wp:rss /-->
-
-<!-- wp:paragraph -->
-<p>This block is used in initial HTML e2e tests and should be kept as the last block.</p>
-<!-- /wp:paragraph -->
 `;
+
+export default textBlocks + mediaBlocks + otherBlocks;

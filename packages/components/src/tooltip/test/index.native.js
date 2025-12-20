@@ -5,14 +5,10 @@ import { fireEvent, render, act } from 'test/helpers';
 import { Keyboard, Text } from 'react-native';
 
 /**
- * WordPress dependencies
- */
-import { SlotFillProvider } from '@wordpress/components';
-
-/**
  * Internal dependencies
  */
 import Tooltip from '../index';
+import { Provider as SlotFillProvider } from '../../slot-fill';
 
 // Minimal tree to render tooltip.
 const TooltipSlot = ( { children } ) => (
@@ -44,7 +40,7 @@ afterAll( () => {
 it( 'displays the message', () => {
 	const screen = render(
 		<TooltipSlot>
-			<Tooltip visible={ true } text="A helpful message">
+			<Tooltip visible text="A helpful message">
 				<Text>I need help</Text>
 			</Tooltip>
 		</TooltipSlot>
@@ -53,12 +49,10 @@ it( 'displays the message', () => {
 	expect( screen.getByText( 'A helpful message' ) ).toBeTruthy();
 } );
 
-// Skipped until `pointerEvents: 'box-none'` no longer erroneously prevents
-// triggering `onTouch*` on the element: https://github.com/callstack/react-native-testing-library/issues/897
-it.skip( 'dismisses when the screen is tapped', () => {
+it( 'dismisses when the screen is tapped', () => {
 	const screen = render(
 		<TooltipSlot>
-			<Tooltip visible={ true } text="A helpful message">
+			<Tooltip visible text="A helpful message">
 				<Text>I need help</Text>
 			</Tooltip>
 		</TooltipSlot>
@@ -74,7 +68,7 @@ it.skip( 'dismisses when the screen is tapped', () => {
 it( 'dismisses when the keyboard closes', () => {
 	const screen = render(
 		<TooltipSlot>
-			<Tooltip visible={ true } text="A helpful message">
+			<Tooltip visible text="A helpful message">
 				<Text>I need help</Text>
 			</Tooltip>
 		</TooltipSlot>

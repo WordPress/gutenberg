@@ -42,7 +42,10 @@ const transforms = {
 					gradient,
 					id,
 					overlayColor,
+					style,
+					textColor,
 					url,
+					useFeaturedImage,
 				},
 				innerBlocks
 			) => {
@@ -66,6 +69,16 @@ const transforms = {
 					};
 				}
 
+				// Maintain custom text color block support value.
+				if ( style?.color?.text ) {
+					additionalAttributes.style = {
+						color: {
+							...additionalAttributes.style?.color,
+							text: style.color.text,
+						},
+					};
+				}
+
 				return createBlock(
 					'core/media-text',
 					{
@@ -77,6 +90,8 @@ const transforms = {
 						mediaId: id,
 						mediaType: backgroundType,
 						mediaUrl: url,
+						textColor,
+						useFeaturedImage,
 						...additionalAttributes,
 					},
 					innerBlocks
@@ -130,11 +145,14 @@ const transforms = {
 					mediaUrl,
 					style,
 					textColor,
+					useFeaturedImage,
 				},
 				innerBlocks
 			) => {
 				const additionalAttributes = {};
 
+				// Migrate the background styles or gradient to Cover's custom
+				// gradient and overlay properties.
 				if ( style?.color?.gradient ) {
 					additionalAttributes.customGradient = style.color.gradient;
 				} else if ( style?.color?.background ) {
@@ -142,74 +160,33 @@ const transforms = {
 						style.color.background;
 				}
 
+				// Maintain custom text color support style.
+				if ( style?.color?.text ) {
+					additionalAttributes.style = {
+						color: { text: style.color.text },
+					};
+				}
+
 				const coverAttributes = {
 					align,
 					alt: mediaAlt,
 					anchor,
 					backgroundType: mediaType,
-					dimRatio: !! mediaUrl ? 50 : 100,
+					dimRatio: !! mediaUrl || useFeaturedImage ? 50 : 100,
 					focalPoint,
 					gradient,
 					id: mediaId,
 					overlayColor: backgroundColor,
+					textColor,
 					url: mediaUrl,
+					useFeaturedImage,
 					...additionalAttributes,
 				};
-				const customTextColor = style?.color?.text;
-
-				// Attempt to maintain any text color selection.
-				// Cover block's do not opt into color block support so we
-				// cannot directly copy the color attributes across.
-				if ( ! textColor && ! customTextColor ) {
-					return createBlock(
-						'core/cover',
-						coverAttributes,
-						innerBlocks
-					);
-				}
-
-				const coloredInnerBlocks = innerBlocks.map( ( innerBlock ) => {
-					const {
-						attributes: { style: innerStyle },
-					} = innerBlock;
-
-					// Only apply the media and text color if the inner block
-					// doesn't set its own color block support selection.
-					if (
-						innerBlock.attributes.textColor ||
-						innerStyle?.color?.text
-					) {
-						return innerBlock;
-					}
-
-					const newAttributes = { textColor };
-
-					// Only add or extend inner block's style object if we have
-					// a custom text color from the media & text block.
-					if ( customTextColor ) {
-						newAttributes.style = {
-							...innerStyle,
-							color: {
-								...innerStyle?.color,
-								text: customTextColor,
-							},
-						};
-					}
-
-					return createBlock(
-						innerBlock.name,
-						{
-							...innerBlock.attributes,
-							...newAttributes,
-						},
-						innerBlock.innerBlocks
-					);
-				} );
 
 				return createBlock(
 					'core/cover',
 					coverAttributes,
-					coloredInnerBlocks
+					innerBlocks
 				);
 			},
 		},

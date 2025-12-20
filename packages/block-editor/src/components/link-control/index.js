@@ -1,17 +1,29 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
  */
-import { Button, Spinner, Notice, TextControl } from '@wordpress/components';
-import { keyboardReturn } from '@wordpress/icons';
-import { __ } from '@wordpress/i18n';
-import { useRef, useState, useEffect } from '@wordpress/element';
+import {
+	Button,
+	Spinner,
+	Notice,
+	TextControl,
+	__experimentalHStack as HStack,
+	__experimentalInputControlSuffixWrapper as InputControlSuffixWrapper,
+} from '@wordpress/components';
+import { __, sprintf } from '@wordpress/i18n';
+import { useRef, useState, useEffect, useMemo } from '@wordpress/element';
+import { useInstanceId } from '@wordpress/compose';
 import { focus } from '@wordpress/dom';
 import { ENTER } from '@wordpress/keycodes';
+import { isShallowEqualObjects } from '@wordpress/is-shallow-equal';
+import { useSelect, useDispatch } from '@wordpress/data';
+import { store as preferencesStore } from '@wordpress/preferences';
+import { keyboardReturn, linkOff } from '@wordpress/icons';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -19,8 +31,9 @@ import { ENTER } from '@wordpress/keycodes';
 import LinkControlSettingsDrawer from './settings-drawer';
 import LinkControlSearchInput from './search-input';
 import LinkPreview from './link-preview';
+import LinkSettings from './settings';
 import useCreatePage from './use-create-page';
-import useInternalInputValue from './use-internal-input-value';
+import useInternalValue from './use-internal-value';
 import { ViewerFill } from './viewer-slot';
 import { DEFAULT_LINK_SETTINGS } from './constants';
 
@@ -36,13 +49,11 @@ import { DEFAULT_LINK_SETTINGS } from './constants';
  *                                    providing a custom `settings` prop.
  */
 
-/* eslint-disable jsdoc/valid-types */
 /**
  * Custom settings values associated with a link.
  *
  * @typedef {{[setting:string]:any}} WPLinkControlSettingsValue
  */
-/* eslint-enable */
 
 /**
  * Custom settings values associated with a link.
@@ -93,11 +104,16 @@ import { DEFAULT_LINK_SETTINGS } from './constants';
  * @property {boolean=}                   withCreateSuggestion       Whether to allow creation of link value from suggestion.
  * @property {Object=}                    suggestionsQuery           Query parameters to pass along to wp.blockEditor.__experimentalFetchLinkSuggestions.
  * @property {boolean=}                   noURLSuggestion            Whether to add a fallback suggestion which treats the search query as a URL.
+ * @property {boolean=}                   hasTextControl             Whether to add a text field to the UI to update the value.title.
  * @property {string|Function|undefined}  createSuggestionButtonText The text to use in the button that calls createSuggestion.
  * @property {Function}                   renderControlBottom        Optional controls to be rendered at the bottom of the component.
+ * @property {boolean=}                   handleEntities             Whether to handle entity links (links with ID). When true and a link has an ID, the input will be disabled and show an unlink button.
  */
 
 const noop = () => {};
+
+const PREFERENCE_SCOPE = 'core/block-editor';
+const PREFERENCE_KEY = 'linkControlSettingsDrawer';
 
 /**
  * Renders a link control. A link control is a controlled input which maintains
@@ -112,6 +128,7 @@ function LinkControl( {
 	settings = DEFAULT_LINK_SETTINGS,
 	onChange = noop,
 	onRemove,
+	onCancel,
 	noDirectEntry = false,
 	showSuggestions = true,
 	showInitialSuggestions,
@@ -125,21 +142,80 @@ function LinkControl( {
 	hasRichPreviews = false,
 	hasTextControl = false,
 	renderControlBottom = null,
+	handleEntities = false,
 } ) {
 	if ( withCreateSuggestion === undefined && createSuggestion ) {
 		withCreateSuggestion = true;
 	}
 
-	const isMounting = useRef( true );
+	const [ settingsOpen, setSettingsOpen ] = useState( false );
+
+	const { advancedSettingsPreference } = useSelect( ( select ) => {
+		const prefsStore = select( preferencesStore );
+
+		return {
+			advancedSettingsPreference:
+				prefsStore.get( PREFERENCE_SCOPE, PREFERENCE_KEY ) ?? false,
+		};
+	}, [] );
+
+	const { set: setPreference } = useDispatch( preferencesStore );
+
+	/**
+	 * Sets the open/closed state of the Advanced Settings Drawer,
+	 * optionlly persisting the state to the user's preferences.
+	 *
+	 * Note that Block Editor components can be consumed by non-WordPress
+	 * environments which may not have preferences setup.
+	 * Therefore a local state is also  used as a fallback.
+	 *
+	 * @param {boolean} prefVal the open/closed state of the Advanced Settings Drawer.
+	 */
+	const setSettingsOpenWithPreference = ( prefVal ) => {
+		if ( setPreference ) {
+			setPreference( PREFERENCE_SCOPE, PREFERENCE_KEY, prefVal );
+		}
+		setSettingsOpen( prefVal );
+	};
+
+	// Block Editor components can be consumed by non-WordPress environments
+	// which may not have these preferences setup.
+	// Therefore a local state is used as a fallback.
+	const isSettingsOpen = advancedSettingsPreference || settingsOpen;
+
+	const isMountingRef = useRef( true );
 	const wrapperNode = useRef();
 	const textInputRef = useRef();
-	const isEndingEditWithFocus = useRef( false );
+	const searchInputRef = useRef();
+	// TODO: Remove entityUrlFallbackRef and previewValue in favor of value prop after taxonomy entity binding
+	// is stable and returns the correct URL instead of null while resolving when creating the entity.
+	//
+	// Preserve the URL from entity suggestions before binding overrides it
+	// This is due to entity binding not being available immediately after the suggestion is selected.
+	// The URL can return null, especially for taxonomy entities, while entity binding is being resolved.
+	// To avoid unnecessary rerenders and focus loss, we preserve the URL from the suggestion and use it
+	// as a fallback until the entity binding is available.
+	const entityUrlFallbackRef = useRef();
 
-	const [ internalUrlInputValue, setInternalUrlInputValue ] =
-		useInternalInputValue( value?.url || '' );
+	const settingsKeys = settings.map( ( { id } ) => id );
 
-	const [ internalTextInputValue, setInternalTextInputValue ] =
-		useInternalInputValue( value?.title || '' );
+	const [
+		internalControlValue,
+		setInternalControlValue,
+		setInternalURLInputValue,
+		setInternalTextInputValue,
+		createSetInternalSettingValueHandler,
+	] = useInternalValue( value );
+
+	// Compute isEntity internally based on handleEntities prop and presence of ID
+	const isEntity = handleEntities && !! internalControlValue?.id;
+
+	// Generate help text ID for accessibility association
+	const baseId = useInstanceId( LinkControl, 'link-control' );
+	const helpTextId = isEntity ? `${ baseId }__help` : null;
+
+	const valueHasChanges =
+		value && ! isShallowEqualObjects( internalControlValue, value );
 
 	const [ isEditingLink, setIsEditingLink ] = useState(
 		forceIsEditingLink !== undefined
@@ -151,28 +227,20 @@ function LinkControl( {
 		useCreatePage( createSuggestion );
 
 	useEffect( () => {
-		if (
-			forceIsEditingLink !== undefined &&
-			forceIsEditingLink !== isEditingLink
-		) {
-			setIsEditingLink( forceIsEditingLink );
+		if ( forceIsEditingLink === undefined ) {
+			return;
 		}
+
+		setIsEditingLink( forceIsEditingLink );
 	}, [ forceIsEditingLink ] );
 
 	useEffect( () => {
 		// We don't auto focus into the Link UI on mount
 		// because otherwise using the keyboard to select text
 		// *within* the link format is not possible.
-		if ( isMounting.current ) {
-			isMounting.current = false;
+		if ( isMountingRef.current ) {
 			return;
 		}
-		// Unless we are mounting, we always want to focus either:
-		// - the URL input
-		// - the first focusable element in the Link UI.
-		// But in editing mode if there is a text input present then
-		// the URL input is at index 1. If not then it is at index 0.
-		const whichFocusTargetIndex = textInputRef?.current ? 1 : 0;
 
 		// Scenario - when:
 		// - switching between editable and non editable LinkControl
@@ -180,44 +248,70 @@ function LinkControl( {
 		// ...then move focus to the *first* element to avoid focus loss
 		// and to ensure focus is *within* the Link UI.
 		const nextFocusTarget =
-			focus.focusable.find( wrapperNode.current )[
-				whichFocusTargetIndex
-			] || wrapperNode.current;
+			focus.focusable.find( wrapperNode.current )[ 0 ] ||
+			wrapperNode.current;
 
 		nextFocusTarget.focus();
-
-		isEndingEditWithFocus.current = false;
 	}, [ isEditingLink, isCreatingPage ] );
 
+	// The component mounting reference is maintained separately
+	// to correctly reset values in `StrictMode`.
+	useEffect( () => {
+		isMountingRef.current = false;
+
+		return () => {
+			isMountingRef.current = true;
+		};
+	}, [] );
+
+	const hasLinkValue = value?.url?.trim()?.length > 0;
+
 	/**
-	 * Cancels editing state and marks that focus may need to be restored after
-	 * the next render, if focus was within the wrapper when editing finished.
+	 * Cancels editing state.
 	 */
 	const stopEditing = () => {
-		isEndingEditWithFocus.current = !! wrapperNode.current?.contains(
-			wrapperNode.current.ownerDocument.activeElement
-		);
-
 		setIsEditingLink( false );
 	};
 
 	const handleSelectSuggestion = ( updatedValue ) => {
+		// Preserve the URL for taxonomy entities before binding overrides it
+		if ( updatedValue?.kind === 'taxonomy' && updatedValue?.url ) {
+			entityUrlFallbackRef.current = updatedValue.url;
+		}
+
+		// Suggestions may contains "settings" values (e.g. `opensInNewTab`)
+		// which should not override any existing settings values set by the
+		// user. This filters out any settings values from the suggestion.
+		const nonSettingsChanges = Object.keys( updatedValue ).reduce(
+			( acc, key ) => {
+				if ( ! settingsKeys.includes( key ) ) {
+					acc[ key ] = updatedValue[ key ];
+				}
+				return acc;
+			},
+			{}
+		);
+
 		onChange( {
-			...updatedValue,
-			title: internalTextInputValue || updatedValue?.title,
+			...internalControlValue,
+			...nonSettingsChanges,
+			// As title is not a setting, it must be manually applied
+			// in such a way as to preserve the users changes over
+			// any "title" value provided by the "suggestion".
+			title: internalControlValue?.title || updatedValue?.title,
 		} );
+
 		stopEditing();
 	};
 
 	const handleSubmit = () => {
-		if (
-			currentUrlInputValue !== value?.url ||
-			internalTextInputValue !== value?.title
-		) {
+		if ( valueHasChanges ) {
+			// Submit the original value with new stored values applied
+			// on top. URL is a special case as it may also be a prop.
 			onChange( {
 				...value,
+				...internalControlValue,
 				url: currentUrlInputValue,
-				title: internalTextInputValue,
 			} );
 		}
 		stopEditing();
@@ -225,6 +319,7 @@ function LinkControl( {
 
 	const handleSubmitWithEnter = ( event ) => {
 		const { keyCode } = event;
+
 		if (
 			keyCode === ENTER &&
 			! currentInputIsEmpty // Disallow submitting empty values.
@@ -234,19 +329,96 @@ function LinkControl( {
 		}
 	};
 
-	const currentUrlInputValue = propInputValue || internalUrlInputValue;
+	const resetInternalValues = () => {
+		setInternalControlValue( value );
+	};
+
+	const handleCancel = ( event ) => {
+		event.preventDefault();
+		event.stopPropagation();
+
+		// Ensure that any unsubmitted input changes are reset.
+		resetInternalValues();
+
+		if ( hasLinkValue ) {
+			// If there is a link then exist editing mode and show preview.
+			stopEditing();
+		} else {
+			// If there is no link value, then remove the link entirely.
+			onRemove?.();
+		}
+
+		onCancel?.();
+	};
+
+	const [ shouldFocusSearchInput, setShouldFocusSearchInput ] =
+		useState( false );
+
+	const handleUnlink = () => {
+		// Clear the internal state to remove the ID and re-enable the field
+		// Explicitly set id, kind, and type to undefined so they override
+		// the original values when spread in handleSubmit. This ensures that
+		// when the user types a custom URL and submits, the entity link is
+		// properly severed (not just when selecting a different entity from suggestions).
+		const { id, kind, type, ...restValue } = internalControlValue;
+		setInternalControlValue( {
+			...restValue,
+			id: undefined,
+			kind: undefined,
+			type: undefined,
+			url: undefined,
+		} );
+
+		// Request focus after the component re-renders with the cleared state
+		// We can't focus immediately because the input might still be disabled
+		setShouldFocusSearchInput( true );
+	};
+
+	// Focus the search input when requested, once the component has re-rendered
+	// This ensures the input is enabled and ready to receive focus
+	useEffect( () => {
+		if ( shouldFocusSearchInput ) {
+			searchInputRef.current?.focus();
+			setShouldFocusSearchInput( false );
+		}
+	}, [ shouldFocusSearchInput ] );
+
+	const currentUrlInputValue =
+		propInputValue || internalControlValue?.url || '';
 
 	const currentInputIsEmpty = ! currentUrlInputValue?.trim()?.length;
 
 	const shownUnlinkControl =
 		onRemove && value && ! isEditingLink && ! isCreatingPage;
 
-	const showSettingsDrawer = !! settings?.length;
+	const showActions = isEditingLink && hasLinkValue;
 
 	// Only show text control once a URL value has been committed
 	// and it isn't just empty whitespace.
 	// See https://github.com/WordPress/gutenberg/pull/33849/#issuecomment-932194927.
-	const showTextControl = value?.url?.trim()?.length > 0 && hasTextControl;
+	const showTextControl = hasLinkValue && hasTextControl;
+
+	const isEditing = ( isEditingLink || ! value ) && ! isCreatingPage;
+	const isDisabled = ! valueHasChanges || currentInputIsEmpty;
+	const showSettings = !! settings?.length && isEditingLink && hasLinkValue;
+
+	const previewValue = useMemo( () => {
+		// There is a chance that the value is not yet set from the entity binding, so we use the preserved URL.
+		if (
+			value?.kind === 'taxonomy' &&
+			! value?.url &&
+			entityUrlFallbackRef.current
+		) {
+			// combine the value prop with the preserved URL from the suggestion
+			return {
+				...value,
+				url: entityUrlFallbackRef.current,
+			};
+		}
+
+		// If we don't have a fallback URL, use the value prop.
+		return value;
+	}, [ value ] );
 
 	return (
 		<div
@@ -260,33 +432,35 @@ function LinkControl( {
 				</div>
 			) }
 
-			{ ( isEditingLink || ! value ) && ! isCreatingPage && (
+			{ isEditing && (
 				<>
 					<div
-						className={ classnames( {
+						className={ clsx( {
 							'block-editor-link-control__search-input-wrapper': true,
 							'has-text-control': showTextControl,
+							'has-actions': showActions,
 						} ) }
 					>
 						{ showTextControl && (
 							<TextControl
 								ref={ textInputRef }
 								className="block-editor-link-control__field block-editor-link-control__text-content"
-								label="Text"
-								value={ internalTextInputValue }
+								label={ __( 'Text' ) }
+								value={ internalControlValue?.title }
 								onChange={ setInternalTextInputValue }
 								onKeyDown={ handleSubmitWithEnter }
+								__next40pxDefaultSize
 							/>
 						) }
-
 						<LinkControlSearchInput
+							ref={ searchInputRef }
 							currentLink={ value }
 							className="block-editor-link-control__field block-editor-link-control__search-input"
 							placeholder={ searchInputPlaceholder }
 							value={ currentUrlInputValue }
 							withCreateSuggestion={ withCreateSuggestion }
 							onCreateSuggestion={ createPage }
-							onChange={ setInternalUrlInputValue }
+							onChange={ setInternalURLInputValue }
 							onSelect={ handleSelectSuggestion }
 							showInitialSuggestions={ showInitialSuggestions }
 							allowDirectEntry={ ! noDirectEntry }
@@ -296,18 +470,31 @@ function LinkControl( {
 							createSuggestionButtonText={
 								createSuggestionButtonText
 							}
-							useLabel={ showTextControl }
-						>
-							<div className="block-editor-link-control__search-actions">
-								<Button
-									onClick={ handleSubmit }
-									label={ __( 'Submit' ) }
-									icon={ keyboardReturn }
-									className="block-editor-link-control__search-submit"
-									disabled={ currentInputIsEmpty } // Disallow submitting empty values.
+							hideLabelFromVision={ ! showTextControl }
+							isEntity={ isEntity }
+							suffix={
+								<SearchSuffixControl
+									isEntity={ isEntity }
+									showActions={ showActions }
+									isDisabled={ isDisabled }
+									onUnlink={ handleUnlink }
+									onSubmit={ handleSubmit }
+									helpTextId={ helpTextId }
 								/>
-							</div>
-						</LinkControlSearchInput>
+							}
+						/>
+						{ isEntity && helpTextId && (
+							<p
+								id={ helpTextId }
+								className="block-editor-link-control__help"
+							>
+								{ sprintf(
+									/* translators: %s: entity type (e.g., page, post) */
+									__( 'Synced with the selected %s.' ),
+									internalControlValue?.type || 'item'
+								) }
+							</p>
+						) }
 					</div>
 					{ errorMessage && (
 						<Notice
@@ -323,29 +510,132 @@ function LinkControl( {
 
 			{ value && ! isEditingLink && ! isCreatingPage && (
 				<LinkPreview
-					key={ value?.url } // force remount when URL changes to avoid race conditions for rich previews
-					value={ value }
+					key={ previewValue?.url } // force remount when URL changes to avoid race conditions for rich previews
+					value={ previewValue }
 					onEditClick={ () => setIsEditingLink( true ) }
 					hasRichPreviews={ hasRichPreviews }
 					hasUnlinkControl={ shownUnlinkControl }
-					onRemove={ onRemove }
+					onRemove={ () => {
+						onRemove();
+						setIsEditingLink( true );
+					} }
 				/>
 			) }
 
-			{ showSettingsDrawer && (
+			{ showSettings && (
 				<div className="block-editor-link-control__tools">
-					<LinkControlSettingsDrawer
-						value={ value }
-						settings={ settings }
-						onChange={ onChange }
-					/>
+					{ ! currentInputIsEmpty && (
+						<LinkControlSettingsDrawer
+							settingsOpen={ isSettingsOpen }
+							setSettingsOpen={ setSettingsOpenWithPreference }
+						>
+							<LinkSettings
+								value={ internalControlValue }
+								settings={ settings }
+								onChange={ createSetInternalSettingValueHandler(
+									settingsKeys
+								) }
+							/>
+						</LinkControlSettingsDrawer>
+					) }
 				</div>
 			) }
-			{ renderControlBottom && renderControlBottom() }
+
+			{ showActions && (
+				<HStack
+					justify="right"
+					className="block-editor-link-control__search-actions"
+				>
+					<Button
+						__next40pxDefaultSize
+						variant="tertiary"
+						onClick={ handleCancel }
+					>
+						{ __( 'Cancel' ) }
+					</Button>
+					<Button
+						__next40pxDefaultSize
+						variant="primary"
+						onClick={ isDisabled ? noop : handleSubmit }
+						className="block-editor-link-control__search-submit"
+						aria-disabled={ isDisabled }
+					>
+						{ __( 'Apply' ) }
+					</Button>
+				</HStack>
+			) }
+
+			{ ! isCreatingPage && renderControlBottom && renderControlBottom() }
 		</div>
 	);
 }
 
-LinkControl.ViewerFill = ViewerFill;
+/**
+ * Suffix control component for LinkControl search input.
+ * Handles the display of unlink button for entities and submit button for regular links.
+ *
+ * @param {Object}   props             - Component props
+ * @param {boolean}  props.isEntity    - Whether the link is bound to an entity
+ * @param {boolean}  props.showActions - Whether to show action buttons
+ * @param {boolean}  props.isDisabled  - Whether the submit button should be disabled
+ * @param {Function} props.onUnlink    - Callback when unlink button is clicked
+ * @param {Function} props.onSubmit    - Callback when submit button is clicked
+ * @param {string}   props.helpTextId  - ID of the help text element for accessibility
+ */
+function SearchSuffixControl( {
+	isEntity,
+	showActions,
+	isDisabled,
+	onUnlink,
+	onSubmit,
+	helpTextId,
+} ) {
+	if ( isEntity ) {
+		return (
+			<Button
+				icon={ linkOff }
+				onClick={ onUnlink }
+				aria-describedby={ helpTextId }
+				showTooltip
+				label={ __( 'Unsync and edit' ) }
+				__next40pxDefaultSize
+			/>
+		);
+	}
 
+	if ( showActions ) {
+		return undefined;
+	}
+
+	return (
+		<InputControlSuffixWrapper variant="control">
+			<Button
+				onClick={ isDisabled ? noop : onSubmit }
+				label={ __( 'Submit' ) }
+				icon={ keyboardReturn }
+				className="block-editor-link-control__search-submit"
+				aria-disabled={ isDisabled }
+				size="small"
+			/>
+		</InputControlSuffixWrapper>
+	);
+}
+
+LinkControl.ViewerFill = ViewerFill;
+LinkControl.DEFAULT_LINK_SETTINGS = DEFAULT_LINK_SETTINGS;
+
+const DeprecatedExperimentalLinkControl = ( props ) => {
+	deprecated( 'wp.blockEditor.__experimentalLinkControl', {
+		since: '6.8',
+		alternative: 'wp.blockEditor.LinkControl',
+	} );
+
+	return <LinkControl { ...props } />;
+};
+
+DeprecatedExperimentalLinkControl.ViewerFill = LinkControl.ViewerFill;
+DeprecatedExperimentalLinkControl.DEFAULT_LINK_SETTINGS =
+	LinkControl.DEFAULT_LINK_SETTINGS;
+
+export { DeprecatedExperimentalLinkControl };
 export default LinkControl;

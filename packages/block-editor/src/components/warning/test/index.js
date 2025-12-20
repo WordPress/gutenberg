@@ -18,7 +18,9 @@ describe( 'Warning', () => {
 
 	it( 'should show primary actions', () => {
 		render(
-			<Warning actions={ <button>Click me</button> }>Message</Warning>
+			<Warning actions={ [ <button key="test">Click me</button> ] }>
+				Message
+			</Warning>
 		);
 
 		expect(
@@ -31,9 +33,7 @@ describe( 'Warning', () => {
 	} );
 
 	it( 'should show hidden secondary actions', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 
 		render(
 			<Warning secondaryActions={ [ { title: 'test', onClick: null } ] }>

@@ -30,6 +30,19 @@ const variations = [
 		},
 		scope: [ 'inserter' ],
 	},
+	{
+		isDefault: false,
+		name: 'post-type-label',
+		title: __( 'Post Type Label' ),
+		description: __(
+			'Display the post type label based on the queried object.'
+		),
+		icon: title,
+		attributes: {
+			type: 'post-type',
+		},
+		scope: [ 'inserter' ],
+	},
 ];
 
 /**
@@ -38,7 +51,9 @@ const variations = [
  *  Block by providing its attributes.
  */
 variations.forEach( ( variation ) => {
-	if ( variation.isActive ) return;
+	if ( variation.isActive ) {
+		return;
+	}
 	variation.isActive = ( blockAttributes, variationAttributes ) =>
 		blockAttributes.type === variationAttributes.type;
 } );

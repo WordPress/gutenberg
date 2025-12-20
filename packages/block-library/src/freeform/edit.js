@@ -6,10 +6,10 @@ import {
 	useBlockProps,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { debounce } from '@wordpress/compose';
+import { debounce, useRefEffect } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 import { ToolbarGroup } from '@wordpress/components';
-import { useEffect, useRef } from '@wordpress/element';
+import { useEffect, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { BACKSPACE, DELETE, F10, isKeyboardEvent } from '@wordpress/keycodes';
 
@@ -17,6 +17,7 @@ import { BACKSPACE, DELETE, F10, isKeyboardEvent } from '@wordpress/keycodes';
  * Internal dependencies
  */
 import ConvertToBlocksButton from './convert-to-blocks-button';
+import ModalEdit from './modal';
 
 const { wp } = window;
 
@@ -36,36 +37,66 @@ function isTmceEmpty( editor ) {
 	return /^\n?$/.test( body.innerText || body.textContent );
 }
 
-export default function ClassicEdit( {
+export default function FreeformEdit( props ) {
+	const { clientId } = props;
+	const canRemove = useSelect(
+		( select ) => select( blockEditorStore ).canRemoveBlock( clientId ),
+		[ clientId ]
+	);
+	const [ isIframed, setIsIframed ] = useState( false );
+	const ref = useRefEffect( ( element ) => {
+		setIsIframed( element.ownerDocument !== document );
+	}, [] );
+
+	return (
+		<>
+			{ canRemove && (
+				<BlockControls>
+					<ToolbarGroup>
+						<ConvertToBlocksButton clientId={ clientId } />
+					</ToolbarGroup>
+				</BlockControls>
+			) }
+			<div { ...useBlockProps( { ref } ) }>
+				{ isIframed ? (
+					<ModalEdit { ...props } />
+				) : (
+					<ClassicEdit { ...props } />
+				) }
+			</div>
+		</>
+	);
+}
+
+function ClassicEdit( {
 	clientId,
 	attributes: { content },
 	setAttributes,
 	onReplace,
 } ) {
 	const { getMultiSelectedBlockClientIds } = useSelect( blockEditorStore );
-	const canRemove = useSelect(
-		( select ) => select( blockEditorStore ).canRemoveBlock( clientId ),
-		[ clientId ]
-	);
-	const didMount = useRef( false );
+	const didMountRef = useRef( false );
 
 	useEffect( () => {
-		if ( ! didMount.current ) {
+		if ( ! didMountRef.current ) {
 			return;
 		}
 
 		const editor = window.tinymce.get( `editor-${ clientId }` );
-		const currentContent = editor?.getContent();
+		if ( ! editor ) {
+			return;
+		}
 
+		const currentContent = editor.getContent();
 		if ( currentContent !== content ) {
 			editor.setContent( content || '' );
 		}
-	}, [ content ] );
+	}, [ clientId, content ] );
 
 	useEffect( () => {
 		const { baseURL, suffix } = window.wpEditorL10n.tinymce;
 
-		didMount.current = true;
+		didMountRef.current = true;
 
 		window.tinymce.EditorManager.overrideDefaults( {
 			base_url: baseURL,
@@ -157,6 +188,13 @@ export default function ClassicEdit( {
 				}
 			} );
 
+			editor.on( 'paste', ( event ) => {
+				// TinyMCE selection isn’t synced with the block editor selection store.
+				// This event handler prevents paste from bubbling so the useClipboardHandler
+				// won’t replace the block.
+				event.stopPropagation();
+			} );
+
 			editor.on( 'init', () => {
 				const rootNode = editor.getBody();
 
@@ -199,6 +237,7 @@ export default function ClassicEdit( {
 				onReadyStateChange
 			);
 			wp.oldEditor.remove( `editor-${ clientId }` );
+			didMountRef.current = false;
 		};
 	}, [] );
 
@@ -225,28 +264,19 @@ export default function ClassicEdit( {
 	/* eslint-disable jsx-a11y/no-static-element-interactions */
 	return (
 		<>
-			{ canRemove && (
-				<BlockControls>
-					<ToolbarGroup>
-						<ConvertToBlocksButton clientId={ clientId } />
-					</ToolbarGroup>
-				</BlockControls>
-			) }
-			<div { ...useBlockProps() }>
-				<div
-					key="toolbar"
-					id={ `toolbar-${ clientId }` }
-					className="block-library-classic__toolbar"
-					onClick={ focus }
-					data-placeholder={ __( 'Classic' ) }
-					onKeyDown={ onToolbarKeyDown }
-				/>
-				<div
-					key="editor"
-					id={ `editor-${ clientId }` }
-					className="wp-block-freeform block-library-rich-text__tinymce"
-				/>
-			</div>
+			<div
+				key="toolbar"
+				id={ `toolbar-${ clientId }` }
+				className="block-library-classic__toolbar"
+				onClick={ focus }
+				data-placeholder={ __( 'Classic' ) }
+				onKeyDown={ onToolbarKeyDown }
+			/>
+			<div
+				key="editor"
+				id={ `editor-${ clientId }` }
+				className="wp-block-freeform block-library-rich-text__tinymce"
+			/>
 		</>
 	);
 	/* eslint-enable jsx-a11y/no-static-element-interactions */

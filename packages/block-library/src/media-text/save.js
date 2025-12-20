@@ -1,8 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
-import { isEmpty } from 'lodash';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -12,7 +11,7 @@ import { useInnerBlocksProps, useBlockProps } from '@wordpress/block-editor';
 /**
  * Internal dependencies
  */
-import { imageFillStyles } from './media-container';
+import { imageFillStyles } from './image-fill';
 import { DEFAULT_MEDIA_SIZE_SLUG } from './constants';
 
 const DEFAULT_MEDIA_WIDTH = 50;
@@ -36,20 +35,25 @@ export default function save( { attributes } ) {
 		rel,
 	} = attributes;
 	const mediaSizeSlug = attributes.mediaSizeSlug || DEFAULT_MEDIA_SIZE_SLUG;
-	const newRel = isEmpty( rel ) ? undefined : rel;
+	const newRel = ! rel ? undefined : rel;
 
-	const imageClasses = classnames( {
+	const imageClasses = clsx( {
 		[ `wp-image-${ mediaId }` ]: mediaId && mediaType === 'image',
 		[ `size-${ mediaSizeSlug }` ]: mediaId && mediaType === 'image',
 	} );
 
-	let image = (
+	const positionStyles = imageFill
+		? imageFillStyles( mediaUrl, focalPoint )
+		: {};
+
+	let image = mediaUrl ? (
 		<img
 			src={ mediaUrl }
 			alt={ mediaAlt }
 			className={ imageClasses || null }
+			style={ positionStyles }
 		/>
-	);
+	) : null;
 
 	if ( href ) {
 		image = (
@@ -68,15 +72,12 @@ export default function save( { attributes } ) {
 		image: () => image,
 		video: () => <video controls src={ mediaUrl } />,
 	};
-	const className = classnames( {
+	const className = clsx( {
 		'has-media-on-the-right': 'right' === mediaPosition,
 		'is-stacked-on-mobile': isStackedOnMobile,
 		[ `is-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
-		'is-image-fill': imageFill,
+		'is-image-fill-element': imageFill,
 	} );
-	const backgroundStyles = imageFill
-		? imageFillStyles( mediaUrl, focalPoint )
-		: {};
 
 	let gridTemplateColumns;
 	if ( mediaWidth !== DEFAULT_MEDIA_WIDTH ) {
@@ -97,10 +98,7 @@ export default function save( { attributes } ) {
 						className: 'wp-block-media-text__content',
 					} ) }
 				/>
-				<figure
-					className="wp-block-media-text__media"
-					style={ backgroundStyles }
-				>
+				<figure className="wp-block-media-text__media">
 					{ ( mediaTypeRenders[ mediaType ] || noop )() }
 				</figure>
 			</div>
@@ -108,10 +106,7 @@ export default function save( { attributes } ) {
 	}
 	return (
 		<div { ...useBlockProps.save( { className, style } ) }>
-			<figure
-				className="wp-block-media-text__media"
-				style={ backgroundStyles }
-			>
+			<figure className="wp-block-media-text__media">
 				{ ( mediaTypeRenders[ mediaType ] || noop )() }
 			</figure>
 			<div

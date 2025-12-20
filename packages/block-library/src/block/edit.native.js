@@ -27,8 +27,8 @@ import {
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
 import {
-	__experimentalRecursionProvider as RecursionProvider,
-	__experimentalUseHasRecursion as useHasRecursion,
+	RecursionProvider,
+	useHasRecursion,
 	InnerBlocks,
 	Warning,
 	store as blockEditorStore,
@@ -36,6 +36,7 @@ import {
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 import { help } from '@wordpress/icons';
 import { store as reusableBlocksStore } from '@wordpress/reusable-blocks';
+import { store as editorStore } from '@wordpress/editor';
 import { store as noticesStore } from '@wordpress/notices';
 
 /**
@@ -88,6 +89,9 @@ export default function ReusableBlockEdit( {
 				'getEntityRecord',
 				[ 'postType', 'wp_block', ref ]
 			);
+
+			const { getBlockCount } = select( blockEditorStore );
+
 			return {
 				hasResolved: hasResolvedBlock,
 				isEditing:
@@ -95,9 +99,15 @@ export default function ReusableBlockEdit( {
 						reusableBlocksStore
 					).__experimentalIsEditingReusableBlock( clientId ),
 				isMissing: hasResolvedBlock && ! persistedBlock,
+				innerBlockCount: getBlockCount( clientId ),
 			};
 		},
 		[ ref, clientId ]
+	);
+	const hostAppNamespace = useSelect(
+		( select ) =>
+			select( editorStore ).getEditorSettings().hostAppNamespace,
+		[]
 	);
 
 	const { createSuccessNotice } = useDispatch( noticesStore );
@@ -122,13 +132,9 @@ export default function ReusableBlockEdit( {
 	}
 
 	const onConvertToRegularBlocks = useCallback( () => {
-		createSuccessNotice(
-			sprintf(
-				/* translators: %s: name of the reusable block */
-				__( '%s converted to regular blocks' ),
-				title
-			)
-		);
+		/* translators: %s: name of the synced block */
+		const successNotice = __( '%s detached' );
+		createSuccessNotice( sprintf( successNotice, title ) );
 
 		clearSelectedBlock();
 		// Convert action is executed at the end of the current JavaScript execution block
@@ -139,11 +145,19 @@ export default function ReusableBlockEdit( {
 	function renderSheet() {
 		const infoTitle =
 			Platform.OS === 'android'
-				? __(
-						'Editing reusable blocks is not yet supported on WordPress for Android'
+				? sprintf(
+						/* translators: %s: name of the host app (e.g. WordPress) */
+						__(
+							'Editing synced patterns is not yet supported on %s for Android'
+						),
+						hostAppNamespace
 				  )
-				: __(
-						'Editing reusable blocks is not yet supported on WordPress for iOS'
+				: sprintf(
+						/* translators: %s: name of the host app (e.g. WordPress) */
+						__(
+							'Editing synced patterns is not yet supported on %s for iOS'
+						),
+						hostAppNamespace
 				  );
 
 		return (
@@ -163,11 +177,11 @@ export default function ReusableBlockEdit( {
 					</Text>
 					<Text style={ [ infoTextStyle, infoDescriptionStyle ] }>
 						{ __(
-							'Alternatively, you can detach and edit these blocks separately by tapping “Convert to regular blocks”.'
+							'Alternatively, you can detach and edit this block separately by tapping “Detach”.'
 						) }
 					</Text>
 					<TextControl
-						label={ __( 'Convert to regular blocks' ) }
+						label={ __( 'Detach' ) }
 						separatorType="topFullWidth"
 						onPress={ onConvertToRegularBlocks }
 						labelStyle={ actionButtonStyle }
@@ -218,7 +232,7 @@ export default function ReusableBlockEdit( {
 			<TouchableWithoutFeedback
 				disabled={ ! isSelected }
 				accessibilityLabel={ __( 'Help button' ) }
-				accessibilityRole={ 'button' }
+				accessibilityRole="button"
 				accessibilityHint={ __( 'Tap here to show help' ) }
 				onPress={ openSheet }
 			>

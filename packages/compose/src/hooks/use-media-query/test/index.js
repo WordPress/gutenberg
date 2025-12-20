@@ -1,125 +1,69 @@
 /**
  * External dependencies
  */
-import { render, act } from '@testing-library/react';
+import { act, render } from '@testing-library/react';
+import { matchMedia, setMedia } from 'mock-match-media';
 
 /**
  * Internal dependencies
  */
 import useMediaQuery from '../';
 
+const TestComponent = ( { query } ) => {
+	const queryResult = useMediaQuery( query );
+	return `useMediaQuery: ${ queryResult }`;
+};
+
 describe( 'useMediaQuery', () => {
-	let addListener, removeListener;
-
 	beforeAll( () => {
-		jest.spyOn( global, 'matchMedia' );
+		window.matchMedia = matchMedia;
+	} );
 
-		addListener = jest.fn();
-		removeListener = jest.fn();
+	beforeEach( () => {
+		setMedia( {
+			width: '960px',
+		} );
 	} );
 
 	afterEach( () => {
-		global.matchMedia.mockClear();
-		addListener.mockClear();
-		removeListener.mockClear();
+		// Do not clean up, this will break our cache. Browsers also do not
+		// reset media queries.
 	} );
 
-	afterAll( () => {
-		global.matchMedia.mockRestore();
-	} );
-
-	const TestComponent = ( { query } ) => {
-		const queryResult = useMediaQuery( query );
-		return `useMediaQuery: ${ queryResult }`;
-	};
-
-	it( 'should return true when query matches', async () => {
-		global.matchMedia.mockReturnValue( {
-			addListener,
-			removeListener,
-			matches: true,
-		} );
-
-		const { container, unmount } = render(
+	it( 'should return true when the query matches', async () => {
+		const { container } = render(
 			<TestComponent query="(min-width: 782px)" />
 		);
 
 		expect( container ).toHaveTextContent( 'useMediaQuery: true' );
-
-		unmount();
-
-		expect( removeListener ).toHaveBeenCalled();
 	} );
 
 	it( 'should correctly update the value when the query evaluation matches', async () => {
-		// First render.
-		global.matchMedia.mockReturnValueOnce( {
-			addListener,
-			removeListener,
-			matches: true,
-		} );
-		// The query within useEffect.
-		global.matchMedia.mockReturnValueOnce( {
-			addListener,
-			removeListener,
-			matches: true,
-		} );
-		global.matchMedia.mockReturnValueOnce( {
-			addListener,
-			removeListener,
-			matches: true,
-		} );
-		global.matchMedia.mockReturnValueOnce( {
-			addListener,
-			removeListener,
-			matches: false,
-		} );
-
-		const { container, unmount } = render(
+		const { container } = render(
 			<TestComponent query="(min-width: 782px)" />
 		);
 
 		expect( container ).toHaveTextContent( 'useMediaQuery: true' );
 
-		let updateMatchFunction;
-		await act( async () => {
-			updateMatchFunction = addListener.mock.calls[ 0 ][ 0 ];
-			updateMatchFunction();
+		act( () => {
+			setMedia( {
+				width: '600px',
+			} );
 		} );
 
 		expect( container ).toHaveTextContent( 'useMediaQuery: false' );
-
-		unmount();
-
-		expect( removeListener ).toHaveBeenCalledWith( updateMatchFunction );
 	} );
 
-	it( 'should return false when the query does not matches', async () => {
-		global.matchMedia.mockReturnValue( {
-			addListener,
-			removeListener,
-			matches: false,
-		} );
-
-		const { container, unmount } = render(
-			<TestComponent query="(min-width: 782px)" />
+	it( 'should return false when the query does not match', async () => {
+		const { container } = render(
+			<TestComponent query="(max-width: 782px)" />
 		);
 
 		expect( container ).toHaveTextContent( 'useMediaQuery: false' );
-
-		unmount();
-
-		expect( removeListener ).toHaveBeenCalled();
 	} );
 
-	it( 'should not call matchMedia if a query is not passed', async () => {
-		global.matchMedia.mockReturnValue( {
-			addListener,
-			removeListener,
-			matches: false,
-		} );
-
-		const { container, rerender, unmount } = render( <TestComponent /> );
+	it( 'should return false when a query is not passed', async () => {
+		const { container, rerender } = render( <TestComponent /> );
 
 		// Query will be case to a boolean to simplify the return type.
 		expect( container ).toHaveTextContent( 'useMediaQuery: false' );
@@ -127,10 +71,5 @@ describe( 'useMediaQuery', () => {
 		rerender( <TestComponent query={ false } /> );
 
 		expect( container ).toHaveTextContent( 'useMediaQuery: false' );
-
-		unmount();
-		expect( global.matchMedia ).not.toHaveBeenCalled();
-		expect( addListener ).not.toHaveBeenCalled();
-		expect( removeListener ).not.toHaveBeenCalled();
 	} );
 } );

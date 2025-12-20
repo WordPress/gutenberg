@@ -10,18 +10,23 @@
 			"dimRatio": 100,
 			"backgroundType": "image",
 			"gradient": "luminous-dusk",
-			"isDark": false
+			"isDark": false,
+			"tagName": "div"
 		},
 		"innerBlocks": [
 			{
 				"name": "core/paragraph",
 				"isValid": true,
 				"attributes": {
-					"align": "center",
 					"content": "Cover!",
 					"dropCap": false,
 					"placeholder": "Write title…",
-					"fontSize": "large"
+					"fontSize": "large",
+					"style": {
+						"typography": {
+							"textAlign": "center"
+						}
+					}
 				},
 				"innerBlocks": []
 			}

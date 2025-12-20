@@ -1,15 +1,10 @@
 # Block Patterns List
 
-The `BlockPatternList` component makes a list of the different registered block patterns. It uses the `BlockPreview` component to display a preview for each block pattern.
+The `BlockPatternsList` component makes a list of the different registered block patterns. It uses the `BlockPreview` component to display a preview for each block pattern.
 
 For more infos about blocks patterns, read [this](https://make.wordpress.org/core/2020/07/16/block-patterns-in-wordpress-5-5/).
 
 ![Block patterns sidebar in WordPress 5.5](https://make.wordpress.org/core/files/2020/09/blocks-patterns-sidebar-in-wordpress-5-5.png)
-
-## Table of contents
-
-1. [Development guidelines](#development-guidelines)
-2. [Related components](#related-components)
 
 ## Development guidelines
 
@@ -18,12 +13,11 @@ For more infos about blocks patterns, read [this](https://make.wordpress.org/cor
 Renders a block patterns list.
 
 ```jsx
-import { BlockPatternList } from '@wordpress/block-editor';
+import { BlockPatternsList } from '@wordpress/block-editor';
 
-const MyBlockPatternList = () => (
-	<BlockPatternList
+const MyBlockPatternsList = () => (
+	<BlockPatternsList
 		blockPatterns={ shownBlockPatterns }
-		shownPatterns={ shownBlockPatterns }
 		onClickPattern={ onSelectBlockPattern }
 	/>
 );
@@ -34,13 +28,6 @@ const MyBlockPatternList = () => (
 #### blockPatterns
 
 An array of block patterns that can be shown in the block patterns list.
-
--   Type: `Array`
--   Required: Yes
-
-#### shownPatterns
-
-An array of shown block patterns objects.
 
 -   Type: `Array`
 -   Required: Yes
@@ -73,6 +60,14 @@ The aria label for the block patterns list.
 -   Type: `string`
 -   Required: No
 -   Default: `Block Patterns`
+
+#### showTitlesAsTooltip
+
+Whether to render the title of each pattern as a tooltip. User-defined patterns always show their visual title regardless of this prop.
+
+-   Type: `boolean`
+-   Required: No
+-   Default: `false`
 
 ## Related components
 

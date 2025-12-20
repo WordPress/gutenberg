@@ -8,6 +8,8 @@
 /**
  * Renders the `core/comment-edit-link` block on the server.
  *
+ * @since 6.0.0
+ *
  * @param array    $attributes Block attributes.
  * @param string   $content    Block default content.
  * @param WP_Block $block      Block instance.
@@ -27,12 +29,15 @@ function render_block_core_comment_edit_link( $attributes, $content, $block ) {
 		$link_atts .= sprintf( 'target="%s"', esc_attr( $attributes['linkTarget'] ) );
 	}
 
-	$classes = '';
+	$classes = array();
 	if ( isset( $attributes['textAlign'] ) ) {
-		$classes .= 'has-text-align-' . $attributes['textAlign'];
+		$classes[] = 'has-text-align-' . $attributes['textAlign'];
+	}
+	if ( isset( $attributes['style']['elements']['link']['color']['text'] ) ) {
+		$classes[] = 'has-link-color';
 	}
 
-	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $classes ) );
+	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => implode( ' ', $classes ) ) );
 
 	return sprintf(
 		'<div %1$s><a href="%2$s" %3$s>%4$s</a></div>',
@@ -45,6 +50,8 @@ function render_block_core_comment_edit_link( $attributes, $content, $block ) {
 
 /**
  * Registers the `core/comment-edit-link` block on the server.
+ *
+ * @since 6.0.0
  */
 function register_block_core_comment_edit_link() {
 	register_block_type_from_metadata(

@@ -1,27 +1,33 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`flags warnings with invalid commenting css snapshot matches warnings 1`] = `
-Array [
-  Object {
+[
+  {
+    "column": 131,
+    "endColumn": 132,
+    "endLine": 24,
+    "line": 24,
+    "rule": "@stylistic/max-line-length",
+    "severity": "error",
+    "text": "Expected line length to be no more than 80 characters (@stylistic/max-line-length)",
+  },
+  {
     "column": 1,
+    "endColumn": 3,
+    "endLine": 14,
     "line": 9,
     "rule": "comment-empty-line-before",
     "severity": "error",
     "text": "Expected empty line before comment (comment-empty-line-before)",
   },
-  Object {
+  {
     "column": 1,
+    "endColumn": 44,
+    "endLine": 18,
     "line": 18,
     "rule": "comment-empty-line-before",
     "severity": "error",
     "text": "Expected empty line before comment (comment-empty-line-before)",
-  },
-  Object {
-    "column": 131,
-    "line": 24,
-    "rule": "max-line-length",
-    "severity": "error",
-    "text": "Expected line length to be no more than 80 characters (max-line-length)",
   },
 ]
 `;

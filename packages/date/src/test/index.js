@@ -10,6 +10,7 @@ import {
 	gmdateI18n,
 	isInTheFuture,
 	setSettings,
+	humanTimeDiff,
 } from '../';
 
 describe( 'isInTheFuture', () => {
@@ -465,6 +466,29 @@ describe( 'Function dateI18n', () => {
 		setSettings( settings );
 	} );
 
+	it( 'should format date into a UTC date when given UTC offset 0', () => {
+		const settings = getSettings();
+
+		// Simulate different timezone.
+		setSettings( {
+			...settings,
+			timezone: { offset: -4, string: 'America/New_York' },
+		} );
+
+		// Check that offset 0 formats in UTC, not site timezone.
+		// This is a regression test for a bug where offset 0 was falsy
+		// and fell through to use site timezone instead.
+		const formattedDate = dateI18n(
+			'Y-m-d H:i',
+			'2019-06-18T11:00:00.000Z',
+			0
+		);
+		expect( formattedDate ).toBe( '2019-06-18 11:00' );
+
+		// Restore default settings.
+		setSettings( settings );
+	} );
+
 	it( 'should format date into a UTC date if `gmt` is set to `true`', () => {
 		const settings = getSettings();
 
@@ -607,7 +631,7 @@ describe( 'Moment.js Localization', () => {
 			},
 		} );
 
-		// Get the freshly changed setings.
+		// Get the freshly changed settings.
 		const newSettings = getSettings();
 
 		// Test the unchanged values.
@@ -619,5 +643,43 @@ describe( 'Moment.js Localization', () => {
 
 		// Restore default settings.
 		setSettings( settings );
+	} );
+
+	describe( 'humanTimeDiff', () => {
+		it( 'should return human readable time differences in the past', () => {
+			expect(
+				humanTimeDiff(
+					'2023-04-28T11:00:00.000Z',
+					'2023-04-28T12:00:00.000Z'
+				)
+			).toBe( 'an hour ago' );
+			expect(
+				humanTimeDiff(
+					'2023-04-28T11:00:00.000Z',
+					'2023-04-28T13:00:00.000Z'
+				)
+			).toBe( '2 hours ago' );
+			expect(
+				humanTimeDiff(
+					'2023-04-28T11:00:00.000Z',
+					'2023-04-30T13:00:00.000Z'
+				)
+			).toBe( '2 days ago' );
+		} );
+
+		it( 'should return human readable time differences in the future', () => {
+			// Future.
+			const now = new Date();
+			const twoHoursLater = new Date(
+				now.getTime() + 2 * 60 * 60 * 1000
+			);
+			expect( humanTimeDiff( twoHoursLater ) ).toBe( 'in 2 hours' );
+
+			const twoDaysLater = new Date(
+				now.getTime() + 2 * 24 * 60 * 60 * 1000
+			); // Adding 2 days in milliseconds
+
+			expect( humanTimeDiff( twoDaysLater ) ).toBe( 'in 2 days' );
+		} );
 	} );
 } );

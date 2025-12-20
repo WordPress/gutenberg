@@ -6,7 +6,7 @@ import Clipboard from 'clipboard';
 /**
  * WordPress dependencies
  */
-import { useRef } from '@wordpress/element';
+import { useRef, useLayoutEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -20,7 +20,9 @@ import useRefEffect from '../use-ref-effect';
  */
 function useUpdatedRef( value ) {
 	const ref = useRef( value );
-	ref.current = value;
+	useLayoutEffect( () => {
+		ref.current = value;
+	}, [ value ] );
 	return ref;
 }
 
@@ -54,9 +56,6 @@ export default function useCopyToClipboard( text, onSuccess ) {
 			// button, ensuring that it is not reset to the body, and
 			// further that it is kept within the rendered node.
 			clearSelection();
-			// Handle ClipboardJS focus bug, see
-			// https://github.com/zenorocha/clipboard.js/issues/680
-			node.focus();
 
 			if ( onSuccessRef.current ) {
 				onSuccessRef.current();

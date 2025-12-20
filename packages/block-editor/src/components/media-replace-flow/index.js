@@ -1,17 +1,15 @@
 /**
  * WordPress dependencies
  */
-import { useRef } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
 import {
 	FormFileUpload,
 	NavigableMenu,
 	MenuItem,
-	ToolbarButton,
 	Dropdown,
 	withFilters,
-	Tooltip,
+	ToolbarButton,
 } from '@wordpress/components';
 import { useSelect, withDispatch } from '@wordpress/data';
 import { DOWN } from '@wordpress/keycodes';
@@ -23,6 +21,7 @@ import {
 import { compose } from '@wordpress/compose';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { store as noticesStore } from '@wordpress/notices';
+import { useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -31,6 +30,7 @@ import MediaUpload from '../media-upload';
 import MediaUploadCheck from '../media-upload/check';
 import LinkControl from '../link-control';
 import { store as blockEditorStore } from '../../store';
+import { getComputedAcceptAttribute } from '../media-placeholder/utils';
 
 const noop = () => {};
 let uniqueId = 0;
@@ -44,6 +44,7 @@ const MediaReplaceFlow = ( {
 	onError,
 	onSelect,
 	onSelectURL,
+	onReset,
 	onToggleFeaturedImage,
 	useFeaturedImage,
 	onFilesUpload = noop,
@@ -54,12 +55,29 @@ const MediaReplaceFlow = ( {
 	multiple = false,
 	addToGallery,
 	handleUpload = true,
+	popoverProps,
+	renderToggle,
+	className,
 } ) => {
-	const mediaUpload = useSelect( ( select ) => {
-		return select( blockEditorStore ).getSettings().mediaUpload;
+	const { mediaUpload, allowedMimeTypes } = useSelect( ( select ) => {
+		const { getSettings } = select( blockEditorStore );
+		const settings = getSettings();
+		return {
+			mediaUpload: settings.mediaUpload,
+			allowedMimeTypes: settings.allowedMimeTypes,
+		};
 	}, [] );
-	const editMediaButtonRef = useRef();
 	const errorNoticeID = `block-editor/media-replace-flow/error-notice/${ ++uniqueId }`;
+
+	const computedAccept = useMemo(
+		() =>
+			getComputedAcceptAttribute(
+				allowedTypes,
+				allowedMimeTypes,
+				accept
+			),
+		[ allowedTypes, allowedMimeTypes, accept ]
+	);
 
 	const onUploadError = ( message ) => {
 		const safeMessage = stripHTML( message );
@@ -69,7 +87,7 @@ const MediaReplaceFlow = ( {
 		}
 		// We need to set a timeout for showing the notice
 		// so that VoiceOver and possibly other screen readers
-		// can announce the error afer the toolbar button
+		// can announce the error after the toolbar button
 		// regains focus once the upload dialog closes.
 		// Otherwise VO simply skips over the notice and announces
 		// the focused element and the open menu.
@@ -130,29 +148,36 @@ const MediaReplaceFlow = ( {
 
 	const gallery = multiple && onlyAllowsImages();
 
-	const POPOVER_PROPS = {
-		variant: 'toolbar',
-	};
-
 	return (
 		<Dropdown
-			popoverProps={ POPOVER_PROPS }
+			popoverProps={ popoverProps }
+			className={ className }
 			contentClassName="block-editor-media-replace-flow__options"
-			renderToggle={ ( { isOpen, onToggle } ) => (
-				<ToolbarButton
-					ref={ editMediaButtonRef }
-					aria-expanded={ isOpen }
-					aria-haspopup="true"
-					onClick={ onToggle }
-					onKeyDown={ openOnArrowDown }
-				>
-					{ name }
-				</ToolbarButton>
-			) }
+			renderToggle={ ( { isOpen, onToggle } ) => {
+				if ( renderToggle ) {
+					return renderToggle( {
+						'aria-expanded': isOpen,
+						'aria-haspopup': 'true',
+						onClick: onToggle,
+						onKeyDown: openOnArrowDown,
+						children: name,
+					} );
+				}
+				return (
+					<ToolbarButton
+						aria-expanded={ isOpen }
+						aria-haspopup="true"
+						onClick={ onToggle }
+						onKeyDown={ openOnArrowDown }
+					>
+						{ name }
+					</ToolbarButton>
+				);
+			} }
 			renderContent={ ( { onClose } ) => (
 				<>
 					<NavigableMenu className="block-editor-media-replace-flow__media-upload-menu">
-						<>
+						<MediaUploadCheck>
 							<MediaUpload
 								gallery={ gallery }
 								addToGallery={ addToGallery }
@@ -171,28 +196,26 @@ const MediaReplaceFlow = ( {
 									</MenuItem>
 								) }
 							/>
-							<MediaUploadCheck>
-								<FormFileUpload
-									onChange={ ( event ) => {
-										uploadFiles( event, onClose );
-									} }
-									accept={ accept }
-									multiple={ multiple }
-									render={ ( { openFileDialog } ) => {
-										return (
-											<MenuItem
-												icon={ upload }
-												onClick={ () => {
-													openFileDialog();
-												} }
-											>
-												{ __( 'Upload' ) }
-											</MenuItem>
-										);
-									} }
-								/>
-							</MediaUploadCheck>
-						</>
+							<FormFileUpload
+								onChange={ ( event ) => {
+									uploadFiles( event, onClose );
+								} }
+								accept={ computedAccept }
+								multiple={ !! multiple }
+								render={ ( { openFileDialog } ) => {
+									return (
+										<MenuItem
+											icon={ upload }
+											onClick={ () => {
+												openFileDialog();
+											} }
+										>
+											{ _x( 'Upload', 'verb' ) }
+										</MenuItem>
+									);
+								} }
+							/>
+						</MediaUploadCheck>
 						{ onToggleFeaturedImage && (
 							<MenuItem
 								icon={ postFeaturedImage }
@@ -202,28 +225,37 @@ const MediaReplaceFlow = ( {
 								{ __( 'Use featured image' ) }
 							</MenuItem>
 						) }
-						{ children }
+						{ mediaURL && onReset && (
+							<MenuItem
+								onClick={ () => {
+									onReset();
+									onClose();
+								} }
+							>
+								{ __( 'Reset' ) }
+							</MenuItem>
+						) }
+						{ typeof children === 'function'
+							? children( { onClose } )
+							: children }
 					</NavigableMenu>
 					{ onSelectURL && (
-						// eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
 						<form className="block-editor-media-flow__url-input">
 							<span className="block-editor-media-replace-flow__image-url-label">
 								{ __( 'Current media URL:' ) }
 							</span>
 
-							<Tooltip text={ mediaURL } position="bottom">
-								<div>
-									<LinkControl
-										value={ { url: mediaURL } }
-										settings={ [] }
-										showSuggestions={ false }
-										onChange={ ( { url } ) => {
-											onSelectURL( url );
-											editMediaButtonRef.current.focus();
-										} }
-									/>
-								</div>
-							</Tooltip>
+							<LinkControl
+								value={ { url: mediaURL } }
+								settings={ [] }
+								showSuggestions={ false }
+								onChange={ ( { url } ) => {
+									onSelectURL( url );
+								} }
+								searchInputPlaceholder={ __(
+									'Paste or type URL'
+								) }
+							/>
 						</form>
 					) }
 				</>

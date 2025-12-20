@@ -24,8 +24,7 @@ describe( 'babel-plugin-import-jsx-pragma', () => {
 	} );
 
 	it( 'does nothing if the scope variable is already defined', () => {
-		const original =
-			'const React = require("react");\n\nlet foo = <bar />;';
+		const original = 'const React = require("react");\nlet foo = <bar />;';
 		const string = getTransformedCode( original );
 
 		expect( string ).toBe( original );
@@ -60,7 +59,7 @@ describe( 'babel-plugin-import-jsx-pragma', () => {
 
 	it( 'adds import for scope variable even when defined inside the local scope', () => {
 		const original =
-			'let foo = <bar />;\n\nfunction local() {\n  const createElement = wp.element.createElement;\n}';
+			'let foo = <bar />;\nfunction local() {\n  const createElement = wp.element.createElement;\n}';
 		const string = getTransformedCode( original, {
 			scopeVariable: 'createElement',
 			source: '@wordpress/element',

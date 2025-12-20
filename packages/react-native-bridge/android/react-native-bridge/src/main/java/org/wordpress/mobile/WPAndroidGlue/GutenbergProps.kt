@@ -8,14 +8,17 @@ data class GutenbergProps @JvmOverloads constructor(
     val enableContactInfoBlock: Boolean,
     val enableLayoutGridBlock: Boolean,
     val enableTiledGalleryBlock: Boolean,
+    val enableVideoPressBlock: Boolean,
+    val enableVideoPressV5Support: Boolean,
     val enableFacebookEmbed: Boolean,
     val enableInstagramEmbed: Boolean,
     val enableLoomEmbed: Boolean,
     val enableSmartframeEmbed: Boolean,
-    val enableMediaFilesCollectionBlocks: Boolean,
     val enableMentions: Boolean,
     val enableXPosts: Boolean,
     val enableUnsupportedBlockEditor: Boolean,
+    val enableSupportSection: Boolean,
+    val enableOnlyCoreBlocks: Boolean,
     val canEnableUnsupportedBlockEditor: Boolean,
     val isAudioBlockMediaUploadEnabled: Boolean,
     val shouldUseFastImage: Boolean,
@@ -51,12 +54,6 @@ data class GutenbergProps @JvmOverloads constructor(
                     ?.let { putSerializable(PROP_FEATURES, it) }
             theme.getSerializable(PROP_IS_FSE_THEME)
                     ?.let { putSerializable(PROP_IS_FSE_THEME, it) }
-            theme.getSerializable(PROP_GALLERY_WITH_IMAGE_BLOCKS)
-                    ?.let { putSerializable(PROP_GALLERY_WITH_IMAGE_BLOCKS, it) }
-            theme.getSerializable(PROP_QUOTE_BLOCK_V2)
-                    ?.let { putSerializable(PROP_QUOTE_BLOCK_V2, it) }
-            theme.getSerializable(PROP_LIST_BLOCK_V2)
-                    ?.let { putSerializable(PROP_LIST_BLOCK_V2, it) }
         }
     }
 
@@ -66,7 +63,8 @@ data class GutenbergProps @JvmOverloads constructor(
         putBoolean(PROP_CAPABILITIES_CONTACT_INFO_BLOCK, enableContactInfoBlock)
         putBoolean(PROP_CAPABILITIES_LAYOUT_GRID_BLOCK, enableLayoutGridBlock)
         putBoolean(PROP_CAPABILITIES_TILED_GALLERY_BLOCK, enableTiledGalleryBlock)
-        putBoolean(PROP_CAPABILITIES_MEDIAFILES_COLLECTION_BLOCK, enableMediaFilesCollectionBlocks)
+        putBoolean(PROP_CAPABILITIES_VIDEOPRESS_BLOCK, enableVideoPressBlock)
+        putBoolean(PROP_CAPABILITIES_VIDEOPRESS_V5_SUPPORT, enableVideoPressV5Support)
         putBoolean(PROP_CAPABILITIES_UNSUPPORTED_BLOCK_EDITOR, enableUnsupportedBlockEditor)
         putBoolean(PROP_CAPABILITIES_CAN_ENABLE_UNSUPPORTED_BLOCK_EDITOR, canEnableUnsupportedBlockEditor)
         putBoolean(PROP_CAPABILITIES_IS_AUDIO_BLOCK_MEDIA_UPLOAD_ENABLED, isAudioBlockMediaUploadEnabled)
@@ -76,6 +74,8 @@ data class GutenbergProps @JvmOverloads constructor(
         putBoolean(PROP_CAPABILITIES_INSTAGRAM_EMBED_BLOCK, enableInstagramEmbed)
         putBoolean(PROP_CAPABILITIES_LOOM_EMBED_BLOCK, enableLoomEmbed)
         putBoolean(PROP_CAPABILITIES_SMARTFRAME_EMBED_BLOCK, enableSmartframeEmbed)
+        putBoolean(PROP_CAPABILITIES_SUPPORT_SECTION, enableSupportSection)
+        putBoolean(PROP_CAPABILITIES_ONLY_CORE_BLOCKS, enableOnlyCoreBlocks)
     }
 
     companion object {
@@ -86,8 +86,6 @@ data class GutenbergProps @JvmOverloads constructor(
                     content?.let { putString(PROP_INITIAL_DATA, it) }
                 }
 
-        private const val PROP_INITIAL_DATA = "initialData"
-        private const val PROP_INITIAL_TITLE = "initialTitle"
         private const val PROP_INITIAL_HTML_MODE_ENABLED = "initialHtmlModeEnabled"
         private const val PROP_POST_TYPE = "postType"
         private const val PROP_HOST_APP_NAMESPACE = "hostAppNamespace"
@@ -95,23 +93,23 @@ data class GutenbergProps @JvmOverloads constructor(
         private const val PROP_TRANSLATIONS = "translations"
         private const val PROP_COLORS = "colors"
         private const val PROP_GRADIENTS = "gradients"
-        private const val PROP_STYLES = "rawStyles"
-        private const val PROP_FEATURES = "rawFeatures"
         private const val PROP_IS_FSE_THEME = "isFSETheme"
-        private const val PROP_GALLERY_WITH_IMAGE_BLOCKS = "galleryWithImageBlocks"
-        private const val PROP_QUOTE_BLOCK_V2 = "quoteBlockV2"
-        private const val PROP_LIST_BLOCK_V2 = "listBlockV2"
 
+        const val PROP_INITIAL_TITLE = "initialTitle"
+        const val PROP_INITIAL_DATA = "initialData"
+        const val PROP_STYLES = "rawStyles"
+        const val PROP_FEATURES = "rawFeatures"
         const val PROP_LOCALE = "locale"
         const val PROP_CAPABILITIES = "capabilities"
         const val PROP_CAPABILITIES_CONTACT_INFO_BLOCK = "contactInfoBlock"
         const val PROP_CAPABILITIES_LAYOUT_GRID_BLOCK = "layoutGridBlock"
         const val PROP_CAPABILITIES_TILED_GALLERY_BLOCK = "tiledGalleryBlock"
+        const val PROP_CAPABILITIES_VIDEOPRESS_BLOCK = "videoPressBlock"
+        const val PROP_CAPABILITIES_VIDEOPRESS_V5_SUPPORT = "videoPressV5Support"
         const val PROP_CAPABILITIES_FACEBOOK_EMBED_BLOCK = "facebookEmbed"
         const val PROP_CAPABILITIES_INSTAGRAM_EMBED_BLOCK = "instagramEmbed"
         const val PROP_CAPABILITIES_LOOM_EMBED_BLOCK = "loomEmbed"
         const val PROP_CAPABILITIES_SMARTFRAME_EMBED_BLOCK = "smartframeEmbed"
-        const val PROP_CAPABILITIES_MEDIAFILES_COLLECTION_BLOCK = "mediaFilesCollectionBlock"
         const val PROP_CAPABILITIES_MENTIONS = "mentions"
         const val PROP_CAPABILITIES_XPOSTS = "xposts"
         const val PROP_CAPABILITIES_UNSUPPORTED_BLOCK_EDITOR = "unsupportedBlockEditor"
@@ -119,6 +117,8 @@ data class GutenbergProps @JvmOverloads constructor(
         const val PROP_CAPABILITIES_IS_AUDIO_BLOCK_MEDIA_UPLOAD_ENABLED = "isAudioBlockMediaUploadEnabled"
         const val PROP_CAPABILITIES_SHOULD_USE_FASTIMAGE = "shouldUseFastImage"
         const val PROP_CAPABILITIES_REUSABLE_BLOCK = "reusableBlock"
+        const val PROP_CAPABILITIES_SUPPORT_SECTION = "supportSection"
+        const val PROP_CAPABILITIES_ONLY_CORE_BLOCKS = "onlyCoreBlocks"
 
         /**
          * Android converts some new language codes to older, deprecated ones, to preserve

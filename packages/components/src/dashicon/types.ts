@@ -1,3 +1,14 @@
+export type DashiconProps = {
+	/**
+	 * The icon name
+	 */
+	icon: IconKey;
+	/**
+	 * Size of the icon
+	 */
+	size?: number;
+};
+
 export type IconKey =
 	| 'admin-appearance'
 	| 'admin-collapse'
@@ -208,7 +219,6 @@ export type IconKey =
 	| 'insert-before'
 	| 'insert'
 	| 'instagram'
-	| 'keyboard-hide'
 	| 'laptop'
 	| 'layout'
 	| 'leftright'
@@ -255,7 +265,6 @@ export type IconKey =
 	| 'playlist-audio'
 	| 'playlist-video'
 	| 'plus-alt'
-	| 'plus-light'
 	| 'plus'
 	| 'portfolio'
 	| 'post-status'

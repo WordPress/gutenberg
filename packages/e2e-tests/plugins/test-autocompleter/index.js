@@ -1,4 +1,4 @@
-(function () {
+( function () {
 	const fruits = {
 		name: 'fruit',
 		// The prefix that triggers this completer
@@ -20,9 +20,7 @@
 		// Declares that the Grapes option is disabled
 		isOptionDisabled: ( option ) => option.name === 'Grapes',
 		// Declares completions should be inserted as abbreviations
-		getOptionCompletion: ( option ) => (
-			option.visual 
-		),
+		getOptionCompletion: ( option ) => option.visual,
 	};
 
 	function duplicateUserMentions( completers ) {
@@ -43,7 +41,7 @@
 			? [ ...completers, fruits, copiedUsers ]
 			: completers;
 	}
-	
+
 	// Adding the filter with a priority of 11
 	// to ensure it fires after the default user mentions are added.
 	wp.hooks.addFilter(
@@ -52,4 +50,4 @@
 		appendTestCompleters,
 		11
 	);
-})()
+} )();

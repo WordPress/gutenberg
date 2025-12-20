@@ -8,18 +8,23 @@
 			"dimRatio": 40,
 			"backgroundType": "image",
 			"isRepeated": false,
-			"alt": ""
+			"alt": "",
+			"tagName": "div"
 		},
 		"innerBlocks": [
 			{
 				"name": "core/paragraph",
 				"isValid": true,
 				"attributes": {
-					"align": "center",
 					"content": "\n\t\t\tGuten Berg!\n\t\t",
 					"dropCap": false,
 					"placeholder": "Write title…",
-					"fontSize": "large"
+					"fontSize": "large",
+					"style": {
+						"typography": {
+							"textAlign": "center"
+						}
+					}
 				},
 				"innerBlocks": []
 			}

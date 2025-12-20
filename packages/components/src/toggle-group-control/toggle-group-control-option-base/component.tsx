@@ -2,22 +2,19 @@
  * External dependencies
  */
 import type { ForwardedRef } from 'react';
-// eslint-disable-next-line no-restricted-imports
-import { Radio } from 'reakit';
+import * as Ariakit from '@ariakit/react';
 
 /**
  * WordPress dependencies
  */
 import { useInstanceId } from '@wordpress/compose';
+import { useLayoutEffect, useMemo, useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import {
-	contextConnect,
-	useContextSystem,
-	WordPressComponentProps,
-} from '../../ui/context';
+import type { WordPressComponentProps } from '../../context';
+import { contextConnect, useContextSystem } from '../../context';
 import type {
 	ToggleGroupControlOptionBaseProps,
 	WithToolTipProps,
@@ -32,7 +29,7 @@ const { ButtonContentView, LabelView } = styles;
 const WithToolTip = ( { showTooltip, text, children }: WithToolTipProps ) => {
 	if ( showTooltip && text ) {
 		return (
-			<Tooltip text={ text } position="top center">
+			<Tooltip text={ text } placement="top">
 				{ children }
 			</Tooltip>
 		);
@@ -41,62 +38,91 @@ const WithToolTip = ( { showTooltip, text, children }: WithToolTipProps ) => {
 };
 
 function ToggleGroupControlOptionBase(
-	props: WordPressComponentProps<
-		ToggleGroupControlOptionBaseProps,
-		'button',
-		false
+	props: Omit<
+		WordPressComponentProps<
+			ToggleGroupControlOptionBaseProps,
+			'button',
+			false
+		>,
+		// the element's id is generated internally
+		| 'id'
+		// due to how the component works, only the `disabled` prop should be used
+		| 'aria-disabled'
 	>,
 	forwardedRef: ForwardedRef< any >
 ) {
 	const toggleGroupControlContext = useToggleGroupControlContext();
+
 	const id = useInstanceId(
 		ToggleGroupControlOptionBase,
 		toggleGroupControlContext.baseId || 'toggle-group-control-option-base'
-	) as string;
+	);
+
 	const buttonProps = useContextSystem(
 		{ ...props, id },
 		'ToggleGroupControlOptionBase'
 	);
+
 	const {
 		isBlock = false,
 		isDeselectable = false,
 		size = 'default',
-		...otherContextProps /* context props for Ariakit Radio */
 	} = toggleGroupControlContext;
+
 	const {
 		className,
 		isIcon = false,
 		value,
 		children,
 		showTooltip = false,
+		disabled,
 		...otherButtonProps
 	} = buttonProps;
 
-	const isPressed = otherContextProps.state === value;
+	const isPressed = toggleGroupControlContext.value === value;
 	const cx = useCx();
-	const labelViewClasses = cx( isBlock && styles.labelBlock );
-	const classes = cx(
-		styles.buttonView( { isDeselectable, isIcon, isPressed, size } ),
-		className
+	const labelViewClasses = useMemo(
+		() => cx( isBlock && styles.labelBlock ),
+		[ cx, isBlock ]
+	);
+	const itemClasses = useMemo(
+		() =>
+			cx(
+				styles.buttonView( {
+					isDeselectable,
+					isIcon,
+					isPressed,
+					size,
+				} ),
+				className
+			),
+		[ cx, isDeselectable, isIcon, isPressed, size, className ]
 	);
 
 	const buttonOnClick = () => {
 		if ( isDeselectable && isPressed ) {
-			otherContextProps.setState( undefined );
+			toggleGroupControlContext.setValue( undefined );
 		} else {
-			otherContextProps.setState( value );
+			toggleGroupControlContext.setValue( value );
 		}
 	};
 
 	const commonProps = {
 		...otherButtonProps,
-		className: classes,
+		className: itemClasses,
 		'data-value': value,
 		ref: forwardedRef,
 	};
 
+	const labelRef = useRef< HTMLDivElement | null >( null );
+	useLayoutEffect( () => {
+		if ( isPressed && labelRef.current ) {
+			toggleGroupControlContext.setSelectedElement( labelRef.current );
+		}
+	}, [ isPressed, toggleGroupControlContext ] );
+
 	return (
-		<LabelView className={ labelViewClasses }>
+		<LabelView ref={ labelRef } className={ labelViewClasses }>
 			<WithToolTip
 				showTooltip={ showTooltip }
 				text={ otherButtonProps[ 'aria-label' ] }
@@ -104,6 +130,7 @@ function ToggleGroupControlOptionBase(
 				{ isDeselectable ? (
 					<button
 						{ ...commonProps }
+						disabled={ disabled }
 						aria-pressed={ isPressed }
 						type="button"
 						onClick={ buttonOnClick }
@@ -111,16 +138,27 @@ function ToggleGroupControlOptionBase(
 						<ButtonContentView>{ children }</ButtonContentView>
 					</button>
 				) : (
-					<Radio
-						{ ...commonProps }
-						{
-							...otherContextProps /* these are only for Ariakit Radio */
-						}
-						as="button"
+					<Ariakit.Radio
+						disabled={ disabled }
+						onFocusVisible={ () => {
+							const selectedValueIsEmpty =
+								toggleGroupControlContext.value === null ||
+								toggleGroupControlContext.value === '';
+
+							// Conditions ensure that the first visible focus to a radio group
+							// without a selected option will not automatically select the option.
+							if (
+								! selectedValueIsEmpty ||
+								toggleGroupControlContext.activeItemIsNotFirstItem?.()
+							) {
+								toggleGroupControlContext.setValue( value );
+							}
+						} }
+						render={ <button type="button" { ...commonProps } /> }
 						value={ value }
 					>
 						<ButtonContentView>{ children }</ButtonContentView>
-					</Radio>
+					</Ariakit.Radio>
 				) }
 			</WithToolTip>
 		</LabelView>

@@ -5,16 +5,16 @@ import { useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import {
 	TextControl,
-	Flex,
-	FlexItem,
 	Button,
 	Modal,
+	__experimentalHStack as HStack,
+	__experimentalVStack as VStack,
 } from '@wordpress/components';
 
 export default function TitleModal( { areaLabel, onClose, onSubmit } ) {
 	// Restructure onCreate to set the blocks on local state.
 	// Add modal to confirm title and trigger onCreate.
-	const [ title, setTitle ] = useState( __( 'Untitled Template Part' ) );
+	const [ title, setTitle ] = useState( '' );
 
 	const submitForCreation = ( event ) => {
 		event.preventDefault();
@@ -25,34 +25,44 @@ export default function TitleModal( { areaLabel, onClose, onSubmit } ) {
 		<Modal
 			title={ sprintf(
 				// Translators: %s as template part area title ("Header", "Footer", etc.).
-				__( 'Name and create your new %s' ),
+				__( 'Create new %s' ),
 				areaLabel.toLowerCase()
 			) }
-			closeLabel={ __( 'Cancel' ) }
-			overlayClassName="wp-block-template-part__placeholder-create-new__title-form"
 			onRequestClose={ onClose }
+			focusOnMount="firstContentElement"
+			size="small"
 		>
 			<form onSubmit={ submitForCreation }>
-				<TextControl
-					label={ __( 'Name' ) }
-					value={ title }
-					onChange={ setTitle }
-				/>
-				<Flex
-					className="wp-block-template-part__placeholder-create-new__title-form-actions"
-					justify="flex-end"
-				>
-					<FlexItem>
+				<VStack spacing="5">
+					<TextControl
+						label={ __( 'Name' ) }
+						value={ title }
+						onChange={ setTitle }
+						placeholder={ __( 'Custom Template Part' ) }
+						__next40pxDefaultSize
+					/>
+					<HStack justify="right">
+						<Button
+							__next40pxDefaultSize
+							variant="tertiary"
+							onClick={ () => {
+								onClose();
+								setTitle( '' );
+							} }
+						>
+							{ __( 'Cancel' ) }
+						</Button>
 						<Button
 							variant="primary"
 							type="submit"
+							accessibleWhenDisabled
 							disabled={ ! title.length }
-							aria-disabled={ ! title.length }
+							__next40pxDefaultSize
 						>
 							{ __( 'Create' ) }
 						</Button>
-					</FlexItem>
-				</Flex>
+					</HStack>
+				</VStack>
 			</form>
 		</Modal>
 	);

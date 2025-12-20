@@ -46,7 +46,7 @@ function calculateVersionBumpFromChangelog(
 	let changesDetected = false;
 	let versionBump = null;
 	for ( const line of lines ) {
-		const lineNormalized = line.toLowerCase().trimLeft();
+		const lineNormalized = line.toLowerCase().trimStart();
 		// Detect unpublished changes first.
 		if ( lineNormalized.startsWith( '## unreleased' ) ) {
 			changesDetected = true;

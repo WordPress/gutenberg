@@ -10,14 +10,10 @@ InspectorControls.Slot = InspectorControlsSlot;
 
 // This is just here for backward compatibility.
 export const InspectorAdvancedControls = ( props ) => {
-	return (
-		<InspectorControlsFill { ...props } __experimentalGroup="advanced" />
-	);
+	return <InspectorControlsFill { ...props } group="advanced" />;
 };
 InspectorAdvancedControls.Slot = ( props ) => {
-	return (
-		<InspectorControlsSlot { ...props } __experimentalGroup="advanced" />
-	);
+	return <InspectorControlsSlot { ...props } group="advanced" />;
 };
 InspectorAdvancedControls.slotName = 'InspectorAdvancedControls';
 

@@ -20,9 +20,11 @@ import { requestMediaPicker } from '@wordpress/react-native-bridge';
  */
 export const setupMediaPicker = () => {
 	let mediaPickerCallback;
+	let multipleItems;
 	requestMediaPicker.mockImplementation(
 		( source, filter, multiple, callback ) => {
 			mediaPickerCallback = callback;
+			multipleItems = multiple;
 		}
 	);
 	return {
@@ -34,16 +36,25 @@ export const setupMediaPicker = () => {
 				mediaPickerCallback
 			),
 		mediaPickerCallback: async ( ...mediaItems ) =>
-			act( async () =>
+			act( async () => {
+				const items = mediaItems.map(
+					( {
+						localId,
+						localUrl,
+						type = 'image',
+						url,
+						id,
+						metadata,
+					} ) => ( {
+						type,
+						url: url ?? localUrl,
+						id: id ?? localId,
+						metadata,
+					} )
+				);
 				mediaPickerCallback(
-					mediaItems.map(
-						( { localId, localUrl, type = 'image' } ) => ( {
-							type,
-							url: localUrl,
-							id: localId,
-						} )
-					)
-				)
-			),
+					items.length === 1 && ! multipleItems ? items[ 0 ] : items
+				);
+			} ),
 	};
 };

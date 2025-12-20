@@ -29,7 +29,7 @@ function Example() {
 
 ## Props
 
-##### alignment
+### alignment
 
 **Type**: `HStackAlignment` | `CSS[ 'alignItems' ]`
 
@@ -44,36 +44,36 @@ Determines how the child elements are aligned.
 -   `bottom`: Aligns content to the bottom.
 -   `bottomLeft`: Aligns content to the bottom/left.
 -   `bottomRight`: Aligns content to the bottom/right.
--   `edge`: Aligns content to the edges of the container.
--   `stretch`: Stretches content to the edges of the container.
+-   `edge`: Justifies content to be evenly spread out up to the main axis edges of the container.
+-   `stretch`: Stretches content to the cross axis edges of the container.
 
-##### direction
+### direction
 
 **Type**: `FlexDirection`
 
 The direction flow of the children content can be adjusted with `direction`. `column` will align children vertically and `row` will align children horizontally.
 
-##### expanded
+### expanded
 
 **Type**: `boolean`
 
 Expands to the maximum available width (if horizontal) or height (if vertical).
 
-##### justify
+### justify
 
 **Type**: `CSS['justifyContent']`
 
 Horizontally aligns content if the `direction` is `row`, or vertically aligns content if the `direction` is `column`.
 In the example below, `flex-start` will align the children content to the left.
 
-##### spacing
+### spacing
 
 **Type**: `CSS['width']`
 
 The amount of space between each child element. Spacing in between each child can be adjusted by using `spacing`.
 The value of `spacing` works as a multiplier to the library's grid system (base of `4px`).
 
-##### wrap
+### wrap
 
 **Type**: `boolean`
 

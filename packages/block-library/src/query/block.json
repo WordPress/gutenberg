@@ -1,10 +1,11 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
-	"apiVersion": 2,
+	"apiVersion": 3,
 	"name": "core/query",
 	"title": "Query Loop",
 	"category": "theme",
 	"description": "An advanced block that allows displaying post types based on different query parameters and visual configurations.",
+	"keywords": [ "posts", "list", "blog", "blogs", "custom post types" ],
 	"textdomain": "default",
 	"attributes": {
 		"queryId": {
@@ -25,40 +26,35 @@
 				"sticky": "",
 				"inherit": true,
 				"taxQuery": null,
-				"parents": []
+				"parents": [],
+				"format": []
 			}
 		},
 		"tagName": {
 			"type": "string",
 			"default": "div"
 		},
-		"displayLayout": {
-			"type": "object",
-			"default": {
-				"type": "list"
-			}
-		},
 		"namespace": {
 			"type": "string"
+		},
+		"enhancedPagination": {
+			"type": "boolean",
+			"default": false
 		}
 	},
+	"usesContext": [ "templateSlug" ],
 	"providesContext": {
 		"queryId": "queryId",
 		"query": "query",
-		"displayLayout": "displayLayout"
+		"displayLayout": "displayLayout",
+		"enhancedPagination": "enhancedPagination"
 	},
 	"supports": {
 		"align": [ "wide", "full" ],
 		"html": false,
-		"color": {
-			"gradients": true,
-			"link": true,
-			"__experimentalDefaultControls": {
-				"background": true,
-				"text": true
-			}
-		},
-		"__experimentalLayout": true
+		"layout": true,
+		"interactivity": true,
+		"contentRole": true
 	},
 	"editorStyle": "wp-block-query-editor"
 }

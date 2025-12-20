@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import { BackHandler } from 'react-native';
 import memize from 'memize';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
@@ -20,6 +21,7 @@ import RNReactNativeGutenbergBridge, {
 	subscribeUpdateCapabilities,
 	subscribeShowNotice,
 	subscribeShowEditorHelp,
+	subscribeToContentUpdate,
 } from '@wordpress/react-native-bridge';
 import { Component } from '@wordpress/element';
 import { count as wordCount } from '@wordpress/wordcount';
@@ -27,19 +29,29 @@ import {
 	parse,
 	serialize,
 	getUnregisteredTypeHandlerName,
+	getBlockType,
 	createBlock,
+	pasteHandler,
 } from '@wordpress/blocks';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import { applyFilters } from '@wordpress/hooks';
-import { store as blockEditorStore } from '@wordpress/block-editor';
-import { getGlobalStyles, getColorsAndGradients } from '@wordpress/components';
+import {
+	store as blockEditorStore,
+	getGlobalStyles,
+	getColorsAndGradients,
+} from '@wordpress/block-editor';
 import { NEW_BLOCK_TYPES } from '@wordpress/block-library';
+import { __ } from '@wordpress/i18n';
 
 const postTypeEntities = [
 	{ name: 'post', baseURL: '/wp/v2/posts' },
 	{ name: 'page', baseURL: '/wp/v2/pages' },
-	{ name: 'attachment', baseURL: '/wp/v2/media' },
+	{
+		name: 'attachment',
+		baseURL: '/wp/v2/media',
+		baseURLParams: { context: 'edit' },
+	},
 	{ name: 'wp_block', baseURL: '/wp/v2/blocks' },
 ].map( ( postTypeEntity ) => ( {
 	kind: 'postType',
@@ -56,12 +68,12 @@ const postTypeEntities = [
 import { EditorHelpTopics, store as editorStore } from '@wordpress/editor';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore } from '@wordpress/core-data';
-import { store as editPostStore } from '@wordpress/edit-post';
 
 /**
  * Internal dependencies
  */
 import EditorProvider from './index.js';
+import { insertContentWithTitle } from '../post-title';
 
 class NativeEditorProvider extends Component {
 	constructor() {
@@ -75,6 +87,9 @@ class NativeEditorProvider extends Component {
 			this.post.type,
 			this.post
 		);
+
+		this.onHardwareBackPress = this.onHardwareBackPress.bind( this );
+		this.onContentUpdate = this.onContentUpdate.bind( this );
 
 		this.getEditorSettings = memize(
 			( settings, capabilities ) => ( {
@@ -91,11 +106,17 @@ class NativeEditorProvider extends Component {
 	}
 
 	componentDidMount() {
-		const { capabilities, locale, hostAppNamespace, updateSettings } =
-			this.props;
+		const {
+			capabilities,
+			createErrorNotice,
+			locale,
+			hostAppNamespace,
+			updateEditorSettings,
+			updateBlockEditorSettings,
+		} = this.props;
 
-		updateSettings( {
-			...capabilities,
+		updateEditorSettings( {
+			capabilities,
 			...this.getThemeColors( this.props ),
 			locale,
 			hostAppNamespace,
@@ -130,30 +151,33 @@ class NativeEditorProvider extends Component {
 		this.subscriptionParentMediaAppend = subscribeMediaAppend(
 			( payload ) => {
 				const blockName = 'core/' + payload.mediaType;
-				const newBlock = createBlock( blockName, {
-					id: payload.mediaId,
-					[ payload.mediaType === 'image' ? 'url' : 'src' ]:
-						payload.mediaUrl,
-				} );
+				const blockType = getBlockType( blockName );
 
-				const indexAfterSelected = this.props.selectedBlockIndex + 1;
-				const insertionIndex =
-					indexAfterSelected || this.props.blockCount;
+				if ( blockType && blockType?.name ) {
+					const newBlock = createBlock( blockType.name, {
+						id: payload.mediaId,
+						[ payload.mediaType === 'image' ? 'url' : 'src' ]:
+							payload.mediaUrl,
+					} );
 
-				this.props.insertBlock( newBlock, insertionIndex );
+					const indexAfterSelected =
+						this.props.selectedBlockIndex + 1;
+					const insertionIndex =
+						indexAfterSelected || this.props.blockCount;
+
+					this.props.insertBlock( newBlock, insertionIndex );
+				} else {
+					createErrorNotice(
+						__( 'File type not supported as a media file.' )
+					);
+				}
 			}
 		);
 
 		this.subscriptionParentUpdateEditorSettings =
-			subscribeUpdateEditorSettings(
-				( { galleryWithImageBlocks, ...editorSettings } ) => {
-					if ( typeof galleryWithImageBlocks === 'boolean' ) {
-						window.wp.galleryBlockV2Enabled =
-							galleryWithImageBlocks;
-					}
-					updateSettings( this.getThemeColors( editorSettings ) );
-				}
-			);
+			subscribeUpdateEditorSettings( ( { ...editorSettings } ) => {
+				updateEditorSettings( this.getThemeColors( editorSettings ) );
+			} );
 
 		this.subscriptionParentUpdateCapabilities = subscribeUpdateCapabilities(
 			( payload ) => {
@@ -171,12 +195,23 @@ class NativeEditorProvider extends Component {
 			this.setState( { isHelpVisible: true } );
 		} );
 
+		this.hardwareBackPressListener = BackHandler.addEventListener(
+			'hardwareBackPress',
+			this.onHardwareBackPress
+		);
+
+		this.subscriptionOnContentUpdate = subscribeToContentUpdate(
+			( data ) => {
+				this.onContentUpdate( data );
+			}
+		);
+
 		// Request current block impressions from native app.
 		requestBlockTypeImpressions( ( storedImpressions ) => {
 			const impressions = { ...NEW_BLOCK_TYPES, ...storedImpressions };
 
 			// Persist impressions to JavaScript store.
-			updateSettings( { impressions } );
+			updateBlockEditorSettings( { impressions } );
 
 			// Persist impressions to native store if they do not include latest
 			// `NEW_BLOCK_TYPES` configuration.
@@ -230,6 +265,14 @@ class NativeEditorProvider extends Component {
 		if ( this.subscriptionParentShowEditorHelp ) {
 			this.subscriptionParentShowEditorHelp.remove();
 		}
+
+		if ( this.hardwareBackPressListener ) {
+			this.hardwareBackPressListener.remove();
+		}
+
+		if ( this.subscriptionOnContentUpdate ) {
+			this.subscriptionOnContentUpdate.remove();
+		}
 	}
 
 	getThemeColors( { rawStyles, rawFeatures } ) {
@@ -258,6 +301,31 @@ class NativeEditorProvider extends Component {
 				unsupportedBlockNames
 			);
 		}
+	}
+
+	onHardwareBackPress() {
+		const { clearSelectedBlock, selectedBlockIndex } = this.props;
+
+		if ( selectedBlockIndex !== -1 ) {
+			clearSelectedBlock();
+			return true;
+		}
+		return false;
+	}
+
+	onContentUpdate( { content: rawContent } ) {
+		const {
+			editTitle,
+			onClearPostTitleSelection,
+			onInsertBlockAfter: onInsertBlocks,
+			title,
+		} = this.props;
+		const content = pasteHandler( {
+			plainText: rawContent,
+		} );
+
+		insertContentWithTitle( title, content, editTitle, onInsertBlocks );
+		onClearPostTitleSelection();
 	}
 
 	serializeToNativeAction() {
@@ -311,13 +379,11 @@ class NativeEditorProvider extends Component {
 		const { mode, switchMode } = this.props;
 		// Refresh html content first.
 		this.serializeToNativeAction();
-		// Make sure to blur the selected block and dismiss the keyboard.
-		this.props.clearSelectedBlock();
 		switchMode( mode === 'visual' ? 'text' : 'visual' );
 	}
 
 	updateCapabilitiesAction( capabilities ) {
-		this.props.updateSettings( capabilities );
+		this.props.updateEditorSettings( { capabilities } );
 	}
 
 	render() {
@@ -337,30 +403,28 @@ class NativeEditorProvider extends Component {
 					isVisible={ this.state.isHelpVisible }
 					onClose={ () => this.setState( { isHelpVisible: false } ) }
 					close={ () => this.setState( { isHelpVisible: false } ) }
+					showSupport={ capabilities?.supportSection === true }
 				/>
 			</>
 		);
 	}
 }
 
-export default compose( [
+const ComposedNativeProvider = compose( [
 	withSelect( ( select ) => {
 		const {
 			__unstableIsEditorReady: isEditorReady,
 			getEditorBlocks,
 			getEditedPostAttribute,
 			getEditedPostContent,
+			getEditorSettings,
+			getEditorMode,
 		} = select( editorStore );
-		const { getEditorMode } = select( editPostStore );
 
-		const {
-			getBlockIndex,
-			getSelectedBlockClientId,
-			getGlobalBlockCount,
-			getSettings: getBlockEditorSettings,
-		} = select( blockEditorStore );
+		const { getBlockIndex, getSelectedBlockClientId, getGlobalBlockCount } =
+			select( blockEditorStore );
 
-		const settings = getBlockEditorSettings();
+		const settings = getEditorSettings();
 		const defaultEditorColors = settings?.colors ?? [];
 		const defaultEditorGradients = settings?.gradients ?? [];
 
@@ -379,23 +443,33 @@ export default compose( [
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
-		const { editPost, resetEditorBlocks } = dispatch( editorStore );
 		const {
-			updateSettings,
+			editPost,
+			resetEditorBlocks,
+			updateEditorSettings,
+			switchEditorMode,
+			togglePostTitleSelection,
+		} = dispatch( editorStore );
+		const {
 			clearSelectedBlock,
+			updateSettings,
 			insertBlock,
+			insertBlocks,
 			replaceBlock,
 		} = dispatch( blockEditorStore );
-		const { switchEditorMode } = dispatch( editPostStore );
 		const { addEntities, receiveEntityRecords } = dispatch( coreStore );
-		const { createSuccessNotice } = dispatch( noticesStore );
+		const { createSuccessNotice, createErrorNotice } =
+			dispatch( noticesStore );
 
 		return {
-			updateSettings,
+			updateBlockEditorSettings: updateSettings,
+			updateEditorSettings,
 			addEntities,
-			clearSelectedBlock,
 			insertBlock,
+			insertBlocks,
 			createSuccessNotice,
+			createErrorNotice,
+			clearSelectedBlock,
 			editTitle( title ) {
 				editPost( { title } );
 			},
@@ -408,7 +482,16 @@ export default compose( [
 			switchMode( mode ) {
 				switchEditorMode( mode );
 			},
+			onInsertBlockAfter( blocks ) {
+				insertBlocks( blocks, undefined, undefined, false );
+			},
+			onClearPostTitleSelection() {
+				togglePostTitleSelection( false );
+			},
 			replaceBlock,
 		};
 	} ),
 ] )( NativeEditorProvider );
+
+export default ComposedNativeProvider;
+export { ComposedNativeProvider as ExperimentalEditorProvider };

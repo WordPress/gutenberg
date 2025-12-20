@@ -3,7 +3,9 @@
 		"name": "core/table-of-contents",
 		"isValid": true,
 		"attributes": {
-			"onlyIncludeCurrentPage": false
+			"headings": [],
+			"onlyIncludeCurrentPage": false,
+			"ordered": true
 		},
 		"innerBlocks": []
 	}

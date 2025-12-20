@@ -11,7 +11,8 @@ import { useMemo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { useContextSystem, WordPressComponentProps } from '../ui/context';
+import type { WordPressComponentProps } from '../context';
+import { useContextSystem } from '../context';
 import * as styles from './styles';
 import { TRUNCATE_ELLIPSIS, TRUNCATE_TYPE, truncateContent } from './utils';
 import { useCx } from '../utils/hooks/use-cx';
@@ -32,20 +33,31 @@ export default function useTruncate(
 
 	const cx = useCx();
 
-	const truncatedContent = truncateContent(
-		typeof children === 'string' ? children : '',
-		{
-			ellipsis,
-			ellipsizeMode,
-			limit,
-			numberOfLines,
-		}
-	);
+	let childrenAsText;
+	if ( typeof children === 'string' ) {
+		childrenAsText = children;
+	} else if ( typeof children === 'number' ) {
+		childrenAsText = children.toString();
+	}
 
-	const shouldTruncate = ellipsizeMode === TRUNCATE_TYPE.auto;
+	const truncatedContent = childrenAsText
+		? truncateContent( childrenAsText, {
+				ellipsis,
+				ellipsizeMode,
+				limit,
+				numberOfLines,
+		  } )
+		: children;
+
+	const shouldTruncate =
+		!! childrenAsText && ellipsizeMode === TRUNCATE_TYPE.auto;
 
 	const classes = useMemo( () => {
+		// The `word-break: break-all` property first makes sure a text line
+		// breaks even when it contains 'unbreakable' content such as long URLs.
+		// See https://github.com/WordPress/gutenberg/issues/60860.
 		const truncateLines = css`
+			${ numberOfLines === 1 ? 'word-break: break-all;' : '' }
 			-webkit-box-orient: vertical;
 			-webkit-line-clamp: ${ numberOfLines };
 			display: -webkit-box;

@@ -23,7 +23,7 @@ import {
 } from '@wordpress/block-editor';
 
 registerBlockType( 'my-plugin/inspector-controls-example', {
-	apiVersion: 2,
+	apiVersion: 3,
 
 	title: 'Inspector controls example',
 
@@ -114,6 +114,7 @@ registerBlockType( 'my-plugin/inspector-controls-example', {
 						/>
 
 						<TextControl
+							__next40pxDefaultSize
 							label="Text Field"
 							help="Additional help text"
 							value={ textField }
@@ -188,9 +189,7 @@ Inspector Advanced Controls appear under the _Advanced_ panel of a block's [Insp
 ### Usage
 
 ```js
-import {
-	TextControl,
-} from '@wordpress/components';
+import { TextControl } from '@wordpress/components';
 import {
 	InspectorControls,
 	InspectorAdvancedControls,
@@ -199,14 +198,13 @@ import {
 function MyBlockEdit( { attributes, setAttributes } ) {
 	return (
 		<>
-			<div>
-				{ /* Block markup goes here */ }
-			</div
+			<div>{ /* Block markup goes here */ }</div>
 			<InspectorControls>
-				{ /* Regular control goes here */
+				{ /* Regular control goes here */ }
 			</InspectorControls>
 			<InspectorAdvancedControls>
 				<TextControl
+					__next40pxDefaultSize
 					label="HTML anchor"
 					value={ attributes.anchor }
 					onChange={ ( nextValue ) => {

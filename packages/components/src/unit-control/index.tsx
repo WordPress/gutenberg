@@ -1,13 +1,8 @@
 /**
  * External dependencies
  */
-import type {
-	FocusEventHandler,
-	KeyboardEvent,
-	ForwardedRef,
-	SyntheticEvent,
-} from 'react';
-import classnames from 'classnames';
+import type { KeyboardEvent, ForwardedRef, SyntheticEvent } from 'react';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -19,8 +14,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import type { WordPressComponentProps } from '../ui/context';
-import * as inputControlActionTypes from '../input-control/reducer/actions';
+import type { WordPressComponentProps } from '../context';
 import { ValueInput } from './styles/unit-control-styles';
 import UnitSelectControl from './unit-select-control';
 import {
@@ -30,8 +24,10 @@ import {
 	getValidParsedQuantityAndUnit,
 } from './utils';
 import { useControlledState } from '../utils/hooks';
+import { escapeRegExp } from '../utils/strings';
 import type { UnitControlProps, UnitControlOnChangeCallback } from './types';
-import type { StateReducer } from '../input-control/reducer/state';
+import { useDeprecated36pxDefaultSizeProp } from '../utils/use-deprecated-props';
+import { maybeWarnDeprecated36pxSize } from '../utils/deprecated-36px-size';
 
 function UnforwardedUnitControl(
 	unitControlProps: WordPressComponentProps<
@@ -42,7 +38,7 @@ function UnforwardedUnitControl(
 	forwardedRef: ForwardedRef< any >
 ) {
 	const {
-		__unstableStateReducer: stateReducerProp,
+		__unstableStateReducer,
 		autoComplete = 'off',
 		// @ts-expect-error Ensure that children is omitted from restProps
 		children,
@@ -59,9 +55,17 @@ function UnforwardedUnitControl(
 		unit: unitProp,
 		units: unitsProp = CSS_UNITS,
 		value: valueProp,
-		onBlur: onBlurProp,
+		onFocus: onFocusProp,
+		__shouldNotWarnDeprecated36pxSize,
 		...props
-	} = unitControlProps;
+	} = useDeprecated36pxDefaultSizeProp( unitControlProps );
+
+	maybeWarnDeprecated36pxSize( {
+		componentName: 'UnitControl',
+		__next40pxDefaultSize: props.__next40pxDefaultSize,
+		size,
+		__shouldNotWarnDeprecated36pxSize,
+	} );
 
 	if ( 'unit' in unitControlProps ) {
 		deprecated( 'UnitControl unit prop', {
@@ -75,10 +79,24 @@ function UnforwardedUnitControl(
 	// ensures it fallback to `undefined` in case a consumer of `UnitControl`
 	// still passes `null` as a `value`.
 	const nonNullValueProp = valueProp ?? undefined;
-	const units = useMemo(
-		() => getUnitsWithCurrentUnit( nonNullValueProp, unitProp, unitsProp ),
-		[ nonNullValueProp, unitProp, unitsProp ]
-	);
+	const [ units, reFirstCharacterOfUnits ] = useMemo( () => {
+		const list = getUnitsWithCurrentUnit(
+			nonNullValueProp,
+			unitProp,
+			unitsProp
+		);
+		const [ { value: firstUnitValue = '' } = {}, ...rest ] = list;
+		const firstCharacters = rest.reduce(
+			( carry, { value } ) => {
+				const first = escapeRegExp( value?.substring( 0, 1 ) || '' );
+				return carry.includes( first )
+					? carry
+					: `${ carry }|${ first }`;
+			},
+			escapeRegExp( firstUnitValue.substring( 0, 1 ) )
+		);
+		return [ list, new RegExp( `^(?:${ firstCharacters })$`, 'i' ) ];
+	}, [ nonNullValueProp, unitProp, unitsProp ] );
 	const [ parsedQuantity, parsedUnit ] = getParsedQuantityAndUnit(
 		nonNullValueProp,
 		unitProp,
@@ -99,10 +117,7 @@ function UnforwardedUnitControl(
 		}
 	}, [ parsedUnit, setUnit ] );
 
-	// Stores parsed value for hand-off in state reducer.
-	const refParsedQuantity = useRef< number | undefined >( undefined );
-
-	const classes = classnames(
+	const classes = clsx(
 		'components-unit-control',
 		// This class is added for legacy purposes to maintain it on the outer
 		// wrapper. See: https://github.com/WordPress/gutenberg/pull/45139
@@ -157,93 +172,41 @@ function UnforwardedUnitControl(
 		setUnit( nextUnitValue );
 	};
 
-	const mayUpdateUnit = ( event: SyntheticEvent< HTMLInputElement > ) => {
-		if ( ! isNaN( Number( event.currentTarget.value ) ) ) {
-			refParsedQuantity.current = undefined;
-			return;
-		}
-		const [ validParsedQuantity, validParsedUnit ] =
-			getValidParsedQuantityAndUnit(
-				event.currentTarget.value,
-				units,
-				parsedQuantity,
-				unit
-			);
-
-		refParsedQuantity.current = validParsedQuantity;
-
-		if ( isPressEnterToChange && validParsedUnit !== unit ) {
-			const data = Array.isArray( units )
-				? units.find( ( option ) => option.value === validParsedUnit )
-				: undefined;
-			const changeProps = { event, data };
-
-			// The `onChange` callback already gets called, no need to call it explicitly.
-			onUnitChange?.( validParsedUnit, changeProps );
-
-			setUnit( validParsedUnit );
-		}
-	};
-
-	const handleOnBlur: FocusEventHandler< HTMLInputElement > = ( event ) => {
-		mayUpdateUnit( event );
-		onBlurProp?.( event );
-	};
-
-	const handleOnKeyDown = ( event: KeyboardEvent< HTMLInputElement > ) => {
-		const { key } = event;
-		if ( key === 'Enter' ) {
-			mayUpdateUnit( event );
-		}
-	};
-
-	/**
-	 * "Middleware" function that intercepts updates from InputControl.
-	 * This allows us to tap into actions to transform the (next) state for
-	 * InputControl.
-	 *
-	 * @param  state  State from InputControl
-	 * @param  action Action triggering state change
-	 * @return The updated state to apply to InputControl
-	 */
-	const unitControlStateReducer: StateReducer = ( state, action ) => {
-		const nextState = { ...state };
-
-		/*
-		 * On commits (when pressing ENTER and on blur if
-		 * isPressEnterToChange is true), if a parse has been performed
-		 * then use that result to update the state.
-		 */
-		if ( action.type === inputControlActionTypes.COMMIT ) {
-			if ( refParsedQuantity.current !== undefined ) {
-				nextState.value = (
-					refParsedQuantity.current ?? ''
-				).toString();
-				refParsedQuantity.current = undefined;
+	let handleOnKeyDown;
+	if ( ! disableUnits && isUnitSelectTabbable && units.length ) {
+		handleOnKeyDown = ( event: KeyboardEvent< HTMLInputElement > ) => {
+			props.onKeyDown?.( event );
+			// Unless the meta or ctrl key was pressed (to avoid interfering with
+			// shortcuts, e.g. pastes), move focus to the unit select if a key
+			// matches the first character of a unit.
+			if (
+				! event.metaKey &&
+				! event.ctrlKey &&
+				reFirstCharacterOfUnits.test( event.key )
+			) {
+				refInputSuffix.current?.focus();
 			}
-		}
-
-		return nextState;
-	};
-
-	let stateReducer: StateReducer = unitControlStateReducer;
-	if ( stateReducerProp ) {
-		stateReducer = ( state, action ) => {
-			const baseState = unitControlStateReducer( state, action );
-			return stateReducerProp( baseState, action );
 		};
 	}
 
+	const refInputSuffix = useRef< HTMLSelectElement >( null );
 	const inputSuffix = ! disableUnits ? (
 		<UnitSelectControl
+			ref={ refInputSuffix }
 			aria-label={ __( 'Select unit' ) }
 			disabled={ disabled }
 			isUnitSelectTabbable={ isUnitSelectTabbable }
 			onChange={ handleOnUnitChange }
-			size={ size }
+			size={
+				[ 'small', 'compact' ].includes( size ) ||
+				( size === 'default' && ! props.__next40pxDefaultSize )
+					? 'small'
+					: 'default'
+			}
 			unit={ unit }
 			units={ units }
-			onBlur={ onBlurProp }
+			onFocus={ onFocusProp }
+			onBlur={ unitControlProps.onBlur }
 		/>
 	) : null;
 
@@ -260,23 +223,24 @@ function UnforwardedUnitControl(
 
 	return (
 		<ValueInput
-			type={ isPressEnterToChange ? 'text' : 'number' }
 			{ ...props }
+			__shouldNotWarnDeprecated36pxSize
 			autoComplete={ autoComplete }
 			className={ classes }
 			disabled={ disabled }
 			spinControls="none"
 			isPressEnterToChange={ isPressEnterToChange }
 			label={ label }
-			onBlur={ handleOnBlur }
 			onKeyDown={ handleOnKeyDown }
 			onChange={ handleOnQuantityChange }
 			ref={ forwardedRef }
 			size={ size }
 			suffix={ inputSuffix }
+			type={ isPressEnterToChange ? 'text' : 'number' }
 			value={ parsedQuantity ?? '' }
 			step={ step }
-			__unstableStateReducer={ stateReducer }
+			onFocus={ onFocusProp }
+			__unstableStateReducer={ __unstableStateReducer }
 		/>
 	);
 }
@@ -285,7 +249,6 @@ function UnforwardedUnitControl(
  * `UnitControl` allows the user to set a numeric quantity as well as a unit (e.g. `px`).
  *
  *
- * @example
  * ```jsx
  * import { __experimentalUnitControl as UnitControl } from '@wordpress/components';
  * import { useState } from '@wordpress/element';
@@ -293,7 +256,7 @@ function UnforwardedUnitControl(
  * const Example = () => {
  *   const [ value, setValue ] = useState( '10px' );
  *
- *   return <UnitControl onChange={ setValue } value={ value } />;
+ *   return <UnitControl __next40pxDefaultSize onChange={ setValue } value={ value } />;
  * };
  * ```
  */

@@ -1,78 +1,76 @@
 /**
  * WordPress dependencies
  */
-import {
-	getActiveFormat,
-	getActiveObject,
-	isCollapsed,
-} from '@wordpress/rich-text';
-/**
- * External dependencies
- */
-import { find } from 'lodash';
+import { getActiveFormat, getActiveObject } from '@wordpress/rich-text';
+import { useContext, useMemo } from '@wordpress/element';
 
-export default function FormatEdit( {
-	formatTypes,
+/**
+ * Internal dependencies
+ */
+import BlockContext from '../block-context';
+
+const DEFAULT_BLOCK_CONTEXT = {};
+
+export const usesContextKey = Symbol( 'usesContext' );
+
+function Edit( {
 	onChange,
 	onFocus,
 	value,
 	forwardedRef,
+	settings,
+	isVisible,
 } ) {
-	return formatTypes.map( ( settings ) => {
-		const { name, edit: Edit } = settings;
+	const {
+		name,
+		edit: EditFunction,
+		[ usesContextKey ]: usesContext,
+	} = settings;
 
-		if ( ! Edit ) {
-			return null;
-		}
+	const blockContext = useContext( BlockContext );
 
-		const activeFormat = getActiveFormat( value, name );
-		let isActive = activeFormat !== undefined;
-		const activeObject = getActiveObject( value );
-		const isObjectActive =
-			activeObject !== undefined && activeObject.type === name;
+	// Assign context values using the block type's declared context needs.
+	const context = useMemo( () => {
+		return usesContext
+			? Object.fromEntries(
+					Object.entries( blockContext ).filter( ( [ key ] ) =>
+						usesContext.includes( key )
+					)
+			  )
+			: DEFAULT_BLOCK_CONTEXT;
+	}, [ usesContext, blockContext ] );
 
-		// Edge case: un-collapsed link formats.
-		// If there is a missing link format at either end of the selection
-		// then we shouldn't show the Edit UI because the selection has exceeded
-		// the bounds of the link format.
-		// Also if the format objects don't match then we're dealing with two separate
-		// links so we should not allow the link to be modified over the top.
-		if ( name === 'core/link' && ! isCollapsed( value ) ) {
-			const formats = value.formats;
+	if ( ! EditFunction ) {
+		return null;
+	}
 
-			const linkFormatAtStart = find( formats[ value.start ], {
-				type: 'core/link',
-			} );
+	const activeFormat = getActiveFormat( value, name );
+	const isActive = activeFormat !== undefined;
+	const activeObject = getActiveObject( value );
+	const isObjectActive =
+		activeObject !== undefined && activeObject.type === name;
 
-			const linkFormatAtEnd = find( formats[ value.end - 1 ], {
-				type: 'core/link',
-			} );
-
-			if (
-				! linkFormatAtStart ||
-				! linkFormatAtEnd ||
-				linkFormatAtStart !== linkFormatAtEnd
-			) {
-				isActive = false;
+	return (
+		<EditFunction
+			key={ name }
+			isActive={ isActive }
+			isVisible={ isVisible }
+			activeAttributes={ isActive ? activeFormat.attributes || {} : {} }
+			isObjectActive={ isObjectActive }
+			activeObjectAttributes={
+				isObjectActive ? activeObject.attributes || {} : {}
 			}
-		}
+			value={ value }
+			onChange={ onChange }
+			onFocus={ onFocus }
+			contentRef={ forwardedRef }
+			context={ context }
+		/>
+	);
+}
 
-		return (
-			<Edit
-				key={ name }
-				isActive={ isActive }
-				activeAttributes={
-					isActive ? activeFormat.attributes || {} : {}
-				}
-				isObjectActive={ isObjectActive }
-				activeObjectAttributes={
-					isObjectActive ? activeObject.attributes || {} : {}
-				}
-				value={ value }
-				onChange={ onChange }
-				onFocus={ onFocus }
-				contentRef={ forwardedRef }
-			/>
-		);
-	} );
+export default function FormatEdit( { formatTypes, ...props } ) {
+	return formatTypes.map( ( settings ) => (
+		<Edit settings={ settings } { ...props } key={ settings.name } />
+	) );
 }

@@ -124,7 +124,7 @@ const EmbedNoPreview = ( {
 	const embedNoProviderPreview = (
 		<>
 			<TouchableWithoutFeedback
-				accessibilityRole={ 'button' }
+				accessibilityRole="button"
 				accessibilityHint={ previewButtonA11yHint }
 				disabled={ ! isSelected }
 				onPress={ onPressContainer }
@@ -145,7 +145,7 @@ const EmbedNoPreview = ( {
 					<TouchableOpacity
 						accessibilityHint={ __( 'Tap here to show help' ) }
 						accessibilityLabel={ __( 'Help button' ) }
-						accessibilityRole={ 'button' }
+						accessibilityRole="button"
 						disabled={ ! isSelected }
 						onPress={ onPressHelp }
 						style={ helpIconStyle }

@@ -12,9 +12,9 @@ import {
 	getGradientValueBySlug,
 	getGradientSlugByValue,
 	__experimentalPanelColorGradientSettings as PanelColorGradientSettings,
+	useMobileGlobalStylesColors,
 } from '@wordpress/block-editor';
 import { useMemo } from '@wordpress/element';
-import { useMobileGlobalStylesColors } from '@wordpress/components';
 
 function OverlayColorSettings( {
 	overlayColor,

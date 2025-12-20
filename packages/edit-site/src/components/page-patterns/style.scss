@@ -1,0 +1,116 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/variables" as *;
+
+.edit-site-patterns__delete-modal {
+	width: $modal-width-small;
+}
+
+.page-patterns-preview-field {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	flex-direction: column;
+	height: 100%;
+	border-radius: $radius-medium;
+
+	.dataviews-view-grid & {
+		.block-editor-block-preview__container {
+			height: 100%;
+		}
+	}
+
+	.dataviews-view-table & {
+		width: 96px;
+		flex-grow: 0;
+		text-wrap: balance; // Fallback for Safari.
+		text-wrap: pretty;
+	}
+}
+
+.edit-site-patterns__pattern-icon {
+	fill: var(--wp-block-synced-color);
+	flex-shrink: 0;
+}
+
+.edit-site-patterns__section-header {
+	border-bottom: 1px solid #f0f0f0;
+	padding: $grid-unit-20 $grid-unit-60;
+	position: sticky;
+	top: 0;
+	z-index: 2;
+	flex-shrink: 0;
+	min-height: $grid-unit-50;
+
+	@media not (prefers-reduced-motion) {
+		transition: padding ease-out 0.1s;
+	}
+
+	.edit-site-patterns__title {
+		min-height: $grid-unit-50;
+
+		.components-heading {
+			flex-grow: 1;
+			flex-basis: 0;
+			white-space: nowrap;
+		}
+	}
+
+	.edit-site-patterns__sub-title {
+		margin-bottom: $grid-unit-10;
+	}
+
+	.screen-reader-shortcut:focus {
+		top: 0;
+	}
+}
+
+.edit-site-page-patterns-dataviews {
+	.dataviews-view-grid__badge-fields {
+		.dataviews-view-grid__field-value:has(.edit-site-patterns__field-sync-status-fully) {
+			background: rgba(var(--wp-block-synced-color--rgb), 0.04);
+			color: var(--wp-block-synced-color);
+		}
+	}
+}
+
+.dataviews-action-modal__duplicate-pattern {
+	// Fix the modal width to prevent added categories from stretching the modal.
+	[role="dialog"] > [role="document"] {
+		width: 350px;
+	}
+
+	.patterns-menu-items__convert-modal-categories {
+		position: relative;
+	}
+
+	.components-form-token-field__suggestions-list:not(:empty) {
+		position: absolute;
+		border: $border-width solid var(--wp-admin-theme-color);
+		border-bottom-left-radius: $radius-small;
+		border-bottom-right-radius: $radius-small;
+		box-shadow: 0 0 0.5px 0.5px var(--wp-admin-theme-color);
+		box-sizing: border-box;
+		z-index: 1;
+		background-color: $white;
+		width: calc(100% + 2px); // Account for the border width of the token field.
+		left: -1px;
+		min-width: initial;
+		max-height: $grid-unit-60 * 2; // Adjust to not cover the save button, showing three items.
+	}
+}
+
+.dataviews-action-modal__duplicate-template-part {
+	.components-modal__frame {
+		@include break-small {
+			max-width: 500px;
+		}
+	}
+}
+
+@container (max-width: 430px) {
+	.edit-site-page-patterns-dataviews .edit-site-patterns__section-header {
+		padding-left: $grid-unit-30;
+		padding-right: $grid-unit-30;
+	}
+}

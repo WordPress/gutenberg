@@ -1,20 +1,22 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
  */
 import { useResizeObserver } from '@wordpress/compose';
 import { SVG, Path } from '@wordpress/primitives';
+import { useEffect } from '@wordpress/element';
+import { speak } from '@wordpress/a11y';
 
 /**
  * Internal dependencies
  */
 import Icon from '../icon';
 import type { PlaceholderProps } from './types';
-import type { WordPressComponentProps } from '../ui/context';
+import type { WordPressComponentProps } from '../context';
 
 const PlaceholderIllustration = (
 	<SVG
@@ -38,12 +40,8 @@ const PlaceholderIllustration = (
  * const MyPlaceholder = () => <Placeholder icon={ more } label="Placeholder" />;
  * ```
  */
-export function Placeholder< IconProps = unknown >(
-	props: WordPressComponentProps<
-		PlaceholderProps< IconProps >,
-		'div',
-		false
-	>
+export function Placeholder(
+	props: WordPressComponentProps< PlaceholderProps, 'div', false >
 ) {
 	const {
 		icon,
@@ -70,15 +68,23 @@ export function Placeholder< IconProps = unknown >(
 		};
 	}
 
-	const classes = classnames(
+	const classes = clsx(
 		'components-placeholder',
 		className,
 		modifierClassNames,
 		withIllustration ? 'has-illustration' : null
 	);
-	const fieldsetClasses = classnames( 'components-placeholder__fieldset', {
+
+	const fieldsetClasses = clsx( 'components-placeholder__fieldset', {
 		'is-column-layout': isColumnLayout,
 	} );
+
+	useEffect( () => {
+		if ( instructions ) {
+			speak( instructions );
+		}
+	}, [ instructions ] );
+
 	return (
 		<div { ...additionalProps } className={ classes }>
 			{ withIllustration ? PlaceholderIllustration : null }
@@ -93,14 +99,12 @@ export function Placeholder< IconProps = unknown >(
 				<Icon icon={ icon } />
 				{ label }
 			</div>
-			<fieldset className={ fieldsetClasses }>
-				{ !! instructions && (
-					<legend className="components-placeholder__instructions">
-						{ instructions }
-					</legend>
-				) }
-				{ children }
-			</fieldset>
+			{ !! instructions && (
+				<div className="components-placeholder__instructions">
+					{ instructions }
+				</div>
+			) }
+			<div className={ fieldsetClasses }>{ children }</div>
 		</div>
 	);
 }

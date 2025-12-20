@@ -9,5 +9,10 @@
 		font-family: inherit;
 		overflow-wrap: break-word;
 		white-space: pre-wrap;
+		// Set direction and avoid inheriting alignment from a parent element.
+		/*!rtl:begin:ignore*/
+		direction: ltr;
+		text-align: initial;
+		/*!rtl:end:ignore*/
 	}
 }

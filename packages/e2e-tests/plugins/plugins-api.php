@@ -15,7 +15,7 @@ function enqueue_plugins_api_plugin_scripts() {
 		'gutenberg-test-plugins-api-post-status-info',
 		plugins_url( 'plugins-api/post-status-info.js', __FILE__ ),
 		array(
-			'wp-edit-post',
+			'wp-editor',
 			'wp-element',
 			'wp-i18n',
 			'wp-plugins',
@@ -28,7 +28,7 @@ function enqueue_plugins_api_plugin_scripts() {
 		'gutenberg-test-plugins-api-publish-pane;',
 		plugins_url( 'plugins-api/publish-panel.js', __FILE__ ),
 		array(
-			'wp-edit-post',
+			'wp-editor',
 			'wp-element',
 			'wp-i18n',
 			'wp-plugins',
@@ -44,7 +44,7 @@ function enqueue_plugins_api_plugin_scripts() {
 			'wp-components',
 			'wp-compose',
 			'wp-data',
-			'wp-edit-post',
+			'wp-editor',
 			'wp-block-editor',
 			'wp-editor',
 			'wp-element',
@@ -63,7 +63,7 @@ function enqueue_plugins_api_plugin_scripts() {
 			'wp-components',
 			'wp-compose',
 			'wp-data',
-			'wp-edit-post',
+			'wp-editor',
 			'wp-block-editor',
 			'wp-element',
 			'wp-i18n',
@@ -78,12 +78,25 @@ function enqueue_plugins_api_plugin_scripts() {
 		'gutenberg-test-plugins-api-document-setting',
 		plugins_url( 'plugins-api/document-setting.js', __FILE__ ),
 		array(
-			'wp-edit-post',
+			'wp-editor',
 			'wp-element',
 			'wp-i18n',
 			'wp-plugins',
 		),
 		filemtime( plugin_dir_path( __FILE__ ) . 'plugins-api/document-setting.js' ),
+		true
+	);
+
+	wp_enqueue_script(
+		'gutenberg-test-plugins-api-preview-menu',
+		plugins_url( 'plugins-api/preview-menu.js', __FILE__ ),
+		array(
+			'wp-editor',
+			'wp-element',
+			'wp-i18n',
+			'wp-plugins',
+		),
+		filemtime( plugin_dir_path( __FILE__ ) . 'plugins-api/preview-menu.js' ),
 		true
 	);
 }

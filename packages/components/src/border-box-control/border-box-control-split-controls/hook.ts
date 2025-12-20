@@ -7,7 +7,8 @@ import { useMemo } from '@wordpress/element';
  * Internal dependencies
  */
 import * as styles from '../styles';
-import { useContextSystem, WordPressComponentProps } from '../../ui/context';
+import type { WordPressComponentProps } from '../../context';
+import { useContextSystem } from '../../context';
 import { useCx } from '../../utils/';
 
 import type { SplitControlsProps } from '../types';
@@ -21,7 +22,6 @@ export function useBorderBoxControlSplitControls(
 		enableAlpha = false,
 		enableStyle = true,
 		size = 'default',
-		__experimentalHasMultipleOrigins = false,
 		__experimentalIsRenderedInSidebar = false,
 		...otherProps
 	} = useContextSystem( props, 'BorderBoxControlSplitControls' );
@@ -49,7 +49,6 @@ export function useBorderBoxControlSplitControls(
 		enableStyle,
 		rightAlignedClassName,
 		size,
-		__experimentalHasMultipleOrigins,
 		__experimentalIsRenderedInSidebar,
 	};
 }

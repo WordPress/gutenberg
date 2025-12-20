@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { mapValues } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { useMemo, useRef } from '@wordpress/element';
@@ -30,29 +25,36 @@ import useRegistry from '../registry-provider/use-registry';
  */
 const useDispatchWithMap = ( dispatchMap, deps ) => {
 	const registry = useRegistry();
-	const currentDispatchMap = useRef( dispatchMap );
+	const currentDispatchMapRef = useRef( dispatchMap );
 
 	useIsomorphicLayoutEffect( () => {
-		currentDispatchMap.current = dispatchMap;
+		currentDispatchMapRef.current = dispatchMap;
 	} );
 
 	return useMemo( () => {
-		const currentDispatchProps = currentDispatchMap.current(
+		const currentDispatchProps = currentDispatchMapRef.current(
 			registry.dispatch,
 			registry
 		);
-		return mapValues( currentDispatchProps, ( dispatcher, propName ) => {
-			if ( typeof dispatcher !== 'function' ) {
-				// eslint-disable-next-line no-console
-				console.warn(
-					`Property ${ propName } returned from dispatchMap in useDispatchWithMap must be a function.`
-				);
-			}
-			return ( ...args ) =>
-				currentDispatchMap
-					.current( registry.dispatch, registry )
-					[ propName ]( ...args );
-		} );
+		return Object.fromEntries(
+			Object.entries( currentDispatchProps ).map(
+				( [ propName, dispatcher ] ) => {
+					if ( typeof dispatcher !== 'function' ) {
+						// eslint-disable-next-line no-console
+						console.warn(
+							`Property ${ propName } returned from dispatchMap in useDispatchWithMap must be a function.`
+						);
+					}
+					return [
+						propName,
+						( ...args ) =>
+							currentDispatchMapRef
+								.current( registry.dispatch, registry )
+								[ propName ]( ...args ),
+					];
+				}
+			)
+		);
 	}, [ registry, ...deps ] );
 };
 

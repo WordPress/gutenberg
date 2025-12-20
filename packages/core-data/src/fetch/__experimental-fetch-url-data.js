@@ -29,7 +29,7 @@ const CACHE = new Map();
  *
  * @async
  * @param {string}  url     the URL to request details from.
- * @param {Object?} options any options to pass to the underlying fetch.
+ * @param {?Object} options any options to pass to the underlying fetch.
  * @example
  * ```js
  * import { __experimentalFetchUrlData as fetchUrlData } from '@wordpress/core-data';

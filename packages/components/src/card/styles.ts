@@ -12,7 +12,7 @@ import { COLORS, CONFIG } from '../utils';
 // (as opposed to the `border` property), the value of the border radius needs
 // to be adjusted by removing 1px (this is because the `box-shadow` renders
 // as an "outer radius").
-const adjustedBorderRadius = `calc(${ CONFIG.cardBorderRadius } - 1px)`;
+const adjustedBorderRadius = `calc(${ CONFIG.radiusLarge } - 1px)`;
 
 export const Card = css`
 	box-shadow: 0 0 0 1px ${ CONFIG.surfaceBorderColor };
@@ -93,26 +93,6 @@ export const borderless = css`
 export const rounded = css`
 	border-radius: ${ adjustedBorderRadius };
 `;
-
-const xSmallCardPadding = css`
-	padding: ${ CONFIG.cardPaddingXSmall };
-`;
-
-export const cardPaddings = {
-	large: css`
-		padding: ${ CONFIG.cardPaddingLarge };
-	`,
-	medium: css`
-		padding: ${ CONFIG.cardPaddingMedium };
-	`,
-	small: css`
-		padding: ${ CONFIG.cardPaddingSmall };
-	`,
-	xSmall: xSmallCardPadding,
-	// The `extraSmall` size is not officially documented, but the following styles
-	// are kept for legacy reasons to support older values of the `size` prop.
-	extraSmall: xSmallCardPadding,
-};
 
 export const shady = css`
 	background-color: ${ COLORS.ui.backgroundDisabled };

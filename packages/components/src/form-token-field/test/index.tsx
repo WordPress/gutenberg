@@ -1,3 +1,5 @@
+/* eslint jest/expect-expect: ["warn", { "assertFunctionNames": ["expect", "expectTokensToBeInTheDocument", "expectTokensNotToBeInTheDocument", "expectVisibleSuggestionsToBe", "expectEscapedProperly"] }] */
+
 /**
  * External dependencies
  */
@@ -19,7 +21,11 @@ import { useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import FormTokenField from '../';
+import _FormTokenField from '../';
+
+const FormTokenField = ( props: ComponentProps< typeof _FormTokenField > ) => (
+	<_FormTokenField __next40pxDefaultSize { ...props } />
+);
 
 const FormTokenFieldWithState = ( {
 	onChange,
@@ -83,6 +89,17 @@ const expectTokensNotToBeInTheDocument = ( tokensText: string[] ) => {
 	);
 };
 
+const expectEscapedProperly = ( tokenHtml: string ) => {
+	screen.getByText( ( _, node: Element | null ) => {
+		if ( node === null ) {
+			return false;
+		}
+
+		// This is hacky, but it's a way we can check exactly the output HTML
+		return node.innerHTML === tokenHtml;
+	} );
+};
+
 const expectVisibleSuggestionsToBe = (
 	listElement: HTMLElement,
 	suggestionsText: string[]
@@ -107,9 +124,7 @@ function unescapeAndFormatSpaces( str: string ) {
 describe( 'FormTokenField', () => {
 	describe( 'basic usage', () => {
 		it( "should add tokens with the input's value when pressing the enter key", async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			const onChangeSpy = jest.fn();
 
@@ -134,9 +149,7 @@ describe( 'FormTokenField', () => {
 		} );
 
 		it( "should add a token with the input's value when pressing the comma key", async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			const onChangeSpy = jest.fn();
 
@@ -152,9 +165,7 @@ describe( 'FormTokenField', () => {
 		} );
 
 		it( 'should add a token with the input value when pressing the space key and the `tokenizeOnSpace` prop is `true`', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			const onChangeSpy = jest.fn();
 
@@ -197,10 +208,43 @@ describe( 'FormTokenField', () => {
 			] );
 		} );
 
-		it( "should not add a token with the input's value when pressing the tab key", async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+		it( 'should add a token with the input value with onBlur when `tokenizeOnBlur` prop is `true`', async () => {
+			const user = userEvent.setup();
+
+			const onChangeSpy = jest.fn();
+
+			const { rerender } = render(
+				<FormTokenFieldWithState onChange={ onChangeSpy } />
+			);
+
+			const input = screen.getByRole( 'combobox' );
+
+			// Add 'grapefruit' token by typing it and check blur of field does not tokenize it.
+			await user.type( input, 'grapefruit' );
+			await user.click( document.body );
+			expect( onChangeSpy ).toHaveBeenCalledTimes( 0 );
+			expectTokensNotToBeInTheDocument( [ 'grapefruit' ] );
+
+			rerender(
+				<FormTokenFieldWithState
+					onChange={ onChangeSpy }
+					tokenizeOnBlur
+				/>
+			);
+			await user.clear( input );
+
+			// Add 'grapefruit' token by typing it and check blur of field tokenizes it.
+			await user.type( input, 'grapefruit' );
+
+			await user.click( document.body );
+			expect( onChangeSpy ).toHaveBeenNthCalledWith( 1, [
+				'grapefruit',
+			] );
+			expectTokensToBeInTheDocument( [ 'grapefruit' ] );
+		} );
+
+		it( "should not add a token with the input's value when tokenizeOnBlur is not set and pressing the tab key", async () => {
+			const user = userEvent.setup();
 
 			const onChangeSpy = jest.fn();
 
@@ -216,9 +260,7 @@ describe( 'FormTokenField', () => {
 		} );
 
 		it( 'should remove the last token when pressing the backspace key', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			const onChangeSpy = jest.fn();
 
@@ -246,9 +288,7 @@ describe( 'FormTokenField', () => {
 		} );
 
 		it( 'should remove a token when clicking the token\'s "remove" button', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			const onChangeSpy = jest.fn();
 
@@ -290,9 +330,7 @@ describe( 'FormTokenField', () => {
 		} );
 
 		it( 'should remove a token when by focusing on the token\'s "remove" button and pressing space bar', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			const onChangeSpy = jest.fn();
 
@@ -327,9 +365,7 @@ describe( 'FormTokenField', () => {
 		} );
 
 		it( 'should not add a new token if a token with the same value already exists', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			const onChangeSpy = jest.fn();
 
@@ -356,9 +392,7 @@ describe( 'FormTokenField', () => {
 		} );
 
 		it( 'should not add a new token if the text input is blank', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			const onChangeSpy = jest.fn();
 
@@ -378,9 +412,7 @@ describe( 'FormTokenField', () => {
 		} );
 
 		it( 'should allow moving the cursor through the tokens when pressing the arrow keys, and should remove the token in front of the cursor when pressing the delete key', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			const onChangeSpy = jest.fn();
 
@@ -486,6 +518,7 @@ describe( 'FormTokenField', () => {
 
 			// This is testing implementation details, but I'm not sure there's
 			// a better way.
+			// eslint-disable-next-line testing-library/no-node-access
 			expect( input.parentElement?.parentElement ).toHaveClass(
 				'test-classname'
 			);
@@ -506,9 +539,7 @@ describe( 'FormTokenField', () => {
 		} );
 
 		it( 'should fire the `onFocus` callback when the input is focused', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			const onFocusSpy = jest.fn();
 
@@ -530,9 +561,7 @@ describe( 'FormTokenField', () => {
 		} );
 
 		it( "should fire the `onInputChange` callback when the input's value changes", async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			const onInputChangeSpy = jest.fn();
 
@@ -599,9 +628,7 @@ describe( 'FormTokenField', () => {
 		} );
 
 		it( "should use the value of the `placeholder` prop as the input's placeholder only when there are no tokens", async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			const onChangeSpy = jest.fn();
 
@@ -630,9 +657,7 @@ describe( 'FormTokenField', () => {
 		} );
 
 		it( 'should handle accents and special characters in tokens and input value', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			const onChangeSpy = jest.fn();
 
@@ -677,9 +702,7 @@ describe( 'FormTokenField', () => {
 		} );
 
 		it( 'should render suggestions when receiving focus if the `__experimentalExpandOnFocus` prop is set to `true`', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			const onFocusSpy = jest.fn();
 
@@ -721,10 +744,105 @@ describe( 'FormTokenField', () => {
 			] );
 		} );
 
+		it( 'should render suggestions after a selection is made when the `__experimentalExpandOnFocus` prop is set to `true`', async () => {
+			const user = userEvent.setup();
+
+			const onFocusSpy = jest.fn();
+
+			const suggestions = [ 'Green', 'Emerald', 'Seaweed' ];
+
+			render(
+				<>
+					<FormTokenFieldWithState
+						onFocus={ onFocusSpy }
+						suggestions={ suggestions }
+						__experimentalExpandOnFocus
+					/>
+				</>
+			);
+
+			const input = screen.getByRole( 'combobox' );
+
+			await user.type( input, 'ee' );
+
+			expectVisibleSuggestionsToBe( screen.getByRole( 'listbox' ), [
+				'Green',
+				'Seaweed',
+			] );
+
+			// Select the first suggestion ("Green")
+			await user.keyboard( '[ArrowDown][Enter]' );
+
+			expect( screen.getByRole( 'listbox' ) ).toBeVisible();
+		} );
+
+		it( 'should not render suggestions after a selection is made when the `__experimentalExpandOnFocus` prop is set to `false` or not defined', async () => {
+			const user = userEvent.setup();
+
+			const onFocusSpy = jest.fn();
+
+			const suggestions = [ 'Green', 'Emerald', 'Seaweed' ];
+
+			render(
+				<>
+					<FormTokenFieldWithState
+						onFocus={ onFocusSpy }
+						suggestions={ suggestions }
+					/>
+				</>
+			);
+
+			const input = screen.getByRole( 'combobox' );
+
+			await user.type( input, 'ee' );
+
+			expectVisibleSuggestionsToBe( screen.getByRole( 'listbox' ), [
+				'Green',
+				'Seaweed',
+			] );
+
+			// Select the first suggestion ("Green")
+			await user.keyboard( '[ArrowDown][Enter]' );
+
+			expect( screen.queryByRole( 'listbox' ) ).not.toBeInTheDocument();
+		} );
+
+		it( 'should not render suggestions after the input is blurred', async () => {
+			const user = userEvent.setup();
+
+			const onFocusSpy = jest.fn();
+
+			const suggestions = [ 'Green', 'Emerald', 'Seaweed' ];
+
+			render(
+				<>
+					<FormTokenFieldWithState
+						onFocus={ onFocusSpy }
+						suggestions={ suggestions }
+					/>
+				</>
+			);
+
+			const input = screen.getByRole( 'combobox' );
+
+			await user.type( input, 'ee' );
+
+			expectVisibleSuggestionsToBe( screen.getByRole( 'listbox' ), [
+				'Green',
+				'Seaweed',
+			] );
+
+			// Select the first suggestion ("Green")
+			await user.keyboard( '[ArrowDown][Enter]' );
+
+			// Click the body, blurring the input.
+			await user.click( document.body );
+
+			expect( screen.queryByRole( 'listbox' ) ).not.toBeInTheDocument();
+		} );
+
 		it( 'should not render suggestions if the text input is not matching any of the suggestions', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			const suggestions = [ 'White', 'Pearl', 'Alabaster' ];
 
@@ -739,9 +857,7 @@ describe( 'FormTokenField', () => {
 		} );
 
 		it( 'should render the matching suggestions only if the text input has the minimum length', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			const suggestions = [ 'Yellow', 'Canary', 'Gold', 'Blonde' ];
 
@@ -766,9 +882,7 @@ describe( 'FormTokenField', () => {
 		} );
 
 		it( 'should not render a matching suggestion if a token with the same value has already been added', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			const suggestions = [ 'Green', 'Emerald', 'Seaweed' ];
 
@@ -791,9 +905,7 @@ describe( 'FormTokenField', () => {
 		} );
 
 		it( 'should allow the user to use the keyboard to navigate and select suggestions (which are marked with the `aria-selected` attribute)', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			const onChangeSpy = jest.fn();
 
@@ -872,9 +984,7 @@ describe( 'FormTokenField', () => {
 		} );
 
 		it( 'should allow the user to use the mouse to navigate and select suggestions (which are marked with the `aria-selected` attribute)', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			const onChangeSpy = jest.fn();
 
@@ -944,9 +1054,7 @@ describe( 'FormTokenField', () => {
 		} );
 
 		it( 'should hide the suggestion list when the Escape key is pressed', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			const onChangeSpy = jest.fn();
 
@@ -978,10 +1086,88 @@ describe( 'FormTokenField', () => {
 			expect( onChangeSpy ).not.toHaveBeenCalled();
 		} );
 
+		it( 'should hide the suggestion list on an empty input', async () => {
+			const user = userEvent.setup();
+
+			const suggestions = [ 'One', 'Two', 'Three' ];
+
+			render( <FormTokenFieldWithState suggestions={ suggestions } /> );
+
+			const input = screen.getByRole( 'combobox' );
+
+			await user.type( input, 'on' );
+
+			expectVisibleSuggestionsToBe( screen.getByRole( 'listbox' ), [
+				'One',
+			] );
+
+			expect( screen.getByRole( 'listbox' ) ).toBeVisible();
+
+			await user.clear( input );
+
+			expect( screen.queryByRole( 'listbox' ) ).not.toBeInTheDocument();
+		} );
+
+		it( 'should hide the suggestion list on blur and invalid input', async () => {
+			const user = userEvent.setup();
+
+			const suggestions = [ 'One', 'Two', 'Three' ];
+
+			render(
+				<FormTokenFieldWithState
+					suggestions={ suggestions }
+					__experimentalValidateInput={ ( token ) =>
+						suggestions.includes( token )
+					}
+				/>
+			);
+
+			const input = screen.getByRole( 'combobox' );
+
+			await user.type( input, 'on' );
+
+			expectVisibleSuggestionsToBe( screen.getByRole( 'listbox' ), [
+				'One',
+			] );
+
+			expect( screen.getByRole( 'listbox' ) ).toBeVisible();
+
+			await user.click( document.body );
+
+			expect( screen.queryByRole( 'listbox' ) ).not.toBeInTheDocument();
+		} );
+
+		it( 'should not hide the suggestion list on blur and valid input', async () => {
+			const user = userEvent.setup();
+
+			const suggestions = [ 'One', 'Two', 'Three' ];
+
+			render(
+				<FormTokenFieldWithState
+					suggestions={ suggestions }
+					__experimentalValidateInput={ ( token ) =>
+						suggestions.includes( token )
+					}
+				/>
+			);
+
+			const input = screen.getByRole( 'combobox' );
+
+			await user.type( input, 'One' );
+
+			expectVisibleSuggestionsToBe( screen.getByRole( 'listbox' ), [
+				'One',
+			] );
+
+			expect( screen.getByRole( 'listbox' ) ).toBeVisible();
+
+			await user.click( document.body );
+
+			expect( screen.getByRole( 'listbox' ) ).toBeVisible();
+		} );
+
 		it( 'matches the search text with the suggestions in a case-insensitive way', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			const suggestions = [ 'Cinnamon', 'Tawny', 'Mocha' ];
 
@@ -1000,9 +1186,7 @@ describe( 'FormTokenField', () => {
 		} );
 
 		it( 'should show, at most, a number of suggestions equals to the value of the `maxSuggestions` prop', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			const suggestions = [
 				'Ablaze',
@@ -1050,9 +1234,7 @@ describe( 'FormTokenField', () => {
 		} );
 
 		it( 'should match the search text against the unescaped values of suggestions with special characters (including spaces)', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			render(
 				<FormTokenFieldWithState
@@ -1092,10 +1274,47 @@ describe( 'FormTokenField', () => {
 			expect( screen.queryByRole( 'listbox' ) ).not.toBeInTheDocument();
 		} );
 
+		it( 'should match suggestions with half-width and full-width characters', async () => {
+			const user = userEvent.setup();
+
+			const suggestions = [
+				// Half-width characters
+				'WordPress',
+				'Gutenberg',
+				// Full-width characters
+				'ＷｏｒｄＰｒｅｓｓ',
+				'Ｇｕｔｅｎｂｅｒｇ',
+				// Mixed characters
+				'WordＰｒｅｓｓ',
+				'Guteｎｂｅｒｇ',
+			];
+
+			render( <FormTokenFieldWithState suggestions={ suggestions } /> );
+
+			const input = screen.getByRole( 'combobox' );
+
+			// Search with half-width characters.
+			await user.type( input, 'rdp' );
+
+			expectVisibleSuggestionsToBe( screen.getByRole( 'listbox' ), [
+				'WordPress',
+				'ＷｏｒｄＰｒｅｓｓ',
+				'WordＰｒｅｓｓ',
+			] );
+
+			// Search with full-width characters.
+			await user.clear( input );
+			await user.type( input, 'ｔｅｎ' );
+
+			expectVisibleSuggestionsToBe( screen.getByRole( 'listbox' ), [
+				'Gutenberg',
+				'Ｇｕｔｅｎｂｅｒｇ',
+				'Guteｎｂｅｒｇ',
+			] );
+		} );
+
 		it( 'should re-render if suggestions change', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			const suggestions = [ 'Aluminum', 'Silver', 'Bronze' ];
 
@@ -1116,9 +1335,7 @@ describe( 'FormTokenField', () => {
 		} );
 
 		it( 'should automatically select the first matching suggestions when the `__experimentalAutoSelectFirstMatch` prop is set to `true`', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			const suggestions = [ 'Walnut', 'Hazelnut', 'Pecan' ];
 
@@ -1159,9 +1376,7 @@ describe( 'FormTokenField', () => {
 		} );
 
 		it( 'should allow to render custom suggestion items via the `__experimentalRenderItem` prop', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			const suggestions = [ 'Wood', 'Stone', 'Metal' ];
 
@@ -1192,9 +1407,7 @@ describe( 'FormTokenField', () => {
 
 	describe( 'tokens as objects', () => {
 		it( 'should accept tokens in their object format', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			const onChangeSpy = jest.fn();
 
@@ -1234,9 +1447,7 @@ describe( 'FormTokenField', () => {
 		} );
 
 		it( 'should trigger mouse callbacks if the `onMouseEnter` and/or the `onMouseLeave` properties are set on a token data object', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			const onMouseEnterSpy = jest.fn();
 			const onMouseLeaveSpy = jest.fn();
@@ -1290,21 +1501,35 @@ describe( 'FormTokenField', () => {
 			expect( screen.getByTitle( 'España' ) ).toBeVisible();
 		} );
 
-		it( 'should be still used to filter out duplicate suggestions', () => {
+		it( 'should be still used to filter out duplicate suggestions', async () => {
+			const user = userEvent.setup();
+
 			render(
 				<FormTokenFieldWithState
 					__experimentalExpandOnFocus
-					initialValue={ [ { value: 'France' }, { value: 'Spain' } ] }
+					initialValue={ [
+						{ value: 'Slovenia' },
+						{ value: 'Spain' },
+					] }
+					suggestions={ [ 'Slovenia', 'Slovakia', 'Sweden' ] }
 				/>
 			);
+
+			const input = screen.getByRole( 'combobox' );
+
+			// Typing `slov` will match both `Slovenia` and `Slovakia`.
+			await user.type( input, 'slov' );
+
+			// However, `Slovenia` is already selected.
+			expectVisibleSuggestionsToBe( screen.getByRole( 'listbox' ), [
+				'Slovakia',
+			] );
 		} );
 	} );
 
 	describe( 'saveTransform', () => {
 		it( "by default, it should trim the input's value from extra white spaces before attempting to add it as a token", async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			const onChangeSpy = jest.fn();
 
@@ -1368,9 +1593,7 @@ describe( 'FormTokenField', () => {
 		} );
 
 		it( "should allow to modify the input's value when saving it as a token", async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			const onChangeSpy = jest.fn();
 
@@ -1433,9 +1656,7 @@ describe( 'FormTokenField', () => {
 		} );
 
 		it( 'is applied to the search value when matching it against the list of suggestions', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			const onChangeSpy = jest.fn();
 
@@ -1473,9 +1694,7 @@ describe( 'FormTokenField', () => {
 
 	describe( 'displayTransform', () => {
 		it( 'should allow to modify the text rendered in the browser for each token', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			const onChangeSpy = jest.fn();
 
@@ -1531,9 +1750,7 @@ describe( 'FormTokenField', () => {
 		} );
 
 		it( "is applied to each suggestions, but doesn't influence the matching against the search value", async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			const onChangeSpy = jest.fn();
 
@@ -1583,15 +1800,7 @@ describe( 'FormTokenField', () => {
 				'a&nbsp;&nbsp;&nbsp;b',
 				'i&nbsp;&lt;3&nbsp;tags',
 				'1&amp;2&amp;3&amp;4',
-			].forEach( ( tokenHtml ) => {
-				screen.getByText( ( _, node: Element | null ) => {
-					if ( node === null ) {
-						return false;
-					}
-
-					return node.innerHTML === tokenHtml;
-				} );
-			} );
+			].forEach( ( tokenHtml ) => expectEscapedProperly( tokenHtml ) );
 		} );
 
 		it( 'should allow to pass a function that renders tokens with special characters correctly', async () => {
@@ -1613,23 +1822,13 @@ describe( 'FormTokenField', () => {
 				'a&nbsp;&nbsp;&nbsp;b',
 				'i&nbsp;&lt;3&nbsp;tags',
 				'1&amp;2&amp;3&amp;4',
-			].forEach( ( tokenHtml ) => {
-				screen.getByText( ( _, node: Element | null ) => {
-					if ( node === null ) {
-						return false;
-					}
-
-					return node.innerHTML === tokenHtml;
-				} );
-			} );
+			].forEach( ( tokenHtml ) => expectEscapedProperly( tokenHtml ) );
 		} );
 	} );
 
 	describe( 'validation', () => {
 		it( 'should add a token only if it passes the validation set via `__experimentalValidateInput`', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			const onChangeSpy = jest.fn();
 			const startsWithCapitalLetter = ( tokenText: string ) =>
@@ -1674,9 +1873,7 @@ describe( 'FormTokenField', () => {
 
 	describe( 'maxLength', () => {
 		it( 'should not allow adding new tokens beyond the value defined by the `maxLength` prop', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			const onChangeSpy = jest.fn();
 
@@ -1744,9 +1941,7 @@ describe( 'FormTokenField', () => {
 		} );
 
 		it( 'should not affect tokens that were added before the limit was imposed', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			const onChangeSpy = jest.fn();
 
@@ -1789,9 +1984,7 @@ describe( 'FormTokenField', () => {
 
 	describe( 'disabled', () => {
 		it( 'should not allow adding tokens when the `disabled` prop is `true`', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			const onChangeSpy = jest.fn();
 
@@ -1819,9 +2012,7 @@ describe( 'FormTokenField', () => {
 		} );
 
 		it( 'should not allow removing tokens when the `disable` prop is `true`', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			const onChangeSpy = jest.fn();
 
@@ -1867,9 +2058,7 @@ describe( 'FormTokenField', () => {
 		};
 
 		it( 'should announce to assistive technology the addition of a new token', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			render( <FormTokenFieldWithState /> );
 
@@ -1885,9 +2074,7 @@ describe( 'FormTokenField', () => {
 		} );
 
 		it( 'should announce to assistive technology the addition of a new token with a custom message', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			render( <FormTokenFieldWithState messages={ customMessages } /> );
 
@@ -1903,9 +2090,7 @@ describe( 'FormTokenField', () => {
 		} );
 
 		it( 'should announce to assistive technology the removal of a token', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			render( <FormTokenFieldWithState initialValue={ [ 'horse' ] } /> );
 
@@ -1920,9 +2105,7 @@ describe( 'FormTokenField', () => {
 		} );
 
 		it( 'should announce to assistive technology the removal of a token with a custom message', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			render(
 				<FormTokenFieldWithState
@@ -1942,9 +2125,7 @@ describe( 'FormTokenField', () => {
 		} );
 
 		it( 'should announce to assistive technology the failure of a potential token to pass validation', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			render(
 				<FormTokenFieldWithState
@@ -1964,9 +2145,7 @@ describe( 'FormTokenField', () => {
 		} );
 
 		it( 'should announce to assistive technology the failure of a potential token to pass validation with a custom message', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			render(
 				<FormTokenFieldWithState
@@ -1987,9 +2166,7 @@ describe( 'FormTokenField', () => {
 		} );
 
 		it( 'should announce to assistive technology the result of the matching of the search text against the list of suggestions', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			render(
 				<FormTokenFieldWithState
@@ -2051,9 +2228,7 @@ describe( 'FormTokenField', () => {
 	// but I wasn't sure if there was a better way.
 	describe( 'aria attributes', () => {
 		it( 'should add the correct aria attributes to the input as the user interacts with it', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			const suggestions = [ 'Pine', 'Pistachio', 'Sage' ];
 

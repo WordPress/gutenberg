@@ -21,7 +21,7 @@ interface QuerySelectResponse< Data > {
 	/** the requested selector return value */
 	data: Data;
 
-	/** is the record still being resolved? Via the `getIsResolving` meta-selector */
+	/** is the record still being resolved? Via the `isResolving` meta-selector */
 	isResolving: boolean;
 
 	/** was the resolution started? Via the `hasStartedResolution` meta-selector */
@@ -108,31 +108,36 @@ const enrichSelectors = memoize( ( ( selectors ) => {
 			get:
 				() =>
 				( ...args: unknown[] ) => {
-					const { getIsResolving, hasFinishedResolution } = selectors;
-					const isResolving = !! getIsResolving( selectorName, args );
-					const hasResolved =
-						! isResolving &&
-						hasFinishedResolution( selectorName, args );
 					const data = selectors[ selectorName ]( ...args );
+					const resolutionStatus = selectors.getResolutionState(
+						selectorName,
+						args
+					)?.status;
 
 					let status;
-					if ( isResolving ) {
-						status = Status.Resolving;
-					} else if ( hasResolved ) {
-						if ( data ) {
+					switch ( resolutionStatus ) {
+						case 'resolving':
+							status = Status.Resolving;
+							break;
+						case 'finished':
 							status = Status.Success;
-						} else {
+							break;
+						case 'error':
 							status = Status.Error;
-						}
-					} else {
-						status = Status.Idle;
+							break;
+						case undefined:
+							status = Status.Idle;
+							break;
 					}
 
 					return {
 						data,
 						status,
-						isResolving,
-						hasResolved,
+						isResolving: status === Status.Resolving,
+						hasStarted: status !== Status.Idle,
+						hasResolved:
+							status === Status.Success ||
+							status === Status.Error,
 					};
 				},
 		} );

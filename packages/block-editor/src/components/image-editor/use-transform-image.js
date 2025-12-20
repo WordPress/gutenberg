@@ -3,48 +3,70 @@
  */
 import { useCallback, useEffect, useMemo, useState } from '@wordpress/element';
 import { applyFilters } from '@wordpress/hooks';
+import { useImageCropper } from '@wordpress/image-cropper';
 
-function useTransformState( { url, naturalWidth, naturalHeight } ) {
+export default function useTransformImage( {
+	url,
+	naturalWidth,
+	naturalHeight,
+} ) {
 	const [ editedUrl, setEditedUrl ] = useState();
-	const [ crop, setCrop ] = useState();
-	const [ position, setPosition ] = useState( { x: 0, y: 0 } );
-	const [ zoom, setZoom ] = useState();
-	const [ rotation, setRotation ] = useState();
-	const [ aspect, setAspect ] = useState();
-	const [ defaultAspect, setDefaultAspect ] = useState();
+	const { cropperState, setCropperState } = useImageCropper();
+	const { zoom, aspectRatio, crop, croppedArea } = cropperState;
 
-	const initializeTransformValues = useCallback( () => {
-		setPosition( { x: 0, y: 0 } );
-		setZoom( 100 );
-		setRotation( 0 );
-		setAspect( naturalWidth / naturalHeight );
-		setDefaultAspect( naturalWidth / naturalHeight );
-	}, [
-		naturalWidth,
-		naturalHeight,
-		setPosition,
-		setZoom,
-		setRotation,
-		setAspect,
-		setDefaultAspect,
-	] );
+	const setZoom = useCallback(
+		( newZoom ) => {
+			setCropperState( { zoom: newZoom } );
+		},
+		[ setCropperState ]
+	);
 
+	const setAspectRatio = useCallback(
+		( newAspect ) => {
+			setCropperState( { aspectRatio: newAspect } );
+		},
+		[ setCropperState ]
+	);
+
+	const defaultAspect = naturalWidth / naturalHeight;
+	const rotatedAspect = naturalHeight / naturalWidth;
+
+	// Initialize aspect ratio on mount or when defaultAspect changes
+	useEffect( () => {
+		setAspectRatio( defaultAspect );
+	}, [] ); // eslint-disable-line react-hooks/exhaustive-deps
+
+	/**
+	 * rotateClockwise rotates the image by 90° clockwise by drawing the original image onto a canvas with rotation applied,
+	 * then saves it as a new blob URL (editedUrl).
+	 * This creates a new rotated image file, bypassing the image-cropper’s CSS transform rotation.
+	 * It's a bespoke solution to ensure that the rotated image fills the content width.
+	 */
+	const [ internalRotation, setInternalRotation ] = useState( 0 );
 	const rotateClockwise = useCallback( () => {
-		const angle = ( rotation + 90 ) % 360;
+		const angle = ( internalRotation + 90 ) % 360;
 
-		let naturalAspectRatio = naturalWidth / naturalHeight;
+		let naturalAspectRatio = defaultAspect;
+		const isDefaultAspect =
+			defaultAspect === aspectRatio || rotatedAspect === aspectRatio;
+		const shouldResetAspect = zoom !== 1 || ! isDefaultAspect;
 
-		if ( rotation % 180 === 90 ) {
-			naturalAspectRatio = naturalHeight / naturalWidth;
+		if ( internalRotation % 180 === 90 ) {
+			naturalAspectRatio = 1 / defaultAspect;
 		}
 
 		if ( angle === 0 ) {
 			setEditedUrl();
-			setRotation( angle );
-			setAspect( naturalWidth / naturalHeight );
-			setPosition( {
-				x: -( position.y * naturalAspectRatio ),
-				y: position.x * naturalAspectRatio,
+			setInternalRotation( angle );
+			const newAspectRatio = shouldResetAspect
+				? aspectRatio
+				: defaultAspect;
+			setCropperState( {
+				aspectRatio: newAspectRatio,
+				crop: {
+					x: -( crop.y * naturalAspectRatio ),
+					y: crop.x * naturalAspectRatio,
+				},
 			} );
 			return;
 		}
@@ -79,11 +101,16 @@ function useTransformState( { url, naturalWidth, naturalHeight } ) {
 
 			canvas.toBlob( ( blob ) => {
 				setEditedUrl( URL.createObjectURL( blob ) );
-				setRotation( angle );
-				setAspect( canvas.width / canvas.height );
-				setPosition( {
-					x: -( position.y * naturalAspectRatio ),
-					y: position.x * naturalAspectRatio,
+				setInternalRotation( angle );
+				const newAspectRatio = shouldResetAspect
+					? aspectRatio
+					: canvas.width / canvas.height;
+				setCropperState( {
+					aspectRatio: newAspectRatio,
+					crop: {
+						x: -( crop.y * naturalAspectRatio ),
+						y: crop.x * naturalAspectRatio,
+					},
 				} );
 			} );
 		}
@@ -101,62 +128,40 @@ function useTransformState( { url, naturalWidth, naturalHeight } ) {
 			el.crossOrigin = imgCrossOrigin;
 		}
 	}, [
-		rotation,
-		naturalWidth,
-		naturalHeight,
-		setEditedUrl,
-		setRotation,
-		setAspect,
-		setPosition,
+		internalRotation,
+		defaultAspect,
+		url,
+		setCropperState,
+		crop,
+		zoom,
+		aspectRatio,
+		rotatedAspect,
+		setInternalRotation,
 	] );
 
 	return useMemo(
 		() => ( {
 			editedUrl,
 			setEditedUrl,
-			crop,
-			setCrop,
-			position,
-			setPosition,
+			crop: croppedArea,
 			zoom,
 			setZoom,
-			rotation,
-			setRotation,
+			rotation: internalRotation,
 			rotateClockwise,
-			aspect,
-			setAspect,
+			aspect: aspectRatio,
+			setAspect: setAspectRatio,
 			defaultAspect,
-			initializeTransformValues,
 		} ),
 		[
 			editedUrl,
-			setEditedUrl,
-			crop,
-			setCrop,
-			position,
-			setPosition,
+			croppedArea,
 			zoom,
 			setZoom,
-			rotation,
-			setRotation,
+			internalRotation,
 			rotateClockwise,
-			aspect,
-			setAspect,
+			aspectRatio,
+			setAspectRatio,
 			defaultAspect,
-			initializeTransformValues,
 		]
 	);
-}
-
-export default function useTransformImage( imageProperties, isEditing ) {
-	const transformState = useTransformState( imageProperties );
-	const { initializeTransformValues } = transformState;
-
-	useEffect( () => {
-		if ( isEditing ) {
-			initializeTransformValues();
-		}
-	}, [ isEditing, initializeTransformValues ] );
-
-	return transformState;
 }

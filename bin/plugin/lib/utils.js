@@ -2,7 +2,7 @@
  * External dependencies
  */
 // @ts-ignore
-const inquirer = require( 'inquirer' );
+const { confirm } = require( '@inquirer/prompts' );
 const fs = require( 'fs' );
 const childProcess = require( 'child_process' );
 const { v4: uuid } = require( 'uuid' );
@@ -33,11 +33,13 @@ function runShellScript( script, cwd, env = {} ) {
 					NO_CHECKS: 'true',
 					PATH: process.env.PATH,
 					HOME: process.env.HOME,
+					USER: process.env.USER,
 					...env,
 				},
 			},
-			function ( error, _, stderr ) {
+			function ( error, stdout, stderr ) {
 				if ( error ) {
+					console.log( stdout ); // Sometimes the error message is thrown via stdout.
 					console.log( stderr );
 					reject( error );
 				} else {
@@ -95,14 +97,19 @@ async function askForConfirmation(
 	isDefault = true,
 	abortMessage = 'Aborting.'
 ) {
-	const { isReady } = await inquirer.prompt( [
-		{
-			type: 'confirm',
-			name: 'isReady',
+	let isReady = false;
+	try {
+		isReady = await confirm( {
 			default: isDefault,
 			message,
-		},
-	] );
+		} );
+	} catch ( error ) {
+		if ( error instanceof Error && error.name === 'ExitPromptError' ) {
+			console.log( 'Cancelled.' );
+			process.exit( 1 );
+		}
+		throw error;
+	}
 
 	if ( ! isReady ) {
 		log( formats.error( '\n' + abortMessage ) );
@@ -119,10 +126,30 @@ function getRandomTemporaryPath() {
 	return path.join( os.tmpdir(), uuid() );
 }
 
+/**
+ * Scans the given directory and returns an array of file paths.
+ *
+ * @param {string} dir The path to the directory to scan.
+ *
+ * @return {string[]} An array of file paths.
+ */
+function getFilesFromDir( dir ) {
+	if ( ! fs.existsSync( dir ) ) {
+		console.log( 'Directory does not exist: ', dir );
+		return [];
+	}
+
+	return fs
+		.readdirSync( dir, { withFileTypes: true } )
+		.filter( ( dirent ) => dirent.isFile() )
+		.map( ( dirent ) => path.join( dir, dirent.name ) );
+}
+
 module.exports = {
 	askForConfirmation,
 	runStep,
 	readJSONFile,
 	runShellScript,
 	getRandomTemporaryPath,
+	getFilesFromDir,
 };

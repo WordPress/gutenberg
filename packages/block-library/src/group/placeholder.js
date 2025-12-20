@@ -20,40 +20,41 @@ const getGroupPlaceholderIcons = ( name = 'group' ) => {
 		group: (
 			<SVG
 				xmlns="http://www.w3.org/2000/svg"
-				width="44"
-				height="32"
-				viewBox="0 0 44 32"
+				width="48"
+				height="48"
+				viewBox="0 0 48 48"
 			>
-				<Path
-					d="M42 0H2C.9 0 0 .9 0 2v28c0 1.1.9 2 2 2h40c1.1 0 2-.9 2-2V2c0-1.1-.9-2-2-2z"
-					// style="fill:#ccc"
-				/>
+				<Path d="M0 10a2 2 0 0 1 2-2h44a2 2 0 0 1 2 2v28a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V10Z" />
 			</SVG>
 		),
 		'group-row': (
 			<SVG
 				xmlns="http://www.w3.org/2000/svg"
-				width="44"
-				height="32"
-				viewBox="0 0 44 32"
+				width="48"
+				height="48"
+				viewBox="0 0 48 48"
 			>
-				<Path
-					d="M42 0H23.5c-.6 0-1 .4-1 1v30c0 .6.4 1 1 1H42c1.1 0 2-.9 2-2V2c0-1.1-.9-2-2-2zM20.5 0H2C.9 0 0 .9 0 2v28c0 1.1.9 2 2 2h18.5c.6 0 1-.4 1-1V1c0-.6-.4-1-1-1z"
-					// style="fill:#ccc"
-				/>
+				<Path d="M0 10a2 2 0 0 1 2-2h19a2 2 0 0 1 2 2v28a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V10Zm25 0a2 2 0 0 1 2-2h19a2 2 0 0 1 2 2v28a2 2 0 0 1-2 2H27a2 2 0 0 1-2-2V10Z" />
 			</SVG>
 		),
 		'group-stack': (
 			<SVG
 				xmlns="http://www.w3.org/2000/svg"
-				width="44"
-				height="32"
-				viewBox="0 0 44 32"
+				width="48"
+				height="48"
+				viewBox="0 0 48 48"
 			>
-				<Path
-					d="M42 0H2C.9 0 0 .9 0 2v12.5c0 .6.4 1 1 1h42c.6 0 1-.4 1-1V2c0-1.1-.9-2-2-2zm1 16.5H1c-.6 0-1 .4-1 1V30c0 1.1.9 2 2 2h40c1.1 0 2-.9 2-2V17.5c0-.6-.4-1-1-1z"
-					// style="fill:#ccc"
-				/>
+				<Path d="M0 10a2 2 0 0 1 2-2h44a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V10Zm0 17a2 2 0 0 1 2-2h44a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V27Z" />
+			</SVG>
+		),
+		'group-grid': (
+			<SVG
+				xmlns="http://www.w3.org/2000/svg"
+				width="48"
+				height="48"
+				viewBox="0 0 48 48"
+			>
+				<Path d="M0 10a2 2 0 0 1 2-2h19a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V10Zm25 0a2 2 0 0 1 2-2h19a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H27a2 2 0 0 1-2-2V10ZM0 27a2 2 0 0 1 2-2h19a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V27Zm25 0a2 2 0 0 1 2-2h19a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H27a2 2 0 0 1-2-2V27Z" />
 			</SVG>
 		),
 	};
@@ -94,7 +95,8 @@ export function useShouldShowPlaceHolder( {
 			! fontSize &&
 			! textColor &&
 			! style &&
-			usedLayoutType !== 'flex'
+			usedLayoutType !== 'flex' &&
+			usedLayoutType !== 'grid'
 	);
 
 	useEffect( () => {
@@ -130,22 +132,19 @@ export function useShouldShowPlaceHolder( {
  * @return {JSX.Element}                The placeholder.
  */
 function GroupPlaceHolder( { name, onSelect } ) {
-	const { defaultVariation, variations } = useSelect(
-		( select ) => {
-			const { getBlockVariations, getDefaultBlockVariation } =
-				select( blocksStore );
-			return {
-				defaultVariation: getDefaultBlockVariation( name, 'block' ),
-				variations: getBlockVariations( name, 'block' ) || [],
-			};
-		},
+	const variations = useSelect(
+		( select ) => select( blocksStore ).getBlockVariations( name, 'block' ),
 		[ name ]
 	);
 	const blockProps = useBlockProps( {
 		className: 'wp-block-group__placeholder',
 	} );
-	const selectVariation = ( nextVariation = defaultVariation ) =>
-		onSelect( nextVariation );
+
+	useEffect( () => {
+		if ( variations && variations.length === 1 ) {
+			onSelect( variations[ 0 ] );
+		}
+	}, [ onSelect, variations ] );
 
 	return (
 		<div { ...blockProps }>
@@ -166,12 +165,13 @@ function GroupPlaceHolder( { name, onSelect } ) {
 					{ variations.map( ( variation ) => (
 						<li key={ variation.name }>
 							<Button
+								__next40pxDefaultSize
 								variant="tertiary"
 								icon={ getGroupPlaceholderIcons(
 									variation.name
 								) }
-								iconSize={ 44 }
-								onClick={ () => selectVariation( variation ) }
+								iconSize={ 48 }
+								onClick={ () => onSelect( variation ) }
 								className="wp-block-group-placeholder__variation-button"
 								label={ `${ variation.title }: ${ variation.description }` }
 							/>

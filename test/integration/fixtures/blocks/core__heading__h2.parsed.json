@@ -3,9 +3,9 @@
 		"blockName": "core/heading",
 		"attrs": {},
 		"innerBlocks": [],
-		"innerHTML": "\n<h2>A picture is worth a thousand words, or so the saying goes</h2>\n",
+		"innerHTML": "\n<h2 class=\"wp-block-heading\">A picture is worth a thousand words, or so the saying goes</h2>\n",
 		"innerContent": [
-			"\n<h2>A picture is worth a thousand words, or so the saying goes</h2>\n"
+			"\n<h2 class=\"wp-block-heading\">A picture is worth a thousand words, or so the saying goes</h2>\n"
 		]
 	}
 ]

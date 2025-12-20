@@ -12,10 +12,7 @@ type DomRectWithOwnerDocument = DOMRect & {
 	ownerDocument?: Document;
 };
 
-export type AnimatedWrapperProps = {
-	placement: Placement;
-	shouldAnimate?: boolean;
-};
+type PopoverPlacement = Placement | 'overlay';
 
 export type PopoverAnchorRefReference = MutableRefObject<
 	Element | null | undefined
@@ -69,6 +66,15 @@ export type PopoverProps = {
 	 */
 	flip?: boolean;
 	/**
+	 * Determines whether tabbing is constrained to within the popover,
+	 * preventing keyboard focus from leaving the popover content without
+	 * explicit focus elswhere, or whether the popover remains part of the wider
+	 * tab order. If no value is passed, it will be derived from `focusOnMount`.
+	 *
+	 * @default `focusOnMount` !== false
+	 */
+	constrainTabbing?: boolean;
+	/**
 	 * By default, the _first tabbable element_ in the popover will receive focus
 	 * when it mounts. This is the same as setting this prop to `"firstElement"`.
 	 * Specifying a `false` value disables the focus handling entirely (this
@@ -111,7 +117,7 @@ export type PopoverProps = {
 	 *
 	 * @default 'bottom-start'
 	 */
-	placement?: Placement;
+	placement?: PopoverPlacement;
 	/**
 	 * Legacy way to specify the popover's position with respect to its anchor.
 	 * _Note: this prop is deprecated. Use the `placement` prop instead._
@@ -123,6 +129,8 @@ export type PopoverProps = {
 	/**
 	 * Adjusts the size of the popover to prevent its contents from going out of
 	 * view when meeting the viewport edges.
+	 * _Note: The `resize` and `shift` props are not intended to be used together.
+	 * Enabling both can cause unexpected behavior._
 	 *
 	 * @default true
 	 */
@@ -130,6 +138,8 @@ export type PopoverProps = {
 	/**
 	 * Enables the `Popover` to shift in order to stay in view when meeting the
 	 * viewport edges.
+	 * _Note: The `resize` and `shift` props are not intended to be used together.
+	 * Enabling both can cause unexpected behavior._
 	 *
 	 * @default false
 	 */
@@ -148,6 +158,12 @@ export type PopoverProps = {
 	 * @default undefined
 	 */
 	variant?: 'unstyled' | 'toolbar';
+	/**
+	 * Whether to render the popover inline or within the slot.
+	 *
+	 * @default false
+	 */
+	inline?: boolean;
 	// Deprecated props
 	/**
 	 * Prevent the popover from flipping and resizing when meeting the viewport
@@ -193,4 +209,14 @@ export type PopoverProps = {
 	 * @deprecated
 	 */
 	isAlternate?: boolean;
+};
+
+export type PopoverSlotProps = {
+	/**
+	 * The name of the Slot in which the popover should be rendered. It should
+	 * be also passed to the corresponding `PopoverSlot` component.
+	 *
+	 * @default 'Popover'
+	 */
+	name?: string;
 };

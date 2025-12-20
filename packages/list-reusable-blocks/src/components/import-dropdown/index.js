@@ -13,10 +13,12 @@ import ImportForm from '../import-form';
 function ImportDropdown( { onUpload } ) {
 	return (
 		<Dropdown
-			position="bottom right"
+			popoverProps={ { placement: 'bottom-start' } }
 			contentClassName="list-reusable-blocks-import-dropdown__content"
 			renderToggle={ ( { isOpen, onToggle } ) => (
 				<Button
+					size="compact"
+					className="list-reusable-blocks-import-dropdown__button"
 					aria-expanded={ isOpen }
 					onClick={ onToggle }
 					variant="primary"

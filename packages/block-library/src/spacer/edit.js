@@ -1,21 +1,32 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
  */
-import { useBlockProps } from '@wordpress/block-editor';
+import {
+	useBlockProps,
+	getCustomValueFromPreset,
+	getSpacingPresetCssVar,
+	store as blockEditorStore,
+	privateApis as blockEditorPrivateApis,
+	useBlockEditingMode,
+} from '@wordpress/block-editor';
 import { ResizableBox } from '@wordpress/components';
 import { useState, useEffect } from '@wordpress/element';
 import { View } from '@wordpress/primitives';
+import { useSelect, useDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
+import { unlock } from '../lock-unlock';
 import SpacerControls from './controls';
 import { MIN_SPACER_SIZE } from './constants';
+
+const { useSpacingSizes } = unlock( blockEditorPrivateApis );
 
 const ResizableSpacer = ( {
 	orientation,
@@ -39,7 +50,7 @@ const ResizableSpacer = ( {
 
 	return (
 		<ResizableBox
-			className={ classnames( 'block-library-spacer__resize-container', {
+			className={ clsx( 'block-library-spacer__resize-container', {
 				'resize-horizontal': orientation === 'horizontal',
 				'is-resizing': isResizing,
 				'is-selected': isSelected,
@@ -60,7 +71,7 @@ const ResizableSpacer = ( {
 				onResizeStop( `${ nextVal }px` );
 				setIsResizing( false );
 			} }
-			__experimentalShowTooltip={ true }
+			__experimentalShowTooltip
 			__experimentalTooltipProps={ {
 				axis: orientation === 'horizontal' ? 'x' : 'y',
 				position: 'corner',
@@ -78,9 +89,34 @@ const SpacerEdit = ( {
 	setAttributes,
 	toggleSelection,
 	context,
+	__unstableParentLayout: parentLayout,
+	className,
 } ) => {
+	const disableCustomSpacingSizes = useSelect( ( select ) => {
+		const editorSettings = select( blockEditorStore ).getSettings();
+		return editorSettings?.disableCustomSpacingSizes;
+	} );
 	const { orientation } = context;
-	const { height, width } = attributes;
+	const {
+		orientation: parentOrientation,
+		type,
+		default: { type: defaultType } = {},
+	} = parentLayout || {};
+	// Check if the spacer is inside a flex container.
+	const isFlexLayout =
+		type === 'flex' || ( ! type && defaultType === 'flex' );
+	// If the spacer is inside a flex container, it should either inherit the orientation
+	// of the parent or use the flex default orientation.
+	const inheritedOrientation =
+		! parentOrientation && isFlexLayout
+			? 'horizontal'
+			: parentOrientation || orientation;
+	const { height, width, style: blockStyle = {} } = attributes;
+
+	const { layout = {} } = blockStyle;
+	const { selfStretch, flexSize } = layout;
+
+	const spacingSizes = useSpacingSizes();
 
 	const [ isResizing, setIsResizing ] = useState( false );
 	const [ temporaryHeight, setTemporaryHeight ] = useState( null );
@@ -89,8 +125,24 @@ const SpacerEdit = ( {
 	const onResizeStart = () => toggleSelection( false );
 	const onResizeStop = () => toggleSelection( true );
 
+	const { __unstableMarkNextChangeAsNotPersistent } =
+		useDispatch( blockEditorStore );
+
 	const handleOnVerticalResizeStop = ( newHeight ) => {
 		onResizeStop();
+
+		if ( isFlexLayout ) {
+			setAttributes( {
+				style: {
+					...blockStyle,
+					layout: {
+						...layout,
+						flexSize: newHeight,
+						selfStretch: 'fixed',
+					},
+				},
+			} );
+		}
 
 		setAttributes( { height: newHeight } );
 		setTemporaryHeight( null );
@@ -98,19 +150,61 @@ const SpacerEdit = ( {
 
 	const handleOnHorizontalResizeStop = ( newWidth ) => {
 		onResizeStop();
+
+		if ( isFlexLayout ) {
+			setAttributes( {
+				style: {
+					...blockStyle,
+					layout: {
+						...layout,
+						flexSize: newWidth,
+						selfStretch: 'fixed',
+					},
+				},
+			} );
+		}
+
 		setAttributes( { width: newWidth } );
 		setTemporaryWidth( null );
 	};
 
+	const getHeightForVerticalBlocks = () => {
+		if ( isFlexLayout ) {
+			return undefined;
+		}
+		return temporaryHeight || getSpacingPresetCssVar( height ) || undefined;
+	};
+
+	const getWidthForHorizontalBlocks = () => {
+		if ( isFlexLayout ) {
+			return undefined;
+		}
+		return temporaryWidth || getSpacingPresetCssVar( width ) || undefined;
+	};
+
+	const sizeConditionalOnOrientation =
+		inheritedOrientation === 'horizontal'
+			? temporaryWidth || flexSize
+			: temporaryHeight || flexSize;
+
 	const style = {
 		height:
-			orientation === 'horizontal'
+			inheritedOrientation === 'horizontal'
 				? 24
-				: temporaryHeight || height || undefined,
+				: getHeightForVerticalBlocks(),
 		width:
-			orientation === 'horizontal'
-				? temporaryWidth || width || undefined
+			inheritedOrientation === 'horizontal'
+				? getWidthForHorizontalBlocks()
 				: undefined,
+		// In vertical flex containers, the spacer shrinks to nothing without a minimum width.
+		minWidth:
+			inheritedOrientation === 'vertical' && isFlexLayout
+				? 48
+				: undefined,
+		// Add flex-basis so temporary sizes are respected.
+		flexBasis: isFlexLayout ? sizeConditionalOnOrientation : undefined,
+		// Remove flex-grow when resizing.
+		flexGrow: isFlexLayout && isResizing ? 0 : undefined,
 	};
 
 	const resizableBoxWithOrientation = ( blockOrientation ) => {
@@ -166,26 +260,117 @@ const SpacerEdit = ( {
 	};
 
 	useEffect( () => {
-		if ( orientation === 'horizontal' && ! width ) {
-			setAttributes( {
-				height: '0px',
-				width: '72px',
+		// To avoid interfering with undo/redo operations any changes in this
+		// effect must not make history and should be preceded by
+		// `__unstableMarkNextChangeAsNotPersistent()`.
+		const setAttributesCovertly = ( nextAttributes ) => {
+			__unstableMarkNextChangeAsNotPersistent();
+			setAttributes( nextAttributes );
+		};
+
+		if (
+			isFlexLayout &&
+			selfStretch !== 'fill' &&
+			selfStretch !== 'fit' &&
+			flexSize === undefined
+		) {
+			if ( inheritedOrientation === 'horizontal' ) {
+				// If spacer is moving from a vertical container to a horizontal container,
+				// it might not have width but have height instead.
+				const newSize =
+					getCustomValueFromPreset( width, spacingSizes ) ||
+					getCustomValueFromPreset( height, spacingSizes ) ||
+					'100px';
+				setAttributesCovertly( {
+					width: '0px',
+					style: {
+						...blockStyle,
+						layout: {
+							...layout,
+							flexSize: newSize,
+							selfStretch: 'fixed',
+						},
+					},
+				} );
+			} else {
+				const newSize =
+					getCustomValueFromPreset( height, spacingSizes ) ||
+					getCustomValueFromPreset( width, spacingSizes ) ||
+					'100px';
+				setAttributesCovertly( {
+					height: '0px',
+					style: {
+						...blockStyle,
+						layout: {
+							...layout,
+							flexSize: newSize,
+							selfStretch: 'fixed',
+						},
+					},
+				} );
+			}
+		} else if (
+			isFlexLayout &&
+			( selfStretch === 'fill' || selfStretch === 'fit' )
+		) {
+			setAttributesCovertly(
+				inheritedOrientation === 'horizontal'
+					? { width: undefined }
+					: { height: undefined }
+			);
+		} else if ( ! isFlexLayout && ( selfStretch || flexSize ) ) {
+			setAttributesCovertly( {
+				...( inheritedOrientation === 'horizontal'
+					? { width: flexSize }
+					: { height: flexSize } ),
+				style: {
+					...blockStyle,
+					layout: {
+						...layout,
+						flexSize: undefined,
+						selfStretch: undefined,
+					},
+				},
 			} );
 		}
-	}, [] );
+	}, [
+		blockStyle,
+		flexSize,
+		height,
+		inheritedOrientation,
+		isFlexLayout,
+		layout,
+		selfStretch,
+		setAttributes,
+		spacingSizes,
+		width,
+		__unstableMarkNextChangeAsNotPersistent,
+	] );
+
+	const blockEditingMode = useBlockEditingMode();
 
 	return (
 		<>
-			<View { ...useBlockProps( { style } ) }>
-				{ resizableBoxWithOrientation( orientation ) }
+			<View
+				{ ...useBlockProps( {
+					style,
+					className: clsx( className, {
+						'custom-sizes-disabled': disableCustomSpacingSizes,
+					} ),
+				} ) }
+			>
+				{ blockEditingMode === 'default' &&
+					resizableBoxWithOrientation( inheritedOrientation ) }
 			</View>
-			<SpacerControls
-				setAttributes={ setAttributes }
-				height={ temporaryHeight || height }
-				width={ temporaryWidth || width }
-				orientation={ orientation }
-				isResizing={ isResizing }
-			/>
+			{ ! isFlexLayout && (
+				<SpacerControls
+					setAttributes={ setAttributes }
+					height={ temporaryHeight || height }
+					width={ temporaryWidth || width }
+					orientation={ inheritedOrientation }
+					isResizing={ isResizing }
+				/>
+			) }
 		</>
 	);
 };

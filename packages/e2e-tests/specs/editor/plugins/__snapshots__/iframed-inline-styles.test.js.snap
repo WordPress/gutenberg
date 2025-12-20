@@ -1,7 +1,0 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
-
-exports[`iframed inline styles should load inline styles in iframe 1`] = `
-"<!-- wp:test/iframed-inline-styles -->
-<div class=\\"wp-block-test-iframed-inline-styles\\">Save</div>
-<!-- /wp:test/iframed-inline-styles -->"
-`;

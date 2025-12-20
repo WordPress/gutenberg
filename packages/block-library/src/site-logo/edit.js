@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -11,12 +11,9 @@ import {
 	createInterpolateElement,
 	useEffect,
 	useState,
-	useRef,
 } from '@wordpress/element';
 import { __, isRTL } from '@wordpress/i18n';
 import {
-	MenuItem,
-	PanelBody,
 	RangeControl,
 	ResizableBox,
 	Spinner,
@@ -24,6 +21,13 @@ import {
 	ToolbarButton,
 	Placeholder,
 	Button,
+	DropZone,
+	FlexItem,
+	__experimentalToolsPanel as ToolsPanel,
+	__experimentalToolsPanelItem as ToolsPanelItem,
+	__experimentalItemGroup as ItemGroup,
+	__experimentalHStack as HStack,
+	__experimentalTruncate as Truncate,
 } from '@wordpress/components';
 import { useViewportMatch } from '@wordpress/compose';
 import {
@@ -34,7 +38,7 @@ import {
 	useBlockProps,
 	store as blockEditorStore,
 	__experimentalImageEditor as ImageEditor,
-	__experimentalImageEditingProvider as ImageEditingProvider,
+	useBlockEditingMode,
 } from '@wordpress/block-editor';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
@@ -44,12 +48,8 @@ import { store as noticesStore } from '@wordpress/notices';
 /**
  * Internal dependencies
  */
-import useClientWidth from '../image/use-client-width';
-
-/**
- * Module constants
- */
 import { MIN_SIZE } from '../image/constants';
+import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
 const ACCEPT_MEDIA_STRING = 'image/*';
@@ -57,7 +57,6 @@ const ACCEPT_MEDIA_STRING = 'image/*';
 const SiteLogo = ( {
 	alt,
 	attributes: { align, width, height, isLink, linkTarget, shouldSyncIcon },
-	containerRef,
 	isSelected,
 	setAttributes,
 	setLogo,
@@ -68,29 +67,28 @@ const SiteLogo = ( {
 	setIcon,
 	canUserEdit,
 } ) => {
-	const clientWidth = useClientWidth( containerRef, [ align ] );
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const isWideAligned = [ 'wide', 'full' ].includes( align );
 	const isResizable = ! isWideAligned && isLargeViewport;
 	const [ { naturalWidth, naturalHeight }, setNaturalSize ] = useState( {} );
 	const [ isEditingImage, setIsEditingImage ] = useState( false );
 	const { toggleSelection } = useDispatch( blockEditorStore );
-	const classes = classnames( 'custom-logo-link', {
-		'is-transient': isBlobURL( logoUrl ),
-	} );
+	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
+
+	// Check if we're in contentOnly mode
+	const blockEditingMode = useBlockEditingMode();
+	const isContentOnlyMode = blockEditingMode === 'contentOnly';
+
 	const { imageEditing, maxWidth, title } = useSelect( ( select ) => {
-		const { getSettings } = select( blockEditorStore );
+		const settings = select( blockEditorStore ).getSettings();
 		const siteEntities = select( coreStore ).getEntityRecord(
 			'root',
 			'__unstableBase'
 		);
 		return {
 			title: siteEntities?.name,
-			...Object.fromEntries(
-				Object.entries( getSettings() ).filter( ( [ key ] ) =>
-					[ 'imageEditing', 'maxWidth' ].includes( key )
-				)
-			),
+			imageEditing: settings.imageEditing,
+			maxWidth: settings.maxWidth,
 		};
 	}, [] );
 
@@ -118,50 +116,38 @@ const SiteLogo = ( {
 	}
 
 	const img = (
-		<img
-			className="custom-logo"
-			src={ logoUrl }
-			alt={ alt }
-			onLoad={ ( event ) => {
-				setNaturalSize(
-					Object.fromEntries(
-						Object.entries( event.target ).filter( ( [ key ] ) =>
-							[ 'naturalWidth', 'naturalHeight' ].includes( key )
-						)
-					)
-				);
-			} }
-		/>
+		<>
+			<img
+				className="custom-logo"
+				src={ logoUrl }
+				alt={ alt }
+				onLoad={ ( event ) => {
+					setNaturalSize( {
+						naturalWidth: event.target.naturalWidth,
+						naturalHeight: event.target.naturalHeight,
+					} );
+				} }
+			/>
+			{ isBlobURL( logoUrl ) && <Spinner /> }
+		</>
 	);
 
 	let imgWrapper = img;
-
-	// Disable reason: Image itself is not meant to be interactive, but
-	// should direct focus to block.
 	if ( isLink ) {
 		imgWrapper = (
-			/* eslint-disable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/click-events-have-key-events */
 			<a
 				href={ siteUrl }
-				className={ classes }
+				className="custom-logo-link"
 				rel="home"
 				title={ title }
 				onClick={ ( event ) => event.preventDefault() }
 			>
 				{ img }
 			</a>
-			/* eslint-enable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/click-events-have-key-events */
 		);
 	}
 
-	let imageWidthWithinContainer;
-
-	if ( clientWidth && naturalWidth && naturalHeight ) {
-		const exceedMaxWidth = naturalWidth > clientWidth;
-		imageWidthWithinContainer = exceedMaxWidth ? clientWidth : naturalWidth;
-	}
-
-	if ( ! isResizable || ! imageWidthWithinContainer ) {
+	if ( ! isResizable || ! naturalWidth || ! naturalHeight ) {
 		return <div style={ { width, height } }>{ imgWrapper }</div>;
 	}
 
@@ -220,36 +206,36 @@ const SiteLogo = ( {
 	const canEditImage =
 		logoId && naturalWidth && naturalHeight && imageEditing;
 
-	const imgEdit =
-		canEditImage && isEditingImage ? (
-			<ImageEditingProvider
+	// Hide crop and dimensions editing in write mode
+	const shouldShowCropAndDimensions = ! isContentOnlyMode;
+
+	let imgEdit;
+	if ( canEditImage && isEditingImage ) {
+		imgEdit = (
+			<ImageEditor
 				id={ logoId }
 				url={ logoUrl }
-				naturalWidth={ naturalWidth }
+				width={ currentWidth }
+				height={ currentHeight }
 				naturalHeight={ naturalHeight }
-				clientWidth={ clientWidth }
+				naturalWidth={ naturalWidth }
 				onSaveImage={ ( imageAttributes ) => {
 					setLogo( imageAttributes.id );
 				} }
-				isEditing={ isEditingImage }
-				onFinishEditing={ () => setIsEditingImage( false ) }
-			>
-				<ImageEditor
-					url={ logoUrl }
-					width={ currentWidth }
-					height={ currentHeight }
-					clientWidth={ clientWidth }
-					naturalHeight={ naturalHeight }
-					naturalWidth={ naturalWidth }
-				/>
-			</ImageEditingProvider>
-		) : (
+				onFinishEditing={ () => {
+					setIsEditingImage( false );
+				} }
+			/>
+		);
+	} else {
+		// Always render ResizableBox but disable resize functionality in contentOnly mode
+		imgEdit = (
 			<ResizableBox
 				size={ {
 					width: currentWidth,
 					height: currentHeight,
 				} }
-				showHandle={ isSelected }
+				showHandle={ isSelected && shouldShowCropAndDimensions }
 				minWidth={ minWidth }
 				maxWidth={ maxWidthBuffer }
 				minHeight={ minHeight }
@@ -273,6 +259,15 @@ const SiteLogo = ( {
 				{ imgWrapper }
 			</ResizableBox>
 		);
+	}
+
+	// Support the previous location for the Site Icon settings. To be removed
+	// when the required WP core version for Gutenberg is >= 6.5.0.
+	const shouldUseNewUrl = ! window?.__experimentalUseCustomizerSiteLogoUrl;
+
+	const siteIconSettingsUrl = shouldUseNewUrl
+		? siteUrl + '/wp-admin/options-general.php'
+		: siteUrl + '/wp-admin/customize.php?autofocus[section]=title_tagline';
 
 	const syncSiteIconHelpText = createInterpolateElement(
 		__(
@@ -282,10 +277,7 @@ const SiteLogo = ( {
 			a: (
 				// eslint-disable-next-line jsx-a11y/anchor-has-content
 				<a
-					href={
-						siteUrl +
-						'/wp-admin/customize.php?autofocus[section]=title_tagline'
-					}
+					href={ siteIconSettingsUrl }
 					target="_blank"
 					rel="noopener noreferrer"
 				/>
@@ -296,28 +288,59 @@ const SiteLogo = ( {
 	return (
 		<>
 			<InspectorControls>
-				<PanelBody title={ __( 'Settings' ) }>
-					<RangeControl
+				<ToolsPanel
+					label={ __( 'Settings' ) }
+					dropdownMenuProps={ dropdownMenuProps }
+				>
+					<ToolsPanelItem
+						isShownByDefault
+						hasValue={ () => !! width }
 						label={ __( 'Image width' ) }
-						onChange={ ( newWidth ) =>
-							setAttributes( { width: newWidth } )
+						onDeselect={ () =>
+							setAttributes( { width: undefined } )
 						}
-						min={ minWidth }
-						max={ maxWidthBuffer }
-						initialPosition={ Math.min(
-							defaultWidth,
-							maxWidthBuffer
-						) }
-						value={ width || '' }
-						disabled={ ! isResizable }
-					/>
-					<ToggleControl
+					>
+						<RangeControl
+							__next40pxDefaultSize
+							label={ __( 'Image width' ) }
+							onChange={ ( newWidth ) =>
+								setAttributes( { width: newWidth } )
+							}
+							min={ minWidth }
+							max={ maxWidthBuffer }
+							initialPosition={ Math.min(
+								defaultWidth,
+								maxWidthBuffer
+							) }
+							value={ width || '' }
+							disabled={ ! isResizable }
+						/>
+					</ToolsPanelItem>
+
+					<ToolsPanelItem
+						isShownByDefault
+						hasValue={ () => ! isLink }
 						label={ __( 'Link image to home' ) }
-						onChange={ () => setAttributes( { isLink: ! isLink } ) }
-						checked={ isLink }
-					/>
+						onDeselect={ () => setAttributes( { isLink: true } ) }
+					>
+						<ToggleControl
+							label={ __( 'Link image to home' ) }
+							onChange={ () =>
+								setAttributes( { isLink: ! isLink } )
+							}
+							checked={ isLink }
+						/>
+					</ToolsPanelItem>
+
 					{ isLink && (
-						<>
+						<ToolsPanelItem
+							isShownByDefault
+							hasValue={ () => linkTarget === '_blank' }
+							label={ __( 'Open in new tab' ) }
+							onDeselect={ () =>
+								setAttributes( { linkTarget: '_self' } )
+							}
+						>
 							<ToggleControl
 								label={ __( 'Open in new tab' ) }
 								onChange={ ( value ) =>
@@ -327,12 +350,21 @@ const SiteLogo = ( {
 								}
 								checked={ linkTarget === '_blank' }
 							/>
-						</>
+						</ToolsPanelItem>
 					) }
+
 					{ canUserEdit && (
-						<>
+						<ToolsPanelItem
+							isShownByDefault
+							hasValue={ () => !! shouldSyncIcon }
+							label={ __( 'Use as Site Icon' ) }
+							onDeselect={ () => {
+								setAttributes( { shouldSyncIcon: false } );
+								setIcon( undefined );
+							} }
+						>
 							<ToggleControl
-								label={ __( 'Use as site icon' ) }
+								label={ __( 'Use as Site Icon' ) }
 								onChange={ ( value ) => {
 									setAttributes( { shouldSyncIcon: value } );
 									setIcon( value ? logoId : undefined );
@@ -340,21 +372,61 @@ const SiteLogo = ( {
 								checked={ !! shouldSyncIcon }
 								help={ syncSiteIconHelpText }
 							/>
-						</>
+						</ToolsPanelItem>
 					) }
-				</PanelBody>
+				</ToolsPanel>
 			</InspectorControls>
-			<BlockControls group="block">
-				{ canEditImage && ! isEditingImage && (
-					<ToolbarButton
-						onClick={ () => setIsEditingImage( true ) }
-						icon={ crop }
-						label={ __( 'Crop' ) }
-					/>
+			{ canEditImage &&
+				! isEditingImage &&
+				shouldShowCropAndDimensions && (
+					<BlockControls group="block">
+						<ToolbarButton
+							onClick={ () => setIsEditingImage( true ) }
+							icon={ crop }
+							label={ __( 'Crop' ) }
+						/>
+					</BlockControls>
 				) }
-			</BlockControls>
 			{ imgEdit }
 		</>
+	);
+};
+
+// This is a light wrapper around MediaReplaceFlow because the block has two
+// different MediaReplaceFlows, one for the inspector and one for the toolbar.
+function SiteLogoReplaceFlow( { mediaURL, ...mediaReplaceProps } ) {
+	return (
+		<MediaReplaceFlow
+			{ ...mediaReplaceProps }
+			mediaURL={ mediaURL }
+			allowedTypes={ ALLOWED_MEDIA_TYPES }
+			accept={ ACCEPT_MEDIA_STRING }
+		/>
+	);
+}
+
+const InspectorLogoPreview = ( { media, itemGroupProps } ) => {
+	const {
+		alt_text: alt,
+		source_url: logoUrl,
+		slug: logoSlug,
+		media_details: logoMediaDetails,
+	} = media ?? {};
+	const logoLabel = logoMediaDetails?.sizes?.full?.file || logoSlug;
+	return (
+		<ItemGroup { ...itemGroupProps } as="span">
+			<HStack justify="flex-start" as="span">
+				<img src={ logoUrl } alt={ alt } />
+				<FlexItem as="span">
+					<Truncate
+						numberOfLines={ 1 }
+						className="block-library-site-logo__inspector-media-replace-title"
+					>
+						{ logoLabel }
+					</Truncate>
+				</FlexItem>
+			</HStack>
+		</ItemGroup>
 	);
 };
 
@@ -365,8 +437,6 @@ export default function LogoEdit( {
 	isSelected,
 } ) {
 	const { width, shouldSyncIcon } = attributes;
-	const ref = useRef();
-
 	const {
 		siteLogoId,
 		canUserEdit,
@@ -377,7 +447,10 @@ export default function LogoEdit( {
 	} = useSelect( ( select ) => {
 		const { canUser, getEntityRecord, getEditedEntityRecord } =
 			select( coreStore );
-		const _canUserEdit = canUser( 'update', 'settings' );
+		const _canUserEdit = canUser( 'update', {
+			kind: 'root',
+			name: 'site',
+		} );
 		const siteSettings = _canUserEdit
 			? getEditedEntityRecord( 'root', 'site' )
 			: undefined;
@@ -388,12 +461,19 @@ export default function LogoEdit( {
 		const _siteIconId = siteSettings?.site_icon;
 		const mediaItem =
 			_siteLogoId &&
-			select( coreStore ).getMedia( _siteLogoId, {
-				context: 'view',
-			} );
+			select( coreStore ).getEntityRecord(
+				'postType',
+				'attachment',
+				_siteLogoId,
+				{
+					context: 'view',
+				}
+			);
 		const _isRequestingMediaItem =
-			_siteLogoId &&
-			! select( coreStore ).hasFinishedResolution( 'getMedia', [
+			!! _siteLogoId &&
+			! select( coreStore ).hasFinishedResolution( 'getEntityRecord', [
+				'postType',
+				'attachment',
 				_siteLogoId,
 				{ context: 'view' },
 			] );
@@ -407,6 +487,9 @@ export default function LogoEdit( {
 			siteIconId: _siteIconId,
 		};
 	}, [] );
+	const { getSettings } = useSelect( blockEditorStore );
+	const [ temporaryURL, setTemporaryURL ] = useState();
+	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
 	const { editEntityRecord } = useDispatch( coreStore );
 
@@ -453,6 +536,7 @@ export default function LogoEdit( {
 
 		if ( ! media.id && media.url ) {
 			// This is a temporary blob image.
+			setTemporaryURL( media.url );
 			setLogo( undefined );
 			return;
 		}
@@ -468,19 +552,35 @@ export default function LogoEdit( {
 	const { createErrorNotice } = useDispatch( noticesStore );
 	const onUploadError = ( message ) => {
 		createErrorNotice( message, { type: 'snackbar' } );
+		setTemporaryURL();
 	};
 
-	const controls = canUserEdit && logoUrl && (
+	const onFilesDrop = ( filesList ) => {
+		getSettings().mediaUpload( {
+			allowedTypes: ALLOWED_MEDIA_TYPES,
+			filesList,
+			onFileChange( [ image ] ) {
+				if ( isBlobURL( image?.url ) ) {
+					setTemporaryURL( image.url );
+					return;
+				}
+				onInitialSelectLogo( image );
+			},
+			onError: onUploadError,
+			multiple: false,
+		} );
+	};
+
+	const mediaReplaceFlowProps = {
+		mediaURL: logoUrl,
+		name: ! logoUrl ? __( 'Choose logo' ) : __( 'Replace' ),
+		onSelect: onSelectLogo,
+		onError: onUploadError,
+		onReset: onRemoveLogo,
+	};
+	const controls = canUserEdit && (
 		<BlockControls group="other">
-			<MediaReplaceFlow
-				mediaURL={ logoUrl }
-				allowedTypes={ ALLOWED_MEDIA_TYPES }
-				accept={ ACCEPT_MEDIA_STRING }
-				onSelect={ onSelectLogo }
-				onError={ onUploadError }
-			>
-				<MenuItem onClick={ onRemoveLogo }>{ __( 'Reset' ) }</MenuItem>
-			</MediaReplaceFlow>
+			<SiteLogoReplaceFlow { ...mediaReplaceFlowProps } />
 		</BlockControls>
 	);
 
@@ -489,27 +589,37 @@ export default function LogoEdit( {
 	if ( isLoading ) {
 		logoImage = <Spinner />;
 	}
-	if ( !! logoUrl ) {
+
+	// Reset temporary url when logoUrl is available.
+	useEffect( () => {
+		if ( logoUrl && temporaryURL ) {
+			setTemporaryURL();
+		}
+	}, [ logoUrl, temporaryURL ] );
+
+	if ( !! logoUrl || !! temporaryURL ) {
 		logoImage = (
-			<SiteLogo
-				alt={ alt }
-				attributes={ attributes }
-				className={ className }
-				containerRef={ ref }
-				isSelected={ isSelected }
-				setAttributes={ setAttributes }
-				logoUrl={ logoUrl }
-				setLogo={ setLogo }
-				logoId={ mediaItemData?.id || siteLogoId }
-				siteUrl={ url }
-				setIcon={ setIcon }
-				iconId={ siteIconId }
-				canUserEdit={ canUserEdit }
-			/>
+			<>
+				<SiteLogo
+					alt={ alt }
+					attributes={ attributes }
+					className={ className }
+					isSelected={ isSelected }
+					setAttributes={ setAttributes }
+					logoUrl={ temporaryURL || logoUrl }
+					setLogo={ setLogo }
+					logoId={ mediaItemData?.id || siteLogoId }
+					siteUrl={ url }
+					setIcon={ setIcon }
+					iconId={ siteIconId }
+					canUserEdit={ canUserEdit }
+				/>
+				{ canUserEdit && <DropZone onFilesDrop={ onFilesDrop } /> }
+			</>
 		);
 	}
 	const placeholder = ( content ) => {
-		const placeholderClassName = classnames(
+		const placeholderClassName = clsx(
 			'block-editor-media-placeholder',
 			className
 		);
@@ -518,7 +628,7 @@ export default function LogoEdit( {
 			<Placeholder
 				className={ placeholderClassName }
 				preview={ logoImage }
-				withIllustration={ true }
+				withIllustration
 				style={ {
 					width,
 				} }
@@ -528,31 +638,85 @@ export default function LogoEdit( {
 		);
 	};
 
-	const classes = classnames( className, {
+	const classes = clsx( className, {
 		'is-default-size': ! width,
+		'is-transient': temporaryURL,
 	} );
 
-	const blockProps = useBlockProps( {
-		ref,
-		className: classes,
-	} );
+	const blockProps = useBlockProps( { className: classes } );
 
-	const label = __( 'Add a site logo' );
+	const mediaInspectorPanel = ( canUserEdit || logoUrl ) && (
+		<InspectorControls>
+			<ToolsPanel
+				label={ __( 'Media' ) }
+				dropdownMenuProps={ dropdownMenuProps }
+			>
+				{ ! canUserEdit ? (
+					<div
+						className="block-library-site-logo__inspector-media-replace-container"
+						style={ { gridColumn: '1 / -1' } }
+					>
+						<InspectorLogoPreview
+							media={ mediaItemData }
+							itemGroupProps={ {
+								isBordered: true,
+								className:
+									'block-library-site-logo__inspector-readonly-logo-preview',
+							} }
+						/>
+					</div>
+				) : (
+					<ToolsPanelItem
+						hasValue={ () => !! logoUrl }
+						label={ __( 'Logo' ) }
+						isShownByDefault
+					>
+						<div className="block-library-site-logo__inspector-media-replace-container">
+							<SiteLogoReplaceFlow
+								{ ...mediaReplaceFlowProps }
+								name={
+									!! logoUrl ? (
+										<InspectorLogoPreview
+											media={ mediaItemData }
+										/>
+									) : (
+										__( 'Choose logo' )
+									)
+								}
+								renderToggle={ ( props ) => (
+									<Button { ...props } __next40pxDefaultSize>
+										{ temporaryURL ? (
+											<Spinner />
+										) : (
+											props.children
+										) }
+									</Button>
+								) }
+							/>
+							<DropZone onFilesDrop={ onFilesDrop } />
+						</div>
+					</ToolsPanelItem>
+				) }
+			</ToolsPanel>
+		</InspectorControls>
+	);
 
 	return (
 		<div { ...blockProps }>
 			{ controls }
-			{ !! logoUrl && logoImage }
-			{ ! logoUrl && ! canUserEdit && (
-				<Placeholder className="site-logo_placeholder">
-					{ !! isLoading && (
+			{ mediaInspectorPanel }
+			{ ( !! logoUrl || !! temporaryURL ) && logoImage }
+			{ ( isLoading ||
+				( ! temporaryURL && ! logoUrl && ! canUserEdit ) ) && (
+				<Placeholder className="site-logo_placeholder" withIllustration>
+					{ isLoading && (
 						<span className="components-placeholder__preview">
 							<Spinner />
 						</span>
 					) }
 				</Placeholder>
 			) }
-			{ ! logoUrl && canUserEdit && (
+			{ ! isLoading && ! temporaryURL && ! logoUrl && canUserEdit && (
 				<MediaPlaceholder
 					onSelect={ onInitialSelectLogo }
 					accept={ ACCEPT_MEDIA_STRING }
@@ -562,11 +726,12 @@ export default function LogoEdit( {
 					mediaLibraryButton={ ( { open } ) => {
 						return (
 							<Button
+								__next40pxDefaultSize
 								icon={ upload }
 								variant="primary"
-								label={ label }
+								label={ __( 'Choose logo' ) }
 								showTooltip
-								tooltipPosition="top center"
+								tooltipPosition="middle right"
 								onClick={ () => {
 									open();
 								} }

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -18,7 +18,7 @@ function PinnedItemsSlot( { scope, className, ...props } ) {
 			{ ( fills ) =>
 				fills?.length > 0 && (
 					<div
-						className={ classnames(
+						className={ clsx(
 							className,
 							'interface-pinned-items'
 						) }

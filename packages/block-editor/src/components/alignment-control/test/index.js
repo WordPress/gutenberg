@@ -48,9 +48,7 @@ describe( 'AlignmentUI', () => {
 	} );
 
 	test( 'should expand controls when toggled', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 
 		const { unmount } = render(
 			<AlignmentUI
@@ -68,7 +66,7 @@ describe( 'AlignmentUI', () => {
 
 		await user.click(
 			screen.getByRole( 'button', {
-				name: 'Align',
+				name: 'Align text',
 			} )
 		);
 
@@ -83,9 +81,7 @@ describe( 'AlignmentUI', () => {
 	} );
 
 	test( 'should call on change with undefined when a control is already active', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 
 		render(
 			<AlignmentUI
@@ -109,9 +105,7 @@ describe( 'AlignmentUI', () => {
 	} );
 
 	test( 'should call on change a new value when the control is not active', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 
 		render(
 			<AlignmentUI
@@ -134,14 +128,12 @@ describe( 'AlignmentUI', () => {
 	} );
 
 	test( 'should allow custom alignment controls to be specified', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 
 		const { container } = render(
 			<AlignmentUI
 				isToolbar
-				value={ 'custom-right' }
+				value="custom-right"
 				onChange={ onChangeSpy }
 				isCollapsed={ false }
 				alignmentControls={ [

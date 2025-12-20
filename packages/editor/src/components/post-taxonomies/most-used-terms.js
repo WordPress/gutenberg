@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { get } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { BaseControl, Button } from '@wordpress/components';
@@ -26,24 +21,26 @@ const DEFAULT_QUERY = {
 };
 
 export default function MostUsedTerms( { onSelect, taxonomy } ) {
-	const { _terms, showTerms } = useSelect( ( select ) => {
-		const mostUsedTerms = select( coreStore ).getEntityRecords(
-			'taxonomy',
-			taxonomy.slug,
-			DEFAULT_QUERY
-		);
-		return {
-			_terms: mostUsedTerms,
-			showTerms: mostUsedTerms?.length >= MIN_MOST_USED_TERMS,
-		};
-	}, [] );
+	const { _terms, showTerms } = useSelect(
+		( select ) => {
+			const mostUsedTerms = select( coreStore ).getEntityRecords(
+				'taxonomy',
+				taxonomy.slug,
+				DEFAULT_QUERY
+			);
+			return {
+				_terms: mostUsedTerms,
+				showTerms: mostUsedTerms?.length >= MIN_MOST_USED_TERMS,
+			};
+		},
+		[ taxonomy.slug ]
+	);
 
 	if ( ! showTerms ) {
 		return null;
 	}
 
 	const terms = unescapeTerms( _terms );
-	const label = get( taxonomy, [ 'labels', 'most_used' ] );
 
 	return (
 		<div className="editor-post-taxonomies__flat-term-most-used">
@@ -51,7 +48,7 @@ export default function MostUsedTerms( { onSelect, taxonomy } ) {
 				as="h3"
 				className="editor-post-taxonomies__flat-term-most-used-label"
 			>
-				{ label }
+				{ taxonomy.labels.most_used }
 			</BaseControl.VisualLabel>
 			{ /*
 			 * Disable reason: The `list` ARIA role is redundant but
@@ -65,6 +62,7 @@ export default function MostUsedTerms( { onSelect, taxonomy } ) {
 				{ terms.map( ( term ) => (
 					<li key={ term.id }>
 						<Button
+							__next40pxDefaultSize
 							variant="link"
 							onClick={ () => onSelect( term ) }
 						>

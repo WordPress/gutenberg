@@ -17,6 +17,7 @@ import {
 	getColorObjectByAttributeValues,
 	getGradientValueBySlug,
 	__experimentalGetColorClassesAndStyles as getColorClassesAndStyles,
+	useMobileGlobalStylesColors,
 } from '@wordpress/block-editor';
 import {
 	PanelBody,
@@ -28,9 +29,9 @@ import {
 	BottomSheetSelectControl,
 	CSS_UNITS,
 	filterUnitsWithSettings,
-	useMobileGlobalStylesColors,
 } from '@wordpress/components';
 import { link } from '@wordpress/icons';
+// eslint-disable-next-line no-restricted-imports
 import { store as editPostStore } from '@wordpress/edit-post';
 
 /**
@@ -179,7 +180,7 @@ function ButtonEdit( props ) {
 			label: __( 'Open in new tab' ),
 		},
 		linkRel: {
-			label: __( 'Link Rel' ),
+			label: __( 'Link relation' ),
 			placeholder: _x( 'None', 'Link rel attribute value placeholder' ),
 		},
 	};
@@ -493,7 +494,7 @@ function ButtonEdit( props ) {
 					<View pointerEvents="none" style={ outLineStyles } />
 				) }
 				<RichText
-					setRef={ onSetRef }
+					ref={ onSetRef }
 					placeholder={ placeholderText }
 					value={ text }
 					onChange={ onChangeText }

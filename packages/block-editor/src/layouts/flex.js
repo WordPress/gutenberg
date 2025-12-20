@@ -7,11 +7,11 @@ import {
 	justifyCenter,
 	justifyRight,
 	justifySpaceBetween,
+	justifyStretch,
 	arrowRight,
 	arrowDown,
 } from '@wordpress/icons';
 import {
-	Button,
 	ToggleControl,
 	Flex,
 	FlexItem,
@@ -30,6 +30,7 @@ import {
 	BlockVerticalAlignmentControl,
 } from '../components';
 import { shouldSkipSerialization } from '../hooks/utils';
+import { LAYOUT_DEFINITIONS } from './definitions';
 
 // Used with the default, horizontal flex orientation.
 const justifyContentMap = {
@@ -44,12 +45,20 @@ const alignItemsMap = {
 	left: 'flex-start',
 	right: 'flex-end',
 	center: 'center',
+	stretch: 'stretch',
 };
 
 const verticalAlignmentMap = {
 	top: 'flex-start',
 	center: 'center',
 	bottom: 'flex-end',
+	stretch: 'stretch',
+	'space-between': 'space-between',
+};
+
+const defaultAlignments = {
+	horizontal: 'center',
+	vertical: 'top',
 };
 
 const flexWrapOptions = [ 'wrap', 'nowrap' ];
@@ -62,24 +71,27 @@ export default {
 		onChange,
 		layoutBlockSupport = {},
 	} ) {
-		const { allowOrientation = true } = layoutBlockSupport;
+		const { allowOrientation = true, allowJustification = true } =
+			layoutBlockSupport;
 		return (
 			<>
 				<Flex>
-					<FlexItem>
-						<FlexLayoutJustifyContentControl
-							layout={ layout }
-							onChange={ onChange }
-						/>
-					</FlexItem>
-					<FlexItem>
-						{ allowOrientation && (
+					{ allowJustification && (
+						<FlexItem>
+							<FlexLayoutJustifyContentControl
+								layout={ layout }
+								onChange={ onChange }
+							/>
+						</FlexItem>
+					) }
+					{ allowOrientation && (
+						<FlexItem>
 							<OrientationControl
 								layout={ layout }
 								onChange={ onChange }
 							/>
-						) }
-					</FlexItem>
+						</FlexItem>
+					) }
 				</Flex>
 				<FlexWrapControl layout={ layout } onChange={ onChange } />
 			</>
@@ -90,25 +102,28 @@ export default {
 		onChange,
 		layoutBlockSupport,
 	} ) {
-		if ( layoutBlockSupport?.allowSwitching ) {
+		const { allowVerticalAlignment = true, allowJustification = true } =
+			layoutBlockSupport;
+
+		if ( ! allowJustification && ! allowVerticalAlignment ) {
 			return null;
 		}
-		const { allowVerticalAlignment = true } = layoutBlockSupport;
+
 		return (
 			<BlockControls group="block" __experimentalShareWithChildBlocks>
-				<FlexLayoutJustifyContentControl
-					layout={ layout }
-					onChange={ onChange }
-					isToolbar
-				/>
-				{ allowVerticalAlignment &&
-					layout?.orientation !== 'vertical' && (
-						<FlexLayoutVerticalAlignmentControl
-							layout={ layout }
-							onChange={ onChange }
-							isToolbar
-						/>
-					) }
+				{ allowJustification && (
+					<FlexLayoutJustifyContentControl
+						layout={ layout }
+						onChange={ onChange }
+						isToolbar
+					/>
+				) }
+				{ allowVerticalAlignment && (
+					<FlexLayoutVerticalAlignmentControl
+						layout={ layout }
+						onChange={ onChange }
+					/>
+				) }
 			</BlockControls>
 		);
 	},
@@ -118,7 +133,7 @@ export default {
 		style,
 		blockName,
 		hasBlockGapSupport,
-		layoutDefinitions,
+		layoutDefinitions = LAYOUT_DEFINITIONS,
 	} ) {
 		const { orientation = 'horizontal' } = layout;
 
@@ -153,6 +168,9 @@ export default {
 				rules.push( `justify-content: ${ justifyContent }` );
 			}
 		} else {
+			if ( verticalAlignment ) {
+				rules.push( `justify-content: ${ verticalAlignment }` );
+			}
 			rules.push( 'flex-direction: column' );
 			rules.push( `align-items: ${ alignItems }` );
 		}
@@ -183,12 +201,15 @@ export default {
 	},
 };
 
-function FlexLayoutVerticalAlignmentControl( {
-	layout,
-	onChange,
-	isToolbar = false,
-} ) {
-	const { verticalAlignment = verticalAlignmentMap.center } = layout;
+function FlexLayoutVerticalAlignmentControl( { layout, onChange } ) {
+	const { orientation = 'horizontal' } = layout;
+
+	const defaultVerticalAlignment =
+		orientation === 'horizontal'
+			? defaultAlignments.horizontal
+			: defaultAlignments.vertical;
+
+	const { verticalAlignment = defaultVerticalAlignment } = layout;
 
 	const onVerticalAlignmentChange = ( value ) => {
 		onChange( {
@@ -196,49 +217,23 @@ function FlexLayoutVerticalAlignmentControl( {
 			verticalAlignment: value,
 		} );
 	};
-	if ( isToolbar ) {
-		return (
-			<BlockVerticalAlignmentControl
-				onChange={ onVerticalAlignmentChange }
-				value={ verticalAlignment }
-			/>
-		);
-	}
-
-	const verticalAlignmentOptions = [
-		{
-			value: 'flex-start',
-			label: __( 'Align items top' ),
-		},
-		{
-			value: 'center',
-			label: __( 'Align items center' ),
-		},
-		{
-			value: 'flex-end',
-			label: __( 'Align items bottom' ),
-		},
-	];
 
 	return (
-		<fieldset className="block-editor-hooks__flex-layout-vertical-alignment-control">
-			<legend>{ __( 'Vertical alignment' ) }</legend>
-			<div>
-				{ verticalAlignmentOptions.map( ( value, icon, label ) => {
-					return (
-						<Button
-							key={ value }
-							label={ label }
-							icon={ icon }
-							isPressed={ verticalAlignment === value }
-							onClick={ () => onVerticalAlignmentChange( value ) }
-						/>
-					);
-				} ) }
-			</div>
-		</fieldset>
+		<BlockVerticalAlignmentControl
+			onChange={ onVerticalAlignmentChange }
+			value={ verticalAlignment }
+			controls={
+				orientation === 'horizontal'
+					? [ 'top', 'center', 'bottom', 'stretch' ]
+					: [ 'top', 'center', 'bottom', 'space-between' ]
+			}
+		/>
 	);
 }
+
+const POPOVER_PROPS = {
+	placement: 'bottom-start',
+};
 
 function FlexLayoutJustifyContentControl( {
 	layout,
@@ -255,6 +250,8 @@ function FlexLayoutJustifyContentControl( {
 	const allowedControls = [ 'left', 'center', 'right' ];
 	if ( orientation === 'horizontal' ) {
 		allowedControls.push( 'space-between' );
+	} else {
+		allowedControls.push( 'stretch' );
 	}
 	if ( isToolbar ) {
 		return (
@@ -262,10 +259,7 @@ function FlexLayoutJustifyContentControl( {
 				allowedControls={ allowedControls }
 				value={ justifyContent }
 				onChange={ onJustificationChange }
-				popoverProps={ {
-					position: 'bottom right',
-					variant: 'toolbar',
-				} }
+				popoverProps={ POPOVER_PROPS }
 			/>
 		);
 	}
@@ -293,10 +287,17 @@ function FlexLayoutJustifyContentControl( {
 			icon: justifySpaceBetween,
 			label: __( 'Space between items' ),
 		} );
+	} else {
+		justificationOptions.push( {
+			value: 'stretch',
+			icon: justifyStretch,
+			label: __( 'Stretch items' ),
+		} );
 	}
 
 	return (
 		<ToggleGroupControl
+			__next40pxDefaultSize
 			label={ __( 'Justification' ) }
 			value={ justifyContent }
 			onChange={ onJustificationChange }
@@ -333,27 +334,52 @@ function FlexWrapControl( { layout, onChange } ) {
 }
 
 function OrientationControl( { layout, onChange } ) {
-	const { orientation = 'horizontal' } = layout;
+	const {
+		orientation = 'horizontal',
+		verticalAlignment,
+		justifyContent,
+	} = layout;
 	return (
 		<ToggleGroupControl
+			__next40pxDefaultSize
 			className="block-editor-hooks__flex-layout-orientation-controls"
 			label={ __( 'Orientation' ) }
 			value={ orientation }
-			onChange={ ( value ) =>
-				onChange( {
+			onChange={ ( value ) => {
+				// Make sure the vertical alignment and justification are compatible with the new orientation.
+				let newVerticalAlignment = verticalAlignment;
+				let newJustification = justifyContent;
+				if ( value === 'horizontal' ) {
+					if ( verticalAlignment === 'space-between' ) {
+						newVerticalAlignment = 'center';
+					}
+					if ( justifyContent === 'stretch' ) {
+						newJustification = 'left';
+					}
+				} else {
+					if ( verticalAlignment === 'stretch' ) {
+						newVerticalAlignment = 'top';
+					}
+					if ( justifyContent === 'space-between' ) {
+						newJustification = 'left';
+					}
+				}
+				return onChange( {
 					...layout,
 					orientation: value,
-				} )
-			}
+					verticalAlignment: newVerticalAlignment,
+					justifyContent: newJustification,
+				} );
+			} }
 		>
 			<ToggleGroupControlOptionIcon
 				icon={ arrowRight }
-				value={ 'horizontal' }
+				value="horizontal"
 				label={ __( 'Horizontal' ) }
 			/>
 			<ToggleGroupControlOptionIcon
 				icon={ arrowDown }
-				value={ 'vertical' }
+				value="vertical"
 				label={ __( 'Vertical' ) }
 			/>
 		</ToggleGroupControl>

@@ -11,11 +11,11 @@ import { isValidElement } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { getValidChildren } from '../ui/utils/get-valid-children';
-import { contextConnect, useContextSystem } from '../ui/context';
+import { getValidChildren } from '../utils/get-valid-children';
+import { contextConnect, useContextSystem } from '../context';
 import { ZStackView, ZStackChildView } from './styles';
 import type { ZStackProps } from './types';
-import type { WordPressComponentProps } from '../ui/context';
+import type { WordPressComponentProps } from '../context';
 
 function UnconnectedZStack(
 	props: WordPressComponentProps< ZStackProps, 'div' >,
@@ -35,13 +35,14 @@ function UnconnectedZStack(
 
 	const clonedChildren = validChildren.map( ( child, index ) => {
 		const zIndex = isReversed ? childrenLastIndex - index : index;
-		const offsetAmount = offset * index;
+		// Only when the component is layered, the offset needs to be multiplied by
+		// the item's index, so that items can correctly stack at the right distance
+		const offsetAmount = isLayered ? offset * index : offset;
 
 		const key = isValidElement( child ) ? child.key : index;
 
 		return (
 			<ZStackChildView
-				isLayered={ isLayered }
 				offsetAmount={ offsetAmount }
 				zIndex={ zIndex }
 				key={ key }
@@ -55,6 +56,7 @@ function UnconnectedZStack(
 		<ZStackView
 			{ ...otherProps }
 			className={ className }
+			isLayered={ isLayered }
 			ref={ forwardedRef }
 		>
 			{ clonedChildren }

@@ -16,12 +16,11 @@
 				"sticky": "",
 				"inherit": true,
 				"taxQuery": null,
-				"parents": []
+				"parents": [],
+				"format": []
 			},
 			"tagName": "div",
-			"displayLayout": {
-				"type": "list"
-			}
+			"enhancedPagination": false
 		},
 		"innerBlocks": []
 	}

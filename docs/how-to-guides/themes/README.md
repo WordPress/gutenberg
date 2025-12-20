@@ -6,7 +6,7 @@ The block editor provides a number of options for theme designers and developers
 
 ### Classic theme
 
-In terms of block editor terminology this is any theme that defines its templates in the traditional `.php` file format, and that doesn't have an `index.html` format template in the `/block-templates` or `/templates` folders. A `Classic` theme has the ability to provide configuration and styling options to the block editor, and block content, via [Theme Supports](/docs/how-to-guides/themes/theme-support.md), or by including a [theme.json](/docs/how-to-guides/themes/theme-json.md) file. A theme does not have to be a `Block` theme in order to take advantage of some of the flexibility provided by the use of a `theme.json` file.
+In terms of block editor terminology this is any theme that defines its templates in the traditional `.php` file format, and that doesn't have an `index.html` format template in the `/block-templates` or `/templates` folders. A `Classic` theme has the ability to provide configuration and styling options to the block editor, and block content, via [Theme Supports](/docs/how-to-guides/themes/theme-support.md), or by including a [theme.json](/docs/how-to-guides/themes/global-settings-and-styles.md) file. A theme does not have to be a `Block` theme in order to take advantage of some of the flexibility provided by the use of a `theme.json` file.
 
 ### Block theme
 
@@ -18,6 +18,5 @@ There isn't an FSE specific theme type. In WordPress > 5.9 FSE is enabled for an
 
 **Contents**
 
-- [Block Theme Overview](/docs/how-to-guides/themes/block-theme-overview.md)
-- [Global Settings (theme.json)](/docs/how-to-guides/themes/theme-json.md)
+- [Global Settings (theme.json)](/docs/how-to-guides/themes/global-settings-and-styles.md)
 - [Theme Support](/docs/how-to-guides/themes/theme-support.md)

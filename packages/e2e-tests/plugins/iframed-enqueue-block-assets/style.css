@@ -1,0 +1,9 @@
+/**
+ * The following styles get applied both on the front of your site and in the
+ * editor.
+ */
+body {
+	background-color: rgb(33, 117, 155) !important;
+	color: #fff !important;
+	padding: 2px !important;
+}

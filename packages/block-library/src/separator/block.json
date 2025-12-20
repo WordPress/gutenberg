@@ -1,6 +1,6 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
-	"apiVersion": 2,
+	"apiVersion": 3,
 	"name": "core/separator",
 	"title": "Separator",
 	"category": "design",
@@ -11,6 +11,11 @@
 		"opacity": {
 			"type": "string",
 			"default": "alpha-channel"
+		},
+		"tagName": {
+			"type": "string",
+			"enum": [ "hr", "div" ],
+			"default": "hr"
 		}
 	},
 	"supports": {
@@ -28,6 +33,9 @@
 		},
 		"spacing": {
 			"margin": [ "top", "bottom" ]
+		},
+		"interactivity": {
+			"clientNavigation": true
 		}
 	},
 	"styles": [

@@ -1,13 +1,15 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`flags warnings with invalid functions css snapshot matches warnings 1`] = `
-Array [
-  Object {
+[
+  {
     "column": 9,
+    "endColumn": 13,
+    "endLine": 4,
     "line": 4,
     "rule": "function-name-case",
     "severity": "error",
-    "text": "Expected \\"Calc\\" to be \\"calc\\" (function-name-case)",
+    "text": "Expected "Calc" to be "calc" (function-name-case)",
   },
 ]
 `;

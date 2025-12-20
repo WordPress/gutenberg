@@ -17,20 +17,23 @@
 				"sticky": "",
 				"inherit": false,
 				"taxQuery": {
-					"category": [ 3, 5 ],
-					"post_tag": [ 6 ]
+					"include": {
+						"category": [ 3, 5 ],
+						"post_tag": [ 6 ]
+					}
 				}
 			},
-			"tagName": "div",
-			"displayLayout": {
-				"type": "list"
-			}
+			"tagName": "div"
 		},
 		"innerBlocks": [
 			{
 				"name": "core/post-template",
 				"isValid": true,
-				"attributes": {},
+				"attributes": {
+					"layout": {
+						"type": "default"
+					}
+				},
 				"innerBlocks": [
 					{
 						"name": "core/post-title",

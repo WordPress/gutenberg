@@ -1,0 +1,282 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/z-index" as *;
+
+.edit-site-layout {
+	height: 100%;
+	background: $gray-900;
+	color: $gray-400;
+	display: flex;
+	flex-direction: column;
+
+	// Show a dark background in "frame" mode to avoid edge artifacts.
+	&:not(.is-full-canvas) .editor-visual-editor {
+		background: $gray-900;
+	}
+}
+
+.edit-site-layout__content {
+	height: 100%;
+	flex-grow: 1;
+	display: flex;
+}
+
+.edit-site-layout__sidebar-region {
+	z-index: z-index(".edit-site-layout__sidebar");
+	width: 100vw;
+	flex-shrink: 0;
+
+	@include break-medium {
+		width: $nav-sidebar-width;
+	}
+
+	// This is only necessary for the exit animation
+	.edit-site-layout.is-full-canvas & {
+		position: fixed !important;
+		height: 100vh;
+		left: 0;
+		top: 0;
+	}
+
+	.edit-site-layout__sidebar {
+		display: flex;
+		flex-direction: column;
+		height: 100%;
+	}
+
+	.resizable-editor__drag-handle {
+		right: 0;
+	}
+}
+
+.edit-site-layout__main {
+	flex-grow: 1;
+	overflow: hidden;
+	display: flex;
+	flex-direction: column;
+}
+
+.edit-site-layout__mobile {
+	position: relative;
+	width: 100%;
+	z-index: z-index(".edit-site-layout__canvas-container");
+	display: flex;
+	flex-direction: column;
+
+	/*
+	 * The SiteHubMobile component is displayed
+	 * for pages that do not have a sidebar,
+	 * yet it needs the Sidebar component for the React context.
+	 *
+	 * This removes the padding in this scenario.
+	 * See https://github.com/WordPress/gutenberg/pull/63118
+	 */
+	.edit-site-sidebar__screen-wrapper {
+		padding: 0;
+	}
+
+	.edit-site-sidebar-navigation-screen__main {
+		padding: 0 $grid-unit-15;
+	}
+}
+
+.edit-site-layout__canvas-container {
+	position: relative;
+	flex-grow: 1;
+	z-index: z-index(".edit-site-layout__canvas-container");
+	// When animating the frame size can exceed its container size.
+	overflow: visible;
+
+	&.is-resizing::after {
+		// This covers the whole content which ensures mouse up triggers
+		// even if the content is "inert".
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		content: "";
+		z-index: z-index(".edit-site-layout__canvas-container.is-resizing::after");
+	}
+}
+
+.edit-site-layout__canvas {
+	position: absolute;
+	top: 0;
+	left: 0;
+	bottom: 0;
+	width: 100%;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+
+	&.is-right-aligned {
+		justify-content: flex-end;
+	}
+
+	.edit-site-resizable-frame__inner {
+		color: $gray-900;
+	}
+
+	@include break-medium {
+		top: $canvas-padding;
+		bottom: $canvas-padding;
+		width: calc(100% - #{$canvas-padding});
+
+		.edit-site-resizable-frame__inner-content {
+			box-shadow: $elevation-x-small;
+			// This ensure the radius work properly.
+			overflow: hidden;
+
+			@media not (prefers-reduced-motion) {
+				transition: border-radius, box-shadow 0.4s;
+			}
+
+			.edit-site-layout:not(.is-full-canvas) & {
+				border-radius: $radius-large;
+			}
+
+			&:hover {
+				box-shadow: $elevation-large;
+			}
+		}
+	}
+
+	.edit-site-layout.is-full-canvas & {
+		top: 0;
+		bottom: 0;
+		width: 100%;
+	}
+}
+
+// This shouldn't be necessary (we should have a way to say that a skeletton is relative
+.edit-site-layout__mobile .interface-interface-skeleton,
+.edit-site-layout__canvas .interface-interface-skeleton,
+.edit-site-template-pages-preview .interface-interface-skeleton {
+	position: relative !important;
+	min-height: 100% !important;
+}
+
+.edit-site-template-pages-preview {
+	height: 100%;
+}
+
+/* stylelint-disable -- Disable reason: View Transitions not supported properly by stylelint. */
+html.canvas-mode-edit-transition::view-transition-group(toggle) {
+	animation-delay: 255ms;
+}
+
+@media (prefers-reduced-motion) {
+	::view-transition-group(*),
+	::view-transition-old(*),
+	::view-transition-new(*) {
+		animation: none !important;
+	}
+}
+/* stylelint-enable  */
+
+.edit-site-layout.is-full-canvas .edit-site-layout__sidebar-region .edit-site-layout__view-mode-toggle {
+	display: none;
+}
+
+.edit-site-layout__view-mode-toggle.components-button {
+	/* stylelint-disable -- Disable reason: View Transitions not supported properly by stylelint. */
+	view-transition-name: toggle;
+	/* stylelint-enable  */
+	position: relative;
+	color: $white;
+	height: $header-height;
+	width: $header-height;
+	overflow: hidden;
+	padding: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: $gray-900;
+	border-radius: 0;
+
+	&:hover,
+	&:active {
+		color: $white;
+	}
+
+	&:focus-visible,
+	&:focus {
+		box-shadow: 0 0 0 3px #1e1e1e, 0 0 0 6px var(--wp-admin-theme-color);
+		outline: 4px solid #0000;
+		outline-offset: 4px;
+	}
+
+	&::before {
+		content: "";
+		display: block;
+		position: absolute;
+		top: $grid-unit-10 + $border-width;
+		right: $grid-unit-10 + $border-width;
+		bottom: $grid-unit-10 + $border-width;
+		left: $grid-unit-20 + $border-width;
+		border-radius: $radius-medium;
+		box-shadow: none;
+
+		@media not (prefers-reduced-motion) {
+			transition: box-shadow 0.1s ease;
+		}
+	}
+
+	.edit-site-layout__view-mode-toggle-icon {
+		display: flex;
+		height: $header-height;
+		width: $header-height;
+		justify-content: center;
+		align-items: center;
+	}
+}
+
+.edit-site-layout__actions {
+	z-index: z-index(".edit-site-layout__actions");
+	position: fixed !important; // Need to override the default relative positioning
+	top: -9999em;
+	bottom: auto;
+	left: auto;
+	right: 0;
+	width: $sidebar-width;
+	color: $gray-900;
+	background: $white;
+
+	&:focus,
+	&:focus-within {
+		top: auto;
+		bottom: 0;
+	}
+
+	&.is-entity-save-view-open {
+		&:focus,
+		&:focus-within {
+			top: 0;
+		}
+	}
+
+	@include break-medium {
+		border-left: $border-width solid $gray-300;
+	}
+}
+
+.edit-site-layout__area {
+	flex-grow: 1;
+	margin: 0;
+	overflow: hidden;
+	box-shadow: $elevation-x-small;
+	@include break-medium() {
+		border-radius: 8px;
+		margin: $canvas-padding $canvas-padding $canvas-padding 0;
+	}
+}
+
+.edit-site .components-editor-notices__snackbar {
+	position: fixed;
+	right: 0;
+	bottom: 16px;
+	padding-left: 16px;
+	padding-right: 16px;
+}

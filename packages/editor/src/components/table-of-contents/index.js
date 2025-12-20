@@ -23,11 +23,14 @@ function TableOfContents(
 	);
 	return (
 		<Dropdown
-			position={ repositionDropdown ? 'middle right right' : 'bottom' }
+			popoverProps={ {
+				placement: repositionDropdown ? 'right' : 'bottom',
+			} }
 			className="table-of-contents"
 			contentClassName="table-of-contents__popover"
 			renderToggle={ ( { isOpen, onToggle } ) => (
 				<Button
+					__next40pxDefaultSize
 					{ ...props }
 					ref={ ref }
 					onClick={ hasBlocks ? onToggle : undefined }
@@ -50,4 +53,14 @@ function TableOfContents(
 	);
 }
 
+/**
+ * Renders a table of contents component.
+ *
+ * @param {Object}      props                         The component props.
+ * @param {boolean}     props.hasOutlineItemsDisabled Whether outline items are disabled.
+ * @param {boolean}     props.repositionDropdown      Whether to reposition the dropdown.
+ * @param {Element.ref} ref                           The component's ref.
+ *
+ * @return {React.ReactNode} The rendered table of contents component.
+ */
 export default forwardRef( TableOfContents );

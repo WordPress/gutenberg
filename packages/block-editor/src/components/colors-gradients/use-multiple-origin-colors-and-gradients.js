@@ -7,8 +7,7 @@ import { _x } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import useSetting from '../use-setting';
-import useCommonSingleMultipleSelects from './use-common-single-multiple-selects';
+import { useSettings } from '../use-settings';
 
 /**
  * Retrieves color and gradient related settings.
@@ -19,11 +18,34 @@ import useCommonSingleMultipleSelects from './use-common-single-multiple-selects
  * @return {Object} Color and gradient related settings.
  */
 export default function useMultipleOriginColorsAndGradients() {
-	const colorGradientSettings = useCommonSingleMultipleSelects();
-	const customColors = useSetting( 'color.palette.custom' );
-	const themeColors = useSetting( 'color.palette.theme' );
-	const defaultColors = useSetting( 'color.palette.default' );
-	const shouldDisplayDefaultColors = useSetting( 'color.defaultPalette' );
+	const [
+		enableCustomColors,
+		customColors,
+		themeColors,
+		defaultColors,
+		shouldDisplayDefaultColors,
+		enableCustomGradients,
+		customGradients,
+		themeGradients,
+		defaultGradients,
+		shouldDisplayDefaultGradients,
+	] = useSettings(
+		'color.custom',
+		'color.palette.custom',
+		'color.palette.theme',
+		'color.palette.default',
+		'color.defaultPalette',
+		'color.customGradient',
+		'color.gradients.custom',
+		'color.gradients.theme',
+		'color.gradients.default',
+		'color.defaultGradients'
+	);
+
+	const colorGradientSettings = {
+		disableCustomColors: ! enableCustomColors,
+		disableCustomGradients: ! enableCustomGradients,
+	};
 
 	colorGradientSettings.colors = useMemo( () => {
 		const result = [];
@@ -33,6 +55,7 @@ export default function useMultipleOriginColorsAndGradients() {
 					'Theme',
 					'Indicates this palette comes from the theme.'
 				),
+				slug: 'theme',
 				colors: themeColors,
 			} );
 		}
@@ -46,6 +69,7 @@ export default function useMultipleOriginColorsAndGradients() {
 					'Default',
 					'Indicates this palette comes from WordPress.'
 				),
+				slug: 'default',
 				colors: defaultColors,
 			} );
 		}
@@ -53,20 +77,20 @@ export default function useMultipleOriginColorsAndGradients() {
 			result.push( {
 				name: _x(
 					'Custom',
-					'Indicates this palette comes from the theme.'
+					'Indicates this palette is created by the user.'
 				),
+				slug: 'custom',
 				colors: customColors,
 			} );
 		}
 		return result;
-	}, [ defaultColors, themeColors, customColors ] );
+	}, [
+		customColors,
+		themeColors,
+		defaultColors,
+		shouldDisplayDefaultColors,
+	] );
 
-	const customGradients = useSetting( 'color.gradients.custom' );
-	const themeGradients = useSetting( 'color.gradients.theme' );
-	const defaultGradients = useSetting( 'color.gradients.default' );
-	const shouldDisplayDefaultGradients = useSetting(
-		'color.defaultGradients'
-	);
 	colorGradientSettings.gradients = useMemo( () => {
 		const result = [];
 		if ( themeGradients && themeGradients.length ) {
@@ -75,6 +99,7 @@ export default function useMultipleOriginColorsAndGradients() {
 					'Theme',
 					'Indicates this palette comes from the theme.'
 				),
+				slug: 'theme',
 				gradients: themeGradients,
 			} );
 		}
@@ -88,6 +113,7 @@ export default function useMultipleOriginColorsAndGradients() {
 					'Default',
 					'Indicates this palette comes from WordPress.'
 				),
+				slug: 'default',
 				gradients: defaultGradients,
 			} );
 		}
@@ -97,11 +123,21 @@ export default function useMultipleOriginColorsAndGradients() {
 					'Custom',
 					'Indicates this palette is created by the user.'
 				),
+				slug: 'custom',
 				gradients: customGradients,
 			} );
 		}
 		return result;
-	}, [ customGradients, themeGradients, defaultGradients ] );
+	}, [
+		customGradients,
+		themeGradients,
+		defaultGradients,
+		shouldDisplayDefaultGradients,
+	] );
+
+	colorGradientSettings.hasColorsOrGradients =
+		!! colorGradientSettings.colors.length ||
+		!! colorGradientSettings.gradients.length;
 
 	return colorGradientSettings;
 }

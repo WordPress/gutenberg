@@ -1,12 +1,60 @@
 /**
- * External dependencies
- */
-import { isEmpty } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import {
+	sidesAll,
+	sidesBottom,
+	sidesHorizontal,
+	sidesLeft,
+	sidesRight,
+	sidesTop,
+	sidesVertical,
+} from '@wordpress/icons';
+
+export const RANGE_CONTROL_MAX_SIZE = 8;
+
+export const ALL_SIDES = [ 'top', 'right', 'bottom', 'left' ];
+
+export const DEFAULT_VALUES = {
+	top: undefined,
+	right: undefined,
+	bottom: undefined,
+	left: undefined,
+};
+
+export const ICONS = {
+	custom: sidesAll,
+	axial: sidesAll,
+	horizontal: sidesHorizontal,
+	vertical: sidesVertical,
+	top: sidesTop,
+	right: sidesRight,
+	bottom: sidesBottom,
+	left: sidesLeft,
+};
+
+export const LABELS = {
+	default: __( 'Spacing control' ),
+	top: __( 'Top' ),
+	bottom: __( 'Bottom' ),
+	left: __( 'Left' ),
+	right: __( 'Right' ),
+	mixed: __( 'Mixed' ),
+	vertical: __( 'Vertical' ),
+	horizontal: __( 'Horizontal' ),
+	axial: __( 'Horizontal & vertical' ),
+	custom: __( 'Custom' ),
+};
+
+export const VIEWS = {
+	axial: 'axial',
+	top: 'top',
+	right: 'right',
+	bottom: 'bottom',
+	left: 'left',
+	custom: 'custom',
+};
 
 /**
  * Checks is given value is a spacing preset.
@@ -54,8 +102,8 @@ export function getCustomValueFromPreset( value, spacingSizes ) {
  * @return {string} The preset value if it can be found.
  */
 export function getPresetValueFromCustomValue( value, spacingSizes ) {
-	// Return value as-is if it is already a preset;
-	if ( isValueSpacingPreset( value ) ) {
+	// Return value as-is if it is undefined or is already a preset, or '0';
+	if ( ! value || isValueSpacingPreset( value ) || value === '0' ) {
 		return value;
 	}
 
@@ -75,7 +123,7 @@ export function getPresetValueFromCustomValue( value, spacingSizes ) {
  *
  * @param {string} value Value to convert.
  *
- * @return {string} CSS var string for given spacing preset value.
+ * @return {string | undefined} CSS var string for given spacing preset value.
  */
 export function getSpacingPresetCssVar( value ) {
 	if ( ! value ) {
@@ -96,7 +144,7 @@ export function getSpacingPresetCssVar( value ) {
  *
  * @param {string} value Value to extract slug from.
  *
- * @return {number} The int value of the slug from given spacing preset.
+ * @return {string|undefined} The int value of the slug from given spacing preset.
  */
 export function getSpacingPresetSlug( value ) {
 	if ( ! value ) {
@@ -136,80 +184,109 @@ export function getSliderValueFromPreset( presetValue, spacingSizes ) {
 	return sliderValue !== -1 ? sliderValue : NaN;
 }
 
-export const LABELS = {
-	all: __( 'All sides' ),
-	top: __( 'Top' ),
-	bottom: __( 'Bottom' ),
-	left: __( 'Left' ),
-	right: __( 'Right' ),
-	mixed: __( 'Mixed' ),
-	vertical: __( 'Vertical' ),
-	horizontal: __( 'Horizontal' ),
-};
-
-export const DEFAULT_VALUES = {
-	top: undefined,
-	right: undefined,
-	bottom: undefined,
-	left: undefined,
-};
-
-export const ALL_SIDES = [ 'top', 'right', 'bottom', 'left' ];
-
 /**
- * Gets an items with the most occurrence within an array
- * https://stackoverflow.com/a/20762713
+ * Determines whether a particular axis has support. If no axis is
+ * specified, this function checks if either axis is supported.
  *
- * @param {Array<any>} arr Array of items to check.
- * @return {any} The item with the most occurrences.
+ * @param {Array}  sides Supported sides.
+ * @param {string} axis  Which axis to check.
+ *
+ * @return {boolean} Whether there is support for the specified axis or both axes.
  */
-function mode( arr ) {
-	return arr
-		.sort(
-			( a, b ) =>
-				arr.filter( ( v ) => v === a ).length -
-				arr.filter( ( v ) => v === b ).length
-		)
-		.pop();
+export function hasAxisSupport( sides, axis ) {
+	if ( ! sides || ! sides.length ) {
+		return false;
+	}
+
+	const hasHorizontalSupport =
+		sides.includes( 'horizontal' ) ||
+		( sides.includes( 'left' ) && sides.includes( 'right' ) );
+
+	const hasVerticalSupport =
+		sides.includes( 'vertical' ) ||
+		( sides.includes( 'top' ) && sides.includes( 'bottom' ) );
+
+	if ( axis === 'horizontal' ) {
+		return hasHorizontalSupport;
+	}
+
+	if ( axis === 'vertical' ) {
+		return hasVerticalSupport;
+	}
+
+	return hasHorizontalSupport || hasVerticalSupport;
 }
 
 /**
- * Gets the 'all' input value from values data.
+ * Checks if the supported sides are balanced for each axis.
+ * - Horizontal - both left and right sides are supported.
+ * - Vertical - both top and bottom are supported.
  *
- * @param {Object} values Box spacing values
+ * @param {Array} sides The supported sides which may be axes as well.
  *
- * @return {string} The most common value from all sides of box.
+ * @return {boolean} Whether or not the supported sides are balanced.
  */
-export function getAllRawValue( values = {} ) {
-	return mode( Object.values( values ) );
-}
+export function hasBalancedSidesSupport( sides = [] ) {
+	const counts = { top: 0, right: 0, bottom: 0, left: 0 };
+	sides.forEach( ( side ) => ( counts[ side ] += 1 ) );
 
-/**
- * Checks to determine if values are mixed.
- *
- * @param {Object} values Box values.
- * @param {Array}  sides  Sides that values relate to.
- *
- * @return {boolean} Whether values are mixed.
- */
-export function isValuesMixed( values = {}, sides = ALL_SIDES ) {
 	return (
-		( Object.values( values ).length >= 1 &&
-			Object.values( values ).length < sides.length ) ||
-		new Set( Object.values( values ) ).size > 1
+		( counts.top + counts.bottom ) % 2 === 0 &&
+		( counts.left + counts.right ) % 2 === 0
 	);
 }
 
 /**
- * Checks to determine if values are defined.
+ * Determines which view the SpacingSizesControl should default to on its
+ * first render; Axial, Custom, or Single side.
  *
- * @param {Object} values Box values.
+ * @param {Object} values Current side values.
+ * @param {Array}  sides  Supported sides.
  *
- * @return {boolean} Whether values are defined.
+ * @return {string} View to display.
  */
-export function isValuesDefined( values ) {
-	if ( values === undefined || values === null ) {
-		return false;
+export function getInitialView( values = {}, sides ) {
+	const { top, right, bottom, left } = values;
+	const sideValues = [ top, right, bottom, left ].filter( Boolean );
+
+	// Axial ( Horizontal & vertical ).
+	// - Has axial side support
+	// - Has axial side values which match
+	// - Has no values and the supported sides are balanced
+	const hasMatchingAxialValues =
+		top === bottom && left === right && ( !! top || !! left );
+	const hasNoValuesAndBalancedSides =
+		! sideValues.length && hasBalancedSidesSupport( sides );
+	const hasOnlyAxialSides =
+		sides?.includes( 'horizontal' ) &&
+		sides?.includes( 'vertical' ) &&
+		sides?.length === 2;
+
+	if (
+		hasAxisSupport( sides ) &&
+		( hasMatchingAxialValues || hasNoValuesAndBalancedSides )
+	) {
+		return VIEWS.axial;
 	}
-	return ! isEmpty( Object.values( values ).filter( ( value ) => !! value ) );
+
+	// Only axial sides are supported and single value defined.
+	// - Ensure the side returned is the first side that has a value.
+	if ( hasOnlyAxialSides && sideValues.length === 1 ) {
+		let side;
+
+		Object.entries( values ).some( ( [ key, value ] ) => {
+			side = key;
+			return value !== undefined;
+		} );
+
+		return side;
+	}
+
+	// Only single side supported and no value defined.
+	if ( sides?.length === 1 && ! sideValues.length ) {
+		return sides[ 0 ];
+	}
+
+	// Default to the Custom (separated sides) view.
+	return VIEWS.custom;
 }

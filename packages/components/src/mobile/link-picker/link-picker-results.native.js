@@ -6,7 +6,6 @@ import { ActivityIndicator, FlatList, View } from 'react-native';
 /**
  * WordPress dependencies
  */
-import { BottomSheet, BottomSheetConsumer } from '@wordpress/components';
 import { debounce } from '@wordpress/compose';
 import { useState, useEffect, useRef } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
@@ -15,6 +14,8 @@ import { useSelect } from '@wordpress/data';
  * Internal dependencies
  */
 import styles from './styles.scss';
+import BottomSheet from '../bottom-sheet';
+import { BottomSheetConsumer } from '../bottom-sheet/bottom-sheet-context';
 
 const PER_PAGE = 20;
 const REQUEST_DEBOUNCE_DELAY = 400;
@@ -74,6 +75,8 @@ export default function LinkPickerResults( {
 		return {
 			fetchMoreSuggestions: debounce( fetchMore, REQUEST_DEBOUNCE_DELAY ),
 		};
+		// Not adding dependencies for now, to avoid introducing a regression
+		// (see https://github.com/WordPress/gutenberg/pull/23922#discussion_r1170634879).
 	}, [] );
 
 	// Prevent setting state when unmounted.
@@ -86,15 +89,13 @@ export default function LinkPickerResults( {
 		setHasAllSuggestions( false );
 		setLinks( [ directEntry ] );
 		fetchMoreSuggestions( { query, links: [ directEntry ] } );
-		// Disable reason: deferring this refactor to the native team.
-		// see https://github.com/WordPress/gutenberg/pull/41166
-		// eslint-disable-next-line react-hooks/exhaustive-deps
+		// See https://github.com/WordPress/gutenberg/pull/41166
 	}, [ query ] );
 
 	const onEndReached = () => fetchMoreSuggestions( { query, links } );
 
 	const spinner = ! hasAllSuggestions && meetsThreshold( query ) && (
-		<View style={ styles.spinner }>
+		<View style={ styles.spinner } testID="link-picker-loading">
 			<ActivityIndicator animating />
 		</View>
 	);

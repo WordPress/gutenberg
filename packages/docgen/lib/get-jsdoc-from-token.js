@@ -28,9 +28,19 @@ module.exports = ( token ) => {
 			let paramCount = 0;
 
 			jsdoc.tags = jsdoc.tags.map( ( tag ) => {
+				const isParam = tag.tag === 'param';
 				const isUnqualifiedParam =
-					tag.tag === 'param' && ! tag.name.includes( '.' );
-				const index = isUnqualifiedParam ? paramCount++ : paramCount;
+					isParam && ! tag.name.includes( '.' );
+				let index = isUnqualifiedParam ? paramCount++ : paramCount;
+
+				// Qualified parameters come after an unqualified parameter. When
+				// the paramCount is incremented for an unqualified parameter, we
+				// still need to access that previous index. In other words, the
+				// qualified parameter types exist at the index of the previous
+				// unqualified parameter. As a result, the index is actually less.
+				if ( isParam && index > 0 && ! isUnqualifiedParam ) {
+					index -= 1;
+				}
 
 				return {
 					...tag,

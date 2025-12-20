@@ -33,7 +33,6 @@ const BlockTransformationsMenu = ( {
 		const blocksThatSplitWhenTransformed = {
 			'core/list': [ 'core/paragraph', 'core/heading' ],
 			'core/quote': [ 'core/paragraph' ],
-			'core/pullquote': [ 'core/paragraph' ],
 		};
 
 		return possibleTransformations.map( ( item ) => {
@@ -75,11 +74,12 @@ const BlockTransformationsMenu = ( {
 
 	return (
 		<Picker
+			testID="block-transformations-menu"
 			ref={ pickerRef }
 			options={ pickerOptions() }
 			onChange={ onPickerSelect }
 			hideCancelButton={ Platform.OS !== 'ios' }
-			leftAlign={ true }
+			leftAlign
 			getAnchor={ getAnchor }
 			// translators: %s: block title e.g: "Paragraph".
 			title={ sprintf( __( 'Transform %s to' ), blockTitle ) }

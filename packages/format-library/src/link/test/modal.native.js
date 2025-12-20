@@ -9,7 +9,10 @@ import { render } from 'test/helpers';
 
 describe( 'LinksUI', () => {
 	it( 'LinksUI renders', () => {
-		const screen = render( <ModalLinkUI /> );
-		expect( screen.container ).toBeTruthy();
+		const value = { text: '' }; // empty `RichTextValue`
+		const screen = render(
+			<ModalLinkUI isVisible value={ value } activeAttributes={ {} } />
+		);
+		expect( screen.toJSON() ).toMatchSnapshot();
 	} );
 } );

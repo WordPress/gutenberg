@@ -51,6 +51,7 @@ import org.wordpress.aztec.formatting.LinkFormatter;
 import org.wordpress.aztec.glideloader.GlideImageLoader;
 import org.wordpress.aztec.glideloader.GlideVideoThumbnailLoader;
 import org.wordpress.aztec.plugins.CssUnderlinePlugin;
+import org.wordpress.aztec.plugins.MarkPlugin;
 import org.wordpress.aztec.plugins.shortcodes.AudioShortcodePlugin;
 import org.wordpress.aztec.plugins.shortcodes.CaptionShortcodePlugin;
 import org.wordpress.aztec.plugins.shortcodes.VideoShortcodePlugin;
@@ -124,6 +125,7 @@ public class ReactAztecManager extends BaseViewManager<ReactAztecText, LayoutSha
                         Color.parseColor("#016087"), true)
         ));
         aztecText.addPlugin(new CssUnderlinePlugin());
+        aztecText.addPlugin(new MarkPlugin());
         return aztecText;
     }
 
@@ -650,6 +652,21 @@ public class ReactAztecManager extends BaseViewManager<ReactAztecText, LayoutSha
             return;
         } else if (commandType.equals("blur")) {
             parent.clearFocusFromJS();
+            return;
+        } else if (commandType.equals("onMarkFormatting")) {
+            String colorString;
+            Boolean resetColor;
+
+            if (args != null && args.getString(0) != null) {
+                colorString = args.getString(0);
+            } else {
+                colorString = "";
+            }
+
+            parent.onMarkFormatting(colorString);
+            return;
+        } else if (commandType.equals("onRemoveMarkFormatting")) {
+            // This is handled by setActiveFormats
             return;
         }
         super.receiveCommand(parent, commandType, args);

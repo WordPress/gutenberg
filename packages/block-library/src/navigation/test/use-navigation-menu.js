@@ -9,6 +9,12 @@ import { store as coreStore } from '@wordpress/core-data';
  */
 import useNavigationMenu from '../use-navigation-menu';
 
+const BASE_ENTITY = {
+	kind: 'postType',
+	name: 'wp_navigation',
+	id: undefined,
+};
+
 function createRegistryWithStores() {
 	// Create a registry and register used stores.
 	const registry = createRegistry();
@@ -36,52 +42,97 @@ function resolveRecords( registry, menus ) {
 	dispatch.startResolution( 'getEntityRecords', [
 		'postType',
 		'wp_navigation',
-		{ per_page: -1, status: [ 'publish', 'draft' ] },
+		{
+			per_page: 100,
+			status: [ 'publish', 'draft' ],
+			order: 'desc',
+			orderby: 'date',
+		},
 	] );
 	dispatch.finishResolution( 'getEntityRecords', [
 		'postType',
 		'wp_navigation',
-		{ per_page: -1, status: [ 'publish', 'draft' ] },
+		{
+			per_page: 100,
+			status: [ 'publish', 'draft' ],
+			order: 'desc',
+			orderby: 'date',
+		},
 	] );
 	dispatch.receiveEntityRecords( 'postType', 'wp_navigation', menus, {
-		per_page: -1,
+		per_page: 100,
 		status: [ 'publish', 'draft' ],
+		order: 'desc',
+		orderby: 'date',
 	} );
 }
 
 function resolveReadPermission( registry, allowed ) {
 	const dispatch = registry.dispatch( coreStore );
-	dispatch.receiveUserPermission( 'create/navigation', allowed );
-	dispatch.startResolution( 'canUser', [ 'read', 'navigation' ] );
-	dispatch.finishResolution( 'canUser', [ 'read', 'navigation' ] );
+	dispatch.receiveUserPermission( 'read/postType/wp_navigation', allowed );
+	dispatch.startResolution( 'canUser', [ 'read', BASE_ENTITY ] );
+	dispatch.finishResolution( 'canUser', [ 'read', BASE_ENTITY ] );
 }
 
 function resolveReadRecordPermission( registry, ref, allowed ) {
 	const dispatch = registry.dispatch( coreStore );
-	dispatch.receiveUserPermission( 'create/navigation', allowed );
-	dispatch.startResolution( 'canUser', [ 'read', 'navigation', ref ] );
-	dispatch.finishResolution( 'canUser', [ 'read', 'navigation', ref ] );
+	dispatch.receiveUserPermission(
+		`read/postType/wp_navigation/${ ref }`,
+		allowed
+	);
+	dispatch.startResolution( 'canUser', [
+		'read',
+		{ ...BASE_ENTITY, id: ref },
+	] );
+	dispatch.finishResolution( 'canUser', [
+		'read',
+		{ ...BASE_ENTITY, id: ref },
+	] );
 }
 
 function resolveCreatePermission( registry, allowed ) {
 	const dispatch = registry.dispatch( coreStore );
-	dispatch.receiveUserPermission( 'create/navigation', allowed );
-	dispatch.startResolution( 'canUser', [ 'create', 'navigation' ] );
-	dispatch.finishResolution( 'canUser', [ 'create', 'navigation' ] );
+	dispatch.receiveUserPermission( 'create/postType/wp_navigation', allowed );
+	dispatch.startResolution( 'canUser', [
+		'create',
+		{ kind: 'postType', name: 'wp_navigation' },
+	] );
+	dispatch.finishResolution( 'canUser', [
+		'create',
+		{ kind: 'postType', name: 'wp_navigation' },
+	] );
 }
 
 function resolveUpdatePermission( registry, ref, allowed ) {
 	const dispatch = registry.dispatch( coreStore );
-	dispatch.receiveUserPermission( `update/navigation/${ ref }`, allowed );
-	dispatch.startResolution( 'canUser', [ 'update', 'navigation', ref ] );
-	dispatch.finishResolution( 'canUser', [ 'update', 'navigation', ref ] );
+	dispatch.receiveUserPermission(
+		`update/postType/wp_navigation/${ ref }`,
+		allowed
+	);
+	dispatch.startResolution( 'canUser', [
+		'update',
+		{ ...BASE_ENTITY, id: ref },
+	] );
+	dispatch.finishResolution( 'canUser', [
+		'update',
+		{ ...BASE_ENTITY, id: ref },
+	] );
 }
 
 function resolveDeletePermission( registry, ref, allowed ) {
 	const dispatch = registry.dispatch( coreStore );
-	dispatch.receiveUserPermission( `delete/navigation/${ ref }`, allowed );
-	dispatch.startResolution( 'canUser', [ 'delete', 'navigation', ref ] );
-	dispatch.finishResolution( 'canUser', [ 'delete', 'navigation', ref ] );
+	dispatch.receiveUserPermission(
+		`delete/postType/wp_navigation/${ ref }`,
+		allowed
+	);
+	dispatch.startResolution( 'canUser', [
+		'delete',
+		{ ...BASE_ENTITY, id: ref },
+	] );
+	dispatch.finishResolution( 'canUser', [
+		'delete',
+		{ ...BASE_ENTITY, id: ref },
+	] );
 }
 
 describe( 'useNavigationMenus', () => {
@@ -105,16 +156,16 @@ describe( 'useNavigationMenus', () => {
 			navigationMenus: null,
 			navigationMenu: undefined,
 			canSwitchNavigationMenu: false,
-			canUserCreateNavigationMenu: false,
+			canUserCreateNavigationMenus: false,
 			canUserDeleteNavigationMenu: undefined,
 			canUserUpdateNavigationMenu: undefined,
-			hasResolvedCanUserCreateNavigationMenu: false,
+			hasResolvedCanUserCreateNavigationMenus: false,
 			hasResolvedCanUserDeleteNavigationMenu: undefined,
 			hasResolvedCanUserUpdateNavigationMenu: undefined,
 			hasResolvedNavigationMenus: false,
 			isNavigationMenuMissing: true,
 			isNavigationMenuResolved: false,
-			isResolvingCanUserCreateNavigationMenu: false,
+			isResolvingCanUserCreateNavigationMenus: false,
 			isResolvingNavigationMenus: false,
 		} );
 	} );
@@ -127,16 +178,16 @@ describe( 'useNavigationMenus', () => {
 			navigationMenus,
 			navigationMenu: undefined,
 			canSwitchNavigationMenu: true,
-			canUserCreateNavigationMenu: true,
+			canUserCreateNavigationMenus: true,
 			canUserDeleteNavigationMenu: undefined,
 			canUserUpdateNavigationMenu: undefined,
-			hasResolvedCanUserCreateNavigationMenu: true,
+			hasResolvedCanUserCreateNavigationMenus: true,
 			hasResolvedCanUserDeleteNavigationMenu: undefined,
 			hasResolvedCanUserUpdateNavigationMenu: undefined,
 			hasResolvedNavigationMenus: true,
 			isNavigationMenuMissing: true,
 			isNavigationMenuResolved: false,
-			isResolvingCanUserCreateNavigationMenu: false,
+			isResolvingCanUserCreateNavigationMenus: false,
 			isResolvingNavigationMenus: false,
 		} );
 	} );
@@ -147,16 +198,16 @@ describe( 'useNavigationMenus', () => {
 			navigationMenu: navigationMenu1,
 			navigationMenus,
 			canSwitchNavigationMenu: true,
-			canUserCreateNavigationMenu: false,
+			canUserCreateNavigationMenus: false,
 			canUserDeleteNavigationMenu: false,
 			canUserUpdateNavigationMenu: false,
-			hasResolvedCanUserCreateNavigationMenu: false,
+			hasResolvedCanUserCreateNavigationMenus: false,
 			hasResolvedCanUserDeleteNavigationMenu: false,
 			hasResolvedCanUserUpdateNavigationMenu: false,
 			hasResolvedNavigationMenus: true,
 			isNavigationMenuMissing: false,
 			isNavigationMenuResolved: false,
-			isResolvingCanUserCreateNavigationMenu: false,
+			isResolvingCanUserCreateNavigationMenus: false,
 			isResolvingNavigationMenus: false,
 		} );
 	} );
@@ -169,16 +220,16 @@ describe( 'useNavigationMenus', () => {
 			navigationMenu: navigationMenuDraft,
 			navigationMenus: testMenus,
 			canSwitchNavigationMenu: true,
-			canUserCreateNavigationMenu: false,
+			canUserCreateNavigationMenus: false,
 			canUserDeleteNavigationMenu: false,
 			canUserUpdateNavigationMenu: false,
-			hasResolvedCanUserCreateNavigationMenu: false,
+			hasResolvedCanUserCreateNavigationMenus: false,
 			hasResolvedCanUserDeleteNavigationMenu: false,
 			hasResolvedCanUserUpdateNavigationMenu: false,
 			hasResolvedNavigationMenus: true,
 			isNavigationMenuMissing: false,
 			isNavigationMenuResolved: false,
-			isResolvingCanUserCreateNavigationMenu: false,
+			isResolvingCanUserCreateNavigationMenus: false,
 			isResolvingNavigationMenus: false,
 		} );
 	} );
@@ -193,16 +244,16 @@ describe( 'useNavigationMenus', () => {
 			navigationMenu: navigationMenu1,
 			navigationMenus,
 			canSwitchNavigationMenu: true,
-			canUserCreateNavigationMenu: true,
+			canUserCreateNavigationMenus: true,
 			canUserDeleteNavigationMenu: false,
 			canUserUpdateNavigationMenu: true,
-			hasResolvedCanUserCreateNavigationMenu: true,
+			hasResolvedCanUserCreateNavigationMenus: true,
 			hasResolvedCanUserDeleteNavigationMenu: true,
 			hasResolvedCanUserUpdateNavigationMenu: true,
 			hasResolvedNavigationMenus: true,
 			isNavigationMenuMissing: false,
 			isNavigationMenuResolved: false,
-			isResolvingCanUserCreateNavigationMenu: false,
+			isResolvingCanUserCreateNavigationMenus: false,
 			isResolvingNavigationMenus: false,
 		} );
 	} );
@@ -217,16 +268,16 @@ describe( 'useNavigationMenus', () => {
 			navigationMenu: navigationMenu1,
 			navigationMenus,
 			canSwitchNavigationMenu: true,
-			canUserCreateNavigationMenu: false,
+			canUserCreateNavigationMenus: false,
 			canUserDeleteNavigationMenu: true,
 			canUserUpdateNavigationMenu: false,
-			hasResolvedCanUserCreateNavigationMenu: true,
+			hasResolvedCanUserCreateNavigationMenus: true,
 			hasResolvedCanUserDeleteNavigationMenu: true,
 			hasResolvedCanUserUpdateNavigationMenu: true,
 			hasResolvedNavigationMenus: true,
 			isNavigationMenuMissing: false,
 			isNavigationMenuResolved: false,
-			isResolvingCanUserCreateNavigationMenu: false,
+			isResolvingCanUserCreateNavigationMenus: false,
 			isResolvingNavigationMenus: false,
 		} );
 	} );
@@ -242,16 +293,16 @@ describe( 'useNavigationMenus', () => {
 			navigationMenu: requestedMenu,
 			navigationMenus,
 			canSwitchNavigationMenu: true,
-			canUserCreateNavigationMenu: false,
+			canUserCreateNavigationMenus: false,
 			canUserDeleteNavigationMenu: false,
 			canUserUpdateNavigationMenu: false,
-			hasResolvedCanUserCreateNavigationMenu: false,
+			hasResolvedCanUserCreateNavigationMenus: false,
 			hasResolvedCanUserDeleteNavigationMenu: false,
 			hasResolvedCanUserUpdateNavigationMenu: false,
 			hasResolvedNavigationMenus: true,
 			isNavigationMenuMissing: false,
 			isNavigationMenuResolved: false,
-			isResolvingCanUserCreateNavigationMenu: false,
+			isResolvingCanUserCreateNavigationMenus: false,
 			isResolvingNavigationMenus: false,
 		} );
 	} );

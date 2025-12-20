@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -15,6 +15,13 @@ import {
 	__experimentalHStack as HStack,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
+import { useRef } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
+
+/**
+ * Internal dependencies
+ */
+import { reset as resetIcon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -76,24 +83,62 @@ const LabeledColorIndicator = ( { colorValue, label } ) => (
 const renderToggle =
 	( settings ) =>
 	( { onToggle, isOpen } ) => {
-		const { colorValue, label } = settings;
+		const {
+			clearable,
+			colorValue,
+			gradientValue,
+			onColorChange,
+			onGradientChange,
+			label,
+		} = settings;
+		const colorButtonRef = useRef( undefined );
 
 		const toggleProps = {
 			onClick: onToggle,
-			className: classnames(
+			className: clsx(
 				'block-editor-panel-color-gradient-settings__dropdown',
 				{ 'is-open': isOpen }
 			),
 			'aria-expanded': isOpen,
+			ref: colorButtonRef,
 		};
 
+		const clearValue = () => {
+			if ( colorValue ) {
+				onColorChange();
+			} else if ( gradientValue ) {
+				onGradientChange();
+			}
+		};
+
+		const value = colorValue ?? gradientValue;
+
 		return (
-			<Button { ...toggleProps }>
-				<LabeledColorIndicator
-					colorValue={ colorValue }
-					label={ label }
-				/>
-			</Button>
+			<>
+				<Button __next40pxDefaultSize { ...toggleProps }>
+					<LabeledColorIndicator
+						colorValue={ value }
+						label={ label }
+					/>
+				</Button>
+				{ clearable && value && (
+					<Button
+						__next40pxDefaultSize
+						label={ __( 'Reset' ) }
+						className="block-editor-panel-color-gradient-settings__reset"
+						size="small"
+						icon={ resetIcon }
+						onClick={ () => {
+							clearValue();
+							if ( isOpen ) {
+								onToggle();
+							}
+							// Return focus to parent button
+							colorButtonRef.current?.focus();
+						} }
+					/>
+				) }
+			</>
 		);
 	};
 
@@ -111,7 +156,6 @@ export default function ColorGradientSettingsDropdown( {
 	enableAlpha,
 	gradients,
 	settings,
-	__experimentalHasMultipleOrigins,
 	__experimentalIsRenderedInSidebar,
 	...props
 } ) {
@@ -140,13 +184,16 @@ export default function ColorGradientSettingsDropdown( {
 					onColorChange: setting.onColorChange,
 					onGradientChange: setting.onGradientChange,
 					showTitle: false,
-					__experimentalHasMultipleOrigins,
 					__experimentalIsRenderedInSidebar,
 					...setting,
 				};
 				const toggleSettings = {
-					colorValue: setting.gradientValue ?? setting.colorValue,
+					clearable: setting.clearable,
 					label: setting.label,
+					colorValue: setting.colorValue,
+					gradientValue: setting.gradientValue,
+					onColorChange: setting.onColorChange,
+					onGradientChange: setting.onGradientChange,
 				};
 
 				return (

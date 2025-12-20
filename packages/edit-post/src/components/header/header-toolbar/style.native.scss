@@ -3,13 +3,13 @@
 	height: $mobile-header-toolbar-height;
 	flex-direction: row;
 	background-color: $app-background;
-	border-top-color: #e9eff3;
-	border-top-width: 1px;
+	border-top-color: $light-quaternary;
+	overflow: hidden;
 }
 
 .header-toolbar__container--dark {
-	background-color: $app-background-dark-alt;
-	border-top-color: $background-dark-elevated;
+	background-color: $app-safe-area-background-dark;
+	border-top-color: $dark-quaternary;
 }
 
 .header-toolbar__container--expanded {
@@ -18,6 +18,7 @@
 
 .header-toolbar__scrollable-content {
 	flex-grow: 1; // Fixes RTL issue on Android.
+	padding-right: 8px;
 }
 
 .header-toolbar__keyboard-hide-container {
@@ -27,4 +28,22 @@
 	width: 44px;
 	justify-content: center;
 	align-items: center;
+	border-color: transparent;
+	background-color: $app-background;
+}
+
+.header-toolbar__keyboard-hide-container--dark {
+	background-color: $app-background-dark-alt;
+}
+
+.header-toolbar__keyboard-hide-shadow--solid {
+	color: $black;
+}
+
+.header-toolbar__keyboard-hide-shadow--light {
+	color: $light-quaternary;
+}
+
+.header-toolbar__keyboard-hide-shadow--dark {
+	color: $light-primary;
 }

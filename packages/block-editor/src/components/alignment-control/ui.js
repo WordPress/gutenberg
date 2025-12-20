@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { find } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __, isRTL } from '@wordpress/i18n';
@@ -29,16 +24,15 @@ const DEFAULT_ALIGNMENT_CONTROLS = [
 ];
 
 const POPOVER_PROPS = {
-	position: 'bottom right',
-	variant: 'toolbar',
+	placement: 'bottom-start',
 };
 
 function AlignmentUI( {
 	value,
 	onChange,
 	alignmentControls = DEFAULT_ALIGNMENT_CONTROLS,
-	label = __( 'Align' ),
-	describedBy = __( 'Change text alignment' ),
+	label = __( 'Align text' ),
+	description = __( 'Change text alignment' ),
 	isCollapsed = true,
 	isToolbar,
 } ) {
@@ -46,13 +40,14 @@ function AlignmentUI( {
 		return () => onChange( value === align ? undefined : align );
 	}
 
-	const activeAlignment = find(
-		alignmentControls,
+	const activeAlignment = alignmentControls.find(
 		( control ) => control.align === value
 	);
 
 	function setIcon() {
-		if ( activeAlignment ) return activeAlignment.icon;
+		if ( activeAlignment ) {
+			return activeAlignment.icon;
+		}
 		return isRTL() ? alignRight : alignLeft;
 	}
 
@@ -61,7 +56,7 @@ function AlignmentUI( {
 		? { isCollapsed }
 		: {
 				toggleProps: {
-					describedBy,
+					description,
 				},
 				popoverProps: POPOVER_PROPS,
 		  };

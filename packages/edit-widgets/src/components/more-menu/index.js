@@ -1,11 +1,15 @@
 /**
  * WordPress dependencies
  */
-import { MenuGroup, MenuItem, VisuallyHidden } from '@wordpress/components';
+import {
+	MenuGroup,
+	MenuItem,
+	VisuallyHidden,
+	DropdownMenu,
+} from '@wordpress/components';
 import { useState } from '@wordpress/element';
 import { __, _x } from '@wordpress/i18n';
-import { external } from '@wordpress/icons';
-import { MoreMenuDropdown } from '@wordpress/interface';
+import { external, moreVertical } from '@wordpress/icons';
 import { PreferenceToggleMenuItem } from '@wordpress/preferences';
 import { displayShortcut } from '@wordpress/keycodes';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
@@ -34,7 +38,18 @@ export default function MoreMenu() {
 
 	return (
 		<>
-			<MoreMenuDropdown>
+			<DropdownMenu
+				icon={ moreVertical }
+				label={ __( 'Options' ) }
+				popoverProps={ {
+					placement: 'bottom-end',
+					className: 'more-menu-dropdown__content',
+				} }
+				toggleProps={ {
+					tooltipPosition: 'bottom',
+					size: 'compact',
+				} }
+			>
 				{ ( onClose ) => (
 					<>
 						{ isLargeViewport && (
@@ -73,7 +88,7 @@ export default function MoreMenu() {
 								role="menuitem"
 								icon={ external }
 								href={ __(
-									'https://wordpress.org/support/article/block-based-widgets-editor/'
+									'https://wordpress.org/documentation/article/block-based-widgets-editor/'
 								) }
 								target="_blank"
 								rel="noopener noreferrer"
@@ -134,7 +149,7 @@ export default function MoreMenu() {
 						</MenuGroup>
 					</>
 				) }
-			</MoreMenuDropdown>
+			</DropdownMenu>
 			<KeyboardShortcutHelpModal
 				isModalActive={ isKeyboardShortcutsModalActive }
 				toggleModal={ toggleKeyboardShortcutsModal }

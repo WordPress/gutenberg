@@ -17,6 +17,7 @@ import {
 	createUpgradedEmbedBlock,
 	getEmbedInfoByProvider,
 	removeAspectRatioClasses,
+	hasAspectRatioClass,
 } from '../util';
 import { embedInstagramIcon } from '../icons';
 import variations from '../variations';
@@ -68,7 +69,7 @@ describe( 'utils', () => {
 			expect( getClassNames( html, '', false ) ).toEqual( expected );
 		} );
 
-		it( 'should preserve exsiting class names when removing responsive classes', () => {
+		it( 'should preserve existing class names when removing responsive classes', () => {
 			const html = '<iframe height="9" width="16"></iframe>';
 			const expected = 'lovely';
 			expect(
@@ -99,6 +100,17 @@ describe( 'utils', () => {
 					true
 				)
 			).toEqual( expected );
+		} );
+	} );
+	describe( 'hasAspectRatioClass', () => {
+		it( 'should return false if an aspect ratio class does not exist', () => {
+			const existingClassNames = 'wp-block-embed is-type-video';
+			expect( hasAspectRatioClass( existingClassNames ) ).toBe( false );
+		} );
+		it( 'should return true if an aspect ratio class exists', () => {
+			const existingClassNames =
+				'wp-block-embed is-type-video wp-embed-aspect-16-9 wp-has-aspect-ratio';
+			expect( hasAspectRatioClass( existingClassNames ) ).toBe( true );
 		} );
 	} );
 	describe( 'removeAspectRatioClasses', () => {
@@ -188,7 +200,7 @@ describe( 'utils', () => {
 			expect( getEmbedInfoByProvider( 'instagram' ) ).toEqual(
 				expect.objectContaining( {
 					icon: embedInstagramIcon,
-					title: 'Instagram',
+					title: 'Instagram Embed',
 				} )
 			);
 		} );

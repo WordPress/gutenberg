@@ -27,6 +27,7 @@ function BlockNavigationDropdownToggle( {
 } ) {
 	return (
 		<Button
+			__next40pxDefaultSize
 			{ ...props }
 			ref={ innerRef }
 			icon={ listView }
@@ -56,7 +57,7 @@ function BlockNavigationDropdown( { isDisabled, ...props }, ref ) {
 	return (
 		<Dropdown
 			contentClassName="block-editor-block-navigation__popover"
-			position="bottom right"
+			popoverProps={ { placement: 'bottom-start' } }
 			renderToggle={ ( { isOpen, onToggle } ) => (
 				<BlockNavigationDropdownToggle
 					{ ...props }

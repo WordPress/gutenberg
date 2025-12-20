@@ -19,7 +19,7 @@ const VIDEO_EXTENSIONS = [
 /**
  * Gets the extension of a file name.
  *
- * @param  filename The file name.
+ * @param filename The file name.
  * @return  The extension of the file name.
  */
 export function getExtension( filename = '' ): string {
@@ -30,18 +30,23 @@ export function getExtension( filename = '' ): string {
 /**
  * Checks if a file is a video.
  *
- * @param  filename The file name.
+ * @param filename The file name.
  * @return Whether the file is a video.
  */
 export function isVideoType( filename: string = '' ): boolean {
-	if ( ! filename ) return false;
-	return VIDEO_EXTENSIONS.includes( getExtension( filename ) );
+	if ( ! filename ) {
+		return false;
+	}
+	return (
+		filename.startsWith( 'data:video/' ) ||
+		VIDEO_EXTENSIONS.includes( getExtension( filename ) )
+	);
 }
 
 /**
  * Transforms a fraction value to a percentage value.
  *
- * @param  fraction The fraction value.
+ * @param fraction The fraction value.
  * @return A percentage value.
  */
 export function fractionToPercentage( fraction: number ): number {

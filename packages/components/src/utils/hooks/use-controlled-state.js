@@ -11,8 +11,8 @@ import { isValueDefined, getDefinedValue } from '../values';
 /**
  * @template T
  * @typedef Options
- * @property {T | undefined} initial  Initial value
- * @property {T | ""}        fallback Fallback value
+ * @property {T}      [initial] Initial value
+ * @property {T | ""} fallback  Fallback value
  */
 
 /** @type {Readonly<{ initial: undefined, fallback: '' }>} */
@@ -68,7 +68,6 @@ function useControlledState( currentState, options = defaultOptions ) {
 		fallback
 	);
 
-	/* eslint-disable jsdoc/no-undefined-types */
 	/** @type {(nextState: T) => void} */
 	const setState = useCallback(
 		( nextState ) => {
@@ -78,7 +77,6 @@ function useControlledState( currentState, options = defaultOptions ) {
 		},
 		[ hasCurrentState ]
 	);
-	/* eslint-enable jsdoc/no-undefined-types */
 
 	return [ state, setState ];
 }

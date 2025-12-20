@@ -2,38 +2,37 @@
  * External dependencies
  */
 import type { ForwardedRef } from 'react';
-// eslint-disable-next-line no-restricted-imports
-import { RadioGroup, useRadioState } from 'reakit';
+import * as Ariakit from '@ariakit/react';
 
 /**
  * WordPress dependencies
  */
-import {
-	useMergeRefs,
-	useInstanceId,
-	usePrevious,
-	useResizeObserver,
-} from '@wordpress/compose';
-import { forwardRef, useRef } from '@wordpress/element';
+import { useInstanceId } from '@wordpress/compose';
+import { forwardRef, useEffect, useMemo } from '@wordpress/element';
+import { isRTL } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import { View } from '../../view';
-import ToggleGroupControlBackdrop from './toggle-group-control-backdrop';
+import type { WordPressComponentProps } from '../../context';
 import ToggleGroupControlContext from '../context';
-import { useUpdateEffect } from '../../utils/hooks';
-import type { WordPressComponentProps } from '../../ui/context';
-import type { ToggleGroupControlMainControlProps } from '../types';
+import { useComputeControlledOrUncontrolledValue } from './utils';
+import type {
+	ToggleGroupControlMainControlProps,
+	ToggleGroupControlContextProps,
+} from '../types';
 
 function UnforwardedToggleGroupControlAsRadioGroup(
 	{
 		children,
 		isAdaptiveWidth,
 		label,
-		onChange,
+		onChange: onChangeProp,
 		size,
-		value,
+		value: valueProp,
+		id: idProp,
+		setSelectedElement,
 		...otherProps
 	}: WordPressComponentProps<
 		ToggleGroupControlMainControlProps,
@@ -42,54 +41,80 @@ function UnforwardedToggleGroupControlAsRadioGroup(
 	>,
 	forwardedRef: ForwardedRef< HTMLDivElement >
 ) {
-	const containerRef = useRef();
-	const [ resizeListener, sizes ] = useResizeObserver();
-	const baseId = useInstanceId(
+	const generatedId = useInstanceId(
 		ToggleGroupControlAsRadioGroup,
 		'toggle-group-control-as-radio-group'
-	).toString();
-	const radio = useRadioState( {
-		baseId,
-		state: value,
+	);
+	const baseId = idProp || generatedId;
+
+	// Use a heuristic to understand if the component is being used in controlled
+	// or uncontrolled mode, and consequently:
+	// - when controlled, convert `undefined` values to `''` (ie. "no value")
+	// - use the `value` prop as the `defaultValue` when uncontrolled
+	const { value, defaultValue } =
+		useComputeControlledOrUncontrolledValue( valueProp );
+
+	// `useRadioStore`'s `setValue` prop can be called with `null`, while
+	// the component's `onChange` prop only expects `undefined`
+	const wrappedOnChangeProp = onChangeProp
+		? ( v: string | number | null ) => {
+				onChangeProp( v ?? undefined );
+		  }
+		: undefined;
+
+	const radio = Ariakit.useRadioStore( {
+		defaultValue,
+		value,
+		setValue: wrappedOnChangeProp,
+		rtl: isRTL(),
 	} );
-	const previousValue = usePrevious( value );
 
-	// Propagate radio.state change.
-	useUpdateEffect( () => {
-		// Avoid calling onChange if radio state changed
-		// from incoming value.
-		if ( previousValue !== radio.state ) {
-			onChange( radio.state );
-		}
-	}, [ radio.state ] );
+	const selectedValue = Ariakit.useStoreState( radio, 'value' );
+	const setValue = radio.setValue;
 
-	// Sync incoming value with radio.state.
-	useUpdateEffect( () => {
-		if ( value !== radio.state ) {
-			radio.setState( value );
+	// Ensures that the active id is also reset after the value is "reset" by the consumer.
+	useEffect( () => {
+		if ( selectedValue === '' ) {
+			radio.setActiveId( undefined );
 		}
-	}, [ value ] );
+	}, [ radio, selectedValue ] );
+
+	const groupContextValue = useMemo(
+		(): ToggleGroupControlContextProps => ( {
+			activeItemIsNotFirstItem: () =>
+				radio.getState().activeId !== radio.first(),
+			baseId,
+			isBlock: ! isAdaptiveWidth,
+			size,
+			// @ts-expect-error - This is wrong and we should fix it.
+			value: selectedValue,
+			// @ts-expect-error - This is wrong and we should fix it.
+			setValue,
+			setSelectedElement,
+		} ),
+		[
+			baseId,
+			isAdaptiveWidth,
+			radio,
+			selectedValue,
+			setSelectedElement,
+			setValue,
+			size,
+		]
+	);
 
 	return (
-		<ToggleGroupControlContext.Provider
-			value={ { ...radio, isBlock: ! isAdaptiveWidth, size } }
-		>
-			<RadioGroup
-				{ ...radio }
+		<ToggleGroupControlContext.Provider value={ groupContextValue }>
+			<Ariakit.RadioGroup
+				store={ radio }
 				aria-label={ label }
-				as={ View }
+				render={ <View /> }
 				{ ...otherProps }
-				ref={ useMergeRefs( [ containerRef, forwardedRef ] ) }
+				id={ baseId }
+				ref={ forwardedRef }
 			>
-				{ resizeListener }
-				<ToggleGroupControlBackdrop
-					state={ radio.state }
-					containerRef={ containerRef }
-					containerWidth={ sizes.width }
-					isAdaptiveWidth={ isAdaptiveWidth }
-				/>
 				{ children }
-			</RadioGroup>
+			</Ariakit.RadioGroup>
 		</ToggleGroupControlContext.Provider>
 	);
 }

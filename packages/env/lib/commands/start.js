@@ -1,17 +1,18 @@
+'use strict';
 /**
  * External dependencies
  */
-const dockerCompose = require( 'docker-compose' );
+const { v2: dockerCompose } = require( 'docker-compose' );
 const util = require( 'util' );
 const path = require( 'path' );
 const fs = require( 'fs' ).promises;
-const inquirer = require( 'inquirer' );
+const { confirm } = require( '@inquirer/prompts' );
 
 /**
  * Promisified dependencies
  */
 const sleep = util.promisify( setTimeout );
-const rimraf = util.promisify( require( 'rimraf' ) );
+const { rimraf } = require( 'rimraf' );
 const exec = util.promisify( require( 'child_process' ).exec );
 
 /**
@@ -27,9 +28,11 @@ const {
 	configureWordPress,
 	setupWordPressDirectories,
 	readWordPressVersion,
+	canAccessWPORG,
 } = require( '../wordpress' );
 const { didCacheChange, setCache } = require( '../cache' );
 const md5 = require( '../md5' );
+const { executeLifecycleScript } = require( '../execute-lifecycle-script' );
 
 /**
  * @typedef {import('../config').WPConfig} WPConfig
@@ -41,11 +44,20 @@ const CONFIG_CACHE_KEY = 'config_checksum';
  *
  * @param {Object}  options
  * @param {Object}  options.spinner A CLI spinner which indicates progress.
- * @param {boolean} options.debug   True if debug mode is enabled.
  * @param {boolean} options.update  If true, update sources.
  * @param {string}  options.xdebug  The Xdebug mode to set.
+ * @param {string}  options.spx     The SPX mode to set.
+ * @param {boolean} options.scripts Indicates whether or not lifecycle scripts should be executed.
+ * @param {boolean} options.debug   True if debug mode is enabled.
  */
-module.exports = async function start( { spinner, debug, update, xdebug } ) {
+module.exports = async function start( {
+	spinner,
+	update,
+	xdebug,
+	spx,
+	scripts,
+	debug,
+} ) {
 	spinner.text = 'Reading configuration.';
 	await checkForLegacyInstall( spinner );
 
@@ -53,6 +65,7 @@ module.exports = async function start( { spinner, debug, update, xdebug } ) {
 		spinner,
 		debug,
 		xdebug,
+		spx,
 		writeChanges: true,
 	} );
 
@@ -68,15 +81,23 @@ module.exports = async function start( { spinner, debug, update, xdebug } ) {
 	const configHash = md5( config );
 	const { workDirectoryPath, dockerComposeConfigPath } = config;
 	const shouldConfigureWp =
-		update ||
-		( await didCacheChange( CONFIG_CACHE_KEY, configHash, {
-			workDirectoryPath,
-		} ) );
+		( update ||
+			( await didCacheChange( CONFIG_CACHE_KEY, configHash, {
+				workDirectoryPath,
+			} ) ) ) &&
+		// Don't reconfigure everything when we can't connect to the internet because
+		// the majority of update tasks involve connecting to the internet. (Such
+		// as downloading sources and pulling docker images.)
+		( await canAccessWPORG() );
 
 	const dockerComposeConfig = {
 		config: dockerComposeConfigPath,
 		log: config.debug,
 	};
+
+	if ( ! ( await canAccessWPORG() ) ) {
+		spinner.info( 'wp-env is offline' );
+	}
 
 	/**
 	 * If the Docker image is already running and the `wp-env` files have been
@@ -152,12 +173,38 @@ module.exports = async function start( { spinner, debug, update, xdebug } ) {
 
 	spinner.text = 'Starting WordPress.';
 
-	await dockerCompose.upMany( [ 'wordpress', 'tests-wordpress' ], {
-		...dockerComposeConfig,
-		commandOptions: shouldConfigureWp
-			? [ '--build', '--force-recreate' ]
-			: [],
-	} );
+	await dockerCompose.upMany(
+		[ 'wordpress', 'tests-wordpress', 'cli', 'tests-cli' ],
+		{
+			...dockerComposeConfig,
+			commandOptions: shouldConfigureWp
+				? [ '--build', '--force-recreate' ]
+				: [],
+		}
+	);
+
+	if ( config.env.development.phpmyadminPort ) {
+		await dockerCompose.upOne( 'phpmyadmin', {
+			...dockerComposeConfig,
+			commandOptions: shouldConfigureWp
+				? [ '--build', '--force-recreate' ]
+				: [],
+		} );
+	}
+
+	if ( config.env.tests.phpmyadminPort ) {
+		await dockerCompose.upOne( 'tests-phpmyadmin', {
+			...dockerComposeConfig,
+			commandOptions: shouldConfigureWp
+				? [ '--build', '--force-recreate' ]
+				: [],
+		} );
+	}
+
+	// Make sure we've consumed the custom CLI dockerfile.
+	if ( shouldConfigureWp ) {
+		await dockerCompose.buildOne( [ 'cli' ], { ...dockerComposeConfig } );
+	}
 
 	// Only run WordPress install/configuration when config has changed.
 	if ( shouldConfigureWp ) {
@@ -192,37 +239,67 @@ module.exports = async function start( { spinner, debug, update, xdebug } ) {
 		} );
 	}
 
-	const siteUrl = config.env.development.config.WP_SITEURL;
-	const e2eSiteUrl = `http://${ config.env.tests.config.WP_TESTS_DOMAIN }:${ config.env.tests.port }/`;
+	if ( scripts ) {
+		await executeLifecycleScript( 'afterStart', config, spinner );
+	}
 
-	const { out: mySQLAddress } = await dockerCompose.port(
+	const siteUrl = config.env.development.config.WP_SITEURL;
+	const testsSiteUrl = config.env.tests.config.WP_SITEURL;
+
+	const mySQLPort = await getPublicDockerPort(
 		'mysql',
 		3306,
 		dockerComposeConfig
 	);
-	const mySQLPort = mySQLAddress.split( ':' ).pop();
 
-	const { out: testsMySQLAddress } = await dockerCompose.port(
+	const testsMySQLPort = await getPublicDockerPort(
 		'tests-mysql',
 		3306,
 		dockerComposeConfig
 	);
-	const testsMySQLPort = testsMySQLAddress.split( ':' ).pop();
 
-	spinner.prefixText = 'WordPress development site started'
-		.concat( siteUrl ? ` at ${ siteUrl }` : '.' )
-		.concat( '\n' )
-		.concat( 'WordPress test site started' )
-		.concat( e2eSiteUrl ? ` at ${ e2eSiteUrl }` : '.' )
-		.concat( '\n' )
-		.concat( `MySQL is listening on port ${ mySQLPort }` )
-		.concat(
-			`MySQL for automated testing is listening on port ${ testsMySQLPort }`
-		)
-		.concat( '\n' );
+	const phpmyadminPort = config.env.development.phpmyadminPort
+		? await getPublicDockerPort( 'phpmyadmin', 80, dockerComposeConfig )
+		: null;
 
+	const testsPhpmyadminPort = config.env.tests.phpmyadminPort
+		? await getPublicDockerPort(
+				'tests-phpmyadmin',
+				80,
+				dockerComposeConfig
+		  )
+		: null;
+
+	spinner.prefixText = [
+		'WordPress development site started' +
+			( siteUrl ? ` at ${ siteUrl }` : '.' ),
+		'WordPress test site started' +
+			( testsSiteUrl ? ` at ${ testsSiteUrl }` : '.' ),
+		`MySQL is listening on port ${ mySQLPort }`,
+		`MySQL for automated testing is listening on port ${ testsMySQLPort }`,
+		phpmyadminPort &&
+			`phpMyAdmin started at http://localhost:${ phpmyadminPort }`,
+		testsPhpmyadminPort &&
+			`phpMyAdmin for automated testing started at http://localhost:${ testsPhpmyadminPort }`,
+	]
+		.filter( Boolean )
+		.join( '\n' );
+	spinner.prefixText += '\n\n';
 	spinner.text = 'Done!';
 };
+
+async function getPublicDockerPort(
+	service,
+	containerPort,
+	dockerComposeConfig
+) {
+	const { out: address } = await dockerCompose.port(
+		service,
+		containerPort,
+		dockerComposeConfig
+	);
+	return address.split( ':' ).pop().trim();
+}
 
 /**
  * Checks for legacy installs and provides
@@ -254,15 +331,21 @@ async function checkForLegacyInstall( spinner ) {
 			' and '
 		) }. Installs are now in your home folder.\n`
 	);
-	const { yesDelete } = await inquirer.prompt( [
-		{
-			type: 'confirm',
-			name: 'yesDelete',
+	let yesDelete = false;
+	try {
+		yesDelete = confirm( {
 			message:
 				'Do you wish to delete these old installs to reclaim disk space?',
 			default: true,
-		},
-	] );
+		} );
+	} catch ( error ) {
+		if ( error.name === 'ExitPromptError' ) {
+			console.log( 'Cancelled.' );
+			process.exit( 1 );
+		}
+		throw error;
+	}
+
 	if ( yesDelete ) {
 		await Promise.all( installs.map( ( install ) => rimraf( install ) ) );
 		spinner.info( 'Old installs deleted successfully.' );

@@ -1,6 +1,6 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
-	"apiVersion": 2,
+	"apiVersion": 3,
 	"name": "core/search",
 	"title": "Search",
 	"category": "widgets",
@@ -10,7 +10,7 @@
 	"attributes": {
 		"label": {
 			"type": "string",
-			"__experimentalRole": "content"
+			"role": "content"
 		},
 		"showLabel": {
 			"type": "boolean",
@@ -19,7 +19,7 @@
 		"placeholder": {
 			"type": "string",
 			"default": "",
-			"__experimentalRole": "content"
+			"role": "content"
 		},
 		"width": {
 			"type": "number"
@@ -29,7 +29,7 @@
 		},
 		"buttonText": {
 			"type": "string",
-			"__experimentalRole": "content"
+			"role": "content"
 		},
 		"buttonPosition": {
 			"type": "string",
@@ -42,6 +42,10 @@
 		"query": {
 			"type": "object",
 			"default": {}
+		},
+		"isSearchFieldHidden": {
+			"type": "boolean",
+			"default": false
 		}
 	},
 	"supports": {
@@ -54,6 +58,7 @@
 				"text": true
 			}
 		},
+		"interactivity": true,
 		"typography": {
 			"__experimentalSkipSerialization": true,
 			"__experimentalSelector": ".wp-block-search__label, .wp-block-search__input, .wp-block-search__button",
@@ -79,6 +84,9 @@
 				"radius": true,
 				"width": true
 			}
+		},
+		"spacing": {
+			"margin": true
 		},
 		"html": false
 	},

@@ -74,18 +74,14 @@ const SegmentedControls = ( {
 	useEffect( () => {
 		setActiveSegmentIndex( selectedSegmentIndex );
 		segmentHandler( segments[ selectedSegmentIndex ] );
-		// Disable reason: deferring this refactor to the native team.
-		// see https://github.com/WordPress/gutenberg/pull/41166
-		// eslint-disable-next-line react-hooks/exhaustive-deps
+		// See https://github.com/WordPress/gutenberg/pull/41166
 	}, [] );
 
 	useEffect( () => {
 		positionAnimationValue.setValue(
 			calculateEndValue( activeSegmentIndex )
 		);
-		// Disable reason: deferring this refactor to the native team.
-		// see https://github.com/WordPress/gutenberg/pull/41166
-		// eslint-disable-next-line react-hooks/exhaustive-deps
+		// See https://github.com/WordPress/gutenberg/pull/41166
 	}, [ segmentsDimensions ] );
 
 	const containerStyle = usePreferredColorSchemeStyle(
@@ -140,8 +136,8 @@ const SegmentedControls = ( {
 		styles.selectedDark
 	);
 
-	const width = segmentsDimensions[ activeSegmentIndex ].width;
-	const height = segmentsDimensions[ activeSegmentIndex ].height;
+	const width = segmentsDimensions[ activeSegmentIndex ]?.width;
+	const height = segmentsDimensions[ activeSegmentIndex ]?.height;
 
 	const outlineStyle = [ styles.outline, isIOS && styles.outlineIOS ];
 
@@ -149,6 +145,17 @@ const SegmentedControls = ( {
 		<View style={ styles.row }>
 			<View style={ styles.flex }>{ addonLeft }</View>
 			<View style={ [ containerStyle, isIOS && styles.containerIOS ] }>
+				<Animated.View
+					style={ [
+						{
+							width,
+							left: positionAnimationValue,
+							height,
+						},
+						selectedStyle,
+						outlineStyle,
+					] }
+				/>
 				{ segments.map( ( segment, index ) => {
 					return (
 						<Segment
@@ -162,7 +169,7 @@ const SegmentedControls = ( {
 							accessibilityState={ {
 								selected: activeSegmentIndex === index,
 							} }
-							accessibilityRole={ 'button' }
+							accessibilityRole="button"
 							accessibilityLabel={ segment }
 							accessibilityHint={ `${ index + 1 } on ${
 								segments.length
@@ -170,17 +177,6 @@ const SegmentedControls = ( {
 						/>
 					);
 				} ) }
-				<Animated.View
-					style={ [
-						{
-							width,
-							left: positionAnimationValue,
-							height,
-						},
-						selectedStyle,
-						outlineStyle,
-					] }
-				/>
 			</View>
 			<View style={ styles.flex }>{ addonRight }</View>
 		</View>

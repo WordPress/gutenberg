@@ -3,12 +3,7 @@
  */
 import { useDispatch } from '@wordpress/data';
 import { cloneBlock } from '@wordpress/blocks';
-import {
-	VisuallyHidden,
-	__unstableComposite as Composite,
-	__unstableUseCompositeState as useCompositeState,
-	__unstableCompositeItem as CompositeItem,
-} from '@wordpress/components';
+import { Composite, VisuallyHidden } from '@wordpress/components';
 
 import { useState } from '@wordpress/element';
 import { useInstanceId } from '@wordpress/compose';
@@ -28,9 +23,10 @@ const SetupContent = ( {
 	activeSlide,
 	patterns,
 	onBlockPatternSelect,
+	showTitles,
 } ) => {
-	const composite = useCompositeState();
 	const containerClass = 'block-editor-block-pattern-setup__container';
+
 	if ( viewMode === VIEWMODES.carousel ) {
 		const slideClass = new Map( [
 			[ activeSlide, 'active-slide' ],
@@ -40,23 +36,24 @@ const SetupContent = ( {
 		return (
 			<div className="block-editor-block-pattern-setup__carousel">
 				<div className={ containerClass }>
-					<ul className="carousel-container">
+					<div className="carousel-container">
 						{ patterns.map( ( pattern, index ) => (
 							<BlockPatternSlide
+								active={ index === activeSlide }
 								className={ slideClass.get( index ) || '' }
 								key={ pattern.name }
 								pattern={ pattern }
 							/>
 						) ) }
-					</ul>
+					</div>
 				</div>
 			</div>
 		);
 	}
+
 	return (
 		<div className="block-editor-block-pattern-setup__grid">
 			<Composite
-				{ ...composite }
 				role="listbox"
 				className={ containerClass }
 				aria-label={ __( 'Patterns list' ) }
@@ -66,7 +63,7 @@ const SetupContent = ( {
 						key={ pattern.name }
 						pattern={ pattern }
 						onSelect={ onBlockPatternSelect }
-						composite={ composite }
+						showTitles={ showTitles }
 					/>
 				) ) }
 			</Composite>
@@ -74,7 +71,7 @@ const SetupContent = ( {
 	);
 };
 
-function BlockPattern( { pattern, onSelect, composite } ) {
+function BlockPattern( { pattern, onSelect, showTitles } ) {
 	const baseClassName = 'block-editor-block-pattern-setup-list';
 	const { blocks, description, viewportWidth = 700 } = pattern;
 	const descriptionId = useInstanceId(
@@ -82,54 +79,61 @@ function BlockPattern( { pattern, onSelect, composite } ) {
 		`${ baseClassName }__item-description`
 	);
 	return (
-		<div
-			className={ `${ baseClassName }__list-item` }
-			aria-label={ pattern.title }
-			aria-describedby={ pattern.description ? descriptionId : undefined }
-		>
-			<CompositeItem
+		<div className={ `${ baseClassName }__list-item` }>
+			<Composite.Item
+				render={
+					<div
+						aria-describedby={
+							description ? descriptionId : undefined
+						}
+						aria-label={ pattern.title }
+						className={ `${ baseClassName }__item` }
+					/>
+				}
+				id={ `${ baseClassName }__pattern__${ pattern.name }` }
 				role="option"
-				as="div"
-				{ ...composite }
-				className={ `${ baseClassName }__item` }
 				onClick={ () => onSelect( blocks ) }
 			>
 				<BlockPreview
 					blocks={ blocks }
 					viewportWidth={ viewportWidth }
 				/>
-			</CompositeItem>
-			{ !! description && (
-				<VisuallyHidden id={ descriptionId }>
-					{ description }
-				</VisuallyHidden>
-			) }
+				{ showTitles && (
+					<div className={ `${ baseClassName }__item-title` }>
+						{ pattern.title }
+					</div>
+				) }
+				{ !! description && (
+					<VisuallyHidden id={ descriptionId }>
+						{ description }
+					</VisuallyHidden>
+				) }
+			</Composite.Item>
 		</div>
 	);
 }
 
-function BlockPatternSlide( { className, pattern, minHeight } ) {
+function BlockPatternSlide( { active, className, pattern, minHeight } ) {
 	const { blocks, title, description } = pattern;
 	const descriptionId = useInstanceId(
 		BlockPatternSlide,
 		'block-editor-block-pattern-setup-list__item-description'
 	);
 	return (
-		<li
+		<div
+			aria-hidden={ ! active }
+			role="img"
 			className={ `pattern-slide ${ className }` }
 			aria-label={ title }
 			aria-describedby={ description ? descriptionId : undefined }
 		>
-			<BlockPreview
-				blocks={ blocks }
-				__experimentalMinHeight={ minHeight }
-			/>
+			<BlockPreview blocks={ blocks } minHeight={ minHeight } />
 			{ !! description && (
 				<VisuallyHidden id={ descriptionId }>
 					{ description }
 				</VisuallyHidden>
 			) }
-		</li>
+		</div>
 	);
 }
 
@@ -138,8 +142,10 @@ const BlockPatternSetup = ( {
 	blockName,
 	filterPatternsFn,
 	onBlockPatternSelect,
+	initialViewMode = VIEWMODES.carousel,
+	showTitles = false,
 } ) => {
-	const [ viewMode, setViewMode ] = useState( VIEWMODES.carousel );
+	const [ viewMode, setViewMode ] = useState( initialViewMode );
 	const [ activeSlide, setActiveSlide ] = useState( 0 );
 	const { replaceBlock } = useDispatch( blockEditorStore );
 	const patterns = usePatternsSetup( clientId, blockName, filterPatternsFn );
@@ -164,6 +170,7 @@ const BlockPatternSetup = ( {
 					activeSlide={ activeSlide }
 					patterns={ patterns }
 					onBlockPatternSelect={ onPatternSelectCallback }
+					showTitles={ showTitles }
 				/>
 				<SetupToolbar
 					viewMode={ viewMode }
@@ -171,10 +178,14 @@ const BlockPatternSetup = ( {
 					activeSlide={ activeSlide }
 					totalSlides={ patterns.length }
 					handleNext={ () => {
-						setActiveSlide( ( active ) => active + 1 );
+						setActiveSlide( ( active ) =>
+							Math.min( active + 1, patterns.length - 1 )
+						);
 					} }
 					handlePrevious={ () => {
-						setActiveSlide( ( active ) => active - 1 );
+						setActiveSlide( ( active ) =>
+							Math.max( active - 1, 0 )
+						);
 					} }
 					onBlockPatternSelect={ () => {
 						onPatternSelectCallback(

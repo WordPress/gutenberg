@@ -1,5 +1,7 @@
 {
-	"version": 1,
+	"$schema": "../../../../schemas/json/theme.json",
+	"version": 3,
+	"title": "Block theme",
 	"settings": {
 		"color": {
 			"palette": [
@@ -14,7 +16,52 @@
 					"color": "#000"
 				}
 			],
-			"custom": false
+			"gradients": [
+				{
+					"name": "Custom gradient",
+					"gradient": "linear-gradient(135deg,rgba(0,0,0) 0%,rgb(0,0,0) 100%)",
+					"slug": "custom-gradient"
+				}
+			],
+			"duotone": [
+				{
+					"colors": [ "#333333", "#aaaaaa" ],
+					"slug": "custom-duotone",
+					"name": "Custom Duotone"
+				}
+			],
+			"custom": false,
+			"customGradient": false
+		},
+		"typography": {
+			"fontSizes": [
+				{
+					"name": "Custom",
+					"slug": "custom",
+					"size": "100px"
+				}
+			],
+			"customFontSize": false,
+			"lineHeight": true
+		},
+		"spacing": {
+			"units": [ "rem" ],
+			"padding": true,
+			"blockGap": true
+		},
+		"shadow": {
+			"presets": [
+				{
+					"name": "Natural",
+					"slug": "natural",
+					"shadow": "2px 2px 3px #000"
+				},
+				{
+					"name": "Test",
+					"slug": "test",
+					"shadow": "2px 2px 3px #000"
+				}
+			]
 		},
 		"blocks": {
 			"core/paragraph": {
@@ -30,10 +77,66 @@
 			}
 		}
 	},
+	"styles": {
+		"blocks": {
+			"core/post-featured-image": {
+				"shadow": "10px 10px 5px 0px rgba(0,0,0,0.66)",
+				"filter": {
+					"duotone": "var(--wp--preset--duotone--custom-duotone)"
+				}
+			},
+			"my/third-party-block": {
+				"color": {
+					"background": "hotpink"
+				},
+				"elements": {
+					"cite": {
+						"color": {
+							"text": "white"
+						}
+					}
+				}
+			}
+		},
+		"elements": {
+			"button": {
+				"shadow": "10px 10px 5px 0px rgba(0,0,0,0.66)"
+			},
+			"link": {
+				"typography": {
+					"textDecoration": "none"
+				},
+				"border": {
+					"bottom": {
+						"width": "2px",
+						"color": "currentColor",
+						"style": "solid"
+					}
+				},
+				":hover": {
+					"typography": {
+						"textDecoration": "none"
+					},
+					"border": {
+						"bottom": {
+							"width": "2px",
+							"color": "#000",
+							"style": "dotted"
+						}
+					}
+				}
+			}
+		}
+	},
 	"customTemplates": [
 		{
 			"name": "page-home",
 			"title": "Homepage template"
+		},
+		{
+			"name": "custom-single-post-template",
+			"title": "Custom Single Post template",
+			"postTypes": [ "post" ]
 		}
 	],
 	"templateParts": [

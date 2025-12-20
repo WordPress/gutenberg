@@ -5,6 +5,7 @@ import type {
 	ComponentPropsWithRef,
 	MouseEventHandler,
 	ReactNode,
+	FocusEvent,
 } from 'react';
 
 type Messages = {
@@ -152,12 +153,20 @@ export interface FormTokenFieldProps
 	 */
 	__experimentalShowHowTo?: boolean;
 	/**
+	 * Deprecated. Use `__next40pxDefaultSize` instead.
+	 *
+	 * @default false
+	 * @deprecated
+	 * @ignore
+	 */
+	__next36pxDefaultSize?: boolean;
+	/**
 	 * Start opting into the larger default height that will become the
 	 * default size in a future version.
 	 *
 	 * @default false
 	 */
-	__next36pxDefaultSize?: boolean;
+	__next40pxDefaultSize?: boolean;
 	/**
 	 * If true, the select the first matching suggestion when the user presses
 	 * the Enter key (or space when tokenizeOnSpace is true).
@@ -169,13 +178,28 @@ export interface FormTokenFieldProps
 	 * Custom renderer for suggestions.
 	 */
 	__experimentalRenderItem?: ( args: { item: string } ) => ReactNode;
+	/**
+	 * Start opting into the new margin-free styles that will become the default in a future version.
+	 *
+	 * @deprecated Default behavior since WP 7.0. Prop can be safely removed.
+	 * @ignore
+	 *
+	 * @default false
+	 */
+	__nextHasNoMarginBottom?: boolean;
+	/**
+	 * If true, add any incompleteTokenValue as a new token when the field loses focus.
+	 *
+	 * @default false
+	 */
+	tokenizeOnBlur?: boolean;
 }
 
 /**
  * `T` can be either a `string` or an object which must have a `value` prop as a string.
  */
 export interface SuggestionsListProps<
-	T = string | ( Record< string, unknown > & { value: string } )
+	T = string | ( Record< string, unknown > & { value: string } ),
 > {
 	selectedIndex: number;
 	scrollIntoView: boolean;

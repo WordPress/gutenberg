@@ -7,18 +7,23 @@
 			"hasParallax": false,
 			"dimRatio": 40,
 			"backgroundType": "image",
-			"isRepeated": false
+			"isRepeated": false,
+			"tagName": "div"
 		},
 		"innerBlocks": [
 			{
 				"name": "core/paragraph",
 				"isValid": true,
 				"attributes": {
-					"align": "center",
 					"content": "\n\t\t\tGuten Berg!\n\t\t",
 					"dropCap": false,
 					"placeholder": "Write title…",
-					"fontSize": "large"
+					"fontSize": "large",
+					"style": {
+						"typography": {
+							"textAlign": "center"
+						}
+					}
 				},
 				"innerBlocks": []
 			}
@@ -40,7 +45,8 @@
 			"isRepeated": false,
 			"minHeight": 48,
 			"minHeightUnit": "vw",
-			"align": "full"
+			"align": "full",
+			"tagName": "div"
 		},
 		"innerBlocks": [
 			{
@@ -65,18 +71,23 @@
 			"backgroundType": "image",
 			"isRepeated": false,
 			"contentPosition": "bottom right",
-			"alt": ""
+			"alt": "",
+			"tagName": "div"
 		},
 		"innerBlocks": [
 			{
 				"name": "core/paragraph",
 				"isValid": true,
 				"attributes": {
-					"align": "center",
 					"content": "test",
 					"dropCap": false,
 					"placeholder": "Write title…",
-					"fontSize": "large"
+					"fontSize": "large",
+					"style": {
+						"typography": {
+							"textAlign": "center"
+						}
+					}
 				},
 				"innerBlocks": []
 			}

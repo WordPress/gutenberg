@@ -15,20 +15,43 @@ concurrency:
     group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.head_ref || github.sha }}
     cancel-in-progress: true
 
+# Disable permissions for all available scopes by default.
+# Any needed permissions should be configured at the job level.
+permissions: {}
+
 jobs:
     check:
-        name: All
-        runs-on: ubuntu-latest
+        name: All${{ (matrix.node != '20' || matrix.os != 'ubuntu-24.04') && format(' (Node.js {0} on {1})', matrix.node, contains(matrix.os, 'macos-') && 'MacOS' || contains(matrix.os, 'windows-') && 'Windows' || 'Linux') || '' }}
+        runs-on: ${{ matrix.os }}
+        env:
+            NODE_OPTIONS: --max-old-space-size=4096
+        permissions:
+            contents: read
         if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
+        strategy:
+            matrix:
+                event: ['${{ github.event_name }}']
+                node: ['20', '22', '24']
+                os: ['macos-15', 'ubuntu-24.04', 'windows-2025']
+                exclude:
+                    # On PRs: Only test Node 20 on Ubuntu and Windows
+                    - event: 'pull_request'
+                      node: '22'
+                    - event: 'pull_request'
+                      node: '24'
+                    - event: 'pull_request'
+                      os: 'macos-15'
 
         steps:
-            - uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
-
-            - name: Use desired version of NodeJS
-              uses: actions/setup-node@8c91899e586c5b171469028077307d293428b516 # v3.5.1
+            - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
               with:
-                  node-version-file: '.nvmrc'
-                  cache: npm
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
+                  persist-credentials: false
+
+            - name: Use desired version of Node.js
+              uses: actions/setup-node@395ad3262231945c25e8478fd5baf05154b1d79f # v6.1.0
+              with:
+                  node-version: ${{ matrix.node }}
 
             - name: Npm install
               # A "full" install is executed, since `npm ci` does not always exit
@@ -43,7 +66,7 @@ jobs:
               run: npm run lint
 
             - name: Type checking
-              run: npm run build:package-types
+              run: npm run build
 
             - name: Check local changes
               run: npm run other:check-local-changes

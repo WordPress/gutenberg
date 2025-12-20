@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * Internal dependencies
@@ -26,7 +26,7 @@ const v2 = {
 			return null;
 		}
 
-		const className = classnames( 'wp-block-embed', {
+		const className = clsx( 'wp-block-embed', {
 			[ `is-type-${ type }` ]: type,
 			[ `is-provider-${ providerNameSlug }` ]: providerNameSlug,
 			[ `wp-block-embed-${ providerNameSlug }` ]: providerNameSlug,
@@ -52,7 +52,7 @@ const v1 = {
 			return null;
 		}
 
-		const embedClassName = classnames( 'wp-block-embed', {
+		const embedClassName = clsx( 'wp-block-embed', {
 			[ `is-type-${ type }` ]: type,
 			[ `is-provider-${ providerNameSlug }` ]: providerNameSlug,
 		} );

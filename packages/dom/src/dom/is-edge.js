@@ -8,15 +8,16 @@ import isSelectionForward from './is-selection-forward';
 import hiddenCaretRangeFromPoint from './hidden-caret-range-from-point';
 import { assertIsDefined } from '../utils/assert-is-defined';
 import isInputOrTextArea from './is-input-or-text-area';
+import { scrollIfNoRange } from './scroll-if-no-range';
 
 /**
  * Check whether the selection is at the edge of the container. Checks for
  * horizontal position by default. Set `onlyVertical` to true to check only
  * vertically.
  *
- * @param {Element} container            Focusable element.
- * @param {boolean} isReverse            Set to true to check left, false to check right.
- * @param {boolean} [onlyVertical=false] Set to true to check only vertical position.
+ * @param {HTMLElement} container            Focusable element.
+ * @param {boolean}     isReverse            Set to true to check left, false to check right.
+ * @param {boolean}     [onlyVertical=false] Set to true to check only vertical position.
  *
  * @return {boolean} True if at the edge, false if not.
  */
@@ -36,7 +37,7 @@ export default function isEdge( container, isReverse, onlyVertical = false ) {
 		return container.value.length === container.selectionStart;
 	}
 
-	if ( ! ( /** @type {HTMLElement} */ ( container ).isContentEditable ) ) {
+	if ( ! container.isContentEditable ) {
 		return true;
 	}
 
@@ -96,11 +97,8 @@ export default function isEdge( container, isReverse, onlyVertical = false ) {
 	// pixels. `getComputedStyle` may return a value with different units.
 	const x = isReverseDir ? containerRect.left + 1 : containerRect.right - 1;
 	const y = isReverse ? containerRect.top + 1 : containerRect.bottom - 1;
-	const testRange = hiddenCaretRangeFromPoint(
-		ownerDocument,
-		x,
-		y,
-		/** @type {HTMLElement} */ ( container )
+	const testRange = scrollIfNoRange( container, isReverse, () =>
+		hiddenCaretRangeFromPoint( ownerDocument, x, y, container )
 	);
 
 	if ( ! testRange ) {

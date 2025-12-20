@@ -4,16 +4,6 @@ The alignment matrix control allows users to quickly adjust inner block alignmen
 
 ![Button components](https://i.imgur.com/PxYkgL5.png)
 
-## Table of contents
-
--   [Alignment Matrix Control](#alignment-matrix-control)
-    -   [Table of contents](#table-of-contents)
-    -   [Design guidelines](#design-guidelines)
-        -   [Usage](#usage)
-    -   [Development guidelines](#development-guidelines)
-        -   [Usage](#usage-1)
-        -   [Props](#props)
-
 ## Design guidelines
 
 ### Usage
@@ -51,13 +41,36 @@ const controls = (
       />
     </BlockControls>
   </>
-}
+);
 ```
 
 ### Props
 
-| Name       | Type       | Default                   | Description                                                                                                                              |
-| ---------- | ---------- | ------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
-| `label`    | `string`   | `Change matrix alignment` | concise description of tool's functionality.                                                                                             |
-| `onChange` | `function` | `noop`                    | the function to execute upon a user's change of the matrix state                                                                         |
-| `value`    | `string`   | `center`                  | describes the content alignment location and can be `top`, `right`, `bottom`, `left`, `topRight`, `bottomRight`, `bottomLeft`, `topLeft` |
+### `label`
+
+-   **Type:** `string`
+-   **Default:** `'Change matrix alignment'`
+
+Label for the control.
+
+### `onChange`
+
+-   **Type:** `Function`
+-   **Default:** `noop`
+
+Function to execute upon a user's change of the matrix state.
+
+### `value`
+
+-   **Type:** `string`
+-   **Default:** `'center'`
+-   **Options:** `'center'`, `'center center'`, `'center left'`, `'center right'`, `'top center'`, `'top left'`, `'top right'`, `'bottom center'`, `'bottom left'`, `'bottom right'`
+
+Content alignment location.
+
+### `isDisabled`
+
+-   **Type:** `boolean`
+-   **Default:** `false`
+
+Whether the control should be disabled.

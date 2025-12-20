@@ -6,8 +6,8 @@ The component renders a user interface that allows the user to select predefined
 ## Usage
 
 ```jsx
+import { useState } from 'react';
 import { FontSizePicker } from '@wordpress/components';
-import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 const fontSizes = [
@@ -29,7 +29,7 @@ const MyFontSizePicker = () => {
 
 	return (
 		<FontSizePicker
-			__nextHasNoMarginBottom
+			__next40pxDefaultSize
 			fontSizes={ fontSizes }
 			value={ fontSize }
 			fallbackFontSize={ fallbackFontSize }
@@ -49,22 +49,20 @@ const MyFontSizePicker = () => {
 
 The component accepts the following props:
 
-### disableCustomFontSizes
+### `disableCustomFontSizes`: `boolean`
 
 If `true`, it will not be possible to choose a custom fontSize. The user will be forced to pick one of the pre-defined sizes passed in fontSizes.
 
--   Type: `Boolean`
 -   Required: no
 -   Default: `false`
 
-### fallbackFontSize
+### `fallbackFontSize`: `number`
 
 If no value exists, this prop defines the starting position for the font size picker slider. Only relevant if `withSlider` is `true`.
 
--   Type: `Number`
 -   Required: No
 
-### fontSizes
+### `fontSizes`: `FontSize[]`
 
 An array of font size objects. The object should contain properties size, name, and slug.
 The property `size` contains a number with the font size value, in `px` or a string specifying the font size CSS property that should be used eg: "13px", "1em", or "clamp(12px, 5vw, 100px)".
@@ -73,44 +71,65 @@ The `slug` property is a string with a unique identifier for the font size. Used
 
 **Note:** The slugs `default` and `custom` are reserved and cannot be used.
 
--   Type: `Array`
 -   Required: No
+-   Default: `[]`
 
-### onChange
+### `onChange`: `( value: number | string | undefined, selectedItem?: FontSize ) => void`
 
 A function that receives the new font size value.
 If onChange is called without any parameter, it should reset the value, attending to what reset means in that context, e.g., set the font size to undefined or set the font size a starting value.
 
--   Type: `function`
 -   Required: Yes
 
-### value
+### `size`: `'default' | '__unstable-large'`
+
+Size of the control.
+
+-   Required: No
+-   Default: `'default'`
+
+### `units`: `string[]`
+
+Available units for custom font size selection.
+
+-   Required: No
+-   Default: `[ 'px', 'em', 'rem', 'vw', 'vh' ]`
+
+### `value`: `number | string`
 
 The current font size value.
 
--   Type: `Number | String`
+**Note**: For the `units` property to work, the current font size value must be specified as strings with units (e.g., `'12px'` instead of `12`). When the font size is provided as a number, the component operates in "unitless mode" where the `units` property has no effect.
+
 -   Required: No
 
-### withSlider
+### `valueMode`: `'literal' | 'slug'`
 
-If `true`, a slider will be displayed alongside the input field when a custom font size is active. Has no effect when `disableCustomFontSizes` is `true`.
+Determines how the `value` prop should be interpreted.
 
--   Type: `Boolean`
--   Required: no
--   Default: `false`
+- `'literal'`: The `value` prop contains the actual font size value (number or string).
+- `'slug'`: The `value` prop contains the slug of the selected font size.
 
-### withReset
+-   Required: No
+-   Default: `'literal'`
+
+### `withReset`: `boolean`
 
 If `true`, a reset button will be displayed alongside the input field when a custom font size is active. Has no effect when `disableCustomFontSizes` is `true`.
 
--   Type: `Boolean`
 -   Required: no
 -   Default: `true`
 
-### __nextHasNoMarginBottom
+### `withSlider`: `boolean`
 
-Start opting into the new margin-free styles that will become the default in a future version, currently scheduled to be WordPress 6.4. (The prop can be safely removed once this happens.)
+If `true`, a slider will be displayed alongside the input field when a custom font size is active. Has no effect when `disableCustomFontSizes` is `true`.
 
--   Type: `Boolean`
 -   Required: no
 -   Default: `false`
+
+### `__next40pxDefaultSize`: `boolean`
+
+Start opting into the larger default height that will become the default size in a future version.
+
+- Required: No
+- Default: `false`

@@ -1,4 +1,8 @@
-# (Experimental) Interface
+# Interface
+
+<div class="callout callout-alert">
+This package is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
+</div>
 
 The Interface Package contains the basis to start a new WordPress screen as Edit Post or Edit Site. The package offers a data store and a set of components. The store is useful to contain common data required by a screen (e.g., active areas). The information is persisted across screen reloads. The components allow one to implement functionality like a sidebar or menu items. Third-party plugins can extend them by default.
 
@@ -27,25 +31,25 @@ Below are some examples of how to control the active complementary area using th
 ```js
 wp.data
 	.select( 'core/interface' )
-	.getActiveComplementaryArea( 'core/edit-post' );
+	.getActiveComplementaryArea( 'core' );
 // -> "edit-post/document"
 
 wp.data
 	.dispatch( 'core/interface' )
-	.enableComplementaryArea( 'core/edit-post', 'edit-post/block' );
+	.enableComplementaryArea( 'core', 'edit-post/block' );
 
 wp.data
 	.select( 'core/interface' )
-	.getActiveComplementaryArea( 'core/edit-post' );
+	.getActiveComplementaryArea( 'core' );
 // -> "edit-post/block"
 
 wp.data
 	.dispatch( 'core/interface' )
-	.disableComplementaryArea( 'core/edit-post' );
+	.disableComplementaryArea( 'core' );
 
 wp.data
 	.select( 'core/interface' )
-	.getActiveComplementaryArea( 'core/edit-post' );
+	.getActiveComplementaryArea( 'core' );
 // -> null
 ```
 
@@ -56,17 +60,17 @@ wp.data
 Example usage: `ComplementaryArea` component makes use of `PinnedItems` and automatically adds a pinned item for the complementary areas marked as a favorite.
 
 ```js
-wp.data.select( 'core/interface' ).isItemPinned( 'core/edit-post', 'edit-post-block-patterns/block-patterns-sidebar' );
+wp.data.select( 'core/interface' ).isItemPinned( 'core', 'edit-post-block-patterns/block-patterns-sidebar' );
 // -> false
 
-wp.data.dispatch( 'core/interface' ).pinItem( 'core/edit-post', 'edit-post-block-patterns/block-patterns-sidebar' );
+wp.data.dispatch( 'core/interface' ).pinItem( 'core', 'edit-post-block-patterns/block-patterns-sidebar' );
 
-wp.data.select( 'core/interface' ).isItemPinned( 'core/edit-post', 'edit-post-block-patterns/block-patterns-sidebar' );
+wp.data.select( 'core/interface' ).isItemPinned( 'core', 'edit-post-block-patterns/block-patterns-sidebar' );
 // -> true
 
-wp.data.dispatch( 'core/interface' ).unpinItem( 'core/edit-post', 'edit-post-block-patterns/block-patterns-sidebar' );
+wp.data.dispatch( 'core/interface' ).unpinItem( 'core', 'edit-post-block-patterns/block-patterns-sidebar' );
 
-wp.data.select( 'core/interface' ).isItemPinned( 'core/edit-post', 'edit-post-block-patterns/block-patterns-sidebar' ); -> false
+wp.data.select( 'core/interface' ).isItemPinned( 'core', 'edit-post-block-patterns/block-patterns-sidebar' ); -> false
 ```
 
 ### Preferences
@@ -109,29 +113,6 @@ wp.data
 wp.data
 	.select( 'core/interface' )
 	.isFeatureActive( 'namespace/editor-or-plugin-name', 'myFeatureName' ); // false
-```
-
-The `MoreMenuDropdown` and `MoreMenuFeatureToggle` components help to implement an editor menu for changing preferences and feature values.
-
-```jsx
-function MyEditorMenu() {
-	return (
-		<MoreMenuDropdown>
-			{ () => (
-				<MenuGroup label={ __( 'Features' ) }>
-					<MoreMenuFeatureToggle
-						scope="namespace/editor-or-plugin-name"
-						feature="myFeatureName"
-						label={ __( 'My feature' ) }
-						info={ __( 'A really awesome feature' ) }
-						messageActivated={ __( 'My feature activated' ) }
-						messageDeactivated={ __( 'My feature deactivated' ) }
-					/>
-				</MenuGroup>
-			) }
-		</MoreMenuDropdown>
-	);
-}
 ```
 
 ## Contributing to this package

@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { mapValues, mergeWith } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { isPhrasingContent, getPhrasingContentSchema } from '@wordpress/dom';
@@ -28,21 +23,30 @@ export function getBlockContentSchemaFromTransforms( transforms, context ) {
 			return schema;
 		}
 
-		return mapValues( schema, ( value ) => {
-			let attributes = value.attributes || [];
-			// If the block supports the "anchor" functionality, it needs to keep its ID attribute.
-			if ( hasAnchorSupport ) {
-				attributes = [ ...attributes, 'id' ];
-			}
-			return {
-				...value,
-				attributes,
-				isMatch: isMatch ? isMatch : undefined,
-			};
-		} );
+		if ( ! schema ) {
+			return {};
+		}
+
+		return Object.fromEntries(
+			Object.entries( schema ).map( ( [ key, value ] ) => {
+				let attributes = value.attributes || [];
+				// If the block supports the "anchor" functionality, it needs to keep its ID attribute.
+				if ( hasAnchorSupport ) {
+					attributes = [ ...attributes, 'id' ];
+				}
+				return [
+					key,
+					{
+						...value,
+						attributes,
+						isMatch: isMatch ? isMatch : undefined,
+					},
+				];
+			} )
+		);
 	} );
 
-	return mergeWith( {}, ...schemas, ( objValue, srcValue, key ) => {
+	function mergeTagNameSchemaProperties( objValue, srcValue, key ) {
 		switch ( key ) {
 			case 'children': {
 				if ( objValue === '*' || srcValue === '*' ) {
@@ -68,12 +72,35 @@ export function getBlockContentSchemaFromTransforms( transforms, context ) {
 				};
 			}
 		}
-	} );
+	}
+
+	// A tagName schema is an object with children, attributes, require, and
+	// isMatch properties.
+	function mergeTagNameSchemas( a, b ) {
+		for ( const key in b ) {
+			a[ key ] = a[ key ]
+				? mergeTagNameSchemaProperties( a[ key ], b[ key ], key )
+				: { ...b[ key ] };
+		}
+		return a;
+	}
+
+	// A schema is an object with tagName schemas by tag name.
+	function mergeSchemas( a, b ) {
+		for ( const key in b ) {
+			a[ key ] = a[ key ]
+				? mergeTagNameSchemas( a[ key ], b[ key ] )
+				: { ...b[ key ] };
+		}
+		return a;
+	}
+
+	return schemas.reduce( mergeSchemas, {} );
 }
 
 /**
  * Gets the block content schema, which is extracted and merged from all
- * registered blocks with raw transfroms.
+ * registered blocks with raw transforms.
  *
  * @param {string} context Set to "paste" when in paste context, where the
  *                         schema is more strict.
@@ -86,14 +113,39 @@ export function getBlockContentSchema( context ) {
 
 /**
  * Checks whether HTML can be considered plain text. That is, it does not contain
- * any elements that are not line breaks.
+ * any elements that are not line breaks, or it only contains a single non-semantic
+ * wrapper element (span) with no semantic child elements.
  *
  * @param {string} HTML The HTML to check.
  *
  * @return {boolean} Whether the HTML can be considered plain text.
  */
 export function isPlain( HTML ) {
-	return ! /<(?!br[ />])/i.test( HTML );
+	if ( ! /<(?!br[ />])/i.test( HTML ) ) {
+		return true;
+	}
+
+	const doc = document.implementation.createHTMLDocument( '' );
+	doc.body.innerHTML = HTML;
+
+	if ( doc.body.children.length !== 1 ) {
+		return false;
+	}
+
+	const wrapper = doc.body.children.item( 0 );
+
+	const descendants = wrapper.getElementsByTagName( '*' );
+	for ( let i = 0; i < descendants.length; i++ ) {
+		if ( descendants.item( i ).tagName !== 'BR' ) {
+			return false;
+		}
+	}
+
+	if ( wrapper.tagName !== 'SPAN' ) {
+		return false;
+	}
+
+	return true;
 }
 
 /**

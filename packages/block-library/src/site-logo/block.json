@@ -1,10 +1,10 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
-	"apiVersion": 2,
+	"apiVersion": 3,
 	"name": "core/site-logo",
 	"title": "Site Logo",
 	"category": "theme",
-	"description": "Display a graphic to represent this site. Update the block, and the changes apply everywhere it’s used. This is different than the site icon, which is the smaller image visible in your dashboard, browser tabs, etc used to help others recognize this site.",
+	"description": "Display an image to represent this site. Update this block and the changes apply everywhere.",
 	"textdomain": "default",
 	"attributes": {
 		"width": {
@@ -12,11 +12,13 @@
 		},
 		"isLink": {
 			"type": "boolean",
-			"default": true
+			"default": true,
+			"role": "content"
 		},
 		"linkTarget": {
 			"type": "string",
-			"default": "_self"
+			"default": "_self",
+			"role": "content"
 		},
 		"shouldSyncIcon": {
 			"type": "boolean"
@@ -34,13 +36,22 @@
 		"align": true,
 		"alignWide": false,
 		"color": {
-			"__experimentalDuotone": "img, .components-placeholder__illustration, .components-placeholder::before",
 			"text": false,
 			"background": false
 		},
 		"spacing": {
 			"margin": true,
-			"padding": true
+			"padding": true,
+			"__experimentalDefaultControls": {
+				"margin": false,
+				"padding": false
+			}
+		},
+		"interactivity": {
+			"clientNavigation": true
+		},
+		"filter": {
+			"duotone": true
 		}
 	},
 	"styles": [
@@ -51,6 +62,11 @@
 		},
 		{ "name": "rounded", "label": "Rounded" }
 	],
+	"selectors": {
+		"filter": {
+			"duotone": ".wp-block-site-logo img, .wp-block-site-logo .components-placeholder__illustration, .wp-block-site-logo .components-placeholder::before"
+		}
+	},
 	"editorStyle": "wp-block-site-logo-editor",
 	"style": "wp-block-site-logo"
 }

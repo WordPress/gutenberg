@@ -6,6 +6,12 @@ export type DropZoneProps = {
 	 */
 	className?: string;
 	/**
+	 * An icon to be shown within the drop zone area.
+	 *
+	 * @default "upload"
+	 */
+	icon?: JSX.Element;
+	/**
 	 * A string to be shown within the drop zone area.
 	 *
 	 * @default `__( 'Drop files to upload' )`
@@ -26,4 +32,9 @@ export type DropZoneProps = {
 	 * It receives the HTML being dropped as an argument.
 	 */
 	onHTMLDrop?: ( html: string ) => void;
+	/**
+	 * A function to determine if the drop zone is eligible to handle the drop
+	 * data transfer items.
+	 */
+	isEligible?: ( dataTransfer: DataTransfer ) => boolean;
 };

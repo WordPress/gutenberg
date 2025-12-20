@@ -10,7 +10,7 @@ class MediaUploadCoordinator: NSObject {
   private let gutenberg: Gutenberg
 
   private var activeUploads: [Int32: Progress] = [:]
-  private(set) var successfullUpload = true
+  private(set) var successfulUpload = true
   
   init(gutenberg: Gutenberg) {
     self.gutenberg = gutenberg
@@ -20,7 +20,7 @@ class MediaUploadCoordinator: NSObject {
 
   func upload(url: URL) -> Int32? {
     //Make sure the media is not larger than a 32 bits to number to avoid problems when bridging to JS
-    successfullUpload = true
+    successfulUpload = true
     let mediaID = Int32(truncatingIfNeeded:UUID().uuidString.hash)
     let progress = Progress(parent: nil, userInfo: [ProgressUserInfoKey.mediaID: mediaID, ProgressUserInfoKey.mediaURL: url])
     progress.totalUnitCount = 100
@@ -42,7 +42,7 @@ class MediaUploadCoordinator: NSObject {
       return
     }
     progress.completedUnitCount = 0
-    successfullUpload = true
+    successfulUpload = true
     Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(timerFireMethod(_:)), userInfo: progress, repeats: true)
   }
 
@@ -54,7 +54,7 @@ class MediaUploadCoordinator: NSObject {
   }
   
   @objc func failUpload() {
-      successfullUpload = false
+      successfulUpload = false
   }
   
   @objc func timerFireMethod(_ timer: Timer) {
@@ -67,11 +67,11 @@ class MediaUploadCoordinator: NSObject {
     }
     progress.completedUnitCount += 1
     
-    if !successfullUpload {
+    if !successfulUpload {
       timer.invalidate()
       progress.setUserInfoObject("Network upload failed", forKey: .mediaError)
-      gutenberg.mediaUploadUpdate(id: mediaID, state: .failed, progress: 1, url: nil, serverID: nil)
-      successfullUpload = true
+      gutenberg.mediaUploadUpdate(id: mediaID, state: .failed, progress: 1, url: nil, serverID: nil, metadata: ["demoApp" : true, "failReason" : "Network upload failed"])
+      successfulUpload = true
       return
     }
     
@@ -80,7 +80,7 @@ class MediaUploadCoordinator: NSObject {
       gutenberg.mediaUploadUpdate(id: mediaID, state: .uploading, progress: Float(progress.fractionCompleted), url: nil, serverID: nil)
     } else if progress.fractionCompleted >= 1 {
       timer.invalidate()
-      gutenberg.mediaUploadUpdate(id: mediaID, state: .succeeded, progress: 1, url: mediaURL, serverID: mediaID)
+      gutenberg.mediaUploadUpdate(id: mediaID, state: .succeeded, progress: 1, url: mediaURL, serverID: mediaID, metadata: ["demoApp" : true])
       activeUploads[mediaID] = nil
     }
   }

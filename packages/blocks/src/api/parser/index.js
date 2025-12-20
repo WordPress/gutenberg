@@ -101,6 +101,7 @@ export function normalizeRawBlock( rawBlock, options ) {
 	// meaning there are no negative consequences to repeated autop calls.
 	if (
 		rawBlockName === fallbackBlockName &&
+		rawBlockName === 'core/freeform' &&
 		! options?.__unstableSkipAutop
 	) {
 		rawInnerHTML = autop( rawInnerHTML ).trim();
@@ -177,7 +178,7 @@ function applyBlockValidation( unvalidatedBlock, blockType ) {
 	);
 	// Attempt to validate the block once again after the built-in fixes.
 	const [ isFixedValid, validationIssues ] = validateBlock(
-		unvalidatedBlock,
+		fixedBlock,
 		blockType
 	);
 
@@ -190,7 +191,7 @@ function applyBlockValidation( unvalidatedBlock, blockType ) {
  * @param {WPRawBlock}   rawBlock The raw block object.
  * @param {ParseOptions} options  Extra options for handling block parsing.
  *
- * @return {WPBlock} Fully parsed block.
+ * @return {WPBlock | undefined} Fully parsed block.
  */
 export function parseRawBlock( rawBlock, options ) {
 	let normalizedBlock = normalizeRawBlock( rawBlock, options );
@@ -203,7 +204,7 @@ export function parseRawBlock( rawBlock, options ) {
 	// Try finding the type for known block name.
 	let blockType = getBlockType( normalizedBlock.blockName );
 
-	// If not blockType is found for the specified name, fallback to the "unregistedBlockType".
+	// If not blockType is found for the specified name, fallback to the "unregisteredBlockType".
 	if ( ! blockType ) {
 		normalizedBlock = createMissingBlockType( normalizedBlock );
 		blockType = getBlockType( normalizedBlock.blockName );

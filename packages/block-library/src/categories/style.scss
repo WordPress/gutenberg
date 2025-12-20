@@ -10,4 +10,12 @@
 		/*rtl:ignore*/
 		margin-left: 2em;
 	}
+	/* Only apply the text align on dropdowns, not lists. */
+	&.wp-block-categories-dropdown.aligncenter {
+		text-align: center;
+	}
+	& .wp-block-categories__label {
+		width: 100%;
+		display: block;
+	}
 }

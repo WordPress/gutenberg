@@ -1,62 +1,78 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`flags warnings with invalid structure css snapshot matches warnings 1`] = `
-Array [
-  Object {
+[
+  {
     "column": 45,
+    "endColumn": 46,
+    "endLine": 7,
     "line": 7,
-    "rule": "block-closing-brace-newline-before",
+    "rule": "@stylistic/block-closing-brace-newline-before",
     "severity": "error",
-    "text": "Expected newline before \\"}\\" (block-closing-brace-newline-before)",
+    "text": "Expected newline before "}" (@stylistic/block-closing-brace-newline-before)",
   },
-  Object {
+  {
     "column": 14,
+    "endColumn": 15,
+    "endLine": 7,
     "line": 7,
-    "rule": "block-opening-brace-newline-after",
+    "rule": "@stylistic/block-opening-brace-newline-after",
     "severity": "error",
-    "text": "Expected newline after \\"{\\" (block-opening-brace-newline-after)",
+    "text": "Expected newline after "{" (@stylistic/block-opening-brace-newline-after)",
   },
-  Object {
+  {
     "column": 32,
+    "endColumn": 33,
+    "endLine": 7,
     "line": 7,
-    "rule": "declaration-block-semicolon-newline-after",
+    "rule": "@stylistic/declaration-block-semicolon-newline-after",
     "severity": "error",
-    "text": "Expected newline after \\";\\" (declaration-block-semicolon-newline-after)",
+    "text": "Expected newline after ";" (@stylistic/declaration-block-semicolon-newline-after)",
   },
-  Object {
-    "column": 12,
-    "line": 1,
-    "rule": "selector-list-comma-newline-after",
-    "severity": "error",
-    "text": "Expected newline after \\",\\" (selector-list-comma-newline-after)",
-  },
-  Object {
-    "column": 25,
-    "line": 1,
-    "rule": "selector-list-comma-newline-after",
-    "severity": "error",
-    "text": "Expected newline after \\",\\" (selector-list-comma-newline-after)",
-  },
-  Object {
+  {
     "column": 3,
+    "endColumn": 4,
+    "endLine": 4,
     "line": 4,
-    "rule": "indentation",
+    "rule": "@stylistic/indentation",
     "severity": "error",
-    "text": "Expected indentation of 0 tabs (indentation)",
+    "text": "Expected indentation of 0 tabs (@stylistic/indentation)",
   },
-  Object {
+  {
     "column": 3,
+    "endColumn": 20,
+    "endLine": 2,
     "line": 2,
-    "rule": "indentation",
+    "rule": "@stylistic/indentation",
     "severity": "error",
-    "text": "Expected indentation of 1 tab (indentation)",
+    "text": "Expected indentation of 1 tab (@stylistic/indentation)",
   },
-  Object {
+  {
     "column": 3,
+    "endColumn": 15,
+    "endLine": 3,
     "line": 3,
-    "rule": "indentation",
+    "rule": "@stylistic/indentation",
     "severity": "error",
-    "text": "Expected indentation of 1 tab (indentation)",
+    "text": "Expected indentation of 1 tab (@stylistic/indentation)",
+  },
+  {
+    "column": 12,
+    "endColumn": 13,
+    "endLine": 1,
+    "line": 1,
+    "rule": "@stylistic/selector-list-comma-newline-after",
+    "severity": "error",
+    "text": "Expected newline after "," (@stylistic/selector-list-comma-newline-after)",
+  },
+  {
+    "column": 25,
+    "endColumn": 26,
+    "endLine": 1,
+    "line": 1,
+    "rule": "@stylistic/selector-list-comma-newline-after",
+    "severity": "error",
+    "text": "Expected newline after "," (@stylistic/selector-list-comma-newline-after)",
   },
 ]
 `;
