@@ -8,6 +8,16 @@
  */
 function fixDeps( pkg ) {
 	/**
+	 * esbuild-sass-plugin dynamically requires postcss-modules for CSS modules support.
+	 */
+	if ( pkg.name === 'esbuild-sass-plugin' ) {
+		pkg.dependencies = {
+			...pkg.dependencies,
+			'postcss-modules': '*',
+		};
+	}
+
+	/**
 	 * Fix missing peer dependency on @emotion/react in @emotion/native.
 	 * @see https://github.com/emotion-js/emotion/issues/3351
 	 */
@@ -20,7 +30,7 @@ function fixDeps( pkg ) {
 
 	/**
 	 * @terrazzo/cli uses @hono/node-server
-	 * 
+	 *
 	 * It is removed in the latest version but not released yet.
 	 */
 	if (

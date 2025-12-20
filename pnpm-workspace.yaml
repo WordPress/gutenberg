@@ -14,6 +14,7 @@ strictPeerDependencies: true
 
 # No hoisting by default.
 hoistPattern: []
+publicHoistPattern: []
 
 # Package compromise avoidance: require dep build script approval.
 strictDepBuilds: true
