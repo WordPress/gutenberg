@@ -46,8 +46,11 @@ function render_block_core_post_excerpt( $attributes, $content, $block ) {
 	*/
 	$excerpt_length = $attributes['excerptLength'];
 	$excerpt        = get_the_excerpt( $block->context['postId'] );
+	$is_trimmed     = false;
 	if ( isset( $excerpt_length ) ) {
-		$excerpt = wp_trim_words( $excerpt, $excerpt_length );
+		$original_excerpt = $excerpt;
+		$excerpt          = wp_trim_words( $excerpt, $excerpt_length, '' );
+		$is_trimmed       = $original_excerpt !== $excerpt;
 	}
 
 	$classes = array();
@@ -64,7 +67,7 @@ function render_block_core_post_excerpt( $attributes, $content, $block ) {
 	if ( $show_more_on_new_line && ! empty( $more_text ) ) {
 		$content .= '</p><p class="wp-block-post-excerpt__more-text">' . $more_text . '</p>';
 	} else {
-		$content .= " $more_text</p>";
+		$content .= ( $is_trimmed ? '&hellip; ' : '' ) . $more_text . '</p>';
 	}
 	remove_filter( 'excerpt_more', $filter_excerpt_more );
 	return sprintf( '<div %1$s>%2$s</div>', $wrapper_attributes, $content );
