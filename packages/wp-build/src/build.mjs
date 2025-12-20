@@ -107,26 +107,54 @@ const wordpressExternalsPlugin = createWordpressExternalsPlugin(
 	HANDLE_PREFIX
 );
 
-const styleBundlingPlugins = [
-	// Handle CSS modules (.module.css and .module.scss)
-	sassPlugin( {
-		embedded: true,
-		filter: /\.module\.(css|scss)$/,
-		transform: postcssModules( {
-			generateScopedName: '[name]__[local]__[hash:base64:5]',
+/**
+ * Create SASS load paths for a given package directory.
+ * Includes the package's local node_modules for pnpm compatibility.
+ *
+ * @param {string} packageDir - The package directory path.
+ * @return {string[]} Array of paths to search for SASS imports.
+ */
+function getSassLoadPaths( packageDir ) {
+	return [
+		// Package's local node_modules (for pnpm's non-hoisted dependencies)
+		path.join( packageDir, 'node_modules' ),
+		// Root node_modules (for hoisted dependencies if any)
+		'node_modules',
+		// Direct path to base-styles for @wordpress/base-styles imports
+		path.join( PACKAGES_DIR, 'base-styles' ),
+	];
+}
+
+/**
+ * Create style bundling plugins for a given package directory.
+ *
+ * @param {string} packageDir - The package directory path.
+ * @return {object[]} Array of esbuild plugins for handling CSS/SCSS.
+ */
+function createStyleBundlingPlugins( packageDir ) {
+	const loadPaths = getSassLoadPaths( packageDir );
+	return [
+		// Handle CSS modules (.module.css and .module.scss)
+		sassPlugin( {
+			embedded: true,
+			filter: /\.module\.(css|scss)$/,
+			transform: postcssModules( {
+				generateScopedName: '[name]__[local]__[hash:base64:5]',
+			} ),
+			type: 'style',
+			loadPaths,
 		} ),
-		type: 'style',
-		loadPaths: [ 'node_modules', path.join( PACKAGES_DIR, 'base-styles' ) ],
-	} ),
-	// Handle regular CSS/SCSS files
-	// Note: .module.css and .module.scss already handled by plugin above
-	sassPlugin( {
-		embedded: true,
-		filter: /\.(css|scss)$/,
-		type: 'style',
-		loadPaths: [ 'node_modules', path.join( PACKAGES_DIR, 'base-styles' ) ],
-	} ),
-];
+		// Handle regular CSS/SCSS files
+		// Note: .module.css and .module.scss already handled by plugin above
+		sassPlugin( {
+			embedded: true,
+			filter: /\.(css|scss)$/,
+			type: 'style',
+			loadPaths,
+		} ),
+	];
+}
+
 
 /**
  * Normalize path separators for cross-platform compatibility.
@@ -1090,7 +1118,7 @@ async function transpilePackage( packageName ) {
 	const plugins = [
 		needsEmotionPlugin && emotionPlugin,
 		externalizeAllExceptCssPlugin,
-		...styleBundlingPlugins,
+		...createStyleBundlingPlugins( packageDir ),
 	].filter( Boolean );
 
 	if ( packageJson.main ) {
@@ -1223,10 +1251,7 @@ async function compileStyles( packageName ) {
 				plugins: [
 					sassPlugin( {
 						embedded: true,
-						loadPaths: [
-							'node_modules',
-							path.join( PACKAGES_DIR, 'base-styles' ),
-						],
+						loadPaths: getSassLoadPaths( packageDir ),
 						async transform( source ) {
 							// Process with autoprefixer for LTR version
 							const ltrResult = await postcss( [
@@ -1411,7 +1436,7 @@ async function buildRoute( routeName ) {
 						[],
 						true // Generate asset file for minified build
 					),
-					...styleBundlingPlugins,
+					...createStyleBundlingPlugins( routeDir ),
 				],
 			} ),
 			esbuild.build( {
@@ -1429,7 +1454,7 @@ async function buildRoute( routeName ) {
 						[],
 						false // Skip asset file for non-minified build
 					),
-					...styleBundlingPlugins,
+					...createStyleBundlingPlugins( routeDir ),
 				],
 			} ),
 		] );
