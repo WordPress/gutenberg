@@ -207,12 +207,18 @@ importers:
       '@types/uuid':
         specifier: 8.3.1
         version: 8.3.1
+      '@wordpress/browserslist-config':
+        specifier: workspace:./packages/browserslist-config
+        version: link:packages/browserslist-config
       '@wordpress/build':
         specifier: workspace:./packages/wp-build
         version: link:packages/wp-build
       '@wordpress/e2e-test-utils-playwright':
         specifier: workspace:./packages/e2e-test-utils-playwright
         version: link:packages/e2e-test-utils-playwright
+      '@wordpress/jest-preset-default':
+        specifier: workspace:./packages/jest-preset-default
+        version: link:packages/jest-preset-default
       '@wordpress/prettier-config':
         specifier: workspace:./packages/prettier-config
         version: link:packages/prettier-config
@@ -22410,7 +22416,9 @@ snapshots:
     transitivePeerDependencies:
       - '@babel/core'
       - '@babel/preset-env'
+      - bufferutil
       - supports-color
+      - utf-8-validate
 
   '@react-native/normalize-color@2.1.0': {}
 
