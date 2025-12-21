@@ -8,7 +8,7 @@ import { fn } from '@storybook/test';
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
-import { check, external, upload } from '@wordpress/icons';
+import { upload } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -143,27 +143,14 @@ export const NoticeListSubcomponent: StoryFn< typeof NoticeList > = () => {
 };
 NoticeListSubcomponent.storyName = 'NoticeList Subcomponent';
 
-export const WithDisabledAction = Template.bind( {} );
-WithDisabledAction.args = {
+/**
+ * Notice actions support all Button component props.
+ * This story demonstrates a few commonly used props.
+ */
+export const WithButtonProps = Template.bind( {} );
+WithButtonProps.args = {
 	...Default.args,
-	children: 'This notice has a disabled action.',
-	actions: [
-		{
-			label: 'Disabled action',
-			onClick: () => {},
-			disabled: true,
-		},
-		{
-			label: 'Enabled action',
-			onClick: () => {},
-		},
-	],
-};
-
-export const WithIconActions = Template.bind( {} );
-WithIconActions.args = {
-	...Default.args,
-	children: 'This notice has actions with icons.',
+	children: 'Notice actions support Button props like disabled, icon, etc.',
 	actions: [
 		{
 			label: 'Upload',
@@ -172,98 +159,17 @@ WithIconActions.args = {
 			variant: 'primary',
 		},
 		{
-			label: 'Done',
+			label: 'Disabled',
 			onClick: () => {},
-			icon: check,
-			iconPosition: 'right',
+			disabled: true,
 		},
 	],
 };
 
-export const WithLoadingAction: StoryFn< typeof Notice > = ( props ) => {
-	const [ isLoading, setIsLoading ] = useState( false );
-
-	const handleClick = () => {
-		setIsLoading( true );
-		setTimeout( () => setIsLoading( false ), 2000 );
-	};
-
-	return (
-		<Notice
-			{ ...props }
-			actions={ [
-				{
-					label: isLoading ? 'Saving...' : 'Save',
-					onClick: handleClick,
-					isBusy: isLoading,
-					disabled: isLoading,
-					variant: 'primary',
-				},
-			] }
-		>
-			Click the button to see the loading state.
-		</Notice>
-	);
-};
-
-export const WithDestructiveAction = Template.bind( {} );
-WithDestructiveAction.args = {
-	...Default.args,
-	status: 'warning',
-	children: 'Are you sure you want to delete this item?',
-	actions: [
-		{
-			label: 'Delete',
-			onClick: () => {},
-			isDestructive: true,
-			variant: 'primary',
-		},
-		{
-			label: 'Cancel',
-			onClick: () => {},
-		},
-	],
-};
-
-export const WithOpenInNewTab = Template.bind( {} );
-WithOpenInNewTab.args = {
-	...Default.args,
-	children: 'Learn more about this feature.',
-	actions: [
-		{
-			label: 'Documentation',
-			url: 'https://wordpress.org',
-			target: '_blank',
-			rel: 'noreferrer',
-			icon: external,
-			iconPosition: 'right',
-		},
-	],
-};
-
-export const WithDifferentSizes = Template.bind( {} );
-WithDifferentSizes.args = {
-	...Default.args,
-	children: 'Actions with different sizes.',
-	actions: [
-		{
-			label: 'Small',
-			onClick: () => {},
-			size: 'small',
-		},
-		{
-			label: 'Compact',
-			onClick: () => {},
-			size: 'compact',
-		},
-		{
-			label: 'Default',
-			onClick: () => {},
-			size: 'default',
-		},
-	],
-};
-
+/**
+ * When both `url` and `onClick` are provided, the action renders as a link
+ * and `onClick` is still called when clicked.
+ */
 export const WithOnClickAndUrl: StoryFn< typeof Notice > = ( props ) => {
 	const [ clickCount, setClickCount ] = useState( 0 );
 

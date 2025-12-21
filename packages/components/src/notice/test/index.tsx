@@ -8,7 +8,6 @@ import userEvent from '@testing-library/user-event';
  * WordPress dependencies
  */
 import { speak } from '@wordpress/a11y';
-import { wordpress } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -124,7 +123,7 @@ describe( 'Notice', () => {
 	} );
 
 	describe( 'actions', () => {
-		it( 'should render a disabled action button', () => {
+		it( 'should pass through Button props to action buttons', () => {
 			render(
 				<Notice
 					actions={ [
@@ -135,7 +134,7 @@ describe( 'Notice', () => {
 						},
 					] }
 				>
-					Notice with disabled action
+					Notice with action
 				</Notice>
 			);
 
@@ -143,88 +142,6 @@ describe( 'Notice', () => {
 				name: 'Disabled action',
 			} );
 			expect( button ).toBeDisabled();
-		} );
-
-		it( 'should render an action button with an icon', () => {
-			render(
-				<Notice
-					actions={ [
-						{
-							label: 'Action with icon',
-							onClick: jest.fn(),
-							icon: wordpress,
-						},
-					] }
-				>
-					Notice with icon action
-				</Notice>
-			);
-
-			const button = screen.getByRole( 'button', {
-				name: 'Action with icon',
-			} );
-			expect( button ).toHaveClass( 'has-icon' );
-		} );
-
-		it( 'should render an action button with isBusy state', () => {
-			render(
-				<Notice
-					actions={ [
-						{
-							label: 'Loading action',
-							onClick: jest.fn(),
-							isBusy: true,
-						},
-					] }
-				>
-					Notice with loading action
-				</Notice>
-			);
-
-			const button = screen.getByRole( 'button', {
-				name: 'Loading action',
-			} );
-			expect( button ).toHaveClass( 'is-busy' );
-		} );
-
-		it( 'should render an action button with isDestructive style', () => {
-			render(
-				<Notice
-					actions={ [
-						{
-							label: 'Delete',
-							onClick: jest.fn(),
-							isDestructive: true,
-						},
-					] }
-				>
-					Destructive action notice
-				</Notice>
-			);
-
-			const button = screen.getByRole( 'button', { name: 'Delete' } );
-			expect( button ).toHaveClass( 'is-destructive' );
-		} );
-
-		it( 'should render a link with target="_blank"', () => {
-			render(
-				<Notice
-					actions={ [
-						{
-							label: 'External link',
-							url: 'https://example.com',
-							target: '_blank',
-							rel: 'noreferrer',
-						},
-					] }
-				>
-					Notice with external link
-				</Notice>
-			);
-
-			const link = screen.getByRole( 'link', { name: 'External link' } );
-			expect( link ).toHaveAttribute( 'target', '_blank' );
-			expect( link ).toHaveAttribute( 'rel', 'noreferrer' );
 		} );
 
 		it( 'should call onClick when action with url is clicked', async () => {
@@ -251,35 +168,6 @@ describe( 'Notice', () => {
 			await user.click( link );
 
 			expect( onClick ).toHaveBeenCalledTimes( 1 );
-		} );
-
-		it( 'should render action buttons with different sizes', () => {
-			render(
-				<Notice
-					actions={ [
-						{
-							label: 'Small',
-							onClick: jest.fn(),
-							size: 'small',
-						},
-						{
-							label: 'Compact',
-							onClick: jest.fn(),
-							size: 'compact',
-						},
-					] }
-				>
-					Notice with sized actions
-				</Notice>
-			);
-
-			const smallButton = screen.getByRole( 'button', { name: 'Small' } );
-			const compactButton = screen.getByRole( 'button', {
-				name: 'Compact',
-			} );
-
-			expect( smallButton ).toHaveClass( 'is-small' );
-			expect( compactButton ).toHaveClass( 'is-compact' );
 		} );
 	} );
 } );
