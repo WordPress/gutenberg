@@ -46,13 +46,12 @@ console.log( BREAKPOINTS.small );  600
 
 ## Source of Truth
 
-All breakpoints are defined in `breakpoints.json`. The build script generates:
+All breakpoints are defined in `src/breakpoints.ts`. The build script generates:
 - `_breakpoints.scss` - SCSS variables
-- `breakpoints.ts` - TypeScript module
 
 The TypeScript build system compiles .ts files and generates type definitions automatically.
 
-Run `npm run build` in this package to regenerate after editing `breakpoints.json`.
+Run `npm run build` in this package to regenerate SCSS after editing `src/breakpoints.ts`.
 
 ## Historical Context
 

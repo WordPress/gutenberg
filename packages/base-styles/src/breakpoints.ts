@@ -1,12 +1,16 @@
 /**
  * Breakpoints
  *
- * ⚠️  AUTO-GENERATED FILE - DO NOT EDIT DIRECTLY
- * This file is generated from breakpoints.json
- * Run 'npm run build' in the base-styles package to regenerate
+ * This is the source file for device-related viewport breakpoint values.
+ * All values are in pixels.
+ *
+ * While this file can be edited, changes should only be made with design input
+ * to maintain consistency across the application.
+ *
+ * See BREAKPOINTS.md for usage documentation and historical context.
  */
 
-const breakpoints = {
+const BREAKPOINTS = {
 	'zoomed-in': 280,
 	mobile: 480,
 	small: 600,
@@ -18,4 +22,4 @@ const breakpoints = {
 	xhuge: 1920,
 } as const;
 
-export default breakpoints;
+export default BREAKPOINTS;

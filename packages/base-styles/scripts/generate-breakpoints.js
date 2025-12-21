@@ -1,27 +1,50 @@
 #!/usr/bin/env node
 
 /**
- * Generates breakpoint files from breakpoints.json
+ * Generates SCSS from breakpoints.ts
  *
- * This script reads the canonical breakpoints.json file and generates:
+ * This script reads the canonical breakpoints.ts file and generates:
  * - _breakpoints.scss (SCSS variables)
- * - breakpoints.ts (TypeScript module)
  */
 
 const fs = require( 'fs' );
 const path = require( 'path' );
 
 const BASE_DIR = path.join( __dirname, '..' );
-const BREAKPOINTS_JSON = path.join( BASE_DIR, 'src/breakpoints.json' );
+const BREAKPOINTS_TS = path.join( BASE_DIR, 'src', 'breakpoints.ts' );
 
-// Read the source JSON
+// Read and parse the TypeScript source
 let breakpoints;
 try {
-	const content = fs.readFileSync( BREAKPOINTS_JSON, 'utf8' );
-	breakpoints = JSON.parse( content );
+	const content = fs.readFileSync( BREAKPOINTS_TS, 'utf8' );
+
+	// Extract the object literal from the TypeScript file
+	const match = content.match( /const BREAKPOINTS = \{([^}]+)\}/ );
+	if ( ! match ) {
+		throw new Error(
+			'Could not find BREAKPOINTS object in breakpoints.ts'
+		);
+	}
+
+	// Parse the object entries
+	breakpoints = {};
+	const entries = match[ 1 ].trim().split( /,\s*\n/ );
+	entries.forEach( ( entry ) => {
+		const [ key, value ] = entry
+			.trim()
+			.split( ':' )
+			.map( ( s ) => s.trim() );
+		if ( key && value ) {
+			const cleanKey = key.replace( /['"]/g, '' );
+			const cleanValue = parseInt( value, 10 );
+			if ( ! isNaN( cleanValue ) ) {
+				breakpoints[ cleanKey ] = cleanValue;
+			}
+		}
+	} );
 } catch ( error ) {
 	/* eslint-disable no-console */
-	console.error( '❌ Error reading breakpoints.json:', error.message );
+	console.error( '❌ Error reading breakpoints.ts:', error.message );
 	/* eslint-enable no-console */
 	process.exit( 1 );
 }
@@ -31,7 +54,7 @@ const scssContent = `/**
  * Breakpoints & Media Queries
  *
  * ⚠️  AUTO-GENERATED FILE - DO NOT EDIT DIRECTLY
- * This file is generated from breakpoints.json
+ * This file is generated from breakpoints.ts
  * Run 'npm run build' in the base-styles package to regenerate
  * See BREAKPOINTS.md for usage documentation
  */
@@ -41,41 +64,14 @@ ${ Object.entries( breakpoints )
 	.join( '\n' ) }
 `;
 
-// Generate TypeScript module
-// Convert to properly formatted object for prettier compliance
-const tsObject = Object.entries( breakpoints )
-	.map( ( [ key, value ] ) => {
-		// Only quote keys that need it (contain special chars like hyphens)
-		const quotedKey = /^[a-z]+$/i.test( key ) ? key : `'${ key }'`;
-		return `\t${ quotedKey }: ${ value },`;
-	} )
-	.join( '\n' );
-
-const tsContent = `/**
- * Breakpoints
- *
- * ⚠️  AUTO-GENERATED FILE - DO NOT EDIT DIRECTLY
- * This file is generated from breakpoints.json
- * Run 'npm run build' in the base-styles package to regenerate
- */
-
-const breakpoints = {
-${ tsObject }
-} as const;
-
-export default breakpoints;
-`;
-
-// Write files
+// Write file
 try {
 	fs.writeFileSync( path.join( BASE_DIR, '_breakpoints.scss' ), scssContent );
-	fs.writeFileSync( path.join( BASE_DIR, 'src/breakpoints.ts' ), tsContent );
 	/* eslint-disable no-console */
-	console.log( '✅ Breakpoints generated successfully:' );
+	console.log( '✅ SCSS generated successfully from breakpoints.ts' );
 	console.log( '   - _breakpoints.scss' );
-	console.log( '   - breakpoints.ts' );
 } catch ( error ) {
-	console.error( '❌ Error writing generated files:', error.message );
+	console.error( '❌ Error writing generated file:', error.message );
 	process.exit( 1 );
 	/* eslint-enable no-console */
 }
