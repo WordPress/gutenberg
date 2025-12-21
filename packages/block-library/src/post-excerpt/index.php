@@ -37,6 +37,10 @@ function render_block_core_post_excerpt( $attributes, $content, $block ) {
 	 * Otherwise, the read more link filter from the theme is not removed.
 	 */
 	add_filter( 'excerpt_more', $filter_excerpt_more );
+	$filter_excerpt_length = static function () {
+		return 100;
+	};	
+	add_filter( 'excerpt_length', $filter_excerpt_length, PHP_INT_MAX );
 
 	/*
 	* The purpose of the excerpt length setting is to limit the length of both
@@ -46,6 +50,9 @@ function render_block_core_post_excerpt( $attributes, $content, $block ) {
 	*/
 	$excerpt_length = $attributes['excerptLength'];
 	$excerpt        = get_the_excerpt( $block->context['postId'] );
+
+	remove_filter( 'excerpt_length', $filter_excerpt_length, PHP_INT_MAX );
+	
 	$is_trimmed     = false;
 	if ( isset( $excerpt_length ) ) {
 		$original_excerpt = $excerpt;
