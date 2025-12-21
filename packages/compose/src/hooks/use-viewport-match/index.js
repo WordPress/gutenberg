@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { createContext, useContext } from '@wordpress/element';
+import { BREAKPOINTS } from '@wordpress/base-styles';
 
 /**
  * Internal dependencies
@@ -9,26 +10,8 @@ import { createContext, useContext } from '@wordpress/element';
 import useMediaQuery from '../use-media-query';
 
 /**
- * @typedef {"xhuge" | "huge" | "wide" | "xlarge" | "large" | "medium" | "small" | "mobile"} WPBreakpoint
+ * @typedef {"xhuge" | "huge" | "wide" | "xlarge" | "large" | "medium" | "small" | "mobile" | "zoomed-in"} WPBreakpoint
  */
-
-/**
- * Hash of breakpoint names with pixel width at which it becomes effective.
- *
- * @see _breakpoints.scss
- *
- * @type {Record<WPBreakpoint, number>}
- */
-const BREAKPOINTS = {
-	xhuge: 1920,
-	huge: 1440,
-	wide: 1280,
-	xlarge: 1080,
-	large: 960,
-	medium: 782,
-	small: 600,
-	mobile: 480,
-};
 
 /**
  * @typedef {">=" | "<"} WPViewportOperator

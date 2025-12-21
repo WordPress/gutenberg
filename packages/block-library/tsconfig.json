@@ -9,6 +9,7 @@
 		{ "path": "../a11y" },
 		{ "path": "../api-fetch" },
 		{ "path": "../autop" },
+		{ "path": "../base-styles" },
 		{ "path": "../blob" },
 		{ "path": "../block-editor" },
 		{ "path": "../components" },

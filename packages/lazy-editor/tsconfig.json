@@ -6,6 +6,7 @@
 	},
 	"references": [
 		{ "path": "../asset-loader" },
+		{ "path": "../base-styles" },
 		{ "path": "../block-editor" },
 		{ "path": "../components" },
 		{ "path": "../core-data" },

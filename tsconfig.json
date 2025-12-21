@@ -8,6 +8,7 @@
 		{ "path": "packages/api-fetch" },
 		{ "path": "packages/asset-loader" },
 		{ "path": "packages/autop" },
+		{ "path": "packages/base-styles" },
 		{ "path": "packages/blob" },
 		{ "path": "packages/block-editor" },
 		{ "path": "packages/block-library" },

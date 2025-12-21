@@ -4,6 +4,7 @@
 	"references": [
 		{ "path": "../a11y" },
 		{ "path": "../api-fetch" },
+		{ "path": "../base-styles" },
 		{ "path": "../block-serialization-default-parser" },
 		{ "path": "../blob" },
 		{ "path": "../components" },

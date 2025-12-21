@@ -3,6 +3,7 @@
 	"extends": "../../tsconfig.base.json",
 	"references": [
 		{ "path": "../a11y" },
+		{ "path": "../base-styles" },
 		{ "path": "../components" },
 		{ "path": "../compose" },
 		{ "path": "../data" },

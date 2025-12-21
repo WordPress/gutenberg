@@ -6,6 +6,7 @@
 		{ "path": "../admin-ui" },
 		{ "path": "../api-fetch" },
 		{ "path": "../autop" },
+		{ "path": "../base-styles" },
 		{ "path": "../blob" },
 		{ "path": "../block-library" },
 		{ "path": "../block-editor" },

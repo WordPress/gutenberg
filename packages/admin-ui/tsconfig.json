@@ -2,6 +2,7 @@
 	"$schema": "https://json.schemastore.org/tsconfig.json",
 	"extends": "../../tsconfig.base.json",
 	"references": [
+		{ "path": "../base-styles" },
 		{ "path": "../components" },
 		{ "path": "../element" },
 		{ "path": "../i18n" },

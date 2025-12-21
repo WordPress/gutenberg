@@ -10,6 +10,7 @@
 		]
 	},
 	"references": [
+		{ "path": "../base-styles" },
 		{ "path": "../components" },
 		{ "path": "../compose" },
 		{ "path": "../data" },

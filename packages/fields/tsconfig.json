@@ -6,6 +6,7 @@
 	},
 	"references": [
 		{ "path": "../api-fetch" },
+		{ "path": "../base-styles" },
 		{ "path": "../blob" },
 		{ "path": "../components" },
 		{ "path": "../compose" },

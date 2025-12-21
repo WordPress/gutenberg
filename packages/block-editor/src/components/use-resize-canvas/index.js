@@ -31,10 +31,10 @@ export default function useResizeCanvas( deviceType ) {
 
 		switch ( device ) {
 			case 'Tablet':
-				deviceWidth = 780;
+				deviceWidth = 782;
 				break;
 			case 'Mobile':
-				deviceWidth = 360;
+				deviceWidth = 480;
 				break;
 			default:
 				return null;

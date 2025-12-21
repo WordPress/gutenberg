@@ -12,6 +12,7 @@
 	},
 	"references": [
 		{ "path": "../a11y" },
+		{ "path": "../base-styles" },
 		{ "path": "../compose" },
 		{ "path": "../date" },
 		{ "path": "../deprecated" },

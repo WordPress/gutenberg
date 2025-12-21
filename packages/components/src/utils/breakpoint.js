@@ -4,8 +4,13 @@
 import breakpoints from './breakpoint-values';
 
 /**
- * @param {keyof breakpoints} point
+ * @param {string} point
  * @return {string} Media query declaration.
  */
-export const breakpoint = ( point ) =>
-	`@media (min-width: ${ breakpoints[ point ] })`;
+export const breakpoint = ( point ) => {
+	const breakpointValue = breakpoints[ point ];
+	if ( ! breakpointValue ) {
+		return '';
+	}
+	return `@media (min-width: ${ breakpointValue })`;
+};

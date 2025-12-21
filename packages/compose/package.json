@@ -40,6 +40,7 @@
 	"sideEffects": false,
 	"dependencies": {
 		"@types/mousetrap": "^1.6.8",
+		"@wordpress/base-styles": "file:../base-styles",
 		"@wordpress/deprecated": "file:../deprecated",
 		"@wordpress/dom": "file:../dom",
 		"@wordpress/element": "file:../element",

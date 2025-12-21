@@ -1,4 +1,9 @@
 /**
+ * WordPress dependencies
+ */
+import { BREAKPOINTS as ALL_BREAKPOINTS } from '@wordpress/base-styles';
+
+/**
  * Internal dependencies
  */
 import addDimensionsEventListener from './listener';
@@ -15,12 +20,12 @@ export { default as withViewportMatch } from './with-viewport-match';
  * @type {Object}
  */
 const BREAKPOINTS = {
-	huge: 1440,
-	wide: 1280,
-	large: 960,
-	medium: 782,
-	small: 600,
-	mobile: 480,
+	huge: ALL_BREAKPOINTS.huge,
+	wide: ALL_BREAKPOINTS.wide,
+	large: ALL_BREAKPOINTS.large,
+	medium: ALL_BREAKPOINTS.medium,
+	small: ALL_BREAKPOINTS.small,
+	mobile: ALL_BREAKPOINTS.mobile,
 };
 
 /**

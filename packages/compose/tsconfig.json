@@ -7,6 +7,7 @@
 		"types": [ "gutenberg-env" ]
 	},
 	"references": [
+		{ "path": "../base-styles" },
 		{ "path": "../deprecated" },
 		{ "path": "../dom" },
 		{ "path": "../element" },
