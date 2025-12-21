@@ -1,14 +1,14 @@
 /**
  * External dependencies
  */
-import { addons, types, useGlobals } from '@storybook/manager-api';
+import { addons, types, useGlobals } from 'storybook/manager-api';
 import { MirrorIcon } from '@storybook/icons';
 import {
 	IconButton,
 	WithTooltip,
 	TooltipMessage,
 	TooltipLinkList,
-} from '@storybook/components';
+} from 'storybook/internal/components';
 
 interface ThemeOption {
 	id: string;
