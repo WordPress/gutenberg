@@ -39,7 +39,7 @@ function render_block_core_post_excerpt( $attributes, $content, $block ) {
 	add_filter( 'excerpt_more', $filter_excerpt_more );
 	$filter_excerpt_length = static function () {
 		return 100;
-	};	
+	};
 	add_filter( 'excerpt_length', $filter_excerpt_length, PHP_INT_MAX );
 
 	/*
@@ -52,8 +52,8 @@ function render_block_core_post_excerpt( $attributes, $content, $block ) {
 	$excerpt        = get_the_excerpt( $block->context['postId'] );
 
 	remove_filter( 'excerpt_length', $filter_excerpt_length, PHP_INT_MAX );
-	
-	$is_trimmed     = false;
+
+	$is_trimmed = false;
 	if ( isset( $excerpt_length ) ) {
 		$original_excerpt = $excerpt;
 		$excerpt          = wp_trim_words( $excerpt, $excerpt_length, '' );
