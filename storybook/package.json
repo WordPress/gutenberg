@@ -1,11 +1,23 @@
 {
 	"name": "@wordpress/storybook",
 	"version": "1.0.0",
+	"description": "Storybook for WordPress Gutenberg components.",
 	"private": true,
-	"description": "Storybook for WordPress Gutenberg components",
-	"scripts": {
-		"storybook:build": "storybook build -c . -o ./build",
-		"storybook:dev": "storybook dev -c . -p 50240"
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"gutenberg",
+		"storybook"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/storybook/README.md",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/WordPress/gutenberg.git",
+		"directory": "storybook"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"dependencies": {
 		"@emotion/react": "^11.7.1",
@@ -58,5 +70,12 @@
 		"storybook-source-link": "2.0.9",
 		"style-loader": "3.2.1",
 		"webpack": "5.97.0"
+	},
+	"publishConfig": {
+		"access": "public"
+	},
+	"scripts": {
+		"storybook:build": "storybook build -c . -o ./build",
+		"storybook:dev": "storybook dev -c . -p 50240"
 	}
 }
