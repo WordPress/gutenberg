@@ -4,11 +4,6 @@
 const fs = require( 'fs' );
 
 /**
- * Internal dependencies
- */
-const isBlockMetadataExperimental = require( './src/utils/is-block-metadata-experimental' );
-
-/**
  * Creates a babel plugin that replaces experimental block imports with
  * null variable declarations.
  *
@@ -142,11 +137,12 @@ function isImportDeclarationAnExperimentalBlock( path ) {
 		);
 		throw e;
 	}
-	if ( ! isBlockMetadataExperimental( blockJSON ) ) {
-		return false;
-	}
 
-	return true;
+	return (
+		blockJSON &&
+		'__experimental' in blockJSON &&
+		blockJSON.__experimental !== false
+	);
 }
 
 const babelPlugin = createBabelPlugin();

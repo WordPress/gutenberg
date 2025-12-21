@@ -1022,7 +1022,12 @@ async function transpilePackage( packageName ) {
 		name: 'externalize-except-css',
 		setup( build ) {
 			// Externalize all non-CSS imports
-			build.onResolve( { filter: /.*/ }, ( args ) => {
+			build.onResolve( { filter: /.*/ }, async ( args ) => {
+				// Skip recursive calls.
+				if ( args.pluginData?.__fromExternalize ) {
+					return null;
+				}
+
 				// Skip entry points
 				if ( args.kind === 'entry-point' ) {
 					return null;
@@ -1031,6 +1036,44 @@ async function transpilePackage( packageName ) {
 				// Let CSS/SCSS files be processed by sassPlugin
 				if ( args.path.match( /\.(css|scss)$/ ) ) {
 					return null;
+				}
+
+				// Fully resolve local dependencies without file extension
+				// and replace the extension with the target extension.
+				if ( args.path.startsWith( '.' ) ) {
+					const resolved = await build.resolve( args.path, {
+						namespace: args.namespace,
+						importer: args.importer,
+						kind: args.kind,
+						resolveDir: args.resolveDir,
+						with: args.with,
+						pluginData: {
+							...args.pluginData,
+							__fromExternalize: true,
+						},
+					} );
+
+					if ( resolved.errors.length > 0 ) {
+						return resolved;
+					}
+
+					// Relativize path: make it relative to resolveDir with leading ./
+					let relativePath = normalizePath(
+						path.relative( args.resolveDir, resolved.path )
+					);
+					if ( ! relativePath.startsWith( '.' ) ) {
+						relativePath = './' + relativePath;
+					}
+
+					// Replace extension: make sure that file extension is always `.js` or `.cjs`.
+					const newExt =
+						build.initialOptions.format === 'cjs' ? '.cjs' : '.js';
+					relativePath = relativePath.replace( /\.[jt]sx?$/, newExt );
+
+					return {
+						path: relativePath,
+						external: true,
+					};
 				}
 
 				// Externalize everything else (keep imports as-is)
@@ -1050,6 +1093,7 @@ async function transpilePackage( packageName ) {
 				entryPoints: srcFiles,
 				outdir: buildDir,
 				outbase: srcDir,
+				outExtension: { '.js': '.cjs' },
 				bundle: true,
 				platform: 'node',
 				format: 'cjs',
@@ -1057,9 +1101,7 @@ async function transpilePackage( packageName ) {
 				target,
 				jsx: 'automatic',
 				jsxImportSource: 'react',
-				loader: {
-					'.js': 'jsx',
-				},
+				loader: { '.js': 'jsx' },
 				plugins,
 			} )
 		);
@@ -1089,9 +1131,7 @@ async function transpilePackage( packageName ) {
 				target,
 				jsx: 'automatic',
 				jsxImportSource: 'react',
-				loader: {
-					'.js': 'jsx',
-				},
+				loader: { '.js': 'jsx' },
 				plugins,
 			} )
 		);

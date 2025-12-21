@@ -483,7 +483,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 
 		$global_style_query = new WP_Query();
 		$recent_posts       = $global_style_query->query( $args );
-		if ( count( $recent_posts ) === 1 ) {
+		if ( count( $recent_posts ) === 1 && is_object( $recent_posts[0] ) ) {
 			$user_cpt = get_object_vars( $recent_posts[0] );
 		} elseif ( $create_post ) {
 			$cpt_post_id = wp_insert_post(
@@ -500,7 +500,10 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 				true
 			);
 			if ( ! is_wp_error( $cpt_post_id ) ) {
-				$user_cpt = get_object_vars( get_post( $cpt_post_id ) );
+				$post = get_post( $cpt_post_id );
+				if ( is_object( $post ) ) {
+					$user_cpt = get_object_vars( $post );
+				}
 			}
 		}
 

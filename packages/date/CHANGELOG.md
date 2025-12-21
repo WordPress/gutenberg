@@ -4,7 +4,8 @@
 
 ## Bug Fixes
 
-- Fixed incorrect spacing for the time format. It was `g: i` (`14: 30`), and it's now `g:i` (`14:30`). See [#73924](https://github.com/WordPress/gutenberg/pull/73924).
+-   Fixed incorrect spacing for the time format. It was `g: i` (`14: 30`), and it's now `g:i` (`14:30`). ([#73924](https://github.com/WordPress/gutenberg/pull/73924))
+-   Fixed `timezone` argument handling to properly treat `0` numeric timezone values as a valid UTC offset (UTC+0). Previously, these were treated as if the `timezone` argument was not passed. ([#73887](https://github.com/WordPress/gutenberg/pull/73887))
 
 ## 5.36.0 (2025-11-26)
 

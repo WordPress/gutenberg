@@ -56,16 +56,18 @@ export default function RootSinglePage() {
 					<div className="boot-layout__surfaces">
 						<UserThemeProvider color={ { bg: '#ffffff' } }>
 							<Outlet />
+							{ /* Render Canvas in Root to prevent remounting on route changes */ }
+							{ ( canvas || canvas === null ) && (
+								<div className="boot-layout__canvas">
+									<CanvasRenderer
+										canvas={ canvas }
+										routeContentModule={
+											routeContentModule
+										}
+									/>
+								</div>
+							) }
 						</UserThemeProvider>
-						{ /* Render Canvas in Root to prevent remounting on route changes */ }
-						{ ( canvas || canvas === null ) && (
-							<div className="boot-layout__canvas">
-								<CanvasRenderer
-									canvas={ canvas }
-									routeContentModule={ routeContentModule }
-								/>
-							</div>
-						) }
 					</div>
 				</div>
 			</UserThemeProvider>
