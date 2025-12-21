@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { useEffect, useState } from '@wordpress/element';
+import { BREAKPOINTS } from '@wordpress/base-styles';
 
 /**
  * Function to resize the editor window.
@@ -31,10 +32,10 @@ export default function useResizeCanvas( deviceType ) {
 
 		switch ( device ) {
 			case 'Tablet':
-				deviceWidth = 782;
+				deviceWidth = BREAKPOINTS.medium;
 				break;
 			case 'Mobile':
-				deviceWidth = 480;
+				deviceWidth = BREAKPOINTS.mobile;
 				break;
 			default:
 				return null;
