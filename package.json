@@ -48,7 +48,6 @@
 		"@emotion/is-prop-valid": "1.2.2",
 		"@emotion/jest": "11.7.1",
 		"@emotion/native": "11.0.0",
-		"@geometricpanda/storybook-addon-badges": "2.0.5",
 		"@inquirer/prompts": "7.2.0",
 		"@octokit/rest": "16.26.0",
 		"@octokit/types": "6.34.0",
@@ -58,11 +57,6 @@
 		"@react-native/babel-preset": "0.73.10",
 		"@react-native/metro-babel-transformer": "0.73.10",
 		"@react-native/metro-config": "0.73.4",
-		"@storybook/addon-a11y": "9.1.17",
-		"@storybook/addon-docs": "9.1.17",
-		"@storybook/addon-webpack5-compiler-babel": "3.0.3",
-		"@storybook/react-webpack5": "9.1.17",
-		"@storybook/source-loader": "8.4.7",
 		"@terrazzo/cli": "^0.10.2",
 		"@terrazzo/plugin-css": "^0.10.2",
 		"@terrazzo/token-tools": "^0.10.2",
@@ -169,8 +163,6 @@
 		"snapshot-diff": "0.10.0",
 		"source-map-loader": "3.0.0",
 		"sprintf-js": "1.1.1",
-		"storybook": "9.1.17",
-		"storybook-source-link": "2.0.9",
 		"style-loader": "3.2.1",
 		"stylelint-plugin-logical-css": "^1.2.3",
 		"terser": "5.32.0",
@@ -232,8 +224,8 @@
 		"prepublishOnly": "npm run build",
 		"start": "npm run dev",
 		"prestorybook:build": "npm run build",
-		"storybook:build": "storybook build -c ./storybook -o ./storybook/build",
-		"storybook:dev": "concurrently \"npm run dev\" \"wait-on .dev-ready && storybook dev -c ./storybook -p 50240\"",
+		"storybook:build": "npm run storybook:build -w @wordpress/storybook",
+		"storybook:dev": "concurrently \"npm run dev\" \"wait-on .dev-ready && npm run storybook:dev -w @wordpress/storybook\"",
 		"storybook:e2e:dev": "concurrently \"npm run dev\" \"wait-on .dev-ready && storybook dev -c test/storybook-playwright/storybook -p 50241\"",
 		"test": "npm-run-all lint test:unit",
 		"test:create-block": "bash ./bin/test-create-block.sh",
@@ -305,6 +297,7 @@
 	},
 	"workspaces": [
 		"packages/*",
-		"routes/*"
+		"routes/*",
+		"storybook"
 	]
 }
