@@ -239,6 +239,140 @@ test.describe( 'Block Visibility', () => {
 	} );
 } );
 
+test.describe( 'Block Visibility - Individual Block Hiding', () => {
+	test.beforeEach( async ( { admin } ) => {
+		await admin.createNewPost();
+	} );
+
+	test( 'should show ghost state for hidden blocks by default', async ( {
+		page,
+		editor,
+	} ) => {
+		// Insert a paragraph block
+		await editor.insertBlock( { name: 'core/paragraph' } );
+		await page.keyboard.type( 'Test paragraph' );
+
+		// Hide the block via block options menu
+		await editor.clickBlockToolbarButton( 'Options' );
+		await page.getByRole( 'menuitem', { name: 'Hide' } ).click();
+
+		// Verify hidden block is accessible via aria-label
+		const hiddenBlock = page.getByRole( 'document', {
+			name: /Block: Paragraph.*This block is hidden and will not appear on the frontend of your site, but remains editable in the editor/,
+		} );
+		await expect( hiddenBlock ).toBeVisible();
+	} );
+
+	test( 'should show hidden block indicator in block inspector', async ( {
+		page,
+		editor,
+	} ) => {
+		await editor.insertBlock( { name: 'core/paragraph' } );
+		await editor.clickBlockToolbarButton( 'Options' );
+		await page.getByRole( 'menuitem', { name: 'Hide' } ).click();
+
+		// Open block inspector/settings sidebar
+		await page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'button', { name: 'Settings' } )
+			.click();
+
+		// Verify Notice appears in BlockCard
+		await expect( page.getByText( 'Block is hidden' ) ).toBeVisible();
+		await expect(
+			page.locator( '.block-editor-block-card__hidden-notice' )
+		).toBeVisible();
+	} );
+
+	test( 'should toggle between ghost and fully hidden via preferences', async ( {
+		page,
+		editor,
+	} ) => {
+		await editor.insertBlock( { name: 'core/paragraph' } );
+		await editor.clickBlockToolbarButton( 'Options' );
+		await page.getByRole( 'menuitem', { name: 'Hide' } ).click();
+
+		// Verify hidden block is accessible via aria-label (ghost state)
+		const hiddenBlock = page.getByRole( 'document', {
+			name: /Block: Paragraph.*This block is hidden and will not appear on the frontend of your site, but remains editable in the editor/,
+		} );
+		await expect( hiddenBlock ).toBeVisible();
+
+		// Disable ghost mode in preferences
+		await page
+			.getByRole( 'region', { name: 'Editor top bar' } )
+			.getByRole( 'button', { name: 'Options' } )
+			.click();
+		await page.getByRole( 'menuitem', { name: 'Preferences' } ).click();
+		await page
+			.getByRole( 'checkbox', { name: 'Show hidden blocks as ghost' } )
+			.uncheck();
+		await page.getByRole( 'button', { name: 'Close' } ).click();
+
+		// Verify block is now fully hidden (not accessible)
+		await expect( hiddenBlock ).toBeHidden();
+	} );
+
+	test( 'should show hidden blocks normally when selected', async ( {
+		page,
+		editor,
+	} ) => {
+		await editor.insertBlock( { name: 'core/paragraph' } );
+		await editor.clickBlockToolbarButton( 'Options' );
+		await page.getByRole( 'menuitem', { name: 'Hide' } ).click();
+
+		// Verify hidden block is accessible via aria-label
+		const hiddenBlock = page.getByRole( 'document', {
+			name: /Block: Paragraph.*This block is hidden and will not appear on the frontend of your site, but remains editable in the editor/,
+		} );
+		await expect( hiddenBlock ).toBeVisible();
+
+		// Select the block
+		await editor.selectBlocks();
+
+		// Verify it's still accessible (aria-label should still indicate it's hidden)
+		await expect( hiddenBlock ).toBeVisible();
+		await expect( hiddenBlock ).toHaveAttribute(
+			'aria-label',
+			/Block: Paragraph.*This block is hidden/
+		);
+	} );
+
+	test( 'should persist preference across page reloads', async ( {
+		page,
+		admin,
+	} ) => {
+		// Set preference to disable ghost mode
+		await page
+			.getByRole( 'region', { name: 'Editor top bar' } )
+			.getByRole( 'button', { name: 'Options' } )
+			.click();
+		await page.getByRole( 'menuitem', { name: 'Preferences' } ).click();
+		await page
+			.getByRole( 'checkbox', {
+				name: 'Show hidden blocks as ghost',
+			} )
+			.uncheck();
+		await page.getByRole( 'button', { name: 'Close' } ).click();
+
+		// Reload page
+		await page.reload();
+		await admin.createNewPost();
+
+		// Verify preference is persisted
+		await page
+			.getByRole( 'region', { name: 'Editor top bar' } )
+			.getByRole( 'button', { name: 'Options' } )
+			.click();
+		await page.getByRole( 'menuitem', { name: 'Preferences' } ).click();
+		await expect(
+			page.getByRole( 'checkbox', {
+				name: 'Show hidden blocks as ghost',
+			} )
+		).not.toBeChecked();
+	} );
+} );
+
 class BlockVisibilityUtils {
 	constructor( { page, admin, requestUtils } ) {
 		this.page = page;
