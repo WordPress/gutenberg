@@ -69,6 +69,7 @@
 	.dataviews-view-picker-grid__media {
 		width: 100%;
 		aspect-ratio: 1/1;
+		min-height: 0;
 		background-color: $white;
 		border-radius: $radius-medium;
 		position: relative;
