@@ -3,9 +3,8 @@
 	"apiVersion": 3,
 	"name": "core/breadcrumbs",
 	"title": "Breadcrumbs",
-	"__experimental": true,
 	"category": "theme",
-	"description": "Display a breadcrumb trail for hierarchical post types or based on taxonomy terms.",
+	"description": "Display a breadcrumb trail showing the path to the current page.",
 	"textdomain": "default",
 	"attributes": {
 		"prefersTaxonomy": {
