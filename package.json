@@ -175,9 +175,7 @@
 		"webpack-bundle-analyzer": "4.9.1"
 	},
 	"overrides": {
-		"jsdom": "26.1.0",
-		"@storybook/components": "$@storybook/components",
-		"@storybook/manager-api": "$@storybook/manager-api"
+		"jsdom": "26.1.0"
 	},
 	"scripts": {
 		"build": "node ./bin/build.mjs",
