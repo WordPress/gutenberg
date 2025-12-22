@@ -4,6 +4,7 @@
 
 ### Code Quality
 
+- Replace HStack/VStack from `wordpress/components` by Stack from `wordpress/ui`. [#74174](https://github.com/WordPress/gutenberg/pull/74174)
 - DataViews: Remove extra wrapper for GridItem. [#73665](https://github.com/WordPress/gutenberg/pull/73665)
 - Field API: move validation to the field type. [#73642](https://github.com/WordPress/gutenberg/pull/73642)
 - Field API: move format logic to the field type. [#73922](https://github.com/WordPress/gutenberg/pull/73922)
