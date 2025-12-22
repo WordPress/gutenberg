@@ -24,6 +24,30 @@ function gutenberg_rest_api_init_collaborative_editing() {
 add_action( 'admin_init', 'gutenberg_rest_api_init_collaborative_editing' );
 
 /**
+ * Registers REST API routes for collaborative editing.
+ */
+function gutenberg_rest_api_register_routes_for_collaborative_editing(): void {
+	$gutenberg_experiments = get_option( 'gutenberg-experiments' );
+	if ( ! $gutenberg_experiments || ! array_key_exists( 'gutenberg-sync-collaboration', $gutenberg_experiments ) ) {
+		return;
+	}
+
+	$sse_sync_server = new Gutenberg_HTTP_SSE_Sync_Server();
+	$sse_sync_server->register_routes();
+
+	// Provide a nonce for the EventSteam connection.
+	$rest_nonce = wp_create_nonce( 'wp_rest' );
+	$rest_url   = get_rest_url( null, '/sync/v1/messages' );
+	wp_add_inline_script(
+		'wp-block-editor',
+		'window.__experimentalCollaborativeEditingNonce = "' . $rest_nonce . '";' .
+		'window.__experimentalCollaborativeEditingApiUrl = "' . $rest_url . '";',
+		'after'
+	);
+}
+add_action( 'rest_api_init', 'gutenberg_rest_api_register_routes_for_collaborative_editing' );
+
+/**
  * Registers post meta for persisting CRDT documents.
  */
 function gutenberg_rest_api_crdt_post_meta() {

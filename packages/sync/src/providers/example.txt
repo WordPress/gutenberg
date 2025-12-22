@@ -1,0 +1,229 @@
+/**
+ * Example usage of HttpSseProvider
+ *
+ * This file demonstrates how to use the HTTP SSE provider for
+ * real-time collaborative editing with Yjs.
+ */
+
+/**
+ * External dependencies
+ */
+import * as Y from 'yjs';
+
+/**
+ * Internal dependencies
+ */
+import { createHttpSseProvider, HttpSseProvider } from './http-sse-provider';
+
+/**
+ * Example 1: Basic usage with provider creator
+ */
+export async function example1_basicUsage() {
+	// Create a Yjs document
+	const doc = new Y.Doc();
+
+	// Get a shared text type
+	const text = doc.getText( 'content' );
+
+	// Create provider creator
+	const providerCreator = createHttpSseProvider( {
+		endpoint: '/wp-json/sync/v1/rooms',
+	} );
+
+	// Create provider for a specific post
+	const provider = await providerCreator( 'post', '123', doc );
+
+	// Make changes to the document
+	text.insert( 0, 'Hello, collaborative world!' );
+
+	// Cleanup when done
+	// provider.destroy();
+}
+
+/**
+ * Example 2: Direct provider instantiation with events
+ */
+export function example2_withEvents() {
+	const doc = new Y.Doc();
+	const text = doc.getText( 'content' );
+
+	// Create provider directly
+	const provider = new HttpSseProvider( doc, {
+		endpoint: '/wp-json/sync/v1/rooms',
+		room: 'post:456',
+	} );
+
+	// Listen to connection status
+	provider.on( 'status', ( { status } ) => {
+		console.log( 'Connection status:', status );
+		if ( status === 'connected' ) {
+			console.log( 'Connected to room!' );
+		} else if ( status === 'disconnected' ) {
+			console.log( 'Disconnected from room' );
+		}
+	} );
+
+	// Listen to sync events
+	provider.on( 'synced', ( { synced } ) => {
+		if ( synced ) {
+			console.log( 'Document is now in sync with server!' );
+		}
+	} );
+
+	// Listen to document changes
+	doc.on( 'update', ( update, origin ) => {
+		if ( origin === provider ) {
+			console.log( 'Received update from another client' );
+		} else {
+			console.log( 'Local update made' );
+		}
+	} );
+
+	return provider;
+}
+
+/**
+ * Example 3: Using awareness for cursor positions
+ */
+export function example3_withAwareness() {
+	const doc = new Y.Doc();
+
+	const provider = new HttpSseProvider( doc, {
+		endpoint: '/wp-json/sync/v1/rooms',
+		room: 'post:789',
+	} );
+
+	// Set local awareness state (e.g., user info and cursor position)
+	provider.awareness.setLocalStateField( 'user', {
+		name: 'John Doe',
+		color: '#FF6B6B',
+	} );
+
+	provider.awareness.setLocalStateField( 'cursor', {
+		line: 1,
+		column: 10,
+	} );
+
+	// Listen to awareness changes from other clients
+	provider.awareness.on( 'change', ( { added, updated, removed } ) => {
+		// Get all client states
+		const states = provider.awareness.getStates();
+
+		states.forEach( ( state, clientId ) => {
+			if ( clientId !== doc.clientID ) {
+				console.log( `Client ${ clientId }:`, state );
+				// Render cursor/selection for this client
+			}
+		} );
+	} );
+
+	return provider;
+}
+
+/**
+ * Example 4: Multiple collaborative data types
+ */
+export function example4_multipleDataTypes() {
+	const doc = new Y.Doc();
+
+	// Different shared types
+	const text = doc.getText( 'content' );
+	const map = doc.getMap( 'metadata' );
+	const array = doc.getArray( 'comments' );
+
+	const provider = new HttpSseProvider( doc, {
+		endpoint: '/wp-json/sync/v1/rooms',
+		room: 'document:101',
+	} );
+
+	// All changes to any shared type are automatically synced
+	text.insert( 0, 'Document content' );
+	map.set( 'title', 'My Document' );
+	map.set( 'author', 'Jane Smith' );
+	array.push( [ { text: 'Great work!', author: 'User1' } ] );
+
+	return provider;
+}
+
+/**
+ * Example 5: Integrating with WordPress Gutenberg editor
+ */
+export function example5_gutenbergIntegration() {
+	const doc = new Y.Doc();
+	const blocks = doc.getArray( 'blocks' );
+
+	const provider = new HttpSseProvider( doc, {
+		endpoint: '/wp-json/sync/v1/rooms',
+		room: `post:${ window.wp?.data?.select( 'core/editor' )?.getCurrentPostId() }`,
+		timeout: 30000,
+		reconnectInterval: 5000,
+	} );
+
+	// Wait for initial sync before allowing edits
+	provider.on( 'synced', ( { synced } ) => {
+		if ( synced ) {
+			console.log( 'Ready for collaborative editing!' );
+			// Enable editor UI
+		}
+	} );
+
+	// Show connection status in UI
+	provider.on( 'status', ( { status } ) => {
+		const statusEl = document.querySelector( '.collaboration-status' );
+		if ( statusEl ) {
+			statusEl.textContent = status === 'connected' ? '🟢 Connected' : '🔴 Disconnected';
+		}
+	} );
+
+	return { doc, provider };
+}
+
+/**
+ * Example 6: Using with WordPress hooks for provider filtering
+ */
+export function example6_wordPressHooksIntegration() {
+	// This would typically be in your plugin's main file
+
+	// @ts-ignore - WordPress hooks
+	if ( window.wp?.hooks ) {
+		window.wp.hooks.addFilter(
+			'sync.providers',
+			'my-plugin/add-http-sse',
+			( providers: any[] ) => {
+				// Add HTTP SSE provider to the list
+				return [
+					...providers,
+					createHttpSseProvider( {
+						endpoint: '/wp-json/sync/v1/rooms',
+					} ),
+				];
+			}
+		);
+	}
+}
+
+/**
+ * Example 7: Manual connection management
+ */
+export function example7_manualConnection() {
+	const doc = new Y.Doc();
+
+	const provider = new HttpSseProvider( doc, {
+		endpoint: '/wp-json/sync/v1/rooms',
+		room: 'temp:session123',
+	} );
+
+	// Manually disconnect (e.g., when user goes idle)
+	const disconnectButton = document.querySelector( '#disconnect' );
+	disconnectButton?.addEventListener( 'click', () => {
+		provider.disconnect();
+	} );
+
+	// Manually reconnect
+	const connectButton = document.querySelector( '#connect' );
+	connectButton?.addEventListener( 'click', () => {
+		provider.connect();
+	} );
+
+	return provider;
+}
