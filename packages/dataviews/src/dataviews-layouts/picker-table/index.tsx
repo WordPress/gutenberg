@@ -402,12 +402,14 @@ function ViewPickerTable< Item >( {
 										className="dataviews-view-table__group-header-cell"
 										role="presentation"
 									>
-										{ sprintf(
-											// translators: 1: The label of the field e.g. "Date". 2: The value of the field, e.g.: "May 2022".
-											__( '%1$s: %2$s' ),
-											groupField.label,
-											groupName
-										) }
+										{ view.groupBy?.showLabel === false
+											? groupName
+											: sprintf(
+													// translators: 1: The label of the field e.g. "Date". 2: The value of the field, e.g.: "May 2022".
+													__( '%1$s: %2$s' ),
+													groupField.label,
+													groupName
+											  ) }
 									</td>
 								</tr>
 								{ groupItems.map( ( item, index ) => (
