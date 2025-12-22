@@ -1,7 +1,10 @@
 /**
  * WordPress dependencies
  */
-import { BlockControls, store } from '@wordpress/block-editor';
+import {
+	BlockControls,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
 import {
 	ToolbarGroup,
 	ToolbarButton,
@@ -40,7 +43,7 @@ function ModalAuxiliaryActions( { onClick, isModalFullScreen } ) {
 
 function ClassicEdit( props ) {
 	const styles = useSelect(
-		( select ) => select( store ).getSettings().styles
+		( select ) => select( blockEditorStore ).getSettings().styles
 	);
 	useEffect( () => {
 		const { baseURL, suffix, settings } = window.wpEditorL10n.tinymce;
@@ -86,7 +89,8 @@ export default function ModalEdit( props ) {
 	const id = `editor-${ clientId }`;
 
 	const wasBlockJustInserted = useSelect(
-		( select ) => select( store ).wasBlockJustInserted( clientId ),
+		( select ) =>
+			select( blockEditorStore ).wasBlockJustInserted( clientId ),
 		[ clientId ]
 	);
 
