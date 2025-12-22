@@ -326,7 +326,7 @@ function ListItem< Item >( {
 						gap="2xs"
 						className="dataviews-view-list__field-wrapper"
 					>
-						<Stack direction="row">
+						<Stack direction="row" align="center">
 							<div
 								className="dataviews-title-field"
 								id={ labelId }
