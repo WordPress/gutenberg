@@ -1282,7 +1282,7 @@ export const orderEventFields: Field< OrderEvent >[] = [
 		header: (
 			<Stack direction="row" gap="2xs" justify="start" align="center">
 				<Icon icon={ category } />
-				<span>Categories</span>
+				<span style={ { minWidth: 0 } }>Categories</span>
 			</Stack>
 		),
 		elements: [
@@ -1382,7 +1382,7 @@ export const fields: Field< SpaceObject >[] = [
 		header: (
 			<Stack direction="row" gap="2xs" justify="start" align="center">
 				<Icon icon={ image } />
-				<span>Image</span>
+				<span style={ { minWidth: 0 } }>Image</span>
 			</Stack>
 		),
 		render: ( { item } ) => {
@@ -1490,7 +1490,7 @@ export const fields: Field< SpaceObject >[] = [
 		header: (
 			<Stack direction="row" gap="2xs" justify="start" align="center">
 				<Icon icon={ category } />
-				<span>Categories</span>
+				<span style={ { minWidth: 0 } }>Categories</span>
 			</Stack>
 		),
 		elements: [
