@@ -101,7 +101,6 @@ export default function Edit( {
 					}
 				>
 					<ToggleControl
-						__nextHasNoMarginBottom
 						label={ __( 'Link to authors URL' ) }
 						onChange={ () => setAttributes( { isLink: ! isLink } ) }
 						checked={ isLink }
@@ -119,7 +118,6 @@ export default function Edit( {
 						}
 					>
 						<ToggleControl
-							__nextHasNoMarginBottom
 							label={ __( 'Open in new tab' ) }
 							onChange={ ( value ) =>
 								setAttributes( {

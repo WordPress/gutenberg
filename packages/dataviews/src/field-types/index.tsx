@@ -28,6 +28,7 @@ import { default as color } from './color';
 import { default as url } from './url';
 import { default as noType } from './no-type';
 import getIsValid from './utils/get-is-valid';
+import getFormat from './utils/get-format';
 
 /**
  *
@@ -110,7 +111,9 @@ export default function normalizeFields< Item >(
 				fieldType.defaultOperators,
 				fieldType.validOperators
 			),
-			format: fieldType.getFormat( field ),
+			format: getFormat( field, fieldType ),
+			getValueFormatted:
+				field.getValueFormatted ?? fieldType.getValueFormatted,
 		};
 	} );
 }

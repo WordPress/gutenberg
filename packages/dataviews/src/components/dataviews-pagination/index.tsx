@@ -85,7 +85,6 @@ export function DataViewsPagination() {
 										} );
 									} }
 									size="small"
-									__nextHasNoMarginBottom
 									variant="minimal"
 								/>
 							),

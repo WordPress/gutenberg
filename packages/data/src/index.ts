@@ -39,7 +39,7 @@ export { default as createReduxStore } from './redux-store';
 export { dispatch } from './dispatch';
 export { select } from './select';
 
-export * from './types';
+export type * from './types';
 
 /**
  * Object of available plugins to use with a registry.

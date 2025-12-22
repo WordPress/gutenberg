@@ -24,7 +24,6 @@ export default function OverlayMenuPreview( { setAttributes, hasIcon, icon } ) {
 				onDeselect={ () => setAttributes( { hasIcon: true } ) }
 			>
 				<ToggleControl
-					__nextHasNoMarginBottom
 					label={ __( 'Show icon button' ) }
 					help={ __(
 						'Configure the visual appearance of the button that toggles the overlay menu.'
@@ -44,7 +43,6 @@ export default function OverlayMenuPreview( { setAttributes, hasIcon, icon } ) {
 			>
 				<ToggleGroupControl
 					__next40pxDefaultSize
-					__nextHasNoMarginBottom
 					className="wp-block-navigation__overlay-menu-icon-toggle-group"
 					label={ __( 'Icon' ) }
 					value={ icon }

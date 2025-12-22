@@ -1,4 +1,5 @@
 @use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/colors" as *;
 @use "@wordpress/base-styles/z-index" as *;
 
 .dataforms-layouts-panel__field {
@@ -6,6 +7,10 @@
 	min-height: $grid-unit-40;
 	justify-content: flex-start !important;
 	align-items: flex-start !important;
+
+	&--label-position-none {
+		align-items: center !important;
+	}
 }
 
 .dataforms-layouts-panel__field-label {
@@ -19,6 +24,18 @@
 
 	&--label-position-side {
 		align-self: center;
+	}
+
+	&.has-error {
+		color: $alert-red;
+	}
+}
+
+.dataforms-layouts-panel__field-label-error-content {
+	cursor: help;
+	fill: $alert-red;
+	svg {
+		fill: currentColor;
 	}
 }
 

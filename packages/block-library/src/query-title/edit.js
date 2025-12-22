@@ -117,7 +117,6 @@ export default function QueryTitleEdit( {
 							isShownByDefault
 						>
 							<ToggleControl
-								__nextHasNoMarginBottom
 								label={ __( 'Show archive type in title' ) }
 								onChange={ () =>
 									setAttributes( {
@@ -156,7 +155,6 @@ export default function QueryTitleEdit( {
 							isShownByDefault
 						>
 							<ToggleControl
-								__nextHasNoMarginBottom
 								label={ __( 'Show search term in title' ) }
 								onChange={ () =>
 									setAttributes( {
@@ -215,7 +213,6 @@ export default function QueryTitleEdit( {
 							isShownByDefault
 						>
 							<ToggleControl
-								__nextHasNoMarginBottom
 								label={ __( 'Show post type label' ) }
 								onChange={ () =>
 									setAttributes( {

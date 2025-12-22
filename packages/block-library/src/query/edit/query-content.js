@@ -130,7 +130,7 @@ export default function QueryContent( {
 
 	return (
 		<>
-			<BlockControls>
+			<BlockControls group="other">
 				<QueryToolbar
 					clientId={ clientId }
 					attributes={ attributes }

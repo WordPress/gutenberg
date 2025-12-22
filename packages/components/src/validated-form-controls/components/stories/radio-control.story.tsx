@@ -35,32 +35,23 @@ export const Default: StoryObj< typeof ValidatedRadioControl > = {
 					typeof ValidatedRadioControl
 				>[ 'selected' ]
 			>();
-		const [ customValidity, setCustomValidity ] =
-			useState<
-				React.ComponentProps<
-					typeof ValidatedRadioControl
-				>[ 'customValidity' ]
-			>( undefined );
 
 		return (
 			<ValidatedRadioControl
 				{ ...args }
 				selected={ selected }
-				onChange={ ( value ) => {
-					setSelected( value );
-					onChange?.( value );
+				onChange={ ( newValue ) => {
+					setSelected( newValue );
+					onChange?.( newValue );
 				} }
-				onValidate={ ( v ) => {
-					if ( v === 'b' ) {
-						setCustomValidity( {
-							type: 'invalid',
-							message: 'Option B is not allowed.',
-						} );
-					} else {
-						setCustomValidity( undefined );
-					}
-				} }
-				customValidity={ customValidity }
+				customValidity={
+					selected === 'b'
+						? {
+								type: 'invalid',
+								message: 'Option B is not allowed.',
+						  }
+						: undefined
+				}
 			/>
 		);
 	},

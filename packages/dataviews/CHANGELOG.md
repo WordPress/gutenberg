@@ -5,16 +5,28 @@
 ### Code Quality
 
 - DataViews: Remove extra wrapper for GridItem. [#73665](https://github.com/WordPress/gutenberg/pull/73665)
+- Field API: move validation to the field type. [#73642](https://github.com/WordPress/gutenberg/pull/73642)
+- Field API: move format logic to the field type. [#73922](https://github.com/WordPress/gutenberg/pull/73922)
 
 ### Bug Fixes
 
 - Fix sticky footer in DataViews grid view. [#73661](https://github.com/WordPress/gutenberg/pull/73661)
+- DataViews: Apply primary style to first column if there is no title field. [#73729](https://github.com/WordPress/gutenberg/pull/73729)
+- DataViews: Combined field alignment in table layout. [#73908](https://github.com/WordPress/gutenberg/pull/73908)
+- DataViews: Fix table row multiselection in Firefox [#73945](https://github.com/WordPress/gutenberg/pull/73945)
+- DataViews: `filterSortAndPaginate()` will ignore sorting on non-sortable fields [#73950](https://github.com/WordPress/gutenberg/pull/73950)
 
 ### Enhancements
 
-- Field API: move validation to the field type. [#73642](https://github.com/WordPress/gutenberg/pull/73642)
+- DataViews table layout: remove row click-to-select behavior and hover styles. Selection is now only possible via checkboxes, or by ctrl/cmd clicking. [#73873](https://github.com/WordPress/gutenberg/pull/73873)
+- Better labels for operators and deprecate the `isNotAll` operator. [#73671](https://github.com/WordPress/gutenberg/pull/73671)
 - DataForm: add support for `min`/`max` and `minLength`/`maxLength` validation for relevant controls. [#73465](https://github.com/WordPress/gutenberg/pull/73465)
 - Field API: display formats for `number` and `integer` types. [#73644](https://github.com/WordPress/gutenberg/pull/73644)
+- Field API: add display format for `datetime` type. [#73924](https://github.com/WordPress/gutenberg/pull/73924)
+- DataViews: Update padding to 24px for consistency. [#73334](https://github.com/WordPress/gutenberg/pull/73334)
+- DataViews: Simplify list layout field color styles. [#73884](https://github.com/WordPress/gutenberg/pull/73884)
+- DataViews: Add panel form layout validation. [#73700](https://github.com/WordPress/gutenberg/pull/73700)
+- Converted package to a compliant dual CJS/ESM module ([#73822](https://github.com/WordPress/gutenberg/pull/73822))
 
 ## 11.0.0 (2025-11-26)
 

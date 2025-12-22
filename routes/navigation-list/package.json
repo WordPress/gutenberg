@@ -1,7 +1,7 @@
 {
 	"route": {
 		"path": "/navigation/list",
-		"page": "gutenberg-boot"
+		"page": "site-editor"
 	},
 	"dependencies": {
 		"@wordpress/admin-ui": "file:../../packages/admin-ui",

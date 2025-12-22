@@ -128,7 +128,6 @@ function SortFieldControl() {
 
 	return (
 		<SelectControl
-			__nextHasNoMarginBottom
 			__next40pxDefaultSize
 			label={ __( 'Sort by' ) }
 			value={ view.sort?.field }
@@ -164,7 +163,6 @@ function SortDirectionControl() {
 	return (
 		<ToggleGroupControl
 			className="dataviews-view-config__sort-direction"
-			__nextHasNoMarginBottom
 			__next40pxDefaultSize
 			isBlock
 			label={ __( 'Order' ) }
@@ -219,7 +217,6 @@ function ItemsPerPageControl() {
 
 	return (
 		<ToggleGroupControl
-			__nextHasNoMarginBottom
 			__next40pxDefaultSize
 			isBlock
 			label={ __( 'Items per page' ) }

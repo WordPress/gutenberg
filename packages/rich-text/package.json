@@ -22,13 +22,21 @@
 		"node": ">=18.12.0",
 		"npm": ">=8.19.2"
 	},
-	"main": "build/index.js",
+	"files": [
+		"src",
+		"build",
+		"build-module",
+		"build-types",
+		"*.md"
+	],
+	"type": "module",
+	"main": "build/index.cjs",
 	"module": "build-module/index.js",
 	"exports": {
 		".": {
 			"types": "./build-types/index.d.ts",
 			"import": "./build-module/index.js",
-			"require": "./build/index.js"
+			"require": "./build/index.cjs"
 		},
 		"./package.json": "./package.json"
 	},
@@ -37,13 +45,19 @@
 	"types": "build-types",
 	"sideEffects": [
 		"src/**/*.scss",
-		"{src,build,build-module}/{index.js,store/index.js}"
+		"src/index.js",
+		"src/store/index.js",
+		"build/index.cjs",
+		"build/store/index.cjs",
+		"build-module/index.js",
+		"build-module/store/index.js"
 	],
 	"dependencies": {
 		"@wordpress/a11y": "file:../a11y",
 		"@wordpress/compose": "file:../compose",
 		"@wordpress/data": "file:../data",
 		"@wordpress/deprecated": "file:../deprecated",
+		"@wordpress/dom": "file:../dom",
 		"@wordpress/element": "file:../element",
 		"@wordpress/escape-html": "file:../escape-html",
 		"@wordpress/i18n": "file:../i18n",
