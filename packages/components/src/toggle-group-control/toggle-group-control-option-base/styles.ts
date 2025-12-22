@@ -78,6 +78,7 @@ export const buttonView = ( {
 	}
 
 	${ isDeselectable && deselectable }
+	${ isDeselectable && ! isPressed && deselectableNotPressed }
 	${ isIcon && isIconStyles( { size } ) }
 	${ isPressed && pressed }
 `;
@@ -97,6 +98,13 @@ const deselectable = css`
 	&:focus {
 		outline: ${ CONFIG.borderWidthFocus } solid ${ COLORS.ui.borderFocus };
 		outline-offset: 2px;
+	}
+`;
+
+const deselectableNotPressed = css`
+	&:focus {
+		background: ${ COLORS.ui.background };
+		box-shadow: 0 0 0 2px ${ COLORS.ui.background };
 	}
 `;
 
