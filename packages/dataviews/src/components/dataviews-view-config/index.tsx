@@ -25,7 +25,6 @@ import { cog } from '@wordpress/icons';
 import warning from '@wordpress/warning';
 import { useInstanceId } from '@wordpress/compose';
 import { Stack } from '@wordpress/ui';
-import '@wordpress/theme/design-tokens.css';
 
 /**
  * Internal dependencies

@@ -8,7 +8,6 @@ import clsx from 'clsx';
  */
 import { Spinner } from '@wordpress/components';
 import { Stack } from '@wordpress/ui';
-import '@wordpress/theme/design-tokens.css';
 
 /**
  * Internal dependencies

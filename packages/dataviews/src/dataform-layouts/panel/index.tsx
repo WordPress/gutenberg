@@ -10,7 +10,6 @@ import { Icon, Tooltip } from '@wordpress/components';
 import { useState, useContext } from '@wordpress/element';
 import { error as errorIcon } from '@wordpress/icons';
 import { Stack } from '@wordpress/ui';
-import '@wordpress/theme/design-tokens.css';
 
 /**
  * Internal dependencies

@@ -3,7 +3,6 @@
  */
 import { memo, useContext, useRef } from '@wordpress/element';
 import { Stack } from '@wordpress/ui';
-import '@wordpress/theme/design-tokens.css';
 
 /**
  * Internal dependencies

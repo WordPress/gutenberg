@@ -7,7 +7,6 @@ import type { ComponentProps, ReactElement } from 'react';
  * WordPress dependencies
  */
 import { Stack } from '@wordpress/ui';
-import '@wordpress/theme/design-tokens.css';
 
 /**
  * Internal dependencies

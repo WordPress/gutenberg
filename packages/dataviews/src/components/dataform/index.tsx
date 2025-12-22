@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { useMemo } from '@wordpress/element';
+import '@wordpress/theme/design-tokens.css';
 
 /**
  * Internal dependencies

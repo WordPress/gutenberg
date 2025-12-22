@@ -6,7 +6,6 @@ import {
 	__experimentalHeading as Heading,
 } from '@wordpress/components';
 import { Stack } from '@wordpress/ui';
-import '@wordpress/theme/design-tokens.css';
 
 /**
  * Internal dependencies

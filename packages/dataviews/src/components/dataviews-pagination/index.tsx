@@ -6,7 +6,6 @@ import { createInterpolateElement, memo, useContext } from '@wordpress/element';
 import { sprintf, __, _x, isRTL } from '@wordpress/i18n';
 import { next, previous } from '@wordpress/icons';
 import { Stack } from '@wordpress/ui';
-import '@wordpress/theme/design-tokens.css';
 
 /**
  * Internal dependencies

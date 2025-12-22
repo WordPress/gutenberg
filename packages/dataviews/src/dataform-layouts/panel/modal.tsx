@@ -15,7 +15,6 @@ import { __ } from '@wordpress/i18n';
 import { useContext, useState, useMemo } from '@wordpress/element';
 import { useFocusOnMount } from '@wordpress/compose';
 import { Stack } from '@wordpress/ui';
-import '@wordpress/theme/design-tokens.css';
 
 /**
  * Internal dependencies

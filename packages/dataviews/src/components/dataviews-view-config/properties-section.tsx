@@ -11,7 +11,6 @@ import { __ } from '@wordpress/i18n';
 import { useContext } from '@wordpress/element';
 import { check } from '@wordpress/icons';
 import { Stack } from '@wordpress/ui';
-import '@wordpress/theme/design-tokens.css';
 
 /**
  * Internal dependencies
