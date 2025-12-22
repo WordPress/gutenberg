@@ -1,14 +1,12 @@
 /**
  * WordPress dependencies
  */
-import {
-	Button,
-	CheckboxControl,
-	__experimentalHStack as HStack,
-} from '@wordpress/components';
+import { Button, CheckboxControl } from '@wordpress/components';
 import { useRegistry } from '@wordpress/data';
 import { useContext, useMemo, useState } from '@wordpress/element';
 import { __, sprintf, _n } from '@wordpress/i18n';
+import { Stack } from '@wordpress/ui';
+import '@wordpress/theme/design-tokens.css';
 
 /**
  * Internal dependencies
@@ -90,7 +88,7 @@ function ActionButtons< Item >( {
 	);
 
 	return (
-		<HStack expanded={ false } spacing={ 1 }>
+		<Stack direction="row" gap="2xs">
 			{ actions.map( ( action ) => {
 				// Only support actions with callbacks for DataViewsPicker.
 				// This is because many use cases of the picker will be already within modals.
@@ -126,7 +124,7 @@ function ActionButtons< Item >( {
 					</Button>
 				);
 			} ) }
-		</HStack>
+		</Stack>
 	);
 }
 
@@ -166,15 +164,15 @@ export function DataViewsPickerFooter() {
 	);
 
 	return (
-		<HStack
-			expanded={ false }
+		<Stack
+			direction="row"
 			justify="space-between"
 			className="dataviews-footer"
 		>
-			<HStack
+			<Stack
+				direction="row"
 				className="dataviews-picker-footer__bulk-selection"
-				expanded={ false }
-				spacing={ 3 }
+				gap="sm"
 			>
 				{ isMultiselect && (
 					<BulkSelectionCheckbox
@@ -188,7 +186,7 @@ export function DataViewsPickerFooter() {
 				<span className="dataviews-bulk-actions-footer__item-count">
 					{ message }
 				</span>
-			</HStack>
+			</Stack>
 			<DataViewsPagination />
 			{ Boolean( actions?.length ) && (
 				<div className="dataviews-picker-footer__actions">
@@ -199,6 +197,6 @@ export function DataViewsPickerFooter() {
 					/>
 				</div>
 			) }
-		</HStack>
+		</Stack>
 	);
 }

@@ -1,8 +1,9 @@
 /**
  * WordPress dependencies
  */
-import { __experimentalVStack as VStack } from '@wordpress/components';
 import { useContext } from '@wordpress/element';
+import { Stack } from '@wordpress/ui';
+import '@wordpress/theme/design-tokens.css';
 
 /**
  * Internal dependencies
@@ -17,9 +18,9 @@ import { getFormFieldLayout } from './index';
 import DataFormContext from '../components/dataform-context';
 
 const DEFAULT_WRAPPER = ( { children }: { children: React.ReactNode } ) => (
-	<VStack className="dataforms-layouts__wrapper" spacing={ 4 }>
+	<Stack direction="column" className="dataforms-layouts__wrapper" gap="md">
 		{ children }
-	</VStack>
+	</Stack>
 );
 
 export function DataFormLayout< Item >( {

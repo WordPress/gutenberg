@@ -19,11 +19,11 @@ import {
 	CardBody,
 	__experimentalHeading as Heading,
 	__experimentalText as Text,
-	__experimentalHStack as HStack,
-	__experimentalVStack as VStack,
 	Button,
 } from '@wordpress/components';
 import { __, _n } from '@wordpress/i18n';
+import { Stack } from '@wordpress/ui';
+import '@wordpress/theme/design-tokens.css';
 
 /**
  * Internal dependencies
@@ -182,10 +182,10 @@ const PlanetIllustration = () => (
 );
 
 const CustomEmptyComponent = () => (
-	<VStack alignment="center" justify="center" spacing={ 3 }>
+	<Stack direction="column" align="center" justify="center" gap="sm">
 		<PlanetIllustration />
 		<Text>No celestial bodies found</Text>
-	</VStack>
+	</Stack>
 );
 
 const EmptyComponent = ( {
@@ -318,19 +318,19 @@ function PlanetOverview( { planets }: { planets: SpaceObject[] } ) {
 				{ __( 'Solar System numbers' ) }
 			</Heading>
 			<div className="free-composition-header">
-				<VStack spacing={ 4 }>
-					<HStack justify="start" spacing={ 2 }>
+				<Stack direction="column" gap="md">
+					<Stack direction="row" justify="start" gap="xs">
 						<DataViews.Search label={ __( 'Search content' ) } />
 						<DataViews.FiltersToggle />
-						<HStack justify="end" spacing={ 2 }>
+						<Stack direction="row" justify="end" gap="xs">
 							<DataViews.ViewConfig />
 							<DataViews.LayoutSwitcher />
-						</HStack>
-					</HStack>
+						</Stack>
+					</Stack>
 					<DataViews.FiltersToggled />
 					<Card variant="secondary">
 						<CardBody>
-							<VStack>
+							<Stack direction="column">
 								<Text size={ 18 } as="p">
 									{ createInterpolateElement(
 										_n(
@@ -362,23 +362,24 @@ function PlanetOverview( { planets }: { planets: SpaceObject[] } ) {
 										}
 									) }
 								</Text>
-							</VStack>
+							</Stack>
 						</CardBody>
 					</Card>
 					<Card style={ { width: '100%' } }>
 						<CardBody>
-							<HStack
+							<Stack
+								direction="row"
 								justify="space-between"
-								alignment="center"
-								spacing={ 2 }
+								align="center"
+								gap="xs"
 							>
 								<DataViews.BulkActionToolbar />
 								<DataViews.Pagination />
-							</HStack>
+							</Stack>
 						</CardBody>
 					</Card>
 					<DataViews.Layout className="free-composition-dataviews-layout" />
-				</VStack>
+				</Stack>
 			</div>
 		</>
 	);
@@ -434,17 +435,18 @@ export const FreeComposition = () => {
 					grid: {},
 				} }
 				empty={
-					<VStack
+					<Stack
+						direction="column"
 						justify="space-around"
-						alignment="center"
+						align="center"
 						className="free-composition-dataviews-empty"
 					>
 						<Text size={ 18 } as="p">
 							No planets
 						</Text>
-						<Text variant="muted">{ `Try a different search because “${ view.search }” returned no results.` }</Text>
+						<Text variant="muted">{ `Try a different search because "${ view.search }" returned no results.` }</Text>
 						<Button variant="secondary">Create new planet</Button>
-					</VStack>
+					</Stack>
 				}
 			>
 				<PlanetOverview planets={ planets } />

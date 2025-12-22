@@ -15,12 +15,9 @@ import {
 	pin,
 	link,
 } from '@wordpress/icons';
-import {
-	Button,
-	__experimentalText as Text,
-	__experimentalHStack as HStack,
-	__experimentalVStack as VStack,
-} from '@wordpress/components';
+import { Button, __experimentalText as Text } from '@wordpress/components';
+import { Stack } from '@wordpress/ui';
+import '@wordpress/theme/design-tokens.css';
 
 /**
  * Internal dependencies
@@ -793,9 +790,9 @@ export const actions: Action< SpaceObject >[] = [
 					? `Are you sure you want to delete ${ items.length } items?`
 					: `Are you sure you want to delete "${ items[ 0 ].name.title }"?`;
 			return (
-				<VStack spacing="5">
+				<Stack direction="column">
 					<Text>{ label }</Text>
-					<HStack justify="right">
+					<Stack direction="row" justify="right">
 						<Button
 							__next40pxDefaultSize
 							variant="tertiary"
@@ -810,8 +807,8 @@ export const actions: Action< SpaceObject >[] = [
 						>
 							Delete
 						</Button>
-					</HStack>
-				</VStack>
+					</Stack>
+				</Stack>
 			);
 		},
 	},
@@ -1283,10 +1280,10 @@ export const orderEventFields: Field< OrderEvent >[] = [
 		label: 'Categories',
 		id: 'categories',
 		header: (
-			<HStack spacing={ 1 } justify="start">
+			<Stack direction="row" gap="2xs" justify="start">
 				<Icon icon={ category } />
 				<span>Categories</span>
-			</HStack>
+			</Stack>
 		),
 		elements: [
 			{ value: 'Order', label: 'Order' },
@@ -1353,9 +1350,9 @@ export const orderEventActions: Action< OrderEvent >[] = [
 				closeModal?.();
 			};
 			return (
-				<VStack spacing="5">
+				<Stack direction="column">
 					<Text>{ label }</Text>
-					<HStack justify="right">
+					<Stack direction="row" justify="right">
 						<Button
 							__next40pxDefaultSize
 							variant="tertiary"
@@ -1370,8 +1367,8 @@ export const orderEventActions: Action< OrderEvent >[] = [
 						>
 							Delete
 						</Button>
-					</HStack>
-				</VStack>
+					</Stack>
+				</Stack>
 			);
 		},
 	},
@@ -1383,10 +1380,10 @@ export const fields: Field< SpaceObject >[] = [
 		id: 'image',
 		type: 'media',
 		header: (
-			<HStack spacing={ 1 } justify="start">
+			<Stack direction="row" gap="2xs" justify="start">
 				<Icon icon={ image } />
 				<span>Image</span>
-			</HStack>
+			</Stack>
 		),
 		render: ( { item } ) => {
 			return (
@@ -1491,10 +1488,10 @@ export const fields: Field< SpaceObject >[] = [
 		label: 'Categories',
 		id: 'categories',
 		header: (
-			<HStack spacing={ 1 } justify="start">
+			<Stack direction="row" gap="2xs" justify="start">
 				<Icon icon={ category } />
 				<span>Categories</span>
-			</HStack>
+			</Stack>
 		),
 		elements: [
 			{ value: 'Solar system', label: 'Solar system' },

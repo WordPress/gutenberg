@@ -3,12 +3,12 @@
  */
 import { useState, useMemo } from '@wordpress/element';
 import {
-	__experimentalHStack as HStack,
-	__experimentalVStack as VStack,
 	Icon,
 	__experimentalInputControlPrefixWrapper as InputControlPrefixWrapper,
 	__experimentalInputControlSuffixWrapper as InputControlSuffixWrapper,
 } from '@wordpress/components';
+import { Stack } from '@wordpress/ui';
+import '@wordpress/theme/design-tokens.css';
 import { starFilled } from '@wordpress/icons';
 
 /**
@@ -618,7 +618,7 @@ const FieldTypeStory = ( {
 		null;
 
 	return (
-		<HStack alignment="stretch">
+		<Stack direction="row" align="stretch">
 			<div style={ { flex: 2 } }>
 				<DataViews
 					getItemId={ ( item ) => item.id.toString() }
@@ -648,7 +648,7 @@ const FieldTypeStory = ( {
 				/>
 			</div>
 			{ selectedItem ? (
-				<VStack alignment="top">
+				<Stack direction="column" align="top">
 					<DataForm
 						data={ selectedItem }
 						form={ form }
@@ -668,9 +668,9 @@ const FieldTypeStory = ( {
 							);
 						} }
 					/>
-				</VStack>
+				</Stack>
 			) : (
-				<VStack alignment="center">
+				<Stack direction="column" align="center">
 					<span
 						style={ {
 							color: '#888',
@@ -678,9 +678,9 @@ const FieldTypeStory = ( {
 					>
 						Please, select a single item.
 					</span>
-				</VStack>
+				</Stack>
 			) }
-		</HStack>
+		</Stack>
 	);
 };
 

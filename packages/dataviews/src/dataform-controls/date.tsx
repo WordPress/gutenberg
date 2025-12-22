@@ -21,8 +21,6 @@ import {
 	Icon,
 	privateApis as componentsPrivateApis,
 	__experimentalInputControl as InputControl,
-	__experimentalHStack as HStack,
-	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import {
 	useCallback,
@@ -34,6 +32,8 @@ import {
 import { __ } from '@wordpress/i18n';
 import { getDate, getSettings } from '@wordpress/date';
 import { error as errorIcon } from '@wordpress/icons';
+import { Stack } from '@wordpress/ui';
+import '@wordpress/theme/design-tokens.css';
 
 /**
  * Internal dependencies
@@ -352,9 +352,14 @@ function CalendarDateControl< Item >( {
 				label={ displayLabel }
 				hideLabelFromVision={ hideLabelFromVision }
 			>
-				<VStack spacing={ 4 }>
+				<Stack direction="column" gap="md">
 					{ /* Preset buttons */ }
-					<HStack spacing={ 2 } wrap justify="flex-start">
+					<Stack
+						direction="row"
+						gap="xs"
+						wrap="wrap"
+						justify="flex-start"
+					>
 						{ DATE_PRESETS.map( ( preset ) => {
 							const isSelected = selectedPresetId === preset.id;
 							return (
@@ -382,7 +387,7 @@ function CalendarDateControl< Item >( {
 						>
 							{ __( 'Custom' ) }
 						</Button>
-					</HStack>
+					</Stack>
 
 					{ /* Manual date input */ }
 					<InputControl
@@ -408,7 +413,7 @@ function CalendarDateControl< Item >( {
 						timeZone={ timezoneString || undefined }
 						weekStartsOn={ weekStartsOn }
 					/>
-				</VStack>
+				</Stack>
 			</BaseControl>
 		</ValidatedDateControl>
 	);
@@ -555,9 +560,14 @@ function CalendarDateRangeControl< Item >( {
 				label={ displayLabel }
 				hideLabelFromVision={ hideLabelFromVision }
 			>
-				<VStack spacing={ 4 }>
+				<Stack direction="column" gap="md">
 					{ /* Preset buttons */ }
-					<HStack spacing={ 2 } wrap justify="flex-start">
+					<Stack
+						direction="row"
+						gap="xs"
+						wrap="wrap"
+						justify="flex-start"
+					>
 						{ DATE_RANGE_PRESETS.map( ( preset ) => {
 							const isSelected = selectedPresetId === preset.id;
 							return (
@@ -585,10 +595,10 @@ function CalendarDateRangeControl< Item >( {
 						>
 							{ __( 'Custom' ) }
 						</Button>
-					</HStack>
+					</Stack>
 
 					{ /* Manual date range inputs */ }
-					<HStack spacing={ 2 }>
+					<Stack direction="row" gap="xs">
 						<InputControl
 							__next40pxDefaultSize
 							ref={ fromInputRef }
@@ -613,7 +623,7 @@ function CalendarDateRangeControl< Item >( {
 							}
 							required={ !! field.isValid?.required }
 						/>
-					</HStack>
+					</Stack>
 
 					<DateRangeCalendar
 						style={ { width: '100%' } }
@@ -624,7 +634,7 @@ function CalendarDateRangeControl< Item >( {
 						timeZone={ timezone.string || undefined }
 						weekStartsOn={ weekStartsOn }
 					/>
-				</VStack>
+				</Stack>
 			</BaseControl>
 		</ValidatedDateControl>
 	);

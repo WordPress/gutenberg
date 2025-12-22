@@ -4,14 +4,14 @@
 import {
 	__experimentalItemGroup as ItemGroup,
 	__experimentalItem as Item,
-	__experimentalVStack as VStack,
-	__experimentalHStack as HStack,
 	BaseControl,
 	Icon,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useContext } from '@wordpress/element';
 import { check } from '@wordpress/icons';
+import { Stack } from '@wordpress/ui';
+import '@wordpress/theme/design-tokens.css';
 
 /**
  * Internal dependencies
@@ -31,14 +31,14 @@ function FieldItem( {
 } ) {
 	return (
 		<Item onClick={ field.enableHiding ? onToggleVisibility : undefined }>
-			<HStack expanded justify="flex-start" alignment="center">
+			<Stack direction="row" justify="flex-start" align="center">
 				<div style={ { height: 24, width: 24 } }>
 					{ isVisible && <Icon icon={ check } /> }
 				</div>
 				<span className="dataviews-view-config__label">
 					{ field.label }
 				</span>
-			</HStack>
+			</Stack>
 		</Item>
 	);
 }
@@ -116,13 +116,16 @@ export function PropertiesSection( {
 	} >;
 
 	return (
-		<VStack className="dataviews-field-control" spacing={ 0 }>
+		<Stack direction="column" className="dataviews-field-control">
 			{ showLabel && (
 				<BaseControl.VisualLabel>
 					{ __( 'Properties' ) }
 				</BaseControl.VisualLabel>
 			) }
-			<VStack className="dataviews-view-config__properties" spacing={ 0 }>
+			<Stack
+				direction="column"
+				className="dataviews-view-config__properties"
+			>
 				<ItemGroup isBordered isSeparated size="medium">
 					{ visibleLockedFields.map( ( { field, isVisibleFlag } ) => {
 						return (
@@ -185,7 +188,7 @@ export function PropertiesSection( {
 						);
 					} ) }
 				</ItemGroup>
-			</VStack>
-		</VStack>
+			</Stack>
+		</Stack>
 	);
 }

@@ -1,10 +1,8 @@
 /**
  * WordPress dependencies
  */
-import {
-	__experimentalVStack as VStack,
-	__experimentalHStack as HStack,
-} from '@wordpress/components';
+import { Stack } from '@wordpress/ui';
+import '@wordpress/theme/design-tokens.css';
 
 /**
  * Internal dependencies
@@ -21,27 +19,39 @@ const FORM_FIELD_LAYOUTS = [
 		type: 'regular',
 		component: FormRegularField,
 		wrapper: ( { children }: { children: React.ReactNode } ) => (
-			<VStack className="dataforms-layouts__wrapper" spacing={ 4 }>
+			<Stack
+				direction="column"
+				className="dataforms-layouts__wrapper"
+				gap="md"
+			>
 				{ children }
-			</VStack>
+			</Stack>
 		),
 	},
 	{
 		type: 'panel',
 		component: FormPanelField,
 		wrapper: ( { children }: { children: React.ReactNode } ) => (
-			<VStack className="dataforms-layouts__wrapper" spacing={ 2 }>
+			<Stack
+				direction="column"
+				className="dataforms-layouts__wrapper"
+				gap="xs"
+			>
 				{ children }
-			</VStack>
+			</Stack>
 		),
 	},
 	{
 		type: 'card',
 		component: FormCardField,
 		wrapper: ( { children }: { children: React.ReactNode } ) => (
-			<VStack className="dataforms-layouts__wrapper" spacing={ 6 }>
+			<Stack
+				direction="column"
+				className="dataforms-layouts__wrapper"
+				gap="lg"
+			>
 				{ children }
-			</VStack>
+			</Stack>
 		),
 	},
 	{
@@ -54,18 +64,21 @@ const FORM_FIELD_LAYOUTS = [
 			children: React.ReactNode;
 			layout: NormalizedLayout;
 		} ) => (
-			<VStack className="dataforms-layouts__wrapper" spacing={ 4 }>
+			<Stack
+				direction="column"
+				className="dataforms-layouts__wrapper"
+				gap="md"
+			>
 				<div className="dataforms-layouts-row__field">
-					<HStack
-						spacing={ 4 }
-						alignment={
-							( layout as NormalizedRowLayout ).alignment
-						}
+					<Stack
+						direction="row"
+						gap="md"
+						align={ ( layout as NormalizedRowLayout ).alignment }
 					>
 						{ children }
-					</HStack>
+					</Stack>
 				</div>
-			</VStack>
+			</Stack>
 		),
 	},
 	{

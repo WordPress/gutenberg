@@ -8,12 +8,12 @@ import clsx from 'clsx';
  */
 import { useContext, useMemo } from '@wordpress/element';
 import {
-	__experimentalHStack as HStack,
-	__experimentalVStack as VStack,
 	__experimentalHeading as Heading,
 	__experimentalSpacer as Spacer,
 	BaseControl,
 } from '@wordpress/components';
+import { Stack } from '@wordpress/ui';
+import '@wordpress/theme/design-tokens.css';
 
 /**
  * Internal dependencies
@@ -29,14 +29,18 @@ import { DEFAULT_LAYOUT } from '../normalize-form';
 
 function Header( { title }: { title: string } ) {
 	return (
-		<VStack className="dataforms-layouts-regular__header" spacing={ 4 }>
-			<HStack alignment="center">
+		<Stack
+			direction="column"
+			className="dataforms-layouts-regular__header"
+			gap="md"
+		>
+			<Stack direction="row" align="center">
 				<Heading level={ 2 } size={ 13 }>
 					{ title }
 				</Heading>
 				<Spacer />
-			</HStack>
-		</VStack>
+			</Stack>
+		</Stack>
 	);
 }
 
@@ -85,7 +89,7 @@ export default function FormRegularField< Item >( {
 
 	if ( labelPosition === 'side' ) {
 		return (
-			<HStack className="dataforms-layouts-regular__field">
+			<Stack direction="row" className="dataforms-layouts-regular__field">
 				<div
 					className={ clsx(
 						'dataforms-layouts-regular__field-label',
@@ -111,7 +115,7 @@ export default function FormRegularField< Item >( {
 						/>
 					) }
 				</div>
-			</HStack>
+			</Stack>
 		);
 	}
 

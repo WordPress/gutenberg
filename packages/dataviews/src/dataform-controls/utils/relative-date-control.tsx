@@ -10,10 +10,11 @@ import {
 	BaseControl,
 	SelectControl,
 	__experimentalNumberControl as NumberControl,
-	__experimentalHStack as HStack,
 } from '@wordpress/components';
 import { useCallback } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { Stack } from '@wordpress/ui';
+import '@wordpress/theme/design-tokens.css';
 
 /**
  * Internal dependencies
@@ -92,7 +93,7 @@ export default function RelativeDateControl< Item >( {
 			label={ label }
 			hideLabelFromVision={ hideLabelFromVision }
 		>
-			<HStack spacing={ 2.5 }>
+			<Stack direction="row" gap="xs">
 				<NumberControl
 					__next40pxDefaultSize
 					className="dataviews-controls__relative-date-number"
@@ -111,7 +112,7 @@ export default function RelativeDateControl< Item >( {
 					onChange={ onChangeUnit }
 					hideLabelFromVision
 				/>
-			</HStack>
+			</Stack>
 		</BaseControl>
 	);
 }

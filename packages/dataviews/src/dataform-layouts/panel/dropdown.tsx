@@ -2,8 +2,6 @@
  * WordPress dependencies
  */
 import {
-	__experimentalVStack as VStack,
-	__experimentalHStack as HStack,
 	__experimentalHeading as Heading,
 	__experimentalSpacer as Spacer,
 	Dropdown,
@@ -13,6 +11,8 @@ import { __ } from '@wordpress/i18n';
 import { useMemo } from '@wordpress/element';
 import { closeSmall } from '@wordpress/icons';
 import { useFocusOnMount } from '@wordpress/compose';
+import { Stack } from '@wordpress/ui';
+import '@wordpress/theme/design-tokens.css';
 
 /**
  * Internal dependencies
@@ -36,11 +36,12 @@ function DropdownHeader( {
 	onClose: () => void;
 } ) {
 	return (
-		<VStack
+		<Stack
+			direction="column"
 			className="dataforms-layouts-panel__dropdown-header"
-			spacing={ 4 }
+			gap="md"
 		>
-			<HStack alignment="center">
+			<Stack direction="row" align="center">
 				{ title && (
 					<Heading level={ 2 } size={ 13 }>
 						{ title }
@@ -55,8 +56,8 @@ function DropdownHeader( {
 						size="small"
 					/>
 				) }
-			</HStack>
-		</VStack>
+			</Stack>
+		</Stack>
 	);
 }
 

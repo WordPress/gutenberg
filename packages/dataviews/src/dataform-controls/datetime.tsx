@@ -9,11 +9,12 @@ import { format } from 'date-fns';
 import {
 	BaseControl,
 	privateApis as componentsPrivateApis,
-	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { getSettings } from '@wordpress/date';
+import { Stack } from '@wordpress/ui';
+import '@wordpress/theme/design-tokens.css';
 
 /**
  * Internal dependencies
@@ -167,7 +168,7 @@ function CalendarDateTimeControl< Item >( {
 			help={ description }
 			hideLabelFromVision={ hideLabelFromVision }
 		>
-			<VStack spacing={ 4 }>
+			<Stack direction="column" gap="md">
 				{ /* Calendar widget */ }
 				<DateCalendar
 					style={ { width: '100%' } }
@@ -198,7 +199,7 @@ function CalendarDateTimeControl< Item >( {
 					}
 					onChange={ handleManualDateTimeChange }
 				/>
-			</VStack>
+			</Stack>
 		</BaseControl>
 	);
 }
