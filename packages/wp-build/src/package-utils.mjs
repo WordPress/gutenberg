@@ -2,13 +2,11 @@
  * External dependencies
  */
 import { readFileSync } from 'fs';
-import { fileURLToPath } from 'url';
+import { createRequire } from 'module';
 
 /**
- * Shared cache for package.json files to avoid redundant reads.
- * Cache is keyed by the full package name from package.json's name field.
+ * Cache for package.json files to avoid redundant reads.
  */
-const packageJsonCache = new Map();
 const packagePathCache = new Map();
 
 /**
@@ -42,21 +40,20 @@ const packagePathCache = new Map();
 
 /**
  * Get package.json info using Node's module resolution.
- * Resolves the package using import.meta.resolve and reads its package.json.
  *
  * @param {string} fullPackageName The full package name (e.g., '@wordpress/blocks').
+ * @param {string} [resolveDir]    Directory to resolve from. Defaults to process.cwd().
  * @return {PackageJson|null} Package.json object or null if not found.
  */
-export function getPackageInfo( fullPackageName ) {
-	if ( packageJsonCache.has( fullPackageName ) ) {
-		return packageJsonCache.get( fullPackageName );
+export function getPackageInfo( fullPackageName, resolveDir = process.cwd() ) {
+	const require = createRequire( resolveDir + '/package.json' );
+	try {
+		return getPackageInfoFromFile(
+			require.resolve( `${ fullPackageName }/package.json` )
+		);
+	} catch {
+		return null;
 	}
-
-	const resolved = import.meta.resolve( `${ fullPackageName }/package.json` );
-	const result = getPackageInfoFromFile( fileURLToPath( resolved ) );
-	packageJsonCache.set( fullPackageName, result );
-
-	return result;
 }
 
 /**
