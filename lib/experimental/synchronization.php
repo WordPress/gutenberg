@@ -6,22 +6,21 @@
  */
 
 /**
- * Initializes the collaborative editing secret.
+ * Registers REST API routes for collaborative editing.
  */
-function gutenberg_rest_api_init_collaborative_editing() {
+function gutenberg_rest_api_register_routes_for_collaborative_editing(): void {
 	$gutenberg_experiments = get_option( 'gutenberg-experiments' );
 	if ( ! $gutenberg_experiments || ! array_key_exists( 'gutenberg-sync-collaboration', $gutenberg_experiments ) ) {
 		return;
 	}
-	$collaborative_editing_secret = get_site_option( 'collaborative_editing_secret' );
-	if ( ! $collaborative_editing_secret ) {
-		$collaborative_editing_secret = wp_generate_password( 64, false );
-	}
-	add_site_option( 'collaborative_editing_secret', $collaborative_editing_secret );
 
-	wp_add_inline_script( 'wp-sync', 'window.__experimentalCollaborativeEditingSecret = "' . $collaborative_editing_secret . '";', 'before' );
+	$sync_storage = new Gutenberg_Sync_Post_Meta_Storage();
+	$sync_storage->init();
+
+	$sse_sync_server = new Gutenberg_HTTP_Polling_Sync_Server( $sync_storage );
+	$sse_sync_server->init();
 }
-add_action( 'admin_init', 'gutenberg_rest_api_init_collaborative_editing' );
+add_action( 'init', 'gutenberg_rest_api_register_routes_for_collaborative_editing' );
 
 /**
  * Registers post meta for persisting CRDT documents.

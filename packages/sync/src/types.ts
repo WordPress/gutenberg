@@ -16,6 +16,7 @@ import type { WORDPRESS_META_KEY_FOR_CRDT_DOC_PERSISTENCE } from './config';
 /* globalThis */
 declare global {
 	interface Window {
+		__experimentalCollaborativeEditingApiUrl?: string;
 		__experimentalCollaborativeEditingSecret?: string;
 		wp?: {
 			ajax?: {

@@ -1,17 +1,17 @@
-// File copied as is from the y-webrtc package with only exports
-// added to the following vars/functions: signalingConns,rooms, publishSignalingMessage, log.
+// File copied from the y-webrtc package with changes to SignalingConn and
+// WebrtcProvider to make the transport injectable.
+
 /* eslint-disable eslint-comments/disable-enable-pair */
 /* eslint-disable eslint-comments/no-unlimited-disable */
 /* eslint-disable */
 // @ts-nocheck
 
-import * as ws from 'lib0/websocket';
 import * as map from 'lib0/map';
 import * as error from 'lib0/error';
 import * as random from 'lib0/random';
 import * as encoding from 'lib0/encoding';
 import * as decoding from 'lib0/decoding';
-import { Observable } from 'lib0/observable';
+import { ObservableV2 } from 'lib0/observable';
 import * as logging from 'lib0/logging';
 import * as promise from 'lib0/promise';
 import * as bc from 'lib0/broadcastchannel';
@@ -27,7 +27,7 @@ import * as awarenessProtocol from 'y-protocols/awareness';
 
 import * as cryptoutils from './crypto.js';
 
-export const log = logging.createModuleLogger( 'y-webrtc' );
+const log = logging.createModuleLogger( 'y-webrtc' );
 
 const messageSync = 0;
 const messageQueryAwareness = 3;
@@ -37,12 +37,12 @@ const messageBcPeerId = 4;
 /**
  * @type {Map<string, SignalingConn>}
  */
-export const signalingConns = new Map();
+const signalingConns = new Map();
 
 /**
  * @type {Map<string,Room>}
  */
-export const rooms = new Map();
+const rooms = new Map();
 
 /**
  * @param {Room} room
@@ -244,7 +244,7 @@ export class WebrtcConn {
 		this.connected = false;
 		this.synced = false;
 		/**
-		 * @type {any}
+		 * @type {import('simple-peer').Instance}
 		 */
 		this.peer = new Peer( { initiator, ...room.provider.peerOpts } );
 		this.peer.on( 'signal', ( signal ) => {
@@ -432,9 +432,9 @@ export class Room {
 		 * Listens to Yjs updates and sends them to remote peers
 		 *
 		 * @param {Uint8Array} update
-		 * @param {any} origin
+		 * @param {any} _origin
 		 */
-		this._docUpdateHandler = ( update, origin ) => {
+		this._docUpdateHandler = ( update, _origin ) => {
 			const encoder = encoding.createEncoder();
 			encoding.writeVarUint( encoder, messageSync );
 			syncProtocol.writeUpdate( encoder, update );
@@ -444,11 +444,11 @@ export class Room {
 		 * Listens to Awareness updates and sends them to remote peers
 		 *
 		 * @param {any} changed
-		 * @param {any} origin
+		 * @param {any} _origin
 		 */
 		this._awarenessUpdateHandler = (
 			{ added, updated, removed },
-			origin
+			_origin
 		) => {
 			const changedClients = added.concat( updated ).concat( removed );
 			const encoderAwareness = encoding.createEncoder();
@@ -592,7 +592,7 @@ const openRoom = ( doc, provider, name, key ) => {
  * @param {Room} room
  * @param {any} data
  */
-export const publishSignalingMessage = ( conn, room, data ) => {
+const publishSignalingMessage = ( conn, room, data ) => {
 	if ( room.key ) {
 		cryptoutils.encryptJson( data, room.key ).then( ( data ) => {
 			conn.send( {
@@ -606,14 +606,20 @@ export const publishSignalingMessage = ( conn, room, data ) => {
 	}
 };
 
-export class SignalingConn extends ws.WebsocketClient {
-	constructor( url ) {
-		super( url );
+class SignalingConn {
+	constructor( transport, url ) {
 		/**
 		 * @type {Set<WebrtcProvider>}
 		 */
 		this.providers = new Set();
+
+		/**
+		 * @type {ws.WebsocketClient}
+		 */
+		this.transport = transport;
+
 		this.on( 'connect', () => {
+			console.log( 'SignalingConn connected', rooms );
 			log( `connected (${ url })` );
 			const topics = Array.from( rooms.keys() );
 			this.send( { type: 'subscribe', topics } );
@@ -740,6 +746,33 @@ export class SignalingConn extends ws.WebsocketClient {
 		} );
 		this.on( 'disconnect', () => log( `disconnect (${ url })` ) );
 	}
+
+	/** PROXY TO TRANSPORT **/
+
+	connect() {
+		this.transport.connect();
+	}
+
+	destroy() {
+		this.transport.destroy();
+	}
+
+	disconnect() {
+		this.transport.disconnect();
+	}
+
+	on( event, fn ) {
+		console.log( 'SignalingConn on', event );
+		this.transport.on( event, fn );
+	}
+
+	off( event, fn ) {
+		this.transport.off( event, fn );
+	}
+
+	send( message ) {
+		this.transport.send( message );
+	}
 }
 
 /**
@@ -749,13 +782,31 @@ export class SignalingConn extends ws.WebsocketClient {
  * @property {awarenessProtocol.Awareness} [awareness]
  * @property {number} [maxConns]
  * @property {boolean} [filterBcConns]
- * @property {any} [peerOpts]
+ * @property {import('simple-peer').SimplePeer['config']} [peerOpts]
  */
 
 /**
- * @extends Observable<string>
+ * @param {WebrtcProvider} provider
  */
-export class WebrtcProvider extends Observable {
+const emitStatus = ( provider ) => {
+	provider.emit( 'status', [
+		{
+			connected: provider.connected,
+		},
+	] );
+};
+
+/**
+ * @typedef {Object} WebrtcProviderEvents
+ * @property {function({connected:boolean}):void} WebrtcProviderEvent.status
+ * @property {function({synced:boolean}):void} WebrtcProviderEvent.synced
+ * @property {function({added:Array<string>,removed:Array<string>,webrtcPeers:Array<string>,bcPeers:Array<string>}):void} WebrtcProviderEvent.peers
+ */
+
+/**
+ * @extends ObservableV2<WebrtcProviderEvents>
+ */
+export class WebrtcProvider extends ObservableV2 {
 	/**
 	 * @param {string} roomName
 	 * @param {Y.Doc} doc
@@ -803,6 +854,7 @@ export class WebrtcProvider extends Observable {
 			} else {
 				this.room.disconnect();
 			}
+			emitStatus( this );
 		} );
 		this.connect();
 		this.destroy = this.destroy.bind( this );
@@ -810,6 +862,15 @@ export class WebrtcProvider extends Observable {
 	}
 
 	/**
+	 * Indicates whether the provider is looking for other peers.
+	 *
+	 * Other peers can be found via signaling servers or via broadcastchannel (cross browser-tab
+	 * communication). You never know when you are connected to all peers. You also don't know if
+	 * there are other peers. connected doesn't mean that you are connected to any physical peers
+	 * working on the same resource as you. It does not change unless you call provider.disconnect()
+	 *
+	 * `this.on('status', (event) => { console.log(event.connected) })`
+	 *
 	 * @type {boolean}
 	 */
 	get connected() {
@@ -822,14 +883,23 @@ export class WebrtcProvider extends Observable {
 			const signalingConn = map.setIfUndefined(
 				signalingConns,
 				url,
-				() => new SignalingConn( url )
+				() =>
+					new SignalingConn(
+						this.createSignalingTransport( url ),
+						url
+					)
 			);
 			this.signalingConns.push( signalingConn );
 			signalingConn.providers.add( this );
 		} );
 		if ( this.room ) {
 			this.room.connect();
+			emitStatus( this );
 		}
+	}
+
+	createSignalingTransport( url ) {
+		return new ws.WebsocketClient( url );
 	}
 
 	disconnect() {
@@ -843,6 +913,7 @@ export class WebrtcProvider extends Observable {
 		} );
 		if ( this.room ) {
 			this.room.disconnect();
+			emitStatus( this );
 		}
 	}
 

@@ -6,30 +6,37 @@ import { applyFilters } from '@wordpress/hooks';
 /**
  * Internal dependencies
  */
-import { createIndexedDbProvider } from './indexeddb-provider';
+import { createHttpPollingProvider } from './http-polling-provider';
 import { createWebRTCProvider } from './webrtc-provider';
 import type { ProviderCreator } from '../types';
 
 let providerCreators: ProviderCreator[] | null = null;
 
 /**
- * Returns provider creators for IndexedDB and WebRTC with HTTP signaling. These
- * are the current default providers.
+ * Returns the defeault provider creators. Long-polling (SSE) is the current
+ * default provider.
  *
  * @return {ProviderCreator[]} Creator functions for Yjs providers.
  */
 function getDefaultProviderCreators(): ProviderCreator[] {
-	const signalingUrl = window?.wp?.ajax?.settings?.url;
+	const password = window?.__experimentalCollaborativeEditingSecret;
+	const signalingUrl = window?.__experimentalCollaborativeEditingApiUrl;
 
-	if ( ! signalingUrl ) {
+	if ( ! password || ! signalingUrl ) {
+		console.warn(
+			'Provider not created because signaling URL or password is missing.'
+		);
 		return [];
 	}
 
 	return [
-		createIndexedDbProvider,
+		createHttpPollingProvider( {
+			endpoint: signalingUrl,
+			secret: password,
+		} ),
 		createWebRTCProvider( {
-			password: window?.__experimentalCollaborativeEditingSecret,
-			signaling: [ signalingUrl ],
+			password,
+			signalingUrl,
 		} ),
 	];
 }
@@ -72,3 +79,8 @@ export function getProviderCreators(): ProviderCreator[] {
 
 	return providerCreators;
 }
+
+/**
+ * Export provider creators for direct use
+ */
+export { createWebRTCProvider, createHttpPollingProvider };
