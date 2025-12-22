@@ -435,7 +435,9 @@ function block_core_breadcrumbs_get_archive_breadcrumbs() {
 			$post_type = reset( $post_type );
 		}
 		$post_type_object = get_post_type_object( $post_type );
-		$title            = apply_filters( 'post_type_archive_title', $post_type_object->labels->archives, $post_type );
+
+		/** This filter is documented in wp-includes/general-template.php */
+		$title = apply_filters( 'post_type_archive_title', $post_type_object->labels->archives, $post_type ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 
 		if ( $post_type_object ) {
 			// Add post type (current if not paginated, link if paginated).
