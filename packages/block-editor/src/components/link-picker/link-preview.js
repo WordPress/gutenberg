@@ -54,7 +54,13 @@ export function LinkPreview( { title, url, image, badges } ) {
 						</Truncate>
 						{ url && (
 							<span className="link-preview-button__hint">
-								{ url }
+								{ /^https?:\/\//.test( url ) ? (
+									<Truncate numberOfLines={ 1 }>
+										{ url }
+									</Truncate>
+								) : (
+									url
+								) }
 							</span>
 						) }
 						{ badges && badges.length > 0 && (
