@@ -8,8 +8,6 @@ import type { ReactNode } from 'react';
  * WordPress dependencies
  */
 import {
-	__experimentalHStack as HStack,
-	__experimentalVStack as VStack,
 	Spinner,
 	Flex,
 	FlexItem,
@@ -19,6 +17,8 @@ import {
 import { __, sprintf } from '@wordpress/i18n';
 import { useInstanceId } from '@wordpress/compose';
 import { useContext } from '@wordpress/element';
+import { Stack } from '@wordpress/ui';
+import '@wordpress/theme/design-tokens.css';
 
 /**
  * Internal dependencies
@@ -96,7 +96,7 @@ function GridItem< Item >( {
 			}
 			key={ id }
 			render={ ( { children, ...props } ) => (
-				<VStack spacing={ 0 } children={ children } { ...props } />
+				<Stack direction="column" children={ children } { ...props } />
 			) }
 			role="option"
 			aria-posinset={ posinset }
@@ -136,16 +136,17 @@ function GridItem< Item >( {
 				/>
 			) }
 			{ showTitle && (
-				<HStack
+				<Stack
+					direction="row"
 					justify="space-between"
 					className="dataviews-view-picker-grid__title-actions"
 				>
 					<div className="dataviews-view-picker-grid__title-field dataviews-title-field">
 						{ renderedTitleField }
 					</div>
-				</HStack>
+				</Stack>
 			) }
-			<VStack spacing={ 1 }>
+			<Stack direction="column" gap="2xs">
 				{ showDescription && descriptionField?.render && (
 					<descriptionField.render
 						item={ item }
@@ -153,11 +154,12 @@ function GridItem< Item >( {
 					/>
 				) }
 				{ !! badgeFields?.length && (
-					<HStack
+					<Stack
+						direction="row"
 						className="dataviews-view-picker-grid__badge-fields"
-						spacing={ 2 }
-						wrap
-						alignment="top"
+						gap="xs"
+						wrap="wrap"
+						align="top"
 						justify="flex-start"
 					>
 						{ badgeFields.map( ( field ) => {
@@ -173,12 +175,13 @@ function GridItem< Item >( {
 								</Badge>
 							);
 						} ) }
-					</HStack>
+					</Stack>
 				) }
 				{ !! regularFields?.length && (
-					<VStack
+					<Stack
+						direction="column"
 						className="dataviews-view-picker-grid__fields"
-						spacing={ 1 }
+						gap="2xs"
 					>
 						{ regularFields.map( ( field ) => {
 							return (
@@ -208,9 +211,9 @@ function GridItem< Item >( {
 								</Flex>
 							);
 						} ) }
-					</VStack>
+					</Stack>
 				) }
-			</VStack>
+			</Stack>
 		</Composite.Item>
 	);
 }
@@ -231,9 +234,10 @@ function GridGroup< Item >( {
 		'dataviews-view-picker-grid-group__header'
 	);
 	return (
-		<VStack
+		<Stack
+			direction="column"
 			key={ groupName }
-			spacing={ 2 }
+			gap="xs"
 			role="group"
 			aria-labelledby={ headerId }
 		>
@@ -251,7 +255,7 @@ function GridGroup< Item >( {
 					: groupName }
 			</h3>
 			{ children }
-		</VStack>
+		</Stack>
 	);
 }
 
@@ -337,8 +341,9 @@ function ViewPickerGrid< Item >( {
 						) }
 						aria-label={ itemListLabel }
 						render={ ( { children, ...props } ) => (
-							<VStack
-								spacing={ 4 }
+							<Stack
+								direction="column"
+								gap="md"
 								children={ children }
 								{ ...props }
 							/>
