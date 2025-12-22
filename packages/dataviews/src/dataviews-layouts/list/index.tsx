@@ -318,6 +318,7 @@ function ListItem< Item >( {
 					gap="sm"
 					justify="start"
 					align="flex-start"
+					style={ { flex: 1 } }
 				>
 					{ renderedMediaField }
 					<Stack
@@ -329,6 +330,7 @@ function ListItem< Item >( {
 							<div
 								className="dataviews-title-field"
 								id={ labelId }
+								style={ { flex: 1 } }
 							>
 								{ renderedTitleField }
 							</div>
