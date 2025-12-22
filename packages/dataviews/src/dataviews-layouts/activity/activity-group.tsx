@@ -1,9 +1,9 @@
 /**
  * WordPress dependencies
  */
-import { __experimentalVStack as VStack } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { createInterpolateElement } from '@wordpress/element';
+import { Stack } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -44,15 +44,15 @@ export default function ActivityGroup< Item >( {
 	);
 
 	return (
-		<VStack
+		<Stack
 			key={ groupName }
-			spacing={ 0 }
+			direction="column"
 			className="dataviews-view-activity__group"
 		>
 			<h3 className="dataviews-view-activity__group-header">
 				{ groupHeader }
 			</h3>
 			{ children }
-		</VStack>
+		</Stack>
 	);
 }

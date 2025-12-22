@@ -6,7 +6,9 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { __experimentalVStack as VStack, Spinner } from '@wordpress/components';
+import { Spinner } from '@wordpress/components';
+import { Stack } from '@wordpress/ui';
+import '@wordpress/theme/design-tokens.css';
 
 /**
  * Internal dependencies
@@ -59,7 +61,7 @@ export default function ViewActivity< Item >(
 	// Render grouped activity
 	if ( hasData && groupField && dataByGroup ) {
 		return (
-			<VStack spacing={ 2 } className={ wrapperClassName }>
+			<Stack direction="column" gap="xs" className={ wrapperClassName }>
 				{ groupedEntries.map(
 					( [ groupName, groupData ]: [ string, Item[] ] ) => (
 						<ActivityGroup< Item >
@@ -76,7 +78,7 @@ export default function ViewActivity< Item >(
 						</ActivityGroup>
 					)
 				) }
-			</VStack>
+			</Stack>
 		);
 	}
 

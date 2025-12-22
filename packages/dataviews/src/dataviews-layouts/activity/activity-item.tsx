@@ -6,13 +6,10 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import {
-	__experimentalHStack as HStack,
-	__experimentalVStack as VStack,
-	VisuallyHidden,
-} from '@wordpress/components';
+import { VisuallyHidden } from '@wordpress/components';
 import { useRef, useContext, useMemo } from '@wordpress/element';
 import { useRegistry } from '@wordpress/data';
+import { Stack } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -100,12 +97,12 @@ function ActivityItem< Item >(
 			<titleField.render item={ item } field={ titleField } />
 		) : null;
 
-	const verticalSpacing = useMemo( () => {
+	const verticalGap = useMemo( () => {
 		switch ( density ) {
 			case 'comfortable':
-				return '3';
+				return 'sm';
 			default:
-				return '2';
+				return 'xs';
 		}
 	}, [ density ] );
 
@@ -124,17 +121,19 @@ function ActivityItem< Item >(
 				density === 'comfortable' && 'is-comfortable'
 			) }
 		>
-			<HStack spacing={ 4 } justify="start" alignment="flex-start">
-				<VStack
-					spacing={ 1 }
-					alignment="center"
+			<Stack direction="row" gap="md" justify="start" align="flex-start">
+				<Stack
+					direction="column"
+					gap="2xs"
+					align="center"
 					className="dataviews-view-activity__item-type"
 				>
 					{ renderedMediaField }
-				</VStack>
-				<VStack
-					spacing={ verticalSpacing }
-					alignment="flex-start"
+				</Stack>
+				<Stack
+					direction="column"
+					gap={ verticalGap }
+					align="flex-start"
 					className="dataviews-view-activity__item-content"
 				>
 					{ renderedTitleField && (
@@ -185,7 +184,7 @@ function ActivityItem< Item >(
 							buttonVariant="secondary"
 						/>
 					) }
-				</VStack>
+				</Stack>
 				{ primaryActions.length < eligibleActions.length && (
 					<div className="dataviews-view-activity__item-actions">
 						<ItemActions
@@ -195,7 +194,7 @@ function ActivityItem< Item >(
 						/>
 					</div>
 				) }
-			</HStack>
+			</Stack>
 		</div>
 	);
 }
