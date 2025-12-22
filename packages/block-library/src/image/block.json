@@ -16,6 +16,10 @@
 	"keywords": [ "img", "photo", "picture" ],
 	"textdomain": "default",
 	"attributes": {
+		"animation": {
+			"type": "string",
+			"default": ""
+		},
 		"blob": {
 			"type": "string",
 			"role": "local"

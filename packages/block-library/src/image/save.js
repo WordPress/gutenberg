@@ -48,6 +48,8 @@ export default function save( { attributes } ) {
 			!! borderProps.className ||
 			( borderProps.style &&
 				Object.keys( borderProps.style ).length > 0 ),
+		[ `wp-block-image-animation-${ attributes.animation }` ]:
+			attributes.animation && attributes.animation !== '',
 	} );
 
 	const imageClasses = clsx( borderProps.className, {

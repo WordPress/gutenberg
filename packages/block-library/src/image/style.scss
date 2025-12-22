@@ -25,6 +25,33 @@
 		}
 	}
 
+
+	&.wp-block-image-animation-fade-in img {
+		@media not (prefers-reduced-motion) {
+			opacity: 0;
+
+			@keyframes fadein {
+				from {
+					opacity: 0;
+				}
+				to {
+					opacity: 1;
+				}
+			}
+
+			/* Create View Timeline */
+			view-timeline-name: --fade-in-image;
+			view-timeline-axis: block;
+
+			/* Attach animation, linked to the  View Timeline */
+			animation: linear fadein both;
+			animation-timeline: --fade-in-image !important;
+
+			/* Tweak range when effect should run*/
+			animation-range: entry 10% cover 40% !important;
+		}
+	}
+
 	// The following style maintains border radius application for deprecated
 	// image blocks that applied border radius to the outer `figure` element.
 	//

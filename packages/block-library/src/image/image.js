@@ -5,6 +5,7 @@ import { isBlobURL } from '@wordpress/blob';
 import {
 	ExternalLink,
 	ResizableBox,
+	SelectControl,
 	Spinner,
 	TextareaControl,
 	TextControl,
@@ -589,6 +590,33 @@ export default function Image( {
 			/>
 		) );
 
+	const animationControl = isSingleSelected && (
+		<ToolsPanelItem
+			label={ __( 'Animation' ) }
+			isShownByDefault
+			hasValue={ () => attributes.animation !== '' }
+			onDeselect={ () => setAttributes( { animation: '' } ) }
+		>
+			<SelectControl
+				label={ __( 'Animation' ) }
+				value={ attributes.animation || '' }
+				options={ [
+					{ label: __( 'None' ), value: '' },
+					{
+						label: __( 'Fade in' ),
+						value: 'fade-in',
+					},
+				] }
+				onChange={ ( value ) => {
+					setAttributes( { animation: value } );
+				} }
+				__nextHasNoMarginBottom
+				__nextHasNoMarginTop
+				__next40pxDefaultSize
+			/>
+		</ToolsPanelItem>
+	);
+
 	const resetAll = () => {
 		setAttributes( {
 			alt: undefined,
@@ -834,6 +862,7 @@ export default function Image( {
 							/>
 						</ToolsPanelItem>
 					) }
+					{ animationControl }
 					{ dimensionsControl }
 					{ !! imageSizeOptions.length && (
 						<ResolutionTool
