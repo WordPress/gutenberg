@@ -86,6 +86,7 @@ const v1 = {
 		return (
 			<TagName { ...blockProps }>
 				<button
+					type="button"
 					className="wp-block-accordion-heading__toggle"
 					style={ spacingProps.style }
 				>
