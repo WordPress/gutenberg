@@ -485,7 +485,11 @@ export const WithCard = () => {
 	);
 };
 
-export const GroupByLayout = () => {
+const GroupByLayoutComponent = ( {
+	showLabel = true,
+}: {
+	showLabel: boolean;
+} ) => {
 	const [ view, setView ] = useState< View >( {
 		type: LAYOUT_GRID,
 		search: '',
@@ -496,11 +500,19 @@ export const GroupByLayout = () => {
 		titleField: 'title',
 		descriptionField: 'description',
 		mediaField: 'image',
-		groupBy: { field: 'type', direction: 'asc' },
+		groupBy: { field: 'type', direction: 'asc', showLabel },
 		layout: {
 			badgeFields: [ 'satellites' ],
 		},
 	} );
+
+	useEffect( () => {
+		setView( ( prevView ) => ( {
+			...prevView,
+			groupBy: { field: 'type', direction: 'asc', showLabel },
+		} ) );
+	}, [ showLabel ] );
+
 	const { data: shownData, paginationInfo } = useMemo( () => {
 		return filterSortAndPaginate( data, view, fields );
 	}, [ view ] );
@@ -516,6 +528,20 @@ export const GroupByLayout = () => {
 			defaultLayouts={ defaultLayouts }
 		/>
 	);
+};
+
+export const GroupByLayout = {
+	render: GroupByLayoutComponent,
+	args: {
+		showLabel: true,
+	},
+	argTypes: {
+		showLabel: {
+			control: 'boolean',
+			description:
+				'Whether to show the field label in group headers (e.g., "Type: Planet" vs just "Planet")',
+		},
+	},
 };
 
 export const InfiniteScroll = () => {
@@ -643,9 +669,11 @@ export const InfiniteScroll = () => {
 const ActivityComponent = ( {
 	showMedia = true,
 	grouping = true,
+	showLabel = true,
 }: {
 	showMedia: boolean;
 	grouping: boolean;
+	showLabel: boolean;
 } ) => {
 	const [ view, setView ] = useState< View >( {
 		type: LAYOUT_ACTIVITY,
@@ -666,6 +694,7 @@ const ActivityComponent = ( {
 			? {
 					field: 'date',
 					direction: 'asc',
+					showLabel,
 			  }
 			: undefined,
 	} );
@@ -674,12 +703,12 @@ const ActivityComponent = ( {
 			return {
 				...prevView,
 				groupBy: grouping
-					? { field: 'date', direction: 'asc' }
+					? { field: 'date', direction: 'asc', showLabel }
 					: undefined,
 				showMedia,
 			};
 		} );
-	}, [ showMedia, grouping ] );
+	}, [ showMedia, grouping, showLabel ] );
 
 	const { data: shownData, paginationInfo } = useMemo( () => {
 		return filterSortAndPaginate( orderEventData, view, orderEventFields );
@@ -711,6 +740,7 @@ export const Activity = {
 	args: {
 		showMedia: true,
 		grouping: true,
+		showLabel: true,
 	},
 	argTypes: {
 		showMedia: {
@@ -725,6 +755,11 @@ export const Activity = {
 			defaultValue: true,
 			description:
 				'Whether items are grouped by date in the activity list',
+		},
+		showLabel: {
+			control: 'boolean',
+			description:
+				'Whether to show the field label in group headers (e.g., "Date: Dec 15" vs just "Dec 15")',
 		},
 	},
 };
