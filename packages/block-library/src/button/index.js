@@ -36,6 +36,14 @@ export const settings = {
 		...a,
 		text: ( a.text || '' ) + text,
 	} ),
+	__experimentalLabel( attributes ) {
+		const customName = attributes?.metadata?.name;
+		if ( customName ) {
+			return customName;
+		}
+		const { text } = attributes;
+		return ! text || text.length === 0 ? __( 'Button' ) : text;
+	},
 };
 
 if ( window.__experimentalContentOnlyInspectorFields ) {
