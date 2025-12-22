@@ -52,7 +52,6 @@ export const buttonView = ( {
 	text-align: center;
 	@media not ( prefers-reduced-motion ) {
 		transition:
-			background ${ CONFIG.transitionDurationFast } linear,
 			color ${ CONFIG.transitionDurationFast } linear,
 			font-weight 60ms linear;
 	}
@@ -73,12 +72,7 @@ export const buttonView = ( {
 		color: ${ COLORS.theme.gray[ 900 ] };
 	}
 
-	&:active {
-		background: ${ COLORS.ui.background };
-	}
-
 	${ isDeselectable && deselectable }
-	${ isDeselectable && ! isPressed && deselectableNotPressed }
 	${ isIcon && isIconStyles( { size } ) }
 	${ isPressed && pressed }
 `;
@@ -86,10 +80,6 @@ export const buttonView = ( {
 const pressed = css`
 	color: ${ COLORS.theme.foreground };
 	font-weight: ${ CONFIG.fontWeightMedium };
-
-	&:active {
-		background: transparent;
-	}
 `;
 
 const deselectable = css`
@@ -98,13 +88,12 @@ const deselectable = css`
 	&:focus {
 		outline: ${ CONFIG.borderWidthFocus } solid ${ COLORS.ui.borderFocus };
 		outline-offset: 2px;
-	}
-`;
 
-const deselectableNotPressed = css`
-	&:focus {
-		background: ${ COLORS.ui.background };
-		box-shadow: 0 0 0 2px ${ COLORS.ui.background };
+		// Hide overlapping border
+		&[aria-pressed='false'] {
+			background: ${ COLORS.ui.background };
+			box-shadow: 0 0 0 2px ${ COLORS.ui.background };
+		}
 	}
 `;
 
