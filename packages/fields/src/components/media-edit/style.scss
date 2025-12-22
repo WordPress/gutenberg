@@ -18,8 +18,8 @@ fieldset.fields__media-edit {
 		display: flex;
 		align-items: center;
 		gap: $grid-unit-15;
-		border: $border-width dashed $gray-300;
-		border-radius: $radius-small;
+		border: $border-width solid $gray-600;
+		border-radius: $radius-x-small;
 		padding: calc(8px - #{$border-width});
 		cursor: pointer;
 		min-width: 0;
@@ -46,7 +46,7 @@ fieldset.fields__media-edit {
 	}
 
 	.fields__media-edit-thumbnail {
-		width: 24px;
+		width: $grid-unit-30;
 		aspect-ratio: 1 / 1;
 		flex-shrink: 0;
 		border-radius: $radius-small;

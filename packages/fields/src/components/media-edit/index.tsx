@@ -7,6 +7,7 @@ import {
 	__experimentalText as Text,
 	__experimentalTruncate as Truncate,
 	__experimentalVStack as VStack,
+	Tooltip,
 	VisuallyHidden,
 } from '@wordpress/components';
 import { store as coreStore, type Attachment } from '@wordpress/core-data';
@@ -74,12 +75,14 @@ function MediaPickerButton( {
 	open,
 	children,
 	label,
+	showTooltip = false,
 }: {
 	open: () => void;
 	children: React.ReactNode;
 	label: string;
+	showTooltip?: boolean;
 } ) {
-	return (
+	const mediaPickerButton = (
 		<div
 			className="fields__media-edit-picker-button"
 			role="button"
@@ -96,6 +99,10 @@ function MediaPickerButton( {
 			{ children }
 		</div>
 	);
+	if ( ! showTooltip ) {
+		return mediaPickerButton;
+	}
+	return <Tooltip text={ label }>{ mediaPickerButton }</Tooltip>;
 }
 
 const archiveMimeTypes = [
@@ -138,10 +145,7 @@ function MediaPreview( {
 	return (
 		<>
 			{ preview }
-			<Truncate
-				className="fields__media-edit-filename"
-				title={ attachmentTitle }
-			>
+			<Truncate className="fields__media-edit-filename">
 				{ attachmentTitle }
 			</Truncate>
 		</>
@@ -252,6 +256,7 @@ export default function MediaEdit< Item >( {
 											<MediaPickerButton
 												open={ open }
 												label={ __( 'Replace' ) }
+												showTooltip
 											>
 												<MediaPreview
 													url={
