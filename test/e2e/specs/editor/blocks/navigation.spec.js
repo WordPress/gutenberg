@@ -1928,21 +1928,12 @@ test.describe( 'Navigation block', () => {
 			pageUtils,
 		} ) => {
 			await test.step( 'Select third navigation link (Empty Link)', async () => {
-				// To do this, we have to select the second link then arrow to the third link.
-				// Otherwise, clicking the empty link directly will open the link control
-				// in the canvas, then remove it once we do not add a link.
-				const navLinkBlock = navigation
-					.getNavBlock()
-					.getByRole( 'document', {
-						name: 'Block: Custom Link',
-					} )
-					.first();
+				// Select the navigation
+				await editor.selectBlocks( navigation.getNavBlock() );
 
-				await navLinkBlock.click();
-
-				// Use arrow keys to select the third link
-				await pageUtils.pressKeys( 'Shift+End' );
-				await pageUtils.pressKeys( 'ArrowRight', { times: 2 } );
+				// select the block via the inspector list view instead of the canvas, as that will
+				// open the link control in the canvas
+				await page.getByRole( 'link', { name: 'Empty Link' } ).click();
 			} );
 
 			await test.step( 'Open inspector and verify LinkPicker shows "Add link" button', async () => {
@@ -1995,17 +1986,13 @@ test.describe( 'Navigation block', () => {
 				await expect( linkButton ).toBeVisible();
 			} );
 
-			// TODO: Verify navigation link in canvas has the correct title of "Empty Link"
-			// await test.step( 'Verify navigation link in canvas updated', async () => {
-			// 	const navLinkBlock = navigation
-			// 		.getNavBlock()
-			// 		.getByRole( 'document', {
-			// 			name: 'Block: Page Link',
-			// 		} )
-			// 		.last();
+			await test.step( 'Verify navigation link in canvas updated with existing title', async () => {
+				const navLinkBlock = navigation
+					.getNavBlock()
+					.getByText( 'Empty Link' );
 
-			// 	await expect( navLinkBlock ).toContainText( 'Empty Link' );
-			// } );
+				await expect( navLinkBlock ).toBeVisible();
+			} );
 		} );
 	} );
 } );

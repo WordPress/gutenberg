@@ -145,7 +145,7 @@ export default function RichTextControl( {
 					</inputEventContext.Provider>
 				</keyboardShortcutContext.Provider>
 			) }
-			<BaseControl __nextHasNoMarginBottom { ...baseControlProps }>
+			<BaseControl { ...baseControlProps }>
 				<div
 					className="block-editor-content-only-controls__rich-text"
 					role="textbox"

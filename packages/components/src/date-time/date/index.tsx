@@ -2,18 +2,15 @@
  * External dependencies
  */
 import {
-	format,
 	isSameDay,
 	subMonths,
 	addMonths,
-	startOfDay,
 	isEqual,
 	addDays,
+	subDays,
 	subWeeks,
 	addWeeks,
 	isSameMonth,
-	startOfWeek,
-	endOfWeek,
 } from 'date-fns';
 import type { KeyboardEventHandler } from 'react';
 
@@ -22,7 +19,7 @@ import type { KeyboardEventHandler } from 'react';
  */
 import { __, _n, sprintf, isRTL } from '@wordpress/i18n';
 import { arrowLeft, arrowRight } from '@wordpress/icons';
-import { getSettings, gmdateI18n } from '@wordpress/date';
+import { dateI18n, date as formatDate, getSettings } from '@wordpress/date';
 import { useState, useRef, useEffect } from '@wordpress/element';
 
 /**
@@ -40,7 +37,11 @@ import {
 	DayOfWeek,
 	DayButton,
 } from './styles';
-import { inputToDate } from '../utils';
+import {
+	inputToDate,
+	setInConfiguredTimezone,
+	startOfDayInConfiguredTimezone,
+} from '../utils';
 import { TIMEZONELESS_FORMAT } from '../constants';
 
 /**
@@ -70,7 +71,7 @@ export function DatePicker( {
 	onMonthPreviewed,
 	startOfWeek: weekStartsOn = 0,
 }: DatePickerProps ) {
-	const date = currentDate ? inputToDate( currentDate ) : new Date();
+	const date = inputToDate( currentDate ?? new Date() );
 
 	const {
 		calendar,
@@ -81,14 +82,16 @@ export function DatePicker( {
 		viewPreviousMonth,
 		viewNextMonth,
 	} = useLilius( {
-		selected: [ startOfDay( date ) ],
-		viewing: startOfDay( date ),
+		selected: [ startOfDayInConfiguredTimezone( date ) ],
+		viewing: startOfDayInConfiguredTimezone( date ),
 		weekStartsOn,
 	} );
 
 	// Used to implement a roving tab index. Tracks the day that receives focus
 	// when the user tabs into the calendar.
-	const [ focusable, setFocusable ] = useState( startOfDay( date ) );
+	const [ focusable, setFocusable ] = useState(
+		startOfDayInConfiguredTimezone( date )
+	);
 
 	// Allows us to only programmatically focus() a day when focus was already
 	// within the calendar. This stops us stealing focus from e.g. a TimePicker
@@ -100,9 +103,9 @@ export function DatePicker( {
 	const [ prevCurrentDate, setPrevCurrentDate ] = useState( currentDate );
 	if ( currentDate !== prevCurrentDate ) {
 		setPrevCurrentDate( currentDate );
-		setSelected( [ startOfDay( date ) ] );
-		setViewing( startOfDay( date ) );
-		setFocusable( startOfDay( date ) );
+		setSelected( [ startOfDayInConfiguredTimezone( date ) ] );
+		setViewing( startOfDayInConfiguredTimezone( date ) );
+		setFocusable( startOfDayInConfiguredTimezone( date ) );
 	}
 
 	return (
@@ -119,18 +122,26 @@ export function DatePicker( {
 					onClick={ () => {
 						viewPreviousMonth();
 						setFocusable( subMonths( focusable, 1 ) );
+						const prevMonth = subMonths( viewing, 1 );
 						onMonthPreviewed?.(
-							format(
-								subMonths( viewing, 1 ),
-								TIMEZONELESS_FORMAT
+							dateI18n(
+								TIMEZONELESS_FORMAT,
+								prevMonth,
+								-prevMonth.getTimezoneOffset()
 							)
 						);
 					} }
 					size="compact"
 				/>
 				<NavigatorHeading level={ 3 }>
-					<strong>{ gmdateI18n( 'F', viewing ) }</strong>{ ' ' }
-					{ gmdateI18n( 'Y', viewing ) }
+					<strong>
+						{ dateI18n(
+							'F',
+							viewing,
+							-viewing.getTimezoneOffset()
+						) }
+					</strong>{ ' ' }
+					{ dateI18n( 'Y', viewing, -viewing.getTimezoneOffset() ) }
 				</NavigatorHeading>
 				<ViewNextMonthButton
 					icon={ isRTL() ? arrowLeft : arrowRight }
@@ -139,10 +150,12 @@ export function DatePicker( {
 					onClick={ () => {
 						viewNextMonth();
 						setFocusable( addMonths( focusable, 1 ) );
+						const nextMonth = addMonths( viewing, 1 );
 						onMonthPreviewed?.(
-							format(
-								addMonths( viewing, 1 ),
-								TIMEZONELESS_FORMAT
+							dateI18n(
+								TIMEZONELESS_FORMAT,
+								nextMonth,
+								-nextMonth.getTimezoneOffset()
 							)
 						);
 					} }
@@ -155,7 +168,7 @@ export function DatePicker( {
 			>
 				{ calendar[ 0 ][ 0 ].map( ( day ) => (
 					<DayOfWeek key={ day.toString() }>
-						{ gmdateI18n( 'D', day ) }
+						{ dateI18n( 'D', day, -day.getTimezoneOffset() ) }
 					</DayOfWeek>
 				) ) }
 				{ calendar[ 0 ].map( ( week ) =>
@@ -171,7 +184,10 @@ export function DatePicker( {
 								isSelected={ isSelected( day ) }
 								isFocusable={ isEqual( day, focusable ) }
 								isFocusAllowed={ isFocusWithinCalendar }
-								isToday={ isSameDay( day, new Date() ) }
+								isToday={ isSameDay(
+									day,
+									startOfDayInConfiguredTimezone( new Date() )
+								) }
 								isInvalid={
 									isInvalidDate ? isInvalidDate( day ) : false
 								}
@@ -183,19 +199,18 @@ export function DatePicker( {
 								onClick={ () => {
 									setSelected( [ day ] );
 									setFocusable( day );
+									const newDate = setInConfiguredTimezone(
+										date,
+										{
+											year: day.getFullYear(),
+											month: day.getMonth(),
+											date: day.getDate(),
+										}
+									);
 									onChange?.(
-										format(
-											// Don't change the selected date's time fields.
-											new Date(
-												day.getFullYear(),
-												day.getMonth(),
-												day.getDate(),
-												date.getHours(),
-												date.getMinutes(),
-												date.getSeconds(),
-												date.getMilliseconds()
-											),
-											TIMEZONELESS_FORMAT
+										formatDate(
+											TIMEZONELESS_FORMAT,
+											newDate
 										)
 									);
 								} }
@@ -226,11 +241,23 @@ export function DatePicker( {
 										nextFocusable = addMonths( day, 1 );
 									}
 									if ( event.key === 'Home' ) {
-										nextFocusable = startOfWeek( day );
+										const dayOfWeek = day.getDay();
+										const daysToSubtract =
+											( dayOfWeek - weekStartsOn + 7 ) %
+											7;
+										nextFocusable = subDays(
+											day,
+											daysToSubtract
+										);
 									}
 									if ( event.key === 'End' ) {
-										nextFocusable = startOfDay(
-											endOfWeek( day )
+										const dayOfWeek = day.getDay();
+										const daysToAdd =
+											( weekStartsOn + 6 - dayOfWeek ) %
+											7;
+										nextFocusable = addDays(
+											day,
+											daysToAdd
 										);
 									}
 									if ( nextFocusable ) {
@@ -244,9 +271,10 @@ export function DatePicker( {
 										) {
 											setViewing( nextFocusable );
 											onMonthPreviewed?.(
-												format(
+												dateI18n(
+													TIMEZONELESS_FORMAT,
 													nextFocusable,
-													TIMEZONELESS_FORMAT
+													-nextFocusable.getTimezoneOffset()
 												)
 											);
 										}
@@ -306,7 +334,7 @@ function Day( {
 			className="components-datetime__date__day" // Unused, for backwards compatibility.
 			disabled={ isInvalid }
 			tabIndex={ isFocusable ? 0 : -1 }
-			aria-label={ getDayLabel( day, isSelected, numEvents ) }
+			aria-label={ getDayLabel( day, isSelected, isToday, numEvents ) }
 			column={ column }
 			isSelected={ isSelected }
 			isToday={ isToday }
@@ -314,44 +342,45 @@ function Day( {
 			onClick={ onClick }
 			onKeyDown={ onKeyDown }
 		>
-			{ gmdateI18n( 'j', day ) }
+			{ dateI18n( 'j', day, -day.getTimezoneOffset() ) }
 		</DayButton>
 	);
 }
 
-function getDayLabel( date: Date, isSelected: boolean, numEvents: number ) {
+function getDayLabel(
+	date: Date,
+	isSelected: boolean,
+	isToday: boolean,
+	numEvents: number
+) {
 	const { formats } = getSettings();
-	const localizedDate = gmdateI18n( formats.date, date );
-	if ( isSelected && numEvents > 0 ) {
-		return sprintf(
-			// translators: 1: The calendar date. 2: Number of events on the calendar date.
-			_n(
-				'%1$s. Selected. There is %2$d event',
-				'%1$s. Selected. There are %2$d events',
+	const localizedDate = dateI18n(
+		formats.date,
+		date,
+		-date.getTimezoneOffset()
+	);
+
+	const parts = [ localizedDate ];
+
+	if ( isSelected ) {
+		parts.push( __( 'Selected' ) );
+	}
+
+	if ( isToday ) {
+		parts.push( __( 'Today' ) );
+	}
+
+	if ( numEvents > 0 ) {
+		parts.push(
+			sprintf(
+				// translators: %d: Number of events on the calendar date.
+				_n( 'There is %d event', 'There are %d events', numEvents ),
 				numEvents
-			),
-			localizedDate,
-			numEvents
-		);
-	} else if ( isSelected ) {
-		return sprintf(
-			// translators: 1: The calendar date.
-			__( '%1$s. Selected' ),
-			localizedDate
-		);
-	} else if ( numEvents > 0 ) {
-		return sprintf(
-			// translators: 1: The calendar date. 2: Number of events on the calendar date.
-			_n(
-				'%1$s. There is %2$d event',
-				'%1$s. There are %2$d events',
-				numEvents
-			),
-			localizedDate,
-			numEvents
+			)
 		);
 	}
-	return localizedDate;
+
+	return parts.join( '. ' );
 }
 
 export default DatePicker;

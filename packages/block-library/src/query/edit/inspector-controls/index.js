@@ -269,7 +269,6 @@ export default function QueryInspectorControls( props ) {
 						>
 							{ postTypesSelectOptions.length > 2 ? (
 								<SelectControl
-									__nextHasNoMarginBottom
 									__next40pxDefaultSize
 									options={ postTypesSelectOptions }
 									value={ postType }

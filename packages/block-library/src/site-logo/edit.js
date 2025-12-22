@@ -301,7 +301,6 @@ const SiteLogo = ( {
 						}
 					>
 						<RangeControl
-							__nextHasNoMarginBottom
 							__next40pxDefaultSize
 							label={ __( 'Image width' ) }
 							onChange={ ( newWidth ) =>

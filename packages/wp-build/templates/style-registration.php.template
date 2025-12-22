@@ -59,7 +59,7 @@ if ( ! function_exists( '{{PREFIX}}_register_package_styles' ) ) {
 			{{PREFIX}}_override_style(
 				$styles,
 				$style_data['handle'],
-				plugins_url( 'build/styles/' . $style_data['path'] . '.css', $plugin_dir ),
+				{{BASE_URL}} . '/styles/' . $style_data['path'] . '.css',
 				$style_data['dependencies'],
 				$default_version
 			);

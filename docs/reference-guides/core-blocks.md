@@ -87,10 +87,9 @@ Reuse this design across your site. ([Source](https://github.com/WordPress/guten
 
 ## Breadcrumbs
 
-Display a breadcrumb trail for hierarchical post types or based on taxonomy terms. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/breadcrumbs))
+Display a breadcrumb trail showing the path to the current page. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/breadcrumbs))
 
 -	**Name:** core/breadcrumbs
--	**Experimental:** true
 -	**Category:** theme
 -	**Supports:** align (full, wide), color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** prefersTaxonomy, separator, showCurrentItem, showHomeItem, showOnHomePage
@@ -601,7 +600,7 @@ Start with the basic building block of all narrative. ([Source](https://github.c
 
 -	**Name:** core/paragraph
 -	**Category:** text
--	**Supports:** __unstablePasteTextInline, anchor, color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), splitting, typography (fitText, fontSize, lineHeight, textAlign), ~~className~~
+-	**Supports:** __unstablePasteTextInline, align (full, wide), anchor, color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), splitting, typography (fitText, fontSize, lineHeight, textAlign, textIndent), ~~className~~
 -	**Attributes:** content, direction, dropCap, placeholder
 
 ## Pattern Placeholder

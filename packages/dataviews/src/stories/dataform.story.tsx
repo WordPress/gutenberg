@@ -554,12 +554,14 @@ const ValidationComponent = ( {
 	custom,
 	pattern,
 	minMax,
+	layout,
 }: {
 	required: boolean;
 	elements: 'sync' | 'async' | 'none';
 	custom: 'sync' | 'async' | 'none';
 	pattern: boolean;
 	minMax: boolean;
+	layout: 'regular' | 'panel' | 'card';
 } ) => {
 	type ValidatedItem = {
 		text: string;
@@ -1275,74 +1277,123 @@ const ValidationComponent = ( {
 		];
 	}, [ elements, custom, required, pattern, minMax, getElements ] );
 
-	const form = useMemo(
-		() => ( {
-			fields: [
-				'text',
-				{ id: 'customEdit' },
-				{
-					id: 'level1Integer',
-					children: [ 'integer' ],
-				},
-				{
-					id: 'level1Number',
-					children: [
-						{ id: 'level2Number', children: [ 'number' ] },
-					],
-				},
-				{
-					id: 'level1Email',
-					children: [
-						{
-							id: 'level2Email',
-							children: [
-								{ id: 'level3Email', children: [ 'email' ] },
-							],
-						},
-					],
-				},
-				{
-					id: 'level1Telephone',
-					children: [
-						{
-							id: 'level2Telephone',
-							children: [
-								{
-									id: 'level3Telephone',
-									children: [
-										{
-											id: 'level4Telephone',
-											children: [ 'telephone' ],
-										},
-									],
-								},
-							],
-						},
-					],
-				},
-				'url',
-				'color',
-				'password',
-				'textarea',
-				'select',
-				'textWithRadio',
-				'boolean',
-				'toggle',
-				'toggleGroup',
-				'array',
-				'date',
-				'dateRange',
-				'datetime',
-			],
-		} ),
-		[]
-	);
+	const form = useMemo( () => {
+		if ( layout === 'regular' ) {
+			return {
+				fields: [
+					'text',
+					{ id: 'customEdit' },
+					{ id: 'level1Integer', children: [ 'integer' ] },
+					{
+						id: 'level1Number',
+						children: [
+							{ id: 'level2Number', children: [ 'number' ] },
+						],
+					},
+					{
+						id: 'level1Email',
+						children: [
+							{
+								id: 'level2Email',
+								children: [
+									{
+										id: 'level3Email',
+										children: [ 'email' ],
+									},
+								],
+							},
+						],
+					},
+					{
+						id: 'level1Telephone',
+						children: [
+							{
+								id: 'level2Telephone',
+								children: [
+									{
+										id: 'level3Telephone',
+										children: [
+											{
+												id: 'level4Telephone',
+												children: [ 'telephone' ],
+											},
+										],
+									},
+								],
+							},
+						],
+					},
+					'url',
+					'color',
+					'password',
+					'textarea',
+					'select',
+					'textWithRadio',
+					'boolean',
+					'toggle',
+					'toggleGroup',
+					'array',
+					'date',
+					'dateRange',
+					'datetime',
+				],
+			};
+		}
+
+		// Panel and card layouts share the same grouped structure
+		const groupedFields = [
+			{
+				id: 'textFields',
+				label: 'Text Fields',
+				children: [ 'text', 'textarea', 'password', 'customEdit' ],
+			},
+			{
+				id: 'numberFields',
+				label: 'Number Fields',
+				children: [ 'integer', 'number' ],
+			},
+			{
+				id: 'contactFields',
+				label: 'Contact Fields',
+				children: [ 'email', 'telephone', 'url' ],
+			},
+			{
+				id: 'selectFields',
+				label: 'Selection Fields',
+				children: [ 'select', 'textWithRadio' ],
+			},
+			{
+				id: 'booleanFields',
+				label: 'Boolean Fields',
+				children: [ 'boolean', 'toggle', 'toggleGroup' ],
+			},
+			{ id: 'color' },
+			{ id: 'array' },
+			{
+				id: 'dateFields',
+				label: 'Date Fields',
+				children: [ 'date', 'dateRange', 'datetime' ],
+			},
+		];
+
+		if ( layout === 'panel' ) {
+			return {
+				layout: { type: 'panel' as const },
+				fields: groupedFields,
+			};
+		}
+
+		return {
+			layout: { type: 'card' as const },
+			fields: groupedFields,
+		};
+	}, [ layout ] );
 
 	const { validity, isValid } = useFormValidity( post, _fields, form );
 
 	return (
 		<form>
-			<VStack alignment="left">
+			<VStack alignment="left" spacing={ 8 }>
 				<DataForm< ValidatedItem >
 					data={ post }
 					fields={ _fields }
@@ -2189,6 +2240,11 @@ export const LayoutMixed = {
 export const Validation = {
 	render: ValidationComponent,
 	argTypes: {
+		layout: {
+			control: { type: 'select' },
+			description: 'Choose the form layout type.',
+			options: [ 'regular', 'panel', 'card' ],
+		},
 		required: {
 			control: { type: 'boolean' },
 			description:
@@ -2217,6 +2273,7 @@ export const Validation = {
 		},
 	},
 	args: {
+		layout: 'regular',
 		required: true,
 		elements: 'sync',
 		custom: 'sync',

@@ -45,7 +45,6 @@ export default function Controls( {
 							} );
 						} }
 						__next40pxDefaultSize
-						__nextHasNoMarginBottom
 					/>
 					<ToggleControl
 						label={ __( 'Default Tab' ) }

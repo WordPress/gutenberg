@@ -51,7 +51,6 @@ export default function Select< Item >( {
 			options={ elements }
 			onChange={ onChangeControl }
 			__next40pxDefaultSize
-			__nextHasNoMarginBottom
 			hideLabelFromVision={ hideLabelFromVision }
 			multiple={ isMultiple }
 		/>

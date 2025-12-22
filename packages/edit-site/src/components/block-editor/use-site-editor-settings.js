@@ -73,9 +73,15 @@ export function useSpecificEditorSettings() {
 	}, [ mergedConfig ] );
 
 	const defaultEditorSettings = useMemo( () => {
+		// Preserve non-global styles from settings.styles (e.g., editor styles from add_editor_style)
+		const nonGlobalStyles = ( settings?.styles ?? [] ).filter(
+			( style ) => ! style.isGlobalStyles
+		);
+
 		return {
 			...settings,
 			styles: [
+				...nonGlobalStyles,
 				...globalStyles,
 				{
 					// Forming a "block formatting context" to prevent margin collapsing.

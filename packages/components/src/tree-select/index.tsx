@@ -104,7 +104,6 @@ export function TreeSelect( props: TreeSelectProps ) {
 			{ ...{ label, options, onChange } }
 			value={ selectedId }
 			{ ...restProps }
-			__nextHasNoMarginBottom
 		/>
 	);
 }

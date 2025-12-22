@@ -172,7 +172,6 @@ function InserterMenu(
 		return (
 			<>
 				<SearchControl
-					__nextHasNoMarginBottom
 					className="block-editor-inserter__search"
 					onChange={ ( value ) => {
 						if ( hoveredItem ) {

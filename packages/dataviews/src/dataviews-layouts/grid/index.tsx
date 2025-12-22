@@ -60,12 +60,14 @@ function ViewGrid< Item >( {
 							( [ groupName, groupItems ] ) => (
 								<VStack key={ groupName } spacing={ 2 }>
 									<h3 className="dataviews-view-grid__group-header">
-										{ sprintf(
-											// translators: 1: The label of the field e.g. "Date". 2: The value of the field, e.g.: "May 2022".
-											__( '%1$s: %2$s' ),
-											groupField.label,
-											groupName
-										) }
+										{ view.groupBy?.showLabel === false
+											? groupName
+											: sprintf(
+													// translators: 1: The label of the field e.g. "Date". 2: The value of the field, e.g.: "May 2022".
+													__( '%1$s: %2$s' ),
+													groupField.label,
+													groupName
+											  ) }
 									</h3>
 									<CompositeGrid
 										{ ...gridProps }

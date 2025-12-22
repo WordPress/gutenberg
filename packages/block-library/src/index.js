@@ -262,10 +262,10 @@ const getAllBlocks = () => {
 		termTemplate,
 		queryTitle,
 		postAuthorBiography,
+		breadcrumbs,
 	];
 
 	if ( window?.__experimentalEnableBlockExperiments ) {
-		blocks.push( breadcrumbs );
 		blocks.push( tab );
 		blocks.push( tabs );
 	}

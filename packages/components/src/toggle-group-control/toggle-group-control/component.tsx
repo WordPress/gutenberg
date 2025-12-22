@@ -91,7 +91,7 @@ function UnconnectedToggleGroupControl(
 	} );
 
 	return (
-		<BaseControl help={ help } __nextHasNoMarginBottom>
+		<BaseControl help={ help }>
 			{ ! hideLabelFromVision && (
 				<VisualLabelWrapper>
 					<BaseControl.VisualLabel>{ label }</BaseControl.VisualLabel>
