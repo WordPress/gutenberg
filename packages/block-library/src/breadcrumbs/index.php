@@ -173,7 +173,7 @@ function render_block_core_breadcrumbs( $attributes, $content, $block ) {
 	 * @param array    $attributes       Block attributes.
 	 * @param WP_Block $block            Block instance.
 	 */
-	$breadcrumb_items = apply_filters( 'block_core_breadcrumbs_items', $breadcrumb_items, $attributes, $block );
+	$breadcrumb_items = apply_filters( 'block_core_breadcrumbs_items', $breadcrumb_items, $attributes );
 
 	if ( empty( $breadcrumb_items ) ) {
 		return '';
