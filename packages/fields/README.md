@@ -71,6 +71,45 @@ Export action as JSON for Pattern.
 
 Featured Image field for BasePostWithEmbeddedFeaturedMedia.
 
+### MediaEdit
+
+A media edit control component that provides a media picker UI with upload functionality for selecting WordPress media attachments. Supports both the traditional WordPress media library and the experimental DataViews media modal.
+
+This component is intended to be used as the `Edit` property of a field definition when registering fields with `registerEntityField` from `@wordpress/editor`.
+
+_Usage_
+
+```tsx
+import { MediaEdit } from '@wordpress/fields';
+import type { DataFormControlProps } from '@wordpress/dataviews';
+
+const featuredImageField = {
+	id: 'featured_media',
+	type: 'media',
+	label: 'Featured Image',
+	Edit: ( props: DataFormControlProps< MyPostType > ) => (
+		<MediaEdit { ...props } allowedTypes={ [ 'image' ] } />
+	),
+};
+```
+
+_Parameters_
+
+-   _props_ `MediaEditProps<Item>`: - The component props.
+-   _props.data_ `Item`: - The item being edited.
+-   _props.field_ `Object`: - The field configuration with getValue and setValue methods.
+-   _props.onChange_ `Function`: - Callback function when the media selection changes.
+-   _props.allowedTypes_ `[string[]]`: - Array of allowed media types. Default `['image']`.
+-   _props.multiple_ `[boolean]`: - Whether to allow multiple media selections. Default `false`.
+
+_Returns_
+
+-   `JSX.Element`: The media edit control component.
+
+### MediaEditProps
+
+Undocumented declaration.
+
 ### notesField
 
 Notes count field for post types that support editor.notes.

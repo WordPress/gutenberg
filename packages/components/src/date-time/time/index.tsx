@@ -1,13 +1,14 @@
 /**
  * External dependencies
  */
-import { startOfMinute, format, set, setMonth } from 'date-fns';
+import { startOfMinute } from 'date-fns';
 
 /**
  * WordPress dependencies
  */
 import { useState, useMemo, useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { date as formatDate } from '@wordpress/date';
 
 /**
  * Internal dependencies
@@ -31,6 +32,7 @@ import {
 	inputToDate,
 	buildPadInputStateReducer,
 	validateInputElementTarget,
+	setInConfiguredTimezone,
 } from '../utils';
 import { TIMEZONELESS_FORMAT } from '../constants';
 import { TimeInput } from './time-input';
@@ -66,17 +68,13 @@ export function TimePicker( {
 }: TimePickerProps ) {
 	const [ date, setDate ] = useState( () =>
 		// Truncate the date at the minutes, see: #15495.
-		currentTime ? startOfMinute( inputToDate( currentTime ) ) : new Date()
+		startOfMinute( inputToDate( currentTime ?? new Date() ) )
 	);
 
 	// Reset the state when currentTime changed.
 	// TODO: useEffect() shouldn't be used like this, causes an unnecessary render
 	useEffect( () => {
-		setDate(
-			currentTime
-				? startOfMinute( inputToDate( currentTime ) )
-				: new Date()
-		);
+		setDate( startOfMinute( inputToDate( currentTime ?? new Date() ) ) );
 	}, [ currentTime ] );
 
 	const monthOptions = [
@@ -96,15 +94,14 @@ export function TimePicker( {
 
 	const { day, month, year, minutes, hours } = useMemo(
 		() => ( {
-			day: format( date, 'dd' ),
-			month: format(
-				date,
-				'MM'
+			day: formatDate( 'd', date ),
+			month: formatDate(
+				'm',
+				date
 			) as ( typeof monthOptions )[ number ][ 'value' ],
-			year: format( date, 'yyyy' ),
-			minutes: format( date, 'mm' ),
-			hours: format( date, 'HH' ),
-			am: format( date, 'a' ),
+			year: formatDate( 'Y', date ),
+			minutes: formatDate( 'i', date ),
+			hours: formatDate( 'H', date ),
 		} ),
 		[ date ]
 	);
@@ -118,9 +115,13 @@ export function TimePicker( {
 			// We can safely assume value is a number if target is valid.
 			const numberValue = Number( value );
 
-			const newDate = set( date, { [ method ]: numberValue } );
+			// Internal date is UTC-normalized, but the field should be updated
+			// as if in the configured timezone.
+			const newDate = setInConfiguredTimezone( date, {
+				[ method ]: numberValue,
+			} );
 			setDate( newDate );
-			onChange?.( format( newDate, TIMEZONELESS_FORMAT ) );
+			onChange?.( formatDate( TIMEZONELESS_FORMAT, newDate ) );
 		};
 		return callback;
 	};
@@ -129,12 +130,14 @@ export function TimePicker( {
 		hours: newHours,
 		minutes: newMinutes,
 	}: TimeInputValue ) => {
-		const newDate = set( date, {
+		// Internal date is UTC-normalized, but the field should be updated
+		// as if in the configured timezone.
+		const newDate = setInConfiguredTimezone( date, {
 			hours: newHours,
 			minutes: newMinutes,
 		} );
 		setDate( newDate );
-		onChange?.( format( newDate, TIMEZONELESS_FORMAT ) );
+		onChange?.( formatDate( TIMEZONELESS_FORMAT, newDate ) );
 	};
 
 	const dayField = (
@@ -167,9 +170,13 @@ export function TimePicker( {
 				value={ month }
 				options={ monthOptions }
 				onChange={ ( value ) => {
-					const newDate = setMonth( date, Number( value ) - 1 );
+					// Internal date is UTC-normalized, but the field should be updated
+					// as if in the configured timezone.
+					const newDate = setInConfiguredTimezone( date, {
+						month: Number( value ) - 1,
+					} );
 					setDate( newDate );
-					onChange?.( format( newDate, TIMEZONELESS_FORMAT ) );
+					onChange?.( formatDate( TIMEZONELESS_FORMAT, newDate ) );
 				} }
 			/>
 		</MonthSelectWrapper>

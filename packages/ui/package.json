@@ -22,13 +22,21 @@
 		"node": ">=20.10.0",
 		"npm": ">=10.2.3"
 	},
-	"main": "build/index.js",
+	"files": [
+		"src",
+		"build",
+		"build-module",
+		"build-types",
+		"*.md"
+	],
+	"type": "module",
+	"main": "build/index.cjs",
 	"module": "build-module/index.js",
 	"exports": {
 		".": {
 			"types": "./build-types/index.d.ts",
 			"import": "./build-module/index.js",
-			"default": "./build/index.js"
+			"default": "./build/index.cjs"
 		},
 		"./package.json": "./package.json"
 	},

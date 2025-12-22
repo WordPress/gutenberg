@@ -1,0 +1,54 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
+
+fieldset.fields__media-edit {
+	// Reset `fieldset` browser defaults.
+	border: 0;
+	padding: 0;
+	margin: 0;
+
+	.fields__media-edit-row {
+		display: grid;
+		grid-template-columns: 1fr auto;
+		gap: $grid-unit-10;
+		align-items: center;
+	}
+
+	.fields__media-edit-picker-button {
+		display: flex;
+		align-items: center;
+		gap: $grid-unit-15;
+		border: $border-width solid $gray-600;
+		border-radius: $radius-x-small;
+		padding: calc(8px - #{$border-width});
+		cursor: pointer;
+		min-width: 0;
+
+		&:hover {
+			background-color: $gray-100;
+		}
+
+		&:focus-visible {
+			box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+			outline: none;
+		}
+	}
+
+	.fields__media-edit-filename,
+	.fields__media-edit-placeholder {
+		flex: 1;
+		min-width: 0;
+		color: $gray-900;
+	}
+
+	.fields__media-edit-placeholder {
+		text-align: center;
+	}
+
+	.fields__media-edit-thumbnail {
+		width: $grid-unit-30;
+		aspect-ratio: 1 / 1;
+		flex-shrink: 0;
+		border-radius: $radius-small;
+	}
+}

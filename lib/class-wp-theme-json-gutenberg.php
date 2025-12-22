@@ -241,7 +241,8 @@ class WP_Theme_JSON_Gutenberg {
 	 * @since 6.2.0 Added `outline-*`, and `min-height` properties.
 	 * @since 6.3.0 Added `writing-mode` property.
 	 * @since 6.6.0 Added `background-[image|position|repeat|size]` properties.
-	 * @since 7.0.0 Added `dimensions.width` and `dimensions.height`.
+	 * @since 7.0.0 Added `dimensions.width`, `dimensions.height`. and
+	 *              `text-indent` properties.
 	 *
 	 * @var array
 	 */
@@ -305,6 +306,7 @@ class WP_Theme_JSON_Gutenberg {
 		'--wp--style--root--padding-left'   => array( 'spacing', 'padding', 'left' ),
 		'text-decoration'                   => array( 'typography', 'textDecoration' ),
 		'text-transform'                    => array( 'typography', 'textTransform' ),
+		'text-indent'                       => array( 'typography', 'textIndent' ),
 		'filter'                            => array( 'filter', 'duotone' ),
 		'box-shadow'                        => array( 'shadow' ),
 		'height'                            => array( 'dimensions', 'height' ),
@@ -398,7 +400,8 @@ class WP_Theme_JSON_Gutenberg {
 	 * @since 6.4.0 Added `layout.allowEditing`.
 	 * @since 6.4.0 Added `lightbox`.
 	 * @since 7.0.0 Added type markers to the schema for boolean values.
-	 * @since 7.0.0 Added `dimensions.width` and `dimensions.height`.
+	 * @since 7.0.0 Added `dimensions.width`, `dimensions.height`. and
+	 *              `text-indent` properties.
 	 * @var array
 	 */
 	const VALID_SETTINGS = array(
@@ -484,6 +487,7 @@ class WP_Theme_JSON_Gutenberg {
 			'textAlign'        => null,
 			'textColumns'      => null,
 			'textDecoration'   => null,
+			'textIndent'       => null,
 			'textTransform'    => null,
 			'writingMode'      => null,
 		),
@@ -527,7 +531,8 @@ class WP_Theme_JSON_Gutenberg {
 	 * @since 6.2.0 Added `outline`, and `minHeight` properties.
 	 * @since 6.6.0 Added `background` sub properties to top-level only.
 	 * @since 6.6.0 Added `dimensions.aspectRatio`.
-	 * @since 7.0.0 Added `dimensions.width` and `dimensions.height`.
+	 * @since 7.0.0 Added `dimensions.width`, `dimensions.height`. and
+	 *              `text-indent` properties.
 	 * @var array
 	 */
 	const VALID_STYLES = array(
@@ -584,6 +589,7 @@ class WP_Theme_JSON_Gutenberg {
 			'textAlign'      => null,
 			'textColumns'    => null,
 			'textDecoration' => null,
+			'textIndent'     => null,
 			'textTransform'  => null,
 			'writingMode'    => null,
 		),
@@ -625,6 +631,7 @@ class WP_Theme_JSON_Gutenberg {
 	 *
 	 * @since 5.8.0
 	 * @since 6.1.0 Added `heading`, `button`, and `caption` elements.
+	 * @since 7.0.0 Added `text` property.
 	 * @var string[]
 	 */
 	const ELEMENTS = array(
