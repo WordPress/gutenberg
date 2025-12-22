@@ -18,7 +18,7 @@ const featuredImageField: Field< BasePostWithEmbeddedFeaturedMedia > = {
 	Edit: MediaEdit,
 	render: FeaturedImageView,
 	setValue: ( { value } ) => ( {
-		featured_media: value ? Number( value ) : 0,
+		featured_media: value ?? 0,
 	} ),
 	enableSorting: false,
 	filterBy: false,
