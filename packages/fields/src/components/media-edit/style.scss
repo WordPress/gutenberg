@@ -18,7 +18,7 @@ fieldset.fields__media-edit {
 		display: flex;
 		align-items: center;
 		gap: $grid-unit-15;
-		border: $border-width dotted $gray-300;
+		border: $border-width dashed $gray-300;
 		border-radius: $radius-small;
 		padding: calc(8px - #{$border-width});
 		cursor: pointer;

@@ -207,14 +207,14 @@ export default function MediaEdit< Item >( {
 		[ value ]
 	);
 	const onChangeControl = useCallback(
-		( newValue: number | number[] ) =>
+		( newValue: number | number[] | undefined ) =>
 			onChange( field.setValue( { item: data, value: newValue } ) ),
 		[ data, field, onChange ]
 	);
 	const removeItem = ( itemId: number ) => {
 		const currentIds = Array.isArray( value ) ? value : [ value ];
 		const newIds = currentIds.filter( ( id ) => id !== itemId );
-		onChangeControl( newIds.length ? newIds : 0 );
+		onChangeControl( newIds.length ? newIds : undefined );
 	};
 	return (
 		<fieldset className="fields__media-edit" data-field-id={ field.id }>
