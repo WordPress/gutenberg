@@ -66,23 +66,13 @@
 .editor-post-featured-image__preview {
 	height: auto !important;
 	outline: $border-width solid rgba($black, 0.1);
-	position: relative;
-
-	// Add checkerboard pattern for transparent images
-	&::before {
-		content: "";
-		position: absolute;
-		inset: 0;
-		z-index: 0;
-		@include checkerboard-background( 12px );
-	}
+	@include checkerboard-background( 12px );
 
 	.editor-post-featured-image__preview-image {
 		object-fit: cover;
 		width: 100%;
 		object-position: 50% 50%;
 		aspect-ratio: 2/1;
-		position: relative;
 	}
 }
 
