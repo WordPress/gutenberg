@@ -91,6 +91,7 @@ function DefaultUI( {
 			>
 				<Stack
 					direction="row"
+					gap="xs"
 					justify="start"
 					className="dataviews__search"
 				>
