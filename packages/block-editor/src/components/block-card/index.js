@@ -11,7 +11,9 @@ import {
 	Icon,
 	__experimentalText as Text,
 	__experimentalVStack as VStack,
+	__experimentalHStack as HStack,
 	privateApis as componentsPrivateApis,
+	Notice,
 } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
@@ -21,6 +23,7 @@ import {
 	chevronRight,
 	arrowRight,
 	arrowLeft,
+	unseen,
 } from '@wordpress/icons';
 
 /**
@@ -119,6 +122,19 @@ function BlockCard( {
 		[ clientId, allowParentNavigation, isChild, parentClientId ]
 	);
 
+	const isBlockHidden = useSelect(
+		( select ) => {
+			if ( ! clientId ) {
+				return false;
+			}
+			const { isBlockHidden: _isBlockHidden } = unlock(
+				select( blockEditorStore )
+			);
+			return _isBlockHidden( clientId );
+		},
+		[ clientId ]
+	);
+
 	const { selectBlock } = useDispatch( blockEditorStore );
 
 	const TitleElement = parentClientId ? 'div' : 'h2';
@@ -166,22 +182,38 @@ function BlockCard( {
 						: undefined
 				}
 			>
-				<BlockIcon icon={ icon } showColors />
-				<VStack spacing={ 1 }>
-					<TitleElement className="block-editor-block-card__title">
-						<span className="block-editor-block-card__name">
-							{ !! name?.length ? name : title }
-						</span>
-						{ ! parentClientId && ! isChild && !! name?.length && (
-							<Badge>{ title }</Badge>
-						) }
-					</TitleElement>
-					{ ! parentClientId && ! isChild && description && (
-						<Text className="block-editor-block-card__description">
-							{ description }
-						</Text>
+				<VStack spacing={ 4 }>
+					<HStack spacing={ 1 } align="start">
+						<BlockIcon icon={ icon } showColors />
+						<VStack spacing={ 1 }>
+							<TitleElement className="block-editor-block-card__title">
+								<span className="block-editor-block-card__name">
+									{ !! name?.length ? name : title }
+								</span>
+								{ ! parentClientId &&
+									! isChild &&
+									!! name?.length && (
+										<Badge>{ title }</Badge>
+									) }
+								{ isBlockHidden && <Icon icon={ unseen } /> }
+							</TitleElement>
+							{ ! parentClientId && ! isChild && description && (
+								<Text className="block-editor-block-card__description">
+									{ description }
+								</Text>
+							) }
+							{ children }
+						</VStack>
+					</HStack>
+					{ isBlockHidden && (
+						<Notice
+							className="block-editor-block-card__hidden-notice"
+							status="warning"
+							isDismissible={ false }
+						>
+							{ __( 'Block is hidden' ) }
+						</Notice>
 					) }
-					{ children }
 				</VStack>
 			</OptionalParentSelectButton>
 		</div>

@@ -103,10 +103,21 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		isWithinSectionBlock,
 		canMove,
 		isBlockHidden,
+		showHiddenBlocksAsGhost,
 	} = useContext( PrivateBlockContext );
 
 	// translators: %s: Type of block (i.e. Text, Image etc)
-	const blockLabel = sprintf( __( 'Block: %s' ), blockTitle );
+	const blockLabel = isBlockHidden
+		? sprintf(
+				/* translators: %1$s: Type of block (i.e. Text, Image etc), %2$s: Additional information about hidden state */
+				__( 'Block: %1$s. %2$s' ),
+				blockTitle,
+				__(
+					'This block is hidden and will not appear on the frontend of your site, but remains editable in the editor.'
+				)
+		  )
+		: // translators: %s: Type of block (i.e. Text, Image etc)
+		  sprintf( __( 'Block: %s' ), blockTitle );
 	const htmlSuffix = mode === 'html' && ! __unstableIsHtml ? '-visual' : '';
 	const ffDragRef = useFirefoxDraggableCompatibility();
 	const isHoverEnabled = ! isWithinSectionBlock;
@@ -186,6 +197,8 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 				'has-negative-margin': hasNegativeMargin,
 				'is-editing-content-only-section': isEditingContentOnlySection,
 				'is-block-hidden': isBlockHidden,
+				'is-fully-hidden':
+					isBlockHidden && ! ( showHiddenBlocksAsGhost ?? true ),
 			},
 			className,
 			props.className,

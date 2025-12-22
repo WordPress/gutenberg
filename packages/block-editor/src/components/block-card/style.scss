@@ -18,7 +18,6 @@
 
 .block-editor-block-card__parent-select-button {
 	padding: 0;
-	align-items: start;
 	text-align: start;
 	height: auto !important;
 }
@@ -54,3 +53,20 @@
 	color: var(--wp-block-synced-color);
 }
 
+.block-editor-block-card__hidden-indicator {
+	display: inline-flex;
+	align-items: center;
+	opacity: 0.6;
+	margin-left: $grid-unit-05;
+
+	svg {
+		width: 24px;
+		height: 24px;
+		fill: currentColor;
+	}
+}
+
+.block-editor-block-card__hidden-notice {
+	padding-top: $grid-unit-05;
+	padding-bottom: $grid-unit-05;
+}

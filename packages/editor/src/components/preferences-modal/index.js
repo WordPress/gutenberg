@@ -104,6 +104,16 @@ function PreferencesModalContents( { extraSections = {} } ) {
 								) }
 								<PreferenceToggleControl
 									scope="core"
+									featureName="showHiddenBlocksAsGhost"
+									help={ __(
+										'Show hidden blocks with a ghosted appearance (dimmed with visual indicator) instead of fully hiding them.'
+									) }
+									label={ __(
+										'Show hidden blocks as ghost'
+									) }
+								/>
+								<PreferenceToggleControl
+									scope="core"
 									featureName="allowRightClickOverrides"
 									help={ __(
 										'Allows contextual List View menus via right-click, overriding browser defaults.'

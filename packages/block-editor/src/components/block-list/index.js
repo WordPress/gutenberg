@@ -12,6 +12,7 @@ import {
 	useDispatch,
 	useRegistry,
 } from '@wordpress/data';
+import { store as preferencesStore } from '@wordpress/preferences';
 import { useMergeRefs, useDebounce } from '@wordpress/compose';
 import {
 	createContext,
@@ -77,7 +78,7 @@ function Root( { className, ...settings } ) {
 					updates[ id ] = isIntersecting;
 				} );
 			setBlockVisibility( updates );
-		}, [ registry ] ),
+		}, [ registry, setBlockVisibility ] ),
 		300,
 		delayedBlockVisibilityDebounceOptions
 	);
@@ -100,7 +101,7 @@ function Root( { className, ...settings } ) {
 			}
 			delayedBlockVisibilityUpdates();
 		} );
-	}, [] );
+	}, [ registry, delayedBlockVisibilityUpdates ] );
 	const innerBlocksProps = useInnerBlocksProps(
 		{
 			ref: useMergeRefs( [
@@ -184,6 +185,7 @@ function Items( {
 		selectedBlocks,
 		visibleBlocks,
 		shouldRenderAppender,
+		showHiddenBlocksAsGhost,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -210,6 +212,8 @@ function Items( {
 				};
 			}
 
+			const { get } = select( preferencesStore );
+
 			const selectedBlockClientIds = getSelectedBlockClientIds();
 			const selectedBlockClientId = selectedBlockClientIds[ 0 ];
 			const showRootAppender =
@@ -233,6 +237,8 @@ function Items( {
 				selectedBlocks: selectedBlockClientIds,
 				visibleBlocks: __unstableGetVisibleBlocks(),
 				isZoomOut: _isZoomOut(),
+				showHiddenBlocksAsGhost:
+					get( 'core', 'showHiddenBlocksAsGhost' ) ?? true,
 				shouldRenderAppender:
 					( ! isSectionBlock( rootClientId ) ||
 						isContainerInsertableToInContentOnlyMode(
@@ -273,6 +279,7 @@ function Items( {
 					<BlockListBlock
 						rootClientId={ rootClientId }
 						clientId={ clientId }
+						showHiddenBlocksAsGhost={ showHiddenBlocksAsGhost }
 					/>
 					{ isZoomOut && (
 						<ZoomOutSeparator

@@ -554,7 +554,7 @@ BlockListBlock = compose(
 // context to pass the rest of the information to the filtered BlockListBlock
 // component, and useBlockProps.
 function BlockListBlockProvider( props ) {
-	const { clientId, rootClientId } = props;
+	const { clientId, rootClientId, showHiddenBlocksAsGhost } = props;
 	const selectedProps = useSelect(
 		( select ) => {
 			const {
@@ -818,17 +818,9 @@ function BlockListBlockProvider( props ) {
 		themeSupportsLayout,
 		canMove,
 		isBlockHidden,
+		showHiddenBlocksAsGhost: showHiddenBlocksAsGhost ?? true,
 		bindableAttributes,
 	};
-
-	if (
-		isBlockHidden &&
-		! isSelected &&
-		! isMultiSelected &&
-		! hasChildSelected
-	) {
-		return null;
-	}
 
 	// Here we separate between the props passed to BlockListBlock and any other
 	// information we selected for internal use. BlockListBlock is a filtered
