@@ -119,6 +119,9 @@ function ParagraphBlock( {
 		style: { direction },
 	} );
 	const blockEditingMode = useBlockEditingMode();
+	const defaultAriaLabel = isSingleSelected
+		? blockProps[ 'aria-label' ]
+		: __( 'Block: Paragraph' );
 
 	return (
 		<>
@@ -156,7 +159,7 @@ function ParagraphBlock( {
 						? __(
 								'Empty block; start writing or type forward slash to choose a block'
 						  )
-						: __( 'Block: Paragraph' )
+						: defaultAriaLabel
 				}
 				data-empty={ RichText.isEmpty( content ) }
 				placeholder={ placeholder || __( 'Type / to choose a block' ) }

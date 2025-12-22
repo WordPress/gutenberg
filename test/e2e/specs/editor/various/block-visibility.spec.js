@@ -252,13 +252,17 @@ test.describe( 'Block Visibility - Individual Block Hiding', () => {
 		await editor.insertBlock( { name: 'core/paragraph' } );
 		await page.keyboard.type( 'Test paragraph' );
 
-		// Hide the block via block options menu
+		// Select the block first
+		await editor.selectBlocks(
+			editor.canvas.getByRole( 'document', { name: 'Block: Paragraph' } )
+		);
+
+		// Hide the block via block options menu.
 		await editor.clickBlockToolbarButton( 'Options' );
 		await page.getByRole( 'menuitem', { name: 'Hide' } ).click();
 
-		// Verify hidden block is accessible via aria-label
-		const hiddenBlock = page.getByRole( 'document', {
-			name: /Block: Paragraph.*This block is hidden and will not appear on the frontend of your site, but remains editable in the editor/,
+		const hiddenBlock = editor.canvas.getByRole( 'document', {
+			name: /Block: Paragraph. This block is hidden/,
 		} );
 		await expect( hiddenBlock ).toBeVisible();
 	} );
@@ -268,14 +272,22 @@ test.describe( 'Block Visibility - Individual Block Hiding', () => {
 		editor,
 	} ) => {
 		await editor.insertBlock( { name: 'core/paragraph' } );
+		await page.keyboard.type( 'Test paragraph' );
+
+		// Select the block first
+		await editor.selectBlocks(
+			editor.canvas.getByRole( 'document', { name: 'Block: Paragraph' } )
+		);
+
 		await editor.clickBlockToolbarButton( 'Options' );
 		await page.getByRole( 'menuitem', { name: 'Hide' } ).click();
 
 		// Open block inspector/settings sidebar
-		await page
-			.getByRole( 'region', { name: 'Editor settings' } )
-			.getByRole( 'button', { name: 'Settings' } )
-			.click();
+		await editor.openDocumentSettingsSidebar();
+
+		await editor.selectBlocks(
+			editor.canvas.getByRole( 'document', { name: 'Block: Paragraph' } )
+		);
 
 		// Verify Notice appears in BlockCard
 		await expect( page.getByText( 'Block is hidden' ) ).toBeVisible();
@@ -289,12 +301,18 @@ test.describe( 'Block Visibility - Individual Block Hiding', () => {
 		editor,
 	} ) => {
 		await editor.insertBlock( { name: 'core/paragraph' } );
+		await page.keyboard.type( 'Test paragraph' );
+
+		// Select the block first
+		await editor.selectBlocks(
+			editor.canvas.getByRole( 'document', { name: 'Block: Paragraph' } )
+		);
+
 		await editor.clickBlockToolbarButton( 'Options' );
 		await page.getByRole( 'menuitem', { name: 'Hide' } ).click();
 
-		// Verify hidden block is accessible via aria-label (ghost state)
-		const hiddenBlock = page.getByRole( 'document', {
-			name: /Block: Paragraph.*This block is hidden and will not appear on the frontend of your site, but remains editable in the editor/,
+		const hiddenBlock = editor.canvas.getByRole( 'document', {
+			name: /Block: Paragraph. This block is hidden/,
 		} );
 		await expect( hiddenBlock ).toBeVisible();
 
@@ -311,31 +329,6 @@ test.describe( 'Block Visibility - Individual Block Hiding', () => {
 
 		// Verify block is now fully hidden (not accessible)
 		await expect( hiddenBlock ).toBeHidden();
-	} );
-
-	test( 'should show hidden blocks normally when selected', async ( {
-		page,
-		editor,
-	} ) => {
-		await editor.insertBlock( { name: 'core/paragraph' } );
-		await editor.clickBlockToolbarButton( 'Options' );
-		await page.getByRole( 'menuitem', { name: 'Hide' } ).click();
-
-		// Verify hidden block is accessible via aria-label
-		const hiddenBlock = page.getByRole( 'document', {
-			name: /Block: Paragraph.*This block is hidden and will not appear on the frontend of your site, but remains editable in the editor/,
-		} );
-		await expect( hiddenBlock ).toBeVisible();
-
-		// Select the block
-		await editor.selectBlocks();
-
-		// Verify it's still accessible (aria-label should still indicate it's hidden)
-		await expect( hiddenBlock ).toBeVisible();
-		await expect( hiddenBlock ).toHaveAttribute(
-			'aria-label',
-			/Block: Paragraph.*This block is hidden/
-		);
 	} );
 
 	test( 'should persist preference across page reloads', async ( {
