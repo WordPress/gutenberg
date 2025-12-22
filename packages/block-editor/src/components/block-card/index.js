@@ -15,13 +15,14 @@ import {
 } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
-import { __, isRTL } from '@wordpress/i18n';
+import { __, sprintf, isRTL } from '@wordpress/i18n';
 import {
 	chevronLeft,
 	chevronRight,
 	arrowRight,
 	arrowLeft,
 } from '@wordpress/icons';
+import { getBlockType } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -29,6 +30,7 @@ import {
 import { unlock } from '../../lock-unlock';
 import { store as blockEditorStore } from '../../store';
 import BlockIcon from '../block-icon';
+import { hasListViewSupport } from '../../hooks/list-view';
 
 const { Badge } = unlock( componentsPrivateApis );
 
@@ -103,18 +105,32 @@ function BlockCard( {
 		( { title, icon, description } = blockType );
 	}
 
-	const parentNavBlockClientId = useSelect(
+	const { parentNavBlockClientId, parentBlockName } = useSelect(
 		( select ) => {
 			if ( parentClientId || isChild || ! allowParentNavigation ) {
-				return;
+				return {};
 			}
-			const { getBlockParentsByBlockName } = select( blockEditorStore );
+			const { getBlockParents, getBlockName } =
+				select( blockEditorStore );
 
-			return getBlockParentsByBlockName(
-				clientId,
-				'core/navigation',
-				true
-			)[ 0 ];
+			// Find the closest parent block that is either:
+			// 1. A navigation block (special case for ad-hoc list view support)
+			// 2. Any block with listView support
+			const parents = getBlockParents( clientId, true );
+			const foundParentId = parents.find( ( parentId ) => {
+				const parentName = getBlockName( parentId );
+				return (
+					parentName === 'core/navigation' ||
+					hasListViewSupport( parentName )
+				);
+			} );
+
+			return {
+				parentNavBlockClientId: foundParentId,
+				parentBlockName: foundParentId
+					? getBlockName( foundParentId )
+					: null,
+			};
 		},
 		[ clientId, allowParentNavigation, isChild, parentClientId ]
 	);
@@ -134,14 +150,17 @@ function BlockCard( {
 				className
 			) }
 		>
-			{ parentNavBlockClientId && ( // This is only used by the Navigation block for now. It's not ideal having Navigation block specific code here.
+			{ parentNavBlockClientId && (
 				<Button
 					onClick={ () => selectBlock( parentNavBlockClientId ) }
 					label={
-						parentNavBlockClientId
-							? __( 'Go to parent Navigation block' )
-							: // TODO - improve copy, not sure that we should use the term 'section'
-							  __( 'Go to parent section' )
+						parentBlockName
+							? sprintf(
+									/* translators: %s: The name of the parent block. */
+									__( 'Go to "%s" block' ),
+									getBlockType( parentBlockName )?.title
+							  )
+							: __( 'Go to parent block' )
 					}
 					style={
 						// TODO: This style override is also used in ToolsPanelHeader.
