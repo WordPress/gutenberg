@@ -95,7 +95,9 @@ test.describe( 'Block variations', () => {
 		await page.getByRole( 'option', { name: 'Success Message' } ).click();
 
 		await expect(
-			editor.canvas.getByRole( 'document', { name: 'Block: Paragraph' } )
+			editor.canvas.getByRole( 'document', {
+				name: 'Block: Success Message',
+			} )
 		).toHaveText( 'This is a success message!' );
 	} );
 

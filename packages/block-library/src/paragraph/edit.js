@@ -119,9 +119,10 @@ function ParagraphBlock( {
 		style: { direction },
 	} );
 	const blockEditingMode = useBlockEditingMode();
-	const defaultAriaLabel = isSingleSelected
-		? blockProps[ 'aria-label' ]
-		: __( 'Block: Paragraph' );
+	const defaultAriaLabel =
+		isSingleSelected && blockProps[ 'aria-label' ]
+			? blockProps[ 'aria-label' ]
+			: __( 'Block: Paragraph' );
 
 	return (
 		<>

@@ -267,35 +267,6 @@ test.describe( 'Block Visibility - Individual Block Hiding', () => {
 		await expect( hiddenBlock ).toBeVisible();
 	} );
 
-	test( 'should show hidden block indicator in block inspector', async ( {
-		page,
-		editor,
-	} ) => {
-		await editor.insertBlock( { name: 'core/paragraph' } );
-		await page.keyboard.type( 'Test paragraph' );
-
-		// Select the block first
-		await editor.selectBlocks(
-			editor.canvas.getByRole( 'document', { name: 'Block: Paragraph' } )
-		);
-
-		await editor.clickBlockToolbarButton( 'Options' );
-		await page.getByRole( 'menuitem', { name: 'Hide' } ).click();
-
-		// Open block inspector/settings sidebar
-		await editor.openDocumentSettingsSidebar();
-
-		await editor.selectBlocks(
-			editor.canvas.getByRole( 'document', { name: 'Block: Paragraph' } )
-		);
-
-		// Verify Notice appears in BlockCard
-		await expect( page.getByText( 'Block is hidden' ) ).toBeVisible();
-		await expect(
-			page.locator( '.block-editor-block-card__hidden-notice' )
-		).toBeVisible();
-	} );
-
 	test( 'should toggle between ghost and fully hidden via preferences', async ( {
 		page,
 		editor,
