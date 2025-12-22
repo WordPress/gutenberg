@@ -1280,7 +1280,7 @@ export const orderEventFields: Field< OrderEvent >[] = [
 		label: 'Categories',
 		id: 'categories',
 		header: (
-			<Stack direction="row" gap="2xs" justify="start">
+			<Stack direction="row" gap="2xs" justify="start" align="center">
 				<Icon icon={ category } />
 				<span>Categories</span>
 			</Stack>
@@ -1380,7 +1380,7 @@ export const fields: Field< SpaceObject >[] = [
 		id: 'image',
 		type: 'media',
 		header: (
-			<Stack direction="row" gap="2xs" justify="start">
+			<Stack direction="row" gap="2xs" justify="start" align="center">
 				<Icon icon={ image } />
 				<span>Image</span>
 			</Stack>
@@ -1488,7 +1488,7 @@ export const fields: Field< SpaceObject >[] = [
 		label: 'Categories',
 		id: 'categories',
 		header: (
-			<Stack direction="row" gap="2xs" justify="start">
+			<Stack direction="row" gap="2xs" justify="start" align="center">
 				<Icon icon={ category } />
 				<span>Categories</span>
 			</Stack>
