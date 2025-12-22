@@ -3,7 +3,6 @@
  */
 import {
 	CreateTemplatePartModal,
-	MediaEdit,
 	patternTitleField,
 	templateTitleField,
 } from '@wordpress/fields';
@@ -40,7 +39,6 @@ const { store: interfaceStore, ...remainingInterfaceApis } = interfaceApis;
 export const privateApis = {};
 lock( privateApis, {
 	CreateTemplatePartModal,
-	MediaEdit,
 	patternTitleField,
 	templateTitleField,
 	BackButton,
