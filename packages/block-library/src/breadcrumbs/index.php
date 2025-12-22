@@ -159,6 +159,22 @@ function render_block_core_breadcrumbs( $attributes, $content, $block ) {
 		array_pop( $breadcrumb_items );
 	}
 
+	/**
+	 * Filters the breadcrumb items array before rendering.
+	 *
+	 * Allows developers to modify, add, or remove breadcrumb items.
+	 *
+	 * @since 7.0.0
+	 *
+	 * @param array    $breadcrumb_items Array of breadcrumb item data. Each item is an array with:
+	 *                                   - 'label' (string) The breadcrumb text
+	 *                                   - 'url' (string, optional) The breadcrumb link URL
+	 *                                   - 'allow_html' (bool, optional) Whether to allow HTML in label
+	 * @param array    $attributes       Block attributes.
+	 * @param WP_Block $block            Block instance.
+	 */
+	$breadcrumb_items = apply_filters( 'block_core_breadcrumbs_items', $breadcrumb_items, $attributes, $block );
+
 	if ( empty( $breadcrumb_items ) ) {
 		return '';
 	}
