@@ -349,6 +349,7 @@ export function MediaUploadModal( {
 			onRequestClose={ handleModalClose }
 			isDismissible={ isDismissible }
 			className={ modalClass }
+			overlayClassName="media-upload-modal"
 			size="fill"
 			headerActions={
 				<FormFileUpload
