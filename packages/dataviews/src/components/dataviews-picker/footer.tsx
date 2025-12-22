@@ -166,12 +166,14 @@ export function DataViewsPickerFooter() {
 		<Stack
 			direction="row"
 			justify="space-between"
+			align="center"
 			className="dataviews-footer"
 		>
 			<Stack
 				direction="row"
 				className="dataviews-picker-footer__bulk-selection"
 				gap="sm"
+				align="center"
 			>
 				{ isMultiselect && (
 					<BulkSelectionCheckbox
