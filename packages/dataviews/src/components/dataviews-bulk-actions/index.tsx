@@ -264,6 +264,7 @@ function renderFooterContent< Item >(
 			direction="row"
 			className="dataviews-bulk-actions-footer__container"
 			gap="sm"
+			align="center"
 		>
 			<BulkSelectionCheckbox
 				selection={ selection }
