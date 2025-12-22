@@ -2,7 +2,7 @@
 
 export const DROPDOWN_MOTION = Object.freeze( {
 	SLIDE_DISTANCE: 4,
-	SLIDE_DURATION: 300,
+	SLIDE_DURATION: 200,
 	SLIDE_EASING: {
 		function: 'cubic-bezier',
 		args: [ 0, 0, 0, 1 ] as const,
