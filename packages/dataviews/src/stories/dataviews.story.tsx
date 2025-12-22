@@ -322,7 +322,12 @@ function PlanetOverview( { planets }: { planets: SpaceObject[] } ) {
 					<Stack direction="row" justify="start" gap="xs">
 						<DataViews.Search label={ __( 'Search content' ) } />
 						<DataViews.FiltersToggle />
-						<Stack direction="row" justify="end" gap="xs">
+						<Stack
+							direction="row"
+							justify="end"
+							gap="xs"
+							style={ { flex: 1 } }
+						>
 							<DataViews.ViewConfig />
 							<DataViews.LayoutSwitcher />
 						</Stack>
@@ -330,7 +335,7 @@ function PlanetOverview( { planets }: { planets: SpaceObject[] } ) {
 					<DataViews.FiltersToggled />
 					<Card variant="secondary">
 						<CardBody>
-							<Stack direction="column">
+							<Stack direction="column" gap="xs">
 								<Text size={ 18 } as="p">
 									{ createInterpolateElement(
 										_n(
