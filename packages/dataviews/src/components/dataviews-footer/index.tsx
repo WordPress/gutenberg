@@ -37,7 +37,12 @@ export default function DataViewsFooter() {
 	}
 	return (
 		!! totalItems && (
-			<Stack direction="row" justify="end" className="dataviews-footer">
+			<Stack
+				direction="row"
+				justify="end"
+				align="center"
+				className="dataviews-footer"
+			>
 				{ hasBulkActions && <BulkActionsFooter /> }
 				<DataViewsPagination />
 			</Stack>

@@ -50,11 +50,13 @@ export function DataViewsPagination() {
 				direction="row"
 				className="dataviews-pagination"
 				justify="end"
+				align="center"
 				gap="lg"
 			>
 				<Stack
 					direction="row"
 					justify="flex-start"
+					align="center"
 					gap="2xs"
 					className="dataviews-pagination__page-select"
 				>
@@ -88,7 +90,7 @@ export function DataViewsPagination() {
 						}
 					) }
 				</Stack>
-				<Stack direction="row" gap="2xs">
+				<Stack direction="row" gap="2xs" align="center">
 					<Button
 						onClick={ () =>
 							onChangeView( {
