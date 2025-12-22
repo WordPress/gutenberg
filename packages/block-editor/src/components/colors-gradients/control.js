@@ -47,6 +47,7 @@ function ColorGradientControlInner( {
 	showTitle = true,
 	enableAlpha,
 	headingLevel,
+	onClose,
 } ) {
 	const canChooseAColor =
 		onColorChange &&
@@ -68,8 +69,12 @@ function ColorGradientControlInner( {
 						? ( newColor ) => {
 								onColorChange( newColor );
 								onGradientChange();
+								onClose?.();
 						  }
-						: onColorChange
+						: ( newColor ) => {
+								onColorChange( newColor );
+								onClose?.();
+						  }
 				}
 				{ ...{ colors, disableCustomColors } }
 				__experimentalIsRenderedInSidebar={
@@ -88,8 +93,12 @@ function ColorGradientControlInner( {
 						? ( newGradient ) => {
 								onGradientChange( newGradient );
 								onColorChange();
+								onClose?.();
 						  }
-						: onGradientChange
+						: ( newGradient ) => {
+								onGradientChange( newGradient );
+								onClose?.();
+						  }
 				}
 				{ ...{ gradients, disableCustomGradients } }
 				__experimentalIsRenderedInSidebar={

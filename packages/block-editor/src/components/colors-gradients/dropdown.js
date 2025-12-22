@@ -209,11 +209,12 @@ export default function ColorGradientSettingsDropdown( {
 								popoverProps={ popoverProps }
 								className="block-editor-tools-panel-color-gradient-settings__dropdown"
 								renderToggle={ renderToggle( toggleSettings ) }
-								renderContent={ () => (
+								renderContent={ ( { onClose } ) => (
 									<DropdownContentWrapper paddingSize="none">
 										<div className="block-editor-panel-color-gradient-settings__dropdown-content">
 											<ColorGradientControl
 												{ ...controlProps }
+												onClose={ onClose }
 											/>
 										</div>
 									</DropdownContentWrapper>
