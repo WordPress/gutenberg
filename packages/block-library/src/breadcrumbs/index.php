@@ -171,7 +171,6 @@ function render_block_core_breadcrumbs( $attributes, $content, $block ) {
 	 *                                   - 'url' (string, optional) The breadcrumb link URL
 	 *                                   - 'allow_html' (bool, optional) Whether to allow HTML in label
 	 * @param array    $attributes       Block attributes.
-	 * @param WP_Block $block            Block instance.
 	 */
 	$breadcrumb_items = apply_filters( 'block_core_breadcrumbs_items', $breadcrumb_items, $attributes );
 
