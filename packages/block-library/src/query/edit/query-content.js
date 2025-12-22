@@ -10,7 +10,6 @@ import {
 	store as blockEditorStore,
 	useInnerBlocksProps,
 	privateApis as blockEditorPrivateApis,
-	BlockControls,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
@@ -130,13 +129,11 @@ export default function QueryContent( {
 
 	return (
 		<>
-			<BlockControls group="other">
-				<QueryToolbar
-					clientId={ clientId }
-					attributes={ attributes }
-					hasInnerBlocks
-				/>
-			</BlockControls>
+			<QueryToolbar
+				clientId={ clientId }
+				attributes={ attributes }
+				hasInnerBlocks
+			/>
 			<EnhancedPaginationModal
 				attributes={ attributes }
 				setAttributes={ setAttributes }
