@@ -8,14 +8,13 @@ import type { ComponentProps, ReactElement, HTMLAttributes } from 'react';
  * WordPress dependencies
  */
 import {
-	__experimentalHStack as HStack,
-	__experimentalVStack as VStack,
 	Flex,
 	FlexItem,
 	Tooltip,
 	Composite,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
+import { Stack } from '@wordpress/ui';
 import { __, sprintf } from '@wordpress/i18n';
 import { useInstanceId } from '@wordpress/compose';
 import { isAppleOS } from '@wordpress/keycodes';
@@ -132,10 +131,10 @@ const GridItem = forwardRef( function GridItem< Item >(
 		}
 	}
 	return (
-		<VStack
+		<Stack
+			direction="column"
 			{ ...props }
 			ref={ ref }
-			spacing={ 0 }
 			className={ clsx(
 				props.className,
 				'dataviews-view-grid__row__gridcell',
@@ -188,7 +187,8 @@ const GridItem = forwardRef( function GridItem< Item >(
 				</div>
 			) }
 			{ showTitle && (
-				<HStack
+				<Stack
+					direction="row"
 					justify="space-between"
 					className="dataviews-view-grid__title-actions"
 				>
@@ -209,9 +209,9 @@ const GridItem = forwardRef( function GridItem< Item >(
 							isCompact
 						/>
 					) }
-				</HStack>
+				</Stack>
 			) }
-			<VStack spacing={ 1 }>
+			<Stack direction="column" gap="2xs">
 				{ showDescription && descriptionField?.render && (
 					<descriptionField.render
 						item={ item }
@@ -219,11 +219,12 @@ const GridItem = forwardRef( function GridItem< Item >(
 					/>
 				) }
 				{ !! badgeFields?.length && (
-					<HStack
+					<Stack
+						direction="row"
 						className="dataviews-view-grid__badge-fields"
-						spacing={ 2 }
-						wrap
-						alignment="top"
+						gap="xs"
+						wrap="wrap"
+						align="top"
 						justify="flex-start"
 					>
 						{ badgeFields.map( ( field ) => {
@@ -239,12 +240,13 @@ const GridItem = forwardRef( function GridItem< Item >(
 								</Badge>
 							);
 						} ) }
-					</HStack>
+					</Stack>
 				) }
 				{ !! regularFields?.length && (
-					<VStack
+					<Stack
+						direction="column"
 						className="dataviews-view-grid__fields"
-						spacing={ 1 }
+						gap="2xs"
 					>
 						{ regularFields.map( ( field ) => {
 							return (
@@ -276,10 +278,10 @@ const GridItem = forwardRef( function GridItem< Item >(
 								</Flex>
 							);
 						} ) }
-					</VStack>
+					</Stack>
 				) }
-			</VStack>
-		</VStack>
+			</Stack>
+		</Stack>
 	);
 } ) as < Item >(
 	props: GridItemProps< Item > & {

@@ -6,8 +6,10 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { __experimentalVStack as VStack, Spinner } from '@wordpress/components';
+import { Spinner } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
+import { Stack } from '@wordpress/ui';
+import '@wordpress/theme/design-tokens.css';
 
 /**
  * Internal dependencies
@@ -55,10 +57,14 @@ function ViewGrid< Item >( {
 			{
 				// Render multiple groups.
 				hasData && groupField && dataByGroup && (
-					<VStack spacing={ 4 }>
+					<Stack direction="column" gap="md">
 						{ Array.from( dataByGroup.entries() ).map(
 							( [ groupName, groupItems ] ) => (
-								<VStack key={ groupName } spacing={ 2 }>
+								<Stack
+									direction="column"
+									key={ groupName }
+									gap="xs"
+								>
 									<h3 className="dataviews-view-grid__group-header">
 										{ view.groupBy?.showLabel === false
 											? groupName
@@ -74,10 +80,10 @@ function ViewGrid< Item >( {
 										data={ groupItems }
 										isInfiniteScroll={ false }
 									/>
-								</VStack>
+								</Stack>
 							)
 						) }
-					</VStack>
+					</Stack>
 				)
 			}
 			{
