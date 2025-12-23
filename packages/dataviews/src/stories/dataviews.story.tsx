@@ -441,6 +441,7 @@ export const FreeComposition = () => {
 				empty={
 					<Stack
 						direction="column"
+						gap="xs"
 						justify="space-around"
 						align="center"
 						className="free-composition-dataviews-empty"
