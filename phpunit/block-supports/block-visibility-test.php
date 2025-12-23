@@ -88,22 +88,6 @@ class WP_Block_Supports_Block_Visibility_Test extends WP_UnitTestCase {
 		);
 	}
 
-	/**
-	 * Disable the viewport visibility experiment.
-	 */
-	private function disable_viewport_visibility_experiment() {
-		add_filter(
-			'pre_option_gutenberg-experiments',
-			function ( $value ) {
-				if ( ! is_array( $value ) ) {
-					$value = array();
-				}
-				unset( $value['gutenberg-hide-blocks-based-on-screen-size'] );
-				return $value;
-			}
-		);
-	}
-
 	public function test_block_visibility_support_hides_block_when_visibility_false() {
 		$this->register_visibility_block_with_support(
 			'test/visibility-block',
