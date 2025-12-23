@@ -8,6 +8,7 @@
 - DataViews: Remove extra wrapper for GridItem. [#73665](https://github.com/WordPress/gutenberg/pull/73665)
 - Field API: move validation to the field type. [#73642](https://github.com/WordPress/gutenberg/pull/73642)
 - Field API: move format logic to the field type. [#73922](https://github.com/WordPress/gutenberg/pull/73922)
+- Reorganize internal code. [#74188](https://github.com/WordPress/gutenberg/pull/74188)
 
 ### Bug Fixes
 
