@@ -820,24 +820,17 @@ class Gutenberg_Posts_Abilities {
 					),
 				),
 				'permission_callback' => function ( $input = array() ): bool {
-					// Get requested post types, default to all public types.
-					$post_types = isset( $input['post_type'] ) && is_array( $input['post_type'] )
-						? $input['post_type']
-						: self::$available_post_types;
-
-					foreach ( $post_types as $post_type ) {
-						$post_type = sanitize_key( (string) $post_type );
-						if ( ! post_type_exists( $post_type ) ) {
-							continue;
-						}
-						$pto = get_post_type_object( $post_type );
-						if ( ! $pto ) {
-							continue;
-						}
-						$cap = $pto->cap->read ?? 'read';
-						if ( ! current_user_can( $cap ) ) {
-							return false;
-						}
+					$post_type = isset( $input['post_type'] ) ? sanitize_key( (string) $input['post_type'] ) : 'post';
+					if ( ! post_type_exists( $post_type ) ) {
+						return false;
+					}
+					$pto = get_post_type_object( $post_type );
+					if ( ! $pto ) {
+						return false;
+					}
+					$cap = $pto->cap->read ?? 'read';
+					if ( ! current_user_can( $cap ) ) {
+						return false;
 					}
 
 					// Check read_private_posts if private status is requested.
@@ -846,23 +839,19 @@ class Gutenberg_Posts_Abilities {
 						: array( 'publish' );
 
 					if ( in_array( 'private', $post_statuses, true ) ) {
-						foreach ( $post_types as $post_type ) {
-							$post_type = sanitize_key( (string) $post_type );
-							$pto       = get_post_type_object( $post_type );
-							if ( $pto && ! current_user_can( $pto->cap->read_private_posts ) ) {
-								return false;
-							}
+						if ( ! current_user_can( $pto->cap->read_private_posts ) ) {
+							return false;
 						}
 					}
 
 					return true;
 				},
 				'execute_callback'    => function ( $input = array() ) {
+					$post_type = isset( $input['post_type'] ) ? sanitize_key( (string) $input['post_type'] ) : 'post';
+
 					// Build query args.
 					$args = array(
-						'post_type'      => isset( $input['post_type'] ) && is_array( $input['post_type'] )
-							? array_map( 'sanitize_key', $input['post_type'] )
-							: self::$available_post_types,
+						'post_type'      => $post_type,
 						'post_status'    => isset( $input['post_status'] ) && is_array( $input['post_status'] )
 							? array_map( 'sanitize_key', $input['post_status'] )
 							: array( 'publish' ),
