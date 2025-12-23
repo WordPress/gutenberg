@@ -125,7 +125,7 @@ function ModalContent< Item >( {
 				className="dataforms-layouts-panel__modal-footer"
 				gap="sm"
 			>
-				<Spacer />
+				<Spacer style={ { flex: 1 } } />
 				<Button
 					variant="tertiary"
 					onClick={ onClose }
