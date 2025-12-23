@@ -320,7 +320,7 @@ function FontLibraryProvider( { children }: { children: React.ReactNode } ) {
 				}[] = [];
 				if ( fontFamilyToInstall?.fontFace?.length ?? 0 > 0 ) {
 					const response = await batchInstallFontFaces(
-						// @ts-expect-error - type definition is not correct. ID is a string.
+						// @ts-expect-error - Type mismatch: WpFontFamily.id can be number | string, but batchInstallFontFaces expects only string.
 						installedFontFamily.id,
 						makeFontFacesFormData(
 							fontFamilyToInstall as FontFamily
