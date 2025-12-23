@@ -7,7 +7,7 @@ import userEvent from '@testing-library/user-event';
 /**
  * Internal dependencies
  */
-import Dataform from '../components/dataform/index';
+import Dataform from '../dataform/index';
 
 const noop = () => {};
 

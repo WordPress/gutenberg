@@ -13,7 +13,7 @@ import { Stack } from '@wordpress/ui';
 /**
  * Internal dependencies
  */
-import DataViewsPicker from '../components/dataviews-picker/index';
+import DataViewsPicker from '../dataviews-picker/index';
 import { LAYOUT_PICKER_GRID, LAYOUT_PICKER_TABLE } from '../constants';
 import filterSortAndPaginate from '../utils/filter-sort-and-paginate';
 import type { ActionButton, View } from '../types';

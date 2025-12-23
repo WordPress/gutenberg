@@ -13,8 +13,8 @@ import { starFilled } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import DataViews from '../components/dataviews/index';
-import DataForm from '../components/dataform/index';
+import DataViews from '../dataviews/index';
+import DataForm from '../dataform/index';
 import filterSortAndPaginate from '../utils/filter-sort-and-paginate';
 import type { View, Form, Field } from '../types';
 

@@ -13,7 +13,7 @@ import { Stack } from '@wordpress/ui';
 /**
  * Internal dependencies
  */
-import DataForm from '../components/dataform';
+import DataForm from '../dataform';
 import useFormValidity from '../hooks/use-form-validity';
 
 import type {
@@ -28,7 +28,7 @@ import type {
 	RegularLayout,
 } from '../types';
 import { unlock } from '../lock-unlock';
-import DateControl from '../dataform-controls/date';
+import DateControl from '../components/dataform-controls/date';
 
 const { ValidatedTextControl, Badge } = unlock( privateApis );
 

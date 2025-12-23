@@ -27,7 +27,7 @@ import { Stack } from '@wordpress/ui';
 /**
  * Internal dependencies
  */
-import DataViews from '../components/dataviews/index';
+import DataViews from '../dataviews/index';
 import {
 	LAYOUT_GRID,
 	LAYOUT_LIST,
