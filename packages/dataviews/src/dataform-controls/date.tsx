@@ -600,6 +600,7 @@ function CalendarDateRangeControl< Item >( {
 					<Stack
 						direction="row"
 						gap="xs"
+						justify="space-between"
 						className="dataviews-controls__date-range-inputs"
 					>
 						<InputControl
