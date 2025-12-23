@@ -55,6 +55,50 @@ function _gutenberg_register_core_posts_abilities() {
 						'description'          => 'Taxonomy terms mapping (taxonomy => term IDs or slugs).',
 						'additionalProperties' => true,
 					),
+					'date'           => array(
+						'type'        => 'string',
+						'description' => 'Post date in YYYY-MM-DD HH:MM:SS format (site timezone).',
+					),
+					'date_gmt'       => array(
+						'type'        => 'string',
+						'description' => 'Post date in YYYY-MM-DD HH:MM:SS format (GMT).',
+					),
+					'comment_status' => array(
+						'type'        => 'string',
+						'description' => 'Whether comments are allowed.',
+						'enum'        => array( 'open', 'closed' ),
+					),
+					'ping_status'    => array(
+						'type'        => 'string',
+						'description' => 'Whether pingbacks/trackbacks are allowed.',
+						'enum'        => array( 'open', 'closed' ),
+					),
+					'password'       => array(
+						'type'        => 'string',
+						'description' => 'Password to protect the post.',
+					),
+					'parent'         => array(
+						'type'        => 'integer',
+						'description' => 'Parent post ID for hierarchical post types.',
+					),
+					'menu_order'     => array(
+						'type'        => 'integer',
+						'description' => 'Order value for sorting.',
+					),
+					'categories'     => array(
+						'type'        => 'array',
+						'description' => 'Category IDs or slugs to assign.',
+						'items'       => array( 'type' => array( 'integer', 'string' ) ),
+					),
+					'tags'           => array(
+						'type'        => 'array',
+						'description' => 'Tag IDs or slugs to assign.',
+						'items'       => array( 'type' => array( 'integer', 'string' ) ),
+					),
+					'template'       => array(
+						'type'        => 'string',
+						'description' => 'Page template file to use (e.g., "templates/full-width.php").',
+					),
 				),
 			),
 			'output_schema'       => array(
@@ -82,10 +126,19 @@ function _gutenberg_register_core_posts_abilities() {
 					return false;
 				}
 
-				// Check assign_terms capability for each taxonomy in tax_input.
-				if ( ! empty( $input['tax_input'] ) && is_array( $input['tax_input'] ) ) {
+				// Merge categories and tags into tax_input for unified processing.
+				$tax_input = isset( $input['tax_input'] ) && is_array( $input['tax_input'] ) ? $input['tax_input'] : array();
+				if ( ! empty( $input['categories'] ) && is_array( $input['categories'] ) ) {
+					$tax_input['category'] = $input['categories'];
+				}
+				if ( ! empty( $input['tags'] ) && is_array( $input['tags'] ) ) {
+					$tax_input['post_tag'] = $input['tags'];
+				}
+
+				// Check assign_terms capability for each taxonomy.
+				if ( ! empty( $tax_input ) ) {
 					$supported_taxonomies = get_object_taxonomies( $post_type, 'names' );
-					foreach ( $input['tax_input'] as $taxonomy => $terms ) {
+					foreach ( $tax_input as $taxonomy => $terms ) {
 						$taxonomy = sanitize_key( (string) $taxonomy );
 						if ( ! taxonomy_exists( $taxonomy ) ) {
 							continue;
@@ -135,6 +188,46 @@ function _gutenberg_register_core_posts_abilities() {
 				if ( ! empty( $input['meta'] ) && is_array( $input['meta'] ) ) {
 					$postarr['meta_input'] = $input['meta'];
 				}
+				if ( ! empty( $input['date'] ) ) {
+					$postarr['post_date'] = sanitize_text_field( (string) $input['date'] );
+				}
+				if ( ! empty( $input['date_gmt'] ) ) {
+					$postarr['post_date_gmt'] = sanitize_text_field( (string) $input['date_gmt'] );
+				}
+				if ( isset( $input['comment_status'] ) ) {
+					$postarr['comment_status'] = in_array( $input['comment_status'], array( 'open', 'closed' ), true )
+						? $input['comment_status']
+						: 'closed';
+				}
+				if ( isset( $input['ping_status'] ) ) {
+					$postarr['ping_status'] = in_array( $input['ping_status'], array( 'open', 'closed' ), true )
+						? $input['ping_status']
+						: 'closed';
+				}
+				if ( isset( $input['password'] ) ) {
+					$postarr['post_password'] = sanitize_text_field( (string) $input['password'] );
+				}
+				if ( ! empty( $input['parent'] ) ) {
+					$postarr['post_parent'] = (int) $input['parent'];
+				}
+				if ( isset( $input['menu_order'] ) ) {
+					$postarr['menu_order'] = (int) $input['menu_order'];
+				}
+				if ( ! empty( $input['template'] ) ) {
+					$postarr['page_template'] = sanitize_text_field( (string) $input['template'] );
+				}
+
+				// Merge categories and tags into tax_input for unified processing.
+				if ( ! isset( $input['tax_input'] ) ) {
+					$input['tax_input'] = array();
+				}
+				if ( ! empty( $input['categories'] ) && is_array( $input['categories'] ) ) {
+					$input['tax_input']['category'] = $input['categories'];
+				}
+				if ( ! empty( $input['tags'] ) && is_array( $input['tags'] ) ) {
+					$input['tax_input']['post_tag'] = $input['tags'];
+				}
+
 				if ( ! empty( $input['tax_input'] ) && is_array( $input['tax_input'] ) ) {
 					$supported_taxonomies = get_object_taxonomies( $post_type, 'names' );
 					$resolved_tax_input   = array();
