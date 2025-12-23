@@ -36,13 +36,17 @@ export const settings = {
 		...a,
 		text: ( a.text || '' ) + text,
 	} ),
-	__experimentalLabel( attributes ) {
-		const customName = attributes?.metadata?.name;
-		if ( customName ) {
-			return customName;
-		}
+	__experimentalLabel( attributes, { context } ) {
 		const { text } = attributes;
-		return ! text || text.length === 0 ? __( 'Button' ) : text;
+
+		const customName = attributes?.metadata?.name;
+		const hasContent = text?.trim().length > 0;
+
+		// In the list view, use the block's text as the label.
+		// If the text is empty, fall back to the default label.
+		if ( context === 'list-view' && ( customName || hasContent ) ) {
+			return customName || text;
+		}
 	},
 };
 
