@@ -62,6 +62,7 @@ function Filters( { className }: { className?: string } ) {
 		<Stack
 			direction="row"
 			justify="flex-start"
+			gap="xs"
 			style={ { width: 'fit-content' } }
 			wrap="wrap"
 			className={ className }
