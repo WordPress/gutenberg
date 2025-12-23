@@ -272,7 +272,7 @@ export function MediaUploadModal( {
 
 					// Transform the selected posts to the expected Attachment format
 					const transformedPosts = ( selectedPosts ?? [] )
-						?.map( transformAttachment )
+						.map( transformAttachment )
 						.filter( Boolean );
 
 					const selectedItems = multiple
