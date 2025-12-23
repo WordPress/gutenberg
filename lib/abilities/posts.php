@@ -7,97 +7,101 @@ function _gutenberg_register_core_posts_abilities() {
 	}
 
 	$available_post_types      = array_values( (array) get_post_types( array( 'public' => true ), 'names' ) );
-	$available_post_types_desc = empty( $available_post_types ) ? 'none' : implode( ', ', $available_post_types );
+	$available_post_types_desc = empty( $available_post_types ) ? __( 'none', 'gutenberg' ) : implode( ', ', $available_post_types );
 
 	wp_register_ability(
 		'core/create-post',
 		array(
-			'label'               => 'Create Post',
-			'description'         => 'Create a WordPress post for any post type using HTML content. Supports WordPress block comments for full editor compatibility. Use list-block-types first to get available blocks and their attributes. Available post types: ' . $available_post_types_desc . '.',
+			'label'               => __( 'Create Post', 'gutenberg' ),
+			'description'         => sprintf(
+				/* translators: %s: comma-separated list of available post types */
+				__( 'Create a WordPress post for any post type using HTML content. Supports WordPress block comments for full editor compatibility. Use list-block-types first to get available blocks and their attributes. Available post types: %s.', 'gutenberg' ),
+				$available_post_types_desc
+			),
 			'input_schema'        => array(
 				'type'       => 'object',
 				'required'   => array( 'post_type' ),
 				'properties' => array(
 					'post_type' => array(
 						'type'        => 'string',
-						'description' => 'The post type to create.',
+						'description' => __( 'The post type to create.', 'gutenberg' ),
 						'enum'        => $available_post_types,
 					),
 
 					'title'     => array(
 						'type'        => 'string',
-						'description' => 'Post title.',
+						'description' => __( 'Post title.', 'gutenberg' ),
 					),
 					'content'   => array(
 						'type'        => 'string',
-						'description' => 'Post content as HTML. Include WordPress block comments (<!-- wp:blockname {"attr":"value"} -->) for full block editor compatibility. Use wpmcp/list-block-types to get valid block names and attributes.',
+						'description' => __( 'Post content as HTML. Include WordPress block comments (<!-- wp:blockname {"attr":"value"} -->) for full block editor compatibility. Use wpmcp/list-block-types to get valid block names and attributes.', 'gutenberg' ),
 					),
 					'excerpt'   => array(
 						'type'        => 'string',
-						'description' => 'Post excerpt.',
+						'description' => __( 'Post excerpt.', 'gutenberg' ),
 					),
 					'status'    => array(
 						'type'        => 'string',
-						'description' => 'Post status (draft, publish, etc).',
+						'description' => __( 'Post status (draft, publish, etc).', 'gutenberg' ),
 						'default'     => 'draft',
 					),
 					'author'    => array(
 						'type'        => 'integer',
-						'description' => 'Author user ID.',
+						'description' => __( 'Author user ID.', 'gutenberg' ),
 					),
 					'meta'      => array(
 						'type'                 => 'object',
-						'description'          => 'Meta fields to set on the post.',
+						'description'          => __( 'Meta fields to set on the post.', 'gutenberg' ),
 						'additionalProperties' => true,
 					),
 					'tax_input' => array(
 						'type'                 => 'object',
-						'description'          => 'Taxonomy terms mapping (taxonomy => term IDs or slugs).',
+						'description'          => __( 'Taxonomy terms mapping (taxonomy => term IDs or slugs).', 'gutenberg' ),
 						'additionalProperties' => true,
 					),
 					'date'           => array(
 						'type'        => 'string',
-						'description' => 'Post date in YYYY-MM-DD HH:MM:SS format (site timezone).',
+						'description' => __( 'Post date in YYYY-MM-DD HH:MM:SS format (site timezone).', 'gutenberg' ),
 					),
 					'date_gmt'       => array(
 						'type'        => 'string',
-						'description' => 'Post date in YYYY-MM-DD HH:MM:SS format (GMT).',
+						'description' => __( 'Post date in YYYY-MM-DD HH:MM:SS format (GMT).', 'gutenberg' ),
 					),
 					'comment_status' => array(
 						'type'        => 'string',
-						'description' => 'Whether comments are allowed.',
+						'description' => __( 'Whether comments are allowed.', 'gutenberg' ),
 						'enum'        => array( 'open', 'closed' ),
 					),
 					'ping_status'    => array(
 						'type'        => 'string',
-						'description' => 'Whether pingbacks/trackbacks are allowed.',
+						'description' => __( 'Whether pingbacks/trackbacks are allowed.', 'gutenberg' ),
 						'enum'        => array( 'open', 'closed' ),
 					),
 					'password'       => array(
 						'type'        => 'string',
-						'description' => 'Password to protect the post.',
+						'description' => __( 'Password to protect the post.', 'gutenberg' ),
 					),
 					'parent'         => array(
 						'type'        => 'integer',
-						'description' => 'Parent post ID for hierarchical post types.',
+						'description' => __( 'Parent post ID for hierarchical post types.', 'gutenberg' ),
 					),
 					'menu_order'     => array(
 						'type'        => 'integer',
-						'description' => 'Order value for sorting.',
+						'description' => __( 'Order value for sorting.', 'gutenberg' ),
 					),
 					'categories'     => array(
 						'type'        => 'array',
-						'description' => 'Category IDs or slugs to assign.',
+						'description' => __( 'Category IDs or slugs to assign.', 'gutenberg' ),
 						'items'       => array( 'type' => array( 'integer', 'string' ) ),
 					),
 					'tags'           => array(
 						'type'        => 'array',
-						'description' => 'Tag IDs or slugs to assign.',
+						'description' => __( 'Tag IDs or slugs to assign.', 'gutenberg' ),
 						'items'       => array( 'type' => array( 'integer', 'string' ) ),
 					),
 					'template'       => array(
 						'type'        => 'string',
-						'description' => 'Page template file to use (e.g., "templates/full-width.php").',
+						'description' => __( 'Page template file to use (e.g., "templates/full-width.php").', 'gutenberg' ),
 					),
 				),
 			),
