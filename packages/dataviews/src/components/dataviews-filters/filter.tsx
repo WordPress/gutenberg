@@ -97,6 +97,7 @@ function OperatorSelector( {
 				gap="xs"
 				justify="flex-start"
 				className="dataviews-filters__summary-operators-container"
+				align="center"
 			>
 				<FlexItem className="dataviews-filters__summary-operators-filter-name">
 					{ filter.name }
