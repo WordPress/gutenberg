@@ -789,9 +789,9 @@ export const actions: Action< SpaceObject >[] = [
 					? `Are you sure you want to delete ${ items.length } items?`
 					: `Are you sure you want to delete "${ items[ 0 ].name.title }"?`;
 			return (
-				<Stack direction="column">
+				<Stack direction="column" gap="lg">
 					<Text>{ label }</Text>
-					<Stack direction="row" justify="right">
+					<Stack direction="row" gap="xs" justify="right">
 						<Button
 							__next40pxDefaultSize
 							variant="tertiary"
@@ -1349,9 +1349,9 @@ export const orderEventActions: Action< OrderEvent >[] = [
 				closeModal?.();
 			};
 			return (
-				<Stack direction="column">
+				<Stack direction="column" gap="lg">
 					<Text>{ label }</Text>
-					<Stack direction="row" justify="right">
+					<Stack direction="row" gap="xs" justify="right">
 						<Button
 							__next40pxDefaultSize
 							variant="tertiary"
