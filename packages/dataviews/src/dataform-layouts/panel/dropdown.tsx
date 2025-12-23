@@ -46,7 +46,7 @@ function DropdownHeader( {
 						{ title }
 					</Heading>
 				) }
-				<Spacer />
+				<Spacer style={ { flex: 1 } } />
 				{ onClose && (
 					<Button
 						label={ __( 'Close' ) }
