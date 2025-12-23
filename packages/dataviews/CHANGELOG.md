@@ -2,6 +2,23 @@
 
 ## Unreleased
 
+### Code Quality
+
+- DataViews: Remove extra wrapper for GridItem. [#73665](https://github.com/WordPress/gutenberg/pull/73665)
+
+### Bug Fixes
+
+- Fix sticky footer in DataViews grid view. [#73661](https://github.com/WordPress/gutenberg/pull/73661)
+- DataViews: Apply primary style to first column if there is no title field. [#73729](https://github.com/WordPress/gutenberg/pull/73729)
+
+### Enhancements
+
+- Better labels for operators and deprecate the `isNotAll` operator. [#73671](https://github.com/WordPress/gutenberg/pull/73671)
+- Field API: move validation to the field type. [#73642](https://github.com/WordPress/gutenberg/pull/73642)
+- DataForm: add support for `min`/`max` and `minLength`/`maxLength` validation for relevant controls. [#73465](https://github.com/WordPress/gutenberg/pull/73465)
+- Field API: display formats for `number` and `integer` types. [#73644](https://github.com/WordPress/gutenberg/pull/73644)
+- DataViews: Update padding to 24px for consistency. [#73334](https://github.com/WordPress/gutenberg/pull/73334)
+
 ## 11.0.0 (2025-11-26)
 
 ### Enhancements
@@ -20,6 +37,7 @@
 - Documentation: surface better the `type` property in the documentation. [#73349](https://github.com/WordPress/gutenberg/pull/73349)
 - Documentation: improve DataView's `layout` prop. [#73470](https://github.com/WordPress/gutenberg/pull/73470)
 - Documentation: document `readOnly`, `description`, and `placeholder` properties. [#73515](https://github.com/WordPress/gutenberg/pull/73515)
+- Documentation: add missing props in DataViews. [#73611](https://github.com/WordPress/gutenberg/pull/73611)
 - DataForm Panel Layout: Focus the first input element when the panel opens. [#72322](https://github.com/WordPress/gutenberg/pull/72322)
 - DataForm: Pattern validation is now supported on all fields that browsers support it in. [#73156](https://github.com/WordPress/gutenberg/pull/73156)
 - Documentation: improve operators docs. [#73523](https://github.com/WordPress/gutenberg/pull/73523)

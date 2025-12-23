@@ -733,14 +733,29 @@ export const IntegerComponent = ( {
 	type,
 	Edit,
 	asyncElements,
+	formatSeparatorThousand,
 }: {
 	type: PanelTypes;
 	Edit: ControlTypes;
 	asyncElements: boolean;
+	formatSeparatorThousand?: string;
 } ) => {
 	const integerFields = useMemo(
-		() => fields.filter( ( field ) => field.type === 'integer' ),
-		[]
+		() =>
+			fields
+				.filter( ( field ) => field.type === 'integer' )
+				.map( ( field ) => {
+					if ( formatSeparatorThousand !== undefined ) {
+						return {
+							...field,
+							format: {
+								separatorThousand: formatSeparatorThousand,
+							},
+						};
+					}
+					return field;
+				} ),
+		[ formatSeparatorThousand ]
 	);
 
 	return (
@@ -753,19 +768,64 @@ export const IntegerComponent = ( {
 	);
 };
 IntegerComponent.storyName = 'integer';
+IntegerComponent.args = {
+	formatSeparatorThousand: ',',
+};
+IntegerComponent.argTypes = {
+	formatSeparatorThousand: {
+		control: 'text',
+		description:
+			'Character used as thousand separator (e.g., "," for "1,234"). Default is ",".',
+	},
+};
 
 export const NumberComponent = ( {
 	type,
 	Edit,
 	asyncElements,
+	formatSeparatorThousand,
+	formatSeparatorDecimal,
+	formatDecimals,
 }: {
 	type: PanelTypes;
 	Edit: ControlTypes;
 	asyncElements: boolean;
+	formatSeparatorThousand?: string;
+	formatSeparatorDecimal?: string;
+	formatDecimals?: number;
 } ) => {
 	const numberFields = useMemo(
-		() => fields.filter( ( field ) => field.type === 'number' ),
-		[]
+		() =>
+			fields
+				.filter( ( field ) => field.type === 'number' )
+				.map( ( field ) => {
+					if (
+						formatSeparatorThousand !== undefined ||
+						formatSeparatorDecimal !== undefined ||
+						formatDecimals !== undefined
+					) {
+						const format: {
+							separatorThousand?: string;
+							separatorDecimal?: string;
+							decimals?: number;
+						} = {};
+						if ( formatSeparatorThousand !== undefined ) {
+							format.separatorThousand = formatSeparatorThousand;
+						}
+						if ( formatSeparatorDecimal !== undefined ) {
+							format.separatorDecimal = formatSeparatorDecimal;
+						}
+						if ( formatDecimals !== undefined ) {
+							format.decimals = formatDecimals;
+						}
+						return {
+							...field,
+							format,
+						};
+					}
+					return field;
+				} ),
+		[ formatSeparatorThousand, formatSeparatorDecimal, formatDecimals ]
 	);
 
 	return (
@@ -778,6 +838,28 @@ export const NumberComponent = ( {
 	);
 };
 NumberComponent.storyName = 'number';
+NumberComponent.args = {
+	formatSeparatorThousand: ',',
+	formatSeparatorDecimal: '.',
+	formatDecimals: 2,
+};
+NumberComponent.argTypes = {
+	formatSeparatorThousand: {
+		control: 'text',
+		description:
+			'Character used as thousand separator (e.g., "," for "1,234"). Default is ",".',
+	},
+	formatSeparatorDecimal: {
+		control: 'text',
+		description:
+			'Character used as decimal separator (e.g., "." for "1.23"). Default is ".".',
+	},
+	formatDecimals: {
+		control: { type: 'number', min: 0, max: 100, step: 1 },
+		description:
+			'Number of decimal places to display (0-100). Default is 2.',
+	},
+};
 
 export const BooleanComponent = ( {
 	type,

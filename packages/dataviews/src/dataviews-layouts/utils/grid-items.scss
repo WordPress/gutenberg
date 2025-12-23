@@ -6,16 +6,8 @@
 	gap: $grid-unit-40;
 	grid-template-rows: max-content;
 	grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
-	padding: 0 $grid-unit-60 $grid-unit-30;
+	padding: 0 $grid-unit-30 $grid-unit-30;
 	container-type: inline-size;
-	/**
-		* Breakpoints were adjusted from media queries breakpoints to account for
-		* the sidebar width. This was done to match the existing styles we had.
-		*/
-	@container (max-width: 430px) {
-		padding-left: $grid-unit-30;
-		padding-right: $grid-unit-30;
-	}
 
 	@media not (prefers-reduced-motion) {
 		transition: padding ease-out 0.1s;

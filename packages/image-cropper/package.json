@@ -1,0 +1,48 @@
+{
+	"name": "@wordpress/image-cropper",
+	"version": "1.0.0",
+	"description": "A basic image cropper component.",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"gutenberg",
+		"image cropper",
+		"cropper"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/image-cropper/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git",
+		"directory": "packages/image-cropper"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"engines": {
+		"node": ">=18.12.0",
+		"npm": ">=8.19.2"
+	},
+	"main": "build/index.js",
+	"module": "build-module/index.js",
+	"exports": {
+		".": {
+			"types": "./build-types/index.d.ts",
+			"import": "./build-module/index.js",
+			"require": "./build/index.js"
+		},
+		"./package.json": "./package.json"
+	},
+	"react-native": "src/index",
+	"types": "build-types",
+	"sideEffects": false,
+	"dependencies": {
+		"@wordpress/element": "file:../element",
+		"clsx": "^2.1.1",
+		"dequal": "^2.0.3",
+		"react-easy-crop": "^5.4.2"
+	},
+	"publishConfig": {
+		"access": "public"
+	}
+}

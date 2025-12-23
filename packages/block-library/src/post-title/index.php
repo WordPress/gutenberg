@@ -27,7 +27,7 @@ function render_block_core_post_title( $attributes, $content, $block ) {
 	 */
 	$title = get_the_title();
 
-	if ( ! $title ) {
+	if ( ! strip_tags( $title ) ) {
 		return '';
 	}
 

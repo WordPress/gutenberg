@@ -83,19 +83,19 @@ function MediaThumbnail( { data, field, attachment } ) {
 	return <Icon icon={ mediaIcon } size={ 24 } />;
 }
 
-export default function Media( { data, field, config = {} } ) {
+export default function Media( { data, field, onChange, config = {} } ) {
 	const { popoverProps } = useInspectorPopoverPlacement( {
 		isControl: true,
 	} );
 	const value = field.getValue( { item: data } );
 	const { allowedTypes = [], multiple = false } = field.config || {};
-	const { clientId, updateBlockAttributes, fieldDef } = config;
+	const { fieldDef } = config;
 	const updateAttributes = ( newFieldValue ) => {
 		const mappedChanges = field.setValue( {
 			item: data,
 			value: newFieldValue,
 		} );
-		updateBlockAttributes( clientId, mappedChanges );
+		onChange( mappedChanges );
 	};
 
 	// Check if featured image is supported by checking if it's in the mapping

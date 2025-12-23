@@ -36,12 +36,6 @@ export const Default: StoryObj< typeof ValidatedToggleGroupControl > = {
 					typeof ValidatedToggleGroupControl
 				>[ 'value' ]
 			>( '1' );
-		const [ customValidity, setCustomValidity ] =
-			useState<
-				React.ComponentProps<
-					typeof ValidatedToggleGroupControl
-				>[ 'customValidity' ]
-			>( undefined );
 
 		return (
 			<ValidatedToggleGroupControl
@@ -51,17 +45,14 @@ export const Default: StoryObj< typeof ValidatedToggleGroupControl > = {
 					setValue( newValue );
 					onChange?.( newValue );
 				} }
-				onValidate={ ( v ) => {
-					if ( v === '2' ) {
-						setCustomValidity( {
-							type: 'invalid',
-							message: 'Option 2 is not allowed.',
-						} );
-					} else {
-						setCustomValidity( undefined );
-					}
-				} }
-				customValidity={ customValidity }
+				customValidity={
+					value === '2'
+						? {
+								type: 'invalid',
+								message: 'Option 2 is not allowed.',
+						  }
+						: undefined
+				}
 			/>
 		);
 	},

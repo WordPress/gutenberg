@@ -583,12 +583,12 @@ function gutenberg_maybe_update_active_templates( $post_id ) {
 	update_option( 'active_templates', $active_templates );
 }
 
-add_action( 'pre_get_block_template', 'gutenberg_get_block_template', 10, 3 );
+add_action( 'pre_get_block_template', 'gutenberg_filter_pre_get_block_template', 10, 3 );
 
 ///////////////////////////////////////////////////////////////////////
 // This function is a copy of core's, except for the marked section. //
 ///////////////////////////////////////////////////////////////////////
-function gutenberg_get_block_template( $output, $id, $template_type ) {
+function gutenberg_filter_pre_get_block_template( $output, $id, $template_type ) {
 	// Check active_templates experiment status.
 	if ( ! gutenberg_is_experiment_enabled( 'active_templates' ) ) {
 		return $output;

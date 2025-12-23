@@ -3,6 +3,7 @@
  */
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, userEvent, waitFor, within } from '@storybook/test';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -32,20 +33,8 @@ type Story = StoryObj< typeof ControlWithError >;
  */
 export const WithMultipleControls: Story = {
 	render: function Template() {
-		const [ text, setText ] = useState( '' );
-		const [ text2, setText2 ] = useState( '' );
-		const [ customValidity, setCustomValidity ] =
-			useState<
-				React.ComponentProps<
-					typeof ValidatedInputControl
-				>[ 'customValidity' ]
-			>( undefined );
-		const [ customValidity2, setCustomValidity2 ] =
-			useState<
-				React.ComponentProps<
-					typeof ValidatedInputControl
-				>[ 'customValidity' ]
-			>( undefined );
+		const [ text, setText ] = useState< string | undefined >( '' );
+		const [ text2, setText2 ] = useState< string | undefined >( '' );
 
 		return (
 			<>
@@ -54,36 +43,30 @@ export const WithMultipleControls: Story = {
 					required
 					value={ text }
 					help="The word 'error' will trigger an error."
-					onValidate={ ( value ) => {
-						if ( value?.toLowerCase() === 'error' ) {
-							setCustomValidity( {
-								type: 'invalid',
-								message: 'The word "error" is not allowed.',
-							} );
-						} else {
-							setCustomValidity( undefined );
-						}
-					} }
-					customValidity={ customValidity }
-					onChange={ ( value ) => setText( value ?? '' ) }
+					onChange={ setText }
+					customValidity={
+						text?.toLowerCase() === 'error'
+							? {
+									type: 'invalid',
+									message: 'The word "error" is not allowed.',
+							  }
+							: undefined
+					}
 				/>
 				<ValidatedInputControl
 					label="Text"
 					required
 					value={ text2 }
 					help="The word 'error' will trigger an error."
-					onValidate={ ( value ) => {
-						if ( value?.toLowerCase() === 'error' ) {
-							setCustomValidity2( {
-								type: 'invalid',
-								message: 'The word "error" is not allowed.',
-							} );
-						} else {
-							setCustomValidity2( undefined );
-						}
-					} }
-					onChange={ ( value ) => setText2( value ?? '' ) }
-					customValidity={ customValidity2 }
+					onChange={ setText2 }
+					customValidity={
+						text2?.toLowerCase() === 'error'
+							? {
+									type: 'invalid',
+									message: 'The word "error" is not allowed.',
+							  }
+							: undefined
+					}
 				/>
 			</>
 		);
@@ -96,37 +79,44 @@ export const WithMultipleControls: Story = {
  */
 export const WithHelpTextReplacement: Story = {
 	render: function Template() {
-		const [ text, setText ] = useState( '' );
-		const [ customValidity, setCustomValidity ] =
-			useState<
-				React.ComponentProps<
-					typeof ValidatedInputControl
-				>[ 'customValidity' ]
-			>( undefined );
+		const [ text, setText ] = useState< string | undefined >( '' );
+		const isInvalid = text?.toLowerCase() === 'error';
 
 		return (
-			<ValidatedInputControl
-				label="Text"
-				required
-				value={ text }
-				help={
-					customValidity
-						? undefined
-						: 'The word "error" is not allowed.'
+			<>
+				<style>
+					{ `
+				.my-control:has(:invalid[data-validity-visible]) .my-control__help:not(.is-visible) {
+					display: none;
 				}
-				onValidate={ ( value ) => {
-					if ( value?.toLowerCase() === 'error' ) {
-						setCustomValidity( {
-							type: 'invalid',
-							message: 'The word "error" is not allowed.',
-						} );
-					} else {
-						setCustomValidity( undefined );
+				` }
+				</style>
+				<ValidatedInputControl
+					className="my-control"
+					label="Text"
+					required
+					value={ text }
+					help={
+						<span
+							className={ clsx(
+								'my-control__help',
+								! isInvalid && 'is-visible'
+							) }
+						>
+							The word &quot;error&quot; is not allowed.
+						</span>
 					}
-				} }
-				onChange={ ( value ) => setText( value ?? '' ) }
-				customValidity={ customValidity }
-			/>
+					onChange={ setText }
+					customValidity={
+						isInvalid
+							? {
+									type: 'invalid',
+									message: 'The word "error" is not allowed.',
+							  }
+							: undefined
+					}
+				/>
+			</>
 		);
 	},
 };
@@ -150,23 +140,19 @@ export const AsyncValidation: StoryObj< typeof ValidatedInputControl > = {
 			>( undefined );
 
 		const timeoutRef = useRef< ReturnType< typeof setTimeout > >();
-		const previousValidationValueRef = useRef< unknown >( '' );
 
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 		const debouncedValidate = useCallback(
 			debounce( ( v ) => {
-				if ( v === previousValidationValueRef.current ) {
+				if ( v === '' ) {
 					return;
 				}
-
-				previousValidationValueRef.current = v;
 
 				setCustomValidity( {
 					type: 'validating',
 					message: 'Validating...',
 				} );
 
-				clearTimeout( timeoutRef.current );
 				timeoutRef.current = setTimeout( () => {
 					if ( v?.toString().toLowerCase() === 'error' ) {
 						setCustomValidity( {
@@ -190,8 +176,10 @@ export const AsyncValidation: StoryObj< typeof ValidatedInputControl > = {
 				value={ text }
 				onChange={ ( newValue ) => {
 					setText( newValue ?? '' );
+					setCustomValidity( undefined );
+					clearTimeout( timeoutRef.current );
+					debouncedValidate( newValue );
 				} }
-				onValidate={ debouncedValidate }
 				customValidity={ customValidity }
 			/>
 		);
@@ -224,14 +212,6 @@ const AsyncValidationWithTest: StoryObj< typeof ValidatedInputControl > = {
 
 		await new Promise( ( resolve ) => setTimeout( resolve, 500 ) );
 		await userEvent.clear( canvas.getByRole( 'textbox' ) );
-
-		// Should show validating state when transitioning from valid to invalid.
-		await waitFor(
-			() => {
-				expect( canvas.getByText( 'Validating...' ) ).toBeVisible();
-			},
-			{ timeout: 2500 }
-		);
 
 		await waitFor(
 			() => {
@@ -285,6 +265,41 @@ const AsyncValidationWithTest: StoryObj< typeof ValidatedInputControl > = {
 				).toBeVisible();
 			},
 			{ timeout: 2500 }
+		);
+	},
+};
+
+/**
+ * Custom validity errors are effective immediately, even when they are not yet visible
+ * to the user. For example, in this form where the initial value is already invalid,
+ * the error message will be shown to the user once the submit button is clicked,
+ * even if the input has never been interacted with.
+ */
+export const CustomErrorsOnSubmit: StoryObj< typeof ValidatedInputControl > = {
+	args: {
+		label: 'Text',
+		required: true,
+		help: 'The word "error" will trigger an error.',
+	},
+	render: function Template( { ...args } ) {
+		const [ text, setText ] = useState< string | undefined >( 'error' );
+
+		return (
+			<>
+				<ValidatedInputControl
+					{ ...args }
+					value={ text }
+					onChange={ setText }
+					customValidity={
+						text === 'error'
+							? {
+									type: 'invalid',
+									message: 'The word "error" is not allowed.',
+							  }
+							: undefined
+					}
+				/>
+			</>
 		);
 	},
 };

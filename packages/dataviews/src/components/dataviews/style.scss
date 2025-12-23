@@ -20,7 +20,7 @@
 .dataviews__view-actions,
 .dataviews-filters__container {
 	box-sizing: border-box;
-	padding: $grid-unit-20 $grid-unit-60;
+	padding: $grid-unit-20 $grid-unit-30;
 	flex-shrink: 0;
 	position: sticky;
 	left: 0;
@@ -33,7 +33,7 @@
 
 .dataviews-no-results,
 .dataviews-loading {
-	padding: 0 $grid-unit-60;
+	padding: 0 $grid-unit-30;
 	flex-grow: 1;
 	display: flex;
 	align-items: center;
@@ -52,12 +52,6 @@
 	.dataviews__view-actions,
 	.dataviews-filters__container {
 		padding: $grid-unit-15 $grid-unit-30;
-	}
-
-	.dataviews-no-results,
-	.dataviews-loading {
-		padding-left: $grid-unit-30;
-		padding-right: $grid-unit-30;
 	}
 }
 
@@ -109,29 +103,10 @@
 }
 
 /**
- * Applying a consistent 24px padding when DataViews are placed within cards.
+ * When DataViews are placed within cards, apply a consistent top padding.
  */
 .components-card__body:has(> .dataviews-wrapper),
 .components-card__body:has(> .dataviews-picker-wrapper) {
 	padding: $grid-unit-10 0 0;
 	overflow: hidden; // Prevent cells with white backgrounds overflowing the card
-
-	.dataviews__view-actions,
-	.dataviews-filters__container,
-	.dataviews-footer,
-	.dataviews-view-grid,
-	.dataviews-loading,
-	.dataviews-no-results {
-		padding-inline: $grid-unit-30;
-	}
-
-	.dataviews-view-table tr td:first-child,
-	.dataviews-view-table tr th:first-child {
-		padding-inline-start: $grid-unit-30;
-	}
-
-	.dataviews-view-table tr td:last-child,
-	.dataviews-view-table tr th:last-child {
-		padding-inline-end: $grid-unit-30;
-	}
 }

@@ -1621,7 +1621,7 @@ describe( 'Selecting links', () => {
 					id: '1',
 					title: 'https://www.wordpress.org',
 					url: 'https://www.wordpress.org',
-					type: 'URL',
+					type: 'link',
 				},
 			], // Url.
 		] )(
@@ -1683,7 +1683,7 @@ describe( 'Selecting links', () => {
 					id: '1',
 					title: 'https://www.wordpress.org',
 					url: 'https://www.wordpress.org',
-					type: 'URL',
+					type: 'link',
 				},
 			], // Url.
 		] )(
@@ -2135,7 +2135,7 @@ describe( 'Rich link previews', () => {
 		id: '1',
 		title: 'WordPress.org', // Customize this for differentiation in assertions.
 		url: 'https://www.wordpress.org',
-		type: 'URL',
+		type: 'link',
 	};
 
 	beforeAll( () => {
@@ -2800,14 +2800,153 @@ describe( 'Entity handling', () => {
 		} );
 		await user.click( applyButton );
 
-		// Verify that onChange was called with the entity link severed
-		// id, kind, and type should be undefined to indicate it's no longer an entity
+		// Verify that onChange was called with entity metadata cleared.
+		// Kind should be undefined (no longer an entity).
+		// Note: Currently when clicking Apply (vs selecting a suggestion),
+		// type and id are also undefined - that's a separate issue with the
+		// TODO: Apply button handler not processing URLs through handleDirectEntry,
+		// so the shape of the data for a custom link can be different depending on
+		// how it was submitted.
 		expect( onChange ).toHaveBeenCalledWith(
 			expect.objectContaining( {
-				url: customUrl,
-				id: undefined,
+				url: 'www.wordpress.org',
 				kind: undefined,
+			} )
+		);
+	} );
+
+	it( 'should clear entity metadata (type/kind) when changing from page link to custom link via suggestion', async () => {
+		const user = userEvent.setup();
+
+		// Start with an entity link that has type and kind
+		const pageLink = {
+			id: 123,
+			url: 'https://example.com/page',
+			title: 'Test Page',
+			type: 'page',
+			kind: 'post-type',
+		};
+
+		const onChange = jest.fn();
+
+		// Mock search suggestions to return a custom URL
+		// URL suggestions have an id and type but no 'kind' (which indicates entity metadata)
+		mockFetchSearchSuggestions.mockImplementation( ( searchTerm ) => {
+			const suggestions = [
+				{
+					id: uniqueId(),
+					title: searchTerm,
+					url: searchTerm,
+					type: 'link', // URL suggestions have type 'link'
+					// Importantly: no 'kind' property (entities have kind)
+				},
+			];
+			return Promise.resolve( suggestions );
+		} );
+
+		render(
+			<LinkControl
+				value={ pageLink }
+				handleEntities
+				forceIsEditingLink
+				onChange={ onChange }
+			/>
+		);
+
+		const searchInput = screen.getByRole( 'combobox', {
+			name: 'Search or type URL',
+		} );
+
+		// Initially should be disabled because it's an entity
+		expect( searchInput ).toBeDisabled();
+
+		// Click the unsync button to enable editing
+		const unlinkButton = screen.getByRole( 'button', {
+			name: 'Unsync and edit',
+		} );
+		await user.click( unlinkButton );
+
+		// Input should now be enabled and value should be cleared
+		expect( searchInput ).toBeEnabled();
+		expect( searchInput ).toHaveValue( '' );
+
+		// Type a custom URL
+		await user.type( searchInput, 'https://custom-url.com' );
+
+		// Wait for suggestions to appear
+		const suggestionsList = await screen.findByRole( 'listbox' );
+		expect( suggestionsList ).toBeVisible();
+
+		// Select the custom URL suggestion (not clicking Apply button)
+		const urlSuggestion = screen.getByRole( 'option', {
+			name: /https:\/\/custom-url\.com/,
+		} );
+		await user.click( urlSuggestion );
+
+		// Verify that onChange was called with id, type and kind explicitly set to undefined
+		// This is the critical fix - when selecting a custom URL suggestion after unlinking,
+		// entity metadata (type/kind) should be cleared (not just when using the Apply button)
+		expect( onChange ).toHaveBeenCalledWith(
+			expect.objectContaining( {
+				url: 'https://custom-url.com',
+				type: 'link',
+				kind: undefined,
+			} )
+		);
+	} );
+
+	it( 'should clear entity metadata when pressing Enter for direct entry (without clicking suggestion)', async () => {
+		const user = userEvent.setup();
+		const onChange = jest.fn();
+
+		const pageLink = {
+			id: 123,
+			url: 'https://example.com/page',
+			title: 'Test Page',
+			type: 'page',
+			kind: 'post-type',
+		};
+
+		render(
+			<LinkControl
+				value={ pageLink }
+				handleEntities
+				forceIsEditingLink
+				onChange={ onChange }
+			/>
+		);
+
+		const searchInput = screen.getByRole( 'combobox', {
+			name: 'Search or type URL',
+		} );
+
+		// Initially should be disabled because it's an entity
+		expect( searchInput ).toBeDisabled();
+
+		// Click the unsync button to enable editing
+		const unlinkButton = screen.getByRole( 'button', {
+			name: 'Unsync and edit',
+		} );
+		await user.click( unlinkButton );
+
+		// Input should now be enabled and value should be cleared
+		expect( searchInput ).toBeEnabled();
+		expect( searchInput ).toHaveValue( '' );
+
+		// Type a custom URL
+		await user.type( searchInput, 'https://direct-entry.com' );
+
+		// Press Enter WITHOUT clicking the suggestion (direct entry path)
+		triggerEnter( searchInput );
+
+		// Verify that onChange was called with type and kind explicitly set to undefined
+		// This tests the direct entry path in onSubmit (lines 157-165 in search-input.js)
+		// where the user types a URL and presses Enter without selecting from suggestions
+		expect( onChange ).toHaveBeenCalledWith(
+			expect.objectContaining( {
+				url: 'https://direct-entry.com',
 				type: undefined,
+				kind: undefined,
 			} )
 		);
 	} );

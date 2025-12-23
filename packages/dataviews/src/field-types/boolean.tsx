@@ -6,10 +6,16 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import type { DataViewRenderFieldProps, Rules, SortDirection } from '../types';
+import type {
+	DataViewRenderFieldProps,
+	NormalizedField,
+	SortDirection,
+} from '../types';
 import type { FieldType } from '../types/private';
 import RenderFromElements from './utils/render-from-elements';
 import { OPERATOR_IS, OPERATOR_IS_NOT } from '../constants';
+import isValidElements from './utils/is-valid-elements';
+import isValidRequiredForBool from './utils/is-valid-required-for-bool';
 
 function render( { item, field }: DataViewRenderFieldProps< any > ) {
 	if ( field.hasElements ) {
@@ -27,21 +33,18 @@ function render( { item, field }: DataViewRenderFieldProps< any > ) {
 	return null;
 }
 
-const isValid: Rules< any > = {
-	elements: true,
-	custom: ( item: any, normalizedField ) => {
-		const value = normalizedField.getValue( { item } );
+function isValidCustom< Item >( item: Item, field: NormalizedField< Item > ) {
+	const value = field.getValue( { item } );
 
-		if (
-			! [ undefined, '', null ].includes( value ) &&
-			! [ true, false ].includes( value )
-		) {
-			return __( 'Value must be true, false, or undefined' );
-		}
+	if (
+		! [ undefined, '', null ].includes( value ) &&
+		! [ true, false ].includes( value )
+	) {
+		return __( 'Value must be true, false, or undefined' );
+	}
 
-		return null;
-	},
-};
+	return null;
+}
 
 const sort = ( a: any, b: any, direction: SortDirection ) => {
 	const boolA = Boolean( a );
@@ -65,7 +68,11 @@ export default {
 	render,
 	Edit: 'checkbox',
 	sort,
-	isValid,
+	validate: {
+		required: isValidRequiredForBool,
+		elements: isValidElements,
+		custom: isValidCustom,
+	},
 	enableSorting: true,
 	enableGlobalSearch: false,
 	defaultOperators: [ OPERATOR_IS, OPERATOR_IS_NOT ],

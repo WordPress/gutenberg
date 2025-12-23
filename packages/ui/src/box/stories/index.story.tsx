@@ -6,7 +6,7 @@ import { type Meta, type StoryObj } from '@storybook/react';
 /**
  * WordPress dependencies
  */
-import '@wordpress/theme/design-tokens.css'; // eslint-disable-line no-restricted-syntax
+import '@wordpress/theme/design-tokens.css';
 
 /**
  * Internal dependencies
@@ -28,6 +28,9 @@ export const Default: Story = {
 		backgroundColor: 'info',
 		color: 'info',
 		padding: 'sm',
+		borderColor: 'brand',
+		borderRadius: 'md',
+		borderWidth: 'sm',
 	},
 	argTypes: {
 		padding: {

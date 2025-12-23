@@ -238,6 +238,16 @@ function gutenberg_register_packages_styles( $styles ) {
 		$version
 	);
 	$styles->add_data( 'wp-block-library-theme', 'rtl', 'replace' );
+
+	gutenberg_override_style(
+		$styles,
+		'classic-theme-styles',
+		gutenberg_url( 'build/styles/block-library/classic.css' ),
+		array(),
+		$version
+	);
+	$styles->add_data( 'classic-theme-styles', 'rtl', 'replace' );
+	$styles->add_data( 'classic-theme-styles', 'path', gutenberg_dir_path() . 'build/styles/block-library/classic.css' );
 }
 add_action( 'wp_default_styles', 'gutenberg_register_packages_styles', 15 );
 
@@ -403,4 +413,9 @@ add_action( 'wp_footer', 'gutenberg_enqueue_stored_styles', 1 );
 add_action( 'enqueue_block_editor_assets', 'gutenberg_enqueue_latex_to_mathml_loader' );
 function gutenberg_enqueue_latex_to_mathml_loader() {
 	wp_enqueue_script_module( '@wordpress/latex-to-mathml/loader' );
+}
+
+add_action( 'admin_enqueue_scripts', 'gutenberg_enqueue_core_abilities' );
+function gutenberg_enqueue_core_abilities() {
+	wp_enqueue_script_module( '@wordpress/core-abilities' );
 }
