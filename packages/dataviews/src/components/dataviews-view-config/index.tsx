@@ -326,6 +326,7 @@ export function DataviewsViewConfigDropdown() {
 						<SettingsSection title={ __( 'Appearance' ) }>
 							<Stack
 								direction="row"
+								gap="xs"
 								className="is-divided-in-two"
 							>
 								<SortFieldControl />
