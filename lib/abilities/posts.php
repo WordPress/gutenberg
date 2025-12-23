@@ -69,7 +69,6 @@ function _gutenberg_register_core_posts_abilities() {
 				),
 			),
 			'permission_callback' => static function ( $input = array() ): bool {
-				// Todo: check also for current_user_can( $taxonomy_obj->cap->assign_terms ) on each tax_input.
 				$post_type = isset( $input['post_type'] ) ? \sanitize_key( (string) $input['post_type'] ) : '';
 				if ( ! $post_type || ! post_type_exists( $post_type ) ) {
 					return false;
@@ -79,7 +78,29 @@ function _gutenberg_register_core_posts_abilities() {
 					return false;
 				}
 				$cap = $pto->cap->create_posts ?? $pto->cap->edit_posts;
-				return current_user_can( $cap );
+				if ( ! current_user_can( $cap ) ) {
+					return false;
+				}
+
+				// Check assign_terms capability for each taxonomy in tax_input.
+				if ( ! empty( $input['tax_input'] ) && is_array( $input['tax_input'] ) ) {
+					$supported_taxonomies = get_object_taxonomies( $post_type, 'names' );
+					foreach ( $input['tax_input'] as $taxonomy => $terms ) {
+						$taxonomy = sanitize_key( (string) $taxonomy );
+						if ( ! taxonomy_exists( $taxonomy ) ) {
+							continue;
+						}
+						if ( ! in_array( $taxonomy, $supported_taxonomies, true ) ) {
+							continue;
+						}
+						$taxonomy_obj = get_taxonomy( $taxonomy );
+						if ( $taxonomy_obj && ! current_user_can( $taxonomy_obj->cap->assign_terms ) ) {
+							return false;
+						}
+					}
+				}
+
+				return true;
 			},
 			'execute_callback'    => static function ( $input = array() ) {
 				// wp_insert_post handles its own santization but admins can use unfiltered_html.
@@ -87,11 +108,11 @@ function _gutenberg_register_core_posts_abilities() {
 				// To try to avoid prompt injections, and other attack vectors.
 				$post_type = sanitize_key( (string) $input['post_type'] );
 				if ( ! post_type_exists( $post_type ) ) {
-								return new WP_Error(
-									'ability_core-create-post_invalid_post_type',
-									/* translators: %s ability name. */
-									sprintf( __( 'Post type "%s" does not exist.' ), esc_html( $post_type ) )
-								);
+					return new WP_Error(
+						'ability_core-create-post_invalid_post_type',
+						/* translators: %s ability name. */
+						sprintf( __( 'Post type "%s" does not exist.' ), esc_html( $post_type ) )
+					);
 				}
 
 				$status  = isset( $input['status'] ) ? sanitize_key( (string) $input['status'] ) : 'draft';
@@ -111,30 +132,25 @@ function _gutenberg_register_core_posts_abilities() {
 				if ( ! empty( $input['author'] ) ) {
 					$postarr['post_author'] = (int) $input['author'];
 				}
-				if ( ! empty( $input['meta'] ) && \is_array( $input['meta'] ) ) {
+				if ( ! empty( $input['meta'] ) && is_array( $input['meta'] ) ) {
 					$postarr['meta_input'] = $input['meta'];
 				}
+				if ( ! empty( $input['tax_input'] ) && is_array( $input['tax_input'] ) ) {
+					$supported_taxonomies = get_object_taxonomies( $post_type, 'names' );
+					$resolved_tax_input   = array();
 
-				$post_id = wp_insert_post( $postarr, true );
-				if ( is_wp_error( $post_id ) ) {
-					return $post_id;
-				}
-
-				// Handle taxonomy assignments with validation after creation.
-				if ( ! empty( $input['tax_input'] ) && \is_array( $input['tax_input'] ) ) {
-					$append               = ! empty( $input['append_terms'] );
-					$create_if_missing    = ! empty( $input['create_terms_if_missing'] );
-					$supported_taxonomies = \get_object_taxonomies( $post_type, 'names' );
 					foreach ( $input['tax_input'] as $taxonomy => $terms_in ) {
-						$taxonomy = \sanitize_key( (string) $taxonomy );
-						if ( ! \taxonomy_exists( $taxonomy ) ) {
+						$taxonomy = sanitize_key( (string) $taxonomy );
+						if ( ! taxonomy_exists( $taxonomy ) ) {
 							continue;
 						}
-						if ( ! \in_array( $taxonomy, $supported_taxonomies, true ) ) {
+						if ( ! in_array( $taxonomy, $supported_taxonomies, true ) ) {
 							continue;
 						}
+
 						$term_ids = array();
 						$terms_in = is_array( $terms_in ) ? $terms_in : array( $terms_in );
+
 						foreach ( $terms_in as $t ) {
 							if ( is_numeric( $t ) ) {
 								$term_ids[] = (int) $t;
@@ -143,26 +159,28 @@ function _gutenberg_register_core_posts_abilities() {
 							if ( ! is_string( $t ) ) {
 								continue;
 							}
-
-							$term = \get_term_by( 'slug', $t, $taxonomy );
+							$term = get_term_by( 'slug', $t, $taxonomy );
 							if ( ! $term ) {
-								$term = \get_term_by( 'name', $t, $taxonomy );
+								$term = get_term_by( 'name', $t, $taxonomy );
 							}
-							if ( $term instanceof \WP_Term ) {
+							if ( $term instanceof WP_Term ) {
 								$term_ids[] = (int) $term->term_id;
-							} elseif ( $create_if_missing && \current_user_can( 'manage_terms' ) ) {
-								$created = \wp_insert_term( $t, $taxonomy );
-								if ( ! \is_wp_error( $created ) && isset( $created['term_id'] ) ) {
-									$term_ids[] = (int) $created['term_id'];
-								}
 							}
-						}
-						if ( empty( $term_ids ) ) {
-							continue;
 						}
 
-						\wp_set_post_terms( $post_id, array_map( 'intval', $term_ids ), $taxonomy, $append );
+						if ( ! empty( $term_ids ) ) {
+							$resolved_tax_input[ $taxonomy ] = $term_ids;
+						}
 					}
+
+					if ( ! empty( $resolved_tax_input ) ) {
+						$postarr['tax_input'] = $resolved_tax_input;
+					}
+				}
+
+				$post_id = wp_insert_post( $postarr, true );
+				if ( is_wp_error( $post_id ) ) {
+					return $post_id;
 				}
 
 				$post = get_post( $post_id );
