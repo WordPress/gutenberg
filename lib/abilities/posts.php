@@ -61,6 +61,8 @@ class Gutenberg_Posts_Abilities {
 				'status'    => array( 'type' => 'string' ),
 				'link'      => array( 'type' => 'string' ),
 				'title'     => array( 'type' => 'string' ),
+				'content'   => array( 'type' => 'string' ),
+				'excerpt'   => array( 'type' => 'string' ),
 			),
 		);
 
@@ -161,19 +163,33 @@ class Gutenberg_Posts_Abilities {
 	}
 
 	/**
-	 * Formats a post for basic output.
+	 * Formats a post for output.
 	 *
-	 * @param WP_Post $post The post object.
+	 * @param WP_Post $post               The post object.
+	 * @param bool    $include_taxonomies Whether to include taxonomy terms.
+	 * @param bool    $include_meta       Whether to include meta fields.
 	 * @return array Formatted post data.
 	 */
-	private static function format_post_output( WP_Post $post ): array {
-		return array(
+	private static function format_post_output( WP_Post $post, bool $include_taxonomies = false, bool $include_meta = false ): array {
+		$result = array(
 			'id'        => $post->ID,
 			'post_type' => $post->post_type,
 			'status'    => $post->post_status,
 			'link'      => (string) get_permalink( $post->ID ),
 			'title'     => (string) $post->post_title,
+			'content'   => (string) $post->post_content,
+			'excerpt'   => (string) $post->post_excerpt,
 		);
+
+		if ( $include_taxonomies ) {
+			$result['taxonomies'] = self::build_taxonomy_output( $post->ID, $post->post_type );
+		}
+
+		if ( $include_meta ) {
+			$result['meta'] = get_post_meta( $post->ID );
+		}
+
+		return $result;
 	}
 
 	/**
@@ -279,6 +295,48 @@ class Gutenberg_Posts_Abilities {
 	}
 
 	/**
+	 * Checks status change permissions.
+	 *
+	 * @param array  $input The input data.
+	 * @param object $pto   The post type object.
+	 * @return bool True if user has permission, false otherwise.
+	 */
+	private static function check_status_permissions( array $input, object $pto ): bool {
+		if ( ! isset( $input['status'] ) ) {
+			return true;
+		}
+		$status = sanitize_key( (string) $input['status'] );
+		if ( in_array( $status, array( 'publish', 'private', 'future' ), true ) ) {
+			if ( ! current_user_can( $pto->cap->publish_posts ) ) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	/**
+	 * Checks author change permissions.
+	 *
+	 * @param array    $input          The input data.
+	 * @param object   $pto            The post type object.
+	 * @param int|null $current_author The current author ID (for updates), or null (for creates).
+	 * @return bool True if user has permission, false otherwise.
+	 */
+	private static function check_author_permissions( array $input, object $pto, ?int $current_author = null ): bool {
+		if ( empty( $input['author'] ) ) {
+			return true;
+		}
+		$new_author = (int) $input['author'];
+		$compare_to = $current_author ?? get_current_user_id();
+		if ( $new_author !== $compare_to ) {
+			if ( ! current_user_can( $pto->cap->edit_others_posts ) ) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	/**
 	 * Processes and resolves tax_input.
 	 *
 	 * @param array  $input     The input data.
@@ -321,6 +379,119 @@ class Gutenberg_Posts_Abilities {
 		}
 
 		return $resolved_tax_input;
+	}
+
+	/**
+	 * Builds post array from input with sanitization.
+	 *
+	 * @param array  $input     The input data.
+	 * @param string $post_type The post type.
+	 * @param bool   $is_update Whether this is an update (uses array_key_exists) or create (uses ! empty).
+	 * @return array|WP_Error The sanitized post array, or WP_Error on validation failure.
+	 */
+	private static function build_postarr( array $input, string $post_type, bool $is_update = false ): array|WP_Error {
+		$postarr = array();
+
+		// Helper to check if field should be processed.
+		$has_field = $is_update
+			? fn( $key ) => array_key_exists( $key, $input )
+			: fn( $key ) => ! empty( $input[ $key ] );
+
+		if ( $has_field( 'title' ) ) {
+			$postarr['post_title'] = sanitize_text_field( (string) $input['title'] );
+		}
+		if ( $has_field( 'content' ) ) {
+			$postarr['post_content'] = wp_kses_post( (string) $input['content'] );
+		}
+		if ( $has_field( 'excerpt' ) ) {
+			$postarr['post_excerpt'] = wp_kses_post( (string) $input['excerpt'] );
+		}
+		if ( $has_field( 'status' ) ) {
+			$status = sanitize_key( (string) $input['status'] );
+			if ( get_post_status_object( $status ) ) {
+				$postarr['post_status'] = $status;
+			} elseif ( ! $is_update ) {
+				$postarr['post_status'] = 'draft';
+			}
+		} elseif ( ! $is_update ) {
+			$postarr['post_status'] = 'draft';
+		}
+		if ( $has_field( 'author' ) ) {
+			$author_id = (int) $input['author'];
+			if ( $author_id && ! get_userdata( $author_id ) ) {
+				return new WP_Error(
+					'ability_invalid_author',
+					__( 'Invalid author ID.', 'gutenberg' )
+				);
+			}
+			if ( $author_id ) {
+				$postarr['post_author'] = $author_id;
+			}
+		}
+		if ( $has_field( 'meta' ) && is_array( $input['meta'] ) ) {
+			$postarr['meta_input'] = $input['meta'];
+		}
+		if ( $has_field( 'date' ) ) {
+			$postarr['post_date'] = sanitize_text_field( (string) $input['date'] );
+		}
+		if ( $has_field( 'date_gmt' ) ) {
+			$postarr['post_date_gmt'] = sanitize_text_field( (string) $input['date_gmt'] );
+		}
+		if ( $has_field( 'comment_status' ) ) {
+			$postarr['comment_status'] = in_array( $input['comment_status'], array( 'open', 'closed' ), true )
+				? $input['comment_status']
+				: 'closed';
+		}
+		if ( $has_field( 'ping_status' ) ) {
+			$postarr['ping_status'] = in_array( $input['ping_status'], array( 'open', 'closed' ), true )
+				? $input['ping_status']
+				: 'closed';
+		}
+		if ( $has_field( 'password' ) ) {
+			$postarr['post_password'] = sanitize_text_field( (string) $input['password'] );
+		}
+		if ( $has_field( 'parent' ) ) {
+			$parent_id = (int) $input['parent'];
+			if ( $parent_id && ! get_post( $parent_id ) ) {
+				return new WP_Error(
+					'ability_invalid_parent',
+					__( 'Invalid parent post ID.', 'gutenberg' )
+				);
+			}
+			$postarr['post_parent'] = $parent_id;
+		}
+		if ( $has_field( 'menu_order' ) ) {
+			$postarr['menu_order'] = (int) $input['menu_order'];
+		}
+		if ( $has_field( 'template' ) ) {
+			$template        = sanitize_text_field( (string) $input['template'] );
+			$valid_templates = array_keys( wp_get_theme()->get_page_templates( null, $post_type ) );
+			$valid_templates[] = ''; // Allow empty template.
+			if ( ! in_array( $template, $valid_templates, true ) ) {
+				return new WP_Error(
+					'ability_invalid_template',
+					__( 'Invalid template.', 'gutenberg' )
+				);
+			}
+			$postarr['page_template'] = $template;
+		}
+		if ( $has_field( 'slug' ) ) {
+			$postarr['post_name'] = sanitize_title( (string) $input['slug'] );
+		}
+
+		// Process taxonomy terms.
+		$has_taxonomy_input = array_key_exists( 'tax_input', $input )
+			|| array_key_exists( 'categories', $input )
+			|| array_key_exists( 'tags', $input );
+
+		if ( $has_taxonomy_input || ! $is_update ) {
+			$resolved_tax_input = self::process_tax_input( $input, $post_type );
+			if ( ! empty( $resolved_tax_input ) ) {
+				$postarr['tax_input'] = $resolved_tax_input;
+			}
+		}
+
+		return $postarr;
 	}
 
 	/**
@@ -370,35 +541,18 @@ class Gutenberg_Posts_Abilities {
 					if ( ! current_user_can( $cap ) ) {
 						return false;
 					}
-
-					// Check publish_posts capability for publish/private/future statuses.
-					if ( isset( $input['status'] ) ) {
-						$status = sanitize_key( (string) $input['status'] );
-						if ( in_array( $status, array( 'publish', 'private', 'future' ), true ) ) {
-							if ( ! current_user_can( $pto->cap->publish_posts ) ) {
-								return false;
-							}
-						}
+					if ( ! self::check_status_permissions( $input, $pto ) ) {
+						return false;
 					}
-
-					// Check edit_others_posts capability when setting different author.
-					if ( ! empty( $input['author'] ) && (int) $input['author'] !== get_current_user_id() ) {
-						if ( ! current_user_can( $pto->cap->edit_others_posts ) ) {
-							return false;
-						}
+					if ( ! self::check_author_permissions( $input, $pto ) ) {
+						return false;
 					}
-
-					// Check assign_terms capability for each taxonomy.
 					if ( ! self::check_taxonomy_permissions( $input, $post_type ) ) {
 						return false;
 					}
-
 					return true;
 				},
 				'execute_callback'    => function ( $input = array() ) {
-					// wp_insert_post handles its own santization but admins can use unfiltered_html.
-					// Given that abilities will be consumed by external agents, we need to sanitize input here.
-					// To try to avoid prompt injections, and other attack vectors.
 					$post_type = sanitize_key( (string) $input['post_type'] );
 					if ( ! post_type_exists( $post_type ) ) {
 						return new WP_Error(
@@ -408,89 +562,11 @@ class Gutenberg_Posts_Abilities {
 						);
 					}
 
-					$status = isset( $input['status'] ) ? sanitize_key( (string) $input['status'] ) : 'draft';
-					if ( ! get_post_status_object( $status ) ) {
-						$status = 'draft';
+					$postarr = self::build_postarr( $input, $post_type, false );
+					if ( is_wp_error( $postarr ) ) {
+						return $postarr;
 					}
-					$postarr = array(
-						'post_type'   => $post_type,
-						'post_status' => $status,
-					);
-					if ( ! empty( $input['content'] ) ) {
-						$postarr['post_content'] = wp_kses_post( (string) $input['content'] );
-					}
-					if ( ! empty( $input['title'] ) ) {
-						$postarr['post_title'] = sanitize_text_field( (string) $input['title'] );
-					}
-					if ( ! empty( $input['excerpt'] ) ) {
-						$postarr['post_excerpt'] = wp_kses_post( (string) $input['excerpt'] );
-					}
-					if ( ! empty( $input['author'] ) ) {
-						$author_id = (int) $input['author'];
-						if ( $author_id !== get_current_user_id() && ! get_userdata( $author_id ) ) {
-							return new WP_Error(
-								'ability_core-create-post_invalid_author',
-								__( 'Invalid author ID.', 'gutenberg' )
-							);
-						}
-						$postarr['post_author'] = $author_id;
-					}
-					if ( ! empty( $input['meta'] ) && is_array( $input['meta'] ) ) {
-						$postarr['meta_input'] = $input['meta'];
-					}
-					if ( ! empty( $input['date'] ) ) {
-						$postarr['post_date'] = sanitize_text_field( (string) $input['date'] );
-					}
-					if ( ! empty( $input['date_gmt'] ) ) {
-						$postarr['post_date_gmt'] = sanitize_text_field( (string) $input['date_gmt'] );
-					}
-					if ( isset( $input['comment_status'] ) ) {
-						$postarr['comment_status'] = in_array( $input['comment_status'], array( 'open', 'closed' ), true )
-							? $input['comment_status']
-							: 'closed';
-					}
-					if ( isset( $input['ping_status'] ) ) {
-						$postarr['ping_status'] = in_array( $input['ping_status'], array( 'open', 'closed' ), true )
-							? $input['ping_status']
-							: 'closed';
-					}
-					if ( isset( $input['password'] ) ) {
-						$postarr['post_password'] = sanitize_text_field( (string) $input['password'] );
-					}
-					if ( ! empty( $input['parent'] ) ) {
-						$parent_id = (int) $input['parent'];
-						if ( $parent_id && ! get_post( $parent_id ) ) {
-							return new WP_Error(
-								'ability_core-create-post_invalid_parent',
-								__( 'Invalid parent post ID.', 'gutenberg' )
-							);
-						}
-						$postarr['post_parent'] = $parent_id;
-					}
-					if ( isset( $input['menu_order'] ) ) {
-						$postarr['menu_order'] = (int) $input['menu_order'];
-					}
-					if ( ! empty( $input['template'] ) ) {
-						$template        = sanitize_text_field( (string) $input['template'] );
-						$valid_templates = array_keys( wp_get_theme()->get_page_templates( null, $post_type ) );
-						$valid_templates[] = ''; // Allow empty template.
-						if ( ! in_array( $template, $valid_templates, true ) ) {
-							return new WP_Error(
-								'ability_core-create-post_invalid_template',
-								__( 'Invalid template.', 'gutenberg' )
-							);
-						}
-						$postarr['page_template'] = $template;
-					}
-					if ( ! empty( $input['slug'] ) ) {
-						$postarr['post_name'] = sanitize_title( (string) $input['slug'] );
-					}
-
-					// Process taxonomy terms.
-					$resolved_tax_input = self::process_tax_input( $input, $post_type );
-					if ( ! empty( $resolved_tax_input ) ) {
-						$postarr['tax_input'] = $resolved_tax_input;
-					}
+					$postarr['post_type'] = $post_type;
 
 					$post_id = wp_insert_post( $postarr, true );
 					if ( is_wp_error( $post_id ) ) {
@@ -555,20 +631,17 @@ class Gutenberg_Posts_Abilities {
 						),
 					),
 				),
-				'output_schema'       => array(
-					'type'       => 'object',
-					'required'   => array( 'id' ),
-					'properties' => array(
-						'id'         => array( 'type' => 'integer' ),
-						'post_type'  => array( 'type' => 'string' ),
-						'status'     => array( 'type' => 'string' ),
-						'link'       => array( 'type' => 'string' ),
-						'title'      => array( 'type' => 'string' ),
-						'content'    => array( 'type' => 'string' ),
-						'excerpt'    => array( 'type' => 'string' ),
-						'taxonomies' => array( 'type' => 'object' ),
-						'meta'       => array( 'type' => 'object' ),
-					),
+				'output_schema'       => array_merge(
+					self::$post_output_schema,
+					array(
+						'properties' => array_merge(
+							self::$post_output_schema['properties'],
+							array(
+								'taxonomies' => array( 'type' => 'object' ),
+								'meta'       => array( 'type' => 'object' ),
+							)
+						),
+					)
 				),
 				'permission_callback' => function ( $input = array() ): bool {
 					$post_id = isset( $input['id'] ) ? (int) $input['id'] : 0;
@@ -588,27 +661,11 @@ class Gutenberg_Posts_Abilities {
 						);
 					}
 
-					$result = array(
-						'id'        => $post->ID,
-						'post_type' => $post->post_type,
-						'status'    => $post->post_status,
-						'link'      => (string) get_permalink( $post->ID ),
-						'title'     => (string) $post->post_title,
-						'content'   => (string) $post->post_content,
-						'excerpt'   => (string) $post->post_excerpt,
+					return self::format_post_output(
+						$post,
+						! empty( $input['include_taxonomies'] ),
+						! empty( $input['include_meta'] )
 					);
-
-					// Include taxonomies if requested.
-					if ( ! empty( $input['include_taxonomies'] ) ) {
-						$result['taxonomies'] = self::build_taxonomy_output( $post->ID, $post->post_type );
-					}
-
-					// Include meta if requested.
-					if ( ! empty( $input['include_meta'] ) ) {
-						$result['meta'] = get_post_meta( $post->ID );
-					}
-
-					return $result;
 				},
 				'category'            => 'post',
 				'meta'                => array(
@@ -646,10 +703,9 @@ class Gutenberg_Posts_Abilities {
 					'type'       => 'object',
 					'properties' => array(
 						'post_type'           => array(
-							'type'        => 'array',
-							'description' => __( 'Post types to search. Defaults to all public post types.', 'gutenberg' ),
-							'items'       => array( 'type' => 'string' ),
-							'default'     => self::$available_post_types,
+							'type'        => 'string',
+							'description' => __( 'Post type to search. Defaults to "post".', 'gutenberg' ),
+							'default'     => 'post',
 						),
 						'post_status'         => array(
 							'type'        => 'array',
@@ -746,18 +802,17 @@ class Gutenberg_Posts_Abilities {
 					'properties' => array(
 						'posts'       => array(
 							'type'  => 'array',
-							'items' => array(
-								'type'       => 'object',
-								'properties' => array(
-									'id'         => array( 'type' => 'integer' ),
-									'post_type'  => array( 'type' => 'string' ),
-									'status'     => array( 'type' => 'string' ),
-									'link'       => array( 'type' => 'string' ),
-									'title'      => array( 'type' => 'string' ),
-									'excerpt'    => array( 'type' => 'string' ),
-									'taxonomies' => array( 'type' => 'object' ),
-									'meta'       => array( 'type' => 'object' ),
-								),
+							'items' => array_merge(
+								self::$post_output_schema,
+								array(
+									'properties' => array_merge(
+										self::$post_output_schema['properties'],
+										array(
+											'taxonomies' => array( 'type' => 'object' ),
+											'meta'       => array( 'type' => 'object' ),
+										)
+									),
+								)
 							),
 						),
 						'total'       => array( 'type' => 'integer' ),
@@ -768,7 +823,7 @@ class Gutenberg_Posts_Abilities {
 					// Get requested post types, default to all public types.
 					$post_types = isset( $input['post_type'] ) && is_array( $input['post_type'] )
 						? $input['post_type']
-						: array_values( (array) get_post_types( array( 'public' => true ), 'names' ) );
+						: self::$available_post_types;
 
 					foreach ( $post_types as $post_type ) {
 						$post_type = sanitize_key( (string) $post_type );
@@ -803,13 +858,11 @@ class Gutenberg_Posts_Abilities {
 					return true;
 				},
 				'execute_callback'    => function ( $input = array() ) {
-					$available_post_types = array_values( (array) get_post_types( array( 'public' => true ), 'names' ) );
-
 					// Build query args.
 					$args = array(
 						'post_type'      => isset( $input['post_type'] ) && is_array( $input['post_type'] )
 							? array_map( 'sanitize_key', $input['post_type'] )
-							: $available_post_types,
+							: self::$available_post_types,
 						'post_status'    => isset( $input['post_status'] ) && is_array( $input['post_status'] )
 							? array_map( 'sanitize_key', $input['post_status'] )
 							: array( 'publish' ),
@@ -904,25 +957,7 @@ class Gutenberg_Posts_Abilities {
 						if ( ! current_user_can( 'read_post', $post->ID ) ) {
 							continue;
 						}
-
-						$post_data = array(
-							'id'        => $post->ID,
-							'post_type' => $post->post_type,
-							'status'    => $post->post_status,
-							'link'      => (string) get_permalink( $post->ID ),
-							'title'     => (string) $post->post_title,
-							'excerpt'   => (string) $post->post_excerpt,
-						);
-
-						if ( $include_taxonomies ) {
-							$post_data['taxonomies'] = self::build_taxonomy_output( $post->ID, $post->post_type );
-						}
-
-						if ( $include_meta ) {
-							$post_data['meta'] = get_post_meta( $post->ID );
-						}
-
-						$posts[] = $post_data;
+						$posts[] = self::format_post_output( $post, $include_taxonomies, $include_meta );
 					}
 
 					return array(
@@ -982,44 +1017,26 @@ class Gutenberg_Posts_Abilities {
 					if ( $post_id <= 0 ) {
 						return false;
 					}
-
 					$post = get_post( $post_id );
 					if ( ! $post ) {
 						return false;
 					}
-
-					// Check edit_post capability.
 					if ( ! current_user_can( 'edit_post', $post_id ) ) {
 						return false;
 					}
-
 					$pto = get_post_type_object( $post->post_type );
 					if ( ! $pto ) {
 						return false;
 					}
-
-					// Check publish_posts capability for publish/private/future statuses.
-					if ( isset( $input['status'] ) ) {
-						$status = sanitize_key( (string) $input['status'] );
-						if ( in_array( $status, array( 'publish', 'private', 'future' ), true ) ) {
-							if ( ! current_user_can( $pto->cap->publish_posts ) ) {
-								return false;
-							}
-						}
+					if ( ! self::check_status_permissions( $input, $pto ) ) {
+						return false;
 					}
-
-					// Check edit_others_posts capability when changing author.
-					if ( ! empty( $input['author'] ) && (int) $input['author'] !== (int) $post->post_author ) {
-						if ( ! current_user_can( $pto->cap->edit_others_posts ) ) {
-							return false;
-						}
+					if ( ! self::check_author_permissions( $input, $pto, (int) $post->post_author ) ) {
+						return false;
 					}
-
-					// Check assign_terms capability for each taxonomy.
 					if ( ! self::check_taxonomy_permissions( $input, $post->post_type ) ) {
 						return false;
 					}
-
 					return true;
 				},
 				'execute_callback'    => function ( $input = array() ) {
@@ -1033,100 +1050,11 @@ class Gutenberg_Posts_Abilities {
 						);
 					}
 
-					$post_type = $post->post_type;
-					$postarr   = array( 'ID' => $post_id );
-
-					// Only update fields that are explicitly provided (use array_key_exists for partial updates).
-					if ( array_key_exists( 'title', $input ) ) {
-						$postarr['post_title'] = sanitize_text_field( (string) $input['title'] );
+					$postarr = self::build_postarr( $input, $post->post_type, true );
+					if ( is_wp_error( $postarr ) ) {
+						return $postarr;
 					}
-					if ( array_key_exists( 'content', $input ) ) {
-						$postarr['post_content'] = wp_kses_post( (string) $input['content'] );
-					}
-					if ( array_key_exists( 'excerpt', $input ) ) {
-						$postarr['post_excerpt'] = wp_kses_post( (string) $input['excerpt'] );
-					}
-					if ( array_key_exists( 'status', $input ) ) {
-						$status = sanitize_key( (string) $input['status'] );
-						if ( get_post_status_object( $status ) ) {
-							$postarr['post_status'] = $status;
-						}
-					}
-					if ( array_key_exists( 'author', $input ) ) {
-						$author_id = (int) $input['author'];
-						if ( $author_id && get_userdata( $author_id ) ) {
-							$postarr['post_author'] = $author_id;
-						} elseif ( $author_id && ! get_userdata( $author_id ) ) {
-							return new WP_Error(
-								'ability_core-update-post_invalid_author',
-								__( 'Invalid author ID.', 'gutenberg' )
-							);
-						}
-					}
-					if ( array_key_exists( 'date', $input ) ) {
-						$postarr['post_date'] = sanitize_text_field( (string) $input['date'] );
-					}
-					if ( array_key_exists( 'date_gmt', $input ) ) {
-						$postarr['post_date_gmt'] = sanitize_text_field( (string) $input['date_gmt'] );
-					}
-					if ( array_key_exists( 'comment_status', $input ) ) {
-						$postarr['comment_status'] = in_array( $input['comment_status'], array( 'open', 'closed' ), true )
-							? $input['comment_status']
-							: 'closed';
-					}
-					if ( array_key_exists( 'ping_status', $input ) ) {
-						$postarr['ping_status'] = in_array( $input['ping_status'], array( 'open', 'closed' ), true )
-							? $input['ping_status']
-							: 'closed';
-					}
-					if ( array_key_exists( 'password', $input ) ) {
-						$postarr['post_password'] = sanitize_text_field( (string) $input['password'] );
-					}
-					if ( array_key_exists( 'parent', $input ) ) {
-						$parent_id = (int) $input['parent'];
-						if ( $parent_id && ! get_post( $parent_id ) ) {
-							return new WP_Error(
-								'ability_core-update-post_invalid_parent',
-								__( 'Invalid parent post ID.', 'gutenberg' )
-							);
-						}
-						$postarr['post_parent'] = $parent_id;
-					}
-					if ( array_key_exists( 'menu_order', $input ) ) {
-						$postarr['menu_order'] = (int) $input['menu_order'];
-					}
-					if ( array_key_exists( 'template', $input ) ) {
-						$template        = sanitize_text_field( (string) $input['template'] );
-						$valid_templates = array_keys( wp_get_theme()->get_page_templates( null, $post_type ) );
-						$valid_templates[] = ''; // Allow empty template.
-						if ( ! in_array( $template, $valid_templates, true ) ) {
-							return new WP_Error(
-								'ability_core-update-post_invalid_template',
-								__( 'Invalid template.', 'gutenberg' )
-							);
-						}
-						$postarr['page_template'] = $template;
-					}
-					if ( array_key_exists( 'slug', $input ) ) {
-						$postarr['post_name'] = sanitize_title( (string) $input['slug'] );
-					}
-
-					// Process taxonomy terms if any taxonomy fields are provided.
-					$has_taxonomy_input = array_key_exists( 'tax_input', $input )
-						|| array_key_exists( 'categories', $input )
-						|| array_key_exists( 'tags', $input );
-
-					if ( $has_taxonomy_input ) {
-						$resolved_tax_input = self::process_tax_input( $input, $post_type );
-						if ( ! empty( $resolved_tax_input ) ) {
-							$postarr['tax_input'] = $resolved_tax_input;
-						}
-					}
-
-					// Update meta if provided.
-					if ( array_key_exists( 'meta', $input ) && is_array( $input['meta'] ) ) {
-						$postarr['meta_input'] = $input['meta'];
-					}
+					$postarr['ID'] = $post_id;
 
 					$result = wp_update_post( $postarr, true );
 					if ( is_wp_error( $result ) ) {
