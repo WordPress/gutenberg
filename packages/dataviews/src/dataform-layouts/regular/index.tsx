@@ -86,7 +86,11 @@ export default function FormRegularField< Item >( {
 
 	if ( labelPosition === 'side' ) {
 		return (
-			<Stack direction="row" className="dataforms-layouts-regular__field">
+			<Stack
+				direction="row"
+				className="dataforms-layouts-regular__field"
+				gap="xs"
+			>
 				<div
 					className={ clsx(
 						'dataforms-layouts-regular__field-label',
