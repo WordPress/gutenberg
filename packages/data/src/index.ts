@@ -110,7 +110,7 @@ export const combineReducers =
  * resolveSelect( myCustomStore ).getPrice( 'hammer' ).then(console.log)
  * ```
  *
- * @return {Object} Object containing the store's promise-wrapped selectors.
+ * @return Object containing the store's promise-wrapped selectors.
  */
 export function resolveSelect< T extends StoreDescriptor< AnyConfig > >(
 	storeNameOrDescriptor: T | string
