@@ -3,6 +3,7 @@
  */
 import {
 	useBlockProps,
+	getTypographyClassesAndStyles,
 	__experimentalGetSpacingClassesAndStyles as getSpacingClassesAndStyles,
 	RichText,
 } from '@wordpress/block-editor';
@@ -170,7 +171,10 @@ const v2 = {
 			},
 		},
 		typography: {
-			__experimentalSkipSerialization: [ 'textDecoration', 'letterSpacing' ],
+			__experimentalSkipSerialization: [
+				'textDecoration',
+				'letterSpacing',
+			],
 			fontSize: true,
 			__experimentalFontFamily: true,
 			__experimentalFontWeight: true,
@@ -206,8 +210,8 @@ const v2 = {
 							className="wp-block-accordion-heading__toggle-icon"
 							aria-hidden="true"
 						>
-						+
-					</span>
+							+
+						</span>
 					) }
 					<RichText.Content
 						className="wp-block-accordion-heading__toggle-title"
@@ -215,7 +219,8 @@ const v2 = {
 						value={ title }
 						style={ {
 							letterSpacing: typographyProps.style.letterSpacing,
-							textDecoration: typographyProps.style.textDecoration,
+							textDecoration:
+								typographyProps.style.textDecoration,
 						} }
 					/>
 					{ showIcon && iconPosition === 'right' && (
@@ -223,8 +228,8 @@ const v2 = {
 							className="wp-block-accordion-heading__toggle-icon"
 							aria-hidden="true"
 						>
-						+
-					</span>
+							+
+						</span>
 					) }
 				</button>
 			</TagName>
