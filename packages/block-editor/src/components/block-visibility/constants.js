@@ -14,16 +14,20 @@ export const BLOCK_VISIBILITY_VIEWPORTS = {
 	desktop: {
 		label: __( 'Desktop' ),
 		icon: desktop,
-		value: 'desktop',
+		key: 'desktop',
 	},
 	tablet: {
 		label: __( 'Tablet' ),
 		icon: tablet,
-		value: 'tablet',
+		key: 'tablet',
 	},
 	mobile: {
 		label: __( 'Mobile' ),
 		icon: mobile,
-		value: 'mobile',
+		key: 'mobile',
 	},
 };
+
+export const BLOCK_VISIBILITY_VIEWPORT_ENTRIES = Object.entries(
+	BLOCK_VISIBILITY_VIEWPORTS
+);
