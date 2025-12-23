@@ -189,7 +189,7 @@ const GridItem = forwardRef( function GridItem< Item >(
 			{ showTitle && (
 				<Stack
 					direction="row"
-					justify="space-between"
+					gap="xs"
 					className="dataviews-view-grid__title-actions"
 				>
 					<ItemClickWrapper
