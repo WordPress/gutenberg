@@ -31,6 +31,15 @@ function render_block_core_loginout( $attributes ) {
 		false
 	);
 
+	// If display as button is enabled, wrap the link in button classes
+	if ( ! empty( $attributes['displayAsButton'] ) ) {
+		$classes .= ' wp-block-button';
+		$contents = sprintf(
+			'<div class="wp-block-button__link wp-element-button">%s</div>',
+			$contents
+		);
+	}
+
 	// If logged-out and displayLoginAsForm is true, show the login form.
 	if ( ! $user_logged_in && ! empty( $attributes['displayLoginAsForm'] ) ) {
 		// Add a class.

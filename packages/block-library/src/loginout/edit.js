@@ -14,7 +14,8 @@ import { __ } from '@wordpress/i18n';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
 export default function LoginOutEdit( { attributes, setAttributes } ) {
-	const { displayLoginAsForm, redirectToCurrent } = attributes;
+	const { displayLoginAsForm, displayAsButton, redirectToCurrent } =
+		attributes;
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
 	return (
@@ -49,6 +50,25 @@ export default function LoginOutEdit( { attributes, setAttributes } ) {
 						/>
 					</ToolsPanelItem>
 					<ToolsPanelItem
+						label={ __( 'Display as button' ) }
+						isShownByDefault
+						hasValue={ () => displayAsButton }
+						onDeselect={ () =>
+							setAttributes( { displayAsButton: false } )
+						}
+					>
+						<ToggleControl
+							__nextHasNoMarginBottom
+							label={ __( 'Display as button' ) }
+							checked={ displayAsButton }
+							onChange={ () =>
+								setAttributes( {
+									displayAsButton: ! displayAsButton,
+								} )
+							}
+						/>
+					</ToolsPanelItem>
+					<ToolsPanelItem
 						label={ __( 'Redirect to current URL' ) }
 						isShownByDefault
 						hasValue={ () => ! redirectToCurrent }
@@ -70,10 +90,18 @@ export default function LoginOutEdit( { attributes, setAttributes } ) {
 			</InspectorControls>
 			<div
 				{ ...useBlockProps( {
-					className: 'logged-in',
+					className: `logged-in${
+						displayAsButton ? ' wp-block-button' : ''
+					}`,
 				} ) }
 			>
-				<a href="#login-pseudo-link">{ __( 'Log out' ) }</a>
+				{ displayAsButton ? (
+					<div className="wp-block-button__link wp-element-button">
+						<a href="#login-pseudo-link">{ __( 'Log out' ) }</a>
+					</div>
+				) : (
+					<a href="#login-pseudo-link">{ __( 'Log out' ) }</a>
+				) }
 			</div>
 		</>
 	);

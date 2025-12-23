@@ -12,6 +12,10 @@
 			"type": "boolean",
 			"default": false
 		},
+		"displayAsButton": {
+			"type": "boolean",
+			"default": false
+		},
 		"redirectToCurrent": {
 			"type": "boolean",
 			"default": true
