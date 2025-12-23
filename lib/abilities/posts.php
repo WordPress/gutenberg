@@ -155,6 +155,18 @@ class Gutenberg_Posts_Abilities {
 	 * @return void
 	 */
 	public static function register(): void {
+		$post_abilities = array(
+			'core/create-post',
+			'core/get-post',
+			'core/find-posts',
+			'core/update-post',
+		);
+		foreach ( $post_abilities as $ability ) {
+			if ( wp_has_ability( $ability ) ) {
+				wp_unregister_ability( $ability );
+			}
+		}
+
 		self::init();
 		self::register_create_post();
 		self::register_get_post();
@@ -500,10 +512,6 @@ class Gutenberg_Posts_Abilities {
 	 * @return void
 	 */
 	private static function register_create_post(): void {
-		if ( wp_has_ability( 'core/create-post' ) ) {
-			wp_unregister_ability( 'core/create-post' );
-		}
-
 		wp_register_ability(
 			'core/create-post',
 			array(
@@ -602,10 +610,6 @@ class Gutenberg_Posts_Abilities {
 	 * @return void
 	 */
 	private static function register_get_post(): void {
-		if ( wp_has_ability( 'core/get-post' ) ) {
-			wp_unregister_ability( 'core/get-post' );
-		}
-
 		wp_register_ability(
 			'core/get-post',
 			array(
@@ -686,10 +690,6 @@ class Gutenberg_Posts_Abilities {
 	 * @return void
 	 */
 	private static function register_find_posts(): void {
-		if ( wp_has_ability( 'core/find-posts' ) ) {
-			wp_unregister_ability( 'core/find-posts' );
-		}
-
 		wp_register_ability(
 			'core/find-posts',
 			array(
@@ -974,10 +974,6 @@ class Gutenberg_Posts_Abilities {
 	 * @return void
 	 */
 	private static function register_update_post(): void {
-		if ( wp_has_ability( 'core/update-post' ) ) {
-			wp_unregister_ability( 'core/update-post' );
-		}
-
 		wp_register_ability(
 			'core/update-post',
 			array(
