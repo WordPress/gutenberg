@@ -172,6 +172,7 @@ export default function FormPanelField< Item >( {
 		<Tooltip text={ errorMessage } placement="top">
 			<Stack
 				direction="row"
+				gap="xs"
 				className="dataforms-layouts-panel__field-label-error-content"
 				justify="flex-start"
 			>
@@ -231,6 +232,7 @@ export default function FormPanelField< Item >( {
 		return (
 			<Stack
 				direction="row"
+				gap="xs"
 				className="dataforms-layouts-panel__field dataforms-layouts-panel__field--label-position-none"
 			>
 				{ showError && (
@@ -253,6 +255,7 @@ export default function FormPanelField< Item >( {
 	return (
 		<Stack
 			direction="row"
+			gap="xs"
 			ref={ setPopoverAnchor }
 			className="dataforms-layouts-panel__field"
 		>
