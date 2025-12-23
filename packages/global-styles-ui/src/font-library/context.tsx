@@ -385,7 +385,7 @@ function FontLibraryProvider( { children }: { children: React.ReactNode } ) {
 			if ( fontFamiliesToActivate.length > 0 ) {
 				// Activate the font family (add the font family to the global styles).
 				const activeFonts = activateCustomFontFamilies(
-					// @ts-expect-error - type definition is not correct. ID is a string.
+					// @ts-expect-error - Type mismatch: items may have id as number | string, but FontFamily.id should be string | undefined.
 					fontFamiliesToActivate
 				);
 				// Save the global styles to the database.
