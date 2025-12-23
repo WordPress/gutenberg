@@ -239,7 +239,7 @@ export const WithModal = ( {
 
 	return (
 		<>
-			<Stack direction="row" justify="left">
+			<Stack direction="row" justify="left" gap="xs">
 				<Button
 					variant="primary"
 					onClick={ () => setIsModalOpen( true ) }
