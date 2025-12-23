@@ -14,7 +14,7 @@ import {
 	ToolbarGroup,
 	ToolbarButton,
 } from '@wordpress/components';
-import { useState, RawHTML } from '@wordpress/element';
+import { useState, useRef, RawHTML } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { classic } from '@wordpress/icons';
 
@@ -31,6 +31,7 @@ export default function FreeformEdit( {
 } ) {
 	const { content } = attributes;
 	const [ isOpen, setOpen ] = useState( false );
+	const editButtonRef = useRef( null );
 
 	const canRemove = useSelect(
 		( select ) => select( blockEditorStore ).canRemoveBlock( clientId ),
@@ -48,7 +49,10 @@ export default function FreeformEdit( {
 			) }
 			<BlockControls>
 				<ToolbarGroup>
-					<ToolbarButton onClick={ () => setOpen( true ) }>
+					<ToolbarButton
+						ref={ editButtonRef }
+						onClick={ () => setOpen( true ) }
+					>
 						{ __( 'Edit' ) }
 					</ToolbarButton>
 				</ToolbarGroup>
@@ -77,7 +81,12 @@ export default function FreeformEdit( {
 					<ModalEdit
 						clientId={ clientId }
 						content={ content }
-						onClose={ () => setOpen( false ) }
+						onClose={ () => {
+							setOpen( false );
+							if ( editButtonRef.current ) {
+								editButtonRef.current.focus();
+							}
+						} }
 						onChange={ ( newContent ) =>
 							setAttributes( { content: newContent } )
 						}
