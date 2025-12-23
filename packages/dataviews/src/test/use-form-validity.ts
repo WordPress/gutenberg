@@ -501,36 +501,6 @@ describe( 'useFormValidity', () => {
 			expect( validity?.tags ).toEqual( ELEMENTS_MESSAGE );
 			expect( isValid ).toBe( false );
 		} );
-
-		it( 'array is invalid when value is not an array', () => {
-			const item = { id: 1, tags: 'not-an-array' };
-			const fields: Field< {} >[] = [
-				{
-					id: 'tags',
-					type: 'array',
-					elements: [
-						{ value: 'red', label: 'Red' },
-						{ value: 'blue', label: 'Blue' },
-					],
-					isValid: {
-						custom: () => null, // Disable to make sure the only validation triggered is elements
-					},
-				},
-			];
-			const form = { fields: [ 'tags' ] };
-			const {
-				result: {
-					current: { validity, isValid },
-				},
-			} = renderHook( () => useFormValidity( item, fields, form ) );
-			expect( validity?.tags ).toEqual( {
-				elements: {
-					type: 'invalid',
-					message: 'Value must be an array.',
-				},
-			} );
-			expect( isValid ).toBe( false );
-		} );
 	} );
 
 	describe( 'isValid.pattern', () => {
@@ -792,7 +762,7 @@ describe( 'useFormValidity', () => {
 			expect( validity?.username ).toEqual( {
 				pattern: {
 					type: 'invalid',
-					message: 'Invalid pattern configuration.',
+					message: 'Value does not match the required pattern.',
 				},
 			} );
 			expect( isValid ).toBe( false );

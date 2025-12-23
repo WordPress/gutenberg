@@ -222,6 +222,11 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 		support: [ 'dimensions', 'minHeight' ],
 		useEngine: true,
 	},
+	height: {
+		value: [ 'dimensions', 'height' ],
+		support: [ 'dimensions', 'height' ],
+		useEngine: true,
+	},
 	width: {
 		value: [ 'dimensions', 'width' ],
 		support: [ 'dimensions', 'width' ],
@@ -258,6 +263,11 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 		support: [ 'typography', '__experimentalLetterSpacing' ],
 		useEngine: true,
 	},
+	textIndent: {
+		value: [ 'typography', 'textIndent' ],
+		support: [ 'typography', 'textIndent' ],
+		useEngine: true,
+	},
 	writingMode: {
 		value: [ 'typography', 'writingMode' ],
 		support: [ 'typography', '__experimentalWritingMode' ],
@@ -285,6 +295,7 @@ export const __EXPERIMENTAL_ELEMENTS = {
 	h4: 'h4',
 	h5: 'h5',
 	h6: 'h6',
+	text: 'p',
 	button: '.wp-element-button, .wp-block-button__link',
 	caption:
 		'.wp-element-caption, .wp-block-audio figcaption, .wp-block-embed figcaption, .wp-block-gallery figcaption, .wp-block-image figcaption, .wp-block-table figcaption, .wp-block-video figcaption',

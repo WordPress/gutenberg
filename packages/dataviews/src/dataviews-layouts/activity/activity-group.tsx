@@ -14,6 +14,7 @@ interface ActivityGroupProps< Item > {
 	groupName: string;
 	groupData: Item[];
 	groupField: NormalizedField< Item >;
+	showLabel?: boolean;
 	children: React.ReactNode;
 }
 
@@ -21,20 +22,25 @@ export default function ActivityGroup< Item >( {
 	groupName,
 	groupData,
 	groupField,
+	showLabel = true,
 	children,
 }: ActivityGroupProps< Item > ) {
-	// Determine if we should show the field label
-	const groupHeader = createInterpolateElement(
-		// translators: %s: The label of the field e.g. "Status".
-		sprintf( __( '%s: <groupName />' ), groupField.label ).trim(),
-		{
-			groupName: (
-				<groupField.render
-					item={ groupData[ 0 ] }
-					field={ groupField }
-				/>
-			),
-		}
+	// Render group header content - either with or without field label
+	const groupHeader = showLabel ? (
+		createInterpolateElement(
+			// translators: %s: The label of the field e.g. "Status".
+			sprintf( __( '%s: <groupName />' ), groupField.label ).trim(),
+			{
+				groupName: (
+					<groupField.render
+						item={ groupData[ 0 ] }
+						field={ groupField }
+					/>
+				),
+			}
+		)
+	) : (
+		<groupField.render item={ groupData[ 0 ] } field={ groupField } />
 	);
 
 	return (

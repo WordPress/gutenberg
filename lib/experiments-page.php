@@ -150,18 +150,6 @@ function gutenberg_initialize_experiments_settings() {
 	);
 
 	add_settings_field(
-		'gutenberg-new-posts-dashboard',
-		__( 'Data Views: enable for Posts', 'gutenberg' ),
-		'gutenberg_display_experiment_field',
-		'gutenberg-experiments',
-		'gutenberg_experiments_section',
-		array(
-			'label' => __( 'Enables a redesigned posts dashboard accessible through a submenu item in the Gutenberg plugin.', 'gutenberg' ),
-			'id'    => 'gutenberg-new-posts-dashboard',
-		)
-	);
-
-	add_settings_field(
 		'gutenberg-quick-edit-dataviews',
 		__( 'Data Views: add Quick Edit', 'gutenberg' ),
 		'gutenberg_display_experiment_field',
@@ -210,6 +198,19 @@ function gutenberg_initialize_experiments_settings() {
 	);
 
 	add_settings_field(
+		'gutenberg-content-only-inspector-fields',
+		__( 'contentOnly: Enable editable inspector fields', 'gutenberg' ),
+		'gutenberg_display_experiment_field',
+		'gutenberg-experiments',
+		'gutenberg_experiments_section',
+		array(
+			'label'    => __( 'Enables editable inspector fields (media, links, alt text, etc.) in the content-only pattern editing interface. Requires "contentOnly: Make patterns contentOnly by default upon insertion" to be enabled.', 'gutenberg' ),
+			'id'       => 'gutenberg-content-only-inspector-fields',
+			'requires' => 'gutenberg-content-only-pattern-insertion',
+		)
+	);
+
+	add_settings_field(
 		'gutenberg-workflow-palette',
 		__( 'Workflow Palette', 'gutenberg' ),
 		'gutenberg_display_experiment_field',
@@ -230,6 +231,32 @@ function gutenberg_initialize_experiments_settings() {
 		array(
 			'label' => __( 'Enables custom mobile overlay design and content control for Navigation blocks, allowing you to create flexible, professional menu experiences.', 'gutenberg' ),
 			'id'    => 'gutenberg-customizable-navigation-overlays',
+		)
+	);
+
+	// create a new experiment for hiding blocks based on screen size
+	add_settings_field(
+		'gutenberg-hide-blocks-based-on-screen-size',
+		__( 'Hide blocks based on screen size', 'gutenberg' ),
+		'gutenberg_display_experiment_field',
+		'gutenberg-experiments',
+		'gutenberg_experiments_section',
+		array(
+			'label' => __( 'Extends block visibility block supports with responsive design controls for hiding blocks based on screen size.', 'gutenberg' ),
+			'id'    => 'gutenberg-hide-blocks-based-on-screen-size',
+		)
+	);
+
+	add_settings_field(
+		'gutenberg-extensible-site-editor',
+		__( 'Extensible Site Editor', 'gutenberg' ),
+		'gutenberg_display_experiment_field',
+		'gutenberg-experiments',
+		'gutenberg_experiments_section',
+		array(
+			'label'    => __( 'Redirects the default site editor (Appearance > Design) to use the extensible site editor page. Requires "Template Activation" experiment to be enabled.', 'gutenberg' ),
+			'id'       => 'gutenberg-extensible-site-editor',
+			'requires' => 'active_templates',
 		)
 	);
 

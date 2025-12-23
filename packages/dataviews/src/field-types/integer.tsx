@@ -6,7 +6,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import type { Rules } from '../types';
+import type { FormatInteger, NormalizedField } from '../types';
 import type { FieldType } from '../types/private';
 import {
 	OPERATOR_IS,
@@ -21,30 +21,69 @@ import {
 	OPERATOR_IS_NOT_ALL,
 	OPERATOR_BETWEEN,
 } from '../constants';
-import render from './utils/render-default';
 import sort from './utils/sort-number';
+import isValidRequired from './utils/is-valid-required';
+import isValidMin from './utils/is-valid-min';
+import isValidMax from './utils/is-valid-max';
+import isValidElements from './utils/is-valid-elements';
+import render from './utils/render-default';
 
-const isValid: Rules< any > = {
-	elements: true,
-	custom: ( item: any, normalizedField ) => {
-		const value = normalizedField.getValue( { item } );
-		if (
-			! [ undefined, '', null ].includes( value ) &&
-			! Number.isInteger( value )
-		) {
-			return __( 'Value must be an integer.' );
-		}
-
-		return null;
-	},
+const format = {
+	separatorThousand: ',',
 };
+
+function getValueFormatted< Item >( {
+	item,
+	field,
+}: {
+	item: Item;
+	field: NormalizedField< Item >;
+} ): string {
+	let value = field.getValue( { item } );
+	if ( value === null || value === undefined ) {
+		return '';
+	}
+
+	value = Number( value );
+	if ( ! Number.isFinite( value ) ) {
+		return String( value );
+	}
+
+	let formatInteger: Required< FormatInteger >;
+	if ( field.type !== 'integer' ) {
+		formatInteger = format;
+	} else {
+		formatInteger = field.format as Required< FormatInteger >;
+	}
+
+	const { separatorThousand } = formatInteger;
+	const integerValue = Math.trunc( value );
+	if ( ! separatorThousand ) {
+		return String( integerValue );
+	}
+
+	return String( integerValue ).replace(
+		/\B(?=(\d{3})+(?!\d))/g,
+		separatorThousand
+	);
+}
+
+function isValidCustom< Item >( item: Item, field: NormalizedField< Item > ) {
+	const value = field.getValue( { item } );
+	if (
+		! [ undefined, '', null ].includes( value ) &&
+		! Number.isInteger( value )
+	) {
+		return __( 'Value must be an integer.' );
+	}
+	return null;
+}
 
 export default {
 	type: 'integer',
 	render,
 	Edit: 'integer',
 	sort,
-	isValid,
 	enableSorting: true,
 	enableGlobalSearch: false,
 	defaultOperators: [
@@ -71,5 +110,13 @@ export default {
 		OPERATOR_IS_ALL,
 		OPERATOR_IS_NOT_ALL,
 	],
-	getFormat: () => ( {} ),
+	format,
+	getValueFormatted,
+	validate: {
+		required: isValidRequired,
+		min: isValidMin,
+		max: isValidMax,
+		elements: isValidElements,
+		custom: isValidCustom,
+	},
 } satisfies FieldType< any >;

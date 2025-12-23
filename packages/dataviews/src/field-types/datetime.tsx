@@ -1,10 +1,14 @@
 /**
+ * WordPress dependencies
+ */
+import { dateI18n, getDate, getSettings } from '@wordpress/date';
+
+/**
  * Internal dependencies
  */
-import type { DataViewRenderFieldProps, SortDirection } from '../types';
+import type { FormatDatetime, NormalizedField, SortDirection } from '../types';
 import type { FieldType } from '../types/private';
-import RenderFromElements from './utils/render-from-elements';
-import parseDateTime from './utils/parse-date-time';
+import isValidElements from './utils/is-valid-elements';
 import {
 	OPERATOR_ON,
 	OPERATOR_NOT_ON,
@@ -15,23 +19,34 @@ import {
 	OPERATOR_IN_THE_PAST,
 	OPERATOR_OVER,
 } from '../constants';
+import isValidRequired from './utils/is-valid-required';
+import render from './utils/render-default';
 
-function render( { item, field }: DataViewRenderFieldProps< any > ) {
-	if ( field.elements ) {
-		return <RenderFromElements item={ item } field={ field } />;
-	}
+const format = {
+	datetime: getSettings().formats.datetime,
+	weekStartsOn: getSettings().l10n.startOfWeek,
+};
 
+function getValueFormatted< Item >( {
+	item,
+	field,
+}: {
+	item: Item;
+	field: NormalizedField< Item >;
+} ): string {
 	const value = field.getValue( { item } );
 	if ( [ '', undefined, null ].includes( value ) ) {
-		return null;
+		return '';
 	}
 
-	try {
-		const dateValue = parseDateTime( value );
-		return dateValue?.toLocaleString();
-	} catch ( error ) {
-		return null;
+	let formatDatetime: Required< FormatDatetime >;
+	if ( field.type !== 'datetime' ) {
+		formatDatetime = format;
+	} else {
+		formatDatetime = field.format as Required< FormatDatetime >;
 	}
+
+	return dateI18n( formatDatetime.datetime, getDate( value ) );
 }
 
 const sort = ( a: any, b: any, direction: SortDirection ) => {
@@ -46,10 +61,6 @@ export default {
 	render,
 	Edit: 'datetime',
 	sort,
-	isValid: {
-		elements: true,
-		custom: () => null,
-	},
 	enableSorting: true,
 	enableGlobalSearch: false,
 	defaultOperators: [
@@ -72,5 +83,10 @@ export default {
 		OPERATOR_IN_THE_PAST,
 		OPERATOR_OVER,
 	],
-	getFormat: () => ( {} ),
+	format,
+	getValueFormatted,
+	validate: {
+		required: isValidRequired,
+		elements: isValidElements,
+	},
 } satisfies FieldType< any >;

@@ -159,6 +159,68 @@ test.describe( 'Annotations', () => {
 			},
 		] );
 	} );
+
+	test( 'automatically annotates the word "apple"', async ( {
+		editor,
+		page,
+		annotations,
+	} ) => {
+		await annotations.openAnnotationsSidebar();
+		await editor.canvas
+			.getByRole( 'textbox', { name: 'Add title' } )
+			.fill( 'Title' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'I love apple pie' );
+
+		const block = editor.canvas.getByRole( 'document', {
+			name: 'Block: Paragraph',
+		} );
+		const blockAnnotation = block.locator(
+			'.annotation-text-test-annotation'
+		);
+
+		await expect( blockAnnotation ).toBeVisible();
+		await expect( blockAnnotation ).toHaveText( 'apple' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'I love apple pie' },
+			},
+		] );
+	} );
+
+	test( 'automatically annotates the word "apple" (bold)', async ( {
+		editor,
+		page,
+		annotations,
+		pageUtils,
+	} ) => {
+		await annotations.openAnnotationsSidebar();
+		await editor.canvas
+			.getByRole( 'textbox', { name: 'Add title' } )
+			.fill( 'Title' );
+		await page.keyboard.press( 'Enter' );
+		await pageUtils.pressKeys( 'primary+b' );
+		await page.keyboard.type( 'I love apple pie' );
+
+		const block = editor.canvas.getByRole( 'document', {
+			name: 'Block: Paragraph',
+		} );
+		const blockAnnotation = block.locator(
+			'.annotation-text-test-annotation'
+		);
+
+		await expect( blockAnnotation ).toBeVisible();
+		await expect( blockAnnotation ).toHaveText( 'apple' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: '<strong>I love apple pie</strong>' },
+			},
+		] );
+	} );
 } );
 
 class AnnotationsUtils {

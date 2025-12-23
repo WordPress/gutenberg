@@ -3,10 +3,14 @@
  */
 import type { SortDirection } from '../types';
 import type { FieldType } from '../types/private';
-import { ALL_OPERATORS, OPERATOR_IS, OPERATOR_IS_NOT } from '../constants';
+import { OPERATOR_IS, OPERATOR_IS_NOT } from '../constants';
+import { getAllOperatorNames } from '../utils/operators';
 import render from './utils/render-default';
 import sortText from './utils/sort-text';
 import sortNumber from './utils/sort-number';
+import isValidRequired from './utils/is-valid-required';
+import isValidElements from './utils/is-valid-elements';
+import getValueFormatted from './utils/get-value-formatted-default';
 
 const sort = ( a: any, b: any, direction: SortDirection ) => {
 	if ( typeof a === 'number' && typeof b === 'number' ) {
@@ -21,13 +25,14 @@ export default {
 	render,
 	Edit: null,
 	sort,
-	isValid: {
-		elements: true,
-		custom: () => null,
-	},
 	enableSorting: true,
 	enableGlobalSearch: false,
 	defaultOperators: [ OPERATOR_IS, OPERATOR_IS_NOT ],
-	validOperators: ALL_OPERATORS,
-	getFormat: () => ( {} ),
+	validOperators: getAllOperatorNames(),
+	format: {},
+	getValueFormatted,
+	validate: {
+		required: isValidRequired,
+		elements: isValidElements,
+	},
 } satisfies FieldType< any >;

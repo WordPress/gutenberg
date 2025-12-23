@@ -41,7 +41,7 @@ function ColumnPrimary< Item >( {
 	isItemClickable: ( item: Item ) => boolean;
 } ) {
 	return (
-		<HStack spacing={ 3 } justify="flex-start">
+		<HStack spacing={ 3 } alignment="flex-start" justify="flex-start">
 			{ mediaField && (
 				<ItemClickWrapper
 					item={ item }

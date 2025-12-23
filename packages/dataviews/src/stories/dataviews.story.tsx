@@ -17,7 +17,6 @@ import {
 	Card,
 	CardHeader,
 	CardBody,
-	__experimentalGrid as Grid,
 	__experimentalHeading as Heading,
 	__experimentalText as Text,
 	__experimentalHStack as HStack,
@@ -318,84 +317,90 @@ function PlanetOverview( { planets }: { planets: SpaceObject[] } ) {
 			<Heading className="free-composition-heading" level={ 2 }>
 				{ __( 'Solar System numbers' ) }
 			</Heading>
-			<Grid
-				templateColumns="repeat(auto-fit, minmax(330px, 1fr))"
-				align="flex-start"
-				className="free-composition-header"
-			>
-				<Card variant="secondary">
-					<CardBody>
-						<VStack>
-							<Text size={ 18 } as="p">
-								{ createInterpolateElement(
-									_n(
-										'<PlanetsNumber /> planet',
-										'<PlanetsNumber /> planets',
-										planets.length
-									),
-									{
-										PlanetsNumber: (
-											<strong>{ planets.length } </strong>
-										),
-									}
-								) }
-							</Text>
-
-							<Text size={ 18 } as="p">
-								{ createInterpolateElement(
-									_n(
-										'<SatellitesNumber /> moon',
-										'<SatellitesNumber /> moons',
-										moons
-									),
-									{
-										SatellitesNumber: (
-											<strong>{ moons } </strong>
-										),
-									}
-								) }
-							</Text>
-						</VStack>
-					</CardBody>
-				</Card>
-
-				<VStack>
-					<HStack justify="start">
+			<div className="free-composition-header">
+				<VStack spacing={ 4 }>
+					<HStack justify="start" spacing={ 2 }>
+						<DataViews.Search label={ __( 'Search content' ) } />
 						<DataViews.FiltersToggle />
-						<DataViews.Search label={ __( 'moons by planet' ) } />
+						<HStack justify="end" spacing={ 2 }>
+							<DataViews.ViewConfig />
+							<DataViews.LayoutSwitcher />
+						</HStack>
 					</HStack>
 					<DataViews.FiltersToggled />
+					<Card variant="secondary">
+						<CardBody>
+							<VStack>
+								<Text size={ 18 } as="p">
+									{ createInterpolateElement(
+										_n(
+											'<PlanetsNumber /> planet',
+											'<PlanetsNumber /> planets',
+											planets.length
+										),
+										{
+											PlanetsNumber: (
+												<strong>
+													{ planets.length }{ ' ' }
+												</strong>
+											),
+										}
+									) }
+								</Text>
+
+								<Text size={ 18 } as="p">
+									{ createInterpolateElement(
+										_n(
+											'<SatellitesNumber /> moon',
+											'<SatellitesNumber /> moons',
+											moons
+										),
+										{
+											SatellitesNumber: (
+												<strong>{ moons } </strong>
+											),
+										}
+									) }
+								</Text>
+							</VStack>
+						</CardBody>
+					</Card>
+					<Card style={ { width: '100%' } }>
+						<CardBody>
+							<HStack
+								justify="space-between"
+								alignment="center"
+								spacing={ 2 }
+							>
+								<DataViews.BulkActionToolbar />
+								<DataViews.Pagination />
+							</HStack>
+						</CardBody>
+					</Card>
+					<DataViews.Layout className="free-composition-dataviews-layout" />
 				</VStack>
-
-				<VStack>
-					<HStack justify="end">
-						<DataViews.Pagination />
-						<DataViews.ViewConfig />
-						<DataViews.LayoutSwitcher />
-					</HStack>
-
-					<DataViews.BulkActionToolbar />
-				</VStack>
-			</Grid>
-
-			<DataViews.Layout className="free-composition-dataviews-layout" />
+			</div>
 		</>
 	);
 }
 
 /**
- * This is a basic example of using the DataViews component in
- * a free composition mode.
+ * Demonstrates how to build a custom layout using DataViews sub-components.
  *
- * Unlike the default usage where DataViews renders its own UI,
- * here we use it purely to provide context and handle data-related logic.
+ * Instead of using the default DataViews UI, this story shows how to:
+ * - Use `<DataViews>` as a context provider (wrapping custom children)
+ * - Compose your own layout with built-in sub-components:
+ *   - `<DataViews.Search />` - Search input
+ *   - `<DataViews.FiltersToggle />` - Button to show/hide filters
+ *   - `<DataViews.FiltersToggled />` - The filter UI itself
+ *   - `<DataViews.Pagination />` - Page navigation
+ *   - `<DataViews.ViewConfig />` - View settings (columns, density, etc.)
+ *   - `<DataViews.LayoutSwitcher />` - Switch between table/grid/list views
+ *   - `<DataViews.BulkActionToolbar />` - Actions for selected items
+ *   - `<DataViews.Layout />` - The data display (table, grid, etc.)
  *
- * The UI is fully custom and composed externally via the
- * `PlanetOverview` component.
- *
- * In future iterations, this story will showcase more advanced compositions
- * using built-in subcomponents like <Search />, filters,
- * or pagination controls.
+ * This pattern is useful when you need full control over the UI layout
+ * while still leveraging DataViews' data management and state handling.
  */
 export const FreeComposition = () => {
 	const [ view, setView ] = useState< View >( {
@@ -480,7 +485,11 @@ export const WithCard = () => {
 	);
 };
 
-export const GroupByLayout = () => {
+const GroupByLayoutComponent = ( {
+	showLabel = true,
+}: {
+	showLabel: boolean;
+} ) => {
 	const [ view, setView ] = useState< View >( {
 		type: LAYOUT_GRID,
 		search: '',
@@ -491,11 +500,19 @@ export const GroupByLayout = () => {
 		titleField: 'title',
 		descriptionField: 'description',
 		mediaField: 'image',
-		groupBy: { field: 'type', direction: 'asc' },
+		groupBy: { field: 'type', direction: 'asc', showLabel },
 		layout: {
 			badgeFields: [ 'satellites' ],
 		},
 	} );
+
+	useEffect( () => {
+		setView( ( prevView ) => ( {
+			...prevView,
+			groupBy: { field: 'type', direction: 'asc', showLabel },
+		} ) );
+	}, [ showLabel ] );
+
 	const { data: shownData, paginationInfo } = useMemo( () => {
 		return filterSortAndPaginate( data, view, fields );
 	}, [ view ] );
@@ -511,6 +528,20 @@ export const GroupByLayout = () => {
 			defaultLayouts={ defaultLayouts }
 		/>
 	);
+};
+
+export const GroupByLayout = {
+	render: GroupByLayoutComponent,
+	args: {
+		showLabel: true,
+	},
+	argTypes: {
+		showLabel: {
+			control: 'boolean',
+			description:
+				'Whether to show the field label in group headers (e.g., "Type: Planet" vs just "Planet")',
+		},
+	},
 };
 
 export const InfiniteScroll = () => {
@@ -638,9 +669,11 @@ export const InfiniteScroll = () => {
 const ActivityComponent = ( {
 	showMedia = true,
 	grouping = true,
+	showLabel = true,
 }: {
 	showMedia: boolean;
 	grouping: boolean;
+	showLabel: boolean;
 } ) => {
 	const [ view, setView ] = useState< View >( {
 		type: LAYOUT_ACTIVITY,
@@ -661,6 +694,7 @@ const ActivityComponent = ( {
 			? {
 					field: 'date',
 					direction: 'asc',
+					showLabel,
 			  }
 			: undefined,
 	} );
@@ -669,12 +703,12 @@ const ActivityComponent = ( {
 			return {
 				...prevView,
 				groupBy: grouping
-					? { field: 'date', direction: 'asc' }
+					? { field: 'date', direction: 'asc', showLabel }
 					: undefined,
 				showMedia,
 			};
 		} );
-	}, [ showMedia, grouping ] );
+	}, [ showMedia, grouping, showLabel ] );
 
 	const { data: shownData, paginationInfo } = useMemo( () => {
 		return filterSortAndPaginate( orderEventData, view, orderEventFields );
@@ -706,6 +740,7 @@ export const Activity = {
 	args: {
 		showMedia: true,
 		grouping: true,
+		showLabel: true,
 	},
 	argTypes: {
 		showMedia: {
@@ -720,6 +755,11 @@ export const Activity = {
 			defaultValue: true,
 			description:
 				'Whether items are grouped by date in the activity list',
+		},
+		showLabel: {
+			control: 'boolean',
+			description:
+				'Whether to show the field label in group headers (e.g., "Date: Dec 15" vs just "Dec 15")',
 		},
 	},
 };

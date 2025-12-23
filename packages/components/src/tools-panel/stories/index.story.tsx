@@ -116,7 +116,6 @@ export const Default: StoryFn< typeof ToolsPanel > = ( {
 						onDeselect={ () => setScale( undefined ) }
 					>
 						<ToggleGroupControl
-							__nextHasNoMarginBottom
 							__next40pxDefaultSize
 							label="Scale"
 							value={ scale }
@@ -472,7 +471,6 @@ export const WithConditionalDefaultControl: StoryFn< typeof ToolsPanel > = ( {
 					isShownByDefault={ !! height }
 				>
 					<ToggleGroupControl
-						__nextHasNoMarginBottom
 						__next40pxDefaultSize
 						label="Scale"
 						value={ scale }
@@ -576,7 +574,6 @@ export const WithConditionallyRenderedControl: StoryFn<
 						isShownByDefault
 					>
 						<ToggleGroupControl
-							__nextHasNoMarginBottom
 							__next40pxDefaultSize
 							label="Scale"
 							value={ scale }

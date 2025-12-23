@@ -69,17 +69,20 @@ div.dataviews-view-list {
 		}
 
 		&:not(.is-selected) {
-			.dataviews-view-list__title-field {
-				color: $gray-900;
-			}
 			&:hover,
 			&.is-hovered,
 			&:focus-within {
 				color: var(--wp-admin-theme-color);
-				background-color: #f8f8f8;
+				background-color: rgba(var(--wp-admin-theme-color--rgb), 0.04);
+				border-top: 1px solid rgba(var(--wp-admin-theme-color--rgb), 0.12);
 
-				.dataviews-view-list__title-field,
-				.dataviews-view-list__fields {
+				& + div[role="row"],
+				& + div[role="article"] {
+					border-top: 1px solid rgba(var(--wp-admin-theme-color--rgb), 0.12);
+				}
+
+				.dataviews-title-field,
+				.dataviews-view-list__field {
 					color: var(--wp-admin-theme-color);
 				}
 			}
@@ -92,12 +95,12 @@ div.dataviews-view-list {
 	div[role="article"].is-selected,
 	div[role="article"].is-selected:focus-within {
 		.dataviews-view-list__item-wrapper {
-			background-color: rgba(var(--wp-admin-theme-color--rgb), 0.04);
+			background-color: rgba(var(--wp-admin-theme-color--rgb), 0.08);
 			color: $gray-900;
 
-			.dataviews-view-list__title-field,
-			.dataviews-view-list__fields {
-				color: var(--wp-admin-theme-color);
+			.dataviews-title-field,
+			.dataviews-view-list__field {
+				color: $gray-900;
 			}
 		}
 	}
@@ -170,8 +173,11 @@ div.dataviews-view-list {
 		flex-grow: 1;
 	}
 
-	.dataviews-view-list__fields {
+	.dataviews-view-list__field {
 		color: $gray-700;
+	}
+
+	.dataviews-view-list__fields {
 		display: flex;
 		gap: $grid-unit-15;
 		row-gap: $grid-unit-05;

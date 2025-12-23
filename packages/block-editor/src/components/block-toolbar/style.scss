@@ -193,18 +193,18 @@
 				font-size: $helptext-font-size;
 			}
 		}
+
+		.block-editor-block-icon {
+			width: 0 !important;
+			height: 0 !important;
+			min-width: 0 !important;
+		}
 	}
 
 	// Padding overrides.
 	.components-accessible-toolbar .components-toolbar-group > div:first-child:last-child > .components-button.has-icon {
 		padding-left: 6px;
 		padding-right: 6px;
-	}
-
-	.block-editor-block-icon {
-		width: 0 !important;
-		height: 0 !important;
-		min-width: 0 !important;
 	}
 
 	// Parent selector overrides

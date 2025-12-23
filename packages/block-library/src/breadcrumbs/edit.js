@@ -26,12 +26,13 @@ const separatorDefaultValue = '/';
 export default function BreadcrumbEdit( {
 	attributes,
 	setAttributes,
+	name,
 	context: { postId, postType, templateSlug },
 } ) {
 	const {
 		separator,
-		showHomeLink,
-		showLastItem,
+		showHomeItem,
+		showCurrentItem,
 		prefersTaxonomy,
 		showOnHomePage,
 	} = attributes;
@@ -104,7 +105,7 @@ export default function BreadcrumbEdit( {
 	const { content } = useServerSideRender( {
 		attributes,
 		skipBlockSupportAttributes: true,
-		block: 'core/breadcrumbs',
+		block: name,
 		urlQueryArgs: { post_id: postId, invalidationKey },
 	} );
 
@@ -143,7 +144,7 @@ export default function BreadcrumbEdit( {
 		( _showTerms && ! hasTermsAssigned );
 	if ( showPlaceholder ) {
 		const placeholderItems = [];
-		if ( showHomeLink ) {
+		if ( showHomeItem ) {
 			placeholderItems.push( __( 'Home' ) );
 		}
 		if ( templateSlug && ! postId ) {
@@ -168,7 +169,7 @@ export default function BreadcrumbEdit( {
 							</a>
 						</li>
 					) ) }
-					{ showLastItem && (
+					{ showCurrentItem && (
 						<li>
 							<span aria-current="page">{ __( 'Current' ) }</span>
 						</li>
@@ -185,48 +186,46 @@ export default function BreadcrumbEdit( {
 					resetAll={ () => {
 						setAttributes( {
 							separator: separatorDefaultValue,
-							showHomeLink: true,
-							showLastItem: true,
+							showHomeItem: true,
+							showCurrentItem: true,
 						} );
 					} }
 					dropdownMenuProps={ dropdownMenuProps }
 				>
 					<ToolsPanelItem
-						label={ __( 'Show home link' ) }
+						label={ __( 'Show home breadcrumb' ) }
 						isShownByDefault
-						hasValue={ () => ! showHomeLink }
+						hasValue={ () => ! showHomeItem }
 						onDeselect={ () =>
 							setAttributes( {
-								showHomeLink: true,
+								showHomeItem: true,
 							} )
 						}
 					>
 						<ToggleControl
-							__nextHasNoMarginBottom
-							label={ __( 'Show home link' ) }
+							label={ __( 'Show home breadcrumb' ) }
 							onChange={ ( value ) =>
-								setAttributes( { showHomeLink: value } )
+								setAttributes( { showHomeItem: value } )
 							}
-							checked={ showHomeLink }
+							checked={ showHomeItem }
 						/>
 					</ToolsPanelItem>
 					<ToolsPanelItem
-						label={ __( 'Show last item' ) }
+						label={ __( 'Show current breadcrumb' ) }
 						isShownByDefault
-						hasValue={ () => ! showLastItem }
+						hasValue={ () => ! showCurrentItem }
 						onDeselect={ () =>
 							setAttributes( {
-								showLastItem: true,
+								showCurrentItem: true,
 							} )
 						}
 					>
 						<ToggleControl
-							__nextHasNoMarginBottom
-							label={ __( 'Show last item' ) }
+							label={ __( 'Show current breadcrumb' ) }
 							onChange={ ( value ) =>
-								setAttributes( { showLastItem: value } )
+								setAttributes( { showCurrentItem: value } )
 							}
-							checked={ showLastItem }
+							checked={ showCurrentItem }
 						/>
 					</ToolsPanelItem>
 					<ToolsPanelItem
@@ -240,7 +239,6 @@ export default function BreadcrumbEdit( {
 						}
 					>
 						<TextControl
-							__nextHasNoMarginBottom
 							__next40pxDefaultSize
 							autoComplete="off"
 							label={ __( 'Separator' ) }
@@ -261,7 +259,6 @@ export default function BreadcrumbEdit( {
 			</InspectorControls>
 			<InspectorControls group="advanced">
 				<CheckboxControl
-					__nextHasNoMarginBottom
 					label={ __( 'Show on homepage' ) }
 					checked={ showOnHomePage }
 					onChange={ ( value ) =>
@@ -272,7 +269,6 @@ export default function BreadcrumbEdit( {
 					) }
 				/>
 				<CheckboxControl
-					__nextHasNoMarginBottom
 					label={ __( 'Prefer taxonomy terms' ) }
 					checked={ prefersTaxonomy }
 					onChange={ ( value ) =>

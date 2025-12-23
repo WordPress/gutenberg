@@ -733,14 +733,29 @@ export const IntegerComponent = ( {
 	type,
 	Edit,
 	asyncElements,
+	formatSeparatorThousand,
 }: {
 	type: PanelTypes;
 	Edit: ControlTypes;
 	asyncElements: boolean;
+	formatSeparatorThousand?: string;
 } ) => {
 	const integerFields = useMemo(
-		() => fields.filter( ( field ) => field.type === 'integer' ),
-		[]
+		() =>
+			fields
+				.filter( ( field ) => field.type === 'integer' )
+				.map( ( field ) => {
+					if ( formatSeparatorThousand !== undefined ) {
+						return {
+							...field,
+							format: {
+								separatorThousand: formatSeparatorThousand,
+							},
+						};
+					}
+					return field;
+				} ),
+		[ formatSeparatorThousand ]
 	);
 
 	return (
@@ -753,19 +768,64 @@ export const IntegerComponent = ( {
 	);
 };
 IntegerComponent.storyName = 'integer';
+IntegerComponent.args = {
+	formatSeparatorThousand: ',',
+};
+IntegerComponent.argTypes = {
+	formatSeparatorThousand: {
+		control: 'text',
+		description:
+			'Character used as thousand separator (e.g., "," for "1,234"). Default is ",".',
+	},
+};
 
 export const NumberComponent = ( {
 	type,
 	Edit,
 	asyncElements,
+	formatSeparatorThousand,
+	formatSeparatorDecimal,
+	formatDecimals,
 }: {
 	type: PanelTypes;
 	Edit: ControlTypes;
 	asyncElements: boolean;
+	formatSeparatorThousand?: string;
+	formatSeparatorDecimal?: string;
+	formatDecimals?: number;
 } ) => {
 	const numberFields = useMemo(
-		() => fields.filter( ( field ) => field.type === 'number' ),
-		[]
+		() =>
+			fields
+				.filter( ( field ) => field.type === 'number' )
+				.map( ( field ) => {
+					if (
+						formatSeparatorThousand !== undefined ||
+						formatSeparatorDecimal !== undefined ||
+						formatDecimals !== undefined
+					) {
+						const format: {
+							separatorThousand?: string;
+							separatorDecimal?: string;
+							decimals?: number;
+						} = {};
+						if ( formatSeparatorThousand !== undefined ) {
+							format.separatorThousand = formatSeparatorThousand;
+						}
+						if ( formatSeparatorDecimal !== undefined ) {
+							format.separatorDecimal = formatSeparatorDecimal;
+						}
+						if ( formatDecimals !== undefined ) {
+							format.decimals = formatDecimals;
+						}
+						return {
+							...field,
+							format,
+						};
+					}
+					return field;
+				} ),
+		[ formatSeparatorThousand, formatSeparatorDecimal, formatDecimals ]
 	);
 
 	return (
@@ -778,6 +838,28 @@ export const NumberComponent = ( {
 	);
 };
 NumberComponent.storyName = 'number';
+NumberComponent.args = {
+	formatSeparatorThousand: ',',
+	formatSeparatorDecimal: '.',
+	formatDecimals: 2,
+};
+NumberComponent.argTypes = {
+	formatSeparatorThousand: {
+		control: 'text',
+		description:
+			'Character used as thousand separator (e.g., "," for "1,234"). Default is ",".',
+	},
+	formatSeparatorDecimal: {
+		control: 'text',
+		description:
+			'Character used as decimal separator (e.g., "." for "1.23"). Default is ".".',
+	},
+	formatDecimals: {
+		control: { type: 'number', min: 0, max: 100, step: 1 },
+		description:
+			'Number of decimal places to display (0-100). Default is 2.',
+	},
+};
 
 export const BooleanComponent = ( {
 	type,
@@ -808,13 +890,39 @@ export const DateTimeComponent = ( {
 	type,
 	Edit,
 	asyncElements,
+	formatDatetime,
+	formatWeekStartsOn,
 }: {
 	type: PanelTypes;
 	Edit: ControlTypes;
 	asyncElements: boolean;
+	formatDatetime?: string;
+	formatWeekStartsOn?: 0 | 1 | 2 | 3 | 4 | 5 | 6;
 } ) => {
-	const datetimeFields = fields.filter( ( field ) =>
-		field.id.startsWith( 'datetime' )
+	const datetimeFields = useMemo(
+		() =>
+			fields
+				.filter( ( field ) => field.id.startsWith( 'datetime' ) )
+				.map( ( field ) => {
+					if ( formatDatetime || formatWeekStartsOn !== undefined ) {
+						const format: {
+							datetime?: string;
+							weekStartsOn?: 0 | 1 | 2 | 3 | 4 | 5 | 6;
+						} = {};
+						if ( formatDatetime ) {
+							format.datetime = formatDatetime;
+						}
+						if ( formatWeekStartsOn !== undefined ) {
+							format.weekStartsOn = formatWeekStartsOn;
+						}
+						return {
+							...field,
+							format,
+						};
+					}
+					return field;
+				} ),
+		[ fields, formatDatetime, formatWeekStartsOn ]
 	);
 
 	return (
@@ -827,6 +935,32 @@ export const DateTimeComponent = ( {
 	);
 };
 DateTimeComponent.storyName = 'datetime';
+DateTimeComponent.args = {
+	formatDatetime: '',
+	formatWeekStartsOn: undefined,
+};
+DateTimeComponent.argTypes = {
+	formatDatetime: {
+		control: 'text',
+		description:
+			'Custom PHP date format string (e.g., "M j, Y g:i a" for "Jan 1, 2021 2:30 pm"). Leave empty to use WordPress default.',
+	},
+	formatWeekStartsOn: {
+		control: 'select',
+		options: {
+			Default: undefined,
+			Sunday: 0,
+			Monday: 1,
+			Tuesday: 2,
+			Wednesday: 3,
+			Thursday: 4,
+			Friday: 5,
+			Saturday: 6,
+		},
+		description:
+			'Day that the week starts on. Leave as Default to use WordPress default.',
+	},
+};
 
 export const DateComponent = ( {
 	type,

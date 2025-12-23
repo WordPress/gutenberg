@@ -8,9 +8,9 @@ export default function render( {
 	item,
 	field,
 }: DataViewRenderFieldProps< any > ) {
-	return field.hasElements ? (
-		<RenderFromElements item={ item } field={ field } />
-	) : (
-		field.getValue( { item } )
-	);
+	if ( field.hasElements ) {
+		return <RenderFromElements item={ item } field={ field } />;
+	}
+
+	return field.getValueFormatted( { item, field } );
 }

@@ -182,7 +182,6 @@ function ScreenBlockList() {
 				) }
 			/>
 			<SearchControl
-				__nextHasNoMarginBottom
 				className="global-styles-ui-block-types-search"
 				onChange={ setFilterValue }
 				value={ filterValue }

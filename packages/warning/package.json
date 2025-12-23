@@ -22,16 +22,25 @@
 		"node": ">=18.12.0",
 		"npm": ">=8.19.2"
 	},
-	"main": "build/index.js",
+	"files": [
+		"src",
+		"build",
+		"build-module",
+		"build-types",
+		"*.md",
+		"babel-plugin.cjs"
+	],
+	"type": "module",
+	"main": "build/index.cjs",
 	"module": "build-module/index.js",
 	"exports": {
 		".": {
 			"types": "./build-types/index.d.ts",
 			"import": "./build-module/index.js",
-			"require": "./build/index.js"
+			"require": "./build/index.cjs"
 		},
 		"./package.json": "./package.json",
-		"./babel-plugin": "./babel-plugin.js"
+		"./babel-plugin": "./babel-plugin.cjs"
 	},
 	"react-native": "src/index",
 	"wpScript": true,

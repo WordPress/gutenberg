@@ -23,15 +23,16 @@ export default function RichTextControl( {
 	data,
 	field,
 	hideLabelFromVision,
+	onChange,
 	config = {},
 } ) {
 	const registry = useRegistry();
 	const attrValue = field.getValue( { item: data } );
 	const fieldConfig = field.config || {};
-	const { clientId, updateBlockAttributes } = config;
+	const { clientId } = config;
 	const updateAttributes = ( html ) => {
 		const mappedChanges = field.setValue( { item: data, value: html } );
-		updateBlockAttributes( clientId, mappedChanges );
+		onChange( mappedChanges );
 	};
 	const [ selection, setSelection ] = useState( {
 		start: undefined,
@@ -144,7 +145,7 @@ export default function RichTextControl( {
 					</inputEventContext.Provider>
 				</keyboardShortcutContext.Provider>
 			) }
-			<BaseControl __nextHasNoMarginBottom { ...baseControlProps }>
+			<BaseControl { ...baseControlProps }>
 				<div
 					className="block-editor-content-only-controls__rich-text"
 					role="textbox"

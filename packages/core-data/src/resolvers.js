@@ -23,6 +23,7 @@ import {
 	getUserPermissionsFromAllowHeader,
 	ALLOWED_RESOURCE_ACTIONS,
 	RECEIVE_INTERMEDIATE_RESULTS,
+	isNumericID,
 } from './utils';
 import { fetchBlockPatterns } from './fetch';
 
@@ -157,6 +158,7 @@ export const getEntityRecord =
 			if (
 				window.__experimentalEnableSync &&
 				entityConfig.syncConfig &&
+				isNumericID( key ) &&
 				! query
 			) {
 				if ( globalThis.IS_GUTENBERG_PLUGIN ) {

@@ -1,12 +1,11 @@
 @use "@wordpress/base-styles/variables";
 @use "@wordpress/base-styles/colors";
 @use "@wordpress/base-styles/mixins";
-@use "./font-library-modal/style.scss" as *;
+@use "./font-library/style.scss" as *;
 @use "./pagination/style.scss" as *;
 @use "./screen-revisions/style.scss" as *;
 @use "./size-control/style.scss" as *;
 @use "./variations/style.scss" as *;
-
 
 .global-styles-ui-preview {
 	display: flex;
@@ -20,7 +19,6 @@
 	max-width: 100%;
 	display: block;
 	width: 100%;
-	clip-path: border-box;
 }
 
 .global-styles-ui-typography-preview {
@@ -45,10 +43,6 @@
 	color: #757575;
 }
 
-.global-styles-ui-screen {
-	margin: 12px 16px 16px;
-}
-
 .global-styles-ui-screen-typography__indicator {
 	height: 24px;
 	width: 24px;
@@ -61,7 +55,7 @@
 
 .global-styles-ui-block-types-search {
 	margin-bottom: 10px;
-	padding: 0 20px;
+	padding: 0 16px;
 }
 
 .global-styles-ui-screen-typography__font-variants-count {
@@ -78,10 +72,6 @@
 	padding-top: 0;
 	border-top: none;
 	row-gap: calc(4px * 3);
-}
-
-.global-styles-ui-header__description {
-	padding: 0 16px;
 }
 
 .global-styles-ui-header {
@@ -133,13 +123,7 @@
 	border: #ddd 1px solid;
 	border-radius: 2px;
 	overflow: auto;
-	background-image:
-		repeating-linear-gradient(45deg, #f5f5f5 25%, #0000 0, #0000 75%, #f5f5f5 0, #f5f5f5),
-		repeating-linear-gradient(45deg, #f5f5f5 25%, #0000 0, #0000 75%, #f5f5f5 0, #f5f5f5);
-	background-position:
-		0 0,
-		8px 8px;
-	background-size: 16px 16px;
+	@include mixins.checkerboard-background( 8px );
 
 	.global-styles-ui__shadow-preview-block {
 		border: #ddd 1px solid;
@@ -278,11 +262,11 @@
 	}
 }
 
+.global-styles-ui-screen-root__active-style-tile-preview {
+	clip-path: border-box;
+}
+
 .global-styles-ui-color-palette-panel,
 .global-styles-ui-gradient-palette-panel {
 	padding: variables.$grid-unit-20;
-}
-
-.components-navigator-screen {
-	padding: variables.$grid-unit-15;
 }

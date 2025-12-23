@@ -81,16 +81,6 @@ export const StyledUnitControl = styled( UnitControl )`
 	width: 100%;
 `;
 
-const deprecatedBottomMargin = ( {
-	__nextHasNoMarginBottom,
-}: FocalPointPickerControlsProps ) => {
-	return ! __nextHasNoMarginBottom
-		? css`
-				padding-bottom: 1em;
-		  `
-		: undefined;
-};
-
 const extraHelpTextMargin = ( {
 	hasHelpText = false,
 }: FocalPointPickerControlsProps ) => {
@@ -106,7 +96,6 @@ export const ControlWrapper = styled( Flex )`
 	padding-top: 1em;
 
 	${ extraHelpTextMargin }
-	${ deprecatedBottomMargin }
 `;
 
 export const GridView = styled.div`

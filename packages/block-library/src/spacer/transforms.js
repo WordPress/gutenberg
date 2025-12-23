@@ -10,7 +10,7 @@ const transforms = {
 			blocks: [ 'core/separator' ], // Transform to Separator.
 			transform: ( { anchor } ) => {
 				return createBlock( 'core/separator', {
-					anchor: anchor || '',
+					anchor: anchor || undefined,
 				} );
 			},
 		},

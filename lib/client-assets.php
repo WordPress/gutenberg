@@ -151,6 +151,18 @@ function gutenberg_register_packages_styles( $styles ) {
 	// wp-customize-widgets: add wp-edit-blocks (custom handle not auto-inferred)
 	$styles->query( 'wp-customize-widgets', 'registered' )->deps[] = 'wp-edit-blocks';
 
+	// Register wp-base-styles and add it to the already registered wp-admin stylesheet
+	gutenberg_override_style(
+		$styles,
+		'wp-base-styles',
+		gutenberg_url( 'build/styles/base-styles/admin-schemes.css' ),
+		array(),
+		$version
+	);
+	$styles->add_data( 'wp-base-styles', 'rtl', 'replace' );
+	$styles->add_data( 'wp-base-styles', 'path', gutenberg_dir_path() . 'build/styles/base-styles/admin-schemes.css' );
+	$styles->query( 'wp-admin', 'registered' )->deps[] = 'wp-base-styles';
+
 	gutenberg_override_style(
 		$styles,
 		'wp-block-editor-content',
@@ -181,6 +193,7 @@ function gutenberg_register_packages_styles( $styles ) {
 		// Until #37466, we can't specifically add them as editor styles yet,
 		// so we must hard-code it here as a dependency.
 		'wp-block-editor-content',
+		'wp-base-styles',
 	);
 
 	// Only load the default layout and margin styles for themes without theme.json file.
@@ -413,4 +426,9 @@ add_action( 'wp_footer', 'gutenberg_enqueue_stored_styles', 1 );
 add_action( 'enqueue_block_editor_assets', 'gutenberg_enqueue_latex_to_mathml_loader' );
 function gutenberg_enqueue_latex_to_mathml_loader() {
 	wp_enqueue_script_module( '@wordpress/latex-to-mathml/loader' );
+}
+
+add_action( 'admin_enqueue_scripts', 'gutenberg_enqueue_core_abilities' );
+function gutenberg_enqueue_core_abilities() {
+	wp_enqueue_script_module( '@wordpress/core-abilities' );
 }

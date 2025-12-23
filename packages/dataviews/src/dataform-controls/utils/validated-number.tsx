@@ -14,7 +14,7 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { OPERATOR_BETWEEN } from '../../constants';
-import type { DataFormControlProps } from '../../types';
+import type { DataFormControlProps, FormatNumber } from '../../types';
 import { unlock } from '../../lock-unlock';
 import getCustomValidity from './get-custom-validity';
 
@@ -57,7 +57,6 @@ function BetweenControls( {
 
 	return (
 		<BaseControl
-			__nextHasNoMarginBottom
 			help={ __( 'The max. value must be greater than the min. value.' ) }
 		>
 			<Flex direction="row" gap={ 4 }>
@@ -84,23 +83,15 @@ function BetweenControls( {
 	);
 }
 
-export type DataFormValidatedNumberControlProps< Item > =
-	DataFormControlProps< Item > & {
-		/**
-		 * Number of decimals, acceps non-negative integer.
-		 */
-		decimals: number;
-	};
-
 export default function ValidatedNumber< Item >( {
 	data,
 	field,
 	onChange,
 	hideLabelFromVision,
 	operator,
-	decimals,
 	validity,
-}: DataFormValidatedNumberControlProps< Item > ) {
+}: DataFormControlProps< Item > ) {
+	const decimals = ( field.format as FormatNumber )?.decimals ?? 0;
 	const step = Math.pow( 10, Math.abs( decimals ) * -1 );
 	const { label, description, getValue, setValue, isValid } = field;
 	const value = getValue( { item: data } ) ?? '';
@@ -157,7 +148,7 @@ export default function ValidatedNumber< Item >( {
 
 	return (
 		<ValidatedNumberControl
-			required={ !! isValid?.required }
+			required={ !! isValid.required }
 			customValidity={ getCustomValidity( isValid, validity ) }
 			label={ label }
 			help={ description }
@@ -166,8 +157,8 @@ export default function ValidatedNumber< Item >( {
 			__next40pxDefaultSize
 			hideLabelFromVision={ hideLabelFromVision }
 			step={ step }
-			min={ isValid?.min }
-			max={ isValid?.max }
+			min={ isValid.min ? isValid.min.constraint : undefined }
+			max={ isValid.max ? isValid.max.constraint : undefined }
 		/>
 	);
 }

@@ -35,6 +35,7 @@ import {
 	selectBlockPatternsKey,
 	reusableBlocksSelectKey,
 	sectionRootClientIdKey,
+	isIsolatedEditorKey,
 } from './private-keys';
 
 const { isContentBlock } = unlock( blocksPrivateApis );
@@ -524,9 +525,15 @@ export function isSectionBlock( state, clientId ) {
 
 	const attributes = getBlockAttributes( state, clientId );
 	const isTemplatePart = blockName === 'core/template-part';
+
+	// When in an isolated editing context (e.g., editing a template part or pattern directly),
+	// don't treat nested unsynced patterns as section blocks.
+	const isIsolatedEditor = state.settings?.[ isIsolatedEditorKey ];
+
 	if (
 		( attributes?.metadata?.patternName || isTemplatePart ) &&
-		!! window?.__experimentalContentOnlyPatternInsertion
+		!! window?.__experimentalContentOnlyPatternInsertion &&
+		! isIsolatedEditor
 	) {
 		return true;
 	}
@@ -710,7 +717,7 @@ export function getInsertionPoint( state ) {
  */
 export const isBlockHidden = ( state, clientId ) => {
 	const blockName = getBlockName( state, clientId );
-	if ( ! hasBlockSupport( state, blockName, 'visibility', true ) ) {
+	if ( ! hasBlockSupport( blockName, 'visibility', true ) ) {
 		return false;
 	}
 	const attributes = state.blocks.attributes.get( clientId );

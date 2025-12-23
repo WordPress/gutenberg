@@ -67,6 +67,7 @@ export default function ViewActivity< Item >(
 							groupName={ groupName }
 							groupData={ groupData }
 							groupField={ groupField }
+							showLabel={ view.groupBy?.showLabel !== false }
 						>
 							<ActivityItems< Item >
 								{ ...props }

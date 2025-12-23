@@ -19,7 +19,7 @@ import {
  */
 import { PREFERENCES_DEFAULTS, SETTINGS_DEFAULTS } from './defaults';
 import { insertAt, moveTo } from './array';
-import { sectionRootClientIdKey } from './private-keys';
+import { sectionRootClientIdKey, isIsolatedEditorKey } from './private-keys';
 import { unlock } from '../lock-unlock';
 
 const { isContentBlock } = unlock( blocksPrivateApis );
@@ -2292,10 +2292,16 @@ function getDerivedBlockEditingModesForTree( state, treeClientId = '' ) {
 		( clientId ) =>
 			state.blockListSettings[ clientId ]?.templateLock === 'contentOnly'
 	);
+
+	// When in an isolated editing context (e.g., editing a template part or pattern directly),
+	// don't apply contentOnly mode to nested unsynced patterns or template parts.
+	const isIsolatedEditor = state.settings?.[ isIsolatedEditorKey ];
+
 	// Use array.from for better back compat. Older versions of the iterator returned
 	// from `keys()` didn't have the `filter` method.
 	const unsyncedPatternClientIds =
-		!! window?.__experimentalContentOnlyPatternInsertion
+		!! window?.__experimentalContentOnlyPatternInsertion &&
+		! isIsolatedEditor
 			? Array.from( state.blocks.attributes.keys() ).filter(
 					( clientId ) =>
 						state.blocks.attributes.get( clientId )?.metadata
@@ -2305,7 +2311,8 @@ function getDerivedBlockEditingModesForTree( state, treeClientId = '' ) {
 	const contentOnlyParents = [
 		...contentOnlyTemplateLockedClientIds,
 		...unsyncedPatternClientIds,
-		...( window?.__experimentalContentOnlyPatternInsertion
+		...( window?.__experimentalContentOnlyPatternInsertion &&
+		! isIsolatedEditor
 			? templatePartClientIds
 			: [] ),
 	];

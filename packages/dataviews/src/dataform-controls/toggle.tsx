@@ -33,7 +33,6 @@ export default function Toggle< Item >( {
 			required={ !! isValid.required }
 			customValidity={ getCustomValidity( isValid, validity ) }
 			hidden={ hideLabelFromVision }
-			__nextHasNoMarginBottom
 			label={ label }
 			help={ description }
 			checked={ getValue( { item: data } ) }

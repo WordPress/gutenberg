@@ -218,10 +218,12 @@ function GridItem< Item >( {
 function GridGroup< Item >( {
 	groupName,
 	groupField,
+	showLabel = true,
 	children,
 }: {
 	groupName: string;
 	groupField: NormalizedField< Item >;
+	showLabel?: boolean;
 	children: ReactNode;
 } ) {
 	const headerId = useInstanceId(
@@ -239,12 +241,14 @@ function GridGroup< Item >( {
 				className="dataviews-view-picker-grid-group__header"
 				id={ headerId }
 			>
-				{ sprintf(
-					// translators: 1: The label of the field e.g. "Date". 2: The value of the field, e.g.: "May 2022".
-					__( '%1$s: %2$s' ),
-					groupField.label,
-					groupName
-				) }
+				{ showLabel
+					? sprintf(
+							// translators: 1: The label of the field e.g. "Date". 2: The value of the field, e.g.: "May 2022".
+							__( '%1$s: %2$s' ),
+							groupField.label,
+							groupName
+					  )
+					: groupName }
 			</h3>
 			{ children }
 		</VStack>
@@ -346,6 +350,9 @@ function ViewPickerGrid< Item >( {
 									key={ groupName }
 									groupName={ groupName }
 									groupField={ groupField }
+									showLabel={
+										view.groupBy?.showLabel !== false
+									}
 								>
 									<GridItems
 										previewSize={ usedPreviewSize }
