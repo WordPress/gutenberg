@@ -29,8 +29,12 @@ export default function HomeEdit( { attributes, setAttributes, context } ) {
 			[ `has-${ backgroundColor }-background-color` ]: !! backgroundColor,
 		} ),
 		style: {
-			color: style?.color?.text,
-			backgroundColor: style?.color?.background,
+			...( ! attributes?.style?.color?.text && {
+				color: style?.color?.text,
+			} ),
+			...( ! attributes?.style?.color?.background && {
+				backgroundColor: style?.color?.background,
+			} ),
 		},
 	} );
 

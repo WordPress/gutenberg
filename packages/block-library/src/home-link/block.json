@@ -25,6 +25,26 @@
 	"supports": {
 		"reusable": false,
 		"html": false,
+		"__experimentalBorder": {
+			"color": true,
+			"width": true,
+			"style": true,
+			"radius": true,
+			"__experimentalDefaultControls": {
+				"width": true,
+				"radius": true
+			}
+		},
+		"color": {
+			"__experimentalDefaultControls": {
+				"background": true,
+				"text": true
+			}
+		},
+		"spacing": {
+			"padding": true,
+			"margin": true
+		},
 		"typography": {
 			"fontSize": true,
 			"lineHeight": true,
@@ -40,6 +60,9 @@
 		},
 		"interactivity": {
 			"clientNavigation": true
+		},
+		"border": {
+			"radius": true
 		}
 	},
 	"editorStyle": "wp-block-home-link-editor",
