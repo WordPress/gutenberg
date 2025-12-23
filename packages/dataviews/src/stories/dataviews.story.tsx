@@ -448,7 +448,7 @@ export const FreeComposition = () => {
 						<Text size={ 18 } as="p">
 							No planets
 						</Text>
-						<Text variant="muted">{ `Try a different search because "${ view.search }" returned no results.` }</Text>
+						<Text variant="muted">{ `Try a different search because “${ view.search }” returned no results.` }</Text>
 						<Button variant="secondary">Create new planet</Button>
 					</Stack>
 				}
