@@ -19,27 +19,14 @@ import {
 import PatternSelection, { useBlockPatterns } from './pattern-selection';
 import { unlock } from '../../lock-unlock';
 
-export default function QueryToolbar( {
-	clientId,
-	attributes,
-	hasInnerBlocks,
-} ) {
+function PatternPicker( { clientId, attributes, hasInnerBlocks } ) {
 	const hasPatterns = useBlockPatterns( clientId, attributes ).length;
-	const isLocked = useSelect(
-		( select ) => {
-			const { isLockedBlock } = unlock( select( blockEditorStore ) );
-			return isLockedBlock( clientId );
-		},
-		[ clientId ]
-	);
-	if ( ! hasPatterns || isLocked ) {
+	if ( ! hasPatterns ) {
 		return null;
 	}
-
 	const buttonLabel = hasInnerBlocks
 		? __( 'Change design' )
 		: __( 'Choose pattern' );
-
 	return (
 		<BlockControls group="other">
 			<DropdownContentWrapper>
@@ -68,4 +55,18 @@ export default function QueryToolbar( {
 			</DropdownContentWrapper>
 		</BlockControls>
 	);
+}
+
+export default function QueryToolbar( props ) {
+	const isLocked = useSelect(
+		( select ) => {
+			const { isLockedBlock } = unlock( select( blockEditorStore ) );
+			return isLockedBlock( props.clientId );
+		},
+		[ props.clientId ]
+	);
+	if ( isLocked ) {
+		return null;
+	}
+	return <PatternPicker { ...props } />;
 }

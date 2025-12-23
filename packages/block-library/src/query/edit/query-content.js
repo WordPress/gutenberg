@@ -35,6 +35,7 @@ export default function QueryContent( {
 	clientId,
 	context,
 	name,
+	isSelected,
 } ) {
 	const {
 		queryId,
@@ -129,11 +130,13 @@ export default function QueryContent( {
 
 	return (
 		<>
-			<QueryToolbar
-				clientId={ clientId }
-				attributes={ attributes }
-				hasInnerBlocks
-			/>
+			{ isSelected && (
+				<QueryToolbar
+					clientId={ clientId }
+					attributes={ attributes }
+					hasInnerBlocks
+				/>
+			) }
 			<EnhancedPaginationModal
 				attributes={ attributes }
 				setAttributes={ setAttributes }
