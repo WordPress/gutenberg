@@ -172,7 +172,7 @@ function render_block_core_breadcrumbs( $attributes, $content, $block ) {
 	 *                                   - 'allow_html' (bool, optional) Whether to allow HTML in label
 	 * @param array    $attributes       Block attributes.
 	 */
-	$breadcrumb_items = apply_filters( 'block_core_breadcrumbs_items', $breadcrumb_items, $attributes );
+	$breadcrumb_items = apply_filters( 'block_core_breadcrumbs_items', $breadcrumb_items );
 
 	if ( empty( $breadcrumb_items ) ) {
 		return '';
