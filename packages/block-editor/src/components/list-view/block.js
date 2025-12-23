@@ -123,25 +123,42 @@ function ListViewBlock( {
 
 	const pasteStyles = usePasteStyles();
 
-	const { block, blockName, allowRightClickOverrides, isBlockHidden } =
-		useSelect(
-			( select ) => {
-				const { getBlock, getBlockName, getSettings } =
-					select( blockEditorStore );
-				const { isBlockHidden: _isBlockHidden } = unlock(
-					select( blockEditorStore )
-				);
+	const {
+		block,
+		blockName,
+		allowRightClickOverrides,
+		isBlockHidden,
+		hasHiddenParent,
+		isRootParentSelected,
+	} = useSelect(
+		( select ) => {
+			const { getBlock, getBlockName, getSettings } =
+				select( blockEditorStore );
+			const { isBlockHidden: _isBlockHidden } = unlock(
+				select( blockEditorStore )
+			);
 
-				return {
-					block: getBlock( clientId ),
-					blockName: getBlockName( clientId ),
-					allowRightClickOverrides:
-						getSettings().allowRightClickOverrides,
-					isBlockHidden: _isBlockHidden( clientId ),
-				};
-			},
-			[ clientId ]
-		);
+			const parentClientIds = getBlockParents( clientId );
+			const _hasHiddenParent = parentClientIds.some( ( parentId ) =>
+				_isBlockHidden( parentId )
+			);
+
+			const rootClientId = getBlockRootClientId( clientId );
+			const _isRootParentSelected =
+				rootClientId && selectedClientIds.includes( rootClientId );
+
+			return {
+				block: getBlock( clientId ),
+				blockName: getBlockName( clientId ),
+				allowRightClickOverrides:
+					getSettings().allowRightClickOverrides,
+				isBlockHidden: _isBlockHidden( clientId ),
+				hasHiddenParent: _hasHiddenParent,
+				isRootParentSelected: _isRootParentSelected,
+			};
+		},
+		[ clientId, getBlockParents, getBlockRootClientId, selectedClientIds ]
+	);
 
 	const showBlockActions =
 		// When a block hides its toolbar it also hides the block settings menu,
@@ -561,6 +578,9 @@ function ListViewBlock( {
 		'is-displacement-down': displacement === 'down',
 		'is-after-dragged-blocks': isAfterDraggedBlocks,
 		'is-nesting': isNesting,
+		'is-block-hidden': isBlockHidden,
+		'has-hidden-parent':
+			hasHiddenParent && ! isSelected && ! isRootParentSelected,
 	} );
 
 	// Only include all selected blocks if the currently clicked on block

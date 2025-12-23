@@ -314,7 +314,7 @@ test.describe( 'Block Visibility - Individual Block Hiding', () => {
 		await page.getByRole( 'menuitem', { name: 'Preferences' } ).click();
 		await page
 			.getByRole( 'checkbox', {
-				name: 'Show hidden blocks as ghost',
+				name: 'Show hidden blocks',
 			} )
 			.uncheck();
 		await page.getByRole( 'button', { name: 'Close' } ).click();
@@ -331,7 +331,7 @@ test.describe( 'Block Visibility - Individual Block Hiding', () => {
 		await page.getByRole( 'menuitem', { name: 'Preferences' } ).click();
 		await expect(
 			page.getByRole( 'checkbox', {
-				name: 'Show hidden blocks as ghost',
+				name: 'Show hidden blocks',
 			} )
 		).not.toBeChecked();
 	} );

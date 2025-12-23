@@ -103,25 +103,17 @@ _::-webkit-full-page-media, _:future, :root [data-has-multi-selection="true"] .b
 	// In order for the block toolbar to render correctly, blocks cannot be hidden.
 	// Instead, use styles to visually hide blocks.
 	// Default: ghost state (visible but dimmed with visual indicator).
-	.block-editor-block-list__block.is-block-hidden {
+	.block-editor-block-list__block.is-block-hidden:not(.is-selected):not(.is-multi-selected):not(.has-child-selected) {
 		opacity: 0.3;
 		border: 1px dashed currentColor;
 		position: relative;
 		background: repeating-linear-gradient(45deg, transparent, transparent 5px, rgba(0, 0, 0, 0.1) 5px, rgba(0, 0, 0, 0.1) 6px);
 		background-size: 12px 12px;
-
-		// When selected, show normally
-		&.is-selected,
-		&.is-multi-selected,
-		&.has-child-selected {
-			opacity: 1;
-			border: 1px dashed currentColor;
-			background: none;
-		}
 	}
 
 	// Fully hidden state (when preference is disabled).
-	.block-editor-block-list__block.is-block-hidden.is-fully-hidden {
+	// Applies to all hidden blocks when ghost mode is off (selected or not).
+	.block-editor-block-list__block.is-fully-hidden {
 		visibility: hidden;
 		overflow: hidden;
 		height: 0;
@@ -129,6 +121,9 @@ _::-webkit-full-page-media, _:future, :root [data-has-multi-selection="true"] .b
 		padding: 0 !important;
 		opacity: 0;
 		background: none;
+		position: fixed;
+		left: -9999px;
+		top: -9999px;
 	}
 
 	&.is-layout-flex:not(.is-vertical) > .is-block-hidden {

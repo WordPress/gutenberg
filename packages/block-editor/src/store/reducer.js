@@ -1220,6 +1220,22 @@ export function isBlockInterfaceHidden( state = false, action ) {
 }
 
 /**
+ * Reducer returning whether hidden blocks should be shown as ghost.
+ *
+ * @param {boolean} state  Current state.
+ * @param {Object}  action Dispatched action.
+ *
+ * @return {boolean} Updated state.
+ */
+export function showHiddenBlocksAsGhost( state = false, action ) {
+	switch ( action.type ) {
+		case 'TOGGLE_SHOW_HIDDEN_BLOCKS_AS_GHOST':
+			return action.showHiddenBlocksAsGhost;
+	}
+	return state;
+}
+
+/**
  * Reducer returning typing state.
  *
  * @param {boolean} state  Current state.
@@ -2149,6 +2165,7 @@ const combinedReducers = combineReducers( {
 	registeredInserterMediaCategories,
 	zoomLevel,
 	hasBlockSpotlight,
+	showHiddenBlocksAsGhost,
 } );
 
 /**

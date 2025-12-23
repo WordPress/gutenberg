@@ -12,7 +12,6 @@ import {
 	useDispatch,
 	useRegistry,
 } from '@wordpress/data';
-import { store as preferencesStore } from '@wordpress/preferences';
 import { useMergeRefs, useDebounce } from '@wordpress/compose';
 import {
 	createContext,
@@ -212,7 +211,9 @@ function Items( {
 				};
 			}
 
-			const { get } = select( preferencesStore );
+			const { shouldShowHiddenBlocksAsGhost } = unlock(
+				select( blockEditorStore )
+			);
 
 			const selectedBlockClientIds = getSelectedBlockClientIds();
 			const selectedBlockClientId = selectedBlockClientIds[ 0 ];
@@ -237,8 +238,7 @@ function Items( {
 				selectedBlocks: selectedBlockClientIds,
 				visibleBlocks: __unstableGetVisibleBlocks(),
 				isZoomOut: _isZoomOut(),
-				showHiddenBlocksAsGhost:
-					get( 'core', 'showHiddenBlocksAsGhost' ) ?? true,
+				showHiddenBlocksAsGhost: shouldShowHiddenBlocksAsGhost(),
 				shouldRenderAppender:
 					( ! isSectionBlock( rootClientId ) ||
 						isContainerInsertableToInContentOnlyMode(

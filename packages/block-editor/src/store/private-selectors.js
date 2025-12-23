@@ -739,6 +739,17 @@ export function hasBlockSpotlight( state ) {
 }
 
 /**
+ * Returns true if hidden blocks should be shown as ghost, or false otherwise.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} Whether hidden blocks should be shown as ghost.
+ */
+export function shouldShowHiddenBlocksAsGhost( state ) {
+	return state.showHiddenBlocksAsGhost ?? false;
+}
+
+/**
  * Returns whether a block is locked to prevent editing.
  *
  * This selector only reasons about block lock, not associated features

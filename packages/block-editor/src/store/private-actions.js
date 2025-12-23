@@ -466,3 +466,16 @@ export function toggleBlockSpotlight( clientId, hasBlockSpotlight ) {
 		hasBlockSpotlight,
 	};
 }
+
+/**
+ * Action that toggles whether hidden blocks should be shown as ghost.
+ *
+ * @param {boolean} showHiddenBlocksAsGhost Whether to show hidden blocks as ghost.
+ * @return {Object} Action object.
+ */
+export function toggleShowHiddenBlocksAsGhost( showHiddenBlocksAsGhost ) {
+	return {
+		type: 'TOGGLE_SHOW_HIDDEN_BLOCKS_AS_GHOST',
+		showHiddenBlocksAsGhost,
+	};
+}

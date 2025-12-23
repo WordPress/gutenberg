@@ -25,8 +25,8 @@ import { ActionItem } from '@wordpress/interface';
 /**
  * Internal dependencies
  */
-import { store as editorStore } from '../../store';
 import { store as blockEditorStore } from '@wordpress/block-editor';
+import { store as editorStore } from '../../store';
 import PostPreviewButton from '../post-preview-button';
 import { unlock } from '../../lock-unlock';
 
@@ -39,6 +39,7 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 		showIconLabels,
 		isTemplateHidden,
 		templateId,
+		showHiddenBlocksAsGhost,
 	} = useSelect( ( select ) => {
 		const {
 			getDeviceType,
@@ -48,6 +49,9 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 		} = select( editorStore );
 		const { getEntityRecord, getPostType } = select( coreStore );
 		const { get } = select( preferencesStore );
+		const { shouldShowHiddenBlocksAsGhost } = unlock(
+			select( blockEditorStore )
+		);
 		const _currentPostType = getCurrentPostType();
 		return {
 			deviceType: getDeviceType(),
@@ -57,12 +61,15 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 			showIconLabels: get( 'core', 'showIconLabels' ),
 			isTemplateHidden: getRenderingMode() === 'post-only',
 			templateId: getCurrentTemplateId(),
+			showHiddenBlocksAsGhost: shouldShowHiddenBlocksAsGhost(),
 		};
 	}, [] );
 	const { setDeviceType, setRenderingMode, setDefaultRenderingMode } = unlock(
 		useDispatch( editorStore )
 	);
-	const { resetZoomLevel } = unlock( useDispatch( blockEditorStore ) );
+	const { resetZoomLevel, toggleShowHiddenBlocksAsGhost } = unlock(
+		useDispatch( blockEditorStore )
+	);
 
 	const handleDevicePreviewChange = ( newDeviceType ) => {
 		setDeviceType( newDeviceType );
@@ -177,6 +184,20 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 							</MenuItem>
 						</MenuGroup>
 					) }
+					<MenuGroup>
+						<MenuItem
+							icon={ showHiddenBlocksAsGhost ? check : undefined }
+							isSelected={ showHiddenBlocksAsGhost }
+							role="menuitemcheckbox"
+							onClick={ () => {
+								toggleShowHiddenBlocksAsGhost(
+									! showHiddenBlocksAsGhost
+								);
+							} }
+						>
+							{ __( 'Show hidden blocks' ) }
+						</MenuItem>
+					</MenuGroup>
 					{ isViewable && (
 						<MenuGroup>
 							<PostPreviewButton

@@ -24,7 +24,6 @@ const withDeprecatedKeys =
 			'mostUsedBlocks',
 			'openPanels',
 			'showBlockBreadcrumbs',
-			'showHiddenBlocksAsGhost',
 			'showIconLabels',
 			'showListViewByDefault',
 			'isPublishSidebarEnabled',

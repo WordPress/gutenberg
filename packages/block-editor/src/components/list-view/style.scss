@@ -301,6 +301,11 @@
 		flex: 0 0 $icon-size;
 	}
 
+	&.is-block-hidden:not(.is-selected):not(.is-branch-selected),
+	&.has-hidden-parent:not(.is-selected):not(.is-branch-selected) {
+		opacity: 0.5;
+	}
+
 	.block-editor-list-view-block__menu-cell,
 	.block-editor-list-view-block__mover-cell,
 	.block-editor-list-view-block__contents-cell {

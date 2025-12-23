@@ -818,9 +818,19 @@ function BlockListBlockProvider( props ) {
 		themeSupportsLayout,
 		canMove,
 		isBlockHidden,
-		showHiddenBlocksAsGhost: showHiddenBlocksAsGhost ?? true,
+		showHiddenBlocksAsGhost: showHiddenBlocksAsGhost ?? false,
 		bindableAttributes,
 	};
+
+	if (
+		isBlockHidden &&
+		! showHiddenBlocksAsGhost &&
+		! isSelected &&
+		! isMultiSelected &&
+		! hasChildSelected
+	) {
+		return null;
+	}
 
 	// Here we separate between the props passed to BlockListBlock and any other
 	// information we selected for internal use. BlockListBlock is a filtered
