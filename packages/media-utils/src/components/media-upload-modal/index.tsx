@@ -271,7 +271,7 @@ export function MediaUploadModal( {
 					);
 
 					// Transform the selected posts to the expected Attachment format
-					const transformedPosts = selectedPosts
+					const transformedPosts = ( selectedPosts ?? [] )
 						?.map( transformAttachment )
 						.filter( Boolean );
 
@@ -279,7 +279,7 @@ export function MediaUploadModal( {
 						? transformedPosts
 						: transformedPosts?.[ 0 ];
 
-					onSelect( selectedItems ?? [] );
+					onSelect( selectedItems );
 				},
 			},
 		],
