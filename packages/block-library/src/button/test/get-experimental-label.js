@@ -27,4 +27,9 @@ describe( 'Button block __experimentalLabel', () => {
 		};
 		expect( getLabel( attributes ) ).toBe( 'Button' );
 	} );
+
+	it( 'returns "Button" when text is undefined', () => {
+		const attributes = {};
+		expect( getLabel( attributes ) ).toBe( 'Button' );
+	} );
 } );
