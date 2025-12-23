@@ -670,7 +670,7 @@ const FieldTypeStory = ( {
 					/>
 				</Stack>
 			) : (
-				<Stack direction="column" align="center">
+				<Stack direction="column" align="center" justify="center">
 					<span
 						style={ {
 							color: '#888',
