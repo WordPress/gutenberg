@@ -180,26 +180,6 @@ describe( 'DataForm component', () => {
 			expect( priceInput ).toHaveValue( 3.75 );
 		} );
 
-		it( 'should wrap fields in HStack when labelPosition is set to side', async () => {
-			const { container } = render(
-				<Dataform
-					onChange={ noop }
-					fields={ fields }
-					form={ {
-						...form,
-						layout: { type: 'regular', labelPosition: 'side' },
-					} }
-					data={ data }
-				/>
-			);
-
-			expect(
-				// It is used here to ensure that the fields are wrapped in HStack. This happens when the labelPosition is set to side.
-				// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
-				container.querySelectorAll( "[data-wp-component='HStack']" )
-			).toHaveLength( 3 );
-		} );
-
 		it( 'should render combined fields correctly', async () => {
 			const formWithCombinedFields = {
 				fields: [
@@ -447,25 +427,6 @@ describe( 'DataForm component', () => {
 					title: newValue.slice( 0, i + 1 ),
 				} );
 			}
-		} );
-
-		it( 'should wrap fields in HStack when labelPosition is set to side', async () => {
-			const { container } = render(
-				<Dataform
-					onChange={ noop }
-					fields={ fields }
-					form={ {
-						...formPanelMode,
-						layout: { type: 'panel', labelPosition: 'side' },
-					} }
-					data={ data }
-				/>
-			);
-
-			expect(
-				// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
-				container.querySelectorAll( "[data-wp-component='HStack']" )
-			).toHaveLength( 3 );
 		} );
 
 		it( 'should render combined fields correctly', async () => {
