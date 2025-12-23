@@ -9,7 +9,6 @@ import deepMerge from 'deepmerge';
 import { useCallback, useMemo, useState } from '@wordpress/element';
 import { Button, privateApis } from '@wordpress/components';
 import { Stack } from '@wordpress/ui';
-import '@wordpress/theme/design-tokens.css';
 
 /**
  * Internal dependencies

@@ -9,7 +9,6 @@ import type { ReactNode } from 'react';
 import { useEffect, useMemo, useRef, useState } from '@wordpress/element';
 import { useResizeObserver, throttle } from '@wordpress/compose';
 import { Stack } from '@wordpress/ui';
-import '@wordpress/theme/design-tokens.css';
 
 /**
  * Internal dependencies

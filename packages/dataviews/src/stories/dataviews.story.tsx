@@ -23,7 +23,6 @@ import {
 } from '@wordpress/components';
 import { __, _n } from '@wordpress/i18n';
 import { Stack } from '@wordpress/ui';
-import '@wordpress/theme/design-tokens.css';
 
 /**
  * Internal dependencies

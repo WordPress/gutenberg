@@ -8,7 +8,6 @@ import {
 	__experimentalInputControlSuffixWrapper as InputControlSuffixWrapper,
 } from '@wordpress/components';
 import { Stack } from '@wordpress/ui';
-import '@wordpress/theme/design-tokens.css';
 import { starFilled } from '@wordpress/icons';
 
 /**

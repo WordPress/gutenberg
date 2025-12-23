@@ -9,7 +9,6 @@ import type { Meta } from '@storybook/react';
 import { useState, useMemo, useCallback, useEffect } from '@wordpress/element';
 import { Modal, Button } from '@wordpress/components';
 import { Stack } from '@wordpress/ui';
-import '@wordpress/theme/design-tokens.css';
 
 /**
  * Internal dependencies

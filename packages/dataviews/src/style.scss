@@ -1,3 +1,5 @@
+@use "@wordpress/theme/src/prebuilt/css/design-tokens.css" as *;
+
 @use "./components/dataviews/style.scss" as *;
 @use "./components/dataviews-bulk-actions/style.scss" as *;
 @use "./components/dataviews-filters/style.scss" as *;
