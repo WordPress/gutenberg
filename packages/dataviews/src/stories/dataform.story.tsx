@@ -1391,7 +1391,7 @@ const ValidationComponent = ( {
 
 	return (
 		<form>
-			<Stack direction="column" align="left">
+			<Stack direction="column" align="start" gap="xl">
 				<DataForm< ValidatedItem >
 					data={ post }
 					fields={ _fields }
