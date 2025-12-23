@@ -40,7 +40,7 @@ function DropdownHeader( {
 			className="dataforms-layouts-panel__dropdown-header"
 			gap="md"
 		>
-			<Stack direction="row" align="center">
+			<Stack direction="row" gap="xs" align="center">
 				{ title && (
 					<Heading level={ 2 } size={ 13 }>
 						{ title }
