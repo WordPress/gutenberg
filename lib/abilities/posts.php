@@ -103,6 +103,10 @@ function _gutenberg_register_core_posts_abilities() {
 						'type'        => 'string',
 						'description' => __( 'Page template file to use (e.g., "templates/full-width.php").', 'gutenberg' ),
 					),
+					'slug'           => array(
+						'type'        => 'string',
+						'description' => __( 'Alphanumeric identifier for the post.', 'gutenberg' ),
+					),
 				),
 			),
 			'output_schema'       => array(
@@ -128,6 +132,23 @@ function _gutenberg_register_core_posts_abilities() {
 				$cap = $pto->cap->create_posts ?? $pto->cap->edit_posts;
 				if ( ! current_user_can( $cap ) ) {
 					return false;
+				}
+
+				// Check publish_posts capability for publish/private/future statuses.
+				if ( isset( $input['status'] ) ) {
+					$status = sanitize_key( (string) $input['status'] );
+					if ( in_array( $status, array( 'publish', 'private', 'future' ), true ) ) {
+						if ( ! current_user_can( $pto->cap->publish_posts ) ) {
+							return false;
+						}
+					}
+				}
+
+				// Check edit_others_posts capability when setting different author.
+				if ( ! empty( $input['author'] ) && (int) $input['author'] !== get_current_user_id() ) {
+					if ( ! current_user_can( $pto->cap->edit_others_posts ) ) {
+						return false;
+					}
 				}
 
 				// Merge categories and tags into tax_input for unified processing.
@@ -167,12 +188,15 @@ function _gutenberg_register_core_posts_abilities() {
 				if ( ! post_type_exists( $post_type ) ) {
 					return new WP_Error(
 						'ability_core-create-post_invalid_post_type',
-						/* translators: %s ability name. */
-						sprintf( __( 'Post type "%s" does not exist.' ), esc_html( $post_type ) )
+						/* translators: %s: post type name. */
+						sprintf( __( 'Post type "%s" does not exist.', 'gutenberg' ), esc_html( $post_type ) )
 					);
 				}
 
-				$status  = isset( $input['status'] ) ? sanitize_key( (string) $input['status'] ) : 'draft';
+				$status = isset( $input['status'] ) ? sanitize_key( (string) $input['status'] ) : 'draft';
+				if ( ! get_post_status_object( $status ) ) {
+					$status = 'draft';
+				}
 				$postarr = array(
 					'post_type'   => $post_type,
 					'post_status' => $status,
@@ -187,7 +211,14 @@ function _gutenberg_register_core_posts_abilities() {
 					$postarr['post_excerpt'] = wp_kses_post( (string) $input['excerpt'] );
 				}
 				if ( ! empty( $input['author'] ) ) {
-					$postarr['post_author'] = (int) $input['author'];
+					$author_id = (int) $input['author'];
+					if ( $author_id !== get_current_user_id() && ! get_userdata( $author_id ) ) {
+						return new WP_Error(
+							'ability_core-create-post_invalid_author',
+							__( 'Invalid author ID.', 'gutenberg' )
+						);
+					}
+					$postarr['post_author'] = $author_id;
 				}
 				if ( ! empty( $input['meta'] ) && is_array( $input['meta'] ) ) {
 					$postarr['meta_input'] = $input['meta'];
@@ -212,13 +243,32 @@ function _gutenberg_register_core_posts_abilities() {
 					$postarr['post_password'] = sanitize_text_field( (string) $input['password'] );
 				}
 				if ( ! empty( $input['parent'] ) ) {
-					$postarr['post_parent'] = (int) $input['parent'];
+					$parent_id = (int) $input['parent'];
+					if ( $parent_id && ! get_post( $parent_id ) ) {
+						return new WP_Error(
+							'ability_core-create-post_invalid_parent',
+							__( 'Invalid parent post ID.', 'gutenberg' )
+						);
+					}
+					$postarr['post_parent'] = $parent_id;
 				}
 				if ( isset( $input['menu_order'] ) ) {
 					$postarr['menu_order'] = (int) $input['menu_order'];
 				}
 				if ( ! empty( $input['template'] ) ) {
-					$postarr['page_template'] = sanitize_text_field( (string) $input['template'] );
+					$template = sanitize_text_field( (string) $input['template'] );
+					$valid_templates = array_keys( wp_get_theme()->get_page_templates( null, $post_type ) );
+					$valid_templates[] = ''; // Allow empty template.
+					if ( ! in_array( $template, $valid_templates, true ) ) {
+						return new WP_Error(
+							'ability_core-create-post_invalid_template',
+							__( 'Invalid template.', 'gutenberg' )
+						);
+					}
+					$postarr['page_template'] = $template;
+				}
+				if ( ! empty( $input['slug'] ) ) {
+					$postarr['post_name'] = sanitize_title( (string) $input['slug'] );
 				}
 
 				// Merge categories and tags into tax_input for unified processing.
@@ -284,8 +334,7 @@ function _gutenberg_register_core_posts_abilities() {
 				if ( ! $post ) {
 					return new WP_Error(
 						'ability_core-create-post_creation_failed',
-						/* translators: %s ability name. */
-						sprintf( __( 'Post created but could not be loaded.' ), esc_html( $post_type ) )
+						__( 'Post created but could not be loaded.', 'gutenberg' )
 					);
 
 				}
