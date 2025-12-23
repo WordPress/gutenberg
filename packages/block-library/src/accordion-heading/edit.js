@@ -9,9 +9,18 @@ import {
 	RichText,
 	getTypographyClassesAndStyles as useTypographyProps,
 	useSettings,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
+import { useSelect, useDispatch } from '@wordpress/data';
+import { createBlock } from '@wordpress/blocks';
+import { ENTER } from '@wordpress/keycodes';
 
-export default function Edit( { attributes, setAttributes, context } ) {
+export default function Edit( {
+	attributes,
+	setAttributes,
+	context,
+	clientId,
+} ) {
 	const { title } = attributes;
 	const {
 		'core/accordion-icon-position': iconPosition,
@@ -46,6 +55,63 @@ export default function Edit( { attributes, setAttributes, context } ) {
 	const blockProps = useBlockProps();
 	const spacingProps = useSpacingProps( attributes );
 
+	const { selectBlock, insertBlock } = useDispatch( blockEditorStore );
+
+	const { panelClientId, firstPanelBlockClientId } = useSelect(
+		( select ) => {
+			const { getBlock, getBlockParents, getBlocks } =
+				select( blockEditorStore );
+
+			const parents = getBlockParents( clientId );
+			const accordionItemId = parents.find( ( parentId ) => {
+				const block = getBlock( parentId );
+				return block?.name === 'core/accordion-item';
+			} );
+
+			if ( ! accordionItemId ) {
+				return {
+					panelClientId: null,
+					firstPanelBlockClientId: null,
+				};
+			}
+
+			const accordionItem = getBlock( accordionItemId );
+			const panelBlock = accordionItem?.innerBlocks?.find(
+				( block ) => block.name === 'core/accordion-panel'
+			);
+
+			if ( ! panelBlock ) {
+				return {
+					panelClientId: null,
+					firstPanelBlockClientId: null,
+				};
+			}
+
+			const panelBlocks = getBlocks( panelBlock.clientId );
+			const firstBlock = panelBlocks?.[ 0 ];
+
+			return {
+				panelClientId: panelBlock.clientId,
+				firstPanelBlockClientId: firstBlock?.clientId,
+			};
+		},
+		[ clientId ]
+	);
+
+	const handleKeyDown = ( event ) => {
+		if ( event.keyCode === ENTER && ! event.shiftKey ) {
+			event.preventDefault();
+			event.stopPropagation();
+
+			if ( firstPanelBlockClientId ) {
+				selectBlock( firstPanelBlockClientId );
+			} else if ( panelClientId ) {
+				const newParagraphBlock = createBlock( 'core/paragraph' );
+				insertBlock( newParagraphBlock, 0, panelClientId, true );
+			}
+		}
+	};
+
 	return (
 		<TagName { ...blockProps }>
 			<button
@@ -69,6 +135,7 @@ export default function Edit( { attributes, setAttributes, context } ) {
 					onChange={ ( newTitle ) =>
 						setAttributes( { title: newTitle } )
 					}
+					onKeyDown={ handleKeyDown }
 					placeholder={ __( 'Accordion title' ) }
 					className="wp-block-accordion-heading__toggle-title"
 					style={ {
