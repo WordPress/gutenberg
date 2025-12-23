@@ -3,9 +3,9 @@
  */
 import {
 	useBlockProps,
-	getTypographyClassesAndStyles,
 	__experimentalGetSpacingClassesAndStyles as getSpacingClassesAndStyles,
 	RichText,
+	getTypographyClassesAndStyles,
 } from '@wordpress/block-editor';
 
 const v1 = {
