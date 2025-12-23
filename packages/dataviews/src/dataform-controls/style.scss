@@ -19,6 +19,11 @@
 	}
 }
 
+.dataviews-controls__date-range-inputs > * {
+	flex: 1 1 50%;
+	min-width: 0;
+}
+
 .dataviews-controls__date-preset {
 	border: 1px solid #ddd;
 

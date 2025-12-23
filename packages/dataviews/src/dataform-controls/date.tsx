@@ -597,7 +597,11 @@ function CalendarDateRangeControl< Item >( {
 					</Stack>
 
 					{ /* Manual date range inputs */ }
-					<Stack direction="row" gap="xs">
+					<Stack
+						direction="row"
+						gap="xs"
+						className="dataviews-controls__date-range-inputs"
+					>
 						<InputControl
 							__next40pxDefaultSize
 							ref={ fromInputRef }
