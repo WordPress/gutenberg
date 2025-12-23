@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 11.1.0 (2025-12-23)
+
 ### Code Quality
 
 - DataViews: Remove extra wrapper for GridItem. [#73665](https://github.com/WordPress/gutenberg/pull/73665)
