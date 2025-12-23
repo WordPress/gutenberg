@@ -9,7 +9,6 @@ import clsx from 'clsx';
 import { useContext, useMemo } from '@wordpress/element';
 import {
 	__experimentalHeading as Heading,
-	__experimentalSpacer as Spacer,
 	BaseControl,
 } from '@wordpress/components';
 import { Stack } from '@wordpress/ui';
@@ -37,7 +36,6 @@ function Header( { title }: { title: string } ) {
 				<Heading level={ 2 } size={ 13 }>
 					{ title }
 				</Heading>
-				<Spacer />
 			</Stack>
 		</Stack>
 	);
