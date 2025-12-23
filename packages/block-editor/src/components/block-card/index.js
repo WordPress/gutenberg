@@ -11,6 +11,7 @@ import {
 	Icon,
 	__experimentalText as Text,
 	__experimentalVStack as VStack,
+	__experimentalHStack as HStack,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
@@ -105,7 +106,7 @@ function BlockCard( {
 		( { title, icon, description } = blockType );
 	}
 
-	const { parentNavBlockClientId, parentBlockName } = useSelect(
+	const { parentBlockClientId, parentBlockName } = useSelect(
 		( select ) => {
 			if ( parentClientId || isChild || ! allowParentNavigation ) {
 				return {};
@@ -126,7 +127,7 @@ function BlockCard( {
 			} );
 
 			return {
-				parentNavBlockClientId: foundParentId,
+				parentBlockClientId: foundParentId,
 				parentBlockName: foundParentId
 					? getBlockName( foundParentId )
 					: null,
@@ -150,59 +151,66 @@ function BlockCard( {
 				className
 			) }
 		>
-			{ parentNavBlockClientId && (
-				<Button
-					onClick={ () => selectBlock( parentNavBlockClientId ) }
-					label={
-						parentBlockName
-							? sprintf(
-									/* translators: %s: The name of the parent block. */
-									__( 'Go to "%s" block' ),
-									getBlockType( parentBlockName )?.title
-							  )
-							: __( 'Go to parent block' )
-					}
-					style={
-						// TODO: This style override is also used in ToolsPanelHeader.
-						// It should be supported out-of-the-box by Button.
-						{ minWidth: 24, padding: 0 }
-					}
-					icon={ isRTL() ? chevronRight : chevronLeft }
-					size="small"
-				/>
-			) }
-			{ isChild && (
-				<span className="block-editor-block-card__child-indicator-icon">
-					<Icon icon={ isRTL() ? arrowLeft : arrowRight } />
-				</span>
-			) }
-			<OptionalParentSelectButton
-				onClick={
-					parentClientId
-						? () => {
-								selectBlock( parentClientId );
-						  }
-						: undefined
-				}
-			>
-				<BlockIcon icon={ icon } showColors />
-				<VStack spacing={ 1 }>
-					<TitleElement className="block-editor-block-card__title">
-						<span className="block-editor-block-card__name">
-							{ !! name?.length ? name : title }
-						</span>
-						{ ! parentClientId && ! isChild && !! name?.length && (
-							<Badge>{ title }</Badge>
-						) }
-					</TitleElement>
-					{ ! parentClientId && ! isChild && description && (
-						<Text className="block-editor-block-card__description">
-							{ description }
-						</Text>
+			<VStack>
+				<HStack justify="flex-start" spacing={ 0 }>
+					{ parentBlockClientId && (
+						<Button
+							onClick={ () => selectBlock( parentBlockClientId ) }
+							label={
+								parentBlockName
+									? sprintf(
+											/* translators: %s: The name of the parent block. */
+											__( 'Go to "%s" block' ),
+											getBlockType( parentBlockName )
+												?.title
+									  )
+									: __( 'Go to parent block' )
+							}
+							style={
+								// TODO: This style override is also used in ToolsPanelHeader.
+								// It should be supported out-of-the-box by Button.
+								{ minWidth: 24, padding: 0 }
+							}
+							icon={ isRTL() ? chevronRight : chevronLeft }
+							size="small"
+						/>
 					) }
-					{ children }
-				</VStack>
-			</OptionalParentSelectButton>
+					{ isChild && (
+						<span className="block-editor-block-card__child-indicator-icon">
+							<Icon icon={ isRTL() ? arrowLeft : arrowRight } />
+						</span>
+					) }
+					<OptionalParentSelectButton
+						onClick={
+							parentClientId
+								? () => {
+										selectBlock( parentClientId );
+								  }
+								: undefined
+						}
+					>
+						<BlockIcon icon={ icon } showColors />
+						<VStack spacing={ 1 }>
+							<TitleElement className="block-editor-block-card__title">
+								<span className="block-editor-block-card__name">
+									{ !! name?.length ? name : title }
+								</span>
+								{ ! parentClientId &&
+									! isChild &&
+									!! name?.length && (
+										<Badge>{ title }</Badge>
+									) }
+							</TitleElement>
+							{ children }
+						</VStack>
+					</OptionalParentSelectButton>
+				</HStack>
+				{ ! parentClientId && ! isChild && description && (
+					<Text className="block-editor-block-card__description">
+						{ description }
+					</Text>
+				) }
+			</VStack>
 		</div>
 	);
 }
