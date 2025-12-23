@@ -168,6 +168,7 @@ export function DataViewsPickerFooter() {
 			justify="space-between"
 			align="center"
 			className="dataviews-footer"
+			gap="xs"
 		>
 			<Stack
 				direction="row"

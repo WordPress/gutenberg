@@ -42,6 +42,7 @@ export default function DataViewsFooter() {
 				justify="end"
 				align="center"
 				className="dataviews-footer"
+				gap="xs"
 			>
 				{ hasBulkActions && <BulkActionsFooter /> }
 				<DataViewsPagination />
