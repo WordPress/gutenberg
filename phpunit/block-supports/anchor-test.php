@@ -70,7 +70,7 @@ class WP_Block_Supports_Anchor_Test extends WP_UnitTestCase {
 	 */
 	public function data_anchor_block_support() {
 		return array(
-			'anchor id attribute is applied' => array(
+			'anchor id attribute is applied'          => array(
 				'support'  => true,
 				'value'    => 'my-anchor',
 				'expected' => array( 'id' => 'my-anchor' ),
@@ -80,12 +80,12 @@ class WP_Block_Supports_Anchor_Test extends WP_UnitTestCase {
 				'value'    => 'my-anchor',
 				'expected' => array(),
 			),
-			'empty anchor value returns empty array' => array(
+			'empty anchor value returns empty array'  => array(
 				'support'  => true,
 				'value'    => '',
 				'expected' => array(),
 			),
-			'null anchor value returns empty array' => array(
+			'null anchor value returns empty array'   => array(
 				'support'  => true,
 				'value'    => null,
 				'expected' => array(),
@@ -95,37 +95,37 @@ class WP_Block_Supports_Anchor_Test extends WP_UnitTestCase {
 				'value'    => '   ',
 				'expected' => array( 'id' => '   ' ),
 			),
-			'anchor with hyphen and numbers' => array(
+			'anchor with hyphen and numbers'          => array(
 				'support'  => true,
 				'value'    => 'section-123',
 				'expected' => array( 'id' => 'section-123' ),
 			),
-			'anchor with underscore' => array(
+			'anchor with underscore'                  => array(
 				'support'  => true,
 				'value'    => 'my_anchor_id',
 				'expected' => array( 'id' => 'my_anchor_id' ),
 			),
-			'anchor with colon (valid in HTML5)' => array(
+			'anchor with colon (valid in HTML5)'      => array(
 				'support'  => true,
 				'value'    => 'my:anchor',
 				'expected' => array( 'id' => 'my:anchor' ),
 			),
-			'anchor with period (valid in HTML5)' => array(
+			'anchor with period (valid in HTML5)'     => array(
 				'support'  => true,
 				'value'    => 'my.anchor',
 				'expected' => array( 'id' => 'my.anchor' ),
 			),
-			'numeric anchor value' => array(
+			'numeric anchor value'                    => array(
 				'support'  => true,
 				'value'    => '123',
 				'expected' => array( 'id' => '123' ),
 			),
-			'zero string anchor value is applied' => array(
+			'zero string anchor value is applied'     => array(
 				'support'  => true,
 				'value'    => '0',
 				'expected' => array( 'id' => '0' ),
 			),
-			'false value is treated as empty' => array(
+			'false value is treated as empty'         => array(
 				'support'  => true,
 				'value'    => false,
 				'expected' => array(),
