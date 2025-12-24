@@ -227,7 +227,7 @@ export const modifiers: WPModifierHandler< WPModifier > = {
  * ```js
  * // Assuming macOS:
  * rawShortcut.primary( 'm' )
- * // "meta+m""
+ * // "meta+m"
  * ```
  */
 export const rawShortcut: WPModifierHandler< WPKeyHandler< string > > =
@@ -239,6 +239,19 @@ export const rawShortcut: WPModifierHandler< WPKeyHandler< string > > =
 			);
 		};
 	} );
+
+/**
+ * An object that contains functions to get shortcuts in a format compatible
+ * with the [`aria-keyshortcuts` HTML attribute](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Reference/Attributes/aria-keyshortcuts).
+ *
+ * @example
+ * ```js
+ * // Assuming macOS:
+ * ariaKeyShortcut.primary( 'c' )
+ * // "meta+c"
+ * ```
+ */
+export const ariaKeyShortcut = rawShortcut;
 
 /**
  * Return an array of the parts of a keyboard shortcut chord for display.

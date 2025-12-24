@@ -42,6 +42,18 @@ onKeyDown( event ) {
 
 Keycode for ALT key.
 
+### ariaKeyShortcut
+
+An object that contains functions to get shortcuts in a format compatible with the [`aria-keyshortcuts` HTML attribute](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Reference/Attributes/aria-keyshortcuts).
+
+_Usage_
+
+```js
+// Assuming macOS:
+ariaKeyShortcut.primary( 'c' );
+// "meta+c"
+```
+
 ### BACKSPACE
 
 Keycode for BACKSPACE key.
@@ -167,7 +179,7 @@ _Usage_
 ```js
 // Assuming macOS:
 rawShortcut.primary( 'm' );
-// "meta+m""
+// "meta+m"
 ```
 
 ### RIGHT
