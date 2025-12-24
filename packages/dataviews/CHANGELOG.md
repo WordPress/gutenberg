@@ -10,6 +10,7 @@
 - Field API: move format logic to the field type. [#73922](https://github.com/WordPress/gutenberg/pull/73922)
 - Reorganize internal code. [#74188](https://github.com/WordPress/gutenberg/pull/74188)
 - Improve stories and tests. [#74192](https://github.com/WordPress/gutenberg/pull/74192)
+- Update DataForm stories. [#74196](https://github.com/WordPress/gutenberg/pull/74196)
 
 ### Bug Fixes
 
