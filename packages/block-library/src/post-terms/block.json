@@ -15,7 +15,8 @@
 		},
 		"separator": {
 			"type": "string",
-			"default": ", "
+			"default": ", ",
+			"role": "content"
 		},
 		"prefix": {
 			"type": "string",
@@ -25,6 +26,16 @@
 		"suffix": {
 			"type": "string",
 			"default": "",
+			"role": "content"
+		},
+		"isLink": {
+			"type": "boolean",
+			"default": true,
+			"role": "content"
+		},
+		"linkTarget": {
+			"type": "string",
+			"default": "_self",
 			"role": "content"
 		}
 	},

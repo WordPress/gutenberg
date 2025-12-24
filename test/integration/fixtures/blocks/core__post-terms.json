@@ -3,6 +3,8 @@
 		"name": "core/post-terms",
 		"isValid": true,
 		"attributes": {
+			"isLink": true,
+			"linkTarget": "_self",
 			"separator": ", ",
 			"prefix": "",
 			"suffix": ""

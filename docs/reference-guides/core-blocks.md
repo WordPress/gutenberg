@@ -738,7 +738,7 @@ Post terms. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages
 -	**Name:** core/post-terms
 -	**Category:** theme
 -	**Supports:** color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** prefix, separator, suffix, term, textAlign
+-	**Attributes:** isLink, linkTarget, prefix, separator, suffix, term, textAlign
 
 ## Time to Read
 

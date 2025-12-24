@@ -16,7 +16,12 @@ import {
 	useBlockEditingMode,
 } from '@wordpress/block-editor';
 import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
-import { Spinner, TextControl } from '@wordpress/components';
+import {
+	Spinner,
+	TextControl,
+	ToggleControl,
+	PanelBody,
+} from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { decodeEntities } from '@wordpress/html-entities';
 import { __ } from '@wordpress/i18n';
@@ -45,7 +50,8 @@ export default function PostTermsEdit( {
 	setAttributes,
 	insertBlocksAfter,
 } ) {
-	const { term, textAlign, separator, prefix, suffix } = attributes;
+	const { term, textAlign, separator, prefix, suffix, isLink, linkTarget } =
+		attributes;
 	const { postId, postType } = context;
 	const blockEditingMode = useBlockEditingMode();
 	const showControls = blockEditingMode === 'default';
@@ -86,6 +92,28 @@ export default function PostTermsEdit( {
 					/>
 				</BlockControls>
 			) }
+			<InspectorControls>
+				<PanelBody title={ __( 'Settings' ) }>
+					<ToggleControl
+						__nextHasNoMarginBottom
+						label={ __( 'Link terms names to term archive pages' ) }
+						checked={ isLink }
+						onChange={ () => setAttributes( { isLink: ! isLink } ) }
+					/>
+					{ isLink && (
+						<ToggleControl
+							__nextHasNoMarginBottom
+							label={ __( 'Open in new tab' ) }
+							onChange={ ( value ) =>
+								setAttributes( {
+									linkTarget: value ? '_blank' : '_self',
+								} )
+							}
+							checked={ linkTarget === '_blank' }
+						/>
+					) }
+				</PanelBody>
+			</InspectorControls>
 			<InspectorControls group="advanced">
 				<TextControl
 					__next40pxDefaultSize
@@ -121,16 +149,25 @@ export default function PostTermsEdit( {
 					! isLoading &&
 					hasPostTerms &&
 					postTerms
-						.map( ( postTerm ) => (
-							<a
-								key={ postTerm.id }
-								href={ postTerm.link }
-								onClick={ ( event ) => event.preventDefault() }
-								rel="tag"
-							>
-								{ decodeEntities( postTerm.name ) }
-							</a>
-						) )
+						.map( ( postTerm ) =>
+							! isLink ? (
+								<span className="wp-block-post-terms__name">
+									{ decodeEntities( postTerm.name ) }
+								</span>
+							) : (
+								<a
+									key={ postTerm.id }
+									href={ postTerm.link }
+									target={ linkTarget ?? '_self' }
+									rel="tag"
+									onClick={ ( event ) =>
+										event.preventDefault()
+									}
+								>
+									{ decodeEntities( postTerm.name ) }
+								</a>
+							)
+						)
 						.reduce( ( prev, curr ) => (
 							<>
 								{ prev }

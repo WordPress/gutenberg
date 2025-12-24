@@ -13,7 +13,7 @@
  * @param array    $attributes Block attributes.
  * @param string   $content    Block default content.
  * @param WP_Block $block      Block instance.
- * @return string Returns the filtered post terms for the current post wrapped inside "a" tags.
+ * @return string Returns the filtered post terms for the current post wrapped inside "a" or "span" tags.
  */
 function render_block_core_post_terms( $attributes, $content, $block ) {
 	if ( ! isset( $block->context['postId'] ) || ! isset( $attributes['term'] ) ) {
@@ -21,6 +21,11 @@ function render_block_core_post_terms( $attributes, $content, $block ) {
 	}
 
 	if ( ! is_taxonomy_viewable( $attributes['term'] ) ) {
+		return '';
+	}
+
+	$post_terms = get_the_terms( $block->context['postId'], $attributes['term'] );
+	if ( is_wp_error( $post_terms ) || empty( $post_terms ) ) {
 		return '';
 	}
 
@@ -46,6 +51,10 @@ function render_block_core_post_terms( $attributes, $content, $block ) {
 		$suffix = '<span class="wp-block-post-terms__suffix">' . $attributes['suffix'] . '</span>' . $suffix;
 	}
 
+	if ( empty( $attributes['isLink'] ) ) {
+		return wp_kses_post( $prefix ) . '<span class="wp-block-post-terms__name">' . wp_kses_post( join( '</span><span class="wp-block-post-terms__separator">' . esc_html( $separator ) . '</span><span class="wp-block-post-terms__name">', wp_list_pluck( $post_terms, 'name' ) ) ) . '</span>' . wp_kses_post( $suffix );
+	}
+
 	$post_terms = get_the_term_list(
 		$block->context['postId'],
 		$attributes['term'],
@@ -56,6 +65,10 @@ function render_block_core_post_terms( $attributes, $content, $block ) {
 
 	if ( is_wp_error( $post_terms ) || empty( $post_terms ) ) {
 		return '';
+	}
+
+	if ( ! empty( $attributes['linkTarget'] ) ) {
+		$post_terms = str_replace( ' rel="tag"', ' rel="tag" target="' . esc_html( $attributes['linkTarget'] ) . '"', $post_terms );
 	}
 
 	return $post_terms;
