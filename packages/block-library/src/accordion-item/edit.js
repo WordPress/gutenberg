@@ -29,14 +29,14 @@ const TEMPLATE = [ [ 'core/accordion-heading' ], [ 'core/accordion-panel' ] ];
 export default function Edit( {
 	attributes,
 	clientId,
-	isBlockSelected,
 	setAttributes,
+	isSelected: isSingleSelected,
 } ) {
 	const { openByDefault } = attributes;
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 	const { isSelected } = useSelect(
 		( select ) => {
-			if ( isBlockSelected || openByDefault ) {
+			if ( isSingleSelected || openByDefault ) {
 				return { isSelected: true };
 			}
 
@@ -47,7 +47,7 @@ export default function Edit( {
 				),
 			};
 		},
-		[ clientId, isBlockSelected, openByDefault ]
+		[ clientId, isSingleSelected, openByDefault ]
 	);
 
 	const blockProps = useBlockProps( {
