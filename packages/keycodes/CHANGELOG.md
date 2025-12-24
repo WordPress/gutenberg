@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+### New features
+
+-   Add new `ariaKeyShortcut` export as an alias of the existing `rawShortcut` export ([#74205](https://github.com/WordPress/gutenberg/pull/74205)).
+-   Add new `shortcutFormats` export ([#74205](https://github.com/WordPress/gutenberg/pull/74205)).
+
 ## 4.36.0 (2025-11-26)
 
 ## 4.35.0 (2025-11-12)
