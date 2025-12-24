@@ -4,9 +4,13 @@
 
 ### Code Quality
 
+- Replace HStack/VStack from `wordpress/components` by Stack from `wordpress/ui`. [#74174](https://github.com/WordPress/gutenberg/pull/74174)
 - DataViews: Remove extra wrapper for GridItem. [#73665](https://github.com/WordPress/gutenberg/pull/73665)
 - Field API: move validation to the field type. [#73642](https://github.com/WordPress/gutenberg/pull/73642)
 - Field API: move format logic to the field type. [#73922](https://github.com/WordPress/gutenberg/pull/73922)
+- Reorganize internal code. [#74188](https://github.com/WordPress/gutenberg/pull/74188)
+- Improve stories and tests. [#74192](https://github.com/WordPress/gutenberg/pull/74192)
+- Update DataForm stories. [#74196](https://github.com/WordPress/gutenberg/pull/74196)
 
 ### Bug Fixes
 
@@ -18,6 +22,8 @@
 
 ### Enhancements
 
+- DataViews: improve how hierarchy is displayed in table layout. [#74199](https://github.com/WordPress/gutenberg/pull/74199)
+- DataViews: Add `groupBy.showLabel` config option to control whether the field label is shown in group headers. [#74161](https://github.com/WordPress/gutenberg/pull/74161)
 - DataViews table layout: remove row click-to-select behavior and hover styles. Selection is now only possible via checkboxes, or by ctrl/cmd clicking. [#73873](https://github.com/WordPress/gutenberg/pull/73873)
 - Better labels for operators and deprecate the `isNotAll` operator. [#73671](https://github.com/WordPress/gutenberg/pull/73671)
 - DataForm: add support for `min`/`max` and `minLength`/`maxLength` validation for relevant controls. [#73465](https://github.com/WordPress/gutenberg/pull/73465)

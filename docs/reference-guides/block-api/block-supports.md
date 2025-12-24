@@ -761,6 +761,8 @@ Set it to true only if the block is not interactive or if it is interactive usin
 
 The `interactive` sub-property indicates whether the block is using the Interactivity API directives.
 
+If you set `supports.interactivity` to `true`, it is equivalent to setting both `supports.interactivity.clientNavigation` and `supports.interactivity.interactive` to `true` as well.
+
 ## layout
 
 -   Type: `boolean` or `Object`

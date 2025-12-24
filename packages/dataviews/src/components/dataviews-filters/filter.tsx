@@ -9,8 +9,6 @@ import type { RefObject } from 'react';
  */
 import {
 	Dropdown,
-	__experimentalVStack as VStack,
-	__experimentalHStack as HStack,
 	FlexItem,
 	SelectControl,
 	Tooltip,
@@ -19,6 +17,7 @@ import {
 import { __, sprintf } from '@wordpress/i18n';
 import { useMemo, useRef } from '@wordpress/element';
 import { closeSmall } from '@wordpress/icons';
+import { Stack } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -93,10 +92,12 @@ function OperatorSelector( {
 	const value = currentFilter?.operator || filter.operators[ 0 ];
 	return (
 		operatorOptions.length > 1 && (
-			<HStack
-				spacing={ 2 }
+			<Stack
+				direction="row"
+				gap="xs"
 				justify="flex-start"
 				className="dataviews-filters__summary-operators-container"
+				align="center"
 			>
 				<FlexItem className="dataviews-filters__summary-operators-filter-name">
 					{ filter.name }
@@ -164,7 +165,7 @@ function OperatorSelector( {
 					variant="minimal"
 					hideLabelFromVision
 				/>
-			</HStack>
+			</Stack>
 		)
 	);
 }
@@ -348,7 +349,7 @@ export default function Filter( {
 			) }
 			renderContent={ () => {
 				return (
-					<VStack spacing={ 0 } justify="flex-start">
+					<Stack direction="column" justify="flex-start">
 						<OperatorSelector { ...commonProps } />
 						{ commonProps.filter.hasElements ? (
 							<SearchWidget
@@ -361,7 +362,7 @@ export default function Filter( {
 						) : (
 							<InputWidget { ...commonProps } fields={ fields } />
 						) }
-					</VStack>
+					</Stack>
 				);
 			} }
 		/>

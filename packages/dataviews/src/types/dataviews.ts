@@ -190,6 +190,13 @@ interface ViewBase {
 		 * The direction to sort by.
 		 */
 		direction: SortDirection;
+
+		/**
+		 * Whether to show the field label in the group header.
+		 *
+		 * @default true
+		 */
+		showLabel?: boolean;
 	};
 
 	/**

@@ -38,7 +38,6 @@ import {
 	lastBlockAttributesChange,
 	lastBlockInserted,
 	blockEditingModes,
-	openedBlockSettingsMenu,
 	expandedBlock,
 	zoomLevel,
 	editedContentOnlySection,
@@ -3483,30 +3482,6 @@ describe( 'state', () => {
 					[ '', 'disabled' ],
 				] )
 			);
-		} );
-	} );
-
-	describe( 'openedBlockSettingsMenu', () => {
-		it( 'should return null by default', () => {
-			expect( openedBlockSettingsMenu( undefined, {} ) ).toBe( null );
-		} );
-
-		it( 'should set client id for opened block settings menu', () => {
-			const state = openedBlockSettingsMenu( null, {
-				type: 'SET_OPENED_BLOCK_SETTINGS_MENU',
-				clientId: '14501cc2-90a6-4f52-aa36-ab6e896135d1',
-			} );
-			expect( state ).toBe( '14501cc2-90a6-4f52-aa36-ab6e896135d1' );
-		} );
-
-		it( 'should clear the state when no client id is passed', () => {
-			const state = openedBlockSettingsMenu(
-				'14501cc2-90a6-4f52-aa36-ab6e896135d1',
-				{
-					type: 'SET_OPENED_BLOCK_SETTINGS_MENU',
-				}
-			);
-			expect( state ).toBe( null );
 		} );
 	} );
 
