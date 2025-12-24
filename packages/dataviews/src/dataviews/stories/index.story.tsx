@@ -9,6 +9,7 @@ import type { Meta } from '@storybook/react';
 import DataViews from '../index';
 import LayoutActivityComponent from './layout-activity';
 import LayoutTableComponent from './layout-table';
+import LayoutGridComponent from './layout-grid';
 import InfiniteScrollComponent from './infinite-scroll';
 import GroupByComponent from './group-by';
 import WithCardComponent from './with-card';
@@ -162,6 +163,44 @@ export const LayoutActivity = {
 
 export const LayoutTable = {
 	render: LayoutTableComponent,
+	args: {
+		groupBy: false,
+		groupByLabel: true,
+		hasClickableItems: true,
+		perPageSizes: [ 10, 25, 50, 100 ],
+		showMedia: true,
+	},
+	argTypes: {
+		backgroundColor: {
+			control: 'color',
+			description: 'Background color of the DataViews component',
+		},
+		groupBy: {
+			control: 'boolean',
+			description: 'Whether items are grouped by field',
+		},
+		groupByLabel: {
+			control: 'boolean',
+			description:
+				'Whether to show the groupBy field label in headers (e.g., "Date: Dec 15" vs just "Dec 15")',
+		},
+		hasClickableItems: {
+			control: 'boolean',
+			description: 'Are the items clickable',
+		},
+		perPageSizes: {
+			control: 'object',
+			description: 'Array of available page sizes',
+		},
+		showMedia: {
+			control: 'boolean',
+			description: 'Whether to display the media field',
+		},
+	},
+};
+
+export const LayoutGrid = {
+	render: LayoutGridComponent,
 	args: {
 		groupBy: false,
 		groupByLabel: true,
