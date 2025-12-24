@@ -1,8 +1,8 @@
 /**
  * Internal dependencies
  */
-import normalizeForm from '../components/dataform-layouts/normalize-form';
-import type { Form } from '../types';
+import normalizeForm from '../normalize-form';
+import type { Form } from '../../../types';
 
 describe( 'normalizeFormFields', () => {
 	describe( 'empty form', () => {

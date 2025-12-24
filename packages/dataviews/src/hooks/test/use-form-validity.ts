@@ -6,8 +6,8 @@ import { renderHook, waitFor } from '@testing-library/react';
 /**
  * Internal dependencies
  */
-import { useFormValidity } from '../hooks';
-import type { Field } from '../types';
+import { useFormValidity } from '../use-form-validity';
+import type { Field } from '../../types';
 
 describe( 'useFormValidity', () => {
 	describe( 'fields', () => {

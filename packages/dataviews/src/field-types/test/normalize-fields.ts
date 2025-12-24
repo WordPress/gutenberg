@@ -1,8 +1,8 @@
 /**
  * Internal dependencies
  */
-import normalizeFields from '../field-types';
-import type { Field } from '../types';
+import normalizeFields from '../index';
+import type { Field } from '../../types';
 
 describe( 'normalizeFields: default getValue', () => {
 	describe( 'getValue from ID', () => {
