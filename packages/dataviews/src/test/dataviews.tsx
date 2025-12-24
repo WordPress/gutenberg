@@ -12,7 +12,7 @@ import { useMemo, useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import DataViews from '../components/dataviews';
+import DataViews from '../dataviews';
 import { LAYOUT_GRID, LAYOUT_LIST, LAYOUT_TABLE } from '../constants';
 import type { Action, View } from '../types';
 import filterSortAndPaginate from '../utils/filter-sort-and-paginate';

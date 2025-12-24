@@ -3,19 +3,18 @@
  */
 import { useState, useMemo } from '@wordpress/element';
 import {
-	__experimentalHStack as HStack,
-	__experimentalVStack as VStack,
 	Icon,
 	__experimentalInputControlPrefixWrapper as InputControlPrefixWrapper,
 	__experimentalInputControlSuffixWrapper as InputControlSuffixWrapper,
 } from '@wordpress/components';
+import { Stack } from '@wordpress/ui';
 import { starFilled } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
-import DataViews from '../components/dataviews/index';
-import DataForm from '../components/dataform/index';
+import DataViews from '../dataviews/index';
+import DataForm from '../dataform/index';
 import filterSortAndPaginate from '../utils/filter-sort-and-paginate';
 import type { View, Form, Field } from '../types';
 
@@ -618,7 +617,7 @@ const FieldTypeStory = ( {
 		null;
 
 	return (
-		<HStack alignment="stretch">
+		<Stack direction="row" gap="xs" align="stretch">
 			<div style={ { flex: 2 } }>
 				<DataViews
 					getItemId={ ( item ) => item.id.toString() }
@@ -648,7 +647,7 @@ const FieldTypeStory = ( {
 				/>
 			</div>
 			{ selectedItem ? (
-				<VStack alignment="top">
+				<Stack direction="column" gap="xs" align="top">
 					<DataForm
 						data={ selectedItem }
 						form={ form }
@@ -668,9 +667,14 @@ const FieldTypeStory = ( {
 							);
 						} }
 					/>
-				</VStack>
+				</Stack>
 			) : (
-				<VStack alignment="center">
+				<Stack
+					direction="column"
+					gap="xs"
+					align="center"
+					justify="center"
+				>
 					<span
 						style={ {
 							color: '#888',
@@ -678,9 +682,9 @@ const FieldTypeStory = ( {
 					>
 						Please, select a single item.
 					</span>
-				</VStack>
+				</Stack>
 			) }
-		</HStack>
+		</Stack>
 	);
 };
 

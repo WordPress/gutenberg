@@ -17,19 +17,17 @@ import {
 	Card,
 	CardHeader,
 	CardBody,
-	__experimentalGrid as Grid,
 	__experimentalHeading as Heading,
 	__experimentalText as Text,
-	__experimentalHStack as HStack,
-	__experimentalVStack as VStack,
 	Button,
 } from '@wordpress/components';
 import { __, _n } from '@wordpress/i18n';
+import { Stack } from '@wordpress/ui';
 
 /**
  * Internal dependencies
  */
-import DataViews from '../components/dataviews/index';
+import DataViews from '../dataviews/index';
 import {
 	LAYOUT_GRID,
 	LAYOUT_LIST,
@@ -183,10 +181,10 @@ const PlanetIllustration = () => (
 );
 
 const CustomEmptyComponent = () => (
-	<VStack alignment="center" justify="center" spacing={ 3 }>
+	<Stack direction="column" align="center" justify="center" gap="sm">
 		<PlanetIllustration />
 		<Text>No celestial bodies found</Text>
-	</VStack>
+	</Stack>
 );
 
 const EmptyComponent = ( {
@@ -318,67 +316,75 @@ function PlanetOverview( { planets }: { planets: SpaceObject[] } ) {
 			<Heading className="free-composition-heading" level={ 2 }>
 				{ __( 'Solar System numbers' ) }
 			</Heading>
-			<Grid
-				templateColumns="repeat(auto-fit, minmax(330px, 1fr))"
-				align="flex-start"
-				className="free-composition-header"
-			>
-				<Card variant="secondary">
-					<CardBody>
-						<VStack>
-							<Text size={ 18 } as="p">
-								{ createInterpolateElement(
-									_n(
-										'<PlanetsNumber /> planet',
-										'<PlanetsNumber /> planets',
-										planets.length
-									),
-									{
-										PlanetsNumber: (
-											<strong>{ planets.length } </strong>
-										),
-									}
-								) }
-							</Text>
-
-							<Text size={ 18 } as="p">
-								{ createInterpolateElement(
-									_n(
-										'<SatellitesNumber /> moon',
-										'<SatellitesNumber /> moons',
-										moons
-									),
-									{
-										SatellitesNumber: (
-											<strong>{ moons } </strong>
-										),
-									}
-								) }
-							</Text>
-						</VStack>
-					</CardBody>
-				</Card>
-
-				<VStack>
-					<HStack justify="start">
+			<div className="free-composition-header">
+				<Stack direction="column" gap="md">
+					<Stack direction="row" justify="start" gap="xs">
+						<DataViews.Search label={ __( 'Search content' ) } />
 						<DataViews.FiltersToggle />
-						<DataViews.Search label={ __( 'moons by planet' ) } />
-					</HStack>
+						<Stack
+							direction="row"
+							justify="end"
+							gap="xs"
+							style={ { flex: 1 } }
+						>
+							<DataViews.ViewConfig />
+							<DataViews.LayoutSwitcher />
+						</Stack>
+					</Stack>
 					<DataViews.FiltersToggled />
-				</VStack>
+					<Card variant="secondary">
+						<CardBody>
+							<Stack direction="column" gap="xs">
+								<Text size={ 18 } as="p">
+									{ createInterpolateElement(
+										_n(
+											'<PlanetsNumber /> planet',
+											'<PlanetsNumber /> planets',
+											planets.length
+										),
+										{
+											PlanetsNumber: (
+												<strong>
+													{ planets.length }{ ' ' }
+												</strong>
+											),
+										}
+									) }
+								</Text>
 
-				<VStack>
-					<HStack justify="end">
-						<DataViews.Pagination />
-						<DataViews.ViewConfig />
-						<DataViews.LayoutSwitcher />
-					</HStack>
-
-					<DataViews.BulkActionToolbar />
-				</VStack>
-			</Grid>
-
-			<DataViews.Layout className="free-composition-dataviews-layout" />
+								<Text size={ 18 } as="p">
+									{ createInterpolateElement(
+										_n(
+											'<SatellitesNumber /> moon',
+											'<SatellitesNumber /> moons',
+											moons
+										),
+										{
+											SatellitesNumber: (
+												<strong>{ moons } </strong>
+											),
+										}
+									) }
+								</Text>
+							</Stack>
+						</CardBody>
+					</Card>
+					<Card style={ { width: '100%' } }>
+						<CardBody>
+							<Stack
+								direction="row"
+								justify="space-between"
+								align="center"
+								gap="xs"
+							>
+								<DataViews.BulkActionToolbar />
+								<DataViews.Pagination />
+							</Stack>
+						</CardBody>
+					</Card>
+					<DataViews.Layout className="free-composition-dataviews-layout" />
+				</Stack>
+			</div>
 		</>
 	);
 }
@@ -433,9 +439,11 @@ export const FreeComposition = () => {
 					grid: {},
 				} }
 				empty={
-					<VStack
+					<Stack
+						direction="column"
+						gap="xs"
 						justify="space-around"
-						alignment="center"
+						align="center"
 						className="free-composition-dataviews-empty"
 					>
 						<Text size={ 18 } as="p">
@@ -443,7 +451,7 @@ export const FreeComposition = () => {
 						</Text>
 						<Text variant="muted">{ `Try a different search because “${ view.search }” returned no results.` }</Text>
 						<Button variant="secondary">Create new planet</Button>
-					</VStack>
+					</Stack>
 				}
 			>
 				<PlanetOverview planets={ planets } />
@@ -484,7 +492,11 @@ export const WithCard = () => {
 	);
 };
 
-export const GroupByLayout = () => {
+const GroupByLayoutComponent = ( {
+	showLabel = true,
+}: {
+	showLabel: boolean;
+} ) => {
 	const [ view, setView ] = useState< View >( {
 		type: LAYOUT_GRID,
 		search: '',
@@ -495,11 +507,19 @@ export const GroupByLayout = () => {
 		titleField: 'title',
 		descriptionField: 'description',
 		mediaField: 'image',
-		groupBy: { field: 'type', direction: 'asc' },
+		groupBy: { field: 'type', direction: 'asc', showLabel },
 		layout: {
 			badgeFields: [ 'satellites' ],
 		},
 	} );
+
+	useEffect( () => {
+		setView( ( prevView ) => ( {
+			...prevView,
+			groupBy: { field: 'type', direction: 'asc', showLabel },
+		} ) );
+	}, [ showLabel ] );
+
 	const { data: shownData, paginationInfo } = useMemo( () => {
 		return filterSortAndPaginate( data, view, fields );
 	}, [ view ] );
@@ -515,6 +535,20 @@ export const GroupByLayout = () => {
 			defaultLayouts={ defaultLayouts }
 		/>
 	);
+};
+
+export const GroupByLayout = {
+	render: GroupByLayoutComponent,
+	args: {
+		showLabel: true,
+	},
+	argTypes: {
+		showLabel: {
+			control: 'boolean',
+			description:
+				'Whether to show the field label in group headers (e.g., "Type: Planet" vs just "Planet")',
+		},
+	},
 };
 
 export const InfiniteScroll = () => {
@@ -642,9 +676,11 @@ export const InfiniteScroll = () => {
 const ActivityComponent = ( {
 	showMedia = true,
 	grouping = true,
+	showLabel = true,
 }: {
 	showMedia: boolean;
 	grouping: boolean;
+	showLabel: boolean;
 } ) => {
 	const [ view, setView ] = useState< View >( {
 		type: LAYOUT_ACTIVITY,
@@ -665,6 +701,7 @@ const ActivityComponent = ( {
 			? {
 					field: 'date',
 					direction: 'asc',
+					showLabel,
 			  }
 			: undefined,
 	} );
@@ -673,12 +710,12 @@ const ActivityComponent = ( {
 			return {
 				...prevView,
 				groupBy: grouping
-					? { field: 'date', direction: 'asc' }
+					? { field: 'date', direction: 'asc', showLabel }
 					: undefined,
 				showMedia,
 			};
 		} );
-	}, [ showMedia, grouping ] );
+	}, [ showMedia, grouping, showLabel ] );
 
 	const { data: shownData, paginationInfo } = useMemo( () => {
 		return filterSortAndPaginate( orderEventData, view, orderEventFields );
@@ -710,6 +747,7 @@ export const Activity = {
 	args: {
 		showMedia: true,
 		grouping: true,
+		showLabel: true,
 	},
 	argTypes: {
 		showMedia: {
@@ -724,6 +762,11 @@ export const Activity = {
 			defaultValue: true,
 			description:
 				'Whether items are grouped by date in the activity list',
+		},
+		showLabel: {
+			control: 'boolean',
+			description:
+				'Whether to show the field label in group headers (e.g., "Date: Dec 15" vs just "Dec 15")',
 		},
 	},
 };

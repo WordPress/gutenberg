@@ -222,6 +222,12 @@ export function MediaUploadModal( {
 
 	const fields: Field< RestAttachment >[] = useMemo(
 		() => [
+			// Media field definitions from @wordpress/media-fields
+			// Cast is safe because RestAttachment has the same properties as Attachment
+			{
+				...( mediaThumbnailField as Field< RestAttachment > ),
+				enableHiding: false, // Within the modal, the thumbnail should always be shown.
+			},
 			{
 				id: 'title',
 				type: 'text' as const,
@@ -231,9 +237,6 @@ export function MediaUploadModal( {
 					return titleValue || __( '(no title)' );
 				},
 			},
-			// Media field definitions from @wordpress/media-fields
-			// Cast is safe because RestAttachment has the same properties as Attachment
-			mediaThumbnailField as Field< RestAttachment >,
 			altTextField as Field< RestAttachment >,
 			captionField as Field< RestAttachment >,
 			descriptionField as Field< RestAttachment >,
@@ -264,15 +267,16 @@ export function MediaUploadModal( {
 
 					const selectedPosts = await resolveSelect(
 						coreStore
-					).getEntityRecords(
+					).getEntityRecords< RestAttachment >(
 						'postType',
 						'attachment',
 						selectedPostsQuery
 					);
 
 					// Transform the selected posts to the expected Attachment format
-					const transformedPosts =
-						selectedPosts?.map( transformAttachment );
+					const transformedPosts = ( selectedPosts ?? [] )
+						.map( transformAttachment )
+						.filter( Boolean );
 
 					const selectedItems = multiple
 						? transformedPosts
@@ -346,6 +350,7 @@ export function MediaUploadModal( {
 			onRequestClose={ handleModalClose }
 			isDismissible={ isDismissible }
 			className={ modalClass }
+			overlayClassName="media-upload-modal"
 			size="fill"
 			headerActions={
 				<FormFileUpload

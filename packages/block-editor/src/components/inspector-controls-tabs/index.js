@@ -6,7 +6,7 @@ import {
 	Tooltip,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
-import { useEffect, useState } from '@wordpress/element';
+import { useEffect, useState, useRef } from '@wordpress/element';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { useSelect } from '@wordpress/data';
 
@@ -18,7 +18,6 @@ import SettingsTab from './settings-tab';
 import StylesTab from './styles-tab';
 import ContentTab from './content-tab';
 import InspectorControls from '../inspector-controls';
-import useIsListViewTabDisabled from './use-is-list-view-tab-disabled';
 import { unlock } from '../../lock-unlock';
 
 const { Tabs } = unlock( componentsPrivateApis );
@@ -35,47 +34,36 @@ export default function InspectorControlsTabs( {
 		return select( preferencesStore ).get( 'core', 'showIconLabels' );
 	}, [] );
 
-	// The tabs panel will mount before fills are rendered to the list view
-	// slot. This means the list view tab isn't initially included in the
-	// available tabs so the panel defaults selection to the settings tab
-	// which at the time is the first tab. This check allows blocks known to
-	// include the list view tab to set it as the tab selected by default.
-	const initialTabName = ! useIsListViewTabDisabled( blockName )
-		? TAB_LIST_VIEW.name
-		: undefined;
+	const [ selectedTabId, setSelectedTabId ] = useState( tabs[ 0 ]?.name );
+	const hasUserSelectionRef = useRef( false );
 
-	const [ selectedTabId, setSelectedTabId ] = useState(
-		initialTabName ?? tabs[ 0 ]?.name
-	);
-
-	// When the active tab is not amongst the available `tabs`, it indicates
-	// the list of tabs was changed dynamically with the active one being
-	// removed. Set the active tab back to the first tab.
+	// Reset when switching blocks
 	useEffect( () => {
-		// Skip this behavior if `initialTabName` is supplied. In the navigation
-		// block, the list view tab isn't present in `tabs` initially. The early
-		// return here prevents the dynamic behavior that follows from overriding
-		// `initialTabName`.
-		if ( initialTabName ) {
+		hasUserSelectionRef.current = false;
+	}, [ clientId ] );
+
+	// Auto-select first available tab unless user has made a selection
+	useEffect( () => {
+		if ( ! tabs?.length || hasUserSelectionRef.current ) {
 			return;
 		}
 
-		if ( tabs?.length && selectedTabId ) {
-			const activeTab = tabs.find(
-				( tab ) => tab.name === selectedTabId
-			);
-			if ( ! activeTab ) {
-				setSelectedTabId( tabs[ 0 ].name );
-			}
+		const firstTabName = tabs[ 0 ]?.name;
+		if ( selectedTabId !== firstTabName ) {
+			setSelectedTabId( firstTabName );
 		}
-	}, [ tabs, selectedTabId, initialTabName ] );
+	}, [ tabs, selectedTabId ] );
+
+	const handleTabSelect = ( tabId ) => {
+		setSelectedTabId( tabId );
+		hasUserSelectionRef.current = true;
+	};
 
 	return (
 		<div className="block-editor-block-inspector__tabs">
 			<Tabs
-				defaultTabId={ initialTabName }
 				selectedTabId={ selectedTabId }
-				onSelect={ setSelectedTabId }
+				onSelect={ handleTabSelect }
 				key={ clientId }
 			>
 				<Tabs.TabList>

@@ -1071,14 +1071,14 @@ Component to render UI in a modal for the action.
 		return (
 			<form onSubmit={ onSubmit }>
 				<p>Modal UI</p>
-				<HStack>
+				<Stack direction="row">
 					<Button variant="tertiary" onClick={ closeModal }>
 						Cancel
 					</Button>
 					<Button variant="primary" type="submit">
 						Submit
 					</Button>
-				</HStack>
+				</Stack>
 			</form>
 		);
 	};
@@ -1202,10 +1202,10 @@ Example:
 	id: 'title',
 	type: 'text',
 	header: (
-		<HStack spacing={ 1 } justify="start">
+		<Stack direction="row" gap="2xs" justify="start">
 			<Icon icon={ icon } />
 			<span>Title</span>
-		</HStack>
+		</Stack>
 	),
 }
 ```

@@ -1,14 +1,11 @@
 /**
  * WordPress dependencies
  */
-import {
-	Button,
-	__experimentalHStack as HStack,
-	SelectControl,
-} from '@wordpress/components';
+import { Button, SelectControl } from '@wordpress/components';
 import { createInterpolateElement, memo, useContext } from '@wordpress/element';
 import { sprintf, __, _x, isRTL } from '@wordpress/i18n';
 import { next, previous } from '@wordpress/icons';
+import { Stack } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -49,16 +46,18 @@ export function DataViewsPagination() {
 	return (
 		!! totalItems &&
 		totalPages !== 1 && (
-			<HStack
-				expanded={ false }
+			<Stack
+				direction="row"
 				className="dataviews-pagination"
 				justify="end"
-				spacing={ 6 }
+				align="center"
+				gap="lg"
 			>
-				<HStack
+				<Stack
+					direction="row"
 					justify="flex-start"
-					expanded={ false }
-					spacing={ 1 }
+					align="center"
+					gap="2xs"
 					className="dataviews-pagination__page-select"
 				>
 					{ createInterpolateElement(
@@ -90,8 +89,8 @@ export function DataViewsPagination() {
 							),
 						}
 					) }
-				</HStack>
-				<HStack expanded={ false } spacing={ 1 }>
+				</Stack>
+				<Stack direction="row" gap="2xs" align="center">
 					<Button
 						onClick={ () =>
 							onChangeView( {
@@ -119,8 +118,8 @@ export function DataViewsPagination() {
 						size="compact"
 						tooltipPosition="top"
 					/>
-				</HStack>
-			</HStack>
+				</Stack>
+			</Stack>
 		)
 	);
 }

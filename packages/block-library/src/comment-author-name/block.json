@@ -15,9 +15,6 @@
 		"linkTarget": {
 			"type": "string",
 			"default": "_self"
-		},
-		"textAlign": {
-			"type": "string"
 		}
 	},
 	"usesContext": [ "commentId" ],
@@ -39,6 +36,7 @@
 		"typography": {
 			"fontSize": true,
 			"lineHeight": true,
+			"textAlign": true,
 			"__experimentalFontFamily": true,
 			"__experimentalFontWeight": true,
 			"__experimentalFontStyle": true,

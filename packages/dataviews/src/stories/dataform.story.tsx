@@ -7,16 +7,13 @@ import deepMerge from 'deepmerge';
  * WordPress dependencies
  */
 import { useCallback, useMemo, useState } from '@wordpress/element';
-import {
-	Button,
-	__experimentalVStack as VStack,
-	privateApis,
-} from '@wordpress/components';
+import { Button, privateApis } from '@wordpress/components';
+import { Stack } from '@wordpress/ui';
 
 /**
  * Internal dependencies
  */
-import DataForm from '../components/dataform';
+import DataForm from '../dataform';
 import useFormValidity from '../hooks/use-form-validity';
 
 import type {
@@ -31,7 +28,7 @@ import type {
 	RegularLayout,
 } from '../types';
 import { unlock } from '../lock-unlock';
-import DateControl from '../dataform-controls/date';
+import DateControl from '../components/dataform-controls/date';
 
 const { ValidatedTextControl, Badge } = unlock( privateApis );
 
@@ -1393,7 +1390,7 @@ const ValidationComponent = ( {
 
 	return (
 		<form>
-			<VStack alignment="left" spacing={ 8 }>
+			<Stack direction="column" align="start" gap="xl">
 				<DataForm< ValidatedItem >
 					data={ post }
 					fields={ _fields }
@@ -1414,7 +1411,7 @@ const ValidationComponent = ( {
 				>
 					Submit
 				</Button>
-			</VStack>
+			</Stack>
 		</form>
 	);
 };
@@ -1625,6 +1622,7 @@ const LayoutCardComponent = ( {
 
 	const form: Form = useMemo(
 		() => ( {
+			layout: { type: 'card' },
 			fields: [
 				{
 					id: 'customerCard',
