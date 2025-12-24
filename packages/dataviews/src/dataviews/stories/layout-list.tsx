@@ -1,44 +1,61 @@
 /**
  * WordPress dependencies
  */
-import { useState, useMemo } from '@wordpress/element';
+import { useState, useMemo, useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import DataViews from '../index';
-import {
-	LAYOUT_GRID,
-	LAYOUT_LIST,
-	LAYOUT_TABLE,
-	LAYOUT_ACTIVITY,
-} from '../../constants';
+import { LAYOUT_LIST } from '../../constants';
 import filterSortAndPaginate from '../../utils/filter-sort-and-paginate';
 import type { View } from '../../types';
-import {
-	DEFAULT_VIEW,
-	actions,
-	data,
-	fields,
-	type SpaceObject,
-} from './fixtures';
+import { actions, data, fields, type SpaceObject } from './fixtures';
 
-export const DefaultComponent = ( {
-	perPageSizes = [ 10, 25, 50, 100 ],
-	hasClickableItems = true,
+export const LayoutTableComponent = ( {
 	backgroundColor,
+	hasClickableItems = true,
+	groupBy = false,
+	groupByLabel = true,
+	perPageSizes = [ 10, 25, 50, 100 ],
+	showMedia = true,
 }: {
-	perPageSizes?: number[];
-	hasClickableItems?: boolean;
 	backgroundColor?: string;
+	hasClickableItems?: boolean;
+	groupBy?: boolean;
+	groupByLabel?: boolean;
+	perPageSizes?: number[];
+	showMedia?: boolean;
 } ) => {
 	const [ view, setView ] = useState< View >( {
-		...DEFAULT_VIEW,
+		type: LAYOUT_LIST,
+		search: '',
+		page: 1,
+		perPage: 10,
+		filters: [],
 		fields: [ 'categories' ],
 		titleField: 'title',
 		descriptionField: 'description',
 		mediaField: 'image',
+		showMedia,
 	} );
+
+	useEffect( () => {
+		setView( ( prevView ) => {
+			return {
+				...prevView,
+				groupBy: groupBy
+					? {
+							field: 'type',
+							direction: 'asc',
+							showLabel: groupByLabel,
+					  }
+					: undefined,
+				showMedia,
+			};
+		} );
+	}, [ groupBy, groupByLabel, showMedia ] );
+
 	const { data: shownData, paginationInfo } = useMemo( () => {
 		return filterSortAndPaginate( data, view, fields );
 	}, [ view ] );
@@ -79,10 +96,7 @@ export const DefaultComponent = ( {
 				) }
 				isItemClickable={ () => hasClickableItems }
 				defaultLayouts={ {
-					[ LAYOUT_TABLE ]: {},
-					[ LAYOUT_GRID ]: {},
 					[ LAYOUT_LIST ]: {},
-					[ LAYOUT_ACTIVITY ]: {},
 				} }
 				config={ { perPageSizes } }
 			/>
@@ -90,4 +104,4 @@ export const DefaultComponent = ( {
 	);
 };
 
-export default DefaultComponent;
+export default LayoutTableComponent;
