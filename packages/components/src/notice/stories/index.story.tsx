@@ -8,7 +8,6 @@ import { fn } from '@storybook/test';
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
-import { upload } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -144,24 +143,38 @@ export const NoticeListSubcomponent: StoryFn< typeof NoticeList > = () => {
 NoticeListSubcomponent.storyName = 'NoticeList Subcomponent';
 
 /**
- * Notice actions support all Button component props.
- * This story demonstrates a few commonly used props.
+ * Action buttons can be disabled.
  */
-export const WithButtonProps = Template.bind( {} );
-WithButtonProps.args = {
+export const WithDisabledAction = Template.bind( {} );
+WithDisabledAction.args = {
 	...Default.args,
-	children: 'Notice actions support Button props like disabled, icon, etc.',
+	children: 'This notice has a disabled action.',
 	actions: [
 		{
-			label: 'Upload',
-			onClick: () => {},
-			icon: upload,
-			variant: 'primary',
-		},
-		{
-			label: 'Disabled',
+			label: 'Disabled action',
 			onClick: () => {},
 			disabled: true,
+		},
+		{
+			label: 'Enabled action',
+			onClick: () => {},
+		},
+	],
+};
+
+/**
+ * Links can open in a new tab using `target="_blank"`.
+ */
+export const WithOpenInNewTab = Template.bind( {} );
+WithOpenInNewTab.args = {
+	...Default.args,
+	children: 'This link opens in a new tab.',
+	actions: [
+		{
+			label: 'Learn more',
+			url: 'https://wordpress.org',
+			target: '_blank',
+			rel: 'noreferrer',
 		},
 	],
 };

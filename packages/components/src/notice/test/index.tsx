@@ -123,7 +123,7 @@ describe( 'Notice', () => {
 	} );
 
 	describe( 'actions', () => {
-		it( 'should pass through Button props to action buttons', () => {
+		it( 'should render a disabled action button', () => {
 			render(
 				<Notice
 					actions={ [
@@ -142,6 +142,27 @@ describe( 'Notice', () => {
 				name: 'Disabled action',
 			} );
 			expect( button ).toBeDisabled();
+		} );
+
+		it( 'should pass target and rel props to link actions', () => {
+			render(
+				<Notice
+					actions={ [
+						{
+							label: 'External link',
+							url: 'https://example.com',
+							target: '_blank',
+							rel: 'noreferrer',
+						},
+					] }
+				>
+					Notice with external link
+				</Notice>
+			);
+
+			const link = screen.getByRole( 'link', { name: 'External link' } );
+			expect( link ).toHaveAttribute( 'target', '_blank' );
+			expect( link ).toHaveAttribute( 'rel', 'noreferrer' );
 		} );
 
 		it( 'should call onClick when action with url is clicked', async () => {

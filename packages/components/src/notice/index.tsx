@@ -123,8 +123,9 @@ function Notice( {
 									noDefaultClasses = false,
 									onClick,
 									url,
-									href,
-									...buttonProps
+									target,
+									rel,
+									disabled,
 								}: NoticeAction &
 									// `isPrimary` is a legacy prop included for
 									// backcompat, but `variant` should be used
@@ -132,13 +133,12 @@ function Notice( {
 									Pick< DeprecatedButtonProps, 'isPrimary' >,
 								index
 							) => {
-								const actionHref = url || href;
 								let computedVariant = variant;
 								if (
 									variant !== 'primary' &&
 									! noDefaultClasses
 								) {
-									computedVariant = ! actionHref
+									computedVariant = ! url
 										? 'secondary'
 										: 'link';
 								}
@@ -151,12 +151,15 @@ function Notice( {
 
 								return (
 									<Button
-										{ ...buttonProps }
 										__next40pxDefaultSize
 										key={ index }
-										href={ actionHref }
+										href={ url }
+										target={ target }
+										rel={ rel }
 										variant={ computedVariant }
 										onClick={ onClick }
+										disabled={ disabled }
+										accessibleWhenDisabled
 										className={ clsx(
 											'components-notice__action',
 											buttonCustomClasses

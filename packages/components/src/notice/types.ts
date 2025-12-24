@@ -3,53 +3,50 @@
  */
 import type { MouseEventHandler, ReactNode } from 'react';
 
-/**
- * Internal dependencies
- */
-import type { ButtonAsButtonProps, ButtonAsAnchorProps } from '../button/types';
-
-type CommonNoticeActionProps = Omit<
-	ButtonAsButtonProps,
-	// Omit props that are handled internally or don't apply to notice actions
-	'href' | 'children' | 'className'
-> & {
-	className?: string;
-	noDefaultClasses?: boolean;
-};
-type AnchorProps = {
+type CommonNoticeActionProps = {
 	/**
-	 * If provided with `url` or `href`, sets the `target` attribute to the anchor.
+	 * The label for the action button.
 	 */
-	target?: ButtonAsAnchorProps[ 'target' ];
+	label: string;
 	/**
-	 * If provided with `url` or `href`, sets the `rel` attribute to the anchor.
+	 * A CSS class to add to the action button.
+	 */
+	className?: string;
+	/**
+	 * Whether to remove default styling from the action button.
+	 */
+	noDefaultClasses?: boolean;
+	/**
+	 * The variant of the action button.
+	 */
+	variant?: 'primary' | 'secondary' | 'link';
+	/**
+	 * Whether the action button is disabled.
+	 */
+	disabled?: boolean;
+};
+// `url` and `onClick` can both be provided. If `url` is provided, the action's
+// button will be rendered as an anchor and `onClick` will still be called.
+type NoticeActionWithURL = CommonNoticeActionProps & {
+	url: string;
+	/**
+	 * If provided with `url`, sets the `target` attribute to the anchor.
+	 */
+	target?: string;
+	/**
+	 * If provided with `url`, sets the `rel` attribute to the anchor.
 	 */
 	rel?: string;
-	onClick?: MouseEventHandler< HTMLButtonElement | HTMLAnchorElement >;
+	onClick?: MouseEventHandler< HTMLAnchorElement | HTMLButtonElement >;
 };
-// `url`/`href` and `onClick` can both be provided. If `url`/`href` is provided,
-// the action's button will be rendered as an anchor and `onClick` will still be called.
-type NoticeActionWithURL = CommonNoticeActionProps &
-	AnchorProps & {
-		url: string;
-		href?: never;
-	};
-type NoticeActionWithHref = CommonNoticeActionProps &
-	AnchorProps & {
-		href: string;
-		url?: never;
-	};
 type NoticeActionWithOnClick = CommonNoticeActionProps & {
 	url?: never;
-	href?: never;
 	target?: never;
-	onClick: MouseEventHandler< HTMLButtonElement | HTMLAnchorElement >;
+	rel?: never;
+	onClick: MouseEventHandler< HTMLAnchorElement | HTMLButtonElement >;
 };
 
-export type NoticeAction =
-	| NoticeActionWithURL
-	| NoticeActionWithHref
-	| NoticeActionWithOnClick;
+export type NoticeAction = NoticeActionWithURL | NoticeActionWithOnClick;
 
 export type NoticeChildren = string | JSX.Element;
 
