@@ -1,5 +1,3 @@
-/* eslint-disable react/forbid-elements */
-
 /**
  * WordPress dependencies
  */
@@ -306,6 +304,46 @@ describe( 'blocks', () => {
 			} );
 		} );
 
+		it( 'should default to empty object when attributes is omitted and without warning', () => {
+			registerBlockType( 'core/test-block-omitted-attributes', {
+				title: 'block title',
+				category: 'text',
+				save: noop,
+			} );
+
+			// Verify no warning was shown (unlike when explicitly set to null/undefined)
+			expect( console ).not.toHaveWarned();
+
+			const blockType = getBlockType(
+				'core/test-block-omitted-attributes'
+			);
+			expect( blockType.attributes ).toEqual( {} );
+		} );
+
+		it.each( [
+			[ 'undefined', undefined ],
+			[ 'null', null ],
+		] )(
+			'should warn and default to empty object when attributes is %s',
+			( _label, value ) => {
+				registerBlockType( 'core/test-block-null-attributes', {
+					title: 'block title',
+					category: 'text',
+					save: noop,
+					attributes: value,
+				} );
+
+				expect( console ).toHaveWarnedWith(
+					'The block "core/test-block-null-attributes" is registering attributes as `null` or `undefined`. Use an empty object (`attributes: {}`) or exclude the `attributes` key.'
+				);
+
+				const blockType = getBlockType(
+					'core/test-block-null-attributes'
+				);
+				expect( blockType.attributes ).toEqual( {} );
+			}
+		);
+
 		it( 'should default to browser-initialized global attributes', () => {
 			const attributes = { ok: { type: 'boolean' } };
 			unstable__bootstrapServerSideBlockDefinitions( {
@@ -463,49 +501,6 @@ describe( 'blocks', () => {
 					{ name: 'bar', label: 'Bar' },
 				],
 				blockHooks: {},
-			} );
-		} );
-
-		// This test can be removed once the polyfill for blockHooks gets removed.
-		it( 'should polyfill blockHooks using metadata on the client when not set on the server', () => {
-			const blockName = 'tests/hooked-block';
-			unstable__bootstrapServerSideBlockDefinitions( {
-				[ blockName ]: {
-					category: 'widgets',
-				},
-			} );
-
-			const blockType = {
-				title: 'block title',
-			};
-			registerBlockType(
-				{
-					name: blockName,
-					blockHooks: {
-						'tests/block': 'firstChild',
-					},
-					category: 'ignored',
-				},
-				blockType
-			);
-			expect( getBlockType( blockName ) ).toEqual( {
-				apiVersion: 1,
-				name: blockName,
-				save: expect.any( Function ),
-				title: 'block title',
-				category: 'widgets',
-				icon: { src: BLOCK_ICON_DEFAULT },
-				attributes: {},
-				providesContext: {},
-				usesContext: [],
-				keywords: [],
-				selectors: {},
-				supports: {},
-				styles: [],
-				variations: [],
-				blockHooks: {
-					'tests/block': 'firstChild',
-				},
 			} );
 		} );
 
@@ -1738,9 +1733,6 @@ describe( 'blocks', () => {
 				getValues: () => 'value',
 				setValues: () => 'new values',
 				canUserEditValue: () => true,
-				getFieldsList: () => {
-					return { field: 'value' };
-				},
 			};
 			registerBlockBindingsSource( {
 				name: 'core/valid-source',
@@ -1801,5 +1793,3 @@ describe( 'blocks', () => {
 		} );
 	} );
 } );
-
-/* eslint-enable react/forbid-elements */

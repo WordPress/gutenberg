@@ -7,7 +7,7 @@ import type { ForwardedRef } from 'react';
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, isRTL } from '@wordpress/i18n';
 import { forwardRef } from '@wordpress/element';
 
 /**
@@ -73,7 +73,7 @@ function UnforwardedExternalLink(
 					__( '(opens in a new tab)' )
 				}
 			>
-				&#8599;
+				{ isRTL() ? '\u2196' : '\u2197' }
 			</span>
 		</a>
 		/* eslint-enable react/jsx-no-target-blank */

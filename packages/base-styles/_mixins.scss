@@ -681,3 +681,20 @@
 	left: 0;
 	@include selected-block-outline($widthRatio);
 }
+
+/**
+ * Creates a checkerboard pattern background to indicate transparency.
+ * @param {String} $size - The size of the squares in the checkerboard pattern. Default is 12px.
+ */
+@mixin checkerboard-background($size: 12px) {
+	// The background image creates a checkerboard pattern. Ignore rtlcss to
+	// make it work both in LTR and RTL.
+	// See https://github.com/WordPress/gutenberg/pull/42510
+	/*rtl:begin:ignore*/
+	background-image:
+		repeating-linear-gradient(45deg, colors.$gray-200 25%, transparent 25%, transparent 75%, colors.$gray-200 75%, colors.$gray-200),
+		repeating-linear-gradient(45deg, colors.$gray-200 25%, transparent 25%, transparent 75%, colors.$gray-200 75%, colors.$gray-200);
+	background-position: 0 0, $size $size;
+	/*rtl:end:ignore*/
+	background-size: calc(2 * $size) calc(2 * $size);
+}

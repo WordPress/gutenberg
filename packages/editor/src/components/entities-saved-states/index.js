@@ -36,7 +36,7 @@ function identity( values ) {
  *
  * @param {Object}   props              The component props.
  * @param {Function} props.close        The function to close the dialog.
- * @param {boolean}  props.renderDialog Whether to render the component with modal dialog behavior.
+ * @param {boolean=} props.renderDialog Whether to render the component with modal dialog behavior.
  * @param {string}   props.variant      Changes the layout of the component. When an `inline` value is provided, the action buttons are rendered at the end of the component instead of at the start.
  *
  * @return {React.ReactNode} The rendered component.

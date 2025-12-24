@@ -199,7 +199,7 @@ class Patterns {
 		this.#page = page;
 
 		this.content = this.#page.getByRole( 'region', {
-			name: 'Patterns content',
+			name: 'All patterns',
 		} );
 		this.navigation = this.#page.getByRole( 'region', {
 			name: 'Navigation',

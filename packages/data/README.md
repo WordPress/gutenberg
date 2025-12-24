@@ -516,10 +516,6 @@ _Related_
 
 -   [use](#use)
 
-_Type_
-
--   `Object`
-
 ### register
 
 Registers a standard `@wordpress/data` store descriptor.
@@ -624,7 +620,7 @@ _Parameters_
 
 _Returns_
 
--   `Object`: Object containing the store's promise-wrapped selectors.
+-   `CurriedSelectorsResolveOf< T >`: Object containing the store's promise-wrapped selectors.
 
 ### select
 
@@ -776,7 +772,7 @@ const ParentProvidingRegistry = ( props ) => {
 
 _Returns_
 
--   `Function`: A custom react hook exposing the registry context value.
+-   `import('../../types').DataRegistry`: A custom react hook exposing the registry context value.
 
 ### useSelect
 
@@ -837,7 +833,7 @@ function Paste( { children } ) {
 _Parameters_
 
 -   _mapSelect_ `T`: Function called on every state change. The returned value is exposed to the component implementing this hook. The function receives the `registry.select` method on the first argument and the `registry` on the second argument. When a store key is passed, all selectors for the store will be returned. This is only meant for usage of these selectors in event callbacks, not for data needed to create the element tree.
--   _deps_ `unknown[]`: If provided, this memoizes the mapSelect so the same `mapSelect` is invoked on every state change unless the dependencies change.
+-   _deps_ `unknown[]=`: If provided, this memoizes the mapSelect so the same `mapSelect` is invoked on every state change unless the dependencies change.
 
 _Returns_
 

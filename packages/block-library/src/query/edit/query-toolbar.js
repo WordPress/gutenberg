@@ -2,34 +2,33 @@
  * WordPress dependencies
  */
 import {
-	ToolbarGroup,
 	ToolbarButton,
 	Dropdown,
 	__experimentalDropdownContentWrapper as DropdownContentWrapper,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { useSelect } from '@wordpress/data';
+import {
+	BlockControls,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
 import PatternSelection, { useBlockPatterns } from './pattern-selection';
+import { unlock } from '../../lock-unlock';
 
-export default function QueryToolbar( {
-	clientId,
-	attributes,
-	hasInnerBlocks,
-} ) {
+function PatternPicker( { clientId, attributes, hasInnerBlocks } ) {
 	const hasPatterns = useBlockPatterns( clientId, attributes ).length;
 	if ( ! hasPatterns ) {
 		return null;
 	}
-
 	const buttonLabel = hasInnerBlocks
 		? __( 'Change design' )
 		: __( 'Choose pattern' );
-
 	return (
-		<ToolbarGroup className="wp-block-template-part__block-control-group">
+		<BlockControls group="other">
 			<DropdownContentWrapper>
 				<Dropdown
 					contentClassName="block-editor-block-settings-menu__popover"
@@ -54,6 +53,20 @@ export default function QueryToolbar( {
 					) }
 				/>
 			</DropdownContentWrapper>
-		</ToolbarGroup>
+		</BlockControls>
 	);
+}
+
+export default function QueryToolbar( props ) {
+	const isLocked = useSelect(
+		( select ) => {
+			const { isLockedBlock } = unlock( select( blockEditorStore ) );
+			return isLockedBlock( props.clientId );
+		},
+		[ props.clientId ]
+	);
+	if ( isLocked ) {
+		return null;
+	}
+	return <PatternPicker { ...props } />;
 }

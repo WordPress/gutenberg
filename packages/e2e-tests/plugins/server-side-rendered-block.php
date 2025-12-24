@@ -43,5 +43,48 @@ add_action(
 				'editor_script_handles' => array( 'server-side-rendered-block' ),
 			)
 		);
+
+		// PHP-only block with auto_register flag, will be auto-registered without JS code
+		register_block_type(
+			'test/auto-register-block',
+			array(
+				'title'           => 'Auto Register Test Block',
+				'icon'            => 'admin-generic',
+				'category'        => 'widgets',
+				'description'     => 'A test block for auto-registration',
+				'keywords'        => array( 'serverblock', 'autotest' ),
+				'render_callback' => static function ( $attributes ) {
+					$wrapper_attributes = get_block_wrapper_attributes(
+						array(
+							'class' => 'auto-register-example',
+						)
+					);
+
+					return sprintf(
+						'<div %1$s><p>Auto-register block content</p><p>Background: %2$s</p></div>',
+						$wrapper_attributes,
+						isset( $attributes['backgroundColor'] ) ? esc_html( $attributes['backgroundColor'] ) : 'default'
+					);
+				},
+				'supports'        => array(
+					'auto_register' => true,
+					'color'         => array(
+						'background' => true,
+						'text'       => false,
+					),
+				),
+			)
+		);
+
+		// PHP-only block WITHOUT auto_register flag, will NOT be auto-registered without JS code
+		register_block_type(
+			'test/php-only-no-auto-register',
+			array(
+				'api_version'     => 3,
+				'render_callback' => static function () {
+					return '<div>PHP-only block content</div>';
+				},
+			)
+		);
 	}
 );

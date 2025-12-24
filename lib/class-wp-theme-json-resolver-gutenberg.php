@@ -2,7 +2,7 @@
 /**
  * WP_Theme_JSON_Resolver_Gutenberg class
  *
- * @package Gutenberg
+ * @package gutenberg
  * @since 5.8.0
  */
 
@@ -459,17 +459,6 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 			$theme = wp_get_theme();
 		}
 
-		/*
-		 * Bail early if the theme does not support a theme.json.
-		 *
-		 * Since wp_theme_has_theme_json only supports the active
-		 * theme, the extra condition for whether $theme is the active theme is
-		 * present here.
-		 */
-		if ( $theme->get_stylesheet() === get_stylesheet() && ! wp_theme_has_theme_json() ) {
-			return array();
-		}
-
 		$user_cpt         = array();
 		$post_type_filter = 'wp_global_styles';
 		$stylesheet       = $theme->get_stylesheet();
@@ -494,7 +483,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 
 		$global_style_query = new WP_Query();
 		$recent_posts       = $global_style_query->query( $args );
-		if ( count( $recent_posts ) === 1 ) {
+		if ( count( $recent_posts ) === 1 && $recent_posts[0] instanceof WP_Post ) {
 			$user_cpt = get_object_vars( $recent_posts[0] );
 		} elseif ( $create_post ) {
 			$cpt_post_id = wp_insert_post(
@@ -511,7 +500,10 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 				true
 			);
 			if ( ! is_wp_error( $cpt_post_id ) ) {
-				$user_cpt = get_object_vars( get_post( $cpt_post_id ) );
+				$post = get_post( $cpt_post_id );
+				if ( $post instanceof WP_Post ) {
+					$user_cpt = get_object_vars( $post );
+				}
 			}
 		}
 

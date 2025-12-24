@@ -45,13 +45,15 @@ test.describe( 'Toolbar roving tabindex', () => {
 		await editor.insertBlock( { name: 'core/heading' } );
 		await page.keyboard.type( 'Heading' );
 		await ToolbarRovingTabindexUtils.testBlockToolbarKeyboardNavigation(
-			'Block: Heading',
-			'Heading'
+			'Block: Heading 2',
+			'Heading 2'
 		);
-		await ToolbarRovingTabindexUtils.wrapCurrentBlockWithGroup( 'Heading' );
+		await ToolbarRovingTabindexUtils.wrapCurrentBlockWithGroup(
+			'Heading 2'
+		);
 		await ToolbarRovingTabindexUtils.testGroupKeyboardNavigation(
-			'Block: Heading',
-			'Heading'
+			'Block: Heading 2',
+			'Heading 2'
 		);
 
 		// ensures list block toolbar uses roving tabindex
@@ -88,20 +90,6 @@ test.describe( 'Toolbar roving tabindex', () => {
 		await ToolbarRovingTabindexUtils.testGroupKeyboardNavigation(
 			'Block: Table',
 			'Table'
-		);
-
-		// ensures custom html block toolbar uses roving tabindex
-		await editor.insertBlock( { name: 'core/html' } );
-		await ToolbarRovingTabindexUtils.testBlockToolbarKeyboardNavigation(
-			'HTML',
-			'Custom HTML'
-		);
-		await ToolbarRovingTabindexUtils.wrapCurrentBlockWithGroup(
-			'Custom HTML'
-		);
-		await ToolbarRovingTabindexUtils.testGroupKeyboardNavigation(
-			'Block: Custom HTML',
-			'Custom HTML'
 		);
 
 		// ensures image block toolbar uses roving tabindex
@@ -142,7 +130,7 @@ test.describe( 'Toolbar roving tabindex', () => {
 		await pageUtils.pressKeys( 'alt+F10' );
 		await page.keyboard.press( 'ArrowRight' );
 		await page.keyboard.press( 'ArrowRight' );
-		await ToolbarRovingTabindexUtils.expectLabelToHaveFocus( 'Bold' );
+		await ToolbarRovingTabindexUtils.expectLabelToHaveFocus( 'Align text' );
 	} );
 } );
 

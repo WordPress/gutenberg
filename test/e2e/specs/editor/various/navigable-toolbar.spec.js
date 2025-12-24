@@ -66,6 +66,7 @@ test.describe( 'Block Toolbar', () => {
 			).toBeFocused();
 			// // Navigate to Align Text
 			await page.keyboard.press( 'ArrowRight' );
+			await page.keyboard.press( 'ArrowRight' );
 			await expect(
 				page.getByRole( 'button', { name: 'Align text', exact: true } )
 			).toBeFocused();
@@ -140,7 +141,7 @@ test.describe( 'Block Toolbar', () => {
 		await expect(
 			page
 				.getByRole( 'toolbar', { name: 'Block Tools' } )
-				.getByRole( 'button', { name: 'Paragraph' } )
+				.getByRole( 'button', { name: 'Paragraph', exact: true } )
 		).toBeFocused();
 	} );
 
@@ -152,8 +153,6 @@ test.describe( 'Block Toolbar', () => {
 		page,
 		pageUtils,
 	} ) => {
-		/* eslint-disable playwright/expect-expect */
-		/* eslint-disable playwright/no-wait-for-timeout */
 		// Set the fixed toolbar
 		await editor.setIsFixedToolbar( true );
 		// Insert a block with a lot of tool buttons
@@ -184,8 +183,6 @@ test.describe( 'Block Toolbar', () => {
 		// Test cleanup
 		await editor.setIsFixedToolbar( false );
 		await pageUtils.setBrowserViewport( 'large' );
-		/* eslint-enable playwright/expect-expect */
-		/* eslint-enable playwright/no-wait-for-timeout */
 	} );
 
 	test( 'Tab order of the block toolbar aligns with visual order', async ( {

@@ -19,7 +19,6 @@ import {
 	validateBlock,
 	isClosedByToken,
 } from '../validation';
-import { createLogger } from '../validation/logger';
 import {
 	registerBlockType,
 	unregisterBlockType,
@@ -758,14 +757,6 @@ describe( 'validation', () => {
 			} );
 
 			expect( isValid ).toBe( true );
-		} );
-	} );
-
-	describe( 'createLogger()', () => {
-		it( 'creates logger that pre-processes string substitutions', () => {
-			createLogger().warning( '%o', { foo: 'bar' } );
-
-			expect( console ).toHaveWarnedWith( "{ foo: 'bar' }" );
 		} );
 	} );
 } );

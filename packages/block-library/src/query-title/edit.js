@@ -46,7 +46,8 @@ export default function QueryTitleEdit( {
 	const { postTypeLabel } = usePostTypeLabel( query?.postType );
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
-	const TagName = `h${ level }`;
+	const TagName = level === 0 ? 'p' : `h${ level }`;
+
 	const blockProps = useBlockProps( {
 		className: clsx( 'wp-block-query-title__placeholder', {
 			[ `has-text-align-${ textAlign }` ]: textAlign,
@@ -116,7 +117,6 @@ export default function QueryTitleEdit( {
 							isShownByDefault
 						>
 							<ToggleControl
-								__nextHasNoMarginBottom
 								label={ __( 'Show archive type in title' ) }
 								onChange={ () =>
 									setAttributes( {
@@ -155,7 +155,6 @@ export default function QueryTitleEdit( {
 							isShownByDefault
 						>
 							<ToggleControl
-								__nextHasNoMarginBottom
 								label={ __( 'Show search term in title' ) }
 								onChange={ () =>
 									setAttributes( {
@@ -214,7 +213,6 @@ export default function QueryTitleEdit( {
 							isShownByDefault
 						>
 							<ToggleControl
-								__nextHasNoMarginBottom
 								label={ __( 'Show post type label' ) }
 								onChange={ () =>
 									setAttributes( {

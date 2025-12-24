@@ -628,10 +628,36 @@ export function registeredPostMeta( state = {}, action ) {
 	return state;
 }
 
-export function templateAutoDraftId( state = {}, action ) {
-	return action.type === 'RECEIVE_TEMPLATE_AUTO_DRAFT_ID'
-		? { ...state, [ action.target ]: action.id }
-		: state;
+/**
+ * Reducer managing editor settings.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Action object.
+ *
+ * @return {Object} Updated state.
+ */
+export function editorSettings( state = null, action ) {
+	switch ( action.type ) {
+		case 'RECEIVE_EDITOR_SETTINGS':
+			return action.settings;
+	}
+	return state;
+}
+
+/**
+ * Reducer managing editor assets.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Action object.
+ *
+ * @return {Object} Updated state.
+ */
+export function editorAssets( state = null, action ) {
+	switch ( action.type ) {
+		case 'RECEIVE_EDITOR_ASSETS':
+			return action.assets;
+	}
+	return state;
 }
 
 export default combineReducers( {
@@ -654,5 +680,6 @@ export default combineReducers( {
 	navigationFallbackId,
 	defaultTemplates,
 	registeredPostMeta,
-	templateAutoDraftId,
+	editorSettings,
+	editorAssets,
 } );

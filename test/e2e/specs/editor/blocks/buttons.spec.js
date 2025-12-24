@@ -210,7 +210,7 @@ test.describe( 'Buttons', () => {
 		await page
 			//TODO: change to a better selector when https://github.com/WordPress/gutenberg/issues/51060 is resolved.
 			.locator( '.block-editor-link-control' )
-			.getByRole( 'button', { name: 'Save' } )
+			.getByRole( 'button', { name: 'Apply' } )
 			.click();
 
 		// The link should have been inserted.
@@ -244,7 +244,7 @@ test.describe( 'Buttons', () => {
 		await page
 			//TODO: change to a better selector when https://github.com/WordPress/gutenberg/issues/51060 is resolved.
 			.locator( '.block-editor-link-control' )
-			.getByRole( 'button', { name: 'Save' } )
+			.getByRole( 'button', { name: 'Apply' } )
 			.click();
 
 		// Check the content again.

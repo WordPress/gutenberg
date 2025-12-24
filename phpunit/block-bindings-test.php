@@ -2,7 +2,7 @@
 /**
  * Tests for Block Bindings integration with block rendering.
  *
- * @package Gutenberg
+ * @package gutenberg
  */
 class Tests_Block_Bindings extends WP_UnitTestCase {
 

@@ -112,7 +112,6 @@ const UnconnectedBorderControl = (
 				/>
 				{ withSlider && (
 					<RangeControl
-						__nextHasNoMarginBottom
 						label={ __( 'Border width' ) }
 						hideLabelFromVision
 						className={ sliderClassName }

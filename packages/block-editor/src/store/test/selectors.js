@@ -2669,6 +2669,7 @@ describe( 'selectors', () => {
 				},
 				blockListSettings: {},
 				settings: {},
+				blockEditingModes: new Map(),
 			};
 			expect( canInsertBlockType( state, 'core/invalid' ) ).toBe( false );
 		} );
@@ -2683,6 +2684,7 @@ describe( 'selectors', () => {
 				settings: {
 					allowedBlockTypes: [],
 				},
+				blockEditingModes: new Map(),
 			};
 			expect( canInsertBlockType( state, 'core/test-block-a' ) ).toBe(
 				false
@@ -2719,6 +2721,7 @@ describe( 'selectors', () => {
 				settings: {
 					templateLock: 'all',
 				},
+				blockEditingModes: new Map(),
 			};
 			expect( canInsertBlockType( state, 'core/test-block-a' ) ).toBe(
 				false
@@ -3078,7 +3081,7 @@ describe( 'selectors', () => {
 					byClientId: new Map(
 						Object.entries( {
 							block1: { name: 'core/test-block-ancestor' },
-							block2: { name: 'core/block' },
+							block2: { name: 'core/group' },
 							block3: { name: 'core/test-block-parent' },
 						} )
 					),
@@ -3876,6 +3879,19 @@ describe( 'selectors', () => {
 
 			expect( getTemplateLock( state, 'chicken' ) ).toBe( 'insert' );
 		} );
+
+		it( 'should return false if the block has contentOnly template lock and is an edited section', () => {
+			const state = {
+				editedContentOnlySection: 'chicken',
+				blockListSettings: {
+					chicken: {
+						templateLock: 'contentOnly',
+					},
+				},
+			};
+
+			expect( getTemplateLock( state, 'chicken' ) ).toBe( false );
+		} );
 	} );
 
 	describe( 'getBlockListSettings', () => {
@@ -4394,7 +4410,6 @@ describe( 'getBlockEditingMode', () => {
 	const baseState = {
 		blockEditingModes: new Map( [] ),
 		derivedBlockEditingModes: new Map( [] ),
-		derivedNavModeBlockEditingModes: new Map( [] ),
 	};
 
 	const hasContentRoleAttribute = jest.fn( () => false );

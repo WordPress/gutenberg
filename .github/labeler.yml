@@ -1,0 +1,253 @@
+# Package labeling rules - only labels that exist on GitHub
+
+'[Package] A11y':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/a11y/**'
+
+'[Package] API fetch':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/api-fetch/**'
+
+'[Package] Autop':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/autop/**'
+
+'[Package] Base styles':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/base-styles/**'
+
+'[Package] Blob':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/blob/**'
+
+'[Package] Block editor':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/block-editor/**'
+
+'[Package] Block library':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/block-library/**'
+
+'[Package] Blocks':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/blocks/**'
+
+'[Package] Commands':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/commands/**'
+
+'[Package] Components':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/components/**'
+
+'[Package] Compose':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/compose/**'
+
+'[Package] Core commands':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/core-commands/**'
+
+'[Package] Core data':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/core-data/**'
+
+'[Package] Data Controls':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/data-controls/**'
+
+'[Package] Data':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/data/**'
+
+'[Package] DataViews':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/dataviews/**'
+
+'[Package] Date':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/date/**'
+
+'[Package] Deprecated':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/deprecated/**'
+
+'[Package] DOM ready':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/dom-ready/**'
+
+'[Package] DOM':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/dom/**'
+
+'[Package] E2E Tests':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/e2e-test-utils-playwright/**'
+
+'[Package] Edit Post':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/edit-post/**'
+
+'[Package] Edit Site':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/edit-site/**'
+
+'[Package] Edit Widgets':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/edit-widgets/**'
+
+'[Package] Editor':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/editor/**'
+
+'[Package] Element':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/element/**'
+
+'[Package] Escape HTML':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/escape-html/**'
+
+'[Package] Fields':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/fields/**'
+
+'[Package] Format library':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/format-library/**'
+
+'[Package] Hooks':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/hooks/**'
+
+'[Package] HTML entities':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/html-entities/**'
+
+'[Package] i18n':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/i18n/**'
+
+'[Package] Icons':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/icons/**'
+
+'[Package] Interactivity':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/interactivity/**'
+
+'[Package] Interactivity Router':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/interactivity-router/**'
+
+'[Package] Interface':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/interface/**'
+
+'[Package] is-shallow-equal':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/is-shallow-equal/**'
+
+'[Package] Keyboard Shortcuts':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/keyboard-shortcuts/**'
+
+'[Package] Keycodes':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/keycodes/**'
+
+'[Package] Lazy import':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/lazy-import/**'
+
+'[Package] Media Utils':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/media-utils/**'
+
+'[Package] Notices':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/notices/**'
+
+'[Package] Patterns':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/patterns/**'
+
+'[Package] Plugins':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/plugins/**'
+
+'[Package] Preferences':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/preferences/**'
+
+'[Package] Primitives':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/primitives/**'
+
+'[Package] Priority Queue':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/priority-queue/**'
+
+'[Package] Private APIs':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/private-apis/**'
+
+'[Package] Project management automation':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/project-management-automation/**'
+
+'[Package] React i18n':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/react-i18n/**'
+
+'[Package] Redux Routine':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/redux-routine/**'
+
+'[Package] Rich text':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/rich-text/**'
+
+'[Package] Router':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/router/**'
+
+'[Package] Sanitize':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/sanitize/**'
+
+'[Package] Server Side Render':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/server-side-render/**'
+
+'[Package] Style Engine':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/style-engine/**'
+
+'[Package] Sync':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/sync/**'
+
+'[Package] Theme':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/theme/**'
+
+'[Package] Token List':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/token-list/**'
+
+'[Package] Url':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/url/**'
+
+'[Package] Viewport':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/viewport/**'
+
+'[Package] Warning':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/warning/**'
+
+'[Package] Word count':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/wordcount/**'

@@ -21,10 +21,10 @@ export const settings = {
 	example: {
 		innerBlocks: [
 			{
-				name: 'core/accordion-content',
+				name: 'core/accordion-item',
 				innerBlocks: [
 					{
-						name: 'core/accordion-header',
+						name: 'core/accordion-heading',
 						attributes: {
 							title: __(
 								'Lorem ipsum dolor sit amet, consectetur.'
@@ -34,10 +34,10 @@ export const settings = {
 				],
 			},
 			{
-				name: 'core/accordion-content',
+				name: 'core/accordion-item',
 				innerBlocks: [
 					{
-						name: 'core/accordion-header',
+						name: 'core/accordion-heading',
 						attributes: {
 							title: __(
 								'Suspendisse commodo lacus, interdum et.'

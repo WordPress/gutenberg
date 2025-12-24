@@ -20,7 +20,7 @@ import {
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { createInterpolateElement, useState } from '@wordpress/element';
-import { grid, list, edit, rss } from '@wordpress/icons';
+import { grid, list, pencil, rss } from '@wordpress/icons';
 import { __, _x } from '@wordpress/i18n';
 import { prependHTTP } from '@wordpress/url';
 import ServerSideRender from '@wordpress/server-side-render';
@@ -113,7 +113,7 @@ export default function RSSEdit( { attributes, setAttributes } ) {
 
 	const toolbarControls = [
 		{
-			icon: edit,
+			icon: pencil,
 			title: __( 'Edit RSS URL' ),
 			onClick: () => setIsEditing( true ),
 		},
@@ -172,7 +172,6 @@ export default function RSSEdit( { attributes, setAttributes } ) {
 						isShownByDefault
 					>
 						<RangeControl
-							__nextHasNoMarginBottom
 							__next40pxDefaultSize
 							label={ __( 'Number of items' ) }
 							value={ itemsToShow }
@@ -194,7 +193,6 @@ export default function RSSEdit( { attributes, setAttributes } ) {
 						isShownByDefault
 					>
 						<ToggleControl
-							__nextHasNoMarginBottom
 							label={ __( 'Display author' ) }
 							checked={ displayAuthor }
 							onChange={ toggleAttribute( 'displayAuthor' ) }
@@ -210,7 +208,6 @@ export default function RSSEdit( { attributes, setAttributes } ) {
 						isShownByDefault
 					>
 						<ToggleControl
-							__nextHasNoMarginBottom
 							label={ __( 'Display date' ) }
 							checked={ displayDate }
 							onChange={ toggleAttribute( 'displayDate' ) }
@@ -226,7 +223,6 @@ export default function RSSEdit( { attributes, setAttributes } ) {
 						isShownByDefault
 					>
 						<ToggleControl
-							__nextHasNoMarginBottom
 							label={ __( 'Display excerpt' ) }
 							checked={ displayExcerpt }
 							onChange={ toggleAttribute( 'displayExcerpt' ) }
@@ -243,7 +239,6 @@ export default function RSSEdit( { attributes, setAttributes } ) {
 							isShownByDefault
 						>
 							<RangeControl
-								__nextHasNoMarginBottom
 								__next40pxDefaultSize
 								label={ __( 'Max number of words in excerpt' ) }
 								value={ excerptLength }
@@ -265,7 +260,6 @@ export default function RSSEdit( { attributes, setAttributes } ) {
 							isShownByDefault
 						>
 							<RangeControl
-								__nextHasNoMarginBottom
 								__next40pxDefaultSize
 								label={ __( 'Columns' ) }
 								value={ columns }
@@ -288,7 +282,6 @@ export default function RSSEdit( { attributes, setAttributes } ) {
 						isShownByDefault
 					>
 						<ToggleControl
-							__nextHasNoMarginBottom
 							label={ __( 'Open links in new tab' ) }
 							checked={ openInNewTab }
 							onChange={ ( value ) =>
@@ -301,7 +294,6 @@ export default function RSSEdit( { attributes, setAttributes } ) {
 			<InspectorControls group="advanced">
 				<TextControl
 					__next40pxDefaultSize
-					__nextHasNoMarginBottom
 					label={ __( 'Link relation' ) }
 					help={ createInterpolateElement(
 						__(

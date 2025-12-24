@@ -6,15 +6,13 @@ import type { ReactElement } from 'react';
 /**
  * WordPress dependencies
  */
-import {
-	Button,
-	CheckboxControl,
-	__experimentalHStack as HStack,
-} from '@wordpress/components';
+import { Button, CheckboxControl } from '@wordpress/components';
 import { __, sprintf, _n } from '@wordpress/i18n';
 import { useMemo, useState, useRef, useContext } from '@wordpress/element';
 import { useRegistry } from '@wordpress/data';
 import { closeSmall } from '@wordpress/icons';
+import { useViewportMatch } from '@wordpress/compose';
+import { Stack } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -22,7 +20,7 @@ import { closeSmall } from '@wordpress/icons';
 import DataViewsContext from '../dataviews-context';
 import { ActionModal } from '../dataviews-item-actions';
 import type { Action, ActionModal as ActionModalType } from '../../types';
-import type { SetSelection } from '../../private-types';
+import type { SetSelection } from '../../types/private';
 import type { ActionTriggerProps } from '../dataviews-item-actions';
 
 interface ActionWithModalProps< Item > {
@@ -123,7 +121,6 @@ export function BulkSelectionCheckbox< Item >( {
 	return (
 		<CheckboxControl
 			className="dataviews-view-table-selection-checkbox"
-			__nextHasNoMarginBottom
 			checked={ areAllSelected }
 			indeterminate={ ! areAllSelected && !! selectedItems.length }
 			onChange={ () => {
@@ -165,18 +162,32 @@ function ActionTrigger< Item >( {
 }: ActionTriggerProps< Item > ) {
 	const label =
 		typeof action.label === 'string' ? action.label : action.label( items );
+	const isMobile = useViewportMatch( 'medium', '<' );
+
+	if ( isMobile ) {
+		return (
+			<Button
+				disabled={ isBusy }
+				accessibleWhenDisabled
+				label={ label }
+				icon={ action.icon }
+				size="compact"
+				onClick={ onClick }
+				isBusy={ isBusy }
+			/>
+		);
+	}
+
 	return (
 		<Button
 			disabled={ isBusy }
 			accessibleWhenDisabled
-			label={ label }
-			icon={ action.icon }
-			isDestructive={ action.isDestructive }
 			size="compact"
 			onClick={ onClick }
 			isBusy={ isBusy }
-			tooltipPosition="top"
-		/>
+		>
+			{ label }
+		</Button>
 	);
 }
 
@@ -249,10 +260,11 @@ function renderFooterContent< Item >(
 					data.length
 			  );
 	return (
-		<HStack
-			expanded={ false }
+		<Stack
+			direction="row"
 			className="dataviews-bulk-actions-footer__container"
-			spacing={ 3 }
+			gap="sm"
+			align="center"
 		>
 			<BulkSelectionCheckbox
 				selection={ selection }
@@ -264,10 +276,10 @@ function renderFooterContent< Item >(
 			<span className="dataviews-bulk-actions-footer__item-count">
 				{ message }
 			</span>
-			<HStack
+			<Stack
+				direction="row"
 				className="dataviews-bulk-actions-footer__action-buttons"
-				expanded={ false }
-				spacing={ 1 }
+				gap="2xs"
 			>
 				{ actionsToShow.map( ( action ) => {
 					return (
@@ -294,8 +306,8 @@ function renderFooterContent< Item >(
 						} }
 					/>
 				) }
-			</HStack>
-		</HStack>
+			</Stack>
+		</Stack>
 	);
 }
 
@@ -310,6 +322,7 @@ function FooterContent< Item >( {
 		null
 	);
 	const footerContentRef = useRef< JSX.Element | null >( null );
+	const isMobile = useViewportMatch( 'medium', '<' );
 
 	const bulkActions = useMemo(
 		() => actions.filter( ( action ) => action.supportsBulk ),
@@ -336,14 +349,14 @@ function FooterContent< Item >( {
 			actions.filter( ( action ) => {
 				return (
 					action.supportsBulk &&
-					action.icon &&
+					( ! isMobile || action.icon ) &&
 					selectedItems.some(
 						( item ) =>
 							! action.isEligible || action.isEligible( item )
 					)
 				);
 			} ),
-		[ actions, selectedItems ]
+		[ actions, selectedItems, isMobile ]
 	);
 	if ( ! actionInProgress ) {
 		if ( footerContentRef.current ) {

@@ -3,6 +3,7 @@
  */
 import { usePrevious } from '@wordpress/compose';
 import { useState, useLayoutEffect } from '@wordpress/element';
+import { getRectangleFromRange } from '@wordpress/dom';
 
 /** @typedef {import('../register-format-type').WPFormat} WPFormat */
 /** @typedef {import('../types').RichTextValue} RichTextValue */
@@ -87,7 +88,7 @@ function createVirtualAnchorElement( range, editableContentElement ) {
 		contextElement: editableContentElement,
 		getBoundingClientRect() {
 			return editableContentElement.contains( range.startContainer )
-				? range.getBoundingClientRect()
+				? getRectangleFromRange( range )
 				: editableContentElement.getBoundingClientRect();
 		},
 	};

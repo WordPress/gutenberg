@@ -21,7 +21,6 @@ import { useSelect } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import { useBlockSelectionClearer } from '../block-selection-clearer';
 import { useWritingFlow } from '../writing-flow';
 import { getCompatibilityStyles } from './get-compatibility-styles';
 import { useScaleCanvas } from './use-scale-canvas';
@@ -119,7 +118,6 @@ function Iframe( {
 	/** @type {[Document, import('react').Dispatch<Document>]} */
 	const [ iframeDocument, setIframeDocument ] = useState();
 	const [ bodyClasses, setBodyClasses ] = useState( [] );
-	const clearerRef = useBlockSelectionClearer();
 	const [ before, writingFlowRef, after ] = useWritingFlow();
 
 	const setRef = useRefEffect( ( node ) => {
@@ -175,8 +173,6 @@ function Iframe( {
 			iFrameDocument = contentDocument;
 
 			documentElement.classList.add( 'block-editor-iframe__html' );
-
-			clearerRef( documentElement );
 
 			contentDocument.dir = ownerDocument.dir;
 
@@ -243,7 +239,6 @@ function Iframe( {
 	const bodyRef = useMergeRefs( [
 		useBubbleEvents( iframeDocument ),
 		contentRef,
-		clearerRef,
 		writingFlowRef,
 		disabledRef,
 	] );
@@ -342,9 +337,6 @@ function Iframe( {
 			>
 				{ iframeDocument &&
 					createPortal(
-						// We want to prevent React events from bubbling through the iframe
-						// we bubble these manually.
-						/* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */
 						<body
 							ref={ bodyRef }
 							className={ clsx(

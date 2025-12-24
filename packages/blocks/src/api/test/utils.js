@@ -495,6 +495,14 @@ describe( 'isUnmodifiedBlock', () => {
 		expect( isUnmodifiedBlock( block, 'non-existent-role' ) ).toBe( true );
 	} );
 
+	it( 'should return false if no attributes exist for the role and some are modified', () => {
+		const block = createBlock( 'core/test-block', {
+			align: 'center',
+			content: 'Updated content',
+		} );
+		expect( isUnmodifiedBlock( block, 'non-existent-role' ) ).toBe( false );
+	} );
+
 	it( 'should return true if metadata attributes is not modified for role content', () => {
 		const block = createBlock( 'core/test-block' );
 		expect( isUnmodifiedBlock( block, 'content' ) ).toBe( true );

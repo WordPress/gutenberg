@@ -8,41 +8,39 @@ import TextareaAutosize from 'react-autosize-textarea';
  */
 import { useState } from '@wordpress/element';
 import {
+	__experimentalVStack as VStack,
 	__experimentalHStack as HStack,
+	__experimentalTruncate as Truncate,
 	Button,
 	VisuallyHidden,
 } from '@wordpress/components';
-import { _x, __ } from '@wordpress/i18n';
-import { useInstanceId } from '@wordpress/compose';
+import { __ } from '@wordpress/i18n';
+import { useInstanceId, useDebounce } from '@wordpress/compose';
+import { isKeyboardEvent } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
  */
-import { sanitizeCommentString } from './utils';
+import { sanitizeCommentString, noop } from './utils';
 
-/**
- * EditComment component.
- *
- * @param {Object}   props                  - The component props.
- * @param {Function} props.onSubmit         - The function to call when updating the comment.
- * @param {Function} props.onCancel         - The function to call when canceling the comment update.
- * @param {Object}   props.thread           - The comment thread object.
- * @param {string}   props.submitButtonText - The text to display on the submit button.
- * @param {string?}  props.placeholderText  - The placeholder text for the comment input.
- * @param {number?}  props.rows             - The number of rows for the comment input.
- * @return {React.ReactNode} The CommentForm component.
- */
 function CommentForm( {
 	onSubmit,
 	onCancel,
 	thread,
 	submitButtonText,
-	placeholderText,
-	rows = 4,
+	labelText,
+	reflowComments = noop,
 } ) {
 	const [ inputComment, setInputComment ] = useState(
 		thread?.content?.raw ?? ''
 	);
+
+	// Regularly trigger a reflow as the user types since the textarea may grow or shrink.
+	const debouncedCommentUpdated = useDebounce( reflowComments, 100 );
+
+	const updateComment = ( value ) => {
+		setInputComment( value );
+	};
 
 	const inputId = useInstanceId( CommentForm, 'comment-input' );
 	const isDisabled =
@@ -50,40 +48,52 @@ function CommentForm( {
 		! sanitizeCommentString( inputComment ).length;
 
 	return (
-		<>
+		<VStack
+			className="editor-collab-sidebar-panel__comment-form"
+			spacing="4"
+			as="form"
+			onSubmit={ ( event ) => {
+				event.preventDefault();
+				onSubmit( inputComment );
+				setInputComment( '' );
+			} }
+		>
 			<VisuallyHidden as="label" htmlFor={ inputId }>
-				{ __( 'Comment' ) }
+				{ labelText ?? __( 'Note' ) }
 			</VisuallyHidden>
 			<TextareaAutosize
 				id={ inputId }
 				value={ inputComment ?? '' }
-				onChange={ ( comment ) =>
-					setInputComment( comment.target.value )
-				}
-				rows={ rows }
+				onChange={ ( comment ) => {
+					updateComment( comment.target.value );
+					debouncedCommentUpdated();
+				} }
+				rows={ 1 }
 				maxRows={ 20 }
-				placeholder={ placeholderText || '' }
+				onKeyDown={ ( event ) => {
+					if (
+						isKeyboardEvent.primary( event, 'Enter' ) &&
+						! isDisabled
+					) {
+						event.target.parentNode.requestSubmit();
+					}
+				} }
 			/>
-			<HStack spacing="3" justify="flex-start" wrap>
+			<HStack spacing="2" justify="flex-end" wrap>
+				<Button size="compact" variant="tertiary" onClick={ onCancel }>
+					<Truncate>{ __( 'Cancel' ) }</Truncate>
+				</Button>
 				<Button
-					__next40pxDefaultSize
+					size="compact"
 					accessibleWhenDisabled
 					variant="primary"
-					onClick={ () => {
-						onSubmit( inputComment );
-						setInputComment( '' );
-					} }
+					type="submit"
 					disabled={ isDisabled }
-					text={ submitButtonText }
-				/>
-				<Button
-					__next40pxDefaultSize
-					variant="tertiary"
-					onClick={ onCancel }
-					text={ _x( 'Cancel', 'Cancel comment button' ) }
-				/>
+				>
+					<Truncate>{ submitButtonText }</Truncate>
+				</Button>
 			</HStack>
-		</>
+		</VStack>
 	);
 }
 

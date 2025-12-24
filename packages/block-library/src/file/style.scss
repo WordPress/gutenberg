@@ -1,3 +1,5 @@
+@use "@wordpress/base-styles/colors" as *;
+
 .wp-block-file {
 	// This block has customizable padding, border-box makes that more predictable.
 	box-sizing: border-box;

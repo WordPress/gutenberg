@@ -3,6 +3,7 @@
  */
 import type { Meta, StoryFn } from '@storybook/react';
 import styled from '@emotion/styled';
+import { fn } from '@storybook/test';
 
 /**
  * WordPress dependencies
@@ -37,8 +38,10 @@ const meta: Meta< typeof ToolsPanel > = {
 		resetAll: { action: 'resetAll' },
 	},
 	tags: [ 'status-experimental' ],
+	args: {
+		resetAll: fn(),
+	},
 	parameters: {
-		actions: { argTypesRegex: '^on.*' },
 		controls: {
 			expanded: true,
 		},
@@ -113,7 +116,6 @@ export const Default: StoryFn< typeof ToolsPanel > = ( {
 						onDeselect={ () => setScale( undefined ) }
 					>
 						<ToggleGroupControl
-							__nextHasNoMarginBottom
 							__next40pxDefaultSize
 							label="Scale"
 							value={ scale }
@@ -469,7 +471,6 @@ export const WithConditionalDefaultControl: StoryFn< typeof ToolsPanel > = ( {
 					isShownByDefault={ !! height }
 				>
 					<ToggleGroupControl
-						__nextHasNoMarginBottom
 						__next40pxDefaultSize
 						label="Scale"
 						value={ scale }
@@ -573,7 +574,6 @@ export const WithConditionallyRenderedControl: StoryFn<
 						isShownByDefault
 					>
 						<ToggleGroupControl
-							__nextHasNoMarginBottom
 							__next40pxDefaultSize
 							label="Scale"
 							value={ scale }
