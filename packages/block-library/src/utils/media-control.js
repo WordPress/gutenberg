@@ -79,14 +79,9 @@ export function MediaControl( {
 	isUploading = false,
 	emptyLabel = __( 'Add media' ),
 } ) {
-	const { mediaUpload } = useSelect( ( select ) => {
-		const { getSettings } = select( blockEditorStore );
-		return {
-			mediaUpload: getSettings().mediaUpload,
-		};
-	}, [] );
-
+	const { getSettings } = useSelect( blockEditorStore );
 	const onFilesDrop = ( filesList ) => {
+		const { mediaUpload } = getSettings();
 		if ( ! mediaUpload ) {
 			return;
 		}
