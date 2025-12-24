@@ -35,4 +35,25 @@ describe( 'VisuallyHidden', () => {
 			'test-class'
 		);
 	} );
+
+	it( 'should support the render prop', () => {
+		render(
+			<>
+				<VisuallyHidden
+					render={
+						// eslint-disable-next-line jsx-a11y/label-has-associated-control
+						<label htmlFor="input-id" />
+					}
+				>
+					My label
+				</VisuallyHidden>
+				{ /* eslint-disable-next-line no-restricted-syntax */ }
+				<input id="input-id" />
+			</>
+		);
+
+		expect(
+			screen.getByRole( 'textbox', { name: 'My label' } )
+		).toBeVisible();
+	} );
 } );
