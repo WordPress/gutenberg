@@ -23,7 +23,7 @@ import {
 	arrowRight,
 	arrowLeft,
 } from '@wordpress/icons';
-import { getBlockType } from '@wordpress/blocks';
+import { getBlockType, hasBlockSupport } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -31,7 +31,6 @@ import { getBlockType } from '@wordpress/blocks';
 import { unlock } from '../../lock-unlock';
 import { store as blockEditorStore } from '../../store';
 import BlockIcon from '../block-icon';
-import { hasListViewSupport } from '../../hooks/list-view';
 
 const { Badge } = unlock( componentsPrivateApis );
 
@@ -122,7 +121,7 @@ function BlockCard( {
 				const parentName = getBlockName( parentId );
 				return (
 					parentName === 'core/navigation' ||
-					hasListViewSupport( parentName )
+					hasBlockSupport( parentName, 'listView' )
 				);
 			} );
 
