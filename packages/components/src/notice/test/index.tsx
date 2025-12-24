@@ -141,7 +141,8 @@ describe( 'Notice', () => {
 			const button = screen.getByRole( 'button', {
 				name: 'Disabled action',
 			} );
-			expect( button ).toBeDisabled();
+			// Button uses accessibleWhenDisabled, so it uses aria-disabled
+			expect( button ).toHaveAttribute( 'aria-disabled', 'true' );
 		} );
 
 		it( 'should pass target and rel props to link actions', () => {
