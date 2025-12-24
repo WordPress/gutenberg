@@ -21,6 +21,7 @@
 
 ### Enhancements
 
+- DataViews: improve how hierarchy is displayed in table layout. [#74199](https://github.com/WordPress/gutenberg/pull/74199)
 - DataViews: Add `groupBy.showLabel` config option to control whether the field label is shown in group headers. [#74161](https://github.com/WordPress/gutenberg/pull/74161)
 - DataViews table layout: remove row click-to-select behavior and hover styles. Selection is now only possible via checkboxes, or by ctrl/cmd clicking. [#73873](https://github.com/WordPress/gutenberg/pull/73873)
 - Better labels for operators and deprecate the `isNotAll` operator. [#73671](https://github.com/WordPress/gutenberg/pull/73671)
