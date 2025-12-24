@@ -164,6 +164,7 @@ function AudioEdit( {
 						onSelectURL={ onSelectURL }
 						onError={ onUploadError }
 						onReset={ () => onSelectAudio( undefined ) }
+						variant="toolbar"
 					/>
 				</BlockControls>
 			) }

@@ -1,4 +1,5 @@
 @use "@wordpress/base-styles/mixins" as *;
+@use "./utils/media-control.scss" as *;
 @use "./archives/editor.scss" as *;
 @use "./audio/editor.scss" as *;
 @use "./avatar/editor.scss" as *;
