@@ -24,7 +24,7 @@ function render_block_core_comments_title( $attributes ) {
 	$show_post_title     = ! empty( $attributes['showPostTitle'] ) && $attributes['showPostTitle'];
 	$show_comments_count = ! empty( $attributes['showCommentsCount'] ) && $attributes['showCommentsCount'];
 	$wrapper_attributes  = get_block_wrapper_attributes( array( 'class' => $align_class_name ) );
-	$comments_count      = get_comments_number();
+	$comments_count      = (int) get_comments_number();
 	/* translators: %s: Post title. */
 	$post_title = sprintf( __( '&#8220;%s&#8221;' ), get_the_title() );
 	$tag_name   = 'h2';
@@ -32,13 +32,13 @@ function render_block_core_comments_title( $attributes ) {
 		$tag_name = 'h' . $attributes['level'];
 	}
 
-	if ( '0' === $comments_count ) {
+	if ( 0 === $comments_count ) {
 		return;
 	}
 
 	if ( $show_comments_count ) {
 		if ( $show_post_title ) {
-			if ( '1' === $comments_count ) {
+			if ( 1 === $comments_count ) {
 				/* translators: %s: Post title. */
 				$comments_title = sprintf( __( 'One response to %s' ), $post_title );
 			} else {
@@ -53,7 +53,7 @@ function render_block_core_comments_title( $attributes ) {
 					$post_title
 				);
 			}
-		} elseif ( '1' === $comments_count ) {
+		} elseif ( 1 === $comments_count ) {
 			$comments_title = __( 'One response' );
 		} else {
 			$comments_title = sprintf(
@@ -63,14 +63,14 @@ function render_block_core_comments_title( $attributes ) {
 			);
 		}
 	} elseif ( $show_post_title ) {
-		if ( '1' === $comments_count ) {
+		if ( 1 === $comments_count ) {
 			/* translators: %s: Post title. */
 			$comments_title = sprintf( __( 'Response to %s' ), $post_title );
 		} else {
 			/* translators: %s: Post title. */
 			$comments_title = sprintf( __( 'Responses to %s' ), $post_title );
 		}
-	} elseif ( '1' === $comments_count ) {
+	} elseif ( 1 === $comments_count ) {
 		$comments_title = __( 'Response' );
 	} else {
 		$comments_title = __( 'Responses' );
