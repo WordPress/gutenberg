@@ -87,15 +87,7 @@ export const Popover = forwardRef<
 			wrapperProps={ wrapperProps }
 			hideOnEscape={ hideOnEscape }
 			unmountOnHide
-			render={ ( renderProps ) => (
-				// Two wrappers are needed for the entry animation, where the menu
-				// container scales with a different factor than its contents.
-				// The {...renderProps} are passed to the inner wrapper, so that the
-				// menu element is the direct parent of the menu item elements.
-				<Styled.PopoverOuterWrapper variant={ menuContext.variant }>
-					<Styled.PopoverInnerWrapper { ...renderProps } />
-				</Styled.PopoverOuterWrapper>
-			) }
+			render={ <Styled.PopoverWrapper variant={ menuContext.variant } /> }
 		>
 			{ children }
 		</Ariakit.Menu>
