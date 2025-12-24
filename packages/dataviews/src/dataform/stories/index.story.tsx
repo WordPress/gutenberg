@@ -29,6 +29,10 @@ export const LayoutCard = {
 			control: { type: 'boolean' },
 			description: 'Whether the card can be collapsed/expanded.',
 		},
+		isOpened: {
+			control: { type: 'boolean' },
+			description: 'Whether the card can be collapsed/expanded.',
+		},
 	},
 	args: {
 		withHeader: true,

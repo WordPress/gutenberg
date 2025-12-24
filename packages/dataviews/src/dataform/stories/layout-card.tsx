@@ -16,9 +16,11 @@ const { Badge } = unlock( privateApis );
 const LayoutCardComponent = ( {
 	withHeader,
 	isCollapsible,
+	isOpened,
 }: {
 	withHeader: boolean;
 	isCollapsible: boolean;
+	isOpened?: boolean;
 } ) => {
 	type Customer = {
 		name: string;
@@ -150,7 +152,13 @@ const LayoutCardComponent = ( {
 					layout: {
 						type: 'card',
 						summary: 'plan-summary',
-						withHeader,
+						...( withHeader === false
+							? { withHeader: false }
+							: {
+									withHeader: true,
+									isCollapsible,
+									isOpened,
+							  } ),
 					},
 					label: 'Customer',
 					description:
@@ -214,15 +222,20 @@ const LayoutCardComponent = ( {
 					label: 'Taxes',
 					layout: {
 						type: 'card',
-						isOpened: false,
 						summary: [ { id: 'dueDate', visibility: 'always' } ],
-						isCollapsible,
+						...( withHeader === false
+							? { withHeader: false }
+							: {
+									withHeader: true,
+									isCollapsible,
+									isOpened: isOpened ?? false,
+							  } ),
 					},
 					children: [ 'vat', 'commission' ],
 				},
 			],
 		} ),
-		[ withHeader, isCollapsible ]
+		[ withHeader, isCollapsible, isOpened ]
 	);
 
 	return (
