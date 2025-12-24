@@ -623,7 +623,10 @@ async function bundlePackage( packageName, options = {} ) {
 					?.map( ( d ) => d.replace( /'/g, '' ) ) || [];
 		}
 
-		const styleDeps = await inferStyleDependencies( scriptDependencies );
+		const styleDeps = await inferStyleDependencies(
+			scriptDependencies,
+			packageName
+		);
 
 		builtStyles.push( {
 			handle: `${ handlePrefix }-${ packageName }`,
@@ -647,14 +650,17 @@ async function bundlePackage( packageName, options = {} ) {
  * 3. Actually have a built style.css file
  *
  * @param {string[]} scriptDependencies Array of script handles from asset file.
+ * @param {string}   packageName        Package name (short name) being bundled, for context-aware resolution.
  * @return {Promise<string[]>} Array of style handles to depend on.
  */
-async function inferStyleDependencies( scriptDependencies ) {
+async function inferStyleDependencies( scriptDependencies, packageName ) {
 	if ( ! scriptDependencies || scriptDependencies.length === 0 ) {
 		return [];
 	}
 
 	const styleDeps = [];
+	// Get the resolve directory for context-aware package resolution
+	const resolveDir = path.join( PACKAGES_DIR, packageName );
 
 	for ( const scriptHandle of scriptDependencies ) {
 		// Skip non-package dependencies (like 'react', 'lodash', etc.)
@@ -662,13 +668,13 @@ async function inferStyleDependencies( scriptDependencies ) {
 			continue;
 		}
 
-		// Convert handle to package name: 'wp-components' → 'components'
+		// Convert handle to package name: 'wp-components' → '@wordpress/components'
 		const shortName = scriptHandle.replace( 'wp-', '' );
 		const depPackageName = `@wordpress/${ shortName }`;
 
-		// Read the dependency's package.json
+		// Read the dependency's package.json with context-aware resolution
 		try {
-			const depPackageJson = getPackageInfo( depPackageName );
+			const depPackageJson = getPackageInfo( depPackageName, resolveDir );
 
 			if ( ! depPackageJson ) {
 				continue;
@@ -1469,18 +1475,20 @@ async function buildAll( baseUrlExpression ) {
 
 	const startTime = Date.now();
 
-	// Build maps: short name ↔ full name from package.json
+	// Build maps: short name ↔ full name ↔ package.json from package.json files
 	const shortToFull = new Map();
 	const fullToShort = new Map();
+	const fullToPackageJson = new Map();
 	for ( const pkg of PACKAGES ) {
 		const packageJson = getPackageInfoFromFile(
 			path.join( PACKAGES_DIR, pkg, 'package.json' )
 		);
 		shortToFull.set( pkg, packageJson.name );
 		fullToShort.set( packageJson.name, pkg );
+		fullToPackageJson.set( packageJson.name, packageJson );
 	}
 
-	const levels = groupByDepth( Array.from( shortToFull.values() ) );
+	const levels = groupByDepth( fullToPackageJson );
 
 	console.log( '📝 Phase 1: Transpiling packages...\n' );
 
@@ -1667,17 +1675,18 @@ async function watchMode() {
 	let isRebuilding = false;
 	const needsRebuild = new Set();
 
-	// Build maps: short name ↔ full name from package.json (once)
+	// Build maps: short name ↔ full name ↔ package.json from package.json files (once)
 	const shortToFull = new Map();
 	const fullToShort = new Map();
+	const fullToPackageJson = new Map();
 	for ( const pkg of PACKAGES ) {
 		const packageJson = getPackageInfoFromFile(
 			path.join( PACKAGES_DIR, pkg, 'package.json' )
 		);
 		shortToFull.set( pkg, packageJson.name );
 		fullToShort.set( packageJson.name, pkg );
+		fullToPackageJson.set( packageJson.name, packageJson );
 	}
-	const allFullNames = Array.from( shortToFull.values() );
 
 	// Get all routes for dependency tracking
 	const allRoutes = getAllRoutes( ROOT_DIR );
@@ -1700,7 +1709,7 @@ async function watchMode() {
 			const fullName = shortToFull.get( packageName );
 			const affectedScripts = findScriptsToRebundle(
 				fullName,
-				allFullNames
+				fullToPackageJson
 			);
 
 			for ( const fullScript of affectedScripts ) {
@@ -1723,7 +1732,7 @@ async function watchMode() {
 			// Find and rebuild affected routes
 			const affectedRoutes = findRoutesToRebuild(
 				fullName,
-				allFullNames,
+				fullToPackageJson,
 				ROOT_DIR,
 				allRoutes
 			);
