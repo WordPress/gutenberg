@@ -366,6 +366,22 @@ export const shortcutAriaLabel: WPModifierHandler< WPKeyHandler< string > > =
 	} );
 
 /**
+ * An object containing all the various formats for a given shortcut.
+ *
+ * @param modifier  The modifier key combination to use, as a string.
+ * @param character The character key to combine with the modifier.
+ * @return Object containing the shortcut in different formats (as an ARIA label, as a string to be displayed to the end user, and as a value for the aria-keyshortcuts attribute).
+ */
+export const shortcutFormats = (
+	modifier: WPKeycodeModifier,
+	character: string
+) => ( {
+	shortcutAriaLabel: shortcutAriaLabel[ modifier ]( character ),
+	displayShortcut: displayShortcut[ modifier ]( character ),
+	ariaKeyShortcut: ariaKeyShortcut[ modifier ]( character ),
+} );
+
+/**
  * From a given KeyboardEvent, returns an array of active modifier constants for
  * the event.
  *
