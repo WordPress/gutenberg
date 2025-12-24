@@ -31,11 +31,16 @@ export const LayoutCard = {
 		},
 		isOpened: {
 			control: { type: 'boolean' },
-			description: 'Whether the card can be collapsed/expanded.',
+			description: 'Whether the card loads opened.',
+		},
+		withSummary: {
+			control: { type: 'boolean' },
+			description: 'Whether the card has a summary.',
 		},
 	},
 	args: {
 		withHeader: true,
+		withSummary: true,
 		isCollapsible: true,
 	},
 };

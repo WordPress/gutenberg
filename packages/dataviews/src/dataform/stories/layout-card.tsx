@@ -15,10 +15,12 @@ const { Badge } = unlock( privateApis );
 
 const LayoutCardComponent = ( {
 	withHeader,
+	withSummary,
 	isCollapsible,
 	isOpened,
 }: {
 	withHeader: boolean;
+	withSummary: boolean;
 	isCollapsible: boolean;
 	isOpened?: boolean;
 } ) => {
@@ -143,23 +145,45 @@ const LayoutCardComponent = ( {
 		dueDate: 'March 1st, 2028',
 	} );
 
+	const getCardLayoutFromStoryArgs = ( {
+		summary,
+		withSummary: displaySummary,
+		withHeader: header,
+		isCollapsible: collapsible,
+		isOpened: opened,
+	}: {
+		summary?: string | { id: string; visibility: 'always' }[];
+		withSummary?: boolean;
+		withHeader?: boolean;
+		isCollapsible?: boolean;
+		isOpened?: boolean;
+	} ) => {
+		return {
+			type: 'card' as const,
+			summary: displaySummary ? summary : undefined,
+			...( header === false
+				? { withHeader: false as const }
+				: {
+						withHeader: true as const,
+						isCollapsible: collapsible,
+						isOpened: opened,
+				  } ),
+		};
+	};
+
 	const form: Form = useMemo(
 		() => ( {
 			layout: { type: 'card' },
 			fields: [
 				{
 					id: 'customerCard',
-					layout: {
-						type: 'card',
+					layout: getCardLayoutFromStoryArgs( {
 						summary: 'plan-summary',
-						...( withHeader === false
-							? { withHeader: false }
-							: {
-									withHeader: true,
-									isCollapsible,
-									isOpened,
-							  } ),
-					},
+						withHeader: withHeader ?? true,
+						withSummary,
+						isCollapsible,
+						isOpened,
+					} ),
 					label: 'Customer',
 					description:
 						'Enter your contact details, plan type, and addresses to complete your customer information.',
@@ -212,30 +236,25 @@ const LayoutCardComponent = ( {
 				},
 				{
 					id: 'payments',
-					layout: {
-						type: 'card',
+					layout: getCardLayoutFromStoryArgs( {
 						withHeader: false,
-					},
+					} ),
 				},
 				{
 					id: 'taxConfiguration',
 					label: 'Taxes',
-					layout: {
-						type: 'card',
+					layout: getCardLayoutFromStoryArgs( {
 						summary: [ { id: 'dueDate', visibility: 'always' } ],
-						...( withHeader === false
-							? { withHeader: false }
-							: {
-									withHeader: true,
-									isCollapsible,
-									isOpened: isOpened ?? false,
-							  } ),
-					},
+						withHeader,
+						withSummary,
+						isCollapsible,
+						isOpened: isOpened ?? false,
+					} ),
 					children: [ 'vat', 'commission' ],
 				},
 			],
 		} ),
-		[ withHeader, isCollapsible, isOpened ]
+		[ withHeader, withSummary, isCollapsible, isOpened ]
 	);
 
 	return (
