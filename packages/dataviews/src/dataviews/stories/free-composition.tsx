@@ -22,13 +22,8 @@ import { Stack } from '@wordpress/ui';
 import DataViews from '../index';
 import filterSortAndPaginate from '../../utils/filter-sort-and-paginate';
 import type { View } from '../../types';
-import {
-	DEFAULT_VIEW,
-	actions,
-	data,
-	fields,
-	type SpaceObject,
-} from './fixtures';
+import { actions, data, fields, type SpaceObject } from './fixtures';
+import { LAYOUT_TABLE } from '../../constants';
 
 /**
  * Custom composition example
@@ -134,7 +129,19 @@ function PlanetOverview( { planets }: { planets: SpaceObject[] } ) {
  */
 export const FreeCompositionComponent = () => {
 	const [ view, setView ] = useState< View >( {
-		...DEFAULT_VIEW,
+		type: LAYOUT_TABLE,
+		search: '',
+		page: 1,
+		perPage: 10,
+		layout: {
+			styles: {
+				satellites: {
+					align: 'end' as const,
+				},
+			},
+			enableMoving: false,
+		},
+		filters: [],
 		fields: [ 'categories' ],
 		titleField: 'title',
 		descriptionField: 'description',
