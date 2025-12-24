@@ -16,11 +16,22 @@ import {
 } from '../../constants';
 import filterSortAndPaginate from '../../utils/filter-sort-and-paginate';
 import type { View } from '../../types';
-import { DEFAULT_VIEW, actions, data, fields } from './fixtures';
+import { actions, data, fields } from './fixtures';
 
 const WithCardComponent = () => {
 	const [ view, setView ] = useState< View >( {
-		...DEFAULT_VIEW,
+		type: LAYOUT_TABLE,
+		search: '',
+		page: 1,
+		perPage: 10,
+		layout: {
+			styles: {
+				satellites: {
+					align: 'end' as const,
+				},
+			},
+		},
+		filters: [],
 		fields: [ 'categories' ],
 		titleField: 'title',
 		descriptionField: 'description',

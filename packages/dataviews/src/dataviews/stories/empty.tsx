@@ -16,7 +16,7 @@ import {
 	LAYOUT_ACTIVITY,
 } from '../../constants';
 import type { View } from '../../types';
-import { DEFAULT_VIEW, actions, fields } from './fixtures';
+import { actions, fields } from './fixtures';
 
 const PlanetIllustration = () => (
 	<svg
@@ -55,7 +55,18 @@ const EmptyComponent = ( {
 	isLoading?: boolean;
 } ) => {
 	const [ view, setView ] = useState< View >( {
-		...DEFAULT_VIEW,
+		type: LAYOUT_TABLE,
+		search: '',
+		page: 1,
+		perPage: 10,
+		layout: {
+			styles: {
+				satellites: {
+					align: 'end' as const,
+				},
+			},
+		},
+		filters: [],
 		fields: [ 'title', 'description', 'categories' ],
 	} );
 

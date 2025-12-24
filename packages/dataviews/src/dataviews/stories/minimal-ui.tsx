@@ -9,7 +9,8 @@ import { useState, useMemo, useEffect } from '@wordpress/element';
 import DataViews from '../index';
 import filterSortAndPaginate from '../../utils/filter-sort-and-paginate';
 import type { Field, View } from '../../types';
-import { DEFAULT_VIEW, data, fields, type SpaceObject } from './fixtures';
+import { data, fields, type SpaceObject } from './fixtures';
+import { LAYOUT_TABLE } from '../../constants';
 
 const MinimalUIComponent = ( {
 	layout = 'table',
@@ -17,11 +18,20 @@ const MinimalUIComponent = ( {
 	layout: 'table' | 'list' | 'grid';
 } ) => {
 	const [ view, setView ] = useState< View >( {
-		...DEFAULT_VIEW,
-		fields: [ 'title', 'description', 'categories' ],
+		type: LAYOUT_TABLE,
+		search: '',
+		page: 1,
+		perPage: 10,
 		layout: {
+			styles: {
+				satellites: {
+					align: 'end' as const,
+				},
+			},
 			enableMoving: false,
 		},
+		filters: [],
+		fields: [ 'title', 'description', 'categories' ],
 	} );
 	const { data: shownData, paginationInfo } = useMemo( () => {
 		return filterSortAndPaginate( data, view, fields );
