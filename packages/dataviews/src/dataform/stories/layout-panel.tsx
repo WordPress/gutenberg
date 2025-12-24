@@ -7,14 +7,7 @@ import { useMemo, useState } from '@wordpress/element';
  * Internal dependencies
  */
 import DataForm from '../index';
-import type {
-	CardLayout,
-	Field,
-	Form,
-	Layout,
-	PanelLayout,
-	RegularLayout,
-} from '../../types';
+import type { Field, Form, Layout, PanelLayout } from '../../types';
 
 type SamplePost = {
 	title: string;
@@ -264,50 +257,32 @@ const fields: Field< SamplePost >[] = [
 	},
 ];
 
-const getLayoutFromStoryArgs = ( {
-	type,
+const getPanelLayoutFromStoryArgs = ( {
+	summary,
 	labelPosition,
 	openAs,
-	withHeader,
 }: {
-	type: 'default' | 'regular' | 'panel' | 'card' | 'row';
+	summary?: string[];
 	labelPosition?: 'default' | 'top' | 'side' | 'none';
 	openAs?: 'default' | 'dropdown' | 'modal';
-	withHeader?: boolean;
 } ): Layout | undefined => {
-	let layout: Layout | undefined;
+	const panelLayout: PanelLayout = {
+		type: 'panel',
+	};
 
-	if ( type === 'default' || type === 'regular' ) {
-		const regularLayout: RegularLayout = {
-			type: 'regular',
-		};
-		if ( labelPosition !== 'default' ) {
-			regularLayout.labelPosition = labelPosition;
-		}
-		layout = regularLayout;
-	} else if ( type === 'panel' ) {
-		const panelLayout: PanelLayout = {
-			type: 'panel',
-		};
-		if ( labelPosition !== 'default' ) {
-			panelLayout.labelPosition = labelPosition;
-		}
-		if ( openAs !== 'default' ) {
-			panelLayout.openAs = openAs;
-		}
-		layout = panelLayout;
-	} else if ( type === 'card' ) {
-		const cardLayout: CardLayout = {
-			type: 'card',
-		};
-		if ( withHeader !== undefined ) {
-			// @ts-ignore We want to demo the effects of configuring withHeader.
-			cardLayout.withHeader = withHeader;
-		}
-		layout = cardLayout;
+	if ( labelPosition !== 'default' ) {
+		panelLayout.labelPosition = labelPosition;
 	}
 
-	return layout;
+	if ( openAs !== 'default' ) {
+		panelLayout.openAs = openAs;
+	}
+
+	if ( summary !== undefined ) {
+		panelLayout.summary = summary;
+	}
+
+	return panelLayout;
 };
 
 const LayoutPanelComponent = ( {
@@ -343,8 +318,7 @@ const LayoutPanelComponent = ( {
 
 	const form: Form = useMemo( () => {
 		return {
-			layout: getLayoutFromStoryArgs( {
-				type: 'panel',
+			layout: getPanelLayoutFromStoryArgs( {
 				labelPosition,
 				openAs,
 			} ),
@@ -379,19 +353,21 @@ const LayoutPanelComponent = ( {
 						'flight_status',
 						'gate',
 					],
-					layout: {
-						type: 'panel',
+					layout: getPanelLayoutFromStoryArgs( {
 						summary: [ 'origin', 'destination', 'flight_status' ],
-					},
+						labelPosition,
+						openAs,
+					} ),
 				},
 				{
 					id: 'passenger_details',
 					label: 'Passenger Details',
 					children: [ 'author', 'seat' ],
-					layout: {
-						type: 'panel',
+					layout: getPanelLayoutFromStoryArgs( {
 						summary: [ 'author', 'seat' ],
-					},
+						labelPosition,
+						openAs,
+					} ),
 				},
 			],
 		};
