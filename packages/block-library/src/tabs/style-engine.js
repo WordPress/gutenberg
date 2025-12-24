@@ -66,6 +66,7 @@ function getColorStyles( { attributes } ) {
 		customTabTextColor,
 		customTabActiveTextColor,
 		customTabHoverTextColor,
+		customTabDividerColor,
 	} = attributes || {};
 
 	// Helper to normalize color objects (preset { slug } vs direct value).
@@ -90,6 +91,7 @@ function getColorStyles( { attributes } ) {
 		'--custom-tab-hover-text-color': getColorValue(
 			customTabHoverTextColor
 		),
+		'--custom-tab-divider-color': getColorValue( customTabDividerColor ),
 	};
 
 	return colorVarMap;

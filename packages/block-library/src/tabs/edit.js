@@ -41,6 +41,8 @@ function Edit( {
 	setTabActiveTextColor,
 	tabHoverTextColor,
 	setTabHoverTextColor,
+	tabDividerColor,
+	setTabDividerColor,
 } ) {
 	const { style, orientation } = attributes;
 
@@ -91,6 +93,8 @@ function Edit( {
 						setTabActiveTextColor,
 						tabHoverTextColor,
 						setTabHoverTextColor,
+						tabDividerColor,
+						setTabDividerColor,
 					} }
 				/>
 			</div>
@@ -104,5 +108,6 @@ export default withColors(
 	'tabActiveColor',
 	'tabTextColor',
 	'tabActiveTextColor',
-	'tabHoverTextColor'
+	'tabHoverTextColor',
+	'tabDividerColor'
 )( Edit );
