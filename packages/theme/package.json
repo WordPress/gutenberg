@@ -57,6 +57,7 @@
 		"memize": "^2.1.0"
 	},
 	"devDependencies": {
+		"@storybook/react": "9.1.17",
 		"esbuild-esm-loader": "0.3.3"
 	},
 	"peerDependencies": {
