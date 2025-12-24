@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/ui",
-	"version": "1.0.0-prerelease",
+	"version": "1.0.1-next.8fd3f8831.0",
 	"description": "Themeable React UI components for the WordPress Design System.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
