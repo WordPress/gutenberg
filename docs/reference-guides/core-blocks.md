@@ -47,7 +47,7 @@ Contains the hidden or revealed content beneath the heading. ([Source](https://g
 -	**Category:** design
 -	**Parent:** core/accordion-item
 -	**Supports:** allowedBlocks, color (background, gradients, text), contentRole, interactivity, layout (~~allowEditing~~), shadow, spacing (blockGap, padding), typography (fontSize, lineHeight), ~~html~~, ~~lock~~, ~~visibility~~
--	**Attributes:** isSelected, openByDefault, templateLock
+-	**Attributes:** isSelected, templateLock
 
 ## Archives
 

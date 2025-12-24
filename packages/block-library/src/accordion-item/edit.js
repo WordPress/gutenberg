@@ -102,11 +102,6 @@ export default function Edit( {
 					label={ __( 'Settings' ) }
 					resetAll={ () => {
 						setAttributes( { openByDefault: false } );
-						if ( contentBlockClientId ) {
-							updateBlockAttributes( contentBlockClientId, {
-								openByDefault: false,
-							} );
-						}
 					} }
 					dropdownMenuProps={ dropdownMenuProps }
 				>
@@ -116,11 +111,6 @@ export default function Edit( {
 						hasValue={ () => !! openByDefault }
 						onDeselect={ () => {
 							setAttributes( { openByDefault: false } );
-							if ( contentBlockClientId ) {
-								updateBlockAttributes( contentBlockClientId, {
-									openByDefault: false,
-								} );
-							}
 						} }
 					>
 						<ToggleControl
@@ -129,14 +119,6 @@ export default function Edit( {
 								setAttributes( {
 									openByDefault: value,
 								} );
-								if ( contentBlockClientId ) {
-									updateBlockAttributes(
-										contentBlockClientId,
-										{
-											openByDefault: value,
-										}
-									);
-								}
 							} }
 							checked={ openByDefault }
 							help={ __(
