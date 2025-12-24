@@ -199,16 +199,6 @@ export function getBlockRemovalRules( state ) {
 }
 
 /**
- * Returns the client ID of the block settings menu that is currently open.
- *
- * @param {Object} state Global application state.
- * @return {string|null} The client ID of the block menu that is currently open.
- */
-export function getOpenedBlockSettingsMenu( state ) {
-	return state.openedBlockSettingsMenu;
-}
-
-/**
  * Returns all style overrides, intended to be merged with global editor styles.
  *
  * Overrides are sorted to match the order of the blocks they relate to. This

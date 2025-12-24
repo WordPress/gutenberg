@@ -11,9 +11,9 @@
 						"blockName": "core/accordion-heading",
 						"attrs": {},
 						"innerBlocks": [],
-						"innerHTML": "\n\t\t<h3 class=\"wp-block-accordion-heading\">\n\t\t\t<button class=\"wp-block-accordion-heading__toggle\"><span class=\"wp-block-accordion-heading__toggle-title\">Accordion Title</span><span class=\"wp-block-accordion-heading__toggle-icon\" aria-hidden=\"true\">+</span></button>\n\t\t</h3>\n\t\t",
+						"innerHTML": "\n\t\t<h3 class=\"wp-block-accordion-heading\">\n\t\t\t<button type=\"button\" class=\"wp-block-accordion-heading__toggle\"><span class=\"wp-block-accordion-heading__toggle-title\">Accordion Title</span><span class=\"wp-block-accordion-heading__toggle-icon\" aria-hidden=\"true\">+</span></button>\n\t\t</h3>\n\t\t",
 						"innerContent": [
-							"\n\t\t<h3 class=\"wp-block-accordion-heading\">\n\t\t\t<button class=\"wp-block-accordion-heading__toggle\"><span class=\"wp-block-accordion-heading__toggle-title\">Accordion Title</span><span class=\"wp-block-accordion-heading__toggle-icon\" aria-hidden=\"true\">+</span></button>\n\t\t</h3>\n\t\t"
+							"\n\t\t<h3 class=\"wp-block-accordion-heading\">\n\t\t\t<button type=\"button\" class=\"wp-block-accordion-heading__toggle\"><span class=\"wp-block-accordion-heading__toggle-title\">Accordion Title</span><span class=\"wp-block-accordion-heading__toggle-icon\" aria-hidden=\"true\">+</span></button>\n\t\t</h3>\n\t\t"
 						]
 					},
 					{

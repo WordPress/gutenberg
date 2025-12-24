@@ -3,10 +3,9 @@
  */
 import { useBlockProps, useInnerBlocksProps } from '@wordpress/block-editor';
 
-export default function Edit( { attributes } ) {
-	const { allowedBlocks, templateLock, openByDefault, isSelected } =
-		attributes;
-
+export default function Edit( { attributes, context } ) {
+	const { allowedBlocks, templateLock, isSelected } = attributes;
+	const openByDefault = context[ 'core/accordion-open-by-default' ];
 	const blockProps = useBlockProps( {
 		'aria-hidden': ! isSelected && ! openByDefault,
 		role: 'region',

@@ -25,12 +25,9 @@ import clsx from 'clsx';
  */
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
-export default function Edit( {
-	attributes,
-	clientId,
-	setAttributes,
-	context,
-} ) {
+const TEMPLATE = [ [ 'core/accordion-heading' ], [ 'core/accordion-panel' ] ];
+
+export default function Edit( { attributes, clientId, setAttributes } ) {
 	const { openByDefault } = attributes;
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
@@ -75,21 +72,8 @@ export default function Edit( {
 		} ),
 	} );
 
-	// Get heading level from context.
-	const headingLevel = context && context[ 'core/accordion-heading-level' ];
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
-		template: [
-			[
-				'core/accordion-heading',
-				headingLevel ? { level: headingLevel } : {},
-			],
-			[
-				'core/accordion-panel',
-				{
-					openByDefault,
-				},
-			],
-		],
+		template: TEMPLATE,
 		templateLock: 'all',
 		directInsert: true,
 		templateInsertUpdatesSelection: true,
@@ -102,11 +86,6 @@ export default function Edit( {
 					label={ __( 'Settings' ) }
 					resetAll={ () => {
 						setAttributes( { openByDefault: false } );
-						if ( contentBlockClientId ) {
-							updateBlockAttributes( contentBlockClientId, {
-								openByDefault: false,
-							} );
-						}
 					} }
 					dropdownMenuProps={ dropdownMenuProps }
 				>
@@ -116,11 +95,6 @@ export default function Edit( {
 						hasValue={ () => !! openByDefault }
 						onDeselect={ () => {
 							setAttributes( { openByDefault: false } );
-							if ( contentBlockClientId ) {
-								updateBlockAttributes( contentBlockClientId, {
-									openByDefault: false,
-								} );
-							}
 						} }
 					>
 						<ToggleControl
@@ -129,14 +103,6 @@ export default function Edit( {
 								setAttributes( {
 									openByDefault: value,
 								} );
-								if ( contentBlockClientId ) {
-									updateBlockAttributes(
-										contentBlockClientId,
-										{
-											openByDefault: value,
-										}
-									);
-								}
 							} }
 							checked={ openByDefault }
 							help={ __(

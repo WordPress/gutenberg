@@ -8,21 +8,11 @@ import styled from '@emotion/styled';
 /**
  * Internal dependencies
  */
-import { COLORS, font, rtl, CONFIG } from '../utils';
+import { COLORS, font, rtl, CONFIG, DROPDOWN_MOTION_CSS } from '../utils';
 import { space } from '../utils/space';
 import Icon from '../icon';
 import { Truncate } from '../truncate';
 import type { ContextProps } from './types';
-
-const ANIMATION_PARAMS = {
-	SCALE_AMOUNT_OUTER: 0.82,
-	SCALE_AMOUNT_CONTENT: 0.9,
-	DURATION: {
-		IN: '400ms',
-		OUT: '200ms',
-	},
-	EASING: 'cubic-bezier(0.33, 0, 0, 1)',
-};
 
 const CONTENT_WRAPPER_PADDING = space( 1 );
 const ITEM_PADDING_BLOCK = space( 1 );
@@ -57,11 +47,13 @@ export const PopoverOuterWrapper = styled.div<
 
 	overflow: hidden;
 
-	/* Open/close animation (outer wrapper) */
+	/* Open/close animation */
 	@media not ( prefers-reduced-motion ) {
 		transition-property: transform, opacity;
-		transition-timing-function: ${ ANIMATION_PARAMS.EASING };
-		transition-duration: ${ ANIMATION_PARAMS.DURATION.IN };
+		transition-duration: ${ DROPDOWN_MOTION_CSS.SLIDE_DURATION },
+			${ DROPDOWN_MOTION_CSS.FADE_DURATION };
+		transition-timing-function: ${ DROPDOWN_MOTION_CSS.SLIDE_EASING },
+			${ DROPDOWN_MOTION_CSS.FADE_EASING };
 		will-change: transform, opacity;
 
 		/* Regardless of the side, fade in and out. */
@@ -70,27 +62,26 @@ export const PopoverOuterWrapper = styled.div<
 			opacity: 1;
 		}
 
-		&:has( [data-leave] ) {
-			transition-duration: ${ ANIMATION_PARAMS.DURATION.OUT };
-		}
-
-		/* For menus opening on top and bottom side, animate the scale Y too. */
-		&:has( [data-side='bottom'] ),
-		&:has( [data-side='top'] ) {
-			transform: scaleY( ${ ANIMATION_PARAMS.SCALE_AMOUNT_OUTER } );
-		}
+		/* Slide in the direction the menu is opening. */
 		&:has( [data-side='bottom'] ) {
-			transform-origin: top;
+			transform: translateY( -${ DROPDOWN_MOTION_CSS.SLIDE_DISTANCE } );
 		}
 		&:has( [data-side='top'] ) {
-			transform-origin: bottom;
+			transform: translateY( ${ DROPDOWN_MOTION_CSS.SLIDE_DISTANCE } );
+		}
+		&:has( [data-side='left'] ) {
+			transform: translateX( ${ DROPDOWN_MOTION_CSS.SLIDE_DISTANCE } );
+		}
+		&:has( [data-side='right'] ) {
+			transform: translateX( -${ DROPDOWN_MOTION_CSS.SLIDE_DISTANCE } );
 		}
 		&:has( [data-enter][data-side='bottom'] ),
-		&:has( [data-enter][data-side='top'] ),
-		/* Do not animate the scaleY when closing the menu */
-		&:has( [data-leave][data-side='bottom'] ),
-		&:has( [data-leave][data-side='top'] ) {
-			transform: scaleY( 1 );
+		&:has( [data-enter][data-side='top'] ) {
+			transform: translateY( 0 );
+		}
+		&:has( [data-enter][data-side='left'] ),
+		&:has( [data-enter][data-side='right'] ) {
+			transform: translateX( 0 );
 		}
 	}
 `;
@@ -117,35 +108,6 @@ export const PopoverInnerWrapper = styled.div`
 
 	/* Only visible in Windows High Contrast mode */
 	outline: 2px solid transparent !important;
-
-	/* Open/close animation (inner content wrapper) */
-	@media not ( prefers-reduced-motion ) {
-		transition: inherit;
-		transform-origin: inherit;
-
-		/*
-		 * For menus opening on top and bottom side, animate the scale Y too.
-		 * The content scales at a different rate than the outer container:
-		 * - first, counter the outer scale factor by doing "1 / scaleAmountOuter"
-		 * - then, apply the content scale factor.
-		 */
-		&[data-side='bottom'],
-		&[data-side='top'] {
-			transform: scaleY(
-				calc(
-					1 / ${ ANIMATION_PARAMS.SCALE_AMOUNT_OUTER } *
-						${ ANIMATION_PARAMS.SCALE_AMOUNT_CONTENT }
-				)
-			);
-		}
-		&[data-enter][data-side='bottom'],
-		&[data-enter][data-side='top'],
-		/* Do not animate the scaleY when closing the menu */
-		&[data-leave][data-side='bottom'],
-		&[data-leave][data-side='top'] {
-			transform: scaleY( 1 );
-		}
-	}
 `;
 
 const baseItem = css`
