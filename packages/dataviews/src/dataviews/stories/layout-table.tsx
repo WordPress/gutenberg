@@ -7,19 +7,15 @@ import { useState, useMemo, useEffect } from '@wordpress/element';
  * Internal dependencies
  */
 import DataViews from '../index';
-import { LAYOUT_ACTIVITY } from '../../constants';
+import { LAYOUT_TABLE } from '../../constants';
 import filterSortAndPaginate from '../../utils/filter-sort-and-paginate';
 import type { View } from '../../types';
-import {
-	orderEventData,
-	orderEventFields,
-	orderEventActions,
-} from './fixtures';
+import { actions, data, fields, type SpaceObject } from './fixtures';
 
-const LayoutActivityComponent = ( {
+export const LayoutTableComponent = ( {
 	backgroundColor,
 	hasClickableItems = true,
-	groupBy = true,
+	groupBy = false,
 	groupByLabel = true,
 	perPageSizes = [ 10, 25, 50, 100 ],
 	showMedia = true,
@@ -32,35 +28,32 @@ const LayoutActivityComponent = ( {
 	showMedia?: boolean;
 } ) => {
 	const [ view, setView ] = useState< View >( {
-		type: LAYOUT_ACTIVITY,
+		type: LAYOUT_TABLE,
 		search: '',
 		page: 1,
-		perPage: 20,
+		perPage: 10,
+		layout: {
+			styles: {
+				satellites: {
+					align: 'end' as const,
+				},
+			},
+		},
 		filters: [],
-		fields: [ 'time', 'categories', 'orderNumber' ],
+		fields: [ 'categories' ],
 		titleField: 'title',
 		descriptionField: 'description',
-		mediaField: 'icon',
+		mediaField: 'image',
 		showMedia,
-		sort: {
-			field: 'datetime',
-			direction: 'asc',
-		},
-		groupBy: groupBy
-			? {
-					field: 'date',
-					direction: 'asc',
-					showLabel: groupByLabel,
-			  }
-			: undefined,
 	} );
+
 	useEffect( () => {
 		setView( ( prevView ) => {
 			return {
 				...prevView,
 				groupBy: groupBy
 					? {
-							field: 'date',
+							field: 'type',
 							direction: 'asc',
 							showLabel: groupByLabel,
 					  }
@@ -68,12 +61,11 @@ const LayoutActivityComponent = ( {
 				showMedia,
 			};
 		} );
-	}, [ showMedia, groupBy, groupByLabel ] );
+	}, [ groupBy, groupByLabel, showMedia ] );
 
 	const { data: shownData, paginationInfo } = useMemo( () => {
-		return filterSortAndPaginate( orderEventData, view, orderEventFields );
+		return filterSortAndPaginate( data, view, fields );
 	}, [ view ] );
-
 	return (
 		<div
 			style={
@@ -87,17 +79,31 @@ const LayoutActivityComponent = ( {
 				paginationInfo={ paginationInfo }
 				data={ shownData }
 				view={ view }
-				fields={ orderEventFields }
+				fields={ fields }
 				onChangeView={ setView }
-				actions={ orderEventActions }
+				actions={ actions }
+				renderItemLink={ ( {
+					item,
+					...props
+				}: {
+					item: SpaceObject;
+				} ) => (
+					<button
+						style={ {
+							background: 'none',
+							border: 'none',
+							padding: 0,
+						} }
+						onClick={ () => {
+							// eslint-disable-next-line no-alert
+							alert( 'Clicked: ' + item.name.title );
+						} }
+						{ ...props }
+					/>
+				) }
 				isItemClickable={ () => hasClickableItems }
 				defaultLayouts={ {
-					[ LAYOUT_ACTIVITY ]: {
-						sort: {
-							field: 'datetime',
-							direction: 'asc',
-						},
-					},
+					[ LAYOUT_TABLE ]: {},
 				} }
 				config={ { perPageSizes } }
 			/>
@@ -105,4 +111,4 @@ const LayoutActivityComponent = ( {
 	);
 };
 
-export default LayoutActivityComponent;
+export default LayoutTableComponent;
