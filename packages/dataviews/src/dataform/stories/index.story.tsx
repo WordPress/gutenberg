@@ -82,11 +82,11 @@ export const LayoutRow = {
 		alignment: {
 			control: { type: 'select' },
 			description: 'The alignment of the fields.',
-			options: [ 'start', 'center', 'end' ],
+			options: [ 'default', 'start', 'center', 'end' ],
 		},
 	},
 	args: {
-		alignment: 'center',
+		alignment: 'default',
 	},
 };
 
