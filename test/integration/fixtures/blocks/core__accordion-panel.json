@@ -4,7 +4,6 @@
 		"isValid": true,
 		"attributes": {
 			"templateLock": false,
-			"openByDefault": false,
 			"isSelected": false
 		},
 		"innerBlocks": [
