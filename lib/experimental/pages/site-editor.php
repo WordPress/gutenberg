@@ -28,9 +28,7 @@ function gutenberg_site_editor_register_default_menu_items() {
 	register_site_editor_menu_item( 'styles', __( 'Styles', 'gutenberg' ), '/styles', '' );
 	register_site_editor_menu_item( 'navigation', __( 'Navigation', 'gutenberg' ), '/navigation', '' );
 	register_site_editor_menu_item( 'pages', __( 'Pages', 'gutenberg' ), '/types/page', '' );
-	if ( gutenberg_is_experiment_enabled( 'active_templates' ) ) {
-		register_site_editor_menu_item( 'templates', __( 'Templates', 'gutenberg' ), '/templates', '' );
-	}
+	register_site_editor_menu_item( 'templates', __( 'Templates', 'gutenberg' ), '/templates', '' );
 	register_site_editor_menu_item( 'templateParts', __( 'Template Parts', 'gutenberg' ), '/template-parts', '' );
 	register_site_editor_menu_item( 'patterns', __( 'Patterns', 'gutenberg' ), '/patterns', '' );
 	register_site_editor_menu_item( 'fontList', __( 'Fonts', 'gutenberg' ), '/font-list', '' );
