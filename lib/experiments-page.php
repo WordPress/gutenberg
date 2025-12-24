@@ -254,8 +254,8 @@ function gutenberg_initialize_experiments_settings() {
 		'gutenberg-experiments',
 		'gutenberg_experiments_section',
 		array(
-			'label'    => __( 'Redirects the default site editor (Appearance > Design) to use the extensible site editor page.', 'gutenberg' ),
-			'id'       => 'gutenberg-extensible-site-editor',
+			'label' => __( 'Redirects the default site editor (Appearance > Design) to use the extensible site editor page.', 'gutenberg' ),
+			'id'    => 'gutenberg-extensible-site-editor',
 		)
 	);
 
