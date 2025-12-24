@@ -32,7 +32,7 @@ const TOOLBAR_VARIANT_BOX_SHADOW = `0 0 0 ${ CONFIG.borderWidth } ${ TOOLBAR_VAR
 
 const GRID_TEMPLATE_COLS = 'minmax( 0, max-content ) 1fr';
 
-export const PopoverWrapper = styled.div< Pick< ContextProps, 'variant' > >`
+export const Menu = styled( Ariakit.Menu )< Pick< ContextProps, 'variant' > >`
 	position: relative;
 	/* Same as popover component */
 	/* TODO: is there a way to read the sass variable? */
@@ -173,7 +173,7 @@ const baseItem = css`
 	}
 
 	/* When the item is the trigger of an open submenu */
-	${ PopoverWrapper }:not(:focus) &:not(:focus)[aria-expanded="true"] {
+	${ Menu }:not(:focus) &:not(:focus)[aria-expanded="true"] {
 		background-color: ${ LIGHT_BACKGROUND_COLOR };
 		color: ${ COLORS.theme.foreground };
 	}
@@ -271,9 +271,9 @@ export const ItemSuffixWrapper = styled.span`
 	 * When the parent menu item is active, except when it's a non-focused/hovered
 	 * submenu trigger (in that case, color should not be inherited)
 	 */
-	[data-active-item]:not( [data-focus-visible] ) *:not(${ PopoverWrapper }) &,
+	[data-active-item]:not( [data-focus-visible] ) *:not(${ Menu }) &,
 	/* When the parent menu item is disabled */
-	[aria-disabled='true'] *:not(${ PopoverWrapper }) & {
+	[aria-disabled='true'] *:not(${ Menu }) & {
 		color: inherit;
 	}
 `;
@@ -336,10 +336,8 @@ export const ItemHelpText = styled( Truncate )`
 	color: ${ LIGHTER_TEXT_COLOR };
 	overflow-wrap: anywhere;
 
-	[data-active-item]:not( [data-focus-visible] )
-		*:not( ${ PopoverWrapper } )
-		&,
-	[aria-disabled='true'] *:not( ${ PopoverWrapper } ) & {
+	[data-active-item]:not( [data-focus-visible] ) *:not( ${ Menu } ) &,
+	[aria-disabled='true'] *:not( ${ Menu } ) & {
 		color: inherit;
 	}
 `;

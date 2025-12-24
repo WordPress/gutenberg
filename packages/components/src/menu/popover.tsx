@@ -71,7 +71,7 @@ export const Popover = forwardRef<
 	}
 
 	return (
-		<Ariakit.Menu
+		<Styled.Menu
 			{ ...otherProps }
 			ref={ ref }
 			modal={ modal }
@@ -87,9 +87,9 @@ export const Popover = forwardRef<
 			wrapperProps={ wrapperProps }
 			hideOnEscape={ hideOnEscape }
 			unmountOnHide
-			render={ <Styled.PopoverWrapper variant={ menuContext.variant } /> }
+			variant={ menuContext.variant }
 		>
 			{ children }
-		</Ariakit.Menu>
+		</Styled.Menu>
 	);
 } );
