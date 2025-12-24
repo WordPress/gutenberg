@@ -5,7 +5,9 @@ import {
 	displayShortcutList,
 	displayShortcut,
 	rawShortcut,
+	ariaKeyShortcut,
 	shortcutAriaLabel,
+	shortcutFormats,
 	isKeyboardEvent,
 } from '..';
 
@@ -267,6 +269,70 @@ describe( 'rawShortcut', () => {
 			const shortcut = rawShortcut.access( 'm', isAppleOSTrue );
 			expect( shortcut ).toEqual( 'ctrl+alt+m' );
 		} );
+	} );
+} );
+
+describe( 'ariaKeyShortcut alias verification', () => {
+	it( 'should be identical to rawShortcut', () => {
+		expect( ariaKeyShortcut ).toBe( rawShortcut );
+	} );
+} );
+
+describe( 'shortcutFormats', () => {
+	it( 'should return all three shortcut formats for primary modifier on Windows', () => {
+		const result = shortcutFormats( 'primary', 'm' );
+
+		expect( result ).toEqual( {
+			shortcutAriaLabel: 'Control + M',
+			displayShortcut: 'Ctrl+M',
+			ariaKeyShortcut: 'ctrl+m',
+		} );
+	} );
+
+	it( 'should return all three shortcut formats for primaryShift modifier', () => {
+		const result = shortcutFormats( 'primaryShift', 'k' );
+
+		expect( result ).toEqual( {
+			shortcutAriaLabel: 'Control + Shift + K',
+			displayShortcut: 'Ctrl+Shift+K',
+			ariaKeyShortcut: 'ctrl+shift+k',
+		} );
+	} );
+
+	it( 'should return all three shortcut formats for access modifier', () => {
+		const result = shortcutFormats( 'access', 'h' );
+
+		expect( result ).toEqual( {
+			shortcutAriaLabel: 'Shift + Alt + H',
+			displayShortcut: 'Shift+Alt+H',
+			ariaKeyShortcut: 'shift+alt+h',
+		} );
+	} );
+
+	it( 'should handle special characters like period', () => {
+		const result = shortcutFormats( 'primary', '.' );
+
+		expect( result ).toEqual( {
+			shortcutAriaLabel: 'Control + Period',
+			displayShortcut: 'Ctrl+.',
+			ariaKeyShortcut: 'ctrl+.',
+		} );
+	} );
+
+	it( 'should return consistent results with individual functions', () => {
+		const modifier = 'primary';
+		const character = 'z';
+		const result = shortcutFormats( modifier, character );
+
+		expect( result.shortcutAriaLabel ).toEqual(
+			shortcutAriaLabel[ modifier ]( character )
+		);
+		expect( result.displayShortcut ).toEqual(
+			displayShortcut[ modifier ]( character )
+		);
+		expect( result.ariaKeyShortcut ).toEqual(
+			ariaKeyShortcut[ modifier ]( character )
+		);
 	} );
 } );
 
