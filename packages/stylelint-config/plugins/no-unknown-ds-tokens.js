@@ -66,10 +66,15 @@ const ruleFunction = ( primary ) => {
 			const { value } = ruleNode;
 			// Early match for WPDS tokens to avoid unnecessary processing.
 			if ( wpdsTokensRegex.test( value ) ) {
-				const unknownTokens = extractCSSVariables(
+				const usedTokens = extractCSSVariables(
 					value,
 					DS_TOKEN_PREFIX
-				).difference( knownTokens );
+				);
+				const unknownTokens = new Set(
+					[ ...usedTokens ].filter(
+						( token ) => ! knownTokens.has( token )
+					)
+				);
 
 				if ( unknownTokens.size > 0 ) {
 					report( {
