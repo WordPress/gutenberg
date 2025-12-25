@@ -897,6 +897,9 @@
 			"description": "Settings defined on a per-block basis.",
 			"type": "object",
 			"properties": {
+				"core/breadcrumbs": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
 				"core/accordion": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
@@ -1955,6 +1958,9 @@
 			"description": "Styles defined on a per-block basis using the block's selector.",
 			"type": "object",
 			"properties": {
+				"core/breadcrumbs": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
 				"core/accordion": {
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
@@ -2406,6 +2412,9 @@
 		"stylesVariationBlocksPropertiesComplete": {
 			"type": "object",
 			"properties": {
+				"core/breadcrumbs": {
+					"$ref": "#/definitions/stylesVariationBlockPropertiesComplete"
+				},
 				"core/accordion": {
 					"$ref": "#/definitions/stylesVariationBlockPropertiesComplete"
 				},
