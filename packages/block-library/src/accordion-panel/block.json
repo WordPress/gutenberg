@@ -61,10 +61,6 @@
 			"type": [ "string", "boolean" ],
 			"enum": [ "all", "insert", "contentOnly", false ],
 			"default": false
-		},
-		"isSelected": {
-			"type": "boolean",
-			"default": false
 		}
 	},
 	"textdomain": "default",

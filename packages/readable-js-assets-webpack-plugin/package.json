@@ -32,6 +32,10 @@
 		".": "./index.js",
 		"./package.json": "./package.json"
 	},
+	"devDependencies": {
+		"mkdirp": "3.0.1",
+		"terser-webpack-plugin": "5.3.10"
+	},
 	"peerDependencies": {
 		"webpack": "^4.8.3 || ^5.0.0"
 	},

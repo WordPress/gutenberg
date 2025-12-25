@@ -46,6 +46,9 @@
 	"wpScript": true,
 	"types": "build-types",
 	"sideEffects": false,
+	"devDependencies": {
+		"benchmark": "2.1.4"
+	},
 	"publishConfig": {
 		"access": "public"
 	}

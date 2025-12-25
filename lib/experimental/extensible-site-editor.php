@@ -7,12 +7,11 @@
 
 /**
  * Redirect the Appearance > Design menu to the extensible site editor
- * when both experiments are enabled.
+ * when the experiment is enabled.
  */
 function gutenberg_redirect_to_extensible_site_editor() {
-	// Only proceed if both required experiments are enabled.
-	if ( ! gutenberg_is_experiment_enabled( 'gutenberg-extensible-site-editor' ) ||
-		! gutenberg_is_experiment_enabled( 'active_templates' ) ) {
+	// Only proceed if the experiment is enabled.
+	if ( ! gutenberg_is_experiment_enabled( 'gutenberg-extensible-site-editor' ) ) {
 		return;
 	}
 

@@ -43,7 +43,9 @@ if ( ! function_exists( '{{PREFIX}}_register_package_styles' ) ) {
 	 * @param WP_Styles $styles WP_Styles instance.
 	 */
 	function {{PREFIX}}_register_package_styles( $styles ) {
-		$default_version = defined( '{{VERSION_CONSTANT}}' ) && ! SCRIPT_DEBUG ? {{VERSION_CONSTANT}} : time();
+		// Load build constants
+		$build_constants = require __DIR__ . '/constants.php';
+		$default_version = ! SCRIPT_DEBUG ? $build_constants['version'] : time();
 
 		$styles_dir  = __DIR__ . '/styles';
 		$styles_file = $styles_dir . '/index.php';
@@ -59,7 +61,7 @@ if ( ! function_exists( '{{PREFIX}}_register_package_styles' ) ) {
 			{{PREFIX}}_override_style(
 				$styles,
 				$style_data['handle'],
-				{{BASE_URL}} . '/styles/' . $style_data['path'] . '.css',
+				$build_constants['build_url'] . 'styles/' . $style_data['path'] . '.css',
 				$style_data['dependencies'],
 				$default_version
 			);
