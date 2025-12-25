@@ -220,6 +220,37 @@ describe( 'toVdom', () => {
 		} );
 	} );
 
+	describe( 'Boolean attributes', () => {
+		it( 'should convert empty string boolean attributes to true', () => {
+			const element = createElementFromHTML(
+				'<details open><summary>Test</summary></details>'
+			);
+			expect( toVdom( element ) ).toMatchVNode(
+				h( 'details' as any, { open: true }, [
+					h( 'summary' as any, {}, [ 'Test' ] ),
+				] )
+			);
+		} );
+
+		it( 'should handle multiple boolean attributes', () => {
+			const element = createElementFromHTML(
+				'<input type="checkbox" checked disabled readonly/>'
+			);
+			expect( toVdom( element ) ).toMatchVNode(
+				h(
+					'input' as any,
+					{
+						type: 'checkbox',
+						checked: true,
+						disabled: true,
+						readonly: true,
+					},
+					[]
+				)
+			);
+		} );
+	} );
+
 	describe( 'Directive processing', () => {
 		it( 'should process simple directives', () => {
 			const element = createElementFromHTML(

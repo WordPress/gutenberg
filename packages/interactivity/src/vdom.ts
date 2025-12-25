@@ -14,6 +14,19 @@ const currentNamespace = () => namespaces[ namespaces.length - 1 ] ?? null;
 const isObject = ( item: unknown ): item is Record< string, unknown > =>
 	Boolean( item && typeof item === 'object' && item.constructor === Object );
 const invalidCharsRegex = /[^a-z0-9-_]/i;
+const booleanAttributes: readonly string[] = [
+	'open',
+	'checked',
+	'disabled',
+	'hidden',
+	'selected',
+	'readonly',
+	'required',
+	'autoplay',
+	'controls',
+	'loop',
+	'muted',
+];
 
 function parseDirectiveName( directiveName: string ): {
 	prefix: string;
@@ -160,7 +173,14 @@ export function toVdom( root: Node ): ComponentChild {
 			} else if ( attributeName === 'ref' ) {
 				continue;
 			}
-			props[ attributeName ] = attributeValue;
+			if (
+				attributeValue === '' &&
+				booleanAttributes.includes( attributeName )
+			) {
+				props[ attributeName ] = true;
+			} else {
+				props[ attributeName ] = attributeValue;
+			}
 		}
 
 		if ( ignore && ! island ) {

@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Preserve boolean HTML attributes during router navigation. ([#XXXXX](https://github.com/WordPress/gutenberg/pull/XXXXX))
+
 ## 6.36.0 (2025-11-26)
 
 ### Bug Fixes
