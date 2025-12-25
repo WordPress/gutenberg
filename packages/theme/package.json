@@ -69,6 +69,11 @@
 		"react-dom": "^18.0.0",
 		"stylelint": "^16.8.2"
 	},
+	"peerDependenciesMeta": {
+		"stylelint": {
+			"optional": true
+		}
+	},
 	"publishConfig": {
 		"access": "public"
 	},
