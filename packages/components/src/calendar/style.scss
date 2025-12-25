@@ -126,13 +126,11 @@ $wp-components-calendar-preview-border-color: color-mix(in srgb, $components-col
 	padding: 0;
 	margin: 0;
 	cursor: pointer;
-	-moz-appearance: none;
-	-webkit-appearance: none;
+	appearance: none;
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
 	position: relative;
-	appearance: none;
 
 	width: $wp-components-calendar-button-width;
 	height: $wp-components-calendar-button-height;
