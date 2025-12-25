@@ -8,6 +8,12 @@
 	"keywords": [ "references" ],
 	"textdomain": "default",
 	"usesContext": [ "postId", "postType" ],
+	"attributes": {
+		"footnotes": {
+			"type": "array",
+			"default": []
+		}
+	},
 	"supports": {
 		"__experimentalBorder": {
 			"radius": true,

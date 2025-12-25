@@ -2,7 +2,9 @@
 	{
 		"name": "core/footnotes",
 		"isValid": true,
-		"attributes": {},
+		"attributes": {
+			"footnotes": []
+		},
 		"innerBlocks": []
 	}
 ]

@@ -6,17 +6,42 @@ import { useEntityProp } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
 import { Placeholder } from '@wordpress/components';
 import { formatListNumbered as icon } from '@wordpress/icons';
+import { useEffect, useMemo } from '@wordpress/element';
 
-export default function FootnotesEdit( { context: { postType, postId } } ) {
+export default function FootnotesEdit( {
+	attributes,
+	setAttributes,
+	context: { postType, postId },
+} ) {
 	const [ meta, updateMeta ] = useEntityProp(
 		'postType',
 		postType,
 		'meta',
 		postId
 	);
+
 	const footnotesSupported = 'string' === typeof meta?.footnotes;
-	const footnotes = meta?.footnotes ? JSON.parse( meta.footnotes ) : [];
 	const blockProps = useBlockProps();
+	const footnotes = useMemo( () => {
+		return meta?.footnotes ? JSON.parse( meta.footnotes ) : [];
+	}, [ meta?.footnotes ] );
+
+	useEffect( () => {
+		if ( footnotesSupported ) {
+			if ( ! attributes.footnotes.length && footnotes.length ) {
+				setAttributes( {
+					footnotes,
+				} );
+			}
+		}
+	}, [
+		footnotesSupported,
+		footnotes.length,
+		setAttributes,
+		meta.footnotes,
+		attributes.footnotes.length,
+		footnotes,
+	] );
 
 	if ( ! footnotesSupported ) {
 		return (
@@ -87,6 +112,14 @@ export default function FootnotesEdit( { context: { postType, postId } } ) {
 											: footnote;
 									} )
 								),
+							} );
+
+							setAttributes( {
+								footnotes: footnotes.map( ( footnote ) => {
+									return footnote.id === id
+										? { content: nextFootnote, id }
+										: footnote;
+								} ),
 							} );
 						} }
 					/>{ ' ' }
