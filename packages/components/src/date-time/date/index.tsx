@@ -193,7 +193,12 @@ export function DatePicker( {
 								}
 								numEvents={
 									events.filter( ( event ) =>
-										isSameDay( event.date, day )
+										isSameDay(
+											startOfDayInConfiguredTimezone(
+												inputToDate( event.date )
+											),
+											day
+										)
 									).length
 								}
 								onClick={ () => {
