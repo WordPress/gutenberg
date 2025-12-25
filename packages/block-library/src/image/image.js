@@ -592,12 +592,6 @@ export default function Image( {
 			/>
 		) );
 
-	const resetContentAttributes = () => {
-		setAttributes( {
-			alt: undefined,
-		} );
-	};
-
 	const resetSettings = () => {
 		setAttributes( {
 			lightbox: undefined,
@@ -783,13 +777,14 @@ export default function Image( {
 			<InspectorControls group="content">
 				<ToolsPanel
 					label={ __( 'Media' ) }
-					resetAll={ resetContentAttributes }
+					resetAll={ () => onSelectImage( undefined ) }
 					dropdownMenuProps={ dropdownMenuProps }
 				>
 					{ isSingleSelected && ! lockUrlControls && (
 						<ToolsPanelItem
 							label={ __( 'Image' ) }
 							hasValue={ () => !! url }
+							onDeselect={ () => onSelectImage( undefined ) }
 							isShownByDefault
 						>
 							<MediaControl
