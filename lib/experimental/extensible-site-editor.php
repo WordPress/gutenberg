@@ -21,7 +21,7 @@ function gutenberg_redirect_to_extensible_site_editor() {
 		foreach ( $submenu['themes.php'] as $key => $item ) {
 			// Find the Design/site-editor menu item and update its URL.
 			if ( isset( $item[2] ) && 'site-editor.php' === $item[2] ) {
-				$submenu['themes.php'][ $key ][2] = 'admin.php?page=site-editor';
+				$submenu['themes.php'][ $key ][2] = 'admin.php?page=site-editor-v2';
 				break;
 			}
 		}
