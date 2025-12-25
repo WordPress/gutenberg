@@ -4,8 +4,8 @@
 module.exports = {
 	extends: [ 'stylelint-config-recommended' ].map( require.resolve ),
 	plugins: [
-		'./plugins/no-unknown-ds-tokens.js',
-		'./plugins/no-setting-wpds-custom-properties.js',
+		'@wordpress/theme/stylelint-plugins/no-unknown-ds-tokens',
+		'@wordpress/theme/stylelint-plugins/no-setting-wpds-custom-properties',
 	],
 	rules: {
 		'at-rule-empty-line-before': [

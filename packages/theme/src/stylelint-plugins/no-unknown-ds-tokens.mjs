@@ -1,5 +1,5 @@
-const stylelint = require( 'stylelint' );
-const tokenList = require( '@wordpress/theme/design-tokens.js' ).default;
+import stylelint from 'stylelint';
+import tokenList from '../prebuilt/js/design-tokens.js';
 
 const DS_TOKEN_PREFIX = 'wpds-';
 
@@ -36,7 +36,7 @@ function extractCSSVariables( value, prefix = '' ) {
 }
 
 const knownTokens = new Set( tokenList );
-const wpdsTokensRegex = new RegExp( `[^\w]--${ DS_TOKEN_PREFIX }`, 'i' );
+const wpdsTokensRegex = new RegExp( `[^\\w]--${ DS_TOKEN_PREFIX }`, 'i' );
 
 const {
 	createPlugin,
@@ -97,4 +97,5 @@ ruleFunction.ruleName = ruleName;
 ruleFunction.messages = messages;
 
 /** @type {import('stylelint').Plugin} */
-module.exports = createPlugin( ruleName, ruleFunction );
+export default createPlugin( ruleName, ruleFunction );
+

@@ -1,11 +1,13 @@
 const utils = require( './utils' );
 const getStylelintResult = utils.getStylelintResult;
 
-describe( 'flags no warnings with valid wpds custom properties css', () => {
+describe( 'flags no warnings with valid wpds tokens css', () => {
 	let result;
 
 	beforeEach( () => {
-		result = getStylelintResult( './wpds-custom-properties-valid.css' );
+		result = getStylelintResult(
+			'./fixtures/no-unknown-ds-tokens-valid.css'
+		);
 	} );
 
 	it( 'did not error', () => {
@@ -19,11 +21,13 @@ describe( 'flags no warnings with valid wpds custom properties css', () => {
 	} );
 } );
 
-describe( 'flags warnings with invalid wpds custom properties css', () => {
+describe( 'flags warnings with invalid wpds tokens css', () => {
 	let result;
 
 	beforeEach( () => {
-		result = getStylelintResult( './wpds-custom-properties-invalid.css' );
+		result = getStylelintResult(
+			'./fixtures/no-unknown-ds-tokens-invalid.css'
+		);
 	} );
 
 	it( 'did error', () => {

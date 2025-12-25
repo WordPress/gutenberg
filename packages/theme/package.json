@@ -40,6 +40,8 @@
 		},
 		"./design-tokens.css": "./src/prebuilt/css/design-tokens.css",
 		"./design-tokens.js": "./src/prebuilt/js/design-tokens.js",
+		"./stylelint-plugins/no-unknown-ds-tokens": "./src/stylelint-plugins/no-unknown-ds-tokens.mjs",
+		"./stylelint-plugins/no-setting-wpds-custom-properties": "./src/stylelint-plugins/no-setting-wpds-custom-properties.mjs",
 		"./package.json": "./package.json"
 	},
 	"react-native": "src/index",
@@ -64,7 +66,8 @@
 	},
 	"peerDependencies": {
 		"react": "^18.0.0",
-		"react-dom": "^18.0.0"
+		"react-dom": "^18.0.0",
+		"stylelint": "^16.8.2"
 	},
 	"publishConfig": {
 		"access": "public"
