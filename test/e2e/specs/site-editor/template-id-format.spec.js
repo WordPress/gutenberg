@@ -56,13 +56,14 @@ test.describe( 'Template ID Format', () => {
 		await requestUtils.setGutenbergExperiments( [] );
 	} );
 
-	const testTemplateEditing = async (
-		{ admin, editor, page, requestUtils },
-		experiments,
-		contentText
-	) => {
-		await requestUtils.setGutenbergExperiments( experiments );
-
+	test( 'should open and edit templates correctly when active_templates experiment is enabled', async ( {
+		admin,
+		editor,
+		page,
+		requestUtils,
+	} ) => {
+		const contentText = 'Test content with experiment enabled';
+		await requestUtils.setGutenbergExperiments( [ 'active_templates' ] );
 		await navigateToTemplateEditor( { admin, editor, page }, pageId );
 
 		await editor.insertBlock( {
@@ -72,10 +73,8 @@ test.describe( 'Template ID Format', () => {
 		await expect( editor.canvas.getByText( contentText ) ).toBeVisible();
 
 		await editor.saveSiteEditorEntities( {
-			isOnlyCurrentEntityDirty:
-				! experiments.includes( 'active_templates' ),
+			isOnlyCurrentEntityDirty: false,
 		} );
-
 		await navigateToTemplateEditor( { admin, editor, page }, pageId );
 
 		// Make a second edit to the template to ensure wp_id is not 0.
@@ -95,27 +94,12 @@ test.describe( 'Template ID Format', () => {
 			.getByRole( 'button', { name: 'Save', exact: true } );
 		await publishSaveButton.or( topBarSaveButton ).click();
 
-		await page
-			.getByRole( 'button', { name: 'Dismiss this notice' } )
-			.getByText( /(updated|published)\./ )
-			.first()
-			.waitFor();
-	};
-
-	test( 'should open and edit templates correctly when active_templates experiment is enabled', async ( {
-		admin,
-		editor,
-		page,
-		requestUtils,
-	} ) => {
-		await testTemplateEditing(
-			{ admin, editor, page, requestUtils },
-			[ 'active_templates' ],
-			'Test content with experiment enabled'
-		);
-
-		// Verify test completed successfully.
-		expect( true ).toBe( true );
+		await expect(
+			page
+				.getByRole( 'button', { name: 'Dismiss this notice' } )
+				.getByText( /(updated|published)\./ )
+				.first()
+		).toBeVisible();
 	} );
 
 	test( 'should open and edit templates correctly when active_templates experiment is disabled', async ( {
@@ -124,13 +108,43 @@ test.describe( 'Template ID Format', () => {
 		page,
 		requestUtils,
 	} ) => {
-		await testTemplateEditing(
-			{ admin, editor, page, requestUtils },
-			[],
-			'Test content with experiment disabled'
-		);
+		const contentText = 'Test content with experiment disabled';
+		await requestUtils.setGutenbergExperiments( [] );
+		await navigateToTemplateEditor( { admin, editor, page }, pageId );
 
-		// Verify test completed successfully.
-		expect( true ).toBe( true );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: contentText },
+		} );
+		await expect( editor.canvas.getByText( contentText ) ).toBeVisible();
+
+		await editor.saveSiteEditorEntities( {
+			isOnlyCurrentEntityDirty: true,
+		} );
+		await navigateToTemplateEditor( { admin, editor, page }, pageId );
+
+		// Make a second edit to the template to ensure wp_id is not 0.
+		const secondEditText = `Second edit: ${ contentText }`;
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: secondEditText },
+		} );
+		await expect( editor.canvas.getByText( secondEditText ) ).toBeVisible();
+
+		// Find the correct save button to click.
+		const publishSaveButton = page
+			.getByRole( 'region', { name: 'Editor publish' } )
+			.getByRole( 'button', { name: 'Save', exact: true } );
+		const topBarSaveButton = page
+			.getByRole( 'region', { name: 'Editor top bar' } )
+			.getByRole( 'button', { name: 'Save', exact: true } );
+		await publishSaveButton.or( topBarSaveButton ).click();
+
+		await expect(
+			page
+				.getByRole( 'button', { name: 'Dismiss this notice' } )
+				.getByText( /(updated|published)\./ )
+				.first()
+		).toBeVisible();
 	} );
 } );
