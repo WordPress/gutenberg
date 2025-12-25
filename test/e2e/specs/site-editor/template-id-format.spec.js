@@ -85,14 +85,20 @@ test.describe( 'Template ID Format', () => {
 		} );
 		await expect( editor.canvas.getByText( secondEditText ) ).toBeVisible();
 
-		// Find the correct save button to click.
 		const publishSaveButton = page
 			.getByRole( 'region', { name: 'Editor publish' } )
 			.getByRole( 'button', { name: 'Save', exact: true } );
 		const topBarSaveButton = page
 			.getByRole( 'region', { name: 'Editor top bar' } )
 			.getByRole( 'button', { name: 'Save', exact: true } );
-		await publishSaveButton.or( topBarSaveButton ).click();
+		// Initiate save.
+		await topBarSaveButton.click();
+		const publishPanelVisible = await publishSaveButton.isVisible();
+		// If the publish panel is visible, click the save button there.
+		// Sometimes template parts trigger the publish panel to appear due to navigation fallback.
+		if ( publishPanelVisible ) {
+			await publishSaveButton.click();
+		}
 
 		await expect(
 			page
@@ -131,14 +137,9 @@ test.describe( 'Template ID Format', () => {
 		} );
 		await expect( editor.canvas.getByText( secondEditText ) ).toBeVisible();
 
-		// Find the correct save button to click.
-		const publishSaveButton = page
-			.getByRole( 'region', { name: 'Editor publish' } )
-			.getByRole( 'button', { name: 'Save', exact: true } );
-		const topBarSaveButton = page
-			.getByRole( 'region', { name: 'Editor top bar' } )
-			.getByRole( 'button', { name: 'Save', exact: true } );
-		await publishSaveButton.or( topBarSaveButton ).click();
+		await editor.saveSiteEditorEntities( {
+			isOnlyCurrentEntityDirty: true,
+		} );
 
 		await expect(
 			page
