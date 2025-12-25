@@ -78,6 +78,16 @@
 		"react-native-video": "https://raw.githubusercontent.com/wordpress-mobile/react-native-video/5.2.0-wp-7/react-native-video-5.2.0-wp-7.tgz",
 		"react-native-webview": "13.6.1"
 	},
+	"devDependencies": {
+		"@react-native/babel-preset": "0.73.10",
+		"@react-native/metro-babel-transformer": "0.73.10",
+		"@react-native/metro-config": "0.73.4",
+		"appium": "2.0.0",
+		"babel-plugin-react-native-classname-to-style": "1.2.2",
+		"babel-plugin-react-native-platform-specific-extensions": "1.1.1",
+		"babel-plugin-transform-remove-console": "6.9.4",
+		"webdriverio": "8.16.20"
+	},
 	"publishConfig": {
 		"access": "public"
 	},
