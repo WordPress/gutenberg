@@ -772,14 +772,14 @@ async function generateScriptRegistrationPhp( scripts, replacements ) {
 }
 
 /**
- * Generate PHP file for version constant.
+ * Generate PHP file for constants (version and build URL).
  *
  * @param {Record<string, string>} replacements PHP template replacements.
  */
-async function generateVersionPhp( replacements ) {
+async function generateConstantsPhp( replacements ) {
 	await generatePhpFromTemplate(
-		'version.php.template',
-		path.join( BUILD_DIR, 'version.php' ),
+		'constants.php.template',
+		path.join( BUILD_DIR, 'constants.php' ),
 		replacements
 	);
 }
@@ -1636,7 +1636,7 @@ async function buildAll( baseUrlExpression ) {
 		generateModuleRegistrationPhp( modules, phpReplacements ),
 		generateScriptRegistrationPhp( scripts, phpReplacements ),
 		generateStyleRegistrationPhp( styles, phpReplacements ),
-		generateVersionPhp( phpReplacements ),
+		generateConstantsPhp( phpReplacements ),
 		generateRoutesRegistry( routes, phpReplacements ),
 		generateRoutesPhp( routes, phpReplacements ),
 		generatePagesPhp( pageData, phpReplacements ),
@@ -1927,7 +1927,7 @@ async function main() {
 			},
 			'base-url': {
 				type: 'string',
-				default: "plugins_url( 'build', dirname( __FILE__ ) )",
+				default: 'plugin_dir_url( __FILE__ )',
 			},
 		},
 	} );

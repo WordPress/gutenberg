@@ -127,6 +127,9 @@ if ( ! function_exists( '{{PAGE_SLUG_UNDERSCORE}}_render_page' ) ) {
 	 * Call this function from add_menu_page or add_submenu_page.
 	 */
 	function {{PAGE_SLUG_UNDERSCORE}}_render_page() {
+		// Load build constants
+		$build_constants = require __DIR__ . '/../../constants.php';
+
 		// Set current screen
 		set_current_screen();
 
@@ -213,7 +216,7 @@ if ( ! function_exists( '{{PAGE_SLUG_UNDERSCORE}}_render_page' ) ) {
 			// Dummy script module to ensure dependencies are loaded
 			wp_register_script_module(
 				'{{PAGE_SLUG}}',
-				{{BASE_URL}} . '/pages/{{PAGE_SLUG}}/loader.js',
+				$build_constants['build_url'] . 'pages/{{PAGE_SLUG}}/loader.js',
 				$boot_dependencies
 			);
 
