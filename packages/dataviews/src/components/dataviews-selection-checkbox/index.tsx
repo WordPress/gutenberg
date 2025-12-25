@@ -39,7 +39,6 @@ export default function DataViewsSelectionCheckbox< Item >( {
 	return (
 		<CheckboxControl
 			className="dataviews-selection-checkbox"
-			__nextHasNoMarginBottom
 			aria-label={ selectionLabel }
 			aria-disabled={ disabled }
 			checked={ checked }

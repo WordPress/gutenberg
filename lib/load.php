@@ -66,6 +66,7 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	require __DIR__ . '/compat/wordpress-7.0/class-gutenberg-rest-static-templates-controller.php';
 	require __DIR__ . '/compat/wordpress-7.0/template-activate.php';
 	require __DIR__ . '/compat/wordpress-7.0/rest-api.php';
+	require __DIR__ . '/compat/wordpress-7.0/global-styles.php';
 
 	// Plugin specific code.
 	require_once __DIR__ . '/class-wp-rest-global-styles-controller-gutenberg.php';
@@ -107,6 +108,7 @@ require __DIR__ . '/compat/wordpress-6.9/client-assets.php';
 require __DIR__ . '/compat/wordpress-7.0/preload.php';
 require __DIR__ . '/compat/wordpress-7.0/php-only-blocks.php';
 require __DIR__ . '/compat/wordpress-7.0/blocks.php';
+require __DIR__ . '/compat/wordpress-7.0/kses.php';
 
 // Experimental features.
 require __DIR__ . '/experimental/block-editor-settings-mobile.php';
@@ -115,8 +117,8 @@ require __DIR__ . '/experimental/navigation-theme-opt-in.php';
 require __DIR__ . '/experimental/kses.php';
 require __DIR__ . '/experimental/synchronization.php';
 require __DIR__ . '/experimental/script-modules.php';
-require __DIR__ . '/experimental/pages/gutenberg-boot.php';
-require __DIR__ . '/experimental/posts/load.php';
+require __DIR__ . '/experimental/pages/site-editor.php';
+require __DIR__ . '/experimental/extensible-site-editor.php';
 require __DIR__ . '/experimental/fonts/load.php';
 
 if ( gutenberg_is_experiment_enabled( 'gutenberg-workflow-palette' ) ) {

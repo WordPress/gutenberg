@@ -140,7 +140,6 @@ export default function SiteTitleEdit( {
 						isShownByDefault
 					>
 						<ToggleControl
-							__nextHasNoMarginBottom
 							label={ __( 'Make title link to home' ) }
 							onChange={ () =>
 								setAttributes( { isLink: ! isLink } )
@@ -158,7 +157,6 @@ export default function SiteTitleEdit( {
 							isShownByDefault
 						>
 							<ToggleControl
-								__nextHasNoMarginBottom
 								label={ __( 'Open in new tab' ) }
 								onChange={ ( value ) =>
 									setAttributes( {

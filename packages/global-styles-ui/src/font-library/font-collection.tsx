@@ -311,11 +311,9 @@ function FontCollection( { slug }: { slug: string } ) {
 									placeholder={ __( 'Font name…' ) }
 									label={ __( 'Search' ) }
 									onChange={ debouncedUpdateSearchInput }
-									__nextHasNoMarginBottom
 									hideLabelFromVision={ false }
 								/>
 								<SelectControl
-									__nextHasNoMarginBottom
 									__next40pxDefaultSize
 									label={ __( 'Category' ) }
 									value={ filters.category }
@@ -423,7 +421,6 @@ function FontCollection( { slug }: { slug: string } ) {
 								checked={ isSelectAllChecked }
 								onChange={ toggleSelectAll }
 								indeterminate={ isIndeterminate }
-								__nextHasNoMarginBottom
 							/>
 							<VStack spacing={ 0 }>
 								{ /*
@@ -535,7 +532,6 @@ function FontCollection( { slug }: { slug: string } ) {
 													)
 												}
 												size="small"
-												__nextHasNoMarginBottom
 												variant="minimal"
 											/>
 										),

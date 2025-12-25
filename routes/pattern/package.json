@@ -4,7 +4,7 @@
 	"private": true,
 	"route": {
 		"path": "/patterns",
-		"page": "gutenberg-boot"
+		"page": "site-editor"
 	},
 	"dependencies": {
 		"@wordpress/route": "file:../../packages/route"

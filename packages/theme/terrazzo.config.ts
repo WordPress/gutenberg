@@ -12,6 +12,7 @@ import pluginModeOverrides from './bin/terrazzo-plugin-mode-overrides/index';
 import pluginKnownWpdsCssVariables from './bin/terrazzo-plugin-known-wpds-css-variables/index';
 import pluginDsTokenDocs from './bin/terrazzo-plugin-ds-tokens-docs/index';
 import inlineAliasValues from './bin/terrazzo-plugin-inline-alias-values/index';
+import typescriptTypes from './bin/terrazzo-plugin-typescript-types/index';
 
 export default defineConfig( {
 	tokens: [
@@ -74,6 +75,121 @@ export default defineConfig( {
 		} ),
 		pluginDsTokenDocs( {
 			filename: '../../docs/ds-tokens.md',
+		} ),
+		typescriptTypes( {
+			filename: 'ts/token-types.ts',
+			types: [
+				{
+					name: 'PaddingSize',
+					description: 'Size scale for padding tokens.',
+					patterns: [ /^wpds-dimension\.padding\.[^.]+\.([^.]+)$/ ],
+				},
+				{
+					name: 'GapSize',
+					description: 'Size scale for gap tokens.',
+					patterns: [ /^wpds-dimension\.gap\.([^.]+)$/ ],
+				},
+				{
+					name: 'BorderRadiusSize',
+					description: 'Size scale for border radius tokens.',
+					patterns: [ /^wpds-border\.radius\.[^.]+\.([^.]+)$/ ],
+				},
+				{
+					name: 'BorderWidthSize',
+					description: 'Size scale for border width tokens.',
+					patterns: [ /^wpds-border\.width\.surface\.([^.]+)$/ ],
+				},
+				{
+					name: 'Target',
+					description:
+						'Target elements that tokens can be applied to.',
+					patterns: [
+						/^wpds-color\.[^.]+\.([^.]+)\./,
+						/^wpds-dimension\.[^.]+\.([^.]+)\./,
+						/^wpds-border\.[^.]+\.([^.]+)\./,
+					],
+				},
+				{
+					name: 'SurfaceBackgroundColor',
+					description:
+						'Background color variants for surface elements.',
+					patterns: [
+						{
+							pattern: /^wpds-color\.bg\.surface\.(.+)$/,
+							transform: ( variant ) =>
+								variant.split( '.' ).join( '-' ),
+						},
+					],
+				},
+				{
+					name: 'InteractiveBackgroundColor',
+					description:
+						'Background color variants for interactive elements.',
+					patterns: [
+						{
+							pattern: /^wpds-color\.bg\.interactive\.(.+)$/,
+							transform: ( variant ) =>
+								variant
+									.split( '.' )
+									.join( '-' )
+									.replace( /-(active|disabled)$/, '' ),
+						},
+					],
+				},
+				{
+					name: 'ContentForegroundColor',
+					description:
+						'Foreground color variants for content text and icons.',
+					patterns: [
+						{
+							pattern: /^wpds-color\.fg\.content\.(.+)$/,
+							transform: ( variant ) =>
+								variant.split( '.' ).join( '-' ),
+						},
+					],
+				},
+				{
+					name: 'InteractiveForegroundColor',
+					description:
+						'Foreground color variants for interactive element text and icons.',
+					patterns: [
+						{
+							pattern: /^wpds-color\.fg\.interactive\.(.+)$/,
+							transform: ( variant ) =>
+								variant
+									.split( '.' )
+									.join( '-' )
+									.replace( /-(active|disabled)$/, '' ),
+						},
+					],
+				},
+				{
+					name: 'SurfaceStrokeColor',
+					description: 'Stroke color variants for surface borders.',
+					patterns: [
+						{
+							pattern: /^wpds-color\.stroke\.surface\.(.+)$/,
+							transform: ( variant ) =>
+								variant.split( '.' ).join( '-' ),
+						},
+					],
+				},
+				{
+					name: 'InteractiveStrokeColor',
+					description:
+						'Stroke color variants for interactive element borders.',
+					patterns: [
+						{
+							pattern: /^wpds-color\.stroke\.interactive\.(.+)$/,
+							transform: ( variant ) =>
+								variant
+									.split( '.' )
+									.join( '-' )
+									.replace( /-(active|disabled)$/, '' ),
+						},
+					],
+				},
+			],
 		} ),
 		pluginModeOverrides(),
 	],

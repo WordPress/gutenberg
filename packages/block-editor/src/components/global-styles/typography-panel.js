@@ -9,7 +9,7 @@ import {
 	Notice,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useCallback, useMemo, useEffect } from '@wordpress/element';
+import { useCallback, useMemo } from '@wordpress/element';
 import { getValueFromVariable } from '@wordpress/global-styles-engine';
 
 /**
@@ -22,6 +22,7 @@ import LetterSpacingControl from '../letter-spacing-control';
 import TextAlignmentControl from '../text-alignment-control';
 import TextTransformControl from '../text-transform-control';
 import TextDecorationControl from '../text-decoration-control';
+import TextIndentControl from '../text-indent-control';
 import WritingModeControl from '../writing-mode-control';
 import { useToolsPanelDropdownMenuProps } from './utils';
 import { setImmutably } from '../../utils/object';
@@ -29,6 +30,7 @@ import {
 	getMergedFontFamiliesAndFontFamilyFaces,
 	findNearestStyleAndWeight,
 } from './typography-utils';
+import { getFontStylesAndWeights } from '../../utils/get-font-styles-and-weights';
 
 const MIN_TEXT_COLUMNS = 1;
 const MAX_TEXT_COLUMNS = 6;
@@ -41,6 +43,7 @@ export function useHasTypographyPanel( settings ) {
 	const hasTextAlign = useHasTextAlignmentControl( settings );
 	const hasTextTransform = useHasTextTransformControl( settings );
 	const hasTextDecoration = useHasTextDecorationControl( settings );
+	const hasTextIndent = useHasTextIndentControl( settings );
 	const hasWritingMode = useHasWritingModeControl( settings );
 	const hasTextColumns = useHasTextColumnsControl( settings );
 	const hasFontSize = useHasFontSizeControl( settings );
@@ -54,6 +57,7 @@ export function useHasTypographyPanel( settings ) {
 		hasTextTransform ||
 		hasFontSize ||
 		hasTextDecoration ||
+		hasTextIndent ||
 		hasWritingMode ||
 		hasTextColumns
 	);
@@ -117,6 +121,10 @@ function useHasTextColumnsControl( settings ) {
 	return settings?.typography?.textColumns;
 }
 
+function useHasTextIndentControl( settings ) {
+	return settings?.typography?.textIndent;
+}
+
 /**
  * Concatenate all the font sizes into a single list for the font size picker.
  *
@@ -168,6 +176,7 @@ const DEFAULT_CONTROLS = {
 	textAlign: true,
 	textTransform: true,
 	textDecoration: true,
+	textIndent: true,
 	writingMode: true,
 	textColumns: true,
 };
@@ -180,7 +189,7 @@ export default function TypographyPanel( {
 	settings,
 	panelId,
 	defaultControls = DEFAULT_CONTROLS,
-	fitText = false,
+	isGlobalStyles = false,
 } ) {
 	const decodeValue = ( rawValue ) =>
 		getValueFromVariable( { settings }, '', rawValue );
@@ -196,15 +205,57 @@ export default function TypographyPanel( {
 		const slug = fontFamilies?.find(
 			( { fontFamily: f } ) => f === newValue
 		)?.slug;
-		onChange(
-			setImmutably(
-				value,
-				[ 'typography', 'fontFamily' ],
-				slug
-					? `var:preset|font-family|${ slug }`
-					: newValue || undefined
-			)
+		let updatedValue = setImmutably(
+			value,
+			[ 'typography', 'fontFamily' ],
+			slug ? `var:preset|font-family|${ slug }` : newValue || undefined
 		);
+
+		// Check if current font style/weight are available in the new font family.
+		const newFontFamilyFaces =
+			fontFamilies?.find( ( { fontFamily: f } ) => f === newValue )
+				?.fontFace ?? [];
+		const { fontStyles, fontWeights } =
+			getFontStylesAndWeights( newFontFamilyFaces );
+		const hasFontStyle = fontStyles?.some(
+			( { value: fs } ) => fs === fontStyle
+		);
+		const hasFontWeight = fontWeights?.some(
+			( { value: fw } ) => fw?.toString() === fontWeight?.toString()
+		);
+
+		// Find the nearest available font style/weight if not available.
+		if ( ! hasFontStyle || ! hasFontWeight ) {
+			const { nearestFontStyle, nearestFontWeight } =
+				findNearestStyleAndWeight(
+					newFontFamilyFaces,
+					fontStyle,
+					fontWeight
+				);
+			if ( nearestFontStyle || nearestFontWeight ) {
+				// Update to the nearest available font style/weight in the new font family.
+				updatedValue = {
+					...updatedValue,
+					typography: {
+						...updatedValue?.typography,
+						fontStyle: nearestFontStyle || undefined,
+						fontWeight: nearestFontWeight || undefined,
+					},
+				};
+			} else if ( fontStyle || fontWeight ) {
+				// Reset if no available styles/weights found.
+				updatedValue = {
+					...updatedValue,
+					typography: {
+						...updatedValue?.typography,
+						fontStyle: undefined,
+						fontWeight: undefined,
+					},
+				};
+			}
+		}
+
+		onChange( updatedValue );
 	};
 	const hasFontFamily = () => !! value?.typography?.fontFamily;
 	const resetFontFamily = () => setFontFamily( undefined );
@@ -262,11 +313,6 @@ export default function TypographyPanel( {
 	const hasFontWeights = settings?.typography?.fontWeight;
 	const fontStyle = decodeValue( inheritedValue?.typography?.fontStyle );
 	const fontWeight = decodeValue( inheritedValue?.typography?.fontWeight );
-	const { nearestFontStyle, nearestFontWeight } = findNearestStyleAndWeight(
-		fontFamilyFaces,
-		fontStyle,
-		fontWeight
-	);
 	const setFontAppearance = useCallback(
 		( { fontStyle: newFontStyle, fontWeight: newFontWeight } ) => {
 			// Only update the font style and weight if they have changed.
@@ -288,24 +334,6 @@ export default function TypographyPanel( {
 	const resetFontAppearance = useCallback( () => {
 		setFontAppearance( {} );
 	}, [ setFontAppearance ] );
-
-	// Check if previous font style and weight values are available in the new font family.
-	useEffect( () => {
-		if ( nearestFontStyle && nearestFontWeight ) {
-			setFontAppearance( {
-				fontStyle: nearestFontStyle,
-				fontWeight: nearestFontWeight,
-			} );
-		} else {
-			// Reset font appearance if there are no available styles or weights.
-			resetFontAppearance();
-		}
-	}, [
-		nearestFontStyle,
-		nearestFontWeight,
-		resetFontAppearance,
-		setFontAppearance,
-	] );
 
 	// Line Height
 	const hasLineHeightEnabled = useHasLineHeightControl( settings );
@@ -338,6 +366,21 @@ export default function TypographyPanel( {
 	};
 	const hasLetterSpacing = () => !! value?.typography?.letterSpacing;
 	const resetLetterSpacing = () => setLetterSpacing( undefined );
+
+	// Text Indent
+	const hasTextIndentControl = useHasTextIndentControl( settings );
+	const textIndent = decodeValue( inheritedValue?.typography?.textIndent );
+	const setTextIndent = ( newValue ) => {
+		onChange(
+			setImmutably(
+				value,
+				[ 'typography', 'textIndent' ],
+				newValue || undefined
+			)
+		);
+	};
+	const hasTextIndent = () => !! value?.typography?.textIndent;
+	const resetTextIndent = () => setTextIndent( undefined );
 
 	// Text Columns
 	const hasTextColumnsControl = useHasTextColumnsControl( settings );
@@ -449,7 +492,7 @@ export default function TypographyPanel( {
 					/>
 				</ToolsPanelItem>
 			) }
-			{ hasFontSizeEnabled && ! fitText && (
+			{ hasFontSizeEnabled && (
 				<ToolsPanelItem
 					label={ __( 'Size' ) }
 					hasValue={ hasFontSize }
@@ -471,7 +514,6 @@ export default function TypographyPanel( {
 			) }
 			{ hasAppearanceControl && (
 				<ToolsPanelItem
-					className="single-column"
 					label={ appearanceControlLabel }
 					hasValue={ hasFontAppearance }
 					onDeselect={ resetFontAppearance }
@@ -522,6 +564,30 @@ export default function TypographyPanel( {
 						onChange={ setLetterSpacing }
 						size="__unstable-large"
 						__unstableInputWidth="auto"
+					/>
+				</ToolsPanelItem>
+			) }
+			{ hasTextIndentControl && (
+				<ToolsPanelItem
+					label={ __( 'Line indent' ) }
+					hasValue={ hasTextIndent }
+					onDeselect={ resetTextIndent }
+					isShownByDefault={ defaultControls.textIndent }
+					panelId={ panelId }
+				>
+					<TextIndentControl
+						value={ textIndent }
+						onChange={ setTextIndent }
+						size="__unstable-large"
+						__unstableInputWidth="auto"
+						withSlider
+						help={
+							isGlobalStyles
+								? __(
+										'Indents the first line of each paragraph after the first one.'
+								  )
+								: __( 'Indents the first line of text.' )
+						}
 					/>
 				</ToolsPanelItem>
 			) }
@@ -576,7 +642,6 @@ export default function TypographyPanel( {
 						value={ writingMode }
 						onChange={ setWritingMode }
 						size="__unstable-large"
-						__nextHasNoMarginBottom
 					/>
 				</ToolsPanelItem>
 			) }
@@ -594,7 +659,6 @@ export default function TypographyPanel( {
 						showNone
 						isBlock
 						size="__unstable-large"
-						__nextHasNoMarginBottom
 					/>
 				</ToolsPanelItem>
 			) }
@@ -611,7 +675,6 @@ export default function TypographyPanel( {
 						onChange={ setTextAlign }
 						options={ [ 'left', 'center', 'right', 'justify' ] }
 						size="__unstable-large"
-						__nextHasNoMarginBottom
 					/>
 
 					{ textAlign === 'justify' && (

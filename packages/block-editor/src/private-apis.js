@@ -59,6 +59,8 @@ import {
 	useBlockElementRef,
 	useBlockElement,
 } from './components/block-list/use-block-props/use-block-refs';
+import { LinkPicker } from './components/link-picker';
+import useRemoteUrlData from './components/link-control/use-rich-url-data';
 
 /**
  * Private @wordpress/block-editor APIs.
@@ -114,4 +116,6 @@ lock( privateApis, {
 	isIsolatedEditorKey,
 	useBlockElement,
 	useBlockElementRef,
+	LinkPicker,
+	useRemoteUrlData,
 } );

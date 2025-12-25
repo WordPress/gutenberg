@@ -156,7 +156,6 @@ export default function Controls( {
 										: 'vertical',
 							} )
 						}
-						__nextHasNoMarginBottom
 					/>
 					<TextControl
 						label={ __( 'Tabs Title' ) }
@@ -170,7 +169,6 @@ export default function Controls( {
 								metadata: { ...metadata, name: value },
 							} );
 						} }
-						__nextHasNoMarginBottom
 						__next40pxDefaultSize
 					/>
 				</PanelBody>

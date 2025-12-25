@@ -17,11 +17,12 @@ import { debounce } from '@wordpress/compose';
 import { ValidatedInputControl } from '..';
 import { formDecorator } from './story-utils';
 import type { ControlWithError } from '../../control-with-error';
+import { Button } from '../../../button';
+import { VStack } from '../../../v-stack';
 
 const meta: Meta< typeof ControlWithError > = {
 	title: 'Components/Selection & Input/Validated Form Controls/Overview',
 	id: 'components-validated-form-controls-overview',
-	decorators: formDecorator,
 };
 export default meta;
 
@@ -32,6 +33,7 @@ type Story = StoryObj< typeof ControlWithError >;
  * move focus to the first control with an error.
  */
 export const WithMultipleControls: Story = {
+	decorators: formDecorator,
 	render: function Template() {
 		const [ text, setText ] = useState< string | undefined >( '' );
 		const [ text2, setText2 ] = useState< string | undefined >( '' );
@@ -78,6 +80,7 @@ export const WithMultipleControls: Story = {
  * will depend on context.
  */
 export const WithHelpTextReplacement: Story = {
+	decorators: formDecorator,
 	render: function Template() {
 		const [ text, setText ] = useState< string | undefined >( '' );
 		const isInvalid = text?.toLowerCase() === 'error';
@@ -130,6 +133,7 @@ export const WithHelpTextReplacement: Story = {
  * They may be unnecessary when responses are generally quick.
  */
 export const AsyncValidation: StoryObj< typeof ValidatedInputControl > = {
+	decorators: formDecorator,
 	render: function Template( { ...args } ) {
 		const [ text, setText ] = useState( '' );
 		const [ customValidity, setCustomValidity ] =
@@ -195,6 +199,7 @@ export const AsyncValidation: StoryObj< typeof ValidatedInputControl > = {
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const AsyncValidationWithTest: StoryObj< typeof ValidatedInputControl > = {
 	...AsyncValidation,
+	decorators: formDecorator,
 	play: async ( { canvasElement } ) => {
 		const canvas = within( canvasElement );
 		await userEvent.click( canvas.getByRole( 'textbox' ) );
@@ -276,6 +281,7 @@ const AsyncValidationWithTest: StoryObj< typeof ValidatedInputControl > = {
  * even if the input has never been interacted with.
  */
 export const CustomErrorsOnSubmit: StoryObj< typeof ValidatedInputControl > = {
+	decorators: formDecorator,
 	args: {
 		label: 'Text',
 		required: true,
@@ -300,6 +306,54 @@ export const CustomErrorsOnSubmit: StoryObj< typeof ValidatedInputControl > = {
 					}
 				/>
 			</>
+		);
+	},
+};
+
+/**
+ * While it is recommended to rely on the built-in behavior for showing errors by
+ * using a `form` element and `type="submit"` button around validated fields,
+ * it is also possible to show errors at arbitrary times.
+ * This can be done by calling the [`reportValidity()` method](https://developer.mozilla.org/en-US/docs/Web/API/HTMLFormElement/reportValidity)
+ * on a ref of the field itself, or the wrapping `form` element.
+ */
+export const ShowingErrorsAtArbitraryTimes: StoryObj<
+	typeof ValidatedInputControl
+> = {
+	args: {
+		label: 'Text',
+		required: true,
+		help: 'The word "error" will trigger an error.',
+	},
+	decorators: [],
+	render: function Template( { ...args } ) {
+		const [ text, setText ] = useState< string | undefined >( 'error' );
+		const ref = useRef< HTMLInputElement >( null );
+
+		return (
+			<VStack spacing={ 4 } alignment="left">
+				<ValidatedInputControl
+					ref={ ref }
+					{ ...args }
+					value={ text }
+					onChange={ setText }
+					customValidity={
+						text === 'error'
+							? {
+									type: 'invalid',
+									message: 'The word "error" is not allowed.',
+							  }
+							: undefined
+					}
+				/>
+				<Button
+					__next40pxDefaultSize
+					variant="secondary"
+					onClick={ () => ref.current?.reportValidity() }
+				>
+					Report validity
+				</Button>
+			</VStack>
 		);
 	},
 };

@@ -1,8 +1,7 @@
 /**
  * External dependencies
  */
-import { basename, join, dirname } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { basename } from 'node:path';
 import type { Plugin } from '@terrazzo/parser';
 
 type DTCGPrimitiveValue =
@@ -189,13 +188,19 @@ export default function pluginModeOverrides(): Plugin {
 					}
 
 					// Output as {basename}.{mode}.json (e.g., dimension.compact.json)
-					const filePath = fileURLToPath( filename );
-					const outFile = join(
-						dirname( filePath ),
-						'modes',
-						`${ basename( filePath, '.json' ) }.${ mode }.json`
+					const sourceDir = new URL( './', filename );
+					const outFileName = `${ basename(
+						filename.pathname,
+						'.json'
+					) }.${ mode }.json`;
+					const outFileUrl = new URL(
+						`modes/${ outFileName }`,
+						sourceDir
 					);
-					outputFile( outFile, JSON.stringify( output, null, '\t' ) );
+					outputFile(
+						outFileUrl.href,
+						JSON.stringify( output, null, '\t' )
+					);
 				}
 			}
 		},
