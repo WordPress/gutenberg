@@ -178,28 +178,3 @@ WithOpenInNewTab.args = {
 		},
 	],
 };
-
-/**
- * When both `url` and `onClick` are provided, the action renders as a link
- * and `onClick` is still called when clicked.
- */
-export const WithOnClickAndUrl: StoryFn< typeof Notice > = ( props ) => {
-	const [ clickCount, setClickCount ] = useState( 0 );
-
-	return (
-		<Notice
-			{ ...props }
-			actions={ [
-				{
-					label: 'Visit WordPress.org',
-					url: 'https://wordpress.org',
-					onClick: () => setClickCount( ( c ) => c + 1 ),
-					target: '_blank',
-					rel: 'noreferrer',
-				},
-			] }
-		>
-			Click count: { clickCount }
-		</Notice>
-	);
-};
