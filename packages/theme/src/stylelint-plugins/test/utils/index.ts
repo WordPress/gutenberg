@@ -7,7 +7,7 @@ const execute = util.promisify( childProcess.exec );
 const generateStylelintCommand = ( filename: string ): string =>
 	'npx stylelint ' +
 	path.resolve( __dirname, '../', filename ) +
-	' -c' +
+	' -c ' +
 	path.resolve( __dirname, '../', './.stylelintrc.json' ) +
 	' --formatter json' +
 	' --ignore-path ' +
