@@ -139,6 +139,9 @@
 		"remove-accents": "^0.5.0",
 		"uuid": "^9.0.1"
 	},
+	"devDependencies": {
+		"deep-freeze": "0.0.1"
+	},
 	"peerDependencies": {
 		"react": "^18.0.0",
 		"react-dom": "^18.0.0"
