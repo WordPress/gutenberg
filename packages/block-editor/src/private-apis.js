@@ -61,6 +61,7 @@ import {
 } from './components/block-list/use-block-props/use-block-refs';
 import { LinkPicker } from './components/link-picker';
 import useRemoteUrlData from './components/link-control/use-rich-url-data';
+import TextIndentControl from './components/text-indent-control';
 
 /**
  * Private @wordpress/block-editor APIs.
@@ -90,6 +91,7 @@ lock( privateApis, {
 	ResolutionTool,
 	TabbedSidebar,
 	TextAlignmentControl,
+	TextIndentControl,
 	usesContextKey,
 	useFlashEditableBlocks,
 	HTMLElementControl,

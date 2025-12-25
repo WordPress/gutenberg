@@ -54,7 +54,6 @@ export { default as __experimentalFontAppearanceControl } from './font-appearanc
 export { default as __experimentalFontFamilyControl } from './font-family';
 export { default as __experimentalLetterSpacingControl } from './letter-spacing-control';
 export { default as __experimentalTextDecorationControl } from './text-decoration-control';
-export { default as __experimentalTextIndentControl } from './text-indent-control';
 export { default as __experimentalTextTransformControl } from './text-transform-control';
 export { default as __experimentalWritingModeControl } from './writing-mode-control';
 export { default as __experimentalColorGradientControl } from './colors-gradients/control';
