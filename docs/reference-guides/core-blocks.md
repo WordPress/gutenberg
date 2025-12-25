@@ -332,6 +332,7 @@ Display footnotes added to the page. ([Source](https://github.com/WordPress/gute
 -	**Name:** core/footnotes
 -	**Category:** text
 -	**Supports:** color (background, link, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~, ~~inserter~~, ~~multiple~~, ~~reusable~~
+-	**Attributes:** footnotes
 
 ## Form
 

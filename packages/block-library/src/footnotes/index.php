@@ -26,13 +26,17 @@ function render_block_core_footnotes( $attributes, $content, $block ) {
 		return;
 	}
 
-	$footnotes = get_post_meta( $block->context['postId'], 'footnotes', true );
+	$footnotes = ! empty( $attributes['footnotes'] )
+		? $attributes['footnotes']
+		: get_post_meta( $block->context['postId'], 'footnotes', true );
 
 	if ( ! $footnotes ) {
 		return;
 	}
 
-	$footnotes = json_decode( $footnotes, true );
+	if ( is_string( $footnotes ) ) {
+		$footnotes = json_decode( $footnotes, true );
+	}
 
 	if ( ! is_array( $footnotes ) || count( $footnotes ) === 0 ) {
 		return '';
