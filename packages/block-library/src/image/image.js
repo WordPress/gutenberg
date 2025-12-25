@@ -861,22 +861,22 @@ export default function Image( {
 			>
 				{ dimensionsControl }
 			</InspectorControls>
-			<InspectorControls>
-				<ToolsPanel
-					label={ __( 'Settings' ) }
-					resetAll={ resetSettings }
-					dropdownMenuProps={ dropdownMenuProps }
-				>
-					{ !! imageSizeOptions.length && (
+			{ !! imageSizeOptions.length && (
+				<InspectorControls>
+					<ToolsPanel
+						label={ __( 'Settings' ) }
+						resetAll={ resetSettings }
+						dropdownMenuProps={ dropdownMenuProps }
+					>
 						<ResolutionTool
 							value={ sizeSlug }
 							defaultValue={ DEFAULT_MEDIA_SIZE_SLUG }
 							onChange={ updateImage }
 							options={ imageSizeOptions }
 						/>
-					) }
-				</ToolsPanel>
-			</InspectorControls>
+					</ToolsPanel>
+				</InspectorControls>
+			) }
 			<InspectorControls group="advanced">
 				<TextControl
 					__next40pxDefaultSize
