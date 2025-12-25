@@ -40,8 +40,8 @@
 		},
 		"./design-tokens.css": "./src/prebuilt/css/design-tokens.css",
 		"./design-tokens.js": "./src/prebuilt/js/design-tokens.js",
-		"./stylelint-plugins/no-unknown-ds-tokens": "./src/stylelint-plugins/no-unknown-ds-tokens.mjs",
-		"./stylelint-plugins/no-setting-wpds-custom-properties": "./src/stylelint-plugins/no-setting-wpds-custom-properties.mjs",
+		"./stylelint-plugins/no-unknown-ds-tokens": "./src/stylelint-plugins/no-unknown-ds-tokens.js",
+		"./stylelint-plugins/no-setting-wpds-custom-properties": "./src/stylelint-plugins/no-setting-wpds-custom-properties.js",
 		"./package.json": "./package.json"
 	},
 	"react-native": "src/index",

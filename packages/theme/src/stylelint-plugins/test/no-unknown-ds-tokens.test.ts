@@ -1,12 +1,11 @@
-const utils = require( './utils' );
-const getStylelintResult = utils.getStylelintResult;
+import { getStylelintResult } from './utils';
 
-describe( 'flags no warnings with valid wpds custom properties css', () => {
-	let result;
+describe( 'flags no warnings with valid wpds tokens css', () => {
+	let result: ReturnType< typeof getStylelintResult >;
 
 	beforeEach( () => {
 		result = getStylelintResult(
-			'./fixtures/no-setting-wpds-custom-properties-valid.css'
+			'./fixtures/no-unknown-ds-tokens-valid.css'
 		);
 	} );
 
@@ -21,12 +20,12 @@ describe( 'flags no warnings with valid wpds custom properties css', () => {
 	} );
 } );
 
-describe( 'flags warnings with invalid wpds custom properties css', () => {
-	let result;
+describe( 'flags warnings with invalid wpds tokens css', () => {
+	let result: ReturnType< typeof getStylelintResult >;
 
 	beforeEach( () => {
 		result = getStylelintResult(
-			'./fixtures/no-setting-wpds-custom-properties-invalid.css'
+			'./fixtures/no-unknown-ds-tokens-invalid.css'
 		);
 	} );
 

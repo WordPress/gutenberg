@@ -28,7 +28,7 @@ const ruleFunction = ( primary ) => {
 			const { prop } = ruleNode;
 			if ( prop.startsWith( '--wpds' ) ) {
 				report( {
-					message: messages.rejected( prop ),
+					message: messages.rejected(),
 					node: ruleNode,
 					result,
 					ruleName,

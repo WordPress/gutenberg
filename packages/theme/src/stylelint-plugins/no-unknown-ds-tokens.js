@@ -22,6 +22,7 @@ const DS_TOKEN_PREFIX = 'wpds-';
  */
 function extractCSSVariables( value, prefix = '' ) {
 	const regex = /--[\w-]+/g;
+	/** @type {Set<string>} */
 	const variables = new Set();
 
 	let match;
@@ -98,4 +99,3 @@ ruleFunction.messages = messages;
 
 /** @type {import('stylelint').Plugin} */
 export default createPlugin( ruleName, ruleFunction );
-
