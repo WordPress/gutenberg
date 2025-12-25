@@ -26,7 +26,7 @@ const ruleFunction = ( primary ) => {
 
 		root.walkDecls( ( ruleNode ) => {
 			const { prop } = ruleNode;
-			if ( prop.startsWith( '--wpds' ) ) {
+			if ( prop.startsWith( '--wpds-' ) ) {
 				report( {
 					message: messages.rejected(),
 					node: ruleNode,
