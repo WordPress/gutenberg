@@ -30,6 +30,38 @@ import {
 
 import type { BasePost, BasePostWithEmbeddedAuthor } from '../types';
 
+// Mock users for the story.
+const mockUsers = [
+	{
+		id: 1,
+		name: 'John Doe',
+		avatar_urls: {
+			'24': 'https://gravatar.com/avatar?d=retro&s=24',
+			'48': 'https://gravatar.com/avatar?d=retro&s=48',
+			'96': 'https://gravatar.com/avatar?d=retro&s=96',
+		},
+	},
+	{
+		id: 2,
+		name: 'Jane Smith',
+		avatar_urls: {
+			'24': 'https://gravatar.com/avatar/2?d=retro&s=24',
+			'48': 'https://gravatar.com/avatar/2?d=retro&s=48',
+			'96': 'https://gravatar.com/avatar/2?d=retro&s=96',
+		},
+	},
+];
+
+// Override author field with mock getElements for Storybook.
+const authorFieldForStory: Field< any > = {
+	...authorField,
+	getElements: async () =>
+		mockUsers.map( ( { id, name } ) => ( {
+			value: id,
+			label: name,
+		} ) ),
+};
+
 export default {
 	title: 'Fields/Base Fields',
 	component: DataForm,
@@ -61,16 +93,7 @@ const sampleBasePost: BasePost = {
 const samplePostWithAuthor: BasePostWithEmbeddedAuthor = {
 	...sampleBasePost,
 	_embedded: {
-		author: [
-			{
-				name: 'John Doe',
-				avatar_urls: {
-					'24': 'https://gravatar.com/avatar?d=retro&s=24',
-					'48': 'https://gravatar.com/avatar?d=retro&s=48',
-					'96': 'https://gravatar.com/avatar?d=retro&s=96',
-				},
-			},
-		],
+		author: [ { ...mockUsers[ 0 ] } ],
 	},
 };
 
@@ -83,7 +106,7 @@ const showcaseFields: Field< any >[] = [
 	slugField,
 	statusField,
 	dateField,
-	authorField,
+	authorFieldForStory,
 	commentStatusField,
 	passwordField,
 	orderField,

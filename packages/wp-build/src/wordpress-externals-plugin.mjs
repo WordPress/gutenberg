@@ -1,14 +1,45 @@
 /**
  * External dependencies
  */
-import { writeFile, mkdir } from 'fs/promises';
+import { writeFile, mkdir, readFile } from 'fs/promises';
 import path from 'path';
 import { camelCase } from 'change-case';
+import { createHash } from 'crypto';
 
 /**
  * Internal dependencies
  */
 import { getPackageInfo } from './package-utils.mjs';
+
+/**
+ * Generate a content hash from file contents.
+ * Uses SHA256 algorithm for broad compatibility across Node.js versions.
+ *
+ * @param {string[]} filePaths - Absolute paths to files to hash
+ * @param {string}   algorithm - Hash algorithm (default: 'sha256')
+ * @param {number}   length    - Hash length (default: 20)
+ * @return {Promise<string>} Content hash string
+ */
+async function generateContentHash(
+	filePaths,
+	algorithm = 'sha256',
+	length = 20
+) {
+	const hashBuilder = createHash( algorithm );
+
+	// Sort paths for deterministic ordering
+	const sortedPaths = [ ...filePaths ].sort();
+
+	// Read and hash each file
+	for ( const filePath of sortedPaths ) {
+		const content = await readFile( filePath );
+		hashBuilder.update( content );
+	}
+
+	// Generate hash as hex string and truncate
+	const fullHash = hashBuilder.digest( 'hex' );
+	return fullHash.slice( 0, length );
+}
 
 /**
  * Create WordPress externals plugin for esbuild.
@@ -33,12 +64,14 @@ export function createWordpressExternalsPlugin(
 	 * @param {string}        assetName         Base name for the asset file (e.g., 'index.min').
 	 * @param {string}        buildFormat       Build format: 'iife' for classic scripts, 'esm' for modules.
 	 * @param {Array<string>} extraDependencies Additional dependencies to include in the asset file.
+	 * @param {boolean}       generateAssetFile Whether to generate the .asset.php file. Default true.
 	 * @return {Object} esbuild plugin object.
 	 */
 	return function wordpressExternalsPlugin(
 		assetName = 'index.min',
 		buildFormat = 'iife',
-		extraDependencies = []
+		extraDependencies = [],
+		generateAssetFile = true
 	) {
 		return {
 			name: 'wordpress-externals',
@@ -180,7 +213,10 @@ export function createWordpressExternalsPlugin(
 							const shortName = parts[ 1 ];
 							const handle = `${ externalConfig.handlePrefix }-${ shortName }`;
 
-							const packageJson = getPackageInfo( packageName );
+							const packageJson = getPackageInfo(
+								packageName,
+								args.resolveDir
+							);
 
 							if ( ! packageJson ) {
 								return undefined;
@@ -220,6 +256,7 @@ export function createWordpressExternalsPlugin(
 								return {
 									path: args.path,
 									external: true,
+									sideEffects: !! packageJson.sideEffects,
 								};
 							}
 
@@ -280,17 +317,6 @@ export function createWordpressExternalsPlugin(
 							return;
 						}
 
-						// Merge discovered dependencies with extra dependencies
-						const allDependencies = new Set( [
-							...dependencies,
-							...extraDependencies,
-						] );
-
-						const dependenciesString = Array.from( allDependencies )
-							.sort()
-							.map( ( dep ) => `'${ dep }'` )
-							.join( ', ' );
-
 						// Format module dependencies as array of arrays with 'id' and 'import' keys
 						const moduleDependenciesArray = Array.from(
 							moduleDependencies.entries()
@@ -306,7 +332,44 @@ export function createWordpressExternalsPlugin(
 								? moduleDependenciesArray.join( ', ' )
 								: '';
 
-						const version = Date.now();
+						// Only generate asset file if requested
+						if ( ! generateAssetFile ) {
+							return;
+						}
+
+						// Merge discovered dependencies with extra dependencies
+						const allDependencies = new Set( [
+							...dependencies,
+							...extraDependencies,
+						] );
+
+						const dependenciesString = Array.from( allDependencies )
+							.sort()
+							.map( ( dep ) => `'${ dep }'` )
+							.join( ', ' );
+
+						// Determine output file path from build config
+						let outputFilePath;
+						if ( build.initialOptions.outfile ) {
+							outputFilePath = build.initialOptions.outfile;
+						} else if ( build.initialOptions.outdir ) {
+							// Construct expected output filename from assetName
+							// e.g., assetName='index.min' -> 'index.min.js'
+							outputFilePath = path.join(
+								build.initialOptions.outdir,
+								`${ assetName }.js`
+							);
+						}
+
+						// Collect files to hash
+						const filesToHash = [];
+						if ( outputFilePath ) {
+							filesToHash.push( outputFilePath );
+						}
+
+						// Generate content-based version hash
+						const version =
+							await generateContentHash( filesToHash );
 
 						const parts = [
 							`'dependencies' => array(${ dependenciesString })`,

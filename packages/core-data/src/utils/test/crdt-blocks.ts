@@ -9,6 +9,25 @@ import { Y } from '@wordpress/sync';
 import { describe, expect, it, jest, beforeEach } from '@jest/globals';
 
 /**
+ * Mock uuid module
+ */
+jest.mock( 'uuid', () => ( {
+	v4: jest.fn( () => 'mocked-uuid-' + Math.random() ),
+} ) );
+
+/**
+ * Mock @wordpress/blocks module
+ */
+jest.mock( '@wordpress/blocks', () => ( {
+	getBlockTypes: jest.fn( () => [
+		{
+			name: 'core/paragraph',
+			attributes: { content: { type: 'rich-text' } },
+		},
+	] ),
+} ) );
+
+/**
  * Internal dependencies
  */
 import {
@@ -261,7 +280,48 @@ describe( 'crdt-blocks', () => {
 			const contentAttr = (
 				block.get( 'attributes' ) as YBlockAttributes
 			 ).get( 'content' ) as Y.Text;
+			expect( contentAttr ).toBeInstanceOf( Y.Text );
 			expect( contentAttr.toString() ).toBe( 'Rich text content' );
+		} );
+
+		it( 'creates Y.Text for rich-text attributes even when the block name changes', () => {
+			const blocks: Block[] = [
+				{
+					name: 'core/freeform',
+					attributes: { content: 'Freeform text' },
+					innerBlocks: [],
+				},
+			];
+
+			mergeCrdtBlocks( yblocks, blocks, null );
+
+			const block = yblocks.get( 0 );
+			const contentAttr = (
+				block.get( 'attributes' ) as YBlockAttributes
+			 ).get( 'content' );
+			expect( block.get( 'name' ) ).toBe( 'core/freeform' );
+			expect( typeof contentAttr ).toBe( 'string' );
+			expect( contentAttr ).toBe( 'Freeform text' );
+
+			const updatedBlocks: Block[] = [
+				{
+					name: 'core/paragraph',
+					attributes: { content: 'Updated text' },
+					innerBlocks: [],
+				},
+			];
+
+			mergeCrdtBlocks( yblocks, updatedBlocks, null );
+
+			expect( yblocks.length ).toBe( 1 );
+
+			const updatedBlock = yblocks.get( 0 );
+			const updatedContentAttr = (
+				updatedBlock.get( 'attributes' ) as YBlockAttributes
+			 ).get( 'content' ) as Y.Text;
+			expect( updatedBlock.get( 'name' ) ).toBe( 'core/paragraph' );
+			expect( updatedContentAttr ).toBeInstanceOf( Y.Text );
+			expect( updatedContentAttr.toString() ).toBe( 'Updated text' );
 		} );
 
 		it( 'removes duplicate clientIds', () => {
@@ -370,6 +430,45 @@ describe( 'crdt-blocks', () => {
 				block.get( 'attributes' ) as YBlockAttributes
 			 ).get( 'content' ) as Y.Text;
 			expect( content.toString() ).toBe( 'Updated Middle' );
+		} );
+
+		it( 'adds new rich-text attribute to existing block without that attribute', () => {
+			// Start with a block that has NO content attribute
+			const initialBlocks: Block[] = [
+				{
+					name: 'core/paragraph',
+					attributes: { level: 1 },
+					innerBlocks: [],
+				},
+			];
+
+			mergeCrdtBlocks( yblocks, initialBlocks, null );
+
+			// Now add the content attribute (rich-text)
+			const updatedBlocks: Block[] = [
+				{
+					name: 'core/paragraph',
+					attributes: {
+						level: 1,
+						content: 'New content added',
+					},
+					innerBlocks: [],
+				},
+			];
+
+			mergeCrdtBlocks( yblocks, updatedBlocks, null );
+
+			expect( yblocks.length ).toBe( 1 );
+			const block = yblocks.get( 0 );
+			const attributes = block.get( 'attributes' ) as YBlockAttributes;
+
+			// The content attribute should now exist
+			expect( attributes.has( 'content' ) ).toBe( true );
+			const content = attributes.get( 'content' ) as Y.Text;
+			expect( content.toString() ).toBe( 'New content added' );
+
+			// The level attribute should still exist
+			expect( attributes.get( 'level' ) ).toBe( 1 );
 		} );
 	} );
 } );

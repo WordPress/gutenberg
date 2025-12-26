@@ -1,17 +1,14 @@
 /**
  * WordPress dependencies
  */
-import { dateI18n, getDate } from '@wordpress/date';
+import { dateI18n, getDate, getSettings } from '@wordpress/date';
 
 /**
  * Internal dependencies
  */
-import type {
-	DataViewRenderFieldProps,
-	SortDirection,
-	FieldTypeDefinition,
-} from '../types';
-import RenderFromElements from './utils/render-from-elements';
+import type { FormatDate, NormalizedField, SortDirection } from '../types';
+import type { FieldType } from '../types/private';
+import isValidElements from './utils/is-valid-elements';
 import {
 	OPERATOR_ON,
 	OPERATOR_NOT_ON,
@@ -23,65 +20,76 @@ import {
 	OPERATOR_OVER,
 	OPERATOR_BETWEEN,
 } from '../constants';
+import isValidRequired from './utils/is-valid-required';
+import render from './utils/render-default';
 
-function sort( a: any, b: any, direction: SortDirection ) {
+const format = {
+	date: getSettings().formats.date,
+	weekStartsOn: getSettings().l10n.startOfWeek,
+};
+
+function getValueFormatted< Item >( {
+	item,
+	field,
+}: {
+	item: Item;
+	field: NormalizedField< Item >;
+} ): string {
+	const value = field.getValue( { item } );
+	if ( [ '', undefined, null ].includes( value ) ) {
+		return '';
+	}
+
+	let formatDate: Required< FormatDate >;
+	if ( field.type !== 'date' ) {
+		formatDate = format;
+	} else {
+		formatDate = field.format as Required< FormatDate >;
+	}
+
+	return dateI18n( formatDate.date, getDate( value ) );
+}
+
+const sort = ( a: any, b: any, direction: SortDirection ) => {
 	const timeA = new Date( a ).getTime();
 	const timeB = new Date( b ).getTime();
 
 	return direction === 'asc' ? timeA - timeB : timeB - timeA;
-}
+};
 
 export default {
-	sort,
+	type: 'date',
+	render,
 	Edit: 'date',
-	isValid: {
-		elements: true,
-		custom: () => null,
-	},
-	render: ( { item, field }: DataViewRenderFieldProps< any > ) => {
-		if ( field.hasElements ) {
-			return <RenderFromElements item={ item } field={ field } />;
-		}
-
-		const value = field.getValue( { item } );
-		if ( ! value ) {
-			return '';
-		}
-
-		// Not all fields have format, but date fields do.
-		//
-		// At runtime, this method will never be called for non-date fields.
-		// However, the type system does not know this, so we need to check it.
-		// There's an opportunity here to improve the type system.
-		if ( field.type !== 'date' ) {
-			return '';
-		}
-
-		return dateI18n( field.format.date, getDate( value ) );
-	},
+	sort,
 	enableSorting: true,
-	filterBy: {
-		defaultOperators: [
-			OPERATOR_ON,
-			OPERATOR_NOT_ON,
-			OPERATOR_BEFORE,
-			OPERATOR_AFTER,
-			OPERATOR_BEFORE_INC,
-			OPERATOR_AFTER_INC,
-			OPERATOR_IN_THE_PAST,
-			OPERATOR_OVER,
-			OPERATOR_BETWEEN,
-		],
-		validOperators: [
-			OPERATOR_ON,
-			OPERATOR_NOT_ON,
-			OPERATOR_BEFORE,
-			OPERATOR_AFTER,
-			OPERATOR_BEFORE_INC,
-			OPERATOR_AFTER_INC,
-			OPERATOR_IN_THE_PAST,
-			OPERATOR_OVER,
-			OPERATOR_BETWEEN,
-		],
+	enableGlobalSearch: false,
+	defaultOperators: [
+		OPERATOR_ON,
+		OPERATOR_NOT_ON,
+		OPERATOR_BEFORE,
+		OPERATOR_AFTER,
+		OPERATOR_BEFORE_INC,
+		OPERATOR_AFTER_INC,
+		OPERATOR_IN_THE_PAST,
+		OPERATOR_OVER,
+		OPERATOR_BETWEEN,
+	],
+	validOperators: [
+		OPERATOR_ON,
+		OPERATOR_NOT_ON,
+		OPERATOR_BEFORE,
+		OPERATOR_AFTER,
+		OPERATOR_BEFORE_INC,
+		OPERATOR_AFTER_INC,
+		OPERATOR_IN_THE_PAST,
+		OPERATOR_OVER,
+		OPERATOR_BETWEEN,
+	],
+	format,
+	getValueFormatted,
+	validate: {
+		required: isValidRequired,
+		elements: isValidElements,
 	},
-} satisfies FieldTypeDefinition< any >;
+} satisfies FieldType< any >;

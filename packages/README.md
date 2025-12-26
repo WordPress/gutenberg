@@ -2,6 +2,40 @@
 
 This repository uses [npm workspaces](https://docs.npmjs.com/cli/v10/using-npm/workspaces) to manage WordPress packages and [lerna](https://lerna.js.org/) to publish them with to [npm](https://www.npmjs.com/).
 
+## Package Guidelines
+
+Packages are the first layer of architecture and organization in Gutenberg. They exist to separate concerns, provide clarity, and establish a shared mental model across teams. To maintain good package hygiene, follow these guidelines when creating new packages or iterating on existing ones:
+
+1. **Each package should have a single, clear purpose.**
+
+   It should be immediately obvious why the package exists.
+
+2. **Every package must include a README.**
+
+   This is the first place contributors look to understand scope and usage.
+
+3. **Any prerequisites must be documented.**
+
+   Generic packages without prerequisites are better, but packages with some prerequisites are acceptable. Examples of prerequisites: API endpoints that must exist, authentication assumptions, environment dependencies. These should be clearly stated in the README.
+
+4. **Public APIs should have documentation.**
+
+   Either inline in the README or linked to external docs.
+
+5. **Avoid utility and kitchen-sink packages.**
+
+   They tend to grow without a coherent domain and become junk drawers.
+
+6. **Avoid broad, catch-all scopes.**
+
+   For example: "Reusable WordPress components" or "Utilities for different use cases." These create unclear ownership and encourage uncontrolled growth. Instead, define a specific domain or purpose.
+
+7. **Default to bundled packages (no globals, no modules) unless necessary.**
+
+   In Gutenberg, we should default to "bundled" packages unless there's a specific need for globals or modules. See the [@wordpress/build README](../wp-build/README.md) for more information on package configuration.
+
+For more information on the build system and package configuration, see the [@wordpress/build README](../wp-build/README.md).
+
 ## Creating a New Package
 
 When creating a new package, you need to provide at least the following. Packages bundled in Gutenberg or WordPress must include a `wpScript` and or `wpScriptModuleExports` field in their `package.json` file. See the details below.
@@ -72,6 +106,8 @@ When creating a new package, you need to provide at least the following. Package
 
     Both `wpScript` and `wpScriptModuleExports` may be included if the package exposes both a script and a script module. These fields are also essential when performing a license check for all their dependencies, because they trigger strict validation against compatibility with GPL v2. All remaining dependencies WordPress doesn't distribute but uses for development purposes can contain also a few other OSS compatible licenses.
 
+    For more details on package configuration options, see the [@wordpress/build README](../wp-build/README.md).
+
 1. `README.md` file containing at least:
     - Package name
     - Package description
@@ -91,6 +127,43 @@ When creating a new package, you need to provide at least the following. Package
     ```
 
 To ensure your package is recognized in npm workspaces, you should run `npm install` to update the package lock file.
+
+## When to Omit or Set `wpScript` to `false`
+
+By default, packages do not expose as WordPress scripts/modules (not accessible via the `wp` global). Only packages that should be directly available in WordPress should set `wpScript: true`.
+
+Omit `wpScript` (or explicitly set to `false`) for packages designed solely as dependencies for other packages:
+
+```json
+{
+	"wpScript": false
+}
+```
+
+**Examples of packages that should not expose to the `wp` global:**
+- Utility packages used internally by other packages
+- Shared logic or helpers without a direct WordPress use case
+- Intermediate packages intended only as dependencies of other `@wordpress/*` packages
+
+When a package omits `wpScript` or sets it to `false`, it:
+- Will not be exposed as a WordPress script (not available via the `wp` global)
+- Can still be used as a dependency by other packages (via npm imports)
+- Should still be published to npm to support backporting to WordPress core releases
+
+### Truly Private Packages
+
+In rare cases, if a package is only used internally within Gutenberg and should never be published to npm, mark it as private:
+
+```json
+{
+	"private": true,
+	"wpScript": false
+}
+```
+
+Private packages will be excluded from npm publication and should only be used for development-only utilities (such as build tools or internal development helpers). They should not be used as dependencies for other packages, as this could break the backporting process to WordPress core.
+
+Note: You can safely include the `publishConfig` field in private packages—it will be ignored by npm since the `private` flag takes precedence.
 
 ## Managing Dependencies
 

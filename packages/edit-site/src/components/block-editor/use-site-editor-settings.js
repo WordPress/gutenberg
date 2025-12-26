@@ -5,7 +5,11 @@ import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { usePrevious } from '@wordpress/compose';
-import { store as editorStore } from '@wordpress/editor';
+import {
+	store as editorStore,
+	privateApis as editorPrivateApis,
+} from '@wordpress/editor';
+import { generateGlobalStyles } from '@wordpress/global-styles-engine';
 
 /**
  * Internal dependencies
@@ -16,31 +20,39 @@ import useNavigateToEntityRecord from './use-navigate-to-entity-record';
 import { FOCUSABLE_ENTITIES } from '../../utils/constants';
 
 const { useLocation, useHistory } = unlock( routerPrivateApis );
+const { useGlobalStyles } = unlock( editorPrivateApis );
 
 function useNavigateToPreviousEntityRecord() {
 	const location = useLocation();
-	const previousLocation = usePrevious( location );
+	const previousCanvas = usePrevious( location.query.canvas );
 	const history = useHistory();
 	const goBack = useMemo( () => {
 		const isFocusMode =
 			location.query.focusMode ||
 			( location?.params?.postId &&
 				FOCUSABLE_ENTITIES.includes( location?.params?.postType ) );
-		const didComeFromEditorCanvas =
-			previousLocation?.query.canvas === 'edit';
+		const didComeFromEditorCanvas = previousCanvas === 'edit';
 		const showBackButton = isFocusMode && didComeFromEditorCanvas;
 		return showBackButton ? () => history.back() : undefined;
-		// `previousLocation` changes when the component updates for any reason, not
-		// just when location changes. Until this is fixed we can't add it to deps. See
-		// https://github.com/WordPress/gutenberg/pull/58710#discussion_r1479219465.
-	}, [ location, history ] );
+	}, [ location, history, previousCanvas ] );
 	return goBack;
 }
 
 export function useSpecificEditorSettings() {
 	const { query } = useLocation();
 	const { canvas = 'view' } = query;
-	const onNavigateToEntityRecord = useNavigateToEntityRecord();
+	const [ onNavigateToEntityRecord, initialBlockSelection ] =
+		useNavigateToEntityRecord();
+
+	/*
+	 * Generate global styles directly to avoid circular dependency with GlobalStylesRenderer
+	 * (which runs inside ExperimentalEditorProvider after this hook).
+	 * GlobalStylesRenderer updates editorStore, but reading from it here would cause infinite
+	 * loops. Reading config from useGlobalStyles and generating CSS directly keeps us in sync.
+	 * See: https://github.com/WordPress/gutenberg/issues/73350
+	 */
+	const { merged: mergedConfig } = useGlobalStyles();
+
 	const { settings, currentPostIsTrashed } = useSelect( ( select ) => {
 		const { getSettings } = select( editSiteStore );
 		const { getCurrentPostAttribute } = select( editorStore );
@@ -53,11 +65,24 @@ export function useSpecificEditorSettings() {
 
 	const onNavigateToPreviousEntityRecord =
 		useNavigateToPreviousEntityRecord();
+
+	const [ globalStyles, globalSettings ] = useMemo( () => {
+		return generateGlobalStyles( mergedConfig, [], {
+			disableRootPadding: false,
+		} );
+	}, [ mergedConfig ] );
+
 	const defaultEditorSettings = useMemo( () => {
+		// Preserve non-global styles from settings.styles (e.g., editor styles from add_editor_style)
+		const nonGlobalStyles = ( settings?.styles ?? [] ).filter(
+			( style ) => ! style.isGlobalStyles
+		);
+
 		return {
 			...settings,
 			styles: [
-				...settings.styles,
+				...nonGlobalStyles,
+				...globalStyles,
 				{
 					// Forming a "block formatting context" to prevent margin collapsing.
 					// @see https://developer.mozilla.org/en-US/docs/Web/Guide/CSS/Block_formatting_context
@@ -71,19 +96,24 @@ export function useSpecificEditorSettings() {
 							: undefined,
 				},
 			],
+			__experimentalFeatures: globalSettings,
 			richEditingEnabled: true,
 			supportsTemplateMode: true,
 			focusMode: canvas !== 'view',
 			onNavigateToEntityRecord,
 			onNavigateToPreviousEntityRecord,
 			isPreviewMode: canvas === 'view',
+			initialBlockSelection,
 		};
 	}, [
 		settings,
+		globalStyles,
+		globalSettings,
 		canvas,
 		currentPostIsTrashed,
 		onNavigateToEntityRecord,
 		onNavigateToPreviousEntityRecord,
+		initialBlockSelection,
 	] );
 
 	return defaultEditorSettings;

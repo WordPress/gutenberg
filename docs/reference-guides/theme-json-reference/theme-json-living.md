@@ -46,7 +46,7 @@ Setting that enables the following UI tools:
 - background: backgroundImage, backgroundSize
 - border: color, radius, style, width
 - color: link, heading, button, caption
-- dimensions: aspectRatio, minHeight
+- dimensions: aspectRatio, height, minHeight, width
 - position: sticky
 - spacing: blockGap, margin, padding
 - typography: lineHeight
@@ -111,7 +111,10 @@ Settings related to dimensions.
 | aspectRatio | Allow users to set an aspect ratio. | `boolean` | `false` |
 | defaultAspectRatios | Allow users to choose aspect ratios from the default set of aspect ratios. | `boolean` | `true` |
 | aspectRatios | Allow users to define aspect ratios for some blocks. | `[ { name, slug, ratio } ]` |  |
+| height | Allow users to set custom height. | `boolean` | `false` |
 | minHeight | Allow users to set custom minimum height. | `boolean` | `false` |
+| width | Allow users to set custom width. | `boolean` | `false` |
+| dimensionSizes | Dimension size presets for dimension block supports. | `[ { name, slug, size } ]` |  |
 
 ---
 
@@ -190,6 +193,7 @@ Settings related to typography.
 | fluid | Enables fluid typography and allows users to set global fluid typography parameters. | `boolean`, `{ minFontSize, maxViewportWidth, minViewportWidth }` | `false` |
 | letterSpacing | Allow users to set custom letter spacing. | `boolean` | `true` |
 | lineHeight | Allow users to set custom line height. | `boolean` | `false` |
+| textIndent | Allow users to set custom line indent. | `boolean` | `false` |
 | textAlign | Allow users to set the text align. | `boolean` | `true` |
 | textColumns | Allow users to set the number of text columns. | `boolean` | `false` |
 | textDecoration | Allow users to set custom text decorations. | `boolean` | `true` |
@@ -267,7 +271,9 @@ Dimensions styles.
 | Property | Description | Type |
 | -------- | ----------- | ---- |
 | aspectRatio | Sets the `aspect-ratio` CSS property. | `string`, `{ ref }` |
+| height | Sets the `height` CSS property. | `string`, `{ ref }` |
 | minHeight | Sets the `min-height` CSS property. | `string`, `{ ref }` |
+| width | Sets the `width` CSS property. | `string`, `{ ref }` |
 
 ---
 
@@ -324,6 +330,7 @@ Typography styles.
 | fontWeight | Sets the `font-weight` CSS property. | `string`, `{ ref }` |
 | letterSpacing | Sets the `letter-spacing` CSS property. | `string`, `{ ref }` |
 | lineHeight | Sets the `line-height` CSS property. | `string`, `{ ref }` |
+| textIndent | Sets the `text-indent` CSS property. | `string`, `{ ref }` |
 | textAlign | Sets the `text-align` CSS property. | `string`, `{ ref }` |
 | textColumns | Sets the `column-count` CSS property. | `string`, `{ ref }` |
 | textDecoration | Sets the `text-decoration` CSS property. | `string`, `{ ref }` |

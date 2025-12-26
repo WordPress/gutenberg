@@ -100,6 +100,14 @@ _Related_
 
 -   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-alignment-control/README.md>
 
+### BlockBindingsAttributeControl
+
+Internal dependencies
+
+### BlockBindingsSourceFieldsList
+
+Undocumented declaration.
+
 ### BlockBreadcrumb
 
 Block breadcrumb component, displaying the hierarchy of the current block selection as a breadcrumb.
@@ -384,6 +392,25 @@ _Returns_
 
 Undocumented declaration.
 
+### DimensionControl
+
+DimensionControl renders a linked unit control and range control for adjusting dimensions of a block.
+
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/dimension-control/README.md>
+
+_Parameters_
+
+-   _props_ `Object`:
+-   _props.label_ `?string`: A label for the control.
+-   _props.onChange_ `( value: string ) => void`: Called when the dimension value changes.
+-   _props.value_ `string`: The current dimension value.
+
+_Returns_
+
+-   `Component`: The component to be rendered.
+
 ### FontSizePicker
 
 _Related_
@@ -591,6 +618,8 @@ _Returns_
 -   `ComponentType`: The toolbar.
 
 ### HeightControl
+
+> **Deprecated** Use DimensionControl instead.
 
 HeightControl renders a linked unit control and range control for adjusting the height of a block.
 
@@ -846,6 +875,10 @@ Block editor data store configuration.
 _Related_
 
 -   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/data/README.md#registerStore>
+
+### ToolSelector
+
+This component has been deprecated and no longer renders anything.
 
 ### transformStyles
 

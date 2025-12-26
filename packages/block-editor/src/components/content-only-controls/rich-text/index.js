@@ -1,17 +1,12 @@
 /**
  * WordPress dependencies
  */
-import {
-	BaseControl,
-	useBaseControlProps,
-	__experimentalToolsPanelItem as ToolsPanelItem,
-} from '@wordpress/components';
+import { BaseControl, useBaseControlProps } from '@wordpress/components';
 import { useMergeRefs } from '@wordpress/compose';
 import { useRegistry } from '@wordpress/data';
 import { useRef, useState } from '@wordpress/element';
 import {
 	__unstableUseRichText as useRichText,
-	isEmpty,
 	removeFormat,
 } from '@wordpress/rich-text';
 
@@ -25,17 +20,20 @@ import FormatEdit from '../../rich-text/format-edit';
 import { keyboardShortcutContext, inputEventContext } from '../../rich-text';
 
 export default function RichTextControl( {
-	clientId,
-	control,
-	blockType,
-	attributeValues,
-	updateAttributes,
+	data,
+	field,
+	hideLabelFromVision,
+	onChange,
+	config = {},
 } ) {
 	const registry = useRegistry();
-	const valueKey = control.mapping.value;
-	const attrValue = attributeValues[ valueKey ];
-	const defaultValue =
-		blockType.attributes[ valueKey ]?.defaultValue ?? undefined;
+	const attrValue = field.getValue( { item: data } );
+	const fieldConfig = field.config || {};
+	const { clientId } = config;
+	const updateAttributes = ( html ) => {
+		const mappedChanges = field.setValue( { item: data, value: html } );
+		onChange( mappedChanges );
+	};
 	const [ selection, setSelection ] = useState( {
 		start: undefined,
 		end: undefined,
@@ -46,8 +44,8 @@ export default function RichTextControl( {
 	const keyboardShortcuts = useRef( new Set() );
 
 	const adjustedAllowedFormats = getAllowedFormats( {
-		allowedFormats: control.args?.allowedFormats,
-		disableFormats: control.args?.disableFormats,
+		allowedFormats: fieldConfig?.allowedFormats,
+		disableFormats: fieldConfig?.disableFormats,
 	} );
 
 	const {
@@ -58,10 +56,9 @@ export default function RichTextControl( {
 		dependencies,
 	} = useFormatTypes( {
 		clientId,
-		identifier: valueKey,
+		identifier: field.id,
 		allowedFormats: adjustedAllowedFormats,
-		withoutInteractiveFormatting:
-			control.args?.withoutInteractiveFormatting,
+		withoutInteractiveFormatting: fieldConfig?.withoutInteractiveFormatting,
 		disableNoneEssentialFormatting: true,
 	} );
 
@@ -102,12 +99,12 @@ export default function RichTextControl( {
 	const {
 		value,
 		getValue,
-		onChange,
+		onChange: onRichTextChange,
 		ref: richTextRef,
 	} = useRichText( {
 		value: attrValue,
 		onChange( html, { __unstableFormats, __unstableText } ) {
-			updateAttributes( { [ valueKey ]: html } );
+			updateAttributes( html );
 			Object.values( changeHandlers ).forEach( ( changeHandler ) => {
 				changeHandler( __unstableFormats, __unstableText );
 			} );
@@ -116,9 +113,9 @@ export default function RichTextControl( {
 		selectionEnd: selection.end,
 		onSelectionChange: ( start, end ) => setSelection( { start, end } ),
 		__unstableIsSelected: isSelected,
-		preserveWhiteSpace: !! control.args?.preserveWhiteSpace,
-		placeholder: control.args?.placeholder,
-		__unstableDisableFormats: control.args?.disableFormats,
+		preserveWhiteSpace: !! fieldConfig?.preserveWhiteSpace,
+		placeholder: fieldConfig?.placeholder,
+		__unstableDisableFormats: fieldConfig?.disableFormats,
 		__unstableDependencies: dependencies,
 		__unstableAfterParse: addEditorOnlyFormats,
 		__unstableBeforeSerialize: removeEditorOnlyFormats,
@@ -126,29 +123,19 @@ export default function RichTextControl( {
 	} );
 
 	const { baseControlProps, controlProps } = useBaseControlProps( {
-		hideLabelFromVision: control.shownByDefault,
-		label: control.label,
+		hideLabelFromVision: hideLabelFromVision ?? field.hideLabelFromVision,
+		label: field.label,
 	} );
 
 	return (
-		<ToolsPanelItem
-			panelId={ clientId }
-			label={ control.label }
-			hasValue={ () => {
-				return value?.text && ! isEmpty( value );
-			} }
-			onDeselect={ () =>
-				updateAttributes( { [ valueKey ]: defaultValue } )
-			}
-			isShownByDefault={ control.shownByDefault }
-		>
+		<>
 			{ isSelected && (
 				<keyboardShortcutContext.Provider value={ keyboardShortcuts }>
 					<inputEventContext.Provider value={ inputEvents }>
 						<div>
 							<FormatEdit
 								value={ value }
-								onChange={ onChange }
+								onChange={ onRichTextChange }
 								onFocus={ onFocus }
 								formatTypes={ formatTypes }
 								forwardedRef={ anchorRef }
@@ -158,25 +145,25 @@ export default function RichTextControl( {
 					</inputEventContext.Provider>
 				</keyboardShortcutContext.Provider>
 			) }
-			<BaseControl __nextHasNoMarginBottom { ...baseControlProps }>
+			<BaseControl { ...baseControlProps }>
 				<div
 					className="block-editor-content-only-controls__rich-text"
 					role="textbox"
-					aria-multiline={ ! control.args?.disableLineBreaks }
+					aria-multiline={ ! fieldConfig?.disableLineBreaks }
 					ref={ useMergeRefs( [
 						richTextRef,
 						useEventListeners( {
 							registry,
 							getValue,
-							onChange,
+							onChange: onRichTextChange,
 							formatTypes,
 							selectionChange: setSelection,
 							isSelected,
-							disableFormats: control.args?.disableFormats,
+							disableFormats: fieldConfig?.disableFormats,
 							value,
 							tagName: 'div',
 							removeEditorOnlyFormats,
-							disableLineBreaks: control.args?.disableLineBreaks,
+							disableLineBreaks: fieldConfig?.disableLineBreaks,
 							keyboardShortcuts,
 							inputEvents,
 						} ),
@@ -188,6 +175,6 @@ export default function RichTextControl( {
 					{ ...controlProps }
 				/>
 			</BaseControl>
-		</ToolsPanelItem>
+		</>
 	);
 }

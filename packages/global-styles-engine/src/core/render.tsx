@@ -155,6 +155,7 @@ const ELEMENT_CLASS_NAMES = {
 const BLOCK_SUPPORT_FEATURE_LEVEL_SELECTORS = {
 	__experimentalBorder: 'border',
 	color: 'color',
+	dimensions: 'dimensions',
 	spacing: 'spacing',
 	typography: 'typography',
 };
@@ -814,9 +815,48 @@ export const getNodesWithStyles = (
 
 	Object.entries( ELEMENTS ).forEach( ( [ name, selector ] ) => {
 		if ( tree.styles?.elements?.[ name ] ) {
+			const elementStyles = tree.styles?.elements?.[ name ] ?? {};
+
+			// Special handling for text element with textIndent - use p + p selector
+			const finalSelector = selector as string;
+			let textIndentStyles = null;
+			if ( name === 'text' && elementStyles?.typography?.textIndent ) {
+				textIndentStyles = {
+					typography: {
+						textIndent: elementStyles.typography.textIndent,
+					},
+				};
+				// Remove textIndent from the main styles to avoid duplication
+				const stylesWithoutTextIndent = { ...elementStyles };
+				if ( stylesWithoutTextIndent.typography ) {
+					const { textIndent, ...restTypography } =
+						stylesWithoutTextIndent.typography;
+					stylesWithoutTextIndent.typography = restTypography;
+				}
+
+				// Push the main styles with p selector (if there are any other styles)
+				if ( Object.keys( stylesWithoutTextIndent ).length > 0 ) {
+					nodes.push( {
+						styles: stylesWithoutTextIndent,
+						selector: finalSelector,
+						skipSelectorWrapper: ! (
+							ELEMENT_CLASS_NAMES as Record< string, string >
+						 )[ name ],
+					} );
+				}
+
+				// Push textIndent with p + p selector
+				nodes.push( {
+					styles: textIndentStyles,
+					selector: 'p + p',
+					skipSelectorWrapper: true,
+				} );
+				return; // Skip the normal push below
+			}
+
 			nodes.push( {
-				styles: tree.styles?.elements?.[ name ] ?? {},
-				selector: selector as string,
+				styles: elementStyles,
+				selector: finalSelector,
 				// Top level elements that don't use a class name should not receive the
 				// `:root :where()` wrapper to maintain backwards compatibility.
 				skipSelectorWrapper: ! (
@@ -1609,6 +1649,7 @@ export interface GlobalStylesRenderOptions {
 	disableLayoutStyles?: boolean;
 	disableRootPadding?: boolean;
 	getBlockStyles?: ( blockName: string ) => any[];
+	styleOptions?: Record< string, boolean >;
 }
 
 /**
@@ -1629,6 +1670,7 @@ export function generateGlobalStyles(
 		hasFallbackGapSupport: hasFallbackGapSupportOption,
 		disableLayoutStyles = false,
 		disableRootPadding = false,
+		styleOptions = {},
 	} = options;
 
 	// Use provided block types or fall back to getBlockTypes()
@@ -1654,7 +1696,8 @@ export function generateGlobalStyles(
 		hasBlockGapSupport,
 		hasFallbackGapSupport,
 		disableLayoutStyles,
-		disableRootPadding
+		disableRootPadding,
+		styleOptions
 	);
 	const svgs = generateSvgFilters( updatedConfig, blockSelectors );
 	const styles = [

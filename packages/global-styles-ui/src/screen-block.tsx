@@ -309,6 +309,7 @@ function ScreenBlock( { name, variation }: ScreenBlockProps ) {
 					value={ style }
 					onChange={ setStyle }
 					settings={ settings }
+					isGlobalStyles
 				/>
 			) }
 			{ hasDimensionsPanel && (

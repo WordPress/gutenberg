@@ -3,15 +3,46 @@
 /**
  * External dependencies
  */
-import { copyFile, mkdir, writeFile } from 'fs/promises';
+import { copyFile, mkdir, writeFile, readFile } from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import esbuild from 'esbuild';
+import { createHash } from 'crypto';
 
 const __dirname = path.dirname( fileURLToPath( import.meta.url ) );
 const ROOT_DIR = path.resolve( __dirname, '../..' );
 const BUILD_DIR = path.join( ROOT_DIR, 'build', 'scripts' );
 const VENDORS_DIR = path.join( BUILD_DIR, 'vendors' );
+
+/**
+ * Generate a content hash from file contents.
+ * Uses SHA256 algorithm for broad compatibility across Node.js versions.
+ *
+ * @param {string[]} filePaths - Absolute paths to files to hash
+ * @param {string}   algorithm - Hash algorithm (default: 'sha256')
+ * @param {number}   length    - Hash length (default: 20)
+ * @return {Promise<string>} Content hash string
+ */
+async function generateContentHash(
+	filePaths,
+	algorithm = 'sha256',
+	length = 20
+) {
+	const hashBuilder = createHash( algorithm );
+
+	// Sort paths for deterministic ordering
+	const sortedPaths = [ ...filePaths ].sort();
+
+	// Read and hash each file
+	for ( const filePath of sortedPaths ) {
+		const content = await readFile( filePath );
+		hashBuilder.update( content );
+	}
+
+	// Generate hash as hex string and truncate
+	const fullHash = hashBuilder.digest( 'hex' );
+	return fullHash.slice( 0, length );
+}
 
 /**
  * Copy React and ReactDOM UMD files from node_modules.
@@ -131,7 +162,9 @@ async function bundleReactRefresh() {
 	} );
 
 	// Generate asset file for react-refresh-entry
-	const entryAssetContent = `<?php return array('dependencies' => array('wp-react-refresh-runtime'), 'version' => '${ Date.now() }');`;
+	const entryOutputFile = path.join( entryDir, 'index.min.js' );
+	const entryVersion = await generateContentHash( [ entryOutputFile ] );
+	const entryAssetContent = `<?php return array('dependencies' => array('wp-react-refresh-runtime'), 'version' => '${ entryVersion }');`;
 	await writeFile(
 		path.join( entryDir, 'index.min.asset.php' ),
 		entryAssetContent
@@ -153,7 +186,9 @@ async function bundleReactRefresh() {
 	} );
 
 	// Generate asset file for react-refresh-runtime
-	const runtimeAssetContent = `<?php return array('dependencies' => array(), 'version' => '${ Date.now() }');`;
+	const runtimeOutputFile = path.join( runtimeDir, 'index.min.js' );
+	const runtimeVersion = await generateContentHash( [ runtimeOutputFile ] );
+	const runtimeAssetContent = `<?php return array('dependencies' => array(), 'version' => '${ runtimeVersion }');`;
 	await writeFile(
 		path.join( runtimeDir, 'index.min.asset.php' ),
 		runtimeAssetContent

@@ -36,6 +36,7 @@ import {
 	PATTERN_POST_TYPE,
 	TEMPLATE_PART_POST_TYPE,
 	TEMPLATE_POST_TYPE,
+	DESIGN_POST_TYPES,
 } from '../../store/constants';
 import { useZoomOutModeExit } from './use-zoom-out-mode-exit';
 import { usePaddingAppender } from './use-padding-appender';
@@ -53,12 +54,6 @@ const {
  * These post types have a special editor where they don't allow you to fill the title
  * and they don't apply the layout styles.
  */
-const DESIGN_POST_TYPES = [
-	PATTERN_POST_TYPE,
-	TEMPLATE_POST_TYPE,
-	NAVIGATION_POST_TYPE,
-	TEMPLATE_PART_POST_TYPE,
-];
 
 /**
  * Given an array of nested blocks, find the first Post Content

@@ -516,10 +516,6 @@ _Related_
 
 -   [use](#use)
 
-_Type_
-
--   `Object`
-
 ### register
 
 Registers a standard `@wordpress/data` store descriptor.
@@ -624,7 +620,7 @@ _Parameters_
 
 _Returns_
 
--   `Object`: Object containing the store's promise-wrapped selectors.
+-   `CurriedSelectorsResolveOf< T >`: Object containing the store's promise-wrapped selectors.
 
 ### select
 
@@ -776,7 +772,7 @@ const ParentProvidingRegistry = ( props ) => {
 
 _Returns_
 
--   `Function`: A custom react hook exposing the registry context value.
+-   `import('../../types').DataRegistry`: A custom react hook exposing the registry context value.
 
 ### useSelect
 

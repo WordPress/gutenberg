@@ -3,6 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { share as icon } from '@wordpress/icons';
+import { privateApis as blocksPrivateApis } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -11,6 +12,9 @@ import initBlock from '../utils/init-block';
 import edit from './edit';
 import metadata from './block.json';
 import variations from './variations';
+import { unlock } from '../lock-unlock';
+
+const { fieldsKey, formKey } = unlock( blocksPrivateApis );
 
 const { name } = metadata;
 
@@ -22,26 +26,26 @@ export const settings = {
 	variations,
 };
 
-if ( window.__experimentalContentOnlyPatternInsertion ) {
-	settings.fields = [
+if ( window.__experimentalContentOnlyInspectorFields ) {
+	settings[ fieldsKey ] = [
 		{
+			id: 'link',
 			label: __( 'Link' ),
-			type: 'Link',
-			shownByDefault: true,
+			type: 'link',
 			mapping: {
 				href: 'url',
 				rel: 'rel',
 			},
 		},
 		{
+			id: 'label',
 			label: __( 'Label' ),
-			type: 'RichText',
-			shownByDefault: false,
-			mapping: {
-				value: 'label',
-			},
+			type: 'richtext',
 		},
 	];
+	settings[ formKey ] = {
+		fields: [ 'link' ],
+	};
 }
 
 export const init = () => initBlock( { name, metadata, settings } );

@@ -700,17 +700,8 @@ function mapSelectorWithResolver(
 	boundMetadataSelectors
 ) {
 	function fulfillSelector( args ) {
-		const state = store.getState();
-
 		if (
 			resolversCache.isRunning( selectorName, args ) ||
-			( typeof resolver.isFulfilled === 'function' &&
-				resolver.isFulfilled( state, ...args ) )
-		) {
-			return;
-		}
-
-		if (
 			boundMetadataSelectors.hasStartedResolution( selectorName, args )
 		) {
 			return;
@@ -724,9 +715,14 @@ function mapSelectorWithResolver(
 				metadataActions.startResolution( selectorName, args )
 			);
 			try {
-				const action = resolver.fulfill( ...args );
-				if ( action ) {
-					await store.dispatch( action );
+				const isFulfilled =
+					typeof resolver.isFulfilled === 'function' &&
+					resolver.isFulfilled( store.getState(), ...args );
+				if ( ! isFulfilled ) {
+					const action = resolver.fulfill( ...args );
+					if ( action ) {
+						await store.dispatch( action );
+					}
 				}
 				store.dispatch(
 					metadataActions.finishResolution( selectorName, args )

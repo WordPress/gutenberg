@@ -1,33 +1,41 @@
 /**
  * Internal dependencies
  */
-import type {
-	DataViewRenderFieldProps,
-	SortDirection,
-	FieldTypeDefinition,
-} from '../types';
-import RenderFromElements from './utils/render-from-elements';
+import type { NormalizedField } from '../types';
+import type { FieldType } from '../types/private';
+import isValidRequired from './utils/is-valid-required';
+import isValidMinLength from './utils/is-valid-min-length';
+import isValidMaxLength from './utils/is-valid-max-length';
+import isValidPattern from './utils/is-valid-pattern';
+import isValidElements from './utils/is-valid-elements';
+import render from './utils/render-default';
 
-/* eslint-disable-next-line @typescript-eslint/no-unused-vars */
-function sort( valueA: any, valueB: any, direction: SortDirection ) {
-	// Passwords should not be sortable for security reasons
-	return 0;
+function getValueFormatted< Item >( {
+	item,
+	field,
+}: {
+	item: Item;
+	field: NormalizedField< Item >;
+} ): string {
+	return field.getValue( { item } ) ? '••••••••' : '';
 }
 
 export default {
-	sort,
-	isValid: {
-		elements: true,
-		custom: () => null,
-	},
+	type: 'password',
+	render,
 	Edit: 'password',
-	render: ( { item, field }: DataViewRenderFieldProps< any > ) => {
-		return field.hasElements ? (
-			<RenderFromElements item={ item } field={ field } />
-		) : (
-			'••••••••'
-		);
-	},
+	sort: () => 0, // Passwords should not be sortable for security reasons
 	enableSorting: false,
-	filterBy: false,
-} satisfies FieldTypeDefinition< any >;
+	enableGlobalSearch: false,
+	defaultOperators: [],
+	validOperators: [],
+	format: {},
+	getValueFormatted,
+	validate: {
+		required: isValidRequired,
+		pattern: isValidPattern,
+		minLength: isValidMinLength,
+		maxLength: isValidMaxLength,
+		elements: isValidElements,
+	},
+} satisfies FieldType< any >;

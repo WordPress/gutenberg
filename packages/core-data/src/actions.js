@@ -88,10 +88,10 @@ export function receiveEntityRecords(
 	kind,
 	name,
 	records,
-	query,
+	query = undefined,
 	invalidateCache = false,
-	edits,
-	meta
+	edits = undefined,
+	meta = undefined
 ) {
 	// Auto drafts should not have titles, but some plugins rely on them so we can't filter this
 	// on the server.
@@ -317,9 +317,10 @@ export const deleteEntityRecord =
 			if (
 				kind === 'postType' &&
 				name === 'wp_template' &&
-				recordId &&
-				typeof recordId === 'string' &&
-				! /^\d+$/.test( recordId )
+				( ( recordId &&
+					typeof recordId === 'string' &&
+					! /^\d+$/.test( recordId ) ) ||
+					! window?.__experimentalTemplateActivate )
 			) {
 				baseURL =
 					baseURL.slice( 0, baseURL.lastIndexOf( '/' ) ) +
@@ -571,9 +572,10 @@ export const saveEntityRecord =
 			if (
 				kind === 'postType' &&
 				name === 'wp_template' &&
-				recordId &&
-				typeof recordId === 'string' &&
-				! /^\d+$/.test( recordId )
+				( ( recordId &&
+					typeof recordId === 'string' &&
+					! /^\d+$/.test( recordId ) ) ||
+					! window?.__experimentalTemplateActivate )
 			) {
 				baseURL =
 					baseURL.slice( 0, baseURL.lastIndexOf( '/' ) ) +

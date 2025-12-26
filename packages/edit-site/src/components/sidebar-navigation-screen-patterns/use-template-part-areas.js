@@ -29,6 +29,7 @@ const useTemplatePartsGroupedByArea = ( items ) => {
 		footer: {},
 		sidebar: {},
 		uncategorized: {},
+		overlay: {},
 	};
 
 	templatePartAreas.forEach(

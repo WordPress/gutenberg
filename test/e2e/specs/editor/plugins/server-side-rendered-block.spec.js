@@ -149,6 +149,40 @@ test.describe( 'PHP-only auto-register blocks', () => {
 		expect( blockExists ).toBe( false );
 	} );
 
+	test( 'should use PHP-defined metadata (title, icon, category, keywords) for auto-registered blocks', async ( {
+		page,
+	} ) => {
+		// Open the inserter
+		await page.getByRole( 'button', { name: 'Block Inserter' } ).click();
+
+		// Search using the custom title defined in PHP
+		await page
+			.getByRole( 'searchbox', { name: 'Search' } )
+			.fill( 'Auto Register Test Block' );
+
+		// Verify the block appears with the custom title
+		const blockOption = page.getByRole( 'option', {
+			name: 'Auto Register Test Block',
+		} );
+		await expect( blockOption ).toBeVisible();
+
+		// Verify block metadata is correctly set from PHP
+		const blockType = await page.evaluate( () => {
+			return window.wp.blocks.getBlockType( 'test/auto-register-block' );
+		} );
+
+		// These should match the PHP-defined values
+		// Icon is normalized to object format by WordPress
+		expect( blockType.title ).toBe( 'Auto Register Test Block' );
+		expect( blockType.icon.src ).toBe( 'admin-generic' );
+		expect( blockType.category ).toBe( 'widgets' );
+		expect( blockType.description ).toBe(
+			'A test block for auto-registration'
+		);
+		expect( blockType.keywords ).toContain( 'serverblock' );
+		expect( blockType.keywords ).toContain( 'autotest' );
+	} );
+
 	test( 'should render server-side content for auto-registered blocks with block supports', async ( {
 		editor,
 		page,

@@ -75,7 +75,7 @@ function Edit( { attributes } ) {
 -   Type: `boolean`
 -   Default value: `false`
 
-Anchors let you link directly to a specific block on a page. This property adds a field to define an id for the block and a button to copy the direct link. _Important: It doesn't work with dynamic blocks yet._
+Anchors let you link directly to a specific block on a page. This property adds a field to define an id for the block and a button to copy the direct link.
 
 ```js
 // Declare support for anchor links.
@@ -629,7 +629,9 @@ _**Note:** Since WordPress 6.2._
 -   Type: `Object`
 -   Default value: null
 -   Subproperties:
+    -   `height`: type `boolean`, default value `false`
     -   `minHeight`: type `boolean`, default value `false`
+    -   `width`: type `boolean`, default value `false`
 
 This value signals that a block supports some of the CSS style properties related to dimensions. When it does, the block editor will show UI controls for the user to set their values if [the theme declares support](/docs/how-to-guides/themes/global-settings-and-styles.md#opt-in-into-ui-controls).
 
@@ -637,21 +639,25 @@ This value signals that a block supports some of the CSS style properties relate
 supports: {
 	dimensions: {
 		aspectRatio: true // Enable aspect ratio control.
+		height: true // Enable height control.
 		minHeight: true // Enable min height control.
+		width: true // Enable width control.
 	}
 }
 ```
 
 When a block declares support for a specific dimensions property, its attributes definition is extended to include the `style` attribute.
 
--   `style`: an attribute of `object` type with no default assigned. This is added when `aspectRatio` or `minHeight` support is declared. It stores the custom values set by the user. For example:
+-   `style`: an attribute of `object` type with no default assigned. This is added when `aspectRatio`, `height`, `minHeight`, or `width` support is declared. It stores the custom values set by the user. For example:
 
 ```js
 attributes: {
     style: {
         dimensions: {
             aspectRatio: "16/9",
-            minHeight: "50vh"
+            height: "40vh",
+            minHeight: "50vh",
+            width: "400px",
         }
     }
 }
@@ -754,6 +760,8 @@ The `clientNavigation` sub-property indicates whether a block is compatible with
 Set it to true only if the block is not interactive or if it is interactive using the Interactivity API. Set it to false if the block is interactive but uses vanilla JS, jQuery or another JS framework/library other than the Interactivity API.
 
 The `interactive` sub-property indicates whether the block is using the Interactivity API directives.
+
+If you set `supports.interactivity` to `true`, it is equivalent to setting both `supports.interactivity.clientNavigation` and `supports.interactivity.interactive` to `true` as well.
 
 ## layout
 
@@ -1169,3 +1177,18 @@ is only meant for simple text blocks such as paragraphs and headings with a
 single `RichText` field. RichText in the `edit` function _must_ have an
 `identifier` prop that matches the attribute key of the text, so that it updates
 the selection correctly and we know where to split.
+
+## visibility
+
+_**Note:** Since WordPress 6.9._
+
+-   Type: `boolean`
+-   Default value: `true`
+
+By default, a block can be hidden by a user from the block 'Options' dropdown. To disable this behavior, set visibility to false.
+
+```js
+supports: {
+	visibility: false,
+}
+```

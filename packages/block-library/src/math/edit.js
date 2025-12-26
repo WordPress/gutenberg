@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import {
 	useBlockProps,
 	store as blockEditorStore,
@@ -14,6 +14,7 @@ import {
 } from '@wordpress/components';
 import { useState, useEffect, useRef } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
+import { speak } from '@wordpress/a11y';
 
 /**
  * Internal dependencies
@@ -72,12 +73,12 @@ export default function MathEdit( { attributes, setAttributes, isSelected } ) {
 					placement="bottom-start"
 					offset={ 8 }
 					anchor={ blockRef }
-					focusOnMount="firstContentElement"
+					focusOnMount={ false }
+					__unstableSlotName="__unstable-block-tools-after"
 				>
 					<div style={ { padding: '4px', minWidth: '300px' } }>
 						<VStack spacing={ 1 }>
 							<TextareaControl
-								__nextHasNoMarginBottom
 								__next40pxDefaultSize
 								label={ __( 'LaTeX math syntax' ) }
 								hideLabelFromVision
@@ -96,6 +97,15 @@ export default function MathEdit( { attributes, setAttributes, isSelected } ) {
 										setError( null );
 									} catch ( err ) {
 										setError( err.message );
+										speak(
+											sprintf(
+												/* translators: %s: error message returned when parsing LaTeX. */
+												__(
+													'Error parsing mathematical expression: %s'
+												),
+												err.message
+											)
+										);
 									}
 									setAttributes( {
 										mathML: newMathML,
@@ -110,7 +120,11 @@ export default function MathEdit( { attributes, setAttributes, isSelected } ) {
 										intent="error"
 										className="wp-block-math__error"
 									>
-										{ error }
+										{ sprintf(
+											/* translators: %s: error message returned when parsing LaTeX. */
+											__( 'Error: %s' ),
+											error
+										) }
 									</Badge>
 									<style children=".wp-block-math__error .components-badge__content{white-space:normal}" />
 								</>

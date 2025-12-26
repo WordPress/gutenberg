@@ -1,0 +1,112 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/mixins" as *;
+
+.dataviews-wrapper,
+.dataviews-picker-wrapper {
+	height: 100%;
+	overflow: auto;
+	box-sizing: border-box;
+	scroll-padding-bottom: $grid-unit-80;
+	/* stylelint-disable-next-line property-no-unknown -- '@container' not globally permitted */
+	container: dataviews-wrapper / inline-size;
+	display: flex;
+	flex-direction: column;
+	font-size: $default-font-size;
+	line-height: $default-line-height;
+	background-color: var(--wp-dataviews-color-background, $white);
+}
+
+.dataviews__view-actions,
+.dataviews-filters__container {
+	box-sizing: border-box;
+	padding: $grid-unit-20 $grid-unit-30;
+	flex-shrink: 0;
+	position: sticky;
+	left: 0;
+	background-color: inherit;
+
+	@media not (prefers-reduced-motion) {
+		transition: padding ease-out 0.1s;
+	}
+}
+
+.dataviews-no-results,
+.dataviews-loading {
+	padding: 0 $grid-unit-30;
+	flex-grow: 1;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+
+	@media not (prefers-reduced-motion) {
+		transition: padding ease-out 0.1s;
+	}
+}
+
+.dataviews-loading-more {
+	text-align: center;
+}
+
+@container (max-width: 430px) {
+	.dataviews__view-actions,
+	.dataviews-filters__container {
+		padding: $grid-unit-15 $grid-unit-30;
+	}
+}
+
+.dataviews-title-field {
+	font-size: $default-font-size;
+	font-weight: $font-weight-medium;
+	color: $gray-800;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	width: 100%;
+
+	a {
+		text-decoration: none;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+		overflow: hidden;
+		display: block;
+		flex-grow: 0;
+		color: $gray-800;
+
+		&:hover {
+			color: var(--wp-admin-theme-color);
+		}
+		@include link-reset();
+	}
+
+	button.components-button.is-link {
+		text-decoration: none;
+		font-weight: inherit;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+		overflow: hidden;
+		display: block;
+		width: 100%;
+		color: $gray-900;
+		&:hover {
+			color: var(--wp-admin-theme-color);
+		}
+	}
+}
+
+.dataviews-title-field--clickable {
+	cursor: pointer;
+	color: $gray-800;
+	&:hover {
+		color: var(--wp-admin-theme-color);
+	}
+	@include link-reset();
+}
+
+/**
+ * When DataViews are placed within cards, apply a consistent top padding.
+ */
+.components-card__body:has(> .dataviews-wrapper),
+.components-card__body:has(> .dataviews-picker-wrapper) {
+	padding: $grid-unit-10 0 0;
+	overflow: hidden; // Prevent cells with white backgrounds overflowing the card
+}
