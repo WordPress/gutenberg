@@ -383,7 +383,7 @@ class WP_Posts_Abilities_Gutenberg {
 	 * @return array|null The processed clause or null if empty.
 	 */
 	private static function process_date_clause( array $query ): ?array {
-		$clause = array();
+		$clause     = array();
 		$int_fields = array( 'year', 'month', 'week', 'day', 'hour', 'minute', 'second', 'dayofweek', 'dayofweek_iso', 'dayofyear' );
 		foreach ( $int_fields as $field ) {
 			if ( isset( $query[ $field ] ) ) {
@@ -629,8 +629,8 @@ class WP_Posts_Abilities_Gutenberg {
 			$postarr['menu_order'] = (int) $input['menu_order'];
 		}
 		if ( $has_field( 'template' ) ) {
-			$template        = sanitize_text_field( (string) $input['template'] );
-			$valid_templates = array_keys( wp_get_theme()->get_page_templates( null, $post_type ) );
+			$template          = sanitize_text_field( (string) $input['template'] );
+			$valid_templates   = array_keys( wp_get_theme()->get_page_templates( null, $post_type ) );
 			$valid_templates[] = ''; // Allow empty template.
 			if ( ! in_array( $template, $valid_templates, true ) ) {
 				return new WP_Error(
@@ -855,45 +855,45 @@ class WP_Posts_Abilities_Gutenberg {
 				'input_schema'        => array(
 					'type'       => 'object',
 					'properties' => array(
-						'post_type'           => array(
+						'post_type'          => array(
 							'type'        => 'string',
 							'description' => __( 'Post type to search. Defaults to "post".', 'gutenberg' ),
 							'default'     => 'post',
 						),
-						'post_status'         => array(
+						'post_status'        => array(
 							'type'        => 'array',
 							'description' => __( 'Post statuses to include.', 'gutenberg' ),
 							'items'       => array( 'type' => 'string' ),
 							'default'     => array( 'publish' ),
 						),
-						'search'              => array(
+						'search'             => array(
 							'type'        => 'string',
 							'description' => __( 'Search query to filter posts by title and content.', 'gutenberg' ),
 						),
-						'author'              => array(
+						'author'             => array(
 							'type'        => 'integer',
 							'description' => __( 'Filter by author user ID.', 'gutenberg' ),
 						),
-						'limit'               => array(
+						'limit'              => array(
 							'type'        => 'integer',
 							'description' => __( 'Maximum number of posts to return (max 100).', 'gutenberg' ),
 							'default'     => 10,
 							'minimum'     => 1,
 							'maximum'     => 100,
 						),
-						'orderby'             => array(
+						'orderby'            => array(
 							'type'        => 'string',
 							'description' => __( 'Field to order results by.', 'gutenberg' ),
 							'enum'        => array( 'date', 'title', 'menu_order', 'ID', 'author', 'name', 'modified', 'comment_count' ),
 							'default'     => 'date',
 						),
-						'order'               => array(
+						'order'              => array(
 							'type'        => 'string',
 							'description' => __( 'Sort order.', 'gutenberg' ),
 							'enum'        => array( 'ASC', 'DESC' ),
 							'default'     => 'DESC',
 						),
-						'tax_query'           => array(
+						'tax_query'          => array(
 							'type'        => 'object',
 							'description' => __( 'Taxonomy query with nested queries and relations.', 'gutenberg' ),
 							'properties'  => array(
@@ -908,10 +908,10 @@ class WP_Posts_Abilities_Gutenberg {
 									'items'       => array(
 										'oneOf' => array(
 											array(
-												'type'                 => 'object',
-												'required'             => array( 'taxonomy', 'terms' ),
+												'type'     => 'object',
+												'required' => array( 'taxonomy', 'terms' ),
 												'additionalProperties' => false,
-												'properties'           => array(
+												'properties' => array(
 													'taxonomy' => array(
 														'type'        => 'string',
 														'description' => __( 'Taxonomy name to query.', 'gutenberg' ),
@@ -938,10 +938,10 @@ class WP_Posts_Abilities_Gutenberg {
 												),
 											),
 											array(
-												'type'                 => 'object',
-												'required'             => array( 'queries' ),
+												'type'     => 'object',
+												'required' => array( 'queries' ),
 												'additionalProperties' => false,
-												'properties'           => array(
+												'properties' => array(
 													'relation' => array(
 														'type'        => 'string',
 														'description' => __( 'Relation for nested group. Defaults to "AND".', 'gutenberg' ),
@@ -958,7 +958,7 @@ class WP_Posts_Abilities_Gutenberg {
 								),
 							),
 						),
-						'meta_query'          => array(
+						'meta_query'         => array(
 							'type'        => 'object',
 							'description' => __( 'Meta query with nested queries and relations.', 'gutenberg' ),
 							'properties'  => array(
@@ -974,15 +974,15 @@ class WP_Posts_Abilities_Gutenberg {
 									'items'       => array(
 										'oneOf' => array(
 											array(
-												'type'                 => 'object',
-												'required'             => array( 'key' ),
+												'type'     => 'object',
+												'required' => array( 'key' ),
 												'additionalProperties' => false,
-												'properties'           => array(
-													'key'     => array(
+												'properties' => array(
+													'key'  => array(
 														'type'        => 'string',
 														'description' => __( 'Meta key to query.', 'gutenberg' ),
 													),
-													'value'   => array(
+													'value' => array(
 														'type'        => array( 'string', 'integer', 'array' ),
 														'description' => __( 'Meta value. Not required for EXISTS/NOT EXISTS.', 'gutenberg' ),
 													),
@@ -991,7 +991,7 @@ class WP_Posts_Abilities_Gutenberg {
 														'description' => __( 'Comparison operator. Defaults to "=".', 'gutenberg' ),
 														'enum'        => array( '=', '!=', '>', '>=', '<', '<=', 'LIKE', 'NOT LIKE', 'IN', 'NOT IN', 'BETWEEN', 'NOT BETWEEN', 'EXISTS', 'NOT EXISTS', 'REGEXP', 'NOT REGEXP', 'RLIKE' ),
 													),
-													'type'    => array(
+													'type' => array(
 														'type'        => 'string',
 														'description' => __( 'Value type for casting.', 'gutenberg' ),
 														'enum'        => array( 'NUMERIC', 'CHAR', 'DATE', 'DATETIME', 'TIME', 'BINARY', 'SIGNED', 'UNSIGNED', 'DECIMAL' ),
@@ -999,10 +999,10 @@ class WP_Posts_Abilities_Gutenberg {
 												),
 											),
 											array(
-												'type'                 => 'object',
-												'required'             => array( 'queries' ),
+												'type'     => 'object',
+												'required' => array( 'queries' ),
 												'additionalProperties' => false,
-												'properties'           => array(
+												'properties' => array(
 													'relation' => array(
 														'type'        => 'string',
 														'description' => __( 'Relation for nested group. Defaults to "AND".', 'gutenberg' ),
@@ -1019,7 +1019,7 @@ class WP_Posts_Abilities_Gutenberg {
 								),
 							),
 						),
-						'date_query'          => array(
+						'date_query'         => array(
 							'type'        => 'object',
 							'description' => __( 'Date query with nested queries and relations.', 'gutenberg' ),
 							'properties'  => array(
@@ -1039,38 +1039,38 @@ class WP_Posts_Abilities_Gutenberg {
 									'items'       => array(
 										'oneOf' => array(
 											array(
-												'type'                 => 'object',
+												'type' => 'object',
 												'additionalProperties' => false,
-												'properties'           => array(
-													'year'          => array(
+												'properties' => array(
+													'year' => array(
 														'type'        => 'integer',
 														'description' => __( '4-digit year (e.g., 2023).', 'gutenberg' ),
 													),
-													'month'         => array(
+													'month' => array(
 														'type'        => 'integer',
 														'description' => __( 'Month number (1-12).', 'gutenberg' ),
 													),
-													'week'          => array(
+													'week' => array(
 														'type'        => 'integer',
 														'description' => __( 'Week of year (0-53).', 'gutenberg' ),
 													),
-													'day'           => array(
+													'day'  => array(
 														'type'        => 'integer',
 														'description' => __( 'Day of month (1-31).', 'gutenberg' ),
 													),
-													'hour'          => array(
+													'hour' => array(
 														'type'        => 'integer',
 														'description' => __( 'Hour (0-23).', 'gutenberg' ),
 													),
-													'minute'        => array(
+													'minute' => array(
 														'type'        => 'integer',
 														'description' => __( 'Minute (0-59).', 'gutenberg' ),
 													),
-													'second'        => array(
+													'second' => array(
 														'type'        => 'integer',
 														'description' => __( 'Second (0-59).', 'gutenberg' ),
 													),
-													'dayofweek'     => array(
+													'dayofweek' => array(
 														'type'        => 'integer',
 														'description' => __( 'Day of week (1-7, Sunday=1).', 'gutenberg' ),
 													),
@@ -1078,11 +1078,11 @@ class WP_Posts_Abilities_Gutenberg {
 														'type'        => 'integer',
 														'description' => __( 'ISO day of week (1-7, Monday=1).', 'gutenberg' ),
 													),
-													'dayofyear'     => array(
+													'dayofyear' => array(
 														'type'        => 'integer',
 														'description' => __( 'Day of year (1-366).', 'gutenberg' ),
 													),
-													'after'         => array(
+													'after' => array(
 														'oneOf'       => array(
 															array( 'type' => 'string' ),
 															array(
@@ -1096,7 +1096,7 @@ class WP_Posts_Abilities_Gutenberg {
 														),
 														'description' => __( 'Date to retrieve posts after. String or object with year/month/day.', 'gutenberg' ),
 													),
-													'before'        => array(
+													'before' => array(
 														'oneOf'       => array(
 															array( 'type' => 'string' ),
 															array(
@@ -1110,16 +1110,16 @@ class WP_Posts_Abilities_Gutenberg {
 														),
 														'description' => __( 'Date to retrieve posts before. String or object with year/month/day.', 'gutenberg' ),
 													),
-													'inclusive'     => array(
+													'inclusive' => array(
 														'type'        => 'boolean',
 														'description' => __( 'Include posts from the boundary date.', 'gutenberg' ),
 													),
-													'compare'       => array(
+													'compare' => array(
 														'type'        => 'string',
 														'description' => __( 'Comparison operator.', 'gutenberg' ),
 														'enum'        => array( '=', '!=', '>', '>=', '<', '<=', 'IN', 'NOT IN', 'BETWEEN', 'NOT BETWEEN' ),
 													),
-													'column'        => array(
+													'column' => array(
 														'type'        => 'string',
 														'description' => __( 'Column to query against for this clause.', 'gutenberg' ),
 														'enum'        => array( 'post_date', 'post_date_gmt', 'post_modified', 'post_modified_gmt' ),
@@ -1127,10 +1127,10 @@ class WP_Posts_Abilities_Gutenberg {
 												),
 											),
 											array(
-												'type'                 => 'object',
-												'required'             => array( 'queries' ),
+												'type'     => 'object',
+												'required' => array( 'queries' ),
 												'additionalProperties' => false,
-												'properties'           => array(
+												'properties' => array(
 													'relation' => array(
 														'type'        => 'string',
 														'description' => __( 'Relation for nested group. Defaults to "AND".', 'gutenberg' ),
@@ -1147,12 +1147,12 @@ class WP_Posts_Abilities_Gutenberg {
 								),
 							),
 						),
-						'include_taxonomies'  => array(
+						'include_taxonomies' => array(
 							'type'        => 'boolean',
 							'description' => __( 'Include taxonomy terms for each post.', 'gutenberg' ),
 							'default'     => false,
 						),
-						'include_meta'        => array(
+						'include_meta'       => array(
 							'type'        => 'boolean',
 							'description' => __( 'Include meta fields for each post.', 'gutenberg' ),
 							'default'     => false,
