@@ -7,16 +7,17 @@ import parse, { attributesToProps, domToReact } from 'html-react-parser';
  * WordPress dependencies
  */
 import { useBlockProps } from '@wordpress/block-editor';
+import { safeHTML } from '@wordpress/dom';
 
 /**
  * Generates an Edit component that works in the block editor
  * from the given HTML content.
  *
- * @param {Object} props         - The props for the component.
- * @param {string} props.content - The content to render.
+ * @param {Object} props      - The props for the component.
+ * @param {string} props.html - The HTML content to render.
  * @return {JSX.Element} The Edit component.
  */
-const BlockFromHtml = ( { content = '' } ) => {
+const BlockFromHtml = ( { html = '' } ) => {
 	const blockProps = useBlockProps();
 	const options = {
 		replace: ( { name, type, attribs, parent, children } ) => {
@@ -37,7 +38,8 @@ const BlockFromHtml = ( { content = '' } ) => {
 			}
 		},
 	};
-	const parsedContent = parse( content, options );
+	const sanitizedContent = safeHTML( html );
+	const parsedContent = parse( sanitizedContent, options );
 	return parsedContent;
 };
 

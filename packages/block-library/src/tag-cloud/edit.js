@@ -260,7 +260,7 @@ function TagCloudEdit( { attributes, setAttributes, name } ) {
 	return (
 		<>
 			{ inspectorControls }
-			<BlockFromHtml content={ content } />
+			<BlockFromHtml html={ content } />
 		</>
 	);
 }
