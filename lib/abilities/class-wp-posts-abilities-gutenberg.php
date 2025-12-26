@@ -1372,13 +1372,17 @@ class WP_Posts_Abilities_Gutenberg {
 	 * @param bool   $is_update Whether this is an update (uses array_key_exists) or create (uses ! empty).
 	 * @return array|WP_Error The sanitized post array, or WP_Error on validation failure.
 	 */
-	private static function build_postarr( array $input, string $post_type, bool $is_update = false ): array|WP_Error {
+	private static function build_postarr( array $input, string $post_type, bool $is_update = false ) {
 		$postarr = array();
 
 		// Helper to check if field should be processed.
 		$has_field = $is_update
-			? fn( $key ) => array_key_exists( $key, $input )
-			: fn( $key ) => ! empty( $input[ $key ] );
+			? function ( $key ) use ( $input ) {
+				return array_key_exists( $key, $input );
+			}
+			: function ( $key ) use ( $input ) {
+				return ! empty( $input[ $key ] );
+			};
 
 		if ( $has_field( 'title' ) ) {
 			$postarr['post_title'] = sanitize_text_field( (string) $input['title'] );
