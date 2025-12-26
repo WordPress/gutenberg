@@ -374,6 +374,87 @@ class WP_Posts_Abilities_Gutenberg {
 	}
 
 	/**
+	 * Recursively processes date_query input into WordPress format.
+	 *
+	 * @param array $input The date_query input (with queries/relation structure).
+	 * @return array WordPress-compatible date_query array.
+	 */
+	private static function process_date_query_recursive( array $input ): array {
+		$result = array();
+
+		// Add relation if present.
+		if ( ! empty( $input['relation'] ) && in_array( $input['relation'], array( 'AND', 'OR' ), true ) ) {
+			$result['relation'] = $input['relation'];
+		}
+
+		// Add column if present at top level.
+		if ( ! empty( $input['column'] ) && in_array( $input['column'], array( 'post_date', 'post_date_gmt', 'post_modified', 'post_modified_gmt' ), true ) ) {
+			$result['column'] = $input['column'];
+		}
+
+		// Process queries array.
+		if ( ! empty( $input['queries'] ) && is_array( $input['queries'] ) ) {
+			foreach ( $input['queries'] as $query ) {
+				if ( ! is_array( $query ) ) {
+					continue;
+				}
+
+				// Check if this is a nested query group (has 'queries' key).
+				if ( isset( $query['queries'] ) ) {
+					$nested = self::process_date_query_recursive( $query );
+					if ( ! empty( $nested ) ) {
+						$result[] = $nested;
+					}
+				} else {
+					// It's a leaf clause - build date clause.
+					$clause = array();
+
+					// Integer date parts.
+					$int_fields = array( 'year', 'month', 'week', 'day', 'hour', 'minute', 'second', 'dayofweek', 'dayofweek_iso', 'dayofyear' );
+					foreach ( $int_fields as $field ) {
+						if ( isset( $query[ $field ] ) ) {
+							$clause[ $field ] = (int) $query[ $field ];
+						}
+					}
+
+					// After/before (can be string or array).
+					if ( isset( $query['after'] ) ) {
+						$clause['after'] = is_array( $query['after'] )
+							? array_map( 'intval', $query['after'] )
+							: sanitize_text_field( (string) $query['after'] );
+					}
+					if ( isset( $query['before'] ) ) {
+						$clause['before'] = is_array( $query['before'] )
+							? array_map( 'intval', $query['before'] )
+							: sanitize_text_field( (string) $query['before'] );
+					}
+
+					// Inclusive.
+					if ( isset( $query['inclusive'] ) ) {
+						$clause['inclusive'] = (bool) $query['inclusive'];
+					}
+
+					// Compare.
+					if ( ! empty( $query['compare'] ) && in_array( $query['compare'], array( '=', '!=', '>', '>=', '<', '<=', 'IN', 'NOT IN', 'BETWEEN', 'NOT BETWEEN' ), true ) ) {
+						$clause['compare'] = $query['compare'];
+					}
+
+					// Column (clause-level override).
+					if ( ! empty( $query['column'] ) && in_array( $query['column'], array( 'post_date', 'post_date_gmt', 'post_modified', 'post_modified_gmt' ), true ) ) {
+						$clause['column'] = $query['column'];
+					}
+
+					if ( ! empty( $clause ) ) {
+						$result[] = $clause;
+					}
+				}
+			}
+		}
+
+		return $result;
+	}
+
+	/**
 	 * Checks taxonomy assignment permissions.
 	 *
 	 * @param array  $input     The input data.
@@ -974,12 +1055,130 @@ class WP_Posts_Abilities_Gutenberg {
 						),
 						'date_query'          => array(
 							'type'        => 'object',
-							'description' => __( 'Date query with: after, before (date strings), year, month (integers).', 'gutenberg' ),
+							'description' => __( 'Date query with nested queries and relations.', 'gutenberg' ),
 							'properties'  => array(
-								'after'  => array( 'type' => 'string' ),
-								'before' => array( 'type' => 'string' ),
-								'year'   => array( 'type' => 'integer' ),
-								'month'  => array( 'type' => 'integer' ),
+								'relation' => array(
+									'type'        => 'string',
+									'description' => __( 'Logical relation between queries.', 'gutenberg' ),
+									'enum'        => array( 'AND', 'OR' ),
+								),
+								'column'   => array(
+									'type'        => 'string',
+									'description' => __( 'Column to query against. Defaults to "post_date".', 'gutenberg' ),
+									'enum'        => array( 'post_date', 'post_date_gmt', 'post_modified', 'post_modified_gmt' ),
+								),
+								'queries'  => array(
+									'type'        => 'array',
+									'description' => __( 'Array of date clauses or nested groups.', 'gutenberg' ),
+									'items'       => array(
+										'oneOf' => array(
+											array(
+												'type'                 => 'object',
+												'additionalProperties' => false,
+												'properties'           => array(
+													'year'          => array(
+														'type'        => 'integer',
+														'description' => __( '4-digit year (e.g., 2023).', 'gutenberg' ),
+													),
+													'month'         => array(
+														'type'        => 'integer',
+														'description' => __( 'Month number (1-12).', 'gutenberg' ),
+													),
+													'week'          => array(
+														'type'        => 'integer',
+														'description' => __( 'Week of year (0-53).', 'gutenberg' ),
+													),
+													'day'           => array(
+														'type'        => 'integer',
+														'description' => __( 'Day of month (1-31).', 'gutenberg' ),
+													),
+													'hour'          => array(
+														'type'        => 'integer',
+														'description' => __( 'Hour (0-23).', 'gutenberg' ),
+													),
+													'minute'        => array(
+														'type'        => 'integer',
+														'description' => __( 'Minute (0-59).', 'gutenberg' ),
+													),
+													'second'        => array(
+														'type'        => 'integer',
+														'description' => __( 'Second (0-59).', 'gutenberg' ),
+													),
+													'dayofweek'     => array(
+														'type'        => 'integer',
+														'description' => __( 'Day of week (1-7, Sunday=1).', 'gutenberg' ),
+													),
+													'dayofweek_iso' => array(
+														'type'        => 'integer',
+														'description' => __( 'ISO day of week (1-7, Monday=1).', 'gutenberg' ),
+													),
+													'dayofyear'     => array(
+														'type'        => 'integer',
+														'description' => __( 'Day of year (1-366).', 'gutenberg' ),
+													),
+													'after'         => array(
+														'oneOf'       => array(
+															array( 'type' => 'string' ),
+															array(
+																'type'       => 'object',
+																'properties' => array(
+																	'year'  => array( 'type' => 'integer' ),
+																	'month' => array( 'type' => 'integer' ),
+																	'day'   => array( 'type' => 'integer' ),
+																),
+															),
+														),
+														'description' => __( 'Date to retrieve posts after. String or object with year/month/day.', 'gutenberg' ),
+													),
+													'before'        => array(
+														'oneOf'       => array(
+															array( 'type' => 'string' ),
+															array(
+																'type'       => 'object',
+																'properties' => array(
+																	'year'  => array( 'type' => 'integer' ),
+																	'month' => array( 'type' => 'integer' ),
+																	'day'   => array( 'type' => 'integer' ),
+																),
+															),
+														),
+														'description' => __( 'Date to retrieve posts before. String or object with year/month/day.', 'gutenberg' ),
+													),
+													'inclusive'     => array(
+														'type'        => 'boolean',
+														'description' => __( 'Include posts from the boundary date.', 'gutenberg' ),
+													),
+													'compare'       => array(
+														'type'        => 'string',
+														'description' => __( 'Comparison operator.', 'gutenberg' ),
+														'enum'        => array( '=', '!=', '>', '>=', '<', '<=', 'IN', 'NOT IN', 'BETWEEN', 'NOT BETWEEN' ),
+													),
+													'column'        => array(
+														'type'        => 'string',
+														'description' => __( 'Column to query against for this clause.', 'gutenberg' ),
+														'enum'        => array( 'post_date', 'post_date_gmt', 'post_modified', 'post_modified_gmt' ),
+													),
+												),
+											),
+											array(
+												'type'                 => 'object',
+												'required'             => array( 'queries' ),
+												'additionalProperties' => false,
+												'properties'           => array(
+													'relation' => array(
+														'type'        => 'string',
+														'description' => __( 'Relation for nested group. Defaults to "AND".', 'gutenberg' ),
+														'enum'        => array( 'AND', 'OR' ),
+													),
+													'queries'  => array(
+														'type'        => 'array',
+														'description' => __( 'Nested date clauses.', 'gutenberg' ),
+													),
+												),
+											),
+										),
+									),
+								),
 							),
 						),
 						'include_taxonomies'  => array(
@@ -1086,21 +1285,9 @@ class WP_Posts_Abilities_Gutenberg {
 
 					// Process date_query.
 					if ( ! empty( $input['date_query'] ) && is_array( $input['date_query'] ) ) {
-						$date_query = array();
-						if ( ! empty( $input['date_query']['after'] ) ) {
-							$date_query['after'] = sanitize_text_field( (string) $input['date_query']['after'] );
-						}
-						if ( ! empty( $input['date_query']['before'] ) ) {
-							$date_query['before'] = sanitize_text_field( (string) $input['date_query']['before'] );
-						}
-						if ( ! empty( $input['date_query']['year'] ) ) {
-							$date_query['year'] = (int) $input['date_query']['year'];
-						}
-						if ( ! empty( $input['date_query']['month'] ) ) {
-							$date_query['month'] = (int) $input['date_query']['month'];
-						}
+						$date_query = self::process_date_query_recursive( $input['date_query'] );
 						if ( ! empty( $date_query ) ) {
-							$args['date_query'] = array( $date_query );
+							$args['date_query'] = $date_query;
 						}
 					}
 
