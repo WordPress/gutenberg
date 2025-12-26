@@ -159,10 +159,6 @@ export function FlatTermSelector( { slug } ) {
 	const { saveEntityRecord } = useDispatch( coreStore );
 	const { createErrorNotice } = useDispatch( noticesStore );
 
-	if ( ! hasAssignAction ) {
-		return null;
-	}
-
 	async function findOrCreateTerm( term ) {
 		try {
 			const newTerm = await saveEntityRecord( 'taxonomy', slug, term, {
@@ -183,6 +179,47 @@ export function FlatTermSelector( { slug } ) {
 
 	function onUpdateTerms( newTermIds ) {
 		editPost( { [ taxonomy.rest_base ]: newTermIds } );
+	}
+
+	const debouncedUpdateTerms = useDebounce(
+		( uniqueTerms, availableTerms, newTermNames ) => {
+			if ( newTermNames.length === 0 ) {
+				onUpdateTerms( termNamesToIds( uniqueTerms, availableTerms ) );
+				return;
+			}
+
+			if ( ! hasCreateAction ) {
+				return;
+			}
+
+			Promise.all(
+				newTermNames.map( ( termName ) =>
+					findOrCreateTerm( { name: termName } )
+				)
+			)
+				.then( ( newTerms ) => {
+					const newAvailableTerms = availableTerms.concat( newTerms );
+					onUpdateTerms(
+						termNamesToIds( uniqueTerms, newAvailableTerms )
+					);
+				} )
+				.catch( ( error ) => {
+					createErrorNotice( error.message, {
+						type: 'snackbar',
+					} );
+					// In case of a failure, try assigning available terms.
+					// This will invalidate the optimistic update.
+					onUpdateTerms(
+						termNamesToIds( uniqueTerms, availableTerms )
+					);
+				} );
+		},
+		500 // 500ms delay to prevent race conditions
+	);
+
+	// Conditional Return (Must come AFTER all hooks)
+	if ( ! hasAssignAction ) {
+		return null;
 	}
 
 	function onChange( termNames ) {
@@ -206,38 +243,11 @@ export function FlatTermSelector( { slug } ) {
 				)
 		);
 
-		// Optimistically update term values.
-		// The selector will always re-fetch terms later.
+		// Optimistically update term values immediately for UI responsiveness
 		setValues( uniqueTerms );
 
-		if ( newTermNames.length === 0 ) {
-			onUpdateTerms( termNamesToIds( uniqueTerms, availableTerms ) );
-			return;
-		}
-
-		if ( ! hasCreateAction ) {
-			return;
-		}
-
-		Promise.all(
-			newTermNames.map( ( termName ) =>
-				findOrCreateTerm( { name: termName } )
-			)
-		)
-			.then( ( newTerms ) => {
-				const newAvailableTerms = availableTerms.concat( newTerms );
-				onUpdateTerms(
-					termNamesToIds( uniqueTerms, newAvailableTerms )
-				);
-			} )
-			.catch( ( error ) => {
-				createErrorNotice( error.message, {
-					type: 'snackbar',
-				} );
-				// In case of a failure, try assigning available terms.
-				// This will invalidate the optimistic update.
-				onUpdateTerms( termNamesToIds( uniqueTerms, availableTerms ) );
-			} );
+		// Pass the heavy lifting to the debounced function
+		debouncedUpdateTerms( uniqueTerms, availableTerms, newTermNames );
 	}
 
 	function appendTerm( newTerm ) {
