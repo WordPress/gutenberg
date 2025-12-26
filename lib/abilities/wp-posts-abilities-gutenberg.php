@@ -265,186 +265,37 @@ class WP_Posts_Abilities_Gutenberg {
 	}
 
 	/**
-	 * Recursively processes meta_query input into WordPress format.
+	 * Generic recursive processor for nested query structures.
 	 *
-	 * @param array $input The meta_query input (with queries/relation structure).
-	 * @return array WordPress-compatible meta_query array.
+	 * @param array         $input             The query input (with queries/relation structure).
+	 * @param callable      $process_leaf      Callback to process leaf clauses. Returns array or null.
+	 * @param callable|null $process_top_level Optional callback for top-level fields (e.g., column).
+	 * @return array WordPress-compatible query array.
 	 */
-	private static function process_meta_query_recursive( array $input ): array {
+	private static function process_query_recursive( array $input, callable $process_leaf, ?callable $process_top_level = null ): array {
 		$result = array();
 
-		// Add relation if present.
 		if ( ! empty( $input['relation'] ) && in_array( $input['relation'], array( 'AND', 'OR' ), true ) ) {
 			$result['relation'] = $input['relation'];
 		}
 
-		// Process queries array.
+		if ( $process_top_level ) {
+			$process_top_level( $input, $result );
+		}
+
 		if ( ! empty( $input['queries'] ) && is_array( $input['queries'] ) ) {
 			foreach ( $input['queries'] as $query ) {
 				if ( ! is_array( $query ) ) {
 					continue;
 				}
-
-				// Check if this is a nested query group (has 'queries' key).
 				if ( isset( $query['queries'] ) ) {
-					$nested = self::process_meta_query_recursive( $query );
-					if ( ! empty( $nested ) ) {
-						$result[] = $nested;
-					}
-				} elseif ( ! empty( $query['key'] ) ) {
-					// It's a leaf clause (has 'key').
-					$clause = array(
-						'key'     => sanitize_key( (string) $query['key'] ),
-						'compare' => isset( $query['compare'] )
-							? sanitize_text_field( (string) $query['compare'] )
-							: '=',
-					);
-					// Only add value if present (some comparisons like EXISTS don't need it).
-					if ( array_key_exists( 'value', $query ) ) {
-						$clause['value'] = $query['value'];
-					}
-					// Add optional 'type' for casting.
-					if ( ! empty( $query['type'] ) ) {
-						$clause['type'] = sanitize_text_field( (string) $query['type'] );
-					}
-					$result[] = $clause;
-				}
-			}
-		}
-
-		return $result;
-	}
-
-	/**
-	 * Recursively processes tax_query input into WordPress format.
-	 *
-	 * @param array $input The tax_query input (with queries/relation structure).
-	 * @return array WordPress-compatible tax_query array.
-	 */
-	private static function process_tax_query_recursive( array $input ): array {
-		$result = array();
-
-		// Add relation if present.
-		if ( ! empty( $input['relation'] ) && in_array( $input['relation'], array( 'AND', 'OR' ), true ) ) {
-			$result['relation'] = $input['relation'];
-		}
-
-		// Process queries array.
-		if ( ! empty( $input['queries'] ) && is_array( $input['queries'] ) ) {
-			foreach ( $input['queries'] as $query ) {
-				if ( ! is_array( $query ) ) {
-					continue;
-				}
-
-				// Check if this is a nested query group (has 'queries' key).
-				if ( isset( $query['queries'] ) ) {
-					$nested = self::process_tax_query_recursive( $query );
-					if ( ! empty( $nested ) ) {
-						$result[] = $nested;
-					}
-				} elseif ( ! empty( $query['taxonomy'] ) && isset( $query['terms'] ) ) {
-					// It's a leaf clause (has 'taxonomy' and 'terms').
-					$taxonomy = sanitize_key( (string) $query['taxonomy'] );
-					if ( ! taxonomy_exists( $taxonomy ) ) {
-						continue;
-					}
-
-					$clause = array(
-						'taxonomy' => $taxonomy,
-						'terms'    => is_array( $query['terms'] ) ? $query['terms'] : array( $query['terms'] ),
-						'field'    => isset( $query['field'] ) && in_array( $query['field'], array( 'term_id', 'slug', 'name', 'term_taxonomy_id' ), true )
-							? $query['field']
-							: 'term_id',
-						'operator' => isset( $query['operator'] ) && in_array( $query['operator'], array( 'IN', 'NOT IN', 'AND', 'EXISTS', 'NOT EXISTS' ), true )
-							? $query['operator']
-							: 'IN',
-					);
-
-					// Add optional include_children.
-					if ( isset( $query['include_children'] ) ) {
-						$clause['include_children'] = (bool) $query['include_children'];
-					}
-
-					$result[] = $clause;
-				}
-			}
-		}
-
-		return $result;
-	}
-
-	/**
-	 * Recursively processes date_query input into WordPress format.
-	 *
-	 * @param array $input The date_query input (with queries/relation structure).
-	 * @return array WordPress-compatible date_query array.
-	 */
-	private static function process_date_query_recursive( array $input ): array {
-		$result = array();
-
-		// Add relation if present.
-		if ( ! empty( $input['relation'] ) && in_array( $input['relation'], array( 'AND', 'OR' ), true ) ) {
-			$result['relation'] = $input['relation'];
-		}
-
-		// Add column if present at top level.
-		if ( ! empty( $input['column'] ) && in_array( $input['column'], array( 'post_date', 'post_date_gmt', 'post_modified', 'post_modified_gmt' ), true ) ) {
-			$result['column'] = $input['column'];
-		}
-
-		// Process queries array.
-		if ( ! empty( $input['queries'] ) && is_array( $input['queries'] ) ) {
-			foreach ( $input['queries'] as $query ) {
-				if ( ! is_array( $query ) ) {
-					continue;
-				}
-
-				// Check if this is a nested query group (has 'queries' key).
-				if ( isset( $query['queries'] ) ) {
-					$nested = self::process_date_query_recursive( $query );
+					$nested = self::process_query_recursive( $query, $process_leaf, $process_top_level );
 					if ( ! empty( $nested ) ) {
 						$result[] = $nested;
 					}
 				} else {
-					// It's a leaf clause - build date clause.
-					$clause = array();
-
-					// Integer date parts.
-					$int_fields = array( 'year', 'month', 'week', 'day', 'hour', 'minute', 'second', 'dayofweek', 'dayofweek_iso', 'dayofyear' );
-					foreach ( $int_fields as $field ) {
-						if ( isset( $query[ $field ] ) ) {
-							$clause[ $field ] = (int) $query[ $field ];
-						}
-					}
-
-					// After/before (can be string or array).
-					if ( isset( $query['after'] ) ) {
-						$clause['after'] = is_array( $query['after'] )
-							? array_map( 'intval', $query['after'] )
-							: sanitize_text_field( (string) $query['after'] );
-					}
-					if ( isset( $query['before'] ) ) {
-						$clause['before'] = is_array( $query['before'] )
-							? array_map( 'intval', $query['before'] )
-							: sanitize_text_field( (string) $query['before'] );
-					}
-
-					// Inclusive.
-					if ( isset( $query['inclusive'] ) ) {
-						$clause['inclusive'] = (bool) $query['inclusive'];
-					}
-
-					// Compare.
-					if ( ! empty( $query['compare'] ) && in_array( $query['compare'], array( '=', '!=', '>', '>=', '<', '<=', 'IN', 'NOT IN', 'BETWEEN', 'NOT BETWEEN' ), true ) ) {
-						$clause['compare'] = $query['compare'];
-					}
-
-					// Column (clause-level override).
-					if ( ! empty( $query['column'] ) && in_array( $query['column'], array( 'post_date', 'post_date_gmt', 'post_modified', 'post_modified_gmt' ), true ) ) {
-						$clause['column'] = $query['column'];
-					}
-
-					if ( ! empty( $clause ) ) {
+					$clause = $process_leaf( $query );
+					if ( $clause !== null ) {
 						$result[] = $clause;
 					}
 				}
@@ -452,6 +303,101 @@ class WP_Posts_Abilities_Gutenberg {
 		}
 
 		return $result;
+	}
+
+	/**
+	 * Process a meta_query leaf clause.
+	 *
+	 * @param array $query The clause data.
+	 * @return array|null The processed clause or null if invalid.
+	 */
+	private static function process_meta_clause( array $query ): ?array {
+		if ( empty( $query['key'] ) ) {
+			return null;
+		}
+		$clause = array(
+			'key'     => sanitize_key( (string) $query['key'] ),
+			'compare' => isset( $query['compare'] ) ? sanitize_text_field( (string) $query['compare'] ) : '=',
+		);
+		if ( array_key_exists( 'value', $query ) ) {
+			$clause['value'] = $query['value'];
+		}
+		if ( ! empty( $query['type'] ) ) {
+			$clause['type'] = sanitize_text_field( (string) $query['type'] );
+		}
+		return $clause;
+	}
+
+	/**
+	 * Process a tax_query leaf clause.
+	 *
+	 * @param array $query The clause data.
+	 * @return array|null The processed clause or null if invalid.
+	 */
+	private static function process_tax_clause( array $query ): ?array {
+		if ( empty( $query['taxonomy'] ) || ! isset( $query['terms'] ) ) {
+			return null;
+		}
+		$taxonomy = sanitize_key( (string) $query['taxonomy'] );
+		if ( ! taxonomy_exists( $taxonomy ) ) {
+			return null;
+		}
+		$clause = array(
+			'taxonomy' => $taxonomy,
+			'terms'    => is_array( $query['terms'] ) ? $query['terms'] : array( $query['terms'] ),
+			'field'    => isset( $query['field'] ) && in_array( $query['field'], array( 'term_id', 'slug', 'name', 'term_taxonomy_id' ), true )
+				? $query['field'] : 'term_id',
+			'operator' => isset( $query['operator'] ) && in_array( $query['operator'], array( 'IN', 'NOT IN', 'AND', 'EXISTS', 'NOT EXISTS' ), true )
+				? $query['operator'] : 'IN',
+		);
+		if ( isset( $query['include_children'] ) ) {
+			$clause['include_children'] = (bool) $query['include_children'];
+		}
+		return $clause;
+	}
+
+	/**
+	 * Process a date_query leaf clause.
+	 *
+	 * @param array $query The clause data.
+	 * @return array|null The processed clause or null if empty.
+	 */
+	private static function process_date_clause( array $query ): ?array {
+		$clause = array();
+		$int_fields = array( 'year', 'month', 'week', 'day', 'hour', 'minute', 'second', 'dayofweek', 'dayofweek_iso', 'dayofyear' );
+		foreach ( $int_fields as $field ) {
+			if ( isset( $query[ $field ] ) ) {
+				$clause[ $field ] = (int) $query[ $field ];
+			}
+		}
+		if ( isset( $query['after'] ) ) {
+			$clause['after'] = is_array( $query['after'] ) ? array_map( 'intval', $query['after'] ) : sanitize_text_field( (string) $query['after'] );
+		}
+		if ( isset( $query['before'] ) ) {
+			$clause['before'] = is_array( $query['before'] ) ? array_map( 'intval', $query['before'] ) : sanitize_text_field( (string) $query['before'] );
+		}
+		if ( isset( $query['inclusive'] ) ) {
+			$clause['inclusive'] = (bool) $query['inclusive'];
+		}
+		if ( ! empty( $query['compare'] ) && in_array( $query['compare'], array( '=', '!=', '>', '>=', '<', '<=', 'IN', 'NOT IN', 'BETWEEN', 'NOT BETWEEN' ), true ) ) {
+			$clause['compare'] = $query['compare'];
+		}
+		if ( ! empty( $query['column'] ) && in_array( $query['column'], array( 'post_date', 'post_date_gmt', 'post_modified', 'post_modified_gmt' ), true ) ) {
+			$clause['column'] = $query['column'];
+		}
+		return ! empty( $clause ) ? $clause : null;
+	}
+
+	/**
+	 * Process date_query top-level fields.
+	 *
+	 * @param array $input  The input data.
+	 * @param array $result The result array (passed by reference).
+	 */
+	private static function process_date_top_level( array $input, array &$result ): void {
+		if ( ! empty( $input['column'] ) && in_array( $input['column'], array( 'post_date', 'post_date_gmt', 'post_modified', 'post_modified_gmt' ), true ) ) {
+			$result['column'] = $input['column'];
+		}
 	}
 
 	/**
@@ -1269,7 +1215,7 @@ class WP_Posts_Abilities_Gutenberg {
 
 					// Process tax_query.
 					if ( ! empty( $input['tax_query'] ) && is_array( $input['tax_query'] ) ) {
-						$tax_query = self::process_tax_query_recursive( $input['tax_query'] );
+						$tax_query = self::process_query_recursive( $input['tax_query'], array( __CLASS__, 'process_tax_clause' ) );
 						if ( ! empty( $tax_query ) ) {
 							$args['tax_query'] = $tax_query;
 						}
@@ -1277,7 +1223,7 @@ class WP_Posts_Abilities_Gutenberg {
 
 					// Process meta_query.
 					if ( ! empty( $input['meta_query'] ) && is_array( $input['meta_query'] ) ) {
-						$meta_query = self::process_meta_query_recursive( $input['meta_query'] );
+						$meta_query = self::process_query_recursive( $input['meta_query'], array( __CLASS__, 'process_meta_clause' ) );
 						if ( ! empty( $meta_query ) ) {
 							$args['meta_query'] = $meta_query;
 						}
@@ -1285,7 +1231,7 @@ class WP_Posts_Abilities_Gutenberg {
 
 					// Process date_query.
 					if ( ! empty( $input['date_query'] ) && is_array( $input['date_query'] ) ) {
-						$date_query = self::process_date_query_recursive( $input['date_query'] );
+						$date_query = self::process_query_recursive( $input['date_query'], array( __CLASS__, 'process_date_clause' ), array( __CLASS__, 'process_date_top_level' ) );
 						if ( ! empty( $date_query ) ) {
 							$args['date_query'] = $date_query;
 						}
