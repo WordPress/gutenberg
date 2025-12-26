@@ -222,6 +222,56 @@ class WP_Posts_Abilities_Gutenberg {
 	}
 
 	/**
+	 * Sanitizes meta input values recursively.
+	 *
+	 * Ensures all meta values are scalar types (string, int, float, bool)
+	 * or arrays of scalar types. Prevents object injection and ensures
+	 * string values are sanitized.
+	 *
+	 * @param array $meta The meta input array.
+	 * @return array Sanitized meta array.
+	 */
+	private static function sanitize_meta_input( array $meta ): array {
+		$sanitized = array();
+
+		foreach ( $meta as $key => $value ) {
+			// Sanitize meta key.
+			$sanitized_key = sanitize_key( (string) $key );
+			if ( empty( $sanitized_key ) ) {
+				continue;
+			}
+
+			// Sanitize meta value.
+			$sanitized[ $sanitized_key ] = self::sanitize_meta_value( $value );
+		}
+
+		return $sanitized;
+	}
+
+	/**
+	 * Sanitizes a single meta value.
+	 *
+	 * @param mixed $value The meta value to sanitize.
+	 * @return mixed Sanitized value (scalar or array of scalars).
+	 */
+	private static function sanitize_meta_value( $value ) {
+		if ( is_array( $value ) ) {
+			return array_map( array( __CLASS__, 'sanitize_meta_value' ), $value );
+		}
+
+		if ( is_string( $value ) ) {
+			return sanitize_text_field( $value );
+		}
+
+		if ( is_int( $value ) || is_float( $value ) || is_bool( $value ) ) {
+			return $value;
+		}
+
+		// Reject non-scalar values (objects, resources, etc.).
+		return '';
+	}
+
+	/**
 	 * Resolves taxonomy terms from IDs or slugs.
 	 *
 	 * @param mixed  $terms_in Terms as IDs, slugs, or names.
@@ -594,7 +644,7 @@ class WP_Posts_Abilities_Gutenberg {
 			}
 		}
 		if ( $has_field( 'meta' ) && is_array( $input['meta'] ) ) {
-			$postarr['meta_input'] = $input['meta'];
+			$postarr['meta_input'] = self::sanitize_meta_input( $input['meta'] );
 		}
 		if ( $has_field( 'date' ) ) {
 			$postarr['post_date'] = sanitize_text_field( (string) $input['date'] );
