@@ -29,7 +29,7 @@ import { useDisabled } from '@wordpress/compose';
  * Internal dependencies
  */
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
-import BlockFromHtml from '../utils/block-from-html';
+import HtmlRenderer from '../utils/html-renderer';
 
 /**
  * Minimum number of tags a user can show using this block.
@@ -262,7 +262,7 @@ function TagCloudEdit( { attributes, setAttributes, name } ) {
 	return (
 		<>
 			{ inspectorControls }
-			<BlockFromHtml wrapperProps={ blockProps } html={ content } />
+			<HtmlRenderer wrapperProps={ blockProps } html={ content } />
 		</>
 	);
 }

@@ -9,15 +9,14 @@ import parse, { attributesToProps, domToReact } from 'html-react-parser';
 import { safeHTML } from '@wordpress/dom';
 
 /**
- * Generates an Edit component that works in the block editor
- * from the given HTML content.
+ * Renders HTML content as React elements with optional wrapper props.
  *
  * @param {Object} props              - The props for the component.
- * @param {Object} props.wrapperProps - The props for the block wrapper.
+ * @param {Object} props.wrapperProps - The props to merge with the root element.
  * @param {string} props.html         - The HTML content to render.
- * @return {JSX.Element} The Edit component.
+ * @return {JSX.Element} The rendered React elements.
  */
-const BlockFromHtml = ( { wrapperProps = {}, html = '' } ) => {
+const HtmlRenderer = ( { wrapperProps = {}, html = '' } ) => {
 	const options = {
 		replace: ( { name, type, attribs, parent, children } ) => {
 			if ( type === 'tag' && name ) {
@@ -44,4 +43,4 @@ const BlockFromHtml = ( { wrapperProps = {}, html = '' } ) => {
 	return parsedContent;
 };
 
-export default BlockFromHtml;
+export default HtmlRenderer;
