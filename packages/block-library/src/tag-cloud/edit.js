@@ -23,6 +23,7 @@ import {
 } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
 import { useServerSideRender } from '@wordpress/server-side-render';
+import { useDisabled } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -239,7 +240,8 @@ function TagCloudEdit( { attributes, setAttributes, name } ) {
 		block: name,
 	} );
 
-	const blockProps = useBlockProps();
+	const disabledRef = useDisabled();
+	const blockProps = useBlockProps( { ref: disabledRef } );
 
 	if ( status === 'loading' ) {
 		return (
@@ -260,7 +262,7 @@ function TagCloudEdit( { attributes, setAttributes, name } ) {
 	return (
 		<>
 			{ inspectorControls }
-			<BlockFromHtml html={ content } />
+			<BlockFromHtml wrapperProps={ blockProps } html={ content } />
 		</>
 	);
 }

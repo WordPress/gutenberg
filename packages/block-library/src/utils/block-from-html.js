@@ -6,22 +6,18 @@ import parse, { attributesToProps, domToReact } from 'html-react-parser';
 /**
  * WordPress dependencies
  */
-import { useBlockProps } from '@wordpress/block-editor';
 import { safeHTML } from '@wordpress/dom';
-import { useDisabled } from '@wordpress/compose';
 
 /**
  * Generates an Edit component that works in the block editor
  * from the given HTML content.
  *
- * @param {Object} props      - The props for the component.
- * @param {string} props.html - The HTML content to render.
+ * @param {Object} props              - The props for the component.
+ * @param {Object} props.wrapperProps - The props for the block wrapper.
+ * @param {string} props.html         - The HTML content to render.
  * @return {JSX.Element} The Edit component.
  */
-const BlockFromHtml = ( { html = '' } ) => {
-	const disabledRef = useDisabled();
-	const blockProps = useBlockProps( { ref: disabledRef } );
-
+const BlockFromHtml = ( { wrapperProps = {}, html = '' } ) => {
 	const options = {
 		replace: ( { name, type, attribs, parent, children } ) => {
 			if ( type === 'tag' && name ) {
@@ -30,7 +26,7 @@ const BlockFromHtml = ( { html = '' } ) => {
 				if ( ! parent ) {
 					const mergedProps = {
 						...parsedProps,
-						...blockProps,
+						...wrapperProps,
 					};
 					return (
 						<TagName { ...mergedProps }>
