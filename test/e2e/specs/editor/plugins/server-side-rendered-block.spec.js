@@ -247,20 +247,20 @@ test.describe( 'PHP-only auto-register blocks', () => {
 
 		// Verify auto-generated controls are present
 		// String attribute → text input
-		await expect( page.getByLabel( 'Title' ) ).toBeVisible();
+		await expect( page.getByLabel( 'title' ) ).toBeVisible();
 
 		// Integer attribute → number input
-		await expect( page.getByLabel( 'Count' ) ).toBeVisible();
+		await expect( page.getByLabel( 'count' ) ).toBeVisible();
 
 		// Number attribute → number control
-		await expect( page.getByLabel( 'Spacing' ) ).toBeVisible();
+		await expect( page.getByLabel( 'spacing' ) ).toBeVisible();
 
 		// Boolean attribute → toggle/checkbox
-		await expect( page.getByLabel( 'Show Emojis' ) ).toBeVisible();
+		await expect( page.getByLabel( 'showEmojis' ) ).toBeVisible();
 
 		// Enum attribute → select control
 		await expect(
-			page.getByLabel( 'Emoji', { exact: true } )
+			page.getByLabel( 'emoji', { exact: true } )
 		).toBeVisible();
 	} );
 } );

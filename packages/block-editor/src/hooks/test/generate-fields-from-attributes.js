@@ -32,7 +32,7 @@ describe( 'generateFieldsFromAttributes', () => {
 		expect( result.fields ).toHaveLength( 1 );
 		expect( result.fields[ 0 ] ).toEqual( {
 			id: 'message',
-			label: 'Message',
+			label: 'message',
 			type: 'text',
 		} );
 		expect( result.form.fields ).toContain( 'message' );
@@ -51,7 +51,7 @@ describe( 'generateFieldsFromAttributes', () => {
 		expect( result.fields ).toHaveLength( 1 );
 		expect( result.fields[ 0 ] ).toEqual( {
 			id: 'amount',
-			label: 'Amount',
+			label: 'amount',
 			type: 'number',
 		} );
 	} );
@@ -69,7 +69,7 @@ describe( 'generateFieldsFromAttributes', () => {
 		expect( result.fields ).toHaveLength( 1 );
 		expect( result.fields[ 0 ] ).toEqual( {
 			id: 'count',
-			label: 'Count',
+			label: 'count',
 			type: 'integer',
 		} );
 	} );
@@ -87,7 +87,7 @@ describe( 'generateFieldsFromAttributes', () => {
 		expect( result.fields ).toHaveLength( 1 );
 		expect( result.fields[ 0 ] ).toEqual( {
 			id: 'enabled',
-			label: 'Enabled',
+			label: 'enabled',
 			type: 'boolean',
 		} );
 	} );
@@ -107,12 +107,12 @@ describe( 'generateFieldsFromAttributes', () => {
 		// DataForm automatically uses a select control when elements are present
 		expect( result.fields[ 0 ] ).toEqual( {
 			id: 'size',
-			label: 'Size',
+			label: 'size',
 			type: 'text',
 			elements: [
-				{ value: 'small', label: 'Small' },
-				{ value: 'medium', label: 'Medium' },
-				{ value: 'large', label: 'Large' },
+				{ value: 'small', label: 'small' },
+				{ value: 'medium', label: 'medium' },
+				{ value: 'large', label: 'large' },
 			],
 		} );
 	} );
@@ -142,42 +142,6 @@ describe( 'generateFieldsFromAttributes', () => {
 		// Only string attribute should generate a field
 		expect( result.fields ).toHaveLength( 1 );
 		expect( result.fields[ 0 ].id ).toBe( 'message' );
-	} );
-
-	it( 'should humanize camelCase attribute names', () => {
-		const attributes = markForAutoInspectorControl( {
-			backgroundColor: {
-				type: 'string',
-			},
-			showTitle: {
-				type: 'boolean',
-			},
-			itemCount: {
-				type: 'integer',
-			},
-		} );
-
-		const result = generateFieldsFromAttributes( attributes );
-
-		expect( result.fields[ 0 ].label ).toBe( 'Background Color' );
-		expect( result.fields[ 1 ].label ).toBe( 'Show Title' );
-		expect( result.fields[ 2 ].label ).toBe( 'Item Count' );
-	} );
-
-	it( 'should humanize snake_case attribute names', () => {
-		const attributes = markForAutoInspectorControl( {
-			background_color: {
-				type: 'string',
-			},
-			show_title: {
-				type: 'boolean',
-			},
-		} );
-
-		const result = generateFieldsFromAttributes( attributes );
-
-		expect( result.fields[ 0 ].label ).toBe( 'Background color' );
-		expect( result.fields[ 1 ].label ).toBe( 'Show title' );
 	} );
 
 	it( 'should return empty fields array for empty attributes', () => {

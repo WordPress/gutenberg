@@ -47,7 +47,7 @@ function createFieldFromAttribute( name, def ) {
 
 	const field = {
 		id: name,
-		label: humanizeKey( name ),
+		label: name,
 		// Only 'string' needs mapping to 'text'; others are 1:1 with DataForm types
 		type: type === 'string' ? 'text' : type,
 	};
@@ -56,28 +56,9 @@ function createFieldFromAttribute( name, def ) {
 	if ( def.enum && Array.isArray( def.enum ) ) {
 		field.elements = def.enum.map( ( value ) => ( {
 			value,
-			label: humanizeKey( String( value ) ),
+			label: String( value ),
 		} ) );
 	}
 
 	return field;
-}
-
-/**
- * Converts an attribute name to a human-readable label.
- *
- * @param {string} str - The attribute name (camelCase or snake_case)
- * @return {string} Human-readable label
- *
- * @example
- * humanizeKey('backgroundColor') // "Background Color"
- * humanizeKey('show_title')      // "Show Title"
- * humanizeKey('itemCount')       // "Item Count"
- */
-function humanizeKey( str ) {
-	return str
-		.replace( /([A-Z])/g, ' $1' ) // Add space before capitals
-		.replace( /[_-]/g, ' ' ) // Replace underscores/hyphens with spaces
-		.trim()
-		.replace( /^\w/, ( c ) => c.toUpperCase() ); // Capitalize first letter
 }
