@@ -7,8 +7,6 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import { privateApis as routePrivateApis } from '@wordpress/route';
-// @ts-expect-error Commands is not typed properly.
-import { CommandMenu } from '@wordpress/commands';
 import { EditorSnackbars } from '@wordpress/editor';
 import { useViewportMatch, useReducedMotion } from '@wordpress/compose';
 import {
@@ -69,7 +67,6 @@ export default function Root() {
 							'has-full-canvas': isFullScreen,
 						} ) }
 					>
-						<CommandMenu />
 						<SavePanel />
 						<EditorSnackbars />
 						{ isMobileViewport && (
