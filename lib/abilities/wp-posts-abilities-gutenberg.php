@@ -316,6 +316,64 @@ class WP_Posts_Abilities_Gutenberg {
 	}
 
 	/**
+	 * Recursively processes tax_query input into WordPress format.
+	 *
+	 * @param array $input The tax_query input (with queries/relation structure).
+	 * @return array WordPress-compatible tax_query array.
+	 */
+	private static function process_tax_query_recursive( array $input ): array {
+		$result = array();
+
+		// Add relation if present.
+		if ( ! empty( $input['relation'] ) && in_array( $input['relation'], array( 'AND', 'OR' ), true ) ) {
+			$result['relation'] = $input['relation'];
+		}
+
+		// Process queries array.
+		if ( ! empty( $input['queries'] ) && is_array( $input['queries'] ) ) {
+			foreach ( $input['queries'] as $query ) {
+				if ( ! is_array( $query ) ) {
+					continue;
+				}
+
+				// Check if this is a nested query group (has 'queries' key).
+				if ( isset( $query['queries'] ) ) {
+					$nested = self::process_tax_query_recursive( $query );
+					if ( ! empty( $nested ) ) {
+						$result[] = $nested;
+					}
+				} elseif ( ! empty( $query['taxonomy'] ) && isset( $query['terms'] ) ) {
+					// It's a leaf clause (has 'taxonomy' and 'terms').
+					$taxonomy = sanitize_key( (string) $query['taxonomy'] );
+					if ( ! taxonomy_exists( $taxonomy ) ) {
+						continue;
+					}
+
+					$clause = array(
+						'taxonomy' => $taxonomy,
+						'terms'    => is_array( $query['terms'] ) ? $query['terms'] : array( $query['terms'] ),
+						'field'    => isset( $query['field'] ) && in_array( $query['field'], array( 'term_id', 'slug', 'name', 'term_taxonomy_id' ), true )
+							? $query['field']
+							: 'term_id',
+						'operator' => isset( $query['operator'] ) && in_array( $query['operator'], array( 'IN', 'NOT IN', 'AND', 'EXISTS', 'NOT EXISTS' ), true )
+							? $query['operator']
+							: 'IN',
+					);
+
+					// Add optional include_children.
+					if ( isset( $query['include_children'] ) ) {
+						$clause['include_children'] = (bool) $query['include_children'];
+					}
+
+					$result[] = $clause;
+				}
+			}
+		}
+
+		return $result;
+	}
+
+	/**
 	 * Checks taxonomy assignment permissions.
 	 *
 	 * @param array  $input     The input data.
@@ -789,23 +847,66 @@ class WP_Posts_Abilities_Gutenberg {
 							'default'     => 'DESC',
 						),
 						'tax_query'           => array(
-							'type'        => 'array',
-							'description' => __( 'Taxonomy query. Array of objects with: taxonomy, terms (array), field (term_id/slug/name), operator (IN/NOT IN/AND).', 'gutenberg' ),
-							'items'       => array(
-								'type'       => 'object',
-								'properties' => array(
-									'taxonomy' => array( 'type' => 'string' ),
-									'terms'    => array(
-										'type'  => 'array',
-										'items' => array( 'type' => array( 'integer', 'string' ) ),
-									),
-									'field'    => array(
-										'type' => 'string',
-										'enum' => array( 'term_id', 'slug', 'name' ),
-									),
-									'operator' => array(
-										'type' => 'string',
-										'enum' => array( 'IN', 'NOT IN', 'AND' ),
+							'type'        => 'object',
+							'description' => __( 'Taxonomy query with nested queries and relations.', 'gutenberg' ),
+							'properties'  => array(
+								'relation' => array(
+									'type'        => 'string',
+									'description' => __( 'Logical relation between queries.', 'gutenberg' ),
+									'enum'        => array( 'AND', 'OR' ),
+								),
+								'queries'  => array(
+									'type'        => 'array',
+									'description' => __( 'Array of taxonomy clauses or nested groups.', 'gutenberg' ),
+									'items'       => array(
+										'oneOf' => array(
+											array(
+												'type'                 => 'object',
+												'required'             => array( 'taxonomy', 'terms' ),
+												'additionalProperties' => false,
+												'properties'           => array(
+													'taxonomy' => array(
+														'type'        => 'string',
+														'description' => __( 'Taxonomy name to query.', 'gutenberg' ),
+													),
+													'terms'    => array(
+														'type'        => 'array',
+														'description' => __( 'Term IDs, slugs, or names to match.', 'gutenberg' ),
+														'items'       => array( 'type' => array( 'integer', 'string' ) ),
+													),
+													'field'    => array(
+														'type'        => 'string',
+														'description' => __( 'Field to match terms against. Defaults to "term_id".', 'gutenberg' ),
+														'enum'        => array( 'term_id', 'slug', 'name', 'term_taxonomy_id' ),
+													),
+													'operator' => array(
+														'type'        => 'string',
+														'description' => __( 'Operator for comparison. Defaults to "IN".', 'gutenberg' ),
+														'enum'        => array( 'IN', 'NOT IN', 'AND', 'EXISTS', 'NOT EXISTS' ),
+													),
+													'include_children' => array(
+														'type'        => 'boolean',
+														'description' => __( 'Include child terms. Defaults to true.', 'gutenberg' ),
+													),
+												),
+											),
+											array(
+												'type'                 => 'object',
+												'required'             => array( 'queries' ),
+												'additionalProperties' => false,
+												'properties'           => array(
+													'relation' => array(
+														'type'        => 'string',
+														'description' => __( 'Relation for nested group. Defaults to "AND".', 'gutenberg' ),
+														'enum'        => array( 'AND', 'OR' ),
+													),
+													'queries'  => array(
+														'type'        => 'array',
+														'description' => __( 'Nested taxonomy clauses.', 'gutenberg' ),
+													),
+												),
+											),
+										),
 									),
 								),
 							),
@@ -969,26 +1070,7 @@ class WP_Posts_Abilities_Gutenberg {
 
 					// Process tax_query.
 					if ( ! empty( $input['tax_query'] ) && is_array( $input['tax_query'] ) ) {
-						$tax_query = array();
-						foreach ( $input['tax_query'] as $tq ) {
-							if ( ! is_array( $tq ) || empty( $tq['taxonomy'] ) || empty( $tq['terms'] ) ) {
-								continue;
-							}
-							$taxonomy = sanitize_key( (string) $tq['taxonomy'] );
-							if ( ! taxonomy_exists( $taxonomy ) ) {
-								continue;
-							}
-							$tax_query[] = array(
-								'taxonomy' => $taxonomy,
-								'terms'    => is_array( $tq['terms'] ) ? $tq['terms'] : array( $tq['terms'] ),
-								'field'    => isset( $tq['field'] ) && in_array( $tq['field'], array( 'term_id', 'slug', 'name' ), true )
-									? $tq['field']
-									: 'term_id',
-								'operator' => isset( $tq['operator'] ) && in_array( $tq['operator'], array( 'IN', 'NOT IN', 'AND' ), true )
-									? $tq['operator']
-									: 'IN',
-							);
-						}
+						$tax_query = self::process_tax_query_recursive( $input['tax_query'] );
 						if ( ! empty( $tax_query ) ) {
 							$args['tax_query'] = $tax_query;
 						}
