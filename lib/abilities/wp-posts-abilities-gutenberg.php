@@ -1,17 +1,14 @@
 <?php
 /**
- * Post abilities for Gutenberg.
- *
- * @package gutenberg
- */
-
-/**
  * Registers core post abilities.
+ * This is a utility class to encapsulate the registration of post-related abilities.
+ * And reuse shared logic and schemas between the abilities.
+ * It is not intended to be instantiated or consumed directly by any other code or plugin.
  *
  * @internal This class is not part of the public API.
  * @access private
  */
-class Gutenberg_Posts_Abilities {
+class WP_Posts_Abilities_Gutenberg {
 
 	/**
 	 * Available public post types.
@@ -1068,13 +1065,4 @@ class Gutenberg_Posts_Abilities {
 			)
 		);
 	}
-}
-
-/**
- * Registers core post abilities.
- *
- * @return void
- */
-function _gutenberg_register_core_posts_abilities() {
-	Gutenberg_Posts_Abilities::register();
 }

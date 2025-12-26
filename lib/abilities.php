@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/abilities/posts.php';
+require_once __DIR__ . '/abilities/wp-posts-abilities-gutenberg.php';
 
 function _gutenberg_register_core_ability_categories() {
 	// If the category already exists, unregister it first, so we can override it.
@@ -17,7 +17,7 @@ function _gutenberg_register_core_ability_categories() {
 }
 
 function _gutenberg_register_core_abilities() {
-	_gutenberg_register_core_posts_abilities();
+	WP_Posts_Abilities_Gutenberg::register_abilities();
 }
 
 // With a priority of 11 to ensure Gutenberg abilities are registered after core ones.
