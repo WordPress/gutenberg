@@ -223,6 +223,10 @@ export function useOrderByOptions( postType ) {
 				label: __( 'Z → A' ),
 				value: 'title/desc',
 			},
+			{
+				label: __( 'Random' ),
+				value: 'rand/desc',
+			},
 		];
 
 		if ( supportsCustomOrder ) {

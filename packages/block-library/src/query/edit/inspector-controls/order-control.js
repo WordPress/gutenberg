@@ -23,6 +23,10 @@ const defaultOrderByOptions = [
 		label: __( 'Z → A' ),
 		value: 'title/desc',
 	},
+	{
+		label: __( 'Random' ),
+		value: 'rand/desc',
+	},
 ];
 
 function OrderControl( {
