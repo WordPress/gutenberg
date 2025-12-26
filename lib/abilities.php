@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/abilities/wp-posts-abilities-gutenberg.php';
+require_once __DIR__ . '/abilities/class-wp-posts-abilities-gutenberg.php';
 
 function _gutenberg_register_core_ability_categories() {
 	// If the category already exists, unregister it first, so we can override it.

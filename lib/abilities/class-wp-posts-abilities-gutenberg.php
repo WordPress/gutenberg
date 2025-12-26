@@ -15,28 +15,28 @@ class WP_Posts_Abilities_Gutenberg {
 	 *
 	 * @var array
 	 */
-	private static array $available_post_types;
+	private static $available_post_types;
 
 	/**
 	 * Description string of available post types.
 	 *
 	 * @var string
 	 */
-	private static string $available_post_types_desc;
+	private static $available_post_types_desc;
 
 	/**
 	 * Shared output schema for basic post response.
 	 *
 	 * @var array
 	 */
-	private static array $post_output_schema;
+	private static $post_output_schema;
 
 	/**
 	 * Shared input schema properties for post fields.
 	 *
 	 * @var array
 	 */
-	private static array $post_fields_schema;
+	private static $post_fields_schema;
 
 	/**
 	 * Initializes shared data.
@@ -315,7 +315,7 @@ class WP_Posts_Abilities_Gutenberg {
 					}
 				} else {
 					$clause = $process_leaf( $query );
-					if ( $clause !== null ) {
+					if ( null !== $clause ) {
 						$result[] = $clause;
 					}
 				}
