@@ -14,10 +14,12 @@ function _gutenberg_register_core_ability_categories() {
 			'description' => 'Abilities related to the creation and management of posts of all types.',
 		)
 	);
+	// register other core ability categories here as needed.
 }
 
 function _gutenberg_register_core_abilities() {
-	WP_Posts_Abilities_Gutenberg::register_abilities();
+	WP_Posts_Abilities_Gutenberg::register();
+	// register other core abilities here as needed.
 }
 
 // With a priority of 11 to ensure Gutenberg abilities are registered after core ones.

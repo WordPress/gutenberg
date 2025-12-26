@@ -265,6 +265,57 @@ class WP_Posts_Abilities_Gutenberg {
 	}
 
 	/**
+	 * Recursively processes meta_query input into WordPress format.
+	 *
+	 * @param array $input The meta_query input (with queries/relation structure).
+	 * @return array WordPress-compatible meta_query array.
+	 */
+	private static function process_meta_query_recursive( array $input ): array {
+		$result = array();
+
+		// Add relation if present.
+		if ( ! empty( $input['relation'] ) && in_array( $input['relation'], array( 'AND', 'OR' ), true ) ) {
+			$result['relation'] = $input['relation'];
+		}
+
+		// Process queries array.
+		if ( ! empty( $input['queries'] ) && is_array( $input['queries'] ) ) {
+			foreach ( $input['queries'] as $query ) {
+				if ( ! is_array( $query ) ) {
+					continue;
+				}
+
+				// Check if this is a nested query group (has 'queries' key).
+				if ( isset( $query['queries'] ) ) {
+					$nested = self::process_meta_query_recursive( $query );
+					if ( ! empty( $nested ) ) {
+						$result[] = $nested;
+					}
+				} elseif ( ! empty( $query['key'] ) ) {
+					// It's a leaf clause (has 'key').
+					$clause = array(
+						'key'     => sanitize_key( (string) $query['key'] ),
+						'compare' => isset( $query['compare'] )
+							? sanitize_text_field( (string) $query['compare'] )
+							: '=',
+					);
+					// Only add value if present (some comparisons like EXISTS don't need it).
+					if ( array_key_exists( 'value', $query ) ) {
+						$clause['value'] = $query['value'];
+					}
+					// Add optional 'type' for casting.
+					if ( ! empty( $query['type'] ) ) {
+						$clause['type'] = sanitize_text_field( (string) $query['type'] );
+					}
+					$result[] = $clause;
+				}
+			}
+		}
+
+		return $result;
+	}
+
+	/**
 	 * Checks taxonomy assignment permissions.
 	 *
 	 * @param array  $input     The input data.
@@ -760,14 +811,51 @@ class WP_Posts_Abilities_Gutenberg {
 							),
 						),
 						'meta_query'          => array(
-							'type'        => 'array',
-							'description' => __( 'Meta query. Array of objects with: key, value, compare (=, !=, >, <, LIKE, etc).', 'gutenberg' ),
-							'items'       => array(
-								'type'       => 'object',
-								'properties' => array(
-									'key'     => array( 'type' => 'string' ),
-									'value'   => array( 'type' => array( 'string', 'integer', 'array' ) ),
-									'compare' => array( 'type' => 'string' ),
+							'type'        => 'object',
+							'description' => __( 'Meta query with support for nested queries and relations. Use "queries" array for clauses (each with key/value/compare/type) and optional nested groups with their own "queries" and "relation". Top-level "relation" defaults to AND.', 'gutenberg' ),
+							'properties'  => array(
+								'relation' => array(
+									'type'        => 'string',
+									'description' => __( 'Logical relation between queries (AND/OR).', 'gutenberg' ),
+									'enum'        => array( 'AND', 'OR' ),
+									'default'     => 'AND',
+								),
+								'queries'  => array(
+									'type'        => 'array',
+									'description' => __( 'Array of meta query clauses (key/value/compare/type) or nested query groups (queries/relation).', 'gutenberg' ),
+									'items'       => array(
+										'type'       => 'object',
+										'properties' => array(
+											'key'      => array(
+												'type'        => 'string',
+												'description' => __( 'Meta key to query.', 'gutenberg' ),
+											),
+											'value'    => array(
+												'type'        => array( 'string', 'integer', 'array' ),
+												'description' => __( 'Meta value to compare. Not required for EXISTS/NOT EXISTS comparisons.', 'gutenberg' ),
+											),
+											'compare'  => array(
+												'type'        => 'string',
+												'description' => __( 'Comparison operator.', 'gutenberg' ),
+												'enum'        => array( '=', '!=', '>', '>=', '<', '<=', 'LIKE', 'NOT LIKE', 'IN', 'NOT IN', 'BETWEEN', 'NOT BETWEEN', 'EXISTS', 'NOT EXISTS', 'REGEXP', 'NOT REGEXP', 'RLIKE' ),
+												'default'     => '=',
+											),
+											'type'     => array(
+												'type'        => 'string',
+												'description' => __( 'Value type for comparison casting.', 'gutenberg' ),
+												'enum'        => array( 'NUMERIC', 'CHAR', 'DATE', 'DATETIME', 'TIME', 'BINARY', 'SIGNED', 'UNSIGNED', 'DECIMAL' ),
+											),
+											'relation' => array(
+												'type'        => 'string',
+												'description' => __( 'Relation for nested query group.', 'gutenberg' ),
+												'enum'        => array( 'AND', 'OR' ),
+											),
+											'queries'  => array(
+												'type'        => 'array',
+												'description' => __( 'Nested query clauses for grouped conditions.', 'gutenberg' ),
+											),
+										),
+									),
 								),
 							),
 						),
@@ -896,17 +984,7 @@ class WP_Posts_Abilities_Gutenberg {
 
 					// Process meta_query.
 					if ( ! empty( $input['meta_query'] ) && is_array( $input['meta_query'] ) ) {
-						$meta_query = array();
-						foreach ( $input['meta_query'] as $mq ) {
-							if ( ! is_array( $mq ) || empty( $mq['key'] ) ) {
-								continue;
-							}
-							$meta_query[] = array(
-								'key'     => sanitize_key( (string) $mq['key'] ),
-								'value'   => $mq['value'] ?? '',
-								'compare' => isset( $mq['compare'] ) ? sanitize_text_field( (string) $mq['compare'] ) : '=',
-							);
-						}
+						$meta_query = self::process_meta_query_recursive( $input['meta_query'] );
 						if ( ! empty( $meta_query ) ) {
 							$args['meta_query'] = $meta_query;
 						}
