@@ -812,47 +812,59 @@ class WP_Posts_Abilities_Gutenberg {
 						),
 						'meta_query'          => array(
 							'type'        => 'object',
-							'description' => __( 'Meta query with support for nested queries and relations. Use "queries" array for clauses (each with key/value/compare/type) and optional nested groups with their own "queries" and "relation". Top-level "relation" defaults to AND.', 'gutenberg' ),
+							'description' => __( 'Meta query with nested queries and relations.', 'gutenberg' ),
 							'properties'  => array(
 								'relation' => array(
 									'type'        => 'string',
-									'description' => __( 'Logical relation between queries (AND/OR).', 'gutenberg' ),
+									'description' => __( 'Logical relation between queries.', 'gutenberg' ),
 									'enum'        => array( 'AND', 'OR' ),
 									'default'     => 'AND',
 								),
 								'queries'  => array(
 									'type'        => 'array',
-									'description' => __( 'Array of meta query clauses (key/value/compare/type) or nested query groups (queries/relation).', 'gutenberg' ),
+									'description' => __( 'Array of query clauses or nested groups.', 'gutenberg' ),
 									'items'       => array(
-										'type'       => 'object',
-										'properties' => array(
-											'key'      => array(
-												'type'        => 'string',
-												'description' => __( 'Meta key to query.', 'gutenberg' ),
+										'oneOf' => array(
+											array(
+												'type'                 => 'object',
+												'required'             => array( 'key' ),
+												'additionalProperties' => false,
+												'properties'           => array(
+													'key'     => array(
+														'type'        => 'string',
+														'description' => __( 'Meta key to query.', 'gutenberg' ),
+													),
+													'value'   => array(
+														'type'        => array( 'string', 'integer', 'array' ),
+														'description' => __( 'Meta value. Not required for EXISTS/NOT EXISTS.', 'gutenberg' ),
+													),
+													'compare' => array(
+														'type'        => 'string',
+														'description' => __( 'Comparison operator. Defaults to "=".', 'gutenberg' ),
+														'enum'        => array( '=', '!=', '>', '>=', '<', '<=', 'LIKE', 'NOT LIKE', 'IN', 'NOT IN', 'BETWEEN', 'NOT BETWEEN', 'EXISTS', 'NOT EXISTS', 'REGEXP', 'NOT REGEXP', 'RLIKE' ),
+													),
+													'type'    => array(
+														'type'        => 'string',
+														'description' => __( 'Value type for casting.', 'gutenberg' ),
+														'enum'        => array( 'NUMERIC', 'CHAR', 'DATE', 'DATETIME', 'TIME', 'BINARY', 'SIGNED', 'UNSIGNED', 'DECIMAL' ),
+													),
+												),
 											),
-											'value'    => array(
-												'type'        => array( 'string', 'integer', 'array' ),
-												'description' => __( 'Meta value to compare. Not required for EXISTS/NOT EXISTS comparisons.', 'gutenberg' ),
-											),
-											'compare'  => array(
-												'type'        => 'string',
-												'description' => __( 'Comparison operator.', 'gutenberg' ),
-												'enum'        => array( '=', '!=', '>', '>=', '<', '<=', 'LIKE', 'NOT LIKE', 'IN', 'NOT IN', 'BETWEEN', 'NOT BETWEEN', 'EXISTS', 'NOT EXISTS', 'REGEXP', 'NOT REGEXP', 'RLIKE' ),
-												'default'     => '=',
-											),
-											'type'     => array(
-												'type'        => 'string',
-												'description' => __( 'Value type for comparison casting.', 'gutenberg' ),
-												'enum'        => array( 'NUMERIC', 'CHAR', 'DATE', 'DATETIME', 'TIME', 'BINARY', 'SIGNED', 'UNSIGNED', 'DECIMAL' ),
-											),
-											'relation' => array(
-												'type'        => 'string',
-												'description' => __( 'Relation for nested query group.', 'gutenberg' ),
-												'enum'        => array( 'AND', 'OR' ),
-											),
-											'queries'  => array(
-												'type'        => 'array',
-												'description' => __( 'Nested query clauses for grouped conditions.', 'gutenberg' ),
+											array(
+												'type'                 => 'object',
+												'required'             => array( 'queries' ),
+												'additionalProperties' => false,
+												'properties'           => array(
+													'relation' => array(
+														'type'        => 'string',
+														'description' => __( 'Relation for nested group. Defaults to "AND".', 'gutenberg' ),
+														'enum'        => array( 'AND', 'OR' ),
+													),
+													'queries'  => array(
+														'type'        => 'array',
+														'description' => __( 'Nested query clauses.', 'gutenberg' ),
+													),
+												),
 											),
 										),
 									),
