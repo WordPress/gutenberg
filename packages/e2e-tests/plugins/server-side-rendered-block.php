@@ -96,27 +96,33 @@ add_action(
 				'category'        => 'widgets',
 				'description'     => 'A test block for auto-generated inspector controls',
 				'keywords'        => array( 'autoregister', 'controls', 'dataform' ),
+				// Labels are translatable via __() in real plugins.
 				'attributes'      => array(
 					'title'         => array(
 						'type'    => 'string',
 						'default' => 'My Emoji Collection',
+						'label'   => 'Title',
 					),
 					'count'         => array(
 						'type'    => 'integer',
 						'default' => 5,
+						'label'   => 'Count',
 					),
 					'spacing'       => array(
 						'type'    => 'number',
 						'default' => 0.1,
+						'label'   => 'Spacing',
 					),
 					'showEmojis'    => array(
 						'type'    => 'boolean',
 						'default' => true,
+						'label'   => 'Show Emojis',
 					),
 					'emoji'         => array(
 						'type'    => 'string',
 						'enum'    => array( '⭐', '❤️', '🎉', '🚀', '🌈' ),
 						'default' => '⭐',
+						'label'   => 'Emoji',
 					),
 					// Should NOT get a control (has source - HTML-derived)
 					'content'       => array(

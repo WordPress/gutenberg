@@ -47,7 +47,7 @@ function createFieldFromAttribute( name, def ) {
 
 	const field = {
 		id: name,
-		label: name,
+		label: def.label || name,
 		// Only 'string' needs mapping to 'text'; others are 1:1 with DataForm types
 		type: type === 'string' ? 'text' : type,
 	};

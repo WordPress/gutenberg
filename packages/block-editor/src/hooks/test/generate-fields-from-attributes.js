@@ -151,6 +151,19 @@ describe( 'generateFieldsFromAttributes', () => {
 		expect( result.form.fields ).toHaveLength( 0 );
 	} );
 
+	it( 'should use custom label when provided', () => {
+		const attributes = markForAutoInspectorControl( {
+			bgColor: {
+				type: 'string',
+				label: 'Background Color',
+			},
+		} );
+
+		const result = generateFieldsFromAttributes( attributes );
+
+		expect( result.fields[ 0 ].label ).toBe( 'Background Color' );
+	} );
+
 	it( 'should skip attributes without __experimentalAutoInspectorControl marker', () => {
 		const attributes = {
 			userDefined: {
