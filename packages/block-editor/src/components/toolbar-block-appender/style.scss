@@ -1,0 +1,35 @@
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/colors" as *;
+
+/**
+ * Toolbar inserter button
+ * Black square with rounded corners and white plus icon, matching the standard block inserter
+ */
+.block-editor-toolbar-block-appender {
+	align-items: center;
+
+	.wp-block-navigation__toolbar-inserter-button.components-button.has-icon {
+		// Match standard inserter toggle styles
+		background: $gray-900;
+		color: $white;
+		padding: 0;
+		min-width: auto;
+		width: $button-size-small;
+		height: $button-size-small;
+
+		// Hide the default focus ::before pseudo-element
+		&::before {
+			display: none;
+		}
+
+		&:hover {
+			color: $white;
+			background: var(--wp-admin-theme-color);
+		}
+
+		&:focus {
+			box-shadow: inset 0 0 0 2px var(--wp-admin-theme-color);
+			outline: none;
+		}
+	}
+}

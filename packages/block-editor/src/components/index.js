@@ -45,6 +45,7 @@ export {
 	ButtonBlockerAppender,
 	default as ButtonBlockAppender,
 } from './button-block-appender';
+export { default as ToolbarBlockAppender } from './toolbar-block-appender';
 export { default as ColorPalette } from './color-palette';
 export { default as ColorPaletteControl } from './color-palette/control';
 export { default as ContrastChecker } from './contrast-checker';

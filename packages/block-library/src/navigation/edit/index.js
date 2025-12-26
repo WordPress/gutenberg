@@ -27,6 +27,7 @@ import {
 	__experimentalUseMultipleOriginColorsAndGradients as useMultipleOriginColorsAndGradients,
 	useBlockEditingMode,
 	BlockControls,
+	ToolbarBlockAppender,
 } from '@wordpress/block-editor';
 import { EntityProvider, store as coreStore } from '@wordpress/core-data';
 
@@ -37,13 +38,9 @@ import {
 	ToggleControl,
 	Spinner,
 	Notice,
-	ToolbarButton,
-	ToolbarGroup,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
-import { page } from '@wordpress/icons';
-import { createBlock } from '@wordpress/blocks';
 import { useInstanceId } from '@wordpress/compose';
 
 /**
@@ -82,39 +79,12 @@ import { DEFAULT_BLOCK } from '../constants';
 /**
  * Component that renders the Add page button for the Navigation block.
  *
- * @param {Object} props          Component props.
- * @param {string} props.clientId Block client ID.
- * @return {JSX.Element|null} The Add page button component or null if not applicable.
+ * @return {JSX.Element} The Add page toolbar button component
  */
-function NavigationAddPageButton( { clientId } ) {
-	const { insertBlock } = useDispatch( blockEditorStore );
-	const { getBlockCount } = useSelect( blockEditorStore );
-
-	const onAddPage = useCallback( () => {
-		// Get the current number of blocks to insert at the end
-		const blockCount = getBlockCount( clientId );
-
-		// Create a new navigation link block (default block)
-		const newBlock = createBlock( DEFAULT_BLOCK.name, {
-			kind: DEFAULT_BLOCK.attributes.kind,
-			type: DEFAULT_BLOCK.attributes.type,
-		} );
-
-		// Insert the block at the end of the navigation
-		insertBlock( newBlock, blockCount, clientId );
-	}, [ clientId, insertBlock, getBlockCount ] );
-
+function NavigationAddPageToolbarButton() {
 	return (
 		<BlockControls>
-			<ToolbarGroup>
-				<ToolbarButton
-					name="add-page"
-					icon={ page }
-					onClick={ onAddPage }
-				>
-					{ __( 'Add page' ) }
-				</ToolbarButton>
-			</ToolbarGroup>
+			<ToolbarBlockAppender defaultBlock={ DEFAULT_BLOCK } />
 		</BlockControls>
 	);
 }
@@ -971,9 +941,7 @@ function Navigation( {
 					blockEditingMode={ blockEditingMode }
 				/>
 				{ blockEditingMode === 'default' && stylingInspectorControls }
-				{ blockEditingMode === 'contentOnly' && isEntityAvailable && (
-					<NavigationAddPageButton clientId={ clientId } />
-				) }
+				{ isEntityAvailable && <NavigationAddPageToolbarButton /> }
 				{ blockEditingMode === 'default' && isEntityAvailable && (
 					<InspectorControls group="advanced">
 						{ hasResolvedCanUserUpdateNavigationMenu &&
