@@ -54,7 +54,7 @@ To update an existing page:
 
 ### Create a new document
 
-To add a new document requires a working JavaScript development environment to build the documentation, see the [JavaScript build setup documentation](/docs/how-to-guides/javascript/js-build-setup.md):
+To add a new document requires a working JavaScript development environment to build the documentation, see the [JavaScript build setup documentation](https://developer.wordpress.org/block-editor/getting-started/devenv/get-started-with-wp-scripts/):
 
 1. Create a Markdown file in the [docs](https://github.com/WordPress/gutenberg/tree/HEAD/docs) folder, use lower-case, no spaces, if needed a dash separator, and `.md` extension.
 2. Add content using markdown notation. All documents require one and only `h1` tag.
@@ -104,7 +104,7 @@ Use the full directory and filename from the Gutenberg repository, not the publi
 An example, the link to this page is: `/docs/contributors/documentation/README.md`
 
 <div class="callout callout-warning">
-<b>Note:</b> The usual link transformation is not applied to links in callouts. See below. 
+<b>Note:</b> The usual link transformation is not applied to links in callouts. See below.
 </div>
 
 ### Code examples
@@ -161,12 +161,12 @@ This is a **warning** callout.
 </div>
 
 <div class="callout callout-warning">
-Note: In callout notices, links also need to be HTML `&lt;a href>&lt;/a>` notations. 
+Note: In callout notices, links also need to be HTML `&lt;a href>&lt;/a>` notations.
 The usual link transformation is not applied to links in callouts.
 For instance, to reach the Getting started > Create Block page, the URL in GitHub is
 https://developer.wordpress.org/docs/getting-started/devenv/get-started-with-create-block.md
-and will have to be hardcoded for the endpoint in the Block Editor Handbook as 
-<a href="https://developer.wordpress.org/block-editor/getting-started/create-block/">https://developer.wordpress.org/block-editor/getting-started/create-block/</a> to link correctly in the handbook. 
+and will have to be hardcoded for the endpoint in the Block Editor Handbook as
+<a href="https://developer.wordpress.org/block-editor/getting-started/create-block/">https://developer.wordpress.org/block-editor/getting-started/create-block/</a> to link correctly in the handbook.
 </div>
 ### Editor config
 
@@ -189,7 +189,7 @@ Depending on where you are viewing this document, the brackets may show as doubl
 
 Videos in the Block Editor Handbook need to be hosted on the [WordPress YouTube channel](https://www.youtube.com/@WordPress) as unlisted videos. This process requires additional permissions. Reach out in the #marketing Slack channel for assistance.
 
-Once the video has been uploaded to YouTube, retrieve the video embed link. It should look something like this: 
+Once the video has been uploaded to YouTube, retrieve the video embed link. It should look something like this:
 
 ```
 https://www.youtube.com/embed/nrut8SfXA44?si=YxvmHmAoYx-BDCog
