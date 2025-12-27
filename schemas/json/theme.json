@@ -897,9 +897,6 @@
 			"description": "Settings defined on a per-block basis.",
 			"type": "object",
 			"properties": {
-				"core/breadcrumbs": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
-				},
 				"core/accordion": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
@@ -922,6 +919,9 @@
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
 				"core/block": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/breadcrumbs": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
 				"core/button": {
@@ -1958,9 +1958,6 @@
 			"description": "Styles defined on a per-block basis using the block's selector.",
 			"type": "object",
 			"properties": {
-				"core/breadcrumbs": {
-					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
-				},
 				"core/accordion": {
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
@@ -1983,6 +1980,9 @@
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
 				"core/block": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/breadcrumbs": {
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
 				"core/button": {
@@ -2412,9 +2412,6 @@
 		"stylesVariationBlocksPropertiesComplete": {
 			"type": "object",
 			"properties": {
-				"core/breadcrumbs": {
-					"$ref": "#/definitions/stylesVariationBlockPropertiesComplete"
-				},
 				"core/accordion": {
 					"$ref": "#/definitions/stylesVariationBlockPropertiesComplete"
 				},
@@ -2437,6 +2434,9 @@
 					"$ref": "#/definitions/stylesVariationBlockPropertiesComplete"
 				},
 				"core/block": {
+					"$ref": "#/definitions/stylesVariationBlockPropertiesComplete"
+				},
+				"core/breadcrumbs": {
 					"$ref": "#/definitions/stylesVariationBlockPropertiesComplete"
 				},
 				"core/button": {
