@@ -7,32 +7,8 @@
 	$subtle-pale-blue: #e7f5fe;
 	$subtle-pale-pink: #fcf0ef;
 
-	// Allow scrolling overflow, with visual cue.
+	// Allow scrolling overflow.
 	overflow-x: auto;
-	animation: scroll-shadow linear;
-	animation-timeline: scroll(self inline);
-
-	--scroll-shadow-color: color-mix(in srgb, currentColor 15%, transparent);
-	--scroll-shadow-width: 6px;
-	--scroll-shadow-height: min(96px, 80%);
-
-	@keyframes scroll-shadow {
-		// Leftmost - only right shadow.
-		0% {
-			background: radial-gradient(farthest-side at right, var(--scroll-shadow-color), transparent) right center / var(--scroll-shadow-width) var(--scroll-shadow-height) no-repeat;
-		}
-		0.1%,
-		99.9% {
-			// Middle - both shadows.
-			background:
-				radial-gradient(farthest-side at left, var(--scroll-shadow-color), transparent) left center / var(--scroll-shadow-width) var(--scroll-shadow-height) no-repeat,
-				radial-gradient(farthest-side at right, var(--scroll-shadow-color), transparent) right center / var(--scroll-shadow-width) var(--scroll-shadow-height) no-repeat;
-		}
-		// Rightmost - only left shadow.
-		100% {
-			background: radial-gradient(farthest-side at left, var(--scroll-shadow-color), transparent) left center / var(--scroll-shadow-width) var(--scroll-shadow-height) no-repeat;
-		}
-	}
 
 	table {
 		border-collapse: collapse;
@@ -225,6 +201,62 @@
 		td {
 			border-width: inherit;
 			border-style: inherit;
+		}
+	}
+}
+
+// Progressive enhancement: show scroll cues when table overflows horizontally.
+@media ( prefers-reduced-motion: no-preference ) {
+	@supports ( animation-timeline: scroll() ) {
+		.wp-block-table {
+			--scroll-cue-color: color-mix(in srgb, currentColor 10%, transparent);
+			--scroll-cue-size: 1rem;
+
+			@keyframes scroll-cue {
+				0% {
+					opacity: 0;
+				}
+				15% {
+					opacity: 1;
+				}
+				100% {
+					opacity: 1;
+				}
+			}
+
+			position: relative;
+			overflow-y: clip;
+			scroll-timeline-name: --scroll-timeline;
+			scroll-timeline-axis: inline;
+
+			&::before,
+			&::after {
+				content: "";
+				position: sticky;
+				display: block;
+				width: var(--scroll-cue-size);
+				height: calc(infinity * 1px);
+				opacity: 0;
+				pointer-events: none;
+				animation-name: scroll-cue;
+				animation-timeline: --scroll-timeline;
+
+				// This buffer is necessary to prevent the border from being cropped by overflow-y: clip;.
+				padding: 1px 0;
+			}
+
+			&::before {
+				left: 0;
+				margin-block-end: calc(-infinity * 1px);
+				background: linear-gradient(90deg, var(--scroll-cue-color), transparent);
+			}
+
+			&::after {
+				animation-direction: reverse;
+				left: calc(100% - var(--scroll-cue-size));
+				margin-block-start: calc(-infinity * 1px);
+				background: linear-gradient(-90deg, var(--scroll-cue-color), transparent);
+			}
 		}
 	}
 }
