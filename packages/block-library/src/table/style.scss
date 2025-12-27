@@ -242,7 +242,8 @@
 				animation-timeline: --scroll-timeline;
 
 				// This buffer is necessary to prevent the border from being cropped by overflow-y: clip;.
-				padding: 1px 0;
+				// When set to half a pixel, it ensures the figure element is the same height as the table.
+				padding: 0.5px 0;
 			}
 
 			&::before {
