@@ -13,7 +13,8 @@
 }
 
 .edit-site-site-icon {
-	background: #333;
+	// Apply a background color here, so that the image itself can have a stroke.
+	background: $gray-900;
 }
 
 .edit-site-site-icon__image {
@@ -26,10 +27,7 @@
 		border-radius: 0;
 	}
 
-	// We make the background here transparent so the a stroke filter can be visible. It needs specificity.
-	background-color: transparent;
-
-	// Apply a white stroke to the image, so that for transparent black logos, they become visible on the dark background.
+	// Apply a stroke to the image to make transparent PNGs visible on dark backgrounds.
 	filter:
 		drop-shadow($border-width 0 0 $white)
 		drop-shadow((-$border-width) 0 0 $white)

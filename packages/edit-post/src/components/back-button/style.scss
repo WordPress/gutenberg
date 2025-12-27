@@ -34,7 +34,6 @@
 	.edit-post-fullscreen-mode-close__view-mode-toggle-icon {
 		svg,
 		img {
-			background: $gray-900;
 			display: block;
 		}
 	}
@@ -47,12 +46,23 @@
 	padding: $grid-unit-15;
 }
 
+.edit-post-fullscreen-mode-close-site-icon {
+	// Apply a background color here, so that the image itself can have a stroke.
+	background: $gray-900;
+}
+
 .edit-post-fullscreen-mode-close-site-icon__image {
 	width: 100%;
 	height: 100%;
 	object-fit: cover;
-	background: #333;
 	aspect-ratio: 1 / 1;
+
+	// Apply a stroke to the image to make transparent PNGs visible on dark backgrounds.
+	filter:
+		drop-shadow($border-width 0 0 $white)
+		drop-shadow((-$border-width) 0 0 $white)
+		drop-shadow(0 ($border-width) 0 $white)
+		drop-shadow(0 (-$border-width) 0 $white);
 }
 
 .edit-post-fullscreen-mode-close.components-button:focus {
