@@ -61,7 +61,7 @@ function useIcons( item ) {
 					  )
 					: null
 			);
-	}, [ api, item.children, item.isComponent ] );
+	}, [ api, item.children, item.type ] );
 }
 
 /**
