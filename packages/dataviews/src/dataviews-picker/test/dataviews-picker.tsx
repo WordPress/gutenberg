@@ -12,10 +12,10 @@ import { useMemo, useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import DataViewsPicker from '../dataviews-picker';
-import { LAYOUT_PICKER_GRID } from '../constants';
-import type { ActionButton, View, ViewPickerGrid } from '../types';
-import filterSortAndPaginate from '../utils/filter-sort-and-paginate';
+import DataViewsPicker from '../index';
+import { LAYOUT_PICKER_GRID } from '../../constants';
+import type { ActionButton, View, ViewPickerGrid } from '../../types';
+import filterSortAndPaginate from '../../utils/filter-sort-and-paginate';
 
 type Data = {
 	id: number;

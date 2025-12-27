@@ -40,6 +40,9 @@
 	"dependencies": {
 		"json2php": "^0.0.7"
 	},
+	"devDependencies": {
+		"mkdirp": "3.0.1"
+	},
 	"peerDependencies": {
 		"webpack": "^5.0.0"
 	},

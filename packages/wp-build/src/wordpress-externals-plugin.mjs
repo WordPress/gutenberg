@@ -213,7 +213,10 @@ export function createWordpressExternalsPlugin(
 							const shortName = parts[ 1 ];
 							const handle = `${ externalConfig.handlePrefix }-${ shortName }`;
 
-							const packageJson = getPackageInfo( packageName );
+							const packageJson = getPackageInfo(
+								packageName,
+								args.resolveDir
+							);
 
 							if ( ! packageJson ) {
 								return undefined;

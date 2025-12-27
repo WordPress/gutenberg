@@ -78,6 +78,9 @@
 		"@wordpress/widgets": "file:../widgets",
 		"clsx": "^2.1.1"
 	},
+	"devDependencies": {
+		"deep-freeze": "0.0.1"
+	},
 	"peerDependencies": {
 		"react": "^18.0.0",
 		"react-dom": "^18.0.0"

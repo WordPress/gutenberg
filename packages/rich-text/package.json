@@ -65,6 +65,9 @@
 		"colord": "2.9.3",
 		"memize": "^2.1.0"
 	},
+	"devDependencies": {
+		"deep-freeze": "0.0.1"
+	},
 	"peerDependencies": {
 		"react": "^18.0.0"
 	},

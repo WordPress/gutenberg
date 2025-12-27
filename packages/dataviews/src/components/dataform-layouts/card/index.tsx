@@ -7,7 +7,13 @@ import {
 	CardBody,
 	CardHeader as OriginalCardHeader,
 } from '@wordpress/components';
-import { useCallback, useContext, useMemo, useState } from '@wordpress/element';
+import {
+	useCallback,
+	useContext,
+	useEffect,
+	useMemo,
+	useState,
+} from '@wordpress/element';
 import { chevronDown, chevronUp } from '@wordpress/icons';
 
 /**
@@ -50,6 +56,12 @@ const NonCollapsibleCardHeader = ( {
 export function useCardHeader( layout: NormalizedCardLayout ) {
 	const { isOpened, isCollapsible } = layout;
 	const [ isOpen, setIsOpen ] = useState( isOpened );
+
+	// Sync internal state when the isOpened prop changes.
+	// This is unlikely to happen in production, but it helps with storybook controls.
+	useEffect( () => {
+		setIsOpen( isOpened );
+	}, [ isOpened ] );
 
 	const toggle = useCallback( () => {
 		setIsOpen( ( prev ) => ! prev );

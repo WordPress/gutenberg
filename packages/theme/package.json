@@ -58,6 +58,9 @@
 	},
 	"devDependencies": {
 		"@storybook/react": "9.1.17",
+		"@terrazzo/cli": "^0.10.2",
+		"@terrazzo/plugin-css": "^0.10.2",
+		"@terrazzo/token-tools": "^0.10.2",
 		"esbuild-esm-loader": "0.3.3"
 	},
 	"peerDependencies": {

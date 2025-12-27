@@ -81,6 +81,7 @@ test.describe( 'Registered sources', () => {
 					},
 				},
 			} );
+			await page.getByRole( 'tab', { name: 'Settings' } ).click();
 			await page.getByLabel( 'Attributes options' ).click();
 			await page
 				.getByRole( 'menuitemcheckbox', { name: 'Show id' } )
@@ -239,12 +240,12 @@ test.describe( 'Registered sources', () => {
 
 			// Alt textarea should have the custom field value.
 			const altValue = await page
-				.getByRole( 'tabpanel', { name: 'Settings' } )
-				.getByLabel( 'Alternative text' )
+				.getByRole( 'textbox', { name: 'Alternative text' } )
 				.inputValue();
 			expect( altValue ).toBe( 'Text Field Value' );
 
 			// Title input should have the original value.
+			await page.getByRole( 'tab', { name: 'Settings' } ).click();
 			const advancedButton = page
 				.getByRole( 'tabpanel', { name: 'Settings' } )
 				.getByRole( 'button', {
@@ -531,18 +532,15 @@ test.describe( 'Registered sources', () => {
 				).toBeHidden();
 
 				// Alt textarea is disabled and with the custom field value.
-				await expect(
-					page
-						.getByRole( 'tabpanel', { name: 'Settings' } )
-						.getByLabel( 'Alternative text' )
-				).toHaveAttribute( 'readonly' );
-				const altValue = await page
-					.getByRole( 'tabpanel', { name: 'Settings' } )
-					.getByLabel( 'Alternative text' )
-					.inputValue();
+				const altInput = page.getByRole( 'textbox', {
+					name: 'Alternative text',
+				} );
+				await expect( altInput ).toHaveAttribute( 'readonly' );
+				const altValue = await altInput.inputValue();
 				expect( altValue ).toBe( 'Text Field Value' );
 
 				// Title input is enabled and with the original value.
+				await page.getByRole( 'tab', { name: 'Settings' } ).click();
 				await page
 					.getByRole( 'tabpanel', { name: 'Settings' } )
 					.getByRole( 'button', { name: 'Advanced' } )
@@ -802,9 +800,9 @@ test.describe( 'Registered sources', () => {
 			await imageBlockImg.click( { force: true } );
 
 			// Edit the custom field value in the alt textarea.
-			const altInputArea = page
-				.getByRole( 'tabpanel', { name: 'Settings' } )
-				.getByLabel( 'Alternative text' );
+			const altInputArea = page.getByRole( 'textbox', {
+				name: 'Alternative text',
+			} );
 			await expect( altInputArea ).not.toHaveAttribute( 'readonly' );
 			await altInputArea.fill( 'new value' );
 
@@ -930,6 +928,7 @@ test.describe( 'Registered sources', () => {
 			await editor.insertBlock( {
 				name: 'core/image',
 			} );
+			await page.getByRole( 'tab', { name: 'Settings' } ).click();
 			await page
 				.getByRole( 'tabpanel', {
 					name: 'Settings',
@@ -1284,6 +1283,7 @@ test.describe( 'Registered sources', () => {
 			page,
 		} ) => {
 			await editor.insertBlock( { name: 'core/image' } );
+			await page.getByRole( 'tab', { name: 'Settings' } ).click();
 			await page.getByLabel( 'Attributes options' ).click();
 			await page
 				.getByRole( 'menuitemcheckbox', { name: 'Show id' } )
