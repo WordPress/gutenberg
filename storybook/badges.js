@@ -46,32 +46,3 @@ const badges = {
 };
 
 export default badges;
-
-/**
- * Tag badge configurations for storybook-addon-tag-badges.
- * Used by manager.js to configure the addon.
- */
-export const tagBadges = [
-	{
-		tags: 'status-private',
-		badge: {
-			text: badges.private.title,
-			tooltip: badges.private.tooltip,
-		},
-	},
-	{
-		tags: 'status-wip',
-		badge: {
-			text: badges.wip.title,
-			style: badges.wip.styles,
-			tooltip: badges.wip.tooltip,
-		},
-	},
-	{
-		tags: 'status-experimental',
-		badge: {
-			text: badges.experimental.title,
-			tooltip: badges.experimental.tooltip,
-		},
-	},
-];
