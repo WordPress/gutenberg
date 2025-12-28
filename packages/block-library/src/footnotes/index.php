@@ -22,14 +22,15 @@ function render_block_core_footnotes( $attributes, $content, $block ) {
 		return '';
 	}
 
+	// Bail if the post is password protected.
 	if ( post_password_required( $block->context['postId'] ) ) {
-		return;
+		return '';
 	}
 
 	$footnotes = get_post_meta( $block->context['postId'], 'footnotes', true );
 
 	if ( ! $footnotes ) {
-		return;
+		return '';
 	}
 
 	$footnotes = json_decode( $footnotes, true );
@@ -48,8 +49,8 @@ function render_block_core_footnotes( $attributes, $content, $block ) {
 		$aria_label     = sprintf( __( 'Jump to footnote reference %1$d' ), $footnote_index );
 		$block_content .= sprintf(
 			'<li id="%1$s">%2$s <a href="#%1$s-link" aria-label="%3$s">↩︎</a></li>',
-			$footnote['id'],
-			$footnote['content'],
+			esc_attr( $footnote['id'] ),
+			wp_kses_post( $footnote['content'] ),
 			$aria_label
 		);
 		++$footnote_index;
