@@ -30,19 +30,14 @@ type CommonNoticeActionProps = {
 type NoticeActionWithURL = CommonNoticeActionProps & {
 	url: string;
 	/**
-	 * If provided with `url`, sets the `target` attribute to the anchor.
+	 * Whether to open the URL in a new tab.
 	 */
-	target?: string;
-	/**
-	 * If provided with `url`, sets the `rel` attribute to the anchor.
-	 */
-	rel?: string;
+	openInNewTab?: boolean;
 	onClick?: MouseEventHandler< HTMLAnchorElement | HTMLButtonElement >;
 };
 type NoticeActionWithOnClick = CommonNoticeActionProps & {
 	url?: never;
-	target?: never;
-	rel?: never;
+	openInNewTab?: never;
 	onClick: MouseEventHandler< HTMLAnchorElement | HTMLButtonElement >;
 };
 

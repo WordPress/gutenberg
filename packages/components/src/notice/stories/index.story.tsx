@@ -163,7 +163,7 @@ WithDisabledAction.args = {
 };
 
 /**
- * Links can open in a new tab using `target="_blank"`.
+ * Links can open in a new tab using `openInNewTab`.
  */
 export const WithOpenInNewTab = Template.bind( {} );
 WithOpenInNewTab.args = {
@@ -173,8 +173,7 @@ WithOpenInNewTab.args = {
 		{
 			label: 'Learn more',
 			url: 'https://wordpress.org',
-			target: '_blank',
-			rel: 'noreferrer',
+			openInNewTab: true,
 		},
 	],
 };

@@ -15,6 +15,7 @@ import { close } from '@wordpress/icons';
  * Internal dependencies
  */
 import Button from '../button';
+import ExternalLink from '../external-link';
 import type { NoticeAction, NoticeProps } from './types';
 import type { DeprecatedButtonProps } from '../button/types';
 import { VisuallyHidden } from '../visually-hidden';
@@ -123,8 +124,7 @@ function Notice( {
 									noDefaultClasses = false,
 									onClick,
 									url,
-									target,
-									rel,
+									openInNewTab,
 									disabled,
 								}: NoticeAction &
 									// `isPrimary` is a legacy prop included for
@@ -149,13 +149,23 @@ function Notice( {
 									computedVariant = 'primary';
 								}
 
-								return (
+								return url && openInNewTab ? (
+									<ExternalLink
+										key={ index }
+										href={ url }
+										onClick={ onClick }
+										className={ clsx(
+											'components-notice__action',
+											buttonCustomClasses
+										) }
+									>
+										{ label }
+									</ExternalLink>
+								) : (
 									<Button
 										__next40pxDefaultSize
 										key={ index }
 										href={ url }
-										target={ target }
-										rel={ rel }
 										variant={ computedVariant }
 										onClick={ onClick }
 										disabled={ disabled }

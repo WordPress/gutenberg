@@ -145,15 +145,14 @@ describe( 'Notice', () => {
 			expect( button ).toHaveAttribute( 'aria-disabled', 'true' );
 		} );
 
-		it( 'should pass target and rel props to link actions', () => {
+		it( 'should open link in new tab when openInNewTab is true', () => {
 			render(
 				<Notice
 					actions={ [
 						{
 							label: 'External link',
 							url: 'https://example.com',
-							target: '_blank',
-							rel: 'noreferrer',
+							openInNewTab: true,
 						},
 					] }
 				>
@@ -161,9 +160,14 @@ describe( 'Notice', () => {
 				</Notice>
 			);
 
-			const link = screen.getByRole( 'link', { name: 'External link' } );
+			const link = screen.getByRole( 'link', {
+				name: /External link/,
+			} );
 			expect( link ).toHaveAttribute( 'target', '_blank' );
-			expect( link ).toHaveAttribute( 'rel', 'noreferrer' );
+			expect( link ).toHaveAttribute(
+				'rel',
+				'external noreferrer noopener'
+			);
 		} );
 
 		it( 'should call onClick when action with url is clicked', async () => {
