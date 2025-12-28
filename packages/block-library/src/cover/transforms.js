@@ -7,7 +7,12 @@ import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 /**
  * Internal dependencies
  */
-import { IMAGE_BACKGROUND_TYPE, VIDEO_BACKGROUND_TYPE } from './shared';
+import {
+	IMAGE_BACKGROUND_TYPE,
+	VIDEO_BACKGROUND_TYPE,
+	EMBED_VIDEO_BACKGROUND_TYPE,
+} from './shared';
+import { createUpgradedEmbedBlock } from '../embed/util';
 import { unlock } from '../lock-unlock';
 
 const { cleanEmptyObject } = unlock( blockEditorPrivateApis );
@@ -194,7 +199,7 @@ const transforms = {
 				customGradient,
 			} ) => {
 				if ( url ) {
-					// If a url exists the transform could happen if that URL represents a video background.
+					// If a url exists the transform could happen if that URL represents a video background (but not embedded videos).
 					return backgroundType === VIDEO_BACKGROUND_TYPE;
 				}
 				// If a url is not set the transform could happen if the cover has no background color or gradient;
@@ -213,6 +218,28 @@ const transforms = {
 					align,
 					anchor,
 				} ),
+		},
+		{
+			type: 'block',
+			blocks: [ 'core/embed' ],
+			isMatch: ( { backgroundType, url } ) => {
+				// Only match if we have an embedded video URL
+				if ( ! url || backgroundType !== EMBED_VIDEO_BACKGROUND_TYPE ) {
+					return false;
+				}
+				// Check if there's an embed block that can handle this URL
+				const embedBlock = createUpgradedEmbedBlock( {
+					attributes: { url },
+				} );
+				return !! embedBlock;
+			},
+			transform: ( { url } ) => {
+				// Create the appropriate embed block (YouTube, Vimeo, etc.)
+				const embedBlock = createUpgradedEmbedBlock( {
+					attributes: { url },
+				} );
+				return embedBlock || createBlock( 'core/embed', { url } );
+			},
 		},
 		{
 			type: 'block',
