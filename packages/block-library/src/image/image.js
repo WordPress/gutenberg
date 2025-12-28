@@ -53,6 +53,7 @@ import { unlock } from '../lock-unlock';
 import { createUpgradedEmbedBlock } from '../embed/util';
 import { isExternalImage } from './edit';
 import { Caption } from '../utils/caption';
+import { MediaControl } from '../utils/media-control';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 import {
 	MIN_SIZE,
@@ -549,6 +550,7 @@ export default function Image( {
 		isResizable &&
 		( SIZED_LAYOUTS.includes( parentLayoutType ) ? (
 			<DimensionsTool
+				panelId={ clientId }
 				value={ { aspectRatio } }
 				onChange={ ( { aspectRatio: newAspectRatio } ) => {
 					setAttributes( {
@@ -561,6 +563,7 @@ export default function Image( {
 			/>
 		) : (
 			<DimensionsTool
+				panelId={ clientId }
 				value={ { width, height, scale, aspectRatio } }
 				onChange={ ( {
 					width: newWidth,
@@ -589,29 +592,12 @@ export default function Image( {
 			/>
 		) );
 
-	const resetAll = () => {
+	const resetSettings = () => {
 		setAttributes( {
-			alt: undefined,
-			width: undefined,
-			height: undefined,
-			scale: undefined,
-			aspectRatio: undefined,
 			lightbox: undefined,
 		} );
 		updateImage( DEFAULT_MEDIA_SIZE_SLUG );
 	};
-
-	const sizeControls = (
-		<InspectorControls>
-			<ToolsPanel
-				label={ __( 'Settings' ) }
-				resetAll={ resetAll }
-				dropdownMenuProps={ dropdownMenuProps }
-			>
-				{ dimensionsControl }
-			</ToolsPanel>
-		</InspectorControls>
-	);
 
 	const arePatternOverridesEnabled =
 		metadata?.bindings?.__default?.source === 'core/pattern-overrides';
@@ -721,6 +707,7 @@ export default function Image( {
 					onError={ onUploadError }
 					name={ ! url ? __( 'Add image' ) : __( 'Replace' ) }
 					onReset={ () => onSelectImage( undefined ) }
+					variant="toolbar"
 				/>
 			</BlockControls>
 		);
@@ -787,12 +774,38 @@ export default function Image( {
 					/>
 				</BlockControls>
 			) }
-			<InspectorControls>
+			<InspectorControls group="content">
 				<ToolsPanel
-					label={ __( 'Settings' ) }
-					resetAll={ resetAll }
+					label={ __( 'Media' ) }
+					resetAll={ () => onSelectImage( undefined ) }
 					dropdownMenuProps={ dropdownMenuProps }
 				>
+					{ isSingleSelected && ! lockUrlControls && (
+						<ToolsPanelItem
+							label={ __( 'Image' ) }
+							hasValue={ () => !! url }
+							onDeselect={ () => onSelectImage( undefined ) }
+							isShownByDefault
+						>
+							<MediaControl
+								mediaId={ id }
+								mediaUrl={ url }
+								alt={ alt }
+								filename={
+									image?.media_details?.sizes?.full?.file ||
+									image?.slug ||
+									getFilename( url )
+								}
+								allowedTypes={ ALLOWED_MEDIA_TYPES }
+								onSelect={ onSelectImage }
+								onSelectURL={ onSelectURL }
+								onError={ onUploadError }
+								onReset={ () => onSelectImage( undefined ) }
+								isUploading={ !! temporaryURL }
+								emptyLabel={ __( 'Add image' ) }
+							/>
+						</ToolsPanelItem>
+					) }
 					{ isSingleSelected && (
 						<ToolsPanelItem
 							label={ __( 'Alternative text' ) }
@@ -834,17 +847,36 @@ export default function Image( {
 							/>
 						</ToolsPanelItem>
 					) }
-					{ dimensionsControl }
-					{ !! imageSizeOptions.length && (
+				</ToolsPanel>
+			</InspectorControls>
+			<InspectorControls
+				group="dimensions"
+				resetAllFilter={ ( attrs ) => ( {
+					...attrs,
+					aspectRatio: undefined,
+					width: undefined,
+					height: undefined,
+					scale: undefined,
+				} ) }
+			>
+				{ dimensionsControl }
+			</InspectorControls>
+			{ !! imageSizeOptions.length && (
+				<InspectorControls>
+					<ToolsPanel
+						label={ __( 'Settings' ) }
+						resetAll={ resetSettings }
+						dropdownMenuProps={ dropdownMenuProps }
+					>
 						<ResolutionTool
 							value={ sizeSlug }
 							defaultValue={ DEFAULT_MEDIA_SIZE_SLUG }
 							onChange={ updateImage }
 							options={ imageSizeOptions }
 						/>
-					) }
-				</ToolsPanel>
-			</InspectorControls>
+					</ToolsPanel>
+				</InspectorControls>
+			) }
 			<InspectorControls group="advanced">
 				<TextControl
 					__next40pxDefaultSize
@@ -1086,8 +1118,7 @@ export default function Image( {
 		return (
 			<>
 				{ mediaReplaceFlow }
-				{ /* Add all controls if the image attributes are connected. */ }
-				{ metadata?.bindings ? controls : sizeControls }
+				{ controls }
 			</>
 		);
 	}

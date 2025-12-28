@@ -29,9 +29,18 @@ export const LayoutCard = {
 			control: { type: 'boolean' },
 			description: 'Whether the card can be collapsed/expanded.',
 		},
+		isOpened: {
+			control: { type: 'boolean' },
+			description: 'Whether the card loads opened.',
+		},
+		withSummary: {
+			control: { type: 'boolean' },
+			description: 'Whether the card has a summary.',
+		},
 	},
 	args: {
 		withHeader: true,
+		withSummary: true,
 		isCollapsible: true,
 	},
 };
@@ -73,11 +82,11 @@ export const LayoutRow = {
 		alignment: {
 			control: { type: 'select' },
 			description: 'The alignment of the fields.',
-			options: [ 'start', 'center', 'end' ],
+			options: [ 'default', 'start', 'center', 'end' ],
 		},
 	},
 	args: {
-		alignment: 'center',
+		alignment: 'default',
 	},
 };
 

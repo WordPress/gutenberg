@@ -15,10 +15,14 @@ const { Badge } = unlock( privateApis );
 
 const LayoutCardComponent = ( {
 	withHeader,
+	withSummary,
 	isCollapsible,
+	isOpened,
 }: {
 	withHeader: boolean;
+	withSummary: boolean;
 	isCollapsible: boolean;
+	isOpened?: boolean;
 } ) => {
 	type Customer = {
 		name: string;
@@ -141,17 +145,45 @@ const LayoutCardComponent = ( {
 		dueDate: 'March 1st, 2028',
 	} );
 
+	const getCardLayoutFromStoryArgs = ( {
+		summary,
+		withSummary: displaySummary,
+		withHeader: header,
+		isCollapsible: collapsible,
+		isOpened: opened,
+	}: {
+		summary?: string | { id: string; visibility: 'always' }[];
+		withSummary?: boolean;
+		withHeader?: boolean;
+		isCollapsible?: boolean;
+		isOpened?: boolean;
+	} ) => {
+		return {
+			type: 'card' as const,
+			summary: displaySummary ? summary : undefined,
+			...( header === false
+				? { withHeader: false as const }
+				: {
+						withHeader: true as const,
+						isCollapsible: collapsible,
+						isOpened: opened,
+				  } ),
+		};
+	};
+
 	const form: Form = useMemo(
 		() => ( {
 			layout: { type: 'card' },
 			fields: [
 				{
 					id: 'customerCard',
-					layout: {
-						type: 'card',
+					layout: getCardLayoutFromStoryArgs( {
 						summary: 'plan-summary',
-						withHeader,
-					},
+						withHeader: withHeader ?? true,
+						withSummary,
+						isCollapsible,
+						isOpened,
+					} ),
 					label: 'Customer',
 					description:
 						'Enter your contact details, plan type, and addresses to complete your customer information.',
@@ -204,25 +236,25 @@ const LayoutCardComponent = ( {
 				},
 				{
 					id: 'payments',
-					layout: {
-						type: 'card',
+					layout: getCardLayoutFromStoryArgs( {
 						withHeader: false,
-					},
+					} ),
 				},
 				{
 					id: 'taxConfiguration',
 					label: 'Taxes',
-					layout: {
-						type: 'card',
-						isOpened: false,
+					layout: getCardLayoutFromStoryArgs( {
 						summary: [ { id: 'dueDate', visibility: 'always' } ],
+						withHeader,
+						withSummary,
 						isCollapsible,
-					},
+						isOpened: isOpened ?? false,
+					} ),
 					children: [ 'vat', 'commission' ],
 				},
 			],
 		} ),
-		[ withHeader, isCollapsible ]
+		[ withHeader, withSummary, isCollapsible, isOpened ]
 	);
 
 	return (

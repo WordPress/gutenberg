@@ -44,6 +44,9 @@
 		"mime": "^3.0.0",
 		"web-vitals": "^4.2.1"
 	},
+	"devDependencies": {
+		"@types/mime": "2.0.3"
+	},
 	"peerDependencies": {
 		"@playwright/test": ">=1"
 	},

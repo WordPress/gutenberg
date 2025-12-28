@@ -47,6 +47,9 @@
 		"@wordpress/a11y": "file:../a11y",
 		"@wordpress/data": "file:../data"
 	},
+	"devDependencies": {
+		"deep-freeze": "0.0.1"
+	},
 	"peerDependencies": {
 		"react": "^18.0.0"
 	},

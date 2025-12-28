@@ -12,7 +12,7 @@ import type { Field, Form } from '../../types';
 const LayoutRowComponent = ( {
 	alignment,
 }: {
-	alignment: 'start' | 'center' | 'end';
+	alignment: 'default' | 'start' | 'center' | 'end';
 } ) => {
 	type Customer = {
 		name: string;
@@ -190,25 +190,44 @@ const LayoutRowComponent = ( {
 		total: 600,
 	} );
 
+	const getRowLayoutFromStoryArgs = ( {
+		alignment: align = 'default',
+		styles,
+	}: {
+		alignment?: 'default' | 'start' | 'center' | 'end';
+		styles?: Record< string, React.CSSProperties >;
+	} ) => {
+		return {
+			type: 'row' as const,
+			alignment: align !== 'default' ? align : undefined,
+			styles,
+		};
+	};
+
 	const form: Form = useMemo(
 		() => ( {
 			fields: [
 				{
 					id: 'customer',
 					label: 'Customer',
-					layout: {
-						type: 'row',
-						alignment,
-					},
+					layout: getRowLayoutFromStoryArgs( { alignment } ),
 					children: [ 'name', 'phone', 'email' ],
+				},
+				{
+					id: 'payments-and-tax',
+					label: 'Payments & Taxes',
+					layout: getRowLayoutFromStoryArgs( {
+						alignment: alignment === 'default' ? 'end' : alignment,
+					} ),
+					children: [ 'vat', 'commission', 'hasDiscount' ],
 				},
 				{
 					id: 'addressRow',
 					label: 'Billing & Shipping Addresses',
-					layout: {
-						type: 'row',
-						alignment,
-					},
+					layout: getRowLayoutFromStoryArgs( {
+						alignment:
+							alignment === 'default' ? 'start' : alignment,
+					} ),
 					children: [
 						{
 							id: 'billingAddress',
@@ -229,22 +248,14 @@ const LayoutRowComponent = ( {
 						},
 					],
 				},
-				{
-					id: 'payments-and-tax',
-					label: 'Payments & Taxes',
-					layout: {
-						type: 'row',
-						alignment,
-					},
-					children: [ 'vat', 'commission', 'hasDiscount' ],
-				},
+
 				{
 					id: 'planRow',
 					label: 'Subscription',
-					layout: {
-						type: 'row',
-						alignment,
-					},
+					layout: getRowLayoutFromStoryArgs( {
+						alignment:
+							alignment === 'default' ? 'start' : alignment,
+					} ),
 					children: [ 'plan', 'renewal' ],
 				},
 			],
@@ -254,10 +265,7 @@ const LayoutRowComponent = ( {
 
 	const topLevelLayout: Form = useMemo(
 		() => ( {
-			layout: {
-				type: 'row',
-				alignment,
-			},
+			layout: getRowLayoutFromStoryArgs( { alignment } ),
 			fields: [ 'name', 'phone', 'email' ],
 		} ),
 		[ alignment ]
@@ -291,6 +299,10 @@ const LayoutRowComponent = ( {
 				}
 			/>
 			<h2>Field widths</h2>
+			<p>
+				The space given for each field is calculated automatically, but
+				the layout row can also set specific widths for each field.
+			</p>
 			<DataForm
 				data={ customer }
 				fields={ customerFields }
@@ -299,15 +311,15 @@ const LayoutRowComponent = ( {
 						{
 							id: 'product',
 							label: 'Product',
-							layout: {
-								type: 'row',
-								alignment: 'end',
+							layout: getRowLayoutFromStoryArgs( {
+								alignment:
+									alignment === 'default' ? 'end' : alignment,
 								styles: {
 									total: { flex: 1 },
 									cost: { flex: 3 },
 									quantity: { flex: 3 },
 								},
-							},
+							} ),
 							children: [ 'total', 'cost', 'quantity' ],
 						},
 					],

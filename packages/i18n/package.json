@@ -53,6 +53,9 @@
 		"memize": "^2.1.0",
 		"tannin": "^1.2.0"
 	},
+	"devDependencies": {
+		"benchmark": "2.1.4"
+	},
 	"publishConfig": {
 		"access": "public"
 	}

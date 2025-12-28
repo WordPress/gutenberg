@@ -32,61 +32,7 @@ const TOOLBAR_VARIANT_BOX_SHADOW = `0 0 0 ${ CONFIG.borderWidth } ${ TOOLBAR_VAR
 
 const GRID_TEMPLATE_COLS = 'minmax( 0, max-content ) 1fr';
 
-export const PopoverOuterWrapper = styled.div<
-	Pick< ContextProps, 'variant' >
->`
-	position: relative;
-
-	background-color: ${ COLORS.ui.background };
-	border-radius: ${ CONFIG.radiusMedium };
-	${ ( props ) => css`
-		box-shadow: ${ props.variant === 'toolbar'
-			? TOOLBAR_VARIANT_BOX_SHADOW
-			: DEFAULT_BOX_SHADOW };
-	` }
-
-	overflow: hidden;
-
-	/* Open/close animation */
-	@media not ( prefers-reduced-motion ) {
-		transition-property: transform, opacity;
-		transition-duration: ${ DROPDOWN_MOTION_CSS.SLIDE_DURATION },
-			${ DROPDOWN_MOTION_CSS.FADE_DURATION };
-		transition-timing-function: ${ DROPDOWN_MOTION_CSS.SLIDE_EASING },
-			${ DROPDOWN_MOTION_CSS.FADE_EASING };
-		will-change: transform, opacity;
-
-		/* Regardless of the side, fade in and out. */
-		opacity: 0;
-		&:has( [data-enter] ) {
-			opacity: 1;
-		}
-
-		/* Slide in the direction the menu is opening. */
-		&:has( [data-side='bottom'] ) {
-			transform: translateY( -${ DROPDOWN_MOTION_CSS.SLIDE_DISTANCE } );
-		}
-		&:has( [data-side='top'] ) {
-			transform: translateY( ${ DROPDOWN_MOTION_CSS.SLIDE_DISTANCE } );
-		}
-		&:has( [data-side='left'] ) {
-			transform: translateX( ${ DROPDOWN_MOTION_CSS.SLIDE_DISTANCE } );
-		}
-		&:has( [data-side='right'] ) {
-			transform: translateX( -${ DROPDOWN_MOTION_CSS.SLIDE_DISTANCE } );
-		}
-		&:has( [data-enter][data-side='bottom'] ),
-		&:has( [data-enter][data-side='top'] ) {
-			transform: translateY( 0 );
-		}
-		&:has( [data-enter][data-side='left'] ),
-		&:has( [data-enter][data-side='right'] ) {
-			transform: translateX( 0 );
-		}
-	}
-`;
-
-export const PopoverInnerWrapper = styled.div`
+export const Menu = styled( Ariakit.Menu )< Pick< ContextProps, 'variant' > >`
 	position: relative;
 	/* Same as popover component */
 	/* TODO: is there a way to read the sass variable? */
@@ -106,8 +52,54 @@ export const PopoverInnerWrapper = styled.div`
 	overscroll-behavior: contain;
 	overflow: auto;
 
+	background-color: ${ COLORS.ui.background };
+	border-radius: ${ CONFIG.radiusMedium };
+	${ ( props ) => css`
+		box-shadow: ${ props.variant === 'toolbar'
+			? TOOLBAR_VARIANT_BOX_SHADOW
+			: DEFAULT_BOX_SHADOW };
+	` }
+
 	/* Only visible in Windows High Contrast mode */
 	outline: 2px solid transparent !important;
+
+	/* Open/close animation */
+	@media not ( prefers-reduced-motion ) {
+		transition-property: transform, opacity;
+		transition-duration: ${ DROPDOWN_MOTION_CSS.SLIDE_DURATION },
+			${ DROPDOWN_MOTION_CSS.FADE_DURATION };
+		transition-timing-function: ${ DROPDOWN_MOTION_CSS.SLIDE_EASING },
+			${ DROPDOWN_MOTION_CSS.FADE_EASING };
+		will-change: transform, opacity;
+
+		/* Regardless of the side, fade in and out. */
+		opacity: 0;
+		&[data-enter] {
+			opacity: 1;
+		}
+
+		/* Slide in the direction the menu is opening. */
+		&[data-side='bottom'] {
+			transform: translateY( -${ DROPDOWN_MOTION_CSS.SLIDE_DISTANCE } );
+		}
+		&[data-side='top'] {
+			transform: translateY( ${ DROPDOWN_MOTION_CSS.SLIDE_DISTANCE } );
+		}
+		&[data-side='left'] {
+			transform: translateX( ${ DROPDOWN_MOTION_CSS.SLIDE_DISTANCE } );
+		}
+		&[data-side='right'] {
+			transform: translateX( -${ DROPDOWN_MOTION_CSS.SLIDE_DISTANCE } );
+		}
+		&[data-enter][data-side='bottom'],
+		&[data-enter][data-side='top'] {
+			transform: translateY( 0 );
+		}
+		&[data-enter][data-side='left'],
+		&[data-enter][data-side='right'] {
+			transform: translateX( 0 );
+		}
+	}
 `;
 
 const baseItem = css`
@@ -181,7 +173,7 @@ const baseItem = css`
 	}
 
 	/* When the item is the trigger of an open submenu */
-	${ PopoverInnerWrapper }:not(:focus) &:not(:focus)[aria-expanded="true"] {
+	${ Menu }:not(:focus) &:not(:focus)[aria-expanded="true"] {
 		background-color: ${ LIGHT_BACKGROUND_COLOR };
 		color: ${ COLORS.theme.foreground };
 	}
@@ -279,9 +271,9 @@ export const ItemSuffixWrapper = styled.span`
 	 * When the parent menu item is active, except when it's a non-focused/hovered
 	 * submenu trigger (in that case, color should not be inherited)
 	 */
-	[data-active-item]:not( [data-focus-visible] ) *:not(${ PopoverInnerWrapper }) &,
+	[data-active-item]:not( [data-focus-visible] ) *:not(${ Menu }) &,
 	/* When the parent menu item is disabled */
-	[aria-disabled='true'] *:not(${ PopoverInnerWrapper }) & {
+	[aria-disabled='true'] *:not(${ Menu }) & {
 		color: inherit;
 	}
 `;
@@ -344,10 +336,8 @@ export const ItemHelpText = styled( Truncate )`
 	color: ${ LIGHTER_TEXT_COLOR };
 	overflow-wrap: anywhere;
 
-	[data-active-item]:not( [data-focus-visible] )
-		*:not( ${ PopoverInnerWrapper } )
-		&,
-	[aria-disabled='true'] *:not( ${ PopoverInnerWrapper } ) & {
+	[data-active-item]:not( [data-focus-visible] ) *:not( ${ Menu } ) &,
+	[aria-disabled='true'] *:not( ${ Menu } ) & {
 		color: inherit;
 	}
 `;

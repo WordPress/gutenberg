@@ -76,7 +76,7 @@ function ColumnPrimary< Item >( {
 					>
 						{ level !== undefined && level > 0 && (
 							<span className="dataviews-view-table__level">
-								{ '—'.repeat( level ) }&nbsp;
+								{ Array( level ).fill( '—' ).join( ' ' ) }&nbsp;
 							</span>
 						) }
 						<titleField.render item={ item } field={ titleField } />

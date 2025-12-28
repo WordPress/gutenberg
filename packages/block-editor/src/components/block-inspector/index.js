@@ -7,7 +7,7 @@ import {
 	getUnregisteredTypeHandlerName,
 	store as blocksStore,
 } from '@wordpress/blocks';
-import { PanelBody, __unstableMotion as motion } from '@wordpress/components';
+import { __unstableMotion as motion } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 
 /**
@@ -30,14 +30,6 @@ import useBlockInspectorAnimationSettings from './useBlockInspectorAnimationSett
 import { useBorderPanelLabel } from '../../hooks/border';
 import ContentTab from '../inspector-controls-tabs/content-tab';
 import { unlock } from '../../lock-unlock';
-
-function BlockStylesPanel( { clientId } ) {
-	return (
-		<PanelBody title={ __( 'Styles' ) }>
-			<BlockStyles clientId={ clientId } />
-		</PanelBody>
-	);
-}
 
 function StyleInspectorSlots( {
 	blockName,
@@ -379,7 +371,7 @@ const BlockInspectorSingleBlock = ( {
 			{ ! shouldShowTabs && (
 				<>
 					{ hasBlockStyles && (
-						<BlockStylesPanel clientId={ renderedBlockClientId } />
+						<BlockStyles clientId={ renderedBlockClientId } />
 					) }
 					<ContentTab
 						rootClientId={ renderedBlockClientId }
