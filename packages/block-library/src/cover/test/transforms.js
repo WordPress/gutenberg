@@ -329,7 +329,7 @@ describe( 'transforms', () => {
 		} );
 
 		it( 'should transform Cover block with Vimeo URL to Vimeo Embed block', () => {
-			const vimeoUrl = 'https://vimeo.com/123456789';
+			const vimeoUrl = 'https://vimeo.com/1119913385';
 			const block = createBlock( 'core/cover', {
 				url: vimeoUrl,
 				backgroundType: EMBED_VIDEO_BACKGROUND_TYPE,
