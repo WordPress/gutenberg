@@ -144,13 +144,15 @@ A deprecated alternative to `onRemove`. This prop is kept for compatibility reas
 An array of notice actions. Each member object should contain:
 
 - `label`: `string` containing the text of the button/link
-- `url`: `string` OR `onClick`: `( event: SyntheticEvent ) => void` to specify what the action does.
-- `openInNewTab`: `boolean` (optional) When set to `true`, opens the URL in a new browser tab.
+- `url`: `string` (optional) The href URL for the action button. If provided, the action will render as an anchor tag.
+- `onClick`: `( event: SyntheticEvent ) => void` (optional) Function to call when clicked.
+- `openInNewTab`: `boolean` (optional) When set to `true`, opens the URL in a new browser tab. Only applies when `url` is provided.
+- `disabled`: `boolean` (optional) Whether the action button is disabled.
 - `className`: `string` (optional) to add custom classes to the button styles.
 - `noDefaultClasses`: `boolean` (optional) A value of `true` will remove all default styling.
 - `variant`: `'primary' | 'secondary' | 'link'` (optional) You can denote a primary button action for a notice by passing a value of `primary`.
 
-The default appearance of an action button is inferred based on whether `url` or `onClick` are provided, rendering the button as a link if appropriate. If both props are provided, `url` takes precedence, and the action button will render as an anchor tag.
+The default appearance of an action button is inferred based on whether `url` is provided, rendering the button as a link. When `openInNewTab` is `true`, the action uses the `ExternalLink` component which opens the link in a new tab and includes an external link icon.
 
 ## Related components
 
