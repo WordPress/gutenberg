@@ -3,6 +3,7 @@
  */
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __, isRTL, sprintf } from '@wordpress/i18n';
+import { speak } from '@wordpress/a11y';
 import {
 	blockDefault,
 	code,
@@ -183,31 +184,34 @@ const getEditorCommandLoader = () =>
 
 		commands.push( {
 			name: 'core/show-outline',
-			label:
-				currentListViewTab === 'outline' && isListViewOpen
-					? __( 'Hide document outline' )
-					: __( 'Show document outline' ),
+			label: __( 'Show or hide document outline' ),
 			icon: listView,
 			callback: ( { close } ) => {
 				// If list view is closed, open it with outline tab
 				if ( ! isListViewOpen ) {
 					setIsListViewOpened( true );
 					setListViewTab( 'outline' );
-					createInfoNotice( __( 'Document outline opened.' ), {
+					const message = __( 'Document outline opened.' );
+					speak( message, 'assertive' );
+					createInfoNotice( message, {
 						id: 'core/editor/show-outline/notice',
 						type: 'snackbar',
 					} );
 				} else if ( currentListViewTab !== 'outline' ) {
 					// Currently on list-view tab, so switch to outline tab
 					setListViewTab( 'outline' );
-					createInfoNotice( __( 'Document outline opened.' ), {
+					const message = __( 'Document outline opened.' );
+					speak( message, 'assertive' );
+					createInfoNotice( message, {
 						id: 'core/editor/show-outline/notice',
 						type: 'snackbar',
 					} );
 				} else {
 					// Currently on outline tab, so close the list view
 					setIsListViewOpened( false );
-					createInfoNotice( __( 'Document outline closed.' ), {
+					const message = __( 'Document outline closed.' );
+					speak( message, 'assertive' );
+					createInfoNotice( message, {
 						id: 'core/editor/show-outline/notice',
 						type: 'snackbar',
 					} );
