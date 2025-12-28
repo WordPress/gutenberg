@@ -101,7 +101,6 @@ function FullscreenModeClose( { showTooltip, icon, href, initialPost } ) {
 			<img
 				className="edit-post-fullscreen-mode-close-site-icon__image"
 				alt={ __( 'Site Icon' ) }
-				className="edit-post-fullscreen-mode-close_site-icon"
 				src={ siteIconUrl }
 			/>
 		);
