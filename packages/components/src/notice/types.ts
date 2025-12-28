@@ -24,6 +24,10 @@ type CommonNoticeActionProps = {
 	 * Whether the action button is disabled.
 	 */
 	disabled?: boolean;
+	/**
+	 * The onClick handler for the action button.
+	 */
+	onClick?: MouseEventHandler< HTMLAnchorElement | HTMLButtonElement >;
 };
 // `url` and `onClick` can both be provided. If `url` is provided, the action's
 // button will be rendered as an anchor and `onClick` will still be called.
@@ -33,15 +37,14 @@ type NoticeActionWithURL = CommonNoticeActionProps & {
 	 * Whether to open the URL in a new tab.
 	 */
 	openInNewTab?: boolean;
-	onClick?: MouseEventHandler< HTMLAnchorElement | HTMLButtonElement >;
-};
-type NoticeActionWithOnClick = CommonNoticeActionProps & {
-	url?: never;
-	openInNewTab?: never;
-	onClick: MouseEventHandler< HTMLAnchorElement | HTMLButtonElement >;
 };
 
-export type NoticeAction = NoticeActionWithURL | NoticeActionWithOnClick;
+type NoticeActionWithoutUrl = CommonNoticeActionProps & {
+	url?: never;
+	openInNewTab?: never;
+};
+
+export type NoticeAction = NoticeActionWithURL | NoticeActionWithoutUrl;
 
 export type NoticeChildren = string | JSX.Element;
 
