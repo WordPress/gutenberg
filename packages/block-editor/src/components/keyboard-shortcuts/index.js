@@ -150,6 +150,7 @@ function KeyboardShortcutsRegister() {
 			description: __( 'Select text across multiple blocks.' ),
 			keyCombination: {
 				modifier: 'shift',
+				// Spotted during my own research — invalid character?
 				character: 'arrow',
 			},
 		} );
