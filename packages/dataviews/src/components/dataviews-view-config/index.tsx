@@ -30,7 +30,7 @@ import { Stack } from '@wordpress/ui';
  * Internal dependencies
  */
 import { SORTING_DIRECTIONS, sortIcons, sortLabels } from '../../constants';
-import { VIEW_LAYOUTS } from '../../dataviews-layouts';
+import { VIEW_LAYOUTS } from '../dataviews-layouts';
 import type { View } from '../../types';
 import DataViewsContext from '../dataviews-context';
 import InfiniteScrollToggle from './infinite-scroll-toggle';

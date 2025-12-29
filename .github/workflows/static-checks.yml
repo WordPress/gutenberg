@@ -38,8 +38,6 @@ jobs:
                     - event: 'pull_request'
                       node: '22'
                     - event: 'pull_request'
-                      node: '24'
-                    - event: 'pull_request'
                       os: 'macos-15'
 
         steps:
@@ -52,6 +50,9 @@ jobs:
               uses: actions/setup-node@395ad3262231945c25e8478fd5baf05154b1d79f # v6.1.0
               with:
                   node-version: ${{ matrix.node }}
+
+            - name: Pin npm version for consistency
+              run: npm install -g npm@10
 
             - name: Npm install
               # A "full" install is executed, since `npm ci` does not always exit

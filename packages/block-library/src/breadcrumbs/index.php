@@ -159,6 +159,26 @@ function render_block_core_breadcrumbs( $attributes, $content, $block ) {
 		array_pop( $breadcrumb_items );
 	}
 
+	/**
+	 * Filters the breadcrumb items array before rendering.
+	 *
+	 * Allows developers to modify, add, or remove breadcrumb items.
+	 *
+	 * @since 7.0.0
+	 *
+	 * @param array[] $breadcrumb_items {
+	 *     Array of breadcrumb item data.
+	 *
+	 *     @type string $label      The breadcrumb text.
+	 *     @type string $url        Optional. The breadcrumb link URL.
+	 *     @type bool   $allow_html Optional. Whether to allow HTML in the label.
+	 *                              When true, the label will be sanitized with wp_kses_post(),
+	 *                              allowing only safe HTML tags. When false or omitted, all HTML
+	 *                              will be escaped with esc_html(). Default false.
+	 * }
+	 */
+	$breadcrumb_items = apply_filters( 'block_core_breadcrumbs_items', $breadcrumb_items );
+
 	if ( empty( $breadcrumb_items ) ) {
 		return '';
 	}

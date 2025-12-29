@@ -163,4 +163,5 @@ export interface Route {
 export interface State {
 	menuItems: Record< string, MenuItem >;
 	routes: Route[];
+	dashboardLink?: string;
 }
