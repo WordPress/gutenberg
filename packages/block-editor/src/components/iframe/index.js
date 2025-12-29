@@ -75,6 +75,51 @@ function fetchCssFile( href ) {
 	return fetchPromise;
 }
 
+/**
+ * Process style elements (link/style tags) and return their CSS content.
+ * Fetches external stylesheets and extracts inline styles.
+ *
+ * @param {Array<Element>} elements - Array of link or style elements
+ * @param {Object}         options  - Additional metadata to include in results
+ * @return {Promise<Array>} Promise resolving to array of style objects
+ */
+function processStyleElements( elements, options = {} ) {
+	const cssPromises = Array.from( elements ).map( ( element ) => {
+		// Handle inline <style> tags
+		if ( element.tagName === 'STYLE' ) {
+			return Promise.resolve( {
+				type: 'inline',
+				id: element.id || element.getAttribute( 'id' ),
+				css: element.textContent,
+				...options,
+			} );
+		}
+
+		// Handle <link rel="stylesheet"> tags
+		if ( element.tagName === 'LINK' ) {
+			const href = element.getAttribute( 'href' );
+			if ( ! href ) {
+				return Promise.resolve( null );
+			}
+
+			return fetchCssFile( href ).then( ( css ) => ( {
+				type: 'external',
+				id: element.id || element.getAttribute( 'id' ),
+				href,
+				css,
+				media: element.getAttribute( 'media' ) || 'all',
+				...options,
+			} ) );
+		}
+
+		return Promise.resolve( null );
+	} );
+
+	return Promise.all( cssPromises ).then( ( styles ) =>
+		styles.filter( Boolean )
+	);
+}
+
 // Fetch compatibility styles once and convert to inline CSS
 async function fetchCompatibilityStyles() {
 	if ( compatStylesCache ) {
@@ -86,32 +131,14 @@ async function fetchCompatibilityStyles() {
 	}
 
 	const compatStyles = getCompatibilityStyles();
-	const cssPromises = compatStyles.map( ( element ) => {
-		// If it's already an inline style, just return the CSS
-		if ( element.tagName === 'STYLE' ) {
-			return Promise.resolve( {
-				id: element.id,
-				css: element.textContent,
-			} );
+
+	compatStylesFetchPromise = processStyleElements( compatStyles ).then(
+		( styles ) => {
+			compatStylesCache = styles;
+			compatStylesFetchPromise = null;
+			return compatStylesCache;
 		}
-
-		// If it's a link, fetch the CSS using shared cache
-		if ( element.tagName === 'LINK' ) {
-			const href = element.getAttribute( 'href' );
-			return fetchCssFile( href ).then( ( css ) => ( {
-				id: element.id,
-				css,
-			} ) );
-		}
-
-		return Promise.resolve( null );
-	} );
-
-	compatStylesFetchPromise = Promise.all( cssPromises ).then( ( styles ) => {
-		compatStylesCache = styles.filter( Boolean );
-		compatStylesFetchPromise = null;
-		return compatStylesCache;
-	} );
+	);
 
 	return compatStylesFetchPromise;
 }
@@ -235,49 +262,22 @@ function Iframe( {
 			return;
 		}
 
-		// Start fetching
+		// Parse HTML string into DOM elements
 		const tempDiv = document.createElement( 'div' );
 		tempDiv.innerHTML = styles;
-		const linkElements = tempDiv.querySelectorAll(
-			'link[rel="stylesheet"]'
-		);
-		const inlineStyles = tempDiv.querySelectorAll( 'style' );
+		const styleElements = [
+			...tempDiv.querySelectorAll( 'link[rel="stylesheet"]' ),
+			...tempDiv.querySelectorAll( 'style' ),
+		];
 
-		const cssPromises = [];
-
-		// Fetch external stylesheets using shared cache
-		linkElements.forEach( ( link ) => {
-			const href = link.getAttribute( 'href' );
-			if ( href ) {
-				cssPromises.push(
-					fetchCssFile( href ).then( ( css ) => ( {
-						type: 'external',
-						href,
-						css,
-						media: link.getAttribute( 'media' ) || 'all',
-						id: link.getAttribute( 'id' ),
-					} ) )
-				);
+		// Process all style elements using shared utility
+		stylesFetchPromise = processStyleElements( styleElements ).then(
+			( cssData ) => {
+				sharedStylesCache.set( cacheKey, cssData );
+				stylesFetchPromise = null;
+				return cssData;
 			}
-		} );
-
-		// Collect inline styles
-		inlineStyles.forEach( ( style ) => {
-			cssPromises.push(
-				Promise.resolve( {
-					type: 'inline',
-					css: style.textContent,
-					id: style.getAttribute( 'id' ),
-				} )
-			);
-		} );
-
-		// Store the promise so other instances can wait
-		stylesFetchPromise = Promise.all( cssPromises ).then( ( cssData ) => {
-			sharedStylesCache.set( cacheKey, cssData );
-			stylesFetchPromise = null;
-			return cssData;
-		} );
+		);
 
 		stylesFetchPromise.then( ( cssData ) => {
 			setCachedStyles( cssData );
