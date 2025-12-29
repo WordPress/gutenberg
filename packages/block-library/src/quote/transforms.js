@@ -141,15 +141,20 @@ const transforms = {
 		{
 			type: 'block',
 			blocks: [ 'core/paragraph' ],
-			transform: ( { citation }, innerBlocks ) =>
-				RichText.isEmpty( citation )
-					? innerBlocks
-					: [
-							...innerBlocks,
-							createBlock( 'core/paragraph', {
-								content: citation,
-							} ),
-					  ],
+			transform: ( { citation }, innerBlocks ) => {
+				if ( RichText.isEmpty( citation ) ) {
+					return innerBlocks.length > 0
+						? innerBlocks
+						: createBlock( 'core/paragraph' );
+				}
+
+				return [
+					...innerBlocks,
+					createBlock( 'core/paragraph', {
+						content: citation,
+					} ),
+				];
+			},
 		},
 		{
 			type: 'block',
