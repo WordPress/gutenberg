@@ -20,8 +20,10 @@ export default function Password< Item >( {
 	onChange,
 	hideLabelFromVision,
 	validity,
+	config,
 }: DataFormControlProps< Item > ) {
 	const [ isVisible, setIsVisible ] = useState( false );
+	const { disabled = false } = config || {};
 
 	const toggleVisibility = useCallback( () => {
 		setIsVisible( ( prev ) => ! prev );
@@ -35,6 +37,7 @@ export default function Password< Item >( {
 				onChange,
 				hideLabelFromVision,
 				validity,
+				disabled,
 				type: isVisible ? 'text' : 'password',
 				suffix: (
 					<InputControlSuffixWrapper variant="control">

@@ -44,8 +44,10 @@ function CalendarDateTimeControl< Item >( {
 	onChange,
 	hideLabelFromVision,
 	validity,
+	config,
 }: DataFormControlProps< Item > ) {
 	const { id, label, description, setValue, getValue, isValid } = field;
+	const { disabled = false } = config || {};
 	const fieldValue = getValue( { item: data } );
 	const value = typeof fieldValue === 'string' ? fieldValue : undefined;
 
@@ -167,17 +169,21 @@ function CalendarDateTimeControl< Item >( {
 		>
 			<VStack spacing={ 4 }>
 				{ /* Calendar widget */ }
-				<DateCalendar
-					style={ { width: '100%' } }
-					selected={
-						value ? parseDateTime( value ) || undefined : undefined
-					}
-					onSelect={ onSelectDate }
-					month={ calendarMonth }
-					onMonthChange={ setCalendarMonth }
-					timeZone={ timezoneString || undefined }
-					weekStartsOn={ startOfWeek }
-				/>
+				{ ! disabled && (
+					<DateCalendar
+						style={ { width: '100%' } }
+						selected={
+							value
+								? parseDateTime( value ) || undefined
+								: undefined
+						}
+						onSelect={ onSelectDate }
+						month={ calendarMonth }
+						onMonthChange={ setCalendarMonth }
+						timeZone={ timezoneString || undefined }
+						weekStartsOn={ startOfWeek }
+					/>
+				) }
 				{ /* Manual datetime input */ }
 				<ValidatedInputControl
 					ref={ inputControlRef }
@@ -195,6 +201,7 @@ function CalendarDateTimeControl< Item >( {
 							: ''
 					}
 					onChange={ handleManualDateTimeChange }
+					disabled={ disabled }
 				/>
 			</VStack>
 		</BaseControl>
@@ -208,6 +215,7 @@ export default function DateTime< Item >( {
 	hideLabelFromVision,
 	operator,
 	validity,
+	config,
 }: DataFormControlProps< Item > ) {
 	if ( operator === OPERATOR_IN_THE_PAST || operator === OPERATOR_OVER ) {
 		return (
@@ -218,6 +226,7 @@ export default function DateTime< Item >( {
 				onChange={ onChange }
 				hideLabelFromVision={ hideLabelFromVision }
 				operator={ operator }
+				config={ config }
 			/>
 		);
 	}
@@ -229,6 +238,7 @@ export default function DateTime< Item >( {
 			onChange={ onChange }
 			hideLabelFromVision={ hideLabelFromVision }
 			validity={ validity }
+			config={ config }
 		/>
 	);
 }

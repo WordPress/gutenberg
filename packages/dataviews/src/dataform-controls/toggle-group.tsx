@@ -24,8 +24,10 @@ export default function ToggleGroup< Item >( {
 	onChange,
 	hideLabelFromVision,
 	validity,
+	config,
 }: DataFormControlProps< Item > ) {
 	const { getValue, setValue, isValid } = field;
+	const { disabled = false } = config || {};
 	const value = getValue( { item: data } );
 
 	const onChangeControl = useCallback(
@@ -65,6 +67,7 @@ export default function ToggleGroup< Item >( {
 					key={ el.value }
 					label={ el.label }
 					value={ el.value }
+					disabled={ disabled }
 				/>
 			) ) }
 		</ValidatedToggleGroupControl>

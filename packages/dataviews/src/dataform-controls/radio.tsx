@@ -20,8 +20,10 @@ export default function Radio< Item >( {
 	onChange,
 	hideLabelFromVision,
 	validity,
+	config,
 }: DataFormControlProps< Item > ) {
 	const { label, description, getValue, setValue, isValid } = field;
+	const { disabled = false } = config || {};
 	const { elements, isLoading } = useElements( {
 		elements: field.elements,
 		getElements: field.getElements,
@@ -48,6 +50,7 @@ export default function Radio< Item >( {
 			options={ elements }
 			selected={ value }
 			hideLabelFromVision={ hideLabelFromVision }
+			disabled={ disabled }
 		/>
 	);
 }

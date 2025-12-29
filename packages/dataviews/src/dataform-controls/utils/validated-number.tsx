@@ -100,10 +100,12 @@ export default function ValidatedNumber< Item >( {
 	operator,
 	decimals,
 	validity,
+	config,
 }: DataFormValidatedNumberControlProps< Item > ) {
 	const step = Math.pow( 10, Math.abs( decimals ) * -1 );
 	const { label, description, getValue, setValue, isValid } = field;
 	const value = getValue( { item: data } ) ?? '';
+	const { disabled = false } = config || {};
 
 	const onChangeControl = useCallback(
 		( newValue: string | undefined ) => {
@@ -168,6 +170,7 @@ export default function ValidatedNumber< Item >( {
 			step={ step }
 			min={ isValid.min ? isValid.min.constraint : undefined }
 			max={ isValid.max ? isValid.max.constraint : undefined }
+			disabled={ disabled }
 		/>
 	);
 }

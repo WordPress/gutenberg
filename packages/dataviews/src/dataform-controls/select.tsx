@@ -20,8 +20,10 @@ export default function Select< Item >( {
 	onChange,
 	hideLabelFromVision,
 	validity,
+	config,
 }: DataFormControlProps< Item > ) {
 	const { type, label, description, getValue, setValue, isValid } = field;
+	const { disabled = false } = config || {};
 
 	const isMultiple = type === 'array';
 	const value = getValue( { item: data } ) ?? ( isMultiple ? [] : '' );
@@ -54,6 +56,7 @@ export default function Select< Item >( {
 			__nextHasNoMarginBottom
 			hideLabelFromVision={ hideLabelFromVision }
 			multiple={ isMultiple }
+			disabled={ disabled }
 		/>
 	);
 }
