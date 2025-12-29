@@ -1,11 +1,13 @@
 [
 	{
-		"name": "core/missing",
+		"name": "core/breadcrumbs",
 		"isValid": true,
 		"attributes": {
-			"originalName": "core/breadcrumbs",
-			"originalUndelimitedContent": "",
-			"originalContent": "<!-- wp:breadcrumbs /-->"
+			"prefersTaxonomy": false,
+			"separator": "/",
+			"showHomeItem": true,
+			"showCurrentItem": true,
+			"showOnHomePage": false
 		},
 		"innerBlocks": []
 	}

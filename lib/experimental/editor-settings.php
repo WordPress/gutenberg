@@ -47,10 +47,13 @@ function gutenberg_enable_experiments() {
 	if ( gutenberg_is_experiment_enabled( 'active_templates' ) ) {
 		wp_add_inline_script( 'wp-block-editor', 'window.__experimentalTemplateActivate = true', 'before' );
 	}
+	if ( gutenberg_is_experiment_enabled( 'gutenberg-extensible-site-editor' ) ) {
+		wp_add_inline_script( 'wp-block-editor', 'window.__experimentalExtensibleSiteEditor = true', 'before' );
+	}
 }
 
 add_action( 'admin_init', 'gutenberg_enable_experiments' );
-add_action( 'site-editor_init', 'gutenberg_enable_experiments' );
+add_action( 'site-editor-v2_init', 'gutenberg_enable_experiments' );
 
 /**
  * Sets a global JS variable used to trigger the availability of form & input blocks.

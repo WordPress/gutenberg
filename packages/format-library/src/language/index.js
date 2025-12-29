@@ -108,7 +108,6 @@ function InlineLanguageUI( { value, contentRef, onChange, onClose } ) {
 				/>
 				<SelectControl
 					__next40pxDefaultSize
-					__nextHasNoMarginBottom
 					label={ __( 'Text direction' ) }
 					value={ dir }
 					options={ [

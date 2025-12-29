@@ -1,5 +1,6 @@
 @use "@wordpress/base-styles/colors" as *;
 @use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/mixins" as *;
 
 .editor-post-featured-image {
 	padding: 0;
@@ -65,6 +66,7 @@
 .editor-post-featured-image__preview {
 	height: auto !important;
 	outline: $border-width solid rgba($black, 0.1);
+	@include checkerboard-background( 12px );
 
 	.editor-post-featured-image__preview-image {
 		object-fit: cover;

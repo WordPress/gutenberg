@@ -22,6 +22,14 @@
 		"node": ">=18.12.0",
 		"npm": ">=8.19.2"
 	},
+	"files": [
+		"src",
+		"build-module",
+		"build-style",
+		"build-types",
+		"*.md"
+	],
+	"type": "module",
 	"module": "build-module/index.js",
 	"exports": {
 		".": {

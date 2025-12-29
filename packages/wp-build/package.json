@@ -36,7 +36,6 @@
 	},
 	"dependencies": {
 		"@emotion/babel-plugin": "11.11.0",
-		"@types/toposort": "2.0.7",
 		"autoprefixer": "10.4.21",
 		"browserslist-to-esbuild": "2.1.1",
 		"change-case": "4.1.2",
@@ -48,8 +47,7 @@
 		"fast-glob": "^3.2.7",
 		"postcss": "8.4.38",
 		"postcss-modules": "6.0.1",
-		"rtlcss": "4.3.0",
-		"toposort": "2.0.2"
+		"rtlcss": "4.3.0"
 	},
 	"peerDependencies": {
 		"@wordpress/boot": "^0.3.0",

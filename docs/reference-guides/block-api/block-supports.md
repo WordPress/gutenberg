@@ -75,7 +75,7 @@ function Edit( { attributes } ) {
 -   Type: `boolean`
 -   Default value: `false`
 
-Anchors let you link directly to a specific block on a page. This property adds a field to define an id for the block and a button to copy the direct link. _Important: It doesn't work with dynamic blocks yet._
+Anchors let you link directly to a specific block on a page. This property adds a field to define an id for the block and a button to copy the direct link.
 
 ```js
 // Declare support for anchor links.
@@ -760,6 +760,8 @@ The `clientNavigation` sub-property indicates whether a block is compatible with
 Set it to true only if the block is not interactive or if it is interactive using the Interactivity API. Set it to false if the block is interactive but uses vanilla JS, jQuery or another JS framework/library other than the Interactivity API.
 
 The `interactive` sub-property indicates whether the block is using the Interactivity API directives.
+
+If you set `supports.interactivity` to `true`, it is equivalent to setting both `supports.interactivity.clientNavigation` and `supports.interactivity.interactive` to `true` as well.
 
 ## layout
 

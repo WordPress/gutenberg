@@ -328,7 +328,6 @@ function ComboboxControl( props: ComboboxControlProps ) {
 	return (
 		<DetectOutside onFocusOutside={ onFocusOutside }>
 			<BaseControl
-				__nextHasNoMarginBottom
 				className={ clsx( className, 'components-combobox-control' ) }
 				label={ label }
 				id={ `components-form-token-input-${ instanceId }` }

@@ -95,7 +95,6 @@ export function CheckboxControl(
 
 	return (
 		<BaseControl
-			__nextHasNoMarginBottom
 			label={ heading }
 			id={ id }
 			help={

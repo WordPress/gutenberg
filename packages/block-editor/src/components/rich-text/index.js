@@ -137,12 +137,8 @@ export function RichTextWrapper(
 			return { isSelected: false };
 		}
 
-		const {
-			getSelectionStart,
-			getSelectionEnd,
-			getBlockEditingMode,
-			getSettings,
-		} = select( blockEditorStore );
+		const { getSelectionStart, getSelectionEnd, getBlockEditingMode } =
+			select( blockEditorStore );
 		const selectionStart = getSelectionStart();
 		const selectionEnd = getSelectionEnd();
 
@@ -159,36 +155,35 @@ export function RichTextWrapper(
 			isSelected = selectionStart.clientId === clientId;
 		}
 
-		const { __experimentalBlockBindingsSupportedAttributes } =
-			getSettings();
-
 		return {
 			selectionStart: isSelected ? selectionStart.offset : undefined,
 			selectionEnd: isSelected ? selectionEnd.offset : undefined,
 			isSelected,
 			isContentOnly: getBlockEditingMode( clientId ) === 'contentOnly',
-			bindableAttributes:
-				__experimentalBlockBindingsSupportedAttributes?.[ blockName ],
 		};
 	};
-	const {
-		selectionStart,
-		selectionEnd,
-		isSelected,
-		isContentOnly,
-		bindableAttributes,
-	} = useSelect( selector, [
-		clientId,
-		blockName,
-		identifier,
-		instanceId,
-		originalIsSelected,
-		isBlockSelected,
-	] );
+	const { selectionStart, selectionEnd, isSelected, isContentOnly } =
+		useSelect( selector, [
+			clientId,
+			identifier,
+			instanceId,
+			originalIsSelected,
+			isBlockSelected,
+		] );
 
 	const { disableBoundBlock, bindingsPlaceholder, bindingsLabel } = useSelect(
 		( select ) => {
-			if ( ! blockBindings?.[ identifier ] || ! bindableAttributes ) {
+			if ( ! blockBindings?.[ identifier ] ) {
+				return {};
+			}
+
+			const { __experimentalBlockBindingsSupportedAttributes } =
+				select( blockEditorStore ).getSettings();
+
+			const bindableAttributes =
+				__experimentalBlockBindingsSupportedAttributes?.[ blockName ];
+
+			if ( ! bindableAttributes ) {
 				return {};
 			}
 
@@ -261,7 +256,7 @@ export function RichTextWrapper(
 		[
 			blockBindings,
 			identifier,
-			bindableAttributes,
+			blockName,
 			adjustedValue,
 			clientId,
 			blockContext,

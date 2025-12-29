@@ -26,6 +26,7 @@ const separatorDefaultValue = '/';
 export default function BreadcrumbEdit( {
 	attributes,
 	setAttributes,
+	name,
 	context: { postId, postType, templateSlug },
 } ) {
 	const {
@@ -104,7 +105,7 @@ export default function BreadcrumbEdit( {
 	const { content } = useServerSideRender( {
 		attributes,
 		skipBlockSupportAttributes: true,
-		block: 'core/breadcrumbs',
+		block: name,
 		urlQueryArgs: { post_id: postId, invalidationKey },
 	} );
 

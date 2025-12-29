@@ -3,7 +3,6 @@
  */
 import { __ } from '@wordpress/i18n';
 import {
-	__experimentalSpacer as Spacer,
 	__experimentalText as Text,
 	__experimentalVStack as VStack,
 	Button,
@@ -212,7 +211,7 @@ function UploadFonts() {
 	return (
 		<div className="font-library__tabpanel-layout">
 			<DropZone onFilesDrop={ handleDropZone } />
-			<VStack className="font-library__local-fonts">
+			<VStack className="font-library__local-fonts" justify="start">
 				{ notice && (
 					<Notice
 						status={ notice.type }
@@ -254,7 +253,6 @@ function UploadFonts() {
 						) }
 					/>
 				) }
-				<Spacer margin={ 2 } />
 				<Text className="font-library__upload-area__text">
 					{ __(
 						'Uploaded fonts appear in your library and can be used in your theme. Supported formats: .ttf, .otf, .woff, and .woff2.'

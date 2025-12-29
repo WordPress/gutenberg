@@ -76,16 +76,9 @@ export type ControlledRangeValue = number | '' | null;
 
 export type RangeControlProps = Pick<
 	BaseControlProps,
-	'hideLabelFromVision' | 'help'
+	'__nextHasNoMarginBottom' | 'hideLabelFromVision' | 'help'
 > &
 	MarksProps & {
-		/**
-		 * Start opting into the new margin-free styles that will become the default in a future version.
-		 *
-		 * @deprecated Default behavior since WordPress 7.0. Prop can be safely removed.
-		 * @ignore
-		 */
-		__nextHasNoMarginBottom?: boolean;
 		/**
 		 * If this property is added, an Icon component will be rendered
 		 * after the slider with the icon equal to afterIcon.

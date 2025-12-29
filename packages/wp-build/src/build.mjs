@@ -623,7 +623,10 @@ async function bundlePackage( packageName, options = {} ) {
 					?.map( ( d ) => d.replace( /'/g, '' ) ) || [];
 		}
 
-		const styleDeps = await inferStyleDependencies( scriptDependencies );
+		const styleDeps = await inferStyleDependencies(
+			scriptDependencies,
+			packageName
+		);
 
 		builtStyles.push( {
 			handle: `${ handlePrefix }-${ packageName }`,
@@ -647,14 +650,17 @@ async function bundlePackage( packageName, options = {} ) {
  * 3. Actually have a built style.css file
  *
  * @param {string[]} scriptDependencies Array of script handles from asset file.
+ * @param {string}   packageName        Package name (short name) being bundled, for context-aware resolution.
  * @return {Promise<string[]>} Array of style handles to depend on.
  */
-async function inferStyleDependencies( scriptDependencies ) {
+async function inferStyleDependencies( scriptDependencies, packageName ) {
 	if ( ! scriptDependencies || scriptDependencies.length === 0 ) {
 		return [];
 	}
 
 	const styleDeps = [];
+	// Get the resolve directory for context-aware package resolution
+	const resolveDir = path.join( PACKAGES_DIR, packageName );
 
 	for ( const scriptHandle of scriptDependencies ) {
 		// Skip non-package dependencies (like 'react', 'lodash', etc.)
@@ -662,13 +668,13 @@ async function inferStyleDependencies( scriptDependencies ) {
 			continue;
 		}
 
-		// Convert handle to package name: 'wp-components' → 'components'
+		// Convert handle to package name: 'wp-components' → '@wordpress/components'
 		const shortName = scriptHandle.replace( 'wp-', '' );
 		const depPackageName = `@wordpress/${ shortName }`;
 
-		// Read the dependency's package.json
+		// Read the dependency's package.json with context-aware resolution
 		try {
-			const depPackageJson = getPackageInfo( depPackageName );
+			const depPackageJson = getPackageInfo( depPackageName, resolveDir );
 
 			if ( ! depPackageJson ) {
 				continue;
@@ -766,14 +772,14 @@ async function generateScriptRegistrationPhp( scripts, replacements ) {
 }
 
 /**
- * Generate PHP file for version constant.
+ * Generate PHP file for constants (version and build URL).
  *
  * @param {Record<string, string>} replacements PHP template replacements.
  */
-async function generateVersionPhp( replacements ) {
+async function generateConstantsPhp( replacements ) {
 	await generatePhpFromTemplate(
-		'version.php.template',
-		path.join( BUILD_DIR, 'version.php' ),
+		'constants.php.template',
+		path.join( BUILD_DIR, 'constants.php' ),
 		replacements
 	);
 }
@@ -1022,7 +1028,12 @@ async function transpilePackage( packageName ) {
 		name: 'externalize-except-css',
 		setup( build ) {
 			// Externalize all non-CSS imports
-			build.onResolve( { filter: /.*/ }, ( args ) => {
+			build.onResolve( { filter: /.*/ }, async ( args ) => {
+				// Skip recursive calls.
+				if ( args.pluginData?.__fromExternalize ) {
+					return null;
+				}
+
 				// Skip entry points
 				if ( args.kind === 'entry-point' ) {
 					return null;
@@ -1031,6 +1042,44 @@ async function transpilePackage( packageName ) {
 				// Let CSS/SCSS files be processed by sassPlugin
 				if ( args.path.match( /\.(css|scss)$/ ) ) {
 					return null;
+				}
+
+				// Fully resolve local dependencies without file extension
+				// and replace the extension with the target extension.
+				if ( args.path.startsWith( '.' ) ) {
+					const resolved = await build.resolve( args.path, {
+						namespace: args.namespace,
+						importer: args.importer,
+						kind: args.kind,
+						resolveDir: args.resolveDir,
+						with: args.with,
+						pluginData: {
+							...args.pluginData,
+							__fromExternalize: true,
+						},
+					} );
+
+					if ( resolved.errors.length > 0 ) {
+						return resolved;
+					}
+
+					// Relativize path: make it relative to resolveDir with leading ./
+					let relativePath = normalizePath(
+						path.relative( args.resolveDir, resolved.path )
+					);
+					if ( ! relativePath.startsWith( '.' ) ) {
+						relativePath = './' + relativePath;
+					}
+
+					// Replace extension: make sure that file extension is always `.js` or `.cjs`.
+					const newExt =
+						build.initialOptions.format === 'cjs' ? '.cjs' : '.js';
+					relativePath = relativePath.replace( /\.[jt]sx?$/, newExt );
+
+					return {
+						path: relativePath,
+						external: true,
+					};
 				}
 
 				// Externalize everything else (keep imports as-is)
@@ -1050,6 +1099,7 @@ async function transpilePackage( packageName ) {
 				entryPoints: srcFiles,
 				outdir: buildDir,
 				outbase: srcDir,
+				outExtension: { '.js': '.cjs' },
 				bundle: true,
 				platform: 'node',
 				format: 'cjs',
@@ -1057,9 +1107,7 @@ async function transpilePackage( packageName ) {
 				target,
 				jsx: 'automatic',
 				jsxImportSource: 'react',
-				loader: {
-					'.js': 'jsx',
-				},
+				loader: { '.js': 'jsx' },
 				plugins,
 			} )
 		);
@@ -1089,9 +1137,7 @@ async function transpilePackage( packageName ) {
 				target,
 				jsx: 'automatic',
 				jsxImportSource: 'react',
-				loader: {
-					'.js': 'jsx',
-				},
+				loader: { '.js': 'jsx' },
 				plugins,
 			} )
 		);
@@ -1421,24 +1467,28 @@ async function buildAllRoutes() {
 
 /**
  * Main build function.
+ *
+ * @param {string?} baseUrlExpression
  */
-async function buildAll() {
+async function buildAll( baseUrlExpression ) {
 	console.log( '🔨 Building packages...\n' );
 
 	const startTime = Date.now();
 
-	// Build maps: short name ↔ full name from package.json
+	// Build maps: short name ↔ full name ↔ package.json from package.json files
 	const shortToFull = new Map();
 	const fullToShort = new Map();
+	const fullToPackageJson = new Map();
 	for ( const pkg of PACKAGES ) {
 		const packageJson = getPackageInfoFromFile(
 			path.join( PACKAGES_DIR, pkg, 'package.json' )
 		);
 		shortToFull.set( pkg, packageJson.name );
 		fullToShort.set( packageJson.name, pkg );
+		fullToPackageJson.set( packageJson.name, packageJson );
 	}
 
-	const levels = groupByDepth( Array.from( shortToFull.values() ) );
+	const levels = groupByDepth( fullToPackageJson );
 
 	console.log( '📝 Phase 1: Transpiling packages...\n' );
 
@@ -1577,13 +1627,16 @@ async function buildAll() {
 	}
 
 	console.log( '\n📄 Generating PHP registration files...\n' );
-	const phpReplacements = await getPhpReplacements( ROOT_DIR );
+	const phpReplacements = await getPhpReplacements(
+		ROOT_DIR,
+		baseUrlExpression
+	);
 	await Promise.all( [
 		generateMainIndexPhp( phpReplacements ),
 		generateModuleRegistrationPhp( modules, phpReplacements ),
 		generateScriptRegistrationPhp( scripts, phpReplacements ),
 		generateStyleRegistrationPhp( styles, phpReplacements ),
-		generateVersionPhp( phpReplacements ),
+		generateConstantsPhp( phpReplacements ),
 		generateRoutesRegistry( routes, phpReplacements ),
 		generateRoutesPhp( routes, phpReplacements ),
 		generatePagesPhp( pageData, phpReplacements ),
@@ -1622,17 +1675,18 @@ async function watchMode() {
 	let isRebuilding = false;
 	const needsRebuild = new Set();
 
-	// Build maps: short name ↔ full name from package.json (once)
+	// Build maps: short name ↔ full name ↔ package.json from package.json files (once)
 	const shortToFull = new Map();
 	const fullToShort = new Map();
+	const fullToPackageJson = new Map();
 	for ( const pkg of PACKAGES ) {
 		const packageJson = getPackageInfoFromFile(
 			path.join( PACKAGES_DIR, pkg, 'package.json' )
 		);
 		shortToFull.set( pkg, packageJson.name );
 		fullToShort.set( packageJson.name, pkg );
+		fullToPackageJson.set( packageJson.name, packageJson );
 	}
-	const allFullNames = Array.from( shortToFull.values() );
 
 	// Get all routes for dependency tracking
 	const allRoutes = getAllRoutes( ROOT_DIR );
@@ -1655,7 +1709,7 @@ async function watchMode() {
 			const fullName = shortToFull.get( packageName );
 			const affectedScripts = findScriptsToRebundle(
 				fullName,
-				allFullNames
+				fullToPackageJson
 			);
 
 			for ( const fullScript of affectedScripts ) {
@@ -1678,7 +1732,7 @@ async function watchMode() {
 			// Find and rebuild affected routes
 			const affectedRoutes = findRoutesToRebuild(
 				fullName,
-				allFullNames,
+				fullToPackageJson,
 				ROOT_DIR,
 				allRoutes
 			);
@@ -1871,10 +1925,16 @@ async function main() {
 				short: 'w',
 				default: false,
 			},
+			'base-url': {
+				type: 'string',
+				default: 'plugin_dir_url( __FILE__ )',
+			},
 		},
 	} );
 
-	await buildAll();
+	const baseUrlExpression = values[ 'base-url' ];
+
+	await buildAll( baseUrlExpression );
 
 	if ( values.watch ) {
 		console.log( '\n👀 Watching for changes...\n' );

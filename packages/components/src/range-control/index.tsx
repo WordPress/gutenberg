@@ -246,7 +246,6 @@ function UnforwardedRangeControl(
 			hideLabelFromVision={ hideLabelFromVision }
 			id={ `${ id }` }
 			help={ help }
-			__nextHasNoMarginBottom
 		>
 			<Root
 				className="components-range-control__root"

@@ -26,16 +26,18 @@
 		"npm": ">=8.19.2"
 	},
 	"files": [
+		"src",
 		"build",
 		"build-module"
 	],
-	"main": "build/index.js",
+	"type": "module",
+	"main": "build/index.cjs",
 	"module": "build-module/index.js",
 	"exports": {
 		".": {
 			"types": "./build-types/index.d.ts",
 			"import": "./build-module/index.js",
-			"require": "./build/index.js"
+			"require": "./build/index.cjs"
 		},
 		"./package.json": "./package.json"
 	},

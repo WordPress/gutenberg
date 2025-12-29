@@ -23,11 +23,13 @@ export async function init( {
 	menuItems,
 	routes,
 	initModules,
+	dashboardLink,
 }: {
 	mountId: string;
 	menuItems?: MenuItem[];
 	routes?: Route[];
 	initModules?: string[];
+	dashboardLink?: string;
 } ) {
 	( menuItems ?? [] ).forEach( ( menuItem ) => {
 		dispatch( store ).registerMenuItem( menuItem.id, menuItem );
@@ -36,6 +38,10 @@ export async function init( {
 	( routes ?? [] ).forEach( ( route ) => {
 		dispatch( store ).registerRoute( route );
 	} );
+
+	if ( dashboardLink ) {
+		dispatch( store ).setDashboardLink( dashboardLink );
+	}
 
 	for ( const moduleId of initModules ?? [] ) {
 		const module = await import( moduleId );

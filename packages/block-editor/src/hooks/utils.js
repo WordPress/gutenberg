@@ -8,6 +8,11 @@ import { createHigherOrderComponent } from '@wordpress/compose';
 import { addFilter } from '@wordpress/hooks';
 
 /**
+ * External dependencies
+ */
+import clsx from 'clsx';
+
+/**
  * Internal dependencies
  */
 import {
@@ -20,10 +25,6 @@ import { useSettingsForBlockElement } from '../components/global-styles/hooks';
 import { getValueFromObjectPath, setImmutably } from '../utils/object';
 import { store as blockEditorStore } from '../store';
 import { unlock } from '../lock-unlock';
-/**
- * External dependencies
- */
-import clsx from 'clsx';
 
 /**
  * Removed falsy values from nested object.
@@ -250,6 +251,7 @@ export function useBlockSettings( name, parentLayout ) {
 		textAlign,
 		textColumns,
 		textDecoration,
+		textIndent,
 		writingMode,
 		textTransform,
 		letterSpacing,
@@ -311,6 +313,7 @@ export function useBlockSettings( name, parentLayout ) {
 		'typography.textAlign',
 		'typography.textColumns',
 		'typography.textDecoration',
+		'typography.textIndent',
 		'typography.writingMode',
 		'typography.textTransform',
 		'typography.letterSpacing',
@@ -410,6 +413,7 @@ export function useBlockSettings( name, parentLayout ) {
 				textAlign,
 				textColumns,
 				textDecoration,
+				textIndent,
 				textTransform,
 				letterSpacing,
 				writingMode,
@@ -462,6 +466,7 @@ export function useBlockSettings( name, parentLayout ) {
 		textAlign,
 		textColumns,
 		textDecoration,
+		textIndent,
 		textTransform,
 		letterSpacing,
 		writingMode,

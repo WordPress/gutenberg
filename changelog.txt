@@ -1,7 +1,6 @@
 == Changelog ==
 
-= 22.3.0-rc.1 =
-
+= 22.3.0 =
 
 ## Changelog
 
@@ -235,6 +234,7 @@
 - Storybook: Skip transpilation of build-modules files. ([73780](https://github.com/WordPress/gutenberg/pull/73780))
 - wp-build: Fix invalid package references for peer dependencies. ([73676](https://github.com/WordPress/gutenberg/pull/73676))
 - wp-ui: Add legacy export fields to package.json. ([73850](https://github.com/WordPress/gutenberg/pull/73850))
+- Fix CI static analysis on Windows. ([73911](https://github.com/WordPress/gutenberg/pull/73911))
 
 #### Testing
 - Remove custom import resolvers and package subpath syntax rules. ([72978](https://github.com/WordPress/gutenberg/pull/72978))
@@ -274,6 +274,8 @@ The following PRs were merged by first-time contributors:
 The following contributors merged PRs in this release:
 
 @aduth @Aljullu @andrewserong @annezazu @badasswp @cbravobernal @chriszarate @dhasilva @dmsnell @getdave @gigitux @huzaifaalmesbah @Infinite-Null @ingeniumed @jameskoster @jasmussen @jeryj @jonathanbossenger @jorgefilipecosta @jsnajdr @juanfra @lezama @Mamaduka @manhphuc @Mayank-Tripathi32 @metodiew @mikachan @mirka @ntsekouras @oandregal @ockham @priethor @ramonjd @ryelle @scruffian @shimotmk @SirLouen @t-hamano @tellthemachines @tyxla @Utsav-Ladani @yogeshbhutkar @youknowriad
+
+
 
 
 = 22.2.0 =

@@ -164,6 +164,7 @@ function AudioEdit( {
 						onSelectURL={ onSelectURL }
 						onError={ onUploadError }
 						onReset={ () => onSelectAudio( undefined ) }
+						variant="toolbar"
 					/>
 				</BlockControls>
 			) }
@@ -224,7 +225,6 @@ function AudioEdit( {
 					>
 						<SelectControl
 							__next40pxDefaultSize
-							__nextHasNoMarginBottom
 							label={ _x(
 								'Preload',
 								'noun; Audio block parameter'

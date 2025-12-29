@@ -7,8 +7,6 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import { privateApis as routePrivateApis } from '@wordpress/route';
-// @ts-expect-error Commands is not typed properly.
-import { CommandMenu } from '@wordpress/commands';
 import { EditorSnackbars } from '@wordpress/editor';
 import { useViewportMatch, useReducedMotion } from '@wordpress/compose';
 import {
@@ -69,7 +67,6 @@ export default function Root() {
 							'has-full-canvas': isFullScreen,
 						} ) }
 					>
-						<CommandMenu />
 						<SavePanel />
 						<EditorSnackbars />
 						{ isMobileViewport && (
@@ -144,40 +141,44 @@ export default function Root() {
 						<div className="boot-layout__surfaces">
 							<UserThemeProvider color={ { bg: '#ffffff' } }>
 								<Outlet />
+								{ /* Render Canvas in Root to prevent remounting on route changes */ }
+								{ ( canvas || canvas === null ) && (
+									<div
+										className={ clsx(
+											'boot-layout__canvas',
+											{
+												'has-mobile-drawer':
+													canvas?.isPreview &&
+													isMobileViewport,
+											}
+										) }
+									>
+										{ canvas?.isPreview &&
+											isMobileViewport && (
+												<div className="boot-layout__mobile-sidebar-drawer">
+													<Button
+														icon={ menu }
+														onClick={ () =>
+															setIsMobileSidebarOpen(
+																true
+															)
+														}
+														label={ __(
+															'Open navigation panel'
+														) }
+														size="compact"
+													/>
+												</div>
+											) }
+										<CanvasRenderer
+											canvas={ canvas }
+											routeContentModule={
+												routeContentModule
+											}
+										/>
+									</div>
+								) }
 							</UserThemeProvider>
-							{ /* Render Canvas in Root to prevent remounting on route changes */ }
-							{ ( canvas || canvas === null ) && (
-								<div
-									className={ clsx( 'boot-layout__canvas', {
-										'has-mobile-drawer':
-											canvas?.isPreview &&
-											isMobileViewport,
-									} ) }
-								>
-									{ canvas?.isPreview && isMobileViewport && (
-										<div className="boot-layout__mobile-sidebar-drawer">
-											<Button
-												icon={ menu }
-												onClick={ () =>
-													setIsMobileSidebarOpen(
-														true
-													)
-												}
-												label={ __(
-													'Open navigation panel'
-												) }
-												size="compact"
-											/>
-										</div>
-									) }
-									<CanvasRenderer
-										canvas={ canvas }
-										routeContentModule={
-											routeContentModule
-										}
-									/>
-								</div>
-							) }
 						</div>
 					</div>
 				</UserThemeProvider>
