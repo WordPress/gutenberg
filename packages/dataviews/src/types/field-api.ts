@@ -129,6 +129,10 @@ export type EditConfigTextarea = {
 	 * Number of rows for the textarea.
 	 */
 	rows?: number;
+	/**
+	 * Whether the control is disabled.
+	 */
+	disabled?: boolean;
 };
 
 /**
@@ -144,13 +148,25 @@ export type EditConfigText = {
 	 * Suffix component to display after the input.
 	 */
 	suffix?: React.ComponentType;
+	/**
+	 * Whether the control is disabled.
+	 */
+	disabled?: boolean;
 };
 
 /**
- * Edit configuration for other control types (excluding 'text' and 'textarea').
+ * Edit configuration for other control types.
+ * Includes all available dataform control types beyond text and textarea.
  */
 export type EditConfigGeneric = {
-	control: Exclude< FieldTypeName, 'text' | 'textarea' >;
+	control:
+		| FieldTypeName
+		| 'checkbox'
+		| 'radio'
+		| 'select'
+		| 'toggle'
+		| 'toggleGroup';
+	disabled?: boolean;
 };
 
 /**
@@ -417,6 +433,7 @@ export type DataFormControlProps< Item > = {
 		prefix?: React.ComponentType;
 		suffix?: React.ComponentType;
 		rows?: number;
+		disabled?: boolean;
 	};
 };
 
