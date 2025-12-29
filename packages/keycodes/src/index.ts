@@ -176,6 +176,169 @@ function capitaliseFirstCharacter( string: string ): string {
 }
 
 /**
+ * Map of key names to their `aria-keyshortcuts` compliant equivalents.
+ *
+ * This includes:
+ * - Shorthand key names (e.g., 'del' → 'Delete')
+ * - Special characters that need named representations per the spec
+ *   (e.g., ' ' → 'Space', '+' → 'Plus')
+ * - Named keys from the UI Events KeyboardEvent key Values specification
+ *
+ * The space key is a special case: per the WAI-ARIA spec, the spacebar
+ * should be represented as "Space" (not ' ') since the space character
+ * would be treated as whitespace.
+ *
+ * @see https://www.w3.org/TR/wai-aria-1.2/#aria-keyshortcuts
+ * @see https://www.w3.org/TR/uievents-key/
+ * @see https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Reference/Attributes/aria-keyshortcuts
+ */
+const ARIA_KEY_SHORTCUT_KEY_MAP: Record< string, string > = {
+	/*
+	 * Shorthand mappings (lowercase keys for case-insensitive lookup).
+	 * These are common abbreviations used in the codebase that need to be
+	 * converted to their full KeyboardEvent.key equivalents.
+	 */
+	del: 'Delete',
+	esc: 'Escape',
+
+	/*
+	 * Special characters that need named representations.
+	 * Per the spec, certain characters must be written out as words.
+	 */
+	' ': 'Space',
+	'+': 'Plus',
+
+	/*
+	 * Whitespace keys.
+	 * @see https://www.w3.org/TR/uievents-key/#keys-whitespace
+	 */
+	enter: 'Enter',
+	tab: 'Tab',
+
+	/*
+	 * Navigation keys.
+	 * @see https://www.w3.org/TR/uievents-key/#keys-navigation
+	 */
+	arrowdown: 'ArrowDown',
+	arrowleft: 'ArrowLeft',
+	arrowright: 'ArrowRight',
+	arrowup: 'ArrowUp',
+	end: 'End',
+	home: 'Home',
+	pagedown: 'PageDown',
+	pageup: 'PageUp',
+
+	/*
+	 * Editing keys.
+	 * @see https://www.w3.org/TR/uievents-key/#keys-editing
+	 */
+	backspace: 'Backspace',
+	clear: 'Clear',
+	copy: 'Copy',
+	cut: 'Cut',
+	delete: 'Delete',
+	insert: 'Insert',
+	paste: 'Paste',
+	redo: 'Redo',
+	undo: 'Undo',
+
+	/*
+	 * UI keys.
+	 * @see https://www.w3.org/TR/uievents-key/#keys-ui
+	 */
+	escape: 'Escape',
+	help: 'Help',
+	contextmenu: 'ContextMenu',
+	pause: 'Pause',
+	printscreen: 'PrintScreen',
+	scrolllock: 'ScrollLock',
+
+	/*
+	 * Function keys.
+	 * @see https://www.w3.org/TR/uievents-key/#keys-function
+	 */
+	f1: 'F1',
+	f2: 'F2',
+	f3: 'F3',
+	f4: 'F4',
+	f5: 'F5',
+	f6: 'F6',
+	f7: 'F7',
+	f8: 'F8',
+	f9: 'F9',
+	f10: 'F10',
+	f11: 'F11',
+	f12: 'F12',
+
+	/*
+	 * Numpad keys (when NumLock is off, these produce navigation actions).
+	 * @see https://www.w3.org/TR/uievents-key/#keys-numpad-section
+	 */
+	numlock: 'NumLock',
+};
+
+/**
+ * Map of characters that need HTML entity escaping for use in HTML attributes.
+ *
+ * Per the WAI-ARIA spec, character values in aria-keyshortcuts should be
+ * HTML escaped to prevent issues with special characters in HTML attributes.
+ *
+ * @see https://www.w3.org/TR/wai-aria-1.2/#aria-keyshortcuts
+ */
+const HTML_ENTITY_MAP: Record< string, string > = {
+	'&': '&amp;',
+	'<': '&lt;',
+	'>': '&gt;',
+	'"': '&quot;',
+	"'": '&#39;',
+};
+
+/**
+ * Escape special HTML characters in a string for use in HTML attributes.
+ *
+ * @param str The string to escape.
+ * @return The escaped string.
+ */
+function escapeHtmlForAriaShortcut( str: string ): string {
+	return str.replace( /[&<>"']/g, ( char ) => HTML_ENTITY_MAP[ char ] );
+}
+
+/**
+ * Normalize a key for use in the `aria-keyshortcuts` attribute.
+ *
+ * This function:
+ * 1. Converts shorthand key names (like 'del') to their standard
+ *    `KeyboardEvent.key` equivalents (like 'Delete')
+ * 2. Converts special characters to their named equivalents
+ *    (like ' ' to 'Space', '+' to 'Plus')
+ * 3. Ensures proper capitalization for character keys
+ * 4. HTML-escapes special characters that could cause issues in HTML attributes
+ *
+ * @param key The key to normalize.
+ * @return The normalized and escaped key name.
+ */
+function normalizeKeyForAriaShortcut( key: string ): string {
+	// Check for exact character mappings first (like ' ' for space)
+	if ( ARIA_KEY_SHORTCUT_KEY_MAP[ key ] ) {
+		return ARIA_KEY_SHORTCUT_KEY_MAP[ key ];
+	}
+
+	// Check for case-insensitive shorthand mappings (like 'del', 'esc')
+	const lowerKey = key.toLowerCase();
+	if ( ARIA_KEY_SHORTCUT_KEY_MAP[ lowerKey ] ) {
+		return ARIA_KEY_SHORTCUT_KEY_MAP[ lowerKey ];
+	}
+
+	// For single characters, uppercase and escape if needed
+	if ( key.length === 1 ) {
+		return escapeHtmlForAriaShortcut( key.toUpperCase() );
+	}
+
+	// Multi-character keys get capitalized (e.g., 'enter' -> 'Enter')
+	return capitaliseFirstCharacter( key );
+}
+
+/**
  * Map the values of an object with a specified callback and return the result object.
  *
  * @template T The object type
@@ -241,17 +404,90 @@ export const rawShortcut: WPModifierHandler< WPKeyHandler< string > > =
 	} );
 
 /**
+ * Get the aria-keyshortcuts compliant name for a modifier key.
+ *
+ * Per the WAI-ARIA spec, modifier keys are written as:
+ * - "Alt" (on Windows/Linux)
+ * - "AltGraph" (Option key on Mac)
+ * - "Control"
+ * - "Shift"
+ * - "Meta" (Command key on Mac)
+ *
+ * @see https://www.w3.org/TR/wai-aria-1.2/#aria-keyshortcuts
+ * @see https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Reference/Attributes/aria-keyshortcuts
+ *
+ * @param key     The internal modifier key constant.
+ * @param isApple Whether the current platform is Apple (macOS/iOS).
+ * @return The WAI-ARIA compliant modifier key name.
+ */
+function getAriaShortcutModifierName(
+	key: WPModifierPart,
+	isApple: boolean
+): string {
+	switch ( key ) {
+		case ALT:
+			// On macOS, the Option key is represented as "AltGraph"
+			// per the aria-keyshortcuts specification.
+			return isApple ? 'AltGraph' : 'Alt';
+		case CTRL:
+			return 'Control';
+		case COMMAND:
+			return 'Meta';
+		case SHIFT:
+			return 'Shift';
+		default:
+			return key;
+	}
+}
+
+/**
  * An object that contains functions to get shortcuts in a format compatible
  * with the [`aria-keyshortcuts` HTML attribute](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Reference/Attributes/aria-keyshortcuts).
+ *
+ * The output follows the WAI-ARIA 1.2 specification:
+ * - Modifier keys use standard names: "Alt", "AltGraph" (Option on Mac),
+ *   "Control", "Shift", "Meta" (Command on Mac)
+ * - Keys are joined with "+"
+ * - Non-modifier keys are normalized to their `KeyboardEvent.key` equivalents
+ * - Special characters are HTML-escaped for safe use in HTML attributes
+ *
+ * @see https://www.w3.org/TR/wai-aria-1.2/#aria-keyshortcuts
+ * @see https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Reference/Attributes/aria-keyshortcuts
  *
  * @example
  * ```js
  * // Assuming macOS:
- * ariaKeyShortcut.primary( 'c' )
- * // "meta+c"
+ * ariaKeyShortcut.primary( 'm' )
+ * // "Meta+M"
+ *
+ * ariaKeyShortcut.primaryAlt( 'm' )
+ * // "AltGraph+Meta+M"
+ *
+ * // Assuming Windows:
+ * ariaKeyShortcut.primary( 'm' )
+ * // "Control+M"
+ *
+ * ariaKeyShortcut.primaryAlt( 'm' )
+ * // "Control+Alt+M"
+ *
+ * ariaKeyShortcut.primaryShift( 'del' )
+ * // "Control+Shift+Delete"
  * ```
  */
-export const ariaKeyShortcut = rawShortcut;
+export const ariaKeyShortcut: WPModifierHandler< WPKeyHandler< string > > =
+	/* @__PURE__ */
+	mapValues( modifiers, ( modifier: WPModifier ) => {
+		return ( character: string, _isApple = isAppleOS ) => {
+			const isApple = _isApple();
+			const modifierKeys = modifier( _isApple ).map( ( key ) =>
+				getAriaShortcutModifierName( key, isApple )
+			);
+			const normalizedCharacter =
+				normalizeKeyForAriaShortcut( character );
+
+			return [ ...modifierKeys, normalizedCharacter ].join( '+' );
+		};
+	} );
 
 /**
  * Return an array of the parts of a keyboard shortcut chord for display.

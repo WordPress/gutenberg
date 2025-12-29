@@ -272,9 +272,209 @@ describe( 'rawShortcut', () => {
 	} );
 } );
 
-describe( 'ariaKeyShortcut alias verification', () => {
-	it( 'should be identical to rawShortcut', () => {
-		expect( ariaKeyShortcut ).toBe( rawShortcut );
+describe( 'ariaKeyShortcut', () => {
+	describe( 'primary', () => {
+		it( 'should output "Control+M" on Windows', () => {
+			const shortcut = ariaKeyShortcut.primary( 'm', isAppleOSFalse );
+			expect( shortcut ).toEqual( 'Control+M' );
+		} );
+
+		it( 'should output "Meta+M" on MacOS', () => {
+			const shortcut = ariaKeyShortcut.primary( 'm', isAppleOSTrue );
+			expect( shortcut ).toEqual( 'Meta+M' );
+		} );
+
+		it( 'should normalize "del" to "Delete"', () => {
+			const shortcut = ariaKeyShortcut.primary( 'del', isAppleOSFalse );
+			expect( shortcut ).toEqual( 'Control+Delete' );
+		} );
+
+		it( 'should normalize "esc" to "Escape"', () => {
+			const shortcut = ariaKeyShortcut.primary( 'esc', isAppleOSFalse );
+			expect( shortcut ).toEqual( 'Control+Escape' );
+		} );
+	} );
+
+	describe( 'primaryShift', () => {
+		it( 'should output "Control+Shift+M" on Windows', () => {
+			const shortcut = ariaKeyShortcut.primaryShift(
+				'm',
+				isAppleOSFalse
+			);
+			expect( shortcut ).toEqual( 'Control+Shift+M' );
+		} );
+
+		it( 'should output "Shift+Meta+M" on MacOS', () => {
+			const shortcut = ariaKeyShortcut.primaryShift( 'm', isAppleOSTrue );
+			expect( shortcut ).toEqual( 'Shift+Meta+M' );
+		} );
+	} );
+
+	describe( 'primaryAlt', () => {
+		it( 'should output "Control+Alt+M" on Windows', () => {
+			const shortcut = ariaKeyShortcut.primaryAlt( 'm', isAppleOSFalse );
+			expect( shortcut ).toEqual( 'Control+Alt+M' );
+		} );
+
+		it( 'should output "AltGraph+Meta+M" on MacOS (Option key is AltGraph)', () => {
+			const shortcut = ariaKeyShortcut.primaryAlt( 'm', isAppleOSTrue );
+			expect( shortcut ).toEqual( 'AltGraph+Meta+M' );
+		} );
+	} );
+
+	describe( 'secondary', () => {
+		it( 'should output "Control+Shift+Alt+M" on Windows', () => {
+			const shortcut = ariaKeyShortcut.secondary( 'm', isAppleOSFalse );
+			expect( shortcut ).toEqual( 'Control+Shift+Alt+M' );
+		} );
+
+		it( 'should output "Shift+AltGraph+Meta+M" on MacOS (Option key is AltGraph)', () => {
+			const shortcut = ariaKeyShortcut.secondary( 'm', isAppleOSTrue );
+			expect( shortcut ).toEqual( 'Shift+AltGraph+Meta+M' );
+		} );
+	} );
+
+	describe( 'access', () => {
+		it( 'should output "Shift+Alt+M" on Windows', () => {
+			const shortcut = ariaKeyShortcut.access( 'm', isAppleOSFalse );
+			expect( shortcut ).toEqual( 'Shift+Alt+M' );
+		} );
+
+		it( 'should output "Control+AltGraph+M" on MacOS (Option key is AltGraph)', () => {
+			const shortcut = ariaKeyShortcut.access( 'm', isAppleOSTrue );
+			expect( shortcut ).toEqual( 'Control+AltGraph+M' );
+		} );
+	} );
+
+	describe( 'alt', () => {
+		it( 'should output "Alt+M" on Windows', () => {
+			const shortcut = ariaKeyShortcut.alt( 'm', isAppleOSFalse );
+			expect( shortcut ).toEqual( 'Alt+M' );
+		} );
+
+		it( 'should output "AltGraph+M" on MacOS (Option key is AltGraph)', () => {
+			const shortcut = ariaKeyShortcut.alt( 'm', isAppleOSTrue );
+			expect( shortcut ).toEqual( 'AltGraph+M' );
+		} );
+	} );
+
+	describe( 'shiftAlt', () => {
+		it( 'should output "Shift+Alt+M" on Windows', () => {
+			const shortcut = ariaKeyShortcut.shiftAlt( 'm', isAppleOSFalse );
+			expect( shortcut ).toEqual( 'Shift+Alt+M' );
+		} );
+
+		it( 'should output "Shift+AltGraph+M" on MacOS (Option key is AltGraph)', () => {
+			const shortcut = ariaKeyShortcut.shiftAlt( 'm', isAppleOSTrue );
+			expect( shortcut ).toEqual( 'Shift+AltGraph+M' );
+		} );
+	} );
+
+	describe( 'special characters and key normalization', () => {
+		it( 'should preserve special characters like period', () => {
+			const shortcut = ariaKeyShortcut.primary( '.', isAppleOSFalse );
+			expect( shortcut ).toEqual( 'Control+.' );
+		} );
+
+		it( 'should convert space to "Space"', () => {
+			const shortcut = ariaKeyShortcut.primary( ' ', isAppleOSFalse );
+			expect( shortcut ).toEqual( 'Control+Space' );
+		} );
+
+		it( 'should convert plus sign to "Plus"', () => {
+			const shortcut = ariaKeyShortcut.primary( '+', isAppleOSFalse );
+			expect( shortcut ).toEqual( 'Control+Plus' );
+		} );
+	} );
+
+	describe( 'named key normalization', () => {
+		it( 'should normalize "enter" to "Enter"', () => {
+			const shortcut = ariaKeyShortcut.primary( 'enter', isAppleOSFalse );
+			expect( shortcut ).toEqual( 'Control+Enter' );
+		} );
+
+		it( 'should normalize "tab" to "Tab"', () => {
+			const shortcut = ariaKeyShortcut.primary( 'tab', isAppleOSFalse );
+			expect( shortcut ).toEqual( 'Control+Tab' );
+		} );
+
+		it( 'should normalize arrow keys', () => {
+			expect(
+				ariaKeyShortcut.primary( 'arrowup', isAppleOSFalse )
+			).toEqual( 'Control+ArrowUp' );
+			expect(
+				ariaKeyShortcut.primary( 'arrowdown', isAppleOSFalse )
+			).toEqual( 'Control+ArrowDown' );
+			expect(
+				ariaKeyShortcut.primary( 'arrowleft', isAppleOSFalse )
+			).toEqual( 'Control+ArrowLeft' );
+			expect(
+				ariaKeyShortcut.primary( 'arrowright', isAppleOSFalse )
+			).toEqual( 'Control+ArrowRight' );
+		} );
+
+		it( 'should normalize navigation keys', () => {
+			expect(
+				ariaKeyShortcut.primary( 'pageup', isAppleOSFalse )
+			).toEqual( 'Control+PageUp' );
+			expect(
+				ariaKeyShortcut.primary( 'pagedown', isAppleOSFalse )
+			).toEqual( 'Control+PageDown' );
+			expect( ariaKeyShortcut.primary( 'home', isAppleOSFalse ) ).toEqual(
+				'Control+Home'
+			);
+			expect( ariaKeyShortcut.primary( 'end', isAppleOSFalse ) ).toEqual(
+				'Control+End'
+			);
+		} );
+
+		it( 'should normalize editing keys', () => {
+			expect(
+				ariaKeyShortcut.primary( 'backspace', isAppleOSFalse )
+			).toEqual( 'Control+Backspace' );
+			expect(
+				ariaKeyShortcut.primary( 'insert', isAppleOSFalse )
+			).toEqual( 'Control+Insert' );
+		} );
+
+		it( 'should normalize function keys', () => {
+			expect( ariaKeyShortcut.undefined( 'f1', isAppleOSFalse ) ).toEqual(
+				'F1'
+			);
+			expect(
+				ariaKeyShortcut.undefined( 'f10', isAppleOSFalse )
+			).toEqual( 'F10' );
+			expect(
+				ariaKeyShortcut.undefined( 'f12', isAppleOSFalse )
+			).toEqual( 'F12' );
+		} );
+	} );
+
+	describe( 'HTML entity escaping', () => {
+		it( 'should escape double quote character', () => {
+			const shortcut = ariaKeyShortcut.shift( '"', isAppleOSFalse );
+			expect( shortcut ).toEqual( 'Shift+&quot;' );
+		} );
+
+		it( 'should escape single quote character', () => {
+			const shortcut = ariaKeyShortcut.primary( "'", isAppleOSFalse );
+			expect( shortcut ).toEqual( 'Control+&#39;' );
+		} );
+
+		it( 'should escape ampersand character', () => {
+			const shortcut = ariaKeyShortcut.primary( '&', isAppleOSFalse );
+			expect( shortcut ).toEqual( 'Control+&amp;' );
+		} );
+
+		it( 'should escape less-than character', () => {
+			const shortcut = ariaKeyShortcut.primary( '<', isAppleOSFalse );
+			expect( shortcut ).toEqual( 'Control+&lt;' );
+		} );
+
+		it( 'should escape greater-than character', () => {
+			const shortcut = ariaKeyShortcut.primary( '>', isAppleOSFalse );
+			expect( shortcut ).toEqual( 'Control+&gt;' );
+		} );
 	} );
 } );
 
@@ -285,7 +485,7 @@ describe( 'shortcutFormats', () => {
 		expect( result ).toEqual( {
 			shortcutAriaLabel: 'Control + M',
 			displayShortcut: 'Ctrl+M',
-			ariaKeyShortcut: 'ctrl+m',
+			ariaKeyShortcut: 'Control+M',
 		} );
 	} );
 
@@ -295,7 +495,7 @@ describe( 'shortcutFormats', () => {
 		expect( result ).toEqual( {
 			shortcutAriaLabel: 'Control + Shift + K',
 			displayShortcut: 'Ctrl+Shift+K',
-			ariaKeyShortcut: 'ctrl+shift+k',
+			ariaKeyShortcut: 'Control+Shift+K',
 		} );
 	} );
 
@@ -305,7 +505,7 @@ describe( 'shortcutFormats', () => {
 		expect( result ).toEqual( {
 			shortcutAriaLabel: 'Shift + Alt + H',
 			displayShortcut: 'Shift+Alt+H',
-			ariaKeyShortcut: 'shift+alt+h',
+			ariaKeyShortcut: 'Shift+Alt+H',
 		} );
 	} );
 
@@ -315,7 +515,7 @@ describe( 'shortcutFormats', () => {
 		expect( result ).toEqual( {
 			shortcutAriaLabel: 'Control + Period',
 			displayShortcut: 'Ctrl+.',
-			ariaKeyShortcut: 'ctrl+.',
+			ariaKeyShortcut: 'Control+.',
 		} );
 	} );
 

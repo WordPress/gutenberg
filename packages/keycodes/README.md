@@ -46,12 +46,37 @@ Keycode for ALT key.
 
 An object that contains functions to get shortcuts in a format compatible with the [`aria-keyshortcuts` HTML attribute](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Reference/Attributes/aria-keyshortcuts).
 
+The output follows the WAI-ARIA 1.2 specification:
+
+-   Modifier keys use standard names: "Alt", "AltGraph" (Option on Mac), "Control", "Shift", "Meta" (Command on Mac)
+-   Keys are joined with "+"
+-   Non-modifier keys are normalized to their `KeyboardEvent.key` equivalents
+-   Special characters are HTML-escaped for safe use in HTML attributes
+
+_Related_
+
+-   <https://www.w3.org/TR/wai-aria-1.2/#aria-keyshortcuts>
+-   <https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Reference/Attributes/aria-keyshortcuts>
+
 _Usage_
 
 ```js
 // Assuming macOS:
-ariaKeyShortcut.primary( 'c' );
-// "meta+c"
+ariaKeyShortcut.primary( 'm' );
+// "Meta+M"
+
+ariaKeyShortcut.primaryAlt( 'm' );
+// "AltGraph+Meta+M"
+
+// Assuming Windows:
+ariaKeyShortcut.primary( 'm' );
+// "Control+M"
+
+ariaKeyShortcut.primaryAlt( 'm' );
+// "Control+Alt+M"
+
+ariaKeyShortcut.primaryShift( 'del' );
+// "Control+Shift+Delete"
 ```
 
 ### BACKSPACE
