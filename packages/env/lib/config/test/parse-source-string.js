@@ -83,14 +83,42 @@ describe( 'parseSourceString', () => {
 			} );
 		} );
 
+		it( 'should parse WordPress.org latest-stable sources', () => {
+			expect(
+				parseSourceString(
+					'https://downloads.wordpress.org/plugin/two-factor.latest-stable.zip',
+					options
+				)
+			).toEqual( {
+				basename: 'two-factor',
+				path: '/test/cache/two-factor',
+				type: 'zip',
+				url: 'https://downloads.wordpress.org/plugin/two-factor.latest-stable.zip',
+			} );
+		} );
+
 		it( 'should parse other sources', () => {
 			expect(
-				parseSourceString( 'http://test.com/testing.zip', options )
+				parseSourceString( 'http://example.com/testing.zip', options )
 			).toEqual( {
 				basename: 'testing',
 				path: '/test/cache/testing',
 				type: 'zip',
-				url: 'http://test.com/testing.zip',
+				url: 'http://example.com/testing.zip',
+			} );
+		} );
+
+		it( 'should strip version suffix from zip sources', () => {
+			expect(
+				parseSourceString(
+					'https://example.org/example-plugin.1.2.3.zip',
+					options
+				)
+			).toEqual( {
+				basename: 'example-plugin',
+				path: '/test/cache/example-plugin',
+				type: 'zip',
+				url: 'https://example.org/example-plugin.1.2.3.zip',
 			} );
 		} );
 	} );

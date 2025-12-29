@@ -69,8 +69,9 @@ function parseSourceString( sourceString, { cacheDirectoryPath } ) {
 
 	if ( zipFields ) {
 		const rawBasename = path.basename( zipFields[ 1 ] );
+		// Strip version suffixes like .1.2.3, .latest-stable, .trunk, .dev, etc.
 		const basename = encodeURIComponent(
-			rawBasename.replace( /\.(\d+\.)*\d+$/, '' )
+			rawBasename.replace( /\.((\d+\.)*\d+|[a-z][\w-]*)$/i, '' )
 		);
 
 		return {
