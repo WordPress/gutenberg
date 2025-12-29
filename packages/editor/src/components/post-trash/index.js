@@ -23,15 +23,19 @@ import PostTrashCheck from './check';
  */
 export default function PostTrash( { onActionPerformed } ) {
 	const registry = useRegistry();
-	const { isNew, isDeleting, postId, title } = useSelect( ( select ) => {
-		const store = select( editorStore );
-		return {
-			isNew: store.isEditedPostNew(),
-			isDeleting: store.isDeletingPost(),
-			postId: store.getCurrentPostId(),
-			title: store.getCurrentPostAttribute( 'title' ),
-		};
-	}, [] );
+	const { disableTrash, isNew, isDeleting, postId, title } = useSelect(
+		( select ) => {
+			const store = select( editorStore );
+			return {
+				disableTrash: store.getEditorSettings().disableTrash,
+				isNew: store.isEditedPostNew(),
+				isDeleting: store.isDeletingPost(),
+				postId: store.getCurrentPostId(),
+				title: store.getCurrentPostAttribute( 'title' ),
+			};
+		},
+		[]
+	);
 	const { trashPost } = useDispatch( editorStore );
 	const [ showConfirmDialog, setShowConfirmDialog ] = useState( false );
 
@@ -49,6 +53,23 @@ export default function PostTrash( { onActionPerformed } ) {
 		// to the post view depending on if the user is on post editor or site editor.
 		onActionPerformed?.( 'move-to-trash', [ item ] );
 	};
+
+	const buttonLabel = disableTrash
+		? __( 'Delete permanently' )
+		: __( 'Move to trash' );
+
+	const confirmMessage = disableTrash
+		? sprintf(
+				/* translators: %s: The item's title. */
+				__( 'Are you sure you want to delete "%s" permanently?' ),
+				title
+		  )
+		: sprintf(
+				/* translators: %s: The item's title. */
+				__( 'Are you sure you want to move "%s" to the trash?' ),
+				title
+		  );
+
 	return (
 		<PostTrashCheck>
 			<Button
@@ -62,20 +83,16 @@ export default function PostTrash( { onActionPerformed } ) {
 					isDeleting ? undefined : () => setShowConfirmDialog( true )
 				}
 			>
-				{ __( 'Move to trash' ) }
+				{ buttonLabel }
 			</Button>
 			<ConfirmDialog
 				isOpen={ showConfirmDialog }
 				onConfirm={ handleConfirm }
 				onCancel={ () => setShowConfirmDialog( false ) }
-				confirmButtonText={ __( 'Move to trash' ) }
+				confirmButtonText={ buttonLabel }
 				size="small"
 			>
-				{ sprintf(
-					// translators: %s: The item's title.
-					__( 'Are you sure you want to move "%s" to the trash?' ),
-					title
-				) }
+				{ confirmMessage }
 			</ConfirmDialog>
 		</PostTrashCheck>
 	);
