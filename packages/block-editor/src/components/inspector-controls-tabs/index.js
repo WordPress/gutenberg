@@ -97,6 +97,7 @@ export default function InspectorControlsTabs( {
 					/>
 				</Tabs.TabPanel>
 				<Tabs.TabPanel tabId={ TAB_CONTENT.name } focusable={ false }>
+					<InspectorControls.Slot group="content" />
 					<ContentTab
 						rootClientId={ clientId }
 						contentClientIds={ contentClientIds }

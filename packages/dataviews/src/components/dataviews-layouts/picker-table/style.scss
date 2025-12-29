@@ -1,9 +1,16 @@
+@use "@wordpress/base-styles/variables" as *;
+
 // Picker-specific table styles
 // The table picker mainly reuses the regular table styles from ../table/style.scss
 // Add any picker-specific overrides here if needed in the future.
 
 .dataviews-view-picker-table {
 	background-color: inherit;
+
+	// Constrain checkbox column to fixed width while other columns share remaining space.
+	.dataviews-view-table__checkbox-column {
+		width: $grid-unit-60;
+	}
 
 	tbody:focus-visible {
 		// Only show one focus outline at a time. When focus is on a child element,
