@@ -155,7 +155,7 @@ function block_core_tabs_generate_border_styles( array $attributes ): string {
 			$radius['bottomLeft'] ?? '0'
 		);
 	} else {
-		$radius_value = (string) $radius;
+		$radius_value = $radius;
 	}
 
 	return wp_sprintf( '--tab-border-radius: %s;', (string) $radius_value );
