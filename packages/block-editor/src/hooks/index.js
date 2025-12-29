@@ -33,6 +33,7 @@ import contentLockUI from './content-lock-ui';
 import './metadata';
 import blockHooks from './block-hooks';
 import blockBindingsPanel from './block-bindings';
+import listView from './list-view';
 import './block-renaming';
 import './grid-visualizer';
 
@@ -52,6 +53,7 @@ createBlockEditFilter(
 		blockBindingsPanel,
 		childLayout,
 		allowedBlocks,
+		listView,
 	].filter( Boolean )
 );
 createBlockListBlockFilter( [

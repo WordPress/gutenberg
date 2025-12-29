@@ -22,13 +22,22 @@
 		"node": ">=18.12.0",
 		"npm": ">=8.19.2"
 	},
-	"main": "build/index.js",
+	"files": [
+		"src",
+		"build",
+		"build-module",
+		"build-style",
+		"build-types",
+		"*.md"
+	],
+	"type": "module",
+	"main": "build/index.cjs",
 	"module": "build-module/index.js",
 	"exports": {
 		".": {
 			"types": "./build-types/index.d.ts",
 			"import": "./build-module/index.js",
-			"require": "./build/index.js"
+			"require": "./build/index.cjs"
 		},
 		"./package.json": "./package.json"
 	},
@@ -42,8 +51,8 @@
 		"src/store/index.js",
 		"src/hooks/**",
 		"src/bindings/**",
-		"build/index.js",
-		"build/store/index.js",
+		"build/index.cjs",
+		"build/store/index.cjs",
 		"build/hooks/**",
 		"build/bindings/**",
 		"build-module/index.js",
@@ -100,6 +109,9 @@
 		"react-autosize-textarea": "^7.1.0",
 		"remove-accents": "^0.5.0",
 		"uuid": "^9.0.1"
+	},
+	"devDependencies": {
+		"deep-freeze": "0.0.1"
 	},
 	"peerDependencies": {
 		"react": "^18.0.0",

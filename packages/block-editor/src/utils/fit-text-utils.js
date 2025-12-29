@@ -4,7 +4,7 @@
  */
 
 /**
- * Find optimal font size using simple binary search between 5-600px.
+ * Find optimal font size using simple binary search between 0-2400px.
  *
  * @param {HTMLElement} textElement   The text element
  * @param {Function}    applyFontSize Function that receives font size in pixels
@@ -13,7 +13,7 @@
 function findOptimalFontSize( textElement, applyFontSize ) {
 	const alreadyHasScrollableHeight =
 		textElement.scrollHeight > textElement.clientHeight;
-	let minSize = 5;
+	let minSize = 0;
 	let maxSize = 2400;
 	let bestSize = minSize;
 

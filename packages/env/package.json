@@ -35,6 +35,7 @@
 	"exports": {
 		".": "./lib/env.js",
 		"./lib/cli.js": "./lib/cli.js",
+		"./lib/config": "./lib/config/index.js",
 		"./package.json": "./package.json"
 	},
 	"bin": {

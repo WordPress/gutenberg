@@ -344,14 +344,7 @@ async function bundlePackage( packageName, options = {} ) {
 			};
 		}
 
-		const bundlePlugins = [
-			momentTimezoneAliasPlugin(),
-			wordpressExternalsPlugin(
-				'index.min',
-				'iife',
-				packageJson.wpScriptExtraDependencies || []
-			),
-		];
+		const baseBundlePlugins = [ momentTimezoneAliasPlugin() ];
 
 		builds.push(
 			esbuild.build( {
@@ -359,14 +352,30 @@ async function bundlePackage( packageName, options = {} ) {
 				outfile: path.join( outputDir, 'index.min.js' ),
 				minify: true,
 				define: getDefine( false ),
-				plugins: bundlePlugins,
+				plugins: [
+					...baseBundlePlugins,
+					wordpressExternalsPlugin(
+						'index.min',
+						'iife',
+						packageJson.wpScriptExtraDependencies || [],
+						true // Generate asset file for minified build
+					),
+				],
 			} ),
 			esbuild.build( {
 				...baseConfig,
 				outfile: path.join( outputDir, 'index.js' ),
 				minify: false,
 				define: getDefine( true ),
-				plugins: bundlePlugins,
+				plugins: [
+					...baseBundlePlugins,
+					wordpressExternalsPlugin(
+						'index.min',
+						'iife',
+						packageJson.wpScriptExtraDependencies || [],
+						false // Skip asset file for non-minified build
+					),
+				],
 			} )
 		);
 
@@ -397,9 +406,6 @@ async function bundlePackage( packageName, options = {} ) {
 					: exportName.replace( /^\.\//, '' );
 			const entryPoint = path.join( packageDir, exportPath );
 			const baseFileName = path.basename( fileName );
-			const modulePlugins = [
-				wordpressExternalsPlugin( `${ baseFileName }.min`, 'esm' ),
-			];
 
 			builds.push(
 				esbuild.build( {
@@ -415,7 +421,14 @@ async function bundlePackage( packageName, options = {} ) {
 					platform: 'browser',
 					minify: true,
 					define: getDefine( false ),
-					plugins: modulePlugins,
+					plugins: [
+						wordpressExternalsPlugin(
+							`${ baseFileName }.min`,
+							'esm',
+							[],
+							true // Generate asset file for minified build
+						),
+					],
 				} ),
 				esbuild.build( {
 					entryPoints: [ entryPoint ],
@@ -430,7 +443,14 @@ async function bundlePackage( packageName, options = {} ) {
 					platform: 'browser',
 					minify: false,
 					define: getDefine( true ),
-					plugins: modulePlugins,
+					plugins: [
+						wordpressExternalsPlugin(
+							`${ baseFileName }.min`,
+							'esm',
+							[],
+							false // Skip asset file for non-minified build
+						),
+					],
 				} )
 			);
 
@@ -603,7 +623,10 @@ async function bundlePackage( packageName, options = {} ) {
 					?.map( ( d ) => d.replace( /'/g, '' ) ) || [];
 		}
 
-		const styleDeps = await inferStyleDependencies( scriptDependencies );
+		const styleDeps = await inferStyleDependencies(
+			scriptDependencies,
+			packageName
+		);
 
 		builtStyles.push( {
 			handle: `${ handlePrefix }-${ packageName }`,
@@ -627,14 +650,17 @@ async function bundlePackage( packageName, options = {} ) {
  * 3. Actually have a built style.css file
  *
  * @param {string[]} scriptDependencies Array of script handles from asset file.
+ * @param {string}   packageName        Package name (short name) being bundled, for context-aware resolution.
  * @return {Promise<string[]>} Array of style handles to depend on.
  */
-async function inferStyleDependencies( scriptDependencies ) {
+async function inferStyleDependencies( scriptDependencies, packageName ) {
 	if ( ! scriptDependencies || scriptDependencies.length === 0 ) {
 		return [];
 	}
 
 	const styleDeps = [];
+	// Get the resolve directory for context-aware package resolution
+	const resolveDir = path.join( PACKAGES_DIR, packageName );
 
 	for ( const scriptHandle of scriptDependencies ) {
 		// Skip non-package dependencies (like 'react', 'lodash', etc.)
@@ -642,13 +668,13 @@ async function inferStyleDependencies( scriptDependencies ) {
 			continue;
 		}
 
-		// Convert handle to package name: 'wp-components' → 'components'
+		// Convert handle to package name: 'wp-components' → '@wordpress/components'
 		const shortName = scriptHandle.replace( 'wp-', '' );
 		const depPackageName = `@wordpress/${ shortName }`;
 
-		// Read the dependency's package.json
+		// Read the dependency's package.json with context-aware resolution
 		try {
-			const depPackageJson = getPackageInfo( depPackageName );
+			const depPackageJson = getPackageInfo( depPackageName, resolveDir );
 
 			if ( ! depPackageJson ) {
 				continue;
@@ -746,14 +772,14 @@ async function generateScriptRegistrationPhp( scripts, replacements ) {
 }
 
 /**
- * Generate PHP file for version constant.
+ * Generate PHP file for constants (version and build URL).
  *
  * @param {Record<string, string>} replacements PHP template replacements.
  */
-async function generateVersionPhp( replacements ) {
+async function generateConstantsPhp( replacements ) {
 	await generatePhpFromTemplate(
-		'version.php.template',
-		path.join( BUILD_DIR, 'version.php' ),
+		'constants.php.template',
+		path.join( BUILD_DIR, 'constants.php' ),
 		replacements
 	);
 }
@@ -1002,7 +1028,12 @@ async function transpilePackage( packageName ) {
 		name: 'externalize-except-css',
 		setup( build ) {
 			// Externalize all non-CSS imports
-			build.onResolve( { filter: /.*/ }, ( args ) => {
+			build.onResolve( { filter: /.*/ }, async ( args ) => {
+				// Skip recursive calls.
+				if ( args.pluginData?.__fromExternalize ) {
+					return null;
+				}
+
 				// Skip entry points
 				if ( args.kind === 'entry-point' ) {
 					return null;
@@ -1011,6 +1042,44 @@ async function transpilePackage( packageName ) {
 				// Let CSS/SCSS files be processed by sassPlugin
 				if ( args.path.match( /\.(css|scss)$/ ) ) {
 					return null;
+				}
+
+				// Fully resolve local dependencies without file extension
+				// and replace the extension with the target extension.
+				if ( args.path.startsWith( '.' ) ) {
+					const resolved = await build.resolve( args.path, {
+						namespace: args.namespace,
+						importer: args.importer,
+						kind: args.kind,
+						resolveDir: args.resolveDir,
+						with: args.with,
+						pluginData: {
+							...args.pluginData,
+							__fromExternalize: true,
+						},
+					} );
+
+					if ( resolved.errors.length > 0 ) {
+						return resolved;
+					}
+
+					// Relativize path: make it relative to resolveDir with leading ./
+					let relativePath = normalizePath(
+						path.relative( args.resolveDir, resolved.path )
+					);
+					if ( ! relativePath.startsWith( '.' ) ) {
+						relativePath = './' + relativePath;
+					}
+
+					// Replace extension: make sure that file extension is always `.js` or `.cjs`.
+					const newExt =
+						build.initialOptions.format === 'cjs' ? '.cjs' : '.js';
+					relativePath = relativePath.replace( /\.[jt]sx?$/, newExt );
+
+					return {
+						path: relativePath,
+						external: true,
+					};
 				}
 
 				// Externalize everything else (keep imports as-is)
@@ -1030,6 +1099,7 @@ async function transpilePackage( packageName ) {
 				entryPoints: srcFiles,
 				outdir: buildDir,
 				outbase: srcDir,
+				outExtension: { '.js': '.cjs' },
 				bundle: true,
 				platform: 'node',
 				format: 'cjs',
@@ -1037,9 +1107,7 @@ async function transpilePackage( packageName ) {
 				target,
 				jsx: 'automatic',
 				jsxImportSource: 'react',
-				loader: {
-					'.js': 'jsx',
-				},
+				loader: { '.js': 'jsx' },
 				plugins,
 			} )
 		);
@@ -1069,9 +1137,7 @@ async function transpilePackage( packageName ) {
 				target,
 				jsx: 'automatic',
 				jsxImportSource: 'react',
-				loader: {
-					'.js': 'jsx',
-				},
+				loader: { '.js': 'jsx' },
 				plugins,
 			} )
 		);
@@ -1279,10 +1345,6 @@ async function buildRoute( routeName ) {
 		} );
 
 		if ( routeEntryPoints.length > 0 ) {
-			const routePlugins = [
-				wordpressExternalsPlugin( 'route.min', 'esm' ),
-			];
-
 			// Build both minified and non-minified versions in parallel
 			await Promise.all( [
 				esbuild.build( {
@@ -1293,7 +1355,14 @@ async function buildRoute( routeName ) {
 					target: browserslistToEsbuild(),
 					minify: true,
 					define: getDefine( false ),
-					plugins: routePlugins,
+					plugins: [
+						wordpressExternalsPlugin(
+							'route.min',
+							'esm',
+							[],
+							true // Generate asset file for minified build
+						),
+					],
 				} ),
 				esbuild.build( {
 					entryPoints: routeEntryPoints,
@@ -1303,7 +1372,14 @@ async function buildRoute( routeName ) {
 					target: browserslistToEsbuild(),
 					minify: false,
 					define: getDefine( true ),
-					plugins: routePlugins,
+					plugins: [
+						wordpressExternalsPlugin(
+							'route.min',
+							'esm',
+							[],
+							false // Skip asset file for non-minified build
+						),
+					],
 				} ),
 			] );
 		}
@@ -1318,11 +1394,6 @@ async function buildRoute( routeName ) {
 		// Write temporary entry file
 		await writeFile( tempEntryPath, syntheticEntry );
 
-		const contentPlugins = [
-			wordpressExternalsPlugin( 'content.min', 'esm' ),
-			...styleBundlingPlugins,
-		];
-
 		// Build both minified and non-minified versions in parallel
 		await Promise.all( [
 			esbuild.build( {
@@ -1333,7 +1404,15 @@ async function buildRoute( routeName ) {
 				target: browserslistToEsbuild(),
 				minify: true,
 				define: getDefine( false ),
-				plugins: contentPlugins,
+				plugins: [
+					wordpressExternalsPlugin(
+						'content.min',
+						'esm',
+						[],
+						true // Generate asset file for minified build
+					),
+					...styleBundlingPlugins,
+				],
 			} ),
 			esbuild.build( {
 				entryPoints: [ tempEntryPath ],
@@ -1343,7 +1422,15 @@ async function buildRoute( routeName ) {
 				target: browserslistToEsbuild(),
 				minify: false,
 				define: getDefine( true ),
-				plugins: contentPlugins,
+				plugins: [
+					wordpressExternalsPlugin(
+						'content.min',
+						'esm',
+						[],
+						false // Skip asset file for non-minified build
+					),
+					...styleBundlingPlugins,
+				],
 			} ),
 		] );
 
@@ -1380,24 +1467,28 @@ async function buildAllRoutes() {
 
 /**
  * Main build function.
+ *
+ * @param {string?} baseUrlExpression
  */
-async function buildAll() {
+async function buildAll( baseUrlExpression ) {
 	console.log( '🔨 Building packages...\n' );
 
 	const startTime = Date.now();
 
-	// Build maps: short name ↔ full name from package.json
+	// Build maps: short name ↔ full name ↔ package.json from package.json files
 	const shortToFull = new Map();
 	const fullToShort = new Map();
+	const fullToPackageJson = new Map();
 	for ( const pkg of PACKAGES ) {
 		const packageJson = getPackageInfoFromFile(
 			path.join( PACKAGES_DIR, pkg, 'package.json' )
 		);
 		shortToFull.set( pkg, packageJson.name );
 		fullToShort.set( packageJson.name, pkg );
+		fullToPackageJson.set( packageJson.name, packageJson );
 	}
 
-	const levels = groupByDepth( Array.from( shortToFull.values() ) );
+	const levels = groupByDepth( fullToPackageJson );
 
 	console.log( '📝 Phase 1: Transpiling packages...\n' );
 
@@ -1444,26 +1535,40 @@ async function buildAll() {
 	await buildAllRoutes();
 
 	// Collect route and page data for PHP generation
-	const routes = getAllRoutes( ROOT_DIR ).map( ( routeName ) => {
+	// Use flatMap to expand routes with multiple pages into separate entries
+	const routes = getAllRoutes( ROOT_DIR ).flatMap( ( routeName ) => {
 		const metadata = getRouteMetadata( ROOT_DIR, routeName );
+
+		// Skip routes without pages
+		if ( ! metadata || ! metadata.pages || metadata.pages.length === 0 ) {
+			return [];
+		}
 		const routeFiles = getRouteFiles(
 			path.join( ROOT_DIR, 'routes', routeName )
 		);
-		return {
-			name: routeName,
-			path: metadata?.path,
-			page: metadata?.page,
-			hasRoute: routeFiles.hasRoute,
-			hasContent: routeFiles.hasStage || routeFiles.hasInspector,
-		};
+
+		// Create a route entry for each page
+		return metadata.pages.map( ( page ) => {
+			return {
+				name: routeName,
+				path: metadata.path,
+				page,
+				hasRoute: routeFiles.hasRoute,
+				hasContent: routeFiles.hasStage || routeFiles.hasInspector,
+			};
+		} );
 	} );
 
 	// Normalize PAGES config to support both string and object formats
 	const normalizedPages = PAGES.map( ( page ) => {
 		if ( typeof page === 'string' ) {
-			return { id: page, init: [] };
+			return { id: page, init: [], title: undefined };
 		}
-		return { id: page.id, init: page.init || [] };
+		return {
+			id: page.id,
+			init: page.init || [],
+			title: page.title || undefined,
+		};
 	} );
 
 	const pageData = normalizedPages.map( ( page ) => {
@@ -1472,6 +1577,7 @@ async function buildAll() {
 			slug: page.id,
 			routes: pageRoutes,
 			initModules: page.init,
+			title: page.title,
 		};
 	} );
 
@@ -1521,13 +1627,16 @@ async function buildAll() {
 	}
 
 	console.log( '\n📄 Generating PHP registration files...\n' );
-	const phpReplacements = await getPhpReplacements( ROOT_DIR );
+	const phpReplacements = await getPhpReplacements(
+		ROOT_DIR,
+		baseUrlExpression
+	);
 	await Promise.all( [
 		generateMainIndexPhp( phpReplacements ),
 		generateModuleRegistrationPhp( modules, phpReplacements ),
 		generateScriptRegistrationPhp( scripts, phpReplacements ),
 		generateStyleRegistrationPhp( styles, phpReplacements ),
-		generateVersionPhp( phpReplacements ),
+		generateConstantsPhp( phpReplacements ),
 		generateRoutesRegistry( routes, phpReplacements ),
 		generateRoutesPhp( routes, phpReplacements ),
 		generatePagesPhp( pageData, phpReplacements ),
@@ -1566,17 +1675,18 @@ async function watchMode() {
 	let isRebuilding = false;
 	const needsRebuild = new Set();
 
-	// Build maps: short name ↔ full name from package.json (once)
+	// Build maps: short name ↔ full name ↔ package.json from package.json files (once)
 	const shortToFull = new Map();
 	const fullToShort = new Map();
+	const fullToPackageJson = new Map();
 	for ( const pkg of PACKAGES ) {
 		const packageJson = getPackageInfoFromFile(
 			path.join( PACKAGES_DIR, pkg, 'package.json' )
 		);
 		shortToFull.set( pkg, packageJson.name );
 		fullToShort.set( packageJson.name, pkg );
+		fullToPackageJson.set( packageJson.name, packageJson );
 	}
-	const allFullNames = Array.from( shortToFull.values() );
 
 	// Get all routes for dependency tracking
 	const allRoutes = getAllRoutes( ROOT_DIR );
@@ -1599,7 +1709,7 @@ async function watchMode() {
 			const fullName = shortToFull.get( packageName );
 			const affectedScripts = findScriptsToRebundle(
 				fullName,
-				allFullNames
+				fullToPackageJson
 			);
 
 			for ( const fullScript of affectedScripts ) {
@@ -1622,7 +1732,7 @@ async function watchMode() {
 			// Find and rebuild affected routes
 			const affectedRoutes = findRoutesToRebuild(
 				fullName,
-				allFullNames,
+				fullToPackageJson,
 				ROOT_DIR,
 				allRoutes
 			);
@@ -1815,10 +1925,16 @@ async function main() {
 				short: 'w',
 				default: false,
 			},
+			'base-url': {
+				type: 'string',
+				default: 'plugin_dir_url( __FILE__ )',
+			},
 		},
 	} );
 
-	await buildAll();
+	const baseUrlExpression = values[ 'base-url' ];
+
+	await buildAll( baseUrlExpression );
 
 	if ( values.watch ) {
 		console.log( '\n👀 Watching for changes...\n' );

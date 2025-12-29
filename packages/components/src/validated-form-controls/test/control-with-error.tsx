@@ -7,7 +7,7 @@ import userEvent from '@testing-library/user-event';
 /**
  * WordPress dependencies
  */
-import { useState, useCallback } from '@wordpress/element';
+import { useState, useCallback, useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -280,6 +280,59 @@ describe( 'ControlWithError', () => {
 
 			// Form is not submitted
 			expect( onSubmit ).not.toHaveBeenCalled();
+		} );
+	} );
+
+	describe( 'Focus behavior', () => {
+		it( 'should focus the first error in the form', async () => {
+			const user = userEvent.setup();
+			render(
+				<form>
+					<ValidatedInputControl label="Text1" required />
+					<ValidatedInputControl label="Text2" required />
+					<button type="submit">Submit</button>
+				</form>
+			);
+
+			await user.click(
+				screen.getByRole( 'button', { name: 'Submit' } )
+			);
+
+			expect(
+				screen.getByRole( 'textbox', { name: /^Text1/ } )
+			).toHaveFocus();
+		} );
+
+		it( 'should focus the field on an `invalid` event, even if there is no enclosing form', async () => {
+			const user = userEvent.setup();
+			function ValidatedInputControlWithRef(
+				props: React.ComponentProps< typeof ValidatedInputControl >
+			) {
+				const ref = useRef< HTMLInputElement >( null );
+				return (
+					<>
+						<ValidatedInputControl ref={ ref } { ...props } />
+						<button
+							type="button"
+							onClick={ () => ref.current?.reportValidity() }
+						>
+							Report Validity
+						</button>
+					</>
+				);
+			}
+
+			render( <ValidatedInputControlWithRef label="Text" required /> );
+
+			await user.click(
+				screen.getByRole( 'button', { name: 'Report Validity' } )
+			);
+
+			await waitFor( () => {
+				expect(
+					screen.getByRole( 'textbox', { name: /^Text/ } )
+				).toHaveFocus();
+			} );
 		} );
 	} );
 } );

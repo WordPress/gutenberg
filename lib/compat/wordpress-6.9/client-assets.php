@@ -19,9 +19,11 @@ if ( ! method_exists( 'WP_Interactivity_API', 'add_client_navigation_support_to_
 	 */
 	function gutenberg_interactive_script_modules_registry( $script_module_id = null ) {
 		static $interactive_script_modules = array(
+			'@wordpress/block-library/file/view-js-module' => true,
+			'@wordpress/block-library/image/view-js-module' => true,
 			'@wordpress/block-library/navigation/view-js-module' => true,
-			'@wordpress/block-library/query/view-js-module'      => true,
-			'@wordpress/block-library/image/view-js-module'      => true,
+			'@wordpress/block-library/query/view-js-module' => true,
+			'@wordpress/block-library/search/view-js-module' => true,
 		);
 		if ( null !== $script_module_id ) {
 			$interactive_script_modules[ $script_module_id . '-js-module' ] = true;

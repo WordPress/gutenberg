@@ -26,6 +26,7 @@ const separatorDefaultValue = '/';
 export default function BreadcrumbEdit( {
 	attributes,
 	setAttributes,
+	name,
 	context: { postId, postType, templateSlug },
 } ) {
 	const {
@@ -104,7 +105,7 @@ export default function BreadcrumbEdit( {
 	const { content } = useServerSideRender( {
 		attributes,
 		skipBlockSupportAttributes: true,
-		block: 'core/breadcrumbs',
+		block: name,
 		urlQueryArgs: { post_id: postId, invalidationKey },
 	} );
 
@@ -202,7 +203,6 @@ export default function BreadcrumbEdit( {
 						}
 					>
 						<ToggleControl
-							__nextHasNoMarginBottom
 							label={ __( 'Show home breadcrumb' ) }
 							onChange={ ( value ) =>
 								setAttributes( { showHomeItem: value } )
@@ -221,7 +221,6 @@ export default function BreadcrumbEdit( {
 						}
 					>
 						<ToggleControl
-							__nextHasNoMarginBottom
 							label={ __( 'Show current breadcrumb' ) }
 							onChange={ ( value ) =>
 								setAttributes( { showCurrentItem: value } )
@@ -240,7 +239,6 @@ export default function BreadcrumbEdit( {
 						}
 					>
 						<TextControl
-							__nextHasNoMarginBottom
 							__next40pxDefaultSize
 							autoComplete="off"
 							label={ __( 'Separator' ) }
@@ -261,7 +259,6 @@ export default function BreadcrumbEdit( {
 			</InspectorControls>
 			<InspectorControls group="advanced">
 				<CheckboxControl
-					__nextHasNoMarginBottom
 					label={ __( 'Show on homepage' ) }
 					checked={ showOnHomePage }
 					onChange={ ( value ) =>
@@ -272,7 +269,6 @@ export default function BreadcrumbEdit( {
 					) }
 				/>
 				<CheckboxControl
-					__nextHasNoMarginBottom
 					label={ __( 'Prefer taxonomy terms' ) }
 					checked={ prefersTaxonomy }
 					onChange={ ( value ) =>

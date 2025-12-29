@@ -64,6 +64,7 @@ export function useRichText( {
 	const recordRef = useRef();
 
 	function setRecordFromProps() {
+		const activeFormats = recordRef.current?.activeFormats;
 		_valueRef.current = value;
 		recordRef.current = value;
 		if ( ! ( value instanceof RichTextData ) ) {
@@ -76,6 +77,7 @@ export function useRichText( {
 			text: recordRef.current.text,
 			formats: recordRef.current.formats,
 			replacements: recordRef.current.replacements,
+			activeFormats,
 		};
 		if ( disableFormats ) {
 			recordRef.current.formats = Array( value.length );

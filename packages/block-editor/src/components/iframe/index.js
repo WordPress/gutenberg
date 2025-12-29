@@ -21,7 +21,6 @@ import { useSelect } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import { useBlockSelectionClearer } from '../block-selection-clearer';
 import { useWritingFlow } from '../writing-flow';
 import { getCompatibilityStyles } from './get-compatibility-styles';
 import { useScaleCanvas } from './use-scale-canvas';
@@ -233,7 +232,6 @@ function Iframe( {
 	/** @type {[Document, import('react').Dispatch<Document>]} */
 	const [ iframeDocument, setIframeDocument ] = useState();
 	const [ bodyClasses, setBodyClasses ] = useState( [] );
-	const clearerRef = useBlockSelectionClearer();
 	const [ before, writingFlowRef, after ] = useWritingFlow();
 
 	// Local state to trigger re-render when shared cache is populated
@@ -361,8 +359,6 @@ function Iframe( {
 
 			documentElement.classList.add( 'block-editor-iframe__html' );
 
-			clearerRef( documentElement );
-
 			contentDocument.dir = ownerDocument.dir;
 
 			// Fetch and inject compatibility styles as inline CSS to avoid duplicate requests
@@ -431,7 +427,6 @@ function Iframe( {
 	const bodyRef = useMergeRefs( [
 		useBubbleEvents( iframeDocument ),
 		contentRef,
-		clearerRef,
 		writingFlowRef,
 		disabledRef,
 	] );

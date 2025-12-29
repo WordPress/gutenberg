@@ -9,7 +9,6 @@ import type { MouseEventHandler } from 'react';
 import {
 	Button,
 	Modal,
-	__experimentalHStack as HStack,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
@@ -17,6 +16,7 @@ import { useMemo, useState } from '@wordpress/element';
 import { moreVertical } from '@wordpress/icons';
 import { useRegistry } from '@wordpress/data';
 import { useViewportMatch } from '@wordpress/compose';
+import { Stack } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -212,8 +212,8 @@ export default function ItemActions< Item >( {
 	}
 
 	return (
-		<HStack
-			spacing={ 0 }
+		<Stack
+			direction="row"
 			justify="flex-end"
 			className="dataviews-item-actions"
 			style={ {
@@ -233,7 +233,7 @@ export default function ItemActions< Item >( {
 					registry={ registry }
 				/>
 			) }
-		</HStack>
+		</Stack>
 	);
 }
 

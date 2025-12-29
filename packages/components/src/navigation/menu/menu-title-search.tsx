@@ -83,7 +83,6 @@ function MenuTitleSearch( {
 	return (
 		<MenuTitleSearchControlWrapper>
 			<SearchControl
-				__nextHasNoMarginBottom
 				className="components-navigation__menu-search-input"
 				id={ inputId }
 				onChange={ ( value ) => onSearch?.( value ) }

@@ -35,6 +35,8 @@
 	"dependencies": {
 		"@actions/core": "^1.8.0",
 		"@actions/github": "^5.0.1",
+		"@octokit/types": "6.34.0",
+		"@octokit/webhooks-types": "5.8.0",
 		"jest-message-util": "^29.6.2"
 	},
 	"publishConfig": {

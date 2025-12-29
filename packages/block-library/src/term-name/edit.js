@@ -95,7 +95,6 @@ export default function TermNameEdit( {
 						isShownByDefault
 					>
 						<ToggleControl
-							__nextHasNoMarginBottom
 							label={ __( 'Make term name a link' ) }
 							onChange={ () =>
 								setAttributes( { isLink: ! isLink } )

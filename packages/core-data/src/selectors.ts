@@ -3,6 +3,7 @@
  */
 import { createSelector, createRegistrySelector } from '@wordpress/data';
 import { addQueryArgs } from '@wordpress/url';
+import type { UndoManager } from '@wordpress/undo-manager';
 import deprecated from '@wordpress/deprecated';
 
 /**
@@ -24,7 +25,6 @@ import {
 	getUserPermissionCacheKey,
 } from './utils';
 import type * as ET from './entity-types';
-import type { UndoManager } from '@wordpress/undo-manager';
 import logEntityDeprecation from './utils/log-entity-deprecation';
 
 // This is an incomplete, high-level approximation of the State type.
@@ -609,6 +609,16 @@ export interface GetEntityRecords {
 		name: string,
 		query?: GetRecordsHttpQuery
 	) => EntityRecord[] | null;
+
+	PromiseCurriedSignature: <
+		EntityRecord extends
+			| ET.EntityRecord< any >
+			| Partial< ET.EntityRecord< any > >,
+	>(
+		kind: string,
+		name: string,
+		query?: GetRecordsHttpQuery
+	) => Promise< EntityRecord[] | null >;
 }
 
 /**

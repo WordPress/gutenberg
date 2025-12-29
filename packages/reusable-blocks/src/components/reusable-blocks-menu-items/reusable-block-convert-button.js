@@ -170,14 +170,12 @@ export default function ReusableBlockConvertButton( {
 						<VStack spacing="5">
 							<TextControl
 								__next40pxDefaultSize
-								__nextHasNoMarginBottom
 								label={ __( 'Name' ) }
 								value={ title }
 								onChange={ setTitle }
 								placeholder={ __( 'My pattern' ) }
 							/>
 							<ToggleControl
-								__nextHasNoMarginBottom
 								label={ _x( 'Synced', 'pattern (singular)' ) }
 								help={ __(
 									'Sync this pattern across multiple locations.'

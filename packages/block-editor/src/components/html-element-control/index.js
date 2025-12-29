@@ -88,7 +88,6 @@ export default function HTMLElementControl( {
 	return (
 		<VStack spacing={ 2 } className="block-editor-html-element-control">
 			<SelectControl
-				__nextHasNoMarginBottom
 				__next40pxDefaultSize
 				label={ __( 'HTML element' ) }
 				options={ modifiedOptions }

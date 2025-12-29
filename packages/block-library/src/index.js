@@ -82,6 +82,7 @@ import * as navigation from './navigation';
 import * as navigationLink from './navigation-link';
 import * as navigationSubmenu from './navigation-submenu';
 import * as nextpage from './nextpage';
+import * as navigationOverlayClose from './navigation-overlay-close';
 import * as pattern from './pattern';
 import * as pageList from './page-list';
 import * as pageListItem from './page-list-item';
@@ -261,10 +262,10 @@ const getAllBlocks = () => {
 		termTemplate,
 		queryTitle,
 		postAuthorBiography,
+		breadcrumbs,
 	];
 
 	if ( window?.__experimentalEnableBlockExperiments ) {
-		blocks.push( breadcrumbs );
 		blocks.push( tab );
 		blocks.push( tabs );
 	}
@@ -274,6 +275,10 @@ const getAllBlocks = () => {
 		blocks.push( formInput );
 		blocks.push( formSubmitButton );
 		blocks.push( formSubmissionNotification );
+	}
+
+	if ( window?.__experimentalNavigationOverlays ) {
+		blocks.push( navigationOverlayClose );
 	}
 
 	// When in a WordPress context, conditionally

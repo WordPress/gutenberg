@@ -1089,10 +1089,10 @@ store(
 
 Apart from the store function, there are also some methods that allows the developer to access data on their store functions.
 
--   getContext()
-    -   getServerContext()
-    -   getServerState()
--   getElement()
+-   [`getContext()`](#getcontext)
+-   [`getElement()`](#getelement)
+-   [`getServerContext()`](#getservercontext)
+-   [`getServerState()`](#getserverstate)
 
 #### getContext()
 
@@ -1131,6 +1131,44 @@ store( 'myPlugin', {
 } );
 ```
 
+#### getElement()
+
+Retrieves a representation of the element that the action is bound to or called from. Such representation is read-only, and contains a reference to the DOM element, its props and a local reactive state.
+It returns an object with two keys:
+
+##### ref
+
+`ref` is the reference to the DOM element as an [HTMLElement](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement). It is equivalent to `useRef` in Preact or React, so it can be `null` when `ref` has not been attached to the actual DOM element yet, i.e., when it is being hydrated or mounted.
+
+##### attributes
+
+`attributes` is an object that contains the attributes of the element. In the button example:
+
+```js
+// store
+import { store, getElement } from '@wordpress/interactivity';
+
+store( 'myPlugin', {
+	actions: {
+		log: () => {
+			const element = getElement();
+			// Logs attributes
+			console.log( 'element attributes => ', element.attributes );
+		},
+	},
+} );
+```
+
+The code will log:
+
+```json
+{
+	"data-wp-on--click": 'actions.log',
+	"children": ['Log'],
+	"onclick": event => { evaluate(entry, event); }
+}
+```
+
 #### getServerContext()
 
 This function is analogous to `getContext()`, but with 2 key differences:
@@ -1163,11 +1201,12 @@ store( 'myPlugin', {
 
 #### getServerState()
 
-Retrieves the server state an interactive region.
+Retrieves the server state of an interactive region.
 
-This function is serves the same purpose as `getServerContext()`, but it returns the **state** instead of the **context**.
+This function serves the same purpose as `getServerContext()`, but it returns the **state** instead of the **context**.
 
 The object returned is read-only, and includes the state defined in PHP with `wp_interactivity_state()`. When using [`actions.navigate()`](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-interactivity-router/#actions) from [`@wordpress/interactivity-router`](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-interactivity-router/), the object returned by `getServerState()` is updated to reflect the changes in its properties, without affecting the state returned by `store()`. Directives can subscribe to those changes to update the state if needed.
+
 
 ```js
 const serverState = getServerState( 'namespace' );
@@ -1189,45 +1228,11 @@ const { state } = store( 'myStore', {
 } );
 ```
 
-#### getElement()
+#### How server context and state merging works during navigation
 
-Retrieves a representation of the element that the action is bound to or called from. Such representation is read-only, and contains a reference to the DOM element, its props and a local reactive state.
-It returns an object with two keys:
+During navigation, the data returned by both `getServerContext()` and `getServerState()` is fully replaced with the values from the new page. In contrast, the related client data (context or state) is "soft merged"—existing client-side properties are preserved, and only new properties from the server are added. This ensures that new blocks or components introduced by navigation can initialize with server-provided values, while client-side changes made by users remain intact. If you need to update existing client properties with data from the server (i.e., overwrite values), call `getServerContext()` or `getServerState()` within your callbacks and manually overwrite the relevant properties.
 
-##### ref
-
-`ref` is the reference to the DOM element as an [HTMLElement](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement). It is equivalent to `useRef` in Preact or React, so it can be `null` when `ref` has not been attached to the actual DOM element yet, i.e., when it is being hydrated or mounted.
-
-##### attributes
-
-`attributes` contains a [Proxy](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy), which adds a getter that allows to reference other store namespaces. Feel free to check the getter in the code. [Link](https://github.com/WordPress/gutenberg/blob/8cb23964d58f3ce5cf6ae1b6f967a4b8d4939a8e/packages/interactivity/src/store.ts#L70)
-
-Those attributes will contain the directives of that element. In the button example:
-
-```js
-// store
-import { store, getElement } from '@wordpress/interactivity';
-
-store( 'myPlugin', {
-	actions: {
-		log: () => {
-			const element = getElement();
-			// Logs attributes
-			console.log( 'element attributes => ', element.attributes );
-		},
-	},
-} );
-```
-
-The code will log:
-
-```json
-{
-	"data-wp-on--click": 'actions.log',
-	"children": ['Log'],
-	"onclick": event => { evaluate(entry, event); }
-}
-```
+If you subscribe to any value returned by `getServerContext()` or `getServerState()` within a callback, that callback will be invoked on every navigation event—regardless of whether that value have changed. This makes it possible to reliably reset or update client-side data as needed whenever navigation occurs.
 
 ### withScope()
 

@@ -3,7 +3,7 @@
 /**
  * External dependencies
  */
-import { spawn } from 'child_process';
+import spawn from 'cross-spawn';
 import { fileURLToPath } from 'url';
 import path from 'path';
 
@@ -27,7 +27,6 @@ function exec( command, args = [], options = {} ) {
 		const childOptions = {
 			cwd: ROOT_DIR,
 			stdio: silent ? 'pipe' : 'inherit',
-			shell: true,
 			...spawnOptions,
 		};
 
@@ -123,7 +122,8 @@ async function build() {
 
 		// Step 7: Build packages
 		console.log( '\n📦 Building packages (production mode)...' );
-		await exec( 'wp-build', [], {
+		const buildArgs = process.argv.slice( 2 );
+		await exec( 'wp-build', buildArgs, {
 			env: { ...process.env, NODE_ENV: 'production' },
 		} );
 
