@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import clsx from 'clsx';
-
-/**
  * WordPress dependencies
  */
 import {
@@ -36,13 +31,7 @@ export default function ArchivesEdit( { attributes, setAttributes, name } ) {
 	} );
 
 	const disabledRef = useDisabled();
-	const blockProps = useBlockProps( {
-		ref: disabledRef,
-		className: clsx( 'wp-block-archives', {
-			'wp-block-archives-dropdown': displayAsDropdown,
-			'wp-block-archives-list': ! displayAsDropdown,
-		} ),
-	} );
+	const blockProps = useBlockProps( { ref: disabledRef } );
 
 	if ( status === 'loading' ) {
 		return (
