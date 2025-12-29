@@ -2,21 +2,18 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import {
-	envelope,
-	forms,
-	hash,
-	link,
-	paragraph,
-	pencil,
-	mobile as phone,
-} from '@wordpress/icons';
+import { envelope, link, mobile as phone } from '@wordpress/icons';
+
+/**
+ * Internal dependencies
+ */
+import { checkbox, hash, text, textarea } from './icons';
 
 const variations = [
 	{
 		name: 'text',
 		title: __( 'Text Input' ),
-		icon: pencil,
+		icon: text,
 		description: __( 'A generic text input.' ),
 		attributes: { type: 'text' },
 		isDefault: true,
@@ -27,7 +24,7 @@ const variations = [
 	{
 		name: 'textarea',
 		title: __( 'Textarea Input' ),
-		icon: paragraph,
+		icon: textarea,
 		description: __(
 			'A textarea input to allow entering multiple lines of text.'
 		),
@@ -40,7 +37,7 @@ const variations = [
 		name: 'checkbox',
 		title: __( 'Checkbox Input' ),
 		description: __( 'A simple checkbox input.' ),
-		icon: forms,
+		icon: checkbox,
 		attributes: { type: 'checkbox', inlineLabel: true },
 		isDefault: true,
 		scope: [ 'inserter', 'transform' ],
