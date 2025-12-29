@@ -23,7 +23,7 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 		// Open the block inspector sidebar and use variations to change level.
 		await editor.openDocumentSettingsSidebar();
 		await page
-			.getByRole( 'button', { name: 'Heading 3', exact: true } )
+			.getByRole( 'radio', { name: 'Transform to Heading 3' } )
 			.click();
 
 		expect( await editor.getBlocks() ).toMatchObject( [
