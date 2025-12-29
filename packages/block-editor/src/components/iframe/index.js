@@ -25,6 +25,7 @@ import { useWritingFlow } from '../writing-flow';
 import { getCompatibilityStyles } from './get-compatibility-styles';
 import { useScaleCanvas } from './use-scale-canvas';
 import { store as blockEditorStore } from '../../store';
+import transformStyles from '../../utils/transform-styles';
 
 // Shared cache for fetched CSS across all iframe instances
 // This ensures we only fetch each stylesheet once, regardless of how many iframes exist
@@ -54,7 +55,11 @@ function fetchCssFile( href ) {
 	const fetchPromise = fetch( href )
 		.then( ( response ) => response.text() )
 		.then( ( css ) => {
-			const processedCss = makeUrlsAbsolute( css, href );
+			// Use transformStyles to rebase URLs
+			const processedCss = transformStyles(
+				[ { css, baseURL: href } ],
+				'' // No wrapper selector needed
+			)[ 0 ];
 			cssUrlCache.set( href, processedCss );
 			cssUrlFetchPromises.delete( href );
 			return processedCss;
@@ -68,35 +73,6 @@ function fetchCssFile( href ) {
 
 	cssUrlFetchPromises.set( href, fetchPromise );
 	return fetchPromise;
-}
-
-// Convert relative URLs in CSS to absolute URLs
-function makeUrlsAbsolute( css, baseUrl ) {
-	// Match url() in CSS and make them absolute
-	return css.replace(
-		/url\(\s*(['"]?)([^'")\s]+)\1\s*\)/g,
-		( match, quote, url ) => {
-			// Skip data URIs, absolute URLs, and root-relative URLs
-			if (
-				url.startsWith( 'data:' ) ||
-				url.startsWith( 'http:' ) ||
-				url.startsWith( 'https:' ) ||
-				url.startsWith( '//' ) ||
-				url.startsWith( '/' )
-			) {
-				return match;
-			}
-
-			// Convert relative URL to absolute
-			try {
-				const absoluteUrl = new URL( url, baseUrl ).href;
-				return `url(${ quote }${ absoluteUrl }${ quote })`;
-			} catch ( e ) {
-				// If URL parsing fails, return original
-				return match;
-			}
-		}
-	);
 }
 
 // Fetch compatibility styles once and convert to inline CSS
