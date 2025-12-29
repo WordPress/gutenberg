@@ -103,9 +103,7 @@ function getColorStyles( { attributes } ) {
  * @return {Object} CSS custom properties for border styles
  */
 function getBorderStyles( { attributes } ) {
-	const { style } = attributes || {};
-	const { border } = style || {};
-	const { radius } = border || {};
+	const { radius } = attributes?.style?.border || {};
 
 	if ( ! radius ) {
 		return {};
