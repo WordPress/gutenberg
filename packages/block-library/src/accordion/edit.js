@@ -22,6 +22,7 @@ import {
 } from '@wordpress/components';
 import { useDispatch, useSelect, useRegistry } from '@wordpress/data';
 import { createBlock } from '@wordpress/blocks';
+import clsx from 'clsx';
 
 /**
  * Internal dependencies
@@ -46,10 +47,16 @@ export default function Edit( {
 	setAttributes,
 	isSelected: isSingleSelected,
 } ) {
+	const iconStateClassName = clsx( {
+		'has-icon': showIcon,
+		'has-icon-left': showIcon && iconPosition === 'left',
+		'has-icon-right': showIcon && iconPosition === 'right',
+	} );
 	const registry = useRegistry();
 	const { getBlockOrder } = useSelect( blockEditorStore );
 	const blockProps = useBlockProps( {
 		role: 'group',
+		className: iconStateClassName,
 	} );
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 	const { updateBlockAttributes, insertBlock } =
