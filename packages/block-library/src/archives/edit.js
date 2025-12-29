@@ -8,7 +8,7 @@ import {
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
 import { useServerSideRender } from '@wordpress/server-side-render';
 import { useDisabled } from '@wordpress/compose';
@@ -44,7 +44,13 @@ export default function ArchivesEdit( { attributes, setAttributes, name } ) {
 	if ( status === 'error' ) {
 		return (
 			<div { ...blockProps }>
-				<p>Error: { error }</p>
+				<p>
+					{ sprintf(
+						/* translators: %s: error message returned when rendering the block. */
+						__( 'Error: %s' ),
+						error
+					) }
+				</p>
 			</div>
 		);
 	}
