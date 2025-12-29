@@ -66,6 +66,9 @@
 			border-block-end: var(--tab-underline-width) solid var(--tab-border-color);
 			border-inline-end: var(--tab-side-border-width) solid var(--tab-border-color);
 			border-radius: var(--tab-border-radius);
+			&:focus {
+				outline: none;
+			}
 			&:focus-visible {
 				outline: 2px solid var(--tab-border-color-active);
 				outline-offset: 2px;

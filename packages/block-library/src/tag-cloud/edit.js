@@ -15,7 +15,7 @@ import {
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import {
 	InspectorControls,
 	useBlockProps,
@@ -254,7 +254,13 @@ function TagCloudEdit( { attributes, setAttributes, name } ) {
 	if ( status === 'error' ) {
 		return (
 			<div { ...blockProps }>
-				<p>Error: { error }</p>
+				<p>
+					{ sprintf(
+						/* translators: %s: error message returned when rendering the block. */
+						__( 'Error: %s' ),
+						error
+					) }
+				</p>
 			</div>
 		);
 	}
