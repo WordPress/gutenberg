@@ -15,6 +15,8 @@ export type FieldRootProps = Omit<
 	children?: Field.Root.Props[ 'children' ];
 	/**
 	 * Whether the field is disabled.
+	 *
+	 * @default false
 	 */
 	disabled?: Field.Root.Props[ 'disabled' ];
 };
