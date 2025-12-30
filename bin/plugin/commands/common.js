@@ -65,7 +65,7 @@ function calculateVersionBumpFromChangelog(
 			break;
 		}
 
-		// A major version bump required. Stop processing.
+		// A major version bump required for stable packages. Stop processing.
 		if ( lineNormalized.startsWith( '### breaking change' ) ) {
 			if ( semver.lt( currentVersion, '1.0.0' ) ) {
 				versionBump = 'minor';
