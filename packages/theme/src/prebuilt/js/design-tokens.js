@@ -140,7 +140,7 @@ export default [
 	'--wpds-font-size-md',
 	'--wpds-font-size-lg',
 	'--wpds-font-size-xl',
-	'--wpds-font-size-2xs',
+	'--wpds-font-size-2xl',
 	'--wpds-font-line-height-xs',
 	'--wpds-font-line-height-sm',
 	'--wpds-font-line-height-md',

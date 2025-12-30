@@ -166,7 +166,7 @@ export type FontFamily = 'heading' | 'body' | 'mono';
 /**
  * Font size scale.
  */
-export type FontSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xs';
+export type FontSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl';
 
 /**
  * Font weight variants.

@@ -57,7 +57,7 @@
 				"$value": { "value": 20, "unit": "px" },
 				"$description": "Extra large font size"
 			},
-			"2xs": {
+			"2xl": {
 				"$value": { "value": 32, "unit": "px" },
 				"$description": "2X large font size"
 			}

@@ -167,7 +167,7 @@ Do not edit directly.
 | `--wpds-font-size-md`         | Medium font size                             |
 | `--wpds-font-size-lg`         | Large font size                              |
 | `--wpds-font-size-xl`         | Extra large font size                        |
-| `--wpds-font-size-2xs`        | 2X large font size                           |
+| `--wpds-font-size-2xl`        | 2X large font size                           |
 | `--wpds-font-line-height-xs`  | Extra small line height                      |
 | `--wpds-font-line-height-sm`  | Small line height                            |
 | `--wpds-font-line-height-md`  | Medium line height                           |
