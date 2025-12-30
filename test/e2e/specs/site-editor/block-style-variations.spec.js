@@ -34,6 +34,14 @@ test.describe( 'Block Style Variations', () => {
 		] );
 	} );
 
+	test.afterEach( async ( { page } ) => {
+		await page.evaluate( async () => {
+			window.wp.data
+				.dispatch( 'core/editor' )
+				.setRenderingMode( 'post-only' );
+		}, [] );
+	} );
+
 	test( 'apply block styles variations to nested blocks', async ( {
 		editor,
 		page,
@@ -102,6 +110,12 @@ test.describe( 'Block Style Variations', () => {
 	} ) => {
 		await draftNewPage( page );
 		await addPageContent( editor, page );
+		// switch to template mode (access to global styles)
+		await page.evaluate( async () => {
+			window.wp.data
+				.dispatch( 'core/editor' )
+				.setRenderingMode( 'template-locked' );
+		}, [] );
 		const firstGroup = editor.canvas
 			.locator( '[data-type="core/group"]' )
 			.first();
@@ -204,21 +218,12 @@ test.describe( 'Block Style Variations', () => {
 		const revisionIframe = page.frameLocator( '[name="revisions"]' );
 
 		const revisionFirstGroup = revisionIframe
-			.getByRole( 'document', {
-				name: 'Block: Content',
-			} )
 			.locator( '[data-type="core/group"]' )
 			.first();
 		const revisionSecondGroup = revisionIframe
-			.getByRole( 'document', {
-				name: 'Block: Content',
-			} )
 			.locator( '[data-type="core/group"]' )
 			.nth( 1 );
 		const revisionThirdGroup = revisionIframe
-			.getByRole( 'document', {
-				name: 'Block: Content',
-			} )
 			.locator( '[data-type="core/group"]' )
 			.nth( 2 );
 
@@ -245,7 +250,7 @@ test.describe( 'Block Style Variations', () => {
 
 		// Click on previous revision.
 		await page
-			.getByRole( 'button', {
+			.getByRole( 'option', {
 				name: /^Changes saved by /,
 			} )
 			.nth( 1 )
@@ -302,7 +307,7 @@ class SiteEditorBlockStyleVariations {
 
 async function draftNewPage( page ) {
 	await page.getByRole( 'button', { name: 'Pages' } ).click();
-	await page.getByRole( 'button', { name: 'Add new page' } ).click();
+	await page.getByRole( 'button', { name: 'Add page' } ).click();
 	await page
 		.locator( 'role=dialog[name="Draft new: page"i]' )
 		.locator( 'role=textbox[name="title"i]' )
@@ -318,13 +323,10 @@ async function draftNewPage( page ) {
 // Create a Group block with 2 nested Group blocks.
 async function addPageContent( editor, page ) {
 	const inserterButton = page.locator(
-		'role=button[name="Toggle block inserter"i]'
+		'role=button[name="Block Inserter"i]'
 	);
 	await inserterButton.click();
-	await page.type(
-		'role=searchbox[name="Search for blocks and patterns"i]',
-		'Group'
-	);
+	await page.type( 'role=searchbox[name="Search"i]', 'Group' );
 	await page.click(
 		'role=listbox[name="Blocks"i] >> role=option[name="Group"i]'
 	);

@@ -29,7 +29,6 @@ import { store as preferencesStore } from '@wordpress/preferences';
 import './store';
 import './filters';
 import * as widgetArea from './blocks/widget-area';
-
 import Layout from './components/layout';
 import {
 	ALLOW_REUSABLE_BLOCKS,
@@ -59,7 +58,8 @@ export function initializeEditor( id, settings ) {
 			block.name.startsWith( 'core/post' ) ||
 			block.name.startsWith( 'core/query' ) ||
 			block.name.startsWith( 'core/site' ) ||
-			block.name.startsWith( 'core/navigation' )
+			block.name.startsWith( 'core/navigation' ) ||
+			block.name.startsWith( 'core/term' )
 		);
 	} );
 

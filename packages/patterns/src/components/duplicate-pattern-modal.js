@@ -3,7 +3,7 @@
  */
 import { store as coreStore } from '@wordpress/core-data';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { __, sprintf } from '@wordpress/i18n';
+import { __, _x, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 
 /**
@@ -17,14 +17,14 @@ function getTermLabels( pattern, categories ) {
 	if ( pattern.type !== PATTERN_TYPES.user ) {
 		return categories.core
 			?.filter( ( category ) =>
-				pattern.categories.includes( category.name )
+				pattern.categories?.includes( category.name )
 			)
 			.map( ( category ) => category.label );
 	}
 
 	return categories.user
 		?.filter( ( category ) =>
-			pattern.wp_pattern_category.includes( category.id )
+			pattern.wp_pattern_category?.includes( category.id )
 		)
 		.map( ( category ) => category.label );
 }
@@ -52,7 +52,7 @@ export function useDuplicatePatternProps( { pattern, onSuccess } ) {
 				: pattern.wp_pattern_sync_status || PATTERN_SYNC_TYPES.full,
 		defaultTitle: sprintf(
 			/* translators: %s: Existing pattern title */
-			__( '%s (Copy)' ),
+			_x( '%s (Copy)', 'pattern' ),
 			typeof pattern.title === 'string'
 				? pattern.title
 				: pattern.title.raw
@@ -61,7 +61,7 @@ export function useDuplicatePatternProps( { pattern, onSuccess } ) {
 			createSuccessNotice(
 				sprintf(
 					// translators: %s: The new pattern's title e.g. 'Call to action (copy)'.
-					__( '"%s" duplicated.' ),
+					_x( '"%s" duplicated.', 'pattern' ),
 					newPattern.title.raw
 				),
 				{

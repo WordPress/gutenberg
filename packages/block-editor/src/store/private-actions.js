@@ -2,12 +2,9 @@
  * WordPress dependencies
  */
 import { Platform } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
-import { store as blockEditorStore } from './index';
-import { unlock } from '../lock-unlock';
+import deprecated from '@wordpress/deprecated';
+import { speak } from '@wordpress/a11y';
+import { __ } from '@wordpress/i18n';
 
 const castArray = ( maybeArray ) =>
 	Array.isArray( maybeArray ) ? maybeArray : [ maybeArray ];
@@ -23,6 +20,7 @@ const castArray = ( maybeArray ) =>
 const privateSettings = [
 	'inserterMediaCategories',
 	'blockInspectorAnimation',
+	'mediaSideload',
 ];
 
 /**
@@ -39,14 +37,32 @@ export function __experimentalUpdateSettings(
 	settings,
 	{ stripExperimentalSettings = false, reset = false } = {}
 ) {
-	let cleanSettings = settings;
+	let incomingSettings = settings;
+
+	if ( Object.hasOwn( incomingSettings, '__unstableIsPreviewMode' ) ) {
+		deprecated(
+			"__unstableIsPreviewMode argument in wp.data.dispatch('core/block-editor').updateSettings",
+			{
+				since: '6.8',
+				alternative: 'isPreviewMode',
+			}
+		);
+
+		incomingSettings = { ...incomingSettings };
+		incomingSettings.isPreviewMode =
+			incomingSettings.__unstableIsPreviewMode;
+		delete incomingSettings.__unstableIsPreviewMode;
+	}
+
+	let cleanSettings = incomingSettings;
+
 	// There are no plugins in the mobile apps, so there is no
 	// need to strip the experimental settings:
 	if ( stripExperimentalSettings && Platform.OS === 'web' ) {
 		cleanSettings = {};
-		for ( const key in settings ) {
+		for ( const key in incomingSettings ) {
 			if ( ! privateSettings.includes( key ) ) {
-				cleanSettings[ key ] = settings[ key ];
+				cleanSettings[ key ] = incomingSettings[ key ];
 			}
 		}
 	}
@@ -259,19 +275,6 @@ export function setBlockRemovalRules( rules = false ) {
 	};
 }
 
-/**
- * Sets the client ID of the block settings menu that is currently open.
- *
- * @param {?string} clientId The block client ID.
- * @return {Object} Action object.
- */
-export function setOpenedBlockSettingsMenu( clientId ) {
-	return {
-		type: 'SET_OPENED_BLOCK_SETTINGS_MENU',
-		clientId,
-	};
-}
-
 export function setStyleOverride( id, style ) {
 	return {
 		type: 'SET_STYLE_OVERRIDE',
@@ -299,29 +302,6 @@ export function setLastFocus( lastFocus = null ) {
 	return {
 		type: 'LAST_FOCUS',
 		lastFocus,
-	};
-}
-
-/**
- * Action that stops temporarily editing as blocks.
- *
- * @param {string} clientId The block's clientId.
- */
-export function stopEditingAsBlocks( clientId ) {
-	return ( { select, dispatch, registry } ) => {
-		const focusModeToRevert = unlock(
-			registry.select( blockEditorStore )
-		).getTemporarilyEditingFocusModeToRevert();
-		dispatch.__unstableMarkNextChangeAsNotPersistent();
-		dispatch.updateBlockAttributes( clientId, {
-			templateLock: 'contentOnly',
-		} );
-		dispatch.updateBlockListSettings( clientId, {
-			...select.getBlockListSettings( clientId ),
-			templateLock: 'contentOnly',
-		} );
-		dispatch.updateSettings( { focusMode: focusModeToRevert } );
-		dispatch.__unstableSetTemporarilyEditingAsBlocks();
 	};
 }
 
@@ -374,29 +354,25 @@ export function setInsertionPoint( value ) {
 }
 
 /**
- * Temporarily modify/unlock the content-only block for editions.
+ * Mark a contentOnly section as being edited.
  *
  * @param {string} clientId The client id of the block.
  */
-export const modifyContentLockBlock =
-	( clientId ) =>
-	( { select, dispatch } ) => {
-		dispatch.selectBlock( clientId );
-		dispatch.__unstableMarkNextChangeAsNotPersistent();
-		dispatch.updateBlockAttributes( clientId, {
-			templateLock: undefined,
-		} );
-		dispatch.updateBlockListSettings( clientId, {
-			...select.getBlockListSettings( clientId ),
-			templateLock: false,
-		} );
-		const focusModeToRevert = select.getSettings().focusMode;
-		dispatch.updateSettings( { focusMode: true } );
-		dispatch.__unstableSetTemporarilyEditingAsBlocks(
-			clientId,
-			focusModeToRevert
-		);
+export function editContentOnlySection( clientId ) {
+	return {
+		type: 'EDIT_CONTENT_ONLY_SECTION',
+		clientId,
 	};
+}
+
+/**
+ * Action that stops editing a contentOnly section.
+ */
+export function stopEditingContentOnlySection() {
+	return {
+		type: 'EDIT_CONTENT_ONLY_SECTION',
+	};
+}
 
 /**
  * Sets the zoom level.
@@ -404,12 +380,54 @@ export const modifyContentLockBlock =
  * @param {number} zoom the new zoom level
  * @return {Object} Action object.
  */
-export function setZoomLevel( zoom = 100 ) {
-	return {
-		type: 'SET_ZOOM_LEVEL',
-		zoom,
+export const setZoomLevel =
+	( zoom = 100 ) =>
+	( { select, dispatch } ) => {
+		// When switching to zoom-out mode, we need to select the parent section
+		if ( zoom !== 100 ) {
+			const firstSelectedClientId = select.getBlockSelectionStart();
+			const sectionRootClientId = select.getSectionRootClientId();
+
+			if ( firstSelectedClientId ) {
+				let sectionClientId;
+
+				if ( sectionRootClientId ) {
+					const sectionClientIds =
+						select.getBlockOrder( sectionRootClientId );
+
+					// If the selected block is a section block, use it.
+					if ( sectionClientIds?.includes( firstSelectedClientId ) ) {
+						sectionClientId = firstSelectedClientId;
+					} else {
+						// If the selected block is not a section block, find
+						// the parent section that contains the selected block.
+						sectionClientId = select
+							.getBlockParents( firstSelectedClientId )
+							.find( ( parent ) =>
+								sectionClientIds.includes( parent )
+							);
+					}
+				} else {
+					sectionClientId = select.getBlockHierarchyRootClientId(
+						firstSelectedClientId
+					);
+				}
+
+				if ( sectionClientId ) {
+					dispatch.selectBlock( sectionClientId );
+				} else {
+					dispatch.clearSelectedBlock();
+				}
+
+				speak( __( 'You are currently in zoom-out mode.' ) );
+			}
+		}
+
+		dispatch( {
+			type: 'SET_ZOOM_LEVEL',
+			zoom,
+		} );
 	};
-}
 
 /**
  * Resets the Zoom state.
@@ -418,5 +436,20 @@ export function setZoomLevel( zoom = 100 ) {
 export function resetZoomLevel() {
 	return {
 		type: 'RESET_ZOOM_LEVEL',
+	};
+}
+
+/**
+ * Action that toggles the spotlighted block state.
+ *
+ * @param {string}  clientId          The block's clientId.
+ * @param {boolean} hasBlockSpotlight The spotlight state.
+ * @return {Object} Action object.
+ */
+export function toggleBlockSpotlight( clientId, hasBlockSpotlight ) {
+	return {
+		type: 'TOGGLE_BLOCK_SPOTLIGHT',
+		clientId,
+		hasBlockSpotlight,
 	};
 }

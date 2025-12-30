@@ -218,7 +218,7 @@ _Parameters_
 
 _Returns_
 
--   `?number`: ID of current post.
+-   `?(number|string)`: The current post ID (number) or template slug (string).
 
 ### getCurrentPostLastRevisionId
 
@@ -272,7 +272,7 @@ _Parameters_
 
 _Returns_
 
--   `string?`: Template ID.
+-   `?string`: Template ID.
 
 ### getDeviceType
 
@@ -298,11 +298,15 @@ _Usage_
 const getFeaturedMediaUrl = useSelect( ( select ) => {
 	const getFeaturedMediaId =
 		select( 'core/editor' ).getEditedPostAttribute( 'featured_media' );
-	const getMedia = select( 'core' ).getMedia( getFeaturedMediaId );
+	const media = select( 'core' ).getEntityRecord(
+		'postType',
+		'attachment',
+		getFeaturedMediaId
+	);
 
 	return (
-		getMedia?.media_details?.sizes?.large?.source_url ||
-		getMedia?.source_url ||
+		media?.media_details?.sizes?.large?.source_url ||
+		media?.source_url ||
 		''
 	);
 }, [] );
@@ -786,7 +790,7 @@ Return true if the current post has already been published.
 _Parameters_
 
 -   _state_ `Object`: Global application state.
--   _currentPost_ `Object?`: Explicit current post for bypassing registry selector.
+-   _currentPost_ `[Object]`: Explicit current post for bypassing registry selector.
 
 _Returns_
 
@@ -1006,6 +1010,27 @@ _Returns_
 
 Returns whether post autosaving is locked.
 
+_Usage_
+
+```jsx
+import { __ } from '@wordpress/i18n';
+import { store as editorStore } from '@wordpress/editor';
+import { useSelect } from '@wordpress/data';
+
+const ExampleComponent = () => {
+	const isAutoSavingLocked = useSelect(
+		( select ) => select( editorStore ).isPostAutosavingLocked(),
+		[]
+	);
+
+	return isAutoSavingLocked ? (
+		<p>{ __( 'Post auto saving is locked' ) }</p>
+	) : (
+		<p>{ __( 'Post auto saving is not locked' ) }</p>
+	);
+};
+```
+
 _Parameters_
 
 -   _state_ `Object`: Global application state.
@@ -1041,6 +1066,27 @@ _Returns_
 ### isPostSavingLocked
 
 Returns whether post saving is locked.
+
+_Usage_
+
+```jsx
+import { __ } from '@wordpress/i18n';
+import { store as editorStore } from '@wordpress/editor';
+import { useSelect } from '@wordpress/data';
+
+const ExampleComponent = () => {
+	const isSavingLocked = useSelect(
+		( select ) => select( editorStore ).isPostSavingLocked(),
+		[]
+	);
+
+	return isSavingLocked ? (
+		<p>{ __( 'Post saving is locked' ) }</p>
+	) : (
+		<p>{ __( 'Post saving is not locked' ) }</p>
+	);
+};
+```
 
 _Parameters_
 
@@ -1148,7 +1194,8 @@ Action that autosaves the current post. This includes server-side autosaving (de
 
 _Parameters_
 
--   _options_ `Object?`: Extra flags to identify the autosave.
+-   _options_ `[Object]`: Extra flags to identify the autosave.
+-   _options.local_ `[boolean]`: Whether to perform a local autosave.
 
 ### clearSelectedBlock
 
@@ -1185,26 +1232,10 @@ _Usage_
 wp.data.dispatch( 'core/editor' ).editPost( { title: `${ newTitle }` } );
 ```
 
-```js
-// Get specific media size based on the featured media ID
-// Note: change sizes?.large for any registered size
-const getFeaturedMediaUrl = useSelect( ( select ) => {
-	const getFeaturedMediaId =
-		select( 'core/editor' ).getEditedPostAttribute( 'featured_media' );
-	const getMedia = select( 'core' ).getMedia( getFeaturedMediaId );
-
-	return (
-		getMedia?.media_details?.sizes?.large?.source_url ||
-		getMedia?.source_url ||
-		''
-	);
-}, [] );
-```
-
 _Parameters_
 
 -   _edits_ `Object`: Post attributes to edit.
--   _options_ `Object`: Options for the edit.
+-   _options_ `[Object]`: Options for the edit.
 
 _Returns_
 
@@ -1417,7 +1448,7 @@ Returns an action object used to signal that the blocks have been updated.
 _Parameters_
 
 -   _blocks_ `Array`: Block Array.
--   _options_ `?Object`: Optional options.
+-   _options_ `[Object]`: Optional options.
 
 ### resetPost
 
@@ -1431,7 +1462,7 @@ Action for saving the current post in the editor.
 
 _Parameters_
 
--   _options_ `Object`:
+-   _options_ `[Object]`:
 
 ### selectBlock
 
@@ -1519,7 +1550,7 @@ _Parameters_
 
 -   _post_ `Object`: Post object.
 -   _edits_ `Object`: Initial edited attributes object.
--   _template_ `Array?`: Block Template.
+-   _template_ `[Array]`: Block Template.
 
 ### setupEditorState
 
@@ -1585,6 +1616,11 @@ _Related_
 
 Action that toggles Distraction free mode. Distraction free mode expects there are no sidebars, as due to the z-index values set, you can't close sidebars.
 
+_Parameters_
+
+-   _options_ `[Object]`: Optional configuration object
+-   _options.createNotice_ `[boolean]`: Whether to create a notice
+
 ### toggleEditorPanelEnabled
 
 Returns an action object used to enable or disable a panel in the editor.
@@ -1618,6 +1654,14 @@ _Returns_
 _Related_
 
 -   toggleSelection in core/block-editor store.
+
+### toggleSpotlightMode
+
+Action that toggles the Spotlight Mode view option.
+
+### toggleTopToolbar
+
+Action that toggles the Top Toolbar view option.
 
 ### trashPost
 

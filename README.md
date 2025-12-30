@@ -7,6 +7,8 @@
 [![React Native E2E Tests (iOS)](<https://github.com/WordPress/gutenberg/workflows/React%20Native%20E2E%20Tests%20(iOS)/badge.svg>)](https://github.com/WordPress/gutenberg/actions?query=workflow%3A%22React+Native+E2E+Tests+%28iOS%29%22+branch%3Atrunk)
 [![React Native E2E Tests (Android)](<https://github.com/WordPress/gutenberg/workflows/React%20Native%20E2E%20Tests%20(Android)/badge.svg>)](https://github.com/WordPress/gutenberg/actions?query=workflow%3A%22React+Native+E2E+Tests+%28Android%29%22+branch%3Atrunk)
 
+<a href="https://wordpress.github.io/gutenberg/" target="_blank"><img src="https://raw.githubusercontent.com/storybooks/brand/master/badge/badge-storybook.svg" alt="Storybook Badge" /></a>
+
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lerna.js.org)
 
 ![Screenshot of the Gutenberg Editor, editing a post in WordPress](https://user-images.githubusercontent.com/1204802/100067796-fc3e8700-2e36-11eb-993b-6b80b4310b87.png)
@@ -23,7 +25,7 @@ Check out the [Keeping up with Gutenberg Index](https://make.wordpress.org/core/
 
 ## Getting Started
 
-Get hands on: check out the [block editor live demo](https://wordpress.org/gutenberg/) to play with a test instance of the editor.
+Get hands-on: check out the [block editor live demo](https://wordpress.org/gutenberg/) to play with a test instance of the editor.
 
 ### Using Gutenberg
 

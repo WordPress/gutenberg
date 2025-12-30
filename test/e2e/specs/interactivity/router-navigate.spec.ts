@@ -33,11 +33,19 @@ test.describe( 'Router navigate', () => {
 				},
 			},
 		} );
+
+		const link4 = await utils.addPostWithBlock( 'test/router-navigate', {
+			alias: 'router navigate - closure',
+			attributes: {
+				title: 'Link with derivedStateClosure',
+				derivedStateClosure: true,
+			},
+		} );
 		await utils.addPostWithBlock( 'test/router-navigate', {
 			alias: 'router navigate - main',
 			attributes: {
 				title: 'Main',
-				links: [ link1, link2, link3 ],
+				links: [ link1, link2, link3, link4 ],
 				data: {
 					getterProp: 'value from main',
 					prop1: 'main',
@@ -264,7 +272,7 @@ test.describe( 'Router navigate', () => {
 		const count = page.getByTestId( 'router navigations count' );
 		const title = page.getByTestId( 'title' );
 
-		// Check the cound to ensure the page has hydrated.
+		// Check the count to ensure the page has hydrated.
 		await expect( count ).toHaveText( '0' );
 
 		// Navigate to a page without clientNavigationDisabled.
@@ -284,5 +292,37 @@ test.describe( 'Router navigate', () => {
 		// Check the page has updated and the navigation count is zero.
 		await expect( title ).toHaveText( 'Main (navigation disabled)' );
 		await expect( count ).toHaveText( '0' );
+	} );
+
+	test( 'should support derived state closures', async ( { page } ) => {
+		const count = page.getByTestId( 'router navigations count' );
+		const status = page.getByTestId( 'router status' );
+		const title = page.getByTestId( 'title' );
+		const derivedStateClosure = page.getByTestId( 'derivedStateClosure' );
+
+		// Check the count to ensure the page has hydrated.
+		await expect( count ).toHaveText( '0' );
+
+		// Ensure the value from the getter is correct.
+		await expect( derivedStateClosure ).toHaveText( 'helloFromGetter' );
+
+		// Navigate to a page without clientNavigationDisabled.
+		await page.getByTestId( 'link 4' ).click();
+
+		// Check the page has updated and the navigation was successfull.
+		await expect( status ).toHaveText( 'idle' );
+		await expect( title ).toHaveText( 'Link with derivedStateClosure' );
+		await expect( count ).toHaveText( '1' );
+
+		// Ensure the value from the getter has not changed.
+		await expect( derivedStateClosure ).toHaveText( 'helloFromGetter' );
+
+		await page.goBack();
+		await expect( status ).toHaveText( 'idle' );
+		await expect( title ).toHaveText( 'Main' );
+		await expect( count ).toHaveText( '1' );
+
+		// Ensure the value from the getter has not changed.
+		await expect( derivedStateClosure ).toHaveText( 'helloFromGetter' );
 	} );
 } );

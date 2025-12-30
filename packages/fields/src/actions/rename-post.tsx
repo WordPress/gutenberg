@@ -26,9 +26,6 @@ import {
 	isTemplateRemovable,
 	isTemplate,
 	isTemplatePart,
-	TEMPLATE_ORIGINS,
-	TEMPLATE_PART_POST_TYPE,
-	TEMPLATE_POST_TYPE,
 } from './utils';
 import type { CoreDataError, PostWithPermissions } from '../types';
 
@@ -38,23 +35,34 @@ const { PATTERN_TYPES } = unlock( patternsPrivateApis );
 const renamePost: Action< PostWithPermissions > = {
 	id: 'rename-post',
 	label: __( 'Rename' ),
+	modalFocusOnMount: 'firstContentElement',
 	isEligible( post ) {
 		if ( post.status === 'trash' ) {
 			return false;
 		}
-		// Templates, template parts and patterns have special checks for renaming.
+
+		// Non-database template cannot be edited.
 		if (
-			! [
-				TEMPLATE_POST_TYPE,
-				TEMPLATE_PART_POST_TYPE,
-				...Object.values( PATTERN_TYPES ),
-			].includes( post.type )
+			post.type === 'wp_template' &&
+			typeof post.id === 'string' &&
+			window?.__experimentalTemplateActivate
 		) {
+			return false;
+		}
+
+		const specialChecks = [ 'wp_template', 'wp_template_part' ];
+
+		if ( ! window?.__experimentalTemplateActivate ) {
+			specialChecks.push( 'wp_template' );
+		}
+
+		// Templates, template parts and patterns have special checks for renaming.
+		if ( ! specialChecks.includes( post.type ) ) {
 			return post.permissions?.update;
 		}
 
 		// In the case of templates, we can only rename custom templates.
-		if ( isTemplate( post ) ) {
+		if ( isTemplate( post ) && ! window?.__experimentalTemplateActivate ) {
 			return (
 				isTemplateRemovable( post ) &&
 				post.is_custom &&
@@ -64,7 +72,7 @@ const renamePost: Action< PostWithPermissions > = {
 
 		if ( isTemplatePart( post ) ) {
 			return (
-				post.source === TEMPLATE_ORIGINS.custom &&
+				post.source === 'custom' &&
 				! post?.has_theme_file &&
 				post.permissions?.update
 			);
@@ -74,7 +82,7 @@ const renamePost: Action< PostWithPermissions > = {
 	},
 	RenderModal: ( { items, closeModal, onActionPerformed } ) => {
 		const [ item ] = items;
-		const [ title, setTitle ] = useState( () => getItemTitle( item ) );
+		const [ title, setTitle ] = useState( () => getItemTitle( item, '' ) );
 		const { editEntityRecord, saveEditedEntityRecord } =
 			useDispatch( coreStore );
 		const { createSuccessNotice, createErrorNotice } =
@@ -111,7 +119,6 @@ const renamePost: Action< PostWithPermissions > = {
 			<form onSubmit={ onRename }>
 				<VStack spacing="5">
 					<TextControl
-						__nextHasNoMarginBottom
 						__next40pxDefaultSize
 						label={ __( 'Name' ) }
 						value={ title }
@@ -142,4 +149,7 @@ const renamePost: Action< PostWithPermissions > = {
 	},
 };
 
+/**
+ * Rename action for PostWithPermissions.
+ */
 export default renamePost;

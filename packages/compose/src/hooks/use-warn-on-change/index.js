@@ -3,7 +3,7 @@
  */
 import usePrevious from '../use-previous';
 
-// Disable reason: Object and object are distinctly different types in TypeScript and we mean the lowercase object in thise case
+// Disable reason: Object and object are distinctly different types in TypeScript and we mean the lowercase object in this case
 // but eslint wants to force us to use `Object`. See https://stackoverflow.com/questions/49464634/difference-between-object-and-object-in-typescript
 /* eslint-disable jsdoc/check-types */
 /**

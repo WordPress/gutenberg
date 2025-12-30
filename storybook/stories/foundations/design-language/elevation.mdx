@@ -1,0 +1,87 @@
+import { Meta, Typeset } from '@storybook/blocks';
+import elevation from './static/elevation.svg';
+import elevationExamples from './static/elevation-examples.svg';
+
+<Meta title="Foundations/Design Language/Elevation" name="page" />
+
+# Elevation
+
+{/* Leaving alt text empty since this image is presentational */}
+
+<img src={ elevation } alt="" width="100%" />
+
+Elevation, through the use of shadows, visually indicates the layers where overlapping UI elements reside. Shadows create the illusion of depth, showing how one UI element is positioned above another on the z-axis. Elevation should be used to organize elements, establish a clear hierarchy, and draw focus to key components.
+
+In the WordPress Design System there are four levels of elevation correlating to specific uses:
+
+<table>
+	<thead>
+		<tr>
+			<th>Elevation</th>
+			<th>Usage</th>
+			<th>Examples</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td>Extra small</td>
+			<td>
+				Applied to large sections and containers that group related content 
+				and controls. These containers may shift or overlap other content 
+				without causing too much visual disruption
+			</td>
+			<td>Preview Frame, Content Frame</td>
+		</tr>
+		<tr>
+			<td>Small</td>
+			<td>
+				Used for components that provide contextual feedback without being 
+				overly intrusive. Small elevation is ideal for non-interruptive elements 
+				that subtly surface additional information or actions.
+			</td>
+			<td>Tooltips, Snackbars</td>
+		</tr>
+		<tr>
+			<td>Medium</td>
+			<td>
+				Applied to components that offer additional actions to the user. This 
+				elevation level helps differentiate actionable elements that appear in 
+				context without requiring major focus shifts.
+			</td>
+			<td>Menus, Command Palette</td>
+		</tr>
+		<tr>
+			<td>Large</td>
+			<td>
+				Reserved for components that confirm actions or require decisions, large 
+				elevation is used for more interruptive elements that demand user attention 
+				to complete important tasks.
+			</td>
+			<td>Modals</td>
+		</tr>
+	</tbody>
+</table>
+
+## Accessibility considerations
+
+* Interactive Elements: Elevation can be an important visual cue to indicate which elements are interactive, 
+particularly for folks with monochromatic color blindness. Elevating buttons, handles, and other interactive 
+elements makes them stand out, helping users quickly identify where they can take action.
+* Focus: Higher levels of elevation can be used to draw attention to components that require user interaction 
+or confirmation, such as modals, guides, and decision-based tasks, enhancing accessibility by reducing 
+cognitive load.
+
+## Examples
+
+The diagram below visually demonstrates the examples outlined in the table above.
+
+<img src={ elevationExamples } alt="Diagram illustrating elevation levels" width="100%" />
+
+1. Content frame and Preview frame
+2. Snackbar
+3. Menu
+4. Modal
+
+## Tokens
+
+Use tokens to apply elevation in your work. Please refer to the [Tokens section](?path=/docs/tokens-elevation--page) to learn more.

@@ -2,6 +2,7 @@
  * External dependencies
  */
 import type { Meta, StoryFn } from '@storybook/react';
+import { fn } from '@storybook/test';
 
 /**
  * Internal dependencies
@@ -21,14 +22,22 @@ const meta: Meta< typeof RadioGroup > = {
 	// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 	subcomponents: { Radio },
 	argTypes: {
-		onChange: { control: { type: null } },
-		children: { control: { type: null } },
+		onChange: { control: false },
+		children: { control: false },
 		checked: { control: { type: 'text' } },
 	},
+	args: {
+		onChange: fn(),
+	},
 	parameters: {
-		actions: { argTypesRegex: '^on.*' },
 		controls: { expanded: true },
-		docs: { canvas: { sourceState: 'shown' } },
+		docs: {
+			canvas: { sourceState: 'shown' },
+			description: {
+				component:
+					'This component is deprecated. Use `RadioControl` or `ToggleGroupControl` instead.',
+			},
+		},
 	},
 };
 export default meta;
@@ -44,9 +53,15 @@ Default.args = {
 	defaultChecked: 'option2',
 	children: (
 		<>
-			<Radio value="option1">Option 1</Radio>
-			<Radio value="option2">Option 2</Radio>
-			<Radio value="option3">Option 3</Radio>
+			<Radio __next40pxDefaultSize value="option1">
+				Option 1
+			</Radio>
+			<Radio __next40pxDefaultSize value="option2">
+				Option 2
+			</Radio>
+			<Radio __next40pxDefaultSize value="option3">
+				Option 3
+			</Radio>
 		</>
 	),
 };
@@ -87,5 +102,5 @@ Controlled.args = {
 	id: 'controlled-radiogroup',
 };
 Controlled.argTypes = {
-	checked: { control: { type: null } },
+	checked: { control: false },
 };

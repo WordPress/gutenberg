@@ -10,6 +10,8 @@ import {
 import deprecated from '@wordpress/deprecated';
 import { addAction } from '@wordpress/hooks';
 import { store as coreStore } from '@wordpress/core-data';
+import { store as noticesStore } from '@wordpress/notices';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -481,7 +483,7 @@ export const initializeMetaBoxes =
 		addAction(
 			'editor.savePost',
 			'core/edit-post/save-metaboxes',
-			async ( options ) => {
+			async ( post, options ) => {
 				if ( ! options.isAutosave && select.hasMetaBoxes() ) {
 					await dispatch.requestMetaBoxUpdates();
 				}
@@ -508,4 +510,45 @@ export const toggleDistractionFree =
 			alternative: "dispatch( 'core/editor').toggleDistractionFree",
 		} );
 		registry.dispatch( editorStore ).toggleDistractionFree();
+	};
+
+/**
+ * Action that toggles the Fullscreen Mode view option.
+ */
+export const toggleFullscreenMode =
+	() =>
+	( { registry } ) => {
+		const isFullscreen = registry
+			.select( preferencesStore )
+			.get( 'core/edit-post', 'fullscreenMode' );
+
+		registry
+			.dispatch( preferencesStore )
+			.toggle( 'core/edit-post', 'fullscreenMode' );
+
+		registry
+			.dispatch( noticesStore )
+			.createInfoNotice(
+				isFullscreen
+					? __( 'Fullscreen mode deactivated.' )
+					: __( 'Fullscreen mode activated.' ),
+				{
+					id: 'core/edit-post/toggle-fullscreen-mode/notice',
+					type: 'snackbar',
+					actions: [
+						{
+							label: __( 'Undo' ),
+
+							onClick: () => {
+								registry
+									.dispatch( preferencesStore )
+									.toggle(
+										'core/edit-post',
+										'fullscreenMode'
+									);
+							},
+						},
+					],
+				}
+			);
 	};

@@ -18,17 +18,25 @@ function gutenberg_test_block_bindings_registration() {
 	$upload_dir  = wp_upload_dir();
 	$testing_url = $upload_dir['url'] . '/1024x768_e2e_test_image_size.jpeg';
 	$fields_list = array(
-		'text_field'  => array(
+		'text_field'          => array(
 			'label' => 'Text Field Label',
 			'value' => 'Text Field Value',
+			'type'  => 'string',
 		),
-		'url_field'   => array(
+		'url_field'           => array(
 			'label' => 'URL Field Label',
 			'value' => $testing_url,
+			'type'  => 'string',
 		),
-		'empty_field' => array(
+		'empty_field'         => array(
 			'label' => 'Empty Field Label',
 			'value' => '',
+			'type'  => 'string',
+		),
+		'number_custom_field' => array(
+			'label' => 'Number Custom Field Label',
+			'value' => 10.5,
+			'type'  => 'number',
 		),
 	);
 
@@ -38,7 +46,11 @@ function gutenberg_test_block_bindings_registration() {
 		plugins_url( 'block-bindings/index.js', __FILE__ ),
 		array(
 			'wp-blocks',
-			'wp-private-apis',
+			'wp-block-editor',
+			'wp-components',
+			'wp-compose',
+			'wp-element',
+			'wp-hooks',
 		),
 		filemtime( plugin_dir_path( __FILE__ ) . 'block-bindings/index.js' ),
 		true
@@ -62,7 +74,9 @@ function gutenberg_test_block_bindings_registration() {
 				if ( ! isset( $source_args['key'] ) || ! isset( $fields_list[ $source_args['key'] ] ) ) {
 					return null;
 				}
-				return $fields_list[ $source_args['key'] ]['value']; },
+				return $fields_list[ $source_args['key'] ]['value'];
+			},
+			'uses_context'       => array( 'postType', 'postId' ),
 		)
 	);
 	register_block_bindings_source(
@@ -106,6 +120,89 @@ function gutenberg_test_block_bindings_registration() {
 			'type'         => 'string',
 		)
 	);
+	// Register different types of custom fields for testing.
+	register_meta(
+		'post',
+		'string_custom_field',
+		array(
+			'label'        => 'String custom field',
+			'default'      => '',
+			'show_in_rest' => true,
+			'single'       => true,
+			'type'         => 'string',
+		)
+	);
+	register_meta(
+		'post',
+		'object_custom_field',
+		array(
+			'label'        => 'Object custom field',
+			'show_in_rest' => array(
+				'schema' => array(
+					'type'       => 'object',
+					'properties' => array(
+						'foo' => array(
+							'type' => 'string',
+						),
+					),
+				),
+			),
+			'single'       => true,
+			'type'         => 'object',
+		)
+	);
+	register_meta(
+		'post',
+		'array_custom_field',
+		array(
+			'label'        => 'Array custom field',
+			'show_in_rest' => array(
+				'schema' => array(
+					'type'  => 'array',
+					'items' => array(
+						'type' => 'string',
+					),
+				),
+			),
+			'single'       => true,
+			'type'         => 'array',
+			'default'      => array(),
+		)
+	);
+	register_meta(
+		'post',
+		'number_custom_field',
+		array(
+			'label'        => 'Number custom field',
+			'type'         => 'number',
+			'show_in_rest' => true,
+			'single'       => true,
+			'default'      => 5.5,
+		)
+	);
+	register_meta(
+		'post',
+		'integer',
+		array(
+			'label'        => 'Integer custom field',
+			'type'         => 'integer',
+			'show_in_rest' => true,
+			'single'       => true,
+			'default'      => 5,
+		)
+	);
+	register_meta(
+		'post',
+		'boolean',
+		array(
+			'label'        => 'Boolean custom field',
+			'type'         => 'boolean',
+			'show_in_rest' => true,
+			'single'       => true,
+			'default'      => true,
+		)
+	);
+
 	// Register CPT custom fields.
 	register_meta(
 		'post',

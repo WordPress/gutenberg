@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { _x, __, sprintf } from '@wordpress/i18n';
+import { _x, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -173,7 +173,7 @@ export function getFontStylesAndWeights( fontFamilyFaces ) {
 					? weightName
 					: sprintf(
 							/* translators: 1: Font weight name. 2: Font style name. */
-							__( '%1$s %2$s' ),
+							_x( '%1$s %2$s', 'font' ),
 							weightName,
 							styleName
 					  );

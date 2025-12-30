@@ -33,10 +33,8 @@ test.describe( 'Columns', () => {
 			.first()
 			.click();
 
-		// Toggle Block inserter
-		await page
-			.locator( 'role=button[name="Toggle block inserter"i]' )
-			.click();
+		// Block Inserter
+		await page.locator( 'role=button[name="Block Inserter"i]' ).click();
 
 		// Verify Column
 		const inserterOptions = page.locator(
@@ -65,7 +63,7 @@ test.describe( 'Columns', () => {
 		);
 		await editor.clickBlockToolbarButton( 'Options' );
 		await page.click( 'role=menuitem[name="Lock"i]' );
-		await page.locator( 'role=checkbox[name="Prevent removal"i]' ).check();
+		await page.locator( 'role=checkbox[name="Lock removal"i]' ).check();
 		await page.click( 'role=button[name="Apply"i]' );
 
 		// Select columns block
@@ -408,5 +406,74 @@ test.describe( 'Columns', () => {
 				attributes: { content: '' },
 			},
 		] );
+	} );
+
+	test.describe( 'Template Lock', () => {
+		for ( const templateLock of [ 'all', 'insert', 'contentOnly' ] ) {
+			test( `templateLock="${ templateLock }" should hide column count control`, async ( {
+				editor,
+				page,
+			} ) => {
+				await editor.insertBlock( {
+					name: 'core/columns',
+					attributes: { templateLock },
+					innerBlocks: [
+						{
+							name: 'core/column',
+							innerBlocks: [
+								{
+									name: 'core/paragraph',
+									attributes: { content: 'Col 1' },
+								},
+							],
+						},
+					],
+				} );
+				await editor.openDocumentSettingsSidebar();
+
+				await expect(
+					page.getByRole( 'slider', { name: 'Columns' } )
+				).toBeHidden();
+			} );
+		}
+
+		test( 'templateLock=false should show column count control inside locked parent', async ( {
+			editor,
+			page,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/group',
+				attributes: {
+					templateLock: 'insert',
+					layout: { type: 'constrained' },
+				},
+				innerBlocks: [
+					{
+						name: 'core/columns',
+						attributes: { templateLock: false },
+						innerBlocks: [
+							{
+								name: 'core/column',
+								innerBlocks: [
+									{
+										name: 'core/paragraph',
+										attributes: { content: 'Col 1' },
+									},
+								],
+							},
+						],
+					},
+				],
+			} );
+			await editor.selectBlocks(
+				editor.canvas.getByLabel( 'Block: Columns' )
+			);
+
+			await editor.openDocumentSettingsSidebar();
+
+			await expect(
+				page.getByRole( 'slider', { name: 'Columns' } )
+			).toBeVisible();
+		} );
 	} );
 } );

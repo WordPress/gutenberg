@@ -15,9 +15,10 @@ const componentPaths = glob( 'packages/components/src/*/**/README.md', {
 		'**/src/mobile/**/README.md',
 		'packages/components/src/theme/README.md',
 		'packages/components/src/view/README.md',
-		'packages/components/src/dropdown-menu-v2/README.md',
+		'packages/components/src/menu/README.md',
 		'packages/components/src/tabs/README.md',
 		'packages/components/src/custom-select-control-v2/README.md',
+		'packages/components/src/badge/README.md',
 	],
 } );
 const packagePaths = glob( 'packages/*/package.json' )

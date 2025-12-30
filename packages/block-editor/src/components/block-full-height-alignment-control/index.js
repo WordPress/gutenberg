@@ -7,7 +7,7 @@ import { fullscreen } from '@wordpress/icons';
 
 function BlockFullHeightAlignmentControl( {
 	isActive,
-	label = __( 'Toggle full height' ),
+	label = __( 'Full height' ),
 	onToggle,
 	isDisabled,
 } ) {

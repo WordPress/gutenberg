@@ -6,7 +6,7 @@ Snapshot Diff:
 + Base styles
 
 @@ -3,8 +3,9 @@
-      "color": "#1e1e1e",
+      "color": "var(--wp-components-color-foreground, #1e1e1e)",
       "font-size": "calc((13 / 13) * 13px)",
       "font-weight": "normal",
       "line-height": "1.4",
@@ -19,7 +19,7 @@ Snapshot Diff:
 
 exports[`Text should render highlighted words with highlightCaseSensitive 1`] = `
 .emotion-0 {
-  color: #1e1e1e;
+  color: var(--wp-components-color-foreground, #1e1e1e);
   line-height: 1.4;
   margin: 0;
   text-wrap: balance;
@@ -52,7 +52,7 @@ exports[`Text should render highlighted words with highlightCaseSensitive 1`] = 
 
 exports[`Text snapshot tests should render correctly 1`] = `
 .emotion-0 {
-  color: #1e1e1e;
+  color: var(--wp-components-color-foreground, #1e1e1e);
   line-height: 1.4;
   margin: 0;
   text-wrap: balance;

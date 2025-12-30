@@ -62,7 +62,7 @@ export default function Pagination( {
 					</HStack>
 					<Text variant="muted">
 						{ sprintf(
-							// translators: %1$s: Current page number, %2$s: Total number of pages.
+							// translators: 1: Current page number. 2: Total number of pages.
 							_x( '%1$s of %2$s', 'paging' ),
 							currentPage,
 							numPages

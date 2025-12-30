@@ -73,4 +73,7 @@ const exportPattern: Action< Pattern > = {
 	},
 };
 
+/**
+ * Export action as JSON for Pattern.
+ */
 export default exportPattern;

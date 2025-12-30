@@ -172,7 +172,7 @@ class Gutenberg_HTTP_Signaling_Server {
 		if ( ! $fd ) {
 			$retries = isset( $_COOKIE['signaling_server_retries'] ) ? intval( $_COOKIE['signaling_server_retries'] ) : 0;
 			$secure  = ( 'https' === parse_url( home_url(), PHP_URL_SCHEME ) );
-			setcookie( 'signaling_server_retries', $retries + 1, time() + DAY_IN_SECONDS, SITECOOKIEPATH, '', $secure );
+			setcookie( 'signaling_server_retries', (string) ( $retries + 1 ), time() + DAY_IN_SECONDS, SITECOOKIEPATH, '', $secure );
 			echo 'id: ' . time() . PHP_EOL;
 			echo 'event: error' . PHP_EOL;
 			echo 'data: ' . 'Could not open required file.' . PHP_EOL . PHP_EOL;
@@ -183,7 +183,7 @@ class Gutenberg_HTTP_Signaling_Server {
 		if ( isset( $_COOKIE['signaling_server_retries'] ) ) {
 			$secure = ( 'https' === parse_url( home_url(), PHP_URL_SCHEME ) );
 			// unset the cookie using a past expiration date.
-			setcookie( 'signaling_server_retries', 0, time() - DAY_IN_SECONDS, SITECOOKIEPATH, '', $secure );
+			setcookie( 'signaling_server_retries', '0', time() - DAY_IN_SECONDS, SITECOOKIEPATH, '', $secure );
 		}
 
 		echo 'retry: 3000' . PHP_EOL;

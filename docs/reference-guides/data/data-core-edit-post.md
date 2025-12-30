@@ -65,7 +65,7 @@ Retrieves the template of the currently edited post.
 
 _Returns_
 
--   `Object?`: Post Template.
+-   `?Object`: Post Template.
 
 ### getEditorMode
 
@@ -527,6 +527,10 @@ Triggers an action used to toggle a feature flag.
 _Parameters_
 
 -   _feature_ `string`: Feature name.
+
+### toggleFullscreenMode
+
+Action that toggles the Fullscreen Mode view option.
 
 ### togglePinnedPluginItem
 

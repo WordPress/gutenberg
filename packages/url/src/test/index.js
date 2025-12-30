@@ -494,12 +494,12 @@ describe( 'getPathAndQueryString', () => {
 	beforeAll( jest.resetModules );
 	afterAll( jest.resetModules );
 	it( 'combines the results of `getPath` and `getQueryString`', () => {
-		jest.doMock( '../get-path.js', () => ( {
+		jest.doMock( '../get-path', () => ( {
 			getPath( { path } = {} ) {
 				return path;
 			},
 		} ) );
-		jest.doMock( '../get-query-string.js', () => ( {
+		jest.doMock( '../get-query-string', () => ( {
 			getQueryString( { queryString } = {} ) {
 				return queryString;
 			},
@@ -636,7 +636,7 @@ describe( 'addQueryArgs', () => {
 		);
 	} );
 
-	it( 'should encodes spaces by RFC 3986', () => {
+	it( 'should encode spaces by RFC 3986', () => {
 		const url = 'https://andalouses.example/beach';
 		const args = { activity: 'fun in the sun' };
 
@@ -650,6 +650,15 @@ describe( 'addQueryArgs', () => {
 		const args = { sun: 'true' };
 
 		expect( addQueryArgs( url, args ) ).toBe( '?sun=true' );
+	} );
+
+	it( 'should add query args before the url fragment', () => {
+		const url = 'https://andalouses.example/beach/#fragment';
+		const args = { sun: 'true' };
+
+		expect( addQueryArgs( url, args ) ).toBe(
+			'https://andalouses.example/beach/?sun=true#fragment'
+		);
 	} );
 
 	it( 'should return URL argument unaffected if no query arguments to append', () => {
@@ -796,7 +805,13 @@ describe( 'getQueryArg', () => {
 		expect( getQueryArg( url, 'baz' ) ).toBeUndefined();
 	} );
 
-	it( 'should get the value of an arry query arg', () => {
+	it( 'should not return what looks like a query arg after the url fragment', () => {
+		const url = 'https://andalouses.example/beach#fragment?foo=bar&bar=baz';
+
+		expect( getQueryArg( url, 'foo' ) ).toBeUndefined();
+	} );
+
+	it( 'should get the value of an array query arg', () => {
 		const url = 'https://andalouses.example/beach?foo[]=bar&foo[]=baz';
 
 		expect( getQueryArg( url, 'foo' ) ).toEqual( [ 'bar', 'baz' ] );
@@ -823,7 +838,13 @@ describe( 'hasQueryArg', () => {
 		expect( hasQueryArg( url, 'baz' ) ).toBeFalsy();
 	} );
 
-	it( 'should return true for an arry query arg', () => {
+	it( 'should return false if the query arg is after url fragment', () => {
+		const url = 'https://andalouses.example/beach#fragment?foo=bar&bar=baz';
+
+		expect( hasQueryArg( url, 'foo' ) ).toBeFalsy();
+	} );
+
+	it( 'should return true for an array query arg', () => {
 		const url = 'https://andalouses.example/beach?foo[]=bar&foo[]=baz';
 
 		expect( hasQueryArg( url, 'foo' ) ).toBeTruthy();
@@ -865,6 +886,23 @@ describe( 'removeQueryArgs', () => {
 
 		expect( removeQueryArgs( url, 'foo' ) ).toEqual(
 			'https://andalouses.example/beach?bar=foobar'
+		);
+	} );
+
+	it( 'should not remove the url fragment', () => {
+		const url =
+			'https://andalouses.example/beach?foo=bar&param=value#fragment';
+
+		expect( removeQueryArgs( url, 'foo' ) ).toEqual(
+			'https://andalouses.example/beach?param=value#fragment'
+		);
+	} );
+
+	it( 'should not remove what looks like a query arg after url fragment', () => {
+		const url = 'https://andalouses.example/beach#fragment?foo=bar';
+
+		expect( removeQueryArgs( url, 'foo' ) ).toEqual(
+			'https://andalouses.example/beach#fragment?foo=bar'
 		);
 	} );
 } );
@@ -1163,6 +1201,24 @@ describe( 'cleanForSlug', () => {
 	it( 'Should replace multiple hyphens with a single one', () => {
 		expect( cleanForSlug( 'the long - cat' ) ).toBe( 'the-long-cat' );
 		expect( cleanForSlug( 'the----long---cat' ) ).toBe( 'the-long-cat' );
+	} );
+
+	it( 'Should remove ampersands', () => {
+		expect( cleanForSlug( 'the long cat & dog' ) ).toBe(
+			'the-long-cat-dog'
+		);
+		expect(
+			cleanForSlug( 'the long cat &amp; a dog &amp;&amp; fish' )
+		).toBe( 'the-long-cat-a-dog-fish' );
+		expect( cleanForSlug( 'the long cat &amp;amp; dog' ) ).toBe(
+			'the-long-cat-amp-dog'
+		);
+	} );
+
+	it( 'Should remove HTML entities', () => {
+		expect(
+			cleanForSlug( 'No &nbsp; Entities> &ndash; Here &mdash;&lt;' )
+		).toBe( 'no-entities-here' );
 	} );
 } );
 

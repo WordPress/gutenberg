@@ -79,7 +79,7 @@ test.describe( 'Widgets Customizer', () => {
 		);
 
 		const inlineInserterSearchBox = page.locator(
-			'role=searchbox[name="Search for blocks and patterns"i]'
+			'role=searchbox[name="Search"i]'
 		);
 
 		await expect( inlineInserterSearchBox ).toBeFocused();
@@ -286,7 +286,7 @@ test.describe( 'Widgets Customizer', () => {
 		await editHeadingWidget.click();
 
 		const headingBlock = page.locator(
-			'role=document[name="Block: Heading"i] >> text="First Heading"'
+			'role=document[name="Block: Heading 2"i] >> text="First Heading"'
 		);
 		await expect( headingBlock ).toBeFocused();
 	} );
@@ -582,10 +582,13 @@ test.describe( 'Widgets Customizer', () => {
 		await widgetsCustomizerPage.expandWidgetArea( 'Footer #1' );
 
 		await widgetsCustomizerPage.addBlock( 'Custom HTML' );
-		const HTMLBlockTextarea = page.locator(
-			'role=document[name="Block: Custom HTML"i] >> role=textbox[name="HTML"i]'
-		);
-		await HTMLBlockTextarea.type( 'hello' );
+		await page.getByRole( 'button', { name: 'Edit HTML' } ).click();
+		await page.getByRole( 'dialog' ).getByRole( 'textbox' ).click();
+		await page.keyboard.type( 'hello' );
+		await page
+			.getByRole( 'dialog' )
+			.getByRole( 'button', { name: 'Update' } )
+			.click();
 
 		// Click Publish
 		await Promise.all( [
@@ -596,8 +599,13 @@ test.describe( 'Widgets Customizer', () => {
 		// reload
 		await widgetsCustomizerPage.visitCustomizerPage();
 		await widgetsCustomizerPage.expandWidgetArea( 'Footer #1' );
-
-		await expect( HTMLBlockTextarea ).toHaveText( 'hello' );
+		await page
+			.locator( 'role=document[name="Block: Custom HTML"i]' )
+			.click();
+		await page.getByRole( 'button', { name: 'Edit' } ).click();
+		await expect(
+			page.getByRole( 'dialog' ).getByRole( 'textbox' )
+		).toHaveText( 'hello' );
 	} );
 } );
 
@@ -651,9 +659,7 @@ class WidgetsCustomizerPage {
 			'role=toolbar[name="Document tools"i] >> role=button[name="Add block"i]'
 		);
 
-		const searchBox = this.page.locator(
-			'role=searchbox[name="Search for blocks and patterns"i]'
-		);
+		const searchBox = this.page.locator( 'role=searchbox[name="Search"i]' );
 
 		// Clear the input.
 		await searchBox.evaluate( ( node ) => {

@@ -12,7 +12,7 @@ import PostLastRevisionCheck from './check';
 /**
  * Renders the panel for displaying the last revision of a post.
  *
- * @return {Component} The component to be rendered.
+ * @return {React.ReactNode} The rendered component.
  */
 function PostLastRevisionPanel() {
 	return (

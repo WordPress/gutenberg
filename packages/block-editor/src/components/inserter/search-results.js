@@ -84,7 +84,9 @@ function InserterSearchResults( {
 	] = useBlockTypesState( destinationRootClientId, onInsertBlocks, isQuick );
 	const [ patterns, , onClickPattern ] = usePatternsState(
 		onInsertBlocks,
-		destinationRootClientId
+		destinationRootClientId,
+		undefined,
+		isQuick
 	);
 
 	const filteredBlockPatterns = useMemo( () => {
@@ -159,11 +161,6 @@ function InserterSearchResults( {
 	const currentShownBlockTypes = useAsyncList( filteredBlockTypes, {
 		step: INITIAL_INSERTER_RESULTS,
 	} );
-	const currentShownPatterns = useAsyncList(
-		currentShownBlockTypes.length === filteredBlockTypes.length
-			? filteredBlockPatterns
-			: EMPTY_ARRAY
-	);
 
 	const hasItems =
 		filteredBlockTypes.length > 0 || filteredBlockPatterns.length > 0;
@@ -190,7 +187,6 @@ function InserterSearchResults( {
 		>
 			<div className="block-editor-inserter__quick-inserter-patterns">
 				<BlockPatternsList
-					shownPatterns={ currentShownPatterns }
 					blockPatterns={ filteredBlockPatterns }
 					onClickPattern={ onClickPattern }
 					onHover={ onHoverPattern }

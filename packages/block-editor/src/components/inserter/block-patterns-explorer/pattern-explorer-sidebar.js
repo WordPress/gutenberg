@@ -37,10 +37,9 @@ function PatternsExplorerSearch( { searchValue, setSearchValue } ) {
 	return (
 		<div className={ baseClassName }>
 			<SearchControl
-				__nextHasNoMarginBottom
 				onChange={ setSearchValue }
 				value={ searchValue }
-				label={ __( 'Search for patterns' ) }
+				label={ __( 'Search' ) }
 				placeholder={ __( 'Search' ) }
 			/>
 		</div>

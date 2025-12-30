@@ -38,7 +38,6 @@ export default function RangeMark(
 				{ ...otherProps }
 				aria-hidden="true"
 				className={ classes }
-				isFilled={ isFilled }
 				style={ style }
 			/>
 			{ label && (

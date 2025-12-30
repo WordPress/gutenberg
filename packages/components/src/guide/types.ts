@@ -41,6 +41,18 @@ export type GuideProps = {
 	 */
 	finishButtonText?: string;
 	/**
+	 * Use this to customize the label of the _Next_ button shown on each page of the guide.
+	 *
+	 * @default 'Next'
+	 */
+	nextButtonText?: string;
+	/**
+	 * Use this to customize the label of the _Previous_ button shown on each page of the guide except the first.
+	 *
+	 * @default 'Previous'
+	 */
+	previousButtonText?: string;
+	/**
 	 * A function which is called when the guide is finished.
 	 */
 	onFinish: ModalProps[ 'onRequestClose' ];

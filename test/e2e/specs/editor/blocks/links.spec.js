@@ -42,7 +42,11 @@ test.describe( 'Links', () => {
 		await editor.clickBlockToolbarButton( 'Link' );
 
 		// Trigger the autocomplete suggestion list and select the first suggestion.
-		await page.keyboard.type( 'Post to create a' );
+		await page
+			.getByRole( 'combobox', {
+				name: 'Search or type URL',
+			} )
+			.fill( 'Post to create a' );
 		await page.getByRole( 'option', { name: titleText } ).click();
 
 		await expect.poll( editor.getBlocks ).toMatchObject( [
@@ -80,7 +84,11 @@ test.describe( 'Links', () => {
 		await editor.clickBlockToolbarButton( 'Link' );
 
 		// Type a URL.
-		await page.keyboard.type( 'https://wordpress.org/gutenberg' );
+		await page
+			.getByRole( 'combobox', {
+				name: 'Search or type URL',
+			} )
+			.fill( 'https://wordpress.org/gutenberg' );
 
 		// Submit the link.
 		await pageUtils.pressKeys( 'Enter' );
@@ -116,41 +124,9 @@ test.describe( 'Links', () => {
 
 		await expect(
 			page.getByRole( 'combobox', {
-				name: 'Link',
+				name: 'Search or type URL',
 			} )
 		).toHaveValue( '' );
-	} );
-
-	test( `can be created without any text selected`, async ( {
-		page,
-		editor,
-		pageUtils,
-	} ) => {
-		// Create a block with some text.
-		await editor.insertBlock( {
-			name: 'core/paragraph',
-		} );
-		await page.keyboard.type( 'This is Gutenberg: ' );
-
-		// Press Cmd+K to insert a link.
-		await pageUtils.pressKeys( 'primary+K' );
-
-		// Type a URL.
-		await page.keyboard.type( 'https://wordpress.org/gutenberg' );
-
-		// Press Enter to apply the link.
-		await pageUtils.pressKeys( 'Enter' );
-
-		// A link with the URL as its text should have been inserted.
-		await expect.poll( editor.getBlocks ).toMatchObject( [
-			{
-				name: 'core/paragraph',
-				attributes: {
-					content:
-						'This is Gutenberg: <a href="https://wordpress.org/gutenberg">https://wordpress.org/gutenberg</a>',
-				},
-			},
-		] );
 	} );
 
 	test( `will automatically create a link if selected text is a valid HTTP based URL`, async ( {
@@ -202,7 +178,11 @@ test.describe( 'Links', () => {
 		await editor.clickBlockToolbarButton( 'Link' );
 
 		// Type a URL.
-		await page.keyboard.type( 'https://wordpress.org/gutenberg' );
+		await page
+			.getByRole( 'combobox', {
+				name: 'Search or type URL',
+			} )
+			.fill( 'https://wordpress.org/gutenberg' );
 
 		// Click somewhere else - it doesn't really matter where.
 		await editor.canvas
@@ -341,7 +321,7 @@ test.describe( 'Links', () => {
 		// Make a collapsed selection inside the link.
 		await pageUtils.pressKeys( 'ArrowLeft' );
 		await pageUtils.pressKeys( 'ArrowRight' );
-		await pageUtils.pressKeys( 'primary+k' );
+		await editor.clickBlockToolbarButton( 'Link' );
 
 		const linkPopover = LinkUtils.getLinkPopover();
 		await linkPopover.getByRole( 'button', { name: 'Edit' } ).click();
@@ -393,7 +373,7 @@ test.describe( 'Links', () => {
 		await pageUtils.pressKeys( 'primary+k' );
 
 		const urlInput = page.getByRole( 'combobox', {
-			name: 'Link',
+			name: 'Search or type URL',
 		} );
 
 		// Expect the "Link" combobox to be visible and focused
@@ -473,7 +453,9 @@ test.describe( 'Links', () => {
 		await pageUtils.pressKeys( 'shiftAlt+ArrowLeft' );
 		await pageUtils.pressKeys( 'primary+K' );
 		const linkPopover = LinkUtils.getLinkPopover();
-		await page.keyboard.type( URL );
+		await page
+			.getByRole( 'combobox', { name: 'Search or type URL' } )
+			.fill( URL );
 		await pageUtils.pressKeys( 'Enter' );
 
 		await expect( linkPopover ).toBeVisible();
@@ -485,14 +467,16 @@ test.describe( 'Links', () => {
 		await pageUtils.pressKeys( 'End' );
 		await expect( linkPopover ).toBeHidden();
 
-		// Move the caret back into the link text and the link popover
-		// should not be displayed.
-		await pageUtils.pressKeys( 'ArrowLeft' );
+		// Move the caret back into and selects the link text.
+		await pageUtils.pressKeys( 'shiftAlt+ArrowLeft' );
 		await expect( linkPopover ).toBeHidden();
 
 		// Switch the Link UI into "Edit" mode via keyboard shortcut
 		// and check that the input has the correct value.
 		await pageUtils.pressKeys( 'primary+K' );
+		await expect(
+			page.getByRole( 'link', { name: 'The new Gutenberg editing' } )
+		).toBeFocused();
 		await pageUtils.pressKeys( 'Tab' );
 		await pageUtils.pressKeys( 'Enter' );
 
@@ -615,7 +599,7 @@ test.describe( 'Links', () => {
 		await expect( checkbox ).toBeFocused();
 
 		// Tab back to the Submit and apply the link.
-		await linkPopover.getByRole( 'button', { name: 'Save' } ).click();
+		await linkPopover.getByRole( 'button', { name: 'Apply' } ).click();
 
 		// The link should have been inserted.
 		await expect.poll( editor.getBlocks ).toMatchObject( [
@@ -647,14 +631,13 @@ test.describe( 'Links', () => {
 
 		// Close the link control to return the caret to the canvas
 		const linkPopover = LinkUtils.getLinkPopover();
+		await page
+			.getByRole( 'combobox', { name: 'Search or type URL' } )
+			.fill( 'w.org' );
 
-		await page.keyboard.type( 'w.org' );
-
-		// Submit the link
+		// Submit the link and close the popover.
 		await page.keyboard.press( 'Enter' );
-
-		// Close the Link Popover.
-		await pageUtils.pressKeys( 'Escape' );
+		await page.keyboard.press( 'Escape' );
 
 		await expect( linkPopover ).toBeHidden();
 
@@ -683,7 +666,7 @@ test.describe( 'Links', () => {
 		await page.keyboard.type( 'wordpress.org' );
 
 		// Save the link.
-		await linkPopover.getByRole( 'button', { name: 'Save' } ).click();
+		await linkPopover.getByRole( 'button', { name: 'Apply' } ).click();
 
 		// Link UI should be closed.
 		await expect( linkPopover ).toBeHidden();
@@ -712,12 +695,16 @@ test.describe( 'Links', () => {
 		} );
 		await page.keyboard.type( 'This is Gutenberg WordPress' );
 
+		const urlInput = page.getByRole( 'combobox', {
+			name: 'Search or type URL',
+		} );
+
 		// Select "WordPress".
 		await pageUtils.pressKeys( 'shiftAlt+ArrowLeft' );
 
 		// Create a link.
 		await pageUtils.pressKeys( 'primary+k' );
-		await page.keyboard.type( 'w.org' );
+		await urlInput.fill( 'w.org' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.press( 'Escape' );
 
@@ -730,7 +717,7 @@ test.describe( 'Links', () => {
 		// Create a link.
 		await pageUtils.pressKeys( 'primary+k' );
 
-		await page.keyboard.type( 'https://wordpress.org/plugins/gutenberg/' );
+		await urlInput.fill( 'https://wordpress.org/plugins/gutenberg/' );
 		await page.keyboard.press( 'Enter' );
 
 		// Press the "Edit" button
@@ -837,7 +824,7 @@ test.describe( 'Links', () => {
 		await linkPopover.getByLabel( 'nofollow' ).click();
 
 		// Save the link
-		await linkPopover.getByRole( 'button', { name: 'Save' } ).click();
+		await linkPopover.getByRole( 'button', { name: 'Apply' } ).click();
 
 		// Expect correct attributes to be set on the underlying link.
 		await expect.poll( editor.getBlocks ).toMatchObject( [
@@ -865,7 +852,7 @@ test.describe( 'Links', () => {
 		await linkPopover.getByLabel( 'nofollow' ).click();
 
 		// Save the link
-		await linkPopover.getByRole( 'button', { name: 'Save' } ).click();
+		await linkPopover.getByRole( 'button', { name: 'Apply' } ).click();
 
 		// Expect correct attributes to be set on the underlying link.
 		await expect.poll( editor.getBlocks ).toMatchObject( [
@@ -1015,7 +1002,6 @@ test.describe( 'Links', () => {
 		test( 'should not display text input when initially creating the link', async ( {
 			page,
 			editor,
-			pageUtils,
 			LinkUtils,
 		} ) => {
 			// Create a block with some text.
@@ -1024,8 +1010,8 @@ test.describe( 'Links', () => {
 			} );
 			await page.keyboard.type( 'This is Gutenberg: ' );
 
-			// Press Cmd+K to insert a link.
-			await pageUtils.pressKeys( 'primary+k' );
+			// Insert a link
+			await editor.clickBlockToolbarButton( 'Link' );
 
 			const linkPopover = LinkUtils.getLinkPopover();
 
@@ -1048,8 +1034,8 @@ test.describe( 'Links', () => {
 			// Make a collapsed selection inside the link. This is used
 			// as a stress test to ensure we can find the link text from a
 			// collapsed RichTextValue that contains a link format.
-			await pageUtils.pressKeys( 'ArrowLeft' );
-			await pageUtils.pressKeys( 'ArrowRight' );
+			await pageUtils.pressKeys( 'End' );
+			await pageUtils.pressKeys( 'shiftAlt+ArrowLeft' );
 			await pageUtils.pressKeys( 'primary+k' );
 
 			const linkPopover = LinkUtils.getLinkPopover();
@@ -1090,7 +1076,11 @@ test.describe( 'Links', () => {
 			await editor.clickBlockToolbarButton( 'Link' );
 
 			// Type a URL.
-			await page.keyboard.type( 'https://wordpress.org/gutenberg' );
+			await page
+				.getByRole( 'combobox', {
+					name: 'Search or type URL',
+				} )
+				.fill( 'https://wordpress.org/gutenberg' );
 
 			// Click on the Submit button.
 			await pageUtils.pressKeys( 'Enter' );
@@ -1162,7 +1152,11 @@ test.describe( 'Links', () => {
 			await editor.clickBlockToolbarButton( 'Link' );
 
 			// Type a URL.
-			await page.keyboard.type( 'www.wordpress.org' );
+			await page
+				.getByRole( 'combobox', {
+					name: 'Search or type URL',
+				} )
+				.fill( 'www.wordpress.org' );
 
 			// Update the link.
 			await pageUtils.pressKeys( 'Enter' );
@@ -1242,7 +1236,11 @@ class LinkUtils {
 		await expect( linkPopover ).toBeVisible();
 
 		// Type a URL.
-		await this.page.keyboard.type( 'https://wordpress.org/gutenberg' );
+		await linkPopover
+			.getByRole( 'combobox', {
+				name: 'Search or type URL',
+			} )
+			.fill( 'https://wordpress.org/gutenberg' );
 
 		// Submit the link.
 		await this.pageUtils.pressKeys( 'Enter' );

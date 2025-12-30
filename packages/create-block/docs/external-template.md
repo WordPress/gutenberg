@@ -76,10 +76,13 @@ The following configurable variables are used with the template files. Template 
 -   `npmDevDependencies` (default: `[]`) – the list of remote npm packages to be installed in the project with [`npm install --save-dev`](https://docs.npmjs.com/cli/v8/commands/npm-install) when `wpScripts` is enabled.
 -   `customPackageJSON` (no default) - allows definition of additional properties for the generated package.json file.
 
-**Plugin header fields** ([learn more](https://developer.wordpress.org/plugins/plugin-basics/header-requirements/)):
+**Plugin header and readme fields** (learn more about [header requirements](https://developer.wordpress.org/plugins/plugin-basics/header-requirements/) and [readmes](https://developer.wordpress.org/plugins/wordpress-org/how-your-readme-txt-works/)):
 
 -   `pluginURI` (no default) – the home page of the plugin.
 -   `version` (default: `'0.1.0'`) – the current version number of the plugin.
+-   `requiresAtLeast` (default: `'6.7'`) – the lowest WordPress version that the plugin will work on.
+-   `requiresPHP` (default: `'7.4'`) – the minimum required PHP version for use with this plugin.
+-   `testedUpTo` (default: `'6.7'`) – the highest WordPress version that the plugin has been tested against.
 -   `author` (default: `'The WordPress Contributors'`) – the name of the plugin author(s).
 -   `license` (default: `'GPL-2.0-or-later'`) – the short name of the plugin’s license.
 -   `licenseURI` (default: `'https://www.gnu.org/licenses/gpl-2.0.html'`) – a link to the full text of the license.
@@ -97,6 +100,7 @@ The following configurable variables are used with the template files. Template 
 -   `description` (no default) – a short description for your block.
 -   `dashicon` (no default) – an icon property thats makes it easier to identify a block ([available values](https://developer.wordpress.org/resource/dashicons/)).
 -   `category` (default: `'widgets'`) – blocks are grouped into categories to help users browse and discover them. The categories provided by core are `text`, `media`, `design`, `widgets`, `theme`, and `embed`.
+-   `textdomain` (defaults to the `slug` value) – the text domain used to make strings translatable ([more info](https://developer.wordpress.org/plugins/internationalization/how-to-internationalize-your-plugin/#text-domains)).
 -   `attributes` (no default) – block attributes ([more details](https://developer.wordpress.org/block-editor/developers/block-api/block-attributes/)).
 -   `supports` (no default) – optional block extended support features ([more details](https://developer.wordpress.org/block-editor/developers/block-api/block-supports/).
 -   `editorScript` (default: `'file:./index.js'`) – an editor script definition.
@@ -167,4 +171,29 @@ This content is only rendered if `--variant primary` is passed.
 This content is only rendered if `--variant secondary` is passed.
 {{/isSecondaryVariant}}
 
+```
+
+Variants can also define their own files by defining `pluginTemplatesPath`, `blockTemplatesPath`, or `assetsPath`. If these are defined, they will override the paths defined by the project template. In the case that a variant doesn't need some of the files defined by the template, `null` can be passed to the appropriate variable to skip scaffolding those files.
+
+```js
+module.exports = {
+	defaultValues: {
+		slug: 'my-fantastic-block',
+		title: 'My fantastic block',
+		dashicon: 'palmtree',
+		version: '1.2.3',
+	},
+	variants: {
+		primary: {},
+		secondary: {
+			title: 'My fantastic block - secondary variant',
+			blockTemplatesPath: join(
+				__dirname,
+				'custom-path',
+				'block-templates'
+			),
+			assetsPath: null, // Will not scaffold any assets files even if defined by the main template.
+		},
+	},
+};
 ```

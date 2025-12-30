@@ -1,11 +1,7 @@
 /**
  * WordPress dependencies
  */
-import {
-	__experimentalUseSlotFills as useSlotFills,
-	__unstableMotionContext as MotionContext,
-} from '@wordpress/components';
-import { useContext, useMemo } from '@wordpress/element';
+import { __experimentalUseSlotFills as useSlotFills } from '@wordpress/components';
 import warning from '@wordpress/warning';
 import deprecated from '@wordpress/deprecated';
 
@@ -34,23 +30,10 @@ export default function InspectorControlsSlot( {
 		);
 		group = __experimentalGroup;
 	}
-	const Slot = groups[ group ]?.Slot;
-	const fills = useSlotFills( Slot?.__unstableName );
+	const slotFill = groups[ group ];
+	const fills = useSlotFills( slotFill?.name );
 
-	const motionContextValue = useContext( MotionContext );
-
-	const computedFillProps = useMemo(
-		() => ( {
-			...( fillProps ?? {} ),
-			forwardedContext: [
-				...( fillProps?.forwardedContext ?? [] ),
-				[ MotionContext.Provider, { value: motionContextValue } ],
-			],
-		} ),
-		[ motionContextValue, fillProps ]
-	);
-
-	if ( ! Slot ) {
+	if ( ! slotFill ) {
 		warning( `Unknown InspectorControls group "${ group }" provided.` );
 		return null;
 	}
@@ -59,19 +42,19 @@ export default function InspectorControlsSlot( {
 		return null;
 	}
 
+	const { Slot } = slotFill;
+
 	if ( label ) {
 		return (
 			<BlockSupportToolsPanel group={ group } label={ label }>
 				<BlockSupportSlotContainer
 					{ ...props }
-					fillProps={ computedFillProps }
+					fillProps={ fillProps }
 					Slot={ Slot }
 				/>
 			</BlockSupportToolsPanel>
 		);
 	}
 
-	return (
-		<Slot { ...props } fillProps={ computedFillProps } bubblesVirtually />
-	);
+	return <Slot { ...props } fillProps={ fillProps } bubblesVirtually />;
 }

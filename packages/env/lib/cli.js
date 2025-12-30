@@ -14,6 +14,7 @@ const { execSync } = require( 'child_process' );
 const pkg = require( '../package.json' );
 const env = require( './env' );
 const parseXdebugMode = require( './parse-xdebug-mode' );
+const parseSpxMode = require( './parse-spx-mode' );
 const {
 	RUN_CONTAINERS,
 	validateRunContainer,
@@ -75,7 +76,6 @@ const withSpinner =
 					spinner.fail(
 						typeof error === 'string' ? error : error.message
 					);
-					// Disable reason: Using console.error() means we get a stack trace.
 					console.error( error );
 					process.exit( 1 );
 				} else {
@@ -137,6 +137,12 @@ module.exports = function cli() {
 				describe:
 					'Enables Xdebug. If not passed, Xdebug is turned off. If no modes are set, uses "debug". You may set multiple Xdebug modes by passing them in a comma-separated list: `--xdebug=develop,coverage`. See https://xdebug.org/docs/all_settings#mode for information about Xdebug modes.',
 				coerce: parseXdebugMode,
+				type: 'string',
+			} );
+			args.option( 'spx', {
+				describe:
+					'Enables SPX profiling. If not passed, SPX is turned off. If no mode is set, uses "enabled". SPX is a simple profiling extension with a built-in web UI. See https://github.com/NoiseByNorthwest/php-spx for more information.',
+				coerce: parseSpxMode,
 				type: 'string',
 			} );
 			args.option( 'scripts', {

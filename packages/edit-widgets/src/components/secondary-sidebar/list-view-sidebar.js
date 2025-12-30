@@ -51,10 +51,10 @@ export default function ListViewSidebar() {
 			<div className="edit-widgets-editor__list-view-panel-header">
 				<strong>{ __( 'List View' ) }</strong>
 				<Button
-					__next40pxDefaultSize
 					icon={ closeSmall }
 					label={ __( 'Close' ) }
 					onClick={ closeListView }
+					size="compact"
 				/>
 			</div>
 			<div

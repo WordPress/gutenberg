@@ -1,0 +1,59 @@
+import { Meta, Typeset } from '@storybook/blocks';
+import radius from './static/radius.svg';
+import radiusDo from './static/radius-do.svg';
+import radiusDont from './static/radius-dont.svg';
+
+<Meta title="Foundations/Design Language/Radius" name="page" />
+
+# Radius
+
+<img src={ radius } alt="Radius" width="100%" />
+
+The radius scale is designed to provide a consistent, elegant appearance across nested elements. The defined values help maintain visual harmony between smaller primitives and larger containers, ensuring a cohesive user experience.
+
+## Scale
+
+The scale includes the following steps:
+
+-   `radius-x-small`: Applied to the smallest elements, such as buttons inside inputs or similar small primitives. This ensures subtle rounding without distracting from the core design.
+-   `radius-small`: The most commonly used radius value, applied to many primitives like buttons, inputs, and other standalone controls. It provides a moderate rounding that feels balanced and polished.
+-   `radius-medium`: Used for medium-sized containers like dropdown menus, popovers, and other mid-level components. This value is slightly more pronounced, giving these elements a soft but noticeable edge.
+-   `radius-large`: Reserved for larger containers such as cards and modals. The larger radius ensures that these elements have a smooth, elegant appearance that enhances their prominence on the page.
+-   `radius-full`: Applies a `border-radius` of `9999px`, this value creates a highly rounded appearance, often used on pill-shaped buttons or other components where extreme rounding is desired but full circularity is not necessary.
+-   `radius-round`: This value applies a `border-radius` of `100%`, making elements fully circular. It's typically used for circular avatars or buttons where complete rounding is required.
+
+These steps are defined as tokens. To view the values and understand how to use them please view the [Tokens section](?path=/docs/tokens-radius--page).
+
+## Usage Guidelines
+
+-   Consistency: To maintain visual cohesion, adhere to the radius scale when styling elements. Avoid custom radius values unless there is a specific need.
+-   Nested Elements: When combining elements of different sizes (e.g., buttons within inputs or cards within modals), ensure that smaller nested elements use the appropriate radius value for their size.
+-   Accessibility: Larger radius values can create a more approachable and friendly appearance, especially for larger components like cards and modals that demand more attention from users.
+
+<table>
+  <thead>
+    <tr>
+      <th width="50%">✅ Do</th>
+      <th width="50%">🚫 Don't</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td width="50%" valign="top">
+        <img src={ radiusDo } alt="Radius do" width="100%" />
+
+        - Scale application of radius with element or container size.
+
+        - Use `radius-round` for circles and `radius-full` for pills.
+      </td>
+      <td width="50%" valign="top">
+        <img src={ radiusDont } alt="Radius don't" width="100%" />
+
+          -   Don't nest larger radii inside smaller radii.
+
+          -   Don't apply the same
+      radius value to container and immediate descendent.
+      </td>
+    </tr>
+  </tbody>
+</table>

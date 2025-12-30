@@ -1,7 +1,10 @@
+@use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/colors" as *;
+
 /**
  * Insertion Point.
  */
-
 .block-editor-block-list__insertion-point {
 	position: absolute;
 	top: 0;
@@ -57,6 +60,18 @@
 	}
 }
 
+// The black plus that shows up on the right side of an empty paragraph block.
+.block-editor-block-list__empty-block-inserter.block-editor-block-list__empty-block-inserter {
+	position: absolute;
+	top: 0;
+	right: 0;
+	line-height: 0;
+
+	&:disabled {
+		display: none;
+	}
+}
+
 // Sibling inserter / "inbetweenserter".
 .block-editor-block-list__empty-block-inserter,
 .block-editor-block-list__insertion-point-inserter {
@@ -66,6 +81,7 @@
 		color: $white;
 		padding: 0;
 
+		// TODO: Consider passing size="small" to the Inserter toggle instead.
 		// Special dimensions for this button.
 		min-width: $button-size-small;
 		height: $button-size-small;
@@ -134,9 +150,12 @@
 
 	.is-dragging-components-draggable & {
 		opacity: 0;
-		// Use a minimal duration to delay hiding the element, see hide-during-dragging animation for more details.
-		// It's essential to hide the toolbar/popover so that `dragEnter` events can pass through them to the underlying elements.
-		animation: hide-during-dragging 1ms linear forwards;
+		@media not ( prefers-reduced-motion ) {
+
+			// Use a minimal duration to delay hiding the element, see hide-during-dragging animation for more details.
+			// It's essential to hide the toolbar/popover so that `dragEnter` events can pass through them to the underlying elements.
+			animation: hide-during-dragging 1ms linear forwards;
+		}
 	}
 
 	.block-editor-block-parent-selector {
@@ -188,22 +207,6 @@
 	left: 50%;
 }
 
-.zoom-out-toolbar {
-
-	.block-editor-block-mover-button.block-editor-block-mover-button:focus-visible::before,
-	.zoom-out-toolbar-button:focus::before,
-	.block-editor-block-toolbar-shuffle:focus::before,
-	.block-selection-button_drag-handle:focus::before {
-		box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
-	}
-
-	.block-editor-block-mover {
-		background: none;
-		border: none;
-	}
-
-	// Make the spacing consistent between controls.
-	.zoom-out-toolbar-button {
-		height: $button-size-next-default-40px;
-	}
+.block-editor-block-tools--is-dragging > .popover-slot {
+	display: none;
 }

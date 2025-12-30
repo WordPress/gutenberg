@@ -5,30 +5,70 @@ import { h, type ComponentChild, type JSX } from 'preact';
 /**
  * Internal dependencies
  */
-import { directivePrefix as p } from './constants';
 import { warn } from './utils';
+import { type DirectiveEntry } from './hooks';
 
-const ignoreAttr = `data-${ p }-ignore`;
-const islandAttr = `data-${ p }-interactive`;
-const fullPrefix = `data-${ p }-`;
+const directivePrefix = `data-wp-`;
 const namespaces: Array< string | null > = [];
 const currentNamespace = () => namespaces[ namespaces.length - 1 ] ?? null;
 const isObject = ( item: unknown ): item is Record< string, unknown > =>
 	Boolean( item && typeof item === 'object' && item.constructor === Object );
+const invalidCharsRegex = /[^a-z0-9-_]/i;
 
-// Regular expression for directive parsing.
-const directiveParser = new RegExp(
-	`^data-${ p }-` + // ${p} must be a prefix string, like 'wp'.
-		// Match alphanumeric characters including hyphen-separated
-		// segments. It excludes underscore intentionally to prevent confusion.
-		// E.g., "custom-directive".
-		'([a-z0-9]+(?:-[a-z0-9]+)*)' +
-		// (Optional) Match '--' followed by any alphanumeric charachters. It
-		// excludes underscore intentionally to prevent confusion, but it can
-		// contain multiple hyphens. E.g., "--custom-prefix--with-more-info".
-		'(?:--([a-z0-9_-]+))?$',
-	'i' // Case insensitive.
-);
+function parseDirectiveName( directiveName: string ): {
+	prefix: string;
+	suffix: string | null;
+	uniqueId: string | null;
+} | null {
+	const name = directiveName.substring( 8 );
+
+	// If the name contains invalid characters, it's not a valid directive name.
+	if ( invalidCharsRegex.test( name ) ) {
+		return null;
+	}
+
+	// Finds the first "--" to separate the prefix.
+	const suffixIndex = name.indexOf( '--' );
+
+	// If "--" is not found, everything is part of the prefix.
+	if ( suffixIndex === -1 ) {
+		return { prefix: name, suffix: null, uniqueId: null };
+	}
+
+	// The prefix is the part before the first "--".
+	const prefix = name.substring( 0, suffixIndex );
+	// The remaining is the part that starts from "--".
+	const remaining = name.substring( suffixIndex );
+
+	// If the suffix starts with "---" (but not "----"), there is no suffix and
+	// the remaining is the unique ID.
+	if ( remaining.startsWith( '---' ) && remaining[ 3 ] !== '-' ) {
+		return {
+			prefix,
+			suffix: null,
+			uniqueId: remaining.substring( 3 ) || null,
+		};
+	}
+
+	// Otherwise, the remaining is a potential suffix. The first two dashes are
+	// removed.
+	let suffix: string | null = remaining.substring( 2 );
+	// Search for "---" for a unique ID within the suffix.
+	const uniqueIdIndex = suffix.indexOf( '---' );
+
+	// If "---" is found, split the suffix and the unique ID.
+	if (
+		uniqueIdIndex !== -1 &&
+		suffix.substring( uniqueIdIndex )[ 3 ] !== '-'
+	) {
+		const uniqueId = suffix.substring( uniqueIdIndex + 3 ) || null;
+		suffix = suffix.substring( 0, uniqueIdIndex ) || null;
+		return { prefix, suffix, uniqueId };
+	}
+
+	// Otherwise, the rest is the entire suffix.
+	return { prefix, suffix: suffix || null, uniqueId: null };
+}
 
 // Regular expression for reference parsing. It can contain a namespace before
 // the reference, separated by `::`, like `some-namespace::state.somePath`.
@@ -44,36 +84,33 @@ export const hydratedIslands = new WeakSet();
  * @param root The root element or node to start traversing on.
  * @return The resulting vDOM tree.
  */
-export function toVdom( root: Node ): Array< ComponentChild > {
+export function toVdom( root: Node ): ComponentChild {
+	const nodesToRemove = new Set< Node >();
+	const nodesToReplace = new Set< Node >();
+
 	const treeWalker = document.createTreeWalker(
 		root,
 		205 // TEXT + CDATA_SECTION + COMMENT + PROCESSING_INSTRUCTION + ELEMENT
 	);
 
-	function walk(
-		node: Node
-	): [ ComponentChild ] | [ ComponentChild, Node | null ] {
+	function walk( node: Node ): ComponentChild | null {
 		const { nodeType } = node;
 
 		// TEXT_NODE (3)
 		if ( nodeType === 3 ) {
-			return [ ( node as Text ).data ];
+			return ( node as Text ).data;
 		}
 
 		// CDATA_SECTION_NODE (4)
 		if ( nodeType === 4 ) {
-			const next = treeWalker.nextSibling();
-			( node as CDATASection ).replaceWith(
-				new window.Text( ( node as CDATASection ).nodeValue ?? '' )
-			);
-			return [ node.nodeValue, next ];
+			nodesToReplace.add( node );
+			return node.nodeValue;
 		}
 
 		// COMMENT_NODE (8) || PROCESSING_INSTRUCTION_NODE (7)
 		if ( nodeType === 8 || nodeType === 7 ) {
-			const next = treeWalker.nextSibling();
-			( node as Comment | ProcessingInstruction ).remove();
-			return [ null, next ];
+			nodesToRemove.add( node );
+			return null;
 		}
 
 		const elementNode = node as HTMLElement;
@@ -92,10 +129,11 @@ export function toVdom( root: Node ): Array< ComponentChild > {
 			const attributeName = attributes[ i ].name;
 			const attributeValue = attributes[ i ].value;
 			if (
-				attributeName[ fullPrefix.length ] &&
-				attributeName.slice( 0, fullPrefix.length ) === fullPrefix
+				attributeName[ directivePrefix.length ] &&
+				attributeName.slice( 0, directivePrefix.length ) ===
+					directivePrefix
 			) {
-				if ( attributeName === ignoreAttr ) {
+				if ( attributeName === 'data-wp-ignore' ) {
 					ignore = true;
 				} else {
 					const regexResult = nsPathRegExp.exec( attributeValue );
@@ -105,7 +143,7 @@ export function toVdom( root: Node ): Array< ComponentChild > {
 						const parsedValue = JSON.parse( value );
 						value = isObject( parsedValue ) ? parsedValue : value;
 					} catch {}
-					if ( attributeName === islandAttr ) {
+					if ( attributeName === 'data-wp-interactive' ) {
 						island = true;
 						const islandNamespace =
 							// eslint-disable-next-line no-nested-ternary
@@ -139,30 +177,51 @@ export function toVdom( root: Node ): Array< ComponentChild > {
 		}
 
 		if ( directives.length ) {
-			props.__directives = directives.reduce(
-				( obj, [ name, ns, value ] ) => {
-					const directiveMatch = directiveParser.exec( name );
-					if ( directiveMatch === null ) {
+			props.__directives = directives.reduce<
+				Record< string, Array< DirectiveEntry > >
+			>( ( obj, [ name, ns, value ] ) => {
+				const directiveParsed = parseDirectiveName( name );
+				if ( directiveParsed === null ) {
+					if ( globalThis.SCRIPT_DEBUG ) {
 						warn( `Found malformed directive name: ${ name }.` );
-						return obj;
 					}
-					const prefix = directiveMatch[ 1 ] || '';
-					const suffix = directiveMatch[ 2 ] || 'default';
-
-					obj[ prefix ] = obj[ prefix ] || [];
-					obj[ prefix ].push( {
-						namespace: ns ?? currentNamespace(),
-						value,
-						suffix,
-					} );
 					return obj;
-				},
-				{}
-			);
+				}
+				const { prefix, suffix, uniqueId } = directiveParsed;
+
+				obj[ prefix ] = obj[ prefix ] || [];
+				obj[ prefix ].push( {
+					namespace: ns ?? currentNamespace()!,
+					value: value as DirectiveEntry[ 'value' ],
+					suffix,
+					uniqueId,
+				} );
+				return obj;
+			}, {} );
+
+			// Sort directive arrays to ensure stable ordering across browsers.
+			// Put nulls first, then sort by suffix and finally by uniqueIds.
+			for ( const prefix in props.__directives ) {
+				props.__directives[ prefix ].sort(
+					( a: DirectiveEntry, b: DirectiveEntry ) => {
+						const aSuffix = a.suffix ?? '';
+						const bSuffix = b.suffix ?? '';
+						if ( aSuffix !== bSuffix ) {
+							return aSuffix < bSuffix ? -1 : 1;
+						}
+						const aId = a.uniqueId ?? '';
+						const bId = b.uniqueId ?? '';
+						return +( aId > bId ) - +( aId < bId );
+					}
+				);
+			}
 		}
 
-		// @ts-expect-error Fixed in upcoming preact release https://github.com/preactjs/preact/pull/4334
-		if ( localName === 'template' ) {
+		if ( props.__directives?.[ 'each-child' ] ) {
+			props.dangerouslySetInnerHTML = {
+				__html: elementNode.innerHTML,
+			};
+		} else if ( localName === 'template' ) {
 			props.content = [
 				...( elementNode as HTMLTemplateElement ).content.childNodes,
 			].map( ( childNode ) => toVdom( childNode ) );
@@ -170,11 +229,11 @@ export function toVdom( root: Node ): Array< ComponentChild > {
 			let child = treeWalker.firstChild();
 			if ( child ) {
 				while ( child ) {
-					const [ vnode, nextChild ] = walk( child );
+					const vnode = walk( child );
 					if ( vnode ) {
 						children.push( vnode );
 					}
-					child = nextChild || treeWalker.nextSibling();
+					child = treeWalker.nextSibling();
 				}
 				treeWalker.parentNode();
 			}
@@ -185,8 +244,19 @@ export function toVdom( root: Node ): Array< ComponentChild > {
 			namespaces.pop();
 		}
 
-		return [ h( localName, props, children ) ];
+		return h( localName, props, children );
 	}
 
-	return walk( treeWalker.currentNode );
+	const vdom = walk( treeWalker.currentNode );
+
+	nodesToRemove.forEach( ( node: Node ) =>
+		( node as Comment | ProcessingInstruction ).remove()
+	);
+	nodesToReplace.forEach( ( node: Node ) =>
+		( node as CDATASection ).replaceWith(
+			new window.Text( ( node as CDATASection ).nodeValue ?? '' )
+		)
+	);
+
+	return vdom;
 }

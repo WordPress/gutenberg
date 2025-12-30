@@ -23,7 +23,7 @@ const meta: Meta< typeof BorderControl > = {
 			action: 'onChange',
 		},
 		width: { control: { type: 'text' } },
-		value: { control: { type: null } },
+		value: { control: false },
 	},
 	parameters: {
 		controls: { expanded: true },
@@ -93,6 +93,7 @@ export const Default = Template.bind( {} );
 Default.args = {
 	colors,
 	label: 'Border',
+	__next40pxDefaultSize: true,
 	enableAlpha: true,
 	enableStyle: true,
 	shouldSanitizeBorder: true,

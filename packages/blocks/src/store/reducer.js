@@ -62,60 +62,24 @@ function bootstrappedBlockTypes( state = {}, action ) {
 		case 'ADD_BOOTSTRAPPED_BLOCK_TYPE':
 			const { name, blockType } = action;
 			const serverDefinition = state[ name ];
-			let newDefinition;
 			// Don't overwrite if already set. It covers the case when metadata
 			// was initialized from the server.
 			if ( serverDefinition ) {
-				// The `blockHooks` prop is not yet included in the server provided
-				// definitions and needs to be polyfilled. This can be removed when the
-				// minimum supported WordPress is >= 6.4.
-				if (
-					serverDefinition.blockHooks === undefined &&
-					blockType.blockHooks
-				) {
-					newDefinition = {
-						...serverDefinition,
-						...newDefinition,
-						blockHooks: blockType.blockHooks,
-					};
-				}
-
-				// The `allowedBlocks` prop is not yet included in the server provided
-				// definitions and needs to be polyfilled. This can be removed when the
-				// minimum supported WordPress is >= 6.5.
-				if (
-					serverDefinition.allowedBlocks === undefined &&
-					blockType.allowedBlocks
-				) {
-					newDefinition = {
-						...serverDefinition,
-						...newDefinition,
-						allowedBlocks: blockType.allowedBlocks,
-					};
-				}
-			} else {
-				newDefinition = Object.fromEntries(
-					Object.entries( blockType )
-						.filter(
-							( [ , value ] ) =>
-								value !== null && value !== undefined
-						)
-						.map( ( [ key, value ] ) => [
-							camelCase( key ),
-							value,
-						] )
-				);
-				newDefinition.name = name;
+				return state;
 			}
+			const newDefinition = Object.fromEntries(
+				Object.entries( blockType )
+					.filter(
+						( [ , value ] ) => value !== null && value !== undefined
+					)
+					.map( ( [ key, value ] ) => [ camelCase( key ), value ] )
+			);
+			newDefinition.name = name;
+			return {
+				...state,
+				[ name ]: newDefinition,
+			};
 
-			if ( newDefinition ) {
-				return {
-					...state,
-					[ name ]: newDefinition,
-				};
-			}
-
-			return state;
 		case 'REMOVE_BLOCK_TYPES':
 			return omit( state, action.names );
 	}
@@ -393,18 +357,10 @@ function getMergedUsesContext( existingUsesContext = [], newUsesContext = [] ) {
 export function blockBindingsSources( state = {}, action ) {
 	switch ( action.type ) {
 		case 'ADD_BLOCK_BINDINGS_SOURCE':
-			// Only open this API in Gutenberg and for `core/post-meta` for the moment.
-			let getFieldsList;
-			if ( globalThis.IS_GUTENBERG_PLUGIN ) {
-				getFieldsList = action.getFieldsList;
-			} else if ( action.name === 'core/post-meta' ) {
-				getFieldsList = action.getFieldsList;
-			}
 			return {
 				...state,
 				[ action.name ]: {
-					// Don't override the label if it's already set.
-					label: state[ action.name ]?.label || action.label,
+					label: action.label || state[ action.name ]?.label,
 					usesContext: getMergedUsesContext(
 						state[ action.name ]?.usesContext,
 						action.usesContext
@@ -414,23 +370,7 @@ export function blockBindingsSources( state = {}, action ) {
 					// Only set `canUserEditValue` if `setValues` is also defined.
 					canUserEditValue:
 						action.setValues && action.canUserEditValue,
-					getFieldsList,
-				},
-			};
-		case 'ADD_BOOTSTRAPPED_BLOCK_BINDINGS_SOURCE':
-			return {
-				...state,
-				[ action.name ]: {
-					/*
-					 * Keep the exisitng properties in case the source has been registered
-					 * in the client before bootstrapping.
-					 */
-					...state[ action.name ],
-					label: action.label,
-					usesContext: getMergedUsesContext(
-						state[ action.name ]?.usesContext,
-						action.usesContext
-					),
+					getFieldsList: action.getFieldsList,
 				},
 			};
 		case 'REMOVE_BLOCK_BINDINGS_SOURCE':

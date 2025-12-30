@@ -219,7 +219,7 @@ extension GutenbergViewController: GutenbergBridgeDelegate {
         }
         alertController.addAction(dismissAction)
 
-        if progress.fractionCompleted < 1 && mediaUploadCoordinator.successfullUpload {
+        if progress.fractionCompleted < 1 && mediaUploadCoordinator.successfulUpload {
             let cancelUploadAction = UIAlertAction(title: "Cancel upload", style: .destructive) { (action) in
                 self.mediaUploadCoordinator.cancelUpload(with: mediaID)
             }
@@ -317,7 +317,7 @@ extension GutenbergViewController: GutenbergBridgeDelegate {
     }
 
     func gutenbergDidRequestSendEventToHost(_ eventName: String, properties: [AnyHashable: Any]) -> Void {
-        print("Gutenberg requested sending '\(eventName)' event to host with propreties: \(properties).")
+        print("Gutenberg requested sending '\(eventName)' event to host with properties: \(properties).")
     }
     
     func gutenbergDidRequestToggleUndoButton(_ isDisabled: Bool) -> Void {

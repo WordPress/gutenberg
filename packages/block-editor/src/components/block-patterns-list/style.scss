@@ -1,3 +1,6 @@
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/colors" as *;
+
 .block-editor-block-patterns-list__list-item {
 	cursor: pointer;
 	margin-bottom: $grid-unit-20;
@@ -26,6 +29,8 @@
 	// the bottom margin set on `...__list-item` above
 	scroll-margin-bottom: ($grid-unit-40 + $grid-unit-30);
 
+	outline: 0;
+
 	.block-editor-block-patterns-list__item-title {
 		flex-grow: 1;
 		font-size: $helptext-font-size;
@@ -42,19 +47,29 @@
 			outline: $border-width solid rgba($black, 0.1);
 			outline-offset: -$border-width;
 			border-radius: $radius-medium;
+			@media not ( prefers-reduced-motion ) {
+				transition: outline 0.1s linear;
+			}
 		}
 	}
 
-	&:hover:not(:focus) .block-editor-block-preview__container::after {
+	// Selected
+	&.is-selected .block-editor-block-preview__container::after {
+		outline-color: $gray-900;
+		outline-width: var(--wp-admin-border-width-focus);
+		outline-offset: calc(-1 * var(--wp-admin-border-width-focus));
+	}
+
+	// Hover state
+	&:hover .block-editor-block-preview__container::after {
 		outline-color: rgba($black, 0.3);
 	}
 
-	&:focus .block-editor-block-preview__container::after {
+	// Focused state
+	&[data-focus-visible] .block-editor-block-preview__container::after {
 		outline-color: var(--wp-admin-theme-color);
 		outline-width: var(--wp-admin-border-width-focus);
-		outline-offset: calc((-1 * var(--wp-admin-border-width-focus)));
-		transition: outline 0.1s linear;
-		@include reduce-motion("transition");
+		outline-offset: calc(-1 * var(--wp-admin-border-width-focus));
 	}
 
 	.block-editor-patterns__pattern-details:not(:empty) {
@@ -66,6 +81,7 @@
 	.block-editor-patterns__pattern-icon-wrapper {
 		min-width: 24px;
 		height: 24px;
+
 		.block-editor-patterns__pattern-icon {
 			fill: var(--wp-block-synced-color);
 		}

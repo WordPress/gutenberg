@@ -10,6 +10,7 @@ import type { NavigationGroupContext as NavigationGroupContextType } from '../ty
 
 export const NavigationGroupContext =
 	createContext< NavigationGroupContextType >( { group: undefined } );
+NavigationGroupContext.displayName = 'NavigationGroupContext';
 
 export const useNavigationGroupContext = () =>
 	useContext( NavigationGroupContext );

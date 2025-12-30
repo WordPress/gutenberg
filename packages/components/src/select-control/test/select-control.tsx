@@ -12,7 +12,7 @@ import _SelectControl from '..';
 const SelectControl = (
 	props: React.ComponentProps< typeof _SelectControl >
 ) => {
-	return <_SelectControl { ...props } __nextHasNoMarginBottom />;
+	return <_SelectControl { ...props } __next40pxDefaultSize />;
 };
 
 describe( 'SelectControl', () => {

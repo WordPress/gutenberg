@@ -13,6 +13,9 @@ export type SearchControlProps = Pick< InputControlProps, 'help' | 'value' > & {
 	 * Start opting into the new margin-free styles that will become the default in a future version.
 	 *
 	 * @default false
+	 *
+	 * @deprecated Default behavior since WordPress 7.0. Prop can be safely removed.
+	 * @ignore
 	 */
 	__nextHasNoMarginBottom?: boolean;
 	/**
@@ -40,6 +43,9 @@ export type SearchControlProps = Pick< InputControlProps, 'help' | 'value' > & {
 	 *
 	 * Use this if you want the button to trigger your own logic to close the search field entirely,
 	 * rather than just clearing the input value.
+	 *
+	 * @deprecated
+	 * @ignore
 	 */
 	onClose?: () => void;
 	/** @ignore */

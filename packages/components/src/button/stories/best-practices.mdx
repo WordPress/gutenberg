@@ -1,0 +1,31 @@
+import { Meta } from '@storybook/blocks';
+
+<Meta title="Components/Actions/Button/Best Practices" />
+
+# Button
+
+## Usage
+Buttons indicate available actions and allow user interaction within the interface. As key elements in the WordPress UI, they appear in toolbars, modals, and forms. Default buttons support most actions, while primary buttons emphasize the main action in a view. Secondary buttons pair as secondary actions next to a primary action. 
+
+Each layout contains one prominently placed, high-emphasis button. If you need multiple buttons, use one primary button for the main action, secondary for the rest of the actions and tertiary sparingly when an action needs to not stand out at all.
+
+### Sizes
+
+- `'default'`: For normal text-label buttons, unless it is a toggle button.
+- `'compact'`: For toggle buttons, icon buttons, and buttons when used in context of either.
+- `'small'`: For icon buttons associated with more advanced or auxiliary features.
+
+## Best practices
+
+- Label buttons to show that a click or tap initiates an action.
+- Use established color conventions; for example, reserve red buttons for irreversible or dangerous actions.
+- Avoid crowding the screen with multiple calls to action, which confuses users.
+- Keep button locations consistent across the interface.
+
+## Content guidelines
+
+Buttons should be clear and predictable, showing users what will happen when clicked. Make labels reflect actions accurately to avoid confusion. 
+
+Start button text with a strong action verb and include a noun to specify the change, except for common actions like Save, Close, Cancel, or OK. 
+
+For other actions, use a `{verb}+{noun}` format for context. Keep button text brief and remove unnecessary words like "the," "an," or "a" for easy scanning.

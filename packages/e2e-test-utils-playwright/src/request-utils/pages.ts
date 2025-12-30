@@ -74,7 +74,7 @@ export async function createPage(
 	const page = await this.rest< Page >( {
 		method: 'POST',
 		path: `/wp/v2/pages`,
-		params: payload,
+		data: { ...payload },
 	} );
 
 	return page;

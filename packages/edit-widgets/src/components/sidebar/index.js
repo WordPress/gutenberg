@@ -88,7 +88,6 @@ function SidebarContent( {
 		// We're intentionally leaving `currentArea` and `isGeneralSidebarOpen`
 		// out of the dep array because we want this effect to run based on
 		// block selection changes, not sidebar state changes.
-		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [ hasSelectedNonAreaBlock, enableComplementaryArea ] );
 
 	const tabsContextValue = useContext( Tabs.Context );

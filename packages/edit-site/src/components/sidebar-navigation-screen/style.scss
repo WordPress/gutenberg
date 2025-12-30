@@ -1,3 +1,8 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/z-index" as *;
+
 .edit-site-sidebar-navigation-screen {
 	display: flex;
 	flex-direction: column;
@@ -18,40 +23,12 @@
 .edit-site-sidebar-navigation-screen__content {
 	padding: 0 $grid-unit-20;
 
-	.components-item-group {
-		margin-left: -$grid-unit-20;
-		margin-right: -$grid-unit-20;
-	}
-
 	.components-text {
 		color: $gray-400;
 	}
 
 	.components-heading {
 		margin-bottom: $grid-unit-10;
-	}
-}
-
-.edit-site-sidebar-navigation-screen__meta {
-	margin: 0 0 $grid-unit-20 $grid-unit-20;
-	color: $gray-400;
-	.components-text {
-		color: $gray-400;
-	}
-}
-
-.edit-site-sidebar-navigation-screen__page-link {
-	color: $gray-600;
-	display: inline-block;
-	word-break: break-word;
-
-	&:hover,
-	&:focus {
-		color: $white;
-	}
-
-	.components-external-link__icon {
-		margin-left: $grid-unit-05;
 	}
 }
 
@@ -68,7 +45,11 @@
 .edit-site-sidebar-navigation-screen__title {
 	flex-grow: 1;
 	overflow-wrap: break-word;
-	padding: $grid-unit-05 * 0.5 0 0 0;
+
+	&#{&},
+	&#{&} .edit-site-sidebar-navigation-screen__title {
+		line-height: $font-line-height-x-large;
+	}
 }
 
 .edit-site-sidebar-navigation-screen__actions {
@@ -91,29 +72,22 @@
 	}
 }
 
-.edit-site-global-styles-variation-title {
-	color: $gray-300;
-	font-size: 11px;
-	text-transform: uppercase;
-	font-weight: 500;
-}
-
-.edit-site-sidebar-navigation-screen__content .edit-site-global-styles-variations_item {
+.edit-site-sidebar-navigation-screen__content .global-styles-ui-variations_item {
 
 	// Use a white outline to provide contrast with the dark background.
-	.edit-site-global-styles-variations_item-preview {
+	.global-styles-ui-variations_item-preview {
 		outline-color: rgba($white, 0.05);
 	}
 
-	&:not(.is-active):hover .edit-site-global-styles-variations_item-preview {
+	&:not(.is-active):hover .global-styles-ui-variations_item-preview {
 		outline-color: rgba($white, 0.15);
 	}
 
-	&.is-active .edit-site-global-styles-variations_item-preview {
+	&.is-active .global-styles-ui-variations_item-preview {
 		outline-color: $white;
 	}
 
-	&:focus-visible .edit-site-global-styles-variations_item-preview {
+	&:focus-visible .global-styles-ui-variations_item-preview {
 		outline-color: var(--wp-admin-theme-color);
 	}
 }
@@ -123,9 +97,14 @@
 	bottom: 0;
 	background-color: $gray-900;
 	gap: 0;
-	padding: $grid-unit-20 0;
+	padding: $grid-unit-10 $grid-unit-20;
 	margin: $grid-unit-20 0 0;
 	border-top: 1px solid $gray-800;
+
+	.edit-site-sidebar-navigation-screen-details-footer {
+		margin-left: -$grid-unit-20;
+		margin-right: -$grid-unit-20;
+	}
 }
 
 /* In general style overrides are discouraged.

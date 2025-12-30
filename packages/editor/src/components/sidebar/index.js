@@ -13,7 +13,7 @@ import {
 	useEffect,
 	useRef,
 } from '@wordpress/element';
-import { isRTL, __ } from '@wordpress/i18n';
+import { isRTL, __, _x } from '@wordpress/i18n';
 import { drawerLeft, drawerRight } from '@wordpress/icons';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import { privateApis as componentsPrivateApis } from '@wordpress/components';
@@ -101,8 +101,10 @@ const SidebarContent = ( {
 			// see https://github.com/WordPress/gutenberg/pull/55360#pullrequestreview-1737671049
 			className="editor-sidebar__panel"
 			headerClassName="editor-sidebar__panel-tabs"
-			/* translators: button label text should, if possible, be under 16 characters. */
-			title={ __( 'Settings' ) }
+			title={
+				/* translators: button label text should, if possible, be under 16 characters. */
+				_x( 'Settings', 'panel button label' )
+			}
 			toggleShortcut={ keyboardShortcut }
 			icon={ isRTL() ? drawerLeft : drawerRight }
 			isActiveByDefault={ SIDEBAR_ACTIVE_BY_DEFAULT }

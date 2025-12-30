@@ -32,7 +32,6 @@ export function useSettings( ...paths ) {
 				clientId,
 				...paths
 			),
-		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[ clientId, ...paths ]
 	);
 }

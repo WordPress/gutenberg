@@ -31,17 +31,21 @@ export function useAllowSwitchingTemplates() {
 			} )
 				? getEntityRecord( 'root', 'site' )
 				: undefined;
-			const templates = getEntityRecords( 'postType', 'wp_template', {
-				per_page: -1,
-			} );
+
 			const isPostsPage = +postId === siteSettings?.page_for_posts;
+			const isFrontPage =
+				postType === 'page' && +postId === siteSettings?.page_on_front;
 			// If current page is set front page or posts page, we also need
 			// to check if the current theme has a template for it. If not
-			const isFrontPage =
-				postType === 'page' &&
-				+postId === siteSettings?.page_on_front &&
-				templates?.some( ( { slug } ) => slug === 'front-page' );
-			return ! isPostsPage && ! isFrontPage;
+			const templates = isFrontPage
+				? getEntityRecords( 'postType', 'wp_template', {
+						per_page: -1,
+				  } )
+				: [];
+			const hasFrontPage =
+				isFrontPage &&
+				!! templates?.some( ( { slug } ) => slug === 'front-page' );
+			return ! isPostsPage && ! hasFrontPage;
 		},
 		[ postId, postType ]
 	);
@@ -53,6 +57,8 @@ function useTemplates( postType ) {
 			select( coreStore ).getEntityRecords( 'postType', 'wp_template', {
 				per_page: -1,
 				post_type: postType,
+				// We look at the combined templates for now (old endpoint)
+				// because posts only accept slugs for templates, not IDs.
 			} ),
 		[ postType ]
 	);

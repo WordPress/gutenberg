@@ -19,14 +19,14 @@ test.describe( 'Child Blocks', () => {
 	test( 'are hidden from the global block inserter', async ( { page } ) => {
 		const blockInserter = page
 			.getByRole( 'toolbar', { name: 'Document tools' } )
-			.getByRole( 'button', { name: 'Toggle block inserter' } );
+			.getByRole( 'button', { name: 'Block Inserter', exact: true } );
 		const blockLibrary = page.getByRole( 'region', {
 			name: 'Block Library',
 		} );
 
 		await blockInserter.click();
 		await expect( blockLibrary ).toBeVisible();
-		expect( blockLibrary.getByRole( 'option' ) ).not.toContain( [
+		await expect( blockLibrary.getByRole( 'option' ) ).not.toContainText( [
 			'Child Blocks Child',
 		] );
 	} );
@@ -47,7 +47,7 @@ test.describe( 'Child Blocks', () => {
 
 		const blockInserter = page
 			.getByRole( 'toolbar', { name: 'Document tools' } )
-			.getByRole( 'button', { name: 'Toggle block inserter' } );
+			.getByRole( 'button', { name: 'Block Inserter', exact: true } );
 		const blockLibrary = page
 			.getByRole( 'region', {
 				name: 'Block Library',
@@ -85,7 +85,7 @@ test.describe( 'Child Blocks', () => {
 
 		const blockInserter = page
 			.getByRole( 'toolbar', { name: 'Document tools' } )
-			.getByRole( 'button', { name: 'Toggle block inserter' } );
+			.getByRole( 'button', { name: 'Block Inserter', exact: true } );
 		const blockLibrary = page
 			.getByRole( 'region', {
 				name: 'Block Library',

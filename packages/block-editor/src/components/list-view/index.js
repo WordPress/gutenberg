@@ -185,8 +185,7 @@ function ListViewComponent(
 		if ( selectedClientIds?.length ) {
 			focusListItem( selectedClientIds[ 0 ], elementRef?.current );
 		}
-		// Disable reason: Only focus on the selected item when the list view is mounted.
-		// eslint-disable-next-line react-hooks/exhaustive-deps
+		// Only focus on the selected item when the list view is mounted.
 	}, [] );
 
 	const expand = useCallback(

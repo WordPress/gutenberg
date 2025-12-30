@@ -640,7 +640,7 @@ class WP_Duotone_Gutenberg {
 	 *
 	 * @param string $block_name The block name.
 	 *
-	 * @return string The CSS selector or null if there is no support.
+	 * @return ?string The CSS selector or null if there is no support.
 	 */
 	private static function get_selector( $block_name ) {
 		$block_type = WP_Block_Type_Registry::get_instance()->get_registered( $block_name );
@@ -669,6 +669,8 @@ class WP_Duotone_Gutenberg {
 			// Regular filter.duotone support uses filter.duotone selectors with fallbacks.
 			return wp_get_block_css_selector( $block_type, array( 'filter', 'duotone' ), true );
 		}
+
+		return null;
 	}
 
 	/**
@@ -825,6 +827,10 @@ class WP_Duotone_Gutenberg {
 	 * @return string                Filtered block content.
 	 */
 	public static function render_duotone_support( $block_content, $block ) {
+		if ( null === $block['blockName'] ) {
+			return $block_content;
+		}
+
 		$duotone_selector = self::get_selector( $block['blockName'] );
 
 		// The block should have a duotone attribute or have duotone defined in its theme.json to be processed.

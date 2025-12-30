@@ -17,7 +17,6 @@ import {
 	__experimentalText as Text,
 	FlexBlock,
 } from '@wordpress/components';
-import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -31,9 +30,9 @@ import {
 	isPatternFiltered,
 	allPatternsCategory,
 	myPatternsCategory,
+	starterPatternsCategory,
 	INSERTER_PATTERN_TYPES,
 } from './utils';
-import { store as blockEditorStore } from '../../../store';
 
 const noop = () => {};
 
@@ -44,11 +43,6 @@ export function PatternCategoryPreviews( {
 	category,
 	showTitlesAsTooltip,
 } ) {
-	const isZoomOutMode = useSelect(
-		( select ) =>
-			select( blockEditorStore ).__unstableGetEditorMode() === 'zoom-out',
-		[]
-	);
 	const [ allPatterns, , onClickPattern ] = usePatternsState(
 		onInsert,
 		rootClientId,
@@ -86,6 +80,13 @@ export function PatternCategoryPreviews( {
 					return true;
 				}
 
+				if (
+					category.name === starterPatternsCategory.name &&
+					pattern.blockTypes?.includes( 'core/post-content' )
+				) {
+					return true;
+				}
+
 				if ( category.name === 'uncategorized' ) {
 					// The uncategorized category should show all the patterns without any category...
 					if ( ! pattern.categories ) {
@@ -117,7 +118,6 @@ export function PatternCategoryPreviews( {
 	const { changePage } = pagingProps;
 
 	// Hide block pattern preview on unmount.
-	// eslint-disable-next-line react-hooks/exhaustive-deps
 	useEffect( () => () => onHover( null ), [] );
 
 	const onSetPatternSyncFilter = useCallback(
@@ -172,18 +172,15 @@ export function PatternCategoryPreviews( {
 			</VStack>
 			{ currentCategoryPatterns.length > 0 && (
 				<>
-					{ isZoomOutMode && (
-						<Text
-							size="12"
-							as="p"
-							className="block-editor-inserter__help-text"
-						>
-							{ __( 'Drag and drop patterns into the canvas.' ) }
-						</Text>
-					) }
+					<Text
+						size="12"
+						as="p"
+						className="block-editor-inserter__help-text"
+					>
+						{ __( 'Drag and drop patterns into the canvas.' ) }
+					</Text>
 					<BlockPatternsList
 						ref={ scrollContainerRef }
-						shownPatterns={ pagingProps.categoryPatternsAsyncList }
 						blockPatterns={ pagingProps.categoryPatterns }
 						onClickPattern={ onClickPattern }
 						onHover={ onHover }

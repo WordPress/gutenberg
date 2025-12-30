@@ -1,8 +1,9 @@
 /**
  * WordPress dependencies
  */
-import { useMergeRefs } from '@wordpress/compose';
+import { useMergeRefs, useViewportMatch } from '@wordpress/compose';
 import { useRef } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -15,6 +16,8 @@ import WritingFlow from '../writing-flow';
 import { useMouseMoveTypingReset } from '../observe-typing';
 import { useBlockSelectionClearer } from '../block-selection-clearer';
 import { useBlockCommands } from '../use-block-commands';
+import { store as blockEditorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
 
 // EditorStyles is a memoized component, so avoid passing a new
 // object reference on each render.
@@ -32,10 +35,22 @@ export function ExperimentalBlockCanvas( {
 	iframeProps,
 } ) {
 	useBlockCommands();
+	const isTabletViewport = useViewportMatch( 'medium', '<' );
 	const resetTypingRef = useMouseMoveTypingReset();
 	const clearerRef = useBlockSelectionClearer();
 	const localRef = useRef();
 	const contentRef = useMergeRefs( [ contentRefProp, clearerRef, localRef ] );
+	const zoomLevel = useSelect(
+		( select ) => unlock( select( blockEditorStore ) ).getZoomLevel(),
+		[]
+	);
+	const zoomOutIframeProps =
+		zoomLevel !== 100 && ! isTabletViewport
+			? {
+					scale: zoomLevel,
+					frameSize: '40px',
+			  }
+			: {};
 
 	if ( ! shouldIframe ) {
 		return (
@@ -70,6 +85,7 @@ export function ExperimentalBlockCanvas( {
 		>
 			<Iframe
 				{ ...iframeProps }
+				{ ...zoomOutIframeProps }
 				ref={ resetTypingRef }
 				contentRef={ contentRef }
 				style={ {

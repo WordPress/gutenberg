@@ -106,7 +106,7 @@ const OptionalControlsGroup = ( {
 					  )
 					: sprintf(
 							// translators: %s: The name of the control to display e.g. "Padding".
-							__( 'Show %s' ),
+							_x( 'Show %s', 'input control' ),
 							label
 					  );
 

@@ -2,14 +2,11 @@
  * WordPress dependencies
  */
 import { usePrevious, useReducedMotion } from '@wordpress/compose';
-import { isRTL } from '@wordpress/i18n';
 import {
-	__experimentalHStack as HStack,
-	FlexBlock,
 	privateApis as componentsPrivateApis,
 	__unstableMotion as motion,
 } from '@wordpress/components';
-import { Icon, chevronRight, chevronLeft } from '@wordpress/icons';
+import { useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -35,11 +32,21 @@ function CategoryTabs( {
 
 	const previousSelectedCategory = usePrevious( selectedCategory );
 
+	const selectedTabId = selectedCategory ? selectedCategory.name : null;
+	const [ activeTabId, setActiveId ] = useState();
+	const firstTabId = categories?.[ 0 ]?.name;
+
+	// If there is no active tab, make the first tab the active tab, so that
+	// when focus is moved to the tablist, the first tab will be focused
+	// despite not being selected
+	if ( selectedTabId === null && ! activeTabId && firstTabId ) {
+		setActiveId( firstTabId );
+	}
+
 	return (
 		<Tabs
-			className="block-editor-inserter__category-tabs"
 			selectOnMove={ false }
-			selectedTabId={ selectedCategory ? selectedCategory.name : null }
+			selectedTabId={ selectedTabId }
 			orientation="vertical"
 			onSelect={ ( categoryId ) => {
 				// Pass the full category object
@@ -49,24 +56,19 @@ function CategoryTabs( {
 					)
 				);
 			} }
+			activeTabId={ activeTabId }
+			onActiveTabIdChange={ setActiveId }
 		>
 			<Tabs.TabList className="block-editor-inserter__category-tablist">
 				{ categories.map( ( category ) => (
 					<Tabs.Tab
 						key={ category.name }
 						tabId={ category.name }
-						className="block-editor-inserter__category-tab"
-						aria-label={ category.label }
 						aria-current={
 							category === selectedCategory ? 'true' : undefined
 						}
 					>
-						<HStack>
-							<FlexBlock>{ category.label }</FlexBlock>
-							<Icon
-								icon={ isRTL() ? chevronLeft : chevronRight }
-							/>
-						</HStack>
+						{ category.label }
 					</Tabs.Tab>
 				) ) }
 			</Tabs.TabList>

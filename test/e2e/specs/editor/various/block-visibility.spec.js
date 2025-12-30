@@ -43,12 +43,12 @@ test.describe( 'Block Visibility', () => {
 			.getByRole( 'button', { name: 'Close' } )
 			.click();
 		await page
-			.getByRole( 'button', { name: 'Toggle block inserter' } )
+			.getByRole( 'button', { name: 'Block Inserter', exact: true } )
 			.click();
 		await page
 			.getByRole( 'region', { name: 'Block Library' } )
 			.getByRole( 'searchbox', {
-				name: 'Search for blocks and patterns',
+				name: 'Search',
 			} )
 			.fill( 'Heading' );
 
@@ -60,7 +60,7 @@ test.describe( 'Block Visibility', () => {
 		).toBeHidden();
 
 		await page
-			.getByRole( 'button', { name: 'Toggle block inserter' } )
+			.getByRole( 'button', { name: 'Block Inserter', exact: true } )
 			.click();
 
 		// Show heading block again.
@@ -84,19 +84,19 @@ test.describe( 'Block Visibility', () => {
 			.getByRole( 'button', { name: 'Close' } )
 			.click();
 		await page
-			.getByRole( 'button', { name: 'Toggle block inserter' } )
+			.getByRole( 'button', { name: 'Block Inserter', exact: true } )
 			.click();
 		await page
 			.getByRole( 'region', { name: 'Block Library' } )
 			.getByRole( 'searchbox', {
-				name: 'Search for blocks and patterns',
+				name: 'Search',
 			} )
 			.fill( 'Heading' );
 
 		await expect(
 			page
 				.getByRole( 'tabpanel', { name: 'Blocks' } )
-				.getByRole( 'option', { name: 'Heading' } ),
+				.getByRole( 'option', { name: 'Heading', exact: true } ),
 			'Heading block should be visible'
 		).toBeVisible();
 	} );
@@ -118,7 +118,7 @@ test.describe( 'Block Visibility', () => {
 			.getByRole( 'button', { name: 'Close' } )
 			.click();
 		await page
-			.getByRole( 'button', { name: 'Toggle block inserter' } )
+			.getByRole( 'button', { name: 'Block Inserter', exact: true } )
 			.click();
 
 		await expect(
@@ -129,7 +129,7 @@ test.describe( 'Block Visibility', () => {
 		).toBeHidden();
 
 		await page
-			.getByRole( 'button', { name: 'Toggle block inserter' } )
+			.getByRole( 'button', { name: 'Block Inserter', exact: true } )
 			.click();
 
 		// Show Media category blocks again.
@@ -153,7 +153,7 @@ test.describe( 'Block Visibility', () => {
 			.getByRole( 'button', { name: 'Close' } )
 			.click();
 		await page
-			.getByRole( 'button', { name: 'Toggle block inserter' } )
+			.getByRole( 'button', { name: 'Block Inserter', exact: true } )
 			.click();
 
 		await expect(

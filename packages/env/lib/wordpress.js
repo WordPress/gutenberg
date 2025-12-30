@@ -86,10 +86,51 @@ async function configureWordPress( environment, config, spinner ) {
 		// Ignore error.
 	}
 
-	const installCommand = `wp core install --url="${ config.env[ environment ].config.WP_SITEURL }" --title="${ config.name }" --admin_user=admin --admin_password=password --admin_email=wordpress@example.com --skip-email`;
+	// Create a project-specific wp-cli configuration, important for the `rewrite` command.
+	// Don't overwrite existing configuration.
+	const cliConfigCommand = `[ -f /var/www/html/wp-cli.yml ] || (
+		exec > /var/www/html/wp-cli.yml
+		echo "apache_modules:"
+		echo "  - mod_rewrite"
+	)`;
+
+	const isMultisite = config.env[ environment ].multisite;
+
+	const installMethod = isMultisite ? 'multisite-install' : 'install';
+	const installCommand = `wp core ${ installMethod } --url="${ config.env[ environment ].config.WP_SITEURL }" --title="${ config.name }" --admin_user=admin --admin_password=password --admin_email=wordpress@example.com --skip-email`;
 
 	// -eo pipefail exits the command as soon as anything fails in bash.
-	const setupCommands = [ 'set -eo pipefail', installCommand ];
+	const setupCommands = [
+		'set -eo pipefail',
+		cliConfigCommand,
+		installCommand,
+	];
+
+	// Bootstrap .htaccess for multisite
+	if ( isMultisite ) {
+		// Using a subshell with `exec` was the best tradeoff I could come up
+		// with between readability of this source and compatibility with the
+		// way that all strings in `setupCommands` are later joined with '&&'.
+		setupCommands.push(
+			`(
+exec > /var/www/html/.htaccess
+echo 'RewriteEngine On'
+echo 'RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]'
+echo 'RewriteBase /'
+echo 'RewriteRule ^index\.php$ - [L]'
+echo ''
+echo '# add a trailing slash to /wp-admin'
+echo 'RewriteRule ^([_0-9a-zA-Z-]+/)?wp-admin$ $1wp-admin/ [R=301,L]'
+echo ''
+echo 'RewriteCond %{REQUEST_FILENAME} -f [OR]'
+echo 'RewriteCond %{REQUEST_FILENAME} -d'
+echo 'RewriteRule ^ - [L]'
+echo 'RewriteRule ^([_0-9a-zA-Z-]+/)?(wp-(content|admin|includes).*) $2 [L]'
+echo 'RewriteRule ^([_0-9a-zA-Z-]+/)?(.*\.php)$ $2 [L]'
+echo 'RewriteRule . index.php [L]'
+)`
+		);
+	}
 
 	// WordPress versions below 5.1 didn't use proper spacing in wp-config.
 	const configAnchor =

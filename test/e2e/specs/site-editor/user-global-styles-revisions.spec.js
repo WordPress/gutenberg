@@ -50,7 +50,7 @@ test.describe( 'Style Revisions', () => {
 		// Now there should be enough revisions to show the revisions UI.
 		await page.getByRole( 'button', { name: 'Revisions' } ).click();
 
-		const revisionButtons = page.getByRole( 'button', {
+		const revisionButtons = page.getByRole( 'option', {
 			name: /^Changes saved by /,
 		} );
 
@@ -75,24 +75,24 @@ test.describe( 'Style Revisions', () => {
 	} ) => {
 		await editor.canvas.locator( 'body' ).click();
 		await userGlobalStylesRevisions.openStylesPanel();
-		await page.getByRole( 'button', { name: 'Colors styles' } ).click();
+		await page.getByRole( 'button', { name: 'Colors' } ).click();
 		await page
-			.getByRole( 'button', { name: 'Color Background styles' } )
+			.getByRole( 'button', { name: 'Background', exact: true } )
 			.click();
 		await page
-			.getByRole( 'option', { name: 'Color: Luminous vivid amber' } )
+			.getByRole( 'option', { name: 'Luminous vivid amber' } )
 			.click( { force: true } );
 
 		await page.getByRole( 'button', { name: 'Revisions' } ).click();
 
-		const unSavedButton = page.getByRole( 'button', {
+		const unSavedButton = page.getByRole( 'option', {
 			name: /^Unsaved changes/,
 		} );
 
 		await expect( unSavedButton ).toBeVisible();
 
 		await page
-			.getByRole( 'button', { name: /^Changes saved by / } )
+			.getByRole( 'option', { name: /^Changes saved by / } )
 			.last()
 			.click();
 
@@ -120,24 +120,35 @@ test.describe( 'Style Revisions', () => {
 		await editor.canvas.locator( 'body' ).click();
 		await userGlobalStylesRevisions.openStylesPanel();
 		await page.getByRole( 'button', { name: 'Revisions' } ).click();
-		const lastRevisionButton = page
+		const lastRevisionItem = page
 			.getByLabel( 'Global styles revisions list' )
-			.getByRole( 'button' )
+			.getByRole( 'option' )
 			.last();
-		await expect( lastRevisionButton ).toContainText( 'Default styles' );
-		await lastRevisionButton.click();
+		await expect( lastRevisionItem ).toContainText( 'Default styles' );
+		await lastRevisionItem.click();
 		await expect(
-			page.getByRole( 'button', { name: 'Reset to defaults' } )
+			page.getByRole( 'button', {
+				name: 'Apply the selected revision to your site.',
+			} )
 		).toBeVisible();
 	} );
 
-	test( 'should access from the site editor sidebar', async ( { page } ) => {
+	test( 'should access from the site editor sidebar', async ( {
+		editor,
+		page,
+	} ) => {
 		const navigationContainer = page.getByRole( 'region', {
 			name: 'Navigation',
 		} );
+
 		await navigationContainer
 			.getByRole( 'button', { name: 'Styles' } )
 			.click();
+
+		// wait for the editor canvas to be ready (to contain a block)
+		await expect(
+			editor.canvas.locator( '.wp-block' ).nth( 0 )
+		).toBeVisible();
 
 		await navigationContainer
 			.getByRole( 'button', { name: 'Revisions' } )
@@ -267,9 +278,7 @@ test.describe( 'Style Revisions', () => {
 		}
 		await userGlobalStylesRevisions.openStylesPanel();
 		await page.getByRole( 'button', { name: 'Revisions' } ).click();
-		const pagination = page.getByLabel(
-			'Global Styles pagination navigation'
-		);
+		const pagination = page.getByLabel( 'Global Styles pagination' );
 		await expect( pagination ).toContainText( '1 of 2' );
 		await pagination.getByRole( 'button', { name: 'Next page' } ).click();
 		await expect( pagination ).toContainText( '2 of 2' );

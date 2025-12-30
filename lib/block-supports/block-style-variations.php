@@ -211,9 +211,9 @@ function gutenberg_render_block_style_variation_support_styles( $parsed_block ) 
  * block attributes in the `render_block_data` filter gets applied to the
  * block's markup.
  *
- * @see gutenberg_render_block_style_variation_support_styles
- *
  * @since 6.6.0
+ *
+ * @see gutenberg_render_block_style_variation_support_styles
  *
  * @param  string $block_content Rendered block content.
  * @param  array  $block         Block object.
@@ -273,7 +273,7 @@ if ( function_exists( 'wp_enqueue_block_style_variation_styles' ) ) {
 }
 
 // Add Gutenberg filters and action.
-add_filter( 'render_block_data', 'gutenberg_render_block_style_variation_support_styles', 10, 2 );
+add_filter( 'render_block_data', 'gutenberg_render_block_style_variation_support_styles' );
 add_filter( 'render_block', 'gutenberg_render_block_style_variation_class_name', 10, 2 );
 add_action( 'wp_enqueue_scripts', 'gutenberg_enqueue_block_style_variation_styles', 1 );
 

@@ -14,13 +14,14 @@ import { useState } from '@wordpress/element';
 import SnackbarList from '../list';
 
 const meta: Meta< typeof SnackbarList > = {
-	title: 'Components/SnackbarList',
+	title: 'Components/Feedback/SnackbarList',
+	id: 'components-snackbarlist',
 	component: SnackbarList,
 	argTypes: {
-		as: { control: { type: null } },
+		as: { control: false },
 		onRemove: {
 			action: 'onRemove',
-			control: { type: null },
+			control: false,
 		},
 	},
 	parameters: {

@@ -137,6 +137,24 @@ describe( 'Interactivity API', () => {
 				expect( context.a ).toBe( 2 );
 				expect( state.a ).toBe( 2 );
 			} );
+
+			it( "should modify props inherited from fallback's ancestors", () => {
+				const ancestor: any = proxifyContext(
+					{ ancestorProp: 'ancestor' },
+					{}
+				);
+				const fallback: any = proxifyContext(
+					{ fallbackProp: 'fallback' },
+					ancestor
+				);
+				const context: any = proxifyContext( {}, fallback );
+
+				context.ancestorProp = 'modified';
+
+				expect( context.ancestorProp ).toBe( 'modified' );
+				expect( fallback.ancestorProp ).toBe( 'modified' );
+				expect( ancestor.ancestorProp ).toBe( 'modified' );
+			} );
 		} );
 
 		describe( 'computations', () => {

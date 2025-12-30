@@ -10,10 +10,7 @@ import {
 import { dispatch } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
 import { createRoot, StrictMode } from '@wordpress/element';
-import {
-	store as editorStore,
-	privateApis as editorPrivateApis,
-} from '@wordpress/editor';
+import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { store as preferencesStore } from '@wordpress/preferences';
 import {
 	registerLegacyWidgetBlock,
@@ -23,15 +20,11 @@ import {
 /**
  * Internal dependencies
  */
-import './hooks';
 import { store as editSiteStore } from './store';
 import { unlock } from './lock-unlock';
 import App from './components/app';
 
-const {
-	registerCoreBlockBindingsSources,
-	bootstrapBlockBindingsSourcesFromServer,
-} = unlock( editorPrivateApis );
+const { registerCoreBlockBindingsSources } = unlock( editorPrivateApis );
 
 /**
  * Initializes the site editor screen.
@@ -48,7 +41,6 @@ export function initializeEditor( id, settings ) {
 		( { name } ) => name !== 'core/freeform'
 	);
 	registerCoreBlocks( coreBlocks );
-	bootstrapBlockBindingsSourcesFromServer( settings?.blockBindingsSources );
 	registerCoreBlockBindingsSources();
 	dispatch( blocksStore ).setFreeformFallbackBlockName( 'core/html' );
 	registerLegacyWidgetBlock( { inserter: false } );
@@ -72,6 +64,7 @@ export function initializeEditor( id, settings ) {
 		allowRightClickOverrides: true,
 		distractionFree: false,
 		editorMode: 'visual',
+		editorTool: 'edit',
 		fixedToolbar: false,
 		focusMode: false,
 		inactivePanels: [],
@@ -90,15 +83,6 @@ export function initializeEditor( id, settings ) {
 	}
 
 	dispatch( editSiteStore ).updateSettings( settings );
-
-	// Keep the defaultTemplateTypes in the core/editor settings too,
-	// so that they can be selected with core/editor selectors in any editor.
-	// This is needed because edit-site doesn't initialize with EditorProvider,
-	// which internally uses updateEditorSettings as well.
-	dispatch( editorStore ).updateEditorSettings( {
-		defaultTemplateTypes: settings.defaultTemplateTypes,
-		defaultTemplatePartAreas: settings.defaultTemplatePartAreas,
-	} );
 
 	// Prevent the default browser action for files dropped outside of dropzones.
 	window.addEventListener( 'dragover', ( e ) => e.preventDefault(), false );
@@ -123,7 +107,3 @@ export function reinitializeEditor() {
 export { default as PluginTemplateSettingPanel } from './components/plugin-template-setting-panel';
 export { store } from './store';
 export * from './deprecated';
-
-// Temporary: While the posts dashboard is being iterated on
-// it's being built in the same package as the site editor.
-export { initializePostsDashboard } from './posts';

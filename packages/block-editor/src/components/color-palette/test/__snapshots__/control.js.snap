@@ -42,7 +42,7 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
 
 .emotion-6 {
   font-size: 11px;
-  font-weight: 500;
+  font-weight: 499;
   line-height: 1.4;
   text-transform: uppercase;
   display: block;
@@ -203,7 +203,7 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
                 class="components-circular-option-picker"
               >
                 <div
-                  aria-label="Custom color picker."
+                  aria-label="Custom color picker"
                   id="components-circular-option-picker-0"
                   role="listbox"
                 >
@@ -217,9 +217,9 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
                         class="components-circular-option-picker__option-wrapper"
                       >
                         <button
-                          aria-label="Color: red"
+                          aria-label="red"
                           aria-selected="true"
-                          class="components-button components-circular-option-picker__option"
+                          class="components-button components-circular-option-picker__option is-next-40px-default-size"
                           data-active-item="true"
                           id="components-circular-option-picker-0-0"
                           role="option"
@@ -236,7 +236,7 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
                           xmlns="http://www.w3.org/2000/svg"
                         >
                           <path
-                            d="M16.7 7.1l-6.3 8.5-3.3-2.5-.9 1.2 4.5 3.4L17.9 8z"
+                            d="M16.5 7.5 10 13.9l-2.5-2.4-1 1 3.5 3.6 7.5-7.6z"
                           />
                         </svg>
                       </div>
@@ -247,7 +247,7 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
                   class="components-circular-option-picker__custom-clear-wrapper"
                 >
                   <button
-                    class="components-button components-circular-option-picker__clear is-tertiary"
+                    class="components-button components-circular-option-picker__clear is-next-40px-default-size is-tertiary"
                     type="button"
                   >
                     Clear

@@ -1,3 +1,7 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/variables" as *;
+
 .editor-post-card-panel {
 	&__content {
 		flex-grow: 1;
@@ -7,8 +11,8 @@
 		width: 100%;
 
 		&.editor-post-card-panel__title {
+			@include heading-medium();
 			margin: 0;
-			padding: 2px 0;
 			display: flex;
 			align-items: center;
 			flex-wrap: wrap;
@@ -32,24 +36,12 @@
 	&.has-description &__header {
 		margin-bottom: $grid-unit-10;
 	}
-}
 
-.editor-post-card-panel__icon.is-sync {
-	fill: var(--wp-block-synced-color);
-
-	& + .editor-post-card-panel__title {
-		color: var(--wp-block-synced-color);
+	.editor-post-card-panel__title-name {
+		padding: 2px 0;
 	}
-}
 
-.editor-post-card-panel__title-badge {
-	background: $gray-100;
-	color: $gray-700;
-	padding: 0 $grid-unit-05;
-	border-radius: $radius-small;
-	font-size: 12px;
-	font-weight: 400;
-	flex-shrink: 0;
-	line-height: $grid-unit-05 * 5;
-	display: inline-block;
+	.editor-post-card-panel__description {
+		color: $gray-700;
+	}
 }

@@ -1,3 +1,5 @@
+@use "@wordpress/base-styles/breakpoints" as *;
+
 .wp-block-media-text {
 	// This block's direction should not be manipulated by rtl, as the mediaPosition control does.
 	/*!rtl:begin:ignore*/
@@ -69,7 +71,7 @@
 }
 
 .wp-block-media-text__media a {
-	display: inline-block;
+	display: block;
 }
 
 .wp-block-media-text__media img,
@@ -106,7 +108,6 @@
 
 /* Image fill for versions 8 and onwards */
 .wp-block-media-text.is-image-fill-element > .wp-block-media-text__media {
-	position: relative;
 	height: 100%;
 	min-height: 250px;
 }
@@ -117,7 +118,6 @@
 }
 
 .wp-block-media-text.is-image-fill-element > .wp-block-media-text__media img {
-	position: absolute;
 	width: 100%;
 	height: 100%;
 	object-fit: cover;

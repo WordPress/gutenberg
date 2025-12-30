@@ -70,9 +70,7 @@ displayShortcut.primary( 'm' );
 // "⌘M"
 ```
 
-_Type_
-
--   `WPModifierHandler<WPKeyHandler<string>>`Keyed map of functions to display shortcuts.
+Keyed map of functions to display shortcuts.
 
 ### displayShortcutList
 
@@ -86,9 +84,7 @@ displayShortcutList.primary( 'm' );
 // [ "⌘", "M" ]
 ```
 
-_Type_
-
--   `WPModifierHandler<WPKeyHandler<string[]>>`Keyed map of functions to shortcut sequences.
+Keyed map of functions to shortcut sequences.
 
 ### DOWN
 
@@ -120,7 +116,7 @@ Return true if platform is MacOS.
 
 _Parameters_
 
--   _\_window_ `Window?`: window object by default; used for DI testing.
+-   _\_window_ `Window`: window object by default; used for DI testing.
 
 _Returns_
 
@@ -138,9 +134,7 @@ isKeyboardEvent.primary( event, 'm' );
 // true
 ```
 
-_Type_
-
--   `WPModifierHandler<WPEventKeyHandler>`Keyed map of functions to match events.
+Keyed map of functions to match events.
 
 ### LEFT
 
@@ -152,7 +146,7 @@ Object that contains functions that return the available modifier depending on p
 
 _Type_
 
--   `WPModifierHandler< ( isApple: () => boolean ) => WPModifierPart[]>`
+-   `WPModifierHandler< WPModifier >`
 
 ### PAGEDOWN
 
@@ -176,10 +170,6 @@ rawShortcut.primary( 'm' );
 // "meta+m""
 ```
 
-_Type_
-
--   `WPModifierHandler<WPKeyHandler<string>>`Keyed map of functions to raw shortcuts.
-
 ### RIGHT
 
 Keycode for RIGHT key.
@@ -200,9 +190,7 @@ shortcutAriaLabel.primary( '.' );
 // "Command + Period"
 ```
 
-_Type_
-
--   `WPModifierHandler<WPKeyHandler<string>>`Keyed map of functions to shortcut ARIA labels.
+Keyed map of functions to shortcut ARIA labels.
 
 ### SPACE
 

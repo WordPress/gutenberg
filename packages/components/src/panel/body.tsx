@@ -116,6 +116,7 @@ const PanelBodyTitle = forwardRef(
 		return (
 			<h2 className="components-panel__body-title">
 				<Button
+					__next40pxDefaultSize
 					className="components-panel__body-toggle"
 					aria-expanded={ isOpened }
 					ref={ ref }

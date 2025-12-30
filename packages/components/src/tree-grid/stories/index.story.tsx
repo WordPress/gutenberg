@@ -2,6 +2,7 @@
  * External dependencies
  */
 import type { Meta, StoryFn } from '@storybook/react';
+import { fn } from '@storybook/test';
 
 /**
  * WordPress dependencies
@@ -16,15 +17,21 @@ import { Button } from '../../button';
 import InputControl from '../../input-control';
 
 const meta: Meta< typeof TreeGrid > = {
-	title: 'Components (Experimental)/TreeGrid',
+	title: 'Components/Navigation/TreeGrid',
+	id: 'components-treegrid',
 	component: TreeGrid,
 	// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 	subcomponents: { TreeGridRow, TreeGridCell },
 	argTypes: {
-		children: { control: { type: null } },
+		children: { control: false },
+	},
+	tags: [ 'status-experimental' ],
+	args: {
+		onExpandRow: fn(),
+		onCollapseRow: fn(),
+		onFocusRow: fn(),
 	},
 	parameters: {
-		actions: { argTypesRegex: '^on.*' },
 		controls: { expanded: true },
 	},
 };
@@ -110,6 +117,7 @@ const Rows = ( {
 										label="Description"
 										hideLabelFromVision
 										placeholder="Description"
+										__next40pxDefaultSize
 										{ ...props }
 									/>
 								) }
@@ -120,6 +128,7 @@ const Rows = ( {
 										label="Notes"
 										hideLabelFromVision
 										placeholder="Notes"
+										__next40pxDefaultSize
 										{ ...props }
 									/>
 								) }

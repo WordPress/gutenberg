@@ -10,10 +10,15 @@ import BaseControl, { useBaseControlProps } from '..';
 import Button from '../../button';
 
 const meta: Meta< typeof BaseControl > = {
-	title: 'Components/BaseControl',
+	title: 'Components/Selection & Input/Common/BaseControl',
+	id: 'components-basecontrol',
 	component: BaseControl,
+	subcomponents: {
+		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+		'BaseControl.VisualLabel': BaseControl.VisualLabel,
+	},
 	argTypes: {
-		children: { control: { type: null } },
+		children: { control: false },
 		help: { control: { type: 'text' } },
 		label: { control: { type: 'text' } },
 	},
@@ -37,7 +42,6 @@ const BaseControlWithTextarea: StoryFn< typeof BaseControl > = ( props ) => {
 export const Default: StoryFn< typeof BaseControl > =
 	BaseControlWithTextarea.bind( {} );
 Default.args = {
-	__nextHasNoMarginBottom: true,
 	label: 'Label text',
 };
 

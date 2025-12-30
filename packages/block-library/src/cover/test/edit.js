@@ -47,15 +47,11 @@ async function setup( attributes, useCoreBlocks, customSettings ) {
 
 async function createAndSelectBlock() {
 	await userEvent.click(
-		screen.getByRole( 'option', {
-			name: 'Color: Black',
-		} )
-	);
-	await userEvent.click(
 		screen.getByRole( 'button', {
-			name: 'Select parent block: Cover',
+			name: 'Black',
 		} )
 	);
+	await selectBlock( 'Block: Cover' );
 }
 
 describe( 'Cover block', () => {
@@ -72,8 +68,8 @@ describe( 'Cover block', () => {
 
 		test( 'can set overlay color using color picker on block placeholder', async () => {
 			const { container } = await setup();
-			const colorPicker = screen.getByRole( 'option', {
-				name: 'Color: Black',
+			const colorPicker = screen.getByRole( 'button', {
+				name: 'Black',
 			} );
 			await userEvent.click( colorPicker );
 			const color = colorPicker.style.backgroundColor;
@@ -96,8 +92,8 @@ describe( 'Cover block', () => {
 			await setup();
 
 			await userEvent.click(
-				screen.getByRole( 'option', {
-					name: 'Color: Black',
+				screen.getByRole( 'button', {
+					name: 'Black',
 				} )
 			);
 
@@ -119,9 +115,7 @@ describe( 'Cover block', () => {
 				'min-height: 100vh;'
 			);
 
-			await userEvent.click(
-				screen.getByLabelText( 'Toggle full height' )
-			);
+			await userEvent.click( screen.getByLabelText( 'Full height' ) );
 
 			expect( screen.getByLabelText( 'Block: Cover' ) ).toHaveStyle(
 				'min-height: 100vh;'
@@ -190,7 +184,7 @@ describe( 'Cover block', () => {
 			test( 'does not display media settings panel if url is not set', async () => {
 				await setup();
 				expect(
-					screen.queryByRole( 'button', {
+					screen.queryByRole( 'heading', {
 						name: 'Settings',
 					} )
 				).not.toBeInTheDocument();
@@ -202,9 +196,7 @@ describe( 'Cover block', () => {
 
 				await selectBlock( 'Block: Cover' );
 				expect(
-					screen.getByRole( 'button', {
-						name: 'Settings',
-					} )
+					await screen.findByRole( 'heading', { name: 'Settings' } )
 				).toBeInTheDocument();
 			} );
 		} );
@@ -218,7 +210,7 @@ describe( 'Cover block', () => {
 			);
 			await selectBlock( 'Block: Cover' );
 			await userEvent.click(
-				screen.getByLabelText( 'Fixed background' )
+				await screen.findByLabelText( 'Fixed background' )
 			);
 			expect( screen.getByLabelText( 'Block: Cover' ) ).toHaveClass(
 				'has-parallax'
@@ -234,7 +226,7 @@ describe( 'Cover block', () => {
 			);
 			await selectBlock( 'Block: Cover' );
 			await userEvent.click(
-				screen.getByLabelText( 'Repeated background' )
+				await screen.findByLabelText( 'Repeated background' )
 			);
 			expect( screen.getByLabelText( 'Block: Cover' ) ).toHaveClass(
 				'is-repeated'
@@ -247,7 +239,7 @@ describe( 'Cover block', () => {
 			} );
 
 			await selectBlock( 'Block: Cover' );
-			await userEvent.clear( screen.getByLabelText( 'Left' ) );
+			await userEvent.clear( await screen.findByLabelText( 'Left' ) );
 			await userEvent.type( screen.getByLabelText( 'Left' ), '100' );
 
 			expect(
@@ -264,7 +256,7 @@ describe( 'Cover block', () => {
 
 			await selectBlock( 'Block: Cover' );
 			await userEvent.type(
-				screen.getByLabelText( 'Alternative text' ),
+				await screen.findByLabelText( 'Alternative text' ),
 				'Me'
 			);
 			expect( screen.getByAltText( 'Me' ) ).toBeInTheDocument();
@@ -339,7 +331,7 @@ describe( 'Cover block', () => {
 			describe( 'when colors are disabled', () => {
 				test( 'does not render overlay control', async () => {
 					await setup( undefined, true, disabledColorSettings );
-					await createAndSelectBlock();
+					await selectBlock( 'Block: Cover' );
 					await userEvent.click(
 						screen.getByRole( 'tab', { name: 'Styles' } )
 					);
@@ -352,7 +344,7 @@ describe( 'Cover block', () => {
 				} );
 				test( 'does not render opacity control', async () => {
 					await setup( undefined, true, disabledColorSettings );
-					await createAndSelectBlock();
+					await selectBlock( 'Block: Cover' );
 					await userEvent.click(
 						screen.getByRole( 'tab', { name: 'Styles' } )
 					);
@@ -393,8 +385,8 @@ describe( 'Cover block', () => {
 	describe( 'isDark settings', () => {
 		test( 'should toggle is-light class if background changed from light to dark', async () => {
 			await setup();
-			const colorPicker = screen.getByRole( 'option', {
-				name: 'Color: White',
+			const colorPicker = screen.getByRole( 'button', {
+				name: 'White',
 			} );
 			await userEvent.click( colorPicker );
 
@@ -410,15 +402,15 @@ describe( 'Cover block', () => {
 			);
 			await userEvent.click( screen.getByText( 'Overlay' ) );
 			const popupColorPicker = screen.getByRole( 'option', {
-				name: 'Color: Black',
+				name: 'Black',
 			} );
 			await userEvent.click( popupColorPicker );
 			expect( coverBlock ).not.toHaveClass( 'is-light' );
 		} );
 		test( 'should remove is-light class if overlay color is removed', async () => {
 			await setup();
-			const colorPicker = screen.getByRole( 'option', {
-				name: 'Color: White',
+			const colorPicker = screen.getByRole( 'button', {
+				name: 'White',
 			} );
 			await userEvent.click( colorPicker );
 			const coverBlock = screen.getByLabelText( 'Block: Cover' );
@@ -430,10 +422,10 @@ describe( 'Cover block', () => {
 				} )
 			);
 			await userEvent.click( screen.getByText( 'Overlay' ) );
-			// The default color is black, so clicking the black color option will remove the background color,
+			// The default color is black, so clicking the black color button will remove the background color,
 			// which should remove the isDark setting and assign the is-light class.
 			const popupColorPicker = screen.getByRole( 'option', {
-				name: 'Color: White',
+				name: 'White',
 			} );
 			await userEvent.click( popupColorPicker );
 			expect( coverBlock ).not.toHaveClass( 'is-light' );

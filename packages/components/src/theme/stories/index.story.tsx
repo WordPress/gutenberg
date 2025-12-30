@@ -13,7 +13,8 @@ import { HStack } from '../../h-stack';
 
 const meta: Meta< typeof Theme > = {
 	component: Theme,
-	title: 'Components/Theme',
+	title: 'Components/Utilities/Theme',
+	id: 'components-theme',
 	argTypes: {
 		accent: { control: { type: 'color' } },
 		background: { control: { type: 'color' } },
@@ -36,7 +37,7 @@ export const Default = Template.bind( {} );
 Default.args = {};
 
 export const Nested: StoryFn< typeof Theme > = ( args ) => (
-	<Theme accent="tomato">
+	<Theme accent="crimson">
 		<Button variant="primary">Outer theme (hardcoded)</Button>
 
 		<Theme { ...args }>

@@ -16,7 +16,8 @@ import { Composite } from '..';
 import { Tooltip } from '../../tooltip';
 
 const meta: Meta< typeof Composite > = {
-	title: 'Components/Composite',
+	title: 'Components/Utilities/Composite',
+	id: 'components-composite',
 	component: Composite,
 	subcomponents: {
 		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
@@ -35,9 +36,9 @@ const meta: Meta< typeof Composite > = {
 		'Composite.Context': Composite.Context,
 	},
 	argTypes: {
-		children: { control: { type: null } },
-		render: { control: { type: null } },
-		setActiveId: { control: { type: null } },
+		children: { control: false },
+		render: { control: false },
+		setActiveId: { control: false },
 		focusLoop: {
 			control: 'select',
 			options: [ true, false, 'horizontal', 'vertical', 'both' ],

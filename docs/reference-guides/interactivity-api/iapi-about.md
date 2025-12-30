@@ -186,7 +186,7 @@ Additionally, with a standard, **WordPress can absorb the maximum amount of comp
 
 _Complexities absorbed by the standard_
 
-<img alt="Two columns table comparing some aspects with and without a standard. Without a standard, block developers have to take care of everything, while having a standard. Totally handled by the standard: Tooling, hydration, integrating it with WordPress, SSR of the interactive parts, inter-block communication, and frontend performance. Partially handled: Security, accessibility, and best practices. Developer responsibility: Block logic. In the without a standard column, everything is under the developer responsability." width=60% src="https://make.wordpress.org/core/files/2023/03/standard-graph.png">
+<img alt="Two columns table comparing some aspects with and without a standard. Without a standard, block developers have to take care of everything, while having a standard. Totally handled by the standard: Tooling, hydration, integrating it with WordPress, SSR of the interactive parts, inter-block communication, and frontend performance. Partially handled: Security, accessibility, and best practices. Developer responsibility: Block logic. In the without a standard column, everything is under the developer responsibility." width=60% src="https://make.wordpress.org/core/files/2023/03/standard-graph.png">
 
 
 With this absorption, less knowledge is required to create interactive blocks, and developers have fewer decisions to worry about.

@@ -18,7 +18,7 @@ import { store as interfaceStore } from '@wordpress/interface';
 import EnablePanelOption from './enable-panel';
 import EnablePluginDocumentSettingPanelOption from './enable-plugin-document-setting-panel';
 import EnablePublishSidebarOption from './enable-publish-sidebar';
-import BlockManager from '../block-manager';
+import BlockVisibility from '../block-visibility';
 import PostTaxonomies from '../post-taxonomies';
 import PostFeaturedImageCheck from '../post-featured-image/check';
 import PostExcerptCheck from '../post-excerpt/check';
@@ -26,7 +26,6 @@ import PageAttributesCheck from '../page-attributes/check';
 import PostTypeSupportCheck from '../post-type-support-check';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
-import { useStartPatterns } from '../start-page-options';
 
 const {
 	PreferencesModal,
@@ -36,29 +35,43 @@ const {
 } = unlock( preferencesPrivateApis );
 
 export default function EditorPreferencesModal( { extraSections = {} } ) {
+	const isActive = useSelect( ( select ) => {
+		return select( interfaceStore ).isModalActive( 'editor/preferences' );
+	}, [] );
+	const { closeModal } = useDispatch( interfaceStore );
+
+	if ( ! isActive ) {
+		return null;
+	}
+
+	// Please wrap all contents inside PreferencesModalContents to prevent all
+	// hooks from executing when the modal is not open.
+	return (
+		<PreferencesModal closeModal={ closeModal }>
+			<PreferencesModalContents extraSections={ extraSections } />
+		</PreferencesModal>
+	);
+}
+
+function PreferencesModalContents( { extraSections = {} } ) {
 	const isLargeViewport = useViewportMatch( 'medium' );
-	const { isActive, showBlockBreadcrumbsOption } = useSelect(
+	const showBlockBreadcrumbsOption = useSelect(
 		( select ) => {
 			const { getEditorSettings } = select( editorStore );
 			const { get } = select( preferencesStore );
-			const { isModalActive } = select( interfaceStore );
 			const isRichEditingEnabled = getEditorSettings().richEditingEnabled;
 			const isDistractionFreeEnabled = get( 'core', 'distractionFree' );
-			return {
-				showBlockBreadcrumbsOption:
-					! isDistractionFreeEnabled &&
-					isLargeViewport &&
-					isRichEditingEnabled,
-				isActive: isModalActive( 'editor/preferences' ),
-			};
+			return (
+				! isDistractionFreeEnabled &&
+				isLargeViewport &&
+				isRichEditingEnabled
+			);
 		},
 		[ isLargeViewport ]
 	);
-	const { closeModal } = useDispatch( interfaceStore );
 	const { setIsListViewOpened, setIsInserterOpened } =
 		useDispatch( editorStore );
 	const { set: setPreference } = useDispatch( preferencesStore );
-	const hasStarterPatterns = !! useStartPatterns().length;
 
 	const sections = useMemo(
 		() =>
@@ -75,7 +88,7 @@ export default function EditorPreferencesModal( { extraSections = {} } ) {
 									scope="core"
 									featureName="showListViewByDefault"
 									help={ __(
-										'Opens the List View sidebar by default.'
+										'Opens the List View panel by default.'
 									) }
 									label={ __( 'Always open List View' ) }
 								/>
@@ -99,16 +112,14 @@ export default function EditorPreferencesModal( { extraSections = {} } ) {
 										'Allow right-click contextual menus'
 									) }
 								/>
-								{ hasStarterPatterns && (
-									<PreferenceToggleControl
-										scope="core"
-										featureName="enableChoosePatternModal"
-										help={ __(
-											'Shows starter patterns when creating a new page.'
-										) }
-										label={ __( 'Show starter patterns' ) }
-									/>
-								) }
+								<PreferenceToggleControl
+									scope="core"
+									featureName="enableChoosePatternModal"
+									help={ __(
+										'Pick from starter content when creating a new page.'
+									) }
+									label={ __( 'Show starter patterns' ) }
+								/>
 							</PreferencesModalSection>
 							<PreferencesModalSection
 								title={ __( 'Document settings' ) }
@@ -239,7 +250,7 @@ export default function EditorPreferencesModal( { extraSections = {} } ) {
 									scope="core"
 									featureName="keepCaretInsideBlock"
 									help={ __(
-										'Keeps the text cursor within the block boundaries, aiding users with screen readers by preventing unintentional cursor movement outside the block.'
+										'Keeps the text cursor within blocks while navigating with arrow keys, preventing it from moving to other blocks and enhancing accessibility for keyboard users.'
 									) }
 									label={ __(
 										'Contain text cursor inside block'
@@ -282,7 +293,7 @@ export default function EditorPreferencesModal( { extraSections = {} } ) {
 									"Disable blocks that you don't want to appear in the inserter. They can always be toggled back on later."
 								) }
 							>
-								<BlockManager />
+								<BlockVisibility />
 							</PreferencesModalSection>
 						</>
 					),
@@ -326,17 +337,8 @@ export default function EditorPreferencesModal( { extraSections = {} } ) {
 			setIsListViewOpened,
 			setPreference,
 			isLargeViewport,
-			hasStarterPatterns,
 		]
 	);
 
-	if ( ! isActive ) {
-		return null;
-	}
-
-	return (
-		<PreferencesModal closeModal={ closeModal }>
-			<PreferencesModalTabs sections={ sections } />
-		</PreferencesModal>
-	);
+	return <PreferencesModalTabs sections={ sections } />;
 }

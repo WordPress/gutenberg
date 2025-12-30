@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { CustomSelectControl } from '@wordpress/components';
+import deprecated from '@wordpress/deprecated';
 import { useMemo } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 
@@ -147,12 +148,27 @@ export default function FontAppearanceControl( props ) {
 		);
 	};
 
+	if (
+		! __next40pxDefaultSize &&
+		( otherProps.size === undefined || otherProps.size === 'default' )
+	) {
+		deprecated(
+			`36px default size for wp.blockEditor.__experimentalFontAppearanceControl`,
+			{
+				since: '6.8',
+				version: '7.1',
+				hint: 'Set the `__next40pxDefaultSize` prop to true to start opting into the new default size, which will become the default in a future version.',
+			}
+		);
+	}
+
 	return (
 		hasStylesOrWeights && (
 			<CustomSelectControl
 				{ ...otherProps }
 				className="components-font-appearance-control"
 				__next40pxDefaultSize={ __next40pxDefaultSize }
+				__shouldNotWarnDeprecated36pxSize
 				label={ label }
 				describedBy={ getDescribedBy() }
 				options={ selectOptions }

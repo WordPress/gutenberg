@@ -51,7 +51,7 @@ describe( 'ColorPaletteControl', () => {
 		).toBeInTheDocument();
 
 		// Is showing the two predefined Colors.
-		expect( screen.getAllByLabelText( /^Color:/ ) ).toHaveLength( 2 );
+		expect( screen.getAllByRole( 'option' ) ).toHaveLength( 2 );
 	} );
 
 	it( 'renders the color picker and does not render tabs if it is only possible to select a color', async () => {
@@ -80,7 +80,7 @@ describe( 'ColorPaletteControl', () => {
 		).not.toBeInTheDocument();
 
 		// Is showing the two predefined Colors.
-		expect( screen.getAllByLabelText( /^Color:/ ) ).toHaveLength( 2 );
+		expect( screen.getAllByRole( 'option' ) ).toHaveLength( 2 );
 	} );
 
 	it( 'renders the gradient picker and does not render tabs if it is only possible to select a gradient', async () => {

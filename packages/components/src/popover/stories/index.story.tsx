@@ -33,21 +33,26 @@ const AVAILABLE_PLACEMENTS: PopoverProps[ 'placement' ][] = [
 ];
 
 const meta: Meta< typeof Popover > = {
-	title: 'Components/Popover',
+	title: 'Components/Overlays/Popover',
+	id: 'components-popover',
 	component: Popover,
+	subcomponents: {
+		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+		'Popover.Slot': Popover.Slot,
+	},
 	argTypes: {
-		anchor: { control: { type: null } },
-		anchorRef: { control: { type: null } },
-		anchorRect: { control: { type: null } },
-		children: { control: { type: null } },
+		anchor: { control: false },
+		anchorRef: { control: false },
+		anchorRect: { control: false },
+		children: { control: false },
 		focusOnMount: {
 			control: { type: 'select' },
 			options: [ 'firstElement', true, false ],
 		},
-		getAnchorRect: { control: { type: null } },
+		getAnchorRect: { control: false },
 		onClose: { action: 'onClose' },
 		onFocusOutside: { action: 'onFocusOutside' },
-		__unstableSlotName: { control: { type: null } },
+		__unstableSlotName: { control: false },
 	},
 	parameters: {
 		controls: { expanded: true },
@@ -57,7 +62,9 @@ const meta: Meta< typeof Popover > = {
 export default meta;
 
 const PopoverWithAnchor = ( args: PopoverProps ) => {
-	const anchorRef = useRef( null );
+	const [ popoverAnchor, setPopoverAnchor ] = useState< Element | null >(
+		null
+	);
 
 	return (
 		<div
@@ -70,11 +77,11 @@ const PopoverWithAnchor = ( args: PopoverProps ) => {
 		>
 			<p
 				style={ { padding: '8px', background: 'salmon' } }
-				ref={ anchorRef }
+				ref={ setPopoverAnchor }
 			>
 				Popover&apos;s anchor
 			</p>
-			<Popover { ...args } anchorRef={ anchorRef } />
+			<Popover { ...args } anchor={ popoverAnchor } />
 		</div>
 	);
 };
@@ -83,10 +90,13 @@ export const Default: StoryObj< typeof Popover > = {
 	decorators: [
 		( Story ) => {
 			const [ isVisible, setIsVisible ] = useState( false );
-			const toggleVisible = () => {
+			const buttonRef = useRef< HTMLButtonElement | undefined >();
+			const toggleVisible = ( event: React.MouseEvent ) => {
+				if ( buttonRef.current && event.target !== buttonRef.current ) {
+					return;
+				}
 				setIsVisible( ( state ) => ! state );
 			};
-			const buttonRef = useRef< HTMLButtonElement | undefined >();
 			useEffect( () => {
 				buttonRef.current?.scrollIntoView?.( {
 					block: 'center',
@@ -250,5 +260,79 @@ export const WithSlotOutsideIframe: StoryObj< typeof Popover > = {
 	),
 	args: {
 		...Default.args,
+	},
+};
+
+export const WithCloseHandlers: StoryObj< typeof Popover > = {
+	render: function WithCloseHandlersStory( args ) {
+		const [ isVisible, setIsVisible ] = useState( false );
+		const buttonRef = useRef< HTMLButtonElement >( null );
+
+		const toggleVisible = ( event: React.MouseEvent ) => {
+			if ( buttonRef.current && event.target !== buttonRef.current ) {
+				return;
+			}
+			setIsVisible( ( prev ) => ! prev );
+		};
+
+		const handleClose = () => {
+			args.onClose?.();
+			setIsVisible( false );
+		};
+
+		const handleFocusOutside = ( e: React.SyntheticEvent ) => {
+			args.onFocusOutside?.( e );
+			setIsVisible( false );
+		};
+
+		useEffect( () => {
+			buttonRef.current?.scrollIntoView( {
+				block: 'center',
+				inline: 'center',
+			} );
+		}, [] );
+
+		return (
+			<div
+				style={ {
+					width: '300vw',
+					height: '300vh',
+					display: 'flex',
+					alignItems: 'center',
+					justifyContent: 'center',
+				} }
+			>
+				<Button
+					variant="secondary"
+					onClick={ toggleVisible }
+					ref={ buttonRef }
+				>
+					Toggle Popover
+					{ isVisible && (
+						<Popover
+							{ ...args }
+							onClose={ handleClose }
+							onFocusOutside={ handleFocusOutside }
+						>
+							{ args.children }
+						</Popover>
+					) }
+				</Button>
+			</div>
+		);
+	},
+	args: {
+		...Default.args,
+		focusOnMount: true,
+		children: (
+			<div style={ { width: '280px', whiteSpace: 'normal' } }>
+				<p>
+					Clicking outside triggers the onFocusOutside callback prop.
+				</p>
+				<p>
+					Pressing the Escape key triggers the onClose callback prop.
+				</p>
+			</div>
+		),
 	},
 };

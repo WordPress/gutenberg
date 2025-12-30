@@ -1,3 +1,8 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/variables" as *;
+@use "../utils/theme-variables" as *;
+
 .components-checkbox-control {
 	// Careful, these CSS vars have experimental overrides in Data Views (packages/dataviews/src/style.scss).
 	--checkbox-input-size: 24px; // Width & height for small viewports.
@@ -32,8 +37,10 @@
 	height: var(--checkbox-input-size);
 
 	appearance: none;
-	transition: 0.1s border-color ease-in-out;
-	@include reduce-motion("transition");
+
+	@media not (prefers-reduced-motion) {
+		transition: 0.1s border-color ease-in-out;
+	}
 
 	&:focus {
 		@include button-style-outset__focus(var(--wp-admin-theme-color));
@@ -43,11 +50,6 @@
 	&:indeterminate {
 		background: $components-color-accent;
 		border-color: $components-color-accent;
-
-		// Hide default checkbox styles in IE.
-		&::-ms-check {
-			opacity: 0;
-		}
 	}
 
 	&:checked::before {

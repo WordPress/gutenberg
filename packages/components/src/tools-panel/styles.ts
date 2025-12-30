@@ -12,7 +12,6 @@ import {
 	StyledHelp as BaseControlHelp,
 	Wrapper as BaseControlWrapper,
 } from '../base-control/styles/base-control-styles';
-import { LabelWrapper } from '../input-control/styles/input-control-styles';
 import { COLORS, CONFIG, rtl } from '../utils';
 import { space } from '../utils/space';
 
@@ -86,7 +85,7 @@ export const ToolsPanelHeader = css`
 
 export const ToolsPanelHeading = css`
 	font-size: inherit;
-	font-weight: 500;
+	font-weight: ${ CONFIG.fontWeightMedium };
 	line-height: normal;
 
 	/* Required to meet specificity requirements to ensure zero margin */
@@ -124,19 +123,6 @@ export const ToolsPanelItem = css`
 	${ BaseControlHelp } {
 		margin-bottom: 0;
 	}
-
-	/**
-	 * Standardize InputControl and BaseControl labels with other labels when
-	 * inside ToolsPanel.
-	 *
-	 * This is a temporary fix until the different control components have their
-	 * labels normalized.
-	 */
-	&& ${ LabelWrapper } {
-		label {
-			line-height: 1.4em;
-		}
-	}
 `;
 
 export const ToolsPanelItemPlaceholder = css`
@@ -150,7 +136,7 @@ export const DropdownMenu = css`
 export const ResetLabel = styled.span`
 	color: ${ COLORS.theme.accentDarker10 };
 	font-size: 11px;
-	font-weight: 500;
+	font-weight: ${ CONFIG.fontWeightMedium };
 	line-height: 1.4;
 	${ rtl( { marginLeft: space( 3 ) } ) }
 	text-transform: uppercase;

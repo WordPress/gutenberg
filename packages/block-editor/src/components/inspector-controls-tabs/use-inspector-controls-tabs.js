@@ -8,9 +8,8 @@ import { useSelect } from '@wordpress/data';
  * Internal dependencies
  */
 import InspectorControlsGroups from '../inspector-controls/groups';
-import useIsListViewTabDisabled from './use-is-list-view-tab-disabled';
 import { InspectorAdvancedControls } from '../inspector-controls';
-import { TAB_LIST_VIEW, TAB_SETTINGS, TAB_STYLES } from './utils';
+import { TAB_LIST_VIEW, TAB_SETTINGS, TAB_STYLES, TAB_CONTENT } from './utils';
 import { store as blockEditorStore } from '../../store';
 
 const EMPTY_ARRAY = [];
@@ -29,12 +28,18 @@ function getShowTabs( blockName, tabSettings = {} ) {
 	return true;
 }
 
-export default function useInspectorControlsTabs( blockName ) {
+export default function useInspectorControlsTabs(
+	blockName,
+	contentClientIds,
+	isSectionBlock,
+	hasBlockStyles
+) {
 	const tabs = [];
 	const {
 		bindings: bindingsGroup,
 		border: borderGroup,
 		color: colorGroup,
+		content: contentGroup,
 		default: defaultGroup,
 		dimensions: dimensionsGroup,
 		list: listGroup,
@@ -45,19 +50,22 @@ export default function useInspectorControlsTabs( blockName ) {
 	} = InspectorControlsGroups;
 
 	// List View Tab: If there are any fills for the list group add that tab.
-	const listViewDisabled = useIsListViewTabDisabled( blockName );
-	const listFills = useSlotFills( listGroup.Slot.__unstableName );
-	const hasListFills = ! listViewDisabled && !! listFills && listFills.length;
+	const listFills = useSlotFills( listGroup.name );
+	const hasListFills = !! listFills && listFills.length;
+
+	// Content Tab: If there are any fills for the content group add that tab.
+	const contentFills = useSlotFills( contentGroup.name );
+	const hasContentFills = !! contentFills && contentFills.length;
 
 	// Styles Tab: Add this tab if there are any fills for block supports
 	// e.g. border, color, spacing, typography, etc.
 	const styleFills = [
-		...( useSlotFills( borderGroup.Slot.__unstableName ) || [] ),
-		...( useSlotFills( colorGroup.Slot.__unstableName ) || [] ),
-		...( useSlotFills( dimensionsGroup.Slot.__unstableName ) || [] ),
-		...( useSlotFills( stylesGroup.Slot.__unstableName ) || [] ),
-		...( useSlotFills( typographyGroup.Slot.__unstableName ) || [] ),
-		...( useSlotFills( effectsGroup.Slot.__unstableName ) || [] ),
+		...( useSlotFills( borderGroup.name ) || [] ),
+		...( useSlotFills( colorGroup.name ) || [] ),
+		...( useSlotFills( dimensionsGroup.name ) || [] ),
+		...( useSlotFills( stylesGroup.name ) || [] ),
+		...( useSlotFills( typographyGroup.name ) || [] ),
+		...( useSlotFills( effectsGroup.name ) || [] ),
 	];
 	const hasStyleFills = styleFills.length;
 
@@ -67,26 +75,41 @@ export default function useInspectorControlsTabs( blockName ) {
 	// the advanced controls slot as well to ensure they are rendered.
 	const advancedFills = [
 		...( useSlotFills( InspectorAdvancedControls.slotName ) || [] ),
-		...( useSlotFills( bindingsGroup.Slot.__unstableName ) || [] ),
+		...( useSlotFills( bindingsGroup.name ) || [] ),
 	];
 
 	const settingsFills = [
-		...( useSlotFills( defaultGroup.Slot.__unstableName ) || [] ),
-		...( useSlotFills( positionGroup.Slot.__unstableName ) || [] ),
+		...( useSlotFills( defaultGroup.name ) || [] ),
+		...( useSlotFills( positionGroup.name ) || [] ),
 		...( hasListFills && hasStyleFills > 1 ? advancedFills : [] ),
 	];
 
+	const hasContentTab =
+		hasContentFills ||
+		!! ( contentClientIds && contentClientIds.length > 0 );
+
+	const hasListTab = hasListFills && ! isSectionBlock;
+
 	// Add the tabs in the order that they will default to if available.
-	// List View > Settings > Styles.
-	if ( hasListFills ) {
+	// List View > Content > Settings > Styles.
+	if ( hasListTab ) {
 		tabs.push( TAB_LIST_VIEW );
 	}
 
-	if ( settingsFills.length ) {
+	if ( hasContentTab ) {
+		tabs.push( TAB_CONTENT );
+	}
+
+	if (
+		( settingsFills.length ||
+			// Advanded fills who up in settings tab if available or they blend into the default tab, if there's only one tab.
+			( advancedFills.length && ( hasContentTab || hasListTab ) ) ) &&
+		! isSectionBlock
+	) {
 		tabs.push( TAB_SETTINGS );
 	}
 
-	if ( hasStyleFills ) {
+	if ( hasBlockStyles || hasStyleFills ) {
 		tabs.push( TAB_STYLES );
 	}
 

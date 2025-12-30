@@ -306,7 +306,7 @@ describe( 'validate-config', () => {
 	} );
 
 	describe( 'checkValidURL', () => {
-		it( 'throws for invaid URLs', () => {
+		it( 'throws for invalid URLs', () => {
 			expect( () =>
 				checkValidURL( 'test.json', 'test', 'localhost' )
 			).toThrow(

@@ -57,7 +57,7 @@ function ResponsiveBlockControl( props ) {
 		);
 
 	const toggleHelpText = __(
-		'Toggle between using the same value for all screen sizes or using a unique value per screen size.'
+		'Choose whether to use the same value for all screen sizes or a unique value for each screen size.'
 	);
 
 	const defaultControl = renderDefaultControl(
@@ -90,7 +90,6 @@ function ResponsiveBlockControl( props ) {
 
 			<div className="block-editor-responsive-block-control__inner">
 				<ToggleControl
-					__nextHasNoMarginBottom
 					className="block-editor-responsive-block-control__toggle"
 					label={ toggleControlLabel }
 					checked={ ! isResponsive }

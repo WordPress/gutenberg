@@ -59,7 +59,7 @@ function PageAttributesOrder() {
  * for setting the order of a given page.
  * The component is now not used in core but was kept for backward compatibility.
  *
- * @return {Component} The component to be rendered.
+ * @return {React.ReactNode} The rendered component.
  */
 export default function PageAttributesOrderWithChecks() {
 	return (

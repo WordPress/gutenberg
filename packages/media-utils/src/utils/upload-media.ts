@@ -12,13 +12,18 @@ import type {
 	Attachment,
 	OnChangeHandler,
 	OnErrorHandler,
-	OnSuccessHandler,
 } from './types';
 import { uploadToServer } from './upload-to-server';
 import { validateMimeType } from './validate-mime-type';
 import { validateMimeTypeForUser } from './validate-mime-type-for-user';
 import { validateFileSize } from './validate-file-size';
 import { UploadError } from './upload-error';
+
+declare global {
+	interface Window {
+		__experimentalMediaProcessing?: boolean;
+	}
+}
 
 interface UploadMediaArgs {
 	// Additional data to include in the request.
@@ -33,12 +38,12 @@ interface UploadMediaArgs {
 	onError?: OnErrorHandler;
 	// Function called each time a file or a temporary representation of the file is available.
 	onFileChange?: OnChangeHandler;
-	// Function called once a file has completely finished uploading, including thumbnails.
-	onSuccess?: OnSuccessHandler;
 	// List of allowed mime types and file extensions.
 	wpAllowedMimeTypes?: Record< string, string > | null;
 	// Abort signal.
 	signal?: AbortSignal;
+	// Whether to allow multiple files to be uploaded.
+	multiple?: boolean;
 }
 
 /**
@@ -54,6 +59,7 @@ interface UploadMediaArgs {
  * @param $0.onFileChange       Function called each time a file or a temporary representation of the file is available.
  * @param $0.wpAllowedMimeTypes List of allowed mime types and file extensions.
  * @param $0.signal             Abort signal.
+ * @param $0.multiple           Whether to allow multiple files to be uploaded.
  */
 export function uploadMedia( {
 	wpAllowedMimeTypes,
@@ -64,13 +70,22 @@ export function uploadMedia( {
 	onError,
 	onFileChange,
 	signal,
+	multiple = true,
 }: UploadMediaArgs ) {
+	if ( ! multiple && filesList.length > 1 ) {
+		onError?.( new Error( __( 'Only one file can be used here.' ) ) );
+		return;
+	}
+
 	const validFiles = [];
 
 	const filesSet: Array< Partial< Attachment > | null > = [];
 	const setAndUpdateFiles = ( index: number, value: Attachment | null ) => {
-		if ( filesSet[ index ]?.url ) {
-			revokeBlobURL( filesSet[ index ].url );
+		// For client-side media processing, this is handled by the upload-media package.
+		if ( ! window.__experimentalMediaProcessing ) {
+			if ( filesSet[ index ]?.url ) {
+				revokeBlobURL( filesSet[ index ].url );
+			}
 		}
 		filesSet[ index ] = value;
 		onFileChange?.(
@@ -107,10 +122,13 @@ export function uploadMedia( {
 
 		validFiles.push( mediaFile );
 
-		// Set temporary URL to create placeholder media file, this is replaced
-		// with final file from media gallery when upload is `done` below.
-		filesSet.push( { url: createBlobURL( mediaFile ) } );
-		onFileChange?.( filesSet as Array< Partial< Attachment > > );
+		// For client-side media processing, this is handled by the upload-media package.
+		if ( ! window.__experimentalMediaProcessing ) {
+			// Set temporary URL to create placeholder media file, this is replaced
+			// with final file from media gallery when upload is `done` below.
+			filesSet.push( { url: createBlobURL( mediaFile ) } );
+			onFileChange?.( filesSet as Array< Partial< Attachment > > );
+		}
 	}
 
 	validFiles.map( async ( file, index ) => {
@@ -125,9 +143,17 @@ export function uploadMedia( {
 			// Reset to empty on failure.
 			setAndUpdateFiles( index, null );
 
-			let message;
-			if ( error instanceof Error ) {
-				message = error.message;
+			// @wordpress/api-fetch throws any response that isn't in the 200 range as-is.
+			let message: string;
+			if (
+				typeof error === 'object' &&
+				error !== null &&
+				'message' in error
+			) {
+				message =
+					typeof error.message === 'string'
+						? error.message
+						: String( error.message );
 			} else {
 				message = sprintf(
 					// translators: %s: file name

@@ -70,7 +70,7 @@ export default function PostContentInformation() {
 		readingTime <= 1
 			? __( '1 minute' )
 			: sprintf(
-					// translators: %s: the number of minutes to read the post.
+					/* translators: %s: the number of minutes to read the post. */
 					_n( '%s minute', '%s minutes', readingTime ),
 					readingTime.toLocaleString()
 			  );

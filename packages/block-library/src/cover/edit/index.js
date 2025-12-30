@@ -32,6 +32,7 @@ import {
 	attributesFromMedia,
 	IMAGE_BACKGROUND_TYPE,
 	VIDEO_BACKGROUND_TYPE,
+	EMBED_VIDEO_BACKGROUND_TYPE,
 	dimRatioToClass,
 	isContentPositionCenter,
 	getPositionClassName,
@@ -47,13 +48,19 @@ import {
 	DEFAULT_BACKGROUND_COLOR,
 	DEFAULT_OVERLAY_COLOR,
 } from './color-utils';
+import { DEFAULT_MEDIA_SIZE_SLUG } from '../constants';
+import { getIframeSrc, getBackgroundVideoSrc } from '../embed-video-utils';
 
 function getInnerBlocksTemplate( attributes ) {
 	return [
 		[
 			'core/paragraph',
 			{
-				align: 'center',
+				style: {
+					typography: {
+						textAlign: 'center',
+					},
+				},
 				placeholder: __( 'Write title…' ),
 				...attributes,
 			},
@@ -100,6 +107,8 @@ function CoverEdit( {
 		templateLock,
 		tagName: TagName = 'div',
 		isUserOverlayColor,
+		sizeSlug,
+		poster,
 	} = attributes;
 
 	const [ featuredImage ] = useEntityProp(
@@ -108,16 +117,31 @@ function CoverEdit( {
 		'featured_media',
 		postId
 	);
+	const { getSettings } = useSelect( blockEditorStore );
 
 	const { __unstableMarkNextChangeAsNotPersistent } =
 		useDispatch( blockEditorStore );
-	const media = useSelect(
-		( select ) =>
-			featuredImage &&
-			select( coreStore ).getMedia( featuredImage, { context: 'view' } ),
-		[ featuredImage ]
+	const { media } = useSelect(
+		( select ) => {
+			return {
+				media:
+					featuredImage && useFeaturedImage
+						? select( coreStore ).getEntityRecord(
+								'postType',
+								'attachment',
+								featuredImage,
+								{
+									context: 'view',
+								}
+						  )
+						: undefined,
+			};
+		},
+		[ featuredImage, useFeaturedImage ]
 	);
-	const mediaUrl = media?.source_url;
+	const mediaUrl =
+		media?.media_details?.sizes?.[ sizeSlug ]?.source_url ??
+		media?.source_url;
 
 	// User can change the featured image outside of the block, but we still
 	// need to update the block when that happens. This effect should only
@@ -149,8 +173,7 @@ function CoverEdit( {
 				isUserOverlayColor: isUserOverlayColor || false,
 			} );
 		} )();
-		// Disable reason: Update the block only when the featured image changes.
-		// eslint-disable-next-line react-hooks/exhaustive-deps
+		// Update the block only when the featured image changes.
 	}, [ mediaUrl ] );
 
 	// instead of destructuring the attributes
@@ -198,6 +221,34 @@ function CoverEdit( {
 			newOverlayColor,
 			averageBackgroundColor
 		);
+
+		if ( backgroundType === IMAGE_BACKGROUND_TYPE && mediaAttributes?.id ) {
+			const { imageDefaultSize } = getSettings();
+
+			// Try to use the previous selected image size if it's available
+			// otherwise try the default image size or fallback to full size.
+			if (
+				sizeSlug &&
+				( newMedia?.sizes?.[ sizeSlug ] ||
+					newMedia?.media_details?.sizes?.[ sizeSlug ] )
+			) {
+				mediaAttributes.sizeSlug = sizeSlug;
+				mediaAttributes.url =
+					newMedia?.sizes?.[ sizeSlug ]?.url ||
+					newMedia?.media_details?.sizes?.[ sizeSlug ]?.source_url;
+			} else if (
+				newMedia?.sizes?.[ imageDefaultSize ] ||
+				newMedia?.media_details?.sizes?.[ imageDefaultSize ]
+			) {
+				mediaAttributes.sizeSlug = imageDefaultSize;
+				mediaAttributes.url =
+					newMedia?.sizes?.[ imageDefaultSize ]?.url ||
+					newMedia?.media_details?.sizes?.[ imageDefaultSize ]
+						?.source_url;
+			} else {
+				mediaAttributes.sizeSlug = DEFAULT_MEDIA_SIZE_SLUG;
+			}
+		}
 
 		setAttributes( {
 			...mediaAttributes,
@@ -274,10 +325,71 @@ function CoverEdit( {
 		createErrorNotice( message, { type: 'snackbar' } );
 	};
 
+	const onSelectEmbedUrl = ( embedUrl ) => {
+		// Only set a new dimRatio if there was no previous media selected
+		// to avoid resetting to 50 if it has been explicitly set to 100.
+		const newDimRatio =
+			originalUrl === undefined && dimRatio === 100 ? 50 : dimRatio;
+
+		// Set initial attributes with URL
+		setAttributes( {
+			url: embedUrl,
+			backgroundType: EMBED_VIDEO_BACKGROUND_TYPE,
+			dimRatio: newDimRatio,
+			id: undefined,
+			focalPoint: undefined,
+			hasParallax: undefined,
+			isRepeated: undefined,
+			useFeaturedImage: undefined,
+		} );
+	};
+
+	// Fetch embed preview for embed videos
+	const { embedPreview, isFetchingEmbed } = useSelect(
+		( select ) => {
+			if ( backgroundType !== EMBED_VIDEO_BACKGROUND_TYPE || ! url ) {
+				return {
+					embedPreview: undefined,
+					isFetchingEmbed: false,
+				};
+			}
+
+			const { getEmbedPreview, isRequestingEmbedPreview } =
+				select( coreStore );
+
+			return {
+				embedPreview: getEmbedPreview( url ),
+				isFetchingEmbed: isRequestingEmbedPreview( url ),
+			};
+		},
+		[ url, backgroundType ]
+	);
+
+	// Compute embedSrc on-the-fly from embed preview for editor display
+	const embedSrc = useMemo( () => {
+		if (
+			backgroundType !== EMBED_VIDEO_BACKGROUND_TYPE ||
+			! embedPreview?.html
+		) {
+			return null;
+		}
+
+		// Extract iframe src from embed HTML
+		const iframeSrc = getIframeSrc( embedPreview.html );
+		if ( ! iframeSrc ) {
+			return null;
+		}
+
+		// Modify the src to add background video parameters (provider auto-detected)
+		return getBackgroundVideoSrc( iframeSrc );
+	}, [ embedPreview, backgroundType ] );
+
 	const isUploadingMedia = isTemporaryMedia( id, url );
 
 	const isImageBackground = IMAGE_BACKGROUND_TYPE === backgroundType;
 	const isVideoBackground = VIDEO_BACKGROUND_TYPE === backgroundType;
+	const isEmbedVideoBackground =
+		EMBED_VIDEO_BACKGROUND_TYPE === backgroundType;
 
 	const blockEditingMode = useBlockEditingMode();
 	const hasNonContentControls = blockEditingMode === 'default';
@@ -285,7 +397,7 @@ function CoverEdit( {
 	const [ resizeListener, { height, width } ] = useResizeObserver();
 	const resizableBoxDimensions = useMemo( () => {
 		return {
-			height: minHeightUnit === 'px' ? minHeight : 'auto',
+			height: minHeightUnit === 'px' && minHeight ? minHeight : 'auto',
 			width: 'auto',
 		};
 	}, [ minHeight, minHeightUnit ] );
@@ -404,9 +516,11 @@ function CoverEdit( {
 			attributes={ attributes }
 			setAttributes={ setAttributes }
 			onSelectMedia={ onSelectMedia }
+			onSelectEmbedUrl={ onSelectEmbedUrl }
 			currentSettings={ currentSettings }
 			toggleUseFeaturedImage={ toggleUseFeaturedImage }
 			onClearMedia={ onClearMedia }
+			blockEditingMode={ blockEditingMode }
 		/>
 	);
 
@@ -421,6 +535,7 @@ function CoverEdit( {
 			toggleUseFeaturedImage={ toggleUseFeaturedImage }
 			updateDimRatio={ onUpdateDimRatio }
 			onClearMedia={ onClearMedia }
+			featuredImage={ media }
 		/>
 	);
 
@@ -441,7 +556,7 @@ function CoverEdit( {
 			setAttributes( { minHeight: newMinHeight } );
 		},
 		// Hide the resize handle if an aspect ratio is set, as the aspect ratio takes precedence.
-		showHandle: ! attributes.style?.dimensions?.aspectRatio ? true : false,
+		showHandle: ! attributes.style?.dimensions?.aspectRatio,
 		size: resizableBoxDimensions,
 		width,
 	};
@@ -474,6 +589,8 @@ function CoverEdit( {
 								value={ overlayColor.color }
 								onChange={ onSetOverlayColor }
 								clearable={ false }
+								asButtons
+								aria-label={ __( 'Overlay color' ) }
 							/>
 						</div>
 					</CoverPlaceholder>
@@ -509,27 +626,6 @@ function CoverEdit( {
 				data-url={ url }
 			>
 				{ resizeListener }
-				{ showOverlay && (
-					<span
-						aria-hidden="true"
-						className={ clsx(
-							'wp-block-cover__background',
-							dimRatioToClass( dimRatio ),
-							{
-								[ overlayColor.class ]: overlayColor.class,
-								'has-background-dim': dimRatio !== undefined,
-								// For backwards compatibility. Former versions of the Cover Block applied
-								// `.wp-block-cover__gradient-background` in the presence of
-								// media, a gradient and a dim.
-								'wp-block-cover__gradient-background':
-									url && gradientValue && dimRatio !== 0,
-								'has-background-gradient': gradientValue,
-								[ gradientClass ]: gradientClass,
-							}
-						) }
-						style={ { backgroundImage: gradientValue, ...bgStyle } }
-					/>
-				) }
 
 				{ ! url && useFeaturedImage && (
 					<Placeholder
@@ -568,10 +664,52 @@ function CoverEdit( {
 						muted
 						loop
 						src={ url }
+						poster={ poster }
 						style={ mediaStyle }
 					/>
 				) }
+				{ isEmbedVideoBackground && embedSrc && (
+					<div
+						ref={ mediaElement }
+						className="wp-block-cover__video-background wp-block-cover__embed-background"
+						style={ mediaStyle }
+					>
+						<iframe
+							src={ embedSrc }
+							title="Background video"
+							frameBorder="0"
+							allow="autoplay; fullscreen"
+						/>
+					</div>
+				) }
+				{ isEmbedVideoBackground && ! embedSrc && isFetchingEmbed && (
+					<Spinner />
+				) }
+
+				{ showOverlay && (
+					<span
+						aria-hidden="true"
+						className={ clsx(
+							'wp-block-cover__background',
+							dimRatioToClass( dimRatio ),
+							{
+								[ overlayColor.class ]: overlayColor.class,
+								'has-background-dim': dimRatio !== undefined,
+								// For backwards compatibility. Former versions of the Cover Block applied
+								// `.wp-block-cover__gradient-background` in the presence of
+								// media, a gradient and a dim.
+								'wp-block-cover__gradient-background':
+									url && gradientValue && dimRatio !== 0,
+								'has-background-gradient': gradientValue,
+								[ gradientClass ]: gradientClass,
+							}
+						) }
+						style={ { backgroundImage: gradientValue, ...bgStyle } }
+					/>
+				) }
+
 				{ isUploadingMedia && <Spinner /> }
+
 				<CoverPlaceholder
 					disableMediaButtons
 					onSelectMedia={ onSelectMedia }

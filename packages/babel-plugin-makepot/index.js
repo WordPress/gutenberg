@@ -85,7 +85,7 @@ const REGEXP_TRANSLATOR_COMMENT = /^\s*translators:\s*([\s\S]+)/im;
 
 /**
  * Given an argument node (or recursed node), attempts to return a string
- * represenation of that node's value.
+ * representation of that node's value.
  *
  * @param {Object} node AST node.
  *
@@ -265,7 +265,7 @@ module.exports = () => {
 						);
 					}
 
-					// Attempt to exract nplurals from header.
+					// Attempt to extract nplurals from header.
 					const pluralsMatch = (
 						baseData.headers[ 'plural-forms' ] || ''
 					).match( /nplurals\s*=\s*(\d+);/ );

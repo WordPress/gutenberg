@@ -56,7 +56,7 @@ test.describe( 'Widgets screen', () => {
 
 		await page
 			.getByRole( 'toolbar', { name: 'Document tools' } )
-			.getByRole( 'button', { name: 'Toggle block inserter' } )
+			.getByRole( 'button', { name: 'Block Inserter', exact: true } )
 			.click();
 		const blockLibrary = page.getByRole( 'region', {
 			name: 'Block Library',
@@ -162,6 +162,7 @@ test.describe( 'Widgets screen', () => {
 
 		const paragraphBlock = inlineQuickInserter.getByRole( 'option', {
 			name: 'Paragraph',
+			exact: true,
 		} );
 		await paragraphBlock.click();
 
@@ -207,14 +208,14 @@ test.describe( 'Widgets screen', () => {
 		await inBetweenInserterButton.click();
 
 		const inserterSearchBox = page.getByRole( 'searchbox', {
-			name: 'Search for blocks and patterns',
+			name: 'Search',
 		} );
 		await expect( inserterSearchBox ).toBeFocused();
 
 		await page.keyboard.type( 'Heading' );
 
 		await inlineQuickInserter
-			.getByRole( 'option', { name: 'Heading' } )
+			.getByRole( 'option', { name: 'Heading', exact: true } )
 			.click();
 
 		await expect(
@@ -698,17 +699,20 @@ class WidgetsScreen {
 		if ( await blockLibrary.isHidden() ) {
 			await this.#page
 				.getByRole( 'toolbar', { name: 'Document tools' } )
-				.getByRole( 'button', { name: 'Toggle block inserter' } )
+				.getByRole( 'button', { name: 'Block Inserter', exact: true } )
 				.click();
 		}
 
 		await blockLibrary
 			.getByRole( 'searchbox', {
-				name: 'Search for blocks and patterns',
+				name: 'Search',
 			} )
 			.fill( blockName );
 
-		return blockLibrary.getByRole( 'option', { name: blockName } );
+		return blockLibrary.getByRole( 'option', {
+			name: blockName,
+			exact: true,
+		} );
 	};
 
 	saveWidgets = async () => {

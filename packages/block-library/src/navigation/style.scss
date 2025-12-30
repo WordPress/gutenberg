@@ -1,3 +1,6 @@
+@use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/variables" as *;
+
 // Navigation block and menu item styles.
 // These styles also affect the Page List block when used inside your navigation block.
 //
@@ -46,6 +49,7 @@ $navigation-icon-size: 24px;
 	// but still allow them to be overridden by user-set colors.
 	.wp-block-navigation-item__content {
 		display: block;
+		z-index: 1;
 	}
 
 	// This rule needs extra specificity so that it inherits the correct color from its parent.
@@ -166,7 +170,9 @@ $navigation-icon-size: 24px;
 
 		// Hide until hover or focus within.
 		opacity: 0;
-		transition: opacity 0.1s linear;
+		@media not (prefers-reduced-motion) {
+			transition: opacity 0.1s linear;
+		}
 		visibility: hidden;
 
 		// Don't take up space when the menu is collapsed.
@@ -179,6 +185,7 @@ $navigation-icon-size: 24px;
 			> .wp-block-navigation-item__content {
 				display: flex;
 				flex-grow: 1;
+				padding: 0.5em 1em;
 
 				// Right-align the chevron in submenus.
 				.wp-block-navigation__submenu-icon {
@@ -308,6 +315,14 @@ button.wp-block-navigation-item__content {
 
 .wp-block-navigation-submenu__toggle {
 	cursor: pointer;
+
+	// Rotate submenu icon when open.
+	&[aria-expanded="true"] {
+		+ .wp-block-navigation__submenu-icon > svg,
+		> svg {
+			transform: rotate(180deg);
+		}
+	}
 }
 
 // When set to open on click, a button element is used.
@@ -502,15 +517,16 @@ button.wp-block-navigation-item__content {
 		background-color: inherit;
 
 		// Animation.
-		animation: overlay-menu__fade-in-animation 0.1s ease-out;
-		animation-fill-mode: forwards;
-		@include reduce-motion("animation");
+		@media not (prefers-reduced-motion) {
+			animation: overlay-menu__fade-in-animation 0.1s ease-out;
+			animation-fill-mode: forwards;
+		}
 
 		// Try to inherit any root paddings set, so the X can align to a top-right aligned menu.
 		padding-top: clamp(1rem, var(--wp--style--root--padding-top), 20rem);
 		padding-right: clamp(1rem, var(--wp--style--root--padding-right), 20rem);
 		padding-bottom: clamp(1rem, var(--wp--style--root--padding-bottom), 20rem);
-		padding-left: clamp(1rem, var(--wp--style--root--padding-left), 20em);
+		padding-left: clamp(1rem, var(--wp--style--root--padding-left), 20rem);
 
 		// Allow modal to scroll.
 		overflow: auto;

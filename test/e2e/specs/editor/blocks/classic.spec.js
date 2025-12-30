@@ -18,23 +18,25 @@ test.use( {
 } );
 
 test.describe( 'Classic', () => {
-	test.beforeEach( async ( { admin, editor } ) => {
+	test.beforeEach( async ( { admin } ) => {
 		await admin.createNewPost();
-		// To do: run with iframe.
-		await editor.switchToLegacyCanvas();
 	} );
 
 	test.afterAll( async ( { requestUtils } ) => {
 		await requestUtils.deleteAllMedia();
 	} );
 
-	test( 'should be inserted', async ( { editor, page, pageUtils } ) => {
+	test( 'should be inserted', async ( { editor, page } ) => {
 		await editor.insertBlock( { name: 'core/freeform' } );
-		// Ensure there is focus.
-		await page.click( '.mce-content-body' );
+		await editor.canvas
+			.getByRole( 'button', { name: 'Edit contents' } )
+			.click();
+		const tinymceFrame = page.frameLocator(
+			'iframe[title*="Rich Text Area"]'
+		);
+		await tinymceFrame.locator( '.mce-content-body' ).click();
 		await page.keyboard.type( 'test' );
-		// Move focus away.
-		await pageUtils.pressKeys( 'shift+Tab' );
+		await page.getByRole( 'button', { name: 'Save' } ).click();
 
 		await expect.poll( editor.getEditedPostContent ).toBe( 'test' );
 	} );
@@ -46,8 +48,13 @@ test.describe( 'Classic', () => {
 		pageUtils,
 	} ) => {
 		await editor.insertBlock( { name: 'core/freeform' } );
-		// Ensure there is focus.
-		await page.click( '.mce-content-body' );
+		await editor.canvas
+			.getByRole( 'button', { name: 'Edit contents' } )
+			.click();
+		const tinymceFrame = page.frameLocator(
+			'iframe[title*="Rich Text Area"]'
+		);
+		await tinymceFrame.locator( '.mce-content-body' ).click();
 		await page.keyboard.type( 'test' );
 
 		await page.getByRole( 'button', { name: /Add Media/i } ).click();
@@ -59,13 +66,13 @@ test.describe( 'Classic', () => {
 		await expect( modalGalleryTab ).toBeVisible();
 		await modalGalleryTab.click();
 
-		const filename = await mediaUtils.upload(
+		const fileName = await mediaUtils.upload(
 			page.locator( '.media-modal .moxie-shim input[type=file]' )
 		);
 
 		// Wait for upload
 		await expect(
-			page.locator( `role=checkbox[name="${ filename }"i]` )
+			page.getByRole( 'checkbox', { name: fileName } )
 		).toBeChecked();
 
 		const createGallery = page.getByRole( 'button', {
@@ -73,23 +80,23 @@ test.describe( 'Classic', () => {
 		} );
 		await expect( createGallery ).toBeEnabled();
 		await createGallery.click();
-		await page.click( 'role=button[name="Insert gallery"i]' );
+		await page.getByRole( 'button', { name: 'Insert gallery' } ).click();
 
-		await pageUtils.pressKeys( 'shift+Tab' );
+		await page.getByRole( 'button', { name: 'Save' } ).click();
 		await expect
 			.poll( editor.getEditedPostContent )
 			.toMatch( /\[gallery ids=\"\d+\"\]/ );
 
 		await editor.clickBlockToolbarButton( 'Convert to blocks' );
-		const galleryBlock = page.locator(
-			'role=document[name="Block: Gallery"i]'
-		);
+		const galleryBlock = editor.canvas.getByRole( 'document', {
+			name: 'Block: Gallery',
+		} );
 		await expect( galleryBlock ).toBeVisible();
 
 		// Check that you can undo back to a Classic block gallery in one step.
 		await pageUtils.pressKeys( 'primary+z' );
 		await expect(
-			page.locator( 'role=document[name="Block: Classic"i]' )
+			editor.canvas.getByRole( 'document', { name: 'Block: Classic' } )
 		).toBeVisible();
 		await expect
 			.poll( editor.getEditedPostContent )
@@ -101,39 +108,36 @@ test.describe( 'Classic', () => {
 			.toMatch( /<!-- wp:gallery/ );
 	} );
 
-	test( 'Should not fail after save/reload', async ( {
-		editor,
-		page,
-		pageUtils,
-	} ) => {
-		// Based on docs routing diables caching.
+	test( 'Should not fail after save/reload', async ( { editor, page } ) => {
+		// Based on docs routing disables caching.
 		// See: https://playwright.dev/docs/api/class-page#page-route
 		await page.route( '**', async ( route ) => {
 			await route.continue();
 		} );
 
 		await editor.insertBlock( { name: 'core/freeform' } );
-		// Ensure there is focus.
-		await page.click( '.mce-content-body' );
+		await editor.canvas
+			.getByRole( 'button', { name: 'Edit contents' } )
+			.click();
+		const tinymceFrame = page.frameLocator(
+			'iframe[title*="Rich Text Area"]'
+		);
+		await tinymceFrame.locator( '.mce-content-body' ).click();
 		await page.keyboard.type( 'test' );
-		// Move focus away.
-		await pageUtils.pressKeys( 'shift+Tab' );
+		await page.getByRole( 'button', { name: 'Save' } ).click();
 
 		await editor.saveDraft();
 		await page.reload();
 		await page.unroute( '**' );
-
-		// To do: run with iframe.
-		await editor.switchToLegacyCanvas();
 
 		const errors = [];
 		page.on( 'pageerror', ( exception ) => {
 			errors.push( exception );
 		} );
 
-		const classicBlock = page.locator(
-			'role=document[name="Block: Classic"i]'
-		);
+		const classicBlock = editor.canvas.getByRole( 'document', {
+			name: 'Block: Classic',
+		} );
 
 		await expect( classicBlock ).toBeVisible();
 		await classicBlock.click();
@@ -161,12 +165,12 @@ class MediaUtils {
 		const tmpDirectory = await fs.mkdtemp(
 			path.join( os.tmpdir(), 'gutenberg-test-image-' )
 		);
-		const filename = uuid();
-		const tmpFileName = path.join( tmpDirectory, filename + '.png' );
+		const fileName = uuid();
+		const tmpFileName = path.join( tmpDirectory, fileName + '.png' );
 		await fs.copyFile( this.TEST_IMAGE_FILE_PATH, tmpFileName );
 
 		await inputElement.setInputFiles( tmpFileName );
 
-		return filename;
+		return fileName;
 	}
 }

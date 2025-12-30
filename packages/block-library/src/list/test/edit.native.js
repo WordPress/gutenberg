@@ -50,7 +50,7 @@ describe( 'List block', () => {
 		await triggerBlockListLayout( listBlock );
 
 		// Get List item
-		const listItemBlock = await getBlock( screen, 'List item' );
+		const listItemBlock = await getBlock( screen, 'List Item' );
 		fireEvent.press( listItemBlock );
 
 		expect( listItemBlock ).toBeVisible();
@@ -75,7 +75,7 @@ describe( 'List block', () => {
 
 		// Select List Item block
 		const [ listItemBlock ] = screen.getAllByLabelText(
-			/List item Block\. Row 1/
+			/List Item Block\. Row 1/
 		);
 		fireEvent.press( listItemBlock );
 
@@ -124,7 +124,7 @@ describe( 'List block', () => {
 
 		// Select List Item block
 		const [ firstNestedLevelBlock ] = within( listBlock ).getAllByLabelText(
-			/List item Block\. Row 2/
+			/List Item Block\. Row 2/
 		);
 		fireEvent.press( firstNestedLevelBlock );
 		await triggerBlockListLayout( firstNestedLevelBlock );
@@ -157,9 +157,9 @@ describe( 'List block', () => {
 		fireEvent.press( listBlock );
 		await triggerBlockListLayout( listBlock );
 
-		// Select Secont List Item block
+		// Select Second List Item block
 		const [ listItemBlock ] = screen.getAllByLabelText(
-			/List item Block\. Row 2/
+			/List Item Block\. Row 2/
 		);
 		fireEvent.press( listItemBlock );
 
@@ -169,7 +169,7 @@ describe( 'List block', () => {
 
 		// Await recently indented list item layout
 		const [ listItemBlock1 ] = screen.getAllByLabelText(
-			/List item Block\. Row 1/
+			/List Item Block\. Row 1/
 		);
 		await triggerBlockListLayout( listItemBlock1 );
 
@@ -203,7 +203,7 @@ describe( 'List block', () => {
 
 		// Select List Item block
 		const [ firstNestedLevelBlock ] = within( listBlock ).getAllByLabelText(
-			/List item Block\. Row 1/
+			/List Item Block\. Row 1/
 		);
 		fireEvent.press( firstNestedLevelBlock );
 		await triggerBlockListLayout( firstNestedLevelBlock );
@@ -217,7 +217,7 @@ describe( 'List block', () => {
 
 		// Select nested List Item block
 		const [ listItemBlock ] = within( innerBlockList ).getAllByLabelText(
-			/List item Block\. Row 1/
+			/List Item Block\. Row 1/
 		);
 		fireEvent.press( listItemBlock );
 
@@ -500,7 +500,7 @@ describe( 'List block', () => {
 
 		// Select List Item block
 		const [ listItemBlock ] = within( listBlock ).getAllByLabelText(
-			/List item Block\. Row 1/
+			/List Item Block\. Row 1/
 		);
 		fireEvent.press( listItemBlock );
 
@@ -560,7 +560,7 @@ describe( 'List block', () => {
 
 		// Select List Item block
 		const [ listItemBlock ] = within( listBlock ).getAllByLabelText(
-			/List item Block\. Row 1/
+			/List Item Block\. Row 1/
 		);
 		fireEvent.press( listItemBlock );
 

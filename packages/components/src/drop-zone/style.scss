@@ -1,3 +1,8 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/z-index" as *;
+@use "../utils/theme-variables" as *;
+
 .components-drop-zone {
 	position: absolute;
 	top: 0;
@@ -42,13 +47,12 @@
 		transform: scale(0.9);
 	}
 
-	&.is-active:not(.has-dragged-out) {
+	&.is-active.is-dragging-over-element {
 		.components-drop-zone__content {
 			opacity: 1;
 
-			transition: opacity 0.2s ease-in-out;
-			@media (prefers-reduced-motion) {
-				transition: none;
+			@media not (prefers-reduced-motion) {
+				transition: opacity 0.2s ease-in-out;
 			}
 		}
 
@@ -56,12 +60,10 @@
 			opacity: 1;
 			transform: scale(1);
 
-			transition:
-				opacity 0.1s ease-in-out 0.1s,
-				transform 0.1s ease-in-out 0.1s;
-
-			@media (prefers-reduced-motion) {
-				transition: none;
+			@media not (prefers-reduced-motion) {
+				transition:
+					opacity 0.1s ease-in-out 0.1s,
+					transform 0.1s ease-in-out 0.1s;
 			}
 		}
 	}

@@ -14,7 +14,7 @@ import CategorySelect from './category-select';
 const DEFAULT_MIN_ITEMS = 1;
 const DEFAULT_MAX_ITEMS = 100;
 
-const options = [
+const defaultOrderByOptions = [
 	{
 		label: __( 'Newest to oldest' ),
 		value: 'date/desc',
@@ -42,6 +42,7 @@ const QueryControls = memo(
 		numberOfItems,
 		order,
 		orderBy,
+		orderByOptions = defaultOrderByOptions,
 		maxItems = DEFAULT_MAX_ITEMS,
 		minItems = DEFAULT_MIN_ITEMS,
 		onCategoryChange,
@@ -68,7 +69,7 @@ const QueryControls = memo(
 					<SelectControl
 						label={ __( 'Order by' ) }
 						value={ `${ orderBy }/${ order }` }
-						options={ options }
+						options={ orderByOptions }
 						onChange={ onChange }
 						hideCancelButton
 					/>

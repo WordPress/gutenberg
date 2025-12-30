@@ -1,4 +1,11 @@
+@use "@wordpress/base-styles/breakpoints" as *;
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/z-index" as *;
+
 .editor-header {
+	@include reset;
 	height: $header-height;
 	background: $white;
 	display: grid;
@@ -7,7 +14,7 @@
 	&:has(> .editor-header__center) {
 		grid-template: auto / $header-height min-content 1fr min-content $header-height;
 		@include break-medium {
-			grid-template: auto / $header-height minmax(min-content, 1fr) 2fr minmax(min-content, 1fr) $header-height;
+			grid-template: auto / $header-height minmax(min-content, 2fr) 2.5fr minmax(min-content, 2fr) $header-height;
 		}
 	}
 	@include break-mobile {
@@ -130,6 +137,7 @@
 		// ... and display labels.
 		&::after {
 			content: attr(aria-label);
+			white-space: nowrap;
 		}
 		&[aria-disabled="true"] {
 			background-color: transparent;
@@ -255,7 +263,8 @@
 
 		& > .editor-header__toolbar .editor-document-tools__document-overview-toggle,
 		& > .editor-header__settings > .editor-preview-dropdown,
-		& > .editor-header__settings > .interface-pinned-items {
+		& > .editor-header__settings > .interface-pinned-items,
+		& > .editor-header__settings > .editor-zoom-out-toggle {
 			display: none;
 		}
 

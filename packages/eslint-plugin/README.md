@@ -22,7 +22,7 @@ To opt-in to the default configuration, extend your own project's `.eslintrc` fi
 }
 ```
 
-Refer to the [ESLint documentation on Shareable Configs](http://eslint.org/docs/developer-guide/shareable-configs) for more information.
+Refer to the [ESLint documentation on Shareable Configs](https://eslint.org/docs/latest/extend/shareable-configs) for more information.
 
 The `recommended` preset will include rules governing an ES2015+ environment, and includes rules from the [`eslint-plugin-jsdoc`](https://github.com/gajus/eslint-plugin-jsdoc), [`eslint-plugin-jsx-a11y`](https://github.com/jsx-eslint/eslint-plugin-jsx-a11y), [`eslint-plugin-react`](https://github.com/yannickcr/eslint-plugin-react), and other similar plugins.
 
@@ -72,7 +72,7 @@ The granular rulesets will not define any environment globals. As such, if they 
 | Rule                                                                                                                                                                 | Description                                                                                     | Recommended |
 | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- | ----------- |
 | [data-no-store-string-literals](https://github.com/WordPress/gutenberg/tree/HEAD/packages/eslint-plugin/docs/rules/data-no-store-string-literals.md)                 | Discourage passing string literals to reference data stores.                                    |             |
-| [dependency-group](https://github.com/WordPress/gutenberg/tree/HEAD/packages/eslint-plugin/docs/rules/dependency-group.md)                                           | Enforce dependencies docblocks formatting.                                                      | ✓           |
+| [dependency-group](https://github.com/WordPress/gutenberg/tree/HEAD/packages/eslint-plugin/docs/rules/dependency-group.md)                                           | Enforce dependencies docblocks formatting.                                                      |             |
 | [i18n-ellipsis](https://github.com/WordPress/gutenberg/tree/HEAD/packages/eslint-plugin/docs/rules/i18n-ellipsis.md)                                                 | Disallow using three dots in translatable strings.                                              | ✓           |
 | [i18n-hyphenated-range](https://github.com/WordPress/gutenberg/tree/HEAD/packages/eslint-plugin/docs/rules/i18n-hyphenated-range.md)                                 | Disallow hyphenated numerical ranges in translatable strings.                                   |             |
 | [i18n-no-collapsible-whitespace](https://github.com/WordPress/gutenberg/tree/HEAD/packages/eslint-plugin/docs/rules/i18n-no-collapsible-whitespace.md)               | Disallow collapsible whitespace in translatable strings.                                        | ✓           |

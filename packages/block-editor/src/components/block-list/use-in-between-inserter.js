@@ -18,7 +18,7 @@ export function useInBetweenInserter() {
 	const isInBetweenInserterDisabled = useSelect(
 		( select ) =>
 			select( blockEditorStore ).getSettings().isDistractionFree ||
-			select( blockEditorStore ).__unstableGetEditorMode() === 'zoom-out',
+			unlock( select( blockEditorStore ) ).isZoomOut(),
 		[]
 	);
 	const {

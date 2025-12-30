@@ -17,8 +17,8 @@ const viewPostRevisions: Action< Post > = {
 		const revisionsCount =
 			items[ 0 ]._links?.[ 'version-history' ]?.[ 0 ]?.count ?? 0;
 		return sprintf(
-			/* translators: %s: number of revisions */
-			__( 'View revisions (%s)' ),
+			/* translators: %d: number of revisions. */
+			__( 'View revisions (%d)' ),
 			revisionsCount
 		);
 	},
@@ -44,4 +44,7 @@ const viewPostRevisions: Action< Post > = {
 	},
 };
 
+/**
+ * View post revisions action for Post.
+ */
 export default viewPostRevisions;

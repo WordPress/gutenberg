@@ -15,9 +15,9 @@ const { state } = store( 'directive-class', {
 		toggleFalseValue: () => {
 			state.falseValue = ! state.falseValue;
 		},
-		toggleContextFalseValue: () => {
+		toggleContextValue: () => {
 			const context = getContext();
-			context.falseValue = ! context.falseValue;
+			context.value = ! context.value;
 		},
 	},
 } );

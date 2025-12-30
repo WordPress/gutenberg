@@ -65,3 +65,13 @@ body:
           options:
               - label: 'Yes'
                 required: true
+
+    - type: checkboxes
+      id: themes
+      attributes:
+          label: Please confirm which theme type you used for testing.
+          options:
+              - label: 'Block'
+              - label: 'Classic'
+              - label: 'Hybrid (e.g. classic with theme.json)'
+              - label: 'Not sure'

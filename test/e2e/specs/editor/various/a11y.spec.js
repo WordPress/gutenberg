@@ -40,10 +40,10 @@ test.describe( 'a11y (@firefox, @webkit)', () => {
 
 		// This test assumes the Editor is not in Fullscreen mode. Check the
 		// first tabbable element within the 'Editor top bar' region is the
-		// 'Toggle block inserter' button.
+		// 'Block Inserter' button.
 		await pageUtils.pressKeys( 'Tab' );
 		await expect(
-			page.locator( 'role=button[name=/Toggle block inserter/i]' )
+			page.locator( 'role=button[name=/Block Inserter/i]' )
 		).toBeFocused();
 	} );
 
@@ -123,7 +123,14 @@ test.describe( 'a11y (@firefox, @webkit)', () => {
 	test( 'should make the modal content focusable when it is scrollable', async ( {
 		page,
 		pageUtils,
+		browserName,
 	} ) => {
+		// eslint-disable-next-line playwright/no-skipped-test
+		test.skip(
+			browserName === 'webkit',
+			'Known bug with focus order in Safari.'
+		);
+
 		// Note: this test depends on a particular viewport height to determine whether or not
 		// the modal content is scrollable. If this tests fails and needs to be debugged locally,
 		// double-check the viewport height when running locally versus in CI. Additionally,

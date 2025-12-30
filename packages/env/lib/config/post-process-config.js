@@ -129,7 +129,7 @@ function appendPortToWPConfigs( config ) {
  */
 function validatePortUniqueness( config ) {
 	// We're going to build a map of the environments and their port
-	// so we can accomodate root-level config options more easily.
+	// so we can accommodate root-level config options more easily.
 	const environmentPorts = {};
 
 	// Add all of the environments to the map. This will
@@ -179,7 +179,7 @@ function validate( config ) {
  * @return {WPRootConfig} A deep copy of the root config object.
  */
 function deepCopyRootOptions( config ) {
-	// Create a shallow clone of the object first so we can operate on it safetly.
+	// Create a shallow clone of the object first so we can operate on it safely.
 	const rootConfig = Object.assign( {}, config );
 
 	// Since we're only dealing with the root options we don't want the environments.

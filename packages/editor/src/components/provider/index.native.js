@@ -47,7 +47,11 @@ import { __ } from '@wordpress/i18n';
 const postTypeEntities = [
 	{ name: 'post', baseURL: '/wp/v2/posts' },
 	{ name: 'page', baseURL: '/wp/v2/pages' },
-	{ name: 'attachment', baseURL: '/wp/v2/media' },
+	{
+		name: 'attachment',
+		baseURL: '/wp/v2/media',
+		baseURLParams: { context: 'edit' },
+	},
 	{ name: 'wp_block', baseURL: '/wp/v2/blocks' },
 ].map( ( postTypeEntity ) => ( {
 	kind: 'postType',

@@ -9,6 +9,7 @@ import {
 } from '@wordpress/compose';
 import { isRTL } from '@wordpress/i18n';
 import {
+	hasBlockSupport,
 	isUnmodifiedDefaultBlock as getIsUnmodifiedDefaultBlock,
 	store as blocksStore,
 } from '@wordpress/blocks';
@@ -147,6 +148,10 @@ export function getDropTargetPosition(
 			blockOrientation,
 		} ) => {
 			const rect = getBoundingClientRect();
+
+			if ( ! rect ) {
+				return;
+			}
 
 			let [ distance, edge ] = getDistanceToNearestEdge(
 				position,
@@ -287,7 +292,7 @@ function isInsertionPoint( targetToCheck, ownerDocument ) {
 	return !! (
 		defaultView &&
 		targetToCheck instanceof defaultView.HTMLElement &&
-		targetToCheck.dataset.isInsertionPoint
+		targetToCheck.closest( '[data-is-insertion-point]' )
 	);
 }
 
@@ -330,8 +335,9 @@ export default function useBlockDropZone( {
 		getAllowedBlocks,
 		isDragging,
 		isGroupable,
-		isZoomOutMode,
+		isZoomOut,
 		getSectionRootClientId,
+		getBlockParents,
 	} = unlock( useSelect( blockEditorStore ) );
 	const {
 		showInsertionPoint,
@@ -358,13 +364,29 @@ export default function useBlockDropZone( {
 					// So, ensure that the drag state is set when the user drags over a drop zone.
 					startDragging();
 				}
+
+				const draggedBlockClientIds = getDraggedBlockClientIds();
+				const targetParents = [
+					targetRootClientId,
+					...getBlockParents( targetRootClientId, true ),
+				];
+
+				// Check if the target is within any of the dragged blocks.
+				const isTargetWithinDraggedBlocks = draggedBlockClientIds.some(
+					( clientId ) => targetParents.includes( clientId )
+				);
+
+				if ( isTargetWithinDraggedBlocks ) {
+					return;
+				}
+
 				const allowedBlocks = getAllowedBlocks( targetRootClientId );
 				const targetBlockName = getBlockNamesByClientId( [
 					targetRootClientId,
 				] )[ 0 ];
 
 				const draggedBlockNames = getBlockNamesByClientId(
-					getDraggedBlockClientIds()
+					draggedBlockClientIds
 				);
 				const isBlockDroppingAllowed = isDropTargetValid(
 					getBlockType,
@@ -383,13 +405,21 @@ export default function useBlockDropZone( {
 				// do not allow dropping as the drop target is not within the root (that which is
 				// treated as "the content" by Zoom Out Mode).
 				if (
-					isZoomOutMode() &&
+					isZoomOut() &&
 					sectionRootClientId !== targetRootClientId
 				) {
 					return;
 				}
 
-				const blocks = getBlocks( targetRootClientId );
+				const blocks = getBlocks( targetRootClientId )
+					// Filter out blocks that are hidden
+					.filter( ( block ) => {
+						return ! (
+							hasBlockSupport( block.name, 'visibility', true ) &&
+							block.attributes?.metadata?.blockVisibility ===
+								false
+						);
+					} );
 
 				// The block list is empty, don't show the insertion point but still allow dropping.
 				if ( blocks.length === 0 ) {
@@ -411,10 +441,14 @@ export default function useBlockDropZone( {
 					return {
 						isUnmodifiedDefaultBlock:
 							getIsUnmodifiedDefaultBlock( block ),
-						getBoundingClientRect: () =>
-							ownerDocument
-								.getElementById( `block-${ clientId }` )
-								.getBoundingClientRect(),
+						getBoundingClientRect: () => {
+							const blockElement = ownerDocument.getElementById(
+								`block-${ clientId }`
+							);
+							return blockElement
+								? blockElement.getBoundingClientRect()
+								: null;
+						},
 						blockIndex: getBlockIndex( clientId ),
 						blockOrientation:
 							getBlockListSettings( clientId )?.orientation,
@@ -439,7 +473,14 @@ export default function useBlockDropZone( {
 				const [ targetIndex, operation, nearestSide ] =
 					dropTargetPosition;
 
-				if ( isZoomOutMode() && operation !== 'insert' ) {
+				const isTargetIndexEmptyDefaultBlock =
+					blocksData[ targetIndex ]?.isUnmodifiedDefaultBlock;
+
+				if (
+					isZoomOut() &&
+					! isTargetIndexEmptyDefaultBlock &&
+					operation !== 'insert'
+				) {
 					return;
 				}
 
@@ -514,7 +555,7 @@ export default function useBlockDropZone( {
 				getDraggedBlockClientIds,
 				getBlockType,
 				getSectionRootClientId,
-				isZoomOutMode,
+				isZoomOut,
 				getBlocks,
 				getBlockListSettings,
 				dropZoneElement,

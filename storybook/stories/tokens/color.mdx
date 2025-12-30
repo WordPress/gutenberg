@@ -1,0 +1,61 @@
+import { Meta, ColorPalette, ColorItem } from '@storybook/blocks';
+
+<Meta title="Tokens/Color" name="page" />
+
+# Color
+
+This document outlines the default color set of the WordPress component system as it ships. The page is a work in progress. 
+
+## Colors
+
+<ColorPalette>
+	<ColorItem
+		title="Black & White"
+		subtitle=""
+		colors={{
+			'$black': '#000',
+			'$white': '#fff',
+		}}
+	/>
+</ColorPalette>
+
+<ColorPalette>
+	<ColorItem
+		title="Gray Tones"
+		subtitle=""
+		colors={{
+			'$gray-900': '#1e1e1e',
+			'$gray-800': '#2f2f2f',
+			'$gray-700': '#757575',
+			'$gray-600': '#949494',
+			'$gray-400': '#ccc',
+			'$gray-300': '#ddd',
+			'$gray-200': '#e0e0e0',
+			'$gray-100': '#f0f0f0',
+		}}
+	/>
+</ColorPalette>
+
+<ColorPalette>
+	<ColorItem
+		title="Alert colors"
+		subtitle=""
+		colors={{
+			'$alert-yellow': '#f0b849',
+			'$alert-red': '#cc1818',
+			'$alert-green': '#4ab866',
+		}}
+	/>
+</ColorPalette>
+
+## Contrast
+
+Ensure proper contrast is met between text, icons, UI, and backgrounds. Text needs to meet a 4.5:1 ratio to meet AA standards, while large text (16px+) and UI elements (borders, etc.) need to meet a 3:1 ratio. In this section is a list of tokens you can use to meet these criteria.
+
+Against a white background:
+
+* **Gray 700**\
+Meets 4.6:1, lightest gray you can use and meet 4.5:1 text contrast.
+
+* **Gray 600**\
+Lightest gray you can use and meet 3:1 UI contrast.

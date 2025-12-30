@@ -1,34 +1,8 @@
 /**
- * WordPress dependencies
- */
-import { useRef } from '@wordpress/element';
-
-/**
  * Internal dependencies
  */
 import useRefEffect from '../use-ref-effect';
-
-/* eslint-disable jsdoc/valid-types */
-/**
- * @template T
- * @param {T} value
- * @return {import('react').MutableRefObject<T|null>} A ref with the value.
- */
-function useFreshRef( value ) {
-	/* eslint-enable jsdoc/valid-types */
-	/* eslint-disable jsdoc/no-undefined-types */
-	/** @type {import('react').MutableRefObject<T>} */
-	/* eslint-enable jsdoc/no-undefined-types */
-	// Disable reason: We're doing something pretty JavaScript-y here where the
-	// ref will always have a current value that is not null or undefined but it
-	// needs to start as undefined. We don't want to change the return type so
-	// it's easier to just ts-ignore this specific line that's complaining about
-	// undefined not being part of T.
-	// @ts-ignore
-	const ref = useRef();
-	ref.current = value;
-	return ref;
-}
+import useEvent from '../use-event';
 
 /**
  * A hook to facilitate drag and drop handling.
@@ -55,12 +29,12 @@ export default function useDropZone( {
 	onDragEnd: _onDragEnd,
 	onDragOver: _onDragOver,
 } ) {
-	const onDropRef = useFreshRef( _onDrop );
-	const onDragStartRef = useFreshRef( _onDragStart );
-	const onDragEnterRef = useFreshRef( _onDragEnter );
-	const onDragLeaveRef = useFreshRef( _onDragLeave );
-	const onDragEndRef = useFreshRef( _onDragEnd );
-	const onDragOverRef = useFreshRef( _onDragOver );
+	const onDropEvent = useEvent( _onDrop );
+	const onDragStartEvent = useEvent( _onDragStart );
+	const onDragEnterEvent = useEvent( _onDragEnter );
+	const onDragLeaveEvent = useEvent( _onDragLeave );
+	const onDragEndEvent = useEvent( _onDragEnd );
+	const onDragOverEvent = useEvent( _onDragOver );
 
 	return useRefEffect(
 		( elem ) => {
@@ -122,8 +96,8 @@ export default function useDropZone( {
 				ownerDocument.addEventListener( 'dragend', maybeDragEnd );
 				ownerDocument.addEventListener( 'mousemove', maybeDragEnd );
 
-				if ( onDragStartRef.current ) {
-					onDragStartRef.current( event );
+				if ( _onDragStart ) {
+					onDragStartEvent( event );
 				}
 			}
 
@@ -142,15 +116,15 @@ export default function useDropZone( {
 					return;
 				}
 
-				if ( onDragEnterRef.current ) {
-					onDragEnterRef.current( event );
+				if ( _onDragEnter ) {
+					onDragEnterEvent( event );
 				}
 			}
 
 			function onDragOver( /** @type {DragEvent} */ event ) {
 				// Only call onDragOver for the innermost hovered drop zones.
-				if ( ! event.defaultPrevented && onDragOverRef.current ) {
-					onDragOverRef.current( event );
+				if ( ! event.defaultPrevented && _onDragOver ) {
+					onDragOverEvent( event );
 				}
 
 				// Prevent the browser default while also signalling to parent
@@ -171,8 +145,8 @@ export default function useDropZone( {
 					return;
 				}
 
-				if ( onDragLeaveRef.current ) {
-					onDragLeaveRef.current( event );
+				if ( _onDragLeave ) {
+					onDragLeaveEvent( event );
 				}
 			}
 
@@ -192,8 +166,8 @@ export default function useDropZone( {
 				// eslint-disable-next-line no-unused-expressions
 				event.dataTransfer && event.dataTransfer.files.length;
 
-				if ( onDropRef.current ) {
-					onDropRef.current( event );
+				if ( _onDrop ) {
+					onDropEvent( event );
 				}
 
 				maybeDragEnd( event );
@@ -209,12 +183,12 @@ export default function useDropZone( {
 				ownerDocument.removeEventListener( 'dragend', maybeDragEnd );
 				ownerDocument.removeEventListener( 'mousemove', maybeDragEnd );
 
-				if ( onDragEndRef.current ) {
-					onDragEndRef.current( event );
+				if ( _onDragEnd ) {
+					onDragEndEvent( event );
 				}
 			}
 
-			element.dataset.isDropZone = 'true';
+			element.setAttribute( 'data-is-drop-zone', 'true' );
 			element.addEventListener( 'drop', onDrop );
 			element.addEventListener( 'dragenter', onDragEnter );
 			element.addEventListener( 'dragover', onDragOver );
@@ -224,7 +198,7 @@ export default function useDropZone( {
 			ownerDocument.addEventListener( 'dragenter', maybeDragStart );
 
 			return () => {
-				delete element.dataset.isDropZone;
+				element.removeAttribute( 'data-is-drop-zone' );
 				element.removeEventListener( 'drop', onDrop );
 				element.removeEventListener( 'dragenter', onDragEnter );
 				element.removeEventListener( 'dragover', onDragOver );

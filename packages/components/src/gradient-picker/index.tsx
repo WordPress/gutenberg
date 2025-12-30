@@ -8,7 +8,9 @@ import { useCallback, useMemo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import CircularOptionPicker from '../circular-option-picker';
+import CircularOptionPicker, {
+	getComputeCircularOptionPickerCommonProps,
+} from '../circular-option-picker';
 import CustomGradientPicker from '../custom-gradient-picker';
 import { VStack } from '../v-stack';
 import { ColorHeading } from '../color-palette/styles';
@@ -128,37 +130,17 @@ function Component( props: PickerProps< any > ) {
 		<SingleOrigin { ...additionalProps } />
 	);
 
-	let metaProps:
-		| { asButtons: false; loop?: boolean; 'aria-label': string }
-		| { asButtons: false; loop?: boolean; 'aria-labelledby': string }
-		| { asButtons: true };
-
-	if ( asButtons ) {
-		metaProps = { asButtons: true };
-	} else {
-		const _metaProps: { asButtons: false; loop?: boolean } = {
-			asButtons: false,
-			loop,
-		};
-
-		if ( ariaLabel ) {
-			metaProps = { ..._metaProps, 'aria-label': ariaLabel };
-		} else if ( ariaLabelledby ) {
-			metaProps = {
-				..._metaProps,
-				'aria-labelledby': ariaLabelledby,
-			};
-		} else {
-			metaProps = {
-				..._metaProps,
-				'aria-label': __( 'Custom color picker.' ),
-			};
-		}
-	}
+	const { metaProps, labelProps } = getComputeCircularOptionPickerCommonProps(
+		asButtons,
+		loop,
+		ariaLabel,
+		ariaLabelledby
+	);
 
 	return (
 		<CircularOptionPicker
 			{ ...metaProps }
+			{ ...labelProps }
 			actions={ actions }
 			options={ options }
 		/>
@@ -166,44 +148,44 @@ function Component( props: PickerProps< any > ) {
 }
 
 /**
- *  GradientPicker is a React component that renders a color gradient picker to
+ * GradientPicker is a React component that renders a color gradient picker to
  * define a multi step gradient. There's either a _linear_ or a _radial_ type
  * available.
  *
  * ```jsx
- *import { GradientPicker } from '@wordpress/components';
- *import { useState } from '@wordpress/element';
+ * import { useState } from 'react';
+ * import { GradientPicker } from '@wordpress/components';
  *
- *const myGradientPicker = () => {
- *	const [ gradient, setGradient ] = useState( null );
+ * const MyGradientPicker = () => {
+ *   const [ gradient, setGradient ] = useState( null );
  *
- *	return (
- *		<GradientPicker
- *			value={ gradient }
- *			onChange={ ( currentGradient ) => setGradient( currentGradient ) }
- *			gradients={ [
- *				{
- *					name: 'JShine',
- *					gradient:
- *						'linear-gradient(135deg,#12c2e9 0%,#c471ed 50%,#f64f59 100%)',
- *					slug: 'jshine',
- *				},
- *				{
- *					name: 'Moonlit Asteroid',
- *					gradient:
- *						'linear-gradient(135deg,#0F2027 0%, #203A43 0%, #2c5364 100%)',
- *					slug: 'moonlit-asteroid',
- *				},
- *				{
- *					name: 'Rastafarie',
- *					gradient:
- *						'linear-gradient(135deg,#1E9600 0%, #FFF200 0%, #FF0000 100%)',
- *					slug: 'rastafari',
- *				},
- *			] }
- *		/>
- *	);
- *};
+ *   return (
+ *     <GradientPicker
+ *       value={ gradient }
+ *       onChange={ ( currentGradient ) => setGradient( currentGradient ) }
+ *       gradients={ [
+ *         {
+ *           name: 'JShine',
+ *           gradient:
+ *             'linear-gradient(135deg,#12c2e9 0%,#c471ed 50%,#f64f59 100%)',
+ *           slug: 'jshine',
+ *         },
+ *         {
+ *           name: 'Moonlit Asteroid',
+ *           gradient:
+ *             'linear-gradient(135deg,#0F2027 0%, #203A43 0%, #2c5364 100%)',
+ *           slug: 'moonlit-asteroid',
+ *         },
+ *         {
+ *           name: 'Rastafarie',
+ *           gradient:
+ *             'linear-gradient(135deg,#1E9600 0%, #FFF200 0%, #FF0000 100%)',
+ *           slug: 'rastafari',
+ *         },
+ *       ] }
+ *     />
+ *   );
+ * };
  *```
  *
  */
@@ -213,6 +195,7 @@ export function GradientPicker( {
 	onChange,
 	value,
 	clearable = true,
+	enableAlpha = true,
 	disableCustomGradients = false,
 	__experimentalIsRenderedInSidebar,
 	headingLevel = 2,
@@ -230,6 +213,7 @@ export function GradientPicker( {
 					__experimentalIsRenderedInSidebar={
 						__experimentalIsRenderedInSidebar
 					}
+					enableAlpha={ enableAlpha }
 					value={ value }
 					onChange={ onChange }
 				/>
@@ -247,6 +231,8 @@ export function GradientPicker( {
 						! disableCustomGradients && (
 							<CircularOptionPicker.ButtonAction
 								onClick={ clearGradient }
+								accessibleWhenDisabled
+								disabled={ ! value }
 							>
 								{ __( 'Clear' ) }
 							</CircularOptionPicker.ButtonAction>

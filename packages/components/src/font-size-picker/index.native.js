@@ -9,7 +9,7 @@ import { View, useWindowDimensions } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useState } from '@wordpress/element';
 import { Icon, chevronRight, check } from '@wordpress/icons';
-import { __, sprintf } from '@wordpress/i18n';
+import { __, _x, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -63,8 +63,8 @@ function FontSizePicker( {
 	} );
 
 	const accessibilityLabel = sprintf(
-		// translators: %1$s: Font size name e.g. Small
-		__( 'Font Size, %1$s' ),
+		// translators: %s: Font size name e.g. Small
+		__( 'Font Size, %s' ),
 		selectedOption.name
 	);
 
@@ -77,8 +77,8 @@ function FontSizePicker( {
 					value={
 						selectedValue
 							? sprintf(
-									// translators: %1$s: Select control font size name e.g. Small, %2$s: Select control font size e.g. 12px
-									__( '%1$s (%2$s)' ),
+									// translators: 1: Select control font size name e.g. Small. 2: Select control font size e.g. 12px
+									_x( '%1$s (%2$s)', 'font size' ),
 									selectedOption.name,
 									selectedPxValue
 							  )
@@ -88,7 +88,7 @@ function FontSizePicker( {
 					accessibilityRole="button"
 					accessibilityLabel={ accessibilityLabel }
 					accessibilityHint={ sprintf(
-						// translators: %s: Select control button label e.g. Small
+						// translators: %s: Select control button label e.g. "Button width"
 						__( 'Navigates to select %s' ),
 						selectedOption.name
 					) }
@@ -126,7 +126,7 @@ function FontSizePicker( {
 						</View>
 					</BottomSheet.Cell>
 					{ fontSizes.map( ( item, index ) => {
-						// Only display a choice that we can currenly select.
+						// Only display a choice that we can currently select.
 						if ( ! parseFloat( item.sizePx ) ) {
 							return null;
 						}
@@ -143,7 +143,7 @@ function FontSizePicker( {
 								accessibilityLabel={
 									item.sizePx === selectedValue
 										? sprintf(
-												// translators: %s: Select font size option value e.g: "Selected: Large".
+												// translators: %s: The selected option.
 												__( 'Selected: %s' ),
 												item.name
 										  )

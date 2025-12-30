@@ -104,7 +104,6 @@ const GradientTypePicker = ( {
 
 	return (
 		<SelectControl
-			__nextHasNoMarginBottom
 			className="components-custom-gradient-picker__type-picker"
 			label={ __( 'Type' ) }
 			labelPosition="top"
@@ -140,6 +139,7 @@ const GradientTypePicker = ( {
 export function CustomGradientPicker( {
 	value,
 	onChange,
+	enableAlpha = true,
 	__experimentalIsRenderedInSidebar = false,
 }: CustomGradientPickerProps ) {
 	const { gradientAST, hasGradient } = getGradientAstWithDefault( value );
@@ -167,6 +167,7 @@ export function CustomGradientPicker( {
 				__experimentalIsRenderedInSidebar={
 					__experimentalIsRenderedInSidebar
 				}
+				disableAlpha={ ! enableAlpha }
 				background={ background }
 				hasGradient={ hasGradient }
 				value={ controlPoints }

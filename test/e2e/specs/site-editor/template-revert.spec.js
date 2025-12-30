@@ -232,11 +232,11 @@ class TemplateRevertUtils {
 	async getCurrentSiteEditorContent() {
 		return this.page.evaluate( () => {
 			const postId = window.wp.data
-				.select( 'core/edit-site' )
-				.getEditedPostId();
+				.select( 'core/editor' )
+				.getCurrentPostId();
 			const postType = window.wp.data
-				.select( 'core/edit-site' )
-				.getEditedPostType();
+				.select( 'core/editor' )
+				.getCurrentPostType();
 			const record = window.wp.data
 				.select( 'core' )
 				.getEditedEntityRecord( 'postType', postType, postId );

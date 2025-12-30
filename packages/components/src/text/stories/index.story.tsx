@@ -10,7 +10,8 @@ import { Text } from '../component';
 
 const meta: Meta< typeof Text > = {
 	component: Text,
-	title: 'Components (Experimental)/Text',
+	title: 'Components/Typography/Text',
+	id: 'components-text',
 	argTypes: {
 		as: { control: { type: 'text' } },
 		color: { control: { type: 'color' } },
@@ -25,8 +26,8 @@ const meta: Meta< typeof Text > = {
 		},
 		weight: { control: { type: 'text' } },
 	},
+	tags: [ 'status-experimental' ],
 	parameters: {
-		actions: { argTypesRegex: '^on.*' },
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
 	},
@@ -48,7 +49,7 @@ Truncate.args = {
 facilisis dictum tortor, eu tincidunt justo scelerisque tincidunt.
 Duis semper dui id augue malesuada, ut feugiat nisi aliquam.
 Vestibulum venenatis diam sem, finibus dictum massa semper in. Nulla
-facilisi. Nunc vulputate faucibus diam, in lobortis arcu ornare vel.
+facilities. Nunc vulputate faucibus diam, in lobortis arcu ornare vel.
 In dignissim nunc sed facilisis finibus. Etiam imperdiet mattis
 arcu, sed rutrum sapien blandit gravida. Aenean sollicitudin neque
 eget enim blandit, sit amet rutrum leo vehicula. Nunc malesuada
@@ -67,7 +68,7 @@ Highlight.args = {
 facilisis dictum tortor, eu tincidunt justo scelerisque tincidunt.
 Duis semper dui id augue malesuada, ut feugiat nisi aliquam.
 Vestibulum venenatis diam sem, finibus dictum massa semper in. Nulla
-facilisi. Nunc vulputate faucibus diam, in lobortis arcu ornare vel.
+facilities. Nunc vulputate faucibus diam, in lobortis arcu ornare vel.
 In dignissim nunc sed facilisis finibus. Etiam imperdiet mattis
 arcu, sed rutrum sapien blandit gravida. Aenean sollicitudin neque
 eget enim blandit, sit amet rutrum leo vehicula. Nunc malesuada

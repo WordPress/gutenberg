@@ -28,15 +28,23 @@ import usePostTitleFocus from './use-post-title-focus';
 import usePostTitle from './use-post-title';
 import PostTypeSupportCheck from '../post-type-support-check';
 
-function PostTitle( _, forwardedRef ) {
-	const { placeholder } = useSelect( ( select ) => {
-		const { getSettings } = select( blockEditorStore );
-		const { titlePlaceholder } = getSettings();
+import { unlock } from '../../lock-unlock';
 
-		return {
-			placeholder: titlePlaceholder,
-		};
-	}, [] );
+const PostTitle = forwardRef( ( _, forwardedRef ) => {
+	const { placeholder, isEditingContentOnlySection } = useSelect(
+		( select ) => {
+			const { getSettings, getEditedContentOnlySection } = unlock(
+				select( blockEditorStore )
+			);
+			const { titlePlaceholder } = getSettings();
+
+			return {
+				placeholder: titlePlaceholder,
+				isEditingContentOnlySection: !! getEditedContentOnlySection(),
+			};
+		},
+		[]
+	);
 
 	const [ isSelected, setIsSelected ] = useState( false );
 
@@ -169,25 +177,28 @@ function PostTitle( _, forwardedRef ) {
 		'is-selected': isSelected,
 	} );
 
+	// Because the title is within the editor iframe, we can't use scss styles.
+	// Instead use an inline style to dim the block when it's disabled.
+	const style = isEditingContentOnlySection ? { opacity: 0.2 } : undefined;
+
 	return (
 		/* eslint-disable jsx-a11y/heading-has-content, jsx-a11y/no-noninteractive-element-to-interactive-role */
-		<PostTypeSupportCheck supportKeys="title">
-			<h1
-				ref={ useMergeRefs( [ richTextRef, focusRef ] ) }
-				contentEditable
-				className={ className }
-				aria-label={ decodedPlaceholder }
-				role="textbox"
-				aria-multiline="true"
-				onFocus={ onSelect }
-				onBlur={ onUnselect }
-				onKeyDown={ onKeyDown }
-				onPaste={ onPaste }
-			/>
-		</PostTypeSupportCheck>
+		<h1
+			ref={ useMergeRefs( [ richTextRef, focusRef ] ) }
+			contentEditable={ ! isEditingContentOnlySection }
+			className={ className }
+			aria-label={ decodedPlaceholder }
+			role="textbox"
+			aria-multiline="true"
+			onFocus={ onSelect }
+			onBlur={ onUnselect }
+			onKeyDown={ onKeyDown }
+			onPaste={ onPaste }
+			style={ style }
+		/>
 		/* eslint-enable jsx-a11y/heading-has-content, jsx-a11y/no-noninteractive-element-to-interactive-role */
 	);
-}
+} );
 
 /**
  * Renders the `PostTitle` component.
@@ -195,6 +206,10 @@ function PostTitle( _, forwardedRef ) {
  * @param {Object}  _            Unused parameter.
  * @param {Element} forwardedRef Forwarded ref for the component.
  *
- * @return {Component} The rendered PostTitle component.
+ * @return {React.ReactNode} The rendered PostTitle component.
  */
-export default forwardRef( PostTitle );
+export default forwardRef( ( _, forwardedRef ) => (
+	<PostTypeSupportCheck supportKeys="title">
+		<PostTitle ref={ forwardedRef } />
+	</PostTypeSupportCheck>
+) );

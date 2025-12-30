@@ -46,19 +46,33 @@ function BlockKeyboardShortcuts() {
 		) {
 			return;
 		}
+		const newAttributes = {
+			content: attributes.content,
+		};
 
-		const textAlign =
-			blockName === 'core/paragraph' ? 'align' : 'textAlign';
-		const destinationTextAlign =
-			destinationBlockName === 'core/paragraph' ? 'align' : 'textAlign';
+		// Read textAlign from source block (could be in old or new format)
+		const sourceTextAlign =
+			attributes.textAlign || attributes.style?.typography?.textAlign;
+
+		// When destination is heading, preserve heading format (textAlign attribute + level)
+		// When destination is paragraph, use block support format (style.typography.textAlign)
+		if ( destinationBlockName === 'core/heading' ) {
+			newAttributes.level = level;
+			if ( sourceTextAlign ) {
+				newAttributes.textAlign = sourceTextAlign;
+			}
+		} else if ( sourceTextAlign ) {
+			// Destination is paragraph
+			newAttributes.style = {
+				typography: {
+					textAlign: sourceTextAlign,
+				},
+			};
+		}
 
 		replaceBlocks(
 			currentClientId,
-			createBlock( destinationBlockName, {
-				level,
-				content: attributes.content,
-				...{ [ destinationTextAlign ]: attributes[ textAlign ] },
-			} )
+			createBlock( destinationBlockName, newAttributes )
 		);
 	};
 
@@ -90,22 +104,36 @@ function BlockKeyboardShortcuts() {
 				},
 			} );
 		} );
-	}, [] );
+	}, [ registerShortcut ] );
 
 	useShortcut(
 		'core/block-editor/transform-heading-to-paragraph',
 		( event ) => handleTransformHeadingAndParagraph( event, 0 )
 	);
-
-	[ 1, 2, 3, 4, 5, 6 ].forEach( ( level ) => {
-		//the loop is based off on a constant therefore
-		//the hook will execute the same way every time
-		//eslint-disable-next-line react-hooks/rules-of-hooks
-		useShortcut(
-			`core/block-editor/transform-paragraph-to-heading-${ level }`,
-			( event ) => handleTransformHeadingAndParagraph( event, level )
-		);
-	} );
+	useShortcut(
+		'core/block-editor/transform-paragraph-to-heading-1',
+		( event ) => handleTransformHeadingAndParagraph( event, 1 )
+	);
+	useShortcut(
+		'core/block-editor/transform-paragraph-to-heading-2',
+		( event ) => handleTransformHeadingAndParagraph( event, 2 )
+	);
+	useShortcut(
+		'core/block-editor/transform-paragraph-to-heading-3',
+		( event ) => handleTransformHeadingAndParagraph( event, 3 )
+	);
+	useShortcut(
+		'core/block-editor/transform-paragraph-to-heading-4',
+		( event ) => handleTransformHeadingAndParagraph( event, 4 )
+	);
+	useShortcut(
+		'core/block-editor/transform-paragraph-to-heading-5',
+		( event ) => handleTransformHeadingAndParagraph( event, 5 )
+	);
+	useShortcut(
+		'core/block-editor/transform-paragraph-to-heading-6',
+		( event ) => handleTransformHeadingAndParagraph( event, 6 )
+	);
 
 	return null;
 }

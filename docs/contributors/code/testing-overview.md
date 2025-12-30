@@ -29,7 +29,7 @@ Assuming you've followed the [instructions](/docs/contributors/code/getting-star
 npm test
 ```
 
-Linting is static code analysis used to enforce coding standards and to avoid potential errors. This project uses [ESLint](http://eslint.org/) and [TypeScript's JavaScript type-checking](https://www.typescriptlang.org/docs/handbook/type-checking-javascript-files.html) to capture these issues. While the above `npm test` will execute both unit tests and code linting, code linting can be verified independently by running `npm run lint`. Some JavaScript issues can be fixed automatically by running `npm run lint:js:fix`.
+Linting is static code analysis used to enforce coding standards and to avoid potential errors. This project uses [ESLint](https://eslint.org/) and [TypeScript's JavaScript type-checking](https://www.typescriptlang.org/docs/handbook/type-checking-javascript-files.html) to capture these issues. While the above `npm test` will execute both unit tests and code linting, code linting can be verified independently by running `npm run lint`. Some JavaScript issues can be fixed automatically by running `npm run lint:js:fix`.
 
 To improve your developer workflow, you should setup an editor linting integration. See the [getting started documentation](/docs/contributors/code/getting-started-with-code-contribution.md) for additional information.
 
@@ -614,6 +614,36 @@ Code style in PHP is enforced using [PHP_CodeSniffer](https://github.com/squizla
 
 To run unit tests only, without the linter, use `npm run test:unit:php` instead.
 
+### Testing Prefixed Functions
+
+Gutenberg's build system automatically prefixes PHP functions with `gutenberg_` to avoid conflicts with WordPress Core. When writing tests for block functions, you must test the **built (prefixed) versions** of functions, not the source versions.
+
+If the tests are backported to WordPress Core, then they must be updated to test the non-prefixed functions.
+
+#### Writing Tests for Prefixed Functions & Classes
+
+Always test the built (prefixed) function names and class names in your PHPUnit tests:
+
+```php
+// phpunit/blocks/my-block-test.php
+class My_Block_Test extends WP_UnitTestCase {
+    public function test_my_function() {
+        // Test the built function (with gutenberg_ prefix)
+        $result = gutenberg_block_core_my_block_render_function( $args );
+        $this->assertEquals( $expected, $result );
+    }
+
+    public function test_my_class() {
+        // Test the built class (with _Gutenberg suffix)
+        $handler = new WP_Example_Block_Handler_Gutenberg();
+        $result = $handler->process( $input );
+        $this->assertEquals( $expected, $result );
+    }
+}
+```
+
+For more detailed information about the build system and function prefixing, see the [Build System: Function Prefixing and Block Loading](/docs/contributors/code/build-system-function-prefixing.md) documentation.
+
 [snapshot testing]: https://jestjs.io/docs/en/snapshot-testing.html
 [update snapshots]: https://jestjs.io/docs/en/snapshot-testing.html#updating-snapshots
 
@@ -631,7 +661,7 @@ To set up the e2e testing environment, checkout the Gutenberg repository and swi
 
 ```
 nvm use && npm install
-npm run build:packages
+npm run build
 ```
 
 To run the tests run the following command:

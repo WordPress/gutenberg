@@ -2,7 +2,6 @@
  * External dependencies
  */
 import * as Ariakit from '@ariakit/react';
-import { useStoreState } from '@ariakit/react';
 import clsx from 'clsx';
 import type { ForwardedRef } from 'react';
 
@@ -16,6 +15,7 @@ import {
 	useCallback,
 } from '@wordpress/element';
 import { useInstanceId, usePrevious } from '@wordpress/compose';
+import { isRTL } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -120,10 +120,11 @@ const UnforwardedTabPanel = (
 		orientation,
 		selectOnMove,
 		defaultSelectedId: prependInstanceId( initialTabName ),
+		rtl: isRTL(),
 	} );
 
 	const selectedTabName = extractTabName(
-		useStoreState( tabStore, 'selectedId' )
+		Ariakit.useStoreState( tabStore, 'selectedId' )
 	);
 
 	const setTabStoreSelectedId = useCallback(
@@ -218,6 +219,7 @@ const UnforwardedTabPanel = (
 							) }-view` }
 							render={
 								<Button
+									__next40pxDefaultSize
 									icon={ tab.icon }
 									label={ tab.icon && tab.title }
 									showTooltip={ !! tab.icon }

@@ -1,0 +1,112 @@
+import { Meta } from '@storybook/blocks';
+import { Badge } from '../index';
+
+<Meta title="Design System/Components/Badge/Choosing intent" />
+
+# Choosing intent
+
+<div style={ { padding: '2rem', display: 'flex', justifyContent: 'center', gap: '0.5rem', flexWrap: 'wrap', border: '1px solid #e0e0e0', borderRadius: '0.5rem' } }>
+	<Badge intent="high">high</Badge>
+	<Badge intent="medium">medium</Badge>
+	<Badge intent="low">low</Badge>
+	<Badge intent="stable">stable</Badge>
+	<Badge intent="informational">informational</Badge>
+	<Badge intent="draft">draft</Badge>
+	<Badge intent="none">none</Badge>
+</div>
+
+It can be difficult to determine which badge intent to use because the component's properties are not tied to any specific product view. Those properties should be balanced against the requirements of the view in which the badge appears, all while keeping an eye on high-level consistency (global statuses that appear across multiple views).
+
+Here is a decision tree to help identify which badge to use.
+
+## 1. Ask first: should this draw the eye?
+
+If the user scans this screen, should their attention be drawn to this badge?
+
+-   If **no** → use `none` (or even just plain text; no badge), even if the state is positive or "stable".
+-   If **yes** → pick an intent based on how important the action or awareness is.
+
+## 2. High / Medium / Low = action priority
+
+Use when there's something for the user to act on.
+
+### `high` – Critical / top priority
+
+* Needs attention as soon as possible
+* _E.g. "Payment declined", "Security issue"_
+
+<Badge intent="high">Payment declined</Badge> <Badge intent="high">Security issue</Badge>
+
+### `medium` – Important / blocks progress
+
+* Blocks a key task, should be handled soon
+* _E.g. "Approval required", "Review needed"_
+
+<Badge intent="medium">Approval required</Badge> <Badge intent="medium">Review needed</Badge>
+
+### `low` – Worth noticing / non‑urgent
+
+* Good to be aware of; action may be optional or later
+* _E.g. "Pending", "Queued", "Minor issues", "Optional setup"_
+
+<Badge intent="low">Pending</Badge> <Badge intent="low">Queued</Badge>
+
+## 3. Informational / draft = special non-final states
+
+### `informational` – Notable, no action / fix needed
+
+* Context only; no clear action
+* _E.g. "Scheduled", "Beta", "Internal only"_
+
+<Badge intent="informational">Scheduled</Badge> <Badge intent="informational">Beta</Badge>
+
+### `draft` – Not final / work in progress
+
+* _E.g. "Draft", "Unpublished", "Work in progress"_
+
+<Badge intent="draft">Draft</Badge> <Badge intent="draft">Unpublished</Badge>
+
+## 4. Stable / none = normal states
+
+### `stable` – Positive / "healthy" state
+
+* Use when confirming success or "all good" is important in that view
+* _E.g. "Healthy", "Active", "Live"_
+
+<Badge intent="stable">Healthy</Badge> <Badge intent="stable">Active</Badge>
+
+### `none` – Default for normal / background states
+
+* Especially in dense lists where too much color creates visual noise
+* _E.g. "Inactive", "Expired"_
+
+<Badge intent="none">Inactive</Badge> <Badge intent="none">Expired</Badge>
+
+## Examples
+
+### Comment status:
+
+-   "Approved" → `none`: <Badge intent="none">Approved</Badge>
+-   "Approval required" → `medium`: <Badge intent="medium">Approval required</Badge>
+
+### Page status:
+
+-   "Published" → `none`: <Badge intent="none">Published</Badge>
+-   "Pending" → `low`: <Badge intent="low">Pending</Badge>
+-   "Draft" → `draft`: <Badge intent="draft">Draft</Badge>
+-   "Scheduled" → `informational`: <Badge intent="informational">Scheduled</Badge>
+-   "Private" → `informational`: <Badge intent="informational">Private</Badge>
+
+### Plugin status:
+
+-   "Active" → `stable`: <Badge intent="stable">Active</Badge>
+-   "Inactive" → `none`: <Badge intent="none">Inactive</Badge>
+
+## 5. When in doubt…
+
+Use the least attention‑grabbing intent that still:
+
+-   Makes it clear what needs attention,
+-   Marks what isn't final, or
+-   Confirms a key success state in that context.
+

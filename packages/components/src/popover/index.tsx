@@ -39,6 +39,7 @@ import {
 import { close } from '@wordpress/icons';
 import deprecated from '@wordpress/deprecated';
 import { Path, SVG } from '@wordpress/primitives';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -58,6 +59,7 @@ import type {
 	PopoverProps,
 	PopoverAnchorRefReference,
 	PopoverAnchorRefTopBottom,
+	PopoverSlotProps,
 } from './types';
 import { overlayMiddlewares } from './overlay-middlewares';
 import { StyleProvider } from '../style-provider';
@@ -68,6 +70,13 @@ import { StyleProvider } from '../style-provider';
  * @type {string}
  */
 export const SLOT_NAME = 'Popover';
+
+/**
+ * Virtual padding to account for overflow boundaries.
+ *
+ * @type {number}
+ */
+const OVERFLOW_PADDING = 8;
 
 // An SVG displaying a triangle facing down, filled with a solid
 // color and bordered in such a way to create an arrow-like effect.
@@ -93,6 +102,7 @@ const ArrowTriangle = () => (
 );
 
 const slotNameContext = createContext< string | undefined >( undefined );
+slotNameContext.displayName = '__unstableSlotNameContext';
 
 const fallbackContainerClassname = 'components-popover__fallback-container';
 const getPopoverFallbackContainer = () => {
@@ -222,6 +232,7 @@ const UnforwardedPopover = (
 		computedFlipProp && flipMiddleware(),
 		computedResizeProp &&
 			size( {
+				padding: OVERFLOW_PADDING,
 				apply( sizeProps ) {
 					const { firstElementChild } = refs.floating.current ?? {};
 
@@ -232,7 +243,10 @@ const UnforwardedPopover = (
 
 					// Reduce the height of the popover to the available space.
 					Object.assign( firstElementChild.style, {
-						maxHeight: `${ sizeProps.availableHeight }px`,
+						maxHeight: `${ Math.max(
+							0,
+							sizeProps.availableHeight
+						) }px`,
 						overflow: 'auto',
 					} );
 				},
@@ -254,9 +268,30 @@ const UnforwardedPopover = (
 		onDialogClose = ( type: string | undefined, event: SyntheticEvent ) => {
 			// Ideally the popover should have just a single onClose prop and
 			// not three props that potentially do the same thing.
-			if ( type === 'focus-outside' && onFocusOutside ) {
-				onFocusOutside( event );
+			if ( type === 'focus-outside' ) {
+				// Check if this blur event is actually relevant to this popover
+				const blurTarget = event?.target as Element;
+				const referenceElement = refs.reference.current;
+				const floatingElement = refs.floating.current;
+
+				// Check if blur is from this popover's reference element or its floating content
+				const isBlurFromThisPopover =
+					( referenceElement &&
+						'contains' in referenceElement &&
+						referenceElement.contains( blurTarget ) ) ||
+					floatingElement?.contains( blurTarget );
+				// Only proceed if the blur is actually from this popover
+				if ( ! isBlurFromThisPopover ) {
+					return;
+				}
+				// Call onFocusOutside if defined or call onClose.
+				if ( onFocusOutside ) {
+					onFocusOutside( event );
+				} else if ( onClose ) {
+					onClose();
+				}
 			} else if ( onClose ) {
+				// onClose should be called for other event types if it exists.
 				onClose();
 			}
 		};
@@ -419,8 +454,10 @@ const UnforwardedPopover = (
 					</span>
 					<Button
 						className="components-popover__close"
+						size="small"
 						icon={ close }
 						onClick={ onClose }
+						label={ __( 'Close' ) }
 					/>
 				</div>
 			) }
@@ -475,6 +512,20 @@ const UnforwardedPopover = (
 	);
 };
 
+// Export the PopoverSlot individually to allow typescript to pick the types up.
+export const PopoverSlot = forwardRef< HTMLDivElement, PopoverSlotProps >(
+	( { name = SLOT_NAME }, ref ) => {
+		return (
+			<Slot
+				bubblesVirtually
+				name={ name }
+				className="popover-slot"
+				ref={ ref }
+			/>
+		);
+	}
+);
+
 /**
  * `Popover` renders its content in a floating modal. If no explicit anchor is passed via props, it anchors to its parent element by default.
  *
@@ -498,25 +549,24 @@ const UnforwardedPopover = (
  * ```
  *
  */
-export const Popover = contextConnect( UnforwardedPopover, 'Popover' );
-
-function PopoverSlot(
-	{ name = SLOT_NAME }: { name?: string },
-	ref: ForwardedRef< any >
-) {
-	return (
-		<Slot
-			bubblesVirtually
-			name={ name }
-			className="popover-slot"
-			ref={ ref }
-		/>
-	);
-}
-
-// @ts-expect-error For Legacy Reasons
-Popover.Slot = forwardRef( PopoverSlot );
-// @ts-expect-error For Legacy Reasons
-Popover.__unstableSlotNameProvider = slotNameContext.Provider;
+export const Popover = Object.assign(
+	contextConnect( UnforwardedPopover, 'Popover' ),
+	{
+		/**
+		 * Renders a slot that is used internally by Popover for rendering content.
+		 */
+		Slot: Object.assign( PopoverSlot, {
+			displayName: 'Popover.Slot',
+		} ),
+		/**
+		 * Provides a context to manage popover slot names.
+		 *
+		 * This is marked as unstable and should not be used directly.
+		 */
+		__unstableSlotNameProvider: Object.assign( slotNameContext.Provider, {
+			displayName: 'Popover.__unstableSlotNameProvider',
+		} ),
+	}
+);
 
 export default Popover;

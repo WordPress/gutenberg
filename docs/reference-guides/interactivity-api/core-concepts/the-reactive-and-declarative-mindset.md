@@ -28,6 +28,15 @@ Take, for example, this interactive block with two buttons and a paragraph:
 	<p id="status-paragraph" class="inactive" hidden>this is inactive</p>
 </div>
 
+<style>
+	.active {
+		color: green;
+	}
+	.inactive {
+		color: red;
+	}
+</style>
+
 <script>
 	const showHideBtn = document.getElementById( 'show-hide-btn' );
 	const activateBtn = document.getElementById( 'activate-btn' );
@@ -101,6 +110,15 @@ The declarative approach simplifies the process by focusing on _what_ should hap
 		this is inactive
 	</p>
 </div>
+
+<style>
+	.active {
+		color: green;
+	}
+	.inactive {
+		color: red;
+	}
+</style>
 ```
 
 ```js
@@ -136,7 +154,7 @@ In this declarative example, the UI automatically updates based on the current s
 
 ### Can you spot the bug?
 
-In the imperative example, a bug has been intentionally introduced for didactical purposes. Can you find it? It's not easy!
+In the imperative example, a bug has been intentionally introduced for didactic purposes. Can you find it? It's not easy!
 
 <details>
 <summary>Show me the answer!</summary>

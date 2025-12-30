@@ -272,6 +272,21 @@ exports[`recordToDom should not error with overlapping formats (2) 1`] = `
 </body>
 `;
 
+exports[`recordToDom should preserve comments 1`] = `
+<body>
+  
+  <span
+    contenteditable="false"
+    data-rich-text-comment="comment"
+  >
+    <span>
+      comment
+    </span>
+  </span>
+  
+</body>
+`;
+
 exports[`recordToDom should preserve emoji 1`] = `
 <body>
   🍒
@@ -289,6 +304,21 @@ exports[`recordToDom should preserve emoji in formatting 1`] = `
 </body>
 `;
 
+exports[`recordToDom should preserve funky comments 1`] = `
+<body>
+  
+  <span
+    contenteditable="false"
+    data-rich-text-comment="/funky"
+  >
+    <span>
+      /funky
+    </span>
+  </span>
+  
+</body>
+`;
+
 exports[`recordToDom should preserve non breaking space 1`] = `
 <body>
   test  test
@@ -299,5 +329,30 @@ exports[`recordToDom should remove padding 1`] = `
 <body>
   
   ﻿
+</body>
+`;
+
+exports[`recordToDom should unwrap element with data-rich-text-bogus attribute 1`] = `
+<body>
+  test
+</body>
+`;
+
+exports[`recordToDom should unwrap nested data-rich-text-bogus elements 1`] = `
+<body>
+  <strong>
+    te
+  </strong>
+  st
+</body>
+`;
+
+exports[`recordToDom should unwrap data-rich-text-bogus element but preserve child formatting 1`] = `
+<body>
+  hello 
+  <em>
+    world
+  </em>
+  
 </body>
 `;

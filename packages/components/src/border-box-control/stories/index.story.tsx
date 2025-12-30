@@ -20,7 +20,7 @@ const meta: Meta< typeof BorderBoxControl > = {
 	component: BorderBoxControl,
 	argTypes: {
 		onChange: { action: 'onChange' },
-		value: { control: { type: null } },
+		value: { control: false },
 	},
 	parameters: {
 		controls: { expanded: true },
@@ -84,4 +84,5 @@ Default.args = {
 	colors,
 	label: 'Borders',
 	enableStyle: true,
+	__next40pxDefaultSize: true,
 };

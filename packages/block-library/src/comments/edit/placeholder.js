@@ -16,10 +16,11 @@ export default function PostCommentsPlaceholder( { postType, postId } ) {
 	let [ postTitle ] = useEntityProp( 'postType', postType, 'title', postId );
 	postTitle = postTitle || __( 'Post Title' );
 
-	const { avatarURL } = useSelect(
+	const avatarURL = useSelect(
 		( select ) =>
 			select( blockEditorStore ).getSettings()
-				.__experimentalDiscussionSettings
+				.__experimentalDiscussionSettings?.avatarURL,
+		[]
 	);
 
 	return (

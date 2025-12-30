@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { trash } from '@wordpress/icons';
-import { __, _n, sprintf } from '@wordpress/i18n';
+import { __, _x, _n, sprintf } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
 import {
 	Button,
@@ -47,6 +47,7 @@ const deletePostAction: Action< Template | TemplatePart | Pattern > = {
 	},
 	supportsBulk: true,
 	hideModalHeader: true,
+	modalFocusOnMount: 'firstContentElement',
 	RenderModal: ( { items, closeModal, onActionPerformed } ) => {
 		const [ isBusy, setIsBusy ] = useState( false );
 		const isResetting = items.every(
@@ -66,8 +67,8 @@ const deletePostAction: Action< Template | TemplatePart | Pattern > = {
 								items.length
 						  )
 						: sprintf(
-								// translators: %s: The template or template part's titles
-								__( 'Delete "%s"?' ),
+								// translators: %s: The template or template part's title
+								_x( 'Delete "%s"?', 'template part' ),
 								getItemTitle( items[ 0 ] )
 						  ) }
 				</Text>
@@ -93,15 +94,18 @@ const deletePostAction: Action< Template | TemplatePart | Pattern > = {
 										getMessage: ( item ) => {
 											return isResetting
 												? sprintf(
-														/* translators: The template/part's name. */
+														/* translators: %s: The template/part's name. */
 														__( '"%s" reset.' ),
 														decodeEntities(
 															getItemTitle( item )
 														)
 												  )
 												: sprintf(
-														/* translators: The template/part's name. */
-														__( '"%s" deleted.' ),
+														/* translators: %s: The template/part's name. */
+														_x(
+															'"%s" deleted.',
+															'template part'
+														),
 														decodeEntities(
 															getItemTitle( item )
 														)
@@ -200,4 +204,7 @@ const deletePostAction: Action< Template | TemplatePart | Pattern > = {
 	},
 };
 
+/**
+ * Delete action for Templates, Patterns and Template Parts.
+ */
 export default deletePostAction;

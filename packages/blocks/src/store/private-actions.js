@@ -7,7 +7,7 @@ import { processBlockType } from './process-block-type';
 
 /**
  * Add bootstrapped block type metadata to the store. These metadata usually come from
- * the `block.json` file and are either statically boostrapped from the server, or
+ * the `block.json` file and are either statically bootstrapped from the server, or
  * passed as the `metadata` parameter to the `registerBlockType` function.
  *
  * @param {string}      name      Block name.
@@ -68,19 +68,5 @@ export function removeBlockBindingsSource( name ) {
 	return {
 		type: 'REMOVE_BLOCK_BINDINGS_SOURCE',
 		name,
-	};
-}
-
-/**
- * Add bootstrapped block bindings sources, usually initialized from the server.
- *
- * @param {string} source Name of the source to bootstrap.
- */
-export function addBootstrappedBlockBindingsSource( source ) {
-	return {
-		type: 'ADD_BOOTSTRAPPED_BLOCK_BINDINGS_SOURCE',
-		name: source.name,
-		label: source.label,
-		usesContext: source.usesContext,
 	};
 }

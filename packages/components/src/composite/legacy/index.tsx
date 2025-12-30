@@ -151,8 +151,11 @@ function proxyComposite< C extends Component >(
 
 		const { store, ...rest } =
 			mapLegacyStatePropsToComponentProps( legacyProps );
-		const props = rest as ComponentProps< C >;
-		props.id = useInstanceId( store, props.baseId, props.id );
+		let props = rest as ComponentProps< C >;
+		props = {
+			...props,
+			id: useInstanceId( store, props.baseId, props.id ),
+		};
 
 		Object.entries( propMap ).forEach( ( [ from, to ] ) => {
 			if ( props.hasOwnProperty( from ) ) {
@@ -235,7 +238,6 @@ export function useCompositeState(
 		loop: focusLoop = false,
 		wrap: focusWrap = false,
 		shift: focusShift = false,
-		// eslint-disable-next-line camelcase
 		unstable_virtual: virtualFocus,
 	} = legacyStateOptions;
 

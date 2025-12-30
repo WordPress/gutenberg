@@ -1,3 +1,7 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/z-index" as *;
+
 /**
  * Default block appender.
  *
@@ -24,20 +28,11 @@
 	.block-editor-default-block-appender__content {
 		// Set the opacity of the initial block appender to the same as placeholder text in an empty Paragraph block.
 		opacity: 0.62;
-	}
 
-	// In "constrained" layout containers, the first and last paragraphs have their margins zeroed out.
-	// In the case of this appender, it needs to apply those same rules to avoid layout shifts.
-	// Such shifts happen when the bottom margin of the Title block has been set to less than the default 1em margin of paragraphs.
-	:where(body .is-layout-constrained) &,
-	:where(.wp-site-blocks) & {
-		> :first-child {
-			margin-block-start: 0;
-			margin-block-end: 0;
-		}
-
-		// Since this appender will only ever appear on an entirely empty document, we don't account for last-child.
-		// This is also because it will never be the last child, the block inserter that sits in this appender is the last child.
+		// The following prevents user agent styles from applying margins to the appender's inner paragraph.
+		// This in turn prevents layout shift due to layout styles removing margins from first and last children.
+		margin-block-start: 0;
+		margin-block-end: 0;
 	}
 
 	// Dropzone.
@@ -51,6 +46,7 @@
 		color: $white;
 		padding: 0;
 
+		// TODO: Consider passing size="small" to the Inserter toggle instead.
 		// Special dimensions for this button.
 		min-width: $button-size-small;
 		height: $button-size-small;
@@ -62,9 +58,7 @@
 	}
 }
 
-// The black plus that shows up on the right side of an empty paragraph block, or the initial appender
-// that exists only on empty documents.
-.block-editor-block-list__empty-block-inserter.block-editor-block-list__empty-block-inserter,
+// The initial appender that exists only on empty documents.
 .block-editor-default-block-appender .block-editor-inserter {
 	position: absolute;
 	top: 0;
@@ -76,10 +70,11 @@
 	}
 }
 
-
 /**
- * Fixed position appender.
- * These styles apply to all in-canvas inserters that exist inside nesting containers.
+ * Fixed position appender (right bottom corner).
+ *
+ * These styles apply to all in-canvas inserters. All in-canvas inserters always
+ * exist within a block.
  */
 
 .block-editor-block-list__block .block-list-appender {
@@ -94,6 +89,10 @@
 	&.block-list-appender {
 		margin: 0;
 		line-height: 0;
+	}
+
+	.block-editor-inserter:disabled {
+		display: none;
 	}
 
 	.block-editor-default-block-appender {

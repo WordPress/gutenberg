@@ -28,7 +28,6 @@ import { unlock } from './lock-unlock';
 const {
 	BackButton: __experimentalMainDashboardButton,
 	registerCoreBlockBindingsSources,
-	bootstrapBlockBindingsSourcesFromServer,
 } = unlock( editorPrivateApis );
 
 /**
@@ -63,6 +62,7 @@ export function initializeEditor(
 	dispatch( preferencesStore ).setDefaults( 'core', {
 		allowRightClickOverrides: true,
 		editorMode: 'visual',
+		editorTool: 'edit',
 		fixedToolbar: false,
 		hiddenBlockTypes: [],
 		inactivePanels: [],
@@ -95,7 +95,6 @@ export function initializeEditor(
 	}
 
 	registerCoreBlocks();
-	bootstrapBlockBindingsSourcesFromServer( settings?.blockBindingsSources );
 	registerCoreBlockBindingsSources();
 	registerLegacyWidgetBlock( { inserter: false } );
 	registerWidgetGroupBlock( { inserter: false } );

@@ -22,8 +22,16 @@ const MyComponentWithConstrainedTabbing = () => {
 	const [ isConstrainedTabbing, setIsConstrainedTabbing ] = useState( false );
 	let form = (
 		<form>
-			<TextControl label="Input 1" onChange={ () => {} } />
-			<TextControl label="Input 2" onChange={ () => {} } />
+			<TextControl
+				__next40pxDefaultSize
+				label="Input 1"
+				onChange={ () => {} }
+			/>
+			<TextControl
+				__next40pxDefaultSize
+				label="Input 2"
+				onChange={ () => {} }
+			/>
 		</form>
 	);
 	if ( isConstrainedTabbing ) {
@@ -43,5 +51,5 @@ const MyComponentWithConstrainedTabbing = () => {
 			</Button>
 		</div>
 	);
-}
+};
 ```

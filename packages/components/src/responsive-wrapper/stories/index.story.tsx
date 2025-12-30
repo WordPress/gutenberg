@@ -10,9 +10,10 @@ import ResponsiveWrapper from '..';
 
 const meta: Meta< typeof ResponsiveWrapper > = {
 	component: ResponsiveWrapper,
-	title: 'Components/ResponsiveWrapper',
+	title: 'Components/Layout/ResponsiveWrapper',
+	id: 'components-responsivewrapper',
 	argTypes: {
-		children: { control: { type: null } },
+		children: { control: false },
 	},
 	parameters: {
 		controls: { expanded: true },

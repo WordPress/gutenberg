@@ -3,7 +3,7 @@
 /**
  * Test the block layout support.
  *
- * @package Gutenberg
+ * @package gutenberg
  */
 
 class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
@@ -99,7 +99,7 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 		$this->assertSame( $expected, gutenberg_restore_image_outer_container( $block_classes_random_placement, $block ) );
 
 		$block_classes_other_attributes = '<figure style="color: red" class=\'is-style-round wp-block-image alignright my-custom-classname size-full\' data-random-tag=">"><img src="/my-image.jpg"/></figure>';
-		$expected_other_attributes      = '<div class="wp-block-image is-style-round my-custom-classname"><figure style="color: red" class=\'alignright size-full\' data-random-tag=">"><img src="/my-image.jpg"/></figure></div>';
+		$expected_other_attributes      = '<div class="wp-block-image is-style-round my-custom-classname"><figure style="color: red" class="alignright size-full" data-random-tag=">"><img src="/my-image.jpg"/></figure></div>';
 
 		$this->assertSame( $expected_other_attributes, gutenberg_restore_image_outer_container( $block_classes_other_attributes, $block ) );
 	}
@@ -501,7 +501,47 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 						),
 					),
 				),
-				'expected_output' => '<p class="wp-container-content-1">Some text.</p>', // The generated classname number assumes `wp_unique_prefixed_id( 'wp-container-content-' )` will not have run previously in this test.
+				'expected_output' => '<p class="wp-container-content-b7aa651c">Some text.</p>',
+			),
+			'single wrapper block layout with flex type'   => array(
+				'args'            => array(
+					'block_content' => '<div class="wp-block-group"></div>',
+					'block'         => array(
+						'blockName'    => 'core/group',
+						'attrs'        => array(
+							'layout' => array(
+								'type'        => 'flex',
+								'orientation' => 'horizontal',
+								'flexWrap'    => 'nowrap',
+							),
+						),
+						'innerBlocks'  => array(),
+						'innerHTML'    => '<div class="wp-block-group"></div>',
+						'innerContent' => array(
+							'<div class="wp-block-group"></div>',
+						),
+					),
+				),
+				'expected_output' => '<div class="wp-block-group is-horizontal is-nowrap is-layout-flex wp-container-core-group-is-layout-67f0b8e2 wp-block-group-is-layout-flex"></div>',
+			),
+			'single wrapper block layout with grid type'   => array(
+				'args'            => array(
+					'block_content' => '<div class="wp-block-group"></div>',
+					'block'         => array(
+						'blockName'    => 'core/group',
+						'attrs'        => array(
+							'layout' => array(
+								'type' => 'grid',
+							),
+						),
+						'innerBlocks'  => array(),
+						'innerHTML'    => '<div class="wp-block-group"></div>',
+						'innerContent' => array(
+							'<div class="wp-block-group"></div>',
+						),
+					),
+				),
+				'expected_output' => '<div class="wp-block-group is-layout-grid wp-container-core-group-is-layout-9649a0d9 wp-block-group-is-layout-grid"></div>',
 			),
 		);
 	}
@@ -590,6 +630,140 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 					),
 				),
 				'expected_output' => '<div class="wp-block-group"><div class="wp-block-group__inner-container is-layout-constrained wp-block-group-is-layout-constrained"></div></div>',
+			),
+		);
+	}
+
+	/**
+	 * Check that gutenberg_render_layout_support_flag() renders consistent hashes
+	 * for the container class when the relevant layout properties are the same.
+	 *
+	 * @dataProvider data_layout_support_flag_renders_consistent_container_hash
+	 *
+	 * @covers ::gutenberg_render_layout_support_flag
+	 *
+	 * @param array $block_attrs     Dataset to test.
+	 * @param array $expected_class  Class generated for the passed dataset.
+	 */
+	public function test_layout_support_flag_renders_consistent_container_hash( $block_attrs, $expected_class ) {
+		switch_theme( 'default' );
+
+		$block_content = '<div class="wp-block-group"></div>';
+		$block         = array(
+			'blockName'    => 'core/group',
+			'innerBlocks'  => array(),
+			'innerHTML'    => '<div class="wp-block-group"></div>',
+			'innerContent' => array(
+				'<div class="wp-block-group"></div>',
+			),
+			'attrs'        => $block_attrs,
+		);
+
+		/*
+		 * The `appearance-tools` theme support is temporarily added to ensure
+		 * that the block gap support is enabled during rendering, which is
+		 * necessary to compute styles for layouts with block gap values.
+		 */
+		add_theme_support( 'appearance-tools' );
+		$output = gutenberg_render_layout_support_flag( $block_content, $block );
+		remove_theme_support( 'appearance-tools' );
+
+		// Process the output and look for the expected class in the first rendered element.
+		$processor = new WP_HTML_Tag_Processor( $output );
+		$processor->next_tag();
+
+		$this->assertTrue(
+			$processor->has_class( $expected_class ),
+			"Expected class '$expected_class' not found in the rendered output, probably because of a different hash."
+		);
+	}
+
+	/**
+	 * Data provider for test_layout_support_flag_renders_consistent_container_hash.
+	 *
+	 * @return array
+	 */
+	public function data_layout_support_flag_renders_consistent_container_hash() {
+		return array(
+			'default type block gap 12px'      => array(
+				'block_attributes' => array(
+					'layout' => array(
+						'type' => 'default',
+					),
+					'style'  => array(
+						'spacing' => array(
+							'blockGap' => '12px',
+						),
+					),
+				),
+				'expected_class'   => 'wp-container-core-group-is-layout-c5c7d83f',
+			),
+			'default type block gap 24px'      => array(
+				'block_attributes' => array(
+					'layout' => array(
+						'type' => 'default',
+					),
+					'style'  => array(
+						'spacing' => array(
+							'blockGap' => '24px',
+						),
+					),
+				),
+				'expected_class'   => 'wp-container-core-group-is-layout-634f0b9d',
+			),
+			'constrained type justified left'  => array(
+				'block_attributes' => array(
+					'layout' => array(
+						'type'           => 'constrained',
+						'justifyContent' => 'left',
+					),
+				),
+				'expected_class'   => 'wp-container-core-group-is-layout-12dd3699',
+			),
+			'constrained type justified right' => array(
+				'block_attributes' => array(
+					'layout' => array(
+						'type'           => 'constrained',
+						'justifyContent' => 'right',
+					),
+				),
+				'expected_class'   => 'wp-container-core-group-is-layout-f1f2ed93',
+			),
+			'flex type horizontal'             => array(
+				'block_attributes' => array(
+					'layout' => array(
+						'type'        => 'flex',
+						'orientation' => 'horizontal',
+						'flexWrap'    => 'nowrap',
+					),
+				),
+				'expected_class'   => 'wp-container-core-group-is-layout-2487dcaa',
+			),
+			'flex type vertical'               => array(
+				'block_attributes' => array(
+					'layout' => array(
+						'type'        => 'flex',
+						'orientation' => 'vertical',
+					),
+				),
+				'expected_class'   => 'wp-container-core-group-is-layout-fe9cc265',
+			),
+			'grid type'                        => array(
+				'block_attributes' => array(
+					'layout' => array(
+						'type' => 'grid',
+					),
+				),
+				'expected_class'   => 'wp-container-core-group-is-layout-478b6e6b',
+			),
+			'grid type 3 columns'              => array(
+				'block_attributes' => array(
+					'layout' => array(
+						'type'        => 'grid',
+						'columnCount' => 3,
+					),
+				),
+				'expected_class'   => 'wp-container-core-group-is-layout-d3b710ac',
 			),
 		);
 	}

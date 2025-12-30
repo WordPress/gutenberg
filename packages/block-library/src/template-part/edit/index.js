@@ -21,7 +21,6 @@ import {
 	MenuItem,
 	ToolbarButton,
 } from '@wordpress/components';
-import { useAsyncList } from '@wordpress/compose';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
 import { useState } from '@wordpress/element';
@@ -85,7 +84,6 @@ function TemplatesList( { area, clientId, isEntityAvailable, onSelect } ) {
 		isEntityAvailable &&
 		!! blockPatterns.length &&
 		( area === 'header' || area === 'footer' );
-	const shownTemplates = useAsyncList( blockPatterns );
 
 	if ( ! canReplace ) {
 		return null;
@@ -96,9 +94,8 @@ function TemplatesList( { area, clientId, isEntityAvailable, onSelect } ) {
 			<BlockPatternsList
 				label={ __( 'Templates' ) }
 				blockPatterns={ blockPatterns }
-				shownPatterns={ shownTemplates }
 				onClickPattern={ onSelect }
-				showTitle={ false }
+				showTitlesAsTooltip
 			/>
 		</PanelBody>
 	);
@@ -214,7 +211,7 @@ export default function TemplatePartEdit( {
 			<TagName { ...blockProps }>
 				<Warning>
 					{ sprintf(
-						/* translators: %s: Template part slug */
+						/* translators: %s: Template part slug. */
 						__(
 							'Template part has been deleted or is unavailable: %s'
 						),
@@ -243,14 +240,16 @@ export default function TemplatePartEdit( {
 					canUserEdit && (
 						<BlockControls group="other">
 							<ToolbarButton
-								onClick={ () =>
+								onClick={ () => {
 									onNavigateToEntityRecord( {
 										postId: templatePartId,
 										postType: 'wp_template_part',
-									} )
-								}
+									} );
+								} }
 							>
-								{ __( 'Edit' ) }
+								{ window?.__experimentalContentOnlyPatternInsertion
+									? __( 'Edit section' )
+									: __( 'Edit' ) }
 							</ToolbarButton>
 						</BlockControls>
 					) }
@@ -263,6 +262,7 @@ export default function TemplatePartEdit( {
 							templatePartId={ templatePartId }
 							defaultWrapper={ areaObject.tagName }
 							hasInnerBlocks={ hasInnerBlocks }
+							clientId={ clientId }
 						/>
 					</InspectorControls>
 				) }

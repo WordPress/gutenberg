@@ -29,6 +29,7 @@ export function initializeEditor( id, postType, postId ) {
 		welcomeGuide: true,
 	} );
 	dispatch( preferencesStore ).setDefaults( 'core', {
+		editorTool: 'edit',
 		hiddenBlockTypes: [],
 		inactivePanels: [],
 		openPanels: [ 'post-status' ],

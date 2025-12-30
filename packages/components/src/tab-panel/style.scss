@@ -1,3 +1,7 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
+@use "../utils/theme-variables" as *;
+
 .components-tab-panel__tabs {
 	display: flex;
 	align-items: stretch;
@@ -7,19 +11,17 @@
 	}
 }
 
-// This tab style CSS is duplicated verbatim in
-// /packages/edit-post/src/components/sidebar/settings-header/style.scss
 .components-tab-panel__tabs-item {
 	position: relative;
 	border-radius: 0;
-	height: $grid-unit-60;
+	height: $grid-unit-60 !important; // https://github.com/WordPress/gutenberg/pull/65075#discussion_r1746282734
 	background: transparent;
 	border: none;
 	box-shadow: none;
 	cursor: pointer;
 	padding: 3px $grid-unit-20; // Use padding to offset the is-active border, this benefits Windows High Contrast mode
 	margin-left: 0;
-	font-weight: 500;
+	font-weight: $font-weight-regular;
 
 	&:focus:not(:disabled) {
 		position: relative;
@@ -42,8 +44,9 @@
 		border-radius: 0;
 
 		// Animation
-		transition: all 0.1s linear;
-		@include reduce-motion("transition");
+		@media not (prefers-reduced-motion) {
+			transition: all 0.1s linear;
+		}
 	}
 
 	// Active.
@@ -70,8 +73,9 @@
 		border-radius: $radius-small;
 
 		// Animation
-		transition: all 0.1s linear;
-		@include reduce-motion("transition");
+		@media not (prefers-reduced-motion) {
+			transition: all 0.1s linear;
+		}
 	}
 
 	&:focus-visible::before {

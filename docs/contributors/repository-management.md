@@ -165,9 +165,3 @@ If you meet this criterion of several meaningful contributions having been accep
 ## Projects
 
 We use [GitHub projects](https://github.com/WordPress/gutenberg/projects) to keep track of details that aren't immediately actionable, but that we want to keep around for future reference.
-
-Some key projects include:
-
--   [Phase 2](https://github.com/WordPress/gutenberg/projects/13) - Development tasks needed for Phase 2 of Gutenberg.
--   [Phase 2 design](https://github.com/WordPress/gutenberg/projects/21) - Tasks for design in Phase 2. Note: specific projects may have their own boards.
--   [Ideas](https://github.com/WordPress/gutenberg/projects/8) - Project containing tickets that, while closed for the time being, can be revisited in the future.

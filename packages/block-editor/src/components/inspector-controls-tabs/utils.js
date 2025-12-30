@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { cog, styles, listView } from '@wordpress/icons';
+import { cog, styles, listView, page } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 
 export const TAB_SETTINGS = {
@@ -9,7 +9,6 @@ export const TAB_SETTINGS = {
 	title: __( 'Settings' ),
 	value: 'settings',
 	icon: cog,
-	className: 'block-editor-block-inspector__tab-item',
 };
 
 export const TAB_STYLES = {
@@ -17,7 +16,13 @@ export const TAB_STYLES = {
 	title: __( 'Styles' ),
 	value: 'styles',
 	icon: styles,
-	className: 'block-editor-block-inspector__tab-item',
+};
+
+export const TAB_CONTENT = {
+	name: 'content',
+	title: __( 'Content' ),
+	value: 'content',
+	icon: page,
 };
 
 export const TAB_LIST_VIEW = {
@@ -25,5 +30,4 @@ export const TAB_LIST_VIEW = {
 	title: __( 'List View' ),
 	value: 'list-view',
 	icon: listView,
-	className: 'block-editor-block-inspector__tab-item',
 };

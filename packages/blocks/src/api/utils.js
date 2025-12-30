@@ -31,45 +31,59 @@ extend( [ namesPlugin, a11yPlugin ] );
 const ICON_COLORS = [ '#191e23', '#f8f9f9' ];
 
 /**
- * Determines whether the block's attribute is equal to the default attribute
- * which means the attribute is unmodified.
- * @param {Object} attributeDefinition The attribute's definition of the block type.
- * @param {*}      value               The attribute's value.
- * @return {boolean} Whether the attribute is unmodified.
- */
-function isUnmodifiedAttribute( attributeDefinition, value ) {
-	// Every attribute that has a default must match the default.
-	if ( attributeDefinition.hasOwnProperty( 'default' ) ) {
-		return value === attributeDefinition.default;
-	}
-
-	// The rich text type is a bit different from the rest because it
-	// has an implicit default value of an empty RichTextData instance,
-	// so check the length of the value.
-	if ( attributeDefinition.type === 'rich-text' ) {
-		return ! value?.length;
-	}
-
-	// Every attribute that doesn't have a default should be undefined.
-	return value === undefined;
-}
-
-/**
  * Determines whether the block's attributes are equal to the default attributes
  * which means the block is unmodified.
  *
- * @param {WPBlock} block Block Object
+ * @param {WPBlock} block Block Object.
+ * @param {?string} role  Optional role to filter attributes for modification check.
  *
  * @return {boolean} Whether the block is an unmodified block.
  */
-export function isUnmodifiedBlock( block ) {
-	return Object.entries( getBlockType( block.name )?.attributes ?? {} ).every(
-		( [ key, definition ] ) => {
-			const value = block.attributes[ key ];
+export function isUnmodifiedBlock( block, role ) {
+	const blockAttributes = getBlockType( block.name )?.attributes ?? {};
 
-			return isUnmodifiedAttribute( definition, value );
+	// Filter attributes by role if a role is provided.
+	const attributesByRole = role
+		? Object.entries( blockAttributes ).filter( ( [ key, definition ] ) => {
+				// A special case for the metadata attribute.
+				// It can include block bindings that serve as a source of content,
+				// without directly modifying content attributes.
+				if ( role === 'content' && key === 'metadata' ) {
+					return (
+						Object.keys( block.attributes[ key ]?.bindings ?? {} )
+							.length > 0
+					);
+				}
+
+				return (
+					definition.role === role ||
+					definition.__experimentalRole === role
+				);
+		  } )
+		: [];
+	// Fallback to all attributes if no attributes match the role.
+	const attributesToCheck = !! attributesByRole.length
+		? attributesByRole
+		: Object.entries( blockAttributes );
+
+	return attributesToCheck.every( ( [ key, definition ] ) => {
+		const value = block.attributes[ key ];
+
+		// Every attribute that has a default must match the default.
+		if ( definition.hasOwnProperty( 'default' ) ) {
+			return value === definition.default;
 		}
-	);
+
+		// The rich text type is a bit different from the rest because it
+		// has an implicit default value of an empty RichTextData instance,
+		// so check the length of the value.
+		if ( definition.type === 'rich-text' ) {
+			return ! value?.length;
+		}
+
+		// Every attribute that doesn't have a default should be undefined.
+		return value === undefined;
+	} );
 }
 
 /**
@@ -77,40 +91,14 @@ export function isUnmodifiedBlock( block ) {
  * to the default attributes which means the block is unmodified.
  *
  * @param {WPBlock} block Block Object
+ * @param {?string} role  Optional role to filter attributes for modification check.
  *
  * @return {boolean} Whether the block is an unmodified default block.
  */
-export function isUnmodifiedDefaultBlock( block ) {
-	return block.name === getDefaultBlockName() && isUnmodifiedBlock( block );
-}
-
-/**
- * Determines whether the block content is unmodified. A block content is
- * considered unmodified if all the attributes that have a role of 'content'
- * are equal to the default attributes (or undefined).
- * If the block does not have any attributes with a role of 'content', it
- * will be considered unmodified if all the attributes are equal to the default
- * attributes (or undefined).
- *
- * @param {WPBlock} block Block Object
- * @return {boolean} Whether the block content is unmodified.
- */
-export function isUnmodifiedBlockContent( block ) {
-	const contentAttributes = getBlockAttributesNamesByRole(
-		block.name,
-		'content'
+export function isUnmodifiedDefaultBlock( block, role ) {
+	return (
+		block.name === getDefaultBlockName() && isUnmodifiedBlock( block, role )
 	);
-
-	if ( contentAttributes.length === 0 ) {
-		return isUnmodifiedBlock( block );
-	}
-
-	return contentAttributes.every( ( key ) => {
-		const definition = getBlockType( block.name )?.attributes[ key ];
-		const value = block.attributes[ key ];
-
-		return isUnmodifiedAttribute( definition, value );
-	} );
 }
 
 /**
@@ -282,7 +270,7 @@ export function getAccessibleBlockLabel(
 
 	if ( hasLabel ) {
 		return sprintf(
-			/* translators: accessibility text. %1: The block title. %2: The block label. */
+			/* translators: accessibility text. 1: The block title. 2: The block label. */
 			__( '%1$s Block. %2$s' ),
 			title,
 			label
@@ -304,6 +292,17 @@ export function getDefault( attributeSchema ) {
 	if ( attributeSchema.type === 'rich-text' ) {
 		return new RichTextData();
 	}
+}
+
+/**
+ * Check if a block is registered.
+ *
+ * @param {string} name The block's name.
+ *
+ * @return {boolean} Whether the block is registered.
+ */
+export function isBlockRegistered( name ) {
+	return getBlockType( name ) !== undefined;
 }
 
 /**
@@ -409,6 +408,36 @@ export const __experimentalGetBlockAttributesNamesByRole = ( ...args ) => {
 	} );
 	return getBlockAttributesNamesByRole( ...args );
 };
+
+/**
+ * Checks if a block is a content block by examining its attributes.
+ * A block is considered a content block if it has at least one attribute
+ * with a role of 'content'.
+ *
+ * @param {string} name The name of the block to check.
+ * @return {boolean}    Whether the block is a content block.
+ */
+export function isContentBlock( name ) {
+	const blockType = getBlockType( name );
+	const attributes = blockType?.attributes;
+	// Not all blocks have attributes but they may support contentRole instead.
+	const supportsContentRole = blockType?.supports?.contentRole;
+
+	if ( supportsContentRole ) {
+		return true;
+	}
+	if ( ! attributes ) {
+		return false;
+	}
+
+	return !! Object.keys( attributes )?.some( ( attributeKey ) => {
+		const attribute = attributes[ attributeKey ];
+		return (
+			attribute?.role === 'content' ||
+			attribute?.__experimentalRole === 'content'
+		);
+	} );
+}
 
 /**
  * Return a new object with the specified keys omitted.

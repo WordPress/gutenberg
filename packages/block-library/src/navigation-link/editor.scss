@@ -1,3 +1,7 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/z-index" as *;
+
 /**
  * Appender
  */
@@ -80,24 +84,12 @@
 	background-image: none !important;
 
 	// Draw a wavy underline.
-	.wp-block-navigation-link__placeholder-text span {
-		$blur: 10%;
-		$width: 6%;
-		$stop1: 30%;
-		$stop2: 64%;
-
-		--wp-underline-color: var(--wp-admin-theme-color);
-
-		background-image:
-			linear-gradient(45deg, transparent ($stop1 - $blur), var(--wp-underline-color) $stop1, var(--wp-underline-color) ($stop1 + $width), transparent ($stop1 + $width + $blur)),
-			linear-gradient(135deg, transparent ($stop2 - $blur), var(--wp-underline-color) $stop2, var(--wp-underline-color) ($stop2 + $width), transparent ($stop2 + $width + $blur));
-		background-position: 0 100%;
-		background-size: 6px 3px;
-		background-repeat: repeat-x;
-
-		// Since applied to a span, it doesn't change the footprint of the item,
-		// but it does vertically shift the underline to better align.
-		padding-bottom: 0.1em;
+	.wp-block-navigation-link__placeholder-text {
+		span {
+			text-decoration: wavy underline;
+			text-decoration-skip-ink: none;
+			text-underline-offset: 0.25rem;
+		}
 	}
 
 	// This needs extra specificity.
@@ -118,7 +110,7 @@
 .link-control-transform__subheading {
 	font-size: 11px;
 	text-transform: uppercase;
-	font-weight: 500;
+	font-weight: $font-weight-medium;
 	color: $gray-900;
 	margin-bottom: 1.5em;
 }
@@ -133,4 +125,28 @@
 	flex-direction: column;
 	gap: $grid-unit-10;
 	height: auto;
+}
+
+.link-ui-page-creator {
+	// Match LinkControl width constraints for consistent UI sizing
+	max-width: 350px;
+	min-width: auto;
+	width: 90vw;
+	padding-top: $grid-unit-10;
+
+	&__inner {
+		padding: $grid-unit-20;
+	}
+
+	&__back {
+		margin-left: $grid-unit-10;
+		text-transform: uppercase;
+	}
+}
+
+/**
+ * Error text styling for missing entity help text.
+ */
+.navigation-link-control__error-text {
+	color: $alert-red;
 }

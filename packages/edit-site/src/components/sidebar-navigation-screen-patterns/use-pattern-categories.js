@@ -69,7 +69,7 @@ export default function usePatternCategories() {
 			// If the pattern has no categories, add it to uncategorized.
 			if (
 				! pattern.wp_pattern_category?.length ||
-				! pattern.wp_pattern_category.some( ( catId ) =>
+				! pattern.wp_pattern_category?.some( ( catId ) =>
 					userPatternCategories.find( ( cat ) => cat.id === catId )
 				)
 			) {

@@ -13,7 +13,6 @@ import {
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import {
-	AlignmentControl,
 	BlockControls,
 	InspectorControls,
 	RichText,
@@ -21,12 +20,13 @@ import {
 	useSettings,
 	useBlockEditingMode,
 } from '@wordpress/block-editor';
+import { getBlockSupport } from '@wordpress/blocks';
 import { formatLtr } from '@wordpress/icons';
-
 /**
  * Internal dependencies
  */
 import { useOnEnter } from './use-enter';
+import useDeprecatedAlign from './deprecated-attributes';
 
 function ParagraphRTLControl( { direction, setDirection } ) {
 	return (
@@ -47,7 +47,7 @@ function hasDropCapDisabled( align ) {
 	return align === ( isRTL() ? 'left' : 'right' ) || align === 'center';
 }
 
-function DropCapControl( { clientId, attributes, setAttributes } ) {
+function DropCapControl( { clientId, attributes, setAttributes, name } ) {
 	// Please do not add a useSelect call to the paragraph block unconditionally.
 	// Every useSelect added to a (frequently used) block will degrade load
 	// and type performance. By moving it within InspectorControls, the subscription is
@@ -58,34 +58,43 @@ function DropCapControl( { clientId, attributes, setAttributes } ) {
 		return null;
 	}
 
-	const { align, dropCap } = attributes;
+	const { style, dropCap } = attributes;
+	const textAlign = style?.typography?.textAlign;
 
 	let helpText;
-	if ( hasDropCapDisabled( align ) ) {
+	if ( hasDropCapDisabled( textAlign ) ) {
 		helpText = __( 'Not available for aligned text.' );
 	} else if ( dropCap ) {
 		helpText = __( 'Showing large initial letter.' );
 	} else {
-		helpText = __( 'Toggle to show a large initial letter.' );
+		helpText = __( 'Show a large initial letter.' );
 	}
 
+	const isDropCapControlEnabledByDefault = getBlockSupport(
+		name,
+		'typography.defaultControls.dropCap',
+		false
+	);
+
 	return (
-		<ToolsPanelItem
-			hasValue={ () => !! dropCap }
-			label={ __( 'Drop cap' ) }
-			onDeselect={ () => setAttributes( { dropCap: undefined } ) }
-			resetAllFilter={ () => ( { dropCap: undefined } ) }
-			panelId={ clientId }
-		>
-			<ToggleControl
-				__nextHasNoMarginBottom
+		<InspectorControls group="typography">
+			<ToolsPanelItem
+				hasValue={ () => !! dropCap }
 				label={ __( 'Drop cap' ) }
-				checked={ !! dropCap }
-				onChange={ () => setAttributes( { dropCap: ! dropCap } ) }
-				help={ helpText }
-				disabled={ hasDropCapDisabled( align ) ? true : false }
-			/>
-		</ToolsPanelItem>
+				isShownByDefault={ isDropCapControlEnabledByDefault }
+				onDeselect={ () => setAttributes( { dropCap: false } ) }
+				resetAllFilter={ () => ( { dropCap: false } ) }
+				panelId={ clientId }
+			>
+				<ToggleControl
+					label={ __( 'Drop cap' ) }
+					checked={ !! dropCap }
+					onChange={ () => setAttributes( { dropCap: ! dropCap } ) }
+					help={ helpText }
+					disabled={ hasDropCapDisabled( textAlign ) }
+				/>
+			</ToolsPanelItem>
+		</InspectorControls>
 	);
 }
 
@@ -96,13 +105,16 @@ function ParagraphBlock( {
 	onRemove,
 	setAttributes,
 	clientId,
+	isSelected: isSingleSelected,
+	name,
 } ) {
-	const { align, content, direction, dropCap, placeholder } = attributes;
+	const { content, direction, dropCap, placeholder, style } = attributes;
+	const textAlign = style?.typography?.textAlign;
+	useDeprecatedAlign( attributes.align, style, setAttributes );
 	const blockProps = useBlockProps( {
 		ref: useOnEnter( { clientId, content } ),
 		className: clsx( {
-			'has-drop-cap': hasDropCapDisabled( align ) ? false : dropCap,
-			[ `has-text-align-${ align }` ]: align,
+			'has-drop-cap': hasDropCapDisabled( textAlign ) ? false : dropCap,
 		} ),
 		style: { direction },
 	} );
@@ -112,17 +124,6 @@ function ParagraphBlock( {
 		<>
 			{ blockEditingMode === 'default' && (
 				<BlockControls group="block">
-					<AlignmentControl
-						value={ align }
-						onChange={ ( newAlign ) =>
-							setAttributes( {
-								align: newAlign,
-								dropCap: hasDropCapDisabled( newAlign )
-									? false
-									: dropCap,
-							} )
-						}
-					/>
 					<ParagraphRTLControl
 						direction={ direction }
 						setDirection={ ( newDirection ) =>
@@ -131,13 +132,14 @@ function ParagraphBlock( {
 					/>
 				</BlockControls>
 			) }
-			<InspectorControls group="typography">
+			{ isSingleSelected && (
 				<DropCapControl
+					name={ name }
 					clientId={ clientId }
 					attributes={ attributes }
 					setAttributes={ setAttributes }
 				/>
-			</InspectorControls>
+			) }
 			<RichText
 				identifier="content"
 				tagName="p"

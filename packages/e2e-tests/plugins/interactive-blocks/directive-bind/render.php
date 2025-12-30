@@ -97,4 +97,15 @@
 		>Toggle</button>
 	</div>
 	<?php endforeach; ?>
+
+	<div data-wp-context='{"test": true}'>
+		<div
+			data-testid="without-unique-id"
+			data-wp-bind--data-test="context.test"
+		></div>
+		<div
+			data-testid="with-unique-id"
+			data-wp-bind--data-test---unique-id="context.test"
+		></div>
+	</div>
 </div>

@@ -6,7 +6,7 @@ import Clipboard from 'clipboard';
 /**
  * WordPress dependencies
  */
-import { useRef } from '@wordpress/element';
+import { useRef, useLayoutEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -20,7 +20,9 @@ import useRefEffect from '../use-ref-effect';
  */
 function useUpdatedRef( value ) {
 	const ref = useRef( value );
-	ref.current = value;
+	useLayoutEffect( () => {
+		ref.current = value;
+	}, [ value ] );
 	return ref;
 }
 

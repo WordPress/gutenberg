@@ -2,18 +2,13 @@
  * External dependencies
  */
 import * as Ariakit from '@ariakit/react';
-import { useStoreState } from '@ariakit/react';
 
 /**
  * WordPress dependencies
  */
 import { useInstanceId } from '@wordpress/compose';
-import {
-	useEffect,
-	useLayoutEffect,
-	useMemo,
-	useRef,
-} from '@wordpress/element';
+import { useEffect, useMemo } from '@wordpress/element';
+import { isRTL } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -24,191 +19,136 @@ import { Tab } from './tab';
 import { TabList } from './tablist';
 import { TabPanel } from './tabpanel';
 
-function Tabs( {
-	selectOnMove = true,
-	defaultTabId,
-	orientation = 'horizontal',
-	onSelect,
-	children,
-	selectedTabId,
-}: TabsProps ) {
-	const instanceId = useInstanceId( Tabs, 'tabs' );
-	const store = Ariakit.useTabStore( {
-		selectOnMove,
-		orientation,
-		defaultSelectedId: defaultTabId && `${ instanceId }-${ defaultTabId }`,
-		setSelectedId: ( selectedId ) => {
-			const strippedDownId =
-				typeof selectedId === 'string'
-					? selectedId.replace( `${ instanceId }-`, '' )
-					: selectedId;
-			onSelect?.( strippedDownId );
-		},
-		selectedId: selectedTabId && `${ instanceId }-${ selectedTabId }`,
-	} );
-
-	const isControlled = selectedTabId !== undefined;
-
-	const { items, selectedId, activeId } = useStoreState( store );
-	const { setSelectedId, setActiveId } = store;
-
-	// Keep track of whether tabs have been populated. This is used to prevent
-	// certain effects from firing too early while tab data and relevant
-	// variables are undefined during the initial render.
-	const tabsHavePopulatedRef = useRef( false );
-	if ( items.length > 0 ) {
-		tabsHavePopulatedRef.current = true;
-	}
-
-	const selectedTab = items.find( ( item ) => item.id === selectedId );
-	const firstEnabledTab = items.find( ( item ) => {
-		// Ariakit internally refers to disabled tabs as `dimmed`.
-		return ! item.dimmed;
-	} );
-	const initialTab = items.find(
-		( item ) => item.id === `${ instanceId }-${ defaultTabId }`
-	);
-
-	// Handle selecting the initial tab.
-	useLayoutEffect( () => {
-		if ( isControlled ) {
-			return;
-		}
-
-		// Wait for the denoted initial tab to be declared before making a
-		// selection. This ensures that if a tab is declared lazily it can
-		// still receive initial selection, as well as ensuring no tab is
-		// selected if an invalid `defaultTabId` is provided.
-		if ( defaultTabId && ! initialTab ) {
-			return;
-		}
-
-		// If the currently selected tab is missing (i.e. removed from the DOM),
-		// fall back to the initial tab or the first enabled tab if there is
-		// one. Otherwise, no tab should be selected.
-		if ( ! items.find( ( item ) => item.id === selectedId ) ) {
-			if ( initialTab && ! initialTab.dimmed ) {
-				setSelectedId( initialTab?.id );
-				return;
-			}
-
-			if ( firstEnabledTab ) {
-				setSelectedId( firstEnabledTab.id );
-			} else if ( tabsHavePopulatedRef.current ) {
-				setSelectedId( null );
-			}
-		}
-	}, [
-		firstEnabledTab,
-		initialTab,
-		defaultTabId,
-		isControlled,
-		items,
-		selectedId,
-		setSelectedId,
-	] );
-
-	// Handle the currently selected tab becoming disabled.
-	useLayoutEffect( () => {
-		if ( ! selectedTab?.dimmed ) {
-			return;
-		}
-
-		// In controlled mode, we trust that disabling tabs is done
-		// intentionally, and don't select a new tab automatically.
-		if ( isControlled ) {
-			setSelectedId( null );
-			return;
-		}
-
-		// If the currently selected tab becomes disabled, fall back to the
-		// `defaultTabId` if possible. Otherwise select the first
-		// enabled tab (if there is one).
-		if ( initialTab && ! initialTab.dimmed ) {
-			setSelectedId( initialTab.id );
-			return;
-		}
-
-		if ( firstEnabledTab ) {
-			setSelectedId( firstEnabledTab.id );
-		}
-	}, [
-		firstEnabledTab,
-		initialTab,
-		isControlled,
-		selectedTab?.dimmed,
-		setSelectedId,
-	] );
-
-	// Clear `selectedId` if the active tab is removed from the DOM in controlled mode.
-	useLayoutEffect( () => {
-		if ( ! isControlled ) {
-			return;
-		}
-
-		// Once the tabs have populated, if the `selectedTabId` still can't be
-		// found, clear the selection.
-		if (
-			tabsHavePopulatedRef.current &&
-			!! selectedTabId &&
-			! selectedTab
-		) {
-			setSelectedId( null );
-		}
-	}, [ isControlled, selectedTab, selectedTabId, setSelectedId ] );
-
-	useEffect( () => {
-		// If there is no active tab, fallback to place focus on the first enabled tab
-		// so there is always an active element
-		if ( selectedTabId === null && ! activeId && firstEnabledTab?.id ) {
-			setActiveId( firstEnabledTab.id );
-		}
-	}, [ selectedTabId, activeId, firstEnabledTab?.id, setActiveId ] );
-
-	useEffect( () => {
-		if ( ! isControlled ) {
-			return;
-		}
-
-		requestAnimationFrame( () => {
-			const focusedElement =
-				items?.[ 0 ]?.element?.ownerDocument.activeElement;
-
-			if (
-				! focusedElement ||
-				! items.some( ( item ) => focusedElement === item.element )
-			) {
-				return; // Return early if no tabs are focused.
-			}
-
-			// If, after ariakit re-computes the active tab, that tab doesn't match
-			// the currently focused tab, then we force an update to ariakit to avoid
-			// any mismatches, especially when navigating to previous/next tab with
-			// arrow keys.
-			if ( activeId !== focusedElement.id ) {
-				setActiveId( focusedElement.id );
-			}
-		} );
-	}, [ activeId, isControlled, items, setActiveId ] );
-
-	const contextValue = useMemo(
-		() => ( {
-			store,
-			instanceId,
-		} ),
-		[ store, instanceId ]
-	);
-
-	return (
-		<TabsContext.Provider value={ contextValue }>
-			{ children }
-		</TabsContext.Provider>
-	);
+function externalToInternalTabId(
+	externalId: string | undefined | null,
+	instanceId: string
+) {
+	return externalId && `${ instanceId }-${ externalId }`;
 }
 
-Tabs.TabList = TabList;
-Tabs.Tab = Tab;
-Tabs.TabPanel = TabPanel;
-Tabs.Context = TabsContext;
+function internalToExternalTabId(
+	internalId: string | undefined | null,
+	instanceId: string
+) {
+	return typeof internalId === 'string'
+		? internalId.replace( `${ instanceId }-`, '' )
+		: internalId;
+}
 
-export default Tabs;
+/**
+ * Tabs is a collection of React components that combine to render
+ * an [ARIA-compliant tabs pattern](https://www.w3.org/WAI/ARIA/apg/patterns/tabs/).
+ *
+ * Tabs organizes content across different screens, data sets, and interactions.
+ * It has two sections: a list of tabs, and the view to show when a tab is chosen.
+ *
+ * `Tabs` itself is a wrapper component and context provider.
+ * It is responsible for managing the state of the tabs, and rendering one instance of the `Tabs.TabList` component and one or more instances of the `Tab.TabPanel` component.
+ */
+export const Tabs = Object.assign(
+	function Tabs( {
+		selectOnMove = true,
+		defaultTabId,
+		orientation = 'horizontal',
+		onSelect,
+		children,
+		selectedTabId,
+		activeTabId,
+		defaultActiveTabId,
+		onActiveTabIdChange,
+	}: TabsProps ) {
+		const instanceId = useInstanceId( Tabs, 'tabs' );
+		const store = Ariakit.useTabStore( {
+			selectOnMove,
+			orientation,
+			defaultSelectedId: externalToInternalTabId(
+				defaultTabId,
+				instanceId
+			),
+			setSelectedId: ( newSelectedId ) => {
+				onSelect?.(
+					internalToExternalTabId( newSelectedId, instanceId )
+				);
+			},
+			selectedId: externalToInternalTabId( selectedTabId, instanceId ),
+			defaultActiveId: externalToInternalTabId(
+				defaultActiveTabId,
+				instanceId
+			),
+			setActiveId: ( newActiveId ) => {
+				onActiveTabIdChange?.(
+					internalToExternalTabId( newActiveId, instanceId )
+				);
+			},
+			activeId: externalToInternalTabId( activeTabId, instanceId ),
+			rtl: isRTL(),
+		} );
+
+		const { items, activeId } = Ariakit.useStoreState( store );
+		const { setActiveId } = store;
+
+		useEffect( () => {
+			requestAnimationFrame( () => {
+				const focusedElement =
+					items?.[ 0 ]?.element?.ownerDocument.activeElement;
+
+				if (
+					! focusedElement ||
+					! items.some( ( item ) => focusedElement === item.element )
+				) {
+					return; // Return early if no tabs are focused.
+				}
+
+				// If, after ariakit re-computes the active tab, that tab doesn't match
+				// the currently focused tab, then we force an update to ariakit to avoid
+				// any mismatches, especially when navigating to previous/next tab with
+				// arrow keys.
+				if ( activeId !== focusedElement.id ) {
+					setActiveId( focusedElement.id );
+				}
+			} );
+		}, [ activeId, items, setActiveId ] );
+
+		const contextValue = useMemo(
+			() => ( {
+				store,
+				instanceId,
+			} ),
+			[ store, instanceId ]
+		);
+
+		return (
+			<TabsContext.Provider value={ contextValue }>
+				{ children }
+			</TabsContext.Provider>
+		);
+	},
+	{
+		/**
+		 * Renders a single tab.
+		 *
+		 * The currently active tab receives default styling that can be
+		 * overridden with CSS targeting `[aria-selected="true"]`.
+		 */
+		Tab: Object.assign( Tab, {
+			displayName: 'Tabs.Tab',
+		} ),
+		/**
+		 * A wrapper component for the `Tab` components.
+		 *
+		 * It is responsible for rendering the list of tabs.
+		 */
+		TabList: Object.assign( TabList, {
+			displayName: 'Tabs.TabList',
+		} ),
+		/**
+		 * Renders the content to display for a single tab once that tab is selected.
+		 */
+		TabPanel: Object.assign( TabPanel, {
+			displayName: 'Tabs.TabPanel',
+		} ),
+		Context: Object.assign( TabsContext, {
+			displayName: 'Tabs.Context',
+		} ),
+	}
+);

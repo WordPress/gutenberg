@@ -46,7 +46,7 @@ function render_block_core_comment_author_avatar( $attributes, $content, $block 
 	$styles  = isset( $wrapper_attributes['style'] ) ? $wrapper_attributes['style'] : '';
 	$classes = isset( $wrapper_attributes['class'] ) ? $wrapper_attributes['class'] : '';
 
-	/* translators: %s is the Comment Author name */
+	/* translators: %s: Author name. */
 	$alt = sprintf( __( '%s Avatar' ), $comment->comment_author );
 
 	$avatar_block = get_avatar(

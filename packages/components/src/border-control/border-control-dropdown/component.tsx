@@ -73,15 +73,19 @@ const getToggleAriaLabel = (
 			const ariaLabelValue = getAriaLabelColorValue( colorObject.color );
 			return style
 				? sprintf(
-						// translators: %1$s: The name of the color e.g. "vivid red". %2$s: The color's hex code e.g.: "#f00:". %3$s: The current border style selection e.g. "solid".
-						'Border color and style picker. The currently selected color is called "%1$s" and has a value of "%2$s". The currently selected style is "%3$s".',
+						// translators: 1: The name of the color e.g. "vivid red". 2: The color's hex code e.g.: "#f00:". 3: The current border style selection e.g. "solid".
+						__(
+							'Border color and style picker. The currently selected color is called "%1$s" and has a value of "%2$s". The currently selected style is "%3$s".'
+						),
 						colorObject.name,
 						ariaLabelValue,
 						style
 				  )
 				: sprintf(
-						// translators: %1$s: The name of the color e.g. "vivid red". %2$s: The color's hex code e.g.: "#f00:".
-						'Border color and style picker. The currently selected color is called "%1$s" and has a value of "%2$s".',
+						// translators: 1: The name of the color e.g. "vivid red". 2: The color's hex code e.g.: "#f00:".
+						__(
+							'Border color and style picker. The currently selected color is called "%1$s" and has a value of "%2$s".'
+						),
 						colorObject.name,
 						ariaLabelValue
 				  );
@@ -91,14 +95,18 @@ const getToggleAriaLabel = (
 			const ariaLabelValue = getAriaLabelColorValue( colorValue );
 			return style
 				? sprintf(
-						// translators: %1$s: The color's hex code e.g.: "#f00:". %2$s: The current border style selection e.g. "solid".
-						'Border color and style picker. The currently selected color has a value of "%1$s". The currently selected style is "%2$s".',
+						// translators: 1: The color's hex code e.g.: "#f00:". 2: The current border style selection e.g. "solid".
+						__(
+							'Border color and style picker. The currently selected color has a value of "%1$s". The currently selected style is "%2$s".'
+						),
 						ariaLabelValue,
 						style
 				  )
 				: sprintf(
-						// translators: %1$s: The color's hex code e.g: "#f00".
-						'Border color and style picker. The currently selected color has a value of "%1$s".',
+						// translators: %s: The color's hex code e.g: "#f00".
+						__(
+							'Border color and style picker. The currently selected color has a value of "%s".'
+						),
 						ariaLabelValue
 				  );
 		}
@@ -108,8 +116,10 @@ const getToggleAriaLabel = (
 
 	if ( colorObject ) {
 		return sprintf(
-			// translators: %1$s: The name of the color e.g. "vivid red". %2$s: The color's hex code e.g: "#f00".
-			'Border color picker. The currently selected color is called "%1$s" and has a value of "%2$s".',
+			// translators: 1: The name of the color e.g. "vivid red". 2: The color's hex code e.g: "#f00".
+			__(
+				'Border color picker. The currently selected color is called "%1$s" and has a value of "%2$s".'
+			),
 			colorObject.name,
 			getAriaLabelColorValue( colorObject.color )
 		);
@@ -117,8 +127,10 @@ const getToggleAriaLabel = (
 
 	if ( colorValue ) {
 		return sprintf(
-			// translators: %1$s: The color's hex code e.g: "#f00".
-			'Border color picker. The currently selected color has a value of "%1$s".',
+			// translators: %s: The color's hex code e.g: "#f00".
+			__(
+				'Border color picker. The currently selected color has a value of "%s".'
+			),
 			getAriaLabelColorValue( colorValue )
 		);
 	}
@@ -145,7 +157,7 @@ const BorderControlDropdown = (
 		onStyleChange,
 		popoverContentClassName,
 		popoverControlsClassName,
-		resetButtonClassName,
+		resetButtonWrapperClassName,
 		size,
 		__unstablePopoverProps,
 		...otherProps
@@ -161,7 +173,7 @@ const BorderControlDropdown = (
 		enableStyle
 	);
 
-	const showResetButton = color || ( style && style !== 'none' );
+	const enableResetButton = color || ( style && style !== 'none' );
 	const dropdownPosition = __experimentalIsRenderedInSidebar
 		? 'bottom left'
 		: undefined;
@@ -176,7 +188,7 @@ const BorderControlDropdown = (
 			tooltipPosition={ dropdownPosition }
 			label={ __( 'Border color and style picker' ) }
 			showTooltip
-			__next40pxDefaultSize={ size === '__unstable-large' ? true : false }
+			__next40pxDefaultSize={ size === '__unstable-large' }
 		>
 			<span className={ indicatorWrapperClassName }>
 				<ColorIndicator
@@ -187,9 +199,7 @@ const BorderControlDropdown = (
 		</Button>
 	);
 
-	const renderContent: DropdownComponentProps[ 'renderContent' ] = ( {
-		onClose,
-	} ) => (
+	const renderContent: DropdownComponentProps[ 'renderContent' ] = () => (
 		<>
 			<DropdownContentWrapper paddingSize="medium">
 				<VStack className={ popoverControlsClassName } spacing={ 6 }>
@@ -212,22 +222,20 @@ const BorderControlDropdown = (
 						/>
 					) }
 				</VStack>
-			</DropdownContentWrapper>
-			{ showResetButton && (
-				<DropdownContentWrapper paddingSize="none">
+				<div className={ resetButtonWrapperClassName }>
 					<Button
-						className={ resetButtonClassName }
 						variant="tertiary"
 						onClick={ () => {
 							onReset();
-							onClose();
 						} }
+						disabled={ ! enableResetButton }
+						accessibleWhenDisabled
 						__next40pxDefaultSize
 					>
 						{ __( 'Reset' ) }
 					</Button>
-				</DropdownContentWrapper>
-			) }
+				</div>
+			</DropdownContentWrapper>
 		</>
 	);
 

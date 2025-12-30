@@ -24,11 +24,13 @@ function myguten_admin_notice() {
 		return;
 	}
 	// Render the notice's HTML.
-	// Each notice should be wrapped in a <div>
-	// with a 'notice' class.
-	echo '<div class="notice notice-success is-dismissible"><p>';
-	echo sprintf( __( 'Post draft updated. <a href="%s" target="_blank">Preview post</a>' ), get_preview_post_link() );
-	echo '</p></div>';
+	wp_admin_notice(
+		sprintf( __( 'Post draft updated. <a href="%s" target="_blank">Preview post</a>' ), get_preview_post_link() ),
+		array(
+			'type'        => 'success',
+			'dismissible' => true,
+		)
+	);
 };
 add_action( 'admin_notices', 'myguten_admin_notice' );
 ```

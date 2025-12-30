@@ -3,13 +3,12 @@
  */
 import type { ForwardedRef } from 'react';
 import * as Ariakit from '@ariakit/react';
-import { useStoreState } from '@ariakit/react';
 
 /**
  * WordPress dependencies
  */
 import { useInstanceId } from '@wordpress/compose';
-import { forwardRef, useMemo } from '@wordpress/element';
+import { forwardRef, useEffect, useMemo } from '@wordpress/element';
 import { isRTL } from '@wordpress/i18n';
 
 /**
@@ -70,11 +69,20 @@ function UnforwardedToggleGroupControlAsRadioGroup(
 		rtl: isRTL(),
 	} );
 
-	const selectedValue = useStoreState( radio, 'value' );
+	const selectedValue = Ariakit.useStoreState( radio, 'value' );
 	const setValue = radio.setValue;
+
+	// Ensures that the active id is also reset after the value is "reset" by the consumer.
+	useEffect( () => {
+		if ( selectedValue === '' ) {
+			radio.setActiveId( undefined );
+		}
+	}, [ radio, selectedValue ] );
 
 	const groupContextValue = useMemo(
 		(): ToggleGroupControlContextProps => ( {
+			activeItemIsNotFirstItem: () =>
+				radio.getState().activeId !== radio.first(),
 			baseId,
 			isBlock: ! isAdaptiveWidth,
 			size,
@@ -87,6 +95,7 @@ function UnforwardedToggleGroupControlAsRadioGroup(
 		[
 			baseId,
 			isAdaptiveWidth,
+			radio,
 			selectedValue,
 			setSelectedElement,
 			setValue,

@@ -1,217 +1,339 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
-import { useState, useMemo, useCallback, useEffect } from '@wordpress/element';
-import { privateApis as corePrivateApis } from '@wordpress/core-data';
+import { Page } from '@wordpress/admin-ui';
+import { __, sprintf } from '@wordpress/i18n';
+import { decodeEntities } from '@wordpress/html-entities';
+import { useState, useMemo, useCallback } from '@wordpress/element';
+import {
+	privateApis as corePrivateApis,
+	store as coreStore,
+} from '@wordpress/core-data';
 import { DataViews, filterSortAndPaginate } from '@wordpress/dataviews';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
+import { addQueryArgs } from '@wordpress/url';
+import { useSelect, useDispatch } from '@wordpress/data';
+import { useEvent } from '@wordpress/compose';
+import { useView } from '@wordpress/views';
+import { Button, Modal } from '@wordpress/components';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
  */
-import Page from '../page';
 import AddNewTemplate from '../add-new-template';
-import {
-	TEMPLATE_POST_TYPE,
-	OPERATOR_IS_ANY,
-	LAYOUT_GRID,
-	LAYOUT_TABLE,
-	LAYOUT_LIST,
-} from '../../utils/constants';
+import { TEMPLATE_POST_TYPE } from '../../utils/constants';
 import { unlock } from '../../lock-unlock';
-import { useEditPostAction } from '../dataviews-actions';
+import {
+	useEditPostAction,
+	useSetActiveTemplateAction,
+} from '../dataviews-actions';
 import {
 	authorField,
 	descriptionField,
 	previewField,
-	titleField,
+	activeField,
+	slugField,
+	useThemeField,
 } from './fields';
+import { defaultLayouts, getDefaultView } from './view-utils';
 
-const { usePostActions } = unlock( editorPrivateApis );
+const { usePostActions, usePostFields, templateTitleField } =
+	unlock( editorPrivateApis );
 const { useHistory, useLocation } = unlock( routerPrivateApis );
 const { useEntityRecordsWithPermissions } = unlock( corePrivateApis );
 
-const EMPTY_ARRAY = [];
-
-const defaultLayouts = {
-	[ LAYOUT_TABLE ]: {
-		fields: [ 'template', 'author' ],
-		layout: {
-			primaryField: 'title',
-			combinedFields: [
-				{
-					id: 'template',
-					label: __( 'Template' ),
-					children: [ 'title', 'description' ],
-					direction: 'vertical',
-				},
-			],
-			styles: {
-				template: {
-					maxWidth: 400,
-					minWidth: 320,
-				},
-				preview: {
-					width: '1%',
-				},
-				author: {
-					width: '1%',
-				},
-			},
-		},
-	},
-	[ LAYOUT_GRID ]: {
-		fields: [ 'title', 'description', 'author' ],
-		layout: {
-			mediaField: 'preview',
-			primaryField: 'title',
-			columnFields: [ 'description' ],
-		},
-	},
-	[ LAYOUT_LIST ]: {
-		fields: [ 'title', 'description', 'author' ],
-		layout: {
-			primaryField: 'title',
-			mediaField: 'preview',
-		},
-	},
-};
-
-const DEFAULT_VIEW = {
-	type: LAYOUT_GRID,
-	search: '',
-	page: 1,
-	perPage: 20,
-	sort: {
-		field: 'title',
-		direction: 'asc',
-	},
-	fields: defaultLayouts[ LAYOUT_GRID ].fields,
-	layout: defaultLayouts[ LAYOUT_GRID ].layout,
-	filters: [],
-};
-
 export default function PageTemplates() {
-	const { params } = useLocation();
-	const { activeView = 'all', layout, postId } = params;
+	const { path, query } = useLocation();
+	const { activeView = 'active', postId } = query;
 	const [ selection, setSelection ] = useState( [ postId ] );
-
+	const [ selectedRegisteredTemplate, setSelectedRegisteredTemplate ] =
+		useState( false );
 	const defaultView = useMemo( () => {
-		const usedType = layout ?? DEFAULT_VIEW.type;
-		return {
-			...DEFAULT_VIEW,
-			type: usedType,
-			layout: defaultLayouts[ usedType ].layout,
-			fields: defaultLayouts[ usedType ].fields,
-			filters:
-				activeView !== 'all'
-					? [
-							{
-								field: 'author',
-								operator: 'isAny',
-								value: [ activeView ],
-							},
-					  ]
-					: [],
-		};
-	}, [ layout, activeView ] );
-	const [ view, setView ] = useState( defaultView );
-	useEffect( () => {
-		setView( ( currentView ) => ( {
-			...currentView,
-			filters:
-				activeView !== 'all'
-					? [
-							{
-								field: 'author',
-								operator: OPERATOR_IS_ANY,
-								value: [ activeView ],
-							},
-					  ]
-					: [],
-		} ) );
+		return getDefaultView( activeView );
 	}, [ activeView ] );
+	const { view, updateView, isModified, resetToDefault } = useView( {
+		kind: 'postType',
+		name: TEMPLATE_POST_TYPE,
+		slug: activeView,
+		defaultView,
+		queryParams: {
+			page: query.pageNumber,
+			search: query.search,
+		},
+		onChangeQueryParams: ( newQueryParams ) => {
+			history.navigate(
+				addQueryArgs( path, {
+					...query,
+					pageNumber: newQueryParams.page,
+					search: newQueryParams.search || undefined,
+				} )
+			);
+		},
+	} );
 
-	const { records, isResolving: isLoadingData } =
+	const { activeTemplatesOption, activeTheme, defaultTemplateTypes } =
+		useSelect( ( select ) => {
+			const { getEntityRecord, getCurrentTheme } = select( coreStore );
+			return {
+				activeTemplatesOption: getEntityRecord( 'root', 'site' )
+					?.active_templates,
+				activeTheme: getCurrentTheme(),
+				defaultTemplateTypes:
+					select( coreStore ).getCurrentTheme()
+						?.default_template_types,
+			};
+		} );
+	// Todo: this will have to be better so that we're not fetching all the
+	// records all the time. Active templates query will need to move server
+	// side.
+	const { records: userRecords, isResolving: isLoadingUserRecords } =
 		useEntityRecordsWithPermissions( 'postType', TEMPLATE_POST_TYPE, {
 			per_page: -1,
+			combinedTemplates: false,
 		} );
+	const { records: staticRecords, isResolving: isLoadingStaticData } =
+		useEntityRecordsWithPermissions( 'root', 'registeredTemplate', {
+			// This should not be needed, the endpoint returns all registered
+			// templates, but it's not possible right now to turn off pagination
+			// for entity configs.
+			per_page: -1,
+		} );
+
+	const activeTemplates = useMemo( () => {
+		const _active = [ ...staticRecords ];
+		if ( activeTemplatesOption ) {
+			for ( const activeSlug in activeTemplatesOption ) {
+				const activeId = activeTemplatesOption[ activeSlug ];
+				// Replace the template in the array.
+				const template = userRecords.find(
+					( userRecord ) =>
+						userRecord.id === activeId &&
+						userRecord.theme === activeTheme.stylesheet
+				);
+				if ( template ) {
+					const index = _active.findIndex(
+						( { slug } ) => slug === template.slug
+					);
+					if ( index !== -1 ) {
+						_active[ index ] = template;
+					} else {
+						_active.push( template );
+					}
+				}
+			}
+		}
+		return _active;
+	}, [ userRecords, staticRecords, activeTemplatesOption, activeTheme ] );
+
+	let isLoadingData;
+	if ( activeView === 'active' ) {
+		isLoadingData = isLoadingUserRecords || isLoadingStaticData;
+	} else if ( activeView === 'user' ) {
+		isLoadingData = isLoadingUserRecords;
+	} else {
+		isLoadingData = isLoadingStaticData;
+	}
+
+	const records = useMemo( () => {
+		function isCustom( record ) {
+			// For registered templates, the is_custom field is defined.
+			return (
+				record.is_custom ??
+				// For user templates it's custom if the is_wp_suggestion meta
+				// field is not set and the slug is not found in the default
+				// template types.
+				( ! record.meta?.is_wp_suggestion &&
+					! defaultTemplateTypes.some(
+						( type ) => type.slug === record.slug
+					) )
+			);
+		}
+
+		let _records;
+		if ( activeView === 'active' ) {
+			// Don't show active custom templates in the active view.
+			_records = activeTemplates.filter(
+				( record ) => ! isCustom( record )
+			);
+		} else if ( activeView === 'user' ) {
+			_records = userRecords;
+		} else {
+			_records = staticRecords;
+		}
+		return _records.map( ( record ) => ( {
+			...record,
+			_isActive: activeTemplates.some(
+				( template ) => template.id === record.id
+			),
+			_isCustom: isCustom( record ),
+		} ) );
+	}, [
+		activeTemplates,
+		defaultTemplateTypes,
+		userRecords,
+		staticRecords,
+		activeView,
+	] );
+
+	const users = useSelect(
+		( select ) => {
+			const { getUser } = select( coreStore );
+			return records.reduce( ( acc, record ) => {
+				if ( record.author_text ) {
+					if ( ! acc[ record.author_text ] ) {
+						acc[ record.author_text ] = record.author_text;
+					}
+				} else if ( record.author ) {
+					if ( ! acc[ record.author ] ) {
+						acc[ record.author ] = getUser( record.author );
+					}
+				}
+				return acc;
+			}, {} );
+		},
+		[ records ]
+	);
+
 	const history = useHistory();
 	const onChangeSelection = useCallback(
 		( items ) => {
 			setSelection( items );
-			if ( view?.type === LAYOUT_LIST ) {
-				history.push( {
-					...params,
-					postId: items.length === 1 ? items[ 0 ] : undefined,
-				} );
+			if ( view?.type === 'list' ) {
+				history.navigate(
+					addQueryArgs( path, {
+						postId: items.length === 1 ? items[ 0 ] : undefined,
+					} )
+				);
 			}
 		},
-		[ history, params, view?.type ]
+		[ history, path, view?.type ]
 	);
 
-	const authors = useMemo( () => {
-		if ( ! records ) {
-			return EMPTY_ARRAY;
-		}
-		const authorsSet = new Set();
-		records.forEach( ( template ) => {
-			authorsSet.add( template.author_text );
-		} );
-		return Array.from( authorsSet ).map( ( author ) => ( {
-			value: author,
-			label: author,
-		} ) );
-	}, [ records ] );
-
-	const fields = useMemo(
-		() => [
+	const postTypeFields = usePostFields( {
+		postType: TEMPLATE_POST_TYPE,
+	} );
+	const dateField = postTypeFields.find( ( field ) => field.id === 'date' );
+	const themeField = useThemeField();
+	const fields = useMemo( () => {
+		const _fields = [
 			previewField,
-			titleField,
+			templateTitleField,
 			descriptionField,
-			{
-				...authorField,
-				elements: authors,
-			},
-		],
-		[ authors ]
-	);
+			activeField,
+			slugField,
+		];
+		if ( activeView === 'user' ) {
+			_fields.push( themeField );
+			if ( dateField ) {
+				_fields.push( dateField );
+			}
+		}
+		const elements = [];
+		for ( const author in users ) {
+			elements.push( {
+				value: users[ author ]?.id ?? author,
+				label: users[ author ]?.name ?? author,
+			} );
+		}
+		_fields.push( {
+			...authorField,
+			elements,
+		} );
+		return _fields;
+	}, [ users, activeView, themeField, dateField ] );
 
 	const { data, paginationInfo } = useMemo( () => {
 		return filterSortAndPaginate( records, view, fields );
 	}, [ records, view, fields ] );
 
+	const { createSuccessNotice } = useDispatch( noticesStore );
+	const onActionPerformed = useCallback(
+		( actionId, items ) => {
+			switch ( actionId ) {
+				case 'duplicate-post':
+					{
+						const newItem = items[ 0 ];
+						const _title =
+							typeof newItem.title === 'string'
+								? newItem.title
+								: newItem.title?.rendered;
+						history.navigate( `/template?activeView=user` );
+						createSuccessNotice(
+							sprintf(
+								// translators: %s: Title of the created post or template, e.g: "Hello world".
+								__( '"%s" successfully created.' ),
+								decodeEntities( _title ) || __( '(no title)' )
+							),
+							{
+								type: 'snackbar',
+								id: 'duplicate-post-action',
+								actions: [
+									{
+										label: __( 'Edit' ),
+										onClick: () => {
+											history.navigate(
+												`/${ newItem.type }/${ newItem.id }?canvas=edit`
+											);
+										},
+									},
+								],
+							}
+						);
+					}
+					break;
+			}
+		},
+		[ history, createSuccessNotice ]
+	);
 	const postTypeActions = usePostActions( {
 		postType: TEMPLATE_POST_TYPE,
 		context: 'list',
+		onActionPerformed,
 	} );
 	const editAction = useEditPostAction();
+	const setActiveTemplateAction = useSetActiveTemplateAction();
 	const actions = useMemo(
-		() => [ editAction, ...postTypeActions ],
-		[ postTypeActions, editAction ]
+		() =>
+			activeView === 'user'
+				? [ setActiveTemplateAction, editAction, ...postTypeActions ]
+				: [ setActiveTemplateAction, ...postTypeActions ],
+		[ postTypeActions, setActiveTemplateAction, editAction, activeView ]
 	);
 
-	const onChangeView = useCallback(
-		( newView ) => {
-			if ( newView.type !== view.type ) {
-				history.push( {
-					...params,
-					layout: newView.type,
-				} );
-			}
+	const onChangeView = useEvent( ( newView ) => {
+		if ( newView.type !== view.type ) {
+			// Retrigger the routing areas resolution.
+			history.invalidate();
+		}
+		updateView( newView );
+	} );
 
-			setView( newView );
-		},
-		[ view.type, setView, history, params ]
+	const duplicateAction = actions.find(
+		( action ) => action.id === 'duplicate-post'
 	);
 
 	return (
 		<Page
 			className="edit-site-page-templates"
 			title={ __( 'Templates' ) }
-			actions={ <AddNewTemplate /> }
+			actions={
+				<>
+					{ isModified && (
+						<Button
+							__next40pxDefaultSize
+							onClick={ () => {
+								resetToDefault();
+								history.invalidate();
+							} }
+						>
+							{ __( 'Reset view' ) }
+						</Button>
+					) }
+					<AddNewTemplate />
+				</>
+			}
 		>
 			<DataViews
 				key={ activeView }
@@ -223,9 +345,31 @@ export default function PageTemplates() {
 				view={ view }
 				onChangeView={ onChangeView }
 				onChangeSelection={ onChangeSelection }
+				isItemClickable={ () => true }
+				onClickItem={ ( item ) => {
+					if ( typeof item.id === 'string' ) {
+						setSelectedRegisteredTemplate( item );
+					} else {
+						history.navigate(
+							`/${ item.type }/${ item.id }?canvas=edit`
+						);
+					}
+				} }
 				selection={ selection }
 				defaultLayouts={ defaultLayouts }
 			/>
+			{ selectedRegisteredTemplate && duplicateAction && (
+				<Modal
+					title={ __( 'Duplicate' ) }
+					onRequestClose={ () => setSelectedRegisteredTemplate() }
+					size="small"
+				>
+					<duplicateAction.RenderModal
+						items={ [ selectedRegisteredTemplate ] }
+						closeModal={ () => setSelectedRegisteredTemplate() }
+					/>
+				</Modal>
+			) }
 		</Page>
 	);
 }

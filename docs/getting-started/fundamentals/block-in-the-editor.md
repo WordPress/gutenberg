@@ -139,6 +139,7 @@ export default function Edit( { attributes, setAttributes } ) {
 				</div>
 			</InspectorControls>
 			<TextControl
+				__next40pxDefaultSize
 				value={ attributes.message }
 				onChange={ ( val ) => setAttributes( { message: val } ) }
 				style={ {

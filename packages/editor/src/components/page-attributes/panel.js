@@ -33,7 +33,7 @@ function AttributesPanel() {
 /**
  * Renders the Page Attributes Panel component.
  *
- * @return {Component} The component to be rendered.
+ * @return {React.ReactNode} The rendered component.
  */
 export default function PageAttributesPanel() {
 	return (

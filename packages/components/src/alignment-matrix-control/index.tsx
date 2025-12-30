@@ -15,11 +15,11 @@ import { useCallback } from '@wordpress/element';
  */
 import Cell from './cell';
 import { Composite } from '../composite';
-import { GridContainer, GridRow } from './styles';
 import AlignmentMatrixControlIcon from './icon';
 import { GRID, getItemId, getItemValue } from './utils';
 import type { WordPressComponentProps } from '../context';
 import type { AlignmentMatrixControlProps } from './types';
+import styles from './style.module.scss';
 
 function UnforwardedAlignmentMatrixControl( {
 	className,
@@ -49,7 +49,11 @@ function UnforwardedAlignmentMatrixControl( {
 		[ baseId, onChange ]
 	);
 
-	const classes = clsx( 'component-alignment-matrix-control', className );
+	const classes = clsx(
+		'component-alignment-matrix-control',
+		styles[ 'grid-container' ],
+		className
+	);
 
 	return (
 		<Composite
@@ -58,18 +62,23 @@ function UnforwardedAlignmentMatrixControl( {
 			setActiveId={ setActiveId }
 			rtl={ isRTL() }
 			render={
-				<GridContainer
+				<div
 					{ ...props }
-					aria-label={ label }
 					className={ classes }
+					aria-label={ label }
 					id={ baseId }
 					role="grid"
-					size={ width }
+					style={ { width: `${ width }px` } }
 				/>
 			}
 		>
 			{ GRID.map( ( cells, index ) => (
-				<Composite.Row render={ <GridRow role="row" /> } key={ index }>
+				<Composite.Row
+					render={
+						<div className={ styles[ 'grid-row' ] } role="row" />
+					}
+					key={ index }
+				>
 					{ cells.map( ( cell ) => (
 						<Cell
 							id={ getItemId( baseId, cell ) }

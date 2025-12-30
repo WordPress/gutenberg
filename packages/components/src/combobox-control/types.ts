@@ -86,4 +86,11 @@ export type ComboboxControlProps = Pick<
 	 * If passed, the combobox input will show a placeholder string if no values are present.
 	 */
 	placeholder?: string;
+	/**
+	 * Show a spinner (and hide the suggestions dropdown) while data
+	 * about the matching suggestions (ie the `options` prop) is loading
+	 *
+	 * @default false
+	 */
+	isLoading?: boolean;
 };

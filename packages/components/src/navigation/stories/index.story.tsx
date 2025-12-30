@@ -2,6 +2,7 @@
  * External dependencies
  */
 import type { Meta } from '@storybook/react';
+import { fn } from '@storybook/test';
 
 /**
  * Internal dependencies
@@ -39,13 +40,15 @@ const meta: Meta< typeof Navigation > = {
 		NavigationMenu,
 	},
 	argTypes: {
-		activeItem: { control: { type: null } },
-		activeMenu: { control: { type: null } },
-		children: { control: { type: null } },
-		onActivateMenu: { control: { type: null } },
+		activeItem: { control: false },
+		activeMenu: { control: false },
+		children: { control: false },
+		onActivateMenu: { control: false },
+	},
+	args: {
+		onActivateMenu: fn(),
 	},
 	parameters: {
-		actions: { argTypesRegex: '^on.*' },
 		controls: {
 			expanded: true,
 		},

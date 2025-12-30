@@ -167,7 +167,8 @@ export const SETTINGS_DEFAULTS = {
 	__mobileEnablePageTemplates: false,
 	__experimentalBlockPatterns: [],
 	__experimentalBlockPatternCategories: [],
-	__unstableIsPreviewMode: false,
+
+	isPreviewMode: false,
 
 	// These settings will be completely revamped in the future.
 	// The goal is to evolve this into an API which will instruct

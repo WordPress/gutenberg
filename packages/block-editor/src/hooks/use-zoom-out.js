@@ -11,37 +11,65 @@ import { store as blockEditorStore } from '../store';
 import { unlock } from '../lock-unlock';
 
 /**
- * A hook used to set the zoomed out view, invoking the hook sets the mode.
+ * A hook used to set the editor mode to zoomed out mode, invoking the hook sets the mode.
+ * Concepts:
+ * - If we most recently changed the zoom level for them (in or out), we always resetZoomLevel() level when unmounting.
+ * - If the user most recently changed the zoom level (manually toggling), we do nothing when unmounting.
  *
- * @param {boolean} zoomOut If we should zoom out or not.
+ * @param {boolean} enabled If we should enter into zoomOut mode or not
  */
-export function useZoomOut( zoomOut = true ) {
-	const { setZoomLevel } = unlock( useDispatch( blockEditorStore ) );
-	const { isZoomOut } = unlock( useSelect( blockEditorStore ) );
+export function useZoomOut( enabled = true ) {
+	const { setZoomLevel, resetZoomLevel } = unlock(
+		useDispatch( blockEditorStore )
+	);
 
-	const originalIsZoomOutRef = useRef( null );
+	/**
+	 * We need access to both the value and the function. The value is to trigger a useEffect hook
+	 * and the function is to check zoom out within another hook without triggering a re-render.
+	 */
+	const { isZoomedOut, isZoomOut } = useSelect( ( select ) => {
+		const { isZoomOut: _isZoomOut } = unlock( select( blockEditorStore ) );
+		return {
+			isZoomedOut: _isZoomOut(),
+			isZoomOut: _isZoomOut,
+		};
+	}, [] );
+
+	const controlZoomLevelRef = useRef( false );
+	const isEnabledRef = useRef( enabled );
+
+	/**
+	 * This hook tracks if the zoom state was changed manually by the user via clicking
+	 * the zoom out button. We only want this to run when isZoomedOut changes, so we use
+	 * a ref to track the enabled state.
+	 */
+	useEffect( () => {
+		// If the zoom state changed (isZoomOut) and it does not match the requested zoom
+		// state (zoomOut), then it means the user manually changed the zoom state while
+		// this hook was mounted, and we should no longer control the zoom state.
+		if ( isZoomedOut !== isEnabledRef.current ) {
+			controlZoomLevelRef.current = false;
+		}
+	}, [ isZoomedOut ] );
 
 	useEffect( () => {
-		// Only set this on mount so we know what to return to when we unmount.
-		if ( ! originalIsZoomOutRef.current ) {
-			originalIsZoomOutRef.current = isZoomOut();
-		}
+		isEnabledRef.current = enabled;
 
-		// The effect opens the zoom-out view if we want it open and the canvas is not currently zoomed-out.
-		if ( zoomOut && isZoomOut() === false ) {
-			setZoomLevel( 50 );
-		} else if (
-			! zoomOut &&
-			isZoomOut() &&
-			originalIsZoomOutRef.current !== isZoomOut()
-		) {
-			setZoomLevel( originalIsZoomOutRef.current ? 50 : 100 );
+		if ( enabled !== isZoomOut() ) {
+			controlZoomLevelRef.current = true;
+
+			if ( enabled ) {
+				setZoomLevel( 'auto-scaled' );
+			} else {
+				resetZoomLevel();
+			}
 		}
 
 		return () => {
-			if ( isZoomOut() && isZoomOut() !== originalIsZoomOutRef.current ) {
-				setZoomLevel( originalIsZoomOutRef.current ? 50 : 100 );
+			// If we are controlling zoom level and are zoomed out, reset the zoom level.
+			if ( controlZoomLevelRef.current && isZoomOut() ) {
+				resetZoomLevel();
 			}
 		};
-	}, [ isZoomOut, setZoomLevel, zoomOut ] );
+	}, [ enabled, isZoomOut, resetZoomLevel, setZoomLevel ] );
 }

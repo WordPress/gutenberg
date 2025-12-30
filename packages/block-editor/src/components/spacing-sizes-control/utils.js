@@ -185,64 +185,6 @@ export function getSliderValueFromPreset( presetValue, spacingSizes ) {
 }
 
 /**
- * Gets an items with the most occurrence within an array
- * https://stackoverflow.com/a/20762713
- *
- * @param {Array<any>} arr Array of items to check.
- * @return {any} The item with the most occurrences.
- */
-function mode( arr ) {
-	return arr
-		.sort(
-			( a, b ) =>
-				arr.filter( ( v ) => v === a ).length -
-				arr.filter( ( v ) => v === b ).length
-		)
-		.pop();
-}
-
-/**
- * Gets the 'all' input value from values data.
- *
- * @param {Object} values Box spacing values
- *
- * @return {string} The most common value from all sides of box.
- */
-export function getAllRawValue( values = {} ) {
-	return mode( Object.values( values ) );
-}
-
-/**
- * Checks to determine if values are mixed.
- *
- * @param {Object} values Box values.
- * @param {Array}  sides  Sides that values relate to.
- *
- * @return {boolean} Whether values are mixed.
- */
-export function isValuesMixed( values = {}, sides = ALL_SIDES ) {
-	return (
-		( Object.values( values ).length >= 1 &&
-			Object.values( values ).length < sides.length ) ||
-		new Set( Object.values( values ) ).size > 1
-	);
-}
-
-/**
- * Checks to determine if values are defined.
- *
- * @param {Object} values Box values.
- *
- * @return {boolean} Whether values are defined.
- */
-export function isValuesDefined( values ) {
-	if ( values === undefined || values === null ) {
-		return false;
-	}
-	return Object.values( values ).filter( ( value ) => !! value ).length > 0;
-}
-
-/**
  * Determines whether a particular axis has support. If no axis is
  * specified, this function checks if either axis is supported.
  *
@@ -273,54 +215,6 @@ export function hasAxisSupport( sides, axis ) {
 	}
 
 	return hasHorizontalSupport || hasVerticalSupport;
-}
-
-/**
- * Determines which menu options should be included in the SidePicker.
- *
- * @param {Array} sides Supported sides.
- *
- * @return {Object} Menu options with each option containing label & icon.
- */
-export function getSupportedMenuItems( sides ) {
-	if ( ! sides || ! sides.length ) {
-		return {};
-	}
-
-	const menuItems = {};
-
-	// Determine the primary "side" menu options.
-	const hasHorizontalSupport = hasAxisSupport( sides, 'horizontal' );
-	const hasVerticalSupport = hasAxisSupport( sides, 'vertical' );
-
-	if ( hasHorizontalSupport && hasVerticalSupport ) {
-		menuItems.axial = { label: LABELS.axial, icon: ICONS.axial };
-	} else if ( hasHorizontalSupport ) {
-		menuItems.axial = { label: LABELS.horizontal, icon: ICONS.horizontal };
-	} else if ( hasVerticalSupport ) {
-		menuItems.axial = { label: LABELS.vertical, icon: ICONS.vertical };
-	}
-
-	// Track whether we have any individual sides so we can omit the custom
-	// option if required.
-	let numberOfIndividualSides = 0;
-
-	ALL_SIDES.forEach( ( side ) => {
-		if ( sides.includes( side ) ) {
-			numberOfIndividualSides += 1;
-			menuItems[ side ] = {
-				label: LABELS[ side ],
-				icon: ICONS[ side ],
-			};
-		}
-	} );
-
-	// Add custom item if there are enough sides to warrant a separated view.
-	if ( numberOfIndividualSides > 1 ) {
-		menuItems.custom = { label: LABELS.custom, icon: ICONS.custom };
-	}
-
-	return menuItems;
 }
 
 /**

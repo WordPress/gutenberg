@@ -94,7 +94,12 @@ const useBlockTypesState = ( rootClientId, onInsert, isQuick ) => {
 				destinationClientId
 			);
 		},
-		[ onInsert, getClosestAllowedInsertionPoint, rootClientId ]
+		[
+			getClosestAllowedInsertionPoint,
+			rootClientId,
+			onInsert,
+			createErrorNotice,
+		]
 	);
 
 	return [ items, categories, collections, onSelectItem ];

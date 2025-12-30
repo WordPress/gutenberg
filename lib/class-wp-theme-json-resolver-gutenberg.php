@@ -2,7 +2,7 @@
 /**
  * WP_Theme_JSON_Resolver_Gutenberg class
  *
- * @package Gutenberg
+ * @package gutenberg
  * @since 5.8.0
  */
 
@@ -316,7 +316,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 		 * So we take theme supports, transform it to theme.json shape
 		 * and merge the static::$theme upon that.
 		 */
-		$theme_support_data = WP_Theme_JSON_Gutenberg::get_from_editor_settings( gutenberg_get_classic_theme_supports_block_editor_settings() );
+		$theme_support_data = WP_Theme_JSON_Gutenberg::get_from_editor_settings( get_classic_theme_supports_block_editor_settings() );
 		if ( ! wp_theme_has_theme_json() ) {
 			/*
 			 * Unlike block themes, classic themes without a theme.json disable
@@ -359,7 +359,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 			}
 			if ( current_theme_supports( 'experimental-link-color' ) ) {
 				_doing_it_wrong(
-					current_theme_supports( 'experimental-link-color' ),
+					"add_theme_support( 'experimental-link-color' )",
 					__( '`experimental-link-color` is no longer supported. Use `link-color` instead.', 'gutenberg' ),
 					'6.3.0'
 				);
@@ -459,17 +459,6 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 			$theme = wp_get_theme();
 		}
 
-		/*
-		 * Bail early if the theme does not support a theme.json.
-		 *
-		 * Since wp_theme_has_theme_json only supports the active
-		 * theme, the extra condition for whether $theme is the active theme is
-		 * present here.
-		 */
-		if ( $theme->get_stylesheet() === get_stylesheet() && ! wp_theme_has_theme_json() ) {
-			return array();
-		}
-
 		$user_cpt         = array();
 		$post_type_filter = 'wp_global_styles';
 		$stylesheet       = $theme->get_stylesheet();
@@ -494,7 +483,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 
 		$global_style_query = new WP_Query();
 		$recent_posts       = $global_style_query->query( $args );
-		if ( count( $recent_posts ) === 1 ) {
+		if ( count( $recent_posts ) === 1 && $recent_posts[0] instanceof WP_Post ) {
 			$user_cpt = get_object_vars( $recent_posts[0] );
 		} elseif ( $create_post ) {
 			$cpt_post_id = wp_insert_post(
@@ -511,7 +500,10 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 				true
 			);
 			if ( ! is_wp_error( $cpt_post_id ) ) {
-				$user_cpt = get_object_vars( get_post( $cpt_post_id ) );
+				$post = get_post( $cpt_post_id );
+				if ( $post instanceof WP_Post ) {
+					$user_cpt = get_object_vars( $post );
+				}
 			}
 		}
 
@@ -920,18 +912,14 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 			return $theme_json;
 		}
 
-		$resolved_theme_json_data = array(
-			'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
-		);
+		$resolved_theme_json_data = $theme_json->get_raw_data();
 
 		foreach ( $resolved_urls as $resolved_url ) {
 			$path = explode( '.', $resolved_url['target'] );
 			_wp_array_set( $resolved_theme_json_data, $path, $resolved_url['href'] );
 		}
 
-		$theme_json->merge( new WP_Theme_JSON_Gutenberg( $resolved_theme_json_data ) );
-
-		return $theme_json;
+		return new WP_Theme_JSON_Gutenberg( $resolved_theme_json_data );
 	}
 
 	/**

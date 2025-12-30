@@ -98,13 +98,13 @@ test.describe( 'Embedding content', () => {
 				MOCK_EMBED_PHOTO_SUCCESS_RESPONSE,
 		} );
 
-		const currenEmbedBlock = editor.canvas
+		const currentEmbedBlock = editor.canvas
 			.getByRole( 'document', { name: 'Block' } )
 			.last();
 
 		await embedUtils.insertEmbed( 'https://twitter.com/notnownikki' );
 		await expect(
-			currenEmbedBlock.locator( 'iframe' ),
+			currentEmbedBlock.locator( 'iframe' ),
 			'Valid embed. Should render valid element.'
 		).toHaveAttribute( 'title', 'Embedded content from twitter.com' );
 
@@ -112,7 +112,7 @@ test.describe( 'Embedding content', () => {
 			'https://twitter.com/wooyaygutenberg123454312'
 		);
 		await expect(
-			currenEmbedBlock.getByRole( 'textbox', { name: 'Embed URL' } ),
+			currentEmbedBlock.getByRole( 'textbox', { name: 'Embed URL' } ),
 			'Valid provider; invalid content. Should render failed, edit state.'
 		).toHaveValue( 'https://twitter.com/wooyaygutenberg123454312' );
 
@@ -120,13 +120,13 @@ test.describe( 'Embedding content', () => {
 			'https://wordpress.org/gutenberg/handbook/'
 		);
 		await expect(
-			currenEmbedBlock.getByRole( 'textbox', { name: 'Embed URL' } ),
+			currentEmbedBlock.getByRole( 'textbox', { name: 'Embed URL' } ),
 			'WordPress invalid content. Should render failed, edit state.'
 		).toHaveValue( 'https://wordpress.org/gutenberg/handbook' );
 
 		await embedUtils.insertEmbed( 'https://twitter.com/thatbunty' );
 		await expect(
-			currenEmbedBlock.getByRole( 'textbox', { name: 'Embed URL' } ),
+			currentEmbedBlock.getByRole( 'textbox', { name: 'Embed URL' } ),
 			'Provider whose oembed API has gone wrong. Should render failed, edit state.'
 		).toHaveValue( 'https://twitter.com/thatbunty' );
 
@@ -134,21 +134,21 @@ test.describe( 'Embedding content', () => {
 			'https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/'
 		);
 		await expect(
-			currenEmbedBlock.locator( 'figure' ),
+			currentEmbedBlock,
 			'WordPress valid content. Should render valid figure element.'
-		).toHaveClass( 'wp-block-embed' );
+		).toHaveClass( /wp-block-embed/ );
 
 		await embedUtils.insertEmbed(
 			'https://www.youtube.com/watch?v=lXMskKTw3Bc'
 		);
 		await expect(
-			currenEmbedBlock.locator( 'figure' ),
+			currentEmbedBlock,
 			'Video content. Should render valid figure element, and include the aspect ratio class.'
 		).toHaveClass( /wp-embed-aspect-16-9/ );
 
 		await embedUtils.insertEmbed( 'https://cloudup.com/cQFlxqtY4ob' );
 		await expect(
-			currenEmbedBlock.locator( 'iframe' ),
+			currentEmbedBlock.locator( 'iframe' ),
 			'Photo content. Should render valid iframe element.'
 		).toHaveAttribute( 'title', 'Embedded content from cloudup.com' );
 	} );
@@ -202,7 +202,7 @@ test.describe( 'Embedding content', () => {
 
 		await expect(
 			editor.canvas.getByRole( 'document', {
-				name: 'Block: Twitter',
+				name: 'Block: X',
 			} )
 		).toBeVisible();
 	} );
@@ -235,7 +235,7 @@ test.describe( 'Embedding content', () => {
 		await embedBlock.getByRole( 'button', { name: 'Try again' } ).click();
 		await expect(
 			editor.canvas.getByRole( 'document', {
-				name: 'Block: Twitter',
+				name: 'Block: X',
 			} )
 		).toBeVisible();
 	} );

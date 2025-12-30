@@ -71,7 +71,7 @@ function getFunctionUnitValue( functionUnitValue, options ) {
  * Take a css function such as min, max, calc, clamp and returns parsedUnit
  *
  * How this works for the nested function is that it first replaces the inner function call.
- * Then it tackles the outer onces.
+ * Then it tackles the outer ones.
  * So for example: min( max(25px, 35px), 40px )
  * in the first pass we would replace max(25px, 35px) with 35px.
  * then we would try to evaluate min( 35px, 40px )
@@ -101,7 +101,7 @@ function parseUnitFunction( cssUnit ) {
 /**
  * Return true if we think this is a math expression.
  *
- * @param {string} cssUnit the cssUnit value being evaluted.
+ * @param {string} cssUnit the cssUnit value being evaluated.
  * @return {boolean} Whether the cssUnit is a math expression.
  */
 function isMathExpression( cssUnit ) {
@@ -115,8 +115,8 @@ function isMathExpression( cssUnit ) {
 /**
  * Evaluates the math expression and return a px value.
  *
- * @param {string} cssUnit the cssUnit value being evaluted.
- * @return {string} return a converfted value to px.
+ * @param {string} cssUnit the cssUnit value being evaluated.
+ * @return {string} return a converted value to px.
  */
 function evalMathExpression( cssUnit ) {
 	let errorFound = false;

@@ -199,9 +199,18 @@ export type Attachment = BetterOmit<
 };
 
 export type OnChangeHandler = ( attachments: Partial< Attachment >[] ) => void;
-export type OnSuccessHandler = ( attachments: Partial< Attachment >[] ) => void;
 export type OnErrorHandler = ( error: Error ) => void;
 
 export type CreateRestAttachment = Partial< RestAttachment >;
 
 export type AdditionalData = BetterOmit< CreateRestAttachment, 'meta' >;
+
+export interface CreateSideloadFile {
+	image_size?: string;
+	upload_request?: string;
+}
+
+export interface SideloadAdditionalData {
+	post: RestAttachment[ 'id' ];
+	image_size?: string;
+}

@@ -38,7 +38,7 @@ const PANEL_NAME = 'post-status';
 export default function PostSummary( { onActionPerformed } ) {
 	const { isRemovedPostStatusPanel, postType, postId } = useSelect(
 		( select ) => {
-			// We use isEditorPanelRemoved to hide the panel if it was programatically removed. We do
+			// We use isEditorPanelRemoved to hide the panel if it was programmatically removed. We do
 			// not use isEditorPanelEnabled since this panel should not be disabled through the UI.
 			const {
 				isEditorPanelRemoved,
@@ -87,11 +87,11 @@ export default function PostSummary( { onActionPerformed } ) {
 										<PostsPerPage />
 										<SiteDiscussion />
 										<PostFormatPanel />
+										{ fills }
 									</VStack>
 									<PostTrash
 										onActionPerformed={ onActionPerformed }
 									/>
-									{ fills }
 								</VStack>
 							) }
 						</VStack>

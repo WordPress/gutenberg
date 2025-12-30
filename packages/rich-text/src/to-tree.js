@@ -97,12 +97,6 @@ function fromFormat( {
 		}
 	}
 
-	// When a format is declared as non editable, make it non editable in the
-	// editor.
-	if ( isEditableTree && formatType.contentEditable === false ) {
-		elementAttributes.contenteditable = 'false';
-	}
-
 	return {
 		type: tagName || formatType.tagName,
 		object: formatType.object,
@@ -229,7 +223,20 @@ export function toTree( {
 			const { type, attributes, innerHTML } = replacement;
 			const formatType = getFormatType( type );
 
-			if ( ! isEditableTree && type === 'script' ) {
+			if ( isEditableTree && type === '#comment' ) {
+				pointer = append( getParent( pointer ), {
+					type: 'span',
+					attributes: {
+						contenteditable: 'false',
+						'data-rich-text-comment':
+							attributes[ 'data-rich-text-comment' ],
+					},
+				} );
+				append(
+					append( pointer, { type: 'span' } ),
+					attributes[ 'data-rich-text-comment' ].trim()
+				);
+			} else if ( ! isEditableTree && type === 'script' ) {
 				pointer = append(
 					getParent( pointer ),
 					fromFormat( {
@@ -243,20 +250,41 @@ export function toTree( {
 					),
 				} );
 			} else if ( formatType?.contentEditable === false ) {
-				// For non editable formats, render the stored inner HTML.
-				pointer = append(
-					getParent( pointer ),
-					fromFormat( {
-						...replacement,
-						isEditableTree,
-						boundaryClass: start === i && end === i + 1,
-					} )
-				);
-
-				if ( innerHTML ) {
-					append( pointer, {
-						html: innerHTML,
-					} );
+				if ( innerHTML || isEditableTree ) {
+					pointer = getParent( pointer );
+					// For non editable formats, render the stored inner HTML.
+					if ( isEditableTree ) {
+						const attrs = {
+							contenteditable: 'false',
+							'data-rich-text-bogus': true,
+						};
+						if ( start === i && end === i + 1 ) {
+							attrs[ 'data-rich-text-format-boundary' ] = true;
+						}
+						pointer = append( pointer, {
+							type: 'span',
+							attributes: attrs,
+						} );
+						// Some browsers like Safari and Firefox have issues placing
+						// the caret after a non-editable element when it's at the
+						// end of the field, so help them a little by providing a
+						// text element. Similar to `insertPadding` above.
+						if ( isEditableTree && i + 1 === text.length ) {
+							append( getParent( pointer ), ZWNBSP );
+						}
+					}
+					pointer = append(
+						pointer,
+						fromFormat( {
+							...replacement,
+							isEditableTree,
+						} )
+					);
+					if ( innerHTML ) {
+						append( pointer, {
+							html: innerHTML,
+						} );
+					}
 				}
 			} else {
 				pointer = append(

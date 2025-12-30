@@ -6,9 +6,11 @@ import {
 	__experimentalNumberControl as NumberControl,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
+	Notice,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useCallback, useMemo, useEffect } from '@wordpress/element';
+import { useCallback, useMemo } from '@wordpress/element';
+import { getValueFromVariable } from '@wordpress/global-styles-engine';
 
 /**
  * Internal dependencies
@@ -21,12 +23,13 @@ import TextAlignmentControl from '../text-alignment-control';
 import TextTransformControl from '../text-transform-control';
 import TextDecorationControl from '../text-decoration-control';
 import WritingModeControl from '../writing-mode-control';
-import { getValueFromVariable, useToolsPanelDropdownMenuProps } from './utils';
+import { useToolsPanelDropdownMenuProps } from './utils';
 import { setImmutably } from '../../utils/object';
 import {
 	getMergedFontFamiliesAndFontFamilyFaces,
 	findNearestStyleAndWeight,
 } from './typography-utils';
+import { getFontStylesAndWeights } from '../../utils/get-font-styles-and-weights';
 
 const MIN_TEXT_COLUMNS = 1;
 const MAX_TEXT_COLUMNS = 6;
@@ -193,15 +196,57 @@ export default function TypographyPanel( {
 		const slug = fontFamilies?.find(
 			( { fontFamily: f } ) => f === newValue
 		)?.slug;
-		onChange(
-			setImmutably(
-				value,
-				[ 'typography', 'fontFamily' ],
-				slug
-					? `var:preset|font-family|${ slug }`
-					: newValue || undefined
-			)
+		let updatedValue = setImmutably(
+			value,
+			[ 'typography', 'fontFamily' ],
+			slug ? `var:preset|font-family|${ slug }` : newValue || undefined
 		);
+
+		// Check if current font style/weight are available in the new font family.
+		const newFontFamilyFaces =
+			fontFamilies?.find( ( { fontFamily: f } ) => f === newValue )
+				?.fontFace ?? [];
+		const { fontStyles, fontWeights } =
+			getFontStylesAndWeights( newFontFamilyFaces );
+		const hasFontStyle = fontStyles?.some(
+			( { value: fs } ) => fs === fontStyle
+		);
+		const hasFontWeight = fontWeights?.some(
+			( { value: fw } ) => fw?.toString() === fontWeight?.toString()
+		);
+
+		// Find the nearest available font style/weight if not available.
+		if ( ! hasFontStyle || ! hasFontWeight ) {
+			const { nearestFontStyle, nearestFontWeight } =
+				findNearestStyleAndWeight(
+					newFontFamilyFaces,
+					fontStyle,
+					fontWeight
+				);
+			if ( nearestFontStyle || nearestFontWeight ) {
+				// Update to the nearest available font style/weight in the new font family.
+				updatedValue = {
+					...updatedValue,
+					typography: {
+						...updatedValue?.typography,
+						fontStyle: nearestFontStyle || undefined,
+						fontWeight: nearestFontWeight || undefined,
+					},
+				};
+			} else if ( fontStyle || fontWeight ) {
+				// Reset if no available styles/weights found.
+				updatedValue = {
+					...updatedValue,
+					typography: {
+						...updatedValue?.typography,
+						fontStyle: undefined,
+						fontWeight: undefined,
+					},
+				};
+			}
+		}
+
+		onChange( updatedValue );
 	};
 	const hasFontFamily = () => !! value?.typography?.fontFamily;
 	const resetFontFamily = () => setFontFamily( undefined );
@@ -212,6 +257,30 @@ export default function TypographyPanel( {
 	const mergedFontSizes = getMergedFontSizes( settings );
 
 	const fontSize = decodeValue( inheritedValue?.typography?.fontSize );
+
+	// Extract the slug from the CSS custom property if it exists
+	const currentFontSizeSlug = ( () => {
+		const rawValue = inheritedValue?.typography?.fontSize;
+		if ( ! rawValue || typeof rawValue !== 'string' ) {
+			return undefined;
+		}
+
+		// Block supports use `var:preset` format.
+		if ( rawValue.startsWith( 'var:preset|font-size|' ) ) {
+			return rawValue.replace( 'var:preset|font-size|', '' );
+		}
+
+		// Global styles data uses `var(--wp--preset)` format.
+		const cssVarMatch = rawValue.match(
+			/^var\(--wp--preset--font-size--([^)]+)\)$/
+		);
+		if ( cssVarMatch ) {
+			return cssVarMatch[ 1 ];
+		}
+
+		return undefined;
+	} )();
+
 	const setFontSize = ( newValue, metadata ) => {
 		const actualValue = !! metadata?.slug
 			? `var:preset|font-size|${ metadata?.slug }`
@@ -235,11 +304,6 @@ export default function TypographyPanel( {
 	const hasFontWeights = settings?.typography?.fontWeight;
 	const fontStyle = decodeValue( inheritedValue?.typography?.fontStyle );
 	const fontWeight = decodeValue( inheritedValue?.typography?.fontWeight );
-	const { nearestFontStyle, nearestFontWeight } = findNearestStyleAndWeight(
-		fontFamilyFaces,
-		fontStyle,
-		fontWeight
-	);
 	const setFontAppearance = useCallback(
 		( { fontStyle: newFontStyle, fontWeight: newFontWeight } ) => {
 			// Only update the font style and weight if they have changed.
@@ -261,24 +325,6 @@ export default function TypographyPanel( {
 	const resetFontAppearance = useCallback( () => {
 		setFontAppearance( {} );
 	}, [ setFontAppearance ] );
-
-	// Check if previous font style and weight values are available in the new font family.
-	useEffect( () => {
-		if ( nearestFontStyle && nearestFontWeight ) {
-			setFontAppearance( {
-				fontStyle: nearestFontStyle,
-				fontWeight: nearestFontWeight,
-			} );
-		} else {
-			// Reset font appearance if there are no available styles or weights.
-			resetFontAppearance();
-		}
-	}, [
-		nearestFontStyle,
-		nearestFontWeight,
-		resetFontAppearance,
-		setFontAppearance,
-	] );
 
 	// Line Height
 	const hasLineHeightEnabled = useHasLineHeightControl( settings );
@@ -419,7 +465,6 @@ export default function TypographyPanel( {
 						value={ fontFamily }
 						onChange={ setFontFamily }
 						size="__unstable-large"
-						__nextHasNoMarginBottom
 					/>
 				</ToolsPanelItem>
 			) }
@@ -432,7 +477,8 @@ export default function TypographyPanel( {
 					panelId={ panelId }
 				>
 					<FontSizePicker
-						value={ fontSize }
+						value={ currentFontSizeSlug || fontSize }
+						valueMode={ currentFontSizeSlug ? 'slug' : 'literal' }
 						onChange={ setFontSize }
 						fontSizes={ mergedFontSizes }
 						disableCustomFontSizes={ disableCustomFontSizes }
@@ -549,7 +595,6 @@ export default function TypographyPanel( {
 						value={ writingMode }
 						onChange={ setWritingMode }
 						size="__unstable-large"
-						__nextHasNoMarginBottom
 					/>
 				</ToolsPanelItem>
 			) }
@@ -567,7 +612,6 @@ export default function TypographyPanel( {
 						showNone
 						isBlock
 						size="__unstable-large"
-						__nextHasNoMarginBottom
 					/>
 				</ToolsPanelItem>
 			) }
@@ -582,9 +626,19 @@ export default function TypographyPanel( {
 					<TextAlignmentControl
 						value={ textAlign }
 						onChange={ setTextAlign }
+						options={ [ 'left', 'center', 'right', 'justify' ] }
 						size="__unstable-large"
-						__nextHasNoMarginBottom
 					/>
+
+					{ textAlign === 'justify' && (
+						<div>
+							<Notice status="warning" isDismissible={ false }>
+								{ __(
+									'Justified text can reduce readability. For better accessibility, use left-aligned text instead.'
+								) }
+							</Notice>
+						</div>
+					) }
 				</ToolsPanelItem>
 			) }
 		</Wrapper>

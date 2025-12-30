@@ -7,16 +7,9 @@ import { __ } from '@wordpress/i18n';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { store as editorStore } from '@wordpress/editor';
 
-/**
- * Internal dependencies
- */
-import useEditedEntityRecord from '../use-edited-entity-record';
-
 export default function WelcomeGuideTemplate() {
 	const { toggle } = useDispatch( preferencesStore );
 
-	const { isLoaded, record } = useEditedEntityRecord();
-	const isPostTypeTemplate = isLoaded && record.type === 'wp_template';
 	const { isActive, hasPreviousEntity } = useSelect( ( select ) => {
 		const { getEditorSettings } = select( editorStore );
 		const { get } = select( preferencesStore );
@@ -26,7 +19,7 @@ export default function WelcomeGuideTemplate() {
 				!! getEditorSettings().onNavigateToPreviousEntityRecord,
 		};
 	}, [] );
-	const isVisible = isActive && isPostTypeTemplate && hasPreviousEntity;
+	const isVisible = isActive && hasPreviousEntity;
 
 	if ( ! isVisible ) {
 		return null;

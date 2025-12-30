@@ -50,6 +50,6 @@ function EditorHistoryRedo( props, ref ) {
  * @param {Object} props - Props.
  * @param {Ref}    ref   - Forwarded ref.
  *
- * @return {Component} The component to be rendered.
+ * @return {React.ReactNode} The rendered component.
  */
 export default forwardRef( EditorHistoryRedo );

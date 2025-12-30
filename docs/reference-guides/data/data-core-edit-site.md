@@ -52,6 +52,8 @@ _Returns_
 
 ### getEditedPostId
 
+> **Deprecated**
+
 Returns the ID of the currently edited template or template part.
 
 _Parameters_
@@ -63,6 +65,8 @@ _Returns_
 -   `?string`: Post ID.
 
 ### getEditedPostType
+
+> **Deprecated**
 
 Returns the current edited post type (wp_template or wp_template_part).
 
@@ -189,6 +193,8 @@ _Returns_
 
 ### isPage
 
+> **Deprecated**
+
 Whether or not the editor has a page loaded into it.
 
 _Related_
@@ -273,6 +279,8 @@ _Parameters_
 
 ### setEditedEntity
 
+> **Deprecated**
+
 Action that sets an edited entity.
 
 _Parameters_
@@ -286,6 +294,8 @@ _Returns_
 -   `Object`: Action object.
 
 ### setEditedPostContext
+
+> **Deprecated**
 
 Set's the current block editor context.
 
@@ -345,6 +355,8 @@ _Parameters_
 
 ### setNavigationMenu
 
+> **Deprecated**
+
 Action that sets a navigation menu.
 
 _Parameters_
@@ -384,6 +396,8 @@ _Returns_
 -   `Object`: Action object.
 
 ### setTemplatePart
+
+> **Deprecated**
 
 Action that sets a template part.
 

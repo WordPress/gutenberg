@@ -42,7 +42,7 @@ exports[`BlockAlignmentUI should match snapshot when controls are visible 1`] = 
       <button
         aria-label="None"
         aria-pressed="false"
-        class="components-button components-toolbar__control has-icon"
+        class="components-button components-toolbar__control is-compact has-icon"
         data-toolbar-item="true"
         type="button"
       >
@@ -64,7 +64,7 @@ exports[`BlockAlignmentUI should match snapshot when controls are visible 1`] = 
       <button
         aria-label="Align left"
         aria-pressed="true"
-        class="components-button components-toolbar__control is-pressed has-icon"
+        class="components-button components-toolbar__control is-compact is-pressed has-icon"
         data-toolbar-item="true"
         type="button"
       >
@@ -86,7 +86,7 @@ exports[`BlockAlignmentUI should match snapshot when controls are visible 1`] = 
       <button
         aria-label="Align center"
         aria-pressed="false"
-        class="components-button components-toolbar__control has-icon"
+        class="components-button components-toolbar__control is-compact has-icon"
         data-toolbar-item="true"
         type="button"
       >
@@ -108,7 +108,7 @@ exports[`BlockAlignmentUI should match snapshot when controls are visible 1`] = 
       <button
         aria-label="Align right"
         aria-pressed="false"
-        class="components-button components-toolbar__control has-icon"
+        class="components-button components-toolbar__control is-compact has-icon"
         data-toolbar-item="true"
         type="button"
       >

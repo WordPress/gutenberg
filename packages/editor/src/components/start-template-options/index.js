@@ -6,7 +6,6 @@ import { __ } from '@wordpress/i18n';
 import { useState, useMemo, useEffect } from '@wordpress/element';
 import { __experimentalBlockPatternsList as BlockPatternsList } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
-import { useAsyncList } from '@wordpress/compose';
 import { parse } from '@wordpress/blocks';
 import { store as coreStore, useEntityBlockEditor } from '@wordpress/core-data';
 
@@ -111,11 +110,9 @@ function useStartPatterns( fallbackContent ) {
 function PatternSelection( { fallbackContent, onChoosePattern, postType } ) {
 	const [ , , onChange ] = useEntityBlockEditor( 'postType', postType );
 	const blockPatterns = useStartPatterns( fallbackContent );
-	const shownBlockPatterns = useAsyncList( blockPatterns );
 	return (
 		<BlockPatternsList
 			blockPatterns={ blockPatterns }
-			shownPatterns={ shownBlockPatterns }
 			onClickPattern={ ( pattern, blocks ) => {
 				onChange( blocks, { selection: undefined } );
 				onChoosePattern();

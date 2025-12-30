@@ -1,4 +1,7 @@
-@import "./elements.scss";
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/default-custom-properties";
+@use "./elements.scss" as *;
 
 // The following selectors have increased specificity (using the :root prefix)
 // to assure colors take effect over another base class color, mainly to let
@@ -32,18 +35,24 @@
 }
 
 // Text alignments.
-.has-text-align-center {
+// The :root prefix increases CSS specificity from 0-1-0 to 0-2-0,
+// ensuring that block instance-level text alignment overrides take
+// precedence over global styles.
+:root .has-text-align-center {
 	text-align: center;
 }
-
-.has-text-align-left {
+:root .has-text-align-left {
 	/*rtl:ignore*/
 	text-align: left;
 }
-
-.has-text-align-right {
+:root .has-text-align-right {
 	/*rtl:ignore*/
 	text-align: right;
+}
+
+// Fit Text
+.has-fit-text {
+	white-space: nowrap !important;
 }
 
 // This tag marks the end of the styles that apply to editing canvas contents and need to be manipulated when we resize the editor.
@@ -75,8 +84,6 @@
 
 .screen-reader-text {
 	border: 0;
-	clip: rect(1px, 1px, 1px, 1px);
-	-webkit-clip-path: inset(50%);
 	clip-path: inset(50%);
 	height: 1px;
 	margin: -1px;
@@ -89,7 +96,6 @@
 
 .screen-reader-text:focus {
 	background-color: $gray-300;
-	clip: auto !important;
 	clip-path: none;
 	color: #444;
 	display: block;
@@ -122,12 +128,14 @@ html :where([style*="border-top-color"]) {
 	border-top-style: solid;
 }
 html :where([style*="border-right-color"]) {
+	/*rtl:ignore*/
 	border-right-style: solid;
 }
 html :where([style*="border-bottom-color"]) {
 	border-bottom-style: solid;
 }
 html :where([style*="border-left-color"]) {
+	/*rtl:ignore*/
 	border-left-style: solid;
 }
 
@@ -138,12 +146,14 @@ html :where([style*="border-top-width"]) {
 	border-top-style: solid;
 }
 html :where([style*="border-right-width"]) {
+	/*rtl:ignore*/
 	border-right-style: solid;
 }
 html :where([style*="border-bottom-width"]) {
 	border-bottom-style: solid;
 }
 html :where([style*="border-left-width"]) {
+	/*rtl:ignore*/
 	border-left-style: solid;
 }
 

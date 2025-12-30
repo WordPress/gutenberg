@@ -118,7 +118,7 @@ export default function WelcomeGuide() {
 					content: (
 						<>
 							<h1 className="edit-widgets-welcome-guide__heading">
-								{ __( 'Make each block your own' ) }
+								{ __( 'Customize each block' ) }
 							</h1>
 							<p className="edit-widgets-welcome-guide__text">
 								{ __(
@@ -138,7 +138,7 @@ export default function WelcomeGuide() {
 					content: (
 						<>
 							<h1 className="edit-widgets-welcome-guide__heading">
-								{ __( 'Get to know the block library' ) }
+								{ __( 'Explore all blocks' ) }
 							</h1>
 							<p className="edit-widgets-welcome-guide__text">
 								{ createInterpolateElement(
@@ -169,7 +169,7 @@ export default function WelcomeGuide() {
 					content: (
 						<>
 							<h1 className="edit-widgets-welcome-guide__heading">
-								{ __( 'Learn how to use the block editor' ) }
+								{ __( 'Learn more' ) }
 							</h1>
 							<p className="edit-widgets-welcome-guide__text">
 								{ createInterpolateElement(

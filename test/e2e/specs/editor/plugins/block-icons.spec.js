@@ -26,7 +26,7 @@ test.describe( 'Block Icons', () => {
 	test( 'Block with svg icon', async ( { editor, page } ) => {
 		await page
 			.getByRole( 'toolbar', { name: 'Document tools' } )
-			.getByRole( 'button', { name: 'Toggle block inserter' } )
+			.getByRole( 'button', { name: 'Block Inserter', exact: true } )
 			.click();
 
 		const blockLibrary = page.getByRole( 'region', {
@@ -60,7 +60,7 @@ test.describe( 'Block Icons', () => {
 	test( 'Block with dash icon', async ( { editor, page } ) => {
 		await page
 			.getByRole( 'toolbar', { name: 'Document tools' } )
-			.getByRole( 'button', { name: 'Toggle block inserter' } )
+			.getByRole( 'button', { name: 'Block Inserter', exact: true } )
 			.click();
 
 		const blockLibrary = page.getByRole( 'region', {
@@ -100,7 +100,7 @@ test.describe( 'Block Icons', () => {
 	test( 'Block with function icon', async ( { editor, page } ) => {
 		await page
 			.getByRole( 'toolbar', { name: 'Document tools' } )
-			.getByRole( 'button', { name: 'Toggle block inserter' } )
+			.getByRole( 'button', { name: 'Block Inserter', exact: true } )
 			.click();
 
 		const blockLibrary = page.getByRole( 'region', {
@@ -137,7 +137,7 @@ test.describe( 'Block Icons', () => {
 	} ) => {
 		await page
 			.getByRole( 'toolbar', { name: 'Document tools' } )
-			.getByRole( 'button', { name: 'Toggle block inserter' } )
+			.getByRole( 'button', { name: 'Block Inserter', exact: true } )
 			.click();
 
 		const blockLibrary = page.getByRole( 'region', {
@@ -185,7 +185,7 @@ test.describe( 'Block Icons', () => {
 	} ) => {
 		await page
 			.getByRole( 'toolbar', { name: 'Document tools' } )
-			.getByRole( 'button', { name: 'Toggle block inserter' } )
+			.getByRole( 'button', { name: 'Block Inserter', exact: true } )
 			.click();
 
 		const blockLibrary = page.getByRole( 'region', {

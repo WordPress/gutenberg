@@ -67,12 +67,13 @@ const BorderBoxControlSplitControls = (
 		isCompact: true,
 		__experimentalIsRenderedInSidebar,
 		size,
+		__shouldNotWarnDeprecated36pxSize: true,
 	};
 
 	const mergedRef = useMergeRefs( [ setPopoverAnchor, forwardedRef ] );
 
 	return (
-		<Grid { ...otherProps } ref={ mergedRef } gap={ 4 }>
+		<Grid { ...otherProps } ref={ mergedRef } gap={ 3 }>
 			<BorderBoxControlVisualizer value={ value } size={ size } />
 			<BorderControl
 				className={ centeredClassName }

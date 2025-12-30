@@ -36,9 +36,8 @@ import { getBlockAndPreviewFromMedia } from './utils';
 import { store as blockEditorStore } from '../../../store';
 
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
-const MAXIMUM_TITLE_LENGTH = 25;
 const MEDIA_OPTIONS_POPOVER_PROPS = {
-	position: 'bottom left',
+	placement: 'bottom-end',
 	className:
 		'block-editor-inserter__media-list__item-preview-options__popover',
 };
@@ -239,12 +238,6 @@ export function MediaPreview( { media, onClick, category } ) {
 			? media.title
 			: media.title?.rendered || __( 'no title' );
 
-	let truncatedTitle;
-	if ( title.length > MAXIMUM_TITLE_LENGTH ) {
-		const omission = '...';
-		truncatedTitle =
-			title.slice( 0, MAXIMUM_TITLE_LENGTH - omission.length ) + omission;
-	}
 	const onMouseEnter = useCallback( () => setIsHovered( true ), [] );
 	const onMouseLeave = useCallback( () => setIsHovered( false ), [] );
 	return (
@@ -268,7 +261,7 @@ export function MediaPreview( { media, onClick, category } ) {
 							onMouseEnter={ onMouseEnter }
 							onMouseLeave={ onMouseLeave }
 						>
-							<Tooltip text={ truncatedTitle || title }>
+							<Tooltip text={ title }>
 								<Composite.Item
 									render={
 										<div

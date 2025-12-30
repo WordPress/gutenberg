@@ -376,10 +376,14 @@ const elementTypes = [
 	},
 ];
 
+// Used for generating the instance ID
+const STYLE_BLOCK_PROPS_REFERENCE = {};
+
 function useBlockProps( { name, style } ) {
-	const blockElementsContainerIdentifier = `wp-elements-${ useInstanceId(
-		useBlockProps
-	) }`;
+	const blockElementsContainerIdentifier = useInstanceId(
+		STYLE_BLOCK_PROPS_REFERENCE,
+		'wp-elements'
+	);
 
 	const baseElementSelector = `.${ blockElementsContainerIdentifier }`;
 	const blockElementStyles = style?.elements;

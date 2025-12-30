@@ -33,6 +33,9 @@ function block_core_latest_posts_get_excerpt_length() {
  *
  * @since 5.0.0
  *
+ * @global WP_Post $post                                   Global post object.
+ * @global int     $block_core_latest_posts_excerpt_length Excerpt length set by the Latest Posts core block.
+ *
  * @param array $attributes The block attributes.
  *
  * @return string Returns the post content with latest posts added.
@@ -123,7 +126,7 @@ function render_block_core_latest_posts( $attributes ) {
 		if ( isset( $attributes['displayAuthor'] ) && $attributes['displayAuthor'] ) {
 			$author_display_name = get_the_author_meta( 'display_name', $post->post_author );
 
-			/* translators: byline. %s: current author. */
+			/* translators: byline. %s: author. */
 			$byline = sprintf( __( 'by %s' ), $author_display_name );
 
 			if ( ! empty( $author_display_name ) ) {

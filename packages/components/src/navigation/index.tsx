@@ -6,6 +6,7 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
+import deprecated from '@wordpress/deprecated';
 import { useEffect, useRef, useState } from '@wordpress/element';
 import { isRTL } from '@wordpress/i18n';
 
@@ -79,6 +80,12 @@ export function Navigation( {
 	const navigationTree = useCreateNavigationTree();
 	const defaultSlideOrigin = isRTL() ? 'right' : 'left';
 
+	deprecated( 'wp.components.Navigation (and all subcomponents)', {
+		since: '6.8',
+		version: '7.1',
+		alternative: 'wp.components.Navigator',
+	} );
+
 	const setActiveMenu: NavigationContextType[ 'setActiveMenu' ] = (
 		menuId,
 		slideInOrigin = defaultSlideOrigin
@@ -104,9 +111,8 @@ export function Navigation( {
 		if ( activeMenu !== menu ) {
 			setActiveMenu( activeMenu );
 		}
-		// Ignore exhaustive-deps here, as it would require either a larger refactor or some questionable workarounds.
+		// Not adding deps for now, as it would require either a larger refactor or some questionable workarounds.
 		// See https://github.com/WordPress/gutenberg/pull/41612 for context.
-		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [ activeMenu ] );
 
 	const context = {

@@ -56,6 +56,7 @@ function UnforwardedMenuItem(
 
 	return (
 		<Button
+			size="compact"
 			ref={ ref }
 			// Make sure aria-checked matches spec https://www.w3.org/TR/wai-aria-1.1/#aria-checked
 			aria-checked={
@@ -66,6 +67,7 @@ function UnforwardedMenuItem(
 			role={ role }
 			icon={ iconPosition === 'left' ? icon : undefined }
 			className={ className }
+			accessibleWhenDisabled
 			{ ...buttonProps }
 		>
 			<span className="components-menu-item__item">{ children }</span>

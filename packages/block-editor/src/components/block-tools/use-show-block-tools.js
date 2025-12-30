@@ -8,6 +8,7 @@ import { isUnmodifiedDefaultBlock } from '@wordpress/blocks';
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
 
 /**
  * Source of truth for which block tools are showing in the block editor.
@@ -22,32 +23,23 @@ export function useShowBlockTools() {
 			getBlock,
 			getBlockMode,
 			getSettings,
-			__unstableGetEditorMode,
 			isTyping,
-		} = select( blockEditorStore );
+			isBlockInterfaceHidden,
+		} = unlock( select( blockEditorStore ) );
 
 		const clientId =
 			getSelectedBlockClientId() || getFirstMultiSelectedBlockClientId();
 
 		const block = getBlock( clientId );
-		const editorMode = __unstableGetEditorMode();
 		const hasSelectedBlock = !! clientId && !! block;
 		const isEmptyDefaultBlock =
 			hasSelectedBlock &&
-			isUnmodifiedDefaultBlock( block ) &&
+			isUnmodifiedDefaultBlock( block, 'content' ) &&
 			getBlockMode( clientId ) !== 'html';
 		const _showEmptyBlockSideInserter =
-			clientId &&
-			! isTyping() &&
-			editorMode === 'edit' &&
-			isEmptyDefaultBlock;
-		const isZoomOut = editorMode === 'zoom-out';
-		const _showZoomOutToolbar =
-			isZoomOut &&
-			block?.attributes?.align === 'full' &&
-			! _showEmptyBlockSideInserter;
+			clientId && ! isTyping() && isEmptyDefaultBlock;
 		const _showBlockToolbarPopover =
-			! _showZoomOutToolbar &&
+			! isBlockInterfaceHidden() &&
 			! getSettings().hasFixedToolbar &&
 			! _showEmptyBlockSideInserter &&
 			hasSelectedBlock &&
@@ -56,7 +48,6 @@ export function useShowBlockTools() {
 		return {
 			showEmptyBlockSideInserter: _showEmptyBlockSideInserter,
 			showBlockToolbarPopover: _showBlockToolbarPopover,
-			showZoomOutToolbar: _showZoomOutToolbar,
 		};
 	}, [] );
 }

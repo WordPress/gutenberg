@@ -114,10 +114,10 @@ export class PostPublishButton extends Component {
 				( ! isPublishable && ! forceIsDirty ) ) &&
 			( ! hasNonPostEntityChanges || isSavingNonPostEntityChanges );
 
-		// If the new status has not changed explicitely, we derive it from
+		// If the new status has not changed explicitly, we derive it from
 		// other factors, like having a publish action, etc.. We need to preserve
 		// this because it affects when to show the pre and post publish panels.
-		// If it has changed though explicitely, we need to respect that.
+		// If it has changed though explicitly, we need to respect that.
 		let publishStatus = 'publish';
 		if ( postStatusHasChanged ) {
 			publishStatus = postStatus;
@@ -151,6 +151,7 @@ export class PostPublishButton extends Component {
 			isBusy: ! isAutoSaving && isSaving,
 			variant: 'primary',
 			onClick: this.createOnClick( onClickButton ),
+			'aria-haspopup': hasNonPostEntityChanges ? 'dialog' : undefined,
 		};
 
 		const toggleProps = {
@@ -161,6 +162,7 @@ export class PostPublishButton extends Component {
 			variant: 'primary',
 			size: 'compact',
 			onClick: this.createOnClick( onClickToggle ),
+			'aria-haspopup': hasNonPostEntityChanges ? 'dialog' : undefined,
 		};
 		const componentProps = isToggle ? toggleProps : buttonProps;
 		return (

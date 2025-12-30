@@ -36,7 +36,6 @@
 	},
 	"supports": {
 		"anchor": true,
-		"className": false,
 		"color": {
 			"gradients": true,
 			"link": true,
@@ -62,8 +61,6 @@
 			"__experimentalDefaultControls": {
 				"fontSize": true
 			}
-		},
-		"__experimentalSelector": "form"
-	},
-	"viewScript": "file:./view.min.js"
+		}
+	}
 }

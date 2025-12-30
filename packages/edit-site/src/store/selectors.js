@@ -79,7 +79,7 @@ export const getCanUserCreateMedia = createRegistrySelector(
 			`wp.data.select( 'core/edit-site' ).getCanUserCreateMedia()`,
 			{
 				since: '6.7',
-				alternative: `wp.data.select( 'core' ).canUser( 'create', { kind: 'root', type: 'media' } )`,
+				alternative: `wp.data.select( 'core' ).canUser( 'create', { kind: 'postType', type: 'attachment' } )`,
 			}
 		);
 
@@ -135,22 +135,32 @@ export function getHomeTemplateId() {
 /**
  * Returns the current edited post type (wp_template or wp_template_part).
  *
+ * @deprecated
  * @param {Object} state Global application state.
  *
  * @return {?TemplateType} Template type.
  */
 export function getEditedPostType( state ) {
+	deprecated( "select( 'core/edit-site' ).getEditedPostType", {
+		since: '6.8',
+		alternative: "select( 'core/editor' ).getCurrentPostType",
+	} );
 	return state.editedPost.postType;
 }
 
 /**
  * Returns the ID of the currently edited template or template part.
  *
+ * @deprecated
  * @param {Object} state Global application state.
  *
  * @return {?string} Post ID.
  */
 export function getEditedPostId( state ) {
+	deprecated( "select( 'core/edit-site' ).getEditedPostId", {
+		since: '6.8',
+		alternative: "select( 'core/editor' ).getCurrentPostId",
+	} );
 	return state.editedPost.id;
 }
 
@@ -163,6 +173,10 @@ export function getEditedPostId( state ) {
  * @return {Object} Page.
  */
 export function getEditedPostContext( state ) {
+	deprecated( "select( 'core/edit-site' ).getEditedPostContext", {
+		since: '6.8',
+	} );
+
 	return state.editedPost.context;
 }
 
@@ -175,6 +189,10 @@ export function getEditedPostContext( state ) {
  * @return {Object} Page.
  */
 export function getPage( state ) {
+	deprecated( "select( 'core/edit-site' ).getPage", {
+		since: '6.8',
+	} );
+
 	return { context: state.editedPost.context };
 }
 
@@ -333,12 +351,17 @@ export function isNavigationOpened() {
  * Whether or not the editor has a page loaded into it.
  *
  * @see setPage
- *
+ * @deprecated
  * @param {Object} state Global application state.
  *
  * @return {boolean} Whether or not the editor has a page loaded into it.
  */
 export function isPage( state ) {
+	deprecated( "select( 'core/edit-site' ).isPage", {
+		since: '6.8',
+		alternative: "select( 'core/editor' ).getCurrentPostType",
+	} );
+
 	return !! state.editedPost.context?.postId;
 }
 

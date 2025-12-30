@@ -16,6 +16,7 @@ const temporaryWordPressInternalTypes = [
 	'WPBlockSelection',
 	'WPBlockSerializationOptions',
 	'WPBlock',
+	'WPBlockBindingsSource',
 	'WPBlockPattern',
 	'WPBlockType',
 	'WPBlockTypeIcon',

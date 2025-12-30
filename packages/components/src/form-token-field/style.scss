@@ -1,5 +1,11 @@
+@use "@wordpress/base-styles/breakpoints" as *;
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/variables" as *;
+@use "../utils/theme-variables" as *;
+
 .components-form-token-field__input-container {
-	@include input-control();
+	@include input-control($components-color-accent);
 	width: 100%;
 	padding: 0;
 	cursor: text;
@@ -10,7 +16,7 @@
 	}
 
 	&.is-active {
-		@include input-style__focus();
+		@include input-style__focus($components-color-accent);
 	}
 
 	// Token input
@@ -27,7 +33,7 @@
 		min-width: 50px;
 		background: inherit;
 		border: 0;
-		color: $gray-900;
+		color: $components-color-foreground;
 		box-shadow: none;
 
 		// Resolves Zooming on iOS devices
@@ -81,7 +87,12 @@
 
 		.components-form-token-field__token-text {
 			background: transparent;
-			color: $components-color-accent;
+		}
+
+		&:not(.is-disabled) {
+			.components-form-token-field__token-text {
+				color: $components-color-accent;
+			}
 		}
 
 		.components-form-token-field__remove-token {
@@ -90,7 +101,6 @@
 			position: absolute;
 			top: 1px;
 			right: 0;
-			padding: 0;
 		}
 
 		&.is-success {
@@ -112,42 +122,36 @@
 			}
 		}
 	}
-
-	&.is-disabled {
-		.components-form-token-field__remove-token {
-			cursor: default;
-		}
-	}
 }
 
 .components-form-token-field__token-text,
 .components-form-token-field__remove-token.components-button {
 	display: inline-block;
-	line-height: 24px;
 	height: auto;
 	background: $gray-300;
 	min-width: unset;
-	transition: all 0.2s cubic-bezier(0.4, 1, 0.4, 1);
-	@include reduce-motion;
+
+	@media not (prefers-reduced-motion) {
+		transition: all 0.2s cubic-bezier(0.4, 1, 0.4, 1);
+	}
 }
 
 .components-form-token-field__token-text {
 	border-radius: $radius-x-small 0 0 $radius-x-small;
 	padding: 0 0 0 8px;
+	line-height: 24px;
 	white-space: nowrap;
 	overflow: hidden;
 	text-overflow: ellipsis;
 }
 
 .components-form-token-field__remove-token.components-button {
-	cursor: pointer;
 	border-radius: 0 $radius-x-small $radius-x-small 0;
-	padding: 0 2px;
 	color: $gray-900;
 	line-height: 10px;
 	overflow: initial;
 
-	&:hover {
+	&:hover:not(:disabled) {
 		color: $gray-900;
 	}
 }
@@ -158,8 +162,11 @@
 	min-width: 100%;
 	max-height: $grid-unit-80 * 2;
 	overflow-y: auto;
-	transition: all 0.15s ease-in-out;
-	@include reduce-motion("transition");
+
+	@media not (prefers-reduced-motion) {
+		transition: all 0.15s ease-in-out;
+	}
+
 	list-style: none;
 	box-shadow: inset 0 $border-width 0 0 $gray-600; // Matches the border color of the input.
 	margin: 0;
@@ -167,18 +174,17 @@
 }
 
 .components-form-token-field__suggestion {
-	color: $gray-900;
+	color: $components-color-foreground;
 	display: block;
 	font-size: $default-font-size;
 	padding: $grid-unit-10 $grid-unit-15;
 	min-height: $button-size-compact;
 	margin: 0;
-	cursor: pointer;
 	box-sizing: border-box;
 
 	&.is-selected {
 		background: $components-color-accent;
-		color: $white;
+		color: $components-color-foreground-inverted;
 	}
 
 	&[aria-disabled="true"] {
@@ -186,7 +192,11 @@
 		color: $gray-600;
 
 		&.is-selected {
-			background-color: $components-color-accent-transparent-40;
+			background: color-mix(in srgb, $components-color-accent 4%, transparent);
 		}
+	}
+
+	&:not(.is-empty) {
+		cursor: pointer;
 	}
 }

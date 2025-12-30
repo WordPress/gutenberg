@@ -15,13 +15,14 @@ import { Slot, Fill, Provider as SlotFillProvider } from '../';
 
 const meta: Meta< typeof Slot > = {
 	component: Slot,
-	title: 'Components/SlotFill',
+	title: 'Components/Utilities/SlotFill',
+	id: 'components-slotfill',
 	// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 	subcomponents: { Fill, SlotFillProvider },
 	argTypes: {
-		name: { control: { type: null } },
+		name: { control: false },
 		as: { control: { type: 'text' } },
-		fillProps: { control: { type: null } },
+		fillProps: { control: false },
 	},
 	parameters: {
 		controls: { expanded: true },

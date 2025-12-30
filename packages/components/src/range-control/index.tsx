@@ -38,6 +38,7 @@ import {
 import type { RangeControlProps } from './types';
 import type { WordPressComponentProps } from '../context';
 import { space } from '../utils/space';
+import { maybeWarnDeprecated36pxSize } from '../utils/deprecated-36px-size';
 
 const noop = () => {};
 
@@ -65,7 +66,7 @@ function UnforwardedRangeControl(
 	forwardedRef: ForwardedRef< HTMLInputElement >
 ) {
 	const {
-		__nextHasNoMarginBottom = false,
+		__nextHasNoMarginBottom: _, // Prevent passing to internal component
 		afterIcon,
 		allowReset = false,
 		beforeIcon,
@@ -96,6 +97,7 @@ function UnforwardedRangeControl(
 		trackColor,
 		value: valueProp,
 		withInputField = true,
+		__shouldNotWarnDeprecated36pxSize,
 		...otherProps
 	} = props;
 
@@ -229,10 +231,16 @@ function UnforwardedRangeControl(
 		[ isRTL() ? 'right' : 'left' ]: fillValueOffset,
 	};
 
+	// Add default size deprecation warning.
+	maybeWarnDeprecated36pxSize( {
+		componentName: 'RangeControl',
+		__next40pxDefaultSize,
+		size: undefined,
+		__shouldNotWarnDeprecated36pxSize,
+	} );
+
 	return (
 		<BaseControl
-			__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
-			__associatedWPComponentName="RangeControl"
 			className={ classes }
 			label={ label }
 			hideLabelFromVision={ hideLabelFromVision }
@@ -249,7 +257,6 @@ function UnforwardedRangeControl(
 					</BeforeIconWrapper>
 				) }
 				<Wrapper
-					__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
 					className={ wrapperClasses }
 					color={ colorProp }
 					marks={ !! marks }
@@ -304,7 +311,7 @@ function UnforwardedRangeControl(
 						<SimpleTooltip
 							className="components-range-control__tooltip"
 							inputRef={ inputRef }
-							tooltipPosition="bottom"
+							tooltipPlacement="bottom"
 							renderTooltipContent={ renderTooltipContent }
 							show={ isCurrentlyFocused || showTooltip }
 							style={ offsetStyle }
@@ -340,6 +347,7 @@ function UnforwardedRangeControl(
 						step={ step }
 						// @ts-expect-error TODO: Investigate if the `null` value is necessary
 						value={ inputSliderValue }
+						__shouldNotWarnDeprecated36pxSize
 					/>
 				) }
 				{ allowReset && (
@@ -380,16 +388,17 @@ function UnforwardedRangeControl(
  * import { useState } from '@wordpress/element';
  *
  * const MyRangeControl = () => {
- *   const [ isChecked, setChecked ] = useState( true );
+ *   const [ value, setValue ] = useState();
  *   return (
  *     <RangeControl
- *       __nextHasNoMarginBottom
+ *       __next40pxDefaultSize
  *       help="Please select how transparent you would like this."
- *       initialPosition={50}
+ *       initialPosition={ 50 }
  *       label="Opacity"
- *       max={100}
- *       min={0}
- *       onChange={() => {}}
+ *       max={ 100 }
+ *       min={ 0 }
+ *       value={ value }
+ *       onChange={ setValue }
  *     />
  *   );
  * };

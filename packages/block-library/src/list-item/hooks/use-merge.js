@@ -3,6 +3,7 @@
  */
 import { useRegistry, useDispatch, useSelect } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
+import { isUnmodifiedBlock } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -17,8 +18,9 @@ export default function useMerge( clientId, onMerge ) {
 		getBlockOrder,
 		getBlockRootClientId,
 		getBlockName,
+		getBlock,
 	} = useSelect( blockEditorStore );
-	const { mergeBlocks, moveBlocksToPosition } =
+	const { mergeBlocks, moveBlocksToPosition, removeBlock } =
 		useDispatch( blockEditorStore );
 	const outdentListItem = useOutdentListItem();
 
@@ -49,7 +51,7 @@ export default function useMerge( clientId, onMerge ) {
 	 * return the next list item of the parent list item if it exists.
 	 *
 	 * @param {string} id A list item client ID.
-	 * @return {string?} The client ID of the next list item.
+	 * @return {?string} The client ID of the next list item.
 	 */
 	function _getNextId( id ) {
 		const next = getNextBlockClientId( id );
@@ -68,7 +70,7 @@ export default function useMerge( clientId, onMerge ) {
 	 * line, regardless of indentation level.
 	 *
 	 * @param {string} id The client ID of the current list item.
-	 * @return {string?} The client ID of the next list item.
+	 * @return {?string} The client ID of the next list item.
 	 */
 	function getNextId( id ) {
 		const order = getBlockOrder( id );
@@ -132,12 +134,26 @@ export default function useMerge( clientId, onMerge ) {
 		} else {
 			// Merging is only done from the top level. For lowel levels, the
 			// list item is outdented instead.
-			const previousBlockClientId = getPreviousBlockClientId( clientId );
 			if ( getParentListItemId( clientId ) ) {
 				outdentListItem( clientId );
-			} else if ( previousBlockClientId ) {
+				return;
+			}
+			const previousBlockClientId = getPreviousBlockClientId( clientId );
+			if ( previousBlockClientId ) {
 				const trailingId = getTrailingId( previousBlockClientId );
 				mergeWithNested( trailingId, clientId );
+				return;
+			}
+
+			const blockOrder = getBlockOrder( clientId );
+			if (
+				isUnmodifiedBlock( getBlock( clientId ), 'content' ) &&
+				blockOrder.length > 0
+			) {
+				registry.batch( () => {
+					outdentListItem( getBlockOrder( blockOrder[ 0 ] ) );
+					removeBlock( clientId, true );
+				} );
 			} else {
 				onMerge( forward );
 			}

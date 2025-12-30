@@ -9,12 +9,8 @@ import clsx from 'clsx';
 import { useViewportMatch } from '@wordpress/compose';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __, _x } from '@wordpress/i18n';
-import {
-	NavigableToolbar,
-	ToolSelector,
-	store as blockEditorStore,
-} from '@wordpress/block-editor';
-import { Button, ToolbarItem } from '@wordpress/components';
+import { NavigableToolbar } from '@wordpress/block-editor';
+import { ToolbarButton, ToolbarItem } from '@wordpress/components';
 import { listView, plus } from '@wordpress/icons';
 import { useCallback } from '@wordpress/element';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
@@ -48,7 +44,6 @@ function DocumentTools( { className, disableBlockTools = false } ) {
 			getListViewToggleRef,
 		} = unlock( select( editorStore ) );
 		const { getShortcutRepresentation } = select( keyboardShortcutsStore );
-		const { __unstableGetEditorMode } = select( blockEditorStore );
 
 		return {
 			isInserterOpened: select( editorStore ).isInserterOpened(),
@@ -61,7 +56,6 @@ function DocumentTools( { className, disableBlockTools = false } ) {
 			showIconLabels: get( 'core', 'showIconLabels' ),
 			isDistractionFree: get( 'core', 'distractionFree' ),
 			isVisualMode: getEditorMode() === 'visual',
-			isZoomedOutView: __unstableGetEditorMode() === 'zoom-out',
 		};
 	}, [] );
 
@@ -78,7 +72,6 @@ function DocumentTools( { className, disableBlockTools = false } ) {
 		}
 	};
 
-	const isLargeViewport = useViewportMatch( 'medium' );
 	const isWideViewport = useViewportMatch( 'wide' );
 
 	/* translators: accessibility text for the editor toolbar */
@@ -96,7 +89,7 @@ function DocumentTools( { className, disableBlockTools = false } ) {
 
 	/* translators: button label text should, if possible, be under 16 characters. */
 	const longLabel = _x(
-		'Toggle block inserter',
+		'Block Inserter',
 		'Generic label for block inserter button'
 	);
 	const shortLabel = ! isInserterOpened ? __( 'Add' ) : __( 'Close' );
@@ -117,9 +110,8 @@ function DocumentTools( { className, disableBlockTools = false } ) {
 		>
 			<div className="editor-document-tools__left">
 				{ ! isDistractionFree && (
-					<ToolbarItem
+					<ToolbarButton
 						ref={ inserterSidebarToggleRef }
-						as={ Button }
 						className="editor-document-tools__inserter-toggle"
 						variant="primary"
 						isPressed={ isInserterOpened }
@@ -134,17 +126,6 @@ function DocumentTools( { className, disableBlockTools = false } ) {
 				) }
 				{ ( isWideViewport || ! showIconLabels ) && (
 					<>
-						{ isLargeViewport && (
-							<ToolbarItem
-								as={ ToolSelector }
-								showTooltip={ ! showIconLabels }
-								variant={
-									showIconLabels ? 'tertiary' : undefined
-								}
-								disabled={ disableBlockTools }
-								size="compact"
-							/>
-						) }
 						<ToolbarItem
 							as={ EditorHistoryUndo }
 							showTooltip={ ! showIconLabels }
@@ -158,8 +139,7 @@ function DocumentTools( { className, disableBlockTools = false } ) {
 							size="compact"
 						/>
 						{ ! isDistractionFree && (
-							<ToolbarItem
-								as={ Button }
+							<ToolbarButton
 								className="editor-document-tools__document-overview-toggle"
 								icon={ listView }
 								disabled={ disableBlockTools }
@@ -174,7 +154,6 @@ function DocumentTools( { className, disableBlockTools = false } ) {
 								}
 								aria-expanded={ isListViewOpen }
 								ref={ listViewToggleRef }
-								size="compact"
 							/>
 						) }
 					</>

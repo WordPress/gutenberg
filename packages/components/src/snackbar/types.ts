@@ -56,7 +56,10 @@ export type SnackbarProps = Pick<
 		 *
 		 * @default []
 		 */
-		actions?: Pick< NoticeAction, 'label' | 'url' | 'onClick' >[];
+		actions?: Pick<
+			NoticeAction,
+			'label' | 'url' | 'onClick' | 'openInNewTab'
+		>[];
 	};
 
 export type SnackbarListProps = {

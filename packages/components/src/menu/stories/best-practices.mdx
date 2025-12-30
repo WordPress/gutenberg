@@ -1,0 +1,38 @@
+import { Meta } from '@storybook/blocks';
+
+import * as MenuStories from './index.story';
+
+<Meta of={ MenuStories } name="Best Practices" />
+
+# Menu
+
+## Usage
+
+### When to use a `Menu`
+
+Use a `Menu` when you want users to:
+
+-   Choose an action or change a setting from a list, AND
+-   Only see the available choices contextually.
+
+`Menu` is a React component to render an expandable menu of buttons. It is similar in purpose to a `<select>` element, with the distinction that it does not maintain a value. Instead, each option behaves as an action button.
+
+If you need to display all the available options at all times, consider using a Toolbar instead. Use a `Menu` to display a list of actions after the user interacts with a button.
+
+**Do**
+Use a `Menu` to display a list of actions after the user interacts with an icon.
+
+**Don’t** use a `Menu` for important actions that should always be visible. Use a `Toolbar` instead.
+
+**Don’t**
+Don’t use a `Menu` for frequently used actions. Use a `Toolbar` instead.
+
+### Behavior
+
+Generally, the parent button should indicate that interacting with it will show a `Menu`.
+
+The parent button should retain the same visual styling regardless of whether the `Menu` is displayed or not.
+
+### Placement
+
+The `Menu` should typically appear directly below, or below and to the left of, the parent button. If there isn’t enough space below to display the full `Menu`, it can be displayed instead above the parent button.
