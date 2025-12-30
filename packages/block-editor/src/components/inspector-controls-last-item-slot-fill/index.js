@@ -1,19 +1,17 @@
 /**
  * WordPress dependencies
  */
-import { privateApis as componentsPrivateApis } from '@wordpress/components';
+import { createSlotFill } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
-import { unlock } from '../../lock-unlock';
 import {
 	useBlockEditContext,
 	mayDisplayControlsKey,
 } from '../block-edit/context';
 
-const { createPrivateSlotFill } = unlock( componentsPrivateApis );
-const { Fill, Slot } = createPrivateSlotFill( 'InspectorControlsLastItem' );
+const { Fill, Slot } = createSlotFill( Symbol( 'InspectorControlsLastItem' ) );
 
 const InspectorControlsLastItem = ( props ) => {
 	const context = useBlockEditContext();
