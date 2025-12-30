@@ -166,9 +166,6 @@ async function dev() {
 			) }s)\n`
 		);
 
-		// Write a marker file to signal that the build is ready
-		readyMarkerFile.create();
-
 		// Step 7: Start watch mode with both TypeScript and package builds
 		console.log( '👀 Starting watch mode...\n' );
 		console.log( '   - TypeScript compiler watching for type changes' );
@@ -181,10 +178,29 @@ async function dev() {
 			'--preserveWatchOutput',
 		] );
 
-		// Start package build watch
-		const buildWatch = execAsync( 'wp-build', [ '--watch' ], {
+		// Start package build watch and wait for initial build to complete
+		// before signaling ready. wp-build outputs "Watching for changes..."
+		// when its initial build is done.
+		const buildWatch = spawn( 'wp-build', [ '--watch' ], {
+			cwd: ROOT_DIR,
+			stdio: [ 'inherit', 'pipe', 'inherit' ],
+			shell: true,
 			env: { ...process.env, NODE_ENV: 'development' },
 		} );
+
+		// Wait for wp-build to complete its initial build
+		await new Promise( ( resolve ) => {
+			buildWatch.stdout.on( 'data', ( data ) => {
+				const output = data.toString();
+				process.stdout.write( output );
+				if ( output.includes( 'Watching for changes' ) ) {
+					resolve();
+				}
+			} );
+		} );
+
+		// Now signal that the build is ready
+		readyMarkerFile.create();
 
 		// Handle process termination
 		const cleanup = () => {
