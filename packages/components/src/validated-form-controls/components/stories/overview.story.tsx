@@ -26,6 +26,9 @@ import { VStack } from '../../../v-stack';
 const meta: Meta< typeof ControlWithError > = {
 	title: 'Components/Selection & Input/Validated Form Controls/Overview',
 	id: 'components-validated-form-controls-overview',
+	parameters: {
+		controls: { disable: true },
+	},
 };
 export default meta;
 
