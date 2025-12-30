@@ -26,10 +26,16 @@ import {
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
-import { useMemo, useState, useEffect, useCallback } from '@wordpress/element';
+import {
+	useMemo,
+	useState,
+	useEffect,
+	useCallback,
+	useRef,
+} from '@wordpress/element';
 import { useEntityRecords } from '@wordpress/core-data';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { speak } from '@wordpress/a11y'; // ← ADD THIS IMPORT
+import { speak } from '@wordpress/a11y';
 
 /**
  * Internal dependencies
@@ -258,7 +264,8 @@ export default function PageListEdit( {
 		parentClientId,
 		hasDraggedChild,
 		isChildOfNavigation,
-		hasSiblingBlocks,
+		isOnlySinglePageList,
+		parentNavigationIsSelected,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -266,6 +273,8 @@ export default function PageListEdit( {
 				hasSelectedInnerBlock,
 				hasDraggedInnerBlock,
 				getBlockOrder,
+				getBlockName,
+				getSelectedBlockClientId,
 			} = select( blockEditorStore );
 			const blockParents = getBlockParentsByBlockName(
 				clientId,
@@ -279,15 +288,21 @@ export default function PageListEdit( {
 			);
 			const navParentClientId = navigationBlockParents[ 0 ];
 
-			// Check if there are sibling blocks in the Navigation block.
-			let siblingBlocks = false;
+			// Check if the Navigation block contains only a single Page List (default state).
+			let isSinglePageList = false;
+			let isParentNavigationSelected = false;
+
 			if ( navParentClientId ) {
 				const siblingClientIds = getBlockOrder( navParentClientId );
-				// Check if there are other blocks besides this Page List.
-				const otherBlocks = siblingClientIds.filter(
-					( id ) => id !== clientId
-				);
-				siblingBlocks = otherBlocks.length > 0;
+
+				// Check if there's exactly one block and it's a Page List.
+				isSinglePageList =
+					siblingClientIds.length === 1 &&
+					getBlockName( siblingClientIds[ 0 ] ) === 'core/page-list';
+
+				// Check if the parent Navigation block is selected.
+				isParentNavigationSelected =
+					getSelectedBlockClientId() === navParentClientId;
 			}
 
 			return {
@@ -296,7 +311,8 @@ export default function PageListEdit( {
 				hasSelectedChild: hasSelectedInnerBlock( clientId, true ),
 				hasDraggedChild: hasDraggedInnerBlock( clientId, true ),
 				parentClientId: navParentClientId,
-				hasSiblingBlocks: siblingBlocks,
+				isOnlySinglePageList: isSinglePageList,
+				parentNavigationIsSelected: isParentNavigationSelected,
 			};
 		},
 		[ clientId ]
@@ -320,6 +336,9 @@ export default function PageListEdit( {
 
 	const { selectBlock } = useDispatch( blockEditorStore );
 
+	// Track if we've already converted to avoid multiple conversions.
+	const hasConverted = useRef( false );
+
 	useEffect( () => {
 		if ( hasSelectedChild || hasDraggedChild ) {
 			openModal();
@@ -337,24 +356,41 @@ export default function PageListEdit( {
 		setAttributes( { isNested } );
 	}, [ isNested, setAttributes ] );
 
-	// Auto-convert Page List to Navigation Links when sibling blocks are added.
+	// Auto-convert Page List to Navigation Links when the parent Navigation block
+	// is selected and contains only the default single Page List block.
+	// This happens when the user clicks the Navigation block to start editing,
+	// which is typically when they click the + button to add blocks.
 	useEffect( () => {
-		if (
-			hasSiblingBlocks &&
+		// Only convert if:
+		// 1. Navigation contains only a single Page List (default state)
+		// 2. Parent Navigation block is selected (user is interacting)
+		// 3. We haven't already converted
+		// 4. All other safety conditions are met
+		const shouldConvert =
+			isOnlySinglePageList &&
+			parentNavigationIsSelected &&
+			! hasConverted.current &&
 			allowConvertToLinks &&
 			hasResolvedPages &&
-			isChildOfNavigation
-		) {
-			// Announce the conversion to screen readers.
+			isChildOfNavigation;
+
+		if ( shouldConvert ) {
+			// Mark as converted to prevent multiple conversions.
+			hasConverted.current = true;
+
+			// Announce the conversion to screen readers for accessibility.
 			speak(
 				__( 'Page List converted to editable Navigation Links.' ),
 				'assertive'
 			);
 
+			// Perform the conversion: replace the Page List block with
+			// individual Navigation Link blocks for each page.
 			convertToNavigationLinks();
 		}
 	}, [
-		hasSiblingBlocks,
+		isOnlySinglePageList,
+		parentNavigationIsSelected,
 		allowConvertToLinks,
 		hasResolvedPages,
 		isChildOfNavigation,
