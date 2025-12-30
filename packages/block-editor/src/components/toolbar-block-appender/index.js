@@ -36,6 +36,7 @@ function ToolbarBlockAppender( {
 						className:
 							'wp-block-navigation__toolbar-inserter-button',
 					} }
+					__experimentalIsQuick
 				/>
 			</ToolbarGroup>
 		</__unstableBlockToolbarLastItem>
