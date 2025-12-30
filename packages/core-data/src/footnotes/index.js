@@ -85,26 +85,6 @@ export function updateFootnotesFromMeta( blocks, meta ) {
 	}
 	findFootnotesBlock( blocks );
 
-	// If footnotes block has contentful footnotes in attributes, they are the source of truth
-	// Only update if order has changed or if we need to sync from meta
-	if (
-		footnotesBlock?.attributes?.footnotes &&
-		Array.isArray( footnotesBlock.attributes.footnotes ) &&
-		footnotesBlock.attributes.footnotes.length > 0 &&
-		footnotesBlock.attributes.footnotes.some(
-			( fn ) => fn.content && fn.content.trim()
-		)
-	) {
-		const blockFootnotesOrder = footnotesBlock.attributes.footnotes.map(
-			( fn ) => fn.id
-		);
-		// If order matches, block attributes are source of truth - don't update
-		if ( blockFootnotesOrder.join( '' ) === newOrder.join( '' ) ) {
-			return output;
-		}
-		// Order changed - we'll reorder but preserve content below
-	}
-
 	// Check if block attributes have footnotes with content
 	const hasBlockAttributesWithContent =
 		footnotesBlock?.attributes?.footnotes &&
@@ -119,11 +99,6 @@ export function updateFootnotesFromMeta( blocks, meta ) {
 	if ( hasBlockAttributesWithContent ) {
 		// Use footnotes from block attributes as source of truth
 		footnotes = footnotesBlock.attributes.footnotes;
-		const blockFootnotesOrder = footnotes.map( ( fn ) => fn.id );
-		// If order matches, no need to update - block attributes are source of truth
-		if ( blockFootnotesOrder.join( '' ) === newOrder.join( '' ) ) {
-			return output;
-		}
 	} else if (
 		footnotesBlock?.attributes?.footnotes &&
 		Array.isArray( footnotesBlock.attributes.footnotes ) &&
@@ -137,11 +112,7 @@ export function updateFootnotesFromMeta( blocks, meta ) {
 	}
 
 	const currentOrder = footnotes.map( ( fn ) => fn.id );
-
-	// If order matches and we're using meta footnotes, also return early
-	if ( currentOrder.join( '' ) === newOrder.join( '' ) ) {
-		return output;
-	}
+	const orderChanged = currentOrder.join( '' ) !== newOrder.join( '' );
 
 	// Create new footnotes array preserving content from existing footnotes
 	const newFootnotes = newOrder.map( ( fnId ) => {
@@ -242,6 +213,10 @@ export function updateFootnotesFromMeta( blocks, meta ) {
 
 	function updateBlocksAttributes( __blocks ) {
 		return __blocks.map( ( block ) => {
+			// Always update attributes to ensure footnote numbering is correct
+			// (updateAttributes updates the numbering in rich text)
+			const updatedAttributes = updateAttributes( block.attributes );
+
 			// Update footnotes block with new footnotes array
 			if ( block.name === 'core/footnotes' ) {
 				// Check if block already has footnotes with content - if so, preserve them
@@ -253,17 +228,18 @@ export function updateFootnotesFromMeta( blocks, meta ) {
 						( fn ) => fn.content && fn.content.trim()
 					);
 
-				// Only update if we're not overwriting contentful footnotes
-				// or if the order has changed and we need to reorder
-				const shouldUpdate =
-					! hasContentfulFootnotes ||
-					currentOrder.join( '' ) !== newOrder.join( '' );
+				// Only update footnotes array if:
+				// 1. We don't have contentful footnotes, OR
+				// 2. The order has changed (need to reorder)
+				// Note: We always update numbering via updateAttributes above
+				const shouldUpdateFootnotesArray =
+					! hasContentfulFootnotes || orderChanged;
 
 				return {
 					...block,
 					attributes: {
-						...updateAttributes( block.attributes ),
-						footnotes: shouldUpdate
+						...updatedAttributes,
+						footnotes: shouldUpdateFootnotesArray
 							? newFootnotes
 							: existingFootnotes,
 					},
@@ -272,7 +248,7 @@ export function updateFootnotesFromMeta( blocks, meta ) {
 			}
 			return {
 				...block,
-				attributes: updateAttributes( block.attributes ),
+				attributes: updatedAttributes,
 				innerBlocks: updateBlocksAttributes( block.innerBlocks ),
 			};
 		} );
