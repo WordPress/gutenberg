@@ -48,7 +48,7 @@ const ruleName = 'plugin-wpds/no-unknown-ds-tokens';
 
 const messages = ruleMessages( ruleName, {
 	rejected: ( tokenNames ) =>
-		`The following CSS variables are not valid (public) Design System tokens: ${ tokenNames }`,
+		`The following CSS variables are not valid Design System tokens: ${ tokenNames }`,
 } );
 
 /** @type {import('stylelint').Rule} */
