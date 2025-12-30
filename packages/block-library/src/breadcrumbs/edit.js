@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
 import {
 	ToggleControl,
@@ -13,13 +13,15 @@ import {
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-import { useEffect, useState, RawHTML } from '@wordpress/element';
+import { useEffect, useState } from '@wordpress/element';
 import { useServerSideRender } from '@wordpress/server-side-render';
+import { useDisabled } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
+import HtmlRenderer from '../utils/html-renderer';
 
 const separatorDefaultValue = '/';
 
@@ -100,19 +102,35 @@ export default function BreadcrumbEdit( {
 		setInvalidationKey( ( c ) => c + 1 );
 	}, [ post ] );
 
-	const blockProps = useBlockProps();
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
-	const { content } = useServerSideRender( {
+	const { content, status, error } = useServerSideRender( {
 		attributes,
 		skipBlockSupportAttributes: true,
 		block: name,
 		urlQueryArgs: { post_id: postId, invalidationKey },
 	} );
 
-	if ( isLoading ) {
+	const disabledRef = useDisabled();
+	const blockProps = useBlockProps( { ref: disabledRef } );
+
+	if ( isLoading || status === 'loading' ) {
 		return (
 			<div { ...blockProps }>
 				<Spinner />
+			</div>
+		);
+	}
+
+	if ( status === 'error' ) {
+		return (
+			<div { ...blockProps }>
+				<p>
+					{ sprintf(
+						/* translators: %s: error message returned when rendering the block. */
+						__( 'Error: %s' ),
+						error
+					) }
+				</p>
 			</div>
 		);
 	}
@@ -279,13 +297,11 @@ export default function BreadcrumbEdit( {
 					) }
 				/>
 			</InspectorControls>
-			<div { ...blockProps }>
-				{ showPlaceholder ? (
-					placeholder
-				) : (
-					<RawHTML inert="true">{ content }</RawHTML>
-				) }
-			</div>
+			{ showPlaceholder ? (
+				<div { ...blockProps }>{ placeholder }</div>
+			) : (
+				<HtmlRenderer wrapperProps={ blockProps } html={ content } />
+			) }
 		</>
 	);
 }
