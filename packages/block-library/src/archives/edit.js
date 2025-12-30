@@ -4,23 +4,56 @@
 import {
 	ToggleControl,
 	SelectControl,
-	Disabled,
+	Spinner,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
-import ServerSideRender from '@wordpress/server-side-render';
+import { useServerSideRender } from '@wordpress/server-side-render';
+import { useDisabled } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
+import HtmlRenderer from '../utils/html-renderer';
 
-export default function ArchivesEdit( { attributes, setAttributes } ) {
+export default function ArchivesEdit( { attributes, setAttributes, name } ) {
 	const { showLabel, showPostCounts, displayAsDropdown, type } = attributes;
 
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
+
+	const { content, status, error } = useServerSideRender( {
+		attributes,
+		skipBlockSupportAttributes: true,
+		block: name,
+	} );
+
+	const disabledRef = useDisabled();
+	const blockProps = useBlockProps( { ref: disabledRef } );
+
+	if ( status === 'loading' ) {
+		return (
+			<div { ...blockProps }>
+				<Spinner />
+			</div>
+		);
+	}
+
+	if ( status === 'error' ) {
+		return (
+			<div { ...blockProps }>
+				<p>
+					{ sprintf(
+						/* translators: %s: error message returned when rendering the block. */
+						__( 'Error: %s' ),
+						error
+					) }
+				</p>
+			</div>
+		);
+	}
 
 	return (
 		<>
@@ -121,15 +154,7 @@ export default function ArchivesEdit( { attributes, setAttributes } ) {
 					</ToolsPanelItem>
 				</ToolsPanel>
 			</InspectorControls>
-			<div { ...useBlockProps() }>
-				<Disabled>
-					<ServerSideRender
-						block="core/archives"
-						skipBlockSupportAttributes
-						attributes={ attributes }
-					/>
-				</Disabled>
-			</div>
+			<HtmlRenderer wrapperProps={ blockProps } html={ content } />
 		</>
 	);
 }
