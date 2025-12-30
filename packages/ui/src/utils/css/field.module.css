@@ -2,17 +2,17 @@
 
 @layer wp-ui-utilities {
 	.label {
-		--wp-ui-field-label-line-height: var(--wpds-font-line-height-x-small);
+		--wp-ui-field-label-line-height: var(--wpds-font-line-height-xs);
 
 		font-family: var(--wpds-font-family-body);
-		font-size: var(--wpds-font-size-x-small);
+		font-size: var(--wpds-font-size-xs);
 		line-height: var(--wp-ui-field-label-line-height);
-		font-weight: 499; /* TODO: Use variable? */
+		font-weight: var(--wpds-font-weight-medium);
 		text-transform: uppercase;
 		color: var(--wpds-color-fg-content-neutral);
 
 		&.is-plain {
-			font-size: var(--wpds-font-size-medium);
+			font-size: var(--wpds-font-size-md);
 			text-transform: none;
 		}
 	}
@@ -20,8 +20,8 @@
 	.description {
 		margin: 0;
 		font-family: var(--wpds-font-family-body);
-		font-size: var(--wpds-font-size-small);
-		line-height: var(--wpds-font-line-height-x-small);
+		font-size: var(--wpds-font-size-sm);
+		line-height: var(--wpds-font-line-height-xs);
 		color: var(--wpds-color-fg-content-neutral-weak);
 	}
 }
