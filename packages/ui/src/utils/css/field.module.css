@@ -2,7 +2,7 @@
 
 @layer wp-ui-utilities {
 	.label {
-		--wp-ui-field-label-line-height: var(--wpds-line-height-x-small);
+		--wp-ui-field-label-line-height: var(--wpds-font-line-height-x-small);
 
 		font-family: var(--wpds-font-family-body);
 		font-size: var(--wpds-font-size-x-small);
@@ -22,7 +22,7 @@
 		margin: 0;
 		font-family: var(--wpds-font-family-body);
 		font-size: var(--wpds-font-size-small);
-		line-height: var(--wpds-line-height-small);
+		line-height: var(--wpds-font-line-height-x-small);
 		color: var(--wpds-color-fg-content-neutral-weak);
 	}
 }
