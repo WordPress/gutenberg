@@ -196,6 +196,10 @@ async function updatePackages( config ) {
 				lines.push( line );
 			}
 
+			const packageJSONPath = changelogPath.replace(
+				'CHANGELOG.md',
+				'package.json'
+			);
 			const { version } = readJSONFile( packageJSONPath );
 			let versionBump = calculateVersionBumpFromChangelog(
 				lines,
@@ -214,10 +218,6 @@ async function updatePackages( config ) {
 			) {
 				versionBump = minimumVersionBump;
 			}
-			const packageJSONPath = changelogPath.replace(
-				'CHANGELOG.md',
-				'package.json'
-			);
 			const nextVersion =
 				versionBump !== null ? semverInc( version, versionBump ) : null;
 
