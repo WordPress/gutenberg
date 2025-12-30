@@ -14387,9 +14387,9 @@ exports[`buildRamps background ramp snapshots 1`] = `
   },
   {
     "input": {
-      "seedComputed": "#4d4c4d",
+      "seedComputed": "#4d4d4d",
       "seedOriginal": "#4d4d4d",
-      "seedUnchanged": false,
+      "seedUnchanged": true,
     },
     "output": {
       "direction": "lighter",
@@ -14411,7 +14411,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
         "stroke3": "#a0a0a0",
         "stroke4": "#c6c6c6",
         "surface1": "#484848",
-        "surface2": "#4d4c4d",
+        "surface2": "#4d4d4d",
         "surface3": "#515151",
         "surface4": "#555",
         "surface5": "#595959",
@@ -14422,9 +14422,9 @@ exports[`buildRamps background ramp snapshots 1`] = `
   },
   {
     "input": {
-      "seedComputed": "#4d4c4d",
+      "seedComputed": "#4d4d4d",
       "seedOriginal": "#4d4d4d",
-      "seedUnchanged": false,
+      "seedUnchanged": true,
     },
     "output": {
       "direction": "lighter",
@@ -14446,7 +14446,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
         "stroke3": "#a0a0a0",
         "stroke4": "#c6c6c6",
         "surface1": "#484848",
-        "surface2": "#4d4c4d",
+        "surface2": "#4d4d4d",
         "surface3": "#515151",
         "surface4": "#555",
         "surface5": "#595959",
@@ -14457,9 +14457,9 @@ exports[`buildRamps background ramp snapshots 1`] = `
   },
   {
     "input": {
-      "seedComputed": "#4d4c4d",
+      "seedComputed": "#4d4d4d",
       "seedOriginal": "#4d4d4d",
-      "seedUnchanged": false,
+      "seedUnchanged": true,
     },
     "output": {
       "direction": "lighter",
@@ -14481,7 +14481,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
         "stroke3": "#a0a0a0",
         "stroke4": "#c6c6c6",
         "surface1": "#484848",
-        "surface2": "#4d4c4d",
+        "surface2": "#4d4d4d",
         "surface3": "#515151",
         "surface4": "#555",
         "surface5": "#595959",
@@ -14492,9 +14492,9 @@ exports[`buildRamps background ramp snapshots 1`] = `
   },
   {
     "input": {
-      "seedComputed": "#4d4c4d",
+      "seedComputed": "#4d4d4d",
       "seedOriginal": "#4d4d4d",
-      "seedUnchanged": false,
+      "seedUnchanged": true,
     },
     "output": {
       "direction": "lighter",
@@ -14516,7 +14516,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
         "stroke3": "#a0a0a0",
         "stroke4": "#c6c6c6",
         "surface1": "#484848",
-        "surface2": "#4d4c4d",
+        "surface2": "#4d4d4d",
         "surface3": "#515151",
         "surface4": "#555",
         "surface5": "#595959",
@@ -14527,9 +14527,9 @@ exports[`buildRamps background ramp snapshots 1`] = `
   },
   {
     "input": {
-      "seedComputed": "#4d4c4d",
+      "seedComputed": "#4d4d4d",
       "seedOriginal": "#4d4d4d",
-      "seedUnchanged": false,
+      "seedUnchanged": true,
     },
     "output": {
       "direction": "lighter",
@@ -14551,7 +14551,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
         "stroke3": "#a0a0a0",
         "stroke4": "#c6c6c6",
         "surface1": "#484848",
-        "surface2": "#4d4c4d",
+        "surface2": "#4d4d4d",
         "surface3": "#515151",
         "surface4": "#555",
         "surface5": "#595959",
@@ -14562,9 +14562,9 @@ exports[`buildRamps background ramp snapshots 1`] = `
   },
   {
     "input": {
-      "seedComputed": "#4d4c4d",
+      "seedComputed": "#4d4d4d",
       "seedOriginal": "#4d4d4d",
-      "seedUnchanged": false,
+      "seedUnchanged": true,
     },
     "output": {
       "direction": "lighter",
@@ -14586,7 +14586,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
         "stroke3": "#a0a0a0",
         "stroke4": "#c6c6c6",
         "surface1": "#484848",
-        "surface2": "#4d4c4d",
+        "surface2": "#4d4d4d",
         "surface3": "#515151",
         "surface4": "#555",
         "surface5": "#595959",
