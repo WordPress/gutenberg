@@ -1,5 +1,4 @@
 import { useRender, mergeProps } from '@base-ui/react';
-import clsx from 'clsx';
 import { forwardRef } from '@wordpress/element';
 import { type StackProps } from './types';
 import styles from './style.module.css';
@@ -12,8 +11,6 @@ export const Stack = forwardRef< HTMLDivElement, StackProps >( function Stack(
 	{ direction, gap, align, justify, wrap, render, ...props },
 	ref
 ) {
-	const className = clsx( props.className, styles.stack );
-
 	const style: React.CSSProperties = {
 		gap: gap && `var(--wpds-dimension-gap-${ gap })`,
 		alignItems: align,
@@ -25,7 +22,7 @@ export const Stack = forwardRef< HTMLDivElement, StackProps >( function Stack(
 	const element = useRender( {
 		render,
 		ref,
-		props: mergeProps< 'div' >( props, { style, className } ),
+		props: mergeProps< 'div' >( props, { style, className: styles.stack } ),
 	} );
 
 	return element;
