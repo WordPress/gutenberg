@@ -186,7 +186,9 @@ export const format = {
 						rootClientId = getBlockRootClientId( rootClientId );
 					}
 
-					fnBlock = createBlock( 'core/footnotes' );
+					fnBlock = createBlock( 'core/footnotes', {
+						footnotes: [],
+					} );
 
 					insertBlock( fnBlock, undefined, rootClientId );
 				}

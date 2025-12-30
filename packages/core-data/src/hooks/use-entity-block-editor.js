@@ -10,7 +10,10 @@ import { parse, __unstableSerializeAndClean } from '@wordpress/blocks';
  */
 import { STORE_NAME } from '../name';
 import useEntityId from './use-entity-id';
-import { updateFootnotesFromMeta } from '../footnotes';
+import {
+	updateFootnotesFromMeta,
+	migrateFootnotesToBlockAttributes,
+} from '../footnotes';
 
 const EMPTY_ARRAY = [];
 const parsedBlocksCache = new WeakMap();
@@ -77,6 +80,10 @@ export default function useEntityBlockEditor( kind, name, { id: _id } = {} ) {
 
 		if ( ! _blocks ) {
 			_blocks = parse( content );
+			// Migrate footnotes from meta to block attributes if needed
+			if ( meta ) {
+				_blocks = migrateFootnotesToBlockAttributes( _blocks, meta );
+			}
 			parsedBlocksCache.set( cackeKey, _blocks );
 		}
 
@@ -87,6 +94,7 @@ export default function useEntityBlockEditor( kind, name, { id: _id } = {} ) {
 		id,
 		editedBlocks,
 		content,
+		meta,
 		getEntityRecord,
 		getEntityRecordEdits,
 	] );
@@ -102,11 +110,18 @@ export default function useEntityBlockEditor( kind, name, { id: _id } = {} ) {
 			// We create a new function here on every persistent edit
 			// to make sure the edit makes the post dirty and creates
 			// a new undo level.
+			// updateFootnotesFromMeta returns { blocks, meta } - we need both:
+			// - blocks: updated blocks with footnotes in attributes (for the entity record)
+			// - meta: updated meta with footnotes (for backward compatibility)
+			const footnotesChanges = updateFootnotesFromMeta( newBlocks, meta );
+			const blocksWithFootnotes = footnotesChanges.blocks || newBlocks;
 			const edits = {
 				selection,
-				content: ( { blocks: blocksForSerialization = [] } ) =>
-					__unstableSerializeAndClean( blocksForSerialization ),
-				...updateFootnotesFromMeta( newBlocks, meta ),
+				blocks: blocksWithFootnotes,
+				content: ( {
+					blocks: blocksForSerialization = blocksWithFootnotes,
+				} ) => __unstableSerializeAndClean( blocksForSerialization ),
+				meta: footnotesChanges.meta,
 			};
 
 			editEntityRecord( kind, name, id, edits, {
@@ -128,6 +143,8 @@ export default function useEntityBlockEditor( kind, name, { id: _id } = {} ) {
 	const onInput = useCallback(
 		( newBlocks, options ) => {
 			const { selection, ...rest } = options;
+			// Only update footnotes if block attributes don't already have contentful footnotes
+			// This prevents overwriting block attributes that are the source of truth
 			const footnotesChanges = updateFootnotesFromMeta( newBlocks, meta );
 			const edits = { selection, ...footnotesChanges };
 
