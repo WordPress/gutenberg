@@ -16,10 +16,10 @@ const { cleanEmptyObject } = unlock( blockEditorPrivateApis );
  * Generate Author-related blocks based on block attributes.
  *
  * @param {Object} attributes Block's attributes.
- *
+ * @param {Object} blockTypes Block types.
  * @return {Object} Generated block.
  */
-export function migrateToRecommendedBlocks( attributes ) {
+export function migrateToRecommendedBlocks( attributes, blockTypes ) {
 	const {
 		avatarSize,
 		byline,
@@ -31,6 +31,21 @@ export function migrateToRecommendedBlocks( attributes ) {
 		style,
 		...restAttributes
 	} = attributes;
+
+	const shouldInsertAvatarBlock =
+		showAvatar &&
+		blockTypes.some( ( blockType ) => blockType.name === 'core/avatar' );
+	const shouldInsertParagraphBlock = blockTypes.some(
+		( blockType ) => blockType.name === 'core/paragraph'
+	);
+	const shouldInsertPostAuthorNameBlock = blockTypes.some(
+		( blockType ) => blockType.name === 'core/post-author-name'
+	);
+	const shouldInsertPostAuthorBiographyBlock =
+		showBio &&
+		blockTypes.some(
+			( blockType ) => blockType.name === 'core/post-author-biography'
+		);
 
 	return createBlock(
 		'core/group',
@@ -54,7 +69,7 @@ export function migrateToRecommendedBlocks( attributes ) {
 			},
 		},
 		[
-			showAvatar &&
+			shouldInsertAvatarBlock &&
 				createBlock( 'core/avatar', {
 					size: avatarSize,
 					style: cleanEmptyObject( {
@@ -82,25 +97,27 @@ export function migrateToRecommendedBlocks( attributes ) {
 					},
 				},
 				[
-					createBlock( 'core/paragraph', {
-						content: byline,
-						placeholder: __( 'Write byline…' ),
-						style: {
-							typography: {
-								fontSize: '0.5em',
+					shouldInsertParagraphBlock &&
+						createBlock( 'core/paragraph', {
+							content: byline,
+							placeholder: __( 'Write byline…' ),
+							style: {
+								typography: {
+									fontSize: '0.5em',
+								},
 							},
-						},
-					} ),
-					createBlock( 'core/post-author-name', {
-						isLink,
-						linkTarget,
-						style: {
-							typography: {
-								fontSize: '1em',
+						} ),
+					shouldInsertPostAuthorNameBlock &&
+						createBlock( 'core/post-author-name', {
+							isLink,
+							linkTarget,
+							style: {
+								typography: {
+									fontSize: '1em',
+								},
 							},
-						},
-					} ),
-					showBio &&
+						} ),
+					shouldInsertPostAuthorBiographyBlock &&
 						createBlock( 'core/post-author-biography', {
 							style: {
 								typography: {

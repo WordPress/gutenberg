@@ -31,6 +31,7 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { useMemo, useState } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
 import { __, sprintf } from '@wordpress/i18n';
+import { store as blocksStore } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -155,7 +156,10 @@ function PostAuthorEdit( {
 		},
 		[ postType, postId ]
 	);
-
+	const blockTypes = useSelect(
+		( select ) => select( blocksStore ).getBlockTypes(),
+		[]
+	);
 	const { editEntityRecord } = useDispatch( coreStore );
 	const { replaceBlock } = useDispatch( blockEditorStore );
 
@@ -207,7 +211,10 @@ function PostAuthorEdit( {
 	}
 
 	function transformBlock() {
-		replaceBlock( clientId, migrateToRecommendedBlocks( attributes ) );
+		replaceBlock(
+			clientId,
+			migrateToRecommendedBlocks( attributes, blockTypes )
+		);
 	}
 
 	return (
@@ -325,26 +332,30 @@ function PostAuthorEdit( {
 					) }
 				</ToolsPanel>
 			</InspectorControls>
-			<InspectorControlsLastItem>
-				<VStack
-					className="wp-block-post-author__transform"
-					alignment="left"
-					spacing={ 4 }
-				>
-					<Text as="p">
-						{ __(
-							'This block is no longer supported. Please migrate to the Author Name, Avatar, and Biography blocks to design youor content as needed.'
-						) }
-					</Text>
-					<Button
-						variant="primary"
-						onClick={ transformBlock }
-						__next40pxDefaultSize
+			{ blockTypes.some(
+				( blockType ) => blockType.name === 'core/group'
+			) && (
+				<InspectorControlsLastItem>
+					<VStack
+						className="wp-block-post-author__transform"
+						alignment="left"
+						spacing={ 4 }
 					>
-						{ __( 'Migrate' ) }
-					</Button>
-				</VStack>
-			</InspectorControlsLastItem>
+						<Text as="p">
+							{ __(
+								'This block is no longer supported. Please migrate to the Author Name, Avatar, and Biography blocks to design youor content as needed.'
+							) }
+						</Text>
+						<Button
+							variant="primary"
+							onClick={ transformBlock }
+							__next40pxDefaultSize
+						>
+							{ __( 'Migrate' ) }
+						</Button>
+					</VStack>
+				</InspectorControlsLastItem>
+			) }
 
 			<BlockControls group="block">
 				<AlignmentControl
