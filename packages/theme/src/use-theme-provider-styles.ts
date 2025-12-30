@@ -103,14 +103,18 @@ function customRgbFormat( color: ColorTypes ) {
 function legacyWpAdminThemeOverridesCSS( accent: string ): Entry[] {
 	const parsedAccent = to( parse( accent ), HSL );
 
-	const coords = parsedAccent.coords;
+	// Fallback to 0 for grayscale colors.
+	const parsedH = parsedAccent.coords[ 0 ] ?? 0;
+	const parsedS = parsedAccent.coords[ 1 ] ?? 0;
+	const parsedL = parsedAccent.coords[ 2 ] ?? 0;
+
 	const darker10 = to(
 		{
 			space: HSL,
 			coords: [
-				coords[ 0 ], // h
-				coords[ 1 ], // s
-				Math.max( 0, Math.min( 100, coords[ 2 ] - 5 ) ), // l (reduced by 5%)
+				parsedH,
+				parsedS,
+				Math.max( 0, Math.min( 100, parsedL - 5 ) ), // L reduced by 5%
 			],
 		},
 		sRGB
@@ -119,9 +123,9 @@ function legacyWpAdminThemeOverridesCSS( accent: string ): Entry[] {
 		{
 			space: HSL,
 			coords: [
-				coords[ 0 ], // h
-				coords[ 1 ], // s
-				Math.max( 0, Math.min( 100, coords[ 2 ] - 10 ) ), // l (reduced by 10%)
+				parsedH,
+				parsedS,
+				Math.max( 0, Math.min( 100, parsedL - 10 ) ), // L reduced by 10%
 			],
 		},
 		sRGB
