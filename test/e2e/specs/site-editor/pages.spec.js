@@ -342,15 +342,15 @@ test.describe( 'Pages', () => {
 		await page.getByRole( 'menuitemradio', { name: 'Table' } ).click();
 
 		// Open actions menu for the test page
-		const row = page.getByRole( 'row', { name: /Order Test Page/ } );
+		let row = page.getByRole( 'row', { name: /Order Test Page/ } );
 		await row.getByRole( 'button', { name: 'Actions' } ).click();
 
 		// Click on Order action
 		await page.getByRole( 'menuitem', { name: 'Order' } ).click();
 
 		// Get the order input and save button
-		const orderInput = page.getByRole( 'spinbutton', { name: 'Order' } );
-		const saveButton = page.getByRole( 'button', { name: 'Save' } );
+		let orderInput = page.getByRole( 'spinbutton', { name: 'Order' } );
+		let saveButton = page.getByRole( 'button', { name: 'Save' } );
 
 		// Test that 0 is valid
 		await orderInput.fill( '0' );
@@ -368,7 +368,7 @@ test.describe( 'Pages', () => {
 		await expect( saveButton ).toBeEnabled();
 
 		// Save with a negative value to verify it persists
-		await orderInput.fill( '-1' );
+		await orderInput.fill( '-5' );
 		await saveButton.click();
 
 		// Verify success notice
@@ -377,5 +377,20 @@ test.describe( 'Pages', () => {
 				'role=button[name="Dismiss this notice"i] >> text="Order updated."'
 			)
 		).toBeVisible();
+
+		// Reload the page to verify the value persisted
+		await admin.visitSiteEditor();
+		await page.getByRole( 'button', { name: 'Pages' } ).click();
+		await page.getByRole( 'button', { name: 'Layout' } ).click();
+		await page.getByRole( 'menuitemradio', { name: 'Table' } ).click();
+
+		// Open Order action again for the same page
+		row = page.getByRole( 'row', { name: /Order Test Page/ } );
+		await row.getByRole( 'button', { name: 'Actions' } ).click();
+		await page.getByRole( 'menuitem', { name: 'Order' } ).click();
+
+		// Verify the negative value was persisted
+		orderInput = page.getByRole( 'spinbutton', { name: 'Order' } );
+		await expect( orderInput ).toHaveValue( '-5' );
 	} );
 } );
