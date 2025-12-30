@@ -22,7 +22,6 @@ function render_block_core_footnotes( $attributes, $content, $block ) {
 		return '';
 	}
 
-	// Bail if the post is password protected.
 	if ( post_password_required( $block->context['postId'] ) ) {
 		return '';
 	}
@@ -51,7 +50,7 @@ function render_block_core_footnotes( $attributes, $content, $block ) {
 			'<li id="%1$s">%2$s <a href="#%1$s-link" aria-label="%3$s">↩︎</a></li>',
 			esc_attr( $footnote['id'] ),
 			wp_kses_post( $footnote['content'] ),
-			$aria_label
+			esc_attr( $aria_label )
 		);
 		++$footnote_index;
 	}
