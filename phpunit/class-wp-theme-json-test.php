@@ -5153,7 +5153,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		);
 
 		$variable_styles = ':root{--wp--preset--shadow--natural: 5px 5px 0 0 black;}';
-		$element_styles  = 'a:where(:not(.wp-element-button)){box-shadow: var(--wp--preset--shadow--natural);}:root :where(.wp-element-button, .wp-block-button__link){box-shadow: var(--wp--preset--shadow--natural);}:root :where(.wp-block-paragraph){box-shadow: var(--wp--preset--shadow--natural);}';
+		$element_styles  = 'a:where(:not(.wp-element-button)){box-shadow: var(--wp--preset--shadow--natural);}:root :where(.wp-element-button, .wp-block-button__link){box-shadow: var(--wp--preset--shadow--natural);}:root :where(p){box-shadow: var(--wp--preset--shadow--natural);}';
 		$expected_styles = $variable_styles . $element_styles;
 		$this->assertSameCSS( $expected_styles, $theme_json->get_stylesheet( array( 'styles', 'presets', 'variables' ), null, array( 'skip_root_layout_styles' => true ) ) );
 	}
@@ -6347,7 +6347,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 			)
 		);
 
-		$expected = ':root :where(.wp-block-paragraph){color: black;}';
+		$expected = ':root :where(p){color: black;}';
 		$this->assertSameCSS( $expected, $theme_json->get_stylesheet( array( 'styles' ), null, array( 'skip_root_layout_styles' => true ) ) );
 		$this->assertStringNotContainsString( 'p:hover{', $theme_json->get_stylesheet( array( 'styles' ) ) );
 	}
