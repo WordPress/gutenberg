@@ -633,11 +633,6 @@
 							"description": "Enable fit text support for the block. This allows text content to automatically adjust its font size to fit within the block's dimensions.",
 							"type": "boolean",
 							"default": false
-						},
-						"textIndent": {
-							"description": "This value signals that a block supports the text-indent CSS style property. When it does, the block editor will show a UI control for the user to set its value if the theme declares support.\n\nWhen the block declares support for textIndent, its attributes definition is extended to include the style attribute.",
-							"type": "boolean",
-							"default": false
 						}
 					}
 				},
@@ -768,7 +763,6 @@
 								"lineHeight": { "type": "string" },
 								"letterSpacing": { "type": "string" },
 								"textDecoration": { "type": "string" },
-								"textIndent": { "type": "string" },
 								"textTransform": { "type": "string" }
 							}
 						}

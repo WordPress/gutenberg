@@ -637,11 +637,6 @@
 							"type": "boolean",
 							"default": false
 						},
-						"textIndent": {
-							"description": "Allow users to set custom line indent.",
-							"type": "boolean",
-							"default": false
-						},
 						"textAlign": {
 							"description": "Allow users to set the text align.",
 							"type": "boolean",
@@ -919,6 +914,9 @@
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
 				"core/block": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/breadcrumbs": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
 				"core/button": {
@@ -1737,13 +1735,6 @@
 								{ "$ref": "#/definitions/refComplete" }
 							]
 						},
-						"textIndent": {
-							"description": "Sets the `text-indent` CSS property.",
-							"oneOf": [
-								{ "type": "string" },
-								{ "$ref": "#/definitions/refComplete" }
-							]
-						},
 						"textAlign": {
 							"description": "Sets the `text-align` CSS property.",
 							"oneOf": [
@@ -1977,6 +1968,9 @@
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
 				"core/block": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/breadcrumbs": {
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
 				"core/button": {
@@ -2428,6 +2422,9 @@
 					"$ref": "#/definitions/stylesVariationBlockPropertiesComplete"
 				},
 				"core/block": {
+					"$ref": "#/definitions/stylesVariationBlockPropertiesComplete"
+				},
+				"core/breadcrumbs": {
 					"$ref": "#/definitions/stylesVariationBlockPropertiesComplete"
 				},
 				"core/button": {

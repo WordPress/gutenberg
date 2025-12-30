@@ -9,10 +9,16 @@ import {
 	registerBlockType,
 	store as blocksStore,
 } from '@wordpress/blocks';
+import { useDisabled } from '@wordpress/compose';
 import { select } from '@wordpress/data';
 import { useBlockProps } from '@wordpress/block-editor';
 import { useServerSideRender } from '@wordpress/server-side-render';
 import { __, sprintf } from '@wordpress/i18n';
+
+/**
+ * Internal dependencies
+ */
+import HtmlRenderer from './utils/html-renderer';
 
 /**
  * Internal dependencies
@@ -351,7 +357,8 @@ export const registerCoreBlocks = (
 					apiVersion: 3,
 				} ),
 				edit: function Edit( { attributes } ) {
-					const blockProps = useBlockProps();
+					const disabledRef = useDisabled();
+					const blockProps = useBlockProps( { ref: disabledRef } );
 					const { content, status, error } = useServerSideRender( {
 						block: blockName,
 						attributes,
@@ -376,11 +383,9 @@ export const registerCoreBlocks = (
 					}
 
 					return (
-						<div
-							{ ...blockProps }
-							dangerouslySetInnerHTML={ {
-								__html: content || '',
-							} }
+						<HtmlRenderer
+							wrapperProps={ blockProps }
+							html={ content }
 						/>
 					);
 				},
