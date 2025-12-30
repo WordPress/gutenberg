@@ -3,20 +3,22 @@
  */
 import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
 import {
-	Disabled,
 	RangeControl,
 	SelectControl,
+	Spinner,
 	ToggleControl,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
-import ServerSideRender from '@wordpress/server-side-render';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
+import { useServerSideRender } from '@wordpress/server-side-render';
+import { useDisabled } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
+import HtmlRenderer from '../utils/html-renderer';
 
 /**
  * Minimum number of comments a user can show using this block.
@@ -31,22 +33,51 @@ const MIN_COMMENTS = 1;
  */
 const MAX_COMMENTS = 100;
 
-export default function LatestComments( { attributes, setAttributes } ) {
+export default function LatestComments( { attributes, setAttributes, name } ) {
 	const { commentsToShow, displayAvatar, displayDate, displayContent } =
 		attributes;
 
-	const serverSideAttributes = {
-		...attributes,
-		style: {
-			...attributes?.style,
-			spacing: undefined,
-		},
-	};
-
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
+	const { content, status, error } = useServerSideRender( {
+		attributes,
+		skipBlockSupportAttributes: true,
+		block: name,
+		urlQueryArgs: {
+			// The preview uses the site's locale to make it more true to how
+			// the block appears on the frontend. Setting the locale
+			// explicitly prevents any middleware from setting it to 'user'.
+			_locale: 'site',
+		},
+	} );
+
+	const disabledRef = useDisabled();
+	const blockProps = useBlockProps( { ref: disabledRef } );
+
+	if ( status === 'loading' ) {
+		return (
+			<div { ...blockProps }>
+				<Spinner />
+			</div>
+		);
+	}
+
+	if ( status === 'error' ) {
+		return (
+			<div { ...blockProps }>
+				<p>
+					{ sprintf(
+						/* translators: %s: error message returned when rendering the block. */
+						__( 'Error: %s' ),
+						error
+					) }
+				</p>
+			</div>
+		);
+	}
+
 	return (
-		<div { ...useBlockProps() }>
+		<>
 			<InspectorControls>
 				<ToolsPanel
 					label={ __( 'Settings' ) }
@@ -143,16 +174,7 @@ export default function LatestComments( { attributes, setAttributes } ) {
 					</ToolsPanelItem>
 				</ToolsPanel>
 			</InspectorControls>
-			<Disabled>
-				<ServerSideRender
-					block="core/latest-comments"
-					attributes={ serverSideAttributes }
-					// The preview uses the site's locale to make it more true to how
-					// the block appears on the frontend. Setting the locale
-					// explicitly prevents any middleware from setting it to 'user'.
-					urlQueryArgs={ { _locale: 'site' } }
-				/>
-			</Disabled>
-		</div>
+			<HtmlRenderer wrapperProps={ blockProps } html={ content } />
+		</>
 	);
 }
