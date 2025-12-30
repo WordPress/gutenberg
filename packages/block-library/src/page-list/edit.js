@@ -29,6 +29,7 @@ import { __, sprintf } from '@wordpress/i18n';
 import { useMemo, useState, useEffect, useCallback } from '@wordpress/element';
 import { useEntityRecords } from '@wordpress/core-data';
 import { useSelect, useDispatch } from '@wordpress/data';
+import { speak } from '@wordpress/a11y'; // ← ADD THIS IMPORT
 
 /**
  * Internal dependencies
@@ -257,12 +258,14 @@ export default function PageListEdit( {
 		parentClientId,
 		hasDraggedChild,
 		isChildOfNavigation,
+		hasSiblingBlocks,
 	} = useSelect(
 		( select ) => {
 			const {
 				getBlockParentsByBlockName,
 				hasSelectedInnerBlock,
 				hasDraggedInnerBlock,
+				getBlockOrder,
 			} = select( blockEditorStore );
 			const blockParents = getBlockParentsByBlockName(
 				clientId,
@@ -274,12 +277,26 @@ export default function PageListEdit( {
 				'core/navigation',
 				true
 			);
+			const navParentClientId = navigationBlockParents[ 0 ];
+
+			// Check if there are sibling blocks in the Navigation block.
+			let siblingBlocks = false;
+			if ( navParentClientId ) {
+				const siblingClientIds = getBlockOrder( navParentClientId );
+				// Check if there are other blocks besides this Page List.
+				const otherBlocks = siblingClientIds.filter(
+					( id ) => id !== clientId
+				);
+				siblingBlocks = otherBlocks.length > 0;
+			}
+
 			return {
 				isNested: blockParents.length > 0,
 				isChildOfNavigation: navigationBlockParents.length > 0,
 				hasSelectedChild: hasSelectedInnerBlock( clientId, true ),
 				hasDraggedChild: hasDraggedInnerBlock( clientId, true ),
-				parentClientId: navigationBlockParents[ 0 ],
+				parentClientId: navParentClientId,
+				hasSiblingBlocks: siblingBlocks,
 			};
 		},
 		[ clientId ]
@@ -319,6 +336,30 @@ export default function PageListEdit( {
 	useEffect( () => {
 		setAttributes( { isNested } );
 	}, [ isNested, setAttributes ] );
+
+	// Auto-convert Page List to Navigation Links when sibling blocks are added.
+	useEffect( () => {
+		if (
+			hasSiblingBlocks &&
+			allowConvertToLinks &&
+			hasResolvedPages &&
+			isChildOfNavigation
+		) {
+			// Announce the conversion to screen readers.
+			speak(
+				__( 'Page List converted to editable Navigation Links.' ),
+				'assertive'
+			);
+
+			convertToNavigationLinks();
+		}
+	}, [
+		hasSiblingBlocks,
+		allowConvertToLinks,
+		hasResolvedPages,
+		isChildOfNavigation,
+		convertToNavigationLinks,
+	] );
 
 	return (
 		<>

@@ -87,4 +87,77 @@ test.describe( 'Page List block', () => {
 		expect( innerHTML ).not.toContain( '&lt;strong&gt;' );
 		expect( innerHTML ).not.toContain( '&lt;/strong&gt;' );
 	} );
+
+	test( 'auto-converts to Navigation Links when inserting new blocks', async ( {
+		editor,
+		admin,
+		page,
+		requestUtils,
+	} ) => {
+		// Create test pages
+		await requestUtils.createPage( {
+			title: 'Test Page 1',
+			status: 'publish',
+		} );
+		await requestUtils.createPage( {
+			title: 'Test Page 2',
+			status: 'publish',
+		} );
+
+		// Create a new post and insert Navigation block
+		await admin.createNewPost();
+		await editor.insertBlock( { name: 'core/navigation' } );
+
+		// Wait for Navigation block to be visible
+		const navigationBlock = editor.canvas.getByRole( 'document', {
+			name: 'Block: Navigation',
+		} );
+		await expect( navigationBlock ).toBeVisible();
+
+		// The Navigation block should contain a Page List by default
+		const pageListBlock = editor.canvas.getByRole( 'document', {
+			name: 'Block: Page List',
+		} );
+		await expect( pageListBlock ).toBeVisible( {
+			timeout: 10000,
+		} );
+
+		// Wait for pages to load in the Page List
+		const pageItems = pageListBlock.locator( 'li' );
+		await pageItems.first().waitFor( { state: 'visible' } );
+
+		// Select the Navigation block
+		await navigationBlock.click();
+
+		// Insert a new Navigation Link block using the block inserter
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '/navigation link' );
+		await page.keyboard.press( 'Enter' );
+
+		// Wait for the Page List to be converted to Navigation Links
+		// After conversion, Page List block should no longer exist
+		await expect( pageListBlock ).not.toBeVisible( {
+			timeout: 5000,
+		} );
+
+		// Verify Navigation Link blocks now exist
+		const navigationLinks = editor.canvas.getByRole( 'document', {
+			name: 'Block: Custom Link',
+		} );
+		await expect( navigationLinks.first() ).toBeVisible();
+
+		// Verify the pages are now individual Navigation Link blocks
+		const linkBlocks = navigationBlock.locator(
+			'[data-type="core/navigation-link"]'
+		);
+		const linkCount = await linkBlocks.count();
+
+		// Should have at least 2 links (our test pages) + the new one we inserted
+		expect( linkCount ).toBeGreaterThanOrEqual( 2 );
+
+		// Verify the test page links are present
+		const navigationContent = await navigationBlock.textContent();
+		expect( navigationContent ).toContain( 'Test Page 1' );
+		expect( navigationContent ).toContain( 'Test Page 2' );
+	} );
 } );
