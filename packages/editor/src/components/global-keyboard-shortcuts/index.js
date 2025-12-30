@@ -91,9 +91,15 @@ export default function EditorKeyboardShortcuts() {
 		savePost();
 	} );
 
-	// Only opens the list view. Other functionality for this shortcut happens in the rendered sidebar.
+	// Only opens the list view. Other functionality for this shortcut happens
+	// in the rendered sidebar. When the `showListViewByDefault` preference is
+	// enabled, the sidebar is rendered by default. As such, we need to prevent
+	// the callback from running twice by using an additional check for
+	// `event.defaultPrevented` otherwise the shortcut:
+	// 1. It will first be invoked in the sidebar, thus closing it.
+	// 2. It will then run again here, reopening the sidebar unexpectedly.
 	useShortcut( 'core/editor/toggle-list-view', ( event ) => {
-		if ( ! isListViewOpened() ) {
+		if ( ! isListViewOpened() && ! event.defaultPrevented ) {
 			event.preventDefault();
 			setIsListViewOpened( true );
 		}

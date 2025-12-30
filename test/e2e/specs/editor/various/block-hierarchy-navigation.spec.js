@@ -252,6 +252,9 @@ test.describe( 'Navigating the block hierarchy', () => {
 				name: 'Block navigation structure',
 			} )
 		).toBeVisible();
+		// Move focus to the first item in the List view,
+		// which happens to be the Group block.
+		await page.keyboard.press( 'Tab' );
 		await page.keyboard.press( 'Enter' );
 
 		await expect(

@@ -52,6 +52,7 @@ function ListViewBlockSelectButton(
 		draggable,
 		isExpanded,
 		ariaDescribedBy,
+		isSelected,
 	},
 	ref
 ) {
@@ -125,6 +126,7 @@ function ListViewBlockSelectButton(
 			href={ `#block-${ clientId }` }
 			aria-describedby={ ariaDescribedBy }
 			aria-expanded={ isExpanded }
+			data-is-selected={ isSelected ? true : undefined }
 		>
 			<ListViewExpander onClick={ onToggleExpanded } />
 			<BlockIcon

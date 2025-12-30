@@ -1390,6 +1390,271 @@ test.describe( 'List View', () => {
 			'The dropdown menu should also be visible'
 		).toBeVisible();
 	} );
+
+	test( 'should set initial focus to the first tab when the Document Overview panel opens and no blocks are selected', async ( {
+		page,
+		editor,
+		pageUtils,
+	} ) => {
+		const notice = page
+			.getByRole( 'button', { name: 'Dismiss this notice' } )
+			.filter( { hasText: 'Draft saved' } );
+
+		// Enter some content, save and reload page.
+		await page.keyboard.type( 'Hello' );
+		await editor.insertBlock( { name: 'core/heading' } );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Paragraph' },
+		} );
+		await pageUtils.pressKeys( 'primary+s' );
+		await notice.waitFor();
+		// After page reload, no blocks are selected.
+		await page.reload();
+
+		const documentOverviewPanel = page.getByRole( 'region', {
+			name: 'Document Overview',
+		} );
+		await expect( documentOverviewPanel ).toBeHidden();
+
+		// Open List View.
+		await pageUtils.pressKeys( 'access+o' );
+
+		// The Document Overview panel should now be open.
+		await expect( documentOverviewPanel ).toBeVisible();
+
+		// Initial focus should be on the first tab.
+		await expect(
+			page.getByRole( 'tab', { name: 'List View' } )
+		).toBeFocused();
+	} );
+
+	test( 'should conditionally set initial focus to the Document Overview panel when the Always open List View preference is enabled', async ( {
+		page,
+		editor,
+		pageUtils,
+	} ) => {
+		const documentOverviewPanel = page.getByRole( 'region', {
+			name: 'Document Overview',
+		} );
+		await expect( documentOverviewPanel ).toBeHidden();
+
+		// Turn on block list view open by default and full screen mode.
+		await editor.setPreferences( 'core', {
+			showListViewByDefault: true,
+		} );
+		await editor.setPreferences( 'core/edit-post', {
+			fullscreenMode: true,
+		} );
+
+		const notice = page
+			.getByRole( 'button', { name: 'Dismiss this notice' } )
+			.filter( { hasText: 'Draft saved' } );
+
+		// Enter a post title and save so that after page reload initial focus
+		// is not set to the post title.
+		await page.keyboard.type( 'Hello' );
+		await pageUtils.pressKeys( 'primary+s' );
+		await notice.waitFor();
+		// After page reload, no blocks are selected§.
+		await page.reload();
+
+		// The Document Overview panel should be open by default.
+		await expect( documentOverviewPanel ).toBeVisible();
+
+		// On first page load, the panel is open by default and  initial focus
+		// should not be set. The tab sequence should start from the document root
+		// i.e. from the View Posts link.
+		await pageUtils.pressKeys( 'Tab' );
+		const viewPostsLink = page.getByRole( 'link', {
+			name: 'View Posts',
+			exact: true,
+		} );
+		await expect( viewPostsLink ).toBeFocused();
+
+		// Move focus to the first tab in the panel.
+		await pageUtils.pressKeys( 'access+o' );
+		// Focus should be on the first tab.
+		await expect(
+			page.getByRole( 'tab', { name: 'List View' } )
+		).toBeFocused();
+
+		// Close the panel.
+		await pageUtils.pressKeys( 'access+o' );
+		await expect( documentOverviewPanel ).toBeHidden();
+
+		// Reopen the panel.
+		await pageUtils.pressKeys( 'access+o' );
+		await expect( documentOverviewPanel ).toBeVisible();
+
+		// When manually closing and reopening again the panel, initial focus
+		// should be normally set to the first tab in the panel.
+		await expect(
+			page.getByRole( 'tab', { name: 'List View' } )
+		).toBeFocused();
+
+		// Reset preferences.
+		await editor.setPreferences( 'core', {
+			showListViewByDefault: false,
+		} );
+		await editor.setPreferences( 'core/edit-post', {
+			fullscreenMode: false,
+		} );
+	} );
+
+	test( 'should set focus to the selected item when using the keyboard shortcut after the list view opens and sets initial focus', async ( {
+		page,
+		editor,
+		pageUtils,
+	} ) => {
+		const documentOverviewPanel = page.getByRole( 'region', {
+			name: 'Document Overview',
+		} );
+		await expect( documentOverviewPanel ).toBeHidden();
+
+		// Add a Heading block and a Paragraph block.
+		await editor.insertBlock( { name: 'core/heading' } );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Paragraph' },
+		} );
+
+		const postTitleField = editor.canvas.getByRole( 'textbox', {
+			name: 'Add title',
+		} );
+		// Focus the post title field to unselect any blocks.
+		await postTitleField.click();
+		await expect( postTitleField ).toBeFocused();
+
+		// Open List View.
+		await pageUtils.pressKeys( 'access+o' );
+
+		// The Document Overview panel should now be open.
+		await expect( documentOverviewPanel ).toBeVisible();
+		// Initial focus should be on the first tab.
+		await expect(
+			page.getByRole( 'tab', { name: 'List View' } )
+		).toBeFocused();
+
+		// Select the second block in the editor canvas.
+		const paragraphBlock = editor.canvas.getByRole( 'document', {
+			name: 'Block: Paragraph',
+		} );
+		await editor.selectBlocks( paragraphBlock );
+		// The Paragraph block should now be focused.
+		await expect( paragraphBlock ).toBeFocused();
+
+		// Press the keyboard shortcut again to move focus to the List View.
+		await pageUtils.pressKeys( 'access+o' );
+
+		// Ths selected item in the List View should now be focused.
+		await expect(
+			documentOverviewPanel.getByRole( 'link', {
+				name: 'Paragraph',
+			} )
+		).toBeFocused();
+	} );
+
+	test( 'should set focus to the nested selected item when using the keyboard shortcut from an inner block', async ( {
+		page,
+		editor,
+		pageUtils,
+	} ) => {
+		const documentOverviewPanel = page.getByRole( 'region', {
+			name: 'Document Overview',
+		} );
+		await expect( documentOverviewPanel ).toBeHidden();
+
+		// Add a Heading block and a Paragraph block.
+		await editor.insertBlock( { name: 'core/heading' } );
+		await editor.insertBlock( {
+			name: 'core/group',
+			innerBlocks: [
+				{
+					name: 'core/paragraph',
+					attributes: { content: 'Inner paragraph' },
+				},
+			],
+		} );
+		await editor.insertBlock( { name: 'core/heading' } );
+
+		// Select the paragraph block within the group block.
+		const paragraphBlock = editor.canvas.getByRole( 'document', {
+			name: 'Block: Paragraph',
+		} );
+		await editor.selectBlocks( paragraphBlock );
+		// The Paragraph block should now be focused.
+		await expect( paragraphBlock ).toBeFocused();
+
+		// Open List View.
+		await pageUtils.pressKeys( 'access+o' );
+
+		// The Document Overview panel should now be open.
+		await expect( documentOverviewPanel ).toBeVisible();
+		// Initial focus should be on the inner selected item within the group item.
+		await expect(
+			documentOverviewPanel.getByRole( 'link', {
+				name: 'Paragraph',
+			} )
+		).toBeFocused();
+	} );
+
+	test( 'should toggle the panel with the keyboard shortcut when the Always open List View preference is enabled', async ( {
+		page,
+		editor,
+		pageUtils,
+	} ) => {
+		const documentOverviewPanel = page.getByRole( 'region', {
+			name: 'Document Overview',
+		} );
+		await expect( documentOverviewPanel ).toBeHidden();
+
+		// Turn on block list view open by default and full screen mode.
+		await editor.setPreferences( 'core', {
+			showListViewByDefault: true,
+		} );
+
+		// After page reload, the panel is open by default.
+		await page.reload();
+		// The Document Overview panel should be open by default.
+		await expect( documentOverviewPanel ).toBeVisible();
+
+		const postTitleField = editor.canvas.getByRole( 'textbox', {
+			name: 'Add title',
+		} );
+		// The post title field should be focused on a new empty post.
+		await expect( postTitleField ).toBeFocused();
+
+		// Move focus to the first tab in the panel.
+		await pageUtils.pressKeys( 'access+o' );
+		// Focus should be on the first tab.
+		await expect(
+			page.getByRole( 'tab', { name: 'List View' } )
+		).toBeFocused();
+
+		// Close the panel.
+		await pageUtils.pressKeys( 'access+o' );
+		await expect( documentOverviewPanel ).toBeHidden();
+
+		// Focus should now be on the list view toggle button.
+		await expect(
+			page.getByRole( 'button', { name: 'Document Overview' } )
+		).toBeFocused();
+
+		// Reopen the panel.
+		await pageUtils.pressKeys( 'access+o' );
+		await expect( documentOverviewPanel ).toBeVisible();
+
+		// Focus should be on the first tab.
+		await expect(
+			page.getByRole( 'tab', { name: 'List View' } )
+		).toBeFocused();
+
+		// Reset preferences.
+		await editor.setPreferences( 'core', {
+			showListViewByDefault: false,
+		} );
+	} );
 } );
 
 /** @typedef {import('@playwright/test').Locator} Locator */

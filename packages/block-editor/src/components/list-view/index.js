@@ -179,12 +179,27 @@ function ListViewComponent(
 		ref,
 	] );
 
+	const timerIdRef = useRef();
+
 	useEffect( () => {
-		// If a blocks are already selected when the list view is initially
+		// If any blocks are already selected when the list view is initially
 		// mounted, shift focus to the first selected block.
-		if ( selectedClientIds?.length ) {
-			focusListItem( selectedClientIds[ 0 ], elementRef?.current );
-		}
+		// The ListView may render within other components that already manage
+		// initial focus via `useFocusOnMount` e.g. the `ListViewSidebar`. As
+		// `useFocusOnMount` uses a timeout internally, it runs last and may steal
+		// focus from the selected item. We use another timeout to make ListView
+		// set its own initial focus last.
+		timerIdRef.current = setTimeout( () => {
+			if ( selectedClientIds?.length ) {
+				focusListItem( selectedClientIds[ 0 ], elementRef?.current );
+			}
+		}, 0 );
+
+		return () => {
+			if ( timerIdRef.current ) {
+				clearTimeout( timerIdRef.current );
+			}
+		};
 		// Only focus on the selected item when the list view is mounted.
 	}, [] );
 

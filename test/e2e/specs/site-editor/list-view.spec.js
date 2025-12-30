@@ -69,6 +69,9 @@ test.describe( 'Site Editor List View', () => {
 		} );
 		await expect( listView ).toBeVisible();
 
+		// Move focus to the first item in the List view,
+		// which happens to be the site title block.
+		await page.keyboard.press( 'Tab' );
 		// The site title block should have focus.
 		await expect(
 			listView.getByRole( 'link', {

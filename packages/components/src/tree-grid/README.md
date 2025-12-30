@@ -12,6 +12,8 @@ A tree grid is a hierarchical 2 dimensional UI component, for example it could b
 
 A tree grid allows the user to navigate using arrow keys. Up/down to navigate vertically across rows, and left/right to navigate horizontally between focusables in a row.
 
+To make the keyboard navigation and roving tabindex behaviors work as expected it is important to avoid programmatically setting focus on any of the focusable items in the tree grid. In fact, `RovingTabIndexItem` handles the logic to make only one item navigable with the Tab key at a time. The other items can be navigated with the arrow keys. Triggering a focus event may conflict with the `RovingTabIndexItem` internal logic.
+
 For more information on a tree grid, see the following links:
 
 -   https://www.w3.org/TR/wai-aria-practices/examples/treegrid/treegrid-1.html
