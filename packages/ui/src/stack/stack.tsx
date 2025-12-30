@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
+import { useRender, mergeProps } from '@base-ui/react';
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { forwardRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
-import { renderElement } from '../utils/element';
 import { type StackProps } from './types';
 import styles from './style.module.css';
 
@@ -31,12 +20,13 @@ export const Stack = forwardRef< HTMLDivElement, StackProps >( function Stack(
 		justifyContent: justify,
 		flexDirection: direction,
 		flexWrap: wrap,
-		...props.style,
 	};
 
-	return renderElement< 'div' >( {
+	const element = useRender( {
 		render,
 		ref,
-		props: { ...props, style, className },
+		props: mergeProps< 'div' >( props, { style, className } ),
 	} );
+
+	return element;
 } );
