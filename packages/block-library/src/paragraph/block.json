@@ -69,7 +69,6 @@
 				"fontSize": true
 			}
 		},
-		"__experimentalSelector": "p",
 		"__unstablePasteTextInline": true,
 		"interactivity": {
 			"clientNavigation": true
