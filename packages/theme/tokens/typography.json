@@ -104,6 +104,9 @@
 			"medium": {
 				"$value": 499,
 				"$description": "Medium font weight for emphasis and headings"
+			},
+			"$extensions": {
+				"com.figma.scopes": [ "FONT_WEIGHT" ]
 			}
 		}
 	}
