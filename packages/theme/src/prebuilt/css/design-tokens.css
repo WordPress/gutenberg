@@ -152,7 +152,7 @@
 	--wpds-font-size-sm: 12px; /* Small font size */
 	--wpds-font-size-xl: 20px; /* Extra large font size */
 	--wpds-font-size-xs: 11px; /* Extra small font size */
-	--wpds-font-weight-medium: 500; /* Medium font weight for emphasis and headings */
+	--wpds-font-weight-medium: 499; /* Medium font weight for emphasis and headings */
 	--wpds-font-weight-regular: 400; /* Regular font weight for body text */
 }
 

@@ -96,7 +96,7 @@
 				"$description": "Regular font weight for body text"
 			},
 			"medium": {
-				"$value": 500,
+				"$value": 499,
 				"$description": "Medium font weight for emphasis and headings"
 			}
 		}
