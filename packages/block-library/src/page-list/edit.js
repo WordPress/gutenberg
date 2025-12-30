@@ -265,7 +265,6 @@ export default function PageListEdit( {
 		hasDraggedChild,
 		isChildOfNavigation,
 		isOnlySinglePageList,
-		parentNavigationIsSelected,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -274,7 +273,6 @@ export default function PageListEdit( {
 				hasDraggedInnerBlock,
 				getBlockOrder,
 				getBlockName,
-				getSelectedBlockClientId,
 			} = select( blockEditorStore );
 			const blockParents = getBlockParentsByBlockName(
 				clientId,
@@ -290,7 +288,6 @@ export default function PageListEdit( {
 
 			// Check if the Navigation block contains only a single Page List (default state).
 			let isSinglePageList = false;
-			let isParentNavigationSelected = false;
 
 			if ( navParentClientId ) {
 				const siblingClientIds = getBlockOrder( navParentClientId );
@@ -299,10 +296,6 @@ export default function PageListEdit( {
 				isSinglePageList =
 					siblingClientIds.length === 1 &&
 					getBlockName( siblingClientIds[ 0 ] ) === 'core/page-list';
-
-				// Check if the parent Navigation block is selected.
-				isParentNavigationSelected =
-					getSelectedBlockClientId() === navParentClientId;
 			}
 
 			return {
@@ -312,7 +305,6 @@ export default function PageListEdit( {
 				hasDraggedChild: hasDraggedInnerBlock( clientId, true ),
 				parentClientId: navParentClientId,
 				isOnlySinglePageList: isSinglePageList,
-				parentNavigationIsSelected: isParentNavigationSelected,
 			};
 		},
 		[ clientId ]
@@ -338,6 +330,8 @@ export default function PageListEdit( {
 
 	// Track if we've already converted to avoid multiple conversions.
 	const hasConverted = useRef( false );
+	// Track the previous state to detect when a block is added.
+	const prevIsOnlySinglePageList = useRef( isOnlySinglePageList );
 
 	useEffect( () => {
 		if ( hasSelectedChild || hasDraggedChild ) {
@@ -356,19 +350,18 @@ export default function PageListEdit( {
 		setAttributes( { isNested } );
 	}, [ isNested, setAttributes ] );
 
-	// Auto-convert Page List to Navigation Links when the parent Navigation block
-	// is selected and contains only the default single Page List block.
-	// This happens when the user clicks the Navigation block to start editing,
-	// which is typically when they click the + button to add blocks.
+	// Auto-convert Page List to Navigation Links when a new block is added
+	// to a Navigation that previously contained only the default Page List.
+	// This improves the first-time editing experience for new users.
 	useEffect( () => {
 		// Only convert if:
-		// 1. Navigation contains only a single Page List (default state)
-		// 2. Parent Navigation block is selected (user is interacting)
+		// 1. Previously had only a single Page List (default state)
+		// 2. Now has multiple blocks (user just added something)
 		// 3. We haven't already converted
 		// 4. All other safety conditions are met
 		const shouldConvert =
-			isOnlySinglePageList &&
-			parentNavigationIsSelected &&
+			prevIsOnlySinglePageList.current === true &&
+			isOnlySinglePageList === false &&
 			! hasConverted.current &&
 			allowConvertToLinks &&
 			hasResolvedPages &&
@@ -388,9 +381,11 @@ export default function PageListEdit( {
 			// individual Navigation Link blocks for each page.
 			convertToNavigationLinks();
 		}
+
+		// Update the previous state for the next render.
+		prevIsOnlySinglePageList.current = isOnlySinglePageList;
 	}, [
 		isOnlySinglePageList,
-		parentNavigationIsSelected,
 		allowConvertToLinks,
 		hasResolvedPages,
 		isChildOfNavigation,
