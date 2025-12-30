@@ -88,6 +88,41 @@ export type CurriedSelectorsOf< S > = S extends StoreDescriptor<
 	: never;
 
 /**
+ * Like CurriedState but wraps the return type in a Promise.
+ * Used for resolveSelect where selectors return promises.
+ *
+ * For generic selectors that define PromiseCurriedSignature, that signature
+ * is used directly to preserve generic type parameters (which would otherwise
+ * be lost when using `infer`).
+ */
+type CurriedStateWithPromise< F > =
+	F extends SelectorWithCustomCurrySignature & {
+		PromiseCurriedSignature: infer S;
+	}
+		? S
+		: F extends SelectorWithCustomCurrySignature & {
+				CurriedSignature: ( ...args: infer P ) => infer R;
+		  }
+		? ( ...args: P ) => Promise< R >
+		: F extends ( state: any, ...args: infer P ) => infer R
+		? ( ...args: P ) => Promise< R >
+		: F;
+
+/**
+ * Like CurriedSelectorsOf but each selector returns a Promise.
+ * Used for resolveSelect.
+ */
+export type CurriedSelectorsResolveOf< S > = S extends StoreDescriptor<
+	ReduxStoreConfig< any, any, infer Selectors >
+>
+	? {
+			[ key in keyof Selectors ]: CurriedStateWithPromise<
+				Selectors[ key ]
+			>;
+	  }
+	: never;
+
+/**
  * Removes the first argument from a function.
  *
  * By default, it removes the `state` parameter from
@@ -155,6 +190,7 @@ type CurriedState< F > = F extends SelectorWithCustomCurrySignature
  */
 export interface SelectorWithCustomCurrySignature {
 	CurriedSignature: Function;
+	PromiseCurriedSignature?: Function;
 }
 
 export interface DataRegistry {

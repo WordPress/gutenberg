@@ -5,7 +5,7 @@
 	"route": {
 		"path": "/font-list",
 		"page": [
-			"gutenberg-boot",
+			"site-editor",
 			"font-library"
 		]
 	},

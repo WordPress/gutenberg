@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import {
 	Controls,
 	Description,
@@ -9,10 +6,6 @@ import {
 	Subtitle,
 	Title,
 } from '@storybook/blocks';
-
-/**
- * Internal dependencies
- */
 import { WithGlobalCSS } from './decorators/with-global-css';
 import { WithMarginChecker } from './decorators/with-margin-checker';
 import { WithMaxWidthWrapper } from './decorators/with-max-width-wrapper';

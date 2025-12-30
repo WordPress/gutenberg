@@ -22,6 +22,8 @@
 		{ "path": "../keycodes" },
 		{ "path": "../primitives" },
 		{ "path": "../private-apis" },
+		{ "path": "../theme" },
+		{ "path": "../ui" },
 		{ "path": "../url" },
 		{ "path": "../warning" }
 	],

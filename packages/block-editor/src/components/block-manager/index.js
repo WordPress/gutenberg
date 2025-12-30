@@ -71,7 +71,6 @@ export default function BlockManager( {
 	return (
 		<VStack className="block-editor-block-manager__content" spacing={ 4 }>
 			<SearchControl
-				__nextHasNoMarginBottom
 				label={ __( 'Search for a block' ) }
 				placeholder={ __( 'Search for a block' ) }
 				value={ search }

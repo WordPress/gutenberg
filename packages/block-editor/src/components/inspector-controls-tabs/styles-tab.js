@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { PanelBody } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
 
@@ -71,13 +70,7 @@ const StylesTab = ( {
 
 	return (
 		<>
-			{ hasBlockStyles && (
-				<div>
-					<PanelBody title={ __( 'Styles' ) }>
-						<BlockStyles clientId={ clientId } />
-					</PanelBody>
-				</div>
-			) }
+			{ hasBlockStyles && <BlockStyles clientId={ clientId } /> }
 			{ isSectionBlock &&
 				window?.__experimentalContentOnlyPatternInsertion && (
 					<SectionBlockColorControls

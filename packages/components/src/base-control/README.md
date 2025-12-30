@@ -17,7 +17,7 @@ const MyCustomTextareaControl = ({ children, ...baseProps }) => (
 	const { baseControlProps, controlProps } = useBaseControlProps( baseProps );
 
 	return (
-		<BaseControl { ...baseControlProps } __nextHasNoMarginBottom>
+		<BaseControl { ...baseControlProps }>
 			<textarea { ...controlProps }>
 			  { children }
 			</textarea>
@@ -27,14 +27,6 @@ const MyCustomTextareaControl = ({ children, ...baseProps }) => (
 ```
 
 ## Props
-
-### `__nextHasNoMarginBottom`
-
- - Type: `boolean`
- - Required: No
- - Default: `false`
-
-Start opting into the new margin-free styles that will become the default in a future version.
 
 ### `as`
 
@@ -104,10 +96,7 @@ otherwise use if the `label` prop was passed.
 import { BaseControl } from '@wordpress/components';
 
 const MyBaseControl = () => (
-	<BaseControl
-		__nextHasNoMarginBottom
-		help="This button is already accessibly labeled."
-	>
+	<BaseControl help="This button is already accessibly labeled.">
 		<BaseControl.VisualLabel>Author</BaseControl.VisualLabel>
 		<Button>Select an author</Button>
 	</BaseControl>

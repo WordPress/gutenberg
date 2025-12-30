@@ -44,7 +44,11 @@ export const settings = {
 				name: 'core/paragraph',
 				attributes: {
 					content: `<strong>${ __( 'Snow Patrol' ) }</strong>`,
-					align: 'center',
+					style: {
+						typography: {
+							textAlign: 'center',
+						},
+					},
 				},
 			},
 		],

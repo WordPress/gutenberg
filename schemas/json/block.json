@@ -323,6 +323,11 @@
 							"type": "boolean",
 							"default": false
 						},
+						"height": {
+							"description": "Allow blocks to define a height value.",
+							"type": "boolean",
+							"default": false
+						},
 						"minHeight": {
 							"description": "Allow blocks to define a minimum height value.",
 							"type": "boolean",
@@ -717,6 +722,7 @@
 							"properties": {
 								"root": { "type": "string" },
 								"aspectRatio": { "type": "string" },
+								"height": { "type": "string" },
 								"minHeight": { "type": "string" },
 								"width": { "type": "string" }
 							}

@@ -2212,13 +2212,13 @@ describe( 'Rich link previews', () => {
 		// Todo: refactor to use user-facing queries.
 		// eslint-disable-next-line testing-library/no-node-access
 		const hasRichImagePreview = linkPreview.querySelector(
-			'.block-editor-link-control__search-item-image'
+			'.block-editor-link-control__preview-image'
 		);
 
 		// Todo: refactor to use user-facing queries.
 		// eslint-disable-next-line testing-library/no-node-access
 		const hasRichDescriptionPreview = linkPreview.querySelector(
-			'.block-editor-link-control__search-item-description'
+			'.block-editor-link-control__preview-description'
 		);
 
 		expect( hasRichImagePreview ).not.toBeInTheDocument();
@@ -2247,7 +2247,7 @@ describe( 'Rich link previews', () => {
 
 		// eslint-disable-next-line testing-library/no-node-access
 		expect( titlePreview.parentElement.parentElement ).toHaveClass(
-			'block-editor-link-control__search-item-title'
+			'block-editor-link-control__preview-title'
 		);
 	} );
 
@@ -2271,7 +2271,7 @@ describe( 'Rich link previews', () => {
 
 		// eslint-disable-next-line testing-library/no-node-access
 		const iconPreview = linkPreview.querySelector(
-			`.block-editor-link-control__search-item-icon`
+			`.block-editor-link-control__preview-icon`
 		);
 
 		// eslint-disable-next-line testing-library/no-node-access
@@ -2310,7 +2310,7 @@ describe( 'Rich link previews', () => {
 
 			// eslint-disable-next-line testing-library/no-node-access
 			const missingDataItem = linkPreview.querySelector(
-				`.block-editor-link-control__search-item-${ dataItem }`
+				`.block-editor-link-control__preview-${ dataItem }`
 			);
 
 			expect( missingDataItem ).not.toBeInTheDocument();

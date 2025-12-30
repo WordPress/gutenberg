@@ -44,6 +44,8 @@ export function CheckboxControl(
 	props: WordPressComponentProps< CheckboxControlProps, 'input', false >
 ) {
 	const {
+		// Prevent passing this to `input`.
+		__nextHasNoMarginBottom: _,
 		label,
 		className,
 		heading,
@@ -93,7 +95,6 @@ export function CheckboxControl(
 
 	return (
 		<BaseControl
-			__nextHasNoMarginBottom
 			label={ heading }
 			id={ id }
 			help={

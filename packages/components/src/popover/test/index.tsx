@@ -528,18 +528,18 @@ describe( 'Popover', () => {
 		} );
 		describe( 'initial translation', () => {
 			it.each( [
-				[ 'top', 'translateY', '2em' ],
-				[ 'top-start', 'translateY', '2em' ],
-				[ 'top-end', 'translateY', '2em' ],
-				[ 'right', 'translateX', '-2em' ],
-				[ 'right-start', 'translateX', '-2em' ],
-				[ 'right-end', 'translateX', '-2em' ],
-				[ 'bottom', 'translateY', '-2em' ],
-				[ 'bottom-start', 'translateY', '-2em' ],
-				[ 'bottom-end', 'translateY', '-2em' ],
-				[ 'left', 'translateX', '2em' ],
-				[ 'left-start', 'translateX', '2em' ],
-				[ 'left-end', 'translateX', '2em' ],
+				[ 'top', 'translateY', '4px' ],
+				[ 'top-start', 'translateY', '4px' ],
+				[ 'top-end', 'translateY', '4px' ],
+				[ 'right', 'translateX', '-4px' ],
+				[ 'right-start', 'translateX', '-4px' ],
+				[ 'right-end', 'translateX', '-4px' ],
+				[ 'bottom', 'translateY', '-4px' ],
+				[ 'bottom-start', 'translateY', '-4px' ],
+				[ 'bottom-end', 'translateY', '-4px' ],
+				[ 'left', 'translateX', '4px' ],
+				[ 'left-start', 'translateX', '4px' ],
+				[ 'left-end', 'translateX', '4px' ],
 			] as PlacementToInitialTranslationTuple[] )(
 				'for the `%s` placement computes an initial `%s` of `%s',
 				(

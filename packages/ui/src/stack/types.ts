@@ -1,9 +1,5 @@
-/**
- * Internal dependencies
- */
+import { type GapSize } from '@wordpress/theme';
 import { type ComponentProps } from '../utils/types';
-
-export type SizeToken = '2xs' | 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 
 export interface StackProps extends ComponentProps< 'div' > {
 	/**
@@ -19,7 +15,7 @@ export interface StackProps extends ComponentProps< 'div' > {
 	 *
 	 * @default undefined
 	 */
-	gap?: SizeToken;
+	gap?: GapSize;
 
 	/**
 	 * The alignment of the stack items along the cross axis.

@@ -1071,14 +1071,14 @@ Component to render UI in a modal for the action.
 		return (
 			<form onSubmit={ onSubmit }>
 				<p>Modal UI</p>
-				<HStack>
+				<Stack direction="row">
 					<Button variant="tertiary" onClick={ closeModal }>
 						Cancel
 					</Button>
 					<Button variant="primary" type="submit">
 						Submit
 					</Button>
-				</HStack>
+				</Stack>
 			</form>
 		);
 	};
@@ -1202,10 +1202,10 @@ Example:
 	id: 'title',
 	type: 'text',
 	header: (
-		<HStack spacing={ 1 } justify="start">
+		<Stack direction="row" gap="2xs" justify="start">
 			<Icon icon={ icon } />
 			<span>Title</span>
-		</HStack>
+		</Stack>
 	),
 }
 ```
@@ -1344,13 +1344,70 @@ const item = {
 }
 ```
 
+### `getValueFormatted`
+
+Function that formats the field value for display by computing it from the field's `format` configuration. The formatted value is used for consistent value presentation across different contexts. For example, by the default `render` implementation provided by the field types and by the filter components that display values.
+
+-   Type: `function`.
+-   Optional.
+-   Each field `type` provides a default implementation that formats values appropriately (e.g., considers weekStartsOn for date, thousand separators for number, etc.).
+-   Args:
+    -   `item`: the data item containing the value.
+    -   `field`: the normalized field configuration.
+-   Returns the formatted value for display (typically a string).
+
+Example of some custom `getValueFormatted` functions:
+
+```js
+// Format a number as currency
+{
+	id: 'price',
+	type: 'number',
+	label: 'Price',
+	getValueFormatted: ( { item, field } ) => {
+		const value = field.getValue( { item } );
+		if ( value === null || value === undefined ) {
+			return '';
+		}
+
+		return `$${ value.toFixed( field.format.decimals ) }`;
+	}
+}
+```
+
+```js
+// Format a date with custom logic
+{
+	id: 'publishDate',
+	type: 'date',
+	label: 'Published',
+	getValueFormatted: ( { item, field } ) => {
+		const value = field.getValue( { item } );
+		if ( ! value ) {
+			return 'Not published';
+		}
+
+		const date = new Date( value );
+		const now = new Date();
+		const diffDays = Math.floor( ( now - date ) / ( 1000 * 60 * 60 * 24 ) );
+		if ( diffDays === 0 ) {
+			return 'Today';
+		}
+		if ( diffDays === 1 ) {
+			return 'Yesterday';
+		}
+		return `${ diffDays } days ago`;
+	}
+}
+```
+
 ### `render`
 
 React component that renders the field.
 
 -   Type: React component.
 -   Optional.
--   The field `type` provides a default render based on `getValue` and `elements` (if provided).
+-   The field `type` provides a default render that uses `getValueFormatted` for value display and `elements` for label lookup (if provided).
 -   Props
     -   `item` value to be processed.
     -   `field` the own field config. Useful to access `getValue`, `elements`, etc.

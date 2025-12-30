@@ -196,7 +196,6 @@ export default function BlockLockModal( { clientId, onClose } ) {
 					{ /* eslint-enable jsx-a11y/no-redundant-roles */ }
 					{ hasTemplateLock && (
 						<ToggleControl
-							__nextHasNoMarginBottom
 							className="block-editor-block-lock-modal__template-lock"
 							label={ __( 'Apply to all blocks inside' ) }
 							checked={ applyTemplateLock }

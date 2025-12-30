@@ -21,7 +21,7 @@
 			"type": "object",
 			"properties": {
 				"appearanceTools": {
-					"description": "Setting that enables the following UI tools:\n\n- background: backgroundImage, backgroundSize\n- border: color, radius, style, width\n- color: link, heading, button, caption\n- dimensions: aspectRatio, minHeight, width\n- position: sticky\n- spacing: blockGap, margin, padding\n- typography: lineHeight",
+					"description": "Setting that enables the following UI tools:\n\n- background: backgroundImage, backgroundSize\n- border: color, radius, style, width\n- color: link, heading, button, caption\n- dimensions: aspectRatio, height, minHeight, width\n- position: sticky\n- spacing: blockGap, margin, padding\n- typography: lineHeight",
 					"type": "boolean",
 					"default": false
 				}
@@ -286,6 +286,11 @@
 								}
 							}
 						},
+						"height": {
+							"description": "Allow users to set custom height.",
+							"type": "boolean",
+							"default": false
+						},
 						"minHeight": {
 							"description": "Allow users to set custom minimum height.",
 							"type": "boolean",
@@ -295,6 +300,28 @@
 							"description": "Allow users to set custom width.",
 							"type": "boolean",
 							"default": false
+						},
+						"dimensionSizes": {
+							"description": "Dimension size presets for dimension block supports.\nGenerates a custom property (`--wp--preset--dimension--{slug}`) per preset value.",
+							"type": "array",
+							"items": {
+								"type": "object",
+								"properties": {
+									"name": {
+										"description": "Name of the dimension size preset, translatable.",
+										"type": "string"
+									},
+									"slug": {
+										"description": "Unique identifier for the dimension size preset.",
+										"type": "string"
+									},
+									"size": {
+										"description": "CSS dimension value, including units.",
+										"type": "string"
+									}
+								},
+								"additionalProperties": false
+							}
 						}
 					},
 					"additionalProperties": false
@@ -887,6 +914,9 @@
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
 				"core/block": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/breadcrumbs": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
 				"core/button": {
@@ -1496,6 +1526,13 @@
 								{ "$ref": "#/definitions/refComplete" }
 							]
 						},
+						"height": {
+							"description": "Sets the `height` CSS property.",
+							"oneOf": [
+								{ "type": "string" },
+								{ "$ref": "#/definitions/refComplete" }
+							]
+						},
 						"minHeight": {
 							"description": "Sets the `min-height` CSS property.",
 							"oneOf": [
@@ -1931,6 +1968,9 @@
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
 				"core/block": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/breadcrumbs": {
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
 				"core/button": {
@@ -2382,6 +2422,9 @@
 					"$ref": "#/definitions/stylesVariationBlockPropertiesComplete"
 				},
 				"core/block": {
+					"$ref": "#/definitions/stylesVariationBlockPropertiesComplete"
+				},
+				"core/breadcrumbs": {
 					"$ref": "#/definitions/stylesVariationBlockPropertiesComplete"
 				},
 				"core/button": {

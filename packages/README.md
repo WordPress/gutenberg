@@ -283,7 +283,7 @@ While other section naming can be used when appropriate, it's important that are
 
 When in doubt, refer to [Semantic Versioning specification](https://semver.org/).
 
-If you are publishing new versions of packages, note that there are versioning recommendations outlined in the [Gutenberg Release Process document](https://github.com/WordPress/gutenberg/blob/HEAD/docs/contributors/code/release.md) which prescribe _minimum_ version bumps for specific types of releases. The chosen version should be the greater of the two between the semantic versioning and Gutenberg release minimum version bumps.
+If you are publishing new versions of packages, note that there are versioning recommendations outlined in the [Gutenberg Release Process document](https://github.com/WordPress/gutenberg/blob/HEAD/docs/contributors/code/release/README.md) which prescribe _minimum_ version bumps for specific types of releases. The chosen version should be the greater of the two between the semantic versioning and Gutenberg release minimum version bumps.
 
 ## TypeScript
 
@@ -374,4 +374,4 @@ Please consult the [side effects documentation](https://github.com/WordPress/gut
 
 ## Publishing to npm
 
-Publishing WordPress packages to npm is automated by synchronizing it with the bi-weekly Gutenberg plugin RC1 release. You can learn more about this process and other ways to publish new versions of npm packages in the [Gutenberg Release Process document](https://github.com/WordPress/gutenberg/blob/HEAD/docs/contributors/code/release.md#packages-releases-to-npm-and-wordpress-core-updates).
+Publishing WordPress packages to npm is automated by synchronizing it with the bi-weekly Gutenberg plugin RC1 release. You can learn more about this process and other ways to publish new versions of npm packages in the [Gutenberg Release Process document](https://github.com/WordPress/gutenberg/blob/HEAD/docs/contributors/code/release/README.md#packages-releases-to-npm-and-wordpress-core-updates).

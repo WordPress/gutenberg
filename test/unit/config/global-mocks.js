@@ -11,6 +11,20 @@ jest.mock( '@wordpress/compose', () => {
 	};
 } );
 
+jest.mock( '@wordpress/block-editor/src/hooks/list-view', () => {
+	return {
+		__esModule: true,
+		LIST_VIEW_SUPPORT_KEY: 'listView',
+		hasListViewSupport: jest.fn( () => false ),
+		ListViewPanel: jest.fn( () => null ),
+		default: {
+			edit: jest.fn( () => null ),
+			hasSupport: jest.fn( () => false ),
+			attributeKeys: [],
+		},
+	};
+} );
+
 /**
  * client-zip is meant to be used in a browser and is therefore released as an ES6 module only,
  * in order to use it in node environment, we need to mock it.

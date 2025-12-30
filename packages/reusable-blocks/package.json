@@ -22,12 +22,21 @@
 		"node": ">=18.12.0",
 		"npm": ">=8.19.2"
 	},
-	"main": "build/index.js",
+	"files": [
+		"src",
+		"build",
+		"build-module",
+		"build-style",
+		"build-types",
+		"*.md"
+	],
+	"type": "module",
+	"main": "build/index.cjs",
 	"module": "build-module/index.js",
 	"exports": {
 		".": {
 			"import": "./build-module/index.js",
-			"require": "./build/index.js"
+			"require": "./build/index.cjs"
 		},
 		"./package.json": "./package.json"
 	},
@@ -36,8 +45,8 @@
 	"sideEffects": [
 		"src/index.js",
 		"src/store/index.js",
-		"build/index.js",
-		"build/store/index.js",
+		"build/index.cjs",
+		"build/store/index.cjs",
 		"build-module/index.js",
 		"build-module/store/index.js"
 	],

@@ -56,6 +56,9 @@
 		"globals": "^13.12.0",
 		"requireindex": "^1.2.0"
 	},
+	"devDependencies": {
+		"@types/estree": "1.0.5"
+	},
 	"peerDependencies": {
 		"@babel/core": ">=7",
 		"eslint": ">=8",
