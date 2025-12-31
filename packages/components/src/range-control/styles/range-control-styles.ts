@@ -256,6 +256,10 @@ export const InputRange = styled.input`
 	right: 0;
 	top: 0;
 	width: calc( 100% + ${ thumbSize }px );
+
+	&:disabled {
+		cursor: default;
+	}
 `;
 
 const tooltipShow = ( { show }: TooltipProps ) => {

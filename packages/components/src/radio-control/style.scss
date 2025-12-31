@@ -63,6 +63,11 @@
 	}
 }
 
+.components-radio-control__input:disabled + .components-radio-control__label,
+.components-radio-control__input[aria-disabled="true"] + .components-radio-control__label {
+	cursor: default;
+}
+
 .components-radio-control__option-description {
 	grid-column: 2;
 	grid-row: 2;

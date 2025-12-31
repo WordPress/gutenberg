@@ -20,6 +20,11 @@
 	cursor: pointer;
 }
 
+.components-checkbox-control:has(.components-checkbox-control__input:disabled) .components-checkbox-control__label,
+.components-checkbox-control:has(.components-checkbox-control__input[aria-disabled="true"]) .components-checkbox-control__label {
+	cursor: default;
+}
+
 .components-checkbox-control__input[type="checkbox"] {
 	@include checkbox-control;
 	background: $white;

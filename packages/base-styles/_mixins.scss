@@ -406,6 +406,11 @@
 		background: var(--wp-admin-theme-color);
 		border: none;
 	}
+
+	&[aria-disabled="true"],
+	&:disabled {
+		cursor: default;
+	}
 }
 
 /**
