@@ -111,7 +111,10 @@ export default function BreadcrumbEdit( {
 	} );
 
 	const disabledRef = useDisabled();
-	const blockProps = useBlockProps( { ref: disabledRef } );
+	const blockProps = useBlockProps( {
+		ref: disabledRef,
+		style: { '--separator': `'${ separator }'` },
+	} );
 
 	if ( isLoading || status === 'loading' ) {
 		return (
@@ -173,12 +176,7 @@ export default function BreadcrumbEdit( {
 			placeholderItems.push( __( 'Ancestor' ), __( 'Parent' ) );
 		}
 		placeholder = (
-			<nav
-				style={ {
-					'--separator': `'${ separator }'`,
-				} }
-				inert="true"
-			>
+			<nav { ...blockProps } inert="true">
 				<ol>
 					{ placeholderItems.map( ( text, index ) => (
 						<li key={ index }>
@@ -298,7 +296,7 @@ export default function BreadcrumbEdit( {
 				/>
 			</InspectorControls>
 			{ showPlaceholder ? (
-				<div { ...blockProps }>{ placeholder }</div>
+				placeholder
 			) : (
 				<HtmlRenderer wrapperProps={ blockProps } html={ content } />
 			) }
