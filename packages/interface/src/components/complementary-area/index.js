@@ -243,10 +243,13 @@ function ComplementaryArea( {
 	useEffect( () => {
 		// Set initial visibility: For large screens, enable if it's active by
 		// default. For small screens, always initially disable.
-		if ( isActiveByDefault && activeArea === undefined && ! isSmall ) {
-			enableComplementaryArea( scope, identifier );
-		} else if ( activeArea === undefined && isSmall ) {
-			disableComplementaryArea( scope, identifier );
+		if ( activeArea === undefined ) {
+			const args = [ scope, identifier, { persist: false } ];
+			if ( isActiveByDefault && ! isSmall ) {
+				enableComplementaryArea( ...args );
+			} else if ( isSmall ) {
+				disableComplementaryArea( ...args );
+			}
 		}
 		setIsReady( true );
 	}, [

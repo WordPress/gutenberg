@@ -33,11 +33,13 @@ export const setDefaultComplementaryArea = ( scope, area ) => {
 /**
  * Enable the complementary area.
  *
- * @param {string} scope Complementary area scope.
- * @param {string} area  Area identifier.
+ * @param {string}  scope           Complementary area scope.
+ * @param {string}  area            Area identifier.
+ * @param {Object}  options         Options.
+ * @param {boolean} options.persist Whether to persist.
  */
 export const enableComplementaryArea =
-	( scope, area ) =>
+	( scope, area, { persist = true } = {} ) =>
 	( { registry, dispatch } ) => {
 		// Return early if there's no area.
 		if ( ! area ) {
@@ -46,14 +48,16 @@ export const enableComplementaryArea =
 		scope = normalizeComplementaryAreaScope( scope );
 		area = normalizeComplementaryAreaName( scope, area );
 
-		const isComplementaryAreaVisible = registry
-			.select( preferencesStore )
-			.get( scope, 'isComplementaryAreaVisible' );
+		if ( persist ) {
+			const isComplementaryAreaVisible = registry
+				.select( preferencesStore )
+				.get( scope, 'isComplementaryAreaVisible' );
 
-		if ( ! isComplementaryAreaVisible ) {
-			registry
-				.dispatch( preferencesStore )
-				.set( scope, 'isComplementaryAreaVisible', true );
+			if ( ! isComplementaryAreaVisible ) {
+				registry
+					.dispatch( preferencesStore )
+					.set( scope, 'isComplementaryAreaVisible', true );
+			}
 		}
 
 		dispatch( {
