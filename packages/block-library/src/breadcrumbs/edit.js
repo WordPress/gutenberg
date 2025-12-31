@@ -116,24 +116,10 @@ export default function BreadcrumbEdit( {
 		style: { '--separator': `'${ separator }'` },
 	} );
 
-	if ( isLoading || status === 'loading' ) {
+	if ( isLoading ) {
 		return (
 			<div { ...blockProps }>
 				<Spinner />
-			</div>
-		);
-	}
-
-	if ( status === 'error' ) {
-		return (
-			<div { ...blockProps }>
-				<p>
-					{ sprintf(
-						/* translators: %s: error message returned when rendering the block. */
-						__( 'Error: %s' ),
-						error
-					) }
-				</p>
 			</div>
 		);
 	}
@@ -295,9 +281,18 @@ export default function BreadcrumbEdit( {
 					) }
 				/>
 			</InspectorControls>
-			{ showPlaceholder ? (
-				placeholder
-			) : (
+			{ status === 'loading' ? <Spinner /> : null }
+			{ status === 'error' && (
+				<p>
+					{ sprintf(
+						/* translators: %s: error message returned when rendering the block. */
+						__( 'Error: %s' ),
+						error
+					) }
+				</p>
+			) }
+			{ showPlaceholder && placeholder }
+			{ ! showPlaceholder && status === 'success' && (
 				<HtmlRenderer wrapperProps={ blockProps } html={ content } />
 			) }
 		</>
