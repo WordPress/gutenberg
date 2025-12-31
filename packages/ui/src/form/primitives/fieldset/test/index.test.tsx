@@ -7,6 +7,7 @@ describe( 'Fieldset', () => {
 		const rootRef = createRef< HTMLFieldSetElement >();
 		const legendRef = createRef< HTMLDivElement >();
 		const descriptionRef = createRef< HTMLParagraphElement >();
+		const detailsRef = createRef< HTMLDivElement >();
 
 		render(
 			<Fieldset.Root ref={ rootRef }>
@@ -16,13 +17,16 @@ describe( 'Fieldset', () => {
 				<Fieldset.Description ref={ descriptionRef }>
 					Fieldset description
 				</Fieldset.Description>
-				{ /* Field content would go here */ }
+				<Fieldset.Details ref={ detailsRef }>
+					Fieldset details
+				</Fieldset.Details>
 			</Fieldset.Root>
 		);
 
 		expect( rootRef.current ).toBeInstanceOf( HTMLFieldSetElement );
 		expect( legendRef.current ).toBeInstanceOf( HTMLDivElement );
 		expect( descriptionRef.current ).toBeInstanceOf( HTMLParagraphElement );
+		expect( detailsRef.current ).toBeInstanceOf( HTMLDivElement );
 	} );
 
 	it( 'accessibly associates description when Fieldset.Description is present', () => {
@@ -93,6 +97,38 @@ describe( 'Fieldset', () => {
 		);
 
 		expect( screen.getByText( 'Fieldset description' ) ).toHaveClass(
+			'custom-class'
+		);
+	} );
+
+	it( 'announces additional details via a visually hidden description', () => {
+		render(
+			<Fieldset.Root>
+				<Fieldset.Legend>Choose your options</Fieldset.Legend>
+				<Fieldset.Details>
+					<a href="#more-info">Learn more about these options</a>
+				</Fieldset.Details>
+			</Fieldset.Root>
+		);
+
+		expect(
+			screen.getByRole( 'group', {
+				name: 'Choose your options',
+				description: 'More details follow.',
+			} )
+		).toBeVisible();
+	} );
+
+	it( 'forwards className to the details element', () => {
+		render(
+			<Fieldset.Root>
+				<Fieldset.Details className="custom-class">
+					Fieldset details
+				</Fieldset.Details>
+			</Fieldset.Root>
+		);
+
+		expect( screen.getByText( 'Fieldset details' ) ).toHaveClass(
 			'custom-class'
 		);
 	} );
