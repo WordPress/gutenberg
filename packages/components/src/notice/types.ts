@@ -34,8 +34,6 @@ export type NoticeAction = {
 	url?: string;
 };
 
-export type NoticeChildren = string | JSX.Element;
-
 export type NoticeProps = {
 	/**
 	 * A CSS `class` to give to the wrapper element.
