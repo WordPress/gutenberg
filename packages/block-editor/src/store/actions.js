@@ -1037,10 +1037,16 @@ export const __unstableSplitSelection =
 		}
 
 		if ( ! blocks.length ) {
-			dispatch.replaceBlocks( select.getSelectedBlockClientIds(), [
-				head,
-				tail,
-			] );
+			dispatch.replaceBlocks(
+				select.getSelectedBlockClientIds(),
+				[ head, tail ],
+				null,
+				0,
+				{
+					// Don't prune block list settings if the block type didn't change.
+					keepBlockListSettings: head.name === tail.name,
+				}
+			);
 			return;
 		}
 

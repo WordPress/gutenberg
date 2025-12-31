@@ -1870,9 +1870,18 @@ export function preferences( state = PREFERENCES_DEFAULTS, action ) {
  */
 export const blockListSettings = ( state = {}, action ) => {
 	switch ( action.type ) {
-		// Even if the replaced blocks have the same client ID, our logic
-		// should correct the state.
-		case 'REPLACE_BLOCKS':
+		case 'REPLACE_BLOCKS': {
+			if ( !! action.meta?.keepBlockListSettings ) {
+				return state;
+			}
+			// Even if the replaced blocks have the same client ID, our logic
+			// should correct the state.
+			return Object.fromEntries(
+				Object.entries( state ).filter(
+					( [ id ] ) => ! action.clientIds.includes( id )
+				)
+			);
+		}
 		case 'REMOVE_BLOCKS': {
 			return Object.fromEntries(
 				Object.entries( state ).filter(
