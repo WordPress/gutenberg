@@ -2,6 +2,7 @@ packages:
     - '.'
     - 'packages/*'
     - 'routes/*'
+    - 'storybook'
 
 engineStrict: true
 managePackageManagerVersions: false
