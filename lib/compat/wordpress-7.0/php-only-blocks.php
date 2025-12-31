@@ -78,4 +78,5 @@ function gutenberg_mark_auto_inspector_control_attributes( $settings ) {
 	return $settings;
 }
 
+// Priority 5 to mark original attributes before other filters (priority 10+) might add their own.
 add_filter( 'register_block_type_args', 'gutenberg_mark_auto_inspector_control_attributes', 5 );
