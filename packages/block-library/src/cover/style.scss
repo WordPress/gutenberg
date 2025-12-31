@@ -254,7 +254,7 @@
 	}
 }
 
-// Fixed background effect for video backgrounds.
+// Parallax background effect for video.
 .wp-block-cover.has-parallax {
 	// Create a clipping context so the fixed video stays within the cover block bounds.
 	clip-path: inset(0);
