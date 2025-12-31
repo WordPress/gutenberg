@@ -91,7 +91,7 @@ export default function RSSEdit( { attributes, setAttributes, name } ) {
 	} );
 
 	const disabledRef = useDisabled();
-	const blockProps = useBlockProps( { ref: disabledRef } );
+	const blockProps = useBlockProps( { ref: isEditing ? null : disabledRef } );
 
 	const label = __( 'RSS URL' );
 
@@ -153,28 +153,6 @@ export default function RSSEdit( { attributes, setAttributes, name } ) {
 			isActive: blockLayout === 'grid',
 		},
 	];
-
-	if ( status === 'loading' ) {
-		return (
-			<div { ...blockProps }>
-				<Spinner />
-			</div>
-		);
-	}
-
-	if ( status === 'error' ) {
-		return (
-			<div { ...blockProps }>
-				<p>
-					{ sprintf(
-						/* translators: %s: error message returned when rendering the block. */
-						__( 'Error: %s' ),
-						error
-					) }
-				</p>
-			</div>
-		);
-	}
 
 	return (
 		<>
@@ -341,7 +319,19 @@ export default function RSSEdit( { attributes, setAttributes, name } ) {
 					onChange={ ( value ) => setAttributes( { rel: value } ) }
 				/>
 			</InspectorControls>
-			<HtmlRenderer wrapperProps={ blockProps } html={ content } />
+			{ status === 'loading' && <Spinner /> }
+			{ status === 'error' && (
+				<p>
+					{ sprintf(
+						/* translators: %s: error message returned when rendering the block. */
+						__( 'Error: %s' ),
+						error
+					) }
+				</p>
+			) }
+			{ status === 'success' && (
+				<HtmlRenderer wrapperProps={ blockProps } html={ content } />
+			) }
 		</>
 	);
 }
