@@ -5,6 +5,12 @@ import styles from './style.module.css';
 import { FieldsetContext } from './context';
 import type { FieldsetRootProps } from './types';
 
+/**
+ * A low-level component that associates an accessible legend and description with
+ * a group of multiple form control elements.
+ *
+ * To label a single form control element, use the `Field` component instead.
+ */
 export const FieldsetRoot = forwardRef<
 	HTMLFieldSetElement,
 	FieldsetRootProps
