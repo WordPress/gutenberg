@@ -1,6 +1,6 @@
 <?php
 /**
- * Appending the wp-block-paragraph to before rendering the stored `core/paragraph` block contents.
+ * Append the `wp-block-paragraph` class before rendering the stored `core/paragraph` block contents.
  *
  * @package WordPress
  */
