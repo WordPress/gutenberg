@@ -282,21 +282,31 @@ export function mergeCrdtBlocks(
 
 					Object.entries( value ).forEach(
 						( [ attributeName, attributeValue ] ) => {
-							if (
-								fastDeepEqual(
-									currentAttributes?.get( attributeName ),
-									attributeValue
-								)
-							) {
-								return;
-							}
-
 							const currentAttribute =
 								currentAttributes.get( attributeName );
 							const isRichText = isRichTextAttribute(
 								block.name,
 								attributeName
 							);
+
+							const attributeHasTypeChange =
+								( isRichText &&
+									! (
+										currentAttribute instanceof Y.Text
+									) ) ||
+								( ! isRichText &&
+									currentAttribute instanceof Y.Text );
+
+							// Skip update if values are equal and type stays the same
+							if (
+								! attributeHasTypeChange &&
+								fastDeepEqual(
+									currentAttribute,
+									attributeValue
+								)
+							) {
+								return;
+							}
 
 							if (
 								isRichText &&
