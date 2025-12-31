@@ -7,15 +7,10 @@ const meta: Meta< typeof Field.Root > = {
 	title: 'Design System/Components/Form/Primitives/Field',
 	component: Field.Root,
 	subcomponents: {
-		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		Item: Field.Item,
-		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		Label: Field.Label,
-		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		Control: Field.Control,
-		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		Description: Field.Description,
-		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		Details: Field.Details,
 	},
 };
