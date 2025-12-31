@@ -11,3 +11,4 @@
 -   Add `Stack` component ([#73928](https://github.com/WordPress/gutenberg/pull/73928)).
 -   Add `VisuallyHidden` component ([#74189](https://github.com/WordPress/gutenberg/pull/74189)).
 -   Add `Field` primitives ([#74190](https://github.com/WordPress/gutenberg/pull/74190)).
+-   Add `Fieldset` primitives ([#74296](https://github.com/WordPress/gutenberg/pull/74296)).
