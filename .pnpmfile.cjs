@@ -18,6 +18,18 @@ function fixDeps( pkg ) {
 	}
 
 	/**
+	 * Storybook CLI dynamically requires framework presets and addons.
+	 * In strict pnpm mode, it can't find them unless they're explicit dependencies.
+	 */
+	if ( pkg.name === 'storybook' ) {
+		pkg.dependencies = {
+			...pkg.dependencies,
+			'@storybook/addon-docs': '*',
+			'@storybook/react-webpack5': '*',
+		};
+	}
+
+	/**
 	 * Fix missing peer dependency on @emotion/react in @emotion/native.
 	 * @see https://github.com/emotion-js/emotion/issues/3351
 	 */

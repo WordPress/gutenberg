@@ -49,6 +49,7 @@
 	],
 	"dependencies": {
 		"@wordpress/api-fetch": "workspace:../api-fetch",
+		"@wordpress/base-styles": "workspace:../base-styles",
 		"@wordpress/blob": "workspace:../blob",
 		"@wordpress/components": "workspace:../components",
 		"@wordpress/core-data": "workspace:../core-data",

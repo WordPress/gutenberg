@@ -36,6 +36,24 @@ ignoredBuiltDependencies:
     - 'sharp'
     - 'unrs-resolver'
 
+# Pin versions to match npm's resolution for test compatibility.
+overrides:
+    # Pin jsdom to ensure consistent test environment.
+    jsdom: 26.1.0
+    # Version 2.2.23 cannot parse React useId()-generated pseudo selectors like ':r27'.
+    # @see https://github.com/nicolo-ribaudo/nwsapi/issues/75
+    jsdom>nwsapi: 2.2.22
+    # Version 1.4.0 uses Node.js export conditions for dev/prod builds, which
+    # Jest doesn't enable by default, causing speedy mode to be enabled in tests.
+    # Version 1.1.0 uses runtime NODE_ENV check which works correctly with Jest.
+    '@emotion/sheet': 1.1.0
+    # Pin ariakit packages to match npm's resolution for consistent test behavior.
+    # Newer versions generate different pseudo selectors that cause test failures.
+    '@ariakit/react': 0.4.15
+    '@ariakit/react-core': 0.4.15
+    '@ariakit/test': 0.4.7
+    '@ariakit/core': 0.4.14
+
 # Dependencies needing patching.
 patchedDependencies:
     'lighthouse@12.8.2': patches/lighthouse@12.8.2.patch
