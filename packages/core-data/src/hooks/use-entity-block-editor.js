@@ -60,33 +60,40 @@ export default function useEntityBlockEditor( kind, name, { id: _id } = {} ) {
 			return undefined;
 		}
 
+		let _blocks;
+
 		if ( editedBlocks ) {
-			return editedBlocks;
-		}
-
-		if ( ! content || typeof content !== 'string' ) {
+			_blocks = editedBlocks;
+		} else if ( ! content || typeof content !== 'string' ) {
 			return EMPTY_ARRAY;
+		} else {
+			// If there's an edit, cache the parsed blocks by the edit.
+			// If not, cache by the original entity record.
+			const edits = getEntityRecordEdits( kind, name, id );
+			const isUnedited = ! edits || ! Object.keys( edits ).length;
+			const cackeKey = isUnedited
+				? getEntityRecord( kind, name, id )
+				: edits;
+			_blocks = parsedBlocksCache.get( cackeKey );
+
+			if ( ! _blocks ) {
+				_blocks = parse( content );
+				parsedBlocksCache.set( cackeKey, _blocks );
+			}
 		}
 
-		// If there's an edit, cache the parsed blocks by the edit.
-		// If not, cache by the original entity record.
-		const edits = getEntityRecordEdits( kind, name, id );
-		const isUnedited = ! edits || ! Object.keys( edits ).length;
-		const cackeKey = isUnedited ? getEntityRecord( kind, name, id ) : edits;
-		let _blocks = parsedBlocksCache.get( cackeKey );
-
-		if ( ! _blocks ) {
-			_blocks = parse( content );
-			parsedBlocksCache.set( cackeKey, _blocks );
-		}
-
-		return _blocks;
+		// Always apply footnote numbering updates to ensure correct numbering
+		// This is critical for undo scenarios where blocks are restored
+		// with potentially stale numbering
+		const footnotesResult = updateFootnotesFromMeta( _blocks, meta );
+		return footnotesResult.blocks || _blocks;
 	}, [
 		kind,
 		name,
 		id,
 		editedBlocks,
 		content,
+		meta,
 		getEntityRecord,
 		getEntityRecordEdits,
 	] );
