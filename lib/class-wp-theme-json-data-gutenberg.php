@@ -16,7 +16,7 @@ class WP_Theme_JSON_Data_Gutenberg {
 	 * Container of the data to update.
 	 *
 	 * @since 6.1.0
-	 * @var WP_Theme_JSON_Gutenberg
+	 * @var WP_Theme_JSON
 	 */
 	private $theme_json = null;
 
@@ -74,7 +74,7 @@ class WP_Theme_JSON_Data_Gutenberg {
 	 *
 	 * @since 18.5.0
 	 *
-	 * @return WP_Theme_JSON_Gutenberg
+	 * @return WP_Theme_JSON
 	 */
 	public function get_theme_json() {
 		return $this->theme_json;
