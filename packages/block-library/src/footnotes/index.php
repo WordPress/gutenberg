@@ -23,13 +23,13 @@ function render_block_core_footnotes( $attributes, $content, $block ) {
 	}
 
 	if ( post_password_required( $block->context['postId'] ) ) {
-		return;
+		return '';
 	}
 
 	$footnotes = get_post_meta( $block->context['postId'], 'footnotes', true );
 
 	if ( ! $footnotes ) {
-		return;
+		return '';
 	}
 
 	$footnotes = json_decode( $footnotes, true );
@@ -39,20 +39,15 @@ function render_block_core_footnotes( $attributes, $content, $block ) {
 	}
 
 	$wrapper_attributes = get_block_wrapper_attributes();
-	$footnote_index     = 1;
 
 	$block_content = '';
 
 	foreach ( $footnotes as $footnote ) {
-		// Translators: %d: Integer representing the number of return links on the page.
-		$aria_label     = sprintf( __( 'Jump to footnote reference %1$d' ), $footnote_index );
 		$block_content .= sprintf(
-			'<li id="%1$s">%2$s <a href="#%1$s-link" aria-label="%3$s">↩︎</a></li>',
+			'<li id="%1$s" popover style="position-anchor: --fn-%1$s;">%2$s</li>',
 			$footnote['id'],
-			$footnote['content'],
-			$aria_label
+			$footnote['content']
 		);
-		++$footnote_index;
 	}
 
 	return sprintf(
@@ -77,6 +72,24 @@ function register_block_core_footnotes() {
 }
 add_action( 'init', 'register_block_core_footnotes' );
 
+/**
+ * Filters blocks to rewrite footnote links to be popovers instead.
+ *
+ * @param string $block_content Block content.
+ * @return string Filtered block content.
+ */
+function filter_blocks_to_rewrite_footnote_links( $block_content ) {
+	// TODO: Use the HTML API instead!
+	$block_content = preg_replace_callback(
+		':(?P<start_tag><sup data-fn="(?P<fn>[^"]+?)" class="fn">)<a[^>]+?>(?P<num>\d+)</a>(?P<end_tag></sup>):',
+		static function ( $matches ) {
+			return $matches['start_tag'] . sprintf( '<button popovertarget="%1$s" style="anchor-name: --fn-%1$s;">%2$s</button>', esc_attr( $matches['fn'] ), $matches['num'] ) . $matches['end_tag'];
+		},
+		$block_content
+	);
+	return $block_content;
+}
+add_filter( 'render_block', 'filter_blocks_to_rewrite_footnote_links' );
 
 /**
  * Registers the footnotes meta field required for footnotes to work.
