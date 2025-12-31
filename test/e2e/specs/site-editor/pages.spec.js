@@ -350,7 +350,7 @@ test.describe( 'Pages', () => {
 
 		// Get the order input and save button
 		let orderInput = page.getByRole( 'spinbutton', { name: 'Order' } );
-		let saveButton = page.getByRole( 'button', { name: 'Save' } );
+		const saveButton = page.getByRole( 'button', { name: 'Save' } );
 
 		// Test that 0 is valid
 		await orderInput.fill( '0' );
