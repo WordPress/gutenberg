@@ -11,6 +11,27 @@ import getFootnotesOrder from './get-footnotes-order';
 let oldFootnotes = {};
 
 /**
+ * Finds the footnotes block in a blocks array.
+ *
+ * @param {Array} blocks The blocks array to search.
+ * @return {Object|null} The footnotes block, or null if not found.
+ */
+function findFootnotesBlock( blocks ) {
+	for ( const block of blocks ) {
+		if ( block.name === 'core/footnotes' ) {
+			return block;
+		}
+		if ( block.innerBlocks ) {
+			const found = findFootnotesBlock( block.innerBlocks );
+			if ( found ) {
+				return found;
+			}
+		}
+	}
+	return null;
+}
+
+/**
  * Migrates footnotes from post meta to block attributes.
  * Finds the footnotes block and updates its attributes with footnotes from meta.
  *
@@ -57,8 +78,187 @@ export function migrateFootnotesToBlockAttributes( blocks, meta ) {
 	return findAndUpdateFootnotesBlock( blocks );
 }
 
+/**
+ * Updates footnote numbering in rich text attributes across all blocks.
+ *
+ * @param {Array} blocks   The blocks array.
+ * @param {Array} newOrder The new footnote order.
+ * @return {Array} Updated blocks array.
+ */
+function updateBlocksAttributesForNumbering( blocks, newOrder ) {
+	function updateAttributes( attributes ) {
+		if (
+			! attributes ||
+			Array.isArray( attributes ) ||
+			typeof attributes !== 'object'
+		) {
+			return attributes;
+		}
+
+		attributes = { ...attributes };
+
+		for ( const key in attributes ) {
+			const value = attributes[ key ];
+
+			if ( Array.isArray( value ) ) {
+				attributes[ key ] = value.map( updateAttributes );
+				continue;
+			}
+
+			if (
+				typeof value !== 'string' &&
+				! ( value instanceof RichTextData )
+			) {
+				continue;
+			}
+
+			const richTextValue =
+				typeof value === 'string'
+					? RichTextData.fromHTMLString( value )
+					: new RichTextData( value );
+
+			let hasFootnotes = false;
+
+			richTextValue.replacements.forEach( ( replacement ) => {
+				if ( replacement.type === 'core/footnote' ) {
+					const id = replacement.attributes[ 'data-fn' ];
+					const index = newOrder.indexOf( id );
+					const countValue = create( {
+						html: replacement.innerHTML,
+					} );
+					countValue.text = String( index + 1 );
+					countValue.formats = Array.from(
+						{ length: countValue.text.length },
+						() => countValue.formats[ 0 ]
+					);
+					countValue.replacements = Array.from(
+						{ length: countValue.text.length },
+						() => countValue.replacements[ 0 ]
+					);
+					replacement.innerHTML = toHTMLString( {
+						value: countValue,
+					} );
+					hasFootnotes = true;
+				}
+			} );
+
+			if ( hasFootnotes ) {
+				attributes[ key ] =
+					typeof value === 'string'
+						? richTextValue.toHTMLString()
+						: richTextValue;
+			}
+		}
+
+		return attributes;
+	}
+
+	function updateBlocksAttributes( __blocks ) {
+		return __blocks.map( ( block ) => {
+			return {
+				...block,
+				attributes: updateAttributes( block.attributes ),
+				innerBlocks: updateBlocksAttributes( block.innerBlocks ),
+			};
+		} );
+	}
+
+	return updateBlocksAttributes( blocks );
+}
+
+/**
+ * Updates blocks with new footnotes array and numbering.
+ *
+ * @param {Array} blocks       The blocks array.
+ * @param {Array} newFootnotes The new footnotes array.
+ * @param {Array} newOrder     The new footnote order.
+ * @return {Array} Updated blocks array.
+ */
+function updateBlocksWithFootnotes( blocks, newFootnotes, newOrder ) {
+	const updatedBlocks = updateBlocksAttributesForNumbering(
+		blocks,
+		newOrder
+	);
+
+	// Update footnotes block with new footnotes array
+	function updateFootnotesBlock( __blocks ) {
+		return __blocks.map( ( block ) => {
+			if ( block.name === 'core/footnotes' ) {
+				return {
+					...block,
+					attributes: {
+						...block.attributes,
+						footnotes: newFootnotes,
+					},
+					innerBlocks: updateFootnotesBlock( block.innerBlocks ),
+				};
+			}
+			return {
+				...block,
+				innerBlocks: updateFootnotesBlock( block.innerBlocks ),
+			};
+		} );
+	}
+
+	return updateFootnotesBlock( updatedBlocks );
+}
+
+/**
+ * Updates footnotes from block attributes (new approach).
+ * Handles order changes and updates footnote numbering in rich text.
+ *
+ * @param {Array} blocks The blocks array.
+ * @return {Object} Object with updated blocks.
+ */
+function updateFootnotesFromBlockAttributes( blocks ) {
+	// Find footnotes block
+	const footnotesBlock = findFootnotesBlock( blocks );
+
+	if ( ! footnotesBlock?.attributes?.footnotes ) {
+		return { blocks };
+	}
+
+	const newOrder = getFootnotesOrder( blocks );
+
+	const footnotes = footnotesBlock.attributes.footnotes;
+	const currentOrder = footnotes.map( ( fn ) => fn.id );
+
+	// If order hasn't changed, only update numbering in rich text
+	if ( currentOrder.join( '' ) === newOrder.join( '' ) ) {
+		// Still need to update numbering in rich text attributes
+		const newBlocks = updateBlocksAttributesForNumbering(
+			blocks,
+			newOrder
+		);
+		return { blocks: newBlocks };
+	}
+
+	// Order changed - reorder footnotes array
+	const newFootnotes = newOrder.map( ( fnId ) => {
+		const existingFootnote = footnotes.find( ( fn ) => fn.id === fnId );
+		if ( existingFootnote ) {
+			return existingFootnote;
+		}
+		// Footnote not found in block attributes - create empty one
+		return {
+			id: fnId,
+			content: '',
+		};
+	} );
+
+	// Update blocks: reorder footnotes array and update numbering
+	const newBlocks = updateBlocksWithFootnotes(
+		blocks,
+		newFootnotes,
+		newOrder
+	);
+
+	return { blocks: newBlocks };
+}
+
 export function updateFootnotesFromMeta( blocks, meta ) {
 	const output = { blocks };
+
 	if ( ! meta ) {
 		return output;
 	}
@@ -68,25 +268,10 @@ export function updateFootnotesFromMeta( blocks, meta ) {
 		return output;
 	}
 
-	const newOrder = getFootnotesOrder( blocks );
+	// Check if footnotes block has footnotes in block attributes (new approach)
+	const footnotesBlock = findFootnotesBlock( blocks );
 
-	// Find footnotes block and check if it has footnotes in attributes
-	let footnotesBlock = null;
-	function findFootnotesBlock( __blocks ) {
-		for ( const block of __blocks ) {
-			if ( block.name === 'core/footnotes' ) {
-				footnotesBlock = block;
-				return;
-			}
-			if ( block.innerBlocks ) {
-				findFootnotesBlock( block.innerBlocks );
-			}
-		}
-	}
-	findFootnotesBlock( blocks );
-
-	// Check if block attributes have footnotes with content
-	const hasBlockAttributesWithContent =
+	const hasBlockAttributes =
 		footnotesBlock?.attributes?.footnotes &&
 		Array.isArray( footnotesBlock.attributes.footnotes ) &&
 		footnotesBlock.attributes.footnotes.length > 0 &&
@@ -94,52 +279,30 @@ export function updateFootnotesFromMeta( blocks, meta ) {
 			( fn ) => fn.content && fn.content.trim()
 		);
 
-	// Prioritize footnotes from block attributes over meta
-	let footnotes = [];
-	if ( hasBlockAttributesWithContent ) {
-		// Use footnotes from block attributes as source of truth
-		footnotes = footnotesBlock.attributes.footnotes;
-	} else if (
-		footnotesBlock?.attributes?.footnotes &&
-		Array.isArray( footnotesBlock.attributes.footnotes ) &&
-		footnotesBlock.attributes.footnotes.length > 0
-	) {
-		// Block attributes exist but have no content, use them anyway
-		footnotes = footnotesBlock.attributes.footnotes;
-	} else if ( meta.footnotes ) {
-		// Fall back to meta if block attributes don't have footnotes
-		footnotes = JSON.parse( meta.footnotes );
+	// If footnotes are in block attributes, use new approach
+	if ( hasBlockAttributes ) {
+		return updateFootnotesFromBlockAttributes( blocks );
 	}
 
-	const currentOrder = footnotes.map( ( fn ) => fn.id );
-	const orderChanged = currentOrder.join( '' ) !== newOrder.join( '' );
+	// OLD APPROACH: Meta-based footnotes (can be cleanly removed later)
+	// ================================================================
+	const newOrder = getFootnotesOrder( blocks );
 
-	// Create new footnotes array preserving content from existing footnotes
-	const newFootnotes = newOrder.map( ( fnId ) => {
-		// First, always check block attributes for content (they're the source of truth)
-		if ( footnotesBlock?.attributes?.footnotes ) {
-			const blockFootnote = footnotesBlock.attributes.footnotes.find(
-				( fn ) => fn.id === fnId
-			);
-			if ( blockFootnote ) {
-				return blockFootnote;
+	const footnotes = meta.footnotes ? JSON.parse( meta.footnotes ) : [];
+	const currentOrder = footnotes.map( ( fn ) => fn.id );
+
+	if ( currentOrder.join( '' ) === newOrder.join( '' ) ) {
+		return output;
+	}
+
+	const newFootnotes = newOrder.map(
+		( fnId ) =>
+			footnotes.find( ( fn ) => fn.id === fnId ) ||
+			oldFootnotes[ fnId ] || {
+				id: fnId,
+				content: '',
 			}
-		}
-		// Then try to find in existing footnotes (from meta or block attributes without content)
-		const existingFootnote = footnotes.find( ( fn ) => fn.id === fnId );
-		if ( existingFootnote ) {
-			return existingFootnote;
-		}
-		// Then try oldFootnotes cache
-		if ( oldFootnotes[ fnId ] ) {
-			return oldFootnotes[ fnId ];
-		}
-		// Finally create empty footnote
-		return {
-			id: fnId,
-			content: '',
-		};
-	} );
+	);
 
 	function updateAttributes( attributes ) {
 		// Only attempt to update attributes, if attributes is an object.
@@ -213,42 +376,9 @@ export function updateFootnotesFromMeta( blocks, meta ) {
 
 	function updateBlocksAttributes( __blocks ) {
 		return __blocks.map( ( block ) => {
-			// Always update attributes to ensure footnote numbering is correct
-			// (updateAttributes updates the numbering in rich text)
-			const updatedAttributes = updateAttributes( block.attributes );
-
-			// Update footnotes block with new footnotes array
-			if ( block.name === 'core/footnotes' ) {
-				// Check if block already has footnotes with content - if so, preserve them
-				const existingFootnotes = block.attributes?.footnotes;
-				const hasContentfulFootnotes =
-					Array.isArray( existingFootnotes ) &&
-					existingFootnotes.length > 0 &&
-					existingFootnotes.some(
-						( fn ) => fn.content && fn.content.trim()
-					);
-
-				// Only update footnotes array if:
-				// 1. We don't have contentful footnotes, OR
-				// 2. The order has changed (need to reorder)
-				// Note: We always update numbering via updateAttributes above
-				const shouldUpdateFootnotesArray =
-					! hasContentfulFootnotes || orderChanged;
-
-				return {
-					...block,
-					attributes: {
-						...updatedAttributes,
-						footnotes: shouldUpdateFootnotesArray
-							? newFootnotes
-							: existingFootnotes,
-					},
-					innerBlocks: updateBlocksAttributes( block.innerBlocks ),
-				};
-			}
 			return {
 				...block,
-				attributes: updatedAttributes,
+				attributes: updateAttributes( block.attributes ),
 				innerBlocks: updateBlocksAttributes( block.innerBlocks ),
 			};
 		} );
