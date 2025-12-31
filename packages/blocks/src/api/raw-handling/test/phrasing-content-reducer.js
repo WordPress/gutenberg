@@ -63,7 +63,7 @@ describe( 'phrasingContentReducer', () => {
 
 	it( 'should preserve existing rel attribute when target is _blank', () => {
 		const input =
-			'<a href="https://wordpress.org" target="_blank" rel="noreferrer noopener nofollow">WordPress</a>';
+			'<a href="https://wordpress.org" target="_blank" rel="nofollow noopener">WordPress</a>';
 		const output =
 			'<a href="https://wordpress.org" target="_blank" rel="noreferrer noopener nofollow">WordPress</a>';
 		expect(
