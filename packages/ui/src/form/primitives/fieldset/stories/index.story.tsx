@@ -24,22 +24,6 @@ export const Default: Story = {
 						<input type="checkbox" /> { fruit }
 					</label>
 				) ) }
-			</>
-		),
-	},
-};
-
-export const WithDescription: Story = {
-	args: {
-		children: (
-			<>
-				<Fieldset.Legend>Legend</Fieldset.Legend>
-				{ [ 'Apples', 'Bananas' ].map( ( fruit ) => (
-					// eslint-disable-next-line jsx-a11y/label-has-associated-control
-					<label key={ fruit }>
-						<input type="checkbox" /> { fruit }
-					</label>
-				) ) }
 				<Fieldset.Description>
 					This is a description for the entire fieldset.
 				</Fieldset.Description>
