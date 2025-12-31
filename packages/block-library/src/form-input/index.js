@@ -1,7 +1,6 @@
 /**
  * Internal dependencies
  */
-import { forms as icon } from '@wordpress/icons';
 import initBlock from '../utils/init-block';
 import deprecated from './deprecated';
 import edit from './edit';
@@ -14,7 +13,6 @@ const { name } = metadata;
 export { metadata, name };
 
 export const settings = {
-	icon,
 	deprecated,
 	edit,
 	save,
