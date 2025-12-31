@@ -243,17 +243,11 @@ function TagCloudEdit( { attributes, setAttributes, name } ) {
 	const disabledRef = useDisabled();
 	const blockProps = useBlockProps( { ref: disabledRef } );
 
-	if ( status === 'loading' ) {
-		return (
-			<div { ...blockProps }>
-				<Spinner />
-			</div>
-		);
-	}
-
-	if ( status === 'error' ) {
-		return (
-			<div { ...blockProps }>
+	return (
+		<>
+			{ inspectorControls }
+			{ status === 'loading' && <Spinner /> }
+			{ status === 'error' && (
 				<p>
 					{ sprintf(
 						/* translators: %s: error message returned when rendering the block. */
@@ -261,14 +255,10 @@ function TagCloudEdit( { attributes, setAttributes, name } ) {
 						error
 					) }
 				</p>
-			</div>
-		);
-	}
-
-	return (
-		<>
-			{ inspectorControls }
-			<HtmlRenderer wrapperProps={ blockProps } html={ content } />
+			) }
+			{ status === 'success' && (
+				<HtmlRenderer wrapperProps={ blockProps } html={ content } />
+			) }
 		</>
 	);
 }
