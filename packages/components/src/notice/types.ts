@@ -29,22 +29,12 @@ type CommonNoticeActionProps = {
 	 */
 	onClick?: MouseEventHandler< HTMLAnchorElement | HTMLButtonElement >;
 };
-// `url` and `onClick` can both be provided. If `url` is provided, the action's
-// button will be rendered as an anchor and `onClick` will still be called.
-type NoticeActionWithURL = CommonNoticeActionProps & {
-	url: string;
+export type NoticeAction = CommonNoticeActionProps & {
 	/**
-	 * Whether to open the URL in a new tab.
+	 * The URL for the action button. If provided, the action will render as an anchor tag.
 	 */
-	openInNewTab?: boolean;
+	url?: string;
 };
-
-type NoticeActionWithoutUrl = CommonNoticeActionProps & {
-	url?: never;
-	openInNewTab?: never;
-};
-
-export type NoticeAction = NoticeActionWithURL | NoticeActionWithoutUrl;
 
 export type NoticeChildren = string | JSX.Element;
 

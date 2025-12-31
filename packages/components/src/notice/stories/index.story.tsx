@@ -161,19 +161,3 @@ WithDisabledAction.args = {
 		},
 	],
 };
-
-/**
- * Links can open in a new tab using `openInNewTab`.
- */
-export const WithOpenInNewTab = Template.bind( {} );
-WithOpenInNewTab.args = {
-	...Default.args,
-	children: 'This link opens in a new tab.',
-	actions: [
-		{
-			label: 'Learn more',
-			url: 'https://wordpress.org',
-			openInNewTab: true,
-		},
-	],
-};

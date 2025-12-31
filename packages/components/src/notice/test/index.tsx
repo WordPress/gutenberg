@@ -145,31 +145,6 @@ describe( 'Notice', () => {
 			expect( button ).toHaveAttribute( 'aria-disabled', 'true' );
 		} );
 
-		it( 'should open link in new tab when openInNewTab is true', () => {
-			render(
-				<Notice
-					actions={ [
-						{
-							label: 'External link',
-							url: 'https://example.com',
-							openInNewTab: true,
-						},
-					] }
-				>
-					Notice with external link
-				</Notice>
-			);
-
-			const link = screen.getByRole( 'link', {
-				name: /External link/,
-			} );
-			expect( link ).toHaveAttribute( 'target', '_blank' );
-			expect( link ).toHaveAttribute(
-				'rel',
-				'external noreferrer noopener'
-			);
-		} );
-
 		it( 'should call onClick when action with url is clicked', async () => {
 			const user = userEvent.setup();
 			const onClick = jest.fn( ( e ) => e.preventDefault() );
