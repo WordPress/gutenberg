@@ -1,12 +1,16 @@
 /**
  * WordPress dependencies
  */
-import { useEffect, useMemo, useRef } from '@wordpress/element';
 import { BlockIcon, RichText, useBlockProps } from '@wordpress/block-editor';
 import { useEntityProp } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
 import { Placeholder } from '@wordpress/components';
 import { formatListNumbered as icon } from '@wordpress/icons';
+
+/**
+ * Internal dependencies
+ */
+import { useMigrateFootnotes } from './use-migrate-footnotes';
 
 export default function FootnotesEdit( {
 	attributes,
@@ -21,62 +25,14 @@ export default function FootnotesEdit( {
 	);
 	const footnotesSupported = 'string' === typeof meta?.footnotes;
 
-	// Get footnotes from block attributes or meta
-	const hasBlockAttributes =
-		attributes?.footnotes &&
-		Array.isArray( attributes.footnotes ) &&
-		attributes.footnotes.length > 0;
-	const hasMetaFootnotes = meta?.footnotes;
-
-	const footnotes = useMemo( () => {
-		if ( hasBlockAttributes ) {
-			// Create a deep copy to avoid mutating the original array
-			return attributes.footnotes.map( ( fn ) => ( { ...fn } ) );
-		}
-		if ( hasMetaFootnotes ) {
-			return JSON.parse( meta.footnotes );
-		}
-		return [];
-	}, [
-		hasBlockAttributes,
-		hasMetaFootnotes,
-		attributes?.footnotes,
-		meta?.footnotes,
-	] );
-
-	// Track if migration has been attempted to prevent infinite loops
-	const migrationAttempted = useRef( false );
-
-	// Migrate footnotes from meta to block attributes on first access
-	useEffect( () => {
-		if (
-			! hasBlockAttributes &&
-			hasMetaFootnotes &&
-			footnotes.length > 0 &&
-			! migrationAttempted.current
-		) {
-			// eslint-disable-next-line react-compiler/react-compiler
-			migrationAttempted.current = true;
-			setAttributes( {
-				footnotes,
-			} );
-			// Also update meta during transition period for backward compatibility
-			if ( footnotesSupported ) {
-				updateMeta( {
-					...meta,
-					footnotes: meta.footnotes,
-				} );
-			}
-		}
-	}, [
-		hasBlockAttributes,
-		hasMetaFootnotes,
-		footnotes,
+	// Get footnotes from block attributes or meta, and migrate if needed
+	const footnotes = useMigrateFootnotes( {
+		attributes,
 		setAttributes,
-		footnotesSupported,
 		meta,
 		updateMeta,
-	] );
+		footnotesSupported,
+	} );
 
 	const blockProps = useBlockProps();
 
