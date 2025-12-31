@@ -188,20 +188,6 @@ async function dev() {
 			env: { ...process.env, NODE_ENV: 'development' },
 		} );
 
-		// Wait for wp-build to complete its initial build
-		await new Promise( ( resolve ) => {
-			buildWatch.stdout.on( 'data', ( data ) => {
-				const output = data.toString();
-				process.stdout.write( output );
-				if ( output.includes( 'Watching for changes' ) ) {
-					resolve();
-				}
-			} );
-		} );
-
-		// Now signal that the build is ready
-		readyMarkerFile.create();
-
 		// Handle process termination
 		const cleanup = () => {
 			console.log( '\n\n👋 Stopping watch mode...' );
@@ -213,6 +199,19 @@ async function dev() {
 
 		process.on( 'SIGINT', cleanup );
 		process.on( 'SIGTERM', cleanup );
+
+		// Wait for wp-build to complete its initial build, then signal ready.
+		// Using .then() ensures cleanup handlers are registered before awaiting,
+		// so early termination still triggers cleanup.
+		const onStdoutData = ( data ) => {
+			const output = data.toString();
+			process.stdout.write( output );
+			if ( output.includes( 'Watching for changes' ) ) {
+				buildWatch.stdout.off( 'data', onStdoutData );
+				readyMarkerFile.create();
+			}
+		};
+		buildWatch.stdout.on( 'data', onStdoutData );
 
 		// Keep the process running
 		await new Promise( () => {} );
