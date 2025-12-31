@@ -201,6 +201,9 @@ importers:
       eslint:
         specifier: ^8.3.0
         version: 8.57.1
+      eslint-config-prettier:
+        specifier: ^8.5.0
+        version: 8.10.2(eslint@8.57.1)
       eslint-import-resolver-typescript:
         specifier: 4.4.4
         version: 4.4.4(eslint-plugin-import@2.25.2)(eslint@8.57.1)
@@ -227,7 +230,7 @@ importers:
         version: 0.15.3(eslint-plugin-jest@27.4.3(@typescript-eslint/eslint-plugin@6.21.0(@typescript-eslint/parser@6.21.0(eslint@8.57.1)(typescript@5.9.3))(eslint@8.57.1)(typescript@5.9.3))(eslint@8.57.1)(jest@29.6.2(@types/node@20.17.10))(typescript@5.9.3))(eslint@8.57.1)
       eslint-plugin-prettier:
         specifier: 5.0.0
-        version: 5.0.0(eslint@8.57.1)(wp-prettier@3.0.3)
+        version: 5.0.0(eslint-config-prettier@8.10.2(eslint@8.57.1))(eslint@8.57.1)(wp-prettier@3.0.3)
       eslint-plugin-react:
         specifier: ^7.27.0
         version: 7.37.5(eslint@8.57.1)
@@ -375,6 +378,9 @@ importers:
       stylelint-plugin-logical-css:
         specifier: ^1.2.3
         version: 1.2.3(stylelint@16.25.0(typescript@5.9.3))
+      stylelint-scss:
+        specifier: ^6.4.0
+        version: 6.12.1(stylelint@16.25.0(typescript@5.9.3))
       typescript:
         specifier: 5.9.3
         version: 5.9.3
@@ -24521,12 +24527,14 @@ snapshots:
       '@types/eslint': 8.56.9
       eslint-config-prettier: 8.10.2(eslint@8.57.1)
 
-  eslint-plugin-prettier@5.0.0(eslint@8.57.1)(wp-prettier@3.0.3):
+  eslint-plugin-prettier@5.0.0(eslint-config-prettier@8.10.2(eslint@8.57.1))(eslint@8.57.1)(wp-prettier@3.0.3):
     dependencies:
       eslint: 8.57.1
       prettier: wp-prettier@3.0.3
       prettier-linter-helpers: 1.0.0
       synckit: 0.8.8
+    optionalDependencies:
+      eslint-config-prettier: 8.10.2(eslint@8.57.1)
 
   eslint-plugin-react-compiler@19.0.0-beta-0dec889-20241115(eslint@8.57.1):
     dependencies:

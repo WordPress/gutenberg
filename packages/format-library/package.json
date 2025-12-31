@@ -44,8 +44,8 @@
 	"wpScript": true,
 	"dependencies": {
 		"@wordpress/a11y": "workspace:../a11y",
-		"@wordpress/block-editor": "workspace:../block-editor",
 		"@wordpress/base-styles": "workspace:../base-styles",
+		"@wordpress/block-editor": "workspace:../block-editor",
 		"@wordpress/components": "workspace:../components",
 		"@wordpress/compose": "workspace:../compose",
 		"@wordpress/data": "workspace:../data",

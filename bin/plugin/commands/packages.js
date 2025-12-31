@@ -353,9 +353,12 @@ async function publishPackagesToNpm( {
 	releaseType,
 } ) {
 	log( '>> Installing packages.' );
-	await command( 'pnpm install --frozen-lockfile --config.auto-install-peers=false', {
-		cwd: gitWorkingDirectoryPath,
-	} );
+	await command(
+		'pnpm install --frozen-lockfile --config.auto-install-peers=false',
+		{
+			cwd: gitWorkingDirectoryPath,
+		}
+	);
 
 	log( '>> Current npm user:' );
 	await command( 'npm whoami', {

@@ -251,7 +251,6 @@ function TableRow< Item >( {
 				// itself (to toggle row selection) without erroneously
 				// intercepting click events from ItemActions.
 
-				/* eslint-disable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/click-events-have-key-events */
 				<td
 					className={ clsx( 'dataviews-view-table__actions-column', {
 						'dataviews-view-table__actions-column--sticky': true,
@@ -262,7 +261,6 @@ function TableRow< Item >( {
 				>
 					<ItemActions item={ item } actions={ actions } />
 				</td>
-				/* eslint-enable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/click-events-have-key-events */
 			) }
 		</tr>
 	);

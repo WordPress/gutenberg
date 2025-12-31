@@ -295,8 +295,6 @@ function ResizableFrame( {
 				[ isRTL() ? 'right' : 'left' ]: canvas === 'view' && (
 					<>
 						<Tooltip text={ __( 'Drag to resize' ) }>
-							{ /* Disable reason: role="separator" does in fact support aria-valuenow */ }
-							{ /* eslint-disable-next-line jsx-a11y/role-supports-aria-props */ }
 							<motion.button
 								key="handle"
 								role="separator"

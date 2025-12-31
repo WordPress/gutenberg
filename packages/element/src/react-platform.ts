@@ -5,9 +5,11 @@ import {
 	createPortal,
 	findDOMNode,
 	flushSync,
+	/* eslint-disable react/no-deprecated */
 	render,
 	hydrate,
 	unmountComponentAtNode,
+	/* eslint-enable react/no-deprecated */
 } from 'react-dom';
 import { createRoot, hydrateRoot } from 'react-dom/client';
 
