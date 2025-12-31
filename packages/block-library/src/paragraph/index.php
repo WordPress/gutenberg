@@ -28,11 +28,8 @@ function block_core_paragraph_render( $attributes, $content ) {
 
 	$p = new WP_HTML_Tag_Processor( $content );
 
-	while ( $p->next_tag() ) {
-		if ( 'P' === $p->get_tag() ) {
+	if ( $p->next_tag( 'p' ) ) {
 			$p->add_class( 'wp-block-paragraph' );
-			break;
-		}
 	}
 
 	return $p->get_updated_html();
