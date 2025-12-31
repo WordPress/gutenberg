@@ -176,7 +176,7 @@ export default function BreadcrumbEdit( {
 			placeholderItems.push( __( 'Ancestor' ), __( 'Parent' ) );
 		}
 		placeholder = (
-			<nav { ...blockProps } inert="true">
+			<nav { ...blockProps }>
 				<ol>
 					{ placeholderItems.map( ( text, index ) => (
 						<li key={ index }>
