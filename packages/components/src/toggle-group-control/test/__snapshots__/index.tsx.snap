@@ -24,6 +24,12 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] = 
   display: flex;
 }
 
+.emotion-4>* {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .emotion-6 {
   font-size: 11px;
   font-weight: 499;
@@ -365,6 +371,12 @@ exports[`ToggleGroupControl controlled should render correctly with text options
   display: flex;
 }
 
+.emotion-4>* {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .emotion-6 {
   font-size: 11px;
   font-weight: 499;
@@ -611,6 +623,12 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`] 
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
+}
+
+.emotion-4>* {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .emotion-6 {
@@ -946,6 +964,12 @@ exports[`ToggleGroupControl uncontrolled should render correctly with text optio
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
+}
+
+.emotion-4>* {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .emotion-6 {
