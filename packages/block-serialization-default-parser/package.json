@@ -45,6 +45,9 @@
 	"wpScript": true,
 	"types": "build-types",
 	"sideEffects": false,
+	"devDependencies": {
+		"@wordpress/block-serialization-spec-parser": "workspace:../block-serialization-spec-parser"
+	},
 	"publishConfig": {
 		"access": "public"
 	}

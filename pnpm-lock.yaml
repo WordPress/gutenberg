@@ -42,6 +42,9 @@ importers:
       '@babel/core':
         specifier: 7.25.7
         version: 7.25.7
+      '@babel/plugin-syntax-jsx':
+        specifier: 7.25.7
+        version: 7.25.7(@babel/core@7.25.7)
       '@babel/preset-env':
         specifier: 7.25.7
         version: 7.25.7(@babel/core@7.25.7)
@@ -171,6 +174,9 @@ importers:
       change-case:
         specifier: 4.1.2
         version: 4.1.2
+      client-zip:
+        specifier: ^2.4.5
+        version: 2.5.0
       commander:
         specifier: 9.2.0
         version: 9.2.0
@@ -461,11 +467,7 @@ importers:
 
   packages/autop: {}
 
-  packages/babel-plugin-import-jsx-pragma:
-    devDependencies:
-      '@babel/plugin-syntax-jsx':
-        specifier: 7.25.7
-        version: 7.25.7(@babel/core@7.25.7)
+  packages/babel-plugin-import-jsx-pragma: {}
 
   packages/babel-plugin-makepot:
     dependencies:
@@ -908,7 +910,11 @@ importers:
         specifier: 0.0.1
         version: 0.0.1
 
-  packages/block-serialization-default-parser: {}
+  packages/block-serialization-default-parser:
+    devDependencies:
+      '@wordpress/block-serialization-spec-parser':
+        specifier: workspace:../block-serialization-spec-parser
+        version: link:../block-serialization-spec-parser
 
   packages/block-serialization-spec-parser:
     dependencies:
@@ -1747,6 +1753,18 @@ importers:
         specifier: ^0.0.7
         version: 0.0.7
     devDependencies:
+      atob:
+        specifier: ^2.1.2
+        version: 2.1.2
+      css-loader:
+        specifier: ^6.8.1
+        version: 6.11.0(webpack@5.97.0(esbuild@0.25.10))
+      lodash:
+        specifier: ^4.17.21
+        version: 4.17.21
+      mini-css-extract-plugin:
+        specifier: ^2.7.5
+        version: 2.9.4(webpack@5.97.0(esbuild@0.25.10))
       mkdirp:
         specifier: 3.0.1
         version: 3.0.1
@@ -3846,6 +3864,13 @@ importers:
       stylelint-config-recommended-scss:
         specifier: ^14.1.0
         version: 14.1.0(postcss@8.5.6)(stylelint@16.25.0(typescript@5.9.3))
+    devDependencies:
+      stylelint:
+        specifier: ^16.8.2
+        version: 16.25.0(typescript@5.9.3)
+      stylelint-scss:
+        specifier: ^6.4.0
+        version: 6.12.1(stylelint@16.25.0(typescript@5.9.3))
 
   packages/sync:
     dependencies:
@@ -27849,6 +27874,12 @@ snapshots:
   mimic-response@3.1.0: {}
 
   min-indent@1.0.1: {}
+
+  mini-css-extract-plugin@2.9.4(webpack@5.97.0(esbuild@0.25.10)):
+    dependencies:
+      schema-utils: 4.3.3
+      tapable: 2.3.0
+      webpack: 5.97.0(esbuild@0.25.10)
 
   mini-css-extract-plugin@2.9.4(webpack@5.97.0):
     dependencies:

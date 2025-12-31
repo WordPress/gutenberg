@@ -50,6 +50,10 @@
 		"stylelint": "^16.8.2",
 		"stylelint-scss": "^6.4.0"
 	},
+	"devDependencies": {
+		"stylelint": "^16.8.2",
+		"stylelint-scss": "^6.4.0"
+	},
 	"npmpackagejsonlint": {
 		"extends": "@wordpress/npm-package-json-lint-config",
 		"rules": {

@@ -14,6 +14,10 @@ process.env.TZ = 'UTC';
 module.exports = {
 	rootDir: '../../',
 	moduleNameMapper: {
+		// Map deep paths first (e.g., @wordpress/block-editor/src/hooks/list-view)
+		[ `@wordpress\\/(${ transpiledPackageNames.join( '|' ) })\\/(.+)$` ]:
+			'packages/$1/$2',
+		// Then map exact package imports (e.g., @wordpress/block-editor)
 		[ `@wordpress\\/(${ transpiledPackageNames.join( '|' ) })$` ]:
 			'packages/$1/src',
 		'.+\\.wasm$': '<rootDir>/test/unit/config/wasm-stub.js',
@@ -49,7 +53,8 @@ module.exports = {
 	},
 	transformIgnorePatterns: [
 		// Match pnpm nested structure (.pnpm/pkg@version/node_modules/pkg)
-		'/node_modules/.pnpm/(?!(docker-compose|yaml|preact|@preact\\+|parsel-js)@)',
+		// Packages that ship ESM and need to be transformed by Babel.
+		'/node_modules/.pnpm/(?!(docker-compose|yaml|preact@|@preact\\+signals|parsel-js))',
 		'\\.pnp\\.[^\\/]+$',
 	],
 	snapshotSerializers: [
