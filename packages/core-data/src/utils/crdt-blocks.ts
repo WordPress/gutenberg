@@ -194,6 +194,26 @@ export function mergeCrdtBlocks(
 	incomingBlocks: Block[],
 	cursorPosition: number | null
 ): void {
+	// Perform the merge
+	mergeCrdtBlocksInternal( yblocks, incomingBlocks, cursorPosition );
+
+	// Remove duplicate clientIds across all nesting levels (at top level)
+	removeDuplicateClientIds( yblocks );
+}
+
+/**
+ * Internal function to merge blocks without any top-level checks.
+ * Called recursively for innerBlocks.
+ *
+ * @param yblocks        The blocks in the local Y.Doc.
+ * @param incomingBlocks Gutenberg blocks being synced.
+ * @param cursorPosition The position of the cursor after the change occurs.
+ */
+function mergeCrdtBlocksInternal(
+	yblocks: YBlocks,
+	incomingBlocks: Block[],
+	cursorPosition: number | null
+): void {
 	// Ensure we are working with serializable block data.
 	if ( ! serializableBlocksCache.has( incomingBlocks ) ) {
 		serializableBlocksCache.set(
@@ -355,7 +375,7 @@ export function mergeCrdtBlocks(
 						yblock.set( key, yInnerBlocks );
 					}
 
-					mergeCrdtBlocks(
+					mergeCrdtBlocksInternal(
 						yInnerBlocks,
 						value ?? [],
 						cursorPosition
@@ -385,23 +405,36 @@ export function mergeCrdtBlocks(
 
 		yblocks.insert( left, newBlock );
 	}
+}
 
-	// remove duplicate clientids
-	const knownClientIds = new Set< string >();
+/**
+ * Recursively remove duplicate clientIds from blocks and their innerBlocks.
+ *
+ * @param yblocks        The blocks to check.
+ * @param knownClientIds Set of clientIds seen so far.
+ */
+function removeDuplicateClientIds(
+	yblocks: YBlocks,
+	knownClientIds: Set< string > = new Set()
+): void {
 	for ( let j = 0; j < yblocks.length; j++ ) {
 		const yblock: YBlock = yblocks.get( j );
 
 		let clientId = yblock.get( 'clientId' );
 
-		if ( ! clientId ) {
-			continue;
+		if ( clientId ) {
+			if ( knownClientIds.has( clientId ) ) {
+				clientId = uuidv4();
+				yblock.set( 'clientId', clientId );
+			}
+			knownClientIds.add( clientId );
 		}
 
-		if ( knownClientIds.has( clientId ) ) {
-			clientId = uuidv4();
-			yblock.set( 'clientId', clientId );
+		// Recursively check innerBlocks
+		const yInnerBlocks = yblock.get( 'innerBlocks' );
+		if ( yInnerBlocks instanceof Y.Array ) {
+			removeDuplicateClientIds( yInnerBlocks, knownClientIds );
 		}
-		knownClientIds.add( clientId );
 	}
 }
 
