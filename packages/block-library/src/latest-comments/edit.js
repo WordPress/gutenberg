@@ -39,8 +39,16 @@ export default function LatestComments( { attributes, setAttributes, name } ) {
 
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
+	const serverSideAttributes = {
+		...attributes,
+		style: {
+			...attributes?.style,
+			spacing: undefined,
+		},
+	};
+
 	const { content, status, error } = useServerSideRender( {
-		attributes,
+		attributes: serverSideAttributes,
 		skipBlockSupportAttributes: true,
 		block: name,
 		urlQueryArgs: {
