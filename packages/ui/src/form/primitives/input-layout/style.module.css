@@ -2,7 +2,7 @@
 
 @layer wp-ui-components {
 	.input-layout {
-		--wp-ui-input-layout-padding-inline: calc(3 * var(--wpds-dimension-base)); /* TODO: Use or create new control/interactive padding token */
+		--wp-ui-input-layout-padding-inline: var(--wpds-dimension-gap-sm);
 
 		display: flex;
 		height: 40px;
@@ -21,12 +21,12 @@
 		}
 
 		&.is-size-compact {
-			--wp-ui-input-layout-padding-inline: calc(2 * var(--wpds-dimension-base)); /* TODO: Use or create new control/interactive padding token */
+			--wp-ui-input-layout-padding-inline: var(--wpds-dimension-gap-xs);
 			height: 32px;
 		}
 
 		&.is-size-small {
-			--wp-ui-input-layout-padding-inline: calc(2 * var(--wpds-dimension-base)); /* TODO: Use or create new control/interactive padding token */
+			--wp-ui-input-layout-padding-inline: var(--wpds-dimension-gap-xs);
 			height: 24px;
 		}
 
@@ -62,10 +62,10 @@
 		&.is-padding-minimal {
 			--wp-ui-input-layout-prefix-padding-start:
 				calc(var(--wp-ui-input-layout-padding-inline) -
-				var(--wpds-dimension-base)); /* TODO: Use or create new control/interactive padding token */
+				var(--wpds-dimension-gap-2xs));
 			--wp-ui-input-layout-suffix-padding-end:
 				calc(var(--wp-ui-input-layout-padding-inline) -
-				var(--wpds-dimension-base)); /* TODO: Use or create new control/interactive padding token */
+				var(--wpds-dimension-gap-2xs));
 		}
 
 		&.is-prefix {
