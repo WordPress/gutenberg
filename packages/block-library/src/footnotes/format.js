@@ -29,6 +29,7 @@ export const formatName = 'core/footnote';
 
 const POST_CONTENT_BLOCK_NAME = 'core/post-content';
 const SYNCED_PATTERN_BLOCK_NAME = 'core/block';
+const FOOTNOTES_BLOCK_NAME = 'core/footnotes';
 
 export const format = {
 	title: __( 'Footnote' ),
@@ -85,10 +86,25 @@ export const format = {
 				// Checks if the selected block lives within a pattern.
 				const {
 					getBlockParentsByBlockName: _getBlockParentsByBlockName,
-					getSelectedBlockClientId: _getSelectedBlockClientId,
+					getSelectionStart,
+					getBlockName: _getBlockName,
 				} = select( blockEditorStore );
+				const selectionStart = getSelectionStart();
+				const selectedClientId = selectionStart?.clientId;
+
+				if ( ! selectedClientId ) {
+					return true;
+				}
+
+				// Check if the selected block itself is a footnotes block.
+				if (
+					_getBlockName( selectedClientId ) === FOOTNOTES_BLOCK_NAME
+				) {
+					return false;
+				}
+
 				const parentCoreBlocks = _getBlockParentsByBlockName(
-					_getSelectedBlockClientId(),
+					selectedClientId,
 					SYNCED_PATTERN_BLOCK_NAME
 				);
 				return ! parentCoreBlocks || parentCoreBlocks.length === 0;
