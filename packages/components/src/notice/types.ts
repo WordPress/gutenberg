@@ -3,7 +3,7 @@
  */
 import type { MouseEventHandler, ReactNode } from 'react';
 
-type CommonNoticeActionProps = {
+export type NoticeAction = {
 	/**
 	 * The label for the action button.
 	 */
@@ -28,8 +28,6 @@ type CommonNoticeActionProps = {
 	 * The onClick handler for the action button.
 	 */
 	onClick?: MouseEventHandler< HTMLAnchorElement | HTMLButtonElement >;
-};
-export type NoticeAction = CommonNoticeActionProps & {
 	/**
 	 * The URL for the action button. If provided, the action will render as an anchor tag.
 	 */
