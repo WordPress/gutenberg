@@ -1,6 +1,5 @@
 import { type Meta, type StoryObj } from '@storybook/react';
 import { type PaddingSize } from '@wordpress/theme';
-import '@wordpress/theme/design-tokens.css';
 import { Box } from '../box';
 
 const meta: Meta< typeof Box > = {
