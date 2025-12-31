@@ -371,15 +371,22 @@ export default function PageListEdit( {
 			// Mark as converted to prevent multiple conversions.
 			hasConverted.current = true;
 
-			// Announce the conversion to screen readers for accessibility.
-			speak(
-				__( 'Page List converted to editable Navigation Links.' ),
-				'assertive'
-			);
+			// Small delay to allow the newly inserted block to settle
+			// before triggering the conversion.
+			const timeoutId = setTimeout( () => {
+				// Announce the conversion to screen readers for accessibility.
+				speak(
+					__( 'Page List converted to editable Navigation Links.' ),
+					'assertive'
+				);
 
-			// Perform the conversion: replace the Page List block with
-			// individual Navigation Link blocks for each page.
-			convertToNavigationLinks();
+				// Perform the conversion: replace the Page List block with
+				// individual Navigation Link blocks for each page.
+				convertToNavigationLinks();
+			}, 50 ); // 50ms delay - enough for block insertion to complete
+
+			// Cleanup function to cancel timeout if component unmounts.
+			return () => clearTimeout( timeoutId );
 		}
 
 		// Update the previous state for the next render.
