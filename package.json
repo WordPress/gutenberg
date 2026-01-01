@@ -66,6 +66,7 @@
 		"@wordpress/block-library": "workspace:./packages/block-library",
 		"@wordpress/browserslist-config": "workspace:./packages/browserslist-config",
 		"@wordpress/build": "workspace:./packages/wp-build",
+		"@wordpress/docgen": "workspace:./packages/docgen",
 		"@wordpress/e2e-test-utils-playwright": "workspace:./packages/e2e-test-utils-playwright",
 		"@wordpress/env": "workspace:./packages/env",
 		"@wordpress/eslint-plugin": "workspace:./packages/eslint-plugin",
