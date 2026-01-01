@@ -1,0 +1,3 @@
+### Bug Fixes
+
+- Ensure global layout styles from theme.json (including blockGap) are applied on the frontend for hybrid themes.
