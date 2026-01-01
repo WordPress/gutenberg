@@ -59,7 +59,6 @@ module.exports = async function loadConfig( configDirectoryPath ) {
 	const isLocalDockerOverride = await hasLocalConfig( [
 		path.resolve( cacheDirectoryPath, 'docker-compose.override.yml' ),
 	] );
-	console.log( isLocalDockerOverride );
 
 	return {
 		name: path.basename( configDirectoryPath ),
