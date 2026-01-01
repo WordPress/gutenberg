@@ -11,8 +11,6 @@ import { renderElement } from '../utils/element';
 
 /**
  * Default render function that renders a div element with the given props.
- *
- * @param props The props to apply to the HTML element.
  */
 const DEFAULT_RENDER = ( props: React.ComponentPropsWithoutRef< 'div' > ) => (
 	<div { ...props } />
@@ -20,9 +18,6 @@ const DEFAULT_RENDER = ( props: React.ComponentPropsWithoutRef< 'div' > ) => (
 
 /**
  * Capitalizes the first character of a string.
- *
- * @param str The string to capitalize.
- * @return The capitalized string.
  */
 const capitalize = ( str: string ): string =>
 	str.charAt( 0 ).toUpperCase() + str.slice( 1 );
