@@ -51,7 +51,7 @@
 		"@storybook/addon-webpack5-compiler-babel": "3.0.3",
 		"@storybook/icons": "1.4.0",
 		"@storybook/react-webpack5": "9.1.17",
-		"@testing-library/jest-dom": "5.16.5",
+		"@testing-library/jest-dom": "6.6.3",
 		"@testing-library/react": "14.3.0",
 		"@testing-library/user-event": "14.4.3",
 		"@types/node": "20.17.10",

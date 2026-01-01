@@ -1,4 +1,7 @@
 {
+	"name": "@wordpress/navigation-edit-route",
+	"version": "1.0.0",
+	"private": true,
 	"route": {
 		"path": "/navigation/edit/$id",
 		"page": "site-editor-v2"

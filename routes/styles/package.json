@@ -1,10 +1,14 @@
 {
+	"name": "@wordpress/styles-route",
+	"version": "1.0.0",
+	"private": true,
 	"route": {
 		"path": "/styles",
 		"page": "site-editor-v2"
 	},
 	"dependencies": {
 		"@wordpress/admin-ui": "file:../../packages/admin-ui",
+		"@wordpress/base-styles": "file:../../packages/base-styles",
 		"@wordpress/components": "file:../../packages/components",
 		"@wordpress/compose": "file:../../packages/compose",
 		"@wordpress/data": "file:../../packages/data",

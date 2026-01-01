@@ -46,6 +46,10 @@
 		"stylelint-config-recommended": "^14.0.1",
 		"stylelint-config-recommended-scss": "^14.1.0"
 	},
+	"devDependencies": {
+		"stylelint": "^16.8.2",
+		"stylelint-scss": "^6.4.0"
+	},
 	"peerDependencies": {
 		"stylelint": "^16.8.2",
 		"stylelint-scss": "^6.4.0"

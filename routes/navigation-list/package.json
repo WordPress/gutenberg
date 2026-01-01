@@ -1,10 +1,14 @@
 {
+	"name": "@wordpress/navigation-list-route",
+	"version": "1.0.0",
+	"private": true,
 	"route": {
 		"path": "/navigation/list",
 		"page": "site-editor-v2"
 	},
 	"dependencies": {
 		"@wordpress/admin-ui": "file:../../packages/admin-ui",
+		"@wordpress/base-styles": "file:../../packages/base-styles",
 		"@wordpress/components": "file:../../packages/components",
 		"@wordpress/core-data": "file:../../packages/core-data",
 		"@wordpress/data": "file:../../packages/data",
