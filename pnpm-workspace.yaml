@@ -22,6 +22,7 @@ strictDepBuilds: true
 verifyDepsBeforeRun: install
 ignoredBuiltDependencies:
     - '@parcel/watcher'
+    - '@swc/core'
     - 'appium'
     - 'core-js'
     - 'core-js-pure'
