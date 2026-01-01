@@ -22,14 +22,13 @@ import { createBlock, store as blocksStore } from '@wordpress/blocks';
  * Internal dependencies
  */
 import { unlock } from '../lock-unlock';
-
-const { usesContextKey } = unlock( privateApis );
+import { name as FOOTNOTES_BLOCK_NAME } from './';
 
 export const formatName = 'core/footnote';
 
+const { usesContextKey } = unlock( privateApis );
 const POST_CONTENT_BLOCK_NAME = 'core/post-content';
 const SYNCED_PATTERN_BLOCK_NAME = 'core/block';
-const FOOTNOTES_BLOCK_NAME = 'core/footnotes';
 
 export const format = {
 	title: __( 'Footnote' ),
@@ -86,14 +85,14 @@ export const format = {
 				// Checks if the selected block lives within a pattern.
 				const {
 					getBlockParentsByBlockName: _getBlockParentsByBlockName,
-					getSelectionStart,
+					getSelectedBlockClientId: _getSelectedBlockClientId,
 					getBlockName: _getBlockName,
 				} = select( blockEditorStore );
-				const selectionStart = getSelectionStart();
-				const selectedClientId = selectionStart?.clientId;
+
+				const selectedClientId = _getSelectedBlockClientId();
 
 				if ( ! selectedClientId ) {
-					return true;
+					return false;
 				}
 
 				// Check if the selected block itself is a footnotes block.
