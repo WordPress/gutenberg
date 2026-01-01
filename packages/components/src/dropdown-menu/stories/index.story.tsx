@@ -2,14 +2,7 @@
  * External dependencies
  */
 import type { Meta, StoryObj } from '@storybook/react';
-import { fn } from '@storybook/test';
-
-/**
- * Internal dependencies
- */
-import { DropdownMenu } from '..';
-import MenuItem from '../../menu-item';
-import MenuGroup from '../../menu-group';
+import { fn } from 'storybook/test';
 
 /**
  * WordPress dependencies
@@ -22,6 +15,13 @@ import {
 	more,
 	trash,
 } from '@wordpress/icons';
+
+/**
+ * Internal dependencies
+ */
+import { DropdownMenu } from '..';
+import MenuItem from '../../menu-item';
+import MenuGroup from '../../menu-group';
 
 const meta: Meta< typeof DropdownMenu > = {
 	title: 'Components/Actions/DropdownMenu',

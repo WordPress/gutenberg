@@ -3,7 +3,7 @@
  */
 import type { StoryObj, Meta } from '@storybook/react';
 import { css } from '@emotion/react';
-import { fn } from '@storybook/test';
+import { fn } from 'storybook/test';
 
 /**
  * WordPress dependencies
@@ -28,29 +28,18 @@ const meta: Meta< typeof Menu > = {
 	title: 'Components/Actions/Menu',
 	component: Menu,
 	subcomponents: {
-		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		Item: Menu.Item,
-		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		CheckboxItem: Menu.CheckboxItem,
-		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		Group: Menu.Group,
-		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		GroupLabel: Menu.GroupLabel,
-		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		Separator: Menu.Separator,
 		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		Context: Menu.Context,
-		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		RadioItem: Menu.RadioItem,
-		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		ItemLabel: Menu.ItemLabel,
-		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		ItemHelpText: Menu.ItemHelpText,
-		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		TriggerButton: Menu.TriggerButton,
-		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		SubmenuTriggerItem: Menu.SubmenuTriggerItem,
-		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		Popover: Menu.Popover,
 	},
 	args: {

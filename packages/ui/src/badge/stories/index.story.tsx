@@ -7,7 +7,6 @@ import type { Meta, StoryObj } from '@storybook/react';
  * WordPress dependencies
  */
 import { Fragment } from '@wordpress/element';
-import '@wordpress/theme/design-tokens.css';
 
 /**
  * Internal dependencies

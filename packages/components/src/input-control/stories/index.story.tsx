@@ -2,7 +2,7 @@
  * External dependencies
  */
 import type { Meta, StoryFn } from '@storybook/react';
-import { fn } from '@storybook/test';
+import { fn } from 'storybook/test';
 
 /**
  * WordPress dependencies
@@ -21,7 +21,6 @@ const meta: Meta< typeof InputControl > = {
 	title: 'Components/Selection & Input/Common/InputControl',
 	id: 'components-inputcontrol',
 	component: InputControl,
-	// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 	subcomponents: { InputControlPrefixWrapper, InputControlSuffixWrapper },
 	argTypes: {
 		__unstableInputWidth: { control: { type: 'text' } },

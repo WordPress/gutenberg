@@ -21,13 +21,9 @@ const meta: Meta< typeof CircularOptionPicker > = {
 	id: 'components-circularoptionpicker',
 	component: CircularOptionPicker,
 	subcomponents: {
-		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		'CircularOptionPicker.Option': CircularOptionPicker.Option,
-		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		'CircularOptionPicker.OptionGroup': CircularOptionPicker.OptionGroup,
-		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		'CircularOptionPicker.ButtonAction': CircularOptionPicker.ButtonAction,
-		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		'CircularOptionPicker.DropdownLinkAction':
 			CircularOptionPicker.DropdownLinkAction,
 	},

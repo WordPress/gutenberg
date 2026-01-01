@@ -91,6 +91,13 @@
 		"typography": {
 			"fontSize": true,
 			"__experimentalFontFamily": true
+		},
+		"__experimentalBorder": {
+			"radius": true,
+			"__experimentalSkipSerialization": true,
+			"__experimentalDefaultControls": {
+				"radius": true
+			}
 		}
 	},
 	"example": {

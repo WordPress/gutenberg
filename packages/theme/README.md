@@ -196,6 +196,60 @@ The files generated in this step will all be committed to the repo.
 
 After the prebuild step, the package will be built into its final form via the repo's standard package build script.
 
+## Stylelint Plugins
+
+This package provides Stylelint plugins to help enforce consistent usage of design tokens. To use them, add the plugins to your Stylelint configuration:
+
+```json
+{
+	"plugins": [
+		"@wordpress/theme/stylelint-plugins/no-unknown-ds-tokens",
+		"@wordpress/theme/stylelint-plugins/no-setting-wpds-custom-properties"
+	],
+	"rules": {
+		"plugin-wpds/no-unknown-ds-tokens": true,
+		"plugin-wpds/no-setting-wpds-custom-properties": true
+	}
+}
+```
+
+### `plugin-wpds/no-unknown-ds-tokens`
+
+This rule reports an error when a CSS value references a `--wpds-*` custom property that is not a valid design token. This helps catch typos and ensures that only valid design tokens are used.
+
+```css
+/* ✗ Error: '--wpds-unknown-token' is not a valid Design System token */
+.example {
+	color: var(--wpds-unknown-token);
+}
+
+/* ✓ OK */
+.example {
+	color: var(--wpds-color-fg-content-neutral);
+}
+```
+
+### `plugin-wpds/no-setting-wpds-custom-properties`
+
+This rule reports an error when a CSS declaration sets (defines) a custom property in the `--wpds-*` namespace. The design system tokens should only be consumed, not defined or overridden in consuming code.
+
+```css
+/* ✗ Error: Do not set CSS custom properties using the Design System tokens namespace */
+.example {
+	--wpds-my-token: red;
+}
+
+/* ✗ Error: Overriding existing tokens is also not allowed */
+.example {
+	--wpds-color-fg-content-neutral: red;
+}
+
+/* ✓ OK */
+.example {
+	--my-custom-token: red;
+}
+```
+
 ## Contributing to this package
 
 This is an individual package that's part of the Gutenberg project. The project is organized as a monorepo. It's made up of multiple self-contained software packages, each with a specific purpose. The packages in this monorepo are published to [npm](https://www.npmjs.com/) and used by [WordPress](https://make.wordpress.org/core/) as well as other software projects.

@@ -4,14 +4,14 @@
 import type { Meta, StoryFn } from '@storybook/react';
 
 /**
- * Internal dependencies
- */
-import ResizableBox from '..';
-
-/**
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
+
+/**
+ * Internal dependencies
+ */
+import ResizableBox from '..';
 
 const meta: Meta< typeof ResizableBox > = {
 	title: 'Components/Utilities/ResizableBox',

@@ -36,12 +36,14 @@ async function findPluginReleaseBranchName( gitWorkingDirectoryPath ) {
  * @param {string[]}                  lines                Changelog content split into lines.
  * @param {('patch'|'minor'|'major')} [minimumVersionBump] Minimum version bump for the package.
  *                                                         Defaults to `patch`.
+ * @param {string}                    [currentVersion]     Current version of the package.
  *
  * @return {string|null} Version bump when applicable, or null otherwise.
  */
 function calculateVersionBumpFromChangelog(
 	lines,
-	minimumVersionBump = 'patch'
+	minimumVersionBump = 'patch',
+	currentVersion = '1.0.0'
 ) {
 	let changesDetected = false;
 	let versionBump = null;
@@ -63,9 +65,14 @@ function calculateVersionBumpFromChangelog(
 			break;
 		}
 
-		// A major version bump required. Stop processing.
+		// A major version bump required for stable packages. Stop processing.
 		if ( lineNormalized.startsWith( '### breaking change' ) ) {
-			versionBump = 'major';
+			if ( semver.lt( currentVersion, '1.0.0' ) ) {
+				versionBump = 'minor';
+			} else {
+				versionBump = 'major';
+			}
+
 			break;
 		}
 
@@ -89,6 +96,7 @@ function calculateVersionBumpFromChangelog(
 			versionBump = minimumVersionBump;
 		}
 	}
+
 	return versionBump;
 }
 

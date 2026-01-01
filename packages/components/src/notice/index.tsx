@@ -123,6 +123,7 @@ function Notice( {
 									noDefaultClasses = false,
 									onClick,
 									url,
+									disabled,
 								}: NoticeAction &
 									// `isPrimary` is a legacy prop included for
 									// backcompat, but `variant` should be used
@@ -152,7 +153,9 @@ function Notice( {
 										key={ index }
 										href={ url }
 										variant={ computedVariant }
-										onClick={ url ? undefined : onClick }
+										onClick={ onClick }
+										disabled={ disabled }
+										accessibleWhenDisabled
 										className={ clsx(
 											'components-notice__action',
 											buttonCustomClasses

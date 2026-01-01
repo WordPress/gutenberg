@@ -79,7 +79,8 @@
 		"remove-accents": "^0.5.0"
 	},
 	"devDependencies": {
-		"@ariakit/test": "^0.4.7"
+		"@ariakit/test": "^0.4.7",
+		"@storybook/react": "9.1.17"
 	},
 	"peerDependencies": {
 		"react": "^18.0.0",

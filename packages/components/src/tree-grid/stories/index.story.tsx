@@ -2,7 +2,7 @@
  * External dependencies
  */
 import type { Meta, StoryFn } from '@storybook/react';
-import { fn } from '@storybook/test';
+import { fn } from 'storybook/test';
 
 /**
  * WordPress dependencies
@@ -20,7 +20,6 @@ const meta: Meta< typeof TreeGrid > = {
 	title: 'Components/Navigation/TreeGrid',
 	id: 'components-treegrid',
 	component: TreeGrid,
-	// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 	subcomponents: { TreeGridRow, TreeGridCell },
 	argTypes: {
 		children: { control: false },

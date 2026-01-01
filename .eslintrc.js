@@ -430,6 +430,10 @@ module.exports = {
 				// Useful to add story descriptions via JSDoc without specifying params,
 				// or in TypeScript files where params are likely already documented outside of the JSDoc.
 				'jsdoc/require-param': 'off',
+				// Disable this rule as eslint-plugin-storybook 0.9.0 doesn't recognize the new
+				// `storybook/test` import path introduced in Storybook 9.
+				// TODO: Remove this override when we upgrade to eslint-plugin-storybook >= 0.10.0.
+				'storybook/use-storybook-expect': 'off',
 			},
 		},
 		{

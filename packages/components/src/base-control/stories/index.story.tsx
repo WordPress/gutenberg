@@ -14,7 +14,6 @@ const meta: Meta< typeof BaseControl > = {
 	id: 'components-basecontrol',
 	component: BaseControl,
 	subcomponents: {
-		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		'BaseControl.VisualLabel': BaseControl.VisualLabel,
 	},
 	argTypes: {

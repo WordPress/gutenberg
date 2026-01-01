@@ -7,7 +7,7 @@ import type { Meta, StoryFn } from '@storybook/react';
  * WordPress dependencies
  */
 import { upload, media } from '@wordpress/icons';
-import { fn } from '@storybook/test';
+import { fn } from 'storybook/test';
 
 /**
  * Internal dependencies

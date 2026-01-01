@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { StoryContext } from '@storybook/types';
+import type { StoryContext } from 'storybook/internal/types';
 
 /**
  * WordPress dependencies

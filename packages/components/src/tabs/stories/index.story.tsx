@@ -2,7 +2,7 @@
  * External dependencies
  */
 import type { Meta, StoryFn } from '@storybook/react';
-import { fn } from '@storybook/test';
+import { fn } from 'storybook/test';
 
 /**
  * WordPress dependencies
@@ -24,11 +24,8 @@ const meta: Meta< typeof Tabs > = {
 	id: 'components-tabs',
 	component: Tabs,
 	subcomponents: {
-		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		'Tabs.TabList': Tabs.TabList,
-		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		'Tabs.Tab': Tabs.Tab,
-		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		'Tabs.TabPanel': Tabs.TabPanel,
 		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		'Tabs.Context': Tabs.Context,

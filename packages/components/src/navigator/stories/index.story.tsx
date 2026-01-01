@@ -14,11 +14,8 @@ import { Navigator, useNavigator } from '../';
 const meta: Meta< typeof Navigator > = {
 	component: Navigator,
 	subcomponents: {
-		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		Screen: Navigator.Screen,
-		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		Button: Navigator.Button,
-		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		BackButton: Navigator.BackButton,
 	},
 	title: 'Components/Navigation/Navigator',

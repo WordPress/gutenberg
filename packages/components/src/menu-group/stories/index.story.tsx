@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import type { Meta, StoryFn } from '@storybook/react';
+
+/**
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
@@ -9,11 +14,6 @@ import { useState } from '@wordpress/element';
 import MenuGroup from '..';
 import MenuItem from '../../menu-item';
 import MenuItemsChoice from '../../menu-items-choice';
-
-/**
- * External dependencies
- */
-import type { Meta, StoryFn } from '@storybook/react';
 
 const meta: Meta< typeof MenuGroup > = {
 	title: 'Components/Actions/MenuGroup',

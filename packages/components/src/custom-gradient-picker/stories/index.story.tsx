@@ -2,7 +2,7 @@
  * External dependencies
  */
 import type { Meta, StoryFn } from '@storybook/react';
-import { fn } from '@storybook/test';
+import { fn } from 'storybook/test';
 /**
  * WordPress dependencies
  */

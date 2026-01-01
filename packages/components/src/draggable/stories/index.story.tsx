@@ -3,7 +3,7 @@
  */
 import type { Meta, StoryFn } from '@storybook/react';
 import type { DragEvent } from 'react';
-import { fn } from '@storybook/test';
+import { fn } from 'storybook/test';
 
 /**
  * WordPress dependencies

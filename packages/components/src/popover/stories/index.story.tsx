@@ -37,7 +37,6 @@ const meta: Meta< typeof Popover > = {
 	id: 'components-popover',
 	component: Popover,
 	subcomponents: {
-		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		'Popover.Slot': Popover.Slot,
 	},
 	argTypes: {

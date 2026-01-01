@@ -3,7 +3,7 @@
  */
 import type { Meta, StoryFn } from '@storybook/react';
 import styled from '@emotion/styled';
-import { fn } from '@storybook/test';
+import { fn } from 'storybook/test';
 
 /**
  * WordPress dependencies
@@ -29,7 +29,6 @@ import { createSlotFill, Provider as SlotFillProvider } from '../../slot-fill';
 const meta: Meta< typeof ToolsPanel > = {
 	title: 'Components/ToolsPanel',
 	component: ToolsPanel,
-	// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 	subcomponents: { ToolsPanelItem },
 	argTypes: {
 		as: { control: false },
