@@ -1,2 +1,2 @@
-// This is to ensure that the package doesn't need to be built to consume its types inside the monorepo
-/// <reference path="./src/declarations.ts" />
+// This ensures types are available both in the monorepo (before build) and for npm consumers
+/// <reference path="./src/declarations.d.ts" />

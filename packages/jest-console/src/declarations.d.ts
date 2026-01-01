@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable @typescript-eslint/method-signature-style */
 // Definitions originally written by Damien Sorel <https://github.com/mistic100> under MIT license.
 // https://github.com/DefinitelyTyped/DefinitelyTyped/blob/f0b72c12f6b561e4342dc8a1cf87432d2ad40ae7/types/wordpress__jest-console/index.d.ts
 
@@ -46,5 +44,3 @@ declare namespace jest {
 		toHaveWarnedWith( ...args: unknown[] ): R;
 	}
 }
-/* eslint-enable @typescript-eslint/method-signature-style */
-/* eslint-enable @typescript-eslint/no-unused-vars */
