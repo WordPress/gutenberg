@@ -50,7 +50,6 @@
 		"clsx": "^2.1.1"
 	},
 	"devDependencies": {
-		"@storybook/react": "9.1.17",
 		"@wordpress/theme": "file:../theme"
 	},
 	"peerDependencies": {
