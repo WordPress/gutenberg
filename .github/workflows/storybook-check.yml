@@ -38,7 +38,7 @@ jobs:
               run: |
                   # storybook is needed as peer dependency of @storybook/test-runner for pnpm
                   STORYBOOK_VERSION=$(node -p "require('./storybook/package.json').devDependencies.storybook")
-                  pnpm add -wD storybook@$STORYBOOK_VERSION @storybook/test-runner@0.22.1
+                  pnpm add -wD "storybook@$STORYBOOK_VERSION" @storybook/test-runner@0.22.1
                   pnpm exec playwright install --with-deps
 
             - name: Serve Storybook and run tests
