@@ -108,7 +108,6 @@
 		"@storybook/addon-docs": "9.1.17",
 		"@storybook/react": "9.1.17",
 		"@testing-library/jest-dom": "^6.6.3",
-		"@types/css-modules": "^1.0.5",
 		"@types/jest": "^29.5.14",
 		"@wordpress/jest-console": "workspace:../jest-console",
 		"snapshot-diff": "0.10.0",

@@ -3,24 +3,12 @@
 	"extends": "../../tsconfig.base.json",
 	"compilerOptions": {
 		"checkJs": false,
-		"typeRoots": [
-			"../../typings",
-			"./node_modules/@types",
-			// This is for the packages with in-built types.
-			"./node_modules"
-		],
-		"types": [
-			"gutenberg-env",
-			"gutenberg-test-env",
-			// From @types/*
-			"jest",
-			// Inbuilt types
-			"@testing-library/jest-dom"
-		]
+		"types": [ "gutenberg-env", "gutenberg-test-env", "jest" ]
 	},
 	"references": [
 		{ "path": "../data" },
 		{ "path": "../i18n" },
 		{ "path": "../style-engine" }
-	]
+	],
+	"files": [ "global.d.ts" ]
 }
