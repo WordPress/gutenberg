@@ -36,7 +36,7 @@ jobs:
 
             - name: Install test-runner and Playwright dependencies
               run: |
-                  pnpm add -D @storybook/test-runner@0.22.1
+                  pnpm add -wD @storybook/test-runner@0.22.1
                   pnpm exec playwright install --with-deps
 
             - name: Serve Storybook and run tests
