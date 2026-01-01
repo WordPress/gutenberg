@@ -100,13 +100,13 @@ function countVisibleItems( blocks, maxDepth, currentDepth = 1 ) {
 }
 
 /**
- * Determines the smart default expansion depth.
+ * Determines the dynamic default expansion depth.
  * Expands blocks until showing max 20 items total, up to 4 levels deep.
  *
  * @param {Array} blocks The top-level blocks in the list view.
  * @return {number} The default expansion depth (1, 2, 3, or 4).
  */
-function getSmartExpansionLevel( blocks ) {
+function getDynamicExpansionLevel( blocks ) {
 	if ( ! blocks?.length ) {
 		return 1;
 	}
@@ -230,8 +230,15 @@ function ListViewComponent(
 
 	const { updateBlockSelection } = useBlockSelection();
 
-	const initialExpandedState = useMemo( () => {
-		const expansionDepth = getSmartExpansionLevel( clientIdsTree );
+	// Calculate initial expanded state only once, on mount.
+	// This ensures user's manual expand/collapse actions persist.
+	const [ hasInitialized, setHasInitialized ] = useState( false );
+	const getInitialExpandedState = useCallback( () => {
+		if ( hasInitialized ) {
+			return {};
+		}
+
+		const expansionDepth = getDynamicExpansionLevel( clientIdsTree );
 
 		if ( expansionDepth <= 1 ) {
 			return {};
@@ -245,12 +252,20 @@ function ListViewComponent(
 			acc[ clientId ] = true;
 			return acc;
 		}, {} );
-	}, [ clientIdsTree ] );
+	}, [ clientIdsTree, hasInitialized ] );
 
 	const [ expandedState, setExpandedState ] = useReducer(
 		expanded,
-		initialExpandedState
+		{},
+		getInitialExpandedState
 	);
+
+	// Mark as initialized after first render
+	useEffect( () => {
+		if ( ! hasInitialized && clientIdsTree.length > 0 ) {
+			setHasInitialized( true );
+		}
+	}, [ hasInitialized, clientIdsTree ] );
 
 	const [ insertedBlock, setInsertedBlock ] = useState( null );
 
