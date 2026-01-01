@@ -84,7 +84,7 @@ export function PropertiesSection( {
 		visibleFieldIds.includes( f.id )
 	).length;
 
-	let visibleLockedFields = lockedFields.filter(
+	const visibleLockedFields = lockedFields.filter(
 		( { field, isVisibleFlag } ) =>
 			// @ts-expect-error
 			isDefined( field ) && ( view[ isVisibleFlag ] ?? true )
@@ -96,23 +96,8 @@ export function PropertiesSection( {
 	// If only one field (locked or regular) is visible, prevent it from being hidden
 	const totalVisibleFields =
 		visibleLockedFields.length + visibleRegularFieldsCount;
-	if ( totalVisibleFields === 1 ) {
-		if ( visibleLockedFields.length === 1 ) {
-			visibleLockedFields = visibleLockedFields.map( ( locked ) => ( {
-				...locked,
-				field: { ...locked.field, enableHiding: false },
-			} ) );
-		}
-	}
-
-	const hiddenLockedFields = lockedFields.filter(
-		( { field, isVisibleFlag } ) =>
-			// @ts-expect-error
-			isDefined( field ) && ! ( view[ isVisibleFlag ] ?? true )
-	) as Array< {
-		field: NormalizedField< any >;
-		isVisibleFlag: string;
-	} >;
+	const isSingleVisibleLockedField =
+		totalVisibleFields === 1 && visibleLockedFields.length === 1;
 
 	return (
 		<Stack direction="column" className="dataviews-field-control">
@@ -126,32 +111,28 @@ export function PropertiesSection( {
 				className="dataviews-view-config__properties"
 			>
 				<ItemGroup isBordered isSeparated size="medium">
-					{ visibleLockedFields.map( ( { field, isVisibleFlag } ) => {
-						return (
-							<FieldItem
-								key={ field.id }
-								field={ field }
-								isVisible
-								onToggleVisibility={ () => {
-									onChangeView( {
-										...view,
-										[ isVisibleFlag ]: false,
-									} );
-								} }
-							/>
-						);
-					} ) }
+					{ lockedFields.map( ( { field, isVisibleFlag } ) => {
+						if ( ! isDefined( field ) ) {
+							return null;
+						}
 
-					{ hiddenLockedFields.map( ( { field, isVisibleFlag } ) => {
+						// @ts-expect-error
+						const isVisible = view[ isVisibleFlag ] ?? true;
+						const isLastVisibleLocked =
+							isSingleVisibleLockedField && isVisible;
+						const fieldToRender = isLastVisibleLocked
+							? { ...field, enableHiding: false }
+							: field;
+
 						return (
 							<FieldItem
 								key={ field.id }
-								field={ field }
-								isVisible={ false }
+								field={ fieldToRender }
+								isVisible={ isVisible }
 								onToggleVisibility={ () => {
 									onChangeView( {
 										...view,
-										[ isVisibleFlag ]: true,
+										[ isVisibleFlag ]: ! isVisible,
 									} );
 								} }
 							/>
