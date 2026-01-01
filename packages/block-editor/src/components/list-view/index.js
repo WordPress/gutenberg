@@ -70,6 +70,100 @@ export const BLOCK_LIST_ITEM_HEIGHT = 32;
 /** @typedef {import('react').Ref<HTMLElement>} Ref */
 
 /**
+ * Counts total visible items when expanding up to a certain depth.
+ *
+ * @param {Array}  blocks       The blocks to count.
+ * @param {number} maxDepth     Maximum depth to expand.
+ * @param {number} currentDepth Current recursion depth.
+ * @return {number} Total count of visible items.
+ */
+function countVisibleItems( blocks, maxDepth, currentDepth = 1 ) {
+	if ( ! blocks?.length ) {
+		return 0;
+	}
+
+	let count = blocks.length;
+
+	if ( currentDepth < maxDepth ) {
+		blocks.forEach( ( block ) => {
+			if ( block.innerBlocks?.length > 0 ) {
+				count += countVisibleItems(
+					block.innerBlocks,
+					maxDepth,
+					currentDepth + 1
+				);
+			}
+		} );
+	}
+
+	return count;
+}
+
+/**
+ * Determines the smart default expansion depth.
+ * Expands blocks until showing max 20 items total, up to 4 levels deep.
+ *
+ * @param {Array} blocks The top-level blocks in the list view.
+ * @return {number} The default expansion depth (1, 2, 3, or 4).
+ */
+function getSmartExpansionLevel( blocks ) {
+	if ( ! blocks?.length ) {
+		return 1;
+	}
+
+	// Try expanding to level 4 first
+	const itemsAtLevel4 = countVisibleItems( blocks, 4 );
+	if ( itemsAtLevel4 <= 20 ) {
+		return 4;
+	}
+
+	// Try expanding to level 3
+	const itemsAtLevel3 = countVisibleItems( blocks, 3 );
+	if ( itemsAtLevel3 <= 20 ) {
+		return 3;
+	}
+
+	// Try expanding to level 2
+	const itemsAtLevel2 = countVisibleItems( blocks, 2 );
+	if ( itemsAtLevel2 <= 20 ) {
+		return 2;
+	}
+
+	// Default to level 1
+	return 1;
+}
+
+/**
+ * Recursively collects client IDs up to a specified depth.
+ *
+ * @param {Array}  blocks       The blocks to process.
+ * @param {number} maxDepth     Maximum depth to expand.
+ * @param {number} currentDepth Current recursion depth.
+ * @return {Array} Array of client IDs to expand.
+ */
+function getClientIdsToDepth( blocks, maxDepth, currentDepth = 1 ) {
+	if ( currentDepth >= maxDepth || ! blocks?.length ) {
+		return [];
+	}
+
+	const clientIds = [];
+	blocks.forEach( ( block ) => {
+		if ( block.innerBlocks?.length > 0 ) {
+			clientIds.push( block.clientId );
+			clientIds.push(
+				...getClientIdsToDepth(
+					block.innerBlocks,
+					maxDepth,
+					currentDepth + 1
+				)
+			);
+		}
+	} );
+
+	return clientIds;
+}
+
+/**
  * Show a hierarchical list of blocks.
  *
  * @param {Object}         props                        Components props.
@@ -136,7 +230,27 @@ function ListViewComponent(
 
 	const { updateBlockSelection } = useBlockSelection();
 
-	const [ expandedState, setExpandedState ] = useReducer( expanded, {} );
+	const initialExpandedState = useMemo( () => {
+		const expansionDepth = getSmartExpansionLevel( clientIdsTree );
+
+		if ( expansionDepth <= 1 ) {
+			return {};
+		}
+
+		const clientIdsToExpand = getClientIdsToDepth(
+			clientIdsTree,
+			expansionDepth
+		);
+		return clientIdsToExpand.reduce( ( acc, clientId ) => {
+			acc[ clientId ] = true;
+			return acc;
+		}, {} );
+	}, [ clientIdsTree ] );
+
+	const [ expandedState, setExpandedState ] = useReducer(
+		expanded,
+		initialExpandedState
+	);
 
 	const [ insertedBlock, setInsertedBlock ] = useState( null );
 
