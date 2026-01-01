@@ -1,4 +1,7 @@
 {
+	"name": "@wordpress/home-route",
+	"version": "1.0.0",
+	"private": true,
 	"route": {
 		"path": "/",
 		"page": "site-editor-v2"

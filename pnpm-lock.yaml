@@ -4206,9 +4206,9 @@ importers:
       '@emotion/babel-plugin':
         specifier: 11.11.0
         version: 11.11.0
-      '@manypkg/find-root':
-        specifier: ^3.1.0
-        version: 3.1.0
+      '@manypkg/get-packages':
+        specifier: 3.0.0
+        version: 3.0.0
       autoprefixer:
         specifier: 10.4.21
         version: 10.4.21(postcss@8.4.38)
@@ -6827,6 +6827,10 @@ packages:
 
   '@manypkg/find-root@3.1.0':
     resolution: {integrity: sha512-BcSqCyKhBVZ5YkSzOiheMCV41kqAFptW6xGqYSTjkVTl9XQpr+pqHhwgGCOHQtjDCv7Is6EFyA14Sm5GVbVABA==}
+    engines: {node: '>=20.0.0'}
+
+  '@manypkg/get-packages@3.0.0':
+    resolution: {integrity: sha512-C5TGJoG/MaVGt0HDij+RYQxVw/O/GDNJc4+qwv8g6wtbGEE8wawCcrQns8+qaNsZJybTTHYgdw7eD3wQhuxTng==}
     engines: {node: '>=20.0.0'}
 
   '@manypkg/tools@2.1.0':
@@ -20942,6 +20946,11 @@ snapshots:
 
   '@manypkg/find-root@3.1.0':
     dependencies:
+      '@manypkg/tools': 2.1.0
+
+  '@manypkg/get-packages@3.0.0':
+    dependencies:
+      '@manypkg/find-root': 3.1.0
       '@manypkg/tools': 2.1.0
 
   '@manypkg/tools@2.1.0':

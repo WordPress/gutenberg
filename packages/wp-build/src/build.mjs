@@ -17,6 +17,7 @@ import rtlcss from 'rtlcss';
 import cssnano from 'cssnano';
 import babel from 'esbuild-plugin-babel';
 import { camelCase } from 'change-case';
+import { getPackages } from '@manypkg/get-packages';
 
 /**
  * Internal dependencies
@@ -108,31 +109,43 @@ const wordpressExternalsPlugin = createWordpressExternalsPlugin(
 );
 
 /**
- * Create SASS load paths for a given package directory.
- * Includes the package's local node_modules for pnpm compatibility.
- *
- * @param {string} packageDir - The package directory path.
- * @return {string[]} Array of paths to search for SASS imports.
+ * Cached SASS load paths from all workspace packages.
+ * @type {string[] | null}
  */
-function getSassLoadPaths( packageDir ) {
-	return [
-		// Package's local node_modules (for pnpm's non-hoisted dependencies)
-		path.join( packageDir, 'node_modules' ),
-		// Root node_modules (for hoisted dependencies if any)
-		'node_modules',
+let cachedSassLoadPaths = null;
+
+/**
+ * Get SASS load paths from all workspace packages.
+ * Uses @manypkg/get-packages to discover all workspaces and their node_modules.
+ *
+ * @return {Promise<string[]>} Array of paths to search for SASS imports.
+ */
+async function getSassLoadPaths() {
+	if ( cachedSassLoadPaths ) {
+		return cachedSassLoadPaths;
+	}
+
+	const { packages, rootDir } = await getPackages( ROOT_DIR );
+
+	cachedSassLoadPaths = [
+		// Each workspace package's node_modules (for pnpm's non-hoisted deps)
+		...packages.map( ( pkg ) => path.join( pkg.dir, 'node_modules' ) ),
+		// Root node_modules
+		path.join( rootDir, 'node_modules' ),
 		// Direct path to base-styles for @wordpress/base-styles imports
 		path.join( PACKAGES_DIR, 'base-styles' ),
 	];
+
+	return cachedSassLoadPaths;
 }
 
 /**
- * Create style bundling plugins for a given package directory.
+ * Create style bundling plugins with the given load paths.
  *
- * @param {string} packageDir - The package directory path.
+ * @param {string[]} loadPaths - Array of paths to search for SASS imports.
  * @return {object[]} Array of esbuild plugins for handling CSS/SCSS.
  */
-function createStyleBundlingPlugins( packageDir ) {
-	const loadPaths = getSassLoadPaths( packageDir );
+function createStyleBundlingPlugins( loadPaths ) {
 	return [
 		// Handle CSS modules (.module.css and .module.scss)
 		sassPlugin( {
@@ -1114,10 +1127,11 @@ async function transpilePackage( packageName ) {
 			} );
 		},
 	};
+	const sassLoadPaths = await getSassLoadPaths();
 	const plugins = [
 		needsEmotionPlugin && emotionPlugin,
 		externalizeAllExceptCssPlugin,
-		...createStyleBundlingPlugins( packageDir ),
+		...createStyleBundlingPlugins( sassLoadPaths ),
 	].filter( Boolean );
 
 	if ( packageJson.main ) {
@@ -1223,6 +1237,7 @@ async function compileStyles( packageName ) {
 	const startTime = Date.now();
 	const buildStyleDir = path.join( packageDir, 'build-style' );
 	const srcDir = path.join( packageDir, 'src' );
+	const sassLoadPaths = await getSassLoadPaths();
 
 	// Process SCSS files
 	await Promise.all(
@@ -1250,7 +1265,7 @@ async function compileStyles( packageName ) {
 				plugins: [
 					sassPlugin( {
 						embedded: true,
-						loadPaths: getSassLoadPaths( packageDir ),
+						loadPaths: sassLoadPaths,
 						async transform( source ) {
 							// Process with autoprefixer for LTR version
 							const ltrResult = await postcss( [
@@ -1349,6 +1364,7 @@ async function buildRoute( routeName ) {
 	const startTime = Date.now();
 	const routeDir = path.join( ROOT_DIR, 'routes', routeName );
 	const outputDir = path.join( BUILD_DIR, 'routes', routeName );
+	const sassLoadPaths = await getSassLoadPaths();
 
 	// Ensure output directory exists
 	await mkdir( outputDir, { recursive: true } );
@@ -1435,7 +1451,7 @@ async function buildRoute( routeName ) {
 						[],
 						true // Generate asset file for minified build
 					),
-					...createStyleBundlingPlugins( routeDir ),
+					...createStyleBundlingPlugins( sassLoadPaths ),
 				],
 			} ),
 			esbuild.build( {
@@ -1453,7 +1469,7 @@ async function buildRoute( routeName ) {
 						[],
 						false // Skip asset file for non-minified build
 					),
-					...createStyleBundlingPlugins( routeDir ),
+					...createStyleBundlingPlugins( sassLoadPaths ),
 				],
 			} ),
 		] );
