@@ -97,15 +97,24 @@ const transforms = {
 		{
 			type: 'block',
 			blocks: [ 'core/paragraph' ],
-			transform: ( { citation }, innerBlocks ) =>
-				RichText.isEmpty( citation )
+			transform: ( { citation }, innerBlocks ) => {
+				return RichText.isEmpty( citation )
 					? innerBlocks
 					: [
 							...innerBlocks,
 							createBlock( 'core/paragraph', {
 								content: citation,
 							} ),
-					  ],
+					  ];
+			},
+			isMatch: ( block ) => {
+				// Only allow transform if there's at least one paragraph block
+				const { innerBlocks = [] } = block;
+				return innerBlocks.some(
+					( innerBlock ) =>
+						innerBlock && innerBlock.name === 'core/paragraph'
+				);
+			},
 		},
 		{
 			type: 'block',
