@@ -32,7 +32,6 @@
 const fs = require( 'fs' );
 const path = require( 'path' );
 
-// eslint-disable-next-line import/no-extraneous-dependencies
 const sass = require( 'sass' );
 // eslint-disable-next-line import/no-extraneous-dependencies
 const css2rn = require( 'css-to-react-native-transform' ).default;
