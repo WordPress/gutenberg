@@ -6,8 +6,7 @@
 			"gutenberg-env",
 			"gutenberg-test-env",
 			"css-modules",
-			"jest",
-			"@testing-library/jest-dom"
+			"jest"
 		]
 	},
 	"references": [
@@ -30,6 +29,7 @@
 		{ "path": "../rich-text" },
 		{ "path": "../warning" }
 	],
+	"files": [ "global.d.ts" ],
 	"exclude": [
 		"src/**/*.android.js",
 		"src/**/*.ios.js",

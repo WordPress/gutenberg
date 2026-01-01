@@ -3,16 +3,12 @@
 	"extends": "../../tsconfig.base.json",
 	"compilerOptions": {
 		"checkJs": false,
-		"types": [
-			"gutenberg-env",
-			"gutenberg-test-env",
-			"jest",
-			"@testing-library/jest-dom"
-		]
+		"types": [ "gutenberg-env", "gutenberg-test-env", "jest" ]
 	},
 	"references": [
 		{ "path": "../data" },
 		{ "path": "../i18n" },
 		{ "path": "../style-engine" }
-	]
+	],
+	"files": [ "global.d.ts" ]
 }
