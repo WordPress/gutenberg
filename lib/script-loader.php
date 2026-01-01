@@ -19,7 +19,8 @@ remove_action( 'wp_footer', 'wp_enqueue_global_styles', 1 );
 function gutenberg_enqueue_global_styles() {
 	$separate_assets  = wp_should_load_separate_core_block_assets();
 	$is_block_theme   = wp_is_block_theme();
-	$is_classic_theme = ! $is_block_theme;
+	$has_theme_json = wp_theme_has_theme_json();
+	$is_classic_theme = ! $has_theme_json;
 
 	/*
 	 * Global styles should be printed in the head when loading all styles combined.
