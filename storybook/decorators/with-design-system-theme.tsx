@@ -42,9 +42,44 @@ export function WithDesignSystemTheme(
 		color = { bg: '#1e1e1e', primary: '#3858e9' };
 	}
 
+	const hasThemedBackground = colorTheme === 'dark';
+
 	return (
 		<ThemeProvider color={ color } density={ density } isRoot>
-			<Story { ...context } />
+			<div
+				style={
+					hasThemedBackground
+						? {
+								background:
+									'var(--wpds-color-bg-surface-neutral-strong)',
+								padding:
+									'var(--wpds-dimension-padding-surface-sm)',
+								paddingBottom:
+									'var(--wpds-dimension-padding-surface-xs)',
+								outline:
+									'1px dashed var(--wpds-color-stroke-surface-neutral)',
+								outlineOffset: '2px',
+						  }
+						: undefined
+				}
+			>
+				<Story { ...context } />
+				{ hasThemedBackground && (
+					<small
+						style={ {
+							display: 'block',
+							opacity: 0.5,
+							marginTop: 'var(--wpds-dimension-gap-sm)',
+							fontSize: 'var(--wpds-font-size-xs)',
+							color: 'var(--wpds-color-fg-content-neutral-weak)',
+							textTransform: 'uppercase',
+							textAlign: 'end',
+						} }
+					>
+						Themed background
+					</small>
+				) }
+			</div>
 		</ThemeProvider>
 	);
 }
