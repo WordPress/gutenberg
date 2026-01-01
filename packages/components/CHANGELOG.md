@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Code Quality
+
+-   Fix missing dependencies. [#74310](https://github.com/WordPress/gutenberg/pull/74310)
+
 ### Breaking Changes
 
 -   Validated form controls (private API): Removed `onValidate` prop (use `onChange` to set `customValidity` messages, or add conditionals directly inside the `customValidity` prop instead) ([#73559](https://github.com/WordPress/gutenberg/pull/73559)).
