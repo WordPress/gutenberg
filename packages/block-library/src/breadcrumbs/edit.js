@@ -281,15 +281,21 @@ export default function BreadcrumbEdit( {
 					) }
 				/>
 			</InspectorControls>
-			{ status === 'loading' ? <Spinner /> : null }
+			{ status === 'loading' && (
+				<div { ...blockProps }>
+					<Spinner />
+				</div>
+			) }
 			{ status === 'error' && (
-				<p>
-					{ sprintf(
-						/* translators: %s: error message returned when rendering the block. */
-						__( 'Error: %s' ),
-						error
-					) }
-				</p>
+				<div { ...blockProps }>
+					<p>
+						{ sprintf(
+							/* translators: %s: error message returned when rendering the block. */
+							__( 'Error: %s' ),
+							error
+						) }
+					</p>
+				</div>
 			) }
 			{ showPlaceholder && placeholder }
 			{ ! showPlaceholder && status === 'success' && (
