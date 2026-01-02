@@ -1,4 +1,5 @@
-const tokenList = require( '@wordpress/theme/design-tokens.js' ).default;
+const tokenListModule = require( '@wordpress/theme/design-tokens.js' );
+const tokenList = tokenListModule.default || tokenListModule;
 
 const DS_TOKEN_PREFIX = 'wpds-';
 
