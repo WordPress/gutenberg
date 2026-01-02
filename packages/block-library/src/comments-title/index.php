@@ -24,9 +24,9 @@ function render_block_core_comments_title( $attributes ) {
 	$show_post_title     = ! empty( $attributes['showPostTitle'] ) && $attributes['showPostTitle'];
 	$show_comments_count = ! empty( $attributes['showCommentsCount'] ) && $attributes['showCommentsCount'];
 	$wrapper_attributes  = get_block_wrapper_attributes( array( 'class' => $align_class_name ) );
-	$comments_count = get_comments_number();
-	$post_title     = get_the_title();
-	$tag_name       = 'h2';
+	$comments_count      = get_comments_number();
+	$post_title          = get_the_title();
+	$tag_name            = 'h2';
 	if ( isset( $attributes['level'] ) ) {
 		$tag_name = 'h' . $attributes['level'];
 	}
