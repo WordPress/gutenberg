@@ -65,6 +65,15 @@ function calculateVersionBumpFromChangelog(
 			break;
 		}
 
+		// Promote a pre-1.0 package to stable 1.0.0 release. Stop processing.
+		if (
+			lineNormalized.startsWith( '### stable release' ) &&
+			semver.lt( currentVersion, '1.0.0' )
+		) {
+			versionBump = 'major';
+			break;
+		}
+
 		// A major version bump required for stable packages. Stop processing.
 		if ( lineNormalized.startsWith( '### breaking change' ) ) {
 			if ( semver.lt( currentVersion, '1.0.0' ) ) {

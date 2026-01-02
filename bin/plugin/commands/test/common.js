@@ -87,5 +87,21 @@ describe( 'calculateVersionBumpFromChangelog', () => {
 				)
 			).toBe( 'minor' );
 		} );
+
+		it( 'should bump the major when stable release heading detected', () => {
+			expect(
+				calculateVersionBumpFromChangelog(
+					[
+						'First line',
+						'## Unreleased',
+						'### Stable Release',
+						'This package is now considered stable.',
+						'Fifth line',
+					],
+					'patch',
+					'0.1.0'
+				)
+			).toBe( 'major' );
+		} );
 	} );
 } );
