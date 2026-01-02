@@ -70,22 +70,8 @@ export default function RSSEdit( { attributes, setAttributes, name } ) {
 		}
 	}
 
-	/*
-	 * This function merges the existing attributes with additional style properties.
-	 * The `border` and `spacing` properties are set to `undefined` to ensure that
-	 * these styles are reset and not applied on the server side.
-	 */
-	const serverSideAttributes = {
-		...attributes,
-		style: {
-			...attributes?.style,
-			border: undefined,
-			spacing: undefined,
-		},
-	};
-
 	const { content, status, error } = useServerSideRender( {
-		attributes: serverSideAttributes,
+		attributes,
 		skipBlockSupportAttributes: true,
 		block: name,
 	} );
@@ -319,15 +305,21 @@ export default function RSSEdit( { attributes, setAttributes, name } ) {
 					onChange={ ( value ) => setAttributes( { rel: value } ) }
 				/>
 			</InspectorControls>
-			{ status === 'loading' && <Spinner /> }
+			{ status === 'loading' && (
+				<div { ...blockProps }>
+					<Spinner />
+				</div>
+			) }
 			{ status === 'error' && (
-				<p>
-					{ sprintf(
-						/* translators: %s: error message returned when rendering the block. */
-						__( 'Error: %s' ),
-						error
-					) }
-				</p>
+				<div { ...blockProps }>
+					<p>
+						{ sprintf(
+							/* translators: %s: error message returned when rendering the block. */
+							__( 'Error: %s' ),
+							error
+						) }
+					</p>
+				</div>
 			) }
 			{ status === 'success' && (
 				<HtmlRenderer wrapperProps={ blockProps } html={ content } />
