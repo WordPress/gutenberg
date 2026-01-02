@@ -86,7 +86,6 @@ export default function CalendarEdit( { attributes, name } ) {
 			...attributes,
 			...getYearMonth( date ),
 		},
-		skipBlockSupportAttributes: true,
 		block: name,
 	} );
 
