@@ -36,16 +36,16 @@ class Gutenberg_HTTP_SSE_Sync_Server {
 			'sync/v1',
 			'/messages',
 			array(
-				'methods'             => array( WP_Rest_Server::READABLE, WP_REST_Server::CREATABLE ),
+				'methods'             => array( WP_REST_Server::READABLE, WP_REST_Server::CREATABLE ),
 				'callback'            => array( $this, 'handle_request' ),
 				'permission_callback' => array( $this, 'check_permissions' ),
 				'args'                => array(
-					'client_id' => array(
+					'client_id'       => array(
 						'minimum'  => 1,
 						'required' => true,
 						'type'     => 'integer',
 					),
-					'room'      => array(
+					'room'            => array(
 						'required'          => true,
 						'type'              => 'string',
 						'sanitize_callback' => 'sanitize_text_field',
@@ -56,7 +56,7 @@ class Gutenberg_HTTP_SSE_Sync_Server {
 						'required' => false,
 						'type'     => 'integer',
 					),
-					'message'   => array(
+					'message'         => array(
 						'required'          => false,
 						'type'              => 'string',
 						'validate_callback' => function ( mixed $message_json, WP_REST_Request $request ): bool|WP_Error {
@@ -152,7 +152,7 @@ class Gutenberg_HTTP_SSE_Sync_Server {
 		}
 
 		// Extract Gutenberg entity kind and name from sync object type
-		[ $entity_kind ]                   = $type_parts;
+		[ $entity_kind ] = $type_parts;
 		[ , $object_id ] = $object_parts;
 
 		// Handle post type entities.
@@ -309,7 +309,7 @@ class Gutenberg_HTTP_SSE_Sync_Server {
 	 */
 	private function get_new_messages( string $room, int $client_id, int $last_message_id = 0 ): array {
 		$cache_key = $this->get_messages_cache_key( $room );
-		$messages = $this->get_value( $cache_key );
+		$messages  = $this->get_value( $cache_key );
 
 		if ( ! $messages || ! is_array( $messages ) ) {
 			return array();
@@ -349,7 +349,7 @@ class Gutenberg_HTTP_SSE_Sync_Server {
 		// Check if there are other active clients, if this is the only client,
 		// implement lazy connection. The client will reconnect after a timeout.
 		if ( 0 === count( self::get_new_messages( $room, $client_id, $last_message_id ) ) ) {
-			echo "data: " . wp_json_encode( array() ) . "\n\n";
+			echo 'data: ' . wp_json_encode( array() ) . "\n\n";
 			flush();
 			exit;
 		}
@@ -357,7 +357,7 @@ class Gutenberg_HTTP_SSE_Sync_Server {
 		$start_time = time();
 
 		// Send initial connection message
-		echo "data: " . wp_json_encode( array( 'messages' => array() ) ) . "\n\n";
+		echo 'data: ' . wp_json_encode( array( 'messages' => array() ) ) . "\n\n";
 		flush();
 
 		// Keep connection alive and send messages
@@ -373,11 +373,11 @@ class Gutenberg_HTTP_SSE_Sync_Server {
 				$this->debug_log( 'Fetched ' . count( $messages ) . ' new messages for room ' . $room . '; last_id=' . $last_message_id );
 
 				// Send messages.
-				echo "data: " . wp_json_encode( array( 'messages' => $messages ) ) . "\n\n";
+				echo 'data: ' . wp_json_encode( array( 'messages' => $messages ) ) . "\n\n";
 				flush();
 
 				// Update last message ID
-				$last_message = end( $messages );
+				$last_message    = end( $messages );
 				$last_message_id = $last_message['id'] ?? $last_message_id;
 			} else {
 				// Send heartbeat to keep connection alive. We do not expect a response.
