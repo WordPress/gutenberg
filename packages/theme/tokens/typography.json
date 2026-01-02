@@ -37,56 +37,67 @@
 		},
 		"size": {
 			"$type": "dimension",
-			"x-small": {
+			"xs": {
 				"$value": { "value": 11, "unit": "px" },
 				"$description": "Extra small font size"
 			},
-			"small": {
+			"sm": {
 				"$value": { "value": 12, "unit": "px" },
 				"$description": "Small font size"
 			},
-			"medium": {
+			"md": {
 				"$value": { "value": 13, "unit": "px" },
 				"$description": "Medium font size"
 			},
-			"large": {
+			"lg": {
 				"$value": { "value": 15, "unit": "px" },
 				"$description": "Large font size"
 			},
-			"x-large": {
+			"xl": {
 				"$value": { "value": 20, "unit": "px" },
 				"$description": "Extra large font size"
 			},
-			"2x-large": {
+			"2xl": {
 				"$value": { "value": 32, "unit": "px" },
 				"$description": "2X large font size"
 			}
 		},
-		"lineHeight": {
+		"line-height": {
 			"$type": "dimension",
-			"x-small": {
+			"xs": {
 				"$value": { "value": 16, "unit": "px" },
 				"$description": "Extra small line height"
 			},
-			"small": {
+			"sm": {
 				"$value": { "value": 20, "unit": "px" },
 				"$description": "Small line height"
 			},
-			"medium": {
+			"md": {
 				"$value": { "value": 24, "unit": "px" },
 				"$description": "Medium line height"
 			},
-			"large": {
+			"lg": {
 				"$value": { "value": 28, "unit": "px" },
 				"$description": "Large line height"
 			},
-			"x-large": {
+			"xl": {
 				"$value": { "value": 32, "unit": "px" },
 				"$description": "Extra large line height"
 			},
-			"2x-large": {
+			"2xl": {
 				"$value": { "value": 40, "unit": "px" },
 				"$description": "2X large line height"
+			}
+		},
+		"weight": {
+			"$type": "fontWeight",
+			"regular": {
+				"$value": 400,
+				"$description": "Regular font weight for body text"
+			},
+			"medium": {
+				"$value": 499,
+				"$description": "Medium font weight for emphasis and headings"
 			}
 		}
 	}
