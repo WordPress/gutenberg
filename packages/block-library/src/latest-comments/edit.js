@@ -39,16 +39,8 @@ export default function LatestComments( { attributes, setAttributes, name } ) {
 
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
-	const serverSideAttributes = {
-		...attributes,
-		style: {
-			...attributes?.style,
-			spacing: undefined,
-		},
-	};
-
 	const { content, status, error } = useServerSideRender( {
-		attributes: serverSideAttributes,
+		attributes,
 		skipBlockSupportAttributes: true,
 		block: name,
 		urlQueryArgs: {
@@ -160,15 +152,21 @@ export default function LatestComments( { attributes, setAttributes, name } ) {
 					</ToolsPanelItem>
 				</ToolsPanel>
 			</InspectorControls>
-			{ status === 'loading' && <Spinner /> }
+			{ status === 'loading' && (
+				<div { ...blockProps }>
+					<Spinner />
+				</div>
+			) }
 			{ status === 'error' && (
-				<p>
-					{ sprintf(
-						/* translators: %s: error message returned when rendering the block. */
-						__( 'Error: %s' ),
-						error
-					) }
-				</p>
+				<div { ...blockProps }>
+					<p>
+						{ sprintf(
+							/* translators: %s: error message returned when rendering the block. */
+							__( 'Error: %s' ),
+							error
+						) }
+					</p>
+				</div>
 			) }
 			{ status === 'success' && (
 				<HtmlRenderer wrapperProps={ blockProps } html={ content } />
