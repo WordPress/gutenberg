@@ -3,17 +3,10 @@
  */
 import { __ } from '@wordpress/i18n';
 
-/**
- * Internal dependencies
- */
-
-import { formInputIcon } from './icons.js';
-
 const variations = [
 	{
 		name: 'text',
 		title: __( 'Text Input' ),
-		icon: formInputIcon,
 		description: __( 'A generic text input.' ),
 		attributes: { type: 'text' },
 		isDefault: true,
@@ -24,7 +17,6 @@ const variations = [
 	{
 		name: 'textarea',
 		title: __( 'Textarea Input' ),
-		icon: formInputIcon,
 		description: __(
 			'A textarea input to allow entering multiple lines of text.'
 		),
@@ -37,7 +29,6 @@ const variations = [
 		name: 'checkbox',
 		title: __( 'Checkbox Input' ),
 		description: __( 'A simple checkbox input.' ),
-		icon: formInputIcon,
 		attributes: { type: 'checkbox', inlineLabel: true },
 		isDefault: true,
 		scope: [ 'inserter', 'transform' ],
@@ -46,7 +37,6 @@ const variations = [
 	{
 		name: 'email',
 		title: __( 'Email Input' ),
-		icon: formInputIcon,
 		description: __( 'Used for email addresses.' ),
 		attributes: { type: 'email' },
 		isDefault: true,
@@ -56,7 +46,6 @@ const variations = [
 	{
 		name: 'url',
 		title: __( 'URL Input' ),
-		icon: formInputIcon,
 		description: __( 'Used for URLs.' ),
 		attributes: { type: 'url' },
 		isDefault: true,
@@ -66,7 +55,6 @@ const variations = [
 	{
 		name: 'tel',
 		title: __( 'Telephone Input' ),
-		icon: formInputIcon,
 		description: __( 'Used for phone numbers.' ),
 		attributes: { type: 'tel' },
 		isDefault: true,
@@ -76,7 +64,6 @@ const variations = [
 	{
 		name: 'number',
 		title: __( 'Number Input' ),
-		icon: formInputIcon,
 		description: __( 'A numeric input.' ),
 		attributes: { type: 'number' },
 		isDefault: true,
