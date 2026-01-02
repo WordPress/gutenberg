@@ -16,6 +16,8 @@ module.exports = {
 	moduleNameMapper: {
 		[ `@wordpress\\/(${ transpiledPackageNames.join( '|' ) })$` ]:
 			'packages/$1/src',
+		'@wordpress/theme/design-tokens.js':
+			'<rootDir>/packages/theme/src/prebuilt/js/design-tokens.js',
 		'.+\\.wasm$': '<rootDir>/test/unit/config/wasm-stub.js',
 	},
 	preset: '@wordpress/jest-preset-default',
