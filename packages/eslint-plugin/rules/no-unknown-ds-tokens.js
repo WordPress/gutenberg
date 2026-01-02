@@ -75,10 +75,15 @@ module.exports = /** @type {import('eslint').Rule.RuleModule} */ ( {
 					return;
 				}
 
-				const unknownTokens = extractCSSVariables(
+				const usedTokens = extractCSSVariables(
 					computedValue,
 					DS_TOKEN_PREFIX
-				).difference( knownTokens );
+				);
+				const unknownTokens = new Set(
+					[ ...usedTokens ].filter(
+						( token ) => ! knownTokens.has( token )
+					)
+				);
 
 				if ( unknownTokens.size > 0 ) {
 					context.report( {
