@@ -1,12 +1,13 @@
 <?php
 /**
- * Append the `wp-block-paragraph` class before rendering the stored `core/paragraph` block contents.
+ * Server-side rendering of the `core/paragraph` block.
  *
  * @package WordPress
  */
 
 /**
- * Adds a wp-block-paragraph class to the paragraph block content.
+ * Append the `wp-block-paragraph` class before rendering the stored
+ * `core/paragraph` block contents.
  *
  * For example, the following block content:
  *  <p class="align-left">Hello World</p>
@@ -16,37 +17,22 @@
  *
  * @since 7.0.0
  *
- * @param array  $attributes Attributes of the block being rendered.
- * @param string $content Content of the block being rendered.
+ * @param string $block_content The block content.
  *
- * @return string The content of the block being rendered.
+ * @return string Filtered block content.
  */
-function block_core_paragraph_render( $attributes, $content ) {
-	if ( ! $content ) {
-		return $content;
+function block_core_paragraph_add_class( $block_content ) {
+	if ( ! $block_content ) {
+		return $block_content;
 	}
 
-	$p = new WP_HTML_Tag_Processor( $content );
+	$processor = new WP_HTML_Tag_Processor( $block_content );
 
-	if ( $p->next_tag( 'p' ) ) {
-			$p->add_class( 'wp-block-paragraph' );
+	if ( $processor->next_tag( 'p' ) ) {
+		$processor->add_class( 'wp-block-paragraph' );
 	}
 
-	return $p->get_updated_html();
+	return $processor->get_updated_html();
 }
 
-/**
- * Registers the `core/paragraph` block on server.
- *
- * @since 7.0.0
- */
-function register_block_core_paragraph() {
-	register_block_type_from_metadata(
-		__DIR__ . '/paragraph',
-		array(
-			'render_callback' => 'block_core_paragraph_render',
-		)
-	);
-}
-
-add_action( 'init', 'register_block_core_paragraph' );
+add_filter( 'render_block_core/paragraph', 'block_core_paragraph_add_class' );
