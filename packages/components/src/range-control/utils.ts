@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useCallback, useEffect } from '@wordpress/element';
+import { useCallback, useEffect, useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -38,6 +38,8 @@ export function useControlledRangeValue(
 	settings: UseControlledRangeValueArgs
 ) {
 	const { min, max, value: valueProp, initial } = settings;
+	const prevValuePropRef = useRef< typeof valueProp >();
+
 	const [ state, setInternalState ] = useControlledState(
 		floatClamp( valueProp, min, max ),
 		{
@@ -46,12 +48,19 @@ export function useControlledRangeValue(
 		}
 	);
 
-	// Clear stale internal state when valueProp is null but state still has a value
+	// Clear stale internal state when valueProp transitions from a number to null/undefined
 	useEffect( () => {
-		if ( valueProp === null && state !== null ) {
+		const isTransitionToNull =
+			typeof prevValuePropRef.current === 'number' &&
+			( valueProp === null || valueProp === undefined );
+
+		if ( isTransitionToNull ) {
 			setInternalState( null );
 		}
-	}, [ valueProp, state, setInternalState ] );
+
+		// Update ref after checking the condition
+		prevValuePropRef.current = valueProp;
+	}, [ valueProp, setInternalState ] );
 
 	const setState = useCallback(
 		( nextValue: number | null ) => {
