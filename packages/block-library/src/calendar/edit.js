@@ -93,28 +93,6 @@ export default function CalendarEdit( { attributes, name } ) {
 	const disabledRef = useDisabled();
 	const blockProps = useBlockProps( { ref: disabledRef } );
 
-	if ( status === 'loading' ) {
-		return (
-			<div { ...blockProps }>
-				<Spinner />
-			</div>
-		);
-	}
-
-	if ( status === 'error' ) {
-		return (
-			<div { ...blockProps }>
-				<p>
-					{ sprintf(
-						/* translators: %s: error message returned when rendering the block. */
-						__( 'Error: %s' ),
-						error
-					) }
-				</p>
-			</div>
-		);
-	}
-
 	if ( ! hasPosts ) {
 		return (
 			<div { ...blockProps }>
@@ -129,5 +107,27 @@ export default function CalendarEdit( { attributes, name } ) {
 		);
 	}
 
-	return <HtmlRenderer wrapperProps={ blockProps } html={ content } />;
+	return (
+		<>
+			{ status === 'loading' && (
+				<div { ...blockProps }>
+					<Spinner />
+				</div>
+			) }
+			{ status === 'error' && (
+				<div { ...blockProps }>
+					<p>
+						{ sprintf(
+							/* translators: %s: error message returned when rendering the block. */
+							__( 'Error: %s' ),
+							error
+						) }
+					</p>
+				</div>
+			) }
+			{ status === 'success' && (
+				<HtmlRenderer wrapperProps={ blockProps } html={ content } />
+			) }
+		</>
+	);
 }
