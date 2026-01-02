@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useCallback } from '@wordpress/element';
+import { useCallback, useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -45,6 +45,13 @@ export function useControlledRangeValue(
 			fallback: null,
 		}
 	);
+
+	// Clear stale internal state when valueProp is null but state still has a value
+	useEffect( () => {
+		if ( valueProp === null && state !== null ) {
+			setInternalState( null );
+		}
+	}, [ valueProp, state, setInternalState ] );
 
 	const setState = useCallback(
 		( nextValue: number | null ) => {
