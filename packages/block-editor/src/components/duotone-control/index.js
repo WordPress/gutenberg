@@ -13,6 +13,8 @@ import { __ } from '@wordpress/i18n';
 import { DOWN } from '@wordpress/keycodes';
 import { Icon, filter } from '@wordpress/icons';
 import { useInstanceId } from '@wordpress/compose';
+// Relative import to avoid circular dependencies within the block-editor package.
+import { resolveDuotoneColors } from '../duotone/utils';
 
 function DuotoneControl( {
 	id: idProp,
@@ -23,13 +25,37 @@ function DuotoneControl( {
 	value,
 	onChange,
 } ) {
+	// Resolve CSS custom properties in duotone presets using the color palette.
+	// This ensures previews in the picker render correctly with actual colors instead of vars.
+	const resolvedDuotonePalette =
+		duotonePalette?.map( ( preset ) => ( {
+			...preset,
+			colors: resolveDuotoneColors( preset.colors, colorPalette ),
+		} ) ) || [];
+
 	let toolbarIcon;
 	if ( value === 'unset' ) {
 		toolbarIcon = (
 			<ColorIndicator className="block-editor-duotone-control__unset-indicator" />
 		);
 	} else if ( value ) {
-		toolbarIcon = <DuotoneSwatch values={ value } />;
+		// Also resolve the current value if it's a preset slug.
+		let resolvedValue = value;
+		if (
+			typeof value === 'string' &&
+			value.startsWith( 'var:preset|duotone|' )
+		) {
+			const slug = value.split( '|' ).pop();
+			const currentPreset = resolvedDuotonePalette.find(
+				( p ) => p.slug === slug
+			);
+			if ( currentPreset ) {
+				resolvedValue = currentPreset.colors;
+			}
+		} else if ( Array.isArray( value ) ) {
+			resolvedValue = resolveDuotoneColors( value, colorPalette );
+		}
+		toolbarIcon = <DuotoneSwatch values={ resolvedValue } />;
 	} else {
 		toolbarIcon = <Icon icon={ filter } />;
 	}
@@ -74,10 +100,10 @@ function DuotoneControl( {
 						aria-label={ actionLabel }
 						aria-describedby={ descriptionId }
 						colorPalette={ colorPalette }
-						duotonePalette={ duotonePalette }
+						duotonePalette={ resolvedDuotonePalette } // Use resolved palette here.
 						disableCustomColors={ disableCustomColors }
 						disableCustomDuotone={ disableCustomDuotone }
-						value={ value }
+						value={ value } // Pass original value; picker handles selection.
 						onChange={ onChange }
 					/>
 				</MenuGroup>

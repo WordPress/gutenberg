@@ -129,6 +129,14 @@ class WP_Duotone_Gutenberg {
 	private static $block_css_declarations = array();
 
 	/**
+	 * Cache for resolved color palette to avoid repeated lookups.
+	 *
+	 * @since 6.8.0
+	 * @var array|null
+	 */
+	private static $color_palette_cache = null;
+
+	/**
 	 * Direct port of colord's clamp function. Using min/max instead of
 	 * nested ternaries.
 	 *
@@ -430,6 +438,17 @@ class WP_Duotone_Gutenberg {
 	 * @return array|null An array of RGBA values or null if the string is invalid.
 	 */
 	private static function colord_parse( $input ) {
+
+		// Handle empty/falsy as transparent.
+		if ( empty( $input ) ) {
+			return array(
+				'r' => 0,
+				'g' => 0,
+				'b' => 0,
+				'a' => 0,
+			);
+		}
+
 		$result = self::colord_parse_hex( $input );
 
 		if ( ! $result ) {
@@ -442,6 +461,221 @@ class WP_Duotone_Gutenberg {
 
 		return $result;
 	}
+
+	/**
+	 * =========================================================================
+	 * NEW: CSS Custom Property Resolution Methods
+	 * =========================================================================
+	 */
+
+	/**
+	 * Get the flattened color palette from global settings.
+	 *
+	 * This retrieves all color presets from default, theme, and custom origins
+	 * and flattens them into a single array indexed by slug.
+	 *
+	 * @since 6.8.0
+	 *
+	 * @return array Associative array of color slugs to color values.
+	 */
+	private static function get_color_palette() {
+		if ( null !== self::$color_palette_cache ) {
+			return self::$color_palette_cache;
+		}
+
+		self::$color_palette_cache = array();
+
+		$settings = gutenberg_get_global_settings();
+		$palette  = $settings['color']['palette'] ?? array();
+
+		// Handle both nested structure (by origin) and flat structure.
+		if ( isset( $palette['default'] ) || isset( $palette['theme'] ) || isset( $palette['custom'] ) ) {
+			// Nested structure: palette is organized by origin.
+			foreach ( array( 'default', 'theme', 'custom' ) as $origin ) {
+				if ( isset( $palette[ $origin ] ) && is_array( $palette[ $origin ] ) ) {
+					foreach ( $palette[ $origin ] as $color_preset ) {
+						if ( isset( $color_preset['slug'], $color_preset['color'] ) ) {
+							self::$color_palette_cache[ $color_preset['slug'] ] = $color_preset['color'];
+						}
+					}
+				}
+			}
+		} else {
+			// Flat structure: palette is a simple array of color presets.
+			foreach ( $palette as $color_preset ) {
+				if ( isset( $color_preset['slug'], $color_preset['color'] ) ) {
+					self::$color_palette_cache[ $color_preset['slug'] ] = $color_preset['color'];
+				}
+			}
+		}
+
+		return self::$color_palette_cache;
+	}
+
+	/**
+	 * Clear the color palette cache.
+	 *
+	 * This should be called when global settings might have changed,
+	 * such as when switching style variations.
+	 *
+	 * @since 6.8.0
+	 */
+	public static function clear_color_palette_cache() {
+		self::$color_palette_cache = null;
+	}
+
+	/**
+	 * Check if a color value is a CSS custom property.
+	 *
+	 * Supports multiple formats:
+	 * - var(--wp--preset--color--slug)
+	 * - var:preset|color|slug
+	 *
+	 * @since 6.8.0
+	 *
+	 * @param string $color The color value to check.
+	 * @return bool True if the color is a CSS custom property.
+	 */
+	private static function is_css_custom_property( $color ) {
+		if ( ! is_string( $color ) ) {
+			return false;
+		}
+
+		// Check for var(--wp--preset--color--slug) format.
+		if ( preg_match( '/^var\(--wp--preset--color--[a-zA-Z0-9_-]+\)$/', $color ) ) {
+			return true;
+		}
+
+		// Check for var:preset|color|slug format.
+		if ( preg_match( '/^var:preset\|color\|[a-zA-Z0-9_-]+$/', $color ) ) {
+			return true;
+		}
+
+		// Check for var(--wp--custom--*) format (custom CSS properties).
+		if ( preg_match( '/^var\(--wp--custom--[a-zA-Z0-9_-]+\)$/', $color ) ) {
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
+	 * Extract the color slug from a CSS custom property.
+	 *
+	 * @since 6.8.0
+	 *
+	 * @param string $color The CSS custom property string.
+	 * @return string|null The color slug, or null if not found.
+	 */
+	private static function get_slug_from_css_custom_property( $color ) {
+		// Try var(--wp--preset--color--slug) format.
+		if ( preg_match( '/^var\(--wp--preset--color--([a-zA-Z0-9_-]+)\)$/', $color, $matches ) ) {
+			return $matches[1];
+		}
+
+		// Try var:preset|color|slug format.
+		if ( preg_match( '/^var:preset\|color\|([a-zA-Z0-9_-]+)$/', $color, $matches ) ) {
+			return $matches[1];
+		}
+
+		return null;
+	}
+
+	/**
+	 * Resolve a CSS custom property to its actual color value.
+	 *
+	 * @since 6.8.0
+	 *
+	 * @param string $color The color value, possibly a CSS custom property.
+	 * @return string|null The resolved color value, or null if it couldn't be resolved.
+	 */
+	private static function resolve_css_custom_property( $color ) {
+		// If it's not a CSS custom property, return as-is.
+		if ( ! self::is_css_custom_property( $color ) ) {
+			return $color;
+		}
+
+		$slug = self::get_slug_from_css_custom_property( $color );
+
+		if ( null === $slug ) {
+			return null;
+		}
+
+		$palette = self::get_color_palette();
+
+		if ( isset( $palette[ $slug ] ) ) {
+			// Recursively resolve in case the palette color is also a variable.
+			return self::resolve_css_custom_property( $palette[ $slug ] );
+		}
+
+		return null;
+	}
+
+	/**
+	 * Resolve all CSS custom properties in an array of colors.
+	 *
+	 * @since 6.8.0
+	 *
+	 * @param array $colors Array of color values.
+	 * @return array Array of resolved color values.
+	 */
+	private static function resolve_duotone_colors( $colors ) {
+		if ( ! is_array( $colors ) ) {
+			return $colors;
+		}
+
+		$resolved_colors = array();
+
+		foreach ( $colors as $color ) {
+			$resolved = self::resolve_css_custom_property( $color );
+
+			if ( null !== $resolved ) {
+				$resolved_colors[] = $resolved;
+			} else {
+				// Log a warning if we couldn't resolve a CSS variable.
+				if ( self::is_css_custom_property( $color ) ) {
+					$error_message = sprintf(
+						/* translators: %s: CSS custom property */
+						__( 'Could not resolve CSS custom property "%s" in duotone colors. Make sure the color preset exists in your theme.json.', 'gutenberg' ),
+						$color
+					);
+					_doing_it_wrong( __METHOD__, $error_message, '6.8.0' );
+				}
+				// Include the original value if it's not a CSS variable.
+				$resolved_colors[] = $color;
+			}
+		}
+
+		return $resolved_colors;
+	}
+
+	/**
+	 * Check if any colors in the array are CSS custom properties.
+	 *
+	 * @since 6.8.0
+	 *
+	 * @param array $colors Array of color values.
+	 * @return bool True if any color is a CSS custom property.
+	 */
+	private static function has_css_custom_properties( $colors ) {
+		if ( ! is_array( $colors ) ) {
+			return false;
+		}
+
+		foreach ( $colors as $color ) {
+			if ( self::is_css_custom_property( $color ) ) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * =========================================================================
+	 * End of CSS Custom Property Resolution Methods
+	 * =========================================================================
+	 */
 
 	/**
 	 * Take the inline CSS duotone variable from a block and return the slug. Handles styles slugs like:
@@ -515,11 +749,16 @@ class WP_Duotone_Gutenberg {
 	/**
 	 * Gets the SVG for the duotone filter definition.
 	 *
+	 * MODIFIED: Now resolves CSS custom properties before generating the SVG.
+	 *
 	 * @param string $filter_id The ID of the filter.
 	 * @param array  $colors    An array of color strings.
 	 * @return string An SVG with a duotone filter definition.
 	 */
 	private static function get_filter_svg( $filter_id, $colors ) {
+		// Resolve any CSS custom properties in the colors array.
+		$resolved_colors = self::resolve_duotone_colors( $colors );
+
 		$duotone_values = array(
 			'r' => array(),
 			'g' => array(),
@@ -527,7 +766,7 @@ class WP_Duotone_Gutenberg {
 			'a' => array(),
 		);
 
-		foreach ( $colors as $color_str ) {
+		foreach ( $resolved_colors as $color_str ) {
 			$color = self::colord_parse( $color_str );
 
 			if ( null === $color ) {
@@ -768,9 +1007,14 @@ class WP_Duotone_Gutenberg {
 	 * Get all possible duotone presets from global and theme styles and store as slug => [ colors array ]
 	 * We only want to process this one time. On block render we'll access and output only the needed presets for that page.
 	 *
+	 * MODIFIED: Now validates and resolves CSS custom properties in duotone presets.
+	 *
 	 * @since 6.3.0
 	 */
 	public static function set_global_styles_presets() {
+		// Clear the color palette cache to ensure we have fresh data.
+		self::clear_color_palette_cache();
+
 		// Get the per block settings from the theme.json.
 		$tree              = gutenberg_get_global_settings();
 		$presets_by_origin = $tree['color']['duotone'] ?? array();
@@ -779,7 +1023,25 @@ class WP_Duotone_Gutenberg {
 			foreach ( $presets as $preset ) {
 				$filter_id = self::get_filter_id( _wp_to_kebab_case( $preset['slug'] ) );
 
+				// Store the preset with original colors (CSS variables will be resolved when generating SVG).
 				self::$global_styles_presets[ $filter_id ] = $preset;
+
+				// Validate that CSS custom properties can be resolved.
+				if ( isset( $preset['colors'] ) && is_array( $preset['colors'] ) ) {
+					if ( self::has_css_custom_properties( $preset['colors'] ) ) {
+						$resolved = self::resolve_duotone_colors( $preset['colors'] );
+
+						// Check if all colors could be resolved.
+						if ( count( $resolved ) !== count( $preset['colors'] ) ) {
+							$error_message = sprintf(
+								/* translators: %s: duotone preset slug */
+								__( 'Duotone preset "%s" contains CSS custom properties that could not be resolved. Make sure the referenced color presets exist in your theme.json.', 'gutenberg' ),
+								$preset['slug']
+							);
+							_doing_it_wrong( __METHOD__, $error_message, '6.8.0' );
+						}
+					}
+				}
 			}
 		}
 	}
@@ -994,11 +1256,47 @@ class WP_Duotone_Gutenberg {
 	}
 
 	/**
+	 * Resolves CSS custom properties in duotone presets for editor use.
+	 *
+	 * This should be called before sending duotone presets to the editor
+	 * so that SVG filters can be generated with actual color values.
+	 *
+	 * @since 6.8.0
+	 *
+	 * @param array $presets The duotone presets with possible CSS variables.
+	 * @return array The presets with CSS variables resolved to actual colors.
+	 */
+	private static function resolve_presets_for_editor( $presets ) {
+		$resolved_presets = array();
+
+		foreach ( $presets as $filter_id => $preset ) {
+			$resolved_preset = $preset;
+
+			if ( isset( $preset['colors'] ) && is_array( $preset['colors'] ) ) {
+				$resolved_colors = self::resolve_duotone_colors( $preset['colors'] );
+				// Only use resolved colors if we got valid results.
+				if ( ! empty( $resolved_colors ) && count( $resolved_colors ) === count( $preset['colors'] ) ) {
+					$resolved_preset['colors'] = $resolved_colors;
+				}
+			}
+
+			$resolved_presets[ $filter_id ] = $resolved_preset;
+		}
+
+		return $resolved_presets;
+	}
+
+	/**
 	 * Adds the duotone SVGs and CSS custom properties to the editor settings so
 	 * they can be pulled in by the EditorStyles component in JS and rendered in
 	 * the post editor.
 	 *
+	 * MODIFIED: Now resolves CSS custom properties when generating editor SVGs.
+	 * This ensures duotone previews render correctly in the editor even when
+	 * presets use CSS variables like var(--wp--preset--color--primary).
+	 *
 	 * @since 6.3.0
+	 * @since 6.8.0 Added CSS custom property resolution for editor previews.
 	 *
 	 * @param array $settings The block editor settings from the `block_editor_settings_all` filter.
 	 * @return array The editor settings with duotone SVGs and CSS custom properties.
@@ -1009,9 +1307,13 @@ class WP_Duotone_Gutenberg {
 				$settings['styles'] = array();
 			}
 
+			// Resolve CSS custom properties for the editor.
+			// The editor needs actual color values to generate SVG filter previews.
+			$resolved_presets = self::resolve_presets_for_editor( self::$global_styles_presets );
+
 			$settings['styles'][] = array(
-				// For the editor we can add all of the presets by default.
-				'assets'         => self::get_svg_definitions( self::$global_styles_presets ),
+				// For the editor we use resolved presets so SVG filters render correctly.
+				'assets'         => self::get_svg_definitions( $resolved_presets ),
 				// The 'svgs' type is new in 6.3 and requires the corresponding JS changes in the EditorStyles component to work.
 				'__unstableType' => 'svgs',
 				// These styles not generated by global styles, so this must be false or they will be stripped out in gutenberg_get_block_editor_settings.
@@ -1026,6 +1328,23 @@ class WP_Duotone_Gutenberg {
 				// These styles are no longer generated by global styles, so this must be false or they will be stripped out in gutenberg_get_block_editor_settings.
 				'isGlobalStyles' => false,
 			);
+
+			// Pass resolved duotone presets to the editor for the DuotonePicker UI.
+			// This enables color swatches and previews to display correctly.
+			$resolved_duotone_for_picker = array();
+			foreach ( $resolved_presets as $filter_id => $preset ) {
+				$resolved_duotone_for_picker[] = array(
+					'name'   => $preset['name'] ?? $preset['slug'],
+					'slug'   => $preset['slug'],
+					'colors' => $preset['colors'],
+				);
+			}
+
+			// Add resolved duotone to editor settings for JavaScript access.
+			if ( ! isset( $settings['duotone'] ) ) {
+				$settings['duotone'] = array();
+			}
+			$settings['duotone']['resolved'] = $resolved_duotone_for_picker;
 		}
 
 		return $settings;
