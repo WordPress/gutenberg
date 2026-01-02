@@ -36,3 +36,13 @@ function block_core_paragraph_add_class( $block_content ) {
 }
 
 add_filter( 'render_block_core/paragraph', 'block_core_paragraph_add_class' );
+
+/**
+ * Registers the `core/paragraph` block on server.
+ *
+ * @since 7.0.0
+ */
+function register_block_core_paragraph() {
+	register_block_type_from_metadata( __DIR__ . '/paragraph' );
+}
+add_action( 'init', 'register_block_core_paragraph' );
