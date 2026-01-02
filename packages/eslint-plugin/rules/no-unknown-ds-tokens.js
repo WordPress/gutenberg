@@ -20,7 +20,7 @@ const DS_TOKEN_PREFIX = 'wpds-';
  * // → Set { '--wpds-border-color', '--wpds-border-fallback', '--wpds-color-fg' }
  */
 function extractCSSVariables( value, prefix = '' ) {
-	const regex = /--[\w-]+/gm;
+	const regex = /--[\w-]+/g;
 	const variables = new Set();
 
 	let match;
@@ -35,7 +35,7 @@ function extractCSSVariables( value, prefix = '' ) {
 }
 
 const knownTokens = new Set( tokenList );
-const wpdsTokensRegex = new RegExp( `[^\w]--${ DS_TOKEN_PREFIX }`, 'i' );
+const wpdsTokensRegex = new RegExp( `[^\\w]--${ DS_TOKEN_PREFIX }`, 'i' );
 
 module.exports = /** @type {import('eslint').Rule.RuleModule} */ ( {
 	meta: {
