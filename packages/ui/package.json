@@ -51,7 +51,6 @@
 	},
 	"devDependencies": {
 		"@storybook/addon-docs": "9.1.17",
-		"@storybook/react": "9.1.17",
 		"@testing-library/jest-dom": "6.6.3",
 		"@types/jest": "29.5.14",
 		"@types/node": "20.17.10",

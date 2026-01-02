@@ -102,7 +102,6 @@
 	"devDependencies": {
 		"@ariakit/test": "^0.4.7",
 		"@storybook/addon-docs": "9.1.17",
-		"@storybook/react": "9.1.17",
 		"@testing-library/jest-dom": "6.6.3",
 		"@types/gradient-parser": "1.1.0",
 		"@types/highlight-words-core": "1.2.1",
