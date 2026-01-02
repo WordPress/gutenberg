@@ -113,7 +113,7 @@ export default function BreadcrumbEdit( {
 	const disabledRef = useDisabled();
 	const blockProps = useBlockProps( {
 		ref: disabledRef,
-		style: { '--separator': `'${ separator }'` },
+		style: { '--separator': `"${ separator.replace( /"/g, '\\"' ) }"` },
 	} );
 
 	if ( isLoading ) {
