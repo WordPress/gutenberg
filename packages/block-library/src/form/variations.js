@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { SVG, Path } from '@wordpress/primitives';
 
 /**
  * Internal dependencies
@@ -11,8 +10,6 @@ import {
 	formSubmissionNotificationSuccess,
 	formSubmissionNotificationError,
 } from './utils.js';
-
-import { icon } from '../form-input/icons.js';
 
 const variations = [
 	{
@@ -32,7 +29,6 @@ const variations = [
 				{
 					type: 'text',
 					name: 'author',
-					icon,
 					label: __( 'Name' ),
 					required: true,
 					visibilityPermissions: 'logged-out',
@@ -43,7 +39,6 @@ const variations = [
 				{
 					type: 'email',
 					name: 'email',
-					icon,
 					label: __( 'Email' ),
 					required: true,
 					visibilityPermissions: 'logged-out',
@@ -54,7 +49,6 @@ const variations = [
 				{
 					type: 'textarea',
 					name: 'comment',
-					icon,
 					label: __( 'Comment' ),
 					required: true,
 					visibilityPermissions: 'all',
@@ -94,7 +88,6 @@ const variations = [
 				{
 					type: 'email',
 					name: 'email',
-					icon,
 					label: __( 'Enter your email address.' ),
 					required: true,
 					visibilityPermissions: 'all',
@@ -105,7 +98,6 @@ const variations = [
 				{
 					type: 'checkbox',
 					name: 'export_personal_data',
-					icon,
 					label: __( 'Request data export' ),
 					required: false,
 					visibilityPermissions: 'all',
@@ -116,7 +108,6 @@ const variations = [
 				{
 					type: 'checkbox',
 					name: 'remove_personal_data',
-					icon,
 					label: __( 'Request data deletion' ),
 					required: false,
 					visibilityPermissions: 'all',
@@ -128,7 +119,6 @@ const variations = [
 				{
 					type: 'hidden',
 					name: 'wp-action',
-					icon,
 					value: 'wp_privacy_send_request',
 				},
 			],
@@ -137,7 +127,6 @@ const variations = [
 				{
 					type: 'hidden',
 					name: 'wp-privacy-request',
-					icon,
 					value: '1',
 				},
 			],
