@@ -463,12 +463,6 @@ class WP_Duotone_Gutenberg {
 	}
 
 	/**
-	 * =========================================================================
-	 * NEW: CSS Custom Property Resolution Methods
-	 * =========================================================================
-	 */
-
-	/**
 	 * Get the flattened color palette from global settings.
 	 *
 	 * This retrieves all color presets from default, theme, and custom origins
@@ -670,12 +664,6 @@ class WP_Duotone_Gutenberg {
 
 		return false;
 	}
-
-	/**
-	 * =========================================================================
-	 * End of CSS Custom Property Resolution Methods
-	 * =========================================================================
-	 */
 
 	/**
 	 * Take the inline CSS duotone variable from a block and return the slug. Handles styles slugs like:
@@ -1291,10 +1279,6 @@ class WP_Duotone_Gutenberg {
 	 * they can be pulled in by the EditorStyles component in JS and rendered in
 	 * the post editor.
 	 *
-	 * MODIFIED: Now resolves CSS custom properties when generating editor SVGs.
-	 * This ensures duotone previews render correctly in the editor even when
-	 * presets use CSS variables like var(--wp--preset--color--primary).
-	 *
 	 * @since 6.3.0
 	 * @since 6.8.0 Added CSS custom property resolution for editor previews.
 	 *
@@ -1332,7 +1316,7 @@ class WP_Duotone_Gutenberg {
 			// Pass resolved duotone presets to the editor for the DuotonePicker UI.
 			// This enables color swatches and previews to display correctly.
 			$resolved_duotone_for_picker = array();
-			foreach ( $resolved_presets as $filter_id => $preset ) {
+			foreach ( $resolved_presets as $preset ) {
 				$resolved_duotone_for_picker[] = array(
 					'name'   => $preset['name'] ?? $preset['slug'],
 					'slug'   => $preset['slug'],
