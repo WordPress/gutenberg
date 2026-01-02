@@ -7,6 +7,11 @@
 -   Updated recommended ruleset to enforce [`import/no-unresolved`](https://github.com/import-js/eslint-plugin-import/blob/main/docs/rules/no-unresolved.md) for `@wordpress/` packages. These packages were previously exempted from the rule. ([#72978](https://github.com/WordPress/gutenberg/pull/72978))
 -   Removed default configuration of [`import/internal-regex`](https://github.com/import-js/eslint-plugin-import/tree/main?tab=readme-ov-file#importinternal-regex) to classify `@wordpress/` packages as internal. From the perspective of an external consumer of this package, `@wordpress/` packages should be considered external. ([#72978](https://github.com/WordPress/gutenberg/pull/72978))
 
+### New Features
+
+-   Added [`no-setting-ds-tokens`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/eslint-plugin/docs/rules/no-setting-ds-tokens.md) rule to disallow setting Design System token CSS custom properties (`--wpds-*`). ([#74325](https://github.com/WordPress/gutenberg/pull/74325))
+-   Added [`no-unknown-ds-tokens`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/eslint-plugin/docs/rules/no-unknown-ds-tokens.md) rule to disallow unknown Design System tokens. ([#74325](https://github.com/WordPress/gutenberg/pull/74325))
+
 ### Enhancements
 
 - The `dependency-group` rule is not recommended anymore. ([#73616](https://github.com/WordPress/gutenberg/pull/73616))
