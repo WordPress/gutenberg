@@ -7,6 +7,7 @@ import metadata from './block.json';
 import save from './save';
 import variations from './variations';
 import deprecated from './deprecated';
+import { icon }	from './icons';
 
 /**
  * WordPress dependencies
@@ -18,6 +19,7 @@ const { name } = metadata;
 export { metadata, name };
 
 export const settings = {
+	icon,
 	edit,
 	save,
 	deprecated,

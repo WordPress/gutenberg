@@ -12,13 +12,11 @@ import {
 	formSubmissionNotificationError,
 } from './utils.js';
 
-import { formIcon } from './icons.js';
-import { formInputIcon } from '../form-input/icons.js';
+import { icon } from '../form-input/icons.js';
 
 const variations = [
 	{
 		name: 'comment-form',
-		icon: formIcon,
 		title: __( 'Experimental Comment form' ),
 		description: __( 'A comment form for posts and pages.' ),
 		attributes: {
@@ -34,7 +32,7 @@ const variations = [
 				{
 					type: 'text',
 					name: 'author',
-					icon: formInputIcon,
+					icon,
 					label: __( 'Name' ),
 					required: true,
 					visibilityPermissions: 'logged-out',
@@ -45,7 +43,7 @@ const variations = [
 				{
 					type: 'email',
 					name: 'email',
-					icon: formInputIcon,
+					icon,
 					label: __( 'Email' ),
 					required: true,
 					visibilityPermissions: 'logged-out',
@@ -56,7 +54,7 @@ const variations = [
 				{
 					type: 'textarea',
 					name: 'comment',
-					icon: formInputIcon,
+					icon,
 					label: __( 'Comment' ),
 					required: true,
 					visibilityPermissions: 'all',
@@ -71,7 +69,6 @@ const variations = [
 	{
 		name: 'wp-privacy-form',
 		title: __( 'Experimental Privacy Request Form' ),
-		icon: formIcon,
 		keywords: [ 'GDPR' ],
 		description: __( 'A form to request data exports and/or deletion.' ),
 		attributes: {
@@ -97,7 +94,7 @@ const variations = [
 				{
 					type: 'email',
 					name: 'email',
-					icon: formInputIcon,
+					icon,
 					label: __( 'Enter your email address.' ),
 					required: true,
 					visibilityPermissions: 'all',
@@ -108,7 +105,7 @@ const variations = [
 				{
 					type: 'checkbox',
 					name: 'export_personal_data',
-					icon: formInputIcon,
+					icon,
 					label: __( 'Request data export' ),
 					required: false,
 					visibilityPermissions: 'all',
@@ -119,7 +116,7 @@ const variations = [
 				{
 					type: 'checkbox',
 					name: 'remove_personal_data',
-					icon: formInputIcon,
+					icon,
 					label: __( 'Request data deletion' ),
 					required: false,
 					visibilityPermissions: 'all',
@@ -131,7 +128,7 @@ const variations = [
 				{
 					type: 'hidden',
 					name: 'wp-action',
-					icon: formInputIcon,
+					icon,
 					value: 'wp_privacy_send_request',
 				},
 			],
@@ -140,7 +137,7 @@ const variations = [
 				{
 					type: 'hidden',
 					name: 'wp-privacy-request',
-					icon: formInputIcon,
+					icon,
 					value: '1',
 				},
 			],
