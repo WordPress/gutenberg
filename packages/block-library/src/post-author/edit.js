@@ -36,7 +36,7 @@ import { store as blocksStore } from '@wordpress/blocks';
 /**
  * Internal dependencies
  */
-import { migrateToRecommendedBlocks } from './utils';
+import { recreateWithRecommendedBlocks } from './utils';
 import {
 	useDefaultAvatar,
 	useToolsPanelDropdownMenuProps,
@@ -213,7 +213,7 @@ function PostAuthorEdit( {
 	function transformBlock() {
 		replaceBlock(
 			clientId,
-			migrateToRecommendedBlocks( attributes, blockTypes )
+			recreateWithRecommendedBlocks( attributes, blockTypes )
 		);
 	}
 
@@ -343,7 +343,7 @@ function PostAuthorEdit( {
 					>
 						<Text as="p">
 							{ __(
-								'This block is no longer supported. Please migrate to the Author Name, Avatar, and Biography blocks to design your content as needed.'
+								'This block is no longer supported. Recreate its design with the Avatar, Author Name and Author Biography blocks.'
 							) }
 						</Text>
 						<Button
@@ -351,7 +351,7 @@ function PostAuthorEdit( {
 							onClick={ transformBlock }
 							__next40pxDefaultSize
 						>
-							{ __( 'Migrate' ) }
+							{ __( 'Recreate' ) }
 						</Button>
 					</VStack>
 				</InspectorControlsLastItem>

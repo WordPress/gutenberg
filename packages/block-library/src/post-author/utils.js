@@ -19,7 +19,7 @@ const { cleanEmptyObject } = unlock( blockEditorPrivateApis );
  * @param {Object} blockTypes Block types.
  * @return {Object} Generated block.
  */
-export function migrateToRecommendedBlocks( attributes, blockTypes ) {
+export function recreateWithRecommendedBlocks( attributes, blockTypes ) {
 	const {
 		avatarSize,
 		byline,
