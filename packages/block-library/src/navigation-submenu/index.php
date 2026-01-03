@@ -142,7 +142,7 @@ function render_block_core_navigation_submenu( $attributes, $content, $block ) {
 	// If Submenus open on hover, we render an anchor tag with attributes.
 	// If submenu icons are set to show, we also render a submenu button, so the submenu can be opened on click.
 	if ( ! $open_on_click ) {
-		$item_url = isset( $attributes['url'] ) ? $attributes['url'] : '';
+		$item_url = $attributes['url'] ?? '';
 		// Start appending HTML attributes to anchor tag.
 		$html .= '<a class="wp-block-navigation-item__content"';
 

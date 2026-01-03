@@ -557,7 +557,7 @@ function gutenberg_set_active_template_theme( $changes, $request ) {
 		return $changes;
 	}
 	$changes->tax_input = array(
-		'wp_theme' => isset( $request['theme'] ) ? $request['theme'] : get_stylesheet(),
+		'wp_theme' => $request['theme'] ?? get_stylesheet(),
 	);
 	// All new templates saved will receive meta so we can distinguish between
 	// templates created the old way as edits and templates created the new way.
@@ -684,7 +684,7 @@ function gutenberg_get_block_templates( $output, $query = array(), $template_typ
 		return $output;
 	}
 
-	$post_type     = isset( $query['post_type'] ) ? $query['post_type'] : '';
+	$post_type     = $query['post_type'] ?? '';
 	$wp_query_args = array(
 		'post_status'         => array( 'auto-draft', 'draft', 'publish' ),
 		'post_type'           => $template_type,

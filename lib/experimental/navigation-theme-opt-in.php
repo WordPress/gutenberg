@@ -217,9 +217,7 @@ function gutenberg_convert_menu_items_to_blocks(
 		}
 
 		$block['innerBlocks'] = gutenberg_convert_menu_items_to_blocks(
-			isset( $menu_items_by_parent_id[ $menu_item->ID ] )
-					? $menu_items_by_parent_id[ $menu_item->ID ]
-					: array(),
+			$menu_items_by_parent_id[ $menu_item->ID ] ?? array(),
 			$menu_items_by_parent_id
 		);
 
@@ -316,9 +314,7 @@ function gutenberg_output_block_nav_menu( $output, $args ) {
 		'blockName'   => 'core/navigation',
 		'attrs'       => $block_attributes,
 		'innerBlocks' => gutenberg_convert_menu_items_to_blocks(
-			isset( $menu_items_by_parent_id[0] )
-				? $menu_items_by_parent_id[0]
-				: array(),
+			$menu_items_by_parent_id[0] ?? array(),
 			$menu_items_by_parent_id
 		),
 	);

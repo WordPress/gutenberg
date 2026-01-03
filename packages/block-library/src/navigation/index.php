@@ -446,7 +446,7 @@ class WP_Navigation_Block_Renderer {
 	private static function get_styles( $attributes ) {
 		$colors       = block_core_navigation_build_css_colors( $attributes );
 		$font_sizes   = block_core_navigation_build_css_font_sizes( $attributes );
-		$block_styles = isset( $attributes['styles'] ) ? $attributes['styles'] : '';
+		$block_styles = $attributes['styles'] ?? '';
 		return $block_styles . $colors['inline_styles'] . $font_sizes['inline_styles'];
 	}
 
@@ -1347,9 +1347,7 @@ function block_core_navigation_get_classic_menu_fallback_blocks( $classic_nav_me
 	}
 
 	$inner_blocks = block_core_navigation_parse_blocks_from_menu_items(
-		isset( $menu_items_by_parent_id[0] )
-			? $menu_items_by_parent_id[0]
-			: array(),
+		$menu_items_by_parent_id[0] ?? array(),
 		$menu_items_by_parent_id
 	);
 

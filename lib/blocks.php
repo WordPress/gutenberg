@@ -63,8 +63,8 @@ add_action( 'init', 'gutenberg_reregister_core_block_types' );
  *                 $script_handle,
  *                 $script_uri,
  *                 $script_dependencies,
- * -           isset( $script_asset['version'] ) ? $script_asset['version'] : false
- * +         isset( $script_asset['version'] ) ? $script_asset['version'] : false,
+ * -           $script_asset['version'] ?? false
+ * +         $script_asset['version'] ?? false,
  * +         array( 'strategy' => 'defer' )
  *         );
  *         if ( ! $result ) {
