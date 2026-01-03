@@ -210,7 +210,7 @@ div.dataviews-view-list {
 	&.has-compact-density {
 		div[role="row"] {
 			.dataviews-view-list__item-wrapper {
-				padding: $grid-unit-10 $grid-unit-20;
+				padding: $grid-unit-10 $grid-unit-30;
 			}
 
 			.dataviews-view-list__title-field {
@@ -242,7 +242,7 @@ div.dataviews-view-list {
 	&.has-comfortable-density {
 		div[role="row"] {
 			.dataviews-view-list__item-wrapper {
-				padding: $grid-unit-30 $grid-unit-40;
+				padding: $grid-unit-30 $grid-unit-30;
 			}
 
 			.dataviews-view-list__title-field {
