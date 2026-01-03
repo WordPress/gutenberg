@@ -156,4 +156,10 @@ export interface MediaEditProps< Item >
 	 * @default false
 	 */
 	multiple?: boolean;
+	/**
+	 * Whether to render in a compact form.
+	 *
+	 * @default true
+	 */
+	isCompact?: boolean;
 }
