@@ -343,7 +343,7 @@ function PostAuthorEdit( {
 					>
 						<Text as="p">
 							{ __(
-								'This block is no longer supported. Please migrate to the Author Name, Avatar, and Biography blocks to design youor content as needed.'
+								'This block is no longer supported. Please migrate to the Author Name, Avatar, and Biography blocks to design your content as needed.'
 							) }
 						</Text>
 						<Button
