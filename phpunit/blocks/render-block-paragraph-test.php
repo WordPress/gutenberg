@@ -16,7 +16,7 @@ class Render_Block_Paragraph_Test extends WP_UnitTestCase {
 
 	/**
 	 * @covers ::gutenberg_block_core_paragraph_render
-	 * @dataProvider add_css_class_test_examples
+	 * @dataProvider data_css_class_examples
 	 */
 	public function test_block_core_paragraph_render_appends_css_class_to_a_vanilla_element( $input, $expected_result ) {
 		$parsed_blocks = parse_blocks( '<!-- wp:paragraph -->' . $input . '<!-- /wp:paragraph -->' );
@@ -25,7 +25,7 @@ class Render_Block_Paragraph_Test extends WP_UnitTestCase {
 		$this->assertEquals( $expected_result, $actual );
 	}
 
-	public function add_css_class_test_examples() {
+	public function data_css_class_examples() {
 		return array(
 			'should add a class name to a vanilla p element' => array(
 				'<p>Hello World</p>',
