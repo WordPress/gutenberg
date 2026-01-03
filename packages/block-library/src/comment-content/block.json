@@ -8,11 +8,6 @@
 	"description": "Displays the contents of a comment.",
 	"textdomain": "default",
 	"usesContext": [ "commentId" ],
-	"attributes": {
-		"textAlign": {
-			"type": "string"
-		}
-	},
 	"supports": {
 		"anchor": true,
 		"color": {
@@ -26,6 +21,7 @@
 		"typography": {
 			"fontSize": true,
 			"lineHeight": true,
+			"textAlign": true,
 			"__experimentalFontFamily": true,
 			"__experimentalFontWeight": true,
 			"__experimentalFontStyle": true,

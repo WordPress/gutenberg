@@ -1,7 +1,12 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryFn } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react-webpack5';
+
+/**
+ * WordPress dependencies
+ */
+import { wordpress } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -11,16 +16,10 @@ import PanelRow from '../row';
 import PanelBody from '../body';
 import InputControl from '../../input-control';
 
-/**
- * WordPress dependencies
- */
-import { wordpress } from '@wordpress/icons';
-
 const meta: Meta< typeof Panel > = {
 	title: 'Components/Containers/Panel',
 	id: 'components-panel',
 	component: Panel,
-	// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 	subcomponents: { PanelRow, PanelBody },
 	argTypes: {
 		children: { control: false },

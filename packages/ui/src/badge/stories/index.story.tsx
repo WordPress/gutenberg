@@ -1,13 +1,12 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react-webpack5';
 
 /**
  * WordPress dependencies
  */
 import { Fragment } from '@wordpress/element';
-import '@wordpress/theme/design-tokens.css';
 
 /**
  * Internal dependencies

@@ -34,8 +34,6 @@ const stories = [
 	'../packages/components/src/**/stories/*.story.@(jsx|tsx)',
 	'../packages/components/src/**/stories/*.mdx',
 	'../packages/icons/src/**/stories/*.story.@(js|tsx|mdx)',
-	'../packages/edit-site/src/**/stories/*.story.@(js|tsx|mdx)',
-	'../packages/global-styles-ui/src/**/stories/*.story.@(js|tsx|mdx)',
 	'../packages/dataviews/src/**/stories/*.story.@(js|tsx|mdx)',
 	'../packages/fields/src/**/stories/*.story.@(js|tsx|mdx)',
 	'../packages/image-cropper/src/**/stories/*.story.@(js|tsx|mdx)',
@@ -56,15 +54,10 @@ module.exports = {
 			name: '@storybook/addon-docs',
 			options: { configureJSX: true },
 		},
-		'@storybook/addon-controls',
-		'@storybook/addon-viewport',
 		'@storybook/addon-a11y',
-		'@storybook/addon-toolbars',
-		'@storybook/addon-actions',
-		'@storybook/addon-interactions',
 		'@storybook/addon-webpack5-compiler-babel',
-		'storybook-source-link',
-		'@geometricpanda/storybook-addon-badges',
+		'storybook-addon-source-link',
+		'storybook-addon-tag-badges',
 		'./addons/design-system-theme/register',
 	],
 	framework: {
@@ -74,6 +67,24 @@ module.exports = {
 	docs: {},
 	typescript: {
 		reactDocgen: 'react-docgen-typescript',
+		// Should match defaults in Storybook except for the propFilter.
+		// https://github.com/storybookjs/storybook/blob/3e34a288c8fabc7d5b5cc43b28ae9d674c48e3ea/code/core/src/core-server/presets/common-preset.ts#L162-L168
+		reactDocgenTypescriptOptions: {
+			shouldExtractLiteralValuesFromEnum: true,
+			shouldRemoveUndefinedFromOptional: true,
+			propFilter: ( prop ) => {
+				if ( ! prop.parent ) {
+					return true;
+				}
+
+				if ( /@base-ui|@ariakit/.test( prop.parent.fileName ) ) {
+					return true;
+				}
+
+				return ! /node_modules/.test( prop.parent.fileName );
+			},
+			savePropValueAsString: true,
+		},
 	},
 	webpackFinal: async ( config ) => {
 		// Find the `babel-loader` rule added by `@storybook/addon-webpack5-compiler-babel`
@@ -107,26 +118,6 @@ module.exports = {
 					{
 						test: /\.md$/,
 						type: 'asset/source',
-					},
-					{
-						test: /\/stories\/.+\.story\.(j|t)sx?$/,
-						use: [
-							{
-								// Adds a `sourceLink` parameter to the story metadata, based on the file path
-								loader: path.resolve(
-									__dirname,
-									'./webpack/source-link-loader.js'
-								),
-							},
-							{
-								// Reads `tags` from the story metadata and copies them to `badges`
-								loader: path.resolve(
-									__dirname,
-									'./webpack/copy-tags-to-badges.js'
-								),
-							},
-						],
-						enforce: 'post',
 					},
 					{
 						test: /\.scss$/,
