@@ -17,6 +17,9 @@ class Render_Block_Paragraph_Test extends WP_UnitTestCase {
 	/**
 	 * @covers ::gutenberg_block_core_paragraph_render
 	 * @dataProvider data_css_class_examples
+	 *
+	 * @param string $input           The input HTML.
+	 * @param string $expected_result The expected result HTML.
 	 */
 	public function test_block_core_paragraph_render_appends_css_class_to_a_vanilla_element( $input, $expected_result ) {
 		$parsed_blocks = parse_blocks( '<!-- wp:paragraph -->' . $input . '<!-- /wp:paragraph -->' );
