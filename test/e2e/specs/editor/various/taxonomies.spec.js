@@ -89,6 +89,13 @@ test.describe( 'Taxonomies', () => {
 			.getByRole( 'textbox', { name: 'Add title' } )
 			.fill( 'Hello World' );
 		await editor.publishPost();
+
+		// Wait for the tag to be saved via API before reloading
+		await page.waitForResponse(
+			( response ) =>
+				response.url().includes( '/wp/v2/tags' ) &&
+				response.status() === 201
+		);
 		await page.reload();
 
 		await expect( tags ).toHaveCount( 1 );
@@ -124,6 +131,12 @@ test.describe( 'Taxonomies', () => {
 			.getByRole( 'textbox', { name: 'Add title' } )
 			.fill( 'Hello World' );
 		await editor.publishPost();
+
+		await page.waitForResponse(
+			( response ) =>
+				response.url().includes( '/wp/v2/tags' ) &&
+				response.status() === 201
+		);
 		await page.reload();
 
 		await expect( tags ).toHaveCount( 1 );
