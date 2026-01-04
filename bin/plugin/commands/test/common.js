@@ -61,16 +61,31 @@ describe( 'calculateVersionBumpFromChangelog', () => {
 
 	it( 'should return major version bump when breaking changes detected', () => {
 		expect(
-			calculateVersionBumpFromChangelog(
-				[
-					'First line',
-					'## Unreleased',
-					'### Breaking Changes',
-					'  - new item added',
-					'Fifth line',
-				],
-				'major'
-			)
+			calculateVersionBumpFromChangelog( [
+				'First line',
+				'## Unreleased',
+				'### Breaking Changes',
+				'  - new item added',
+				'Fifth line',
+			] )
 		).toBe( 'major' );
+	} );
+
+	describe( 'prerelease versions', () => {
+		it( 'should not bump the major even if breaking changes detected', () => {
+			expect(
+				calculateVersionBumpFromChangelog(
+					[
+						'First line',
+						'## Unreleased',
+						'### Breaking Changes',
+						'  - new item added',
+						'Fifth line',
+					],
+					'patch',
+					'0.1.0'
+				)
+			).toBe( 'minor' );
+		} );
 	} );
 } );

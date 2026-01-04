@@ -1,13 +1,14 @@
 /**
  * External dependencies
  */
-const { command } = require( 'execa' );
 const path = require( 'path' );
-const glob = require( 'fast-glob' );
 const fs = require( 'fs' );
+const readline = require( 'readline' );
+const { join } = require( 'path' );
+const { command } = require( 'execa' );
+const glob = require( 'fast-glob' );
 const { inc: semverInc } = require( 'semver' );
 const { rimraf } = require( 'rimraf' );
-const readline = require( 'readline' );
 const SimpleGit = require( 'simple-git' );
 
 /**
@@ -24,7 +25,6 @@ const {
 	calculateVersionBumpFromChangelog,
 	findPluginReleaseBranchName,
 } = require( './common' );
-const { join } = require( 'path' );
 const pluginConfig = require( '../config' );
 
 /**
@@ -196,9 +196,15 @@ async function updatePackages( config ) {
 				lines.push( line );
 			}
 
+			const packageJSONPath = changelogPath.replace(
+				'CHANGELOG.md',
+				'package.json'
+			);
+			const { version } = readJSONFile( packageJSONPath );
 			let versionBump = calculateVersionBumpFromChangelog(
 				lines,
-				minimumVersionBump
+				minimumVersionBump,
+				version
 			);
 			const packageName = `@wordpress/${
 				changelogPath.split( '/' ).reverse()[ 1 ]
@@ -212,11 +218,6 @@ async function updatePackages( config ) {
 			) {
 				versionBump = minimumVersionBump;
 			}
-			const packageJSONPath = changelogPath.replace(
-				'CHANGELOG.md',
-				'package.json'
-			);
-			const { version } = readJSONFile( packageJSONPath );
 			const nextVersion =
 				versionBump !== null ? semverInc( version, versionBump ) : null;
 

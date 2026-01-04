@@ -1,4 +1,4 @@
-@import "~@wordpress/base-styles/variables";
+@use "@wordpress/base-styles/variables" as *;
 
 body {
 	font-family: $default-font;

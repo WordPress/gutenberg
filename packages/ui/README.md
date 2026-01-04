@@ -16,6 +16,24 @@ This is a companion to the `@wordpress/theme` package that provides:
 -   **Design Tokens**: A comprehensive system of design tokens for colors, spacing, typography, and more
 -   **Theme System**: A flexible theming provider for consistent theming across applications
 
+## Installation
+
+Install using NPM:
+
+```
+npm install @wordpress/ui
+```
+
+As an implementation of the design system and companion to the `@wordpress/theme` package, these components depend on CSS custom properties defined by the theme package. This is managed on your behalf in a WordPress admin page context, but you will need to install and include the base theme stylesheet yourself if you're using the components in an application outside WordPress:
+
+```
+npm install @wordpress/theme
+```
+
+```tsx
+import '@wordpress/theme/design-tokens.css';
+```
+
 ## Usage
 
 ### Basic Component Usage

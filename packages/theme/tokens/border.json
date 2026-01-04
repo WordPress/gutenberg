@@ -19,25 +19,40 @@
 					"$value": { "value": 8, "unit": "px" },
 					"$description": "Large radius for surfaces"
 				}
+			},
+			"$extensions": {
+				"com.figma.scopes": [ "CORNER_RADIUS" ]
 			}
 		},
 		"width": {
 			"surface": {
 				"xs": {
 					"$value": { "value": 1, "unit": "px" },
-					"$description": "Extra small width for surfaces"
+					"$description": "Extra small width for surfaces",
+					"$extensions": {
+						"com.figma.scopes": [ "STROKE_FLOAT" ]
+					}
 				},
 				"sm": {
 					"$value": { "value": 2, "unit": "px" },
-					"$description": "Small width for surfaces"
+					"$description": "Small width for surfaces",
+					"$extensions": {
+						"com.figma.scopes": [ "STROKE_FLOAT" ]
+					}
 				},
 				"md": {
 					"$value": { "value": 4, "unit": "px" },
-					"$description": "Medium width for surfaces"
+					"$description": "Medium width for surfaces",
+					"$extensions": {
+						"com.figma.scopes": [ "STROKE_FLOAT" ]
+					}
 				},
 				"lg": {
 					"$value": { "value": 8, "unit": "px" },
-					"$description": "Large width for surfaces"
+					"$description": "Large width for surfaces",
+					"$extensions": {
+						"com.figma.scopes": [ "STROKE_FLOAT" ]
+					}
 				}
 			},
 			"interactive": {
@@ -47,7 +62,8 @@
 					"$extensions": {
 						"mode": {
 							"high-dpi": { "value": 1.5, "unit": "px" }
-						}
+						},
+						"com.figma.scopes": [ "STROKE_FLOAT" ]
 					}
 				}
 			}

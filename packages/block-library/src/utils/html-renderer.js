@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import clsx from 'clsx';
 import parse, { attributesToProps, domToReact } from 'html-react-parser';
 
 /**
@@ -26,6 +27,10 @@ const HtmlRenderer = ( { wrapperProps = {}, html = '' } ) => {
 					const mergedProps = {
 						...parsedProps,
 						...wrapperProps,
+						className: clsx(
+							parsedProps.className,
+							wrapperProps.className
+						),
 					};
 					return (
 						<TagName { ...mergedProps }>

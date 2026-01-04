@@ -7,12 +7,18 @@ import memoize from 'memize';
  * WordPress dependencies
  */
 import { calendar as icon } from '@wordpress/icons';
-import { Disabled, Placeholder, Spinner } from '@wordpress/components';
+import { Placeholder, Spinner } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
-import ServerSideRender from '@wordpress/server-side-render';
+import { useServerSideRender } from '@wordpress/server-side-render';
 import { useBlockProps } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
+import { useDisabled } from '@wordpress/compose';
+
+/**
+ * Internal dependencies
+ */
+import HtmlRenderer from '../utils/html-renderer';
 
 /**
  * Returns the year and month of a specified date.
@@ -33,8 +39,7 @@ const getYearMonth = memoize( ( date ) => {
 	};
 } );
 
-export default function CalendarEdit( { attributes } ) {
-	const blockProps = useBlockProps();
+export default function CalendarEdit( { attributes, name } ) {
 	const { date, hasPosts, hasPostsResolved } = useSelect( ( select ) => {
 		const { getEntityRecords, hasFinishedResolution } = select( coreStore );
 
@@ -76,6 +81,17 @@ export default function CalendarEdit( { attributes } ) {
 		};
 	}, [] );
 
+	const { content, status, error } = useServerSideRender( {
+		attributes: {
+			...attributes,
+			...getYearMonth( date ),
+		},
+		block: name,
+	} );
+
+	const disabledRef = useDisabled();
+	const blockProps = useBlockProps( { ref: disabledRef } );
+
 	if ( ! hasPosts ) {
 		return (
 			<div { ...blockProps }>
@@ -91,13 +107,26 @@ export default function CalendarEdit( { attributes } ) {
 	}
 
 	return (
-		<div { ...blockProps }>
-			<Disabled>
-				<ServerSideRender
-					block="core/calendar"
-					attributes={ { ...attributes, ...getYearMonth( date ) } }
-				/>
-			</Disabled>
-		</div>
+		<>
+			{ status === 'loading' && (
+				<div { ...blockProps }>
+					<Spinner />
+				</div>
+			) }
+			{ status === 'error' && (
+				<div { ...blockProps }>
+					<p>
+						{ sprintf(
+							/* translators: %s: error message returned when rendering the block. */
+							__( 'Error: %s' ),
+							error
+						) }
+					</p>
+				</div>
+			) }
+			{ status === 'success' && (
+				<HtmlRenderer wrapperProps={ blockProps } html={ content } />
+			) }
+		</>
 	);
 }

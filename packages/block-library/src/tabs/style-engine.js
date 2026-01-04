@@ -96,6 +96,39 @@ function getColorStyles( { attributes } ) {
 }
 
 /**
+ * Gets the border styles for the tab block.
+ *
+ * @param {Object} props
+ * @param {Object} props.attributes Block attributes
+ * @return {Object} CSS custom properties for border styles
+ */
+function getBorderStyles( { attributes } ) {
+	const { radius } = attributes?.style?.border || {};
+
+	if ( ! radius ) {
+		return {};
+	}
+
+	let radiusValue = radius;
+
+	if ( typeof radius === 'object' ) {
+		const {
+			topLeft = '0',
+			topRight = '0',
+			bottomRight = '0',
+			bottomLeft = '0',
+		} = radius;
+		radiusValue = `${ topLeft } ${ topRight } ${ bottomRight } ${ bottomLeft }`;
+	}
+
+	const borderMap = {
+		'--tab-border-radius': radiusValue,
+	};
+
+	return borderMap;
+}
+
+/**
  * Injects color CSS custom properties for the tabs block, mirroring the pattern
  * used by gap-styles (scoped to `#block-{ clientId }`). This replaces the prior
  * inline-style object return value approach so that these values participate in
@@ -109,10 +142,12 @@ function getColorStyles( { attributes } ) {
 export default function StyleEngine( { attributes, clientId } ) {
 	const gapVarMap = getGapStyles( { attributes } );
 	const colorVarMap = getColorStyles( { attributes } );
+	const borderVarMap = getBorderStyles( { attributes } );
 
 	const styleVarMap = {
 		...gapVarMap,
 		...colorVarMap,
+		...borderVarMap,
 	};
 
 	// Build scoped CSS only for defined values to avoid unnecessary empty declarations.
