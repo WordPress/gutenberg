@@ -15,7 +15,6 @@ class Render_Block_Paragraph_Test extends WP_UnitTestCase {
 
 
 	/**
-	 * @covers ::gutenberg_block_core_paragraph_render
 	 * @dataProvider data_css_class_examples
 	 *
 	 * @param string $input           The input HTML.
