@@ -735,7 +735,7 @@ class WP_Navigation_Block_Renderer {
 		
 		if ( $has_custom_overlay ) {
 			$custom_overlay_markup = sprintf(
-				'<div class="wp-block-navigation__overlay-container" aria-hidden="true">%s</div>',
+				'<div class="wp-block-navigation__overlay-container">%s</div>',
 				$overlay_blocks_html
 			);
 		}
