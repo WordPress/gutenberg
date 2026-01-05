@@ -9,6 +9,7 @@
  * Renders the `core/footnotes` block on the server.
  *
  * @since 6.3.0
+ * @since x.x.x Migrate footnotes from post meta to block attributes.
  *
  * @param array    $attributes Block attributes.
  * @param string   $content    Block default content.
@@ -26,7 +27,7 @@ function render_block_core_footnotes( $attributes, $content, $block ) {
 		return '';
 	}
 
-	// Read from block attributes first, fall back to post meta for backward compatibility
+	// Read from block attributes first, fall back to post meta for backward compatibility.
 	$footnotes = null;
 	if ( ! empty( $attributes['footnotes'] ) && is_array( $attributes['footnotes'] ) ) {
 		$footnotes = $attributes['footnotes'];
