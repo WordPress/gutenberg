@@ -194,6 +194,26 @@ export function mergeCrdtBlocks(
 	incomingBlocks: Block[],
 	cursorPosition: number | null
 ): void {
+	// Perform the merge
+	mergeCrdtBlocksInternal( yblocks, incomingBlocks, cursorPosition );
+
+	// Remove duplicate clientIds across all nesting levels (at top level)
+	removeDuplicateClientIds( yblocks );
+}
+
+/**
+ * Internal function to merge blocks without any top-level checks.
+ * Called recursively for innerBlocks.
+ *
+ * @param yblocks        The blocks in the local Y.Doc.
+ * @param incomingBlocks Gutenberg blocks being synced.
+ * @param cursorPosition The position of the cursor after the change occurs.
+ */
+function mergeCrdtBlocksInternal(
+	yblocks: YBlocks,
+	incomingBlocks: Block[],
+	cursorPosition: number | null
+): void {
 	// Ensure we are working with serializable block data.
 	if ( ! serializableBlocksCache.has( incomingBlocks ) ) {
 		serializableBlocksCache.set(
@@ -282,43 +302,29 @@ export function mergeCrdtBlocks(
 
 					Object.entries( value ).forEach(
 						( [ attributeName, attributeValue ] ) => {
-							if (
-								fastDeepEqual(
-									currentAttributes?.get( attributeName ),
-									attributeValue
-								)
-							) {
-								return;
-							}
-
 							const currentAttribute =
 								currentAttributes.get( attributeName );
-							const isRichText = isRichTextAttribute(
+
+							const isExpectedType = isExpectedAttributeType(
 								block.name,
-								attributeName
+								attributeName,
+								currentAttribute
 							);
 
-							if (
-								isRichText &&
-								'string' === typeof attributeValue &&
-								currentAttributes.has( attributeName ) &&
-								currentAttribute instanceof Y.Text
-							) {
-								// Rich text values are stored as persistent Y.Text instances.
-								// Update the value with a delta in place.
-								mergeRichTextUpdate(
+							const isAttributeChanged =
+								! isExpectedType ||
+								! fastDeepEqual(
 									currentAttribute,
-									attributeValue,
-									cursorPosition
+									attributeValue
 								);
-							} else {
-								currentAttributes.set(
+
+							if ( isAttributeChanged ) {
+								updateYBlockAttribute(
+									block.name,
 									attributeName,
-									createNewYAttributeValue(
-										block.name,
-										attributeName,
-										attributeValue
-									)
+									attributeValue,
+									currentAttributes,
+									cursorPosition
 								);
 							}
 						}
@@ -345,7 +351,7 @@ export function mergeCrdtBlocks(
 						yblock.set( key, yInnerBlocks );
 					}
 
-					mergeCrdtBlocks(
+					mergeCrdtBlocksInternal(
 						yInnerBlocks,
 						value ?? [],
 						cursorPosition
@@ -375,23 +381,36 @@ export function mergeCrdtBlocks(
 
 		yblocks.insert( left, newBlock );
 	}
+}
 
-	// remove duplicate clientids
-	const knownClientIds = new Set< string >();
+/**
+ * Recursively remove duplicate clientIds from blocks and their innerBlocks.
+ *
+ * @param yblocks        The blocks to check.
+ * @param knownClientIds Set of clientIds seen so far.
+ */
+function removeDuplicateClientIds(
+	yblocks: YBlocks,
+	knownClientIds: Set< string > = new Set()
+): void {
 	for ( let j = 0; j < yblocks.length; j++ ) {
 		const yblock: YBlock = yblocks.get( j );
 
 		let clientId = yblock.get( 'clientId' );
 
-		if ( ! clientId ) {
-			continue;
+		if ( clientId ) {
+			if ( knownClientIds.has( clientId ) ) {
+				clientId = uuidv4();
+				yblock.set( 'clientId', clientId );
+			}
+			knownClientIds.add( clientId );
 		}
 
-		if ( knownClientIds.has( clientId ) ) {
-			clientId = uuidv4();
-			yblock.set( 'clientId', clientId );
+		// Recursively check innerBlocks
+		const yInnerBlocks = yblock.get( 'innerBlocks' );
+		if ( yInnerBlocks instanceof Y.Array ) {
+			removeDuplicateClientIds( yInnerBlocks, knownClientIds );
 		}
-		knownClientIds.add( clientId );
 	}
 }
 
@@ -428,8 +447,99 @@ function shouldBlockBeSynced( block: Block ): boolean {
 	return true;
 }
 
+function updateYBlockAttribute(
+	blockName: string,
+	attributeName: string,
+	attributeValue: unknown,
+	currentAttributes: YBlockAttributes,
+	cursorPosition: number | null
+): void {
+	const isRichText = isRichTextAttribute( blockName, attributeName );
+	const currentAttribute = currentAttributes.get( attributeName );
+
+	if (
+		isRichText &&
+		'string' === typeof attributeValue &&
+		currentAttributes.has( attributeName ) &&
+		currentAttribute instanceof Y.Text
+	) {
+		// Rich text values are stored as persistent Y.Text instances.
+		// Update the value with a delta in place.
+		mergeRichTextUpdate( currentAttribute, attributeValue, cursorPosition );
+	} else {
+		currentAttributes.set(
+			attributeName,
+			createNewYAttributeValue( blockName, attributeName, attributeValue )
+		);
+	}
+}
+
 // Cache rich-text attributes for all block types.
-let cachedRichTextAttributes: Map< string, Map< string, true > >;
+let cachedBlockAttributeTypes: Map< string, Map< string, string > >;
+
+/**
+ * Get the defined attribute type for a block attribute.
+ *
+ * @param blockName     The name of the block, e.g. 'core/paragraph'.
+ * @param attributeName The name of the attribute, e.g. 'content'.
+ * @return The type of the attribute, e.g. 'rich-text' or 'string'.
+ */
+function getBlockAttributeType(
+	blockName: string,
+	attributeName: string
+): string | undefined {
+	if ( ! cachedBlockAttributeTypes ) {
+		// Parse the attributes for all blocks once.
+		cachedBlockAttributeTypes = new Map< string, Map< string, string > >();
+
+		for ( const blockType of getBlockTypes() as BlockType[] ) {
+			const blockAttributeTypeMap = new Map< string, string >();
+
+			for ( const [ name, definition ] of Object.entries(
+				blockType.attributes ?? {}
+			) ) {
+				if ( definition.type ) {
+					blockAttributeTypeMap.set( name, definition.type );
+				}
+			}
+
+			cachedBlockAttributeTypes.set(
+				blockType.name,
+				blockAttributeTypeMap
+			);
+		}
+	}
+
+	return cachedBlockAttributeTypes.get( blockName )?.get( attributeName );
+}
+
+/**
+ * Check if an attribute value is the expected type.
+ *
+ * @param blockName      The name of the block, e.g. 'core/paragraph'.
+ * @param attributeName  The name of the attribute, e.g. 'content'.
+ * @param attributeValue The current attribute value.
+ * @return True if the attribute type is expected, false otherwise.
+ */
+function isExpectedAttributeType(
+	blockName: string,
+	attributeName: string,
+	attributeValue: unknown
+): boolean {
+	const expectedAttributeType = getBlockAttributeType(
+		blockName,
+		attributeName
+	);
+
+	if ( expectedAttributeType === 'rich-text' ) {
+		return attributeValue instanceof Y.Text;
+	} else if ( expectedAttributeType === 'string' ) {
+		return typeof attributeValue === 'string';
+	}
+
+	// No other types comparisons use special logic.
+	return true;
+}
 
 /**
  * Given a block name and attribute key, return true if the attribute is rich-text typed.
@@ -442,31 +552,7 @@ function isRichTextAttribute(
 	blockName: string,
 	attributeName: string
 ): boolean {
-	if ( ! cachedRichTextAttributes ) {
-		// Parse the attributes for all blocks once.
-		cachedRichTextAttributes = new Map< string, Map< string, true > >();
-
-		for ( const blockType of getBlockTypes() as BlockType[] ) {
-			const richTextAttributeMap = new Map< string, true >();
-
-			for ( const [ name, definition ] of Object.entries(
-				blockType.attributes ?? {}
-			) ) {
-				if ( 'rich-text' === definition.type ) {
-					richTextAttributeMap.set( name, true );
-				}
-			}
-
-			cachedRichTextAttributes.set(
-				blockType.name,
-				richTextAttributeMap
-			);
-		}
-	}
-
-	return (
-		cachedRichTextAttributes.get( blockName )?.has( attributeName ) ?? false
-	);
+	return 'rich-text' === getBlockAttributeType( blockName, attributeName );
 }
 
 let localDoc: Y.Doc;
