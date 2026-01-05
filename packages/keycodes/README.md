@@ -229,19 +229,6 @@ shortcutAriaLabel.primary( '.' );
 
 Keyed map of functions to shortcut ARIA labels.
 
-### shortcutFormats
-
-An object containing all the various formats for a given shortcut.
-
-_Parameters_
-
--   _modifier_ `WPKeycodeModifier`: The modifier key combination to use, as a string.
--   _character_ `string`: The character key to combine with the modifier.
-
-_Returns_
-
--   Object containing the shortcut in different formats (as an ARIA label, as a string to be displayed to the end user, and as a value for the aria-keyshortcuts attribute).
-
 ### SPACE
 
 Keycode for SPACE key.

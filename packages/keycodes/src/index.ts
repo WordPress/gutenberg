@@ -244,7 +244,7 @@ export const rawShortcut: WPModifierHandler< WPKeyHandler< string > > =
  * An object that contains functions to get shortcuts in a format compatible
  * with the [`aria-keyshortcuts` HTML attribute](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Reference/Attributes/aria-keyshortcuts).
  *
- * The provided shortcut character strings (ie. not the modifiers) should follow
+ * **Note**: The provided shortcut character strings (ie. not the modifiers) should follow
  * the values specified in the [UI Events KeyboardEvent key Values spec](https://www.w3.org/TR/uievents-key/) — for example, "Enter", "Tab", "ArrowRight", "PageDown",
  * "Escape", "Plus", or "F1". The spacebar key should be represented with the
  * "Space" string (an exception to the UI Events KeyboardEvent key Values spec).
@@ -398,22 +398,6 @@ export const shortcutAriaLabel: WPModifierHandler< WPKeyHandler< string > > =
 				.join( isApple ? ' ' : ' + ' );
 		};
 	} );
-
-/**
- * An object containing all the various formats for a given shortcut.
- *
- * @param modifier  The modifier key combination to use, as a string.
- * @param character The character key to combine with the modifier.
- * @return Object containing the shortcut in different formats (as an ARIA label, as a string to be displayed to the end user, and as a value for the aria-keyshortcuts attribute).
- */
-export const shortcutFormats = (
-	modifier: WPKeycodeModifier,
-	character: string
-) => ( {
-	shortcutAriaLabel: shortcutAriaLabel[ modifier ]( character ),
-	displayShortcut: displayShortcut[ modifier ]( character ),
-	ariaKeyShortcut: ariaKeyShortcut[ modifier ]( character ),
-} );
 
 /**
  * From a given KeyboardEvent, returns an array of active modifier constants for

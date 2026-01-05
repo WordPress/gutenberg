@@ -7,7 +7,6 @@ import {
 	rawShortcut,
 	ariaKeyShortcut,
 	shortcutAriaLabel,
-	shortcutFormats,
 	isKeyboardEvent,
 } from '..';
 
@@ -507,64 +506,6 @@ describe( 'KeyboardEvent.key value handling', () => {
 			const expected = key.charAt( 0 ).toUpperCase() + key.slice( 1 );
 			expect( shortcut ).toEqual( `Control+${ expected }` );
 		} );
-	} );
-} );
-
-describe( 'shortcutFormats', () => {
-	it( 'should return all three shortcut formats for primary modifier on Windows', () => {
-		const result = shortcutFormats( 'primary', 'm' );
-
-		expect( result ).toEqual( {
-			shortcutAriaLabel: 'Control + M',
-			displayShortcut: 'Ctrl+M',
-			ariaKeyShortcut: 'Control+M',
-		} );
-	} );
-
-	it( 'should return all three shortcut formats for primaryShift modifier', () => {
-		const result = shortcutFormats( 'primaryShift', 'k' );
-
-		expect( result ).toEqual( {
-			shortcutAriaLabel: 'Control + Shift + K',
-			displayShortcut: 'Ctrl+Shift+K',
-			ariaKeyShortcut: 'Control+Shift+K',
-		} );
-	} );
-
-	it( 'should return all three shortcut formats for access modifier', () => {
-		const result = shortcutFormats( 'access', 'h' );
-
-		expect( result ).toEqual( {
-			shortcutAriaLabel: 'Shift + Alt + H',
-			displayShortcut: 'Shift+Alt+H',
-			ariaKeyShortcut: 'Shift+Alt+H',
-		} );
-	} );
-
-	it( 'should handle special characters like period', () => {
-		const result = shortcutFormats( 'primary', '.' );
-
-		expect( result ).toEqual( {
-			shortcutAriaLabel: 'Control + Period',
-			displayShortcut: 'Ctrl+.',
-			ariaKeyShortcut: 'Control+.',
-		} );
-	} );
-
-	it( 'should return consistent results with individual functions', () => {
-		const modifier = 'primary';
-		const character = 'z';
-		const result = shortcutFormats( modifier, character );
-
-		expect( result.shortcutAriaLabel ).toEqual(
-			shortcutAriaLabel[ modifier ]( character )
-		);
-		expect( result.displayShortcut ).toEqual(
-			displayShortcut[ modifier ]( character )
-		);
-		expect( result.ariaKeyShortcut ).toEqual(
-			ariaKeyShortcut[ modifier ]( character )
-		);
 	} );
 } );
 
