@@ -65,6 +65,7 @@ export function RadioControl(
 		selected,
 		help,
 		onChange,
+		onClick,
 		hideLabelFromVision,
 		options = [],
 		id: preferredId,
@@ -121,6 +122,12 @@ export function RadioControl(
 									? generateOptionDescriptionId( id, index )
 									: undefined
 							}
+							onClick={ ( event ) => {
+								// Compat code for Safari to ensure that the radio is focused when clicked.
+								event.currentTarget.focus();
+
+								onClick?.( event );
+							} }
 							{ ...additionalProps }
 						/>
 						<label
@@ -131,7 +138,6 @@ export function RadioControl(
 						</label>
 						{ !! option.description ? (
 							<StyledHelp
-								__nextHasNoMarginBottom
 								id={ generateOptionDescriptionId( id, index ) }
 								className="components-radio-control__option-description"
 							>
@@ -143,7 +149,6 @@ export function RadioControl(
 			</VStack>
 			{ !! help && (
 				<StyledHelp
-					__nextHasNoMarginBottom
 					id={ generateHelpId( id ) }
 					className="components-base-control__help"
 				>

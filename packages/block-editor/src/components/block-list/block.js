@@ -563,13 +563,14 @@ function BlockListBlockProvider( props ) {
 				isSelectionEnabled,
 				getTemplateLock,
 				isSectionBlock: _isSectionBlock,
+				getParentSectionBlock,
 				getBlockWithoutAttributes,
 				getBlockAttributes,
 				canRemoveBlock,
 				canMoveBlock,
 
 				getSettings,
-				getTemporarilyEditingAsBlocks,
+				getEditedContentOnlySection,
 				getBlockEditingMode,
 				getBlockName,
 				isFirstMultiSelectedBlock,
@@ -606,7 +607,17 @@ function BlockListBlockProvider( props ) {
 			const attributes = getBlockAttributes( clientId );
 			const { name: blockName, isValid } = blockWithoutAttributes;
 			const blockType = getBlockType( blockName );
-			const { supportsLayout, isPreviewMode } = getSettings();
+			const {
+				supportsLayout,
+				isPreviewMode,
+				__experimentalBlockBindingsSupportedAttributes,
+			} = getSettings();
+			const { isBlockHidden: _isBlockHidden } = unlock(
+				select( blockEditorStore )
+			);
+			const bindableAttributes =
+				__experimentalBlockBindingsSupportedAttributes?.[ blockName ];
+
 			const hasLightBlockWrapper = blockType?.apiVersion > 1;
 			const previewContext = {
 				isPreviewMode,
@@ -624,6 +635,8 @@ function BlockListBlockProvider( props ) {
 					? getBlockDefaultClassName( blockName )
 					: undefined,
 				blockTitle: blockType?.title,
+				isBlockHidden: _isBlockHidden( clientId ),
+				bindableAttributes,
 			};
 
 			// When in preview mode, we can avoid a lot of selection and
@@ -631,7 +644,6 @@ function BlockListBlockProvider( props ) {
 			if ( isPreviewMode ) {
 				return previewContext;
 			}
-
 			const _isSelected = isBlockSelected( clientId );
 			const canRemove = canRemoveBlock( clientId );
 			const canMove = canMoveBlock( clientId );
@@ -661,11 +673,14 @@ function BlockListBlockProvider( props ) {
 				isSelectionEnabled: isSelectionEnabled(),
 				isLocked: !! getTemplateLock( rootClientId ),
 				isSectionBlock: _isSectionBlock( clientId ),
+				isWithinSectionBlock:
+					_isSectionBlock( clientId ) ||
+					!! getParentSectionBlock( clientId ),
 				canRemove,
 				canMove,
 				isSelected: _isSelected,
-				isTemporarilyEditingAsBlocks:
-					getTemporarilyEditingAsBlocks() === clientId,
+				isEditingContentOnlySection:
+					getEditedContentOnlySection() === clientId,
 				blockEditingMode,
 				mayDisplayControls:
 					_isSelected ||
@@ -725,7 +740,7 @@ function BlockListBlockProvider( props ) {
 		isValid,
 		isSelected = false,
 		themeSupportsLayout,
-		isTemporarilyEditingAsBlocks,
+		isEditingContentOnlySection,
 		blockEditingMode,
 		mayDisplayControls,
 		mayDisplayParentControls,
@@ -742,11 +757,14 @@ function BlockListBlockProvider( props ) {
 		isDragging,
 		hasChildSelected,
 		isSectionBlock,
+		isWithinSectionBlock,
 		isEditingDisabled,
 		hasEditableOutline,
 		className,
 		defaultClassName,
 		originalBlockClientId,
+		isBlockHidden,
+		bindableAttributes,
 	} = selectedProps;
 
 	// Users of the editor.BlockListBlock filter used to be able to
@@ -786,16 +804,28 @@ function BlockListBlockProvider( props ) {
 		isDragging,
 		hasChildSelected,
 		isSectionBlock,
+		isWithinSectionBlock,
 		isEditingDisabled,
 		hasEditableOutline,
-		isTemporarilyEditingAsBlocks,
+		isEditingContentOnlySection,
 		defaultClassName,
 		mayDisplayControls,
 		mayDisplayParentControls,
 		originalBlockClientId,
 		themeSupportsLayout,
 		canMove,
+		isBlockHidden,
+		bindableAttributes,
 	};
+
+	if (
+		isBlockHidden &&
+		! isSelected &&
+		! isMultiSelected &&
+		! hasChildSelected
+	) {
+		return null;
+	}
 
 	// Here we separate between the props passed to BlockListBlock and any other
 	// information we selected for internal use. BlockListBlock is a filtered

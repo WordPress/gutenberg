@@ -263,8 +263,8 @@ test.describe( 'Zoom Out', () => {
 			.getByRole( 'menu', { name: 'Options' } )
 			.getByRole( 'menuitem' );
 
-		// we expect 4 items in the options menu
-		await expect( optionsMenu ).toHaveCount( 4 );
+		// we expect 2 items in the options menu: Duplicate and Delete.
+		await expect( optionsMenu ).toHaveCount( 2 );
 	} );
 
 	test( 'Zoom Out cannot be activated when the section root is missing', async ( {

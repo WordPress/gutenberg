@@ -88,9 +88,9 @@ export default function PostCardPanel( {
 	let title = __( 'No title' );
 	if ( labels?.name && postIds.length > 1 ) {
 		title = sprintf(
-			// translators: %i number of selected items %s: Name of the plural post type e.g: "Posts".
-			__( '%i %s' ),
-			postId.length,
+			// translators: %1$d number of selected items %2$s: Name of the plural post type e.g: "Posts".
+			__( '%1$d %2$s' ),
+			postIds.length,
 			labels?.name
 		);
 	} else if ( postTitle ) {
@@ -102,7 +102,7 @@ export default function PostCardPanel( {
 			<HStack
 				spacing={ 2 }
 				className="editor-post-card-panel__header"
-				align="flex-start"
+				alignment="flex-start"
 			>
 				<Icon className="editor-post-card-panel__icon" icon={ icon } />
 				<Text

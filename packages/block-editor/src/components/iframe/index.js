@@ -21,7 +21,6 @@ import { useSelect } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import { useBlockSelectionClearer } from '../block-selection-clearer';
 import { useWritingFlow } from '../writing-flow';
 import { getCompatibilityStyles } from './get-compatibility-styles';
 import { useScaleCanvas } from './use-scale-canvas';
@@ -119,7 +118,6 @@ function Iframe( {
 	/** @type {[Document, import('react').Dispatch<Document>]} */
 	const [ iframeDocument, setIframeDocument ] = useState();
 	const [ bodyClasses, setBodyClasses ] = useState( [] );
-	const clearerRef = useBlockSelectionClearer();
 	const [ before, writingFlowRef, after ] = useWritingFlow();
 
 	const setRef = useRefEffect( ( node ) => {
@@ -130,6 +128,29 @@ function Iframe( {
 		// Prevent the default browser action for files dropped outside of dropzones.
 		function preventFileDropDefault( event ) {
 			event.preventDefault();
+		}
+		// Prevent clicks on link fragments from navigating away. Note that links
+		// inside `contenteditable` are already disabled by the browser, so
+		// this is for links in blocks outside of `contenteditable`.
+		function interceptLinkClicks( event ) {
+			if (
+				event.target.tagName === 'A' &&
+				event.target.getAttribute( 'href' )?.startsWith( '#' )
+			) {
+				event.preventDefault();
+				// Manually handle link fragment navigation within the iframe. The iframe's
+				// location is a blob URL, which can't be used to resolve relative links like
+				// `#hash`. The relative link would be resolved against the iframe's base URL
+				// or the parent frame's URL, causing the iframe to navigate to a completely
+				// different page. Setting the `location.hash` works because it really sets the
+				// blob URL's hash.
+				//
+				// Links with fragments are used for example with footnotes. Clicking on these
+				// links will scroll smoothly to the anchors in the editor canvas.
+				iFrameDocument.defaultView.location.hash = event.target
+					.getAttribute( 'href' )
+					.slice( 1 );
+			}
 		}
 
 		const { ownerDocument } = node;
@@ -152,8 +173,6 @@ function Iframe( {
 			iFrameDocument = contentDocument;
 
 			documentElement.classList.add( 'block-editor-iframe__html' );
-
-			clearerRef( documentElement );
 
 			contentDocument.dir = ownerDocument.dir;
 
@@ -185,22 +204,7 @@ function Iframe( {
 				preventFileDropDefault,
 				false
 			);
-			// Prevent clicks on links from navigating away. Note that links
-			// inside `contenteditable` are already disabled by the browser, so
-			// this is for links in blocks outside of `contenteditable`.
-			iFrameDocument.addEventListener( 'click', ( event ) => {
-				if ( event.target.tagName === 'A' ) {
-					event.preventDefault();
-
-					// Appending a hash to the current URL will not reload the
-					// page. This is useful for e.g. footnotes.
-					const href = event.target.getAttribute( 'href' );
-					if ( href?.startsWith( '#' ) ) {
-						iFrameDocument.defaultView.location.hash =
-							href.slice( 1 );
-					}
-				}
-			} );
+			iFrameDocument.addEventListener( 'click', interceptLinkClicks );
 		}
 
 		node.addEventListener( 'load', onLoad );
@@ -216,6 +220,7 @@ function Iframe( {
 				'drop',
 				preventFileDropDefault
 			);
+			iFrameDocument?.removeEventListener( 'click', interceptLinkClicks );
 		};
 	}, [] );
 
@@ -234,7 +239,6 @@ function Iframe( {
 	const bodyRef = useMergeRefs( [
 		useBubbleEvents( iframeDocument ),
 		contentRef,
-		clearerRef,
 		writingFlowRef,
 		disabledRef,
 	] );
@@ -333,9 +337,6 @@ function Iframe( {
 			>
 				{ iframeDocument &&
 					createPortal(
-						// We want to prevent React events from bubbling through the iframe
-						// we bubble these manually.
-						/* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */
 						<body
 							ref={ bodyRef }
 							className={ clsx(

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryFn } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react-webpack5';
 
 /**
  * WordPress dependencies
@@ -54,8 +54,8 @@ export const Default: StoryFn< typeof TextControl > = DefaultTemplate.bind(
 	{}
 );
 Default.args = {
-	__nextHasNoMarginBottom: true,
 	__next40pxDefaultSize: true,
+	placeholder: 'Placeholder',
 };
 
 export const WithLabelAndHelpText: StoryFn< typeof TextControl > =

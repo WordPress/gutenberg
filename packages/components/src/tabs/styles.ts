@@ -7,7 +7,7 @@ import * as Ariakit from '@ariakit/react';
 /**
  * Internal dependencies
  */
-import { COLORS, CONFIG } from '../utils';
+import { COLORS, CONFIG, font } from '../utils';
 import { space } from '../utils/space';
 import Icon from '../icon';
 
@@ -58,7 +58,7 @@ export const StyledTabList = styled( Ariakit.TabList )`
 			when scaling in the transform, see: https://stackoverflow.com/a/52159123 */
 	--antialiasing-factor: 100;
 	&[aria-orientation='horizontal'] {
-		--fade-width: 4rem;
+		--fade-width: 64px;
 		--fade-gradient-base: transparent 0%, black var( --fade-width );
 		--fade-gradient-composed: var( --fade-gradient-base ), black 60%,
 			transparent 50%;
@@ -163,6 +163,7 @@ export const Tab = styled( Ariakit.Tab )`
 		cursor: pointer;
 		line-height: 1.2; // Characters in some languages (e.g. Japanese) may have a native higher line-height.
 		font-weight: 400;
+		font-size: ${ font( 'default.fontSize' ) };
 		color: ${ COLORS.theme.foreground };
 
 		&[aria-disabled='true'] {

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryFn } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react-webpack5';
 
 /**
  * WordPress dependencies
@@ -49,5 +49,4 @@ const Template: StoryFn< typeof SearchControl > = ( {
 export const Default = Template.bind( {} );
 Default.args = {
 	help: 'Help text to explain the input.',
-	__nextHasNoMarginBottom: true,
 };

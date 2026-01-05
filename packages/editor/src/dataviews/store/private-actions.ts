@@ -24,6 +24,8 @@ import {
 	parentField,
 	passwordField,
 	commentStatusField,
+	pingStatusField,
+	discussionField,
 	slugField,
 	statusField,
 	authorField,
@@ -32,14 +34,36 @@ import {
 	templateTitleField,
 	pageTitleField,
 	patternTitleField,
+	notesField,
 } from '@wordpress/fields';
 
 /**
  * Internal dependencies
  */
 import { store as editorStore } from '../../store';
+import { DESIGN_POST_TYPES } from '../../store/constants';
 import postPreviewField from '../fields/content-preview';
 import { unlock } from '../../lock-unlock';
+
+declare global {
+	interface Window {
+		__experimentalTemplateActivate?: boolean;
+	}
+}
+
+/**
+ * Check if a post type supports editor notes.
+ *
+ * @param supports The post type supports object.
+ * @return Whether editor notes are supported.
+ */
+function hasEditorNotesSupport( supports?: PostType[ 'supports' ] ): boolean {
+	const editor = supports?.editor;
+	if ( Array.isArray( editor ) ) {
+		return !! editor[ 0 ]?.notes;
+	}
+	return false;
+}
 
 export function registerEntityAction< Item >(
 	kind: string,
@@ -131,19 +155,37 @@ export const registerPostTypeSchema =
 			.resolveSelect( coreStore )
 			.getCurrentTheme();
 
+		let canDuplicate =
+			! [ 'wp_block', 'wp_template_part' ].includes(
+				postTypeConfig.slug
+			) &&
+			canCreate &&
+			duplicatePost;
+
+		// @ts-ignore
+		if ( ! globalThis.IS_GUTENBERG_PLUGIN ) {
+			// Outside Gutenberg, disable duplication except for wp_template.
+			if ( 'wp_template' !== postTypeConfig.slug ) {
+				canDuplicate = undefined;
+			}
+		}
+
+		// When template activation experiment is disabled, templates cannot be duplicated.
+		// @ts-ignore
+		if (
+			postTypeConfig.slug === 'wp_template' &&
+			! window?.__experimentalTemplateActivate
+		) {
+			canDuplicate = undefined;
+		}
+
 		const actions = [
 			postTypeConfig.viewable ? viewPost : undefined,
 			!! postTypeConfig.supports?.revisions
 				? viewPostRevisions
 				: undefined,
 			// @ts-ignore
-			globalThis.IS_GUTENBERG_PLUGIN
-				? ! [ 'wp_template', 'wp_block', 'wp_template_part' ].includes(
-						postTypeConfig.slug
-				  ) &&
-				  canCreate &&
-				  duplicatePost
-				: undefined,
+			canDuplicate,
 			postTypeConfig.slug === 'wp_template_part' &&
 			canCreate &&
 			currentTheme?.is_block_theme
@@ -170,15 +212,20 @@ export const registerPostTypeSchema =
 				featuredImageField,
 			postTypeConfig.supports?.author && authorField,
 			statusField,
-			dateField,
+			! DESIGN_POST_TYPES.includes( postTypeConfig.slug ) && dateField,
 			slugField,
 			postTypeConfig.supports?.[ 'page-attributes' ] && parentField,
 			postTypeConfig.supports?.comments && commentStatusField,
+			postTypeConfig.supports?.trackbacks && pingStatusField,
+			( postTypeConfig.supports?.comments ||
+				postTypeConfig.supports?.trackbacks ) &&
+				discussionField,
 			templateField,
 			passwordField,
 			postTypeConfig.supports?.editor &&
 				postTypeConfig.viewable &&
 				postPreviewField,
+			hasEditorNotesSupport( postTypeConfig.supports ) && notesField,
 		].filter( Boolean );
 		if ( postTypeConfig.supports?.title ) {
 			let _titleField;

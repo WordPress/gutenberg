@@ -18,6 +18,7 @@ import {
 import {
 	ToggleControl,
 	TextControl,
+	ExternalLink,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
@@ -25,6 +26,7 @@ import { __ } from '@wordpress/i18n';
 import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
 import { useEntityProp, store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
+import { createInterpolateElement } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -84,7 +86,7 @@ export default function PostTitleEdit( {
 		titleElement = userCanEdit ? (
 			<PlainText
 				tagName={ TagName }
-				placeholder={ __( 'No title' ) }
+				placeholder={ __( '(no title)' ) }
 				value={ rawTitle }
 				onChange={ setTitle }
 				__experimentalVersion={ 2 }
@@ -94,7 +96,9 @@ export default function PostTitleEdit( {
 		) : (
 			<TagName
 				{ ...blockProps }
-				dangerouslySetInnerHTML={ { __html: fullTitle?.rendered } }
+				dangerouslySetInnerHTML={ {
+					__html: fullTitle?.rendered || __( '(no title)' ),
+				} }
 			/>
 		);
 	}
@@ -107,7 +111,9 @@ export default function PostTitleEdit( {
 					href={ link }
 					target={ linkTarget }
 					rel={ rel }
-					placeholder={ ! rawTitle.length ? __( 'No title' ) : null }
+					placeholder={
+						! rawTitle.length ? __( '(no title)' ) : null
+					}
 					value={ rawTitle }
 					onChange={ setTitle }
 					__experimentalVersion={ 2 }
@@ -122,7 +128,7 @@ export default function PostTitleEdit( {
 					rel={ rel }
 					onClick={ ( event ) => event.preventDefault() }
 					dangerouslySetInnerHTML={ {
-						__html: fullTitle?.rendered,
+						__html: fullTitle?.rendered || __( '(no title)' ),
 					} }
 				/>
 			</TagName>
@@ -169,7 +175,6 @@ export default function PostTitleEdit( {
 								}
 							>
 								<ToggleControl
-									__nextHasNoMarginBottom
 									label={ __( 'Make title a link' ) }
 									onChange={ () =>
 										setAttributes( { isLink: ! isLink } )
@@ -192,7 +197,6 @@ export default function PostTitleEdit( {
 										}
 									>
 										<ToggleControl
-											__nextHasNoMarginBottom
 											label={ __( 'Open in new tab' ) }
 											onChange={ ( value ) =>
 												setAttributes( {
@@ -205,7 +209,7 @@ export default function PostTitleEdit( {
 										/>
 									</ToolsPanelItem>
 									<ToolsPanelItem
-										label={ __( 'Link rel' ) }
+										label={ __( 'Link relation' ) }
 										isShownByDefault
 										hasValue={ () => !! rel }
 										onDeselect={ () =>
@@ -214,8 +218,17 @@ export default function PostTitleEdit( {
 									>
 										<TextControl
 											__next40pxDefaultSize
-											__nextHasNoMarginBottom
-											label={ __( 'Link rel' ) }
+											label={ __( 'Link relation' ) }
+											help={ createInterpolateElement(
+												__(
+													'The <a>Link Relation</a> attribute defines the relationship between a linked resource and the current document.'
+												),
+												{
+													a: (
+														<ExternalLink href="https://developer.mozilla.org/docs/Web/HTML/Attributes/rel" />
+													),
+												}
+											) }
 											value={ rel }
 											onChange={ ( newRel ) =>
 												setAttributes( { rel: newRel } )

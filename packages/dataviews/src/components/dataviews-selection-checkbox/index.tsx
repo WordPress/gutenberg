@@ -7,16 +7,17 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import type { Field } from '../../types';
-import type { SetSelection } from '../../private-types';
+import type { SetSelection } from '../../types/private';
+import type { NormalizedField } from '../../types';
 
 interface DataViewsSelectionCheckboxProps< Item > {
 	selection: string[];
 	onChangeSelection: SetSelection;
 	item: Item;
 	getItemId: ( item: Item ) => string;
-	titleField?: Field< Item >;
+	titleField?: NormalizedField< Item >;
 	disabled: boolean;
+	tabIndex?: number;
 }
 
 export default function DataViewsSelectionCheckbox< Item >( {
@@ -26,6 +27,7 @@ export default function DataViewsSelectionCheckbox< Item >( {
 	getItemId,
 	titleField,
 	disabled,
+	...extraProps
 }: DataViewsSelectionCheckboxProps< Item > ) {
 	const id = getItemId( item );
 	const checked = ! disabled && selection.includes( id );
@@ -37,7 +39,6 @@ export default function DataViewsSelectionCheckbox< Item >( {
 	return (
 		<CheckboxControl
 			className="dataviews-selection-checkbox"
-			__nextHasNoMarginBottom
 			aria-label={ selectionLabel }
 			aria-disabled={ disabled }
 			checked={ checked }
@@ -52,6 +53,7 @@ export default function DataViewsSelectionCheckbox< Item >( {
 						: [ ...selection, id ]
 				);
 			} }
+			{ ...extraProps }
 		/>
 	);
 }

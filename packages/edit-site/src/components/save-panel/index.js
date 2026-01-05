@@ -6,6 +6,7 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
+import { NavigableRegion } from '@wordpress/admin-ui';
 import { Button, Modal } from '@wordpress/components';
 import {
 	EntitiesSavedStates,
@@ -27,8 +28,7 @@ import { useActivateTheme } from '../../utils/use-activate-theme';
 import { useActualCurrentTheme } from '../../utils/use-actual-current-theme';
 import { isPreviewingTheme } from '../../utils/is-previewing-theme';
 
-const { EntitiesSavedStatesExtensible, NavigableRegion } =
-	unlock( privateApis );
+const { EntitiesSavedStatesExtensible } = unlock( privateApis );
 const { useLocation } = unlock( routerPrivateApis );
 
 const EntitiesSavedStatesForPreview = ( {

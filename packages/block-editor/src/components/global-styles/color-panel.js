@@ -21,13 +21,14 @@ import {
 } from '@wordpress/components';
 import { useCallback, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { getValueFromVariable } from '@wordpress/global-styles-engine';
 
 /**
  * Internal dependencies
  */
 import ColorGradientControl from '../colors-gradients/control';
 import { useColorsPerOrigin, useGradientsPerOrigin } from './hooks';
-import { getValueFromVariable, useToolsPanelDropdownMenuProps } from './utils';
+import { useToolsPanelDropdownMenuProps } from './utils';
 import { setImmutably } from '../../utils/object';
 import { unlock } from '../../lock-unlock';
 import { reset as resetIcon } from '@wordpress/icons';
@@ -110,12 +111,13 @@ export function useHasBackgroundColorPanel( settings ) {
 	);
 }
 
-function ColorToolsPanel( {
+export function ColorToolsPanel( {
 	resetAllFilter,
 	onChange,
 	value,
 	panelId,
 	children,
+	label,
 } ) {
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 	const resetAll = () => {
@@ -125,7 +127,7 @@ function ColorToolsPanel( {
 
 	return (
 		<ToolsPanel
-			label={ __( 'Elements' ) }
+			label={ label || __( 'Elements' ) }
 			resetAll={ resetAll }
 			panelId={ panelId }
 			hasInnerWrapper
@@ -323,6 +325,7 @@ export default function ColorPanel( {
 	settings,
 	panelId,
 	defaultControls = DEFAULT_CONTROLS,
+	label,
 	children,
 } ) {
 	const colors = useColorsPerOrigin( settings );
@@ -508,31 +511,34 @@ export default function ColorPanel( {
 		},
 	];
 
-	const resetAllFilter = useCallback( ( previousValue ) => {
-		return {
-			...previousValue,
-			color: undefined,
-			elements: {
-				...previousValue?.elements,
-				link: {
-					...previousValue?.elements?.link,
-					color: undefined,
-					':hover': {
+	const resetAllFilter = useCallback(
+		( previousValue ) => {
+			return {
+				...previousValue,
+				color: undefined,
+				elements: {
+					...previousValue?.elements,
+					link: {
+						...previousValue?.elements?.link,
 						color: undefined,
-					},
-				},
-				...elements.reduce( ( acc, element ) => {
-					return {
-						...acc,
-						[ element.name ]: {
-							...previousValue?.elements?.[ element.name ],
+						':hover': {
 							color: undefined,
 						},
-					};
-				}, {} ),
-			},
-		};
-	}, [] );
+					},
+					...elements.reduce( ( acc, element ) => {
+						return {
+							...acc,
+							[ element.name ]: {
+								...previousValue?.elements?.[ element.name ],
+								color: undefined,
+							},
+						};
+					}, {} ),
+				},
+			};
+		},
+		[ elements ]
+	);
 
 	const items = [
 		showTextPanel && {
@@ -603,7 +609,7 @@ export default function ColorPanel( {
 		},
 	].filter( Boolean );
 
-	elements.forEach( ( { name, label, showPanel } ) => {
+	elements.forEach( ( { name, label: elementLabel, showPanel } ) => {
 		if ( ! showPanel ) {
 			return;
 		}
@@ -677,7 +683,7 @@ export default function ColorPanel( {
 
 		items.push( {
 			key: name,
-			label,
+			label: elementLabel,
 			hasValue: hasElement,
 			resetValue: resetElement,
 			isShownByDefault: defaultControls[ name ],
@@ -728,6 +734,7 @@ export default function ColorPanel( {
 			value={ value }
 			onChange={ onChange }
 			panelId={ panelId }
+			label={ label }
 		>
 			{ items.map( ( item ) => {
 				const { key, ...restItem } = item;

@@ -124,6 +124,9 @@ selectorNames.forEach( ( name ) => {
 					labels: {
 						singular_name: postTypeLabel,
 					},
+					supports: {
+						autosave: state.postType !== 'without-autosave',
+					},
 				};
 			},
 
@@ -1586,6 +1589,33 @@ describe( 'selectors', () => {
 				currentPost: {},
 				saving: {},
 				postAutosavingLock: { example: true },
+			};
+
+			expect( isEditedPostAutosaveable( state ) ).toBe( false );
+		} );
+
+		it( 'should return false if post type does not support autosave', () => {
+			const state = {
+				editor: {
+					present: {
+						blocks: {
+							value: [],
+						},
+						edits: {},
+					},
+				},
+				initialEdits: {},
+				currentPost: {
+					title: 'sassel',
+				},
+				saving: {},
+				getCurrentUser() {},
+				hasFetchedAutosaves() {
+					return true;
+				},
+				getAutosave() {},
+				postAutosavingLock: {},
+				postType: 'without-autosave',
 			};
 
 			expect( isEditedPostAutosaveable( state ) ).toBe( false );

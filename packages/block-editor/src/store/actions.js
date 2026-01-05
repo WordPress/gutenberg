@@ -34,6 +34,7 @@ import {
 import {
 	__experimentalUpdateSettings,
 	privateRemoveBlocks,
+	editContentOnlySection,
 } from './private-actions';
 
 /** @typedef {import('../components/use-on-block-drop/types').WPDropOperation} WPDropOperation */
@@ -104,7 +105,6 @@ export const validateBlocksToTemplate =
  * @property {WPBlockSelection} end   The selection end.
  */
 
-/* eslint-disable jsdoc/valid-types */
 /**
  * Returns an action object used in signalling that selection state should be
  * reset to the specified selection.
@@ -120,7 +120,6 @@ export function resetSelection(
 	selectionEnd,
 	initialPosition
 ) {
-	/* eslint-enable jsdoc/valid-types */
 	return {
 		type: 'RESET_SELECTION',
 		selectionStart,
@@ -155,22 +154,26 @@ export function receiveBlocks( blocks ) {
 /**
  * Action that updates attributes of multiple blocks with the specified client IDs.
  *
- * @param {string|string[]} clientIds     Block client IDs.
- * @param {Object}          attributes    Block attributes to be merged. Should be keyed by clientIds if
- *                                        uniqueByBlock is true.
- * @param {boolean}         uniqueByBlock true if each block in clientIds array has a unique set of attributes
+ * @param {string|string[]} clientIds                     Block client IDs.
+ * @param {Object}          attributes                    Block attributes to be merged. Should be keyed by clientIds if `options.uniqueByBlock` is true.
+ * @param {Object}          options                       Updating options.
+ * @param {boolean}         [options.uniqueByBlock=false] Whether each block in clientIds array has a unique set of attributes.
  * @return {Object} Action object.
  */
 export function updateBlockAttributes(
 	clientIds,
 	attributes,
-	uniqueByBlock = false
+	options = { uniqueByBlock: false }
 ) {
+	if ( typeof options === 'boolean' ) {
+		options = { uniqueByBlock: options };
+	}
+
 	return {
 		type: 'UPDATE_BLOCK_ATTRIBUTES',
 		clientIds: castArray( clientIds ),
 		attributes,
-		uniqueByBlock,
+		options,
 	};
 }
 
@@ -190,7 +193,6 @@ export function updateBlock( clientId, updates ) {
 	};
 }
 
-/* eslint-disable jsdoc/valid-types */
 /**
  * Returns an action object used in signalling that the block with the
  * specified client ID has been selected, optionally accepting a position
@@ -198,13 +200,12 @@ export function updateBlock( clientId, updates ) {
  * reflects a reverse selection.
  *
  * @param {string}    clientId        Block client ID.
- * @param {0|-1|null} initialPosition Optional initial position. Pass as -1 to
- *                                    reflect reverse selection.
+ * @param {0|-1|null} initialPosition Optional initial position. Pass -1 to reflect reverse selection
+ *                                    or `null` to prevent focusing the block.
  *
  * @return {Object} Action object.
  */
 export function selectBlock( clientId, initialPosition = 0 ) {
-	/* eslint-enable jsdoc/valid-types */
 	return {
 		type: 'SELECT_BLOCK',
 		initialPosition,
@@ -216,14 +217,15 @@ export function selectBlock( clientId, initialPosition = 0 ) {
  * Returns an action object used in signalling that the block with the
  * specified client ID has been hovered.
  *
- * @param {string} clientId Block client ID.
- *
- * @return {Object} Action object.
+ * @deprecated
  */
-export function hoverBlock( clientId ) {
+export function hoverBlock() {
+	deprecated( 'wp.data.dispatch( "core/block-editor" ).hoverBlock', {
+		since: '6.9',
+		version: '7.1',
+	} );
 	return {
-		type: 'HOVER_BLOCK',
-		clientId,
+		type: 'DO_NOTHING',
 	};
 }
 
@@ -350,7 +352,6 @@ export function toggleSelection( isSelectionEnabled = true ) {
 	};
 }
 
-/* eslint-disable jsdoc/valid-types */
 /**
  * Action that replaces given blocks with one or more replacement blocks.
  *
@@ -365,7 +366,6 @@ export function toggleSelection( isSelectionEnabled = true ) {
 export const replaceBlocks =
 	( clientIds, blocks, indexToSelect, initialPosition = 0, meta ) =>
 	( { select, dispatch, registry } ) => {
-		/* eslint-enable jsdoc/valid-types */
 		clientIds = castArray( clientIds );
 		blocks = castArray( blocks );
 		const rootClientId = select.getBlockRootClientId( clientIds[ 0 ] );
@@ -535,7 +535,6 @@ export function insertBlock(
 	);
 }
 
-/* eslint-disable jsdoc/valid-types */
 /**
  * Action that inserts an array of blocks, optionally at a specific index respective a root block list.
  *
@@ -561,7 +560,6 @@ export const insertBlocks =
 		meta
 	) =>
 	( { select, dispatch } ) => {
-		/* eslint-enable jsdoc/valid-types */
 		if ( initialPosition !== null && typeof initialPosition === 'object' ) {
 			meta = initialPosition;
 			initialPosition = 0;
@@ -925,7 +923,7 @@ export const __unstableSplitSelection =
 			// If an unmodified default block is selected, replace it. We don't
 			// want to be converting into a default block.
 			if ( blocks.length ) {
-				if ( isUnmodifiedDefaultBlock( blockA ) ) {
+				if ( isUnmodifiedDefaultBlock( blockA, 'content' ) ) {
 					dispatch.replaceBlocks(
 						[ selectionA.clientId ],
 						blocks,
@@ -1254,7 +1252,14 @@ export const mergeBlocks =
 		}
 
 		if ( ! blockAType.merge ) {
-			dispatch.selectBlock( blockA.clientId );
+			if ( isUnmodifiedBlock( blockB, 'content' ) ) {
+				dispatch.removeBlock(
+					clientIdB,
+					select.isBlockSelected( clientIdB )
+				);
+			} else {
+				dispatch.selectBlock( blockA.clientId );
+			}
 			return;
 		}
 
@@ -1388,7 +1393,6 @@ export function removeBlock( clientId, selectPrevious ) {
 	return removeBlocks( [ clientId ], selectPrevious );
 }
 
-/* eslint-disable jsdoc/valid-types */
 /**
  * Returns an action object used in signalling that the inner blocks with the
  * specified client ID should be replaced.
@@ -1405,7 +1409,6 @@ export function replaceInnerBlocks(
 	updateSelection = false,
 	initialPosition = 0
 ) {
-	/* eslint-enable jsdoc/valid-types */
 	return {
 		type: 'REPLACE_INNER_BLOCKS',
 		rootClientId,
@@ -1654,19 +1657,6 @@ export const __unstableMarkAutomaticChange =
 	};
 
 /**
- * Action that enables or disables the navigation mode.
- *
- * @param {boolean} isNavigationMode Enable/Disable navigation mode.
- */
-export const setNavigationMode =
-	( isNavigationMode = true ) =>
-	( { dispatch } ) => {
-		dispatch.__unstableSetEditorMode(
-			isNavigationMode ? 'navigation' : 'edit'
-		);
-	};
-
-/**
  * Action that sets the editor mode
  *
  * @param {string} mode Editor mode
@@ -1864,12 +1854,13 @@ export function toggleBlockHighlight( clientId, isHighlighted ) {
  * Action that "flashes" the block with a given `clientId` by rhythmically highlighting it.
  *
  * @param {string} clientId Target block client ID.
+ * @param {number} timeout  Duration in milliseconds to keep the highlight. Defaults to 150ms.
  */
 export const flashBlock =
-	( clientId ) =>
+	( clientId, timeout = 150 ) =>
 	async ( { dispatch } ) => {
 		dispatch( toggleBlockHighlight( clientId, true ) );
-		await new Promise( ( resolve ) => setTimeout( resolve, 150 ) );
+		await new Promise( ( resolve ) => setTimeout( resolve, timeout ) );
 		dispatch( toggleBlockHighlight( clientId, false ) );
 	};
 
@@ -1909,18 +1900,16 @@ export function setBlockVisibility( updates ) {
  * This action is created for internal/experimental only usage and may be
  * removed anytime without any warning, causing breakage on any plugin or theme invoking it.
  *
- * @param {?string} temporarilyEditingAsBlocks The block's clientId being temporarily edited as blocks.
- * @param {?string} focusModeToRevert          The focus mode to revert after temporarily edit as blocks finishes.
+ * @param {?string} clientId The clientId of the block being temporarily edited.
  */
-export function __unstableSetTemporarilyEditingAsBlocks(
-	temporarilyEditingAsBlocks,
-	focusModeToRevert
-) {
-	return {
-		type: 'SET_TEMPORARILY_EDITING_AS_BLOCKS',
-		temporarilyEditingAsBlocks,
-		focusModeToRevert,
-	};
+export function __unstableSetTemporarilyEditingAsBlocks( clientId ) {
+	deprecated(
+		"wp.data.dispatch( 'core/block-editor' ).__unstableSetTemporarilyEditingAsBlocks",
+		{
+			since: '7.0',
+		}
+	);
+	return editContentOnlySection( clientId );
 }
 
 /**

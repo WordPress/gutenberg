@@ -53,8 +53,8 @@ export default function WidgetAreasBlockEditorProvider( {
 		return {
 			hasUploadPermissions:
 				canUser( 'create', {
-					kind: 'root',
-					name: 'media',
+					kind: 'postType',
+					name: 'attachment',
 				} ) ?? true,
 			reusableBlocks: ALLOW_REUSABLE_BLOCKS
 				? getEntityRecords( 'postType', 'wp_block' )

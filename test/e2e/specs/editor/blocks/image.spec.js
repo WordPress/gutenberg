@@ -460,7 +460,7 @@ test.describe( 'Image', () => {
 			.getByRole( 'listbox', { name: 'Media List' } )
 			.getByRole( 'option' )
 			.first()
-			.dragTo( imageBlock );
+			.dragTo( imageBlock, { steps: 3 } );
 
 		await expect( async () => {
 			const blocks = await editor.getBlocks();
@@ -493,7 +493,7 @@ test.describe( 'Image', () => {
 			.getByRole( 'listbox', { name: 'Media List' } )
 			.getByRole( 'option' )
 			.nth( 1 )
-			.dragTo( imageBlock );
+			.dragTo( imageBlock, { steps: 3 } );
 
 		await expect( async () => {
 			const blocks = await editor.getBlocks();
@@ -514,69 +514,6 @@ test.describe( 'Image', () => {
 				'should be updated to the media library'
 			).toBe( new URL( page.url() ).host );
 		}, 'should replace the original image with the second image' ).toPass();
-	} );
-
-	test( 'should allow dragging and dropping HTML to media placeholder', async ( {
-		page,
-		editor,
-	} ) => {
-		await editor.insertBlock( { name: 'core/image' } );
-		const imageBlock = editor.canvas.getByRole( 'document', {
-			name: 'Block: Image',
-		} );
-
-		await page.evaluate( () => {
-			const { createBlock } = window.wp.blocks;
-			const block = createBlock( 'core/image', {
-				url: 'https://live.staticflickr.com/3894/14962688165_04759a8b03_b.jpg',
-				alt: 'Cat',
-				caption: `"Cat" by tomhouslay is licensed under <a href="https://creativecommons.org/licenses/by-nc/2.0/?ref=openverse">CC BY-NC 2.0</a>.`,
-			} );
-			const dummy = document.createElement( 'div' );
-			dummy.style.width = '10px';
-			dummy.style.height = '10px';
-			dummy.style.zIndex = 99999;
-			dummy.style.position = 'fixed';
-			dummy.style.top = 0;
-			dummy.style.left = 0;
-			dummy.draggable = 'true';
-			dummy.addEventListener( 'dragstart', ( event ) => {
-				event.dataTransfer.setData(
-					'wp-blocks',
-					JSON.stringify( { blocks: [ block ] } )
-				);
-				event.dataTransfer.setData( 'wp-block:core/image', '' );
-				setTimeout( () => {
-					dummy.remove();
-				}, 0 );
-			} );
-			document.body.appendChild( dummy );
-		} );
-
-		await page.mouse.move( 0, 0 );
-		await page.mouse.down();
-		await imageBlock.hover();
-		await page.mouse.up();
-
-		const host = new URL( page.url() ).host;
-
-		await expect.poll( editor.getBlocks ).toMatchObject( [
-			{
-				name: 'core/image',
-				attributes: {
-					link: expect.stringContaining( host ),
-					url: expect.stringContaining( host ),
-					id: expect.any( Number ),
-					alt: 'Cat',
-					caption: `"Cat" by tomhouslay is licensed under <a href="https://creativecommons.org/licenses/by-nc/2.0/?ref=openverse">CC BY-NC 2.0</a>.`,
-				},
-			},
-		] );
-		const url = ( await editor.getBlocks() )[ 0 ].attributes.url;
-		await expect( imageBlock.getByRole( 'img' ) ).toHaveAttribute(
-			'src',
-			url
-		);
 	} );
 
 	test( 'image inserted via upload should appear in the frontend published post content', async ( {
@@ -695,6 +632,39 @@ test.describe( 'Image', () => {
 		const linkDom = figureDom.locator( 'a' );
 		await expect( linkDom ).toBeVisible();
 		await expect( linkDom ).toHaveAttribute( 'href', url );
+	} );
+
+	test( 'appends http protocol to links added which are missing a protocol', async ( {
+		editor,
+		page,
+		imageBlockUtils,
+	} ) => {
+		await editor.insertBlock( { name: 'core/image' } );
+		const imageBlock = editor.canvas.locator(
+			'role=document[name="Block: Image"i]'
+		);
+		await expect( imageBlock ).toBeVisible();
+
+		await imageBlockUtils.upload(
+			imageBlock.locator( 'data-testid=form-file-upload-input' )
+		);
+
+		await editor.clickBlockToolbarButton( 'Link' );
+
+		const urlPopover = page.locator(
+			'.block-editor-url-popover__link-editor'
+		);
+		const urlInput = urlPopover.getByRole( 'combobox', { name: 'URL' } );
+
+		await urlInput.fill( 'example.com' );
+		await urlPopover.getByRole( 'button', { name: 'Apply' } ).click();
+
+		// Move to "Edit" and switch UI back to edit mode
+		await page.keyboard.press( 'Tab' );
+		await page.keyboard.press( 'Enter' );
+
+		// Check the value of the URL input has had http:// prepended.
+		await expect( urlInput ).toHaveValue( 'http://example.com' );
 	} );
 
 	test( 'should upload external image to media library', async ( {

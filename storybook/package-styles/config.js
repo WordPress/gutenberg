@@ -13,6 +13,11 @@ import editSiteLtr from '../package-styles/edit-site-ltr.lazy.scss';
 import editSiteRtl from '../package-styles/edit-site-rtl.lazy.scss';
 import dataviewsLtr from '../package-styles/dataviews-ltr.lazy.scss';
 import dataviewsRtl from '../package-styles/dataviews-rtl.lazy.scss';
+import fieldsLtr from '../package-styles/fields-ltr.lazy.scss';
+import fieldsRtl from '../package-styles/fields-rtl.lazy.scss';
+import mediaFieldsLtr from '../package-styles/media-fields-ltr.lazy.scss';
+import mediaFieldsRtl from '../package-styles/media-fields-rtl.lazy.scss';
+import ui from '../package-styles/ui.lazy.scss';
 
 /**
  * Stylesheets to lazy load when the story's context.componentId matches the
@@ -57,6 +62,16 @@ const CONFIG = [
 		componentIdMatcher: /^dataviews-/,
 		ltr: [ componentsLtr, dataviewsLtr ],
 		rtl: [ componentsRtl, dataviewsRtl ],
+	},
+	{
+		componentIdMatcher: /^fields-/,
+		ltr: [ componentsLtr, dataviewsLtr, fieldsLtr, mediaFieldsLtr ],
+		rtl: [ componentsRtl, dataviewsRtl, fieldsRtl, mediaFieldsRtl ],
+	},
+	{
+		componentIdMatcher: /^design-system-components-/,
+		ltr: [ ui ],
+		rtl: [ ui ],
 	},
 ];
 

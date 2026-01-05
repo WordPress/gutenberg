@@ -2,6 +2,32 @@
 
 ## Unreleased
 
+## 7.36.0 (2025-11-26)
+
+### New Features
+
+-   `useFocusOnMount`: Now the hook supports `firstInputElement` option which when enabled focuses the first input element and not the first tabbable element (as happens on default mode) ([#72322](https://github.com/WordPress/gutenberg/pull/72322)).
+
+## 7.35.0 (2025-11-12)
+
+## 7.34.0 (2025-10-29)
+
+## 7.33.0 (2025-10-17)
+
+## 7.32.0 (2025-10-01)
+
+## 7.31.0 (2025-09-17)
+
+## 7.30.0 (2025-09-03)
+
+## 7.29.0 (2025-08-20)
+
+## 7.28.0 (2025-08-07)
+
+## 7.27.0 (2025-07-23)
+
+## 7.26.0 (2025-06-25)
+
 ## 7.25.0 (2025-06-04)
 
 ## 7.24.0 (2025-05-22)

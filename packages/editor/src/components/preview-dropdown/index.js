@@ -170,6 +170,7 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 										: 'post-only';
 									setRenderingMode( newRenderingMode );
 									setDefaultRenderingMode( newRenderingMode );
+									resetZoomLevel();
 								} }
 							>
 								{ __( 'Show template' ) }

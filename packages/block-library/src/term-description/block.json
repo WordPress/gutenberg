@@ -6,12 +6,14 @@
 	"category": "theme",
 	"description": "Display the description of categories, tags and custom taxonomies when viewing an archive.",
 	"textdomain": "default",
+	"usesContext": [ "termId", "taxonomy" ],
 	"attributes": {
 		"textAlign": {
 			"type": "string"
 		}
 	},
 	"supports": {
+		"anchor": true,
 		"align": [ "wide", "full" ],
 		"html": false,
 		"color": {

@@ -15,6 +15,8 @@ export const DEFAULT_BLOCK_EDIT_CONTEXT = {
 };
 
 const Context = createContext( DEFAULT_BLOCK_EDIT_CONTEXT );
+Context.displayName = 'BlockEditContext';
+
 const { Provider } = Context;
 
 export { Provider as BlockEditContextProvider };

@@ -40,6 +40,7 @@ function __experimentalReusableBlocksSelect( select ) {
 }
 
 const BLOCK_EDITOR_SETTINGS = [
+	'__experimentalBlockBindingsSupportedAttributes',
 	'__experimentalBlockDirectory',
 	'__experimentalDiscussionSettings',
 	'__experimentalFeatures',
@@ -94,6 +95,10 @@ const {
 	selectBlockPatternsKey,
 	reusableBlocksSelectKey,
 	sectionRootClientIdKey,
+	mediaEditKey,
+	getMediaSelectKey,
+	isIsolatedEditorKey,
+	deviceTypeKey,
 } = unlock( privateApis );
 
 /**
@@ -124,6 +129,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		userPatternCategories,
 		restBlockPatternCategories,
 		sectionRootClientId,
+		deviceType,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -135,6 +141,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 			} = select( coreStore );
 			const { get } = select( preferencesStore );
 			const { getBlockTypes } = select( blocksStore );
+			const { getDeviceType } = unlock( select( editorStore ) );
 			const { getBlocksByName, getBlockAttributes } =
 				select( blockEditorStore );
 			const siteSettings = canUser( 'read', {
@@ -176,8 +183,8 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 				keepCaretInsideBlock: get( 'core', 'keepCaretInsideBlock' ),
 				hasUploadPermissions:
 					canUser( 'create', {
-						kind: 'root',
-						name: 'media',
+						kind: 'postType',
+						name: 'attachment',
 					} ) ?? true,
 				userCanCreatePages: canUser( 'create', {
 					kind: 'postType',
@@ -188,6 +195,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 				userPatternCategories: getUserPatternCategories(),
 				restBlockPatternCategories: getBlockPatternCategories(),
 				sectionRootClientId: getSectionRootBlock(),
+				deviceType: getDeviceType(),
 			};
 		},
 		[ postType, postId, isLargeViewport, renderingMode ]
@@ -231,7 +239,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 	);
 
 	const { undo, setIsInserterOpened } = useDispatch( editorStore );
-
+	const { editMediaEntity } = unlock( useDispatch( coreStore ) );
 	const { saveEntityRecord } = useDispatch( coreStore );
 
 	/**
@@ -253,6 +261,27 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 			return saveEntityRecord( 'postType', 'page', options );
 		},
 		[ saveEntityRecord, userCanCreatePages ]
+	);
+
+	const { getSelectedBlockClientId } = useSelect( blockEditorStore );
+
+	/**
+	 * Wraps onNavigateToEntityRecord to automatically include the currently selected block.
+	 * This ensures that navigation can restore the selection when returning to the previous entity.
+	 */
+	const wrappedOnNavigateToEntityRecord = useCallback(
+		( params ) => {
+			if ( ! settings.onNavigateToEntityRecord ) {
+				return;
+			}
+			const selectedBlockClientId = getSelectedBlockClientId();
+
+			return settings.onNavigateToEntityRecord( {
+				...params,
+				selectedBlockClientId,
+			} );
+		},
+		[ settings, getSelectedBlockClientId ]
 	);
 
 	const allowedBlockTypes = useMemo( () => {
@@ -279,9 +308,12 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 	return useMemo( () => {
 		const blockEditorSettings = {
 			...Object.fromEntries(
-				Object.entries( settings ).filter( ( [ key ] ) =>
-					BLOCK_EDITOR_SETTINGS.includes( key )
-				)
+				Object.entries( settings )
+					.filter( ( [ key ] ) =>
+						BLOCK_EDITOR_SETTINGS.includes( key )
+					)
+					// Exclude onNavigateToEntityRecord since we're wrapping it
+					.filter( ( [ key ] ) => key !== 'onNavigateToEntityRecord' )
 			),
 			[ globalStylesDataKey ]: globalStylesData,
 			[ globalStylesLinksDataKey ]: globalStylesLinksData,
@@ -291,6 +323,19 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 			hasFixedToolbar,
 			isDistractionFree,
 			keepCaretInsideBlock,
+			onNavigateToEntityRecord: settings.onNavigateToEntityRecord
+				? wrappedOnNavigateToEntityRecord
+				: undefined,
+			[ getMediaSelectKey ]: ( select, attachmentId ) => {
+				return select( coreStore ).getEntityRecord(
+					'postType',
+					'attachment',
+					attachmentId
+				);
+			},
+			[ mediaEditKey ]: hasUploadPermissions
+				? editMediaEntity
+				: undefined,
 			mediaUpload: hasUploadPermissions ? mediaUpload : undefined,
 			mediaSideload: hasUploadPermissions ? mediaSideload : undefined,
 			__experimentalBlockPatterns: blockPatterns,
@@ -335,6 +380,16 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 				renderingMode === 'post-only' && postType !== 'wp_template'
 					? 'edit'
 					: undefined,
+			// When editing template parts, patterns, or navigation directly,
+			// we're in an isolated editing context (focused on that entity alone).
+			[ isIsolatedEditorKey ]: [
+				'wp_template_part',
+				'wp_block',
+				'wp_navigation',
+			].includes( postType ),
+			...( window.__experimentalHideBlocksBasedOnScreenSize && deviceType
+				? { [ deviceTypeKey ]: deviceType }
+				: {} ),
 		};
 
 		return blockEditorSettings;
@@ -363,6 +418,9 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		globalStylesData,
 		globalStylesLinksData,
 		renderingMode,
+		editMediaEntity,
+		wrappedOnNavigateToEntityRecord,
+		deviceType,
 	] );
 }
 

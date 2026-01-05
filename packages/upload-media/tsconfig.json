@@ -11,6 +11,7 @@
 		{ "path": "../data" },
 		{ "path": "../element" },
 		{ "path": "../i18n" },
+		{ "path": "../preferences" },
 		{ "path": "../private-apis" },
 		{ "path": "../url" }
 	]

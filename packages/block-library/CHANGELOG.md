@@ -2,6 +2,36 @@
 
 ## Unreleased
 
+-   Post Date Block: Improve semantic HTML to add `<time>` inside link element.
+
+## 9.37.0 (2025-12-23)
+
+## 9.36.0 (2025-11-26)
+
+## 9.35.0 (2025-11-12)
+
+## 9.34.0 (2025-10-29)
+
+## 9.33.0 (2025-10-17)
+
+### Enhancements
+
+-   Enable the Query Loop "Force Page Reload" setting to be false when the Post Content block is used. ([#72160](https://github.com/WordPress/gutenberg/pull/72160))
+
+## 9.32.0 (2025-10-01)
+
+## 9.31.0 (2025-09-17)
+
+## 9.30.0 (2025-09-03)
+
+## 9.29.0 (2025-08-20)
+
+## 9.28.0 (2025-08-07)
+
+## 9.27.0 (2025-07-23)
+
+## 9.26.0 (2025-06-25)
+
 ## 9.25.0 (2025-06-04)
 
 ## 9.24.0 (2025-05-22)

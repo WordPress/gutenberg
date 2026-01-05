@@ -6,11 +6,11 @@ import { fireEvent } from '@testing-library/react-native';
 /**
  * Paste content into a RichText component.
  *
- * @param {import('react-test-renderer').ReactTestInstance} richText        RichText test instance.
- * @param {Object}                                          content         Content to paste.
- * @param {string}                                          content.text    Text format of the content.
- * @param {string}                                          [content.html]  HTML format of the content. If not provided, text format will be used.
- * @param {string}                                          [content.files] Files array to add to the editor.
+ * @param {ReturnType<import('@testing-library/react-native').RenderAPI['getByTestId']>} richText        RichText test instance.
+ * @param {Object}                                                                       content         Content to paste.
+ * @param {string}                                                                       content.text    Text format of the content.
+ * @param {string}                                                                       [content.html]  HTML format of the content. If not provided, text format will be used.
+ * @param {string}                                                                       [content.files] Files array to add to the editor.
  */
 export const pasteIntoRichText = ( richText, { text, html, files = [] } ) => {
 	fireEvent( richText, 'focus' );

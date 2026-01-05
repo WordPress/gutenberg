@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import type { Meta } from '@storybook/react';
+import type { Meta } from '@storybook/react-webpack5';
+import { fn } from 'storybook/test';
 
 /**
  * Internal dependencies
@@ -29,13 +30,9 @@ const meta: Meta< typeof Navigation > = {
 	id: 'components-navigation',
 	component: Navigation,
 	subcomponents: {
-		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		NavigationBackButton,
-		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		NavigationGroup,
-		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		NavigationItem,
-		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		NavigationMenu,
 	},
 	argTypes: {
@@ -44,8 +41,10 @@ const meta: Meta< typeof Navigation > = {
 		children: { control: false },
 		onActivateMenu: { control: false },
 	},
+	args: {
+		onActivateMenu: fn(),
+	},
 	parameters: {
-		actions: { argTypesRegex: '^on.*' },
 		controls: {
 			expanded: true,
 		},

@@ -1,1 +1,1 @@
-export { ModifyContentLockMenuItem } from './modify-content-lock-menu-item';
+export { ModifyContentOnlySectionMenuItem } from './modify-content-lock-menu-item';

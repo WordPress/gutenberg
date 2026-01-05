@@ -63,10 +63,15 @@ Specifying this prop does not affect the layout of the inner blocks, but results
 By default `InnerBlocks` opens a list of permitted blocks via `allowedBlocks` when the block appender is clicked. You can modify the default block and its attributes that are inserted when the initial block appender is clicked by using the `defaultBlock` property. For example:
 
 ```js
-<InnerBlocks defaultBlock={['core/paragraph', {placeholder: "Lorem ipsum..."}]} directInsert />
+<InnerBlocks
+	defaultBlock={
+		{ name: 'core/paragraph', attributes: { content: 'Lorem ipsum...' } }
+	}
+	directInsert
+/>
 ```
 
-By default this behavior is disabled until the `directInsert` prop is set to `true`. This allows you to specify conditions for when the default block should or should not be inserted.
+This behavior is disabled until the `directInsert` prop is set to `true`. This allows you to specify conditions for when the default block should or should not be inserted.
 
 ## Template
 
@@ -175,6 +180,8 @@ When defining a set of possible descendant blocks, use the `allowedBlocks` block
 You can use a react hook called `useInnerBlocksProps` instead of the `InnerBlocks` component. This hook allows you to take more control over the markup of inner blocks areas.
 
 The `useInnerBlocksProps` is exported from the `@wordpress/block-editor` package same as the `InnerBlocks` component itself and supports everything the component does. It also works like the `useBlockProps` hook.
+
+It is important to note that `useBlockProps` hook must be called *before* `useInnerBlocksProps`, otherwise `useBlockProps` will return empty object.
 
 Here is the basic `useInnerBlocksProps` hook usage.
 

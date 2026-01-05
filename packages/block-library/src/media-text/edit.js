@@ -58,7 +58,6 @@ const applyWidthConstraints = ( width ) =>
 	);
 
 function getImageSourceUrlBySizeSlug( image, slug ) {
-	// eslint-disable-next-line camelcase
 	return image?.media_details?.sizes?.[ slug ]?.source_url;
 }
 
@@ -105,7 +104,6 @@ function attributesFromMedia( {
 			// Try the "large" size URL, falling back to the "full" size URL below.
 			src =
 				media.sizes?.large?.url ||
-				// eslint-disable-next-line camelcase
 				media.media_details?.sizes?.large?.source_url;
 		}
 
@@ -199,9 +197,14 @@ function MediaTextEdit( {
 			return {
 				featuredImageMedia:
 					featuredImage && useFeaturedImage
-						? select( coreStore ).getMedia( featuredImage, {
-								context: 'view',
-						  } )
+						? select( coreStore ).getEntityRecord(
+								'postType',
+								'attachment',
+								featuredImage,
+								{
+									context: 'view',
+								}
+						  )
 						: undefined,
 			};
 		},
@@ -213,9 +216,14 @@ function MediaTextEdit( {
 			return {
 				image:
 					mediaId && isSelected
-						? select( coreStore ).getMedia( mediaId, {
-								context: 'view',
-						  } )
+						? select( coreStore ).getEntityRecord(
+								'postType',
+								'attachment',
+								mediaId,
+								{
+									context: 'view',
+								}
+						  )
 						: null,
 			};
 		},
@@ -317,8 +325,8 @@ function MediaTextEdit( {
 					mediaAlt: '',
 					focalPoint: undefined,
 					mediaWidth: 50,
-					mediaSizeSlug: undefined,
 				} );
+				updateImage( DEFAULT_MEDIA_SIZE_SLUG );
 			} }
 			dropdownMenuProps={ dropdownMenuProps }
 		>
@@ -329,7 +337,6 @@ function MediaTextEdit( {
 				onDeselect={ () => setAttributes( { mediaWidth: 50 } ) }
 			>
 				<RangeControl
-					__nextHasNoMarginBottom
 					__next40pxDefaultSize
 					label={ __( 'Media width' ) }
 					value={ temporaryMediaWidth || mediaWidth }
@@ -347,7 +354,6 @@ function MediaTextEdit( {
 				}
 			>
 				<ToggleControl
-					__nextHasNoMarginBottom
 					label={ __( 'Stack on mobile' ) }
 					checked={ isStackedOnMobile }
 					onChange={ () =>
@@ -365,7 +371,6 @@ function MediaTextEdit( {
 					onDeselect={ () => setAttributes( { imageFill: false } ) }
 				>
 					<ToggleControl
-						__nextHasNoMarginBottom
 						label={ __( 'Crop image to fill' ) }
 						checked={ !! imageFill }
 						onChange={ () =>
@@ -388,7 +393,6 @@ function MediaTextEdit( {
 						}
 					>
 						<FocalPointPicker
-							__nextHasNoMarginBottom
 							label={ __( 'Focal point' ) }
 							url={
 								useFeaturedImage && featuredImageURL
@@ -412,7 +416,6 @@ function MediaTextEdit( {
 					onDeselect={ () => setAttributes( { mediaAlt: '' } ) }
 				>
 					<TextareaControl
-						__nextHasNoMarginBottom
 						label={ __( 'Alternative text' ) }
 						value={ mediaAlt }
 						onChange={ onMediaAltChange }

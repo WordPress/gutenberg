@@ -72,7 +72,7 @@ export type WithToolTipProps = {
 
 export type ToggleGroupControlProps = Pick<
 	BaseControlProps,
-	'help' | '__nextHasNoMarginBottom'
+	'__nextHasNoMarginBottom' | 'help'
 > & {
 	/**
 	 * Label for the control.

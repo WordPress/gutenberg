@@ -1,8 +1,9 @@
 /**
  * External dependencies
  */
-import type { StoryObj, Meta } from '@storybook/react';
+import type { StoryObj, Meta } from '@storybook/react-webpack5';
 import { css } from '@emotion/react';
+import { fn } from 'storybook/test';
 
 /**
  * WordPress dependencies
@@ -24,40 +25,31 @@ import type { Props } from '../types';
 
 const meta: Meta< typeof Menu > = {
 	id: 'components-menu',
-	title: 'Components (Experimental)/Actions/Menu',
+	title: 'Components/Actions/Menu',
 	component: Menu,
 	subcomponents: {
-		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		Item: Menu.Item,
-		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		CheckboxItem: Menu.CheckboxItem,
-		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		Group: Menu.Group,
-		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		GroupLabel: Menu.GroupLabel,
-		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		Separator: Menu.Separator,
 		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		Context: Menu.Context,
-		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		RadioItem: Menu.RadioItem,
-		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		ItemLabel: Menu.ItemLabel,
-		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		ItemHelpText: Menu.ItemHelpText,
-		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		TriggerButton: Menu.TriggerButton,
-		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		SubmenuTriggerItem: Menu.SubmenuTriggerItem,
-		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		Popover: Menu.Popover,
+	},
+	args: {
+		onOpenChange: fn(),
 	},
 	argTypes: {
 		children: { control: false },
 	},
 	tags: [ 'status-private' ],
 	parameters: {
-		actions: { argTypesRegex: '^on.*' },
 		controls: { expanded: true },
 		docs: {
 			canvas: { sourceState: 'shown' },

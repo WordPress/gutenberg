@@ -26,7 +26,7 @@ import {
 import { __, sprintf } from '@wordpress/i18n';
 import { withDispatch, withSelect, useSelect } from '@wordpress/data';
 import { withInstanceId, compose } from '@wordpress/compose';
-import { moreHorizontalMobile } from '@wordpress/icons';
+import { moreHorizontal } from '@wordpress/icons';
 import { useRef, useState } from '@wordpress/element';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as reusableBlocksStore } from '@wordpress/reusable-blocks';
@@ -255,7 +255,7 @@ const BlockActionsMenu = ( {
 			<ToolbarGroup>
 				<ToolbarButton
 					title={ __( 'Open Block Actions Menu' ) }
-					icon={ moreHorizontalMobile }
+					icon={ moreHorizontal }
 					disabled
 				/>
 			</ToolbarGroup>
@@ -298,7 +298,7 @@ const BlockActionsMenu = ( {
 			<ToolbarButton
 				title={ __( 'Open Block Actions Menu' ) }
 				onClick={ onPickerPresent }
-				icon={ moreHorizontalMobile }
+				icon={ moreHorizontal }
 				extraProps={ {
 					hint: accessibilityHint,
 				} }

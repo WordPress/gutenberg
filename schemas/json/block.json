@@ -16,10 +16,9 @@
 			"type": "string"
 		},
 		"apiVersion": {
-			"description": "The version of the Block API used by the block. The most recent version is 3 and it was introduced in WordPress 6.3.\n\n See the API versions documentation at https://developer.wordpress.org/block-editor/reference-guides/block-api/block-api-versions/ for more details.",
+			"description": "The version of the Block API used by the block. If the block is registered with API version 2 or lower, the post editor may work as a non-iframe editor. Since all editors are planned to work as iframes in the future, it is recommended to set the `apiVersion` field to 3 and test the block inside the iframe editor.\n\nSee the API versions documentation at https://developer.wordpress.org/block-editor/reference-guides/block-api/block-api-versions/ for more details.",
 			"type": "integer",
-			"enum": [ 1, 2, 3 ],
-			"default": 1
+			"const": 3
 		},
 		"name": {
 			"description": "The name for a block is a unique string that identifies a block. Names have to be structured as `namespace/block-name`, where namespace is the name of your plugin or theme.",
@@ -254,6 +253,11 @@
 					"type": "boolean",
 					"default": true
 				},
+				"allowedBlocks": {
+					"description": "This property adds UI controls which enable the user to select allowed child blocks for a block container. Note: To use this feature, pass `attributes.allowedBlocks` as the `allowedBlocks` property in the options object of `useInnerBlocksProps`.",
+					"type": "boolean",
+					"default": false
+				},
 				"ariaLabel": {
 					"description": "ARIA-labels let you define an accessible label for elements. This property allows enabling the definition of an aria-label for the block, without exposing a UI field.",
 					"type": "boolean",
@@ -319,8 +323,18 @@
 							"type": "boolean",
 							"default": false
 						},
+						"height": {
+							"description": "Allow blocks to define a height value.",
+							"type": "boolean",
+							"default": false
+						},
 						"minHeight": {
 							"description": "Allow blocks to define a minimum height value.",
+							"type": "boolean",
+							"default": false
+						},
+						"width": {
+							"description": "Allow blocks to define a width value.",
 							"type": "boolean",
 							"default": false
 						}
@@ -365,6 +379,11 @@
 				},
 				"renaming": {
 					"description": "By default, a block can be renamed by a user from the block 'Options' dropdown or the 'Advanced' panel. To disable this behavior, set renaming to false.",
+					"type": "boolean",
+					"default": true
+				},
+				"visibility": {
+					"description": "By default, a block can be hidden by a user from the block 'Options' dropdown. To disable this behavior, set visibility to false.",
 					"type": "boolean",
 					"default": true
 				},
@@ -609,6 +628,11 @@
 								}
 							],
 							"default": false
+						},
+						"fitText": {
+							"description": "Enable fit text support for the block. This allows text content to automatically adjust its font size to fit within the block's dimensions.",
+							"type": "boolean",
+							"default": false
 						}
 					}
 				},
@@ -698,7 +722,9 @@
 							"properties": {
 								"root": { "type": "string" },
 								"aspectRatio": { "type": "string" },
-								"minHeight": { "type": "string" }
+								"height": { "type": "string" },
+								"minHeight": { "type": "string" },
+								"width": { "type": "string" }
 							}
 						}
 					]
@@ -996,6 +1022,6 @@
 			"type": "string"
 		}
 	},
-	"required": [ "name", "title" ],
+	"required": [ "apiVersion", "name", "title" ],
 	"additionalProperties": false
 }

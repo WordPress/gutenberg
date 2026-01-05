@@ -40,7 +40,7 @@ function injectThemeAttributeInBlockTemplateContent(
  * Filter all patterns and return only the ones that are compatible with the current template.
  *
  * @param {Array}  patterns An array of patterns.
- * @param {Object} template The current template.
+ * @param {Object} template The current template. Required values are `area`, `name`, and `slug`.
  * @return {Array} Array of patterns that are compatible with the current template.
  */
 function filterPatterns( patterns, template ) {
@@ -83,7 +83,7 @@ function preparePatterns( patterns, currentThemeStylesheet ) {
 	} ) );
 }
 
-export function useAvailablePatterns( template ) {
+export function useAvailablePatterns( { area, name, slug } ) {
 	const { blockPatterns, restBlockPatterns, currentThemeStylesheet } =
 		useSelect( ( select ) => {
 			const { getEditorSettings } = select( editorStore );
@@ -104,11 +104,18 @@ export function useAvailablePatterns( template ) {
 			...( blockPatterns || [] ),
 			...( restBlockPatterns || [] ),
 		];
-		const filteredPatterns = filterPatterns( mergedPatterns, template );
-		return preparePatterns(
-			filteredPatterns,
-			template,
-			currentThemeStylesheet
-		);
-	}, [ blockPatterns, restBlockPatterns, template, currentThemeStylesheet ] );
+		const filteredPatterns = filterPatterns( mergedPatterns, {
+			area,
+			name,
+			slug,
+		} );
+		return preparePatterns( filteredPatterns, currentThemeStylesheet );
+	}, [
+		area,
+		name,
+		slug,
+		blockPatterns,
+		restBlockPatterns,
+		currentThemeStylesheet,
+	] );
 }

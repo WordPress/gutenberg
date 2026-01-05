@@ -107,6 +107,8 @@ function Icon( {
 		return cloneElement( icon, {
 			// @ts-ignore Just forwarding the size prop along
 			size,
+			width: size,
+			height: size,
 			...additionalProps,
 		} );
 	}

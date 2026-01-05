@@ -42,7 +42,6 @@ const DataViewsSearch = memo( function Search( { label }: SearchProps ) {
 	return (
 		<SearchControl
 			className="dataviews-search"
-			__nextHasNoMarginBottom
 			onChange={ setSearch }
 			value={ search }
 			label={ searchLabel }
