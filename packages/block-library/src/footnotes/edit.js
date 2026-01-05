@@ -25,15 +25,8 @@ export default function FootnotesEdit( {
 	);
 	const footnotesSupported = 'string' === typeof meta?.footnotes;
 
-	// Get footnotes from block attributes or meta, and migrate if needed
-	const footnotes = useMigrateFootnotes( {
-		attributes,
-		setAttributes,
-		meta,
-		updateMeta,
-		footnotesSupported,
-	} );
-
+	// Migrate footnotes from meta to block attributes when block loads
+	const footnotes = useMigrateFootnotes( attributes, setAttributes, meta );
 	const blockProps = useBlockProps();
 
 	if ( ! footnotesSupported ) {
@@ -109,7 +102,8 @@ export default function FootnotesEdit( {
 								footnotes: updatedFootnotes,
 							} );
 
-							// Also update meta during transition period for backward compatibility
+							// Also update meta during transition period for backward compatibility.
+							// Should the meta be cleared after migration?
 							if ( footnotesSupported ) {
 								updateMeta( {
 									...meta,

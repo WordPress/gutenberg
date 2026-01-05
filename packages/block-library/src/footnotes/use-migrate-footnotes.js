@@ -4,81 +4,71 @@
 import { useEffect, useMemo, useRef } from '@wordpress/element';
 
 /**
- * Custom hook to derive footnotes from block attributes or post meta,
- * and migrate footnotes from post meta to block attributes.
- * This ensures backward compatibility during the transition period.
+ * Migrates footnotes from post meta to block attributes when the block loads.
+ * This follows the same pattern as quote and list blocks for handling migrations.
  *
- * @param {Object}   options                    Hook options.
- * @param {Object}   options.attributes         Block attributes object.
- * @param {Function} options.setAttributes      Function to update block attributes.
- * @param {Object}   options.meta               The post meta object.
- * @param {Function} options.updateMeta         Function to update post meta.
- * @param {boolean}  options.footnotesSupported Whether footnotes are supported in this context.
- * @return {Array} The footnotes array.
+ * @param {Object}   attributes    Block attributes.
+ * @param {Function} setAttributes Function to update block attributes.
+ * @param {Object}   meta          Post meta object.
  */
-export function useMigrateFootnotes( {
-	attributes,
-	setAttributes,
-	meta,
-	updateMeta,
-	footnotesSupported,
-} ) {
-	// Get footnotes from block attributes or meta
-	const hasBlockAttributes =
-		attributes?.footnotes &&
-		Array.isArray( attributes.footnotes ) &&
-		attributes.footnotes.length > 0;
-	const hasMetaFootnotes = meta?.footnotes;
+export function useMigrateFootnotes( attributes, setAttributes, meta ) {
+	const migrationAttemptedRef = useRef( false );
+	const footnotesSupported = 'string' === typeof meta?.footnotes;
 
-	const footnotes = useMemo( () => {
-		if ( hasBlockAttributes ) {
-			// Create a deep copy to avoid mutating the original array
-			return attributes.footnotes.map( ( fn ) => ( { ...fn } ) );
-		}
-		if ( hasMetaFootnotes ) {
-			return JSON.parse( meta.footnotes );
-		}
-		return [];
-	}, [
-		hasBlockAttributes,
-		hasMetaFootnotes,
-		attributes?.footnotes,
-		meta?.footnotes,
-	] );
-
-	// Track if migration has been attempted to prevent infinite loops
-	const migrationAttempted = useRef( false );
-
-	// Migrate footnotes from meta to block attributes on first access
-	useEffect( () => {
-		if (
-			! hasBlockAttributes &&
-			hasMetaFootnotes &&
-			footnotes.length > 0 &&
-			! migrationAttempted.current
-		) {
-			// eslint-disable-next-line react-compiler/react-compiler
-			migrationAttempted.current = true;
-			setAttributes( {
-				footnotes,
-			} );
-			// Also update meta during transition period for backward compatibility
-			if ( footnotesSupported ) {
-				updateMeta( {
-					...meta,
-					footnotes: meta.footnotes,
-				} );
+	// Parse meta.footnotes once
+	const footnotesFromMeta = useMemo( () => {
+		if ( footnotesSupported && meta?.footnotes ) {
+			try {
+				return JSON.parse( meta.footnotes );
+			} catch ( e ) {
+				return null;
 			}
 		}
-	}, [
-		hasBlockAttributes,
-		hasMetaFootnotes,
-		footnotes,
-		setAttributes,
-		footnotesSupported,
-		meta,
-		updateMeta,
-	] );
+		return null;
+	}, [ meta?.footnotes, footnotesSupported ] );
+
+	// Always return footnotes - from attributes if migrated, from parsed meta if not yet migrated
+	const footnotes = useMemo( () => {
+		const hasBlockAttributes =
+			attributes?.footnotes &&
+			Array.isArray( attributes.footnotes ) &&
+			attributes.footnotes.length > 0;
+
+		if ( hasBlockAttributes ) {
+			return attributes.footnotes;
+		}
+
+		// Fallback to parsed meta if not migrated yet
+		return Array.isArray( footnotesFromMeta ) ? footnotesFromMeta : [];
+	}, [ attributes?.footnotes, footnotesFromMeta ] );
+
+	useEffect( () => {
+		// Only migrate if:
+		// 1. Footnotes are supported
+		// 2. Migration hasn't been attempted yet
+		if ( ! footnotesSupported || migrationAttemptedRef.current ) {
+			return;
+		}
+
+		const hasBlockAttributes =
+			attributes?.footnotes &&
+			Array.isArray( attributes.footnotes ) &&
+			attributes.footnotes.length > 0;
+
+		if ( hasBlockAttributes ) {
+			return;
+		}
+
+		// Use the already-parsed footnotesFromMeta
+		if (
+			footnotesFromMeta &&
+			Array.isArray( footnotesFromMeta ) &&
+			footnotesFromMeta.length > 0
+		) {
+			migrationAttemptedRef.current = true;
+			setAttributes( { footnotes: [ ...footnotesFromMeta ] } );
+		}
+	}, [ attributes, setAttributes, footnotesFromMeta, footnotesSupported ] );
 
 	return footnotes;
 }
