@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { parse, serialize } from 'colorjs.io/fn';
+import { serialize } from 'colorjs.io/fn';
 
 /**
  * Internal dependencies
@@ -26,11 +26,11 @@ describe( 'buildRamps', () => {
 		expect(
 			allBgColors.map( ( bg ) => {
 				const ramp = buildRamp( bg, BG_RAMP_CONFIG );
-				const seedOriginal = serialize( parse( bg ), {
+				const seedOriginal = serialize( bg, {
 					format: 'hex',
 					inGamut: true,
 				} );
-				const seedComputed = serialize( parse( ramp.ramp.surface2 ), {
+				const seedComputed = serialize( ramp.ramp.surface2, {
 					format: 'hex',
 					inGamut: true,
 				} );
@@ -99,17 +99,14 @@ describe( 'buildRamps', () => {
 			allPrimaryColors.map( ( primary ) =>
 				options.map( ( o ) => {
 					const ramp = buildRamp( primary, ACCENT_RAMP_CONFIG, o );
-					const seedOriginal = serialize( parse( primary ), {
+					const seedOriginal = serialize( primary, {
 						format: 'hex',
 						inGamut: true,
 					} );
-					const seedComputed = serialize(
-						parse( ramp.ramp.bgFill1 ),
-						{
-							format: 'hex',
-							inGamut: true,
-						}
-					);
+					const seedComputed = serialize( ramp.ramp.bgFill1, {
+						format: 'hex',
+						inGamut: true,
+					} );
 
 					return {
 						input: {

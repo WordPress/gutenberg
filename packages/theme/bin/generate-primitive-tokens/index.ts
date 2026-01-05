@@ -4,7 +4,7 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { parse, to, serialize, sRGB, getAll } from 'colorjs.io/fn';
+import { to, serialize, sRGB, getAll } from 'colorjs.io/fn';
 
 /**
  * Internal dependencies
@@ -29,7 +29,7 @@ const colorJsonPath = path.join( __dirname, '../../tokens/color.json' );
 const HEX_ROUNDING_PRECISION = 3;
 
 const transformColorStringToDTCGValue = ( color: string ) => {
-	const parsed = to( parse( color ), sRGB );
+	const parsed = to( color, sRGB );
 
 	return {
 		colorSpace: 'srgb',

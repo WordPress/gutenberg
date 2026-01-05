@@ -4,7 +4,6 @@
 import type { CSSProperties } from 'react';
 import {
 	clone,
-	parse,
 	set,
 	to,
 	serialize,
@@ -102,7 +101,7 @@ function customRgbFormat( color: PlainColorObject ): string {
 }
 
 function legacyWpAdminThemeOverridesCSS( accent: string ): Entry[] {
-	const parsedAccent = to( parse( accent ), HSL );
+	const parsedAccent = to( accent, HSL );
 	const parsedL = parsedAccent.coords[ 2 ] ?? 0;
 
 	// Create darker version of accent —
