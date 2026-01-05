@@ -312,7 +312,7 @@ function CompactMediaEditAttachments( {
  * @param {string[]}             [props.allowedTypes]        - Array of allowed media types. Default `['image']`.
  * @param {boolean}              [props.multiple]            - Whether to allow multiple media selections. Default `false`.
  * @param {boolean}              [props.hideLabelFromVision] - Whether the label should be hidden from vision.
- * @param {boolean}              [props.isCompact]           - Whether to render in a compact form. Default `true`.
+ * @param {boolean}              [props.isExpanded]          - Whether to render in an expanded form. Default `false`.
  *
  * @return {JSX.Element} The media edit control component.
  *
@@ -341,7 +341,7 @@ export default function MediaEdit< Item >( {
 	hideLabelFromVision,
 	allowedTypes = [ 'image' ],
 	multiple,
-	isCompact = true,
+	isExpanded,
 }: MediaEditProps< Item > ) {
 	const value = field.getValue( { item: data } );
 	const attachments = useSelect(
@@ -388,9 +388,9 @@ export default function MediaEdit< Item >( {
 				multiple={ multiple }
 				title={ field.label }
 				render={ ( { open }: any ) => {
-					const AttachmentsComponent = isCompact
-						? CompactMediaEditAttachments
-						: ExpandedMediaEditAttachments;
+					const AttachmentsComponent = isExpanded
+						? ExpandedMediaEditAttachments
+						: CompactMediaEditAttachments;
 					return (
 						<VStack spacing={ 2 }>
 							{ field.label &&
