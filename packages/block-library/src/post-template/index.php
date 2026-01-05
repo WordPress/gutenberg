@@ -72,6 +72,7 @@ function render_block_core_post_template( $attributes, $content, $block ) {
 		$query      = new WP_Query( $query_args );
 	}
 
+
 	if ( ! $query->have_posts() ) {
 		return '';
 	}
@@ -98,6 +99,15 @@ function render_block_core_post_template( $attributes, $content, $block ) {
 	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => trim( $classnames ) ) );
 
 	$content = '';
+
+	/*
+	 * Compute the current post ID to avoid rendering it within the Post Template block.
+	 */
+	$current_post_id = get_the_ID();
+	if ( ! $current_post_id && is_singular() ) {
+		$current_post_id = get_queried_object_id();
+	}
+
 	while ( $query->have_posts() ) {
 		$query->the_post();
 
@@ -110,6 +120,10 @@ function render_block_core_post_template( $attributes, $content, $block ) {
 
 		$post_id              = get_the_ID();
 		$post_type            = get_post_type();
+		if( $post_id === $current_post_id ) {
+			// Skip the current post to avoid recursion.
+			continue;
+		}
 		$filter_block_context = static function ( $context ) use ( $post_id, $post_type ) {
 			$context['postType'] = $post_type;
 			$context['postId']   = $post_id;
