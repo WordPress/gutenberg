@@ -44,4 +44,3 @@ function gutenberg_register_overlay_block_patterns() {
 }
 
 add_action( 'init', 'gutenberg_register_overlay_block_patterns', 20 );
-
