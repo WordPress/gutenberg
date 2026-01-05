@@ -6,14 +6,6 @@
  */
 
 /**
- * Stores the custom CSS for block instances to be output in the footer.
- *
- * @var string
- */
-global $gutenberg_block_custom_css;
-$gutenberg_block_custom_css = '';
-
-/**
  * Render the custom CSS stylesheet and add class name to block as required.
  *
  * @since 7.0.0
@@ -22,8 +14,6 @@ $gutenberg_block_custom_css = '';
  * @return array The same parsed block with custom CSS class name added if appropriate.
  */
 function gutenberg_render_custom_css_support_styles( $parsed_block ) {
-	global $gutenberg_block_custom_css;
-
 	$block_type = WP_Block_Type_Registry::get_instance()->get_registered( $parsed_block['blockName'] );
 
 	if ( ! block_has_support( $block_type, 'customCSS', true ) ) {
@@ -49,29 +39,25 @@ function gutenberg_render_custom_css_support_styles( $parsed_block ) {
 	$processed_css = WP_Theme_JSON_Gutenberg::process_blocks_custom_css( $custom_css, $selector );
 
 	if ( ! empty( $processed_css ) ) {
-		// Store the CSS to be output later.
-		$gutenberg_block_custom_css .= $processed_css;
+		/*
+		 * Register and add inline style for block custom CSS.
+		 * The style depends on global-styles to ensure custom CSS loads after
+		 * and can override global styles.
+		 */
+		wp_register_style( 'wp-block-custom-css', false, array( 'global-styles' ) );
+		wp_add_inline_style( 'wp-block-custom-css', $processed_css );
 	}
 
 	return $parsed_block;
 }
 
 /**
- * Outputs the collected block custom CSS in the footer.
- *
- * The CSS is output in the footer because it's collected during block rendering
- * (via render_block_data filter), which happens after wp_head.
+ * Enqueues the block custom CSS styles.
  *
  * @since 7.0.0
  */
-function gutenberg_output_block_custom_css() {
-	global $gutenberg_block_custom_css;
-
-	if ( empty( $gutenberg_block_custom_css ) ) {
-		return;
-	}
-
-	echo '<style id="wp-block-custom-css">' . $gutenberg_block_custom_css . '</style>';
+function gutenberg_enqueue_block_custom_css() {
+	wp_enqueue_style( 'wp-block-custom-css' );
 }
 
 /**
@@ -105,4 +91,4 @@ function gutenberg_render_custom_css_class_name( $block_content, $block ) {
 
 add_filter( 'render_block', 'gutenberg_render_custom_css_class_name', 10, 2 );
 add_filter( 'render_block_data', 'gutenberg_render_custom_css_support_styles', 10, 1 );
-add_action( 'wp_footer', 'gutenberg_output_block_custom_css' );
+add_action( 'wp_enqueue_scripts', 'gutenberg_enqueue_block_custom_css', 1 );
