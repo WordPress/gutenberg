@@ -19,6 +19,11 @@ test.describe( 'Preload', () => {
 	} ) => {
 		const requests = [];
 
+		let resolveRequests = null;
+		const requestsPromise = new Promise( ( resolve ) => {
+			resolveRequests = resolve;
+		} );
+
 		function onRequest( request ) {
 			if (
 				request.resourceType() === 'document' &&
@@ -26,6 +31,7 @@ test.describe( 'Preload', () => {
 			) {
 				// Stop recording when the iframe is initialized.
 				page.off( 'request', onRequest );
+				resolveRequests();
 			} else if ( request.resourceType() === 'fetch' ) {
 				const url = request.url();
 				const urlObject = new URL( url );
@@ -42,7 +48,7 @@ test.describe( 'Preload', () => {
 
 		page.on( 'request', onRequest );
 
-		await admin.visitSiteEditor();
+		await Promise.all( [ admin.visitSiteEditor(), requestsPromise ] );
 
 		// To do: these should all be removed or preloaded.
 		expect( requests ).toEqual( [
