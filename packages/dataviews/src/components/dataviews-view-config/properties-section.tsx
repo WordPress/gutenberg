@@ -78,16 +78,19 @@ export function PropertiesSection( {
 			field: descriptionField,
 			isVisibleFlag: 'showDescription',
 		},
-	].filter( ( { field } ) => isDefined( field ) );
+	].filter( ( { field } ) => isDefined( field ) ) as Array< {
+		field: NormalizedField< any >;
+		isVisibleFlag: string;
+	} >;
 	const visibleFieldIds = view.fields ?? [];
 	const visibleRegularFieldsCount = regularFields.filter( ( f ) =>
 		visibleFieldIds.includes( f.id )
 	).length;
 
 	const visibleLockedFields = lockedFields.filter(
-		( { isVisibleFlag } ) =>
+		( { field, isVisibleFlag } ) =>
 			// @ts-expect-error
-			view[ isVisibleFlag ] ?? true
+			isDefined( field ) && ( view[ isVisibleFlag ] ?? true )
 	) as Array< {
 		field: NormalizedField< any >;
 		isVisibleFlag: string;
@@ -112,10 +115,6 @@ export function PropertiesSection( {
 			>
 				<ItemGroup isBordered isSeparated size="medium">
 					{ lockedFields.map( ( { field, isVisibleFlag } ) => {
-						if ( ! isDefined( field ) ) {
-							return null;
-						}
-
 						// @ts-expect-error
 						const isVisible = view[ isVisibleFlag ] ?? true;
 						const isLastVisibleLocked =
