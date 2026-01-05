@@ -71,6 +71,22 @@ describe( 'calculateVersionBumpFromChangelog', () => {
 		).toBe( 'major' );
 	} );
 
+	it( 'should have no effect to use stable release heading on stable package', () => {
+		expect(
+			calculateVersionBumpFromChangelog(
+				[
+					'First line',
+					'## Unreleased',
+					'### Stable Release',
+					'This package is now considered stable.',
+					'Fifth line',
+				],
+				'patch',
+				'1.0.0'
+			)
+		).toBe( 'patch' );
+	} );
+
 	describe( 'prerelease versions', () => {
 		it( 'should not bump the major even if breaking changes detected', () => {
 			expect(
