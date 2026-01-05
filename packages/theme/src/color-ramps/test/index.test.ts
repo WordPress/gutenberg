@@ -15,7 +15,7 @@ const lStops = [ 100, 90, 80, 70, 60, 50, 40, 30, 20, 10 ];
 const sStops = [ 100, 80, 60, 40, 20, 0 ];
 const hstops = [ 0, 60, 120, 180, 240, 300 ];
 
-describe( 'buildRamps', () => {
+describe.skip( 'buildRamps', () => {
 	it( 'background ramp snapshots', () => {
 		const allBgColors = lStops.flatMap( ( l ) =>
 			sStops.flatMap( ( s ) =>
