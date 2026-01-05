@@ -739,47 +739,6 @@ export const isBlockHidden = ( state, clientId ) => {
 };
 
 /**
- * Returns true if the block is hidden on any device/viewport, or false otherwise.
- *
- * A block is considered to have visibility restrictions if it's hidden everywhere
- * or has any breakpoint-specific visibility settings (mobile, tablet, or desktop).
- *
- * @param {Object} state    Global application state.
- * @param {string} clientId Client ID of the block.
- *
- * @return {boolean} Whether the block has visibility restrictions.
- */
-export const isHiddenInAnyDevice = ( state, clientId ) => {
-	// Gate behind experimental flag
-	if ( ! window.__experimentalHideBlocksBasedOnScreenSize ) {
-		return false;
-	}
-
-	const blockName = getBlockName( state, clientId );
-	if ( ! hasBlockSupport( state, blockName, 'visibility', true ) ) {
-		return false;
-	}
-	const attributes = state.blocks.attributes.get( clientId );
-	const blockVisibility = attributes?.metadata?.blockVisibility;
-
-	// Hidden everywhere
-	if ( blockVisibility === false ) {
-		return true;
-	}
-
-	// Check if any breakpoint has visibility set to false
-	if ( typeof blockVisibility === 'object' && blockVisibility !== null ) {
-		return (
-			blockVisibility.mobile === false ||
-			blockVisibility.tablet === false ||
-			blockVisibility.desktop === false
-		);
-	}
-
-	return false;
-};
-
-/**
  * Returns true if there is a spotlighted block.
  *
  * The spotlight is also active when a contentOnly section is being edited, the selector
