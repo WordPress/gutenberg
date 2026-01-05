@@ -304,22 +304,16 @@ function mergeCrdtBlocksInternal(
 						( [ attributeName, attributeValue ] ) => {
 							const currentAttribute =
 								currentAttributes.get( attributeName );
-							const isRichText = isRichTextAttribute(
-								block.name,
-								attributeName
-							);
 
-							const attributeHasTypeChange =
-								( isRichText &&
-									! (
-										currentAttribute instanceof Y.Text
-									) ) ||
-								( ! isRichText &&
-									currentAttribute instanceof Y.Text );
+							const isExpectedType = isExpectedAttributeType(
+								block.name,
+								attributeName,
+								currentAttribute
+							);
 
 							// Skip update if values are equal and type stays the same
 							if (
-								! attributeHasTypeChange &&
+								isExpectedType &&
 								fastDeepEqual(
 									currentAttribute,
 									attributeValue
@@ -327,6 +321,11 @@ function mergeCrdtBlocksInternal(
 							) {
 								return;
 							}
+
+							const isRichText = isRichTextAttribute(
+								block.name,
+								attributeName
+							);
 
 							if (
 								isRichText &&
@@ -472,7 +471,71 @@ function shouldBlockBeSynced( block: Block ): boolean {
 }
 
 // Cache rich-text attributes for all block types.
-let cachedRichTextAttributes: Map< string, Map< string, true > >;
+let cachedBlockAttributeTypes: Map< string, Map< string, string > >;
+
+/**
+ * Get the defined attribute type for a block attribute.
+ *
+ * @param blockName     The name of the block, e.g. 'core/paragraph'.
+ * @param attributeName The name of the attribute, e.g. 'content'.
+ * @return The type of the attribute, e.g. 'rich-text' or 'string'.
+ */
+function getBlockAttributeType(
+	blockName: string,
+	attributeName: string
+): string | undefined {
+	if ( ! cachedBlockAttributeTypes ) {
+		// Parse the attributes for all blocks once.
+		cachedBlockAttributeTypes = new Map< string, Map< string, string > >();
+
+		for ( const blockType of getBlockTypes() as BlockType[] ) {
+			const blockAttributeTypeMap = new Map< string, string >();
+
+			for ( const [ name, definition ] of Object.entries(
+				blockType.attributes ?? {}
+			) ) {
+				if ( definition.type ) {
+					blockAttributeTypeMap.set( name, definition.type );
+				}
+			}
+
+			cachedBlockAttributeTypes.set(
+				blockType.name,
+				blockAttributeTypeMap
+			);
+		}
+	}
+
+	return cachedBlockAttributeTypes.get( blockName )?.get( attributeName );
+}
+
+/**
+ * Check if an attribute value is the expected type.
+ *
+ * @param blockName      The name of the block, e.g. 'core/paragraph'.
+ * @param attributeName  The name of the attribute, e.g. 'content'.
+ * @param attributeValue The current attribute value.
+ * @return True if the attribute type is expected, false otherwise.
+ */
+function isExpectedAttributeType(
+	blockName: string,
+	attributeName: string,
+	attributeValue: unknown
+): boolean {
+	const expectedAttributeType = getBlockAttributeType(
+		blockName,
+		attributeName
+	);
+
+	if ( expectedAttributeType === 'rich-text' ) {
+		return attributeValue instanceof Y.Text;
+	} else if ( expectedAttributeType === 'string' ) {
+		return typeof attributeValue === 'string';
+	}
+
+	// No other types comparisons use special logic.
+	return true;
+}
 
 /**
  * Given a block name and attribute key, return true if the attribute is rich-text typed.
@@ -485,31 +548,7 @@ function isRichTextAttribute(
 	blockName: string,
 	attributeName: string
 ): boolean {
-	if ( ! cachedRichTextAttributes ) {
-		// Parse the attributes for all blocks once.
-		cachedRichTextAttributes = new Map< string, Map< string, true > >();
-
-		for ( const blockType of getBlockTypes() as BlockType[] ) {
-			const richTextAttributeMap = new Map< string, true >();
-
-			for ( const [ name, definition ] of Object.entries(
-				blockType.attributes ?? {}
-			) ) {
-				if ( 'rich-text' === definition.type ) {
-					richTextAttributeMap.set( name, true );
-				}
-			}
-
-			cachedRichTextAttributes.set(
-				blockType.name,
-				richTextAttributeMap
-			);
-		}
-	}
-
-	return (
-		cachedRichTextAttributes.get( blockName )?.has( attributeName ) ?? false
-	);
+	return 'rich-text' === getBlockAttributeType( blockName, attributeName );
 }
 
 let localDoc: Y.Doc;
