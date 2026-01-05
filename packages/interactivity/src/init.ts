@@ -7,7 +7,6 @@ import { hydrate, type ContainerNode, type ComponentChild } from 'preact';
  */
 import { toVdom, hydratedIslands } from './vdom';
 import { createRootFragment, splitTask } from './utils';
-import { directivePrefix } from './constants';
 
 // Keep the same root fragment for each interactive region node.
 const regionRootFragments = new WeakMap();
@@ -32,9 +31,7 @@ export const initialVdom = new WeakMap< Element, ComponentChild >();
 
 // Initialize the router with the initial DOM.
 export const init = async () => {
-	const nodes = document.querySelectorAll(
-		`[data-${ directivePrefix }-interactive]`
-	);
+	const nodes = document.querySelectorAll( `[data-wp-interactive]` );
 
 	/*
 	 * This `await` with setTimeout is required to apparently ensure that the interactive blocks have their stores

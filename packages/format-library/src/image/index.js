@@ -72,7 +72,6 @@ function InlineUI( { value, onChange, activeObjectAttributes, contentRef } ) {
 
 	return (
 		<Popover
-			placement="bottom"
 			focusOnMount={ false }
 			anchor={ popoverAnchor }
 			className="block-editor-format-toolbar__image-popover"
@@ -113,7 +112,6 @@ function InlineUI( { value, onChange, activeObjectAttributes, contentRef } ) {
 					/>
 					<TextareaControl
 						label={ __( 'Alternative text' ) }
-						__nextHasNoMarginBottom
 						value={ editedAlt }
 						onChange={ ( newAlt ) => {
 							setEditedAlt( newAlt );

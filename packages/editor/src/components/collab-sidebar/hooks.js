@@ -1,11 +1,28 @@
 /**
+ * External dependencies
+ */
+import {
+	useFloating,
+	offset as offsetMiddleware,
+	autoUpdate,
+} from '@floating-ui/react-dom';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useEffect, useMemo } from '@wordpress/element';
+import {
+	useEffect,
+	useMemo,
+	useCallback,
+	useReducer,
+} from '@wordpress/element';
 import { useEntityRecords, store as coreStore } from '@wordpress/core-data';
 import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
-import { store as blockEditorStore } from '@wordpress/block-editor';
+import {
+	store as blockEditorStore,
+	privateApis as blockEditorPrivateApis,
+} from '@wordpress/block-editor';
 import { store as noticesStore } from '@wordpress/notices';
 import { decodeEntities } from '@wordpress/html-entities';
 import { store as interfaceStore } from '@wordpress/interface';
@@ -15,16 +32,25 @@ import { store as interfaceStore } from '@wordpress/interface';
  */
 import { store as editorStore } from '../../store';
 import { collabSidebarName } from './constants';
+import { unlock } from '../../lock-unlock';
+import { noop } from './utils';
+
+const { useBlockElement, cleanEmptyObject } = unlock( blockEditorPrivateApis );
 
 export function useBlockComments( postId ) {
+	const [ commentLastUpdated, reflowComments ] = useReducer(
+		() => Date.now(),
+		0
+	);
+
 	const queryArgs = {
 		post: postId,
-		type: 'block_comment',
+		type: 'note',
 		status: 'all',
-		per_page: 100,
+		per_page: -1,
 	};
 
-	const { records: threads, totalPages } = useEntityRecords(
+	const { records: threads } = useEntityRecords(
 		'root',
 		'comment',
 		queryArgs,
@@ -41,9 +67,12 @@ export function useBlockComments( postId ) {
 
 	// Process comments to build the tree structure.
 	const { resultComments, unresolvedSortedThreads } = useMemo( () => {
+		if ( ! threads || threads.length === 0 ) {
+			return { resultComments: [], unresolvedSortedThreads: [] };
+		}
+
 		const blocksWithComments = clientIds.reduce( ( results, clientId ) => {
-			const commentId =
-				getBlockAttributes( clientId )?.metadata?.commentId;
+			const commentId = getBlockAttributes( clientId )?.metadata?.noteId;
 			if ( commentId ) {
 				results[ clientId ] = commentId;
 			}
@@ -54,13 +83,17 @@ export function useBlockComments( postId ) {
 		const compare = {};
 		const result = [];
 
-		const allComments = threads ?? [];
+		// Create a reverse map for faster lookup.
+		const commentIdToBlockClientId = Object.keys(
+			blocksWithComments
+		).reduce( ( mapping, clientId ) => {
+			mapping[ blocksWithComments[ clientId ] ] = clientId;
+			return mapping;
+		}, {} );
 
 		// Initialize each object with an empty `reply` array and map blockClientId.
-		allComments.forEach( ( item ) => {
-			const itemBlock = Object.keys( blocksWithComments ).find(
-				( key ) => blocksWithComments[ key ] === item.id
-			);
+		threads.forEach( ( item ) => {
+			const itemBlock = commentIdToBlockClientId[ item.id ];
 
 			compare[ item.id ] = {
 				...item,
@@ -70,7 +103,7 @@ export function useBlockComments( postId ) {
 		} );
 
 		// Iterate over the data to build the tree structure.
-		allComments.forEach( ( item ) => {
+		threads.forEach( ( item ) => {
 			if ( item.parent === 0 ) {
 				// If parent is 0, it's a root item, push it to the result array.
 				result.push( compare[ item.id ] );
@@ -93,6 +126,11 @@ export function useBlockComments( postId ) {
 			updatedResult.map( ( thread ) => [ String( thread.id ), thread ] )
 		);
 
+		// Prepare sets to determine which threads are linked to existing blocks.
+		const mappedIds = new Set(
+			Object.values( blocksWithComments ).map( ( id ) => String( id ) )
+		);
+
 		// Get comments by block order, first unresolved, then resolved.
 		const unresolvedSortedComments = Object.values( blocksWithComments )
 			.map( ( commentId ) => threadIdMap.get( String( commentId ) ) )
@@ -107,10 +145,15 @@ export function useBlockComments( postId ) {
 					thread !== undefined && thread.status === 'approved'
 			);
 
-		// Combine unresolved comments in block order with resolved comments at the end.
+		// Append orphaned notes (whose related block was deleted or missing).
+		const orphanedComments = updatedResult.filter(
+			( thread ) => ! mappedIds.has( String( thread.id ) )
+		);
+
 		const allSortedComments = [
 			...unresolvedSortedComments,
 			...resolvedSortedComments,
+			...orphanedComments,
 		];
 
 		return {
@@ -119,10 +162,15 @@ export function useBlockComments( postId ) {
 		};
 	}, [ clientIds, threads, getBlockAttributes ] );
 
-	return { resultComments, unresolvedSortedThreads, totalPages };
+	return {
+		resultComments,
+		unresolvedSortedThreads,
+		reflowComments,
+		commentLastUpdated,
+	};
 }
 
-export function useBlockCommentsActions() {
+export function useBlockCommentsActions( reflowComments = noop ) {
 	const { createNotice } = useDispatch( noticesStore );
 	const { saveEntityRecord, deleteEntityRecord } = useDispatch( coreStore );
 	const { getCurrentPostId } = useSelect( editorStore );
@@ -149,8 +197,8 @@ export function useBlockCommentsActions() {
 				{
 					post: getCurrentPostId(),
 					content,
-					comment_type: 'block_comment',
-					comment_approved: 0,
+					status: 'hold',
+					type: 'note',
 					parent: parent || 0,
 				},
 				{ throwOnError: true }
@@ -163,24 +211,23 @@ export function useBlockCommentsActions() {
 				updateBlockAttributes( clientId, {
 					metadata: {
 						...metadata,
-						commentId: savedRecord.id,
+						noteId: savedRecord.id,
 					},
 				} );
 			}
 
 			createNotice(
 				'snackbar',
-				parent
-					? __( 'Reply added successfully.' )
-					: __( 'Comment added successfully.' ),
+				parent ? __( 'Reply added.' ) : __( 'Note added.' ),
 				{
 					type: 'snackbar',
 					isDismissible: true,
 				}
 			);
-
+			setTimeout( reflowComments, 300 );
 			return savedRecord;
 		} catch ( error ) {
+			reflowComments();
 			onError( error );
 		}
 	};
@@ -188,31 +235,66 @@ export function useBlockCommentsActions() {
 	const onEdit = async ( { id, content, status } ) => {
 		const messageType = status ? status : 'updated';
 		const messages = {
-			approved: __( 'Comment marked as resolved.' ),
-			hold: __( 'Comment reopened.' ),
-			updated: __( 'Comment updated.' ),
+			approved: __( 'Note marked as resolved.' ),
+			hold: __( 'Note reopened.' ),
+			updated: __( 'Note updated.' ),
 		};
 
 		try {
-			await saveEntityRecord(
-				'root',
-				'comment',
-				{
+			// For resolution or reopen actions, create a new note with metadata.
+			if ( status === 'approved' || status === 'hold' ) {
+				// First, update the thread status.
+				await saveEntityRecord(
+					'root',
+					'comment',
+					{
+						id,
+						status,
+					},
+					{
+						throwOnError: true,
+					}
+				);
+
+				// Then create a new comment with the metadata.
+				const newCommentData = {
+					post: getCurrentPostId(),
+					content: content || '', // Empty content for resolve, content for reopen.
+					type: 'note',
+					status,
+					parent: id,
+					meta: {
+						_wp_note_status:
+							status === 'approved' ? 'resolved' : 'reopen',
+					},
+				};
+
+				await saveEntityRecord( 'root', 'comment', newCommentData, {
+					throwOnError: true,
+				} );
+			} else {
+				const updateData = {
 					id,
 					content,
 					status,
-				},
-				{ throwOnError: true }
-			);
+				};
+
+				await saveEntityRecord( 'root', 'comment', updateData, {
+					throwOnError: true,
+				} );
+			}
+
 			createNotice(
 				'snackbar',
-				messages[ messageType ] ?? __( 'Comment updated.' ),
+				messages[ messageType ] ?? __( 'Note updated.' ),
 				{
 					type: 'snackbar',
 					isDismissible: true,
 				}
 			);
+			reflowComments();
 		} catch ( error ) {
+			reflowComments();
 			onError( error );
 		}
 	};
@@ -233,18 +315,20 @@ export function useBlockCommentsActions() {
 				const clientId = getSelectedBlockClientId();
 				const metadata = getBlockAttributes( clientId )?.metadata;
 				updateBlockAttributes( clientId, {
-					metadata: {
+					metadata: cleanEmptyObject( {
 						...metadata,
-						commentId: undefined,
-					},
+						noteId: undefined,
+					} ),
 				} );
 			}
 
-			createNotice( 'snackbar', __( 'Comment deleted successfully.' ), {
+			createNotice( 'snackbar', __( 'Note deleted.' ), {
 				type: 'snackbar',
 				isDismissible: true,
 			} );
+			reflowComments();
 		} catch ( error ) {
+			reflowComments();
 			onError( error );
 		}
 	};
@@ -259,16 +343,89 @@ export function useEnableFloatingSidebar( enabled = false ) {
 			return;
 		}
 
-		return registry.subscribe( () => {
-			const activeSidebar = registry
-				.select( interfaceStore )
-				.getActiveComplementaryArea( 'core' );
+		const { getActiveComplementaryArea } =
+			registry.select( interfaceStore );
+		const { disableComplementaryArea, enableComplementaryArea } =
+			registry.dispatch( interfaceStore );
 
-			if ( ! activeSidebar ) {
-				registry
-					.dispatch( interfaceStore )
-					.enableComplementaryArea( 'core', collabSidebarName );
+		const unsubscribe = registry.subscribe( () => {
+			// Return `null` to indicate the user hid the complementary area.
+			if ( getActiveComplementaryArea( 'core' ) === null ) {
+				enableComplementaryArea( 'core', collabSidebarName );
 			}
 		} );
+
+		return () => {
+			unsubscribe();
+			if ( getActiveComplementaryArea( 'core' ) === collabSidebarName ) {
+				disableComplementaryArea( 'core', collabSidebarName );
+			}
+		};
 	}, [ enabled, registry ] );
+}
+
+export function useFloatingThread( {
+	thread,
+	calculatedOffset,
+	setHeights,
+	selectedThread,
+	setBlockRef,
+	commentLastUpdated,
+} ) {
+	const blockElement = useBlockElement( thread.blockClientId );
+	const updateHeight = useCallback(
+		( id, newHeight ) => {
+			setHeights( ( prev ) => {
+				if ( prev[ id ] !== newHeight ) {
+					return { ...prev, [ id ]: newHeight };
+				}
+				return prev;
+			} );
+		},
+		[ setHeights ]
+	);
+
+	// Use floating-ui to track the block element's position with the calculated offset.
+	const { y, refs } = useFloating( {
+		placement: 'right-start',
+		middleware: [
+			offsetMiddleware( {
+				crossAxis: calculatedOffset || -16,
+			} ),
+		],
+		whileElementsMounted: autoUpdate,
+	} );
+
+	// Store the block reference for each thread.
+	useEffect( () => {
+		if ( blockElement ) {
+			refs.setReference( blockElement );
+		}
+	}, [ blockElement, refs, commentLastUpdated ] );
+
+	// Track thread heights.
+	useEffect( () => {
+		if ( refs.floating?.current ) {
+			setBlockRef( thread.id, blockElement );
+		}
+	}, [ blockElement, thread.id, refs.floating, setBlockRef ] );
+
+	// When the selected thread changes, update heights, triggering offset recalculation.
+	useEffect( () => {
+		if ( refs.floating?.current ) {
+			const newHeight = refs.floating.current.scrollHeight;
+			updateHeight( thread.id, newHeight );
+		}
+	}, [
+		thread.id,
+		updateHeight,
+		refs.floating,
+		selectedThread,
+		commentLastUpdated,
+	] );
+
+	return {
+		y,
+		refs,
+	};
 }

@@ -3,8 +3,11 @@
 		"name": "core/breadcrumbs",
 		"isValid": true,
 		"attributes": {
+			"prefersTaxonomy": false,
 			"separator": "/",
-			"showHomeLink": true
+			"showHomeItem": true,
+			"showCurrentItem": true,
+			"showOnHomePage": false
 		},
 		"innerBlocks": []
 	}

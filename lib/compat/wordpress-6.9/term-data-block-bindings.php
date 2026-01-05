@@ -14,21 +14,42 @@
  * @access private
  *
  * @param array    $source_args    Array containing source arguments used to look up the override value.
- *                                 Example: array( "key" => "name" ).
+ *                                 Example: array( "field" => "name" ).
  * @param WP_Block $block_instance The block instance.
  * @return mixed The value computed for the source.
  */
 function gutenberg_block_bindings_term_data_get_value( array $source_args, $block_instance ) {
-	if ( empty( $source_args['key'] ) ) {
+	if ( empty( $source_args['field'] ) ) {
 		return null;
 	}
 
-	if ( empty( $block_instance->context['termId'] ) || empty( $block_instance->context['taxonomy'] ) ) {
-		return null;
+	/*
+	 * BACKWARDS COMPATIBILITY: Hardcoded exception for navigation blocks.
+	 * Required for WordPress 6.9+ navigation blocks. DO NOT REMOVE.
+	 */
+	$block_name          = $block_instance->name ?? '';
+	$is_navigation_block = in_array(
+		$block_name,
+		array( 'core/navigation-link', 'core/navigation-submenu' ),
+		true
+	);
+
+	if ( $is_navigation_block ) {
+		// Navigation blocks: read from block attributes
+		$term_id = $block_instance->attributes['id'] ?? null;
+		$type    = $block_instance->attributes['type'] ?? '';
+		// Map UI shorthand to taxonomy slug when using attributes.
+		$taxonomy = ( 'tag' === $type ) ? 'post_tag' : $type;
+	} else {
+		// All other blocks: use context
+		$term_id  = $block_instance->context['termId'] ?? null;
+		$taxonomy = $block_instance->context['taxonomy'] ?? '';
 	}
 
-	$term_id  = $block_instance->context['termId'];
-	$taxonomy = $block_instance->context['taxonomy'];
+	// If we don't have required identifiers, bail early.
+	if ( empty( $term_id ) || empty( $taxonomy ) ) {
+		return null;
+	}
 
 	// Get the term data.
 	$term = get_term( $term_id, $taxonomy );
@@ -44,7 +65,7 @@ function gutenberg_block_bindings_term_data_get_value( array $source_args, $bloc
 		}
 	}
 
-	switch ( $source_args['key'] ) {
+	switch ( $source_args['field'] ) {
 		case 'id':
 			return esc_html( (string) $term_id );
 
@@ -52,7 +73,9 @@ function gutenberg_block_bindings_term_data_get_value( array $source_args, $bloc
 			return esc_html( $term->name );
 
 		case 'link':
-			return esc_url( get_term_link( $term ) );
+			// Only taxonomy entities are supported by Term Data.
+			$term_link = get_term_link( $term );
+			return is_wp_error( $term_link ) ? null : esc_url( $term_link );
 
 		case 'slug':
 			return esc_html( $term->slug );
@@ -64,7 +87,7 @@ function gutenberg_block_bindings_term_data_get_value( array $source_args, $bloc
 			return esc_html( (string) $term->parent );
 
 		case 'count':
-			return esc_html( (string) '(' . $term->count . ')' );
+			return esc_html( (string) $term->count );
 
 		default:
 			return null;

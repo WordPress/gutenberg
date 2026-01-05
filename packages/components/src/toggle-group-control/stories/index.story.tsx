@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryFn } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react-webpack5';
 
 /**
  * WordPress dependencies
@@ -25,7 +25,6 @@ import type {
 
 const meta: Meta< typeof ToggleGroupControl > = {
 	component: ToggleGroupControl,
-	// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 	subcomponents: { ToggleGroupControlOption, ToggleGroupControlOptionIcon },
 	title: 'Components/Selection & Input/Common/ToggleGroupControl',
 	id: 'components-togglegroupcontrol',
@@ -51,7 +50,6 @@ const Template: StoryFn< typeof ToggleGroupControl > = ( {
 
 	return (
 		<ToggleGroupControl
-			__nextHasNoMarginBottom
 			__next40pxDefaultSize
 			{ ...props }
 			onChange={ ( ...changeArgs ) => {

@@ -9,7 +9,6 @@ import Clipboard from 'clipboard';
 import { useRef, useEffect, useState } from '@wordpress/element';
 import deprecated from '@wordpress/deprecated';
 
-/* eslint-disable jsdoc/no-undefined-types */
 /**
  * Copies the text to the clipboard when the element is clicked.
  *
@@ -24,7 +23,6 @@ import deprecated from '@wordpress/deprecated';
  *                   timeout.
  */
 export default function useCopyOnClick( ref, text, timeout = 4000 ) {
-	/* eslint-enable jsdoc/no-undefined-types */
 	deprecated( 'wp.compose.useCopyOnClick', {
 		since: '5.8',
 		alternative: 'wp.compose.useCopyToClipboard',

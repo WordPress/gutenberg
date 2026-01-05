@@ -7,7 +7,7 @@ import fastDeepEqual from 'fast-deep-equal/es6';
  * WordPress dependencies
  */
 import { useState, useEffect, useCallback } from '@wordpress/element';
-import isShallowEqual from '@wordpress/is-shallow-equal';
+import { isShallowEqual } from '@wordpress/is-shallow-equal';
 import { getWidgetIdFromBlock, addWidgetIdToBlock } from '@wordpress/widgets';
 
 /**

@@ -9,6 +9,7 @@ import fastDeepEqual from 'fast-deep-equal/es6';
  */
 import {
 	useRef,
+	useState,
 	useCallback,
 	forwardRef,
 	createContext,
@@ -123,6 +124,7 @@ export function RichTextWrapper(
 
 	const instanceId = useInstanceId( RichTextWrapper );
 	const anchorRef = useRef();
+	const [ anchorElement, setAnchorElement ] = useState( null );
 	const context = useBlockEditContext();
 	const { clientId, isSelected: isBlockSelected, name: blockName } = context;
 	const blockBindings = context[ blockBindingsKey ];
@@ -171,15 +173,17 @@ export function RichTextWrapper(
 
 	const { disableBoundBlock, bindingsPlaceholder, bindingsLabel } = useSelect(
 		( select ) => {
+			if ( ! blockBindings?.[ identifier ] ) {
+				return {};
+			}
+
 			const { __experimentalBlockBindingsSupportedAttributes } =
 				select( blockEditorStore ).getSettings();
 
-			if (
-				! blockBindings?.[ identifier ] ||
-				! (
-					blockName in __experimentalBlockBindingsSupportedAttributes
-				)
-			) {
+			const bindableAttributes =
+				__experimentalBlockBindingsSupportedAttributes?.[ blockName ];
+
+			if ( ! bindableAttributes ) {
 				return {};
 			}
 
@@ -214,12 +218,12 @@ export function RichTextWrapper(
 			const { getBlockAttributes } = select( blockEditorStore );
 			const blockAttributes = getBlockAttributes( clientId );
 			let clientSideFieldLabel = null;
-			if ( blockBindingsSource?.editorUI ) {
-				const editorUIResult = blockBindingsSource.editorUI( {
+			if ( blockBindingsSource?.getFieldsList ) {
+				const fieldsItems = blockBindingsSource.getFieldsList( {
 					select,
 					context: blockBindingsContext,
 				} );
-				clientSideFieldLabel = editorUIResult.data?.find( ( item ) =>
+				clientSideFieldLabel = fieldsItems?.find( ( item ) =>
 					fastDeepEqual( item.args, relatedBinding?.args )
 				)?.label;
 			}
@@ -446,7 +450,7 @@ export function RichTextWrapper(
 			{ isSelected && hasFormats && (
 				<FormatToolbarContainer
 					inline={ inlineToolbar }
-					editableContentElement={ anchorRef.current }
+					editableContentElement={ anchorElement }
 				/>
 			) }
 			<TagName
@@ -497,6 +501,7 @@ export function RichTextWrapper(
 						inputEvents,
 					} ),
 					anchorRef,
+					setAnchorElement,
 				] ) }
 				contentEditable={ ! shouldDisableEditing }
 				suppressContentEditableWarning
@@ -575,6 +580,7 @@ const PublicForwardedRichTextContainer = forwardRef( ( props, ref ) => {
 		} = removeNativeProps( props );
 		return (
 			<Tag
+				ref={ ref }
 				{ ...contentProps }
 				dangerouslySetInnerHTML={ {
 					__html: valueToHTMLString( value, multiline ),

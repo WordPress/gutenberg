@@ -102,22 +102,22 @@ export default function Edit( {
 	return (
 		<>
 			{ isSingleSelected && ! isContentOnlyMode && (
-				<BlockControls>
-					<ToolbarGroup>
-						<HeadingLevelDropdown
-							value={ headingLevel }
-							options={ levelOptions }
-							onChange={ updateHeadingLevel }
-						/>
-					</ToolbarGroup>
-				</BlockControls>
-			) }
-			{ isSingleSelected && (
-				<BlockControls group="other">
-					<ToolbarButton onClick={ addAccordionItemBlock }>
-						{ __( 'Add' ) }
-					</ToolbarButton>
-				</BlockControls>
+				<>
+					<BlockControls>
+						<ToolbarGroup>
+							<HeadingLevelDropdown
+								value={ headingLevel }
+								options={ levelOptions }
+								onChange={ updateHeadingLevel }
+							/>
+						</ToolbarGroup>
+					</BlockControls>
+					<BlockControls group="other">
+						<ToolbarButton onClick={ addAccordionItemBlock }>
+							{ __( 'Add item' ) }
+						</ToolbarButton>
+					</BlockControls>
+				</>
 			) }
 			<InspectorControls key="setting">
 				<ToolsPanel
@@ -141,7 +141,6 @@ export default function Edit( {
 					>
 						<ToggleControl
 							isBlock
-							__nextHasNoMarginBottom
 							label={ __( 'Auto-close' ) }
 							onChange={ ( value ) => {
 								setAttributes( {
@@ -162,7 +161,6 @@ export default function Edit( {
 					>
 						<ToggleControl
 							isBlock
-							__nextHasNoMarginBottom
 							label={ __( 'Show icon' ) }
 							onChange={ ( value ) => {
 								setAttributes( {
@@ -188,7 +186,6 @@ export default function Edit( {
 							}
 						>
 							<ToggleGroupControl
-								__nextHasNoMarginBottom
 								__next40pxDefaultSize
 								isBlock
 								label={ __( 'Icon Position' ) }

@@ -165,7 +165,6 @@ export default function TableOfContentsEdit( {
 					isShownByDefault
 				>
 					<ToggleControl
-						__nextHasNoMarginBottom
 						label={ __( 'Only include current page' ) }
 						checked={ onlyIncludeCurrentPage }
 						onChange={ ( value ) =>
@@ -191,7 +190,6 @@ export default function TableOfContentsEdit( {
 					isShownByDefault
 				>
 					<SelectControl
-						__nextHasNoMarginBottom
 						__next40pxDefaultSize
 						label={ __( 'Include headings down to level' ) }
 						value={ maxLevel || '' }

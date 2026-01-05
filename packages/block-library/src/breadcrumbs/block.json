@@ -4,21 +4,35 @@
 	"name": "core/breadcrumbs",
 	"title": "Breadcrumbs",
 	"category": "theme",
-	"description": "Display a breadcrumb trail only for Pages, or for hierarchical post types. The block is useful to insert in the Pages template.",
+	"description": "Display a breadcrumb trail showing the path to the current page.",
 	"textdomain": "default",
 	"attributes": {
+		"prefersTaxonomy": {
+			"type": "boolean",
+			"default": false
+		},
 		"separator": {
 			"type": "string",
 			"default": "/"
 		},
-		"showHomeLink": {
+		"showHomeItem": {
 			"type": "boolean",
 			"default": true
+		},
+		"showCurrentItem": {
+			"type": "boolean",
+			"default": true
+		},
+		"showOnHomePage": {
+			"type": "boolean",
+			"default": false
 		}
 	},
-	"usesContext": [ "postId", "postType" ],
+	"usesContext": [ "postId", "postType", "templateSlug" ],
 	"supports": {
+		"anchor": true,
 		"html": false,
+		"align": [ "wide", "full" ],
 		"spacing": {
 			"margin": true,
 			"padding": true

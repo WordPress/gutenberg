@@ -1,46 +1,41 @@
 /**
- * WordPress dependencies
- */
-import { __ } from '@wordpress/i18n';
-
-/**
  * Internal dependencies
  */
-import type {
-	DataViewRenderFieldProps,
-	SortDirection,
-	NormalizedField,
-	FieldTypeDefinition,
-} from '../types';
-import renderFromElements from './utils/render-from-elements';
+import type { NormalizedField } from '../types';
+import type { FieldType } from '../types/private';
+import isValidRequired from './utils/is-valid-required';
+import isValidMinLength from './utils/is-valid-min-length';
+import isValidMaxLength from './utils/is-valid-max-length';
+import isValidPattern from './utils/is-valid-pattern';
+import isValidElements from './utils/is-valid-elements';
+import render from './utils/render-default';
 
-/* eslint-disable-next-line @typescript-eslint/no-unused-vars */
-function sort( valueA: any, valueB: any, direction: SortDirection ) {
-	// Passwords should not be sortable for security reasons
-	return 0;
+function getValueFormatted< Item >( {
+	item,
+	field,
+}: {
+	item: Item;
+	field: NormalizedField< Item >;
+} ): string {
+	return field.getValue( { item } ) ? '••••••••' : '';
 }
 
 export default {
-	sort,
-	isValid: {
-		custom: ( item: any, field: NormalizedField< any > ) => {
-			const value = field.getValue( { item } );
-			if ( field?.elements ) {
-				const validValues = field.elements.map( ( f ) => f.value );
-				if ( ! validValues.includes( value ) ) {
-					return __( 'Value must be one of the elements.' );
-				}
-			}
-
-			return null;
-		},
-	},
+	type: 'password',
+	render,
 	Edit: 'password',
-	render: ( { item, field }: DataViewRenderFieldProps< any > ) => {
-		return field.elements
-			? renderFromElements( { item, field } )
-			: '••••••••';
-	},
+	sort: () => 0, // Passwords should not be sortable for security reasons
 	enableSorting: false,
-	filterBy: false,
-} satisfies FieldTypeDefinition< any >;
+	enableGlobalSearch: false,
+	defaultOperators: [],
+	validOperators: [],
+	format: {},
+	getValueFormatted,
+	validate: {
+		required: isValidRequired,
+		pattern: isValidPattern,
+		minLength: isValidMinLength,
+		maxLength: isValidMaxLength,
+		elements: isValidElements,
+	},
+} satisfies FieldType< any >;

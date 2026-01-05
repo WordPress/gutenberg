@@ -16,33 +16,34 @@ import { store as commandsStore } from '../store';
  *
  * @example
  * ```js
+ * import { __ } from '@wordpress/i18n';
+ * import { addQueryArgs } from '@wordpress/url';
  * import { useCommandLoader } from '@wordpress/commands';
- * import { post, page, layout, symbolFilled } from '@wordpress/icons';
- *
- * const icons = {
- *     post,
- *     page,
- *     wp_template: layout,
- *     wp_template_part: symbolFilled,
- * };
+ * import { page } from '@wordpress/icons';
+ * import { useSelect } from '@wordpress/data';
+ * import { store as coreStore } from '@wordpress/core-data';
+ * import { useMemo } from '@wordpress/element';
  *
  * function usePageSearchCommandLoader( { search } ) {
  *     // Retrieve the pages for the "search" term.
- *     const { records, isLoading } = useSelect( ( select ) => {
- *         const { getEntityRecords } = select( coreStore );
- *         const query = {
- *             search: !! search ? search : undefined,
- *             per_page: 10,
- *             orderby: search ? 'relevance' : 'date',
- *         };
- *         return {
- *             records: getEntityRecords( 'postType', 'page', query ),
- *             isLoading: ! select( coreStore ).hasFinishedResolution(
- *                 'getEntityRecords',
- *                 'postType', 'page', query ]
- *             ),
- *         };
- *     }, [ search ] );
+ *     const { records, isLoading } = useSelect(
+ *         ( select ) => {
+ *             const { getEntityRecords } = select( coreStore );
+ *             const query = {
+ *                 search: !! search ? search : undefined,
+ *                 per_page: 10,
+ *                 orderby: search ? 'relevance' : 'date',
+ *             };
+ *             return {
+ *                 records: getEntityRecords( 'postType', 'page', query ),
+ *                 isLoading: ! select( coreStore ).hasFinishedResolution(
+ *                     'getEntityRecords',
+ *                     [ 'postType', 'page', query ]
+ *                 ),
+ *             };
+ *         },
+ *         [ search ]
+ *     );
  *
  *     // Create the commands.
  *     const commands = useMemo( () => {
@@ -52,19 +53,18 @@ import { store as commandsStore } from '../store';
  *                 label: record.title?.rendered
  *                     ? record.title?.rendered
  *                     : __( '(no title)' ),
- *                 icon: icons[ postType ],
+ *                 icon: page,
  *                 callback: ( { close } ) => {
  *                     const args = {
- *                         postType,
- *                         postId: record.id,
- *                         ...extraArgs,
+ * 							p: '/page',
+ * 							postId: record.id,
  *                     };
  *                     document.location = addQueryArgs( 'site-editor.php', args );
  *                     close();
  *                 },
  *             };
  *         } );
- *     }, [ records, history ] );
+ *     }, [ records ] );
  *
  *     return {
  *         commands,

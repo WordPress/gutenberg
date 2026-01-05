@@ -27,6 +27,7 @@ jest.mock( '../../../utils/hooks', () => ( {
 jest.mock( '../use-entity-binding', () => ( {
 	useEntityBinding: jest.fn( () => ( {
 		hasUrlBinding: false,
+		isBoundEntityAvailable: false,
 		clearBinding: jest.fn(),
 	} ) ),
 } ) );
@@ -59,7 +60,7 @@ describe( 'Controls', () => {
 		render( <Controls { ...defaultProps } /> );
 
 		expect( screen.getByLabelText( 'Text' ) ).toBeInTheDocument();
-		expect( screen.getByLabelText( 'Link' ) ).toBeInTheDocument();
+		expect( screen.getByText( 'Link to' ) ).toBeInTheDocument();
 		expect(
 			screen.getByLabelText( 'Open in new tab' )
 		).toBeInTheDocument();
@@ -79,81 +80,6 @@ describe( 'Controls', () => {
 
 		const textInput = screen.getByLabelText( 'Text' );
 		expect( textInput.value ).toBe( 'Bold Text' );
-	} );
-
-	it( 'decodes URL values for display', () => {
-		const propsWithEncodedUrl = {
-			...defaultProps,
-			attributes: {
-				...defaultProps.attributes,
-				url: 'https://example.com/test%20page',
-			},
-		};
-		render( <Controls { ...propsWithEncodedUrl } /> );
-
-		const urlInput = screen.getByLabelText( 'Link' );
-		expect( urlInput.value ).toBe( 'https://example.com/test page' );
-	} );
-
-	it( 'encodes URL values when changed', () => {
-		render( <Controls { ...defaultProps } /> );
-
-		const urlInput = screen.getByLabelText( 'Link' );
-
-		fireEvent.change( urlInput, {
-			target: { value: 'https://example.com/test page' },
-		} );
-
-		expect( defaultProps.setAttributes ).toHaveBeenCalledWith( {
-			url: 'https://example.com/test%20page',
-		} );
-	} );
-
-	it( 'calls updateAttributes on URL blur', () => {
-		render( <Controls { ...defaultProps } /> );
-
-		const urlInput = screen.getByLabelText( 'Link' );
-
-		fireEvent.focus( urlInput );
-		fireEvent.blur( urlInput );
-
-		expect( mockUpdateAttributes ).toHaveBeenCalledWith(
-			{ url: 'https://example.com' },
-			defaultProps.setAttributes,
-			{ ...defaultProps.attributes, url: 'https://example.com' }
-		);
-	} );
-
-	it( 'stores last URL value on focus and uses it in updateAttributes', () => {
-		const propsWithDifferentUrl = {
-			...defaultProps,
-			attributes: {
-				...defaultProps.attributes,
-				url: 'https://different.com',
-			},
-		};
-		render( <Controls { ...propsWithDifferentUrl } /> );
-
-		const urlInput = screen.getByLabelText( 'Link' );
-
-		fireEvent.focus( urlInput );
-
-		// Change the URL
-		fireEvent.change( urlInput, {
-			target: { value: 'https://new.com' },
-		} );
-
-		// Blur should call updateAttributes with the current URL (since url exists)
-		fireEvent.blur( urlInput );
-
-		expect( mockUpdateAttributes ).toHaveBeenCalledWith(
-			{ url: 'https://different.com' }, // Current URL from attributes (not input value)
-			defaultProps.setAttributes,
-			{
-				...propsWithDifferentUrl.attributes,
-				url: 'https://different.com',
-			} // lastURLRef.current
-		);
 	} );
 
 	it( 'handles all form field changes correctly', () => {
@@ -197,6 +123,7 @@ describe( 'Controls', () => {
 			const { useEntityBinding } = require( '../use-entity-binding' );
 			useEntityBinding.mockReturnValue( {
 				hasUrlBinding: true,
+				isBoundEntityAvailable: true,
 				clearBinding: jest.fn(),
 			} );
 
@@ -220,6 +147,7 @@ describe( 'Controls', () => {
 			const { useEntityBinding } = require( '../use-entity-binding' );
 			useEntityBinding.mockReturnValue( {
 				hasUrlBinding: true,
+				isBoundEntityAvailable: true,
 				clearBinding: jest.fn(),
 			} );
 
@@ -257,6 +185,7 @@ describe( 'Controls', () => {
 			const { useEntityBinding } = require( '../use-entity-binding' );
 			useEntityBinding.mockReturnValue( {
 				hasUrlBinding: true,
+				isBoundEntityAvailable: true,
 				clearBinding: jest.fn(),
 			} );
 
@@ -280,6 +209,7 @@ describe( 'Controls', () => {
 			const { useEntityBinding } = require( '../use-entity-binding' );
 			useEntityBinding.mockReturnValue( {
 				hasUrlBinding: true,
+				isBoundEntityAvailable: true,
 				clearBinding: jest.fn(),
 			} );
 

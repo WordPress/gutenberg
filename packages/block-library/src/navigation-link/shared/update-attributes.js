@@ -222,5 +222,6 @@ export const updateAttributes = (
 
 	return {
 		isEntityLink: !! finalId && finalKind !== 'custom',
+		attributes, // Return the computed attributes object
 	};
 };

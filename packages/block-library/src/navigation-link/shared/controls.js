@@ -4,25 +4,27 @@
 import {
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
-	__experimentalInputControl as InputControl,
-	Button,
 	CheckboxControl,
 	TextControl,
 	TextareaControl,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
-import { useRef } from '@wordpress/element';
-import { useInstanceId } from '@wordpress/compose';
-import { safeDecodeURI } from '@wordpress/url';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
-import { linkOff as unlinkIcon } from '@wordpress/icons';
+import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
+import { useSelect } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
  */
 import { useToolsPanelDropdownMenuProps } from '../../utils/hooks';
-import { updateAttributes } from './update-attributes';
+import { useHandleLinkChange } from './use-handle-link-change';
 import { useEntityBinding } from './use-entity-binding';
+import { getSuggestionsQuery } from '../link-ui';
+import { useLinkPreview } from './use-link-preview';
+import { unlock } from '../../lock-unlock';
+
+const { LinkPicker } = unlock( blockEditorPrivateApis );
 
 /**
  * Get a human-readable entity type name.
@@ -68,24 +70,74 @@ function getEntityTypeName( type, kind ) {
  */
 export function Controls( { attributes, setAttributes, clientId } ) {
 	const { label, url, description, rel, opensInNewTab } = attributes;
-	const lastURLRef = useRef( url );
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
-	const inputId = useInstanceId( Controls, 'link-input' );
-	const helpTextId = `${ inputId }__help`;
 
-	// Use the entity binding hook internally
-	const { hasUrlBinding, clearBinding } = useEntityBinding( {
+	// Use the entity binding hook for UI state (help text, link preview, etc.)
+	const { hasUrlBinding, isBoundEntityAvailable, entityRecord } =
+		useEntityBinding( {
+			clientId,
+			attributes,
+		} );
+
+	const needsHelpText = hasUrlBinding;
+	const helpText = isBoundEntityAvailable
+		? BindingHelpText( {
+				type: attributes.type,
+				kind: attributes.kind,
+		  } )
+		: MissingEntityHelpText( {
+				type: attributes.type,
+				kind: attributes.kind,
+		  } );
+
+	// Get the link change handler with built-in binding management
+	const handleLinkChange = useHandleLinkChange( {
 		clientId,
 		attributes,
+		setAttributes,
 	} );
 
-	const editBoundLink = () => {
-		// Remove the binding
-		clearBinding();
+	const linkTitle =
+		entityRecord?.title?.rendered ||
+		entityRecord?.title ||
+		entityRecord?.name;
 
-		// Clear url and id to allow picking a new entity (keep type and kind)
-		setAttributes( { url: undefined, id: undefined } );
-	};
+	const linkImage = useSelect(
+		( select ) => {
+			// Only fetch for post-type entities with featured media
+			if ( ! entityRecord?.featured_media ) {
+				return null;
+			}
+
+			const { getEntityRecord } = select( coreStore );
+
+			// Get the media entity to fetch the image URL
+			const media = getEntityRecord(
+				'postType',
+				'attachment',
+				entityRecord.featured_media
+			);
+
+			// Return the thumbnail or medium size URL, fallback to source_url
+			return (
+				media?.media_details?.sizes?.thumbnail?.source_url ||
+				media?.media_details?.sizes?.medium?.source_url ||
+				media?.source_url ||
+				null
+			);
+		},
+		[ entityRecord?.featured_media ]
+	);
+
+	const preview = useLinkPreview( {
+		url,
+		title: linkTitle,
+		image: linkImage,
+		type: attributes.type,
+		entityStatus: entityRecord?.status,
+		hasBinding: hasUrlBinding,
+		isEntityAvailable: isBoundEntityAvailable,
+	} );
 
 	return (
 		<ToolsPanel
@@ -108,7 +160,6 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 				isShownByDefault
 			>
 				<TextControl
-					__nextHasNoMarginBottom
 					__next40pxDefaultSize
 					label={ __( 'Text' ) }
 					value={ label ? stripHTML( label ) : '' }
@@ -121,64 +172,19 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 
 			<ToolsPanelItem
 				hasValue={ () => !! url }
-				label={ __( 'Link' ) }
+				label={ __( 'Link to' ) }
 				onDeselect={ () => setAttributes( { url: '' } ) }
 				isShownByDefault
 			>
-				<InputControl
-					__nextHasNoMarginBottom
-					__next40pxDefaultSize
-					id={ inputId }
-					label={ __( 'Link' ) }
-					value={ url ? safeDecodeURI( url ) : '' }
-					onChange={ ( urlValue ) => {
-						if ( hasUrlBinding ) {
-							return; // Prevent editing when URL is bound
-						}
-						setAttributes( {
-							url: encodeURI( safeDecodeURI( urlValue ) ),
-						} );
-					} }
-					autoComplete="off"
-					type="url"
-					disabled={ hasUrlBinding }
-					onFocus={ () => {
-						if ( hasUrlBinding ) {
-							return;
-						}
-						lastURLRef.current = url;
-					} }
-					onBlur={ () => {
-						if ( hasUrlBinding ) {
-							return;
-						}
-						// Defer the updateAttributes call to ensure entity connection isn't severed by accident.
-						updateAttributes(
-							{ url: ! url ? lastURLRef.current : url },
-							setAttributes,
-							{ ...attributes, url: lastURLRef.current }
-						);
-					} }
-					help={
-						hasUrlBinding && (
-							<BindingHelpText
-								type={ attributes.type }
-								kind={ attributes.kind }
-							/>
-						)
-					}
-					suffix={
-						hasUrlBinding && (
-							<Button
-								icon={ unlinkIcon }
-								onClick={ editBoundLink }
-								aria-describedby={ helpTextId }
-								showTooltip
-								label={ __( 'Unsync and edit' ) }
-								__next40pxDefaultSize
-							/>
-						)
-					}
+				<LinkPicker
+					preview={ preview }
+					onSelect={ handleLinkChange }
+					suggestionsQuery={ getSuggestionsQuery(
+						attributes.type,
+						attributes.kind
+					) }
+					label={ __( 'Link to' ) }
+					help={ needsHelpText ? helpText : undefined }
 				/>
 			</ToolsPanelItem>
 
@@ -189,7 +195,6 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 				isShownByDefault
 			>
 				<CheckboxControl
-					__nextHasNoMarginBottom
 					label={ __( 'Open in new tab' ) }
 					checked={ opensInNewTab }
 					onChange={ ( value ) =>
@@ -205,7 +210,6 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 				isShownByDefault
 			>
 				<TextareaControl
-					__nextHasNoMarginBottom
 					label={ __( 'Description' ) }
 					value={ description || '' }
 					onChange={ ( descriptionValue ) => {
@@ -224,7 +228,6 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 				isShownByDefault
 			>
 				<TextControl
-					__nextHasNoMarginBottom
 					__next40pxDefaultSize
 					label={ __( 'Rel attribute' ) }
 					value={ rel || '' }
@@ -249,11 +252,28 @@ export function Controls( { attributes, setAttributes, clientId } ) {
  * @param {string} props.kind - The entity kind
  * @return {string} Help text for the bound URL
  */
-function BindingHelpText( { type, kind } ) {
+export function BindingHelpText( { type, kind } ) {
 	const entityType = getEntityTypeName( type, kind );
 	return sprintf(
 		/* translators: %s is the entity type (e.g., "page", "post", "category") */
 		__( 'Synced with the selected %s.' ),
+		entityType
+	);
+}
+
+/**
+ * Component to display error help text for missing entity bindings.
+ *
+ * @param {Object} props      - Component props
+ * @param {string} props.type - The entity type
+ * @param {string} props.kind - The entity kind
+ * @return {JSX.Element} Error help text component
+ */
+export function MissingEntityHelpText( { type, kind } ) {
+	const entityType = getEntityTypeName( type, kind );
+	return sprintf(
+		/* translators: %s is the entity type (e.g., "page", "post", "category") */
+		__( 'Synced %s is missing. Please update or remove this link.' ),
 		entityType
 	);
 }

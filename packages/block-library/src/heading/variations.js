@@ -1,29 +1,42 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
-import { textColor } from '@wordpress/icons';
+import { __, sprintf } from '@wordpress/i18n';
+import {
+	headingLevel1,
+	headingLevel2,
+	headingLevel3,
+	headingLevel4,
+	headingLevel5,
+	headingLevel6,
+} from '@wordpress/icons';
+
+const LEVEL_ICONS = [
+	headingLevel1,
+	headingLevel2,
+	headingLevel3,
+	headingLevel4,
+	headingLevel5,
+	headingLevel6,
+];
 
 const variations = [
-	{
-		name: 'Stretchy Heading',
-		title: __( 'Stretchy Heading' ),
-		description: __(
-			'Heading text automatically resizes to fit the container width.'
+	...[ 1, 2, 3, 4, 5, 6 ].map( ( level ) => ( {
+		name: `h${ level }`,
+		title: sprintf(
+			/* translators: %d: heading level e.g: "1", "2", "3" */
+			__( 'Heading %d' ),
+			level
 		),
-		attributes: { fitText: true },
-		scope: [ 'inserter' ],
-		isActive: ( blockAttributes ) => blockAttributes.fitText,
-		icon: textColor,
-		example: {
-			attributes: {
-				content: __(
-					'This heading will automatically resize to fit its container width.'
-				),
-				fitText: true,
-			},
-		},
-	},
+		description: __(
+			'Introduce new sections and organize content to help visitors (and search engines) understand the structure of your content.'
+		),
+		icon: LEVEL_ICONS[ level - 1 ],
+		attributes: { level },
+		scope: [ 'block', 'transform' ],
+		keywords: [ `h${ level }` ],
+		isActive: ( blockAttributes ) => blockAttributes.level === level,
+	} ) ),
 ];
 
 export default variations;

@@ -33,11 +33,11 @@ import { useRef, useState, useEffect, useMemo } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { focus } from '@wordpress/dom';
 import { isBlobURL } from '@wordpress/blob';
+import { getResolvedValue } from '@wordpress/global-styles-engine';
 
 /**
  * Internal dependencies
  */
-import { getResolvedValue } from '../global-styles/utils';
 import { hasBackgroundImageValue } from '../global-styles/background-panel';
 import { setImmutably } from '../../utils/object';
 import MediaReplaceFlow from '../media-replace-flow';
@@ -579,20 +579,17 @@ function BackgroundSizeControls( {
 	return (
 		<VStack spacing={ 3 } className="single-column">
 			<FocalPointPicker
-				__nextHasNoMarginBottom
 				label={ __( 'Focal point' ) }
 				url={ imageValue }
 				value={ backgroundPositionToCoords( backgroundPositionValue ) }
 				onChange={ updateBackgroundPosition }
 			/>
 			<ToggleControl
-				__nextHasNoMarginBottom
 				label={ __( 'Fixed background' ) }
 				checked={ attachmentValue === 'fixed' }
 				onChange={ toggleScrollWithPage }
 			/>
 			<ToggleGroupControl
-				__nextHasNoMarginBottom
 				size="__unstable-large"
 				label={ __( 'Size' ) }
 				value={ currentValueForToggle }
@@ -642,7 +639,6 @@ function BackgroundSizeControls( {
 					}
 				/>
 				<ToggleControl
-					__nextHasNoMarginBottom
 					label={ __( 'Repeat' ) }
 					checked={ repeatCheckedValue }
 					onChange={ toggleIsRepeated }

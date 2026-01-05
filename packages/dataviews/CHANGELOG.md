@@ -2,6 +2,120 @@
 
 ## Unreleased
 
+### Code Quality
+
+- Replace HStack/VStack from `wordpress/components` by Stack from `wordpress/ui`. [#74174](https://github.com/WordPress/gutenberg/pull/74174)
+- DataViews: Remove extra wrapper for GridItem. [#73665](https://github.com/WordPress/gutenberg/pull/73665)
+- Field API: move validation to the field type. [#73642](https://github.com/WordPress/gutenberg/pull/73642)
+- Field API: move format logic to the field type. [#73922](https://github.com/WordPress/gutenberg/pull/73922)
+- Reorganize internal code. [#74188](https://github.com/WordPress/gutenberg/pull/74188)
+- Improve stories and tests. [#74192](https://github.com/WordPress/gutenberg/pull/74192)
+- Update DataForm stories. [#74196](https://github.com/WordPress/gutenberg/pull/74196)
+
+### Bug Fixes
+
+- Fix panel field width with empty value for top/none label positions.[#74264](https://github.com/WordPress/gutenberg/pull/74264)
+- Fix sticky footer in DataViews grid view. [#73661](https://github.com/WordPress/gutenberg/pull/73661)
+- DataViews: Apply primary style to first column if there is no title field. [#73729](https://github.com/WordPress/gutenberg/pull/73729)
+- DataViews: Combined field alignment in table layout. [#73908](https://github.com/WordPress/gutenberg/pull/73908)
+- DataViews: Fix table row multiselection in Firefox [#73945](https://github.com/WordPress/gutenberg/pull/73945)
+- DataViews: `filterSortAndPaginate()` will ignore sorting on non-sortable fields [#73950](https://github.com/WordPress/gutenberg/pull/73950)
+
+### Enhancements
+
+- DataViewsPicker: Ensure checkbox column in table picker layout is always `48px` wide. [#74181](https://github.com/WordPress/gutenberg/pull/74181)
+- DataViews: improve how hierarchy is displayed in table layout. [#74199](https://github.com/WordPress/gutenberg/pull/74199)
+- DataViews: Add `groupBy.showLabel` config option to control whether the field label is shown in group headers. [#74161](https://github.com/WordPress/gutenberg/pull/74161)
+- DataViews table layout: remove row click-to-select behavior and hover styles. Selection is now only possible via checkboxes, or by ctrl/cmd clicking. [#73873](https://github.com/WordPress/gutenberg/pull/73873)
+- Better labels for operators and deprecate the `isNotAll` operator. [#73671](https://github.com/WordPress/gutenberg/pull/73671)
+- DataForm: add support for `min`/`max` and `minLength`/`maxLength` validation for relevant controls. [#73465](https://github.com/WordPress/gutenberg/pull/73465)
+- Field API: display formats for `number` and `integer` types. [#73644](https://github.com/WordPress/gutenberg/pull/73644)
+- Field API: add display format for `datetime` type. [#73924](https://github.com/WordPress/gutenberg/pull/73924)
+- DataViews: Update padding to 24px for consistency. [#73334](https://github.com/WordPress/gutenberg/pull/73334)
+- DataViews: Simplify list layout field color styles. [#73884](https://github.com/WordPress/gutenberg/pull/73884)
+- DataViews: Add panel form layout validation. [#73700](https://github.com/WordPress/gutenberg/pull/73700)
+- Converted package to a compliant dual CJS/ESM module ([#73822](https://github.com/WordPress/gutenberg/pull/73822))
+
+## 11.0.0 (2025-11-26)
+
+### Enhancements
+
+- Simplify field normalization and types. [#73387](https://github.com/WordPress/gutenberg/pull/73387)
+- DataViews table layout: make checkboxes permanently visible when bulk actions are available. [#73245](https://github.com/WordPress/gutenberg/pull/73245)
+- DataViews: Add insert left/right in table column header. [#72929](https://github.com/WordPress/gutenberg/pull/72929)
+- DataViews: Make sticky elements (table headers, footer, actions column) inherit background colors from parent container. This allows DataViews instances to seamlessly adapt to containers with custom background colors. [#73240](https://github.com/WordPress/gutenberg/pull/73240)
+- DataViews table layout: only apply hover styles when bulk actions are available. [#73248](https://github.com/WordPress/gutenberg/pull/73248)
+- DataViews: add support for activity layout. [#72780](https://github.com/WordPress/gutenberg/pull/72780)
+- DataViews: Add grid keyboard navigation. [#72997](https://github.com/WordPress/gutenberg/pull/72997)
+- DataViews: Introduce CSS var to enable users to apply a different background color to DataViews containers. [#73390](https://github.com/WordPress/gutenberg/pull/73390)
+- Field API: introduce the `format` prop to format the `date` field type. [#72999](https://github.com/WordPress/gutenberg/pull/72999)
+- Field API: fix display format for date. [#73538](https://github.com/WordPress/gutenberg/pull/73538)
+- Documentation: improve Edit component. [#73202](https://github.com/WordPress/gutenberg/pull/73202)
+- Documentation: surface better the `type` property in the documentation. [#73349](https://github.com/WordPress/gutenberg/pull/73349)
+- Documentation: improve DataView's `layout` prop. [#73470](https://github.com/WordPress/gutenberg/pull/73470)
+- Documentation: document `readOnly`, `description`, and `placeholder` properties. [#73515](https://github.com/WordPress/gutenberg/pull/73515)
+- Documentation: add missing props in DataViews. [#73611](https://github.com/WordPress/gutenberg/pull/73611)
+- DataForm Panel Layout: Focus the first input element when the panel opens. [#72322](https://github.com/WordPress/gutenberg/pull/72322)
+- DataForm: Pattern validation is now supported on all fields that browsers support it in. [#73156](https://github.com/WordPress/gutenberg/pull/73156)
+- Documentation: improve operators docs. [#73523](https://github.com/WordPress/gutenberg/pull/73523)
+- DataViews table layout: fix table header spacing when using non-default column alignment. [#73398](https://github.com/WordPress/gutenberg/pull/73398)
+
+### Bug fixes
+
+- Fix: ensure primary actions are not wrapped in the list layout. [#73333](https://github.com/WordPress/gutenberg/pull/73333)
+- Fix: DataViews consistently opens filter section on clicking Add Filter via column header. [#72998](https://github.com/WordPress/gutenberg/pull/72998)
+- DataForm Panel Layout: Fix Tags fields issue related to deepMerge. [#73344](https://github.com/WordPress/gutenberg/pull/73344)
+
+### Breaking changes
+
+- DataViews: rename `groupByField` to `groupBy.field` to allow control over both the field and the direction of the grouping. [#72780](https://github.com/WordPress/gutenberg/pull/72780)
+- Types: FieldType is now FieldTypeName. [#73546](https://github.com/WordPress/gutenberg/pull/73546)
+
+## 10.3.0 (2025-11-12)
+
+### Enhancements
+
+- DataForm: add new details layout. [#72355](https://github.com/WordPress/gutenberg/pull/72355)
+- DatViews list layout: remove link variant from primary actions's button. [#72920](https://github.com/WordPress/gutenberg/pull/72920)
+- DataForm: simplify form normalization. [#72848](https://github.com/WordPress/gutenberg/pull/72848)
+- DataViewsPicker: Add With Modal story. [#72913](https://github.com/WordPress/gutenberg/pull/72913)
+- DataForm: make the card layout borderless. [#72514](https://github.com/WordPress/gutenberg/pull/72514)
+- DataViews: Simplify the view config properties section. [#73064](https://github.com/WordPress/gutenberg/pull/73064)
+- DataViews: Add a contextual menu to the table layout header. [#73104](https://github.com/WordPress/gutenberg/pull/73104)
+- DataViewsPicker: Add table layout support. [#72914](https://github.com/WordPress/gutenberg/pull/72914)
+- DataForm: use envelope icon instead of atSymbol for email control component. [#73184](https://github.com/WordPress/gutenberg/pull/73184)
+- DataViews: Group DataViews actions based on primary actions and regular actions and adds a separator between the groups. [#72866](https://github.com/WordPress/gutenberg/pull/72866)
+
+### Bug fixes
+
+- useFormValidity: make it work with any level of nesting in the form. [#72588](https://github.com/WordPress/gutenberg/pull/72588)
+- Fix: DataViews modal actions in list layout. [#72793](https://github.com/WordPress/gutenberg/pull/72793)
+- Fix: Incorrect aria-label in table layout when items are not clickable. [#73034](https://github.com/WordPress/gutenberg/pull/73034)
+- Fix: Table layout column spacing. [#72969](https://github.com/WordPress/gutenberg/pull/72969)
+
+## 10.2.0 (2025-10-29)
+
+### Enhancements
+
+- DataViews: datetime filter and default render use local time. [#72756](https://github.com/WordPress/gutenberg/pull/72756)
+- DataViews: keep icon-only buttons on mobile for bulk actions. [#72761](https://github.com/WordPress/gutenberg/pull/72761)
+- DataForm: update spacing for regular and card layouts. [#72249](https://github.com/WordPress/gutenberg/pull/72249).
+- DataForm: Fix password field suffix alignment. [#72524](https://github.com/WordPress/gutenberg/pull/72524).
+
+## 10.1.0 (2025-10-21)
+
+### Enhancements
+
+- Consistently use font-weight 499 instead of 500 ([#72473](https://github.com/WordPress/gutenberg/pull/72473)).
+- Dataviews: Use text based buttons for actions instead of text. [#72417](https://github.com/WordPress/gutenberg/pull/72417)
+- DataForm: Add support for non collapsible cards. [#72540](https://github.com/WordPress/gutenberg/pull/72540)
+
+## 10.0.0 (2025-10-17)
+
+### Bug Fixes
+
+- DataViewsPicker: ensure title overflows correctly in Grid view. ([#72339](https://github.com/WordPress/gutenberg/pull/72339))
+
 ### Enhancements
 
 - Dataviews: Make header table view select all checkbox always visible. ([#72050](https://github.com/WordPress/gutenberg/pull/72050))
@@ -11,12 +125,18 @@
 - Normalize search field styles ([#72072](https://github.com/WordPress/gutenberg/pull/72072)).
 - DataForm control for `date` supports `required` and `custom` validation [#72048](https://github.com/WordPress/gutenberg/pull/72048).
 - DataForm control for `datetime` supports `required` and `custom` validation. [#72060](https://github.com/WordPress/gutenberg/pull/72060).
+- Standardise DataForm typography. [#72284](https://github.com/WordPress/gutenberg/pull/72284).
+- Dataviews: Add support for dynamic modal headers. [#72384](https://github.com/WordPress/gutenberg/pull/72384)
+- Field API: support async loading elements. [#72254](https://github.com/WordPress/gutenberg/pull/72254)
 
 ### Breaking changes
 
+- DataForm no longer injects an empty value to the `select` control. Consumers must now explicitly provide it if they need one. [#72241](https://github.com/WordPress/gutenberg/pull/72241)
 - DataForm: Add summary field support for both card and panel layouts. The `summary` property has been moved from the field level to the layout level, and so fields using `summary` at the field level must now configure it within the `layout` object. Additionally, the first children will only be used as summary for the panel if 1) there is no `layout.summary` and 2) the form field ID doesn't match any existing field. See README for details. [#71576](https://github.com/WordPress/gutenberg/pull/71576)
 - Remove `Data< Item >` type, as it is no longer used internally for a long time. [#72051](https://github.com/WordPress/gutenberg/pull/72051)
 - Remove `isDestructive` prop from actions API. Destructive actions should be communicated via flow (opens modal to confirm) and color should be used in the modal. [#72111](https://github.com/WordPress/gutenberg/pull/72111)
+- The `isValid.custom` default function that comes with the field type no longer checks for elements. This is now the `isValid.elements` responsibility and can be toggle on/off separately. [#72325](https://github.com/WordPress/gutenberg/pull/72325)
+- DataForm: make validation controlled by leveraging a `validity` prop. This also removes `isItemValid` and introduces `useFormValidity` hook to calculate the `validity` prop. [#71412](https://github.com/WordPress/gutenberg/pull/71412)
 
 ### Features
 
@@ -27,6 +147,7 @@
 - Reorganizes normalize-form-fields and renames `dataforms-layouts/` to `dataform-layout/` to follow the naming schema of any other folder in the package. [#72056](https://github.com/WordPress/gutenberg/pull/72056)
 - Moves `utils.ts` to `field-types/utils/render-from-elements.ts`, so it's collocated where it is used. [#72058](https://github.com/WordPress/gutenberg/pull/72058)
 - Centralize all top-level utilities in a `utils/` folder, sets a name that reflects on the function name, and uses the default exports. [#72063](https://github.com/WordPress/gutenberg/pull/72063)
+- DataForm: refactor RelativeDateControl to use DataFormControl props. [#72361](https://github.com/WordPress/gutenberg/pull/72361)
 
 ## 9.1.0 (2025-10-01)
 

@@ -19,7 +19,7 @@ import {
  */
 import { PREFERENCES_DEFAULTS, SETTINGS_DEFAULTS } from './defaults';
 import { insertAt, moveTo } from './array';
-import { sectionRootClientIdKey } from './private-keys';
+import { sectionRootClientIdKey, isIsolatedEditorKey } from './private-keys';
 import { unlock } from '../lock-unlock';
 
 const { isContentBlock } = unlock( blocksPrivateApis );
@@ -1963,31 +1963,16 @@ export function lastBlockInserted( state = {}, action ) {
 }
 
 /**
- * Reducer returning the block that is eding temporarily edited as blocks.
+ * Reducer returning the contentOnly block that is being edited.
  *
- * @param {Object} state  Current state.
- * @param {Object} action Dispatched action.
+ * @param {string|undefined} state  Current state.
+ * @param {Object}           action Dispatched action.
  *
- * @return {Object} Updated state.
+ * @return {string|undefined} Updated state.
  */
-export function temporarilyEditingAsBlocks( state = '', action ) {
-	if ( action.type === 'SET_TEMPORARILY_EDITING_AS_BLOCKS' ) {
-		return action.temporarilyEditingAsBlocks;
-	}
-	return state;
-}
-
-/**
- * Reducer returning the focus mode that should be used when temporarily edit as blocks finishes.
- *
- * @param {Object} state  Current state.
- * @param {Object} action Dispatched action.
- *
- * @return {Object} Updated state.
- */
-export function temporarilyEditingFocusModeRevert( state = '', action ) {
-	if ( action.type === 'SET_TEMPORARILY_EDITING_AS_BLOCKS' ) {
-		return action.focusModeToRevert;
+export function editedContentOnlySection( state, action ) {
+	if ( action.type === 'EDIT_CONTENT_ONLY_SECTION' ) {
+		return action.clientId;
 	}
 	return state;
 }
@@ -2020,21 +2005,6 @@ export function blockEditingModes( state = new Map(), action ) {
 				? new Map().set( '', state.get( '' ) )
 				: state;
 		}
-	}
-	return state;
-}
-
-/**
- * Reducer returning the clientId of the block settings menu that is currently open.
- *
- * @param {string|null} state  Current state.
- * @param {Object}      action Dispatched action.
- *
- * @return {string|null} Updated state.
- */
-export function openedBlockSettingsMenu( state = null, action ) {
-	if ( 'SET_OPENED_BLOCK_SETTINGS_MENU' === action.type ) {
-		return action?.clientId ?? null;
 	}
 	return state;
 }
@@ -2154,14 +2124,12 @@ const combinedReducers = combineReducers( {
 	expandedBlock,
 	highlightedBlock,
 	lastBlockInserted,
-	temporarilyEditingAsBlocks,
-	temporarilyEditingFocusModeRevert,
+	editedContentOnlySection,
 	blockVisibility,
 	blockEditingModes,
 	styleOverrides,
 	removalPromptData,
 	blockRemovalRules,
-	openedBlockSettingsMenu,
 	registeredInserterMediaCategories,
 	zoomLevel,
 	hasBlockSpotlight,
@@ -2270,18 +2238,13 @@ function hasBindings( block ) {
  * Computes and returns derived block editing modes for a given block tree.
  *
  * This function calculates the editing modes for each block in the tree, taking into account
- * various factors such as zoom level, navigation mode, sections, and synced patterns.
+ * various factors such as zoom level, sections, and synced patterns.
  *
- * @param {Object}  state        The current state object.
- * @param {boolean} isNavMode    Whether the navigation mode is active.
- * @param {string}  treeClientId The client ID of the root block for the tree. Defaults to an empty string.
+ * @param {Object} state        The current state object.
+ * @param {string} treeClientId The client ID of the root block for the tree. Defaults to an empty string.
  * @return {Map} A Map containing the derived block editing modes, keyed by block client ID.
  */
-function getDerivedBlockEditingModesForTree(
-	state,
-	isNavMode = false,
-	treeClientId = ''
-) {
+function getDerivedBlockEditingModesForTree( state, treeClientId = '' ) {
 	const isZoomedOut =
 		state?.zoomLevel < 100 || state?.zoomLevel === 'auto-scaled';
 	const derivedBlockEditingModes = new Map();
@@ -2313,10 +2276,16 @@ function getDerivedBlockEditingModesForTree(
 		( clientId ) =>
 			state.blockListSettings[ clientId ]?.templateLock === 'contentOnly'
 	);
+
+	// When in an isolated editing context (e.g., editing a template part or pattern directly),
+	// don't apply contentOnly mode to nested unsynced patterns or template parts.
+	const isIsolatedEditor = state.settings?.[ isIsolatedEditorKey ];
+
 	// Use array.from for better back compat. Older versions of the iterator returned
 	// from `keys()` didn't have the `filter` method.
 	const unsyncedPatternClientIds =
-		!! window?.__experimentalContentOnlyPatternInsertion
+		!! window?.__experimentalContentOnlyPatternInsertion &&
+		! isIsolatedEditor
 			? Array.from( state.blocks.attributes.keys() ).filter(
 					( clientId ) =>
 						state.blocks.attributes.get( clientId )?.metadata
@@ -2326,13 +2295,40 @@ function getDerivedBlockEditingModesForTree(
 	const contentOnlyParents = [
 		...contentOnlyTemplateLockedClientIds,
 		...unsyncedPatternClientIds,
-		...( window?.__experimentalContentOnlyPatternInsertion
+		...( window?.__experimentalContentOnlyPatternInsertion &&
+		! isIsolatedEditor
 			? templatePartClientIds
 			: [] ),
 	];
 
 	traverseBlockTree( state, treeClientId, ( block ) => {
 		const { clientId, name: blockName } = block;
+
+		// Set the edited section and all blocks within it to 'default', so that all changes can be made.
+		if ( state.editedContentOnlySection ) {
+			// If this is the edited section, use the default mode.
+			if ( state.editedContentOnlySection === clientId ) {
+				derivedBlockEditingModes.set( clientId, 'default' );
+				return;
+			}
+
+			// If the block is within the edited section also use the default mode.
+			const parentTempEditedClientId = findParentInClientIdsList(
+				state,
+				clientId,
+				[ state.editedContentOnlySection ]
+			);
+			if ( parentTempEditedClientId ) {
+				derivedBlockEditingModes.set( clientId, 'default' );
+				return;
+			}
+
+			// For the content only pattern experiment, disable blocks that are outside of the edited section.
+			if ( window?.__experimentalContentOnlyPatternInsertion ) {
+				derivedBlockEditingModes.set( clientId, 'disabled' );
+				return;
+			}
+		}
 
 		// If the block already has an explicit block editing mode set,
 		// don't override it.
@@ -2367,7 +2363,7 @@ function getDerivedBlockEditingModesForTree(
 			}
 		}
 
-		if ( isZoomedOut || isNavMode ) {
+		if ( isZoomedOut ) {
 			// If the root block is the section root set its editing mode to contentOnly.
 			if ( clientId === sectionRootClientId ) {
 				derivedBlockEditingModes.set( clientId, 'contentOnly' );
@@ -2387,81 +2383,6 @@ function getDerivedBlockEditingModesForTree(
 
 			// If zoomed out, all blocks that aren't sections or the section root are
 			// disabled.
-			if ( isZoomedOut ) {
-				derivedBlockEditingModes.set( clientId, 'disabled' );
-				return;
-			}
-
-			const isInSection = !! findParentInClientIdsList(
-				state,
-				clientId,
-				sectionClientIds
-			);
-			if ( ! isInSection ) {
-				if ( clientId === '' ) {
-					derivedBlockEditingModes.set( clientId, 'disabled' );
-					return;
-				}
-
-				// Allow selection of template parts outside of sections.
-				if ( blockName === 'core/template-part' ) {
-					derivedBlockEditingModes.set( clientId, 'contentOnly' );
-					return;
-				}
-
-				const isInTemplatePart = !! findParentInClientIdsList(
-					state,
-					clientId,
-					templatePartClientIds
-				);
-				// Allow contentOnly blocks in template parts outside of sections
-				// to be editable. Only disable blocks that don't fit this criteria.
-				if ( ! isInTemplatePart && ! isContentBlock( blockName ) ) {
-					derivedBlockEditingModes.set( clientId, 'disabled' );
-					return;
-				}
-			}
-
-			// Handle synced pattern content so the inner blocks of a synced pattern are
-			// properly disabled.
-			if ( syncedPatternClientIds.length ) {
-				const parentPatternClientId = findParentInClientIdsList(
-					state,
-					clientId,
-					syncedPatternClientIds
-				);
-
-				if ( parentPatternClientId ) {
-					// This is a pattern nested in another pattern, it should be disabled.
-					if (
-						findParentInClientIdsList(
-							state,
-							parentPatternClientId,
-							syncedPatternClientIds
-						)
-					) {
-						derivedBlockEditingModes.set( clientId, 'disabled' );
-						return;
-					}
-
-					if ( hasBindings( block ) ) {
-						derivedBlockEditingModes.set( clientId, 'contentOnly' );
-						return;
-					}
-
-					// Synced pattern content without a binding isn't editable
-					// from the instance, the user has to edit the pattern source,
-					// so return 'disabled'.
-					derivedBlockEditingModes.set( clientId, 'disabled' );
-					return;
-				}
-			}
-
-			if ( blockName && isContentBlock( blockName ) ) {
-				derivedBlockEditingModes.set( clientId, 'contentOnly' );
-				return;
-			}
-
 			derivedBlockEditingModes.set( clientId, 'disabled' );
 			return;
 		}
@@ -2544,12 +2465,11 @@ function getDerivedBlockEditingModesForTree(
  *
  * It only returns a value when modifications are made to the block editing modes.
  *
- * @param {Object}  options                    The options for updating derived block editing modes.
- * @param {Object}  options.prevState          The previous state object.
- * @param {Object}  options.nextState          The next state object.
- * @param {Array}   [options.addedBlocks]      An array of blocks that were added.
- * @param {Array}   [options.removedClientIds] An array of client IDs of blocks that were removed.
- * @param {boolean} [options.isNavMode]        Whether the navigation mode is active.
+ * @param {Object} options                    The options for updating derived block editing modes.
+ * @param {Object} options.prevState          The previous state object.
+ * @param {Object} options.nextState          The next state object.
+ * @param {Array}  [options.addedBlocks]      An array of blocks that were added.
+ * @param {Array}  [options.removedClientIds] An array of client IDs of blocks that were removed.
  * @return {Map|undefined} The updated derived block editing modes, or undefined if no changes were made.
  */
 function getDerivedBlockEditingModesUpdates( {
@@ -2557,11 +2477,8 @@ function getDerivedBlockEditingModesUpdates( {
 	nextState,
 	addedBlocks,
 	removedClientIds,
-	isNavMode = false,
 } ) {
-	const prevDerivedBlockEditingModes = isNavMode
-		? prevState.derivedNavModeBlockEditingModes
-		: prevState.derivedBlockEditingModes;
+	const prevDerivedBlockEditingModes = prevState.derivedBlockEditingModes;
 	let nextDerivedBlockEditingModes;
 
 	// Perform removals before additions to handle cases like the `MOVE_BLOCKS_TO_POSITION` action.
@@ -2586,7 +2503,6 @@ function getDerivedBlockEditingModesUpdates( {
 	addedBlocks?.forEach( ( addedBlock ) => {
 		const updates = getDerivedBlockEditingModesForTree(
 			nextState,
-			isNavMode,
 			addedBlock.clientId
 		);
 
@@ -2641,28 +2557,14 @@ export function withDerivedBlockEditingModes( reducer ) {
 						prevState: state,
 						nextState,
 						removedClientIds: action.clientIds,
-						isNavMode: false,
-					} );
-				const nextDerivedNavModeBlockEditingModes =
-					getDerivedBlockEditingModesUpdates( {
-						prevState: state,
-						nextState,
-						removedClientIds: action.clientIds,
-						isNavMode: true,
 					} );
 
-				if (
-					nextDerivedBlockEditingModes ||
-					nextDerivedNavModeBlockEditingModes
-				) {
+				if ( nextDerivedBlockEditingModes ) {
 					return {
 						...nextState,
 						derivedBlockEditingModes:
 							nextDerivedBlockEditingModes ??
 							state.derivedBlockEditingModes,
-						derivedNavModeBlockEditingModes:
-							nextDerivedNavModeBlockEditingModes ??
-							state.derivedNavModeBlockEditingModes,
 					};
 				}
 				break;
@@ -2674,28 +2576,14 @@ export function withDerivedBlockEditingModes( reducer ) {
 						prevState: state,
 						nextState,
 						addedBlocks: action.blocks,
-						isNavMode: false,
-					} );
-				const nextDerivedNavModeBlockEditingModes =
-					getDerivedBlockEditingModesUpdates( {
-						prevState: state,
-						nextState,
-						addedBlocks: action.blocks,
-						isNavMode: true,
 					} );
 
-				if (
-					nextDerivedBlockEditingModes ||
-					nextDerivedNavModeBlockEditingModes
-				) {
+				if ( nextDerivedBlockEditingModes ) {
 					return {
 						...nextState,
 						derivedBlockEditingModes:
 							nextDerivedBlockEditingModes ??
 							state.derivedBlockEditingModes,
-						derivedNavModeBlockEditingModes:
-							nextDerivedNavModeBlockEditingModes ??
-							state.derivedNavModeBlockEditingModes,
 					};
 				}
 				break;
@@ -2752,29 +2640,14 @@ export function withDerivedBlockEditingModes( reducer ) {
 						nextState,
 						addedBlocks,
 						removedClientIds,
-						isNavMode: false,
-					} );
-				const nextDerivedNavModeBlockEditingModes =
-					getDerivedBlockEditingModesUpdates( {
-						prevState: state,
-						nextState,
-						addedBlocks,
-						removedClientIds,
-						isNavMode: true,
 					} );
 
-				if (
-					nextDerivedBlockEditingModes ||
-					nextDerivedNavModeBlockEditingModes
-				) {
+				if ( nextDerivedBlockEditingModes ) {
 					return {
 						...nextState,
 						derivedBlockEditingModes:
 							nextDerivedBlockEditingModes ??
 							state.derivedBlockEditingModes,
-						derivedNavModeBlockEditingModes:
-							nextDerivedNavModeBlockEditingModes ??
-							state.derivedNavModeBlockEditingModes,
 					};
 				}
 
@@ -2822,29 +2695,14 @@ export function withDerivedBlockEditingModes( reducer ) {
 						nextState,
 						addedBlocks,
 						removedClientIds,
-						isNavMode: false,
-					} );
-				const nextDerivedNavModeBlockEditingModes =
-					getDerivedBlockEditingModesUpdates( {
-						prevState: state,
-						nextState,
-						addedBlocks,
-						removedClientIds,
-						isNavMode: true,
 					} );
 
-				if (
-					nextDerivedBlockEditingModes ||
-					nextDerivedNavModeBlockEditingModes
-				) {
+				if ( nextDerivedBlockEditingModes ) {
 					return {
 						...nextState,
 						derivedBlockEditingModes:
 							nextDerivedBlockEditingModes ??
 							state.derivedBlockEditingModes,
-						derivedNavModeBlockEditingModes:
-							nextDerivedNavModeBlockEditingModes ??
-							state.derivedNavModeBlockEditingModes,
 					};
 				}
 				break;
@@ -2869,29 +2727,14 @@ export function withDerivedBlockEditingModes( reducer ) {
 						nextState,
 						removedClientIds: [ action.clientId ],
 						addedBlocks: [ updatedBlock ],
-						isNavMode: false,
-					} );
-				const nextDerivedNavModeBlockEditingModes =
-					getDerivedBlockEditingModesUpdates( {
-						prevState: state,
-						nextState,
-						removedClientIds: [ action.clientId ],
-						addedBlocks: [ updatedBlock ],
-						isNavMode: true,
 					} );
 
-				if (
-					nextDerivedBlockEditingModes ||
-					nextDerivedNavModeBlockEditingModes
-				) {
+				if ( nextDerivedBlockEditingModes ) {
 					return {
 						...nextState,
 						derivedBlockEditingModes:
 							nextDerivedBlockEditingModes ??
 							state.derivedBlockEditingModes,
-						derivedNavModeBlockEditingModes:
-							nextDerivedNavModeBlockEditingModes ??
-							state.derivedNavModeBlockEditingModes,
 					};
 				}
 				break;
@@ -2903,29 +2746,14 @@ export function withDerivedBlockEditingModes( reducer ) {
 						nextState,
 						addedBlocks: action.blocks,
 						removedClientIds: action.clientIds,
-						isNavMode: false,
-					} );
-				const nextDerivedNavModeBlockEditingModes =
-					getDerivedBlockEditingModesUpdates( {
-						prevState: state,
-						nextState,
-						addedBlocks: action.blocks,
-						removedClientIds: action.clientIds,
-						isNavMode: true,
 					} );
 
-				if (
-					nextDerivedBlockEditingModes ||
-					nextDerivedNavModeBlockEditingModes
-				) {
+				if ( nextDerivedBlockEditingModes ) {
 					return {
 						...nextState,
 						derivedBlockEditingModes:
 							nextDerivedBlockEditingModes ??
 							state.derivedBlockEditingModes,
-						derivedNavModeBlockEditingModes:
-							nextDerivedNavModeBlockEditingModes ??
-							state.derivedNavModeBlockEditingModes,
 					};
 				}
 				break;
@@ -2942,29 +2770,13 @@ export function withDerivedBlockEditingModes( reducer ) {
 						nextState,
 						addedBlocks: action.blocks,
 						removedClientIds,
-						isNavMode: false,
 					} );
-				const nextDerivedNavModeBlockEditingModes =
-					getDerivedBlockEditingModesUpdates( {
-						prevState: state,
-						nextState,
-						addedBlocks: action.blocks,
-						removedClientIds,
-						isNavMode: true,
-					} );
-
-				if (
-					nextDerivedBlockEditingModes ||
-					nextDerivedNavModeBlockEditingModes
-				) {
+				if ( nextDerivedBlockEditingModes ) {
 					return {
 						...nextState,
 						derivedBlockEditingModes:
 							nextDerivedBlockEditingModes ??
 							state.derivedBlockEditingModes,
-						derivedNavModeBlockEditingModes:
-							nextDerivedNavModeBlockEditingModes ??
-							state.derivedNavModeBlockEditingModes,
 					};
 				}
 				break;
@@ -2979,29 +2791,14 @@ export function withDerivedBlockEditingModes( reducer ) {
 						nextState,
 						addedBlocks,
 						removedClientIds: action.clientIds,
-						isNavMode: false,
-					} );
-				const nextDerivedNavModeBlockEditingModes =
-					getDerivedBlockEditingModesUpdates( {
-						prevState: state,
-						nextState,
-						addedBlocks,
-						removedClientIds: action.clientIds,
-						isNavMode: true,
 					} );
 
-				if (
-					nextDerivedBlockEditingModes ||
-					nextDerivedNavModeBlockEditingModes
-				) {
+				if ( nextDerivedBlockEditingModes ) {
 					return {
 						...nextState,
 						derivedBlockEditingModes:
 							nextDerivedBlockEditingModes ??
 							state.derivedBlockEditingModes,
-						derivedNavModeBlockEditingModes:
-							nextDerivedNavModeBlockEditingModes ??
-							state.derivedNavModeBlockEditingModes,
 					};
 				}
 				break;
@@ -3015,20 +2812,13 @@ export function withDerivedBlockEditingModes( reducer ) {
 					return {
 						...nextState,
 						derivedBlockEditingModes:
-							getDerivedBlockEditingModesForTree(
-								nextState,
-								false /* Nav mode off */
-							),
-						derivedNavModeBlockEditingModes:
-							getDerivedBlockEditingModesForTree(
-								nextState,
-								true /* Nav mode on */
-							),
+							getDerivedBlockEditingModesForTree( nextState ),
 					};
 				}
 				break;
 			}
 			case 'RESET_BLOCKS':
+			case 'EDIT_CONTENT_ONLY_SECTION':
 			case 'SET_EDITOR_MODE':
 			case 'RESET_ZOOM_LEVEL':
 			case 'SET_ZOOM_LEVEL': {
@@ -3037,15 +2827,7 @@ export function withDerivedBlockEditingModes( reducer ) {
 				return {
 					...nextState,
 					derivedBlockEditingModes:
-						getDerivedBlockEditingModesForTree(
-							nextState,
-							false /* Nav mode off */
-						),
-					derivedNavModeBlockEditingModes:
-						getDerivedBlockEditingModesForTree(
-							nextState,
-							true /* Nav mode on */
-						),
+						getDerivedBlockEditingModesForTree( nextState ),
 				};
 			}
 		}
@@ -3054,8 +2836,6 @@ export function withDerivedBlockEditingModes( reducer ) {
 		// state need to be preserved.
 		nextState.derivedBlockEditingModes =
 			state?.derivedBlockEditingModes ?? new Map();
-		nextState.derivedNavModeBlockEditingModes =
-			state?.derivedNavModeBlockEditingModes ?? new Map();
 
 		return nextState;
 	};

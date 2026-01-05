@@ -17,6 +17,7 @@ import {
 	InspectorControls,
 	RichText,
 	useBlockProps,
+	useBlockEditingMode,
 	store as blockEditorStore,
 	getColorClassName,
 } from '@wordpress/block-editor';
@@ -129,7 +130,16 @@ export default function NavigationSubmenuEdit( {
 } ) {
 	const { label, url, description } = attributes;
 
-	const { showSubmenuIcon, maxNestingLevel, openSubmenusOnClick } = context;
+	const {
+		showSubmenuIcon,
+		maxNestingLevel,
+		openSubmenusOnClick: contextOpenSubmenusOnClick,
+	} = context;
+	const blockEditingMode = useBlockEditingMode();
+
+	// Force click-only behavior in contentOnly mode to prevent hover dropdowns
+	const openSubmenusOnClick =
+		blockEditingMode !== 'default' ? true : contextOpenSubmenusOnClick;
 
 	// URL binding logic
 	const { clearBinding, createBinding } = useEntityBinding( {
@@ -381,9 +391,7 @@ export default function NavigationSubmenuEdit( {
 				/>
 			</InspectorControls>
 			<div { ...blockProps }>
-				{ /* eslint-disable jsx-a11y/anchor-is-valid */ }
 				<ParentElement className="wp-block-navigation-item__content">
-					{ /* eslint-enable */ }
 					<RichText
 						ref={ ref }
 						identifier="label"
@@ -422,7 +430,10 @@ export default function NavigationSubmenuEdit( {
 							} }
 							onChange={ ( updatedValue ) => {
 								// updateAttributes determines the final state and returns metadata
-								const { isEntityLink } = updateAttributes(
+								const {
+									isEntityLink,
+									attributes: updatedAttributes,
+								} = updateAttributes(
 									updatedValue,
 									setAttributes,
 									attributes
@@ -432,7 +443,7 @@ export default function NavigationSubmenuEdit( {
 								// Only create bindings for entity links (posts, pages, taxonomies)
 								// Never create bindings for custom links (manual URLs)
 								if ( isEntityLink ) {
-									createBinding();
+									createBinding( updatedAttributes );
 								} else {
 									clearBinding();
 								}

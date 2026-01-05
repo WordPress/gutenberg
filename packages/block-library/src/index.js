@@ -9,10 +9,16 @@ import {
 	registerBlockType,
 	store as blocksStore,
 } from '@wordpress/blocks';
+import { useDisabled } from '@wordpress/compose';
 import { select } from '@wordpress/data';
 import { useBlockProps } from '@wordpress/block-editor';
 import { useServerSideRender } from '@wordpress/server-side-render';
 import { __, sprintf } from '@wordpress/i18n';
+
+/**
+ * Internal dependencies
+ */
+import HtmlRenderer from './utils/html-renderer';
 
 /**
  * Internal dependencies
@@ -73,6 +79,7 @@ import * as image from './image';
 import * as latestComments from './latest-comments';
 import * as latestPosts from './latest-posts';
 import * as list from './list';
+import * as math from './math';
 import * as listItem from './list-item';
 import * as logInOut from './loginout';
 import * as mediaText from './media-text';
@@ -82,6 +89,7 @@ import * as navigation from './navigation';
 import * as navigationLink from './navigation-link';
 import * as navigationSubmenu from './navigation-submenu';
 import * as nextpage from './nextpage';
+import * as navigationOverlayClose from './navigation-overlay-close';
 import * as pattern from './pattern';
 import * as pageList from './page-list';
 import * as pageListItem from './page-list-item';
@@ -125,11 +133,15 @@ import * as siteTitle from './site-title';
 import * as socialLink from './social-link';
 import * as socialLinks from './social-links';
 import * as spacer from './spacer';
+import * as tab from './tab';
 import * as table from './table';
 import * as tableOfContents from './table-of-contents';
+import * as tabs from './tabs';
 import * as tagCloud from './tag-cloud';
 import * as templatePart from './template-part';
+import * as termCount from './term-count';
 import * as termDescription from './term-description';
+import * as termName from './term-name';
 import * as termsQuery from './terms-query';
 import * as termTemplate from './term-template';
 import * as textColumns from './text-columns';
@@ -162,7 +174,6 @@ const getAllBlocks = () => {
 		accordionPanel,
 		archives,
 		audio,
-		breadcrumbs,
 		button,
 		buttons,
 		calendar,
@@ -178,6 +189,7 @@ const getAllBlocks = () => {
 		group,
 		html,
 		icon,
+		math,
 		latestComments,
 		latestPosts,
 		mediaText,
@@ -251,14 +263,19 @@ const getAllBlocks = () => {
 		tableOfContents,
 		homeLink,
 		logInOut,
+		termCount,
 		termDescription,
+		termName,
+		termsQuery,
+		termTemplate,
 		queryTitle,
 		postAuthorBiography,
+		breadcrumbs,
 	];
 
 	if ( window?.__experimentalEnableBlockExperiments ) {
-		blocks.push( termsQuery );
-		blocks.push( termTemplate );
+		blocks.push( tab );
+		blocks.push( tabs );
 	}
 
 	if ( window?.__experimentalEnableFormBlocks ) {
@@ -266,6 +283,10 @@ const getAllBlocks = () => {
 		blocks.push( formInput );
 		blocks.push( formSubmitButton );
 		blocks.push( formSubmissionNotification );
+	}
+
+	if ( window?.__experimentalNavigationOverlays ) {
+		blocks.push( navigationOverlayClose );
 	}
 
 	// When in a WordPress context, conditionally
@@ -326,13 +347,21 @@ export const registerCoreBlocks = (
 			const bootstrappedBlockType = unlock(
 				select( blocksStore )
 			).getBootstrappedBlockType( blockName );
-			const bootstrappedApiVersion = bootstrappedBlockType.apiVersion;
 
 			registerBlockType( blockName, {
-				title: blockName,
-				...( bootstrappedApiVersion < 3 && { apiVersion: 3 } ),
+				// Use all metadata from PHP registration,
+				// but fall back title to block name if not provided,
+				// ensure minimum apiVersion 3 for block wrapper support,
+				// and override with a ServerSideRender-based edit function.
+				...bootstrappedBlockType,
+				title: bootstrappedBlockType?.title || blockName,
+				...( ( bootstrappedBlockType?.apiVersion ?? 0 ) < 3 && {
+					apiVersion: 3,
+				} ),
+				// Inspector controls are rendered by the auto-register hook in block-editor
 				edit: function Edit( { attributes } ) {
-					const blockProps = useBlockProps();
+					const disabledRef = useDisabled();
+					const blockProps = useBlockProps( { ref: disabledRef } );
 					const { content, status, error } = useServerSideRender( {
 						block: blockName,
 						attributes,
@@ -357,11 +386,9 @@ export const registerCoreBlocks = (
 					}
 
 					return (
-						<div
-							{ ...blockProps }
-							dangerouslySetInnerHTML={ {
-								__html: content || '',
-							} }
+						<HtmlRenderer
+							wrapperProps={ blockProps }
+							html={ content }
 						/>
 					);
 				},

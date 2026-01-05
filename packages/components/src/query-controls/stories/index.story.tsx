@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryFn } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react-webpack5';
+import { fn } from 'storybook/test';
 
 /**
  * WordPress dependencies
@@ -29,8 +30,14 @@ const meta: Meta< typeof QueryControls > = {
 		selectedCategories: { control: false },
 		selectedCategoryId: { control: false },
 	},
+	args: {
+		onAuthorChange: fn(),
+		onNumberOfItemsChange: fn(),
+		onOrderByChange: fn(),
+		onOrderChange: fn(),
+		onCategoryChange: fn(),
+	},
 	parameters: {
-		actions: { argTypesRegex: '^on.*' },
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
 	},

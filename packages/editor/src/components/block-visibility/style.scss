@@ -1,3 +1,7 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/z-index" as *;
+
 .editor-block-visibility__disabled-blocks-count {
 	border: $border-width solid $gray-300;
 	border-width: $border-width 0;

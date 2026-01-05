@@ -34,7 +34,8 @@
 			"default": false
 		},
 		"url": {
-			"type": "string"
+			"type": "string",
+			"role": "content"
 		},
 		"title": {
 			"type": "string"
@@ -62,6 +63,7 @@
 		"style"
 	],
 	"supports": {
+		"anchor": true,
 		"reusable": false,
 		"html": false,
 		"__experimentalSlashInserter": true,

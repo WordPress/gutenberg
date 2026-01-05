@@ -20,13 +20,6 @@ import { useBlockEditingMode } from '../components/block-editing-mode';
  */
 const ANCHOR_REGEX = /[\s#]/g;
 
-const ANCHOR_SCHEMA = {
-	type: 'string',
-	source: 'attribute',
-	attribute: 'id',
-	selector: '*',
-};
-
 /**
  * Filters registered block settings, extending attributes with anchor using ID
  * of the first node.
@@ -44,7 +37,9 @@ export function addAttribute( settings ) {
 		// Gracefully handle if settings.attributes is undefined.
 		settings.attributes = {
 			...settings.attributes,
-			anchor: ANCHOR_SCHEMA,
+			anchor: {
+				type: 'string',
+			},
 		};
 	}
 
@@ -63,7 +58,6 @@ function BlockEditAnchorControlPure( { anchor, setAttributes } ) {
 	return (
 		<InspectorControls group="advanced">
 			<TextControl
-				__nextHasNoMarginBottom
 				__next40pxDefaultSize
 				className="html-anchor-control"
 				label={ __( 'HTML anchor' ) }
@@ -91,7 +85,7 @@ function BlockEditAnchorControlPure( { anchor, setAttributes } ) {
 				onChange={ ( nextValue ) => {
 					nextValue = nextValue.replace( ANCHOR_REGEX, '-' );
 					setAttributes( {
-						anchor: nextValue,
+						anchor: nextValue !== '' ? nextValue : undefined,
 					} );
 				} }
 				autoCapitalize="none"

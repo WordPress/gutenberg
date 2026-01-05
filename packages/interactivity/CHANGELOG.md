@@ -2,6 +2,32 @@
 
 ## Unreleased
 
+## 6.36.0 (2025-11-26)
+
+### Bug Fixes
+
+-   Return a deep-clone object from `getServerState` and `getServerContext` functions. ([#73437](https://github.com/WordPress/gutenberg/pull/73437))
+-   Fix using `getServerContext` in derived state getters. ([#73518](https://github.com/WordPress/gutenberg/pull/73518))
+
+## 6.35.0 (2025-11-12)
+
+## 6.34.0 (2025-10-29)
+
+### Bug Fixes
+
+-   Fix derived state closures processing on client-side navigation. ([#72725](https://github.com/WordPress/gutenberg/pull/72725))
+
+## 6.33.0 (2025-10-17)
+
+### Enhancements
+
+-   Add official support for unique IDs. ([#72161](https://github.com/WordPress/gutenberg/pull/72161))
+
+### Bug Fixes
+
+-   Change ordering of multiple `data-wp-context` directives in iAPI processing. ([#72395](https://github.com/WordPress/gutenberg/pull/72395))
+-   Handle client-server state synchronization scenarios for `getServerContext` and `getServerState`. ([#72381](https://github.com/WordPress/gutenberg/pull/72381))
+
 ## 6.32.0 (2025-10-01)
 
 -   Update router regions inside elements with `data-wp-interactive`. ([#71635](https://github.com/WordPress/gutenberg/pull/71635))

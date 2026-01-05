@@ -154,7 +154,11 @@
 						"docs/reference-guides/block-api/block-annotations.md": []
 					},
 					{
-						"docs/reference-guides/block-api/block-api-versions.md": []
+						"docs/reference-guides/block-api/block-api-versions/README.md": [
+							{
+								"docs/reference-guides/block-api/block-api-versions/block-migration-for-iframe-editor-compatibility.md": []
+							}
+						]
 					},
 					{
 						"docs/reference-guides/block-api/block-attributes.md": []
@@ -373,9 +377,6 @@
 						"docs/contributors/code/testing-overview.md": [
 							{
 								"docs/contributors/code/e2e/README.md": [
-									{
-										"docs/contributors/code/e2e/migration.md": []
-									},
 									{
 										"docs/contributors/code/e2e/overusing-snapshots.md": []
 									}
