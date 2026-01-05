@@ -4,7 +4,7 @@
 import { useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { useInstanceId } from '@wordpress/compose';
-import { getBlockType } from '@wordpress/blocks';
+import { getBlockType, hasBlockSupport } from '@wordpress/blocks';
 import { __, sprintf } from '@wordpress/i18n';
 import { processCSSNesting } from '@wordpress/global-styles-engine';
 
@@ -118,6 +118,10 @@ function useBlockProps( { style } ) {
  * @return {Object} Filtered props applied to save element.
  */
 function addSaveProps( props, blockType, attributes ) {
+	if ( ! hasBlockSupport( blockType, 'customCSS', true ) ) {
+		return props;
+	}
+
 	if ( ! attributes?.style?.css ) {
 		return props;
 	}
@@ -139,7 +143,7 @@ export default {
 	useBlockProps,
 	addSaveProps,
 	attributeKeys: [ 'style' ],
-	hasSupport() {
-		return true;
+	hasSupport( name ) {
+		return hasBlockSupport( name, 'customCSS', true );
 	},
 };

@@ -24,6 +24,12 @@ $gutenberg_block_custom_css = '';
 function gutenberg_render_custom_css_support_styles( $parsed_block ) {
 	global $gutenberg_block_custom_css;
 
+	$block_type = WP_Block_Type_Registry::get_instance()->get_registered( $parsed_block['blockName'] );
+
+	if ( ! block_has_support( $block_type, 'customCSS', true ) ) {
+		return $parsed_block;
+	}
+
 	$custom_css = $parsed_block['attrs']['style']['css'] ?? null;
 
 	if ( empty( $custom_css ) ) {
@@ -31,7 +37,7 @@ function gutenberg_render_custom_css_support_styles( $parsed_block ) {
 	}
 
 	// Generate a unique class name for this block instance.
-	$class_name         =  wp_unique_id_from_values( $parsed_block, 'wp-custom-css-' );
+	$class_name         = wp_unique_id_from_values( $parsed_block, 'wp-custom-css-' );
 	$updated_class_name = isset( $parsed_block['attrs']['className'] )
 		? $parsed_block['attrs']['className'] . " $class_name"
 		: $class_name;
