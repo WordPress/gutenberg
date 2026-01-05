@@ -92,6 +92,7 @@ const PACKAGE_NAMESPACE = WP_PLUGIN_CONFIG.packageNamespace;
 const HANDLE_PREFIX = WP_PLUGIN_CONFIG.handlePrefix || PACKAGE_NAMESPACE;
 const EXTERNAL_NAMESPACES = WP_PLUGIN_CONFIG.externalNamespaces || {};
 const PAGES = WP_PLUGIN_CONFIG.pages || [];
+const VENDOR_SCRIPTS = WP_PLUGIN_CONFIG.vendorScripts || [];
 
 const baseDefine = {
 	'globalThis.IS_GUTENBERG_PLUGIN': JSON.stringify(
@@ -108,12 +109,14 @@ const getDefine = ( scriptDebug ) => ( {
 
 /**
  * Initialize WordPress externals plugin with custom namespace configuration.
+ * Pass vendor scripts so the plugin knows which vendors are built locally.
  */
 const wordpressExternalsPlugin = createWordpressExternalsPlugin(
 	PACKAGE_NAMESPACE,
 	SCRIPT_GLOBAL,
 	EXTERNAL_NAMESPACES,
-	HANDLE_PREFIX
+	HANDLE_PREFIX,
+	VENDOR_SCRIPTS
 );
 
 /**
@@ -765,6 +768,188 @@ async function bundlePackage( packageName, options = {} ) {
 		scripts: builtScripts,
 		styles: builtStyles,
 	};
+}
+
+/**
+ * Bundle a vendor script from node_modules into an IIFE script.
+ * This is used to build packages like React that don't ship UMD builds.
+ *
+ * @param {Object} config              Vendor script configuration.
+ * @param {string} config.name         Package name (e.g., 'react', 'react-dom', 'react/jsx-runtime').
+ * @param {string} config.global       Global variable name (e.g., 'React', 'ReactDOM').
+ * @param {string} config.handle       WordPress script handle (e.g., 'react', 'react-dom').
+ * @param {Array}  config.dependencies Array of dependency handles (e.g., ['react']).
+ * @param {Array}  allVendorScripts    All vendor scripts being built (for externalization).
+ * @return {Promise<Object>} Built script info for registration.
+ */
+async function bundleVendorScript( config, allVendorScripts = [] ) {
+	const {
+		name,
+		global: globalName,
+		handle,
+		dependencies = [],
+	} = config;
+
+	const { createRequire } = await import( 'module' );
+	const require = createRequire( import.meta.url );
+
+	// Resolve the package entry point from node_modules
+	let entryPoint;
+	try {
+		// For subpath exports like 'react/jsx-runtime', resolve directly
+		entryPoint = require.resolve( name, { paths: [ ROOT_DIR ] } );
+	} catch {
+		throw new Error( `Could not resolve vendor package: ${ name }` );
+	}
+
+	const outputDir = path.join( BUILD_DIR, 'scripts', handle );
+	const target = browserslistToEsbuild();
+
+	// Build a map of vendor scripts to externalize (other than the current one)
+	const vendorExternalsMap = {};
+	for ( const vendor of allVendorScripts ) {
+		if ( vendor.name !== name ) {
+			vendorExternalsMap[ vendor.name ] = {
+				global: vendor.global,
+				handle: vendor.handle,
+			};
+		}
+	}
+
+	// Create a simple plugin to externalize other vendor packages
+	const vendorExternalsPlugin = {
+		name: 'vendor-externals',
+		setup( build ) {
+			for ( const [ pkgName, pkgConfig ] of Object.entries(
+				vendorExternalsMap
+			) ) {
+				build.onResolve(
+					{ filter: new RegExp( `^${ pkgName.replace( '/', '\\/' ) }$` ) },
+					() => ( {
+						path: pkgName,
+						namespace: 'vendor-external',
+						pluginData: { global: pkgConfig.global },
+					} )
+				);
+			}
+
+			build.onLoad(
+				{ filter: /.*/, namespace: 'vendor-external' },
+				( args ) => {
+					const vendorGlobal = args.pluginData.global;
+					return {
+						contents: `module.exports = window.${ vendorGlobal };`,
+						loader: 'js',
+					};
+				}
+			);
+		},
+	};
+
+	// Generate content hash for versioning
+	const generateVendorHash = async ( filePath ) => {
+		const { createHash } = await import( 'crypto' );
+		const content = await readFile( filePath );
+		return createHash( 'sha256' ).digest( 'hex' ).slice( 0, 20 );
+	};
+
+	// Build both minified and non-minified versions
+	await Promise.all( [
+		esbuild.build( {
+			entryPoints: [ entryPoint ],
+			outfile: path.join( outputDir, 'index.min.js' ),
+			bundle: true,
+			format: 'iife',
+			globalName,
+			minify: true,
+			target,
+			platform: 'browser',
+			define: getDefine( false ),
+			plugins: [ vendorExternalsPlugin ],
+		} ),
+		esbuild.build( {
+			entryPoints: [ entryPoint ],
+			outfile: path.join( outputDir, 'index.js' ),
+			bundle: true,
+			format: 'iife',
+			globalName,
+			minify: false,
+			target,
+			platform: 'browser',
+			define: getDefine( true ),
+			plugins: [ vendorExternalsPlugin ],
+		} ),
+	] );
+
+	// Generate content hash from built file
+	const { createHash } = await import( 'crypto' );
+	const builtContent = await readFile(
+		path.join( outputDir, 'index.min.js' )
+	);
+	const version = createHash( 'sha256' )
+		.update( builtContent )
+		.digest( 'hex' )
+		.slice( 0, 20 );
+
+	// Generate asset file
+	const depsString = dependencies.map( ( d ) => `'${ d }'` ).join( ', ' );
+	const assetContent = `<?php return array('dependencies' => array(${ depsString }), 'version' => '${ version }');`;
+	await writeFile(
+		path.join( outputDir, 'index.min.asset.php' ),
+		assetContent
+	);
+
+	return {
+		handle,
+		path: `${ handle }/index`,
+		asset: `${ handle }/index.min.asset.php`,
+	};
+}
+
+/**
+ * Bundle all configured vendor scripts.
+ *
+ * @return {Promise<Array>} Array of built script info objects.
+ */
+async function bundleAllVendorScripts() {
+	if ( VENDOR_SCRIPTS.length === 0 ) {
+		return [];
+	}
+
+	console.log( '\n📦 Bundling vendor scripts...\n' );
+
+	const builtScripts = [];
+
+	// Build vendor scripts in dependency order
+	// First pass: scripts with no dependencies
+	// Second pass: scripts with dependencies
+	const noDeps = VENDOR_SCRIPTS.filter(
+		( v ) => ! v.dependencies || v.dependencies.length === 0
+	);
+	const withDeps = VENDOR_SCRIPTS.filter(
+		( v ) => v.dependencies && v.dependencies.length > 0
+	);
+
+	for ( const vendorConfig of [ ...noDeps, ...withDeps ] ) {
+		try {
+			const startTime = Date.now();
+			const scriptInfo = await bundleVendorScript(
+				vendorConfig,
+				VENDOR_SCRIPTS
+			);
+			const buildTime = Date.now() - startTime;
+			builtScripts.push( scriptInfo );
+			console.log(
+				`   ✔ Bundled vendor ${ vendorConfig.name } (${ buildTime }ms)`
+			);
+		} catch ( error ) {
+			console.error(
+				`   ✘ Failed to bundle vendor ${ vendorConfig.name }: ${ error.message }`
+			);
+		}
+	}
+
+	return builtScripts;
 }
 
 /**
@@ -1695,6 +1880,10 @@ async function buildAll( baseUrlExpression ) {
 			}
 		} )
 	);
+
+	// Bundle vendor scripts (e.g., React) from node_modules
+	const builtVendorScripts = await bundleAllVendorScripts();
+	scripts.push( ...builtVendorScripts );
 
 	// Build routes
 	await buildAllRoutes();

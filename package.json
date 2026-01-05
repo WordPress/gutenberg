@@ -31,6 +31,29 @@
 				]
 			},
 			"font-library"
+		],
+		"vendorScripts": [
+			{
+				"name": "react",
+				"global": "React",
+				"handle": "react"
+			},
+			{
+				"name": "react-dom",
+				"global": "ReactDOM",
+				"handle": "react-dom",
+				"dependencies": [
+					"react"
+				]
+			},
+			{
+				"name": "react/jsx-runtime",
+				"global": "ReactJSXRuntime",
+				"handle": "react-jsx-runtime",
+				"dependencies": [
+					"react"
+				]
+			}
 		]
 	},
 	"config": {
