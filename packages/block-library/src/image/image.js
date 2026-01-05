@@ -605,7 +605,6 @@ export default function Image( {
 	const resetSettings = () => {
 		setAttributes( {
 			lightbox: undefined,
-			focalPoint: undefined,
 		} );
 		updateImage( DEFAULT_MEDIA_SIZE_SLUG );
 	};
@@ -875,9 +874,36 @@ export default function Image( {
 					width: undefined,
 					height: undefined,
 					scale: undefined,
+					focalPoint: undefined,
 				} ) }
 			>
 				{ dimensionsControl }
+				{ aspectRatio && url && (
+					<ToolsPanelItem
+						label={ __( 'Focal point' ) }
+						isShownByDefault
+						hasValue={ () => !! focalPoint }
+						onDeselect={ () =>
+							setAttributes( {
+								focalPoint: undefined,
+							} )
+						}
+						panelId={ clientId }
+					>
+						<FocalPointPicker
+							label={ __( 'Focal point' ) }
+							url={ url }
+							value={ focalPoint }
+							onDragStart={ imperativeFocalPointPreview }
+							onDrag={ imperativeFocalPointPreview }
+							onChange={ ( newFocalPoint ) =>
+								setAttributes( {
+									focalPoint: newFocalPoint,
+								} )
+							}
+						/>
+					</ToolsPanelItem>
+				) }
 			</InspectorControls>
 			{ !! imageSizeOptions.length && (
 				<InspectorControls>
@@ -892,32 +918,6 @@ export default function Image( {
 							onChange={ updateImage }
 							options={ imageSizeOptions }
 						/>
-						{ aspectRatio && url && (
-							<ToolsPanelItem
-								label={ __( 'Focal point' ) }
-								isShownByDefault
-								hasValue={ () => !! focalPoint }
-								onDeselect={ () =>
-									setAttributes( {
-										focalPoint: undefined,
-									} )
-								}
-							>
-								<FocalPointPicker
-									__nextHasNoMarginBottom
-									label={ __( 'Focal point' ) }
-									url={ url }
-									value={ focalPoint }
-									onDragStart={ imperativeFocalPointPreview }
-									onDrag={ imperativeFocalPointPreview }
-									onChange={ ( newFocalPoint ) =>
-										setAttributes( {
-											focalPoint: newFocalPoint,
-										} )
-									}
-								/>
-							</ToolsPanelItem>
-						) }
 					</ToolsPanel>
 				</InspectorControls>
 			) }
