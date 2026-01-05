@@ -343,38 +343,23 @@ const hasFitTextSupport = ( blockNameOrType ) => {
 	return hasBlockSupport( blockNameOrType, FIT_TEXT_SUPPORT_KEY );
 };
 
-function FitTextEdit( props ) {
-	const { name, attributes, clientId, isSelected, setAttributes } = props;
-	const { fitText } = attributes;
+/*
+ * Helper to encapsulate calls to the relatively expensive `useFitText` hook.
+ * Used in `addFitTextControl` so that the hook is only called when a block's
+ * `fitText` attribute is set.
+ */
+function WithFitTextFontSize( { fitText, name, clientId, children } ) {
 	const { fontSize } = useFitText( { fitText, name, clientId } );
-
-	return (
-		isSelected && (
-			<FitTextControl
-				clientId={ clientId }
-				fitText={ fitText }
-				setAttributes={ setAttributes }
-				name={ name }
-				fontSize={ attributes.fontSize }
-				style={ attributes.style }
-				warning={
-					fontSize < MIN_FONT_SIZE_FOR_WARNING && (
-						<FitTextSizeWarning />
-					)
-				}
-			/>
-		)
-	);
+	return children( fontSize );
 }
 
-/**
- * Higher-order component that when fit text is enabled,
- * adds the FitTextEdit component to the block's edit interface.
- * We could not use the expored edit component because, we need
- * this to added even when the block is not selected to ensure
- * the fit text calculations are done.
+/*
+ * Fit-text requires that layout calculations be done even when a block is not
+ * currently selected. Therefore, the regular hooking approach using an
+ * exported `edit` method is not enough, and we must use this HoC with the
+ * `editor.BlockEdit` filter.
  */
-const withFitTextEdit = createHigherOrderComponent( ( BlockEdit ) => {
+const addFitTextControl = createHigherOrderComponent( ( BlockEdit ) => {
 	return ( props ) => {
 		const { name, attributes, clientId, isSelected, setAttributes } = props;
 		const { fitText } = attributes;
@@ -386,14 +371,30 @@ const withFitTextEdit = createHigherOrderComponent( ( BlockEdit ) => {
 			<>
 				<BlockEdit { ...props } />
 				{ fitText && (
-					<FitTextEdit
-						clientId={ clientId }
+					<WithFitTextFontSize
 						fitText={ fitText }
-						setAttributes={ props.setAttributes }
 						name={ name }
-						attributes={ attributes }
-						isSelected={ isSelected }
-					/>
+						clientId={ clientId }
+					>
+						{ ( fontSize ) =>
+							isSelected && (
+								<FitTextControl
+									clientId={ clientId }
+									fitText={ fitText }
+									setAttributes={ setAttributes }
+									name={ name }
+									fontSize={ attributes.fontSize }
+									style={ attributes.style }
+									warning={
+										fontSize <
+											MIN_FONT_SIZE_FOR_WARNING && (
+											<FitTextSizeWarning />
+										)
+									}
+								/>
+							)
+						}
+					</WithFitTextFontSize>
 				) }
 				{ ! fitText && isSelected && (
 					<FitTextControl
@@ -408,12 +409,12 @@ const withFitTextEdit = createHigherOrderComponent( ( BlockEdit ) => {
 			</>
 		);
 	};
-}, 'withFitTextEdit' );
+}, 'addFitTextControl' );
 
 addFilter(
 	'editor.BlockEdit',
-	'core/fit-text/with-fit-text-edit',
-	withFitTextEdit
+	'core/fit-text/add-fit-text-control',
+	addFitTextControl
 );
 
 export default {
