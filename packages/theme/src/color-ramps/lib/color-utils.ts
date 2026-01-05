@@ -22,7 +22,7 @@ import './register-color-spaces';
  * @return String representation
  */
 export function getColorString( color: ColorTypes ): string {
-	return serialize( to( color, sRGB ), { format: 'hex', inGamut: true } );
+	return serialize( color, { format: 'hex', inGamut: true } );
 }
 
 /**
