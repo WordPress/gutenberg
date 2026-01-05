@@ -21,12 +21,13 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { ActionItem } from '@wordpress/interface';
+import { useEffect } from '@wordpress/element';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
 import { store as editorStore } from '../../store';
-import { store as blockEditorStore } from '@wordpress/block-editor';
 import PostPreviewButton from '../post-preview-button';
 import { unlock } from '../../lock-unlock';
 
@@ -70,6 +71,15 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 	};
 
 	const isMobile = useViewportMatch( 'medium', '<' );
+
+	// Reset device to Desktop when viewport becomes non-mobile
+	useEffect( () => {
+		if ( isMobile && deviceType !== 'Desktop' ) {
+			setDeviceType( 'Desktop' );
+			resetZoomLevel();
+		}
+	}, [ isMobile, deviceType, setDeviceType, resetZoomLevel ] );
+
 	if ( isMobile ) {
 		return null;
 	}
