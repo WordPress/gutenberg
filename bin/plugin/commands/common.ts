@@ -13,11 +13,11 @@ const { readJSONFile } = require( '../lib/utils' );
  * Finds the name of the current plugin release branch based on the version in
  * the package.json file and the latest `trunk` branch in `git`.
  *
- * @param {string} gitWorkingDirectoryPath Path to the project's working directory.
+ * @param gitWorkingDirectoryPath Path to the project's working directory.
  *
- * @return {string} Name of the plugin release branch.
+ * @return Name of the plugin release branch.
  */
-async function findPluginReleaseBranchName( gitWorkingDirectoryPath ) {
+async function findPluginReleaseBranchName( gitWorkingDirectoryPath: string ) {
 	await SimpleGit( gitWorkingDirectoryPath )
 		.fetch( 'origin', 'trunk' )
 		.checkout( 'trunk' );
@@ -33,17 +33,17 @@ async function findPluginReleaseBranchName( gitWorkingDirectoryPath ) {
  * Calculates version bump for the packages based on the content
  * from the provided CHANGELOG file split into individual lines.
  *
- * @param {string[]}                  lines                Changelog content split into lines.
- * @param {('patch'|'minor'|'major')} [minimumVersionBump] Minimum version bump for the package.
- *                                                         Defaults to `patch`.
- * @param {string}                    [currentVersion]     Current version of the package.
+ * @param lines              Changelog content split into lines.
+ * @param minimumVersionBump Minimum version bump for the package. Defaults to
+ *                           `patch`.
+ * @param currentVersion     Current version of the package.
  *
- * @return {string|null} Version bump when applicable, or null otherwise.
+ * @return Version bump when applicable, or null otherwise.
  */
 function calculateVersionBumpFromChangelog(
-	lines,
-	minimumVersionBump = 'patch',
-	currentVersion = '1.0.0'
+	lines: string[],
+	minimumVersionBump: 'patch' | 'minor' | 'major' = 'patch',
+	currentVersion: string = '1.0.0'
 ) {
 	let changesDetected = false;
 	let versionBump = null;
