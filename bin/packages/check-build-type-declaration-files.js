@@ -112,7 +112,7 @@ async function checkUnverifiedDeclarationFiles() {
 				chalk.red(
 					`Incorrect published types for ${ reason.file }:\n`
 				),
-				reason.stdout
+				reason.stderr || reason.stdout
 			);
 		}
 	} );
