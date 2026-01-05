@@ -274,7 +274,7 @@ _Example:_
 
 ### Promoting a Pre-Release Package to Stable (1.0.0)
 
-The automated package publishing workflow will at most bump the minor version of a pre-release package (those having a version like `0.x.x`), even if it includes breaking changes. This is consistent with semantic versioning, where 0.x versions are intended for initial development where the API may change frequently.
+The automated package publishing workflow will at most bump the minor version of a pre-release package (those having a version like `0.x.x`), even if it includes breaking changes. This is consistent with semantic versioning, where `0.x` versions are intended for initial development where the API may change frequently.
 
 When a package's API is considered stable and ready for production use, it should be promoted to version 1.0.0. This is done by adding a "Stable Release" section to the `CHANGELOG.md` file:
 
