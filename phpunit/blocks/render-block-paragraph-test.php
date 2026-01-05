@@ -13,7 +13,6 @@
  */
 class Render_Block_Paragraph_Test extends WP_UnitTestCase {
 
-
 	/**
 	 * @dataProvider data_css_class_examples
 	 *
