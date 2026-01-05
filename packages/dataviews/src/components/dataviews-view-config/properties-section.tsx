@@ -85,9 +85,9 @@ export function PropertiesSection( {
 	).length;
 
 	const visibleLockedFields = lockedFields.filter(
-		( { field, isVisibleFlag } ) =>
+		( { isVisibleFlag } ) =>
 			// @ts-expect-error
-			isDefined( field ) && ( view[ isVisibleFlag ] ?? true )
+			view[ isVisibleFlag ] ?? true
 	) as Array< {
 		field: NormalizedField< any >;
 		isVisibleFlag: string;
