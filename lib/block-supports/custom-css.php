@@ -14,18 +14,6 @@ global $gutenberg_block_custom_css;
 $gutenberg_block_custom_css = '';
 
 /**
- * Get the custom CSS class name for a block.
- *
- * @since 7.0.0
- *
- * @param array $block Block object.
- * @return string The custom CSS class name.
- */
-function gutenberg_get_custom_css_class_name( $block ) {
-	return wp_unique_id_from_values( $block, 'wp-custom-css-' );
-}
-
-/**
  * Render the custom CSS stylesheet and add class name to block as required.
  *
  * @since 7.0.0
@@ -43,7 +31,7 @@ function gutenberg_render_custom_css_support_styles( $parsed_block ) {
 	}
 
 	// Generate a unique class name for this block instance.
-	$class_name         = gutenberg_get_custom_css_class_name( $parsed_block );
+	$class_name         =  wp_unique_id_from_values( $parsed_block, 'wp-custom-css-' );
 	$updated_class_name = isset( $parsed_block['attrs']['className'] )
 		? $parsed_block['attrs']['className'] . " $class_name"
 		: $class_name;
