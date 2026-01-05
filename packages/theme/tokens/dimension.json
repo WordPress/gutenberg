@@ -58,7 +58,8 @@
 						"mode": {
 							"compact": "{wpds-dimension.primitive.space.10}",
 							"comfortable": "{wpds-dimension.primitive.space.20}"
-						}
+						},
+						"com.figma.scopes": [ "GAP" ]
 					}
 				},
 				"xs": {
@@ -68,7 +69,8 @@
 						"mode": {
 							"compact": "{wpds-dimension.primitive.space.10}",
 							"comfortable": "{wpds-dimension.primitive.space.30}"
-						}
+						},
+						"com.figma.scopes": [ "GAP" ]
 					}
 				},
 				"sm": {
@@ -78,7 +80,8 @@
 						"mode": {
 							"compact": "{wpds-dimension.primitive.space.30}",
 							"comfortable": "{wpds-dimension.primitive.space.50}"
-						}
+						},
+						"com.figma.scopes": [ "GAP" ]
 					}
 				},
 				"md": {
@@ -88,7 +91,8 @@
 						"mode": {
 							"compact": "{wpds-dimension.primitive.space.50}",
 							"comfortable": "{wpds-dimension.primitive.space.70}"
-						}
+						},
+						"com.figma.scopes": [ "GAP" ]
 					}
 				},
 				"lg": {
@@ -98,7 +102,8 @@
 						"mode": {
 							"compact": "{wpds-dimension.primitive.space.60}",
 							"comfortable": "{wpds-dimension.primitive.space.80}"
-						}
+						},
+						"com.figma.scopes": [ "GAP" ]
 					}
 				}
 			}
@@ -111,7 +116,8 @@
 					"mode": {
 						"compact": "{wpds-dimension.primitive.space.10}",
 						"comfortable": "{wpds-dimension.primitive.space.20}"
-					}
+					},
+					"com.figma.scopes": [ "GAP" ]
 				}
 			},
 			"xs": {
@@ -121,7 +127,8 @@
 					"mode": {
 						"compact": "{wpds-dimension.primitive.space.10}",
 						"comfortable": "{wpds-dimension.primitive.space.30}"
-					}
+					},
+					"com.figma.scopes": [ "GAP" ]
 				}
 			},
 			"sm": {
@@ -131,7 +138,8 @@
 					"mode": {
 						"compact": "{wpds-dimension.primitive.space.20}",
 						"comfortable": "{wpds-dimension.primitive.space.40}"
-					}
+					},
+					"com.figma.scopes": [ "GAP" ]
 				}
 			},
 			"md": {
@@ -141,7 +149,8 @@
 					"mode": {
 						"compact": "{wpds-dimension.primitive.space.30}",
 						"comfortable": "{wpds-dimension.primitive.space.50}"
-					}
+					},
+					"com.figma.scopes": [ "GAP" ]
 				}
 			},
 			"lg": {
@@ -151,7 +160,8 @@
 					"mode": {
 						"compact": "{wpds-dimension.primitive.space.50}",
 						"comfortable": "{wpds-dimension.primitive.space.70}"
-					}
+					},
+					"com.figma.scopes": [ "GAP" ]
 				}
 			},
 			"xl": {
@@ -161,7 +171,8 @@
 					"mode": {
 						"compact": "{wpds-dimension.primitive.space.70}",
 						"comfortable": "{wpds-dimension.primitive.space.90}"
-					}
+					},
+					"com.figma.scopes": [ "GAP" ]
 				}
 			}
 		}

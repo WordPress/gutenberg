@@ -12,8 +12,6 @@ import { type BadgeProps } from './types';
 
 /**
  * Default render function that renders a span element with the given props.
- *
- * @param props The props to apply to the HTML element.
  */
 const DEFAULT_RENDER = ( props: React.ComponentPropsWithoutRef< 'span' > ) => (
 	<span { ...props } />
@@ -22,7 +20,6 @@ const DEFAULT_RENDER = ( props: React.ComponentPropsWithoutRef< 'span' > ) => (
 /**
  * Maps intent values to Box backgroundColor and color props.
  * Uses strong emphasis styles (as emphasis prop has been removed).
- * @param intent
  */
 const getIntentStyles = (
 	intent: BadgeProps[ 'intent' ]

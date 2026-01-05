@@ -26,6 +26,7 @@ export default function FieldsDropdownMenu( {
 			icon={ moreVertical }
 			label={ __( 'Options' ) }
 			popoverProps={ popoverProps }
+			toggleProps={ { size: 'small' } }
 		>
 			{ ( { onClose } ) => (
 				<MenuGroup label={ __( 'Show / Hide' ) }>
