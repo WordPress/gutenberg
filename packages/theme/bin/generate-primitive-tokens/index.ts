@@ -26,14 +26,14 @@ const colorJsonPath = path.join( __dirname, '../../tokens/color.json' );
 // With 3 decimal places rounding to the nearest 0.001, the maximum rounding
 // error is 0.0005. With 256 possible hex values, 0.0005 × 256 = 0.128,
 // guaranteeing the rounded value stays within 0.5 of the original value.
-const ROUNDING_PRECISION = 3;
+const HEX_ROUNDING_PRECISION = 3;
 
 const transformColorStringToDTCGValue = ( color: string ) => {
 	const parsed = to( parse( color ), sRGB );
 
 	return {
 		colorSpace: 'srgb',
-		components: getAll( parsed, { precision: ROUNDING_PRECISION } ),
+		components: getAll( parsed, { precision: HEX_ROUNDING_PRECISION } ),
 		...( ( parsed.alpha ?? 1 ) < 1 ? { alpha: parsed.alpha } : undefined ),
 		hex: serialize( parsed, { format: 'hex' } ),
 	};
