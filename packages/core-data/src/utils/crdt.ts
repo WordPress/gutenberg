@@ -19,7 +19,7 @@ import { dispatch, select } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import { store as coreStore } from '../';
+import { STORE_NAME } from '../name';
 import {
 	mergeCrdtBlocks,
 	type Block,
@@ -371,14 +371,22 @@ export function getPostChangesFromCRDTDoc(
 
 					// The enforced mode has been set to code editor.
 					if ( rtcMeta?.enforcedMode === 'codeEditor' ) {
-						const currenUser = select( coreStore ).getCurrentUser();
+						// @ts-ignore - Using STORE_NAME string to avoid circular dependency.
+						const currenUser =
+							select( STORE_NAME ).getCurrentUser();
 
 						// The current user is not the owner of the enforced mode, set the collaborator mode to view.
 						if ( currenUser.id !== rtcMeta.enforcedModeOwner ) {
-							dispatch( coreStore ).setCollaboratorMode( 'view' );
+							// @ts-ignore - Using STORE_NAME string to avoid circular dependency.
+							dispatch( STORE_NAME ).setCollaboratorMode(
+								'view'
+							);
 							// The current user is the owner of the enforced mode, set the collaborator mode to edit.
 						} else {
-							dispatch( coreStore ).setCollaboratorMode( 'edit' );
+							// @ts-ignore - Using STORE_NAME string to avoid circular dependency.
+							dispatch( STORE_NAME ).setCollaboratorMode(
+								'edit'
+							);
 						}
 						// The enforced mode has been removed, set the collaborator mode to edit.
 					} else if (
@@ -386,7 +394,8 @@ export function getPostChangesFromCRDTDoc(
 						! rtcMeta.enforcedMode &&
 						! rtcMeta.enforcedModeOwner
 					) {
-						dispatch( coreStore ).setCollaboratorMode( 'edit' );
+						// @ts-ignore - Using STORE_NAME string to avoid circular dependency.
+						dispatch( STORE_NAME ).setCollaboratorMode( 'edit' );
 					}
 
 					// Merge the allowed meta changes with the current meta values since
