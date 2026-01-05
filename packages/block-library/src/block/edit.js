@@ -168,24 +168,29 @@ function ReusableBlockEdit( {
 	const { __unstableMarkLastChangeAsPersistent } =
 		useDispatch( blockEditorStore );
 
-	const { onNavigateToEntityRecord, hasPatternOverridesSource } = useSelect(
-		( select ) => {
-			const { getSettings } = select( blockEditorStore );
-			// For editing link to the site editor if the theme and user permissions support it.
-			return {
-				onNavigateToEntityRecord:
-					getSettings().onNavigateToEntityRecord,
-				hasPatternOverridesSource: !! getBlockBindingsSource(
-					'core/pattern-overrides'
-				),
-			};
-		},
-		[]
-	);
+	const {
+		onNavigateToEntityRecord,
+		hasPatternOverridesSource,
+		supportedBlocks,
+	} = useSelect( ( select ) => {
+		const { getSettings } = select( blockEditorStore );
+		const settings = getSettings();
+		// For editing link to the site editor if the theme and user permissions support it.
+		return {
+			onNavigateToEntityRecord: settings.onNavigateToEntityRecord,
+			hasPatternOverridesSource: !! getBlockBindingsSource(
+				'core/pattern-overrides'
+			),
+			supportedBlocks:
+				settings.__experimentalBlockBindingsSupportedAttributes,
+		};
+	}, [] );
 
 	const canOverrideBlocks = useMemo(
-		() => hasPatternOverridesSource && hasOverridableBlocks( blocks ),
-		[ hasPatternOverridesSource, blocks ]
+		() =>
+			hasPatternOverridesSource &&
+			hasOverridableBlocks( blocks, supportedBlocks ),
+		[ hasPatternOverridesSource, blocks, supportedBlocks ]
 	);
 
 	const { alignment, layout } = useInferredLayout( blocks, parentLayout );

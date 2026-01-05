@@ -4,7 +4,10 @@
 import { addFilter } from '@wordpress/hooks';
 import { privateApis as patternsPrivateApis } from '@wordpress/patterns';
 import { createHigherOrderComponent } from '@wordpress/compose';
-import { useBlockEditingMode } from '@wordpress/block-editor';
+import {
+	useBlockEditingMode,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 import { getBlockBindingsSource } from '@wordpress/blocks';
 
@@ -20,14 +23,12 @@ const {
 	PatternOverridesControls,
 	ResetOverridesControl,
 	PATTERN_TYPES,
-	PARTIAL_SYNCING_SUPPORTED_BLOCKS,
 	PATTERN_SYNC_TYPES,
 } = unlock( patternsPrivateApis );
 
 /**
  * Override the default edit UI to include a new block inspector control for
  * assigning a partial syncing controls to supported blocks in the pattern editor.
- * Currently, only the `core/paragraph` block is supported.
  *
  * @param {Component} BlockEdit Original component.
  *
@@ -35,13 +36,10 @@ const {
  */
 const withPatternOverrideControls = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
-		const isSupportedBlock =
-			!! PARTIAL_SYNCING_SUPPORTED_BLOCKS[ props.name ];
-
 		return (
 			<>
 				<BlockEdit key="edit" { ...props } />
-				{ props.isSelected && isSupportedBlock && (
+				{ props.isSelected && (
 					<ControlsWithStoreSubscription { ...props } />
 				) }
 			</>
@@ -54,10 +52,16 @@ const withPatternOverrideControls = createHigherOrderComponent(
 // on every block.
 function ControlsWithStoreSubscription( props ) {
 	const blockEditingMode = useBlockEditingMode();
-	const { hasPatternOverridesSource, isEditingSyncedPattern } = useSelect(
+	const {
+		hasPatternOverridesSource,
+		isEditingSyncedPattern,
+		isSupportedBlock,
+	} = useSelect(
 		( select ) => {
 			const { getCurrentPostType, getEditedPostAttribute } =
 				select( editorStore );
+			const { __experimentalBlockBindingsSupportedAttributes } =
+				select( blockEditorStore ).getSettings();
 
 			return {
 				// For editing link to the site editor if the theme and user permissions support it.
@@ -70,9 +74,13 @@ function ControlsWithStoreSubscription( props ) {
 						PATTERN_SYNC_TYPES.unsynced &&
 					getEditedPostAttribute( 'wp_pattern_sync_status' ) !==
 						PATTERN_SYNC_TYPES.unsynced,
+				isSupportedBlock:
+					!! __experimentalBlockBindingsSupportedAttributes?.[
+						props.name
+					]?.length,
 			};
 		},
-		[]
+		[ props.name ]
 	);
 
 	const bindings = props.attributes.metadata?.bindings;
@@ -90,7 +98,7 @@ function ControlsWithStoreSubscription( props ) {
 		blockEditingMode !== 'disabled' &&
 		hasPatternBindings;
 
-	if ( ! hasPatternOverridesSource ) {
+	if ( ! hasPatternOverridesSource || ! isSupportedBlock ) {
 		return null;
 	}
 

@@ -19,18 +19,23 @@ import { unlock } from '../lock-unlock';
 const { BlockQuickNavigation } = unlock( blockEditorPrivateApis );
 
 export default function OverridesPanel() {
-	const allClientIds = useSelect(
-		( select ) => select( blockEditorStore ).getClientIdsWithDescendants(),
-		[]
-	);
+	const { allClientIds, supportedBlocks } = useSelect( ( select ) => {
+		const { getClientIdsWithDescendants, getSettings } =
+			select( blockEditorStore );
+		return {
+			allClientIds: getClientIdsWithDescendants(),
+			supportedBlocks:
+				getSettings().__experimentalBlockBindingsSupportedAttributes,
+		};
+	}, [] );
 	const { getBlock } = useSelect( blockEditorStore );
 	const clientIdsWithOverrides = useMemo(
 		() =>
 			allClientIds.filter( ( clientId ) => {
 				const block = getBlock( clientId );
-				return isOverridableBlock( block );
+				return isOverridableBlock( block, supportedBlocks );
 			} ),
-		[ allClientIds, getBlock ]
+		[ allClientIds, getBlock, supportedBlocks ]
 	);
 
 	if ( ! clientIdsWithOverrides?.length ) {

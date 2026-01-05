@@ -23,7 +23,7 @@ An example could be connecting an Image block `url` attribute to a function that
 
 ## Compatible blocks and their attributes
 
-Right now, not all block attributes are compatible with block bindings. There is some ongoing effort to increase this compatibility, but for now, this is the list:
+Right now, not all block attributes are compatible with block bindings. There is some ongoing effort to increase this compatibility, but for now, this is the default list:
 
 | Supported Blocks    | Supported Attributes       |
 | ----------------    | --------------------       |
@@ -31,6 +31,44 @@ Right now, not all block attributes are compatible with block bindings. There is
 | Heading             | content                    |
 | Image               | id, url, title, alt        |
 | Button              | text, url, linkTarget, rel |
+
+### Extending supported attributes
+
+_**Note:** Since WordPress 6.9._
+
+Developers can extend the list of supported attributes using the `block_bindings_supported_attributes` filter. This filter allows adding support for additional block attributes.
+
+There are two filters available:
+
+- `block_bindings_supported_attributes`: A general filter that receives the supported attributes array and the block type name.
+- `block_bindings_supported_attributes_{$block_type}`: A dynamic filter specific to a block type (e.g., `block_bindings_supported_attributes_core/image`).
+
+Example of adding support for the `caption` attribute on the Image block:
+
+```php
+add_filter(
+	'block_bindings_supported_attributes_core/image',
+	function ( $supported_attributes ) {
+		$supported_attributes[] = 'caption';
+		return $supported_attributes;
+	}
+);
+```
+
+Example of adding support for a custom block:
+
+```php
+add_filter(
+	'block_bindings_supported_attributes_my-plugin/my-block',
+	function ( $supported_attributes ) {
+		$supported_attributes[] = 'title';
+		$supported_attributes[] = 'description';
+		return $supported_attributes;
+	}
+);
+```
+
+This filter also affects which blocks and attributes are available for Pattern Overrides, as both features share the same underlying supported attributes configuration.
 
 ## Registering a custom source
 
