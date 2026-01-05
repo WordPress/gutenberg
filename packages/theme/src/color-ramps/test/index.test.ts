@@ -15,7 +15,14 @@ const lStops = [ 100, 90, 80, 70, 60, 50, 40, 30, 20, 10 ];
 const sStops = [ 100, 80, 60, 40, 20, 0 ];
 const hstops = [ 0, 60, 120, 180, 240, 300 ];
 
-describe.skip( 'buildRamps', () => {
+const nodeMajorVersion = Number( process.versions.node.split( '.' )[ 0 ] );
+const describeIfNode24Plus = nodeMajorVersion >= 24 ? describe : describe.skip;
+
+// Node.js 24+ produces subtly different color values compared to earlier versions,
+// likely due to changes in floating-point rounding behavior. Since the snapshots
+// in this file were generated using Node.js 24, we skip these tests on older
+// versions to avoid false negatives from inconsequential numerical differences.
+describeIfNode24Plus( 'buildRamps (skipped on Node.js 23 or earlier)', () => {
 	it( 'background ramp snapshots', () => {
 		const allBgColors = lStops.flatMap( ( l ) =>
 			sStops.flatMap( ( s ) =>
