@@ -4,18 +4,22 @@
 import {
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
+	__experimentalItemGroup as ItemGroup,
 } from '@wordpress/components';
 import { useCallback, Platform } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
+
 /**
  * Internal dependencies
  */
 import BackgroundImageControl from '../background-image-control';
+import BackgroundColorControl from '../background-color-control';
 import { useToolsPanelDropdownMenuProps } from './utils';
 import { setImmutably } from '../../utils/object';
-import { __ } from '@wordpress/i18n';
 
 const DEFAULT_CONTROLS = {
 	backgroundImage: true,
+	backgroundColor: true,
 };
 
 /**
@@ -77,6 +81,7 @@ function BackgroundToolsPanel( {
 
 	return (
 		<ToolsPanel
+			headingLevel={ 3 }
 			label={ headerLabel }
 			resetAll={ resetAll }
 			panelId={ panelId }
@@ -96,15 +101,28 @@ export default function BackgroundImagePanel( {
 	panelId,
 	defaultControls = DEFAULT_CONTROLS,
 	defaultValues = {},
-	headerLabel = __( 'Background image' ),
+	headerLabel = __( 'Options' ),
 } ) {
 	const showBackgroundImageControl = useHasBackgroundPanel( settings );
+	const shouldShowBackgroundColorControls = useHasBackgroundPanel( settings );
+
 	const resetBackground = () =>
 		onChange( setImmutably( value, [ 'background' ], {} ) );
+	const resetBackgroundColor = () => {
+		const newValue = setImmutably(
+			value,
+			[ 'color', 'background' ],
+			undefined
+		);
+		newValue.color.gradient = undefined;
+		onChange( newValue );
+	};
+
 	const resetAllFilter = useCallback( ( previousValue ) => {
 		return {
 			...previousValue,
 			background: {},
+			color: undefined,
 		};
 	}, [] );
 
@@ -116,24 +134,48 @@ export default function BackgroundImagePanel( {
 			panelId={ panelId }
 			headerLabel={ headerLabel }
 		>
-			{ showBackgroundImageControl && (
-				<ToolsPanelItem
-					hasValue={ () => !! value?.background }
-					label={ __( 'Image' ) }
-					onDeselect={ resetBackground }
-					isShownByDefault={ defaultControls.backgroundImage }
-					panelId={ panelId }
-				>
-					<BackgroundImageControl
-						value={ value }
-						onChange={ onChange }
-						settings={ settings }
-						inheritedValue={ inheritedValue }
-						defaultControls={ defaultControls }
-						defaultValues={ defaultValues }
-					/>
-				</ToolsPanelItem>
-			) }
+			<ItemGroup
+				className="block-editor-global-styles-background-panel__inspector-media-replace-container"
+				isSeparated
+				isBordered
+			>
+				{ showBackgroundImageControl && (
+					<ToolsPanelItem
+						hasValue={ () => !! value?.background }
+						label={ __( 'Image' ) }
+						onDeselect={ resetBackground }
+						isShownByDefault={ defaultControls.backgroundImage }
+						panelId={ panelId }
+					>
+						<BackgroundImageControl
+							value={ value }
+							onChange={ onChange }
+							settings={ settings }
+							inheritedValue={ inheritedValue }
+							defaultControls={ defaultControls }
+							defaultValues={ defaultValues }
+						/>
+					</ToolsPanelItem>
+				) }
+				{ shouldShowBackgroundColorControls && (
+					<ToolsPanelItem
+						hasValue={ () => !! value?.color }
+						label={ __( 'Color' ) }
+						onDeselect={ resetBackgroundColor }
+						isShownByDefault={ defaultControls.backgroundColor }
+						panelId={ panelId }
+					>
+						<BackgroundColorControl
+							value={ value }
+							onChange={ onChange }
+							settings={ settings }
+							inheritedValue={ inheritedValue }
+							defaultControls={ defaultControls }
+							defaultValues={ defaultValues }
+						/>
+					</ToolsPanelItem>
+				) }
+			</ItemGroup>
 		</Wrapper>
 	);
 }
