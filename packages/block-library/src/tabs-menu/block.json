@@ -1,0 +1,106 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"__experimental": true,
+	"apiVersion": 3,
+	"name": "core/tabs-menu",
+	"title": "Tabs Menu",
+	"description": "Display the tab buttons for a tabbed interface.",
+	"version": "1.0.0",
+	"category": "design",
+	"textdomain": "default",
+	"parent": [ "core/tabs" ],
+	"usesContext": [
+		"core/tabs-list",
+		"core/tabs-id",
+		"core/tabs-activeTabIndex",
+		"core/tabs-editorActiveTabIndex"
+	],
+	"attributes": {
+		"activeBackgroundColor": {
+			"type": "string"
+		},
+		"customActiveBackgroundColor": {
+			"type": "string"
+		},
+		"activeTextColor": {
+			"type": "string"
+		},
+		"customActiveTextColor": {
+			"type": "string"
+		},
+		"hoverBackgroundColor": {
+			"type": "string"
+		},
+		"customHoverBackgroundColor": {
+			"type": "string"
+		},
+		"hoverTextColor": {
+			"type": "string"
+		},
+		"customHoverTextColor": {
+			"type": "string"
+		}
+	},
+	"styles": [
+		{
+			"name": "tab",
+			"label": "Tabs",
+			"isDefault": true
+		},
+		{
+			"name": "links",
+			"label": "Links"
+		},
+		{
+			"name": "button",
+			"label": "Button"
+		}
+	],
+	"supports": {
+		"html": false,
+		"reusable": false,
+		"color": {
+			"__experimentalSkipSerialization": true,
+			"background": true,
+			"text": true,
+			"__experimentalDefaultControls": {
+				"background": true,
+				"text": true
+			}
+		},
+		"typography": {
+			"fontSize": true,
+			"__experimentalFontFamily": true,
+			"__experimentalSkipSerialization": [
+				"fontSize",
+				"fontFamily"
+			],
+			"__experimentalDefaultControls": {
+				"fontSize": true
+			}
+		},
+		"spacing": {
+			"padding": true,
+			"__experimentalSkipSerialization": true,
+			"__experimentalDefaultControls": {
+				"padding": true
+			}
+		},
+		"__experimentalBorder": {
+			"radius": true,
+			"__experimentalSkipSerialization": true,
+			"__experimentalDefaultControls": {
+				"radius": true
+			}
+		}
+	},
+	"selectors": {
+		"root": ".wp-block-tabs-menu",
+		"color": ".wp-block-tabs-menu .tabs__tab-label",
+		"typography": ".wp-block-tabs-menu .tabs__tab-label",
+		"spacing": ".wp-block-tabs-menu .tabs__tab-label"
+	},
+	"editorScript": "file:./index.js",
+	"editorStyle": "file:./editor.css",
+	"style": "file:./style-index.css"
+}

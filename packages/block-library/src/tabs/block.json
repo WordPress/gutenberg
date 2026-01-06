@@ -8,7 +8,10 @@
 	"version": "1.0.0",
 	"category": "design",
 	"textdomain": "default",
-	"allowedBlocks": [ "core/tab" ],
+	"allowedBlocks": [
+		"core/tabs-menu",
+		"core/tab-panels"
+	],
 	"attributes": {
 		"tabsId": {
 			"type": "string",
@@ -17,64 +20,20 @@
 		"orientation": {
 			"type": "string",
 			"default": "horizontal",
-			"enum": [ "horizontal", "vertical" ]
+			"enum": [
+				"horizontal",
+				"vertical"
+			]
 		},
 		"activeTabIndex": {
 			"type": "number",
 			"default": 0
 		},
-		"tabInactiveColor": {
-			"type": "string"
-		},
-		"customTabInactiveColor": {
-			"type": "string"
-		},
-		"tabHoverColor": {
-			"type": "string"
-		},
-		"customTabHoverColor": {
-			"type": "string"
-		},
-		"tabActiveColor": {
-			"type": "string"
-		},
-		"customTabActiveColor": {
-			"type": "string"
-		},
-		"tabTextColor": {
-			"type": "string"
-		},
-		"customTabTextColor": {
-			"type": "string"
-		},
-		"tabActiveTextColor": {
-			"type": "string"
-		},
-		"customTabActiveTextColor": {
-			"type": "string"
-		},
-		"tabHoverTextColor": {
-			"type": "string"
-		},
-		"customTabHoverTextColor": {
-			"type": "string"
+		"editorActiveTabIndex": {
+			"type": "number",
+			"role": "local"
 		}
 	},
-	"styles": [
-		{
-			"name": "tab",
-			"label": "Tabs",
-			"isDefault": true
-		},
-		{
-			"name": "links",
-			"label": "Links"
-		},
-		{
-			"name": "button",
-			"label": "Button"
-		}
-	],
 	"supports": {
 		"align": true,
 		"color": {
@@ -84,20 +43,16 @@
 		"html": false,
 		"interactivity": true,
 		"spacing": {
-			"blockGap": [ "horizontal", "vertical" ],
+			"blockGap": [
+				"horizontal",
+				"vertical"
+			],
 			"margin": true,
 			"padding": false
 		},
 		"typography": {
 			"fontSize": true,
 			"__experimentalFontFamily": true
-		},
-		"__experimentalBorder": {
-			"radius": true,
-			"__experimentalSkipSerialization": true,
-			"__experimentalDefaultControls": {
-				"radius": true
-			}
 		}
 	},
 	"example": {
@@ -106,41 +61,47 @@
 		},
 		"innerBlocks": [
 			{
-				"name": "core/tab",
-				"attributes": {
-					"label": "Tab 1"
-				},
+				"name": "core/tabs-menu",
+				"attributes": {}
+			},
+			{
+				"name": "core/tab-panels",
+				"attributes": {},
 				"innerBlocks": [
 					{
-						"name": "core/paragraph",
+						"name": "core/tab",
 						"attributes": {
-							"content": "Pariatur commodo sint mollit. Veniam Lorem labore voluptate fugiat. Ad nulla est labore cillum cillum qui nostrud do incididunt eiusmod. Aliqua aliqua sunt consequat consequat in duis deserunt."
+							"label": "Tab 1"
+						},
+						"innerBlocks": [
+							{
+								"name": "core/paragraph",
+								"attributes": {
+									"content": "Pariatur commodo sint mollit. Veniam Lorem labore voluptate fugiat. Ad nulla est labore cillum cillum qui nostrud do incididunt eiusmod."
+								}
+							}
+						]
+					},
+					{
+						"name": "core/tab",
+						"attributes": {
+							"label": "Tab 2"
 						}
 					},
 					{
-						"name": "core/paragraph",
+						"name": "core/tab",
 						"attributes": {
-							"content": "Adipisicing ullamco nisi in eu laborum adipisicing aliquip aliqua. Fugiat labore officia consequat nisi veniam velit commodo cillum enim duis quis ad."
+							"label": "Tab 3"
 						}
 					}
 				]
-			},
-			{
-				"name": "core/tab",
-				"attributes": {
-					"label": "Tab 2"
-				}
-			},
-			{
-				"name": "core/tab",
-				"attributes": {
-					"label": "Tab 3"
-				}
 			}
 		]
 	},
 	"providesContext": {
-		"core/tabs-id": "tabsId"
+		"core/tabs-id": "tabsId",
+		"core/tabs-activeTabIndex": "activeTabIndex",
+		"core/tabs-editorActiveTabIndex": "editorActiveTabIndex"
 	},
 	"editorScript": "file:./index.js",
 	"editorStyle": "file:./index.css",

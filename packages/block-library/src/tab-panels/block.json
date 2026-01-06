@@ -1,0 +1,30 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"__experimental": true,
+	"apiVersion": 3,
+	"name": "core/tab-panels",
+	"title": "Tab Panels",
+	"description": "Container for tab panel content in a tabbed interface.",
+	"version": "1.0.0",
+	"category": "design",
+	"textdomain": "default",
+	"parent": [ "core/tabs" ],
+	"allowedBlocks": [ "core/tab" ],
+	"attributes": {},
+	"supports": {
+		"anchor": false,
+		"html": false,
+		"reusable": false,
+		"layout": {
+			"allowSwitching": false,
+			"allowInheriting": false
+		},
+		"spacing": {
+			"blockGap": true,
+			"padding": true,
+			"margin": false
+		}
+	},
+	"editorScript": "file:./index.js",
+	"style": "file:./style-index.css"
+}

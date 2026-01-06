@@ -11,23 +11,16 @@ import {
 	useBlockProps,
 	useInnerBlocksProps,
 	getTypographyClassesAndStyles as useTypographyProps,
-	__experimentalUseColorProps as useColorProps,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useSelect, useDispatch } from '@wordpress/data';
-import {
-	useMemo,
-	useRef,
-	useEffect,
-	useCallback,
-	useState,
-} from '@wordpress/element';
+import { useMemo, useRef, useEffect } from '@wordpress/element';
+
 /**
  * Internal dependencies
  */
 import Controls from './controls';
 import slugFromLabel from './slug-from-label';
-import TabsList from './tabs-list';
 
 const TEMPLATE = [
 	[
@@ -38,54 +31,25 @@ const TEMPLATE = [
 	],
 ];
 
-const { requestAnimationFrame, cancelAnimationFrame } = window;
+const { cancelAnimationFrame } = window;
 
 export default function Edit( {
 	attributes,
 	clientId,
+	context,
 	isSelected,
 	setAttributes,
 	__unstableLayoutClassNames: layoutClassNames,
 } ) {
-	const { selectBlock } = useDispatch( blockEditorStore );
-
 	const innerBlocksRef = useRef( null );
 	const focusRef = useRef();
-	const [ isInitialMount, setIsInitialMount ] = useState( true );
-	const labelElementRef = useRef( null );
 
 	const { anchor, label } = attributes;
 
-	// Callback ref that stores the element and focuses on initial mount.
-	const labelRef = useCallback(
-		( node ) => {
-			labelElementRef.current = node;
-			if ( node && isInitialMount ) {
-				// Focus immediately when ref is set on initial mount.
-				const animationId = requestAnimationFrame( () => {
-					if ( node ) {
-						node.focus();
-					}
-				} );
-				focusRef.current = animationId;
-				setIsInitialMount( false );
-			}
-		},
-		[ isInitialMount ]
-	);
-
-	// Focus the label RichText component when no label exists (after initial mount).
-	useEffect( () => {
-		if ( ! label && ! isInitialMount && labelElementRef.current ) {
-			const animationId = requestAnimationFrame( () => {
-				if ( labelElementRef.current ) {
-					labelElementRef.current.focus();
-				}
-			} );
-			focusRef.current = animationId;
-			return () => cancelAnimationFrame( focusRef.current );
-		}
-	}, [ label, isInitialMount ] );
+	// Consume tab indices from context
+	const activeTabIndex = context[ 'core/tabs-activeTabIndex' ] ?? 0;
+	const editorActiveTabIndex = context[ 'core/tabs-editorActiveTabIndex' ];
+	const effectiveActiveIndex = editorActiveTabIndex ?? activeTabIndex;
 
 	// Clean up animation frames on unmount.
 	useEffect( () => {
@@ -99,81 +63,76 @@ export default function Edit( {
 	const {
 		blockIndex,
 		hasInnerBlocksSelected,
-		tabsHasSelectedBlock,
 		tabsClientId,
-		tabsAttributes,
-		forceDisplay,
-		isTabsClientSelected,
-		isDefaultTab,
-		siblingTabs,
 	} = useSelect(
 		( select ) => {
 			const {
 				getBlockRootClientId,
 				getBlockIndex,
-				isBlockSelected,
 				hasSelectedInnerBlock,
-				getBlockAttributes,
-				getBlocks,
 			} = select( blockEditorStore );
 
-			// Get data from core/tabs.
-			const rootClientId = getBlockRootClientId( clientId );
-			const hasTabSelected = hasSelectedInnerBlock( rootClientId, true );
-			const rootAttributes = getBlockAttributes( rootClientId );
-			const { activeTabIndex } = rootAttributes;
-			const _isTabsClientSelected = isBlockSelected( rootClientId );
+			// Get the tab-panels parent first
+			const tabPanelsClientId = getBlockRootClientId( clientId );
+			// Then get the tabs parent
+			const _tabsClientId = getBlockRootClientId( tabPanelsClientId );
 
 			// Get data about this instance of core/tab.
 			const _blockIndex = getBlockIndex( clientId );
-			const _isDefaultTab = activeTabIndex === _blockIndex;
 			const _hasInnerBlocksSelected = hasSelectedInnerBlock(
 				clientId,
 				true
 			);
 
-			// Get all sibling tabs from parent.
-			const _siblingTabs = getBlocks( rootClientId );
-
 			return {
 				blockIndex: _blockIndex,
 				hasInnerBlocksSelected: _hasInnerBlocksSelected,
-				tabsClientId: rootClientId,
-				forceDisplay: _isDefaultTab && _isTabsClientSelected,
-				tabsHasSelectedBlock: hasTabSelected,
-				isTabsClientSelected: _isTabsClientSelected,
-				isDefaultTab: _isDefaultTab,
-				tabsAttributes: rootAttributes,
-				siblingTabs: _siblingTabs,
+				tabsClientId: _tabsClientId,
 			};
 		},
 		[ clientId ]
 	);
 
-	/**
-	 * This hook determines if the current tab is selected. This is true if it is the active tab, or if it is selected directly.
-	 */
-	const isSelectedTab = useMemo( () => {
-		if ( isSelected || hasInnerBlocksSelected || forceDisplay ) {
-			return true;
+	const { updateBlockAttributes } = useDispatch( blockEditorStore );
+
+	// Sync editorActiveTabIndex when this tab is selected directly
+	useEffect( () => {
+		// Only update if this tab is selected and not already the active index
+		const isTabSelected = isSelected || hasInnerBlocksSelected;
+		if ( isTabSelected && tabsClientId && effectiveActiveIndex !== blockIndex ) {
+			updateBlockAttributes( tabsClientId, { editorActiveTabIndex: blockIndex } );
 		}
-		if (
-			isDefaultTab &&
-			! isTabsClientSelected &&
-			! isSelected &&
-			! tabsHasSelectedBlock
-		) {
-			return true;
-		}
-		return false;
 	}, [
 		isSelected,
 		hasInnerBlocksSelected,
-		forceDisplay,
-		isDefaultTab,
-		isTabsClientSelected,
-		tabsHasSelectedBlock,
+		tabsClientId,
+		effectiveActiveIndex,
+		blockIndex,
+		updateBlockAttributes,
 	] );
+
+	// Determine if this is the currently active tab (for editor visibility)
+	const isActiveTab = effectiveActiveIndex === blockIndex;
+
+	// Determine if this is the default tab (for the "Default Tab" toggle in controls)
+	const isDefaultTab = activeTabIndex === blockIndex;
+
+	/**
+	 * This hook determines if the current tab panel should be visible.
+	 * This is true if it is the editor active tab, or if it is selected directly.
+	 */
+	const isSelectedTab = useMemo( () => {
+		// Show if this tab is directly selected or has selected inner blocks
+		if ( isSelected || hasInnerBlocksSelected ) {
+			return true;
+		}
+		// Always show the active tab (at effectiveActiveIndex) regardless of other selection state.
+		// This ensures the tab panel remains visible when editing labels in tabs-menu.
+		if ( isActiveTab ) {
+			return true;
+		}
+		return false;
+	}, [ isSelected, hasInnerBlocksSelected, isActiveTab ] );
 
 	// Use a custom anchor, if set. Otherwise fall back to the slug generated from the label text.
 	const tabPanelId = useMemo(
@@ -182,7 +141,6 @@ export default function Edit( {
 	);
 	const tabLabelId = useMemo( () => `${ tabPanelId }--tab`, [ tabPanelId ] );
 
-	const tabItemColorProps = useColorProps( tabsAttributes );
 	const tabContentTypographyProps = useTypographyProps( attributes );
 
 	const blockProps = useBlockProps( {
@@ -211,38 +169,15 @@ export default function Edit( {
 	);
 
 	return (
-		<>
-			<div { ...blockProps }>
-				<Controls
-					attributes={ attributes }
-					setAttributes={ setAttributes }
-					tabsClientId={ tabsClientId }
-					blockIndex={ blockIndex }
-					isDefaultTab={ isDefaultTab }
-				/>
-				{ isSelectedTab && (
-					<>
-						<TabsList
-							siblingTabs={ siblingTabs }
-							currentClientId={ clientId }
-							currentBlockIndex={ blockIndex }
-							currentLabel={ label }
-							tabItemColorProps={ tabItemColorProps }
-							onSelectTab={ selectBlock }
-							onLabelChange={ ( value ) =>
-								setAttributes( {
-									label: value,
-									anchor: slugFromLabel( value, blockIndex ),
-								} )
-							}
-							labelRef={ labelRef }
-							focusRef={ focusRef }
-							labelElementRef={ labelElementRef }
-						/>
-						<section { ...innerBlocksProps } />
-					</>
-				) }
-			</div>
-		</>
+		<div { ...blockProps }>
+			<Controls
+				attributes={ attributes }
+				setAttributes={ setAttributes }
+				tabsClientId={ tabsClientId }
+				blockIndex={ blockIndex }
+				isDefaultTab={ isDefaultTab }
+			/>
+			{ isSelectedTab && <section { ...innerBlocksProps } /> }
+		</div>
 	);
 }

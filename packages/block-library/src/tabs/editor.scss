@@ -1,30 +1,34 @@
 .wp-block-tabs.wp-block {
-	.wp-block-tabs__tab-item__inserter {
-		height: 100%;
-		display: flex;
-		align-items: center;
+	.wp-block-tab-panels {
+		flex-grow: 1;
+		min-width: 0;
 	}
+
 	.wp-block-tab.wp-block {
 		display: flex;
 		flex-direction: column;
-		gap: var(--wp--style--unstable-tabs-gap);
+		gap: var(--wp--style--unstable-tabs-gap, 0.5em);
+
 		& > section {
 			flex-grow: 1;
+
 			& > .wp-block:first-child {
 				margin-top: 0;
 			}
+
 			& > .wp-block:last-child {
 				margin-bottom: 0;
 			}
 		}
 	}
+
 	&.is-vertical {
-		& > .wp-block-tab.wp-block {
-			flex-direction: row;
+		.wp-block-tab-panels {
+			flex-grow: 1;
 		}
-		.wp-block-tabs__tab-item__inserter {
-			align-items: flex-start;
-			margin-right: -1px; // Hack to get the inserter to align with the tab border
+
+		.wp-block-tab.wp-block {
+			flex-direction: row;
 		}
 	}
 }
