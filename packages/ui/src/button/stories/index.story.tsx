@@ -1,5 +1,5 @@
 import { Fragment, useState } from '@wordpress/element';
-import type { Meta, StoryObj } from '@storybook/react-webpack5';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import { cog } from '@wordpress/icons';
 import { Button } from '../index';
 
