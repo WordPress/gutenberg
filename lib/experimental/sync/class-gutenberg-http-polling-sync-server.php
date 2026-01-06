@@ -336,8 +336,11 @@ class Gutenberg_HTTP_Polling_Sync_Server {
 		$messages = $this->get_new_messages( $room, $client_id, $last_message_id );
 		$this->debug_log( 'Fetched ' . count( $messages ) . ' new messages for room ' . $room . '; last_id=' . $last_message_id );
 
-		return new WP_REST_Response( [
-			'messages' => $messages,
-		], 200 );
+		return new WP_REST_Response(
+			array(
+				'messages' => $messages,
+			),
+			200
+		);
 	}
 }

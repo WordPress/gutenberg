@@ -22,7 +22,7 @@ interface HttpPollingProviderOptions {
 	doc: Y.Doc;
 	endpoint: string;
 	fullStateIntervalInMs?: number;
-	reconnectIntervalInMs?: number;
+	pollingIntervalInMs?: number;
 	room: string;
 }
 
@@ -41,7 +41,7 @@ interface SyncMessagePayload {
 }
 
 const DEFAULT_FULL_STATE_INTERVAL_IN_MS = 30000;
-const DEFAULT_RECONNECT_INTERVAL_IN_MS = 5000;
+const DEFAULT_POLLING_INTERVAL_IN_MS = 200;
 
 /**
  * Yjs provider that uses HTTP SSE for real-time synchronization.
@@ -51,13 +51,12 @@ const DEFAULT_RECONNECT_INTERVAL_IN_MS = 5000;
 export class HttpPollingProvider extends Observable< string > {
 	private options: HttpPollingProviderOptions;
 
-	private eventSource: EventSource | null = null;
 	private lastMessageId = 0;
 	private seenMessages = new Set< number >();
 	private synced = false;
 
 	private fullStateTimeout?: NodeJS.Timeout;
-	private reconnectTimeout?: NodeJS.Timeout;
+	private pollingTimeout?: NodeJS.Timeout;
 
 	public constructor( options: HttpPollingProviderOptions ) {
 		super();
@@ -73,14 +72,6 @@ export class HttpPollingProvider extends Observable< string > {
 	 * Connect to the endpoint and initialize sync.
 	 */
 	public connect(): void {
-		if ( ! this.reconnectTimeout ) {
-			this.reconnectTimeout = setInterval(
-				this.connect.bind( this ),
-				this.options.reconnectIntervalInMs ??
-					DEFAULT_RECONNECT_INTERVAL_IN_MS
-			);
-		}
-
 		// Set up periodic full state sending (every 30 seconds)
 		if ( ! this.fullStateTimeout ) {
 			this.fullStateTimeout = setInterval(
@@ -90,31 +81,13 @@ export class HttpPollingProvider extends Observable< string > {
 			);
 		}
 
-		const readyState = this.eventSource?.readyState;
-		if ( 0 === readyState || 1 === readyState ) {
-			this.log( 'Already connected or connecting to endpoint', {
-				readyState,
-			} );
-			return;
-		}
+		this.log( 'Initializing polling' );
+		this.pollForMessages();
 
-		this.log( 'Connecting to endpoint' );
+		// Send initial sync
+		this.sendSyncStep1();
 
-		// Setup EventSource for receiving messages
-		const url = addQueryArgs( this.options.endpoint, {
-			// @ts-ignore
-			_wpnonce: globalThis.__experimentalCollaborativeEditingNonce ?? '',
-			client_id: this.options.doc.clientID,
-			last_message_id: this.lastMessageId,
-			room: this.options.room,
-		} );
-
-		this.eventSource?.close();
-		this.eventSource = new EventSource( url, { withCredentials: true } );
-
-		this.eventSource.onerror = this.onEventSourceError.bind( this );
-		this.eventSource.onopen = this.onEventSourceOpen.bind( this );
-		this.eventSource.onmessage = this.onEventSourceMessage.bind( this );
+		this.emitStatus( 'connected' );
 	}
 
 	/**
@@ -123,12 +96,11 @@ export class HttpPollingProvider extends Observable< string > {
 	public destroy(): void {
 		this.log( 'Disconnecting' );
 
-		this.eventSource?.close();
 		this.emitStatus( 'disconnected' );
 		this.options.doc.off( 'update', this.onDocUpdate );
 
 		clearInterval( this.fullStateTimeout );
-		clearInterval( this.reconnectTimeout );
+		clearInterval( this.pollingTimeout );
 
 		super.destroy();
 	}
@@ -177,58 +149,60 @@ export class HttpPollingProvider extends Observable< string > {
 		this.sendEncodedMessage( encoding.toUint8Array( encoder ) );
 	};
 
-	/**
-	 * Handle EventSource errors and attempt to reconnect. NOTE: If the connection
-	 * closes for any reason -- even an expected reason like the server closing the
-	 * connection after a time limit is reached -- an error event is emitted. The
-	 * error event is a generic event with no useful information, so it is not
-	 * inspected.
-	 */
-	private onEventSourceError = (): void => {
-		this.log( 'SSE connection error', {
-			readystate: this.eventSource?.readyState,
+	/* END bound arrow functions */
+
+	private pollForMessages(): void {
+		clearTimeout( this.pollingTimeout );
+
+		const url = addQueryArgs( this.options.endpoint, {
+			// @ts-ignore
+			_wpnonce: globalThis.__experimentalCollaborativeEditingNonce ?? '',
+			client_id: this.options.doc.clientID,
+			last_message_id: this.lastMessageId,
+			room: this.options.room,
 		} );
 
-		this.connect();
-	};
+		globalThis
+			.fetch( url, {
+				method: 'GET',
+				credentials: 'include',
+				headers: {
+					'X-WP-Nonce':
+						// @ts-ignore
+						globalThis.__experimentalCollaborativeEditingNonce ??
+						'',
+				},
+			} )
+			.then( async ( response: Response ) => {
+				if ( ! response.ok ) {
+					throw new Error(
+						`HTTP error! status: ${ response.status }`
+					);
+				}
 
-	/**
-	 * Handle EventSource open event and initiate sync.
-	 */
-	private onEventSourceOpen = (): void => {
-		this.log( 'Connection opened' );
-		this.emitStatus( 'connected' );
+				const data = await response.json();
+				if ( Array.isArray( data.messages ) ) {
+					data.messages.forEach( ( message: SyncMessage ) => {
+						this.processMessage( message );
+					} );
+				}
+			} )
+			.catch( ( error ) => {
+				this.log( 'Polling error', { error } );
+			} );
 
-		// Send initial sync
-		this.sendSyncStep1();
-	};
-
-	/**
-	 * Handle incoming EventSource messages.
-	 *
-	 * @param {MessageEvent} event The incoming message event
-	 */
-	private onEventSourceMessage = ( event: MessageEvent ): void => {
-		try {
-			const data = JSON.parse( event.data );
-			if ( Array.isArray( data.messages ) ) {
-				data.messages.forEach( ( message: any ) => {
-					this.processEventSourceMessage( message );
-				} );
-			}
-		} catch ( error ) {
-			this.log( 'Error parsing SSE message', { error } );
-		}
-	};
-
-	/* END bound arrow functions */
+		this.pollingTimeout = setTimeout(
+			this.pollForMessages.bind( this ),
+			this.options.pollingIntervalInMs ?? DEFAULT_POLLING_INTERVAL_IN_MS
+		);
+	}
 
 	/**
 	 * Process incoming messages from the server
 	 *
 	 * @param {SyncMessage} message The incoming sync message
 	 */
-	private processEventSourceMessage( message: SyncMessage ): void {
+	private processMessage( message: SyncMessage ): void {
 		if ( message.from === this.options.doc.clientID ) {
 			this.log( 'Ignoring own message', { messageId: message.id } );
 			return;
