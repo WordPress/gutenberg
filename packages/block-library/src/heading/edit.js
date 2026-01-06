@@ -1,45 +1,30 @@
 /**
- * External dependencies
- */
-import clsx from 'clsx';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
 import { useEffect, Platform } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import {
-	AlignmentControl,
-	BlockControls,
 	RichText,
 	useBlockProps,
 	store as blockEditorStore,
-	useBlockEditingMode,
 } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
 import { generateAnchor, setAnchor } from './autogenerate-anchors';
+import useDeprecatedTextAlign from '../utils/deprecated-text-align-attributes';
 
-function HeadingEdit( {
-	attributes,
-	setAttributes,
-	mergeBlocks,
-	onReplace,
-	style,
-	clientId,
-} ) {
-	const { textAlign, content, level, placeholder, anchor } = attributes;
+function HeadingEdit( props ) {
+	const { attributes, setAttributes, mergeBlocks, onReplace, clientId } =
+		props;
+	useDeprecatedTextAlign( props );
+	const { style, content, level, placeholder, anchor } = attributes;
 	const tagName = 'h' + level;
 	const blockProps = useBlockProps( {
-		className: clsx( {
-			[ `has-text-align-${ textAlign }` ]: textAlign,
-		} ),
 		style,
 	} );
-	const blockEditingMode = useBlockEditingMode();
 
 	const { canGenerateAnchors } = useSelect( ( select ) => {
 		const { getGlobalBlockCount, getSettings } = select( blockEditorStore );
@@ -90,16 +75,6 @@ function HeadingEdit( {
 
 	return (
 		<>
-			{ blockEditingMode === 'default' && (
-				<BlockControls group="block">
-					<AlignmentControl
-						value={ textAlign }
-						onChange={ ( nextAlign ) => {
-							setAttributes( { textAlign: nextAlign } );
-						} }
-					/>
-				</BlockControls>
-			) }
 			<RichText
 				identifier="content"
 				tagName={ tagName }
@@ -109,7 +84,6 @@ function HeadingEdit( {
 				onReplace={ onReplace }
 				onRemove={ () => onReplace( [] ) }
 				placeholder={ placeholder || __( 'Heading' ) }
-				textAlign={ textAlign }
 				{ ...( Platform.isNative && { deleteEnter: true } ) } // setup RichText on native mobile to delete the "Enter" key as it's handled by the JS/RN side
 				{ ...blockProps }
 			/>

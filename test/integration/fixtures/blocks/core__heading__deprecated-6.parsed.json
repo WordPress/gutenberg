@@ -1,0 +1,18 @@
+[
+	{
+		"blockName": "core/heading",
+		"attrs": {
+			"style": {
+				"typography": {
+					"textAlign": "right"
+				}
+			},
+			"textColor": "primary"
+		},
+		"innerBlocks": [],
+		"innerHTML": "\n<h2 class=\"wp-block-heading has-text-align-right has-primary-color has-text-color\">Text</h2>\n",
+		"innerContent": [
+			"\n<h2 class=\"wp-block-heading has-text-align-right has-primary-color has-text-color\">Text</h2>\n"
+		]
+	}
+]
