@@ -97,9 +97,7 @@ function Layout() {
 	const isFullCanvas = canvas === 'edit';
 	useLayoutEffect( () => {
 		const areaTarget = contentAreaRef.current ?? editAreaRef.current;
-		const nextTarget = isFullCanvas
-			? contentRef.current
-			: areaTarget ?? contentRef.current;
+		const nextTarget = isFullCanvas ? contentRef.current : areaTarget;
 
 		if ( nextTarget && nextTarget !== snackbarTarget ) {
 			setSnackbarTarget( nextTarget );
