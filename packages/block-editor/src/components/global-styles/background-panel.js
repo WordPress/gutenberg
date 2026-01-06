@@ -16,6 +16,7 @@ import BackgroundImageControl from '../background-image-control';
 import BackgroundColorControl from '../background-color-control';
 import { useToolsPanelDropdownMenuProps } from './utils';
 import { setImmutably } from '../../utils/object';
+import { useHasBackgroundColorPanel } from './color-panel';
 
 const DEFAULT_CONTROLS = {
 	backgroundImage: true,
@@ -23,15 +24,26 @@ const DEFAULT_CONTROLS = {
 };
 
 /**
+ * Checks site settings to see if the background image control should be available.
+ *
+ * @param {Object} settings Site settings
+ * @return {boolean}        Whether background image control is enabled.
+ */
+export function useHasBackgroundImageControl( settings ) {
+	return Platform.OS === 'web' && settings?.background?.backgroundImage;
+}
+
+/**
  * Checks site settings to see if the background panel may be used.
- * `settings.background.backgroundSize` exists also,
- * but can only be used if settings?.background?.backgroundImage is `true`.
+ * The panel is available if either background image or background color is enabled.
  *
  * @param {Object} settings Site settings
  * @return {boolean}        Whether site settings has activated background panel.
  */
 export function useHasBackgroundPanel( settings ) {
-	return Platform.OS === 'web' && settings?.background?.backgroundImage;
+	const hasBackgroundImage = useHasBackgroundImageControl( settings );
+	const hasBackgroundColor = useHasBackgroundColorPanel( settings );
+	return hasBackgroundImage || hasBackgroundColor;
 }
 
 /**
@@ -103,8 +115,8 @@ export default function BackgroundImagePanel( {
 	defaultValues = {},
 	headerLabel = __( 'Options' ),
 } ) {
-	const showBackgroundImageControl = useHasBackgroundPanel( settings );
-	const shouldShowBackgroundColorControls = useHasBackgroundPanel( settings );
+	const showBackgroundImageControl = useHasBackgroundImageControl( settings );
+	const showBackgroundColorControl = useHasBackgroundColorPanel( settings );
 
 	const resetBackground = () =>
 		onChange( setImmutably( value, [ 'background' ], {} ) );
@@ -157,7 +169,7 @@ export default function BackgroundImagePanel( {
 						/>
 					</ToolsPanelItem>
 				) }
-				{ shouldShowBackgroundColorControls && (
+				{ showBackgroundColorControl && (
 					<ToolsPanelItem
 						hasValue={ () => !! value?.color }
 						label={ __( 'Color' ) }

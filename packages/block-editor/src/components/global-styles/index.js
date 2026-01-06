@@ -22,4 +22,5 @@ export { default as AdvancedPanel } from './advanced-panel';
 export {
 	default as BackgroundPanel,
 	useHasBackgroundPanel,
+	useHasBackgroundImageControl,
 } from './background-panel';
