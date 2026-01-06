@@ -655,11 +655,11 @@ describe( 'Popover', () => {
 			await user.click( screen.getByTestId( 'external-button' ) );
 
 			await waitFor( () => {
-				expect( onNestedFocusOutside ).toHaveBeenCalled();
+				expect( onNestedFocusOutside ).toHaveBeenCalledTimes( 1 );
 			} );
 
 			await waitFor( () => {
-				expect( onParentFocusOutside ).toHaveBeenCalled();
+				expect( onParentFocusOutside ).toHaveBeenCalledTimes( 1 );
 			} );
 		} );
 	} );
