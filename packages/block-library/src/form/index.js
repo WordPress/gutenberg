@@ -1,4 +1,9 @@
 /**
+ * WordPress dependencies
+ */
+import { addFilter } from '@wordpress/hooks';
+
+/**
  * Internal dependencies
  */
 import initBlock from '../utils/init-block';
@@ -7,12 +12,7 @@ import metadata from './block.json';
 import save from './save';
 import variations from './variations';
 import deprecated from './deprecated';
-import { icon }	from './icons';
-
-/**
- * WordPress dependencies
- */
-import { addFilter } from '@wordpress/hooks';
+import { icon } from './icons';
 
 const { name } = metadata;
 
