@@ -614,25 +614,25 @@ class WP_Navigation_Block_Renderer {
 		$colors          = block_core_navigation_build_css_colors( $attributes );
 		$modal_unique_id = wp_unique_id( 'modal-' );
 
-		$is_hidden_by_default          = isset( $attributes['overlayMenu'] ) && 'always' === $attributes['overlayMenu'];
+		$is_hidden_by_default = isset( $attributes['overlayMenu'] ) && 'always' === $attributes['overlayMenu'];
 
 		// Set-up variables for the custom overlay experiment.
 		// Values are set to "off" so they don't affect the default behavior.
-		$is_overlay_experiment_enabled = static::is_overlay_experiment_enabled();
-		$has_custom_overlay = false;
-		$close_button_markup = '';
+		$is_overlay_experiment_enabled  = static::is_overlay_experiment_enabled();
+		$has_custom_overlay             = false;
+		$close_button_markup            = '';
 		$has_custom_overlay_close_block = false;
-		$overlay_blocks_html = '';
-		$custom_overlay_markup = '';
+		$overlay_blocks_html            = '';
+		$custom_overlay_markup          = '';
 
-		if( $is_overlay_experiment_enabled ) {
+		if ( $is_overlay_experiment_enabled ) {
 			// Check if an overlay template part is selected and render it.
 			// This needs to happen before building classes so we know if overlay blocks actually exist.
 			if ( ! empty( $attributes['overlay'] ) ) {
 				// Get blocks from the overlay template part.
 				$overlay_blocks = static::get_overlay_blocks_from_template_part( $attributes['overlay'], $attributes );
 				// Check if overlay contains a navigation-overlay-close block.
-				$has_custom_overlay_close_block = block_tree_has_block_type(
+				$has_custom_overlay_close_block = block_core_navigation_block_tree_has_block_type(
 					$overlay_blocks,
 					'core/navigation-overlay-close',
 					array( 'core/navigation' ) // Skip navigation blocks, as they cannot contain an overlay close block
@@ -707,7 +707,6 @@ class WP_Navigation_Block_Renderer {
 
 		$overlay_inline_styles = esc_attr( safecss_filter_attr( $colors['overlay_inline_styles'] ) );
 
-		
 		if ( $has_custom_overlay ) {
 			$custom_overlay_markup = sprintf(
 				'<div class="wp-block-navigation__overlay-container">%s</div>',
@@ -904,7 +903,7 @@ class WP_Navigation_Block_Renderer {
 
 		$inner_blocks = static::get_inner_blocks( $attributes, $block );
 		// Prevent navigation blocks referencing themselves from rendering.
-		if ( block_tree_has_block_type(
+		if ( block_core_navigation_block_tree_has_block_type(
 			$inner_blocks,
 			'core/navigation'
 		) ) {
@@ -1260,7 +1259,7 @@ function block_core_navigation_filter_out_empty_blocks( $parsed_blocks ) {
  * @param array         $skip_block_types Optional. Block types to skip when recursing. Default empty array.
  * @return bool Returns true if the specified block type is found.
  */
-function block_tree_has_block_type( $blocks, $block_type, $skip_block_types = array() ) {
+function block_core_navigation_block_tree_has_block_type( $blocks, $block_type, $skip_block_types = array() ) {
 	if ( empty( $blocks ) ) {
 		return false;
 	}
@@ -1272,7 +1271,7 @@ function block_tree_has_block_type( $blocks, $block_type, $skip_block_types = ar
 
 		// Recursively check inner blocks, skipping specified block types.
 		if ( ! in_array( $block->name, $skip_block_types, true ) && ! empty( $block->inner_blocks ) ) {
-			if ( block_tree_has_block_type( $block->inner_blocks, $block_type, $skip_block_types ) ) {
+			if ( block_core_navigation_block_tree_has_block_type( $block->inner_blocks, $block_type, $skip_block_types ) ) {
 				return true;
 			}
 		}
@@ -1285,15 +1284,15 @@ function block_tree_has_block_type( $blocks, $block_type, $skip_block_types = ar
  * Returns true if the navigation block contains a nested navigation block.
  *
  * @since 6.2.0
- * @deprecated 7.0.0 Use block_tree_has_block_type() instead.
+ * @deprecated 7.0.0 Use block_core_navigation_block_tree_has_block_type() instead.
  *
  * @param WP_Block_List $inner_blocks Inner block instance to be normalized.
  * @return bool true if the navigation block contains a nested navigation block.
  */
 function block_core_navigation_block_contains_core_navigation( $inner_blocks ) {
-	_deprecated_function( __FUNCTION__, '7.0.0', 'block_tree_has_block_type()' );
+	_deprecated_function( __FUNCTION__, '7.0.0', 'block_core_navigation_block_tree_has_block_type()' );
 
-	return block_tree_has_block_type(
+	return block_core_navigation_block_tree_has_block_type(
 		$inner_blocks,
 		'core/navigation'
 	);
