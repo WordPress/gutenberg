@@ -376,6 +376,7 @@ const BlockInspectorSingleBlock = ( {
 						<BlockStyles clientId={ renderedBlockClientId } />
 					) }
 					<ContentTab contentClientIds={ contentClientIds } />
+					<InspectorControls.Slot group="content" />
 					{ ! isSectionBlock && (
 						<StyleInspectorSlots
 							blockName={ blockName }
@@ -386,7 +387,6 @@ const BlockInspectorSingleBlock = ( {
 						isBlockSynced &&
 						isSectionBlockSelected && (
 							<>
-								<InspectorControls.Slot group="content" />
 								<InspectorControls.Slot />
 								{ /* Allow AdvancedControls so users can adjust local attributes (e.g. additional CSS classes, HTML element). */ }
 								<AdvancedControls />
