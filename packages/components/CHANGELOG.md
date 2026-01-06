@@ -42,6 +42,7 @@
 -   `Notice`: Fix notice component spacing issue when actions are present. ([#69430](https://github.com/WordPress/gutenberg/pull/69430))
 -   `DatePicker`: Fix missing scheduled events and current date indicators. ([#73887](https://github.com/WordPress/gutenberg/pull/73887))
 -   `DatePicker`: Fix handling of `currentDate` when passed values as Date or timestamp. ([#73887](https://github.com/WordPress/gutenberg/pull/73887))
+-   `RangeControl`: Fix reset button requiring double-click when value is `0`. ([#74323](https://github.com/WordPress/gutenberg/pull/74323))
 
 ### Internal
 
