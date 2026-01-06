@@ -18,7 +18,7 @@ import { Stack } from '@wordpress/ui';
 import { __, sprintf } from '@wordpress/i18n';
 import { useInstanceId } from '@wordpress/compose';
 import { isAppleOS } from '@wordpress/keycodes';
-import { useContext, forwardRef } from '@wordpress/element';
+import { useContext, forwardRef, useEffect, useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -40,6 +40,7 @@ import type { SetSelection } from '../../../types/private';
 import { ItemClickWrapper } from '../utils/item-click-wrapper';
 const { Badge } = unlock( componentsPrivateApis );
 import { useGridColumns } from './preview-size-picker';
+import { GridItems } from '../utils/grid-items';
 
 function chunk< T >( array: T[], size: number ): T[][] {
 	const chunks: T[][] = [];
@@ -326,9 +327,15 @@ export default function CompositeGrid< Item >( {
 	getItemId,
 	actions,
 }: CompositeGridProps< Item > ) {
-	const { paginationInfo, resizeObserverRef } =
+	const { paginationInfo, resizeObserverRef, intersectionObserverCallback } =
 		useContext( DataViewsContext );
 	const gridColumns = useGridColumns();
+	const intersectionObserverRef = useRef< IntersectionObserver | null >(
+		null
+	);
+	const itemRefs = useRef< Map< number, HTMLElement > >( new Map() );
+	// Track stable positions for items in infinite scroll mode
+	const itemPositions = useRef< Map< string, number > >( new Map() );
 	const hasBulkActions = useSomeItemHasAPossibleBulkAction( actions, data );
 	const titleField = fields.find(
 		( field ) => field.id === view?.titleField
@@ -369,90 +376,258 @@ export default function CompositeGrid< Item >( {
 	const size = '900px';
 	const totalRows = Math.ceil( data.length / gridColumns );
 
+	// Update item positions for infinite scroll
+	// Store positions based on the order items appear in the data array
+	useEffect( () => {
+		if ( ! isInfiniteScroll ) {
+			return;
+		}
+
+		data.forEach( ( item, index ) => {
+			const itemId = getItemId( item );
+			if ( ! itemPositions.current.has( itemId ) ) {
+				// Use 1-based indexing for aria-posinset (starts at 1, not 0)
+				// Calculate based on current page and per-page settings
+				const currentPage = view.page || 1;
+				const perPage = view.perPage || 20;
+				const positionInFullSet =
+					( currentPage - 1 ) * perPage + index + 1;
+				itemPositions.current.set( itemId, positionInFullSet );
+			}
+		} );
+	}, [ data, getItemId, isInfiniteScroll, view.page, view.perPage ] );
+
+	// Set up IntersectionObserver for infinite scroll
+	useEffect( () => {
+		if ( ! intersectionObserverCallback || ! isInfiniteScroll ) {
+			return;
+		}
+
+		const observer = new IntersectionObserver(
+			intersectionObserverCallback,
+			{
+				root: null,
+				rootMargin: '0px',
+				threshold: 0.1,
+			}
+		);
+
+		intersectionObserverRef.current = observer;
+
+		// Observe all current items
+		itemRefs.current.forEach( ( element ) => {
+			observer.observe( element );
+		} );
+
+		return () => {
+			observer.disconnect();
+		};
+	}, [ intersectionObserverCallback, isInfiniteScroll ] );
+
+	// Helper function to handle item ref changes
+	const setItemRef = (
+		itemId: number | undefined,
+		element: HTMLElement | null
+	) => {
+		if ( itemId === undefined ) {
+			return;
+		}
+
+		// Don't observe if we don't have infinite scroll enabled
+		if ( ! isInfiniteScroll ) {
+			return;
+		}
+
+		const observer = intersectionObserverRef.current;
+		const currentElement = itemRefs.current.get( itemId );
+
+		// Unobserve previous element if it exists
+		if ( currentElement && observer ) {
+			observer.unobserve( currentElement );
+		}
+
+		if ( element ) {
+			itemRefs.current.set( itemId, element );
+			// Observe new element if observer is ready
+			if ( observer ) {
+				observer.observe( element );
+			}
+		} else {
+			itemRefs.current.delete( itemId );
+		}
+	};
+
 	return (
-		<Composite
-			role={ isInfiniteScroll ? 'feed' : 'grid' }
-			className={ clsx( 'dataviews-view-grid', className, {
-				[ `has-${ view.layout?.density }-density` ]:
-					view.layout?.density &&
-					[ 'compact', 'comfortable' ].includes(
-						view.layout.density
-					),
-			} ) }
-			focusWrap
-			aria-busy={ isLoading }
-			aria-rowcount={ isInfiniteScroll ? undefined : totalRows }
-			ref={ resizeObserverRef }
-			// @ts-ignore
-			inert={ inert }
-		>
-			{ chunk( data, gridColumns ).map( ( row, i ) => (
-				<Composite.Row
-					key={ i }
-					render={
-						<div
-							role="row"
-							aria-rowindex={ i + 1 }
-							aria-label={ sprintf(
-								/* translators: %d: The row number in the grid */
-								__( 'Row %d' ),
-								i + 1
-							) }
-							className="dataviews-view-grid__row"
-							style={ {
-								gridTemplateColumns: `repeat( ${ gridColumns }, minmax(0, 1fr) )`,
-							} }
-						/>
-					}
-				>
-					{ row.map( ( item, indexInRow ) => {
-						const index = i * gridColumns + indexInRow;
-						return (
-							<Composite.Item
-								key={ getItemId( item ) }
-								render={ ( props ) => (
-									<GridItem
-										{ ...props }
-										role={
-											isInfiniteScroll
-												? 'article'
-												: 'gridcell'
-										}
-										aria-setsize={
-											isInfiniteScroll
-												? paginationInfo.totalItems
-												: undefined
-										}
-										aria-posinset={
-											isInfiniteScroll
-												? index + 1
-												: undefined
-										}
-										view={ view }
-										selection={ selection }
-										onChangeSelection={ onChangeSelection }
-										onClickItem={ onClickItem }
-										isItemClickable={ isItemClickable }
-										renderItemLink={ renderItemLink }
-										getItemId={ getItemId }
-										item={ item }
-										actions={ actions }
-										mediaField={ mediaField }
-										titleField={ titleField }
-										descriptionField={ descriptionField }
-										regularFields={ regularFields }
-										badgeFields={ badgeFields }
-										hasBulkActions={ hasBulkActions }
-										config={ {
-											sizes: size,
+		<>
+			{
+				// Render infinite scroll layout (no rows, feed semantics)
+				isInfiniteScroll && (
+					<Composite
+						render={
+							<GridItems
+								className={ clsx(
+									'dataviews-view-grid-infinite-scroll',
+									className,
+									{
+										[ `has-${ view.layout?.density }-density` ]:
+											view.layout?.density &&
+											[
+												'compact',
+												'comfortable',
+											].includes( view.layout.density ),
+									}
+								) }
+								previewSize={ view.layout?.previewSize }
+								aria-busy={ isLoading }
+								ref={ resizeObserverRef }
+							/>
+						}
+						role="feed"
+						focusWrap
+						// @ts-ignore
+						inert={ inert }
+					>
+						{ data.map( ( item ) => {
+							const itemId = getItemId( item );
+							// Get stable position for infinite scroll
+							const stablePosition =
+								itemPositions.current.get( itemId );
+							return (
+								<Composite.Item
+									key={ itemId }
+									render={ ( props ) => (
+										<GridItem
+											{ ...props }
+											ref={ ( element ) =>
+												setItemRef(
+													stablePosition,
+													element
+												)
+											}
+											id={ itemId }
+											role="article"
+											aria-setsize={
+												paginationInfo.totalItems
+											}
+											aria-posinset={ stablePosition }
+											view={ view }
+											selection={ selection }
+											onChangeSelection={
+												onChangeSelection
+											}
+											onClickItem={ onClickItem }
+											isItemClickable={ isItemClickable }
+											renderItemLink={ renderItemLink }
+											getItemId={ getItemId }
+											item={ item }
+											actions={ actions }
+											mediaField={ mediaField }
+											titleField={ titleField }
+											descriptionField={
+												descriptionField
+											}
+											regularFields={ regularFields }
+											badgeFields={ badgeFields }
+											hasBulkActions={ hasBulkActions }
+											config={ {
+												sizes: size,
+											} }
+										/>
+									) }
+								/>
+							);
+						} ) }
+					</Composite>
+				)
+			}
+			{
+				// Render standard grid layout (with rows, grid semantics)
+				! isInfiniteScroll && (
+					<Composite
+						role="grid"
+						className={ clsx( 'dataviews-view-grid', className, {
+							[ `has-${ view.layout?.density }-density` ]:
+								view.layout?.density &&
+								[ 'compact', 'comfortable' ].includes(
+									view.layout.density
+								),
+						} ) }
+						focusWrap
+						aria-busy={ isLoading }
+						aria-rowcount={ totalRows }
+						ref={ resizeObserverRef }
+						// @ts-ignore
+						inert={ inert }
+					>
+						{ chunk( data, gridColumns ).map( ( row, i ) => (
+							<Composite.Row
+								key={ i }
+								render={
+									<div
+										role="row"
+										aria-rowindex={ i + 1 }
+										aria-label={ sprintf(
+											/* translators: %d: The row number in the grid */
+											__( 'Row %d' ),
+											i + 1
+										) }
+										className="dataviews-view-grid__row"
+										style={ {
+											gridTemplateColumns: `repeat( ${ gridColumns }, minmax(0, 1fr) )`,
 										} }
 									/>
-								) }
-							/>
-						);
-					} ) }
-				</Composite.Row>
-			) ) }
-		</Composite>
+								}
+							>
+								{ row.map( ( item ) => {
+									const itemId = getItemId( item );
+									return (
+										<Composite.Item
+											key={ itemId }
+											render={ ( props ) => (
+												<GridItem
+													{ ...props }
+													id={ itemId }
+													role="gridcell"
+													view={ view }
+													selection={ selection }
+													onChangeSelection={
+														onChangeSelection
+													}
+													onClickItem={ onClickItem }
+													isItemClickable={
+														isItemClickable
+													}
+													renderItemLink={
+														renderItemLink
+													}
+													getItemId={ getItemId }
+													item={ item }
+													actions={ actions }
+													mediaField={ mediaField }
+													titleField={ titleField }
+													descriptionField={
+														descriptionField
+													}
+													regularFields={
+														regularFields
+													}
+													badgeFields={ badgeFields }
+													hasBulkActions={
+														hasBulkActions
+													}
+													config={ {
+														sizes: size,
+													} }
+												/>
+											) }
+										/>
+									);
+								} ) }
+							</Composite.Row>
+						) ) }
+					</Composite>
+				)
+			}
+		</>
 	);
 }
