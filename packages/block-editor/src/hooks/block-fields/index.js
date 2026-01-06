@@ -21,8 +21,7 @@ import useBlockDisplayInformation from '../../components/use-block-display-infor
 const { fieldsKey, formKey } = unlock( blocksPrivateApis );
 import FieldsDropdownMenu from './fields-dropdown-menu';
 import { PrivateBlockContext } from '../../components/block-list/private-block-context';
-import { BlockFieldsFill } from '../../components/inspector-controls-tabs/content-tab';
-import { InspectorControls } from '../../components';
+import { PrivateInspectorControlsFill } from '../../components/inspector-controls/fill';
 
 // controls
 import RichText from './rich-text';
@@ -365,18 +364,21 @@ const withBlockFields = createHigherOrderComponent(
 					isSelectionWithinCurrentSection &&
 						( isSectionBlock ||
 							blockEditingMode === 'contentOnly' ) && (
-							<BlockFieldsFill>
+							<PrivateInspectorControlsFill
+								group="content"
+								forceDisplayControls
+							>
 								<BlockFields
 									{ ...props }
 									blockType={ blockType }
 								/>
-							</BlockFieldsFill>
+							</PrivateInspectorControlsFill>
 						)
 				}
 				{ ! isSelectionWithinCurrentSection && isSelected && (
-					<InspectorControls group="content">
+					<PrivateInspectorControlsFill group="content">
 						<BlockFields { ...props } blockType={ blockType } />
-					</InspectorControls>
+					</PrivateInspectorControlsFill>
 				) }
 			</>
 		);
