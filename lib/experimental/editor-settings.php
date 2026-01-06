@@ -50,6 +50,9 @@ function gutenberg_enable_experiments() {
 	if ( gutenberg_is_experiment_enabled( 'gutenberg-extensible-site-editor' ) ) {
 		wp_add_inline_script( 'wp-block-editor', 'window.__experimentalExtensibleSiteEditor = true', 'before' );
 	}
+	if ( $gutenberg_experiments && array_key_exists( 'gutenberg-list-view-dynamic-expansion', $gutenberg_experiments ) ) {
+		wp_add_inline_script( 'wp-block-editor', 'window.__experimentalFeatures = window.__experimentalFeatures || {}; window.__experimentalFeatures["gutenberg-list-view-dynamic-expansion"] = true;', 'before' );
+	}
 }
 
 add_action( 'admin_init', 'gutenberg_enable_experiments' );
