@@ -31,7 +31,7 @@ import {
 	useState,
 } from '@wordpress/element';
 import { chevronDown, chevronUp } from '@wordpress/icons';
-import { NoticesSnackbarList, store as noticesStore } from '@wordpress/notices';
+import { SnackbarNotices, store as noticesStore } from '@wordpress/notices';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { privateApis as commandsPrivateApis } from '@wordpress/commands';
 import { privateApis as blockLibraryPrivateApis } from '@wordpress/block-library';
@@ -658,7 +658,7 @@ function Layout( {
 						<PluginArea onError={ onPluginAreaError } />
 						<PostEditorMoreMenu />
 						{ backButton }
-						<NoticesSnackbarList className="components-notices__snackbar" />
+						<SnackbarNotices className="components-notices__snackbar" />
 					</Editor>
 				</div>
 			</ErrorBoundary>

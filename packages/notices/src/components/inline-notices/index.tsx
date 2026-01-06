@@ -15,17 +15,17 @@ import { useDispatch, useSelect } from '@wordpress/data';
  */
 import { store as noticesStore } from '../../store';
 
-type NoticesDefaultListProps = {
+type InlineNoticesProps = {
 	children?: ReactNode;
 	pinnedNoticesClassName?: string;
 	dismissibleNoticesClassName?: string;
 };
 
-export default function NoticesDefaultList( {
+export default function InlineNotices( {
 	children,
 	pinnedNoticesClassName,
 	dismissibleNoticesClassName,
-}: NoticesDefaultListProps ) {
+}: InlineNoticesProps ) {
 	const notices = useSelect( ( select ) =>
 		select( noticesStore ).getNotices()
 	);

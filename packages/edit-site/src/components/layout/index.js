@@ -28,7 +28,7 @@ import {
 } from '@wordpress/editor';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { PluginArea } from '@wordpress/plugins';
-import { NoticesSnackbarList, store as noticesStore } from '@wordpress/notices';
+import { SnackbarNotices, store as noticesStore } from '@wordpress/notices';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as preferencesStore } from '@wordpress/preferences';
 
@@ -154,7 +154,7 @@ function Layout() {
 						</NavigableRegion>
 					) }
 
-					<NoticesSnackbarList className="components-notices__snackbar" />
+					<SnackbarNotices className="components-notices__snackbar" />
 
 					{ isMobileViewport && areas.mobile && (
 						<div className="edit-site-layout__mobile">

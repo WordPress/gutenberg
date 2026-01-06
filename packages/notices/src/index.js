@@ -1,3 +1,3 @@
 export { store } from './store';
-export { default as NoticesDefaultList } from './components/notices-default-list';
-export { default as NoticesSnackbarList } from './components/notices-snackbar-list';
+export { default as InlineNotices } from './components/inline-notices';
+export { default as SnackbarNotices } from './components/snackbar-notices';
