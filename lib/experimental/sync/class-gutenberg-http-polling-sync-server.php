@@ -1,18 +1,17 @@
 <?php
 /**
- * Gutenberg_HTTP_SSE_Sync_Server class
+ * Gutenberg_HTTP_Polling_Sync_Server class
  *
  * @package Gutenberg
  */
 
 /**
- * Gutenberg class that contains an HTTP-based SSE server used for collaborative
- * editing.
+ * Gutenberg class that contains an HTTP server used for collaborative editing.
  *
  * @access private
  * @internal
  */
-class Gutenberg_HTTP_SSE_Sync_Server {
+class Gutenberg_HTTP_Polling_Sync_Server {
 	/**
 	 * Cache expiration time in seconds
 	 */
@@ -22,11 +21,6 @@ class Gutenberg_HTTP_SSE_Sync_Server {
 	 * Cache key prefix
 	 */
 	const CACHE_PREFIX = 'gutenberg_sse_sync_';
-
-	/**
-	 * Maximum client connection time in seconds
-	 */
-	const MAX_CONNECTION_TIME_IN_S = 60;
 
 	/**
 	 * Register REST API routes.
@@ -165,7 +159,7 @@ class Gutenberg_HTTP_SSE_Sync_Server {
 	}
 
 	/**
-	 * Handle all requests (both SSE connections and message posting).
+	 * Handle all requests (both polling connections and message posting).
 	 *
 	 * @param WP_REST_Request $request The REST request.
 	 * @return WP_REST_Response|WP_Error Response object or error.
@@ -285,7 +279,7 @@ class Gutenberg_HTTP_SSE_Sync_Server {
 	 */
 	private function debug_log( string $message ): void {
 		if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
-			error_log( '[Gutenberg SSE Sync] ' . $message );
+			error_log( '[Gutenberg Sync] ' . $message );
 		}
 	}
 
@@ -334,61 +328,16 @@ class Gutenberg_HTTP_SSE_Sync_Server {
 	 * @param string $room      Room identifier.
 	 * @param int    $client_id Client identifier.
 	 * @param int    $last_message_id Last message ID received.
-	 * @return WP_REST_Response Response with SSE stream.
+	 * @return WP_REST_Response
 	 */
-	private function poll_for_messages( string $room, int $client_id, int $last_message_id = 0 ) {
+	private function poll_for_messages( string $room, int $client_id, int $last_message_id = 0 ): WP_REST_Response {
 		header( 'Cache-Control: no-store' );
-		header( 'Connection: keep-alive' );
-		header( 'Content-Type: text/event-stream' );
-		header( 'X-Accel-Buffering: no' ); // Disable Nginx buffering
 
-		// Disable output buffering and compression.
-		ini_set( 'output_buffering', 'off' );
-		ini_set( 'zlib.output_compression', false );
+		$messages = $this->get_new_messages( $room, $client_id, $last_message_id );
+		$this->debug_log( 'Fetched ' . count( $messages ) . ' new messages for room ' . $room . '; last_id=' . $last_message_id );
 
-		// Check if there are other active clients, if this is the only client,
-		// implement lazy connection. The client will reconnect after a timeout.
-		if ( 0 === count( self::get_new_messages( $room, $client_id, $last_message_id ) ) ) {
-			echo 'data: ' . wp_json_encode( array() ) . "\n\n";
-			flush();
-			exit;
-		}
-
-		$start_time = time();
-
-		// Send initial connection message
-		echo 'data: ' . wp_json_encode( array( 'messages' => array() ) ) . "\n\n";
-		flush();
-
-		// Keep connection alive and send messages
-		while ( true ) {
-			// Check if client is still connected (basic check)
-			if ( connection_aborted() || ( time() - $start_time ) > self::MAX_CONNECTION_TIME_IN_S ) {
-				break;
-			}
-
-			$messages = $this->get_new_messages( $room, $client_id, $last_message_id );
-
-			if ( count( $messages ) > 0 ) {
-				$this->debug_log( 'Fetched ' . count( $messages ) . ' new messages for room ' . $room . '; last_id=' . $last_message_id );
-
-				// Send messages.
-				echo 'data: ' . wp_json_encode( array( 'messages' => $messages ) ) . "\n\n";
-				flush();
-
-				// Update last message ID
-				$last_message    = end( $messages );
-				$last_message_id = $last_message['id'] ?? $last_message_id;
-			} else {
-				// Send heartbeat to keep connection alive. We do not expect a response.
-				echo "heartbeat: ping\n\n";
-				flush();
-			}
-
-			// Sleep briefly before checking again
-			usleep( 100000 ); // 100ms
-		}
-
-		exit;
+		return new WP_REST_Response( [
+			'messages' => $messages,
+		], 200 );
 	}
 }

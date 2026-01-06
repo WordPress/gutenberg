@@ -6,9 +6,9 @@ import { applyFilters } from '@wordpress/hooks';
 /**
  * Internal dependencies
  */
+import { createHttpPollingProvider } from './http-polling-provider';
 import { createIndexedDbProvider } from './indexeddb-provider';
 import { createWebRTCProvider } from './webrtc-provider';
-import { createHttpSseProvider } from './http-sse-provider';
 import type { ProviderCreator } from '../types';
 
 let providerCreators: ProviderCreator[] | null = null;
@@ -21,7 +21,7 @@ let providerCreators: ProviderCreator[] | null = null;
  */
 function getDefaultProviderCreators(): ProviderCreator[] {
 	return [
-		createHttpSseProvider( {
+		createHttpPollingProvider( {
 			// @ts-ignore
 			endpoint: window.__experimentalCollaborativeEditingApiUrl,
 		} ),
@@ -70,4 +70,8 @@ export function getProviderCreators(): ProviderCreator[] {
 /**
  * Export provider creators for direct use
  */
-export { createIndexedDbProvider, createWebRTCProvider, createHttpSseProvider };
+export {
+	createIndexedDbProvider,
+	createWebRTCProvider,
+	createHttpPollingProvider,
+};

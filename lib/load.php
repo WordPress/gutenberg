@@ -90,9 +90,9 @@ if ( ! class_exists( 'Gutenberg_HTTP_Singling_Server' ) ) {
 	require_once __DIR__ . '/experimental/sync/class-gutenberg-http-signaling-server.php';
 }
 
-// Experimental SSE sync server.
-if ( ! class_exists( 'Gutenberg_HTTP_SSE_Sync_Server' ) ) {
-	require_once __DIR__ . '/experimental/sync/class-gutenberg-http-sse-sync-server.php';
+// Experimental polling sync server.
+if ( ! class_exists( 'Gutenberg_HTTP_Polling_Sync_Server' ) ) {
+	require_once __DIR__ . '/experimental/sync/class-gutenberg-http-polling-sync-server.php';
 }
 
 require_once __DIR__ . '/experimental/editor-settings.php';

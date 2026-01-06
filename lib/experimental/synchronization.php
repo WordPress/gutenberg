@@ -32,7 +32,7 @@ function gutenberg_rest_api_register_routes_for_collaborative_editing(): void {
 		return;
 	}
 
-	$sse_sync_server = new Gutenberg_HTTP_SSE_Sync_Server();
+	$sse_sync_server = new Gutenberg_HTTP_Polling_Sync_Server();
 	$sse_sync_server->register_routes();
 
 	// Provide a nonce for the EventSteam connection.

@@ -17,7 +17,7 @@ import { addQueryArgs } from '@wordpress/url';
  */
 import type { ProviderCreator, ProviderCreatorResult } from '../types';
 
-interface HttpSseProviderOptions {
+interface HttpPollingProviderOptions {
 	debug?: boolean;
 	doc: Y.Doc;
 	endpoint: string;
@@ -48,8 +48,8 @@ const DEFAULT_RECONNECT_INTERVAL_IN_MS = 5000;
  * Unlike WebRTC, this provider communicates through a central server
  * which manages rooms and broadcasts updates to all connected clients.
  */
-export class HttpSseProvider extends Observable< string > {
-	private options: HttpSseProviderOptions;
+export class HttpPollingProvider extends Observable< string > {
+	private options: HttpPollingProviderOptions;
 
 	private eventSource: EventSource | null = null;
 	private lastMessageId = 0;
@@ -59,7 +59,7 @@ export class HttpSseProvider extends Observable< string > {
 	private fullStateTimeout?: NodeJS.Timeout;
 	private reconnectTimeout?: NodeJS.Timeout;
 
-	public constructor( options: HttpSseProviderOptions ) {
+	public constructor( options: HttpPollingProviderOptions ) {
 		super();
 
 		this.options = options;
@@ -151,7 +151,7 @@ export class HttpSseProvider extends Observable< string > {
 	private log( message: string, debug: object = {} ): void {
 		if ( this.options.debug ) {
 			// eslint-disable-next-line no-console
-			console.log( `[HttpSseProvider]: ${ message }`, {
+			console.log( `[HttpPollingProvider]: ${ message }`, {
 				room: this.options.room,
 				...debug,
 			} );
@@ -334,18 +334,18 @@ export class HttpSseProvider extends Observable< string > {
 	}
 }
 
-type CreateHttpSseProviderOptions = Omit<
-	HttpSseProviderOptions,
+type CreateHttpPollingProviderOptions = Omit<
+	HttpPollingProviderOptions,
 	'doc' | 'room'
 >;
 
 /**
- * Create a provider creator function for the HttpSseProvider
+ * Create a provider creator function for the HttpPollingProvider
  *
- * @param {CreateHttpSseProviderOptions} options Options for the HttpSseProvider excluding doc and room
+ * @param {CreateHttpPollingProviderOptions} options Options for the HttpPollingProvider excluding doc and room
  */
-export function createHttpSseProvider(
-	options: CreateHttpSseProviderOptions
+export function createHttpPollingProvider(
+	options: CreateHttpPollingProviderOptions
 ): ProviderCreator {
 	return async (
 		objectType: string,
@@ -354,7 +354,7 @@ export function createHttpSseProvider(
 	): Promise< ProviderCreatorResult > => {
 		// Generate room name from objectType and objectId
 		const room = objectId ? `${ objectType }:${ objectId }` : objectType;
-		const provider = new HttpSseProvider( {
+		const provider = new HttpPollingProvider( {
 			...options,
 			debug: false,
 			doc,
