@@ -7,10 +7,13 @@ import * as Y from 'yjs';
  * Internal dependencies
  */
 import {
+	CRDT_DOC_VERSION,
 	CRDT_RECORD_MAP_KEY as RECORD_KEY,
 	LOCAL_SYNC_MANAGER_ORIGIN,
 	CRDT_RECORD_METADATA_MAP_KEY as RECORD_METADATA_KEY,
 	CRDT_RECORD_METADATA_SAVED_AT_KEY as SAVED_AT_KEY,
+	CRDT_STATE_MAP_KEY,
+	CRDT_STATE_VERSION_KEY,
 } from './config';
 import { createPersistedCRDTDoc, getPersistedCrdtDoc } from './persistence';
 import { getProviderCreators } from './providers';
@@ -118,6 +121,7 @@ export function createSyncManager(): SyncManager {
 		const ydoc = createYjsDoc( { objectType } );
 		const recordMap = ydoc.getMap( RECORD_KEY );
 		const recordMetaMap = ydoc.getMap( RECORD_METADATA_KEY );
+		const stateMap = ydoc.getMap( CRDT_STATE_MAP_KEY );
 		const now = Date.now();
 
 		// Clean up providers and in-memory state when the entity is unloaded.
@@ -125,6 +129,7 @@ export function createSyncManager(): SyncManager {
 			providerResults.forEach( ( result ) => result.destroy() );
 			recordMap.unobserveDeep( onRecordUpdate );
 			recordMetaMap.unobserve( onRecordMetaUpdate );
+			stateMap.unobserve( onStateUpdate );
 			ydoc.destroy();
 			entityStates.delete( entityId );
 		};
@@ -172,6 +177,31 @@ export function createSyncManager(): SyncManager {
 			undoManager = createUndoManager();
 		}
 
+		const onStateUpdate = (
+			event: Y.YMapEvent< unknown >,
+			transaction: Y.Transaction
+		) => {
+			if ( transaction.local ) {
+				return;
+			}
+
+			event.keysChanged.forEach( ( key ) => {
+				switch ( key ) {
+					case CRDT_STATE_VERSION_KEY:
+						const remoteVersion = stateMap.get(
+							CRDT_STATE_VERSION_KEY
+						);
+
+						if ( remoteVersion !== CRDT_DOC_VERSION ) {
+							console.log( 'Remote version mismatch detected' );
+							console.log( 'remoteVersion', remoteVersion );
+							console.log( 'CRDT_DOC_VERSION', CRDT_DOC_VERSION );
+						}
+						break;
+				}
+			} );
+		};
+
 		const { addUndoMeta, restoreUndoMeta } = handlers;
 		undoManager.addToScope( recordMap, {
 			addUndoMeta,
@@ -202,6 +232,7 @@ export function createSyncManager(): SyncManager {
 		// Attach observers.
 		recordMap.observeDeep( onRecordUpdate );
 		recordMetaMap.observe( onRecordMetaUpdate );
+		stateMap.observe( onStateUpdate );
 
 		// Get and apply the persisted CRDT document, if it exists.
 		applyPersistedCrdtDoc( objectType, objectId, record );
@@ -231,12 +262,14 @@ export function createSyncManager(): SyncManager {
 
 		const ydoc = createYjsDoc( { collection: true, objectType } );
 		const recordMetaMap = ydoc.getMap( RECORD_METADATA_KEY );
+		const stateMap = ydoc.getMap( CRDT_STATE_MAP_KEY );
 		const now = Date.now();
 
 		// Clean up providers and in-memory state when the entity is unloaded.
 		const unload = (): void => {
 			providerResults.forEach( ( result ) => result.destroy() );
 			recordMetaMap.unobserve( onRecordMetaUpdate );
+			stateMap.unobserve( onStateUpdate );
 			ydoc.destroy();
 			collectionStates.delete( objectType );
 		};
@@ -263,6 +296,32 @@ export function createSyncManager(): SyncManager {
 			} );
 		};
 
+		const onStateUpdate = (
+			event: Y.YMapEvent< unknown >,
+			transaction: Y.Transaction
+		) => {
+			if ( transaction.local ) {
+				return;
+			}
+
+			event.keysChanged.forEach( ( key ) => {
+				switch ( key ) {
+					case CRDT_STATE_VERSION_KEY:
+						const remoteVersion = stateMap.get(
+							CRDT_STATE_VERSION_KEY
+						);
+						if ( remoteVersion !== CRDT_DOC_VERSION ) {
+							console.log(
+								'Remote version mismatch detected (collection)'
+							);
+							console.log( 'remoteVersion', remoteVersion );
+							console.log( 'CRDT_DOC_VERSION', CRDT_DOC_VERSION );
+						}
+						break;
+				}
+			} );
+		};
+
 		const collectionState: CollectionState = {
 			handlers,
 			syncConfig,
@@ -281,6 +340,7 @@ export function createSyncManager(): SyncManager {
 
 		// Attach observers.
 		recordMetaMap.observe( onRecordMetaUpdate );
+		stateMap.observe( onStateUpdate );
 	}
 
 	/**
