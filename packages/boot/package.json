@@ -57,6 +57,7 @@
 		"@wordpress/keyboard-shortcuts": "file:../keyboard-shortcuts",
 		"@wordpress/keycodes": "file:../keycodes",
 		"@wordpress/lazy-editor": "file:../lazy-editor",
+		"@wordpress/notices": "file:../notices",
 		"@wordpress/primitives": "file:../primitives",
 		"@wordpress/private-apis": "file:../private-apis",
 		"@wordpress/route": "file:../route",

@@ -128,7 +128,7 @@
 }
 
 // Adjust the position of the notices
-.components-editor-notices__snackbar {
+.components-notices__snackbar {
 	position: fixed;
 	right: 0;
 	bottom: 24px;
@@ -136,4 +136,4 @@
 	padding-right: 24px;
 }
 
-@include editor-left(".edit-post-layout .components-editor-notices__snackbar");
+@include editor-left(".edit-post-layout .components-notices__snackbar");

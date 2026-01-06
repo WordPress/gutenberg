@@ -22,14 +22,13 @@ import {
 import { __, sprintf } from '@wordpress/i18n';
 import { useState, useRef, useEffect } from '@wordpress/element';
 import {
-	EditorSnackbars,
 	UnsavedChangesWarning,
 	ErrorBoundary,
 	privateApis as editorPrivateApis,
 } from '@wordpress/editor';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { PluginArea } from '@wordpress/plugins';
-import { store as noticesStore } from '@wordpress/notices';
+import { NoticesSnackbarList, store as noticesStore } from '@wordpress/notices';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as preferencesStore } from '@wordpress/preferences';
 
@@ -155,7 +154,7 @@ function Layout() {
 						</NavigableRegion>
 					) }
 
-					<EditorSnackbars />
+					<NoticesSnackbarList className="components-notices__snackbar" />
 
 					{ isMobileViewport && areas.mobile && (
 						<div className="edit-site-layout__mobile">

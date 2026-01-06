@@ -1,12 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { SnackbarList } from '@wordpress/components';
-import { useSelect, useDispatch } from '@wordpress/data';
-import { store as noticesStore } from '@wordpress/notices';
-
-// Last three notices. Slices from the tail end of the list.
-const MAX_VISIBLE_NOTICES = -3;
+import deprecated from '@wordpress/deprecated';
+import { NoticesSnackbarList } from '@wordpress/notices';
 
 /**
  * Renders the editor snackbars component.
@@ -14,20 +10,13 @@ const MAX_VISIBLE_NOTICES = -3;
  * @return {React.ReactNode} The rendered component.
  */
 export default function EditorSnackbars() {
-	const notices = useSelect(
-		( select ) => select( noticesStore ).getNotices(),
-		[]
-	);
-	const { removeNotice } = useDispatch( noticesStore );
-	const snackbarNotices = notices
-		.filter( ( { type } ) => type === 'snackbar' )
-		.slice( MAX_VISIBLE_NOTICES );
+	deprecated( 'wp.editor.EditorSnackbars', {
+		since: '6.7',
+		version: '6.9',
+		alternative: 'wp.notices.NoticesSnackbarList',
+	} );
 
 	return (
-		<SnackbarList
-			notices={ snackbarNotices }
-			className="components-editor-notices__snackbar"
-			onRemove={ removeNotice }
-		/>
+		<NoticesSnackbarList className="components-editor-notices__snackbar" />
 	);
 }

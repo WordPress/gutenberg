@@ -12,7 +12,6 @@ import {
 	LocalAutosaveMonitor,
 	UnsavedChangesWarning,
 	EditorKeyboardShortcutsRegister,
-	EditorSnackbars,
 	ErrorBoundary,
 	PostLockedModal,
 	store as editorStore,
@@ -32,7 +31,7 @@ import {
 	useState,
 } from '@wordpress/element';
 import { chevronDown, chevronUp } from '@wordpress/icons';
-import { store as noticesStore } from '@wordpress/notices';
+import { NoticesSnackbarList, store as noticesStore } from '@wordpress/notices';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { privateApis as commandsPrivateApis } from '@wordpress/commands';
 import { privateApis as blockLibraryPrivateApis } from '@wordpress/block-library';
@@ -659,7 +658,7 @@ function Layout( {
 						<PluginArea onError={ onPluginAreaError } />
 						<PostEditorMoreMenu />
 						{ backButton }
-						<EditorSnackbars />
+						<NoticesSnackbarList className="components-notices__snackbar" />
 					</Editor>
 				</div>
 			</ErrorBoundary>

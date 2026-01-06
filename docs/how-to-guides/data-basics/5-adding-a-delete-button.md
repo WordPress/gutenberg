@@ -7,7 +7,7 @@ Here's a glimpse of what we're going to build:
 
 ![](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/how-to-guides/data-basics/media/delete-button/delete-button.png)
 
-### Step 1: Add a _Delete_ button
+### Step 1: Add a *Delete* button
 
 Let's start by creating the `DeletePageButton` component and updating the user interface of our `PagesList` component:
 
@@ -94,7 +94,7 @@ const DeletePageButton = ({ pageId }) => {
 
 ### Step 3: Add visual feedback
 
-It may take a few moments for the REST API request to finish after clicking the _Delete_ button. Let's communicate that with a `<Spinner />` component similarly to what we did in the previous parts of this tutorial.
+It may take a few moments for the REST API request to finish after clicking the *Delete* button. Let's communicate that with a `<Spinner />` component similarly to what we did in the previous parts of this tutorial.
 
 We'll need the `isDeletingEntityRecord` selector for that. It is similar to the `isSavingEntityRecord` selector we've already seen in [part 3](/docs/how-to-guides/data-basics/3-building-an-edit-form.md): it returns `true` or `false` and never issues any HTTP requests:
 
@@ -193,15 +193,15 @@ Let's create our own `Notifications` components:
 
 ```js
 import { SnackbarList } from '@wordpress/components';
-import { store as noticesStore } from '@wordpress/notices';
+import { store as noticesStore, NoticesSnackbarList } from '@wordpress/notices';
 
 function Notifications() {
 	const notices = []; // We'll come back here in a second!
 
 	return (
-		<SnackbarList
+		<NoticesSnackbarList
 			notices={ notices }
-			className="components-editor-notices__snackbar"
+			className="components-notices__snackbar"
 		/>
 	);
 }
@@ -226,7 +226,7 @@ function Notifications() {
 	return (
 		<SnackbarList
 			notices={ snackbarNotices }
-			className="components-editor-notices__snackbar"
+			className="components-notices__snackbar"
 			onRemove={ removeNotice }
 		/>
 	);
@@ -355,7 +355,7 @@ function SnackbarNotices() {
 	return (
 		<SnackbarList
 			notices={ snackbarNotices }
-			className="components-editor-notices__snackbar"
+			className="components-notices__snackbar"
 			onRemove={ removeNotice }
 		/>
 	);

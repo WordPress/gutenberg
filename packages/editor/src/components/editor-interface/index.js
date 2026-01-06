@@ -14,13 +14,14 @@ import { BlockBreadcrumb, BlockToolbar } from '@wordpress/block-editor';
 import { useViewportMatch } from '@wordpress/compose';
 import { useState, useCallback } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
+import { NoticesDefaultList } from '@wordpress/notices';
 
 /**
  * Internal dependencies
  */
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
-import EditorNotices from '../editor-notices';
+import TemplateValidationNotice from '../template-validation-notice';
 import Header from '../header';
 import InserterSidebar from '../inserter-sidebar';
 import ListViewSidebar from '../list-view-sidebar';
@@ -136,7 +137,14 @@ export default function EditorInterface( {
 					/>
 				)
 			}
-			editorNotices={ <EditorNotices /> }
+			editorNotices={
+				<NoticesDefaultList
+					pinnedNoticesClassName="editor-notices__pinned"
+					dismissibleNoticesClassName="editor-notices__dismissible"
+				>
+					<TemplateValidationNotice />
+				</NoticesDefaultList>
+			}
 			secondarySidebar={
 				! isPreviewMode &&
 				mode === 'visual' &&
@@ -150,7 +158,12 @@ export default function EditorInterface( {
 			content={
 				<>
 					{ ! isDistractionFree && ! isPreviewMode && (
-						<EditorNotices />
+						<NoticesDefaultList
+							pinnedNoticesClassName="editor-notices__pinned"
+							dismissibleNoticesClassName="editor-notices__dismissible"
+						>
+							<TemplateValidationNotice />
+						</NoticesDefaultList>
 					) }
 
 					{ shouldShowStylesCanvas ? (

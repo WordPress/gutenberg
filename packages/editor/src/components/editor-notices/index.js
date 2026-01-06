@@ -1,9 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { NoticeList } from '@wordpress/components';
-import { useDispatch, useSelect } from '@wordpress/data';
-import { store as noticesStore } from '@wordpress/notices';
+import deprecated from '@wordpress/deprecated';
+import { NoticesDefaultList } from '@wordpress/notices';
 
 /**
  * Internal dependencies
@@ -21,34 +20,19 @@ import TemplateValidationNotice from '../template-validation-notice';
  * @return {React.ReactNode} The rendered EditorNotices component.
  */
 export function EditorNotices() {
-	const { notices } = useSelect(
-		( select ) => ( {
-			notices: select( noticesStore ).getNotices(),
-		} ),
-		[]
-	);
-	const { removeNotice } = useDispatch( noticesStore );
-	const dismissibleNotices = notices.filter(
-		( { isDismissible, type } ) => isDismissible && type === 'default'
-	);
-	const nonDismissibleNotices = notices.filter(
-		( { isDismissible, type } ) => ! isDismissible && type === 'default'
-	);
+	deprecated( 'wp.editor.EditorNotices', {
+		since: '6.7',
+		version: '6.9',
+		alternative: 'wp.notices.NoticesDefaultList',
+	} );
 
 	return (
-		<>
-			<NoticeList
-				notices={ nonDismissibleNotices }
-				className="components-editor-notices__pinned"
-			/>
-			<NoticeList
-				notices={ dismissibleNotices }
-				className="components-editor-notices__dismissible"
-				onRemove={ removeNotice }
-			>
-				<TemplateValidationNotice />
-			</NoticeList>
-		</>
+		<NoticesDefaultList
+			pinnedNoticesClassName="components-editor-notices__pinned"
+			dismissibleNoticesClassName="components-editor-notices__dismissible"
+		>
+			<TemplateValidationNotice />
+		</NoticesDefaultList>
 	);
 }
 
