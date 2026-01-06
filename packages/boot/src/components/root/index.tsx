@@ -7,7 +7,7 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import { privateApis as routePrivateApis } from '@wordpress/route';
-import { NoticesSnackbarList } from '@wordpress/notices';
+import { SnackbarNotices } from '@wordpress/notices';
 import { useViewportMatch, useReducedMotion } from '@wordpress/compose';
 import {
 	__unstableMotion as motion,
@@ -70,10 +70,11 @@ export default function Root() {
 	const isCanvasVisible = canvas && isFullScreen;
 	const snackbarList = snackbarTarget
 		? createPortal(
-				<NoticesSnackbarList
-					className={ clsx( 'snackbar-list', {
-						'snackbar-list--canvas-visible': isCanvasVisible,
-						'snackbar-list--in-area': ! isCanvasVisible,
+				<SnackbarNotices
+					className={ clsx( 'boot-layout__snackbar', {
+						'boot-layout__snackbar--canvas-visible':
+							isCanvasVisible,
+						'boot-layout__snackbar--in-area': ! isCanvasVisible,
 					} ) }
 				/>,
 				snackbarTarget

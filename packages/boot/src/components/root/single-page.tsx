@@ -7,7 +7,7 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import { privateApis as routePrivateApis } from '@wordpress/route';
-import { NoticesSnackbarList } from '@wordpress/notices';
+import { SnackbarNotices } from '@wordpress/notices';
 import { SlotFillProvider } from '@wordpress/components';
 
 /**
@@ -54,7 +54,7 @@ export default function RootSinglePage() {
 						) }
 					>
 						<SavePanel />
-						<NoticesSnackbarList className="editor-notices__snackbar" />
+						<SnackbarNotices className="editor-notices__snackbar" />
 						<div className="boot-layout__surfaces">
 							<UserThemeProvider color={ { bg: '#ffffff' } }>
 								<Outlet />

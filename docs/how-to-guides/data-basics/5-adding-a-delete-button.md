@@ -94,7 +94,7 @@ const DeletePageButton = ({ pageId }) => {
 
 ### Step 3: Add visual feedback
 
-It may take a few moments for the REST API request to finish after clicking the *Delete* button. Let's communicate that with a `<Spinner />` component similarly to what we did in the previous parts of this tutorial.
+It may take a few moments for the REST API request to finish after clicking the _Delete_ button. Let's communicate that with a `<Spinner />` component similarly to what we did in the previous parts of this tutorial.
 
 We'll need the `isDeletingEntityRecord` selector for that. It is similar to the `isSavingEntityRecord` selector we've already seen in [part 3](/docs/how-to-guides/data-basics/3-building-an-edit-form.md): it returns `true` or `false` and never issues any HTTP requests:
 
@@ -187,19 +187,19 @@ WordPress conveniently provides us with all the React components we need to rend
 
 ![](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/how-to-guides/data-basics/media/delete-button/snackbar.png)
 
-We won't use `Snackbar` directly, though. We'll use `NoticesSnackbarList` from `@wordpress/notices`, which can display multiple notices using smooth animations and automatically hide them after a few seconds. In fact, WordPress uses the same component in the Widgets editor and other wp-admin pages!
+We won't use `Snackbar` directly, though. We'll use `SnackbarNotices` from `@wordpress/notices`, which can display multiple notices using smooth animations and automatically hide them after a few seconds. In fact, WordPress uses the same component in the Widgets editor and other wp-admin pages!
 
 Let's create our own `Notifications` components:
 
 ```js
-import { NoticesSnackbarList } from '@wordpress/notices';
+import { SnackbarNotices } from '@wordpress/notices';
 
 function Notifications() {
-	return <NoticesSnackbarList className="notifications__snackbar" />;
+	return <SnackbarNotices className="notifications__snackbar" />;
 }
 ```
 
-The basic structure is in place. `NoticesSnackbarList` reads from the notices store automatically, so all you need to do is render it once in your app:
+The basic structure is in place. `SnackbarNotices` reads from the notices store automatically, so all you need to do is render it once in your app:
 
 ```js
 function MyFirstApp() {
@@ -315,7 +315,7 @@ function MyFirstApp() {
 }
 
 function Notifications() {
-	return <NoticesSnackbarList className="notifications__snackbar" />;
+	return <SnackbarNotices className="notifications__snackbar" />;
 }
 
 function PagesList( { hasResolved, pages } ) {

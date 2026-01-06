@@ -34,7 +34,7 @@ import {
 } from '@wordpress/editor';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { PluginArea } from '@wordpress/plugins';
-import { NoticesSnackbarList, store as noticesStore } from '@wordpress/notices';
+import { SnackbarNotices, store as noticesStore } from '@wordpress/notices';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as preferencesStore } from '@wordpress/preferences';
 
@@ -108,10 +108,11 @@ function Layout() {
 
 	const snackbarList = snackbarTarget
 		? createPortal(
-				<NoticesSnackbarList
-					className={ clsx( 'snackbar-list', {
-						'snackbar-list--canvas-visible': isFullCanvas,
-						'snackbar-list--in-area': ! isFullCanvas,
+				<SnackbarNotices
+					className={ clsx( 'edit-site-layout__snackbar', {
+						'edit-site-layout__snackbar--canvas-visible':
+							isFullCanvas,
+						'edit-site-layout__snackbar--in-area': ! isFullCanvas,
 					} ) }
 				/>,
 				snackbarTarget

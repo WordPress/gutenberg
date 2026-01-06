@@ -17,13 +17,11 @@ import { store as noticesStore } from '../../store';
 // Last three notices. Slices from the tail end of the list.
 const MAX_VISIBLE_NOTICES = -3;
 
-type NoticesSnackbarListProps = {
+type SnackbarNoticesProps = {
 	className?: string;
 };
 
-export default function NoticesSnackbarList( {
-	className,
-}: NoticesSnackbarListProps ) {
+export default function SnackbarNotices( { className }: SnackbarNoticesProps ) {
 	const notices = useSelect( ( select ) =>
 		select( noticesStore ).getNotices()
 	);

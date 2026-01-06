@@ -30,10 +30,19 @@
 	}
 }
 
-.boot-layout .editor-notices__snackbar {
-	position: fixed;
-	right: 0;
-	bottom: 16px;
-	padding-left: 16px;
-	padding-right: 16px;
+.boot-layout .boot-layout__snackbar {
+	&--canvas-visible {
+		position: fixed;
+		right: 0;
+		bottom: 16px;
+		padding-left: 16px;
+		padding-right: 16px;
+	}
+	&--in-area {
+		position: absolute;
+		right: 0;
+		bottom: 16px;
+		padding-left: 16px;
+		padding-right: 16px;
+	}
 }

@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import deprecated from '@wordpress/deprecated';
-import { NoticesSnackbarList } from '@wordpress/notices';
+import { SnackbarNotices } from '@wordpress/notices';
 
 /**
  * Renders the editor snackbars component.
@@ -13,10 +13,8 @@ export default function EditorSnackbars() {
 	deprecated( 'wp.editor.EditorSnackbars', {
 		since: '6.7',
 		version: '6.9',
-		alternative: 'wp.notices.NoticesSnackbarList',
+		alternative: 'wp.notices.SnackbarNotices',
 	} );
 
-	return (
-		<NoticesSnackbarList className="components-editor-notices__snackbar" />
-	);
+	return <SnackbarNotices className="components-editor-notices__snackbar" />;
 }

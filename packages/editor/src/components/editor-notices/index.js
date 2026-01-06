@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import deprecated from '@wordpress/deprecated';
-import { NoticesDefaultList } from '@wordpress/notices';
+import { InlineNotices } from '@wordpress/notices';
 
 /**
  * Internal dependencies
@@ -23,16 +23,16 @@ export function EditorNotices() {
 	deprecated( 'wp.editor.EditorNotices', {
 		since: '6.7',
 		version: '6.9',
-		alternative: 'wp.notices.NoticesDefaultList',
+		alternative: 'wp.notices.InlineNotices',
 	} );
 
 	return (
-		<NoticesDefaultList
+		<InlineNotices
 			pinnedNoticesClassName="components-editor-notices__pinned"
 			dismissibleNoticesClassName="components-editor-notices__dismissible"
 		>
 			<TemplateValidationNotice />
-		</NoticesDefaultList>
+		</InlineNotices>
 	);
 }
 
