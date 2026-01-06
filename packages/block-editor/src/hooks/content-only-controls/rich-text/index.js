@@ -13,11 +13,14 @@ import {
 /**
  * Internal dependencies
  */
-import { useFormatTypes } from '../../rich-text/use-format-types';
-import { getAllowedFormats } from '../../rich-text/utils';
-import { useEventListeners } from '../../rich-text/event-listeners';
-import FormatEdit from '../../rich-text/format-edit';
-import { keyboardShortcutContext, inputEventContext } from '../../rich-text';
+import { useFormatTypes } from '../../../components/rich-text/use-format-types';
+import { getAllowedFormats } from '../../../components/rich-text/utils';
+import { useEventListeners } from '../../../components/rich-text/event-listeners';
+import FormatEdit from '../../../components/rich-text/format-edit';
+import {
+	keyboardShortcutContext,
+	inputEventContext,
+} from '../../../components/rich-text';
 
 export default function RichTextControl( {
 	data,

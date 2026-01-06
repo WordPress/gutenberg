@@ -18,8 +18,8 @@ import {
 /**
  * Internal dependencies
  */
-import MediaReplaceFlow from '../../media-replace-flow';
-import MediaUploadCheck from '../../media-upload/check';
+import MediaReplaceFlow from '../../../components/media-replace-flow';
+import MediaUploadCheck from '../../../components/media-upload/check';
 import { useInspectorPopoverPlacement } from '../use-inspector-popover-placement';
 import { getMediaSelectKey } from '../../../store/private-keys';
 import { store as blockEditorStore } from '../../../store';

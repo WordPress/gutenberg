@@ -6,7 +6,6 @@ import { privateApis as blocksPrivateApis } from '@wordpress/blocks';
 import {
 	__experimentalHStack as HStack,
 	__experimentalTruncate as Truncate,
-	createSlotFill,
 } from '@wordpress/components';
 import { createHigherOrderComponent } from '@wordpress/compose';
 import { DataForm } from '@wordpress/dataviews';
@@ -16,12 +15,13 @@ import { useContext, useState, useMemo } from '@wordpress/element';
  * Internal dependencies
  */
 import { unlock } from '../../lock-unlock';
-import BlockIcon from '../block-icon';
-import useBlockDisplayTitle from '../block-title/use-block-display-title';
-import useBlockDisplayInformation from '../use-block-display-information';
+import BlockIcon from '../../components/block-icon';
+import useBlockDisplayTitle from '../../components/block-title/use-block-display-title';
+import useBlockDisplayInformation from '../../components/use-block-display-information';
 const { fieldsKey, formKey } = unlock( blocksPrivateApis );
 import FieldsDropdownMenu from './fields-dropdown-menu';
-import { PrivateBlockContext } from '../block-list/private-block-context';
+import { PrivateBlockContext } from '../../components/block-list/private-block-context';
+import { BlockFieldsFill } from '../../components/inspector-controls-tabs/content-tab';
 
 // controls
 import RichText from './rich-text';
@@ -33,11 +33,6 @@ const CONTROLS = {
 	media: Media,
 	link: Link,
 };
-
-const { Fill: BlockFieldsFill, Slot: BlockFieldsSlot } =
-	createSlotFill( 'BlockFields' );
-
-export { BlockFieldsSlot };
 
 /**
  * Creates a configured control component that wraps a custom control
