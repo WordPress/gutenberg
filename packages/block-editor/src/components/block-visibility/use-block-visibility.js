@@ -44,7 +44,7 @@ export function useBlockVisibility( clientId ) {
 	const isLargerThanMobile = useViewportMatch( 'mobile', '>=' ); // >= 480px
 	const isLargerThanTablet = useViewportMatch( 'medium', '>=' ); // >= 782px
 
-	// Determine current viewport based on deviceType
+	// Determine current viewport based on deviceType and/or viewport detection.
 	const currentViewport = useMemo( () => {
 		if ( deviceType === BLOCK_VISIBILITY_VIEWPORTS.mobile.value ) {
 			return BLOCK_VISIBILITY_VIEWPORTS.mobile.value;
@@ -65,15 +65,18 @@ export function useBlockVisibility( clientId ) {
 		return BLOCK_VISIBILITY_VIEWPORTS.desktop.value;
 	}, [ deviceType, isLargerThanMobile, isLargerThanTablet ] );
 
-	// Determine if block is currently hidden
+	// Determine if block is currently hidden.
 	const isBlockCurrentlyHidden = useMemo( () => {
-		// Hidden everywhere takes precedence
+		// Hidden everywhere takes precedence.
 		if ( blockVisibility === false ) {
 			return true;
 		}
 
-		// Check if hidden on current viewport (false means hidden)
-		if ( blockVisibility?.[ currentViewport ] === false ) {
+		// Check if hidden on current viewport (false means hidden). Only apply when the experimental flag is enabled.
+		if (
+			window.__experimentalHideBlocksBasedOnScreenSize &&
+			blockVisibility?.[ currentViewport ] === false
+		) {
 			return true;
 		}
 

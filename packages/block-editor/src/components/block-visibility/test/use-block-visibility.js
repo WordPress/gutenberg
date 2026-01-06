@@ -37,6 +37,12 @@ describe( 'useBlockVisibility', () => {
 	beforeEach( () => {
 		// Reset all mocks before each test
 		jest.clearAllMocks();
+		// Enable experimental flag
+		window.__experimentalHideBlocksBasedOnScreenSize = true;
+	} );
+
+	afterEach( () => {
+		delete window.__experimentalHideBlocksBasedOnScreenSize;
 	} );
 
 	describe( 'Device type overrides', () => {
@@ -539,6 +545,37 @@ describe( 'useBlockVisibility', () => {
 			);
 
 			expect( result.current.isBlockCurrentlyHidden ).toBe( true );
+		} );
+
+		it( 'should not hide blocks when experimental flag is disabled', () => {
+			delete window.__experimentalHideBlocksBasedOnScreenSize;
+
+			useSelect.mockImplementation( ( callback ) =>
+				callback( () => ( {
+					getBlock: () => ( {
+						attributes: {
+							metadata: {
+								blockVisibility: {
+									desktop: false,
+								},
+							},
+						},
+					} ),
+					getSettings: () => ( {
+						__experimentalDeviceType: 'Desktop',
+					} ),
+				} ) )
+			);
+
+			useViewportMatch
+				.mockReturnValueOnce( true )
+				.mockReturnValueOnce( true );
+
+			const { result } = renderHook( () =>
+				useBlockVisibility( clientId )
+			);
+
+			expect( result.current.isBlockCurrentlyHidden ).toBe( false );
 		} );
 	} );
 
