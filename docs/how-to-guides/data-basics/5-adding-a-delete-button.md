@@ -1,7 +1,7 @@
 # Adding a delete button
 
 In the [previous part](/docs/how-to-guides/data-basics/3-building-an-edit-form.md) we added an ability to create new pages,
-and in this part we will add a *Delete* feature to our app.
+and in this part we will add a _Delete_ feature to our app.
 
 Here's a glimpse of what we're going to build:
 
