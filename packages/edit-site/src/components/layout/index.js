@@ -20,7 +20,13 @@ import {
 	usePrevious,
 } from '@wordpress/compose';
 import { __, sprintf } from '@wordpress/i18n';
-import { useState, useRef, useEffect } from '@wordpress/element';
+import {
+	createPortal,
+	useLayoutEffect,
+	useState,
+	useRef,
+	useEffect,
+} from '@wordpress/element';
 import {
 	UnsavedChangesWarning,
 	ErrorBoundary,
@@ -55,6 +61,10 @@ function Layout() {
 	const { canvas = 'view' } = query;
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const toggleRef = useRef();
+	const contentRef = useRef();
+	const contentAreaRef = useRef();
+	const editAreaRef = useRef();
+	const [ snackbarTarget, setSnackbarTarget ] = useState( null );
 	const navigateRegionsProps = useNavigateRegions();
 	const disableMotion = useReducedMotion();
 	const [ canvasResizer, canvasSize ] = useResizeObserver();
@@ -84,6 +94,30 @@ function Layout() {
 		// Should not depend on the previous canvas mode value but the next.
 	}, [ canvas ] );
 
+	const isFullCanvas = canvas === 'edit';
+	useLayoutEffect( () => {
+		const areaTarget = contentAreaRef.current ?? editAreaRef.current;
+		const nextTarget = isFullCanvas
+			? contentRef.current
+			: areaTarget ?? contentRef.current;
+
+		if ( nextTarget && nextTarget !== snackbarTarget ) {
+			setSnackbarTarget( nextTarget );
+		}
+	}, [ isFullCanvas, !! areas.content, !! areas.edit, snackbarTarget ] );
+
+	const snackbarList = snackbarTarget
+		? createPortal(
+				<NoticesSnackbarList
+					className={ clsx( 'snackbar-list', {
+						'snackbar-list--canvas-visible': isFullCanvas,
+						'snackbar-list--in-area': ! isFullCanvas,
+					} ) }
+				/>,
+				snackbarTarget
+		  )
+		: null;
+
 	return (
 		<>
 			<UnsavedChangesWarning />
@@ -95,12 +129,12 @@ function Layout() {
 					'edit-site-layout',
 					navigateRegionsProps.className,
 					{
-						'is-full-canvas': canvas === 'edit',
+						'is-full-canvas': isFullCanvas,
 						'show-icon-labels': showIconLabels,
 					}
 				) }
 			>
-				<div className="edit-site-layout__content">
+				<div className="edit-site-layout__content" ref={ contentRef }>
 					{ /*
 						The NavigableRegion must always be rendered and not use
 						`inert` otherwise `useNavigateRegions` will fail.
@@ -154,8 +188,6 @@ function Layout() {
 						</NavigableRegion>
 					) }
 
-					<NoticesSnackbarList className="components-notices__snackbar" />
-
 					{ isMobileViewport && areas.mobile && (
 						<div className="edit-site-layout__mobile">
 							<SidebarNavigationProvider>
@@ -189,6 +221,7 @@ function Layout() {
 						canvas !== 'edit' && (
 							<div
 								className="edit-site-layout__area"
+								ref={ contentAreaRef }
 								style={ {
 									maxWidth: widths?.content,
 								} }
@@ -200,6 +233,7 @@ function Layout() {
 					{ ! isMobileViewport && areas.edit && canvas !== 'edit' && (
 						<div
 							className="edit-site-layout__area"
+							ref={ editAreaRef }
 							style={ {
 								maxWidth: widths?.edit,
 							} }
@@ -253,6 +287,7 @@ function Layout() {
 					) }
 				</div>
 			</div>
+			{ snackbarList }
 		</>
 	);
 }
