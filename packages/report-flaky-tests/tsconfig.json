@@ -3,7 +3,8 @@
 	"extends": "../../tsconfig.base.json",
 	"compilerOptions": {
 		"module": "CommonJS",
-		"types": [ "jest" ]
+		"types": [ "jest" ],
+		"moduleResolution": "node"
 	},
 	"exclude": [ "src/__tests__", "src/__fixtures__" ]
 }
