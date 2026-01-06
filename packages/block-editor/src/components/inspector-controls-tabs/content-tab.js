@@ -19,20 +19,18 @@ const ContentTab = ( { contentClientIds } ) => {
 		return null;
 	}
 
-	const shouldShowContentOnlyControls =
+	const shouldShowBlockFields =
 		window?.__experimentalContentOnlyPatternInsertion &&
 		window?.__experimentalContentOnlyInspectorFields;
 
 	return (
 		<>
-			{ ! shouldShowContentOnlyControls && (
+			{ ! shouldShowBlockFields && (
 				<PanelBody title={ __( 'Content' ) }>
 					<BlockQuickNavigation clientIds={ contentClientIds } />
 				</PanelBody>
 			) }
-			{ shouldShowContentOnlyControls && (
-				<BlockFieldsSlot bubblesVirtually />
-			) }
+			{ shouldShowBlockFields && <BlockFieldsSlot bubblesVirtually /> }
 		</>
 	);
 };
