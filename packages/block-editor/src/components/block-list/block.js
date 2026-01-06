@@ -38,6 +38,7 @@ import { useBlockProps } from './use-block-props';
 import { store as blockEditorStore } from '../../store';
 import { useLayout } from './layout';
 import { PrivateBlockContext } from './private-block-context';
+import BlockNoteIndicator from '../list-view/block-note-indicator';
 
 import { unlock } from '../../lock-unlock';
 
@@ -240,6 +241,7 @@ function BlockListBlock( {
 					</Block>
 				}
 			>
+				<BlockNoteIndicator clientId={ clientId } />
 				{ block }
 			</BlockCrashBoundary>
 		</PrivateBlockContext.Provider>
