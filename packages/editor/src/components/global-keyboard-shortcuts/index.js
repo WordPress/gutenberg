@@ -155,7 +155,7 @@ export default function EditorKeyboardShortcuts() {
 
 		// Copy to clipboard.
 		window?.navigator?.clipboard?.writeText( content ).then( () => {
-			createNotice( 'info', __( 'All content copied.' ), {
+			createNotice( 'info', __( 'All blocks copied.' ), {
 				isDismissible: true,
 				type: 'snackbar',
 			} );

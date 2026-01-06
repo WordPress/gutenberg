@@ -102,7 +102,7 @@ function EditorKeyboardShortcutsRegister() {
 		registerShortcut( {
 			name: 'core/editor/copy-all',
 			category: 'global',
-			description: __( 'Copy all content.' ),
+			description: __( 'Copy all blocks.' ),
 			keyCombination: {
 				modifier: 'secondary',
 				character: 'c',
