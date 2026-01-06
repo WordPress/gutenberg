@@ -22,6 +22,7 @@ const { fieldsKey, formKey } = unlock( blocksPrivateApis );
 import FieldsDropdownMenu from './fields-dropdown-menu';
 import { PrivateBlockContext } from '../../components/block-list/private-block-context';
 import { BlockFieldsFill } from '../../components/inspector-controls-tabs/content-tab';
+import { InspectorControls } from '../../components';
 
 // controls
 import RichText from './rich-text';
@@ -344,19 +345,39 @@ const withBlockFields = createHigherOrderComponent(
 			isSelectionWithinCurrentSection,
 			isSectionBlock,
 			blockEditingMode,
+			isSelected,
 		} = useContext( PrivateBlockContext );
+
+		const shouldShowBlockFields =
+			window?.__experimentalContentOnlyPatternInsertion &&
+			window?.__experimentalContentOnlyInspectorFields;
 		const blockTypeFields = blockType?.[ fieldsKey ];
+
+		if ( ! shouldShowBlockFields || ! blockTypeFields?.length ) {
+			return <BlockEdit key="edit" { ...props } />;
+		}
 
 		return (
 			<>
 				<BlockEdit key="edit" { ...props } />
-				{ isSelectionWithinCurrentSection &&
-					( isSectionBlock || blockEditingMode === 'contentOnly' ) &&
-					!! blockTypeFields?.length && (
-						<BlockFieldsFill>
-							<BlockFields { ...props } blockType={ blockType } />
-						</BlockFieldsFill>
-					) }
+				{
+					// Display the controls of all inner blocks for section/pattern editing.
+					isSelectionWithinCurrentSection &&
+						( isSectionBlock ||
+							blockEditingMode === 'contentOnly' ) && (
+							<BlockFieldsFill>
+								<BlockFields
+									{ ...props }
+									blockType={ blockType }
+								/>
+							</BlockFieldsFill>
+						)
+				}
+				{ ! isSelectionWithinCurrentSection && isSelected && (
+					<InspectorControls group="content">
+						<BlockFields { ...props } blockType={ blockType } />
+					</InspectorControls>
+				) }
 			</>
 		);
 	}
