@@ -1,7 +1,7 @@
 # Adding a delete button
 
 In the [previous part](/docs/how-to-guides/data-basics/3-building-an-edit-form.md) we added an ability to create new pages,
-and in this part we will add a _Delete_ feature to our app.
+and in this part we will add a *Delete* feature to our app.
 
 Here's a glimpse of what we're going to build:
 
@@ -126,7 +126,7 @@ Here's what it looks like in action:
 
 ### Step 4: Handle errors
 
-We optimistically assumed that a _delete_ operation would always succeed. Unfortunately, under the hood, it is a REST API request that can fail in many ways:
+We optimistically assumed that a *delete* operation would always succeed. Unfortunately, under the hood, it is a REST API request that can fail in many ways:
 
 * The website can be down.
 * The delete request may be invalid.
@@ -402,5 +402,5 @@ function DeletePageButton( { pageId } ) {
 
 ## What's next?
 
-* **Previous part:** [Building a _Create page form_](/docs/how-to-guides/data-basics/4-building-a-create-page-form.md)
+* **Previous part:** [Building a *Create page form*](/docs/how-to-guides/data-basics/4-building-a-create-page-form.md)
 * (optional) Review the [finished app](https://github.com/WordPress/block-development-examples/tree/trunk/plugins/data-basics-59c8f8) in the block-development-examples repository
