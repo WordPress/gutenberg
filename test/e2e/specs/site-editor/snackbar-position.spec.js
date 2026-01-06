@@ -32,7 +32,9 @@ test.describe( 'Site Editor snackbars', () => {
 		).toContainText( 'Area snackbar' );
 
 		const hasAreaParent = await page.evaluate( () => {
-			const snackbar = document.querySelector( '.snackbar-list' );
+			const snackbar = document.querySelector(
+				'.edit-site-layout__snackbar'
+			);
 			return snackbar?.parentElement?.classList.contains(
 				'edit-site-layout__area'
 			);
@@ -58,7 +60,9 @@ test.describe( 'Site Editor snackbars', () => {
 		).toContainText( 'Fixed snackbar' );
 
 		const hasContentParent = await page.evaluate( () => {
-			const snackbar = document.querySelector( '.snackbar-list' );
+			const snackbar = document.querySelector(
+				'.edit-site-layout__snackbar'
+			);
 			return snackbar?.parentElement?.classList.contains(
 				'edit-site-layout__content'
 			);
