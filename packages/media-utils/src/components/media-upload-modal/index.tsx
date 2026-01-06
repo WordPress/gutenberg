@@ -15,6 +15,8 @@ import type { View, Field, ActionButton } from '@wordpress/dataviews';
 import {
 	altTextField,
 	captionField,
+	dateAddedField,
+	dateModifiedField,
 	descriptionField,
 	filenameField,
 	filesizeField,
@@ -240,6 +242,8 @@ export function MediaUploadModal( {
 			altTextField as Field< RestAttachment >,
 			captionField as Field< RestAttachment >,
 			descriptionField as Field< RestAttachment >,
+			dateAddedField as Field< RestAttachment >,
+			dateModifiedField as Field< RestAttachment >,
 			filenameField as Field< RestAttachment >,
 			filesizeField as Field< RestAttachment >,
 			mediaDimensionsField as Field< RestAttachment >,
