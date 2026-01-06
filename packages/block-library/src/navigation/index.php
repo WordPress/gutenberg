@@ -171,35 +171,6 @@ class WP_Navigation_Block_Renderer {
 	}
 
 	/**
-	 * Checks if blocks contain a core/navigation-overlay-close block.
-	 *
-	 * @since 6.5.0
-	 *
-	 * @param WP_Block_List $blocks The list of blocks to check.
-	 * @return bool Returns true if a navigation-overlay-close block is found.
-	 */
-	private static function has_navigation_overlay_close_block( $blocks ) {
-		if ( empty( $blocks ) ) {
-			return false;
-		}
-
-		foreach ( $blocks as $block ) {
-			if ( 'core/navigation-overlay-close' === $block->name ) {
-				return true;
-			}
-
-			// Recursively check inner blocks, but skip navigation blocks.
-			if ( 'core/navigation' !== $block->name && ! empty( $block->inner_blocks ) ) {
-				if ( static::has_navigation_overlay_close_block( $block->inner_blocks ) ) {
-					return true;
-				}
-			}
-		}
-
-		return false;
-	}
-
-	/**
 	 * Returns the html for blocks from a template part (without navigation container wrapper).
 	 *
 	 * @since 6.5.0
@@ -661,7 +632,11 @@ class WP_Navigation_Block_Renderer {
 				// Get blocks from the overlay template part.
 				$overlay_blocks = static::get_overlay_blocks_from_template_part( $attributes['overlay'], $attributes );
 				// Check if overlay contains a navigation-overlay-close block.
-				$has_custom_overlay_close_block = static::has_navigation_overlay_close_block( $overlay_blocks );
+				$has_custom_overlay_close_block = block_tree_has_block_type(
+					$overlay_blocks,
+					'core/navigation-overlay-close',
+					array( 'core/navigation' ) // Skip navigation blocks, as they cannot contain an overlay close block
+				);
 				// Render template part blocks directly without navigation container wrapper.
 				$overlay_blocks_html = static::get_template_part_blocks_html( $overlay_blocks );
 				// Add Interactivity API directives to the overlay close block if present.
@@ -929,7 +904,10 @@ class WP_Navigation_Block_Renderer {
 
 		$inner_blocks = static::get_inner_blocks( $attributes, $block );
 		// Prevent navigation blocks referencing themselves from rendering.
-		if ( block_core_navigation_block_contains_core_navigation( $inner_blocks ) ) {
+		if ( block_tree_has_block_type(
+			$inner_blocks,
+			'core/navigation'
+		) ) {
 			return '';
 		}
 
@@ -1273,24 +1251,52 @@ function block_core_navigation_filter_out_empty_blocks( $parsed_blocks ) {
 }
 
 /**
+ * Recursively checks if blocks contain a specific block type.
+ *
+ * @since 7.0.0
+ *
+ * @param WP_Block_List $blocks           The list of blocks to check.
+ * @param string        $block_type       The block type to search for (e.g., 'core/navigation').
+ * @param array         $skip_block_types Optional. Block types to skip when recursing. Default empty array.
+ * @return bool Returns true if the specified block type is found.
+ */
+function block_tree_has_block_type( $blocks, $block_type, $skip_block_types = array() ) {
+	if ( empty( $blocks ) ) {
+		return false;
+	}
+
+	foreach ( $blocks as $block ) {
+		if ( $block_type === $block->name ) {
+			return true;
+		}
+
+		// Recursively check inner blocks, skipping specified block types.
+		if ( ! in_array( $block->name, $skip_block_types, true ) && ! empty( $block->inner_blocks ) ) {
+			if ( block_tree_has_block_type( $block->inner_blocks, $block_type, $skip_block_types ) ) {
+				return true;
+			}
+		}
+	}
+
+	return false;
+}
+
+/**
  * Returns true if the navigation block contains a nested navigation block.
  *
  * @since 6.2.0
+ * @deprecated 7.0.0 Use block_tree_has_block_type() instead.
  *
  * @param WP_Block_List $inner_blocks Inner block instance to be normalized.
  * @return bool true if the navigation block contains a nested navigation block.
  */
 function block_core_navigation_block_contains_core_navigation( $inner_blocks ) {
-	foreach ( $inner_blocks as $block ) {
-		if ( 'core/navigation' === $block->name ) {
-			return true;
-		}
-		if ( $block->inner_blocks && block_core_navigation_block_contains_core_navigation( $block->inner_blocks ) ) {
-			return true;
-		}
-	}
+	_deprecated_function( __FUNCTION__, '7.0.0', 'block_tree_has_block_type()' );
 
-	return false;
+	return block_tree_has_block_type(
+		$inner_blocks,
+		'core/navigation'
+	);
 }
 
 /**
