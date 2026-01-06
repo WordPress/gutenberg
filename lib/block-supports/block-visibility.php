@@ -44,7 +44,7 @@ function gutenberg_render_block_visibility_support( $block_content, $block ) {
 			array(
 				'name' => 'Mobile',
 				'slug' => 'mobile',
-				'size' => '599px',
+				'size' => '479px',
 			),
 			array(
 				'name' => 'Tablet',
