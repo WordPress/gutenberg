@@ -38,6 +38,28 @@ export default defineConfig( {
 		pluginCSS( {
 			filename: 'css/design-tokens.css',
 			variableName: ( token ) => makeCSSVar( token.id ),
+			// See: https://github.com/terrazzoapp/terrazzo/pull/632
+			// @ts-expect-error - Valid return types excluded from package types.
+			transform( token ) {
+				// This addresses a specific browser issue where Chrome renders
+				// a font-weight of 500 as 600 instead of 400 when the target
+				// weight is not locally available, which is inconsistent with
+				// the spec-defined behavior. This workaround ensures that a 400
+				// weight is used if the 500 weight is not locally available,
+				// while still using the 500 weight if it _is_ available. This
+				// is applied at the plugin layer to ensure the original token
+				// value can be preserved at the intended 500 weight, where the
+				// bug only occurs in specific browser rendering.
+				//
+				// See: https://issues.chromium.org/issues/40552893
+				// See: https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/font-weight#fallback_weights
+				if (
+					token.id.startsWith( 'wpds-font.weight.' ) &&
+					token.$value === 500
+				) {
+					return '499';
+				}
+			},
 			baseSelector: ':root',
 			modeSelectors: [
 				{
