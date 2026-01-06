@@ -13,7 +13,7 @@ import {
 import { createHigherOrderComponent } from '@wordpress/compose';
 
 const EMPTY_OBJECT = {};
-const MIN_FONT_SIZE_FOR_WARNING = 6;
+const MIN_FONT_SIZE_FOR_WARNING = 12;
 
 /**
  * Internal dependencies
