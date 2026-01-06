@@ -16,6 +16,7 @@ const ListViewBlockContents = forwardRef(
 			onClick,
 			onToggleExpanded,
 			block,
+			notes,
 			isSelected,
 			position,
 			siblingBlockCount,
@@ -57,6 +58,7 @@ const ListViewBlockContents = forwardRef(
 							ref={ ref }
 							className="block-editor-list-view-block-contents"
 							block={ block }
+							notes={ notes }
 							onClick={ onClick }
 							onToggleExpanded={ onToggleExpanded }
 							isSelected={ isSelected }
