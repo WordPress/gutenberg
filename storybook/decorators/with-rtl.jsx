@@ -50,10 +50,12 @@ export const WithRTL = ( Story, context ) => {
 			}
 		} );
 
-		stylesToUse.forEach( ( style ) => style.use() );
+		const style = document.createElement( 'style' );
+		style.textContent = stylesToUse.join( '\n' );
+		document.head.appendChild( style );
 
 		return () => {
-			stylesToUse.forEach( ( style ) => style.unuse() );
+			document.head.removeChild( style );
 		};
 	}, [ context.componentId, context.globals.direction ] );
 

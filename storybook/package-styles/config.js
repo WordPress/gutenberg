@@ -1,23 +1,23 @@
 /**
  * Internal dependencies
  */
-import blockEditorLtr from '../package-styles/block-editor-ltr.lazy.scss';
-import blockEditorRtl from '../package-styles/block-editor-rtl.lazy.scss';
-import blockLibraryLtr from '../package-styles/block-library-ltr.lazy.scss';
-import blockLibraryRtl from '../package-styles/block-library-rtl.lazy.scss';
-import componentsLtr from '../package-styles/components-ltr.lazy.scss';
-import componentsRtl from '../package-styles/components-rtl.lazy.scss';
-import formatLibraryLtr from '../package-styles/format-library-ltr.lazy.scss';
-import formatLibraryRtl from '../package-styles/format-library-rtl.lazy.scss';
-import editSiteLtr from '../package-styles/edit-site-ltr.lazy.scss';
-import editSiteRtl from '../package-styles/edit-site-rtl.lazy.scss';
-import dataviewsLtr from '../package-styles/dataviews-ltr.lazy.scss';
-import dataviewsRtl from '../package-styles/dataviews-rtl.lazy.scss';
-import fieldsLtr from '../package-styles/fields-ltr.lazy.scss';
-import fieldsRtl from '../package-styles/fields-rtl.lazy.scss';
-import mediaFieldsLtr from '../package-styles/media-fields-ltr.lazy.scss';
-import mediaFieldsRtl from '../package-styles/media-fields-rtl.lazy.scss';
-import ui from '../package-styles/ui.lazy.scss';
+import blockEditorLtr from '../package-styles/block-editor-ltr.lazy.scss?raw';
+import blockEditorRtl from '../package-styles/block-editor-rtl.lazy.scss?raw';
+import blockLibraryLtr from '../package-styles/block-library-ltr.lazy.scss?raw';
+import blockLibraryRtl from '../package-styles/block-library-rtl.lazy.scss?raw';
+import componentsLtr from '../package-styles/components-ltr.lazy.scss?raw';
+import componentsRtl from '../package-styles/components-rtl.lazy.scss?raw';
+import formatLibraryLtr from '../package-styles/format-library-ltr.lazy.scss?raw';
+import formatLibraryRtl from '../package-styles/format-library-rtl.lazy.scss?raw';
+import editSiteLtr from '../package-styles/edit-site-ltr.lazy.scss?raw';
+import editSiteRtl from '../package-styles/edit-site-rtl.lazy.scss?raw';
+import dataviewsLtr from '../package-styles/dataviews-ltr.lazy.scss?raw';
+import dataviewsRtl from '../package-styles/dataviews-rtl.lazy.scss?raw';
+import fieldsLtr from '../package-styles/fields-ltr.lazy.scss?raw';
+import fieldsRtl from '../package-styles/fields-rtl.lazy.scss?raw';
+import mediaFieldsLtr from '../package-styles/media-fields-ltr.lazy.scss?raw';
+import mediaFieldsRtl from '../package-styles/media-fields-rtl.lazy.scss?raw';
+import ui from '../package-styles/ui.lazy.scss?raw';
 
 /**
  * Stylesheets to lazy load when the story's context.componentId matches the

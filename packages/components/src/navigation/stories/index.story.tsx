@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta } from '@storybook/react-webpack5';
+import type { Meta } from '@storybook/react-vite';
 import { fn } from 'storybook/test';
 
 /**
