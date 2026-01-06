@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import * as Y from 'yjs';
+import type * as Y from 'yjs';
 import * as encoding from 'lib0/encoding';
 import * as decoding from 'lib0/decoding';
 import * as syncProtocol from 'y-protocols/sync';
@@ -21,7 +21,6 @@ interface HttpPollingProviderOptions {
 	debug?: boolean;
 	doc: Y.Doc;
 	endpoint: string;
-	fullStateIntervalInMs?: number;
 	pollingIntervalInMs?: number;
 	room: string;
 }
@@ -40,7 +39,6 @@ interface SyncMessagePayload {
 	room: string;
 }
 
-const DEFAULT_FULL_STATE_INTERVAL_IN_MS = 30000;
 const DEFAULT_POLLING_INTERVAL_IN_MS = 200;
 
 /**
@@ -55,7 +53,6 @@ export class HttpPollingProvider extends Observable< string > {
 	private seenMessages = new Set< number >();
 	private synced = false;
 
-	private fullStateTimeout?: NodeJS.Timeout;
 	private pollingTimeout?: NodeJS.Timeout;
 
 	public constructor( options: HttpPollingProviderOptions ) {
@@ -72,15 +69,6 @@ export class HttpPollingProvider extends Observable< string > {
 	 * Connect to the endpoint and initialize sync.
 	 */
 	public connect(): void {
-		// Set up periodic full state sending (every 30 seconds)
-		if ( ! this.fullStateTimeout ) {
-			this.fullStateTimeout = setInterval(
-				this.sendFullState.bind( this ),
-				this.options.fullStateIntervalInMs ??
-					DEFAULT_FULL_STATE_INTERVAL_IN_MS
-			);
-		}
-
 		this.log( 'Initializing polling' );
 		this.pollForMessages();
 
@@ -99,7 +87,6 @@ export class HttpPollingProvider extends Observable< string > {
 		this.emitStatus( 'disconnected' );
 		this.options.doc.off( 'update', this.onDocUpdate );
 
-		clearInterval( this.fullStateTimeout );
 		clearInterval( this.pollingTimeout );
 
 		super.destroy();
@@ -286,16 +273,6 @@ export class HttpPollingProvider extends Observable< string > {
 			.catch( ( error ) => {
 				this.log( 'Error sending message to server', { error } );
 			} );
-	}
-
-	/**
-	 * Send the full document state to the server.
-	 */
-	private sendFullState(): void {
-		const state = Y.encodeStateAsUpdateV2( this.options.doc );
-		const encoder = encoding.createEncoder();
-		syncProtocol.writeUpdate( encoder, state );
-		this.sendEncodedMessage( state, true );
 	}
 
 	/**

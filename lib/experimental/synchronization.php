@@ -24,6 +24,20 @@ function gutenberg_rest_api_init_collaborative_editing() {
 add_action( 'admin_init', 'gutenberg_rest_api_init_collaborative_editing' );
 
 /**
+ * Registers the custom post type for sync storage.
+ */
+function gutenberg_rest_api_register_sync_post_type(): void {
+	$gutenberg_experiments = get_option( 'gutenberg-experiments' );
+	if ( ! $gutenberg_experiments || ! array_key_exists( 'gutenberg-sync-collaboration', $gutenberg_experiments ) ) {
+		return;
+	}
+
+	$sse_sync_server = new Gutenberg_HTTP_Polling_Sync_Server();
+	$sse_sync_server->register_post_type();
+}
+add_action( 'init', 'gutenberg_rest_api_register_sync_post_type' );
+
+/**
  * Registers REST API routes for collaborative editing.
  */
 function gutenberg_rest_api_register_routes_for_collaborative_editing(): void {

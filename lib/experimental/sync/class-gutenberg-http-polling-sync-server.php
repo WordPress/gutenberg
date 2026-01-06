@@ -13,14 +13,78 @@
  */
 class Gutenberg_HTTP_Polling_Sync_Server {
 	/**
-	 * Cache expiration time in seconds
+	 * Post type for sync storage
 	 */
-	const CACHE_EXPIRATION_IN_S = 300;
+	const POST_TYPE = 'sync_messages';
 
 	/**
-	 * Cache key prefix
+	 * Singleton post ID for storing sync data
+	 *
+	 * @var int|null
 	 */
-	const CACHE_PREFIX = 'gutenberg_sse_sync_';
+	private static $storage_post_id = null;
+
+	/**
+	 * Register the custom post type for sync storage.
+	 */
+	public function register_post_type(): void {
+		register_post_type(
+			self::POST_TYPE,
+			array(
+				'public'             => false,
+				'publicly_queryable' => false,
+				'show_ui'            => false,
+				'show_in_menu'       => false,
+				'show_in_rest'       => false,
+				'capability_type'    => 'post',
+				'map_meta_cap'       => true,
+				'supports'           => array( 'custom-fields' ),
+				'label'              => 'Gutenberg Sync Storage',
+			)
+		);
+	}
+
+	/**
+	 * Get or create the singleton post for storing sync data.
+	 *
+	 * @return int Post ID.
+	 */
+	private function get_storage_post_id(): int {
+		if ( is_int( self::$storage_post_id ) ) {
+			return self::$storage_post_id;
+		}
+
+		// Try to find existing post
+		$posts = get_posts(
+			array(
+				'post_type'      => self::POST_TYPE,
+				'posts_per_page' => 1,
+				'post_status'    => 'publish',
+				'orderby'        => 'ID',
+				'order'          => 'ASC',
+			)
+		);
+
+		if ( ! empty( $posts ) ) {
+			self::$storage_post_id = $posts[0]->ID;
+			return self::$storage_post_id;
+		}
+
+		// Create new post if none exists
+		$post_id = wp_insert_post(
+			array(
+				'post_type'   => self::POST_TYPE,
+				'post_status' => 'publish',
+				'post_title'  => 'Gutenberg Sync Storage',
+			)
+		);
+
+		if ( ! is_wp_error( $post_id ) ) {
+			self::$storage_post_id = $post_id;
+		}
+
+		return self::$storage_post_id;
+	}
 
 	/**
 	 * Register REST API routes.
@@ -188,29 +252,13 @@ class Gutenberg_HTTP_Polling_Sync_Server {
 	}
 
 	/**
-	 * Get a value from the store.
+	 * Get the meta key for a room's messages.
 	 *
-	 * @param string $cache_key     Cache key.
-	 * @param bool   $force_refresh Whether to force refresh from store.
-	 * @return mixed Cached value.
+	 * @param string $room Room identifier.
+	 * @return string Meta key.
 	 */
-	private function get_value( string $cache_key, bool $force_refresh = true ): mixed {
-		if ( $force_refresh ) {
-			// Delete from object cache to force fresh read from database.
-			wp_cache_delete( '_transient_' . $cache_key, 'options' );
-		}
-
-		return get_transient( $cache_key );
-	}
-
-	/**
-	 * Set a value in the store.
-	 *
-	 * @param string $cache_key Cache key.
-	 * @param mixed  $value     Value to cache.
-	 */
-	private function set_value( string $cache_key, mixed $value ): void {
-		set_transient( $cache_key, $value, self::CACHE_EXPIRATION_IN_S );
+	private function get_room_meta_key( string $room ): string {
+		return 'sync_message_' . $room;
 	}
 
 	/**
@@ -220,56 +268,30 @@ class Gutenberg_HTTP_Polling_Sync_Server {
 	 * @param array  $message Message data.
 	 */
 	private function add_message_to_room( string $room, array $message ): void {
-		$cache_key = $this->get_messages_cache_key( $room );
-		$messages  = $this->get_value( $cache_key );
+		$post_id  = $this->get_storage_post_id();
+		$meta_key = $this->get_room_meta_key( $room );
 
-		if ( ! $messages || ! is_array( $messages ) ) {
-			$messages = array();
+		// Get existing messages.
+		$messages = get_post_meta( $post_id, $meta_key, false );
+
+		// Get the last message to determine next ID.
+		$last_message    = end( $messages );
+		$last_message_id = isset( $last_message['id'] ) ? $last_message['id'] : 0;
+
+		// If this is a full state, confirm that it reflects all of our existing
+		// messages. If so, delete them.
+		if ( $message['is_full_state'] && $message['last_message_id'] >= $last_message_id ) {
+			$this->debug_log( 'Full state received for room ' . $room . ', deleting existing messages' );
+			delete_post_meta( $post_id, $meta_key );
+			$last_message_id = 0;
 		}
 
-		// Add message with incremented ID
-		$last_message  = end( $messages );
-		$message['id'] = isset( $last_message['id'] ) ? $last_message['id'] + 1 : 1;
-		$messages[]    = $message;
+		$message['id'] = $last_message_id + 1;
 
-		$prev_count = count( $messages );
+		// Add the new message (single=false means it's added as a new value)
+		add_post_meta( $post_id, $meta_key, $message, false );
 
-		if ( $message['is_full_state'] && $message['last_message_id'] > 0 ) {
-			$messages = $this->cleanup_old_messages( $messages );
-		}
-
-		$count = count( $messages );
-		if ( $count < $prev_count ) {
-			$this->debug_log( 'Cleaned up ' . ( $prev_count - $count ) . ' old messages in room ' . $room );
-		}
-
-		$this->debug_log( 'Added message ID ' . $message['id'] . ' to room ' . $room . '; count=' . $count );
-		$this->set_value( $cache_key, $messages );
-	}
-
-	/**
-	 * Clean up old messages based on the latest full-state snapshot.
-	 *
-	 * @param array  $messages Current messages array.
-	 * @return array Cleaned messages array.
-	 */
-	private function cleanup_old_messages( array $messages ): array {
-		$previous_last_message_id = 0;
-
-		foreach ( $messages as $message ) {
-			if ( $message['is_full_state'] ?? false ) {
-				if ( $message['last_message_id'] > $previous_last_message_id ) {
-					$previous_last_message_id = $message['last_message_id'];
-				}
-			}
-		}
-
-		return array_filter(
-			$messages,
-			function ( $message ) use ( $previous_last_message_id ) {
-				return $message['id'] > $previous_last_message_id;
-			}
-		);
+		$this->debug_log( 'Added message ID ' . $message['id'] . ' to room ' . $room . '; count=' . $last_message_id );
 	}
 
 	/**
@@ -284,16 +306,6 @@ class Gutenberg_HTTP_Polling_Sync_Server {
 	}
 
 	/**
-	 * Get the cache key for a room's messages
-	 *
-	 * @param string $room Room identifier.
-	 * @return string Cache key.
-	 */
-	private function get_messages_cache_key( string $room ): string {
-		return self::CACHE_PREFIX . "messages_{$room}";
-	}
-
-	/**
 	 * Get new messages from a room since a given message ID.
 	 *
 	 * @param string $room           Room identifier.
@@ -302,14 +314,17 @@ class Gutenberg_HTTP_Polling_Sync_Server {
 	 * @return array Array of messages.
 	 */
 	private function get_new_messages( string $room, int $client_id, int $last_message_id = 0 ): array {
-		$cache_key = $this->get_messages_cache_key( $room );
-		$messages  = $this->get_value( $cache_key );
+		$post_id  = $this->get_storage_post_id();
+		$meta_key = $this->get_room_meta_key( $room );
+
+		// Get all messages for this room (single=false returns array of all values)
+		$messages = get_post_meta( $post_id, $meta_key, false );
 
 		if ( ! $messages || ! is_array( $messages ) ) {
 			return array();
 		}
 
-		// Filter messages newer than last_message_id
+		// Filter messages newer than last_message_id and not from this client
 		$new_messages = array_filter(
 			$messages,
 			function ( $message ) use ( $client_id, $last_message_id ) {
