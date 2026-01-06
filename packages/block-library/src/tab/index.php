@@ -66,6 +66,11 @@ function block_core_tab_render( array $attributes, string $content ): string {
 	$tag_processor = new WP_HTML_Tag_Processor( $content );
 	$tag_processor->next_tag( array( 'class_name' => 'wp-block-tab' ) );
 	$tab_id = (string) $tag_processor->get_attribute( 'id' );
+	// If no id, generate a unique one
+	if ( empty( $tab_id ) ) {
+		$tab_id = sanitize_title( $attributes['label'] );
+		$tag_processor->set_attribute( 'id', $tab_id );
+	}
 
 	/**
 	 * Add interactivity to the tab element.

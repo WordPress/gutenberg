@@ -8,8 +8,12 @@
 	"version": "1.0.0",
 	"category": "design",
 	"textdomain": "default",
-	"parent": [ "core/tabs" ],
-	"allowedBlocks": [ "core/tab" ],
+	"parent": [
+		"core/tabs"
+	],
+	"allowedBlocks": [
+		"core/tab"
+	],
 	"attributes": {},
 	"supports": {
 		"anchor": false,
@@ -19,6 +23,7 @@
 			"allowSwitching": false,
 			"allowInheriting": false
 		},
+		"lock": false,
 		"spacing": {
 			"blockGap": true,
 			"padding": true,

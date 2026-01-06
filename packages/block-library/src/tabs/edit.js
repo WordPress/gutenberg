@@ -106,6 +106,7 @@ function Edit( { clientId, attributes, setAttributes } ) {
 		template: TABS_TEMPLATE,
 		templateLock: false,
 		renderAppender: false,
+		__experimentalCaptureToolbars: true,
 	} );
 
 	return (

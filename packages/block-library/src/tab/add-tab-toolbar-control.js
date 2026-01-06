@@ -23,7 +23,7 @@ export default function AddTabToolbarControl( { attributes, tabsClientId } ) {
 	const { insertBlock } = useDispatch( blockEditorStore );
 
 	// Find the tab-panels block within the tabs block
-	const tabPanelsClientId = useSelect(
+	const {tabPanelsClientId, nextTabIndex} = useSelect(
 		( select ) => {
 			if ( ! tabsClientId ) {
 				return null;
@@ -33,7 +33,10 @@ export default function AddTabToolbarControl( { attributes, tabsClientId } ) {
 			const tabPanels = innerBlocks.find(
 				( block ) => block.name === 'core/tab-panels'
 			);
-			return tabPanels?.clientId || null;
+			return {
+				tabPanelsClientId: tabPanels?.clientId || null,
+				nextTabIndex: ( tabPanels?.innerBlocks.length || 0 ) + 1,
+			};
 		},
 		[ tabsClientId ]
 	);
@@ -48,6 +51,7 @@ export default function AddTabToolbarControl( { attributes, tabsClientId } ) {
 			className,
 			fontFamily,
 			fontSize,
+			anchor: 'tab-' + nextTabIndex,
 		} );
 		insertBlock( newTabBlock, undefined, tabPanelsClientId );
 	};

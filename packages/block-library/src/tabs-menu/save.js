@@ -9,33 +9,43 @@ import clsx from 'clsx';
 import {
 	useBlockProps,
 	__experimentalGetBorderClassesAndStyles as getBorderClassesAndStyles,
-	__experimentalGetColorClassesAndStyles as getColorClassesAndStyles,
 	__experimentalGetSpacingClassesAndStyles as getSpacingClassesAndStyles,
 	getTypographyClassesAndStyles,
 } from '@wordpress/block-editor';
 
 export default function Save( { attributes } ) {
 	const borderProps = getBorderClassesAndStyles( attributes );
-	const colorProps = getColorClassesAndStyles( attributes );
 	const spacingProps = getSpacingClassesAndStyles( attributes );
 	const typographyProps = getTypographyClassesAndStyles( attributes );
 
+	// Container props - simple, no color classes (handled via CSS custom properties)
 	const blockProps = useBlockProps.save( {
+		className: 'tabs__list',
+		role: 'tablist',
+	} );
+
+	// Template element with all serialized styles for individual tabs
+	// PHP will extract this template and clone it for each tab
+	const tabTemplateProps = {
 		className: clsx(
-			'tabs__list',
-			colorProps.className,
+			'tabs__tab-label',
+			'tabs__tab-template', // Marker class for PHP extraction
 			borderProps.className,
 			typographyProps.className
 		),
 		style: {
-			...colorProps.style,
 			...borderProps.style,
 			...spacingProps.style,
 			...typographyProps.style,
 		},
-		role: 'tablist',
-	} );
+		// Hidden by default, will be removed by PHP
+		hidden: true,
+	};
 
-	// Return empty tablist - will be populated by PHP render callback
-	return <div { ...blockProps }></div>;
+	return (
+		<div { ...blockProps }>
+			{ /* eslint-disable-next-line jsx-a11y/anchor-has-content, jsx-a11y/anchor-is-valid */ }
+			<a { ...tabTemplateProps } />
+		</div>
+	);
 }

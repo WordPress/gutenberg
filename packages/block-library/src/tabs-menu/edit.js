@@ -26,6 +26,7 @@ import { RawHTML, useRef, useCallback, useState, useEffect, useMemo } from '@wor
  */
 import Controls from './controls';
 import AddTabToolbarControl from '../tab/add-tab-toolbar-control';
+import slugFromLabel from '../tab/slug-from-label';
 
 const { requestAnimationFrame, cancelAnimationFrame } = window;
 
@@ -136,8 +137,8 @@ function Edit( {
 	);
 
 	const handleLabelChange = useCallback(
-		( tabClientId, newLabel ) => {
-			updateBlockAttributes( tabClientId, { label: newLabel } );
+		( tabClientId, newLabel, tabIndex ) => {
+			updateBlockAttributes( tabClientId, { label: newLabel, anchor: slugFromLabel( newLabel, tabIndex ) } );
 		},
 		[ updateBlockAttributes ]
 	);
@@ -307,7 +308,7 @@ function Edit( {
 									value={ decodeEntities( editingLabel ) }
 									onChange={ ( value ) => {
 										setEditingLabel( value );
-										handleLabelChange( tab.clientId, value );
+										handleLabelChange( tab.clientId, value, index );
 									} }
 									onBlur={ () => {
 										setEditingTabClientId( null );
