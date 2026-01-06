@@ -71,7 +71,7 @@ export default defineConfig( {
 			legacyHex: true,
 		} ),
 		pluginKnownWpdsCssVariables( {
-			filename: 'js/design-tokens.js',
+			filename: 'js/design-tokens.mjs',
 		} ),
 		pluginDsTokenDocs( {
 			filename: '../../docs/ds-tokens.md',

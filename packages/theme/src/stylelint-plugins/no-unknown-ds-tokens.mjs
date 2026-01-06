@@ -1,5 +1,5 @@
 import stylelint from 'stylelint';
-import tokenList from '../prebuilt/js/design-tokens.js';
+import tokenList from '../prebuilt/js/design-tokens.mjs';
 
 const DS_TOKEN_PREFIX = 'wpds-';
 

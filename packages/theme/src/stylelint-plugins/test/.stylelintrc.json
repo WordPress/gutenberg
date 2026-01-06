@@ -1,7 +1,7 @@
 {
 	"plugins": [
-		"../no-unknown-ds-tokens.js",
-		"../no-setting-wpds-custom-properties.js"
+		"../no-unknown-ds-tokens.mjs",
+		"../no-setting-wpds-custom-properties.mjs"
 	],
 	"rules": {
 		"plugin-wpds/no-unknown-ds-tokens": true,
