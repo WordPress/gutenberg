@@ -171,6 +171,8 @@ class Gutenberg_HTTP_Signaling_Server {
 		list( $fd, $subscriber_to_messages ) = static::get_contents_and_lock_file( $subscriber_to_messages_path );
 		if ( ! $fd ) {
 			$retries = isset( $_COOKIE['signaling_server_retries'] ) ? intval( $_COOKIE['signaling_server_retries'] ) : 0;
+			// Clamp retries to avoid unbounded exponential backoff.
+			$retries = max( 0, min( $retries, 10 ) );
 			$secure  = ( 'https' === parse_url( home_url(), PHP_URL_SCHEME ) );
 			setcookie( 'signaling_server_retries', (string) ( $retries + 1 ), time() + DAY_IN_SECONDS, SITECOOKIEPATH, '', $secure );
 			echo 'id: ' . time() . PHP_EOL;
