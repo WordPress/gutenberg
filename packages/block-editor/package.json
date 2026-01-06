@@ -31,12 +31,11 @@
 		"build-types",
 		"*.md"
 	],
-	"type": "module",
 	"main": "build/index.cjs",
-	"module": "build-module/index.js",
+	"module": "build-module/index.mjs",
 	"exports": {
 		".": {
-			"import": "./build-module/index.js",
+			"import": "./build-module/index.mjs",
 			"require": "./build/index.cjs"
 		},
 		"./package.json": "./package.json",
@@ -45,7 +44,7 @@
 	"react-native": "src/index",
 	"wpScript": true,
 	"wpScriptModuleExports": {
-		"./utils/fit-text-frontend": "./build-module/utils/fit-text-frontend.js"
+		"./utils/fit-text-frontend": "./build-module/utils/fit-text-frontend.mjs"
 	},
 	"sideEffects": [
 		"build-style/**",
@@ -56,8 +55,8 @@
 		"build/index.cjs",
 		"build/store/index.cjs",
 		"build/hooks/**",
-		"build-module/index.js",
-		"build-module/store/index.js",
+		"build-module/index.mjs",
+		"build-module/store/index.mjs",
 		"build-module/hooks/**"
 	],
 	"dependencies": {

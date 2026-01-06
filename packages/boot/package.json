@@ -29,17 +29,16 @@
 		"build-types",
 		"*.md"
 	],
-	"type": "module",
-	"module": "build-module/index.js",
+	"module": "build-module/index.mjs",
 	"exports": {
 		".": {
 			"types": "./build-types/index.d.ts",
-			"import": "./build-module/index.js"
+			"import": "./build-module/index.mjs"
 		},
 		"./package.json": "./package.json"
 	},
 	"react-native": "src/index",
-	"wpScriptModuleExports": "./build-module/index.js",
+	"wpScriptModuleExports": "./build-module/index.mjs",
 	"types": "build-types",
 	"dependencies": {
 		"@wordpress/a11y": "file:../a11y",

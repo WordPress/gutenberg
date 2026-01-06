@@ -28,11 +28,11 @@
 		"build",
 		"build-types"
 	],
-	"main": "./build/index.js",
+	"main": "./build/index.cjs",
 	"exports": {
 		".": {
 			"types": "./build-types/index.d.ts",
-			"default": "./build/index.js"
+			"default": "./build/index.cjs"
 		},
 		"./package.json": "./package.json"
 	},
