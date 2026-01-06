@@ -13,6 +13,10 @@
 		// for tools panel.
 		border-top: $border-width solid $gray-200;
 	}
+
+	&:last-of-type {
+		padding-block-end: $grid-unit-20;
+	}
 }
 
 .block-editor-content-only-controls__fields-header {
