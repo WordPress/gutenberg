@@ -20,17 +20,198 @@ An example could be connecting an Image block `url` attribute to a function that
 } -->
 ```
 
-
 ## Compatible blocks and their attributes
 
 Right now, not all block attributes are compatible with block bindings. There is some ongoing effort to increase this compatibility, but for now, this is the default list:
 
-| Supported Blocks    | Supported Attributes       |
-| ----------------    | --------------------       |
-| Paragraph           | content                    |
-| Heading             | content                    |
-| Image               | id, url, title, alt        |
-| Button              | text, url, linkTarget, rel |
+| Supported Blocks         | Supported Attributes              |
+| ------------------------ | --------------------------------- |
+| core/image               | id, url, title, alt, caption      |
+| core/heading             | content                           |
+| core/paragraph           | content                           |
+| core/button              | url, text, linkTarget, rel        |
+| core/navigation-link     | url                               |
+| core/navigation-submenu  | url                               |
+| core/post-date           | datetime                          |
+
+## Core Sources
+
+WordPress includes several built-in block bindings sources that you can use without any custom registration.
+
+- [core/post-meta](#corepost-meta)
+- [core/post-data](#corepost-data)
+- [core/term-data](#coreterm-data)
+- [core/pattern-overrides](#corepattern-overrides)
+
+### core/post-meta
+
+The `core/post-meta` source allows you to bind block attributes to post meta fields.
+
+**Requirements:**
+
+-   Post meta must be registered with `show_in_rest => true`
+-   Post meta keys cannot start with an underscore (protected keys are not accessible)
+
+**Example usage:**
+
+First, register your post meta:
+
+```php
+register_meta(
+	'post',
+	'my_custom_field',
+	array(
+		'show_in_rest' => true,
+		'single'       => true,
+		'type'         => 'string',
+	)
+);
+```
+
+Then bind it to a block attribute:
+
+```html
+<!-- wp:paragraph {
+	"metadata":{
+		"bindings":{
+			"content":{
+				"source":"core/post-meta",
+				"args":{"key":"my_custom_field"}
+			}
+		}
+	}
+} -->
+<p>Fallback content</p>
+<!-- /wp:paragraph -->
+```
+
+### core/post-data
+
+_**Note:** Since WordPress 6.9._
+
+The `core/post-data` source provides access to post data fields.
+
+**Available fields:**
+
+-   `date` - The post publication date
+-   `modified` - The post last modified date
+-   `link` - The post permalink
+
+**Example usage:**
+
+```html
+<!-- wp:paragraph {
+	"metadata":{
+		"bindings":{
+			"content":{
+				"source":"core/post-data",
+				"args":{"field":"date"}
+			}
+		}
+	}
+} -->
+<p>Fallback content</p>
+<!-- /wp:paragraph -->
+```
+
+### core/term-data
+
+_**Note:** Since WordPress 6.9._
+
+The `core/term-data` source provides access to taxonomy term data fields when term context is available. It requires `termId` and `taxonomy` to be available from block context to function properly.
+
+#### Available Fields
+
+| Field | Description | Example Output |
+|-------|-------------|----------------|
+| `id` | Term ID | `123` |
+| `name` | Term name | `Category Name` |
+| `link` | URL to term archive | `https://example.com/category/news` |
+| `slug` | URL-friendly slug | `category-slug` |
+| `description` | Term description | `A description of the category` |
+| `parent` | Parent term ID (hierarchical taxonomies) | `0` |
+| `count` | Number of posts in this term | `5` | 
+
+#### Example Usage
+
+**Display term names in a list:**
+
+```html
+<!-- wp:terms-query {"termQuery":{"taxonomy":"category","perPage":5}} -->
+<div class="wp-block-terms-query">
+	<!-- wp:term-template {"layout":{"type":"default"}} -->
+	<!-- wp:paragraph {"metadata":{"bindings":{"content":{"source":"core/term-data","args":{"field":"name"}}}}} -->
+	<p>Category Name</p>
+	<!-- /wp:paragraph -->
+	<!-- /wp:term-template -->
+</div>
+<!-- /wp:terms-query -->
+```
+
+**Create linked term archives:**
+
+```html
+<!-- wp:terms-query {"termQuery":{"taxonomy":"post_tag","perPage":10}} -->
+<div class="wp-block-terms-query">
+	<!-- wp:term-template {"layout":{"type":"default"}} -->
+	<!-- wp:paragraph {"metadata":{"bindings":{"content":{"source":"core/term-data","args":{"field":"name"}}}}} -->
+	<p><a href="#">Tag Name</a></p>
+	<!-- /wp:paragraph -->
+	<!-- /wp:term-template -->
+</div>
+<!-- /wp:terms-query -->
+```
+
+#### Context Requirements
+
+The [`core/term-data`](https://github.com/WordPress/gutenberg/tree/trunk/packages/editor/src/bindings/term-data.js) source works in these contexts:
+
+1. **Any block providing term context** - Built-in blocks like [`core/term-template`](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/term-template), or custom blocks that provide `termId` and `taxonomy` via block context
+2.  **Navigation Blocks** - Special backwards compatibility handling for `core/navigation-link` and `core/navigation-submenu` (these read from block attributes instead of context)
+
+### core/pattern-overrides
+
+The `core/pattern-overrides` source enables pattern instances to have their content overridden on a per-instance basis. This is particularly useful for synced patterns where you want to allow specific blocks to be customized while keeping the rest of the pattern synchronized .
+
+**How it works:**
+
+-   Pattern blocks can define which attributes are overridable using `metadata.bindings`
+-   Each pattern instance stores its override values in the `content` attribute
+-   The binding connects the block attribute to the override value using the block's `metadata.name` as a key
+-   The context structure follows: `pattern/overrides → {block_name} → {attribute_name}`
+
+**Example usage:**
+
+In the pattern definition, mark blocks as overridable:
+
+```html
+<!-- wp:paragraph {
+   "metadata":{
+      "bindings":{
+         "content":{
+            "source":"core/pattern-overrides"
+         }
+      },
+      "name":"custom-heading"
+   }
+} -->
+<p>Default heading text</p>
+<!-- /wp:paragraph -->
+```
+
+When the pattern is instantiated, users can override the content for that specific instance:
+
+```html
+<!-- wp:block {"ref":123,"content":{"custom-heading":{"content":"My custom heading text"}}} / -->
+```
+
+In this example:
+
+-   **`custom-heading`** is a unique identifier for the `core/paragraph` block within the `core/pattern-overrides` system.
+-   It acts as a key in the overrides context structure: `pattern/overrides → custom-heading → content`.
+-   This identifier allows multiple blocks of the same type (e.g., `core/paragraph`) within a pattern to have distinct, per-instance attribute overrides using `metadata.name`.
+
+For instance, `"custom-heading"` links the specific paragraph block's `content` attribute to its override value (`"My custom heading text"`) for a particular pattern instance.
 
 ### Extending supported attributes
 
@@ -159,11 +340,11 @@ Server registration allows applying a callback that will be executed on the fron
 
 The function to register a custom source is `register_block_bindings_source($name, $args)`:
 
-- `name`: `string` that sets the unique ID for the custom source.
-- `args`: `array` that contains:
-    - `label`: `string` with the human-readable name of the custom source.
-    - `uses_context`: `array` with the block context that is passed to the callback (optional).
-    - `get_value_callback`: `function` that will run on the bound block's render function. It accepts three arguments: `source_args`, `block_instance` and `attribute_name`. This value can be overridden with the filter `block_bindings_source_value`.
+-   `name`: `string` that sets the unique ID for the custom source.
+-   `args`: `array` that contains:
+    -   `label`: `string` with the human-readable name of the custom source.
+    -   `uses_context`: `array` with the block context that is passed to the callback (optional).
+    -   `get_value_callback`: `function` that will run on the bound block's render function. It accepts three arguments: `source_args`, `block_instance` and `attribute_name`. This value can be overridden with the filter `block_bindings_source_value`.
 
 Note that `register_block_bindings_source()` should be called from a handler attached to the `init` hook.
 
@@ -221,11 +402,11 @@ _**Note:** Since WordPress 6.7._
 The value returned by `get_value_callback` can be modified with the `block_bindings_source_value` filter.
 The filter has the following parameters:
 
-- `value`: The value to be filtered.
-- `name`: The name of the source.
-- `source_args`: `array` containing source arguments.
-- `block_instance`: The block instance object.
-- `attribute_name`: The name of the attribute.
+-   `value`: The value to be filtered.
+-   `name`: The name of the source.
+-   `source_args`: `array` containing source arguments.
+-   `block_instance`: The block instance object.
+-   `attribute_name`: The name of the attribute.
 
 Example:
 
@@ -244,14 +425,35 @@ function wpmovies_format_visualization_date( $value, $name ) {
 add_filter( 'block_bindings_source_value', 'wpmovies_format_visualization_date', 10, 2 );
 ```
 
+#### Customizing supported attributes filter
+
+_**Note:** Since WordPress 6.9._
+
+The `block_bindings_supported_attributes_{$block_type}` filter allows developers to customize which of a block's attributes can be connected to a Block Bindings source. This filter enables the Block Bindings UI in the editor for the specified attributes.
+
+This filter provides a way to extend or restrict which attributes of a specific block type can be bound to dynamic sources. The attributes registered through this filter will appear as options in the block binding interface.
+
+<div class="callout callout-warning">This filter has no impact on pattern overrides as they are handled independently.</div>
+
+Example:
+
+```php
+// Allow binding the 'caption' attribute for image blocks
+add_filter( 'block_bindings_supported_attributes_core/image', function( $supported_attributes ) {
+    $supported_attributes[] = 'caption';
+    return $supported_attributes;
+} );
+```
+
 #### Server registration Core examples
 
 There are a few examples in Core that can be used as reference.
 
-- Post Meta. [Source code](https://github.com/WordPress/wordpress-develop/blob/trunk/src/wp-includes/block-bindings/post-meta.php)
-- Pattern overrides. [Source code](https://github.com/WordPress/wordpress-develop/blob/trunk/src/wp-includes/block-bindings/pattern-overrides.php)
-- Twenty Twenty-Five theme. [Source code](https://github.com/WordPress/wordpress-develop/blob/trunk/src/wp-content/themes/twentytwentyfive/functions.php)
-
+-   Post Meta. [Source code](https://github.com/WordPress/wordpress-develop/blob/trunk/src/wp-includes/block-bindings/post-meta.php)
+-   Post Data. [Source code](https://github.com/WordPress/wordpress-develop/blob/trunk/src/wp-includes/block-bindings/post-data.php)
+-   Term Data. [Source code](https://github.com/WordPress/wordpress-develop/blob/trunk/src/wp-includes/block-bindings/term-data.php)
+-   Pattern overrides. [Source code](https://github.com/WordPress/wordpress-develop/blob/trunk/src/wp-includes/block-bindings/pattern-overrides.php)
+-   Twenty Twenty-Five theme. [Source code](https://github.com/WordPress/wordpress-develop/blob/trunk/src/wp-content/themes/twentytwentyfive/functions.php)
 
 ### Editor registration
 
@@ -261,21 +463,19 @@ Editor registration on the client allows defining what the bound block will do w
 
 The function to register a custom source is `registerBlockBindingsSource( args )`:
 
-- `args`: `object` with the following structure:
-    - `name`: `string` with the unique and machine-readable name.
-    - `label`: `string` with the human readable name of the custom source. In case it was defined already on the server, the server label will be overridden by this one, in that case, it is not recommended to be defined here. (optional)
-    - `usesContext`: `array` with the block context that the custom source may need. In case it was defined already on the server, it should not be defined here. (optional)
-    - `getValues`: `function` that retrieves the values from the source. (optional)
-    - `setValues`: `function` that allows updating the values connected to the source. (optional)
-    - `canUserEditValue`: `function` to determine if the user can edit the value. The user won't be able to edit by default. (optional)
-
+-   `args`: `object` with the following structure:
+    -   `name`: `string` with the unique and machine-readable name.
+    -   `label`: `string` with the human readable name of the custom source. In case it was defined already on the server, the server label will be overridden by this one, in that case, it is not recommended to be defined here. (optional)
+    -   `usesContext`: `array` with the block context that the custom source may need. In case it was defined already on the server, it should not be defined here. (optional)
+    -   `getValues`: `function` that retrieves the values from the source. (optional)
+    -   `setValues`: `function` that allows updating the values connected to the source. (optional)
+    -   `canUserEditValue`: `function` to determine if the user can edit the value. The user won't be able to edit by default. (optional)
+    -   `getFieldsList`: `function` that returns available fields for the UI dropdown selector. (_Since WordPress 6.9_) (optional)
 
 This example will show a custom post meta date in the editor and, if it doesn't exist, it will show today's date. The user can edit the value of the date. (Caution: This example does not format the user input as a date—it's only for educational purposes.)
 
 ```js
-import {
-	registerBlockBindingsSource,
-} from '@wordpress/blocks';
+import { registerBlockBindingsSource } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
 import { store as coreDataStore } from '@wordpress/core-data';
 
@@ -325,10 +525,10 @@ registerBlockBindingsSource( {
 
 The `getValues` function retrieves the value from the source on block loading. It receives an `object` as an argument with the following properties:
 
-- `bindings` returns the bindings object of the specific source. It must have the attributes as a key, and the value can be a `string` or an `object` with arguments.
-- `clientId` returns a `string` with the current block client ID.
-- `context` returns an `object` of the current block context, defined in the `usesContext` property. [More about block context.](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-context/).
-- `select` returns an `object` of a given store's selectors. [More info in their docs.](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-data/#select).
+-   `bindings` returns the bindings object of the specific source. It must have the attributes as a key, and the value can be a `string` or an `object` with arguments.
+-   `clientId` returns a `string` with the current block client ID.
+-   `context` returns an `object` of the current block context, defined in the `usesContext` property. [More about block context.](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-context/).
+-   `select` returns an `object` of a given store's selectors. [More info in their docs.](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-data/#select).
 
 The function must return an `object` with this structure:
 `{ 'block attribute' : value }`
@@ -337,19 +537,73 @@ The function must return an `object` with this structure:
 
 The `setValues` function updates all the values of the source of the block bound. It receives an `object` as an argument with the following properties:
 
-- `bindings` returns the bindings object of the specific source. It must have the attributes as a key, and the value can be a `string` or an `object` with arguments. This object contains a `newValue` property with the user's input.
-- `clientId` returns a `string` with the current block client ID.
-- `context` returns an `object` of the current block context, defined in the `usesContext` property. [More about block context.](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-context/).
-- `dispatch` returns an `object` of the store's action creators. [More about dispatch](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-data/#dispatch).
-- `select` returns an `object` of a given store's selectors. [More info in their docs.](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-data/#select).
+-   `bindings` returns the bindings object of the specific source. It must have the attributes as a key, and the value can be a `string` or an `object` with arguments. This object contains a `newValue` property with the user's input.
+-   `clientId` returns a `string` with the current block client ID.
+-   `context` returns an `object` of the current block context, defined in the `usesContext` property. [More about block context.](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-context/).
+-   `dispatch` returns an `object` of the store's action creators. [More about dispatch](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-data/#dispatch).
+-   `select` returns an `object` of a given store's selectors. [More info in their docs.](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-data/#select).
 
+#### getFieldsList
+
+_**Note:** Since WordPress 6.9._
+
+The `getFieldsList` function enables custom sources to appear in the Block Bindings UI dropdown selector. When a user selects an option from the dropdown, the source is automatically bound to the block attribute with the corresponding `args` from the selected field. This function must return an array of field objects that define the available binding options.
+
+Each field object in the array should have the following properties:
+
+-   `label`: `string` that defines the label shown in the dropdown selector. Defaults to the source label if not provided.
+-   `type`: `string` that defines the attribute value type. It must match the attribute type it binds to; otherwise, it won't appear in the UI. For example, an `id` attribute that accepts only numbers should only display fields that return numeric values.
+-   `args`: `object` that defines the source arguments that are applied when a user selects the field from the dropdown.
+
+Example:
+
+```js
+registerBlockBindingsSource( {
+	name: 'my-plugin/custom-fields',
+	label: 'Custom Fields',
+	getFieldsList() {
+		return [
+			{
+				label: 'Author Name',
+				type: 'string',
+				args: {
+					field: 'author_name',
+				},
+			},
+			{
+				label: 'Publication Year',
+				type: 'string',
+				args: {
+					field: 'publication_year',
+				},
+			},
+			{
+				label: 'Page Count',
+				type: 'number',
+				args: {
+					field: 'page_count',
+				},
+			},
+		];
+	},
+	getValues( { bindings } ) {
+		// Implementation to retrieve values based on args.field
+	},
+} );
+```
+
+With this implementation, users will see "Author Name", "Publication Year", and "Page Count" as options in the Block Bindings UI dropdown when binding block attributes to your custom source.
+
+<div class="callout callout-info">
+Check the <a href="https://github.com/WordPress/block-development-examples/tree/trunk/plugins/editor-bindings">Editor Bindings</a> example from the <a href="https://github.com/WordPress/block-development-examples/">Block Development Examples</a> repo
+</div>
 
 #### Editor registration Core examples
 
 There are a few examples in Core that can be used as reference.
 
-- Post Meta. [Source code](https://github.com/WordPress/gutenberg/blob/5afd6c27bfba2be2e06b502257753fbfff1ae9f0/packages/editor/src/bindings/post-meta.js#L74-L146)
-- Pattern overrides. [Source code](https://github.com/WordPress/gutenberg/blob/5afd6c27bfba2be2e06b502257753fbfff1ae9f0/packages/editor/src/bindings/pattern-overrides.js#L8-L100)
+-   Post Meta. [Source code](https://github.com/WordPress/gutenberg/blob/5afd6c27bfba2be2e06b502257753fbfff1ae9f0/packages/editor/src/bindings/post-meta.js#L74-L146)
+-   Pattern overrides. [Source code](https://github.com/WordPress/gutenberg/blob/5afd6c27bfba2be2e06b502257753fbfff1ae9f0/packages/editor/src/bindings/pattern-overrides.js#L8-L100)
 
 ## Unregistering a source
 
@@ -414,11 +668,11 @@ import { useBlockBindingsUtils } from '@wordpress/block-editor';
 const { updateBlockBindings } = useBlockBindingsUtils();
 
 function updateBlockBindingsURLSource( url ) {
-	updateBlockBindings({
+	updateBlockBindings( {
 		url: {
 			source: 'myplugin/new-source',
-		}
-	})
+		},
+	} );
 }
 
 // Remove binding from url attribute.
@@ -440,6 +694,3 @@ function clearBlockBindings() {
 	removeAllBlockBindings();
 }
 ```
-
-
-

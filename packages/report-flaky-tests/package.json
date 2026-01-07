@@ -23,11 +23,11 @@
 		"node": ">=18.12.0",
 		"npm": ">=8.19.2"
 	},
-	"main": "build/index.js",
+	"main": "build/index.mjs",
 	"exports": {
 		".": {
 			"types": "./build-types/index.d.ts",
-			"require": "./build/index.js"
+			"require": "./build/index.mjs"
 		},
 		"./package.json": "./package.json"
 	},

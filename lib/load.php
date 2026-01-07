@@ -211,3 +211,8 @@ if ( gutenberg_is_experiment_enabled( 'gutenberg-full-page-client-side-navigatio
 	require __DIR__ . '/experimental/interactivity-api/class-gutenberg-interactivity-api-full-page-navigation.php';
 	Gutenberg_Interactivity_API_Full_Page_Navigation::instance();
 }
+
+// Block patterns (only load when navigation overlays experiment is enabled).
+if ( gutenberg_is_experiment_enabled( 'gutenberg-customizable-navigation-overlays' ) ) {
+	require __DIR__ . '/experimental/overlay-patterns.php';
+}

@@ -4,6 +4,7 @@
 .block-editor-content-only-controls__media {
 	width: 100%;
 	box-shadow: inset 0 0 0 $border-width $gray-400;
+	padding: $grid-unit-10;
 
 	&:focus:not(:disabled) {
 		// Allow smooth transition between focused and unfocused box-shadow states.
@@ -39,9 +40,15 @@
 	overflow: hidden;
 }
 
-block-editor-content-only-controls__media-thumbnail {
-	width: 100%;
-	height: 100%;
+.block-editor-content-only-controls__media-thumbnail {
+	width: 24px;
+	height: 24px;
 	border-radius: $radius-small;
 	align-self: center;
+
+	img {
+		width: 100% !important;
+		height: 100% !important;
+		object-fit: cover;
+	}
 }

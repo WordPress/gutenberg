@@ -31,12 +31,11 @@
 		"*.md",
 		"babel-plugin.cjs"
 	],
-	"type": "module",
 	"main": "build/index.cjs",
-	"module": "build-module/index.js",
+	"module": "build-module/index.mjs",
 	"exports": {
 		".": {
-			"import": "./build-module/index.js",
+			"import": "./build-module/index.mjs",
 			"require": "./build/index.cjs"
 		},
 		"./babel-plugin": "./babel-plugin.cjs",
@@ -47,14 +46,14 @@
 	"react-native": "src/index",
 	"wpScript": true,
 	"wpScriptModuleExports": {
-		"./accordion/view": "./build-module/accordion/view.js",
-		"./file/view": "./build-module/file/view.js",
-		"./form/view": "./build-module/form/view.js",
-		"./image/view": "./build-module/image/view.js",
-		"./navigation/view": "./build-module/navigation/view.js",
-		"./query/view": "./build-module/query/view.js",
-		"./search/view": "./build-module/search/view.js",
-		"./tabs/view": "./build-module/tabs/view.js"
+		"./accordion/view": "./build-module/accordion/view.mjs",
+		"./file/view": "./build-module/file/view.mjs",
+		"./form/view": "./build-module/form/view.mjs",
+		"./image/view": "./build-module/image/view.mjs",
+		"./navigation/view": "./build-module/navigation/view.mjs",
+		"./query/view": "./build-module/query/view.mjs",
+		"./search/view": "./build-module/search/view.mjs",
+		"./tabs/view": "./build-module/tabs/view.mjs"
 	},
 	"wpStyleEntryPoints": [
 		"src/*.scss",
@@ -91,7 +90,7 @@
 		"src/**/*.scss",
 		"src/*/init.js",
 		"build/*/init.js",
-		"build-module/*/init.js"
+		"build-module/*/init.mjs"
 	],
 	"dependencies": {
 		"@wordpress/a11y": "file:../a11y",

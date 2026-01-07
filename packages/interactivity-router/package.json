@@ -29,21 +29,20 @@
 		"build-types",
 		"*.md"
 	],
-	"type": "module",
 	"main": "build/index.cjs",
-	"module": "build-module/index.js",
+	"module": "build-module/index.mjs",
 	"exports": {
 		".": {
 			"types": "./build-types/index.d.ts",
-			"import": "./build-module/index.js",
+			"import": "./build-module/index.mjs",
 			"require": "./build/index.cjs"
 		},
 		"./package.json": "./package.json"
 	},
 	"react-native": "src/index",
 	"wpScriptModuleExports": {
-		".": "./build-module/index.js",
-		"./full-page": "./build-module/full-page.js"
+		".": "./build-module/index.mjs",
+		"./full-page": "./build-module/full-page.mjs"
 	},
 	"types": "build-types",
 	"dependencies": {

@@ -43,7 +43,7 @@ const ROOT_DIR = process.cwd();
 const PACKAGES_DIR = path.join( ROOT_DIR, 'packages' );
 const BUILD_DIR = path.join( ROOT_DIR, 'build' );
 
-const SOURCE_EXTENSIONS = '{js,ts,tsx}';
+const SOURCE_EXTENSIONS = '{js,mjs,ts,tsx}';
 const ASSET_EXTENSIONS = 'json';
 const IGNORE_PATTERNS = [
 	'**/benchmark/**',
@@ -1073,9 +1073,9 @@ async function transpilePackage( packageName ) {
 						relativePath = './' + relativePath;
 					}
 
-					// Replace extension: make sure that file extension is always `.js` or `.cjs`.
+					// Replace extension: make sure that file extension is always `.mjs` or `.cjs`.
 					const newExt =
-						build.initialOptions.format === 'cjs' ? '.cjs' : '.js';
+						build.initialOptions.format === 'cjs' ? '.cjs' : '.mjs';
 					relativePath = relativePath.replace( /\.[jt]sx?$/, newExt );
 
 					return {
@@ -1132,6 +1132,7 @@ async function transpilePackage( packageName ) {
 				entryPoints: srcFiles,
 				outdir: buildModuleDir,
 				outbase: srcDir,
+				outExtension: { '.js': '.mjs' },
 				bundle: true,
 				platform: 'neutral',
 				format: 'esm',

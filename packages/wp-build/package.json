@@ -24,7 +24,7 @@
 		"npm": ">=10.2.3"
 	},
 	"type": "module",
-	"main": "./src/build.mjs",
+	"module": "./src/build.mjs",
 	"exports": {
 		".": {
 			"import": "./src/build.mjs"

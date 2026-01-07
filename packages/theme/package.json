@@ -29,29 +29,28 @@
 		"build-types",
 		"*.md"
 	],
-	"type": "module",
 	"main": "build/index.cjs",
-	"module": "build-module/index.js",
+	"module": "build-module/index.mjs",
 	"exports": {
 		".": {
 			"types": "./build-types/index.d.ts",
-			"import": "./build-module/index.js",
+			"import": "./build-module/index.mjs",
 			"default": "./build/index.cjs"
 		},
 		"./design-tokens.css": "./src/prebuilt/css/design-tokens.css",
 		"./design-tokens.js": {
 			"types": "./build-types/prebuilt/js/design-tokens.d.ts",
-			"import": "./build-module/prebuilt/js/design-tokens.js",
+			"import": "./build-module/prebuilt/js/design-tokens.mjs",
 			"default": "./build/prebuilt/js/design-tokens.cjs"
 		},
 		"./stylelint-plugins/no-unknown-ds-tokens": {
 			"types": "./build-types/stylelint-plugins/no-unknown-ds-tokens.d.ts",
-			"import": "./src/stylelint-plugins/no-unknown-ds-tokens.js",
+			"import": "./src/stylelint-plugins/no-unknown-ds-tokens.mjs",
 			"default": "./build/stylelint-plugins/no-unknown-ds-tokens.cjs"
 		},
 		"./stylelint-plugins/no-setting-wpds-custom-properties": {
 			"types": "./build-types/stylelint-plugins/no-setting-wpds-custom-properties.d.ts",
-			"import": "./src/stylelint-plugins/no-setting-wpds-custom-properties.js",
+			"import": "./src/stylelint-plugins/no-setting-wpds-custom-properties.mjs",
 			"default": "./build/stylelint-plugins/no-setting-wpds-custom-properties.cjs"
 		},
 		"./package.json": "./package.json"
@@ -62,7 +61,7 @@
 	"sideEffects": [
 		"src/color-ramps/lib/register-color-spaces.ts",
 		"build/color-ramps/lib/register-color-spaces.js",
-		"build-module/color-ramps/lib/register-color-spaces.js"
+		"build-module/color-ramps/lib/register-color-spaces.mjs"
 	],
 	"dependencies": {
 		"@wordpress/element": "file:../element",
