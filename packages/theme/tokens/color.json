@@ -1319,6 +1319,9 @@
 					"$value": "{wpds-color.primitive.bg.stroke2}",
 					"$description": "Background color for thumbs with a brand tone and normal emphasis (eg. slider thumb and filled track), in their disabled state."
 				}
+			},
+			"$extensions": {
+				"com.figma.scopes": [ "FRAME_FILL", "SHAPE_FILL" ]
 			}
 		},
 		"fg": {
@@ -1453,6 +1456,9 @@
 					"$value": "{wpds-color.primitive.bg.fgSurface3}",
 					"$description": "Foreground color for interactive elements with error tone and strong emphasis, in their disabled state."
 				}
+			},
+			"$extensions": {
+				"com.figma.scopes": [ "TEXT_FILL", "SHAPE_FILL" ]
 			}
 		},
 		"stroke": {
@@ -1553,6 +1559,9 @@
 					"$value": "{wpds-color.primitive.primary.stroke3}",
 					"$description": "Accessible stroke color applied to focus rings."
 				}
+			},
+			"$extensions": {
+				"com.figma.scopes": [ "STROKE" ]
 			}
 		}
 	}

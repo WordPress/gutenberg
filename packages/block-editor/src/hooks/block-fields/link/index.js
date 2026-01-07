@@ -15,7 +15,7 @@ import { prependHTTP } from '@wordpress/url';
 /**
  * Internal dependencies
  */
-import LinkControl from '../../link-control';
+import LinkControl from '../../../components/link-control';
 import { useInspectorPopoverPlacement } from '../use-inspector-popover-placement';
 
 export const NEW_TAB_REL = 'noreferrer noopener';

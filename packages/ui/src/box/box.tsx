@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
+import { useRender, mergeProps } from '@base-ui/react';
 import { forwardRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { type BoxProps } from './types';
-import { renderElement } from '../utils/element';
 
 /**
  * Default render function that renders a div element with the given props.
@@ -85,7 +78,7 @@ export const Box = forwardRef< HTMLDivElement, BoxProps >( function Box(
 	},
 	ref
 ) {
-	const style: React.CSSProperties = { ...props.style };
+	const style: React.CSSProperties = {};
 
 	if ( backgroundColor ) {
 		style.backgroundColor = `var(--wpds-color-bg-${ target }-${ backgroundColor }, var(--wpds-color-bg-surface-${ backgroundColor }))`;
@@ -115,9 +108,11 @@ export const Box = forwardRef< HTMLDivElement, BoxProps >( function Box(
 		style.borderColor = `var(--wpds-color-stroke-${ target }-${ borderColor }, var(--wpds-color-stroke-surface-${ borderColor }))`;
 	}
 
-	return renderElement< 'div' >( {
+	const element = useRender( {
 		render,
 		ref,
-		props: { ...props, style },
+		props: mergeProps< 'div' >( props, { style } ),
 	} );
+
+	return element;
 } );

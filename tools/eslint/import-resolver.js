@@ -32,7 +32,9 @@ exports.resolve = function ( source, file, config ) {
 			const manifest = JSON.parse( readFileSync( manifestPath, 'utf8' ) );
 			const subpath = path.join( '.', pathParts.join( '/' ) );
 			const exportPath = manifest.exports?.[ subpath ]?.import;
-			const sourcePath = exportPath.replace( 'build-module', 'src' );
+			const sourcePath = exportPath
+				.replace( 'build-module', 'src' )
+				.replace( /\.mjs$/, '.js' );
 
 			return resolve( path.join( packagePath, sourcePath ) );
 		} catch {

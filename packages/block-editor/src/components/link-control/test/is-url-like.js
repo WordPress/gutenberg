@@ -44,12 +44,12 @@ describe( 'isURLLike', () => {
 	// use .each to test multiple cases
 	it.each( [
 		[ true, 'http://example.com' ],
-		[ true, 'https://test.co.uk?query=param' ],
-		[ true, 'ftp://openai.ai?param=value#section' ],
+		[ true, 'https://example.org?query=param' ],
+		[ true, 'ftp://example.org?param=value#section' ],
 		[ true, 'example.com' ],
 		[ true, 'http://example.com?query=param#section' ],
-		[ true, 'https://test.co.uk/some/path' ],
-		[ true, 'ftp://openai.ai/some/path' ],
+		[ true, 'https://example.org/some/path' ],
+		[ true, 'ftp://example.org/some/path' ],
 		[ true, 'example.org/some/path' ],
 		[ true, 'example_test.tld' ],
 		[ true, 'example_test.com' ],

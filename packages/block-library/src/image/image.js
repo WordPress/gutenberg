@@ -712,6 +712,10 @@ export default function Image( {
 			</BlockControls>
 		);
 
+	const hasDataFormBlockFields =
+		window?.__experimentalContentOnlyPatternInsertion &&
+		window?.__experimentalContentOnlyInspectorFields;
+
 	const controls = (
 		<>
 			{ showBlockControls && (
@@ -774,81 +778,84 @@ export default function Image( {
 					/>
 				</BlockControls>
 			) }
-			<InspectorControls group="content">
-				<ToolsPanel
-					label={ __( 'Media' ) }
-					resetAll={ () => onSelectImage( undefined ) }
-					dropdownMenuProps={ dropdownMenuProps }
-				>
-					{ isSingleSelected && ! lockUrlControls && (
-						<ToolsPanelItem
-							label={ __( 'Image' ) }
-							hasValue={ () => !! url }
-							onDeselect={ () => onSelectImage( undefined ) }
-							isShownByDefault
-						>
-							<MediaControl
-								mediaId={ id }
-								mediaUrl={ url }
-								alt={ alt }
-								filename={
-									image?.media_details?.sizes?.full?.file ||
-									image?.slug ||
-									getFilename( url )
-								}
-								allowedTypes={ ALLOWED_MEDIA_TYPES }
-								onSelect={ onSelectImage }
-								onSelectURL={ onSelectURL }
-								onError={ onUploadError }
-								onReset={ () => onSelectImage( undefined ) }
-								isUploading={ !! temporaryURL }
-								emptyLabel={ __( 'Add image' ) }
-							/>
-						</ToolsPanelItem>
-					) }
-					{ isSingleSelected && (
-						<ToolsPanelItem
-							label={ __( 'Alternative text' ) }
-							isShownByDefault
-							hasValue={ () => !! alt }
-							onDeselect={ () =>
-								setAttributes( { alt: undefined } )
-							}
-						>
-							<TextareaControl
+			{ ! hasDataFormBlockFields && (
+				<InspectorControls group="content">
+					<ToolsPanel
+						label={ __( 'Media' ) }
+						resetAll={ () => onSelectImage( undefined ) }
+						dropdownMenuProps={ dropdownMenuProps }
+					>
+						{ isSingleSelected && ! lockUrlControls && (
+							<ToolsPanelItem
+								label={ __( 'Image' ) }
+								hasValue={ () => !! url }
+								onDeselect={ () => onSelectImage( undefined ) }
+								isShownByDefault
+							>
+								<MediaControl
+									mediaId={ id }
+									mediaUrl={ url }
+									alt={ alt }
+									filename={
+										image?.media_details?.sizes?.full
+											?.file ||
+										image?.slug ||
+										getFilename( url )
+									}
+									allowedTypes={ ALLOWED_MEDIA_TYPES }
+									onSelect={ onSelectImage }
+									onSelectURL={ onSelectURL }
+									onError={ onUploadError }
+									onReset={ () => onSelectImage( undefined ) }
+									isUploading={ !! temporaryURL }
+									emptyLabel={ __( 'Add image' ) }
+								/>
+							</ToolsPanelItem>
+						) }
+						{ isSingleSelected && (
+							<ToolsPanelItem
 								label={ __( 'Alternative text' ) }
-								value={ alt || '' }
-								onChange={ updateAlt }
-								readOnly={ lockAltControls }
-								help={
-									lockAltControls ? (
-										<>{ lockAltControlsMessage }</>
-									) : (
-										<>
-											<ExternalLink
-												href={
-													// translators: Localized tutorial, if one exists. W3C Web Accessibility Initiative link has list of existing translations.
-													__(
-														'https://www.w3.org/WAI/tutorials/images/decision-tree/'
-													)
-												}
-											>
-												{ __(
-													'Describe the purpose of the image.'
-												) }
-											</ExternalLink>
-											<br />
-											{ __(
-												'Leave empty if decorative.'
-											) }
-										</>
-									)
+								isShownByDefault
+								hasValue={ () => !! alt }
+								onDeselect={ () =>
+									setAttributes( { alt: undefined } )
 								}
-							/>
-						</ToolsPanelItem>
-					) }
-				</ToolsPanel>
-			</InspectorControls>
+							>
+								<TextareaControl
+									label={ __( 'Alternative text' ) }
+									value={ alt || '' }
+									onChange={ updateAlt }
+									readOnly={ lockAltControls }
+									help={
+										lockAltControls ? (
+											<>{ lockAltControlsMessage }</>
+										) : (
+											<>
+												<ExternalLink
+													href={
+														// translators: Localized tutorial, if one exists. W3C Web Accessibility Initiative link has list of existing translations.
+														__(
+															'https://www.w3.org/WAI/tutorials/images/decision-tree/'
+														)
+													}
+												>
+													{ __(
+														'Describe the purpose of the image.'
+													) }
+												</ExternalLink>
+												<br />
+												{ __(
+													'Leave empty if decorative.'
+												) }
+											</>
+										)
+									}
+								/>
+							</ToolsPanelItem>
+						) }
+					</ToolsPanel>
+				</InspectorControls>
+			) }
 			<InspectorControls
 				group="dimensions"
 				resetAllFilter={ ( attrs ) => ( {

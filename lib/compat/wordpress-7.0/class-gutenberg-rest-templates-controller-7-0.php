@@ -404,9 +404,7 @@ class Gutenberg_REST_Templates_Controller_7_0 extends WP_REST_Templates_Controll
 				if ( isset( $plugins[ $plugin_basename ] ) && isset( $plugins[ $plugin_basename ]['Name'] ) ) {
 					return $plugins[ $plugin_basename ]['Name'];
 				}
-				return isset( $template_object->plugin ) ?
-					$template_object->plugin :
-					$template_object->theme;
+				return $template_object->plugin ?? $template_object->theme;
 			case 'site':
 				return get_bloginfo( 'name' );
 			case 'user':
