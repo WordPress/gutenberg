@@ -88,8 +88,10 @@ export default function ResponsiveWrapper( {
 	const handleToggleClick = () => {
 		// If an overlay template part is selected, navigate to it instead of toggling
 		if ( overlay && onNavigateToEntityRecord ) {
-			const theme = currentTheme;
-			const templatePartId = createTemplatePartId( theme, overlay );
+			const templatePartId = createTemplatePartId(
+				currentTheme,
+				overlay
+			);
 
 			onNavigateToEntityRecord( {
 				postId: templatePartId,
