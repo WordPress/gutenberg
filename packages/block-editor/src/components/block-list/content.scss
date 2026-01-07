@@ -473,3 +473,15 @@ _::-webkit-full-page-media, _:future, :root [data-has-multi-selection="true"] .b
 	cursor: grabbing;
 }
 
+.block-editor-block-note-indicator {
+	position: absolute;
+	right: 40px;
+	display: flex;
+	align-items: center;
+	gap: 4px;
+
+	&__count {
+		font-size: 14px;
+		font-weight: 600;
+	}
+}

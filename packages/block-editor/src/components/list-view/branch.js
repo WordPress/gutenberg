@@ -17,6 +17,7 @@ import { useListViewContext } from './context';
 import { getDragDisplacementValues, isClientIdSelected } from './utils';
 import { store as blockEditorStore } from '../../store';
 import useBlockDisplayInformation from '../use-block-display-information';
+import { useBlockComments } from './use-block-comments';
 
 /**
  * Given a block, returns the total number of blocks in that subtree. This is used to help determine
@@ -114,6 +115,16 @@ function ListViewBranch( props ) {
 		[ parentId ]
 	);
 
+	// Get the postId, mode, and editorMode from the editor store.
+	const { postId } = useSelect( ( select ) => {
+		const { getCurrentPostId } = select( 'core/editor' ); // eslint-disable-line @wordpress/data-no-store-string-literals
+		return {
+			postId: getCurrentPostId(),
+		};
+	}, [] );
+
+	const { resultComments } = useBlockComments( postId );
+
 	const {
 		blockDropPosition,
 		blockDropTargetIndex,
@@ -190,6 +201,10 @@ function ListViewBranch( props ) {
 				const isSelectedBranch =
 					isBranchSelected || ( isSelected && hasNestedBlocks );
 
+				const blockNotes = resultComments.find(
+					( comment ) => comment.blockClientId === clientId
+				);
+
 				// To avoid performance issues, we only render blocks that are in view,
 				// or blocks that are selected or dragged. If a block is selected,
 				// it is only counted if it is the first of the block selection.
@@ -209,6 +224,7 @@ function ListViewBranch( props ) {
 						{ showBlock && (
 							<ListViewBlock
 								block={ block }
+								notes={ blockNotes }
 								selectBlock={ selectBlock }
 								isSelected={ isSelected }
 								isBranchSelected={ isSelectedBranch }

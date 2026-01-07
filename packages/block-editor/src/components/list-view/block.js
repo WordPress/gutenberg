@@ -57,6 +57,7 @@ import { cleanEmptyObject } from '../../hooks/utils';
 
 function ListViewBlock( {
 	block: { clientId },
+	notes,
 	displacement,
 	isAfterDraggedBlocks,
 	isDragged,
@@ -604,6 +605,7 @@ function ListViewBlock( {
 					<div className="block-editor-list-view-block__contents-container">
 						<ListViewBlockContents
 							block={ block }
+							notes={ notes }
 							onClick={ selectEditorBlock }
 							onContextMenu={ onContextMenu }
 							onMouseDown={ onMouseDown }

@@ -9,9 +9,10 @@ import clsx from 'clsx';
 import {
 	__experimentalHStack as HStack,
 	__experimentalTruncate as Truncate,
+	__experimentalText as Text,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
-import { forwardRef } from '@wordpress/element';
+import { forwardRef, useMemo } from '@wordpress/element';
 import {
 	Icon,
 	lockSmall as lock,
@@ -22,6 +23,7 @@ import {
 import { SPACE, ENTER } from '@wordpress/keycodes';
 import { useSelect } from '@wordpress/data';
 import { hasBlockSupport } from '@wordpress/blocks';
+import { __, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -41,6 +43,7 @@ function ListViewBlockSelectButton(
 	{
 		className,
 		block: { clientId },
+		notes,
 		onClick,
 		onContextMenu,
 		onMouseDown,
@@ -105,6 +108,56 @@ function ListViewBlockSelectButton(
 			onClick( event );
 		}
 	}
+
+	const threadParticipants = useMemo( () => {
+		if ( ! notes ) {
+			return [];
+		}
+
+		const participantsMap = new Map();
+		const allComments = [ notes, ...notes.reply ];
+
+		// Sort by date to show participants in chronological order.
+		allComments.sort( ( a, b ) => new Date( a.date ) - new Date( b.date ) );
+
+		allComments.forEach( ( comment ) => {
+			// Track thread participants (original commenter + repliers).
+			if ( comment.author_name && comment.author_avatar_urls ) {
+				if ( ! participantsMap.has( comment.author ) ) {
+					participantsMap.set( comment.author, {
+						name: comment.author_name,
+						avatar:
+							comment.author_avatar_urls?.[ '48' ] ||
+							comment.author_avatar_urls?.[ '96' ],
+						id: comment.author,
+						date: comment.date,
+					} );
+				}
+			}
+		} );
+
+		return Array.from( participantsMap.values() );
+	}, [ notes ] );
+
+	const maxAvatars = 3;
+	const isOverflow = threadParticipants?.length > maxAvatars;
+	const visibleParticipants = isOverflow
+		? threadParticipants?.slice( 0, maxAvatars - 1 )
+		: threadParticipants;
+	const overflowCount = Math.max(
+		0,
+		threadParticipants?.length - visibleParticipants?.length
+	);
+	const threadHasMoreParticipants = threadParticipants?.length > 100;
+
+	const overflowText =
+		threadHasMoreParticipants && overflowCount > 0
+			? __( '100+' )
+			: sprintf(
+					// translators: %s: Number of participants.
+					__( '+%s' ),
+					overflowCount
+			  );
 
 	return (
 		<a
@@ -181,6 +234,23 @@ function ListViewBlockSelectButton(
 					</span>
 				) }
 			</HStack>
+			{ notes && (
+				<div className="block-editor-list-view-block-comment-avatar-indicator comment-avatar-indicator">
+					<HStack spacing="0.5">
+						{ visibleParticipants.map( ( participant ) => (
+							<img
+								key={ participant.id }
+								src={ participant.avatar }
+								alt={ participant.author_name }
+								className="comment-avatar"
+							/>
+						) ) }
+						{ overflowCount > 0 && (
+							<Text weight={ 500 }>{ overflowText }</Text>
+						) }
+					</HStack>
+				</div>
+			) }
 		</a>
 	);
 }
