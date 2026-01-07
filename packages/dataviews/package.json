@@ -79,7 +79,6 @@
 		"remove-accents": "^0.5.0"
 	},
 	"devDependencies": {
-		"@ariakit/test": "^0.4.7",
 		"@testing-library/jest-dom": "^6.6.3",
 		"@types/jest": "^29.5.14",
 		"storybook": "^9.1.17"
