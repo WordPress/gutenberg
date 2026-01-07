@@ -22,18 +22,12 @@ function addAttribute( el ) {
 			return;
 		}
 
-		el.setAttribute( 'credentialless', 'true' );
+		el.setAttribute( 'credentialless', '' );
 
 		// Reload the iframe to ensure the new attribute is taken into account.
-		if ( ! el.hasAttribute( 'src' ) ) {
-			el.setAttribute( 'src', '' );
-		} else {
-			const origSrc = el.getAttribute( 'src' );
-			if ( origSrc ) {
-				el.setAttribute( 'src', '' );
-				el.setAttribute( 'src', origSrc );
-			}
-		}
+		const origSrc = el.getAttribute( 'src' ) || '';
+		el.setAttribute( 'src', '' );
+		el.setAttribute( 'src', origSrc );
 	}
 }
 
