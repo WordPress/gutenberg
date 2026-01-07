@@ -129,6 +129,52 @@ const styleBundlingPlugins = [
 ];
 
 /**
+ * Plugin to inline WASM files as base64 data URLs.
+ * This eliminates the need for separate WASM file downloads and avoids
+ * issues with hosts not serving WASM files with the correct MIME type.
+ *
+ * @return {Object} esbuild plugin.
+ */
+function wasmInlinePlugin() {
+	return {
+		name: 'wasm-inline',
+		setup( build ) {
+			// Resolve .wasm imports from node_modules
+			build.onResolve( { filter: /\.wasm$/ }, async ( args ) => {
+				// Handle imports like 'wasm-vips/vips.wasm'
+				if ( ! args.path.startsWith( '.' ) ) {
+					const { createRequire } = await import( 'module' );
+					const require = createRequire( args.resolveDir + '/index.js' );
+					try {
+						const resolved = require.resolve( args.path );
+						return {
+							path: resolved,
+							namespace: 'wasm-inline',
+						};
+					} catch {
+						// If resolution fails, let other plugins handle it
+						return null;
+					}
+				}
+				return null;
+			} );
+
+			// Load WASM files and convert to base64 data URLs
+			build.onLoad( { filter: /.*/, namespace: 'wasm-inline' }, async ( args ) => {
+				const wasmBuffer = await readFile( args.path );
+				const base64 = wasmBuffer.toString( 'base64' );
+				const dataUrl = `data:application/wasm;base64,${ base64 }`;
+
+				return {
+					contents: `export default "${ dataUrl }";`,
+					loader: 'js',
+				};
+			} );
+		},
+	};
+}
+
+/**
  * Normalize path separators for cross-platform compatibility.
  *
  * @param {string} p Path to normalize.
@@ -1091,6 +1137,7 @@ async function transpilePackage( packageName ) {
 	};
 	const plugins = [
 		needsEmotionPlugin && emotionPlugin,
+		wasmInlinePlugin(),
 		externalizeAllExceptCssPlugin,
 		...styleBundlingPlugins,
 	].filter( Boolean );
