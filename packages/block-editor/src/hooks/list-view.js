@@ -11,10 +11,7 @@ import { store as blocksStore, hasBlockSupport } from '@wordpress/blocks';
  */
 import InspectorControls from '../components/inspector-controls';
 import { store as blockEditorStore } from '../store';
-import { privateApis } from '../private-apis';
-import { unlock } from '../lock-unlock';
-
-const { PrivateListView } = unlock( privateApis );
+import { PrivateListView } from '../components/list-view';
 
 export const LIST_VIEW_SUPPORT_KEY = 'listView';
 
