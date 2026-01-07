@@ -13,6 +13,7 @@ import './lock';
 import allowedBlocks from './allowed-blocks';
 import anchor from './anchor';
 import ariaLabel from './aria-label';
+import './block-fields';
 import customClassName from './custom-class-name';
 import './generated-class-name';
 import style from './style';

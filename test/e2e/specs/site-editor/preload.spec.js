@@ -51,9 +51,6 @@ test.describe( 'Preload', () => {
 			'/wp-abilities/v1/abilities?per_page=100&context=edit',
 			// Seems to be coming from `enableComplementaryArea`.
 			'/wp/v2/users/me',
-			// There are two separate settings OPTIONS requests. We should fix
-			// so the one for canUser and getEntityRecord are reused.
-			'/wp/v2/settings',
 		] );
 	} );
 } );

@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/ui",
-	"version": "0.3.0",
+	"version": "0.4.0",
 	"description": "Themeable React UI components for the WordPress Design System.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -29,13 +29,12 @@
 		"build-types",
 		"*.md"
 	],
-	"type": "module",
 	"main": "build/index.cjs",
-	"module": "build-module/index.js",
+	"module": "build-module/index.mjs",
 	"exports": {
 		".": {
 			"types": "./build-types/index.d.ts",
-			"import": "./build-module/index.js",
+			"import": "./build-module/index.mjs",
 			"default": "./build/index.cjs"
 		},
 		"./package.json": "./package.json"
@@ -52,7 +51,6 @@
 		"clsx": "^2.1.1"
 	},
 	"devDependencies": {
-		"@storybook/react": "9.1.17",
 		"@wordpress/theme": "file:../theme"
 	},
 	"peerDependencies": {
