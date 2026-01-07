@@ -77,6 +77,11 @@ function Edit( {
 		return editorActiveTabIndex ?? activeTabIndex;
 	}, [ editorActiveTabIndex, activeTabIndex ] );
 
+	// Read orientation from tabs-menu's own layout
+	const layout = attributes.layout || {};
+	const orientation = layout.orientation || 'horizontal';
+	const isVertical = orientation === 'vertical';
+
 	const { selectBlock } = useDispatch( blockEditorStore );
 	const focusRef = useRef();
 	const labelElementRef = useRef( null );
@@ -116,6 +121,74 @@ function Edit( {
 
 	// Update tab label in the tab block and parent tabs block
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
+
+	// Arrow key navigation handler
+	const handleKeyDown = useCallback(
+		( event, currentIndex ) => {
+			const { key } = event;
+			const tabsCount = tabsList.length;
+
+			// Don't handle navigation if editing a label (let RichText handle it)
+			if ( editingTabClientId ) {
+				return;
+			}
+
+			let nextIndex = currentIndex;
+
+			// Arrow key navigation (respects orientation)
+			if ( key === 'ArrowRight' && ! isVertical ) {
+				event.preventDefault();
+				nextIndex = ( currentIndex + 1 ) % tabsCount;
+			} else if ( key === 'ArrowLeft' && ! isVertical ) {
+				event.preventDefault();
+				nextIndex = ( currentIndex - 1 + tabsCount ) % tabsCount;
+			} else if ( key === 'ArrowDown' && isVertical ) {
+				event.preventDefault();
+				nextIndex = ( currentIndex + 1 ) % tabsCount;
+			} else if ( key === 'ArrowUp' && isVertical ) {
+				event.preventDefault();
+				nextIndex = ( currentIndex - 1 + tabsCount ) % tabsCount;
+			}
+			// Home/End keys
+			else if ( key === 'Home' ) {
+				event.preventDefault();
+				nextIndex = 0;
+			} else if ( key === 'End' ) {
+				event.preventDefault();
+				nextIndex = tabsCount - 1;
+			} else {
+				// Not a navigation key, let default behavior happen (including Tab)
+				return;
+			}
+
+			// Update active tab and focus
+			if ( nextIndex !== currentIndex && tabsList[ nextIndex ] ) {
+				const nextTab = tabsList[ nextIndex ];
+
+				// Update editorActiveTabIndex
+				if ( tabsClientId ) {
+					updateBlockAttributes( tabsClientId, {
+						editorActiveTabIndex: nextIndex,
+					} );
+				}
+
+				// Focus the next tab button
+				const nextTabButton = document.getElementById(
+					`${ nextTab.id || `tab-${ nextIndex }` }--tab`
+				);
+				if ( nextTabButton ) {
+					nextTabButton.focus();
+				}
+			}
+		},
+		[
+			isVertical,
+			tabsList,
+			editingTabClientId,
+			tabsClientId,
+			updateBlockAttributes,
+		]
+	);
 
 	// Update editor active tab index on parent tabs block when tab is clicked
 	const handleTabClick = useCallback(
@@ -317,10 +390,15 @@ function Edit( {
 								setEditingLabel( tab.label || '' );
 							} }
 							onKeyDown={ ( event ) => {
+								// Handle Enter key separately (activates tab)
 								if ( event.key === 'Enter' && ! event.shiftKey ) {
 									event.preventDefault();
 									handleTabClick( index, tab.clientId );
+									return;
 								}
+
+								// Handle arrow keys and Home/End (Tab key will have normal behavior)
+								handleKeyDown( event, index );
 							} }
 						>
 							{ isEditing ? (

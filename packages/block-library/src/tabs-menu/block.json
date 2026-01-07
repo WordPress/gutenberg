@@ -74,7 +74,8 @@
 		"layout": {
 			"default": {
 				"type": "flex",
-				"flexWrap": "nowrap"
+				"flexWrap": "nowrap",
+				"orientation": "horizontal"
 			},
 			"allowSwitching": false,
 			"allowVerticalAlignment": true,
