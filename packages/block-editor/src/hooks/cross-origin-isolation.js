@@ -5,15 +5,6 @@ import { addFilter } from '@wordpress/hooks';
 import { createHigherOrderComponent } from '@wordpress/compose';
 
 /**
- * Forces crossorigin attribute to 'anonymous' for media elements.
- *
- * @return {string} The crossorigin value.
- */
-function forceCrossOrigin() {
-	return 'anonymous';
-}
-
-/**
  * Adds crossorigin and credentialless attributes to elements as needed.
  *
  * @param {Element} el The element to modify.
@@ -46,18 +37,10 @@ function addAttribute( el ) {
 	}
 }
 
-// Only apply the filter and mutation observer if the site is cross-origin isolated.
+// Only add the mutation observer if the site is cross-origin isolated.
 if ( window.crossOriginIsolated ) {
-	addFilter(
-		'media.crossOrigin',
-		'media-experiments/cross-origin-isolation/force-crossorigin',
-		forceCrossOrigin
-	);
-
 	/*
-	 * Complementary component to the Cross_Origin_Isolation PHP class
-	 * that detects dynamically added DOM nodes that are missing the `crossorigin` attribute.
-	 * These are typically found in custom meta boxes and the WordPress admin bar.
+	 * Detects dynamically added DOM nodes that are missing the `crossorigin` attribute.
 	 */
 	const observer = new window.MutationObserver( ( mutations ) => {
 		mutations.forEach( ( mutation ) => {
