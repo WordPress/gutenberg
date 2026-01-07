@@ -11,7 +11,10 @@ class WP_Navigation_Block_Renderer_Test extends WP_UnitTestCase {
 	public static function setUpBeforeClass(): void {
 		parent::setUpBeforeClass();
 		// Ensure the navigation block functions are loaded.
-		require_once __DIR__ . '/../../packages/block-library/src/navigation/index.php';
+		// Only load if the specific function we need doesn't exist yet.
+		if ( ! function_exists( 'block_core_navigation_block_tree_has_block_type' ) ) {
+			require_once __DIR__ . '/../../packages/block-library/src/navigation/index.php';
+		}
 	}
 
 	/**
