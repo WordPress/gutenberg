@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 32.0.0-next.0 (2026-01-07)
+
 ### Breaking Changes
 
 -   Validated form controls (private API): Removed `onValidate` prop (use `onChange` to set `customValidity` messages, or add conditionals directly inside the `customValidity` prop instead) ([#73559](https://github.com/WordPress/gutenberg/pull/73559)).

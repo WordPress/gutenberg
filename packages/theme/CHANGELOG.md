@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.5.0-next.0 (2026-01-07)
+
 ### New Features
 
 -   Added stylelint plugins for design token linting: `no-unknown-ds-tokens` to catch references to non-existent design tokens, and `no-setting-wpds-custom-properties` to prevent reassignments of design token variables ([#74226](https://github.com/WordPress/gutenberg/pull/74226)).
