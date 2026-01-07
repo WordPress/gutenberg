@@ -40,7 +40,6 @@
 		"./package.json": "./package.json"
 	},
 	"types": "build-types",
-	"sideEffects": false,
 	"dependencies": {
 		"@wordpress/api-fetch": "file:../api-fetch",
 		"@wordpress/blob": "file:../blob",
