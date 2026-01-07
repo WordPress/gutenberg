@@ -9,7 +9,6 @@ import clsx from 'clsx';
 import { __ } from '@wordpress/i18n';
 import { getBlockSupport, hasBlockSupport } from '@wordpress/blocks';
 import { alignLeft, alignRight, alignCenter } from '@wordpress/icons';
-import { addFilter } from '@wordpress/hooks';
 
 /**
  * Internal dependencies
@@ -20,7 +19,6 @@ import {
 	cleanEmptyObject,
 	shouldSkipSerialization,
 	useBlockSettings,
-	transformStyles,
 } from './utils';
 import { TYPOGRAPHY_SUPPORT_KEY } from './typography';
 
@@ -184,31 +182,3 @@ export function addAssignedTextAlign( props, blockType, attributes ) {
 	}
 	return props;
 }
-
-const MIGRATION_PATHS = {
-	textAlign: [ [ 'style', 'typography', 'textAlign' ] ],
-};
-
-function addTransforms( result, source, index, results ) {
-	const destinationBlockType = result.name;
-	const activeSupports = {
-		textAlign: hasBlockSupport(
-			destinationBlockType,
-			TEXT_ALIGN_SUPPORT_KEY
-		),
-	};
-	return transformStyles(
-		activeSupports,
-		MIGRATION_PATHS,
-		result,
-		source,
-		index,
-		results
-	);
-}
-
-addFilter(
-	'blocks.switchToBlockType.transformedBlock',
-	'core/text-align/addTransforms',
-	addTransforms
-);
