@@ -117,7 +117,7 @@ The `core/post-data` source provides access to post data fields.
 
 _**Note:** Since WordPress 6.9._
 
-The `core/term-data` source provides access to taxonomy term data fields when term context is available. It requires `termId` and `taxonomy` context to function properly.
+The `core/term-data` source provides access to taxonomy term data fields when term context is available. It requires `termId` and `taxonomy` to be available from block context to function properly.
 
 #### Available Fields
 
