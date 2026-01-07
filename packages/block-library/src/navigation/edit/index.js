@@ -493,67 +493,39 @@ function Navigation( {
 
 	// Check if this navigation block is inside an overlay template part.
 	// If so, disable the overlay menu to prevent nested overlays.
-	const isWithinOverlayTemplatePart = useSelect(
-		( select ) => {
-			const { getBlockParentsByBlockName, getBlock } =
-				select( blockEditorStore );
-			const { getEditedEntityRecord } = select( coreStore );
+	const isWithinOverlayTemplatePart = useSelect( ( select ) => {
+		const { getEditedEntityRecord } = select( coreStore );
 
-			// Check if we're directly editing a template part by examining the URL.
-			// This avoids needing to import the editor store.
-			// Site editor uses format: ?p=%2Fwp_template_part%2Ftheme%2F%2Fslug
-			if ( typeof window !== 'undefined' && window.location ) {
-				const urlParams = new URLSearchParams( window.location.search );
-				const path = urlParams.get( 'p' );
+		// Check if we're directly editing a template part by examining the URL.
+		// This avoids needing to import the editor store.
+		// Site editor uses format: ?p=%2Fwp_template_part%2Ftheme%2F%2Fslug
+		if ( typeof window !== 'undefined' && window.location ) {
+			const urlParams = new URLSearchParams( window.location.search );
+			const path = urlParams.get( 'p' );
 
-				// Parse the path to extract post type and ID
-				if ( path && path.includes( 'wp_template_part' ) ) {
-					// Path format: /wp_template_part/theme//slug
-					const pathParts = decodeURIComponent( path ).split( '/' );
+			// Parse the path to extract post type and ID
+			if ( path && path.includes( 'wp_template_part' ) ) {
+				// Path format: /wp_template_part/theme//slug
+				const pathParts = decodeURIComponent( path ).split( '/' );
 
-					if ( pathParts[ 1 ] === 'wp_template_part' ) {
-						// Reconstruct the template part ID (theme//slug)
-						const templatePartId = pathParts.slice( 2 ).join( '/' );
+				if ( pathParts[ 1 ] === 'wp_template_part' ) {
+					// Reconstruct the template part ID (theme//slug)
+					const templatePartId = pathParts.slice( 2 ).join( '/' );
 
-						const currentTemplatePart = getEditedEntityRecord(
-							'postType',
-							'wp_template_part',
-							templatePartId
-						);
-						if ( currentTemplatePart?.area === 'overlay' ) {
-							return true;
-						}
+					const currentTemplatePart = getEditedEntityRecord(
+						'postType',
+						'wp_template_part',
+						templatePartId
+					);
+					if ( currentTemplatePart?.area === 'overlay' ) {
+						return true;
 					}
 				}
 			}
+		}
 
-			// Find all parent template-part blocks.
-			const templatePartParents = getBlockParentsByBlockName(
-				clientId,
-				'core/template-part'
-			);
-
-			// Check if any parent template part has area 'overlay'.
-			return templatePartParents.some( ( parentClientId ) => {
-				const parentBlock = getBlock( parentClientId );
-				const { slug, theme } = parentBlock?.attributes || {};
-
-				// If we have a slug and theme, get the template part entity to check its area.
-				if ( slug ) {
-					const templatePartEntity = getEditedEntityRecord(
-						'postType',
-						'wp_template_part',
-						`${ theme }//${ slug }`
-					);
-					return templatePartEntity?.area === 'overlay';
-				}
-
-				// Fallback to checking block attributes (for unsaved template parts).
-				return parentBlock?.attributes?.area === 'overlay';
-			} );
-		},
-		[ clientId ]
-	);
+		return false;
+	}, [] );
 
 	// Force overlayMenu to 'never' if within an overlay template part.
 	const effectiveOverlayMenu = isWithinOverlayTemplatePart
