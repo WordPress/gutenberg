@@ -1,11 +1,12 @@
 .wp-block-tabs-menu {
 	display: flex;
 	list-style: none;
+
 	margin: 0;
 	padding: 0;
+
 	align-items: flex-end;
-	// flex-grow: 1;
-	// flex-basis: 100%;
+
 	gap: var(--wp--style--unstable-tabs-list-gap, var(--wp--style--tabs-gap-default, 0.5em));
 	min-width: fit-content;
 
@@ -80,16 +81,9 @@
 	}
 }
 
-// Vertical layout adjustments (set by parent tabs block)
-.wp-block-tabs.is-vertical .wp-block-tabs-menu {
-	overflow-x: hidden;
-}
-
-// Horizontal layout divider
-.wp-block-tabs:not(.is-vertical) .wp-block-tabs-menu {
-	overflow-x: auto;
-	// border-block-end: 1px solid var(--tabs-divider-color, #000);
-}
+/**
+ * @TODO: Additional styles for tabs menu, these may be removed in the future.
+ */
 
 // Links style
 .wp-block-tabs-menu.is-style-links {

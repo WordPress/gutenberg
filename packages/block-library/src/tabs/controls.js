@@ -12,7 +12,6 @@ import AddTabToolbarControl from '../tab/add-tab-toolbar-control';
 
 export default function Controls( { attributes, setAttributes, clientId } ) {
 	const {
-		orientation,
 		metadata = {
 			name: '',
 		},
@@ -26,18 +25,6 @@ export default function Controls( { attributes, setAttributes, clientId } ) {
 			/>
 			<InspectorControls>
 				<PanelBody title={ __( 'Tabs Settings' ) }>
-					<ToggleControl
-						label={ __( 'Vertical Tabs' ) }
-						checked={ 'vertical' === orientation }
-						onChange={ () =>
-							setAttributes( {
-								orientation:
-									'vertical' === orientation
-										? 'horizontal'
-										: 'vertical',
-							} )
-						}
-					/>
 					<TextControl
 						label={ __( 'Tabs Title' ) }
 						help={ __(

@@ -165,11 +165,13 @@ function block_core_tabs_render_block_callback( array $attributes, string $conte
 		)
 	);
 
-	$is_vertical = 'vertical' === ( $attributes['orientation'] ?? 'horizontal' );
+	$layout = $attributes['layout'] ?? array();
+	$orientation = $layout['orientation'] ?? 'vertical';
+	$is_vertical = 'vertical' !== $orientation; // @TODO: Going to pull out all this is_vertical logic from the original and replace with something context sensitive to tabs menu.
 
 	$tag_processor = new WP_HTML_Tag_Processor( $content );
 	$tag_processor->next_tag( array( 'class_name' => 'wp-block-tabs' ) );
-	$tag_processor->add_class( $is_vertical ? 'is-vertical' : 'is-horizontal' );
+	$tag_processor->add_class( $orientation === 'vertical' ? 'is-vertical' : 'is-horizontal' );
 	$tag_processor->set_attribute( 'data-wp-interactive', 'core/tabs/private' );
 	$tag_processor->set_attribute(
 		'data-wp-context',
