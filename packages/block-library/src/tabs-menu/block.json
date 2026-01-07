@@ -73,6 +73,9 @@
 			"allowOrientation": true
 		},
 		"lock": false,
+		"shadow": {
+			"__experimentalSkipSerialization": true
+		},
 		"typography": {
 			"fontSize": true,
 			"__experimentalFontFamily": true,

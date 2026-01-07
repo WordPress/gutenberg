@@ -12,6 +12,7 @@ import {
 	__experimentalUseBorderProps as useBorderProps,
 	__experimentalUseColorProps as useColorProps,
 	__experimentalGetSpacingClassesAndStyles as useSpacingProps,
+	__experimentalGetShadowClassesAndStyles as useShadowProps,
 	getTypographyClassesAndStyles as useTypographyProps,
 	withColors,
 	store as blockEditorStore,
@@ -92,6 +93,7 @@ function Edit( {
 	// Get style props using button pattern
 	const borderProps = useBorderProps( attributes );
 	const colorProps = useColorProps( attributes );
+	const shadowProps = useShadowProps( attributes );
 	const spacingProps = useSpacingProps( attributes );
 	const typographyProps = useTypographyProps( attributes );
 
@@ -210,11 +212,6 @@ function Edit( {
 				selectBlock( clientId );
 				return;
 			}
-
-			// Select the tab block
-			// if ( tabClientId ) {
-			// 	selectBlock( tabClientId );
-			// }
 		},
 		[ editingTabClientId, tabsClientId, effectiveActiveIndex, updateBlockAttributes, selectBlock, isSelected, clientId ]
 	);
@@ -366,6 +363,7 @@ function Edit( {
 								// Don't include colorProps.className - the has-*-background-color classes
 								// have high specificity that overrides our active/hover state CSS
 								borderProps.className,
+								shadowProps.className,
 								typographyProps.className,
 								{
 									'is-active': isActiveTab,
@@ -376,6 +374,7 @@ function Edit( {
 								// Don't spread colorProps.style - colors are handled via CSS custom properties
 								// to allow active/hover states to properly override base colors
 								...borderProps.style,
+								...shadowProps.style,
 								...spacingProps.style,
 								...typographyProps.style,
 							} }

@@ -10,11 +10,13 @@ import {
 	useBlockProps,
 	__experimentalGetBorderClassesAndStyles as getBorderClassesAndStyles,
 	__experimentalGetSpacingClassesAndStyles as getSpacingClassesAndStyles,
+	__experimentalGetShadowClassesAndStyles as getShadowClassesAndStyles,
 	getTypographyClassesAndStyles,
 } from '@wordpress/block-editor';
 
 export default function Save( { attributes } ) {
 	const borderProps = getBorderClassesAndStyles( attributes );
+	const shadowProps = getShadowClassesAndStyles( attributes );
 	const spacingProps = getSpacingClassesAndStyles( attributes );
 	const typographyProps = getTypographyClassesAndStyles( attributes );
 
@@ -31,10 +33,12 @@ export default function Save( { attributes } ) {
 			'tabs__tab-label',
 			'tabs__tab-template', // Marker class for PHP extraction
 			borderProps.className,
-			typographyProps.className
+			typographyProps.className,
+			shadowProps.className,
 		),
 		style: {
 			...borderProps.style,
+			...shadowProps.style,
 			...spacingProps.style,
 			...typographyProps.style,
 		},
