@@ -20,22 +20,30 @@ import { useDispatch, useSelect } from '@wordpress/data';
  * @return {JSX.Element} The toolbar control element.
  */
 export default function AddTabToolbarControl( { attributes, tabsClientId } ) {
-	const { insertBlock } = useDispatch( blockEditorStore );
+	const { insertBlock, updateBlockAttributes, selectBlock } = useDispatch( blockEditorStore );
 
-	// Find the tab-panels block within the tabs block
-	const {tabPanelsClientId, nextTabIndex} = useSelect(
+	// Find the tab-panels block and tabs-menu block within the tabs block
+	const { tabPanelsClientId, nextTabIndex, tabsMenuClientId } = useSelect(
 		( select ) => {
 			if ( ! tabsClientId ) {
-				return null;
+				return {
+					tabPanelsClientId: null,
+					nextTabIndex: 0,
+					tabsMenuClientId: null,
+				};
 			}
 			const { getBlocks } = select( blockEditorStore );
 			const innerBlocks = getBlocks( tabsClientId );
 			const tabPanels = innerBlocks.find(
 				( block ) => block.name === 'core/tab-panels'
 			);
+			const tabsMenu = innerBlocks.find(
+				( block ) => block.name === 'core/tabs-menu'
+			);
 			return {
 				tabPanelsClientId: tabPanels?.clientId || null,
 				nextTabIndex: ( tabPanels?.innerBlocks.length || 0 ) + 1,
+				tabsMenuClientId: tabsMenu?.clientId || null,
 			};
 		},
 		[ tabsClientId ]
@@ -53,7 +61,20 @@ export default function AddTabToolbarControl( { attributes, tabsClientId } ) {
 			fontSize,
 			anchor: 'tab-' + nextTabIndex,
 		} );
-		insertBlock( newTabBlock, undefined, tabPanelsClientId );
+		// Pass false for updateSelection to prevent focusing the newly created tab
+		insertBlock( newTabBlock, undefined, tabPanelsClientId, false );
+
+		// Set the new tab as the active editor tab (0-indexed, so nextTabIndex - 1)
+		if ( tabsClientId ) {
+			updateBlockAttributes( tabsClientId, {
+				editorActiveTabIndex: nextTabIndex - 1,
+			} );
+		}
+
+		// Select the tabs-menu so it can handle label editing
+		if ( tabsMenuClientId ) {
+			selectBlock( tabsMenuClientId );
+		}
 	};
 
 	return (

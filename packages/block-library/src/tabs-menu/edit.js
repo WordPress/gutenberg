@@ -62,6 +62,7 @@ function Edit( {
 	setHoverBackgroundColor,
 	hoverTextColor,
 	setHoverTextColor,
+	isSelected,
 	__unstableLayoutClassNames: layoutClassNames,
 } ) {
 	const tabsList = context[ 'core/tabs-list' ] || [];
@@ -79,6 +80,7 @@ function Edit( {
 	const { selectBlock } = useDispatch( blockEditorStore );
 	const focusRef = useRef();
 	const labelElementRef = useRef( null );
+	const prevTabsCountRef = useRef( tabsList.length );
 	const [ editingTabClientId, setEditingTabClientId ] = useState( null );
 	const [ editingLabel, setEditingLabel ] = useState( '' );
 
@@ -89,15 +91,11 @@ function Edit( {
 	const typographyProps = useTypographyProps( attributes );
 
 	// Get selection info and parent clientId
-	const { selectedTabClientId, tabsClientId, isTabsMenuSelected } = useSelect(
+	const { selectedTabClientId, tabsClientId } = useSelect(
 		( select ) => {
-			const { getBlockRootClientId, getSelectedBlockClientIds, hasSelectedInnerBlock, getSelectedBlockClientId } = select( blockEditorStore );
+			const { getBlockRootClientId, getSelectedBlockClientIds, hasSelectedInnerBlock } = select( blockEditorStore );
 			const _tabsClientId = getBlockRootClientId( clientId );
 			const selectedIds = getSelectedBlockClientIds();
-			const currentlySelectedBlockId = getSelectedBlockClientId();
-
-			// Check if the tabs-menu block itself is selected
-			const _isTabsMenuSelected = currentlySelectedBlockId === clientId;
 
 			// Find if any tab is selected
 			let selectedTab = null;
@@ -111,7 +109,6 @@ function Edit( {
 			return {
 				selectedTabClientId: selectedTab,
 				tabsClientId: _tabsClientId,
-				isTabsMenuSelected: _isTabsMenuSelected,
 			};
 		},
 		[ clientId, tabsList ]
@@ -136,17 +133,17 @@ function Edit( {
 
 			// If the tabs-menu is not selected, select it first instead of the tab
 			// This allows users to interact with the tabs-menu before drilling into individual tabs
-			if ( ! isTabsMenuSelected ) {
+			if ( ! isSelected ) {
 				selectBlock( clientId );
 				return;
 			}
 
-			// Select the tab block (only if tabs-menu is already selected)
-			if ( tabClientId ) {
-				selectBlock( tabClientId );
-			}
+			// Select the tab block
+			// if ( tabClientId ) {
+			// 	selectBlock( tabClientId );
+			// }
 		},
-		[ editingTabClientId, tabsClientId, effectiveActiveIndex, updateBlockAttributes, selectBlock, isTabsMenuSelected, clientId ]
+		[ editingTabClientId, tabsClientId, effectiveActiveIndex, updateBlockAttributes, selectBlock, isSelected, clientId ]
 	);
 
 	const handleLabelChange = useCallback(
@@ -180,6 +177,24 @@ function Edit( {
 			}
 		};
 	}, [] );
+
+	// Auto-enter edit mode when a new tab is added
+	useEffect( () => {
+		const prevCount = prevTabsCountRef.current;
+		const currentCount = tabsList.length;
+
+		// If a tab was added (count increased)
+		if ( currentCount > prevCount && currentCount > 0 ) {
+			const lastTab = tabsList[ currentCount - 1 ];
+			if ( lastTab ) {
+				// Enter edit mode for the new tab's label
+				setEditingTabClientId( lastTab.clientId );
+				setEditingLabel( lastTab.label || '' );
+			}
+		}
+
+		prevTabsCountRef.current = currentCount;
+	}, [ tabsList ] );
 
 	// Build CSS custom properties for all color states (matching PHP render pattern)
 	// Only include properties that have values to preserve CSS fallback defaults
