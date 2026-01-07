@@ -23,6 +23,7 @@ import textarea from './textarea';
 import toggleGroup from './toggle-group';
 import array from './array';
 import color from './color';
+import object from './object';
 import password from './password';
 import hasElements from '../../field-types/utils/has-elements';
 
@@ -41,6 +42,7 @@ const FORM_CONTROLS: FormControls = {
 	url,
 	integer,
 	number,
+	object,
 	password,
 	radio,
 	select,

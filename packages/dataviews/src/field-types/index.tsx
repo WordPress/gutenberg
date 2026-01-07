@@ -26,6 +26,7 @@ import { default as password } from './password';
 import { default as telephone } from './telephone';
 import { default as color } from './color';
 import { default as url } from './url';
+import { default as object } from './object';
 import { default as noType } from './no-type';
 import getIsValid from './utils/get-is-valid';
 import getFormat from './utils/get-format';
@@ -51,6 +52,7 @@ function getFieldTypeByName< Item >( type?: FieldTypeName ): FieldType< Item > {
 		telephone,
 		color,
 		url,
+		object,
 	].find( ( fieldType ) => fieldType?.type === type );
 
 	if ( !! found ) {
@@ -114,6 +116,16 @@ export default function normalizeFields< Item >(
 			format: getFormat( field, fieldType ),
 			getValueFormatted:
 				field.getValueFormatted ?? fieldType.getValueFormatted,
+			properties: field.properties
+				? Object.fromEntries(
+						Object.entries( field.properties ).map(
+							( [ key, property ] ) => [
+								key,
+								normalizeFields( [ property ] )[ 0 ],
+							]
+						)
+				  )
+				: {},
 		};
 	} );
 }
