@@ -164,6 +164,7 @@ export const LinkStyledAsButton: Story = {
 		// Link content passed through `children`
 		// eslint-disable-next-line jsx-a11y/anchor-has-content
 		render: <a href="https://example.com" />,
+		nativeButton: false,
 		children: 'Link',
 	},
 };
