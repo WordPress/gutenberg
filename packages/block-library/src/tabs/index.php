@@ -102,7 +102,7 @@ function block_core_tabs_generate_tabs_list( array $innerblocks = array() ): arr
 						'label' => esc_html( (string) $tab_label ),
 						'index' => $tab_index,
 					);
-					$tab_index++;
+					++$tab_index;
 				}
 			}
 			break;
@@ -129,7 +129,7 @@ function block_core_tabs_provide_context( array $context, array $parsed_block, $
 
 	// Find the parent tabs block and extract tabs list from tab-panels
 	if ( $parent_block && 'core/tabs' === $parent_block->name ) {
-		$tabs_list                  = block_core_tabs_generate_tabs_list( $parent_block->parsed_block['innerBlocks'] ?? array() );
+		$tabs_list                 = block_core_tabs_generate_tabs_list( $parent_block->parsed_block['innerBlocks'] ?? array() );
 		$context['core/tabs-list'] = $tabs_list;
 	}
 
@@ -178,14 +178,14 @@ function block_core_tabs_render_block_callback( array $attributes, string $conte
 	$tag_processor->set_attribute( 'data-wp-interactive', 'core/tabs/private' );
 
 	// Inspect inside the tabs-menu to see if its vertical or not.
-	$tag_processor->set_bookmark('core/tabs_wrapper');
+	$tag_processor->set_bookmark( 'core/tabs_wrapper' );
 	while ( $tag_processor->next_tag( array( 'class_name' => 'wp-block-tabs-menu' ) ) ) {
 		if ( $tag_processor->has_class( 'is-vertical' ) ) {
 			$is_vertical = true;
 			break;
 		}
 	}
-	$tag_processor->seek('core/tabs_wrapper');
+	$tag_processor->seek( 'core/tabs_wrapper' );
 
 	$tag_processor->set_attribute(
 		'data-wp-context',

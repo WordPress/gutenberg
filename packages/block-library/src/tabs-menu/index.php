@@ -20,7 +20,7 @@ function block_core_tabs_menu_generate_color_styles( array $attributes ): string
 
 	// Extract base colors from core color supports (background/text)
 	// Check custom colors first (style.color.background/text), then preset colors (backgroundColor/textColor)
-	$base_bg = $attributes['style']['color']['background'] ?? '';
+	$base_bg   = $attributes['style']['color']['background'] ?? '';
 	$base_text = $attributes['style']['color']['text'] ?? '';
 
 	// Handle preset colors (these are slugs that need to be converted to CSS custom properties)
@@ -133,8 +133,9 @@ function block_core_tabs_menu_render_callback( array $attributes, string $conten
 
 		// Clone template and inject tab-specific attributes
 		$tab_element = $template;
+
 		// Remove closing > to append more attributes
-		$tab_element = preg_replace( '/>$/', '', $tab_element );
+		$tab_element  = preg_replace( '/>$/', '', $tab_element );
 		$tab_element .= sprintf(
 			' id="tab__%1$s" href="#%1$s" role="tab" aria-controls="%1$s" ' .
 			'data-wp-on--click="actions.handleTabClick" ' .
