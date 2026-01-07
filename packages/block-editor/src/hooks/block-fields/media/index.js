@@ -34,17 +34,18 @@ function MediaThumbnail( { data, field, attachment } ) {
 
 	if ( attachment?.media_type === 'image' || attachment?.poster ) {
 		return (
-			<img
-				className="block-editor-content-only-controls__media-thumbnail"
-				alt=""
-				width={ 24 }
-				height={ 24 }
-				src={
-					attachment.media_type === 'image'
-						? attachment.source_url
-						: attachment.poster
-				}
-			/>
+			<div className="block-editor-content-only-controls__media-thumbnail">
+				<img
+					alt=""
+					width={ 24 }
+					height={ 24 }
+					src={
+						attachment.media_type === 'image'
+							? attachment.source_url
+							: attachment.poster
+					}
+				/>
+			</div>
 		);
 	}
 
@@ -54,13 +55,9 @@ function MediaThumbnail( { data, field, attachment } ) {
 
 		if ( url ) {
 			return (
-				<img
-					className="block-editor-content-only-controls__media-thumbnail"
-					alt=""
-					width={ 24 }
-					height={ 24 }
-					src={ url }
-				/>
+				<div className="block-editor-content-only-controls__media-thumbnail">
+					<img alt="" width={ 24 } height={ 24 } src={ url } />
+				</div>
 			);
 		}
 
