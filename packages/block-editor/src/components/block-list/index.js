@@ -184,7 +184,6 @@ function Items( {
 		selectedBlocks,
 		visibleBlocks,
 		shouldRenderAppender,
-		isSelectionWithinCurrentSection,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -199,9 +198,6 @@ function Items( {
 				getBlockName,
 				isZoomOut: _isZoomOut,
 				canInsertBlockType,
-				getParentSectionBlock,
-				isBlockSelected,
-				hasSelectedInnerBlock,
 			} = unlock( select( blockEditorStore ) );
 
 			const _order = getBlockOrder( rootClientId );
@@ -231,21 +227,12 @@ function Items( {
 			);
 
 			const templateLock = getTemplateLock( rootClientId );
-			const sectionBlockClientId = isSectionBlock( rootClientId )
-				? rootClientId
-				: getParentSectionBlock( rootClientId );
 
 			return {
 				order: _order,
 				selectedBlocks: selectedBlockClientIds,
 				visibleBlocks: __unstableGetVisibleBlocks(),
 				isZoomOut: _isZoomOut(),
-				isSelectionWithinCurrentSection:
-					isBlockSelected( sectionBlockClientId ) ||
-					hasSelectedInnerBlock(
-						sectionBlockClientId,
-						true /* checkDeep */
-					),
 				shouldRenderAppender:
 					( ! isSectionBlock( rootClientId ) ||
 						isContainerInsertableToInContentOnlyMode(
@@ -273,8 +260,7 @@ function Items( {
 						// Only provide data asynchronously if the block is
 						// not visible and not selected.
 						! visibleBlocks.has( clientId ) &&
-						! selectedBlocks.includes( clientId ) &&
-						! isSelectionWithinCurrentSection
+						! selectedBlocks.includes( clientId )
 					}
 				>
 					{ isZoomOut && (
