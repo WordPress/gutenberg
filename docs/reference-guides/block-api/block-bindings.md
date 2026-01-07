@@ -130,7 +130,7 @@ The `core/term-data` source provides access to taxonomy term data fields when te
 | `slug` | URL-friendly slug | `category-slug` |
 | `description` | Term description | `A description of the category` |
 | `parent` | Parent term ID (hierarchical taxonomies) | `0` |
-| `count` | Number of posts in this term | `5` | [2](#9-1) 
+| `count` | Number of posts in this term | `5` | 
 
 #### Example Usage
 
@@ -138,11 +138,13 @@ The `core/term-data` source provides access to taxonomy term data fields when te
 
 ```html
 <!-- wp:terms-query {"termQuery":{"taxonomy":"category","perPage":5}} -->
-  <!-- wp:term-template {"layout":{"type":"default"}} -->
-    <!-- wp:paragraph {"metadata":{"bindings":{"content":{"source":"core/term-data","args":{"field":"name"}}}}} -->
-    <p>Category Name</p>
-    <!-- /wp:paragraph -->
-  <!-- /wp:term-template -->
+<div class="wp-block-terms-query">
+	<!-- wp:term-template {"layout":{"type":"default"}} -->
+	<!-- wp:paragraph {"metadata":{"bindings":{"content":{"source":"core/term-data","args":{"field":"name"}}}}} -->
+	<p>Category Name</p>
+	<!-- /wp:paragraph -->
+	<!-- /wp:term-template -->
+</div>
 <!-- /wp:terms-query -->
 ```
 
@@ -150,21 +152,22 @@ The `core/term-data` source provides access to taxonomy term data fields when te
 
 ```html
 <!-- wp:terms-query {"termQuery":{"taxonomy":"post_tag","perPage":10}} -->
-  <!-- wp:term-template {"layout":{"type":"default"}} -->
-    <!-- wp:paragraph {"metadata":{"bindings":{"content":{"source":"core/term-data","args":{"field":"name"}}}}} -->
-    <a href="#">Tag Name</a>
-    <!-- /wp:paragraph -->
-  <!-- /wp:term-template -->
+<div class="wp-block-terms-query">
+	<!-- wp:term-template {"layout":{"type":"default"}} -->
+	<!-- wp:paragraph {"metadata":{"bindings":{"content":{"source":"core/term-data","args":{"field":"name"}}}}} -->
+	<p><a href="#">Tag Name</a></p>
+	<!-- /wp:paragraph -->
+	<!-- /wp:term-template -->
+</div>
 <!-- /wp:terms-query -->
 ```
 
 #### Context Requirements
 
-The `core/term-data` source works in these contexts:
+The [`core/term-data`](https://github.com/WordPress/gutenberg/tree/trunk/packages/editor/src/bindings/term-data.js) source works in these contexts:
 
-1. **Term Templates** - Automatically provides context for each term
-2. **Navigation Blocks** - Special backwards compatibility handling for `core/navigation-link` and `core/navigation-submenu`
-3. **Custom Context** - Any template that provides `termId` and `taxonomy` context
+1. **Any block providing term context** - Built-in blocks like [`core/term-template`](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/term-template), or custom blocks that provide `termId` and `taxonomy` via block context
+2.  **Navigation Blocks** - Special backwards compatibility handling for `core/navigation-link` and `core/navigation-submenu` (these read from block attributes instead of context)
 
 ### core/pattern-overrides
 
@@ -319,17 +322,15 @@ The `block_bindings_supported_attributes_{$block_type}` filter allows developers
 
 This filter provides a way to extend or restrict which attributes of a specific block type can be bound to dynamic sources. The attributes registered through this filter will appear as options in the block binding interface.
 
-**Note:** This filter is currently not implemented for pattern overrides.
+<div class="callout callout-warning">This filter has no impact on pattern overrides as they are handled independently.</div>
 
 Example:
 
 ```php
-// Allow binding the 'className' attribute for paragraph blocks
-add_filter( 'block_bindings_supported_attributes_core/paragraph', function( $attributes ) {
-    $attributes['className'] = array(
-        'type' => 'string',
-    );
-    return $attributes;
+// Allow binding the 'caption' attribute for image blocks
+add_filter( 'block_bindings_supported_attributes_core/image', function( $supported_attributes ) {
+    $supported_attributes[] = 'caption';
+    return $supported_attributes;
 } );
 ```
 
@@ -338,6 +339,8 @@ add_filter( 'block_bindings_supported_attributes_core/paragraph', function( $att
 There are a few examples in Core that can be used as reference.
 
 -   Post Meta. [Source code](https://github.com/WordPress/wordpress-develop/blob/trunk/src/wp-includes/block-bindings/post-meta.php)
+-   Post Data. [Source code](https://github.com/WordPress/wordpress-develop/blob/trunk/src/wp-includes/block-bindings/post-data.php)
+-   Term Data. [Source code](https://github.com/WordPress/wordpress-develop/blob/trunk/src/wp-includes/block-bindings/term-data.php)
 -   Pattern overrides. [Source code](https://github.com/WordPress/wordpress-develop/blob/trunk/src/wp-includes/block-bindings/pattern-overrides.php)
 -   Twenty Twenty-Five theme. [Source code](https://github.com/WordPress/wordpress-develop/blob/trunk/src/wp-content/themes/twentytwentyfive/functions.php)
 
