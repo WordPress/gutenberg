@@ -8,12 +8,6 @@
 
 class WP_Navigation_Block_Renderer_Test extends WP_UnitTestCase {
 
-	public static function setUpBeforeClass(): void {
-		parent::setUpBeforeClass();
-		// Navigation block functions are loaded via lib/blocks.php which loads
-		// the built files with prefixed function names. No need to manually require.
-	}
-
 	/**
 	 * Test that navigation links are wrapped in list items to preserve accessible markup
 	 *
