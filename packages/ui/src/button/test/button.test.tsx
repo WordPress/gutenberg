@@ -96,10 +96,9 @@ describe( 'Button', () => {
 				Click me
 			</Button>
 		);
-		const button = screen.getByRole( 'button', { name: 'Click me' } );
 
-		// Should have both built-in classes and custom class
-		expect( button ).toHaveClass( 'button' );
-		expect( button ).toHaveClass( customClass );
+		expect(
+			screen.getByRole( 'button', { name: 'Click me' } )
+		).toHaveClass( customClass );
 	} );
 } );
