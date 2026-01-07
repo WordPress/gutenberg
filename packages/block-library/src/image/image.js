@@ -473,8 +473,10 @@ export default function Image( {
 
 	const imperativeFocalPointPreview = ( value ) => {
 		if ( imageElement ) {
-			// eslint-disable-next-line react-compiler/react-compiler
-			imageElement.style.objectPosition = mediaPosition( value );
+			imageElement.style.setProperty(
+				'object-position',
+				mediaPosition( value )
+			);
 		}
 	};
 
