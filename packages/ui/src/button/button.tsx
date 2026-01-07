@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+// eslint-disable-next-line no-restricted-imports
 import { Button as AriakitButton } from '@ariakit/react';
 import { forwardRef, useEffect } from '@wordpress/element';
 import clsx from 'clsx';
