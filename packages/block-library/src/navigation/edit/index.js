@@ -29,6 +29,7 @@ import {
 	BlockControls,
 } from '@wordpress/block-editor';
 import { EntityProvider, store as coreStore } from '@wordpress/core-data';
+import { store as editorStore } from '@wordpress/editor';
 
 import { useDispatch, useSelect } from '@wordpress/data';
 import {
@@ -491,7 +492,47 @@ function Navigation( {
 			),
 		[ clientId ]
 	);
-	const isResponsive = 'never' !== overlayMenu;
+
+	// Check if this navigation block is inside an overlay template part.
+	// If so, disable the overlay menu to prevent nested overlays.
+	const isWithinOverlayTemplatePart = useSelect(
+		( select ) => {
+			const { getBlockParentsByBlockName, getBlock } =
+				select( blockEditorStore );
+			const { getCurrentPostType, getCurrentPost } =
+				select( editorStore );
+
+			// Check if we're directly editing a template part with area 'overlay'.
+			const currentPostType = getCurrentPostType();
+			const currentPost = getCurrentPost();
+			if (
+				currentPostType === 'wp_template_part' &&
+				currentPost?.area === 'overlay'
+			) {
+				return true;
+			}
+
+			// Find all parent template-part blocks.
+			const templatePartParents = getBlockParentsByBlockName(
+				clientId,
+				'core/template-part'
+			);
+
+			// Check if any parent template part has area 'overlay'.
+			return templatePartParents.some( ( parentClientId ) => {
+				const parentBlock = getBlock( parentClientId );
+				return parentBlock?.attributes?.area === 'overlay';
+			} );
+		},
+		[ clientId ]
+	);
+
+	// Force overlayMenu to 'never' if within an overlay template part.
+	const effectiveOverlayMenu = isWithinOverlayTemplatePart
+		? 'never'
+		: overlayMenu;
+
+	const isResponsive = 'never' !== effectiveOverlayMenu;
 	const blockProps = useBlockProps( {
 		ref: navRef,
 		className: clsx(
@@ -803,7 +844,7 @@ function Navigation( {
 					</ToolsPanel>
 				) }
 			</InspectorControls>
-			{ isOverlayExperimentEnabled && (
+			{ isOverlayExperimentEnabled && ! isWithinOverlayTemplatePart && (
 				<InspectorControls>
 					<OverlayPanel
 						overlayMenu={ overlayMenu }
@@ -844,7 +885,7 @@ function Navigation( {
 	);
 
 	const accessibleDescriptionId = `${ clientId }-desc`;
-	const isHiddenByDefault = 'always' === overlayMenu;
+	const isHiddenByDefault = 'always' === effectiveOverlayMenu;
 	const isManageMenusButtonDisabled =
 		! hasManagePermissions || ! hasResolvedNavigationMenus;
 
