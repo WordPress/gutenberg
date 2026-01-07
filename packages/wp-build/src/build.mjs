@@ -43,7 +43,7 @@ const ROOT_DIR = process.cwd();
 const PACKAGES_DIR = path.join( ROOT_DIR, 'packages' );
 const BUILD_DIR = path.join( ROOT_DIR, 'build' );
 
-const SOURCE_EXTENSIONS = '{js,ts,tsx}';
+const SOURCE_EXTENSIONS = '{js,mjs,ts,tsx}';
 const ASSET_EXTENSIONS = 'json';
 const IGNORE_PATTERNS = [
 	'**/benchmark/**',
@@ -471,7 +471,6 @@ async function bundlePackage( packageName, options = {} ) {
 	if ( packageJson.wpScript ) {
 		const buildStyleDir = path.join( packageDir, 'build-style' );
 		const outputDir = path.join( BUILD_DIR, 'styles', packageName );
-		const isProduction = process.env.NODE_ENV === 'production';
 
 		const cssFiles = await glob(
 			normalizePath( path.join( buildStyleDir, '**/*.css' ) )
@@ -487,36 +486,39 @@ async function bundlePackage( packageName, options = {} ) {
 				hasMainStyle = true;
 			}
 
-			if ( isProduction ) {
-				builds.push(
-					( async () => {
-						await mkdir( destDir, { recursive: true } );
-						const content = await readFile( cssFile, 'utf8' );
-						const result = await postcss( [
-							cssnano( {
-								preset: [
-									'default',
-									{
-										discardComments: {
-											removeAll: true,
-										},
+			// Generate minified path: style.css -> style.min.css, style-rtl.css -> style-rtl.min.css
+			const minifiedPath = destPath.replace( /\.css$/, '.min.css' );
+
+			// Always produce both versions (like JavaScript does):
+			// 1. Non-minified version (for SCRIPT_DEBUG=true)
+			// 2. Minified version (for SCRIPT_DEBUG=false)
+			builds.push(
+				( async () => {
+					await mkdir( destDir, { recursive: true } );
+					const content = await readFile( cssFile, 'utf8' );
+
+					// Write non-minified version
+					await writeFile( destPath, content );
+
+					// Write minified version
+					const result = await postcss( [
+						cssnano( {
+							preset: [
+								'default',
+								{
+									discardComments: {
+										removeAll: true,
 									},
-								],
-							} ),
-						] ).process( content, {
-							from: cssFile,
-							to: destPath,
-						} );
-						await writeFile( destPath, result.css );
-					} )()
-				);
-			} else {
-				builds.push(
-					mkdir( destDir, { recursive: true } ).then( () =>
-						copyFile( cssFile, destPath )
-					)
-				);
-			}
+								},
+							],
+						} ),
+					] ).process( content, {
+						from: cssFile,
+						to: minifiedPath,
+					} );
+					await writeFile( minifiedPath, result.css );
+				} )()
+			);
 		}
 	}
 
@@ -772,14 +774,14 @@ async function generateScriptRegistrationPhp( scripts, replacements ) {
 }
 
 /**
- * Generate PHP file for version constant.
+ * Generate PHP file for constants (version and build URL).
  *
  * @param {Record<string, string>} replacements PHP template replacements.
  */
-async function generateVersionPhp( replacements ) {
+async function generateConstantsPhp( replacements ) {
 	await generatePhpFromTemplate(
-		'version.php.template',
-		path.join( BUILD_DIR, 'version.php' ),
+		'constants.php.template',
+		path.join( BUILD_DIR, 'constants.php' ),
 		replacements
 	);
 }
@@ -1071,9 +1073,9 @@ async function transpilePackage( packageName ) {
 						relativePath = './' + relativePath;
 					}
 
-					// Replace extension: make sure that file extension is always `.js` or `.cjs`.
+					// Replace extension: make sure that file extension is always `.mjs` or `.cjs`.
 					const newExt =
-						build.initialOptions.format === 'cjs' ? '.cjs' : '.js';
+						build.initialOptions.format === 'cjs' ? '.cjs' : '.mjs';
 					relativePath = relativePath.replace( /\.[jt]sx?$/, newExt );
 
 					return {
@@ -1130,6 +1132,7 @@ async function transpilePackage( packageName ) {
 				entryPoints: srcFiles,
 				outdir: buildModuleDir,
 				outbase: srcDir,
+				outExtension: { '.js': '.mjs' },
 				bundle: true,
 				platform: 'neutral',
 				format: 'esm',
@@ -1636,7 +1639,7 @@ async function buildAll( baseUrlExpression ) {
 		generateModuleRegistrationPhp( modules, phpReplacements ),
 		generateScriptRegistrationPhp( scripts, phpReplacements ),
 		generateStyleRegistrationPhp( styles, phpReplacements ),
-		generateVersionPhp( phpReplacements ),
+		generateConstantsPhp( phpReplacements ),
 		generateRoutesRegistry( routes, phpReplacements ),
 		generateRoutesPhp( routes, phpReplacements ),
 		generatePagesPhp( pageData, phpReplacements ),
@@ -1927,7 +1930,7 @@ async function main() {
 			},
 			'base-url': {
 				type: 'string',
-				default: "plugins_url( 'build', dirname( __FILE__ ) )",
+				default: 'plugin_dir_url( __FILE__ )',
 			},
 		},
 	} );

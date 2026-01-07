@@ -283,15 +283,7 @@
 	}
 
 	// Use opacity to work in various editor styles.
-	&::-webkit-input-placeholder {
-		color: colors.$dark-gray-placeholder;
-	}
-
-	&::-moz-placeholder {
-		color: colors.$dark-gray-placeholder;
-	}
-
-	&:-ms-input-placeholder {
+	&::placeholder {
 		color: colors.$dark-gray-placeholder;
 	}
 }
@@ -313,11 +305,6 @@
 	&:checked {
 		background: var(--wp-admin-theme-color);
 		border-color: var(--wp-admin-theme-color);
-
-		// Hide default checkbox styles in IE.
-		&::-ms-check {
-			opacity: 0;
-		}
 	}
 
 	&:checked::before,

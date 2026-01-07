@@ -280,8 +280,16 @@ const UnforwardedPopover = (
 						'contains' in referenceElement &&
 						referenceElement.contains( blurTarget ) ) ||
 					floatingElement?.contains( blurTarget );
-				// Only proceed if the blur is actually from this popover
-				if ( ! isBlurFromThisPopover ) {
+				// Ignore blur events that don't originate from this popover when there's no
+				// relatedTarget (next focus target) and focus moves to document.body.
+				// This prevents incorrectly closing the popover when clicking on elements
+				// that don't accept focus (like clicking outside to empty space).
+				const ownerDocument = floatingElement?.ownerDocument;
+				if (
+					! isBlurFromThisPopover &&
+					! ( 'relatedTarget' in event && event.relatedTarget ) &&
+					ownerDocument?.activeElement === ownerDocument?.body
+				) {
 					return;
 				}
 				// Call onFocusOutside if defined or call onClose.

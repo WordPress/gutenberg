@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/build",
-	"version": "0.4.1-next.8fd3f8831.0",
+	"version": "0.4.0",
 	"description": "Build tool for WordPress plugins.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -24,7 +24,7 @@
 		"npm": ">=10.2.3"
 	},
 	"type": "module",
-	"main": "./src/build.mjs",
+	"module": "./src/build.mjs",
 	"exports": {
 		".": {
 			"import": "./src/build.mjs"

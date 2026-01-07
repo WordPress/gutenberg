@@ -31,8 +31,7 @@
 						"name": "core/accordion-panel",
 						"isValid": true,
 						"attributes": {
-							"templateLock": false,
-							"isSelected": false
+							"templateLock": false
 						},
 						"innerBlocks": [
 							{

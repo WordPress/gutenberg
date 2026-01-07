@@ -2,12 +2,12 @@
 
 ## Unreleased
 
-## 1.0.0-next.0 (2025-12-24)
-
 ### Breaking Changes
 
--   Remove numeric multiplier option for spacing tokens from `Stack` and `Box` components. ([#73852](https://github.com/WordPress/gutenberg/pull/73852), [#74008](https://github.com/WordPress/gutenberg/pull/74008))
+-   Remove numeric multiplier option for spacing tokens from `Stack` and `Box` components ([#73852](https://github.com/WordPress/gutenberg/pull/73852), [#74008](https://github.com/WordPress/gutenberg/pull/74008)).
 
 ### New Features
 
--   Add `Stack` component. ([#73928](https://github.com/WordPress/gutenberg/pull/73928))
+-   Add `Stack` component ([#73928](https://github.com/WordPress/gutenberg/pull/73928)).
+-   Add `VisuallyHidden` component ([#74189](https://github.com/WordPress/gutenberg/pull/74189)).
+-   Add `Field` primitives ([#74190](https://github.com/WordPress/gutenberg/pull/74190)).

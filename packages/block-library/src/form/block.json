@@ -17,7 +17,6 @@
 	"description": "A form.",
 	"keywords": [ "container", "wrapper", "row", "section" ],
 	"textdomain": "default",
-	"icon": "feedback",
 	"attributes": {
 		"submissionMethod": {
 			"type": "string",

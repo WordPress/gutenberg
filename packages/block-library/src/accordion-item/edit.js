@@ -8,8 +8,7 @@ import {
 	InspectorControls,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { useDispatch, useSelect } from '@wordpress/data';
-import { useEffect } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
 import {
 	ToggleControl,
 	__experimentalToolsPanel as ToolsPanel,
@@ -27,44 +26,29 @@ import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
 const TEMPLATE = [ [ 'core/accordion-heading' ], [ 'core/accordion-panel' ] ];
 
-export default function Edit( { attributes, clientId, setAttributes } ) {
+export default function Edit( {
+	attributes,
+	clientId,
+	setAttributes,
+	isSelected: isSingleSelected,
+} ) {
 	const { openByDefault } = attributes;
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
-
-	const { isSelected, getBlockOrder } = useSelect(
+	const { isSelected } = useSelect(
 		( select ) => {
-			const {
-				isBlockSelected,
-				hasSelectedInnerBlock,
-				getBlockOrder: getBlockOrderSelector,
-			} = select( blockEditorStore );
+			if ( isSingleSelected || openByDefault ) {
+				return { isSelected: true };
+			}
+
 			return {
-				isSelected:
-					isBlockSelected( clientId ) ||
-					hasSelectedInnerBlock( clientId, true ),
-				getBlockOrder: getBlockOrderSelector,
+				isSelected: select( blockEditorStore ).hasSelectedInnerBlock(
+					clientId,
+					true
+				),
 			};
 		},
-		[ clientId ]
+		[ clientId, isSingleSelected, openByDefault ]
 	);
-
-	const contentBlockClientId = getBlockOrder( clientId )[ 1 ];
-	const { updateBlockAttributes, __unstableMarkNextChangeAsNotPersistent } =
-		useDispatch( blockEditorStore );
-
-	useEffect( () => {
-		if ( contentBlockClientId ) {
-			__unstableMarkNextChangeAsNotPersistent();
-			updateBlockAttributes( contentBlockClientId, {
-				isSelected,
-			} );
-		}
-	}, [
-		isSelected,
-		contentBlockClientId,
-		__unstableMarkNextChangeAsNotPersistent,
-		updateBlockAttributes,
-	] );
 
 	const blockProps = useBlockProps( {
 		className: clsx( {

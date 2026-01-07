@@ -17,12 +17,9 @@ const __dirname = path.dirname( fileURLToPath( import.meta.url ) );
  *
  * @param {string} rootDir           Root directory path.
  * @param {string} baseUrlExpression PHP expression for base URL (e.g. "includes_url( 'build' )").
- * @return {Promise<Record<string, string>>} Replacements object with {{PREFIX}}, {{VERSION}}, {{VERSION_CONSTANT}}, {{BASE_URL}}.
+ * @return {Promise<Record<string, string>>} Replacements object with {{PREFIX}}, {{VERSION}}, {{BASE_URL}}.
  */
-export async function getPhpReplacements(
-	rootDir,
-	baseUrlExpression = "plugins_url( 'build', dirname( __FILE__ ) )"
-) {
+export async function getPhpReplacements( rootDir, baseUrlExpression ) {
 	const rootPackageJson = getPackageInfoFromFile(
 		path.join( rootDir, 'package.json' )
 	);
@@ -33,13 +30,10 @@ export async function getPhpReplacements(
 	// @ts-expect-error specific override to package.json
 	const name = rootPackageJson.wpPlugin?.name || 'gutenberg';
 	const version = rootPackageJson.version;
-	const versionConstant =
-		name.toUpperCase().replace( /-/g, '_' ) + '_VERSION';
 
 	return {
 		'{{PREFIX}}': name,
 		'{{VERSION}}': version,
-		'{{VERSION_CONSTANT}}': versionConstant,
 		'{{BASE_URL}}': baseUrlExpression,
 	};
 }

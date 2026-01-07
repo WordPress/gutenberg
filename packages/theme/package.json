@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/theme",
-	"version": "0.4.1-next.8fd3f8831.0",
+	"version": "0.3.0",
 	"description": "Theme and context provider for the WordPress Design System.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -29,17 +29,30 @@
 		"build-types",
 		"*.md"
 	],
-	"type": "module",
 	"main": "build/index.cjs",
-	"module": "build-module/index.js",
+	"module": "build-module/index.mjs",
 	"exports": {
 		".": {
 			"types": "./build-types/index.d.ts",
-			"import": "./build-module/index.js",
+			"import": "./build-module/index.mjs",
 			"default": "./build/index.cjs"
 		},
 		"./design-tokens.css": "./src/prebuilt/css/design-tokens.css",
-		"./design-tokens.js": "./src/prebuilt/js/design-tokens.js",
+		"./design-tokens.js": {
+			"types": "./build-types/prebuilt/js/design-tokens.d.ts",
+			"import": "./build-module/prebuilt/js/design-tokens.mjs",
+			"default": "./build/prebuilt/js/design-tokens.cjs"
+		},
+		"./stylelint-plugins/no-unknown-ds-tokens": {
+			"types": "./build-types/stylelint-plugins/no-unknown-ds-tokens.d.ts",
+			"import": "./src/stylelint-plugins/no-unknown-ds-tokens.mjs",
+			"default": "./build/stylelint-plugins/no-unknown-ds-tokens.cjs"
+		},
+		"./stylelint-plugins/no-setting-wpds-custom-properties": {
+			"types": "./build-types/stylelint-plugins/no-setting-wpds-custom-properties.d.ts",
+			"import": "./src/stylelint-plugins/no-setting-wpds-custom-properties.mjs",
+			"default": "./build/stylelint-plugins/no-setting-wpds-custom-properties.cjs"
+		},
 		"./package.json": "./package.json"
 	},
 	"react-native": "src/index",
@@ -48,20 +61,29 @@
 	"sideEffects": [
 		"src/color-ramps/lib/register-color-spaces.ts",
 		"build/color-ramps/lib/register-color-spaces.js",
-		"build-module/color-ramps/lib/register-color-spaces.js"
+		"build-module/color-ramps/lib/register-color-spaces.mjs"
 	],
 	"dependencies": {
 		"@wordpress/element": "file:../element",
 		"@wordpress/private-apis": "file:../private-apis",
-		"colorjs.io": "^0.5.2",
+		"colorjs.io": "^0.6.0",
 		"memize": "^2.1.0"
 	},
 	"devDependencies": {
+		"@terrazzo/cli": "^0.10.2",
+		"@terrazzo/plugin-css": "^0.10.2",
+		"@terrazzo/token-tools": "^0.10.2",
 		"esbuild-esm-loader": "0.3.3"
 	},
 	"peerDependencies": {
 		"react": "^18.0.0",
-		"react-dom": "^18.0.0"
+		"react-dom": "^18.0.0",
+		"stylelint": "^16.8.2"
+	},
+	"peerDependenciesMeta": {
+		"stylelint": {
+			"optional": true
+		}
 	},
 	"publishConfig": {
 		"access": "public"

@@ -53,7 +53,9 @@ if ( ! function_exists( '{{PREFIX}}_register_package_scripts' ) ) {
 	 * Register all package scripts.
 	 */
 	function {{PREFIX}}_register_package_scripts( $scripts ) {
-		$default_version = defined( '{{VERSION_CONSTANT}}' ) && ! SCRIPT_DEBUG ? {{VERSION_CONSTANT}} : time();
+		// Load build constants
+		$build_constants = require __DIR__ . '/constants.php';
+		$default_version = ! SCRIPT_DEBUG ? $build_constants['version'] : time();
 		$extension       = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '.js' : '.min.js';
 
 		$scripts_dir  = __DIR__ . '/scripts';
@@ -75,7 +77,7 @@ if ( ! function_exists( '{{PREFIX}}_register_package_scripts' ) ) {
 			{{PREFIX}}_override_script(
 				$scripts,
 				$script_data['handle'],
-				{{BASE_URL}} . '/scripts/' . $script_data['path'] . $extension,
+				$build_constants['build_url'] . 'scripts/' . $script_data['path'] . $extension,
 				$dependencies,
 				$version,
 				true

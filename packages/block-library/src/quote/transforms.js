@@ -2,10 +2,19 @@
  * WordPress dependencies
  */
 import { RichText } from '@wordpress/block-editor';
-import { createBlock } from '@wordpress/blocks';
+import { createBlock, switchToBlockType } from '@wordpress/blocks';
 
 const transforms = {
 	from: [
+		{
+			type: 'block',
+			blocks: [ 'core/verse' ],
+			transform: ( { content } ) => {
+				return createBlock( 'core/quote', {}, [
+					createBlock( 'core/paragraph', { content } ),
+				] );
+			},
+		},
 		{
 			type: 'block',
 			blocks: [ 'core/pullquote' ],
@@ -94,6 +103,41 @@ const transforms = {
 		},
 	],
 	to: [
+		{
+			type: 'block',
+			blocks: [ 'core/verse' ],
+			isMatch: ( {}, block ) => {
+				return block.innerBlocks.every( ( innerBlock ) => {
+					// Paragraphs are already in the target format
+					if ( innerBlock.name === 'core/paragraph' ) {
+						return true;
+					}
+					// Check if other blocks can be converted to paragraphs
+					const converted = switchToBlockType(
+						innerBlock,
+						'core/paragraph'
+					);
+					return converted !== null;
+				} );
+			},
+			transform: ( {}, innerBlocks ) => {
+				const paragraphs = innerBlocks.flatMap( ( innerBlock ) => {
+					// If already a paragraph, use it directly
+					if ( innerBlock.name === 'core/paragraph' ) {
+						return innerBlock;
+					}
+					// Otherwise convert to paragraph
+					return (
+						switchToBlockType( innerBlock, 'core/paragraph' ) || []
+					);
+				} );
+				const content = paragraphs
+					.map( ( { attributes } ) => attributes.content || '' )
+					.filter( Boolean )
+					.join( '<br>' );
+				return createBlock( 'core/verse', { content } );
+			},
+		},
 		{
 			type: 'block',
 			blocks: [ 'core/paragraph' ],

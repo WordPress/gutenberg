@@ -39,6 +39,7 @@ export default function useInspectorControlsTabs(
 		bindings: bindingsGroup,
 		border: borderGroup,
 		color: colorGroup,
+		content: contentGroup,
 		default: defaultGroup,
 		dimensions: dimensionsGroup,
 		list: listGroup,
@@ -51,6 +52,10 @@ export default function useInspectorControlsTabs(
 	// List View Tab: If there are any fills for the list group add that tab.
 	const listFills = useSlotFills( listGroup.name );
 	const hasListFills = !! listFills && listFills.length;
+
+	// Content Tab: If there are any fills for the content group add that tab.
+	const contentFills = useSlotFills( contentGroup.name );
+	const hasContentFills = !! contentFills && contentFills.length;
 
 	// Styles Tab: Add this tab if there are any fills for block supports
 	// e.g. border, color, spacing, typography, etc.
@@ -79,13 +84,15 @@ export default function useInspectorControlsTabs(
 		...( hasListFills && hasStyleFills > 1 ? advancedFills : [] ),
 	];
 
-	const hasContentTab = !! (
-		contentClientIds && contentClientIds.length > 0
-	);
+	const hasContentTab =
+		hasContentFills ||
+		!! ( contentClientIds && contentClientIds.length > 0 );
+
+	const hasListTab = hasListFills && ! isSectionBlock;
 
 	// Add the tabs in the order that they will default to if available.
 	// List View > Content > Settings > Styles.
-	if ( hasListFills && ! isSectionBlock ) {
+	if ( hasListTab ) {
 		tabs.push( TAB_LIST_VIEW );
 	}
 
@@ -93,7 +100,12 @@ export default function useInspectorControlsTabs(
 		tabs.push( TAB_CONTENT );
 	}
 
-	if ( settingsFills.length && ! isSectionBlock ) {
+	if (
+		( settingsFills.length ||
+			// Advanded fills who up in settings tab if available or they blend into the default tab, if there's only one tab.
+			( advancedFills.length && ( hasContentTab || hasListTab ) ) ) &&
+		! isSectionBlock
+	) {
 		tabs.push( TAB_SETTINGS );
 	}
 

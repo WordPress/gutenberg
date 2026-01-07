@@ -140,18 +140,20 @@
 	--wpds-font-family-heading: -apple-system, system-ui, 'Segoe UI', 'Roboto',
 		'Oxygen-Sans', 'Ubuntu', 'Cantarell', 'Helvetica Neue', sans-serif; /* Headings font family */
 	--wpds-font-family-mono: 'Menlo', 'Consolas', monaco, monospace; /* Monospace font family */
-	--wpds-font-line-height-2x-large: 40px; /* 2X large line height */
-	--wpds-font-line-height-large: 28px; /* Large line height */
-	--wpds-font-line-height-medium: 24px; /* Medium line height */
-	--wpds-font-line-height-small: 20px; /* Small line height */
-	--wpds-font-line-height-x-large: 32px; /* Extra large line height */
-	--wpds-font-line-height-x-small: 16px; /* Extra small line height */
-	--wpds-font-size-2x-large: 32px; /* 2X large font size */
-	--wpds-font-size-large: 15px; /* Large font size */
-	--wpds-font-size-medium: 13px; /* Medium font size */
-	--wpds-font-size-small: 12px; /* Small font size */
-	--wpds-font-size-x-large: 20px; /* Extra large font size */
-	--wpds-font-size-x-small: 11px; /* Extra small font size */
+	--wpds-font-line-height-2xl: 40px; /* 2X large line height */
+	--wpds-font-line-height-lg: 28px; /* Large line height */
+	--wpds-font-line-height-md: 24px; /* Medium line height */
+	--wpds-font-line-height-sm: 20px; /* Small line height */
+	--wpds-font-line-height-xl: 32px; /* Extra large line height */
+	--wpds-font-line-height-xs: 16px; /* Extra small line height */
+	--wpds-font-size-2xl: 32px; /* 2X large font size */
+	--wpds-font-size-lg: 15px; /* Large font size */
+	--wpds-font-size-md: 13px; /* Medium font size */
+	--wpds-font-size-sm: 12px; /* Small font size */
+	--wpds-font-size-xl: 20px; /* Extra large font size */
+	--wpds-font-size-xs: 11px; /* Extra small font size */
+	--wpds-font-weight-medium: 499; /* Medium font weight for emphasis and headings */
+	--wpds-font-weight-regular: 400; /* Regular font weight for body text */
 }
 
 [data-wpds-theme-provider-id][data-wpds-density='default'] {
