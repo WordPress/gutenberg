@@ -57,7 +57,7 @@ export default function Root() {
 	// Mobile sidebar state
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const layoutRef = useRef< HTMLDivElement | null >( null );
-	const surfacesRef = useRef< HTMLDivElement | null >( null );
+	const contentSurfacesRef = useRef< HTMLDivElement | null >( null );
 	const [ snackbarTarget, setSnackbarTarget ] =
 		useState< HTMLElement | null >( null );
 	const [ isMobileSidebarOpen, setIsMobileSidebarOpen ] = useState( false );
@@ -67,29 +67,32 @@ export default function Root() {
 		setIsMobileSidebarOpen( false );
 	}, [ location.pathname, isMobileViewport ] );
 
-	const isCanvasVisible = canvas && isFullScreen;
+	useLayoutEffect( () => {
+		const nextTarget =
+			isFullScreen || ! contentSurfacesRef.current
+				? layoutRef.current
+				: contentSurfacesRef.current;
+
+		if ( nextTarget && nextTarget !== snackbarTarget ) {
+			setSnackbarTarget( nextTarget );
+		}
+	}, [ isFullScreen, snackbarTarget ] );
+
+	const shouldSnackbarBeFixed = isFullScreen || ! contentSurfacesRef.current;
+
 	const snackbarList = snackbarTarget
 		? createPortal(
 				<SnackbarNotices
 					className={ clsx( 'boot-layout__snackbar', {
 						'boot-layout__snackbar--canvas-visible':
-							isCanvasVisible,
-						'boot-layout__snackbar--in-area': ! isCanvasVisible,
+							shouldSnackbarBeFixed,
+						'boot-layout__snackbar--in-area':
+							! shouldSnackbarBeFixed,
 					} ) }
 				/>,
 				snackbarTarget
 		  )
 		: null;
-
-	useLayoutEffect( () => {
-		const nextTarget = isCanvasVisible
-			? layoutRef.current
-			: surfacesRef.current ?? layoutRef.current;
-
-		if ( nextTarget && nextTarget !== snackbarTarget ) {
-			setSnackbarTarget( nextTarget );
-		}
-	}, [ isCanvasVisible, snackbarTarget ] );
 
 	return (
 		<SlotFillProvider>
@@ -175,7 +178,7 @@ export default function Root() {
 						) }
 						<div
 							className="boot-layout__surfaces"
-							ref={ surfacesRef }
+							ref={ contentSurfacesRef }
 						>
 							<UserThemeProvider color={ { bg: '#ffffff' } }>
 								<Outlet />

@@ -61,9 +61,9 @@ function Layout() {
 	const { canvas = 'view' } = query;
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const toggleRef = useRef();
-	const contentRef = useRef();
-	const contentAreaRef = useRef();
-	const editAreaRef = useRef();
+	const mainContentRef = useRef();
+	const contentSidebarRef = useRef();
+	const editSidebarRef = useRef();
 	const [ snackbarTarget, setSnackbarTarget ] = useState( null );
 	const navigateRegionsProps = useNavigateRegions();
 	const disableMotion = useReducedMotion();
@@ -95,22 +95,27 @@ function Layout() {
 	}, [ canvas ] );
 
 	const isFullCanvas = canvas === 'edit';
+	const shouldSnackbarBeFixed =
+		isFullCanvas ||
+		! ( contentSidebarRef.current ?? editSidebarRef.current );
 	useLayoutEffect( () => {
-		const areaTarget = contentAreaRef.current ?? editAreaRef.current;
-		const nextTarget = isFullCanvas ? contentRef.current : areaTarget;
+		const areaTarget = contentSidebarRef.current ?? editSidebarRef.current;
+		const nextTarget =
+			isFullCanvas || ! areaTarget ? mainContentRef.current : areaTarget;
 
 		if ( nextTarget && nextTarget !== snackbarTarget ) {
 			setSnackbarTarget( nextTarget );
 		}
-	}, [ isFullCanvas, !! areas.content, !! areas.edit, snackbarTarget ] );
+	}, [ isFullCanvas, snackbarTarget ] );
 
 	const snackbarList = snackbarTarget
 		? createPortal(
 				<SnackbarNotices
 					className={ clsx( 'edit-site-layout__snackbar', {
 						'edit-site-layout__snackbar--canvas-visible':
-							isFullCanvas,
-						'edit-site-layout__snackbar--in-area': ! isFullCanvas,
+							shouldSnackbarBeFixed,
+						'edit-site-layout__snackbar--in-area':
+							! shouldSnackbarBeFixed,
 					} ) }
 				/>,
 				snackbarTarget
@@ -133,7 +138,10 @@ function Layout() {
 					}
 				) }
 			>
-				<div className="edit-site-layout__content" ref={ contentRef }>
+				<div
+					className="edit-site-layout__content"
+					ref={ mainContentRef }
+				>
 					{ /*
 						The NavigableRegion must always be rendered and not use
 						`inert` otherwise `useNavigateRegions` will fail.
@@ -220,7 +228,7 @@ function Layout() {
 						canvas !== 'edit' && (
 							<div
 								className="edit-site-layout__area"
-								ref={ contentAreaRef }
+								ref={ contentSidebarRef }
 								style={ {
 									maxWidth: widths?.content,
 								} }
@@ -232,7 +240,7 @@ function Layout() {
 					{ ! isMobileViewport && areas.edit && canvas !== 'edit' && (
 						<div
 							className="edit-site-layout__area"
-							ref={ editAreaRef }
+							ref={ editSidebarRef }
 							style={ {
 								maxWidth: widths?.edit,
 							} }
