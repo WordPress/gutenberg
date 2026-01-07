@@ -20,14 +20,12 @@
 	}
 
 	.outset-ring--focus:focus,
-	.outset-ring--focus-except-active:focus:not( :active ),
+	.outset-ring--focus-except-active:focus:not(:active),
 	.outset-ring--focus-visible:focus-visible,
 	.outset-ring--focus-within:focus-within,
-	.outset-ring--focus-within-except-active:focus-within:not(
-			:has( :active )
-		),
-	.outset-ring--focus-within-visible:focus-within:has( :focus-visible ) {
-		outline-width: var( --wpds-border-width-focus );
-		outline-color: var( --wpds-color-stroke-focus-brand );
+	.outset-ring--focus-within-except-active:focus-within:not(:has(:active)),
+	.outset-ring--focus-within-visible:focus-within:has(:focus-visible) {
+		outline-width: var(--wpds-border-width-interactive-focus);
+		outline-color: var(--wpds-color-stroke-focus-brand);
 	}
 }
