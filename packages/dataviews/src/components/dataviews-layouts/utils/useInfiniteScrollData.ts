@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useState, useCallback, useEffect, useRef } from '@wordpress/element';
+import { useState, useEffect, useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -10,7 +10,6 @@ import type { View } from '../../../types';
 
 interface UseInfiniteScrollDataParams< Item > {
 	view: View;
-	setView: ( view: View ) => void;
 	data: Item[];
 	getItemId: ( item: Item ) => string;
 	totalDataLength: number;
@@ -21,11 +20,8 @@ interface UseInfiniteScrollDataResult< Item > {
 	paginationInfo: {
 		totalItems: number;
 		totalPages: number;
-		infiniteScrollHandler?: ( direction: 'up' | 'down' ) => void;
 		setVisibleEntries?: React.Dispatch< React.SetStateAction< number[] > >;
 	};
-	isLoadingMore: boolean;
-	hasMoreData: boolean;
 }
 
 /**
@@ -39,7 +35,6 @@ interface UseInfiniteScrollDataResult< Item > {
  *
  * @param params                 - Configuration parameters
  * @param params.view            - Current view configuration
- * @param params.setView         - Function to update the view
  * @param params.data            - Current page of data
  * @param params.getItemId       - Function to extract item ID
  * @param params.totalDataLength - Total number of items in the dataset
@@ -47,7 +42,6 @@ interface UseInfiniteScrollDataResult< Item > {
  */
 export function useInfiniteScrollData< Item extends { id: number } >( {
 	view,
-	setView,
 	data: shownData,
 	getItemId,
 	totalDataLength,
@@ -56,10 +50,6 @@ export function useInfiniteScrollData< Item extends { id: number } >( {
 	const [ allLoadedRecords, setAllLoadedRecords ] = useState<
 		( Item | null )[]
 	>( [] );
-	const [ isLoadingMore, setIsLoadingMore ] = useState( false );
-	const [ scrollDirection, setScrollDirection ] = useState<
-		'up' | 'down' | undefined
-	>( undefined );
 
 	const [ visibleEntries, setVisibleEntries ] = useState< number[] >( [] );
 
@@ -73,42 +63,27 @@ export function useInfiniteScrollData< Item extends { id: number } >( {
 
 	const totalItems = totalDataLength;
 	const totalPages = Math.ceil( totalItems / ( view.perPage || 10 ) );
-	const currentPage = view.page || 1;
-	const hasMoreData = currentPage < totalPages;
 
-	const infiniteScrollHandler = useCallback(
-		( direction: 'up' | 'down' ) => {
-			if ( isLoadingMore ) {
-				return;
-			}
+	// Determine scroll direction based on position changes
+	const scrollDirectionRef = useRef< 'up' | 'down' | undefined >( undefined );
+	const prevStartPositionRef = useRef< number | undefined >( undefined );
 
-			// Handle scrolling down to load next page
-			if ( direction === 'down' && currentPage < totalPages ) {
-				setIsLoadingMore( true );
-				setScrollDirection( 'down' );
-				setView( {
-					...view,
-					page: currentPage + 1,
-				} );
-			}
-
-			// Handle scrolling up to load previous page
-			if ( direction === 'up' && currentPage > 1 ) {
-				setIsLoadingMore( true );
-				setScrollDirection( 'up' );
-				setView( {
-					...view,
-					page: currentPage - 1,
-				} );
-			}
-		},
-		[ isLoadingMore, currentPage, totalPages, view, setView ]
-	);
+	if (
+		view.startPosition !== undefined &&
+		prevStartPositionRef.current !== undefined
+	) {
+		if ( view.startPosition < prevStartPositionRef.current ) {
+			scrollDirectionRef.current = 'up';
+		} else if ( view.startPosition > prevStartPositionRef.current ) {
+			scrollDirectionRef.current = 'down';
+		}
+	}
+	prevStartPositionRef.current = view.startPosition;
 
 	// Initialize data on first load or when view changes significantly
 	useEffect( () => {
 		if (
-			( currentPage === 1 && ! allLoadedRecords.length ) ||
+			( view.startPosition === undefined && ! allLoadedRecords.length ) ||
 			! view.infiniteScrollEnabled
 		) {
 			// First page - replace all data and initialize range
@@ -120,7 +95,10 @@ export function useInfiniteScrollData< Item extends { id: number } >( {
 				if ( position !== undefined ) {
 					positionMapRef.current.set( getItemId( record ), position );
 				}
-				return record;
+				return {
+					...record,
+					position,
+				};
 			} );
 			setAllLoadedRecords( records );
 
@@ -187,6 +165,7 @@ export function useInfiniteScrollData< Item extends { id: number } >( {
 				}
 
 				// Update the loaded range
+				const scrollDirection = scrollDirectionRef.current;
 				const allRecords =
 					scrollDirection === 'up'
 						? [ ...newRecords, ...prev ]
@@ -223,7 +202,7 @@ export function useInfiniteScrollData< Item extends { id: number } >( {
 					const visibleMax = Math.max( ...visibleEntries );
 					// Buffer size balances allowing new items to render (when prepended
 					// during scroll up) while unloading items no longer on screen
-					const buffer = 9;
+					const buffer = 6;
 
 					const filtered = result
 						.map( ( record, index ) => {
@@ -255,20 +234,15 @@ export function useInfiniteScrollData< Item extends { id: number } >( {
 				return result.filter( ( r ) => r !== null );
 			} );
 		}
-		setIsLoadingMore( false );
-		// Reset scroll direction after processing to allow filtering on next update
-		if ( scrollDirection !== undefined ) {
-			setScrollDirection( undefined );
-		}
 	}, [
 		shownData,
 		view.search,
 		view.filters,
 		view.perPage,
-		currentPage,
+		view.startPosition,
+		view.endPosition,
 		view.infiniteScrollEnabled,
 		allLoadedRecords.length,
-		scrollDirection,
 		visibleEntries,
 		getItemId,
 	] );
@@ -276,7 +250,6 @@ export function useInfiniteScrollData< Item extends { id: number } >( {
 	const paginationInfo = {
 		totalItems,
 		totalPages,
-		infiniteScrollHandler,
 		setVisibleEntries,
 	};
 
@@ -288,7 +261,5 @@ export function useInfiniteScrollData< Item extends { id: number } >( {
 	return {
 		data: displayData,
 		paginationInfo,
-		isLoadingMore,
-		hasMoreData,
 	};
 }

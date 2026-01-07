@@ -57,7 +57,6 @@ type DataViewsContextType< Item > = {
 	config: { perPageSizes: number[] };
 	empty?: ReactNode;
 	hasInitiallyLoaded?: boolean;
-	hasInfiniteScrollHandler: boolean;
 	itemListLabel?: string;
 	onReset?: ( () => void ) | false;
 	intersectionObserverCallback?: IntersectionObserverCallback;
@@ -87,7 +86,6 @@ const DataViewsContext = createContext< DataViewsContextType< any > >( {
 	isShowingFilter: false,
 	setIsShowingFilter: () => {},
 	hasInitiallyLoaded: false,
-	hasInfiniteScrollHandler: false,
 	config: {
 		perPageSizes: [],
 	},

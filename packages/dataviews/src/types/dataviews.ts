@@ -203,6 +203,18 @@ interface ViewBase {
 	 * Whether infinite scroll is enabled.
 	 */
 	infiniteScrollEnabled?: boolean;
+
+	/**
+	 * The start position for infinite scroll (1-indexed).
+	 * Used when infiniteScrollEnabled is true.
+	 */
+	startPosition?: number;
+
+	/**
+	 * The end position for infinite scroll (1-indexed).
+	 * Used when infiniteScrollEnabled is true.
+	 */
+	endPosition?: number;
 }
 
 export interface ColumnStyle {
