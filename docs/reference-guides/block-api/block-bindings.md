@@ -104,7 +104,7 @@ The `core/post-data` source provides access to post data fields.
 		"bindings":{
 			"content":{
 				"source":"core/post-data",
-				"args":{"key":"date"}
+				"args":{"field":"date"}
 			}
 		}
 	}
