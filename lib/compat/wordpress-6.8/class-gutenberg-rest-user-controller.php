@@ -34,9 +34,7 @@ function gutenberg_modify_user_query_args( $prepared_args, $request ) {
 		$search_columns = $request->get_param( 'search_columns' );
 
 		// Validate search columns
-		$valid_columns          = isset( $prepared_args['search_columns'] )
-			? $prepared_args['search_columns']
-			: array( 'ID', 'user_login', 'user_nicename', 'user_email', 'user_url', 'display_name' );
+		$valid_columns          = $prepared_args['search_columns'] ?? array( 'ID', 'user_login', 'user_nicename', 'user_email', 'user_url', 'display_name' );
 		$search_columns_mapping = array(
 			'id'       => 'ID',
 			'username' => 'user_login',

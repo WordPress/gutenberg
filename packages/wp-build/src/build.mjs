@@ -471,7 +471,6 @@ async function bundlePackage( packageName, options = {} ) {
 	if ( packageJson.wpScript ) {
 		const buildStyleDir = path.join( packageDir, 'build-style' );
 		const outputDir = path.join( BUILD_DIR, 'styles', packageName );
-		const isProduction = process.env.NODE_ENV === 'production';
 
 		const cssFiles = await glob(
 			normalizePath( path.join( buildStyleDir, '**/*.css' ) )
@@ -487,36 +486,39 @@ async function bundlePackage( packageName, options = {} ) {
 				hasMainStyle = true;
 			}
 
-			if ( isProduction ) {
-				builds.push(
-					( async () => {
-						await mkdir( destDir, { recursive: true } );
-						const content = await readFile( cssFile, 'utf8' );
-						const result = await postcss( [
-							cssnano( {
-								preset: [
-									'default',
-									{
-										discardComments: {
-											removeAll: true,
-										},
+			// Generate minified path: style.css -> style.min.css, style-rtl.css -> style-rtl.min.css
+			const minifiedPath = destPath.replace( /\.css$/, '.min.css' );
+
+			// Always produce both versions (like JavaScript does):
+			// 1. Non-minified version (for SCRIPT_DEBUG=true)
+			// 2. Minified version (for SCRIPT_DEBUG=false)
+			builds.push(
+				( async () => {
+					await mkdir( destDir, { recursive: true } );
+					const content = await readFile( cssFile, 'utf8' );
+
+					// Write non-minified version
+					await writeFile( destPath, content );
+
+					// Write minified version
+					const result = await postcss( [
+						cssnano( {
+							preset: [
+								'default',
+								{
+									discardComments: {
+										removeAll: true,
 									},
-								],
-							} ),
-						] ).process( content, {
-							from: cssFile,
-							to: destPath,
-						} );
-						await writeFile( destPath, result.css );
-					} )()
-				);
-			} else {
-				builds.push(
-					mkdir( destDir, { recursive: true } ).then( () =>
-						copyFile( cssFile, destPath )
-					)
-				);
-			}
+								},
+							],
+						} ),
+					] ).process( content, {
+						from: cssFile,
+						to: minifiedPath,
+					} );
+					await writeFile( minifiedPath, result.css );
+				} )()
+			);
 		}
 	}
 

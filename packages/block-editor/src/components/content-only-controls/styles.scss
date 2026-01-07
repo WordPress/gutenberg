@@ -42,3 +42,11 @@
 	padding: $grid-unit-10 0;
 	margin-bottom: $grid-unit-05;
 }
+
+.block-editor-content-only-controls__fields-header-icon {
+	flex: 0 0 $icon-size;
+}
+
+.block-editor-content-only-controls__fields-header-title {
+	flex: 1;
+}
