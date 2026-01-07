@@ -13,10 +13,10 @@ import { cog } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import { Button } from './index';
+import { Button } from '../index';
 
 const meta: Meta< typeof Button > = {
-	title: 'Design System/Button',
+	title: 'Design System/Components/Button',
 	component: Button,
 };
 export default meta;
