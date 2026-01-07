@@ -13,11 +13,6 @@ import { createHigherOrderComponent } from '@wordpress/compose';
 import { addFilter } from '@wordpress/hooks';
 
 /**
- * External dependencies
- */
-import clsx from 'clsx';
-
-/**
  * Internal dependencies
  */
 import {
