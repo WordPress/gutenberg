@@ -307,15 +307,15 @@ function BlockFields( { clientId, blockType, attributes, setAttributes } ) {
 	}
 
 	return (
-		<div className="block-editor-content-only-controls__fields-container">
-			<div className="block-editor-content-only-controls__fields-header">
+		<div className="block-editor-block-fields__container">
+			<div className="block-editor-block-fields__header">
 				<HStack spacing={ 1 }>
 					<BlockIcon
-						className="block-editor-content-only-controls__fields-header-icon"
+						className="block-editor-block-fields__header-icon"
 						icon={ blockInformation?.icon }
 					/>
 					<Truncate
-						className="block-editor-content-only-controls__fields-header-title"
+						className="block-editor-block-fields__header-title"
 						numberOfLines={ 1 }
 					>
 						{ blockTitle }

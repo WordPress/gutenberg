@@ -4,7 +4,7 @@
 @use "./media/styles.scss" as *;
 @use "./rich-text/styles.scss" as *;
 
-.block-editor-content-only-controls__fields-container {
+.block-editor-block-fields__container {
 	padding: 0 $grid-unit-20;
 
 	&:first-of-type {
@@ -19,15 +19,15 @@
 	}
 }
 
-.block-editor-content-only-controls__fields-header {
+.block-editor-block-fields__header {
 	padding: $grid-unit-10 0;
 	margin-bottom: $grid-unit-05;
 }
 
-.block-editor-content-only-controls__fields-header-icon {
+.block-editor-block-fields__header-icon {
 	flex: 0 0 $icon-size;
 }
 
-.block-editor-content-only-controls__fields-header-title {
+.block-editor-block-fields__header-title {
 	flex: 1;
 }
