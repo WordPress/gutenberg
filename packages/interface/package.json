@@ -31,12 +31,11 @@
 		"build-types",
 		"*.md"
 	],
-	"type": "module",
 	"main": "build/index.cjs",
-	"module": "build-module/index.js",
+	"module": "build-module/index.mjs",
 	"exports": {
 		".": {
-			"import": "./build-module/index.js",
+			"import": "./build-module/index.mjs",
 			"require": "./build/index.cjs"
 		},
 		"./package.json": "./package.json",
@@ -50,8 +49,8 @@
 		"src/store/index.js",
 		"build/index.cjs",
 		"build/store/index.cjs",
-		"build-module/index.js",
-		"build-module/store/index.js"
+		"build-module/index.mjs",
+		"build-module/store/index.mjs"
 	],
 	"dependencies": {
 		"@wordpress/a11y": "file:../a11y",

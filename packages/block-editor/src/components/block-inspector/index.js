@@ -29,6 +29,7 @@ import PositionControls from '../inspector-controls-tabs/position-controls-panel
 import useBlockInspectorAnimationSettings from './useBlockInspectorAnimationSettings';
 import { useBorderPanelLabel } from '../../hooks/border';
 import ContentTab from '../inspector-controls-tabs/content-tab';
+import BlockVisibilityInfo from '../block-visibility/block-visibility-info';
 import { unlock } from '../../lock-unlock';
 
 function StyleInspectorSlots( {
@@ -354,6 +355,7 @@ const BlockInspectorSingleBlock = ( {
 				isChild={ hasParentChildBlockCards }
 				clientId={ renderedBlockClientId }
 			/>
+			<BlockVisibilityInfo clientId={ renderedBlockClientId } />
 			{ window?.__experimentalContentOnlyPatternInsertion && (
 				<EditContents clientId={ renderedBlockClientId } />
 			) }
@@ -373,10 +375,8 @@ const BlockInspectorSingleBlock = ( {
 					{ hasBlockStyles && (
 						<BlockStyles clientId={ renderedBlockClientId } />
 					) }
-					<ContentTab
-						rootClientId={ renderedBlockClientId }
-						contentClientIds={ contentClientIds }
-					/>
+					<ContentTab contentClientIds={ contentClientIds } />
+					<InspectorControls.Slot group="content" />
 					{ ! isSectionBlock && (
 						<StyleInspectorSlots
 							blockName={ blockName }

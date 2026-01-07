@@ -154,7 +154,7 @@ In this declarative example, the UI automatically updates based on the current s
 
 ### Can you spot the bug?
 
-In the imperative example, a bug has been intentionally introduced for didactical purposes. Can you find it? It's not easy!
+In the imperative example, a bug has been intentionally introduced for didactic purposes. Can you find it? It's not easy!
 
 <details>
 <summary>Show me the answer!</summary>

@@ -14,6 +14,10 @@ define( 'IS_GUTENBERG_PLUGIN', true );
 require_once __DIR__ . '/init.php';
 require_once __DIR__ . '/upgrade.php';
 
+// Clear Core's routes before Gutenberg's build/index.php registers its own.
+// This must be loaded before build/index.php to ensure correct action ordering.
+require_once __DIR__ . '/clear-core-routes.php';
+
 // Load auto-generated build registration.
 $build_registration = plugin_dir_path( __DIR__ ) . 'build/index.php';
 if ( file_exists( $build_registration ) ) {

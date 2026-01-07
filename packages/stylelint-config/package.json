@@ -42,6 +42,7 @@
 	},
 	"dependencies": {
 		"@stylistic/stylelint-plugin": "^3.0.1",
+		"@wordpress/theme": "file:../theme",
 		"stylelint-config-recommended": "^14.0.1",
 		"stylelint-config-recommended-scss": "^14.1.0"
 	},
