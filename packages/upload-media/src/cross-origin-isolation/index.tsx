@@ -17,10 +17,12 @@ function forceCrossOrigin( _imgCrossOrigin: CrossOriginValue, _url: string ) {
 }
 
 function addAttribute( el: Element ) {
+	// Add the crossorigin attribute if missing.
 	if ( ! el.hasAttribute( 'crossorigin' ) ) {
 		el.setAttribute( 'crossorigin', 'anonymous' );
 	}
 
+	// For iframes, add the credentialless attribute.
 	if ( el.nodeName === 'IFRAME' && ! el.hasAttribute( 'credentialless' ) ) {
 		// Do not modify the iframed editor canvas.
 		if ( el.getAttribute( 'src' )?.startsWith( 'blob:' ) ) {
@@ -29,6 +31,7 @@ function addAttribute( el: Element ) {
 
 		el.setAttribute( 'credentialless', 'true' );
 
+		// Reload the iframe to ensure the new attribute is taken into account.
 		if ( ! el.hasAttribute( 'src' ) ) {
 			el.setAttribute( 'src', '' );
 		} else {
@@ -41,6 +44,7 @@ function addAttribute( el: Element ) {
 	}
 }
 
+// Only apply the filter and mutation observer if the site is cross-origin isolated.
 if ( window.crossOriginIsolated ) {
 	addFilter(
 		'media.crossOrigin',
