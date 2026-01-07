@@ -55,7 +55,12 @@
 				"text": true
 			}
 		},
-		"dimensions": false,
+		"dimensions": {
+			"aspectRatio": false,
+			"height": false,
+			"minHeight": false,
+			"width": false
+		},
 		"layout": {
 			"default": {
 				"type": "flex",

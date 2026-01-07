@@ -20,7 +20,12 @@
 		"html": false,
 		"reusable": false,
 		"lock": false,
-		"dimensions": false,
+		"dimensions": {
+			"aspectRatio": false,
+			"height": false,
+			"minHeight": false,
+			"width": false
+		},
 		"spacing": {
 			"blockGap": false,
 			"padding": true,
