@@ -5,18 +5,20 @@ import { addFilter } from '@wordpress/hooks';
 import { createHigherOrderComponent } from '@wordpress/compose';
 
 /**
- * Internal dependencies
+ * Forces crossorigin attribute to 'anonymous' for media elements.
+ *
+ * @return {string} The crossorigin value.
  */
-import type { MediaPanelProps } from '../types';
-
-type CrossOriginValue = 'anonymous' | 'use-credentials' | '' | undefined;
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-function forceCrossOrigin( _imgCrossOrigin: CrossOriginValue, _url: string ) {
-	return 'anonymous' as CrossOriginValue;
+function forceCrossOrigin() {
+	return 'anonymous';
 }
 
-function addAttribute( el: Element ) {
+/**
+ * Adds crossorigin and credentialless attributes to elements as needed.
+ *
+ * @param {Element} el The element to modify.
+ */
+function addAttribute( el ) {
 	// Add the crossorigin attribute if missing.
 	if ( ! el.hasAttribute( 'crossorigin' ) ) {
 		el.setAttribute( 'crossorigin', 'anonymous' );
@@ -57,12 +59,13 @@ if ( window.crossOriginIsolated ) {
 	 * that detects dynamically added DOM nodes that are missing the `crossorigin` attribute.
 	 * These are typically found in custom meta boxes and the WordPress admin bar.
 	 */
-	const observer = new MutationObserver( ( mutations ) => {
+	const observer = new window.MutationObserver( ( mutations ) => {
 		mutations.forEach( ( mutation ) => {
 			[ mutation.addedNodes, mutation.target ].forEach( ( value ) => {
-				const nodes = value instanceof NodeList ? value : [ value ];
+				const nodes =
+					value instanceof window.NodeList ? value : [ value ];
 				nodes.forEach( ( node ) => {
-					const el: HTMLElement = node as HTMLElement;
+					const el = node;
 
 					if ( ! el.querySelectorAll ) {
 						// Most likely a text node.
@@ -76,8 +79,7 @@ if ( window.crossOriginIsolated ) {
 					} );
 
 					if ( el.nodeName === 'IFRAME' ) {
-						const iframeNode: HTMLIFrameElement =
-							el as HTMLIFrameElement;
+						const iframeNode = el;
 
 						/*
 						 * If for example embedding a tweet, it should be loaded
@@ -132,10 +134,10 @@ if ( window.crossOriginIsolated ) {
 
 const supportsCredentialless =
 	window.crossOriginIsolated &&
-	'credentialless' in HTMLIFrameElement.prototype;
+	'credentialless' in window.HTMLIFrameElement.prototype;
 
 const disableEmbedPreviews = createHigherOrderComponent(
-	( BlockEdit ) => ( props: MediaPanelProps ) => {
+	( BlockEdit ) => ( props ) => {
 		if ( 'core/embed' !== props.name ) {
 			return <BlockEdit { ...props } />;
 		}
