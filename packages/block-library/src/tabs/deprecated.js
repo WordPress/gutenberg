@@ -6,6 +6,8 @@ import { createBlock } from '@wordpress/blocks';
 
 /**
  * The old attributes before restructuring.
+ * Maintain during experimental phase to allow for migration.
+ * @TODO: Should be removed after the experimental phase before release into main block library.
  */
 const v1Attributes = {
 	tabsId: {

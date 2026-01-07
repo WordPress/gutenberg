@@ -54,7 +54,8 @@
 				"__experimentalFontFamily": true
 			},
 			"__experimentalSkipSerialization": true
-		}
+		},
+		"renaming": true
 	},
 	"providesContext": {
 		"core/tab-label": "label"
