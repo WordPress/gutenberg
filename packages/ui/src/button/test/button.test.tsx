@@ -1,8 +1,8 @@
 /**
  * External dependencies
  */
-import { createRef } from 'react';
 import { render } from '@testing-library/react';
+import { createRef } from '@wordpress/element';
 import userEvent from '@testing-library/user-event';
 
 /**

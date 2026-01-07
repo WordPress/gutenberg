@@ -1,8 +1,8 @@
 /**
  * External dependencies
  */
-import { forwardRef, useEffect } from 'react';
 import { Button as AriakitButton } from '@ariakit/react';
+import { forwardRef, useEffect } from '@wordpress/element';
 import clsx from 'clsx';
 
 /**

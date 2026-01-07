@@ -1,8 +1,8 @@
 /**
  * External dependencies
  */
-import { Fragment, useState } from 'react';
-import type { Meta, StoryObj } from '@storybook/react-vite';
+import { Fragment, useState } from '@wordpress/element';
+import type { Meta, StoryObj } from '@storybook/react-webpack5';
 
 /**
  * WordPress dependencies
