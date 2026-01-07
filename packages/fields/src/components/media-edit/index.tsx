@@ -7,6 +7,7 @@ import {
 	__experimentalText as Text,
 	__experimentalTruncate as Truncate,
 	__experimentalVStack as VStack,
+	BaseControl,
 	Tooltip,
 	VisuallyHidden,
 } from '@wordpress/components';
@@ -162,12 +163,13 @@ function MediaPreview( {
  *
  * @template Item - The type of the item being edited.
  *
- * @param {MediaEditProps<Item>} props                - The component props.
- * @param {Item}                 props.data           - The item being edited.
- * @param {Object}               props.field          - The field configuration with getValue and setValue methods.
- * @param {Function}             props.onChange       - Callback function when the media selection changes.
- * @param {string[]}             [props.allowedTypes] - Array of allowed media types. Default `['image']`.
- * @param {boolean}              [props.multiple]     - Whether to allow multiple media selections. Default `false`.
+ * @param {MediaEditProps<Item>} props                       - The component props.
+ * @param {Item}                 props.data                  - The item being edited.
+ * @param {Object}               props.field                 - The field configuration with getValue and setValue methods.
+ * @param {Function}             props.onChange              - Callback function when the media selection changes.
+ * @param {string[]}             [props.allowedTypes]        - Array of allowed media types. Default `['image']`.
+ * @param {boolean}              [props.multiple]            - Whether to allow multiple media selections. Default `false`.
+ * @param {boolean}              [props.hideLabelFromVision] - Whether the label should be hidden from vision.
  *
  * @return {JSX.Element} The media edit control component.
  *
@@ -193,6 +195,7 @@ export default function MediaEdit< Item >( {
 	data,
 	field,
 	onChange,
+	hideLabelFromVision,
 	allowedTypes = [ 'image' ],
 	multiple,
 }: MediaEditProps< Item > ) {
@@ -243,9 +246,16 @@ export default function MediaEdit< Item >( {
 						: field.placeholder || __( 'Choose file' );
 					return (
 						<VStack spacing={ 2 }>
-							<VisuallyHidden as="label">
-								{ field.label }
-							</VisuallyHidden>
+							{ field.label &&
+								( hideLabelFromVision ? (
+									<VisuallyHidden as="legend">
+										{ field.label }
+									</VisuallyHidden>
+								) : (
+									<BaseControl.VisualLabel as="legend">
+										{ field.label }
+									</BaseControl.VisualLabel>
+								) ) }
 							{ !! attachments?.length && (
 								<VStack spacing={ 2 }>
 									{ attachments.map( ( attachment ) => (

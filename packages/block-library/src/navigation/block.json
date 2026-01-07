@@ -106,6 +106,7 @@
 		"maxNestingLevel": "maxNestingLevel"
 	},
 	"supports": {
+		"anchor": true,
 		"align": [ "wide", "full" ],
 		"ariaLabel": true,
 		"contentRole": true,

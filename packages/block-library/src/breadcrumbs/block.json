@@ -30,6 +30,7 @@
 	},
 	"usesContext": [ "postId", "postType", "templateSlug" ],
 	"supports": {
+		"anchor": true,
 		"html": false,
 		"align": [ "wide", "full" ],
 		"spacing": {

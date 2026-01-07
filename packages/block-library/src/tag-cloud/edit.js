@@ -6,28 +6,30 @@ import {
 	FlexItem,
 	ToggleControl,
 	SelectControl,
+	Spinner,
 	RangeControl,
 	__experimentalUnitControl as UnitControl,
 	__experimentalUseCustomUnits as useCustomUnits,
 	__experimentalParseQuantityAndUnitFromRawValue as parseQuantityAndUnitFromRawValue,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
-	Disabled,
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import {
 	InspectorControls,
 	useBlockProps,
 	useSettings,
 } from '@wordpress/block-editor';
-import ServerSideRender from '@wordpress/server-side-render';
 import { store as coreStore } from '@wordpress/core-data';
+import { useServerSideRender } from '@wordpress/server-side-render';
+import { useDisabled } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
+import HtmlRenderer from '../utils/html-renderer';
 
 /**
  * Minimum number of tags a user can show using this block.
@@ -46,7 +48,7 @@ const MAX_TAGS = 100;
 const MIN_FONT_SIZE = 0.1;
 const MAX_FONT_SIZE = 100;
 
-function TagCloudEdit( { attributes, setAttributes } ) {
+function TagCloudEdit( { attributes, setAttributes, name } ) {
 	const {
 		taxonomy,
 		showTagCounts,
@@ -111,15 +113,6 @@ function TagCloudEdit( { attributes, setAttributes } ) {
 			}
 		} );
 		setAttributes( updateObj );
-	};
-
-	// Remove border styles from the server-side attributes to prevent duplicate border.
-	const serverSideAttributes = {
-		...attributes,
-		style: {
-			...attributes?.style,
-			border: undefined,
-		},
 	};
 
 	const inspectorControls = (
@@ -241,18 +234,37 @@ function TagCloudEdit( { attributes, setAttributes } ) {
 		</InspectorControls>
 	);
 
+	const { content, status, error } = useServerSideRender( {
+		attributes,
+		skipBlockSupportAttributes: true,
+		block: name,
+	} );
+
+	const disabledRef = useDisabled();
+	const blockProps = useBlockProps( { ref: disabledRef } );
+
 	return (
 		<>
 			{ inspectorControls }
-			<div { ...useBlockProps() }>
-				<Disabled>
-					<ServerSideRender
-						skipBlockSupportAttributes
-						block="core/tag-cloud"
-						attributes={ serverSideAttributes }
-					/>
-				</Disabled>
-			</div>
+			{ status === 'loading' && (
+				<div { ...blockProps }>
+					<Spinner />
+				</div>
+			) }
+			{ status === 'error' && (
+				<div { ...blockProps }>
+					<p>
+						{ sprintf(
+							/* translators: %s: error message returned when rendering the block. */
+							__( 'Error: %s' ),
+							error
+						) }
+					</p>
+				</div>
+			) }
+			{ status === 'success' && (
+				<HtmlRenderer wrapperProps={ blockProps } html={ content } />
+			) }
 		</>
 	);
 }

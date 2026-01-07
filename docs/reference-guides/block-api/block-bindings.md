@@ -23,7 +23,7 @@ An example could be connecting an Image block `url` attribute to a function that
 
 ## Compatible blocks and their attributes
 
-Right now, not all block attributes are compatible with block bindings. There is some ongoing effort to increase this compatibility, but for now, this is the list:
+Right now, not all block attributes are compatible with block bindings. There is some ongoing effort to increase this compatibility, but for now, this is the default list:
 
 | Supported Blocks    | Supported Attributes       |
 | ----------------    | --------------------       |
@@ -31,6 +31,117 @@ Right now, not all block attributes are compatible with block bindings. There is
 | Heading             | content                    |
 | Image               | id, url, title, alt        |
 | Button              | text, url, linkTarget, rel |
+
+### Extending supported attributes
+
+_**Note:** Since WordPress 6.9._
+
+Developers can extend the list of supported attributes using the `block_bindings_supported_attributes` filter. This filter allows adding support for additional block attributes.
+
+There are two filters available:
+
+- `block_bindings_supported_attributes`: A general filter that receives the supported attributes array and the block type name.
+- `block_bindings_supported_attributes_{$block_type}`: A dynamic filter specific to a block type (e.g., `block_bindings_supported_attributes_core/image`).
+
+Example of adding support for the `caption` attribute on the Image block:
+
+```php
+add_filter(
+	'block_bindings_supported_attributes_core/image',
+	function ( $supported_attributes ) {
+		$supported_attributes[] = 'caption';
+		return $supported_attributes;
+	}
+);
+```
+
+Example of adding support for a custom block:
+
+```php
+add_filter(
+	'block_bindings_supported_attributes_my-plugin/my-block',
+	function ( $supported_attributes ) {
+		$supported_attributes[] = 'title';
+		$supported_attributes[] = 'description';
+		return $supported_attributes;
+	}
+);
+```
+
+This filter also affects which blocks and attributes are available for Pattern Overrides, as both features share the same underlying supported attributes configuration.
+
+### Accessing Pattern Override values in dynamic blocks
+
+When creating a dynamic block that supports Pattern Overrides, you can access the override values within your `render_callback` function. The Pattern block (`core/block`) provides override values to nested blocks via the `pattern/overrides` context.
+
+**Step 1: Register your block with the required context and supported attributes**
+
+```php
+add_action( 'init', function() {
+	// Register supported attributes for pattern overrides
+	add_filter(
+		'block_bindings_supported_attributes_my-plugin/my-block',
+		function ( $supported_attributes ) {
+			$supported_attributes[] = 'title';
+			$supported_attributes[] = 'description';
+			return $supported_attributes;
+		}
+	);
+
+	register_block_type( 'my-plugin/my-block', array(
+		'attributes'   => array(
+			'title'       => array( 'type' => 'string', 'default' => '' ),
+			'description' => array( 'type' => 'string', 'default' => '' ),
+			'metadata'    => array( 'type' => 'object' ),
+		),
+		// Declare that you need the pattern/overrides context
+		'uses_context'    => array( 'pattern/overrides' ),
+		'render_callback' => 'my_block_render_callback',
+	) );
+} );
+```
+
+**Step 2: Access override values in your render callback**
+
+The override values are stored in `$block->context['pattern/overrides']` as an associative array. The keys are block metadata names (assigned when enabling overrides), and the values are arrays of attribute overrides.
+
+```php
+function my_block_render_callback( $attributes, $content, $block ) {
+	// Get the block's metadata name (set when enabling overrides)
+	$block_name = $attributes['metadata']['name'] ?? null;
+
+	// Get the pattern overrides from context
+	$overrides = array();
+	if ( $block_name && isset( $block->context['pattern/overrides'][ $block_name ] ) ) {
+		$overrides = $block->context['pattern/overrides'][ $block_name ];
+	}
+
+	// Get attribute values, preferring overrides when available
+	// Note: An empty string in overrides means "reset to default"
+	$title = $attributes['title'];
+	if ( isset( $overrides['title'] ) && $overrides['title'] !== '' ) {
+		$title = $overrides['title'];
+	}
+
+	$description = $attributes['description'];
+	if ( isset( $overrides['description'] ) && $overrides['description'] !== '' ) {
+		$description = $overrides['description'];
+	}
+
+	return sprintf(
+		'<div class="my-block"><h3>%s</h3><p>%s</p></div>',
+		esc_html( $title ),
+		esc_html( $description )
+	);
+}
+```
+
+**Key points to keep in mind:**
+
+- **`uses_context`**: Your block must declare `pattern/overrides` in its `uses_context` to receive override data from parent Pattern blocks.
+- **Block metadata name**: Each overridable block instance has a unique name stored in `$attributes['metadata']['name']`. This name is assigned when the user enables overrides on the block in the editor.
+- **Empty string convention**: An empty string (`""`) in the overrides represents a reset to the default value. Your code should handle this appropriately.
+- **Fallback behavior**: Always provide fallback values from `$attributes` in case the block is not inside a pattern or overrides are not set.
 
 ## Registering a custom source
 

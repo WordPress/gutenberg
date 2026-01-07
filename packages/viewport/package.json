@@ -46,6 +46,9 @@
 		"@wordpress/data": "file:../data",
 		"@wordpress/element": "file:../element"
 	},
+	"devDependencies": {
+		"deep-freeze": "0.0.1"
+	},
 	"peerDependencies": {
 		"react": "^18.0.0"
 	},

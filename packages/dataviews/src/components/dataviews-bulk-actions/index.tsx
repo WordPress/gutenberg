@@ -6,16 +6,13 @@ import type { ReactElement } from 'react';
 /**
  * WordPress dependencies
  */
-import {
-	Button,
-	CheckboxControl,
-	__experimentalHStack as HStack,
-} from '@wordpress/components';
+import { Button, CheckboxControl } from '@wordpress/components';
 import { __, sprintf, _n } from '@wordpress/i18n';
 import { useMemo, useState, useRef, useContext } from '@wordpress/element';
 import { useRegistry } from '@wordpress/data';
 import { closeSmall } from '@wordpress/icons';
 import { useViewportMatch } from '@wordpress/compose';
+import { Stack } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -263,10 +260,11 @@ function renderFooterContent< Item >(
 					data.length
 			  );
 	return (
-		<HStack
-			expanded={ false }
+		<Stack
+			direction="row"
 			className="dataviews-bulk-actions-footer__container"
-			spacing={ 3 }
+			gap="sm"
+			align="center"
 		>
 			<BulkSelectionCheckbox
 				selection={ selection }
@@ -278,10 +276,10 @@ function renderFooterContent< Item >(
 			<span className="dataviews-bulk-actions-footer__item-count">
 				{ message }
 			</span>
-			<HStack
+			<Stack
+				direction="row"
 				className="dataviews-bulk-actions-footer__action-buttons"
-				expanded={ false }
-				spacing={ 1 }
+				gap="2xs"
 			>
 				{ actionsToShow.map( ( action ) => {
 					return (
@@ -308,8 +306,8 @@ function renderFooterContent< Item >(
 						} }
 					/>
 				) }
-			</HStack>
-		</HStack>
+			</Stack>
+		</Stack>
 	);
 }
 

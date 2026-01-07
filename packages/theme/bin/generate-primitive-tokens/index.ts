@@ -4,7 +4,7 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { parse, to, serialize, sRGB } from 'colorjs.io/fn';
+import { to, serialize, sRGB, getAll } from 'colorjs.io/fn';
 
 /**
  * Internal dependencies
@@ -22,26 +22,19 @@ const __dirname = path.dirname( __filename );
 // Path to the color.json file
 const colorJsonPath = path.join( __dirname, '../../tokens/color.json' );
 
-/**
- * Rounds a given hex value (0-255) to 3 decimal places.
- *
- * 3 decimal places is the minimum precision for lossless hex serialization.
- * With 3 decimal places rounding to the nearest 0.001, the maximum rounding
- * error is 0.0005. With 256 possible hex values, 0.0005 × 256 = 0.128,
- * guaranteeing the rounded value stays within 0.5 of the original value.
- *
- * @param n - The hex value to round.
- * @return The rounded hex value.
- */
-const roundHexComponent = ( n: number ) => Math.round( n * 1000 ) / 1000;
+// 3 decimal places is the minimum precision for lossless hex serialization.
+// With 3 decimal places rounding to the nearest 0.001, the maximum rounding
+// error is 0.0005. With 256 possible hex values, 0.0005 × 256 = 0.128,
+// guaranteeing the rounded value stays within 0.5 of the original value.
+const HEX_ROUNDING_PRECISION = 3;
 
 const transformColorStringToDTCGValue = ( color: string ) => {
-	const parsed = to( parse( color ), sRGB );
+	const parsed = to( color, sRGB );
 
 	return {
 		colorSpace: 'srgb',
-		components: parsed.coords.map( roundHexComponent ),
-		...( parsed.alpha < 1 ? { alpha: parsed.alpha } : undefined ),
+		components: getAll( parsed, { precision: HEX_ROUNDING_PRECISION } ),
+		...( ( parsed.alpha ?? 1 ) < 1 ? { alpha: parsed.alpha } : undefined ),
 		hex: serialize( parsed, { format: 'hex' } ),
 	};
 };

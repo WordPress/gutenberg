@@ -112,8 +112,8 @@ function block_core_gallery_render( $attributes, $content, $block ) {
 	$gap_column   = $gap_value;
 
 	if ( is_array( $gap_value ) ) {
-		$gap_row    = isset( $gap_value['top'] ) ? $gap_value['top'] : $fallback_gap;
-		$gap_column = isset( $gap_value['left'] ) ? $gap_value['left'] : $fallback_gap;
+		$gap_row    = $gap_value['top'] ?? $fallback_gap;
+		$gap_column = $gap_value['left'] ?? $fallback_gap;
 		$gap_value  = $gap_row === $gap_column ? $gap_row : $gap_row . ' ' . $gap_column;
 	}
 

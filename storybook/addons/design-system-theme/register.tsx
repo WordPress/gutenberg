@@ -1,14 +1,16 @@
 /**
  * External dependencies
  */
-import { addons, types, useGlobals } from '@storybook/manager-api';
+// eslint-disable-next-line @typescript-eslint/no-restricted-imports
+import { createElement, Fragment } from 'react';
+import { addons, types, useGlobals } from 'storybook/manager-api';
 import { MirrorIcon } from '@storybook/icons';
 import {
 	IconButton,
 	WithTooltip,
 	TooltipMessage,
 	TooltipLinkList,
-} from '@storybook/components';
+} from 'storybook/internal/components';
 
 interface ThemeOption {
 	id: string;
@@ -50,41 +52,43 @@ function ThemeTooltipMessage( {
 			updateGlobals( { [ globalName ]: option.id || undefined } ),
 	} ) );
 
-	return (
-		<TooltipMessage
-			title={ title }
-			desc={ <TooltipLinkList links={ links } /> }
-		/>
-	);
+	// We cannot use JSX here as Storybook expects local addons to be pre-built.
+	return createElement( TooltipMessage, {
+		title,
+		desc: createElement( TooltipLinkList, { links } ),
+	} );
 }
 
 const ThemeTool = () => {
-	return (
-		<WithTooltip
-			placement="top"
-			trigger="click"
-			closeOnOutsideClick
-			tooltip={
-				<>
-					<ThemeTooltipMessage
-						title="Density"
-						globalName="dsDensity"
-						options={ DENSITY_OPTIONS }
-					/>
-					<ThemeTooltipMessage
-						title="Color"
-						globalName="dsColorTheme"
-						options={ COLOR_OPTIONS }
-					/>
-				</>
-			}
-		>
-			<IconButton title="Design System Theme" active>
-				<MirrorIcon />
-				Theme
-			</IconButton>
-		</WithTooltip>
+	const tooltip = createElement(
+		Fragment,
+		null,
+		createElement( ThemeTooltipMessage, {
+			title: 'Density',
+			globalName: 'dsDensity',
+			options: DENSITY_OPTIONS,
+		} ),
+		createElement( ThemeTooltipMessage, {
+			title: 'Color',
+			globalName: 'dsColorTheme',
+			options: COLOR_OPTIONS,
+		} )
 	);
+
+	const button = createElement(
+		IconButton,
+		{ title: 'Design System Theme', active: true },
+		createElement( MirrorIcon ),
+		'Theme'
+	);
+
+	return createElement( WithTooltip, {
+		placement: 'top',
+		trigger: 'click',
+		closeOnOutsideClick: true,
+		tooltip,
+		children: button,
+	} );
 };
 
 addons.register( ADDON_ID, () => {

@@ -189,6 +189,37 @@ export default defineConfig( {
 						},
 					],
 				},
+				{
+					name: 'ForegroundColor',
+					description: 'Foreground color variants for text elements.',
+					patterns: [
+						{
+							pattern: /^wpds-color\.fg\.[^.]+\.(.+)$/,
+							transform: ( variant ) =>
+								variant.split( '.' ).join( '-' ),
+						},
+					],
+				},
+				{
+					name: 'FontFamily',
+					description: 'Font family variants.',
+					patterns: [ /^wpds-font\.family\.([^.]+)$/ ],
+				},
+				{
+					name: 'FontSize',
+					description: 'Font size scale.',
+					patterns: [ /^wpds-font\.size\.([^.]+)$/ ],
+				},
+				{
+					name: 'FontWeight',
+					description: 'Font weight variants.',
+					patterns: [ /^wpds-font\.weight\.([^.]+)$/ ],
+				},
+				{
+					name: 'LineHeight',
+					description: 'Line height scale.',
+					patterns: [ /^wpds-font\.line-height\.([^.]+)$/ ],
+				},
 			],
 		} ),
 		pluginModeOverrides(),

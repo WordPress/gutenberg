@@ -22,6 +22,7 @@ import {
 	isBlockHidden,
 } from '../private-selectors';
 import { getBlockEditingMode } from '../selectors';
+import { deviceTypeKey } from '../private-keys';
 
 describe( 'private selectors', () => {
 	describe( 'isBlockInterfaceHidden', () => {
@@ -1147,6 +1148,100 @@ describe( 'private selectors', () => {
 			expect( isBlockHidden( state, 'non-existent-block' ) ).toBe(
 				false
 			);
+		} );
+	} );
+
+	describe( 'isBlockHidden in different devices', () => {
+		const originalExperimentalFlag =
+			window.__experimentalHideBlocksBasedOnScreenSize;
+
+		beforeEach( () => {
+			window.__experimentalHideBlocksBasedOnScreenSize = true;
+		} );
+
+		afterEach( () => {
+			window.__experimentalHideBlocksBasedOnScreenSize =
+				originalExperimentalFlag;
+		} );
+
+		const createState = ( blockVisibility, deviceType = 'Desktop' ) => ( {
+			settings: {
+				[ deviceTypeKey ]: deviceType,
+			},
+			blocks: {
+				byClientId: new Map( [
+					[
+						'test-block',
+						{
+							name: 'core/paragraph',
+							attributes: {
+								metadata: {
+									blockVisibility,
+								},
+							},
+						},
+					],
+				] ),
+				attributes: new Map( [
+					[
+						'test-block',
+						{
+							metadata: {
+								blockVisibility,
+							},
+						},
+					],
+				] ),
+			},
+		} );
+
+		it( 'returns false when experimental flag is disabled and block has breakpoint visibility', () => {
+			window.__experimentalHideBlocksBasedOnScreenSize = false;
+			const state = createState( { mobile: false, tablet: true } );
+			const result = isBlockHidden( state, 'test-block' );
+			expect( result ).toBe( false );
+		} );
+
+		it( 'returns false when Desktop is selected and block has breakpoint visibility', () => {
+			const state = createState(
+				{ mobile: false, tablet: true },
+				'Desktop'
+			);
+			const result = isBlockHidden( state, 'test-block' );
+			expect( result ).toBe( false );
+		} );
+
+		it( 'returns true when Desktop is selected and block is hidden on desktop', () => {
+			const state = createState( { desktop: false }, 'Desktop' );
+			const result = isBlockHidden( state, 'test-block' );
+			expect( result ).toBe( true );
+		} );
+
+		it( 'returns true when Tablet is selected and block is hidden on tablet', () => {
+			const state = createState(
+				{ mobile: true, tablet: false },
+				'Tablet'
+			);
+			const result = isBlockHidden( state, 'test-block' );
+			expect( result ).toBe( true );
+		} );
+
+		it( 'returns true when Mobile is selected and block is hidden on mobile', () => {
+			const state = createState(
+				{ mobile: false, tablet: true },
+				'Mobile'
+			);
+			const result = isBlockHidden( state, 'test-block' );
+			expect( result ).toBe( true );
+		} );
+
+		it( 'returns false when Tablet is selected and block is visible on tablet', () => {
+			const state = createState(
+				{ mobile: false, tablet: true },
+				'Tablet'
+			);
+			const result = isBlockHidden( state, 'test-block' );
+			expect( result ).toBe( false );
 		} );
 	} );
 } );

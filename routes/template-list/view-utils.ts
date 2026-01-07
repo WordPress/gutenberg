@@ -77,6 +77,43 @@ export async function ensureView(
 	} );
 }
 
+export function getDefaultViewLegacy( activeView?: string ): View {
+	// All templates view (default) - remove 'active' and 'slug' fields
+	if ( activeView === 'all' || ! activeView ) {
+		return {
+			...DEFAULT_VIEW,
+			fields: [ 'author' ], // Remove 'active' and 'slug' fields
+		};
+	}
+
+	// Author-based view: filter by author
+	return {
+		...DEFAULT_VIEW,
+		fields: [ 'author' ],
+		filters: [
+			{
+				field: 'author',
+				operator: 'isAny',
+				value: [ activeView ],
+			},
+		],
+	};
+}
+
+export async function ensureViewLegacy(
+	activeView?: string,
+	search?: { page?: number; search?: string }
+) {
+	const defaultView = getDefaultViewLegacy( activeView );
+	return loadView( {
+		kind: 'postType',
+		name: 'wp_template',
+		slug: activeView ?? 'all',
+		defaultView,
+		queryParams: search,
+	} );
+}
+
 export function viewToQuery( view: View ) {
 	const result: Record< string, any > = {};
 

@@ -13,7 +13,7 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import DataViewsContext from '../dataviews-context';
-import { VIEW_LAYOUTS } from '../../dataviews-layouts';
+import { VIEW_LAYOUTS } from '../dataviews-layouts';
 import type { ViewBaseProps } from '../../types';
 
 type DataViewsLayoutProps = {

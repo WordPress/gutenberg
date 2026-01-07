@@ -339,7 +339,7 @@ function build_variation_for_navigation_link( $entity, $kind ) {
 	}
 
 	// Calculate singular name once (used for both title and description)
-	$singular = isset( $entity->labels->singular_name ) ? $entity->labels->singular_name : ucfirst( $entity->name );
+	$singular = $entity->labels->singular_name ?? ucfirst( $entity->name );
 
 	// Set default title if needed
 	if ( $is_default_title || '' === $title ) {

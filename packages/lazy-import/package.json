@@ -33,6 +33,10 @@
 		"npm-package-arg": "^8.1.5",
 		"semver": "^7.3.5"
 	},
+	"devDependencies": {
+		"@types/npm-package-arg": "6.1.1",
+		"@types/semver": "7.3.8"
+	},
 	"publishConfig": {
 		"access": "public"
 	}

@@ -7,6 +7,7 @@ import {
 } from '@wordpress/blocks';
 import {
 	__experimentalHStack as HStack,
+	__experimentalTruncate as Truncate,
 	Icon,
 	Navigator,
 } from '@wordpress/components';
@@ -328,11 +329,17 @@ function BlockFields( { clientId } ) {
 	return (
 		<div className="block-editor-content-only-controls__fields-container">
 			<div className="block-editor-content-only-controls__fields-header">
-				<HStack spacing={ 1 } justify="space-between" expanded>
-					<HStack spacing={ 1 } justify="flex-start">
-						<BlockIcon icon={ blockInformation?.icon } />
-						<div>{ blockTitle }</div>
-					</HStack>
+				<HStack spacing={ 1 }>
+					<BlockIcon
+						className="block-editor-content-only-controls__fields-header-icon"
+						icon={ blockInformation?.icon }
+					/>
+					<Truncate
+						className="block-editor-content-only-controls__fields-header-title"
+						numberOfLines={ 1 }
+					>
+						{ blockTitle }
+					</Truncate>
 					<FieldsDropdownMenu
 						fields={ dataFormFields }
 						visibleFields={ form.fields }

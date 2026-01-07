@@ -114,6 +114,10 @@
 		"react-easy-crop": "^5.0.6",
 		"remove-accents": "^0.5.0"
 	},
+	"devDependencies": {
+		"@ariakit/test": "^0.4.7",
+		"deep-freeze": "0.0.1"
+	},
 	"peerDependencies": {
 		"react": "^18.0.0",
 		"react-dom": "^18.0.0"

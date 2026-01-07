@@ -267,9 +267,7 @@ function gutenberg_process_block_bindings( $instance ) {
 		 */
 		foreach ( $supported_block_attributes as $attribute_name ) {
 			// Retain any non-pattern override bindings that might be present.
-			$updated_bindings[ $attribute_name ] = isset( $bindings[ $attribute_name ] )
-				? $bindings[ $attribute_name ]
-				: array( 'source' => 'core/pattern-overrides' );
+			$updated_bindings[ $attribute_name ] = $bindings[ $attribute_name ] ?? array( 'source' => 'core/pattern-overrides' );
 		}
 		$bindings = $updated_bindings;
 		/*
