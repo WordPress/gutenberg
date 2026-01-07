@@ -1375,7 +1375,7 @@ const { state } = store( 'myPlugin', {
 
 `wp_interactivity_process_directives` returns the updated HTML after the directives have been processed.
 
-It is the Core function of the Interactivity API server side rendering part, and is public so any HTML can be processed, whether is a block or not.
+It is the Core function of the Interactivity API server side rendering part, and is public so any HTML can be processed, whether it is a block or not.
 
 This code
 

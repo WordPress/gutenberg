@@ -157,20 +157,22 @@ Do not edit directly.
 
 ### Typography
 
-| Variable name                      | Description             |
-| ---------------------------------- | ----------------------- |
-| `--wpds-font-family-heading`       | Headings font family    |
-| `--wpds-font-family-body`          | Body font family        |
-| `--wpds-font-family-mono`          | Monospace font family   |
-| `--wpds-font-size-x-small`         | Extra small font size   |
-| `--wpds-font-size-small`           | Small font size         |
-| `--wpds-font-size-medium`          | Medium font size        |
-| `--wpds-font-size-large`           | Large font size         |
-| `--wpds-font-size-x-large`         | Extra large font size   |
-| `--wpds-font-size-2x-large`        | 2X large font size      |
-| `--wpds-font-line-height-x-small`  | Extra small line height |
-| `--wpds-font-line-height-small`    | Small line height       |
-| `--wpds-font-line-height-medium`   | Medium line height      |
-| `--wpds-font-line-height-large`    | Large line height       |
-| `--wpds-font-line-height-x-large`  | Extra large line height |
-| `--wpds-font-line-height-2x-large` | 2X large line height    |
+| Variable name                 | Description                                  |
+| ----------------------------- | -------------------------------------------- |
+| `--wpds-font-family-heading`  | Headings font family                         |
+| `--wpds-font-family-body`     | Body font family                             |
+| `--wpds-font-family-mono`     | Monospace font family                        |
+| `--wpds-font-size-xs`         | Extra small font size                        |
+| `--wpds-font-size-sm`         | Small font size                              |
+| `--wpds-font-size-md`         | Medium font size                             |
+| `--wpds-font-size-lg`         | Large font size                              |
+| `--wpds-font-size-xl`         | Extra large font size                        |
+| `--wpds-font-size-2xl`        | 2X large font size                           |
+| `--wpds-font-line-height-xs`  | Extra small line height                      |
+| `--wpds-font-line-height-sm`  | Small line height                            |
+| `--wpds-font-line-height-md`  | Medium line height                           |
+| `--wpds-font-line-height-lg`  | Large line height                            |
+| `--wpds-font-line-height-xl`  | Extra large line height                      |
+| `--wpds-font-line-height-2xl` | 2X large line height                         |
+| `--wpds-font-weight-regular`  | Regular font weight for body text            |
+| `--wpds-font-weight-medium`   | Medium font weight for emphasis and headings |

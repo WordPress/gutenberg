@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import clsx from 'clsx';
+
+/**
  * WordPress dependencies
  */
 import { getBlockSupport } from '@wordpress/blocks';
@@ -251,7 +256,6 @@ export function useBlockSettings( name, parentLayout ) {
 		textAlign,
 		textColumns,
 		textDecoration,
-		textIndent,
 		writingMode,
 		textTransform,
 		letterSpacing,
@@ -313,7 +317,6 @@ export function useBlockSettings( name, parentLayout ) {
 		'typography.textAlign',
 		'typography.textColumns',
 		'typography.textDecoration',
-		'typography.textIndent',
 		'typography.writingMode',
 		'typography.textTransform',
 		'typography.letterSpacing',
@@ -413,7 +416,6 @@ export function useBlockSettings( name, parentLayout ) {
 				textAlign,
 				textColumns,
 				textDecoration,
-				textIndent,
 				textTransform,
 				letterSpacing,
 				writingMode,
@@ -466,7 +468,6 @@ export function useBlockSettings( name, parentLayout ) {
 		textAlign,
 		textColumns,
 		textDecoration,
-		textIndent,
 		textTransform,
 		letterSpacing,
 		writingMode,

@@ -36,6 +36,7 @@ import {
 	reusableBlocksSelectKey,
 	sectionRootClientIdKey,
 	isIsolatedEditorKey,
+	deviceTypeKey,
 } from './private-keys';
 
 const { isContentBlock } = unlock( blocksPrivateApis );
@@ -700,6 +701,10 @@ export function getInsertionPoint( state ) {
 /**
  * Returns true if the block is hidden, or false otherwise.
  *
+ * A block is considered hidden if:
+ * - blockVisibility is false (hidden everywhere)
+ * - blockVisibility is an object with the current device preview set to false
+ *
  * @param {Object} state    Global application state.
  * @param {string} clientId Client ID of the block.
  *
@@ -711,7 +716,26 @@ export const isBlockHidden = ( state, clientId ) => {
 		return false;
 	}
 	const attributes = state.blocks.attributes.get( clientId );
-	return attributes?.metadata?.blockVisibility === false;
+	const blockVisibility = attributes?.metadata?.blockVisibility;
+
+	if ( blockVisibility === false ) {
+		return true;
+	}
+
+	if ( ! window.__experimentalHideBlocksBasedOnScreenSize ) {
+		return false;
+	}
+
+	// Check viewport-specific hiding based on current device preview
+	// Only apply when a device is explicitly selected.
+	if ( typeof blockVisibility === 'object' && blockVisibility !== null ) {
+		const settings = getSettings( state );
+		const viewportType = settings[ deviceTypeKey ] ?? 'Desktop';
+		const viewportKey = viewportType.toLowerCase();
+		return blockVisibility?.[ viewportKey ] === false;
+	}
+
+	return false;
 };
 
 /**

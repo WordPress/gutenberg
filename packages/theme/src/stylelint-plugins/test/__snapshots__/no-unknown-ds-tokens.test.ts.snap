@@ -1,0 +1,24 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`flags warnings with invalid wpds tokens css snapshot matches warnings 1`] = `
+[
+  {
+    "column": 2,
+    "endColumn": 39,
+    "endLine": 3,
+    "line": 3,
+    "rule": "plugin-wpds/no-unknown-ds-tokens",
+    "severity": "error",
+    "text": "The following CSS variables are not valid Design System tokens: '--wpds-nonexistent-token' (plugin-wpds/no-unknown-ds-tokens)",
+  },
+  {
+    "column": 2,
+    "endColumn": 40,
+    "endLine": 7,
+    "line": 7,
+    "rule": "plugin-wpds/no-unknown-ds-tokens",
+    "severity": "error",
+    "text": "The following CSS variables are not valid Design System tokens: '--wpds-made-up-color' (plugin-wpds/no-unknown-ds-tokens)",
+  },
+]
+`;
