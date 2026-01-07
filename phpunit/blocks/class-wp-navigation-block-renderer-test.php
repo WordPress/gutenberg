@@ -8,6 +8,12 @@
 
 class WP_Navigation_Block_Renderer_Test extends WP_UnitTestCase {
 
+	public static function setUpBeforeClass(): void {
+		parent::setUpBeforeClass();
+		// Ensure the navigation block functions are loaded.
+		require_once __DIR__ . '/../../packages/block-library/src/navigation/index.php';
+	}
+
 	/**
 	 * Test that navigation links are wrapped in list items to preserve accessible markup
 	 *
