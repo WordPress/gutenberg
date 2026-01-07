@@ -54,6 +54,11 @@ function BlockKeyboardShortcuts() {
 		const sourceTextAlign =
 			attributes.textAlign || attributes.style?.typography?.textAlign;
 
+		// When destination is heading, set the level
+		if ( destinationBlockName === 'core/heading' ) {
+			newAttributes.level = level;
+		}
+
 		if ( sourceTextAlign ) {
 			newAttributes.style = {
 				typography: {
