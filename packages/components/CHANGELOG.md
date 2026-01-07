@@ -8,6 +8,7 @@
 -   `Button`: Revert disabled primary button state to its previous one ([#73037](https://github.com/WordPress/gutenberg/pull/73037)).
 -   `NumberControl`: Fix crash when min prop is string and step prop contains decimal ([#73107](https://github.com/WordPress/gutenberg/pull/73107)).
 -   `Popover`: Fix `onDialogClose` logic to only close the popover if the blur event targets the specific popover instance ([#72376](https://github.com/WordPress/gutenberg/pull/72376)).
+-   `Popover`: Fix bug where clicking outside nested popovers only closed the inner one. ([#74340](https://github.com/WordPress/gutenberg/pull/74340))
 
 ## 30.6.0 (2025-10-17)
 
