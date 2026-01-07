@@ -94,6 +94,7 @@ test.describe( 'Taxonomies', () => {
 		await page.waitForResponse(
 			( response ) =>
 				response.url().includes( '/wp/v2/tags' ) &&
+			    response.request().method() === 'POST' &&
 				response.status() === 201
 		);
 		await page.reload();
@@ -102,44 +103,46 @@ test.describe( 'Taxonomies', () => {
 		await expect( tags ).toContainText( tagName );
 	} );
 
-	// See: https://github.com/WordPress/gutenberg/pull/21693.
-	test( `should be able to create a new tag with ' on the name`, async ( {
-		editor,
-		page,
-	} ) => {
-		// Open the Document -> Tags panel.
-		const panelToggle = page.getByRole( 'button', {
-			name: 'Tags',
-		} );
+    test( 'should be able to create multiple tags in rapid succession', async ( {
+        editor,
+        page,
+    } ) => {
+        const panelToggle = page.getByRole( 'button', {
+            name: 'Tags',
+        } );
 
-		if (
-			( await panelToggle.getAttribute( 'aria-expanded' ) ) === 'false'
-		) {
-			await panelToggle.click();
-		}
+        if (
+            ( await panelToggle.getAttribute( 'aria-expanded' ) ) === 'false'
+        ) {
+            await panelToggle.click();
+        }
 
-		const tagName = "tag'-" + generateRandomNumber();
-		const tags = page.locator( '.components-form-token-field__token-text' );
+        const tags = page.locator( '.components-form-token-field__token-text' );
+        const input = page.getByRole( 'combobox', { name: 'Add tag' } );
+		const rnd = generateRandomNumber(); 
+        const tagNames = [ `Tag A ${ rnd }`, `Tag B ${ rnd }`, `Tag C ${ rnd }` ];
+    
+        for ( const tagName of tagNames ) {
+            await input.fill( tagName );
+            await page.keyboard.press( 'Enter' );
+        }
 
-		await page.getByRole( 'combobox', { name: 'Add tag' } ).fill( tagName );
-		await page.keyboard.press( 'Enter' );
+        await expect( tags ).toHaveCount( 3 );
 
-		await expect( tags ).toHaveCount( 1 );
-		await expect( tags ).toContainText( tagName );
+        await editor.canvas
+            .getByRole( 'textbox', { name: 'Add title' } )
+            .fill( 'Rapid Tags Test' );
+        await editor.publishPost();
+        await page.reload();
 
-		await editor.canvas
-			.getByRole( 'textbox', { name: 'Add title' } )
-			.fill( 'Hello World' );
-		await editor.publishPost();
+        const newPanelToggle = page.getByRole( 'button', { name: 'Tags' } );
+        if (
+            ( await newPanelToggle.getAttribute( 'aria-expanded' ) ) === 'false'
+        ) {
+            await newPanelToggle.click();
+        }
 
-		await page.waitForResponse(
-			( response ) =>
-				response.url().includes( '/wp/v2/tags' ) &&
-				response.status() === 201
-		);
-		await page.reload();
-
-		await expect( tags ).toHaveCount( 1 );
-		await expect( tags ).toContainText( tagName );
-	} );
-} );
+        await expect( tags ).toHaveCount( 3 );
+        await expect( tags ).toContainText( tagNames );
+    } );
+});

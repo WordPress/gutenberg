@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __, _x, sprintf } from '@wordpress/i18n';
-import { useEffect, useMemo, useState } from '@wordpress/element';
+import { useEffect, useMemo, useState, useRef } from '@wordpress/element';
 import {
 	FormTokenField,
 	withFilters,
@@ -68,6 +68,11 @@ export function FlatTermSelector( { slug } ) {
 	const [ values, setValues ] = useState( [] );
 	const [ search, setSearch ] = useState( '' );
 	const debouncedSearch = useDebounce( setSearch, 500 );
+    const requestQueue = useRef( [] );
+    const isProcessing = useRef( false );
+    const termsInQueue = useRef( new Set() );
+    const selectedNamesRef = useRef( [] );
+    const localTermCache = useRef( {} );
 
 	const {
 		terms,
@@ -136,16 +141,17 @@ export function FlatTermSelector( { slug } ) {
 		[ search, slug ]
 	);
 
-	// Update terms state only after the selectors are resolved.
-	// We're using this to avoid terms temporarily disappearing on slow networks
-	// while core data makes REST API requests.
-	useEffect( () => {
+		useEffect( () => {
+		if ( isProcessing.current ) {
+			return; // STOP! Don't touch the input value.
+		}
+
 		if ( hasResolvedTerms ) {
 			const newValues = ( terms ?? [] ).map( ( term ) =>
 				unescapeString( term.name )
 			);
-
 			setValues( newValues );
+			selectedNamesRef.current = newValues;
 		}
 	}, [ terms, hasResolvedTerms ] );
 
@@ -181,60 +187,68 @@ export function FlatTermSelector( { slug } ) {
 		editPost( { [ taxonomy.rest_base ]: newTermIds } );
 	}
 
-	const debouncedUpdateTerms = useDebounce(
-		( uniqueTerms, availableTerms, newTermNames ) => {
-			if ( newTermNames.length === 0 ) {
-				onUpdateTerms( termNamesToIds( uniqueTerms, availableTerms ) );
-				return;
-			}
+		function getCurrentTermIds( termNames, currentAvailableTerms ) {
+		return termNames
+			.map( ( name ) => {
+				const found = currentAvailableTerms.find( ( t ) => isSameTermName( t.name, name ) );
+				if ( found ) return found.id;
+				
+				const cached = localTermCache.current[ unescapeString(name).toLowerCase() ];
+				if ( cached ) return cached.id;
 
-			if ( ! hasCreateAction ) {
-				return;
-			}
-
-			Promise.all(
-				newTermNames.map( ( termName ) =>
-					findOrCreateTerm( { name: termName } )
-				)
-			)
-				.then( ( newTerms ) => {
-					const newAvailableTerms = availableTerms.concat( newTerms );
-					onUpdateTerms(
-						termNamesToIds( uniqueTerms, newAvailableTerms )
-					);
-				} )
-				.catch( ( error ) => {
-					createErrorNotice( error.message, {
-						type: 'snackbar',
-					} );
-					// In case of a failure, try assigning available terms.
-					// This will invalidate the optimistic update.
-					onUpdateTerms(
-						termNamesToIds( uniqueTerms, availableTerms )
-					);
-				} );
-		},
-		500 // 500ms delay to prevent race conditions
-	);
-
-	// Conditional Return (Must come AFTER all hooks)
-	if ( ! hasAssignAction ) {
-		return null;
+				return undefined;
+			} )
+			.filter( ( id ) => id !== undefined );
 	}
 
-	function onChange( termNames ) {
+	async function processQueue( currentAvailableTerms ) {
+		if ( isProcessing.current ) {
+			return;
+		}
+
+		isProcessing.current = true;
+		const lockName = 'term-creation-queue';
+		lockPostSaving( lockName );
+
+		try {
+			while ( requestQueue.current.length > 0 ) {
+				const termName = requestQueue.current.shift();
+				
+				try {
+					const newTerm = await findOrCreateTerm( { name: termName } );
+					localTermCache.current[ unescapeString( termName ).toLowerCase() ] = newTerm;
+
+					const idsToSave = getCurrentTermIds( selectedNamesRef.current, currentAvailableTerms );
+					onUpdateTerms( idsToSave );
+
+				} catch ( error ) {
+					if ( error.code !== 'term_exists' ) {
+						createErrorNotice( error.message, { type: 'snackbar' } );
+					}
+				} finally {
+					termsInQueue.current.delete( termName );
+				}
+			}
+		} finally {
+			isProcessing.current = false;
+			unlockPostSaving( lockName );
+		}
+	}
+
+		async function onChange( termNames ) {
 		const availableTerms = [
 			...( terms ?? [] ),
 			...( searchResults ?? [] ),
 		];
 		const uniqueTerms = termNames.reduce( ( acc, name ) => {
-			if (
-				! acc.some( ( n ) => n.toLowerCase() === name.toLowerCase() )
-			) {
+			if ( ! acc.some( ( n ) => n.toLowerCase() === name.toLowerCase() ) ) {
 				acc.push( name );
 			}
 			return acc;
 		}, [] );
+
+		setValues( uniqueTerms );
+		selectedNamesRef.current = uniqueTerms;
 
 		const newTermNames = uniqueTerms.filter(
 			( termName ) =>
@@ -243,11 +257,32 @@ export function FlatTermSelector( { slug } ) {
 				)
 		);
 
-		// Optimistically update term values immediately for UI responsiveness
-		setValues( uniqueTerms );
+		if ( newTermNames.length === 0 ) {
+			const ids = getCurrentTermIds( uniqueTerms, availableTerms );
+			onUpdateTerms( ids );
+			return;
+		}
 
-		// Pass the heavy lifting to the debounced function
-		debouncedUpdateTerms( uniqueTerms, availableTerms, newTermNames );
+		if ( ! hasCreateAction ) {
+			return;
+		}
+
+		let hasNewItems = false;
+		newTermNames.forEach( ( termName ) => {
+			const isCached = localTermCache.current[ unescapeString(termName).toLowerCase() ];
+			if ( ! termsInQueue.current.has( termName ) && ! isCached ) {
+				requestQueue.current.push( termName );
+				termsInQueue.current.add( termName );
+				hasNewItems = true;
+			}
+		} );
+
+		if ( hasNewItems ) {
+			processQueue( availableTerms );
+		} else {
+			const ids = getCurrentTermIds( uniqueTerms, availableTerms );
+			onUpdateTerms( ids );
+		}
 	}
 
 	function appendTerm( newTerm ) {
