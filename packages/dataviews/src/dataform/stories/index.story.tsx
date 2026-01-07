@@ -11,7 +11,6 @@ import LayoutPanelComponent from './layout-panel';
 import DataAdapterComponent from './data-adapter';
 import ValidationComponent from './validation';
 import VisibilityComponent from './visibility';
-import DisabledFieldsComponent from './disabled';
 
 const meta = {
 	title: 'DataViews/DataForm',
@@ -74,6 +73,13 @@ export const LayoutRegular = {
 			description: 'Chooses the label position.',
 			options: [ 'default', 'top', 'side', 'none' ],
 		},
+		disabled: {
+			control: { type: 'boolean' },
+			description: 'Disable all fields in the form.',
+		},
+	},
+	args: {
+		disabled: false,
 	},
 };
 
@@ -146,8 +152,4 @@ export const Visibility = {
 
 export const DataAdapter = {
 	render: DataAdapterComponent,
-};
-
-export const DisabledFields = {
-	render: DisabledFieldsComponent,
 };
