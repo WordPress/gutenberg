@@ -144,7 +144,9 @@ function wasmInlinePlugin() {
 				// Handle imports like 'wasm-vips/vips.wasm'
 				if ( ! args.path.startsWith( '.' ) ) {
 					const { createRequire } = await import( 'module' );
-					const require = createRequire( args.resolveDir + '/index.js' );
+					const require = createRequire(
+						args.resolveDir + '/index.js'
+					);
 					try {
 						const resolved = require.resolve( args.path );
 						return {
@@ -160,16 +162,19 @@ function wasmInlinePlugin() {
 			} );
 
 			// Load WASM files and convert to base64 data URLs
-			build.onLoad( { filter: /.*/, namespace: 'wasm-inline' }, async ( args ) => {
-				const wasmBuffer = await readFile( args.path );
-				const base64 = wasmBuffer.toString( 'base64' );
-				const dataUrl = `data:application/wasm;base64,${ base64 }`;
+			build.onLoad(
+				{ filter: /.*/, namespace: 'wasm-inline' },
+				async ( args ) => {
+					const wasmBuffer = await readFile( args.path );
+					const base64 = wasmBuffer.toString( 'base64' );
+					const dataUrl = `data:application/wasm;base64,${ base64 }`;
 
-				return {
-					contents: `export default "${ dataUrl }";`,
-					loader: 'js',
-				};
-			} );
+					return {
+						contents: `export default "${ dataUrl }";`,
+						loader: 'js',
+					};
+				}
+			);
 		},
 	};
 }
