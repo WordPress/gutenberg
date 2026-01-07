@@ -36,7 +36,6 @@
 	},
 	"dependencies": {
 		"@emotion/babel-plugin": "11.11.0",
-		"@manypkg/get-packages": "3.0.0",
 		"autoprefixer": "10.4.21",
 		"browserslist-to-esbuild": "2.1.1",
 		"change-case": "4.1.2",

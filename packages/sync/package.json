@@ -57,7 +57,7 @@
 	},
 	"devDependencies": {
 		"@types/node": "^20.17.10",
-		"@types/simple-peer": "9.11.5"
+		"@types/simple-peer": "^9.11.5"
 	},
 	"publishConfig": {
 		"access": "public"
