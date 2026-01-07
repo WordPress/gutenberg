@@ -56,7 +56,7 @@
 		"yjs": "~13.6.6"
 	},
 	"devDependencies": {
-		"@types/node": "20.17.10",
+		"@types/node": "^20.17.10",
 		"@types/simple-peer": "9.11.5"
 	},
 	"publishConfig": {

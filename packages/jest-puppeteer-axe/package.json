@@ -42,7 +42,7 @@
 		"./package.json": "./package.json"
 	},
 	"dependencies": {
-		"@axe-core/puppeteer": "4.0.0"
+		"@axe-core/puppeteer": "^4.0.0"
 	},
 	"peerDependencies": {
 		"jest": ">=29",

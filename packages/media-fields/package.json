@@ -62,7 +62,7 @@
 		"@wordpress/url": "file:../url"
 	},
 	"devDependencies": {
-		"@testing-library/jest-dom": "6.6.3",
+		"@testing-library/jest-dom": "^6.6.3",
 		"@types/jest": "29.5.14"
 	},
 	"peerDependencies": {
