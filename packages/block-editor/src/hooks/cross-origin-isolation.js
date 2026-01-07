@@ -109,35 +109,37 @@ if ( window.crossOriginIsolated ) {
 	} );
 }
 
-const supportsCredentialless =
-	window.crossOriginIsolated &&
-	'credentialless' in window.HTMLIFrameElement.prototype;
+// Only apply the embed preview filter when cross-origin isolated.
+if ( window.crossOriginIsolated ) {
+	const supportsCredentialless =
+		'credentialless' in window.HTMLIFrameElement.prototype;
 
-const disableEmbedPreviews = createHigherOrderComponent(
-	( BlockEdit ) => ( props ) => {
-		if ( 'core/embed' !== props.name ) {
-			return <BlockEdit { ...props } />;
-		}
+	const disableEmbedPreviews = createHigherOrderComponent(
+		( BlockEdit ) => ( props ) => {
+			if ( 'core/embed' !== props.name ) {
+				return <BlockEdit { ...props } />;
+			}
 
-		// Denylist taken from packages/block-library/src/embed/variations.js in Gutenberg.
-		const previewable =
-			supportsCredentialless &&
-			! [ 'facebook', 'smugmug' ].includes(
-				props.attributes.providerNameSlug
+			// Denylist taken from packages/block-library/src/embed/variations.js in Gutenberg.
+			const previewable =
+				supportsCredentialless &&
+				! [ 'facebook', 'smugmug' ].includes(
+					props.attributes.providerNameSlug
+				);
+
+			return (
+				<BlockEdit
+					{ ...props }
+					attributes={ { ...props.attributes, previewable } }
+				/>
 			);
+		},
+		'withDisabledEmbedPreview'
+	);
 
-		return (
-			<BlockEdit
-				{ ...props }
-				attributes={ { ...props.attributes, previewable } }
-			/>
-		);
-	},
-	'withDisabledEmbedPreview'
-);
-
-addFilter(
-	'editor.BlockEdit',
-	'media-experiments/disable-embed-previews',
-	disableEmbedPreviews
-);
+	addFilter(
+		'editor.BlockEdit',
+		'media-experiments/disable-embed-previews',
+		disableEmbedPreviews
+	);
+}
