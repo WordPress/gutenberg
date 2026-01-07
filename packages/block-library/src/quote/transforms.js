@@ -141,19 +141,40 @@ const transforms = {
 		{
 			type: 'block',
 			blocks: [ 'core/paragraph' ],
-			transform: ( { citation }, innerBlocks ) => {
-				if ( RichText.isEmpty( citation ) ) {
-					return innerBlocks.length > 0
-						? innerBlocks
-						: createBlock( 'core/paragraph' );
+			isMatch: ( { citation }, block ) => {
+				const innerBlocks = block.innerBlocks;
+				if ( ! innerBlocks.length ) {
+					return ! RichText.isEmpty( citation );
 				}
 
-				return [
-					...innerBlocks,
-					createBlock( 'core/paragraph', {
-						content: citation,
-					} ),
-				];
+				return innerBlocks.every( ( innerBlock ) => {
+					if ( innerBlock.name === 'core/paragraph' ) {
+						return true;
+					}
+					const converted = switchToBlockType(
+						innerBlock,
+						'core/paragraph'
+					);
+					return converted !== null;
+				} );
+			},
+			transform: ( { citation }, innerBlocks ) => {
+				const paragraphs = innerBlocks.flatMap( ( innerBlock ) => {
+					if ( innerBlock.name === 'core/paragraph' ) {
+						return innerBlock;
+					}
+					return (
+						switchToBlockType( innerBlock, 'core/paragraph' ) || []
+					);
+				} );
+				return RichText.isEmpty( citation )
+					? paragraphs
+					: [
+							...paragraphs,
+							createBlock( 'core/paragraph', {
+								content: citation,
+							} ),
+					  ];
 			},
 		},
 		{
