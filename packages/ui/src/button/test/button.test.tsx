@@ -1,8 +1,8 @@
 /**
  * External dependencies
  */
-import { render } from '@testing-library/react';
 import { createRef } from '@wordpress/element';
+import { screen, render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 /**
@@ -12,10 +12,10 @@ import { Button } from '../index';
 
 describe( 'Button', () => {
 	it( 'renders a button element by default', () => {
-		const { getByRole } = render( <Button>Click me</Button> );
+		render( <Button>Click me</Button> );
 
 		expect(
-			getByRole( 'button', { name: 'Click me' } )
+			screen.getByRole( 'button', { name: 'Click me' } )
 		).toBeInTheDocument();
 	} );
 
@@ -31,13 +31,13 @@ describe( 'Button', () => {
 		const user = userEvent.setup();
 
 		const onClickMock = jest.fn();
-		const { getByRole } = render(
+		render(
 			// eslint-disable-next-line no-restricted-syntax
 			<Button disabled onClick={ onClickMock }>
 				Click me
 			</Button>
 		);
-		const button = getByRole( 'button', { name: 'Click me' } );
+		const button = screen.getByRole( 'button', { name: 'Click me' } );
 
 		expect( button ).toBeEnabled();
 		expect( button ).toHaveAttribute( 'aria-disabled', 'true' );
@@ -50,20 +50,20 @@ describe( 'Button', () => {
 	} );
 
 	it( 'is disabled when loading', () => {
-		const { getByRole } = render(
+		render(
 			<Button loading loadingAnnouncement="Loading">
 				Click me
 			</Button>
 		);
 
-		const button = getByRole( 'button', { name: 'Click me' } );
+		const button = screen.getByRole( 'button', { name: 'Click me' } );
 
 		expect( button ).toBeEnabled();
 		expect( button ).toHaveAttribute( 'aria-disabled', 'true' );
 	} );
 
 	it( 'can be enabled explicitly when loading', () => {
-		const { getByRole } = render(
+		render(
 			// Additional improvement in the original lint rule: only error if disabled=true?
 			// eslint-disable-next-line no-restricted-syntax
 			<Button loading loadingAnnouncement="Loading" disabled={ false }>
@@ -71,32 +71,32 @@ describe( 'Button', () => {
 			</Button>
 		);
 
-		const button = getByRole( 'button', { name: 'Click me' } );
+		const button = screen.getByRole( 'button', { name: 'Click me' } );
 
 		expect( button ).toBeEnabled();
 		expect( button ).not.toHaveAttribute( 'aria-disabled', 'true' );
 	} );
 
 	it( 'supports custom render prop while retaining the default accessible when disabled behavior', () => {
-		const { getByRole } = render(
+		render(
 			// eslint-disable-next-line jsx-a11y/anchor-has-content, no-restricted-syntax
 			<Button render={ <a href="/" /> } disabled>
 				Click me
 			</Button>
 		);
-		const button = getByRole( 'link', { name: 'Click me' } );
+		const button = screen.getByRole( 'link', { name: 'Click me' } );
 
 		expect( button ).toHaveAttribute( 'aria-disabled', 'true' );
 	} );
 
 	it( 'merges custom className with built-in classes', () => {
 		const customClass = 'my-button';
-		const { getByRole } = render(
+		render(
 			<Button render={ <button /> } className={ customClass }>
 				Click me
 			</Button>
 		);
-		const button = getByRole( 'button', { name: 'Click me' } );
+		const button = screen.getByRole( 'button', { name: 'Click me' } );
 
 		// Should have both built-in classes and custom class
 		expect( button ).toHaveClass( 'button' );
