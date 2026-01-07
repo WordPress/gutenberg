@@ -30,7 +30,12 @@ const setConsoleMethodSpy = ( args: [ string, string ] ) => {
 	function assertExpectedCalls() {
 		if ( spy.assertionsNumber === 0 && spy.mock.calls.length > 0 ) {
 			// Using 'as' to satisfy TypeScript compiler about the matcher name.
-			const name = matcherName as 'toHaveErrored';
+			type MatcherName = `toHave${
+				| 'Errored'
+				| 'Informed'
+				| 'Logged'
+				| 'Warned' }`;
+			const name = matcherName as MatcherName;
 
 			expect( console ).not[ name ]();
 		}
