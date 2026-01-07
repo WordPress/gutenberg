@@ -53,7 +53,6 @@
 	],
 	"dependencies": {
 		"@ariakit/react": "^0.4.15",
-		"@ariakit/react-core": "^0.4.15",
 		"@date-fns/utc": "^2.1.1",
 		"@emotion/cache": "^11.7.1",
 		"@emotion/css": "^11.7.1",
