@@ -456,8 +456,8 @@ async function bundlePackage( packageName, options = {} ) {
 
 			const scriptModuleId =
 				exportName === '.'
-					? `@wordpress/${ packageName }`
-					: `@wordpress/${ packageName }/${ fileName }`;
+					? `@${ packageNamespace }/${ packageName }`
+					: `@${ packageNamespace }/${ packageName }/${ fileName }`;
 
 			builtModules.push( {
 				id: scriptModuleId,
