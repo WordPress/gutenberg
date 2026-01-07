@@ -33,7 +33,6 @@ const fs = require( 'fs' );
 const path = require( 'path' );
 
 const sass = require( 'sass' );
-// eslint-disable-next-line import/no-extraneous-dependencies
 const css2rn = require( 'css-to-react-native-transform' ).default;
 const upstreamTransformer = require( '@react-native/metro-babel-transformer' );
 
