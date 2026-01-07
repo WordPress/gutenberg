@@ -110,22 +110,42 @@ class WP_Block_Parser {
 				 * we have options
 				 * - treat it all as freeform text
 				 * - assume an implicit closer (easiest when not nesting)
+				 *
+				 * Treat this as a stack of implicit closers.
 				 */
+				$implicitly_closed = null;
+				$last_freeform     = null;
+				// phpcs:ignore Generic.CodeAnalysis.AssignmentInCondition.FoundInWhileCondition --
+				while ( null !== ( $stack_top = array_pop( $this->stack ) ) ) {
+					if ( isset( $last_freeform ) ) {
+						$html = substr( $this->document, $stack_top->prev_offset, $last_freeform[1] - $stack_top->prev_offset );
+					} else {
+						$html = substr( $this->document, $stack_top->prev_offset );
+					}
 
-				// for the easy case we'll assume an implicit closer.
-				if ( 1 === $stack_depth ) {
-					$this->add_block_from_stack();
-					return false;
+					$stack_top->block->innerHTML     .= $html;
+					$stack_top->block->innerContent[] = $html;
+
+					// Trap potential leading freeform content for the final output.
+					$last_freeform = array( $stack_top->leading_html_start ?? 0, $stack_top->token_start );
+
+					if ( isset( $implicitly_closed ) ) {
+						$stack_top->block->innerContent[] = null;
+						$stack_top->block->innerBlocks[]  = $implicitly_closed;
+					}
+
+					$implicitly_closed = $stack_top->block;
 				}
 
-				/*
-				 * for the nested case where it's more difficult we'll
-				 * have to assume that multiple closers are missing
-				 * and so we'll collapse the whole stack piecewise
-				 */
-				while ( 0 < count( $this->stack ) ) {
-					$this->add_block_from_stack();
+				if ( isset( $last_freeform ) && $last_freeform[1] > $last_freeform[0] ) {
+					$html           = substr( $this->document, $last_freeform[0], $last_freeform[1] - $last_freeform[0] );
+					$this->output[] = (array) $this->freeform( $html );
 				}
+
+				if ( isset( $implicitly_closed ) ) {
+					$this->output[] = $implicitly_closed;
+				}
+
 				return false;
 
 			case 'void-block':
