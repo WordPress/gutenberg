@@ -61,6 +61,7 @@
 		"@types/semver": "7.3.8",
 		"@types/sprintf-js": "1.1.2",
 		"@types/uuid": "8.3.1",
+		"@types/wordpress__blocks": "^12.5.18",
 		"@wordpress/build": "file:./packages/wp-build",
 		"ajv": "8.17.1",
 		"babel-jest": "29.7.0",
