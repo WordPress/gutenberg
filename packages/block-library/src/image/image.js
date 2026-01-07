@@ -62,8 +62,7 @@ import {
 	SIZED_LAYOUTS,
 	DEFAULT_MEDIA_SIZE_SLUG,
 } from './constants';
-import { evalAspectRatio } from './utils';
-import { mediaPosition } from '../cover/shared';
+import { evalAspectRatio, mediaPosition } from './utils';
 
 const { DimensionsTool, ResolutionTool } = unlock( blockEditorPrivateApis );
 

@@ -17,7 +17,7 @@ import {
 /**
  * Internal dependencies
  */
-import { mediaPosition } from '../cover/shared';
+import { mediaPosition } from './utils';
 
 export default function save( { attributes } ) {
 	const {
