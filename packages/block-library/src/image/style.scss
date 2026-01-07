@@ -242,8 +242,8 @@
 		vertical-align: middle;
 	}
 
-	.wp-lightbox-navigation-container-prev,
-	.wp-lightbox-navigation-container-next {
+	.wp-lightbox-navigation-button-prev,
+	.wp-lightbox-navigation-button-next {
 		display: none;
 		position: absolute;
 		top: 50%;
@@ -257,15 +257,15 @@
 		}
 
 		@include break-mobile() {
-			display: block;
+			display: flex;
 		}
 	}
 
-	.wp-lightbox-navigation-container-prev {
+	.wp-lightbox-navigation-button-prev {
 		left: calc(env(safe-area-inset-left) + 16px);
 	}
 
-	.wp-lightbox-navigation-container-next {
+	.wp-lightbox-navigation-button-next {
 		right: calc(env(safe-area-inset-right) + 16px);
 	}
 
@@ -284,7 +284,7 @@
 		&:not(:hover):not(:active):not(.has-background) {
 			background: none;
 			border: none;
-			padding: 0 4px;
+			padding: 0 8px;
 		}
 
 		&:has(.wp-lightbox-navigation-text:not([hidden])) .wp-lightbox-navigation-icon svg {
