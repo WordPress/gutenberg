@@ -16,7 +16,6 @@
 - Field API: Display formats for `number` and `integer` types. ([73644](https://github.com/WordPress/gutenberg/pull/73644))
 - Try using 24px padding for consistency across different uses. ([73334](https://github.com/WordPress/gutenberg/pull/73334))
 - Update operator labels and deprecate the `isNotAll`. ([73671](https://github.com/WordPress/gutenberg/pull/73671))
-- Add density preference support to List view with compact, balanced (default), and comfortable options. ([#71050](https://github.com/WordPress/gutenberg/pull/71050))
 
 #### Block Library
 - Add support for 'align' to the Breadcrumbs block. ([73794](https://github.com/WordPress/gutenberg/pull/73794))
