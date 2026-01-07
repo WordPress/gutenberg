@@ -10,11 +10,8 @@ class WP_Navigation_Block_Renderer_Test extends WP_UnitTestCase {
 
 	public static function setUpBeforeClass(): void {
 		parent::setUpBeforeClass();
-		// Ensure the navigation block functions are loaded.
-		// Only load if the specific function we need doesn't exist yet.
-		if ( ! function_exists( 'block_core_navigation_block_tree_has_block_type' ) ) {
-			require_once __DIR__ . '/../../packages/block-library/src/navigation/index.php';
-		}
+		// Navigation block functions are loaded via lib/blocks.php which loads
+		// the built files with prefixed function names. No need to manually require.
 	}
 
 	/**
@@ -188,11 +185,11 @@ class WP_Navigation_Block_Renderer_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Test that block_core_navigation_block_tree_has_block_type finds a block at the top level.
+	 * Test that gutenberg_block_core_navigation_block_tree_has_block_type finds a block at the top level.
 	 *
 	 * @group navigation-renderer
 	 *
-	 * @covers ::block_core_navigation_block_tree_has_block_type
+	 * @covers ::gutenberg_block_core_navigation_block_tree_has_block_type
 	 */
 	public function test_gutenberg_block_core_navigation_block_tree_has_block_type_finds_top_level_block() {
 		$parsed_blocks = parse_blocks(
@@ -200,7 +197,7 @@ class WP_Navigation_Block_Renderer_Test extends WP_UnitTestCase {
 		);
 		$blocks        = new WP_Block_List( $parsed_blocks, array() );
 
-		$result = block_core_navigation_block_tree_has_block_type(
+		$result = gutenberg_block_core_navigation_block_tree_has_block_type(
 			$blocks,
 			'core/navigation-overlay-close'
 		);
@@ -209,11 +206,11 @@ class WP_Navigation_Block_Renderer_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Test that block_core_navigation_block_tree_has_block_type finds a deeply nested block.
+	 * Test that gutenberg_block_core_navigation_block_tree_has_block_type finds a deeply nested block.
 	 *
 	 * @group navigation-renderer
 	 *
-	 * @covers ::block_core_navigation_block_tree_has_block_type
+	 * @covers ::gutenberg_block_core_navigation_block_tree_has_block_type
 	 */
 	public function test_gutenberg_block_core_navigation_block_tree_has_block_type_finds_nested_block() {
 		$parsed_blocks = parse_blocks(
@@ -233,7 +230,7 @@ class WP_Navigation_Block_Renderer_Test extends WP_UnitTestCase {
 		);
 		$blocks        = new WP_Block_List( $parsed_blocks, array() );
 
-		$result = block_core_navigation_block_tree_has_block_type(
+		$result = gutenberg_block_core_navigation_block_tree_has_block_type(
 			$blocks,
 			'core/navigation-overlay-close'
 		);
@@ -242,11 +239,11 @@ class WP_Navigation_Block_Renderer_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Test that block_core_navigation_block_tree_has_block_type returns false when block is not found.
+	 * Test that gutenberg_block_core_navigation_block_tree_has_block_type returns false when block is not found.
 	 *
 	 * @group navigation-renderer
 	 *
-	 * @covers ::block_core_navigation_block_tree_has_block_type
+	 * @covers ::gutenberg_block_core_navigation_block_tree_has_block_type
 	 */
 	public function test_gutenberg_block_core_navigation_block_tree_has_block_type_returns_false_when_not_found() {
 		$parsed_blocks = parse_blocks(
@@ -254,7 +251,7 @@ class WP_Navigation_Block_Renderer_Test extends WP_UnitTestCase {
 		);
 		$blocks        = new WP_Block_List( $parsed_blocks, array() );
 
-		$result = block_core_navigation_block_tree_has_block_type(
+		$result = gutenberg_block_core_navigation_block_tree_has_block_type(
 			$blocks,
 			'core/navigation-overlay-close'
 		);
@@ -263,11 +260,11 @@ class WP_Navigation_Block_Renderer_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Test that block_core_navigation_block_tree_has_block_type skips searching inside specified block types.
+	 * Test that gutenberg_block_core_navigation_block_tree_has_block_type skips searching inside specified block types.
 	 *
 	 * @group navigation-renderer
 	 *
-	 * @covers ::block_core_navigation_block_tree_has_block_type
+	 * @covers ::gutenberg_block_core_navigation_block_tree_has_block_type
 	 */
 	public function test_gutenberg_block_core_navigation_block_tree_has_block_type_skips_specified_blocks() {
 		$parsed_blocks = parse_blocks(
@@ -280,7 +277,7 @@ class WP_Navigation_Block_Renderer_Test extends WP_UnitTestCase {
 		$blocks        = new WP_Block_List( $parsed_blocks, array() );
 
 		// Should NOT find the block because it's inside a navigation block which we're skipping
-		$result = block_core_navigation_block_tree_has_block_type(
+		$result = gutenberg_block_core_navigation_block_tree_has_block_type(
 			$blocks,
 			'core/navigation-link',
 			array( 'core/navigation' )
