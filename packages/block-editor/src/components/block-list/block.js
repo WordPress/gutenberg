@@ -612,7 +612,9 @@ function BlockListBlockProvider( props ) {
 				isPreviewMode,
 				__experimentalBlockBindingsSupportedAttributes,
 			} = getSettings();
-
+			const { isBlockHidden: _isBlockHidden } = unlock(
+				select( blockEditorStore )
+			);
 			const bindableAttributes =
 				__experimentalBlockBindingsSupportedAttributes?.[ blockName ];
 
@@ -633,7 +635,7 @@ function BlockListBlockProvider( props ) {
 					? getBlockDefaultClassName( blockName )
 					: undefined,
 				blockTitle: blockType?.title,
-				isBlockHidden: attributes?.metadata?.blockVisibility === false,
+				isBlockHidden: _isBlockHidden( clientId ),
 				bindableAttributes,
 			};
 
@@ -642,10 +644,6 @@ function BlockListBlockProvider( props ) {
 			if ( isPreviewMode ) {
 				return previewContext;
 			}
-
-			const { isBlockHidden: _isBlockHidden } = unlock(
-				select( blockEditorStore )
-			);
 			const _isSelected = isBlockSelected( clientId );
 			const canRemove = canRemoveBlock( clientId );
 			const canMove = canMoveBlock( clientId );
@@ -657,6 +655,9 @@ function BlockListBlockProvider( props ) {
 				checkDeep
 			);
 			const blockEditingMode = getBlockEditingMode( clientId );
+			const sectionBlockClientId = _isSectionBlock( clientId )
+				? clientId
+				: getParentSectionBlock( clientId );
 
 			const multiple = hasBlockSupport( blockName, 'multiple', true );
 
@@ -675,9 +676,11 @@ function BlockListBlockProvider( props ) {
 				isSelectionEnabled: isSelectionEnabled(),
 				isLocked: !! getTemplateLock( rootClientId ),
 				isSectionBlock: _isSectionBlock( clientId ),
-				isWithinSectionBlock:
-					_isSectionBlock( clientId ) ||
-					!! getParentSectionBlock( clientId ),
+				isWithinSectionBlock: !! sectionBlockClientId,
+				isSelectionWithinCurrentSection:
+					isBlockSelected( sectionBlockClientId ) ||
+					hasSelectedInnerBlock( sectionBlockClientId, checkDeep ),
+				blockType,
 				canRemove,
 				canMove,
 				isSelected: _isSelected,
@@ -722,7 +725,6 @@ function BlockListBlockProvider( props ) {
 				originalBlockClientId: isInvalid
 					? blocksWithSameName[ 0 ]
 					: false,
-				isBlockHidden: _isBlockHidden( clientId ),
 			};
 		},
 		[ clientId, rootClientId ]
@@ -749,6 +751,7 @@ function BlockListBlockProvider( props ) {
 		mayDisplayParentControls,
 		index,
 		blockApiVersion,
+		blockType,
 		blockTitle,
 		isSubtreeDisabled,
 		hasOverlay,
@@ -761,6 +764,7 @@ function BlockListBlockProvider( props ) {
 		hasChildSelected,
 		isSectionBlock,
 		isWithinSectionBlock,
+		isSelectionWithinCurrentSection,
 		isEditingDisabled,
 		hasEditableOutline,
 		className,
@@ -794,6 +798,7 @@ function BlockListBlockProvider( props ) {
 		mode,
 		name,
 		blockApiVersion,
+		blockType,
 		blockTitle,
 		isSelected,
 		isSubtreeDisabled,
@@ -808,6 +813,7 @@ function BlockListBlockProvider( props ) {
 		hasChildSelected,
 		isSectionBlock,
 		isWithinSectionBlock,
+		isSelectionWithinCurrentSection,
 		isEditingDisabled,
 		hasEditableOutline,
 		isEditingContentOnlySection,

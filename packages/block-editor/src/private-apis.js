@@ -42,6 +42,7 @@ import {
 	mediaEditKey,
 	getMediaSelectKey,
 	essentialFormatKey,
+	deviceTypeKey,
 	isIsolatedEditorKey,
 } from './store/private-keys';
 import { requiresWrapperOnCopy } from './components/writing-flow/utils';
@@ -113,6 +114,7 @@ lock( privateApis, {
 	mediaEditKey,
 	getMediaSelectKey,
 	essentialFormatKey,
+	deviceTypeKey,
 	isIsolatedEditorKey,
 	useBlockElement,
 	useBlockElementRef,

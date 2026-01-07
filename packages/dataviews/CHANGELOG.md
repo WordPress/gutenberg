@@ -14,6 +14,7 @@
 
 ### Bug Fixes
 
+- Fix panel field width with empty value for top/none label positions.[#74264](https://github.com/WordPress/gutenberg/pull/74264)
 - Fix sticky footer in DataViews grid view. [#73661](https://github.com/WordPress/gutenberg/pull/73661)
 - DataViews: Apply primary style to first column if there is no title field. [#73729](https://github.com/WordPress/gutenberg/pull/73729)
 - DataViews: Combined field alignment in table layout. [#73908](https://github.com/WordPress/gutenberg/pull/73908)
@@ -33,7 +34,7 @@
 - DataViews: Update padding to 24px for consistency. [#73334](https://github.com/WordPress/gutenberg/pull/73334)
 - DataViews: Simplify list layout field color styles. [#73884](https://github.com/WordPress/gutenberg/pull/73884)
 - DataViews: Add panel form layout validation. [#73700](https://github.com/WordPress/gutenberg/pull/73700)
-- Converted package to a compliant dual CJS/ESM module ([#73822](https://github.com/WordPress/gutenberg/pull/73822))
+- Converted package to a compliant dual CJS/ESM module ([#73822](https://github.com/WordPress/gutenberg/pull/73822) and [#74348](https://github.com/WordPress/gutenberg/pull/74348))
 
 ## 11.0.0 (2025-11-26)
 

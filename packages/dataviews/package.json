@@ -31,13 +31,12 @@
 		"build-wp",
 		"*.md"
 	],
-	"type": "module",
 	"main": "build/index.cjs",
-	"module": "build-module/index.js",
+	"module": "build-module/index.mjs",
 	"exports": {
 		".": {
 			"types": "./build-types/index.d.ts",
-			"import": "./build-module/index.js",
+			"import": "./build-module/index.mjs",
 			"require": "./build/index.cjs"
 		},
 		"./wp": {
@@ -79,8 +78,7 @@
 		"remove-accents": "^0.5.0"
 	},
 	"devDependencies": {
-		"@ariakit/test": "^0.4.7",
-		"@storybook/react": "9.1.17"
+		"@ariakit/test": "^0.4.7"
 	},
 	"peerDependencies": {
 		"react": "^18.0.0",

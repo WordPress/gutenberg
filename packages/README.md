@@ -8,31 +8,31 @@ Packages are the first layer of architecture and organization in Gutenberg. They
 
 1. **Each package should have a single, clear purpose.**
 
-   It should be immediately obvious why the package exists.
+    It should be immediately obvious why the package exists.
 
 2. **Every package must include a README.**
 
-   This is the first place contributors look to understand scope and usage.
+    This is the first place contributors look to understand scope and usage.
 
 3. **Any prerequisites must be documented.**
 
-   Generic packages without prerequisites are better, but packages with some prerequisites are acceptable. Examples of prerequisites: API endpoints that must exist, authentication assumptions, environment dependencies. These should be clearly stated in the README.
+    Generic packages without prerequisites are better, but packages with some prerequisites are acceptable. Examples of prerequisites: API endpoints that must exist, authentication assumptions, environment dependencies. These should be clearly stated in the README.
 
 4. **Public APIs should have documentation.**
 
-   Either inline in the README or linked to external docs.
+    Either inline in the README or linked to external docs.
 
 5. **Avoid utility and kitchen-sink packages.**
 
-   They tend to grow without a coherent domain and become junk drawers.
+    They tend to grow without a coherent domain and become junk drawers.
 
 6. **Avoid broad, catch-all scopes.**
 
-   For example: "Reusable WordPress components" or "Utilities for different use cases." These create unclear ownership and encourage uncontrolled growth. Instead, define a specific domain or purpose.
+    For example: "Reusable WordPress components" or "Utilities for different use cases." These create unclear ownership and encourage uncontrolled growth. Instead, define a specific domain or purpose.
 
 7. **Default to bundled packages (no globals, no modules) unless necessary.**
 
-   In Gutenberg, we should default to "bundled" packages unless there's a specific need for globals or modules. See the [@wordpress/build README](../wp-build/README.md) for more information on package configuration.
+    In Gutenberg, we should default to "bundled" packages unless there's a specific need for globals or modules. See the [@wordpress/build README](../wp-build/README.md) for more information on package configuration.
 
 For more information on the build system and package configuration, see the [@wordpress/build README](../wp-build/README.md).
 
@@ -141,14 +141,16 @@ Omit `wpScript` (or explicitly set to `false`) for packages designed solely as d
 ```
 
 **Examples of packages that should not expose to the `wp` global:**
-- Utility packages used internally by other packages
-- Shared logic or helpers without a direct WordPress use case
-- Intermediate packages intended only as dependencies of other `@wordpress/*` packages
+
+-   Utility packages used internally by other packages
+-   Shared logic or helpers without a direct WordPress use case
+-   Intermediate packages intended only as dependencies of other `@wordpress/*` packages
 
 When a package omits `wpScript` or sets it to `false`, it:
-- Will not be exposed as a WordPress script (not available via the `wp` global)
-- Can still be used as a dependency by other packages (via npm imports)
-- Should still be published to npm to support backporting to WordPress core releases
+
+-   Will not be exposed as a WordPress script (not available via the `wp` global)
+-   Can still be used as a dependency by other packages (via npm imports)
+-   Should still be published to npm to support backporting to WordPress core releases
 
 ### Truly Private Packages
 
@@ -270,14 +272,39 @@ _Example:_
 -   Fixed an off-by-one error with the `sum` function.
 ```
 
+### Promoting a Pre-Release Package to Stable (1.0.0)
+
+The automated package publishing workflow will at most bump the minor version of a pre-release package (those having a version like `0.x.x`), even if it includes breaking changes. This is consistent with semantic versioning, where `0.x` versions are intended for initial development where the API may change frequently.
+
+When a package's API is considered stable and ready for production use, it should be promoted to version 1.0.0. This is done by adding a "Stable Release" section to the `CHANGELOG.md` file:
+
+_Example:_
+
+```md
+## Unreleased
+
+### Stable Release
+
+This package is now considered stable and production-ready. The API will follow semantic versioning from this point forward.
+
+### Breaking Changes
+
+-   Final API adjustments before 1.0.0 release.
+```
+
+The presence of the "Stable Release" heading will cause the automated release process to bump a pre-1.0 package to 1.0.0. The "Stable Release" heading should only be used for pre-1.0 packages, and from that point forward breaking changes will result in major version bumps as expected.
+
+### Changelog Subsections
+
 There are a number of common release subsections you can follow. Each is intended to align to a specific meaning in the context of the [Semantic Versioning (`semver`) specification](https://semver.org/) the project adheres to. It is important that you describe your changes accurately, since this is used in the packages release process to help determine the version of the next release.
 
--   "Breaking Changes" - A backwards-incompatible change which requires specific attention of the impacted developers to reconcile (requires a major version bump).
+-   "Breaking Changes" - A backwards-incompatible change which requires specific attention of the impacted developers to reconcile (requires a major version bump for stable packages).
 -   "New Features" - The addition of a new backwards-compatible function or feature to the existing public API (requires a minor version bump).
 -   "Enhancements" - Backwards-compatible improvements to existing functionality (requires a minor version bump).
 -   "Deprecations" - Deprecation notices. These do not impact the public interface or behavior of the module (requires a minor version bump).
 -   "Bug Fixes" - Resolutions to existing buggy behavior (requires a patch version bump).
 -   "Internal" - Changes which do not have an impact on the public interface or behavior of the module (requires a patch version bump).
+-   "Stable Release" - Marks a pre-1.0 package as stable and production-ready. This should only be used for packages currently published as a 0.x pre-release, to intentionally communicate that a package's API is now stable and ready for production use.
 
 While other section naming can be used when appropriate, it's important that are expressed clearly to avoid confusion for both the packages releaser and third-party consumers.
 
