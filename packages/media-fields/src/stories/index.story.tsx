@@ -11,6 +11,8 @@ import type { Field, View } from '@wordpress/dataviews';
 import {
 	altTextField,
 	captionField,
+	dateAddedField,
+	dateModifiedField,
 	descriptionField,
 	filenameField,
 	filesizeField,
@@ -232,6 +234,8 @@ const showcaseFields = [
 	filenameField,
 	altTextField,
 	captionField,
+	dateAddedField,
+	dateModifiedField,
 	descriptionField,
 	mimeTypeField,
 	mediaDimensionsField,
@@ -259,6 +263,8 @@ const DataFormsComponent = ( { type }: { type: 'regular' | 'panel' } ) => {
 			'mime_type',
 			'media_dimensions',
 			'filesize',
+			'date',
+			'modified',
 		],
 	};
 

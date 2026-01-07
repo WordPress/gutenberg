@@ -186,9 +186,12 @@ export function MediaUploadModal( {
 				filters.author = filter.value;
 			}
 			// Handle date filters
-			if ( filter.field === 'date' ) {
-				filters.after = filter.value?.after;
-				filters.before = filter.value?.before;
+			if ( filter.field === 'date' || filter.field === 'modified' ) {
+				if ( filter.operator === 'before' ) {
+					filters.before = filter.value;
+				} else if ( filter.operator === 'after' ) {
+					filters.after = filter.value;
+				}
 			}
 			// Handle mime type filters
 			if ( filter.field === 'mime_type' ) {
@@ -329,7 +332,7 @@ export function MediaUploadModal( {
 				showTitle: false,
 			},
 			[ LAYOUT_PICKER_TABLE ]: {
-				fields: [ 'filename', 'filesize', 'media_dimensions' ],
+				fields: [ 'filename', 'filesize', 'media_dimensions', 'date' ],
 				showTitle: true,
 			},
 		} ),
