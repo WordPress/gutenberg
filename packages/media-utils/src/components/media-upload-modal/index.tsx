@@ -360,13 +360,13 @@ export function MediaUploadModal( {
 						per_page: -1,
 					};
 
-					const selectedPosts = await resolveSelect(
+					const selectedPosts = ( await resolveSelect(
 						coreStore
-					).getEntityRecords< RestAttachment >(
+					).getEntityRecords(
 						'postType',
 						'attachment',
 						selectedPostsQuery
-					);
+					) ) as RestAttachment[] | null;
 
 					// Transform the selected posts to the expected Attachment format
 					const transformedPosts = ( selectedPosts ?? [] )

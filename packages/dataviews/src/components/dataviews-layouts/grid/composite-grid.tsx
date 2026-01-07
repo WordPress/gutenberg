@@ -383,19 +383,17 @@ export default function CompositeGrid< Item >( {
 			return;
 		}
 
-		data.forEach( ( item, index ) => {
+		data.forEach( ( item ) => {
 			const itemId = getItemId( item );
 			if ( ! itemPositions.current.has( itemId ) ) {
-				// Use 1-based indexing for aria-posinset (starts at 1, not 0)
-				// Calculate based on current page and per-page settings
-				const currentPage = view.page || 1;
-				const perPage = view.perPage || 20;
-				const positionInFullSet =
-					( currentPage - 1 ) * perPage + index + 1;
-				itemPositions.current.set( itemId, positionInFullSet );
+				// Check if item has position metadata
+				const position = ( item as any ).position;
+				if ( position !== undefined ) {
+					itemPositions.current.set( itemId, position );
+				}
 			}
 		} );
-	}, [ data, getItemId, isInfiniteScroll, view.page, view.perPage ] );
+	}, [ data, getItemId, isInfiniteScroll ] );
 
 	// Set up IntersectionObserver for infinite scroll
 	useEffect( () => {

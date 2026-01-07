@@ -160,22 +160,26 @@ export function useInfiniteScrollData< Item extends { id: number } >( {
 					)
 					.map( ( record ) => {
 						const itemId = getItemId( record );
+						let position: number | undefined;
 
 						if ( view.infiniteScrollEnabled ) {
 							// Check if this record already has a position
 							const existingPosition =
 								positionMapRef.current.get( itemId );
-							if ( existingPosition === undefined ) {
+							if ( existingPosition !== undefined ) {
+								position = existingPosition;
+							} else {
 								// Assign new position and increment for next record
-								positionMapRef.current.set(
-									itemId,
-									nextPosition
-								);
+								position = nextPosition;
+								positionMapRef.current.set( itemId, position );
 								nextPosition++;
 							}
 						}
 
-						return record;
+						return {
+							...record,
+							position,
+						};
 					} );
 
 				if ( newRecords.length === 0 ) {
