@@ -22,7 +22,7 @@ import {
 import { resolveSelect, useDispatch } from '@wordpress/data';
 import { Modal, DropZone, FormFileUpload, Button } from '@wordpress/components';
 import { upload as uploadIcon } from '@wordpress/icons';
-import { DataViewsPicker, filterSortAndPaginate } from '@wordpress/dataviews';
+import { DataViewsPicker } from '@wordpress/dataviews';
 import type { View, Field, ActionButton } from '@wordpress/dataviews';
 import { Stack } from '@wordpress/ui';
 import {
@@ -326,12 +326,10 @@ export function MediaUploadModal( {
 	// Fetch all media attachments using WordPress core data with permissions
 	const {
 		records: mediaRecords,
-		isResolving: isLoadingRecords,
+		isResolving: isLoading,
 		totalItems,
 		totalPages,
 	} = useEntityRecordsWithPermissions( 'postType', 'attachment', queryArgs );
-
-	const isLoading = isLoadingRecords;
 
 	const fields: Field< RestAttachment >[] = useMemo(
 		() => [
@@ -365,36 +363,6 @@ export function MediaUploadModal( {
 		[]
 	);
 
-	// Apply client-side filtering, sorting, and pagination using filterSortAndPaginate
-	// when needed (e.g., for infinite scroll position-based slicing)
-	const processedData = useMemo( () => {
-		if ( ! mediaRecords ) {
-			return [];
-		}
-
-		// For infinite scroll, we need to use filterSortAndPaginate to slice
-		// the data based on startPosition and endPosition
-		if (
-			view.infiniteScrollEnabled &&
-			view.startPosition !== undefined &&
-			view.endPosition !== undefined
-		) {
-			return filterSortAndPaginate( mediaRecords, view, fields ).data;
-		}
-
-		// For regular pagination, use server-provided data as-is
-		return mediaRecords;
-	}, [ mediaRecords, view, fields ] );
-
-	// Always use server-provided total counts for pagination info
-	const paginationInfo = useMemo(
-		() => ( {
-			totalItems: totalItems || 0,
-			totalPages: totalPages || 0,
-		} ),
-		[ totalItems, totalPages ]
-	);
-
 	const actions: ActionButton< RestAttachment >[] = useMemo(
 		() => [
 			{
@@ -412,13 +380,13 @@ export function MediaUploadModal( {
 						per_page: -1,
 					};
 
-					const selectedPosts = ( await resolveSelect(
+					const selectedPosts = await resolveSelect(
 						coreStore
-					).getEntityRecords(
+					).getEntityRecords< RestAttachment >(
 						'postType',
 						'attachment',
 						selectedPostsQuery
-					) ) as RestAttachment[] | null;
+					);
 
 					// Transform the selected posts to the expected Attachment format
 					const transformedPosts = ( selectedPosts ?? [] )
@@ -496,6 +464,14 @@ export function MediaUploadModal( {
 			}
 		},
 		[ allowedTypes, handleUpload, registerBatch ]
+	);
+
+	const paginationInfo = useMemo(
+		() => ( {
+			totalItems,
+			totalPages,
+		} ),
+		[ totalItems, totalPages ]
 	);
 
 	const defaultLayouts = useMemo(
@@ -588,11 +564,7 @@ export function MediaUploadModal( {
 				label={ __( 'Drop files to upload' ) }
 			/>
 			<DataViewsPicker
-				data={
-					processedData as ( RestAttachment & {
-						id: number;
-					} )[]
-				}
+				data={ mediaRecords || [] }
 				fields={ fields }
 				view={ view }
 				onChangeView={ setView }
