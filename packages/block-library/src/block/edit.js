@@ -187,11 +187,9 @@ function ReusableBlockEdit( {
 				EMPTY_OBJECT,
 		};
 	}, [] );
-	const supportedBlockTypes = useMemo(
-		() => Object.keys( supportedBlockTypesRaw ),
-		[ supportedBlockTypesRaw ]
-	);
+
 	const canOverrideBlocks = useMemo( () => {
+		const supportedBlockTypes = Object.keys( supportedBlockTypesRaw );
 		const hasOverridableBlocks = ( _blocks ) =>
 			_blocks.some( ( block ) => {
 				if (
@@ -203,7 +201,7 @@ function ReusableBlockEdit( {
 				return hasOverridableBlocks( block.innerBlocks );
 			} );
 		return hasPatternOverridesSource && hasOverridableBlocks( blocks );
-	}, [ hasPatternOverridesSource, blocks, supportedBlockTypes ] );
+	}, [ hasPatternOverridesSource, blocks, supportedBlockTypesRaw ] );
 
 	const { alignment, layout } = useInferredLayout( blocks, parentLayout );
 	const layoutClasses = useLayoutClasses( { layout }, name );
