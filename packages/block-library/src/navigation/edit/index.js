@@ -28,7 +28,12 @@ import {
 	useBlockEditingMode,
 	BlockControls,
 } from '@wordpress/block-editor';
-import { EntityProvider, store as coreStore } from '@wordpress/core-data';
+import {
+	EntityProvider,
+	store as coreStore,
+	useEntityId,
+	useEntityRecord,
+} from '@wordpress/core-data';
 import { useDispatch, useSelect } from '@wordpress/data';
 import {
 	__experimentalToolsPanel as ToolsPanel,
@@ -493,39 +498,14 @@ function Navigation( {
 
 	// Check if this navigation block is inside an overlay template part.
 	// If so, disable the overlay menu to prevent nested overlays.
-	const isWithinOverlayTemplatePart = useSelect( ( select ) => {
-		const { getEditedEntityRecord } = select( coreStore );
-
-		// Check if we're directly editing a template part by examining the URL.
-		// This avoids needing to import the editor store.
-		// Site editor uses format: ?p=%2Fwp_template_part%2Ftheme%2F%2Fslug
-		if ( typeof window !== 'undefined' && window.location ) {
-			const urlParams = new URLSearchParams( window.location.search );
-			const path = urlParams.get( 'p' );
-
-			// Parse the path to extract post type and ID
-			if ( path && path.includes( 'wp_template_part' ) ) {
-				// Path format: /wp_template_part/theme//slug
-				const pathParts = decodeURIComponent( path ).split( '/' );
-
-				if ( pathParts[ 1 ] === 'wp_template_part' ) {
-					// Reconstruct the template part ID (theme//slug)
-					const templatePartId = pathParts.slice( 2 ).join( '/' );
-
-					const currentTemplatePart = getEditedEntityRecord(
-						'postType',
-						'wp_template_part',
-						templatePartId
-					);
-					if ( currentTemplatePart?.area === 'overlay' ) {
-						return true;
-					}
-				}
-			}
-		}
-
-		return false;
-	}, [] );
+	// Use the entity context to get the current template part being edited.
+	const templatePartId = useEntityId( 'postType', 'wp_template_part' );
+	const { record: templatePart } = useEntityRecord(
+		'postType',
+		'wp_template_part',
+		templatePartId
+	);
+	const isWithinOverlayTemplatePart = templatePart?.area === 'overlay';
 
 	// Force overlayMenu to 'never' if within an overlay template part.
 	const effectiveOverlayMenu = isWithinOverlayTemplatePart
