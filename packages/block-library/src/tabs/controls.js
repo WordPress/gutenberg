@@ -21,7 +21,6 @@ export default function Controls( { attributes, setAttributes, clientId } ) {
 		<>
 			<AddTabToolbarControl
 				tabsClientId={ clientId }
-				attributes={ attributes }
 			/>
 			<InspectorControls>
 				<PanelBody title={ __( 'Tabs Settings' ) }>

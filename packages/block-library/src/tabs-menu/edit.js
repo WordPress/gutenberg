@@ -330,7 +330,6 @@ function Edit( {
 		<>
 			<AddTabToolbarControl
 				tabsClientId={ tabsClientId }
-				attributes={ attributes }
 			/>
 			<Controls
 				{ ...{

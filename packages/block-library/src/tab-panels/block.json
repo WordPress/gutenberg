@@ -26,6 +26,18 @@
 			"padding": true,
 			"margin": true
 		},
+		"layout": {
+			"default": {
+				"type": "flex",
+				"flexWrap": "nowrap",
+				"justifyContent": "stretch",
+				"orientation": "vertical"
+			},
+			"allowSwitching": false,
+			"allowVerticalAlignment": false,
+			"allowJustification": true,
+			"allowSizingOnChildren": false
+		},
 		"__experimentalBorder": {
 			"radius": true,
 			"color": true,

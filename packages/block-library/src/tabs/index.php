@@ -149,6 +149,12 @@ add_filter( 'render_block_context', 'block_core_tabs_provide_context', 10, 3 );
 function block_core_tabs_render_block_callback( array $attributes, string $content, \WP_Block $block ): string {
 	$active_tab_index = $attributes['activeTabIndex'] ?? 0;
 
+	$title = $attributes['metadata']['name'] ?? '';
+	if ( empty( $title ) ) {
+		$title = 'Tab Contents';
+	}
+	$title = wp_sprintf( '<h3 class="tabs__title">%s</h3>', esc_html( $title ) );
+
 	$tabs_list = block_core_tabs_generate_tabs_list( $block->parsed_block['innerBlocks'] ?? array() );
 
 	$tabs_id = wp_unique_id( 'tabs_' );
@@ -165,14 +171,22 @@ function block_core_tabs_render_block_callback( array $attributes, string $conte
 		)
 	);
 
-	$layout = $attributes['layout'] ?? array();
-	$orientation = $layout['orientation'] ?? 'vertical';
-	$is_vertical = 'vertical' !== $orientation; // @TODO: Going to pull out all this is_vertical logic from the original and replace with something context sensitive to tabs menu.
+	$is_vertical = false;
 
 	$tag_processor = new WP_HTML_Tag_Processor( $content );
 	$tag_processor->next_tag( array( 'class_name' => 'wp-block-tabs' ) );
-	$tag_processor->add_class( $orientation === 'vertical' ? 'is-vertical' : 'is-horizontal' );
 	$tag_processor->set_attribute( 'data-wp-interactive', 'core/tabs/private' );
+
+	// Inspect inside the tabs-menu to see if its vertical or not.
+	$tag_processor->set_bookmark('core/tabs_wrapper');
+	while ( $tag_processor->next_tag( array( 'class_name' => 'wp-block-tabs-menu' ) ) ) {
+		if ( $tag_processor->has_class( 'is-vertical' ) ) {
+			$is_vertical = true;
+			break;
+		}
+	}
+	$tag_processor->seek('core/tabs_wrapper');
+
 	$tag_processor->set_attribute(
 		'data-wp-context',
 		wp_json_encode(
@@ -193,7 +207,12 @@ function block_core_tabs_render_block_callback( array $attributes, string $conte
 	$style .= block_core_tabs_generate_gap_styles( $attributes, $is_vertical );
 	$tag_processor->set_attribute( 'style', $style );
 
-	return $tag_processor->get_updated_html();
+	$output = $tag_processor->get_updated_html();
+
+	// Insert the title after the first opening tag.
+	$output = preg_replace( '/^(<[^>]+>)/', '$1' . $title, $output );
+
+	return $output;
 }
 
 /**

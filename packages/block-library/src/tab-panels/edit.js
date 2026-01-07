@@ -39,7 +39,6 @@ export default function Edit( { attributes, clientId } ) {
 		<>
 			<AddTabToolbarControl
 				tabsClientId={ tabsClientId }
-				attributes={ attributes }
 			/>
 			<div { ...innerBlocksProps } />
 		</>

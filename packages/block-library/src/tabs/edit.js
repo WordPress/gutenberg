@@ -6,6 +6,7 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
+import { __ } from '@wordpress/i18n';
 import {
 	useBlockProps,
 	useInnerBlocksProps,
@@ -30,11 +31,20 @@ const TABS_TEMPLATE = [
 		lock: {
 			remove: true,
 		}
-	}, [ [ 'core/tab', {} ] ] ],
+	}, [
+		[ 'core/tab', {
+			anchor: 'tab-1',
+			label: 'Tab 1',
+		}, [
+			[ 'core/paragraph', {
+				placeholder: __( 'Type / to add a block to tab' ),
+			} ]
+		] ]
+	] ],
 ];
 
-function Edit( { clientId, attributes, setAttributes } ) {
-	const { orientation, activeTabIndex, editorActiveTabIndex } = attributes;
+function Edit( { clientId, attributes, setAttributes, __unstableLayoutClassNames: layoutClassNames } ) {
+	const { activeTabIndex, editorActiveTabIndex } = attributes;
 
 	/**
 	 * Initialize editorActiveTabIndex to activeTabIndex on mount.
@@ -94,9 +104,7 @@ function Edit( { clientId, attributes, setAttributes } ) {
 	 * Block props for the tabs container.
 	 */
 	const blockProps = useBlockProps( {
-		className: clsx(
-			'vertical' === orientation ? 'is-vertical' : 'is-horizontal'
-		),
+		className: layoutClassNames,
 	} );
 
 	/**
@@ -112,12 +120,12 @@ function Edit( { clientId, attributes, setAttributes } ) {
 	return (
 		<BlockContextProvider value={ contextValue }>
 			<div { ...innerBlockProps }>
-				{ innerBlockProps.children }
 				<Controls
 					clientId={ clientId }
 					attributes={ attributes }
 					setAttributes={ setAttributes }
 				/>
+				{ innerBlockProps.children }
 			</div>
 		</BlockContextProvider>
 	);

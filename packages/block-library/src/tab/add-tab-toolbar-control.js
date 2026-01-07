@@ -19,7 +19,7 @@ import { useDispatch, useSelect } from '@wordpress/data';
  * @param {string} props.tabsClientId The client ID of the parent tabs block.
  * @return {JSX.Element} The toolbar control element.
  */
-export default function AddTabToolbarControl( { attributes, tabsClientId } ) {
+export default function AddTabToolbarControl( { tabsClientId } ) {
 	const { insertBlock, updateBlockAttributes, selectBlock } = useDispatch( blockEditorStore );
 
 	// Find the tab-panels block and tabs-menu block within the tabs block
@@ -49,16 +49,11 @@ export default function AddTabToolbarControl( { attributes, tabsClientId } ) {
 		[ tabsClientId ]
 	);
 
-	const { className, fontFamily, fontSize } = attributes;
-
 	const addTab = () => {
 		if ( ! tabPanelsClientId ) {
 			return;
 		}
 		const newTabBlock = createBlock( 'core/tab', {
-			className,
-			fontFamily,
-			fontSize,
 			anchor: 'tab-' + nextTabIndex,
 		} );
 		// Pass false for updateSelection to prevent focusing the newly created tab

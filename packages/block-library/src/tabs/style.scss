@@ -1,11 +1,12 @@
 .wp-block-tabs {
-	gap: var(--wp--style--unstable-tabs-gap, var(--wp--style--tabs-gap-default, 0.5em));
 	box-sizing: border-box;
-
 	// CSS custom properties for child blocks to inherit
 	--tabs-divider-color: var(--custom-tab-active-color, #000);
-
 	.tabs__title {
 		display: none;
 	}
+}
+
+:root :where(.wp-block-tabs) {
+	gap: var(--wp--style--unstable-tabs-gap, var(--wp--style--tabs-gap-default, 0.5em));
 }

@@ -37,6 +37,7 @@
 				"type": "flex",
 				"flexWrap": "nowrap",
 				"justifyContent": "stretch",
+				"verticalAlignment": "stretch",
 				"orientation": "vertical"
 			},
 			"allowSwitching": false,

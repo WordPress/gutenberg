@@ -10,7 +10,6 @@ import { __ } from '@wordpress/i18n';
 import {
 	useBlockProps,
 	useInnerBlocksProps,
-	getTypographyClassesAndStyles as useTypographyProps,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -141,35 +140,28 @@ export default function Edit( {
 	);
 	const tabLabelId = useMemo( () => `${ tabPanelId }--tab`, [ tabPanelId ] );
 
-	const tabContentTypographyProps = useTypographyProps( attributes );
-
 	const blockProps = useBlockProps( {
 		hidden: ! isSelectedTab,
+		'aria-labelledby': tabLabelId,
+		id: tabPanelId,
+		role: 'tabpanel',
+		ref: innerBlocksRef,
+		tabIndex: isSelectedTab ? 0 : -1,
+		className: clsx(
+			'tabs__tab-editor-content',
+			layoutClassNames
+		),
 	} );
 
 	const innerBlocksProps = useInnerBlocksProps(
-		{
-			'aria-labelledby': tabLabelId,
-			id: tabPanelId,
-			role: 'tabpanel',
-			ref: innerBlocksRef,
-			tabIndex: isSelectedTab ? 0 : -1,
-			className: clsx(
-				tabContentTypographyProps.className,
-				'tabs__tab-editor-content',
-				layoutClassNames
-			),
-			style: {
-				...tabContentTypographyProps.style,
-			},
-		},
+		blockProps,
 		{
 			template: TEMPLATE,
 		}
 	);
 
 	return (
-		<section { ...blockProps }>
+		<section { ...innerBlocksProps }>
 			<Controls
 				attributes={ attributes }
 				setAttributes={ setAttributes }

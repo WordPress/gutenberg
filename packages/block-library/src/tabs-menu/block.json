@@ -43,21 +43,6 @@
 			"type": "string"
 		}
 	},
-	"styles": [
-		{
-			"name": "tab",
-			"label": "Tabs",
-			"isDefault": true
-		},
-		{
-			"name": "links",
-			"label": "Links"
-		},
-		{
-			"name": "button",
-			"label": "Button"
-		}
-	],
 	"supports": {
 		"html": false,
 		"reusable": false,
