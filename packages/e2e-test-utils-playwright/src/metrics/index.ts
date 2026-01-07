@@ -1,11 +1,8 @@
 /**
  * External dependencies
  */
-import type { Page, Browser } from '@playwright/test';
 import { join } from 'path';
-// resolution-mode support in TypeScript 5.3 will resolve this.
-// See https://devblogs.microsoft.com/typescript/announcing-typescript-5-3-beta/
-// @ts-expect-error
+import type { Page, Browser } from '@playwright/test';
 import type { Metric } from 'web-vitals';
 
 type EventType =
