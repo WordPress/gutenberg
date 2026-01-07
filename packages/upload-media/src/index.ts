@@ -9,3 +9,5 @@ export { default as MediaUploadProvider } from './components/provider';
 export { UploadError } from './upload-error';
 
 export type { ImageFormat } from './store/types';
+
+import './cross-origin-isolation';
