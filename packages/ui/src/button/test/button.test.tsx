@@ -32,6 +32,7 @@ describe( 'Button', () => {
 
 		const onClickMock = jest.fn();
 		const { getByRole } = render(
+			// eslint-disable-next-line no-restricted-syntax
 			<Button disabled onClick={ onClickMock }>
 				Click me
 			</Button>
@@ -63,6 +64,8 @@ describe( 'Button', () => {
 
 	it( 'can be enabled explicitly when loading', () => {
 		const { getByRole } = render(
+			// Additional improvement in the original lint rule: only error if disabled=true?
+			// eslint-disable-next-line no-restricted-syntax
 			<Button loading loadingAnnouncement="Loading" disabled={ false }>
 				Click me
 			</Button>
@@ -76,7 +79,7 @@ describe( 'Button', () => {
 
 	it( 'supports custom render prop while retaining the default accessible when disabled behavior', () => {
 		const { getByRole } = render(
-			// eslint-disable-next-line jsx-a11y/anchor-has-content
+			// eslint-disable-next-line jsx-a11y/anchor-has-content, no-restricted-syntax
 			<Button render={ <a href="/" /> } disabled>
 				Click me
 			</Button>

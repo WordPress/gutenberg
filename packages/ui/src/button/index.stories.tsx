@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-syntax */
 /**
  * External dependencies
  */
@@ -213,3 +214,5 @@ export const Pressed: Story = {
 		);
 	},
 };
+
+/* eslint-enable no-restricted-syntax */
