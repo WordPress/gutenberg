@@ -70,6 +70,17 @@
 				"text": true
 			}
 		},
+		"dimensions": false,
+		"layout": {
+			"default": {
+				"type": "flex",
+				"flexWrap": "nowrap"
+			},
+			"allowSwitching": false,
+			"allowVerticalAlignment": true,
+			"allowJustification": true,
+			"allowOrientation": true
+		},
 		"lock": false,
 		"typography": {
 			"fontSize": true,

@@ -169,7 +169,7 @@ export default function Edit( {
 	);
 
 	return (
-		<div { ...blockProps }>
+		<section { ...blockProps }>
 			<Controls
 				attributes={ attributes }
 				setAttributes={ setAttributes }
@@ -177,7 +177,7 @@ export default function Edit( {
 				blockIndex={ blockIndex }
 				isDefaultTab={ isDefaultTab }
 			/>
-			{ isSelectedTab && <section { ...innerBlocksProps } /> }
-		</div>
+			{ isSelectedTab && innerBlocksProps.children }
+		</section>
 	);
 }

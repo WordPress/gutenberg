@@ -4,10 +4,10 @@
 	margin: 0;
 	padding: 0;
 	align-items: flex-end;
-	flex-grow: 1;
-	flex-basis: 100%;
+	// flex-grow: 1;
+	// flex-basis: 100%;
 	gap: var(--wp--style--unstable-tabs-list-gap, var(--wp--style--tabs-gap-default, 0.5em));
-	min-width: 100px;
+	min-width: fit-content;
 
 	--tab-bg: var(--wp--custom--tabs-menu--background-color, transparent);
 	--tab-bg-hover: var(--custom-tab-hover-color, #eaeaea);
@@ -82,23 +82,13 @@
 
 // Vertical layout adjustments (set by parent tabs block)
 .wp-block-tabs.is-vertical .wp-block-tabs-menu {
-	flex-grow: 0;
-	flex-direction: column;
-	max-width: 30%;
-	border-inline-end: 1px solid var(--tabs-divider-color, #000);
-	border-block-end: none;
 	overflow-x: hidden;
-
-	.tabs__tab-label {
-		max-width: 100%;
-		text-align: end;
-	}
 }
 
 // Horizontal layout divider
 .wp-block-tabs:not(.is-vertical) .wp-block-tabs-menu {
 	overflow-x: auto;
-	border-block-end: 1px solid var(--tabs-divider-color, #000);
+	// border-block-end: 1px solid var(--tabs-divider-color, #000);
 }
 
 // Links style

@@ -19,15 +19,18 @@
 		"anchor": false,
 		"html": false,
 		"reusable": false,
-		"layout": {
-			"allowSwitching": false,
-			"allowInheriting": false
-		},
 		"lock": false,
+		"dimensions": false,
 		"spacing": {
-			"blockGap": true,
+			"blockGap": false,
 			"padding": true,
-			"margin": false
+			"margin": true
+		},
+		"__experimentalBorder": {
+			"radius": true,
+			"color": true,
+			"width": true,
+			"style": true
 		}
 	},
 	"editorScript": "file:./index.js",

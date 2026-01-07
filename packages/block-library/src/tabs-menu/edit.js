@@ -62,6 +62,7 @@ function Edit( {
 	setHoverBackgroundColor,
 	hoverTextColor,
 	setHoverTextColor,
+	__unstableLayoutClassNames: layoutClassNames,
 } ) {
 	const tabsList = context[ 'core/tabs-list' ] || [];
 	const tabsId = context[ 'core/tabs-id' ] || '';
@@ -88,11 +89,15 @@ function Edit( {
 	const typographyProps = useTypographyProps( attributes );
 
 	// Get selection info and parent clientId
-	const { selectedTabClientId, tabsClientId } = useSelect(
+	const { selectedTabClientId, tabsClientId, isTabsMenuSelected } = useSelect(
 		( select ) => {
-			const { getBlockRootClientId, getSelectedBlockClientIds, hasSelectedInnerBlock } = select( blockEditorStore );
+			const { getBlockRootClientId, getSelectedBlockClientIds, hasSelectedInnerBlock, getSelectedBlockClientId } = select( blockEditorStore );
 			const _tabsClientId = getBlockRootClientId( clientId );
 			const selectedIds = getSelectedBlockClientIds();
+			const currentlySelectedBlockId = getSelectedBlockClientId();
+
+			// Check if the tabs-menu block itself is selected
+			const _isTabsMenuSelected = currentlySelectedBlockId === clientId;
 
 			// Find if any tab is selected
 			let selectedTab = null;
@@ -106,6 +111,7 @@ function Edit( {
 			return {
 				selectedTabClientId: selectedTab,
 				tabsClientId: _tabsClientId,
+				isTabsMenuSelected: _isTabsMenuSelected,
 			};
 		},
 		[ clientId, tabsList ]
@@ -128,12 +134,19 @@ function Edit( {
 				return;
 			}
 
-			// Select the tab block
+			// If the tabs-menu is not selected, select it first instead of the tab
+			// This allows users to interact with the tabs-menu before drilling into individual tabs
+			if ( ! isTabsMenuSelected ) {
+				selectBlock( clientId );
+				return;
+			}
+
+			// Select the tab block (only if tabs-menu is already selected)
 			if ( tabClientId ) {
 				selectBlock( tabClientId );
 			}
 		},
-		[ editingTabClientId, tabsClientId, effectiveActiveIndex, updateBlockAttributes, selectBlock ]
+		[ editingTabClientId, tabsClientId, effectiveActiveIndex, updateBlockAttributes, selectBlock, isTabsMenuSelected, clientId ]
 	);
 
 	const handleLabelChange = useCallback(
@@ -220,7 +233,7 @@ function Edit( {
 	] );
 
 	const blockProps = useBlockProps( {
-		className: clsx( 'wp-block-tabs-menu', 'tabs__list' ),
+		className: clsx( 'wp-block-tabs-menu', 'tabs__list', layoutClassNames ),
 		role: 'tablist',
 		style: customColorStyles,
 	} );

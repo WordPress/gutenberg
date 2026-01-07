@@ -1,7 +1,4 @@
 .wp-block-tabs {
-	display: flex;
-	flex-direction: row;
-	flex-wrap: wrap;
 	gap: var(--wp--style--unstable-tabs-gap, var(--wp--style--tabs-gap-default, 0.5em));
 	box-sizing: border-box;
 
@@ -10,9 +7,5 @@
 
 	.tabs__title {
 		display: none;
-	}
-
-	&.is-vertical {
-		flex-wrap: nowrap;
 	}
 }

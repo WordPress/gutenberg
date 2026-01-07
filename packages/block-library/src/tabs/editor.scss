@@ -3,32 +3,4 @@
 		flex-grow: 1;
 		min-width: 0;
 	}
-
-	.wp-block-tab.wp-block {
-		display: flex;
-		flex-direction: column;
-		gap: var(--wp--style--unstable-tabs-gap, 0.5em);
-
-		& > section {
-			flex-grow: 1;
-
-			& > .wp-block:first-child {
-				margin-top: 0;
-			}
-
-			& > .wp-block:last-child {
-				margin-bottom: 0;
-			}
-		}
-	}
-
-	&.is-vertical {
-		.wp-block-tab-panels {
-			flex-grow: 1;
-		}
-
-		.wp-block-tab.wp-block {
-			flex-direction: row;
-		}
-	}
 }

@@ -56,6 +56,11 @@ function ContrastCheckerMatrix( { attributes } ) {
 	return (
 		<>
 			<ContrastChecker
+				backgroundColor={ backgroundColor }
+				fontSize={ fontSize }
+				textColor={ textColor }
+			/>
+			<ContrastChecker
 				backgroundColor={ activeBackground }
 				fontSize={ fontSize }
 				textColor={ activeText }
