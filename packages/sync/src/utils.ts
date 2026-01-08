@@ -9,12 +9,9 @@ import * as buffer from 'lib0/buffer';
  */
 import {
 	CRDT_DOC_META_PERSISTENCE_KEY,
-	CRDT_DOC_VERSION,
 	CRDT_RECORD_METADATA_MAP_KEY as RECORD_METADATA_KEY,
 	CRDT_RECORD_METADATA_SAVED_AT_KEY as SAVED_AT_KEY,
 	CRDT_RECORD_METADATA_SAVED_BY_KEY as SAVED_BY_KEY,
-	CRDT_STATE_MAP_KEY,
-	CRDT_STATE_VERSION_KEY,
 } from './config';
 import type { CRDTDoc } from './types';
 
@@ -32,9 +29,6 @@ export function createYjsDoc( documentMeta: DocumentMeta = {} ): Y.Doc {
 	);
 
 	const ydoc = new Y.Doc( { meta: metaMap } );
-	const stateMap = ydoc.getMap( CRDT_STATE_MAP_KEY );
-
-	stateMap.set( CRDT_STATE_VERSION_KEY, CRDT_DOC_VERSION );
 
 	return ydoc;
 }

@@ -177,30 +177,7 @@ export function createSyncManager(): SyncManager {
 			undoManager = createUndoManager();
 		}
 
-		const onStateUpdate = (
-			event: Y.YMapEvent< unknown >,
-			transaction: Y.Transaction
-		) => {
-			if ( transaction.local ) {
-				return;
-			}
-
-			event.keysChanged.forEach( ( key ) => {
-				switch ( key ) {
-					case CRDT_STATE_VERSION_KEY:
-						const remoteVersion = stateMap.get(
-							CRDT_STATE_VERSION_KEY
-						);
-
-						if ( remoteVersion !== CRDT_DOC_VERSION ) {
-							console.log( 'Remote version mismatch detected' );
-							console.log( 'remoteVersion', remoteVersion );
-							console.log( 'CRDT_DOC_VERSION', CRDT_DOC_VERSION );
-						}
-						break;
-				}
-			} );
-		};
+		const onStateUpdate = createStateUpdateObserver( ydoc );
 
 		const { addUndoMeta, restoreUndoMeta } = handlers;
 		undoManager.addToScope( recordMap, {
@@ -236,6 +213,9 @@ export function createSyncManager(): SyncManager {
 
 		// Get and apply the persisted CRDT document, if it exists.
 		applyPersistedCrdtDoc( objectType, objectId, record );
+
+		// Announce our CRDT version to the network
+		setupVersionAnnouncement( ydoc );
 	}
 
 	/**
@@ -296,31 +276,7 @@ export function createSyncManager(): SyncManager {
 			} );
 		};
 
-		const onStateUpdate = (
-			event: Y.YMapEvent< unknown >,
-			transaction: Y.Transaction
-		) => {
-			if ( transaction.local ) {
-				return;
-			}
-
-			event.keysChanged.forEach( ( key ) => {
-				switch ( key ) {
-					case CRDT_STATE_VERSION_KEY:
-						const remoteVersion = stateMap.get(
-							CRDT_STATE_VERSION_KEY
-						);
-						if ( remoteVersion !== CRDT_DOC_VERSION ) {
-							console.log(
-								'Remote version mismatch detected (collection)'
-							);
-							console.log( 'remoteVersion', remoteVersion );
-							console.log( 'CRDT_DOC_VERSION', CRDT_DOC_VERSION );
-						}
-						break;
-				}
-			} );
-		};
+		const onStateUpdate = createStateUpdateObserver( ydoc );
 
 		const collectionState: CollectionState = {
 			handlers,
@@ -341,6 +297,9 @@ export function createSyncManager(): SyncManager {
 		// Attach observers.
 		recordMetaMap.observe( onRecordMetaUpdate );
 		stateMap.observe( onStateUpdate );
+
+		// Announce our CRDT version to the network
+		setupVersionAnnouncement( ydoc );
 	}
 
 	/**
@@ -566,6 +525,105 @@ export function createSyncManager(): SyncManager {
 		}
 
 		return createPersistedCRDTDoc( entityState.ydoc );
+	}
+
+	/**
+	 * Observe state updates and check for version mismatches.
+	 *
+	 * @param {CRDTDoc} ydoc The Yjs document to observe.
+	 * @return {Function} The observer function.
+	 */
+	function createStateUpdateObserver( ydoc: CRDTDoc ) {
+		return (
+			event: Y.YMapEvent< unknown >,
+			transaction: Y.Transaction
+		) => {
+			if ( transaction.local ) {
+				return;
+			}
+
+			const stateMap = ydoc.getMap( CRDT_STATE_MAP_KEY );
+
+			event.keysChanged.forEach( ( key ) => {
+				switch ( key ) {
+					case CRDT_STATE_VERSION_KEY:
+						const remoteVersion = stateMap.get(
+							CRDT_STATE_VERSION_KEY
+						) as number | undefined;
+
+						// Warn if the remote version is HIGHER than ours (we're outdated)
+						if (
+							typeof remoteVersion !== 'undefined' &&
+							remoteVersion > CRDT_DOC_VERSION
+						) {
+							console.log(
+								'Outdated client detected! We have',
+								CRDT_DOC_VERSION,
+								'network has version',
+								remoteVersion
+							);
+						}
+						break;
+				}
+			} );
+		};
+	}
+
+	/**
+	 * Set up version announcement for a ydoc. This waits for the first remote
+	 * update (indicating sync has started) before announcing our version, with
+	 * a fallback timeout in case we're the only client.
+	 *
+	 * @param {CRDTDoc} ydoc The Yjs document to announce version for.
+	 */
+	function setupVersionAnnouncement( ydoc: CRDTDoc ): void {
+		let versionAnnounced = false;
+
+		const announceVersion = () => {
+			if ( ! versionAnnounced ) {
+				versionAnnounced = true;
+
+				/**
+				 * Announce this client's CRDT version to the network.
+				 * The version will only be set if it's higher than the current
+				 * network maximum, ensuring that clients with older versions
+				 * can always detect when newer versions exist.
+				 */
+				ydoc.transact( () => {
+					const stateMap = ydoc.getMap( CRDT_STATE_MAP_KEY );
+					const currentMax = stateMap.get(
+						CRDT_STATE_VERSION_KEY
+					) as number | undefined;
+
+					// Only set if we're higher than current max (or no max exists).
+					// This ensures the version only increases, never decreases.
+					if (
+						currentMax === undefined ||
+						CRDT_DOC_VERSION > currentMax
+					) {
+						stateMap.set(
+							CRDT_STATE_VERSION_KEY,
+							CRDT_DOC_VERSION
+						);
+					}
+				} );
+
+				ydoc.off( 'update', onFirstUpdate );
+			}
+		};
+
+		const onFirstUpdate = ( _update: Uint8Array, origin: any ) => {
+			// Announce version after receiving a remote update
+			if ( origin ) {
+				announceVersion();
+			}
+		};
+
+		ydoc.on( 'update', onFirstUpdate );
+
+		// If no updates are received within 1 second, announce anyway.
+		// This handles the case where we're the only client.
+		setTimeout( announceVersion, 1000 );
 	}
 
 	return {
