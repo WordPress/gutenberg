@@ -80,18 +80,16 @@ module.exports = /** @type {import('eslint').Rule.RuleModule} */ ( {
 					computedValue,
 					DS_TOKEN_PREFIX
 				);
-				const unknownTokens = new Set(
-					[ ...usedTokens ].filter(
-						( token ) => ! knownTokens.has( token )
-					)
+				const unknownTokens = [ ...usedTokens ].filter(
+					( token ) => ! knownTokens.has( token )
 				);
 
-				if ( unknownTokens.size > 0 ) {
+				if ( unknownTokens.length > 0 ) {
 					context.report( {
 						node,
 						messageId: 'onlyKnownTokens',
 						data: {
-							tokenNames: Array.from( unknownTokens )
+							tokenNames: unknownTokens
 								.map( ( token ) => `'${ token }'` )
 								.join( ', ' ),
 						},
