@@ -219,9 +219,9 @@ export const saveDirtyEntities =
 					const errorNotice =
 						uniqueMessages.length > 0
 							? sprintf(
-									/* translators: %s: Error message returned from the server. */
+									/* translators: %s: a list of comma separated error messages */
 									__( 'Saving failed: %s' ),
-									uniqueMessages.join( '; ' )
+									uniqueMessages.join( ',' )
 							  )
 							: __( 'Saving failed.' );
 
