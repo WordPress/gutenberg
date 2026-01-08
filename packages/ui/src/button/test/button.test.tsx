@@ -9,7 +9,7 @@ describe( 'Button', () => {
 
 		expect(
 			screen.getByRole( 'button', { name: 'Click me' } )
-		).toBeInTheDocument();
+		).toBeVisible();
 	} );
 
 	it( 'forwards ref', () => {
