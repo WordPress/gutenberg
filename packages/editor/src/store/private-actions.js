@@ -205,9 +205,8 @@ export const saveDirtyEntities =
 				) {
 					// Retrieve error messages for entities that failed to save.
 					const errorMessages = [];
-					let i = 0;
-					for ( const { kind, name, key } of entitiesToSave ) {
-						if ( typeof values[ i ] === 'undefined' ) {
+					entitiesToSave.forEach( ( { kind, name, key }, index ) => {
+						if ( typeof values[ index ] === 'undefined' ) {
 							const error = registry
 								.select( coreStore )
 								.getLastEntitySaveError( kind, name, key );
@@ -215,8 +214,7 @@ export const saveDirtyEntities =
 								errorMessages.push( error.message );
 							}
 						}
-						i++;
-					}
+					} );
 
 					// Display error with details if available.
 					const uniqueMessages = [ ...new Set( errorMessages ) ];
@@ -225,7 +223,7 @@ export const saveDirtyEntities =
 							? sprintf(
 									/* translators: %s: Error message returned from the server. */
 									__( 'Saving failed: %s' ),
-									uniqueMessages.join( ' ' )
+									uniqueMessages.join( '; ' )
 							  )
 							: __( 'Saving failed.' );
 
