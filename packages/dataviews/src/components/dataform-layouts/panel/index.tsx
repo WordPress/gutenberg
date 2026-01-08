@@ -136,6 +136,7 @@ export default function FormPanelField< Item >( {
 	data,
 	field,
 	onChange,
+	markWhenOptional,
 	validity,
 }: FieldLayoutProps< Item > ) {
 	const { fields } = useContext( DataFormContext );

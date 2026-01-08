@@ -40,6 +40,7 @@ export function DataFormLayout< Item >( {
 			field: NormalizedFormField;
 			onChange: ( value: any ) => void;
 			hideLabelFromVision?: boolean;
+			markWhenOptional?: boolean;
 			validity?: FieldValidity;
 		} ) => React.JSX.Element | null,
 		childField: NormalizedFormField,

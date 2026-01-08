@@ -20,6 +20,7 @@ export default function FormDetailsField< Item >( {
 	data,
 	field,
 	onChange,
+	markWhenOptional,
 }: FieldLayoutProps< Item > ) {
 	const { fields } = useContext( DataFormContext );
 

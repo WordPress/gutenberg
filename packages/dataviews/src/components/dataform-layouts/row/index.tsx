@@ -42,6 +42,7 @@ export default function FormRowField< Item >( {
 	field,
 	onChange,
 	hideLabelFromVision,
+	markWhenOptional,
 	validity,
 }: FieldLayoutProps< Item > ) {
 	const layout = field.layout as NormalizedRowLayout;
@@ -76,6 +77,7 @@ export default function FormRowField< Item >( {
 									field={ childField }
 									onChange={ onChange }
 									hideLabelFromVision={ hideLabelFromVision }
+									markWhenOptional={ markWhenOptional }
 									validity={ childFieldValidity }
 								/>
 							</div>
@@ -98,6 +100,7 @@ export default function FormRowField< Item >( {
 					data={ data }
 					field={ field }
 					onChange={ onChange }
+					markWhenOptional={ markWhenOptional }
 					validity={ validity }
 				/>
 			</div>
