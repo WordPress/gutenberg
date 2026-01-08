@@ -10,7 +10,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { isTextField } from '@wordpress/dom';
 import { Popover } from '@wordpress/components';
 import { __unstableUseShortcutEventMatch as useShortcutEventMatch } from '@wordpress/keyboard-shortcuts';
-import { useRef } from '@wordpress/element';
+import { useRef, useState } from '@wordpress/element';
 import {
 	switchToBlockType,
 	store as blocksStore,
@@ -35,6 +35,7 @@ import { useShowBlockTools } from './use-show-block-tools';
 import { unlock } from '../../lock-unlock';
 import { cleanEmptyObject } from '../../hooks/utils';
 import usePasteStyles from '../use-paste-styles';
+import { BlockRenameModal } from '../block-rename';
 
 function selector( select ) {
 	const {
@@ -80,6 +81,8 @@ export default function BlockTools( {
 		getBlocksByClientId,
 		getSelectedBlockClientIds,
 		getBlockRootClientId,
+		getBlockEditingMode,
+		getBlockAttributes,
 		isGroupable,
 		getBlockName,
 		getEditedContentOnlySection,
@@ -88,6 +91,8 @@ export default function BlockTools( {
 	const { showEmptyBlockSideInserter, showBlockToolbarPopover } =
 		useShowBlockTools();
 	const pasteStyles = usePasteStyles();
+	const [ renamingBlockClientId, setRenamingBlockClientId ] =
+		useState( null );
 
 	const {
 		duplicateBlocks,
@@ -214,6 +219,23 @@ export default function BlockTools( {
 				replaceBlocks( clientIds, newBlocks );
 				speak( __( 'Selected blocks are grouped.' ) );
 			}
+		} else if ( isMatch( 'core/block-editor/rename', event ) ) {
+			const clientIds = getSelectedBlockClientIds();
+			if ( clientIds.length === 1 ) {
+				const blockName = getBlockName( clientIds[ 0 ] );
+				const isContentOnly =
+					getBlockEditingMode( clientIds[ 0 ] ) === 'contentOnly';
+				const isNavigationLink =
+					getBlockAttributes( clientIds[ 0 ] )?.type !== undefined;
+				const canRename =
+					hasBlockSupport( blockName, 'renaming', true ) &&
+					! isContentOnly &&
+					! isNavigationLink;
+				if ( canRename ) {
+					event.preventDefault();
+					setRenamingBlockClientId( clientIds[ 0 ] );
+				}
+			}
 		} else if (
 			isMatch( 'core/block-editor/toggle-block-visibility', event )
 		) {
@@ -317,6 +339,12 @@ export default function BlockTools( {
 					/>
 				) }
 			</InsertionPointOpenRef.Provider>
+			{ renamingBlockClientId && (
+				<BlockRenameModal
+					clientId={ renamingBlockClientId }
+					onClose={ () => setRenamingBlockClientId( null ) }
+				/>
+			) }
 		</div>
 	);
 }

@@ -50,6 +50,7 @@ import {
 import { store as blockEditorStore } from '../../store';
 import useBlockDisplayInformation from '../use-block-display-information';
 import { useBlockLock } from '../block-lock';
+import { useBlockRename, BlockRenameModal } from '../block-rename';
 import AriaReferencedText from './aria-referenced-text';
 import { unlock } from '../../lock-unlock';
 import usePasteStyles from '../use-paste-styles';
@@ -79,6 +80,7 @@ function ListViewBlock( {
 	const settingsRef = useRef( null );
 	const [ isHovered, setIsHovered ] = useState( false );
 	const [ settingsAnchorRect, setSettingsAnchorRect ] = useState();
+	const [ isRenameModalOpen, setIsRenameModalOpen ] = useState( false );
 
 	const { isLocked } = useBlockLock( clientId );
 
@@ -116,6 +118,9 @@ function ListViewBlock( {
 		canRemoveBlocks,
 		isGroupable,
 	} = useSelect( blockEditorStore );
+	const { getBlockEditingMode, getBlockAttributes } = unlock(
+		useSelect( blockEditorStore )
+	);
 	const { getGroupingBlockName } = useSelect( blocksStore );
 
 	const blockInformation = useBlockDisplayInformation( clientId );
@@ -141,6 +146,8 @@ function ListViewBlock( {
 			},
 			[ clientId ]
 		);
+
+	const { canRename } = useBlockRename( blockName );
 
 	const showBlockActions =
 		// When a block hides its toolbar it also hides the block settings menu,
@@ -397,6 +404,21 @@ function ListViewBlock( {
 			updateBlockAttributes( blocksToUpdate, attributesByClientId, {
 				uniqueByBlock: true,
 			} );
+		} else if ( isMatch( 'core/block-editor/rename', event ) ) {
+			const { blocksToUpdate } = getBlocksToUpdate();
+			const isContentOnly =
+				getBlockEditingMode( blocksToUpdate[ 0 ] ) === 'contentOnly';
+			const isNavigationLink =
+				getBlockAttributes( blocksToUpdate[ 0 ] )?.type !== undefined;
+			if (
+				blocksToUpdate.length === 1 &&
+				canRename &&
+				! isContentOnly &&
+				! isNavigationLink
+			) {
+				event.preventDefault();
+				setIsRenameModalOpen( true );
+			}
 		}
 	}
 
@@ -577,129 +599,137 @@ function ListViewBlock( {
 		isSelected && selectedClientIds.length === 1;
 
 	return (
-		<ListViewLeaf
-			className={ classes }
-			isDragged={ isDragged }
-			onKeyDown={ onKeyDown }
-			onMouseEnter={ onMouseEnter }
-			onMouseLeave={ onMouseLeave }
-			onFocus={ onMouseEnter }
-			onBlur={ onMouseLeave }
-			level={ level }
-			position={ position }
-			rowCount={ rowCount }
-			path={ path }
-			id={ `list-view-${ listViewInstanceId }-block-${ clientId }` }
-			data-block={ clientId }
-			data-expanded={ canEditBlock ? isExpanded : undefined }
-			ref={ rowRef }
-		>
-			<TreeGridCell
-				className="block-editor-list-view-block__contents-cell"
-				colSpan={ colSpan }
-				ref={ cellRef }
-				aria-selected={ !! isSelected }
+		<>
+			<ListViewLeaf
+				className={ classes }
+				isDragged={ isDragged }
+				onKeyDown={ onKeyDown }
+				onMouseEnter={ onMouseEnter }
+				onMouseLeave={ onMouseLeave }
+				onFocus={ onMouseEnter }
+				onBlur={ onMouseLeave }
+				level={ level }
+				position={ position }
+				rowCount={ rowCount }
+				path={ path }
+				id={ `list-view-${ listViewInstanceId }-block-${ clientId }` }
+				data-block={ clientId }
+				data-expanded={ canEditBlock ? isExpanded : undefined }
+				ref={ rowRef }
 			>
-				{ ( { ref, tabIndex, onFocus } ) => (
-					<div className="block-editor-list-view-block__contents-container">
-						<ListViewBlockContents
-							block={ block }
-							onClick={ selectEditorBlock }
-							onContextMenu={ onContextMenu }
-							onMouseDown={ onMouseDown }
-							onToggleExpanded={ toggleExpanded }
-							isSelected={ isSelected }
-							position={ position }
-							siblingBlockCount={ siblingBlockCount }
-							level={ level }
-							ref={ ref }
-							tabIndex={
-								currentlyEditingBlockInCanvas ? 0 : tabIndex
-							}
-							onFocus={ onFocus }
-							isExpanded={ canEditBlock ? isExpanded : undefined }
-							selectedClientIds={ selectedClientIds }
-							ariaDescribedBy={ descriptionId }
-						/>
-						<AriaReferencedText id={ descriptionId }>
-							{ [
-								blockPositionDescription,
-								blockPropertiesDescription,
-								blockVisibilityDescription,
-							]
-								.filter( Boolean )
-								.join( ' ' ) }
-						</AriaReferencedText>
-					</div>
-				) }
-			</TreeGridCell>
-			{ hasRenderedMovers && (
-				<>
-					<TreeGridCell
-						className={ moverCellClassName }
-						withoutGridItem
-					>
-						<TreeGridItem>
-							{ ( { ref, tabIndex, onFocus } ) => (
-								<BlockMoverUpButton
-									orientation="vertical"
-									clientIds={ [ clientId ] }
-									ref={ ref }
-									tabIndex={ tabIndex }
-									onFocus={ onFocus }
-								/>
-							) }
-						</TreeGridItem>
-						<TreeGridItem>
-							{ ( { ref, tabIndex, onFocus } ) => (
-								<BlockMoverDownButton
-									orientation="vertical"
-									clientIds={ [ clientId ] }
-									ref={ ref }
-									tabIndex={ tabIndex }
-									onFocus={ onFocus }
-								/>
-							) }
-						</TreeGridItem>
-					</TreeGridCell>
-				</>
-			) }
-
-			{ showBlockActions && BlockSettingsMenu && (
 				<TreeGridCell
-					className={ listViewBlockSettingsClassName }
+					className="block-editor-list-view-block__contents-cell"
+					colSpan={ colSpan }
+					ref={ cellRef }
 					aria-selected={ !! isSelected }
-					ref={ settingsRef }
 				>
 					{ ( { ref, tabIndex, onFocus } ) => (
-						<BlockSettingsMenu
-							clientIds={ dropdownClientIds }
-							block={ block }
-							icon={ moreVertical }
-							label={ __( 'Options' ) }
-							popoverProps={ {
-								anchor: settingsPopoverAnchor, // Used to position the settings at the cursor on right-click.
-							} }
-							toggleProps={ {
-								ref,
-								className: 'block-editor-list-view-block__menu',
-								tabIndex,
-								onClick: clearSettingsAnchorRect,
-								onFocus,
-								size: 'small',
-							} }
-							disableOpenOnArrowDown
-							expand={ expand }
-							expandedState={ expandedState }
-							setInsertedBlock={ setInsertedBlock }
-							__experimentalSelectBlock={
-								updateFocusAndSelection
-							}
-						/>
+						<div className="block-editor-list-view-block__contents-container">
+							<ListViewBlockContents
+								block={ block }
+								onClick={ selectEditorBlock }
+								onContextMenu={ onContextMenu }
+								onMouseDown={ onMouseDown }
+								onToggleExpanded={ toggleExpanded }
+								isSelected={ isSelected }
+								position={ position }
+								siblingBlockCount={ siblingBlockCount }
+								level={ level }
+								ref={ ref }
+								tabIndex={
+									currentlyEditingBlockInCanvas ? 0 : tabIndex
+								}
+								onFocus={ onFocus }
+								isExpanded={ canEditBlock ? isExpanded : undefined }
+								selectedClientIds={ selectedClientIds }
+								ariaDescribedBy={ descriptionId }
+							/>
+							<AriaReferencedText id={ descriptionId }>
+								{ [
+									blockPositionDescription,
+									blockPropertiesDescription,
+									blockVisibilityDescription,
+								]
+									.filter( Boolean )
+									.join( ' ' ) }
+							</AriaReferencedText>
+						</div>
 					) }
 				</TreeGridCell>
+				{ hasRenderedMovers && (
+					<>
+						<TreeGridCell
+							className={ moverCellClassName }
+							withoutGridItem
+						>
+							<TreeGridItem>
+								{ ( { ref, tabIndex, onFocus } ) => (
+									<BlockMoverUpButton
+										orientation="vertical"
+										clientIds={ [ clientId ] }
+										ref={ ref }
+										tabIndex={ tabIndex }
+										onFocus={ onFocus }
+									/>
+								) }
+							</TreeGridItem>
+							<TreeGridItem>
+								{ ( { ref, tabIndex, onFocus } ) => (
+									<BlockMoverDownButton
+										orientation="vertical"
+										clientIds={ [ clientId ] }
+										ref={ ref }
+										tabIndex={ tabIndex }
+										onFocus={ onFocus }
+									/>
+								) }
+							</TreeGridItem>
+						</TreeGridCell>
+					</>
+				) }
+
+				{ showBlockActions && BlockSettingsMenu && (
+					<TreeGridCell
+						className={ listViewBlockSettingsClassName }
+						aria-selected={ !! isSelected }
+						ref={ settingsRef }
+					>
+						{ ( { ref, tabIndex, onFocus } ) => (
+							<BlockSettingsMenu
+								clientIds={ dropdownClientIds }
+								block={ block }
+								icon={ moreVertical }
+								label={ __( 'Options' ) }
+								popoverProps={ {
+									anchor: settingsPopoverAnchor, // Used to position the settings at the cursor on right-click.
+								} }
+								toggleProps={ {
+									ref,
+									className: 'block-editor-list-view-block__menu',
+									tabIndex,
+									onClick: clearSettingsAnchorRect,
+									onFocus,
+									size: 'small',
+								} }
+								disableOpenOnArrowDown
+								expand={ expand }
+								expandedState={ expandedState }
+								setInsertedBlock={ setInsertedBlock }
+								__experimentalSelectBlock={
+									updateFocusAndSelection
+								}
+							/>
+						) }
+					</TreeGridCell>
+				) }
+			</ListViewLeaf>
+			{ isRenameModalOpen && (
+				<BlockRenameModal
+					clientId={ clientId }
+					onClose={ () => setIsRenameModalOpen( false ) }
+				/>
 			) }
-		</ListViewLeaf>
+		</>
 	);
 }
 
