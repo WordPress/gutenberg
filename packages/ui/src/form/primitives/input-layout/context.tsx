@@ -1,4 +1,4 @@
-import { createContext, useContext } from '@wordpress/element';
+import { Children, createContext, useContext } from '@wordpress/element';
 import type { InputLayoutSlotType } from './types';
 
 /**
@@ -24,7 +24,7 @@ export function SlotContextProvider( {
 	type: InputLayoutSlotType;
 	children: React.ReactNode;
 } ) {
-	if ( children === null || children === undefined ) {
+	if ( Children.count( children ) === 0 ) {
 		return null;
 	}
 
