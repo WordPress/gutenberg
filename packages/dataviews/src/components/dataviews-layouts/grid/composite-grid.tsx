@@ -18,7 +18,7 @@ import { Stack } from '@wordpress/ui';
 import { __, sprintf } from '@wordpress/i18n';
 import { useInstanceId } from '@wordpress/compose';
 import { isAppleOS } from '@wordpress/keycodes';
-import { useContext, forwardRef, useEffect, useRef } from '@wordpress/element';
+import { useContext, useEffect, useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -73,40 +73,73 @@ interface GridItemProps< Item > extends HTMLAttributes< HTMLDivElement > {
 	config: {
 		sizes: string;
 	};
+	posinset?: number;
+	setsize?: number;
 }
 
-const GridItem = forwardRef( function GridItem< Item >(
-	{
-		view,
-		selection,
-		onChangeSelection,
-		onClickItem,
-		isItemClickable,
-		renderItemLink,
-		getItemId,
-		item,
-		actions,
-		mediaField,
-		titleField,
-		descriptionField,
-		regularFields,
-		badgeFields,
-		hasBulkActions,
-		config,
-		...props
-	}: GridItemProps< Item >,
-	ref: React.ForwardedRef< HTMLDivElement >
-) {
+function GridItem< Item >( {
+	view,
+	selection,
+	onChangeSelection,
+	onClickItem,
+	isItemClickable,
+	renderItemLink,
+	getItemId,
+	item,
+	actions,
+	mediaField,
+	titleField,
+	descriptionField,
+	regularFields,
+	badgeFields,
+	hasBulkActions,
+	config,
+	posinset,
+	setsize,
+	...props
+}: GridItemProps< Item > ) {
 	const { showTitle = true, showMedia = true, showDescription = true } = view;
 	const hasBulkAction = useHasAPossibleBulkAction( actions, item );
 	const id = getItemId( item );
+	const elementRef = useRef< HTMLElement | null >( null );
+	const { intersectionObserverCallback } = useContext( DataViewsContext );
 	const instanceId = useInstanceId( GridItem );
 	const isSelected = selection.includes( id );
+
+	const setElementRef = ( element: HTMLElement | null ) => {
+		elementRef.current = element;
+	};
+
+	// Set up IntersectionObserver for this item
+	useEffect( () => {
+		if (
+			! intersectionObserverCallback ||
+			! elementRef.current ||
+			posinset === undefined
+		) {
+			return;
+		}
+
+		const observer = new IntersectionObserver(
+			intersectionObserverCallback,
+			{
+				root: null,
+				rootMargin: '0px',
+				threshold: 0.1,
+			}
+		);
+
+		observer.observe( elementRef.current );
+
+		return () => {
+			observer.disconnect();
+		};
+	}, [ intersectionObserverCallback, posinset ] );
 	const mediaPlaceholder = (
 		<span className="dataviews-view-grid__media-placeholder" />
 	);
 	const rendersMediaField = showMedia && mediaField?.render;
-	const renderedMediaField = rendersMediaField ? (
+	const renderedMediaField = mediaField?.render ? (
 		<mediaField.render
 			item={ item }
 			field={ mediaField }
@@ -139,7 +172,9 @@ const GridItem = forwardRef( function GridItem< Item >(
 		<Stack
 			direction="column"
 			{ ...props }
-			ref={ ref }
+			ref={ setElementRef }
+			aria-setsize={ setsize }
+			aria-posinset={ posinset }
 			className={ clsx(
 				props.className,
 				'dataviews-view-grid__row__gridcell',
@@ -289,7 +324,7 @@ const GridItem = forwardRef( function GridItem< Item >(
 		ref?: React.ForwardedRef< HTMLDivElement >;
 	}
 ) => React.ReactNode;
-
+}
 interface CompositeGridProps< Item > {
 	data: Item[];
 	isInfiniteScroll: boolean;
@@ -327,13 +362,9 @@ export default function CompositeGrid< Item >( {
 	getItemId,
 	actions,
 }: CompositeGridProps< Item > ) {
-	const { paginationInfo, resizeObserverRef, intersectionObserverCallback } =
+	const { paginationInfo, resizeObserverRef } =
 		useContext( DataViewsContext );
 	const gridColumns = useGridColumns();
-	const intersectionObserverRef = useRef< IntersectionObserver | null >(
-		null
-	);
-	const itemRefs = useRef< Map< number, HTMLElement > >( new Map() );
 	// Track stable positions for items in infinite scroll mode
 	const itemPositions = useRef< Map< string, number > >( new Map() );
 	const hasBulkActions = useSomeItemHasAPossibleBulkAction( actions, data );
@@ -395,66 +426,6 @@ export default function CompositeGrid< Item >( {
 		} );
 	}, [ data, getItemId, isInfiniteScroll ] );
 
-	// Set up IntersectionObserver for infinite scroll
-	useEffect( () => {
-		if ( ! intersectionObserverCallback || ! isInfiniteScroll ) {
-			return;
-		}
-
-		const observer = new IntersectionObserver(
-			intersectionObserverCallback,
-			{
-				root: null,
-				rootMargin: '0px',
-				threshold: 0.1,
-			}
-		);
-
-		intersectionObserverRef.current = observer;
-
-		// Observe all current items
-		itemRefs.current.forEach( ( element ) => {
-			observer.observe( element );
-		} );
-
-		return () => {
-			observer.disconnect();
-		};
-	}, [ intersectionObserverCallback, isInfiniteScroll ] );
-
-	// Helper function to handle item ref changes
-	const setItemRef = (
-		itemId: number | undefined,
-		element: HTMLElement | null
-	) => {
-		if ( itemId === undefined ) {
-			return;
-		}
-
-		// Don't observe if we don't have infinite scroll enabled
-		if ( ! isInfiniteScroll ) {
-			return;
-		}
-
-		const observer = intersectionObserverRef.current;
-		const currentElement = itemRefs.current.get( itemId );
-
-		// Unobserve previous element if it exists
-		if ( currentElement && observer ) {
-			observer.unobserve( currentElement );
-		}
-
-		if ( element ) {
-			itemRefs.current.set( itemId, element );
-			// Observe new element if observer is ready
-			if ( observer ) {
-				observer.observe( element );
-			}
-		} else {
-			itemRefs.current.delete( itemId );
-		}
-	};
-
 	return (
 		<>
 			{
@@ -496,18 +467,8 @@ export default function CompositeGrid< Item >( {
 									render={ ( props ) => (
 										<GridItem
 											{ ...props }
-											ref={ ( element ) =>
-												setItemRef(
-													stablePosition,
-													element
-												)
-											}
 											id={ itemId }
 											role="article"
-											aria-setsize={
-												paginationInfo.totalItems
-											}
-											aria-posinset={ stablePosition }
 											view={ view }
 											selection={ selection }
 											onChangeSelection={
@@ -527,6 +488,10 @@ export default function CompositeGrid< Item >( {
 											regularFields={ regularFields }
 											badgeFields={ badgeFields }
 											hasBulkActions={ hasBulkActions }
+											posinset={ stablePosition }
+											setsize={
+												paginationInfo.totalItems
+											}
 											config={ {
 												sizes: size,
 											} }
