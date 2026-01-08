@@ -31,9 +31,6 @@
 			"import": "./build-module/index.js",
 			"require": "./build/index.js"
 		},
-		"./redux-store": {
-			"types": "./build-types/redux-store/index.d.ts"
-		},
 		"./redux-store/metadata/actions": {
 			"types": "./build-types/redux-store/metadata/actions.d.ts"
 		},
