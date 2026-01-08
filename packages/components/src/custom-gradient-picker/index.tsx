@@ -104,7 +104,6 @@ const GradientTypePicker = ( {
 
 	return (
 		<SelectControl
-			__nextHasNoMarginBottom
 			className="components-custom-gradient-picker__type-picker"
 			label={ __( 'Type' ) }
 			labelPosition="top"

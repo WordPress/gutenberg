@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import clsx from 'clsx';
+
+/**
  * WordPress dependencies
  */
 import { __, _x } from '@wordpress/i18n';
@@ -12,7 +17,6 @@ import {
 	ToolbarButton,
 } from '@wordpress/components';
 import { useSelect, withDispatch } from '@wordpress/data';
-import { useState } from '@wordpress/element';
 import { DOWN } from '@wordpress/keycodes';
 import {
 	postFeaturedImage,
@@ -22,54 +26,19 @@ import {
 import { compose } from '@wordpress/compose';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { store as noticesStore } from '@wordpress/notices';
+import { useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import MediaUpload from '../media-upload';
-import MediaUploadModal from '../media-upload-modal';
 import MediaUploadCheck from '../media-upload/check';
 import LinkControl from '../link-control';
 import { store as blockEditorStore } from '../../store';
+import { getComputedAcceptAttribute } from '../media-placeholder/utils';
 
 const noop = () => {};
 let uniqueId = 0;
-
-/**
- * Conditional Media component that uses MediaUploadModal when experiment is enabled,
- * otherwise falls back to MediaUpload.
- *
- * @param {Object}   root0        Component props.
- * @param {Function} root0.render Render prop function that receives { open } object.
- * @return {JSX.Element} The component.
- */
-function ConditionalMediaUpload( { render, ...props } ) {
-	const [ isModalOpen, setIsModalOpen ] = useState( false );
-	const { getSettings } = useSelect( blockEditorStore );
-
-	if ( window.__experimentalDataViewsMediaModal ) {
-		return (
-			<>
-				{ render && render( { open: () => setIsModalOpen( true ) } ) }
-				<MediaUploadModal
-					{ ...props }
-					isOpen={ isModalOpen }
-					onClose={ () => {
-						setIsModalOpen( false );
-						props.onClose?.();
-					} }
-					onSelect={ ( media ) => {
-						setIsModalOpen( false );
-						props.onSelect?.( media );
-					} }
-					onUpload={ getSettings().mediaUpload }
-				/>
-			</>
-		);
-	}
-
-	return <MediaUpload { ...props } render={ render } />;
-}
 
 const MediaReplaceFlow = ( {
 	mediaURL,
@@ -91,11 +60,30 @@ const MediaReplaceFlow = ( {
 	multiple = false,
 	addToGallery,
 	handleUpload = true,
+	variant,
 	popoverProps,
 	renderToggle,
+	className,
 } ) => {
-	const { getSettings } = useSelect( blockEditorStore );
+	const { mediaUpload, allowedMimeTypes } = useSelect( ( select ) => {
+		const { getSettings } = select( blockEditorStore );
+		const settings = getSettings();
+		return {
+			mediaUpload: settings.mediaUpload,
+			allowedMimeTypes: settings.allowedMimeTypes,
+		};
+	}, [] );
 	const errorNoticeID = `block-editor/media-replace-flow/error-notice/${ ++uniqueId }`;
+
+	const computedAccept = useMemo(
+		() =>
+			getComputedAcceptAttribute(
+				allowedTypes,
+				allowedMimeTypes,
+				accept
+			),
+		[ allowedTypes, allowedMimeTypes, accept ]
+	);
 
 	const onUploadError = ( message ) => {
 		const safeMessage = stripHTML( message );
@@ -136,7 +124,7 @@ const MediaReplaceFlow = ( {
 			return onSelect( files );
 		}
 		onFilesUpload( files );
-		getSettings().mediaUpload( {
+		mediaUpload( {
 			allowedTypes,
 			filesList: files,
 			onFileChange: ( [ media ] ) => {
@@ -166,10 +154,19 @@ const MediaReplaceFlow = ( {
 
 	const gallery = multiple && onlyAllowsImages();
 
+	const mergedPopoverProps = {
+		...popoverProps,
+		variant,
+	};
+
 	return (
 		<Dropdown
-			popoverProps={ popoverProps }
-			contentClassName="block-editor-media-replace-flow__options"
+			popoverProps={ mergedPopoverProps }
+			className={ className }
+			contentClassName={ clsx(
+				'block-editor-media-replace-flow__options',
+				variant && `is-variant-${ variant }`
+			) }
 			renderToggle={ ( { isOpen, onToggle } ) => {
 				if ( renderToggle ) {
 					return renderToggle( {
@@ -195,7 +192,7 @@ const MediaReplaceFlow = ( {
 				<>
 					<NavigableMenu className="block-editor-media-replace-flow__media-upload-menu">
 						<MediaUploadCheck>
-							<ConditionalMediaUpload
+							<MediaUpload
 								gallery={ gallery }
 								addToGallery={ addToGallery }
 								multiple={ multiple }
@@ -217,7 +214,7 @@ const MediaReplaceFlow = ( {
 								onChange={ ( event ) => {
 									uploadFiles( event, onClose );
 								} }
-								accept={ accept }
+								accept={ computedAccept }
 								multiple={ !! multiple }
 								render={ ( { openFileDialog } ) => {
 									return (

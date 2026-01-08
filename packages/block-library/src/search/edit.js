@@ -367,7 +367,6 @@ export default function SearchEdit( {
 						isShownByDefault
 					>
 						<ToggleControl
-							__nextHasNoMarginBottom
 							checked={ showLabel }
 							label={ __( 'Show label' ) }
 							onChange={ ( value ) =>
@@ -391,7 +390,6 @@ export default function SearchEdit( {
 						<SelectControl
 							value={ buttonPosition }
 							__next40pxDefaultSize
-							__nextHasNoMarginBottom
 							label={ __( 'Button position' ) }
 							onChange={ ( value ) => {
 								setAttributes( {
@@ -415,7 +413,6 @@ export default function SearchEdit( {
 							isShownByDefault
 						>
 							<ToggleControl
-								__nextHasNoMarginBottom
 								checked={ buttonUseIcon }
 								label={ __( 'Use button with icon' ) }
 								onChange={ ( value ) =>
@@ -492,7 +489,6 @@ export default function SearchEdit( {
 								} }
 								isBlock
 								__next40pxDefaultSize
-								__nextHasNoMarginBottom
 							>
 								{ PERCENTAGE_WIDTHS.map( ( widthValue ) => {
 									return (

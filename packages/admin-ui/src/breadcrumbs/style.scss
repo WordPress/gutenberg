@@ -1,0 +1,22 @@
+@use "@wordpress/base-styles/variables";
+
+.admin-ui-breadcrumbs__list {
+	list-style: none;
+	padding: 0;
+	margin: 0;
+	// gap prop don't seem to be working properly.
+	gap: 0;
+	font-size: 15px;
+	min-height: 32px;
+	font-weight: 500;
+
+	li:not(:last-child)::after {
+		content: "/";
+		margin: 0 variables.$grid-unit-10;
+	}
+
+	h1 {
+		font-size: inherit;
+		line-height: inherit;
+	}
+}

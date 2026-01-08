@@ -8,11 +8,15 @@ test.describe( 'Template Activate', () => {
 		await requestUtils.activateTheme( 'emptytheme' );
 		await requestUtils.deleteAllTemplates( 'wp_template' );
 		await requestUtils.deleteAllTemplates( 'wp_template_part' );
+		// Enable the template activation feature.
+		await requestUtils.setGutenbergExperiments( [ 'active_templates' ] );
 	} );
 	test.afterAll( async ( { requestUtils } ) => {
 		await requestUtils.deleteAllTemplates( 'wp_template' );
 		await requestUtils.deleteAllTemplates( 'wp_template_part' );
 		await requestUtils.activateTheme( 'twentytwentyone' );
+		// Disable the template activation experiment.
+		await requestUtils.setGutenbergExperiments( [] );
 	} );
 	test.beforeEach( async ( { admin, requestUtils } ) => {
 		await requestUtils.deleteAllTemplates( 'wp_template' );

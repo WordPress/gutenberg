@@ -19,9 +19,13 @@
 		"isLink": {
 			"type": "boolean",
 			"default": false
+		},
+		"levelOptions": {
+			"type": "array"
 		}
 	},
 	"supports": {
+		"anchor": true,
 		"align": [ "wide", "full" ],
 		"html": false,
 		"color": {

@@ -349,5 +349,71 @@ describe( 'Confirm', () => {
 
 			expect( onConfirm ).toHaveBeenCalled();
 		} );
+
+		it( 'should handle `isBusy` prop with different combinations', () => {
+			const { rerender } = render(
+				<ConfirmDialog
+					isOpen
+					onConfirm={ noop }
+					onCancel={ noop }
+					isBusy
+				>
+					Are you sure?
+				</ConfirmDialog>
+			);
+
+			let cancelButton = screen.getByRole( 'button', {
+				name: 'Cancel',
+			} );
+			let confirmButton = screen.getByRole( 'button', { name: 'OK' } );
+
+			// Only confirm button shows busy spinner
+			expect( cancelButton ).not.toHaveClass( 'is-busy' );
+			expect( confirmButton ).toHaveClass( 'is-busy' );
+
+			// Both buttons are disabled (exposed via aria-disabled due to accessibleWhenDisabled)
+			// Intentionally rely on aria-disabled rather than disabled attribute
+			expect( cancelButton ).toHaveAttribute( 'aria-disabled', 'true' );
+			expect( confirmButton ).toHaveAttribute( 'aria-disabled', 'true' );
+
+			// Test when isBusy is false
+			rerender(
+				<ConfirmDialog
+					isOpen
+					onConfirm={ noop }
+					onCancel={ noop }
+					isBusy={ false }
+				>
+					Are you sure?
+				</ConfirmDialog>
+			);
+
+			cancelButton = screen.getByRole( 'button', {
+				name: 'Cancel',
+			} );
+			confirmButton = screen.getByRole( 'button', { name: 'OK' } );
+
+			expect( cancelButton ).not.toHaveClass( 'is-busy' );
+			expect( confirmButton ).not.toHaveClass( 'is-busy' );
+			expect( cancelButton ).toBeEnabled();
+			expect( confirmButton ).toBeEnabled();
+
+			// Test when isBusy is undefined
+			rerender(
+				<ConfirmDialog isOpen onConfirm={ noop } onCancel={ noop }>
+					Are you sure?
+				</ConfirmDialog>
+			);
+
+			cancelButton = screen.getByRole( 'button', {
+				name: 'Cancel',
+			} );
+			confirmButton = screen.getByRole( 'button', { name: 'OK' } );
+
+			expect( cancelButton ).not.toHaveClass( 'is-busy' );
+			expect( confirmButton ).not.toHaveClass( 'is-busy' );
+			expect( cancelButton ).toBeEnabled();
+			expect( confirmButton ).toBeEnabled();
+		} );
 	} );
 } );

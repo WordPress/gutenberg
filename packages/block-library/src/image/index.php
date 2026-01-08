@@ -94,7 +94,7 @@ function render_block_core_image( $attributes, $content, $block ) {
 		$figcaption_span = $processor->block_core_image_extract_empty_figcaption_element();
 	}
 
-	$link_destination  = isset( $attributes['linkDestination'] ) ? $attributes['linkDestination'] : 'none';
+	$link_destination  = $attributes['linkDestination'] ?? 'none';
 	$lightbox_settings = block_core_image_get_lightbox_settings( $block->parsed_block );
 
 	/*
@@ -196,6 +196,7 @@ function block_core_image_render_lightbox( $block_content, $block ) {
 	$img_styles        = $processor->get_attribute( 'style' );
 	$img_width         = 'none';
 	$img_height        = 'none';
+	$img_srcset        = false;
 	$aria_label        = __( 'Enlarge' );
 	$dialog_aria_label = __( 'Enlarged image' );
 

@@ -103,6 +103,19 @@ export const processBlockType =
 			),
 		};
 
+		// If the block is registering attributes as null or undefined, warn and default to empty object.
+		if (
+			! blockType.attributes ||
+			typeof blockType.attributes !== 'object'
+		) {
+			warning(
+				'The block "' +
+					name +
+					'" is registering attributes as `null` or `undefined`. Use an empty object (`attributes: {}`) or exclude the `attributes` key.'
+			);
+			blockType.attributes = {};
+		}
+
 		const settings = applyFilters(
 			'blocks.registerBlockType',
 			blockType,

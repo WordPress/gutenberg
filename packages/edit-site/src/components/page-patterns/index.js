@@ -106,7 +106,7 @@ export default function DataviewsPatterns() {
 		slug: categoryId,
 		defaultView: DEFAULT_VIEW,
 		queryParams: {
-			page: Number( query.pageNumber ?? 1 ),
+			page: query.pageNumber,
 			search: query.search,
 		},
 		onChangeQueryParams: ( params ) => {

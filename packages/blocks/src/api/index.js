@@ -176,5 +176,10 @@ export {
 	__EXPERIMENTAL_PATHS_WITH_OVERRIDE,
 } from './constants';
 
+// Allows blocks to declare private keys (fields form)
+// that we can use to generate UI controls for them via DataForm.
+const fieldsKey = Symbol( 'fields' );
+const formKey = Symbol( 'form' );
+
 export const privateApis = {};
-lock( privateApis, { isContentBlock } );
+lock( privateApis, { isContentBlock, fieldsKey, formKey } );

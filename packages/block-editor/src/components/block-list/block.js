@@ -38,7 +38,7 @@ import { useBlockProps } from './use-block-props';
 import { store as blockEditorStore } from '../../store';
 import { useLayout } from './layout';
 import { PrivateBlockContext } from './private-block-context';
-
+import { useBlockVisibility } from '../block-visibility/';
 import { unlock } from '../../lock-unlock';
 
 /**
@@ -555,6 +555,7 @@ BlockListBlock = compose(
 // component, and useBlockProps.
 function BlockListBlockProvider( props ) {
 	const { clientId, rootClientId } = props;
+	const { isBlockCurrentlyHidden } = useBlockVisibility( clientId );
 	const selectedProps = useSelect(
 		( select ) => {
 			const {
@@ -563,6 +564,7 @@ function BlockListBlockProvider( props ) {
 				isSelectionEnabled,
 				getTemplateLock,
 				isSectionBlock: _isSectionBlock,
+				getParentSectionBlock,
 				getBlockWithoutAttributes,
 				getBlockAttributes,
 				canRemoveBlock,
@@ -611,7 +613,6 @@ function BlockListBlockProvider( props ) {
 				isPreviewMode,
 				__experimentalBlockBindingsSupportedAttributes,
 			} = getSettings();
-
 			const bindableAttributes =
 				__experimentalBlockBindingsSupportedAttributes?.[ blockName ];
 
@@ -632,7 +633,6 @@ function BlockListBlockProvider( props ) {
 					? getBlockDefaultClassName( blockName )
 					: undefined,
 				blockTitle: blockType?.title,
-				isBlockHidden: attributes?.metadata?.blockVisibility === false,
 				bindableAttributes,
 			};
 
@@ -641,10 +641,6 @@ function BlockListBlockProvider( props ) {
 			if ( isPreviewMode ) {
 				return previewContext;
 			}
-
-			const { isBlockHidden: _isBlockHidden } = unlock(
-				select( blockEditorStore )
-			);
 			const _isSelected = isBlockSelected( clientId );
 			const canRemove = canRemoveBlock( clientId );
 			const canMove = canMoveBlock( clientId );
@@ -656,6 +652,9 @@ function BlockListBlockProvider( props ) {
 				checkDeep
 			);
 			const blockEditingMode = getBlockEditingMode( clientId );
+			const sectionBlockClientId = _isSectionBlock( clientId )
+				? clientId
+				: getParentSectionBlock( clientId );
 
 			const multiple = hasBlockSupport( blockName, 'multiple', true );
 
@@ -674,6 +673,11 @@ function BlockListBlockProvider( props ) {
 				isSelectionEnabled: isSelectionEnabled(),
 				isLocked: !! getTemplateLock( rootClientId ),
 				isSectionBlock: _isSectionBlock( clientId ),
+				isWithinSectionBlock: !! sectionBlockClientId,
+				isSelectionWithinCurrentSection:
+					isBlockSelected( sectionBlockClientId ) ||
+					hasSelectedInnerBlock( sectionBlockClientId, checkDeep ),
+				blockType,
 				canRemove,
 				canMove,
 				isSelected: _isSelected,
@@ -718,7 +722,6 @@ function BlockListBlockProvider( props ) {
 				originalBlockClientId: isInvalid
 					? blocksWithSameName[ 0 ]
 					: false,
-				isBlockHidden: _isBlockHidden( clientId ),
 			};
 		},
 		[ clientId, rootClientId ]
@@ -745,6 +748,7 @@ function BlockListBlockProvider( props ) {
 		mayDisplayParentControls,
 		index,
 		blockApiVersion,
+		blockType,
 		blockTitle,
 		isSubtreeDisabled,
 		hasOverlay,
@@ -756,12 +760,13 @@ function BlockListBlockProvider( props ) {
 		isDragging,
 		hasChildSelected,
 		isSectionBlock,
+		isWithinSectionBlock,
+		isSelectionWithinCurrentSection,
 		isEditingDisabled,
 		hasEditableOutline,
 		className,
 		defaultClassName,
 		originalBlockClientId,
-		isBlockHidden,
 		bindableAttributes,
 	} = selectedProps;
 
@@ -789,6 +794,7 @@ function BlockListBlockProvider( props ) {
 		mode,
 		name,
 		blockApiVersion,
+		blockType,
 		blockTitle,
 		isSelected,
 		isSubtreeDisabled,
@@ -802,6 +808,8 @@ function BlockListBlockProvider( props ) {
 		isDragging,
 		hasChildSelected,
 		isSectionBlock,
+		isWithinSectionBlock,
+		isSelectionWithinCurrentSection,
 		isEditingDisabled,
 		hasEditableOutline,
 		isEditingContentOnlySection,
@@ -811,12 +819,12 @@ function BlockListBlockProvider( props ) {
 		originalBlockClientId,
 		themeSupportsLayout,
 		canMove,
-		isBlockHidden,
+		isBlockCurrentlyHidden,
 		bindableAttributes,
 	};
 
 	if (
-		isBlockHidden &&
+		isBlockCurrentlyHidden &&
 		! isSelected &&
 		! isMultiSelected &&
 		! hasChildSelected

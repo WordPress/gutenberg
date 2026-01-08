@@ -19,10 +19,10 @@ import { Subtitle } from './subtitle';
 import { useSetting } from './hooks';
 import FontLibraryProvider, {
 	FontLibraryContext,
-} from './font-library-modal/context';
-import FontLibraryModal from './font-library-modal';
+} from './font-library/context';
+import FontLibraryModal from './font-library/modal';
 import FontFamilyItem from './font-family-item';
-import { setUIValuesNeeded } from './font-library-modal/utils';
+import { setUIValuesNeeded } from './font-library/utils';
 
 /**
  * Maps the fonts with the source, if available.

@@ -15,9 +15,9 @@ import {
 import { useMergeRefs, useDebounce } from '@wordpress/compose';
 import {
 	createContext,
+	useEffect,
 	useMemo,
 	useCallback,
-	useEffect,
 } from '@wordpress/element';
 import { getDefaultBlockName } from '@wordpress/blocks';
 
@@ -52,9 +52,9 @@ function Root( { className, ...settings } ) {
 		( select ) => {
 			const {
 				getSettings,
-				getEditedContentOnlySection,
 				isTyping,
 				hasBlockSpotlight,
+				getEditedContentOnlySection,
 			} = unlock( select( blockEditorStore ) );
 			const { outlineMode, focusMode } = getSettings();
 			return {
@@ -133,24 +133,26 @@ function StopEditingContentOnlySectionOnOutsideSelect( { clientId } ) {
 	);
 	const isBlockOrDescendantSelected = useSelect(
 		( select ) => {
-			const { isBlockSelected, hasSelectedInnerBlock } =
-				select( blockEditorStore );
+			const {
+				isBlockSelected,
+				hasSelectedInnerBlock,
+				getBlockSelectionStart,
+			} = select( blockEditorStore );
 			return (
+				! getBlockSelectionStart() ||
 				isBlockSelected( clientId ) ||
 				hasSelectedInnerBlock( clientId, true )
 			);
 		},
 		[ clientId ]
 	);
+
 	useEffect( () => {
 		if ( ! isBlockOrDescendantSelected ) {
 			stopEditingContentOnlySection();
 		}
-	}, [
-		isBlockOrDescendantSelected,
-		clientId,
-		stopEditingContentOnlySection,
-	] );
+	}, [ isBlockOrDescendantSelected, stopEditingContentOnlySection ] );
+
 	return null;
 }
 
@@ -224,6 +226,8 @@ function Items( {
 				rootClientId === selectedBlockClientId
 			);
 
+			const templateLock = getTemplateLock( rootClientId );
+
 			return {
 				order: _order,
 				selectedBlocks: selectedBlockClientIds,
@@ -236,7 +240,7 @@ function Items( {
 							rootClientId
 						) ) &&
 					getBlockEditingMode( rootClientId ) !== 'disabled' &&
-					! getTemplateLock( rootClientId ) &&
+					( ! templateLock || templateLock === 'contentOnly' ) &&
 					hasAppender &&
 					! _isZoomOut() &&
 					( hasCustomAppender ||

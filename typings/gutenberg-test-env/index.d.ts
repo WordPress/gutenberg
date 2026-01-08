@@ -14,5 +14,7 @@ declare namespace jest {
 		 * [Testing Overview docs]: https://github.com/WordPress/gutenberg/blob/trunk/docs/contributors/code/testing-overview.md#best-practices
 		 */
 		toMatchStyleDiffSnapshot( expected: Element | null ): R;
+
+		toBePositionedPopover(): R;
 	}
 }

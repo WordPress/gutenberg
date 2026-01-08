@@ -10,7 +10,7 @@ import {
 	type VNode,
 	type RefObject,
 } from 'preact';
-import { useContext, useMemo, useRef } from 'preact/hooks';
+import { useContext, useLayoutEffect, useMemo, useRef } from 'preact/hooks';
 import { signal, type Signal } from '@preact/signals';
 
 /**
@@ -23,7 +23,7 @@ import {
 	warn,
 	splitTask,
 	isPlainObject,
-	deepReadOnly,
+	deepClone,
 } from './utils';
 import {
 	directive,
@@ -33,7 +33,7 @@ import {
 	type DirectiveCallback,
 	type DirectiveEntry,
 } from './hooks';
-import { getScope } from './scopes';
+import { getScope, navigationContextSignal } from './scopes';
 import { proxifyState, proxifyContext, deepMerge } from './proxies';
 import { PENDING_GETTER } from './proxies/state';
 
@@ -68,27 +68,6 @@ const warnWithSyncEvent = ( wrongPrefix: string, rightPrefix: string ) => {
 		);
 	}
 };
-
-/**
- * Recursively clones the passed object.
- *
- * @param source Source object.
- * @return Cloned object.
- */
-function deepClone< T >( source: T ): T {
-	if ( isPlainObject( source ) ) {
-		return Object.fromEntries(
-			Object.entries( source as object ).map( ( [ key, value ] ) => [
-				key,
-				deepClone( value ),
-			] )
-		) as T;
-	}
-	if ( Array.isArray( source ) ) {
-		return source.map( ( i ) => deepClone( i ) ) as T;
-	}
-	return source;
-}
 
 /**
  * Wraps event object to warn about access of synchronous properties and methods.
@@ -423,9 +402,9 @@ export default () => {
 					false
 				);
 
-				// Sets the server context for that namespace to a deep
-				// read-only.
-				server[ namespace ] = deepReadOnly( value );
+				// Replaces the server context for that namespace with the
+				// current value.
+				server[ namespace ] = value;
 
 				// Registers the namespace.
 				namespaces.add( namespace );
@@ -1042,6 +1021,15 @@ export default () => {
 
 			// Get the content of this router region.
 			const vdom = routerRegions.get( regionId )!.value;
+
+			// Triggers an invalidation after the directive data-wp-context has
+			// been evaluated and the value of the server context has changed.
+			useLayoutEffect( () => {
+				if ( vdom && typeof vdom.type !== 'string' ) {
+					navigationContextSignal.value =
+						navigationContextSignal.peek() + 1;
+				}
+			}, [ vdom ] );
 
 			if ( vdom && typeof vdom.type !== 'string' ) {
 				// The scope needs to be injected.

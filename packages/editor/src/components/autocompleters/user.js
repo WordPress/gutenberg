@@ -5,6 +5,12 @@ import { useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 
+/**
+ * Renders a user label for the autocompleter.
+ *
+ * @param {Object} user User object.
+ * @return {JSX.Element} User label component.
+ */
 export function getUserLabel( user ) {
 	const avatar =
 		user.avatar_urls && user.avatar_urls[ 24 ] ? (

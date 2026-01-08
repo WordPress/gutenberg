@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react-webpack5';
 
 /**
  * Internal dependencies
@@ -133,10 +133,12 @@ export const Default: StoryObj< typeof ColorGen > = {
 									fgName,
 									fgColor,
 									unmetContrast,
+									achievedContrast,
 								},
 								i
 							) => (
 								<li key={ i }>
+									{ fgName } (
 									<span
 										style={ {
 											width: 20,
@@ -144,8 +146,8 @@ export const Default: StoryObj< typeof ColorGen > = {
 											backgroundColor: fgColor,
 											display: 'inline-block',
 										} }
-									></span>
-									{ fgName } over
+									/>
+									{ fgColor }) over { bgName } (
 									<span
 										style={ {
 											width: 20,
@@ -153,8 +155,9 @@ export const Default: StoryObj< typeof ColorGen > = {
 											backgroundColor: bgColor,
 											display: 'inline-block',
 										} }
-									></span>
-									{ bgName } did not meet { unmetContrast }
+									/>
+									{ bgColor }) did not meet { unmetContrast },
+									achieved just { achievedContrast }
 								</li>
 							)
 						) }
@@ -224,14 +227,17 @@ export const SampleCombinations: StoryObj< typeof ColorGen > = {
 					value: background,
 				},
 				ramp: bgRamp.ramp,
+				warnings: bgRamp.warnings,
 			};
 
+			const primaryRamp = buildAccentRamp( primary, bgRamp );
 			const primaryRampObj = {
 				seed: {
 					name: 'bgFill1' as const,
 					value: primary,
 				},
-				ramp: buildAccentRamp( primary, bgRamp ).ramp,
+				ramp: primaryRamp.ramp,
+				warnings: primaryRamp.warnings,
 			};
 
 			return [ bgRampObj, primaryRampObj ];

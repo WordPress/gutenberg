@@ -5,9 +5,6 @@ const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Post Data source', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
-		await requestUtils.activateTheme(
-			'gutenberg-test-themes/block-bindings'
-		);
 		await requestUtils.activatePlugin( 'gutenberg-test-block-bindings' );
 	} );
 
@@ -19,12 +16,7 @@ test.describe( 'Post Data source', () => {
 		await requestUtils.deleteAllPosts();
 	} );
 
-	test.afterEach( async ( { requestUtils } ) => {
-		await requestUtils.deleteAllPosts();
-	} );
-
 	test.afterAll( async ( { requestUtils } ) => {
-		await requestUtils.activateTheme( 'twentytwentyone' );
 		await requestUtils.deactivatePlugin( 'gutenberg-test-block-bindings' );
 	} );
 	test.describe( 'Post Data bindings UI.', () => {

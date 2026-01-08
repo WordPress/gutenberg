@@ -137,7 +137,6 @@ function FlexControls( {
 			panelId={ panelId }
 		>
 			<ToggleGroupControl
-				__nextHasNoMarginBottom
 				size="__unstable-large"
 				label={ childLayoutOrientation( parentLayout ) }
 				value={ selfStretch || 'fit' }

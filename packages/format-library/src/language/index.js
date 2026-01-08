@@ -99,7 +99,6 @@ function InlineLanguageUI( { value, contentRef, onChange, onClose } ) {
 			>
 				<TextControl
 					__next40pxDefaultSize
-					__nextHasNoMarginBottom
 					label={ title }
 					value={ lang }
 					onChange={ ( val ) => setLang( val ) }
@@ -109,7 +108,6 @@ function InlineLanguageUI( { value, contentRef, onChange, onClose } ) {
 				/>
 				<SelectControl
 					__next40pxDefaultSize
-					__nextHasNoMarginBottom
 					label={ __( 'Text direction' ) }
 					value={ dir }
 					options={ [

@@ -6,6 +6,7 @@ build-types
 build-wp
 node_modules
 gutenberg.zip
+.content-entry.js
 coverage
 .phpunit.result.cache
 .reassure

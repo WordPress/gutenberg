@@ -6,9 +6,13 @@ const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 test.describe( 'calling saveEntityRecord with a theme template ID', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.activateTheme( 'emptytheme' );
+		// Enable the template activation feature.
+		await requestUtils.setGutenbergExperiments( [ 'active_templates' ] );
 	} );
 	test.afterAll( async ( { requestUtils } ) => {
 		await requestUtils.activateTheme( 'twentytwentyone' );
+		// Disable the template activation feature.
+		await requestUtils.setGutenbergExperiments( [] );
 	} );
 	test.beforeEach( async ( { requestUtils } ) => {
 		await requestUtils.deleteAllTemplates( 'wp_template' );

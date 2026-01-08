@@ -1,8 +1,9 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryFn } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react-webpack5';
 import type { DragEvent } from 'react';
+import { fn } from 'storybook/test';
 
 /**
  * WordPress dependencies
@@ -24,8 +25,12 @@ const meta: Meta< typeof Draggable > = {
 		elementId: { control: false },
 		__experimentalDragComponent: { control: false },
 	},
+	args: {
+		onDragStart: fn(),
+		onDragEnd: fn(),
+		onDragOver: fn(),
+	},
 	parameters: {
-		actions: { argTypesRegex: '^on.*' },
 		controls: { expanded: true },
 		docs: { source: { code: '' } },
 	},

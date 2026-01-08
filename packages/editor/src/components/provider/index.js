@@ -318,8 +318,15 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 		// Synchronizes the active post with the state
 		useEffect( () => {
 			setEditedPost( post.type, post.id );
-			// Clear any notices dependent on the post context.
-			removeNotice( 'template-activate-notice' );
+			if (
+				typeof window !== 'undefined' &&
+				window.__experimentalTemplateActivate
+			) {
+				// Clear any notices dependent on the post context.
+				removeNotice( 'template-activate-notice' );
+			}
+
+			return () => setEditedPost( null, null );
 		}, [ post.type, post.id, setEditedPost, removeNotice ] );
 
 		// Synchronize the editor settings as they change.

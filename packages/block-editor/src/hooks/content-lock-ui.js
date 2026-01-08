@@ -45,17 +45,20 @@ function ContentLockControlsPure( { clientId } ) {
 		! isLockedByParent && templateLock === 'contentOnly';
 
 	const stopEditingAsBlockCallback = useCallback( () => {
-		stopEditingContentOnlySection( clientId );
-	}, [ clientId, stopEditingContentOnlySection ] );
+		stopEditingContentOnlySection();
+	}, [ stopEditingContentOnlySection ] );
 
-	if ( ! isContentLocked && ! isEditingContentOnlySection ) {
+	// Hide the Done button when the content only pattern insertion experiment is active.
+	// This is replaced by an alternative UI in the experiment.
+	if (
+		window?.__experimentalContentOnlyPatternInsertion ||
+		( ! isContentLocked && ! isEditingContentOnlySection )
+	) {
 		return null;
 	}
 
-	const showDoneButton = isEditingContentOnlySection && ! isContentLocked;
-
 	return (
-		showDoneButton && (
+		isEditingContentOnlySection && (
 			<BlockControls group="other">
 				<ToolbarButton onClick={ stopEditingAsBlockCallback }>
 					{ __( 'Done' ) }

@@ -73,7 +73,7 @@ export function useAvailableTemplates( postType ) {
 			allowSwitchingTemplate &&
 			templates?.filter(
 				( template ) =>
-					( template.is_custom || template.type === 'wp_template' ) &&
+					template.is_custom &&
 					template.slug !== currentTemplateSlug &&
 					!! template.content.raw // Skip empty templates.
 			),

@@ -23,6 +23,7 @@
 -   Type `rc` for release candidate OR `stable` for final release
 -   Click `Run workflow`
 -   When the release draft is generated in [GitHub Releases](https://github.com/WordPress/gutenberg/releases), publish it for the workflow to continue
+-   For RC1 releases only: get team approval to publish @wordpress packages to npm - ask in [#core-editor](https://wordpress.slack.com/messages/C02QB2JS7) if needed ([see details](#publishing-the-wordpress-packages-to-npm))
 -   For stable releases only: wait for team approval to upload to WordPress.org - this is the last step of the workflow for the plugin to be deployed to the plugin directory ([example](https://github.com/WordPress/gutenberg/actions/runs/18559811968))
 
 #### Step 3: Edit the Release Notes
@@ -150,7 +151,7 @@ This will trigger a GitHub Actions (GHA) workflow that will bump the plugin vers
 
 As part of the release workflow, all of the @wordpress packages are published to NPM. After the [Build Gutenberg Plugin Zip](https://github.com/WordPress/gutenberg/actions/workflows/build-plugin-zip.yml) action has created the draft release, you may see a message that the [Publish npm packages](https://github.com/WordPress/gutenberg/actions/workflows/publish-npm-packages.yml) action requires someone with appropriate permissions to trigger it.
 
-This message is misleading. You do not need to take any action to publish the @wordpress packages to NPM. The process is automated and will automatically run after the release notes are published.
+A member of the [Gutenberg Release](https://github.com/orgs/WordPress/teams/gutenberg-release), [Gutenberg Core](https://github.com/orgs/WordPress/teams/gutenberg-core), or [WordPress Core](https://github.com/orgs/WordPress/teams/wordpress-core) teams must [approve the deployment](https://docs.github.com/en/actions/how-tos/managing-workflow-runs-and-deployments/managing-deployments/reviewing-deployments#approving-or-rejecting-a-job). If needed, ask in [#core-editor](https://wordpress.slack.com/messages/C02QB2JS7) for someone to approve. This step is only needed for RC1 releases.
 
 ### Viewing the release draft
 
@@ -247,7 +248,8 @@ If the cherry-picked fixes deserve another release candidate before the stable v
 <div class="callout callout-info">
     <strong>Quick reference</strong>
     <ul>
-        <li>In the release draft, press the “Publish release” button.</li>
+        <li>In the release draft, press the "Publish release" button.</li>
+        <li>If publishing RC1, approve the npm publishing job in the <a href="https://github.com/WordPress/gutenberg/actions/workflows/build-plugin-zip.yml">Build Gutenberg Plugin Zip</a> workflow.</li>
         <li>If publishing a stable release, get approval from a member of the <a href="https://github.com/orgs/WordPress/teams/gutenberg-release">Gutenberg Release</a>, <a href="https://github.com/orgs/WordPress/teams/gutenberg-core">Gutenberg Core</a>, or the <a href="https://github.com/orgs/WordPress/teams/wordpress-core">WordPress Core</a> teams to upload the new plugin version to the WordPress.org plugin repository (SVN).</li>
         <li>Once uploaded, confirm that the latest version can be downloaded and updated from the WordPress plugin dashboard.</li>
     </ul>

@@ -5,6 +5,7 @@ import {
 	displayShortcutList,
 	displayShortcut,
 	rawShortcut,
+	ariaKeyShortcut,
 	shortcutAriaLabel,
 	isKeyboardEvent,
 } from '..';
@@ -266,6 +267,244 @@ describe( 'rawShortcut', () => {
 		it( 'should output ctrl+alt on MacOS', () => {
 			const shortcut = rawShortcut.access( 'm', isAppleOSTrue );
 			expect( shortcut ).toEqual( 'ctrl+alt+m' );
+		} );
+	} );
+} );
+
+describe( 'ariaKeyShortcut', () => {
+	describe( 'modifier key formatting', () => {
+		it( 'should use "Control" (not "ctrl") on Windows', () => {
+			const shortcut = ariaKeyShortcut.primary( 'm', isAppleOSFalse );
+			expect( shortcut ).toEqual( 'Control+M' );
+		} );
+
+		it( 'should use "Meta" for Command key on MacOS', () => {
+			const shortcut = ariaKeyShortcut.primary( 'm', isAppleOSTrue );
+			expect( shortcut ).toEqual( 'Meta+M' );
+		} );
+
+		it( 'should capitalize modifier keys (Shift, Alt)', () => {
+			const shortcut = ariaKeyShortcut.secondary( 'm', isAppleOSFalse );
+			expect( shortcut ).toEqual( 'Control+Shift+Alt+M' );
+		} );
+
+		it( 'should handle multiple modifiers on MacOS', () => {
+			const shortcut = ariaKeyShortcut.secondary( 'm', isAppleOSTrue );
+			expect( shortcut ).toEqual( 'Shift+Alt+Meta+M' );
+		} );
+	} );
+
+	describe( 'character handling', () => {
+		it( 'should uppercase single letter characters', () => {
+			const shortcut = ariaKeyShortcut.primary( 'k', isAppleOSFalse );
+			expect( shortcut ).toEqual( 'Control+K' );
+		} );
+
+		it( 'should pass through number characters', () => {
+			const shortcut = ariaKeyShortcut.primary( '1', isAppleOSFalse );
+			expect( shortcut ).toEqual( 'Control+1' );
+		} );
+
+		it( 'should capitalize multi-character key names', () => {
+			const shortcut = ariaKeyShortcut.primary( 'enter', isAppleOSFalse );
+			expect( shortcut ).toEqual( 'Control+Enter' );
+		} );
+
+		it( 'should pass through special characters unchanged', () => {
+			const shortcut = ariaKeyShortcut.primary( '.', isAppleOSFalse );
+			expect( shortcut ).toEqual( 'Control+.' );
+		} );
+
+		it( 'should output just the character when no modifier is used', () => {
+			const shortcut = ariaKeyShortcut.undefined( 'F1', isAppleOSFalse );
+			expect( shortcut ).toEqual( 'F1' );
+		} );
+	} );
+} );
+
+/**
+ * Tests for handling KeyboardEvent.key-style values.
+ *
+ * These tests document how each shortcut function handles named keys
+ * (like "Enter", "Tab", "Delete") as opposed to single character keys.
+ *
+ * @see https://developer.mozilla.org/en-US/docs/Web/API/UI_Events/Keyboard_event_key_values
+ */
+describe( 'KeyboardEvent.key value handling', () => {
+	const namedKeys = [
+		// Whitespace keys
+		'Tab',
+		'Enter',
+		'Space',
+		// Navigation keys
+		'ArrowUp',
+		'ArrowDown',
+		'ArrowLeft',
+		'ArrowRight',
+		'End',
+		'Home',
+		'PageDown',
+		'PageUp',
+		// Editing keys
+		'Backspace',
+		'Delete',
+		'Insert',
+		// UI keys
+		'Escape',
+		// Function keys
+		'F1',
+		'F10',
+	];
+
+	// Also test the lowercase/shorthand versions commonly used in the codebase
+	const shorthandKeys = [ 'del', 'esc', 'enter', 'tab', 'space' ];
+
+	describe( 'rawShortcut', () => {
+		it( 'lowercases named keys', () => {
+			expect( rawShortcut.primary( 'Enter', isAppleOSFalse ) ).toEqual(
+				'ctrl+enter'
+			);
+			expect( rawShortcut.primary( 'Delete', isAppleOSFalse ) ).toEqual(
+				'ctrl+delete'
+			);
+			expect( rawShortcut.primary( 'ArrowUp', isAppleOSFalse ) ).toEqual(
+				'ctrl+arrowup'
+			);
+		} );
+
+		it( 'passes through shorthand keys lowercased', () => {
+			expect( rawShortcut.primary( 'del', isAppleOSFalse ) ).toEqual(
+				'ctrl+del'
+			);
+			expect( rawShortcut.primary( 'esc', isAppleOSFalse ) ).toEqual(
+				'ctrl+esc'
+			);
+		} );
+
+		it.each( namedKeys )(
+			'outputs %s lowercased with modifier',
+			( key ) => {
+				const shortcut = rawShortcut.primary( key, isAppleOSFalse );
+				expect( shortcut ).toEqual( `ctrl+${ key.toLowerCase() }` );
+			}
+		);
+	} );
+
+	describe( 'displayShortcut', () => {
+		it( 'capitalizes first letter of named keys', () => {
+			expect(
+				displayShortcut.primary( 'enter', isAppleOSFalse )
+			).toEqual( 'Ctrl+Enter' );
+			expect( displayShortcut.primary( 'del', isAppleOSFalse ) ).toEqual(
+				'Ctrl+Del'
+			);
+			expect(
+				displayShortcut.primary( 'arrowup', isAppleOSFalse )
+			).toEqual( 'Ctrl+Arrowup' );
+		} );
+
+		it( 'preserves casing of already-capitalized keys', () => {
+			expect(
+				displayShortcut.primary( 'Enter', isAppleOSFalse )
+			).toEqual( 'Ctrl+Enter' );
+			expect(
+				displayShortcut.primary( 'ArrowUp', isAppleOSFalse )
+			).toEqual( 'Ctrl+ArrowUp' );
+		} );
+
+		it.each( namedKeys )(
+			'outputs %s with capitalized first letter',
+			( key ) => {
+				const shortcut = displayShortcut.primary( key, isAppleOSFalse );
+				// capitaliseFirstCharacter keeps the rest of the string as-is
+				const expected = key.charAt( 0 ).toUpperCase() + key.slice( 1 );
+				expect( shortcut ).toEqual( `Ctrl+${ expected }` );
+			}
+		);
+
+		it.each( shorthandKeys )( 'capitalizes shorthand key %s', ( key ) => {
+			const shortcut = displayShortcut.primary( key, isAppleOSFalse );
+			const expected = key.charAt( 0 ).toUpperCase() + key.slice( 1 );
+			expect( shortcut ).toEqual( `Ctrl+${ expected }` );
+		} );
+	} );
+
+	describe( 'displayShortcutList', () => {
+		it( 'capitalizes first letter of named keys in list', () => {
+			expect(
+				displayShortcutList.primary( 'enter', isAppleOSFalse )
+			).toEqual( [ 'Ctrl', '+', 'Enter' ] );
+			expect(
+				displayShortcutList.primary( 'PageDown', isAppleOSFalse )
+			).toEqual( [ 'Ctrl', '+', 'PageDown' ] );
+		} );
+	} );
+
+	describe( 'shortcutAriaLabel', () => {
+		it( 'capitalizes first letter of named keys', () => {
+			expect(
+				shortcutAriaLabel.primary( 'enter', isAppleOSFalse )
+			).toEqual( 'Control + Enter' );
+			expect(
+				shortcutAriaLabel.primary( 'Delete', isAppleOSFalse )
+			).toEqual( 'Control + Delete' );
+		} );
+
+		it( 'does not have special mappings for most named keys', () => {
+			// Unlike period/comma which are mapped, named keys are just capitalized
+			expect(
+				shortcutAriaLabel.primary( 'ArrowUp', isAppleOSFalse )
+			).toEqual( 'Control + ArrowUp' );
+			expect(
+				shortcutAriaLabel.primary( 'Escape', isAppleOSFalse )
+			).toEqual( 'Control + Escape' );
+		} );
+
+		it.each( namedKeys )(
+			'outputs %s with capitalized first letter',
+			( key ) => {
+				const shortcut = shortcutAriaLabel.primary(
+					key,
+					isAppleOSFalse
+				);
+				const expected = key.charAt( 0 ).toUpperCase() + key.slice( 1 );
+				expect( shortcut ).toEqual( `Control + ${ expected }` );
+			}
+		);
+	} );
+
+	describe( 'ariaKeyShortcut', () => {
+		it( 'capitalizes first letter of named keys', () => {
+			expect(
+				ariaKeyShortcut.primary( 'enter', isAppleOSFalse )
+			).toEqual( 'Control+Enter' );
+			expect(
+				ariaKeyShortcut.primary( 'Delete', isAppleOSFalse )
+			).toEqual( 'Control+Delete' );
+		} );
+
+		it( 'preserves casing after first character', () => {
+			expect(
+				ariaKeyShortcut.primary( 'ArrowUp', isAppleOSFalse )
+			).toEqual( 'Control+ArrowUp' );
+			expect(
+				ariaKeyShortcut.primary( 'PageDown', isAppleOSFalse )
+			).toEqual( 'Control+PageDown' );
+		} );
+
+		it.each( namedKeys )(
+			'outputs %s with capitalized first letter',
+			( key ) => {
+				const shortcut = ariaKeyShortcut.primary( key, isAppleOSFalse );
+				const expected = key.charAt( 0 ).toUpperCase() + key.slice( 1 );
+				expect( shortcut ).toEqual( `Control+${ expected }` );
+			}
+		);
+
+		it.each( shorthandKeys )( 'capitalizes shorthand key %s', ( key ) => {
+			const shortcut = ariaKeyShortcut.primary( key, isAppleOSFalse );
+			const expected = key.charAt( 0 ).toUpperCase() + key.slice( 1 );
+			expect( shortcut ).toEqual( `Control+${ expected }` );
 		} );
 	} );
 } );

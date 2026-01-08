@@ -365,6 +365,7 @@ function UnforwardedModal(
 									? focusOnMountRef
 									: null,
 							] ) }
+							className="components-modal__children-container"
 						>
 							{ children }
 						</div>

@@ -45,7 +45,6 @@ const LinkControlSettings = ( { value, onChange = noop, settings } ) => {
 			// If render property is not provided, use CheckboxControl
 			return (
 				<CheckboxControl
-					__nextHasNoMarginBottom
 					className="block-editor-link-control__setting"
 					key={ setting.id }
 					label={ setting.title }

@@ -169,7 +169,6 @@ function PostTimeToReadEdit( { attributes, setAttributes, context } ) {
 							} }
 						>
 							<ToggleControl
-								__nextHasNoMarginBottom
 								label={ __( 'Display as range' ) }
 								checked={ !! displayAsRange }
 								onChange={ () =>

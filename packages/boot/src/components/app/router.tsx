@@ -1,29 +1,38 @@
 /**
  * External dependencies
  */
-import {
-	createRouter,
-	createRootRoute,
-	createRoute,
-	RouterProvider,
-	createBrowserHistory,
-	type AnyRoute,
-} from '@tanstack/react-router';
-import { parseHref } from '@tanstack/history';
 import type { ComponentType } from 'react';
 
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { lazy, useState, useEffect } from '@wordpress/element';
+import { useMemo } from '@wordpress/element';
 import { Page } from '@wordpress/admin-ui';
+import {
+	privateApis as routePrivateApis,
+	type AnyRoute,
+} from '@wordpress/route';
+import { resolveSelect } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
  */
 import Root from '../root';
-import type { Route, RouteLoaderContext } from '../../store/types';
+import type { Route, RouteConfig, RouteLoaderContext } from '../../store/types';
+import { unlock } from '../../lock-unlock';
+
+const {
+	createLazyRoute,
+	createRouter,
+	createRootRoute,
+	createRoute,
+	RouterProvider,
+	createBrowserHistory,
+	parseHref,
+	useLoaderData,
+} = unlock( routePrivateApis );
 
 // Not found component
 function NotFoundComponent() {
@@ -36,29 +45,6 @@ function NotFoundComponent() {
 	);
 }
 
-function RouteComponent( {
-	stage: Stage,
-	inspector: Inspector,
-}: {
-	stage?: ComponentType;
-	inspector?: ComponentType;
-} ) {
-	return (
-		<>
-			{ Stage && (
-				<div className="boot-layout__stage">
-					<Stage />
-				</div>
-			) }
-			{ Inspector && (
-				<div className="boot-layout__inspector">
-					<Inspector />
-				</div>
-			) }
-		</>
-	);
-}
-
 /**
  * Creates a TanStack route from a Route definition.
  *
@@ -66,77 +52,124 @@ function RouteComponent( {
  * @param parentRoute Parent route.
  * @return Tanstack Route.
  */
-async function createRouteFromDefinition(
-	route: Route,
-	parentRoute: AnyRoute
-) {
-	// Create lazy components for stage and inspector surfaces
-	const SurfacesModule = route.content_module
-		? lazy( async () => {
-				const module = await import( route.content_module! );
-				// Return a component that renders the surfaces
-				return {
-					default: () => (
-						<RouteComponent
-							stage={ module.stage }
-							inspector={ module.inspector }
-						/>
-					),
-				};
-		  } )
-		: () => null;
-
-	// Load route module for lifecycle functions if specified
-	let routeConfig: {
-		beforeLoad?: ( context: RouteLoaderContext ) => void | Promise< void >;
-		loader?: ( context: RouteLoaderContext ) => Promise< unknown >;
-	} = {};
-
-	if ( route.route_module ) {
-		const module = await import( route.route_module );
-		routeConfig = module.route || {};
-	}
-
-	return createRoute( {
+function createRouteFromDefinition( route: Route, parentRoute: AnyRoute ) {
+	// Create route without component initially
+	let tanstackRoute = createRoute( {
 		getParentRoute: () => parentRoute,
 		path: route.path,
-		beforeLoad: routeConfig.beforeLoad
-			? async ( opts: any ) => {
-					const context: RouteLoaderContext = {
+		beforeLoad: async ( opts: any ) => {
+			// Import route module here (lazy)
+			if ( route.route_module ) {
+				const module = await import( route.route_module );
+				const routeConfig = module.route || {};
+
+				if ( routeConfig.beforeLoad ) {
+					return routeConfig.beforeLoad( {
 						params: opts.params || {},
 						search: opts.search || {},
-					};
-					await routeConfig.beforeLoad!( context );
-			  }
-			: undefined,
-		loader: routeConfig.loader
-			? async ( opts: any ) => {
-					const context: RouteLoaderContext = {
-						params: opts.params || {},
-						search: opts.search || {},
-					};
-					return await routeConfig.loader!( context );
-			  }
-			: undefined,
-		component: SurfacesModule,
+					} );
+				}
+			}
+		},
+		loader: async ( opts: any ) => {
+			// Import route module here (lazy)
+			let routeConfig: RouteConfig = {};
+			if ( route.route_module ) {
+				const module = await import( route.route_module );
+				routeConfig = module.route || {};
+			}
+
+			const context: RouteLoaderContext = {
+				params: opts.params || {},
+				search: opts.deps || {},
+			};
+
+			const [ , loaderData, canvasData, titleData ] = await Promise.all( [
+				resolveSelect( coreStore ).getEntityRecord(
+					'root',
+					'__unstableBase'
+				),
+				routeConfig.loader
+					? routeConfig.loader( context )
+					: Promise.resolve( undefined ),
+				routeConfig.canvas
+					? routeConfig.canvas( context )
+					: Promise.resolve( undefined ),
+				routeConfig.title
+					? routeConfig.title( context )
+					: Promise.resolve( undefined ),
+			] );
+
+			let inspector = true;
+			if ( routeConfig.inspector ) {
+				inspector = await routeConfig.inspector( context );
+			}
+
+			return {
+				...( loaderData as any ),
+				canvas: canvasData,
+				inspector,
+				title: titleData,
+				routeContentModule: route.content_module,
+			};
+		},
+		loaderDeps: ( opts: any ) => opts.search,
 	} );
+
+	// Chain .lazy() to preload content module on intent
+	tanstackRoute = tanstackRoute.lazy( async () => {
+		const module = route.content_module
+			? await import( route.content_module )
+			: {};
+
+		const Stage = module.stage;
+		const Inspector = module.inspector;
+
+		return createLazyRoute( route.path )( {
+			component: function RouteComponent() {
+				const { inspector: showInspector } =
+					useLoaderData( { from: route.path } ) ?? {};
+
+				return (
+					<>
+						{ Stage && (
+							<div className="boot-layout__stage">
+								<Stage />
+							</div>
+						) }
+						{ Inspector && showInspector && (
+							<div className="boot-layout__inspector">
+								<Inspector />
+							</div>
+						) }
+					</>
+				);
+			},
+		} );
+	} );
+
+	return tanstackRoute;
 }
 
 /**
  * Creates a route tree from route definitions.
  *
- * @param routes Routes definition.
+ * @param routes        Routes definition.
+ * @param rootComponent Root component to use for the router.
  * @return Router tree.
  */
-async function createRouteTree( routes: Route[] ) {
+function createRouteTree(
+	routes: Route[],
+	rootComponent: ComponentType = Root
+) {
 	const rootRoute = createRootRoute( {
-		component: Root,
+		component: rootComponent as any,
 		context: () => ( {} ),
 	} );
 
-	// Create routes from definitions
-	const dynamicRoutes = await Promise.all(
-		routes.map( ( route ) => createRouteFromDefinition( route, rootRoute ) )
+	// Create routes from definitions (now synchronous)
+	const dynamicRoutes = routes.map( ( route ) =>
+		createRouteFromDefinition( route, rootRoute )
 	);
 
 	return rootRoute.addChildren( dynamicRoutes );
@@ -151,7 +184,7 @@ function createPathHistory() {
 			const pathHref = `${ path }${ url.hash }`;
 			return parseHref( pathHref, window.history.state );
 		},
-		createHref: ( href ) => {
+		createHref: ( href: string ) => {
 			const searchParams = new URLSearchParams( window.location.search );
 			searchParams.set( 'p', href );
 			return `${ window.location.pathname }?${ searchParams }`;
@@ -161,38 +194,43 @@ function createPathHistory() {
 
 interface RouterProps {
 	routes: Route[];
+	rootComponent?: ComponentType;
 }
 
-export default function Router( { routes }: RouterProps ) {
-	const [ router, setRouter ] = useState< any >( null );
+export default function Router( {
+	routes,
+	rootComponent = Root,
+}: RouterProps ) {
+	const router = useMemo( () => {
+		const history = createPathHistory();
+		const routeTree = createRouteTree( routes, rootComponent );
 
-	useEffect( () => {
-		let cancelled = false;
+		return createRouter( {
+			history,
+			routeTree,
+			defaultPreload: 'intent',
+			defaultNotFoundComponent: NotFoundComponent,
+			defaultViewTransition: {
+				types: ( {
+					fromLocation,
+				}: {
+					fromLocation?: unknown;
+					toLocation: unknown;
+					pathChanged: boolean;
+					hrefChanged: boolean;
+					hashChanged: boolean;
+				} ) => {
+					// Disable view transition on initial navigation (no previous location)
+					if ( ! fromLocation ) {
+						return false;
+					}
 
-		async function initializeRouter() {
-			const history = createPathHistory();
-			const routeTree = await createRouteTree( routes );
-
-			if ( ! cancelled ) {
-				const newRouter = createRouter( {
-					history,
-					routeTree,
-					defaultNotFoundComponent: NotFoundComponent,
-				} );
-				setRouter( newRouter );
-			}
-		}
-
-		initializeRouter();
-
-		return () => {
-			cancelled = true;
-		};
-	}, [ routes ] );
-
-	if ( ! router ) {
-		return <div>Loading routes...</div>;
-	}
+					// Enable with navigation type for subsequent navigations
+					return [ 'navigate' ];
+				},
+			},
+		} );
+	}, [ routes, rootComponent ] );
 
 	return <RouterProvider router={ router } />;
 }

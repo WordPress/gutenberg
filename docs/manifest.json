@@ -362,8 +362,14 @@
 	{
 		"title": "API Versions",
 		"slug": "block-api-versions",
-		"markdown_source": "../docs/reference-guides/block-api/block-api-versions.md",
+		"markdown_source": "../docs/reference-guides/block-api/block-api-versions/README.md",
 		"parent": "block-api"
+	},
+	{
+		"title": "Migrating Blocks for iframe Editor Compatibility",
+		"slug": "block-migration-for-iframe-editor-compatibility",
+		"markdown_source": "../docs/reference-guides/block-api/block-api-versions/block-migration-for-iframe-editor-compatibility.md",
+		"parent": "block-api-versions"
 	},
 	{
 		"title": "Attributes",
@@ -843,12 +849,6 @@
 		"title": "DateTime",
 		"slug": "date-time",
 		"markdown_source": "../packages/components/src/date-time/README.md",
-		"parent": "components"
-	},
-	{
-		"title": "DimensionControl",
-		"slug": "dimension-control",
-		"markdown_source": "../packages/components/src/dimension-control/README.md",
 		"parent": "components"
 	},
 	{
@@ -1428,6 +1428,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/abilities",
+		"slug": "packages-abilities",
+		"markdown_source": "../packages/abilities/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/admin-ui",
 		"slug": "packages-admin-ui",
 		"markdown_source": "../packages/admin-ui/README.md",
@@ -1443,6 +1449,12 @@
 		"title": "@wordpress/api-fetch",
 		"slug": "packages-api-fetch",
 		"markdown_source": "../packages/api-fetch/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/asset-loader",
+		"slug": "packages-asset-loader",
+		"markdown_source": "../packages/asset-loader/README.md",
 		"parent": "packages"
 	},
 	{
@@ -1545,6 +1557,12 @@
 		"title": "@wordpress/compose",
 		"slug": "packages-compose",
 		"markdown_source": "../packages/compose/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/core-abilities",
+		"slug": "packages-core-abilities",
+		"markdown_source": "../packages/core-abilities/README.md",
 		"parent": "packages"
 	},
 	{
@@ -1752,6 +1770,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/image-cropper",
+		"slug": "packages-image-cropper",
+		"markdown_source": "../packages/image-cropper/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/interactivity-router",
 		"slug": "packages-interactivity-router",
 		"markdown_source": "../packages/interactivity-router/README.md",
@@ -1812,6 +1836,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/lazy-editor",
+		"slug": "packages-lazy-editor",
+		"markdown_source": "../packages/lazy-editor/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/lazy-import",
 		"slug": "packages-lazy-import",
 		"markdown_source": "../packages/lazy-import/README.md",
@@ -1821,6 +1851,12 @@
 		"title": "@wordpress/list-reusable-blocks",
 		"slug": "packages-list-reusable-blocks",
 		"markdown_source": "../packages/list-reusable-blocks/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/media-fields",
+		"slug": "packages-media-fields",
+		"markdown_source": "../packages/media-fields/README.md",
 		"parent": "packages"
 	},
 	{
@@ -1944,6 +1980,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/route",
+		"slug": "packages-route",
+		"markdown_source": "../packages/route/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/router",
 		"slug": "packages-router",
 		"markdown_source": "../packages/router/README.md",
@@ -2001,6 +2043,12 @@
 		"title": "@wordpress/token-list",
 		"slug": "packages-token-list",
 		"markdown_source": "../packages/token-list/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/ui",
+		"slug": "packages-ui",
+		"markdown_source": "../packages/ui/README.md",
 		"parent": "packages"
 	},
 	{

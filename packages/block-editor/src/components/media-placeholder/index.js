@@ -16,7 +16,7 @@ import {
 	withFilters,
 } from '@wordpress/components';
 import { __, _x } from '@wordpress/i18n';
-import { useState, useEffect } from '@wordpress/element';
+import { useState, useEffect, useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { keyboardReturn } from '@wordpress/icons';
 import deprecated from '@wordpress/deprecated';
@@ -25,52 +25,13 @@ import deprecated from '@wordpress/deprecated';
  * Internal dependencies
  */
 import MediaUpload from '../media-upload';
-import MediaUploadModal from '../media-upload-modal';
 import MediaUploadCheck from '../media-upload/check';
 import URLPopover from '../url-popover';
 import { store as blockEditorStore } from '../../store';
 import { parseDropEvent } from '../use-on-block-drop';
+import { getComputedAcceptAttribute } from './utils';
 
 const noop = () => {};
-
-/**
- * Conditional Media component that uses MediaUploadModal when experiment is enabled,
- * otherwise falls back to MediaUpload.
- *
- * @param {Object}   root0        Component props.
- * @param {Function} root0.render Render prop function that receives { open } object.
- * @return {JSX.Element} The component.
- */
-function ConditionalMediaUpload( { render, ...props } ) {
-	const [ isModalOpen, setIsModalOpen ] = useState( false );
-	const mediaUpload = useSelect( ( select ) => {
-		const { getSettings } = select( blockEditorStore );
-		return getSettings().mediaUpload;
-	}, [] );
-
-	if ( window.__experimentalDataViewsMediaModal ) {
-		return (
-			<>
-				{ render && render( { open: () => setIsModalOpen( true ) } ) }
-				<MediaUploadModal
-					{ ...props }
-					isOpen={ isModalOpen }
-					onClose={ () => {
-						setIsModalOpen( false );
-						props.onClose?.();
-					} }
-					onSelect={ ( media ) => {
-						setIsModalOpen( false );
-						props.onSelect?.( media );
-					} }
-					onUpload={ mediaUpload }
-				/>
-			</>
-		);
-	}
-
-	return <MediaUpload { ...props } render={ render } />;
-}
 
 const InsertFromURLPopover = ( {
 	src,
@@ -190,15 +151,29 @@ export function MediaPlaceholder( {
 		} );
 	}
 
-	const mediaUpload = useSelect( ( select ) => {
+	const { mediaUpload, allowedMimeTypes } = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
-		return getSettings().mediaUpload;
+		const settings = getSettings();
+		return {
+			mediaUpload: settings.mediaUpload,
+			allowedMimeTypes: settings.allowedMimeTypes,
+		};
 	}, [] );
 	const [ src, setSrc ] = useState( '' );
 
 	useEffect( () => {
 		setSrc( value?.src ?? '' );
 	}, [ value?.src ] );
+
+	const computedAccept = useMemo(
+		() =>
+			getComputedAcceptAttribute(
+				allowedTypes,
+				allowedMimeTypes,
+				accept
+			),
+		[ allowedTypes, allowedMimeTypes, accept ]
+	);
 
 	const onlyAllowsImages = () => {
 		if ( ! allowedTypes || allowedTypes.length === 0 ) {
@@ -488,7 +463,7 @@ export function MediaPlaceholder( {
 		};
 		const libraryButton = mediaLibraryButton ?? defaultButton;
 		const uploadMediaLibraryButton = (
-			<ConditionalMediaUpload
+			<MediaUpload
 				addToGallery={ addToGallery }
 				gallery={ multiple && onlyAllowsImages() }
 				multiple={ multiple }
@@ -510,7 +485,7 @@ export function MediaPlaceholder( {
 					{ renderDropZone() }
 					<FormFileUpload
 						onChange={ onUpload }
-						accept={ accept }
+						accept={ computedAccept }
 						multiple={ !! multiple }
 						render={ ( { openFileDialog } ) => {
 							const content = (
@@ -558,7 +533,7 @@ export function MediaPlaceholder( {
 							</Button>
 						) }
 						onChange={ onUpload }
-						accept={ accept }
+						accept={ computedAccept }
 						multiple={ !! multiple }
 					/>
 					{ uploadMediaLibraryButton }

@@ -50,11 +50,6 @@
 	&:indeterminate {
 		background: $components-color-accent;
 		border-color: $components-color-accent;
-
-		// Hide default checkbox styles in IE.
-		&::-ms-check {
-			opacity: 0;
-		}
 	}
 
 	&:checked::before {

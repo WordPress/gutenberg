@@ -62,7 +62,7 @@ export const setupEditor =
 		}
 		if (
 			edits &&
-			Object.values( edits ).some(
+			Object.entries( edits ).some(
 				( [ key, edit ] ) =>
 					edit !== ( post[ key ]?.raw ?? post[ key ] )
 			)
@@ -274,6 +274,8 @@ export const savePost =
 		dispatch( { type: 'REQUEST_POST_UPDATE_FINISH', options } );
 
 		if (
+			typeof window !== 'undefined' &&
+			window.__experimentalTemplateActivate &&
 			! options.isAutosave &&
 			previousRecord.type === 'wp_template' &&
 			( typeof previousRecord.id === 'number' ||
@@ -476,6 +478,14 @@ export const autosave =
 		}
 	};
 
+/**
+ * Save for preview.
+ *
+ * @param {Object}  options                     Options object.
+ * @param {boolean} options.forceIsAutosaveable Whether to force the post to be autosaveable.
+ *
+ * @return {Function} Thunk that saves for preview and returns the preview link.
+ */
 export const __unstableSaveForPreview =
 	( { forceIsAutosaveable } = {} ) =>
 	async ( { select, dispatch } ) => {

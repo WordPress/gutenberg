@@ -34,6 +34,9 @@ test.describe( 'Site editor url navigation', () => {
 		await admin.visitSiteEditor();
 		await page.click( 'role=button[name="Templates"]' );
 		await page.click( 'role=button[name="Add Template"i]' );
+		// Wait for network idle to avoid flaky tests.
+		// eslint-disable-next-line playwright/no-networkidle
+		await page.waitForLoadState( 'networkidle' );
 		await page
 			.getByRole( 'button', {
 				name: 'Single item: Post',
@@ -44,7 +47,7 @@ test.describe( 'Site editor url navigation', () => {
 			.click();
 		await page.getByRole( 'option', { name: 'Demo' } ).click();
 		await expect( page ).toHaveURL(
-			/wp-admin\/site-editor\.php\?p=%2Fwp_template%2F\d+&canvas=edit/
+			'/wp-admin/site-editor.php?p=%2Fwp_template%2Femptytheme%2F%2Fsingle-post-demo&canvas=edit'
 		);
 	} );
 

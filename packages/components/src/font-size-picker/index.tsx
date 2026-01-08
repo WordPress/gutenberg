@@ -235,7 +235,6 @@ const UnforwardedFontSizePicker = (
 							<FlexItem isBlock>
 								<Spacer marginX={ 2 } marginBottom={ 0 }>
 									<RangeControl
-										__nextHasNoMarginBottom
 										__next40pxDefaultSize={
 											__next40pxDefaultSize
 										}
