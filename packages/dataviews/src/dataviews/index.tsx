@@ -157,41 +157,25 @@ function DataViews< Item >( {
 	empty,
 	onReset,
 }: DataViewsProps< Item > ) {
-	// Use infinite scroll hook internally when enabled
+	// Always use useData for pagination info and initial load tracking
 	const {
-		data: defaultData,
-		paginationInfo: defaultPaginationInfo,
+		data: dataFromUseData,
+		paginationInfo: paginationInfoFromUseData,
 		hasInitiallyLoaded,
 	} = useData( data, isLoading, paginationInfo );
 
-	const {
-		data: infiniteScrollData,
-		paginationInfo: infiniteScrollPaginationInfo,
-	} = useInfiniteScrollData( {
-		view,
-		data: data as any,
-		getItemId: getItemId as any,
-		totalDataLength: paginationInfo.totalItems,
-	} );
+	// Use infinite scroll hook when enabled to get the infinite scroll data
+	const { data: infiniteScrollData, setVisibleEntries } =
+		useInfiniteScrollData( {
+			view,
+			data: data as any,
+			getItemId: getItemId as any,
+		} );
 
-	// Use infinite scroll data and pagination info when enabled,
-	// otherwise use the values from useData.
+	// Use infinite scroll data when enabled, otherwise use data from useData
 	const displayData = view.infiniteScrollEnabled
 		? ( infiniteScrollData as Item[] )
-		: ( defaultData as Item[] );
-
-	const displayPaginationInfo: {
-		totalItems: number;
-		totalPages: number;
-		setVisibleEntries?: React.Dispatch< React.SetStateAction< number[] > >;
-	} = view.infiniteScrollEnabled
-		? {
-				...defaultPaginationInfo,
-				...infiniteScrollPaginationInfo,
-		  }
-		: paginationInfo;
-
-	const { setVisibleEntries } = displayPaginationInfo;
+		: ( dataFromUseData as Item[] );
 	const containerRef = useRef< HTMLDivElement >( null );
 	const [ containerWidth, setContainerWidth ] = useState( 0 );
 	const isLoadingRef = useRef( false );
@@ -402,7 +386,7 @@ function DataViews< Item >( {
 				actions,
 				data: displayData,
 				isLoading,
-				paginationInfo: displayPaginationInfo,
+				paginationInfo: paginationInfoFromUseData,
 				selection: _selection,
 				onChangeSelection: setSelectionWithChange,
 				openedFilter,

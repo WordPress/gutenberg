@@ -12,16 +12,11 @@ interface UseInfiniteScrollDataParams< Item > {
 	view: View;
 	data: Item[];
 	getItemId: ( item: Item ) => string;
-	totalDataLength: number;
 }
 
 interface UseInfiniteScrollDataResult< Item > {
 	data: Item[];
-	paginationInfo: {
-		totalItems: number;
-		totalPages: number;
-		setVisibleEntries?: React.Dispatch< React.SetStateAction< number[] > >;
-	};
+	setVisibleEntries?: React.Dispatch< React.SetStateAction< number[] > >;
 }
 
 /**
@@ -33,18 +28,16 @@ interface UseInfiniteScrollDataResult< Item > {
  * - Unloading items that are no longer visible (with a buffer)
  * - Managing placeholders for unloaded items
  *
- * @param params                 - Configuration parameters
- * @param params.view            - Current view configuration
- * @param params.data            - Current page of data
- * @param params.getItemId       - Function to extract item ID
- * @param params.totalDataLength - Total number of items in the dataset
+ * @param params           - Configuration parameters
+ * @param params.view      - Current view configuration
+ * @param params.data      - Current page of data
+ * @param params.getItemId - Function to extract item ID
  * @return Object containing filtered data, pagination info, and loading state
  */
 export function useInfiniteScrollData< Item extends { id: number } >( {
 	view,
 	data: shownData,
 	getItemId,
-	totalDataLength,
 }: UseInfiniteScrollDataParams< Item > ): UseInfiniteScrollDataResult< Item > {
 	// Custom pagination handler that simulates server-side pagination
 	const [ allLoadedRecords, setAllLoadedRecords ] = useState<
@@ -60,9 +53,6 @@ export function useInfiniteScrollData< Item extends { id: number } >( {
 	const loadedRangeRef = useRef< { min: number; max: number } | null >(
 		null
 	);
-
-	const totalItems = totalDataLength;
-	const totalPages = Math.ceil( totalItems / ( view.perPage || 10 ) );
 
 	// Determine scroll direction based on position changes
 	const scrollDirectionRef = useRef< 'up' | 'down' | undefined >( undefined );
@@ -247,12 +237,6 @@ export function useInfiniteScrollData< Item extends { id: number } >( {
 		getItemId,
 	] );
 
-	const paginationInfo = {
-		totalItems,
-		totalPages,
-		setVisibleEntries,
-	};
-
 	// Filter out null placeholders for display
 	const displayData = allLoadedRecords.filter(
 		( record ): record is Item => record !== null
@@ -260,6 +244,6 @@ export function useInfiniteScrollData< Item extends { id: number } >( {
 
 	return {
 		data: displayData,
-		paginationInfo,
+		setVisibleEntries,
 	};
 }
