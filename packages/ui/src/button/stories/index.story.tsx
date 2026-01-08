@@ -1,4 +1,3 @@
-/* eslint-disable no-restricted-syntax */
 import { Fragment, useState } from '@wordpress/element';
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
 import { cog } from '@wordpress/icons';
@@ -133,6 +132,11 @@ export const AllTonesAndVariants: Story = {
 									{ ...args }
 									tone={ tone }
 									variant={ variant }
+									// Disabling because this lint rule was meant for the
+									// `@wordpress/components` Button, but is being applied here.
+									// TODO: rework the lint rule so that it checks the package
+									// where the Button comes from.
+									// eslint-disable-next-line no-restricted-syntax
 									disabled
 								/>
 							</div>
@@ -203,5 +207,3 @@ export const Pressed: Story = {
 		);
 	},
 };
-
-/* eslint-enable no-restricted-syntax */

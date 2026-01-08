@@ -25,6 +25,10 @@ describe( 'Button', () => {
 
 		const onClickMock = jest.fn();
 		render(
+			// Disabling because this lint rule was meant for the
+			// `@wordpress/components` Button, but is being applied here.
+			// TODO: rework the lint rule so that it checks the package
+			// where the Button comes from.
 			// eslint-disable-next-line no-restricted-syntax
 			<Button disabled onClick={ onClickMock }>
 				Click me
@@ -57,7 +61,11 @@ describe( 'Button', () => {
 
 	it( 'can be enabled explicitly when loading', () => {
 		render(
-			// Additional improvement in the original lint rule: only error if disabled=true?
+			// Disabling because this lint rule was meant for the
+			// `@wordpress/components` Button, but is being applied here.
+			// TODO: rework the lint rule so that it checks the package
+			// where the Button comes from.
+			// TODO: Additional improvement in the original lint rule: only error if disabled=true?
 			// eslint-disable-next-line no-restricted-syntax
 			<Button loading loadingAnnouncement="Loading" disabled={ false }>
 				Click me
