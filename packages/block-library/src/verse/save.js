@@ -11,6 +11,10 @@ import { RichText, useBlockProps } from '@wordpress/block-editor';
 export default function save( { attributes } ) {
 	const { textAlign, content } = attributes;
 
+	if ( RichText.isEmpty( content ) ) {
+		return null;
+	}
+
 	const className = clsx( {
 		[ `has-text-align-${ textAlign }` ]: textAlign,
 	} );

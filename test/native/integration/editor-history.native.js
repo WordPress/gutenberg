@@ -57,9 +57,7 @@ describe( 'Editor History', () => {
 
 		// Assert
 		expect( getEditorHtml() ).toMatchInlineSnapshot( `
-		"<!-- wp:verse -->
-		<pre class="wp-block-verse"></pre>
-		<!-- /wp:verse -->
+		"<!-- wp:verse /-->
 
 		<!-- wp:image -->
 		<figure class="wp-block-image"><img alt=""/></figure>
@@ -85,9 +83,7 @@ describe( 'Editor History', () => {
 
 		// Assert
 		expect( getEditorHtml() ).toMatchInlineSnapshot( `
-		"<!-- wp:verse -->
-		<pre class="wp-block-verse"></pre>
-		<!-- /wp:verse -->
+		"<!-- wp:verse /-->
 
 		<!-- wp:image -->
 		<figure class="wp-block-image"><img alt=""/></figure>
