@@ -45,6 +45,7 @@ const LinkControlSearchInput = forwardRef(
 			hideLabelFromVision = false,
 			suffix,
 			isEntity = false,
+			noEntitySearch = false,
 		},
 		ref
 	) => {
@@ -52,7 +53,8 @@ const LinkControlSearchInput = forwardRef(
 			suggestionsQuery,
 			allowDirectEntry,
 			withCreateSuggestion,
-			withURLSuggestion
+			withURLSuggestion,
+			noEntitySearch
 		);
 
 		const searchHandler = showSuggestions

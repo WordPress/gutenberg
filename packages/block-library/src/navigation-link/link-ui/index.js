@@ -143,6 +143,10 @@ function UnforwardedLinkUI( props, ref ) {
 
 	const blockEditingMode = useBlockEditingMode();
 
+	// Custom Link variation is identified by having no type.
+	// When true, disable entity search but keep URL suggestions.
+	const hasType = !! type;
+
 	return (
 		<Popover
 			ref={ ref }
@@ -173,8 +177,9 @@ function UnforwardedLinkUI( props, ref ) {
 						value={ link }
 						showInitialSuggestions
 						withCreateSuggestion={ false }
-						noDirectEntry={ !! type }
-						noURLSuggestion={ !! type }
+						noDirectEntry={ hasType }
+						noURLSuggestion={ hasType }
+						noEntitySearch={ ! hasType }
 						suggestionsQuery={ getSuggestionsQuery( type, kind ) }
 						onChange={ props.onChange }
 						onRemove={ props.onRemove }
