@@ -18,6 +18,7 @@ export default function AdvancedPanel( {
 	value,
 	onChange,
 	inheritedValue = value,
+	serverError,
 } ) {
 	// Custom CSS
 	const [ cssError, setCSSError ] = useState( null );
@@ -66,6 +67,11 @@ export default function AdvancedPanel( {
 			{ cssError && (
 				<Notice status="error" onRemove={ () => setCSSError( null ) }>
 					{ cssError }
+				</Notice>
+			) }
+			{ serverError && (
+				<Notice status="error" isDismissible={ false }>
+					{ serverError }
 				</Notice>
 			) }
 			<TextareaControl

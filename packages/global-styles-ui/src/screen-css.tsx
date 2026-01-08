@@ -3,6 +3,8 @@
  */
 import { __ } from '@wordpress/i18n';
 import { ExternalLink } from '@wordpress/components';
+import { useSelect } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
 // @ts-expect-error: Not typed yet.
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 
@@ -26,6 +28,32 @@ function ScreenCSS() {
 		'merged',
 		false
 	);
+
+	// Get server-side save error
+	const serverError = useSelect( ( select ) => {
+		// @ts-expect-error: Experimental API not in types yet
+		const globalStylesId =
+			select( coreStore ).__experimentalGetCurrentGlobalStylesId();
+
+		if ( ! globalStylesId ) {
+			return null;
+		}
+
+		const error = select( coreStore ).getLastEntitySaveError(
+			'root',
+			'globalStyles',
+			globalStylesId
+		);
+
+		// Extract error message from the error object
+		if ( error?.message ) {
+			return error.message;
+		}
+		if ( typeof error === 'string' ) {
+			return error;
+		}
+		return null;
+	}, [] );
 
 	return (
 		<>
@@ -53,6 +81,7 @@ function ScreenCSS() {
 					value={ style }
 					onChange={ setStyle }
 					inheritedValue={ inheritedStyle }
+					serverError={ serverError }
 				/>
 			</div>
 		</>
