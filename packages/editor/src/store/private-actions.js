@@ -203,9 +203,35 @@ export const saveDirtyEntities =
 				if (
 					values.some( ( value ) => typeof value === 'undefined' )
 				) {
+					// Retrieve error messages for entities that failed to save.
+					const errorMessages = [];
+					let i = 0;
+					for ( const { kind, name, key } of entitiesToSave ) {
+						if ( typeof values[ i ] === 'undefined' ) {
+							const error = registry
+								.select( coreStore )
+								.getLastEntitySaveError( kind, name, key );
+							if ( error?.message ) {
+								errorMessages.push( error.message );
+							}
+						}
+						i++;
+					}
+
+					// Display error with details if available.
+					const uniqueMessages = [ ...new Set( errorMessages ) ];
+					const errorNotice =
+						uniqueMessages.length > 0
+							? sprintf(
+									/* translators: %s: Error message returned from the server. */
+									__( 'Saving failed: %s' ),
+									uniqueMessages.join( ' ' )
+							  )
+							: __( 'Saving failed.' );
+
 					registry
 						.dispatch( noticesStore )
-						.createErrorNotice( __( 'Saving failed.' ) );
+						.createErrorNotice( errorNotice );
 				} else {
 					registry
 						.dispatch( noticesStore )
