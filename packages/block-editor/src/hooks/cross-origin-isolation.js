@@ -120,7 +120,7 @@ if ( window.crossOriginIsolated ) {
 				return <BlockEdit { ...props } />;
 			}
 
-			// Denylist taken from packages/block-library/src/embed/variations.js in Gutenberg.
+			// List of embeds that do not support a preview is from packages/block-library/src/embed/variations.js.
 			const previewable =
 				supportsCredentialless &&
 				! [ 'facebook', 'smugmug' ].includes(
