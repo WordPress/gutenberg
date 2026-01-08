@@ -40,6 +40,7 @@ const meta = {
 				'date',
 				'datetime',
 				'email',
+				'group',
 				'integer',
 				'number',
 				'object',
@@ -135,6 +136,10 @@ type DataType = {
 		city: string;
 		country: string;
 	};
+	// Flat data for group example (not nested)
+	imageId: string;
+	imageUrl: string;
+	imageCaption: string;
 };
 
 const data: DataType[] = [
@@ -186,6 +191,9 @@ const data: DataType[] = [
 			city: 'San Francisco',
 			country: 'USA',
 		},
+		imageId: '42',
+		imageUrl: 'https://wordpress.org/image.png',
+		imageCaption: 'A sample image',
 	},
 ];
 
@@ -610,6 +618,17 @@ const fields: Field< DataType >[] = [
 			country: { id: 'country', type: 'text', label: 'Country' },
 		},
 	},
+	{
+		id: 'imageGroup',
+		type: 'group',
+		label: 'Image',
+		description: 'Group field with flat data (not nested).',
+		properties: {
+			imageId: { id: 'imageId', type: 'text', label: 'Image ID' },
+			imageUrl: { id: 'imageUrl', type: 'url', label: 'URL' },
+			imageCaption: { id: 'imageCaption', type: 'text', label: 'Caption' },
+		},
+	},
 ];
 
 type PanelTypes = 'regular' | 'panel';
@@ -621,6 +640,7 @@ type ControlTypes =
 	| 'date'
 	| 'datetime'
 	| 'email'
+	| 'group'
 	| 'integer'
 	| 'number'
 	| 'object'
@@ -1328,6 +1348,31 @@ export const ObjectComponent = ( {
 	);
 };
 ObjectComponent.storyName = 'object';
+
+export const GroupComponent = ( {
+	type,
+	Edit,
+	asyncElements,
+}: {
+	type: PanelTypes;
+	Edit: ControlTypes;
+	asyncElements: boolean;
+} ) => {
+	const groupFields = useMemo(
+		() => fields.filter( ( field ) => field.type === 'group' ),
+		[]
+	);
+
+	return (
+		<FieldTypeStory
+			fields={ groupFields }
+			type={ type }
+			Edit={ Edit }
+			asyncElements={ asyncElements }
+		/>
+	);
+};
+GroupComponent.storyName = 'group';
 
 export const NoTypeComponent = ( {
 	type,

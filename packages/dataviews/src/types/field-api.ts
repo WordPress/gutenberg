@@ -75,7 +75,8 @@ export type FieldTypeName =
 	| 'color'
 	| 'url'
 	| 'array'
-	| 'object';
+	| 'object'
+	| 'group';
 
 export type Rules< Item > = {
 	required?: boolean;

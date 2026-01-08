@@ -27,6 +27,7 @@ import { default as telephone } from './telephone';
 import { default as color } from './color';
 import { default as url } from './url';
 import { default as object } from './object';
+import { default as group } from './group';
 import { default as noType } from './no-type';
 import getIsValid from './utils/get-is-valid';
 import getFormat from './utils/get-format';
@@ -53,6 +54,7 @@ function getFieldTypeByName< Item >( type?: FieldTypeName ): FieldType< Item > {
 		color,
 		url,
 		object,
+		group,
 	].find( ( fieldType ) => fieldType?.type === type );
 
 	if ( !! found ) {
