@@ -3,13 +3,13 @@
  */
 import Vips from 'wasm-vips';
 
-// @ts-expect-error - WASM files are inlined as base64 data URLs at build time
+// @ts-expect-error
 import VipsModule from 'wasm-vips/vips.wasm';
 
-// @ts-expect-error - WASM files are inlined as base64 data URLs at build time
+// @ts-expect-error
 import VipsHeifModule from 'wasm-vips/vips-heif.wasm';
 
-// @ts-expect-error - WASM files are inlined as base64 data URLs at build time
+// @ts-expect-error
 import VipsJxlModule from 'wasm-vips/vips-jxl.wasm';
 
 /**
@@ -29,6 +29,20 @@ interface EmscriptenModule {
 	setDelayFunction: ( fn: ( fn: () => void ) => void ) => void;
 }
 
+let location = '';
+
+/**
+ * Dynamically sets the location / public path to use for loading the WASM files.
+ *
+ * This is required when loading this module in an inline worker,
+ * where globals such as __webpack_public_path__ are not available.
+ *
+ * @param newLocation Location, typically a base URL such as "https://example.com/path/to/js/...".
+ */
+export function setLocation( newLocation: string ) {
+	location = newLocation;
+}
+
 let cleanup: () => void;
 
 let vipsInstance: typeof Vips;
@@ -45,18 +59,15 @@ async function getVips(): Promise< typeof Vips > {
 
 	vipsInstance = await Vips( {
 		locateFile: ( fileName: string ) => {
-			// WASM files are inlined as base64 data URLs at build time,
-			// eliminating the need for separate file downloads and avoiding
-			// issues with hosts not serving WASM files with correct MIME types.
 			if ( fileName.endsWith( 'vips.wasm' ) ) {
-				return VipsModule;
+				fileName = VipsModule;
 			} else if ( fileName.endsWith( 'vips-heif.wasm' ) ) {
-				return VipsHeifModule;
+				fileName = VipsHeifModule;
 			} else if ( fileName.endsWith( 'vips-jxl.wasm' ) ) {
-				return VipsJxlModule;
+				fileName = VipsJxlModule;
 			}
 
-			return fileName;
+			return location + fileName;
 		},
 		preRun: ( module: EmscriptenModule ) => {
 			// https://github.com/kleisauke/wasm-vips/issues/13#issuecomment-1073246828
