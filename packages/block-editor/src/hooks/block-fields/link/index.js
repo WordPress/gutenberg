@@ -139,7 +139,6 @@ export default function Link( { data, field, onChange, config = {} } ) {
 								...newValues,
 							} );
 
-							// Build update object dynamically based on what's in the mapping
 							const newValue = {};
 
 							if ( fieldDef?.properties ) {
@@ -161,7 +160,6 @@ export default function Link( { data, field, onChange, config = {} } ) {
 							);
 						} }
 						onRemove={ () => {
-							// Remove all link-related properties based on what's in the mapping
 							const removeValue = {};
 
 							if ( fieldDef?.properties ) {

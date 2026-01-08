@@ -90,7 +90,7 @@ export default function Media( { data, field, onChange, config = {} } ) {
 
 	// Check if featured image is supported by checking if it's in the mapping
 	const hasFeaturedImageSupport =
-		fieldDef?.mapping && 'featuredImage' in fieldDef.mapping;
+		fieldDef?.properties && 'featuredImage' in fieldDef.properties;
 
 	const id = value?.id;
 	const url = value?.url;
@@ -140,7 +140,6 @@ export default function Media( { data, field, onChange, config = {} } ) {
 				multiple={ multiple }
 				popoverProps={ popoverProps }
 				onReset={ () => {
-					// Build reset value dynamically based on mapping
 					const resetValue = {};
 
 					if ( fieldDef?.properties ) {
@@ -152,7 +151,7 @@ export default function Media( { data, field, onChange, config = {} } ) {
 						} );
 					}
 
-					// Turn off featured image when resetting (only if it's in the mapping)
+					// Turn off featured image when resetting (only if it's in the properties)
 					if ( hasFeaturedImageSupport ) {
 						resetValue.featuredImage = false;
 					}
@@ -176,12 +175,11 @@ export default function Media( { data, field, onChange, config = {} } ) {
 				} ) }
 				onSelect={ ( selectedMedia ) => {
 					if ( selectedMedia.id && selectedMedia.url ) {
-						// // Build new value dynamically based on what's in the mapping
 						const newValue = {};
 
-						// Iterate over mapping keys and set values for supported properties.
+						// Iterate over properties keys and pick only values for supported properties.
 						// The properties used by the field should closely match those returned
-						// by the media API to ensure no mapping is required.
+						// by the media API to ensure no mapping of keys is required.
 						if ( fieldDef?.properties ) {
 							Object.keys( fieldDef.properties ).forEach(
 								( key ) => {
