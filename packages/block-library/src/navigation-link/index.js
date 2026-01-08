@@ -106,9 +106,17 @@ if ( window.__experimentalContentOnlyInspectorFields ) {
 			label: __( 'Link' ),
 			Edit: 'link',
 			type: 'object',
-			mapping: {
-				href: 'url',
-				rel: 'rel',
+			properties: {
+				href: {
+					id: 'url',
+					type: 'url',
+					label: __( 'Url' ),
+				},
+				rel: {
+					id: 'rel',
+					type: 'text',
+					label: __( 'Rel' ),
+				},
 				// TODO - opens in new tab? id?
 			},
 		},

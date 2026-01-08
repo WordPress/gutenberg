@@ -61,11 +61,27 @@ if ( window.__experimentalContentOnlyInspectorFields ) {
 			label: __( 'Media' ),
 			Edit: 'media',
 			type: 'object',
-			mapping: {
-				id: 'mediaId',
-				type: 'mediaType',
-				url: 'mediaUrl',
-				link: 'mediaLink',
+			properties: {
+				id: {
+					id: 'mediaId',
+					type: 'number',
+					label: __( 'Id' ),
+				},
+				media_type: {
+					id: 'mediaType',
+					type: 'string',
+					label: __( 'Type' ),
+				},
+				url: {
+					id: 'mediaUrl',
+					type: 'url',
+					label: __( 'Url' ),
+				},
+				link: {
+					id: 'mediaLink',
+					type: 'url',
+					label: __( 'Link' ),
+				},
 			},
 			args: {
 				allowedTypes: [ 'image', 'video' ],
@@ -77,10 +93,22 @@ if ( window.__experimentalContentOnlyInspectorFields ) {
 			label: __( 'Link' ),
 			Edit: 'link',
 			type: 'object',
-			mapping: {
-				url: 'href',
-				rel: 'rel',
-				linkTarget: 'linkTarget',
+			properties: {
+				url: {
+					id: 'href',
+					type: 'url',
+					label: __( 'Url' ),
+				},
+				rel: {
+					id: 'rel',
+					type: 'text',
+					label: __( 'Rel' ),
+				},
+				linkTarget: {
+					id: 'linkTarget',
+					type: 'text',
+					label: __( 'Target' ),
+				},
 			},
 		},
 	];

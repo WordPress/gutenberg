@@ -63,10 +63,22 @@ if ( window.__experimentalContentOnlyInspectorFields ) {
 			label: __( 'Link' ),
 			Edit: 'link',
 			type: 'object',
-			mapping: {
-				url: 'url',
-				rel: 'rel',
-				linkTarget: 'linkTarget',
+			properties: {
+				url: {
+					id: 'url',
+					type: 'url',
+					label: __( 'Url' ),
+				},
+				rel: {
+					id: 'rel',
+					type: 'text',
+					label: __( 'Rel' ),
+				},
+				linkTarget: {
+					id: 'linkTarget',
+					type: 'text',
+					label: __( 'Target' ),
+				},
 			},
 		},
 	];

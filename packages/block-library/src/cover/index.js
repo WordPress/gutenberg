@@ -67,12 +67,32 @@ if ( window.__experimentalContentOnlyInspectorFields ) {
 			label: __( 'Background' ),
 			Edit: 'media',
 			type: 'object',
-			mapping: {
-				type: 'backgroundType',
-				id: 'id',
-				url: 'url',
-				alt: 'alt',
-				featuredImage: 'useFeaturedImage',
+			properties: {
+				media_type: {
+					id: 'backgroundType',
+					type: 'string',
+					label: __( 'Type' ),
+				},
+				id: {
+					id: 'id',
+					type: 'number',
+					label: __( 'Id' ),
+				},
+				url: {
+					id: 'url',
+					type: 'url',
+					label: __( 'Url' ),
+				},
+				alt: {
+					id: 'alt',
+					type: 'text',
+					label: __( 'Alt text' ),
+				},
+				featuredImage: {
+					id: 'useFeaturedImage',
+					type: 'boolean',
+					label: __( 'Use featured image' ),
+				},
 			},
 			args: {
 				// TODO - How to support custom gradient?

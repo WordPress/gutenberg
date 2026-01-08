@@ -43,9 +43,17 @@ if ( window.__experimentalContentOnlyInspectorFields ) {
 			label: __( 'File' ),
 			Edit: 'media',
 			type: 'object',
-			mapping: {
-				id: 'id',
-				url: 'href',
+			properties: {
+				id: {
+					id: 'id',
+					type: 'number',
+					label: __( 'Id' ),
+				},
+				url: {
+					id: 'href',
+					type: 'url',
+					label: __( 'Url' ),
+				},
 			},
 			args: {
 				allowedTypes: [],

@@ -43,9 +43,17 @@ if ( window.__experimentalContentOnlyInspectorFields ) {
 			label: __( 'Audio' ),
 			Edit: 'media',
 			type: 'object',
-			mapping: {
-				id: 'id',
-				url: 'src',
+			properties: {
+				id: {
+					id: 'id',
+					type: 'number',
+					label: __( 'Id' ),
+				},
+				url: {
+					id: 'src',
+					type: 'url',
+					label: __( 'Url' ),
+				},
 			},
 			args: {
 				allowedTypes: [ 'audio' ],
