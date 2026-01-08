@@ -6,6 +6,11 @@ import { Button } from '../index';
 const meta: Meta< typeof Button > = {
 	title: 'Design System/Components/Button',
 	component: Button,
+	argTypes: {
+		'aria-pressed': {
+			control: { type: 'boolean' },
+		},
+	},
 };
 export default meta;
 
@@ -15,11 +20,6 @@ export const Default: Story = {
 	args: {
 		children: 'Button',
 		loadingAnnouncement: 'Loading',
-	},
-	argTypes: {
-		'aria-pressed': {
-			control: { type: 'boolean' },
-		},
 	},
 };
 
