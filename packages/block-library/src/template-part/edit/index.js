@@ -53,7 +53,7 @@ function getSupportedAreas() {
 		typeof window !== 'undefined' &&
 		window.__experimentalNavigationOverlays === true;
 	return isOverlayExperimentEnabled
-		? [ ...SUPPORTED_AREAS, 'overlay' ]
+		? [ ...SUPPORTED_AREAS, 'navigation-overlay' ]
 		: SUPPORTED_AREAS;
 }
 
