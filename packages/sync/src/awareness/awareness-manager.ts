@@ -1,0 +1,57 @@
+import { ObjectID, ObjectType } from "../types";
+import { AwarenessState } from "./awareness-state";
+import { PostEditorAwarenessState } from "./post-editor-awareness-state";
+
+import type * as Y from 'yjs';
+
+const awarenessInstances: Map< string, AwarenessState > = new Map();
+
+function getAwarenessId( objectType: ObjectType, objectId: ObjectID | null ): string {
+	return `${ objectType }:${ objectId }`;
+}
+
+function getAwarenessInstance(
+	objectType: ObjectType,
+	objectId: ObjectID | null
+): AwarenessState | undefined {
+	return awarenessInstances.get( getAwarenessId( objectType, objectId ) );
+}
+
+export function getPostEditorAwareness(
+	postId: number,
+	postType: string
+): PostEditorAwarenessState | undefined {
+	const objectId: ObjectID = postId.toString();
+	const objectType: ObjectType = `postType/${ postType }`;
+
+	const awareness = getAwarenessInstance( objectType, objectId );
+	if ( awareness instanceof PostEditorAwarenessState ) {
+		return awareness;
+	}
+
+	return undefined;
+}
+
+export async function createAwareness(
+	objectType: ObjectType,
+	objectId: ObjectID | null,
+	ydoc: Y.Doc
+): Promise< AwarenessState | undefined > {
+	if ( objectId && objectType.startsWith( 'postType/' ) ) {
+		const awareness = new PostEditorAwarenessState( ydoc );
+		awareness.setUp();
+		awarenessInstances.set( getAwarenessId( objectType, objectId ), awareness );
+
+		return awareness;
+	}
+
+	return undefined;
+}
+
+export function setConnectionStatus(
+	objectType: ObjectType,
+	objectId: ObjectID | null,
+	isConnected: boolean
+): void {
+	getAwarenessInstance( objectType, objectId )?.setConnectionStatus( isConnected );
+}
