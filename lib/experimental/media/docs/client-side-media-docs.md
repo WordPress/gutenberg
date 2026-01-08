@@ -2,7 +2,7 @@
 
 ## Cross-origin isolation / `SharedArrayBuffer`
 
-WASM-based image optimization requires `SharedArrayBuffer` support, which in turn requires [cross-origin isolation](https://web.dev/articles/cross-origin-isolation-guide). To implement this, the plugin uses the following headers:
+WASM-based image optimization requires `SharedArrayBuffer` support, which in turn requires [cross-origin isolation](https://web.dev/articles/cross-origin-isolation-guide). To implement this, the editor uses the following headers:
 - `Cross-Origin-Opener-Policy: same-origin`
 - `Cross-Origin-Embedder-Policy: credentialless` (or `require-corp` for safari)
 
