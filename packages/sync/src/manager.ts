@@ -210,7 +210,7 @@ export function createSyncManager(): SyncManager {
 
 		const onStateUpdate = createVersionObserver( ydoc, () => {
 			// Disconnect providers when outdated client is detected
-			providerResults.forEach( ( result ) => result.destroy() );
+			unload();
 		} );
 		stateMap.observe( onStateUpdate );
 
@@ -300,7 +300,7 @@ export function createSyncManager(): SyncManager {
 
 		const onStateUpdate = createVersionObserver( ydoc, () => {
 			// Disconnect providers when outdated client is detected
-			providerResults.forEach( ( result ) => result.destroy() );
+			unload();
 		} );
 		stateMap.observe( onStateUpdate );
 
