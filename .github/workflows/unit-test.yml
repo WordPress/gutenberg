@@ -188,9 +188,7 @@ jobs:
                 multisite: [false, true]
                 wordpress: ['', 'previous major version']
                 exclude:
-                    # On PRs: Only test PHP 8.3, single-site, latest WP
-                    - event: 'pull_request'
-                      php: '7.4'
+                    # On PRs: Only test PHP 7.4 and 8.3, single-site, latest WP
                     - event: 'pull_request'
                       php: '8.0'
                     - event: 'pull_request'
