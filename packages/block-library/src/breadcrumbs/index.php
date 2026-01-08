@@ -511,37 +511,9 @@ function block_core_breadcrumbs_get_terms_breadcrumbs( $post_id, $post_type ) {
 	 *                            post has only one term, that term is used regardless.
 	 * }
 	 * @param string $post_type The post type slug.
-	 */
-	$settings = apply_filters( 'block_core_breadcrumbs_post_type_settings', array(), $post_type );
-
-	/**
-	 * Filters the arguments used to retrieve and order terms for breadcrumb generation.
-	 *
-	 * This filter allows developers to control how terms are ordered when a post
-	 * has multiple terms in a taxonomy. The ordering affects which term is selected
-	 * as the "first" term for the breadcrumb trail.
-	 *
-	 * @since 7.0.0
-	 *
-	 * @param array  $args {
-	 *     Array of term query arguments. These are passed to wp_get_object_terms().
-	 *
-	 *     @type string $orderby How to order terms. Default 'name'.
-	 *                           Accepts 'name', 'term_id', 'count', 'parent', 'term_order'.
-	 *     @type string $order   Sort order. Default 'ASC'. Accepts 'ASC' or 'DESC'.
-	 * }
 	 * @param int    $post_id   The post ID.
-	 * @param string $post_type The post type name.
 	 */
-	$term_args = apply_filters(
-		'block_core_breadcrumbs_term_args',
-		array(
-			'orderby' => 'name',
-			'order'   => 'ASC',
-		),
-		$post_id,
-		$post_type
-	);
+	$settings = apply_filters( 'block_core_breadcrumbs_post_type_settings', array(), $post_type, $post_id );
 
 	$taxonomy_name = null;
 	$terms         = array();
@@ -550,7 +522,7 @@ function block_core_breadcrumbs_get_terms_breadcrumbs( $post_id, $post_type ) {
 	if ( ! empty( $settings['taxonomy'] ) ) {
 		foreach ( $taxonomies as $taxonomy ) {
 			if ( $taxonomy->name === $settings['taxonomy'] ) {
-				$post_terms = wp_get_object_terms( $post_id, $taxonomy->name, $term_args );
+				$post_terms = get_the_terms( $post_id, $taxonomy->name );
 				if ( ! empty( $post_terms ) && ! is_wp_error( $post_terms ) ) {
 					$taxonomy_name = $taxonomy->name;
 					$terms         = $post_terms;
@@ -563,7 +535,7 @@ function block_core_breadcrumbs_get_terms_breadcrumbs( $post_id, $post_type ) {
 	// If no preferred taxonomy or it didn't have terms, find the first taxonomy with terms.
 	if ( empty( $terms ) ) {
 		foreach ( $taxonomies as $taxonomy ) {
-			$post_terms = wp_get_object_terms( $post_id, $taxonomy->name, $term_args );
+			$post_terms = get_the_terms( $post_id, $taxonomy->name );
 			if ( ! empty( $post_terms ) && ! is_wp_error( $post_terms ) ) {
 				$taxonomy_name = $taxonomy->name;
 				$terms         = $post_terms;
