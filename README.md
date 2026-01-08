@@ -25,7 +25,9 @@ Check out the [Keeping up with Gutenberg Index](https://make.wordpress.org/core/
 
 ## Getting Started
 
-Get hands-on: check out the [block editor live demo](https://wordpress.org/gutenberg/) to play with a test instance of the editor.
+Note for New Contributors: When setting up your development environment, make sure to review our Quick Start Guide
+to avoid common setup issues. For first-time contributors, we also recommend checking out our Beginner’s Troubleshooting Tips
+to help you get started smoothly.
 
 ### Using Gutenberg
 
@@ -43,7 +45,8 @@ Review the [Quick Start Guide](https://developer.wordpress.org/block-editor/gett
 
 ### Contribute to Gutenberg
 
-Gutenberg is an open-source project and welcomes all contributors from code to design, and from documentation to triage. The project is built by many contributors and volunteers, and we'd love your help building it.
+Tip: Before you start contributing code, please read our Contributing Guidelines
+ and Code of Conduct to ensure a welcoming and collaborative environment for everyone. We’re excited to have you on board!
 
 See the [Contributors Handbook](https://developer.wordpress.org/block-editor/contributors/) for all the details on how you can contribute.
 
