@@ -259,6 +259,18 @@ function gutenberg_initialize_experiments_settings() {
 		)
 	);
 
+	add_settings_field(
+		'gutenberg-list-view-dynamic-expansion',
+		__( 'List View: Dynamic expansion', 'gutenberg' ),
+		'gutenberg_display_experiment_field',
+		'gutenberg-experiments',
+		'gutenberg_experiments_section',
+		array(
+			'label' => __( 'Automatically adjusts List View expansion depth based on the number of blocks to improve performance and usability. The List View will collapse deeper levels to keep the visible block count manageable. Configure the maximum visible blocks in Editor Preferences &gt; General &gt; List View.', 'gutenberg' ),
+			'id'    => 'gutenberg-list-view-dynamic-expansion',
+		)
+	);
+
 	register_setting(
 		'gutenberg-experiments',
 		'gutenberg-experiments'

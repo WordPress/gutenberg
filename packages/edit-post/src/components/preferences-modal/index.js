@@ -11,13 +11,19 @@ import { privateApis as editorPrivateApis } from '@wordpress/editor';
  */
 import { unlock } from '../../lock-unlock';
 import MetaBoxesSection from './meta-boxes-section';
+import ListViewDynamicExpansionSettings from './list-view-dynamic-expansion-settings';
 
 const { PreferenceToggleControl } = unlock( preferencesPrivateApis );
 const { PreferencesModal } = unlock( editorPrivateApis );
 
 export default function EditPostPreferencesModal() {
 	const extraSections = {
-		general: <MetaBoxesSection title={ __( 'Advanced' ) } />,
+		general: (
+			<>
+				<MetaBoxesSection title={ __( 'Advanced' ) } />
+				<ListViewDynamicExpansionSettings />
+			</>
+		),
 		appearance: (
 			<PreferenceToggleControl
 				scope="core/edit-post"
