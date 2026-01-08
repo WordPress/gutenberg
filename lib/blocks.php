@@ -114,6 +114,12 @@ function gutenberg_deregister_core_block_and_assets( $block_name ) {
  * @return void
  */
 function gutenberg_register_core_block_assets( $block_name ) {
+	// Running `gutenberg_url` inside of a loop can be expensive in systems with
+	// many callbacks attached to the `plugins_url` hook.
+	// Since all of the paths have the same root, we can instead retrieve the
+	// corresponding URL root once, and manually concatenate the URL below.
+	static $gutenberg_url_root = gutenberg_url( '/' );
+
 	if ( ! wp_should_load_separate_core_block_assets() ) {
 		return;
 	}
@@ -126,7 +132,7 @@ function gutenberg_register_core_block_assets( $block_name ) {
 	$suffix          = SCRIPT_DEBUG ? '' : '.min';
 
 	$style_path      = "build/styles/block-library/$block_name/";
-	$stylesheet_url  = gutenberg_url( $style_path . 'style' . $suffix . '.css' );
+	$stylesheet_url  = $gutenberg_url_root . $style_path . 'style' . $suffix . '.css';
 	$stylesheet_path = gutenberg_dir_path() . $style_path . ( is_rtl() ? 'style-rtl' . $suffix . '.css' : 'style' . $suffix . '.css' );
 
 	if ( file_exists( $stylesheet_path ) ) {
