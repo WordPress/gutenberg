@@ -8,7 +8,7 @@ import {
 	code,
 	drawerLeft,
 	drawerRight,
-	edit,
+	pencil,
 	formatListBullets,
 	listView,
 	external,
@@ -25,7 +25,6 @@ import { store as noticesStore } from '@wordpress/notices';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as coreStore, useEntityRecord } from '@wordpress/core-data';
 import { store as interfaceStore } from '@wordpress/interface';
-import { getPath } from '@wordpress/url';
 import { decodeEntities } from '@wordpress/html-entities';
 
 /**
@@ -91,19 +90,6 @@ const getEditorCommandLoader = () =>
 		const { openModal, enableComplementaryArea, disableComplementaryArea } =
 			useDispatch( interfaceStore );
 		const { getCurrentPostId } = useSelect( editorStore );
-		const { isBlockBasedTheme, canCreateTemplate } = useSelect(
-			( select ) => {
-				return {
-					isBlockBasedTheme:
-						select( coreStore ).getCurrentTheme()?.is_block_theme,
-					canCreateTemplate: select( coreStore ).canUser( 'create', {
-						kind: 'postType',
-						name: 'wp_template',
-					} ),
-				};
-			},
-			[]
-		);
 		const allowSwitchEditorMode =
 			isCodeEditingEnabled && isRichEditingEnabled;
 
@@ -223,7 +209,7 @@ const getEditorCommandLoader = () =>
 
 		commands.push( {
 			name: 'core/open-settings-sidebar',
-			label: __( 'Show or hide the Settings panel.' ),
+			label: __( 'Show or hide the Settings panel' ),
 			icon: isRTL() ? drawerLeft : drawerRight,
 			callback: ( { close } ) => {
 				const activeSidebar = getActiveComplementaryArea( 'core' );
@@ -285,21 +271,6 @@ const getEditorCommandLoader = () =>
 				},
 			} );
 		}
-		if ( canCreateTemplate && isBlockBasedTheme ) {
-			const isSiteEditor = getPath( window.location.href )?.includes(
-				'site-editor.php'
-			);
-			if ( ! isSiteEditor ) {
-				commands.push( {
-					name: 'core/go-to-site-editor',
-					label: __( 'Open Site Editor' ),
-					callback: ( { close } ) => {
-						close();
-						document.location = 'site-editor.php';
-					},
-				} );
-			}
-		}
 
 		return {
 			commands,
@@ -322,7 +293,7 @@ const getEditedEntityContextualCommands = () =>
 			commands.push( {
 				name: 'core/rename-pattern',
 				label: __( 'Rename pattern' ),
-				icon: edit,
+				icon: pencil,
 				callback: ( { close } ) => {
 					openModal( patternRenameModalName );
 					close();
@@ -344,24 +315,37 @@ const getEditedEntityContextualCommands = () =>
 
 const getPageContentFocusCommands = () =>
 	function usePageContentFocusCommands() {
-		const { onNavigateToEntityRecord, goBack, templateId, isPreviewMode } =
-			useSelect( ( select ) => {
-				const {
-					getRenderingMode,
-					getEditorSettings: _getEditorSettings,
-					getCurrentTemplateId,
-				} = unlock( select( editorStore ) );
-				const editorSettings = _getEditorSettings();
-				return {
-					isTemplateHidden: getRenderingMode() === 'post-only',
-					onNavigateToEntityRecord:
-						editorSettings.onNavigateToEntityRecord,
-					getEditorSettings: _getEditorSettings,
-					goBack: editorSettings.onNavigateToPreviousEntityRecord,
-					templateId: getCurrentTemplateId(),
-					isPreviewMode: editorSettings.isPreviewMode,
-				};
-			}, [] );
+		const {
+			onNavigateToEntityRecord,
+			goBack,
+			templateId,
+			isPreviewMode,
+			canEditTemplate,
+		} = useSelect( ( select ) => {
+			const {
+				getRenderingMode,
+				getEditorSettings: _getEditorSettings,
+				getCurrentTemplateId,
+			} = unlock( select( editorStore ) );
+			const editorSettings = _getEditorSettings();
+			const _templateId = getCurrentTemplateId();
+			return {
+				isTemplateHidden: getRenderingMode() === 'post-only',
+				onNavigateToEntityRecord:
+					editorSettings.onNavigateToEntityRecord,
+				getEditorSettings: _getEditorSettings,
+				goBack: editorSettings.onNavigateToPreviousEntityRecord,
+				templateId: _templateId,
+				isPreviewMode: editorSettings.isPreviewMode,
+				canEditTemplate:
+					!! _templateId &&
+					select( coreStore ).canUser( 'update', {
+						kind: 'postType',
+						name: 'wp_template',
+						id: _templateId,
+					} ),
+			};
+		}, [] );
 		const { editedRecord: template, hasResolved } = useEntityRecord(
 			'postType',
 			'wp_template',
@@ -374,7 +358,7 @@ const getPageContentFocusCommands = () =>
 
 		const commands = [];
 
-		if ( templateId && hasResolved ) {
+		if ( templateId && hasResolved && canEditTemplate ) {
 			commands.push( {
 				name: 'core/switch-to-template-focus',
 				label: sprintf(

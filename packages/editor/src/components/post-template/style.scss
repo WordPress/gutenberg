@@ -1,5 +1,24 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/z-index" as *;
+
 .editor-post-template__swap-template-modal {
 	z-index: z-index(".editor-post-template__swap-template-modal");
+
+	.editor-post-template__swap-template-search {
+		background: $white;
+		position: sticky;
+		top: 0;
+		padding: $grid-unit-20 0;
+		transform: translateY(- $grid-unit-05); // Offsets the top padding on the modal content container
+		margin-bottom: - $grid-unit-05;
+		z-index: z-index(".editor-post-template__swap-template-search");
+	}
+}
+
+.editor-post-template__create-template-modal {
+	z-index: z-index(".editor-post-template__create-template-modal");
 }
 
 .editor-post-template__swap-template-modal-content .block-editor-block-patterns-list {

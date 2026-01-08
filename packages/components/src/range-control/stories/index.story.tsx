@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryFn } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react-webpack5';
+import { fn } from 'storybook/test';
 
 /**
  * WordPress dependencies
@@ -46,8 +47,14 @@ const meta: Meta< typeof RangeControl > = {
 		type: { control: { type: 'check' }, options: [ 'stepper' ] },
 		value: { control: false },
 	},
+	args: {
+		onBlur: fn(),
+		onChange: fn(),
+		onFocus: fn(),
+		onMouseLeave: fn(),
+		onMouseMove: fn(),
+	},
 	parameters: {
-		actions: { argTypesRegex: '^on.*' },
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
 	},
@@ -71,7 +78,6 @@ const Template: StoryFn< typeof RangeControl > = ( { onChange, ...args } ) => {
 
 export const Default: StoryFn< typeof RangeControl > = Template.bind( {} );
 Default.args = {
-	__nextHasNoMarginBottom: true,
 	__next40pxDefaultSize: true,
 	help: 'Please select how transparent you would like this.',
 	initialPosition: 50,
@@ -107,7 +113,6 @@ export const WithAnyStep: StoryFn< typeof RangeControl > = ( {
 	);
 };
 WithAnyStep.args = {
-	__nextHasNoMarginBottom: true,
 	__next40pxDefaultSize: true,
 	label: 'Brightness',
 	step: 'any',
@@ -172,7 +177,6 @@ export const WithIntegerStepAndMarks: StoryFn< typeof RangeControl > =
 	MarkTemplate.bind( {} );
 
 WithIntegerStepAndMarks.args = {
-	__nextHasNoMarginBottom: true,
 	__next40pxDefaultSize: true,
 	label: 'Integer Step',
 	marks: marksBase,
@@ -190,7 +194,6 @@ export const WithDecimalStepAndMarks: StoryFn< typeof RangeControl > =
 	MarkTemplate.bind( {} );
 
 WithDecimalStepAndMarks.args = {
-	__nextHasNoMarginBottom: true,
 	__next40pxDefaultSize: true,
 	marks: [
 		...marksBase,
@@ -211,7 +214,6 @@ export const WithNegativeMinimumAndMarks: StoryFn< typeof RangeControl > =
 	MarkTemplate.bind( {} );
 
 WithNegativeMinimumAndMarks.args = {
-	__nextHasNoMarginBottom: true,
 	__next40pxDefaultSize: true,
 	marks: marksWithNegatives,
 	max: 10,
@@ -228,7 +230,6 @@ export const WithNegativeRangeAndMarks: StoryFn< typeof RangeControl > =
 	MarkTemplate.bind( {} );
 
 WithNegativeRangeAndMarks.args = {
-	__nextHasNoMarginBottom: true,
 	__next40pxDefaultSize: true,
 	marks: marksWithNegatives,
 	max: -1,
@@ -245,7 +246,6 @@ export const WithAnyStepAndMarks: StoryFn< typeof RangeControl > =
 	MarkTemplate.bind( {} );
 
 WithAnyStepAndMarks.args = {
-	__nextHasNoMarginBottom: true,
 	__next40pxDefaultSize: true,
 	marks: marksBase,
 	max: 10,

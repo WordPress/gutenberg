@@ -133,7 +133,6 @@ class WP_Navigation_Block_Renderer {
 		 * @since 6.5.0
 		 *
 		 * @param array $needs_list_item_wrapper The list of blocks that need a list item wrapper.
-		 * @return array The list of blocks that need a list item wrapper.
 		 */
 		$needs_list_item_wrapper = apply_filters( 'block_core_navigation_listable_blocks', static::$needs_list_item_wrapper );
 
@@ -241,11 +240,12 @@ class WP_Navigation_Block_Renderer {
 			// it encounters whitespace. This code strips it.
 			$blocks = block_core_navigation_filter_out_empty_blocks( $parsed_blocks );
 
-			// Run Block Hooks algorithm to inject hooked blocks.
-			$markup         = block_core_navigation_insert_hooked_blocks( $blocks, $navigation_post );
-			$root_nav_block = parse_blocks( $markup )[0];
-
-			$blocks = isset( $root_nav_block['innerBlocks'] ) ? $root_nav_block['innerBlocks'] : $blocks;
+			// Re-serialize, and run Block Hooks algorithm to inject hooked blocks.
+			// TODO: See if we can move the apply_block_hooks_to_content_from_post_object() call
+			// before the parse_blocks() call further above, to avoid the extra serialization/parsing.
+			$markup = serialize_blocks( $blocks );
+			$markup = apply_block_hooks_to_content_from_post_object( $markup, $navigation_post );
+			$blocks = parse_blocks( $markup );
 
 			// TODO - this uses the full navigation block attributes for the
 			// context which could be refined.
@@ -446,7 +446,7 @@ class WP_Navigation_Block_Renderer {
 	private static function get_styles( $attributes ) {
 		$colors       = block_core_navigation_build_css_colors( $attributes );
 		$font_sizes   = block_core_navigation_build_css_font_sizes( $attributes );
-		$block_styles = isset( $attributes['styles'] ) ? $attributes['styles'] : '';
+		$block_styles = $attributes['styles'] ?? '';
 		return $block_styles . $colors['inline_styles'] . $font_sizes['inline_styles'];
 	}
 
@@ -478,10 +478,10 @@ class WP_Navigation_Block_Renderer {
 		);
 
 		$should_display_icon_label = isset( $attributes['hasIcon'] ) && true === $attributes['hasIcon'];
-		$toggle_button_icon        = '<svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="4" y="7.5" width="16" height="1.5" /><rect x="4" y="15" width="16" height="1.5" /></svg>';
+		$toggle_button_icon        = '<svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 7.5h16v1.5H4z"></path><path d="M4 15h16v1.5H4z"></path></svg>';
 		if ( isset( $attributes['icon'] ) ) {
 			if ( 'menu' === $attributes['icon'] ) {
-				$toggle_button_icon = '<svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M5 5v1.5h14V5H5zm0 7.8h14v-1.5H5v1.5zM5 19h14v-1.5H5V19z" /></svg>';
+				$toggle_button_icon = '<svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M5 5v1.5h14V5H5z"></path><path d="M5 12.8h14v-1.5H5v1.5z"></path><path d="M5 19h14v-1.5H5V19z"></path></svg>';
 			}
 		}
 		$toggle_button_content       = $should_display_icon_label ? $toggle_button_icon : __( 'Menu' );
@@ -497,7 +497,7 @@ class WP_Navigation_Block_Renderer {
 		$close_button_directives         = '';
 		if ( $is_interactive ) {
 			$open_button_directives                  = '
-				data-wp-on-async--click="actions.openMenuOnClick"
+				data-wp-on--click="actions.openMenuOnClick"
 				data-wp-on--keydown="actions.handleMenuKeydown"
 			';
 			$responsive_container_directives         = '
@@ -505,7 +505,7 @@ class WP_Navigation_Block_Renderer {
 				data-wp-class--is-menu-open="state.isMenuOpen"
 				data-wp-watch="callbacks.initMenu"
 				data-wp-on--keydown="actions.handleMenuKeydown"
-				data-wp-on-async--focusout="actions.handleMenuFocusout"
+				data-wp-on--focusout="actions.handleMenuFocusout"
 				tabindex="-1"
 			';
 			$responsive_dialog_directives            = '
@@ -514,7 +514,7 @@ class WP_Navigation_Block_Renderer {
 				data-wp-bind--role="state.roleAttribute"
 			';
 			$close_button_directives                 = '
-				data-wp-on-async--click="actions.closeMenuOnClick"
+				data-wp-on--click="actions.closeMenuOnClick"
 			';
 			$responsive_container_content_directives = '
 				data-wp-watch="callbacks.focusFirstElement"
@@ -818,7 +818,7 @@ function block_core_navigation_add_directives_to_submenu( $tags, $block_attribut
 	) ) {
 		// Add directives to the parent `<li>`.
 		$tags->set_attribute( 'data-wp-interactive', 'core/navigation' );
-		$tags->set_attribute( 'data-wp-context', '{ "submenuOpenedBy": { "click": false, "hover": false, "focus": false }, "type": "submenu", "modal": null }' );
+		$tags->set_attribute( 'data-wp-context', '{ "submenuOpenedBy": { "click": false, "hover": false, "focus": false }, "type": "submenu", "modal": null, "previousFocus": null }' );
 		$tags->set_attribute( 'data-wp-watch', 'callbacks.initMenu' );
 		$tags->set_attribute( 'data-wp-on--focusout', 'actions.handleMenuFocusout' );
 		$tags->set_attribute( 'data-wp-on--keydown', 'actions.handleMenuKeydown' );
@@ -830,8 +830,8 @@ function block_core_navigation_add_directives_to_submenu( $tags, $block_attribut
 		$tags->set_attribute( 'tabindex', '-1' );
 
 		if ( ! isset( $block_attributes['openSubmenusOnClick'] ) || false === $block_attributes['openSubmenusOnClick'] ) {
-			$tags->set_attribute( 'data-wp-on-async--mouseenter', 'actions.openMenuOnHover' );
-			$tags->set_attribute( 'data-wp-on-async--mouseleave', 'actions.closeMenuOnHover' );
+			$tags->set_attribute( 'data-wp-on--mouseenter', 'actions.openMenuOnHover' );
+			$tags->set_attribute( 'data-wp-on--mouseleave', 'actions.closeMenuOnHover' );
 		}
 
 		// Add directives to the toggle submenu button.
@@ -841,7 +841,7 @@ function block_core_navigation_add_directives_to_submenu( $tags, $block_attribut
 				'class_name' => 'wp-block-navigation-submenu__toggle',
 			)
 		) ) {
-			$tags->set_attribute( 'data-wp-on-async--click', 'actions.toggleMenuOnClick' );
+			$tags->set_attribute( 'data-wp-on--click', 'actions.toggleMenuOnClick' );
 			$tags->set_attribute( 'data-wp-bind--aria-expanded', 'state.isMenuOpen' );
 			// The `aria-expanded` attribute for SSR is already added in the submenu block.
 		}
@@ -852,7 +852,7 @@ function block_core_navigation_add_directives_to_submenu( $tags, $block_attribut
 				'class_name' => 'wp-block-navigation__submenu-container',
 			)
 		) ) {
-			$tags->set_attribute( 'data-wp-on-async--focus', 'actions.openMenuOnFocus' );
+			$tags->set_attribute( 'data-wp-on--focus', 'actions.openMenuOnFocus' );
 		}
 
 		// Iterate through subitems if exist.
@@ -1077,12 +1077,11 @@ function block_core_navigation_get_fallback_blocks() {
 
 		// Run Block Hooks algorithm to inject hooked blocks.
 		// We have to run it here because we need the post ID of the Navigation block to track ignored hooked blocks.
-		$markup = block_core_navigation_insert_hooked_blocks( $fallback_blocks, $navigation_post );
-		$blocks = parse_blocks( $markup );
-
-		if ( isset( $blocks[0]['innerBlocks'] ) ) {
-			$fallback_blocks = $blocks[0]['innerBlocks'];
-		}
+		// TODO: See if we can move the apply_block_hooks_to_content_from_post_object() call
+		// before the parse_blocks() call further above, to avoid the extra serialization/parsing.
+		$markup          = serialize_blocks( $fallback_blocks );
+		$markup          = apply_block_hooks_to_content_from_post_object( $markup, $navigation_post );
+		$fallback_blocks = parse_blocks( $markup );
 	}
 
 	/**
@@ -1348,9 +1347,7 @@ function block_core_navigation_get_classic_menu_fallback_blocks( $classic_nav_me
 	}
 
 	$inner_blocks = block_core_navigation_parse_blocks_from_menu_items(
-		isset( $menu_items_by_parent_id[0] )
-			? $menu_items_by_parent_id[0]
-			: array(),
+		$menu_items_by_parent_id[0] ?? array(),
 		$menu_items_by_parent_id
 	);
 
@@ -1435,62 +1432,4 @@ function block_core_navigation_get_most_recently_published_navigation() {
 	}
 
 	return null;
-}
-
-/**
- * Mock a parsed block for the Navigation block given its inner blocks and the `wp_navigation` post object.
- * The `wp_navigation` post's `_wp_ignored_hooked_blocks` meta is queried to add the `metadata.ignoredHookedBlocks` attribute.
- *
- * @since 6.5.0
- *
- * @param array   $inner_blocks Parsed inner blocks of a Navigation block.
- * @param WP_Post $post         `wp_navigation` post object corresponding to the block.
- *
- * @return array the normalized parsed blocks.
- */
-function block_core_navigation_mock_parsed_block( $inner_blocks, $post ) {
-	$attributes = array();
-
-	if ( isset( $post->ID ) ) {
-		$ignored_hooked_blocks = get_post_meta( $post->ID, '_wp_ignored_hooked_blocks', true );
-		if ( ! empty( $ignored_hooked_blocks ) ) {
-			$ignored_hooked_blocks  = json_decode( $ignored_hooked_blocks, true );
-			$attributes['metadata'] = array(
-				'ignoredHookedBlocks' => $ignored_hooked_blocks,
-			);
-		}
-	}
-
-	$mock_anchor_parent_block = array(
-		'blockName'    => 'core/navigation',
-		'attrs'        => $attributes,
-		'innerBlocks'  => $inner_blocks,
-		'innerContent' => array_fill( 0, count( $inner_blocks ), null ),
-	);
-
-	return $mock_anchor_parent_block;
-}
-
-/**
- * Insert hooked blocks into a Navigation block.
- *
- * Given a Navigation block's inner blocks and its corresponding `wp_navigation` post object,
- * this function inserts hooked blocks into it, and returns the serialized inner blocks in a
- * mock Navigation block wrapper.
- *
- * If there are any hooked blocks that need to be inserted as the Navigation block's first or last
- * children, the `wp_navigation` post's `_wp_ignored_hooked_blocks` meta is checked to see if any
- * of those hooked blocks should be exempted from insertion.
- *
- * @since 6.5.0
- *
- * @param array   $inner_blocks Parsed inner blocks of a Navigation block.
- * @param WP_Post $post         `wp_navigation` post object corresponding to the block.
- * @return string Serialized inner blocks in mock Navigation block wrapper, with hooked blocks inserted, if any.
- */
-function block_core_navigation_insert_hooked_blocks( $inner_blocks, $post ) {
-	$mock_navigation_block = block_core_navigation_mock_parsed_block( $inner_blocks, $post );
-
-	$mock_navigation_block_markup = serialize_block( $mock_navigation_block );
-	return apply_block_hooks_to_content( $mock_navigation_block_markup, $post, 'insert_hooked_blocks' );
 }

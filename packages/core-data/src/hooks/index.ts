@@ -1,3 +1,12 @@
+/**
+ * Internal dependencies
+ */
+import type { WithPermissions } from './use-entity-records';
+
+/**
+ * Utility type that adds permissions to any record type.
+ */
+export type { WithPermissions };
 export {
 	default as useEntityRecord,
 	__experimentalUseEntityRecord,

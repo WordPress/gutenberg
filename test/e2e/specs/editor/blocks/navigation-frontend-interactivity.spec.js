@@ -256,6 +256,15 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 			// Tab outside the complex submenu.
 			await page.keyboard.press( 'Tab' );
 			await expect( firstLevelElement ).toBeHidden();
+
+			// Test: nested submenu closes on ESC key and focuses parent menu item:
+			// See: https://github.com/WordPress/gutenberg/issues/69834
+			await complexSubmenuButton.click();
+			await nestedSubmenuButton.click();
+			await expect( secondLevelElement ).toBeVisible();
+			await pageUtils.pressKeys( 'Escape' );
+			await expect( secondLevelElement ).toBeHidden();
+			await expect( nestedSubmenuButton ).toBeFocused();
 		} );
 
 		/**
@@ -343,6 +352,15 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 			// Close the menu via click on the body
 			await page.click( 'body' );
 			await expect( firstLevelElement ).toBeHidden();
+
+			// Test: nested submenu closes on ESC key and focuses parent menu item:
+			// See: https://github.com/WordPress/gutenberg/issues/69834
+			await complexSubmenuButton.click();
+			await nestedSubmenuButton.click();
+			await expect( secondLevelElement ).toBeVisible();
+			await pageUtils.pressKeys( 'Escape' );
+			await expect( secondLevelElement ).toBeHidden();
+			await expect( nestedSubmenuButton ).toBeFocused();
 
 			// Tests not covered: Tabbing to close menus
 		} );

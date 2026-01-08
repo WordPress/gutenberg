@@ -11,7 +11,8 @@
 			"type": "string"
 		},
 		"moreText": {
-			"type": "string"
+			"type": "string",
+			"role": "content"
 		},
 		"showMoreOnNewLine": {
 			"type": "boolean",
@@ -27,6 +28,7 @@
 		"viewportWidth": 350
 	},
 	"supports": {
+		"anchor": true,
 		"html": false,
 		"color": {
 			"gradients": true,

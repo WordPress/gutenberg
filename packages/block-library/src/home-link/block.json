@@ -9,7 +9,8 @@
 	"textdomain": "default",
 	"attributes": {
 		"label": {
-			"type": "string"
+			"type": "string",
+			"role": "content"
 		}
 	},
 	"usesContext": [
@@ -22,6 +23,7 @@
 		"style"
 	],
 	"supports": {
+		"anchor": true,
 		"reusable": false,
 		"html": false,
 		"typography": {

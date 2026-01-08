@@ -119,6 +119,25 @@
 					"description": "The port number for the test site. You'll access the instance through the port: http://localhost:8889",
 					"type": "integer",
 					"default": 8889
+				},
+				"lifecycleScripts": {
+					"description": "Mapping of commands that should be executed at certain points in the lifecycle.",
+					"type": "object",
+					"default": {},
+					"properties": {
+						"afterStart": {
+							"description": "Runs after wp-env start has finished setting up the environment.",
+							"type": "string"
+						},
+						"afterClean": {
+							"description": "Runs after wp-env clean has finished cleaning the environment.",
+							"type": "string"
+						},
+						"afterDestroy": {
+							"description": "Runs after wp-env destroy has destroyed the environment.",
+							"type": "string"
+						}
+					}
 				}
 			}
 		},
@@ -130,7 +149,12 @@
 						"$ref": "#/definitions/wpEnvPropertyNames"
 					},
 					{
-						"enum": [ "$schema", "env", "testsPort" ]
+						"enum": [
+							"$schema",
+							"env",
+							"testsPort",
+							"lifecycleScripts"
+						]
 					}
 				]
 			}

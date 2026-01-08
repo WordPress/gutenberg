@@ -103,7 +103,7 @@ const SidebarContent = ( {
 			headerClassName="editor-sidebar__panel-tabs"
 			title={
 				/* translators: button label text should, if possible, be under 16 characters. */
-				_x( 'Settings', 'sidebar button label' )
+				_x( 'Settings', 'panel button label' )
 			}
 			toggleShortcut={ keyboardShortcut }
 			icon={ isRTL() ? drawerLeft : drawerRight }

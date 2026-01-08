@@ -9,7 +9,7 @@ import {
 	getBlockTransformOptions,
 } from 'test/helpers';
 
-const block = 'Pullquote';
+const block = 'Pullquote \\(deprecated\\)';
 const initialHtml = `
 <!-- wp:pullquote -->
 <figure class="wp-block-pullquote"><blockquote><p>One of the hardest things to do in technology is disrupt yourself.</p><cite>Matt Mullenweg</cite></blockquote></figure>

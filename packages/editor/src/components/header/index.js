@@ -12,7 +12,6 @@ import { PinnedItems } from '@wordpress/interface';
 /**
  * Internal dependencies
  */
-import CollabSidebar from '../collab-sidebar';
 import BackButton, { useHasBackButton } from './back-button';
 import CollapsibleBlockToolbar from '../collapsible-block-toolbar';
 import DocumentBar from '../document-bar';
@@ -31,9 +30,6 @@ import {
 	NAVIGATION_POST_TYPE,
 } from '../../store/constants';
 import { unlock } from '../../lock-unlock';
-
-const isBlockCommentExperimentEnabled =
-	window?.__experimentalEnableBlockComment;
 
 const toolbarVariations = {
 	distractionFreeDisabled: { y: '-50px' },
@@ -54,9 +50,7 @@ const backButtonVariations = {
 function Header( {
 	customSaveButton,
 	forceIsDirty,
-	forceDisableBlockTools,
 	setEntitiesSavedStatesCallback,
-	title,
 } ) {
 	const isWideViewport = useViewportMatch( 'large' );
 	const isLargeViewport = useViewportMatch( 'medium' );
@@ -69,6 +63,7 @@ function Header( {
 		hasFixedToolbar,
 		hasBlockSelection,
 		hasSectionRootClientId,
+		isStylesCanvasActive,
 	} = useSelect( ( select ) => {
 		const { get: getPreference } = select( preferencesStore );
 		const {
@@ -76,6 +71,9 @@ function Header( {
 			getCurrentPostType,
 			isPublishSidebarOpened: _isPublishSidebarOpened,
 		} = select( editorStore );
+		const { getStylesPath, getShowStylebook } = unlock(
+			select( editorStore )
+		);
 		const { getBlockSelectionStart, getSectionRootClientId } = unlock(
 			select( blockEditorStore )
 		);
@@ -88,6 +86,9 @@ function Header( {
 			hasFixedToolbar: getPreference( 'core', 'fixedToolbar' ),
 			hasBlockSelection: !! getBlockSelectionStart(),
 			hasSectionRootClientId: !! getSectionRootClientId(),
+			isStylesCanvasActive:
+				!! getStylesPath()?.startsWith( '/revisions' ) ||
+				getShowStylebook(),
 		};
 	}, [] );
 
@@ -95,11 +96,12 @@ function Header( {
 		[ 'post', 'page', 'wp_template' ].includes( postType ) &&
 		hasSectionRootClientId;
 
-	const disablePreviewOption = [
-		NAVIGATION_POST_TYPE,
-		TEMPLATE_PART_POST_TYPE,
-		PATTERN_POST_TYPE,
-	].includes( postType );
+	const disablePreviewOption =
+		[
+			NAVIGATION_POST_TYPE,
+			TEMPLATE_PART_POST_TYPE,
+			PATTERN_POST_TYPE,
+		].includes( postType ) || isStylesCanvasActive;
 
 	const [ isBlockToolsCollapsed, setIsBlockToolsCollapsed ] =
 		useState( true );
@@ -132,7 +134,7 @@ function Header( {
 				transition={ { type: 'tween' } }
 			>
 				<DocumentTools
-					disableBlockTools={ forceDisableBlockTools || isTextEditor }
+					disableBlockTools={ isStylesCanvasActive || isTextEditor }
 				/>
 				{ hasFixedToolbar && isLargeViewport && (
 					<CollapsibleBlockToolbar
@@ -147,7 +149,7 @@ function Header( {
 					variants={ toolbarVariations }
 					transition={ { type: 'tween' } }
 				>
-					<DocumentBar title={ title } />
+					<DocumentBar />
 				</motion.div>
 			) }
 			<motion.div
@@ -179,7 +181,7 @@ function Header( {
 				/>
 
 				{ isWideViewport && canBeZoomedOut && (
-					<ZoomOutToggle disabled={ forceDisableBlockTools } />
+					<ZoomOutToggle disabled={ isStylesCanvasActive } />
 				) }
 
 				{ ( isWideViewport || ! showIconLabels ) && (
@@ -194,11 +196,6 @@ function Header( {
 						}
 					/>
 				) }
-
-				{ isBlockCommentExperimentEnabled ? (
-					<CollabSidebar />
-				) : undefined }
-
 				{ customSaveButton }
 				<MoreMenu />
 			</motion.div>

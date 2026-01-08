@@ -44,13 +44,13 @@ _Example:_
 }
 ```
 
-It might also be a good idea to get familiar with the [JavaScript Build Setup tutorial](https://github.com/WordPress/gutenberg/tree/HEAD/docs/how-to-guides/javascript/js-build-setup.md) for setting up a development environment to use ESNext syntax. It gives a very in-depth explanation of how to use the [build](#build) and [start](#start) scripts.
+It might also be a good idea to get familiar with [Working with JavaScript for the Block Editor](/docs/getting-started/fundamentals/javascript-in-the-block-editor.md) for setting up a development environment to use ESNext syntax. It gives a very in-depth explanation of how to use the [build](#build) and [start](#start) scripts.
 
 ## Updating to New Release
 
-To update an existing project to a new version of `@wordpress/scripts`, open the [changelog](https://github.com/WordPress/gutenberg/blob/HEAD/packages/scripts/CHANGELOG.md), find the version you’re currently on (check `package.json` in the top-level directory of your project), and apply the migration instructions for the newer versions.
+To update an existing project to a new version of `@wordpress/scripts`, open the [changelog](/packages/scripts/CHANGELOG.md), find the version you’re currently on (check `package.json` in the top-level directory of your project), and apply the migration instructions for the newer versions.
 
-In most cases bumping the `@wordpress/scripts` version in `package.json` and running `npm install` in the root folder of your project should be enough, but it’s good to check the [changelog](https://github.com/WordPress/gutenberg/blob/HEAD/packages/scripts/CHANGELOG.md) for potential breaking changes. There is also `packages-update` script included in this package that aims to automate the process of updating WordPress dependencies in your projects.
+In most cases bumping the `@wordpress/scripts` version in `package.json` and running `npm install` in the root folder of your project should be enough, but it’s good to check the [changelog](/packages/scripts/CHANGELOG.md) for potential breaking changes. There is also `packages-update` script included in this package that aims to automate the process of updating WordPress dependencies in your projects.
 
 We commit to keeping the breaking changes minimal so you can upgrade `@wordpress/scripts` as seamless as possible.
 
@@ -89,6 +89,7 @@ This script automatically use the optimized config but sometimes you may want to
 -   `--webpack-bundle-analyzer` – enables visualization for the size of webpack output files with an interactive zoomable treemap.
 -   `--webpack-copy-php` – enables copying all PHP files from the source directory ( default is `src` ) and its subfolders to the output directory.
 -   `--webpack-no-externals` – disables scripts’ assets generation, and omits the list of default externals.
+-   `--blocks-manifest` – generates a PHP file containing block metadata from all `block.json` files in the project. This is useful for enhancing performance when registering multiple block types, as it allows you to use `wp_register_block_metadata_collection()` and `wp_register_block_types_from_metadata_collection()` in WordPress.
 -   `--source-path` – allows customization of the source directory. The default is the project root `.` when [entry points are listed](#listing-entry-points) in the command, or `src` otherwise.
 -   `--output-path` – allows customization of the output directory. The default is the `build` folder.
 
@@ -105,10 +106,7 @@ This script uses [webpack](https://webpack.js.org/) behind the scenes. It’ll l
 
 ### `build-blocks-manifest`
 
-This script generates a PHP file containing block metadata from all
-`block.json` files in the project. This is useful for enhancing performance
-when registering multiple block types, as it allows you to use
-`wp_register_block_metadata_collection()` in WordPress.
+This script generates a PHP file containing block metadata from all `block.json` files in the project. This is useful for enhancing performance when registering multiple block types, as it allows you to use `wp_register_block_metadata_collection()` and `wp_register_block_types_from_metadata_collection()` in WordPress.
 
 Usage: `wp-scripts build-blocks-manifest [options]`
 
@@ -138,6 +136,20 @@ wp_register_block_metadata_collection(
 Using this approach can improve performance when registering multiple block
 types, especially for plugins with several custom blocks. Note that this
 feature is only available in WordPress 6.7 and later versions.
+
+Alternatively, you can use `wp_register_block_types_from_metadata_collection()`
+to have all block types from your plugin automatically registered in the same
+function call. This way you no longer need to call `register_block_type()` for
+every block type in your plugin.
+
+```php
+wp_register_block_types_from_metadata_collection(
+    plugin_dir_path( __FILE__ ) . 'dist',
+    plugin_dir_path( __FILE__ ) . 'dist/blocks-manifest.php'
+);
+```
+
+Note that this feature is only available in WordPress 6.8 and later versions.
 
 ### `check-engines`
 
@@ -284,7 +296,7 @@ By default, files located in `build`, `node_modules`, and `vendor` folders are i
 
 #### Advanced information
 
-It uses [markdownlint](https://github.com/DavidAnson/markdownlint) with the [.markdownlint.json](https://github.com/WordPress/gutenberg/blob/HEAD/packages/scripts/config/.markdownlint.json) configuration. This configuration tunes the linting rules to match WordPress standard, you can override with your own config, see [markdownlint-cli](https://github.com/igorshubovych/markdownlint-cli/) for command-line parameters.
+It uses [markdownlint](https://github.com/DavidAnson/markdownlint) with the [.markdownlint.json](/packages/scripts/config/.markdownlint.json) configuration. This configuration tunes the linting rules to match WordPress standard, you can override with your own config, see [markdownlint-cli](https://github.com/igorshubovych/markdownlint-cli/) for command-line parameters.
 
 ### `lint-style`
 
@@ -411,6 +423,7 @@ This script automatically use the optimized config but sometimes you may want to
 -   `--webpack-copy-php` – enables copying all PHP files from the source directory ( default is `src` ) and its subfolders to the output directory.
 -   `--webpack-devtool` – controls how source maps are generated. See options at https://webpack.js.org/configuration/devtool/#devtool.
 -   `--webpack-no-externals` – disables scripts’ assets generation, and omits the list of default externals.
+-   `--blocks-manifest` – generates a PHP file containing block metadata from all `block.json` files in the project. This is useful for enhancing performance when registering multiple block types, as it allows you to use `wp_register_block_metadata_collection()` and `wp_register_block_types_from_metadata_collection()` in WordPress.
 -   `--source-path` – allows customization of the source directory. The default is the project root `.` when [entry points are listed](#listing-entry-points) in the command, or `src` otherwise.
 -   `--output-path` – allows customization of the output directory. The default is the `build` folder.
 
@@ -752,7 +765,7 @@ This package should generally be used with the set of recommended config files. 
 -   [Plugins](https://webpack.js.org/configuration/plugins) (among others):
     -   [`CopyWebpackPlugin`](https://webpack.js.org/plugins/copy-webpack-plugin/) copies all `block.json` files discovered in the `src` directory to the build directory.
     -   [`MiniCssExtractPlugin`](https://webpack.js.org/plugins/mini-css-extract-plugin/) extracts CSS into separate files. It creates a CSS file per JavaScript entry point which contains CSS.
-    -   [`@wordpress/dependency-extraction-webpack-plugin`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/dependency-extraction-webpack-plugin/README.md) is used with the default configuration to ensure that WordPress provided scripts are not included in the built bundle.
+    -   [`@wordpress/dependency-extraction-webpack-plugin`](/packages/dependency-extraction-webpack-plugin/README.md) is used with the default configuration to ensure that WordPress provided scripts are not included in the built bundle.
 
 ### Provide your own webpack config
 
@@ -792,12 +805,12 @@ module.exports = {
 If you follow this approach, please, be aware that:
 
 -   You should keep using the `wp-scripts` commands (`start` and `build`). Do not use `webpack` directly.
--   Future versions of this package may change what webpack and Babel plugins we bundle, default configs, etc. Should those changes be necessary, they will be registered in the [package’s CHANGELOG](https://github.com/WordPress/gutenberg/blob/HEAD/packages/scripts/CHANGELOG.md), so make sure to read it before upgrading.
+-   Future versions of this package may change what webpack and Babel plugins we bundle, default configs, etc. Should those changes be necessary, they will be registered in the [package’s CHANGELOG](/packages/scripts/CHANGELOG.md), so make sure to read it before upgrading.
 
 ## Contributing to this package
 
 This is an individual package that’s part of the Gutenberg project. The project is organized as a monorepo. It’s made up of multiple self-contained software packages, each with a specific purpose. The packages in this monorepo are published to [npm](https://www.npmjs.com/) and used by [WordPress](https://make.wordpress.org/core/) as well as other software projects.
 
-To find out more about contributing to this package or Gutenberg as a whole, please read the project’s main [contributor guide](https://github.com/WordPress/gutenberg/tree/HEAD/CONTRIBUTING.md).
+To find out more about contributing to this package or Gutenberg as a whole, please read the project’s main [contributor guide](/CONTRIBUTING.md).
 
 <br /><br /><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>

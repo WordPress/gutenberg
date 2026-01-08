@@ -1,7 +1,9 @@
+@use "@wordpress/base-styles/variables" as *;
+
 .edit-widgets-error-boundary {
 	margin: auto;
 	max-width: 780px;
 	padding: 20px;
-	margin-top: 60px;
+	margin-top: $header-height;
 	box-shadow: $elevation-large;
 }

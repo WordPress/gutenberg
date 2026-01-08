@@ -1,0 +1,22 @@
+[
+	{
+		"blockName": "core/image",
+		"attrs": {
+			"metadata": {
+				"bindings": {
+					"caption": {
+						"source": "core/post-data",
+						"args": {
+							"field": "date"
+						}
+					}
+				}
+			}
+		},
+		"innerBlocks": [],
+		"innerHTML": "\n<figure class=\"wp-block-image\"><img src=\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==\" alt=\"\" /><figcaption class=\"wp-element-caption\"></figcaption></figure>\n",
+		"innerContent": [
+			"\n<figure class=\"wp-block-image\"><img src=\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==\" alt=\"\" /><figcaption class=\"wp-element-caption\"></figcaption></figure>\n"
+		]
+	}
+]

@@ -51,12 +51,6 @@ export default function HomeEdit( { attributes, setAttributes, context } ) {
 					aria-label={ __( 'Home link text' ) }
 					placeholder={ __( 'Add home link' ) }
 					withoutInteractiveFormatting
-					allowedFormats={ [
-						'core/bold',
-						'core/italic',
-						'core/image',
-						'core/strikethrough',
-					] }
 				/>
 			</a>
 		</div>

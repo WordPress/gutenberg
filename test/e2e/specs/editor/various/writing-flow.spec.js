@@ -838,6 +838,9 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 		await page.keyboard.type( '1' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '/image' );
+		await expect(
+			page.getByRole( 'option', { name: 'Image', selected: true } )
+		).toBeVisible();
 		await page.keyboard.press( 'Enter' );
 		await editor.clickBlockToolbarButton( 'Align' );
 
@@ -890,6 +893,24 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 		).toHaveClass( /is-selected/ );
 	} );
 
+	test( 'should focus preceding tabbable using shift+tab from post title and writing flow container', async ( {
+		editor,
+		page,
+	} ) => {
+		const optionsButton = page
+			.getByRole( 'region', { name: 'Editor top bar' } )
+			.getByRole( 'button', { name: 'Options' } );
+		await page.keyboard.press( 'Shift+Tab' );
+		await expect( optionsButton ).toBeFocused();
+
+		const editorCanvasBody = editor.canvas.locator( 'body' );
+		// Focuses the editor canvas body. In the editor the click doesn’t have
+		// to be on the element itself – just somewhere that won’t focus a block.
+		await editorCanvasBody.click();
+		await page.keyboard.press( 'Shift+Tab' );
+		await expect( optionsButton ).toBeFocused();
+	} );
+
 	test( 'should only consider the content as one tab stop', async ( {
 		editor,
 		page,
@@ -897,6 +918,9 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 	} ) => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '/table' );
+		await expect(
+			page.getByRole( 'option', { name: 'Table', selected: true } )
+		).toBeVisible();
 		await page.keyboard.press( 'Enter' );
 		// Tab to the "Create table" button.
 		await pageUtils.pressKeys( 'Tab' );
@@ -1088,7 +1112,7 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 
 		await editor.clickBlockOptionsMenuItem( 'Create pattern' );
 		const createPatternDialog = editor.page.getByRole( 'dialog', {
-			name: 'add new pattern',
+			name: 'add pattern',
 		} );
 		await createPatternDialog
 			.getByRole( 'textbox', { name: 'Name' } )
@@ -1128,11 +1152,15 @@ class WritingFlowUtils {
 	}
 
 	async addDemoContent() {
-		await this.page.keyboard.press( 'Enter' );
-		await this.page.keyboard.type( 'First paragraph' );
-		await this.page.keyboard.press( 'Enter' );
-		await this.page.keyboard.type( '/columns' );
-		await this.page.keyboard.press( 'Enter' );
+		await this.editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: {
+				content: 'First paragraph',
+			},
+		} );
+		await this.editor.insertBlock( {
+			name: 'core/columns',
+		} );
 		await this.editor.canvas
 			.locator( 'role=button[name="Two columns; equal split"i]' )
 			.click();

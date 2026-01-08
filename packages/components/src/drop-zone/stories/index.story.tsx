@@ -1,18 +1,38 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryFn } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react-webpack5';
+
+/**
+ * WordPress dependencies
+ */
+import { upload, media } from '@wordpress/icons';
+import { fn } from 'storybook/test';
+
 /**
  * Internal dependencies
  */
 import DropZone from '..';
 
+const ICONS = { upload, media };
+
 const meta: Meta< typeof DropZone > = {
 	component: DropZone,
 	id: 'components-dropzone',
 	title: 'Components/Selection & Input/File Upload/DropZone',
+	argTypes: {
+		icon: {
+			control: { type: 'select' },
+			options: Object.keys( ICONS ),
+			mapping: ICONS,
+		},
+	},
+	args: {
+		onFilesDrop: fn(),
+		onHTMLDrop: fn(),
+		onDrop: fn(),
+	},
 	parameters: {
-		actions: { argTypesRegex: '^on.*' },
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
 	},

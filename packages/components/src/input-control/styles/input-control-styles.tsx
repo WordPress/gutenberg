@@ -285,7 +285,15 @@ export const Input = styled.input< InputProps >`
 		${ customPaddings }
 
 		&::-webkit-input-placeholder {
-			line-height: normal;
+			color: ${ COLORS.ui.darkGrayPlaceholder };
+		}
+
+		&::-moz-placeholder {
+			color: ${ COLORS.ui.darkGrayPlaceholder };
+		}
+
+		&:-ms-input-placeholder {
+			color: ${ COLORS.ui.darkGrayPlaceholder };
 		}
 
 		&[type='email'],

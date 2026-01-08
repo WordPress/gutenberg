@@ -30,3 +30,9 @@ export const GLOBAL_POST_TYPES = [
 	'wp_block',
 	'wp_navigation',
 ];
+export const DESIGN_POST_TYPES = [
+	TEMPLATE_POST_TYPE,
+	TEMPLATE_PART_POST_TYPE,
+	PATTERN_POST_TYPE,
+	NAVIGATION_POST_TYPE,
+];

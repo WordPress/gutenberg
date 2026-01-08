@@ -25,6 +25,12 @@ import apiFetch from '@wordpress/api-fetch';
 import { getItemTitle, isTemplateOrTemplatePart } from './utils';
 import type { CoreDataError, Template, TemplatePart } from '../types';
 
+declare global {
+	interface Window {
+		__experimentalTemplateActivate?: boolean;
+	}
+}
+
 const isTemplateRevertable = (
 	templateOrTemplatePart: Template | TemplatePart
 ) => {
@@ -179,6 +185,15 @@ const resetPostAction: Action< Template | TemplatePart > = {
 	id: 'reset-post',
 	label: __( 'Reset' ),
 	isEligible: ( item ) => {
+		if ( window?.__experimentalTemplateActivate ) {
+			return (
+				item.type === 'wp_template_part' &&
+				item?.source === 'custom' &&
+				item?.has_theme_file
+			);
+		}
+
+		// When experiment is disabled: use wp/6.9 logic for both templates and template parts.
 		return (
 			isTemplateOrTemplatePart( item ) &&
 			item?.source === 'custom' &&
@@ -189,6 +204,7 @@ const resetPostAction: Action< Template | TemplatePart > = {
 	icon: backup,
 	supportsBulk: true,
 	hideModalHeader: true,
+	modalFocusOnMount: 'firstContentElement',
 	RenderModal: ( { items, closeModal, onActionPerformed } ) => {
 		const [ isBusy, setIsBusy ] = useState( false );
 
@@ -210,12 +226,12 @@ const resetPostAction: Action< Template | TemplatePart > = {
 				createSuccessNotice(
 					items.length > 1
 						? sprintf(
-								/* translators: The number of items. */
-								__( '%s items reset.' ),
+								/* translators: %d: The number of items. */
+								__( '%d items reset.' ),
 								items.length
 						  )
 						: sprintf(
-								/* translators: The template/part's name. */
+								/* translators: %s: The template/part's name. */
 								__( '"%s" reset.' ),
 								getItemTitle( items[ 0 ] )
 						  ),

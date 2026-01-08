@@ -283,7 +283,6 @@ This directive adds or removes inline style to an HTML element, depending on its
 	</button>
 	<p data-wp-style--color="context.color">Hello World!</p>
 </div>
->
 ```
 
 <details>
@@ -873,28 +872,28 @@ const { state } = store( 'myPlugin', {
 } );
 ```
 
-As mentioned above with [`wp-on`](#wp-on), [`wp-on-window`](#wp-on-window), and [`wp-on-document`](#wp-on-document), an async action should be used whenever the `async` versions of the aforementioned directives cannot be used due to the action requiring synchronous access to the `event` object. Synchronous access is required whenever the action needs to call `event.preventDefault()`, `event.stopPropagation()`, or `event.stopImmediatePropagation()`. To ensure that the action code does not contribute to a long task, you may manually yield to the main thread after calling the synchronous event API. For example:
+You may want to add multiple such `yield` points in your action if it is doing a lot of work.
+
+As mentioned above with [`wp-on`](#wp-on), [`wp-on-window`](#wp-on-window), and [`wp-on-document`](#wp-on-document), an async action should be used whenever the `async` versions of the aforementioned directives cannot be used due to the action requiring synchronous access to the `event` object. Synchronous access is required whenever the action needs to call `event.preventDefault()`, `event.stopPropagation()`, or `event.stopImmediatePropagation()`.
+
+To ensure that the action code does not contribute to a long task, you may manually yield to the main thread after calling the synchronous event API. The Interactivity API provides the `splitTask()` function for that purpose, which implements yielding in a cross-browser compatible way. Here is an example:
 
 ```js
-// Note: In WordPress 6.6 this splitTask function is exported by @wordpress/interactivity.
-function splitTask() {
-	return new Promise( ( resolve ) => {
-		setTimeout( resolve, 0 );
-	} );
-}
+import { splitTask } from '@wordpress/interactivity';
 
 store( 'myPlugin', {
 	actions: {
-		handleClick: function* ( event ) {
+		handleClick: withSyncEvent( function* ( event ) {
 			event.preventDefault();
 			yield splitTask();
 			doTheWork();
-		},
+		} ),
 	},
 } );
 ```
 
-You may want to add multiple such `yield` points in your action if it is doing a lot of work.
+You may notice the use of the [`withSyncEvent()`](#withsyncevent) utility function in this example. This is necessary due to an ongoing effort to handle store actions asynchronously by default, unless they require synchronous event access (which this example does due to the call to `event.preventDefault()`). Otherwise a deprecation warning will be triggered, and in a future release the behavior will change accordingly.
+
 
 #### Side Effects
 
@@ -1090,10 +1089,10 @@ store(
 
 Apart from the store function, there are also some methods that allows the developer to access data on their store functions.
 
--   getContext()
-    -   getServerContext()
-    -   getServerState()
--   getElement()
+-   [`getContext()`](#getcontext)
+-   [`getElement()`](#getelement)
+-   [`getServerContext()`](#getservercontext)
+-   [`getServerState()`](#getserverstate)
 
 #### getContext()
 
@@ -1132,6 +1131,44 @@ store( 'myPlugin', {
 } );
 ```
 
+#### getElement()
+
+Retrieves a representation of the element that the action is bound to or called from. Such representation is read-only, and contains a reference to the DOM element, its props and a local reactive state.
+It returns an object with two keys:
+
+##### ref
+
+`ref` is the reference to the DOM element as an [HTMLElement](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement). It is equivalent to `useRef` in Preact or React, so it can be `null` when `ref` has not been attached to the actual DOM element yet, i.e., when it is being hydrated or mounted.
+
+##### attributes
+
+`attributes` is an object that contains the attributes of the element. In the button example:
+
+```js
+// store
+import { store, getElement } from '@wordpress/interactivity';
+
+store( 'myPlugin', {
+	actions: {
+		log: () => {
+			const element = getElement();
+			// Logs attributes
+			console.log( 'element attributes => ', element.attributes );
+		},
+	},
+} );
+```
+
+The code will log:
+
+```json
+{
+	"data-wp-on--click": 'actions.log',
+	"children": ['Log'],
+	"onclick": event => { evaluate(entry, event); }
+}
+```
+
 #### getServerContext()
 
 This function is analogous to `getContext()`, but with 2 key differences:
@@ -1164,11 +1201,12 @@ store( 'myPlugin', {
 
 #### getServerState()
 
-Retrieves the server state an interactive region.
+Retrieves the server state of an interactive region.
 
-This function is serves the same purpose as `getServerContext()`, but it returns the **state** instead of the **context**.
+This function serves the same purpose as `getServerContext()`, but it returns the **state** instead of the **context**.
 
 The object returned is read-only, and includes the state defined in PHP with `wp_interactivity_state()`. When using [`actions.navigate()`](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-interactivity-router/#actions) from [`@wordpress/interactivity-router`](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-interactivity-router/), the object returned by `getServerState()` is updated to reflect the changes in its properties, without affecting the state returned by `store()`. Directives can subscribe to those changes to update the state if needed.
+
 
 ```js
 const serverState = getServerState( 'namespace' );
@@ -1190,45 +1228,11 @@ const { state } = store( 'myStore', {
 } );
 ```
 
-#### getElement()
+#### How server context and state merging works during navigation
 
-Retrieves a representation of the element that the action is bound to or called from. Such representation is read-only, and contains a reference to the DOM element, its props and a local reactive state.
-It returns an object with two keys:
+During navigation, the data returned by both `getServerContext()` and `getServerState()` is fully replaced with the values from the new page. In contrast, the related client data (context or state) is "soft merged"—existing client-side properties are preserved, and only new properties from the server are added. This ensures that new blocks or components introduced by navigation can initialize with server-provided values, while client-side changes made by users remain intact. If you need to update existing client properties with data from the server (i.e., overwrite values), call `getServerContext()` or `getServerState()` within your callbacks and manually overwrite the relevant properties.
 
-##### ref
-
-`ref` is the reference to the DOM element as an [HTMLElement](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement). It is equivalent to `useRef` in Preact or React, so it can be `null` when `ref` has not been attached to the actual DOM element yet, i.e., when it is being hydrated or mounted.
-
-##### attributes
-
-`attributes` contains a [Proxy](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy), which adds a getter that allows to reference other store namespaces. Feel free to check the getter in the code. [Link](https://github.com/WordPress/gutenberg/blob/8cb23964d58f3ce5cf6ae1b6f967a4b8d4939a8e/packages/interactivity/src/store.ts#L70)
-
-Those attributes will contain the directives of that element. In the button example:
-
-```js
-// store
-import { store, getElement } from '@wordpress/interactivity';
-
-store( 'myPlugin', {
-	actions: {
-		log: () => {
-			const element = getElement();
-			// Logs attributes
-			console.log( 'element attributes => ', element.attributes );
-		},
-	},
-} );
-```
-
-The code will log:
-
-```json
-{
-	"data-wp-on--click": 'actions.log',
-	"children": ['Log'],
-	"onclick": event => { evaluate(entry, event); }
-}
-```
+If you subscribe to any value returned by `getServerContext()` or `getServerState()` within a callback, that callback will be invoked on every navigation event—regardless of whether that value have changed. This makes it possible to reliably reset or update client-side data as needed whenever navigation occurs.
 
 ### withScope()
 
@@ -1248,6 +1252,43 @@ store( 'mySliderPlugin', {
 				} ),
 				3_000
 			);
+		},
+	},
+} );
+```
+
+### withSyncEvent()
+
+Actions that require synchronous access to the `event` object need to use the `withSyncEvent()` function to annotate their handler callback. This is necessary due to an ongoing effort to handle store actions asynchronously by default, unless they require synchronous event access. Therefore, as of Gutenberg 20.4 / WordPress 6.8 all actions that require synchronous event access need to use the `withSyncEvent()` function. Otherwise a deprecation warning will be triggered, and in a future release the behavior will change accordingly.
+
+Only very specific event methods and properties require synchronous access, so it is advised to only use `withSyncEvent()` when necessary. The following event methods and properties require synchronous access:
+
+* `event.currentTarget`
+* `event.preventDefault()`
+* `event.stopImmediatePropagation()`
+* `event.stopPropagation()`
+
+Here is an example, where one action requires synchronous event access while the other actions do not:
+
+```js
+// store
+import { store, withSyncEvent } from '@wordpress/interactivity';
+
+store( 'myPlugin', {
+	actions: {
+		// `event.preventDefault()` requires synchronous event access.
+		preventNavigation: withSyncEvent( ( event ) => {
+			event.preventDefault();
+		} ),
+
+		// `event.target` does not require synchronous event access.
+		logTarget: ( event ) => {
+			console.log( 'event target => ', event.target );
+		},
+
+		// Not using `event` at all does not require synchronous event access.
+		logSomething: () => {
+			console.log( 'something' );
 		},
 	},
 } );
@@ -1334,7 +1375,7 @@ const { state } = store( 'myPlugin', {
 
 `wp_interactivity_process_directives` returns the updated HTML after the directives have been processed.
 
-It is the Core function of the Interactivity API server side rendering part, and is public so any HTML can be processed, whether is a block or not.
+It is the Core function of the Interactivity API server side rendering part, and is public so any HTML can be processed, whether it is a block or not.
 
 This code
 

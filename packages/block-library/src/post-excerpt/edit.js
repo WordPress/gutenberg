@@ -15,6 +15,7 @@ import {
 	RichText,
 	Warning,
 	useBlockProps,
+	useBlockEditingMode,
 } from '@wordpress/block-editor';
 import {
 	ToggleControl,
@@ -41,6 +42,8 @@ export default function PostExcerptEditor( {
 	isSelected,
 	context: { postId, postType, queryId },
 } ) {
+	const blockEditingMode = useBlockEditingMode();
+	const showControls = blockEditingMode === 'default';
 	const isDescendentOfQueryLoop = Number.isFinite( queryId );
 	const userCanEdit = useCanEditEntity( 'postType', postType, postId );
 	const [
@@ -220,14 +223,16 @@ export default function PostExcerptEditor( {
 	);
 	return (
 		<>
-			<BlockControls>
-				<AlignmentToolbar
-					value={ textAlign }
-					onChange={ ( newAlign ) =>
-						setAttributes( { textAlign: newAlign } )
-					}
-				/>
-			</BlockControls>
+			{ showControls && (
+				<BlockControls>
+					<AlignmentToolbar
+						value={ textAlign }
+						onChange={ ( newAlign ) =>
+							setAttributes( { textAlign: newAlign } )
+						}
+					/>
+				</BlockControls>
+			) }
 			<InspectorControls>
 				<ToolsPanel
 					label={ __( 'Settings' ) }
@@ -248,7 +253,6 @@ export default function PostExcerptEditor( {
 						isShownByDefault
 					>
 						<ToggleControl
-							__nextHasNoMarginBottom
 							label={ __( 'Show link on new line' ) }
 							checked={ showMoreOnNewLine }
 							onChange={ ( newShowMoreOnNewLine ) =>
@@ -268,7 +272,6 @@ export default function PostExcerptEditor( {
 					>
 						<RangeControl
 							__next40pxDefaultSize
-							__nextHasNoMarginBottom
 							label={ __( 'Max number of words' ) }
 							value={ excerptLength }
 							onChange={ ( value ) => {

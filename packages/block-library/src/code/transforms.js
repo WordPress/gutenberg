@@ -7,7 +7,7 @@ import { create, toHTMLString } from '@wordpress/rich-text';
 /**
  * Internal dependencies
  */
-import { getTransformedMetadata } from '../utils/get-transformed-metadata';
+import { getTransformedAttributes } from '../utils/get-transformed-attributes';
 
 const transforms = {
 	from: [
@@ -19,21 +19,26 @@ const transforms = {
 		{
 			type: 'block',
 			blocks: [ 'core/paragraph' ],
-			transform: ( { content, metadata } ) =>
-				createBlock( 'core/code', {
+			transform: ( attributes ) => {
+				const { content } = attributes;
+				return createBlock( 'core/code', {
+					...attributes,
+					...getTransformedAttributes( attributes, 'core/code' ),
 					content,
-					metadata: getTransformedMetadata( metadata, 'core/code' ),
-				} ),
+				} );
+			},
 		},
 		{
 			type: 'block',
 			blocks: [ 'core/html' ],
-			transform: ( { content: text, metadata } ) => {
+			transform: ( attributes ) => {
+				const { content: text } = attributes;
 				return createBlock( 'core/code', {
+					...attributes,
+					...getTransformedAttributes( attributes, 'core/code' ),
 					// The HTML is plain text (with plain line breaks), so
 					// convert it to rich text.
 					content: toHTMLString( { value: create( { text } ) } ),
-					metadata: getTransformedMetadata( metadata, 'core/code' ),
 				} );
 			},
 		},
@@ -60,14 +65,13 @@ const transforms = {
 		{
 			type: 'block',
 			blocks: [ 'core/paragraph' ],
-			transform: ( { content, metadata } ) =>
-				createBlock( 'core/paragraph', {
+			transform: ( attributes ) => {
+				const { content } = attributes;
+				return createBlock( 'core/paragraph', {
+					...getTransformedAttributes( attributes, 'core/paragraph' ),
 					content,
-					metadata: getTransformedMetadata(
-						metadata,
-						'core/paragraph'
-					),
-				} ),
+				} );
+			},
 		},
 	],
 };

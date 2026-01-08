@@ -100,7 +100,6 @@ function PostAuthorNameEdit( {
 						onDeselect={ () => setAttributes( { isLink: false } ) }
 					>
 						<ToggleControl
-							__nextHasNoMarginBottom
 							label={ __( 'Link to author archive' ) }
 							onChange={ () =>
 								setAttributes( { isLink: ! isLink } )
@@ -118,7 +117,6 @@ function PostAuthorNameEdit( {
 							}
 						>
 							<ToggleControl
-								__nextHasNoMarginBottom
 								label={ __( 'Open in new tab' ) }
 								onChange={ ( value ) =>
 									setAttributes( {
@@ -132,15 +130,15 @@ function PostAuthorNameEdit( {
 				</ToolsPanel>
 			</InspectorControls>
 			<div { ...blockProps }>
-				{ supportsAuthor
-					? displayAuthor
-					: sprintf(
+				{ ! supportsAuthor && postType !== undefined
+					? sprintf(
 							// translators: %s: Name of the post type e.g: "post".
 							__(
 								'This post type (%s) does not support the author.'
 							),
 							postType
-					  ) }
+					  )
+					: displayAuthor }
 			</div>
 		</>
 	);

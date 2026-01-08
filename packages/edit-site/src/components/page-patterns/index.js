@@ -1,20 +1,20 @@
 /**
  * WordPress dependencies
  */
+import { Page } from '@wordpress/admin-ui';
 import { __ } from '@wordpress/i18n';
-import { useState, useMemo, useId, useEffect } from '@wordpress/element';
+import { useMemo } from '@wordpress/element';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { DataViews, filterSortAndPaginate } from '@wordpress/dataviews';
-import { usePrevious } from '@wordpress/compose';
-import { useEntityRecords } from '@wordpress/core-data';
+import { useEntityRecords, store as coreStore } from '@wordpress/core-data';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
-import { patternTitleField } from '@wordpress/fields';
+import { useView } from '@wordpress/views';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
-import Page from '../page';
 import {
 	LAYOUT_GRID,
 	LAYOUT_TABLE,
@@ -25,16 +25,19 @@ import {
 import usePatternSettings from './use-pattern-settings';
 import { unlock } from '../../lock-unlock';
 import usePatterns, { useAugmentPatternsWithPermissions } from './use-patterns';
-import PatternsHeader from './header';
+import PatternsActions from './actions';
 import { useEditPostAction } from '../dataviews-actions';
 import {
 	patternStatusField,
 	previewField,
 	templatePartAuthorField,
 } from './fields';
+import { addQueryArgs } from '@wordpress/url';
+import usePatternCategories from '../sidebar-navigation-screen-patterns/use-pattern-categories';
+import { Button } from '@wordpress/components';
 
 const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
-const { usePostActions } = unlock( editorPrivateApis );
+const { usePostActions, patternTitleField } = unlock( editorPrivateApis );
 const { useLocation, useHistory } = unlock( routerPrivateApis );
 
 const EMPTY_ARRAY = [];
@@ -56,8 +59,6 @@ const defaultLayouts = {
 };
 const DEFAULT_VIEW = {
 	type: LAYOUT_GRID,
-	search: '',
-	page: 1,
 	perPage: 20,
 	titleField: 'title',
 	mediaField: 'preview',
@@ -66,15 +67,58 @@ const DEFAULT_VIEW = {
 	...defaultLayouts[ LAYOUT_GRID ],
 };
 
+function usePagePatternsHeader( type, categoryId ) {
+	const { patternCategories } = usePatternCategories();
+	const templatePartAreas = useSelect(
+		( select ) =>
+			select( coreStore ).getCurrentTheme()
+				?.default_template_part_areas || [],
+		[]
+	);
+	let title, description, patternCategory;
+	if ( type === TEMPLATE_PART_POST_TYPE ) {
+		const templatePartArea = templatePartAreas.find(
+			( area ) => area.area === categoryId
+		);
+		title = templatePartArea?.label || __( 'All Template Parts' );
+		description =
+			templatePartArea?.description ||
+			__( 'Includes every template part defined for any area.' );
+	} else if ( type === PATTERN_TYPES.user && !! categoryId ) {
+		patternCategory = patternCategories.find(
+			( category ) => category.name === categoryId
+		);
+		title = patternCategory?.label;
+		description = patternCategory?.description;
+	}
+
+	return { title, description };
+}
+
 export default function DataviewsPatterns() {
-	const {
-		query: { postType = 'wp_block', categoryId: categoryIdFromURL },
-	} = useLocation();
+	const { path, query } = useLocation();
+	const { postType = 'wp_block', categoryId: categoryIdFromURL } = query;
 	const history = useHistory();
 	const categoryId = categoryIdFromURL || PATTERN_DEFAULT_CATEGORY;
-	const [ view, setView ] = useState( DEFAULT_VIEW );
-	const previousCategoryId = usePrevious( categoryId );
-	const previousPostType = usePrevious( postType );
+	const { view, updateView, isModified, resetToDefault } = useView( {
+		kind: 'postType',
+		name: postType,
+		slug: categoryId,
+		defaultView: DEFAULT_VIEW,
+		queryParams: {
+			page: query.pageNumber,
+			search: query.search,
+		},
+		onChangeQueryParams: ( params ) => {
+			history.navigate(
+				addQueryArgs( path, {
+					...query,
+					pageNumber: params.page,
+					search: params.search,
+				} )
+			);
+		},
+	} );
 	const viewSyncStatus = view.filters?.find(
 		( { field } ) => field === 'sync-status'
 	)?.value;
@@ -116,15 +160,6 @@ export default function DataviewsPatterns() {
 		return _fields;
 	}, [ postType, authors ] );
 
-	// Reset the page number when the category changes.
-	useEffect( () => {
-		if (
-			previousCategoryId !== categoryId ||
-			previousPostType !== postType
-		) {
-			setView( ( prevView ) => ( { ...prevView, page: 1 } ) );
-		}
-	}, [ categoryId, previousCategoryId, previousPostType, postType ] );
 	const { data, paginationInfo } = useMemo( () => {
 		// Search is managed server-side as well as filters for patterns.
 		// However, the author filter in template parts is done client-side.
@@ -154,24 +189,35 @@ export default function DataviewsPatterns() {
 		}
 		return [ editAction, ...patternActions ].filter( Boolean );
 	}, [ editAction, postType, templatePartActions, patternActions ] );
-	const id = useId();
 	const settings = usePatternSettings();
+	const { title, description } = usePagePatternsHeader(
+		postType,
+		categoryId
+	);
+
 	// Wrap everything in a block editor provider.
 	// This ensures 'styles' that are needed for the previews are synced
 	// from the site editor store to the block editor store.
 	return (
 		<ExperimentalBlockEditorProvider settings={ settings }>
 			<Page
-				title={ __( 'Patterns content' ) }
 				className="edit-site-page-patterns-dataviews"
-				hideTitleFromUI
+				title={ title }
+				subTitle={ description }
+				actions={
+					<>
+						{ isModified && (
+							<Button
+								__next40pxDefaultSize
+								onClick={ resetToDefault }
+							>
+								{ __( 'Reset view' ) }
+							</Button>
+						) }
+						<PatternsActions />
+					</>
+				}
 			>
-				<PatternsHeader
-					categoryId={ categoryId }
-					type={ postType }
-					titleId={ `${ id }-title` }
-					descriptionId={ `${ id }-description` }
-				/>
 				<DataViews
 					key={ categoryId + postType }
 					paginationInfo={ paginationInfo }
@@ -196,7 +242,7 @@ export default function DataviewsPatterns() {
 						);
 					} }
 					view={ view }
-					onChangeView={ setView }
+					onChangeView={ updateView }
 					defaultLayouts={ defaultLayouts }
 				/>
 			</Page>

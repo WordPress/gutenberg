@@ -1,7 +1,11 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
+@use "../../utils/theme-variables" as *;
+
 .components-toolbar-group {
 	min-height: $block-toolbar-height;
-	border-right: $border-width solid $gray-900;
-	background-color: $white;
+	border-right: $border-width solid $components-color-foreground;
+	background-color: $components-color-background;
 	display: inline-flex;
 	flex-shrink: 0;
 	flex-wrap: wrap;
@@ -41,8 +45,8 @@
 .components-toolbar {
 	min-height: $block-toolbar-height;
 	margin: 0;
-	border: $border-width solid $gray-900;
-	background-color: $white;
+	border: $border-width solid $components-color-foreground;
+	background-color: $components-color-background;
 	display: inline-flex;
 	flex-shrink: 0;
 	flex-wrap: wrap;

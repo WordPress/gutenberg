@@ -24,7 +24,7 @@ module.exports = async ( { rootDirectory } ) => {
 	} );
 
 	info( '' );
-	info( 'Compiling block.' );
+	info( 'Compiling block and generating blocks manifest.' );
 	await command( 'npm run build', {
 		cwd: rootDirectory,
 	} );

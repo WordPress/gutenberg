@@ -21,12 +21,12 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { ActionItem } from '@wordpress/interface';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
 import { store as editorStore } from '../../store';
-import { store as blockEditorStore } from '@wordpress/block-editor';
 import PostPreviewButton from '../post-preview-button';
 import { unlock } from '../../lock-unlock';
 
@@ -40,9 +40,12 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 		isTemplateHidden,
 		templateId,
 	} = useSelect( ( select ) => {
-		const { getDeviceType, getCurrentPostType, getCurrentTemplateId } =
-			select( editorStore );
-		const { getRenderingMode } = unlock( select( editorStore ) );
+		const {
+			getDeviceType,
+			getCurrentPostType,
+			getCurrentTemplateId,
+			getRenderingMode,
+		} = select( editorStore );
 		const { getEntityRecord, getPostType } = select( coreStore );
 		const { get } = select( preferencesStore );
 		const _currentPostType = getCurrentPostType();
@@ -56,7 +59,9 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 			templateId: getCurrentTemplateId(),
 		};
 	}, [] );
-	const { setDeviceType, setRenderingMode } = useDispatch( editorStore );
+	const { setDeviceType, setRenderingMode, setDefaultRenderingMode } = unlock(
+		useDispatch( editorStore )
+	);
 	const { resetZoomLevel } = unlock( useDispatch( blockEditorStore ) );
 
 	const handleDevicePreviewChange = ( newDeviceType ) => {
@@ -160,11 +165,12 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 								isSelected={ ! isTemplateHidden }
 								role="menuitemcheckbox"
 								onClick={ () => {
-									setRenderingMode(
-										isTemplateHidden
-											? 'template-locked'
-											: 'post-only'
-									);
+									const newRenderingMode = isTemplateHidden
+										? 'template-locked'
+										: 'post-only';
+									setRenderingMode( newRenderingMode );
+									setDefaultRenderingMode( newRenderingMode );
+									resetZoomLevel();
 								} }
 							>
 								{ __( 'Show template' ) }

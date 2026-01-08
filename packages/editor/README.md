@@ -293,11 +293,11 @@ Component check if there are any headings (core/heading blocks) present in the d
 _Parameters_
 
 -   _props_ `Object`: Props.
--   _props.children_ `React.ReactElement`: Children to be rendered.
+-   _props.children_ `React.ReactNode`: Children to be rendered.
 
 _Returns_
 
--   `React.ReactElement`: The component to be rendered or null if there are headings.
+-   `React.ReactNode`: The component to be rendered or null if there are headings.
 
 ### EditorHistoryRedo
 
@@ -401,7 +401,8 @@ _Parameters_
 
 -   _props_ `Object`: The component props.
 -   _props.close_ `Function`: The function to close the dialog.
--   _props.renderDialog_ `boolean`: Whether to render the component with modal dialog behavior.
+-   _props.renderDialog_ `boolean=`: Whether to render the component with modal dialog behavior.
+-   _props.variant_ `string`: Changes the layout of the component. When an `inline` value is provided, the action buttons are rendered at the end of the component instead of at the start.
 
 _Returns_
 
@@ -441,11 +442,11 @@ getDerivedStateFromError is used to render a fallback UI after an error has been
 
 ### getTemplatePartIcon
 
-Helper function to retrieve the corresponding icon by name.
+Helper function to retrieve the corresponding icon by area name or icon name.
 
 _Parameters_
 
--   _iconName_ `string`: The name of the icon.
+-   _areaOrIconName_ `string`: The area name (e.g., 'header', 'overlay') or icon name (e.g., 'menu').
 
 _Returns_
 
@@ -488,7 +489,7 @@ The module also checks for sessionStorage support and conditionally exports the 
 
 ### mediaUpload
 
-Upload a media file when the file upload button is activated. Wrapper around mediaUpload() that injects the current post ID.
+Upload a media file when the file upload button is activated. Wrapper around uploadMedia() that injects the current post ID.
 
 _Parameters_
 
@@ -500,6 +501,7 @@ _Parameters_
 -   _$0.onError_ `Function`: Function called when an error happens.
 -   _$0.onFileChange_ `Function`: Function called each time a file or a temporary representation of the file is available.
 -   _$0.onSuccess_ `Function`: Function called after the final representation of the file is available.
+-   _$0.multiple_ `boolean`: Whether to allow multiple files to be uploaded.
 
 ### MediaUploadCheck
 
@@ -524,11 +526,11 @@ Wrapper component that renders its children only if the post type supports page 
 _Parameters_
 
 -   _props_ `Object`: - The component props.
--   _props.children_ `React.ReactElement`: - The child components to render.
+-   _props.children_ `React.ReactNode`: - The child components to render.
 
 _Returns_
 
--   `React.ReactElement`: The rendered child components or null if page attributes are not supported.
+-   `React.ReactNode`: The rendered child components or null if page attributes are not supported.
 
 ### PageAttributesOrder
 
@@ -856,7 +858,7 @@ _Parameters_
 -   _props.className_ `[string]`: An optional class name added to the panel.
 -   _props.title_ `[string]`: Title displayed at the top of the panel.
 -   _props.initialOpen_ `[boolean]`: Whether to have the panel initially opened. When no title is provided it is always opened.
--   _props.icon_ `[WPBlockTypeIconRender]`: The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element, to be rendered when the sidebar is pinned to toolbar.
+-   _props.icon_ `[WPBlockTypeIconRender]`: The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element, to be rendered when the sidebar is pinned to toolbar. If `false` is passed, no icon will be rendered.
 -   _props.children_ `React.ReactNode`: Children to be rendered
 
 _Returns_
@@ -1211,11 +1213,11 @@ This component checks the publishing status of the current post. If the post is 
 _Parameters_
 
 -   _props_ `Object`: Component properties.
--   _props.children_ `React.ReactElement`: Children to be rendered.
+-   _props.children_ `React.ReactNode`: Children to be rendered.
 
 _Returns_
 
--   `React.ReactElement`: The rendered child elements or null if the post is already published or the user doesn't have the capability to publish.
+-   `React.ReactNode`: The rendered child elements or null if the post is already published or the user doesn't have the capability to publish.
 
 ### PostPingbacks
 
@@ -1287,11 +1289,11 @@ Wrapper component that renders its children only if post has a publish action.
 _Parameters_
 
 -   _props_ `Object`: Props.
--   _props.children_ `React.ReactElement`: Children to be rendered.
+-   _props.children_ `React.ReactNode`: Children to be rendered.
 
 _Returns_
 
--   `React.ReactElement`: - The component to be rendered or null if there is no publish action.
+-   `React.ReactNode`: - The component to be rendered or null if there is no publish action.
 
 ### PostScheduleLabel
 
@@ -1328,11 +1330,11 @@ Wrapper component that renders its children only if post has a sticky action.
 _Parameters_
 
 -   _props_ `Object`: Props.
--   _props.children_ `React.ReactElement`: Children to be rendered.
+-   _props.children_ `React.ReactNode`: Children to be rendered.
 
 _Returns_
 
--   `React.ReactElement`: The component to be rendered or null if post type is not 'post' or hasStickyAction is false.
+-   `React.ReactNode`: The component to be rendered or null if post type is not 'post' or hasStickyAction is false.
 
 ### PostSwitchToDraftButton
 
@@ -1374,7 +1376,7 @@ _Parameters_
 
 _Returns_
 
--   `React.ReactElement`: The rendered children components or null if the current post type has no taxonomies.
+-   `React.ReactNode`: The rendered children components or null if the current post type has no taxonomies.
 
 ### PostTaxonomiesFlatTermSelector
 
@@ -1384,7 +1386,6 @@ _Parameters_
 
 -   _props_ `Object`: The component props.
 -   _props.slug_ `string`: The slug of the taxonomy.
--   _props.\_\_nextHasNoMarginBottom_ `boolean`: Start opting into the new margin-free styles that will become the default in a future version, currently scheduled to be WordPress 7.0. (The prop can be safely removed once this happens.)
 
 _Returns_
 
@@ -1463,11 +1464,11 @@ Wrapper component that renders its children only if the post can be trashed.
 _Parameters_
 
 -   _props_ `Object`: The component props.
--   _props.children_ `React.ReactElement`: The child components.
+-   _props.children_ `React.ReactNode`: The child components.
 
 _Returns_
 
--   `React.ReactElement | null`: The rendered child components or null if the post can't be trashed.
+-   `React.ReactNode`: The rendered child components or null if the post can't be trashed.
 
 ### PostTypeSupportCheck
 
@@ -1476,12 +1477,12 @@ A component which renders its own children only if the current editor post type 
 _Parameters_
 
 -   _props_ `Object`: Props.
--   _props.children_ `React.ReactElement`: Children to be rendered if post type supports.
+-   _props.children_ `React.ReactNode`: Children to be rendered if post type supports.
 -   _props.supportKeys_ `(string|string[])`: String or string array of keys to test.
 
 _Returns_
 
--   `React.ReactElement`: The component to be rendered.
+-   `React.ReactNode`: The component to be rendered.
 
 ### PostURL
 
@@ -1509,11 +1510,11 @@ Check if the post URL is valid and visible.
 _Parameters_
 
 -   _props_ `Object`: The component props.
--   _props.children_ `React.ReactElement`: The child components.
+-   _props.children_ `React.ReactNode`: The child components.
 
 _Returns_
 
--   `React.ReactElement`: The child components if the post URL is valid and visible, otherwise null.
+-   `React.ReactNode`: The child components if the post URL is valid and visible, otherwise null.
 
 ### PostURLLabel
 
@@ -1657,12 +1658,12 @@ Checks if the current theme supports specific features and renders the children 
 _Parameters_
 
 -   _props_ `Object`: The component props.
--   _props.children_ `React.ReactElement`: The children to render if the theme supports the specified features.
+-   _props.children_ `React.ReactNode`: The children to render if the theme supports the specified features.
 -   _props.supportKeys_ `string|string[]`: The key(s) of the theme support(s) to check.
 
 _Returns_
 
--   `React.ReactElement`: The rendered children if the theme supports the specified features, otherwise null.
+-   `React.ReactNode`: The rendered children if the theme supports the specified features, otherwise null.
 
 ### TimeToRead
 

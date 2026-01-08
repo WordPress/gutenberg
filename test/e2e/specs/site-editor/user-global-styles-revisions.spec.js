@@ -133,13 +133,22 @@ test.describe( 'Style Revisions', () => {
 		).toBeVisible();
 	} );
 
-	test( 'should access from the site editor sidebar', async ( { page } ) => {
+	test( 'should access from the site editor sidebar', async ( {
+		editor,
+		page,
+	} ) => {
 		const navigationContainer = page.getByRole( 'region', {
 			name: 'Navigation',
 		} );
+
 		await navigationContainer
 			.getByRole( 'button', { name: 'Styles' } )
 			.click();
+
+		// wait for the editor canvas to be ready (to contain a block)
+		await expect(
+			editor.canvas.locator( '.wp-block' ).nth( 0 )
+		).toBeVisible();
 
 		await navigationContainer
 			.getByRole( 'button', { name: 'Revisions' } )
@@ -269,9 +278,7 @@ test.describe( 'Style Revisions', () => {
 		}
 		await userGlobalStylesRevisions.openStylesPanel();
 		await page.getByRole( 'button', { name: 'Revisions' } ).click();
-		const pagination = page.getByLabel(
-			'Global Styles pagination navigation'
-		);
+		const pagination = page.getByLabel( 'Global Styles pagination' );
 		await expect( pagination ).toContainText( '1 of 2' );
 		await pagination.getByRole( 'button', { name: 'Next page' } ).click();
 		await expect( pagination ).toContainText( '2 of 2' );

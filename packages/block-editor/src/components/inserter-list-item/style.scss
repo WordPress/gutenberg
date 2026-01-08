@@ -1,3 +1,5 @@
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/colors" as *;
 
 .block-editor-block-types-list__list-item {
 	display: block;
@@ -43,17 +45,19 @@
 	cursor: pointer;
 	background: transparent;
 	word-break: break-word;
-	transition: all 0.05s ease-in-out;
-	@include reduce-motion("transition");
+	@media not ( prefers-reduced-motion ) {
+		transition: all 0.05s ease-in-out;
+	}
 	position: relative;
 	height: auto;
 
-	&:disabled {
+	&:disabled,
+	&[aria-disabled="true"] {
 		opacity: 0.6;
 		cursor: default;
 	}
 
-	&:not(:disabled) {
+	&:not(:disabled, [aria-disabled="true"]) {
 		&:hover {
 			.block-editor-block-types-list__item-title {
 				color: var(--wp-admin-theme-color) !important;
@@ -79,10 +83,6 @@
 			}
 		}
 
-		&:focus {
-			box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
-		}
-
 		&.is-active {
 			color: $white;
 			background: $gray-900;
@@ -92,13 +92,20 @@
 			outline-offset: -2px;
 		}
 	}
+
+	&:not(:disabled) {
+		&:focus {
+			box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+		}
+	}
 }
 
 .block-editor-block-types-list__item-icon {
 	padding: 12px 20px;
 	color: $gray-900;
-	transition: all 0.05s ease-in-out;
-	@include reduce-motion("transition");
+	@media not ( prefers-reduced-motion ) {
+		transition: all 0.05s ease-in-out;
+	}
 
 	.block-editor-block-icon {
 		margin-left: auto;
@@ -106,8 +113,9 @@
 	}
 
 	svg {
-		transition: all 0.15s ease-out;
-		@include reduce-motion("transition");
+		@media not ( prefers-reduced-motion ) {
+			transition: all 0.15s ease-out;
+		}
 	}
 
 	.block-editor-block-types-list__list-item[draggable="true"] & {

@@ -2,6 +2,68 @@
 
 ## Unreleased
 
+### Internal
+
+-   The bundled `eslint` dependency has been updated from `^8.3.0` to `^8.57.1` ([#74316](https://github.com/WordPress/gutenberg/pull/74316)).
+
+## 31.1.0 (2025-11-26)
+
+## 31.0.0 (2025-11-12)
+
+### Breaking Changes
+
+-   The `lint-js` script now includes `.cjs`, `.mjs`, `.cts`, and `.mts` as default extensions to lint. This is considered a breaking change because the script may now surface lint errors in your project which would not have been previously identified.
+
+## 30.27.0 (2025-10-29)
+
+## 30.26.0 (2025-10-17)
+
+## 30.25.0 (2025-10-01)
+
+## 30.24.0 (2025-09-17)
+
+## 30.23.0 (2025-09-03)
+
+### Internal
+
+-   Remove deprecated `clean-webpack-plugin` dependency in favor of webpack's native cleaning functionality ([#71080](https://github.com/WordPress/gutenberg/pull/71080))
+
+## 30.22.0 (2025-08-20)
+
+## 30.21.0 (2025-08-07)
+
+## 30.20.0 (2025-07-23)
+
+## 30.19.0 (2025-06-25)
+
+## 30.18.0 (2025-06-04)
+
+## 30.17.0 (2025-05-22)
+
+## 30.16.0 (2025-05-07)
+
+## 30.15.0 (2025-04-11)
+
+## 30.14.1 (2025-04-01)
+
+### Bug Fixes
+
+-   Fix: `--blocks-manifest` CLI flag doesn't work when the directory name has space ([#69766](https://github.com/WordPress/gutenberg/pull/69766)).
+
+## 30.14.0 (2025-03-27)
+
+### New Features
+
+-   Add `--blocks-manifest` CLI flag to generate a PHP file containing block metadata from all `block.json` files in the project ([#69578](https://github.com/WordPress/gutenberg/pull/69578)).
+
+## 30.13.0 (2025-03-13)
+
+## 30.12.0 (2025-02-28)
+
+## 30.11.0 (2025-02-12)
+
+## 30.10.0 (2025-01-29)
+
 ## 30.9.0 (2025-01-15)
 
 ## 30.8.0 (2025-01-02)

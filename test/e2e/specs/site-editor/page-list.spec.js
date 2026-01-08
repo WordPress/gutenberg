@@ -1,11 +1,12 @@
 /**
- * WordPress dependencies
- */
-const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
-/**
  * External dependencies
  */
 const path = require( 'path' );
+
+/**
+ * WordPress dependencies
+ */
+const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 const createPages = async ( requestUtils ) => {
 	await requestUtils.createPage( {
@@ -23,6 +24,7 @@ test.describe( 'Page List', () => {
 		// Activate a theme with permissions to access the site editor.
 		await requestUtils.activateTheme( 'emptytheme' );
 		await createPages( requestUtils );
+		await requestUtils.deleteAllMedia();
 	} );
 
 	test.afterAll( async ( { requestUtils } ) => {
@@ -30,6 +32,7 @@ test.describe( 'Page List', () => {
 		await Promise.all( [
 			requestUtils.activateTheme( 'twentytwentyone' ),
 			requestUtils.deleteAllPages(),
+			requestUtils.deleteAllMedia(),
 		] );
 	} );
 
@@ -67,7 +70,7 @@ test.describe( 'Page List', () => {
 			featuredImage: {
 				performEdit: async ( page ) => {
 					const placeholder = page.getByRole( 'button', {
-						name: 'Choose an image…',
+						name: 'Choose file',
 					} );
 					await placeholder.click();
 					const mediaLibrary = page.getByRole( 'dialog' );
@@ -92,21 +95,19 @@ test.describe( 'Page List', () => {
 						.click();
 				},
 				assertInitialState: async ( page ) => {
-					const el = page.getByText( 'Choose an image…' );
+					const el = page.getByText( 'Choose file' );
 					const placeholder = page.getByRole( 'button', {
-						name: 'Choose an image…',
+						name: 'Choose file',
 					} );
 					await expect( el ).toBeVisible();
 					await expect( placeholder ).toBeVisible();
 				},
 				assertEditedState: async ( page ) => {
 					const placeholder = page.getByRole( 'button', {
-						name: 'Choose an image…',
+						name: 'Choose file',
 					} );
 					await expect( placeholder ).toBeHidden();
-					const img = page.locator(
-						'.fields-controls__featured-image-image'
-					);
+					const img = page.locator( '.fields__media-edit-thumbnail' );
 					await expect( img ).toBeVisible();
 				},
 			},
@@ -168,9 +169,20 @@ test.describe( 'Page List', () => {
 					const selectElement = page.locator(
 						'select:has(option[value="1"])'
 					);
-					await selectElement.selectOption( { value: '1' } );
+					await selectElement.selectOption( {
+						label: 'Test Author',
+					} );
 				},
-				assertEditedState: async () => {},
+				assertEditedState: async ( page ) => {
+					const author = page.getByLabel( 'Edit Author' );
+					await expect( author ).toContainText( 'Test Author' );
+					// Check that the list still shows "admin" (changes not yet saved).
+					const selectedItem = page.locator( '.is-selected' );
+					const authorCell = selectedItem.getByRole( 'cell', {
+						name: 'admin',
+					} );
+					await expect( authorCell ).toBeVisible();
+				},
 			},
 			date: {
 				assertInitialState: async ( page ) => {
@@ -183,14 +195,26 @@ test.describe( 'Page List', () => {
 				performEdit: async ( page ) => {
 					const dateEl = page.getByLabel( 'Edit Date' );
 					await dateEl.click();
-					const date = new Date();
-					const yy = Number( date.getFullYear() );
-					const yyEl = page.locator(
-						`input[type="number"][value="${ yy }"]`
-					);
 
-					await yyEl.focus();
-					await page.keyboard.press( 'ArrowUp' );
+					// Wait for the datetime control to appear
+					const datetimeInput = page.locator(
+						'input[type="datetime-local"]'
+					);
+					await datetimeInput.waitFor( { state: 'visible' } );
+
+					// Get current datetime value and increment year
+					const currentValue = await datetimeInput.inputValue();
+					if ( currentValue ) {
+						const currentDate = new Date( currentValue );
+						const newDate = new Date( currentDate );
+						newDate.setFullYear( currentDate.getFullYear() + 1 );
+
+						// Format for datetime-local input (YYYY-MM-DDTHH:MM)
+						const formattedDate = newDate
+							.toISOString()
+							.slice( 0, 16 );
+						await datetimeInput.fill( formattedDate );
+					}
 				},
 				assertEditedState: async ( page ) => {
 					const date = new Date();
@@ -273,7 +297,7 @@ test.describe( 'Page List', () => {
 				},
 				assertEditedState: async ( page ) => {
 					const discussion = page.getByLabel( 'Edit Discussion' );
-					await expect( discussion ).toContainText( 'Open' );
+					await expect( discussion ).toContainText( 'Comments only' );
 				},
 			},
 		};
@@ -282,6 +306,14 @@ test.describe( 'Page List', () => {
 			await requestUtils.setGutenbergExperiments( [
 				'gutenberg-quick-edit-dataviews',
 			] );
+			// Create a test user for `author` field testing.
+			await requestUtils.createUser( {
+				username: 'testauthor',
+				email: 'testauthor@example.com',
+				firstName: 'Test',
+				lastName: 'Author',
+				password: '1',
+			} );
 		} );
 
 		test.beforeEach( async ( { admin, page } ) => {
@@ -321,7 +353,7 @@ test.describe( 'Page List', () => {
 		} ) => {
 			const selectedItem = page.locator( '.is-selected' );
 			const imagePlaceholder = selectedItem.locator(
-				'.fields-controls__featured-image-placeholder'
+				'.fields__media-edit-placeholder'
 			);
 			const status = selectedItem.getByRole( 'cell', {
 				name: 'Published',
@@ -366,7 +398,7 @@ test.describe( 'Page List', () => {
 		// 	expect( await selectedItems.all() ).toHaveLength( 2 );
 
 		// 	const imagePlaceholders = selectedItems.locator(
-		// 		'.fields-controls__featured-image-placeholder',
+		// 		'.fields__media-edit-placeholder',
 		// 		{ strict: false }
 		// 	);
 
@@ -411,6 +443,7 @@ test.describe( 'Page List', () => {
 
 		test.afterAll( async ( { requestUtils } ) => {
 			await requestUtils.setGutenbergExperiments( [] );
+			await requestUtils.deleteAllUsers();
 		} );
 	} );
 } );

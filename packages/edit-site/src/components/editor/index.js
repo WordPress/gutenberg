@@ -12,34 +12,27 @@ import { useInstanceId, useReducedMotion } from '@wordpress/compose';
 import {
 	EditorKeyboardShortcutsRegister,
 	privateApis as editorPrivateApis,
-	store as editorStore,
 } from '@wordpress/editor';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as coreDataStore } from '@wordpress/core-data';
 import { privateApis as blockLibraryPrivateApis } from '@wordpress/block-library';
-import { useCallback, useMemo } from '@wordpress/element';
+import { useCallback } from '@wordpress/element';
 import { store as noticesStore } from '@wordpress/notices';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { decodeEntities } from '@wordpress/html-entities';
 import { Icon, arrowUpLeft } from '@wordpress/icons';
 import { store as blockEditorStore } from '@wordpress/block-editor';
+import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
  */
 import WelcomeGuide from '../welcome-guide';
-import { store as editSiteStore } from '../../store';
-import { GlobalStylesRenderer } from '../global-styles-renderer';
 import CanvasLoader from '../canvas-loader';
 import { unlock } from '../../lock-unlock';
 import { useSpecificEditorSettings } from '../block-editor/use-site-editor-settings';
 import PluginTemplateSettingPanel from '../plugin-template-setting-panel';
-import GlobalStylesSidebar from '../global-styles-sidebar';
 import { isPreviewingTheme } from '../../utils/is-previewing-theme';
-import {
-	getEditorCanvasContainerTitle,
-	useHasEditorCanvasContainer,
-} from '../editor-canvas-container';
 import SaveButton from '../save-button';
 import SavePanel from '../save-panel';
 import SiteEditorMoreMenu from '../more-menu';
@@ -48,12 +41,11 @@ import useEditorIframeProps from '../block-editor/use-editor-iframe-props';
 import useEditorTitle from './use-editor-title';
 import { useIsSiteEditorLoading } from '../layout/hooks';
 import { useAdaptEditorToCanvas } from './use-adapt-editor-to-canvas';
-import { TEMPLATE_POST_TYPE } from '../../utils/constants';
 import {
 	useResolveEditedEntity,
 	useSyncDeprecatedEntityIntoState,
 } from './use-resolve-edited-entity';
-import { addQueryArgs } from '@wordpress/url';
+import SitePreview from './site-preview';
 
 const { Editor, BackButton } = unlock( editorPrivateApis );
 const { useHistory, useLocation } = unlock( routerPrivateApis );
@@ -109,6 +101,7 @@ function getNavigationPath( location, postType ) {
 			'template-part-item',
 			'page-item',
 			'template-item',
+			'static-template-item',
 			'post-item',
 		].includes( name )
 	) {
@@ -117,7 +110,7 @@ function getNavigationPath( location, postType ) {
 	return addQueryArgs( path, { canvas: undefined } );
 }
 
-export default function EditSiteEditor( { isPostsList = false } ) {
+export default function EditSiteEditor( { isHomeRoute = false } ) {
 	const disableMotion = useReducedMotion();
 	const location = useLocation();
 	const { canvas = 'view' } = location.query;
@@ -127,24 +120,12 @@ export default function EditSiteEditor( { isPostsList = false } ) {
 	// deprecated sync state with url
 	useSyncDeprecatedEntityIntoState( entity );
 	const { postType, postId, context } = entity;
-	const {
-		supportsGlobalStyles,
-		editorCanvasView,
-		currentPostIsTrashed,
-		hasSiteIcon,
-	} = useSelect( ( select ) => {
-		const { getEditorCanvasContainerView } = unlock(
-			select( editSiteStore )
-		);
+	const { isBlockBasedTheme, hasSiteIcon } = useSelect( ( select ) => {
 		const { getCurrentTheme, getEntityRecord } = select( coreDataStore );
 		const siteData = getEntityRecord( 'root', '__unstableBase', undefined );
 
 		return {
-			supportsGlobalStyles: getCurrentTheme()?.is_block_theme,
-			editorCanvasView: getEditorCanvasContainerView(),
-			currentPostIsTrashed:
-				select( editorStore ).getCurrentPostAttribute( 'status' ) ===
-				'trash',
+			isBlockBasedTheme: getCurrentTheme()?.is_block_theme,
 			hasSiteIcon: !! siteData?.site_icon_url,
 		};
 	}, [] );
@@ -154,7 +135,6 @@ export default function EditSiteEditor( { isPostsList = false } ) {
 		postWithTemplate ? context.postId : postId
 	);
 	const _isPreviewingTheme = isPreviewingTheme();
-	const hasDefaultEditorCanvasView = ! useHasEditorCanvasContainer();
 	const iframeProps = useEditorIframeProps();
 	const isEditMode = canvas === 'edit';
 	const loadingProgressId = useInstanceId(
@@ -163,22 +143,7 @@ export default function EditSiteEditor( { isPostsList = false } ) {
 	);
 
 	const settings = useSpecificEditorSettings();
-	const styles = useMemo(
-		() => [
-			...settings.styles,
-			{
-				// Forming a "block formatting context" to prevent margin collapsing.
-				// @see https://developer.mozilla.org/en-US/docs/Web/Guide/CSS/Block_formatting_context
-				css:
-					canvas === 'view'
-						? `body{min-height: 100vh; ${
-								currentPostIsTrashed ? '' : 'cursor: pointer;'
-						  }}`
-						: undefined,
-			},
-		],
-		[ settings.styles, canvas, currentPostIsTrashed ]
-	);
+	const { initialBlockSelection, ...editorSettings } = settings;
 	const { resetZoomLevel } = unlock( useDispatch( blockEditorStore ) );
 	const { createSuccessNotice } = useDispatch( noticesStore );
 	const history = useHistory();
@@ -206,7 +171,7 @@ export default function EditSiteEditor( { isPostsList = false } ) {
 							sprintf(
 								// translators: %s: Title of the created post or template, e.g: "Hello world".
 								__( '"%s" successfully created.' ),
-								decodeEntities( _title )
+								decodeEntities( _title ) || __( '(no title)' )
 							),
 							{
 								type: 'snackbar',
@@ -236,19 +201,15 @@ export default function EditSiteEditor( { isPostsList = false } ) {
 		]
 	);
 
-	// Replace the title and icon displayed in the DocumentBar when there's an overlay visible.
-	const title = getEditorCanvasContainerTitle( editorCanvasView );
-
 	const isReady = ! isLoading;
 	const transition = {
 		duration: disableMotion ? 0 : 0.2,
 	};
 
-	return (
+	return ! isBlockBasedTheme && isHomeRoute ? (
+		<SitePreview />
+	) : (
 		<>
-			<GlobalStylesRenderer
-				disableRootPadding={ postType !== TEMPLATE_POST_TYPE }
-			/>
 			<EditorKeyboardShortcutsRegister />
 			{ isEditMode && <BlockKeyboardShortcuts /> }
 			{ ! isReady ? <CanvasLoader id={ loadingProgressId } /> : null }
@@ -262,15 +223,13 @@ export default function EditSiteEditor( { isPostsList = false } ) {
 					postType={ postWithTemplate ? context.postType : postType }
 					postId={ postWithTemplate ? context.postId : postId }
 					templateId={ postWithTemplate ? postId : undefined }
-					settings={ settings }
+					settings={ editorSettings }
+					initialSelection={ initialBlockSelection }
 					className="edit-site-editor__editor-interface"
-					styles={ styles }
 					customSaveButton={
 						_isPreviewingTheme && <SaveButton size="compact" />
 					}
 					customSavePanel={ _isPreviewingTheme && <SavePanel /> }
-					forceDisableBlockTools={ ! hasDefaultEditorCanvasView }
-					title={ title }
 					iframeProps={ iframeProps }
 					onActionPerformed={ onActionPerformed }
 					extraSidebarPanels={
@@ -298,31 +257,18 @@ export default function EditSiteEditor( { isPostsList = false } ) {
 											tooltipPosition="middle right"
 											onClick={ () => {
 												resetZoomLevel();
-
-												// TODO: this is a temporary solution to navigate to the posts list if we are
-												// come here through `posts list` and are in focus mode editing a template, template part etc..
-												if (
-													isPostsList &&
-													location.query?.focusMode
-												) {
-													history.navigate( '/', {
+												history.navigate(
+													getNavigationPath(
+														location,
+														postWithTemplate
+															? context.postType
+															: postType
+													),
+													{
 														transition:
 															'canvas-mode-view-transition',
-													} );
-												} else {
-													history.navigate(
-														getNavigationPath(
-															location,
-															postWithTemplate
-																? context.postType
-																: postType
-														),
-														{
-															transition:
-																'canvas-mode-view-transition',
-														}
-													);
-												}
+													}
+												);
 											} }
 										>
 											<motion.div
@@ -349,7 +295,6 @@ export default function EditSiteEditor( { isPostsList = false } ) {
 						</BackButton>
 					) }
 					<SiteEditorMoreMenu />
-					{ supportsGlobalStyles && <GlobalStylesSidebar /> }
 				</Editor>
 			) }
 		</>

@@ -202,7 +202,7 @@ describe( 'BorderBoxControl', () => {
 			await waitFor( () =>
 				expect(
 					screen.getByRole( 'button', {
-						name: 'Custom color picker.',
+						name: 'Custom color picker',
 					} )
 				).toBeVisible()
 			);

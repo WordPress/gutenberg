@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryFn } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react-webpack5';
+import { fn } from 'storybook/test';
 
 /**
  * WordPress dependencies
@@ -17,8 +18,10 @@ import type { Color, Gradient } from '../types';
 const meta: Meta< typeof PaletteEdit > = {
 	title: 'Components/PaletteEdit',
 	component: PaletteEdit,
+	args: {
+		onChange: fn(),
+	},
 	parameters: {
-		actions: { argTypesRegex: '^on.*' },
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
 	},

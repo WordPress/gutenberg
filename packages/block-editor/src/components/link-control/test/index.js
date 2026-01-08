@@ -13,7 +13,7 @@ import userEvent from '@testing-library/user-event';
 /**
  * WordPress dependencies
  */
-import { useState } from '@wordpress/element';
+import { useState, createElement } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 
 /**
@@ -27,6 +27,18 @@ import {
 } from './fixtures';
 
 const mockFetchSearchSuggestions = jest.fn();
+
+function getExpectedVisualTypeName( type ) {
+	const builtInLabels = {
+		post: 'Post',
+		page: 'Page',
+		post_tag: 'Tag',
+		category: 'Category',
+		attachment: 'Attachment',
+	};
+
+	return builtInLabels[ type ] || type;
+}
 
 /**
  * The call to the real method `fetchRichUrlData` is wrapped in a promise in order to make it cancellable.
@@ -510,7 +522,7 @@ describe( 'Searching for a link', () => {
 				firstSuggestion.title
 			);
 			expect( searchResultElements[ 0 ] ).toHaveTextContent(
-				firstSuggestion.type
+				getExpectedVisualTypeName( firstSuggestion.type )
 			);
 
 			// The fallback URL suggestion should not be shown when input is not URL-like.
@@ -783,7 +795,7 @@ describe( 'Manual link entry', () => {
 				}
 
 				const submitButton = screen.queryByRole( 'button', {
-					name: 'Save',
+					name: 'Apply',
 				} );
 
 				// Verify the submission UI is disabled.
@@ -852,7 +864,7 @@ describe( 'Manual link entry', () => {
 			await toggleSettingsDrawer( user );
 
 			let searchInput = screen.getByRole( 'combobox', {
-				name: 'Search or type URL',
+				name: 'Link',
 			} );
 
 			let textInput = screen.getByRole( 'textbox', {
@@ -889,7 +901,7 @@ describe( 'Manual link entry', () => {
 
 			// Re-query the inputs as they have been replaced.
 			searchInput = screen.getByRole( 'combobox', {
-				name: 'Search or type URL',
+				name: 'Link',
 			} );
 
 			textInput = screen.getByRole( 'textbox', {
@@ -1023,7 +1035,7 @@ describe( 'Link submission', () => {
 		expect( createSubmitButton ).not.toBeInTheDocument();
 
 		const editSubmitButton = screen.getByRole( 'button', {
-			name: 'Save',
+			name: 'Apply',
 		} );
 
 		expect( editSubmitButton ).toBeVisible();
@@ -1506,16 +1518,17 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 
 			await user.click( createButton );
 
-			searchInput = screen.getByRole( 'combobox', {
-				name: 'Search or type URL',
-			} );
-
-			const errorNotice = screen.getAllByText(
+			// Wait for the error message to appear after the async operation fails
+			const errorNotice = await screen.findByText(
 				'API response returned invalid entity.'
-			)[ 1 ];
+			);
 
 			// Catch the error in the test to avoid test failures.
 			expect( throwsError ).toThrow( Error );
+
+			searchInput = screen.getByRole( 'combobox', {
+				name: 'Search or type URL',
+			} );
 
 			// Check human readable error notice is perceivable.
 			expect( errorNotice ).toBeVisible();
@@ -1608,7 +1621,7 @@ describe( 'Selecting links', () => {
 					id: '1',
 					title: 'https://www.wordpress.org',
 					url: 'https://www.wordpress.org',
-					type: 'URL',
+					type: 'link',
 				},
 			], // Url.
 		] )(
@@ -1670,7 +1683,7 @@ describe( 'Selecting links', () => {
 					id: '1',
 					title: 'https://www.wordpress.org',
 					url: 'https://www.wordpress.org',
-					type: 'URL',
+					type: 'link',
 				},
 			], // Url.
 		] )(
@@ -2021,7 +2034,7 @@ describe( 'Addition Settings UI', () => {
 
 		// check that the "Apply" button is disabled by default.
 		const submitButton = screen.queryByRole( 'button', {
-			name: 'Save',
+			name: 'Apply',
 		} );
 
 		expect( submitButton ).toHaveAttribute( 'aria-disabled', 'true' );
@@ -2078,7 +2091,7 @@ describe( 'Post types', () => {
 
 		searchResultElements.forEach( ( resultItem, index ) => {
 			expect( resultItem ).toHaveTextContent(
-				fauxEntitySuggestions[ index ].type
+				getExpectedVisualTypeName( fauxEntitySuggestions[ index ].type )
 			);
 		} );
 	} );
@@ -2122,7 +2135,7 @@ describe( 'Rich link previews', () => {
 		id: '1',
 		title: 'WordPress.org', // Customize this for differentiation in assertions.
 		url: 'https://www.wordpress.org',
-		type: 'URL',
+		type: 'link',
 	};
 
 	beforeAll( () => {
@@ -2199,13 +2212,13 @@ describe( 'Rich link previews', () => {
 		// Todo: refactor to use user-facing queries.
 		// eslint-disable-next-line testing-library/no-node-access
 		const hasRichImagePreview = linkPreview.querySelector(
-			'.block-editor-link-control__search-item-image'
+			'.block-editor-link-control__preview-image'
 		);
 
 		// Todo: refactor to use user-facing queries.
 		// eslint-disable-next-line testing-library/no-node-access
 		const hasRichDescriptionPreview = linkPreview.querySelector(
-			'.block-editor-link-control__search-item-description'
+			'.block-editor-link-control__preview-description'
 		);
 
 		expect( hasRichImagePreview ).not.toBeInTheDocument();
@@ -2234,7 +2247,7 @@ describe( 'Rich link previews', () => {
 
 		// eslint-disable-next-line testing-library/no-node-access
 		expect( titlePreview.parentElement.parentElement ).toHaveClass(
-			'block-editor-link-control__search-item-title'
+			'block-editor-link-control__preview-title'
 		);
 	} );
 
@@ -2258,7 +2271,7 @@ describe( 'Rich link previews', () => {
 
 		// eslint-disable-next-line testing-library/no-node-access
 		const iconPreview = linkPreview.querySelector(
-			`.block-editor-link-control__search-item-icon`
+			`.block-editor-link-control__preview-icon`
 		);
 
 		// eslint-disable-next-line testing-library/no-node-access
@@ -2297,7 +2310,7 @@ describe( 'Rich link previews', () => {
 
 			// eslint-disable-next-line testing-library/no-node-access
 			const missingDataItem = linkPreview.querySelector(
-				`.block-editor-link-control__search-item-${ dataItem }`
+				`.block-editor-link-control__preview-${ dataItem }`
 			);
 
 			expect( missingDataItem ).not.toBeInTheDocument();
@@ -2477,7 +2490,7 @@ describe( 'Controlling link title text', () => {
 		expect( textInput ).toHaveValue( textValue );
 
 		const submitButton = screen.queryByRole( 'button', {
-			name: 'Save',
+			name: 'Apply',
 		} );
 
 		await user.click( submitButton );
@@ -2568,6 +2581,655 @@ describe( 'Controlling link title text', () => {
 		expect( screen.queryByRole( 'textbox', { name: 'Text' } ) ).toHaveValue(
 			'Something else'
 		);
+	} );
+} );
+
+describe( 'Entity handling', () => {
+	it( 'should enable input when handleEntities is false', () => {
+		const entityLink = {
+			id: 123, // provide an id to be considered an entity
+			url: 'https://example.com/page',
+			title: 'Test Page',
+			type: 'page',
+		};
+
+		render(
+			<LinkControl
+				value={ entityLink }
+				handleEntities={ false }
+				forceIsEditingLink
+			/>
+		);
+
+		const searchInput = screen.getByRole( 'combobox', {
+			name: 'Search or type URL',
+		} );
+
+		expect( searchInput ).toBeVisible();
+		expect( searchInput ).toBeEnabled();
+	} );
+
+	it( 'should disable input when handleEntities is true and link has id', () => {
+		const entityLink = {
+			id: 123, // provide an id to be considered an entity
+			url: 'https://example.com/page',
+			title: 'Test Page',
+			type: 'page',
+		};
+
+		render(
+			<LinkControl
+				value={ entityLink }
+				handleEntities
+				forceIsEditingLink
+			/>
+		);
+
+		const searchInput = screen.getByRole( 'combobox', {
+			name: 'Search or type URL',
+		} );
+
+		expect( searchInput ).toBeVisible();
+		expect( searchInput ).toBeDisabled();
+
+		// Should show help text indicating this is an entity link
+		expect(
+			screen.getByText( 'Synced with the selected page.' )
+		).toBeVisible();
+	} );
+
+	it( 'should enable input when handleEntities is true but link has no id', () => {
+		const nonEntityLink = {
+			url: 'https://example.com/external',
+			title: 'External Link',
+			// No id property - not an entity
+		};
+
+		render(
+			<LinkControl
+				value={ nonEntityLink }
+				handleEntities
+				forceIsEditingLink
+			/>
+		);
+
+		const searchInput = screen.getByRole( 'combobox', {
+			name: 'Search or type URL',
+		} );
+
+		expect( searchInput ).toBeVisible();
+		expect( searchInput ).toBeEnabled();
+
+		// Should not show entity help text for non-entity links
+		expect(
+			screen.queryByText( 'Synced with the selected page.' )
+		).not.toBeInTheDocument();
+	} );
+
+	it( 'should allow unlinking and selecting different entity', async () => {
+		const user = userEvent.setup();
+
+		// Mock search suggestions to return multiple entities
+		mockFetchSearchSuggestions.mockImplementation( () =>
+			Promise.resolve( [
+				{
+					id: 456, // Different ID from original entity
+					title: 'Different Page',
+					type: 'page',
+					url: 'https://example.com/different-page',
+				},
+				{
+					id: 789,
+					title: 'Another Post',
+					type: 'post',
+					url: 'https://example.com/another-post',
+				},
+				{
+					id: 101,
+					title: 'Third Option',
+					type: 'page',
+					url: 'https://example.com/third-option',
+				},
+			] )
+		);
+
+		const entityLink = {
+			id: 123, // provide an id to be considered an entity
+			url: 'https://example.com/page',
+			title: 'Test Page',
+			type: 'page',
+		};
+
+		const onChange = jest.fn();
+
+		render(
+			<LinkControl
+				value={ entityLink }
+				handleEntities
+				forceIsEditingLink
+				onChange={ onChange }
+				showInitialSuggestions
+			/>
+		);
+
+		const searchInput = screen.getByRole( 'combobox', {
+			name: 'Search or type URL',
+		} );
+
+		// Initially should be disabled
+		expect( searchInput ).toBeDisabled();
+
+		// Click the unlink button
+		const unlinkButton = screen.getByRole( 'button', {
+			name: 'Unsync and edit',
+		} );
+		await user.click( unlinkButton );
+
+		// Input should now be enabled and value should be cleared
+		expect( searchInput ).toBeEnabled();
+		expect( searchInput ).toHaveValue( '' );
+
+		// Wait for initial suggestions to appear automatically
+		const suggestionsList = await screen.findByRole( 'listbox' );
+		expect( suggestionsList ).toBeVisible();
+
+		// Click on a different entity suggestion
+		const differentSuggestion = screen.getByRole( 'option', {
+			name: 'Different Page /different-page Page',
+		} );
+		await user.click( differentSuggestion );
+
+		// Verify that onChange was called with the correct entity data
+		expect( onChange ).toHaveBeenCalledWith( {
+			id: 456,
+			title: 'Test Page', // Component preserves original title
+			type: 'page',
+			url: 'https://example.com/different-page',
+		} );
+	} );
+
+	it( 'should allow unlinking and entering a custom URL', async () => {
+		const user = userEvent.setup();
+
+		const entityLink = {
+			id: 123,
+			url: 'https://example.com/page',
+			title: 'Test Page',
+			type: 'page',
+			kind: 'post-type',
+		};
+
+		const onChange = jest.fn();
+
+		render(
+			<LinkControl
+				value={ entityLink }
+				handleEntities
+				forceIsEditingLink
+				onChange={ onChange }
+			/>
+		);
+
+		const searchInput = screen.getByRole( 'combobox', {
+			name: 'Search or type URL',
+		} );
+
+		// Initially should be disabled because it's an entity
+		expect( searchInput ).toBeDisabled();
+
+		// Click the unsync button
+		const unlinkButton = screen.getByRole( 'button', {
+			name: 'Unsync and edit',
+		} );
+		await user.click( unlinkButton );
+
+		// Input should now be enabled and value should be cleared
+		expect( searchInput ).toBeEnabled();
+		expect( searchInput ).toHaveValue( '' );
+
+		// Type a custom URL (not selecting from suggestions)
+		const customUrl = 'www.wordpress.org';
+		await user.type( searchInput, customUrl );
+
+		// Wait for the URL suggestion to appear
+		await screen.findByRole( 'listbox' );
+
+		// Click the Apply button to submit
+		const applyButton = screen.getByRole( 'button', {
+			name: 'Apply',
+		} );
+		await user.click( applyButton );
+
+		// Verify that onChange was called with entity metadata cleared.
+		// Kind should be undefined (no longer an entity).
+		// Note: Currently when clicking Apply (vs selecting a suggestion),
+		// type and id are also undefined - that's a separate issue with the
+		// TODO: Apply button handler not processing URLs through handleDirectEntry,
+		// so the shape of the data for a custom link can be different depending on
+		// how it was submitted.
+		expect( onChange ).toHaveBeenCalledWith(
+			expect.objectContaining( {
+				url: 'www.wordpress.org',
+				kind: undefined,
+			} )
+		);
+	} );
+
+	it( 'should clear entity metadata (type/kind) when changing from page link to custom link via suggestion', async () => {
+		const user = userEvent.setup();
+
+		// Start with an entity link that has type and kind
+		const pageLink = {
+			id: 123,
+			url: 'https://example.com/page',
+			title: 'Test Page',
+			type: 'page',
+			kind: 'post-type',
+		};
+
+		const onChange = jest.fn();
+
+		// Mock search suggestions to return a custom URL
+		// URL suggestions have an id and type but no 'kind' (which indicates entity metadata)
+		mockFetchSearchSuggestions.mockImplementation( ( searchTerm ) => {
+			const suggestions = [
+				{
+					id: uniqueId(),
+					title: searchTerm,
+					url: searchTerm,
+					type: 'link', // URL suggestions have type 'link'
+					// Importantly: no 'kind' property (entities have kind)
+				},
+			];
+			return Promise.resolve( suggestions );
+		} );
+
+		render(
+			<LinkControl
+				value={ pageLink }
+				handleEntities
+				forceIsEditingLink
+				onChange={ onChange }
+			/>
+		);
+
+		const searchInput = screen.getByRole( 'combobox', {
+			name: 'Search or type URL',
+		} );
+
+		// Initially should be disabled because it's an entity
+		expect( searchInput ).toBeDisabled();
+
+		// Click the unsync button to enable editing
+		const unlinkButton = screen.getByRole( 'button', {
+			name: 'Unsync and edit',
+		} );
+		await user.click( unlinkButton );
+
+		// Input should now be enabled and value should be cleared
+		expect( searchInput ).toBeEnabled();
+		expect( searchInput ).toHaveValue( '' );
+
+		// Type a custom URL
+		await user.type( searchInput, 'https://custom-url.com' );
+
+		// Wait for suggestions to appear
+		const suggestionsList = await screen.findByRole( 'listbox' );
+		expect( suggestionsList ).toBeVisible();
+
+		// Select the custom URL suggestion (not clicking Apply button)
+		const urlSuggestion = screen.getByRole( 'option', {
+			name: /https:\/\/custom-url\.com/,
+		} );
+		await user.click( urlSuggestion );
+
+		// Verify that onChange was called with id, type and kind explicitly set to undefined
+		// This is the critical fix - when selecting a custom URL suggestion after unlinking,
+		// entity metadata (type/kind) should be cleared (not just when using the Apply button)
+		expect( onChange ).toHaveBeenCalledWith(
+			expect.objectContaining( {
+				url: 'https://custom-url.com',
+				type: 'link',
+				kind: undefined,
+			} )
+		);
+	} );
+
+	it( 'should clear entity metadata when pressing Enter for direct entry (without clicking suggestion)', async () => {
+		const user = userEvent.setup();
+		const onChange = jest.fn();
+
+		const pageLink = {
+			id: 123,
+			url: 'https://example.com/page',
+			title: 'Test Page',
+			type: 'page',
+			kind: 'post-type',
+		};
+
+		render(
+			<LinkControl
+				value={ pageLink }
+				handleEntities
+				forceIsEditingLink
+				onChange={ onChange }
+			/>
+		);
+
+		const searchInput = screen.getByRole( 'combobox', {
+			name: 'Search or type URL',
+		} );
+
+		// Initially should be disabled because it's an entity
+		expect( searchInput ).toBeDisabled();
+
+		// Click the unsync button to enable editing
+		const unlinkButton = screen.getByRole( 'button', {
+			name: 'Unsync and edit',
+		} );
+		await user.click( unlinkButton );
+
+		// Input should now be enabled and value should be cleared
+		expect( searchInput ).toBeEnabled();
+		expect( searchInput ).toHaveValue( '' );
+
+		// Type a custom URL
+		await user.type( searchInput, 'https://direct-entry.com' );
+
+		// Press Enter WITHOUT clicking the suggestion (direct entry path)
+		triggerEnter( searchInput );
+
+		// Verify that onChange was called with type and kind explicitly set to undefined
+		// This tests the direct entry path in onSubmit (lines 157-165 in search-input.js)
+		// where the user types a URL and presses Enter without selecting from suggestions
+		expect( onChange ).toHaveBeenCalledWith(
+			expect.objectContaining( {
+				url: 'https://direct-entry.com',
+				type: undefined,
+				kind: undefined,
+			} )
+		);
+	} );
+
+	describe( 'Accessibility association for entity links', () => {
+		it( 'should associate unlink button with help text via aria-describedby', () => {
+			const entityLink = {
+				id: 123,
+				url: 'https://example.com/page',
+				title: 'Test Page',
+				type: 'page',
+			};
+
+			render(
+				<LinkControl
+					value={ entityLink }
+					handleEntities
+					forceIsEditingLink
+				/>
+			);
+
+			// Find the unlink button
+			const unlinkButton = screen.getByRole( 'button', {
+				name: 'Unsync and edit',
+			} );
+
+			// Get the help text ID from the button's aria-describedby
+			const helpTextId = unlinkButton.getAttribute( 'aria-describedby' );
+			expect( helpTextId ).toBeTruthy();
+			expect( helpTextId ).toMatch( /^link-control-\d+__help$/ );
+
+			// Verify the help text element exists with the correct content
+			expect(
+				screen.getByText( 'Synced with the selected page.' )
+			).toBeInTheDocument();
+		} );
+
+		it( 'should generate unique help text IDs for multiple LinkControl instances', () => {
+			const entityLink1 = {
+				id: 123,
+				url: 'https://example.com/page1',
+				title: 'Page 1',
+				type: 'page',
+			};
+
+			const entityLink2 = {
+				id: 456,
+				url: 'https://example.com/page2',
+				title: 'Page 2',
+				type: 'page',
+			};
+
+			render(
+				<div>
+					<LinkControl
+						value={ entityLink1 }
+						handleEntities
+						forceIsEditingLink
+					/>
+					<LinkControl
+						value={ entityLink2 }
+						handleEntities
+						forceIsEditingLink
+					/>
+				</div>
+			);
+
+			const unlinkButtons = screen.getAllByRole( 'button', {
+				name: 'Unsync and edit',
+			} );
+
+			// Get help text IDs from both buttons
+			const helpTextId1 =
+				unlinkButtons[ 0 ].getAttribute( 'aria-describedby' );
+			const helpTextId2 =
+				unlinkButtons[ 1 ].getAttribute( 'aria-describedby' );
+
+			// IDs should be different
+			expect( helpTextId1 ).not.toBe( helpTextId2 );
+
+			// Each button should be associated with its corresponding help text
+			expect( unlinkButtons[ 0 ] ).toHaveAttribute(
+				'aria-describedby',
+				helpTextId1
+			);
+			expect( unlinkButtons[ 1 ] ).toHaveAttribute(
+				'aria-describedby',
+				helpTextId2
+			);
+
+			// Help text elements should exist with correct content
+			expect(
+				screen.getAllByText( 'Synced with the selected page.' )
+			).toHaveLength( 2 );
+		} );
+	} );
+} );
+
+describe( 'Custom settings rendering', () => {
+	it( 'renders custom settings with valid render functions', async () => {
+		const user = userEvent.setup();
+		const mockRender = jest.fn(
+			// eslint-disable-next-line no-unused-vars
+			( setting, value, onChange ) =>
+				createElement(
+					'div',
+					{ 'data-testid': 'custom-setting' },
+					'Custom Setting Content'
+				)
+		);
+
+		const settings = [
+			{
+				id: 'customSetting',
+				title: 'Custom Setting',
+				render: mockRender,
+			},
+		];
+
+		const selectedLink = fauxEntitySuggestions[ 0 ];
+
+		render(
+			<LinkControl
+				value={ selectedLink }
+				settings={ settings }
+				forceIsEditingLink
+			/>
+		);
+
+		await toggleSettingsDrawer( user );
+
+		expect( mockRender ).toHaveBeenCalledWith(
+			settings[ 0 ],
+			selectedLink,
+			expect.any( Function )
+		);
+		expect( screen.getByTestId( 'custom-setting' ) ).toBeInTheDocument();
+		expect(
+			screen.getByText( 'Custom Setting Content' )
+		).toBeInTheDocument();
+	} );
+
+	it( 'renders only valid settings when mixed with invalid ones', async () => {
+		const user = userEvent.setup();
+		const validRender = jest.fn(
+			// eslint-disable-next-line no-unused-vars
+			( setting, value, onChange ) =>
+				createElement(
+					'div',
+					{ 'data-testid': 'valid-setting' },
+					'Valid Setting'
+				)
+		);
+
+		const settings = [
+			{
+				id: 'validSetting',
+				title: 'Valid Setting',
+				render: validRender,
+			},
+			{
+				id: 'invalidSetting',
+				title: 'Invalid Setting',
+				render: 'not a function',
+			},
+			{
+				id: 'anotherValidSetting',
+				title: 'Another Valid Setting',
+				render: validRender,
+			},
+		];
+
+		const selectedLink = fauxEntitySuggestions[ 0 ];
+
+		render(
+			<LinkControl
+				value={ selectedLink }
+				settings={ settings }
+				forceIsEditingLink
+			/>
+		);
+
+		await toggleSettingsDrawer( user );
+
+		// Should render only the valid settings
+		expect( screen.getAllByTestId( 'valid-setting' ) ).toHaveLength( 2 );
+		expect(
+			screen.queryByText( 'Invalid Setting' )
+		).not.toBeInTheDocument();
+	} );
+
+	it( 'renders CheckboxControl for settings without render property', async () => {
+		const user = userEvent.setup();
+
+		const settings = [
+			{
+				id: 'noRenderSetting',
+				title: 'No Render Setting',
+				// No render property
+			},
+		];
+
+		const selectedLink = fauxEntitySuggestions[ 0 ];
+
+		render(
+			<LinkControl
+				value={ selectedLink }
+				settings={ settings }
+				forceIsEditingLink
+			/>
+		);
+
+		await toggleSettingsDrawer( user );
+
+		// Should render CheckboxControl
+		expect(
+			screen.getByRole( 'checkbox', { name: 'No Render Setting' } )
+		).toBeInTheDocument();
+	} );
+
+	it( 'allows custom render functions to call onChange in LinkControl', async () => {
+		const user = userEvent.setup();
+		const mockOnChange = jest.fn();
+
+		const mockRender = jest.fn( ( setting, value, onChange ) => {
+			return createElement(
+				'button',
+				{
+					'data-testid': 'custom-toggle-button',
+					onClick: () =>
+						onChange( { [ setting.id ]: ! value[ setting.id ] } ),
+				},
+				'Toggle Custom Setting'
+			);
+		} );
+
+		const settings = [
+			{
+				id: 'customToggleSetting',
+				title: 'Custom Toggle Setting',
+				render: mockRender,
+			},
+		];
+
+		const selectedLink = {
+			...fauxEntitySuggestions[ 0 ],
+			customToggleSetting: false,
+		};
+
+		render(
+			<LinkControl
+				value={ selectedLink }
+				settings={ settings }
+				onChange={ mockOnChange }
+				forceIsEditingLink
+			/>
+		);
+
+		await toggleSettingsDrawer( user );
+
+		// Verify the custom render function was called
+		expect( mockRender ).toHaveBeenCalledWith(
+			settings[ 0 ],
+			selectedLink,
+			expect.any( Function )
+		);
+
+		// Click the custom button
+		const customButton = screen.getByTestId( 'custom-toggle-button' );
+		await user.click( customButton );
+
+		// Check that the Apply button is now enabled
+		const applyButton = screen.getByRole( 'button', { name: 'Apply' } );
+		expect( applyButton ).toBeEnabled();
+
+		// Click Apply to submit the changes
+		await user.click( applyButton );
+
+		// Verify onChange was called with the updated value
+		expect( mockOnChange ).toHaveBeenCalledWith( {
+			...selectedLink,
+			customToggleSetting: true,
+		} );
 	} );
 } );
 

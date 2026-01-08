@@ -20,7 +20,7 @@ function setupUseSelectMock( mode, blockType, codeEditingEnabled = true ) {
 		return {
 			mode,
 			blockType,
-			isCodeEditingEnabled: codeEditingEnabled,
+			enabled: codeEditingEnabled,
 		};
 	} );
 }

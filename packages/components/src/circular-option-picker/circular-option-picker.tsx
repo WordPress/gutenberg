@@ -132,7 +132,7 @@ function ButtonsCircularOptionPicker(
 	);
 
 	return (
-		<div { ...additionalProps } id={ baseId }>
+		<div { ...additionalProps } role="group" id={ baseId }>
 			<CircularOptionPickerContext.Provider value={ contextValue }>
 				{ options }
 				{ children }

@@ -22,13 +22,14 @@ function render_block_core_post_featured_image( $attributes, $content, $block ) 
 	$post_ID = $block->context['postId'];
 
 	$is_link        = isset( $attributes['isLink'] ) && $attributes['isLink'];
-	$size_slug      = isset( $attributes['sizeSlug'] ) ? $attributes['sizeSlug'] : 'post-thumbnail';
+	$size_slug      = $attributes['sizeSlug'] ?? 'post-thumbnail';
 	$attr           = get_block_core_post_featured_image_border_attributes( $attributes );
 	$overlay_markup = get_block_core_post_featured_image_overlay_element_markup( $attributes );
 
 	if ( $is_link ) {
-		if ( get_the_title( $post_ID ) ) {
-			$attr['alt'] = trim( strip_tags( get_the_title( $post_ID ) ) );
+		$title = get_the_title( $post_ID );
+		if ( $title ) {
+			$attr['alt'] = trim( strip_tags( $title ) );
 		} else {
 			$attr['alt'] = sprintf(
 				// translators: %d is the post ID.
@@ -235,9 +236,9 @@ function get_block_core_post_featured_image_border_attributes( $attributes ) {
 	foreach ( $sides as $side ) {
 		$border                 = $attributes['style']['border'][ $side ] ?? null;
 		$border_styles[ $side ] = array(
-			'color' => isset( $border['color'] ) ? $border['color'] : null,
-			'style' => isset( $border['style'] ) ? $border['style'] : null,
-			'width' => isset( $border['width'] ) ? $border['width'] : null,
+			'color' => $border['color'] ?? null,
+			'style' => $border['style'] ?? null,
+			'width' => $border['width'] ?? null,
 		);
 	}
 

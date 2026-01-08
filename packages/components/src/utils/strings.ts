@@ -20,6 +20,7 @@ const ALL_UNICODE_DASH_CHARACTERS = new RegExp(
 
 export const normalizeTextString = ( value: string ): string => {
 	return removeAccents( value )
+		.normalize( 'NFKC' )
 		.toLocaleLowerCase()
 		.replace( ALL_UNICODE_DASH_CHARACTERS, '-' );
 };

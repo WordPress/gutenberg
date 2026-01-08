@@ -1,0 +1,190 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/variables" as *;
+
+.template-list-custom-template-modal {
+	&__contents-wrapper {
+		height: 100%;
+		justify-content: flex-start !important; // Required as topLeft alignment isn't working on VStack
+
+		> * {
+			width: 100%;
+		}
+
+		&__suggestions_list {
+			margin-left: - $grid-unit-15;
+			margin-right: - $grid-unit-15;
+			width: calc(100% + #{$grid-unit-15 * 2});
+		}
+	}
+
+	&__contents {
+		> .components-button {
+			height: auto;
+			justify-content: center;
+		}
+	}
+
+	@include break-medium() {
+		width: 456px;
+	}
+
+	.template-list-custom-template-modal__suggestions_list {
+		@include break-small() {
+			max-height: $grid-unit-70 * 4; // Height of four buttons
+			overflow-y: auto;
+		}
+
+		&__list-item {
+			display: block;
+			width: 100%;
+			text-align: left;
+			white-space: pre-wrap;
+			overflow-wrap: break-word;
+			height: auto;
+			padding: $grid-unit-10 $grid-unit-15;
+
+			mark {
+				font-weight: 700;
+				background: none;
+			}
+
+			&:hover {
+				background: rgba(var(--wp-admin-theme-color--rgb), 0.04);
+
+				* {
+					color: var(--wp-admin-theme-color);
+				}
+
+				mark {
+					color: var(--wp-admin-theme-color);
+				}
+			}
+
+			&:focus {
+				background-color: $gray-100;
+			}
+
+			&:focus:not(:disabled) {
+				box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color) inset;
+			}
+
+			&__title,
+			&__info {
+				overflow: hidden;
+				text-overflow: ellipsis;
+				display: block;
+			}
+
+			&__info {
+				word-break: break-all;
+				color: $gray-700;
+			}
+		}
+	}
+}
+
+.template-list-custom-template-modal__no-results {
+	border: $border-width solid $gray-400;
+	border-radius: $radius-small;
+	padding: $grid-unit-20;
+}
+
+.template-list-custom-generic-template__modal {
+	.components-modal__header {
+		border-bottom: none;
+	}
+
+	.components-modal__content::before {
+		margin-bottom: $grid-unit-05;
+	}
+}
+
+.template-list-add-new-template__modal {
+
+	@include break-large() {
+		max-width: $grid-unit-80 * 13;
+		margin-top: $grid-unit-80;
+		width: calc(100% - #{$grid-unit-80 * 2});
+		max-height: calc(100% - #{$grid-unit-80 * 2});
+	}
+
+	.template-list-add-new-template__template-button,
+	.template-list-add-new-template__custom-template-button {
+		svg {
+			fill: var(--wp-admin-theme-color);
+		}
+	}
+
+	.template-list-add-new-template__custom-template-button {
+		.template-list-add-new-template__template-name {
+			flex-grow: 1;
+			align-items: flex-start;
+		}
+	}
+
+	.template-list-add-new-template__template-icon {
+		padding: $grid-unit-10;
+		background: rgba(var(--wp-admin-theme-color--rgb), 0.04);
+		border-radius: 100%;
+		max-height: $grid-unit-50;
+		max-width: $grid-unit-50;
+	}
+}
+
+.template-list-custom-template-modal__contents,
+.template-list-add-new-template__template-list__contents {
+	> .components-button {
+		padding: $grid-unit-40;
+		display: flex;
+		flex-direction: column;
+		border: $border-width solid $gray-300;
+		justify-content: center;
+
+		// Show the boundary of the button, in High Contrast Mode.
+		outline: 1px solid transparent;
+
+		span:first-child {
+			color: $gray-900;
+		}
+
+		span {
+			color: $gray-700;
+		}
+
+		&:hover {
+			color: var(--wp-admin-theme-color-darker-10);
+			background: rgba(var(--wp-admin-theme-color--rgb), 0.04);
+			border-color: transparent;
+
+			span {
+				color: var(--wp-admin-theme-color);
+			}
+		}
+
+		&:focus {
+			box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+			border-color: transparent;
+
+			// Windows High Contrast mode will show this outline, but not the box-shadow.
+			outline: 3px solid transparent;
+
+			span:first-child {
+				color: var(--wp-admin-theme-color);
+			}
+		}
+	}
+
+	.template-list-add-new-template__custom-template-button,
+	.template-list-add-new-template__template-list__prompt {
+		grid-column: 1 / -1;
+	}
+}
+
+.template-list-add-new-template__template-list__contents {
+	> .components-button {
+		height: 100%;
+		text-align: start;
+		align-items: flex-start;
+	}
+}

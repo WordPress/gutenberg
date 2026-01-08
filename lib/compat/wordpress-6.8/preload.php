@@ -26,8 +26,8 @@ function gutenberg_block_editor_preload_paths_6_8( $paths, $context ) {
 				if ( 'page' === $post->post_type ) {
 					$paths[] = add_query_arg(
 						'slug',
-						// @see https://github.com/WordPress/gutenberg/blob/489f6067c623926bce7151a76755bb68d8e22ea7/packages/edit-site/src/components/sync-state-with-url/use-init-edited-entity-from-url.js#L139-L140
-						'page-' . $post->post_name,
+						// @see https://github.com/WordPress/gutenberg/blob/e093fefd041eb6cc4a4e7f67b92ab54fd75c8858/packages/core-data/src/private-selectors.ts#L244-L254
+						empty( $post->post_name ) ? 'page' : 'page-' . $post->post_name,
 						'/wp/v2/templates/lookup'
 					);
 				}
@@ -36,23 +36,6 @@ function gutenberg_block_editor_preload_paths_6_8( $paths, $context ) {
 
 		$paths[] = '/wp/v2/settings';
 		$paths[] = array( '/wp/v2/settings', 'OPTIONS' );
-		$paths[] = '/?_fields=' . implode(
-			',',
-			// @see packages/core-data/src/entities.js
-			array(
-				'description',
-				'gmt_offset',
-				'home',
-				'name',
-				'site_icon',
-				'site_icon_url',
-				'site_logo',
-				'timezone_string',
-				'default_template_part_areas',
-				'default_template_types',
-				'url',
-			)
-		);
 		$paths[] = '/wp/v2/templates/lookup?slug=front-page';
 		$paths[] = '/wp/v2/templates/lookup?slug=home';
 	}
@@ -85,12 +68,45 @@ function gutenberg_block_editor_preload_paths_6_8( $paths, $context ) {
 		 * See the call to `canUser()`, under `useGlobalStylesUserConfig()` in `packages/edit-site/src/components/use-global-styles-user-config/index.js`.
 		 * Please ensure that the equivalent check is kept in sync with this preload path.
 		 */
-		$context = current_user_can( 'edit_theme_options' ) ? 'edit' : 'view';
-		$paths[] = "/wp/v2/global-styles/$global_styles_id?context=$context";
+		$rest_context = current_user_can( 'edit_theme_options' ) ? 'edit' : 'view';
+		$paths[]      = "/wp/v2/global-styles/$global_styles_id?context=$rest_context";
 
 		// Used by getBlockPatternCategories in useBlockEditorSettings.
 		$paths[] = '/wp/v2/block-patterns/categories';
+		$paths[] = '/?_fields=' . implode(
+			',',
+			// @see packages/core-data/src/entities.js
+			array(
+				'description',
+				'gmt_offset',
+				'home',
+				'name',
+				'site_icon',
+				'site_icon_url',
+				'site_logo',
+				'timezone_string',
+				'url',
+				'page_for_posts',
+				'page_on_front',
+				'show_on_front',
+			)
+		);
 	}
+
+	if ( 'core/edit-post' === $context->name ) {
+		$slug = 'page' === $context->post->post_type ? 'page' : 'single-' . $context->post->post_type;
+		if ( ! empty( $context->post->post_name ) ) {
+			$slug .= '-' . $context->post->post_name;
+		}
+
+		$paths[] = add_query_arg(
+			'slug',
+			// @see https://github.com/WordPress/gutenberg/blob/e093fefd041eb6cc4a4e7f67b92ab54fd75c8858/packages/core-data/src/private-selectors.ts#L244-L254
+			$slug,
+			'/wp/v2/templates/lookup'
+		);
+	}
+
 	return $paths;
 }
 add_filter( 'block_editor_rest_api_preload_paths', 'gutenberg_block_editor_preload_paths_6_8', 10, 2 );

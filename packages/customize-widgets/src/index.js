@@ -56,7 +56,8 @@ export function initialize( editorName, blockEditorSettings ) {
 			block.name.startsWith( 'core/post' ) ||
 			block.name.startsWith( 'core/query' ) ||
 			block.name.startsWith( 'core/site' ) ||
-			block.name.startsWith( 'core/navigation' )
+			block.name.startsWith( 'core/navigation' ) ||
+			block.name.startsWith( 'core/term' )
 		);
 	} );
 	registerCoreBlocks( coreBlocks );

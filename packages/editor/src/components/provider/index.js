@@ -32,7 +32,6 @@ import useCommands from '../commands';
 import BlockRemovalWarnings from '../block-removal-warnings';
 import StartPageOptions from '../start-page-options';
 import KeyboardShortcutHelpModal from '../keyboard-shortcut-help-modal';
-import ContentOnlySettingsMenu from '../block-settings-menu/content-only-settings-menu';
 import StartTemplateOptions from '../start-template-options';
 import EditorKeyboardShortcuts from '../global-keyboard-shortcuts';
 import PatternRenameModal from '../pattern-rename-modal';
@@ -55,11 +54,6 @@ const NON_CONTEXTUAL_POST_TYPES = [
 	'wp_navigation',
 	'wp_template_part',
 ];
-
-/**
- * These are rendering modes that the editor supports.
- */
-const RENDERING_MODES = [ 'post-only', 'template-locked' ];
 
 /**
  * Depending on the post, template and template mode,
@@ -183,34 +177,33 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 					getEditorSelection,
 					getRenderingMode,
 					__unstableIsEditorReady,
-				} = select( editorStore );
-				const {
-					getEntitiesConfig,
-					getPostType,
-					hasFinishedResolution,
-				} = select( coreStore );
+					getDefaultRenderingMode,
+				} = unlock( select( editorStore ) );
+				const { getEntitiesConfig } = select( coreStore );
 
-				const postTypeSupports = getPostType( post.type )?.supports;
-				const hasLoadedPostObject = hasFinishedResolution(
-					'getPostType',
-					[ post.type ]
-				);
-
-				const _defaultMode = Array.isArray( postTypeSupports?.editor )
-					? postTypeSupports.editor.find(
-							( features ) => 'default_mode' in features
-					  )?.default_mode
-					: undefined;
-				const hasDefaultMode = RENDERING_MODES.includes( _defaultMode );
+				const _mode = getRenderingMode();
+				const _defaultMode = getDefaultRenderingMode( post.type );
+				/**
+				 * To avoid content "flash", wait until rendering mode has been resolved.
+				 * This is important for the initial render of the editor.
+				 *
+				 * - Wait for template to be resolved if the default mode is 'template-locked'.
+				 * - Wait for default mode to be resolved otherwise.
+				 */
+				const hasResolvedDefaultMode =
+					_defaultMode === 'template-locked'
+						? hasTemplate
+						: _defaultMode !== undefined;
+				// Wait until the default mode is retrieved and start rendering canvas.
+				const isRenderingModeReady = _defaultMode !== undefined;
 
 				return {
 					editorSettings: getEditorSettings(),
-					isReady: __unstableIsEditorReady() && hasLoadedPostObject,
-					mode: getRenderingMode(),
-					defaultMode:
-						hasTemplate && hasDefaultMode
-							? _defaultMode
-							: 'post-only',
+					isReady: __unstableIsEditorReady(),
+					mode: isRenderingModeReady ? _mode : undefined,
+					defaultMode: hasResolvedDefaultMode
+						? _defaultMode
+						: undefined,
 					selection: getEditorSelection(),
 					postTypeEntities:
 						post.type === 'wp_template'
@@ -221,7 +214,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 			[ post.type, hasTemplate ]
 		);
 
-		const shouldRenderTemplate = !! template && mode !== 'post-only';
+		const shouldRenderTemplate = hasTemplate && mode !== 'post-only';
 		const rootLevelPost = shouldRenderTemplate ? template : post;
 		const defaultBlockContext = useMemo( () => {
 			const postContext = {};
@@ -288,7 +281,8 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 			setEditedPost,
 			setRenderingMode,
 		} = unlock( useDispatch( editorStore ) );
-		const { createWarningNotice } = useDispatch( noticesStore );
+		const { createWarningNotice, removeNotice } =
+			useDispatch( noticesStore );
 
 		// Ideally this should be synced on each change and not just something you do once.
 		useLayoutEffect( () => {
@@ -324,7 +318,16 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 		// Synchronizes the active post with the state
 		useEffect( () => {
 			setEditedPost( post.type, post.id );
-		}, [ post.type, post.id, setEditedPost ] );
+			if (
+				typeof window !== 'undefined' &&
+				window.__experimentalTemplateActivate
+			) {
+				// Clear any notices dependent on the post context.
+				removeNotice( 'template-activate-notice' );
+			}
+
+			return () => setEditedPost( null, null );
+		}, [ post.type, post.id, setEditedPost, removeNotice ] );
 
 		// Synchronize the editor settings as they change.
 		useEffect( () => {
@@ -338,7 +341,9 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 
 		// Sets the right rendering mode when loading the editor.
 		useEffect( () => {
-			setRenderingMode( defaultMode );
+			if ( defaultMode ) {
+				setRenderingMode( defaultMode );
+			}
 		}, [ defaultMode, setRenderingMode ] );
 
 		useHideBlocksFromInserter( post.type, mode );
@@ -371,7 +376,6 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 								<>
 									<PatternsMenuItems />
 									<TemplatePartMenuItems />
-									<ContentOnlySettingsMenu />
 									{ mode === 'template-locked' && (
 										<DisableNonPageContentBlocks />
 									) }

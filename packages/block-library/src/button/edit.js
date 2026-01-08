@@ -1,32 +1,23 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * Internal dependencies
- */
-import { NEW_TAB_TARGET, NOFOLLOW_REL } from './constants';
-import { getUpdatedLinkAttributes } from './get-updated-link-attributes';
-import removeAnchorTag from '../utils/remove-anchor-tag';
-import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
-
-/**
- * WordPress dependencies
- */
 import { __, sprintf } from '@wordpress/i18n';
-import { useEffect, useState, useRef, useMemo } from '@wordpress/element';
+import {
+	useEffect,
+	useState,
+	useRef,
+	useMemo,
+	createInterpolateElement,
+} from '@wordpress/element';
 import {
 	TextControl,
 	ToolbarButton,
 	Popover,
+	ExternalLink,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 } from '@wordpress/components';
 import {
-	AlignmentControl,
 	BlockControls,
 	InspectorControls,
 	RichText,
@@ -41,6 +32,7 @@ import {
 	useBlockEditingMode,
 	getTypographyClassesAndStyles as useTypographyProps,
 	useSettings,
+	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { displayShortcut, isKeyboardEvent, ENTER } from '@wordpress/keycodes';
 import { link, linkOff } from '@wordpress/icons';
@@ -52,6 +44,14 @@ import {
 } from '@wordpress/blocks';
 import { useMergeRefs, useRefEffect } from '@wordpress/compose';
 import { useSelect, useDispatch } from '@wordpress/data';
+import { NEW_TAB_TARGET, NOFOLLOW_REL } from './constants';
+import { getUpdatedLinkAttributes } from './get-updated-link-attributes';
+import removeAnchorTag from '../utils/remove-anchor-tag';
+import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
+import { unlock } from '../lock-unlock';
+import useDeprecatedTextAlign from '../utils/deprecated-text-align-attributes';
+
+const { HTMLElementControl } = unlock( blockEditorPrivateApis );
 
 const LINK_SETTINGS = [
 	...LinkControl.DEFAULT_LINK_SETTINGS,
@@ -131,7 +131,6 @@ function WidthPanel( { selectedWidth, setAttributes } ) {
 				isShownByDefault
 				hasValue={ () => !! selectedWidth }
 				onDeselect={ () => setAttributes( { width: undefined } ) }
-				__nextHasNoMarginBottom
 			>
 				<ToggleGroupControl
 					label={ __( 'Width' ) }
@@ -141,7 +140,6 @@ function WidthPanel( { selectedWidth, setAttributes } ) {
 					}
 					isBlock
 					__next40pxDefaultSize
-					__nextHasNoMarginBottom
 				>
 					{ [ 25, 50, 75, 100 ].map( ( widthValue ) => {
 						return (
@@ -149,7 +147,7 @@ function WidthPanel( { selectedWidth, setAttributes } ) {
 								key={ widthValue }
 								value={ widthValue }
 								label={ sprintf(
-									/* translators: Percentage value. */
+									/* translators: %d: Percentage value. */
 									__( '%d%%' ),
 									widthValue
 								) }
@@ -175,7 +173,6 @@ function ButtonEdit( props ) {
 	} = props;
 	const {
 		tagName,
-		textAlign,
 		linkTarget,
 		placeholder,
 		rel,
@@ -185,6 +182,7 @@ function ButtonEdit( props ) {
 		width,
 		metadata,
 	} = attributes;
+	useDeprecatedTextAlign( props );
 
 	const TagName = tagName || 'a';
 
@@ -219,6 +217,63 @@ function ButtonEdit( props ) {
 	const nofollow = !! rel?.includes( NOFOLLOW_REL );
 	const isLinkTag = 'a' === TagName;
 
+	const {
+		createPageEntity,
+		userCanCreatePages,
+		lockUrlControls = false,
+	} = useSelect(
+		( select ) => {
+			if ( ! isSelected ) {
+				return {};
+			}
+
+			const _settings = select( blockEditorStore ).getSettings();
+
+			const blockBindingsSource = getBlockBindingsSource(
+				metadata?.bindings?.url?.source
+			);
+
+			return {
+				createPageEntity: _settings.__experimentalCreatePageEntity,
+				userCanCreatePages: _settings.__experimentalUserCanCreatePages,
+				lockUrlControls:
+					!! metadata?.bindings?.url &&
+					! blockBindingsSource?.canUserEditValue?.( {
+						select,
+						context,
+						args: metadata?.bindings?.url?.args,
+					} ),
+			};
+		},
+		[ context, isSelected, metadata?.bindings?.url ]
+	);
+
+	async function handleCreate( pageTitle ) {
+		const page = await createPageEntity( {
+			title: pageTitle,
+			status: 'draft',
+		} );
+
+		return {
+			id: page.id,
+			type: page.type,
+			title: page.title.rendered,
+			url: page.link,
+			kind: 'post-type',
+		};
+	}
+
+	function createButtonText( searchTerm ) {
+		return createInterpolateElement(
+			sprintf(
+				/* translators: %s: search term. */
+				__( 'Create page: <mark>%s</mark>' ),
+				searchTerm
+			),
+			{ mark: <mark /> }
+		);
+	}
+
 	function startEditing( event ) {
 		event.preventDefault();
 		setIsEditingURL( true );
@@ -249,29 +304,6 @@ function ButtonEdit( props ) {
 	const useEnterRef = useEnter( { content: text, clientId } );
 	const mergedRef = useMergeRefs( [ useEnterRef, richTextRef ] );
 
-	const { lockUrlControls = false } = useSelect(
-		( select ) => {
-			if ( ! isSelected ) {
-				return {};
-			}
-
-			const blockBindingsSource = getBlockBindingsSource(
-				metadata?.bindings?.url?.source
-			);
-
-			return {
-				lockUrlControls:
-					!! metadata?.bindings?.url &&
-					! blockBindingsSource?.canUserEditValue?.( {
-						select,
-						context,
-						args: metadata?.bindings?.url?.args,
-					} ),
-			};
-		},
-		[ context, isSelected, metadata?.bindings?.url ]
-	);
-
 	const [ fluidTypographySettings, layout ] = useSettings(
 		'typography.fluid',
 		'layout'
@@ -284,6 +316,10 @@ function ButtonEdit( props ) {
 			wideSize: layout?.wideSize,
 		},
 	} );
+
+	const hasNonContentControls = blockEditingMode === 'default';
+	const hasBlockControls =
+		hasNonContentControls || ( isLinkTag && ! lockUrlControls );
 
 	return (
 		<>
@@ -312,7 +348,6 @@ function ButtonEdit( props ) {
 						borderProps.className,
 						typographyProps.className,
 						{
-							[ `has-text-align-${ textAlign }` ]: textAlign,
 							// For backwards compatibility add style that isn't
 							// provided via block support.
 							'no-border-radius': style?.border?.radius === 0,
@@ -334,35 +369,24 @@ function ButtonEdit( props ) {
 					identifier="text"
 				/>
 			</div>
-			<BlockControls group="block">
-				{ blockEditingMode === 'default' && (
-					<AlignmentControl
-						value={ textAlign }
-						onChange={ ( nextAlign ) => {
-							setAttributes( { textAlign: nextAlign } );
-						} }
-					/>
-				) }
-				{ ! isURLSet && isLinkTag && ! lockUrlControls && (
-					<ToolbarButton
-						name="link"
-						icon={ link }
-						title={ __( 'Link' ) }
-						shortcut={ displayShortcut.primary( 'k' ) }
-						onClick={ startEditing }
-					/>
-				) }
-				{ isURLSet && isLinkTag && ! lockUrlControls && (
-					<ToolbarButton
-						name="link"
-						icon={ linkOff }
-						title={ __( 'Unlink' ) }
-						shortcut={ displayShortcut.primaryShift( 'k' ) }
-						onClick={ unlink }
-						isActive
-					/>
-				) }
-			</BlockControls>
+			{ hasBlockControls && (
+				<BlockControls group="block">
+					{ isLinkTag && ! lockUrlControls && (
+						<ToolbarButton
+							name="link"
+							icon={ ! isURLSet ? link : linkOff }
+							title={ ! isURLSet ? __( 'Link' ) : __( 'Unlink' ) }
+							shortcut={
+								! isURLSet
+									? displayShortcut.primary( 'k' )
+									: displayShortcut.primaryShift( 'k' )
+							}
+							onClick={ ! isURLSet ? startEditing : unlink }
+							isActive={ isURLSet }
+						/>
+					) }
+				</BlockControls>
+			) }
 			{ isLinkTag &&
 				isSelected &&
 				( isEditingURL || isURLSet ) &&
@@ -400,6 +424,11 @@ function ButtonEdit( props ) {
 							} }
 							forceIsEditingLink={ isEditingURL }
 							settings={ LINK_SETTINGS }
+							createSuggestion={
+								createPageEntity && handleCreate
+							}
+							withCreateSuggestion={ userCanCreatePages }
+							createSuggestionButtonText={ createButtonText }
 						/>
 					</Popover>
 				) }
@@ -410,11 +439,30 @@ function ButtonEdit( props ) {
 				/>
 			</InspectorControls>
 			<InspectorControls group="advanced">
+				<HTMLElementControl
+					tagName={ tagName }
+					onChange={ ( value ) =>
+						setAttributes( { tagName: value } )
+					}
+					options={ [
+						{ label: __( 'Default (<a>)' ), value: 'a' },
+						{ label: '<button>', value: 'button' },
+					] }
+				/>
 				{ isLinkTag && (
 					<TextControl
 						__next40pxDefaultSize
-						__nextHasNoMarginBottom
-						label={ __( 'Link rel' ) }
+						label={ __( 'Link relation' ) }
+						help={ createInterpolateElement(
+							__(
+								'The <a>Link Relation</a> attribute defines the relationship between a linked resource and the current document.'
+							),
+							{
+								a: (
+									<ExternalLink href="https://developer.mozilla.org/docs/Web/HTML/Attributes/rel" />
+								),
+							}
+						) }
 						value={ rel || '' }
 						onChange={ ( newRel ) =>
 							setAttributes( { rel: newRel } )

@@ -153,7 +153,6 @@ function ColumnInspectorControls( {
 		<ToolsPanel
 			label={ __( 'Settings' ) }
 			resetAll={ () => {
-				updateColumns( count, minCount );
 				setAttributes( {
 					isStackedOnMobile: true,
 				} );
@@ -161,36 +160,25 @@ function ColumnInspectorControls( {
 			dropdownMenuProps={ dropdownMenuProps }
 		>
 			{ canInsertColumnBlock && (
-				<ToolsPanelItem
-					label={ __( 'Columns' ) }
-					isShownByDefault
-					hasValue={ () => count }
-					onDeselect={ () => updateColumns( count, minCount ) }
-				>
-					<VStack spacing={ 4 }>
-						<RangeControl
-							__nextHasNoMarginBottom
-							__next40pxDefaultSize
-							label={ __( 'Columns' ) }
-							value={ count }
-							onChange={ ( value ) =>
-								updateColumns(
-									count,
-									Math.max( minCount, value )
-								)
-							}
-							min={ Math.max( 1, minCount ) }
-							max={ Math.max( 6, count ) }
-						/>
-						{ count > 6 && (
-							<Notice status="warning" isDismissible={ false }>
-								{ __(
-									'This column count exceeds the recommended amount and may cause visual breakage.'
-								) }
-							</Notice>
-						) }
-					</VStack>
-				</ToolsPanelItem>
+				<VStack spacing={ 4 } style={ { gridColumn: '1 / -1' } }>
+					<RangeControl
+						__next40pxDefaultSize
+						label={ __( 'Columns' ) }
+						value={ count }
+						onChange={ ( value ) =>
+							updateColumns( count, Math.max( minCount, value ) )
+						}
+						min={ Math.max( 1, minCount ) }
+						max={ Math.max( 6, count ) }
+					/>
+					{ count > 6 && (
+						<Notice status="warning" isDismissible={ false }>
+							{ __(
+								'This column count exceeds the recommended amount and may cause visual breakage.'
+							) }
+						</Notice>
+					) }
+				</VStack>
 			) }
 			<ToolsPanelItem
 				label={ __( 'Stack on mobile' ) }
@@ -203,7 +191,6 @@ function ColumnInspectorControls( {
 				}
 			>
 				<ToggleControl
-					__nextHasNoMarginBottom
 					label={ __( 'Stack on mobile' ) }
 					checked={ isStackedOnMobile }
 					onChange={ () =>

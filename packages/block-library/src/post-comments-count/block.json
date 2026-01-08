@@ -1,7 +1,6 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 3,
-	"__experimental": "fse",
 	"name": "core/post-comments-count",
 	"title": "Comments Count",
 	"category": "theme",
@@ -13,7 +12,11 @@
 		}
 	},
 	"usesContext": [ "postId" ],
+	"example": {
+		"viewportWidth": 350
+	},
 	"supports": {
+		"anchor": true,
 		"html": false,
 		"color": {
 			"gradients": true,
@@ -39,8 +42,15 @@
 				"fontSize": true
 			}
 		},
+		"__experimentalBorder": {
+			"radius": true,
+			"color": true,
+			"width": true,
+			"style": true
+		},
 		"interactivity": {
 			"clientNavigation": true
 		}
-	}
+	},
+	"style": "wp-block-post-comments-count"
 }

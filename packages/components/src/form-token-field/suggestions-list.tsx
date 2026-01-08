@@ -37,7 +37,6 @@ export function SuggestionsList<
 		( listNode ) => {
 			// only have to worry about scrolling selected suggestion into view
 			// when already expanded.
-			let rafId: number | undefined;
 			if (
 				selectedIndex > -1 &&
 				scrollIntoView &&
@@ -49,12 +48,6 @@ export function SuggestionsList<
 					inline: 'nearest',
 				} );
 			}
-
-			return () => {
-				if ( rafId !== undefined ) {
-					cancelAnimationFrame( rafId );
-				}
-			};
 		},
 		[ selectedIndex, scrollIntoView ]
 	);
@@ -72,13 +65,16 @@ export function SuggestionsList<
 	};
 
 	const computeSuggestionMatch = ( suggestion: T ) => {
-		const matchText = displayTransform( match ).toLocaleLowerCase();
+		const matchText = displayTransform( match )
+			.normalize( 'NFKC' )
+			.toLocaleLowerCase();
 		if ( matchText.length === 0 ) {
 			return null;
 		}
 
 		const transformedSuggestion = displayTransform( suggestion );
 		const indexOfMatch = transformedSuggestion
+			.normalize( 'NFKC' )
 			.toLocaleLowerCase()
 			.indexOf( matchText );
 

@@ -6,9 +6,9 @@ import { privateApis as routerPrivateApis } from '@wordpress/router';
 /**
  * Internal dependencies
  */
-import { NAVIGATION_POST_TYPE } from '../../utils/constants';
 import Editor from '../editor';
 import SidebarNavigationScreenNavigationMenu from '../sidebar-navigation-screen-navigation-menu';
+import SidebarNavigationScreenUnsupported from '../sidebar-navigation-screen-unsupported';
 import { unlock } from '../../lock-unlock';
 
 const { useLocation } = unlock( routerPrivateApis );
@@ -20,9 +20,7 @@ function MobileNavigationItemView() {
 	return canvas === 'edit' ? (
 		<Editor />
 	) : (
-		<SidebarNavigationScreenNavigationMenu
-			backPath={ { postType: NAVIGATION_POST_TYPE } }
-		/>
+		<SidebarNavigationScreenNavigationMenu backPath="/navigation" />
 	);
 }
 
@@ -30,10 +28,29 @@ export const navigationItemRoute = {
 	name: 'navigation-item',
 	path: '/wp_navigation/:postId',
 	areas: {
-		sidebar: (
-			<SidebarNavigationScreenNavigationMenu backPath="/navigation" />
-		),
-		preview: <Editor />,
-		mobile: <MobileNavigationItemView />,
+		sidebar( { siteData } ) {
+			const isBlockTheme = siteData.currentTheme?.is_block_theme;
+			return isBlockTheme ? (
+				<SidebarNavigationScreenNavigationMenu backPath="/navigation" />
+			) : (
+				<SidebarNavigationScreenUnsupported />
+			);
+		},
+		preview( { siteData } ) {
+			const isBlockTheme = siteData.currentTheme?.is_block_theme;
+			return isBlockTheme ? (
+				<Editor />
+			) : (
+				<SidebarNavigationScreenUnsupported />
+			);
+		},
+		mobile( { siteData } ) {
+			const isBlockTheme = siteData.currentTheme?.is_block_theme;
+			return isBlockTheme ? (
+				<MobileNavigationItemView />
+			) : (
+				<SidebarNavigationScreenUnsupported />
+			);
+		},
 	},
 };

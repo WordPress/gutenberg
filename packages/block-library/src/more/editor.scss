@@ -1,3 +1,6 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
+
 .block-editor-block-list__block[data-type="core/more"] {
 	max-width: 100%;
 	text-align: center;
@@ -11,27 +14,18 @@
 	white-space: nowrap;
 
 	// Label
-	input[type="text"] {
+	.rich-text {
 		position: relative;
 		font-size: $default-font-size;
 		text-transform: uppercase;
 		font-weight: 600;
 		font-family: $default-font;
 		color: $gray-700;
-		border: none;
-		box-shadow: none;
+		display: inline-flex;
 		white-space: nowrap;
 		text-align: center;
-		margin: 0;
-		border-radius: 4px;
 		background: $white;
-		padding: 6px 8px;
-		height: $button-size-small;
-		max-width: 100%;
-
-		&:focus {
-			box-shadow: none;
-		}
+		padding: 10px 36px;
 	}
 
 	// Dashed line

@@ -100,17 +100,32 @@ export type BoxControlProps = Pick< UnitControlProps, 'units' > &
 		 * @default false
 		 */
 		__next40pxDefaultSize?: boolean;
-		/**
-		 * Available presets to pick from.
-		 */
-		presets?: Preset[];
-		/**
-		 * The key of the preset to apply.
-		 * If you provide a list of presets, you must provide a preset key to use.
-		 * The format of preset selected values is going to be `var:preset|${ presetKey }|${ presetSlug }`
-		 */
-		presetKey?: string;
-	};
+	} & (
+		| {
+				/**
+				 * Available presets to pick from.
+				 */
+				presets?: never;
+				/**
+				 * The key of the preset to apply.
+				 * If you provide a list of presets, you must provide a preset key to use.
+				 * The format of preset selected values is going to be `var:preset|${ presetKey }|${ presetSlug }`
+				 */
+				presetKey?: never;
+		  }
+		| {
+				/**
+				 * Available presets to pick from.
+				 */
+				presets: Preset[];
+				/**
+				 * The key of the preset to apply.
+				 * If you provide a list of presets, you must provide a preset key to use.
+				 * The format of preset selected values is going to be `var:preset|${ presetKey }|${ presetSlug }`
+				 */
+				presetKey: string;
+		  }
+	);
 
 export type BoxControlInputControlProps = UnitControlPassthroughProps & {
 	onChange?: ( nextValues: BoxControlValue ) => void;

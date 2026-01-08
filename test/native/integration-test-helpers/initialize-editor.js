@@ -38,7 +38,7 @@ export async function initializeEditor( props, { component } = {} ) {
 	resolutionSpy.mockImplementation( ( selectorName, args ) => {
 		// The mobile editor only supports the `post-only` rendering mode, so we
 		// presume a resolved `getPostType` selector to unblock editor rendering.
-		if ( 'getPostType' === selectorName ) {
+		if ( [ 'getPostType', 'getCurrentTheme' ].includes( selectorName ) ) {
 			return true;
 		}
 

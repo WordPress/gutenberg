@@ -1,11 +1,16 @@
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/z-index" as *;
+
 .block-editor-block-lock-modal {
 	z-index: z-index(".block-editor-block-lock-modal");
+}
 
-	.components-modal__frame {
-		@include break-small() {
-			max-width: $break-mobile;
-		}
-	}
+.block-editor-block-lock-modal__options {
+	// Reset `fieldset` browser defaults.
+	border: 0;
+	padding: 0;
+	margin: 0;
 }
 
 .block-editor-block-lock-modal__options legend {
@@ -14,6 +19,9 @@
 }
 
 .block-editor-block-lock-modal__checklist {
+	// Reset `ul` browser defaults.
+	list-style: none;
+	padding: 0;
 	margin: 0;
 }
 

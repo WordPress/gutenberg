@@ -36,10 +36,7 @@ export default function EntityRecordItem( { record, checked, onChange } ) {
 			);
 
 			const { default_template_types: templateTypes = [] } =
-				select( coreStore ).getEntityRecord(
-					'root',
-					'__unstableBase'
-				) ?? {};
+				select( coreStore ).getCurrentTheme() ?? {};
 
 			return {
 				entityRecordTitle: getTemplateInfo( {
@@ -58,12 +55,12 @@ export default function EntityRecordItem( { record, checked, onChange } ) {
 		<>
 			<PanelRow>
 				<CheckboxControl
-					__nextHasNoMarginBottom
 					label={
 						decodeEntities( entityRecordTitle ) || __( 'Untitled' )
 					}
 					checked={ checked }
 					onChange={ onChange }
+					className="entities-saved-states__change-control"
 				/>
 			</PanelRow>
 			{ hasPostMetaChanges && (

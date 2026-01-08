@@ -1,54 +1,46 @@
 # Status of the sync experiment in Gutenberg
 
-The sync package is part of an ongoing research effort to lay the groundwork of Real-Time Collaboration in Gutenberg.
+The sync package provides an implementation of real-time collaboration in Gutenberg.
 
-Relevant docs:
+Relevant docs and discussions:
 
-- https://make.wordpress.org/core/2023/07/13/real-time-collaboration-architecture/
-- https://github.com/WordPress/gutenberg/issues/52593
-- https://docs.yjs.dev/
+-   https://make.wordpress.org/core/2023/07/13/real-time-collaboration-architecture/
+-   https://github.com/WordPress/gutenberg/issues/52593
+-   https://github.com/WordPress/gutenberg/discussions/65012
+-   https://docs.yjs.dev/
 
 ## Enable the experiment
 
-The experiment can be enabled in the "Guteberg > Experiments" page. When it is enabled (search for `gutenberg-sync-collaboration` in the codebase), the client receives two new pieces of data:
+The real-time collaboration experiment must be enabled on the "Gutenberg > Experiments" page. A WebRTC provider with HTTP signaling is used to connect peers.
 
-- `window.__experimentalEnableSync`: boolean. Used by the `core-data` package to determine whether to bootstrap and use the sync provider offered by the `sync` package.
-- `window.__experimentalCollaborativeEditingSecret`: string. A secret used by the `sync` package to create a secure connection among peers.
+When it is enabled, the following global variables are defined::
+
+-   `window.__experimentalEnableSync` (`boolean`): Used by the `core-data` package to determine whether entity syncing is available.
+-   `window.__experimentalCollaborativeEditingSecret` (`string`). A secret (stored in a WordPress option) used by the WebRTC provider to create a secure connection between peers.
 
 ## The data flow
 
-The current experiment updates `core-data` to leverage the YJS library for synchronization and merging changes. Each core-data entity record represents a YJS document and updates to the `--edit` record are broadcasted among peers.
+Each entity with sync enabled is represented by a CRDT (Yjs) document. Local edits (unsaved changes) to an entity record are applied to its CRDT document, which is synced with other peers via a provider. Those peers use the CRDT document to update their local state.
 
 These are the specific checkpoints:
 
-1. REGISTER.
-	- See `getSyncProvider().register( ... )` in `registerSyncConfigs`.
-	- Not all entity types are sync-enabled at the moment, look at those that declare a `syncConfig` and `syncObjectType` in `rootEntitiesConfig`.
-2. BOOTSTRAP.
-	- See `getSyncProvider().bootstrap( ... )` in `getEntityRecord`.
-	- The `bootstrap` function fetches the entity and sets up the callback that will dispatch the relevant Redux action when document changes are broadcasted from other peers.
-3. UPDATE.
-	- See `getSyncProvider().update( ... )` in `editEntityRecord`.
-	- Each change done by a peer to the `--edit` entity record (local changes, not persisted ones) is broadcasted to the others.
-	- The data that is shared is the whole block list.
+1. **CONFIG**: The entity's config defines a `syncConfig` property to enable syncing for that entity type and define its behavior.
+    - See `packages/core-data/src/entities.js`.
+    - Not all entities are sync-enabled; look for those that define a `syncConfig` property.
+    - Not all properties are synced; look for the `syncedProperties` set that is passed as an argument to various functions.
+2. **LOAD**: When an entity record is loaded for the first time and it supports syncing, it is loaded into the `syncManager` to provide handlers for various lifecycle events.
+    - See `getEntityRecord` in `packages/core-data/src/resolvers.js`.
+    - See `syncManager.load()` in this package.
+3. **LOCAL CHANGES**: When local changes are made to an entity record, it is applied to the entity's CRDT document, which is synced with peers.
+    - See `editEntityRecord` in `packages/core-data/src/actions.js`.
+    - See `syncManager.update()` in this package.
+4. **REMOTE CHANGES**: When an entity's CRDT document is updated by a remote peer, changes are extracted and the entity record is updated in the local store.
+    - See `updateEntityRecord` in this package.
 
-This is the data flow when the peer A makes a local change:
+While the Redux actions in `core-data` and the `syncManager` orchestrate this data flow, the behavior of what gets synced is controlled by the entity's `syncConfig`:
 
-- Peer A makes a local change.
-- Peer A triggers a `getSyncProvider().update( ... )` request (see `editEntityRecord`).
-- All peers (including A) receive the broadcasted change and execute the callback (see `updateHandler` in `createSyncProvider.bootstrap`).
-- All peers (including A) trigger a `EDIT_ENTITY_RECORD` redux action.
+-   `applyChangesToCRDTDoc` determines how (or if) local changes are applied to the CRDT document.
+-   `getChangesFromCRDTDoc` determines how (or if) changes from the CRDT document are extracted and applied to the entity record.
+-   `supports` is a hash that declares support for various sync features, present and future.
 
-## What works and what doesn't
-
-- Undo/redo does not work.
-- Changes can be persisted and the publish/update button should react accordingly for all peers.
-- Offline.
-	- Changes are stored in the browser's local storage (indexedDB) for each user/peer. Users can navigate away from the document and they'll see the changes when they come back.
-	- Offline changes can be deleted via visiting the browser's database in all peers, then reload the document.
-- Documents can get out of sync. For example:
-	- Two peers open the same document.
-	- One of them (A) leaves the document. Then, the remaining user (B) makes changes.
-	- When A comes back to the document, the changes B made are not visible to A.
-- Entities
-	- Not all entities are synced. For example, global styles are not. Look at the `base` entity config for an example (it declares `syncConfig` and `syncObjectType` properties).
+An entity's `syncConfig` "owns" the sync behavior of the entity (especially via `applyChangesToCRDTDoc` and `getChangesFromCRDTDoc`) and it should not delegate or leak that responsibility to other parts of the codebase.
