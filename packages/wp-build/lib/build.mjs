@@ -135,8 +135,7 @@ const styleBundlingPlugins = [
  *
  * @return {Object} esbuild plugin.
  */
-function wasmInlinePlugin() {
-	return {
+const wasmInlinePlugin= {
 		name: 'wasm-inline',
 		setup( build ) {
 			// Resolve .wasm imports from node_modules.
@@ -147,6 +146,7 @@ function wasmInlinePlugin() {
 					const require = createRequire(
 						args.resolveDir + '/index.js'
 					);
+					console.log( 'Resolving WASM module:', args.path );
 					try {
 						const resolved = require.resolve( args.path );
 						return {
@@ -177,7 +177,7 @@ function wasmInlinePlugin() {
 			);
 		},
 	};
-}
+
 
 /**
  * Normalize path separators for cross-platform compatibility.
@@ -1142,7 +1142,7 @@ async function transpilePackage( packageName ) {
 	};
 	const plugins = [
 		needsEmotionPlugin && emotionPlugin,
-		wasmInlinePlugin(),
+		wasmInlinePlugin,
 		externalizeAllExceptCssPlugin,
 		...styleBundlingPlugins,
 	].filter( Boolean );
