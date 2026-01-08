@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Preserve boolean HTML attributes during client-side navigation. ([#XXX](https://github.com/WordPress/gutenberg/pull/XXX))
+
 ## 6.36.0 (2025-11-26)
 
 ### Bug Fixes
