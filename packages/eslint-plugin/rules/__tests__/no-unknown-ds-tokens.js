@@ -42,6 +42,9 @@ ruleTester.run( 'no-unknown-ds-tokens', rule, {
 			errors: [
 				{
 					messageId: 'onlyKnownTokens',
+					data: {
+						tokenNames: "'--wpds-fake-color', '--wpds-also-fake'",
+					},
 				},
 			],
 		},
