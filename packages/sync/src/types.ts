@@ -12,6 +12,7 @@ import type * as Y from 'yjs';
  * Internal dependencies
  */
 import type { WORDPRESS_META_KEY_FOR_CRDT_DOC_PERSISTENCE } from './config';
+import { AwarenessState } from './awareness/awareness-state';
 
 /* globalThis */
 declare global {
@@ -55,7 +56,8 @@ export interface ProviderCreatorResult {
 export type ProviderCreator = (
 	objectType: ObjectType,
 	objectId: ObjectID,
-	ydoc: Y.Doc
+	ydoc: Y.Doc,
+	awareness: AwarenessState | undefined
 ) => Promise< ProviderCreatorResult >;
 
 export interface RecordHandlers {
