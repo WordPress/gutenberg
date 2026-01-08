@@ -49,6 +49,7 @@
 		"@storybook/addon-a11y": "9.1.17",
 		"@storybook/addon-docs": "^9.1.17",
 		"@storybook/addon-webpack5-compiler-babel": "3.0.3",
+		"@shopify/web-worker": "^6.4.0",
 		"@storybook/icons": "1.4.0",
 		"@storybook/react-webpack5": "9.1.17",
 		"@testing-library/jest-dom": "^6.6.3",

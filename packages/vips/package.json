@@ -38,10 +38,16 @@
 			"import": "./build-module/index.mjs",
 			"default": "./build/index.cjs"
 		},
+		"./worker": {
+			"types": "./build-types/vips-worker.d.ts",
+			"import": "./build-module/vips-worker.mjs",
+			"default": "./build/vips-worker.cjs"
+		},
 		"./package.json": "./package.json"
 	},
 	"types": "build-types",
 	"dependencies": {
+		"@shopify/web-worker": "^6.4.0",
 		"wasm-vips": "^0.0.10"
 	},
 	"publishConfig": {
