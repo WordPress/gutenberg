@@ -18,7 +18,11 @@ _This package assumes that your code will run in an **ES2015+** environment. If 
 
 ### NAVIGATION_OVERLAY_TEMPLATE_PART_AREA
 
-Undocumented declaration.
+Template part area identifier for navigation overlays. This constant defines the area name used when registering and filtering template parts that are specifically designed for navigation overlay layouts.
+
+_Type_
+
+-   `string`
 
 ### registerCoreBlocks
 
