@@ -27,7 +27,6 @@ import { link as linkIcon, removeSubmenu } from '@wordpress/icons';
 import { speak } from '@wordpress/a11y';
 import { createBlock } from '@wordpress/blocks';
 import { useMergeRefs, usePrevious } from '@wordpress/compose';
-import { decodeEntities } from '@wordpress/html-entities';
 
 /**
  * Internal dependencies
@@ -39,6 +38,7 @@ import {
 	updateAttributes,
 	useEntityBinding,
 	useIsInvalidLink,
+	InvalidDraftDisplay,
 } from '../navigation-link/shared';
 import {
 	getColors,
@@ -443,26 +443,12 @@ export default function NavigationSubmenuEdit( {
 						</>
 					) }
 					{ ( isInvalid || isDraft ) && (
-						<div
-							className={ clsx(
-								'wp-block-navigation-link__placeholder-text',
-								'wp-block-navigation-item__label',
-								{
-									'is-invalid': isInvalid,
-									'is-draft': isDraft,
-								}
-							) }
-						>
-							<span>
-								{ `${ decodeEntities( label ) } ${
-									isInvalid
-										? /* translators: Indicating that the navigation link is Invalid. */
-										  `(${ __( 'Invalid' ) })`
-										: /* translators: Indicating that the navigation link is a Draft. */
-										  `(${ __( 'Draft' ) })`
-								}`.trim() }
-							</span>
-						</div>
+						<InvalidDraftDisplay
+							label={ label }
+							isInvalid={ isInvalid }
+							isDraft={ isDraft }
+							className="wp-block-navigation-item__label"
+						/>
 					) }
 					{ ! openSubmenusOnClick && isLinkOpen && (
 						<LinkUI

@@ -14,3 +14,4 @@ export {
 export { LinkUI } from '../link-ui';
 export { useHandleLinkChange } from './use-handle-link-change';
 export { useIsInvalidLink } from './use-is-invalid-link';
+export { InvalidDraftDisplay } from './invalid-draft-display';

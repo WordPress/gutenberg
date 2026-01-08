@@ -26,7 +26,6 @@ import {
 } from '@wordpress/block-editor';
 import { isURL, prependHTTP } from '@wordpress/url';
 import { useState, useEffect, useRef, useCallback } from '@wordpress/element';
-import { decodeEntities } from '@wordpress/html-entities';
 import { link as linkIcon, addSubmenu } from '@wordpress/icons';
 import { useMergeRefs, useInstanceId } from '@wordpress/compose';
 
@@ -41,6 +40,7 @@ import {
 	MissingEntityHelpText,
 	useHandleLinkChange,
 	useIsInvalidLink,
+	InvalidDraftDisplay,
 } from './shared';
 
 const DEFAULT_BLOCK = { name: 'core/navigation-link' };
@@ -436,10 +436,6 @@ export default function NavigationLinkEdit( {
 	} );
 
 	const missingText = getMissingText( type );
-	/* translators: Whether the navigation link is Invalid or a Draft. */
-	const placeholderText = `(${
-		isInvalid ? __( 'Invalid' ) : __( 'Draft' )
-	})`;
 
 	return (
 		<>
@@ -521,31 +517,12 @@ export default function NavigationLinkEdit( {
 								</>
 							) }
 							{ ( isInvalid || isDraft ) && (
-								<div
-									className={ clsx(
-										'wp-block-navigation-link__placeholder-text',
-										'wp-block-navigation-link__label',
-										{
-											'is-invalid': isInvalid,
-											'is-draft': isDraft,
-										}
-									) }
-								>
-									<span>
-										{
-											// Some attributes are stored in an escaped form. It's a legacy issue.
-											// Ideally they would be stored in a raw, unescaped form.
-											// Unescape is used here to "recover" the escaped characters
-											// so they display without encoding.
-											// See `updateAttributes` for more details.
-											`${ decodeEntities( label ) } ${
-												isInvalid || isDraft
-													? placeholderText
-													: ''
-											}`.trim()
-										}
-									</span>
-								</div>
+								<InvalidDraftDisplay
+									label={ label }
+									isInvalid={ isInvalid }
+									isDraft={ isDraft }
+									className="wp-block-navigation-link__label"
+								/>
 							) }
 						</>
 					) }
