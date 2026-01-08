@@ -27,6 +27,8 @@ import { link as linkIcon, removeSubmenu } from '@wordpress/icons';
 import { speak } from '@wordpress/a11y';
 import { createBlock } from '@wordpress/blocks';
 import { useMergeRefs, usePrevious } from '@wordpress/compose';
+import { decodeEntities } from '@wordpress/html-entities';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -102,6 +104,72 @@ const useIsDraggingWithin = ( elementRef ) => {
 };
 
 /**
+ * A React hook to determine if the submenu's parent link is invalid.
+ *
+ * @param {string}  kind    The kind of link (post-type, custom, taxonomy, etc).
+ * @param {string}  type    The type of post (post, page, etc).
+ * @param {number}  id      The post or term id.
+ * @param {boolean} enabled Whether to enable the validation check.
+ *
+ * @return {Array} Array containing [isInvalid, isDraft] booleans.
+ */
+const useIsInvalidLink = ( kind, type, id, enabled ) => {
+	const isPostType =
+		kind === 'post-type' || type === 'post' || type === 'page';
+	const hasId = Number.isInteger( id );
+	const blockEditingMode = useBlockEditingMode();
+
+	const { postStatus, isDeleted } = useSelect(
+		( select ) => {
+			if ( ! isPostType ) {
+				return { postStatus: null, isDeleted: false };
+			}
+
+			// Fetching the posts status is an "expensive" operation. Especially for sites with large navigations.
+			// When the block is rendered in a template or other disabled contexts we can skip this check in order
+			// to avoid all these additional requests that don't really add any value in that mode.
+			if ( blockEditingMode === 'disabled' || ! enabled ) {
+				return { postStatus: null, isDeleted: false };
+			}
+
+			const { getEntityRecord, hasFinishedResolution } =
+				select( coreStore );
+			const entityRecord = getEntityRecord( 'postType', type, id );
+			const hasResolved = hasFinishedResolution( 'getEntityRecord', [
+				'postType',
+				type,
+				id,
+			] );
+
+			// If resolution has finished and entityRecord is undefined, the entity was deleted.
+			const deleted = hasResolved && entityRecord === undefined;
+
+			return {
+				postStatus: entityRecord?.status,
+				isDeleted: deleted,
+			};
+		},
+		[ isPostType, blockEditingMode, enabled, type, id ]
+	);
+
+	// Check Navigation Link validity if:
+	// 1. Link is 'post-type'.
+	// 2. It has an id.
+	// 3. It's neither null, nor undefined, as valid items might be either of those while loading.
+	// If those conditions are met, check if
+	// 1. The post status is trash (trashed).
+	// 2. The entity doesn't exist (deleted).
+	// If either of those is true, invalidate.
+	const isInvalid =
+		isPostType &&
+		hasId &&
+		( isDeleted || ( postStatus && 'trash' === postStatus ) );
+	const isDraft = 'draft' === postStatus;
+
+	return [ isInvalid, isDraft ];
+};
+
+/**
  * @typedef {'post-type'|'custom'|'taxonomy'|'post-type-archive'} WPNavigationLinkKind
  */
 
@@ -128,7 +196,7 @@ export default function NavigationSubmenuEdit( {
 	context,
 	clientId,
 } ) {
-	const { label, url, description } = attributes;
+	const { label, url, description, kind, type, id } = attributes;
 
 	const {
 		showSubmenuIcon,
@@ -165,6 +233,7 @@ export default function NavigationSubmenuEdit( {
 		hasChildren,
 		selectedBlockHasChildren,
 		onlyDescendantIsEmptyLink,
+		validateLinkStatus,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -193,6 +262,16 @@ export default function NavigationSubmenuEdit( {
 					! singleBlock?.attributes?.label;
 			}
 
+			const rootNavigationId = getBlockParentsByBlockName(
+				clientId,
+				'core/navigation'
+			)[ 0 ];
+
+			// Enable when the root Navigation block is selected or any of its inner blocks.
+			const enableLinkStatusValidation =
+				selectedBlockId === rootNavigationId ||
+				hasSelectedInnerBlock( rootNavigationId, true );
+
 			return {
 				parentCount: getBlockParentsByBlockName(
 					clientId,
@@ -209,12 +288,21 @@ export default function NavigationSubmenuEdit( {
 				hasChildren: !! getBlockCount( clientId ),
 				selectedBlockHasChildren: !! selectedBlockChildren?.length,
 				onlyDescendantIsEmptyLink: _onlyDescendantIsEmptyLink,
+				validateLinkStatus: enableLinkStatusValidation,
 			};
 		},
 		[ clientId ]
 	);
 
 	const prevHasChildren = usePrevious( hasChildren );
+
+	// Check if the submenu's parent link is invalid or draft
+	const [ isInvalid, isDraft ] = useIsInvalidLink(
+		kind,
+		type,
+		id,
+		validateLinkStatus
+	);
 
 	// Show the LinkControl on mount if the URL is empty
 	// ( When adding a new menu item)
@@ -392,29 +480,55 @@ export default function NavigationSubmenuEdit( {
 			</InspectorControls>
 			<div { ...blockProps }>
 				<ParentElement className="wp-block-navigation-item__content">
-					<RichText
-						ref={ ref }
-						identifier="label"
-						className="wp-block-navigation-item__label"
-						value={ label }
-						onChange={ ( labelValue ) =>
-							setAttributes( { label: labelValue } )
-						}
-						onMerge={ mergeBlocks }
-						onReplace={ onReplace }
-						aria-label={ __( 'Navigation link text' ) }
-						placeholder={ itemLabelPlaceholder }
-						withoutInteractiveFormatting
-						onClick={ () => {
-							if ( ! openSubmenusOnClick && ! url ) {
-								setIsLinkOpen( true );
-							}
-						} }
-					/>
-					{ description && (
-						<span className="wp-block-navigation-item__description">
-							{ description }
-						</span>
+					{ ! isInvalid && ! isDraft && (
+						<>
+							<RichText
+								ref={ ref }
+								identifier="label"
+								className="wp-block-navigation-item__label"
+								value={ label }
+								onChange={ ( labelValue ) =>
+									setAttributes( { label: labelValue } )
+								}
+								onMerge={ mergeBlocks }
+								onReplace={ onReplace }
+								aria-label={ __( 'Navigation link text' ) }
+								placeholder={ itemLabelPlaceholder }
+								withoutInteractiveFormatting
+								onClick={ () => {
+									if ( ! openSubmenusOnClick && ! url ) {
+										setIsLinkOpen( true );
+									}
+								} }
+							/>
+							{ description && (
+								<span className="wp-block-navigation-item__description">
+									{ description }
+								</span>
+							) }
+						</>
+					) }
+					{ ( isInvalid || isDraft ) && (
+						<div
+							className={ clsx(
+								'wp-block-navigation-link__placeholder-text',
+								'wp-block-navigation-item__label',
+								{
+									'is-invalid': isInvalid,
+									'is-draft': isDraft,
+								}
+							) }
+						>
+							<span>
+								{ `${ decodeEntities( label ) } ${
+									isInvalid
+										? /* translators: Indicating that the navigation link is Invalid. */
+										  `(${ __( 'Invalid' ) })`
+										: /* translators: Indicating that the navigation link is a Draft. */
+										  `(${ __( 'Draft' ) })`
+								}`.trim() }
+							</span>
+						</div>
 					) }
 					{ ! openSubmenusOnClick && isLinkOpen && (
 						<LinkUI
