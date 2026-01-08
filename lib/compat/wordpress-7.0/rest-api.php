@@ -55,13 +55,9 @@ add_filter( 'register_wp_template_part_post_type_args', 'gutenberg_modify_wp_tem
  * @return array Modified array of template part area definitions.
  */
 if ( gutenberg_is_experiment_enabled( 'gutenberg-customizable-navigation-overlays' ) ) {
-	// Ensure the constant is defined.
-	if ( ! defined( 'GUTENBERG_NAVIGATION_OVERLAY_TEMPLATE_PART_AREA' ) ) {
-		require_once __DIR__ . '/../../packages/block-library/src/navigation/index.php';
-	}
 	function gutenberg_register_overlay_template_part_area( $areas ) {
 		$areas[] = array(
-			'area'        => GUTENBERG_NAVIGATION_OVERLAY_TEMPLATE_PART_AREA,
+			'area'        => 'navigation-overlay',
 			'label'       => __( 'Navigation Overlay', 'gutenberg' ),
 			'description' => __( 'Custom overlay area for navigation overlays.', 'gutenberg' ),
 			'icon'        => 'overlay',
