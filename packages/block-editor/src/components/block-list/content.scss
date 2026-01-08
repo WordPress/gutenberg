@@ -108,6 +108,8 @@ _::-webkit-full-page-media, _:future, :root [data-has-multi-selection="true"] .b
 		height: 0;
 		border: none !important;
 		padding: 0 !important;
+		opacity: 0;
+		margin: 0 !important;
 	}
 
 	&.is-layout-flex:not(.is-vertical) > .is-block-hidden {

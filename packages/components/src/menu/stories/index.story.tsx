@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { StoryObj, Meta } from '@storybook/react';
+import type { StoryObj, Meta } from '@storybook/react-webpack5';
 import { css } from '@emotion/react';
 import { fn } from 'storybook/test';
 

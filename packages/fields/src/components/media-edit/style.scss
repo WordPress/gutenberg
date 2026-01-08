@@ -1,6 +1,12 @@
 @use "@wordpress/base-styles/colors" as *;
 @use "@wordpress/base-styles/variables" as *;
 
+@mixin preview-overlay {
+	border-radius: $radius-x-small;
+	backdrop-filter: blur(16px) saturate(180%);
+	background: rgba(255, 255, 255, 0.75);
+}
+
 fieldset.fields__media-edit {
 	// Reset `fieldset` browser defaults.
 	border: 0;
@@ -9,7 +15,10 @@ fieldset.fields__media-edit {
 
 	width: 100%;
 
-	.fields__media-edit-row {
+	/* stylelint-disable-next-line property-no-unknown -- '@container' not globally permitted */
+	container-type: inline-size;
+
+	.fields__media-edit-compact {
 		display: grid;
 		grid-template-columns: 1fr auto;
 		gap: $grid-unit-10;
@@ -39,8 +48,8 @@ fieldset.fields__media-edit {
 	.fields__media-edit-filename,
 	.fields__media-edit-placeholder {
 		flex: 1;
+		width: 100%;
 		min-width: 0;
-		color: $gray-900;
 	}
 
 	.fields__media-edit-placeholder {
@@ -52,5 +61,129 @@ fieldset.fields__media-edit {
 		aspect-ratio: 1 / 1;
 		flex-shrink: 0;
 		border-radius: $radius-small;
+	}
+
+	.fields__media-edit-expanded {
+		// Always use grid layout
+		display: grid;
+		gap: $grid-unit-10;
+
+		.fields__media-edit-expanded-preview {
+			position: relative;
+			width: 100%;
+			aspect-ratio: 3/2;
+			border-radius: $radius-small;
+			padding: $grid-unit-05;
+			overflow: hidden;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+
+			.fields__media-edit-expanded-preview-stack {
+				width: 100%;
+				height: 100%;
+			}
+		}
+
+		.fields__media-edit-expanded-overlay {
+			position: absolute;
+			top: 0;
+			left: 0;
+			right: 0;
+			bottom: 0;
+			opacity: 0;
+			pointer-events: none;
+
+			@media not (prefers-reduced-motion) {
+				transition: opacity 50ms ease-out;
+			}
+
+			* {
+				pointer-events: auto;
+			}
+		}
+
+		.fields__media-edit-expanded-remove {
+			position: absolute;
+			top: $grid-unit-10;
+			right: $grid-unit-10;
+			@include preview-overlay;
+		}
+
+		.fields__media-edit-expanded-title {
+			position: absolute;
+			bottom: 0;
+			left: 0;
+			right: 0;
+			margin: $grid-unit-10;
+			padding: $grid-unit-05;
+			text-align: center;
+			@include preview-overlay;
+		}
+
+		.fields__media-edit-expanded-item {
+			position: relative;
+			min-width: 0;
+
+			&:hover,
+			&:focus-within {
+				.fields__media-edit-expanded-overlay {
+					opacity: 1;
+				}
+			}
+
+			&:not(.has-preview-image) {
+				.fields__media-edit-expanded-preview-stack {
+					padding: $grid-unit-10;
+				}
+			}
+		}
+
+		.fields__media-edit-thumbnail {
+			width: 100%;
+			height: 100%;
+			object-fit: cover;
+			object-position: 50% 50%;
+		}
+
+		.fields__media-edit-filename {
+			text-align: center;
+			flex: none;
+		}
+
+		&.is-single {
+			grid-template-columns: 1fr;
+
+			.fields__media-edit-expanded-preview {
+				aspect-ratio: 2/1;
+			}
+		}
+
+		&.is-multiple:not(.is-empty) {
+			grid-template-columns: repeat(3, 1fr);
+
+			/* stylelint-disable-next-line property-no-unknown -- '@container' not globally permitted */
+			@container (max-width: 768px) {
+				grid-template-columns: repeat(2, 1fr);
+			}
+
+			/* stylelint-disable-next-line property-no-unknown -- '@container' not globally permitted */
+			@container (max-width: 280px) {
+				grid-template-columns: 1fr;
+			}
+		}
+
+		&:not(.is-empty) {
+			.fields__media-edit-picker-button {
+				padding: 0;
+			}
+
+			.fields__media-edit-placeholder {
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				aspect-ratio: 3/2;
+			}
+		}
 	}
 }
