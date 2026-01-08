@@ -174,7 +174,7 @@ class WP_Block_Supports_Block_Visibility_Test extends WP_UnitTestCase {
 		$actual_stylesheet = gutenberg_style_engine_get_stylesheet_from_context( 'block-supports' );
 
 		$this->assertSame(
-			'@media (max-width: 599px){.wp-block-hidden-mobile{display:none !important;}}',
+			'@media (max-width: 480px){.wp-block-hidden-mobile{display:none !important;}}',
 			$actual_stylesheet,
 			'CSS should contain mobile visibility rule'
 		);
@@ -207,7 +207,7 @@ class WP_Block_Supports_Block_Visibility_Test extends WP_UnitTestCase {
 		$actual_stylesheet = gutenberg_style_engine_get_stylesheet_from_context( 'block-supports' );
 
 		$this->assertSame(
-			'@media (min-width: calc(599px + 1px)) and (max-width: 959px){.wp-block-hidden-tablet{display:none !important;}}',
+			'@media (min-width: calc(480px + 1px)) and (max-width: 782px){.wp-block-hidden-tablet{display:none !important;}}',
 			$actual_stylesheet,
 			'CSS should contain tablet visibility rule'
 		);
@@ -240,7 +240,7 @@ class WP_Block_Supports_Block_Visibility_Test extends WP_UnitTestCase {
 		$actual_stylesheet = gutenberg_style_engine_get_stylesheet_from_context( 'block-supports' );
 
 		$this->assertSame(
-			'@media (min-width: calc(959px + 1px)){.wp-block-hidden-desktop{display:none !important;}}',
+			'@media (min-width: calc(782px + 1px)){.wp-block-hidden-desktop{display:none !important;}}',
 			$actual_stylesheet,
 			'CSS should contain desktop visibility rule'
 		);
@@ -278,7 +278,7 @@ class WP_Block_Supports_Block_Visibility_Test extends WP_UnitTestCase {
 		$actual_stylesheet = gutenberg_style_engine_get_stylesheet_from_context( 'block-supports' );
 
 		$this->assertSame(
-			'@media (min-width: calc(959px + 1px)){.wp-block-hidden-desktop{display:none !important;}}@media (max-width: 599px){.wp-block-hidden-mobile{display:none !important;}}',
+			'@media (min-width: calc(782px + 1px)){.wp-block-hidden-desktop{display:none !important;}}@media (max-width: 480px){.wp-block-hidden-mobile{display:none !important;}}',
 			$actual_stylesheet,
 			'CSS should contain both visibility rules'
 		);

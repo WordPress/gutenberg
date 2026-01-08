@@ -12,7 +12,7 @@ import { getTransformedAttributes } from '../utils/get-transformed-attributes';
 const transforms = {
 	from: [
 		{
-			type: 'enter',
+			type: 'input',
 			regExp: /^```$/,
 			transform: () => createBlock( 'core/code' ),
 		},

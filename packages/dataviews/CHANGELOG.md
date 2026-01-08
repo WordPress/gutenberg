@@ -11,6 +11,8 @@
 - Reorganize internal code. [#74188](https://github.com/WordPress/gutenberg/pull/74188)
 - Improve stories and tests. [#74192](https://github.com/WordPress/gutenberg/pull/74192)
 - Update DataForm stories. [#74196](https://github.com/WordPress/gutenberg/pull/74196)
+- Fix missing dependencies. [#74310](https://github.com/WordPress/gutenberg/pull/74310)
+- Add details layout to DataForm validation story. [#74445](https://github.com/WordPress/gutenberg/pull/74445)
 
 ### Bug Fixes
 
@@ -35,6 +37,8 @@
 - DataViews: Simplify list layout field color styles. [#73884](https://github.com/WordPress/gutenberg/pull/73884)
 - DataViews: Add panel form layout validation. [#73700](https://github.com/WordPress/gutenberg/pull/73700)
 - Converted package to a compliant dual CJS/ESM module ([#73822](https://github.com/WordPress/gutenberg/pull/73822) and [#74348](https://github.com/WordPress/gutenberg/pull/74348))
+- Add density preference support to List view with compact, balanced (default), and comfortable options. ([#71050](https://github.com/WordPress/gutenberg/pull/71050))
+
 
 ## 11.0.0 (2025-11-26)
 

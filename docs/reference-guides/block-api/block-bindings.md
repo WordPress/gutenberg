@@ -425,26 +425,6 @@ function wpmovies_format_visualization_date( $value, $name ) {
 add_filter( 'block_bindings_source_value', 'wpmovies_format_visualization_date', 10, 2 );
 ```
 
-#### Customizing supported attributes filter
-
-_**Note:** Since WordPress 6.9._
-
-The `block_bindings_supported_attributes_{$block_type}` filter allows developers to customize which of a block's attributes can be connected to a Block Bindings source. This filter enables the Block Bindings UI in the editor for the specified attributes.
-
-This filter provides a way to extend or restrict which attributes of a specific block type can be bound to dynamic sources. The attributes registered through this filter will appear as options in the block binding interface.
-
-<div class="callout callout-warning">This filter has no impact on pattern overrides as they are handled independently.</div>
-
-Example:
-
-```php
-// Allow binding the 'caption' attribute for image blocks
-add_filter( 'block_bindings_supported_attributes_core/image', function( $supported_attributes ) {
-    $supported_attributes[] = 'caption';
-    return $supported_attributes;
-} );
-```
-
 #### Server registration Core examples
 
 There are a few examples in Core that can be used as reference.
