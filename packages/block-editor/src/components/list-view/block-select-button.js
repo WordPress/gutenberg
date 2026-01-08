@@ -67,6 +67,7 @@ function ListViewBlockSelectButton(
 		canToggleBlockVisibility,
 		isBlockHidden,
 		hasPatternName,
+		isNavigationLink,
 	} = useSelect(
 		( select ) => {
 			const { getBlockName, getBlockAttributes } =
@@ -89,6 +90,9 @@ function ListViewBlockSelectButton(
 				),
 				isBlockHidden: _isBlockHidden( clientId ),
 				hasPatternName: !! blockAttributes?.metadata?.patternName,
+				// Navigation link blocks have a `type` attribute (e.g., 'page', 'post', 'custom').
+				// These blocks don't support renaming via the block settings menu.
+				isNavigationLink: !! blockAttributes?.type,
 			};
 		},
 		[ clientId ]
@@ -98,7 +102,9 @@ function ListViewBlockSelectButton(
 		canToggleBlockVisibility && isBlockHidden;
 	const isSticky = blockInformation?.positionType === 'sticky';
 	const images = useListViewImages( { clientId, isExpanded } );
-	const canRename = useBlockRename( blockName ) && ! isContentOnly;
+	const { canRename: blockSupportsRename } = useBlockRename( blockName );
+	const canRename =
+		blockSupportsRename && ! isContentOnly && ! isNavigationLink;
 	const [ isRenameModalOpen, setIsRenameModalOpen ] = useState( false );
 
 	// The `href` attribute triggers the browser's native HTML drag operations.
