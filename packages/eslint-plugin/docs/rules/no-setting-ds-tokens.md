@@ -2,6 +2,8 @@
 
 Design System tokens (CSS custom properties beginning with `--wpds-`) are meant to be consumed, not set. Setting these properties in inline styles can lead to unexpected behavior and breaks the Design System's theming capabilities.
 
+This rule lints JSX inline styles. For CSS files, use the corresponding Stylelint rule from the `@wordpress/theme` package.
+
 ## Rule details
 
 Examples of **incorrect** code for this rule:
