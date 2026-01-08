@@ -177,8 +177,6 @@ export function createSyncManager(): SyncManager {
 			undoManager = createUndoManager();
 		}
 
-		const onStateUpdate = createStateUpdateObserver( ydoc );
-
 		const { addUndoMeta, restoreUndoMeta } = handlers;
 		undoManager.addToScope( recordMap, {
 			addUndoMeta,
@@ -209,6 +207,11 @@ export function createSyncManager(): SyncManager {
 		// Attach observers.
 		recordMap.observeDeep( onRecordUpdate );
 		recordMetaMap.observe( onRecordMetaUpdate );
+
+		const onStateUpdate = createVersionObserver( ydoc, () => {
+			// Disconnect providers when outdated client is detected
+			providerResults.forEach( ( result ) => result.destroy() );
+		} );
 		stateMap.observe( onStateUpdate );
 
 		// Get and apply the persisted CRDT document, if it exists.
@@ -276,8 +279,6 @@ export function createSyncManager(): SyncManager {
 			} );
 		};
 
-		const onStateUpdate = createStateUpdateObserver( ydoc );
-
 		const collectionState: CollectionState = {
 			handlers,
 			syncConfig,
@@ -296,6 +297,11 @@ export function createSyncManager(): SyncManager {
 
 		// Attach observers.
 		recordMetaMap.observe( onRecordMetaUpdate );
+
+		const onStateUpdate = createVersionObserver( ydoc, () => {
+			// Disconnect providers when outdated client is detected
+			providerResults.forEach( ( result ) => result.destroy() );
+		} );
 		stateMap.observe( onStateUpdate );
 
 		// Announce our CRDT version to the network
@@ -528,12 +534,17 @@ export function createSyncManager(): SyncManager {
 	}
 
 	/**
-	 * Observe state updates and check for version mismatches.
+	 * Observe state updates for version changes and invoke the callback if
+	 * the current client's version is lower than the remote version.
 	 *
-	 * @param {CRDTDoc} ydoc The Yjs document to observe.
+	 * @param {CRDTDoc}  ydoc               The Yjs document to observe.
+	 * @param {Function} onOutdatedCallback Callback to invoke when an outdated client is detected.
 	 * @return {Function} The observer function.
 	 */
-	function createStateUpdateObserver( ydoc: CRDTDoc ) {
+	function createVersionObserver(
+		ydoc: CRDTDoc,
+		onOutdatedCallback: () => void
+	) {
 		return (
 			event: Y.YMapEvent< unknown >,
 			transaction: Y.Transaction
@@ -551,17 +562,13 @@ export function createSyncManager(): SyncManager {
 							CRDT_STATE_VERSION_KEY
 						) as number | undefined;
 
-						// Warn if the remote version is HIGHER than ours (we're outdated)
+						// Callback if the remote version is higher than the
+						// current client's version.
 						if (
-							typeof remoteVersion !== 'undefined' &&
+							remoteVersion !== undefined &&
 							remoteVersion > CRDT_DOC_VERSION
 						) {
-							console.log(
-								'Outdated client detected! We have',
-								CRDT_DOC_VERSION,
-								'network has version',
-								remoteVersion
-							);
+							onOutdatedCallback();
 						}
 						break;
 				}
