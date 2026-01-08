@@ -1,25 +1,86 @@
-/**
- * WordPress dependencies
- */
-import { useRef, useCallback, useLayoutEffect } from '@wordpress/element';
+// @ts-nocheck
+import { useCallback, useEffect, useRef } from '@wordpress/element';
 
-/**
- * @template T
- * @typedef {T extends import('react').Ref<infer R> ? R : never} TypeFromRef
- */
-
-/**
- * @template T
- * @param {import('react').Ref<T>} ref
- * @param {T}                      value
- */
-function assignRef( ref, value ) {
+function createRefRecord( ref ) {
 	if ( typeof ref === 'function' ) {
-		ref( value );
-	} else if ( ref && ref.hasOwnProperty( 'current' ) ) {
-		/** @type {import('react').MutableRefObject<T>} */ ( ref ).current =
-			value;
+		let cleanup = null;
+
+		return {
+			ref,
+			attach( node ) {
+				const ret = ref( node );
+				if ( typeof ret === 'function' ) {
+					cleanup = ret;
+				}
+			},
+			detach() {
+				if ( cleanup ) {
+					cleanup();
+					cleanup = null;
+				} else {
+					ref( null );
+				}
+			},
+		};
 	}
+
+	if ( ref && typeof ref === 'object' ) {
+		return {
+			ref,
+			attach: ( node ) => ( ref.current = node ),
+			detach: () => ( ref.current = null ),
+		};
+	}
+
+	return null;
+}
+
+function createRefEffectReconciler() {
+	let node = null;
+	let records = [];
+
+	return {
+		attach( nextNode ) {
+			if ( node === nextNode ) {
+				return;
+			}
+
+			if ( node ) {
+				records.forEach( ( r ) => r.detach() );
+			}
+			node = nextNode;
+			if ( node ) {
+				records.forEach( ( r ) => r.attach( node ) );
+			}
+		},
+
+		update( nextRefs ) {
+			const next = nextRefs.map( createRefRecord );
+			const len = Math.max( records.length, next.length );
+
+			for ( let i = 0; i < len; i++ ) {
+				const prev = records[ i ];
+				const curr = next[ i ];
+
+				if ( prev?.ref === curr?.ref ) {
+					next[ i ] = prev;
+				} else {
+					prev?.detach();
+					if ( curr && node ) {
+						curr.attach( node );
+					}
+				}
+			}
+
+			records = next.filter( Boolean );
+		},
+
+		detach() {
+			records.forEach( ( r ) => r.detach() );
+			records = [];
+			node = null;
+		},
+	};
 }
 
 /**
@@ -66,62 +127,32 @@ function assignRef( ref, value ) {
  * @return {import('react').RefCallback<TypeFromRef<TRef>>} The merged ref callback.
  */
 export default function useMergeRefs( refs ) {
-	const element = useRef();
-	const isAttachedRef = useRef( false );
-	const didElementChangeRef = useRef( false );
-	/** @type {import('react').MutableRefObject<TRef[]>} */
-	const previousRefsRef = useRef( [] );
-	const currentRefsRef = useRef( refs );
+	const reconcilerRef = useRef( null );
 
-	// Update on render before the ref callback is called, so the ref callback
-	// always has access to the current refs.
-	currentRefsRef.current = refs;
+	if ( ! reconcilerRef.current ) {
+		reconcilerRef.current = createRefEffectReconciler();
+	}
 
-	// If any of the refs change, call the previous ref with `null` and the new
-	// ref with the node, except when the element changes in the same cycle, in
-	// which case the ref callbacks will already have been called.
-	useLayoutEffect( () => {
-		if (
-			didElementChangeRef.current === false &&
-			isAttachedRef.current === true
-		) {
-			refs.forEach( ( ref, index ) => {
-				const previousRef = previousRefsRef.current[ index ];
-				if ( ref !== previousRef ) {
-					assignRef( previousRef, null );
-					assignRef( ref, element.current );
-				}
-			} );
-		}
+	const reconciler = reconcilerRef.current;
 
-		previousRefsRef.current = refs;
-	}, refs );
+	const mergedRef = useCallback(
+		( node ) => {
+			if ( node ) {
+				reconciler.attach( node );
+			} else {
+				reconciler.detach();
+			}
+		},
+		[ reconciler ]
+	);
 
-	// No dependencies, must be reset after every render so ref callbacks are
-	// correctly called after a ref change.
-	useLayoutEffect( () => {
-		didElementChangeRef.current = false;
-	} );
+	useEffect( () => {
+		reconciler.update( refs );
+	}, [ refs, reconciler ] );
 
-	// There should be no dependencies so that `callback` is only called when
-	// the node changes.
-	return useCallback( ( value ) => {
-		// Update the element so it can be used when calling ref callbacks on a
-		// dependency change.
-		assignRef( element, value );
+	useEffect( () => {
+		return () => reconciler.detach();
+	}, [ reconciler ] );
 
-		didElementChangeRef.current = true;
-		isAttachedRef.current = value !== null;
-
-		// When an element changes, the current ref callback should be called
-		// with the new element and the previous one with `null`.
-		const refsToAssign = value
-			? currentRefsRef.current
-			: previousRefsRef.current;
-
-		// Update the latest refs.
-		for ( const ref of refsToAssign ) {
-			assignRef( ref, value );
-		}
-	}, [] );
+	return mergedRef;
 }

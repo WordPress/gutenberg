@@ -344,4 +344,59 @@ describe( 'useMergeRefs', () => {
 			[ [], [] ],
 		] );
 	} );
+
+	it( 'supports cleanup functions returned from refs (React 19)', () => {
+		const cleanup = jest.fn();
+		const ref = jest.fn( () => cleanup );
+
+		function Test() {
+			const merged = useMergeRefs( [ ref ] );
+			return <div ref={ merged } />;
+		}
+
+		const { unmount } = render( <Test /> );
+
+		expect( ref ).toHaveBeenCalledTimes( 1 );
+		expect( cleanup ).not.toHaveBeenCalled();
+
+		unmount();
+
+		expect( cleanup ).toHaveBeenCalledTimes( 1 );
+		expect( ref ).not.toHaveBeenCalledWith( null );
+	} );
+
+	it( 'cleans up old ref when callback identity changes', () => {
+		const cleanup1 = jest.fn();
+		const cleanup2 = jest.fn();
+
+		function Test( { dep } ) {
+			const ref = useCallback( () => cleanup1, [] );
+			const ref2 = useCallback( () => cleanup2, [ dep ] );
+			const merged = useMergeRefs( [ ref, ref2 ] );
+			return <div ref={ merged } />;
+		}
+
+		const { rerender } = render( <Test dep={ 1 } /> );
+
+		rerender( <Test dep={ 2 } /> );
+
+		expect( cleanup1 ).not.toHaveBeenCalled();
+		expect( cleanup2 ).toHaveBeenCalledTimes( 1 );
+	} );
+
+	it( 'runs cleanup when the node changes', () => {
+		const cleanup = jest.fn();
+		const ref = jest.fn( () => cleanup );
+
+		function Test( { as: Tag } ) {
+			const merged = useMergeRefs( [ ref ] );
+			return <Tag ref={ merged } />;
+		}
+
+		const { rerender } = render( <Test as="div" /> );
+
+		rerender( <Test as="button" /> );
+
+		expect( cleanup ).toHaveBeenCalledTimes( 1 );
+	} );
 } );
