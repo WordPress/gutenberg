@@ -55,7 +55,7 @@ export default function OverlayTemplatePartSelector( {
 			return [];
 		}
 		return templateParts.filter(
-			( templatePart ) => templatePart.area === 'overlay'
+			( templatePart ) => templatePart.area === 'navigation-overlay'
 		);
 	}, [ templateParts ] );
 

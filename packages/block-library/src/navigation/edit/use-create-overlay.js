@@ -40,7 +40,7 @@ export default function useCreateOverlayTemplatePart( overlayTemplateParts ) {
 			{
 				slug: cleanSlug,
 				title: uniqueTitle,
-				area: 'overlay',
+				area: 'navigation-overlay',
 			},
 			{ throwOnError: true }
 		);
