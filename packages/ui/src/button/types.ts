@@ -17,7 +17,7 @@ export interface ButtonProps
 	 *
 	 * @default "brand"
 	 */
-	tone?: 'brand' | 'neutral';
+	tone?: 'brand' | 'neutral' | 'destructive';
 
 	/**
 	 * The size of the button.
