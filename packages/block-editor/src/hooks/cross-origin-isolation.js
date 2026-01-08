@@ -59,11 +59,9 @@ if ( window.crossOriginIsolated ) {
 						const iframeNode = el;
 
 						/*
-						 * If for example embedding a tweet, it should be loaded
-						 * in a credentialless iframe, but the tweet itself
-						 * should not be modified.
+						 * Sandboxed iframes should not get modified. For example embedding a tweet served in a sandboxed
+						 * iframe, the tweet itself would not be modified.
 						 */
-
 						const isEmbedSandboxIframe =
 							iframeNode.classList.contains(
 								'components-sandbox'
