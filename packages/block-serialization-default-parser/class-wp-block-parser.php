@@ -97,55 +97,32 @@ class WP_Block_Parser {
 
 		switch ( $token_type ) {
 			case 'no-more-tokens':
-				// if not in a block then flush output.
+				/*
+				 * Most documents will end with all blocks properly closed.
+				 * In these cases, all that’s necessary is to flush the output.
+				 * There is probably a terminating newline.
+				 */
 				if ( 0 === $stack_depth ) {
 					$this->add_freeform();
 					return false;
 				}
 
 				/*
-				 * Otherwise we have a problem
-				 * This is an error
+				 * However, if blocks remain open it means there were missing
+				 * closing block delimiters. The post may have been truncated,
+				 * for example, but some amount of corruption produced a malformed
+				 * document.
 				 *
-				 * we have options
-				 * - treat it all as freeform text
-				 * - assume an implicit closer (easiest when not nesting)
+				 * The spec parser considers this a parse error and returns a long
+				 * freeform block containing the full span of text from the input
+				 * document from the start of the un-closed block.
 				 *
-				 * Treat this as a stack of implicit closers.
+				 * This parser, however, is making a different pragmatic choice: it
+				 * will implicitly close any remaining open blocks, as if the closers
+				 * were provided. This ensures recovery of as much of the provided
+				 * block structure as is possible.
 				 */
-				$implicitly_closed = null;
-				$last_freeform     = null;
-				// phpcs:ignore Generic.CodeAnalysis.AssignmentInCondition.FoundInWhileCondition --
-				while ( null !== ( $stack_top = array_pop( $this->stack ) ) ) {
-					if ( isset( $last_freeform ) ) {
-						$html = substr( $this->document, $stack_top->prev_offset, $last_freeform[1] - $stack_top->prev_offset );
-					} else {
-						$html = substr( $this->document, $stack_top->prev_offset );
-					}
-
-					$stack_top->block->innerHTML     .= $html;
-					$stack_top->block->innerContent[] = $html;
-
-					// Trap potential leading freeform content for the final output.
-					$last_freeform = array( $stack_top->leading_html_start ?? 0, $stack_top->token_start );
-
-					if ( isset( $implicitly_closed ) ) {
-						$stack_top->block->innerContent[] = null;
-						$stack_top->block->innerBlocks[]  = $implicitly_closed;
-					}
-
-					$implicitly_closed = $stack_top->block;
-				}
-
-				if ( isset( $last_freeform ) && $last_freeform[1] > $last_freeform[0] ) {
-					$html           = substr( $this->document, $last_freeform[0], $last_freeform[1] - $last_freeform[0] );
-					$this->output[] = (array) $this->freeform( $html );
-				}
-
-				if ( isset( $implicitly_closed ) ) {
-					$this->output[] = $implicitly_closed;
-				}
-
+				$this->implicitly_close_and_add_open_blocks();
 				return false;
 
 			case 'void-block':
@@ -373,6 +350,47 @@ class WP_Block_Parser {
 
 		$parent->block->innerContent[] = null;
 		$parent->prev_offset           = $last_offset ? $last_offset : $token_start + $token_length;
+	}
+
+	/**
+	 * Closes all open blocks and adds remaining blocks and freeform content to the output list.
+	 *
+	 * @internal
+	 * @since 6.9.1
+	 */
+	public function implicitly_close_and_add_open_blocks() {
+		$implicitly_closed = null;
+		$last_freeform     = null;
+		// phpcs:ignore Generic.CodeAnalysis.AssignmentInCondition.FoundInWhileCondition --
+		while ( null !== ( $stack_top = array_pop( $this->stack ) ) ) {
+			if ( isset( $last_freeform ) ) {
+				$html = substr( $this->document, $stack_top->prev_offset, $last_freeform[1] - $stack_top->prev_offset );
+			} else {
+				$html = substr( $this->document, $stack_top->prev_offset );
+			}
+
+			$stack_top->block->innerHTML     .= $html;
+			$stack_top->block->innerContent[] = $html;
+
+			// Trap potential leading freeform content for the final output.
+			$last_freeform = array( $stack_top->leading_html_start ?? 0, $stack_top->token_start );
+
+			if ( isset( $implicitly_closed ) ) {
+				$stack_top->block->innerContent[] = null;
+				$stack_top->block->innerBlocks[]  = $implicitly_closed;
+			}
+
+			$implicitly_closed = $stack_top->block;
+		}
+
+		if ( isset( $last_freeform ) && $last_freeform[1] > $last_freeform[0] ) {
+			$html           = substr( $this->document, $last_freeform[0], $last_freeform[1] - $last_freeform[0] );
+			$this->output[] = (array) $this->freeform( $html );
+		}
+
+		if ( isset( $implicitly_closed ) ) {
+			$this->output[] = $implicitly_closed;
+		}
 	}
 
 	/**
