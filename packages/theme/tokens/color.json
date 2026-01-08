@@ -1168,7 +1168,11 @@
 					"$description": "Background color for interactive elements with neutral tone and normal emphasis that are hovered, focused, or active."
 				},
 				"neutral-disabled": {
-					"$value": "{wpds-color.primitive.bg.surface5}",
+					"$value": {
+						"colorSpace": "srgb",
+						"components": [ 0, 0, 0 ],
+						"alpha": 0
+					},
 					"$description": "Background color for interactive elements with neutral tone and normal emphasis, in their disabled state."
 				},
 				"neutral-strong": {
@@ -1196,7 +1200,11 @@
 					"$description": "Background color for interactive elements with neutral tone and weak emphasis that are hovered, focused, or active."
 				},
 				"neutral-weak-disabled": {
-					"$value": "{wpds-color.primitive.bg.surface5}",
+					"$value": {
+						"colorSpace": "srgb",
+						"components": [ 0, 0, 0 ],
+						"alpha": 0
+					},
 					"$description": "Background color for interactive elements with neutral tone and weak emphasis, in their disabled state."
 				},
 				"brand": {
@@ -1212,7 +1220,11 @@
 					"$description": "Background color for interactive elements with brand tone and normal emphasis that are hovered, focused, or active."
 				},
 				"brand-disabled": {
-					"$value": "{wpds-color.primitive.bg.surface5}",
+					"$value": {
+						"colorSpace": "srgb",
+						"components": [ 0, 0, 0 ],
+						"alpha": 0
+					},
 					"$description": "Background color for interactive elements with brand tone and normal emphasis, in their disabled state."
 				},
 				"brand-strong": {
@@ -1240,7 +1252,11 @@
 					"$description": "Background color for interactive elements with brand tone and weak emphasis that are hovered, focused, or active."
 				},
 				"brand-weak-disabled": {
-					"$value": "{wpds-color.primitive.bg.surface5}",
+					"$value": {
+						"colorSpace": "srgb",
+						"components": [ 0, 0, 0 ],
+						"alpha": 0
+					},
 					"$description": "Background color for interactive elements with brand tone and weak emphasis, in their disabled state."
 				},
 				"error": {
@@ -1256,7 +1272,11 @@
 					"$description": "Background color for interactive elements with error tone and normal emphasis that are hovered, focused, or active."
 				},
 				"error-disabled": {
-					"$value": "{wpds-color.primitive.bg.surface5}",
+					"$value": {
+						"colorSpace": "srgb",
+						"components": [ 0, 0, 0 ],
+						"alpha": 0
+					},
 					"$description": "Background color for interactive elements with error tone and normal emphasis, in their disabled state."
 				},
 				"error-strong": {
@@ -1284,7 +1304,11 @@
 					"$description": "Background color for interactive elements with error tone and weak emphasis that are hovered, focused, or active."
 				},
 				"error-weak-disabled": {
-					"$value": "{wpds-color.primitive.bg.surface5}",
+					"$value": {
+						"colorSpace": "srgb",
+						"components": [ 0, 0, 0 ],
+						"alpha": 0
+					},
 					"$description": "Background color for interactive elements with error tone and weak emphasis, in their disabled state."
 				}
 			},

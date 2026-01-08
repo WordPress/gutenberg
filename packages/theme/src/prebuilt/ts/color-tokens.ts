@@ -77,14 +77,6 @@ export default {
 		'bg-interactive-error-strong-disabled',
 		'bg-interactive-neutral-strong-disabled',
 	],
-	'bg-surface5': [
-		'bg-interactive-brand-disabled',
-		'bg-interactive-brand-weak-disabled',
-		'bg-interactive-error-disabled',
-		'bg-interactive-error-weak-disabled',
-		'bg-interactive-neutral-disabled',
-		'bg-interactive-neutral-weak-disabled',
-	],
 	'bg-surface4': [
 		'bg-interactive-neutral-active',
 		'bg-interactive-neutral-weak-active',
