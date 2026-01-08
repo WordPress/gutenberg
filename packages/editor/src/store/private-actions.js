@@ -221,7 +221,7 @@ export const saveDirtyEntities =
 							? sprintf(
 									/* translators: %s: a list of comma separated error messages */
 									__( 'Saving failed: %s' ),
-									uniqueMessages.join( ',' )
+									uniqueMessages.join( ', ' )
 							  )
 							: __( 'Saving failed.' );
 
