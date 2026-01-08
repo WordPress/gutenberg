@@ -9,7 +9,7 @@ import { createHigherOrderComponent } from '@wordpress/compose';
  *
  * @param {Element} el The element to modify.
  */
-function addAttribute( el ) {
+function addCrossOriginAttributes( el ) {
 	// Add the crossorigin attribute if missing.
 	if ( ! el.hasAttribute( 'crossorigin' ) ) {
 		el.setAttribute( 'crossorigin', 'anonymous' );
@@ -52,7 +52,7 @@ if ( window.crossOriginIsolated ) {
 					el.querySelectorAll(
 						'img,source,script,video,link,iframe'
 					).forEach( ( v ) => {
-						addAttribute( v );
+						addCrossOriginAttributes( v );
 					} );
 
 					if ( el.nodeName === 'IFRAME' ) {
@@ -93,7 +93,7 @@ if ( window.crossOriginIsolated ) {
 							'IFRAME',
 						].includes( el.nodeName )
 					) {
-						addAttribute( el );
+						addCrossOriginAttributes( el );
 					}
 				} );
 			} );
