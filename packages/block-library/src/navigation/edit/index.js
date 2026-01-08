@@ -507,12 +507,15 @@ function Navigation( {
 	);
 	const isWithinOverlayTemplatePart = templatePart?.area === 'overlay';
 
-	// Force overlayMenu to 'never' if within an overlay template part.
-	const effectiveOverlayMenu = isWithinOverlayTemplatePart
-		? 'never'
-		: overlayMenu;
+	// Force overlayMenu to 'never' if within an overlay template part
+	// to prevents overlays within overlays.
+	useEffect( () => {
+		if ( isWithinOverlayTemplatePart && overlayMenu !== 'never' ) {
+			setAttributes( { overlayMenu: 'never' } );
+		}
+	}, [ isWithinOverlayTemplatePart, overlayMenu, setAttributes ] );
 
-	const isResponsive = 'never' !== effectiveOverlayMenu;
+	const isResponsive = 'never' !== overlayMenu;
 	const blockProps = useBlockProps( {
 		ref: navRef,
 		className: clsx(
@@ -865,7 +868,7 @@ function Navigation( {
 	);
 
 	const accessibleDescriptionId = `${ clientId }-desc`;
-	const isHiddenByDefault = 'always' === effectiveOverlayMenu;
+	const isHiddenByDefault = 'always' === overlayMenu;
 	const isManageMenusButtonDisabled =
 		! hasManagePermissions || ! hasResolvedNavigationMenus;
 
