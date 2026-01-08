@@ -4,7 +4,7 @@
 
 ### Bug Fixes
 
--   Preserve boolean HTML attributes during client-side navigation. ([#XXX](https://github.com/WordPress/gutenberg/pull/XXX))
+-   Preserve boolean HTML attributes during client-side navigation. ([#74446](https://github.com/WordPress/gutenberg/pull/74446))
 
 ## 6.36.0 (2025-11-26)
 
