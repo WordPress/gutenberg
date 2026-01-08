@@ -184,15 +184,11 @@ jobs:
             fail-fast: true
             matrix:
                 event: ['${{ github.event_name }}']
-                php: ['7.2', '7.3', '7.4', '8.0', '8.1', '8.2', '8.3']
+                php: ['7.4', '8.0', '8.1', '8.2', '8.3']
                 multisite: [false, true]
                 wordpress: ['', 'previous major version']
                 exclude:
                     # On PRs: Only test PHP 8.3, single-site, latest WP
-                    - event: 'pull_request'
-                      php: '7.2'
-                    - event: 'pull_request'
-                      php: '7.3'
                     - event: 'pull_request'
                       php: '7.4'
                     - event: 'pull_request'
@@ -206,8 +202,6 @@ jobs:
                     - event: 'pull_request'
                       wordpress: 'previous major version'
                     # On trunk/releases: Only test previous WP version with specific PHP versions
-                    - php: '7.3'
-                      wordpress: 'previous major version'
                     - php: '8.0'
                       wordpress: 'previous major version'
                     - php: '8.1'
