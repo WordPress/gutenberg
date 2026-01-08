@@ -201,13 +201,28 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 						'has-aspect-ratio' => true,
 					),
 				),
+				'height'      => array(
+					'property_keys' => array(
+						'default' => 'height',
+					),
+					'path'          => array( 'dimensions', 'height' ),
+				),
 				'minHeight'   => array(
 					'property_keys' => array(
 						'default' => 'min-height',
 					),
 					'path'          => array( 'dimensions', 'minHeight' ),
 					'css_vars'      => array(
-						'spacing' => '--wp--preset--spacing--$slug',
+						'dimension' => '--wp--preset--dimension--$slug',
+					),
+				),
+				'width'       => array(
+					'property_keys' => array(
+						'default' => 'width',
+					),
+					'path'          => array( 'dimensions', 'width' ),
+					'css_vars'      => array(
+						'dimension' => '--wp--preset--dimension--$slug',
 					),
 				),
 			),

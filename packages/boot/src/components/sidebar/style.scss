@@ -13,3 +13,7 @@
 	contain: content;
 	position: relative;
 }
+
+.boot-sidebar__footer {
+	padding: variables.$grid-unit-20 variables.$grid-unit-10 variables.$grid-unit-10 variables.$grid-unit-20;
+}

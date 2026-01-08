@@ -1,10 +1,11 @@
 /**
  * WordPress dependencies
  */
-import { _x } from '@wordpress/i18n';
+import { _x, __ } from '@wordpress/i18n';
 import { customLink as linkIcon } from '@wordpress/icons';
 import { InnerBlocks } from '@wordpress/block-editor';
 import { addFilter } from '@wordpress/hooks';
+import { privateApis as blocksPrivateApis } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -15,6 +16,9 @@ import edit from './edit';
 import save from './save';
 import { enhanceNavigationLinkVariations } from './hooks';
 import transforms from './transforms';
+import { unlock } from '../lock-unlock';
+
+const { fieldsKey, formKey } = unlock( blocksPrivateApis );
 
 const { name } = metadata;
 
@@ -88,6 +92,29 @@ export const settings = {
 	],
 	transforms,
 };
+
+if ( window.__experimentalContentOnlyInspectorFields ) {
+	settings[ fieldsKey ] = [
+		{
+			id: 'label',
+			label: __( 'Label' ),
+			type: 'richtext',
+		},
+		{
+			id: 'link',
+			label: __( 'Link' ),
+			type: 'link',
+			mapping: {
+				href: 'url',
+				rel: 'rel',
+				// TODO - opens in new tab? id?
+			},
+		},
+	];
+	settings[ formKey ] = {
+		fields: [ 'label' ],
+	};
+}
 
 export const init = () => {
 	addFilter(

@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import clsx from 'clsx';
+
+/**
  * WordPress dependencies
  */
 import { getBlockSupport } from '@wordpress/blocks';
@@ -20,10 +25,6 @@ import { useSettingsForBlockElement } from '../components/global-styles/hooks';
 import { getValueFromObjectPath, setImmutably } from '../utils/object';
 import { store as blockEditorStore } from '../store';
 import { unlock } from '../lock-unlock';
-/**
- * External dependencies
- */
-import clsx from 'clsx';
 
 /**
  * Removed falsy values from nested object.
@@ -218,6 +219,7 @@ export function usePrivateStyleOverride( {
 		setStyleOverride,
 		deleteStyleOverride,
 		registry,
+		variation,
 	] );
 }
 
@@ -262,7 +264,10 @@ export function useBlockSettings( name, parentLayout ) {
 		themeSpacingSizes,
 		units,
 		aspectRatio,
+		height,
 		minHeight,
+		width,
+		dimensionSizes,
 		layout,
 		borderColor,
 		borderRadius,
@@ -320,7 +325,10 @@ export function useBlockSettings( name, parentLayout ) {
 		'spacing.spacingSizes.theme',
 		'spacing.units',
 		'dimensions.aspectRatio',
+		'dimensions.height',
 		'dimensions.minHeight',
+		'dimensions.width',
+		'dimensions.dimensionSizes',
 		'layout',
 		'border.color',
 		'border.radius',
@@ -429,7 +437,10 @@ export function useBlockSettings( name, parentLayout ) {
 			},
 			dimensions: {
 				aspectRatio,
+				height,
 				minHeight,
+				width,
+				dimensionSizes,
 			},
 			layout,
 			parentLayout,
@@ -465,7 +476,10 @@ export function useBlockSettings( name, parentLayout ) {
 		themeSpacingSizes,
 		units,
 		aspectRatio,
+		height,
 		minHeight,
+		width,
+		dimensionSizes,
 		layout,
 		parentLayout,
 		borderColor,

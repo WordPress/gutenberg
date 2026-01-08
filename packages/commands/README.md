@@ -122,65 +122,65 @@ Attach a command loader to the command palette. Used for dynamic commands.
 _Usage_
 
 ```js
+import { __ } from '@wordpress/i18n';
+import { addQueryArgs } from '@wordpress/url';
 import { useCommandLoader } from '@wordpress/commands';
-import { post, page, layout, symbolFilled } from '@wordpress/icons';
-
-const icons = {
-    post,
-    page,
-    wp_template: layout,
-    wp_template_part: symbolFilled,
-};
+import { page } from '@wordpress/icons';
+import { useSelect } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
+import { useMemo } from '@wordpress/element';
 
 function usePageSearchCommandLoader( { search } ) {
-    // Retrieve the pages for the "search" term.
-    const { records, isLoading } = useSelect( ( select ) => {
-        const { getEntityRecords } = select( coreStore );
-        const query = {
-            search: !! search ? search : undefined,
-            per_page: 10,
-            orderby: search ? 'relevance' : 'date',
-        };
-        return {
-            records: getEntityRecords( 'postType', 'page', query ),
-            isLoading: ! select( coreStore ).hasFinishedResolution(
-                'getEntityRecords',
-                'postType', 'page', query ]
-            ),
-        };
-    }, [ search ] );
+	// Retrieve the pages for the "search" term.
+	const { records, isLoading } = useSelect(
+		( select ) => {
+			const { getEntityRecords } = select( coreStore );
+			const query = {
+				search: !! search ? search : undefined,
+				per_page: 10,
+				orderby: search ? 'relevance' : 'date',
+			};
+			return {
+				records: getEntityRecords( 'postType', 'page', query ),
+				isLoading: ! select( coreStore ).hasFinishedResolution(
+					'getEntityRecords',
+					[ 'postType', 'page', query ]
+				),
+			};
+		},
+		[ search ]
+	);
 
-    // Create the commands.
-    const commands = useMemo( () => {
-        return ( records ?? [] ).slice( 0, 10 ).map( ( record ) => {
-            return {
-                name: record.title?.rendered + ' ' + record.id,
-                label: record.title?.rendered
-                    ? record.title?.rendered
-                    : __( '(no title)' ),
-                icon: icons[ postType ],
-                callback: ( { close } ) => {
-                    const args = {
-                        postType,
-                        postId: record.id,
-                        ...extraArgs,
-                    };
-                    document.location = addQueryArgs( 'site-editor.php', args );
-                    close();
-                },
-            };
-        } );
-    }, [ records, history ] );
+	// Create the commands.
+	const commands = useMemo( () => {
+		return ( records ?? [] ).slice( 0, 10 ).map( ( record ) => {
+			return {
+				name: record.title?.rendered + ' ' + record.id,
+				label: record.title?.rendered
+					? record.title?.rendered
+					: __( '(no title)' ),
+				icon: page,
+				callback: ( { close } ) => {
+					const args = {
+						p: '/page',
+						postId: record.id,
+					};
+					document.location = addQueryArgs( 'site-editor.php', args );
+					close();
+				},
+			};
+		} );
+	}, [ records ] );
 
-    return {
-        commands,
-        isLoading,
-    };
+	return {
+		commands,
+		isLoading,
+	};
 }
 
 useCommandLoader( {
-    name: 'myplugin/page-search',
-    hook: usePageSearchCommandLoader,
+	name: 'myplugin/page-search',
+	hook: usePageSearchCommandLoader,
 } );
 ```
 

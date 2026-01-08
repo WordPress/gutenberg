@@ -1,13 +1,17 @@
 /**
- * External dependencies
+ * WordPress dependencies
  */
-import { Link, useCanGoBack, useRouter } from '@tanstack/react-router';
+import { Link, privateApis as routePrivateApis } from '@wordpress/route';
+import { Tooltip } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
+import { unlock } from '../../lock-unlock';
 import SiteIcon from '../site-icon';
 import './style.scss';
+
+const { useCanGoBack, useRouter } = unlock( routePrivateApis );
 
 function SiteIconLink( {
 	to,
@@ -22,21 +26,23 @@ function SiteIconLink( {
 	const canGoBack = useCanGoBack();
 
 	return (
-		<Link
-			to={ to }
-			aria-label={ props[ 'aria-label' ] }
-			className="boot-site-icon-link"
-			onClick={ ( event ) => {
-				// If possible, restore the previous page with
-				// filters etc.
-				if ( canGoBack && isBackButton ) {
-					event.preventDefault();
-					router.history.back();
-				}
-			} }
-		>
-			<SiteIcon />
-		</Link>
+		<Tooltip text={ props[ 'aria-label' ] } placement="right">
+			<Link
+				to={ to }
+				aria-label={ props[ 'aria-label' ] }
+				className="boot-site-icon-link"
+				onClick={ ( event ) => {
+					// If possible, restore the previous page with
+					// filters etc.
+					if ( canGoBack && isBackButton ) {
+						event.preventDefault();
+						router.history.back();
+					}
+				} }
+			>
+				<SiteIcon />
+			</Link>
+		</Tooltip>
 	);
 }
 

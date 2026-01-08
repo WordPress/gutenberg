@@ -211,6 +211,15 @@ export const rootEntitiesConfig = [
 		baseURL: '/wp/v2/registered-templates',
 		key: 'id',
 	},
+	{
+		label: __( 'Font Collections' ),
+		name: 'fontCollection',
+		kind: 'root',
+		baseURL: '/wp/v2/font-collections',
+		baseURLParams: { context: 'view' },
+		plural: 'fontCollections',
+		key: 'slug',
+	},
 ];
 
 export const deprecatedEntities = {
@@ -329,7 +338,10 @@ async function loadPostTypeEntities() {
 				}/${ parentId }/revisions${
 					revisionId ? '/' + revisionId : ''
 				}`,
-			revisionKey: DEFAULT_ENTITY_KEY,
+			revisionKey:
+				isTemplate && ! window?.__experimentalTemplateActivate
+					? 'wp_id'
+					: DEFAULT_ENTITY_KEY,
 		};
 
 		if ( window.__experimentalEnableSync ) {

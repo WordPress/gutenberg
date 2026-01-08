@@ -9,7 +9,6 @@ import clsx from 'clsx';
 import {
 	AlignmentControl,
 	BlockControls,
-	Warning,
 	useBlockProps,
 } from '@wordpress/block-editor';
 import { useState, useEffect } from '@wordpress/element';
@@ -59,18 +58,6 @@ function PostCommentsLinkEdit( { context, attributes, setAttributes } ) {
 		[ postType, postId ]
 	);
 
-	if ( ! post ) {
-		return (
-			<div { ...blockProps }>
-				<Warning>
-					{ __( 'Post Comments Link block: post not found.' ) }
-				</Warning>
-			</div>
-		);
-	}
-
-	const { link } = post;
-
 	let commentsText;
 	if ( commentsCount !== undefined ) {
 		const commentsNumber = parseInt( commentsCount );
@@ -98,17 +85,20 @@ function PostCommentsLinkEdit( { context, attributes, setAttributes } ) {
 			</BlockControls>
 
 			<div { ...blockProps }>
-				{ link && commentsText !== undefined ? (
+				{ post?.link && commentsText !== undefined ? (
 					<a
-						href={ link + '#comments' }
+						href={ post?.link + '#comments' }
 						onClick={ ( event ) => event.preventDefault() }
 					>
 						{ commentsText }
 					</a>
 				) : (
-					<Warning>
-						{ __( 'Post Comments Link block: post not found.' ) }
-					</Warning>
+					<a
+						href="#post-comments-link-pseudo-link"
+						onClick={ ( event ) => event.preventDefault() }
+					>
+						{ __( 'No comments' ) }
+					</a>
 				) }
 			</div>
 		</>

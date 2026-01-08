@@ -16,6 +16,7 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useInstanceId, useDebounce } from '@wordpress/compose';
+import { isKeyboardEvent } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
@@ -50,6 +51,12 @@ function CommentForm( {
 		<VStack
 			className="editor-collab-sidebar-panel__comment-form"
 			spacing="4"
+			as="form"
+			onSubmit={ ( event ) => {
+				event.preventDefault();
+				onSubmit( inputComment );
+				setInputComment( '' );
+			} }
 		>
 			<VisuallyHidden as="label" htmlFor={ inputId }>
 				{ labelText ?? __( 'Note' ) }
@@ -63,6 +70,14 @@ function CommentForm( {
 				} }
 				rows={ 1 }
 				maxRows={ 20 }
+				onKeyDown={ ( event ) => {
+					if (
+						isKeyboardEvent.primary( event, 'Enter' ) &&
+						! isDisabled
+					) {
+						event.target.parentNode.requestSubmit();
+					}
+				} }
 			/>
 			<HStack spacing="2" justify="flex-end" wrap>
 				<Button size="compact" variant="tertiary" onClick={ onCancel }>
@@ -72,10 +87,7 @@ function CommentForm( {
 					size="compact"
 					accessibleWhenDisabled
 					variant="primary"
-					onClick={ () => {
-						onSubmit( inputComment );
-						setInputComment( '' );
-					} }
+					type="submit"
 					disabled={ isDisabled }
 				>
 					<Truncate>{ submitButtonText }</Truncate>

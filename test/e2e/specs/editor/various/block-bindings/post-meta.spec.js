@@ -5,30 +5,38 @@ const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Post Meta source', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
-		await requestUtils.activateTheme(
-			'gutenberg-test-themes/block-bindings'
-		);
+		await requestUtils.activateTheme( 'emptytheme' );
 		await requestUtils.activatePlugin( 'gutenberg-test-block-bindings' );
 	} );
 
-	test.afterEach( async ( { requestUtils } ) => {
-		await requestUtils.deleteAllPosts();
-	} );
-
 	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.deleteAllPosts( 'movie' );
 		await requestUtils.deleteAllMedia();
 		await requestUtils.activateTheme( 'twentytwentyone' );
 		await requestUtils.deactivatePlugin( 'gutenberg-test-block-bindings' );
 	} );
 
 	test.describe( 'Movie CPT template', () => {
+		test.beforeAll( async ( { requestUtils } ) => {
+			await requestUtils.createTemplate( 'wp_template', {
+				slug: 'single-movie',
+				title: 'Single Movie',
+				content:
+					'<!-- wp:post-title /--><!-- wp:post-content {"layout":{"inherit":true}} /-->',
+			} );
+		} );
+
 		test.beforeEach( async ( { admin, editor } ) => {
 			await admin.visitSiteEditor( {
-				postId: 'gutenberg-test-themes/block-bindings//single-movie',
+				postId: 'emptytheme//single-movie',
 				postType: 'wp_template',
 				canvas: 'edit',
 			} );
 			await editor.openDocumentSettingsSidebar();
+		} );
+
+		test.afterAll( async ( { requestUtils } ) => {
+			await requestUtils.deleteAllTemplates( 'wp_template' );
 		} );
 
 		test.describe( 'Block attributes values', () => {
@@ -144,34 +152,24 @@ test.describe( 'Post Meta source', () => {
 				editor,
 				page,
 			} ) => {
-				/**
-				 * Create connection manually until this issue is solved:
-				 * https://github.com/WordPress/gutenberg/pull/65604
-				 *
-				 * Once solved, block with the binding can be directly inserted.
-				 */
 				await editor.insertBlock( {
 					name: 'core/paragraph',
+					attributes: {
+						metadata: {
+							bindings: {
+								content: {
+									source: 'core/post-meta',
+									args: {
+										key: 'movie_field',
+									},
+								},
+							},
+						},
+					},
 				} );
-				await page.getByLabel( 'Attributes options' ).click();
-				await page
-					.getByRole( 'menuitemcheckbox', {
-						name: 'Show content',
-					} )
-					.click();
 				const contentBinding = page.getByRole( 'button', {
 					name: 'content',
 				} );
-				await contentBinding.click();
-				await page
-					.getByRole( 'menuitem', {
-						name: 'Post Meta',
-					} )
-					.click();
-				await page
-					.getByRole( 'menuitemcheckbox' )
-					.filter( { hasText: 'Movie field label' } )
-					.click();
 				await expect( contentBinding ).toContainText(
 					'Movie field label'
 				);
@@ -180,34 +178,24 @@ test.describe( 'Post Meta source', () => {
 				editor,
 				page,
 			} ) => {
-				/**
-				 * Create connection manually until this issue is solved:
-				 * https://github.com/WordPress/gutenberg/pull/65604
-				 *
-				 * Once solved, block with the binding can be directly inserted.
-				 */
 				await editor.insertBlock( {
 					name: 'core/paragraph',
+					attributes: {
+						metadata: {
+							bindings: {
+								content: {
+									source: 'core/post-meta',
+									args: {
+										key: 'field_without_label_or_default',
+									},
+								},
+							},
+						},
+					},
 				} );
-				await page.getByLabel( 'Attributes options' ).click();
-				await page
-					.getByRole( 'menuitemcheckbox', {
-						name: 'Show content',
-					} )
-					.click();
 				const contentBinding = page.getByRole( 'button', {
 					name: 'content',
 				} );
-				await contentBinding.click();
-				await page
-					.getByRole( 'menuitem', {
-						name: 'Post Meta',
-					} )
-					.click();
-				await page
-					.getByRole( 'menuitemcheckbox' )
-					.filter( { hasText: 'field_without_label_or_default' } )
-					.click();
 				await expect( contentBinding ).toContainText(
 					'field_without_label_or_default'
 				);
@@ -299,7 +287,7 @@ test.describe( 'Post Meta source', () => {
 	test.describe( 'Custom template', () => {
 		test.beforeEach( async ( { admin, editor } ) => {
 			await admin.visitSiteEditor( {
-				postId: 'gutenberg-test-themes/block-bindings//custom-template',
+				postId: 'emptytheme//custom-template',
 				postType: 'wp_template',
 				canvas: 'edit',
 			} );

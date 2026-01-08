@@ -94,10 +94,17 @@ describe( 'BlockSwitcher', () => {
 				},
 			],
 			blocks: [ headingBlock1 ],
+			patterns: [],
+			isUsingBindings: false,
 			canRemove: true,
 		} ) );
 		const user = userEvent.setup();
-		render( <BlockSwitcher clientIds={ [ headingBlock1.clientId ] } /> );
+		render(
+			<BlockSwitcher
+				clientIds={ [ headingBlock1.clientId ] }
+				label="Block Name"
+			/>
+		);
 		expect(
 			screen.getByRole( 'button', {
 				name: 'Block Name',
@@ -134,29 +141,21 @@ describe( 'BlockSwitcher', () => {
 		expect( items[ 1 ] ).toHaveTextContent( headingBlockType.title );
 	} );
 
-	test( 'should render accessibly disabled block switcher when we have a single selected block without styles and we cannot remove it', () => {
-		useSelect.mockImplementation( () => ( {
-			blocks: [ headingBlock1 ],
-			icon: copy,
-			hasBlockStyles: false,
-			canRemove: false,
-		} ) );
-		render( <BlockSwitcher clientIds={ [ headingBlock1.clientId ] } /> );
-		const blockSwitcher = screen.getByRole( 'button', {
-			name: 'Block Name',
-		} );
-		expect( blockSwitcher ).toBeEnabled();
-		expect( blockSwitcher ).toHaveAttribute( 'aria-disabled', 'true' );
-	} );
-
 	test( 'should render message for no available transforms', async () => {
 		useSelect.mockImplementation( () => ( {
 			possibleBlockTransformations: [],
 			blocks: [ headingBlock1 ],
+			patterns: [],
+			isUsingBindings: false,
+			canRemove: false,
 			icon: copy,
-			canRemove: true,
 		} ) );
-		render( <BlockSwitcher clientIds={ [ headingBlock1.clientId ] } /> );
+		render(
+			<BlockSwitcher
+				clientIds={ [ headingBlock1.clientId ] }
+				label="Block Name"
+			/>
+		);
 		const user = userEvent.setup();
 		await user.type(
 			screen.getByRole( 'button', {

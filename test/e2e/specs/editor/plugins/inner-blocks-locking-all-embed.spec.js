@@ -53,7 +53,7 @@ test.describe( 'Embed block inside a locked all parent', () => {
 		await page.keyboard.press( 'Enter' );
 
 		await expect(
-			page.getByRole( 'document', { name: 'Block: Twitter' } )
+			page.getByRole( 'document', { name: 'Block: X' } )
 		).toBeVisible();
 	} );
 } );

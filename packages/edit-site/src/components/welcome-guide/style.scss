@@ -1,3 +1,4 @@
+@use "@wordpress/base-styles/colors" as *;
 @use "@wordpress/base-styles/variables" as *;
 
 .edit-site-welcome-guide {
@@ -48,5 +49,12 @@
 	&__inserter-icon {
 		margin: 0 4px;
 		vertical-align: text-top;
+	}
+	.components-button {
+		&:hover {
+			svg {
+				fill: $white;
+			}
+		}
 	}
 }

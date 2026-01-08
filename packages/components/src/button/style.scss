@@ -19,7 +19,7 @@
 	margin: 0;
 	border: 0;
 	cursor: pointer;
-	-webkit-appearance: none;
+	appearance: none;
 	background: none;
 
 	@media not ( prefers-reduced-motion ) {
@@ -29,7 +29,7 @@
 	height: $button-size;
 	align-items: center;
 	box-sizing: border-box;
-	padding: 6px 12px;
+	padding: 4px 12px; // Allows 32px min-height.
 	border-radius: $radius-small;
 	color: $components-color-foreground;
 
@@ -44,7 +44,7 @@
 
 	// Focus.
 	// See https://github.com/WordPress/gutenberg/issues/13267 for more context on these selectors.
-	&:focus:not(:disabled) {
+	&:focus:not(:active) {
 		box-shadow: 0 0 0 var(--wp-admin-border-width-focus) $components-color-accent;
 
 		// Windows High Contrast mode will show this outline, but not the box-shadow.
@@ -76,7 +76,7 @@
 			color: $components-color-accent-inverted;
 		}
 
-		&:focus:not(:disabled) {
+		&:focus:not(:active) {
 			box-shadow: inset 0 0 0 1px $components-color-background, 0 0 0 var(--wp-admin-border-width-focus) $components-color-accent;
 		}
 
@@ -86,9 +86,9 @@
 		&[aria-disabled="true"]:enabled, // This catches a situation where a Button is aria-disabled, but not disabled.
 		&[aria-disabled="true"]:active:enabled {
 			// TODO: Prepare for theming (https://github.com/WordPress/gutenberg/pull/45466/files#r1030872724)
-			color: $components-color-foreground-inverted;
-			background: $components-color-gray-300;
-			border-color: $components-color-gray-300;
+			color: rgba($white, 0.4);
+			background: $components-color-accent;
+			border-color: $components-color-accent;
 			outline: none;
 
 			&:focus:enabled {
@@ -159,7 +159,7 @@
 			box-shadow: inset 0 0 0 $border-width $gray-300;
 		}
 
-		&:focus:not(:disabled) {
+		&:focus:not(:active) {
 			box-shadow: 0 0 0 currentColor inset, 0 0 0 var(--wp-admin-border-width-focus) $components-color-accent;
 		}
 	}
@@ -213,7 +213,7 @@
 				color: color.adjust($alert-red, $lightness: -20%);
 			}
 
-			&:focus {
+			&:focus:not(:active) {
 				box-shadow: 0 0 0 var(--wp-admin-border-width-focus) $alert-red;
 			}
 
@@ -376,7 +376,7 @@
 			}
 		}
 
-		&:focus:not(:disabled) {
+		&:focus:not(:active) {
 			box-shadow: inset 0 0 0 1px $components-color-background, 0 0 0 var(--wp-admin-border-width-focus) $components-color-accent;
 
 			// Windows High Contrast mode will show this outline, but not the box-shadow.

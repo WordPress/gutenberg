@@ -38,6 +38,7 @@ store( 'core/fit-text', {
 					context.fontSize = optimizeFitText( ref, applyFontSize );
 				} );
 				resizeObserver.observe( ref.parentElement );
+				resizeObserver.observe( ref );
 
 				// Return cleanup function to be called when element is removed.
 				return () => {

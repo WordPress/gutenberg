@@ -170,12 +170,16 @@ https://vimeo.com/22439234
 <!-- /wp:embed -->
 
 <!-- wp:paragraph -->
-<p><?php _e( 'You can build any block you like, static or dynamic, decorative or plain. Here&#8217;s a pullquote block:', 'gutenberg' ); ?></p>
+<p><?php _e( 'You can build any block you like, static or dynamic, decorative or plain. Here&#8217;s a quote block:', 'gutenberg' ); ?></p>
 <!-- /wp:paragraph -->
 
-<!-- wp:pullquote -->
-<figure class="wp-block-pullquote"><blockquote><p><?php _e( 'Code is Poetry', 'gutenberg' ); ?></p><cite><?php _e( 'The WordPress community', 'gutenberg' ); ?></cite></blockquote></figure>
-<!-- /wp:pullquote -->
+<!-- wp:quote -->
+<blockquote class="wp-block-quote">
+<!-- wp:paragraph -->
+<p><?php _e( 'Code is Poetry', 'gutenberg' ); ?></p>
+<!-- /wp:paragraph -->
+<cite><?php _e( 'The WordPress community', 'gutenberg' ); ?></cite></blockquote>
+<!-- /wp:quote -->
 
 <!-- wp:paragraph {"align":"center"} -->
 <p class="has-text-align-center">

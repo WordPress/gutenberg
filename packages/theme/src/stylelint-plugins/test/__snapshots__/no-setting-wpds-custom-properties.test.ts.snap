@@ -1,0 +1,24 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`flags warnings with invalid wpds custom properties css snapshot matches warnings 1`] = `
+[
+  {
+    "column": 2,
+    "endColumn": 31,
+    "endLine": 3,
+    "line": 3,
+    "rule": "plugin-wpds/no-setting-wpds-custom-properties",
+    "severity": "error",
+    "text": "Do not set CSS custom properties using the Design System tokens namespace (i.e. beginning with --wpds-*). (plugin-wpds/no-setting-wpds-custom-properties)",
+  },
+  {
+    "column": 2,
+    "endColumn": 27,
+    "endLine": 7,
+    "line": 7,
+    "rule": "plugin-wpds/no-setting-wpds-custom-properties",
+    "severity": "error",
+    "text": "Do not set CSS custom properties using the Design System tokens namespace (i.e. beginning with --wpds-*). (plugin-wpds/no-setting-wpds-custom-properties)",
+  },
+]
+`;

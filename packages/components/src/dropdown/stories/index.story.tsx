@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react-webpack5';
+import { fn } from 'storybook/test';
 
 /**
  * Internal dependencies
@@ -16,8 +17,11 @@ const meta: Meta< typeof Dropdown > = {
 	title: 'Components/Overlays/Dropdown',
 	id: 'components-dropdown',
 	component: Dropdown,
-	// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 	subcomponents: { DropdownContentWrapper },
+	args: {
+		onClose: fn(),
+		onToggle: fn(),
+	},
 	argTypes: {
 		focusOnMount: {
 			options: [ 'firstElement', true, false ],
@@ -34,7 +38,6 @@ const meta: Meta< typeof Dropdown > = {
 		onClose: { control: false },
 	},
 	parameters: {
-		actions: { argTypesRegex: '^on.*' },
 		controls: {
 			expanded: true,
 		},

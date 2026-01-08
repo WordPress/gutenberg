@@ -100,15 +100,19 @@ export const previewField = {
 export const descriptionField = {
 	label: __( 'Description' ),
 	id: 'description',
-	render: function RenderDescription( { item } ) {
-		const defaultTemplateTypes = useAllDefaultTemplateTypes();
-		const defaultTemplateType = defaultTemplateTypes.find(
-			( type ) => type.slug === item.slug
-		);
-		return item.description
-			? decodeEntities( item.description )
-			: defaultTemplateType?.description;
-	},
+	render: window?.__experimentalTemplateActivate
+		? function RenderDescription( { item } ) {
+				const defaultTemplateTypes = useAllDefaultTemplateTypes();
+				const defaultTemplateType = defaultTemplateTypes.find(
+					( type ) => type.slug === item.slug
+				);
+				return item.description
+					? decodeEntities( item.description )
+					: defaultTemplateType?.description;
+		  }
+		: ( { item } ) => {
+				return item.description && decodeEntities( item.description );
+		  },
 	enableSorting: false,
 	enableGlobalSearch: true,
 };

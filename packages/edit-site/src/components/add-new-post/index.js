@@ -99,7 +99,6 @@ export default function AddNewPostModal( { postType, onSave, onClose } ) {
 				<VStack spacing={ 4 }>
 					<TextControl
 						__next40pxDefaultSize
-						__nextHasNoMarginBottom
 						label={ __( 'Title' ) }
 						onChange={ setTitle }
 						placeholder={ __( 'No title' ) }

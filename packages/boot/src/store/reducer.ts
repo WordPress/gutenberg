@@ -7,6 +7,7 @@ import type { State } from './types';
 const initialState: State = {
 	menuItems: {},
 	routes: [],
+	dashboardLink: undefined,
 };
 
 export function reducer( state: State = initialState, action: Action ): State {
@@ -20,10 +21,28 @@ export function reducer( state: State = initialState, action: Action ): State {
 				},
 			};
 
+		case 'UPDATE_MENU_ITEM':
+			return {
+				...state,
+				menuItems: {
+					...state.menuItems,
+					[ action.id ]: {
+						...state.menuItems[ action.id ],
+						...action.updates,
+					},
+				},
+			};
+
 		case 'REGISTER_ROUTE':
 			return {
 				...state,
 				routes: [ ...state.routes, action.route ],
+			};
+
+		case 'SET_DASHBOARD_LINK':
+			return {
+				...state,
+				dashboardLink: action.dashboardLink,
 			};
 	}
 

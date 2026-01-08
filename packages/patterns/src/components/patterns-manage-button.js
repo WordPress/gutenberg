@@ -103,7 +103,7 @@ function PatternsManageButton( { clientId } ) {
 						}
 					} }
 				>
-					{ __( 'Detach' ) }
+					{ __( 'Disconnect pattern' ) }
 				</MenuItem>
 			) }
 			<MenuItem href={ managePatternsUrl }>

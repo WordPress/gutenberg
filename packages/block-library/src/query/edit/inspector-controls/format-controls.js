@@ -83,7 +83,6 @@ export default function FormatControls( { onChange, query: { format } } ) {
 			} }
 			__experimentalShowHowTo={ false }
 			__experimentalExpandOnFocus
-			__nextHasNoMarginBottom
 			__next40pxDefaultSize
 		/>
 	);

@@ -2,12 +2,21 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Fixed scaffolded `package.json` dependencies to include WordPress packages used in default templates. ([#72978](https://github.com/WordPress/gutenberg/pull/72978))
+
+## 4.79.0 (2025-11-26)
+
+## 4.78.0 (2025-11-12)
+
 ## 4.77.0 (2025-10-29)
 
 ## 4.76.0 (2025-10-17)
 
-## Enhancement 
-- Enable `alias` package installation ([#72079](https://github.com/WordPress/gutenberg/pull/72079)).
+## Enhancement
+
+-   Enable `alias` package installation ([#72079](https://github.com/WordPress/gutenberg/pull/72079)).
 
 ## 4.75.0 (2025-10-01)
 
@@ -16,6 +25,7 @@
 ## 4.73.0 (2025-09-03)
 
 ### Enhancement
+
 -   Add lifecycle script execution support during npm packages installation ([#71072](https://github.com/WordPress/gutenberg/pull/71072)).
 
 ## 4.72.0 (2025-08-20)

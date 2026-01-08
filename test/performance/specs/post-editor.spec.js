@@ -492,12 +492,14 @@ test.describe( 'Post Editor Performance', () => {
 				.getByRole( 'button', {
 					name: 'Block Inserter',
 				} );
-			const paragraphBlockItem = page.locator(
-				'.block-editor-inserter__menu .editor-block-list-item-paragraph'
-			);
-			const headingBlockItem = page.locator(
-				'.block-editor-inserter__menu .editor-block-list-item-heading'
-			);
+			const paragraphBlockItem = page.getByRole( 'option', {
+				name: 'Paragraph',
+				exact: true,
+			} );
+			const headingBlockItem = page.getByRole( 'option', {
+				name: 'Heading',
+				exact: true,
+			} );
 
 			// Open Inserter.
 			await globalInserterToggle.click();

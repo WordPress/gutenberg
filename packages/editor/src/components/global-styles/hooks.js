@@ -188,8 +188,8 @@ export function useGlobalStyles() {
 /**
  * Hook to get a style value from global styles
  *
- * @param {string} path      Style path (e.g., 'color.background')
- * @param {string} blockName Optional block name
+ * @param {string}  path      Style path (e.g., 'color.background')
+ * @param {string=} blockName Optional block name
  * @return {*} Style value
  */
 export function useStyle( path, blockName ) {
@@ -203,8 +203,8 @@ export function useStyle( path, blockName ) {
 /**
  * Hook to get a setting value from global styles
  *
- * @param {string} path      Setting path (e.g., 'spacing.blockGap')
- * @param {string} blockName Optional block name
+ * @param {string}  path      Setting path (e.g., 'spacing.blockGap')
+ * @param {string=} blockName Optional block name
  * @return {*} Setting value
  */
 export function useSetting( path, blockName ) {

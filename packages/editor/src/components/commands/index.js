@@ -315,24 +315,37 @@ const getEditedEntityContextualCommands = () =>
 
 const getPageContentFocusCommands = () =>
 	function usePageContentFocusCommands() {
-		const { onNavigateToEntityRecord, goBack, templateId, isPreviewMode } =
-			useSelect( ( select ) => {
-				const {
-					getRenderingMode,
-					getEditorSettings: _getEditorSettings,
-					getCurrentTemplateId,
-				} = unlock( select( editorStore ) );
-				const editorSettings = _getEditorSettings();
-				return {
-					isTemplateHidden: getRenderingMode() === 'post-only',
-					onNavigateToEntityRecord:
-						editorSettings.onNavigateToEntityRecord,
-					getEditorSettings: _getEditorSettings,
-					goBack: editorSettings.onNavigateToPreviousEntityRecord,
-					templateId: getCurrentTemplateId(),
-					isPreviewMode: editorSettings.isPreviewMode,
-				};
-			}, [] );
+		const {
+			onNavigateToEntityRecord,
+			goBack,
+			templateId,
+			isPreviewMode,
+			canEditTemplate,
+		} = useSelect( ( select ) => {
+			const {
+				getRenderingMode,
+				getEditorSettings: _getEditorSettings,
+				getCurrentTemplateId,
+			} = unlock( select( editorStore ) );
+			const editorSettings = _getEditorSettings();
+			const _templateId = getCurrentTemplateId();
+			return {
+				isTemplateHidden: getRenderingMode() === 'post-only',
+				onNavigateToEntityRecord:
+					editorSettings.onNavigateToEntityRecord,
+				getEditorSettings: _getEditorSettings,
+				goBack: editorSettings.onNavigateToPreviousEntityRecord,
+				templateId: _templateId,
+				isPreviewMode: editorSettings.isPreviewMode,
+				canEditTemplate:
+					!! _templateId &&
+					select( coreStore ).canUser( 'update', {
+						kind: 'postType',
+						name: 'wp_template',
+						id: _templateId,
+					} ),
+			};
+		}, [] );
 		const { editedRecord: template, hasResolved } = useEntityRecord(
 			'postType',
 			'wp_template',
@@ -345,7 +358,7 @@ const getPageContentFocusCommands = () =>
 
 		const commands = [];
 
-		if ( templateId && hasResolved ) {
+		if ( templateId && hasResolved && canEditTemplate ) {
 			commands.push( {
 				name: 'core/switch-to-template-focus',
 				label: sprintf(

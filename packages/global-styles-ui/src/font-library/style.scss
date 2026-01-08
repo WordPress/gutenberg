@@ -1,0 +1,226 @@
+@use "@wordpress/base-styles/mixins";
+@use "@wordpress/base-styles/variables";
+@use "@wordpress/base-styles/colors";
+
+$footer-height: 90px;
+
+.font-library-modal {
+	// @todo If a new prop is added to the Modal component that constrains
+	// the content width, we should use that prop instead of this style.
+	// see https://github.com/WordPress/gutenberg/issues/54471.
+	&.font-library-modal {
+		@include mixins.break-medium() {
+			width: 65vw;
+		}
+	}
+
+	.components-modal__header {
+		border-bottom: none;
+	}
+
+	.components-modal__content {
+		padding: 0;
+		margin-bottom: $footer-height;
+	}
+
+	.font-library__subtitle {
+		text-transform: uppercase;
+		font-weight: variables.$font-weight-medium;
+		font-size: 11px;
+	}
+}
+
+.font-library-modal__tab-panel {
+	height: calc(100% - 50px); // Subtracting header and tab heights
+}
+
+.font-library__tabpanel-layout {
+	height: 100%;
+	display: flex;
+	flex-direction: column;
+
+	> div {
+		flex-grow: 1;
+	}
+
+	.font-library__loading {
+		width: 100%;
+		height: 100%;
+		display: flex;
+		position: absolute;
+		left: 0;
+		top: 0;
+		align-items: center;
+		justify-content: center;
+		// Push down so that the progress bar is centered vertically.
+		// It should be 120px (72px modal header height + 48px tab height)
+		padding-top:
+			variables.$header-height + variables.$grid-unit-15 +
+			variables.$grid-unit-60;
+		box-sizing: border-box;
+	}
+
+	.components-navigator-screen {
+		padding: variables.$grid-unit-30;
+		width: 100%;
+	}
+}
+
+.font-library__footer {
+	position: absolute;
+	width: 100%;
+	bottom: 0;
+	border-top: 1px solid colors.$gray-300;
+	padding: variables.$grid-unit-30;
+	background-color: colors.$white;
+	box-sizing: border-box;
+	flex-grow: 0 !important;
+	flex-shrink: 0;
+	height: $footer-height;
+}
+
+.font-library__page-selection {
+	font-size: 11px;
+	font-weight: variables.$font-weight-medium;
+	text-transform: uppercase;
+
+	@include mixins.break-small() {
+		.font-library__page-selection-trigger {
+			font-size: 11px !important;
+			font-weight: variables.$font-weight-medium;
+		}
+	}
+}
+
+.font-library__fonts-title {
+	text-transform: uppercase;
+	font-size: 11px;
+	font-weight: 600;
+	margin-top: 0;
+	margin-bottom: 0;
+}
+
+.font-library__fonts-list {
+	list-style: none;
+	padding: 0;
+	margin-top: 0;
+	margin-bottom: 0;
+}
+
+.font-library__fonts-list-item {
+	margin-bottom: 0;
+}
+
+.font-library__font-card {
+	box-sizing: border-box;
+	border: variables.$border-width solid colors.$gray-300;
+	width: 100%;
+
+	// Override the default 40px height set by the Button component.
+	// Ref - https://github.com/WordPress/gutenberg/pull/65258#discussion_r1756147260
+	height: auto !important;
+
+	padding: variables.$grid-unit-20;
+	margin-top: -1px; /* To collapse the margin with the previous element */
+
+	&:hover {
+		background-color: colors.$gray-100;
+	}
+
+	&:focus {
+		position: relative;
+	}
+
+	.font-library__font-card__name {
+		font-weight: bold;
+	}
+
+	.font-library__font-card__count {
+		color: colors.$gray-700;
+	}
+
+	.font-library__font-variant_demo-image {
+		display: block;
+		height: variables.$grid-unit-30;
+		width: auto;
+	}
+
+	.font-library__font-variant_demo-text {
+		white-space: nowrap;
+		flex-shrink: 0;
+
+		@media not ( prefers-reduced-motion ) {
+			transition: opacity 0.3s ease-in-out;
+		}
+	}
+}
+
+.font-library-modal__tablist-container {
+	position: sticky;
+	top: 0;
+	border-bottom: 1px solid colors.$gray-300;
+	background: colors.$white;
+	z-index: 1;
+}
+
+.font-library__upload-area {
+	align-items: center;
+	display: flex;
+	justify-content: center;
+
+	// Override the default 40px height set by the Button component.
+	// Ref - https://github.com/WordPress/gutenberg/pull/65258#discussion_r1756155039
+	height: variables.$grid-unit-80 * 4 !important; // 256px
+
+	width: 100%;
+}
+
+button.font-library__upload-area {
+	background-color: colors.$gray-100;
+}
+
+.font-library__local-fonts {
+	margin: variables.$grid-unit-30 auto;
+	width: 80%;
+
+	.font-library__upload-area__text {
+		color: colors.$gray-700;
+	}
+}
+
+.font-library__google-fonts-confirm {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	margin-top: variables.$grid-unit-80;
+
+	p {
+		line-height: variables.$default-line-height;
+	}
+
+	h2 {
+		font-size: 1.2rem;
+		font-weight: 400;
+	}
+
+	.components-card {
+		padding: variables.$grid-unit-20;
+		width: 400px;
+	}
+
+	.components-button {
+		width: 100%;
+		justify-content: center;
+	}
+}
+
+.font-library__select-all {
+	padding:
+		variables.$grid-unit-20 variables.$grid-unit-20
+		variables.$grid-unit-20 variables.$grid-unit-20 +
+		variables.$border-width;
+
+	.components-checkbox-control__label {
+		padding-left: variables.$grid-unit-20;
+	}
+}

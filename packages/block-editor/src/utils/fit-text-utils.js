@@ -4,7 +4,7 @@
  */
 
 /**
- * Find optimal font size using simple binary search between 5-600px.
+ * Find optimal font size using simple binary search between 0-2400px.
  *
  * @param {HTMLElement} textElement   The text element
  * @param {Function}    applyFontSize Function that receives font size in pixels
@@ -13,15 +13,32 @@
 function findOptimalFontSize( textElement, applyFontSize ) {
 	const alreadyHasScrollableHeight =
 		textElement.scrollHeight > textElement.clientHeight;
-	let minSize = 5;
-	let maxSize = 600;
+	let minSize = 0;
+	let maxSize = 2400;
 	let bestSize = minSize;
+
+	const computedStyle = window.getComputedStyle( textElement );
+	const paddingLeft = parseFloat( computedStyle.paddingLeft ) || 0;
+	const paddingRight = parseFloat( computedStyle.paddingRight ) || 0;
+	const range = document.createRange();
+	range.selectNodeContents( textElement );
 
 	while ( minSize <= maxSize ) {
 		const midSize = Math.floor( ( minSize + maxSize ) / 2 );
 		applyFontSize( midSize );
 
-		const fitsWidth = textElement.scrollWidth <= textElement.clientWidth;
+		// When there is padding if the text overflows to the
+		// padding area, it should be considered overflowing.
+		// Use Range API to measure actual text content dimensions.
+		const rect = range.getBoundingClientRect();
+		const textWidth = rect.width;
+
+		// Check if text fits within the element's width and is not
+		// overflowing into the padding area.
+		const fitsWidth =
+			textElement.scrollWidth <= textElement.clientWidth &&
+			textWidth <= textElement.clientWidth - paddingLeft - paddingRight;
+		// Check if text fits within the element's height.
 		const fitsHeight =
 			alreadyHasScrollableHeight ||
 			textElement.scrollHeight <= textElement.clientHeight;
@@ -33,6 +50,7 @@ function findOptimalFontSize( textElement, applyFontSize ) {
 			maxSize = midSize - 1;
 		}
 	}
+	range.detach();
 
 	return bestSize;
 }

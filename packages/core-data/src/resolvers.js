@@ -23,6 +23,7 @@ import {
 	getUserPermissionsFromAllowHeader,
 	ALLOWED_RESOURCE_ACTIONS,
 	RECEIVE_INTERMEDIATE_RESULTS,
+	isNumericID,
 } from './utils';
 import { fetchBlockPatterns } from './fetch';
 
@@ -118,9 +119,8 @@ export const getEntityRecord =
 			if (
 				kind === 'postType' &&
 				name === 'wp_template' &&
-				key &&
-				typeof key === 'string' &&
-				! /^\d+$/.test( key )
+				( ( key && typeof key === 'string' && ! /^\d+$/.test( key ) ) ||
+					! window?.__experimentalTemplateActivate )
 			) {
 				baseURL =
 					baseURL.slice( 0, baseURL.lastIndexOf( '/' ) ) +
@@ -158,6 +158,7 @@ export const getEntityRecord =
 			if (
 				window.__experimentalEnableSync &&
 				entityConfig.syncConfig &&
+				isNumericID( key ) &&
 				! query
 			) {
 				if ( globalThis.IS_GUTENBERG_PLUGIN ) {
@@ -903,7 +904,12 @@ export const getDefaultTemplateId =
 		// Wait for the the entities config to be loaded, otherwise receiving
 		// the template as an entity will not work.
 		await resolveSelect.getEntitiesConfig( 'postType' );
-		const id = template?.wp_id || template?.id;
+		// When active_templates experiment is enabled, use numeric wp_id if it
+		// exists, otherwise fall back to string ID format (theme//slug) as the
+		// frontend expects string IDs for templates.
+		const id = window?.__experimentalTemplateActivate
+			? template?.wp_id || template?.id
+			: template?.id;
 		// Endpoint may return an empty object if no template is found.
 		if ( id ) {
 			template.id = id;
@@ -1163,4 +1169,28 @@ export const getEntitiesConfig =
 		} catch {
 			// Do nothing if the request comes back with an API error.
 		}
+	};
+
+/**
+ * Requests editor settings from the REST API.
+ */
+export const getEditorSettings =
+	() =>
+	async ( { dispatch } ) => {
+		const settings = await apiFetch( {
+			path: '/wp-block-editor/v1/settings',
+		} );
+		dispatch.receiveEditorSettings( settings );
+	};
+
+/**
+ * Requests editor assets from the REST API.
+ */
+export const getEditorAssets =
+	() =>
+	async ( { dispatch } ) => {
+		const assets = await apiFetch( {
+			path: '/wp-block-editor/v1/assets',
+		} );
+		dispatch.receiveEditorAssets( assets );
 	};

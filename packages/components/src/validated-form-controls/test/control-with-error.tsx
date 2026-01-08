@@ -7,7 +7,7 @@ import userEvent from '@testing-library/user-event';
 /**
  * WordPress dependencies
  */
-import { useState, useCallback } from '@wordpress/element';
+import { useState, useCallback, useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -38,7 +38,7 @@ describe( 'ControlWithError', () => {
 					>[ 'customValidity' ]
 				>( undefined );
 
-			const onValidate = useCallback(
+			const onChange = useCallback(
 				( value?: string ) => {
 					setCustomValidity( {
 						type: 'validating',
@@ -59,6 +59,8 @@ describe( 'ControlWithError', () => {
 							} );
 						}
 					}, serverDelayMs );
+
+					setText( value ?? '' );
 				},
 				[ serverDelayMs ]
 			);
@@ -67,10 +69,7 @@ describe( 'ControlWithError', () => {
 				<ValidatedInputControl
 					label="Text"
 					value={ text }
-					onChange={ ( newValue ) => {
-						setText( newValue ?? '' );
-					} }
-					onValidate={ onValidate }
+					onChange={ onChange }
 					customValidity={ customValidity }
 					{ ...restProps }
 				/>
@@ -218,6 +217,121 @@ describe( 'ControlWithError', () => {
 				expect(
 					screen.getByText( 'The word "error" is not allowed.' )
 				).toBeVisible();
+			} );
+		} );
+	} );
+
+	describe( 'Form submission', () => {
+		const CustomValidatedInputControl = ( {
+			...restProps
+		}: React.ComponentProps< typeof ValidatedInputControl > ) => {
+			const [ customValidity, setCustomValidity ] =
+				useState<
+					React.ComponentProps<
+						typeof ValidatedInputControl
+					>[ 'customValidity' ]
+				>( undefined );
+			return (
+				<ValidatedInputControl
+					onChange={ ( value ) =>
+						value === 'error'
+							? setCustomValidity( {
+									type: 'invalid',
+									message: 'The word "error" is not allowed.',
+							  } )
+							: setCustomValidity( undefined )
+					}
+					customValidity={ customValidity }
+					{ ...restProps }
+				/>
+			);
+		};
+
+		it( 'should show custom validity messages regardless of "touched" state if parent form is submitted', async () => {
+			const user = userEvent.setup();
+			const onSubmit = jest.fn();
+			render(
+				<form onSubmit={ onSubmit }>
+					<CustomValidatedInputControl label="Text" />
+					<button type="submit">Submit</button>
+				</form>
+			);
+
+			const input = screen.getByRole< HTMLInputElement >( 'textbox', {
+				name: 'Text',
+			} );
+
+			// User has interacted, but not blurred
+			await user.type( input, 'error' );
+			await user.keyboard( '{enter}' );
+
+			// Input is marked as invalid at the HTML level
+			await waitFor( () => {
+				expect( input.checkValidity() ).toBe( false );
+			} );
+			expect( input.validationMessage ).toBe(
+				'The word "error" is not allowed.'
+			);
+
+			// Field is showing the error message
+			expect(
+				screen.getByText( 'The word "error" is not allowed.' )
+			).toBeVisible();
+
+			// Form is not submitted
+			expect( onSubmit ).not.toHaveBeenCalled();
+		} );
+	} );
+
+	describe( 'Focus behavior', () => {
+		it( 'should focus the first error in the form', async () => {
+			const user = userEvent.setup();
+			render(
+				<form>
+					<ValidatedInputControl label="Text1" required />
+					<ValidatedInputControl label="Text2" required />
+					<button type="submit">Submit</button>
+				</form>
+			);
+
+			await user.click(
+				screen.getByRole( 'button', { name: 'Submit' } )
+			);
+
+			expect(
+				screen.getByRole( 'textbox', { name: /^Text1/ } )
+			).toHaveFocus();
+		} );
+
+		it( 'should focus the field on an `invalid` event, even if there is no enclosing form', async () => {
+			const user = userEvent.setup();
+			function ValidatedInputControlWithRef(
+				props: React.ComponentProps< typeof ValidatedInputControl >
+			) {
+				const ref = useRef< HTMLInputElement >( null );
+				return (
+					<>
+						<ValidatedInputControl ref={ ref } { ...props } />
+						<button
+							type="button"
+							onClick={ () => ref.current?.reportValidity() }
+						>
+							Report Validity
+						</button>
+					</>
+				);
+			}
+
+			render( <ValidatedInputControlWithRef label="Text" required /> );
+
+			await user.click(
+				screen.getByRole( 'button', { name: 'Report Validity' } )
+			);
+
+			await waitFor( () => {
+				expect(
+					screen.getByRole( 'textbox', { name: /^Text/ } )
+				).toHaveFocus();
 			} );
 		} );
 	} );

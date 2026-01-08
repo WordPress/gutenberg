@@ -8,9 +8,13 @@ import clsx from 'clsx';
  */
 import { createBlock } from '@wordpress/blocks';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { ToolbarButton, ToolbarGroup } from '@wordpress/components';
+import {
+	ToolbarButton,
+	ToolbarGroup,
+	VisuallyHidden,
+} from '@wordpress/components';
 import { displayShortcut, isKeyboardEvent } from '@wordpress/keycodes';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import {
 	BlockControls,
 	InspectorControls,
@@ -26,13 +30,19 @@ import { useState, useEffect, useRef, useCallback } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
 import { link as linkIcon, addSubmenu } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
-import { useMergeRefs, usePrevious } from '@wordpress/compose';
+import { useMergeRefs, useInstanceId } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import { getColors } from '../navigation/edit/utils';
-import { Controls, LinkUI, updateAttributes, useEntityBinding } from './shared';
+import {
+	Controls,
+	LinkUI,
+	useEntityBinding,
+	MissingEntityHelpText,
+	useHandleLinkChange,
+} from './shared';
 
 const DEFAULT_BLOCK = { name: 'core/navigation-link' };
 const NESTING_BLOCK_NAMES = [
@@ -97,21 +107,35 @@ const useIsInvalidLink = ( kind, type, id, enabled ) => {
 	const hasId = Number.isInteger( id );
 	const blockEditingMode = useBlockEditingMode();
 
-	const postStatus = useSelect(
+	const { postStatus, isDeleted } = useSelect(
 		( select ) => {
 			if ( ! isPostType ) {
-				return null;
+				return { postStatus: null, isDeleted: false };
 			}
 
 			// Fetching the posts status is an "expensive" operation. Especially for sites with large navigations.
 			// When the block is rendered in a template or other disabled contexts we can skip this check in order
 			// to avoid all these additional requests that don't really add any value in that mode.
 			if ( blockEditingMode === 'disabled' || ! enabled ) {
-				return null;
+				return { postStatus: null, isDeleted: false };
 			}
 
-			const { getEntityRecord } = select( coreStore );
-			return getEntityRecord( 'postType', type, id )?.status;
+			const { getEntityRecord, hasFinishedResolution } =
+				select( coreStore );
+			const entityRecord = getEntityRecord( 'postType', type, id );
+			const hasResolved = hasFinishedResolution( 'getEntityRecord', [
+				'postType',
+				type,
+				id,
+			] );
+
+			// If resolution has finished and entityRecord is undefined, the entity was deleted.
+			const deleted = hasResolved && entityRecord === undefined;
+
+			return {
+				postStatus: entityRecord?.status,
+				isDeleted: deleted,
+			};
 		},
 		[ isPostType, blockEditingMode, enabled, type, id ]
 	);
@@ -121,11 +145,13 @@ const useIsInvalidLink = ( kind, type, id, enabled ) => {
 	// 2. It has an id.
 	// 3. It's neither null, nor undefined, as valid items might be either of those while loading.
 	// If those conditions are met, check if
-	// 1. The post status is published.
-	// 2. The Navigation Link item has no label.
+	// 1. The post status is trash (trashed).
+	// 2. The entity doesn't exist (deleted).
 	// If either of those is true, invalidate.
 	const isInvalid =
-		isPostType && hasId && postStatus && 'trash' === postStatus;
+		isPostType &&
+		hasId &&
+		( isDeleted || ( postStatus && 'trash' === postStatus ) );
 	const isDraft = 'draft' === postStatus;
 
 	return [ isInvalid, isDraft ];
@@ -187,8 +213,11 @@ export default function NavigationLinkEdit( {
 	const itemLabelPlaceholder = __( 'Add label…' );
 	const ref = useRef();
 	const linkUIref = useRef();
-	const prevUrl = usePrevious( url );
-	const isNewLink = useRef( ! url );
+	// A link is "new" only if it has an undefined label
+	// After the link is created, even if no label is provided, it's set to an empty string.
+	const isNewLink = useRef( label === undefined );
+	// Track whether we should focus the submenu appender when closing the link UI
+	const shouldSelectSubmenuAppenderOnClose = useRef( false );
 
 	const {
 		isAtMaxNesting,
@@ -197,6 +226,7 @@ export default function NavigationLinkEdit( {
 		hasChildren,
 		validateLinkStatus,
 		parentBlockClientId,
+		isSubmenu,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -241,6 +271,7 @@ export default function NavigationLinkEdit( {
 				hasChildren: !! getBlockCount( clientId ),
 				validateLinkStatus: enableLinkStatusValidation,
 				parentBlockClientId: parentBlockId,
+				isSubmenu: parentBlockName === 'core/navigation-submenu',
 			};
 		},
 		[ clientId, maxNestingLevel ]
@@ -248,9 +279,15 @@ export default function NavigationLinkEdit( {
 	const { getBlocks } = useSelect( blockEditorStore );
 
 	// URL binding logic
-	const { clearBinding, createBinding } = useEntityBinding( {
+	const { hasUrlBinding, isBoundEntityAvailable } = useEntityBinding( {
 		clientId,
 		attributes,
+	} );
+
+	const handleLinkChange = useHandleLinkChange( {
+		clientId,
+		attributes,
+		setAttributes,
 	} );
 
 	const [ isInvalid, isDraft ] = useIsInvalidLink(
@@ -283,7 +320,7 @@ export default function NavigationLinkEdit( {
 	// If we leave focus on this block, then when we close the link without creating a link, focus will
 	// be lost during the new block selection process.
 	useEffect( () => {
-		if ( isNewLink.current && isSelected && ! url ) {
+		if ( isNewLink.current && isSelected ) {
 			selectBlock( parentBlockClientId );
 		}
 	}, [] ); // eslint-disable-line react-hooks/exhaustive-deps
@@ -302,20 +339,46 @@ export default function NavigationLinkEdit( {
 		transformToSubmenu,
 	] );
 
-	// If the LinkControl popover is open and the URL has changed, close the LinkControl and focus the label text.
+	// Handle link UI when a new link is created
 	useEffect( () => {
-		// We only want to do this when the URL has gone from nothing to a new URL AND the label looks like a URL
-		if (
-			! prevUrl &&
-			url &&
-			isLinkOpen &&
-			isURL( prependHTTP( label ) ) &&
-			/^.+\.[a-z]+/.test( label )
-		) {
+		// We know if a link was just created from our link UI if
+		// 1. isNewLink.current is true
+		// 2. url has a value
+		// 3. isLinkOpen is true
+		if ( ! isNewLink.current || ! url || ! isLinkOpen ) {
+			return;
+		}
+
+		// Ensure this only runs once
+		isNewLink.current = false;
+
+		// We just created a link and the block is now selected.
+		// If the label looks like a URL, focus and select the label text.
+		if ( isURL( prependHTTP( label ) ) && /^.+\.[a-z]+/.test( label ) ) {
 			// Focus and select the label text.
 			selectLabelText();
+		} else {
+			// If the link was just created, we want to select the block so the inspector controls
+			// are accurate.
+			selectBlock( clientId, null );
+
+			// Edge case: When the created link is the first child of a submenu, the focus will have
+			// originated from the add submenu toolbar button. In this case, we need to return focus
+			// to the submenu appender if the user closes the link ui using the keyboard.
+			// Check if this is the first and only child of a newly created submenu.
+			if ( isSubmenu ) {
+				const parentBlocks = getBlocks( parentBlockClientId );
+				// If this is the only child, then this is a new submenu.
+				// Set the flag to select the submenu appender when the link ui is closed.
+				if (
+					parentBlocks.length === 1 &&
+					parentBlocks[ 0 ].clientId === clientId
+				) {
+					shouldSelectSubmenuAppenderOnClose.current = true;
+				}
+			}
 		}
-	}, [ prevUrl, url, isLinkOpen, label ] );
+	}, [ url, isLinkOpen, isNewLink, label ] );
 
 	/**
 	 * Focus the Link label text and select it.
@@ -373,6 +436,12 @@ export default function NavigationLinkEdit( {
 		}
 	}
 
+	const instanceId = useInstanceId( NavigationLinkEdit );
+	const hasMissingEntity = hasUrlBinding && ! isBoundEntityAvailable;
+	const missingEntityDescriptionId = hasMissingEntity
+		? sprintf( 'navigation-link-edit-%d-desc', instanceId )
+		: undefined;
+
 	const blockProps = useBlockProps( {
 		ref: useMergeRefs( [ setPopoverAnchor, listItemRef ] ),
 		className: clsx( 'wp-block-navigation-item', {
@@ -386,6 +455,8 @@ export default function NavigationLinkEdit( {
 			[ getColorClassName( 'background-color', backgroundColor ) ]:
 				!! backgroundColor,
 		} ),
+		'aria-describedby': missingEntityDescriptionId,
+		'aria-invalid': hasMissingEntity,
 		style: {
 			color: ! textColor && customTextColor,
 			backgroundColor: ! backgroundColor && customBackgroundColor,
@@ -405,14 +476,20 @@ export default function NavigationLinkEdit( {
 		}
 	);
 
-	if ( ! url || isInvalid || isDraft ) {
+	const needsValidLink =
+		( ! url && ! ( hasUrlBinding && isBoundEntityAvailable ) ) ||
+		isInvalid ||
+		isDraft ||
+		( hasUrlBinding && ! isBoundEntityAvailable );
+
+	if ( needsValidLink ) {
 		blockProps.onClick = () => {
 			setIsLinkOpen( true );
 		};
 	}
 
 	const classes = clsx( 'wp-block-navigation-item__content', {
-		'wp-block-navigation-link__placeholder': ! url || isInvalid || isDraft,
+		'wp-block-navigation-link__placeholder': needsValidLink,
 	} );
 
 	const missingText = getMissingText( type );
@@ -452,6 +529,11 @@ export default function NavigationLinkEdit( {
 				/>
 			</InspectorControls>
 			<div { ...blockProps }>
+				{ hasMissingEntity && (
+					<VisuallyHidden id={ missingEntityDescriptionId }>
+						<MissingEntityHelpText type={ type } kind={ kind } />
+					</VisuallyHidden>
+				) }
 				{ /* eslint-disable jsx-a11y/anchor-is-valid */ }
 				<a className={ classes }>
 					{ /* eslint-enable */ }
@@ -531,36 +613,37 @@ export default function NavigationLinkEdit( {
 							link={ attributes }
 							onClose={ () => {
 								setIsLinkOpen( false );
-								// If there is no link then remove the auto-inserted block.
+								// If there is no link and no binding, remove the auto-inserted block.
 								// This avoids empty blocks which can provided a poor UX.
-								if ( ! url ) {
+								// Don't remove if binding exists (even if entity is unavailable) so user can fix it.
+								if ( ! url && ! hasUrlBinding ) {
 									onReplace( [] );
-								} else if ( isNewLink.current ) {
-									// If we just created a new link, select it
-									selectBlock( clientId );
+									return;
+								}
+
+								// Edge case: If this is the first child of a new submenu, focus the submenu's appender
+								if (
+									shouldSelectSubmenuAppenderOnClose.current
+								) {
+									shouldSelectSubmenuAppenderOnClose.current = false;
+
+									// The appender is the next sibling in the DOM after the current block
+									if (
+										listItemRef.current?.nextElementSibling
+									) {
+										const appenderButton =
+											listItemRef.current.nextElementSibling.querySelector(
+												'.block-editor-button-block-appender'
+											);
+										if ( appenderButton ) {
+											appenderButton.focus();
+										}
+									}
 								}
 							} }
 							anchor={ popoverAnchor }
 							onRemove={ removeLink }
-							onChange={ ( updatedValue ) => {
-								const {
-									isEntityLink,
-									attributes: updatedAttributes,
-								} = updateAttributes(
-									updatedValue,
-									setAttributes,
-									attributes
-								);
-
-								// Handle URL binding based on the final computed state
-								// Only create bindings for entity links (posts, pages, taxonomies)
-								// Never create bindings for custom links (manual URLs)
-								if ( isEntityLink ) {
-									createBinding( updatedAttributes );
-								} else {
-									clearBinding();
-								}
-							} }
+							onChange={ handleLinkChange }
 						/>
 					) }
 				</a>

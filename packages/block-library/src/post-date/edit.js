@@ -235,7 +235,6 @@ export default function PostDateEdit( {
 						isShownByDefault
 					>
 						<ToggleControl
-							__nextHasNoMarginBottom
 							label={
 								postType?.labels.singular_name
 									? sprintf(

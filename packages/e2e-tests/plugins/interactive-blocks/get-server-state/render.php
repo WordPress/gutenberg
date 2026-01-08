@@ -21,6 +21,7 @@ if ( isset( $attributes['state'] ) ) {
 >
 	<div data-testid="prop" data-wp-text="state.prop"></div>
 	<div data-testid="nested.prop" data-wp-text="state.nested.prop"></div>
+	<div data-testid="objCopiedFromServer" data-wp-text="state.objCopiedFromServer.prop"></div>
 	<div data-testid="newProp" data-wp-text="state.newProp"></div>
 	<div data-testid="nested.newProp" data-wp-text="state.nested.newProp"></div>
 	<div data-testid="nonChanging" data-wp-text="state.nonChanging"></div>

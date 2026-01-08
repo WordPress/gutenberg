@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import clsx from 'clsx';
+
+/**
  * WordPress dependencies
  */
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -77,7 +82,8 @@ export default function BlockTools( {
 		getBlockRootClientId,
 		isGroupable,
 		getBlockName,
-	} = useSelect( blockEditorStore );
+		getEditedContentOnlySection,
+	} = unlock( useSelect( blockEditorStore ) );
 	const { getGroupingBlockName } = useSelect( blocksStore );
 	const { showEmptyBlockSideInserter, showBlockToolbarPopover } =
 		useShowBlockTools();
@@ -94,6 +100,7 @@ export default function BlockTools( {
 		moveBlocksDown,
 		expandBlock,
 		updateBlockAttributes,
+		stopEditingContentOnlySection,
 	} = unlock( useDispatch( blockEditorStore ) );
 
 	function onKeyDown( event ) {
@@ -217,7 +224,7 @@ export default function BlockTools( {
 				const canToggleBlockVisibility = blocks.every( ( block ) =>
 					hasBlockSupport(
 						getBlockName( block.clientId ),
-						'blockVisibility',
+						'visibility',
 						true
 					)
 				);
@@ -246,13 +253,29 @@ export default function BlockTools( {
 				} );
 			}
 		}
+
+		// Has the same keyboard shortcut as 'unselect', so can't be within the
+		// if/else chain above.
+		if ( isMatch( 'core/block-editor/stop-editing-as-blocks', event ) ) {
+			if ( getEditedContentOnlySection() ) {
+				stopEditingContentOnlySection();
+			}
+		}
 	}
 	const blockToolbarRef = usePopoverScroll( __unstableContentRef );
 	const blockToolbarAfterRef = usePopoverScroll( __unstableContentRef );
 
 	return (
 		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
-		<div { ...props } onKeyDown={ onKeyDown }>
+		<div
+			{ ...props }
+			onKeyDown={ onKeyDown }
+			// Popover slots cannot be unmounted during dragging because the
+			// will just be rendered in a fallback popover slot instead.
+			className={ clsx( props.className, {
+				'block-editor-block-tools--is-dragging': isDragging,
+			} ) }
+		>
 			<InsertionPointOpenRef.Provider value={ useRef( false ) }>
 				{ ! isTyping && ! isZoomOutMode && (
 					<InsertionPoint

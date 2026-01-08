@@ -18,12 +18,23 @@ import {
 // Mock the entire @wordpress/block-editor module
 jest.mock( '@wordpress/block-editor', () => ( {
 	useBlockBindingsUtils: jest.fn(),
+	useBlockEditingMode: jest.fn(),
 } ) );
+
+// Mock useSelect specifically to avoid needing to set up full data store
+jest.mock( '@wordpress/data/src/components/use-select', () => {
+	const mock = jest.fn();
+	return mock;
+} );
 
 /**
  * WordPress dependencies
  */
-import { useBlockBindingsUtils } from '@wordpress/block-editor';
+import {
+	useBlockBindingsUtils,
+	useBlockEditingMode,
+} from '@wordpress/block-editor';
+import { useSelect } from '@wordpress/data';
 
 describe( 'useEntityBinding', () => {
 	const mockUpdateBlockBindings = jest.fn();
@@ -33,6 +44,8 @@ describe( 'useEntityBinding', () => {
 		useBlockBindingsUtils.mockReturnValue( {
 			updateBlockBindings: mockUpdateBlockBindings,
 		} );
+		useBlockEditingMode.mockReturnValue( 'default' );
+		useSelect.mockReturnValue( true );
 	} );
 
 	describe( 'hasUrlBinding', () => {

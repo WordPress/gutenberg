@@ -3,6 +3,11 @@
  */
 import { heading as icon } from '@wordpress/icons';
 import { __, sprintf } from '@wordpress/i18n';
+import {
+	privateApis as blocksPrivateApis,
+	getBlockType,
+	unregisterBlockVariation,
+} from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -13,6 +18,10 @@ import edit from './edit';
 import metadata from './block.json';
 import save from './save';
 import transforms from './transforms';
+import variations from './variations';
+import { unlock } from '../lock-unlock';
+
+const { fieldsKey, formKey } = unlock( blocksPrivateApis );
 
 const { name } = metadata;
 
@@ -65,6 +74,37 @@ export const settings = {
 	},
 	edit,
 	save,
+	variations,
 };
 
-export const init = () => initBlock( { name, metadata, settings } );
+if ( window.__experimentalContentOnlyInspectorFields ) {
+	settings[ fieldsKey ] = [
+		{
+			id: 'content',
+			label: __( 'Content' ),
+			type: 'richtext',
+		},
+	];
+	settings[ formKey ] = {
+		fields: [ 'content' ],
+	};
+}
+
+export const init = () => {
+	const block = initBlock( { name, metadata, settings } );
+
+	// Unregister heading level variations based on `levelOptions` attribute.
+	// This is for backwards compatibility, as extenders can now unregister the
+	// variation directly: `wp.blocks.unregisterBlockVariation( 'core/heading', 'h1' )`.
+	const levelOptions =
+		getBlockType( name )?.attributes?.levelOptions?.default;
+	if ( levelOptions ) {
+		[ 1, 2, 3, 4, 5, 6 ].forEach( ( level ) => {
+			if ( ! levelOptions.includes( level ) ) {
+				unregisterBlockVariation( name, `h${ level }` );
+			}
+		} );
+	}
+
+	return block;
+};

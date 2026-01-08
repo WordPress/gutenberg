@@ -1,20 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * Internal dependencies
- */
-import { NEW_TAB_TARGET, NOFOLLOW_REL } from './constants';
-import { getUpdatedLinkAttributes } from './get-updated-link-attributes';
-import removeAnchorTag from '../utils/remove-anchor-tag';
-import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
-import { unlock } from '../lock-unlock';
-
-/**
- * WordPress dependencies
- */
 import { __, sprintf } from '@wordpress/i18n';
 import {
 	useEffect,
@@ -34,7 +18,6 @@ import {
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 } from '@wordpress/components';
 import {
-	AlignmentControl,
 	BlockControls,
 	InspectorControls,
 	RichText,
@@ -61,6 +44,12 @@ import {
 } from '@wordpress/blocks';
 import { useMergeRefs, useRefEffect } from '@wordpress/compose';
 import { useSelect, useDispatch } from '@wordpress/data';
+import { NEW_TAB_TARGET, NOFOLLOW_REL } from './constants';
+import { getUpdatedLinkAttributes } from './get-updated-link-attributes';
+import removeAnchorTag from '../utils/remove-anchor-tag';
+import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
+import { unlock } from '../lock-unlock';
+import useDeprecatedTextAlign from '../utils/deprecated-text-align-attributes';
 
 const { HTMLElementControl } = unlock( blockEditorPrivateApis );
 
@@ -142,7 +131,6 @@ function WidthPanel( { selectedWidth, setAttributes } ) {
 				isShownByDefault
 				hasValue={ () => !! selectedWidth }
 				onDeselect={ () => setAttributes( { width: undefined } ) }
-				__nextHasNoMarginBottom
 			>
 				<ToggleGroupControl
 					label={ __( 'Width' ) }
@@ -152,7 +140,6 @@ function WidthPanel( { selectedWidth, setAttributes } ) {
 					}
 					isBlock
 					__next40pxDefaultSize
-					__nextHasNoMarginBottom
 				>
 					{ [ 25, 50, 75, 100 ].map( ( widthValue ) => {
 						return (
@@ -186,7 +173,6 @@ function ButtonEdit( props ) {
 	} = props;
 	const {
 		tagName,
-		textAlign,
 		linkTarget,
 		placeholder,
 		rel,
@@ -196,6 +182,7 @@ function ButtonEdit( props ) {
 		width,
 		metadata,
 	} = attributes;
+	useDeprecatedTextAlign( props );
 
 	const TagName = tagName || 'a';
 
@@ -361,7 +348,6 @@ function ButtonEdit( props ) {
 						borderProps.className,
 						typographyProps.className,
 						{
-							[ `has-text-align-${ textAlign }` ]: textAlign,
 							// For backwards compatibility add style that isn't
 							// provided via block support.
 							'no-border-radius': style?.border?.radius === 0,
@@ -385,14 +371,6 @@ function ButtonEdit( props ) {
 			</div>
 			{ hasBlockControls && (
 				<BlockControls group="block">
-					{ hasNonContentControls && (
-						<AlignmentControl
-							value={ textAlign }
-							onChange={ ( nextAlign ) => {
-								setAttributes( { textAlign: nextAlign } );
-							} }
-						/>
-					) }
 					{ isLinkTag && ! lockUrlControls && (
 						<ToolbarButton
 							name="link"
@@ -474,7 +452,6 @@ function ButtonEdit( props ) {
 				{ isLinkTag && (
 					<TextControl
 						__next40pxDefaultSize
-						__nextHasNoMarginBottom
 						label={ __( 'Link relation' ) }
 						help={ createInterpolateElement(
 							__(
