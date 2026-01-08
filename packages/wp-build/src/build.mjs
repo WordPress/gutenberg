@@ -139,9 +139,9 @@ function wasmInlinePlugin() {
 	return {
 		name: 'wasm-inline',
 		setup( build ) {
-			// Resolve .wasm imports from node_modules
+			// Resolve .wasm imports from node_modules.
 			build.onResolve( { filter: /\.wasm$/ }, async ( args ) => {
-				// Handle imports like 'wasm-vips/vips.wasm'
+				// Handle imports like 'wasm-vips/vips.wasm'.
 				if ( ! args.path.startsWith( '.' ) ) {
 					const { createRequire } = await import( 'module' );
 					const require = createRequire(
@@ -154,14 +154,14 @@ function wasmInlinePlugin() {
 							namespace: 'wasm-inline',
 						};
 					} catch {
-						// If resolution fails, let other plugins handle it
+						// If resolution fails, let other plugins handle it.
 						return null;
 					}
 				}
 				return null;
 			} );
 
-			// Load WASM files and convert to base64 data URLs
+			// Load WASM files and convert to base64 data URLs.
 			build.onLoad(
 				{ filter: /.*/, namespace: 'wasm-inline' },
 				async ( args ) => {
