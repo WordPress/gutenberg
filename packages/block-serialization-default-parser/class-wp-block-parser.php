@@ -122,7 +122,7 @@ class WP_Block_Parser {
 						$html = substr( $this->document, $stack_top->prev_offset );
 					}
 
-					$stack_top->block->innerHTML      .= $html;
+					$stack_top->block->innerHTML     .= $html;
 					$stack_top->block->innerContent[] = $html;
 
 					// Trap potential leading freeform content for the final output.
@@ -130,14 +130,14 @@ class WP_Block_Parser {
 
 					if ( isset( $implicitly_closed ) ) {
 						$stack_top->block->innerContent[] = null;
-						$stack_top->block->innerBlocks[] = $implicitly_closed;
+						$stack_top->block->innerBlocks[]  = $implicitly_closed;
 					}
 
 					$implicitly_closed = $stack_top->block;
 				}
 
 				if ( isset( $last_freeform ) && $last_freeform[1] > $last_freeform[0] ) {
-					$html = substr( $this->document, $last_freeform[0], $last_freeform[1] - $last_freeform[0] );
+					$html           = substr( $this->document, $last_freeform[0], $last_freeform[1] - $last_freeform[0] );
 					$this->output[] = (array) $this->freeform( $html );
 				}
 
