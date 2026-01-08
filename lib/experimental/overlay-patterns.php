@@ -15,6 +15,11 @@
  * @since 6.0.0
  */
 function gutenberg_register_overlay_block_patterns() {
+	// Ensure the constant is defined.
+	if ( ! defined( 'GUTENBERG_NAVIGATION_OVERLAY_TEMPLATE_PART_AREA' ) ) {
+		require_once __DIR__ . '/../packages/block-library/src/navigation/index.php';
+	}
+
 	register_block_pattern_category(
 		'navigation',
 		array(
@@ -38,7 +43,7 @@ function gutenberg_register_overlay_block_patterns() {
 <!-- wp:navigation {"layout":{"type":"flex","orientation":"vertical"}} /--></div>
 <!-- /wp:group -->',
 			'categories'  => array( 'navigation' ),
-			'blockTypes'  => array( 'core/template-part/overlay' ),
+			'blockTypes'  => array( 'core/template-part/' . GUTENBERG_NAVIGATION_OVERLAY_TEMPLATE_PART_AREA ),
 		)
 	);
 }

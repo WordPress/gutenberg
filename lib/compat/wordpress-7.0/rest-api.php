@@ -49,21 +49,16 @@ function gutenberg_modify_wp_template_part_post_type_args_7_0( $args ) {
 add_filter( 'register_wp_template_part_post_type_args', 'gutenberg_modify_wp_template_part_post_type_args_7_0' );
 
 /**
- * Navigation overlay template part area identifier.
- * This constant should match NAVIGATION_OVERLAY_TEMPLATE_PART_AREA in
- * packages/block-library/src/navigation/constants.js
- *
- * @since 7.0.0
- */
-define( 'GUTENBERG_NAVIGATION_OVERLAY_TEMPLATE_PART_AREA', 'navigation-overlay' );
-
-/**
  * Registers the 'navigation-overlay' template part area when the experiment is enabled.
  *
  * @param array $areas Array of template part area definitions.
  * @return array Modified array of template part area definitions.
  */
 if ( gutenberg_is_experiment_enabled( 'gutenberg-customizable-navigation-overlays' ) ) {
+	// Ensure the constant is defined.
+	if ( ! defined( 'GUTENBERG_NAVIGATION_OVERLAY_TEMPLATE_PART_AREA' ) ) {
+		require_once __DIR__ . '/../../packages/block-library/src/navigation/index.php';
+	}
 	function gutenberg_register_overlay_template_part_area( $areas ) {
 		$areas[] = array(
 			'area'        => GUTENBERG_NAVIGATION_OVERLAY_TEMPLATE_PART_AREA,

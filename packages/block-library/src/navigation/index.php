@@ -6,6 +6,15 @@
  */
 
 /**
+ * Navigation overlay template part area constant.
+ * Matches the JavaScript constant NAVIGATION_OVERLAY_TEMPLATE_PART_AREA
+ * in packages/block-library/src/navigation/constants.js
+ */
+if ( ! defined( 'GUTENBERG_NAVIGATION_OVERLAY_TEMPLATE_PART_AREA' ) ) {
+	define( 'GUTENBERG_NAVIGATION_OVERLAY_TEMPLATE_PART_AREA', 'navigation-overlay' );
+}
+
+/**
  * Helper functions used to render the navigation block.
  *
  * @since 6.5.0
