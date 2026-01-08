@@ -16,9 +16,6 @@ export function useInputLayoutSlotContext() {
 
 /**
  * Wrapper component that provides slot type context for prefix and suffix slots.
- * @param root0
- * @param root0.type
- * @param root0.children
  */
 export function SlotContextProvider( {
 	type,
