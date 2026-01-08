@@ -24,6 +24,9 @@ ruleTester.run( 'no-unknown-ds-tokens', rule, {
 		{
 			code: `<div style={ { color: 'var(--wpds-color-fg-content-neutral)' } } />`,
 		},
+		{
+			code: '<div style={ { color: `var(--wpds-color-fg-content-neutral)` } } />',
+		},
 	],
 	invalid: [
 		{
@@ -36,6 +39,14 @@ ruleTester.run( 'no-unknown-ds-tokens', rule, {
 		},
 		{
 			code: `<div style={ { color: 'var(--wpds-fake-color, var(--wpds-also-fake))' } } />`,
+			errors: [
+				{
+					messageId: 'onlyKnownTokens',
+				},
+			],
+		},
+		{
+			code: '<div style={ { color: `var(--wpds-nonexistent)` } } />',
 			errors: [
 				{
 					messageId: 'onlyKnownTokens',
