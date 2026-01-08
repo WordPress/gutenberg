@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-const { join, relative, resolve, sep, dirname } = require( 'path' );
+const { relative, resolve, sep, dirname } = require( 'path' );
 const glob = require( 'fast-glob' );
 const execa = require( 'execa' );
 const { Transform } = require( 'stream' );
@@ -216,28 +216,20 @@ glob.stream( [
 				token,
 				path = findDefaultSourcePath( dirname( file ) ),
 			] of tokens ) {
-				await execa(
-					`"${ join(
-						__dirname,
-						'..',
-						'..',
-						'node_modules',
-						'.bin',
-						'docgen'
-					) }"`,
-					[
-						relative( ROOT_DIR, resolve( dirname( file ), path ) ),
-						`--output ${ output }`,
-						'--to-token',
-						`--use-token "${ token }"`,
-						'--ignore "/unstable|experimental/i"',
-					],
-					{ shell: true }
-				);
+				await execa( 'pnpm', [
+					'exec',
+					'docgen',
+					relative( ROOT_DIR, resolve( dirname( file ), path ) ),
+					'--output',
+					output,
+					'--to-token',
+					'--use-token',
+					token,
+					'--ignore',
+					'/unstable|experimental/i',
+				] );
 			}
-			await execa( 'npm', [ 'run', 'format', output ], {
-				shell: true,
-			} );
+			await execa( 'pnpm', [ 'run', 'format', output ] );
 		} catch ( error ) {
 			console.error( error );
 			process.exit( 1 );

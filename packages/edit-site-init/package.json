@@ -32,9 +32,9 @@
 	"module": "build-module/index.mjs",
 	"wpScriptModuleExports": "./build-module/index.mjs",
 	"dependencies": {
-		"@wordpress/boot": "file:../boot",
-		"@wordpress/data": "file:../data",
-		"@wordpress/icons": "file:../icons"
+		"@wordpress/boot": "workspace:*",
+		"@wordpress/data": "workspace:*",
+		"@wordpress/icons": "workspace:*"
 	},
 	"publishConfig": {
 		"access": "public"

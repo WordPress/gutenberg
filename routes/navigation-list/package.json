@@ -7,19 +7,19 @@
 		"page": "site-editor-v2"
 	},
 	"dependencies": {
-		"@wordpress/admin-ui": "file:../../packages/admin-ui",
-		"@wordpress/base-styles": "file:../../packages/base-styles",
-		"@wordpress/components": "file:../../packages/components",
-		"@wordpress/core-data": "file:../../packages/core-data",
-		"@wordpress/data": "file:../../packages/data",
-		"@wordpress/dataviews": "file:../../packages/dataviews",
-		"@wordpress/editor": "file:../../packages/editor",
-		"@wordpress/element": "file:../../packages/element",
-		"@wordpress/html-entities": "file:../../packages/html-entities",
-		"@wordpress/i18n": "file:../../packages/i18n",
-		"@wordpress/icons": "file:../../packages/icons",
-		"@wordpress/notices": "file:../../packages/notices",
-		"@wordpress/route": "file:../../packages/route",
-		"@wordpress/views": "file:../../packages/views"
+		"@wordpress/admin-ui": "workspace:*",
+		"@wordpress/base-styles": "workspace:*",
+		"@wordpress/components": "workspace:*",
+		"@wordpress/core-data": "workspace:*",
+		"@wordpress/data": "workspace:*",
+		"@wordpress/dataviews": "workspace:*",
+		"@wordpress/editor": "workspace:*",
+		"@wordpress/element": "workspace:*",
+		"@wordpress/html-entities": "workspace:*",
+		"@wordpress/i18n": "workspace:*",
+		"@wordpress/icons": "workspace:*",
+		"@wordpress/notices": "workspace:*",
+		"@wordpress/route": "workspace:*",
+		"@wordpress/views": "workspace:*"
 	}
 }

@@ -31,7 +31,7 @@ jobs:
               env:
                   NODE_OPTIONS: --max-old-space-size=8192
                   NODE_ENV: production
-              run: npm run storybook:build
+              run: pnpm run storybook:build
 
             - name: Deploy
               uses: peaceiris/actions-gh-pages@4f9cc6602d3f66b9c108549d475ec49e8ef4d45e # v4.0.0

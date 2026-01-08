@@ -132,6 +132,10 @@ function getSassOptions( workingDir ) {
 		loadPaths: [
 			// Package's own node_modules (for pnpm isolated deps)
 			path.join( workingDir, 'node_modules' ),
+			// All workspace package node_modules (for pnpm's non-hoisted deps)
+			...PACKAGES.map( ( pkg ) =>
+				path.join( PACKAGES_DIR, pkg, 'node_modules' )
+			),
 			// Root node_modules (for npm hoisted deps)
 			path.join( ROOT_DIR, 'node_modules' ),
 			// For local imports like @use "mixins"

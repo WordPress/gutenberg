@@ -45,7 +45,7 @@
 	"dependencies": {
 		"@tanstack/history": "^1.133.28",
 		"@tanstack/react-router": "^1.120.5",
-		"@wordpress/private-apis": "file:../private-apis"
+		"@wordpress/private-apis": "workspace:*"
 	},
 	"peerDependencies": {
 		"react": "^18.0.0"

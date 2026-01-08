@@ -43,7 +43,7 @@
 	"wpScript": true,
 	"types": "build-types",
 	"dependencies": {
-		"@wordpress/deprecated": "file:../deprecated",
+		"@wordpress/deprecated": "workspace:*",
 		"moment": "^2.29.4",
 		"moment-timezone": "^0.5.40"
 	},

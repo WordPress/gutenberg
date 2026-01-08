@@ -43,9 +43,9 @@
 	"wpScript": true,
 	"types": "build-types",
 	"dependencies": {
-		"@wordpress/a11y": "file:../a11y",
-		"@wordpress/components": "file:../components",
-		"@wordpress/data": "file:../data",
+		"@wordpress/a11y": "workspace:*",
+		"@wordpress/components": "workspace:*",
+		"@wordpress/data": "workspace:*",
 		"clsx": "^2.1.1"
 	},
 	"devDependencies": {

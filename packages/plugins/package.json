@@ -43,13 +43,13 @@
 	"wpScript": true,
 	"types": "build-types",
 	"dependencies": {
-		"@wordpress/components": "file:../components",
-		"@wordpress/compose": "file:../compose",
-		"@wordpress/deprecated": "file:../deprecated",
-		"@wordpress/element": "file:../element",
-		"@wordpress/hooks": "file:../hooks",
-		"@wordpress/icons": "file:../icons",
-		"@wordpress/is-shallow-equal": "file:../is-shallow-equal",
+		"@wordpress/components": "workspace:*",
+		"@wordpress/compose": "workspace:*",
+		"@wordpress/deprecated": "workspace:*",
+		"@wordpress/element": "workspace:*",
+		"@wordpress/hooks": "workspace:*",
+		"@wordpress/icons": "workspace:*",
+		"@wordpress/is-shallow-equal": "workspace:*",
 		"memize": "^2.0.1"
 	},
 	"peerDependencies": {

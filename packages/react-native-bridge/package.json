@@ -30,7 +30,7 @@
 	},
 	"react-native": "index",
 	"dependencies": {
-		"@wordpress/react-native-aztec": "file:../react-native-aztec"
+		"@wordpress/react-native-aztec": "workspace:*"
 	},
 	"peerDependencies": {
 		"react-native": "*"

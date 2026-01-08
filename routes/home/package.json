@@ -7,6 +7,6 @@
 		"page": "site-editor-v2"
 	},
 	"dependencies": {
-		"@wordpress/i18n": "file:../../packages/i18n"
+		"@wordpress/i18n": "workspace:*"
 	}
 }

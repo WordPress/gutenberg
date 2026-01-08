@@ -7,6 +7,6 @@
 		"page": "site-editor-v2"
 	},
 	"dependencies": {
-		"@wordpress/route": "file:../../packages/route"
+		"@wordpress/route": "workspace:*"
 	}
 }

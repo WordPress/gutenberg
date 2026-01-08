@@ -45,7 +45,7 @@
 	"types": "build-types",
 	"sideEffects": false,
 	"dependencies": {
-		"@wordpress/hooks": "file:../hooks"
+		"@wordpress/hooks": "workspace:*"
 	},
 	"publishConfig": {
 		"access": "public"

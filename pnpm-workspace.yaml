@@ -1,0 +1,51 @@
+packages:
+    - '.'
+    - 'packages/*'
+    - 'routes/*'
+    - 'storybook'
+
+engineStrict: true
+managePackageManagerVersions: false
+preferWorkspacePackages: true
+
+# Be strict about peer deps
+autoInstallPeers: false
+dedupePeerDependents: false
+strictPeerDependencies: true
+
+# No hoisting by default.
+hoistPattern: []
+publicHoistPattern: []
+
+# Package compromise avoidance: require dep build script approval.
+strictDepBuilds: true
+verifyDepsBeforeRun: install
+allowBuilds:
+    '@parcel/watcher': false
+    '@swc/core': false
+    appium: false
+    core-js-pure: false
+    core-js: false
+    edgedriver: false
+    esbuild: false
+    fs-ext: false
+    fs-ext-extra-prebuilt: false
+    fsevents: false
+    geckodriver: false
+    husky: false
+    node-sass: false
+    nx: false
+    puppeteer: false
+    sharp: false
+    unrs-resolver: false
+
+overrides:
+    # Version 14.6.0+ patches HTMLElement.prototype.focus as read-only, breaking @ariakit/test.
+    # @see https://github.com/testing-library/user-event/discussions/1258
+    '@testing-library/user-event': 14.5.2
+
+# Dependencies needing patching.
+patchedDependencies:
+    'react-autosize-textarea@7.1.0': patches/react-autosize-textarea@7.1.0.patch
+    'react-devtools-core@4.28.5': patches/react-devtools-core@4.28.5.patch
+    'react-native@0.73.3': patches/react-native@0.73.3.patch

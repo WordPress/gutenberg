@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# This script validates whether `npm init @wordpress/block` works properly
+# This script validates whether the create-block package works properly
 # with the latest changes applied to the `trunk` branch. It purposefully
 # avoids installing `@wordpress/scripts` package from npm when scaffolding
 # a test block and uses the local package by executing everything from the
@@ -29,7 +29,7 @@ trap cleanup EXIT
 # First test block
 
 status "Scaffolding Example Static (ES5) block..."
-npx wp-create-block example-static-es5 -t es5
+node ./packages/create-block/index.js example-static-es5 -t es5
 cd example-static-es5
 
 status "Verifying project..."
@@ -45,7 +45,7 @@ cd ..
 # Second test block
 
 status "Scaffolding Example Static block..."
-npx wp-create-block example-static --no-wp-scripts
+node ./packages/create-block/index.js example-static --no-wp-scripts
 cd example-static
 
 status "Verifying project..."
@@ -75,11 +75,16 @@ module.exports = {
 };
 EOF
 
+# Set NODE_PATH to include @wordpress/scripts node_modules so webpack can be found.
+# With pnpm, dependencies are not hoisted to root node_modules, so we need to
+# explicitly add the path where webpack is installed.
+export NODE_PATH="../packages/scripts/node_modules:$NODE_PATH"
+
 status "Formatting files..."
-../node_modules/.bin/wp-scripts format
+pnpm exec wp-scripts format
 
 status "Building block..."
-../node_modules/.bin/wp-scripts build
+pnpm exec wp-scripts build
 
 status "Verifying build..."
 expected=9
@@ -90,14 +95,14 @@ if [ "$expected" -ne "$actual" ]; then
 fi
 
 status "Linting CSS files..."
-../node_modules/.bin/wp-scripts lint-style
+pnpm exec wp-scripts lint-style
 
 # Ensure monorepo prelint:js scripts have run (e.g., to build design tokens for ESLint).
 status "Running prelint:js..."
-( cd .. && npm run prelint:js )
+( cd .. && pnpm run prelint:js )
 
 status "Linting JavaScript files..."
-../node_modules/.bin/wp-scripts lint-js
+pnpm exec wp-scripts lint-js
 
 status "Creating a plugin zip file..."
-../node_modules/.bin/wp-scripts plugin-zip
+pnpm exec wp-scripts plugin-zip

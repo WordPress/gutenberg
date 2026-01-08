@@ -43,13 +43,13 @@
 	},
 	"wpScript": true,
 	"dependencies": {
-		"@wordpress/api-fetch": "file:../api-fetch",
-		"@wordpress/base-styles": "file:../base-styles",
-		"@wordpress/blob": "file:../blob",
-		"@wordpress/components": "file:../components",
-		"@wordpress/compose": "file:../compose",
-		"@wordpress/element": "file:../element",
-		"@wordpress/i18n": "file:../i18n",
+		"@wordpress/api-fetch": "workspace:*",
+		"@wordpress/base-styles": "workspace:*",
+		"@wordpress/blob": "workspace:*",
+		"@wordpress/components": "workspace:*",
+		"@wordpress/compose": "workspace:*",
+		"@wordpress/element": "workspace:*",
+		"@wordpress/i18n": "workspace:*",
 		"change-case": "^4.1.2"
 	},
 	"peerDependencies": {

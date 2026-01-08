@@ -37,7 +37,7 @@ async function buildSVG( file ) {
 ${ FgRed }Please add it to Git, then restart:${ Reset }
 
 ${ FgRed }	git add ${ path.relative( '', file ) }${ Reset }
-${ FgRed }	npm run dev${ Reset }
+${ FgRed }	pnpm run dev${ Reset }
 `
 		);
 	}

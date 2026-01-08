@@ -14,15 +14,18 @@ process.env.TZ = 'UTC';
 module.exports = {
 	rootDir: '../../',
 	moduleNameMapper: {
-		// Mock @wordpress/vips/worker before the general pattern so it doesn't try to load the real file.
-		// The worker-code.ts file is auto-generated during full builds and is gitignored.
+		// Specific mappings first (before generic patterns)
 		'@wordpress/vips/worker':
 			'<rootDir>/test/unit/config/vips-worker-code-stub.js',
-		[ `@wordpress\\/(${ transpiledPackageNames.join( '|' ) })$` ]:
-			'packages/$1/src',
 		'@wordpress/theme/design-tokens.js':
 			'<rootDir>/packages/theme/src/prebuilt/js/design-tokens.mjs',
 		'.+\\.wasm$': '<rootDir>/test/unit/config/wasm-stub.js',
+		// Map deep paths (e.g., @wordpress/block-editor/src/hooks/list-view)
+		[ `@wordpress\\/(${ transpiledPackageNames.join( '|' ) })\\/(.+)$` ]:
+			'packages/$1/$2',
+		// Then map exact package imports (e.g., @wordpress/block-editor)
+		[ `@wordpress\\/(${ transpiledPackageNames.join( '|' ) })$` ]:
+			'packages/$1/src',
 	},
 	preset: '@wordpress/jest-preset-default',
 	setupFiles: [
@@ -53,7 +56,9 @@ module.exports = {
 		'^.+\\.m?[jt]sx?$': '<rootDir>/test/unit/scripts/babel-transformer.js',
 	},
 	transformIgnorePatterns: [
-		'/node_modules/(?!(docker-compose|yaml|preact|@preact|parsel-js|comctx)/)',
+		// Match pnpm nested structure (.pnpm/pkg@version/node_modules/pkg)
+		// Packages that ship ESM and need to be transformed by Babel.
+		'/node_modules/.pnpm/(?!(docker-compose|yaml|preact@|@preact\\+signals|parsel-js|comctx))',
 		'\\.pnp\\.[^\\/]+$',
 	],
 	snapshotSerializers: [

@@ -42,10 +42,10 @@
 	],
 	"dependencies": {
 		"@babel/runtime": "^7.16.0",
-		"@wordpress/components": "file:../components",
-		"@wordpress/dataviews": "file:../dataviews",
-		"@wordpress/element": "file:../element",
-		"@wordpress/i18n": "file:../i18n"
+		"@wordpress/components": "workspace:*",
+		"@wordpress/dataviews": "workspace:*",
+		"@wordpress/element": "workspace:*",
+		"@wordpress/i18n": "workspace:*"
 	},
 	"peerDependencies": {
 		"react": "^18.0.0"

@@ -64,12 +64,13 @@
 		"build-module/color-ramps/lib/register-color-spaces.mjs"
 	],
 	"dependencies": {
-		"@wordpress/element": "file:../element",
-		"@wordpress/private-apis": "file:../private-apis",
+		"@wordpress/element": "workspace:*",
+		"@wordpress/private-apis": "workspace:*",
 		"colorjs.io": "^0.6.0",
 		"memize": "^2.1.0"
 	},
 	"devDependencies": {
+		"@storybook/addon-docs": "^10.1.11",
 		"@storybook/react-vite": "^10.1.11",
 		"@terrazzo/cli": "^0.10.2",
 		"@terrazzo/plugin-css": "^0.10.2",

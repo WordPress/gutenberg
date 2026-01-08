@@ -41,10 +41,10 @@
 	"react-native": "src/index",
 	"wpScript": true,
 	"dependencies": {
-		"@wordpress/data": "file:../data",
-		"@wordpress/hooks": "file:../hooks",
-		"@wordpress/i18n": "file:../i18n",
-		"@wordpress/rich-text": "file:../rich-text",
+		"@wordpress/data": "workspace:*",
+		"@wordpress/hooks": "workspace:*",
+		"@wordpress/i18n": "workspace:*",
+		"@wordpress/rich-text": "workspace:*",
 		"uuid": "^9.0.1"
 	},
 	"peerDependencies": {

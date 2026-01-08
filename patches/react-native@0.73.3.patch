@@ -1,7 +1,7 @@
-diff --git a/node_modules/react-native/Libraries/Components/TextInput/TextInput.js b/node_modules/react-native/Libraries/Components/TextInput/TextInput.js
+diff --git a/Libraries/Components/TextInput/TextInput.js b/Libraries/Components/TextInput/TextInput.js
 index 481938f..9509857 100644
---- a/node_modules/react-native/Libraries/Components/TextInput/TextInput.js
-+++ b/node_modules/react-native/Libraries/Components/TextInput/TextInput.js
+--- a/Libraries/Components/TextInput/TextInput.js
++++ b/Libraries/Components/TextInput/TextInput.js
 @@ -1452,7 +1452,6 @@ function InternalTextInput(props: Props): React.Node {
          ref={ref}
          {...otherProps}

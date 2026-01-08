@@ -45,11 +45,11 @@
 	"types": "build-types",
 	"sideEffects": false,
 	"dependencies": {
-		"@wordpress/base-styles": "file:../base-styles",
-		"@wordpress/components": "file:../components",
-		"@wordpress/element": "file:../element",
-		"@wordpress/i18n": "file:../i18n",
-		"@wordpress/route": "file:../route",
+		"@wordpress/base-styles": "workspace:*",
+		"@wordpress/components": "workspace:*",
+		"@wordpress/element": "workspace:*",
+		"@wordpress/i18n": "workspace:*",
+		"@wordpress/route": "workspace:*",
 		"clsx": "^2.1.1"
 	},
 	"peerDependencies": {

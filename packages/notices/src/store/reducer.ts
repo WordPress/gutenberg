@@ -15,7 +15,7 @@ import onSubKey from './utils/on-sub-key';
  */
 const notices = onSubKey( 'context' )< Array< Notice >, ReducerAction >( (
 	state = [],
-	action
+	action: ReducerAction
 ) => {
 	switch ( action.type ) {
 		case 'CREATE_NOTICE':

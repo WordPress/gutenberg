@@ -65,7 +65,9 @@ export default function inlineAliasValues( {
 				}
 
 				// Check if any mode values reference a primitive
-				for ( const modeValue of Object.values( token.mode ) ) {
+				for ( const modeValue of Object.values(
+					token.mode
+				) as TokenNormalized[] ) {
 					const { aliasOf } = modeValue;
 					if ( aliasOf && pattern.test( aliasOf ) ) {
 						const primitiveId = aliasOf;

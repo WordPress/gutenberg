@@ -35,12 +35,14 @@ jobs:
               env:
                   NODE_OPTIONS: --max-old-space-size=8192
                   NODE_ENV: test
-              run: npm run storybook:build
+              run: pnpm run storybook:build
 
             - name: Install test-runner and Playwright dependencies
               run: |
-                  npm install --no-save @storybook/test-runner@0.24.2
-                  npx playwright install --with-deps
+                  # storybook and playwright are needed as peer dependencies of @storybook/test-runner for pnpm
+                  STORYBOOK_VERSION=$(node -p "require('./storybook/package.json').devDependencies.storybook")
+                  pnpm add -wD "storybook@$STORYBOOK_VERSION" @storybook/test-runner@0.24.2 playwright
+                  pnpm exec playwright install --with-deps
 
             - name: Serve Storybook and run tests
               run: |

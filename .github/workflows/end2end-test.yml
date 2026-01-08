@@ -41,8 +41,17 @@ jobs:
             - name: Setup Node.js and install dependencies
               uses: ./.github/setup-node
 
-            - name: Npm build
-              run: npm run build -- --skip-types
+            - name: Detect package manager
+              id: detect-pm
+              run: |
+                  if [ -f "pnpm-lock.yaml" ]; then
+                    echo "manager=pnpm" >> "$GITHUB_OUTPUT"
+                  else
+                    echo "manager=npm" >> "$GITHUB_OUTPUT"
+                  fi
+
+            - name: Build
+              run: ${{ steps.detect-pm.outputs.manager }} run build -- --skip-types
 
             - name: Install Playwright dependencies
               run: |
@@ -50,7 +59,7 @@ jobs:
 
             - name: Install WordPress and start the server
               run: |
-                  npm run wp-env-test start
+                  ${{ steps.detect-pm.outputs.manager }} run wp-env-test start
 
             - name: Run the tests
               env:
@@ -58,7 +67,7 @@ jobs:
                   SHARD_PART: ${{ matrix.part }}
                   SHARD_TOTAL: ${{ matrix.totalParts }}
               run: |
-                  xvfb-run --auto-servernum --server-args="-screen 0 1280x960x24" -- npm run test:e2e -- --shard="${SHARD_PART}/${SHARD_TOTAL}"
+                  xvfb-run --auto-servernum --server-args="-screen 0 1280x960x24" -- ${{ steps.detect-pm.outputs.manager }} run test:e2e --shard="${SHARD_PART}/${SHARD_TOTAL}"
 
             - name: Archive debug artifacts (screenshots, traces)
               uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
@@ -132,8 +141,17 @@ jobs:
             - name: Setup Node.js and install dependencies
               uses: ./.github/setup-node
 
-            - name: Npm build
-              run: npm run build -- --skip-types
+            - name: Detect package manager
+              id: detect-pm
+              run: |
+                  if [ -f "pnpm-lock.yaml" ]; then
+                    echo "manager=pnpm" >> "$GITHUB_OUTPUT"
+                  else
+                    echo "manager=npm" >> "$GITHUB_OUTPUT"
+                  fi
+
+            - name: Build
+              run: ${{ steps.detect-pm.outputs.manager }} run build -- --skip-types
 
             - name: Report flaky tests
               uses: ./packages/report-flaky-tests

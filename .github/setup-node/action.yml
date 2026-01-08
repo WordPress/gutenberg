@@ -1,29 +1,70 @@
-name: 'Setup Node.js and install npm dependencies'
-description: 'Configure Node.js and install npm dependencies while managing all aspects of caching.'
+name: 'Setup Node.js and install dependencies'
+description: 'Configure Node.js and install npm/pnpm dependencies while managing all aspects of caching.'
 inputs:
     node-version:
         description: 'Optional. The Node.js version to use. When not specified, the version specified in .nvmrc will be used.'
         required: false
         type: string
+outputs:
+    package-manager:
+        description: 'The detected package manager (npm or pnpm)'
+        value: ${{ steps.detect-pm.outputs.manager }}
 
 runs:
     using: 'composite'
     steps:
+        - name: Detect package manager
+          id: detect-pm
+          run: |
+              if [ -f "pnpm-lock.yaml" ]; then
+                echo "manager=pnpm" >> "$GITHUB_OUTPUT"
+              else
+                echo "manager=npm" >> "$GITHUB_OUTPUT"
+              fi
+          shell: bash
+
+        - name: Install pnpm
+          if: steps.detect-pm.outputs.manager == 'pnpm'
+          uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda # v4.1.0
+
         - name: Use desired version of Node.js
           uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238 # v6.2.0
           with:
               node-version-file: ${{ inputs.node-version == '' && '.nvmrc' || '' }}
               node-version: ${{ inputs.node-version }}
               check-latest: true
-              cache: npm
+              cache: ${{ steps.detect-pm.outputs.manager }}
 
-        - name: Get Node.js and npm version
+        - name: Get Node.js version
           id: node-version
-          run: |
-              echo "NODE_VERSION=$(node -v)" >> "$GITHUB_OUTPUT"
+          run: echo "NODE_VERSION=$(node -v)" >> "$GITHUB_OUTPUT"
           shell: bash
 
+        # pnpm caching
+        - name: Get pnpm store directory
+          if: steps.detect-pm.outputs.manager == 'pnpm'
+          id: pnpm-cache
+          run: echo "STORE_PATH=$(pnpm store path)" >> "$GITHUB_OUTPUT"
+          shell: bash
+
+        - name: Cache pnpm store
+          if: steps.detect-pm.outputs.manager == 'pnpm'
+          id: cache-pnpm-store
+          uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+          with:
+              path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+              key: pnpm-store-${{ runner.os }}-${{ runner.arch }}-${{ steps.node-version.outputs.NODE_VERSION }}-${{ hashFiles('pnpm-lock.yaml') }}
+              restore-keys: |
+                  pnpm-store-${{ runner.os }}-${{ runner.arch }}-${{ steps.node-version.outputs.NODE_VERSION }}-
+
+        - name: Install pnpm dependencies
+          if: steps.detect-pm.outputs.manager == 'pnpm'
+          run: pnpm install
+          shell: bash
+
+        # npm caching
         - name: Cache node_modules
+          if: steps.detect-pm.outputs.manager == 'npm'
           id: cache-node_modules
           uses: actions/cache@8b402f58fbc84540c8b491a91e594a4576fec3d7 # v5.0.2
           with:
@@ -31,24 +72,31 @@ runs:
               key: node_modules-${{ runner.os }}-${{ runner.arch }}-${{ steps.node-version.outputs.NODE_VERSION }}-${{ hashFiles('package-lock.json', 'patches/**') }}
 
         - name: Install npm dependencies
-          if: ${{ steps.cache-node_modules.outputs.cache-hit != 'true' }}
-          run: |
-              npm ci
+          if: steps.detect-pm.outputs.manager == 'npm' && steps.cache-node_modules.outputs.cache-hit != 'true'
+          run: npm ci
           shell: bash
-        - name: Upload npm logs as an artifact on failure
-          uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
-          if: failure()
-          with:
-              name: npm-logs
-              path: C:\npm\cache\_logs
 
         # On cache hit, we run the post-install script to match the native `npm ci` behavior.
         # An example of this is to patch `node_modules` using patch-package.
-        - name: Post-install
-          if: ${{ steps.cache-node_modules.outputs.cache-hit == 'true' }}
+        - name: Post-install (npm)
+          if: steps.detect-pm.outputs.manager == 'npm' && steps.cache-node_modules.outputs.cache-hit == 'true'
           run: |
               # Run the post-install script for the root project.
               npm run postinstall
               # Run the post-install scripts for workspaces.
               npx lerna run postinstall
           shell: bash
+
+        - name: Upload pnpm logs as an artifact on failure
+          uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
+          if: failure() && steps.detect-pm.outputs.manager == 'pnpm'
+          with:
+              name: pnpm-logs
+              path: ~/.local/share/pnpm/store
+
+        - name: Upload npm logs as an artifact on failure
+          uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+          if: failure() && steps.detect-pm.outputs.manager == 'npm'
+          with:
+              name: npm-logs
+              path: C:\npm\cache\_logs

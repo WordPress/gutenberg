@@ -19,6 +19,35 @@
 	"bugs": {
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
+	"dependencies": {
+		"@emotion/react": "^11.7.1",
+		"@emotion/styled": "^11.6.0",
+		"@wordpress/base-styles": "workspace:*",
+		"@wordpress/block-editor": "workspace:*",
+		"@wordpress/block-library": "workspace:*",
+		"@wordpress/blocks": "workspace:*",
+		"@wordpress/components": "workspace:*",
+		"@wordpress/compose": "workspace:*",
+		"@wordpress/data": "workspace:*",
+		"@wordpress/dataviews": "workspace:*",
+		"@wordpress/element": "workspace:*",
+		"@wordpress/fields": "workspace:*",
+		"@wordpress/format-library": "workspace:*",
+		"@wordpress/hooks": "workspace:*",
+		"@wordpress/i18n": "workspace:*",
+		"@wordpress/icons": "workspace:*",
+		"@wordpress/image-cropper": "workspace:*",
+		"@wordpress/keycodes": "workspace:*",
+		"@wordpress/media-fields": "workspace:*",
+		"@wordpress/postcss-plugins-preset": "workspace:*",
+		"@wordpress/primitives": "workspace:*",
+		"@wordpress/private-apis": "workspace:*",
+		"@wordpress/theme": "workspace:*",
+		"@wordpress/ui": "workspace:*",
+		"clsx": "^2.1.1",
+		"react": "^18.0.0",
+		"react-dom": "^18.0.0"
+	},
 	"devDependencies": {
 		"@storybook/addon-a11y": "^10.1.11",
 		"@storybook/addon-docs": "^10.1.11",
@@ -26,7 +55,8 @@
 		"@storybook/react-vite": "^10.1.11",
 		"storybook": "^10.1.11",
 		"storybook-addon-tag-badges": "^3.0.4",
-		"terser": "^5.37.0"
+		"terser": "^5.37.0",
+		"vite": "7.3.0"
 	},
 	"publishConfig": {
 		"access": "public"

@@ -87,13 +87,13 @@ async function build() {
 	try {
 		// Step 1: Clean packages
 		console.log( '🧹 Cleaning packages...' );
-		await exec( 'npm', [ 'run', 'clean:packages' ], { silent: true } );
+		await exec( 'pnpm', [ 'run', 'clean:packages' ], { silent: true } );
 
 		// Step 2: Build workspaces
 		console.log( '\n📦 Building workspaces...' );
 		await exec(
-			'npm',
-			[ 'run', '--if-present', '--workspaces', '--silent', 'build' ],
+			'pnpm',
+			[ 'run', '--if-present', '--recursive', '--silent', 'build' ],
 			{ silent: true }
 		);
 
@@ -115,7 +115,7 @@ async function build() {
 			console.log( '\n📘 Building TypeScript types...' );
 			await exec( 'tsc', [ '--build' ] ).catch( () => {
 				console.error(
-					'\n❌ TypeScript compilation failed. Try cleaning up first: `npm run clean:package-types`'
+					'\n❌ TypeScript compilation failed. Try cleaning up first: `pnpm run clean:package-types`'
 				);
 				throw new Error( 'TypeScript compilation failed' );
 			} );
@@ -171,8 +171,8 @@ async function build() {
 		// Step 8: Build workspace :wp targets
 		console.log( '\n📦 Building workspace :wp targets...' );
 		await exec(
-			'npm',
-			[ 'run', '--if-present', '--workspaces', '--silent', 'build:wp' ],
+			'pnpm',
+			[ 'run', '--if-present', '--recursive', '--silent', 'build:wp' ],
 			{ silent: true }
 		);
 

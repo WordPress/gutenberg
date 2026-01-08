@@ -75,6 +75,12 @@ jobs:
                   git config user.name "Gutenberg Repository Automation"
                   git config user.email gutenberg@wordpress.org
 
+            - name: Install pnpm
+              if: ${{ github.event.inputs.release_type != 'wp' }}
+              uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda # v4.1.0
+              with:
+                  package_json_file: 'cli/package.json'
+
             - name: Setup Node.js
               if: ${{ github.event.inputs.release_type != 'wp' }}
               uses: actions/setup-node@395ad3262231945c25e8478fd5baf05154b1d79f # v6.1.0
@@ -82,6 +88,14 @@ jobs:
                   node-version-file: 'cli/.nvmrc'
                   registry-url: 'https://registry.npmjs.org'
                   check-latest: true
+                  cache: pnpm
+                  cache-dependency-path: 'cli/pnpm-lock.yaml'
+
+            - name: Install pnpm (for WP major version)
+              if: ${{ github.event.inputs.release_type == 'wp' && github.event.inputs.wp_version }}
+              uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda # v4.1.0
+              with:
+                  package_json_file: 'publish/package.json'
 
             - name: Setup Node.js (for WP major version)
               if: ${{ github.event.inputs.release_type == 'wp' && github.event.inputs.wp_version }}
@@ -90,12 +104,14 @@ jobs:
                   node-version-file: 'publish/.nvmrc'
                   registry-url: 'https://registry.npmjs.org'
                   check-latest: true
+                  cache: pnpm
+                  cache-dependency-path: 'publish/pnpm-lock.yaml'
 
             - name: Publish development packages to npm ("next" dist-tag)
               if: ${{ github.event.inputs.release_type == 'development' }}
               run: |
                   cd cli
-                  npm ci
+                  pnpm install
                   ./bin/plugin/cli.js npm-next --ci --repository-path ../publish
               env:
                   NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
@@ -104,7 +120,7 @@ jobs:
               if: ${{ github.event.inputs.release_type == 'latest' }}
               run: |
                   cd cli
-                  npm ci
+                  pnpm install
                   ./bin/plugin/cli.js npm-latest --semver minor --ci --repository-path ../publish
               env:
                   NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
@@ -113,7 +129,7 @@ jobs:
               if: ${{ github.event.inputs.release_type == 'bugfix' }}
               run: |
                   cd cli
-                  npm ci
+                  pnpm install
                   ./bin/plugin/cli.js npm-bugfix --ci --repository-path ../publish
               env:
                   NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
@@ -122,8 +138,8 @@ jobs:
               if: ${{ github.event.inputs.release_type == 'wp' && github.event.inputs.wp_version }}
               run: |
                   cd publish
-                  npm ci
-                  npx lerna publish patch --dist-tag "wp-$WP_VERSION" --no-private --yes --no-verify-access
+                  pnpm install
+                  pnpm exec lerna publish patch --dist-tag "wp-$WP_VERSION" --no-private --yes --no-verify-access
               env:
                   NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
                   WP_VERSION: ${{ github.event.inputs.wp_version }}

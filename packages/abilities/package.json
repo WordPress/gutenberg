@@ -45,8 +45,8 @@
 	},
 	"types": "build-types",
 	"dependencies": {
-		"@wordpress/data": "file:../data",
-		"@wordpress/i18n": "file:../i18n",
+		"@wordpress/data": "workspace:*",
+		"@wordpress/i18n": "workspace:*",
 		"ajv": "^8.17.1",
 		"ajv-draft-04": "^1.0.0",
 		"ajv-formats": "^3.0.1"

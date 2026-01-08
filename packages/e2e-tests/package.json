@@ -24,8 +24,8 @@
 		"npm": ">=8.19.2"
 	},
 	"dependencies": {
-		"@wordpress/interactivity": "file:../interactivity",
-		"@wordpress/interactivity-router": "file:../interactivity-router"
+		"@wordpress/interactivity": "workspace:*",
+		"@wordpress/interactivity-router": "workspace:*"
 	},
 	"peerDependencies": {
 		"jest": ">=29",

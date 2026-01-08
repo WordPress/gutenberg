@@ -44,7 +44,7 @@
 	"wpScript": true,
 	"sideEffects": false,
 	"dependencies": {
-		"@wordpress/api-fetch": "file:../api-fetch"
+		"@wordpress/api-fetch": "workspace:*"
 	},
 	"publishConfig": {
 		"access": "public"

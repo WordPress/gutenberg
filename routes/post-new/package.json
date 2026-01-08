@@ -7,7 +7,7 @@
 		"page": "site-editor-v2"
 	},
 	"dependencies": {
-		"@wordpress/core-data": "file:../../packages/core-data",
-		"@wordpress/data": "file:../../packages/data"
+		"@wordpress/core-data": "workspace:*",
+		"@wordpress/data": "workspace:*"
 	}
 }

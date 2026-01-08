@@ -41,10 +41,10 @@
 	},
 	"types": "build-types",
 	"dependencies": {
-		"@wordpress/data": "file:../data",
-		"@wordpress/dataviews": "file:../dataviews",
-		"@wordpress/element": "file:../element",
-		"@wordpress/preferences": "file:../preferences",
+		"@wordpress/data": "workspace:*",
+		"@wordpress/dataviews": "workspace:*",
+		"@wordpress/element": "workspace:*",
+		"@wordpress/preferences": "workspace:*",
 		"dequal": "^2.0.3"
 	},
 	"publishConfig": {

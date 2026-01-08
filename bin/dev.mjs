@@ -124,13 +124,13 @@ async function dev() {
 	try {
 		// Step 1: Clean packages
 		console.log( '🧹 Cleaning packages...' );
-		await exec( 'npm', [ 'run', 'clean:packages' ], { silent: true } );
+		await exec( 'pnpm', [ 'run', 'clean:packages' ], { silent: true } );
 
 		// Step 2: Build workspaces
 		console.log( '\n📦 Building workspaces...' );
 		await exec(
-			'npm',
-			[ 'run', '--if-present', '--workspaces', '--silent', 'build' ],
+			'pnpm',
+			[ 'run', '--if-present', '-r', '--silent', 'build' ],
 			{ silent: true }
 		);
 
@@ -151,7 +151,7 @@ async function dev() {
 		console.log( '\n📘 Building TypeScript types...' );
 		await exec( 'tsc', [ '--build' ] ).catch( () => {
 			console.error(
-				'\n❌ TypeScript compilation failed. Try cleaning up first: `npm run clean:package-types`'
+				'\n❌ TypeScript compilation failed. Try cleaning up first: `pnpm run clean:package-types`'
 			);
 			throw new Error( 'TypeScript compilation failed' );
 		} );

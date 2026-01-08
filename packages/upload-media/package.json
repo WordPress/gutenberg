@@ -49,16 +49,16 @@
 		"build-module/store/index.mjs"
 	],
 	"dependencies": {
-		"@wordpress/api-fetch": "file:../api-fetch",
-		"@wordpress/blob": "file:../blob",
-		"@wordpress/compose": "file:../compose",
-		"@wordpress/data": "file:../data",
-		"@wordpress/element": "file:../element",
-		"@wordpress/i18n": "file:../i18n",
-		"@wordpress/preferences": "file:../preferences",
-		"@wordpress/private-apis": "file:../private-apis",
-		"@wordpress/url": "file:../url",
-		"@wordpress/vips": "file:../vips",
+		"@wordpress/api-fetch": "workspace:*",
+		"@wordpress/blob": "workspace:*",
+		"@wordpress/compose": "workspace:*",
+		"@wordpress/data": "workspace:*",
+		"@wordpress/element": "workspace:*",
+		"@wordpress/i18n": "workspace:*",
+		"@wordpress/preferences": "workspace:*",
+		"@wordpress/private-apis": "workspace:*",
+		"@wordpress/url": "workspace:*",
+		"@wordpress/vips": "workspace:*",
 		"uuid": "^9.0.1"
 	},
 	"peerDependencies": {

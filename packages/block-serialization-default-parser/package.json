@@ -45,7 +45,7 @@
 	"types": "build-types",
 	"sideEffects": false,
 	"devDependencies": {
-		"@wordpress/block-serialization-spec-parser": "file:../block-serialization-spec-parser"
+		"@wordpress/block-serialization-spec-parser": "workspace:*"
 	},
 	"publishConfig": {
 		"access": "public"

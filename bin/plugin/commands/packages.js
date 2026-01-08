@@ -352,8 +352,8 @@ async function publishPackagesToNpm( {
 	minimumVersionBump,
 	releaseType,
 } ) {
-	log( '>> Installing npm packages.' );
-	await command( 'npm ci', {
+	log( '>> Installing packages.' );
+	await command( 'pnpm install', {
 		cwd: gitWorkingDirectoryPath,
 	} );
 

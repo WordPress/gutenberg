@@ -46,7 +46,7 @@ const config = defineConfig( {
 		video: 'on-first-retry',
 	},
 	webServer: {
-		command: 'npm run wp-env start',
+		command: 'pnpm run wp-env start',
 		port: baseUrl.port,
 		timeout: 120_000, // 120 seconds.
 		reuseExistingServer: true,

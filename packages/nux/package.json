@@ -53,14 +53,14 @@
 		"build-module/store/index.mjs"
 	],
 	"dependencies": {
-		"@wordpress/base-styles": "file:../base-styles",
-		"@wordpress/components": "file:../components",
-		"@wordpress/compose": "file:../compose",
-		"@wordpress/data": "file:../data",
-		"@wordpress/deprecated": "file:../deprecated",
-		"@wordpress/element": "file:../element",
-		"@wordpress/i18n": "file:../i18n",
-		"@wordpress/icons": "file:../icons"
+		"@wordpress/base-styles": "workspace:*",
+		"@wordpress/components": "workspace:*",
+		"@wordpress/compose": "workspace:*",
+		"@wordpress/data": "workspace:*",
+		"@wordpress/deprecated": "workspace:*",
+		"@wordpress/element": "workspace:*",
+		"@wordpress/i18n": "workspace:*",
+		"@wordpress/icons": "workspace:*"
 	},
 	"peerDependencies": {
 		"react": "^18.0.0",

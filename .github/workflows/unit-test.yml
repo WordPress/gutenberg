@@ -70,7 +70,7 @@ jobs:
                   MAXWORKERS: ${{ steps.cpu-cores.outputs.count }}
                   SHARD: ${{ matrix.shard }}
               run: |
-                  npm run test:unit -- \
+                  pnpm run test:unit \
                     --ci \
                     --maxWorkers="$MAXWORKERS" \
                     --shard="$SHARD" \
@@ -119,7 +119,7 @@ jobs:
             - name: Run the date tests
               env:
                   MAXWORKERS: ${{ steps.cpu-cores.outputs.count }}
-              run: npm run test:unit:date -- --ci --maxWorkers="$MAXWORKERS" --cacheDirectory="$HOME/.jest-cache"
+              run: pnpm run test:unit:date --ci --maxWorkers="$MAXWORKERS" --cacheDirectory="$HOME/.jest-cache"
 
     compute-previous-wordpress-version:
         name: Compute previous WordPress version
@@ -162,8 +162,17 @@ jobs:
             - name: Setup Node.js and install dependencies
               uses: ./.github/setup-node
 
+            - name: Detect package manager
+              id: detect-pm
+              run: |
+                  if [ -f "pnpm-lock.yaml" ]; then
+                    echo "manager=pnpm" >> "$GITHUB_OUTPUT"
+                  else
+                    echo "manager=npm" >> "$GITHUB_OUTPUT"
+                  fi
+
             - name: Run build scripts
-              run: npm run build -- --skip-types
+              run: ${{ steps.detect-pm.outputs.manager }} run build -- --skip-types
 
             - name: Upload built JavaScript assets
               uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
@@ -254,39 +263,39 @@ jobs:
 
             - name: General debug information
               run: |
-                  npm --version
+                  pnpm --version
                   node --version
                   curl --version
                   git --version
                   locale -a
 
             - name: Start Docker environment
-              run: npm run wp-env-test start
+              run: pnpm run wp-env-test start
 
             - name: Log running Docker containers
               run: docker ps -a
 
             - name: Docker container debug information
               run: |
-                  npm run wp-env-test -- run mysql mariadb -- --version
-                  npm run wp-env-test -- run wordpress php -- --version
-                  npm run wp-env-test -- run wordpress php -m
-                  npm run wp-env-test -- run wordpress php -i
-                  npm run wp-env-test -- run wordpress /var/www/html/wp-content/plugins/gutenberg/vendor/bin/phpunit -- --version
-                  npm run wp-env-test -- run wordpress locale -a
-                  npm run wp-env-test -- run cli wp core version
+                  pnpm run wp-env-test run mysql mariadb --version
+                  pnpm run wp-env-test run wordpress php --version
+                  pnpm run wp-env-test run wordpress php -m
+                  pnpm run wp-env-test run wordpress php -i
+                  pnpm run wp-env-test run wordpress /var/www/html/wp-content/plugins/gutenberg/vendor/bin/phpunit --version
+                  pnpm run wp-env-test run wordpress locale -a
+                  pnpm run wp-env-test run cli wp core version
 
             - name: Running single site unit tests
               if: ${{ ! matrix.multisite }}
               run: |
                   set -o pipefail
-                  npm run test:unit:php | tee phpunit.log
+                  pnpm run test:unit:php | tee phpunit.log
 
             - name: Running multisite unit tests
               if: ${{ matrix.multisite }}
               run: |
                   set -o pipefail
-                  npm run test:unit:php:multisite | tee phpunit.log
+                  pnpm run test:unit:php:multisite | tee phpunit.log
 
             # Verifies that PHPUnit actually runs in the first place. We want visibility
             # into issues which can cause it to fail silently, so we check the output
@@ -416,4 +425,4 @@ jobs:
             - name: Running the tests
               env:
                   MAXWORKERS: ${{ steps.cpu-cores.outputs.count }}
-              run: npm run test:native -- --ci --maxWorkers="$MAXWORKERS" --cacheDirectory="$HOME/.jest-cache"
+              run: pnpm run test:native --ci --maxWorkers="$MAXWORKERS" --cacheDirectory="$HOME/.jest-cache"

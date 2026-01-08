@@ -48,9 +48,9 @@
 		"{src,build,build-module}/index.js"
 	],
 	"dependencies": {
-		"@wordpress/abilities": "file:../abilities",
-		"@wordpress/api-fetch": "file:../api-fetch",
-		"@wordpress/url": "file:../url"
+		"@wordpress/abilities": "workspace:*",
+		"@wordpress/api-fetch": "workspace:*",
+		"@wordpress/url": "workspace:*"
 	},
 	"publishConfig": {
 		"access": "public"

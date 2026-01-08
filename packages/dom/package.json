@@ -45,7 +45,7 @@
 	"types": "build-types",
 	"sideEffects": false,
 	"dependencies": {
-		"@wordpress/deprecated": "file:../deprecated"
+		"@wordpress/deprecated": "workspace:*"
 	},
 	"publishConfig": {
 		"access": "public"

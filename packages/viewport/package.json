@@ -41,9 +41,9 @@
 	"react-native": "src/index",
 	"wpScript": true,
 	"dependencies": {
-		"@wordpress/compose": "file:../compose",
-		"@wordpress/data": "file:../data",
-		"@wordpress/element": "file:../element"
+		"@wordpress/compose": "workspace:*",
+		"@wordpress/data": "workspace:*",
+		"@wordpress/element": "workspace:*"
 	},
 	"devDependencies": {
 		"deep-freeze": "0.0.1"

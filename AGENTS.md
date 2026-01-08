@@ -4,13 +4,13 @@
 
 ```bash
 # Setup
-npm install && composer install
-npm run wp-env status   # Always check status first
-npm run wp-env start    # Only start if not already running
+pnpm install && composer install
+pnpm run wp-env status   # Always check status first
+pnpm run wp-env start    # Only start if not already running
 
 # Development
-npm start               # Development with watch
-npm run build          # Production build
+pnpm start               # Development with watch
+pnpm run build          # Production build
 ```
 
 ### Key Directories
@@ -31,10 +31,10 @@ npm run build          # Production build
 
 ```bash
 # JavaScript
-npm test                   # All JS tests
-npm run test:unit         # Unit tests
-npm run test:unit -- --testNamePattern="<TestName>"  # Specific test
-npm run test:unit <path_to_test_directory>
+pnpm test                   # All JS tests
+pnpm run test:unit         # Unit tests
+pnpm run test:unit --testNamePattern="<TestName>"  # Specific test
+pnpm run test:unit <path_to_test_directory>
 
 # PHP (requires wp-env)
 composer test             # All PHP tests
@@ -42,13 +42,13 @@ vendor/bin/phpunit <path_to_test_file.php>  # Specific file
 vendor/bin/phpunit <path_to_test_directory>/              # Directory
 
 # E2E (requires wp-env)
-npm run test:e2e
-npm run test:e2e -- <path_to_test_file.spec.js>  # Specific test file
-npm run test:e2e -- --headed                   # Run with browser visible
+pnpm run test:e2e
+pnpm run test:e2e <path_to_test_file.spec.js>  # Specific test file
+pnpm run test:e2e --headed                   # Run with browser visible
 
 # Code Quality
-npm run format            # Fix JS formatting
-npm run lint:js          # Check JS linting
+pnpm run format            # Fix JS formatting
+pnpm run lint:js          # Check JS linting
 vendor/bin/phpcbf        # Fix PHP standards
 vendor/bin/phpcs         # Check PHP standards
 

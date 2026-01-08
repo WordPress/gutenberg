@@ -9,6 +9,6 @@
 		]
 	},
 	"dependencies": {
-		"@wordpress/route": "file:../../packages/route"
+		"@wordpress/route": "workspace:*"
 	}
 }

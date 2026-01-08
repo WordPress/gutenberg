@@ -44,8 +44,8 @@
 	"types": "build-types",
 	"sideEffects": false,
 	"dependencies": {
-		"@wordpress/element": "file:../element",
-		"@wordpress/primitives": "file:../primitives",
+		"@wordpress/element": "workspace:*",
+		"@wordpress/primitives": "workspace:*",
 		"change-case": "4.1.2"
 	},
 	"peerDependencies": {
@@ -55,8 +55,8 @@
 		"access": "public"
 	},
 	"scripts": {
-		"prelint:js": "npm run build",
-		"prepare": "npm run build",
+		"prelint:js": "pnpm run build",
+		"prepare": "pnpm run build",
 		"build": "node lib/generate-library.cjs && node lib/generate-manifest-php.cjs"
 	}
 }

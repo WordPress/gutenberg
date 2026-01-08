@@ -50,18 +50,18 @@
 		"build-module/store/index.mjs"
 	],
 	"dependencies": {
-		"@wordpress/base-styles": "file:../base-styles",
-		"@wordpress/block-editor": "file:../block-editor",
-		"@wordpress/blocks": "file:../blocks",
-		"@wordpress/components": "file:../components",
-		"@wordpress/core-data": "file:../core-data",
-		"@wordpress/data": "file:../data",
-		"@wordpress/element": "file:../element",
-		"@wordpress/i18n": "file:../i18n",
-		"@wordpress/icons": "file:../icons",
-		"@wordpress/notices": "file:../notices",
-		"@wordpress/private-apis": "file:../private-apis",
-		"@wordpress/url": "file:../url"
+		"@wordpress/base-styles": "workspace:*",
+		"@wordpress/block-editor": "workspace:*",
+		"@wordpress/blocks": "workspace:*",
+		"@wordpress/components": "workspace:*",
+		"@wordpress/core-data": "workspace:*",
+		"@wordpress/data": "workspace:*",
+		"@wordpress/element": "workspace:*",
+		"@wordpress/i18n": "workspace:*",
+		"@wordpress/icons": "workspace:*",
+		"@wordpress/notices": "workspace:*",
+		"@wordpress/private-apis": "workspace:*",
+		"@wordpress/url": "workspace:*"
 	},
 	"peerDependencies": {
 		"react": "^18.0.0",

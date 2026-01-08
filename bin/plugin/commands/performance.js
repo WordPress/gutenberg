@@ -24,6 +24,54 @@ const RAW_RESULTS_FILE_SUFFIX = '.performance-results.raw.json';
 const RESULTS_FILE_SUFFIX = '.performance-results.json';
 
 /**
+ * Detects the package manager used in a directory based on lock files.
+ *
+ * @param {string} dir Directory to check.
+ * @return {string} 'pnpm' or 'npm'.
+ */
+function detectPackageManager( dir ) {
+	if ( fs.existsSync( path.join( dir, 'pnpm-lock.yaml' ) ) ) {
+		return 'pnpm';
+	}
+	return 'npm';
+}
+
+/**
+ * Gets the install and build command for a directory based on its package manager.
+ *
+ * @param {string}  dir               Directory to run commands in.
+ * @param {boolean} installPlaywright Whether to install Playwright.
+ * @return {string} Shell command to install dependencies and build.
+ */
+function getInstallBuildCommand( dir, installPlaywright = false ) {
+	const pm = detectPackageManager( dir );
+	let playwrightCmd = '';
+	if ( installPlaywright ) {
+		playwrightCmd =
+			pm === 'pnpm'
+				? '&& pnpm exec playwright install chromium --with-deps'
+				: '&& npx playwright install chromium --with-deps';
+	}
+
+	if ( pm === 'pnpm' ) {
+		return `bash -c "source $HOME/.nvm/nvm.sh && nvm install && pnpm install ${ playwrightCmd } && pnpm run build"`;
+	}
+	return `bash -c "source $HOME/.nvm/nvm.sh && nvm install && npm ci${ playwrightCmd } && npm run build"`;
+}
+
+/**
+ * Gets the command to run a script based on the package manager.
+ *
+ * @param {string} dir    Directory to check.
+ * @param {string} script Script to run.
+ * @return {string} Command to run the script.
+ */
+function getRunCommand( dir, script ) {
+	const pm = detectPackageManager( dir );
+	return `${ pm } run ${ script }`;
+}
+
+/**
  * @typedef WPPerformanceCommandOptions
  *
  * @property {boolean=} ci          Run on CI.
@@ -159,7 +207,10 @@ function printStats( m, s ) {
  */
 async function runTestSuite( testSuite, testRunnerDir, runKey ) {
 	await runShellScript(
-		`npm run test:performance -- ${ testSuite }`,
+		`${ getRunCommand(
+			testRunnerDir,
+			'test:performance'
+		) } -- ${ testSuite }`,
 		testRunnerDir,
 		{
 			...process.env,
@@ -341,7 +392,7 @@ async function runPerformanceTests( branches, options ) {
 
 	logAtIndent( 2, 'Installing dependencies and building' );
 	await runShellScript(
-		`bash -c "source $HOME/.nvm/nvm.sh && nvm install && npm ci && npx playwright install chromium --with-deps && npm run build"`,
+		getInstallBuildCommand( testRunnerDir, true ),
 		testRunnerDir
 	);
 
@@ -384,7 +435,7 @@ async function runPerformanceTests( branches, options ) {
 
 		logAtIndent( 3, 'Installing dependencies and building' );
 		await runShellScript(
-			`bash -c "source $HOME/.nvm/nvm.sh && nvm install && npm ci && npm run build"`,
+			getInstallBuildCommand( buildDir, false ),
 			buildDir
 		);
 
