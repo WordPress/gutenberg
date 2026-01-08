@@ -523,10 +523,13 @@ button.wp-block-navigation-item__content {
 		}
 
 		// Try to inherit any root paddings set, so the X can align to a top-right aligned menu.
-		padding-top: clamp(1rem, var(--wp--style--root--padding-top), 20rem);
-		padding-right: clamp(1rem, var(--wp--style--root--padding-right), 20rem);
-		padding-bottom: clamp(1rem, var(--wp--style--root--padding-bottom), 20rem);
-		padding-left: clamp(1rem, var(--wp--style--root--padding-left), 20rem);
+		// Don't apply default padding when custom overlay is present.
+		&:not(.disable-default-overlay) {
+			padding-top: clamp(1rem, var(--wp--style--root--padding-top), 20rem);
+			padding-right: clamp(1rem, var(--wp--style--root--padding-right), 20rem);
+			padding-bottom: clamp(1rem, var(--wp--style--root--padding-bottom), 20rem);
+			padding-left: clamp(1rem, var(--wp--style--root--padding-left), 20rem);
+		}
 
 		// Allow modal to scroll.
 		overflow: auto;
@@ -534,10 +537,13 @@ button.wp-block-navigation-item__content {
 		// Give it a z-index just higher than the adminbar.
 		z-index: 100000;
 
-		.wp-block-navigation__responsive-container-content {
-			// Add padding above to accommodate close button.
+		// Add padding above to accommodate close button.
+		// Don't apply default padding when custom overlay is present.
+		&:not(.disable-default-overlay) .wp-block-navigation__responsive-container-content {
 			padding-top: calc(2rem + #{ $navigation-icon-size });
+		}
 
+		.wp-block-navigation__responsive-container-content {
 			// Don't crop the focus style.
 			overflow: visible;
 
@@ -623,6 +629,29 @@ button.wp-block-navigation-item__content {
 		}
 	}
 
+	// Custom overlay container visibility.
+	// When there's a custom overlay, by default hide overlay container.
+	&.disable-default-overlay {
+		.wp-block-navigation__overlay-container {
+			display: none;
+			width: 100%;
+		}
+
+		// When menu is open with custom overlay, hide default navigation and show overlay.
+		&.is-menu-open {
+			.wp-block-navigation__responsive-container-content {
+				// Hides the content of the non-overlay navigation.
+				> .wp-block-navigation__container {
+					display: none;
+				}
+
+				.wp-block-navigation__overlay-container {
+					display: block;
+				}
+			}
+		}
+	}
+
 	@include break-small() {
 		&:not(.hidden-by-default) {
 			&:not(.is-menu-open) {
@@ -648,13 +677,14 @@ button.wp-block-navigation-item__content {
 }
 
 // Default menu background and font color.
+// Don't apply default colors when custom overlay is present.
 .wp-block-navigation:not(.has-background)
-.wp-block-navigation__responsive-container.is-menu-open {
+.wp-block-navigation__responsive-container.is-menu-open:not(.disable-default-overlay) {
 	background-color: #fff;
 }
 
 .wp-block-navigation:not(.has-text-color)
-.wp-block-navigation__responsive-container.is-menu-open {
+.wp-block-navigation__responsive-container.is-menu-open:not(.disable-default-overlay) {
 	color: #000;
 }
 
@@ -721,6 +751,12 @@ button.wp-block-navigation-item__content {
 	}
 }
 
+// When default close button is within a custom overlay, add spacing from edges.
+.disable-default-overlay .wp-block-navigation__responsive-container-close {
+	top: clamp(1rem, var(--wp--style--root--padding-left), 20rem);
+	right: clamp(1rem, var(--wp--style--root--padding-left), 20rem);
+}
+
 // The menu adds wrapping containers.
 .wp-block-navigation__responsive-close {
 	width: 100%;
@@ -753,7 +789,8 @@ button.wp-block-navigation-item__content {
 
 // Adjust open dialog top margin when admin-bar is visible.
 // Needs to be scoped to .is-menu-open, or it will shift the position of any other navigations that may be present.
-.has-modal-open .admin-bar .is-menu-open .wp-block-navigation__responsive-dialog {
+// Don't apply margin when custom overlay is present.
+.has-modal-open .admin-bar .is-menu-open:not(.disable-default-overlay) .wp-block-navigation__responsive-dialog {
 	margin-top: $admin-bar-height-big;
 
 	// Handle smaller admin-bar.

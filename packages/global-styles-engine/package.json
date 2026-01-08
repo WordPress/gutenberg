@@ -52,6 +52,10 @@
 		"is-plain-object": "^5.0.0",
 		"memize": "^2.1.0"
 	},
+	"devDependencies": {
+		"@testing-library/jest-dom": "^6.6.3",
+		"@types/jest": "^29.5.14"
+	},
 	"publishConfig": {
 		"access": "public"
 	}

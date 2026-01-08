@@ -43,7 +43,9 @@
 	"types": "build-types",
 	"sideEffects": false,
 	"dependencies": {
+		"@ariakit/react": "^0.4.15",
 		"@base-ui/react": "^1.0.0",
+		"@wordpress/a11y": "file:../a11y",
 		"@wordpress/element": "file:../element",
 		"@wordpress/i18n": "file:../i18n",
 		"@wordpress/icons": "file:../icons",
@@ -51,7 +53,12 @@
 		"clsx": "^2.1.1"
 	},
 	"devDependencies": {
-		"@wordpress/theme": "file:../theme"
+		"@storybook/addon-docs": "^9.1.17",
+		"@testing-library/jest-dom": "^6.6.3",
+		"@types/jest": "^29.5.14",
+		"@types/node": "^20.17.10",
+		"@wordpress/theme": "file:../theme",
+		"storybook": "^9.1.17"
 	},
 	"peerDependencies": {
 		"react": "^18.0.0",

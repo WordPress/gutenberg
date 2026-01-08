@@ -57,6 +57,7 @@
 		"requireindex": "^1.2.0"
 	},
 	"devDependencies": {
+		"@types/eslint": "^8",
 		"@types/estree": "1.0.5"
 	},
 	"peerDependencies": {

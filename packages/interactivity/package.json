@@ -37,6 +37,9 @@
 		"@preact/signals": "^1.3.0",
 		"preact": "^10.24.2"
 	},
+	"devDependencies": {
+		"@types/jest": "^29.5.14"
+	},
 	"publishConfig": {
 		"access": "public"
 	}

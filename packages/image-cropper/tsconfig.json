@@ -4,5 +4,9 @@
 	"compilerOptions": {
 		"checkJs": false
 	},
-	"references": [ { "path": "../element" } ]
+	"references": [
+		{ "path": "../components" },
+		{ "path": "../element" },
+		{ "path": "../i18n" }
+	]
 }

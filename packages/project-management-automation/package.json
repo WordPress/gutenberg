@@ -37,6 +37,9 @@
 		"@octokit/webhooks": "^9.26.3",
 		"@octokit/webhooks-types": "5.8.0"
 	},
+	"devDependencies": {
+		"@types/node": "^20.17.10"
+	},
 	"publishConfig": {
 		"access": "public"
 	}

@@ -43,8 +43,8 @@
 	"types": "build-types",
 	"sideEffects": false,
 	"dependencies": {
-		"@types/simple-peer": "^9.11.5",
 		"@wordpress/hooks": "file:../hooks",
+		"@wordpress/undo-manager": "file:../undo-manager",
 		"@wordpress/url": "file:../url",
 		"import-locals": "^2.0.0",
 		"lib0": "^0.2.42",
@@ -53,6 +53,10 @@
 		"y-protocols": "^1.0.5",
 		"y-webrtc": "~10.2.5",
 		"yjs": "~13.6.6"
+	},
+	"devDependencies": {
+		"@types/node": "^20.17.10",
+		"@types/simple-peer": "^9.11.5"
 	},
 	"publishConfig": {
 		"access": "public"

@@ -45,8 +45,8 @@
 	"types": "build-types",
 	"sideEffects": false,
 	"dependencies": {
-		"@types/react": "^18.2.79",
-		"@types/react-dom": "^18.2.25",
+		"@types/react": "^18.3.27",
+		"@types/react-dom": "^18.3.1",
 		"@wordpress/escape-html": "file:../escape-html",
 		"change-case": "^4.1.2",
 		"is-plain-object": "^5.0.0",

@@ -48,6 +48,7 @@
 	],
 	"dependencies": {
 		"@wordpress/api-fetch": "file:../api-fetch",
+		"@wordpress/base-styles": "file:../base-styles",
 		"@wordpress/blob": "file:../blob",
 		"@wordpress/components": "file:../components",
 		"@wordpress/core-data": "file:../core-data",

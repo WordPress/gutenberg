@@ -32,6 +32,9 @@
 		"./package.json": "./package.json"
 	},
 	"types": "build-types",
+	"devDependencies": {
+		"@types/node": "^20.17.10"
+	},
 	"peerDependencies": {
 		"prettier": ">=3"
 	},
