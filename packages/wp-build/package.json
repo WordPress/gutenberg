@@ -36,7 +36,6 @@
 	},
 	"dependencies": {
 		"@emotion/babel-plugin": "11.11.0",
-		"@manypkg/get-packages": "^3.1.0",
 		"autoprefixer": "10.4.21",
 		"browserslist-to-esbuild": "2.1.1",
 		"change-case": "4.1.2",
@@ -49,7 +48,8 @@
 		"moment-timezone": "^0.5.40",
 		"postcss": "8.4.38",
 		"postcss-modules": "6.0.1",
-		"rtlcss": "4.3.0"
+		"rtlcss": "4.3.0",
+		"sass-embedded": "^1.97.2"
 	},
 	"devDependencies": {
 		"@types/node": "^20.17.10"
