@@ -109,24 +109,37 @@ const wordpressExternalsPlugin = createWordpressExternalsPlugin(
 );
 
 /**
- * Create style bundling plugins with the given working directory.
+ * Get SASS options for the given working directory.
  *
  * Uses NodePackageImporter from sass-embedded for resolving package imports
  * (like @wordpress/base-styles) which works with any package manager (npm, pnpm, yarn).
  *
  * @param {string} workingDir - The directory where we're working (for NodePackageImporter).
- * @return {object[]} Array of esbuild plugins for handling CSS/SCSS.
+ * @return {Object} SASS options object with importers and loadPaths.
  */
-function createStyleBundlingPlugins( workingDir ) {
-	const sassOptions = {
+function getSassOptions( workingDir ) {
+	return {
 		importers: [ new NodePackageImporter( workingDir ) ],
 		// loadPaths for resolving @wordpress/base-styles imports and local base-styles imports
 		loadPaths: [
+			// Package's own node_modules (for pnpm isolated deps)
 			path.join( workingDir, 'node_modules' ),
+			// Root node_modules (for npm hoisted deps)
 			path.join( ROOT_DIR, 'node_modules' ),
+			// For local imports like @use "mixins"
 			path.join( PACKAGES_DIR, 'base-styles' ),
 		],
 	};
+}
+
+/**
+ * Create style bundling plugins with the given working directory.
+ *
+ * @param {string} workingDir - The directory where we're working (for NodePackageImporter).
+ * @return {object[]} Array of esbuild plugins for handling CSS/SCSS.
+ */
+function createStyleBundlingPlugins( workingDir ) {
+	const sassOptions = getSassOptions( workingDir );
 	return [
 		// Handle CSS modules (.module.css and .module.scss)
 		sassPlugin( {
@@ -1247,12 +1260,7 @@ async function compileStyles( packageName ) {
 				plugins: [
 					sassPlugin( {
 						embedded: true,
-						importers: [ new NodePackageImporter( packageDir ) ],
-						loadPaths: [
-							path.join( packageDir, 'node_modules' ),
-							path.join( ROOT_DIR, 'node_modules' ),
-							path.join( PACKAGES_DIR, 'base-styles' ),
-						],
+						...getSassOptions( packageDir ),
 						async transform( source ) {
 							// Process with autoprefixer for LTR version
 							const ltrResult = await postcss( [
