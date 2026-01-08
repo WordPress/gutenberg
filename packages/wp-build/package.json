@@ -24,15 +24,15 @@
 		"npm": ">=10.2.3"
 	},
 	"type": "module",
-	"module": "./src/build.mjs",
+	"module": "./lib/build.mjs",
 	"exports": {
 		".": {
-			"import": "./src/build.mjs"
+			"import": "./lib/build.mjs"
 		},
 		"./package.json": "./package.json"
 	},
 	"bin": {
-		"wp-build": "./src/build.mjs"
+		"wp-build": "./lib/build.mjs"
 	},
 	"dependencies": {
 		"@emotion/babel-plugin": "11.11.0",
