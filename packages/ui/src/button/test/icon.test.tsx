@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 import { createRef } from '@wordpress/element';
 import { render } from '@testing-library/react';
-
-/**
- * Internal dependencies
- */
 import { ButtonIcon } from '../icon';
 
 describe( 'Button.Icon', () => {

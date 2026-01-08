@@ -1,18 +1,7 @@
-/**
- * External dependencies
- */
 import { Button as AriakitButton } from '@ariakit/react';
-import { forwardRef, useEffect } from '@wordpress/element';
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
+import { forwardRef, useEffect } from '@wordpress/element';
 import { speak } from '@wordpress/a11y';
-
-/**
- * Internal dependencies
- */
 import { type ButtonProps } from './types';
 import styles from './style.module.css';
 import resetStyles from '../utils/css/resets.module.css';

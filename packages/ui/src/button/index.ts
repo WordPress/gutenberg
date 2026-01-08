@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { Button as ButtonButton } from './button';
 import { ButtonIcon } from './icon';
 

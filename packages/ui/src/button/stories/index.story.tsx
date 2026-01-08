@@ -1,18 +1,7 @@
 /* eslint-disable no-restricted-syntax */
-/**
- * External dependencies
- */
 import { Fragment, useState } from '@wordpress/element';
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
-
-/**
- * WordPress dependencies
- */
 import { cog } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import { Button } from '../index';
 
 const meta: Meta< typeof Button > = {

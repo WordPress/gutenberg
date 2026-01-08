@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import { forwardRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { type IconProps } from '../icon/types';
 import { Icon } from '../icon';
 

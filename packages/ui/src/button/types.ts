@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 import { type ReactNode, type HTMLAttributes } from 'react';
 import { type ButtonProps as AriakitButtonProps } from '@ariakit/react';
-
-/**
- * Internal dependencies
- */
 import { type ComponentProps } from '../utils/types';
 
 interface ButtonBaseProps

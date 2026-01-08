@@ -1,13 +1,6 @@
-/**
- * External dependencies
- */
 import { createRef } from '@wordpress/element';
 import { screen, render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-
-/**
- * Internal dependencies
- */
 import { Button } from '../index';
 
 describe( 'Button', () => {
