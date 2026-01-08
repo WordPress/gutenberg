@@ -14,6 +14,16 @@ import { __ } from '@wordpress/i18n';
  */
 import { default as transformStyles } from '../../utils/transform-styles';
 
+/**
+ * AdvancedPanel component for editing custom CSS in global styles.
+ *
+ * @param {Object}      props                Component props.
+ * @param {Object}      props.value          The current CSS value object.
+ * @param {Function}    props.onChange       Callback to update the CSS value.
+ * @param {Object}      props.inheritedValue The inherited CSS value (includes base styles).
+ * @param {string|null} props.serverError    Optional server-side error message to display.
+ * @return {Element} The AdvancedPanel component.
+ */
 export default function AdvancedPanel( {
 	value,
 	onChange,

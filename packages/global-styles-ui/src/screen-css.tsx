@@ -29,31 +29,36 @@ function ScreenCSS() {
 		false
 	);
 
-	// Get server-side save error
-	const serverError = useSelect( ( select ) => {
+	// Get the global styles ID
+	const globalStylesId = useSelect( ( select ) => {
 		// @ts-expect-error: Experimental API not in types yet
-		const globalStylesId =
-			select( coreStore ).__experimentalGetCurrentGlobalStylesId();
-
-		if ( ! globalStylesId ) {
-			return null;
-		}
-
-		const error = select( coreStore ).getLastEntitySaveError(
-			'root',
-			'globalStyles',
-			globalStylesId
-		);
-
-		// Extract error message from the error object
-		if ( error?.message ) {
-			return error.message;
-		}
-		if ( typeof error === 'string' ) {
-			return error;
-		}
-		return null;
+		return select( coreStore ).__experimentalGetCurrentGlobalStylesId();
 	}, [] );
+
+	// Get server-side save error
+	const serverError = useSelect(
+		( select ) => {
+			if ( ! globalStylesId ) {
+				return null;
+			}
+
+			const error = select( coreStore ).getLastEntitySaveError(
+				'root',
+				'globalStyles',
+				globalStylesId
+			);
+
+			// Extract error message from the error object
+			if ( error?.message ) {
+				return error.message;
+			}
+			if ( typeof error === 'string' ) {
+				return error;
+			}
+			return null;
+		},
+		[ globalStylesId ]
+	);
 
 	return (
 		<>
