@@ -49,6 +49,15 @@ function gutenberg_modify_wp_template_part_post_type_args_7_0( $args ) {
 add_filter( 'register_wp_template_part_post_type_args', 'gutenberg_modify_wp_template_part_post_type_args_7_0' );
 
 /**
+ * Navigation overlay template part area identifier.
+ * This constant should match NAVIGATION_OVERLAY_TEMPLATE_PART_AREA in
+ * packages/block-library/src/navigation/constants.js
+ *
+ * @since 7.0.0
+ */
+define( 'GUTENBERG_NAVIGATION_OVERLAY_TEMPLATE_PART_AREA', 'navigation-overlay' );
+
+/**
  * Registers the 'navigation-overlay' template part area when the experiment is enabled.
  *
  * @param array $areas Array of template part area definitions.
@@ -56,9 +65,8 @@ add_filter( 'register_wp_template_part_post_type_args', 'gutenberg_modify_wp_tem
  */
 if ( gutenberg_is_experiment_enabled( 'gutenberg-customizable-navigation-overlays' ) ) {
 	function gutenberg_register_overlay_template_part_area( $areas ) {
-
 		$areas[] = array(
-			'area'        => 'navigation-overlay',
+			'area'        => GUTENBERG_NAVIGATION_OVERLAY_TEMPLATE_PART_AREA,
 			'label'       => __( 'Navigation Overlay', 'gutenberg' ),
 			'description' => __( 'Custom overlay area for navigation overlays.', 'gutenberg' ),
 			'icon'        => 'overlay',
