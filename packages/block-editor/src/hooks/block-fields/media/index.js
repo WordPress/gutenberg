@@ -87,13 +87,6 @@ export default function Media( { data, field, onChange, config = {} } ) {
 	const value = field.getValue( { item: data } );
 	const { allowedTypes = [], multiple = false } = field.config || {};
 	const { fieldDef } = config;
-	const updateAttributes = ( newFieldValue ) => {
-		const mappedChanges = field.setValue( {
-			item: data,
-			value: newFieldValue,
-		} );
-		onChange( mappedChanges );
-	};
 
 	// Check if featured image is supported by checking if it's in the mapping
 	const hasFeaturedImageSupport =
@@ -150,17 +143,12 @@ export default function Media( { data, field, onChange, config = {} } ) {
 					// Build reset value dynamically based on mapping
 					const resetValue = {};
 
-					if ( fieldDef?.mapping ) {
-						Object.keys( fieldDef.mapping ).forEach( ( key ) => {
-							if (
-								key === 'id' ||
-								key === 'src' ||
-								key === 'url'
-							) {
-								resetValue[ key ] = undefined;
-							} else if ( key === 'caption' || key === 'alt' ) {
+					if ( fieldDef?.properties ) {
+						Object.keys( fieldDef.properties ).forEach( ( key ) => {
+							if ( key === 'caption' || key === 'alt' ) {
 								resetValue[ key ] = '';
 							}
+							resetValue[ key ] = undefined;
 						} );
 					}
 
@@ -170,71 +158,35 @@ export default function Media( { data, field, onChange, config = {} } ) {
 					}
 
 					// Merge with existing value to preserve other field properties
-					updateAttributes( { ...value, ...resetValue } );
+					onChange(
+						field.setValue( {
+							item: data,
+							value: resetValue,
+						} )
+					);
 				} }
 				{ ...( hasFeaturedImageSupport && {
 					useFeaturedImage: !! value?.featuredImage,
 					onToggleFeaturedImage: () => {
-						updateAttributes( {
-							...value,
+						// TODO - this should unset id, src, etc.
+						onChange( {
 							featuredImage: ! value?.featuredImage,
 						} );
 					},
 				} ) }
 				onSelect={ ( selectedMedia ) => {
 					if ( selectedMedia.id && selectedMedia.url ) {
-						// Determine mediaType from MIME type, not from object type
-						let mediaType = 'image'; // default
-						if ( selectedMedia.mime_type ) {
-							if (
-								selectedMedia.mime_type.startsWith( 'video/' )
-							) {
-								mediaType = 'video';
-							} else if (
-								selectedMedia.mime_type.startsWith( 'audio/' )
-							) {
-								mediaType = 'audio';
-							}
-						}
-
-						// Build new value dynamically based on what's in the mapping
+						// // Build new value dynamically based on what's in the mapping
 						const newValue = {};
 
-						// Iterate over mapping keys and set values for supported properties
-						if ( fieldDef?.mapping ) {
-							Object.keys( fieldDef.mapping ).forEach(
+						// Iterate over mapping keys and set values for supported properties.
+						// The properties used by the field should closely match those returned
+						// by the media API to ensure no mapping is required.
+						if ( fieldDef?.properties ) {
+							Object.keys( fieldDef.properties ).forEach(
 								( key ) => {
-									if ( key === 'id' ) {
-										newValue[ key ] = selectedMedia.id;
-									} else if (
-										key === 'src' ||
-										key === 'url'
-									) {
-										newValue[ key ] = selectedMedia.url;
-									} else if ( key === 'type' ) {
-										newValue[ key ] = mediaType;
-									} else if (
-										key === 'link' &&
-										selectedMedia.link
-									) {
-										newValue[ key ] = selectedMedia.link;
-									} else if (
-										key === 'caption' &&
-										! value?.caption &&
-										selectedMedia.caption
-									) {
-										newValue[ key ] = selectedMedia.caption;
-									} else if (
-										key === 'alt' &&
-										! value?.alt &&
-										selectedMedia.alt
-									) {
-										newValue[ key ] = selectedMedia.alt;
-									} else if (
-										key === 'poster' &&
-										selectedMedia.poster
-									) {
-										newValue[ key ] = selectedMedia.poster;
+									if ( selectedMedia[ key ] ) {
+										newValue[ key ] = selectedMedia[ key ];
 									}
 								}
 							);
@@ -246,8 +198,12 @@ export default function Media( { data, field, onChange, config = {} } ) {
 						}
 
 						// Merge with existing value to preserve other field properties
-						const finalValue = { ...value, ...newValue };
-						updateAttributes( finalValue );
+						onChange(
+							field.setValue( {
+								item: data,
+								value: newValue,
+							} )
+						);
 					}
 				} }
 				renderToggle={ ( buttonProps ) => (

@@ -71,12 +71,29 @@ if ( window.__experimentalContentOnlyInspectorFields ) {
 		{
 			id: 'image',
 			label: __( 'Image' ),
-			type: 'media',
-			mapping: {
-				id: 'id',
-				url: 'url',
-				caption: 'caption',
-				alt: 'alt',
+			Edit: 'media',
+			type: 'object',
+			properties: {
+				id: {
+					id: 'id',
+					type: 'number',
+					label: __( 'Id' ),
+				},
+				url: {
+					id: 'url',
+					type: 'url',
+					label: __( 'URL' ),
+				},
+				caption: {
+					id: 'caption',
+					type: 'text',
+					label: __( 'Caption' ),
+				},
+				alt: {
+					id: 'alt',
+					type: 'text',
+					label: __( 'Alt Text' ),
+				},
 			},
 			args: {
 				allowedTypes: [ 'image' ],
@@ -86,18 +103,36 @@ if ( window.__experimentalContentOnlyInspectorFields ) {
 		{
 			id: 'link',
 			label: __( 'Link' ),
-			type: 'link',
-			mapping: {
-				url: 'href',
-				rel: 'rel',
-				linkTarget: 'linkTarget',
-				destination: 'linkDestination',
+			Edit: 'link',
+			type: 'object',
+			properties: {
+				url: {
+					id: 'href',
+					type: 'url',
+					label: __( 'URL' ),
+				},
+				rel: {
+					id: 'rel',
+					type: 'text',
+					label: __( 'Rel' ),
+				},
+				linkTarget: {
+					id: 'linkTarget',
+					type: 'text',
+					label: __( 'Target' ),
+				},
+				destination: {
+					id: 'linkDestination',
+					type: 'text',
+					label: __( 'Destination' ),
+				},
 			},
 		},
 		{
 			id: 'caption',
 			label: __( 'Caption' ),
-			type: 'richtext',
+			Edit: 'richtext',
+			type: 'text',
 		},
 		{
 			id: 'alt',

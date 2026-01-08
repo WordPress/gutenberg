@@ -73,16 +73,10 @@ export default function Link( { data, field, onChange, config = {} } ) {
 		isControl: true,
 	} );
 	const { fieldDef } = config;
-	const updateAttributes = ( newValue ) => {
-		const mappedChanges = field.setValue( { item: data, value: newValue } );
-		onChange( mappedChanges );
-	};
-
 	const value = field.getValue( { item: data } );
 	const url = value?.url;
 	const rel = value?.rel || '';
 	const target = value?.linkTarget;
-
 	const opensInNewTab = target === NEW_TAB_TARGET;
 	const nofollow = rel === NOFOLLOW_REL;
 
@@ -146,51 +140,44 @@ export default function Link( { data, field, onChange, config = {} } ) {
 							} );
 
 							// Build update object dynamically based on what's in the mapping
-							const updateValue = { ...value };
+							const newValue = {};
 
-							if ( fieldDef?.mapping ) {
-								Object.keys( fieldDef.mapping ).forEach(
+							if ( fieldDef?.properties ) {
+								Object.keys( fieldDef.properties ).forEach(
 									( key ) => {
-										if ( key === 'href' || key === 'url' ) {
-											updateValue[ key ] =
-												updatedAttrs.url;
-										} else if ( key === 'rel' ) {
-											updateValue[ key ] =
-												updatedAttrs.rel;
-										} else if (
-											key === 'target' ||
-											key === 'linkTarget'
-										) {
-											updateValue[ key ] =
-												updatedAttrs.linkTarget;
+										if ( updatedAttrs[ key ] ) {
+											newValue[ key ] =
+												updatedAttrs[ key ];
 										}
 									}
 								);
 							}
 
-							updateAttributes( updateValue );
+							onChange(
+								field.setValue( {
+									item: data,
+									value: newValue,
+								} )
+							);
 						} }
 						onRemove={ () => {
 							// Remove all link-related properties based on what's in the mapping
 							const removeValue = {};
 
-							if ( fieldDef?.mapping ) {
-								Object.keys( fieldDef.mapping ).forEach(
+							if ( fieldDef?.properties ) {
+								Object.keys( fieldDef.properties ).forEach(
 									( key ) => {
-										if (
-											key === 'href' ||
-											key === 'url' ||
-											key === 'rel' ||
-											key === 'target' ||
-											key === 'linkTarget'
-										) {
-											removeValue[ key ] = undefined;
-										}
+										removeValue[ key ] = undefined;
 									}
 								);
 							}
 
-							updateAttributes( removeValue );
+							onChange(
+								field.setValue( {
+									item: data,
+									value: removeValue,
+								} )
+							);
 						} }
 					/>
 				</Popover>

@@ -55,120 +55,6 @@ function createConfiguredControl( config ) {
 	};
 }
 
-/**
- * Normalize a media value to a canonical structure.
- * Only includes properties that are present in the field's mapping (if provided).
- *
- * @param {Object} value    - The mapped value from the block attributes (with canonical keys)
- * @param {Object} fieldDef - Optional field definition containing the mapping
- * @return {Object} Normalized media value with canonical properties
- */
-function normalizeMediaValue( value, fieldDef ) {
-	const defaults = {
-		id: null,
-		url: '',
-		caption: '',
-		alt: '',
-		type: 'image',
-		poster: '',
-		featuredImage: false,
-		link: '',
-	};
-
-	const result = {};
-
-	// If there's a mapping, only include properties that are in it
-	if ( fieldDef?.mapping ) {
-		Object.keys( fieldDef.mapping ).forEach( ( key ) => {
-			result[ key ] = value?.[ key ] ?? defaults[ key ] ?? '';
-		} );
-		return result;
-	}
-
-	// Without mapping, include all default properties
-	Object.keys( defaults ).forEach( ( key ) => {
-		result[ key ] = value?.[ key ] ?? defaults[ key ];
-	} );
-	return result;
-}
-
-/**
- * Denormalize a media value from canonical structure back to mapped keys.
- * Only includes properties that are present in the field's mapping.
- *
- * @param {Object} value    - The normalized media value
- * @param {Object} fieldDef - The field definition containing the mapping
- * @return {Object} Value with only mapped properties
- */
-function denormalizeMediaValue( value, fieldDef ) {
-	if ( ! fieldDef.mapping ) {
-		return value;
-	}
-
-	const result = {};
-	Object.entries( fieldDef.mapping ).forEach( ( [ key ] ) => {
-		if ( key in value ) {
-			result[ key ] = value[ key ];
-		}
-	} );
-	return result;
-}
-
-/**
- * Normalize a link value to a canonical structure.
- * Only includes properties that are present in the field's mapping (if provided).
- *
- * @param {Object} value    - The mapped value from the block attributes (with canonical keys)
- * @param {Object} fieldDef - Optional field definition containing the mapping
- * @return {Object} Normalized link value with canonical properties
- */
-function normalizeLinkValue( value, fieldDef ) {
-	const defaults = {
-		url: '',
-		rel: '',
-		linkTarget: '',
-		destination: '',
-	};
-
-	const result = {};
-
-	// If there's a mapping, only include properties that are in it
-	if ( fieldDef?.mapping ) {
-		Object.keys( fieldDef.mapping ).forEach( ( key ) => {
-			result[ key ] = value?.[ key ] ?? defaults[ key ] ?? '';
-		} );
-		return result;
-	}
-
-	// Without mapping, include all default properties
-	Object.keys( defaults ).forEach( ( key ) => {
-		result[ key ] = value?.[ key ] ?? defaults[ key ];
-	} );
-	return result;
-}
-
-/**
- * Denormalize a link value from canonical structure back to mapped keys.
- * Only includes properties that are present in the field's mapping.
- *
- * @param {Object} value    - The normalized link value
- * @param {Object} fieldDef - The field definition containing the mapping
- * @return {Object} Value with only mapped properties
- */
-function denormalizeLinkValue( value, fieldDef ) {
-	if ( ! fieldDef.mapping ) {
-		return value;
-	}
-
-	const result = {};
-	Object.entries( fieldDef.mapping ).forEach( ( [ key ] ) => {
-		if ( key in value ) {
-			result[ key ] = value[ key ];
-		}
-	} );
-	return result;
-}
-
 function BlockFields( { clientId, blockType, attributes, setAttributes } ) {
 	const blockTitle = useBlockDisplayTitle( {
 		clientId,
@@ -189,8 +75,6 @@ function BlockFields( { clientId, blockType, attributes, setAttributes } ) {
 		}
 
 		return blockTypeFields.map( ( fieldDef ) => {
-			const ControlComponent = CONTROLS[ fieldDef.type ];
-
 			const defaultValues = {};
 			if ( fieldDef.mapping && blockType?.attributes ) {
 				Object.entries( fieldDef.mapping ).forEach(
@@ -210,71 +94,48 @@ function BlockFields( { clientId, blockType, attributes, setAttributes } ) {
 				hideLabelFromVision: fieldDef.id === 'content',
 				// getValue and setValue handle the mapping to block attributes
 				getValue: ( { item } ) => {
-					if ( fieldDef.mapping ) {
-						// Extract mapped properties from the block attributes
+					// When a field is an object, flatten all the properties to the root
+					// of the block attributes.
+					if ( fieldDef.type === 'object' && fieldDef.properties ) {
 						const mappedValue = {};
-						Object.entries( fieldDef.mapping ).forEach(
-							( [ key, attrKey ] ) => {
-								mappedValue[ key ] = item[ attrKey ];
+
+						// Convert to field keys.
+						Object.keys( fieldDef.properties ).forEach( ( key ) => {
+							const attributeKey =
+								fieldDef.properties[ key ].id ?? key;
+							if ( item[ attributeKey ] ) {
+								mappedValue[ key ] = item[ attributeKey ];
 							}
-						);
-
-						// Normalize to canonical structure based on field type
-						if ( fieldDef.type === 'media' ) {
-							return normalizeMediaValue( mappedValue, fieldDef );
-						}
-						if ( fieldDef.type === 'link' ) {
-							return normalizeLinkValue( mappedValue, fieldDef );
-						}
-
-						// For other types, return as-is
+						} );
 						return mappedValue;
 					}
-					// For simple id-based fields, use the id as the attribute key
 					return item[ fieldDef.id ];
 				},
-				setValue: ( { item, value } ) => {
-					if ( fieldDef.mapping ) {
-						// Denormalize from canonical structure back to mapped keys
-						let denormalizedValue = value;
-						if ( fieldDef.type === 'media' ) {
-							denormalizedValue = denormalizeMediaValue(
-								value,
-								fieldDef
-							);
-						} else if ( fieldDef.type === 'link' ) {
-							denormalizedValue = denormalizeLinkValue(
-								value,
-								fieldDef
-							);
-						}
+				setValue: ( { value } ) => {
+					// When a field is an object, flatten all the properties to the root
+					// of the block attributes.
+					if ( fieldDef.type === 'object' && fieldDef.properties ) {
+						const mappedValue = {};
 
-						// Build an object with all mapped attributes
-						const updates = {};
-						Object.entries( fieldDef.mapping ).forEach(
-							( [ key, attrKey ] ) => {
-								// If key is explicitly in value, use it (even if undefined to allow clearing)
-								// Otherwise, preserve the old value
-								if ( key in denormalizedValue ) {
-									updates[ attrKey ] =
-										denormalizedValue[ key ];
-								} else {
-									updates[ attrKey ] = item[ attrKey ];
-								}
+						// Convert to attribute keys.
+						Object.keys( fieldDef.properties ).forEach( ( key ) => {
+							if ( value[ key ] ) {
+								const attributeKey =
+									fieldDef.properties[ key ].id ?? key;
+								mappedValue[ attributeKey ] = value[ key ];
 							}
-						);
-						return updates;
+						} );
+						return mappedValue;
 					}
-					// For simple id-based fields, use the id as the attribute key
 					return { [ fieldDef.id ]: value };
 				},
 			};
 
 			// Only add custom Edit component if one exists for this type
-			if ( ControlComponent ) {
+			if ( fieldDef.Edit ) {
 				// Use EditConfig pattern: Edit is an object with control type and config props
 				field.Edit = createConfiguredControl( {
-					control: fieldDef.type,
+					control: fieldDef.Edit,
 					clientId,
 					fieldDef,
 				} );
