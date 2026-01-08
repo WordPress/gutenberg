@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { type ReactNode, type HTMLAttributes } from 'react';
-// eslint-disable-next-line no-restricted-imports
 import { type ButtonProps as AriakitButtonProps } from '@ariakit/react';
 
 /**
