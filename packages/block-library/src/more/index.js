@@ -45,7 +45,8 @@ if ( window.__experimentalContentOnlyInspectorFields ) {
 		{
 			id: 'customText',
 			label: __( 'Content' ),
-			type: 'richtext',
+			Edit: 'richtext',
+			type: 'string',
 		},
 	];
 	settings[ formKey ] = {

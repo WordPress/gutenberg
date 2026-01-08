@@ -45,12 +45,14 @@ if ( window.__experimentalContentOnlyInspectorFields ) {
 		{
 			id: 'value',
 			label: __( 'Content' ),
-			type: 'richtext',
+			Edit: 'richtext',
+			type: 'string',
 		},
 		{
 			id: 'citation',
 			label: __( 'Citation' ),
-			type: 'richtext',
+			Edit: 'richtext',
+			type: 'string',
 		},
 	];
 	settings[ formKey ] = {

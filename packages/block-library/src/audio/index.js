@@ -41,7 +41,8 @@ if ( window.__experimentalContentOnlyInspectorFields ) {
 		{
 			id: 'audio',
 			label: __( 'Audio' ),
-			type: 'media',
+			Edit: 'media',
+			type: 'object',
 			mapping: {
 				id: 'id',
 				url: 'src',
@@ -54,7 +55,8 @@ if ( window.__experimentalContentOnlyInspectorFields ) {
 		{
 			id: 'caption',
 			label: __( 'Caption' ),
-			type: 'richtext',
+			Edit: 'richtext',
+			type: 'string',
 		},
 	];
 	settings[ formKey ] = {

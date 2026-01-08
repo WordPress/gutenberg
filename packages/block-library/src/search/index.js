@@ -35,18 +35,21 @@ if ( window.__experimentalContentOnlyInspectorFields ) {
 		{
 			id: 'label',
 			label: __( 'Label' ),
-			type: 'richtext',
+			Edit: 'richtext',
+			type: 'string',
 			shownByDefault: true,
 		},
 		{
 			id: 'buttonText',
 			label: __( 'Button text' ),
-			type: 'richtext',
+			Edit: 'richtext',
+			type: 'string',
 		},
 		{
 			id: 'placeholder',
 			label: __( 'Placeholder' ),
-			type: 'richtext',
+			Edit: 'richtext',
+			type: 'string',
 		},
 	];
 	settings[ formKey ] = {

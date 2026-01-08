@@ -31,7 +31,8 @@ if ( window.__experimentalContentOnlyInspectorFields ) {
 		{
 			id: 'link',
 			label: __( 'Link' ),
-			type: 'link',
+			Edit: 'link',
+			type: 'object',
 			mapping: {
 				href: 'url',
 				rel: 'rel',
@@ -40,7 +41,8 @@ if ( window.__experimentalContentOnlyInspectorFields ) {
 		{
 			id: 'label',
 			label: __( 'Label' ),
-			type: 'richtext',
+			Edit: 'richtext',
+			type: 'string',
 		},
 	];
 	settings[ formKey ] = {

@@ -42,7 +42,8 @@ if ( window.__experimentalContentOnlyInspectorFields ) {
 		{
 			id: 'video',
 			label: __( 'Video' ),
-			type: 'media',
+			Edit: 'media',
+			type: 'object',
 			mapping: {
 				id: 'id',
 				url: 'src',
@@ -57,7 +58,8 @@ if ( window.__experimentalContentOnlyInspectorFields ) {
 		{
 			id: 'caption',
 			label: __( 'Caption' ),
-			type: 'richtext',
+			Edit: 'richtext',
+			type: 'string',
 		},
 	];
 	settings[ formKey ] = {

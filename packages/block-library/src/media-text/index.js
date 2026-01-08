@@ -59,7 +59,8 @@ if ( window.__experimentalContentOnlyInspectorFields ) {
 		{
 			id: 'media',
 			label: __( 'Media' ),
-			type: 'media',
+			Edit: 'media',
+			type: 'object',
 			mapping: {
 				id: 'mediaId',
 				type: 'mediaType',
@@ -74,7 +75,8 @@ if ( window.__experimentalContentOnlyInspectorFields ) {
 		{
 			id: 'link',
 			label: __( 'Link' ),
-			type: 'link',
+			Edit: 'link',
+			type: 'object',
 			mapping: {
 				url: 'href',
 				rel: 'rel',

@@ -41,7 +41,8 @@ if ( window.__experimentalContentOnlyInspectorFields ) {
 		{
 			id: 'file',
 			label: __( 'File' ),
-			type: 'media',
+			Edit: 'media',
+			type: 'object',
 			mapping: {
 				id: 'id',
 				url: 'href',
@@ -54,12 +55,14 @@ if ( window.__experimentalContentOnlyInspectorFields ) {
 		{
 			id: 'fileName',
 			label: __( 'Filename' ),
-			type: 'richtext',
+			Edit: 'richtext',
+			type: 'string',
 		},
 		{
 			id: 'downloadButtonText',
 			label: __( 'Button Text' ),
-			type: 'richtext',
+			Edit: 'richtext',
+			type: 'string',
 		},
 	];
 	settings[ formKey ] = {

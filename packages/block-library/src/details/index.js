@@ -70,7 +70,8 @@ if ( window.__experimentalContentOnlyInspectorFields ) {
 		{
 			id: 'summary',
 			label: __( 'Summary' ),
-			type: 'richtext',
+			Edit: 'richtext',
+			type: 'string',
 		},
 	];
 	settings[ formKey ] = {

@@ -65,7 +65,8 @@ if ( window.__experimentalContentOnlyInspectorFields ) {
 		{
 			id: 'background',
 			label: __( 'Background' ),
-			type: 'media',
+			Edit: 'media',
+			type: 'object',
 			mapping: {
 				type: 'backgroundType',
 				id: 'id',

@@ -55,12 +55,14 @@ if ( window.__experimentalContentOnlyInspectorFields ) {
 		{
 			id: 'text',
 			label: __( 'Content' ),
-			type: 'richtext',
+			Edit: 'richtext',
+			type: 'string',
 		},
 		{
 			id: 'link',
 			label: __( 'Link' ),
-			type: 'link',
+			Edit: 'link',
+			type: 'object',
 			mapping: {
 				url: 'url',
 				rel: 'rel',
