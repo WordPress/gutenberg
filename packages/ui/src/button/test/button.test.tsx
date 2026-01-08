@@ -47,11 +47,7 @@ describe( 'Button', () => {
 	} );
 
 	it( 'is disabled when loading', () => {
-		render(
-			<Button loading loadingAnnouncement="Loading">
-				Click me
-			</Button>
-		);
+		render( <Button loading>Click me</Button> );
 
 		const button = screen.getByRole( 'button', { name: 'Click me' } );
 
@@ -67,7 +63,7 @@ describe( 'Button', () => {
 			// where the Button comes from.
 			// TODO: Additional improvement in the original lint rule: only error if disabled=true?
 			// eslint-disable-next-line no-restricted-syntax
-			<Button loading loadingAnnouncement="Loading" disabled={ false }>
+			<Button loading disabled={ false }>
 				Click me
 			</Button>
 		);

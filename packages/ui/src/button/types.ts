@@ -2,7 +2,7 @@ import { type ReactNode, type HTMLAttributes } from 'react';
 import { type ButtonProps as AriakitButtonProps } from '@ariakit/react';
 import { type ComponentProps } from '../utils/types';
 
-interface ButtonBaseProps
+export interface ButtonProps
 	extends Omit< ComponentProps< 'button' >, 'disabled' | 'aria-pressed' > {
 	/**
 	 * The variant of the button. Variants describe the visual style treatment
@@ -52,33 +52,16 @@ interface ButtonBaseProps
 	 * The content of the button.
 	 */
 	children?: ReactNode;
-}
 
-interface ButtonNotLoadingProps {
 	/**
 	 * Whether the button is in a loading state, such as when an action is being
 	 * performed.
+	 * @default false
 	 */
-	loading?: never;
+	loading?: boolean;
 
 	/**
 	 * The text used for assistive technology to indicate the loading state.
 	 */
-	loadingAnnouncement?: never;
+	loadingAnnouncement?: string;
 }
-
-interface ButtonLoadingProps {
-	/**
-	 * Whether the button is in a loading state, such as when an action is being
-	 * performed.
-	 */
-	loading: boolean;
-
-	/**
-	 * The text used for assistive technology to indicate the loading state.
-	 */
-	loadingAnnouncement: string;
-}
-
-export type ButtonProps = ButtonBaseProps &
-	( ButtonLoadingProps | ButtonNotLoadingProps );

@@ -1,7 +1,8 @@
 import { Button as AriakitButton } from '@ariakit/react';
 import clsx from 'clsx';
-import { forwardRef, useEffect } from '@wordpress/element';
 import { speak } from '@wordpress/a11y';
+import { forwardRef, useEffect } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
 import { type ButtonProps } from './types';
 import styles from './style.module.css';
 import resetStyles from '../utils/css/resets.module.css';
@@ -17,7 +18,7 @@ export const Button = forwardRef< HTMLButtonElement, ButtonProps >(
 			accessibleWhenDisabled = true,
 			disabled,
 			loading,
-			loadingAnnouncement,
+			loadingAnnouncement = __( 'Loading' ),
 			children,
 			...props
 		},
