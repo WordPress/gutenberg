@@ -41,7 +41,11 @@
 		"json2php": "^0.0.7"
 	},
 	"devDependencies": {
-		"mkdirp": "3.0.1"
+		"atob": "^2.1.2",
+		"css-loader": "^6.2.0",
+		"lodash": "^4.17.21",
+		"mini-css-extract-plugin": "^2.9.2",
+		"mkdirp": "^3.0.1"
 	},
 	"peerDependencies": {
 		"webpack": "^5.0.0"

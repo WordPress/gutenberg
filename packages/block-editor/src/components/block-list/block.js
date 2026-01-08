@@ -38,7 +38,7 @@ import { useBlockProps } from './use-block-props';
 import { store as blockEditorStore } from '../../store';
 import { useLayout } from './layout';
 import { PrivateBlockContext } from './private-block-context';
-
+import { useBlockVisibility } from '../block-visibility/';
 import { unlock } from '../../lock-unlock';
 
 /**
@@ -555,6 +555,7 @@ BlockListBlock = compose(
 // component, and useBlockProps.
 function BlockListBlockProvider( props ) {
 	const { clientId, rootClientId } = props;
+	const { isBlockCurrentlyHidden } = useBlockVisibility( clientId );
 	const selectedProps = useSelect(
 		( select ) => {
 			const {
@@ -612,9 +613,6 @@ function BlockListBlockProvider( props ) {
 				isPreviewMode,
 				__experimentalBlockBindingsSupportedAttributes,
 			} = getSettings();
-			const { isBlockHidden: _isBlockHidden } = unlock(
-				select( blockEditorStore )
-			);
 			const bindableAttributes =
 				__experimentalBlockBindingsSupportedAttributes?.[ blockName ];
 
@@ -635,7 +633,6 @@ function BlockListBlockProvider( props ) {
 					? getBlockDefaultClassName( blockName )
 					: undefined,
 				blockTitle: blockType?.title,
-				isBlockHidden: _isBlockHidden( clientId ),
 				bindableAttributes,
 			};
 
@@ -770,7 +767,6 @@ function BlockListBlockProvider( props ) {
 		className,
 		defaultClassName,
 		originalBlockClientId,
-		isBlockHidden,
 		bindableAttributes,
 	} = selectedProps;
 
@@ -823,12 +819,12 @@ function BlockListBlockProvider( props ) {
 		originalBlockClientId,
 		themeSupportsLayout,
 		canMove,
-		isBlockHidden,
+		isBlockCurrentlyHidden,
 		bindableAttributes,
 	};
 
 	if (
-		isBlockHidden &&
+		isBlockCurrentlyHidden &&
 		! isSelected &&
 		! isMultiSelected &&
 		! hasChildSelected

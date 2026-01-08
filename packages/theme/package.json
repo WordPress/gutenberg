@@ -73,7 +73,11 @@
 		"@terrazzo/cli": "^0.10.2",
 		"@terrazzo/plugin-css": "^0.10.2",
 		"@terrazzo/token-tools": "^0.10.2",
-		"esbuild-esm-loader": "0.3.3"
+		"@testing-library/jest-dom": "^6.6.3",
+		"@types/jest": "^29.5.14",
+		"@types/node": "^20.17.10",
+		"esbuild-esm-loader": "^0.3.3",
+		"storybook": "^9.1.17"
 	},
 	"peerDependencies": {
 		"react": "^18.0.0",

@@ -41,13 +41,17 @@
 		"change-case": "4.1.2",
 		"chokidar": "^4.0.0",
 		"cssnano": "6.0.1",
-		"esbuild": "0.25.10",
+		"esbuild": "^0.27.2",
 		"esbuild-plugin-babel": "0.2.3",
 		"esbuild-sass-plugin": "3.3.1",
 		"fast-glob": "^3.2.7",
+		"moment-timezone": "^0.5.40",
 		"postcss": "8.4.38",
 		"postcss-modules": "6.0.1",
 		"rtlcss": "4.3.0"
+	},
+	"devDependencies": {
+		"@types/node": "^20.17.10"
 	},
 	"peerDependencies": {
 		"@wordpress/boot": "^0.3.0",

@@ -27,6 +27,7 @@
 	"main": "parser.js",
 	"exports": {
 		".": "./parser.js",
+		"./shared-tests": "./shared-tests.js",
 		"./package.json": "./package.json"
 	},
 	"wpScript": true,

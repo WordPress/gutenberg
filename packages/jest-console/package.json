@@ -40,9 +40,14 @@
 		},
 		"./package.json": "./package.json"
 	},
-	"types": "build-types",
+	"types": "index.d.ts",
 	"dependencies": {
-		"jest-matcher-utils": "^29.6.2"
+		"jest-matcher-utils": "^29.6.2",
+		"jest-mock": "^29.6.2"
+	},
+	"devDependencies": {
+		"@testing-library/jest-dom": "^6.6.3",
+		"@types/jest": "^29.5.14"
 	},
 	"peerDependencies": {
 		"jest": ">=29"
