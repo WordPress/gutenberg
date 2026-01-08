@@ -879,7 +879,7 @@ export default function Image( {
 				} ) }
 			>
 				{ dimensionsControl }
-				{ aspectRatio && url && (
+				{ url && scale && (
 					<ToolsPanelItem
 						label={ __( 'Focal point' ) }
 						isShownByDefault
