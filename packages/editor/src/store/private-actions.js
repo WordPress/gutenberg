@@ -205,14 +205,12 @@ export const saveDirtyEntities =
 				) {
 					// Retrieve error messages for entities that failed to save.
 					const errorMessages = [];
-					entitiesToSave.forEach( ( { kind, name, key }, index ) => {
-						if ( typeof values[ index ] === 'undefined' ) {
-							const error = registry
-								.select( coreStore )
-								.getLastEntitySaveError( kind, name, key );
-							if ( error?.message ) {
-								errorMessages.push( error.message );
-							}
+					entitiesToSave.forEach( ( { kind, name, key } ) => {
+						const error = registry
+							.select( coreStore )
+							.getLastEntitySaveError( kind, name, key );
+						if ( error?.message ) {
+							errorMessages.push( error.message );
 						}
 					} );
 
