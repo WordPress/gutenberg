@@ -194,7 +194,7 @@ export const Pressed: Story = {
 		variant: 'minimal',
 	},
 	render: ( args ) => {
-		const [ isPressed, setIsPressed ] = useState( false );
+		const [ isPressed, setIsPressed ] = useState( true );
 
 		return (
 			<Button
