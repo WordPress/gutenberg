@@ -51,6 +51,7 @@
 	"dependencies": {
 		"@wordpress/base-styles": "file:../base-styles",
 		"@wordpress/components": "file:../components",
+		"@wordpress/compose": "file:../compose",
 		"@wordpress/core-data": "file:../core-data",
 		"@wordpress/data": "file:../data",
 		"@wordpress/dataviews": "file:../dataviews",
