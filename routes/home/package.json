@@ -1,9 +1,12 @@
 {
+	"name": "@wordpress/home-route",
+	"version": "1.0.0",
+	"private": true,
 	"route": {
-		"path": "/"
+		"path": "/",
+		"page": "site-editor-v2"
 	},
 	"dependencies": {
-		"@wordpress/admin-ui": "file:../../packages/admin-ui",
 		"@wordpress/i18n": "file:../../packages/i18n"
 	}
 }

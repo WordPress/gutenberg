@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
+import { __unstableStripHTML as stripHTML, focus } from '@wordpress/dom';
 import {
 	Popover,
 	Button,
@@ -26,6 +26,7 @@ import { useInstanceId } from '@wordpress/compose';
  */
 import { LinkUIPageCreator } from './page-creator';
 import LinkUIBlockInserter from './block-inserter';
+import { useEntityBinding } from '../shared/use-entity-binding';
 
 /**
  * Given the Link block's type attribute, return the query params to give to
@@ -66,24 +67,26 @@ export function getSuggestionsQuery( type, kind ) {
 }
 
 function UnforwardedLinkUI( props, ref ) {
-	const { label, url, opensInNewTab, type, kind, id, metadata } = props.link;
+	const { label, url, opensInNewTab, type, kind, id } = props.link;
+	const { clientId } = props;
 	const postType = type || 'page';
 
 	const [ addingBlock, setAddingBlock ] = useState( false );
 	const [ addingPage, setAddingPage ] = useState( false );
-	const [ focusAddBlockButton, setFocusAddBlockButton ] = useState( false );
-	const [ focusAddPageButton, setFocusAddPageButton ] = useState( false );
+	const [ shouldFocusPane, setShouldFocusPane ] = useState( null );
+	const linkControlWrapperRef = useRef();
+	const addPageButtonRef = useRef();
+	const addBlockButtonRef = useRef();
 	const permissions = useResourcePermissions( {
 		kind: 'postType',
 		name: postType,
 	} );
 
-	// Check if there's a URL binding with the new binding sources
-	// Only enable handleEntities when there's actually a binding present
-	const hasUrlBinding =
-		( metadata?.bindings?.url?.source === 'core/post-data' ||
-			metadata?.bindings?.url?.source === 'core/term-data' ) &&
-		!! id;
+	// Use the entity binding hook to get binding status
+	const { isBoundEntityAvailable } = useEntityBinding( {
+		clientId,
+		attributes: props.link,
+	} );
 
 	// Memoize link value to avoid overriding the LinkControl's internal state.
 	// This is a temporary fix. See https://github.com/WordPress/gutenberg/issues/50976#issuecomment-1568226407.
@@ -102,8 +105,9 @@ function UnforwardedLinkUI( props, ref ) {
 	const handlePageCreated = ( pageLink ) => {
 		// Set the new page as the current link
 		props.onChange( pageLink );
-		// Return to main Link UI
+		// Return to main Link UI and focus the first focusable element
 		setAddingPage( false );
+		setShouldFocusPane( true );
 	};
 
 	const dialogTitleId = useInstanceId(
@@ -114,6 +118,28 @@ function UnforwardedLinkUI( props, ref ) {
 		LinkUI,
 		'link-ui-link-control__description'
 	);
+
+	// Focus management when transitioning between panes
+	useEffect( () => {
+		if ( shouldFocusPane && linkControlWrapperRef.current ) {
+			// If we have a specific element to focus, focus it
+			if ( shouldFocusPane?.current ) {
+				// Focus the specific element passed
+				shouldFocusPane.current.focus();
+			} else {
+				// Focus the first tabbable element (keyboard-accessible, excluding tabindex="-1")
+				const tabbableElements = focus.tabbable.find(
+					linkControlWrapperRef.current
+				);
+				const nextFocusTarget =
+					tabbableElements[ 0 ] || linkControlWrapperRef.current;
+				nextFocusTarget.focus();
+			}
+
+			// Reset the state
+			setShouldFocusPane( false );
+		}
+	}, [ shouldFocusPane ] );
 
 	const blockEditingMode = useBlockEditingMode();
 
@@ -127,6 +153,7 @@ function UnforwardedLinkUI( props, ref ) {
 		>
 			{ ! addingBlock && ! addingPage && (
 				<div
+					ref={ linkControlWrapperRef }
 					role="dialog"
 					aria-labelledby={ dialogTitleId }
 					aria-describedby={ dialogDescriptionId }
@@ -152,7 +179,8 @@ function UnforwardedLinkUI( props, ref ) {
 						onChange={ props.onChange }
 						onRemove={ props.onRemove }
 						onCancel={ props.onCancel }
-						handleEntities={ hasUrlBinding }
+						handleEntities={ isBoundEntityAvailable }
+						forceIsEditingLink={ link?.url ? false : undefined }
 						renderControlBottom={ () => {
 							// Don't show the tools when there is submitted link (preview state).
 							if ( link?.url?.length ) {
@@ -161,15 +189,13 @@ function UnforwardedLinkUI( props, ref ) {
 
 							return (
 								<LinkUITools
-									focusAddBlockButton={ focusAddBlockButton }
-									focusAddPageButton={ focusAddPageButton }
+									addPageButtonRef={ addPageButtonRef }
+									addBlockButtonRef={ addBlockButtonRef }
 									setAddingBlock={ () => {
 										setAddingBlock( true );
-										setFocusAddBlockButton( false );
 									} }
 									setAddingPage={ () => {
 										setAddingPage( true );
-										setFocusAddPageButton( false );
 									} }
 									canAddPage={
 										permissions?.canCreate &&
@@ -190,8 +216,7 @@ function UnforwardedLinkUI( props, ref ) {
 					clientId={ props.clientId }
 					onBack={ () => {
 						setAddingBlock( false );
-						setFocusAddBlockButton( true );
-						setFocusAddPageButton( false );
+						setShouldFocusPane( addBlockButtonRef );
 					} }
 					onBlockInsert={ props?.onBlockInsert }
 				/>
@@ -202,8 +227,7 @@ function UnforwardedLinkUI( props, ref ) {
 					postType={ postType }
 					onBack={ () => {
 						setAddingPage( false );
-						setFocusAddPageButton( true );
-						setFocusAddBlockButton( false );
+						setShouldFocusPane( addPageButtonRef );
 					} }
 					onPageCreated={ handlePageCreated }
 					initialTitle={ link?.url || '' }
@@ -216,30 +240,14 @@ function UnforwardedLinkUI( props, ref ) {
 export const LinkUI = forwardRef( UnforwardedLinkUI );
 
 const LinkUITools = ( {
+	addPageButtonRef,
+	addBlockButtonRef,
 	setAddingBlock,
 	setAddingPage,
-	focusAddBlockButton,
-	focusAddPageButton,
 	canAddPage,
 	canAddBlock,
 } ) => {
 	const blockInserterAriaRole = 'listbox';
-	const addBlockButtonRef = useRef();
-	const addPageButtonRef = useRef();
-
-	// Focus the add block button when the popover is opened.
-	useEffect( () => {
-		if ( focusAddBlockButton ) {
-			addBlockButtonRef.current?.focus();
-		}
-	}, [ focusAddBlockButton ] );
-
-	// Focus the add page button when the popover is opened.
-	useEffect( () => {
-		if ( focusAddPageButton ) {
-			addPageButtonRef.current?.focus();
-		}
-	}, [ focusAddPageButton ] );
 
 	// Don't render anything if neither button should be shown
 	if ( ! canAddPage && ! canAddBlock ) {

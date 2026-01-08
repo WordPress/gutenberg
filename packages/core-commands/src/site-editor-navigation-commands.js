@@ -48,6 +48,49 @@ function useDebouncedValue( value ) {
 	return debouncedValue;
 }
 
+// Route mapping for experimental site editor
+const ROUTE_MAPPING = {
+	'/template': '/templates',
+	'/pattern': '/patterns',
+};
+
+// Helper to determine the site editor page URL
+function getSiteEditorPage() {
+	return window.__experimentalExtensibleSiteEditor
+		? 'admin.php?page=site-editor-v2'
+		: 'site-editor.php';
+}
+
+// Helper to map routes for experimental site editor
+function mapRoute( path ) {
+	if ( ! window.__experimentalExtensibleSiteEditor ) {
+		return path;
+	}
+
+	// Check if path needs mapping
+	for ( const [ oldPath, newPath ] of Object.entries( ROUTE_MAPPING ) ) {
+		if ( path === oldPath || path.startsWith( oldPath + '?' ) ) {
+			// Handle template parts special case
+			if ( path.includes( 'postType=wp_template_part' ) ) {
+				return '/template-parts';
+			}
+			// Replace the base path
+			return path.replace( oldPath, newPath );
+		}
+	}
+
+	return path;
+}
+
+// Helper to check if currently in site editor
+function isInSiteEditor() {
+	const path = getPath( window.location.href );
+	return (
+		path?.includes( 'site-editor.php' ) ||
+		path?.includes( 'page=site-editor-v2' )
+	);
+}
+
 const getNavigationCommandLoaderPerPostType = ( postType ) =>
 	function useNavigationCommandLoader( { search } ) {
 		const history = useHistory();
@@ -130,9 +173,7 @@ const getNavigationCommandLoaderPerPostType = ( postType ) =>
 					};
 				}
 
-				const isSiteEditor = getPath( window.location.href )?.includes(
-					'site-editor.php'
-				);
+				const isSiteEditor = isInSiteEditor();
 
 				return {
 					...command,
@@ -143,7 +184,7 @@ const getNavigationCommandLoaderPerPostType = ( postType ) =>
 							);
 						} else {
 							document.location = addQueryArgs(
-								'site-editor.php',
+								getSiteEditorPage(),
 								{
 									p: `/${ postType }/${ record.id }`,
 									canvas: 'edit',
@@ -226,7 +267,7 @@ const getNavigationCommandLoaderPerTemplate = ( templateType ) =>
 								);
 							} else {
 								document.location = addQueryArgs(
-									'site-editor.php',
+									getSiteEditorPage(),
 									{
 										p: `/${ templateType }/${ record.id }`,
 										canvas: 'edit',
@@ -250,13 +291,15 @@ const getNavigationCommandLoaderPerTemplate = ( templateType ) =>
 					callback: ( { close } ) => {
 						if ( isSiteEditor ) {
 							history.navigate(
-								'/pattern?postType=wp_template_part&categoryId=all-parts'
+								mapRoute(
+									'/pattern?postType=wp_template_part&categoryId=all-parts'
+								)
 							);
 						} else {
 							document.location = addQueryArgs(
-								'site-editor.php',
+								getSiteEditorPage(),
 								{
-									p: '/pattern',
+									p: mapRoute( '/pattern' ),
 									postType: 'wp_template_part',
 									categoryId: 'all-parts',
 								}
@@ -278,9 +321,7 @@ const getNavigationCommandLoaderPerTemplate = ( templateType ) =>
 const getSiteEditorBasicNavigationCommands = () =>
 	function useSiteEditorBasicNavigationCommands() {
 		const history = useHistory();
-		const isSiteEditor = getPath( window.location.href )?.includes(
-			'site-editor.php'
-		);
+		const isSiteEditor = isInSiteEditor();
 		const { isBlockBasedTheme, canCreateTemplate, canCreatePatterns } =
 			useSelect( ( select ) => {
 				return {
@@ -310,7 +351,7 @@ const getSiteEditorBasicNavigationCommands = () =>
 							history.navigate( '/styles' );
 						} else {
 							document.location = addQueryArgs(
-								'site-editor.php',
+								getSiteEditorPage(),
 								{
 									p: '/styles',
 								}
@@ -329,7 +370,7 @@ const getSiteEditorBasicNavigationCommands = () =>
 							history.navigate( '/navigation' );
 						} else {
 							document.location = addQueryArgs(
-								'site-editor.php',
+								getSiteEditorPage(),
 								{
 									p: '/navigation',
 								}
@@ -345,12 +386,12 @@ const getSiteEditorBasicNavigationCommands = () =>
 					icon: layout,
 					callback: ( { close } ) => {
 						if ( isSiteEditor ) {
-							history.navigate( '/template' );
+							history.navigate( mapRoute( '/template' ) );
 						} else {
 							document.location = addQueryArgs(
-								'site-editor.php',
+								getSiteEditorPage(),
 								{
-									p: '/template',
+									p: mapRoute( '/template' ),
 								}
 							);
 						}
@@ -367,12 +408,12 @@ const getSiteEditorBasicNavigationCommands = () =>
 					callback: ( { close } ) => {
 						if ( canCreateTemplate ) {
 							if ( isSiteEditor ) {
-								history.navigate( '/pattern' );
+								history.navigate( mapRoute( '/pattern' ) );
 							} else {
 								document.location = addQueryArgs(
-									'site-editor.php',
+									getSiteEditorPage(),
 									{
-										p: '/pattern',
+										p: mapRoute( '/pattern' ),
 									}
 								);
 							}
@@ -404,9 +445,7 @@ const getSiteEditorBasicNavigationCommands = () =>
 const getGlobalStylesOpenCssCommands = () =>
 	function useGlobalStylesOpenCssCommands() {
 		const history = useHistory();
-		const isSiteEditor = getPath( window.location.href )?.includes(
-			'site-editor.php'
-		);
+		const isSiteEditor = isInSiteEditor();
 		const { canEditCSS } = useSelect( ( select ) => {
 			const { getEntityRecord, __experimentalGetCurrentGlobalStylesId } =
 				select( coreStore );
@@ -438,7 +477,7 @@ const getGlobalStylesOpenCssCommands = () =>
 							history.navigate( '/styles?section=/css' );
 						} else {
 							document.location = addQueryArgs(
-								'site-editor.php',
+								getSiteEditorPage(),
 								{
 									p: '/styles',
 									section: '/css',

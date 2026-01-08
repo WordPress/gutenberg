@@ -44,6 +44,15 @@ function gutenberg_enqueue_tinymce_proxy() {
 add_action( 'admin_enqueue_scripts', 'gutenberg_enqueue_tinymce_proxy' );
 
 /**
+ * Dequeue the `mce-view` script as it was only necessary for the Classic block.
+ */
+function gutenberg_wp_enqueue_media() {
+	wp_dequeue_script( 'mce-view' );
+}
+
+add_action( 'wp_enqueue_media', 'gutenberg_wp_enqueue_media' );
+
+/**
  * Example TinyMCE usage used for testing.
  * Uncomment line 8 in this file to enable.
  */

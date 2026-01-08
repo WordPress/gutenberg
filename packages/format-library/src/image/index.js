@@ -112,7 +112,6 @@ function InlineUI( { value, onChange, activeObjectAttributes, contentRef } ) {
 					/>
 					<TextareaControl
 						label={ __( 'Alternative text' ) }
-						__nextHasNoMarginBottom
 						value={ editedAlt }
 						onChange={ ( newAlt ) => {
 							setEditedAlt( newAlt );

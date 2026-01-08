@@ -283,7 +283,7 @@ describe( 'Paragraph block', () => {
 
 		// Assert
 		expect( getEditorHtml() ).toMatchInlineSnapshot( `
-		"<!-- wp:paragraph {"align":"left"} -->
+		"<!-- wp:paragraph {"style":{"typography":{"textAlign":"left"}}} -->
 		<p class="has-text-align-left">A quick brown fox jumps over the lazy dog.</p>
 		<!-- /wp:paragraph -->"
 	` );
@@ -308,7 +308,7 @@ describe( 'Paragraph block', () => {
 
 		// Assert
 		expect( getEditorHtml() ).toMatchInlineSnapshot( `
-		"<!-- wp:paragraph {"align":"center"} -->
+		"<!-- wp:paragraph {"style":{"typography":{"textAlign":"center"}}} -->
 		<p class="has-text-align-center">A quick brown fox jumps over the lazy dog.</p>
 		<!-- /wp:paragraph -->"
 	` );
@@ -333,7 +333,7 @@ describe( 'Paragraph block', () => {
 
 		// Assert
 		expect( getEditorHtml() ).toMatchInlineSnapshot( `
-		"<!-- wp:paragraph {"align":"right"} -->
+		"<!-- wp:paragraph {"style":{"typography":{"textAlign":"right"}}} -->
 		<p class="has-text-align-right">A quick brown fox jumps over the lazy dog.</p>
 		<!-- /wp:paragraph -->"
 	` );
@@ -399,11 +399,11 @@ describe( 'Paragraph block', () => {
 
 		// Assert
 		expect( getEditorHtml() ).toMatchInlineSnapshot( `
-		"<!-- wp:paragraph {"align":"center"} -->
+		"<!-- wp:paragraph {"style":{"typography":{"textAlign":"center"}}} -->
 		<p class="has-text-align-center">A quick brown fox jum</p>
 		<!-- /wp:paragraph -->
 
-		<!-- wp:paragraph {"align":"center"} -->
+		<!-- wp:paragraph {"style":{"typography":{"textAlign":"center"}}} -->
 		<p class="has-text-align-center">ps over the lazy dog.</p>
 		<!-- /wp:paragraph -->"
 	` );

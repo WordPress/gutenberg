@@ -8,6 +8,7 @@ import clsx from 'clsx';
  */
 import Header from './header';
 import NavigableRegion from '../navigable-region';
+import { SidebarToggleFill } from './sidebar-toggle-slot';
 
 function Page( {
 	breadcrumbs,
@@ -18,6 +19,7 @@ function Page( {
 	className,
 	actions,
 	hasPadding = false,
+	showSidebarToggle = true,
 }: {
 	breadcrumbs?: React.ReactNode;
 	badges?: React.ReactNode;
@@ -27,6 +29,7 @@ function Page( {
 	className?: string;
 	actions?: React.ReactNode;
 	hasPadding?: boolean;
+	showSidebarToggle?: boolean;
 } ) {
 	const classes = clsx( 'admin-ui-page', className );
 
@@ -39,6 +42,7 @@ function Page( {
 					title={ title }
 					subTitle={ subTitle }
 					actions={ actions }
+					showSidebarToggle={ showSidebarToggle }
 				/>
 			) }
 			{ hasPadding ? (
@@ -51,5 +55,7 @@ function Page( {
 		</NavigableRegion>
 	);
 }
+
+Page.SidebarToggleFill = SidebarToggleFill;
 
 export default Page;

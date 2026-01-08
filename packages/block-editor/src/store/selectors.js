@@ -1693,7 +1693,8 @@ const canInsertBlockTypeUnmemoized = (
 		blockType = getBlockType( blockName );
 	}
 
-	if ( getTemplateLock( state, rootClientId ) ) {
+	const rootTemplateLock = getTemplateLock( state, rootClientId );
+	if ( rootTemplateLock && rootTemplateLock !== 'contentOnly' ) {
 		return false;
 	}
 
@@ -1876,7 +1877,8 @@ export function canRemoveBlock( state, clientId ) {
 	}
 
 	const rootClientId = getBlockRootClientId( state, clientId );
-	if ( getTemplateLock( state, rootClientId ) ) {
+	const rootTemplateLock = getTemplateLock( state, rootClientId );
+	if ( rootTemplateLock && rootTemplateLock !== 'contentOnly' ) {
 		return false;
 	}
 
@@ -1937,8 +1939,8 @@ export function canMoveBlock( state, clientId ) {
 	}
 
 	const rootClientId = getBlockRootClientId( state, clientId );
-	const templateLock = getTemplateLock( state, rootClientId );
-	if ( templateLock === 'all' || templateLock === 'contentOnly' ) {
+	const rootTemplateLock = getTemplateLock( state, rootClientId );
+	if ( rootTemplateLock === 'all' ) {
 		return false;
 	}
 
@@ -2076,6 +2078,8 @@ const getItemFromVariation = ( state, item ) => ( variation ) => {
 		innerBlocks: variation.innerBlocks,
 		keywords: variation.keywords || item.keywords,
 		frecency: calculateFrecency( time, count ),
+		// Pass through search-only flag for block-scope variations.
+		isSearchOnly: variation.isSearchOnly,
 	};
 };
 
@@ -2149,6 +2153,27 @@ const buildBlockTypeItem =
 			blockType.name,
 			'inserter'
 		);
+		const blockVariations = getBlockVariations( blockType.name, 'block' );
+		// Combine inserter and block variations. Block-scope variations without
+		// inserter scope are searchable via slash commands but hidden from browse.
+		const inserterVariationNames = new Set(
+			inserterVariations.map( ( variation ) => variation.name )
+		);
+		const allVariations = [
+			...inserterVariations,
+			...blockVariations
+				.filter(
+					( variation ) =>
+						! inserterVariationNames.has( variation.name )
+				)
+				.map( ( variation ) => ( {
+					...variation,
+					isSearchOnly: true,
+					// Block-scope `isDefault` is for the placeholder picker,
+					// not for the inserter, so don't carry it over.
+					isDefault: false,
+				} ) ),
+		];
 		return {
 			...blockItemBase,
 			initialAttributes: {},
@@ -2157,7 +2182,7 @@ const buildBlockTypeItem =
 			keywords: blockType.keywords,
 			parent: blockType.parent,
 			ancestor: blockType.ancestor,
-			variations: inserterVariations,
+			variations: allVariations,
 			example: blockType.example,
 			utility: 1, // Deprecated.
 		};
@@ -3126,6 +3151,7 @@ export function getBlockEditingMode( state, clientId = '' ) {
  * requirement of being the default grouping block.
  * Additionally a block can only be ungrouped if it has inner blocks and can
  * be removed.
+ * Section blocks are not ungroupable.
  *
  * @param {Object} state    Global application state.
  * @param {string} clientId Client Id of the block. If not passed the selected block's client id will be used.
@@ -3138,6 +3164,12 @@ export const isUngroupable = createRegistrySelector(
 			if ( ! _clientId ) {
 				return false;
 			}
+
+			// Section blocks should not be ungroupable.
+			if ( isSectionBlock( state, _clientId ) ) {
+				return false;
+			}
+
 			const { getGroupingBlockName } = select( blocksStore );
 			const block = getBlock( state, _clientId );
 			const groupingBlockName = getGroupingBlockName();

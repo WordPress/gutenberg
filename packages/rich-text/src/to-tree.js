@@ -250,40 +250,41 @@ export function toTree( {
 					),
 				} );
 			} else if ( formatType?.contentEditable === false ) {
-				pointer = getParent( pointer );
-				// For non editable formats, render the stored inner HTML.
-				if ( isEditableTree ) {
-					const attrs = {
-						contenteditable: 'false',
-						'data-rich-text-bogus': true,
-					};
-					if ( start === i && end === i + 1 ) {
-						attrs[ 'data-rich-text-format-boundary' ] = true;
+				if ( innerHTML || isEditableTree ) {
+					pointer = getParent( pointer );
+					// For non editable formats, render the stored inner HTML.
+					if ( isEditableTree ) {
+						const attrs = {
+							contenteditable: 'false',
+							'data-rich-text-bogus': true,
+						};
+						if ( start === i && end === i + 1 ) {
+							attrs[ 'data-rich-text-format-boundary' ] = true;
+						}
+						pointer = append( pointer, {
+							type: 'span',
+							attributes: attrs,
+						} );
+						// Some browsers like Safari and Firefox have issues placing
+						// the caret after a non-editable element when it's at the
+						// end of the field, so help them a little by providing a
+						// text element. Similar to `insertPadding` above.
+						if ( isEditableTree && i + 1 === text.length ) {
+							append( getParent( pointer ), ZWNBSP );
+						}
 					}
-					pointer = append( pointer, {
-						type: 'span',
-						attributes: attrs,
-					} );
-					// Some browsers like Safari and Firefox have issues placing
-					// the caret after a non-editable element when it's at the
-					// end of the field, so help them a little by providing a
-					// text element. Similar to `insertPadding` above.
-					if ( isEditableTree && i + 1 === text.length ) {
-						append( getParent( pointer ), ZWNBSP );
+					pointer = append(
+						pointer,
+						fromFormat( {
+							...replacement,
+							isEditableTree,
+						} )
+					);
+					if ( innerHTML ) {
+						append( pointer, {
+							html: innerHTML,
+						} );
 					}
-				}
-				pointer = append(
-					pointer,
-					fromFormat( {
-						...replacement,
-						isEditableTree,
-					} )
-				);
-
-				if ( innerHTML ) {
-					append( pointer, {
-						html: innerHTML,
-					} );
 				}
 			} else {
 				pointer = append(

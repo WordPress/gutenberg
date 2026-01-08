@@ -334,7 +334,7 @@ test.describe( 'Synced pattern', () => {
 		await editor.selectBlocks(
 			editor.canvas.getByRole( 'document', { name: 'Block: Pattern' } )
 		);
-		await editor.clickBlockOptionsMenuItem( 'Detach' );
+		await editor.clickBlockOptionsMenuItem( 'Disconnect pattern' );
 
 		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
@@ -369,7 +369,7 @@ test.describe( 'Synced pattern', () => {
 		await editor.selectBlocks(
 			editor.canvas.getByRole( 'document', { name: 'Block: Pattern' } )
 		);
-		await editor.clickBlockOptionsMenuItem( 'Detach' );
+		await editor.clickBlockOptionsMenuItem( 'Disconnect pattern' );
 
 		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
@@ -470,7 +470,7 @@ test.describe( 'Synced pattern', () => {
 		await editor.selectBlocks(
 			editor.canvas.getByRole( 'document', { name: 'Block: Pattern' } )
 		);
-		await editor.clickBlockOptionsMenuItem( 'Detach' );
+		await editor.clickBlockOptionsMenuItem( 'Disconnect pattern' );
 
 		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
@@ -619,7 +619,7 @@ test.describe( 'Synced pattern', () => {
 		await expect(
 			page
 				.getByRole( 'region', { name: 'Editor settings' } )
-				.getByRole( 'button', { name: 'Styles', exact: true } )
+				.getByRole( 'heading', { name: 'Styles', exact: true } )
 		).toBeVisible();
 
 		await editor.clickBlockOptionsMenuItem( 'Create pattern' );

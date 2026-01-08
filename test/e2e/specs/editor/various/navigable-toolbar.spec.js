@@ -66,6 +66,7 @@ test.describe( 'Block Toolbar', () => {
 			).toBeFocused();
 			// // Navigate to Align Text
 			await page.keyboard.press( 'ArrowRight' );
+			await page.keyboard.press( 'ArrowRight' );
 			await expect(
 				page.getByRole( 'button', { name: 'Align text', exact: true } )
 			).toBeFocused();
@@ -140,7 +141,7 @@ test.describe( 'Block Toolbar', () => {
 		await expect(
 			page
 				.getByRole( 'toolbar', { name: 'Block Tools' } )
-				.getByRole( 'button', { name: 'Paragraph' } )
+				.getByRole( 'button', { name: 'Paragraph', exact: true } )
 		).toBeFocused();
 	} );
 

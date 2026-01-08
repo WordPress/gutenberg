@@ -69,7 +69,6 @@ function ScreenTypographyElement( { element }: ScreenTypographyElementProps ) {
 						}
 						isBlock
 						size="__unstable-large"
-						__nextHasNoMarginBottom
 					>
 						<ToggleGroupControlOption
 							value="heading"

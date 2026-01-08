@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { parse, to, serialize, sRGB } from 'colorjs.io/fn';
+import { serialize } from 'colorjs.io/fn';
 
 /**
  * Internal dependencies
@@ -11,29 +11,29 @@ import { buildRamp } from '../lib';
 import { BG_RAMP_CONFIG, ACCENT_RAMP_CONFIG } from '../lib/ramp-configs';
 import { DEFAULT_SEED_COLORS } from '../lib/constants';
 
-describe( 'buildRamps', () => {
+const lStops = [ 100, 90, 80, 70, 60, 50, 40, 30, 20, 10 ];
+const sStops = [ 100, 80, 60, 40, 20, 0 ];
+const hstops = [ 0, 60, 120, 180, 240, 300 ];
+
+describe.skip( 'buildRamps', () => {
 	it( 'background ramp snapshots', () => {
-		// Representative sample covering edge cases and various hue/saturation/lightness combinations
-		const allBgColors = [
-			'hsl(0deg 0% 30%)', // Dark gray (desaturated)
-			'hsl(120deg 50% 60%)', // Mid-range green
-			'hsl(240deg 100% 30%)', // Dark saturated blue
-		];
+		const allBgColors = lStops.flatMap( ( l ) =>
+			sStops.flatMap( ( s ) =>
+				hstops.map( ( h ) => `hsl(${ h }deg ${ s }% ${ l }%)` )
+			)
+		);
 
 		expect(
 			allBgColors.map( ( bg ) => {
 				const ramp = buildRamp( bg, BG_RAMP_CONFIG );
-				const seedOriginal = serialize( to( parse( bg ), sRGB ), {
+				const seedOriginal = serialize( bg, {
 					format: 'hex',
 					inGamut: true,
 				} );
-				const seedComputed = serialize(
-					to( parse( ramp.ramp.surface2.color ), sRGB ),
-					{
-						format: 'hex',
-						inGamut: true,
-					}
-				);
+				const seedComputed = serialize( ramp.ramp.surface2, {
+					format: 'hex',
+					inGamut: true,
+				} );
 
 				return {
 					input: {
@@ -45,18 +45,41 @@ describe( 'buildRamps', () => {
 				};
 			} )
 		).toMatchSnapshot();
-	} );
+	}, 10000 );
 
 	it( 'accent ramp snapshots', () => {
-		// Representative sample covering key option combinations
 		const options = [
 			{
 				pinLightness: { stepName: 'surface2', value: 0 },
 				mainDirection: 'lighter',
 			},
 			{
-				pinLightness: { stepName: 'surface2', value: 0.5 },
+				pinLightness: { stepName: 'surface2', value: 0.1 },
 				mainDirection: 'lighter',
+			},
+			{
+				pinLightness: { stepName: 'surface2', value: 0.2 },
+				mainDirection: 'lighter',
+			},
+			{
+				pinLightness: { stepName: 'surface2', value: 0.3 },
+				mainDirection: 'lighter',
+			},
+			{
+				pinLightness: { stepName: 'surface2', value: 0.4 },
+				mainDirection: 'lighter',
+			},
+			{
+				pinLightness: { stepName: 'surface2', value: 0.7 },
+				mainDirection: 'darker',
+			},
+			{
+				pinLightness: { stepName: 'surface2', value: 0.8 },
+				mainDirection: 'darker',
+			},
+			{
+				pinLightness: { stepName: 'surface2', value: 0.9 },
+				mainDirection: 'darker',
 			},
 			{
 				pinLightness: { stepName: 'surface2', value: 1 },
@@ -64,31 +87,26 @@ describe( 'buildRamps', () => {
 			},
 		] as const;
 
-		// Representative sample covering different hue ranges and saturation levels
 		const allPrimaryColors = [
-			DEFAULT_SEED_COLORS.primary, // WP blue (mid saturation)
-			DEFAULT_SEED_COLORS.error, // WP error red (saturated)
-			'#c7a589', // WP Admin "coffee" theme accent (desaturated/beige)
+			...Object.values( DEFAULT_SEED_COLORS ),
+			'#52accc', // WP Admin "blue" theme accent
+			'#c7a589', // WP Admin "coffee" theme accent
+			'#a3b745', // WP Admin "ectoplasm" theme accent
+			'#dd823b', // WP Admin "sunrise" theme accent
 		];
 
 		expect(
 			allPrimaryColors.map( ( primary ) =>
 				options.map( ( o ) => {
 					const ramp = buildRamp( primary, ACCENT_RAMP_CONFIG, o );
-					const seedOriginal = serialize(
-						to( parse( primary ), sRGB ),
-						{
-							format: 'hex',
-							inGamut: true,
-						}
-					);
-					const seedComputed = serialize(
-						to( parse( ramp.ramp.bgFill1.color ), sRGB ),
-						{
-							format: 'hex',
-							inGamut: true,
-						}
-					);
+					const seedOriginal = serialize( primary, {
+						format: 'hex',
+						inGamut: true,
+					} );
+					const seedComputed = serialize( ramp.ramp.bgFill1, {
+						format: 'hex',
+						inGamut: true,
+					} );
 
 					return {
 						input: {

@@ -3,7 +3,11 @@
  */
 import { store, getContext, withSyncEvent } from '@wordpress/interactivity';
 
-store(
+// Whether the hash has been handled for the current page load.
+// This is used to prevent the hash from being handled multiple times.
+let hashHandled = false;
+
+const { actions } = store(
 	'core/accordion',
 	{
 		state: {
@@ -75,15 +79,68 @@ store(
 					nextButton.focus();
 				}
 			} ),
+			openPanelByHash: () => {
+				if ( hashHandled || ! window.location?.hash?.length ) {
+					return;
+				}
+
+				const context = getContext();
+				const { id, accordionItems, autoclose } = context;
+				const hash = decodeURIComponent(
+					window.location.hash.slice( 1 )
+				);
+				const targetElement = window.document.getElementById( hash );
+
+				if ( ! targetElement ) {
+					return;
+				}
+
+				const panelElement = window.document.querySelector(
+					'.wp-block-accordion-panel[aria-labelledby="' + id + '"]'
+				);
+
+				if (
+					! panelElement ||
+					! panelElement.contains( targetElement )
+				) {
+					return;
+				}
+
+				hashHandled = true;
+
+				if ( autoclose ) {
+					accordionItems.forEach( ( item ) => {
+						item.isOpen = item.id === id;
+					} );
+				} else {
+					const targetItem = accordionItems.find(
+						( item ) => item.id === id
+					);
+
+					if ( targetItem ) {
+						targetItem.isOpen = true;
+					}
+				}
+
+				// Wait for the panel to be opened before scrolling to it.
+				window.setTimeout( () => {
+					targetElement.scrollIntoView();
+				}, 0 );
+			},
 		},
 		callbacks: {
 			initAccordionItems: () => {
 				const context = getContext();
-				const { id, openByDefault } = context;
-				context.accordionItems.push( {
+				const { id, openByDefault, accordionItems } = context;
+				accordionItems.push( {
 					id,
 					isOpen: openByDefault,
 				} );
+				actions.openPanelByHash();
+			},
+			hashChange: () => {
+				hashHandled = false;
+				actions.openPanelByHash();
 			},
 		},
 	},

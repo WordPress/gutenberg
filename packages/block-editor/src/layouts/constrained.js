@@ -89,7 +89,10 @@ export default {
 										: nextWidth;
 								onChange( {
 									...layout,
-									contentSize: nextWidth,
+									contentSize:
+										nextWidth !== ''
+											? nextWidth
+											: undefined,
 								} );
 							} }
 							units={ units }
@@ -111,7 +114,10 @@ export default {
 										: nextWidth;
 								onChange( {
 									...layout,
-									wideSize: nextWidth,
+									wideSize:
+										nextWidth !== ''
+											? nextWidth
+											: undefined,
 								} );
 							} }
 							units={ units }
@@ -131,7 +137,6 @@ export default {
 				{ allowJustification && (
 					<ToggleGroupControl
 						__next40pxDefaultSize
-						__nextHasNoMarginBottom
 						label={ __( 'Justification' ) }
 						value={ justifyContent }
 						onChange={ onJustificationChange }

@@ -115,15 +115,29 @@ function TypographyInspectorControl( { children, resetAllFilter } ) {
 }
 
 export function TypographyPanel( { clientId, name, setAttributes, settings } ) {
-	function selector( select ) {
-		const { style, fontFamily, fontSize, fitText } =
-			select( blockEditorStore ).getBlockAttributes( clientId ) || {};
-		return { style, fontFamily, fontSize, fitText };
-	}
-	const { style, fontFamily, fontSize, fitText } = useSelect( selector, [
-		clientId,
-	] );
 	const isEnabled = useHasTypographyPanel( settings );
+
+	const { style, fontFamily, fontSize, fitText } = useSelect(
+		( select ) => {
+			// Early return to avoid subscription when disabled.
+			if ( ! isEnabled ) {
+				return {};
+			}
+			const {
+				style: _style,
+				fontFamily: _fontFamily,
+				fontSize: _fontSize,
+				fitText: _fitText,
+			} = select( blockEditorStore ).getBlockAttributes( clientId ) || {};
+			return {
+				style: _style,
+				fontFamily: _fontFamily,
+				fontSize: _fontSize,
+				fitText: _fitText,
+			};
+		},
+		[ clientId, isEnabled ]
+	);
 	const value = useMemo(
 		() => attributesToStyle( { style, fontFamily, fontSize } ),
 		[ style, fontSize, fontFamily ]

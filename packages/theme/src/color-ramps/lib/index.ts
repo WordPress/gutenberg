@@ -5,7 +5,6 @@ import {
 	clone,
 	get,
 	OKLCH,
-	parse,
 	set,
 	type ColorTypes,
 	type PlainColorObject,
@@ -15,13 +14,14 @@ import {
  * Internal dependencies
  */
 import './register-color-spaces';
-import { getContrast, getColorString } from './color-utils';
+import { clampToGamut, getContrast, getColorString } from './color-utils';
 import { findColorMeetingRequirements } from './find-color-with-constraints';
 import {
-	clampToGamut,
 	sortByDependency,
 	computeBetterFgColorDirection,
 	adjustContrastTarget,
+	stepsForStep,
+	solveWithBisect,
 } from './utils';
 
 import type {
@@ -31,7 +31,7 @@ import type {
 	RampConfig,
 	RampResult,
 } from './types';
-import { LIGHTNESS_EPSILON, MAX_BISECTION_ITERATIONS } from './constants';
+import { CONTRAST_EPSILON } from './constants';
 
 /**
  * Calculate a complete color ramp based on the provided configuration.
@@ -55,7 +55,7 @@ function calculateRamp( {
 	oppDir,
 	pinLightness,
 }: {
-	seed: ColorTypes;
+	seed: PlainColorObject;
 	sortedSteps: ( keyof Ramp )[];
 	config: RampConfig;
 	mainDir: RampDirection;
@@ -65,17 +65,15 @@ function calculateRamp( {
 		value: number;
 	};
 } ) {
-	const rampResults = {} as Record<
-		keyof Ramp,
-		{ color: string; warning: boolean }
-	>;
-	let SATISFIED_ALL_CONTRAST_REQUIREMENTS = true;
-	let UNSATISFIED_DIRECTION: RampDirection = 'lighter';
-	let MAX_WEIGHTED_DEFICIT = 0;
+	const rampResults = {} as Record< keyof Ramp, string >;
+	let warnings: string[] | undefined;
+	let maxDeficit = -Infinity;
+	let maxDeficitDirection: RampDirection = 'lighter';
+	let maxDeficitStep;
 
 	// Keep track of the calculated colors, as they are going to be useful
 	// when other colors reference them.
-	const calculatedColors = new Map< keyof Ramp | 'seed', ColorTypes >();
+	const calculatedColors = new Map< keyof Ramp | 'seed', PlainColorObject >();
 	calculatedColors.set( 'seed', seed );
 
 	for ( const stepName of sortedSteps ) {
@@ -85,8 +83,8 @@ function calculateRamp( {
 			taperChromaOptions,
 			sameAsIfPossible,
 		} = config[ stepName ];
-		const referenceColor = calculatedColors.get( contrast.reference );
 
+		const referenceColor = calculatedColors.get( contrast.reference );
 		if ( ! referenceColor ) {
 			throw new Error(
 				`Reference color for step ${ stepName } not found: ${ contrast.reference }`
@@ -96,23 +94,24 @@ function calculateRamp( {
 		// Check if we can reuse color from the `sameAsIfPossible` config option
 		if ( sameAsIfPossible ) {
 			const candidateColor = calculatedColors.get( sameAsIfPossible );
-			if ( candidateColor ) {
-				const candidateContrast = getContrast(
-					referenceColor,
-					candidateColor
+			if ( ! candidateColor ) {
+				throw new Error(
+					`Same-as color for step ${ stepName } not found: ${ sameAsIfPossible }`
 				);
-				const adjustedTarget = adjustContrastTarget( contrast.target );
-				// If the candidate meets the contrast requirement, use it
-				if ( candidateContrast >= adjustedTarget ) {
-					// Store the reused color
-					calculatedColors.set( stepName, candidateColor );
-					rampResults[ stepName ] = {
-						color: getColorString( candidateColor ),
-						warning: false,
-					};
+			}
 
-					continue; // Skip to next step
-				}
+			const candidateContrast = getContrast(
+				referenceColor,
+				candidateColor
+			);
+			const adjustedTarget = adjustContrastTarget( contrast.target );
+			// If the candidate meets the contrast requirement, use it
+			if ( candidateContrast >= adjustedTarget ) {
+				// Store the reused color
+				calculatedColors.set( stepName, candidateColor );
+				rampResults[ stepName ] = getColorString( candidateColor );
+
+				continue; // Skip to next step
 			}
 		}
 
@@ -166,7 +165,6 @@ function calculateRamp( {
 			adjustedTarget,
 			computedDir,
 			{
-				strict: false,
 				lightnessConstraint,
 				taperChromaOptions,
 			}
@@ -174,41 +172,34 @@ function calculateRamp( {
 
 		// When the target contrast is not met, take note of it and use
 		// that information to guide the ramp calculation bisection.
-		if ( ! searchResults.reached && ! contrast.ignoreWhenAdjustingSeed ) {
-			SATISFIED_ALL_CONTRAST_REQUIREMENTS = false;
-
-			// Calculate constraint failure severity for seed optimization
-			// Use the relative deficit size, weighted by how changing the seed would impact this constraint
-			const deficitVsTarget = adjustedTarget - searchResults.achieved;
-
-			// Weight the deficit by how much seed adjustment would help this constraint
-			// If seed has low contrast vs reference, adjusting seed has high impact
-			// If seed has high contrast vs reference, adjusting seed has low impact
-			const impactWeight = 1 / getContrast( seed, referenceColor );
-			const weightedDeficit = deficitVsTarget * impactWeight;
-
-			// Track the most impactful failure for seed optimization
-			if ( weightedDeficit > MAX_WEIGHTED_DEFICIT ) {
-				MAX_WEIGHTED_DEFICIT = weightedDeficit;
-				UNSATISFIED_DIRECTION = computedDir;
-			}
+		if (
+			! contrast.ignoreWhenAdjustingSeed &&
+			searchResults.deficit &&
+			searchResults.deficit > maxDeficit
+		) {
+			maxDeficit = searchResults.deficit;
+			maxDeficitDirection = computedDir;
+			maxDeficitStep = stepName;
 		}
 
 		// Store calculated color for future dependencies
 		calculatedColors.set( stepName, searchResults.color );
 
 		// Add to results
-		rampResults[ stepName ] = {
-			color: getColorString( searchResults.color ),
-			warning:
-				! contrast.ignoreWhenAdjustingSeed && ! searchResults.reached,
-		};
+		rampResults[ stepName ] = getColorString( searchResults.color );
+
+		if ( ! searchResults.reached && ! contrast.ignoreWhenAdjustingSeed ) {
+			warnings ??= [];
+			warnings.push( stepName );
+		}
 	}
 
 	return {
 		rampResults,
-		SATISFIED_ALL_CONTRAST_REQUIREMENTS,
-		UNSATISFIED_DIRECTION,
+		warnings,
+		maxDeficit,
+		maxDeficitDirection,
+		maxDeficitStep,
 	};
 }
 
@@ -230,7 +221,7 @@ export function buildRamp(
 ): RampResult {
 	let seed: PlainColorObject;
 	try {
-		seed = clampToGamut( parse( seedArg ) );
+		seed = clampToGamut( seedArg );
 	} catch ( error ) {
 		throw new Error(
 			`Invalid seed color "${ seedArg }": ${
@@ -257,8 +248,10 @@ export function buildRamp(
 	// Calculate the ramp with the initial seed.
 	const {
 		rampResults,
-		SATISFIED_ALL_CONTRAST_REQUIREMENTS,
-		UNSATISFIED_DIRECTION,
+		warnings,
+		maxDeficit,
+		maxDeficitDirection,
+		maxDeficitStep,
 	} = calculateRamp( {
 		seed,
 		sortedSteps,
@@ -267,69 +260,74 @@ export function buildRamp(
 		oppDir,
 		pinLightness,
 	} );
-	const toReturn = {
-		ramp: rampResults,
-		direction: mainDir,
-	} as RampResult;
 
-	if (
-		! SATISFIED_ALL_CONTRAST_REQUIREMENTS &&
-		rescaleToFitContrastTargets
-	) {
-		let worseSeedL = get( seed, [ OKLCH, 'l' ] );
-		// For a scale with the "lighter" direction, the contrast can be improved
-		// by darkening the seed. For "darker" direction, by lightening the seed.
-		let betterSeedL = UNSATISFIED_DIRECTION === 'lighter' ? 0 : 1;
+	let bestRamp = rampResults;
 
-		// Binary search: try a new seed and recompute the whole ramp
-		// (TODO: try a smarter approach?)
-		for (
-			let i = 0;
-			i < MAX_BISECTION_ITERATIONS &&
-			Math.abs( betterSeedL - worseSeedL ) > LIGHTNESS_EPSILON;
-			i++
-		) {
-			const newSeed = clampToGamut(
-				set(
-					clone( seed ),
-					[ OKLCH, 'l' ],
-					( worseSeedL + betterSeedL ) / 2
-				)
-			);
+	if ( maxDeficit > CONTRAST_EPSILON && rescaleToFitContrastTargets ) {
+		const iterSteps = stepsForStep( maxDeficitStep!, config );
 
+		function getSeedForL( l: number ): PlainColorObject {
+			return clampToGamut( set( clone( seed ), [ OKLCH, 'l' ], l ) );
+		}
+
+		function getDeficitForSeed( s: PlainColorObject ): number {
 			const iterationResults = calculateRamp( {
-				seed: newSeed,
-				sortedSteps,
+				seed: s,
+				sortedSteps: iterSteps,
 				config,
 				mainDir,
 				oppDir,
 				pinLightness,
 			} );
 
-			if ( iterationResults.SATISFIED_ALL_CONTRAST_REQUIREMENTS ) {
-				betterSeedL = get( newSeed, [ OKLCH, 'l' ] );
-				// Only update toReturn when the ramp satisfies all constraints.
-				toReturn.ramp = iterationResults.rampResults;
-			} else if ( UNSATISFIED_DIRECTION !== mainDir ) {
-				// Failing constraint is in opposite direction to main ramp direction
-				// We've moved too far in mainDir, constrain the search
-				betterSeedL = get( newSeed, [ OKLCH, 'l' ] );
-			} else {
-				// Failing constraint is in same direction as main ramp direction
-				// We haven't moved far enough in mainDir, continue searching
-				worseSeedL = get( newSeed, [ OKLCH, 'l' ] );
-			}
+			// If the constraints start failing in the opposite direction to the original
+			// iteration's direction, that means we've moved too far away from the target.
+			// Don't use the `maxDeficit` value because it's not related to our search,
+			// and might even be positive, which would confuse the bisection algorithm.
+			return iterationResults.maxDeficitDirection === maxDeficitDirection
+				? iterationResults.maxDeficit
+				: -maxDeficit;
 		}
+
+		// For a scale with the "lighter" direction, the contrast can be improved
+		// by darkening the seed. For "darker" direction, by lightening the seed.
+		const lowerSeedL = maxDeficitDirection === 'lighter' ? 0 : 1;
+		const lowerDeficit = -maxDeficit;
+		const upperSeedL = get( seed, [ OKLCH, 'l' ] );
+		const upperDeficit = maxDeficit;
+
+		const bestSeed = solveWithBisect(
+			getSeedForL,
+			getDeficitForSeed,
+			lowerSeedL,
+			lowerDeficit,
+			upperSeedL,
+			upperDeficit
+		);
+
+		// Calculate the final ramp with adjusted seed.
+		bestRamp = calculateRamp( {
+			seed: bestSeed,
+			sortedSteps,
+			config,
+			mainDir,
+			oppDir,
+			pinLightness,
+		} ).rampResults;
 	}
 
 	// Swap surface1 and surface3 for darker ramps to maintain visual elevation hierarchy.
 	// This ensures surface1 appears "behind" surface2, and surface3 appears "in front",
 	// regardless of the ramp's main direction.
 	if ( mainDir === 'darker' ) {
-		const tmpSurface1 = toReturn.ramp.surface1;
-		toReturn.ramp.surface1 = toReturn.ramp.surface3;
-		toReturn.ramp.surface3 = tmpSurface1;
+		const tmpSurface1 = bestRamp.surface1;
+		bestRamp.surface1 = bestRamp.surface3;
+		bestRamp.surface3 = tmpSurface1;
 	}
 
-	return toReturn;
+	return {
+		ramp: bestRamp,
+		warnings,
+		direction: mainDir,
+	};
 }

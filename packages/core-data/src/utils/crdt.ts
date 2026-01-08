@@ -297,8 +297,8 @@ export function getPostChangesFromCRDTDoc(
 				}
 
 				case 'date': {
-					// Do not sync an empty date if our current value is a "floating" date.
-					// Borrowing logic from the isEditedPostDateFloating selector.
+					// Do not overwrite a "floating" date. Borrowing logic from the
+					// isEditedPostDateFloating selector.
 					const currentDateIsFloating =
 						[ 'draft', 'auto-draft', 'pending' ].includes(
 							ymap.get( 'status' ) as string
@@ -306,7 +306,7 @@ export function getPostChangesFromCRDTDoc(
 						( null === currentValue ||
 							editedRecord.modified === currentValue );
 
-					if ( ! newValue && currentDateIsFloating ) {
+					if ( currentDateIsFloating ) {
 						return false;
 					}
 

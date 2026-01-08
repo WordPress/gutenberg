@@ -10,4 +10,4 @@ paths:
     .github/workflows/end2end-test.yml:
         ignore:
             # This file gets created in the step prior.
-            - 'file "build/index.js" does not exist.+'
+            - 'file "build/index.cjs" does not exist.+'

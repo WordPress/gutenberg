@@ -4,14 +4,7 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import {
-	parse,
-	to,
-	serialize,
-	OKLCH,
-	sRGB,
-	type PlainColorObject,
-} from 'colorjs.io/fn';
+import { to, serialize, sRGB, getAll } from 'colorjs.io/fn';
 
 /**
  * Internal dependencies
@@ -29,29 +22,21 @@ const __dirname = path.dirname( __filename );
 // Path to the color.json file
 const colorJsonPath = path.join( __dirname, '../../tokens/color.json' );
 
+// 3 decimal places is the minimum precision for lossless hex serialization.
+// With 3 decimal places rounding to the nearest 0.001, the maximum rounding
+// error is 0.0005. With 256 possible hex values, 0.0005 × 256 = 0.128,
+// guaranteeing the rounded value stays within 0.5 of the original value.
+const HEX_ROUNDING_PRECISION = 3;
+
 const transformColorStringToDTCGValue = ( color: string ) => {
-	if ( /oklch|p3/.test( color ) ) {
-		let parsed: PlainColorObject;
-		try {
-			parsed = to( parse( color ), OKLCH );
-		} catch {
-			return color;
-		}
+	const parsed = to( color, sRGB );
 
-		const coords = parsed.coords;
-		return {
-			colorSpace: 'oklch',
-			components: [
-				Math.floor( 10000 * coords[ 0 ] ) / 10000, // l
-				coords[ 1 ], // c
-				isNaN( coords[ 2 ] ) ? 0 : coords[ 2 ], // h
-			],
-			...( parsed.alpha < 1 ? { alpha: parsed.alpha } : undefined ),
-			hex: serialize( to( parsed, sRGB ), { format: 'hex' } ),
-		};
-	}
-
-	return color;
+	return {
+		colorSpace: 'srgb',
+		components: getAll( parsed, { precision: HEX_ROUNDING_PRECISION } ),
+		...( ( parsed.alpha ?? 1 ) < 1 ? { alpha: parsed.alpha } : undefined ),
+		hex: serialize( parsed, { format: 'hex' } ),
+	};
 };
 
 // Main function
@@ -82,13 +67,14 @@ function generatePrimitiveColorTokens() {
 			},
 			...accentRamps,
 		].forEach( ( { scaleName, ramp } ) => {
-			colorJson.color.primitive[ scaleName ] = {};
+			colorJson[ 'wpds-color' ].primitive[ scaleName ] = {};
 			for ( const [ tokenName, tokenValue ] of Object.entries(
 				ramp.ramp
 			) ) {
-				colorJson.color.primitive[ scaleName ][ tokenName ] = {
-					$value: transformColorStringToDTCGValue( tokenValue.color ),
-				};
+				colorJson[ 'wpds-color' ].primitive[ scaleName ][ tokenName ] =
+					{
+						$value: transformColorStringToDTCGValue( tokenValue ),
+					};
 			}
 		} );
 

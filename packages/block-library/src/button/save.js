@@ -21,7 +21,6 @@ export default function save( { attributes, className } ) {
 	const {
 		tagName,
 		type,
-		textAlign,
 		fontSize,
 		linkTarget,
 		rel,
@@ -46,7 +45,6 @@ export default function save( { attributes, className } ) {
 		borderProps.className,
 		typographyProps.className,
 		{
-			[ `has-text-align-${ textAlign }` ]: textAlign,
 			// For backwards compatibility add style that isn't provided via
 			// block support.
 			'no-border-radius': style?.border?.radius === 0,

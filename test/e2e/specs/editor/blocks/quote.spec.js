@@ -241,19 +241,27 @@ test.describe( 'Quote', () => {
 		);
 	} );
 
-	test( 'can be converted to a pullquote', async ( { editor, page } ) => {
-		await editor.insertBlock( { name: 'core/quote' } );
-		await page.keyboard.type( 'one' );
-		await page.keyboard.press( 'Enter' );
-		await page.keyboard.type( 'two' );
-		await editor.clickBlockToolbarButton( 'Select parent block: Quote' );
-		await editor.clickBlockToolbarButton( 'Add citation' );
-		await page.keyboard.type( 'cite' );
-		await editor.transformBlockTo( 'core/pullquote' );
+	test( 'can be converted to verse with mixed content', async ( {
+		editor,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/quote',
+			innerBlocks: [
+				{
+					name: 'core/paragraph',
+					attributes: { content: 'First paragraph' },
+				},
+				{
+					name: 'core/heading',
+					attributes: { content: 'A heading', level: 2 },
+				},
+			],
+		} );
+		await editor.transformBlockTo( 'core/verse' );
 		expect( await editor.getEditedPostContent() ).toBe(
-			`<!-- wp:pullquote -->
-<figure class="wp-block-pullquote"><blockquote><p>one<br>two</p><cite>cite</cite></blockquote></figure>
-<!-- /wp:pullquote -->`
+			`<!-- wp:verse -->
+<pre class="wp-block-verse">First paragraph<br>A heading</pre>
+<!-- /wp:verse -->`
 		);
 	} );
 

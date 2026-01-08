@@ -3,13 +3,13 @@
  */
 import type { CSSProperties } from 'react';
 import {
-	parse,
+	clone,
+	set,
 	to,
-	get,
 	serialize,
 	sRGB,
 	HSL,
-	type ColorTypes,
+	type PlainColorObject,
 } from 'colorjs.io/fn';
 import memoize from 'memize';
 
@@ -23,7 +23,7 @@ import { useMemo, useContext } from '@wordpress/element';
  */
 import './color-ramps/lib/register-color-spaces';
 import { ThemeContext } from './context';
-import semanticVariables from './prebuilt/ts/design-tokens';
+import colorTokens from './prebuilt/ts/color-tokens';
 import {
 	buildBgRamp,
 	buildAccentRamp,
@@ -93,44 +93,33 @@ const legacyWpComponentsOverridesCSS: Entry[] = [
 	],
 ];
 
-function customRgbFormat( color: ColorTypes ) {
+function customRgbFormat( color: PlainColorObject ): string {
 	const rgb = to( color, sRGB );
-	return [ get( rgb, 'srgb.r' ), get( rgb, 'srgb.g' ), get( rgb, 'srgb.b' ) ]
-		.map( ( n ) => Math.round( n * 255 ) )
+	return rgb.coords
+		.map( ( n ) => Math.round( ( n ?? 0 ) * 255 ) )
 		.join( ', ' );
 }
 
 function legacyWpAdminThemeOverridesCSS( accent: string ): Entry[] {
-	const parsedAccent = to( parse( accent ), HSL );
+	const parsedAccent = to( accent, HSL );
+	const parsedL = parsedAccent.coords[ 2 ] ?? 0;
 
-	const coords = parsedAccent.coords;
-	const darker10 = to(
-		{
-			space: HSL,
-			coords: [
-				coords[ 0 ], // h
-				coords[ 1 ], // s
-				Math.max( 0, Math.min( 100, coords[ 2 ] - 5 ) ), // l (reduced by 5%)
-			],
-		},
-		sRGB
+	// Create darker version of accent —
+	const darker10 = set(
+		clone( parsedAccent ),
+		[ HSL, 'l' ],
+		Math.max( 0, parsedL - 5 ) // L reduced by 5%
 	);
-	const darker20 = to(
-		{
-			space: HSL,
-			coords: [
-				coords[ 0 ], // h
-				coords[ 1 ], // s
-				Math.max( 0, Math.min( 100, coords[ 2 ] - 10 ) ), // l (reduced by 10%)
-			],
-		},
-		sRGB
+	const darker20 = set(
+		clone( parsedAccent ),
+		[ HSL, 'l' ],
+		Math.max( 0, parsedL - 10 ) // L reduced by 10%
 	);
 
 	return [
 		[
 			'--wp-admin-theme-color',
-			serialize( to( parsedAccent, sRGB ), { format: 'hex' } ),
+			serialize( parsedAccent, { format: 'hex' } ),
 		],
 		[ '--wp-admin-theme-color--rgb', customRgbFormat( parsedAccent ) ],
 		[
@@ -152,31 +141,22 @@ function legacyWpAdminThemeOverridesCSS( accent: string ): Entry[] {
 	];
 }
 
-function semanticTokensCSS(
-	filterFn: ( entry: [ string, Record< string, string > ] ) => boolean = () =>
-		true
+function colorTokensCSS(
+	computedColorRamps: Map< string, RampResult >
 ): Entry[] {
-	return Object.entries( semanticVariables )
-		.filter( filterFn )
-		.map( ( [ variableName, modesAndValues ] ) => [
-			variableName,
-			modesAndValues[ '.' ],
-		] );
-}
+	const entries: Entry[] = [];
 
-const toKebabCase = ( str: string ) =>
-	str.replace(
-		/[A-Z]+(?![a-z])|[A-Z]/g,
-		( $, ofs ) => ( ofs ? '-' : '' ) + $.toLowerCase()
-	);
+	for ( const [ rampName, { ramp } ] of computedColorRamps ) {
+		for ( const [ tokenName, tokenValue ] of Object.entries( ramp ) ) {
+			const key = `${ rampName }-${ tokenName }`;
+			const aliasedBy = colorTokens[ key ] ?? [];
+			for ( const aliasedId of aliasedBy ) {
+				entries.push( [ `--wpds-color-${ aliasedId }`, tokenValue ] );
+			}
+		}
+	}
 
-function colorRampCSS( ramp: RampResult, prefix: string ): Entry[] {
-	return [ ...Object.entries( ramp.ramp ) ].map(
-		( [ tokenName, tokenValue ] ) => [
-			`${ prefix }${ toKebabCase( tokenName ) }`,
-			tokenValue.color,
-		]
-	);
+	return entries;
 }
 
 function generateStyles( {
@@ -188,17 +168,8 @@ function generateStyles( {
 } ): CSSProperties {
 	return Object.fromEntries(
 		[
-			// Primitive tokens
-			Array.from( computedColorRamps )
-				.map( ( [ rampName, computedColorRamp ] ) => [
-					colorRampCSS(
-						computedColorRamp,
-						`--wpds-color-private-${ rampName }-`
-					),
-				] )
-				.flat( 2 ),
-			// Semantic color tokens (other semantic tokens for now are static)
-			semanticTokensCSS( ( [ key ] ) => /color/.test( key ) ),
+			// Semantic color tokens
+			colorTokensCSS( computedColorRamps ),
 			// Legacy overrides
 			legacyWpAdminThemeOverridesCSS( primary ),
 			legacyWpComponentsOverridesCSS,

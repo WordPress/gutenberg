@@ -8,13 +8,26 @@ import {
 	store as coreStore,
 } from '@wordpress/core-data';
 import { resolveSelect } from '@wordpress/data';
-import { Modal, DropZone } from '@wordpress/components';
+import { Modal, DropZone, FormFileUpload, Button } from '@wordpress/components';
+import { upload as uploadIcon } from '@wordpress/icons';
+import { DataViewsPicker } from '@wordpress/dataviews';
+import type { View, Field, ActionButton } from '@wordpress/dataviews';
+import {
+	altTextField,
+	captionField,
+	dateAddedField,
+	dateModifiedField,
+	descriptionField,
+	filenameField,
+	filesizeField,
+	mediaDimensionsField,
+	mediaThumbnailField,
+	mimeTypeField,
+} from '@wordpress/media-fields';
 
 /**
  * Internal dependencies
  */
-import { DataViewsPicker } from '@wordpress/dataviews';
-import type { View, Field, ActionButton } from '@wordpress/dataviews';
 import type { Attachment, RestAttachment } from '../../utils/types';
 import { transformAttachment } from '../../utils/transform-attachment';
 import { uploadMedia } from '../../utils/upload-media';
@@ -22,8 +35,9 @@ import { unlock } from '../../lock-unlock';
 
 const { useEntityRecordsWithPermissions } = unlock( coreDataPrivateApis );
 
-// Layout constant - matching the picker grid layout type
+// Layout constants - matching the picker layout types
 const LAYOUT_PICKER_GRID = 'pickerGrid';
+const LAYOUT_PICKER_TABLE = 'pickerTable';
 
 interface MediaUploadModalProps {
 	/**
@@ -149,8 +163,9 @@ export function MediaUploadModal( {
 	const [ view, setView ] = useState< View >( () => ( {
 		type: LAYOUT_PICKER_GRID,
 		fields: [],
+		showTitle: false,
 		titleField: 'title',
-		mediaField: 'url',
+		mediaField: 'media_thumbnail',
 		search: '',
 		page: 1,
 		perPage: 20,
@@ -171,9 +186,12 @@ export function MediaUploadModal( {
 				filters.author = filter.value;
 			}
 			// Handle date filters
-			if ( filter.field === 'date' ) {
-				filters.after = filter.value?.after;
-				filters.before = filter.value?.before;
+			if ( filter.field === 'date' || filter.field === 'modified' ) {
+				if ( filter.operator === 'before' ) {
+					filters.before = filter.value;
+				} else if ( filter.operator === 'after' ) {
+					filters.after = filter.value;
+				}
 			}
 			// Handle mime type filters
 			if ( filter.field === 'mime_type' ) {
@@ -185,7 +203,7 @@ export function MediaUploadModal( {
 		if ( ! filters.media_type ) {
 			filters.media_type = allowedTypes.includes( '*' )
 				? undefined
-				: allowedTypes[ 0 ];
+				: allowedTypes;
 		}
 
 		return {
@@ -209,22 +227,11 @@ export function MediaUploadModal( {
 
 	const fields: Field< RestAttachment >[] = useMemo(
 		() => [
+			// Media field definitions from @wordpress/media-fields
+			// Cast is safe because RestAttachment has the same properties as Attachment
 			{
-				id: 'url',
-				type: 'media' as const,
-				label: __( 'Media' ),
-				render: ( { item }: { item: RestAttachment } ) => (
-					<img
-						src={ item.source_url }
-						alt={ item.alt_text }
-						style={ {
-							width: '100%',
-							height: '100%',
-							objectFit: 'cover',
-							borderRadius: '4px',
-						} }
-					/>
-				),
+				...( mediaThumbnailField as Field< RestAttachment > ),
+				enableHiding: false, // Within the modal, the thumbnail should always be shown.
 			},
 			{
 				id: 'title',
@@ -235,13 +242,15 @@ export function MediaUploadModal( {
 					return titleValue || __( '(no title)' );
 				},
 			},
-			{
-				id: 'alt',
-				type: 'text' as const,
-				label: __( 'Alt text' ),
-				getValue: ( { item }: { item: RestAttachment } ) =>
-					item.alt_text,
-			},
+			altTextField as Field< RestAttachment >,
+			captionField as Field< RestAttachment >,
+			descriptionField as Field< RestAttachment >,
+			dateAddedField as Field< RestAttachment >,
+			dateModifiedField as Field< RestAttachment >,
+			filenameField as Field< RestAttachment >,
+			filesizeField as Field< RestAttachment >,
+			mediaDimensionsField as Field< RestAttachment >,
+			mimeTypeField as Field< RestAttachment >,
 		],
 		[]
 	);
@@ -265,15 +274,16 @@ export function MediaUploadModal( {
 
 					const selectedPosts = await resolveSelect(
 						coreStore
-					).getEntityRecords(
+					).getEntityRecords< RestAttachment >(
 						'postType',
 						'attachment',
 						selectedPostsQuery
 					);
 
 					// Transform the selected posts to the expected Attachment format
-					const transformedPosts =
-						selectedPosts?.map( transformAttachment );
+					const transformedPosts = ( selectedPosts ?? [] )
+						.map( transformAttachment )
+						.filter( Boolean );
 
 					const selectedItems = multiple
 						? transformedPosts
@@ -290,6 +300,23 @@ export function MediaUploadModal( {
 		onClose?.();
 	}, [ onClose ] );
 
+	// Use onUpload if provided, otherwise fall back to uploadMedia
+	const handleUpload = onUpload || uploadMedia;
+
+	const handleFileSelect = useCallback(
+		( event: React.ChangeEvent< HTMLInputElement > ) => {
+			const files = event.target.files;
+			if ( files && files.length > 0 ) {
+				const filesArray = Array.from( files );
+				handleUpload( {
+					allowedTypes,
+					filesList: filesArray,
+				} );
+			}
+		},
+		[ allowedTypes, handleUpload ]
+	);
+
 	const paginationInfo = useMemo(
 		() => ( {
 			totalItems,
@@ -300,17 +327,29 @@ export function MediaUploadModal( {
 
 	const defaultLayouts = useMemo(
 		() => ( {
-			[ LAYOUT_PICKER_GRID ]: {},
+			[ LAYOUT_PICKER_GRID ]: {
+				fields: [],
+				showTitle: false,
+			},
+			[ LAYOUT_PICKER_TABLE ]: {
+				fields: [ 'filename', 'filesize', 'media_dimensions', 'date' ],
+				showTitle: true,
+			},
 		} ),
 		[]
 	);
 
+	// Build accept attribute from allowedTypes
+	const acceptTypes = useMemo( () => {
+		if ( allowedTypes.includes( '*' ) ) {
+			return undefined;
+		}
+		return allowedTypes.join( ',' );
+	}, [ allowedTypes ] );
+
 	if ( ! isOpen ) {
 		return null;
 	}
-
-	// Use onUpload if provided, otherwise fall back to uploadMedia
-	const handleUpload = onUpload || uploadMedia;
 
 	return (
 		<Modal
@@ -318,7 +357,25 @@ export function MediaUploadModal( {
 			onRequestClose={ handleModalClose }
 			isDismissible={ isDismissible }
 			className={ modalClass }
+			overlayClassName="media-upload-modal"
 			size="fill"
+			headerActions={
+				<FormFileUpload
+					accept={ acceptTypes }
+					multiple
+					onChange={ handleFileSelect }
+					__next40pxDefaultSize
+					render={ ( { openFileDialog } ) => (
+						<Button
+							onClick={ openFileDialog }
+							icon={ uploadIcon }
+							__next40pxDefaultSize
+						>
+							{ __( 'Upload media' ) }
+						</Button>
+					) }
+				/>
+			}
 		>
 			<DropZone
 				onFilesDrop={ ( files ) => {
@@ -341,7 +398,6 @@ export function MediaUploadModal( {
 						handleUpload( {
 							allowedTypes,
 							filesList: filteredFiles,
-							multiple,
 						} );
 					}
 				} }

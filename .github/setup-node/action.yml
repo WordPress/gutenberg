@@ -28,7 +28,7 @@ runs:
           uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
           with:
               path: '**/node_modules'
-              key: node_modules-${{ runner.os }}-${{ runner.arch }}-${{ steps.node-version.outputs.NODE_VERSION }}-${{ hashFiles('package-lock.json') }}
+              key: node_modules-${{ runner.os }}-${{ runner.arch }}-${{ steps.node-version.outputs.NODE_VERSION }}-${{ hashFiles('package-lock.json', 'patches/**') }}
 
         - name: Install npm dependencies
           if: ${{ steps.cache-node_modules.outputs.cache-hit != 'true' }}

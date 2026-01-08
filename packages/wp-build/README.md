@@ -58,13 +58,19 @@ Configure your `package.json` with the following optional fields:
 
 ### `wpScript`
 
-Set to `true` to bundle the package as a WordPress script/module:
+Controls whether the package is exposed as a bundled WordPress script/module and accessible via the configured global variable.
+
+- **`true`**: The package will be bundled and exposed as a WordPress script. It will be available in WordPress as part of the configured global (e.g., `wp.blockEditor`, `wp.data`, or a custom global name if configured differently).
+
+- **Omitted or `false` (default)**: The package will not be exposed as a WordPress script. Use this for packages designed solely as dependencies for other packages. The package can still be used as a dependency via npm imports by other packages.
 
 ```json
 {
 	"wpScript": true
 }
 ```
+
+For more details on when to omit or set this to `false`, see the [package guidelines](../README.md#when-to-omit-or-set-wpscript-to-false).
 
 ### `wpScriptModuleExports`
 
@@ -201,6 +207,115 @@ This allows your packages to consume third-party dependencies as externals:
 
 If `handlePrefix` is omitted, it defaults to the namespace key (e.g., `"woo"` → `woo-cart`).
 
+### `wpPlugin.pages` (Experimental)
+
+Define admin pages that support routes. Each page gets generated PHP functions for route registration and can be extended by other plugins.
+
+Pages can be defined as simple strings or as objects with initialization modules:
+
+```json
+{
+	"wpPlugin": {
+		"pages": [
+			"my-admin-page",
+			{
+				"id": "my-other-page",
+				"init": ["@my-plugin/my-page-init"]
+			}
+		]
+	}
+}
+```
+
+**Page Configuration:**
+- **String format**: `"my-admin-page"` - Simple page with no init modules
+- **Object format**: `{ "id": "page-slug", "init": ["@scope/package"] }` - Page with optional init modules
+  - **`id`** (required): The page slug used in WordPress admin URLs
+  - **`init`** (optional): Array of script module IDs to execute during page initialization
+
+**Generated Files:**
+
+This generates two page modes:
+- `build/pages/my-admin-page/page.php` - Full-page mode (takes over entire admin screen with custom sidebar)
+- `build/pages/my-admin-page/page-wp-admin.php` - WP-Admin mode (integrates within standard wp-admin interface)
+- `build/pages.php` - Loader for all pages
+
+Each mode provides route/menu registration functions and a render callback. Routes are automatically registered for both modes.
+
+**Registering a menu item for WP-Admin mode:**
+
+WP-Admin mode integrates within the standard WordPress admin interface (keeping the sidebar and header). Menu items should be registered with a simple slug and callback:
+
+```php
+add_submenu_page(
+	'themes.php',                              // Parent menu
+	__( 'My Page', 'my-plugin' ),             // Page title
+	__( 'My Page', 'my-plugin' ),             // Menu title
+	'edit_theme_options',                      // Capability
+	'my-admin-page-wp-admin',                  // Menu slug (simple)
+	'my_admin_page_wp_admin_render_page'       // Callback from generated PHP
+);
+```
+
+The page slug is `my-admin-page-wp-admin` (your page ID + `-wp-admin`). WordPress routes all requests to this callback, and the JavaScript router handles internal navigation.
+
+**Deep linking with the `p` query parameter:**
+
+Users and extensions can link directly to specific routes using the `p` query parameter:
+```php
+// Link to a specific route
+$url = admin_url( 'admin.php?page=my-admin-page-wp-admin&p=' . urlencode( '/settings' ) );
+```
+
+When the page loads, the JavaScript boot system reads the `p` parameter and navigates to that route automatically.
+
+**Registering a menu item for full-page mode:**
+
+Full-page mode takes over the entire admin screen with a custom sidebar:
+
+```php
+add_menu_page( 'Title', 'Menu', 'capability', 'my-admin-page', 'my_admin_page_render_page', 'icon', 20 );
+```
+
+**Init Modules:**
+Init modules are JavaScript packages that execute during page initialization, before routes are registered and the app renders. They're ideal for:
+- Adding icons to menu items (icons can't be passed from PHP)
+- Registering command palette entries
+
+**Creating an Init Module:**
+
+In `packages/my-page-init/package.json`:
+```json
+{
+	"name": "@my-plugin/my-page-init",
+	"wpScriptModuleExports": "./build-module/index.js",
+	"dependencies": {
+		"@wordpress/boot": "file:../boot",
+		"@wordpress/data": "file:../data",
+		"@wordpress/icons": "file:../icons"
+	}
+}
+```
+
+In `packages/my-page-init/src/index.ts`:
+```typescript
+import { home, styles } from '@wordpress/icons';
+import { dispatch } from '@wordpress/data';
+import { store as bootStore } from '@wordpress/boot';
+
+/**
+ * Initialize page - this function is mandatory.
+ * All init modules must export an 'init' function.
+ */
+export async function init() {
+	// Add icons to menu items
+	dispatch( bootStore ).updateMenuItem( 'home', { icon: home } );
+	dispatch( bootStore ).updateMenuItem( 'styles', { icon: styles } );
+}
+```
+
+The `init()` function is **mandatory** - all init modules must export this named function. Init modules are loaded as static dependencies and executed sequentially before the boot system registers menu items and routes.
+
 ### Example: WordPress Core (Gutenberg)
 
 ```json
@@ -254,7 +369,7 @@ require_once plugin_dir_path( __FILE__ ) . 'build/index.php';
 
 ## Routes (Experimental)
 
-Routes provide a file-based routing system for WordPress admin pages. Create a `routes/` directory at your repository root with subdirectories for each route.
+Routes provide a file-based routing system for WordPress admin pages. Each route must be associated with a page defined in `wpPlugin.pages` (see above). Create a `routes/` directory at your repository root with subdirectories for each route.
 
 ### Structure
 
@@ -264,7 +379,8 @@ routes/
     package.json    # Route configuration
     stage.tsx       # Main content component
     inspector.tsx   # Optional sidebar component
-    route.tsx       # Optional lifecycle hooks (beforeLoad, loader)
+    canvas.tsx      # Optional custom canvas component
+    route.tsx       # Optional lifecycle hooks (beforeLoad, loader, canvas)
 ```
 
 ### Route Configuration
@@ -274,10 +390,30 @@ In `routes/{route-name}/package.json`:
 ```json
 {
 	"route": {
-		"path": "/"
+		"path": "/",
+		"page": "my-admin-page"
 	}
 }
 ```
+
+For routes that should appear on multiple pages:
+
+```json
+{
+	"route": {
+		"path": "/settings",
+		"page": ["my-admin-page", "other-page"]
+	}
+}
+```
+
+The `page` field can be either:
+- **String**: Route belongs to a single page
+- **Array**: Route appears on multiple pages (the build system will register the route for each page)
+
+Each page ID must match one of the pages defined in `wpPlugin.pages` in your root `package.json`. This tells the build system which page(s) this route belongs to. It can also map to existing pages registered by other plugins.
+
+Multi-page routes are useful for shared functionality across different admin pages, such as settings routes accessible from both a main page and a dedicated settings page.
 
 ### Components
 
@@ -291,6 +427,13 @@ export const stage = () => <div>Content</div>;
 export const inspector = () => <div>Inspector</div>;
 ```
 
+**canvas.tsx** - Custom canvas component (optional):
+```tsx
+export const canvas = () => <div>Custom Canvas</div>;
+```
+
+The canvas is a full-screen area typically used for editor previews. You can provide a custom canvas component that will be conditionally rendered based on the `canvas()` function's return value in `route.tsx`.
+
 **route.tsx** - Lifecycle hooks (optional):
 ```tsx
 export const route = {
@@ -299,14 +442,33 @@ export const route = {
 	},
 	loader: ({ params, search }) => {
 		// Data preloading
+	},
+	canvas: ({ params, search }) => {
+		// Return CanvasData to use default canvas (editor)
+		return {
+			postType: 'post',
+			postId: '123',
+			isPreview: true
+		};
+
+		// Return null to use custom canvas.tsx component
+		// return null;
+
+		// Return undefined to show no canvas
+		// return undefined;
 	}
 };
 ```
 
+The `canvas()` function controls which canvas is rendered:
+- Returns `CanvasData` object (`{ postType, postId, isPreview? }`) → Renders the default WordPress editor canvas
+- Returns `null` → Renders the custom canvas component from `canvas.tsx` (if provided)
+- Returns `undefined` or is omitted → No canvas is rendered
+
 ### Build Output
 
 The build system generates:
-- `build/routes/{route-name}/content.js` - Bundled stage/inspector components
+- `build/routes/{route-name}/content.js` - Bundled stage/inspector/canvas components
 - `build/routes/{route-name}/route.js` - Bundled lifecycle hooks (if present)
 - `build/routes/index.php` - Route registry data
 - `build/routes.php` - Route registration logic

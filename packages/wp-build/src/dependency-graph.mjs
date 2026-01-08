@@ -5,30 +5,17 @@
  * and determine the correct build order using topological sorting.
  */
 
-/**
- * External dependencies
- */
-import toposort from 'toposort';
-
-/**
- * Node dependencies
- */
 import path from 'path';
-
-/**
- * Internal dependencies
- */
-import { getPackageInfo, getPackageInfoFromFile } from './package-utils.mjs';
+import { getPackageInfoFromFile } from './package-utils.mjs';
 
 /**
  * Check if a package is a script or script module.
  * A package is a script if it has wpScript or wpScriptModuleExports.
  *
- * @param {string} packageName The full package name (e.g., '@wordpress/blocks').
+ * @param {import('./package-utils.mjs').PackageJson|null|undefined} packageJson The package.json object.
  * @return {boolean} True if the package is a script or script module.
  */
-function isScriptOrModule( packageName ) {
-	const packageJson = getPackageInfo( packageName );
+function isScriptOrModule( packageJson ) {
 	if ( ! packageJson ) {
 		return false;
 	}
@@ -36,13 +23,12 @@ function isScriptOrModule( packageName ) {
 }
 
 /**
- * Get package dependencies from a package.json file.
+ * Get package dependencies from a package.json object.
  *
- * @param {string} packageName The full package name (e.g., '@wordpress/blocks').
+ * @param {import('./package-utils.mjs').PackageJson|null|undefined} packageJson The package.json object.
  * @return {string[]} Array of package names this package depends on.
  */
-function getDependencies( packageName ) {
-	const packageJson = getPackageInfo( packageName );
+function getDependencies( packageJson ) {
 	if ( ! packageJson ) {
 		return [];
 	}
@@ -53,77 +39,14 @@ function getDependencies( packageName ) {
 }
 
 /**
- * Build a dependency graph for the given packages.
- *
- * @param {string[]} packages Array of full package names to analyze.
- * @return {Array<[string, string]>} Array of [dependent, dependency] edges.
- */
-function buildDependencyGraph( packages ) {
-	/** @type {Array<[string, string]>} */
-	const edges = [];
-	const packagesSet = new Set( packages );
-
-	for ( const packageName of packages ) {
-		const deps = getDependencies( packageName );
-
-		// Only include edges where both packages are in our list
-		for ( const dep of deps ) {
-			if ( packagesSet.has( dep ) ) {
-				edges.push( [ packageName, dep ] );
-			}
-		}
-
-		// If package has no dependencies in our list, add a self-reference
-		// This ensures it appears in the sorted output
-		if ( deps.filter( ( dep ) => packagesSet.has( dep ) ).length === 0 ) {
-			edges.push( [ packageName, packageName ] );
-		}
-	}
-
-	return edges;
-}
-
-/**
- * Sort packages in topological order based on their dependencies.
- *
- * @param {string[]} packages Array of full package names to sort.
- * @return {string[]} Sorted array where dependencies come before dependents.
- */
-function topologicalSort( packages ) {
-	const edges = buildDependencyGraph( packages );
-
-	try {
-		// toposort returns dependencies first, then dependents
-		/** @type {Array<string>} */
-		const sorted = toposort( edges );
-
-		// Filter to only include packages in our input list
-		// (toposort might include extra nodes)
-		const packagesSet = new Set( packages );
-		return sorted.filter( ( pkg ) => packagesSet.has( pkg ) );
-	} catch ( error ) {
-		if ( error instanceof Error && error.message.includes( 'cyclic' ) ) {
-			console.error(
-				'❌ Cyclic dependency detected in packages:',
-				error.message
-			);
-			throw new Error(
-				'Cannot build packages due to cyclic dependencies'
-			);
-		}
-		throw error;
-	}
-}
-
-/**
  * Group packages by dependency depth level.
  * Packages at the same depth level can be built in parallel.
  *
- * @param {string[]} packages Array of full package names to group.
- * @return {string[][]} Array of arrays, where each inner array is a depth level.
+ * @param {Map<string, import('./package-utils.mjs').PackageJson>} packages Map of package names to package.json objects.
+ * @return {string[][]} Array of arrays, where each inner array is a depth level containing package names.
  */
 function groupByDepth( packages ) {
-	const packagesSet = new Set( packages );
+	const packagesSet = new Set( packages.keys() );
 	const depths = new Map();
 	const visited = new Set();
 
@@ -145,7 +68,8 @@ function groupByDepth( packages ) {
 
 		visited.add( packageName );
 
-		const deps = getDependencies( packageName );
+		const packageJson = packages.get( packageName );
+		const deps = getDependencies( packageJson );
 		const relevantDeps = deps.filter( ( dep ) => packagesSet.has( dep ) );
 
 		if ( relevantDeps.length === 0 ) {
@@ -163,7 +87,7 @@ function groupByDepth( packages ) {
 	}
 
 	// Calculate depth for all packages
-	for ( const packageName of packages ) {
+	for ( const packageName of packages.keys() ) {
 		calculateDepth( packageName );
 	}
 
@@ -172,7 +96,7 @@ function groupByDepth( packages ) {
 	const maxDepth = Math.max( ...depths.values() );
 
 	for ( let depth = 0; depth <= maxDepth; depth++ ) {
-		const packagesAtDepth = packages.filter(
+		const packagesAtDepth = Array.from( packages.keys() ).filter(
 			( pkg ) => depths.get( pkg ) === depth
 		);
 		if ( packagesAtDepth.length > 0 ) {
@@ -186,15 +110,15 @@ function groupByDepth( packages ) {
 /**
  * Get packages that depend on a given package (reverse dependencies).
  *
- * @param {string}   packageName The full package name to find dependents of.
- * @param {string[]} allPackages Array of all full package names to search.
+ * @param {string}                                                 packageName       The full package name to find dependents of.
+ * @param {Map<string, import('./package-utils.mjs').PackageJson>} workspacePackages Map of workspace package names to package.json objects.
  * @return {string[]} Array of package names that depend on the given package.
  */
-function getReverseDependencies( packageName, allPackages ) {
+function getReverseDependencies( packageName, workspacePackages ) {
 	const dependents = [];
 
-	for ( const pkg of allPackages ) {
-		const deps = getDependencies( pkg );
+	for ( const [ pkg, packageJson ] of workspacePackages ) {
+		const deps = getDependencies( packageJson );
 		if ( deps.includes( packageName ) ) {
 			dependents.push( pkg );
 		}
@@ -218,14 +142,15 @@ function getReverseDependencies( packageName, allPackages ) {
  * - D (script) depends on C
  * Result: Only C needs rebundling (D stops at C boundary)
  *
- * @param {string}   changedPackage The full package name that changed.
- * @param {string[]} allPackages    Array of all full package names.
+ * @param {string}                                                 changedPackage    The full package name that changed.
+ * @param {Map<string, import('./package-utils.mjs').PackageJson>} workspacePackages Map of workspace package names to package.json objects.
  * @return {string[]} Array of script/module package names to rebundle.
  */
-function findScriptsToRebundle( changedPackage, allPackages ) {
+function findScriptsToRebundle( changedPackage, workspacePackages ) {
 	// If the changed package itself is a script/module, no need to find others
 	// (it will be rebuilt by the regular watch logic)
-	if ( isScriptOrModule( changedPackage ) ) {
+	const changedPackageJson = workspacePackages.get( changedPackage );
+	if ( isScriptOrModule( changedPackageJson ) ) {
 		return [];
 	}
 
@@ -244,13 +169,14 @@ function findScriptsToRebundle( changedPackage, allPackages ) {
 		// Get all packages that depend on the current package
 		const dependents = getReverseDependencies(
 			currentPackage,
-			allPackages
+			workspacePackages
 		);
 
 		for ( const dependent of dependents ) {
 			// If this dependent is a script/module, add it to the result
 			// but don't traverse further (stop at script boundaries)
-			if ( isScriptOrModule( dependent ) ) {
+			const dependentPackageJson = workspacePackages.get( dependent );
+			if ( isScriptOrModule( dependentPackageJson ) ) {
 				scriptsToRebundle.add( dependent );
 			} else if ( ! visited.has( dependent ) ) {
 				// If it's a bundled package, continue traversing
@@ -296,21 +222,22 @@ function getRouteDependencies( rootDir, routeName ) {
  * - home (route) depends on B
  * Result: Both C and home need rebuilding
  *
- * @param {string}   changedPackage The full package name that changed.
- * @param {string[]} allPackages    Array of all full package names.
- * @param {string}   rootDir        Root directory path.
- * @param {string[]} allRoutes      Array of all route names.
+ * @param {string}                                                 changedPackage    The full package name that changed.
+ * @param {Map<string, import('./package-utils.mjs').PackageJson>} workspacePackages Map of workspace package names to package.json objects.
+ * @param {string}                                                 rootDir           Root directory path.
+ * @param {string[]}                                               allRoutes         Array of all route names.
  * @return {string[]} Array of route names to rebuild.
  */
 function findRoutesToRebuild(
 	changedPackage,
-	allPackages,
+	workspacePackages,
 	rootDir,
 	allRoutes
 ) {
 	// If the changed package itself is a script/module, routes won't be affected
 	// (routes depend on bundled packages, not scripts/modules)
-	if ( isScriptOrModule( changedPackage ) ) {
+	const changedPackageJson = workspacePackages.get( changedPackage );
+	if ( isScriptOrModule( changedPackageJson ) ) {
 		return [];
 	}
 
@@ -337,14 +264,15 @@ function findRoutesToRebuild(
 		// Get all packages that depend on the current package
 		const dependents = getReverseDependencies(
 			currentPackage,
-			allPackages
+			workspacePackages
 		);
 
 		for ( const dependent of dependents ) {
 			// If this dependent is a script/module, don't traverse further
 			// (stop at script boundaries)
+			const dependentPackageJson = workspacePackages.get( dependent );
 			if (
-				! isScriptOrModule( dependent ) &&
+				! isScriptOrModule( dependentPackageJson ) &&
 				! visited.has( dependent )
 			) {
 				// If it's a bundled package, continue traversing
@@ -358,8 +286,6 @@ function findRoutesToRebuild(
 
 export {
 	getDependencies,
-	buildDependencyGraph,
-	topologicalSort,
 	groupByDepth,
 	isScriptOrModule,
 	getReverseDependencies,

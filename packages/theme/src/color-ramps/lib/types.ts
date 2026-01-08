@@ -79,12 +79,7 @@ export type RampStepConfig = {
 export type RampConfig = Record< keyof Ramp, RampStepConfig >;
 
 export type RampResult = {
-	ramp: Record<
-		keyof Ramp,
-		{
-			color: string;
-			warning: boolean;
-		}
-	>;
+	ramp: Record< keyof Ramp, string >;
+	warnings?: string[];
 	direction: RampDirection;
 };

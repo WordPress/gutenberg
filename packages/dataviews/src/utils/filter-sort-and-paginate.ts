@@ -7,6 +7,7 @@ import { subDays, subWeeks, subMonths, subYears } from 'date-fns';
 /**
  * WordPress dependencies
  */
+import deprecated from '@wordpress/deprecated';
 import { getDate } from '@wordpress/date';
 
 /**
@@ -36,7 +37,7 @@ import {
 	OPERATOR_IN_THE_PAST,
 	OPERATOR_OVER,
 } from '../constants';
-import normalizeFields from './normalize-fields';
+import normalizeFields from '../field-types';
 import type { Field, View } from '../types';
 
 function normalizeSearchInput( input = '' ) {
@@ -163,6 +164,10 @@ export default function filterSortAndPaginate< Item >(
 					filter.operator === OPERATOR_IS_NOT_ALL &&
 					filter?.value?.length > 0
 				) {
+					deprecated( "The 'isNotAll' filter operator", {
+						since: '7.0',
+						alternative: "'isNone'",
+					} );
 					filteredData = filteredData.filter( ( item ) => {
 						return filter.value.every( ( value: any ) => {
 							return ! field
@@ -384,18 +389,28 @@ export default function filterSortAndPaginate< Item >(
 	// Handle sorting.
 	const sortByField = view.sort?.field
 		? _fields.find( ( field ) => {
-				return field.id === view.sort?.field;
+				return (
+					field.enableSorting !== false &&
+					field.id === view.sort?.field
+				);
 		  } )
 		: null;
-	const groupByField = view.groupByField
+	const groupByField = view.groupBy?.field
 		? _fields.find( ( field ) => {
-				return field.id === view.groupByField;
+				return (
+					field.enableSorting !== false &&
+					field.id === view.groupBy?.field
+				);
 		  } )
 		: null;
 	if ( sortByField || groupByField ) {
 		filteredData.sort( ( a, b ) => {
 			if ( groupByField ) {
-				const groupCompare = groupByField.sort( a, b, 'asc' );
+				const groupCompare = groupByField.sort(
+					a,
+					b,
+					view.groupBy?.direction ?? 'asc'
+				);
 
 				// If items are in different groups, return the group comparison result.
 				// Otherwise, fall back to sorting by the sort field.

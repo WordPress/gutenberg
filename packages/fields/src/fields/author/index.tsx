@@ -35,6 +35,7 @@ const authorField: Field< BasePostWithEmbeddedAuthor > = {
 			label: name,
 		} ) );
 	},
+	setValue: ( { value } ) => ( { author: Number( value ) } ),
 	render: AuthorView,
 	sort: ( a, b, direction ) => {
 		const nameA = a._embedded?.author?.[ 0 ]?.name || '';

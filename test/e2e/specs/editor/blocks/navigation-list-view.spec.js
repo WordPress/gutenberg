@@ -338,7 +338,7 @@ test.describe( 'Navigation block - List view editing', () => {
 		// Click the back button to go back to the Nav block.
 		await blockSettings
 			.getByRole( 'button', {
-				name: 'Go to parent Navigation block',
+				name: 'Go to "Navigation" block',
 			} )
 			.click();
 

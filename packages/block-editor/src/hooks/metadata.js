@@ -91,7 +91,7 @@ export function addTransforms( result, source, index, results ) {
 	if (
 		sourceMetadata.blockVisibility !== undefined &&
 		! result.attributes?.metadata?.blockVisibility &&
-		hasBlockSupport( result.name, 'blockVisibility', true )
+		hasBlockSupport( result.name, 'visibility', true )
 	) {
 		preservedMetadata.blockVisibility = sourceMetadata.blockVisibility;
 	}

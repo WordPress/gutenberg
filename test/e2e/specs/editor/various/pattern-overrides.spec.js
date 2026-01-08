@@ -698,7 +698,7 @@ test.describe( 'Pattern Overrides', () => {
 			editor.canvas.getByRole( 'document', { name: 'Block: Pattern' } )
 		);
 		await editor.showBlockToolbar();
-		await editor.clickBlockOptionsMenuItem( 'Detach' );
+		await editor.clickBlockOptionsMenuItem( 'Disconnect pattern' );
 
 		// Check that the overrides remain.
 		await expect.poll( editor.getBlocks ).toMatchObject( [
@@ -739,7 +739,7 @@ test.describe( 'Pattern Overrides', () => {
 			editor.canvas.getByRole( 'document', { name: 'Block: Pattern' } )
 		);
 		await editor.showBlockToolbar();
-		await editor.clickBlockOptionsMenuItem( 'Detach' );
+		await editor.clickBlockOptionsMenuItem( 'Disconnect pattern' );
 
 		// Check that the overrides remain.
 		await expect.poll( editor.getBlocks ).toMatchObject( [

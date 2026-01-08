@@ -6,12 +6,6 @@
  * @package {{PREFIX}}
  */
 
-// Load version constant.
-$version_file = __DIR__ . '/version.php';
-if ( file_exists( $version_file ) ) {
-	require_once $version_file;
-}
-
 // Load script module registration.
 $modules_file = __DIR__ . '/modules.php';
 if ( file_exists( $modules_file ) ) {
@@ -34,4 +28,10 @@ if ( file_exists( $styles_file ) ) {
 $routes_file = __DIR__ . '/routes.php';
 if ( file_exists( $routes_file ) ) {
 	require_once $routes_file;
+}
+
+// Load pages registration.
+$pages_file = __DIR__ . '/pages.php';
+if ( file_exists( $pages_file ) ) {
+	require_once $pages_file;
 }

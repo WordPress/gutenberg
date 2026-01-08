@@ -103,7 +103,6 @@ export function QueryControls( {
 			{ [
 				onOrderChange && onOrderByChange && (
 					<SelectControl
-						__nextHasNoMarginBottom
 						__next40pxDefaultSize
 						key="query-controls-order-select"
 						label={ __( 'Order by' ) }
@@ -154,7 +153,6 @@ export function QueryControls( {
 					props.onCategoryChange && (
 						<FormTokenField
 							__next40pxDefaultSize
-							__nextHasNoMarginBottom
 							key="query-controls-categories-select"
 							label={ __( 'Categories' ) }
 							value={
@@ -188,7 +186,6 @@ export function QueryControls( {
 				),
 				onNumberOfItemsChange && (
 					<RangeControl
-						__nextHasNoMarginBottom
 						__next40pxDefaultSize
 						key="query-controls-range-control"
 						label={ __( 'Number of items' ) }

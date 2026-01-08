@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/block-directory",
-	"version": "5.34.0",
+	"version": "5.37.0",
 	"description": "Extend editor with block directory features to search, download and install blocks.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -22,12 +22,20 @@
 		"node": ">=18.12.0",
 		"npm": ">=8.19.2"
 	},
-	"main": "build/index.js",
-	"module": "build-module/index.js",
+	"files": [
+		"src",
+		"build",
+		"build-module",
+		"build-style",
+		"build-types",
+		"*.md"
+	],
+	"main": "build/index.cjs",
+	"module": "build-module/index.mjs",
 	"exports": {
 		".": {
-			"import": "./build-module/index.js",
-			"require": "./build/index.js"
+			"import": "./build-module/index.mjs",
+			"require": "./build/index.cjs"
 		},
 		"./package.json": "./package.json"
 	},
@@ -55,6 +63,9 @@
 		"@wordpress/url": "file:../url",
 		"change-case": "^4.1.2",
 		"clsx": "^2.1.1"
+	},
+	"devDependencies": {
+		"deep-freeze": "0.0.1"
 	},
 	"peerDependencies": {
 		"react": "^18.0.0",

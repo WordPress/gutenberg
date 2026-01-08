@@ -18,6 +18,10 @@
 	}
 }
 
+.block-editor-block-styles {
+	grid-column: 1 / -1;
+}
+
 .block-editor-block-styles__variants {
 	display: flex;
 	flex-wrap: wrap;

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react-webpack5';
 
 /**
  * WordPress dependencies
@@ -18,6 +18,7 @@ import {
  * Internal dependencies
  */
 import { ThemeProvider } from '../theme-provider';
+import '../prebuilt/css/design-tokens.css';
 
 const meta: Meta< typeof ThemeProvider > = {
 	title: 'Design System/Theme Provider',
@@ -39,7 +40,6 @@ const meta: Meta< typeof ThemeProvider > = {
 export default meta;
 
 function getCSSCustomPropsFromStylesheets() {
-	const primitiveProps: Record< string, string > = {};
 	const semanticProps: Record< string, string > = {};
 	const legacyProps: Record< string, string > = {};
 
@@ -58,15 +58,9 @@ function getCSSCustomPropsFromStylesheets() {
 								.trim();
 						}
 						if ( name.startsWith( '--wpds-color' ) ) {
-							if ( name.includes( 'private' ) ) {
-								primitiveProps[ name ] = ruleStyle
-									.getPropertyValue( name )
-									.trim();
-							} else {
-								semanticProps[ name ] = ruleStyle
-									.getPropertyValue( name )
-									.trim();
-							}
+							semanticProps[ name ] = ruleStyle
+								.getPropertyValue( name )
+								.trim();
 						}
 					}
 				}
@@ -79,7 +73,7 @@ function getCSSCustomPropsFromStylesheets() {
 		}
 	}
 
-	return { primitiveProps, semanticProps, legacyProps };
+	return { semanticProps, legacyProps };
 }
 
 const ColorTokenTable = ( {
@@ -126,11 +120,9 @@ const ColorTokenTable = ( {
 const DSTokensList = () => {
 	const [ props, setProps ] = useState< {
 		semanticProps: Record< string, string >;
-		primitiveProps: Record< string, string >;
 		legacyProps: Record< string, string >;
 	} >( {
 		semanticProps: {},
-		primitiveProps: {},
 		legacyProps: {},
 	} );
 
@@ -143,11 +135,6 @@ const DSTokensList = () => {
 			<h1>DS Color tokens</h1>
 			<h2>Semantic tokens (can be consumed directly)</h2>
 			<ColorTokenTable tokens={ props.semanticProps } />
-			<h2>Primitive tokens (should not be consumed directly)</h2>
-			<details>
-				<summary>Click to expand</summary>
-				<ColorTokenTable tokens={ props.primitiveProps } />
-			</details>
 			<h2>Legacy tokens (should not be consumed directly)</h2>
 			<details>
 				<summary>Click to expand</summary>
@@ -212,10 +199,10 @@ export const WithPicker: StoryObj< typeof ThemeProvider > = {
 	},
 };
 
-const NestingDebug = ( { bg = '', primary = '' } ) => (
+const NestingDebug = ( { bg = '', primary = '', density = '' } ) => (
 	<div
 		style={ {
-			padding: '0.25rem',
+			padding: 'var(--wpds-dimension-padding-surface-sm)',
 			color: 'var(--wpds-color-fg-content-neutral)',
 			backgroundColor: 'var(--wpds-color-bg-surface-neutral)',
 			display: 'flex',
@@ -224,13 +211,13 @@ const NestingDebug = ( { bg = '', primary = '' } ) => (
 			gap: '1rem',
 		} }
 	>
-		<pre>
-			bg: { bg } | primary: { primary }
+		<pre style={ { margin: 0 } }>
+			bg: { bg } | primary: { primary } | density: { density }
 		</pre>
 		<span
 			style={ {
 				display: 'inline-block',
-				padding: '0.25rem',
+				padding: 'var(--wpds-dimension-padding-surface-xs)',
 				borderRadius: '0.25rem',
 				backgroundColor:
 					'var(--wpds-color-bg-interactive-brand-strong)',
@@ -243,7 +230,7 @@ const NestingDebug = ( { bg = '', primary = '' } ) => (
 			style={ {
 				display: 'inline-block',
 				marginInlineStart: '0.25rem',
-				padding: '0.25rem',
+				padding: 'var(--wpds-dimension-padding-surface-xs)',
 				borderRadius: '0.25rem',
 				backgroundColor:
 					'var(--wpds-color-bg-interactive-brand-weak-disabled)',
@@ -259,27 +246,39 @@ export const NestingAndInheriting: StoryObj< typeof ThemeProvider > = {
 	render: () => {
 		return (
 			<ThemeProvider>
-				<NestingDebug bg="inherit (root)" primary="inherit (root)" />
+				<NestingDebug
+					bg="inherit (root)"
+					primary="inherit (root)"
+					density="inherit (root)"
+				/>
 				<div style={ { paddingInlineStart: '1rem' } }>
 					<ThemeProvider
 						color={ {
 							bg: '#1e1e1e',
 						} }
+						density="compact"
 					>
-						<NestingDebug bg="#1e1e1e" primary="inherit (root)" />
+						<NestingDebug
+							bg="#1e1e1e"
+							primary="inherit (root)"
+							density="compact"
+						/>
 						<div style={ { paddingInlineStart: '1rem' } }>
 							<ThemeProvider>
 								<NestingDebug
 									bg="inherit (#1e1e1e)"
 									primary="inherit (root)"
+									density="inherit (compact)"
 								/>
 								<div style={ { paddingInlineStart: '1rem' } }>
 									<ThemeProvider
 										color={ { primary: 'hotpink' } }
+										density="default"
 									>
 										<NestingDebug
 											bg="inherit (#1e1e1e)"
 											primary="hotpink"
+											density="default"
 										/>
 										<div
 											style={ {
@@ -292,6 +291,7 @@ export const NestingAndInheriting: StoryObj< typeof ThemeProvider > = {
 												<NestingDebug
 													bg="#f8f8f8"
 													primary="inherit (hotpink)"
+													density="inherit (default)"
 												/>
 											</ThemeProvider>
 										</div>
@@ -411,7 +411,7 @@ export const AcrossIframes: StoryObj< typeof ThemeProvider > = {
 				<span
 					style={ {
 						display: 'inline-block',
-						padding: '0.25rem',
+						padding: 'var(--wpds-dimension-padding-surface-xs)',
 						borderRadius: '0.25rem',
 						backgroundColor:
 							'var(--wpds-color-bg-interactive-brand-strong)',

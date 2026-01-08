@@ -142,7 +142,6 @@ export default function IncludeControl( {
 			suggestions={ suggestions }
 			onChange={ onTermChange }
 			__experimentalShowHowTo={ false }
-			__nextHasNoMarginBottom
 			{ ...props }
 		/>
 	);

@@ -10,7 +10,10 @@ import { Tooltip } from '@wordpress/components';
 import { useMemo, useContext, useState } from '@wordpress/element';
 import { ENTER } from '@wordpress/keycodes';
 import { _x, sprintf } from '@wordpress/i18n';
-import { areGlobalStylesEqual } from '@wordpress/global-styles-engine';
+import {
+	areGlobalStylesEqual,
+	mergeGlobalStyles,
+} from '@wordpress/global-styles-engine';
 
 /**
  * Internal dependencies
@@ -41,7 +44,7 @@ export default function Variation( {
 	} = useContext( GlobalStylesContext );
 
 	const context = useMemo( () => {
-		let merged = { ...base, ...variation };
+		let merged = mergeGlobalStyles( base, variation );
 		if ( properties ) {
 			merged = filterObjectByProperties( merged, properties );
 		}

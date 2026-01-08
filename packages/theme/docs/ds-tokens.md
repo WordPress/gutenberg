@@ -9,13 +9,17 @@ Do not edit directly.
 
 ### Border
 
-| Variable name                  | Description                 |
-| ------------------------------ | --------------------------- |
-| `--wpds-border-radius-x-small` | Extra small radius          |
-| `--wpds-border-radius-small`   | Small radius                |
-| `--wpds-border-radius-medium`  | Medium radius               |
-| `--wpds-border-radius-large`   | Large radius                |
-| `--wpds-border-width-focus`    | Border width for focus ring |
+| Variable name                           | Description                     |
+| --------------------------------------- | ------------------------------- |
+| `--wpds-border-radius-surface-xs`       | Extra small radius for surfaces |
+| `--wpds-border-radius-surface-sm`       | Small radius for surfaces       |
+| `--wpds-border-radius-surface-md`       | Medium radius for surfaces      |
+| `--wpds-border-radius-surface-lg`       | Large radius for surfaces       |
+| `--wpds-border-width-surface-xs`        | Extra small width for surfaces  |
+| `--wpds-border-width-surface-sm`        | Small width for surfaces        |
+| `--wpds-border-width-surface-md`        | Medium width for surfaces       |
+| `--wpds-border-width-surface-lg`        | Large width for surfaces        |
+| `--wpds-border-width-interactive-focus` | Border width for focus ring     |
 
 ### Color
 
@@ -53,6 +57,15 @@ Do not edit directly.
 | `--wpds-color-bg-interactive-brand-weak`              | Background color for interactive elements with brand tone and weak emphasis.                                                                |
 | `--wpds-color-bg-interactive-brand-weak-active`       | Background color for interactive elements with brand tone and weak emphasis that are hovered, focused, or active.                           |
 | `--wpds-color-bg-interactive-brand-weak-disabled`     | Background color for interactive elements with brand tone and weak emphasis, in their disabled state.                                       |
+| `--wpds-color-bg-interactive-error`                   | Background color for interactive elements with error tone and normal emphasis.                                                              |
+| `--wpds-color-bg-interactive-error-active`            | Background color for interactive elements with error tone and normal emphasis that are hovered, focused, or active.                         |
+| `--wpds-color-bg-interactive-error-disabled`          | Background color for interactive elements with error tone and normal emphasis, in their disabled state.                                     |
+| `--wpds-color-bg-interactive-error-strong`            | Background color for interactive elements with error tone and strong emphasis.                                                              |
+| `--wpds-color-bg-interactive-error-strong-active`     | Background color for interactive elements with error tone and strong emphasis that are hovered, focused, or active.                         |
+| `--wpds-color-bg-interactive-error-strong-disabled`   | Background color for interactive elements with error tone and strong emphasis, in their disabled state.                                     |
+| `--wpds-color-bg-interactive-error-weak`              | Background color for interactive elements with error tone and weak emphasis.                                                                |
+| `--wpds-color-bg-interactive-error-weak-active`       | Background color for interactive elements with error tone and weak emphasis that are hovered, focused, or active.                           |
+| `--wpds-color-bg-interactive-error-weak-disabled`     | Background color for interactive elements with error tone and weak emphasis, in their disabled state.                                       |
 | `--wpds-color-bg-track-neutral-weak`                  | Background color for tracks with a neutral tone and weak emphasis (eg. scrollbar track).                                                    |
 | `--wpds-color-bg-track-neutral`                       | Background color for tracks with a neutral tone and normal emphasis (eg. slider or progressbar track).                                      |
 | `--wpds-color-bg-thumb-neutral-weak`                  | Background color for thumbs with a neutral tone and weak emphasis (eg. scrollbar thumb).                                                    |
@@ -86,11 +99,17 @@ Do not edit directly.
 | `--wpds-color-fg-interactive-brand-strong`            | Foreground color for interactive elements with brand tone and strong emphasis.                                                              |
 | `--wpds-color-fg-interactive-brand-strong-active`     | Foreground color for interactive elements with brand tone and strong emphasis that are hovered, focused, or active.                         |
 | `--wpds-color-fg-interactive-brand-strong-disabled`   | Foreground color for interactive elements with brand tone and strong emphasis, in their disabled state.                                     |
+| `--wpds-color-fg-interactive-error`                   | Foreground color for interactive elements with error tone and normal emphasis.                                                              |
+| `--wpds-color-fg-interactive-error-active`            | Foreground color for interactive elements with error tone and normal emphasis that are hovered, focused, or active.                         |
+| `--wpds-color-fg-interactive-error-disabled`          | Foreground color for interactive elements with error tone and normal emphasis, in their disabled state.                                     |
+| `--wpds-color-fg-interactive-error-strong`            | Foreground color for interactive elements with error tone and strong emphasis.                                                              |
+| `--wpds-color-fg-interactive-error-strong-active`     | Foreground color for interactive elements with error tone and strong emphasis that are hovered, focused, or active.                         |
+| `--wpds-color-fg-interactive-error-strong-disabled`   | Foreground color for interactive elements with error tone and strong emphasis, in their disabled state.                                     |
 | `--wpds-color-stroke-surface-neutral`                 | Decorative stroke color used to define neutrally-toned surface boundaries with normal emphasis.                                             |
 | `--wpds-color-stroke-surface-neutral-weak`            | Decorative stroke color used to define neutrally-toned surface boundaries with weak emphasis.                                               |
 | `--wpds-color-stroke-surface-neutral-strong`          | Decorative stroke color used to define neutrally-toned surface boundaries with strong emphasis.                                             |
 | `--wpds-color-stroke-surface-brand`                   | Decorative stroke color used to define brand-toned surface boundaries with normal emphasis.                                                 |
-| `--wpds-color-stroke-surface-brand-strong`            | Decorative stroke color used to define neutrally-toned surface boundaries with strong emphasis.                                             |
+| `--wpds-color-stroke-surface-brand-strong`            | Decorative stroke color used to define brand-toned surface boundaries with strong emphasis.                                                 |
 | `--wpds-color-stroke-surface-success`                 | Decorative stroke color used to define success-toned surface boundaries with normal emphasis.                                               |
 | `--wpds-color-stroke-surface-success-strong`          | Decorative stroke color used to define success-toned surface boundaries with strong emphasis.                                               |
 | `--wpds-color-stroke-surface-info`                    | Decorative stroke color used to define info-toned surface boundaries with normal emphasis.                                                  |
@@ -105,9 +124,27 @@ Do not edit directly.
 | `--wpds-color-stroke-interactive-neutral-strong`      | Accessible stroke color used for interactive neutrally-toned elements with strong emphasis.                                                 |
 | `--wpds-color-stroke-interactive-brand`               | Accessible stroke color used for interactive brand-toned elements with normal emphasis.                                                     |
 | `--wpds-color-stroke-interactive-brand-active`        | Accessible stroke color used for interactive brand-toned elements with normal emphasis that are hovered, focused, or active.                |
-| `--wpds-color-stroke-interactive-brand-disabled`      | Accessible stroke color used for interactive brand-toned elements with normal emphasis, in their disabled state.                            |
+| `--wpds-color-stroke-interactive-error`               | Accessible stroke color used for interactive error-toned elements with normal emphasis.                                                     |
+| `--wpds-color-stroke-interactive-error-active`        | Accessible stroke color used for interactive error-toned elements with normal emphasis that are hovered, focused, or active.                |
 | `--wpds-color-stroke-interactive-error-strong`        | Accessible stroke color used for interactive error-toned elements with strong emphasis.                                                     |
 | `--wpds-color-stroke-focus-brand`                     | Accessible stroke color applied to focus rings.                                                                                             |
+
+### Dimension
+
+| Variable name                          | Description                         |
+| -------------------------------------- | ----------------------------------- |
+| `--wpds-dimension-base`                | Base dimension unit                 |
+| `--wpds-dimension-padding-surface-2xs` | 2x extra small spacing for surfaces |
+| `--wpds-dimension-padding-surface-xs`  | Extra small spacing for surfaces    |
+| `--wpds-dimension-padding-surface-sm`  | Small spacing for surfaces          |
+| `--wpds-dimension-padding-surface-md`  | Medium spacing for surfaces         |
+| `--wpds-dimension-padding-surface-lg`  | Large spacing for surfaces          |
+| `--wpds-dimension-gap-2xs`             | 2x extra small gap                  |
+| `--wpds-dimension-gap-xs`              | Extra small gap                     |
+| `--wpds-dimension-gap-sm`              | Small gap                           |
+| `--wpds-dimension-gap-md`              | Medium gap                          |
+| `--wpds-dimension-gap-lg`              | Large gap                           |
+| `--wpds-dimension-gap-xl`              | Extra large gap                     |
 
 ### Elevation
 
@@ -118,200 +155,24 @@ Do not edit directly.
 | `--wpds-elevation-medium`  | For components that offer additional actions. Example: Menus, Command Palette                                                     |
 | `--wpds-elevation-large`   | For components that confirm decisions or handle necessary interruptions. Example: Modals.                                         |
 
-### Spacing
-
-| Variable name       | Description         |
-| ------------------- | ------------------- |
-| `--wpds-spacing-05` | Extra small spacing |
-| `--wpds-spacing-10` | Small spacing       |
-| `--wpds-spacing-15` | Medium spacing      |
-| `--wpds-spacing-20` | Large spacing       |
-| `--wpds-spacing-30` | Extra large spacing |
-| `--wpds-spacing-40` | 2X large spacing    |
-| `--wpds-spacing-50` | 3X large spacing    |
-| `--wpds-spacing-60` | 4X large spacing    |
-| `--wpds-spacing-70` | 5X large spacing    |
-| `--wpds-spacing-80` | 6X large spacing    |
-
 ### Typography
 
-| Variable name                      | Description             |
-| ---------------------------------- | ----------------------- |
-| `--wpds-font-family-heading`       | Headings font family    |
-| `--wpds-font-family-body`          | Body font family        |
-| `--wpds-font-family-mono`          | Monospace font family   |
-| `--wpds-font-size-x-small`         | Extra small font size   |
-| `--wpds-font-size-small`           | Small font size         |
-| `--wpds-font-size-medium`          | Medium font size        |
-| `--wpds-font-size-large`           | Large font size         |
-| `--wpds-font-size-x-large`         | Extra large font size   |
-| `--wpds-font-size-2x-large`        | 2X large font size      |
-| `--wpds-font-line-height-x-small`  | Extra small line height |
-| `--wpds-font-line-height-small`    | Small line height       |
-| `--wpds-font-line-height-medium`   | Medium line height      |
-| `--wpds-font-line-height-large`    | Large line height       |
-| `--wpds-font-line-height-x-large`  | Extra large line height |
-| `--wpds-font-line-height-2x-large` | 2X large line height    |
-
-## Primitive tokens
-
-**🚨 Note: These tokens are only private implementation details of the Theme, and should never be referenced / consumed directly in the code.**
-
-### Color (private)
-
-| Variable name                                    | Description |
-| ------------------------------------------------ | ----------- |
-| `--wpds-color-private-primary-bg-fill1`          | N/A         |
-| `--wpds-color-private-primary-fg-fill`           | N/A         |
-| `--wpds-color-private-primary-bg-fill2`          | N/A         |
-| `--wpds-color-private-primary-surface2`          | N/A         |
-| `--wpds-color-private-primary-surface6`          | N/A         |
-| `--wpds-color-private-primary-surface5`          | N/A         |
-| `--wpds-color-private-primary-surface4`          | N/A         |
-| `--wpds-color-private-primary-surface3`          | N/A         |
-| `--wpds-color-private-primary-fg-surface4`       | N/A         |
-| `--wpds-color-private-primary-fg-surface3`       | N/A         |
-| `--wpds-color-private-primary-fg-surface2`       | N/A         |
-| `--wpds-color-private-primary-fg-surface1`       | N/A         |
-| `--wpds-color-private-primary-stroke3`           | N/A         |
-| `--wpds-color-private-primary-stroke4`           | N/A         |
-| `--wpds-color-private-primary-stroke2`           | N/A         |
-| `--wpds-color-private-primary-stroke1`           | N/A         |
-| `--wpds-color-private-primary-bg-fill-dark`      | N/A         |
-| `--wpds-color-private-primary-fg-fill-dark`      | N/A         |
-| `--wpds-color-private-primary-bg-fill-inverted2` | N/A         |
-| `--wpds-color-private-primary-bg-fill-inverted1` | N/A         |
-| `--wpds-color-private-primary-fg-fill-inverted`  | N/A         |
-| `--wpds-color-private-primary-surface1`          | N/A         |
-| `--wpds-color-private-info-bg-fill1`             | N/A         |
-| `--wpds-color-private-info-fg-fill`              | N/A         |
-| `--wpds-color-private-info-bg-fill2`             | N/A         |
-| `--wpds-color-private-info-surface2`             | N/A         |
-| `--wpds-color-private-info-surface6`             | N/A         |
-| `--wpds-color-private-info-surface5`             | N/A         |
-| `--wpds-color-private-info-surface4`             | N/A         |
-| `--wpds-color-private-info-surface3`             | N/A         |
-| `--wpds-color-private-info-fg-surface4`          | N/A         |
-| `--wpds-color-private-info-fg-surface3`          | N/A         |
-| `--wpds-color-private-info-fg-surface2`          | N/A         |
-| `--wpds-color-private-info-fg-surface1`          | N/A         |
-| `--wpds-color-private-info-stroke3`              | N/A         |
-| `--wpds-color-private-info-stroke4`              | N/A         |
-| `--wpds-color-private-info-stroke2`              | N/A         |
-| `--wpds-color-private-info-stroke1`              | N/A         |
-| `--wpds-color-private-info-bg-fill-dark`         | N/A         |
-| `--wpds-color-private-info-fg-fill-dark`         | N/A         |
-| `--wpds-color-private-info-bg-fill-inverted2`    | N/A         |
-| `--wpds-color-private-info-bg-fill-inverted1`    | N/A         |
-| `--wpds-color-private-info-fg-fill-inverted`     | N/A         |
-| `--wpds-color-private-info-surface1`             | N/A         |
-| `--wpds-color-private-success-bg-fill1`          | N/A         |
-| `--wpds-color-private-success-fg-fill`           | N/A         |
-| `--wpds-color-private-success-bg-fill2`          | N/A         |
-| `--wpds-color-private-success-surface2`          | N/A         |
-| `--wpds-color-private-success-surface6`          | N/A         |
-| `--wpds-color-private-success-surface5`          | N/A         |
-| `--wpds-color-private-success-surface4`          | N/A         |
-| `--wpds-color-private-success-surface3`          | N/A         |
-| `--wpds-color-private-success-fg-surface4`       | N/A         |
-| `--wpds-color-private-success-fg-surface3`       | N/A         |
-| `--wpds-color-private-success-fg-surface2`       | N/A         |
-| `--wpds-color-private-success-fg-surface1`       | N/A         |
-| `--wpds-color-private-success-stroke3`           | N/A         |
-| `--wpds-color-private-success-stroke4`           | N/A         |
-| `--wpds-color-private-success-stroke2`           | N/A         |
-| `--wpds-color-private-success-stroke1`           | N/A         |
-| `--wpds-color-private-success-bg-fill-dark`      | N/A         |
-| `--wpds-color-private-success-fg-fill-dark`      | N/A         |
-| `--wpds-color-private-success-bg-fill-inverted2` | N/A         |
-| `--wpds-color-private-success-bg-fill-inverted1` | N/A         |
-| `--wpds-color-private-success-fg-fill-inverted`  | N/A         |
-| `--wpds-color-private-success-surface1`          | N/A         |
-| `--wpds-color-private-warning-bg-fill1`          | N/A         |
-| `--wpds-color-private-warning-fg-fill`           | N/A         |
-| `--wpds-color-private-warning-bg-fill2`          | N/A         |
-| `--wpds-color-private-warning-surface2`          | N/A         |
-| `--wpds-color-private-warning-surface6`          | N/A         |
-| `--wpds-color-private-warning-surface5`          | N/A         |
-| `--wpds-color-private-warning-surface4`          | N/A         |
-| `--wpds-color-private-warning-surface3`          | N/A         |
-| `--wpds-color-private-warning-fg-surface4`       | N/A         |
-| `--wpds-color-private-warning-fg-surface3`       | N/A         |
-| `--wpds-color-private-warning-fg-surface2`       | N/A         |
-| `--wpds-color-private-warning-fg-surface1`       | N/A         |
-| `--wpds-color-private-warning-stroke3`           | N/A         |
-| `--wpds-color-private-warning-stroke4`           | N/A         |
-| `--wpds-color-private-warning-stroke2`           | N/A         |
-| `--wpds-color-private-warning-stroke1`           | N/A         |
-| `--wpds-color-private-warning-bg-fill-dark`      | N/A         |
-| `--wpds-color-private-warning-fg-fill-dark`      | N/A         |
-| `--wpds-color-private-warning-bg-fill-inverted2` | N/A         |
-| `--wpds-color-private-warning-bg-fill-inverted1` | N/A         |
-| `--wpds-color-private-warning-fg-fill-inverted`  | N/A         |
-| `--wpds-color-private-warning-surface1`          | N/A         |
-| `--wpds-color-private-error-bg-fill1`            | N/A         |
-| `--wpds-color-private-error-fg-fill`             | N/A         |
-| `--wpds-color-private-error-bg-fill2`            | N/A         |
-| `--wpds-color-private-error-surface2`            | N/A         |
-| `--wpds-color-private-error-surface6`            | N/A         |
-| `--wpds-color-private-error-surface5`            | N/A         |
-| `--wpds-color-private-error-surface4`            | N/A         |
-| `--wpds-color-private-error-surface3`            | N/A         |
-| `--wpds-color-private-error-fg-surface4`         | N/A         |
-| `--wpds-color-private-error-fg-surface3`         | N/A         |
-| `--wpds-color-private-error-fg-surface2`         | N/A         |
-| `--wpds-color-private-error-fg-surface1`         | N/A         |
-| `--wpds-color-private-error-stroke3`             | N/A         |
-| `--wpds-color-private-error-stroke4`             | N/A         |
-| `--wpds-color-private-error-stroke2`             | N/A         |
-| `--wpds-color-private-error-stroke1`             | N/A         |
-| `--wpds-color-private-error-bg-fill-dark`        | N/A         |
-| `--wpds-color-private-error-fg-fill-dark`        | N/A         |
-| `--wpds-color-private-error-bg-fill-inverted2`   | N/A         |
-| `--wpds-color-private-error-bg-fill-inverted1`   | N/A         |
-| `--wpds-color-private-error-fg-fill-inverted`    | N/A         |
-| `--wpds-color-private-error-surface1`            | N/A         |
-| `--wpds-color-private-bg-surface2`               | N/A         |
-| `--wpds-color-private-bg-bg-fill1`               | N/A         |
-| `--wpds-color-private-bg-fg-fill`                | N/A         |
-| `--wpds-color-private-bg-bg-fill2`               | N/A         |
-| `--wpds-color-private-bg-surface6`               | N/A         |
-| `--wpds-color-private-bg-surface5`               | N/A         |
-| `--wpds-color-private-bg-surface4`               | N/A         |
-| `--wpds-color-private-bg-surface3`               | N/A         |
-| `--wpds-color-private-bg-fg-surface4`            | N/A         |
-| `--wpds-color-private-bg-fg-surface3`            | N/A         |
-| `--wpds-color-private-bg-fg-surface2`            | N/A         |
-| `--wpds-color-private-bg-fg-surface1`            | N/A         |
-| `--wpds-color-private-bg-stroke3`                | N/A         |
-| `--wpds-color-private-bg-stroke4`                | N/A         |
-| `--wpds-color-private-bg-stroke2`                | N/A         |
-| `--wpds-color-private-bg-stroke1`                | N/A         |
-| `--wpds-color-private-bg-bg-fill-dark`           | N/A         |
-| `--wpds-color-private-bg-fg-fill-dark`           | N/A         |
-| `--wpds-color-private-bg-bg-fill-inverted2`      | N/A         |
-| `--wpds-color-private-bg-bg-fill-inverted1`      | N/A         |
-| `--wpds-color-private-bg-fg-fill-inverted`       | N/A         |
-| `--wpds-color-private-bg-surface1`               | N/A         |
-| `--wpds-color-private-caution-bg-fill1`          | N/A         |
-| `--wpds-color-private-caution-fg-fill`           | N/A         |
-| `--wpds-color-private-caution-bg-fill2`          | N/A         |
-| `--wpds-color-private-caution-surface2`          | N/A         |
-| `--wpds-color-private-caution-surface6`          | N/A         |
-| `--wpds-color-private-caution-surface5`          | N/A         |
-| `--wpds-color-private-caution-surface4`          | N/A         |
-| `--wpds-color-private-caution-surface3`          | N/A         |
-| `--wpds-color-private-caution-fg-surface4`       | N/A         |
-| `--wpds-color-private-caution-fg-surface3`       | N/A         |
-| `--wpds-color-private-caution-fg-surface2`       | N/A         |
-| `--wpds-color-private-caution-fg-surface1`       | N/A         |
-| `--wpds-color-private-caution-stroke3`           | N/A         |
-| `--wpds-color-private-caution-stroke4`           | N/A         |
-| `--wpds-color-private-caution-stroke2`           | N/A         |
-| `--wpds-color-private-caution-stroke1`           | N/A         |
-| `--wpds-color-private-caution-bg-fill-dark`      | N/A         |
-| `--wpds-color-private-caution-fg-fill-dark`      | N/A         |
-| `--wpds-color-private-caution-bg-fill-inverted2` | N/A         |
-| `--wpds-color-private-caution-bg-fill-inverted1` | N/A         |
-| `--wpds-color-private-caution-fg-fill-inverted`  | N/A         |
-| `--wpds-color-private-caution-surface1`          | N/A         |
+| Variable name                 | Description                                  |
+| ----------------------------- | -------------------------------------------- |
+| `--wpds-font-family-heading`  | Headings font family                         |
+| `--wpds-font-family-body`     | Body font family                             |
+| `--wpds-font-family-mono`     | Monospace font family                        |
+| `--wpds-font-size-xs`         | Extra small font size                        |
+| `--wpds-font-size-sm`         | Small font size                              |
+| `--wpds-font-size-md`         | Medium font size                             |
+| `--wpds-font-size-lg`         | Large font size                              |
+| `--wpds-font-size-xl`         | Extra large font size                        |
+| `--wpds-font-size-2xl`        | 2X large font size                           |
+| `--wpds-font-line-height-xs`  | Extra small line height                      |
+| `--wpds-font-line-height-sm`  | Small line height                            |
+| `--wpds-font-line-height-md`  | Medium line height                           |
+| `--wpds-font-line-height-lg`  | Large line height                            |
+| `--wpds-font-line-height-xl`  | Extra large line height                      |
+| `--wpds-font-line-height-2xl` | 2X large line height                         |
+| `--wpds-font-weight-regular`  | Regular font weight for body text            |
+| `--wpds-font-weight-medium`   | Medium font weight for emphasis and headings |

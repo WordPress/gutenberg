@@ -17,7 +17,6 @@ function BaseOption( {
 	return (
 		<div className="preference-base-option">
 			<ToggleControl
-				__nextHasNoMarginBottom
 				help={ help }
 				label={ label }
 				checked={ isChecked }

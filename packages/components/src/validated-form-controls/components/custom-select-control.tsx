@@ -9,32 +9,21 @@ import { forwardRef, useRef } from '@wordpress/element';
 import { ControlWithError } from '../control-with-error';
 import type { ValidatedControlProps } from './types';
 import CustomSelectControl from '../../custom-select-control';
-import type {
-	CustomSelectOption,
-	CustomSelectProps,
-} from '../../custom-select-control/types';
-
-type CustomSelectControlProps = CustomSelectProps< CustomSelectOption >;
-
-type Value = CustomSelectControlProps[ 'value' ];
 
 const UnforwardedValidatedCustomSelectControl = (
 	{
 		required,
-		onValidate,
 		customValidity,
-		onChange,
 		markWhenOptional,
 		...restProps
 	}: Omit<
 		React.ComponentProps< typeof CustomSelectControl >,
 		'__next40pxDefaultSize'
 	> &
-		ValidatedControlProps< Value >,
+		ValidatedControlProps,
 	forwardedRef: React.ForwardedRef< HTMLDivElement >
 ) => {
 	const validityTargetRef = useRef< HTMLSelectElement >( null );
-	const valueRef = useRef< Value >( restProps.value );
 
 	return (
 		<div
@@ -44,9 +33,6 @@ const UnforwardedValidatedCustomSelectControl = (
 			<ControlWithError
 				required={ required }
 				markWhenOptional={ markWhenOptional }
-				onValidate={ () => {
-					return onValidate?.( valueRef.current );
-				} }
 				customValidity={ customValidity }
 				getValidityTarget={ () => validityTargetRef.current }
 			>
@@ -54,10 +40,6 @@ const UnforwardedValidatedCustomSelectControl = (
 					// TODO: Upstream limitation - Required isn't passed down correctly,
 					// so it needs to be set on a delegate element.
 					__next40pxDefaultSize
-					onChange={ ( value ) => {
-						valueRef.current = value.selectedItem;
-						onChange?.( value );
-					} }
 					{ ...restProps }
 				/>
 			</ControlWithError>

@@ -70,7 +70,6 @@ export default function AdvancedPanel( {
 			) }
 			<TextareaControl
 				label={ __( 'Additional CSS' ) }
-				__nextHasNoMarginBottom
 				value={ customCSS }
 				onChange={ ( newValue ) => handleOnChange( newValue ) }
 				onBlur={ handleOnBlur }

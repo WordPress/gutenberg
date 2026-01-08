@@ -309,7 +309,7 @@ function checkDepLicense( path, licenses ) {
  * @param {Object}  deps    The dependencies tree.
  * @param {Options} options
  */
-function checkDepsInTree( deps, options ) {
+function checkDeps( deps, options ) {
 	const licenses = getLicenses( options.gpl2 );
 
 	for ( const key in deps ) {
@@ -319,7 +319,11 @@ function checkDepsInTree( deps, options ) {
 			continue;
 		}
 
-		if ( Object.keys( dep ).length === 0 ) {
+		// Don't check for licenses if the package entry is invalid. This can
+		// happen if an incomplete package directory exists in node_modules.
+		// Historically this could happen due to buggy behavior of Windows
+		// environments in handling optional dependenciess
+		if ( ! dep.name || Object.keys( dep ).length === 0 ) {
 			continue;
 		}
 
@@ -340,10 +344,6 @@ function checkDepsInTree( deps, options ) {
 			}
 		} else {
 			checkDepLicense( dep.path, licenses );
-		}
-
-		if ( dep.hasOwnProperty( 'dependencies' ) ) {
-			checkDepsInTree( dep.dependencies, options );
 		}
 	}
 }
@@ -373,5 +373,6 @@ function detectTypeFromLicenseFiles( path ) {
 module.exports = {
 	detectTypeFromLicenseText,
 	checkAllCompatible,
-	checkDepsInTree,
+	checkDeps,
+	getLicenses,
 };

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get, OKLCH, parse, serialize } from 'colorjs.io/fn';
+import { get, OKLCH } from 'colorjs.io/fn';
 
 /**
  * Internal dependencies
@@ -44,7 +44,7 @@ function getBgRampInfo( ramp: InternalRampResult ): {
 		pinLightness: {
 			stepName: STEP_TO_PIN,
 			value: clampAccentScaleReferenceLightness(
-				get( parse( ramp.ramp[ STEP_TO_PIN ].color ), [ OKLCH, 'l' ] ),
+				get( ramp.ramp[ STEP_TO_PIN ], [ OKLCH, 'l' ] ),
 				ramp.direction
 			),
 		},
@@ -89,6 +89,7 @@ export function checkAccessibleCombinations( {
 		fgName: keyof Ramp;
 		fgColor: string;
 		unmetContrast: number;
+		achievedContrast: number;
 	}[] = [];
 
 	// Assess combinations within each ramp
@@ -96,15 +97,17 @@ export function checkAccessibleCombinations( {
 		CONTRAST_COMBINATIONS.forEach( ( { bgs, fgs, target } ) => {
 			for ( const bg of bgs ) {
 				for ( const fg of fgs ) {
-					const bgColor = parse( ramp.ramp[ bg ].color );
-					const fgColor = parse( ramp.ramp[ fg ].color );
-					if ( getContrast( bgColor, fgColor ) < target ) {
+					const bgColor = ramp.ramp[ bg ];
+					const fgColor = ramp.ramp[ fg ];
+					const achievedContrast = getContrast( bgColor, fgColor );
+					if ( achievedContrast < target ) {
 						unmetTargets.push( {
 							bgName: bg,
-							bgColor: serialize( bgColor ),
+							bgColor,
 							fgName: fg,
-							fgColor: serialize( fgColor ),
+							fgColor,
 							unmetContrast: target,
+							achievedContrast,
 						} );
 					}
 				}
@@ -116,15 +119,17 @@ export function checkAccessibleCombinations( {
 		CONTRAST_COMBINATIONS.forEach( ( { bgs, fgs, target } ) => {
 			for ( const bg of bgs ) {
 				for ( const fg of fgs ) {
-					const bgColor = parse( bgRamp.ramp[ bg ].color );
-					const fgColor = parse( ramp.ramp[ fg ].color );
-					if ( getContrast( bgColor, fgColor ) < target ) {
+					const bgColor = bgRamp.ramp[ bg ];
+					const fgColor = ramp.ramp[ fg ];
+					const achievedContrast = getContrast( bgColor, fgColor );
+					if ( achievedContrast < target ) {
 						unmetTargets.push( {
 							bgName: bg,
-							bgColor: serialize( bgColor ),
+							bgColor,
 							fgName: fg,
-							fgColor: serialize( fgColor ),
+							fgColor,
 							unmetContrast: target,
+							achievedContrast,
 						} );
 					}
 				}

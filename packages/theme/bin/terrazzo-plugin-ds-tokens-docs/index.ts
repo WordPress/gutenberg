@@ -4,10 +4,6 @@
 import { FORMAT_ID } from '@terrazzo/plugin-css';
 import type { Plugin } from '@terrazzo/parser';
 
-function isPrivateToken( token: string ) {
-	return /-private-/i.test( token );
-}
-
 function titleCase( str: string ) {
 	return str[ 0 ].toUpperCase() + str.slice( 1 );
 }
@@ -24,7 +20,6 @@ export default function pluginDsTokenDocs( {
 				return;
 			}
 
-			const primitiveTokens: TokensMap = {};
 			const semanticTokens: TokensMap = {};
 			// Re-use transformed tokens from the CSS plugin
 			for ( const token of getTransforms( {
@@ -46,24 +41,16 @@ export default function pluginDsTokenDocs( {
 						.at( -1 )
 						?.split( '.json' )[ 0 ] ?? 'Miscellaneous';
 
-				// Organize tokens in semantic/private, and group by category.
-				const tokensObject = isPrivateToken( token.localID )
-					? primitiveTokens
-					: semanticTokens;
-				tokensObject[ group ] ??= {};
-				tokensObject[ group ][ token.localID ] =
+				// Group by category
+				semanticTokens[ group ] ??= {};
+				semanticTokens[ group ][ token.localID ] =
 					token.token.$description ?? 'N/A';
 			}
 
-			function tokensToMdTable(
-				tokens: TokensMap,
-				isPrivate: boolean = false
-			) {
+			function tokensToMdTable( tokens: TokensMap ) {
 				return Object.entries( tokens )
 					.map( ( [ group, tokensInGroup ] ) => [
-						`### ${ titleCase( group ) }${
-							isPrivate ? ' (private)' : ''
-						}`,
+						`### ${ titleCase( group ) }`,
 						'',
 						'| Variable name | Description |',
 						'|---|---|',
@@ -89,12 +76,6 @@ export default function pluginDsTokenDocs( {
 					'## Semantic tokens',
 					'',
 					...tokensToMdTable( semanticTokens ),
-					'',
-					'## Primitive tokens',
-					'',
-					'**🚨 Note: These tokens are only private implementation details of the Theme, and should never be referenced / consumed directly in the code.**',
-					'',
-					...tokensToMdTable( primitiveTokens, true ),
 					'', // final empty line
 				].join( '\n' )
 			);

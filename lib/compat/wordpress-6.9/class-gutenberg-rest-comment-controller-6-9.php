@@ -378,7 +378,11 @@ class Gutenberg_REST_Comment_Controller_6_9 extends WP_REST_Comments_Controller 
 			);
 		}
 
-		$prepared_comment['comment_approved'] = wp_allow_comment( $prepared_comment, true );
+		// Don't check for duplicates or flooding for notes.
+		$prepared_comment['comment_approved'] =
+			'note' === $prepared_comment['comment_type'] ?
+			'1' :
+			wp_allow_comment( $prepared_comment, true );
 
 		if ( is_wp_error( $prepared_comment['comment_approved'] ) ) {
 			$error_code    = $prepared_comment['comment_approved']->get_error_code();
@@ -568,6 +572,10 @@ class Gutenberg_REST_Comment_Controller_6_9 extends WP_REST_Comments_Controller 
 	 * @return bool True if the content is allowed, false otherwise.
 	 */
 	protected function check_is_comment_content_allowed( $prepared_comment ) {
+		if ( ! isset( $prepared_comment['comment_content'] ) ) {
+			return true;
+		}
+
 		$check = wp_parse_args(
 			$prepared_comment,
 			array(
