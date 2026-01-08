@@ -325,6 +325,9 @@ class WP_Navigation_Block_Renderer {
 					$block['attrs'] = array();
 				}
 				$block['attrs']['overlayMenu'] = 'never';
+				// Mark this as a nested navigation within an overlay template part
+				// so we can handle its rendering differently.
+				$block['attrs']['_isWithinOverlayTemplatePart'] = true;
 			}
 
 			// Recursively process inner blocks.
@@ -507,15 +510,7 @@ class WP_Navigation_Block_Renderer {
 			// Only published posts are valid. If this is changed then a corresponding change
 			// must also be implemented in `use-navigation-menu.js`.
 			if ( 'publish' === $navigation_post->post_status ) {
-				$navigation_name = $navigation_post->post_title;
-
-				// This is used to count the number of times a navigation name has been seen,
-				// so that we can ensure every navigation has a unique id.
-				if ( isset( static::$seen_menu_names[ $navigation_name ] ) ) {
-					++static::$seen_menu_names[ $navigation_name ];
-				} else {
-					static::$seen_menu_names[ $navigation_name ] = 1;
-				}
+				return $navigation_post->post_title;
 			}
 		}
 
@@ -765,8 +760,7 @@ class WP_Navigation_Block_Renderer {
 	 * @param WP_Block_List $inner_blocks  A list of inner blocks.
 	 * @return string Returns the navigation block markup.
 	 */
-	private static function get_nav_wrapper_attributes( $attributes, $inner_blocks ) {
-		$nav_menu_name      = static::get_unique_navigation_name( $attributes );
+	private static function get_nav_attributes( $attributes, $inner_blocks ) {
 		$is_interactive     = static::is_interactive( $attributes, $inner_blocks );
 		$is_responsive_menu = static::is_responsive( $attributes );
 		$style              = static::get_styles( $attributes );
@@ -775,6 +769,15 @@ class WP_Navigation_Block_Renderer {
 			'class' => $class,
 			'style' => $style,
 		);
+		// Only add aria-label for top-level navigation blocks.
+		// Skip navigation blocks marked as being within overlay template parts.
+		$is_within_overlay = $attributes['_isWithinOverlayTemplatePart'] ?? false;
+		if ( $is_within_overlay ) {
+			$nav_menu_name = static::get_navigation_name( $attributes );
+		} else {
+			$nav_menu_name = static::get_unique_navigation_name( $attributes );
+		}
+
 		if ( ! empty( $nav_menu_name ) ) {
 			$extra_attributes['aria-label'] = $nav_menu_name;
 		}
@@ -844,7 +847,7 @@ class WP_Navigation_Block_Renderer {
 	 * @param WP_Block_List $inner_blocks The list of inner blocks.
 	 * @return string Returns the navigation wrapper markup.
 	 */
-	private static function get_wrapper_markup( $attributes, $inner_blocks ) {
+	private static function get_inner_block_markup( $attributes, $inner_blocks ) {
 		$inner_blocks_html = static::get_inner_blocks_html( $attributes, $inner_blocks );
 		if ( static::is_responsive( $attributes ) ) {
 			return static::get_responsive_container_markup( $attributes, $inner_blocks, $inner_blocks_html );
@@ -862,6 +865,14 @@ class WP_Navigation_Block_Renderer {
 	 */
 	private static function get_unique_navigation_name( $attributes ) {
 		$nav_menu_name = static::get_navigation_name( $attributes );
+
+		// This is used to count the number of times a navigation name has been seen,
+		// so that we can ensure every navigation has a unique id.
+		if ( isset( static::$seen_menu_names[ $nav_menu_name ] ) ) {
+			++static::$seen_menu_names[ $nav_menu_name ];
+		} else {
+			static::$seen_menu_names[ $nav_menu_name ] = 1;
+		}
 
 		// If the menu name has been used previously then append an ID
 		// to the name to ensure uniqueness across a given post.
@@ -914,8 +925,8 @@ class WP_Navigation_Block_Renderer {
 
 		return sprintf(
 			'<nav %1$s>%2$s</nav>',
-			static::get_nav_wrapper_attributes( $attributes, $inner_blocks ),
-			static::get_wrapper_markup( $attributes, $inner_blocks )
+			static::get_nav_attributes( $attributes, $inner_blocks ),
+			static::get_inner_block_markup( $attributes, $inner_blocks )
 		);
 	}
 }
