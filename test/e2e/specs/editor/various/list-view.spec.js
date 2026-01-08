@@ -515,7 +515,11 @@ test.describe( 'List View', () => {
 		// Move focus and selection to the file block to set up for testing duplication.
 		await listView
 			.getByRole( 'gridcell', { name: 'File', exact: true } )
-			.dblclick();
+			.click();
+		// Second click on the 'File' gridcell, so that's not interpreted as a double-click.
+		await listView
+			.getByRole( 'gridcell', { name: 'File', exact: true } )
+			.click();
 
 		// Test duplication behaviour.
 		await pageUtils.pressKeys( 'primaryShift+d' );
@@ -1031,7 +1035,12 @@ test.describe( 'List View', () => {
 		await listView
 			.getByRole( 'gridcell', { name: 'File', exact: true } )
 			.first()
-			.dblclick();
+			.click();
+		// Second click on the 'File' gridcell, so that's not interpreted as a double-click.
+		await listView
+			.getByRole( 'gridcell', { name: 'File', exact: true } )
+			.first()
+			.click();
 
 		// Delete the first File block.
 		await page.keyboard.press( 'Delete' );
@@ -1332,6 +1341,7 @@ test.describe( 'List View', () => {
 			'Pressing Enter should open the menu dropdown'
 		).toBeVisible();
 
+		await optionsForFileMenu.getByRole( 'menuitem' ).first().focus();
 		await page.keyboard.press( 'Escape' );
 		await expect(
 			optionsForFileMenu,
