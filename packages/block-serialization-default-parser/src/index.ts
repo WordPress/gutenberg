@@ -246,24 +246,17 @@ function proceed(): boolean {
 				return false;
 			}
 
-			// Otherwise we have a problem
-			// This is an error
-			// we have options
-			//  - treat it all as freeform text
-			//  - assume an implicit closer (easiest when not nesting)
-
-			// For the easy case we'll assume an implicit closer.
-			if ( 1 === stackDepth ) {
-				addBlockFromStack();
-				return false;
-			}
-
-			// For the nested case where it's more difficult we'll
-			// have to assume that multiple closers are missing
-			// and so we'll collapse the whole stack piecewise.
-			while ( 0 < stack.length ) {
-				addBlockFromStack();
-			}
+			/*
+			 * Otherwise we have a problem
+			 * This is an error
+			 *
+			 * we have options
+			 * - treat it all as freeform text
+			 * - assume an implicit closer (easiest when not nesting)
+			 *
+			 * Treat this as a stack of implicit closers.
+			 */
+			implicitlyCloseAllOpenBlocks();
 			return false;
 		case 'void-block':
 			// easy case is if we stumbled upon a void block
@@ -503,4 +496,58 @@ function addBlockFromStack( endOffset?: number ) {
 	}
 
 	output.push( block );
+}
+
+/**
+ * Implicitly closes all open blocks when the end of the document is reached.
+ *
+ * This handles the case where blocks are not properly closed with their
+ * closing delimiters. Instead of treating the entire content as freeform,
+ * this function attempts to preserve as much of the block structure as possible
+ * by implicitly closing all open blocks on the stack.
+ *
+ * @since TBD
+ */
+function implicitlyCloseAllOpenBlocks() {
+	let implicitlyClosed: ParsedBlock | null = null;
+	let lastFreeform: [ number, number ] | null = null;
+
+	while ( stack.length > 0 ) {
+		const stackTop = stack.pop() as ParsedFrame;
+		let html: string;
+
+		if ( lastFreeform !== null ) {
+			html = document.substr(
+				stackTop.prevOffset,
+				lastFreeform[ 1 ] - stackTop.prevOffset
+			);
+		} else {
+			html = document.substr( stackTop.prevOffset );
+		}
+
+		stackTop.block.innerHTML += html;
+		stackTop.block.innerContent.push( html );
+
+		// Trap potential leading freeform content for the final output.
+		lastFreeform = [ stackTop.leadingHtmlStart ?? 0, stackTop.tokenStart ];
+
+		if ( implicitlyClosed !== null ) {
+			stackTop.block.innerContent.push( null );
+			stackTop.block.innerBlocks.push( implicitlyClosed );
+		}
+
+		implicitlyClosed = stackTop.block;
+	}
+
+	if ( lastFreeform !== null && lastFreeform[ 1 ] > lastFreeform[ 0 ] ) {
+		const html = document.substr(
+			lastFreeform[ 0 ],
+			lastFreeform[ 1 ] - lastFreeform[ 0 ]
+		);
+		output.push( Freeform( html ) );
+	}
+
+	if ( implicitlyClosed !== null ) {
+		output.push( implicitlyClosed );
+	}
 }
