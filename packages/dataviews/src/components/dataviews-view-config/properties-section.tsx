@@ -88,13 +88,10 @@ export function PropertiesSection( {
 	).length;
 
 	const visibleLockedFields = lockedFields.filter(
-		( { field, isVisibleFlag } ) =>
+		( { isVisibleFlag } ) =>
 			// @ts-expect-error
-			isDefined( field ) && ( view[ isVisibleFlag ] ?? true )
-	) as Array< {
-		field: NormalizedField< any >;
-		isVisibleFlag: string;
-	} >;
+			view[ isVisibleFlag ] ?? true
+	);
 
 	// If only one field (locked or regular) is visible, prevent it from being hidden
 	const totalVisibleFields =
