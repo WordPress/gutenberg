@@ -17,6 +17,7 @@ import rtlcss from 'rtlcss';
 import cssnano from 'cssnano';
 import babel from 'esbuild-plugin-babel';
 import { camelCase } from 'change-case';
+import { getPackages } from '@manypkg/get-packages';
 
 /**
  * Internal dependencies
@@ -107,26 +108,65 @@ const wordpressExternalsPlugin = createWordpressExternalsPlugin(
 	HANDLE_PREFIX
 );
 
-const styleBundlingPlugins = [
-	// Handle CSS modules (.module.css and .module.scss)
-	sassPlugin( {
-		embedded: true,
-		filter: /\.module\.(css|scss)$/,
-		transform: postcssModules( {
-			generateScopedName: '[name]__[local]__[hash:base64:5]',
+/**
+ * Cached SASS load paths from all workspace packages.
+ * @type {string[] | null}
+ */
+let cachedSassLoadPaths = null;
+
+/**
+ * Get SASS load paths from all workspace packages.
+ * Uses @manypkg/get-packages to discover all workspaces and their node_modules.
+ *
+ * @return {Promise<string[]>} Array of paths to search for SASS imports.
+ */
+async function getSassLoadPaths() {
+	if ( cachedSassLoadPaths ) {
+		return cachedSassLoadPaths;
+	}
+
+	const { packages, rootDir } = await getPackages( ROOT_DIR );
+
+	cachedSassLoadPaths = [
+		// Each workspace package's node_modules (for non-hoisted deps)
+		...packages.map( ( pkg ) => path.join( pkg.dir, 'node_modules' ) ),
+		// Root node_modules
+		path.join( rootDir, 'node_modules' ),
+		// Direct path to base-styles for @wordpress/base-styles imports
+		path.join( PACKAGES_DIR, 'base-styles' ),
+	];
+
+	return cachedSassLoadPaths;
+}
+
+/**
+ * Create style bundling plugins with the given load paths.
+ *
+ * @param {string[]} loadPaths - Array of paths to search for SASS imports.
+ * @return {object[]} Array of esbuild plugins for handling CSS/SCSS.
+ */
+function createStyleBundlingPlugins( loadPaths ) {
+	return [
+		// Handle CSS modules (.module.css and .module.scss)
+		sassPlugin( {
+			embedded: true,
+			filter: /\.module\.(css|scss)$/,
+			transform: postcssModules( {
+				generateScopedName: '[name]__[local]__[hash:base64:5]',
+			} ),
+			type: 'style',
+			loadPaths,
 		} ),
-		type: 'style',
-		loadPaths: [ 'node_modules', path.join( PACKAGES_DIR, 'base-styles' ) ],
-	} ),
-	// Handle regular CSS/SCSS files
-	// Note: .module.css and .module.scss already handled by plugin above
-	sassPlugin( {
-		embedded: true,
-		filter: /\.(css|scss)$/,
-		type: 'style',
-		loadPaths: [ 'node_modules', path.join( PACKAGES_DIR, 'base-styles' ) ],
-	} ),
-];
+		// Handle regular CSS/SCSS files
+		// Note: .module.css and .module.scss already handled by plugin above
+		sassPlugin( {
+			embedded: true,
+			filter: /\.(css|scss)$/,
+			type: 'style',
+			loadPaths,
+		} ),
+	];
+}
 
 /**
  * Normalize path separators for cross-platform compatibility.
@@ -1089,10 +1129,11 @@ async function transpilePackage( packageName ) {
 			} );
 		},
 	};
+	const sassLoadPaths = await getSassLoadPaths();
 	const plugins = [
 		needsEmotionPlugin && emotionPlugin,
 		externalizeAllExceptCssPlugin,
-		...styleBundlingPlugins,
+		...createStyleBundlingPlugins( sassLoadPaths ),
 	].filter( Boolean );
 
 	if ( packageJson.main ) {
@@ -1199,6 +1240,7 @@ async function compileStyles( packageName ) {
 	const startTime = Date.now();
 	const buildStyleDir = path.join( packageDir, 'build-style' );
 	const srcDir = path.join( packageDir, 'src' );
+	const sassLoadPaths = await getSassLoadPaths();
 
 	// Process SCSS files
 	await Promise.all(
@@ -1226,10 +1268,7 @@ async function compileStyles( packageName ) {
 				plugins: [
 					sassPlugin( {
 						embedded: true,
-						loadPaths: [
-							'node_modules',
-							path.join( PACKAGES_DIR, 'base-styles' ),
-						],
+						loadPaths: sassLoadPaths,
 						async transform( source ) {
 							// Process with autoprefixer for LTR version
 							const ltrResult = await postcss( [
@@ -1328,6 +1367,7 @@ async function buildRoute( routeName ) {
 	const startTime = Date.now();
 	const routeDir = path.join( ROOT_DIR, 'routes', routeName );
 	const outputDir = path.join( BUILD_DIR, 'routes', routeName );
+	const sassLoadPaths = await getSassLoadPaths();
 
 	// Ensure output directory exists
 	await mkdir( outputDir, { recursive: true } );
@@ -1414,7 +1454,7 @@ async function buildRoute( routeName ) {
 						[],
 						true // Generate asset file for minified build
 					),
-					...styleBundlingPlugins,
+					...createStyleBundlingPlugins( sassLoadPaths ),
 				],
 			} ),
 			esbuild.build( {
@@ -1432,7 +1472,7 @@ async function buildRoute( routeName ) {
 						[],
 						false // Skip asset file for non-minified build
 					),
-					...styleBundlingPlugins,
+					...createStyleBundlingPlugins( sassLoadPaths ),
 				],
 			} ),
 		] );
