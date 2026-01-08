@@ -10,9 +10,7 @@ import type { View } from '@wordpress/dataviews';
 /**
  * Navigation overlay template part area constant.
  * This should match NAVIGATION_OVERLAY_TEMPLATE_PART_AREA in
- * packages/block-library/src/navigation/constants.js and
- * GUTENBERG_NAVIGATION_OVERLAY_TEMPLATE_PART_AREA in
- * packages/block-library/src/navigation/index.php
+ * packages/block-library/src/navigation/constants.js
  */
 const NAVIGATION_OVERLAY_TEMPLATE_PART_AREA = 'navigation-overlay';
 

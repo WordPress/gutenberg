@@ -3,6 +3,7 @@
  */
 import { useEntityRecords, store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
+import { NAVIGATION_OVERLAY_TEMPLATE_PART_AREA } from '@wordpress/block-library';
 
 /**
  * Internal dependencies
@@ -29,7 +30,7 @@ const useTemplatePartsGroupedByArea = ( items ) => {
 		footer: {},
 		sidebar: {},
 		uncategorized: {},
-		overlay: {},
+		[ NAVIGATION_OVERLAY_TEMPLATE_PART_AREA ]: {},
 	};
 
 	templatePartAreas.forEach(

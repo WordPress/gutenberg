@@ -436,3 +436,4 @@ export const __experimentalRegisterExperimentalCoreBlocks =
 		: undefined;
 
 export { privateApis } from './private-apis';
+export { NAVIGATION_OVERLAY_TEMPLATE_PART_AREA } from './navigation/constants';
