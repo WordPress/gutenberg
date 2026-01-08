@@ -168,7 +168,7 @@ function gutenberg_register_core_block_assets( $block_name ) {
 			wp_deregister_style( "wp-block-{$block_name}-theme" );
 			wp_register_style(
 				"wp-block-{$block_name}-theme",
-				gutenberg_url( $theme_style_path ),
+				$gutenberg_url_root . $theme_style_path,
 				array(),
 				$default_version
 			);
@@ -182,7 +182,7 @@ function gutenberg_register_core_block_assets( $block_name ) {
 		wp_deregister_style( "wp-block-{$block_name}-editor" );
 		wp_register_style(
 			"wp-block-{$block_name}-editor",
-			gutenberg_url( $editor_style_path ),
+			$gutenberg_url_root . $editor_style_path,
 			array(),
 			$default_version
 		);
