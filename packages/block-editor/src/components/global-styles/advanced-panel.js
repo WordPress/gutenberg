@@ -79,6 +79,7 @@ export default function AdvancedPanel( {
 					{ cssError }
 				</Notice>
 			) }
+			{ /* Server errors are not dismissible because they persist in the store until resolved */ }
 			{ serverError && (
 				<Notice status="error" isDismissible={ false }>
 					{ serverError }
