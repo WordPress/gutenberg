@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import isStagedId, { STAGED_ID_PREFIX } from '../is-staged-id';
+import { isStagedId, STAGED_ID_PREFIX } from '../is-staged-id';
 
 describe( 'isStagedId', () => {
 	it( 'returns true for staged IDs', () => {

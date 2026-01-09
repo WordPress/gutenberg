@@ -530,6 +530,7 @@ export const saveEntityRecord =
 		const entityIdKey = entityConfig.key ?? DEFAULT_ENTITY_KEY;
 		const recordId = record[ entityIdKey ];
 		const isLocalStaged =
+			typeof recordId === 'string' &&
 			recordId.startsWith( STAGED_ID_PREFIX ) &&
 			record.__unstablePersistedId === undefined;
 		const serverRecordId = isLocalStaged
