@@ -139,8 +139,8 @@ export const parameters = {
 	sourceLink: {
 		links: {
 			// Disable default links
-			'component-vscode': () => undefined,
-			'story-vscode': () => undefined,
+			'component-editor': () => undefined,
+			'story-editor': () => undefined,
 			'addon-powered-by': () => undefined,
 			// Custom GitHub link
 			'story-github': ( { importPath } ) => {
