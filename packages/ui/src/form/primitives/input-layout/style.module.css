@@ -13,12 +13,12 @@
 		border-color: var(--wpds-color-stroke-interactive-neutral);
 		border-radius: 2px;
 		font-family: var(--wpds-font-family-body);
-		font-size: 16px; /* for mobile */
+		font-size: max(var(--wpds-font-size-md), 16px); /* avoid mobile zoom */
 		line-height: 1;
 		color: var(--wpds-color-fg-content-neutral);
 
 		@media (min-width: 600px) {
-			font-size: 13px;
+			font-size: var(--wpds-font-size-md);
 		}
 
 		&.is-size-compact {
