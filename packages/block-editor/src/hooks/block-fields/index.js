@@ -10,6 +10,7 @@ import {
 import { createHigherOrderComponent } from '@wordpress/compose';
 import { DataForm } from '@wordpress/dataviews';
 import { useContext, useState, useMemo } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -169,7 +170,13 @@ function denormalizeLinkValue( value, fieldDef ) {
 	return result;
 }
 
-function BlockFields( { clientId, blockType, attributes, setAttributes } ) {
+function BlockFields( {
+	clientId,
+	blockType,
+	attributes,
+	setAttributes,
+	isCollapsed = false,
+} ) {
 	const blockTitle = useBlockDisplayTitle( {
 		clientId,
 		context: 'list-view',
@@ -178,9 +185,19 @@ function BlockFields( { clientId, blockType, attributes, setAttributes } ) {
 
 	const blockTypeFields = blockType?.[ fieldsKey ];
 
-	const [ form, setForm ] = useState( () => {
-		return blockType?.[ formKey ];
-	} );
+	const computedForm = useMemo( () => {
+		if ( ! isCollapsed ) {
+			return blockType?.[ formKey ];
+		}
+
+		// For a collapsed form only show the first field by default.
+		return {
+			...blockType?.[ formKey ],
+			fields: [ blockType?.[ formKey ]?.fields?.[ 0 ] ],
+		};
+	}, [ blockType, isCollapsed ] );
+
+	const [ form, setForm ] = useState( computedForm );
 
 	// Build DataForm fields with proper structure
 	const dataFormFields = useMemo( () => {
@@ -310,16 +327,24 @@ function BlockFields( { clientId, blockType, attributes, setAttributes } ) {
 		<div className="block-editor-block-fields__container">
 			<div className="block-editor-block-fields__header">
 				<HStack spacing={ 1 }>
-					<BlockIcon
-						className="block-editor-block-fields__header-icon"
-						icon={ blockInformation?.icon }
-					/>
-					<Truncate
-						className="block-editor-block-fields__header-title"
-						numberOfLines={ 1 }
-					>
-						{ blockTitle }
-					</Truncate>
+					{ isCollapsed && (
+						<>
+							<BlockIcon
+								className="block-editor-block-fields__header-icon"
+								icon={ blockInformation?.icon }
+							/>
+							<h2 className="block-editor-block-fields__header-title">
+								<Truncate numberOfLines={ 1 }>
+									{ blockTitle }
+								</Truncate>
+							</h2>
+						</>
+					) }
+					{ ! isCollapsed && (
+						<h2 className="block-editor-block-fields__header-title">
+							{ __( 'Content' ) }
+						</h2>
+					) }
 					<FieldsDropdownMenu
 						fields={ dataFormFields }
 						visibleFields={ form.fields }
@@ -371,6 +396,7 @@ const withBlockFields = createHigherOrderComponent(
 								<BlockFields
 									{ ...props }
 									blockType={ blockType }
+									isCollapsed
 								/>
 							</PrivateInspectorControlsFill>
 						)
