@@ -11,6 +11,10 @@ module.exports = ( api ) => {
 					require.resolve( '@wordpress/block-library/babel-plugin' ),
 				],
 			},
+			{
+				test: 'packages/vips/**',
+				plugins: [ require.resolve( '@shopify/web-worker/babel' ) ],
+			},
 		],
 	};
 };

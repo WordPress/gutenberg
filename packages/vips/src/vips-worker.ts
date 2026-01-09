@@ -1,52 +1,36 @@
 /**
  * External dependencies
  */
-import { wrap, terminate, type Remote } from '@wordpress/worker-threads';
+import { createWorkerFactory, terminate } from '@shopify/web-worker';
 
 /**
  * Internal dependencies
  */
 import type { ItemId, ImageSizeCrop } from './types';
-import type { WorkerAPI } from './worker';
-import { workerCode } from './worker-code';
 
 /**
- * The worker instance, lazily created on first use.
+ * Creates a worker factory for the vips worker module.
+ * The webpackChunkName comment ensures consistent naming of the worker chunk.
  */
-let worker: Worker | undefined;
+const createVipsWorker = createWorkerFactory(
+	() => import( /* webpackChunkName: 'vips' */ './worker' )
+);
 
-/**
- * The wrapped worker API for RPC calls.
- */
-let workerAPI: Remote< WorkerAPI > | undefined;
+type WorkerCreator = ReturnType< typeof createVipsWorker >;
 
-/**
- * The Blob URL for the worker, kept for cleanup.
- */
-let workerBlobUrl: string | undefined;
+let vipsWorker: WorkerCreator | undefined;
 
 /**
  * Gets or creates the vips worker instance.
  * Uses lazy initialization to only create the worker when needed.
  *
- * The worker code is bundled inline and loaded via a Blob URL.
- * This avoids issues with import.meta.url not being available
- * when the code is bundled via webpack.
- *
- * @return The wrapped worker API.
+ * @return The vips worker instance.
  */
-function getWorkerAPI(): Remote< WorkerAPI > {
-	if ( workerAPI === undefined ) {
-		// Create worker from inline code via Blob URL.
-		// This approach works regardless of how the code is bundled.
-		const blob = new Blob( [ workerCode ], {
-			type: 'application/javascript',
-		} );
-		workerBlobUrl = URL.createObjectURL( blob );
-		worker = new Worker( workerBlobUrl );
-		workerAPI = wrap< WorkerAPI >( worker );
+function getVipsWorker(): WorkerCreator {
+	if ( vipsWorker === undefined ) {
+		vipsWorker = createVipsWorker();
 	}
-	return workerAPI;
+	return vipsWorker;
 }
 
 /**
@@ -68,8 +52,8 @@ export async function vipsConvertImageFormat(
 	quality = 0.82,
 	interlaced = false
 ): Promise< ArrayBuffer | ArrayBufferLike > {
-	const api = getWorkerAPI();
-	return api.convertImageFormat(
+	const worker = getVipsWorker();
+	return worker.convertImageFormat(
 		id,
 		buffer,
 		inputType,
@@ -96,8 +80,8 @@ export async function vipsCompressImage(
 	quality = 0.82,
 	interlaced = false
 ): Promise< ArrayBuffer | ArrayBufferLike > {
-	const api = getWorkerAPI();
-	return api.compressImage( id, buffer, type, quality, interlaced );
+	const worker = getVipsWorker();
+	return worker.compressImage( id, buffer, type, quality, interlaced );
 }
 
 /**
@@ -123,8 +107,8 @@ export async function vipsResizeImage(
 	originalWidth: number;
 	originalHeight: number;
 } > {
-	const api = getWorkerAPI();
-	return api.resizeImage( id, buffer, type, resize, smartCrop );
+	const worker = getVipsWorker();
+	return worker.resizeImage( id, buffer, type, resize, smartCrop );
 }
 
 /**
@@ -136,8 +120,8 @@ export async function vipsResizeImage(
 export async function vipsHasTransparency(
 	buffer: ArrayBuffer
 ): Promise< boolean > {
-	const api = getWorkerAPI();
-	return api.hasTransparency( buffer );
+	const worker = getVipsWorker();
+	return worker.hasTransparency( buffer );
 }
 
 /**
@@ -147,8 +131,8 @@ export async function vipsHasTransparency(
  * @return Whether any operation was cancelled.
  */
 export async function vipsCancelOperations( id: ItemId ): Promise< boolean > {
-	const api = getWorkerAPI();
-	return api.cancelOperations( id );
+	const worker = getVipsWorker();
+	return worker.cancelOperations( id );
 }
 
 /**
@@ -156,13 +140,8 @@ export async function vipsCancelOperations( id: ItemId ): Promise< boolean > {
  * Call this to free up resources when vips processing is no longer needed.
  */
 export function terminateVipsWorker(): void {
-	if ( workerAPI ) {
-		terminate( workerAPI );
-		workerAPI = undefined;
-		worker = undefined;
-	}
-	if ( workerBlobUrl ) {
-		URL.revokeObjectURL( workerBlobUrl );
-		workerBlobUrl = undefined;
+	if ( vipsWorker ) {
+		terminate( vipsWorker );
+		vipsWorker = undefined;
 	}
 }

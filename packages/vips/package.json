@@ -40,6 +40,11 @@
 			"types": "./build-types/vips-worker.d.ts",
 			"import": "./build-module/vips-worker.mjs"
 		},
+		"./worker": {
+			"types": "./build-types/vips-worker.d.ts",
+			"import": "./build-module/vips-worker.mjs",
+			"default": "./build/vips-worker.cjs"
+		},
 		"./package.json": "./package.json"
 	},
 	"types": "build-types",
@@ -47,7 +52,7 @@
 		"./worker": "./src/worker.ts"
 	},
 	"dependencies": {
-		"@wordpress/worker-threads": "file:../worker-threads",
+		"@shopify/web-worker": "^6.4.0",
 		"wasm-vips": "^0.0.10"
 	},
 	"publishConfig": {
