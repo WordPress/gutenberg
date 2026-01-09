@@ -143,3 +143,30 @@ export function getPendingUploads( state: State ): QueueItem[] {
 		);
 	} );
 }
+
+/**
+ * Returns items that failed with an error.
+ *
+ * @param state Upload state.
+ *
+ * @return Failed items.
+ */
+export function getFailedItems( state: State ): QueueItem[] {
+	return state.queue.filter( ( item ) => item.error !== undefined );
+}
+
+/**
+ * Returns the progress of a specific item.
+ *
+ * @param state Upload state.
+ * @param id    Item ID.
+ *
+ * @return Progress value (0-100), or undefined if item not found.
+ */
+export function getItemProgress(
+	state: State,
+	id: QueueItemId
+): number | undefined {
+	const item = state.queue.find( ( i ) => i.id === id );
+	return item?.progress;
+}
