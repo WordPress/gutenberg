@@ -713,7 +713,6 @@ export default function Image( {
 		);
 
 	const hasDataFormBlockFields =
-		window?.__experimentalContentOnlyPatternInsertion &&
 		window?.__experimentalContentOnlyInspectorFields;
 
 	const controls = (
