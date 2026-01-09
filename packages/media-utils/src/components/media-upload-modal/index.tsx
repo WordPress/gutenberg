@@ -14,6 +14,7 @@ import { DataViewsPicker } from '@wordpress/dataviews';
 import type { View, Field, ActionButton } from '@wordpress/dataviews';
 import {
 	altTextField,
+	attachedToField,
 	captionField,
 	dateAddedField,
 	dateModifiedField,
@@ -213,6 +214,7 @@ export function MediaUploadModal( {
 			order: view.sort?.direction,
 			orderby: view.sort?.field,
 			search: view.search,
+			_embed: 'wp:attached-to',
 			...filters,
 		};
 	}, [ view, allowedTypes ] );
@@ -251,6 +253,7 @@ export function MediaUploadModal( {
 			filesizeField as Field< RestAttachment >,
 			mediaDimensionsField as Field< RestAttachment >,
 			mimeTypeField as Field< RestAttachment >,
+			attachedToField as Field< RestAttachment >,
 		],
 		[]
 	);

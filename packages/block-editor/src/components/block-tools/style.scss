@@ -166,6 +166,11 @@
 			content: "";
 		}
 
+		// Hide the dot divider since the parent selector is visually separated.
+		&::after {
+			display: none;
+		}
+
 		.block-editor-block-parent-selector__button {
 			border: $border-width solid $gray-900;
 			padding-right: 6px;
@@ -186,6 +191,11 @@
 			position: relative;
 			left: auto;
 			margin-left: -$border-width;
+
+			// Show the dot divider since the parent selector is inline.
+			&::after {
+				display: inline-flex;
+			}
 		}
 
 		.block-editor-block-mover__move-button-container,

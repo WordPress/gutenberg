@@ -114,11 +114,14 @@ function gutenberg_deregister_core_block_and_assets( $block_name ) {
  * @return void
  */
 function gutenberg_register_core_block_assets( $block_name ) {
+	static $gutenberg_url_root = null;
 	// Running `gutenberg_url` inside of a loop can be expensive in systems with
 	// many callbacks attached to the `plugins_url` hook.
 	// Since all of the paths have the same root, we can instead retrieve the
 	// corresponding URL root once, and manually concatenate the URL below.
-	static $gutenberg_url_root = gutenberg_url( '/' );
+	if ( is_null( $gutenberg_url_root ) ) {
+		$gutenberg_url_root = gutenberg_url( '/' );
+	}
 
 	if ( ! wp_should_load_separate_core_block_assets() ) {
 		return;

@@ -6,6 +6,7 @@
 	},
 	"references": [
 		{ "path": "../components" },
+		{ "path": "../compose" },
 		{ "path": "../core-data" },
 		{ "path": "../data" },
 		{ "path": "../dataviews" },
