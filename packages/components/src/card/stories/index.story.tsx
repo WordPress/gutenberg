@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react-webpack5';
 
 /**
  * Internal dependencies
@@ -20,7 +20,6 @@ import Button from '../../button';
 
 const meta: Meta< typeof Card > = {
 	component: Card,
-	// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 	subcomponents: { CardHeader, CardBody, CardDivider, CardMedia, CardFooter },
 	title: 'Components/Containers/Card',
 	id: 'components-card',

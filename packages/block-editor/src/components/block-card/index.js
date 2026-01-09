@@ -11,17 +11,19 @@ import {
 	Icon,
 	__experimentalText as Text,
 	__experimentalVStack as VStack,
+	__experimentalHStack as HStack,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
-import { __, isRTL } from '@wordpress/i18n';
+import { __, sprintf, isRTL } from '@wordpress/i18n';
 import {
 	chevronLeft,
 	chevronRight,
 	arrowRight,
 	arrowLeft,
 } from '@wordpress/icons';
+import { getBlockType, hasBlockSupport } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -103,18 +105,32 @@ function BlockCard( {
 		( { title, icon, description } = blockType );
 	}
 
-	const parentNavBlockClientId = useSelect(
+	const { parentBlockClientId, parentBlockName } = useSelect(
 		( select ) => {
 			if ( parentClientId || isChild || ! allowParentNavigation ) {
-				return;
+				return {};
 			}
-			const { getBlockParentsByBlockName } = select( blockEditorStore );
+			const { getBlockParents, getBlockName } =
+				select( blockEditorStore );
 
-			return getBlockParentsByBlockName(
-				clientId,
-				'core/navigation',
-				true
-			)[ 0 ];
+			// Find the closest parent block that is either:
+			// 1. A navigation block (special case for ad-hoc list view support)
+			// 2. Any block with listView support
+			const parents = getBlockParents( clientId, true );
+			const foundParentId = parents.find( ( parentId ) => {
+				const parentName = getBlockName( parentId );
+				return (
+					parentName === 'core/navigation' ||
+					hasBlockSupport( parentName, 'listView' )
+				);
+			} );
+
+			return {
+				parentBlockClientId: foundParentId,
+				parentBlockName: foundParentId
+					? getBlockName( foundParentId )
+					: null,
+			};
 		},
 		[ clientId, allowParentNavigation, isChild, parentClientId ]
 	);
@@ -134,56 +150,66 @@ function BlockCard( {
 				className
 			) }
 		>
-			{ parentNavBlockClientId && ( // This is only used by the Navigation block for now. It's not ideal having Navigation block specific code here.
-				<Button
-					onClick={ () => selectBlock( parentNavBlockClientId ) }
-					label={
-						parentNavBlockClientId
-							? __( 'Go to parent Navigation block' )
-							: // TODO - improve copy, not sure that we should use the term 'section'
-							  __( 'Go to parent section' )
-					}
-					style={
-						// TODO: This style override is also used in ToolsPanelHeader.
-						// It should be supported out-of-the-box by Button.
-						{ minWidth: 24, padding: 0 }
-					}
-					icon={ isRTL() ? chevronRight : chevronLeft }
-					size="small"
-				/>
-			) }
-			{ isChild && (
-				<span className="block-editor-block-card__child-indicator-icon">
-					<Icon icon={ isRTL() ? arrowLeft : arrowRight } />
-				</span>
-			) }
-			<OptionalParentSelectButton
-				onClick={
-					parentClientId
-						? () => {
-								selectBlock( parentClientId );
-						  }
-						: undefined
-				}
-			>
-				<BlockIcon icon={ icon } showColors />
-				<VStack spacing={ 1 }>
-					<TitleElement className="block-editor-block-card__title">
-						<span className="block-editor-block-card__name">
-							{ !! name?.length ? name : title }
-						</span>
-						{ ! parentClientId && ! isChild && !! name?.length && (
-							<Badge>{ title }</Badge>
-						) }
-					</TitleElement>
-					{ ! parentClientId && ! isChild && description && (
-						<Text className="block-editor-block-card__description">
-							{ description }
-						</Text>
+			<VStack>
+				<HStack justify="flex-start" spacing={ 0 }>
+					{ parentBlockClientId && (
+						<Button
+							onClick={ () => selectBlock( parentBlockClientId ) }
+							label={
+								parentBlockName
+									? sprintf(
+											/* translators: %s: The name of the parent block. */
+											__( 'Go to "%s" block' ),
+											getBlockType( parentBlockName )
+												?.title
+									  )
+									: __( 'Go to parent block' )
+							}
+							style={
+								// TODO: This style override is also used in ToolsPanelHeader.
+								// It should be supported out-of-the-box by Button.
+								{ minWidth: 24, padding: 0 }
+							}
+							icon={ isRTL() ? chevronRight : chevronLeft }
+							size="small"
+						/>
 					) }
-					{ children }
-				</VStack>
-			</OptionalParentSelectButton>
+					{ isChild && (
+						<span className="block-editor-block-card__child-indicator-icon">
+							<Icon icon={ isRTL() ? arrowLeft : arrowRight } />
+						</span>
+					) }
+					<OptionalParentSelectButton
+						onClick={
+							parentClientId
+								? () => {
+										selectBlock( parentClientId );
+								  }
+								: undefined
+						}
+					>
+						<BlockIcon icon={ icon } showColors />
+						<VStack spacing={ 1 }>
+							<TitleElement className="block-editor-block-card__title">
+								<span className="block-editor-block-card__name">
+									{ !! name?.length ? name : title }
+								</span>
+								{ ! parentClientId &&
+									! isChild &&
+									!! name?.length && (
+										<Badge>{ title }</Badge>
+									) }
+							</TitleElement>
+							{ children }
+						</VStack>
+					</OptionalParentSelectButton>
+				</HStack>
+				{ ! parentClientId && ! isChild && description && (
+					<Text className="block-editor-block-card__description">
+						{ description }
+					</Text>
+				) }
+			</VStack>
 		</div>
 	);
 }

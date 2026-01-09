@@ -1,5 +1,6 @@
 @use "@wordpress/base-styles/default-custom-properties";
 @use "./components/create-template-part-modal/style.scss" as *;
+@use "./components/media-edit/style.scss" as *;
 @use "./fields/slug/style.scss" as *;
 @use "./fields/featured-image/style.scss" as *;
 @use "./fields/parent/style.scss" as *;

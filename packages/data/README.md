@@ -620,7 +620,7 @@ _Parameters_
 
 _Returns_
 
--   `Object`: Object containing the store's promise-wrapped selectors.
+-   `CurriedSelectorsResolveOf< T >`: Object containing the store's promise-wrapped selectors.
 
 ### select
 

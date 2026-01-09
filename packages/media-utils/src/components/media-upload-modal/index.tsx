@@ -14,7 +14,10 @@ import { DataViewsPicker } from '@wordpress/dataviews';
 import type { View, Field, ActionButton } from '@wordpress/dataviews';
 import {
 	altTextField,
+	attachedToField,
 	captionField,
+	dateAddedField,
+	dateModifiedField,
 	descriptionField,
 	filenameField,
 	filesizeField,
@@ -184,9 +187,12 @@ export function MediaUploadModal( {
 				filters.author = filter.value;
 			}
 			// Handle date filters
-			if ( filter.field === 'date' ) {
-				filters.after = filter.value?.after;
-				filters.before = filter.value?.before;
+			if ( filter.field === 'date' || filter.field === 'modified' ) {
+				if ( filter.operator === 'before' ) {
+					filters.before = filter.value;
+				} else if ( filter.operator === 'after' ) {
+					filters.after = filter.value;
+				}
 			}
 			// Handle mime type filters
 			if ( filter.field === 'mime_type' ) {
@@ -208,6 +214,7 @@ export function MediaUploadModal( {
 			order: view.sort?.direction,
 			orderby: view.sort?.field,
 			search: view.search,
+			_embed: 'wp:attached-to',
 			...filters,
 		};
 	}, [ view, allowedTypes ] );
@@ -240,10 +247,13 @@ export function MediaUploadModal( {
 			altTextField as Field< RestAttachment >,
 			captionField as Field< RestAttachment >,
 			descriptionField as Field< RestAttachment >,
+			dateAddedField as Field< RestAttachment >,
+			dateModifiedField as Field< RestAttachment >,
 			filenameField as Field< RestAttachment >,
 			filesizeField as Field< RestAttachment >,
 			mediaDimensionsField as Field< RestAttachment >,
 			mimeTypeField as Field< RestAttachment >,
+			attachedToField as Field< RestAttachment >,
 		],
 		[]
 	);
@@ -267,15 +277,16 @@ export function MediaUploadModal( {
 
 					const selectedPosts = await resolveSelect(
 						coreStore
-					).getEntityRecords(
+					).getEntityRecords< RestAttachment >(
 						'postType',
 						'attachment',
 						selectedPostsQuery
 					);
 
 					// Transform the selected posts to the expected Attachment format
-					const transformedPosts =
-						selectedPosts?.map( transformAttachment );
+					const transformedPosts = ( selectedPosts ?? [] )
+						.map( transformAttachment )
+						.filter( Boolean );
 
 					const selectedItems = multiple
 						? transformedPosts
@@ -324,7 +335,7 @@ export function MediaUploadModal( {
 				showTitle: false,
 			},
 			[ LAYOUT_PICKER_TABLE ]: {
-				fields: [ 'filename', 'filesize', 'media_dimensions' ],
+				fields: [ 'filename', 'filesize', 'media_dimensions', 'date' ],
 				showTitle: true,
 			},
 		} ),
@@ -349,6 +360,7 @@ export function MediaUploadModal( {
 			onRequestClose={ handleModalClose }
 			isDismissible={ isDismissible }
 			className={ modalClass }
+			overlayClassName="media-upload-modal"
 			size="fill"
 			headerActions={
 				<FormFileUpload

@@ -8,7 +8,7 @@ import type {
 	SortDirection,
 } from '../types';
 import type { FieldType } from '../types/private';
-import { getControl } from '../dataform-controls';
+import { getControl } from '../components/dataform-controls';
 import getFilterBy from './utils/get-filter-by';
 import getValueFromId from './utils/get-value-from-id';
 import hasElements from './utils/has-elements';

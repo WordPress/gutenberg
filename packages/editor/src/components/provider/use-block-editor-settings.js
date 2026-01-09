@@ -98,6 +98,7 @@ const {
 	mediaEditKey,
 	getMediaSelectKey,
 	isIsolatedEditorKey,
+	deviceTypeKey,
 } = unlock( privateApis );
 
 /**
@@ -128,6 +129,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		userPatternCategories,
 		restBlockPatternCategories,
 		sectionRootClientId,
+		deviceType,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -139,6 +141,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 			} = select( coreStore );
 			const { get } = select( preferencesStore );
 			const { getBlockTypes } = select( blocksStore );
+			const { getDeviceType } = unlock( select( editorStore ) );
 			const { getBlocksByName, getBlockAttributes } =
 				select( blockEditorStore );
 			const siteSettings = canUser( 'read', {
@@ -192,6 +195,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 				userPatternCategories: getUserPatternCategories(),
 				restBlockPatternCategories: getBlockPatternCategories(),
 				sectionRootClientId: getSectionRootBlock(),
+				deviceType: getDeviceType(),
 			};
 		},
 		[ postType, postId, isLargeViewport, renderingMode ]
@@ -383,6 +387,9 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 				'wp_block',
 				'wp_navigation',
 			].includes( postType ),
+			...( window.__experimentalHideBlocksBasedOnScreenSize && deviceType
+				? { [ deviceTypeKey ]: deviceType }
+				: {} ),
 		};
 
 		return blockEditorSettings;
@@ -413,6 +420,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		renderingMode,
 		editMediaEntity,
 		wrappedOnNavigateToEntityRecord,
+		deviceType,
 	] );
 }
 

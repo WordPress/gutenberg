@@ -23,6 +23,7 @@ import type {
 	CollectionFontFamily,
 	FontFace,
 	FontFamily,
+	WpFontFamily,
 } from '@wordpress/core-data';
 
 /**
@@ -244,11 +245,15 @@ function FontLibraryProvider( { children }: { children: React.ReactNode } ) {
 				// Get the font family if it already exists.
 				const fontFamilyRecords = await resolveSelect(
 					coreStore
-				).getEntityRecords( 'postType', 'wp_font_family', {
-					slug: fontFamilyToInstall.slug,
-					per_page: 1,
-					_embed: true,
-				} );
+				).getEntityRecords< WpFontFamily >(
+					'postType',
+					'wp_font_family',
+					{
+						slug: fontFamilyToInstall.slug,
+						per_page: 1,
+						_embed: true,
+					}
+				);
 
 				const fontFamilyPost =
 					fontFamilyRecords && fontFamilyRecords.length > 0
@@ -315,6 +320,7 @@ function FontLibraryProvider( { children }: { children: React.ReactNode } ) {
 				}[] = [];
 				if ( fontFamilyToInstall?.fontFace?.length ?? 0 > 0 ) {
 					const response = await batchInstallFontFaces(
+						// @ts-expect-error - Type mismatch: WpFontFamily.id can be number | string, but batchInstallFontFaces expects only string.
 						installedFontFamily.id,
 						makeFontFacesFormData(
 							fontFamilyToInstall as FontFamily
@@ -379,6 +385,7 @@ function FontLibraryProvider( { children }: { children: React.ReactNode } ) {
 			if ( fontFamiliesToActivate.length > 0 ) {
 				// Activate the font family (add the font family to the global styles).
 				const activeFonts = activateCustomFontFamilies(
+					// @ts-expect-error - Type mismatch: items may have id as number | string, but FontFamily.id should be string | undefined.
 					fontFamiliesToActivate
 				);
 				// Save the global styles to the database.

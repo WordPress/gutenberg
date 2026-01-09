@@ -1,17 +1,5 @@
-/**
- * External dependencies
- */
-import type { Meta, StoryObj } from '@storybook/react';
-
-/**
- * WordPress dependencies
- */
+import type { Meta, StoryObj } from '@storybook/react-webpack5';
 import { Fragment } from '@wordpress/element';
-import '@wordpress/theme/design-tokens.css';
-
-/**
- * Internal dependencies
- */
 import { Badge } from '../index';
 
 const meta: Meta< typeof Badge > = {

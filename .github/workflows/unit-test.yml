@@ -163,7 +163,7 @@ jobs:
               uses: ./.github/setup-node
 
             - name: Run build scripts
-              run: npm run build
+              run: npm run build -- --fast
 
             - name: Upload built JavaScript assets
               uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
@@ -184,17 +184,11 @@ jobs:
             fail-fast: true
             matrix:
                 event: ['${{ github.event_name }}']
-                php: ['7.2', '7.3', '7.4', '8.0', '8.1', '8.2', '8.3']
+                php: ['7.4', '8.0', '8.1', '8.2', '8.3']
                 multisite: [false, true]
                 wordpress: ['', 'previous major version']
                 exclude:
-                    # On PRs: Only test PHP 8.3, single-site, latest WP
-                    - event: 'pull_request'
-                      php: '7.2'
-                    - event: 'pull_request'
-                      php: '7.3'
-                    - event: 'pull_request'
-                      php: '7.4'
+                    # On PRs: Only test PHP 7.4 and 8.3, single-site, latest WP
                     - event: 'pull_request'
                       php: '8.0'
                     - event: 'pull_request'
@@ -206,8 +200,6 @@ jobs:
                     - event: 'pull_request'
                       wordpress: 'previous major version'
                     # On trunk/releases: Only test previous WP version with specific PHP versions
-                    - php: '7.3'
-                      wordpress: 'previous major version'
                     - php: '8.0'
                       wordpress: 'previous major version'
                     - php: '8.1'

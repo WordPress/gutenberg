@@ -7,6 +7,7 @@ import type { Placement, ReferenceType } from '@floating-ui/react-dom';
 /**
  * Internal dependencies
  */
+import { DROPDOWN_MOTION } from '../utils';
 import type {
 	PopoverProps,
 	PopoverAnchorRefReference,
@@ -129,14 +130,19 @@ export const placementToMotionAnimationProps = (
 		style: PLACEMENT_TO_ANIMATION_ORIGIN[ placement ],
 		initial: {
 			opacity: 0,
-			[ translateProp ]: `${ 4 * translateDirection }px`,
+			[ translateProp ]: `${
+				DROPDOWN_MOTION.SLIDE_DISTANCE * translateDirection
+			}px`,
 		},
 		animate: { opacity: 1, [ translateProp ]: 0 },
 		transition: {
-			opacity: { duration: 0.08, ease: 'linear' },
+			opacity: {
+				duration: DROPDOWN_MOTION.FADE_DURATION / 1000,
+				ease: DROPDOWN_MOTION.FADE_EASING.function,
+			},
 			[ translateProp ]: {
-				duration: 0.3,
-				ease: cubicBezier( 0, 0, 0, 1 ),
+				duration: DROPDOWN_MOTION.SLIDE_DURATION / 1000,
+				ease: cubicBezier( ...DROPDOWN_MOTION.SLIDE_EASING.args ),
 			},
 		},
 	};

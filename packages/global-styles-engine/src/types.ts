@@ -285,7 +285,6 @@ export interface GlobalStylesStyles {
 		lineHeight?: UnresolvedValue;
 		letterSpacing?: UnresolvedValue;
 		textTransform?: UnresolvedValue;
-		textIndent?: UnresolvedValue;
 	};
 	spacing?: {
 		padding?: UnresolvedValue | Record< string, UnresolvedValue >;

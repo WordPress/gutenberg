@@ -7,9 +7,8 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import { privateApis as routePrivateApis } from '@wordpress/route';
-// @ts-expect-error Commands is not typed properly.
-import { CommandMenu } from '@wordpress/commands';
 import { EditorSnackbars } from '@wordpress/editor';
+import { SlotFillProvider } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -42,35 +41,39 @@ export default function RootSinglePage() {
 	useRouteTitle();
 
 	return (
-		<UserThemeProvider isRoot color={ { bg: '#f8f8f8' } }>
-			<UserThemeProvider color={ { bg: '#1d2327' } }>
-				<div
-					className={ clsx( 'boot-layout boot-layout--single-page', {
-						'has-canvas': !! canvas || canvas === null,
-						'has-full-canvas': isFullScreen,
-					} ) }
-				>
-					<CommandMenu />
-					<SavePanel />
-					<EditorSnackbars />
-					<div className="boot-layout__surfaces">
-						<UserThemeProvider color={ { bg: '#ffffff' } }>
-							<Outlet />
-							{ /* Render Canvas in Root to prevent remounting on route changes */ }
-							{ ( canvas || canvas === null ) && (
-								<div className="boot-layout__canvas">
-									<CanvasRenderer
-										canvas={ canvas }
-										routeContentModule={
-											routeContentModule
-										}
-									/>
-								</div>
-							) }
-						</UserThemeProvider>
+		<SlotFillProvider>
+			<UserThemeProvider isRoot color={ { bg: '#f8f8f8' } }>
+				<UserThemeProvider color={ { bg: '#1d2327' } }>
+					<div
+						className={ clsx(
+							'boot-layout boot-layout--single-page',
+							{
+								'has-canvas': !! canvas || canvas === null,
+								'has-full-canvas': isFullScreen,
+							}
+						) }
+					>
+						<SavePanel />
+						<EditorSnackbars />
+						<div className="boot-layout__surfaces">
+							<UserThemeProvider color={ { bg: '#ffffff' } }>
+								<Outlet />
+								{ /* Render Canvas in Root to prevent remounting on route changes */ }
+								{ ( canvas || canvas === null ) && (
+									<div className="boot-layout__canvas">
+										<CanvasRenderer
+											canvas={ canvas }
+											routeContentModule={
+												routeContentModule
+											}
+										/>
+									</div>
+								) }
+							</UserThemeProvider>
+						</div>
 					</div>
-				</div>
+				</UserThemeProvider>
 			</UserThemeProvider>
-		</UserThemeProvider>
+		</SlotFillProvider>
 	);
 }
