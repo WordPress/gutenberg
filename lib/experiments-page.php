@@ -187,7 +187,7 @@ function gutenberg_initialize_experiments_settings() {
 
 	add_settings_field(
 		'gutenberg-content-only-pattern-insertion',
-		__( 'contentOnly: Make patterns contentOnly by default upon insertion', 'gutenberg' ),
+		__( 'Pattern Editing: Make patterns contentOnly by default upon insertion', 'gutenberg' ),
 		'gutenberg_display_experiment_field',
 		'gutenberg-experiments',
 		'gutenberg_experiments_section',
