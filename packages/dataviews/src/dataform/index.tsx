@@ -33,11 +33,17 @@ export default function DataForm< Item >( {
 
 	// Resolve labelMode (handles 'auto')
 	const effectiveLabelMode: 'showRequired' | 'showOptional' = useMemo( () => {
-		if ( form.labelMode === 'showOptional' ) return 'showOptional';
-		if ( form.labelMode === 'showRequired' ) return 'showRequired';
+		if ( form.labelMode === 'showOptional' ) {
+			return 'showOptional';
+		}
+		if ( form.labelMode === 'showRequired' ) {
+			return 'showRequired';
+		}
 		if ( form.labelMode === 'auto' ) {
 			const optionalCount = normalizedFields.length - requiredCount;
-			return requiredCount >= optionalCount ? 'showOptional' : 'showRequired';
+			return requiredCount >= optionalCount
+				? 'showOptional'
+				: 'showRequired';
 		}
 		return 'showRequired';
 	}, [ form.labelMode, requiredCount, normalizedFields.length ] );
