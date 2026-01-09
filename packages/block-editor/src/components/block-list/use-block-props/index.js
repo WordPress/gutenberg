@@ -103,6 +103,8 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		isSectionBlock,
 		isWithinSectionBlock,
 		canMove,
+		blockVisibility,
+		deviceType,
 	} = useContext( PrivateBlockContext );
 
 	// translators: %s: Type of block (i.e. Text, Image etc)
@@ -138,7 +140,11 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		  }
 		: {};
 
-	const { isBlockCurrentlyHidden } = useBlockVisibility( clientId );
+	// Use block visibility hook with data from context to avoid extra subscription.
+	const { isBlockCurrentlyHidden } = useBlockVisibility( {
+		blockVisibility,
+		deviceType,
+	} );
 
 	// Ensures it warns only inside the `edit` implementation for the block.
 	if ( blockApiVersion < 2 && clientId === blockEditContext.clientId ) {
