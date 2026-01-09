@@ -46,6 +46,7 @@
 		"@octokit/rest": "16.26.0",
 		"@playwright/test": "1.57.0",
 		"@pmmmwh/react-refresh-webpack-plugin": "0.5.11",
+		"@shopify/web-worker": "^6.4.0",
 		"@storybook/addon-a11y": "9.1.17",
 		"@storybook/addon-docs": "^9.1.17",
 		"@storybook/addon-webpack5-compiler-babel": "3.0.3",
