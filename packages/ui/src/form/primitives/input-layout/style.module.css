@@ -15,7 +15,7 @@
 		font-family: var(--wpds-font-family-body);
 		font-size: max(var(--wpds-font-size-md), 16px); /* avoid mobile zoom */
 		line-height: 1;
-		color: var(--wpds-color-fg-content-neutral);
+		color: var(--wpds-color-fg-interactive-neutral);
 
 		@media (min-width: 600px) {
 			font-size: var(--wpds-font-size-md);
