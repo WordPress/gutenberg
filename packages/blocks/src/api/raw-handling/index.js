@@ -18,12 +18,6 @@ import shortcodeConverter from './shortcode-converter';
 import { deepFilterHTML, getBlockContentSchema } from './utils';
 
 export { pasteHandler, getLatexToMathML } from './paste-handler';
-export {
-	default as latexDelimiterConverter,
-	hasLatexDelimiters,
-	isPureDisplayMath,
-	extractDisplayMathContent,
-} from './latex-delimiter-converter';
 
 export function deprecatedGetPhrasingContentSchema( context ) {
 	deprecated( 'wp.blocks.getPhrasingContentSchema', {

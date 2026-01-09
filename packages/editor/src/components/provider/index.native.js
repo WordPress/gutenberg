@@ -42,7 +42,10 @@ import {
 	getColorsAndGradients,
 } from '@wordpress/block-editor';
 import { NEW_BLOCK_TYPES } from '@wordpress/block-library';
+import { store as coreStore } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
+import { store as noticesStore } from '@wordpress/notices';
+import { EditorHelpTopics, store as editorStore } from '@wordpress/editor';
 
 const postTypeEntities = [
 	{ name: 'post', baseURL: '/wp/v2/posts' },
@@ -65,9 +68,6 @@ const postTypeEntities = [
 	},
 	rawAttributes: [ 'title', 'excerpt', 'content' ],
 } ) );
-import { store as coreStore } from '@wordpress/core-data';
-import { store as noticesStore } from '@wordpress/notices';
-import { EditorHelpTopics, store as editorStore } from '@wordpress/editor';
 
 /**
  * Internal dependencies

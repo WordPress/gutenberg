@@ -38,7 +38,16 @@ const transforms = {
 					node.nodeName.toUpperCase() === 'MATH'
 						? node
 						: node.querySelector( 'math[display="block"]' );
-				const latex = mathElement?.getAttribute( 'data-latex' ) || '';
+
+				// Try data-latex attribute first (old format), then annotation element (Temml format)
+				let latex = mathElement?.getAttribute( 'data-latex' ) || '';
+				if ( ! latex ) {
+					const annotation = mathElement?.querySelector(
+						'annotation[encoding="application/x-tex"]'
+					);
+					latex = annotation?.textContent || '';
+				}
+
 				let mathML = '';
 				const latexToMathML = getLatexToMathML();
 				if ( latexToMathML ) {

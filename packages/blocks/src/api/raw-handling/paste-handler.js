@@ -33,18 +33,67 @@ import { deepFilterHTML, isPlain, getBlockContentSchema } from './utils';
 import emptyParagraphRemover from './empty-paragraph-remover';
 import slackParagraphCorrector from './slack-paragraph-corrector';
 import isLatexMathMode from './latex-to-math';
-import latexDelimiterConverter, {
-	hasLatexDelimiters,
-	isPureDisplayMath,
-	extractDisplayMathContent,
-} from './latex-delimiter-converter';
 import { createBlock } from '../factory';
 import headingTransformer from './heading-transformer';
 
 const log = ( ...args ) => window?.console?.log?.( ...args );
 
-// Module-level cache for lazy-loaded latex-to-mathml
+// Module-level cache for lazy-loaded latex-to-mathml functions
 let latexToMathMLFn = null;
+let renderMathInHTMLFn = null;
+
+/**
+ * Quick regex check for LaTeX delimiters. Used to decide whether to lazy-load
+ * the math rendering library.
+ *
+ * @param {string} text The text to check.
+ * @return {boolean} True if any LaTeX delimiters are found.
+ */
+function hasLatexDelimiters( text ) {
+	if ( ! text ) {
+		return false;
+	}
+	// Check for $$...$$, $...$, \[...\], \(...\)
+	return /\$\$|\\\[|\\\(|\$[^$\n]+\$/.test( text );
+}
+
+/**
+ * Checks if the entire text is a single display math expression.
+ * Matches $$...$$ or \[...\] with optional whitespace.
+ *
+ * @param {string} text The text to check.
+ * @return {boolean} True if pure display math.
+ */
+function isPureDisplayMath( text ) {
+	if ( ! text ) {
+		return false;
+	}
+	const trimmed = text.trim();
+	// Match $$...$$ or \[...\]
+	return (
+		/^\$\$[\s\S]+\$\$$/.test( trimmed ) ||
+		/^\\\[[\s\S]+\\\]$/.test( trimmed )
+	);
+}
+
+/**
+ * Extracts the LaTeX content from display math delimiters.
+ *
+ * @param {string} text The text containing display math.
+ * @return {string} The LaTeX content without delimiters.
+ */
+function extractDisplayMathContent( text ) {
+	const trimmed = text.trim();
+	// Remove $$...$$ delimiters
+	if ( trimmed.startsWith( '$$' ) && trimmed.endsWith( '$$' ) ) {
+		return trimmed.slice( 2, -2 ).trim();
+	}
+	// Remove \[...\] delimiters
+	if ( trimmed.startsWith( '\\[' ) && trimmed.endsWith( '\\]' ) ) {
+		return trimmed.slice( 2, -2 ).trim();
+	}
+	return trimmed;
+}
 
 /**
  * Returns the cached latex-to-mathml function, or null if not yet loaded.
@@ -107,9 +156,10 @@ export async function pasteHandler( options ) {
 		isPureDisplayMath( plainText ) ||
 		isLatexMathMode( plainText )
 	) {
-		if ( ! latexToMathMLFn ) {
+		if ( ! latexToMathMLFn || ! renderMathInHTMLFn ) {
 			const module = await import( '@wordpress/latex-to-mathml' );
 			latexToMathMLFn = module.default;
+			renderMathInHTMLFn = module.renderMathInHTML;
 		}
 	}
 	return pasteHandlerSync( options );
@@ -215,11 +265,12 @@ function pasteHandlerSync( {
 		}
 	}
 
-	// Convert LaTeX delimiters to <math> elements.
-	// Runs after Markdown conversion to handle mixed Markdown + LaTeX content.
-	// Skips content inside <code>, <pre>, etc.
-	if ( hasLatexDelimiters( HTML ) ) {
-		HTML = latexDelimiterConverter( HTML );
+	// Convert LaTeX delimiters to MathML.
+	// Runs AFTER markdown for plain text (only $...$ and $$...$$ work - backslash
+	// delimiters are consumed by markdown's escape handling).
+	// For HTML input, all delimiter types work.
+	if ( renderMathInHTMLFn && hasLatexDelimiters( HTML ) ) {
+		HTML = renderMathInHTMLFn( HTML );
 	}
 
 	// An array of HTML strings and block objects. The blocks replace matched

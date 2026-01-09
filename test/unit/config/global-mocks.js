@@ -63,3 +63,20 @@ if ( ! global.TextEncoder ) {
 // Override jsdom built-ins with native node implementation.
 global.Blob = BlobPolyfill;
 global.File = FilePolyfill;
+
+/**
+ * Polyfill for MathML element style property.
+ * JSDOM doesn't support style on MathML elements, but Temml needs it.
+ * This patches createElementNS to add a dummy style object for MathML elements.
+ */
+const originalCreateElementNS = document.createElementNS.bind( document );
+document.createElementNS = function ( namespaceURI, qualifiedName ) {
+	const element = originalCreateElementNS( namespaceURI, qualifiedName );
+	if (
+		namespaceURI === 'http://www.w3.org/1998/Math/MathML' &&
+		! element.style
+	) {
+		element.style = {};
+	}
+	return element;
+};
