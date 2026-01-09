@@ -19,6 +19,7 @@ export interface QueueItem {
 	currentOperation?: OperationType;
 	operations?: Operation[];
 	error?: Error;
+	retryCount?: number;
 	batchId?: string;
 	sourceUrl?: string;
 	sourceAttachmentId?: number;
@@ -38,6 +39,7 @@ export enum Type {
 	Prepare = 'PREPARE_ITEM',
 	Cancel = 'CANCEL_ITEM',
 	Remove = 'REMOVE_ITEM',
+	RetryItem = 'RETRY_ITEM',
 	PauseItem = 'PAUSE_ITEM',
 	ResumeItem = 'RESUME_ITEM',
 	PauseQueue = 'PAUSE_QUEUE',
@@ -81,6 +83,7 @@ export type CancelAction = Action<
 	Type.Cancel,
 	{ id: QueueItemId; error: Error }
 >;
+export type RetryItemAction = Action< Type.RetryItem, { id: QueueItemId } >;
 export type PauseItemAction = Action< Type.PauseItem, { id: QueueItemId } >;
 export type ResumeItemAction = Action< Type.ResumeItem, { id: QueueItemId } >;
 export type PauseQueueAction = Action< Type.PauseQueue >;

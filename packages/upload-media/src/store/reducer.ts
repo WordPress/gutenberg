@@ -15,6 +15,7 @@ import {
 	type RemoveAction,
 	type ResumeItemAction,
 	type ResumeQueueAction,
+	type RetryItemAction,
 	type RevokeBlobUrlsAction,
 	type State,
 	Type,
@@ -39,6 +40,7 @@ type Action =
 	| AddAction
 	| RemoveAction
 	| CancelAction
+	| RetryItemAction
 	| PauseItemAction
 	| ResumeItemAction
 	| PauseQueueAction
@@ -113,6 +115,22 @@ function reducer(
 							? {
 									...item,
 									error: action.error,
+							  }
+							: item
+				),
+			};
+
+		case Type.RetryItem:
+			return {
+				...state,
+				queue: state.queue.map(
+					( item ): QueueItem =>
+						item.id === action.id
+							? {
+									...item,
+									status: ItemStatus.Processing,
+									error: undefined,
+									retryCount: ( item.retryCount ?? 0 ) + 1,
 							  }
 							: item
 				),
