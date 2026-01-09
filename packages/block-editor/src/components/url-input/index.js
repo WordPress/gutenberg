@@ -452,7 +452,7 @@ class URLInput extends Component {
 			value,
 			required: true,
 			type: 'text',
-			name: 'url-input-control',
+			name: inputId,
 			onChange: disabled ? () => {} : this.onChange, // Disable onChange when disabled
 			onFocus: disabled ? () => {} : this.onFocus, // Disable onFocus when disabled
 			placeholder,
