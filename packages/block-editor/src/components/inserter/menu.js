@@ -75,6 +75,8 @@ function InserterMenu(
 	const [ selectedMediaCategory, setSelectedMediaCategory ] =
 		useState( null );
 	const isLargeViewport = useViewportMatch( 'large' );
+	const isMobileViewport = useViewportMatch( 'medium', '<' );
+	const onInserterClose = isMobileViewport ? onClose : NOOP;
 
 	function getInitialTab() {
 		if ( __experimentalInitialTab ) {
@@ -114,6 +116,7 @@ function InserterMenu(
 				_rootClientId
 			);
 			onSelect( blocks );
+			onInserterClose();
 
 			// Check for focus loss due to filtering blocks by selected block type
 			window.requestAnimationFrame( () => {
@@ -136,6 +139,7 @@ function InserterMenu(
 			onToggleInsertionPoint( false );
 			onInsertBlocks( blocks, { patternName }, ...args );
 			onSelect();
+			onInserterClose();
 		},
 		[ onInsertBlocks, onSelect ]
 	);
