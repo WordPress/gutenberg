@@ -352,6 +352,12 @@ class DockerRuntime {
 			);
 		}
 
+		// Add port change messages if any ports were automatically reassigned
+		if ( fullConfig.portMessages && fullConfig.portMessages.length > 0 ) {
+			message.push( '' ); // Empty line for separation
+			message.push( ...fullConfig.portMessages );
+		}
+
 		const formattedMessage = message.filter( Boolean ).join( '\n' );
 
 		return {

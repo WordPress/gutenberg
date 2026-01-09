@@ -47,6 +47,27 @@ function checkPort( configFile, configKey, port ) {
 }
 
 /**
+ * Validates a port range value (min or max) and throws if it isn't valid.
+ *
+ * @param {string} configFile The configuration file we're validating.
+ * @param {string} configKey  The configuration key we're validating.
+ * @param {number} port       The port range value to check.
+ */
+function checkPortRangeValue( configFile, configKey, port ) {
+	if ( ! Number.isInteger( port ) ) {
+		throw new ValidationError(
+			`Invalid ${ configFile }: "${ configKey }" must be an integer.`
+		);
+	}
+
+	if ( port < 0 || port > 65535 ) {
+		throw new ValidationError(
+			`Invalid ${ configFile }: "${ configKey }" must be a valid port (0-65535).`
+		);
+	}
+}
+
+/**
  * Validates the array and throws if it isn't valid.
  *
  * @param {string}   configFile The config file we're validating.
@@ -174,6 +195,7 @@ module.exports = {
 	ValidationError,
 	checkString,
 	checkPort,
+	checkPortRangeValue,
 	checkStringArray,
 	checkObjectWithValues,
 	checkVersion,

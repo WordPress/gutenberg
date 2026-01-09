@@ -131,7 +131,7 @@ module.exports = async function start( {
 		await executeLifecycleScript( 'afterStart', config, spinner );
 	}
 
-	spinner.prefixText = result.message;
+spinner.prefixText = result.message;
 	spinner.prefixText += '\n\n';
 	spinner.text = 'Done!';
 };

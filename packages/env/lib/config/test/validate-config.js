@@ -6,6 +6,7 @@ const {
 	ValidationError,
 	checkString,
 	checkPort,
+	checkPortRangeValue,
 	checkStringArray,
 	checkObjectWithValues,
 	checkVersion,
@@ -63,6 +64,56 @@ describe( 'validate-config', () => {
 		it( 'passes for valid port', () => {
 			expect( () =>
 				checkPort( 'test.json', 'test', 8888 )
+			).not.toThrow();
+		} );
+	} );
+
+	describe( 'checkPortRangeValue', () => {
+		it( 'throws when not an integer', () => {
+			expect( () =>
+				checkPortRangeValue( 'test.json', 'portRangeMin', 'test' )
+			).toThrow(
+				new ValidationError(
+					'Invalid test.json: "portRangeMin" must be an integer.'
+				)
+			);
+
+			expect( () =>
+				checkPortRangeValue( 'test.json', 'portRangeMax', 8.5 )
+			).toThrow(
+				new ValidationError(
+					'Invalid test.json: "portRangeMax" must be an integer.'
+				)
+			);
+		} );
+
+		it( 'throws when port out of range', () => {
+			expect( () =>
+				checkPortRangeValue( 'test.json', 'portRangeMin', -1 )
+			).toThrow(
+				new ValidationError(
+					'Invalid test.json: "portRangeMin" must be a valid port (0-65535).'
+				)
+			);
+
+			expect( () =>
+				checkPortRangeValue( 'test.json', 'portRangeMax', 70000 )
+			).toThrow(
+				new ValidationError(
+					'Invalid test.json: "portRangeMax" must be a valid port (0-65535).'
+				)
+			);
+		} );
+
+		it( 'passes for valid port range values', () => {
+			expect( () =>
+				checkPortRangeValue( 'test.json', 'portRangeMin', 1024 )
+			).not.toThrow();
+			expect( () =>
+				checkPortRangeValue( 'test.json', 'portRangeMax', 65535 )
+			).not.toThrow();
+			expect( () =>
+				checkPortRangeValue( 'test.json', 'portRangeMin', 0 )
 			).not.toThrow();
 		} );
 	} );

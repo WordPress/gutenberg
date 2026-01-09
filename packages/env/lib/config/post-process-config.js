@@ -58,12 +58,44 @@ function mergeRootToEnvironments( config ) {
 			delete config.port;
 		}
 		if (
+			config.portRangeMin !== undefined &&
+			config.env.development.portRangeMin === undefined
+		) {
+			removedRootOptions.portRangeMin = config.portRangeMin;
+			config.env.development.portRangeMin = config.portRangeMin;
+			delete config.portRangeMin;
+		}
+		if (
+			config.portRangeMax !== undefined &&
+			config.env.development.portRangeMax === undefined
+		) {
+			removedRootOptions.portRangeMax = config.portRangeMax;
+			config.env.development.portRangeMax = config.portRangeMax;
+			delete config.portRangeMax;
+		}
+		if (
 			config.testsPort !== undefined &&
 			config.env.tests.port === undefined
 		) {
 			removedRootOptions.testsPort = config.testsPort;
 			config.env.tests.port = config.testsPort;
 			delete config.testsPort;
+		}
+		if (
+			config.testsPortRangeMin !== undefined &&
+			config.env.tests.portRangeMin === undefined
+		) {
+			removedRootOptions.testsPortRangeMin = config.testsPortRangeMin;
+			config.env.tests.portRangeMin = config.testsPortRangeMin;
+			delete config.testsPortRangeMin;
+		}
+		if (
+			config.testsPortRangeMax !== undefined &&
+			config.env.tests.portRangeMax === undefined
+		) {
+			removedRootOptions.testsPortRangeMax = config.testsPortRangeMax;
+			config.env.tests.portRangeMax = config.testsPortRangeMax;
+			delete config.testsPortRangeMax;
 		}
 	}
 	if ( config.lifecycleScripts !== undefined ) {
