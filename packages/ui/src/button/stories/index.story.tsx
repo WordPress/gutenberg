@@ -62,12 +62,15 @@ export const Neutral: Story = {
 	},
 };
 
-export const NeutralOutline: Story = {
+/**
+ * Destructive buttons should be used for high-stakes, irreversible actions.
+ */
+export const Destructive: Story = {
 	...Default,
 	args: {
 		...Default.args,
-		tone: 'neutral',
-		variant: 'outline',
+		children: 'Permanently delete',
+		tone: 'destructive',
 	},
 };
 
