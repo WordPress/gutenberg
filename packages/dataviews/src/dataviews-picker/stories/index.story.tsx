@@ -154,7 +154,7 @@ const DataViewsPickerContent = ( {
 				itemListLabel="Galactic Bodies"
 				defaultLayouts={ {
 					[ LAYOUT_PICKER_GRID ]: {},
-					[ LAYOUT_PICKER_TABLE ]: { perPage: 20 },
+					[ LAYOUT_PICKER_TABLE ]: {},
 				} }
 			/>
 		</>

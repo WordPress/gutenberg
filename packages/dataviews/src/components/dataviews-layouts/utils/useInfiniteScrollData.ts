@@ -146,7 +146,15 @@ export function useInfiniteScrollData< Item extends { id: number } >( {
 						const itemPosition = (
 							record as Item & { position: number }
 						 ).position;
-						// Keep items within buffer range of visible items
+						// When scrolling, only trim items from the end we're scrolling away from
+						if ( scrollDirection === 'up' ) {
+							// When scrolling up, only trim items below the visible range
+							return itemPosition <= visibleMax + buffer;
+						} else if ( scrollDirection === 'down' ) {
+							// When scrolling down, only trim items above the visible range
+							return itemPosition >= visibleMin - buffer;
+						}
+						// When not scrolling or first load, keep items within buffer range
 						return (
 							itemPosition >= visibleMin - buffer &&
 							itemPosition <= visibleMax + buffer
