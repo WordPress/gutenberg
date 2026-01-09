@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- TypeScript types added for accessing the `core/preferences` store by name
+
 ## 4.36.0 (2025-11-26)
 
 ## 4.35.0 (2025-11-12)

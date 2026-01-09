@@ -28,3 +28,19 @@ export const store = createReduxStore<
 } );
 
 register( store );
+
+type SubsequentArgsOfFunc< F > = F extends ( arg: any, ...args: infer R ) => any
+	? R
+	: never;
+type CurriedSelectors = {
+	[ key in keyof typeof selectors ]: (
+		...args: SubsequentArgsOfFunc< ( typeof selectors )[ key ] >
+	) => ReturnType< ( typeof selectors )[ key ] >;
+};
+declare module '@wordpress/data' {
+	function dispatch( key: typeof STORE_NAME ): typeof actions;
+	function select( key: typeof STORE_NAME ): CurriedSelectors;
+
+	function useDispatch( key: typeof STORE_NAME ): typeof actions;
+	function useSelect( key: typeof STORE_NAME ): CurriedSelectors;
+}
