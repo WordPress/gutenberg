@@ -93,42 +93,42 @@ function BlockFields( { clientId, blockType, attributes, setAttributes } ) {
 				config: { ...fieldDef.args, defaultValues },
 				hideLabelFromVision: fieldDef.id === 'content',
 				// getValue and setValue handle the mapping to block attributes
-				getValue: ( { item } ) => {
-					// When a field is an object, flatten all the properties to the root
-					// of the block attributes.
-					if ( fieldDef.type === 'object' && fieldDef.properties ) {
-						const mappedValue = {};
+				// getValue: ( { item } ) => {
+				// 	// When a field is an object, flatten all the properties to the root
+				// 	// of the block attributes.
+				// 	if ( fieldDef.type === 'object' && fieldDef.properties ) {
+				// 		const mappedValue = {};
 
-						// Convert to field keys.
-						Object.keys( fieldDef.properties ).forEach( ( key ) => {
-							const attributeKey =
-								fieldDef.properties[ key ].id ?? key;
-							if ( item[ attributeKey ] ) {
-								mappedValue[ key ] = item[ attributeKey ];
-							}
-						} );
-						return mappedValue;
-					}
-					return item[ fieldDef.id ];
-				},
-				setValue: ( { value } ) => {
-					// When a field is an object, flatten all the properties to the root
-					// of the block attributes.
-					if ( fieldDef.type === 'object' && fieldDef.properties ) {
-						const mappedValue = {};
+				// 		// Convert to field keys.
+				// 		Object.keys( fieldDef.properties ).forEach( ( key ) => {
+				// 			const attributeKey =
+				// 				fieldDef.properties[ key ].id ?? key;
+				// 			if ( item[ attributeKey ] ) {
+				// 				mappedValue[ key ] = item[ attributeKey ];
+				// 			}
+				// 		} );
+				// 		return mappedValue;
+				// 	}
+				// 	return item[ fieldDef.id ];
+				// },
+				// setValue: ( { value } ) => {
+				// 	// When a field is an object, flatten all the properties to the root
+				// 	// of the block attributes.
+				// 	if ( fieldDef.type === 'object' && fieldDef.properties ) {
+				// 		const mappedValue = {};
 
-						// Convert to attribute keys.
-						Object.keys( fieldDef.properties ).forEach( ( key ) => {
-							if ( value[ key ] ) {
-								const attributeKey =
-									fieldDef.properties[ key ].id ?? key;
-								mappedValue[ attributeKey ] = value[ key ];
-							}
-						} );
-						return mappedValue;
-					}
-					return { [ fieldDef.id ]: value };
-				},
+				// 		// Convert to attribute keys.
+				// 		Object.keys( fieldDef.properties ).forEach( ( key ) => {
+				// 			if ( value[ key ] ) {
+				// 				const attributeKey =
+				// 					fieldDef.properties[ key ].id ?? key;
+				// 				mappedValue[ attributeKey ] = value[ key ];
+				// 			}
+				// 		} );
+				// 		return mappedValue;
+				// 	}
+				// 	return { [ fieldDef.id ]: value };
+				// },
 			};
 
 			// Only add custom Edit component if one exists for this type

@@ -43,7 +43,7 @@ if ( window.__experimentalContentOnlyInspectorFields ) {
 			id: 'video',
 			label: __( 'Video' ),
 			Edit: 'media',
-			type: 'object',
+			type: 'group',
 			properties: {
 				id: {
 					id: 'id',

@@ -42,7 +42,7 @@ if ( window.__experimentalContentOnlyInspectorFields ) {
 			id: 'file',
 			label: __( 'File' ),
 			Edit: 'media',
-			type: 'object',
+			type: 'group',
 			properties: {
 				id: {
 					id: 'id',

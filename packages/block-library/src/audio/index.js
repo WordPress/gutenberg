@@ -42,7 +42,7 @@ if ( window.__experimentalContentOnlyInspectorFields ) {
 			id: 'audio',
 			label: __( 'Audio' ),
 			Edit: 'media',
-			type: 'object',
+			type: 'group',
 			properties: {
 				id: {
 					id: 'id',

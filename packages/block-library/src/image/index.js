@@ -72,7 +72,7 @@ if ( window.__experimentalContentOnlyInspectorFields ) {
 			id: 'image',
 			label: __( 'Image' ),
 			Edit: 'media',
-			type: 'object',
+			type: 'group',
 			properties: {
 				id: {
 					id: 'id',
@@ -104,7 +104,7 @@ if ( window.__experimentalContentOnlyInspectorFields ) {
 			id: 'link',
 			label: __( 'Link' ),
 			Edit: 'link',
-			type: 'object',
+			type: 'group',
 			properties: {
 				url: {
 					id: 'href',

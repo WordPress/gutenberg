@@ -23,6 +23,7 @@ import MediaUploadCheck from '../../../components/media-upload/check';
 import { useInspectorPopoverPlacement } from '../use-inspector-popover-placement';
 import { getMediaSelectKey } from '../../../store/private-keys';
 import { store as blockEditorStore } from '../../../store';
+import { getValue, setValue } from '../utils';
 
 function MediaThumbnail( { data, field, attachment } ) {
 	const config = field.config || {};
@@ -50,7 +51,7 @@ function MediaThumbnail( { data, field, attachment } ) {
 	}
 
 	if ( allowedTypes.length === 1 ) {
-		const value = field.getValue( { item: data } );
+		const value = getValue( data, config.fieldDef );
 		const url = value?.url;
 
 		if ( url ) {
@@ -84,13 +85,14 @@ export default function Media( { data, field, onChange, config = {} } ) {
 	const { popoverProps } = useInspectorPopoverPlacement( {
 		isControl: true,
 	} );
-	const value = field.getValue( { item: data } );
 	const { fieldDef } = config;
 	const { allowedTypes = [], multiple = false } = fieldDef.args || {};
 
 	// Check if featured image is supported by checking if it's in the mapping
 	const hasFeaturedImageSupport =
 		fieldDef?.properties && 'featuredImage' in fieldDef.properties;
+
+	const value = getValue( data, fieldDef );
 
 	const id = value?.id;
 	const url = value?.url;
@@ -157,20 +159,20 @@ export default function Media( { data, field, onChange, config = {} } ) {
 					}
 
 					// Merge with existing value to preserve other field properties
-					onChange(
-						field.setValue( {
-							item: data,
-							value: resetValue,
-						} )
-					);
+					onChange( setValue( resetValue, fieldDef ) );
 				} }
 				{ ...( hasFeaturedImageSupport && {
-					useFeaturedImage: !! value?.featuredImage,
+					useFeaturedImage: !! data?.featuredImage,
 					onToggleFeaturedImage: () => {
 						// TODO - this should unset id, src, etc.
-						onChange( {
-							featuredImage: ! value?.featuredImage,
-						} );
+						onChange(
+							setValue(
+								{
+									featuredImage: ! data?.featuredImage,
+								},
+								fieldDef
+							)
+						);
 					},
 				} ) }
 				onSelect={ ( selectedMedia ) => {
@@ -196,12 +198,7 @@ export default function Media( { data, field, onChange, config = {} } ) {
 						}
 
 						// Merge with existing value to preserve other field properties
-						onChange(
-							field.setValue( {
-								item: data,
-								value: newValue,
-							} )
-						);
+						onChange( setValue( newValue, fieldDef ) );
 					}
 				} }
 				renderToggle={ ( buttonProps ) => (

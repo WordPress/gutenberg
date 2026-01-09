@@ -17,6 +17,7 @@ import { prependHTTP } from '@wordpress/url';
  */
 import LinkControl from '../../../components/link-control';
 import { useInspectorPopoverPlacement } from '../use-inspector-popover-placement';
+import { getValue, setValue } from '../utils';
 
 export const NEW_TAB_REL = 'noreferrer noopener';
 export const NEW_TAB_TARGET = '_blank';
@@ -67,13 +68,13 @@ export function getUpdatedLinkAttributes( {
 	};
 }
 
-export default function Link( { data, field, onChange, config = {} } ) {
+export default function Link( { data, onChange, config = {} } ) {
 	const [ isLinkControlOpen, setIsLinkControlOpen ] = useState( false );
 	const { popoverProps } = useInspectorPopoverPlacement( {
 		isControl: true,
 	} );
 	const { fieldDef } = config;
-	const value = field.getValue( { item: data } );
+	const value = getValue( data, fieldDef );
 	const url = value?.url;
 	const rel = value?.rel || '';
 	const target = value?.linkTarget;
@@ -152,12 +153,7 @@ export default function Link( { data, field, onChange, config = {} } ) {
 								);
 							}
 
-							onChange(
-								field.setValue( {
-									item: data,
-									value: newValue,
-								} )
-							);
+							onChange( setValue( newValue, fieldDef ) );
 						} }
 						onRemove={ () => {
 							const removeValue = {};
@@ -170,12 +166,7 @@ export default function Link( { data, field, onChange, config = {} } ) {
 								);
 							}
 
-							onChange(
-								field.setValue( {
-									item: data,
-									value: removeValue,
-								} )
-							);
+							onChange( setValue( removeValue, fieldDef ) );
 						} }
 					/>
 				</Popover>

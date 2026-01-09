@@ -66,7 +66,7 @@ if ( window.__experimentalContentOnlyInspectorFields ) {
 			id: 'background',
 			label: __( 'Background' ),
 			Edit: 'media',
-			type: 'object',
+			type: 'group',
 			properties: {
 				media_type: {
 					id: 'backgroundType',

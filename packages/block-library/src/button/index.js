@@ -62,7 +62,7 @@ if ( window.__experimentalContentOnlyInspectorFields ) {
 			id: 'link',
 			label: __( 'Link' ),
 			Edit: 'link',
-			type: 'object',
+			type: 'group',
 			properties: {
 				url: {
 					id: 'url',
