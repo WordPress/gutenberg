@@ -9,15 +9,15 @@ import { store as coreDataStore } from '@wordpress/core-data';
 /**
  * Internal dependencies
  */
-import type { BasePostWithEmbeddedAuthor } from '../../types';
-import AuthorView from './author-view';
+import type { MediaItem } from '../types';
+import AuthorView from './view';
 
 interface Author {
 	id: number;
 	name: string;
 }
 
-const authorField: Field< BasePostWithEmbeddedAuthor > = {
+const authorField: Partial< Field< MediaItem > > = {
 	label: __( 'Author' ),
 	id: 'author',
 	type: 'integer',
@@ -35,7 +35,6 @@ const authorField: Field< BasePostWithEmbeddedAuthor > = {
 			label: name,
 		} ) );
 	},
-	setValue: ( { value } ) => ( { author: Number( value ) } ),
 	render: AuthorView,
 	sort: ( a, b, direction ) => {
 		const nameA = a._embedded?.author?.[ 0 ]?.name || '';
@@ -48,9 +47,7 @@ const authorField: Field< BasePostWithEmbeddedAuthor > = {
 	filterBy: {
 		operators: [ 'isAny', 'isNone' ],
 	},
+	readOnly: true,
 };
 
-/**
- * Author field for BasePost.
- */
 export default authorField;
