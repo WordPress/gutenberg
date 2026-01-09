@@ -102,6 +102,11 @@ export const Validation = {
 			description: 'Choose the form layout type.',
 			options: [ 'regular', 'panel', 'card', 'details' ],
 		},
+		labelMode: {
+			control: { type: 'select' },
+			description: 'How to label required/optional fields.',
+			options: [ 'showRequired', 'showOptional', 'auto' ],
+		},
 		required: {
 			control: { type: 'boolean' },
 			description:
@@ -131,6 +136,7 @@ export const Validation = {
 	},
 	args: {
 		layout: 'regular',
+		labelMode: 'showRequired',
 		required: true,
 		elements: 'sync',
 		custom: 'sync',

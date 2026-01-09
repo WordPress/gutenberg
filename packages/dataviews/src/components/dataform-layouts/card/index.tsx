@@ -180,6 +180,7 @@ export default function FormCardField< Item >( {
 		() => ( {
 			layout: DEFAULT_LAYOUT as NormalizedLayout,
 			fields: field.children ?? [],
+			labelMode: 'showRequired',
 		} ),
 		[ field ]
 	);

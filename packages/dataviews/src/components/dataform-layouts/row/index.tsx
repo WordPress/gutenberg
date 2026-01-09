@@ -51,6 +51,7 @@ export default function FormRowField< Item >( {
 		const form: NormalizedForm = {
 			layout: DEFAULT_LAYOUT as NormalizedLayout,
 			fields: field.children,
+			labelMode: 'showRequired',
 		};
 
 		return (

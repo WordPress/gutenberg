@@ -97,6 +97,7 @@ export function DataFormLayout< Item >( {
 						data={ data }
 						field={ formField }
 						onChange={ onChange }
+						markWhenOptional={ form.labelMode === 'showOptional' }
 						validity={ validity?.[ formField.id ] }
 					/>
 				);

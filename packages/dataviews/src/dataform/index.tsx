@@ -25,6 +25,29 @@ export default function DataForm< Item >( {
 		[ fields ]
 	);
 
+	// Calculate required count for stable dependency
+	const requiredCount = useMemo(
+		() => normalizedFields.filter( ( f ) => !! f.isValid?.required ).length,
+		[ normalizedFields ]
+	);
+
+	// Resolve labelMode (handles 'auto')
+	const effectiveLabelMode: 'showRequired' | 'showOptional' = useMemo( () => {
+		if ( form.labelMode === 'showOptional' ) return 'showOptional';
+		if ( form.labelMode === 'showRequired' ) return 'showRequired';
+		if ( form.labelMode === 'auto' ) {
+			const optionalCount = normalizedFields.length - requiredCount;
+			return requiredCount >= optionalCount ? 'showOptional' : 'showRequired';
+		}
+		return 'showRequired';
+	}, [ form.labelMode, requiredCount, normalizedFields.length ] );
+
+	// Merge resolved labelMode into form
+	const formWithResolvedLabelMode = useMemo(
+		() => ( { ...normalizedForm, labelMode: effectiveLabelMode } ),
+		[ normalizedForm, effectiveLabelMode ]
+	);
+
 	if ( ! form.fields ) {
 		return null;
 	}
@@ -33,7 +56,7 @@ export default function DataForm< Item >( {
 		<DataFormProvider fields={ normalizedFields }>
 			<DataFormLayout
 				data={ data }
-				form={ normalizedForm }
+				form={ formWithResolvedLabelMode }
 				onChange={ onChange }
 				validity={ validity }
 			/>
