@@ -18,7 +18,7 @@ import { Stack } from '@wordpress/ui';
 import { __, sprintf } from '@wordpress/i18n';
 import { useInstanceId } from '@wordpress/compose';
 import { isAppleOS } from '@wordpress/keycodes';
-import { useContext, useEffect, useRef } from '@wordpress/element';
+import { useContext, useEffect, useRef, forwardRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -77,245 +77,266 @@ interface GridItemProps< Item > extends HTMLAttributes< HTMLDivElement > {
 	setsize?: number;
 }
 
-function GridItem< Item >( {
-	view,
-	selection,
-	onChangeSelection,
-	onClickItem,
-	isItemClickable,
-	renderItemLink,
-	getItemId,
-	item,
-	actions,
-	mediaField,
-	titleField,
-	descriptionField,
-	regularFields,
-	badgeFields,
-	hasBulkActions,
-	config,
-	posinset,
-	setsize,
-	...props
-}: GridItemProps< Item > ) {
-	const { showTitle = true, showMedia = true, showDescription = true } = view;
-	const hasBulkAction = useHasAPossibleBulkAction( actions, item );
-	const id = getItemId( item );
-	const elementRef = useRef< HTMLElement | null >( null );
-	const { intersectionObserverCallback } = useContext( DataViewsContext );
-	const instanceId = useInstanceId( GridItem );
-	const isSelected = selection.includes( id );
+const GridItem = forwardRef< HTMLDivElement, GridItemProps< any > >(
+	function GridItem(
+		{
+			view,
+			selection,
+			onChangeSelection,
+			onClickItem,
+			isItemClickable,
+			renderItemLink,
+			getItemId,
+			item,
+			actions,
+			mediaField,
+			titleField,
+			descriptionField,
+			regularFields,
+			badgeFields,
+			hasBulkActions,
+			config,
+			posinset,
+			setsize,
+			...props
+		},
+		forwardedRef
+	) {
+		const {
+			showTitle = true,
+			showMedia = true,
+			showDescription = true,
+		} = view;
+		const hasBulkAction = useHasAPossibleBulkAction( actions, item );
+		const id = getItemId( item );
+		const elementRef = useRef< HTMLDivElement | null >( null );
 
-	const setElementRef = ( element: HTMLElement | null ) => {
-		elementRef.current = element;
-	};
-
-	// Set up IntersectionObserver for this item
-	useEffect( () => {
-		if (
-			! intersectionObserverCallback ||
-			! elementRef.current ||
-			posinset === undefined
-		) {
-			return;
-		}
-
-		const observer = new IntersectionObserver(
-			intersectionObserverCallback,
-			{
-				root: null,
-				rootMargin: '0px',
-				threshold: 0.1,
+		// Merge refs callback
+		const setRefs = ( node: HTMLDivElement | null ) => {
+			elementRef.current = node;
+			if ( typeof forwardedRef === 'function' ) {
+				forwardedRef( node );
+			} else if ( forwardedRef ) {
+				forwardedRef.current = node;
 			}
-		);
-
-		observer.observe( elementRef.current );
-
-		return () => {
-			observer.disconnect();
 		};
-	}, [ intersectionObserverCallback, posinset ] );
-	const mediaPlaceholder = (
-		<span className="dataviews-view-grid__media-placeholder" />
-	);
-	const rendersMediaField = showMedia && mediaField?.render;
-	const renderedMediaField = mediaField?.render ? (
-		<mediaField.render
-			item={ item }
-			field={ mediaField }
-			config={ config }
-		/>
-	) : (
-		mediaPlaceholder
-	);
-	const renderedTitleField =
-		showTitle && titleField?.render ? (
-			<titleField.render item={ item } field={ titleField } />
-		) : null;
-	let mediaA11yProps;
-	let titleA11yProps;
-	if ( isItemClickable( item ) && onClickItem ) {
-		if ( renderedTitleField ) {
-			mediaA11yProps = {
-				'aria-labelledby': `dataviews-view-grid__title-field-${ instanceId }`,
-			};
-			titleA11yProps = {
-				id: `dataviews-view-grid__title-field-${ instanceId }`,
-			};
-		} else {
-			mediaA11yProps = {
-				'aria-label': __( 'Navigate to item' ),
-			};
-		}
-	}
-	return (
-		<Stack
-			direction="column"
-			{ ...props }
-			ref={ setElementRef }
-			aria-setsize={ setsize }
-			aria-posinset={ posinset }
-			className={ clsx(
-				props.className,
-				'dataviews-view-grid__row__gridcell',
-				'dataviews-view-grid__card',
+		const { intersectionObserverCallback } = useContext( DataViewsContext );
+		const instanceId = useInstanceId( GridItem );
+		const isSelected = selection.includes( id );
+
+		// Set up IntersectionObserver for this item
+		useEffect( () => {
+			if (
+				! intersectionObserverCallback ||
+				! elementRef.current ||
+				posinset === undefined
+			) {
+				return;
+			}
+
+			const observer = new IntersectionObserver(
+				intersectionObserverCallback,
 				{
-					'is-selected': hasBulkAction && isSelected,
+					root: null,
+					rootMargin: '0px',
+					threshold: 0.1,
 				}
-			) }
-			onClickCapture={ ( event ) => {
-				props.onClickCapture?.( event );
-				if ( isAppleOS() ? event.metaKey : event.ctrlKey ) {
-					event.stopPropagation();
-					event.preventDefault();
-					if ( ! hasBulkAction ) {
-						return;
-					}
-					onChangeSelection(
-						selection.includes( id )
-							? selection.filter( ( itemId ) => id !== itemId )
-							: [ ...selection, id ]
-					);
-				}
-			} }
-		>
-			<ItemClickWrapper
+			);
+
+			observer.observe( elementRef.current );
+
+			return () => {
+				observer.disconnect();
+			};
+		}, [ intersectionObserverCallback, posinset ] );
+		const mediaPlaceholder = (
+			<span className="dataviews-view-grid__media-placeholder" />
+		);
+		const rendersMediaField = showMedia && mediaField?.render;
+		const renderedMediaField = rendersMediaField ? (
+			<mediaField.render
 				item={ item }
-				isItemClickable={ isItemClickable }
-				onClickItem={ onClickItem }
-				renderItemLink={ renderItemLink }
-				className={ clsx( 'dataviews-view-grid__media', {
-					'dataviews-view-grid__media--placeholder':
-						! rendersMediaField,
-				} ) }
-				{ ...mediaA11yProps }
-			>
-				{ renderedMediaField }
-			</ItemClickWrapper>
-			{ hasBulkActions && (
-				<DataViewsSelectionCheckbox
-					item={ item }
-					selection={ selection }
-					onChangeSelection={ onChangeSelection }
-					getItemId={ getItemId }
-					titleField={ titleField }
-					disabled={ ! hasBulkAction }
-				/>
-			) }
-			{ !! actions?.length && (
-				<div className="dataviews-view-grid__media-actions">
-					<ItemActions item={ item } actions={ actions } isCompact />
-				</div>
-			) }
-			{ showTitle && (
-				<div className="dataviews-view-grid__title">
-					<ItemClickWrapper
-						item={ item }
-						isItemClickable={ isItemClickable }
-						onClickItem={ onClickItem }
-						renderItemLink={ renderItemLink }
-						className="dataviews-view-grid__title-field dataviews-title-field"
-						{ ...titleA11yProps }
-						title={
-							titleField?.getValueFormatted( {
-								item,
-								field: titleField,
-							} ) || undefined
+				field={ mediaField }
+				config={ config }
+			/>
+		) : (
+			mediaPlaceholder
+		);
+		const renderedTitleField =
+			showTitle && titleField?.render ? (
+				<titleField.render item={ item } field={ titleField } />
+			) : null;
+		let mediaA11yProps;
+		let titleA11yProps;
+		if ( isItemClickable( item ) && onClickItem ) {
+			if ( renderedTitleField ) {
+				mediaA11yProps = {
+					'aria-labelledby': `dataviews-view-grid__title-field-${ instanceId }`,
+				};
+				titleA11yProps = {
+					id: `dataviews-view-grid__title-field-${ instanceId }`,
+				};
+			} else {
+				mediaA11yProps = {
+					'aria-label': __( 'Navigate to item' ),
+				};
+			}
+		}
+		return (
+			<Stack
+				direction="column"
+				{ ...props }
+				ref={ setRefs }
+				aria-setsize={ setsize }
+				aria-posinset={ posinset }
+				className={ clsx(
+					props.className,
+					'dataviews-view-grid__row__gridcell',
+					'dataviews-view-grid__card',
+					{
+						'is-selected': hasBulkAction && isSelected,
+					}
+				) }
+				onClickCapture={ ( event ) => {
+					props.onClickCapture?.( event );
+					if ( isAppleOS() ? event.metaKey : event.ctrlKey ) {
+						event.stopPropagation();
+						event.preventDefault();
+						if ( ! hasBulkAction ) {
+							return;
 						}
-					>
-						{ renderedTitleField }
-					</ItemClickWrapper>
-				</div>
-			) }
-			<Stack direction="column" gap="xs">
-				{ showDescription && descriptionField?.render && (
-					<descriptionField.render
+						onChangeSelection(
+							selection.includes( id )
+								? selection.filter(
+										( itemId ) => id !== itemId
+								  )
+								: [ ...selection, id ]
+						);
+					}
+				} }
+			>
+				<ItemClickWrapper
+					item={ item }
+					isItemClickable={ isItemClickable }
+					onClickItem={ onClickItem }
+					renderItemLink={ renderItemLink }
+					className={ clsx( 'dataviews-view-grid__media', {
+						'dataviews-view-grid__media--placeholder':
+							! rendersMediaField,
+					} ) }
+					{ ...mediaA11yProps }
+				>
+					{ renderedMediaField }
+				</ItemClickWrapper>
+				{ hasBulkActions && (
+					<DataViewsSelectionCheckbox
 						item={ item }
-						field={ descriptionField }
+						selection={ selection }
+						onChangeSelection={ onChangeSelection }
+						getItemId={ getItemId }
+						titleField={ titleField }
+						disabled={ ! hasBulkAction }
 					/>
 				) }
-				{ !! badgeFields?.length && (
-					<Stack
-						direction="row"
-						className="dataviews-view-grid__badge-fields"
-						gap="sm"
-						wrap="wrap"
-						align="top"
-						justify="flex-start"
-					>
-						{ badgeFields.map( ( field ) => {
-							return (
-								<Badge
-									key={ field.id }
-									className="dataviews-view-grid__field-value"
-								>
-									<field.render
-										item={ item }
-										field={ field }
-									/>
-								</Badge>
-							);
-						} ) }
-					</Stack>
+				{ !! actions?.length && (
+					<div className="dataviews-view-grid__media-actions">
+						<ItemActions
+							item={ item }
+							actions={ actions }
+							isCompact
+						/>
+					</div>
 				) }
-				{ !! regularFields?.length && (
-					<Stack
-						direction="column"
-						className="dataviews-view-grid__fields"
-						gap="xs"
-					>
-						{ regularFields.map( ( field ) => {
-							return (
-								<Flex
-									className="dataviews-view-grid__field"
-									key={ field.id }
-									gap={ 1 }
-									justify="flex-start"
-									expanded
-									style={ { height: 'auto' } }
-									direction="row"
-								>
-									<>
-										<Tooltip text={ field.label }>
-											<FlexItem className="dataviews-view-grid__field-name">
-												{ field.header }
+				{ showTitle && (
+					<div className="dataviews-view-grid__title">
+						<ItemClickWrapper
+							item={ item }
+							isItemClickable={ isItemClickable }
+							onClickItem={ onClickItem }
+							renderItemLink={ renderItemLink }
+							className="dataviews-view-grid__title-field dataviews-title-field"
+							{ ...titleA11yProps }
+							title={
+								titleField?.getValueFormatted( {
+									item,
+									field: titleField,
+								} ) || undefined
+							}
+						>
+							{ renderedTitleField }
+						</ItemClickWrapper>
+					</div>
+				) }
+				<Stack direction="column" gap="xs">
+					{ showDescription && descriptionField?.render && (
+						<descriptionField.render
+							item={ item }
+							field={ descriptionField }
+						/>
+					) }
+					{ !! badgeFields?.length && (
+						<Stack
+							direction="row"
+							className="dataviews-view-grid__badge-fields"
+							gap="sm"
+							wrap="wrap"
+							align="top"
+							justify="flex-start"
+						>
+							{ badgeFields.map( ( field ) => {
+								return (
+									<Badge
+										key={ field.id }
+										className="dataviews-view-grid__field-value"
+									>
+										<field.render
+											item={ item }
+											field={ field }
+										/>
+									</Badge>
+								);
+							} ) }
+						</Stack>
+					) }
+					{ !! regularFields?.length && (
+						<Stack
+							direction="column"
+							className="dataviews-view-grid__fields"
+							gap="xs"
+						>
+							{ regularFields.map( ( field ) => {
+								return (
+									<Flex
+										className="dataviews-view-grid__field"
+										key={ field.id }
+										gap={ 1 }
+										justify="flex-start"
+										expanded
+										style={ { height: 'auto' } }
+										direction="row"
+									>
+										<>
+											<Tooltip text={ field.label }>
+												<FlexItem className="dataviews-view-grid__field-name">
+													{ field.header }
+												</FlexItem>
+											</Tooltip>
+											<FlexItem
+												className="dataviews-view-grid__field-value"
+												style={ { maxHeight: 'none' } }
+											>
+												<field.render
+													item={ item }
+													field={ field }
+												/>
 											</FlexItem>
-										</Tooltip>
-										<FlexItem
-											className="dataviews-view-grid__field-value"
-											style={ { maxHeight: 'none' } }
-										>
-											<field.render
-												item={ item }
-												field={ field }
-											/>
-										</FlexItem>
-									</>
-								</Flex>
-							);
-						} ) }
-					</Stack>
-				) }
+										</>
+									</Flex>
+								);
+							} ) }
+						</Stack>
+					) }
+				</Stack>
 			</Stack>
 		</Stack>
 	);
