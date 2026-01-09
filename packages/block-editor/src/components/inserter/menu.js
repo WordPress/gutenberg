@@ -76,7 +76,7 @@ function InserterMenu(
 		useState( null );
 	const isLargeViewport = useViewportMatch( 'large' );
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
-	const onInserterClose = isMobileViewport ? onClose : NOOP;
+	const maybeCloseInserter = isMobileViewport ? onClose : NOOP;
 
 	function getInitialTab() {
 		if ( __experimentalInitialTab ) {
@@ -116,7 +116,7 @@ function InserterMenu(
 				_rootClientId
 			);
 			onSelect( blocks );
-			onInserterClose();
+			maybeCloseInserter();
 
 			// Check for focus loss due to filtering blocks by selected block type
 			window.requestAnimationFrame( () => {
@@ -131,7 +131,7 @@ function InserterMenu(
 				}
 			} );
 		},
-		[ onInsertBlocks, onInserterClose, onSelect, ref, shouldFocusBlock ]
+		[ onInsertBlocks, maybeCloseInserter, onSelect, ref, shouldFocusBlock ]
 	);
 
 	const onInsertPattern = useCallback(
@@ -139,9 +139,9 @@ function InserterMenu(
 			onToggleInsertionPoint( false );
 			onInsertBlocks( blocks, { patternName }, ...args );
 			onSelect();
-			onInserterClose();
+			maybeCloseInserter();
 		},
-		[ onInsertBlocks, onInserterClose, onSelect, onToggleInsertionPoint ]
+		[ onInsertBlocks, maybeCloseInserter, onSelect, onToggleInsertionPoint ]
 	);
 
 	const onHover = useCallback(
