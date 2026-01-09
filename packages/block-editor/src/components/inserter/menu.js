@@ -131,7 +131,7 @@ function InserterMenu(
 				}
 			} );
 		},
-		[ onInsertBlocks, onSelect, shouldFocusBlock ]
+		[ onInsertBlocks, onInserterClose, onSelect, ref, shouldFocusBlock ]
 	);
 
 	const onInsertPattern = useCallback(
@@ -141,7 +141,7 @@ function InserterMenu(
 			onSelect();
 			onInserterClose();
 		},
-		[ onInsertBlocks, onSelect ]
+		[ onInsertBlocks, onInserterClose, onSelect, onToggleInsertionPoint ]
 	);
 
 	const onHover = useCallback(
