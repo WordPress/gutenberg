@@ -3,12 +3,42 @@
 		"name": "core/heading",
 		"isValid": true,
 		"attributes": {
-			"content": "Text",
+			"content": "Text 1",
 			"level": 2,
 			"textColor": "primary",
 			"style": {
 				"typography": {
 					"textAlign": "right"
+				}
+			}
+		},
+		"innerBlocks": []
+	},
+	{
+		"name": "core/heading",
+		"isValid": true,
+		"attributes": {
+			"content": "Text 2",
+			"level": 2,
+			"textColor": "primary",
+			"style": {
+				"typography": {
+					"textAlign": "center"
+				}
+			}
+		},
+		"innerBlocks": []
+	},
+	{
+		"name": "core/heading",
+		"isValid": true,
+		"attributes": {
+			"content": "Text",
+			"level": 2,
+			"textColor": "primary",
+			"style": {
+				"typography": {
+					"textAlign": "left"
 				}
 			}
 		},

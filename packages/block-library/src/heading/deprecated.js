@@ -15,7 +15,7 @@ import {
 /**
  * Internal dependencies
  */
-import migrateTextAlignV2 from '../utils/migrate-text-align';
+import migrateTextAlignAttributeToBlockSupport from '../utils/migrate-text-align';
 
 const blockSupports = {
 	className: false,
@@ -80,7 +80,7 @@ const v1 = {
 		},
 	},
 	migrate: ( attributes ) =>
-		migrateTextAlignV2(
+		migrateTextAlignAttributeToBlockSupport(
 			migrateCustomColors( migrateTextAlign( attributes ) )
 		),
 	save( { attributes } ) {
@@ -118,7 +118,7 @@ const v2 = {
 		},
 	},
 	migrate: ( attributes ) =>
-		migrateTextAlignV2(
+		migrateTextAlignAttributeToBlockSupport(
 			migrateCustomColors( migrateTextAlign( attributes ) )
 		),
 	save( { attributes } ) {
@@ -158,7 +158,7 @@ const v3 = {
 		},
 	},
 	migrate: ( attributes ) =>
-		migrateTextAlignV2(
+		migrateTextAlignAttributeToBlockSupport(
 			migrateCustomColors( migrateTextAlign( attributes ) )
 		),
 	save( { attributes } ) {
@@ -207,7 +207,7 @@ const v4 = {
 	attributes: blockAttributes,
 	isEligible: ( { align } ) => TEXT_ALIGN_OPTIONS.includes( align ),
 	migrate: ( attributes ) =>
-		migrateTextAlignV2(
+		migrateTextAlignAttributeToBlockSupport(
 			migrateCustomColors( migrateTextAlign( attributes ) )
 		),
 	save( { attributes } ) {
@@ -298,7 +298,7 @@ const v5 = {
 		);
 	},
 	migrate: ( attributes ) =>
-		migrateTextAlignV2(
+		migrateTextAlignAttributeToBlockSupport(
 			migrateCustomColors( migrateTextAlign( attributes ) )
 		),
 };
@@ -385,7 +385,7 @@ const v6 = {
 		);
 	},
 	migrate: ( attributes ) =>
-		migrateTextAlignV2(
+		migrateTextAlignAttributeToBlockSupport(
 			migrateCustomColors( migrateTextAlign( attributes ) )
 		),
 	isEligible( attributes ) {
