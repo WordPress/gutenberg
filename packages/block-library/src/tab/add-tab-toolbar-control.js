@@ -20,7 +20,12 @@ import { useDispatch, useSelect } from '@wordpress/data';
  * @return {JSX.Element} The toolbar control element.
  */
 export default function AddTabToolbarControl( { tabsClientId } ) {
-	const { insertBlock, updateBlockAttributes, selectBlock } = useDispatch( blockEditorStore );
+	const {
+		insertBlock,
+		updateBlockAttributes,
+		selectBlock,
+		__unstableMarkNextChangeAsNotPersistent,
+	} = useDispatch( blockEditorStore );
 
 	// Find the tab-panels block and tabs-menu block within the tabs block
 	const { tabPanelsClientId, nextTabIndex, tabsMenuClientId } = useSelect(
@@ -60,7 +65,9 @@ export default function AddTabToolbarControl( { tabsClientId } ) {
 		insertBlock( newTabBlock, undefined, tabPanelsClientId, false );
 
 		// Set the new tab as the active editor tab (0-indexed, so nextTabIndex - 1)
+		// Mark as non-persistent so it doesn't add to undo history
 		if ( tabsClientId ) {
+			__unstableMarkNextChangeAsNotPersistent();
 			updateBlockAttributes( tabsClientId, {
 				editorActiveTabIndex: nextTabIndex - 1,
 			} );

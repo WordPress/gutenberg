@@ -83,7 +83,8 @@ function Edit( {
 	const orientation = layout.orientation || 'horizontal';
 	const isVertical = orientation === 'vertical';
 
-	const { selectBlock } = useDispatch( blockEditorStore );
+	const { selectBlock, __unstableMarkNextChangeAsNotPersistent } =
+		useDispatch( blockEditorStore );
 	const focusRef = useRef();
 	const labelElementRef = useRef( null );
 	const prevTabsCountRef = useRef( tabsList.length );
@@ -167,12 +168,13 @@ function Edit( {
 			if ( nextIndex !== currentIndex && tabsList[ nextIndex ] ) {
 				const nextTab = tabsList[ nextIndex ];
 
-				// Update editorActiveTabIndex
-				if ( tabsClientId ) {
-					updateBlockAttributes( tabsClientId, {
-						editorActiveTabIndex: nextIndex,
-					} );
-				}
+			// Update editorActiveTabIndex (non-undoable since it's ephemeral editor state)
+			if ( tabsClientId ) {
+				__unstableMarkNextChangeAsNotPersistent();
+				updateBlockAttributes( tabsClientId, {
+					editorActiveTabIndex: nextIndex,
+				} );
+			}
 
 				// Focus the next tab button
 				const nextTabButton = document.getElementById(
@@ -189,6 +191,7 @@ function Edit( {
 			editingTabClientId,
 			tabsClientId,
 			updateBlockAttributes,
+			__unstableMarkNextChangeAsNotPersistent,
 		]
 	);
 
@@ -196,7 +199,9 @@ function Edit( {
 	const handleTabClick = useCallback(
 		( index, tabClientId ) => {
 			// Update the parent tabs block's editorActiveTabIndex (ephemeral, not persisted)
+			// Mark as non-persistent so it doesn't add to undo history
 			if ( tabsClientId && index !== effectiveActiveIndex ) {
+				__unstableMarkNextChangeAsNotPersistent();
 				updateBlockAttributes( tabsClientId, { editorActiveTabIndex: index } );
 			}
 
@@ -213,7 +218,7 @@ function Edit( {
 				return;
 			}
 		},
-		[ editingTabClientId, tabsClientId, effectiveActiveIndex, updateBlockAttributes, selectBlock, isSelected, clientId ]
+		[ editingTabClientId, tabsClientId, effectiveActiveIndex, updateBlockAttributes, selectBlock, isSelected, clientId, __unstableMarkNextChangeAsNotPersistent ]
 	);
 
 	const handleLabelChange = useCallback(

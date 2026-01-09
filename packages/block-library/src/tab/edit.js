@@ -40,7 +40,6 @@ export default function Edit( {
 	setAttributes,
 	__unstableLayoutClassNames: layoutClassNames,
 } ) {
-	const innerBlocksRef = useRef( null );
 	const focusRef = useRef();
 
 	const { anchor, label } = attributes;
@@ -92,13 +91,16 @@ export default function Edit( {
 		[ clientId ]
 	);
 
-	const { updateBlockAttributes } = useDispatch( blockEditorStore );
+	const { updateBlockAttributes, __unstableMarkNextChangeAsNotPersistent } =
+		useDispatch( blockEditorStore );
 
 	// Sync editorActiveTabIndex when this tab is selected directly
 	useEffect( () => {
 		// Only update if this tab is selected and not already the active index
 		const isTabSelected = isSelected || hasInnerBlocksSelected;
 		if ( isTabSelected && tabsClientId && effectiveActiveIndex !== blockIndex ) {
+			// Mark as non-persistent so it doesn't add to undo history
+			__unstableMarkNextChangeAsNotPersistent();
 			updateBlockAttributes( tabsClientId, { editorActiveTabIndex: blockIndex } );
 		}
 	}, [
@@ -108,6 +110,7 @@ export default function Edit( {
 		effectiveActiveIndex,
 		blockIndex,
 		updateBlockAttributes,
+		__unstableMarkNextChangeAsNotPersistent,
 	] );
 
 	// Determine if this is the currently active tab (for editor visibility)
@@ -145,7 +148,6 @@ export default function Edit( {
 		'aria-labelledby': tabLabelId,
 		id: tabPanelId,
 		role: 'tabpanel',
-		ref: innerBlocksRef,
 		tabIndex: isSelectedTab ? 0 : -1,
 		className: clsx(
 			'tabs__tab-editor-content',
