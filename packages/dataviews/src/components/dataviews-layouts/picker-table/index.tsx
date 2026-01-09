@@ -94,9 +94,41 @@ function TableRow< Item >( {
 	multiselect,
 	posinset,
 }: TableRowProps< Item > ) {
-	const { paginationInfo } = useContext( DataViewsContext );
+	const { paginationInfo, intersectionObserverCallback } =
+		useContext( DataViewsContext );
 	const isSelected = selection.includes( id );
 	const [ isHovered, setIsHovered ] = useState( false );
+	const elementRef = useRef< HTMLElement | null >( null );
+
+	const setElementRef = ( element: HTMLElement | null ) => {
+		elementRef.current = element;
+	};
+
+	// Set up IntersectionObserver for this item
+	useEffect( () => {
+		if (
+			! intersectionObserverCallback ||
+			! elementRef.current ||
+			posinset === undefined
+		) {
+			return;
+		}
+
+		const observer = new IntersectionObserver(
+			intersectionObserverCallback,
+			{
+				root: null,
+				rootMargin: '0px',
+				threshold: 0.1,
+			}
+		);
+
+		observer.observe( elementRef.current );
+
+		return () => {
+			observer.disconnect();
+		};
+	}, [ intersectionObserverCallback, posinset ] );
 	const {
 		showTitle = true,
 		showMedia = true,
@@ -119,6 +151,7 @@ function TableRow< Item >( {
 	return (
 		<Composite.Item
 			key={ id }
+			ref={ setElementRef }
 			render={ ( { children, ...props } ) => (
 				<tr
 					className={ clsx( 'dataviews-view-table__row', {
@@ -228,6 +261,8 @@ function ViewPickerTable< Item >( {
 	const [ nextHeaderMenuToFocus, setNextHeaderMenuToFocus ] =
 		useState< HTMLButtonElement >();
 	const isMultiselect = useIsMultiselectPicker( actions ) ?? false;
+	// Track stable positions for items in infinite scroll mode.
+	const itemPositions = useRef< Map< string, number > >( new Map() );
 
 	useEffect( () => {
 		if ( headerMenuToFocusRef.current ) {
@@ -235,6 +270,31 @@ function ViewPickerTable< Item >( {
 			headerMenuToFocusRef.current = undefined;
 		}
 	} );
+
+	const groupField = view.groupBy?.field
+		? fields.find( ( f ) => f.id === view.groupBy?.field )
+		: null;
+	const dataByGroup = groupField ? getDataByGroup( data, groupField ) : null;
+	const isInfiniteScroll = view.infiniteScrollEnabled && ! dataByGroup;
+
+	// Update item positions for infinite scroll
+	// Store positions from item metadata to ensure they remain stable
+	useEffect( () => {
+		if ( ! isInfiniteScroll ) {
+			return;
+		}
+
+		data.forEach( ( item ) => {
+			const itemId = getItemId( item );
+			if ( ! itemPositions.current.has( itemId ) ) {
+				// Check if item has position metadata
+				const position = ( item as any ).position;
+				if ( position !== undefined ) {
+					itemPositions.current.set( itemId, position );
+				}
+			}
+		} );
+	}, [ data, getItemId, isInfiniteScroll ] );
 
 	const tableNoticeId = useId();
 
@@ -264,10 +324,6 @@ function ViewPickerTable< Item >( {
 		( field ) => field.id === view.descriptionField
 	);
 
-	const groupField = view.groupBy?.field
-		? fields.find( ( f ) => f.id === view.groupBy?.field )
-		: null;
-	const dataByGroup = groupField ? getDataByGroup( data, groupField ) : null;
 	const { showTitle = true, showMedia = true, showDescription = true } = view;
 	const hasPrimaryColumn =
 		( titleField && showTitle ) ||
@@ -285,7 +341,6 @@ function ViewPickerTable< Item >( {
 				headerMenuRefs.current.delete( column );
 			}
 		};
-	const isInfiniteScroll = view.infiniteScrollEnabled && ! dataByGroup;
 
 	return (
 		<>
@@ -441,23 +496,30 @@ function ViewPickerTable< Item >( {
 						orientation="vertical"
 					>
 						{ hasData &&
-							data.map( ( item, index ) => (
-								<TableRow
-									key={ getItemId( item ) }
-									item={ item }
-									fields={ fields }
-									id={ getItemId( item ) || index.toString() }
-									view={ view }
-									titleField={ titleField }
-									mediaField={ mediaField }
-									descriptionField={ descriptionField }
-									selection={ selection }
-									getItemId={ getItemId }
-									onChangeSelection={ onChangeSelection }
-									multiselect={ isMultiselect }
-									posinset={ index + 1 }
-								/>
-							) ) }
+							data.map( ( item, index ) => {
+								const itemId = getItemId( item );
+								// Use stable position for accessibility.
+								const posinset =
+									itemPositions.current.get( itemId );
+
+								return (
+									<TableRow
+										key={ itemId }
+										item={ item }
+										fields={ fields }
+										id={ itemId || index.toString() }
+										view={ view }
+										titleField={ titleField }
+										mediaField={ mediaField }
+										descriptionField={ descriptionField }
+										selection={ selection }
+										getItemId={ getItemId }
+										onChangeSelection={ onChangeSelection }
+										multiselect={ isMultiselect }
+										posinset={ posinset }
+									/>
+								);
+							} ) }
 					</Composite>
 				) }
 			</table>
