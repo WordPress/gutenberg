@@ -190,6 +190,65 @@ export function itemIsComplete( state = {}, action ) {
 }
 
 /**
+ * Reducer tracking the mapping from persisted (server) IDs to local staged IDs.
+ * This is used when a staged record (with a local `__staged__` prefixed ID) is
+ * saved to the server and receives a real ID. The local ID is preserved to avoid
+ * UI re-mounts, and this map allows queries (which use server IDs) to find the
+ * correct local record.
+ *
+ * @param {Object<string,Object<number|string,string>>} state  Current state.
+ * @param {Object}                                      action Dispatched action.
+ *
+ * @return {Object<string,Object<number|string,string>>} Next state.
+ */
+export function persistedIdMap( state = {}, action ) {
+	switch ( action.type ) {
+		case 'RECEIVE_ITEMS': {
+			const context = getContextFromAction( action );
+			const key = action.key || DEFAULT_ENTITY_KEY;
+
+			const newMappings = action.items.reduce( ( result, item ) => {
+				const persistedId = item?.__unstablePersistedId;
+				const localId = item?.[ key ];
+				if ( persistedId !== undefined && localId !== undefined ) {
+					result[ persistedId ] = localId;
+				}
+				return result;
+			}, {} );
+
+			// Only update state if there are new mappings
+			if ( Object.keys( newMappings ).length === 0 ) {
+				return state;
+			}
+
+			return {
+				...state,
+				[ context ]: {
+					...state[ context ],
+					...newMappings,
+				},
+			};
+		}
+		case 'REMOVE_ITEMS': {
+			// Remove mappings for removed items
+			const removedSet = new Set( action.itemIds );
+			return Object.fromEntries(
+				Object.entries( state ).map( ( [ ctx, contextMap ] ) => [
+					ctx,
+					Object.fromEntries(
+						Object.entries( contextMap ).filter(
+							( [ , localId ] ) => ! removedSet.has( localId )
+						)
+					),
+				] )
+			);
+		}
+	}
+
+	return state;
+}
+
+/**
  * Reducer tracking queries state, keyed by stable query key. Each reducer
  * query object includes `itemIds` and `requestingPageByPerPage`.
  *
@@ -289,4 +348,5 @@ export default combineReducers( {
 	items,
 	itemIsComplete,
 	queries,
+	persistedIdMap,
 } );

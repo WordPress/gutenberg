@@ -10,6 +10,7 @@ import { getDefaultTemplateId, getEntityRecord, type State } from './selectors';
 import { STORE_NAME } from './name';
 import { unlock } from './lock-unlock';
 import { getSyncManager } from './sync';
+import { STAGED_ID_PREFIX } from './utils/is-staged-id';
 import logEntityDeprecation from './utils/log-entity-deprecation';
 
 type EntityRecordKey = string | number;
@@ -309,3 +310,44 @@ export function getEditorSettings(
 export function getEditorAssets( state: State ): Record< string, any > | null {
 	return state.editorAssets;
 }
+
+/**
+ * Returns only local-only staged entity records created via
+ * `createStagedEntityRecord`.
+ *
+ * This selector returns staged entities that exist in the store but haven't
+ * been persisted to the server yet. Staged entities are identified by their
+ * special staged ID prefix (`__staged__`).
+ *
+ * @param state State tree.
+ * @param kind  Entity kind.
+ * @param name  Entity name.
+ *
+ * @return Array of staged entity records, or empty array if none exist.
+ */
+export const getStagedEntityRecords = createSelector(
+	( state: State, kind: string, name: string ): any[] => {
+		const queriedData =
+			state.entities.records?.[ kind ]?.[ name ]?.queriedData;
+		// @ts-expect-error
+		const allItems = queriedData?.items?.default;
+
+		if ( ! allItems ) {
+			return [];
+		}
+
+		return Object.values( allItems ).filter(
+			( item ) =>
+				// @ts-expect-error
+				typeof item.id === 'string' &&
+				// @ts-expect-error
+				item?.id.startsWith( STAGED_ID_PREFIX ) === true &&
+				// @ts-expect-error
+				item?.__unstablePersistedId === undefined
+		);
+	},
+	( state: State, kind: string, name: string ) => [
+		// Watch the entire queriedData to detect any changes to items
+		state.entities.records?.[ kind ]?.[ name ]?.queriedData,
+	]
+);

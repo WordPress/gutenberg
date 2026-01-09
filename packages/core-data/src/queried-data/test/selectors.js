@@ -92,6 +92,45 @@ describe( 'getQueriedItems', () => {
 		expect( result ).toEqual( [ { id: 1 } ] );
 	} );
 
+	it( 'should map persisted IDs to local staged IDs', () => {
+		const state = {
+			items: {
+				default: {
+					__staged__1: {
+						id: '__staged__1',
+						title: 'Staged',
+						__unstablePersistedId: 10,
+					},
+				},
+			},
+			itemIsComplete: {
+				default: {
+					__staged__1: true,
+				},
+			},
+			queries: {
+				default: {
+					'': { itemIds: [ 10 ] },
+				},
+			},
+			persistedIdMap: {
+				default: {
+					10: '__staged__1',
+				},
+			},
+		};
+
+		const result = getQueriedItems( state );
+
+		expect( result ).toEqual( [
+			{
+				id: '__staged__1',
+				title: 'Staged',
+				__unstablePersistedId: 10,
+			},
+		] );
+	} );
+
 	it( 'should dynamically construct fields-filtered item from available data', () => {
 		const state = {
 			items: {

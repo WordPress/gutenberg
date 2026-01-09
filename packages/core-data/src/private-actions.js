@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { v4 as uuid } from 'uuid';
+
+/**
  * WordPress dependencies
  */
 import apiFetch from '@wordpress/api-fetch';
@@ -7,6 +12,8 @@ import apiFetch from '@wordpress/api-fetch';
  * Internal dependencies
  */
 import { STORE_NAME } from './name';
+import { STAGED_ID_PREFIX } from './utils/is-staged-id';
+import { DEFAULT_ENTITY_KEY } from './entities';
 
 /**
  * Returns an action object used in signalling that the registered post meta
@@ -160,3 +167,55 @@ export function receiveEditorAssets( assets ) {
 		assets,
 	};
 }
+
+/**
+ * Creates a local-only entity record in the store without persisting to the database.
+ *
+ * This action allows creating a staged entity that can be edited locally and
+ * only persisted when explicitly saved using `saveEntityRecord`.
+ *
+ * The created record is assigned a temporary staged ID that can be used with
+ * `editEntityRecord` to make local changes. When `saveEntityRecord` is called
+ * with this staged record, the staged ID is stripped and a new record is created
+ * on the server, returning the real ID assigned by WordPress.
+ *
+ * @param {string} kind   Kind of the entity (e.g., 'postType').
+ * @param {string} name   Name of the entity (e.g., 'post', 'postType').
+ * @param {Object} record The entity record data. Should not include an ID
+ *                        as one will be generated.
+ *
+ * @return {Object} The created entity record with its temporary staged ID.
+ */
+export const createStagedEntityRecord =
+	( kind, name, record ) =>
+	( { select, dispatch } ) => {
+		const configs = select.getEntitiesConfig( kind );
+		const entityConfig = configs?.find(
+			( config ) => config.kind === kind && config.name === name
+		);
+		if ( ! entityConfig ) {
+			throw new Error(
+				`The entity being created (${ kind }, ${ name }) does not have a loaded config.`
+			);
+		}
+
+		const entityIdKey = entityConfig.key ?? DEFAULT_ENTITY_KEY;
+
+		// Generate a unique staged ID
+		const stagedId = `${ STAGED_ID_PREFIX }${ uuid() }`;
+
+		// Create the record with the staged ID and a flag indicating it's local-only
+		const stagedRecord = {
+			...record,
+			[ entityIdKey ]: stagedId,
+		};
+
+		// Add the record to the store
+		dispatch.receiveEntityRecords( kind, name, stagedRecord, undefined );
+
+		// If there are any initial edits beyond what's in the record,
+		// we could apply them here, but for now, we just return the record
+		// and let the caller use editEntityRecord for subsequent changes.
+
+		return stagedRecord;
+	};

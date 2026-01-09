@@ -18,6 +18,7 @@ import {
 	receiveCurrentUser,
 	__experimentalBatch,
 } from '../actions';
+import { STAGED_ID_PREFIX } from '../utils';
 
 jest.mock( '../batch', () => {
 	const { createBatch } = jest.requireActual( '../batch' );
@@ -506,6 +507,96 @@ describe( 'saveEntityRecord', () => {
 		);
 
 		expect( result ).toBe( postType );
+	} );
+
+	it( 'treats staged records as new and uses POST method', async () => {
+		const draftId = `${ STAGED_ID_PREFIX }test-uuid-123`;
+		const post = { id: draftId, title: 'Draft Post', status: 'draft' };
+		const configs = [
+			{ name: 'post', kind: 'postType', baseURL: '/wp/v2/posts' },
+		];
+		const select = {
+			getRawEntityRecord: () => post,
+		};
+		const resolveSelect = { getEntitiesConfig: jest.fn( () => configs ) };
+
+		// Provide response - simulates the server returning a real ID
+		const savedRecord = { id: 100, title: 'Draft Post', status: 'draft' };
+		apiFetch.mockImplementation( () => savedRecord );
+
+		const result = await saveEntityRecord(
+			'postType',
+			'post',
+			post
+		)( { select, dispatch, resolveSelect } );
+
+		// Should use POST method since staged records don't exist on the server
+		expect( apiFetch ).toHaveBeenCalledTimes( 1 );
+		expect( apiFetch ).toHaveBeenCalledWith( {
+			path: '/wp/v2/posts',
+			method: 'POST',
+			// Draft ID should be stripped from the data sent to the server
+			data: { title: 'Draft Post', status: 'draft' },
+		} );
+
+		// Should receive the new record with the persisted ID stored separately
+		expect( dispatch.receiveEntityRecords ).toHaveBeenCalledWith(
+			'postType',
+			'post',
+			{
+				...savedRecord,
+				id: draftId,
+				__unstablePersistedId: 100,
+				__unstableIsStaged: true,
+			},
+			undefined,
+			true,
+			{ title: 'Draft Post', status: 'draft' }
+		);
+
+		expect( result ).toBe( savedRecord );
+	} );
+
+	it( 'handles staged records with custom entity keys', async () => {
+		const draftId = `${ STAGED_ID_PREFIX }test-uuid-456`;
+		const menuLocation = {
+			name: draftId,
+			menu: 5,
+			description: 'Test Location',
+		};
+		const configs = [
+			{
+				name: 'menuLocation',
+				kind: 'root',
+				baseURL: '/wp/v2/menu-locations',
+				key: 'name',
+			},
+		];
+		const select = {
+			getRawEntityRecord: () => menuLocation,
+		};
+		const resolveSelect = { getEntitiesConfig: jest.fn( () => configs ) };
+
+		// Provide response
+		const savedRecord = {
+			name: 'primary',
+			menu: 5,
+			description: 'Test Location',
+		};
+		apiFetch.mockImplementation( () => savedRecord );
+
+		await saveEntityRecord(
+			'root',
+			'menuLocation',
+			menuLocation
+		)( { select, dispatch, resolveSelect } );
+
+		// Should use POST and strip the draft key
+		expect( apiFetch ).toHaveBeenCalledWith( {
+			path: '/wp/v2/menu-locations',
+			method: 'POST',
+			data: { menu: 5, description: 'Test Location' },
+		} );
 	} );
 } );
 

@@ -20,6 +20,7 @@ import { DEFAULT_ENTITY_KEY } from './entities';
 import { createBatch } from './batch';
 import { STORE_NAME } from './name';
 import { LOCAL_EDITOR_ORIGIN, getSyncManager } from './sync';
+import { STAGED_ID_PREFIX } from './utils/is-staged-id';
 import logEntityDeprecation from './utils/log-entity-deprecation';
 
 /**
@@ -528,11 +529,24 @@ export const saveEntityRecord =
 		}
 		const entityIdKey = entityConfig.key ?? DEFAULT_ENTITY_KEY;
 		const recordId = record[ entityIdKey ];
-		const isNewRecord = !! entityIdKey && ! recordId;
+		const isLocalStaged =
+			recordId.startsWith( STAGED_ID_PREFIX ) &&
+			record.__unstablePersistedId === undefined;
+		const serverRecordId = isLocalStaged
+			? record.__unstablePersistedId
+			: recordId;
+		// Treat records without a persisted ID as new records.
+		const isNewRecord = ! serverRecordId;
 
 		const lock = await dispatch.__unstableAcquireStoreLock(
 			STORE_NAME,
-			[ 'entities', 'records', kind, name, recordId || uuid() ],
+			[
+				'entities',
+				'records',
+				kind,
+				name,
+				serverRecordId || recordId || uuid(),
+			],
 			{ exclusive: true }
 		);
 
@@ -582,7 +596,9 @@ export const saveEntityRecord =
 					'/templates';
 			}
 			try {
-				const path = `${ baseURL }${ recordId ? '/' + recordId : '' }`;
+				const path = `${ baseURL }${
+					serverRecordId ? '/' + serverRecordId : ''
+				}`;
 				// Skip the raw values check when creating a new record; they don't exist yet.
 				const persistedRecord = ! isNewRecord
 					? select.getRawEntityRecord( kind, name, recordId )
@@ -701,11 +717,24 @@ export const saveEntityRecord =
 							),
 						};
 					}
+
 					updatedRecord = await __unstableFetch( {
 						path,
-						method: recordId ? 'PUT' : 'POST',
+						method: serverRecordId ? 'PUT' : 'POST',
 						data: edits,
 					} );
+
+					if ( isLocalStaged ) {
+						const updatedRecordId = updatedRecord?.[ entityIdKey ];
+						updatedRecord = {
+							...updatedRecord,
+							// Do NOT replace the local ID with the persisted one:
+							// changing IDs would cause UI re-mounts (keys change) and visual flicker.
+							[ entityIdKey ]: recordId,
+							__unstablePersistedId: updatedRecordId,
+						};
+					}
+
 					dispatch.receiveEntityRecords(
 						kind,
 						name,
@@ -827,7 +856,16 @@ export const saveEditedEntityRecord =
 			name,
 			recordId
 		);
+		const persistedRecord = select.getRawEntityRecord?.(
+			kind,
+			name,
+			recordId
+		);
 		const record = { [ entityIdKey ]: recordId, ...edits };
+		if ( persistedRecord?.__unstablePersistedId !== undefined ) {
+			record.__unstablePersistedId =
+				persistedRecord.__unstablePersistedId;
+		}
 		return await dispatch.saveEntityRecord( kind, name, record, options );
 	};
 
@@ -868,6 +906,11 @@ export const __experimentalSaveSpecifiedEntityEdits =
 		);
 
 		const entityIdKey = entityConfig?.key || DEFAULT_ENTITY_KEY;
+		const persistedRecord = select.getRawEntityRecord?.(
+			kind,
+			name,
+			recordId
+		);
 
 		// If a record key is provided then update the existing record.
 		// This necessitates providing `recordKey` to saveEntityRecord as part of the
@@ -875,6 +918,14 @@ export const __experimentalSaveSpecifiedEntityEdits =
 		// a new record and instead cause it to update the existing record.
 		if ( recordId ) {
 			editsToSave[ entityIdKey ] = recordId;
+			if ( persistedRecord?.__unstablePersistedId !== undefined ) {
+				editsToSave.__unstablePersistedId =
+					persistedRecord.__unstablePersistedId;
+			}
+			if ( persistedRecord?.__unstableIsStaged !== undefined ) {
+				editsToSave.__unstableIsStaged =
+					persistedRecord.__unstableIsStaged;
+			}
 		}
 		return await dispatch.saveEntityRecord(
 			kind,

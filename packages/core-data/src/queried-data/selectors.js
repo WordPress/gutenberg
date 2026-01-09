@@ -35,6 +35,13 @@ function getQueriedItemsUncached( state, query ) {
 	const { stableKey, page, perPage, include, fields, context } =
 		getQueryParts( query );
 	let itemIds;
+	const itemsById = state.items?.[ context ] || {};
+	const persistedIdMapForContext = state.persistedIdMap?.[ context ] || {};
+	const includeMapped = Array.isArray( include )
+		? include.map(
+				( itemId ) => persistedIdMapForContext[ itemId ] || itemId
+		  )
+		: null;
 
 	if ( state.queries?.[ context ]?.[ stableKey ] ) {
 		itemIds = state.queries[ context ][ stableKey ].itemIds;
@@ -52,19 +59,20 @@ function getQueriedItemsUncached( state, query ) {
 
 	const items = [];
 	for ( let i = startOffset; i < endOffset; i++ ) {
-		const itemId = itemIds[ i ];
-		if ( Array.isArray( include ) && ! include.includes( itemId ) ) {
-			continue;
-		}
+		let itemId = itemIds[ i ];
 		if ( itemId === undefined ) {
 			continue;
 		}
+		itemId = persistedIdMapForContext[ itemId ] || itemId;
+		if ( includeMapped && ! includeMapped.includes( itemId ) ) {
+			continue;
+		}
 		// Having a target item ID doesn't guarantee that this object has been queried.
-		if ( ! state.items[ context ]?.hasOwnProperty( itemId ) ) {
+		if ( ! itemsById.hasOwnProperty( itemId ) ) {
 			return null;
 		}
 
-		const item = state.items[ context ][ itemId ];
+		const item = itemsById[ itemId ];
 
 		let filteredItem;
 		if ( Array.isArray( fields ) ) {

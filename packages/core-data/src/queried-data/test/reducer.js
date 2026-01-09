@@ -147,6 +147,7 @@ describe( 'reducer', () => {
 			items: {},
 			queries: {},
 			itemIsComplete: {},
+			persistedIdMap: {},
 		} );
 	} );
 
@@ -155,6 +156,7 @@ describe( 'reducer', () => {
 			items: { default: {} },
 			queries: {},
 			itemIsComplete: { default: {} },
+			persistedIdMap: {},
 		} );
 		const state = reducer( original, {
 			type: 'RECEIVE_ITEMS',
@@ -170,8 +172,9 @@ describe( 'reducer', () => {
 				default: { 1: true },
 			},
 			queries: {
-				default: { 's=a': { itemIds: [ 1 ] } },
+				default: { 's=a': { itemIds: [ 1 ], meta: undefined } },
 			},
+			persistedIdMap: {},
 		} );
 	} );
 
@@ -180,6 +183,7 @@ describe( 'reducer', () => {
 			items: { default: {} },
 			queries: {},
 			itemIsComplete: { default: {} },
+			persistedIdMap: {},
 		} );
 		const state = reducer( original, {
 			type: 'RECEIVE_ITEMS',
@@ -194,6 +198,7 @@ describe( 'reducer', () => {
 				default: { 1: true },
 			},
 			queries: {},
+			persistedIdMap: {},
 		} );
 	} );
 
@@ -215,6 +220,7 @@ describe( 'reducer', () => {
 					's=a': { itemIds: [ 1, 3 ] },
 				},
 			},
+			persistedIdMap: {},
 		} );
 		const state = reducer( original, removeItems( kind, name, 3 ) );
 
@@ -233,6 +239,7 @@ describe( 'reducer', () => {
 					's=a': { itemIds: [ 1 ] },
 				},
 			},
+			persistedIdMap: {},
 		} );
 	} );
 
@@ -253,6 +260,7 @@ describe( 'reducer', () => {
 					's=2': { itemIds: [ 'foo//bar2' ] },
 				},
 			},
+			persistedIdMap: {},
 		} );
 		const state = reducer(
 			original,
@@ -273,6 +281,7 @@ describe( 'reducer', () => {
 					's=2': { itemIds: [] },
 				},
 			},
+			persistedIdMap: {},
 		} );
 	} );
 } );
