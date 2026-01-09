@@ -547,7 +547,6 @@ describe( 'saveEntityRecord', () => {
 				...savedRecord,
 				id: draftId,
 				__unstablePersistedId: 100,
-				__unstableIsStaged: true,
 			},
 			undefined,
 			true,

@@ -189,10 +189,7 @@ export function receiveEditorAssets( assets ) {
 export const createStagedEntityRecord =
 	( kind, name, record ) =>
 	( { select, dispatch } ) => {
-		const configs = select.getEntitiesConfig( kind );
-		const entityConfig = configs?.find(
-			( config ) => config.kind === kind && config.name === name
-		);
+		const entityConfig = select.getEntityConfig( kind, name );
 		if ( ! entityConfig ) {
 			throw new Error(
 				`The entity being created (${ kind }, ${ name }) does not have a loaded config.`

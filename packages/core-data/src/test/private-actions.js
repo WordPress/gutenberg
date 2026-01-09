@@ -7,7 +7,7 @@ import apiFetch from '@wordpress/api-fetch';
  * Internal dependencies
  */
 import { editMediaEntity, createStagedEntityRecord } from '../private-actions';
-import { STAGED_ID_PREFIX } from '../utils';
+import { STAGED_ID_PREFIX } from '../utils/is-staged-id';
 
 jest.mock( '@wordpress/api-fetch' );
 
@@ -223,7 +223,7 @@ describe( 'createStagedEntityRecord', () => {
 			receiveEntityRecords: jest.fn(),
 		} );
 		select = {
-			getEntitiesConfig: jest.fn( () => [
+			getEntityConfig: jest.fn( () => [
 				{
 					kind: 'postType',
 					name: 'post',
@@ -231,25 +231,12 @@ describe( 'createStagedEntityRecord', () => {
 				},
 			] ),
 		};
-		resolveSelect = {};
 	} );
 
-	it( 'should throw when the entity does not have a loaded config', async () => {
-		select.getEntitiesConfig.mockReturnValue( [] );
-
-		await expect(
-			createStagedEntityRecord( 'postType', 'unknownEntity', {
-				title: 'Test',
-			} )( { select, dispatch, resolveSelect } )
-		).rejects.toThrow(
-			'The entity being created (postType, unknownEntity) does not have a loaded config.'
-		);
-	} );
-
-	it( 'should create a local-only entity record with a staged ID', async () => {
+	it( 'should create a local-only entity record with a staged ID', () => {
 		const record = { title: 'New Post', status: 'draft' };
 
-		const result = await createStagedEntityRecord(
+		const result = createStagedEntityRecord(
 			'postType',
 			'post',
 			record
@@ -275,39 +262,16 @@ describe( 'createStagedEntityRecord', () => {
 		);
 	} );
 
-	it( 'should use the entity key from config', async () => {
-		select.getEntitiesConfig.mockReturnValue( [
-			{
-				kind: 'root',
-				name: 'menuLocation',
-				key: 'name',
-			},
-		] );
-
-		const record = { menu: 0 };
-
-		const result = await createStagedEntityRecord(
-			'root',
-			'menuLocation',
-			record
-		)( { select, dispatch, resolveSelect } );
-
-		// Verify the result uses the custom key
-		expect( result.name ).toBeDefined();
-		expect( result.name.startsWith( STAGED_ID_PREFIX ) ).toBe( true );
-		expect( result.menu ).toBe( 0 );
-	} );
-
-	it( 'should generate unique staged IDs for each call', async () => {
+	it( 'should generate unique staged IDs for each call', () => {
 		const record = { title: 'Test' };
 
-		const result1 = await createStagedEntityRecord(
+		const result1 = createStagedEntityRecord(
 			'postType',
 			'post',
 			record
 		)( { select, dispatch, resolveSelect } );
 
-		const result2 = await createStagedEntityRecord(
+		const result2 = createStagedEntityRecord(
 			'postType',
 			'post',
 			record

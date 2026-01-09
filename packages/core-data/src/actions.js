@@ -923,10 +923,6 @@ export const __experimentalSaveSpecifiedEntityEdits =
 				editsToSave.__unstablePersistedId =
 					persistedRecord.__unstablePersistedId;
 			}
-			if ( persistedRecord?.__unstableIsStaged !== undefined ) {
-				editsToSave.__unstableIsStaged =
-					persistedRecord.__unstableIsStaged;
-			}
 		}
 		return await dispatch.saveEntityRecord(
 			kind,
