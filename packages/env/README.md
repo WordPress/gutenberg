@@ -446,8 +446,9 @@ Destroy the WordPress environment. Deletes docker containers, volumes, and
 networks associated with the WordPress environment and removes local files.
 
 Options:
-  --debug    Enable debug output.                     [boolean] [default: false]
-  --scripts  Execute any configured lifecycle scripts. [boolean] [default: true]
+  --debug        Enable debug output.                                 [boolean] [default: false]
+  --scripts      Execute any configured lifecycle scripts.            [boolean] [default: true]
+  -q, --quiet    Silence all non-error ouput and auto confirm choices [boolean] [default: false]
 ```
 
 ### `wp-env logs [environment]`

@@ -25,8 +25,9 @@ const { executeLifecycleScript } = require( '../execute-lifecycle-script' );
  * @param {Object}  options.spinner A CLI spinner which indicates progress.
  * @param {boolean} options.scripts Indicates whether or not lifecycle scripts should be executed.
  * @param {boolean} options.debug   True if debug mode is enabled.
+ * @param {boolean} options.quiet   Supresses non-error output and auto confirms.
  */
-module.exports = async function destroy( { spinner, scripts, debug } ) {
+module.exports = async function destroy( { spinner, scripts, debug, quiet } ) {
 	const config = await loadConfig( path.resolve( '.' ) );
 
 	try {
@@ -36,25 +37,34 @@ module.exports = async function destroy( { spinner, scripts, debug } ) {
 		return;
 	}
 
-	spinner.info(
-		'WARNING! This will remove Docker containers, volumes, networks, and images associated with the WordPress instance.'
-	);
-
-	let yesDelete = false;
-	try {
-		yesDelete = await confirm( {
-			message: 'Are you sure you want to continue?',
-			default: false,
-		} );
-	} catch ( error ) {
-		if ( error.name === 'ExitPromptError' ) {
-			console.log( 'Cancelled.' );
-			process.exit( 1 );
-		}
-		throw error;
+	if ( ! quiet ) {
+		spinner.info(
+			'WARNING! This will remove Docker containers, volumes, networks, and images associated with the WordPress instance.'
+		);
 	}
 
-	spinner.start();
+	// If we are running in quiet mode we auto accept any confirmation.
+	let yesDelete = quiet;
+	if ( ! yesDelete ) {
+		try {
+			yesDelete = await confirm( {
+				message: 'Are you sure you want to continue?',
+				default: false,
+			} );
+		} catch ( error ) {
+			if ( error.name === 'ExitPromptError' ) {
+				if ( ! quiet ) {
+					console.log( 'Cancelled.' );
+				}
+				process.exit( 1 );
+			}
+			throw error;
+		}
+	}
+
+	if ( ! quiet ) {
+		spinner.start();
+	}
 
 	if ( ! yesDelete ) {
 		spinner.text = 'Cancelled.';
