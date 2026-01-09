@@ -58,7 +58,7 @@ if ( window.__experimentalContentOnlyInspectorFields ) {
 		},
 	];
 	settings[ formKey ] = {
-		fields: [ 'audio' ],
+		fields: [ 'audio', 'caption' ],
 	};
 }
 
