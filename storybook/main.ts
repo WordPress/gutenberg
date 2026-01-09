@@ -17,6 +17,7 @@ const stories = [
 	'../packages/components/src/**/stories/*.mdx',
 	'../packages/icons/src/**/stories/*.story.@(js|tsx|mdx)',
 	'../packages/dataviews/src/**/stories/*.story.@(js|tsx|mdx)',
+	'../packages/dataviews/src/**/stories/*.mdx',
 	'../packages/fields/src/**/stories/*.story.@(js|tsx|mdx)',
 	'../packages/image-cropper/src/**/stories/*.story.@(js|tsx|mdx)',
 	'../packages/media-fields/src/**/stories/*.story.@(js|tsx|mdx)',
