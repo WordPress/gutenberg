@@ -105,6 +105,9 @@ export const parameters = {
 	controls: {
 		sort: 'requiredFirst',
 	},
+	backgrounds: {
+		disable: true,
+	},
 	docs: {
 		controls: {
 			sort: 'requiredFirst',
