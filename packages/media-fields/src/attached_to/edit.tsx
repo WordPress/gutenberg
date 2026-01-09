@@ -117,17 +117,17 @@ export default function MediaAttachedToEdit( {
 			const selectedPost = searchResults.find(
 				( result ) => result.id === Number( selectedPostId )
 			);
+			// Although unlikely, it's technically possible for selectedPost to not be found.
+			// E.g. if the user selects an option just as new search results are loaded.
+			// TODO: Add error handling for when selectedPost is not found.
 			if ( selectedPost && postTypes ) {
 				const postType = postTypes.find(
 					( _postType: { slug: string } ) =>
 						_postType.slug === selectedPost?.type
 				);
-				if ( ! postType ) {
-					throw new Error( 'Post type not found' );
-				}
 
 				const attachedTo = {
-					type: postType.slug,
+					...( postType && { type: postType.slug } ),
 					id: Number( selectedPostId ),
 					title: {
 						raw: selectedPost.title,
