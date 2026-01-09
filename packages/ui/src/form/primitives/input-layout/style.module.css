@@ -8,10 +8,10 @@
 		display: flex;
 		height: 40px;
 		background-color: var(--wpds-color-bg-interactive-neutral);
-		border-width: 1px;
+		border-width: var(--wpds-border-width-surface-xs);
 		border-style: solid;
 		border-color: var(--wpds-color-stroke-interactive-neutral);
-		border-radius: 2px;
+		border-radius: var(--wpds-border-radius-surface-sm);
 		font-family: var(--wpds-font-family-body);
 		font-size: max(var(--wpds-font-size-md), 16px); /* avoid mobile zoom */
 		line-height: 1;
