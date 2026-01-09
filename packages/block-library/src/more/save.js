@@ -10,7 +10,7 @@ export default function save( { attributes: { customText, noTeaser } } ) {
 
 	return (
 		<RawHTML>
-			{ [ moreTag, noTeaserTag ].filter( Boolean ).join( '\n' ) }
+			{ [ moreTag, noTeaserTag ].filter( Boolean ).join( '' ) }
 		</RawHTML>
 	);
 }
