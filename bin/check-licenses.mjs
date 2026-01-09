@@ -10,7 +10,7 @@ import spawn from 'cross-spawn';
  */
 import { checkDeps, getLicenses } from '../packages/scripts/utils/license.js';
 
-const ignored = [ '@ampproject/remapping', 'webpack' ];
+const ignored = [ '@ampproject/remapping' ];
 
 /*
  * `wp-scripts check-licenses` uses prod and dev dependencies of the package to scan for dependencies. With npm workspaces, workspace packages (the @wordpress/* packages) are not listed in the main package json and this approach does not work.
