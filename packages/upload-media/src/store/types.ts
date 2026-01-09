@@ -151,8 +151,11 @@ export type OnErrorHandler = ( error: Error ) => void;
 export type OnBatchSuccessHandler = () => void;
 
 export enum ItemStatus {
+	Queued = 'QUEUED',
 	Processing = 'PROCESSING',
 	Paused = 'PAUSED',
+	Uploaded = 'UPLOADED',
+	Error = 'ERROR',
 }
 
 export enum OperationType {
