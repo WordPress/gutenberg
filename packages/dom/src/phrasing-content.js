@@ -125,7 +125,7 @@ const embeddedContentSchema = {
 		],
 	},
 	math: {
-		attributes: [ 'display', 'xmlns' ],
+		attributes: [ 'display', 'xmlns', 'data-latex' ],
 		children: '*',
 	},
 };

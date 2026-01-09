@@ -26,6 +26,8 @@ exports[`Blocks raw handling pasteHandler gutenberg 1`] = `"Test"`;
 
 exports[`Blocks raw handling pasteHandler iframe-embed 1`] = `""`;
 
+exports[`Blocks raw handling pasteHandler latex-markdown 1`] = `"Math with LaTeX<br>The <strong>quadratic formula</strong> is <math data-latex="x = \\frac{-b \\pm \\sqrt{b^2-4ac}}{2a}"></math> for any <math data-latex="ax^2 + bx + c = 0"></math>.<br>Here is a display equation:<br><math display="block" data-latex="E = mc^2"></math><br>Another paragraph with inline <math data-latex="\\pi"></math> and <math data-latex="e"></math>.<br>Display math with fractions:<br><math display="block" data-latex="\\frac{a}{b} + \\frac{c}{d}"></math><br>Code blocks should not be converted: <code>$x^2$</code><br>Currency like $100 should remain as text.<br>Mixed inline: Given <math data-latex="a"></math> and <math data-latex="b"></math>, compute <math data-latex="a + b"></math>."`;
+
 exports[`Blocks raw handling pasteHandler markdown 1`] = `"This is a heading with <em>italic</em><br>This is a paragraph with a <a href="https://w.org/">link</a>, <strong>bold</strong>, and <del>strikethrough</del>.<br>Preserve<br>line breaks please.<br>Lists<br>A<br>Bulleted Indented<br>List<br>One<br>Two<br>Three<br>Table<br>First Header<br>Second Header<br>Content from cell 1<br>Content from cell 2<br>Content in the first column<br>Content in the second column<br><br><br><br>Table with empty cells.<br>Quote<br>First<br>Second<br>Code<br>Inline <code>code</code> tags should work.<br><code>This is a code block.</code>"`;
 
 exports[`Blocks raw handling pasteHandler mixed-content 1`] = `"Some heading<br><br>Content we need to preserve"`;

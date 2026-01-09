@@ -426,6 +426,7 @@ describe( 'Blocks raw handling', () => {
 			'slack-quote',
 			'slack-paragraphs',
 			'mixed-content',
+			'latex-markdown',
 		].forEach( ( type ) => {
 			// eslint-disable-next-line jest/valid-title
 			it( type, () => {

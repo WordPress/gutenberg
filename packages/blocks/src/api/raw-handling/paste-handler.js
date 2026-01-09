@@ -33,6 +33,11 @@ import { deepFilterHTML, isPlain, getBlockContentSchema } from './utils';
 import emptyParagraphRemover from './empty-paragraph-remover';
 import slackParagraphCorrector from './slack-paragraph-corrector';
 import isLatexMathMode from './latex-to-math';
+import latexDelimiterConverter, {
+	hasLatexDelimiters,
+	isPureDisplayMath,
+	extractDisplayMathContent,
+} from './latex-delimiter-converter';
 import { createBlock } from '../factory';
 import headingTransformer from './heading-transformer';
 
@@ -131,6 +136,16 @@ export function pasteHandler( {
 	// * There is no HTML version, or it has no formatting.
 	const isPlainText = plainText && ( ! HTML || isPlain( HTML ) );
 
+	// Check for pure display math with delimiters ($$...$$ or \[...\])
+	if ( isPlainText && isPureDisplayMath( plainText ) ) {
+		return [
+			createBlock( 'core/math', {
+				latex: extractDisplayMathContent( plainText ),
+			} ),
+		];
+	}
+
+	// Fallback: existing bare LaTeX detection (no delimiters)
 	if ( isPlainText && isLatexMathMode( plainText ) ) {
 		return [ createBlock( 'core/math', { latex: plainText } ) ];
 	}
@@ -143,6 +158,13 @@ export function pasteHandler( {
 		if ( ! /^\s+$/.test( plainText ) ) {
 			HTML = markdownConverter( HTML );
 		}
+	}
+
+	// Convert LaTeX delimiters to <math> elements.
+	// Runs after Markdown conversion to handle mixed Markdown + LaTeX content.
+	// Skips content inside <code>, <pre>, etc.
+	if ( hasLatexDelimiters( HTML ) ) {
+		HTML = latexDelimiterConverter( HTML );
 	}
 
 	// An array of HTML strings and block objects. The blocks replace matched

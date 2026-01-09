@@ -11,6 +11,7 @@ import edit from './edit';
 import metadata from './block.json';
 import save from './save';
 import deprecated from './deprecated';
+import transforms from './transforms';
 
 const { name } = metadata;
 
@@ -28,6 +29,7 @@ export const settings = {
 	edit,
 	save,
 	deprecated,
+	transforms,
 };
 
 export const init = () => initBlock( { name, metadata, settings } );
