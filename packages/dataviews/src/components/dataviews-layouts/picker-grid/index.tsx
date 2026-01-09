@@ -35,6 +35,7 @@ import type { SetSelection } from '../../../types/private';
 import { GridItems } from '../utils/grid-items';
 const { Badge } = unlock( componentsPrivateApis );
 import getDataByGroup from '../utils/get-data-by-group';
+import { useGridColumns } from '../grid/preview-size-picker';
 
 interface GridItemProps< Item > {
 	view: ViewPickerGridType;
@@ -358,6 +359,15 @@ function ViewPickerGrid< Item >( {
 	const perPage = view?.perPage ?? 0;
 	const setSize = isInfiniteScroll ? paginationInfo?.totalItems : undefined;
 
+	// Calculate placeholders needed for infinite scroll
+	const gridColumns = useGridColumns();
+	const firstItemPosition =
+		hasData && isInfiniteScroll ? ( data[ 0 ] as any ).position : undefined;
+	const placeholdersNeeded =
+		firstItemPosition && gridColumns
+			? ( firstItemPosition - 1 ) % gridColumns
+			: 0;
+
 	return (
 		<>
 			{
@@ -487,6 +497,25 @@ function ViewPickerGrid< Item >( {
 						aria-multiselectable={ isMultiselect }
 						aria-label={ itemListLabel }
 					>
+						{ /* Render placeholders for unloaded items in first row */ }
+						{ Array.from( { length: placeholdersNeeded } ).map(
+							( _, index ) => (
+								<Composite.Item
+									key={ `placeholder-${ index }` }
+									render={ ( { children, ...props } ) => (
+										<Stack
+											direction="column"
+											children={ children }
+											{ ...props }
+										/>
+									) }
+									role="option"
+									aria-hidden
+									tabIndex={ -1 }
+									className="dataviews-view-picker-grid__card dataviews-view-picker-grid__placeholder"
+								/>
+							)
+						) }
 						{ data.map( ( item ) => {
 							// Use position from item for accessibility in infinite scroll mode.
 							const posinset = ( item as any ).position;

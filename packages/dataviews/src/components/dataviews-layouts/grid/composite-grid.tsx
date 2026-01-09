@@ -426,6 +426,15 @@ export default function CompositeGrid< Item >( {
 	const size = '900px';
 	const totalRows = Math.ceil( data.length / gridColumns );
 
+	// Calculate placeholders needed for infinite scroll
+	const hasData = !! data?.length;
+	const firstItemPosition =
+		hasData && isInfiniteScroll ? ( data[ 0 ] as any ).position : undefined;
+	const placeholdersNeeded =
+		firstItemPosition && gridColumns
+			? ( firstItemPosition - 1 ) % gridColumns
+			: 0;
+
 	return (
 		<>
 			{
@@ -456,6 +465,24 @@ export default function CompositeGrid< Item >( {
 						// @ts-ignore
 						inert={ inert }
 					>
+						{ /* Render placeholders for unloaded items in first row */ }
+						{ Array.from( { length: placeholdersNeeded } ).map(
+							( _, index ) => (
+								<Composite.Item
+									key={ `placeholder-${ index }` }
+									render={ ( props ) => (
+										<Stack
+											{ ...props }
+											direction="column"
+											role="article"
+											className="dataviews-view-grid__row__gridcell dataviews-view-grid__card dataviews-view-grid__placeholder"
+										/>
+									) }
+									aria-hidden
+									tabIndex={ -1 }
+								/>
+							)
+						) }
 						{ data.map( ( item ) => {
 							const itemId = getItemId( item );
 							// Use position from item for infinite scroll
