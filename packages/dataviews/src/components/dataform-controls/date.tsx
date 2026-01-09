@@ -334,11 +334,12 @@ function CalendarDateControl< Item >( {
 		timezone: { string: timezoneString },
 	} = getSettings();
 
-	const displayLabel = isValid?.required && ! markWhenOptional
-		? `${ label } (${ __( 'Required' ) })`
-		: ! isValid?.required && markWhenOptional
-		? `${ label } (${ __( 'Optional' ) })`
-		: label;
+	let displayLabel = label;
+	if ( isValid?.required && ! markWhenOptional ) {
+		displayLabel = `${ label } (${ __( 'Required' ) })`;
+	} else if ( ! isValid?.required && markWhenOptional ) {
+		displayLabel = `${ label } (${ __( 'Optional' ) })`;
+	}
 
 	return (
 		<ValidatedDateControl
@@ -545,11 +546,12 @@ function CalendarDateRangeControl< Item >( {
 
 	const { timezone } = getSettings();
 
-	const displayLabel = field.isValid?.required && ! markWhenOptional
-		? `${ label } (${ __( 'Required' ) })`
-		: ! field.isValid?.required && markWhenOptional
-		? `${ label } (${ __( 'Optional' ) })`
-		: label;
+	let displayLabel = label;
+	if ( field.isValid?.required && ! markWhenOptional ) {
+		displayLabel = `${ label } (${ __( 'Required' ) })`;
+	} else if ( ! field.isValid?.required && markWhenOptional ) {
+		displayLabel = `${ label } (${ __( 'Optional' ) })`;
+	}
 
 	return (
 		<ValidatedDateControl

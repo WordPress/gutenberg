@@ -156,12 +156,12 @@ function CalendarDateTimeControl< Item >( {
 		timezone: { string: timezoneString },
 	} = getSettings();
 
-	const displayLabel =
-		isValid?.required && ! markWhenOptional && ! hideLabelFromVision
-			? `${ label } (${ __( 'Required' ) })`
-			: ! isValid?.required && markWhenOptional && ! hideLabelFromVision
-			? `${ label } (${ __( 'Optional' ) })`
-			: label;
+	let displayLabel = label;
+	if ( isValid?.required && ! markWhenOptional && ! hideLabelFromVision ) {
+		displayLabel = `${ label } (${ __( 'Required' ) })`;
+	} else if ( ! isValid?.required && markWhenOptional && ! hideLabelFromVision ) {
+		displayLabel = `${ label } (${ __( 'Optional' ) })`;
+	}
 
 	return (
 		<BaseControl

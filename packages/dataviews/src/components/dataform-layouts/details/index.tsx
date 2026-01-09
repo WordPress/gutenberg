@@ -20,8 +20,7 @@ export default function FormDetailsField< Item >( {
 	data,
 	field,
 	onChange,
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	markWhenOptional,
+	markWhenOptional: _markWhenOptional,
 }: FieldLayoutProps< Item > ) {
 	const { fields } = useContext( DataFormContext );
 

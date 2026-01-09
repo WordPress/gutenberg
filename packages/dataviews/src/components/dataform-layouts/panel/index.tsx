@@ -136,8 +136,7 @@ export default function FormPanelField< Item >( {
 	data,
 	field,
 	onChange,
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	markWhenOptional,
+	markWhenOptional: _markWhenOptional,
 	validity,
 }: FieldLayoutProps< Item > ) {
 	const { fields } = useContext( DataFormContext );
