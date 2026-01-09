@@ -15,6 +15,7 @@ export type AnyConfig = ReduxStoreConfig< any, any, any >;
 export interface StoreInstance< Config extends AnyConfig > {
 	getSelectors: () => SelectorsOf< Config >;
 	getActions: () => ActionCreatorsOf< Config >;
+	getResolveSelectors?: () => PromisifiedSelectorsOf< Config >;
 	subscribe: ( listener: () => void ) => () => void;
 }
 
@@ -57,9 +58,11 @@ export type UseDispatchReturn< StoreNameOrDescriptor > =
 		? ActionCreatorsOf< ConfigOf< StoreNameOrDescriptor > >
 		: StoreNameOrDescriptor extends undefined
 		? DispatchFunction
-		: any;
+		: unknown;
 
-export type DispatchFunction = < StoreNameOrDescriptor >(
+export type DispatchFunction = <
+	StoreNameOrDescriptor extends StoreDescriptor | string,
+>(
 	store: StoreNameOrDescriptor
 ) => DispatchReturn< StoreNameOrDescriptor >;
 
@@ -194,10 +197,32 @@ export interface SelectorWithCustomCurrySignature {
 }
 
 export interface DataRegistry {
-	register: ( store: StoreDescriptor< any > ) => void;
-	dispatch: < S extends StoreDescriptor< any > >(
-		store: S
-	) => ActionCreatorsOf< ConfigOf< S > >;
+	/**
+	 * Given a namespace key and settings object, registers a new generic store.
+	 */
+	registerGenericStore: (
+		name: string,
+		store: StoreInstance< AnyConfig >
+	) => void;
+	/**
+	 * Given a namespace key and settings object, registers a new namespace store.
+	 */
+	registerStore: Function;
+	/**
+	 * Given a function callback, invokes the callback on any change to state within any registered store.
+	 */
+	subscribe: Function;
+	/**
+	 * Given a namespace key, returns an object of the store's registered selectors.
+	 */
+	select: < Config extends AnyConfig = AnyConfig >(
+		storeNameOrDescriptor: StoreDescriptor< Config > | string
+	) => SelectorsOf< Config > | undefined;
+	/**
+	 * Given a namespace key, returns an object of the store's registered action dispatchers.
+	 */
+	register: ( store: StoreDescriptor ) => void;
+	dispatch: DispatchFunction;
 }
 
 // Type Helpers.
@@ -237,12 +262,19 @@ export type ThunkReturnType< Action extends ActionCreator > = Awaited<
 	ReturnType< ReturnType< Action > >
 >;
 
-type SelectorsOf< Config extends AnyConfig > = Config extends ReduxStoreConfig<
-	any,
-	any,
-	infer Selectors
->
-	? { [ name in keyof Selectors ]: Function }
-	: never;
+export type SelectorsOf< Config extends AnyConfig > =
+	Config extends ReduxStoreConfig< any, any, infer Selectors >
+		? { [ name in keyof Selectors ]: Function }
+		: never;
+
+type PromisifyFunctionReturns<
+	T extends { [ K in string ]: ( ...args: any[] ) => any },
+> = {
+	[ K in keyof T ]: (
+		...args: Parameters< T[ K ] >
+	) => Promise< ReturnType< T[ K ] > >;
+};
+export type PromisifiedSelectorsOf< Config extends AnyConfig > =
+	PromisifyFunctionReturns< SelectorsOf< Config > >;
 
 export type combineReducers = typeof reduxCombineReducers;

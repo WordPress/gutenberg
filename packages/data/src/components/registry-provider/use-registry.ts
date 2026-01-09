@@ -45,7 +45,7 @@ import { Context } from './context';
  * };
  * ```
  *
- * @return {import('../../types').DataRegistry} A custom react hook exposing the registry context value.
+ * @return A custom react hook exposing the registry context value.
  */
 export default function useRegistry() {
 	return useContext( Context );

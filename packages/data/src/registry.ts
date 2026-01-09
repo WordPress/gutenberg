@@ -10,36 +10,27 @@ import createReduxStore from './redux-store';
 import coreDataStore from './store';
 import { createEmitter } from './utils/emitter';
 import { lock, unlock } from './lock-unlock';
-
-/** @typedef {import('./types').StoreDescriptor} StoreDescriptor */
-
-/**
- * @typedef {Object} WPDataRegistry An isolated orchestrator of store registrations.
- *
- * @property {Function} registerGenericStore Given a namespace key and settings
- *                                           object, registers a new generic
- *                                           store.
- * @property {Function} registerStore        Given a namespace key and settings
- *                                           object, registers a new namespace
- *                                           store.
- * @property {Function} subscribe            Given a function callback, invokes
- *                                           the callback on any change to state
- *                                           within any registered store.
- * @property {Function} select               Given a namespace key, returns an
- *                                           object of the  store's registered
- *                                           selectors.
- * @property {Function} dispatch             Given a namespace key, returns an
- *                                           object of the store's registered
- *                                           action dispatchers.
- */
+import {
+	AnyConfig,
+	ConfigOf,
+	DataRegistry,
+	DispatchFunction,
+	DispatchReturn,
+	PromisifiedSelectorsOf,
+	ReduxStoreConfig,
+	SelectorsOf,
+	StoreDescriptor,
+	StoreInstance,
+} from './types';
 
 /**
- * @typedef {Object} WPDataPlugin An object of registry function overrides.
- *
- * @property {Function} registerStore registers store.
+ * An object of registry function overrides.
  */
+interface WPDataPlugin {
+	registerStore: Function;
+}
 
-function getStoreName( storeNameOrDescriptor ) {
+function getStoreName( storeNameOrDescriptor: StoreDescriptor | string ) {
 	return typeof storeNameOrDescriptor === 'string'
 		? storeNameOrDescriptor
 		: storeNameOrDescriptor.name;
@@ -51,12 +42,15 @@ function getStoreName( storeNameOrDescriptor ) {
  * @param {Object}  storeConfigs Initial store configurations.
  * @param {?Object} parent       Parent registry.
  *
- * @return {WPDataRegistry} Data registry.
+ * @return {DataRegistry} Data registry.
  */
-export function createRegistry( storeConfigs = {}, parent = null ) {
-	const stores = {};
+export function createRegistry(
+	storeConfigs = {},
+	parent: DataRegistry | null = null
+): DataRegistry {
+	const stores: Record< string, StoreInstance< AnyConfig > > = {};
 	const emitter = createEmitter();
-	let listeningStores = null;
+	let listeningStores: Set< string > | null = null;
 
 	/**
 	 * Global listener called for each store's update.
@@ -104,17 +98,22 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 	 * @param {string|StoreDescriptor} storeNameOrDescriptor Unique namespace identifier for the store
 	 *                                                       or the store descriptor.
 	 *
-	 * @return {*} The selector's returned value.
+	 * @return The selector's returned value.
 	 */
-	function select( storeNameOrDescriptor ) {
+	function select< StoreNameOrDescriptor extends string | StoreDescriptor >(
+		storeNameOrDescriptor: StoreNameOrDescriptor
+	): SelectorsOf< ConfigOf< StoreNameOrDescriptor > > | undefined {
 		const storeName = getStoreName( storeNameOrDescriptor );
 		listeningStores?.add( storeName );
 		const store = stores[ storeName ];
 		if ( store ) {
-			return store.getSelectors();
+			return store.getSelectors() as SelectorsOf<
+				ConfigOf< StoreNameOrDescriptor >
+			>;
 		}
 
-		return parent?.select( storeName );
+		// @ts-expect-error storeName cannot be statically back-resolved to StoreNameOrDescriptor
+		return parent?.select< StoreNameOrDescriptor >( storeName );
 	}
 
 	function __unstableMarkListeningStores( callback, ref ) {
@@ -138,12 +137,18 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 	 *
 	 * @return {Object} Each key of the object matches the name of a selector.
 	 */
-	function resolveSelect( storeNameOrDescriptor ) {
+	function resolveSelect<
+		StoreNameOrDescriptor extends string | StoreDescriptor,
+	>(
+		storeNameOrDescriptor: StoreNameOrDescriptor
+	): PromisifiedSelectorsOf< ConfigOf< StoreNameOrDescriptor > > | undefined {
 		const storeName = getStoreName( storeNameOrDescriptor );
 		listeningStores?.add( storeName );
-		const store = stores[ storeName ];
+		const store = stores[ storeName ] as StoreInstance<
+			ConfigOf< StoreNameOrDescriptor >
+		>;
 		if ( store ) {
-			return store.getResolveSelectors();
+			return store.getResolveSelectors?.();
 		}
 
 		return parent && parent.resolveSelect( storeName );
@@ -179,14 +184,16 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 	 *
 	 * @return {*} The action's returned value.
 	 */
-	function dispatch( storeNameOrDescriptor ) {
+	function dispatch< Config extends AnyConfig = AnyConfig >(
+		storeNameOrDescriptor: StoreDescriptor< Config > | string
+	) {
 		const storeName = getStoreName( storeNameOrDescriptor );
 		const store = stores[ storeName ];
 		if ( store ) {
-			return store.getActions();
+			return store.getActions() as DispatchReturn< Config >;
 		}
 
-		return parent && parent.dispatch( storeName );
+		return parent?.dispatch( storeName );
 	}
 
 	//
@@ -214,7 +221,10 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 	 * @param {string}   name        Store registry name.
 	 * @param {Function} createStore Function that creates a store object (getSelectors, getActions, subscribe).
 	 */
-	function registerStoreInstance( name, createStore ) {
+	function registerStoreInstance< Config extends AnyConfig >(
+		name: string,
+		createStore: () => StoreInstance< Config >
+	) {
 		if ( stores[ name ] ) {
 			// eslint-disable-next-line no-console
 			console.error( 'Store "' + name + '" is already registered.' );
@@ -279,13 +289,16 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 	 *
 	 * @param {StoreDescriptor} store Store descriptor.
 	 */
-	function register( store ) {
+	function register( store: StoreDescriptor ) {
 		registerStoreInstance( store.name, () =>
 			store.instantiate( registry )
 		);
 	}
 
-	function registerGenericStore( name, store ) {
+	function registerGenericStore(
+		name: string,
+		store: StoreInstance< AnyConfig >
+	) {
 		deprecated( 'wp.data.registerGenericStore', {
 			since: '5.9',
 			alternative: 'wp.data.register( storeDescriptor )',
@@ -301,7 +314,10 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 	 *
 	 * @return {Object} Registered store object.
 	 */
-	function registerStore( storeName, options ) {
+	function registerStore(
+		storeName: string,
+		options: ReduxStoreConfig< any, any, any >
+	) {
 		if ( ! options.reducer ) {
 			throw new TypeError( 'Must specify store reducer' );
 		}
@@ -332,7 +348,7 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 		}
 	}
 
-	let registry = {
+	let registry: DataRegistry = {
 		batch,
 		stores,
 		namespaces: stores, // TODO: Deprecate/remove this.
@@ -376,7 +392,7 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 
 	const registryWithPlugins = withPlugins( registry );
 	lock( registryWithPlugins, {
-		privateActionsOf: ( name ) => {
+		privateActionsOf: ( name: string ) => {
 			try {
 				return unlock( stores[ name ].store ).privateActions;
 			} catch ( e ) {
@@ -385,7 +401,7 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 				return {};
 			}
 		},
-		privateSelectorsOf: ( name ) => {
+		privateSelectorsOf: ( name: string ) => {
 			try {
 				return unlock( stores[ name ].store ).privateSelectors;
 			} catch ( e ) {

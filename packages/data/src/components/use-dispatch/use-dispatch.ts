@@ -2,6 +2,7 @@
  * Internal dependencies
  */
 import useRegistry from '../registry-provider/use-registry';
+import type { StoreDescriptor, UseDispatchReturn } from '../../types';
 
 /**
  * @typedef {import('../../types').StoreDescriptor<StoreConfig>} StoreDescriptor
@@ -58,7 +59,11 @@ import useRegistry from '../registry-provider/use-registry';
  * ```
  * @return {UseDispatchReturn<StoreNameOrDescriptor>} A custom react hook.
  */
-const useDispatch = ( storeNameOrDescriptor ) => {
+const useDispatch = <
+	StoreNameOrDescriptor extends undefined | string | StoreDescriptor< any >,
+>(
+	storeNameOrDescriptor?: StoreNameOrDescriptor
+): UseDispatchReturn< StoreNameOrDescriptor > => {
 	const { dispatch } = useRegistry();
 	return storeNameOrDescriptor === void 0
 		? dispatch
