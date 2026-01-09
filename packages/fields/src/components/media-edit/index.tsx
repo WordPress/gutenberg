@@ -131,7 +131,7 @@ function MediaPickerButton( {
 		>
 			{ children }
 			{ isBlob && (
-				<span className="fields__media-edit-picker-button_spinner">
+				<span className="fields__media-edit-picker-button-spinner">
 					<Spinner />
 				</span>
 			) }
@@ -491,7 +491,7 @@ export default function MediaEdit< Item >( {
 						}
 					);
 					setBlobs( blobItems );
-					// If all uploads are complete reset the replacingId.
+					// If all uploads are complete reset the replacementId.
 					if ( uploadedItems.length === uploadedMedia.length ) {
 						setReplacementId( undefined );
 					}
@@ -500,6 +500,10 @@ export default function MediaEdit< Item >( {
 					}
 					if ( ! multiple ) {
 						onChangeControl( uploadedItems[ 0 ] );
+						return;
+					}
+					if ( ! value ) {
+						onChangeControl( uploadedItems );
 						return;
 					}
 					const normalizedValue = Array.isArray( value )
