@@ -50,6 +50,7 @@ import {
 } from './color-utils';
 import { DEFAULT_MEDIA_SIZE_SLUG } from '../constants';
 import { getIframeSrc, getBackgroundVideoSrc } from '../embed-video-utils';
+import { observeStickyHeaderHeight } from '../sticky-header-utils';
 
 function getInnerBlocksTemplate( attributes ) {
 	return [
@@ -175,6 +176,12 @@ function CoverEdit( {
 		} )();
 		// Update the block only when the featured image changes.
 	}, [ mediaUrl ] );
+
+	// Observe sticky header height and update CSS custom property
+	useEffect( () => {
+		const cleanup = observeStickyHeaderHeight();
+		return cleanup;
+	}, [] );
 
 	// instead of destructuring the attributes
 	// we define the url and background type
