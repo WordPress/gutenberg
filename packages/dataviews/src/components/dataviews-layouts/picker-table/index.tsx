@@ -261,8 +261,6 @@ function ViewPickerTable< Item >( {
 	const [ nextHeaderMenuToFocus, setNextHeaderMenuToFocus ] =
 		useState< HTMLButtonElement >();
 	const isMultiselect = useIsMultiselectPicker( actions ) ?? false;
-	// Track stable positions for items in infinite scroll mode.
-	const itemPositions = useRef< Map< string, number > >( new Map() );
 
 	useEffect( () => {
 		if ( headerMenuToFocusRef.current ) {
@@ -276,25 +274,6 @@ function ViewPickerTable< Item >( {
 		: null;
 	const dataByGroup = groupField ? getDataByGroup( data, groupField ) : null;
 	const isInfiniteScroll = view.infiniteScrollEnabled && ! dataByGroup;
-
-	// Update item positions for infinite scroll
-	// Store positions from item metadata to ensure they remain stable
-	useEffect( () => {
-		if ( ! isInfiniteScroll ) {
-			return;
-		}
-
-		data.forEach( ( item ) => {
-			const itemId = getItemId( item );
-			if ( ! itemPositions.current.has( itemId ) ) {
-				// Check if item has position metadata
-				const position = ( item as any ).position;
-				if ( position !== undefined ) {
-					itemPositions.current.set( itemId, position );
-				}
-			}
-		} );
-	}, [ data, getItemId, isInfiniteScroll ] );
 
 	const tableNoticeId = useId();
 
@@ -498,9 +477,8 @@ function ViewPickerTable< Item >( {
 						{ hasData &&
 							data.map( ( item, index ) => {
 								const itemId = getItemId( item );
-								// Use stable position for accessibility.
-								const posinset =
-									itemPositions.current.get( itemId );
+								// Use position from item for accessibility in infinite scroll mode.
+								const posinset = ( item as any ).position;
 
 								return (
 									<TableRow

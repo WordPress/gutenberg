@@ -306,8 +306,6 @@ function ViewPickerGrid< Item >( {
 }: ViewPickerGridProps< Item > ) {
 	const { resizeObserverRef, paginationInfo, itemListLabel } =
 		useContext( DataViewsContext );
-	// Track stable positions for items in infinite scroll mode.
-	const itemPositions = useRef< Map< string, number > >( new Map() );
 	const titleField = fields.find(
 		( field ) => field.id === view?.titleField
 	);
@@ -359,25 +357,6 @@ function ViewPickerGrid< Item >( {
 	const currentPage = view?.page ?? 1;
 	const perPage = view?.perPage ?? 0;
 	const setSize = isInfiniteScroll ? paginationInfo?.totalItems : undefined;
-
-	// Update item positions for infinite scroll
-	// Store positions from item metadata to ensure they remain stable
-	useEffect( () => {
-		if ( ! isInfiniteScroll ) {
-			return;
-		}
-
-		data.forEach( ( item ) => {
-			const itemId = getItemId( item );
-			if ( ! itemPositions.current.has( itemId ) ) {
-				// Check if item has position metadata
-				const position = ( item as any ).position;
-				if ( position !== undefined ) {
-					itemPositions.current.set( itemId, position );
-				}
-			}
-		} );
-	}, [ data, getItemId, isInfiniteScroll ] );
 
 	return (
 		<>
@@ -433,19 +412,12 @@ function ViewPickerGrid< Item >( {
 										}
 									>
 										{ groupItems.map( ( item ) => {
-											const itemId = getItemId( item );
-											// Use stable position if available, otherwise calculate.
+											// Use position from item if available (infinite scroll), otherwise calculate.
 											const posInSet =
-												itemPositions.current.has(
-													itemId
-												)
-													? itemPositions.current.get(
-															itemId
-													  )
-													: ( currentPage - 1 ) *
-															perPage +
-													  data.indexOf( item ) +
-													  1;
+												( item as any ).position ??
+												( currentPage - 1 ) * perPage +
+													data.indexOf( item ) +
+													1;
 											return (
 												<GridItem
 													key={ getItemId( item ) }
@@ -516,10 +488,8 @@ function ViewPickerGrid< Item >( {
 						aria-label={ itemListLabel }
 					>
 						{ data.map( ( item ) => {
-							const itemId = getItemId( item );
-							// Use stable position for accessibility.
-							const posinset =
-								itemPositions.current.get( itemId );
+							// Use position from item for accessibility in infinite scroll mode.
+							const posinset = ( item as any ).position;
 
 							return (
 								<GridItem

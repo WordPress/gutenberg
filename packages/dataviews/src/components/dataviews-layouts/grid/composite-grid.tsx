@@ -386,8 +386,6 @@ export default function CompositeGrid< Item >( {
 	const { paginationInfo, resizeObserverRef } =
 		useContext( DataViewsContext );
 	const gridColumns = useGridColumns();
-	// Track stable positions for items in infinite scroll mode
-	const itemPositions = useRef< Map< string, number > >( new Map() );
 	const hasBulkActions = useSomeItemHasAPossibleBulkAction( actions, data );
 	const titleField = fields.find(
 		( field ) => field.id === view?.titleField
@@ -428,25 +426,6 @@ export default function CompositeGrid< Item >( {
 	const size = '900px';
 	const totalRows = Math.ceil( data.length / gridColumns );
 
-	// Update item positions for infinite scroll
-	// Store positions based on the order items appear in the data array
-	useEffect( () => {
-		if ( ! isInfiniteScroll ) {
-			return;
-		}
-
-		data.forEach( ( item ) => {
-			const itemId = getItemId( item );
-			if ( ! itemPositions.current.has( itemId ) ) {
-				// Check if item has position metadata
-				const position = ( item as any ).position;
-				if ( position !== undefined ) {
-					itemPositions.current.set( itemId, position );
-				}
-			}
-		} );
-	}, [ data, getItemId, isInfiniteScroll ] );
-
 	return (
 		<>
 			{
@@ -479,9 +458,8 @@ export default function CompositeGrid< Item >( {
 					>
 						{ data.map( ( item ) => {
 							const itemId = getItemId( item );
-							// Get stable position for infinite scroll
-							const stablePosition =
-								itemPositions.current.get( itemId );
+							// Use position from item for infinite scroll
+							const stablePosition = ( item as any ).position;
 							return (
 								<Composite.Item
 									key={ itemId }
