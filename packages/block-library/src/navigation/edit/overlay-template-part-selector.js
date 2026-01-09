@@ -21,6 +21,7 @@ import { plus } from '@wordpress/icons';
  */
 import { createTemplatePartId } from '../../template-part/edit/utils/create-template-part-id';
 import useCreateOverlayTemplatePart from './use-create-overlay';
+import { NAVIGATION_OVERLAY_TEMPLATE_PART_AREA } from '../constants';
 
 /**
  * Overlay Template Part Selector component.
@@ -55,7 +56,8 @@ export default function OverlayTemplatePartSelector( {
 			return [];
 		}
 		return templateParts.filter(
-			( templatePart ) => templatePart.area === 'overlay'
+			( templatePart ) =>
+				templatePart.area === NAVIGATION_OVERLAY_TEMPLATE_PART_AREA
 		);
 	}, [ templateParts ] );
 

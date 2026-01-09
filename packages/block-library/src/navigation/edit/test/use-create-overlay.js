@@ -42,7 +42,7 @@ describe( 'useCreateOverlayTemplatePart', () => {
 			title: {
 				rendered: 'Overlay',
 			},
-			area: 'overlay',
+			area: 'navigation-overlay',
 		};
 
 		mockSaveEntityRecord.mockResolvedValue( createdOverlay );
@@ -62,7 +62,7 @@ describe( 'useCreateOverlayTemplatePart', () => {
 			expect.objectContaining( {
 				slug: 'overlay',
 				title: 'Overlay',
-				area: 'overlay',
+				area: 'navigation-overlay',
 			} ),
 			{ throwOnError: true }
 		);
@@ -77,7 +77,7 @@ describe( 'useCreateOverlayTemplatePart', () => {
 			title: {
 				rendered: 'Overlay',
 			},
-			area: 'overlay',
+			area: 'navigation-overlay',
 		};
 		const overlayTemplateParts = [ existingOverlay ];
 		const createdOverlay = {
@@ -87,7 +87,7 @@ describe( 'useCreateOverlayTemplatePart', () => {
 			title: {
 				rendered: 'Overlay 2',
 			},
-			area: 'overlay',
+			area: 'navigation-overlay',
 		};
 
 		mockSaveEntityRecord.mockResolvedValue( createdOverlay );
@@ -107,7 +107,7 @@ describe( 'useCreateOverlayTemplatePart', () => {
 			expect.objectContaining( {
 				title: 'Overlay 2',
 				slug: 'overlay-2',
-				area: 'overlay',
+				area: 'navigation-overlay',
 			} ),
 			{ throwOnError: true }
 		);

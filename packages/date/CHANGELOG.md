@@ -2,8 +2,6 @@
 
 ## Unreleased
 
-## 5.37.1-next.0 (2026-01-07)
-
 ### Bug Fixes
 
 -   Fixed incorrect spacing for the time format. It was `g: i` (`14: 30`), and it's now `g:i` (`14:30`). ([#73924](https://github.com/WordPress/gutenberg/pull/73924))

@@ -10,7 +10,10 @@ import type { Field, View } from '@wordpress/dataviews';
  */
 import {
 	altTextField,
+	attachedToField,
 	captionField,
+	dateAddedField,
+	dateModifiedField,
 	descriptionField,
 	filenameField,
 	filesizeField,
@@ -148,7 +151,7 @@ const sampleMediaItemZip: MediaItem = {
 	},
 	mime_type: 'application/zip',
 	media_type: 'file',
-	post: 1,
+	post: 123,
 	source_url:
 		'http://localhost:8888/wp-content/uploads/2025/11/gutenberg-v22-0-0.zip',
 	media_details: {
@@ -173,6 +176,28 @@ const sampleMediaItemZip: MediaItem = {
 		sizes: {},
 	},
 	missing_image_sizes: [],
+	_embedded: {
+		'wp:attached-to': [
+			{
+				id: 123,
+				date: '2025-12-19T00:21:52',
+				slug: '',
+				type: 'post',
+				link: 'http://localhost:8888/?p=123',
+				title: {
+					raw: 'A post title',
+					rendered: 'A post title',
+				},
+				excerpt: {
+					raw: '',
+					rendered: '',
+					protected: false,
+				},
+				author: 1,
+				featured_media: 0,
+			},
+		],
+	},
 };
 
 // Sample data for a broken image (demonstrates error fallback)
@@ -231,7 +256,10 @@ const showcaseFields = [
 	mediaThumbnailField,
 	filenameField,
 	altTextField,
+	attachedToField,
 	captionField,
+	dateAddedField,
+	dateModifiedField,
 	descriptionField,
 	mimeTypeField,
 	mediaDimensionsField,
@@ -259,6 +287,9 @@ const DataFormsComponent = ( { type }: { type: 'regular' | 'panel' } ) => {
 			'mime_type',
 			'media_dimensions',
 			'filesize',
+			'date',
+			'modified',
+			'attached_to',
 		],
 	};
 
