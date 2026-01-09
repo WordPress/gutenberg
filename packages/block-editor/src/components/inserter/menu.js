@@ -182,7 +182,6 @@ function InserterMenu(
 					value={ filterValue }
 					label={ __( 'Search' ) }
 					placeholder={ __( 'Search' ) }
-					name="block-inserter-search"
 				/>
 				{ !! delayedFilterValue && (
 					<InserterSearchResults
