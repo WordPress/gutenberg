@@ -179,7 +179,6 @@ const wasmInlinePlugin = {
 			if ( ! args.path.startsWith( '.' ) ) {
 				const { createRequire } = await import( 'module' );
 				const require = createRequire( args.resolveDir + '/index.js' );
-				console.log( 'Resolving WASM module:', args.path );
 				try {
 					const resolved = require.resolve( args.path );
 					return {
