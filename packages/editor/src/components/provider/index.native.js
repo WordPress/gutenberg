@@ -65,9 +65,9 @@ const postTypeEntities = [
 	},
 	rawAttributes: [ 'title', 'excerpt', 'content' ],
 } ) );
-import { EditorHelpTopics, store as editorStore } from '@wordpress/editor';
-import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore } from '@wordpress/core-data';
+import { store as noticesStore } from '@wordpress/notices';
+import { EditorHelpTopics, store as editorStore } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -313,14 +313,14 @@ class NativeEditorProvider extends Component {
 		return false;
 	}
 
-	onContentUpdate( { content: rawContent } ) {
+	async onContentUpdate( { content: rawContent } ) {
 		const {
 			editTitle,
 			onClearPostTitleSelection,
 			onInsertBlockAfter: onInsertBlocks,
 			title,
 		} = this.props;
-		const content = pasteHandler( {
+		const content = await pasteHandler( {
 			plainText: rawContent,
 		} );
 

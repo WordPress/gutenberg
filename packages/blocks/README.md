@@ -275,6 +275,14 @@ _Returns_
 
 -   `?string`: Block name.
 
+### getLatexToMathML
+
+Returns the cached latex-to-mathml function, or null if not yet loaded. Used by math block transforms to generate MathML during paste.
+
+_Returns_
+
+-   `Function|null`: The latexToMathML function or null.
+
 ### getPhrasingContentSchema
 
 Undocumented declaration.
@@ -493,6 +501,8 @@ _Returns_
 
 Converts an HTML string to known blocks. Strips everything else.
 
+This is the async version that pre-loads latex-to-mathml for MathML generation.
+
 _Parameters_
 
 -   _options_ `Object`:
@@ -503,7 +513,7 @@ _Parameters_
 
 _Returns_
 
--   `Array|string`: A list of blocks or a string, depending on `handlerMode`.
+-   `Promise<Array|string>`: A promise resolving to blocks or string.
 
 ### privateApis
 

@@ -1,14 +1,21 @@
 /**
  * WordPress dependencies
  */
-import { createBlock } from '@wordpress/blocks';
+import { createBlock, getLatexToMathML } from '@wordpress/blocks';
 
 const transforms = {
 	from: [
 		{
 			type: 'raw',
 			isMatch: ( node ) => {
-				// Match <p> containing only a <math display="block"> element
+				// Match bare <math display="block">
+				if (
+					node.nodeName.toUpperCase() === 'MATH' &&
+					node.getAttribute( 'display' ) === 'block'
+				) {
+					return true;
+				}
+				// Match <p> containing only <math display="block">
 				if ( node.nodeName !== 'P' ) {
 					return false;
 				}
@@ -21,19 +28,27 @@ const transforms = {
 					return false;
 				}
 				const child = children[ 0 ];
-				// nodeName is uppercase for HTML, but check both cases for safety
-				const nodeName = child.nodeName.toUpperCase();
 				return (
-					nodeName === 'MATH' &&
+					child.nodeName.toUpperCase() === 'MATH' &&
 					child.getAttribute( 'display' ) === 'block'
 				);
 			},
 			transform: ( node ) => {
-				const mathElement = node.querySelector(
-					'math[display="block"]'
-				);
+				const mathElement =
+					node.nodeName.toUpperCase() === 'MATH'
+						? node
+						: node.querySelector( 'math[display="block"]' );
 				const latex = mathElement?.getAttribute( 'data-latex' ) || '';
-				return createBlock( 'core/math', { latex } );
+				let mathML = '';
+				const latexToMathML = getLatexToMathML();
+				if ( latexToMathML ) {
+					try {
+						mathML = latexToMathML( latex, { displayMode: true } );
+					} catch ( e ) {
+						// Leave empty on error - editor will retry
+					}
+				}
+				return createBlock( 'core/math', { latex, mathML } );
 			},
 			priority: 5, // Higher priority than paragraph
 		},

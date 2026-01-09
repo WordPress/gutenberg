@@ -112,7 +112,7 @@ const PostTitle = forwardRef( ( _, forwardedRef ) => {
 		}
 	}
 
-	function onPaste( event ) {
+	async function onPaste( event ) {
 		const clipboardData = event.clipboardData;
 
 		let plainText = '';
@@ -128,16 +128,16 @@ const PostTitle = forwardRef( ( _, forwardedRef ) => {
 			return;
 		}
 
+		event.preventDefault();
+
 		// Allows us to ask for this information when we get a report.
 		window.console.log( 'Received HTML:\n\n', html );
 		window.console.log( 'Received plain text:\n\n', plainText );
 
-		const content = pasteHandler( {
+		const content = await pasteHandler( {
 			HTML: html,
 			plainText,
 		} );
-
-		event.preventDefault();
 
 		if ( ! content.length ) {
 			return;

@@ -10,9 +10,9 @@ describe( 'Handling of non matched tags in block transforms', () => {
 		require( '../../packages/editor/src/hooks' );
 		registerCoreBlocks();
 	} );
-	it( 'correctly pastes preformatted tag even if preformatted block is removed', () => {
+	it( 'correctly pastes preformatted tag even if preformatted block is removed', async () => {
 		unregisterBlockType( 'core/preformatted' );
-		const simplePreformattedResult = pasteHandler( {
+		const simplePreformattedResult = await pasteHandler( {
 			HTML: '<pre>Pre</pre>',
 			mode: 'AUTO',
 		} );
@@ -23,7 +23,7 @@ describe( 'Handling of non matched tags in block transforms', () => {
 			simplePreformattedResult[ 0 ].attributes.content.valueOf()
 		).toBe( 'Pre' );
 
-		const codeResult = pasteHandler( {
+		const codeResult = await pasteHandler( {
 			HTML: '<pre><code>code</code></pre>',
 			mode: 'AUTO',
 		} );

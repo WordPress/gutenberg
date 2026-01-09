@@ -68,7 +68,7 @@ export function setClipboardBlocks( event, blocks, registry ) {
  * @param {boolean}        canUserUseUnfilteredHTML Whether the user can or can't post unfiltered HTML.
  * @return {Array|string} A list of blocks or a string, depending on `handlerMode`.
  */
-export function getPasteBlocks( event, canUserUseUnfilteredHTML ) {
+export async function getPasteBlocks( event, canUserUseUnfilteredHTML ) {
 	const { plainText, html, files } = getPasteEventData( event );
 	let blocks = [];
 
@@ -89,7 +89,7 @@ export function getPasteBlocks( event, canUserUseUnfilteredHTML ) {
 			}, [] )
 			.flat();
 	} else {
-		blocks = pasteHandler( {
+		blocks = await pasteHandler( {
 			HTML: html,
 			plainText,
 			mode: 'BLOCKS',

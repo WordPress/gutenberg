@@ -199,8 +199,8 @@ export function onFilesDrop(
  * @return {Function} The event handler for a block-related HTML drop event.
  */
 export function onHTMLDrop( insertOrReplaceBlocks ) {
-	return ( HTML ) => {
-		const blocks = pasteHandler( { HTML, mode: 'BLOCKS' } );
+	return async ( HTML ) => {
+		const blocks = await pasteHandler( { HTML, mode: 'BLOCKS' } );
 
 		if ( blocks.length ) {
 			insertOrReplaceBlocks( blocks );

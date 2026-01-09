@@ -17,7 +17,7 @@ import figureContentReducer from './figure-content-reducer';
 import shortcodeConverter from './shortcode-converter';
 import { deepFilterHTML, getBlockContentSchema } from './utils';
 
-export { pasteHandler } from './paste-handler';
+export { pasteHandler, getLatexToMathML } from './paste-handler';
 export {
 	default as latexDelimiterConverter,
 	hasLatexDelimiters,
