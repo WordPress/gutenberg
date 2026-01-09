@@ -18,6 +18,7 @@ import {
 	type UnknownAction,
 	type UpdateSettingsAction,
 } from './types';
+import { DEFAULT_MAX_CONCURRENT_UPLOADS } from './constants';
 
 const noop = () => {};
 
@@ -27,6 +28,7 @@ const DEFAULT_STATE: State = {
 	blobUrls: {},
 	settings: {
 		mediaUpload: noop,
+		maxConcurrentUploads: DEFAULT_MAX_CONCURRENT_UPLOADS,
 	},
 };
 

@@ -125,8 +125,10 @@ export interface Settings {
 	mediaUpload: ( args: UploadMediaArgs ) => void;
 	// List of allowed mime types and file extensions.
 	allowedMimeTypes?: Record< string, string > | null;
-	// Maximum upload file size
+	// Maximum upload file size.
 	maxUploadFileSize?: number;
+	// Maximum number of concurrent uploads.
+	maxConcurrentUploads: number;
 }
 
 // Must match the Attachment type from the media-utils package.

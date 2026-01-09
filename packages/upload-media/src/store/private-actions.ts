@@ -185,6 +185,19 @@ export function processItem( id: QueueItemId ) {
 			? item.operations[ 0 ][ 0 ]
 			: item.operations?.[ 0 ];
 
+		/*
+		 * If the next operation is an upload, check concurrency limit.
+		 * If at capacity, the item remains queued and will be processed
+		 * when another upload completes.
+		 */
+		if ( operation === OperationType.Upload ) {
+			const settings = select.getSettings();
+			const activeCount = select.getActiveUploadCount();
+			if ( activeCount >= settings.maxConcurrentUploads ) {
+				return;
+			}
+		}
+
 		if ( attachment ) {
 			onChange?.( [ attachment ] );
 		}
@@ -298,7 +311,10 @@ export function finishOperation(
 	id: QueueItemId,
 	updates: Partial< QueueItem >
 ) {
-	return async ( { dispatch }: ThunkArgs ) => {
+	return async ( { select, dispatch }: ThunkArgs ) => {
+		const item = select.getItem( id );
+		const previousOperation = item?.currentOperation;
+
 		dispatch< OperationFinishAction >( {
 			type: Type.OperationFinish,
 			id,
@@ -306,6 +322,17 @@ export function finishOperation(
 		} );
 
 		dispatch.processItem( id );
+
+		/*
+		 * If an upload just finished, there may be items waiting in the queue
+		 * due to concurrency limits. Trigger processing for them.
+		 */
+		if ( previousOperation === OperationType.Upload ) {
+			const pendingUploads = select.getPendingUploads();
+			for ( const pendingItem of pendingUploads ) {
+				dispatch.processItem( pendingItem.id );
+			}
+		}
 	};
 }
 

@@ -111,3 +111,35 @@ export function isPaused( state: State ): boolean {
 export function getBlobUrls( state: State, id: QueueItemId ): string[] {
 	return state.blobUrls[ id ] || [];
 }
+
+/**
+ * Returns the number of items currently uploading.
+ *
+ * @param state Upload state.
+ *
+ * @return Number of items currently uploading.
+ */
+export function getActiveUploadCount( state: State ): number {
+	return state.queue.filter(
+		( item ) => item.currentOperation === OperationType.Upload
+	).length;
+}
+
+/**
+ * Returns items that are waiting for upload (next operation is Upload but not yet started).
+ *
+ * @param state Upload state.
+ *
+ * @return Items pending upload.
+ */
+export function getPendingUploads( state: State ): QueueItem[] {
+	return state.queue.filter( ( item ) => {
+		const nextOperation = Array.isArray( item.operations?.[ 0 ] )
+			? item.operations[ 0 ][ 0 ]
+			: item.operations?.[ 0 ];
+		return (
+			nextOperation === OperationType.Upload &&
+			item.currentOperation !== OperationType.Upload
+		);
+	} );
+}
