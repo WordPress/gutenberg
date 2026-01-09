@@ -492,7 +492,7 @@ function block_core_breadcrumbs_get_terms_breadcrumbs( $post_id, $post_type ) {
 	}
 
 	/**
-	 * Filters breadcrumb taxonomy and term selection for a specific post.
+	 * Filters breadcrumb settings (taxonomy and term selection) for a post or post type.
 	 *
 	 * Allows developers to specify which taxonomy and term should be used in the
 	 * breadcrumb trail when a post type has multiple taxonomies or when a post is
