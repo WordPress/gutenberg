@@ -130,6 +130,7 @@ function ColorTools( {
 	setOverlayBackgroundColor,
 	clientId,
 	navRef,
+	overlay,
 } ) {
 	const [ detectedBackgroundColor, setDetectedBackgroundColor ] = useState();
 	const [ detectedColor, setDetectedColor ] = useState();
@@ -178,44 +179,52 @@ function ColorTools( {
 	if ( ! colorGradientSettings.hasColorsOrGradients ) {
 		return null;
 	}
+	const baseColorSettings = [
+		{
+			colorValue: textColor.color,
+			label: __( 'Text' ),
+			onColorChange: setTextColor,
+			resetAllFilter: () => setTextColor(),
+			clearable: true,
+			enableAlpha: true,
+		},
+		{
+			colorValue: backgroundColor.color,
+			label: __( 'Background' ),
+			onColorChange: setBackgroundColor,
+			resetAllFilter: () => setBackgroundColor(),
+			clearable: true,
+			enableAlpha: true,
+		},
+	];
+
+	// Only include overlay color controls when no custom overlay is selected
+	const overlayColorSettings = ! overlay
+		? [
+				{
+					colorValue: overlayTextColor.color,
+					label: __( 'Submenu & overlay text' ),
+					onColorChange: setOverlayTextColor,
+					resetAllFilter: () => setOverlayTextColor(),
+					clearable: true,
+					enableAlpha: true,
+				},
+				{
+					colorValue: overlayBackgroundColor.color,
+					label: __( 'Submenu & overlay background' ),
+					onColorChange: setOverlayBackgroundColor,
+					resetAllFilter: () => setOverlayBackgroundColor(),
+					clearable: true,
+					enableAlpha: true,
+				},
+		  ]
+		: [];
+
 	return (
 		<>
 			<ColorGradientSettingsDropdown
 				__experimentalIsRenderedInSidebar
-				settings={ [
-					{
-						colorValue: textColor.color,
-						label: __( 'Text' ),
-						onColorChange: setTextColor,
-						resetAllFilter: () => setTextColor(),
-						clearable: true,
-						enableAlpha: true,
-					},
-					{
-						colorValue: backgroundColor.color,
-						label: __( 'Background' ),
-						onColorChange: setBackgroundColor,
-						resetAllFilter: () => setBackgroundColor(),
-						clearable: true,
-						enableAlpha: true,
-					},
-					{
-						colorValue: overlayTextColor.color,
-						label: __( 'Submenu & overlay text' ),
-						onColorChange: setOverlayTextColor,
-						resetAllFilter: () => setOverlayTextColor(),
-						clearable: true,
-						enableAlpha: true,
-					},
-					{
-						colorValue: overlayBackgroundColor.color,
-						label: __( 'Submenu & overlay background' ),
-						onColorChange: setOverlayBackgroundColor,
-						resetAllFilter: () => setOverlayBackgroundColor(),
-						clearable: true,
-						enableAlpha: true,
-					},
-				] }
+				settings={ [ ...baseColorSettings, ...overlayColorSettings ] }
 				panelId={ clientId }
 				{ ...colorGradientSettings }
 				gradients={ [] }
@@ -819,6 +828,7 @@ function Navigation( {
 					setOverlayBackgroundColor={ setOverlayBackgroundColor }
 					clientId={ clientId }
 					navRef={ navRef }
+					overlay={ overlay }
 				/>
 			</InspectorControls>
 		</>

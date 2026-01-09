@@ -650,11 +650,14 @@ class WP_Navigation_Block_Renderer {
 		}
 
 		// Only add the disable-default-overlay class if experiment is enabled AND overlay blocks actually rendered.
+		// Skip adding default overlay color classes if a custom overlay is used.
+		$should_skip_overlay_colors = $has_custom_overlay || ! empty( $attributes['overlay'] );
+
 		$responsive_container_classes = array(
 			'wp-block-navigation__responsive-container',
 			$is_hidden_by_default ? 'hidden-by-default' : '',
 			$has_custom_overlay ? 'disable-default-overlay' : '',
-			implode( ' ', $colors['overlay_css_classes'] ),
+			$should_skip_overlay_colors ? '' : implode( ' ', $colors['overlay_css_classes'] ),
 		);
 		$open_button_classes          = array(
 			'wp-block-navigation__responsive-container-open',
@@ -705,7 +708,8 @@ class WP_Navigation_Block_Renderer {
 			';
 		}
 
-		$overlay_inline_styles = esc_attr( safecss_filter_attr( $colors['overlay_inline_styles'] ) );
+		// Only apply overlay inline styles if no custom overlay is selected.
+		$overlay_inline_styles = $should_skip_overlay_colors ? '' : esc_attr( safecss_filter_attr( $colors['overlay_inline_styles'] ) );
 
 		if ( $has_custom_overlay ) {
 			$custom_overlay_markup = sprintf(
