@@ -1,4 +1,3 @@
-import path from 'node:path';
 import { mergeConfig, transformWithEsbuild } from 'vite';
 import react from '@vitejs/plugin-react';
 
@@ -32,12 +31,7 @@ export default {
 		'@storybook/addon-a11y',
 		'storybook-addon-source-link',
 		'storybook-addon-tag-badges',
-	],
-	managerEntries: [
-		path.join(
-			import.meta.dirname,
-			'./addons/design-system-theme/manager.ts'
-		),
+		import.meta.resolve( './addons/design-system-theme/preset.ts' ),
 	],
 	framework: '@storybook/react-vite',
 	docs: {},
