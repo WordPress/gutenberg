@@ -492,9 +492,11 @@ function block_core_breadcrumbs_get_terms_breadcrumbs( $post_id, $post_type ) {
 	}
 
 	/**
-	 * Filters breadcrumb settings on a per-post-type basis.
+	 * Filters breadcrumb taxonomy and term selection for a specific post.
 	 *
-	 * Allow developers to customize breadcrumb behavior for specific post types.
+	 * Allows developers to specify which taxonomy and term should be used in the
+	 * breadcrumb trail when a post type has multiple taxonomies or when a post is
+	 * assigned to multiple terms within a taxonomy.
 	 *
 	 * @since 7.0.0
 	 *
@@ -504,10 +506,10 @@ function block_core_breadcrumbs_get_terms_breadcrumbs( $post_id, $post_type ) {
 	 *     @type string $taxonomy Optional. Taxonomy slug to use for breadcrumbs.
 	 *                            The taxonomy must be registered for the post type and have
 	 *                            terms assigned to the post. If not found or has no terms,
-	 *                            fall back to the first available taxonomy with terms.
+	 *                            falls back to the first available taxonomy with terms.
 	 *     @type string $term     Optional. Term slug to use when the post has multiple terms
 	 *                            in the selected taxonomy. If the term is not found or not
-	 *                            assigned to the post, fall back to the first term. If the
+	 *                            assigned to the post, falls back to the first term. If the
 	 *                            post has only one term, that term is used regardless.
 	 * }
 	 * @param string $post_type The post type slug.
