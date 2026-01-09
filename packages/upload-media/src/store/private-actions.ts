@@ -38,6 +38,7 @@ import type {
 	RevokeBlobUrlsAction,
 	Settings,
 	State,
+	UpdateProgressAction,
 	UpdateSettingsAction,
 } from './types';
 import { ItemStatus, OperationType, Type } from './types';
@@ -53,6 +54,7 @@ type ActionCreators = {
 	processItem: typeof processItem;
 	finishOperation: typeof finishOperation;
 	uploadItem: typeof uploadItem;
+	updateItemProgress: typeof updateItemProgress;
 	revokeBlobUrls: typeof revokeBlobUrls;
 	< T = Record< string, unknown > >( args: T ): void;
 };
@@ -451,6 +453,22 @@ export function revokeBlobUrls( id: QueueItemId ) {
 		dispatch< RevokeBlobUrlsAction >( {
 			type: Type.RevokeBlobUrls,
 			id,
+		} );
+	};
+}
+
+/**
+ * Updates the progress of an item.
+ *
+ * @param id       Item ID.
+ * @param progress Progress value (0-100).
+ */
+export function updateItemProgress( id: QueueItemId, progress: number ) {
+	return async ( { dispatch }: ThunkArgs ) => {
+		dispatch< UpdateProgressAction >( {
+			type: Type.UpdateProgress,
+			id,
+			progress,
 		} );
 	};
 }

@@ -20,6 +20,7 @@ export interface QueueItem {
 	operations?: Operation[];
 	error?: Error;
 	retryCount?: number;
+	progress?: number;
 	batchId?: string;
 	sourceUrl?: string;
 	sourceAttachmentId?: number;
@@ -49,6 +50,7 @@ export enum Type {
 	AddOperations = 'ADD_OPERATIONS',
 	CacheBlobUrl = 'CACHE_BLOB_URL',
 	RevokeBlobUrls = 'REVOKE_BLOB_URLS',
+	UpdateProgress = 'UPDATE_PROGRESS',
 	UpdateSettings = 'UPDATE_SETTINGS',
 }
 
@@ -96,6 +98,10 @@ export type CacheBlobUrlAction = Action<
 export type RevokeBlobUrlsAction = Action<
 	Type.RevokeBlobUrls,
 	{ id: QueueItemId }
+>;
+export type UpdateProgressAction = Action<
+	Type.UpdateProgress,
+	{ id: QueueItemId; progress: number }
 >;
 export type UpdateSettingsAction = Action<
 	Type.UpdateSettings,

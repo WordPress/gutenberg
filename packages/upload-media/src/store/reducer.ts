@@ -20,6 +20,7 @@ import {
 	type State,
 	Type,
 	type UnknownAction,
+	type UpdateProgressAction,
 	type UpdateSettingsAction,
 } from './types';
 import { DEFAULT_MAX_CONCURRENT_UPLOADS } from './constants';
@@ -50,6 +51,7 @@ type Action =
 	| OperationStartAction
 	| CacheBlobUrlAction
 	| RevokeBlobUrlsAction
+	| UpdateProgressAction
 	| UpdateSettingsAction
 	| UnknownAction;
 
@@ -230,6 +232,20 @@ function reducer(
 				blobUrls: newBlobUrls,
 			};
 		}
+
+		case Type.UpdateProgress:
+			return {
+				...state,
+				queue: state.queue.map(
+					( item ): QueueItem =>
+						item.id === action.id
+							? {
+									...item,
+									progress: action.progress,
+							  }
+							: item
+				),
+			};
 
 		case Type.UpdateSettings: {
 			return {
