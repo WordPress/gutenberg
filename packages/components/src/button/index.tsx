@@ -167,15 +167,21 @@ export function UnforwardedButton(
 	const trulyDisabled = disabled && ! accessibleWhenDisabled;
 	const Tag = href !== undefined && ! disabled ? 'a' : 'button';
 	const buttonProps: ComponentPropsWithoutRef< 'button' > =
-		Tag === 'button'
-			? {
-					type: 'button',
-					disabled: trulyDisabled,
+	Tag === 'button'
+		? {
+				type: 'button',
+				disabled: trulyDisabled,
+				...( ariaChecked !== undefined && {
 					'aria-checked': ariaChecked,
+				} ),
+				...( ariaPressed !== undefined && {
 					'aria-pressed': ariaPressed,
+				} ),
+				...( ariaSelected !== undefined && {
 					'aria-selected': ariaSelected,
-			  }
-			: {};
+				} ),
+		  }
+		: {};
 	const anchorProps: ComponentPropsWithoutRef< 'a' > =
 		Tag === 'a' ? { href, target } : {};
 
