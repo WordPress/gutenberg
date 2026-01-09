@@ -113,7 +113,9 @@ function block_core_tabs_generate_tabs_list( array $innerblocks = array() ): arr
 }
 
 /**
- * Filter to provide tabs list context to child blocks.
+ * Filter to provide tabs list context to core/tabs and core/tabs-menu blocks.
+ * It is more performant to do this here, once, rather than in the tabs render and tabs context filters.
+ * In this way core/tabs is both a provider and a consumer of the core/tabs-list context.
  *
  * @param array         $context      Default block context.
  * @param array         $parsed_block The block being rendered.
@@ -122,15 +124,11 @@ function block_core_tabs_generate_tabs_list( array $innerblocks = array() ): arr
  * @return array Modified context.
  */
 function block_core_tabs_provide_context( array $context, array $parsed_block, $parent_block ): array {
-	// Only modify context for tabs-menu blocks inside a tabs block
-	if ( 'core/tabs-menu' !== $parsed_block['blockName'] ) {
-		return $context;
-	}
-
-	// Find the parent tabs block and extract tabs list from tab-panels
-	if ( $parent_block && 'core/tabs' === $parent_block->name ) {
-		$tabs_list                 = block_core_tabs_generate_tabs_list( $parent_block->parsed_block['innerBlocks'] ?? array() );
+	if ( 'core/tabs' === $parsed_block['blockName'] ) {
+		$tabs_list                 = block_core_tabs_generate_tabs_list( $parsed_block['innerBlocks'] ?? array() );
 		$context['core/tabs-list'] = $tabs_list;
+		do_action('qm/debug', 'TABS LIST:');
+		do_action('qm/debug', print_r($context, true));
 	}
 
 	return $context;
@@ -155,7 +153,7 @@ function block_core_tabs_render_block_callback( array $attributes, string $conte
 	}
 	$title = wp_sprintf( '<h3 class="tabs__title">%s</h3>', esc_html( $title ) );
 
-	$tabs_list = block_core_tabs_generate_tabs_list( $block->parsed_block['innerBlocks'] ?? array() );
+	$tabs_list = $block->context['core/tabs-list'] ?? array();
 
 	$tabs_id = wp_unique_id( 'tabs_' );
 
