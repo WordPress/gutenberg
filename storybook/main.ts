@@ -19,7 +19,7 @@ const stories = [
 	'../packages/ui/src/**/stories/*.story.@(ts|tsx)',
 ].filter( Boolean );
 
-const config: StorybookConfig = {
+export default {
 	core: {
 		disableTelemetry: true,
 	},
@@ -58,8 +58,8 @@ const config: StorybookConfig = {
 			savePropValueAsString: true,
 		},
 	},
-	viteFinal: async ( _config ) => {
-		return mergeConfig( _config, {
+	viteFinal: async ( config ) => {
+		return mergeConfig( config, {
 			plugins: [
 				react( {
 					jsxImportSource: '@emotion/react',
@@ -96,6 +96,4 @@ const config: StorybookConfig = {
 			},
 		} );
 	},
-};
-
-export default config;
+} satisfies StorybookConfig;
