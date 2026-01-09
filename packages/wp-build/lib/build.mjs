@@ -233,16 +233,12 @@ function momentTimezoneAliasPlugin() {
 
 			// Cached paths - resolved lazily on first use
 			let preBuiltBundlePath;
-			let momentTimezoneUtilsPath;
 			const resolvePaths = () => {
 				if ( preBuiltBundlePath ) {
 					return;
 				}
 				preBuiltBundlePath = require.resolve(
-					'moment-timezone/builds/moment-timezone-with-data-1970-2030'
-				);
-				momentTimezoneUtilsPath = require.resolve(
-					'moment-timezone/moment-timezone-utils.js'
+					'moment-timezone/builds/moment-timezone-with-data-1970-2030.js'
 				);
 			};
 
@@ -252,17 +248,6 @@ function momentTimezoneAliasPlugin() {
 				() => {
 					resolvePaths();
 					return { path: preBuiltBundlePath };
-				}
-			);
-
-			// For utils, we need to load it but ensure it works with the pre-built bundle.
-			// The utils file tries to require('./') which would load index.js.
-			// We need to make sure it gets the pre-built bundle instead.
-			build.onResolve(
-				{ filter: /^moment-timezone\/moment-timezone-utils$/ },
-				() => {
-					resolvePaths();
-					return { path: momentTimezoneUtilsPath };
 				}
 			);
 
