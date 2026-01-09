@@ -29,9 +29,11 @@ import type {
 	Operation,
 	OperationFinishAction,
 	OperationStartAction,
+	PauseItemAction,
 	PauseQueueAction,
 	QueueItem,
 	QueueItemId,
+	ResumeItemAction,
 	ResumeQueueAction,
 	RevokeBlobUrlsAction,
 	Settings,
@@ -45,6 +47,8 @@ type ActionCreators = {
 	cancelItem: typeof cancelItem;
 	addItem: typeof addItem;
 	removeItem: typeof removeItem;
+	pauseItem: typeof pauseItem;
+	resumeItem: typeof resumeItem;
 	prepareItem: typeof prepareItem;
 	processItem: typeof processItem;
 	finishOperation: typeof finishOperation;
@@ -279,6 +283,41 @@ export function resumeQueue() {
 		for ( const item of select.getAllItems() ) {
 			dispatch.processItem( item.id );
 		}
+	};
+}
+
+/**
+ * Pauses a specific item in the queue.
+ *
+ * @param id Item ID.
+ */
+export function pauseItem( id: QueueItemId ) {
+	return async ( { dispatch }: ThunkArgs ) => {
+		dispatch< PauseItemAction >( {
+			type: Type.PauseItem,
+			id,
+		} );
+	};
+}
+
+/**
+ * Resumes a specific paused item in the queue.
+ *
+ * @param id Item ID.
+ */
+export function resumeItem( id: QueueItemId ) {
+	return async ( { select, dispatch }: ThunkArgs ) => {
+		const item = select.getItem( id );
+		if ( ! item || item.status !== ItemStatus.Paused ) {
+			return;
+		}
+
+		dispatch< ResumeItemAction >( {
+			type: Type.ResumeItem,
+			id,
+		} );
+
+		dispatch.processItem( id );
 	};
 }
 

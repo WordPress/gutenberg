@@ -6,11 +6,14 @@ import {
 	type AddOperationsAction,
 	type CacheBlobUrlAction,
 	type CancelAction,
+	ItemStatus,
 	type OperationFinishAction,
 	type OperationStartAction,
+	type PauseItemAction,
 	type PauseQueueAction,
 	type QueueItem,
 	type RemoveAction,
+	type ResumeItemAction,
 	type ResumeQueueAction,
 	type RevokeBlobUrlsAction,
 	type State,
@@ -36,6 +39,8 @@ type Action =
 	| AddAction
 	| RemoveAction
 	| CancelAction
+	| PauseItemAction
+	| ResumeItemAction
 	| PauseQueueAction
 	| ResumeQueueAction
 	| AddOperationsAction
@@ -64,6 +69,34 @@ function reducer(
 				queueStatus: 'active',
 			};
 		}
+
+		case Type.PauseItem:
+			return {
+				...state,
+				queue: state.queue.map(
+					( item ): QueueItem =>
+						item.id === action.id
+							? {
+									...item,
+									status: ItemStatus.Paused,
+							  }
+							: item
+				),
+			};
+
+		case Type.ResumeItem:
+			return {
+				...state,
+				queue: state.queue.map(
+					( item ): QueueItem =>
+						item.id === action.id
+							? {
+									...item,
+									status: ItemStatus.Processing,
+							  }
+							: item
+				),
+			};
 
 		case Type.Add:
 			return {
