@@ -87,42 +87,46 @@ export function useInfiniteScrollData< Item extends { id: number } >( {
 		} else {
 			// Subsequent pages - load more data
 			setAllLoadedRecords( ( prev ) => {
-				const existingIds = new Set( prev.map( getItemId ) );
+				const shownDataIds = new Set( shownData.map( getItemId ) );
 				// Calculate start position based on the highest position already tracked
 				let nextPosition =
 					positionMapRef.current.size > 0
 						? Math.max( ...positionMapRef.current.values() ) + 1
 						: 1;
 
-				const newRecords = shownData
-					.filter(
-						( record ) => ! existingIds.has( getItemId( record ) )
-					)
-					.map( ( record ) => {
-						const itemId = getItemId( record );
-						let position: number | undefined;
+				const newRecords = shownData.map( ( record ) => {
+					const itemId = getItemId( record );
+					let position: number | undefined;
 
-						if ( view.infiniteScrollEnabled ) {
-							// Check if this record already has a position
-							const existingPosition =
-								positionMapRef.current.get( itemId );
-							if ( existingPosition !== undefined ) {
-								position = existingPosition;
-							} else {
-								// Assign new position and increment for next record
-								position = nextPosition;
-								positionMapRef.current.set( itemId, position );
-								nextPosition++;
-							}
+					if ( view.infiniteScrollEnabled ) {
+						// Check if this record already has a position
+						const existingPosition =
+							positionMapRef.current.get( itemId );
+						if ( existingPosition !== undefined ) {
+							position = existingPosition;
+						} else {
+							// Assign new position and increment for next record
+							position = nextPosition;
+							positionMapRef.current.set( itemId, position );
+							nextPosition++;
 						}
+					}
 
-						return {
-							...record,
-							position,
-						};
-					} );
+					return {
+						...record,
+						position,
+					};
+				} );
 
-				if ( newRecords.length === 0 ) {
+				// Remove duplicates from prev, keeping only records not in shownData
+				const prevWithoutDuplicates = prev.filter(
+					( record ) => ! shownDataIds.has( getItemId( record ) )
+				);
+
+				if (
+					newRecords.length === 0 &&
+					prevWithoutDuplicates.length === 0
+				) {
 					return prev;
 				}
 
@@ -130,8 +134,8 @@ export function useInfiniteScrollData< Item extends { id: number } >( {
 				const scrollDirection = scrollDirectionRef.current;
 				const allRecords =
 					scrollDirection === 'up'
-						? [ ...newRecords, ...prev ]
-						: [ ...prev, ...newRecords ];
+						? [ ...newRecords, ...prevWithoutDuplicates ]
+						: [ ...prevWithoutDuplicates, ...newRecords ];
 
 				// Filter to keep only records that should remain visible
 				// Keep items within a certain range of visible entries
