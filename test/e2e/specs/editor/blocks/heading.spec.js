@@ -416,7 +416,7 @@ test.describe( 'Heading', () => {
 				);
 			} );
 
-			test( 'should preserve the text align attribute', async ( {
+			test( 'should preserve the text align block support', async ( {
 				editor,
 			} ) => {
 				await editor.insertBlock( {
