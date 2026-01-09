@@ -11,7 +11,6 @@ import { WebrtcProviderWithHttpSignaling } from './webrtc-http-stream-signaling'
 /** @typedef {import('../types').ObjectType} ObjectType */
 /** @typedef {import('../types').ObjectID} ObjectID */
 /** @typedef {import('../types').CRDTDoc} CRDTDoc */
-/** @typedef {import('y-protocols/awareness').Awareness | undefined} Awareness */
 /** @typedef {import('../types').ProviderCreator} ProviderCreator */
 
 /**
@@ -26,14 +25,12 @@ export function createWebRTCProvider( { signaling, password } ) {
 	return function (
 		/** @type {ObjectType} */ objectType,
 		/** @type {ObjectID} */ objectId,
-		/** @type {CRDTDoc} */ doc,
-		/** @type {Awareness | undefined} */ awareness
+		/** @type {CRDTDoc} */ doc
 	) {
 		const roomName = `${ objectType }-${ objectId }`;
 		const provider = new WebrtcProviderWithHttpSignaling( roomName, doc, {
 			signaling,
 			password,
-			awareness,
 		} );
 
 		return Promise.resolve( {
