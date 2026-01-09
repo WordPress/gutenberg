@@ -127,8 +127,6 @@ function block_core_tabs_provide_context( array $context, array $parsed_block, $
 	if ( 'core/tabs' === $parsed_block['blockName'] ) {
 		$tabs_list                 = block_core_tabs_generate_tabs_list( $parsed_block['innerBlocks'] ?? array() );
 		$context['core/tabs-list'] = $tabs_list;
-		do_action('qm/debug', 'TABS LIST:');
-		do_action('qm/debug', print_r($context, true));
 	}
 
 	return $context;
