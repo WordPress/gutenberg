@@ -50,16 +50,9 @@ export const Root = styled.div< RootProps >`
 const wrapperColor = ( { color = COLORS.ui.borderFocus }: WrapperProps ) =>
 	css( { color } );
 
-const wrapperMargin = ( { marks, __nextHasNoMarginBottom }: WrapperProps ) => {
-	if ( ! __nextHasNoMarginBottom ) {
-		return css( { marginBottom: marks ? 16 : undefined } );
-	}
-	return '';
-};
-
 export const Wrapper = styled( 'div', {
 	shouldForwardProp: ( prop: string ) =>
-		! [ 'color', '__nextHasNoMarginBottom', 'marks' ].includes( prop ),
+		! [ 'color', 'marks' ].includes( prop ),
 } )< WrapperProps >`
 	display: block;
 	flex: 1;
@@ -68,7 +61,6 @@ export const Wrapper = styled( 'div', {
 
 	${ wrapperColor };
 	${ rangeHeight };
-	${ wrapperMargin };
 `;
 
 export const BeforeIconWrapper = styled.span`
@@ -283,8 +275,8 @@ const tooltipShow = ( { show }: TooltipProps ) => {
 	`;
 };
 
-const tooltipPosition = ( { position }: TooltipProps ) => {
-	const isBottom = position === 'bottom';
+const tooltipPlacement = ( { placement }: TooltipProps ) => {
+	const isBottom = placement === 'bottom';
 
 	if ( isBottom ) {
 		return css`
@@ -312,7 +304,7 @@ export const Tooltip = styled.span< TooltipProps >`
 
 	${ tooltipShow };
 
-	${ tooltipPosition };
+	${ tooltipPlacement };
 	${ rtl(
 		{ transform: 'translateX(-50%)' },
 		{ transform: 'translateX(50%)' }

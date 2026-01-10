@@ -228,7 +228,17 @@ export default function SearchEdit( {
 		);
 		const textFieldStyles = {
 			...( isButtonPositionInside
-				? { borderRadius }
+				? {
+						borderRadius: borderProps.style?.borderRadius,
+						borderTopLeftRadius:
+							borderProps.style?.borderTopLeftRadius,
+						borderTopRightRadius:
+							borderProps.style?.borderTopRightRadius,
+						borderBottomLeftRadius:
+							borderProps.style?.borderBottomLeftRadius,
+						borderBottomRightRadius:
+							borderProps.style?.borderBottomRightRadius,
+				  }
 				: borderProps.style ),
 			...typographyProps.style,
 			textDecoration: undefined,
@@ -269,7 +279,17 @@ export default function SearchEdit( {
 			...colorProps.style,
 			...typographyProps.style,
 			...( isButtonPositionInside
-				? { borderRadius }
+				? {
+						borderRadius: borderProps.style?.borderRadius,
+						borderTopLeftRadius:
+							borderProps.style?.borderTopLeftRadius,
+						borderTopRightRadius:
+							borderProps.style?.borderTopRightRadius,
+						borderBottomLeftRadius:
+							borderProps.style?.borderBottomLeftRadius,
+						borderBottomRightRadius:
+							borderProps.style?.borderBottomRightRadius,
+				  }
 				: borderProps.style ),
 		};
 		const handleButtonClick = () => {
@@ -347,7 +367,6 @@ export default function SearchEdit( {
 						isShownByDefault
 					>
 						<ToggleControl
-							__nextHasNoMarginBottom
 							checked={ showLabel }
 							label={ __( 'Show label' ) }
 							onChange={ ( value ) =>
@@ -371,7 +390,6 @@ export default function SearchEdit( {
 						<SelectControl
 							value={ buttonPosition }
 							__next40pxDefaultSize
-							__nextHasNoMarginBottom
 							label={ __( 'Button position' ) }
 							onChange={ ( value ) => {
 								setAttributes( {
@@ -395,7 +413,6 @@ export default function SearchEdit( {
 							isShownByDefault
 						>
 							<ToggleControl
-								__nextHasNoMarginBottom
 								checked={ buttonUseIcon }
 								label={ __( 'Use button with icon' ) }
 								onChange={ ( value ) =>
@@ -472,7 +489,6 @@ export default function SearchEdit( {
 								} }
 								isBlock
 								__next40pxDefaultSize
-								__nextHasNoMarginBottom
 							>
 								{ PERCENTAGE_WIDTHS.map( ( widthValue ) => {
 									return (
@@ -480,7 +496,7 @@ export default function SearchEdit( {
 											key={ widthValue }
 											value={ widthValue }
 											label={ sprintf(
-												/* translators: Percentage value. */
+												/* translators: %d: Percentage value. */
 												__( '%d%%' ),
 												widthValue
 											) }
@@ -495,8 +511,13 @@ export default function SearchEdit( {
 		</>
 	);
 
+	const isNonZeroBorderRadius = ( radius ) =>
+		radius !== undefined && parseInt( radius, 10 ) !== 0;
+
 	const padBorderRadius = ( radius ) =>
-		radius ? `calc(${ radius } + ${ DEFAULT_INNER_PADDING })` : undefined;
+		isNonZeroBorderRadius( radius )
+			? `calc(${ radius } + ${ DEFAULT_INNER_PADDING })`
+			: undefined;
 
 	const getWrapperStyles = () => {
 		const styles = isButtonPositionInside
@@ -512,10 +533,7 @@ export default function SearchEdit( {
 						borderProps.style?.borderBottomRightRadius,
 			  };
 
-		const isNonZeroBorderRadius =
-			borderRadius !== undefined && parseInt( borderRadius, 10 ) !== 0;
-
-		if ( isButtonPositionInside && isNonZeroBorderRadius ) {
+		if ( isButtonPositionInside ) {
 			// We have button inside wrapper and a border radius value to apply.
 			// Add default padding so we don't get "fat" corners.
 			//
@@ -524,15 +542,24 @@ export default function SearchEdit( {
 
 			if ( typeof borderRadius === 'object' ) {
 				// Individual corner border radii present.
-				const { topLeft, topRight, bottomLeft, bottomRight } =
-					borderRadius;
+				const {
+					borderTopLeftRadius,
+					borderTopRightRadius,
+					borderBottomLeftRadius,
+					borderBottomRightRadius,
+				} = borderProps.style;
 
 				return {
 					...styles,
-					borderTopLeftRadius: padBorderRadius( topLeft ),
-					borderTopRightRadius: padBorderRadius( topRight ),
-					borderBottomLeftRadius: padBorderRadius( bottomLeft ),
-					borderBottomRightRadius: padBorderRadius( bottomRight ),
+					borderTopLeftRadius: padBorderRadius( borderTopLeftRadius ),
+					borderTopRightRadius:
+						padBorderRadius( borderTopRightRadius ),
+					borderBottomLeftRadius: padBorderRadius(
+						borderBottomLeftRadius
+					),
+					borderBottomRightRadius: padBorderRadius(
+						borderBottomRightRadius
+					),
 				};
 			}
 

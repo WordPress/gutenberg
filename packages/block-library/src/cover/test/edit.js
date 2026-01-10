@@ -51,11 +51,7 @@ async function createAndSelectBlock() {
 			name: 'Black',
 		} )
 	);
-	await userEvent.click(
-		screen.getByRole( 'button', {
-			name: 'Select parent block: Cover',
-		} )
-	);
+	await selectBlock( 'Block: Cover' );
 }
 
 describe( 'Cover block', () => {

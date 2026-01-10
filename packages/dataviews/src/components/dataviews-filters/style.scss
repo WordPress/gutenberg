@@ -1,3 +1,8 @@
+@use "sass:math";
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/mixins" as *;
+
 .dataviews-filters__button {
 	position: relative;
 }
@@ -22,7 +27,9 @@
 	line-height: $default-line-height;
 
 	.components-popover__content {
-		width: 230px;
+		width: 100%;
+		min-width: 230px;
+		max-width: 250px;
 		border-radius: $grid-unit-05;
 	}
 
@@ -37,6 +44,7 @@
 	padding: $grid-unit-10 $grid-unit-20;
 
 	&:has(+ .dataviews-filters__search-widget-listbox),
+	&:has(+ .dataviews-filters__search-widget-no-elements),
 	&:has(+ .dataviews-filters__user-input-widget) {
 		border-bottom: 1px solid $gray-200;
 	}
@@ -78,11 +86,15 @@
 		align-items: center;
 		box-sizing: border-box;
 
+		&.is-not-clickable {
+			cursor: default;
+		}
+
 		&.has-reset {
 			padding-inline-end: $button-size-small + $grid-unit-05;
 		}
 
-		&:hover,
+		&:hover:not(&.is-not-clickable),
 		&:focus-visible,
 		&[aria-expanded="true"] {
 			background: $gray-200;
@@ -107,7 +119,7 @@
 		}
 
 		.dataviews-filters-__summary-filter-text-name {
-			font-weight: 500;
+			font-weight: $font-weight-medium;
 		}
 	}
 
@@ -311,9 +323,7 @@
 	.dataviews-filters__search-widget-filter-combobox__input {
 		@include input-control;
 		display: block;
-		padding: 0 $grid-unit-40 0 $grid-unit-10;
-		background: $gray-100;
-		border: none;
+		padding: 0 $grid-unit-10 0 $grid-unit-40;
 		width: 100%;
 		height: $grid-unit-40;
 
@@ -348,13 +358,17 @@
 
 	.dataviews-filters__search-widget-filter-combobox__icon {
 		position: absolute;
-		right: $grid-unit-15;
-		top: 50%;
-		transform: translateY(-50%);
+		inset-inline-start: $grid-unit-15;
+		top: 0;
+		bottom: 0;
 		display: flex;
 		align-items: center;
 		justify-content: center;
 		width: $icon-size;
+
+		&:dir(ltr) {
+			transform: scaleX(-1);
+		}
 	}
 }
 
@@ -391,4 +405,11 @@
 	.components-input-control__prefix {
 		padding-left: $grid-unit-10;
 	}
+}
+
+.dataviews-filters__search-widget-no-elements {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: $grid-unit-20;
 }

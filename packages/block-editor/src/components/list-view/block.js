@@ -15,7 +15,7 @@ import {
 	__experimentalTreeGridCell as TreeGridCell,
 	__experimentalTreeGridItem as TreeGridItem,
 } from '@wordpress/components';
-import { useInstanceId } from '@wordpress/compose';
+import { useInstanceId, useDebounce } from '@wordpress/compose';
 import { moreVertical } from '@wordpress/icons';
 import {
 	useCallback,
@@ -27,7 +27,7 @@ import {
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { BACKSPACE, DELETE } from '@wordpress/keycodes';
-import isShallowEqual from '@wordpress/is-shallow-equal';
+import { isShallowEqual } from '@wordpress/is-shallow-equal';
 import { __unstableUseShortcutEventMatch as useShortcutEventMatch } from '@wordpress/keyboard-shortcuts';
 import { speak } from '@wordpress/a11y';
 
@@ -53,6 +53,7 @@ import { useBlockLock } from '../block-lock';
 import AriaReferencedText from './aria-referenced-text';
 import { unlock } from '../../lock-unlock';
 import usePasteStyles from '../use-paste-styles';
+import { cleanEmptyObject } from '../../hooks/utils';
 
 function ListViewBlock( {
 	block: { clientId },
@@ -79,7 +80,7 @@ function ListViewBlock( {
 	const [ isHovered, setIsHovered ] = useState( false );
 	const [ settingsAnchorRect, setSettingsAnchorRect ] = useState();
 
-	const { isLocked, canEdit, canMove } = useBlockLock( clientId );
+	const { isLocked } = useBlockLock( clientId );
 
 	const isFirstSelectedBlock =
 		isSelected && selectedClientIds[ 0 ] === clientId;
@@ -95,8 +96,12 @@ function ListViewBlock( {
 		removeBlocks,
 		insertAfterBlock,
 		insertBeforeBlock,
-		setOpenedBlockSettingsMenu,
+		updateBlockAttributes,
 	} = unlock( useDispatch( blockEditorStore ) );
+	const debouncedToggleBlockHighlight = useDebounce(
+		toggleBlockHighlight,
+		50
+	);
 
 	const {
 		canInsertBlockType,
@@ -106,6 +111,8 @@ function ListViewBlock( {
 		getBlockOrder,
 		getBlockParents,
 		getBlocksByClientId,
+		canEditBlock,
+		canMoveBlock,
 		canRemoveBlocks,
 		isGroupable,
 	} = useSelect( blockEditorStore );
@@ -115,20 +122,25 @@ function ListViewBlock( {
 
 	const pasteStyles = usePasteStyles();
 
-	const { block, blockName, allowRightClickOverrides } = useSelect(
-		( select ) => {
-			const { getBlock, getBlockName, getSettings } =
-				select( blockEditorStore );
+	const { block, blockName, allowRightClickOverrides, isBlockHidden } =
+		useSelect(
+			( select ) => {
+				const { getBlock, getBlockName, getSettings } =
+					select( blockEditorStore );
+				const { isBlockHidden: _isBlockHidden } = unlock(
+					select( blockEditorStore )
+				);
 
-			return {
-				block: getBlock( clientId ),
-				blockName: getBlockName( clientId ),
-				allowRightClickOverrides:
-					getSettings().allowRightClickOverrides,
-			};
-		},
-		[ clientId ]
-	);
+				return {
+					block: getBlock( clientId ),
+					blockName: getBlockName( clientId ),
+					allowRightClickOverrides:
+						getSettings().allowRightClickOverrides,
+					isBlockHidden: _isBlockHidden( clientId ),
+				};
+			},
+			[ clientId ]
+		);
 
 	const showBlockActions =
 		// When a block hides its toolbar it also hides the block settings menu,
@@ -285,7 +297,6 @@ function ListViewBlock( {
 			const newlySelectedBlocks = getSelectedBlockClientIds();
 
 			// Focus the first block of the newly inserted blocks, to keep focus within the list view.
-			setOpenedBlockSettingsMenu( undefined );
 			updateFocusAndSelection( newlySelectedBlocks[ 0 ], false );
 		} else if ( isMatch( 'core/block-editor/insert-after', event ) ) {
 			event.preventDefault();
@@ -295,7 +306,6 @@ function ListViewBlock( {
 			const newlySelectedBlocks = getSelectedBlockClientIds();
 
 			// Focus the first block of the newly inserted blocks, to keep focus within the list view.
-			setOpenedBlockSettingsMenu( undefined );
 			updateFocusAndSelection( newlySelectedBlocks[ 0 ], false );
 		} else if ( isMatch( 'core/block-editor/select-all', event ) ) {
 			event.preventDefault();
@@ -355,20 +365,49 @@ function ListViewBlock( {
 				speak( __( 'Selected blocks are grouped.' ) );
 				const newlySelectedBlocks = getSelectedBlockClientIds();
 				// Focus the first block of the newly inserted blocks, to keep focus within the list view.
-				setOpenedBlockSettingsMenu( undefined );
 				updateFocusAndSelection( newlySelectedBlocks[ 0 ], false );
 			}
+		} else if (
+			isMatch( 'core/block-editor/toggle-block-visibility', event )
+		) {
+			event.preventDefault();
+			const { blocksToUpdate } = getBlocksToUpdate();
+			const blocks = getBlocksByClientId( blocksToUpdate );
+			const canToggleVisibility = blocks.every( ( blockToUpdate ) =>
+				hasBlockSupport( blockToUpdate.name, 'visibility', true )
+			);
+			if ( ! canToggleVisibility ) {
+				return;
+			}
+			const hasHiddenBlock = blocks.some(
+				( blockToUpdate ) =>
+					blockToUpdate.attributes.metadata?.blockVisibility === false
+			);
+			const attributesByClientId = Object.fromEntries(
+				blocks.map( ( { clientId: mapClientId, attributes } ) => [
+					mapClientId,
+					{
+						metadata: cleanEmptyObject( {
+							...attributes?.metadata,
+							blockVisibility: hasHiddenBlock ? undefined : false,
+						} ),
+					},
+				] )
+			);
+			updateBlockAttributes( blocksToUpdate, attributesByClientId, {
+				uniqueByBlock: true,
+			} );
 		}
 	}
 
 	const onMouseEnter = useCallback( () => {
 		setIsHovered( true );
-		toggleBlockHighlight( clientId, true );
-	}, [ clientId, setIsHovered, toggleBlockHighlight ] );
+		debouncedToggleBlockHighlight( clientId, true );
+	}, [ clientId, setIsHovered, debouncedToggleBlockHighlight ] );
 	const onMouseLeave = useCallback( () => {
 		setIsHovered( false );
-		toggleBlockHighlight( clientId, false );
-	}, [ clientId, setIsHovered, toggleBlockHighlight ] );
+		debouncedToggleBlockHighlight( clientId, false );
+	}, [ clientId, setIsHovered, debouncedToggleBlockHighlight ] );
 
 	const selectEditorBlock = useCallback(
 		( event ) => {
@@ -406,6 +445,11 @@ function ListViewBlock( {
 	// Allow right-clicking an item in the List View to open up the block settings dropdown.
 	const onContextMenu = useCallback(
 		( event ) => {
+			const { ownerDocument } = settingsRef?.current || {};
+			if ( ! ownerDocument || ! ownerDocument.hasFocus() ) {
+				return;
+			}
+
 			if ( showBlockActions && allowRightClickOverrides ) {
 				settingsRef.current?.click();
 				// Ensure the position of the settings dropdown is at the cursor.
@@ -480,6 +524,10 @@ function ListViewBlock( {
 		isLocked
 	);
 
+	const blockVisibilityDescription = isBlockHidden
+		? __( 'Block is hidden.' )
+		: null;
+
 	const hasSiblings = siblingBlockCount > 0;
 	const hasRenderedMovers = showBlockMovers && hasSiblings;
 	const moverCellClassName = clsx(
@@ -508,7 +556,7 @@ function ListViewBlock( {
 		'is-dragging': isDragged,
 		'has-single-cell': ! showBlockActions,
 		'is-synced': blockInformation?.isSynced,
-		'is-draggable': canMove,
+		'is-draggable': canMoveBlock,
 		'is-displacement-normal': displacement === 'normal',
 		'is-displacement-up': displacement === 'up',
 		'is-displacement-down': displacement === 'down',
@@ -543,7 +591,7 @@ function ListViewBlock( {
 			path={ path }
 			id={ `list-view-${ listViewInstanceId }-block-${ clientId }` }
 			data-block={ clientId }
-			data-expanded={ canEdit ? isExpanded : undefined }
+			data-expanded={ canEditBlock ? isExpanded : undefined }
 			ref={ rowRef }
 		>
 			<TreeGridCell
@@ -569,7 +617,7 @@ function ListViewBlock( {
 								currentlyEditingBlockInCanvas ? 0 : tabIndex
 							}
 							onFocus={ onFocus }
-							isExpanded={ canEdit ? isExpanded : undefined }
+							isExpanded={ canEditBlock ? isExpanded : undefined }
 							selectedClientIds={ selectedClientIds }
 							ariaDescribedBy={ descriptionId }
 						/>
@@ -577,6 +625,7 @@ function ListViewBlock( {
 							{ [
 								blockPositionDescription,
 								blockPropertiesDescription,
+								blockVisibilityDescription,
 							]
 								.filter( Boolean )
 								.join( ' ' ) }
@@ -637,6 +686,7 @@ function ListViewBlock( {
 								tabIndex,
 								onClick: clearSettingsAnchorRect,
 								onFocus,
+								size: 'small',
 							} }
 							disableOpenOnArrowDown
 							expand={ expand }

@@ -1,28 +1,22 @@
 /**
  * Internal dependencies
  */
-import type { ValidationContext, FieldTypeDefinition } from '../types';
-
-function sort() {
-	return 0;
-}
-
-function isValid( value: any, context?: ValidationContext ) {
-	if ( context?.elements ) {
-		const validValues = context?.elements.map( ( f ) => f.value );
-		if ( ! validValues.includes( value ) ) {
-			return false;
-		}
-	}
-
-	return true;
-}
+import type { FieldType } from '../types/private';
+import getValueFormatted from './utils/get-value-formatted-default';
 
 export default {
-	sort,
-	isValid,
-	Edit: null,
+	type: 'media',
 	render: () => null,
+	Edit: null,
+	sort: () => 0,
 	enableSorting: false,
-	filterBy: false,
-} satisfies FieldTypeDefinition< any >;
+	enableGlobalSearch: false,
+	defaultOperators: [],
+	validOperators: [],
+	format: {},
+	getValueFormatted,
+	// cannot validate any constraint, so
+	// the only available validation for the field author
+	// would be providing a custom validator.
+	validate: {},
+} satisfies FieldType< any >;

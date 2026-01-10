@@ -100,7 +100,7 @@ This section describes all the properties that can be added to the `block.json` 
 
 The version of the Block API used by the block. The most recent version is `3` and it was introduced in WordPress 6.3.
 
-See [the API versions documentation](/docs/reference-guides/block-api/block-api-versions.md) for more details.
+See [the API versions documentation](/docs/reference-guides/block-api/block-api-versions/README.md) for more details.
 
 ### Name
 

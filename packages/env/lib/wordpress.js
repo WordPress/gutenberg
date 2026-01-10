@@ -86,13 +86,25 @@ async function configureWordPress( environment, config, spinner ) {
 		// Ignore error.
 	}
 
+	// Create a project-specific wp-cli configuration, important for the `rewrite` command.
+	// Don't overwrite existing configuration.
+	const cliConfigCommand = `[ -f /var/www/html/wp-cli.yml ] || (
+		exec > /var/www/html/wp-cli.yml
+		echo "apache_modules:"
+		echo "  - mod_rewrite"
+	)`;
+
 	const isMultisite = config.env[ environment ].multisite;
 
 	const installMethod = isMultisite ? 'multisite-install' : 'install';
 	const installCommand = `wp core ${ installMethod } --url="${ config.env[ environment ].config.WP_SITEURL }" --title="${ config.name }" --admin_user=admin --admin_password=password --admin_email=wordpress@example.com --skip-email`;
 
 	// -eo pipefail exits the command as soon as anything fails in bash.
-	const setupCommands = [ 'set -eo pipefail', installCommand ];
+	const setupCommands = [
+		'set -eo pipefail',
+		cliConfigCommand,
+		installCommand,
+	];
 
 	// Bootstrap .htaccess for multisite
 	if ( isMultisite ) {

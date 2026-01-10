@@ -631,6 +631,24 @@ describe( 'Router styles management', () => {
 			expect( link.sheet!.media.mediaText ).toBe( 'all' );
 			expect( style.sheet!.media.mediaText ).toBe( 'all' );
 		} );
+
+		it( 'should preserve media if it was initially set', () => {
+			// Create link elements with originalMedia.
+			const link = createLinkElement( 'link' );
+			link.setAttribute( 'media', 'print' );
+
+			// Add to document.
+			document.head.appendChild( link );
+
+			// Init `sheet` property.
+			mockSheet( link, { disabled: false, mediaText: 'print' } );
+
+			// Apply styles.
+			applyStyles( [ link ] );
+
+			// Check that media was preserved correctly.
+			expect( link.sheet!.media.mediaText ).toBe( 'print' );
+		} );
 	} );
 
 	describe( 'normalizeMedia', () => {

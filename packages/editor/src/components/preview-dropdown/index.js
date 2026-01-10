@@ -21,12 +21,12 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { ActionItem } from '@wordpress/interface';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
 import { store as editorStore } from '../../store';
-import { store as blockEditorStore } from '@wordpress/block-editor';
 import PostPreviewButton from '../post-preview-button';
 import { unlock } from '../../lock-unlock';
 
@@ -170,6 +170,7 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 										: 'post-only';
 									setRenderingMode( newRenderingMode );
 									setDefaultRenderingMode( newRenderingMode );
+									resetZoomLevel();
 								} }
 							>
 								{ __( 'Show template' ) }

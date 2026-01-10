@@ -1,3 +1,8 @@
+/**
+ * WordPress dependencies
+ */
+import type { DataFormControlProps } from '@wordpress/dataviews';
+
 type PostStatus =
 	| 'publish'
 	| 'draft'
@@ -24,6 +29,7 @@ interface Links {
 }
 
 interface Author {
+	id: number;
 	name: string;
 	avatar_urls: Record< string, string >;
 }
@@ -56,6 +62,24 @@ export interface BasePost extends CommonPost {
 
 export interface BasePostWithEmbeddedAuthor extends BasePost {
 	_embedded: EmbeddedAuthor;
+}
+
+interface FeaturedMedia {
+	title: {
+		rendered: string;
+	};
+	source_url: string;
+	media_details: {
+		sizes: Record< string, { width: number; source_url: string } >;
+	};
+}
+
+interface EmbeddedFeaturedMedia {
+	'wp:featuredmedia': FeaturedMedia[];
+}
+
+export interface BasePostWithEmbeddedFeaturedMedia extends BasePost {
+	_embedded: EmbeddedFeaturedMedia;
 }
 
 export interface Template extends CommonPost {
@@ -93,6 +117,10 @@ export type PostWithPermissions = Post & {
 	};
 };
 
+interface EditorSupport {
+	notes?: boolean;
+}
+
 export interface PostType {
 	slug: string;
 	viewable: boolean;
@@ -103,9 +131,35 @@ export interface PostType {
 		author?: string;
 		thumbnail?: string;
 		comments?: string;
-		editor?: boolean;
+		editor?: boolean | [ EditorSupport ];
+		trackbacks?: boolean;
 	};
 }
 
 // Will be unnecessary after typescript 5.0 upgrade.
 export type CoreDataError = { message?: string; code?: string };
+
+export interface MediaEditProps< Item >
+	extends Pick<
+		DataFormControlProps< Item >,
+		'data' | 'field' | 'onChange' | 'hideLabelFromVision'
+	> {
+	/**
+	 * Array of allowed media types (e.g., ['image', 'video']).
+	 *
+	 * @default ['image']
+	 */
+	allowedTypes?: string[];
+	/**
+	 * Whether to allow multiple media selections.
+	 *
+	 * @default false
+	 */
+	multiple?: boolean;
+	/**
+	 * Whether to render in an expanded form.
+	 *
+	 * @default false
+	 */
+	isExpanded?: boolean;
+}

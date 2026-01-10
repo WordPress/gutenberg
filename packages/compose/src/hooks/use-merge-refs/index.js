@@ -3,12 +3,10 @@
  */
 import { useRef, useCallback, useLayoutEffect } from '@wordpress/element';
 
-/* eslint-disable jsdoc/valid-types */
 /**
  * @template T
  * @typedef {T extends import('react').Ref<infer R> ? R : never} TypeFromRef
  */
-/* eslint-enable jsdoc/valid-types */
 
 /**
  * @template T
@@ -19,10 +17,8 @@ function assignRef( ref, value ) {
 	if ( typeof ref === 'function' ) {
 		ref( value );
 	} else if ( ref && ref.hasOwnProperty( 'current' ) ) {
-		/* eslint-disable jsdoc/no-undefined-types */
 		/** @type {import('react').MutableRefObject<T>} */ ( ref ).current =
 			value;
-		/* eslint-enable jsdoc/no-undefined-types */
 	}
 }
 
@@ -73,9 +69,7 @@ export default function useMergeRefs( refs ) {
 	const element = useRef();
 	const isAttachedRef = useRef( false );
 	const didElementChangeRef = useRef( false );
-	/* eslint-disable jsdoc/no-undefined-types */
 	/** @type {import('react').MutableRefObject<TRef[]>} */
-	/* eslint-enable jsdoc/no-undefined-types */
 	const previousRefsRef = useRef( [] );
 	const currentRefsRef = useRef( refs );
 

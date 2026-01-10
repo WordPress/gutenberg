@@ -401,7 +401,7 @@ _Parameters_
 
 -   _props_ `Object`: The component props.
 -   _props.close_ `Function`: The function to close the dialog.
--   _props.renderDialog_ `boolean`: Whether to render the component with modal dialog behavior.
+-   _props.renderDialog_ `boolean=`: Whether to render the component with modal dialog behavior.
 -   _props.variant_ `string`: Changes the layout of the component. When an `inline` value is provided, the action buttons are rendered at the end of the component instead of at the start.
 
 _Returns_
@@ -442,11 +442,11 @@ getDerivedStateFromError is used to render a fallback UI after an error has been
 
 ### getTemplatePartIcon
 
-Helper function to retrieve the corresponding icon by name.
+Helper function to retrieve the corresponding icon by area name or icon name.
 
 _Parameters_
 
--   _iconName_ `string`: The name of the icon.
+-   _areaOrIconName_ `string`: The area name (e.g., 'header', 'navigation-overlay') or icon name (e.g., 'menu').
 
 _Returns_
 
@@ -489,7 +489,7 @@ The module also checks for sessionStorage support and conditionally exports the 
 
 ### mediaUpload
 
-Upload a media file when the file upload button is activated. Wrapper around mediaUpload() that injects the current post ID.
+Upload a media file when the file upload button is activated. Wrapper around uploadMedia() that injects the current post ID.
 
 _Parameters_
 
@@ -1386,7 +1386,6 @@ _Parameters_
 
 -   _props_ `Object`: The component props.
 -   _props.slug_ `string`: The slug of the taxonomy.
--   _props.\_\_nextHasNoMarginBottom_ `boolean`: Start opting into the new margin-free styles that will become the default in a future version, currently scheduled to be WordPress 7.0. (The prop can be safely removed once this happens.)
 
 _Returns_
 

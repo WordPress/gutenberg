@@ -100,7 +100,6 @@ function PostAuthorNameEdit( {
 						onDeselect={ () => setAttributes( { isLink: false } ) }
 					>
 						<ToggleControl
-							__nextHasNoMarginBottom
 							label={ __( 'Link to author archive' ) }
 							onChange={ () =>
 								setAttributes( { isLink: ! isLink } )
@@ -118,7 +117,6 @@ function PostAuthorNameEdit( {
 							}
 						>
 							<ToggleControl
-								__nextHasNoMarginBottom
 								label={ __( 'Open in new tab' ) }
 								onChange={ ( value ) =>
 									setAttributes( {

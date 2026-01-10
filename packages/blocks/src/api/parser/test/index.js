@@ -115,6 +115,37 @@ describe( 'block parser', () => {
 			} );
 		} );
 
+		it( 'should apply anchor block validation fixes', () => {
+			registerBlockType( 'core/test-block', {
+				...defaultBlockSettings,
+				attributes: {
+					fruit: {
+						type: 'string',
+						source: 'text',
+						selector: 'div',
+					},
+				},
+				supports: {
+					anchor: true,
+				},
+				save: ( { attributes } ) => (
+					<div id={ attributes.anchor }>{ attributes.fruit }</div>
+				),
+			} );
+
+			const block = parseRawBlock( {
+				blockName: 'core/test-block',
+				innerHTML: '<div id="custom-anchor">Bananas</div>',
+				attrs: { fruit: 'Bananas' },
+			} );
+
+			expect( block.name ).toEqual( 'core/test-block' );
+			expect( block.attributes ).toEqual( {
+				fruit: 'Bananas',
+				anchor: 'custom-anchor',
+			} );
+		} );
+
 		it( 'should create the requested block if it exists', () => {
 			registerBlockType( 'core/test-block', defaultBlockSettings );
 

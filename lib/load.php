@@ -14,6 +14,24 @@ define( 'IS_GUTENBERG_PLUGIN', true );
 require_once __DIR__ . '/init.php';
 require_once __DIR__ . '/upgrade.php';
 
+// Clear Core's routes before Gutenberg's build/index.php registers its own.
+// This must be loaded before build/index.php to ensure correct action ordering.
+require_once __DIR__ . '/clear-core-routes.php';
+
+// Load auto-generated build registration.
+$build_registration = plugin_dir_path( __DIR__ ) . 'build/index.php';
+if ( file_exists( $build_registration ) ) {
+	require_once $build_registration;
+}
+
+// Define version constant for backwards compatibility.
+// The constants.php file returns an array but doesn't define constants to avoid conflicts.
+$constants_file = plugin_dir_path( __DIR__ ) . 'build/constants.php';
+if ( file_exists( $constants_file ) && ! defined( 'GUTENBERG_VERSION' ) ) {
+	$build_constants = require_once $constants_file;
+	define( 'GUTENBERG_VERSION', $build_constants['version'] );
+}
+
 /**
  * Checks whether the Gutenberg experiment is enabled.
  *
@@ -24,6 +42,12 @@ require_once __DIR__ . '/upgrade.php';
  * @return bool True when the experiment is enabled.
  */
 function gutenberg_is_experiment_enabled( $name ) {
+	// Special handling for active_templates - check if the active_templates option exists.
+	// This is not stored in the experiments array but as a separate option.
+	if ( 'active_templates' === $name ) {
+		return is_array( get_option( 'active_templates' ) );
+	}
+
 	$experiments = get_option( 'gutenberg-experiments' );
 	return ! empty( $experiments[ $name ] );
 }
@@ -35,12 +59,23 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 		require_once __DIR__ . '/experimental/class-wp-rest-block-editor-settings-controller.php';
 	}
 
-	// WordPress 6.8 compat.
-	require __DIR__ . '/compat/wordpress-6.8/rest-api.php';
-
 	// WordPress 6.9 compat.
+	require __DIR__ . '/compat/wordpress-6.9/class-gutenberg-rest-attachments-controller-6-9.php';
+	require __DIR__ . '/compat/wordpress-6.9/block-bindings.php';
+	require __DIR__ . '/compat/wordpress-6.9/post-data-block-bindings.php';
+	require __DIR__ . '/compat/wordpress-6.9/term-data-block-bindings.php';
 	require __DIR__ . '/compat/wordpress-6.9/rest-api.php';
 	require __DIR__ . '/compat/wordpress-6.9/class-gutenberg-hierarchical-sort.php';
+	require __DIR__ . '/compat/wordpress-6.9/block-comments.php';
+	require __DIR__ . '/compat/wordpress-6.9/class-gutenberg-rest-comment-controller-6-9.php';
+
+	// WordPress 7.0 compat.
+	require __DIR__ . '/compat/wordpress-7.0/class-gutenberg-rest-block-patterns-controller-7-0.php';
+	require __DIR__ . '/compat/wordpress-7.0/class-gutenberg-rest-templates-controller-7-0.php';
+	require __DIR__ . '/compat/wordpress-7.0/class-gutenberg-rest-static-templates-controller.php';
+	require __DIR__ . '/compat/wordpress-7.0/template-activate.php';
+	require __DIR__ . '/compat/wordpress-7.0/rest-api.php';
+	require __DIR__ . '/compat/wordpress-7.0/global-styles.php';
 
 	// Plugin specific code.
 	require_once __DIR__ . '/class-wp-rest-global-styles-controller-gutenberg.php';
@@ -49,12 +84,6 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 
 	require_once __DIR__ . '/experimental/rest-api.php';
 	require_once __DIR__ . '/experimental/kses-allowed-html.php';
-
-	// Block Comments.
-	if ( gutenberg_is_experiment_enabled( 'gutenberg-block-comment' ) ) {
-		require __DIR__ . '/experimental/block-comments.php';
-		require __DIR__ . '/experimental/class-gutenberg-rest-comment-controller.php';
-	}
 }
 
 // Experimental signaling server.
@@ -62,31 +91,39 @@ if ( ! class_exists( 'Gutenberg_HTTP_Singling_Server' ) ) {
 	require_once __DIR__ . '/experimental/sync/class-gutenberg-http-signaling-server.php';
 }
 
-require __DIR__ . '/experimental/editor-settings.php';
+require_once __DIR__ . '/experimental/editor-settings.php';
+require_once __DIR__ . '/experimental/rest-api-overrides.php';
 
 // Gutenberg plugin compat.
 require __DIR__ . '/compat/plugin/edit-site-routes-backwards-compat.php';
 require __DIR__ . '/compat/plugin/fonts.php';
 
-// WordPress 6.8 compat.
-// Note: admin-bar.php (69271) was reverted in Gutenberg 20.8.0. See https://github.com/WordPress/gutenberg/pull/69974.
-require __DIR__ . '/compat/wordpress-6.8/preload.php';
-require __DIR__ . '/compat/wordpress-6.8/blocks.php';
-require __DIR__ . '/compat/wordpress-6.8/functions.php';
-require __DIR__ . '/compat/wordpress-6.8/site-editor.php';
-require __DIR__ . '/compat/wordpress-6.8/class-gutenberg-rest-user-controller.php';
-require __DIR__ . '/compat/wordpress-6.8/block-template-utils.php';
-require __DIR__ . '/compat/wordpress-6.8/site-preview.php';
+
+// WordPress 6.9 compat.
+require __DIR__ . '/compat/wordpress-6.9/customizer-preview-custom-css.php';
+require __DIR__ . '/compat/wordpress-6.9/command-palette.php';
+require __DIR__ . '/compat/wordpress-6.9/client-assets.php';
+
+// WordPress 7.0 compat.
+require __DIR__ . '/compat/wordpress-7.0/preload.php';
+require __DIR__ . '/compat/wordpress-7.0/php-only-blocks.php';
+require __DIR__ . '/compat/wordpress-7.0/blocks.php';
+require __DIR__ . '/compat/wordpress-7.0/kses.php';
 
 // Experimental features.
 require __DIR__ . '/experimental/block-editor-settings-mobile.php';
 require __DIR__ . '/experimental/blocks.php';
 require __DIR__ . '/experimental/navigation-theme-opt-in.php';
 require __DIR__ . '/experimental/kses.php';
-require __DIR__ . '/experimental/l10n.php';
 require __DIR__ . '/experimental/synchronization.php';
 require __DIR__ . '/experimental/script-modules.php';
-require __DIR__ . '/experimental/posts/load.php';
+require __DIR__ . '/experimental/pages/site-editor.php';
+require __DIR__ . '/experimental/extensible-site-editor.php';
+require __DIR__ . '/experimental/fonts/load.php';
+
+if ( gutenberg_is_experiment_enabled( 'gutenberg-workflow-palette' ) ) {
+	require __DIR__ . '/experimental/workflow-palette.php';
+}
 
 if ( gutenberg_is_experiment_enabled( 'gutenberg-no-tinymce' ) ) {
 	require __DIR__ . '/experimental/disable-tinymce.php';
@@ -118,19 +155,20 @@ require __DIR__ . '/class-wp-duotone-gutenberg.php';
 require __DIR__ . '/blocks.php';
 require __DIR__ . '/block-editor-settings.php';
 require __DIR__ . '/client-assets.php';
+require __DIR__ . '/mathml-kses.php';
 require __DIR__ . '/demo.php';
 require __DIR__ . '/experiments-page.php';
 require __DIR__ . '/interactivity-api.php';
 require __DIR__ . '/block-template-utils.php';
 
 // Copied package PHP files.
-if ( is_dir( __DIR__ . '/../build/style-engine' ) ) {
-	require_once __DIR__ . '/../build/style-engine/class-wp-style-engine-css-declarations-gutenberg.php';
-	require_once __DIR__ . '/../build/style-engine/class-wp-style-engine-css-rule-gutenberg.php';
-	require_once __DIR__ . '/../build/style-engine/class-wp-style-engine-css-rules-store-gutenberg.php';
-	require_once __DIR__ . '/../build/style-engine/class-wp-style-engine-processor-gutenberg.php';
-	require_once __DIR__ . '/../build/style-engine/class-wp-style-engine-gutenberg.php';
-	require_once __DIR__ . '/../build/style-engine/style-engine-gutenberg.php';
+if ( is_dir( __DIR__ . '/../build/scripts/style-engine' ) ) {
+	require_once __DIR__ . '/../build/scripts/style-engine/class-wp-style-engine-css-declarations-gutenberg.php';
+	require_once __DIR__ . '/../build/scripts/style-engine/class-wp-style-engine-css-rule-gutenberg.php';
+	require_once __DIR__ . '/../build/scripts/style-engine/class-wp-style-engine-css-rules-store-gutenberg.php';
+	require_once __DIR__ . '/../build/scripts/style-engine/class-wp-style-engine-processor-gutenberg.php';
+	require_once __DIR__ . '/../build/scripts/style-engine/class-wp-style-engine-gutenberg.php';
+	require_once __DIR__ . '/../build/scripts/style-engine/style-engine-gutenberg.php';
 }
 
 // Block supports overrides.
@@ -148,9 +186,8 @@ require __DIR__ . '/block-supports/shadow.php';
 require __DIR__ . '/block-supports/background.php';
 require __DIR__ . '/block-supports/block-style-variations.php';
 require __DIR__ . '/block-supports/aria-label.php';
-
-// Data views.
-require_once __DIR__ . '/experimental/data-views.php';
+require __DIR__ . '/block-supports/anchor.php';
+require __DIR__ . '/block-supports/block-visibility.php';
 
 // Client-side media processing.
 if ( gutenberg_is_experiment_enabled( 'gutenberg-media-processing' ) ) {
@@ -161,4 +198,9 @@ if ( gutenberg_is_experiment_enabled( 'gutenberg-media-processing' ) ) {
 if ( gutenberg_is_experiment_enabled( 'gutenberg-full-page-client-side-navigation' ) ) {
 	require __DIR__ . '/experimental/interactivity-api/class-gutenberg-interactivity-api-full-page-navigation.php';
 	Gutenberg_Interactivity_API_Full_Page_Navigation::instance();
+}
+
+// Block patterns (only load when navigation overlays experiment is enabled).
+if ( gutenberg_is_experiment_enabled( 'gutenberg-customizable-navigation-overlays' ) ) {
+	require __DIR__ . '/experimental/overlay-patterns.php';
 }

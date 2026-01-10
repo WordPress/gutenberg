@@ -64,6 +64,7 @@ export function useRichText( {
 	const recordRef = useRef();
 
 	function setRecordFromProps() {
+		const activeFormats = recordRef.current?.activeFormats;
 		_valueRef.current = value;
 		recordRef.current = value;
 		if ( ! ( value instanceof RichTextData ) ) {
@@ -76,6 +77,7 @@ export function useRichText( {
 			text: recordRef.current.text,
 			formats: recordRef.current.formats,
 			replacements: recordRef.current.replacements,
+			activeFormats,
 		};
 		if ( disableFormats ) {
 			recordRef.current.formats = Array( value.length );
@@ -151,8 +153,28 @@ export function useRichText( {
 	}
 
 	function applyFromProps() {
+		// Get previous value before updating
+		const previousValue = _valueRef.current;
+
 		setRecordFromProps();
-		applyRecord( recordRef.current );
+
+		// Check if content length changed (text was added/removed, not just formatted)
+		const contentLengthChanged =
+			previousValue &&
+			typeof previousValue === 'string' &&
+			typeof value === 'string' &&
+			previousValue.length !== value.length;
+
+		// Check if focus is on this element
+		const hasFocus = ref.current?.contains(
+			ref.current.ownerDocument.activeElement
+		);
+
+		// Skip re-applying the selection state when content changed from external source
+		// (e.g., typing in sidebar input changes canvas text)
+		const skipSelection = contentLengthChanged && ! hasFocus;
+
+		applyRecord( recordRef.current, { domOnly: skipSelection } );
 	}
 
 	const didMountRef = useRef( false );

@@ -17,7 +17,6 @@ function BlockTypesChecklist( { blockTypes, value, onItemChange } ) {
 					className="block-editor-block-manager__checklist-item"
 				>
 					<CheckboxControl
-						__nextHasNoMarginBottom
 						label={ blockType.title }
 						checked={ value.includes( blockType.name ) }
 						onChange={ ( ...args ) =>

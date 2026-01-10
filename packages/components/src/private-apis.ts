@@ -11,6 +11,21 @@ import { withIgnoreIMEEvents } from './utils/with-ignore-ime-events';
 import { lock } from './lock-unlock';
 import Badge from './badge';
 
+import { DateCalendar, DateRangeCalendar, TZDate } from './calendar';
+import {
+	ValidatedCheckboxControl,
+	ValidatedInputControl,
+	ValidatedNumberControl,
+	ValidatedSelectControl,
+	ValidatedRadioControl,
+	ValidatedTextControl,
+	ValidatedTextareaControl,
+	ValidatedToggleControl,
+	ValidatedToggleGroupControl,
+} from './validated-form-controls';
+import { ValidatedFormTokenField } from './validated-form-controls/components/form-token-field';
+import { Picker } from './color-picker/picker';
+
 export const privateApis = {};
 lock( privateApis, {
 	__experimentalPopoverLegacyPositionToPlacement,
@@ -22,4 +37,18 @@ lock( privateApis, {
 	withIgnoreIMEEvents,
 	Badge,
 	normalizeTextString,
+	DateCalendar,
+	DateRangeCalendar,
+	TZDate,
+	Picker,
+	ValidatedInputControl,
+	ValidatedCheckboxControl,
+	ValidatedNumberControl,
+	ValidatedSelectControl,
+	ValidatedRadioControl,
+	ValidatedTextControl,
+	ValidatedTextareaControl,
+	ValidatedToggleControl,
+	ValidatedToggleGroupControl,
+	ValidatedFormTokenField,
 } );

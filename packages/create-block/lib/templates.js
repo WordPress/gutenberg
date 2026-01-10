@@ -60,6 +60,11 @@ const predefinedPluginTemplates = {
 			viewScript: 'file:./view.js',
 			example: {},
 			folderName: './src/$slug',
+			npmDependencies: [
+				'@wordpress/block-editor',
+				'@wordpress/blocks',
+				'@wordpress/i18n',
+			],
 		},
 		variants: {
 			static: {},
@@ -299,4 +304,6 @@ module.exports = {
 	getDefaultValues,
 	getProjectTemplate,
 	runPrompts,
+	getOutputTemplates,
+	getOutputAssets,
 };

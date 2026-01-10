@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryFn } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react-webpack5';
 
 /**
  * Internal dependencies
@@ -11,11 +11,12 @@ import { Text } from '../../text';
 
 const meta: Meta< typeof Surface > = {
 	component: Surface,
-	title: 'Components (Experimental)/Surface',
+	title: 'Components/Surface',
 	argTypes: {
 		children: { control: false },
 		as: { control: { type: 'text' } },
 	},
+	tags: [ 'status-experimental' ],
 	parameters: {
 		controls: {
 			expanded: true,

@@ -1,0 +1,33 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
+@use "./link/styles.scss" as *;
+@use "./media/styles.scss" as *;
+@use "./rich-text/styles.scss" as *;
+
+.block-editor-block-fields__container {
+	padding: 0 $grid-unit-20;
+
+	&:first-of-type {
+		padding-block-start: $grid-unit-10;
+		// Add border for the entire content controls and remove the similar border
+		// for tools panel.
+		border-top: $border-width solid $gray-200;
+	}
+
+	&:last-of-type {
+		padding-block-end: $grid-unit-20;
+	}
+}
+
+.block-editor-block-fields__header {
+	padding: $grid-unit-10 0;
+	margin-bottom: $grid-unit-05;
+}
+
+.block-editor-block-fields__header-icon {
+	flex: 0 0 $icon-size;
+}
+
+.block-editor-block-fields__header-title {
+	flex: 1;
+}

@@ -12,7 +12,11 @@
 			"type": "string"
 		}
 	},
+	"example": {
+		"viewportWidth": 350
+	},
 	"supports": {
+		"anchor": true,
 		"html": false,
 		"color": {
 			"link": true,

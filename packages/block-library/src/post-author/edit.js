@@ -21,16 +21,19 @@ import {
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { debounce } from '@wordpress/compose';
-import { useMemo, useState } from '@wordpress/element';
-import { useSelect, useDispatch } from '@wordpress/data';
-import { __, sprintf } from '@wordpress/i18n';
-import { decodeEntities } from '@wordpress/html-entities';
 import { store as coreStore } from '@wordpress/core-data';
+import { useDispatch, useSelect } from '@wordpress/data';
+import { useMemo, useState } from '@wordpress/element';
+import { decodeEntities } from '@wordpress/html-entities';
+import { __, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
-import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
+import {
+	useDefaultAvatar,
+	useToolsPanelDropdownMenuProps,
+} from '../utils/hooks';
 
 const AUTHORS_QUERY = {
 	who: 'authors',
@@ -95,7 +98,6 @@ function AuthorCombobox( { value, onChange } ) {
 	return (
 		<ComboboxControl
 			__next40pxDefaultSize
-			__nextHasNoMarginBottom
 			label={ __( 'Author' ) }
 			options={ authorOptions }
 			value={ value?.id }
@@ -115,6 +117,7 @@ function PostAuthorEdit( {
 } ) {
 	const isDescendentOfQueryLoop = Number.isFinite( queryId );
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
+	const defaultAvatar = useDefaultAvatar();
 
 	const { authorDetails, canAssignAuthor, supportsAuthor } = useSelect(
 		( select ) => {
@@ -224,7 +227,6 @@ function PostAuthorEdit( {
 						}
 					>
 						<ToggleControl
-							__nextHasNoMarginBottom
 							label={ __( 'Show avatar' ) }
 							checked={ showAvatar }
 							onChange={ () =>
@@ -245,7 +247,6 @@ function PostAuthorEdit( {
 						>
 							<SelectControl
 								__next40pxDefaultSize
-								__nextHasNoMarginBottom
 								label={ __( 'Avatar size' ) }
 								value={ avatarSize }
 								options={ avatarSizes }
@@ -266,7 +267,6 @@ function PostAuthorEdit( {
 						}
 					>
 						<ToggleControl
-							__nextHasNoMarginBottom
 							label={ __( 'Show bio' ) }
 							checked={ !! showBio }
 							onChange={ () =>
@@ -281,7 +281,6 @@ function PostAuthorEdit( {
 						onDeselect={ () => setAttributes( { isLink: false } ) }
 					>
 						<ToggleControl
-							__nextHasNoMarginBottom
 							label={ __( 'Link author name to author page' ) }
 							checked={ isLink }
 							onChange={ () =>
@@ -299,7 +298,6 @@ function PostAuthorEdit( {
 							}
 						>
 							<ToggleControl
-								__nextHasNoMarginBottom
 								label={ __( 'Open in new tab' ) }
 								onChange={ ( value ) =>
 									setAttributes( {
@@ -323,12 +321,17 @@ function PostAuthorEdit( {
 			</BlockControls>
 
 			<div { ...blockProps }>
-				{ showAvatar && authorDetails?.avatar_urls && (
+				{ showAvatar && (
 					<div className="wp-block-post-author__avatar">
 						<img
 							width={ avatarSize }
-							src={ authorDetails.avatar_urls[ avatarSize ] }
-							alt={ authorDetails.name }
+							src={
+								authorDetails?.avatar_urls?.[ avatarSize ] ||
+								defaultAvatar
+							}
+							alt={
+								authorDetails?.name || __( 'Default Avatar' )
+							}
 						/>
 					</div>
 				) }
