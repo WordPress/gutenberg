@@ -6,7 +6,7 @@
 	display: flex;
 	align-items: flex-end;
 
-	gap: var(--wp--style--unstable-tabs-list-gap, var(--wp--style--tabs-gap-default, 0.5em));
+	// gap: var(--wp--style--unstable-tabs-list-gap, var(--wp--style--tabs-gap-default, 0.5em));
 	min-width: fit-content;
 
 	--tab-bg: var(--wp--custom--tabs-menu--background-color, transparent);

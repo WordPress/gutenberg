@@ -49,12 +49,9 @@
 		"html": false,
 		"interactivity": true,
 		"spacing": {
-			"blockGap": [
-				"horizontal",
-				"vertical"
-			],
+			"blockGap": true,
 			"margin": true,
-			"padding": false
+			"padding": true
 		},
 		"typography": {
 			"fontSize": true,

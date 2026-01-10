@@ -6,7 +6,3 @@
 		display: none;
 	}
 }
-
-:root :where(.wp-block-tabs) {
-	gap: var(--wp--style--unstable-tabs-gap, var(--wp--style--tabs-gap-default, 0.5em));
-}
