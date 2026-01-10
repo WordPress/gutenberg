@@ -12,6 +12,7 @@
 - Improve stories and tests. [#74192](https://github.com/WordPress/gutenberg/pull/74192)
 - Update DataForm stories. [#74196](https://github.com/WordPress/gutenberg/pull/74196)
 - Fix missing dependencies. [#74310](https://github.com/WordPress/gutenberg/pull/74310)
+- Add details layout to DataForm validation story. [#74445](https://github.com/WordPress/gutenberg/pull/74445)
 
 ### Bug Fixes
 

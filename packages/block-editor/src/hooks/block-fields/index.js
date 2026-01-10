@@ -348,7 +348,6 @@ const withBlockFields = createHigherOrderComponent(
 		} = useContext( PrivateBlockContext );
 
 		const shouldShowBlockFields =
-			window?.__experimentalContentOnlyPatternInsertion &&
 			window?.__experimentalContentOnlyInspectorFields;
 		const blockTypeFields = blockType?.[ fieldsKey ];
 

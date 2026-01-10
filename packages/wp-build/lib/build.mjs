@@ -17,6 +17,7 @@ import rtlcss from 'rtlcss';
 import cssnano from 'cssnano';
 import babel from 'esbuild-plugin-babel';
 import { camelCase } from 'change-case';
+import { NodePackageImporter } from 'sass-embedded';
 
 /**
  * Internal dependencies
@@ -107,26 +108,59 @@ const wordpressExternalsPlugin = createWordpressExternalsPlugin(
 	HANDLE_PREFIX
 );
 
-const styleBundlingPlugins = [
-	// Handle CSS modules (.module.css and .module.scss)
-	sassPlugin( {
-		embedded: true,
-		filter: /\.module\.(css|scss)$/,
-		transform: postcssModules( {
-			generateScopedName: '[name]__[local]__[hash:base64:5]',
+/**
+ * Get SASS options for the given working directory.
+ *
+ * Uses NodePackageImporter from sass-embedded for resolving package imports
+ * (like @wordpress/base-styles) which works with any package manager (npm, pnpm, yarn).
+ *
+ * @param {string} workingDir - The directory where we're working (for NodePackageImporter).
+ * @return {Object} SASS options object with importers and loadPaths.
+ */
+function getSassOptions( workingDir ) {
+	return {
+		importers: [ new NodePackageImporter( workingDir ) ],
+		// loadPaths for resolving @wordpress/base-styles imports and local base-styles imports
+		loadPaths: [
+			// Package's own node_modules (for pnpm isolated deps)
+			path.join( workingDir, 'node_modules' ),
+			// Root node_modules (for npm hoisted deps)
+			path.join( ROOT_DIR, 'node_modules' ),
+			// For local imports like @use "mixins"
+			path.join( PACKAGES_DIR, 'base-styles' ),
+		],
+	};
+}
+
+/**
+ * Create style bundling plugins with the given working directory.
+ *
+ * @param {string} workingDir - The directory where we're working (for NodePackageImporter).
+ * @return {object[]} Array of esbuild plugins for handling CSS/SCSS.
+ */
+function createStyleBundlingPlugins( workingDir ) {
+	const sassOptions = getSassOptions( workingDir );
+	return [
+		// Handle CSS modules (.module.css and .module.scss)
+		sassPlugin( {
+			embedded: true,
+			filter: /\.module\.(css|scss)$/,
+			transform: postcssModules( {
+				generateScopedName: '[name]__[local]__[hash:base64:5]',
+			} ),
+			type: 'style',
+			...sassOptions,
 		} ),
-		type: 'style',
-		loadPaths: [ 'node_modules', path.join( PACKAGES_DIR, 'base-styles' ) ],
-	} ),
-	// Handle regular CSS/SCSS files
-	// Note: .module.css and .module.scss already handled by plugin above
-	sassPlugin( {
-		embedded: true,
-		filter: /\.(css|scss)$/,
-		type: 'style',
-		loadPaths: [ 'node_modules', path.join( PACKAGES_DIR, 'base-styles' ) ],
-	} ),
-];
+		// Handle regular CSS/SCSS files
+		// Note: .module.css and .module.scss already handled by plugin above
+		sassPlugin( {
+			embedded: true,
+			filter: /\.(css|scss)$/,
+			type: 'style',
+			...sassOptions,
+		} ),
+	];
+}
 
 /**
  * Normalize path separators for cross-platform compatibility.
@@ -1092,7 +1126,7 @@ async function transpilePackage( packageName ) {
 	const plugins = [
 		needsEmotionPlugin && emotionPlugin,
 		externalizeAllExceptCssPlugin,
-		...styleBundlingPlugins,
+		...createStyleBundlingPlugins( packageDir ),
 	].filter( Boolean );
 
 	if ( packageJson.main ) {
@@ -1226,10 +1260,7 @@ async function compileStyles( packageName ) {
 				plugins: [
 					sassPlugin( {
 						embedded: true,
-						loadPaths: [
-							'node_modules',
-							path.join( PACKAGES_DIR, 'base-styles' ),
-						],
+						...getSassOptions( packageDir ),
 						async transform( source ) {
 							// Process with autoprefixer for LTR version
 							const ltrResult = await postcss( [
@@ -1414,7 +1445,7 @@ async function buildRoute( routeName ) {
 						[],
 						true // Generate asset file for minified build
 					),
-					...styleBundlingPlugins,
+					...createStyleBundlingPlugins( routeDir ),
 				],
 			} ),
 			esbuild.build( {
@@ -1432,7 +1463,7 @@ async function buildRoute( routeName ) {
 						[],
 						false // Skip asset file for non-minified build
 					),
-					...styleBundlingPlugins,
+					...createStyleBundlingPlugins( routeDir ),
 				],
 			} ),
 		] );

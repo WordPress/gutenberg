@@ -24,15 +24,15 @@
 		"npm": ">=10.2.3"
 	},
 	"type": "module",
-	"module": "./src/build.mjs",
+	"module": "./lib/build.mjs",
 	"exports": {
 		".": {
-			"import": "./src/build.mjs"
+			"import": "./lib/build.mjs"
 		},
 		"./package.json": "./package.json"
 	},
 	"bin": {
-		"wp-build": "./src/build.mjs"
+		"wp-build": "./lib/build.mjs"
 	},
 	"dependencies": {
 		"@emotion/babel-plugin": "11.11.0",
@@ -48,7 +48,8 @@
 		"moment-timezone": "^0.5.40",
 		"postcss": "8.4.38",
 		"postcss-modules": "6.0.1",
-		"rtlcss": "4.3.0"
+		"rtlcss": "4.3.0",
+		"sass-embedded": "^1.97.2"
 	},
 	"devDependencies": {
 		"@types/node": "^20.17.10"

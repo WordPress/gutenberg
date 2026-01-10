@@ -12,7 +12,7 @@ import {
 /**
  * Helper function to retrieve the corresponding icon by area name or icon name.
  *
- * @param {string} areaOrIconName The area name (e.g., 'header', 'overlay') or icon name (e.g., 'menu').
+ * @param {string} areaOrIconName The area name (e.g., 'header', 'navigation-overlay') or icon name (e.g., 'menu').
  *
  * @return {Object} The corresponding icon.
  */
@@ -24,7 +24,7 @@ export function getTemplatePartIcon( areaOrIconName ) {
 		return footerIcon;
 	} else if ( 'sidebar' === areaOrIconName ) {
 		return sidebarIcon;
-	} else if ( 'overlay' === areaOrIconName ) {
+	} else if ( 'navigation-overlay' === areaOrIconName ) {
 		// TODO: Replace with a proper overlay icon when available.
 		// Using tableColumnAfter as a placeholder.
 		return overlayIcon;
