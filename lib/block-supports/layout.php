@@ -845,81 +845,83 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 	 */
 	if ( ! current_theme_supports( 'disable-layout-styles' ) ) {
 
-        // 1. Check for manual user overrides (highest priority)
-        $gap_value = $block['attrs']['style']['spacing']['blockGap'] ?? null;
+		// 1. Check for manual user overrides (highest priority).
+		$gap_value = isset( $block['attrs']['style']['spacing']['blockGap'] ) ? $block['attrs']['style']['spacing']['blockGap'] : null;
 
-        // 2. NEW FIX: If no manual override, check if a Style Variation has a blockGap
-        if ( null === $gap_value && ! empty( $block['attrs']['className'] ) ) {
-            $style_variation_names = array_filter(
-                explode( ' ', $block['attrs']['className'] ),
-                function( $class ) {
-                    return 0 === strpos( $class, 'is-style-' );
-                }
-            );
+		// 2. NEW FIX: If no manual override, check if a Style Variation has a blockGap.
+		if ( null === $gap_value && ! empty( $block['attrs']['className'] ) ) {
+			$style_variation_names = array_filter(
+				explode( ' ', $block['attrs']['className'] ),
+				function( $class ) {
+					// Use strpos for maximum compatibility across PHP versions.
+					return 0 === strpos( $class, 'is-style-' );
+				}
+			);
 
-            if ( ! empty( $style_variation_names ) ) {
-                $resolved_styles = WP_Theme_JSON_Resolver::get_merged_data()->get_block_data( 
-                    $block_type->name, 
-                    array( 'variation' => $style_variation_names ) 
-                );
-                
-                $variation_gap = $resolved_styles['spacing']['blockGap'] ?? null;
-                
-                if ( null !== $variation_gap ) {
-                    $gap_value = $variation_gap;
-                }
-            }
-        }
+			if ( ! empty( $style_variation_names ) ) {
+				// Fetch the merged theme.json data for this block and the active variation.
+				$resolved_styles = WP_Theme_JSON_Resolver::get_merged_data()->get_block_data(
+					$block_type->name,
+					array( 'variation' => $style_variation_names )
+				);
 
-        /*
-         * Skip if gap value contains unsupported characters.
-         * Regex for CSS value borrowed from `safecss_filter_attr`, and used here
-         * to only match against the value, not the CSS attribute.
-         */
-        if ( is_array( $gap_value ) ) {
-            foreach ( $gap_value as $key => $value ) {
-                $gap_value[ $key ] = $value && preg_match( '%[\\\(&=}]|/\*%', $value ) ? null : $value;
-            }
-        } else {
-            $gap_value = $gap_value && preg_match( '%[\\\(&=}]|/\*%', $gap_value ) ? null : $gap_value;
-        }
+				$variation_gap = isset( $resolved_styles['spacing']['blockGap'] ) ? $resolved_styles['spacing']['blockGap'] : null;
 
-        $fallback_gap_value = $block_type->supports['spacing']['blockGap']['__experimentalDefault'] ?? '0.5em';
-        $block_spacing      = $block['attrs']['style']['spacing'] ?? null;
+				if ( null !== $variation_gap ) {
+					$gap_value = $variation_gap;
+				}
+			}
+		}
 
-        $should_skip_gap_serialization = wp_should_skip_block_supports_serialization( $block_type, 'spacing', 'blockGap' );
+		/*
+		 * Skip if gap value contains unsupported characters.
+		 * Regex for CSS value borrowed from `safecss_filter_attr`, and used here
+		 * to only match against the value, not the CSS attribute.
+		 */
+		if ( is_array( $gap_value ) ) {
+			foreach ( $gap_value as $key => $value ) {
+				$gap_value[ $key ] = $value && preg_match( '%[\\\(&=}]|/\*%', $value ) ? null : $value;
+			}
+		} else {
+			$gap_value = $gap_value && preg_match( '%[\\\(&=}]|/\*%', $gap_value ) ? null : $gap_value;
+		}
 
-        $block_gap             = $global_settings['spacing']['blockGap'] ?? null;
-        $has_block_gap_support = isset( $block_gap );
+		$fallback_gap_value = isset( $block_type->supports['spacing']['blockGap']['__experimentalDefault'] ) ? $block_type->supports['spacing']['blockGap']['__experimentalDefault'] : '0.5em';
+		$block_spacing      = isset( $block['attrs']['style']['spacing'] ) ? $block['attrs']['style']['spacing'] : null;
 
-        // Generate unique ID based on the spacing values
-        $container_class = gutenberg_unique_id_from_values(
-            array(
-                $used_layout,
-                $has_block_gap_support,
-                $gap_value,
-                $should_skip_gap_serialization,
-                $fallback_gap_value,
-                $block_spacing,
-            ),
-            'wp-container-' . sanitize_title( $block['blockName'] ) . '-is-layout-'
-        );
+		$should_skip_gap_serialization = wp_should_skip_block_supports_serialization( $block_type, 'spacing', 'blockGap' );
 
-        $style = gutenberg_get_layout_style(
-            ".$container_class",
-            $used_layout,
-            $has_block_gap_support,
-            $gap_value,
-            $should_skip_gap_serialization,
-            $fallback_gap_value,
-            $block_spacing
-        );
+		$block_gap             = isset( $global_settings['spacing']['blockGap'] ) ? $global_settings['spacing']['blockGap'] : null;
+		$has_block_gap_support = isset( $block_gap );
 
-        // Only add container class if unique styles were generated.
-        if ( ! empty( $style ) ) {
-            $class_names[] = $container_class;
-        }
-    }
+		// Generate unique ID based on the spacing values.
+		$container_class = gutenberg_unique_id_from_values(
+			array(
+				$used_layout,
+				$has_block_gap_support,
+				$gap_value,
+				$should_skip_gap_serialization,
+				$fallback_gap_value,
+				$block_spacing,
+			),
+			'wp-container-' . sanitize_title( $block['blockName'] ) . '-is-layout-'
+		);
+
+		$style = gutenberg_get_layout_style(
+			".$container_class",
+			$used_layout,
+			$has_block_gap_support,
+			$gap_value,
+			$should_skip_gap_serialization,
+			$fallback_gap_value,
+			$block_spacing
+		);
+
+		// Only add container class if unique styles were generated.
+		if ( ! empty( $style ) ) {
+			$class_names[] = $container_class;
+		}
+	}
 
 	// Add combined layout and block classname for global styles to hook onto.
 	$split_block_name = explode( '/', $block['blockName'] );
