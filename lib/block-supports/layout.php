@@ -848,6 +848,29 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		$gap_value = $block['attrs']['style']['spacing']['blockGap'] ?? null;
 
 		/*
+		 * Check for style variation blockGap first.
+		 * Style variations should override block-level and global blockGap values.
+		 */
+		$classes = $block['attrs']['className'] ?? '';
+		if ( ! empty( $classes ) && function_exists( 'gutenberg_get_block_style_variation_name_from_class' ) ) {
+			$variations = gutenberg_get_block_style_variation_name_from_class( $classes );
+			
+			if ( $variations ) {
+				$tree = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data();
+				$theme_json = $tree->get_raw_data();
+				
+				foreach ( $variations as $variation ) {
+					$variation_data = $theme_json['styles']['blocks'][ $block['blockName'] ]['variations'][ $variation ] ?? array();
+					
+					if ( isset( $variation_data['spacing']['blockGap'] ) ) {
+						$gap_value = $variation_data['spacing']['blockGap'];
+						break; // Use first matching variation with blockGap.
+					}
+				}
+			}
+		}
+
+		/*
 		 * Skip if gap value contains unsupported characters.
 		 * Regex for CSS value borrowed from `safecss_filter_attr`, and used here
 		 * to only match against the value, not the CSS attribute.
