@@ -74,6 +74,9 @@ export function BlockSettingsDropdown( {
 	clientIds,
 	children,
 	__experimentalSelectBlock,
+	expand,
+	collapse,
+	expandedState,
 	...props
 } ) {
 	// Get the client id of the current block for this menu, if one is set.
@@ -126,7 +129,7 @@ export function BlockSettingsDropdown( {
 		[ firstBlockClientId ]
 	);
 
-	const { getBlockOrder, getSelectedBlockClientIds } =
+	const { getBlockOrder, getSelectedBlockClientIds, getBlocks } =
 		useSelect( blockEditorStore );
 
 	const shortcuts = useSelect( ( select ) => {
@@ -186,6 +189,74 @@ export function BlockSettingsDropdown( {
 	const shouldShowBlockParentMenuItem =
 		! parentBlockIsSelected && !! firstParentClientId;
 
+	// Only show expand/collapse options if we're in List View context
+	// (expand, collapse, and expandedState are only passed from List View)
+	const showExpandCollapseOptions = expand && collapse && expandedState;
+
+	// Helper functions for expand/collapse - defined inline to avoid import issues
+	function hasInnerBlocksHelper( clientId ) {
+		try {
+			const innerBlocks = getBlocks( clientId );
+			return innerBlocks && innerBlocks.length > 0;
+		} catch ( error ) {
+			return false;
+		}
+	}
+
+	function getAllDescendantIdsHelper( clientId ) {
+		try {
+			const innerBlocks = getBlocks( clientId );
+			const descendants = [];
+
+			if ( ! innerBlocks ) {
+				return descendants;
+			}
+
+			innerBlocks.forEach( ( innerBlock ) => {
+				if ( innerBlock && innerBlock.clientId ) {
+					descendants.push( innerBlock.clientId );
+					descendants.push(
+						...getAllDescendantIdsHelper( innerBlock.clientId )
+					);
+				}
+			} );
+
+			return descendants;
+		} catch ( error ) {
+			return [];
+		}
+	}
+
+	function handleExpandRecursively() {
+		if ( ! expand ) {
+			return;
+		}
+
+		// Expand all selected blocks and their descendants
+		const allIdsToExpand = [];
+		clientIds.forEach( ( clientId ) => {
+			allIdsToExpand.push( clientId );
+			allIdsToExpand.push( ...getAllDescendantIdsHelper( clientId ) );
+		} );
+
+		expand( allIdsToExpand );
+	}
+
+	function handleCollapseChildren() {
+		if ( ! collapse ) {
+			return;
+		}
+
+		// Collapse all selected blocks and their descendants
+		clientIds.forEach( ( clientId ) => {
+			collapse( clientId );
+			const descendantIds = getAllDescendantIdsHelper( clientId );
+			descendantIds.forEach( ( childId ) => {
+				collapse( childId );
+			} );
+		} );
+	}
+
 	return (
 		<BlockActions
 			clientIds={ clientIds }
@@ -226,134 +297,241 @@ export function BlockSettingsDropdown( {
 						noIcons
 						{ ...props }
 					>
-						{ ( { onClose } ) => (
-							<>
-								<MenuGroup>
-									<__unstableBlockSettingsMenuFirstItem.Slot
-										fillProps={ { onClose } }
-									/>
-									{ shouldShowBlockParentMenuItem && (
-										<BlockParentSelectorMenuItem
-											parentClientId={
-												firstParentClientId
-											}
-											parentBlockType={ parentBlockType }
+						{ ( { onClose } ) => {
+							// Calculate these values only when the menu is opened
+							// to avoid performance issues during render
+							let blockHasChildren = false;
+							let canExpandRecursively = false;
+							let canCollapseChildren = false;
+
+							if ( showExpandCollapseOptions ) {
+								// Check all selected blocks
+								let anyBlockHasChildren = false;
+								let anyBlockIsCollapsed = false;
+								let anyBlockIsExpanded = false;
+
+								clientIds.forEach( ( clientId ) => {
+									const hasChildren =
+										hasInnerBlocksHelper( clientId );
+
+									if ( hasChildren ) {
+										anyBlockHasChildren = true;
+
+										const isInState =
+											clientId in expandedState;
+										const isExplicitlyCollapsed =
+											expandedState[ clientId ] === false;
+										const isCollapsed =
+											! isInState ||
+											isExplicitlyCollapsed;
+
+										if ( isCollapsed ) {
+											anyBlockIsCollapsed = true;
+
+											// Also check if this block has collapsed descendants
+											const descendants =
+												getAllDescendantIdsHelper(
+													clientId
+												);
+											descendants.forEach(
+												( descendantId ) => {
+													const descendantHasChildren =
+														hasInnerBlocksHelper(
+															descendantId
+														);
+													if (
+														descendantHasChildren
+													) {
+														const descIsInState =
+															descendantId in
+															expandedState;
+														const descIsCollapsed =
+															! descIsInState ||
+															expandedState[
+																descendantId
+															] === false;
+														if ( descIsCollapsed ) {
+															anyBlockIsCollapsed = true;
+														}
+													}
+												}
+											);
+										} else {
+											anyBlockIsExpanded = true;
+										}
+									}
+								} );
+
+								blockHasChildren = anyBlockHasChildren;
+								canExpandRecursively = anyBlockIsCollapsed;
+								canCollapseChildren = anyBlockIsExpanded;
+							}
+
+							return (
+								<>
+									<MenuGroup>
+										<__unstableBlockSettingsMenuFirstItem.Slot
+											fillProps={ { onClose } }
 										/>
-									) }
-									{ count === 1 && (
-										<BlockHTMLConvertButton
-											clientId={ firstBlockClientId }
-										/>
-									) }
-									{ ! isContentOnly && (
-										<CopyMenuItem
-											clientIds={ clientIds }
-											onCopy={ onCopy }
-											shortcut={ shortcuts.copy }
-										/>
-									) }
-									{ ! isContentOnly && (
-										<CopyMenuItem
-											clientIds={ clientIds }
-											label={ __( 'Cut' ) }
-											eventType="cut"
-											shortcut={ shortcuts.cut }
-											__experimentalUpdateSelection={
-												! __experimentalSelectBlock
-											}
-										/>
-									) }
-									{ canDuplicate && (
-										<MenuItem
-											onClick={ pipe(
-												onClose,
-												onDuplicate,
-												updateSelectionAfterDuplicate
-											) }
-											shortcut={ shortcuts.duplicate }
-										>
-											{ __( 'Duplicate' ) }
-										</MenuItem>
-									) }
-									{ canInsertBlock && ! isZoomOut && (
-										<>
+										{ shouldShowBlockParentMenuItem && (
+											<BlockParentSelectorMenuItem
+												parentClientId={
+													firstParentClientId
+												}
+												parentBlockType={
+													parentBlockType
+												}
+											/>
+										) }
+										{ count === 1 && (
+											<BlockHTMLConvertButton
+												clientId={ firstBlockClientId }
+											/>
+										) }
+										{ ! isContentOnly && (
+											<CopyMenuItem
+												clientIds={ clientIds }
+												onCopy={ onCopy }
+												shortcut={ shortcuts.copy }
+											/>
+										) }
+										{ ! isContentOnly && (
+											<CopyMenuItem
+												clientIds={ clientIds }
+												label={ __( 'Cut' ) }
+												eventType="cut"
+												shortcut={ shortcuts.cut }
+												__experimentalUpdateSelection={
+													! __experimentalSelectBlock
+												}
+											/>
+										) }
+										{ canDuplicate && (
 											<MenuItem
 												onClick={ pipe(
 													onClose,
-													onInsertBefore
+													onDuplicate,
+													updateSelectionAfterDuplicate
 												) }
-												shortcut={
-													shortcuts.insertBefore
-												}
+												shortcut={ shortcuts.duplicate }
 											>
-												{ __( 'Add before' ) }
+												{ __( 'Duplicate' ) }
 											</MenuItem>
-											<MenuItem
-												onClick={ pipe(
+										) }
+										{ canInsertBlock && ! isZoomOut && (
+											<>
+												<MenuItem
+													onClick={ pipe(
+														onClose,
+														onInsertBefore
+													) }
+													shortcut={
+														shortcuts.insertBefore
+													}
+												>
+													{ __( 'Add before' ) }
+												</MenuItem>
+												<MenuItem
+													onClick={ pipe(
+														onClose,
+														onInsertAfter
+													) }
+													shortcut={
+														shortcuts.insertAfter
+													}
+												>
+													{ __( 'Add after' ) }
+												</MenuItem>
+											</>
+										) }
+										{ count === 1 && (
+											<CommentIconSlotFill.Slot
+												fillProps={ {
+													clientId:
+														firstBlockClientId,
 													onClose,
-													onInsertAfter
+												} }
+											/>
+										) }
+									</MenuGroup>
+									{ showExpandCollapseOptions &&
+										blockHasChildren &&
+										( canExpandRecursively ||
+											canCollapseChildren ) && (
+											<MenuGroup>
+												{ canExpandRecursively && (
+													<MenuItem
+														onClick={ pipe(
+															onClose,
+															handleExpandRecursively
+														) }
+													>
+														{ __(
+															'Expand all blocks'
+														) }
+													</MenuItem>
 												) }
-												shortcut={
-													shortcuts.insertAfter
-												}
-											>
-												{ __( 'Add after' ) }
+												{ canCollapseChildren && (
+													<MenuItem
+														onClick={ pipe(
+															onClose,
+															handleCollapseChildren
+														) }
+													>
+														{ __(
+															'Collapse nested blocks'
+														) }
+													</MenuItem>
+												) }
+											</MenuGroup>
+										) }
+									{ canCopyStyles && ! isContentOnly && (
+										<MenuGroup>
+											<CopyMenuItem
+												clientIds={ clientIds }
+												onCopy={ onCopy }
+												label={ __( 'Copy styles' ) }
+												eventType="copyStyles"
+											/>
+											<MenuItem onClick={ onPasteStyles }>
+												{ __( 'Paste styles' ) }
 											</MenuItem>
-										</>
+										</MenuGroup>
 									) }
-									{ count === 1 && (
-										<CommentIconSlotFill.Slot
+									{ ! isContentOnly && (
+										<BlockSettingsMenuControls.Slot
 											fillProps={ {
-												clientId: firstBlockClientId,
 												onClose,
+												count,
+												firstBlockClientId,
 											} }
+											clientIds={ clientIds }
 										/>
 									) }
-								</MenuGroup>
-								{ canCopyStyles && ! isContentOnly && (
-									<MenuGroup>
-										<CopyMenuItem
-											clientIds={ clientIds }
-											onCopy={ onCopy }
-											label={ __( 'Copy styles' ) }
-											eventType="copyStyles"
-										/>
-										<MenuItem onClick={ onPasteStyles }>
-											{ __( 'Paste styles' ) }
-										</MenuItem>
-									</MenuGroup>
-								) }
-								{ ! isContentOnly && (
-									<BlockSettingsMenuControls.Slot
-										fillProps={ {
-											onClose,
-											count,
-											firstBlockClientId,
-										} }
-										clientIds={ clientIds }
-									/>
-								) }
-								{ typeof children === 'function'
-									? children( { onClose } )
-									: Children.map( ( child ) =>
-											cloneElement( child, { onClose } )
-									  ) }
-								{ canRemove && (
-									<MenuGroup>
-										<MenuItem
-											onClick={ pipe(
-												onClose,
-												onRemove,
-												updateSelectionAfterRemove
-											) }
-											shortcut={ shortcuts.remove }
-										>
-											{ __( 'Delete' ) }
-										</MenuItem>
-									</MenuGroup>
-								) }
-							</>
-						) }
+									{ typeof children === 'function'
+										? children( { onClose } )
+										: Children.map( ( child ) =>
+												cloneElement( child, {
+													onClose,
+												} )
+										  ) }
+									{ canRemove && (
+										<MenuGroup>
+											<MenuItem
+												onClick={ pipe(
+													onClose,
+													onRemove,
+													updateSelectionAfterRemove
+												) }
+												shortcut={ shortcuts.remove }
+											>
+												{ __( 'Delete' ) }
+											</MenuItem>
+										</MenuGroup>
+									) }
+								</>
+							);
+						} }
 					</DropdownMenu>
 				);
 			} }

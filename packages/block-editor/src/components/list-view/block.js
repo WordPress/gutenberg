@@ -690,6 +690,7 @@ function ListViewBlock( {
 							} }
 							disableOpenOnArrowDown
 							expand={ expand }
+							collapse={ collapse }
 							expandedState={ expandedState }
 							setInsertedBlock={ setInsertedBlock }
 							__experimentalSelectBlock={
