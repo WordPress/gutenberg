@@ -89,10 +89,9 @@
 		},
 		"spacing": {
 			"padding": true,
-			"blockGap": true,
+			"__experimentalSkipSerialization": true,
 			"__experimentalDefaultControls": {
-				"padding": true,
-				"blockGap": true
+				"padding": true
 			}
 		},
 		"__experimentalBorder": {
