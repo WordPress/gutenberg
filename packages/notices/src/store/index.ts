@@ -21,6 +21,4 @@ export const store = createReduxStore( 'core/notices', {
 	selectors,
 } );
 
-export * from './types';
-
 register( store );
