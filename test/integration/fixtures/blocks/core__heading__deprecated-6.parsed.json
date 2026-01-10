@@ -2,63 +2,48 @@
 	{
 		"blockName": "core/heading",
 		"attrs": {
-			"style": {
-				"typography": {
-					"textAlign": "right"
-				}
-			},
-			"textColor": "primary"
+			"textAlign": "left"
 		},
 		"innerBlocks": [],
-		"innerHTML": "\n<h2 class=\"wp-block-heading has-text-align-right has-primary-color has-text-color\">Text 1</h2>\n",
+		"innerHTML": "\n<h2 class=\"wp-block-heading has-text-align-left\">Heading</h2>\n",
 		"innerContent": [
-			"\n<h2 class=\"wp-block-heading has-text-align-right has-primary-color has-text-color\">Text 1</h2>\n"
+			"\n<h2 class=\"wp-block-heading has-text-align-left\">Heading</h2>\n"
 		]
 	},
 	{
 		"blockName": null,
 		"attrs": {},
 		"innerBlocks": [],
-		"innerHTML": "\n\n",
-		"innerContent": [ "\n\n" ]
+		"innerHTML": "\n",
+		"innerContent": [ "\n" ]
 	},
 	{
 		"blockName": "core/heading",
 		"attrs": {
-			"style": {
-				"typography": {
-					"textAlign": "center"
-				}
-			},
-			"textColor": "primary"
+			"textAlign": "center"
 		},
 		"innerBlocks": [],
-		"innerHTML": "\n<h2 class=\"wp-block-heading has-text-align-center has-primary-color has-text-color\">Text 2</h2>\n",
+		"innerHTML": "\n<h2 class=\"wp-block-heading has-text-align-center\">Heading</h2>\n",
 		"innerContent": [
-			"\n<h2 class=\"wp-block-heading has-text-align-center has-primary-color has-text-color\">Text 2</h2>\n"
+			"\n<h2 class=\"wp-block-heading has-text-align-center\">Heading</h2>\n"
 		]
 	},
 	{
 		"blockName": null,
 		"attrs": {},
 		"innerBlocks": [],
-		"innerHTML": "\n\n",
-		"innerContent": [ "\n\n" ]
+		"innerHTML": "\n",
+		"innerContent": [ "\n" ]
 	},
 	{
 		"blockName": "core/heading",
 		"attrs": {
-			"style": {
-				"typography": {
-					"textAlign": "left"
-				}
-			},
-			"textColor": "primary"
+			"textAlign": "right"
 		},
 		"innerBlocks": [],
-		"innerHTML": "\n<h2 class=\"wp-block-heading has-text-align-left has-primary-color has-text-color\">Text</h2>\n",
+		"innerHTML": "\n<h2 class=\"wp-block-heading has-text-align-right\">Heading</h2>\n",
 		"innerContent": [
-			"\n<h2 class=\"wp-block-heading has-text-align-left has-primary-color has-text-color\">Text</h2>\n"
+			"\n<h2 class=\"wp-block-heading has-text-align-right\">Heading</h2>\n"
 		]
 	}
 ]
