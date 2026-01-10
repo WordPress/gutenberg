@@ -31,7 +31,14 @@ exports.resolve = function ( source, file, config ) {
 			const manifestPath = path.join( packagePath, 'package.json' );
 			const manifest = JSON.parse( readFileSync( manifestPath, 'utf8' ) );
 			const subpath = path.join( '.', pathParts.join( '/' ) );
+
 			const exportPath = manifest.exports?.[ subpath ]?.import;
+
+			// ✅ SAFETY FIX: prevent crash if exportPath is undefined
+			if ( ! exportPath ) {
+				return { found: false };
+			}
+
 			const sourcePath = exportPath
 				.replace( 'build-module', 'src' )
 				.replace( /\.mjs$/, '.js' );
