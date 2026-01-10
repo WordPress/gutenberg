@@ -29,13 +29,11 @@ const transforms = {
 						),
 						content,
 						anchor,
-						...( textAlign && {
-							style: {
-								typography: {
-									textAlign,
-								},
+						style: {
+							typography: {
+								textAlign,
 							},
-						} ),
+						},
 					} );
 				} ),
 		},
@@ -116,13 +114,11 @@ const transforms = {
 							} )
 						),
 						content,
-						...( textAlign && {
-							style: {
-								typography: {
-									textAlign,
-								},
+						style: {
+							typography: {
+								textAlign,
 							},
-						} ),
+						},
 					} );
 				} ),
 		},
