@@ -13,9 +13,13 @@
 
 ![Screenshot of the Gutenberg Editor, editing a post in WordPress](https://user-images.githubusercontent.com/1204802/100067796-fc3e8700-2e36-11eb-993b-6b80b4310b87.png)
 
-Welcome to the development hub for the WordPress Gutenberg project!
+Welcome to the development hub of the WordPress Gutenberg project!
+## Pull Requests
 
-"Gutenberg" is a codename for a whole new paradigm in WordPress site building and publishing that aims to revolutionize the entire publishing experience as much as Gutenberg did the printed word. Right now, the project is in the second phase of a four-phase process that will touch every piece of WordPress -- Editing, Customization, **Collaboration** (which includes [Real-time collaboration](https://make.wordpress.org/core/2023/07/03/real-time-collaboration/), [Asynchronous collaboration](https://make.wordpress.org/core/2023/07/04/workflows/), [Publishing flows](https://make.wordpress.org/core/2023/07/04/workflows/), [Post revisions interface](https://make.wordpress.org/core/2023/07/05/revisions/), [Admin design](https://make.wordpress.org/core/2023/07/12/admin-design/), [Library](https://make.wordpress.org/core/2023/07/10/block-library/)), and Multilingual -- and is focused on a new editing experience, the block editor.
+We welcome contributions via Pull Requests! If you'd like to submit code, please fork the repository, make your changes on a separate branch, and submit a PR. For guidance, see our [Contributing Guidelines](https://github.com/WordPress/gutenberg/blob/HEAD/CONTRIBUTING.md) and ensure your PR adheres to our coding standards and testing requirements.
+
+
+"Gutenberg" is a codename for a new paradigm in WordPress site building and publishing that aims to revolutionize the entire publishing experience as much as Gutenberg did the printed word. Right now, the project is in the second phase of a four-phase process that will touch every piece of WordPress -- Editing, Customization, **Collaboration** (which includes [Real-time collaboration](https://make.wordpress.org/core/2023/07/03/real-time-collaboration/), [Asynchronous collaboration](https://make.wordpress.org/core/2023/07/04/workflows/), [Publishing flows](https://make.wordpress.org/core/2023/07/04/workflows/), [Post revisions interface](https://make.wordpress.org/core/2023/07/05/revisions/), [Admin design](https://make.wordpress.org/core/2023/07/12/admin-design/), [Library](https://make.wordpress.org/core/2023/07/10/block-library/)), and Multilingual -- and is focused on a new editing experience, the block editor.
 
 The block editor introduces a modular approach to pages and posts: each piece of content in the editor, from a paragraph to an image gallery to a headline, is its own block. And just like physical blocks, WordPress blocks can be added, arranged, and rearranged, allowing WordPress users to create media-rich pages in a visually intuitive way -- and without workarounds like shortcodes or custom HTML.
 
