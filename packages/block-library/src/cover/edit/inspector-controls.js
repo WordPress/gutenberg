@@ -41,56 +41,56 @@ const { cleanEmptyObject, ResolutionTool, HTMLElementControl } = unlock(
 	blockEditorPrivateApis
 );
 
-function CoverHeightInput( {
+function CoverHeightInput({
 	onChange,
 	onUnitChange,
 	unit = 'px',
 	value = '',
-} ) {
-	const instanceId = useInstanceId( UnitControl );
-	const inputId = `block-cover-height-input-${ instanceId }`;
+}) {
+	const instanceId = useInstanceId(UnitControl);
+	const inputId = `block-cover-height-input-${instanceId}`;
 	const isPx = unit === 'px';
 
-	const [ availableUnits ] = useSettings( 'spacing.units' );
-	const units = useCustomUnits( {
-		availableUnits: availableUnits || [ 'px', 'em', 'rem', 'vw', 'vh' ],
+	const [availableUnits] = useSettings('spacing.units');
+	const units = useCustomUnits({
+		availableUnits: availableUnits || ['px', 'em', 'rem', 'vw', 'vh'],
 		defaultValues: { px: 430, '%': 20, em: 20, rem: 20, vw: 20, vh: 50 },
-	} );
+	});
 
-	const handleOnChange = ( unprocessedValue ) => {
+	const handleOnChange = (unprocessedValue) => {
 		const inputValue =
 			unprocessedValue !== ''
-				? parseFloat( unprocessedValue )
+				? parseFloat(unprocessedValue)
 				: undefined;
 
-		if ( isNaN( inputValue ) && inputValue !== undefined ) {
+		if (isNaN(inputValue) && inputValue !== undefined) {
 			return;
 		}
-		onChange( inputValue );
+		onChange(inputValue);
 	};
 
-	const computedValue = useMemo( () => {
-		const [ parsedQuantity ] = parseQuantityAndUnitFromRawValue( value );
-		return [ parsedQuantity, unit ].join( '' );
-	}, [ unit, value ] );
+	const computedValue = useMemo(() => {
+		const [parsedQuantity] = parseQuantityAndUnitFromRawValue(value);
+		return [parsedQuantity, unit].join('');
+	}, [unit, value]);
 
 	const min = isPx ? COVER_MIN_HEIGHT : 0;
 
 	return (
 		<UnitControl
 			__next40pxDefaultSize
-			label={ __( 'Minimum height' ) }
-			id={ inputId }
+			label={__('Minimum height')}
+			id={inputId}
 			isResetValueOnUnitChange
-			min={ min }
-			onChange={ handleOnChange }
-			onUnitChange={ onUnitChange }
-			units={ units }
-			value={ computedValue }
+			min={min}
+			onChange={handleOnChange}
+			onUnitChange={onUnitChange}
+			units={units}
+			value={computedValue}
 		/>
 	);
 }
-export default function CoverInspectorControls( {
+export default function CoverInspectorControls({
 	attributes,
 	setAttributes,
 	clientId,
@@ -99,7 +99,7 @@ export default function CoverInspectorControls( {
 	currentSettings,
 	updateDimRatio,
 	featuredImage,
-} ) {
+}) {
 	const {
 		useFeaturedImage,
 		id,
@@ -124,69 +124,69 @@ export default function CoverInspectorControls( {
 	const sizeSlug = attributes.sizeSlug || DEFAULT_MEDIA_SIZE_SLUG;
 
 	const { gradientValue, setGradient } = __experimentalUseGradient();
-	const { getSettings } = useSelect( blockEditorStore );
+	const { getSettings } = useSelect(blockEditorStore);
 
 	const imageSizes = getSettings()?.imageSizes;
 
 	const image = useSelect(
-		( select ) =>
+		(select) =>
 			id && isImageBackground
-				? select( coreStore ).getEntityRecord(
-						'postType',
-						'attachment',
-						id,
-						{ context: 'view' }
-				  )
+				? select(coreStore).getEntityRecord(
+					'postType',
+					'attachment',
+					id,
+					{ context: 'view' }
+				)
 				: null,
-		[ id, isImageBackground ]
+		[id, isImageBackground]
 	);
 
 	const currentBackgroundImage = useFeaturedImage ? featuredImage : image;
 
-	function updateImage( newSizeSlug ) {
+	function updateImage(newSizeSlug) {
 		const newUrl =
-			currentBackgroundImage?.media_details?.sizes?.[ newSizeSlug ]
+			currentBackgroundImage?.media_details?.sizes?.[newSizeSlug]
 				?.source_url;
-		if ( ! newUrl ) {
+		if (!newUrl) {
 			return null;
 		}
 
-		setAttributes( {
+		setAttributes({
 			url: newUrl,
 			sizeSlug: newSizeSlug,
-		} );
+		});
 	}
 
 	const imageSizeOptions = imageSizes
 		?.filter(
-			( { slug } ) =>
-				currentBackgroundImage?.media_details?.sizes?.[ slug ]
+			({ slug }) =>
+				currentBackgroundImage?.media_details?.sizes?.[slug]
 					?.source_url
 		)
-		?.map( ( { name, slug } ) => ( { value: slug, label: name } ) );
+		?.map(({ name, slug }) => ({ value: slug, label: name }));
 
 	const toggleParallax = () => {
-		setAttributes( {
-			hasParallax: ! hasParallax,
-			...( ! hasParallax ? { focalPoint: undefined } : {} ),
-		} );
+		setAttributes({
+			hasParallax: !hasParallax,
+			...(!hasParallax ? { focalPoint: undefined } : {}),
+		});
 	};
 
 	const toggleIsRepeated = () => {
-		setAttributes( {
-			isRepeated: ! isRepeated,
-		} );
+		setAttributes({
+			isRepeated: !isRepeated,
+		});
 	};
 
 	const showFocalPointPicker =
 		isVideoBackground ||
-		( isImageBackground && ( ! hasParallax || isRepeated ) );
+		(isImageBackground && (!hasParallax || isRepeated));
 
-	const imperativeFocalPointPreview = ( value ) => {
-		const [ styleOfRef, property ] = mediaElement.current
-			? [ mediaElement.current.style, 'objectPosition' ]
-			: [ coverRef.current.style, 'backgroundPosition' ];
-		styleOfRef[ property ] = mediaPosition( value );
+	const imperativeFocalPointPreview = (value) => {
+		const [styleOfRef, property] = mediaElement.current
+			? [mediaElement.current.style, 'objectPosition']
+			: [coverRef.current.style, 'backgroundPosition'];
+		styleOfRef[property] = mediaPosition(value);
 	};
 
 	const colorGradientSettings = useMultipleOriginColorsAndGradients();
@@ -196,108 +196,110 @@ export default function CoverInspectorControls( {
 	return (
 		<>
 			<InspectorControls>
-				{ ( !! url || useFeaturedImage ) && (
+				{(!!url || useFeaturedImage) && (
 					<ToolsPanel
-						label={ __( 'Settings' ) }
-						resetAll={ () => {
-							setAttributes( {
+						label={__('Settings')}
+						resetAll={() => {
+							setAttributes({
 								hasParallax: false,
 								focalPoint: undefined,
 								isRepeated: false,
 								alt: '',
 								poster: undefined,
-							} );
-							updateImage( DEFAULT_MEDIA_SIZE_SLUG );
-						} }
-						dropdownMenuProps={ dropdownMenuProps }
+							});
+							updateImage(DEFAULT_MEDIA_SIZE_SLUG);
+						}}
+						dropdownMenuProps={dropdownMenuProps}
 					>
-						{ isImageBackground && (
+						{(isImageBackground || isVideoBackground) && (
 							<>
 								<ToolsPanelItem
-									label={ __( 'Fixed background' ) }
+									label={__('Fixed background')}
 									isShownByDefault
-									hasValue={ () => !! hasParallax }
-									onDeselect={ () =>
-										setAttributes( {
+									hasValue={() => !!hasParallax}
+									onDeselect={() =>
+										setAttributes({
 											hasParallax: false,
 											focalPoint: undefined,
-										} )
+										})
 									}
 								>
 									<ToggleControl
-										label={ __( 'Fixed background' ) }
-										checked={ !! hasParallax }
-										onChange={ toggleParallax }
+										label={__('Fixed background')}
+										checked={!!hasParallax}
+										onChange={toggleParallax}
 									/>
 								</ToolsPanelItem>
 
-								<ToolsPanelItem
-									label={ __( 'Repeated background' ) }
-									isShownByDefault
-									hasValue={ () => isRepeated }
-									onDeselect={ () =>
-										setAttributes( {
-											isRepeated: false,
-										} )
-									}
-								>
-									<ToggleControl
-										label={ __( 'Repeated background' ) }
-										checked={ isRepeated }
-										onChange={ toggleIsRepeated }
-									/>
-								</ToolsPanelItem>
+								{isImageBackground && (
+									<ToolsPanelItem
+										label={__('Repeated background')}
+										isShownByDefault
+										hasValue={() => isRepeated}
+										onDeselect={() =>
+											setAttributes({
+												isRepeated: false,
+											})
+										}
+									>
+										<ToggleControl
+											label={__('Repeated background')}
+											checked={isRepeated}
+											onChange={toggleIsRepeated}
+										/>
+									</ToolsPanelItem>
+								)}
 							</>
-						) }
-						{ showFocalPointPicker && (
+						)}
+						{showFocalPointPicker && (
 							<ToolsPanelItem
-								label={ __( 'Focal point' ) }
+								label={__('Focal point')}
 								isShownByDefault
-								hasValue={ () => !! focalPoint }
-								onDeselect={ () =>
-									setAttributes( {
+								hasValue={() => !!focalPoint}
+								onDeselect={() =>
+									setAttributes({
 										focalPoint: undefined,
-									} )
+									})
 								}
 							>
 								<FocalPointPicker
-									label={ __( 'Focal point' ) }
-									url={ url }
-									value={ focalPoint }
-									onDragStart={ imperativeFocalPointPreview }
-									onDrag={ imperativeFocalPointPreview }
-									onChange={ ( newFocalPoint ) =>
-										setAttributes( {
+									label={__('Focal point')}
+									url={url}
+									value={focalPoint}
+									onDragStart={imperativeFocalPointPreview}
+									onDrag={imperativeFocalPointPreview}
+									onChange={(newFocalPoint) =>
+										setAttributes({
 											focalPoint: newFocalPoint,
-										} )
+										})
 									}
 								/>
 							</ToolsPanelItem>
-						) }
-						{ isVideoBackground && (
+						)}
+						{isVideoBackground && (
 							<PosterImage
-								poster={ poster }
-								onChange={ ( posterImage ) =>
-									setAttributes( {
+								poster={poster}
+								onChange={(posterImage) =>
+									setAttributes({
 										poster: posterImage?.url,
-									} )
+									})
 								}
 							/>
-						) }
-						{ ! useFeaturedImage && url && ! isVideoBackground && (
+						)}
+						{!useFeaturedImage && url && !isVideoBackground && (
 							<ToolsPanelItem
-								label={ __( 'Alternative text' ) }
+								label={__('Alternative text')}
 								isShownByDefault
-								hasValue={ () => !! alt }
-								onDeselect={ () =>
-									setAttributes( { alt: '' } )
+								hasValue={() => !!alt}
+								onDeselect={() =>
+									setAttributes({ alt: '' })
 								}
 							>
 								<TextareaControl
-									label={ __( 'Alternative text' ) }
-									value={ alt }
-									onChange={ ( newAlt ) =>
-										setAttributes( { alt: newAlt } )
+									label={__('Alternative text')}
+									value={alt}
+									onChange={(newAlt) =>
+										setAttributes({ alt: newAlt })
 									}
 									help={
 										<>
@@ -309,102 +311,102 @@ export default function CoverInspectorControls( {
 													)
 												}
 											>
-												{ __(
+												{__(
 													'Describe the purpose of the image.'
-												) }
+												)}
 											</ExternalLink>
 											<br />
-											{ __(
+											{__(
 												'Leave empty if decorative.'
-											) }
+											)}
 										</>
 									}
 								/>
 							</ToolsPanelItem>
-						) }
-						{ !! imageSizeOptions?.length && (
+						)}
+						{!!imageSizeOptions?.length && (
 							<ResolutionTool
-								value={ sizeSlug }
-								onChange={ updateImage }
-								options={ imageSizeOptions }
-								defaultValue={ DEFAULT_MEDIA_SIZE_SLUG }
+								value={sizeSlug}
+								onChange={updateImage}
+								options={imageSizeOptions}
+								defaultValue={DEFAULT_MEDIA_SIZE_SLUG}
 							/>
-						) }
+						)}
 					</ToolsPanel>
-				) }
+				)}
 			</InspectorControls>
-			{ colorGradientSettings.hasColorsOrGradients && (
+			{colorGradientSettings.hasColorsOrGradients && (
 				<InspectorControls group="color">
 					<ColorGradientSettingsDropdown
 						__experimentalIsRenderedInSidebar
-						settings={ [
+						settings={[
 							{
 								colorValue: overlayColor.color,
 								gradientValue,
-								label: __( 'Overlay' ),
+								label: __('Overlay'),
 								onColorChange: setOverlayColor,
 								onGradientChange: setGradient,
 								isShownByDefault: true,
-								resetAllFilter: () => ( {
+								resetAllFilter: () => ({
 									overlayColor: undefined,
 									customOverlayColor: undefined,
 									gradient: undefined,
 									customGradient: undefined,
-								} ),
+								}),
 								clearable: true,
 							},
-						] }
-						panelId={ clientId }
-						{ ...colorGradientSettings }
+						]}
+						panelId={clientId}
+						{...colorGradientSettings}
 					/>
 					<ToolsPanelItem
-						hasValue={ () => {
+						hasValue={() => {
 							// If there's a media background the dimRatio will be
 							// defaulted to 50 whereas it will be 100 for colors.
 							return dimRatio === undefined
 								? false
-								: dimRatio !== ( url ? 50 : 100 );
-						} }
-						label={ __( 'Overlay opacity' ) }
-						onDeselect={ () => updateDimRatio( url ? 50 : 100 ) }
-						resetAllFilter={ () => ( {
+								: dimRatio !== (url ? 50 : 100);
+						}}
+						label={__('Overlay opacity')}
+						onDeselect={() => updateDimRatio(url ? 50 : 100)}
+						resetAllFilter={() => ({
 							dimRatio: url ? 50 : 100,
-						} ) }
+						})}
 						isShownByDefault
-						panelId={ clientId }
+						panelId={clientId}
 					>
 						<RangeControl
-							label={ __( 'Overlay opacity' ) }
-							value={ dimRatio }
-							onChange={ ( newDimRatio ) =>
-								updateDimRatio( newDimRatio )
+							label={__('Overlay opacity')}
+							value={dimRatio}
+							onChange={(newDimRatio) =>
+								updateDimRatio(newDimRatio)
 							}
-							min={ 0 }
-							max={ 100 }
-							step={ 10 }
+							min={0}
+							max={100}
+							step={10}
 							required
 							__next40pxDefaultSize
 						/>
 					</ToolsPanelItem>
 				</InspectorControls>
-			) }
+			)}
 			<InspectorControls group="dimensions">
 				<ToolsPanelItem
 					className="single-column"
-					hasValue={ () => !! minHeight }
-					label={ __( 'Minimum height' ) }
-					onDeselect={ () =>
-						setAttributes( {
+					hasValue={() => !!minHeight}
+					label={__('Minimum height')}
+					onDeselect={() =>
+						setAttributes({
 							minHeight: undefined,
 							minHeightUnit: undefined,
-						} )
+						})
 					}
-					resetAllFilter={ () => ( {
+					resetAllFilter={() => ({
 						minHeight: undefined,
 						minHeightUnit: undefined,
-					} ) }
+					})}
 					isShownByDefault
-					panelId={ clientId }
+					panelId={clientId}
 				>
 					<CoverHeightInput
 						value={
@@ -412,43 +414,43 @@ export default function CoverInspectorControls( {
 								? ''
 								: minHeight
 						}
-						unit={ minHeightUnit }
-						onChange={ ( newMinHeight ) =>
-							setAttributes( {
+						unit={minHeightUnit}
+						onChange={(newMinHeight) =>
+							setAttributes({
 								minHeight: newMinHeight,
-								style: cleanEmptyObject( {
+								style: cleanEmptyObject({
 									...attributes?.style,
 									dimensions: {
 										...attributes?.style?.dimensions,
 										aspectRatio: undefined, // Reset aspect ratio when minHeight is set.
 									},
-								} ),
-							} )
+								}),
+							})
 						}
-						onUnitChange={ ( nextUnit ) =>
-							setAttributes( {
+						onUnitChange={(nextUnit) =>
+							setAttributes({
 								minHeightUnit: nextUnit,
-							} )
+							})
 						}
 					/>
 				</ToolsPanelItem>
 			</InspectorControls>
 			<InspectorControls group="advanced">
 				<HTMLElementControl
-					tagName={ tagName }
-					onChange={ ( value ) =>
-						setAttributes( { tagName: value } )
+					tagName={tagName}
+					onChange={(value) =>
+						setAttributes({ tagName: value })
 					}
-					clientId={ clientId }
-					options={ [
-						{ label: __( 'Default (<div>)' ), value: 'div' },
+					clientId={clientId}
+					options={[
+						{ label: __('Default (<div>)'), value: 'div' },
 						{ label: '<header>', value: 'header' },
 						{ label: '<main>', value: 'main' },
 						{ label: '<section>', value: 'section' },
 						{ label: '<article>', value: 'article' },
 						{ label: '<aside>', value: 'aside' },
 						{ label: '<footer>', value: 'footer' },
-					] }
+					]}
 				/>
 			</InspectorControls>
 		</>

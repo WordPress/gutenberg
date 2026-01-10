@@ -26,7 +26,7 @@ import {
 	mediaPosition,
 } from './shared';
 
-export default function save( { attributes } ) {
+export default function save({ attributes }) {
 	const {
 		backgroundType,
 		gradient,
@@ -53,10 +53,10 @@ export default function save( { attributes } ) {
 		'background-color',
 		overlayColor
 	);
-	const gradientClass = __experimentalGetGradientClass( gradient );
+	const gradientClass = __experimentalGetGradientClass(gradient);
 	const minHeight =
 		minHeightProp && minHeightUnit
-			? `${ minHeightProp }${ minHeightUnit }`
+			? `${minHeightProp}${minHeightUnit}`
 			: minHeightProp;
 
 	const isImageBackground = IMAGE_BACKGROUND_TYPE === backgroundType;
@@ -64,43 +64,43 @@ export default function save( { attributes } ) {
 	const isEmbedVideoBackground =
 		EMBED_VIDEO_BACKGROUND_TYPE === backgroundType;
 
-	const isImgElement = ! ( hasParallax || isRepeated );
+	const isImgElement = !(hasParallax || isRepeated);
 
 	const style = {
 		minHeight: minHeight || undefined,
 	};
 
 	const bgStyle = {
-		backgroundColor: ! overlayColorClass ? customOverlayColor : undefined,
+		backgroundColor: !overlayColorClass ? customOverlayColor : undefined,
 		background: customGradient ? customGradient : undefined,
 	};
 
 	const objectPosition =
 		// prettier-ignore
 		focalPoint && isImgElement
-			  ? mediaPosition(focalPoint)
-			  : undefined;
+			? mediaPosition(focalPoint)
+			: undefined;
 
-	const backgroundImage = url ? `url(${ url })` : undefined;
+	const backgroundImage = url ? `url(${url})` : undefined;
 
-	const backgroundPosition = mediaPosition( focalPoint );
+	const backgroundPosition = mediaPosition(focalPoint);
 
 	const classes = clsx(
 		{
-			'is-light': ! isDark,
+			'is-light': !isDark,
 			'has-parallax': hasParallax,
 			'is-repeated': isRepeated,
 			'has-custom-content-position':
-				! isContentPositionCenter( contentPosition ),
+				!isContentPositionCenter(contentPosition),
 		},
-		getPositionClassName( contentPosition )
+		getPositionClassName(contentPosition)
 	);
 
 	const imgClasses = clsx(
 		'wp-block-cover__image-background',
-		id ? `wp-image-${ id }` : null,
+		id ? `wp-image-${id}` : null,
 		{
-			[ `size-${ sizeSlug }` ]: sizeSlug,
+			[`size-${sizeSlug}`]: sizeSlug,
 			'has-parallax': hasParallax,
 			'is-repeated': isRepeated,
 		}
@@ -109,55 +109,56 @@ export default function save( { attributes } ) {
 	const gradientValue = gradient || customGradient;
 
 	return (
-		<Tag { ...useBlockProps.save( { className: classes, style } ) }>
-			{ ! useFeaturedImage &&
+		<Tag {...useBlockProps.save({ className: classes, style })}>
+			{!useFeaturedImage &&
 				isImageBackground &&
 				url &&
-				( isImgElement ? (
+				(isImgElement ? (
 					<img
-						className={ imgClasses }
-						alt={ alt }
-						src={ url }
-						style={ { objectPosition } }
+						className={imgClasses}
+						alt={alt}
+						src={url}
+						style={{ objectPosition }}
 						data-object-fit="cover"
-						data-object-position={ objectPosition }
+						data-object-position={objectPosition}
 					/>
 				) : (
 					<div
-						role={ alt ? 'img' : undefined }
-						aria-label={ alt ? alt : undefined }
-						className={ imgClasses }
-						style={ { backgroundPosition, backgroundImage } }
+						role={alt ? 'img' : undefined}
+						aria-label={alt ? alt : undefined}
+						className={imgClasses}
+						style={{ backgroundPosition, backgroundImage }}
 					/>
-				) ) }
-			{ isVideoBackground && url && (
+				))}
+			{isVideoBackground && url && (
 				<video
-					className={ clsx(
+					className={clsx(
 						'wp-block-cover__video-background',
-						'intrinsic-ignore'
-					) }
+						'intrinsic-ignore',
+						{ 'has-parallax': hasParallax }
+					)}
 					autoPlay
 					muted
 					loop
 					playsInline
-					src={ url }
-					poster={ poster }
-					style={ { objectPosition } }
+					src={url}
+					poster={poster}
+					style={{ objectPosition }}
 					data-object-fit="cover"
-					data-object-position={ objectPosition }
+					data-object-position={objectPosition}
 				/>
-			) }
-			{ isEmbedVideoBackground && url && (
+			)}
+			{isEmbedVideoBackground && url && (
 				<figure
-					className={ clsx(
+					className={clsx(
 						'wp-block-cover__video-background',
 						'wp-block-cover__embed-background',
 						'wp-block-embed'
-					) }
+					)}
 				>
-					<div className="wp-block-embed__wrapper">{ url }</div>
+					<div className="wp-block-embed__wrapper">{url}</div>
 				</figure>
-			) }
+			)}
 
 			{ /* The `wp-block-cover__background` needs to be immediately before
 			the `wp-block-cover__inner-container`, so the exclusion CSS selector
@@ -167,10 +168,10 @@ export default function save( { attributes } ) {
 			needs change. */ }
 			<span
 				aria-hidden="true"
-				className={ clsx(
+				className={clsx(
 					'wp-block-cover__background',
 					overlayColorClass,
-					dimRatioToClass( dimRatio ),
+					dimRatioToClass(dimRatio),
 					{
 						'has-background-dim': dimRatio !== undefined,
 						// For backwards compatibility. Former versions of the Cover Block applied
@@ -179,16 +180,16 @@ export default function save( { attributes } ) {
 						'wp-block-cover__gradient-background':
 							url && gradientValue && dimRatio !== 0,
 						'has-background-gradient': gradientValue,
-						[ gradientClass ]: gradientClass,
+						[gradientClass]: gradientClass,
 					}
-				) }
-				style={ bgStyle }
+				)}
+				style={bgStyle}
 			/>
 
 			<div
-				{ ...useInnerBlocksProps.save( {
+				{...useInnerBlocksProps.save({
 					className: 'wp-block-cover__inner-container',
-				} ) }
+				})}
 			/>
 		</Tag>
 	);
