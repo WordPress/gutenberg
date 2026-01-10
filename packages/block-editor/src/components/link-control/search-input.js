@@ -129,8 +129,15 @@ const LinkControlSearchInput = forwardRef(
 				: __( 'Link' );
 
 		return (
-			<div className="block-editor-link-control__search-input-container">
+				<div
+					className="block-editor-link-control__search-input-container"
+					aria-label={ __( 'Search links' ) }
+				>
+				<h2 id="link-dialog-title" className="screen-reader-text">
+					{ __( 'Insert Link' ) }
+				</h2>
 				<URLInput
+					aria-label={ __( 'Link URL' ) }
 					disableSuggestions={ currentLink?.url === value }
 					label={ label }
 					hideLabelFromVision={ hideLabelFromVision }

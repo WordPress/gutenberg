@@ -301,7 +301,9 @@ function UnforwardedModal(
 							'is-scrollable': hasScrollableContent,
 							'has-scrolled-content': hasScrolledContent,
 						} ) }
-						role="document"
+						role="dialog"
+						aria-labelledby="link-dialog-title"
+						aria-modal="true"
 						onScroll={ onContentContainerScroll }
 						ref={ contentRef }
 						aria-label={
