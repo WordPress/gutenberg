@@ -138,23 +138,32 @@ export type NoticeOptions = {
 	__unstableHTML?: boolean;
 };
 
-export type ReducerAction = {
-	context: string;
-} & (
+export type ReducerAction =
 	| {
 			type: 'CREATE_NOTICE';
+			context: string;
 			notice: Notice;
 	  }
 	| {
 			type: 'REMOVE_NOTICE';
+			context: string;
 			id: string;
 	  }
 	| {
 			type: 'REMOVE_NOTICES';
+			context: string;
 			ids: Array< string >;
 	  }
 	| {
 			type: 'REMOVE_ALL_NOTICES';
+			context: string;
 			noticeType: string;
 	  }
-);
+	| {
+			/**
+			 * Represents any action not explicitly handled by this reducer,
+			 * allowing TypeScript's discriminated union narrowing to work correctly.
+			 */
+			type: '@@UNKNOWN_ACTION';
+			context?: string;
+	  };
