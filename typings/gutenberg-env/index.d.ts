@@ -1,18 +1,18 @@
 declare namespace NodeJS {
 	interface ProcessEnv {
-		readonly NODE_ENV?: 'production' | 'development' | 'test';
+		readonly NODE_ENV?: 'production' | 'development' | 'test' | string;
 	}
 	interface Process {
 		env: NodeJS.ProcessEnv;
 	}
 }
 
-declare var process: NodeJS.Process;
+declare const process: NodeJS.Process;
 
 /**
  * Whether the code is running in WordPress with SCRIPT_DEBUG flag.
  */
-declare var SCRIPT_DEBUG: undefined | boolean;
+declare const SCRIPT_DEBUG: boolean | undefined;
 
 /**
  * Whether code is running within the Gutenberg plugin.
@@ -20,6 +20,8 @@ declare var SCRIPT_DEBUG: undefined | boolean;
  * When the codebase is built for the plugin, this variable will be set to `true`.
  * When building for WordPress Core, it will be set to `false` or `undefined`.
  */
-declare var IS_GUTENBERG_PLUGIN: undefined | boolean;
+declare const IS_GUTENBERG_PLUGIN: boolean | undefined;
 
-declare var IS_WORDPRESS_CORE: undefined | boolean;
+declare const IS_WORDPRESS_CORE: boolean | undefined;
+
+export {};
