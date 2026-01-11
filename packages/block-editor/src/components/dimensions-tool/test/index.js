@@ -648,4 +648,58 @@ describe( 'DimensionsTool', () => {
 			] );
 		} );
 	} );
+
+	describe( 'isResizable prop', () => {
+		it( 'shows AspectRatio tool but hides WidthHeight tool when isResizable is false', () => {
+			const initialValue = {};
+			const onChange = jest.fn();
+
+			render(
+				<Example
+					initialValue={ initialValue }
+					onChange={ onChange }
+					isResizable={ false }
+				/>
+			);
+
+			// Aspect Ratio should be visible
+			expect(
+				screen.getByRole( 'combobox', { name: 'Aspect ratio' } )
+			).toBeInTheDocument();
+
+			// Width and Height inputs should NOT be visible
+			expect(
+				screen.queryByRole( 'spinbutton', { name: 'Width' } )
+			).not.toBeInTheDocument();
+			expect(
+				screen.queryByRole( 'spinbutton', { name: 'Height' } )
+			).not.toBeInTheDocument();
+		} );
+
+		it( 'shows WidthHeight tool when isResizable is true (default)', () => {
+			const initialValue = {};
+			const onChange = jest.fn();
+
+			render(
+				<Example
+					initialValue={ initialValue }
+					onChange={ onChange }
+					isResizable
+				/>
+			);
+
+			// Aspect Ratio should be visible
+			expect(
+				screen.getByRole( 'combobox', { name: 'Aspect ratio' } )
+			).toBeInTheDocument();
+
+			// Width and Height inputs SHOULD be visible
+			expect(
+				screen.getByRole( 'spinbutton', { name: 'Width' } )
+			).toBeInTheDocument();
+			expect(
+				screen.getByRole( 'spinbutton', { name: 'Height' } )
+			).toBeInTheDocument();
+		} );
+	} );
 } );

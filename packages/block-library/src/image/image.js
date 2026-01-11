@@ -557,51 +557,51 @@ export default function Image( {
 
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
-	const dimensionsControl =
-		isResizable &&
-		( SIZED_LAYOUTS.includes( parentLayoutType ) ? (
-			<DimensionsTool
-				panelId={ clientId }
-				value={ { aspectRatio } }
-				onChange={ ( { aspectRatio: newAspectRatio } ) => {
-					setAttributes( {
-						aspectRatio: newAspectRatio,
-						scale: 'cover',
-					} );
-				} }
-				defaultAspectRatio="auto"
-				tools={ [ 'aspectRatio' ] }
-			/>
-		) : (
-			<DimensionsTool
-				panelId={ clientId }
-				value={ { width, height, scale, aspectRatio } }
-				onChange={ ( {
-					width: newWidth,
+	const dimensionsControl = SIZED_LAYOUTS.includes( parentLayoutType ) ? (
+		<DimensionsTool
+			panelId={ clientId }
+			value={ { aspectRatio } }
+			onChange={ ( { aspectRatio: newAspectRatio } ) => {
+				setAttributes( {
+					aspectRatio: newAspectRatio,
+					scale: 'cover',
+				} );
+			} }
+			defaultAspectRatio="auto"
+			tools={ [ 'aspectRatio' ] }
+			isResizable={ isResizable }
+		/>
+	) : (
+		<DimensionsTool
+			panelId={ clientId }
+			value={ { width, height, scale, aspectRatio } }
+			onChange={ ( {
+				width: newWidth,
+				height: newHeight,
+				scale: newScale,
+				aspectRatio: newAspectRatio,
+			} ) => {
+				// Rebuilding the object forces setting `undefined`
+				// for values that are removed since setAttributes
+				// doesn't do anything with keys that aren't set.
+				setAttributes( {
+					// CSS includes `height: auto`, but we need
+					// `width: auto` to fix the aspect ratio when
+					// only height is set due to the width and
+					// height attributes set via the server.
+					width: ! newWidth && newHeight ? 'auto' : newWidth,
 					height: newHeight,
 					scale: newScale,
 					aspectRatio: newAspectRatio,
-				} ) => {
-					// Rebuilding the object forces setting `undefined`
-					// for values that are removed since setAttributes
-					// doesn't do anything with keys that aren't set.
-					setAttributes( {
-						// CSS includes `height: auto`, but we need
-						// `width: auto` to fix the aspect ratio when
-						// only height is set due to the width and
-						// height attributes set via the server.
-						width: ! newWidth && newHeight ? 'auto' : newWidth,
-						height: newHeight,
-						scale: newScale,
-						aspectRatio: newAspectRatio,
-					} );
-				} }
-				defaultScale="cover"
-				defaultAspectRatio="auto"
-				scaleOptions={ scaleOptions }
-				unitsOptions={ dimensionsUnitsOptions }
-			/>
-		) );
+				} );
+			} }
+			defaultScale="cover"
+			defaultAspectRatio="auto"
+			scaleOptions={ scaleOptions }
+			unitsOptions={ dimensionsUnitsOptions }
+			isResizable={ isResizable }
+		/>
+	);
 
 	const resetSettings = () => {
 		setAttributes( {
