@@ -446,7 +446,7 @@ Helper function to retrieve the corresponding icon by area name or icon name.
 
 _Parameters_
 
--   _areaOrIconName_ `string`: The area name (e.g., 'header', 'overlay') or icon name (e.g., 'menu').
+-   _areaOrIconName_ `string`: The area name (e.g., 'header', 'navigation-overlay') or icon name (e.g., 'menu').
 
 _Returns_
 

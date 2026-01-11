@@ -22,7 +22,7 @@ function render_block_core_template_part( $attributes ) {
 	$template_part_id = null;
 	$content          = null;
 	$area             = WP_TEMPLATE_PART_AREA_UNCATEGORIZED;
-	$theme            = isset( $attributes['theme'] ) ? $attributes['theme'] : get_stylesheet();
+	$theme            = $attributes['theme'] ?? get_stylesheet();
 
 	if ( isset( $attributes['slug'] ) && get_stylesheet() === $theme ) {
 		$template_part_id    = $theme . '//' . $attributes['slug'];
@@ -260,7 +260,7 @@ function build_template_part_block_instance_variations() {
 				'area'  => $template_part->area,
 			),
 			'scope'       => array( 'inserter' ),
-			'icon'        => isset( $icon_by_area[ $template_part->area ] ) ? $icon_by_area[ $template_part->area ] : null,
+			'icon'        => $icon_by_area[ $template_part->area ] ?? null,
 			'example'     => array(
 				'attributes' => array(
 					'slug'  => $template_part->slug,

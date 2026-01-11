@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/boot",
-	"version": "0.3.0",
+	"version": "0.4.0",
 	"description": "Minimal boot package for WordPress admin pages.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -29,21 +29,21 @@
 		"build-types",
 		"*.md"
 	],
-	"type": "module",
-	"module": "build-module/index.js",
+	"module": "build-module/index.mjs",
 	"exports": {
 		".": {
 			"types": "./build-types/index.d.ts",
-			"import": "./build-module/index.js"
+			"import": "./build-module/index.mjs"
 		},
 		"./package.json": "./package.json"
 	},
 	"react-native": "src/index",
-	"wpScriptModuleExports": "./build-module/index.js",
+	"wpScriptModuleExports": "./build-module/index.mjs",
 	"types": "build-types",
 	"dependencies": {
 		"@wordpress/a11y": "file:../a11y",
 		"@wordpress/admin-ui": "file:../admin-ui",
+		"@wordpress/base-styles": "file:../base-styles",
 		"@wordpress/commands": "file:../commands",
 		"@wordpress/components": "file:../components",
 		"@wordpress/compose": "file:../compose",

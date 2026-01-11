@@ -44,12 +44,12 @@ function gutenberg_render_block_visibility_support( $block_content, $block ) {
 			array(
 				'name' => 'Mobile',
 				'slug' => 'mobile',
-				'size' => '599px',
+				'size' => '480px',
 			),
 			array(
 				'name' => 'Tablet',
 				'slug' => 'tablet',
-				'size' => '959px',
+				'size' => '782px',
 			),
 			array(
 				'name' => 'Desktop',

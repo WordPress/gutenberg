@@ -100,7 +100,7 @@ export const Validation = {
 		layout: {
 			control: { type: 'select' },
 			description: 'Choose the form layout type.',
-			options: [ 'regular', 'panel', 'card' ],
+			options: [ 'regular', 'panel', 'card', 'details' ],
 		},
 		required: {
 			control: { type: 'boolean' },

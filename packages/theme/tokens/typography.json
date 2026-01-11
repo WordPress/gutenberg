@@ -60,6 +60,9 @@
 			"2xl": {
 				"$value": { "value": 32, "unit": "px" },
 				"$description": "2X large font size"
+			},
+			"$extensions": {
+				"com.figma.scopes": [ "FONT_SIZE" ]
 			}
 		},
 		"line-height": {
@@ -87,6 +90,9 @@
 			"2xl": {
 				"$value": { "value": 40, "unit": "px" },
 				"$description": "2X large line height"
+			},
+			"$extensions": {
+				"com.figma.scopes": [ "LINE_HEIGHT" ]
 			}
 		},
 		"weight": {
@@ -96,8 +102,11 @@
 				"$description": "Regular font weight for body text"
 			},
 			"medium": {
-				"$value": 499,
+				"$value": 500,
 				"$description": "Medium font weight for emphasis and headings"
+			},
+			"$extensions": {
+				"com.figma.scopes": [ "FONT_WEIGHT" ]
 			}
 		}
 	}

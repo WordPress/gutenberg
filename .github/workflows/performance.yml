@@ -76,14 +76,14 @@ jobs:
             - name: Compare performance with base branch
               if: github.event_name == 'push'
               # The base hash used here need to be a commit that is compatible with the current WP version
-              # The current one is 1b8efa77d39f68fb3d963ea02ce6ea6a8201d521 and it needs to be updated every WP major release.
+              # The current one is dae102af1458310b05de3c1281b1654951a729ab and it needs to be updated every WP major release.
               # It is used as a base comparison point to avoid fluctuation in the performance metrics.
               # See: https://developer.wordpress.org/block-editor/explanations/architecture/performance/#update-the-reference-commit.
               run: |
                   WP_VERSION="$(awk -F ': ' '/^Tested up to/{print $2}' readme.txt)"
                   IFS=. read -ra WP_VERSION_ARRAY <<< "$WP_VERSION"
                   WP_MAJOR="${WP_VERSION_ARRAY[0]}.${WP_VERSION_ARRAY[1]}"
-                  ./bin/plugin/cli.js perf "$GITHUB_SHA" 1b8efa77d39f68fb3d963ea02ce6ea6a8201d521 --tests-branch "$GITHUB_SHA" --wp-version "$WP_MAJOR"
+                  ./bin/plugin/cli.js perf "$GITHUB_SHA" dae102af1458310b05de3c1281b1654951a729ab --tests-branch "$GITHUB_SHA" --wp-version "$WP_MAJOR"
 
             - name: Compare performance with custom branches
               if: github.event_name == 'workflow_dispatch'
@@ -109,7 +109,7 @@ jobs:
                   CODEHEALTH_PROJECT_TOKEN: ${{ secrets.CODEHEALTH_PROJECT_TOKEN }}
               run: |
                   COMMITTED_AT="$(git show -s "$GITHUB_SHA" --format="%cI")"
-                  ./bin/log-performance-results.js "$CODEHEALTH_PROJECT_TOKEN" trunk "$GITHUB_SHA" 1b8efa77d39f68fb3d963ea02ce6ea6a8201d521 "$COMMITTED_AT"
+                  ./bin/log-performance-results.js "$CODEHEALTH_PROJECT_TOKEN" trunk "$GITHUB_SHA" dae102af1458310b05de3c1281b1654951a729ab "$COMMITTED_AT"
 
             - name: Archive debug artifacts (screenshots, HTML snapshots)
               uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
