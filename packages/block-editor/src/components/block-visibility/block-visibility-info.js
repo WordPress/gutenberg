@@ -25,9 +25,8 @@ export default function BlockVisibilityInfo( { clientId } ) {
 			if ( ! clientId ) {
 				return { isBlockHidden: false, hasHiddenParent: false };
 			}
-			const { isBlockHidden: _isBlockHidden, getBlockParents } = unlock(
-				select( blockEditorStore )
-			);
+			const { isBlockHiddenEverywhere: _isBlockHidden, getBlockParents } =
+				unlock( select( blockEditorStore ) );
 
 			const blockHidden = _isBlockHidden( clientId );
 			const parents = getBlockParents( clientId );

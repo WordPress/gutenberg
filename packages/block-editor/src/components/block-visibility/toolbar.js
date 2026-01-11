@@ -13,15 +13,19 @@ import { hasBlockSupport } from '@wordpress/blocks';
  */
 import { store as blockEditorStore } from '../../store';
 import { cleanEmptyObject } from '../../hooks/utils';
+import { unlock } from '../../lock-unlock';
 
 export default function BlockVisibilityToolbar( { clientIds } ) {
-	const { blocks, canToggleBlockVisibility } = useSelect(
+	const { blocks, canToggleBlockVisibility, hasHiddenBlock } = useSelect(
 		( select ) => {
-			const { getBlockName, getBlocksByClientId } =
-				select( blockEditorStore );
+			const { getBlockName, getBlocksByClientId, isBlockHiddenAnywhere } =
+				unlock( select( blockEditorStore ) );
 			const _blocks = getBlocksByClientId( clientIds );
 			return {
 				blocks: _blocks,
+				hasHiddenBlock: _blocks.some( ( { clientId } ) =>
+					isBlockHiddenAnywhere( clientId )
+				),
 				canToggleBlockVisibility: _blocks.every( ( { clientId } ) =>
 					hasBlockSupport(
 						getBlockName( clientId ),
@@ -32,10 +36,6 @@ export default function BlockVisibilityToolbar( { clientIds } ) {
 			};
 		},
 		[ clientIds ]
-	);
-
-	const hasHiddenBlock = blocks.some(
-		( block ) => block.attributes.metadata?.blockVisibility === false
 	);
 
 	const hasBlockVisibilityButtonShownRef = useRef( false );

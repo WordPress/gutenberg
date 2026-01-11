@@ -7,6 +7,9 @@ import BlockVisibilityViewportToolbar from './viewport-toolbar';
 import BlockVisibilityMenuItemDefault from './menu-item';
 import BlockVisibilityViewportMenuItem from './viewport-menu-item';
 
+import BlockVisibilityInfoDefault from './block-visibility-info';
+import ViewportVisibilityInfo from './viewport-visibility-info';
+
 const hasViewportVisibilityExperiment =
 	typeof window !== 'undefined' &&
 	window.__experimentalHideBlocksBasedOnScreenSize;
@@ -19,3 +22,7 @@ export const BlockVisibilityMenuItem = hasViewportVisibilityExperiment
 export const BlockVisibilityToolbar = hasViewportVisibilityExperiment
 	? BlockVisibilityViewportToolbar
 	: BlockVisibilityToolbarDefault;
+
+export const BlockVisibilityInfo = hasViewportVisibilityExperiment
+	? ViewportVisibilityInfo
+	: BlockVisibilityInfoDefault;
