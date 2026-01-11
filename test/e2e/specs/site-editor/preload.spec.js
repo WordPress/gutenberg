@@ -31,7 +31,9 @@ test.describe( 'Preload', () => {
 				const urlObject = new URL( url );
 				const restRoute = urlObject.searchParams.get( 'rest_route' );
 				if ( restRoute ) {
-					requests.push( restRoute );
+					urlObject.searchParams.delete( 'rest_route' );
+					urlObject.searchParams.delete( '_locale' );
+					requests.push( restRoute + urlObject.search );
 				} else {
 					requests.push( url );
 				}
@@ -44,11 +46,11 @@ test.describe( 'Preload', () => {
 
 		// To do: these should all be removed or preloaded.
 		expect( requests ).toEqual( [
+			// Abilities system initialization.
+			'/wp-abilities/v1/categories?per_page=100&context=edit',
+			'/wp-abilities/v1/abilities?per_page=100&context=edit',
 			// Seems to be coming from `enableComplementaryArea`.
 			'/wp/v2/users/me',
-			// There are two separate settings OPTIONS requests. We should fix
-			// so the one for canUser and getEntityRecord are reused.
-			'/wp/v2/settings',
 		] );
 	} );
 } );

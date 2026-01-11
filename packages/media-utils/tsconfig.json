@@ -8,8 +8,14 @@
 	"references": [
 		{ "path": "../api-fetch" },
 		{ "path": "../blob" },
+		{ "path": "../components" },
+		{ "path": "../core-data" },
+		{ "path": "../data" },
+		{ "path": "../dataviews" },
 		{ "path": "../element" },
 		{ "path": "../i18n" },
+		{ "path": "../icons" },
+		{ "path": "../media-fields" },
 		{ "path": "../private-apis" }
 	]
 }

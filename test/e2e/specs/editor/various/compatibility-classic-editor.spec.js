@@ -17,10 +17,17 @@ test.describe( 'Compatibility with classic editor', () => {
 		editor,
 	} ) => {
 		await editor.insertBlock( { name: 'core/html' } );
-		await editor.canvas.locator( 'role=textbox[name="HTML"i]' ).focus();
+		await editor.canvas
+			.getByRole( 'button', { name: 'Edit HTML' } )
+			.click();
+		await page.getByRole( 'dialog' ).getByRole( 'textbox' ).click();
 		await page.keyboard.type( '<a>' );
 		await page.keyboard.type( 'Random Link' );
 		await page.keyboard.type( '</a> ' );
+		await page
+			.getByRole( 'dialog' )
+			.getByRole( 'button', { name: 'Update' } )
+			.click();
 		// Publish Post
 		const postId = await editor.publishPost();
 		// View Post

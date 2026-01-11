@@ -21,7 +21,7 @@
 			"type": "object",
 			"properties": {
 				"appearanceTools": {
-					"description": "Setting that enables the following UI tools:\n\n- background: backgroundImage, backgroundSize\n- border: color, radius, style, width\n- color: link, heading, button, caption\n- dimensions: aspectRatio, minHeight\n- position: sticky\n- spacing: blockGap, margin, padding\n- typography: lineHeight",
+					"description": "Setting that enables the following UI tools:\n\n- background: backgroundImage, backgroundSize\n- border: color, radius, style, width\n- color: link, heading, button, caption\n- dimensions: aspectRatio, height, minHeight, width\n- position: sticky\n- spacing: blockGap, margin, padding\n- typography: lineHeight",
 					"type": "boolean",
 					"default": false
 				}
@@ -75,6 +75,28 @@
 							"description": "Allow users to set custom border widths.",
 							"type": "boolean",
 							"default": false
+						},
+						"radiusSizes": {
+							"description": "Border radius size presets for the border radius selector.\nGenerates a custom property (`--wp--preset--border-radius--{slug}`) per preset value.",
+							"type": "array",
+							"items": {
+								"type": "object",
+								"properties": {
+									"name": {
+										"description": "Name of the border radius size preset, translatable.",
+										"type": "string"
+									},
+									"slug": {
+										"description": "Unique identifier for the border raidus size preset.",
+										"type": "string"
+									},
+									"size": {
+										"description": "CSS border-radius value, including units.",
+										"type": "string"
+									}
+								},
+								"additionalProperties": false
+							}
 						}
 					},
 					"additionalProperties": false
@@ -264,10 +286,42 @@
 								}
 							}
 						},
+						"height": {
+							"description": "Allow users to set custom height.",
+							"type": "boolean",
+							"default": false
+						},
 						"minHeight": {
 							"description": "Allow users to set custom minimum height.",
 							"type": "boolean",
 							"default": false
+						},
+						"width": {
+							"description": "Allow users to set custom width.",
+							"type": "boolean",
+							"default": false
+						},
+						"dimensionSizes": {
+							"description": "Dimension size presets for dimension block supports.\nGenerates a custom property (`--wp--preset--dimension--{slug}`) per preset value.",
+							"type": "array",
+							"items": {
+								"type": "object",
+								"properties": {
+									"name": {
+										"description": "Name of the dimension size preset, translatable.",
+										"type": "string"
+									},
+									"slug": {
+										"description": "Unique identifier for the dimension size preset.",
+										"type": "string"
+									},
+									"size": {
+										"description": "CSS dimension value, including units.",
+										"type": "string"
+									}
+								},
+								"additionalProperties": false
+							}
 						}
 					},
 					"additionalProperties": false
@@ -838,6 +892,18 @@
 			"description": "Settings defined on a per-block basis.",
 			"type": "object",
 			"properties": {
+				"core/accordion": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/accordion-heading": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/accordion-item": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/accordion-panel": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
 				"core/archives": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
@@ -848,6 +914,9 @@
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
 				"core/block": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/breadcrumbs": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
 				"core/button": {
@@ -961,6 +1030,9 @@
 				"core/loginout": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
+				"core/math": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
 				"core/media-text": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
@@ -1031,6 +1103,9 @@
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
 				"core/post-terms": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/post-time-to-read": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
 				"core/post-title": {
@@ -1111,7 +1186,19 @@
 				"core/template-part": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
+				"core/term-count": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
 				"core/term-description": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/term-name": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/term-template": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/terms-query": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
 				"core/text-columns": {
@@ -1439,8 +1526,22 @@
 								{ "$ref": "#/definitions/refComplete" }
 							]
 						},
+						"height": {
+							"description": "Sets the `height` CSS property.",
+							"oneOf": [
+								{ "type": "string" },
+								{ "$ref": "#/definitions/refComplete" }
+							]
+						},
 						"minHeight": {
 							"description": "Sets the `min-height` CSS property.",
+							"oneOf": [
+								{ "type": "string" },
+								{ "$ref": "#/definitions/refComplete" }
+							]
+						},
+						"width": {
+							"description": "Sets the `width` CSS property.",
 							"oneOf": [
 								{ "type": "string" },
 								{ "$ref": "#/definitions/refComplete" }
@@ -1727,6 +1828,23 @@
 				}
 			}
 		},
+		"stylesBlocksPseudoSelectorsProperties": {
+			"type": "object",
+			"properties": {
+				":hover": {
+					"$ref": "#/definitions/stylesPropertiesComplete"
+				},
+				":focus": {
+					"$ref": "#/definitions/stylesPropertiesComplete"
+				},
+				":focus-visible": {
+					"$ref": "#/definitions/stylesPropertiesComplete"
+				},
+				":active": {
+					"$ref": "#/definitions/stylesPropertiesComplete"
+				}
+			}
+		},
 		"stylesElementsPseudoSelectorsPropertyNames": {
 			"enum": [
 				":active",
@@ -1814,6 +1932,12 @@
 				},
 				"cite": {
 					"$ref": "#/definitions/stylesPropertiesComplete"
+				},
+				"select": {
+					"$ref": "#/definitions/stylesPropertiesComplete"
+				},
+				"textInput": {
+					"$ref": "#/definitions/stylesPropertiesComplete"
 				}
 			},
 			"additionalProperties": false
@@ -1822,6 +1946,18 @@
 			"description": "Styles defined on a per-block basis using the block's selector.",
 			"type": "object",
 			"properties": {
+				"core/accordion": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/accordion-heading": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/accordion-item": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/accordion-panel": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
 				"core/archives": {
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
@@ -1834,8 +1970,18 @@
 				"core/block": {
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
-				"core/button": {
+				"core/breadcrumbs": {
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/button": {
+					"allOf": [
+						{
+							"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+						},
+						{
+							"$ref": "#/definitions/stylesBlocksPseudoSelectorsProperties"
+						}
+					]
 				},
 				"core/buttons": {
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
@@ -1945,6 +2091,9 @@
 				"core/loginout": {
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
+				"core/math": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
 				"core/media-text": {
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
@@ -2015,6 +2164,9 @@
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
 				"core/post-terms": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/post-time-to-read": {
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
 				"core/post-title": {
@@ -2095,7 +2247,19 @@
 				"core/template-part": {
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
+				"core/term-count": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
 				"core/term-description": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/term-name": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/term-template": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/terms-query": {
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
 				"core/text-columns": {
@@ -2236,6 +2400,18 @@
 		"stylesVariationBlocksPropertiesComplete": {
 			"type": "object",
 			"properties": {
+				"core/accordion": {
+					"$ref": "#/definitions/stylesVariationBlockPropertiesComplete"
+				},
+				"core/accordion-heading": {
+					"$ref": "#/definitions/stylesVariationBlockPropertiesComplete"
+				},
+				"core/accordion-item": {
+					"$ref": "#/definitions/stylesVariationBlockPropertiesComplete"
+				},
+				"core/accordion-panel": {
+					"$ref": "#/definitions/stylesVariationBlockPropertiesComplete"
+				},
 				"core/archives": {
 					"$ref": "#/definitions/stylesVariationBlockPropertiesComplete"
 				},
@@ -2246,6 +2422,9 @@
 					"$ref": "#/definitions/stylesVariationBlockPropertiesComplete"
 				},
 				"core/block": {
+					"$ref": "#/definitions/stylesVariationBlockPropertiesComplete"
+				},
+				"core/breadcrumbs": {
 					"$ref": "#/definitions/stylesVariationBlockPropertiesComplete"
 				},
 				"core/button": {
@@ -2359,6 +2538,9 @@
 				"core/loginout": {
 					"$ref": "#/definitions/stylesVariationBlockPropertiesComplete"
 				},
+				"core/math": {
+					"$ref": "#/definitions/stylesVariationBlockPropertiesComplete"
+				},
 				"core/media-text": {
 					"$ref": "#/definitions/stylesVariationBlockPropertiesComplete"
 				},
@@ -2429,6 +2611,9 @@
 					"$ref": "#/definitions/stylesVariationBlockPropertiesComplete"
 				},
 				"core/post-terms": {
+					"$ref": "#/definitions/stylesVariationBlockPropertiesComplete"
+				},
+				"core/post-time-to-read": {
 					"$ref": "#/definitions/stylesVariationBlockPropertiesComplete"
 				},
 				"core/post-title": {
@@ -2509,7 +2694,19 @@
 				"core/template-part": {
 					"$ref": "#/definitions/stylesVariationBlockPropertiesComplete"
 				},
+				"core/term-count": {
+					"$ref": "#/definitions/stylesVariationBlockPropertiesComplete"
+				},
 				"core/term-description": {
+					"$ref": "#/definitions/stylesVariationBlockPropertiesComplete"
+				},
+				"core/term-name": {
+					"$ref": "#/definitions/stylesVariationBlockPropertiesComplete"
+				},
+				"core/term-template": {
+					"$ref": "#/definitions/stylesVariationBlockPropertiesComplete"
+				},
+				"core/terms-query": {
 					"$ref": "#/definitions/stylesVariationBlockPropertiesComplete"
 				},
 				"core/text-columns": {

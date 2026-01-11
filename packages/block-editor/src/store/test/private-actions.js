@@ -7,7 +7,6 @@ import {
 	expandBlock,
 	__experimentalUpdateSettings,
 	setInsertionPoint,
-	setOpenedBlockSettingsMenu,
 	startDragging,
 	stopDragging,
 } from '../private-actions';
@@ -80,22 +79,6 @@ describe( 'private actions', () => {
 					baz: 'baz',
 				},
 				reset: false,
-			} );
-		} );
-	} );
-
-	describe( 'setOpenedBlockSettingsMenu', () => {
-		it( 'should return the SET_OPENED_BLOCK_SETTINGS_MENU action', () => {
-			expect( setOpenedBlockSettingsMenu() ).toEqual( {
-				clientId: undefined,
-				type: 'SET_OPENED_BLOCK_SETTINGS_MENU',
-			} );
-		} );
-
-		it( 'should return the SET_OPENED_BLOCK_SETTINGS_MENU action with client id if provided', () => {
-			expect( setOpenedBlockSettingsMenu( 'abcd' ) ).toEqual( {
-				clientId: 'abcd',
-				type: 'SET_OPENED_BLOCK_SETTINGS_MENU',
 			} );
 		} );
 	} );

@@ -19,7 +19,7 @@ const noop = () => {};
 
 /**
  * Upload a media file when the file upload button is activated.
- * Wrapper around mediaUpload() that injects the current post ID.
+ * Wrapper around uploadMedia() that injects the current post ID.
  *
  * @param {Object}   $0                   Parameters object passed to the function.
  * @param {?Object}  $0.additionalData    Additional data to include in the request.
@@ -92,8 +92,8 @@ export default function mediaUpload( {
 			if ( entityFiles?.length ) {
 				const invalidateCache = true;
 				receiveEntityRecords(
-					'root',
-					'media',
+					'postType',
+					'attachment',
 					entityFiles,
 					undefined,
 					invalidateCache

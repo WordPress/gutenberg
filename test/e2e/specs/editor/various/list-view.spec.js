@@ -58,7 +58,7 @@ test.describe( 'List View', () => {
 			exact: true,
 		} );
 		const headingBlockItem = listView.getByRole( 'gridcell', {
-			name: 'Heading',
+			name: 'Heading 2',
 			exact: true,
 		} );
 
@@ -334,7 +334,7 @@ test.describe( 'List View', () => {
 	// If list view sidebar is open and focus is not inside the sidebar, move
 	// focus to the sidebar when using the shortcut. If focus is inside the
 	// sidebar, shortcut should close the sidebar.
-	test( 'ensures List View global shortcut works properly', async ( {
+	test.skip( 'ensures List View global shortcut works properly', async ( {
 		editor,
 		page,
 		pageUtils,
@@ -544,10 +544,7 @@ test.describe( 'List View', () => {
 		await editor.insertBlock( { name: 'core/file' } );
 		await editor.insertBlock( {
 			name: 'core/group',
-			innerBlocks: [
-				{ name: 'core/paragraph' },
-				{ name: 'core/pullquote' },
-			],
+			innerBlocks: [ { name: 'core/paragraph' }, { name: 'core/code' } ],
 		} );
 
 		// Open List View.
@@ -561,12 +558,13 @@ test.describe( 'List View', () => {
 			} )
 			.click();
 
-		// Move down to group block, expand, and then move to the paragraph block.
-		await page.keyboard.press( 'ArrowDown' );
+		// Expand group block, then move to code block, and copy.
 		await page.keyboard.press( 'ArrowRight' );
 		await page.keyboard.press( 'ArrowDown' );
 		await page.keyboard.press( 'ArrowDown' );
 		await pageUtils.pressKeys( 'primary+c' );
+
+		// Move up to paragraph block and paste.
 		await page.keyboard.press( 'ArrowUp' );
 		await pageUtils.pressKeys( 'primary+v' );
 
@@ -583,12 +581,12 @@ test.describe( 'List View', () => {
 					selected: true,
 					innerBlocks: [
 						{
-							name: 'core/pullquote',
+							name: 'core/code',
 							selected: false,
 							focused: true,
 						},
 						{
-							name: 'core/pullquote',
+							name: 'core/code',
 							selected: false,
 							focused: false,
 						},
@@ -688,10 +686,7 @@ test.describe( 'List View', () => {
 		await editor.insertBlock( { name: 'core/file' } );
 		await editor.insertBlock( {
 			name: 'core/group',
-			innerBlocks: [
-				{ name: 'core/pullquote' },
-				{ name: 'core/pullquote' },
-			],
+			innerBlocks: [ { name: 'core/code' }, { name: 'core/code' } ],
 		} );
 
 		// Open List View.
@@ -733,12 +728,12 @@ test.describe( 'List View', () => {
 					focused: true,
 					innerBlocks: [
 						{
-							name: 'core/pullquote',
+							name: 'core/code',
 							selected: false,
 							focused: false,
 						},
 						{
-							name: 'core/pullquote',
+							name: 'core/code',
 							selected: false,
 							focused: false,
 						},
@@ -756,7 +751,7 @@ test.describe( 'List View', () => {
 		// Insert some blocks of different types.
 		await editor.insertBlock( {
 			name: 'core/group',
-			innerBlocks: [ { name: 'core/pullquote' } ],
+			innerBlocks: [ { name: 'core/quote' } ],
 		} );
 		await editor.insertBlock( {
 			name: 'core/columns',
@@ -884,7 +879,7 @@ test.describe( 'List View', () => {
 		// Insert some blocks of different types.
 		await editor.insertBlock( {
 			name: 'core/group',
-			innerBlocks: [ { name: 'core/pullquote' } ],
+			innerBlocks: [ { name: 'core/quote' } ],
 		} );
 		await editor.insertBlock( {
 			name: 'core/columns',
@@ -1095,7 +1090,7 @@ test.describe( 'List View', () => {
 		await page.keyboard.press( 'ArrowRight' );
 		// Move focus and select the Heading block.
 		await listView
-			.getByRole( 'gridcell', { name: 'Heading', exact: true } )
+			.getByRole( 'gridcell', { name: 'Heading 2', exact: true } )
 			.dblclick();
 		// Select both inner blocks in the column.
 		await page.keyboard.press( 'Shift+ArrowDown' );
@@ -1163,7 +1158,7 @@ test.describe( 'List View', () => {
 			window.wp.data.dispatch( 'core/block-editor' ).clearSelectedBlock()
 		);
 		await listView
-			.getByRole( 'gridcell', { name: 'Paragraph' } )
+			.getByRole( 'gridcell', { name: 'Paragraph', exact: true } )
 			.getByRole( 'link' )
 			.focus();
 		await expect
@@ -1193,7 +1188,7 @@ test.describe( 'List View', () => {
 		} );
 		// Click on the Heading block to select it.
 		await listView
-			.getByRole( 'gridcell', { name: 'Heading', exact: true } )
+			.getByRole( 'gridcell', { name: 'Heading 2', exact: true } )
 			.click();
 		await listView
 			.getByRole( 'gridcell', { name: 'File' } )

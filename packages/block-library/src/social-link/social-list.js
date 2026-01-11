@@ -6,29 +6,24 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import variations from './variations';
 import { ChainIcon } from './icons';
 
 /**
- * Retrieves the social service's icon component.
+ * Retrieves the social service's icon component and label.
  *
- * @param {string} name key for a social service (lowercase slug)
- *
- * @return {Component} Icon component for social service.
+ * @param {Object} variation The object of the social service variation.
+ * @return {Object} An object containing the Icon component for social service and label.
  */
-export const getIconBySite = ( name ) => {
-	const variation = variations.find( ( v ) => v.name === name );
-	return variation ? variation.icon : ChainIcon;
-};
+export function getSocialService( variation ) {
+	if ( ! variation?.name ) {
+		return {
+			icon: ChainIcon,
+			label: __( 'Social Icon' ),
+		};
+	}
 
-/**
- * Retrieves the display name for the social service.
- *
- * @param {string} name key for a social service (lowercase slug)
- *
- * @return {string} Display name for social service
- */
-export const getNameBySite = ( name ) => {
-	const variation = variations.find( ( v ) => v.name === name );
-	return variation ? variation.title : __( 'Social Icon' );
-};
+	return {
+		icon: variation?.icon ?? ChainIcon,
+		label: variation?.title ?? __( 'Social Icon' ),
+	};
+}

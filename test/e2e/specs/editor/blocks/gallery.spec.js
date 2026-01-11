@@ -219,6 +219,67 @@ test.describe( 'Gallery', () => {
 			mediaLibrary.locator( 'role=button[name="Create a new gallery"i]' )
 		).toBeVisible();
 	} );
+
+	test( 'can randomize the image on the front end', async ( {
+		admin,
+		editor,
+		page,
+	} ) => {
+		const numbers = Array.from( { length: 10 }, ( _, i ) => i + 1 );
+		await admin.createNewPost();
+		await editor.insertBlock( {
+			name: 'core/gallery',
+			attributes: {
+				randomOrder: true,
+			},
+			innerBlocks: numbers.map( ( i ) => ( {
+				name: 'core/image',
+				attributes: {
+					id: uploadedMedia.id,
+					alt: i.toString(),
+					url: uploadedMedia.source_url,
+				},
+			} ) ),
+		} );
+		const postId = await editor.publishPost();
+		await page.goto( `/?p=${ postId }` );
+		const imageElements = page.locator( '.wp-block-gallery img' );
+		const imageAltTexts = await imageElements.evaluateAll( ( imgs ) =>
+			imgs.map( ( img ) => parseInt( img.alt, 10 ) )
+		);
+		expect( numbers ).not.toEqual( imageAltTexts );
+	} );
+
+	test( 'can randomize the image with a lightbox effect on the front end', async ( {
+		admin,
+		editor,
+		page,
+	} ) => {
+		const numbers = Array.from( { length: 10 }, ( _, i ) => i + 1 );
+		await admin.createNewPost();
+		await editor.insertBlock( {
+			name: 'core/gallery',
+			attributes: {
+				randomOrder: true,
+			},
+			innerBlocks: numbers.map( ( i ) => ( {
+				name: 'core/image',
+				attributes: {
+					id: uploadedMedia.id,
+					alt: i.toString(),
+					url: uploadedMedia.source_url,
+					lightbox: { enabled: true },
+				},
+			} ) ),
+		} );
+		const postId = await editor.publishPost();
+		await page.goto( `/?p=${ postId }` );
+		const imageElements = page.locator( '.wp-block-gallery img' );
+		const imageAltTexts = await imageElements.evaluateAll( ( imgs ) =>
+			imgs.map( ( img ) => parseInt( img.alt, 10 ) )
+		);
+		expect( numbers ).not.toEqual( imageAltTexts );
+	} );
 } );
 
 class GalleryBlockUtils {

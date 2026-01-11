@@ -48,7 +48,9 @@ function UnforwardedToggleGroupControlAsButtonGroup(
 	const { value, defaultValue } =
 		useComputeControlledOrUncontrolledValue( valueProp );
 
-	const [ selectedValue, setSelectedValue ] = useControlledValue( {
+	const [ selectedValue, setSelectedValue ] = useControlledValue<
+		typeof value
+	>( {
 		defaultValue,
 		value,
 		onChange,

@@ -9,6 +9,8 @@ import { createSelector, createRegistrySelector } from '@wordpress/data';
 import { getDefaultTemplateId, getEntityRecord, type State } from './selectors';
 import { STORE_NAME } from './name';
 import { unlock } from './lock-unlock';
+import { getSyncManager } from './sync';
+import logEntityDeprecation from './utils/log-entity-deprecation';
 
 type EntityRecordKey = string | number;
 
@@ -16,11 +18,29 @@ type EntityRecordKey = string | number;
  * Returns the previous edit from the current undo offset
  * for the entity records edits history, if any.
  *
+ * Known Issue: Every-time state.undoManager changes, the getUndoManager
+ * private selector is called (if used within useSelect and things like that)
+ * which ensures the UI is always properly reactive. But, it's not the case with
+ * the custom "sync" undo manager.
+ *
+ * Assumption: When an undo/redo is created, other parts of the core-data state
+ * are likely changing simultaneously, which will trigger the selectors again.
+ *
+ * This issue is acceptable based on the assumption above.
+ *
+ * @see https://github.com/WordPress/gutenberg/pull/72407/files#r2580214235 for more details.
+ *
  * @param state State tree.
  *
  * @return The undo manager.
  */
 export function getUndoManager( state: State ) {
+	if ( window.__experimentalEnableSync ) {
+		if ( globalThis.IS_GUTENBERG_PLUGIN ) {
+			return getSyncManager()?.undoManager ?? state.undoManager;
+		}
+	}
+
 	return state.undoManager;
 }
 
@@ -97,6 +117,7 @@ export function getEntityRecordPermissions(
 	name: string,
 	id: string
 ) {
+	logEntityDeprecation( kind, name, 'getEntityRecordPermissions' );
 	return getEntityRecordsPermissions( state, kind, name, id )[ 0 ];
 }
 
@@ -161,6 +182,9 @@ export const getHomePage = createRegistrySelector( ( select ) =>
 			return { postType: 'wp_template', postId: frontPageTemplateId };
 		},
 		( state ) => [
+			// Even though getDefaultTemplateId.shouldInvalidate returns true when root/site changes,
+			// it doesn't seem to invalidate this cache, I'm not sure why.
+			getEntityRecord( state, 'root', 'site' ),
 			getEntityRecord( state, 'root', '__unstableBase' ),
 			getDefaultTemplateId( state, {
 				slug: 'front-page',
@@ -263,3 +287,25 @@ export const getTemplateId = createRegistrySelector(
 		} );
 	}
 );
+
+/**
+ * Returns the editor settings.
+ *
+ * @param state Data state.
+ * @return Editor settings object or null if not loaded.
+ */
+export function getEditorSettings(
+	state: State
+): Record< string, any > | null {
+	return state.editorSettings;
+}
+
+/**
+ * Returns the editor assets.
+ *
+ * @param state Data state.
+ * @return Editor assets object or null if not loaded.
+ */
+export function getEditorAssets( state: State ): Record< string, any > | null {
+	return state.editorAssets;
+}

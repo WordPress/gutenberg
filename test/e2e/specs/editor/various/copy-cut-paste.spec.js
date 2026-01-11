@@ -582,7 +582,7 @@ test.describe( 'Copy/cut/paste', () => {
 		} );
 
 		await pageUtils.pressKeys( 'primaryAlt+v' );
-		expect( await editor.getBlocks() ).toMatchObject( [
+		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
 				name: 'core/paragraph',
 				attributes: {
@@ -788,6 +788,41 @@ test.describe( 'Copy/cut/paste', () => {
 				name: 'core/paragraph',
 				attributes: {
 					content: 'bB',
+				},
+			},
+		] );
+	} );
+
+	test( 'should replace the default block on paste when the content is unmodified', async ( {
+		editor,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/heading',
+			attributes: {
+				content: 'AB',
+			},
+		} );
+		await pageUtils.pressKeys( 'primary+c' );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { metadata: { name: 'Test' } },
+		} );
+		await pageUtils.pressKeys( 'primary+v' );
+
+		expect( await editor.getBlocks() ).toMatchObject( [
+			{
+				name: 'core/heading',
+				attributes: {
+					content: 'AB',
+					level: 2,
+				},
+			},
+			{
+				name: 'core/heading',
+				attributes: {
+					content: 'AB',
+					level: 2,
 				},
 			},
 		] );

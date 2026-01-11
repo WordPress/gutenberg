@@ -20,6 +20,7 @@ const pageTitleField: Field< BasePost > = {
 	render: PageTitleView,
 	enableHiding: false,
 	enableGlobalSearch: true,
+	filterBy: false,
 };
 
 /**

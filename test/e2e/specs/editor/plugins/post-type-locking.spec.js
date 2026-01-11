@@ -50,7 +50,8 @@ test.describe( 'Post-type locking', () => {
 					name: 'Empty block',
 				} )
 				.first()
-				.click();
+				.fill( 'p1' );
+			await editor.showBlockToolbar();
 
 			await expect(
 				page
@@ -166,18 +167,15 @@ test.describe( 'Post-type locking', () => {
 			).toBeHidden();
 		} );
 
-		test( 'should allow blocks to be moved', async ( { editor, page } ) => {
+		test( 'should allow blocks to be moved', async ( { editor } ) => {
 			await editor.canvas
 				.getByRole( 'document', {
 					name: 'Empty block',
 				} )
 				.first()
-				.click();
+				.fill( 'p1' );
 
-			await page
-				.getByRole( 'toolbar', { name: 'Block tools' } )
-				.getByRole( 'button', { name: 'Move up' } )
-				.click();
+			await editor.clickBlockToolbarButton( 'Move up' );
 
 			await expect.poll( editor.getBlocks ).toMatchObject( [
 				{
@@ -248,18 +246,15 @@ test.describe( 'Post-type locking', () => {
 			] );
 		} );
 
-		test( 'should allow blocks to be moved', async ( { editor, page } ) => {
+		test( 'should allow blocks to be moved', async ( { editor } ) => {
 			await editor.canvas
 				.getByRole( 'document', {
 					name: 'Empty block',
 				} )
 				.first()
-				.click();
+				.fill( 'p1' );
 
-			await page
-				.getByRole( 'toolbar', { name: 'Block tools' } )
-				.getByRole( 'button', { name: 'Move up' } )
-				.click();
+			await editor.clickBlockToolbarButton( 'Move up' );
 
 			await expect.poll( editor.getBlocks ).toMatchObject( [
 				{
@@ -304,18 +299,15 @@ test.describe( 'Post-type locking', () => {
 			] );
 		} );
 
-		test( 'should allow blocks to be moved', async ( { editor, page } ) => {
+		test( 'should allow blocks to be moved', async ( { editor } ) => {
 			await editor.canvas
 				.getByRole( 'document', {
 					name: 'Empty block',
 				} )
 				.last()
-				.click();
+				.fill( 'p1' );
 
-			await page
-				.getByRole( 'toolbar', { name: 'Block tools' } )
-				.getByRole( 'button', { name: 'Move up' } )
-				.click();
+			await editor.clickBlockToolbarButton( 'Move up' );
 
 			await expect.poll( editor.getBlocks ).toMatchObject( [
 				{
@@ -345,7 +337,7 @@ test.describe( 'Post-type locking', () => {
 
 			const blockSwitcher = page
 				.getByRole( 'toolbar', { name: 'Block tools' } )
-				.getByRole( 'button', { name: 'Paragraph' } );
+				.getByRole( 'button', { name: 'Paragraph', exact: true } );
 
 			// Verify the block switcher exists.
 			await expect( blockSwitcher ).toHaveAttribute(
@@ -357,7 +349,7 @@ test.describe( 'Post-type locking', () => {
 			await blockSwitcher.click();
 			await expect(
 				page
-					.getByRole( 'menu', { name: 'Paragraph' } )
+					.getByRole( 'menu', { name: 'Paragraph', exact: true } )
 					.getByRole( 'menuitem' )
 			).toHaveText( [
 				'Heading',
@@ -369,7 +361,6 @@ test.describe( 'Post-type locking', () => {
 				'Details',
 				'Group',
 				'Preformatted',
-				'Pullquote',
 				'Verse',
 			] );
 		} );
@@ -409,7 +400,8 @@ test.describe( 'Post-type locking', () => {
 					name: 'Empty block',
 				} )
 				.last()
-				.click();
+				.fill( 'p1' );
+			await editor.showBlockToolbar();
 
 			await expect(
 				page
@@ -453,7 +445,8 @@ test.describe( 'Post-type locking', () => {
 					name: 'Empty block',
 				} )
 				.last()
-				.click();
+				.fill( 'p1' );
+			await editor.showBlockToolbar();
 
 			await expect(
 				page

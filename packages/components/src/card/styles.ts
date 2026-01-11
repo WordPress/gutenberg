@@ -94,26 +94,6 @@ export const rounded = css`
 	border-radius: ${ adjustedBorderRadius };
 `;
 
-const xSmallCardPadding = css`
-	padding: ${ CONFIG.cardPaddingXSmall };
-`;
-
-export const cardPaddings = {
-	large: css`
-		padding: ${ CONFIG.cardPaddingLarge };
-	`,
-	medium: css`
-		padding: ${ CONFIG.cardPaddingMedium };
-	`,
-	small: css`
-		padding: ${ CONFIG.cardPaddingSmall };
-	`,
-	xSmall: xSmallCardPadding,
-	// The `extraSmall` size is not officially documented, but the following styles
-	// are kept for legacy reasons to support older values of the `size` prop.
-	extraSmall: xSmallCardPadding,
-};
-
 export const shady = css`
 	background-color: ${ COLORS.ui.backgroundDisabled };
 `;

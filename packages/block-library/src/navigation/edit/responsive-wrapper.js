@@ -27,6 +27,8 @@ export default function ResponsiveWrapper( {
 	overlayTextColor,
 	hasIcon,
 	icon,
+	overlay,
+	onNavigateToEntityRecord,
 } ) {
 	if ( ! isResponsive ) {
 		return children;
@@ -75,6 +77,19 @@ export default function ResponsiveWrapper( {
 		} ),
 	};
 
+	const handleToggleClick = () => {
+		// If an overlay template part is selected, navigate to it instead of toggling
+		if ( overlay && onNavigateToEntityRecord ) {
+			onNavigateToEntityRecord( {
+				postId: overlay,
+				postType: 'wp_template_part',
+			} );
+			return;
+		}
+		// Otherwise, use normal toggle behavior
+		onToggle( true );
+	};
+
 	return (
 		<>
 			{ ! isOpen && (
@@ -83,7 +98,7 @@ export default function ResponsiveWrapper( {
 					aria-haspopup="true"
 					aria-label={ hasIcon && __( 'Open menu' ) }
 					className={ openButtonClasses }
-					onClick={ () => onToggle( true ) }
+					onClick={ handleToggleClick }
 				>
 					{ hasIcon && <OverlayMenuIcon icon={ icon } /> }
 					{ ! hasIcon && __( 'Menu' ) }

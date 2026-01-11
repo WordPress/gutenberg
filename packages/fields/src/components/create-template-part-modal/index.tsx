@@ -21,6 +21,7 @@ import {
 	footer as footerIcon,
 	header as headerIcon,
 	sidebar as sidebarIcon,
+	tableColumnAfter as overlayIcon,
 	symbolFilled as symbolFilledIcon,
 } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
@@ -56,14 +57,14 @@ type CreateTemplatePartModalContentsProps = {
 /**
  * A React component that renders a modal for creating a template part. The modal displays a title and the contents for creating the template part.
  * This component should not live in this package, it should be moved to a dedicated package responsible for managing template.
- * @param {Object} props            The component props.
- * @param          props.modalTitle
+ * @param props            The component props.
+ * @param props.modalTitle
  */
 export default function CreateTemplatePartModal( {
 	modalTitle,
 	...restProps
 }: {
-	modalTitle: string;
+	modalTitle?: string;
 } & CreateTemplatePartModalContentsProps ) {
 	const defaultModalTitle = useSelect(
 		( select ) =>
@@ -84,13 +85,31 @@ export default function CreateTemplatePartModal( {
 	);
 }
 
-const getTemplatePartIcon = ( iconName: string ) => {
-	if ( 'header' === iconName ) {
+/**
+ * Helper function to retrieve the corresponding icon by area name or icon name.
+ *
+ * @param {string} areaOrIconName The area name (e.g., 'header', 'navigation-overlay') or icon name (e.g., 'menu').
+ *
+ * @return {Object} The corresponding icon.
+ */
+const getTemplatePartIcon = ( areaOrIconName: string ) => {
+	// Handle area names first
+	if ( 'header' === areaOrIconName ) {
 		return headerIcon;
-	} else if ( 'footer' === iconName ) {
+	} else if ( 'footer' === areaOrIconName ) {
 		return footerIcon;
-	} else if ( 'sidebar' === iconName ) {
+	} else if ( 'sidebar' === areaOrIconName ) {
 		return sidebarIcon;
+	} else if ( 'navigation-overlay' === areaOrIconName ) {
+		// TODO: Replace with a proper overlay icon when available.
+		// Using tableColumnAfter as a placeholder.
+		return overlayIcon;
+	}
+	// Handle icon names for backwards compatibility
+	if ( 'menu' === areaOrIconName ) {
+		// TODO: Replace with a proper overlay icon when available.
+		// Using tableColumnAfter as a placeholder.
+		return overlayIcon;
 	}
 	return symbolFilledIcon;
 };
@@ -187,13 +206,12 @@ export function CreateTemplatePartModalContents( {
 			<VStack spacing="4">
 				<TextControl
 					__next40pxDefaultSize
-					__nextHasNoMarginBottom
 					label={ __( 'Name' ) }
 					value={ title }
 					onChange={ setTitle }
 					required
 				/>
-				<fieldset>
+				<fieldset className="fields-create-template-part-modal__area-fieldset">
 					<BaseControl.VisualLabel as="legend">
 						{ __( 'Area' ) }
 					</BaseControl.VisualLabel>

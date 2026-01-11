@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/sync",
-	"version": "1.25.0",
+	"version": "1.37.0",
 	"description": "Sync Data.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -22,15 +22,29 @@
 		"node": ">=18.12.0",
 		"npm": ">=8.19.2"
 	},
-	"main": "build/index.js",
-	"module": "build-module/index.js",
+	"files": [
+		"src",
+		"build",
+		"build-module",
+		"build-types",
+		"*.md"
+	],
+	"main": "build/index.cjs",
+	"module": "build-module/index.mjs",
+	"exports": {
+		".": {
+			"types": "./build-types/index.d.ts",
+			"import": "./build-module/index.mjs",
+			"require": "./build/index.cjs"
+		},
+		"./package.json": "./package.json"
+	},
 	"react-native": "src/index",
-	"wpScript": true,
 	"types": "build-types",
 	"sideEffects": false,
 	"dependencies": {
-		"@babel/runtime": "7.25.7",
-		"@types/simple-peer": "^9.11.5",
+		"@wordpress/hooks": "file:../hooks",
+		"@wordpress/undo-manager": "file:../undo-manager",
 		"@wordpress/url": "file:../url",
 		"import-locals": "^2.0.0",
 		"lib0": "^0.2.42",
@@ -39,6 +53,10 @@
 		"y-protocols": "^1.0.5",
 		"y-webrtc": "~10.2.5",
 		"yjs": "~13.6.6"
+	},
+	"devDependencies": {
+		"@types/node": "^20.17.10",
+		"@types/simple-peer": "^9.11.5"
 	},
 	"publishConfig": {
 		"access": "public"

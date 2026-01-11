@@ -23,7 +23,6 @@ export default function PostAuthorSelect() {
 	return (
 		<SelectControl
 			__next40pxDefaultSize
-			__nextHasNoMarginBottom
 			className="post-author-selector"
 			label={ __( 'Author' ) }
 			options={ authorOptions }

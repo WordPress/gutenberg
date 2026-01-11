@@ -12,7 +12,11 @@
 		}
 	},
 	"usesContext": [ "postId" ],
+	"example": {
+		"viewportWidth": 350
+	},
 	"supports": {
+		"anchor": true,
 		"html": false,
 		"color": {
 			"gradients": true,

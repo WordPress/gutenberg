@@ -93,8 +93,8 @@ function block_core_gallery_render( $attributes, $content ) {
 	$gap_column   = $gap_value;
 
 	if ( is_array( $gap_value ) ) {
-		$gap_row    = isset( $gap_value['top'] ) ? $gap_value['top'] : $fallback_gap;
-		$gap_column = isset( $gap_value['left'] ) ? $gap_value['left'] : $fallback_gap;
+		$gap_row    = $gap_value['top'] ?? $fallback_gap;
+		$gap_column = $gap_value['left'] ?? $fallback_gap;
 		$gap_value  = $gap_row === $gap_column ? $gap_row : $gap_row . ' ' . $gap_column;
 	}
 
@@ -142,7 +142,7 @@ function block_core_gallery_render( $attributes, $content ) {
 
 	// This pattern matches figure elements with the `wp-block-image` class to
 	// avoid the gallery's wrapping `figure` element and extract images only.
-	$pattern = '/<figure[^>]*\bwp-block-image\b[^>]*>.*?<\/figure>/';
+	$pattern = '/<figure[^>]*\bwp-block-image\b[^>]*>.*?<\/figure>/s';
 
 	// Find all Image blocks.
 	preg_match_all( $pattern, $updated_content, $matches );
