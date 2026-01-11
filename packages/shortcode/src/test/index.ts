@@ -7,7 +7,7 @@ describe( 'shortcode', () => {
 	describe( 'next', () => {
 		it( 'should find the shortcode', () => {
 			const result = next( 'foo', 'this has the [foo] shortcode' );
-			expect( result.index ).toBe( 13 );
+			expect( result?.index ).toBe( 13 );
 		} );
 
 		it( 'should find the shortcode with attributes', () => {
@@ -15,7 +15,7 @@ describe( 'shortcode', () => {
 				'foo',
 				'this has the [foo param="foo"] shortcode'
 			);
-			expect( result.index ).toBe( 13 );
+			expect( result?.index ).toBe( 13 );
 		} );
 
 		it( 'should not find shortcodes that are not there', () => {
@@ -33,10 +33,10 @@ describe( 'shortcode', () => {
 
 		it( 'should find the shortcode when told to start looking beyond the start of the string', () => {
 			const result1 = next( 'foo', 'this has the [foo] shortcode', 12 );
-			expect( result1.index ).toBe( 13 );
+			expect( result1?.index ).toBe( 13 );
 
 			const result2 = next( 'foo', 'this has the [foo] shortcode', 13 );
-			expect( result2.index ).toBe( 13 );
+			expect( result2?.index ).toBe( 13 );
 
 			const result3 = next( 'foo', 'this has the [foo] shortcode', 14 );
 			expect( result3 ).toBe( undefined );
@@ -48,7 +48,7 @@ describe( 'shortcode', () => {
 				'this has the [foo] shortcode [foo] twice',
 				14
 			);
-			expect( result.index ).toBe( 29 );
+			expect( result?.index ).toBe( 29 );
 		} );
 
 		it( 'should not find escaped shortcodes', () => {
@@ -66,18 +66,18 @@ describe( 'shortcode', () => {
 
 		it( 'should find shortcodes that are incorrectly escaped by newlines', () => {
 			const result1 = next( 'foo', 'this has the [\n[foo]] shortcode' );
-			expect( result1.index ).toBe( 15 );
+			expect( result1?.index ).toBe( 15 );
 
 			const result2 = next( 'foo', 'this has the [[foo]\n] shortcode' );
-			expect( result2.index ).toBe( 14 );
+			expect( result2?.index ).toBe( 14 );
 		} );
 
 		it( 'should still work when there are not equal amounts of square brackets', () => {
 			const result1 = next( 'foo', 'this has the [[foo] shortcode' );
-			expect( result1.index ).toBe( 14 );
+			expect( result1?.index ).toBe( 14 );
 
 			const result2 = next( 'foo', 'this has the [foo]] shortcode' );
-			expect( result2.index ).toBe( 13 );
+			expect( result2?.index ).toBe( 13 );
 		} );
 
 		it( 'should find the second instances of the shortcode when the first one is escaped', () => {
@@ -85,7 +85,7 @@ describe( 'shortcode', () => {
 				'foo',
 				'this has the [[foo]] shortcode [foo] twice'
 			);
-			expect( result.index ).toBe( 31 );
+			expect( result?.index ).toBe( 31 );
 		} );
 
 		it( 'should not find shortcodes that are not full matches', () => {
@@ -221,13 +221,13 @@ describe( 'shortcode', () => {
 		} );
 
 		it( 'should replace shortcode with a number', () => {
-			const result1 = replace( 'foo', 'hello [foo] world', () => 3 );
+			const result1 = replace( 'foo', 'hello [foo] world', () => '3' );
 			expect( result1 ).toBe( 'hello 3 world' );
 
 			const result2 = replace(
 				'foo',
 				'hello [foo bar=bar baz="baz" qux]delete me[/foo] world',
-				() => 4
+				() => '4'
 			);
 			expect( result2 ).toBe( 'hello 4 world' );
 		} );
