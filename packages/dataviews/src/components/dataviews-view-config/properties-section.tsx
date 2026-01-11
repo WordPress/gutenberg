@@ -114,11 +114,10 @@ export function PropertiesSection( {
 					{ lockedFields.map( ( { field, isVisibleFlag } ) => {
 						// @ts-expect-error
 						const isVisible = view[ isVisibleFlag ] ?? true;
-						const isLastVisibleLocked =
-							isSingleVisibleLockedField && isVisible;
-						const fieldToRender = isLastVisibleLocked
-							? { ...field, enableHiding: false }
-							: field;
+						const fieldToRender =
+							isSingleVisibleLockedField && isVisible
+								? { ...field, enableHiding: false }
+								: field;
 
 						return (
 							<FieldItem
@@ -138,11 +137,10 @@ export function PropertiesSection( {
 					{ regularFields.map( ( field ) => {
 						// Check if this is the last visible field to prevent hiding
 						const isVisible = visibleFieldIds.includes( field.id );
-						const isLastVisible =
-							totalVisibleFields === 1 && isVisible;
-						const fieldToRender = isLastVisible
-							? { ...field, enableHiding: false }
-							: field;
+						const fieldToRender =
+							totalVisibleFields === 1 && isVisible
+								? { ...field, enableHiding: false }
+								: field;
 
 						return (
 							<FieldItem
