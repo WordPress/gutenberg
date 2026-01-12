@@ -59,7 +59,6 @@ export type SurfaceBackgroundColor =
 export type InteractiveBackgroundColor =
 	| 'neutral-strong'
 	| 'neutral-weak'
-	| 'brand'
 	| 'brand-strong'
 	| 'brand-weak'
 	| 'error'

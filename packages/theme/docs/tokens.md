@@ -45,8 +45,6 @@ Do not edit directly.
 | `--wpds-color-bg-interactive-neutral-weak`            | Background color for interactive elements with neutral tone and weak emphasis.                                                              |
 | `--wpds-color-bg-interactive-neutral-weak-active`     | Background color for interactive elements with neutral tone and weak emphasis that are hovered, focused, or active.                         |
 | `--wpds-color-bg-interactive-neutral-weak-disabled`   | Background color for interactive elements with neutral tone and weak emphasis, in their disabled state.                                     |
-| `--wpds-color-bg-interactive-brand`                   | Background color for interactive elements with brand tone and normal emphasis.                                                              |
-| `--wpds-color-bg-interactive-brand-active`            | Background color for interactive elements with brand tone and normal emphasis that are hovered, focused, or active.                         |
 | `--wpds-color-bg-interactive-brand-strong`            | Background color for interactive elements with brand tone and strong emphasis.                                                              |
 | `--wpds-color-bg-interactive-brand-strong-active`     | Background color for interactive elements with brand tone and strong emphasis that are hovered, focused, or active.                         |
 | `--wpds-color-bg-interactive-brand-weak`              | Background color for interactive elements with brand tone and weak emphasis.                                                                |

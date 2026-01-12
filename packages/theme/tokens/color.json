@@ -1187,18 +1187,6 @@
 					},
 					"$description": "Background color for interactive elements with neutral tone and weak emphasis, in their disabled state."
 				},
-				"brand": {
-					"$value": {
-						"colorSpace": "srgb",
-						"components": [ 0, 0, 0 ],
-						"alpha": 0
-					},
-					"$description": "Background color for interactive elements with brand tone and normal emphasis."
-				},
-				"brand-active": {
-					"$value": "{wpds-color.primitive.primary.surface2}",
-					"$description": "Background color for interactive elements with brand tone and normal emphasis that are hovered, focused, or active."
-				},
 				"brand-strong": {
 					"$value": "{wpds-color.primitive.primary.bgFill1}",
 					"$description": "Background color for interactive elements with brand tone and strong emphasis."

@@ -33,8 +33,6 @@ export default [
 	'--wpds-color-bg-interactive-neutral-weak',
 	'--wpds-color-bg-interactive-neutral-weak-active',
 	'--wpds-color-bg-interactive-neutral-weak-disabled',
-	'--wpds-color-bg-interactive-brand',
-	'--wpds-color-bg-interactive-brand-active',
 	'--wpds-color-bg-interactive-brand-strong',
 	'--wpds-color-bg-interactive-brand-strong-active',
 	'--wpds-color-bg-interactive-brand-weak',

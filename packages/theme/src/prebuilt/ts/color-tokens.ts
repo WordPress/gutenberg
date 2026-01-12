@@ -10,7 +10,6 @@ export default {
 		'fg-interactive-brand-strong-active',
 	],
 	'primary-bgFill2': [ 'bg-interactive-brand-strong-active' ],
-	'primary-surface2': [ 'bg-interactive-brand-active' ],
 	'primary-surface4': [ 'bg-interactive-brand-weak-active' ],
 	'primary-fgSurface3': [
 		'fg-interactive-brand',
