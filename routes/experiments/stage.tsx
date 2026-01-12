@@ -13,16 +13,15 @@ import { useEntityRecord } from '@wordpress/core-data';
 import {
 	Notice,
 	Spinner,
-	__experimentalHeading as Heading,
-	__experimentalText as Text,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
+import { Page } from '@wordpress/admin-ui';
 
 /**
  * Internal dependencies
  */
 import CategorySection from './components/category-section';
-import HeaderIllustration from './components/header-illustration';
+import './style.scss';
 
 /**
  * Category labels and order.
@@ -36,18 +35,32 @@ const CATEGORY_CONFIG = {
 const CATEGORY_ORDER = [ 'blocks', 'editor', 'advanced' ];
 
 /**
- * Main experiments page component.
- *
- * @param {Object} props             Component props.
- * @param {Array}  props.experiments Experiment definitions from PHP.
+ * Get experiment definitions.
+ * These are registered via the init module.
  */
-export default function ExperimentsPage( { experiments: experimentDefs } ) {
-	const [ savingIds, setSavingIds ] = useState( new Set() );
-	const [ notice, setNotice ] = useState( null );
-	const [ recentlySaved, setRecentlySaved ] = useState( new Map() );
+function getExperimentDefinitions() {
+	return ( window as any ).gutenbergExperimentDefinitions || [];
+}
+
+/**
+ * Main experiments page stage component.
+ */
+function Stage() {
+	const [ savingIds, setSavingIds ] = useState< Set< string > >( new Set() );
+	const [ notice, setNotice ] = useState< {
+		status: 'success' | 'error';
+		message: string;
+	} | null >( null );
+	const [ recentlySaved, setRecentlySaved ] = useState<
+		Map< string, 'enabled' | 'disabled' >
+	>( new Map() );
+
+	const experimentDefs = getExperimentDefinitions();
 
 	// Track timeout IDs for cleanup on unmount.
-	const timeoutIdsRef = useRef( new Map() );
+	const timeoutIdsRef = useRef<
+		Map< string, ReturnType< typeof setTimeout > >
+	>( new Map() );
 
 	// Cleanup all timeouts on unmount.
 	useEffect( () => {
@@ -69,7 +82,7 @@ export default function ExperimentsPage( { experiments: experimentDefs } ) {
 
 	// Get current experiment values from settings.
 	const gutenbergExperiments = useMemo( () => {
-		return siteSettings?.[ 'gutenberg-experiments' ] || {};
+		return ( siteSettings as any )?.[ 'gutenberg-experiments' ] || {};
 	}, [ siteSettings ] );
 
 	// Merge experiment definitions with current values.
@@ -77,7 +90,7 @@ export default function ExperimentsPage( { experiments: experimentDefs } ) {
 		if ( ! experimentDefs || ! hasResolved ) {
 			return [];
 		}
-		return experimentDefs.map( ( exp ) => ( {
+		return experimentDefs.map( ( exp: any ) => ( {
 			...exp,
 			enabled: Boolean( gutenbergExperiments[ exp.id ] ),
 		} ) );
@@ -85,7 +98,7 @@ export default function ExperimentsPage( { experiments: experimentDefs } ) {
 
 	// Update a single experiment.
 	const updateExperiment = useCallback(
-		async ( experimentId, enabled ) => {
+		async ( experimentId: string, enabled: boolean ) => {
 			setSavingIds( ( prev ) => new Set( prev ).add( experimentId ) );
 
 			try {
@@ -145,124 +158,129 @@ export default function ExperimentsPage( { experiments: experimentDefs } ) {
 
 	// Handle toggle.
 	const handleToggle = useCallback(
-		( experimentId, newValue ) =>
+		( experimentId: string, newValue: boolean ) =>
 			updateExperiment( experimentId, newValue ),
 		[ updateExperiment ]
 	);
 
 	// Group experiments by category.
 	const groupedExperiments = useMemo( () => {
-		return CATEGORY_ORDER.reduce( ( acc, category ) => {
-			const categoryExperiments = experiments.filter(
-				( exp ) => exp.category === category
-			);
-			if ( categoryExperiments.length > 0 ) {
-				acc[ category ] = categoryExperiments;
-			}
-			return acc;
-		}, {} );
+		return CATEGORY_ORDER.reduce(
+			( acc, category ) => {
+				const categoryExperiments = experiments.filter(
+					( exp: any ) => exp.category === category
+				);
+				if ( categoryExperiments.length > 0 ) {
+					acc[ category ] = categoryExperiments;
+				}
+				return acc;
+			},
+			{} as Record< string, any[] >
+		);
 	}, [ experiments ] );
 
 	// Count enabled experiments.
-	const enabledCount = experiments.filter( ( exp ) => exp.enabled ).length;
+	const enabledCount = experiments.filter(
+		( exp: any ) => exp.enabled
+	).length;
 
 	const isLoading = ! hasResolved;
 
 	// Handle error state when settings fail to load.
 	if ( hasResolved && hasResolvedError ) {
 		return (
-			<div className="gutenberg-experiments-page">
+			<Page title={ __( 'Experimental Settings' ) } hasPadding>
 				<Notice status="error" isDismissible={ false }>
 					{ __(
 						'Could not load experiment settings. Please refresh the page or try again later.'
 					) }
 				</Notice>
-			</div>
+			</Page>
 		);
 	}
 
 	// Handle case where settings resolved but record is empty/invalid.
 	if ( hasResolved && ! siteSettings ) {
 		return (
-			<div className="gutenberg-experiments-page">
+			<Page title={ __( 'Experimental Settings' ) } hasPadding>
 				<Notice status="error" isDismissible={ false }>
 					{ __(
 						'Unable to access site settings. Please ensure you have the required permissions.'
 					) }
 				</Notice>
-			</div>
+			</Page>
 		);
 	}
 
 	return (
-		<div className="gutenberg-experiments-page">
-			<header className="gutenberg-experiments-page__header">
-				<div className="gutenberg-experiments-page__header-content">
-					<Heading level={ 1 }>
-						{ __( 'Experimental Settings' ) }
-					</Heading>
-					<Text className="gutenberg-experiments-page__description">
-						{ __(
-							"The block editor includes experimental features that are usable while they're in development. Select the ones you'd like to enable. These features are likely to change, so avoid using them in production."
+		<Page
+			title={ __( 'Experimental Settings' ) }
+			subTitle={ __(
+				"The block editor includes experimental features that are usable while they're in development. Select the ones you'd like to enable. These features are likely to change, so avoid using them in production."
+			) }
+			badges={
+				! isLoading ? (
+					<>
+						<span className="experiments-badge">
+							{ experiments.length } { __( 'experiments' ) }
+						</span>
+						<span className="experiments-badge experiments-badge--enabled">
+							{ enabledCount } { __( 'enabled' ) }
+						</span>
+					</>
+				) : null
+			}
+			className="experiments-page"
+		>
+			<div className="experiments-page__content">
+				{ notice && (
+					<Notice
+						status={ notice.status }
+						isDismissible
+						onRemove={ () => setNotice( null ) }
+						className="experiments-page__notice"
+					>
+						{ notice.message }
+					</Notice>
+				) }
+
+				{ isLoading ? (
+					<VStack
+						className="experiments-page__loading"
+						alignment="center"
+						justify="center"
+						spacing={ 4 }
+					>
+						<Spinner />
+						<span>{ __( 'Loading experiments…' ) }</span>
+					</VStack>
+				) : (
+					<VStack
+						className="experiments-page__categories"
+						spacing={ 8 }
+					>
+						{ Object.entries( groupedExperiments ).map(
+							( [ category, categoryExperiments ] ) => (
+								<CategorySection
+									key={ category }
+									categoryKey={ category }
+									categoryData={
+										CATEGORY_CONFIG[
+											category as keyof typeof CATEGORY_CONFIG
+										]
+									}
+									experiments={ categoryExperiments }
+									onToggle={ handleToggle }
+									savingIds={ savingIds }
+									recentlySaved={ recentlySaved }
+								/>
+							)
 						) }
-					</Text>
-					{ ! isLoading && (
-						<div className="gutenberg-experiments-page__badges">
-							<span className="gutenberg-experiments-page__badge">
-								{ experiments.length } { __( 'experiments' ) }
-							</span>
-							<span className="gutenberg-experiments-page__badge gutenberg-experiments-page__badge--enabled">
-								{ enabledCount } { __( 'enabled' ) }
-							</span>
-						</div>
-					) }
-				</div>
-				<div className="gutenberg-experiments-page__header-illustration">
-					<HeaderIllustration />
-				</div>
-			</header>
-
-			{ notice && (
-				<Notice
-					status={ notice.status }
-					isDismissible
-					onRemove={ () => setNotice( null ) }
-					className={ `gutenberg-experiments-page__notice gutenberg-experiments-page__notice--${ notice.status }` }
-				>
-					{ notice.message }
-				</Notice>
-			) }
-
-			{ isLoading ? (
-				<VStack
-					className="gutenberg-experiments-page__loading"
-					alignment="center"
-					justify="center"
-					spacing={ 4 }
-				>
-					<Spinner />
-					<Text>{ __( 'Loading experiments…' ) }</Text>
-				</VStack>
-			) : (
-				<VStack
-					className="gutenberg-experiments-page__categories"
-					spacing={ 10 }
-				>
-					{ Object.entries( groupedExperiments ).map(
-						( [ category, categoryExperiments ] ) => (
-							<CategorySection
-								key={ category }
-								categoryKey={ category }
-								categoryData={ CATEGORY_CONFIG[ category ] }
-								experiments={ categoryExperiments }
-								onToggle={ handleToggle }
-								savingIds={ savingIds }
-								recentlySaved={ recentlySaved }
-							/>
-						)
-					) }
-				</VStack>
-			) }
-		</div>
+					</VStack>
+				) }
+			</div>
+		</Page>
 	);
 }
+
+export const stage = Stage;

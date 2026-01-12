@@ -30,7 +30,13 @@
 					"@wordpress/edit-site-init"
 				]
 			},
-			"font-library"
+			"font-library",
+			{
+				"id": "gutenberg-experiments",
+				"init": [
+					"@wordpress/experiments-init"
+				]
+			}
 		]
 	},
 	"config": {

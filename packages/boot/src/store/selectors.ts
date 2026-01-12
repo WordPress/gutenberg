@@ -14,3 +14,7 @@ export function getRoutes( state: State ) {
 export function getDashboardLink( state: State ) {
 	return state.dashboardLink;
 }
+
+export function getPageConfig( state: State ) {
+	return state.pageConfig;
+}

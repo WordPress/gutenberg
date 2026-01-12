@@ -13,7 +13,7 @@ import DrilldownItem from './drilldown-item';
 import DropdownItem from './dropdown-item';
 import NavigationScreen from './navigation-screen';
 import { useSidebarParent } from './use-sidebar-parent';
-import type { MenuItem } from '../../store/types';
+import type { MenuItem, PageConfig } from '../../store/types';
 
 function Navigation() {
 	const backButtonRef = useRef< HTMLButtonElement >( null );
@@ -22,10 +22,15 @@ function Navigation() {
 	>( null );
 	const [ parentId, setParentId, parentDropdownId, setParentDropdownId ] =
 		useSidebarParent();
-	const menuItems = useSelect(
-		( select ) =>
+	const { menuItems, pageConfig } = useSelect(
+		( select ) => ( {
 			// @ts-ignore
-			select( STORE_NAME ).getMenuItems() as MenuItem[],
+			menuItems: select( STORE_NAME ).getMenuItems() as MenuItem[],
+			// @ts-ignore
+			pageConfig: select( STORE_NAME ).getPageConfig() as
+				| PageConfig
+				| undefined,
+		} ),
 		[]
 	);
 	const parent = useMemo(
@@ -35,6 +40,10 @@ function Navigation() {
 	// Create a unique key for the current navigation state
 	// The sidebar will animate when the key changes.
 	const navigationKey = parent ? `drilldown-${ parent.id }` : 'root';
+
+	// Determine title and description based on navigation state
+	const title = parent ? parent.label : pageConfig?.title || '';
+	const description = parent ? parent.description : pageConfig?.description;
 
 	// We use transitions to handle navigation clicks
 	// This allows smooth animations and non blocking navigation.
@@ -65,7 +74,8 @@ function Navigation() {
 	return (
 		<NavigationScreen
 			isRoot={ ! parent }
-			title={ parent ? parent.label : '' }
+			title={ title }
+			description={ description }
 			backMenuItem={ parent?.parent }
 			backButtonRef={ backButtonRef }
 			animationDirection={ animationDirection || undefined }

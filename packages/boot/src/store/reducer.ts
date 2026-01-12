@@ -8,6 +8,7 @@ const initialState: State = {
 	menuItems: {},
 	routes: [],
 	dashboardLink: undefined,
+	pageConfig: undefined,
 };
 
 export function reducer( state: State = initialState, action: Action ): State {
@@ -22,6 +23,11 @@ export function reducer( state: State = initialState, action: Action ): State {
 			};
 
 		case 'UPDATE_MENU_ITEM':
+			// Only update if the menu item already exists
+			// This prevents creating partial/ghost items
+			if ( ! state.menuItems[ action.id ] ) {
+				return state;
+			}
 			return {
 				...state,
 				menuItems: {
@@ -43,6 +49,12 @@ export function reducer( state: State = initialState, action: Action ): State {
 			return {
 				...state,
 				dashboardLink: action.dashboardLink,
+			};
+
+		case 'SET_PAGE_CONFIG':
+			return {
+				...state,
+				pageConfig: action.pageConfig,
 			};
 	}
 

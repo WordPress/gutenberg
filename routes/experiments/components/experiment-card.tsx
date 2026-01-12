@@ -1,8 +1,6 @@
 /**
  * External dependencies
  */
-// clsx is available during build via root node_modules.
-// eslint-disable-next-line import/no-extraneous-dependencies
 import clsx from 'clsx';
 
 /**
@@ -45,7 +43,7 @@ import {
 /**
  * Icon mapping for experiments.
  */
-const EXPERIMENT_ICONS = {
+const EXPERIMENT_ICONS: Record< string, typeof blockDefault > = {
 	blockDefault,
 	postComments,
 	grid,
@@ -64,21 +62,38 @@ const EXPERIMENT_ICONS = {
 	plugins,
 };
 
+interface Experiment {
+	id: string;
+	name: string;
+	description: string;
+	warning?: string;
+	learnMore?: string;
+	enabled: boolean;
+	icon: string;
+}
+
+interface ExperimentCardProps {
+	experiment: Experiment;
+	onToggle: ( experimentId: string, newValue: boolean ) => void;
+	isSaving: boolean;
+	savedState?: 'enabled' | 'disabled';
+}
+
 /**
  * Individual experiment card component.
  *
- * @param {Object}   props            Component props.
- * @param {Object}   props.experiment Experiment data.
- * @param {Function} props.onToggle   Toggle handler.
- * @param {boolean}  props.isSaving   Whether the experiment is currently saving.
- * @param {string}   props.savedState State of recent save: 'enabled', 'disabled', or undefined.
+ * @param root0            Component props.
+ * @param root0.experiment The experiment data object.
+ * @param root0.onToggle   Callback when the experiment is toggled.
+ * @param root0.isSaving   Whether the experiment is currently being saved.
+ * @param root0.savedState The recently saved state, if any.
  */
 export default function ExperimentCard( {
 	experiment,
 	onToggle,
 	isSaving,
 	savedState,
-} ) {
+}: ExperimentCardProps ) {
 	const { id, name, description, warning, learnMore, enabled, icon } =
 		experiment;
 	const ExperimentIcon = EXPERIMENT_ICONS[ icon ] || plugins;

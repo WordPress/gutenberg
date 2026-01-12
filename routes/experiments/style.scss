@@ -2,17 +2,6 @@
 @use "@wordpress/base-styles/colors" as *;
 @use "@wordpress/base-styles/variables" as *;
 
-// Full-bleed container - override WordPress admin default padding
-#gutenberg-experiments {
-	// Pull the container to the edges by countering wpbody-content padding
-	margin: -10px 0 0 -20px;
-	padding: 0;
-	background: $gray-100;
-	min-height: calc(100vh - 22px); // Account for negative margin
-	box-sizing: border-box;
-	width: calc(100% + 20px);
-}
-
 // Animations
 @keyframes fadeInUp {
 	from {
@@ -39,214 +28,50 @@
 	}
 }
 
-@keyframes shimmer {
-	0% {
-		background-position: -200% 0;
-	}
-	100% {
-		background-position: 200% 0;
-	}
-}
+// Badges in page header
+.experiments-badge {
+	display: inline-flex;
+	align-items: center;
+	font-size: 13px;
+	font-weight: 500;
+	padding: 4px 12px;
+	border-radius: 100px;
+	background: $gray-100;
+	color: $gray-700;
+	margin-right: 8px;
 
-
-@keyframes gentleFloat {
-	0%,
-	100% {
-		transform: translateY(0);
-	}
-	50% {
-		transform: translateY(-6px);
+	&--enabled {
+		color: var(--wp-admin-theme-color);
 	}
 }
 
-@keyframes gentlePulse {
-	0%,
-	100% {
-		opacity: 0.4;
-		transform: scale(1);
-	}
-	50% {
-		opacity: 0.6;
-		transform: scale(1.1);
-	}
-}
-
-.gutenberg-experiments-page {
-	padding: 0 20px 20px;
-
-	h1 {
-		font-size: 2rem;
-		font-weight: 700;
-		margin-bottom: 12px;
-		color: $gray-900;
-	}
-
-	&__header {
-		display: flex;
-		align-items: flex-start;
-		justify-content: space-between;
-		gap: 40px;
-		margin: 0 -20px 32px -20px;
-		padding: 32px 20px;
-		background: $white;
-		border-bottom: $border-width solid $gray-100;
-	}
-
-	&__header-content {
-		flex: 1;
-		max-width: 700px;
-	}
-
-	&__header-illustration {
-		flex-shrink: 0;
-		width: 160px;
-		height: 160px;
-		animation: gentleFloat 6s ease-in-out infinite;
-
-		@media (max-width: 900px) {
-			display: none;
-		}
-	}
-
-	&__description {
-		display: block;
-		color: $gray-900;
-		opacity: 0.7;
-		max-width: 600px;
-		line-height: 1.6;
-		font-size: 14px;
-	}
-
-	&__badges {
-		display: flex;
-		gap: 10px;
-		margin-top: 20px;
-		flex-wrap: wrap;
-	}
-
-	&__badge {
-		display: inline-flex;
-		align-items: center;
-		font-size: 13px;
-		font-weight: 500;
-		padding: 6px 14px;
-		border-radius: 100px;
-		background: $gray-100;
-		color: $gray-700;
-
-		&--enabled {
-			color: var(--wp-admin-theme-color);
-		}
+.experiments-page {
+	&__content {
+		padding: 24px;
+		max-width: 1400px;
 	}
 
 	&__notice {
 		margin-bottom: 24px;
 		animation: fadeInUp 0.3s ease-out;
-
-		&--success {
-			border-left-color: $alert-green;
-		}
-
-		&--error {
-			border-left-color: $alert-red;
-		}
 	}
 
 	&__loading {
 		padding: 80px;
-		color: $gray-900;
-		opacity: 0.6;
+		color: $gray-700;
 	}
 
-	// VStack handles the flex layout, we just add the base styles
 	&__categories {
 		// VStack handles spacing via the spacing prop
-	}
-
-	&__modal {
-		max-width: 480px;
-	}
-
-	&__modal-list {
-		margin: 16px 0;
-		padding-left: 24px;
-
-		li {
-			margin-bottom: 8px;
-			font-weight: 500;
-			color: $gray-900;
-		}
-	}
-
-	&__modal-actions {
-		display: flex;
-		justify-content: flex-end;
-		gap: 12px;
-		margin-top: 24px;
-	}
-}
-
-// Header Illustration
-.header-illustration {
-	width: 100%;
-	height: 100%;
-
-	&__flask-group {
-		animation: gentleFloat 4s ease-in-out infinite;
-	}
-
-	&__liquid {
-		animation: liquidWave 3s ease-in-out infinite;
-	}
-
-	&__bubble {
-		&--1 {
-			animation: gentlePulse 3s ease-in-out infinite;
-		}
-		&--2 {
-			animation: gentlePulse 3.5s ease-in-out infinite 0.3s;
-		}
-		&--3 {
-			animation: gentlePulse 2.8s ease-in-out infinite 0.6s;
-		}
-	}
-
-	&__float {
-		&--1 {
-			animation: gentleFloat 3s ease-in-out infinite;
-		}
-		&--2 {
-			animation: gentleFloat 4s ease-in-out infinite 0.5s;
-		}
-		&--3 {
-			animation: gentleFloat 3.5s ease-in-out infinite 1s;
-		}
-		&--4 {
-			animation: gentleFloat 4.5s ease-in-out infinite 0.3s;
-		}
-		&--5 {
-			animation: gentleFloat 3.8s ease-in-out infinite 0.8s;
-		}
-	}
-}
-
-@keyframes liquidWave {
-	0%,
-	100% {
-		transform: translateY(0);
-	}
-	50% {
-		transform: translateY(-2px);
 	}
 }
 
 .experiments-category {
-
 	&__header {
 		display: flex;
 		align-items: baseline;
 		gap: 12px;
-		margin-bottom: 12px;
+		margin-bottom: 16px;
 		padding-bottom: 8px;
 		border-bottom: 2px solid $gray-100;
 	}
@@ -271,6 +96,15 @@
 		display: grid;
 		grid-template-columns: repeat(3, 1fr);
 		gap: 20px;
+
+		@media (max-width: 1200px) {
+			grid-template-columns: repeat(2, 1fr);
+		}
+
+		@media (max-width: 782px) {
+			grid-template-columns: 1fr;
+			gap: 16px;
+		}
 	}
 }
 
@@ -291,7 +125,7 @@
 		pointer-events: none;
 	}
 
-	// Use component class for specificity instead of !important
+	// Use component class for specificity
 	&.components-card &__header,
 	&__header.components-card__header {
 		padding: 16px;
@@ -397,7 +231,7 @@
 		}
 	}
 
-	// Use component class for specificity instead of !important
+	// Use component class for specificity
 	&.components-card &__body,
 	&__body.components-card__body {
 		flex: 1;
@@ -426,7 +260,7 @@
 		}
 	}
 
-	// Use component class for specificity instead of !important
+	// Use component class for specificity
 	&.components-card &__footer,
 	&__footer.components-card__footer {
 		padding: 12px 16px;
@@ -445,55 +279,24 @@
 	}
 }
 
-// Responsive grid adjustments
-@media (max-width: 1200px) {
-	.experiments-category__grid {
-		grid-template-columns: repeat(2, 1fr);
-	}
-}
-
+// Responsive adjustments
 @media (max-width: 782px) {
-	.gutenberg-experiments-page {
-		padding: 16px 0;
-
-		h1 {
-			font-size: 1.5rem;
-		}
-
-		&__header {
-			padding: 16px 20px;
-			margin-bottom: 24px;
-		}
-
-		&__badges {
-			gap: 8px;
-			margin-top: 16px;
-		}
-
-		&__badge {
-			font-size: 12px;
-			padding: 5px 12px;
-		}
+	.experiments-page__content {
+		padding: 16px;
 	}
 
 	.experiments-category {
 		&__header {
 			gap: 10px;
-			margin-bottom: 16px;
+			margin-bottom: 12px;
 		}
 
 		&__title {
 			font-size: 1.1rem;
 		}
-
-		&__grid {
-			grid-template-columns: 1fr;
-			gap: 16px;
-		}
 	}
 
 	.experiment-card {
-		// Use component class for specificity instead of !important
 		&.components-card .experiment-card__header,
 		.experiment-card__header.components-card__header {
 			padding: 12px;
@@ -504,13 +307,11 @@
 			height: 32px;
 		}
 
-		// Use component class for specificity instead of !important
 		&.components-card .experiment-card__body,
 		.experiment-card__body.components-card__body {
 			padding: 12px;
 		}
 
-		// Use component class for specificity instead of !important
 		&.components-card .experiment-card__footer,
 		.experiment-card__footer.components-card__footer {
 			padding: 10px 12px;
@@ -520,11 +321,6 @@
 
 // Reduced motion preference
 @media (prefers-reduced-motion: reduce) {
-	.gutenberg-experiments-page__header-illustration,
-	.header-illustration__flask-group,
-	.header-illustration__liquid,
-	.header-illustration__bubble,
-	.header-illustration__float,
 	.experiment-card__saved-indicator {
 		animation: none;
 	}

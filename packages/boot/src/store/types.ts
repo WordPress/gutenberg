@@ -19,6 +19,26 @@ export interface MenuItem {
 	icon?: IconType;
 	parent?: string;
 	parent_type?: 'drilldown' | 'dropdown';
+	/**
+	 * Optional description shown below the title in the sidebar header.
+	 * Useful for providing context about a section.
+	 */
+	description?: string;
+}
+
+/**
+ * Page-level configuration for the sidebar header.
+ * Used when at the root level of navigation.
+ */
+export interface PageConfig {
+	/**
+	 * Title shown in the sidebar header.
+	 */
+	title?: string;
+	/**
+	 * Description shown below the title.
+	 */
+	description?: string;
 }
 
 /**
@@ -164,4 +184,5 @@ export interface State {
 	menuItems: Record< string, MenuItem >;
 	routes: Route[];
 	dashboardLink?: string;
+	pageConfig?: PageConfig;
 }
