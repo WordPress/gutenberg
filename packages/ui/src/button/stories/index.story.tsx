@@ -157,18 +157,6 @@ export const AllTonesAndVariants: Story = {
 	),
 };
 
-export const LinkStyledAsButton: Story = {
-	...Default,
-	args: {
-		...Default.args,
-		// Link content passed through `children`
-		// eslint-disable-next-line jsx-a11y/anchor-has-content
-		render: <a href="https://example.com" />,
-		nativeButton: false,
-		children: 'Link',
-	},
-};
-
 export const WithIcon: Story = {
 	...Default,
 	args: {
