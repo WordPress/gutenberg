@@ -44,7 +44,11 @@ export const settings = {
 				name: 'core/paragraph',
 				attributes: {
 					content: `<strong>${ __( 'Snow Patrol' ) }</strong>`,
-					align: 'center',
+					style: {
+						typography: {
+							textAlign: 'center',
+						},
+					},
 				},
 			},
 		],
@@ -56,7 +60,7 @@ export const settings = {
 	variations,
 };
 
-if ( window.__experimentalContentOnlyPatternInsertion ) {
+if ( window.__experimentalContentOnlyInspectorFields ) {
 	settings[ fieldsKey ] = [
 		{
 			id: 'background',
@@ -78,7 +82,7 @@ if ( window.__experimentalContentOnlyPatternInsertion ) {
 		},
 	];
 	settings[ formKey ] = {
-		fields: [ 'content' ],
+		fields: [ 'background' ],
 	};
 }
 

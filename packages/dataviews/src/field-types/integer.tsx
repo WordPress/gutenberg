@@ -6,15 +6,8 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import type {
-	DataViewRenderFieldProps,
-	Field,
-	NormalizedField,
-	Operator,
-	Rules,
-	SortDirection,
-} from '../types';
-import RenderFromElements from './utils/render-from-elements';
+import type { FormatInteger, NormalizedField } from '../types';
+import type { FieldType } from '../types/private';
 import {
 	OPERATOR_IS,
 	OPERATOR_IS_NOT,
@@ -28,47 +21,72 @@ import {
 	OPERATOR_IS_NOT_ALL,
 	OPERATOR_BETWEEN,
 } from '../constants';
-import { getControl } from '../dataform-controls';
-import hasElements from './utils/has-elements';
-import getValueFromId from './utils/get-value-from-id';
-import setValueFromId from './utils/set-value-from-id';
-import getFilterBy from './utils/get-filter-by';
+import sort from './utils/sort-number';
+import isValidRequired from './utils/is-valid-required';
+import isValidMin from './utils/is-valid-min';
+import isValidMax from './utils/is-valid-max';
+import isValidElements from './utils/is-valid-elements';
+import render from './utils/render-default';
 
-function render( { item, field }: DataViewRenderFieldProps< any > ) {
-	return field.hasElements ? (
-		<RenderFromElements item={ item } field={ field } />
-	) : (
-		field.getValue( { item } )
+const format = {
+	separatorThousand: ',',
+};
+
+function getValueFormatted< Item >( {
+	item,
+	field,
+}: {
+	item: Item;
+	field: NormalizedField< Item >;
+} ): string {
+	let value = field.getValue( { item } );
+	if ( value === null || value === undefined ) {
+		return '';
+	}
+
+	value = Number( value );
+	if ( ! Number.isFinite( value ) ) {
+		return String( value );
+	}
+
+	let formatInteger: Required< FormatInteger >;
+	if ( field.type !== 'integer' ) {
+		formatInteger = format;
+	} else {
+		formatInteger = field.format as Required< FormatInteger >;
+	}
+
+	const { separatorThousand } = formatInteger;
+	const integerValue = Math.trunc( value );
+	if ( ! separatorThousand ) {
+		return String( integerValue );
+	}
+
+	return String( integerValue ).replace(
+		/\B(?=(\d{3})+(?!\d))/g,
+		separatorThousand
 	);
 }
 
-export default function normalizeField< Item >(
-	field: Field< Item >
-): NormalizedField< Item > {
-	const getValue = field.getValue || getValueFromId( field.id );
-	const setValue = field.setValue || setValueFromId( field.id );
-	const isValid: Rules< Item > = {
-		elements: true,
-		custom: ( item: any, normalizedField ) => {
-			const value = normalizedField.getValue( { item } );
-			if (
-				! [ undefined, '', null ].includes( value ) &&
-				! Number.isInteger( value )
-			) {
-				return __( 'Value must be an integer.' );
-			}
+function isValidCustom< Item >( item: Item, field: NormalizedField< Item > ) {
+	const value = field.getValue( { item } );
+	if (
+		! [ undefined, '', null ].includes( value ) &&
+		! Number.isInteger( value )
+	) {
+		return __( 'Value must be an integer.' );
+	}
+	return null;
+}
 
-			return null;
-		},
-	};
-
-	const sort = ( a: Item, b: Item, direction: SortDirection ) => {
-		const valueA = getValue( { item: a } );
-		const valueB = getValue( { item: b } );
-		return direction === 'asc' ? valueA - valueB : valueB - valueA;
-	};
-
-	const defaultOperators: Operator[] = [
+export default {
+	type: 'integer',
+	render,
+	Edit: 'integer',
+	sort,
+	enableSorting: true,
+	enableGlobalSearch: false,
+	defaultOperators: [
 		OPERATOR_IS,
 		OPERATOR_IS_NOT,
 		OPERATOR_LESS_THAN,
@@ -76,9 +94,8 @@ export default function normalizeField< Item >(
 		OPERATOR_LESS_THAN_OR_EQUAL,
 		OPERATOR_GREATER_THAN_OR_EQUAL,
 		OPERATOR_BETWEEN,
-	];
-
-	const validOperators: Operator[] = [
+	],
+	validOperators: [
 		// Single-selection
 		OPERATOR_IS,
 		OPERATOR_IS_NOT,
@@ -92,33 +109,14 @@ export default function normalizeField< Item >(
 		OPERATOR_IS_NONE,
 		OPERATOR_IS_ALL,
 		OPERATOR_IS_NOT_ALL,
-	];
-
-	return {
-		id: field.id,
-		type: 'integer',
-		label: field.label || field.id,
-		header: field.header || field.label || field.id,
-		description: field.description,
-		placeholder: field.placeholder,
-		getValue,
-		setValue,
-		elements: field.elements,
-		getElements: field.getElements,
-		hasElements: hasElements( field ),
-		render: field.render ?? render,
-		Edit: getControl( field, 'integer' ),
-		sort: field.sort ?? sort,
-		isValid: {
-			...isValid,
-			...field.isValid,
-		},
-		isVisible: field.isVisible,
-		enableSorting: field.enableSorting ?? true,
-		enableGlobalSearch: field.enableGlobalSearch ?? false,
-		enableHiding: field.enableHiding ?? true,
-		readOnly: field.readOnly ?? false,
-		filterBy: getFilterBy( field, defaultOperators, validOperators ),
-		format: {},
-	};
-}
+	],
+	format,
+	getValueFormatted,
+	validate: {
+		required: isValidRequired,
+		min: isValidMin,
+		max: isValidMax,
+		elements: isValidElements,
+		custom: isValidCustom,
+	},
+} satisfies FieldType< any >;

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useEffect, useState } from '@wordpress/element';
 import { registerCoreBlocks } from '@wordpress/block-library';
 import { useDispatch } from '@wordpress/data';
@@ -12,14 +9,9 @@ import {
 } from '@wordpress/block-editor';
 import { __dangerousOptInToUnstableAPIsOnlyForCoreModules } from '@wordpress/private-apis';
 import { parse } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
-import { editorStyles } from '../editor-styles';
-// eslint-disable-next-line @wordpress/dependency-group
-import contentCss from '!!raw-loader!../../../../packages/block-editor/build-style/content.css';
 import { pattern } from './pattern';
+import { editorStyles } from '../editor-styles';
+import contentCss from '!!raw-loader!../../../../packages/block-editor/build-style/content.css';
 
 // Temporary hack to access private APIs before stabilizing zoom level.
 const { unlock } = __dangerousOptInToUnstableAPIsOnlyForCoreModules(

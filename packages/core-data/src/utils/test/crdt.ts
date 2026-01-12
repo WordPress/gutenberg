@@ -269,7 +269,7 @@ describe( 'crdt', () => {
 			expect( changes ).not.toHaveProperty( 'status' );
 		} );
 
-		it( 'does not sync empty date for floating dates', () => {
+		it( 'does not overwrite null floating date', () => {
 			map.set( 'status', 'draft' );
 			map.set( 'date', '' );
 
@@ -279,13 +279,52 @@ describe( 'crdt', () => {
 				modified: '2025-01-01',
 			} as unknown as Post;
 
-			const changes = getPostChangesFromCRDTDoc(
+			const changesWithEmptyDate = getPostChangesFromCRDTDoc(
 				doc,
 				editedRecord,
 				mockPostType
 			);
 
-			expect( changes ).not.toHaveProperty( 'date' );
+			expect( changesWithEmptyDate ).not.toHaveProperty( 'date' );
+
+			map.set( 'date', '2025-01-02' );
+
+			const changesWithDefinedDate = getPostChangesFromCRDTDoc(
+				doc,
+				editedRecord,
+				mockPostType
+			);
+
+			expect( changesWithDefinedDate ).not.toHaveProperty( 'date' );
+		} );
+
+		it( 'does not overwrite defined floating date', () => {
+			map.set( 'status', 'draft' );
+			map.set( 'date', '' );
+
+			const editedRecord = {
+				status: 'draft',
+				date: '2025-01-01', // matches modified
+				modified: '2025-01-01',
+			} as unknown as Post;
+
+			const changesWithEmptyDate = getPostChangesFromCRDTDoc(
+				doc,
+				editedRecord,
+				mockPostType
+			);
+
+			expect( changesWithEmptyDate ).not.toHaveProperty( 'date' );
+
+			map.set( 'date', '2025-01-02' );
+
+			const changesWithDefinedDate = getPostChangesFromCRDTDoc(
+				doc,
+				editedRecord,
+				mockPostType
+			);
+
+			expect( changesWithDefinedDate ).not.toHaveProperty( 'date' );
 		} );
 
 		it( 'includes blocks in changes', () => {

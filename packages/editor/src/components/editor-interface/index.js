@@ -8,11 +8,12 @@ import clsx from 'clsx';
  */
 import { InterfaceSkeleton, ComplementaryArea } from '@wordpress/interface';
 import { useSelect } from '@wordpress/data';
-import { __, _x } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { BlockBreadcrumb, BlockToolbar } from '@wordpress/block-editor';
 import { useViewportMatch } from '@wordpress/compose';
 import { useState, useCallback } from '@wordpress/element';
+import { decodeEntities } from '@wordpress/html-entities';
 
 /**
  * Internal dependencies
@@ -60,7 +61,7 @@ export default function EditorInterface( {
 		isDistractionFree,
 		isPreviewMode,
 		showBlockBreadcrumbs,
-		documentLabel,
+		postTypeLabel,
 		stylesPath,
 		showStylebook,
 	} = useSelect( ( select ) => {
@@ -70,7 +71,6 @@ export default function EditorInterface( {
 			select( editorStore )
 		);
 		const editorSettings = getEditorSettings();
-		const postTypeLabel = getPostTypeLabel();
 
 		let _mode = select( editorStore ).getEditorMode();
 		if ( ! editorSettings.richEditingEnabled && _mode === 'visual' ) {
@@ -87,9 +87,7 @@ export default function EditorInterface( {
 			isDistractionFree: get( 'core', 'distractionFree' ),
 			isPreviewMode: editorSettings.isPreviewMode,
 			showBlockBreadcrumbs: get( 'core', 'showBlockBreadcrumbs' ),
-			documentLabel:
-				// translators: Default label for the Document in the Block Breadcrumb.
-				postTypeLabel || _x( 'Document', 'noun, breadcrumb' ),
+			postTypeLabel: getPostTypeLabel(),
 			stylesPath: getStylesPath(),
 			showStylebook: getShowStylebook(),
 		};
@@ -192,7 +190,13 @@ export default function EditorInterface( {
 				isLargeViewport &&
 				showBlockBreadcrumbs &&
 				mode === 'visual' && (
-					<BlockBreadcrumb rootLabelText={ documentLabel } />
+					<BlockBreadcrumb
+						rootLabelText={
+							postTypeLabel
+								? decodeEntities( postTypeLabel )
+								: undefined
+						}
+					/>
 				)
 			}
 			actions={

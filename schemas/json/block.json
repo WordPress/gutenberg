@@ -323,6 +323,11 @@
 							"type": "boolean",
 							"default": false
 						},
+						"height": {
+							"description": "Allow blocks to define a height value.",
+							"type": "boolean",
+							"default": false
+						},
 						"minHeight": {
 							"description": "Allow blocks to define a minimum height value.",
 							"type": "boolean",
@@ -374,6 +379,11 @@
 				},
 				"renaming": {
 					"description": "By default, a block can be renamed by a user from the block 'Options' dropdown or the 'Advanced' panel. To disable this behavior, set renaming to false.",
+					"type": "boolean",
+					"default": true
+				},
+				"visibility": {
+					"description": "By default, a block can be hidden by a user from the block 'Options' dropdown. To disable this behavior, set visibility to false.",
 					"type": "boolean",
 					"default": true
 				},
@@ -712,6 +722,7 @@
 							"properties": {
 								"root": { "type": "string" },
 								"aspectRatio": { "type": "string" },
+								"height": { "type": "string" },
 								"minHeight": { "type": "string" },
 								"width": { "type": "string" }
 							}

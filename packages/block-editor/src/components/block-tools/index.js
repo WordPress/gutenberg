@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import clsx from 'clsx';
+
+/**
  * WordPress dependencies
  */
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -262,7 +267,15 @@ export default function BlockTools( {
 
 	return (
 		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
-		<div { ...props } onKeyDown={ onKeyDown }>
+		<div
+			{ ...props }
+			onKeyDown={ onKeyDown }
+			// Popover slots cannot be unmounted during dragging because the
+			// will just be rendered in a fallback popover slot instead.
+			className={ clsx( props.className, {
+				'block-editor-block-tools--is-dragging': isDragging,
+			} ) }
+		>
 			<InsertionPointOpenRef.Provider value={ useRef( false ) }>
 				{ ! isTyping && ! isZoomOutMode && (
 					<InsertionPoint

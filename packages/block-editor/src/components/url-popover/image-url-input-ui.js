@@ -228,14 +228,12 @@ const ImageURLInputUI = ( {
 	const advancedOptions = (
 		<VStack spacing="3">
 			<ToggleControl
-				__nextHasNoMarginBottom
 				label={ __( 'Open in new tab' ) }
 				onChange={ onSetNewTab }
 				checked={ linkTarget === '_blank' }
 			/>
 			<TextControl
 				__next40pxDefaultSize
-				__nextHasNoMarginBottom
 				label={ __( 'Link relation' ) }
 				value={ rel ?? '' }
 				onChange={ onSetLinkRel }
@@ -252,7 +250,6 @@ const ImageURLInputUI = ( {
 			/>
 			<TextControl
 				__next40pxDefaultSize
-				__nextHasNoMarginBottom
 				label={ __( 'Link CSS class' ) }
 				value={ linkClass || '' }
 				onChange={ onSetLinkClass }

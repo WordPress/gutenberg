@@ -52,7 +52,7 @@ export const settings = {
 	transforms,
 };
 
-if ( window.__experimentalContentOnlyPatternInsertion ) {
+if ( window.__experimentalContentOnlyInspectorFields ) {
 	settings[ fieldsKey ] = [
 		{
 			id: 'label',
@@ -71,7 +71,7 @@ if ( window.__experimentalContentOnlyPatternInsertion ) {
 		},
 	];
 	settings[ formKey ] = {
-		fields: [ 'label' ],
+		fields: [ 'label', 'link' ],
 	};
 }
 

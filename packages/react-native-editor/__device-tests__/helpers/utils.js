@@ -1,15 +1,9 @@
-/**
- * External dependencies
- */
-const childProcess = require( 'child_process' );
-// eslint-disable-next-line import/no-extraneous-dependencies
 import { remote, Key } from 'webdriverio';
+import { getAndroidEmulatorID } from './get-android-emulator-id';
 
+const childProcess = require( 'child_process' );
 const crypto = require( 'crypto' );
 const path = require( 'path' );
-/**
- * Internal dependencies
- */
 const serverConfigs = require( './serverConfigs' );
 const {
 	iosServer,
@@ -19,7 +13,6 @@ const {
 	prefixKeysWithAppium,
 } = require( './caps' );
 const AppiumLocal = require( './appium-local' );
-import { getAndroidEmulatorID } from './get-android-emulator-id';
 
 // Platform setup.
 const defaultPlatform = 'android';

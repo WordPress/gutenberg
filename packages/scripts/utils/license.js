@@ -319,7 +319,11 @@ function checkDeps( deps, options ) {
 			continue;
 		}
 
-		if ( Object.keys( dep ).length === 0 ) {
+		// Don't check for licenses if the package entry is invalid. This can
+		// happen if an incomplete package directory exists in node_modules.
+		// Historically this could happen due to buggy behavior of Windows
+		// environments in handling optional dependenciess
+		if ( ! dep.name || Object.keys( dep ).length === 0 ) {
 			continue;
 		}
 

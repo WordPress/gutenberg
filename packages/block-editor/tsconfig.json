@@ -23,6 +23,7 @@
 		{ "path": "../html-entities" },
 		{ "path": "../i18n" },
 		{ "path": "../icons" },
+		{ "path": "../image-cropper" },
 		{ "path": "../interactivity" },
 		{ "path": "../is-shallow-equal" },
 		{ "path": "../keycodes" },

@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { memo, useContext, useRef } from '@wordpress/element';
-import { __experimentalHStack as HStack } from '@wordpress/components';
+import { Stack } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -59,14 +59,16 @@ function Filters( { className }: { className?: string } ) {
 	);
 
 	return (
-		<HStack
+		<Stack
+			direction="row"
 			justify="flex-start"
+			gap="xs"
 			style={ { width: 'fit-content' } }
-			wrap
+			wrap="wrap"
 			className={ className }
 		>
 			{ filterComponents }
-		</HStack>
+		</Stack>
 	);
 }
 

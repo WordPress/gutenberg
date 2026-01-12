@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryFn } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react-webpack5';
 
 /**
  * Internal dependencies
@@ -13,7 +13,6 @@ type ItemProps = React.ComponentPropsWithoutRef< typeof Item >;
 
 const meta: Meta< typeof ItemGroup > = {
 	component: ItemGroup,
-	// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 	subcomponents: { Item },
 	title: 'Components/ItemGroup',
 	argTypes: {

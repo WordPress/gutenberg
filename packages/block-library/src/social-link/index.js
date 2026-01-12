@@ -26,7 +26,7 @@ export const settings = {
 	variations,
 };
 
-if ( window.__experimentalContentOnlyPatternInsertion ) {
+if ( window.__experimentalContentOnlyInspectorFields ) {
 	settings[ fieldsKey ] = [
 		{
 			id: 'link',
@@ -44,7 +44,7 @@ if ( window.__experimentalContentOnlyPatternInsertion ) {
 		},
 	];
 	settings[ formKey ] = {
-		fields: [ 'link' ],
+		fields: [ 'link', 'label' ],
 	};
 }
 

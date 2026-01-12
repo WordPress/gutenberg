@@ -442,11 +442,11 @@ getDerivedStateFromError is used to render a fallback UI after an error has been
 
 ### getTemplatePartIcon
 
-Helper function to retrieve the corresponding icon by name.
+Helper function to retrieve the corresponding icon by area name or icon name.
 
 _Parameters_
 
--   _iconName_ `string`: The name of the icon.
+-   _areaOrIconName_ `string`: The area name (e.g., 'header', 'navigation-overlay') or icon name (e.g., 'menu').
 
 _Returns_
 
@@ -1386,7 +1386,6 @@ _Parameters_
 
 -   _props_ `Object`: The component props.
 -   _props.slug_ `string`: The slug of the taxonomy.
--   _props.\_\_nextHasNoMarginBottom_ `boolean`: Start opting into the new margin-free styles that will become the default in a future version, currently scheduled to be WordPress 7.0. (The prop can be safely removed once this happens.)
 
 _Returns_
 

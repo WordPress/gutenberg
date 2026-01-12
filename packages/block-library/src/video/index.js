@@ -37,7 +37,7 @@ export const settings = {
 	save,
 };
 
-if ( window.__experimentalContentOnlyPatternInsertion ) {
+if ( window.__experimentalContentOnlyInspectorFields ) {
 	settings[ fieldsKey ] = [
 		{
 			id: 'video',
@@ -61,7 +61,7 @@ if ( window.__experimentalContentOnlyPatternInsertion ) {
 		},
 	];
 	settings[ formKey ] = {
-		fields: [ 'video' ],
+		fields: [ 'video', 'caption' ],
 	};
 }
 

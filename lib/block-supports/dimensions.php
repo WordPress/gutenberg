@@ -57,7 +57,7 @@ function gutenberg_apply_dimensions_support( $block_type, $block_attributes ) {
 	}
 
 	$dimensions_block_styles = array();
-	$supported_features      = array( 'minHeight', 'width' );
+	$supported_features      = array( 'minHeight', 'height', 'width' );
 
 	foreach ( $supported_features as $feature ) {
 		$has_support        = block_has_support( $block_type, array( 'dimensions', $feature ), false );
@@ -103,14 +103,17 @@ function gutenberg_render_dimensions_support( $block_content, $block ) {
 	$dimensions_block_styles                = array();
 	$dimensions_block_styles['aspectRatio'] = $block_attributes['style']['dimensions']['aspectRatio'] ?? null;
 
-	// To ensure the aspect ratio does not get overridden by `minHeight` unset any existing rule.
+	// To ensure the aspect ratio does not get overridden by `minHeight` or `height` unset any existing rule.
 	if (
 		isset( $dimensions_block_styles['aspectRatio'] )
 	) {
 		$dimensions_block_styles['minHeight'] = 'unset';
+		$dimensions_block_styles['height']    = 'unset';
 	} elseif (
 		isset( $block_attributes['style']['dimensions']['minHeight'] ) ||
-		isset( $block_attributes['minHeight'] )
+		isset( $block_attributes['minHeight'] ) ||
+		isset( $block_attributes['style']['dimensions']['height'] ) ||
+		isset( $block_attributes['height'] )
 	) {
 		$dimensions_block_styles['aspectRatio'] = 'unset';
 	}

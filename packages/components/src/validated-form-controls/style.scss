@@ -4,14 +4,14 @@
 
 .components-validated-control {
 	// For components based on InputBase
-	&:has(:is(input, select):user-invalid)
+	&:has(:is(input, select):invalid[data-validity-visible])
 	.components-input-control__backdrop {
 		--wp-components-color-accent: #{$alert-red};
 		border-color: $alert-red;
 	}
 
 	// For TextControl, TextareaControl
-	:is(textarea, input[type="text"]):user-invalid {
+	:is(textarea, input[type="text"]):invalid[data-validity-visible] {
 		--wp-admin-theme-color: #{$alert-red};
 		--wp-components-color-accent: #{$alert-red};
 		border-color: $alert-red;
@@ -19,9 +19,9 @@
 
 	// For ComboboxControl
 	.components-combobox-control__suggestions-container:has(
-	input:user-invalid
+	input:invalid[data-validity-visible]
 ):not(:has([aria-expanded="true"])) {
-		border-color: $alert-red;
+		--wp-components-color-accent: #{$alert-red};
 	}
 }
 
@@ -29,18 +29,18 @@
 	position: relative;
 
 	// For CustomSelectControl
-	&:has(select:user-invalid) .components-input-control__backdrop {
+	&:has(select:invalid[data-validity-visible]) .components-input-control__backdrop {
 		--wp-components-color-accent: #{$alert-red};
 		border-color: $alert-red;
 	}
 
 	// For ToggleGroupControl
-	&:has(input[type="radio"]:invalid) {
+	&:has(input[type="radio"]:invalid[data-validity-visible]) {
 		--wp-components-color-accent: #{$alert-red};
 	}
 
 	// For FormTokenField
-	&:has(input:user-invalid) .components-form-token-field__input-container:not(:has([aria-expanded="true"])) {
+	&:has(input:invalid[data-validity-visible]) .components-form-token-field__input-container:not(:has([aria-expanded="true"])) {
 		--wp-components-color-accent: #{$alert-red};
 		border-color: $alert-red;
 	}

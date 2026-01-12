@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/block-editor",
-	"version": "15.8.0",
+	"version": "15.10.0",
 	"description": "Generic block editor.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -23,12 +23,20 @@
 		"node": ">=18.12.0",
 		"npm": ">=8.19.2"
 	},
-	"main": "build/index.js",
-	"module": "build-module/index.js",
+	"files": [
+		"src",
+		"build",
+		"build-module",
+		"build-style",
+		"build-types",
+		"*.md"
+	],
+	"main": "build/index.cjs",
+	"module": "build-module/index.mjs",
 	"exports": {
 		".": {
-			"import": "./build-module/index.js",
-			"require": "./build/index.js"
+			"import": "./build-module/index.mjs",
+			"require": "./build/index.cjs"
 		},
 		"./package.json": "./package.json",
 		"./build-style/": "./build-style/"
@@ -36,7 +44,7 @@
 	"react-native": "src/index",
 	"wpScript": true,
 	"wpScriptModuleExports": {
-		"./utils/fit-text-frontend": "./build-module/utils/fit-text-frontend.js"
+		"./utils/fit-text-frontend": "./build-module/utils/fit-text-frontend.mjs"
 	},
 	"sideEffects": [
 		"build-style/**",
@@ -44,16 +52,14 @@
 		"src/index.js",
 		"src/store/index.js",
 		"src/hooks/**",
-		"build/index.js",
-		"build/store/index.js",
+		"build/index.cjs",
+		"build/store/index.cjs",
 		"build/hooks/**",
-		"build-module/index.js",
-		"build-module/store/index.js",
+		"build-module/index.mjs",
+		"build-module/store/index.mjs",
 		"build-module/hooks/**"
 	],
 	"dependencies": {
-		"@emotion/react": "^11.7.1",
-		"@emotion/styled": "^11.6.0",
 		"@react-spring/web": "^9.4.5",
 		"@wordpress/a11y": "file:../a11y",
 		"@wordpress/api-fetch": "file:../api-fetch",
@@ -76,6 +82,7 @@
 		"@wordpress/html-entities": "file:../html-entities",
 		"@wordpress/i18n": "file:../i18n",
 		"@wordpress/icons": "file:../icons",
+		"@wordpress/image-cropper": "file:../image-cropper",
 		"@wordpress/interactivity": "file:../interactivity",
 		"@wordpress/is-shallow-equal": "file:../is-shallow-equal",
 		"@wordpress/keyboard-shortcuts": "file:../keyboard-shortcuts",
@@ -105,6 +112,10 @@
 		"react-autosize-textarea": "^7.1.0",
 		"react-easy-crop": "^5.0.6",
 		"remove-accents": "^0.5.0"
+	},
+	"devDependencies": {
+		"@ariakit/test": "^0.4.7",
+		"deep-freeze": "0.0.1"
 	},
 	"peerDependencies": {
 		"react": "^18.0.0",

@@ -73,7 +73,6 @@ export default function QueryPaginationNumbersEdit( {
 					>
 						<RangeControl
 							__next40pxDefaultSize
-							__nextHasNoMarginBottom
 							label={ __( 'Number of links' ) }
 							help={ __(
 								'Specify how many links can appear before and after the current page number. Links to the first, current and last page are always visible.'

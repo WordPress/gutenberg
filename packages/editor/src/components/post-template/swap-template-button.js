@@ -82,7 +82,6 @@ function TemplatesList( { postType, onSelect } ) {
 	return (
 		<>
 			<SearchControl
-				__nextHasNoMarginBottom
 				onChange={ setSearchValue }
 				value={ searchValue }
 				label={ __( 'Search' ) }

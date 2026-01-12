@@ -25,3 +25,28 @@ src/
 
 -   The folder name should match the primary component name
 -   The `index.ts` file should contain only the public API exports for the component(s)
+
+## CSS Architecture
+
+### CSS Layers
+
+We use [CSS cascade layers](https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Styling_basics/Cascade_layers) to ensure an expected order of precedence in style resolution. All component stylesheets must follow this layering approach to maintain consistency and prevent specificity conflicts.
+
+Every component stylesheet must include the layer definition at the top and wrap all styles within the appropriate layer:
+
+```css
+@layer wp-ui-utilities, wp-ui-components, wp-ui-compositions, wp-ui-overrides;
+
+@layer wp-ui-components {
+	.stack {
+		display: flex;
+	}
+}
+```
+
+#### CSS Layer Hierarchy
+
+-   **`wp-ui-utilities`** - Shared utility styles (box-sizing, focus rings, resets) that apply before component styles
+-   **`wp-ui-components`** - Default styles for design system components (`.stack`, etc.)
+-   **`wp-ui-compositions`** - Internal compositions that extend base components
+-   **`wp-ui-overrides`** - Last-resort styles to override default rules

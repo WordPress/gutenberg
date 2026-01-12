@@ -3,6 +3,7 @@
  */
 import { createSelector, createRegistrySelector } from '@wordpress/data';
 import { addQueryArgs } from '@wordpress/url';
+import type { UndoManager } from '@wordpress/undo-manager';
 import deprecated from '@wordpress/deprecated';
 
 /**
@@ -15,6 +16,7 @@ import {
 	getQueriedTotalPages,
 } from './queried-data';
 import { DEFAULT_ENTITY_KEY } from './entities';
+import { getUndoManager } from './private-selectors';
 import {
 	getNormalizedCommaSeparable,
 	isRawAttribute,
@@ -23,7 +25,6 @@ import {
 	getUserPermissionCacheKey,
 } from './utils';
 import type * as ET from './entity-types';
-import type { UndoManager } from '@wordpress/undo-manager';
 import logEntityDeprecation from './utils/log-entity-deprecation';
 
 // This is an incomplete, high-level approximation of the State type.
@@ -608,6 +609,16 @@ export interface GetEntityRecords {
 		name: string,
 		query?: GetRecordsHttpQuery
 	) => EntityRecord[] | null;
+
+	PromiseCurriedSignature: <
+		EntityRecord extends
+			| ET.EntityRecord< any >
+			| Partial< ET.EntityRecord< any > >,
+	>(
+		kind: string,
+		name: string,
+		query?: GetRecordsHttpQuery
+	) => Promise< EntityRecord[] | null >;
 }
 
 /**
@@ -1127,7 +1138,7 @@ export function getRedoEdit( state: State ): Optional< any > {
  * @return Whether there is a previous edit or not.
  */
 export function hasUndo( state: State ): boolean {
-	return state.undoManager.hasUndo();
+	return getUndoManager( state ).hasUndo();
 }
 
 /**
@@ -1139,7 +1150,7 @@ export function hasUndo( state: State ): boolean {
  * @return Whether there is a next edit or not.
  */
 export function hasRedo( state: State ): boolean {
-	return state.undoManager.hasRedo();
+	return getUndoManager( state ).hasRedo();
 }
 
 /**

@@ -1,8 +1,8 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryFn } from '@storybook/react';
-import { fn } from '@storybook/test';
+import type { Meta, StoryFn } from '@storybook/react-webpack5';
+import { fn } from 'storybook/test';
 
 /**
  * WordPress dependencies
@@ -82,7 +82,6 @@ const Template: StoryFn< typeof ComboboxControl > = ( {
 export const Default = Template.bind( {} );
 Default.args = {
 	__next40pxDefaultSize: true,
-	__nextHasNoMarginBottom: true,
 	label: 'Select a country',
 	options: countryOptions,
 };

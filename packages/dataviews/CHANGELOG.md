@@ -2,6 +2,48 @@
 
 ## Unreleased
 
+### Code Quality
+
+- Replace HStack/VStack from `wordpress/components` by Stack from `wordpress/ui`. [#74174](https://github.com/WordPress/gutenberg/pull/74174)
+- DataViews: Remove extra wrapper for GridItem. [#73665](https://github.com/WordPress/gutenberg/pull/73665)
+- Field API: move validation to the field type. [#73642](https://github.com/WordPress/gutenberg/pull/73642)
+- Field API: move format logic to the field type. [#73922](https://github.com/WordPress/gutenberg/pull/73922)
+- Reorganize internal code. [#74188](https://github.com/WordPress/gutenberg/pull/74188)
+- Improve stories and tests. [#74192](https://github.com/WordPress/gutenberg/pull/74192)
+- Update DataForm stories. [#74196](https://github.com/WordPress/gutenberg/pull/74196)
+- Fix missing dependencies. [#74310](https://github.com/WordPress/gutenberg/pull/74310)
+- Add details layout to DataForm validation story. [#74445](https://github.com/WordPress/gutenberg/pull/74445)
+- Updated `fast-deep-equal` imports for compatibility with strict Node.js resolution ([#74530](https://github.com/WordPress/gutenberg/pull/74530))
+
+### Bug Fixes
+
+- Fix panel field width with empty value for top/none label positions.[#74264](https://github.com/WordPress/gutenberg/pull/74264)
+- Fix sticky footer in DataViews grid view. [#73661](https://github.com/WordPress/gutenberg/pull/73661)
+- DataViews: Apply primary style to first column if there is no title field. [#73729](https://github.com/WordPress/gutenberg/pull/73729)
+- DataViews: Combined field alignment in table layout. [#73908](https://github.com/WordPress/gutenberg/pull/73908)
+- DataViews: Fix table row multiselection in Firefox [#73945](https://github.com/WordPress/gutenberg/pull/73945)
+- DataViews: `filterSortAndPaginate()` will ignore sorting on non-sortable fields [#73950](https://github.com/WordPress/gutenberg/pull/73950)
+- DataViews: Fix locked fields order when toggling visibility in properties section. [#74326](https://github.com/WordPress/gutenberg/pull/74326)
+
+### Enhancements
+
+- DataViewsPicker: Ensure checkbox column in table picker layout is always `48px` wide. [#74181](https://github.com/WordPress/gutenberg/pull/74181)
+- DataViews: improve how hierarchy is displayed in table layout. [#74199](https://github.com/WordPress/gutenberg/pull/74199)
+- DataViews: Add `groupBy.showLabel` config option to control whether the field label is shown in group headers. [#74161](https://github.com/WordPress/gutenberg/pull/74161)
+- DataViews table layout: remove row click-to-select behavior and hover styles. Selection is now only possible via checkboxes, or by ctrl/cmd clicking. [#73873](https://github.com/WordPress/gutenberg/pull/73873)
+- Better labels for operators and deprecate the `isNotAll` operator. [#73671](https://github.com/WordPress/gutenberg/pull/73671)
+- DataForm: add support for `min`/`max` and `minLength`/`maxLength` validation for relevant controls. [#73465](https://github.com/WordPress/gutenberg/pull/73465)
+- Field API: display formats for `number` and `integer` types. [#73644](https://github.com/WordPress/gutenberg/pull/73644)
+- Field API: add display format for `datetime` type. [#73924](https://github.com/WordPress/gutenberg/pull/73924)
+- DataViews: Update padding to 24px for consistency. [#73334](https://github.com/WordPress/gutenberg/pull/73334)
+- DataViews: Simplify list layout field color styles. [#73884](https://github.com/WordPress/gutenberg/pull/73884)
+- DataViews: Add panel form layout validation. [#73700](https://github.com/WordPress/gutenberg/pull/73700)
+- Converted package to a compliant dual CJS/ESM module ([#73822](https://github.com/WordPress/gutenberg/pull/73822) and [#74348](https://github.com/WordPress/gutenberg/pull/74348))
+- Add density preference support to List view with compact, balanced (default), and comfortable options. ([#71050](https://github.com/WordPress/gutenberg/pull/71050))
+
+
+## 11.0.0 (2025-11-26)
+
 ### Enhancements
 
 - Simplify field normalization and types. [#73387](https://github.com/WordPress/gutenberg/pull/73387)
@@ -11,11 +53,14 @@
 - DataViews table layout: only apply hover styles when bulk actions are available. [#73248](https://github.com/WordPress/gutenberg/pull/73248)
 - DataViews: add support for activity layout. [#72780](https://github.com/WordPress/gutenberg/pull/72780)
 - DataViews: Add grid keyboard navigation. [#72997](https://github.com/WordPress/gutenberg/pull/72997)
+- DataViews: Introduce CSS var to enable users to apply a different background color to DataViews containers. [#73390](https://github.com/WordPress/gutenberg/pull/73390)
 - Field API: introduce the `format` prop to format the `date` field type. [#72999](https://github.com/WordPress/gutenberg/pull/72999)
+- Field API: fix display format for date. [#73538](https://github.com/WordPress/gutenberg/pull/73538)
 - Documentation: improve Edit component. [#73202](https://github.com/WordPress/gutenberg/pull/73202)
 - Documentation: surface better the `type` property in the documentation. [#73349](https://github.com/WordPress/gutenberg/pull/73349)
 - Documentation: improve DataView's `layout` prop. [#73470](https://github.com/WordPress/gutenberg/pull/73470)
 - Documentation: document `readOnly`, `description`, and `placeholder` properties. [#73515](https://github.com/WordPress/gutenberg/pull/73515)
+- Documentation: add missing props in DataViews. [#73611](https://github.com/WordPress/gutenberg/pull/73611)
 - DataForm Panel Layout: Focus the first input element when the panel opens. [#72322](https://github.com/WordPress/gutenberg/pull/72322)
 - DataForm: Pattern validation is now supported on all fields that browsers support it in. [#73156](https://github.com/WordPress/gutenberg/pull/73156)
 - Documentation: improve operators docs. [#73523](https://github.com/WordPress/gutenberg/pull/73523)
@@ -30,6 +75,7 @@
 ### Breaking changes
 
 - DataViews: rename `groupByField` to `groupBy.field` to allow control over both the field and the direction of the grouping. [#72780](https://github.com/WordPress/gutenberg/pull/72780)
+- Types: FieldType is now FieldTypeName. [#73546](https://github.com/WordPress/gutenberg/pull/73546)
 
 ## 10.3.0 (2025-11-12)
 

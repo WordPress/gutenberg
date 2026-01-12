@@ -36,7 +36,7 @@ export const settings = {
 	save,
 };
 
-if ( window.__experimentalContentOnlyPatternInsertion ) {
+if ( window.__experimentalContentOnlyInspectorFields ) {
 	settings[ fieldsKey ] = [
 		{
 			id: 'audio',
@@ -58,7 +58,7 @@ if ( window.__experimentalContentOnlyPatternInsertion ) {
 		},
 	];
 	settings[ formKey ] = {
-		fields: [ 'audio' ],
+		fields: [ 'audio', 'caption' ],
 	};
 }
 

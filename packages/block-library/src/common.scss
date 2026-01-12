@@ -128,12 +128,14 @@ html :where([style*="border-top-color"]) {
 	border-top-style: solid;
 }
 html :where([style*="border-right-color"]) {
+	/*rtl:ignore*/
 	border-right-style: solid;
 }
 html :where([style*="border-bottom-color"]) {
 	border-bottom-style: solid;
 }
 html :where([style*="border-left-color"]) {
+	/*rtl:ignore*/
 	border-left-style: solid;
 }
 
@@ -144,12 +146,14 @@ html :where([style*="border-top-width"]) {
 	border-top-style: solid;
 }
 html :where([style*="border-right-width"]) {
+	/*rtl:ignore*/
 	border-right-style: solid;
 }
 html :where([style*="border-bottom-width"]) {
 	border-bottom-style: solid;
 }
 html :where([style*="border-left-width"]) {
+	/*rtl:ignore*/
 	border-left-style: solid;
 }
 

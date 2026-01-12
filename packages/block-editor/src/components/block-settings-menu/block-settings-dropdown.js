@@ -77,7 +77,6 @@ export function BlockSettingsDropdown( {
 	...props
 } ) {
 	// Get the client id of the current block for this menu, if one is set.
-	const currentClientId = block?.clientId;
 	const count = clientIds.length;
 	const firstBlockClientId = clientIds[ 0 ];
 
@@ -86,7 +85,6 @@ export function BlockSettingsDropdown( {
 		parentBlockType,
 		previousBlockClientId,
 		selectedBlockClientIds,
-		openedBlockSettingsMenu,
 		isContentOnly,
 		isZoomOut,
 	} = useSelect(
@@ -97,7 +95,6 @@ export function BlockSettingsDropdown( {
 				getPreviousBlockClientId,
 				getSelectedBlockClientIds,
 				getBlockAttributes,
-				getOpenedBlockSettingsMenu,
 				getBlockEditingMode,
 				isZoomOut: _isZoomOut,
 			} = unlock( select( blockEditorStore ) );
@@ -121,7 +118,6 @@ export function BlockSettingsDropdown( {
 				previousBlockClientId:
 					getPreviousBlockClientId( firstBlockClientId ),
 				selectedBlockClientIds: getSelectedBlockClientIds(),
-				openedBlockSettingsMenu: getOpenedBlockSettingsMenu(),
 				isContentOnly:
 					getBlockEditingMode( firstBlockClientId ) === 'contentOnly',
 				isZoomOut: _isZoomOut(),
@@ -132,10 +128,6 @@ export function BlockSettingsDropdown( {
 
 	const { getBlockOrder, getSelectedBlockClientIds } =
 		useSelect( blockEditorStore );
-
-	const { setOpenedBlockSettingsMenu } = unlock(
-		useDispatch( blockEditorStore )
-	);
 
 	const shortcuts = useSelect( ( select ) => {
 		const { getShortcutRepresentation } = select( keyboardShortcutsStore );
@@ -191,29 +183,6 @@ export function BlockSettingsDropdown( {
 	const parentBlockIsSelected =
 		selectedBlockClientIds?.includes( firstParentClientId );
 
-	// When a currentClientId is in use, treat the menu as a controlled component.
-	// This ensures that only one block settings menu is open at a time.
-	// This is a temporary solution to work around an issue with `onFocusOutside`
-	// where it does not allow a dropdown to be closed if focus was never within
-	// the dropdown to begin with. Examples include a user either CMD+Clicking or
-	// right clicking into an inactive window.
-	// See: https://github.com/WordPress/gutenberg/pull/54083
-	const open = ! currentClientId
-		? undefined
-		: openedBlockSettingsMenu === currentClientId || false;
-
-	function onToggle( localOpen ) {
-		if ( localOpen && openedBlockSettingsMenu !== currentClientId ) {
-			setOpenedBlockSettingsMenu( currentClientId );
-		} else if (
-			! localOpen &&
-			openedBlockSettingsMenu &&
-			openedBlockSettingsMenu === currentClientId
-		) {
-			setOpenedBlockSettingsMenu( undefined );
-		}
-	}
-
 	const shouldShowBlockParentMenuItem =
 		! parentBlockIsSelected && !! firstParentClientId;
 
@@ -254,8 +223,6 @@ export function BlockSettingsDropdown( {
 						label={ __( 'Options' ) }
 						className="block-editor-block-settings-menu"
 						popoverProps={ POPOVER_PROPS }
-						open={ open }
-						onToggle={ onToggle }
 						noIcons
 						{ ...props }
 					>

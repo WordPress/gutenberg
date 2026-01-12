@@ -127,6 +127,9 @@ if ( ! function_exists( '{{PAGE_SLUG_UNDERSCORE}}_render_page' ) ) {
 	 * Call this function from add_menu_page or add_submenu_page.
 	 */
 	function {{PAGE_SLUG_UNDERSCORE}}_render_page() {
+		// Load build constants
+		$build_constants = require __DIR__ . '/../../constants.php';
+
 		// Set current screen
 		set_current_screen();
 
@@ -144,6 +147,11 @@ if ( ! function_exists( '{{PAGE_SLUG_UNDERSCORE}}_render_page' ) ) {
 		// Fire init action for extensions to register routes and menu items
 		do_action( '{{PAGE_SLUG}}_init' );
 
+		// Enqueue command palette assets for boot-based pages
+		if ( function_exists( 'wp_enqueue_command_palette_assets' ) ) {
+			wp_enqueue_command_palette_assets();
+		}
+
 		// Preload REST API data
 		{{PAGE_SLUG_UNDERSCORE}}_preload_data();
 
@@ -152,7 +160,7 @@ if ( ! function_exists( '{{PAGE_SLUG_UNDERSCORE}}_render_page' ) ) {
 		$routes = get_{{PAGE_SLUG_UNDERSCORE}}_routes();
 
 		// Get boot module asset file for dependencies
-		$asset_file = plugin_dir_path( __FILE__ ) . '../../modules/boot/index.min.asset.php';
+		$asset_file = __DIR__ . '/../../modules/boot/index.min.asset.php';
 		if ( file_exists( $asset_file ) ) {
 			$asset = require $asset_file;
 
@@ -166,11 +174,12 @@ if ( ! function_exists( '{{PAGE_SLUG_UNDERSCORE}}_render_page' ) ) {
 			wp_add_inline_script(
 				'{{PAGE_SLUG}}-prerequisites',
 				sprintf(
-					'import("@wordpress/boot").then(mod => mod.init({mountId: "%s", menuItems: %s, routes: %s, initModules: %s}));',
+					'import("@wordpress/boot").then(mod => mod.init({mountId: "%s", menuItems: %s, routes: %s, initModules: %s, dashboardLink: "%s"}));',
 					'{{PAGE_SLUG}}-app',
 					wp_json_encode( $menu_items, JSON_HEX_TAG | JSON_UNESCAPED_SLASHES ),
 					wp_json_encode( $routes, JSON_HEX_TAG | JSON_UNESCAPED_SLASHES ),
-					wp_json_encode( $init_modules, JSON_HEX_TAG | JSON_UNESCAPED_SLASHES )
+					wp_json_encode( $init_modules, JSON_HEX_TAG | JSON_UNESCAPED_SLASHES ),
+					esc_url( admin_url( '/' ) )
 				)
 			);
 
@@ -213,7 +222,7 @@ if ( ! function_exists( '{{PAGE_SLUG_UNDERSCORE}}_render_page' ) ) {
 			// Dummy script module to ensure dependencies are loaded
 			wp_register_script_module(
 				'{{PAGE_SLUG}}',
-				plugin_dir_url( __FILE__ ) . 'loader.js',
+				$build_constants['build_url'] . 'pages/{{PAGE_SLUG}}/loader.js',
 				$boot_dependencies
 			);
 

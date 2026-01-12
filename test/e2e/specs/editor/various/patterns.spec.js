@@ -619,7 +619,7 @@ test.describe( 'Synced pattern', () => {
 		await expect(
 			page
 				.getByRole( 'region', { name: 'Editor settings' } )
-				.getByRole( 'button', { name: 'Styles', exact: true } )
+				.getByRole( 'heading', { name: 'Styles', exact: true } )
 		).toBeVisible();
 
 		await editor.clickBlockOptionsMenuItem( 'Create pattern' );

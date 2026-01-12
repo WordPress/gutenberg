@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/icons",
-	"version": "11.2.0",
+	"version": "11.4.0",
 	"description": "WordPress Icons package, based on dashicon.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -23,13 +23,20 @@
 		"node": ">=18.12.0",
 		"npm": ">=8.19.2"
 	},
-	"main": "build/index.js",
-	"module": "build-module/index.js",
+	"files": [
+		"src",
+		"build",
+		"build-module",
+		"build-types",
+		"*.md"
+	],
+	"main": "build/index.cjs",
+	"module": "build-module/index.mjs",
 	"exports": {
 		".": {
 			"types": "./build-types/index.d.ts",
-			"import": "./build-module/index.js",
-			"require": "./build/index.js"
+			"import": "./build-module/index.mjs",
+			"require": "./build/index.cjs"
 		},
 		"./package.json": "./package.json"
 	},
@@ -49,6 +56,6 @@
 	"scripts": {
 		"prelint": "npm run build",
 		"prepare": "npm run build",
-		"build": "node lib/generate-library"
+		"build": "node lib/generate-library.cjs"
 	}
 }

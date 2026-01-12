@@ -59,8 +59,8 @@ export default function Edit( {
 		pageComments,
 	} = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
-		return getSettings().__experimentalDiscussionSettings;
-	} );
+		return getSettings().__experimentalDiscussionSettings ?? {};
+	}, [] );
 
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
@@ -141,7 +141,6 @@ export default function Edit( {
 					}
 				>
 					<ToggleControl
-						__nextHasNoMarginBottom
 						label={ __( 'Show post title' ) }
 						checked={ showPostTitle }
 						onChange={ ( value ) =>
@@ -158,7 +157,6 @@ export default function Edit( {
 					}
 				>
 					<ToggleControl
-						__nextHasNoMarginBottom
 						label={ __( 'Show comments count' ) }
 						checked={ showCommentsCount }
 						onChange={ ( value ) =>

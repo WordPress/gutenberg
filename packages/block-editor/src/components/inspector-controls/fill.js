@@ -18,11 +18,12 @@ import {
 } from '../block-edit/context';
 import groups from './groups';
 
-export default function InspectorControlsFill( {
+export function PrivateInspectorControlsFill( {
 	children,
 	group = 'default',
 	__experimentalGroup,
 	resetAllFilter,
+	forceDisplayControls,
 } ) {
 	if ( __experimentalGroup ) {
 		deprecated(
@@ -42,7 +43,7 @@ export default function InspectorControlsFill( {
 		warning( `Unknown InspectorControls group "${ group }" provided.` );
 		return null;
 	}
-	if ( ! context[ mayDisplayControlsKey ] ) {
+	if ( ! forceDisplayControls && ! context[ mayDisplayControlsKey ] ) {
 		return null;
 	}
 
@@ -60,6 +61,23 @@ export default function InspectorControlsFill( {
 				} }
 			</Fill>
 		</StyleProvider>
+	);
+}
+
+export default function InspectorControlsFill( {
+	children,
+	group = 'default',
+	__experimentalGroup,
+	resetAllFilter,
+} ) {
+	return (
+		<PrivateInspectorControlsFill
+			group={ group }
+			__experimentalGroup={ __experimentalGroup }
+			resetAllFilter={ resetAllFilter }
+		>
+			{ children }
+		</PrivateInspectorControlsFill>
 	);
 }
 

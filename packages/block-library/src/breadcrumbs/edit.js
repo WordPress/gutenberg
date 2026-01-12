@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
 import {
 	ToggleControl,
@@ -13,25 +13,28 @@ import {
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-import { useEffect, useState, RawHTML } from '@wordpress/element';
+import { useEffect, useState } from '@wordpress/element';
 import { useServerSideRender } from '@wordpress/server-side-render';
+import { useDisabled } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
+import HtmlRenderer from '../utils/html-renderer';
 
 const separatorDefaultValue = '/';
 
 export default function BreadcrumbEdit( {
 	attributes,
 	setAttributes,
+	name,
 	context: { postId, postType, templateSlug },
 } ) {
 	const {
 		separator,
-		showHomeLink,
-		showLastItem,
+		showHomeItem,
+		showCurrentItem,
 		prefersTaxonomy,
 		showOnHomePage,
 	} = attributes;
@@ -99,14 +102,16 @@ export default function BreadcrumbEdit( {
 		setInvalidationKey( ( c ) => c + 1 );
 	}, [ post ] );
 
-	const blockProps = useBlockProps();
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
-	const { content } = useServerSideRender( {
+	const { content, status, error } = useServerSideRender( {
 		attributes,
 		skipBlockSupportAttributes: true,
-		block: 'core/breadcrumbs',
+		block: name,
 		urlQueryArgs: { post_id: postId, invalidationKey },
 	} );
+
+	const disabledRef = useDisabled();
+	const blockProps = useBlockProps( { ref: disabledRef } );
 
 	if ( isLoading ) {
 		return (
@@ -143,7 +148,7 @@ export default function BreadcrumbEdit( {
 		( _showTerms && ! hasTermsAssigned );
 	if ( showPlaceholder ) {
 		const placeholderItems = [];
-		if ( showHomeLink ) {
+		if ( showHomeItem ) {
 			placeholderItems.push( __( 'Home' ) );
 		}
 		if ( templateSlug && ! postId ) {
@@ -154,12 +159,7 @@ export default function BreadcrumbEdit( {
 			placeholderItems.push( __( 'Ancestor' ), __( 'Parent' ) );
 		}
 		placeholder = (
-			<nav
-				style={ {
-					'--separator': `'${ separator }'`,
-				} }
-				inert="true"
-			>
+			<nav { ...blockProps }>
 				<ol>
 					{ placeholderItems.map( ( text, index ) => (
 						<li key={ index }>
@@ -168,7 +168,7 @@ export default function BreadcrumbEdit( {
 							</a>
 						</li>
 					) ) }
-					{ showLastItem && (
+					{ showCurrentItem && (
 						<li>
 							<span aria-current="page">{ __( 'Current' ) }</span>
 						</li>
@@ -185,48 +185,46 @@ export default function BreadcrumbEdit( {
 					resetAll={ () => {
 						setAttributes( {
 							separator: separatorDefaultValue,
-							showHomeLink: true,
-							showLastItem: true,
+							showHomeItem: true,
+							showCurrentItem: true,
 						} );
 					} }
 					dropdownMenuProps={ dropdownMenuProps }
 				>
 					<ToolsPanelItem
-						label={ __( 'Show home link' ) }
+						label={ __( 'Show home breadcrumb' ) }
 						isShownByDefault
-						hasValue={ () => ! showHomeLink }
+						hasValue={ () => ! showHomeItem }
 						onDeselect={ () =>
 							setAttributes( {
-								showHomeLink: true,
+								showHomeItem: true,
 							} )
 						}
 					>
 						<ToggleControl
-							__nextHasNoMarginBottom
-							label={ __( 'Show home link' ) }
+							label={ __( 'Show home breadcrumb' ) }
 							onChange={ ( value ) =>
-								setAttributes( { showHomeLink: value } )
+								setAttributes( { showHomeItem: value } )
 							}
-							checked={ showHomeLink }
+							checked={ showHomeItem }
 						/>
 					</ToolsPanelItem>
 					<ToolsPanelItem
-						label={ __( 'Show last item' ) }
+						label={ __( 'Show current breadcrumb' ) }
 						isShownByDefault
-						hasValue={ () => ! showLastItem }
+						hasValue={ () => ! showCurrentItem }
 						onDeselect={ () =>
 							setAttributes( {
-								showLastItem: true,
+								showCurrentItem: true,
 							} )
 						}
 					>
 						<ToggleControl
-							__nextHasNoMarginBottom
-							label={ __( 'Show last item' ) }
+							label={ __( 'Show current breadcrumb' ) }
 							onChange={ ( value ) =>
-								setAttributes( { showLastItem: value } )
+								setAttributes( { showCurrentItem: value } )
 							}
-							checked={ showLastItem }
+							checked={ showCurrentItem }
 						/>
 					</ToolsPanelItem>
 					<ToolsPanelItem
@@ -240,7 +238,6 @@ export default function BreadcrumbEdit( {
 						}
 					>
 						<TextControl
-							__nextHasNoMarginBottom
 							__next40pxDefaultSize
 							autoComplete="off"
 							label={ __( 'Separator' ) }
@@ -261,7 +258,6 @@ export default function BreadcrumbEdit( {
 			</InspectorControls>
 			<InspectorControls group="advanced">
 				<CheckboxControl
-					__nextHasNoMarginBottom
 					label={ __( 'Show on homepage' ) }
 					checked={ showOnHomePage }
 					onChange={ ( value ) =>
@@ -272,7 +268,6 @@ export default function BreadcrumbEdit( {
 					) }
 				/>
 				<CheckboxControl
-					__nextHasNoMarginBottom
 					label={ __( 'Prefer taxonomy terms' ) }
 					checked={ prefersTaxonomy }
 					onChange={ ( value ) =>
@@ -283,13 +278,26 @@ export default function BreadcrumbEdit( {
 					) }
 				/>
 			</InspectorControls>
-			<div { ...blockProps }>
-				{ showPlaceholder ? (
-					placeholder
-				) : (
-					<RawHTML inert="true">{ content }</RawHTML>
-				) }
-			</div>
+			{ status === 'loading' && (
+				<div { ...blockProps }>
+					<Spinner />
+				</div>
+			) }
+			{ status === 'error' && (
+				<div { ...blockProps }>
+					<p>
+						{ sprintf(
+							/* translators: %s: error message returned when rendering the block. */
+							__( 'Error: %s' ),
+							error
+						) }
+					</p>
+				</div>
+			) }
+			{ showPlaceholder && placeholder }
+			{ ! showPlaceholder && status === 'success' && (
+				<HtmlRenderer wrapperProps={ blockProps } html={ content } />
+			) }
 		</>
 	);
 }

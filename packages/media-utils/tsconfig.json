@@ -15,6 +15,7 @@
 		{ "path": "../element" },
 		{ "path": "../i18n" },
 		{ "path": "../icons" },
+		{ "path": "../media-fields" },
 		{ "path": "../private-apis" }
 	]
 }

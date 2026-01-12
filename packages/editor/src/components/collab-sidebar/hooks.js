@@ -14,7 +14,6 @@ import { __ } from '@wordpress/i18n';
 import {
 	useEffect,
 	useMemo,
-	useRef,
 	useCallback,
 	useReducer,
 } from '@wordpress/element';
@@ -36,9 +35,7 @@ import { collabSidebarName } from './constants';
 import { unlock } from '../../lock-unlock';
 import { noop } from './utils';
 
-const { useBlockElementRef, cleanEmptyObject } = unlock(
-	blockEditorPrivateApis
-);
+const { useBlockElement, cleanEmptyObject } = unlock( blockEditorPrivateApis );
 
 export function useBlockComments( postId ) {
 	const [ commentLastUpdated, reflowComments ] = useReducer(
@@ -86,11 +83,17 @@ export function useBlockComments( postId ) {
 		const compare = {};
 		const result = [];
 
+		// Create a reverse map for faster lookup.
+		const commentIdToBlockClientId = Object.keys(
+			blocksWithComments
+		).reduce( ( mapping, clientId ) => {
+			mapping[ blocksWithComments[ clientId ] ] = clientId;
+			return mapping;
+		}, {} );
+
 		// Initialize each object with an empty `reply` array and map blockClientId.
 		threads.forEach( ( item ) => {
-			const itemBlock = Object.keys( blocksWithComments ).find(
-				( key ) => blocksWithComments[ key ] === item.id
-			);
+			const itemBlock = commentIdToBlockClientId[ item.id ];
 
 			compare[ item.id ] = {
 				...item,
@@ -369,9 +372,7 @@ export function useFloatingThread( {
 	setBlockRef,
 	commentLastUpdated,
 } ) {
-	const blockRef = useRef();
-	useBlockElementRef( thread.blockClientId, blockRef );
-
+	const blockElement = useBlockElement( thread.blockClientId );
 	const updateHeight = useCallback(
 		( id, newHeight ) => {
 			setHeights( ( prev ) => {
@@ -397,17 +398,17 @@ export function useFloatingThread( {
 
 	// Store the block reference for each thread.
 	useEffect( () => {
-		if ( blockRef.current ) {
-			refs.setReference( blockRef.current );
+		if ( blockElement ) {
+			refs.setReference( blockElement );
 		}
-	}, [ blockRef, refs, commentLastUpdated ] );
+	}, [ blockElement, refs, commentLastUpdated ] );
 
 	// Track thread heights.
 	useEffect( () => {
 		if ( refs.floating?.current ) {
-			setBlockRef( thread.id, blockRef.current );
+			setBlockRef( thread.id, blockElement );
 		}
-	}, [ thread.id, refs.floating, setBlockRef ] );
+	}, [ blockElement, thread.id, refs.floating, setBlockRef ] );
 
 	// When the selected thread changes, update heights, triggering offset recalculation.
 	useEffect( () => {
@@ -424,7 +425,6 @@ export function useFloatingThread( {
 	] );
 
 	return {
-		blockRef,
 		y,
 		refs,
 	};

@@ -1,8 +1,8 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryFn } from '@storybook/react';
-import { fn } from '@storybook/test';
+import type { Meta, StoryFn } from '@storybook/react-webpack5';
+import { fn } from 'storybook/test';
 
 /**
  * WordPress dependencies
@@ -21,7 +21,6 @@ const meta: Meta< typeof Notice > = {
 	title: 'Components/Feedback/Notice',
 	id: 'components-notice',
 	component: Notice,
-	// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 	subcomponents: { NoticeList },
 	args: {
 		onDismiss: fn(),
@@ -89,7 +88,7 @@ WithActions.args = {
 };
 
 export const NoticeListSubcomponent: StoryFn< typeof NoticeList > = () => {
-	const exampleNotices = [
+	const exampleNotices: NoticeListProps[ 'notices' ] = [
 		{
 			id: 'second-notice',
 			content: 'second notice content',
@@ -97,6 +96,22 @@ export const NoticeListSubcomponent: StoryFn< typeof NoticeList > = () => {
 		{
 			id: 'first-notice',
 			content: 'first notice content',
+			actions: [
+				{
+					label: 'Click me!',
+					onClick: () => {},
+					variant: 'primary',
+				},
+				{
+					label: 'Or click me instead!',
+					onClick: () => {},
+				},
+				{
+					label: 'Or visit a link for more info',
+					url: 'https://wordpress.org',
+					variant: 'link',
+				},
+			],
 		},
 	];
 	const [ notices, setNotices ] = useState( exampleNotices );
@@ -125,3 +140,23 @@ export const NoticeListSubcomponent: StoryFn< typeof NoticeList > = () => {
 	);
 };
 NoticeListSubcomponent.storyName = 'NoticeList Subcomponent';
+
+/**
+ * Action buttons can be disabled.
+ */
+export const WithDisabledAction = Template.bind( {} );
+WithDisabledAction.args = {
+	...Default.args,
+	children: 'This notice has a disabled action.',
+	actions: [
+		{
+			label: 'Disabled action',
+			onClick: () => {},
+			disabled: true,
+		},
+		{
+			label: 'Enabled action',
+			onClick: () => {},
+		},
+	],
+};

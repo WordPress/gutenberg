@@ -9,7 +9,7 @@ import {
 	useSyncExternalStore,
 	useDebugValue,
 } from '@wordpress/element';
-import isShallowEqual from '@wordpress/is-shallow-equal';
+import { isShallowEqual } from '@wordpress/is-shallow-equal';
 
 /**
  * Internal dependencies

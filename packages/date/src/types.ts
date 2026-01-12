@@ -51,7 +51,7 @@ export type TimezoneConfig = {
 	/**
 	 * Offset setting.
 	 */
-	offset: string;
+	offset: number;
 
 	/**
 	 * Offset setting with decimals formatted to minutes.

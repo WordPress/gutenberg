@@ -36,7 +36,7 @@ export const settings = {
 	save,
 };
 
-if ( window.__experimentalContentOnlyPatternInsertion ) {
+if ( window.__experimentalContentOnlyInspectorFields ) {
 	settings[ fieldsKey ] = [
 		{
 			id: 'file',
@@ -63,7 +63,7 @@ if ( window.__experimentalContentOnlyPatternInsertion ) {
 		},
 	];
 	settings[ formKey ] = {
-		fields: [ 'file' ],
+		fields: [ 'file', 'fileName', 'downloadButtonText' ],
 	};
 }
 

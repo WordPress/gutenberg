@@ -325,6 +325,8 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 				// Clear any notices dependent on the post context.
 				removeNotice( 'template-activate-notice' );
 			}
+
+			return () => setEditedPost( null, null );
 		}, [ post.type, post.id, setEditedPost, removeNotice ] );
 
 		// Synchronize the editor settings as they change.

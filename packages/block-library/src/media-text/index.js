@@ -54,7 +54,7 @@ export const settings = {
 	deprecated,
 };
 
-if ( window.__experimentalContentOnlyPatternInsertion ) {
+if ( window.__experimentalContentOnlyInspectorFields ) {
 	settings[ fieldsKey ] = [
 		{
 			id: 'media',
@@ -83,7 +83,7 @@ if ( window.__experimentalContentOnlyPatternInsertion ) {
 		},
 	];
 	settings[ formKey ] = {
-		fields: [ 'media' ],
+		fields: [ 'media', 'link' ],
 	};
 }
 

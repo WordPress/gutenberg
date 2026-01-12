@@ -3,26 +3,17 @@
  */
 
 /**
- * WordPress dependencies
- */
-import { resolveSelect } from '@wordpress/data';
-
-/**
  * Internal dependencies
  */
 import {
-	receiveAbilities,
 	registerAbility,
 	unregisterAbility,
-	receiveCategories,
 	registerAbilityCategory,
 	unregisterAbilityCategory,
 } from '../actions';
 import {
-	RECEIVE_ABILITIES,
 	REGISTER_ABILITY,
 	UNREGISTER_ABILITY,
-	RECEIVE_CATEGORIES,
 	REGISTER_ABILITY_CATEGORY,
 	UNREGISTER_ABILITY_CATEGORY,
 } from '../constants';
@@ -32,52 +23,7 @@ import type {
 	AbilityCategoryArgs,
 } from '../../types';
 
-// Mock the WordPress data store
-jest.mock( '@wordpress/data', () => ( {
-	resolveSelect: jest.fn(),
-} ) );
-
 describe( 'Store Actions', () => {
-	describe( 'receiveAbilities', () => {
-		it( 'should create an action to receive abilities', () => {
-			const abilities: Ability[] = [
-				{
-					name: 'test/ability1',
-					label: 'Test Ability 1',
-					description: 'First test ability',
-					category: 'test-category',
-					input_schema: { type: 'object' },
-					output_schema: { type: 'object' },
-				},
-				{
-					name: 'test/ability2',
-					label: 'Test Ability 2',
-					description: 'Second test ability',
-					category: 'test-category',
-					input_schema: { type: 'object' },
-					output_schema: { type: 'object' },
-				},
-			];
-
-			const action = receiveAbilities( abilities );
-
-			expect( action ).toEqual( {
-				type: RECEIVE_ABILITIES,
-				abilities,
-			} );
-		} );
-
-		it( 'should handle empty abilities array', () => {
-			const abilities: Ability[] = [];
-			const action = receiveAbilities( abilities );
-
-			expect( action ).toEqual( {
-				type: RECEIVE_ABILITIES,
-				abilities: [],
-			} );
-		} );
-	} );
-
 	describe( 'registerAbility', () => {
 		let mockSelect: any;
 		let mockDispatch: jest.Mock;
@@ -119,16 +65,9 @@ describe( 'Store Actions', () => {
 				} ),
 			};
 			mockDispatch = jest.fn();
-
-			// Mock resolveSelect to return categories
-			( resolveSelect as jest.Mock ).mockReturnValue( {
-				getAbilityCategories: jest
-					.fn()
-					.mockResolvedValue( defaultCategories ),
-			} );
 		} );
 
-		it( 'should register a valid client ability', async () => {
+		it( 'should register a valid client ability', () => {
 			const ability: Ability = {
 				name: 'test/ability',
 				label: 'Test Ability',
@@ -150,15 +89,18 @@ describe( 'Store Actions', () => {
 			};
 
 			const action = registerAbility( ability );
-			await action( { select: mockSelect, dispatch: mockDispatch } );
+			action( { select: mockSelect, dispatch: mockDispatch } );
 
 			expect( mockDispatch ).toHaveBeenCalledWith( {
 				type: REGISTER_ABILITY,
-				ability,
+				ability: {
+					...ability,
+					meta: { annotations: { clientRegistered: true } },
+				},
 			} );
 		} );
 
-		it( 'should register server-side abilities', async () => {
+		it( 'should register server-side abilities', () => {
 			const ability: Ability = {
 				name: 'test/server-ability',
 				label: 'Server Ability',
@@ -169,15 +111,18 @@ describe( 'Store Actions', () => {
 			};
 
 			const action = registerAbility( ability );
-			await action( { select: mockSelect, dispatch: mockDispatch } );
+			action( { select: mockSelect, dispatch: mockDispatch } );
 
 			expect( mockDispatch ).toHaveBeenCalledWith( {
 				type: REGISTER_ABILITY,
-				ability,
+				ability: {
+					...ability,
+					meta: { annotations: { clientRegistered: true } },
+				},
 			} );
 		} );
 
-		it( 'should validate and reject ability without name', async () => {
+		it( 'should validate and reject ability without name', () => {
 			const ability: Ability = {
 				name: '',
 				label: 'Test Ability',
@@ -188,13 +133,13 @@ describe( 'Store Actions', () => {
 
 			const action = registerAbility( ability );
 
-			await expect(
+			expect( () =>
 				action( { select: mockSelect, dispatch: mockDispatch } )
-			).rejects.toThrow( 'Ability name is required' );
+			).toThrow( 'Ability name is required' );
 			expect( mockDispatch ).not.toHaveBeenCalled();
 		} );
 
-		it( 'should validate and reject ability with invalid name format', async () => {
+		it( 'should validate and reject ability with invalid name format', () => {
 			const testCases = [
 				'invalid', // No namespace
 				'my-plugin/feature/action', // Multiple slashes
@@ -215,9 +160,9 @@ describe( 'Store Actions', () => {
 
 				const action = registerAbility( ability );
 
-				await expect(
+				expect( () =>
 					action( { select: mockSelect, dispatch: mockDispatch } )
-				).rejects.toThrow(
+				).toThrow(
 					'Ability name must be a string containing a namespace prefix'
 				);
 				expect( mockDispatch ).not.toHaveBeenCalled();
@@ -225,7 +170,7 @@ describe( 'Store Actions', () => {
 			}
 		} );
 
-		it( 'should validate and reject ability without label', async () => {
+		it( 'should validate and reject ability without label', () => {
 			const ability: Ability = {
 				name: 'test/ability',
 				label: '',
@@ -236,13 +181,13 @@ describe( 'Store Actions', () => {
 
 			const action = registerAbility( ability );
 
-			await expect(
+			expect( () =>
 				action( { select: mockSelect, dispatch: mockDispatch } )
-			).rejects.toThrow( 'Ability "test/ability" must have a label' );
+			).toThrow( 'Ability "test/ability" must have a label' );
 			expect( mockDispatch ).not.toHaveBeenCalled();
 		} );
 
-		it( 'should validate and reject ability without description', async () => {
+		it( 'should validate and reject ability without description', () => {
 			const ability: Ability = {
 				name: 'test/ability',
 				label: 'Test Ability',
@@ -253,15 +198,13 @@ describe( 'Store Actions', () => {
 
 			const action = registerAbility( ability );
 
-			await expect(
+			expect( () =>
 				action( { select: mockSelect, dispatch: mockDispatch } )
-			).rejects.toThrow(
-				'Ability "test/ability" must have a description'
-			);
+			).toThrow( 'Ability "test/ability" must have a description' );
 			expect( mockDispatch ).not.toHaveBeenCalled();
 		} );
 
-		it( 'should validate and reject ability without category', async () => {
+		it( 'should validate and reject ability without category', () => {
 			const ability: Ability = {
 				name: 'test/ability',
 				label: 'Test Ability',
@@ -272,13 +215,13 @@ describe( 'Store Actions', () => {
 
 			const action = registerAbility( ability );
 
-			await expect(
+			expect( () =>
 				action( { select: mockSelect, dispatch: mockDispatch } )
-			).rejects.toThrow( 'Ability "test/ability" must have a category' );
+			).toThrow( 'Ability "test/ability" must have a category' );
 			expect( mockDispatch ).not.toHaveBeenCalled();
 		} );
 
-		it( 'should validate and reject ability with invalid category format', async () => {
+		it( 'should validate and reject ability with invalid category format', () => {
 			const testCases = [
 				'Data-Retrieval', // Uppercase letters
 				'data_retrieval', // Underscores not allowed
@@ -300,9 +243,9 @@ describe( 'Store Actions', () => {
 
 				const action = registerAbility( ability );
 
-				await expect(
+				expect( () =>
 					action( { select: mockSelect, dispatch: mockDispatch } )
-				).rejects.toThrow(
+				).toThrow(
 					'Ability "test/ability" has an invalid category. Category must be lowercase alphanumeric with dashes only'
 				);
 				expect( mockDispatch ).not.toHaveBeenCalled();
@@ -310,7 +253,7 @@ describe( 'Store Actions', () => {
 			}
 		} );
 
-		it( 'should accept ability with valid category format', async () => {
+		it( 'should accept ability with valid category format', () => {
 			const validCategories = [
 				'data-retrieval',
 				'user-management',
@@ -345,30 +288,28 @@ describe( 'Store Actions', () => {
 					},
 				];
 
-				// Mock both select and resolveSelect
+				// Mock select to return categories
 				mockSelect.getAbilityCategories.mockReturnValue(
 					categoriesForTest
 				);
-				( resolveSelect as jest.Mock ).mockReturnValue( {
-					getAbilityCategories: jest
-						.fn()
-						.mockResolvedValue( categoriesForTest ),
-				} );
 
 				mockSelect.getAbility.mockReturnValue( null );
 				mockDispatch.mockClear();
 
 				const action = registerAbility( ability );
-				await action( { select: mockSelect, dispatch: mockDispatch } );
+				action( { select: mockSelect, dispatch: mockDispatch } );
 
 				expect( mockDispatch ).toHaveBeenCalledWith( {
 					type: REGISTER_ABILITY,
-					ability,
+					ability: {
+						...ability,
+						meta: { annotations: { clientRegistered: true } },
+					},
 				} );
 			}
 		} );
 
-		it( 'should validate and reject ability with non-existent category', async () => {
+		it( 'should validate and reject ability with non-existent category', () => {
 			mockSelect.getAbilityCategories.mockReturnValue( [
 				{
 					slug: 'test-category',
@@ -392,15 +333,15 @@ describe( 'Store Actions', () => {
 
 			const action = registerAbility( ability );
 
-			await expect(
+			expect( () =>
 				action( { select: mockSelect, dispatch: mockDispatch } )
-			).rejects.toThrow(
+			).toThrow(
 				'Ability "test/ability" references non-existent category "non-existent-category". Please register the category first.'
 			);
 			expect( mockDispatch ).not.toHaveBeenCalled();
 		} );
 
-		it( 'should accept ability with existing category', async () => {
+		it( 'should accept ability with existing category', () => {
 			const categoriesForTest = [
 				{
 					slug: 'test-category',
@@ -417,11 +358,6 @@ describe( 'Store Actions', () => {
 			mockSelect.getAbilityCategories.mockReturnValue(
 				categoriesForTest
 			);
-			( resolveSelect as jest.Mock ).mockReturnValue( {
-				getAbilityCategories: jest
-					.fn()
-					.mockResolvedValue( categoriesForTest ),
-			} );
 
 			const ability: Ability = {
 				name: 'test/ability',
@@ -432,17 +368,18 @@ describe( 'Store Actions', () => {
 			};
 
 			const action = registerAbility( ability );
-			await action( { select: mockSelect, dispatch: mockDispatch } );
+			action( { select: mockSelect, dispatch: mockDispatch } );
 
-			// resolveSelect should have been called to load categories
-			expect( resolveSelect ).toHaveBeenCalledWith( 'core/abilities' );
 			expect( mockDispatch ).toHaveBeenCalledWith( {
 				type: REGISTER_ABILITY,
-				ability,
+				ability: {
+					...ability,
+					meta: { annotations: { clientRegistered: true } },
+				},
 			} );
 		} );
 
-		it( 'should validate and reject ability with invalid callback', async () => {
+		it( 'should validate and reject ability with invalid callback', () => {
 			const ability: Ability = {
 				name: 'test/ability',
 				label: 'Test Ability',
@@ -453,15 +390,15 @@ describe( 'Store Actions', () => {
 
 			const action = registerAbility( ability );
 
-			await expect(
+			expect( () =>
 				action( { select: mockSelect, dispatch: mockDispatch } )
-			).rejects.toThrow(
+			).toThrow(
 				'Ability "test/ability" has an invalid callback. Callback must be a function'
 			);
 			expect( mockDispatch ).not.toHaveBeenCalled();
 		} );
 
-		it( 'should validate and reject already registered ability', async () => {
+		it( 'should validate and reject already registered ability', () => {
 			const existingAbility: Ability = {
 				name: 'test/ability',
 				label: 'Existing Ability',
@@ -481,44 +418,10 @@ describe( 'Store Actions', () => {
 
 			const action = registerAbility( ability );
 
-			await expect(
+			expect( () =>
 				action( { select: mockSelect, dispatch: mockDispatch } )
-			).rejects.toThrow( 'Ability "test/ability" is already registered' );
+			).toThrow( 'Ability "test/ability" is already registered' );
 			expect( mockDispatch ).not.toHaveBeenCalled();
-		} );
-
-		it( 'should load categories using resolveSelect before validation', async () => {
-			const categories = [
-				{
-					slug: 'test-category',
-					label: 'Test Category',
-					description: 'Test category',
-				},
-			];
-
-			// Mock resolveSelect to return categories directly
-			( resolveSelect as jest.Mock ).mockReturnValue( {
-				getAbilityCategories: jest.fn().mockResolvedValue( categories ),
-			} );
-
-			const ability: Ability = {
-				name: 'test/ability',
-				label: 'Test Ability',
-				description: 'Test description',
-				category: 'test-category',
-				callback: jest.fn(),
-			};
-
-			const action = registerAbility( ability );
-			await action( { select: mockSelect, dispatch: mockDispatch } );
-
-			// Should have called resolveSelect to load categories
-			expect( resolveSelect ).toHaveBeenCalledWith( 'core/abilities' );
-			// Should have successfully registered
-			expect( mockDispatch ).toHaveBeenCalledWith( {
-				type: REGISTER_ABILITY,
-				ability,
-			} );
 		} );
 	} );
 
@@ -544,40 +447,6 @@ describe( 'Store Actions', () => {
 		} );
 	} );
 
-	describe( 'receiveCategories', () => {
-		it( 'should create an action to receive categories', () => {
-			const categories: AbilityCategory[] = [
-				{
-					slug: 'data-retrieval',
-					label: 'Data Retrieval',
-					description: 'Abilities that retrieve data',
-				},
-				{
-					slug: 'user-management',
-					label: 'User Management',
-					description: 'Abilities for managing users',
-				},
-			];
-
-			const action = receiveCategories( categories );
-
-			expect( action ).toEqual( {
-				type: RECEIVE_CATEGORIES,
-				categories,
-			} );
-		} );
-
-		it( 'should handle empty categories array', () => {
-			const categories: AbilityCategory[] = [];
-			const action = receiveCategories( categories );
-
-			expect( action ).toEqual( {
-				type: RECEIVE_CATEGORIES,
-				categories: [],
-			} );
-		} );
-	} );
-
 	describe( 'registerAbilityCategory', () => {
 		let mockSelect: any;
 		let mockDispatch: jest.Mock;
@@ -589,14 +458,9 @@ describe( 'Store Actions', () => {
 				getAbilityCategories: jest.fn().mockReturnValue( [] ),
 			};
 			mockDispatch = jest.fn();
-
-			// Mock resolveSelect to return a mock that resolves the getAbilityCategories call
-			( resolveSelect as jest.Mock ).mockReturnValue( {
-				getAbilityCategories: jest.fn().mockResolvedValue( undefined ),
-			} );
 		} );
 
-		it( 'should register a valid category', async () => {
+		it( 'should register a valid category', () => {
 			const slug = 'test-category';
 			const args: AbilityCategoryArgs = {
 				label: 'Test Category',
@@ -604,7 +468,7 @@ describe( 'Store Actions', () => {
 			};
 
 			const action = registerAbilityCategory( slug, args );
-			await action( { select: mockSelect, dispatch: mockDispatch } );
+			action( { select: mockSelect, dispatch: mockDispatch } );
 
 			expect( mockDispatch ).toHaveBeenCalledWith( {
 				type: REGISTER_ABILITY_CATEGORY,
@@ -612,24 +476,25 @@ describe( 'Store Actions', () => {
 					slug,
 					label: args.label,
 					description: args.description,
-					meta: {
-						_clientRegistered: true,
-					},
+					meta: { annotations: { clientRegistered: true } },
 				},
 			} );
 		} );
 
-		it( 'should register a category with meta', async () => {
+		it( 'should register a category with meta and filter to only annotations', () => {
 			const slug = 'test-category';
 			const args: AbilityCategoryArgs = {
 				label: 'Test Category',
 				description: 'A test category',
-				meta: { foo: 'bar', nested: { key: 'value' } },
+				meta: {
+					annotations: { serverRegistered: true },
+				},
 			};
 
 			const action = registerAbilityCategory( slug, args );
-			await action( { select: mockSelect, dispatch: mockDispatch } );
+			action( { select: mockSelect, dispatch: mockDispatch } );
 
+			// Should only keep annotations, not add clientRegistered since serverRegistered is true
 			expect( mockDispatch ).toHaveBeenCalledWith( {
 				type: REGISTER_ABILITY_CATEGORY,
 				category: {
@@ -637,14 +502,13 @@ describe( 'Store Actions', () => {
 					label: args.label,
 					description: args.description,
 					meta: {
-						...args.meta,
-						_clientRegistered: true,
+						annotations: { serverRegistered: true },
 					},
 				},
 			} );
 		} );
 
-		it( 'should validate and reject empty slug', async () => {
+		it( 'should validate and reject empty slug', () => {
 			const args: AbilityCategoryArgs = {
 				label: 'Test',
 				description: 'Test',
@@ -652,13 +516,13 @@ describe( 'Store Actions', () => {
 
 			const action = registerAbilityCategory( '', args );
 
-			await expect(
+			expect( () =>
 				action( { select: mockSelect, dispatch: mockDispatch } )
-			).rejects.toThrow( 'Category slug is required' );
+			).toThrow( 'Category slug is required' );
 			expect( mockDispatch ).not.toHaveBeenCalled();
 		} );
 
-		it( 'should validate and reject invalid slug formats', async () => {
+		it( 'should validate and reject invalid slug formats', () => {
 			const testCases = [
 				'Data-Retrieval', // Uppercase
 				'data_retrieval', // Underscores
@@ -679,9 +543,9 @@ describe( 'Store Actions', () => {
 			for ( const invalidSlug of testCases ) {
 				const action = registerAbilityCategory( invalidSlug, args );
 
-				await expect(
+				expect( () =>
 					action( { select: mockSelect, dispatch: mockDispatch } )
-				).rejects.toThrow(
+				).toThrow(
 					'Category slug must contain only lowercase alphanumeric characters and dashes'
 				);
 				expect( mockDispatch ).not.toHaveBeenCalled();
@@ -689,7 +553,7 @@ describe( 'Store Actions', () => {
 			}
 		} );
 
-		it( 'should accept valid slug formats', async () => {
+		it( 'should accept valid slug formats', () => {
 			const validSlugs = [
 				'data-retrieval',
 				'user-management',
@@ -710,7 +574,7 @@ describe( 'Store Actions', () => {
 				mockDispatch.mockClear();
 
 				const action = registerAbilityCategory( validSlug, args );
-				await action( { select: mockSelect, dispatch: mockDispatch } );
+				action( { select: mockSelect, dispatch: mockDispatch } );
 
 				expect( mockDispatch ).toHaveBeenCalledWith( {
 					type: REGISTER_ABILITY_CATEGORY,
@@ -718,15 +582,13 @@ describe( 'Store Actions', () => {
 						slug: validSlug,
 						label: args.label,
 						description: args.description,
-						meta: {
-							_clientRegistered: true,
-						},
+						meta: { annotations: { clientRegistered: true } },
 					},
 				} );
 			}
 		} );
 
-		it( 'should validate and reject missing label', async () => {
+		it( 'should validate and reject missing label', () => {
 			const slug = 'test-category';
 			const args = {
 				label: '',
@@ -735,15 +597,15 @@ describe( 'Store Actions', () => {
 
 			const action = registerAbilityCategory( slug, args );
 
-			await expect(
+			expect( () =>
 				action( { select: mockSelect, dispatch: mockDispatch } )
-			).rejects.toThrow(
+			).toThrow(
 				'The category properties must contain a `label` string.'
 			);
 			expect( mockDispatch ).not.toHaveBeenCalled();
 		} );
 
-		it( 'should validate and reject non-string label', async () => {
+		it( 'should validate and reject non-string label', () => {
 			const slug = 'test-category';
 			const args = {
 				label: 123 as any,
@@ -752,15 +614,15 @@ describe( 'Store Actions', () => {
 
 			const action = registerAbilityCategory( slug, args );
 
-			await expect(
+			expect( () =>
 				action( { select: mockSelect, dispatch: mockDispatch } )
-			).rejects.toThrow(
+			).toThrow(
 				'The category properties must contain a `label` string.'
 			);
 			expect( mockDispatch ).not.toHaveBeenCalled();
 		} );
 
-		it( 'should validate and reject missing description', async () => {
+		it( 'should validate and reject missing description', () => {
 			const slug = 'test-category';
 			const args = {
 				label: 'Test',
@@ -769,15 +631,15 @@ describe( 'Store Actions', () => {
 
 			const action = registerAbilityCategory( slug, args );
 
-			await expect(
+			expect( () =>
 				action( { select: mockSelect, dispatch: mockDispatch } )
-			).rejects.toThrow(
+			).toThrow(
 				'The category properties must contain a `description` string.'
 			);
 			expect( mockDispatch ).not.toHaveBeenCalled();
 		} );
 
-		it( 'should validate and reject non-string description', async () => {
+		it( 'should validate and reject non-string description', () => {
 			const slug = 'test-category';
 			const args = {
 				label: 'Test',
@@ -786,15 +648,15 @@ describe( 'Store Actions', () => {
 
 			const action = registerAbilityCategory( slug, args );
 
-			await expect(
+			expect( () =>
 				action( { select: mockSelect, dispatch: mockDispatch } )
-			).rejects.toThrow(
+			).toThrow(
 				'The category properties must contain a `description` string.'
 			);
 			expect( mockDispatch ).not.toHaveBeenCalled();
 		} );
 
-		it( 'should validate and reject non-object meta', async () => {
+		it( 'should validate and reject non-object meta', () => {
 			const slug = 'test-category';
 			const args = {
 				label: 'Test',
@@ -804,15 +666,15 @@ describe( 'Store Actions', () => {
 
 			const action = registerAbilityCategory( slug, args );
 
-			await expect(
+			expect( () =>
 				action( { select: mockSelect, dispatch: mockDispatch } )
-			).rejects.toThrow(
+			).toThrow(
 				'The category properties should provide a valid `meta` object.'
 			);
 			expect( mockDispatch ).not.toHaveBeenCalled();
 		} );
 
-		it( 'should validate and reject array as meta', async () => {
+		it( 'should validate and reject array as meta', () => {
 			const slug = 'test-category';
 			const args = {
 				label: 'Test',
@@ -822,15 +684,15 @@ describe( 'Store Actions', () => {
 
 			const action = registerAbilityCategory( slug, args );
 
-			await expect(
+			expect( () =>
 				action( { select: mockSelect, dispatch: mockDispatch } )
-			).rejects.toThrow(
+			).toThrow(
 				'The category properties should provide a valid `meta` object.'
 			);
 			expect( mockDispatch ).not.toHaveBeenCalled();
 		} );
 
-		it( 'should validate and reject already registered category', async () => {
+		it( 'should validate and reject already registered category', () => {
 			const existingCategory: AbilityCategory = {
 				slug: 'test-category',
 				label: 'Existing Category',
@@ -846,15 +708,13 @@ describe( 'Store Actions', () => {
 
 			const action = registerAbilityCategory( 'test-category', args );
 
-			await expect(
+			expect( () =>
 				action( { select: mockSelect, dispatch: mockDispatch } )
-			).rejects.toThrow(
-				'Category "test-category" is already registered.'
-			);
+			).toThrow( 'Category "test-category" is already registered.' );
 			expect( mockDispatch ).not.toHaveBeenCalled();
 		} );
 
-		it( 'should allow registering ability after registering category', async () => {
+		it( 'should allow registering ability after registering category', () => {
 			// First register a category
 			const categorySlug = 'new-category';
 			const categoryArgs: AbilityCategoryArgs = {
@@ -866,7 +726,7 @@ describe( 'Store Actions', () => {
 				categorySlug,
 				categoryArgs
 			);
-			await categoryAction( {
+			categoryAction( {
 				select: mockSelect,
 				dispatch: mockDispatch,
 			} );
@@ -878,9 +738,7 @@ describe( 'Store Actions', () => {
 					slug: categorySlug,
 					label: categoryArgs.label,
 					description: categoryArgs.description,
-					meta: {
-						_clientRegistered: true,
-					},
+					meta: { annotations: { clientRegistered: true } },
 				},
 			} );
 
@@ -895,11 +753,6 @@ describe( 'Store Actions', () => {
 			mockSelect.getAbilityCategories = jest
 				.fn()
 				.mockReturnValue( categoriesWithNew );
-			( resolveSelect as jest.Mock ).mockReturnValue( {
-				getAbilityCategories: jest
-					.fn()
-					.mockResolvedValue( categoriesWithNew ),
-			} );
 			mockSelect.getAbility = jest.fn().mockReturnValue( null );
 			mockDispatch.mockClear();
 
@@ -913,7 +766,7 @@ describe( 'Store Actions', () => {
 			};
 
 			const abilityAction = registerAbility( ability );
-			await abilityAction( {
+			abilityAction( {
 				select: mockSelect,
 				dispatch: mockDispatch,
 			} );
@@ -921,7 +774,10 @@ describe( 'Store Actions', () => {
 			// Should successfully register with the new category
 			expect( mockDispatch ).toHaveBeenCalledWith( {
 				type: REGISTER_ABILITY,
-				ability,
+				ability: {
+					...ability,
+					meta: { annotations: { clientRegistered: true } },
+				},
 			} );
 		} );
 	} );

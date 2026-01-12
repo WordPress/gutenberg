@@ -4,6 +4,12 @@
 
 ### Bug Fixes
 
+-   Preserve boolean HTML attributes during client-side navigation. ([#74446](https://github.com/WordPress/gutenberg/pull/74446))
+
+## 6.36.0 (2025-11-26)
+
+### Bug Fixes
+
 -   Return a deep-clone object from `getServerState` and `getServerContext` functions. ([#73437](https://github.com/WordPress/gutenberg/pull/73437))
 -   Fix using `getServerContext` in derived state getters using `useLayoutEffect`. ([#73518](https://github.com/WordPress/gutenberg/pull/73518))
 -   Fix using `getServerContext` in derived state getters using signals. ([#73518](https://github.com/WordPress/gutenberg/pull/73518))

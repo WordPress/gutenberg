@@ -1,16 +1,14 @@
 /**
+ * WordPress dependencies
+ */
+import { dateI18n, getDate, getSettings } from '@wordpress/date';
+
+/**
  * Internal dependencies
  */
-import type {
-	DataViewRenderFieldProps,
-	Field,
-	NormalizedField,
-	Operator,
-	Rules,
-	SortDirection,
-} from '../types';
-import RenderFromElements from './utils/render-from-elements';
-import parseDateTime from './utils/parse-date-time';
+import type { FormatDatetime, NormalizedField, SortDirection } from '../types';
+import type { FieldType } from '../types/private';
+import isValidElements from './utils/is-valid-elements';
 import {
 	OPERATOR_ON,
 	OPERATOR_NOT_ON,
@@ -21,50 +19,51 @@ import {
 	OPERATOR_IN_THE_PAST,
 	OPERATOR_OVER,
 } from '../constants';
-import { getControl } from '../dataform-controls';
-import hasElements from './utils/has-elements';
-import getValueFromId from './utils/get-value-from-id';
-import setValueFromId from './utils/set-value-from-id';
-import getFilterBy from './utils/get-filter-by';
+import isValidRequired from './utils/is-valid-required';
+import render from './utils/render-default';
 
-function render( { item, field }: DataViewRenderFieldProps< any > ) {
-	if ( field.elements ) {
-		return <RenderFromElements item={ item } field={ field } />;
-	}
+const format = {
+	datetime: getSettings().formats.datetime,
+	weekStartsOn: getSettings().l10n.startOfWeek,
+};
 
+function getValueFormatted< Item >( {
+	item,
+	field,
+}: {
+	item: Item;
+	field: NormalizedField< Item >;
+} ): string {
 	const value = field.getValue( { item } );
 	if ( [ '', undefined, null ].includes( value ) ) {
-		return null;
+		return '';
 	}
 
-	try {
-		const dateValue = parseDateTime( value );
-		return dateValue?.toLocaleString();
-	} catch ( error ) {
-		return null;
+	let formatDatetime: Required< FormatDatetime >;
+	if ( field.type !== 'datetime' ) {
+		formatDatetime = format;
+	} else {
+		formatDatetime = field.format as Required< FormatDatetime >;
 	}
+
+	return dateI18n( formatDatetime.datetime, getDate( value ) );
 }
 
-export default function normalizeField< Item >(
-	field: Field< Item >
-): NormalizedField< Item > {
-	const getValue = field.getValue || getValueFromId( field.id );
-	const setValue = field.setValue || setValueFromId( field.id );
-	const isValid: Rules< Item > = {
-		elements: true,
-		custom: () => null,
-	};
+const sort = ( a: any, b: any, direction: SortDirection ) => {
+	const timeA = new Date( a ).getTime();
+	const timeB = new Date( b ).getTime();
 
-	const sort = ( a: Item, b: Item, direction: SortDirection ) => {
-		const valueA = getValue( { item: a } );
-		const valueB = getValue( { item: b } );
-		const timeA = new Date( valueA ).getTime();
-		const timeB = new Date( valueB ).getTime();
+	return direction === 'asc' ? timeA - timeB : timeB - timeA;
+};
 
-		return direction === 'asc' ? timeA - timeB : timeB - timeA;
-	};
-
-	const defaultOperators: Operator[] = [
+export default {
+	type: 'datetime',
+	render,
+	Edit: 'datetime',
+	sort,
+	enableSorting: true,
+	enableGlobalSearch: false,
+	defaultOperators: [
 		OPERATOR_ON,
 		OPERATOR_NOT_ON,
 		OPERATOR_BEFORE,
@@ -73,9 +72,8 @@ export default function normalizeField< Item >(
 		OPERATOR_AFTER_INC,
 		OPERATOR_IN_THE_PAST,
 		OPERATOR_OVER,
-	];
-
-	const validOperators: Operator[] = [
+	],
+	validOperators: [
 		OPERATOR_ON,
 		OPERATOR_NOT_ON,
 		OPERATOR_BEFORE,
@@ -84,33 +82,11 @@ export default function normalizeField< Item >(
 		OPERATOR_AFTER_INC,
 		OPERATOR_IN_THE_PAST,
 		OPERATOR_OVER,
-	];
-
-	return {
-		id: field.id,
-		type: 'datetime',
-		label: field.label || field.id,
-		header: field.header || field.label || field.id,
-		description: field.description,
-		placeholder: field.placeholder,
-		getValue,
-		setValue,
-		elements: field.elements,
-		getElements: field.getElements,
-		hasElements: hasElements( field ),
-		render: field.render ?? render,
-		Edit: getControl( field, 'datetime' ),
-		sort: field.sort ?? sort,
-		isValid: {
-			...isValid,
-			...field.isValid,
-		},
-		isVisible: field.isVisible,
-		enableSorting: field.enableSorting ?? true,
-		enableGlobalSearch: field.enableGlobalSearch ?? false,
-		enableHiding: field.enableHiding ?? true,
-		readOnly: field.readOnly ?? false,
-		filterBy: getFilterBy( field, defaultOperators, validOperators ),
-		format: {},
-	};
-}
+	],
+	format,
+	getValueFormatted,
+	validate: {
+		required: isValidRequired,
+		elements: isValidElements,
+	},
+} satisfies FieldType< any >;

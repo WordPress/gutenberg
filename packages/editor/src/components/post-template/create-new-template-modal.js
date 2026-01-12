@@ -125,7 +125,6 @@ export default function CreateNewTemplateModal( { onClose } ) {
 				<VStack spacing="3">
 					<TextControl
 						__next40pxDefaultSize
-						__nextHasNoMarginBottom
 						label={ __( 'Name' ) }
 						value={ title }
 						onChange={ setTitle }

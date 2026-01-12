@@ -14,7 +14,7 @@ import {
 	__unstableMotion as motion,
 	__unstableAnimatePresence as AnimatePresence,
 } from '@wordpress/components';
-import { BlockIcon } from '@wordpress/block-editor';
+import { BlockIcon, store as blockEditorStore } from '@wordpress/block-editor';
 import { chevronLeftSmall, chevronRightSmall, layout } from '@wordpress/icons';
 import { displayShortcut } from '@wordpress/keycodes';
 import { store as coreStore } from '@wordpress/core-data';
@@ -33,6 +33,7 @@ import usePageTypeBadge from '../../utils/pageTypeBadge';
 import { getTemplateInfo } from '../../utils/get-template-info';
 import { getStylesCanvasTitle } from '../styles-canvas';
 import { unlock } from '../../lock-unlock';
+import useEditedSectionDetails from './useEditedSectionDetails';
 
 /** @typedef {import("@wordpress/components").IconType} IconType */
 
@@ -56,6 +57,14 @@ const MotionButton = motion.create( Button );
  * @return {React.ReactNode} The rendered DocumentBar component.
  */
 export default function DocumentBar( props ) {
+	// Get action to lock the pattern design
+	const { stopEditingContentOnlySection } = unlock(
+		useDispatch( blockEditorStore )
+	);
+
+	// Get details about the currently edited content-only section
+	const unlockedPatternInfo = useEditedSectionDetails();
+
 	const {
 		postId,
 		postType,
@@ -133,10 +142,27 @@ export default function DocumentBar( props ) {
 	const isReducedMotion = useReducedMotion();
 
 	const isTemplate = TEMPLATE_POST_TYPES.includes( postType );
-	const hasBackButton = !! onNavigateToPreviousEntityRecord;
+	const hasBackButton =
+		!! onNavigateToPreviousEntityRecord || !! unlockedPatternInfo;
 	const entityTitle = isTemplate ? templateTitle : documentTitle;
-	const title = props.title || stylesCanvasTitle || entityTitle;
+
+	// Use pattern info if a pattern block is unlocked, otherwise use document/entity info
+	const title =
+		unlockedPatternInfo?.patternTitle ||
+		props.title ||
+		stylesCanvasTitle ||
+		entityTitle;
 	const icon = props.icon;
+
+	// Determine the back button action
+	const handleBackClick = ( event ) => {
+		event.stopPropagation();
+		if ( unlockedPatternInfo ) {
+			stopEditingContentOnlySection();
+		} else if ( onNavigateToPreviousEntityRecord ) {
+			onNavigateToPreviousEntityRecord();
+		}
+	};
 
 	const pageTypeBadge = usePageTypeBadge( postId );
 
@@ -156,10 +182,7 @@ export default function DocumentBar( props ) {
 					<MotionButton
 						className="editor-document-bar__back"
 						icon={ isRTL() ? chevronRightSmall : chevronLeftSmall }
-						onClick={ ( event ) => {
-							event.stopPropagation();
-							onNavigateToPreviousEntityRecord();
-						} }
+						onClick={ handleBackClick }
 						size="compact"
 						initial={
 							mountedRef.current
@@ -219,12 +242,21 @@ export default function DocumentBar( props ) {
 									? stripHTML( title )
 									: __( 'No title' ) }
 							</span>
-							{ pageTypeBadge && (
+							{ unlockedPatternInfo && (
+								<span className="editor-document-bar__post-type-label">
+									{ unlockedPatternInfo.type ===
+									'template-part'
+										? `· ${ __( 'Template Part' ) }`
+										: `· ${ __( 'Pattern' ) }` }
+								</span>
+							) }
+							{ ! unlockedPatternInfo && pageTypeBadge && (
 								<span className="editor-document-bar__post-type-label">
 									{ `· ${ pageTypeBadge }` }
 								</span>
 							) }
-							{ postTypeLabel &&
+							{ ! unlockedPatternInfo &&
+								postTypeLabel &&
 								! props.title &&
 								! pageTypeBadge && (
 									<span className="editor-document-bar__post-type-label">
