@@ -111,7 +111,8 @@ Color tokens extend the base pattern with additional modifiers for tone, emphasi
 | `warning` | Higher-severity or time-sensitive issues that require user attention but are not errors |
 | `error`   | Blocking issues, validation failures, or destructive actions                            |
 
-> [!NOTE] > `caution` and `warning` represent two escalation levels of non-error severity.
+> [!NOTE]
+> `caution` and `warning` represent two escalation levels of non-error severity.
 > Use **`caution`** for guidance or minor risks, and **`warning`** when the user must act to prevent an error.
 
 **Emphasis** adjusts color strength relative to the base tone, if specified. The default is a normal emphasis.
