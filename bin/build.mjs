@@ -141,6 +141,15 @@ async function build() {
 			{ silent: true }
 		);
 
+		// Step 9: Build experiments page (Gutenberg plugin only)
+		console.log( '\n🧪 Building experiments page...' );
+		await exec( 'npx', [
+			'wp-scripts',
+			'build',
+			'lib/experiments-page/src/index.js',
+			'--output-path=build/experiments-page',
+		] );
+
 		const totalTime = Date.now() - startTime;
 		console.log(
 			`\n🎉 Build completed successfully! (${ Math.round(

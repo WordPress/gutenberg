@@ -179,43 +179,54 @@ if ( ! function_exists( 'the_gutenberg_experiments' ) ) {
 	/**
 	 * The main entry point for the Gutenberg experiments page.
 	 *
-	 * Renders the modern React-based UI using the edit-site package.
+	 * Renders the modern React-based UI.
 	 *
 	 * @since 6.3.0
 	 */
 	function the_gutenberg_experiments() {
-		$suffix  = SCRIPT_DEBUG ? '' : '.min';
 		$version = defined( 'GUTENBERG_VERSION' ) && ! SCRIPT_DEBUG ? GUTENBERG_VERSION : time();
 
-		$style_path = gutenberg_dir_path() . 'build/styles/edit-site/experiments' . $suffix . '.css';
+		// Get the asset file for dependencies.
+		$asset_file = gutenberg_dir_path() . 'build/experiments-page/index.asset.php';
+		$asset      = file_exists( $asset_file ) ? require $asset_file : array(
+			'dependencies' => array( 'wp-element', 'wp-components', 'wp-i18n', 'wp-core-data' ),
+			'version'      => $version,
+		);
 
-		// Enqueue experiments page styles if the file exists.
-		if ( file_exists( $style_path ) ) {
-			wp_enqueue_style(
-				'wp-gutenberg-experiments',
-				gutenberg_url( 'build/styles/edit-site/experiments' . $suffix . '.css' ),
-				array( 'wp-components' ),
-				$version
-			);
-			wp_style_add_data( 'wp-gutenberg-experiments', 'rtl', 'replace' );
-			wp_style_add_data( 'wp-gutenberg-experiments', 'suffix', $suffix );
-		}
+		// Enqueue the experiments page script.
+		wp_enqueue_script(
+			'wp-gutenberg-experiments-page',
+			gutenberg_url( 'build/experiments-page/index.js' ),
+			$asset['dependencies'],
+			$asset['version'],
+			true
+		);
 
-		// Enqueue the edit-site script and its dependencies.
-		wp_enqueue_script( 'wp-edit-site' );
+		// Enqueue the experiments page styles.
+		wp_enqueue_style(
+			'wp-gutenberg-experiments-page',
+			gutenberg_url( 'build/experiments-page/style-index.css' ),
+			array( 'wp-components' ),
+			$asset['version']
+		);
 
-		// Add inline script to initialize the experiments page.
-		// This must come after wp_enqueue_script so the inline script attaches properly.
+		// Pass experiments data to the script.
 		wp_add_inline_script(
-			'wp-edit-site',
+			'wp-gutenberg-experiments-page',
 			sprintf(
-				'wp.domReady( function() {
-					if ( wp.editSite && wp.editSite.initializeExperiments ) {
-						wp.editSite.initializeExperiments( "gutenberg-experiments", %s );
+				'window.gutenbergExperimentsInit = function() {
+					if ( window.gutenbergExperimentsPage && window.gutenbergExperimentsPage.initializeExperiments ) {
+						window.gutenbergExperimentsPage.initializeExperiments( "gutenberg-experiments", %s );
 					}
-				} );',
+				};
+				if ( document.readyState === "loading" ) {
+					document.addEventListener( "DOMContentLoaded", window.gutenbergExperimentsInit );
+				} else {
+					window.gutenbergExperimentsInit();
+				}',
 				wp_json_encode( gutenberg_get_experiment_definitions() )
-			)
+			),
+			'after'
 		);
 
 		// Output the mount point.

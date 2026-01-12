@@ -107,6 +107,3 @@ export function reinitializeEditor() {
 export { default as PluginTemplateSettingPanel } from './components/plugin-template-setting-panel';
 export { store } from './store';
 export * from './deprecated';
-
-// Experiments page (Gutenberg plugin only)
-export { initializeExperiments } from './experiments';
