@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import clsx from 'clsx';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -61,34 +66,27 @@ const EXPERIMENT_ICONS = {
 /**
  * Individual experiment card component.
  *
- * @param {Object}   props                    Component props.
- * @param {Object}   props.experiment         Experiment data.
- * @param {Function} props.onToggle           Toggle handler.
- * @param {boolean}  props.isSaving           Whether the experiment is currently saving.
- * @param {Object}   props.requiredExperiment The required experiment if dependency is unmet.
- * @param {string}   props.savedState         State of recent save: 'enabled', 'disabled', or undefined.
+ * @param {Object}   props            Component props.
+ * @param {Object}   props.experiment Experiment data.
+ * @param {Function} props.onToggle   Toggle handler.
+ * @param {boolean}  props.isSaving   Whether the experiment is currently saving.
+ * @param {string}   props.savedState State of recent save: 'enabled', 'disabled', or undefined.
  */
 export default function ExperimentCard( {
 	experiment,
 	onToggle,
 	isSaving,
-	requiredExperiment,
 	savedState,
 } ) {
 	const { id, name, description, warning, learnMore, enabled, icon } =
 		experiment;
 	const ExperimentIcon = EXPERIMENT_ICONS[ icon ] || plugins;
-	const hasDependency = !! requiredExperiment;
 
-	const cardClasses = [
-		'experiment-card',
-		hasDependency && 'experiment-card--has-dependency',
-		enabled && 'experiment-card--enabled',
-		savedState && 'experiment-card--saved',
-		isSaving && 'experiment-card--saving',
-	]
-		.filter( Boolean )
-		.join( ' ' );
+	const cardClasses = clsx( 'experiment-card', {
+		'experiment-card--enabled': enabled,
+		'experiment-card--saved': savedState,
+		'experiment-card--saving': isSaving,
+	} );
 
 	return (
 		<Card className={ cardClasses } size="small">
@@ -125,10 +123,9 @@ export default function ExperimentCard( {
 							) : (
 								<ToggleControl
 									__nextHasNoMarginBottom
+									label={ name }
 									checked={ enabled }
-									onChange={ ( value ) =>
-										onToggle( id, value, requiredExperiment )
-									}
+									onChange={ ( value ) => onToggle( id, value ) }
 									disabled={ isSaving }
 								/>
 							) }
@@ -143,15 +140,6 @@ export default function ExperimentCard( {
 				{ warning && (
 					<div className="experiment-card__warning">
 						<Text>{ warning }</Text>
-					</div>
-				) }
-				{ requiredExperiment && (
-					<div className="experiment-card__dependency-notice">
-						<Text>
-							{ __( 'Requires', 'gutenberg' ) }{ ' ' }
-							<strong>{ requiredExperiment.name }</strong>{ ' ' }
-							{ __( 'to be enabled.', 'gutenberg' ) }
-						</Text>
 					</div>
 				) }
 			</CardBody>

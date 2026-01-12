@@ -1,0 +1,20 @@
+/**
+ * Experiments page styles.
+ *
+ * This is a separate stylesheet entry point for the experiments page,
+ * which renders within the normal WordPress admin chrome.
+ */
+
+// Import experiments page component styles
+@import "./components/experiments-page/style.scss";
+
+// Full-bleed container - override WordPress admin default padding
+#gutenberg-experiments {
+	// Pull the container to the edges by countering wpbody-content padding
+	margin: -10px 0 0 -20px;
+	padding: 0;
+	background: #f0f0f0;
+	min-height: calc(100vh - 22px); // Account for negative margin
+	box-sizing: border-box;
+	width: calc(100% + 20px);
+}

@@ -369,12 +369,43 @@ function gutenberg_enqueue_stored_styles( $options = array() ) {
 function gutenberg_register_vendor_scripts( $scripts ) {
 	$extension = SCRIPT_DEBUG ? '.js' : '.min.js';
 
+	// Register react-refresh scripts for development hot reloading.
+	// These are only used when SCRIPT_DEBUG is true AND the dev server is running with --hot.
+	// Note: react-refresh scripts only have .min.js versions in the build.
+	// We check if the files exist to avoid errors when running production builds.
+	$react_refresh_runtime_file = gutenberg_dir_path() . 'build/scripts/react-refresh-runtime/index.min.js';
+	$react_refresh_entry_file   = gutenberg_dir_path() . 'build/scripts/react-refresh-entry/index.min.js';
+
+	if ( SCRIPT_DEBUG && file_exists( $react_refresh_runtime_file ) && file_exists( $react_refresh_entry_file ) ) {
+		gutenberg_override_script(
+			$scripts,
+			'wp-react-refresh-runtime',
+			gutenberg_url( 'build/scripts/react-refresh-runtime/index.min.js' ),
+			array(),
+			false
+		);
+
+		gutenberg_override_script(
+			$scripts,
+			'wp-react-refresh-entry',
+			gutenberg_url( 'build/scripts/react-refresh-entry/index.min.js' ),
+			array( 'wp-react-refresh-runtime' ),
+			false
+		);
+	}
+
+	// Determine React dependencies - only include react-refresh if it was registered.
+	$react_deps = array( 'wp-polyfill' );
+	if ( SCRIPT_DEBUG && isset( $scripts->registered['wp-react-refresh-entry'] ) ) {
+		array_unshift( $react_deps, 'wp-react-refresh-entry' );
+	}
+
 	gutenberg_override_script(
 		$scripts,
 		'react',
 		gutenberg_url( 'build/scripts/vendors/react' . $extension ),
 		// See https://github.com/pmmmwh/react-refresh-webpack-plugin/blob/main/docs/TROUBLESHOOTING.md#externalising-react.
-		SCRIPT_DEBUG ? array( 'wp-react-refresh-entry', 'wp-polyfill' ) : array( 'wp-polyfill' ),
+		$react_deps,
 		'18'
 	);
 	gutenberg_override_script(
