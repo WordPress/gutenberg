@@ -280,7 +280,7 @@ class WP_Block_Supports_Block_Visibility_Test extends WP_UnitTestCase {
 		$this->assertSame(
 			'@media (width > 782px){.wp-block-hidden-desktop{display:none !important;}}@media (width <= 480px){.wp-block-hidden-mobile{display:none !important;}}',
 			$actual_stylesheet,
-			'CSS should contain both visibility rules'
+			'CSS should contain desktop and mobile visibility rules'
 		);
 	}
 

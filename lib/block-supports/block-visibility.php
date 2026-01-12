@@ -129,21 +129,19 @@ function gutenberg_render_block_visibility_support( $block_content, $block ) {
 			);
 		}
 
-		if ( ! empty( $css_rules ) ) {
-			gutenberg_style_engine_get_stylesheet_from_css_rules(
-				$css_rules,
-				array(
-					'context'  => 'block-supports',
-					'prettify' => false,
-				)
-			);
+		gutenberg_style_engine_get_stylesheet_from_css_rules(
+			$css_rules,
+			array(
+				'context'  => 'block-supports',
+				'prettify' => false,
+			)
+		);
 
-			if ( ! empty( $block_content ) ) {
-				$processor = new WP_HTML_Tag_Processor( $block_content );
-				if ( $processor->next_tag() ) {
-					$processor->add_class( implode( ' ', $class_names ) );
-					$block_content = $processor->get_updated_html();
-				}
+		if ( ! empty( $block_content ) ) {
+			$processor = new WP_HTML_Tag_Processor( $block_content );
+			if ( $processor->next_tag() ) {
+				$processor->add_class( implode( ' ', $class_names ) );
+				$block_content = $processor->get_updated_html();
 			}
 		}
 	}
