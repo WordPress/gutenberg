@@ -40,6 +40,7 @@ describe( 'getEntityRecord', () => {
 	];
 	const registry = { batch: ( callback ) => callback() };
 	const resolveSelect = { getEntitiesConfig: jest.fn( () => ENTITIES ) };
+	const select = { getPersistedIdMap: jest.fn( () => ( {} ) ) };
 
 	let dispatch;
 	let syncManager;
@@ -72,7 +73,7 @@ describe( 'getEntityRecord', () => {
 			'root',
 			'postType',
 			'post'
-		)( { dispatch, registry, resolveSelect } );
+		)( { dispatch, registry, resolveSelect, select } );
 
 		// Fetch request should have been issued.
 		expect( triggerFetch ).toHaveBeenCalledWith( {
@@ -108,7 +109,7 @@ describe( 'getEntityRecord', () => {
 			'postType',
 			'post',
 			query
-		)( { dispatch, registry, resolveSelect } );
+		)( { dispatch, registry, resolveSelect, select } );
 
 		// Trigger apiFetch, test that the query is present in the url.
 		expect( triggerFetch ).toHaveBeenCalledWith( {
@@ -138,7 +139,7 @@ describe( 'getEntityRecord', () => {
 			'root',
 			'postType',
 			`${ STAGED_ID_PREFIX }post`
-		)( { dispatch, registry, resolveSelect } );
+		)( { dispatch, registry, resolveSelect, select } );
 
 		expect( triggerFetch ).not.toHaveBeenCalled();
 		expect( dispatch.__unstableAcquireStoreLock ).not.toHaveBeenCalled();
@@ -176,6 +177,7 @@ describe( 'getEntityRecord', () => {
 			dispatch,
 			registry,
 			resolveSelect: resolveSelectWithSync,
+			select,
 		} );
 
 		// Verify load was called with correct arguments.
@@ -230,6 +232,7 @@ describe( 'getEntityRecord', () => {
 			dispatch,
 			registry,
 			resolveSelect: resolveSelectWithSync,
+			select,
 		} );
 
 		// Verify load was called with correct arguments.
@@ -275,6 +278,7 @@ describe( 'getEntityRecord', () => {
 			dispatch,
 			registry,
 			resolveSelect: resolveSelectWithSync,
+			select,
 		} );
 
 		expect( syncManager.load ).not.toHaveBeenCalled();
@@ -309,6 +313,7 @@ describe( 'getEntityRecord', () => {
 			dispatch,
 			registry,
 			resolveSelect: resolveSelectWithSync,
+			select,
 		} );
 
 		expect( syncManager.load ).not.toHaveBeenCalled();
@@ -347,6 +352,7 @@ describe( 'getEntityRecords', () => {
 	];
 	const registry = { batch: ( callback ) => callback() };
 	const resolveSelect = { getEntitiesConfig: jest.fn( () => ENTITIES ) };
+	const select = { getPersistedIdMap: jest.fn( () => ( {} ) ) };
 
 	beforeEach( async () => {
 		triggerFetch.mockReset();
@@ -365,7 +371,7 @@ describe( 'getEntityRecords', () => {
 		await getEntityRecords(
 			'root',
 			'postType'
-		)( { dispatch, registry, resolveSelect } );
+		)( { dispatch, registry, resolveSelect, select } );
 
 		// Fetch request should have been issued.
 		expect( triggerFetch ).toHaveBeenCalledWith( {
@@ -397,7 +403,7 @@ describe( 'getEntityRecords', () => {
 		await getEntityRecords(
 			'root',
 			'postType'
-		)( { dispatch, registry, resolveSelect } );
+		)( { dispatch, registry, resolveSelect, select } );
 
 		// Fetch request should have been issued.
 		expect( triggerFetch ).toHaveBeenCalledWith( {
@@ -431,7 +437,7 @@ describe( 'getEntityRecords', () => {
 		await getEntityRecords(
 			'root',
 			'postType'
-		)( { dispatch, registry, resolveSelect } );
+		)( { dispatch, registry, resolveSelect, select } );
 
 		// Fetch request should have been issued.
 		expect( triggerFetch ).toHaveBeenCalledWith( {
@@ -480,6 +486,7 @@ describe( 'getEntityRecords', () => {
 			dispatch,
 			registry,
 			resolveSelect,
+			select,
 		} );
 
 		// Permissions should have been cached
@@ -521,6 +528,7 @@ describe( 'getEntityRecords', () => {
 			dispatch,
 			registry,
 			resolveSelect,
+			select,
 		} );
 
 		// Permissions should NOT have been cached
@@ -565,7 +573,7 @@ describe( 'getEntityRecords', () => {
 		await getEntityRecords( 'postType', 'attachment', {
 			per_page: -1,
 			[ RECEIVE_INTERMEDIATE_RESULTS ]: true,
-		} )( { dispatch, registry, resolveSelect } );
+		} )( { dispatch, registry, resolveSelect, select } );
 
 		// 3 calls for intermediate results (one per page), plus 1 final call with complete records
 		expect( dispatch.receiveEntityRecords ).toHaveBeenCalledTimes( 4 );
@@ -610,7 +618,7 @@ describe( 'getEntityRecords', () => {
 
 describe( 'taxonomy pagination', () => {
 	const registry = { batch: ( callback ) => callback() };
-	let dispatch, loadedTaxonomyEntities;
+	let dispatch, loadedTaxonomyEntities, select;
 
 	beforeEach( async () => {
 		dispatch = Object.assign( jest.fn(), {
@@ -618,6 +626,7 @@ describe( 'taxonomy pagination', () => {
 			__unstableAcquireStoreLock: jest.fn().mockResolvedValue( 'lock' ),
 			__unstableReleaseStoreLock: jest.fn(),
 		} );
+		select = { getPersistedIdMap: jest.fn( () => ( {} ) ) };
 		triggerFetch.mockReset();
 
 		const mockTaxonomyConfig = {
@@ -651,7 +660,7 @@ describe( 'taxonomy pagination', () => {
 		await getEntityRecords( 'taxonomy', 'category', {
 			per_page: 2,
 			page: 1,
-		} )( { dispatch, registry, resolveSelect } );
+		} )( { dispatch, registry, resolveSelect, select } );
 
 		expect( triggerFetch ).toHaveBeenLastCalledWith( {
 			path: '/wp/v2/categories?context=edit&per_page=2&page=1',
@@ -690,7 +699,7 @@ describe( 'taxonomy pagination', () => {
 		await getEntityRecords( 'taxonomy', 'category', {
 			per_page: 2,
 			page: 1,
-		} )( { dispatch, registry, resolveSelect } );
+		} )( { dispatch, registry, resolveSelect, select } );
 
 		expect( dispatch.receiveEntityRecords ).toHaveBeenCalledWith(
 			'taxonomy',
