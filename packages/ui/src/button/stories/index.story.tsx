@@ -62,15 +62,12 @@ export const Neutral: Story = {
 	},
 };
 
-/**
- * Destructive buttons should be used for high-stakes, irreversible actions.
- */
-export const Destructive: Story = {
+export const NeutralOutline: Story = {
 	...Default,
 	args: {
 		...Default.args,
-		children: 'Permanently delete',
-		tone: 'destructive',
+		tone: 'neutral',
+		variant: 'outline',
 	},
 };
 
@@ -95,64 +92,57 @@ export const AllTonesAndVariants: Story = {
 			<div></div>
 			<div style={ { textAlign: 'center' } }>Resting</div>
 			<div style={ { textAlign: 'center' } }>Disabled</div>
-			{ ( [ 'brand', 'neutral', 'destructive' ] as const ).map(
-				( tone ) => (
-					<Fragment key={ tone }>
-						{ (
-							[
-								'solid',
-								'outline',
-								'minimal',
-								'unstyled',
-							] as const
-						 ).map( ( variant ) => (
-							<Fragment key={ variant }>
-								<div
-									style={ {
-										paddingInlineEnd: '1rem',
-										display: 'flex',
-										alignItems: 'center',
-									} }
-								>
-									{ variant }, { tone }
-								</div>
-								<div
-									style={ {
-										padding: '0.5rem 1rem',
-										display: 'flex',
-										alignItems: 'center',
-									} }
-								>
-									<Button
-										{ ...args }
-										tone={ tone }
-										variant={ variant }
-									/>
-								</div>
-								<div
-									style={ {
-										padding: '0.5rem 1rem',
-										display: 'flex',
-										alignItems: 'center',
-									} }
-								>
-									<Button
-										{ ...args }
-										tone={ tone }
-										variant={ variant }
-										// Disabling because this lint rule was meant for the
-										// `@wordpress/components` Button, but is being applied here.
-										// TODO: rework the lint rule so that it checks the package
-										// where the Button comes from.
-										// eslint-disable-next-line no-restricted-syntax
-										disabled
-									/>
-								</div>
-							</Fragment>
-						) ) }
-					</Fragment>
-				)
-			) }
+			{ ( [ 'brand', 'neutral' ] as const ).map( ( tone ) => (
+				<Fragment key={ tone }>
+					{ (
+						[ 'solid', 'outline', 'minimal', 'unstyled' ] as const
+					 ).map( ( variant ) => (
+						<Fragment key={ variant }>
+							<div
+								style={ {
+									paddingInlineEnd: '1rem',
+									display: 'flex',
+									alignItems: 'center',
+								} }
+							>
+								{ variant }, { tone }
+							</div>
+							<div
+								style={ {
+									padding: '0.5rem 1rem',
+									display: 'flex',
+									alignItems: 'center',
+								} }
+							>
+								<Button
+									{ ...args }
+									tone={ tone }
+									variant={ variant }
+								/>
+							</div>
+							<div
+								style={ {
+									padding: '0.5rem 1rem',
+									display: 'flex',
+									alignItems: 'center',
+								} }
+							>
+								<Button
+									{ ...args }
+									tone={ tone }
+									variant={ variant }
+									// Disabling because this lint rule was meant for the
+									// `@wordpress/components` Button, but is being applied here.
+									// TODO: rework the lint rule so that it checks the package
+									// where the Button comes from.
+									// eslint-disable-next-line no-restricted-syntax
+									disabled
+								/>
+							</div>
+						</Fragment>
+					) ) }
+				</Fragment>
+			) ) }
 		</div>
 	),
 };
