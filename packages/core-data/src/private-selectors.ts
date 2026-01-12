@@ -378,13 +378,39 @@ export const getStagedEntityRecords = createSelector(
 			context,
 		} );
 		const persistedLocalIds = new Set( Object.values( persistedIdMap ) );
+		const persistedIdByLocalId = new Map(
+			Object.entries( persistedIdMap ).map(
+				( [ persistedId, localId ] ) => [ localId, persistedId ]
+			)
+		);
+		const queryItemIds = new Set();
+		const queriesForContext = queriedData?.queries?.[ context ] || {};
+		Object.values( queriesForContext ).forEach( ( queryResult ) => {
+			if ( Array.isArray( queryResult?.itemIds ) ) {
+				queryResult.itemIds.forEach( ( itemId ) =>
+					queryItemIds.add( String( itemId ) )
+				);
+			}
+		} );
 
 		return Object.values( allItems ).filter( ( item ) => {
 			const itemId = item?.[ entityIdKey ];
+			if (
+				typeof itemId !== 'string' ||
+				! itemId.startsWith( STAGED_ID_PREFIX )
+			) {
+				return false;
+			}
+			if ( queryItemIds.has( itemId ) ) {
+				return false;
+			}
+			if ( ! persistedLocalIds.has( itemId ) ) {
+				return true;
+			}
+			const persistedId = persistedIdByLocalId.get( itemId );
 			return (
-				typeof itemId === 'string' &&
-				itemId.startsWith( STAGED_ID_PREFIX ) &&
-				! persistedLocalIds.has( itemId )
+				persistedId === undefined ||
+				! queryItemIds.has( String( persistedId ) )
 			);
 		} );
 	},

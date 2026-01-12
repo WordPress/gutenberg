@@ -89,11 +89,6 @@ describe( 'getStagedEntityRecords', () => {
 			status: 'draft',
 			__unstablePersistedId: 10,
 		};
-		const persistedRecord = {
-			id: 10,
-			title: 'Persisted Post',
-			status: 'publish',
-		};
 
 		const state = deepFreeze( {
 			entities: {
@@ -105,16 +100,21 @@ describe( 'getStagedEntityRecords', () => {
 								items: {
 									default: {
 										[ draftId ]: stagedRecord,
-										10: persistedRecord,
 									},
 								},
 								itemIsComplete: {
 									default: {
 										[ draftId ]: true,
-										10: true,
 									},
 								},
-								queries: {},
+								queries: {
+									default: {
+										'': { itemIds: [ 10 ] },
+									},
+								},
+								persistedIdMap: {
+									default: { 10: draftId },
+								},
 							},
 						},
 					},
@@ -153,6 +153,9 @@ describe( 'getStagedEntityRecords', () => {
 									},
 								},
 								queries: {},
+								persistedIdMap: {
+									default: { 10: draftId },
+								},
 							},
 						},
 					},
@@ -163,6 +166,47 @@ describe( 'getStagedEntityRecords', () => {
 		expect( getStagedEntityRecords( state, 'postType', 'post' ) ).toEqual( [
 			stagedRecord,
 		] );
+	} );
+
+	it( 'filters out staged records that already exist in query results', () => {
+		const stagedRecord = {
+			id: draftId,
+			title: 'Staged Post',
+			status: 'draft',
+		};
+
+		const state = deepFreeze( {
+			entities: {
+				config: [ { kind: 'postType', name: 'post', key: 'id' } ],
+				records: {
+					postType: {
+						post: {
+							queriedData: {
+								items: {
+									default: {
+										[ draftId ]: stagedRecord,
+									},
+								},
+								itemIsComplete: {
+									default: {
+										[ draftId ]: true,
+									},
+								},
+								queries: {
+									default: {
+										'': { itemIds: [ draftId ] },
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		} );
+
+		expect( getStagedEntityRecords( state, 'postType', 'post' ) ).toEqual(
+			[]
+		);
 	} );
 
 	it( 'should return multiple staged records', () => {
