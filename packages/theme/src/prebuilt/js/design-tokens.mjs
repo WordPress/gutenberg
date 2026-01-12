@@ -49,7 +49,7 @@ export default [
 	'--wpds-color-bg-thumb-neutral-weak-active',
 	'--wpds-color-bg-thumb-brand',
 	'--wpds-color-bg-thumb-brand-active',
-	'--wpds-color-bg-thumb-brand-disabled',
+	'--wpds-color-bg-thumb-neutral-disabled',
 	'--wpds-color-fg-content-neutral',
 	'--wpds-color-fg-content-neutral-weak',
 	'--wpds-color-fg-content-success',

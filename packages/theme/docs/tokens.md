@@ -61,7 +61,7 @@ Do not edit directly.
 | `--wpds-color-bg-thumb-neutral-weak-active`           | Background color for thumbs with a neutral tone and weak emphasis (eg. scrollbar thumb) that are hovered, focused, or active.               |
 | `--wpds-color-bg-thumb-brand`                         | Background color for thumbs with a brand tone and normal emphasis (eg. slider thumb and filled track).                                      |
 | `--wpds-color-bg-thumb-brand-active`                  | Background color for thumbs with a brand tone and normal emphasis (eg. slider thumb and filled track) that are hovered, focused, or active. |
-| `--wpds-color-bg-thumb-brand-disabled`                | Background color for thumbs with a brand tone and normal emphasis (eg. slider thumb and filled track), in their disabled state.             |
+| `--wpds-color-bg-thumb-neutral-disabled`              | Background color for thumbs with normal emphasis (eg. slider thumb and filled track), in their disabled state, regardless of the tone.      |
 | `--wpds-color-fg-content-neutral`                     | Foreground color for content like text with normal emphasis.                                                                                |
 | `--wpds-color-fg-content-neutral-weak`                | Foreground color for content like text with weak emphasis.                                                                                  |
 | `--wpds-color-fg-content-success`                     | Foreground color for content like text with success tone and normal emphasis.                                                               |

@@ -99,7 +99,7 @@ export default {
 		'stroke-interactive-neutral-strong',
 	],
 	'bg-stroke2': [
-		'bg-thumb-brand-disabled',
+		'bg-thumb-neutral-disabled',
 		'bg-track-neutral',
 		'stroke-interactive-neutral-disabled',
 		'stroke-surface-neutral',
