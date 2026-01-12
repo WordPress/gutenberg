@@ -6,6 +6,7 @@ import {
 	Card,
 	CardBody,
 	CardHeader as OriginalCardHeader,
+	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import {
 	useCallback,
@@ -19,10 +20,12 @@ import { chevronDown, chevronUp } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
+import { unlock } from '../../../lock-unlock';
 import { getFormFieldLayout } from '..';
 import DataFormContext from '../../dataform-context';
 import type {
 	FieldLayoutProps,
+	FieldValidity,
 	NormalizedCardLayout,
 	NormalizedField,
 	NormalizedForm,
@@ -31,6 +34,35 @@ import type {
 import { DataFormLayout } from '../data-form-layout';
 import { DEFAULT_LAYOUT } from '../normalize-form';
 import { getSummaryFields } from '../get-summary-fields';
+
+const { Badge } = unlock( componentsPrivateApis );
+
+function countInvalidFields( validity: FieldValidity | undefined ): number {
+	if ( ! validity ) {
+		return 0;
+	}
+
+	let count = 0;
+	const validityRules = Object.keys( validity ).filter(
+		( key ) => key !== 'children'
+	);
+
+	for ( const key of validityRules ) {
+		const rule = validity[ key as keyof Omit< FieldValidity, 'children' > ];
+		if ( rule?.type === 'invalid' ) {
+			count++;
+		}
+	}
+
+	// Count children recursively
+	if ( validity.children ) {
+		for ( const childValidity of Object.values( validity.children ) ) {
+			count += countInvalidFields( childValidity );
+		}
+	}
+
+	return count;
+}
 
 const NonCollapsibleCardHeader = ( {
 	children,
@@ -56,6 +88,7 @@ const NonCollapsibleCardHeader = ( {
 export function useCardHeader( layout: NormalizedCardLayout ) {
 	const { isOpened, isCollapsible } = layout;
 	const [ isOpen, setIsOpen ] = useState( isOpened );
+	const [ touched, setTouched ] = useState( false );
 
 	// Sync internal state when the isOpened prop changes.
 	// This is unlikely to happen in production, but it helps with storybook controls.
@@ -64,7 +97,13 @@ export function useCardHeader( layout: NormalizedCardLayout ) {
 	}, [ isOpened ] );
 
 	const toggle = useCallback( () => {
-		setIsOpen( ( prev ) => ! prev );
+		setIsOpen( ( prev ) => {
+			// Mark as touched when collapsing (going from open to closed)
+			if ( prev ) {
+				setTouched( true );
+			}
+			return ! prev;
+		} );
 	}, [] );
 
 	const CollapsibleCardHeader = useCallback(
@@ -111,7 +150,12 @@ export function useCardHeader( layout: NormalizedCardLayout ) {
 		? CollapsibleCardHeader
 		: NonCollapsibleCardHeader;
 
-	return { isOpen: effectiveIsOpen, CardHeader: CardHeaderComponent };
+	return {
+		isOpen: effectiveIsOpen,
+		CardHeader: CardHeaderComponent,
+		touched,
+		setTouched,
+	};
 }
 
 function isSummaryFieldVisible< Item >(
@@ -183,13 +227,24 @@ export default function FormCardField< Item >( {
 		[ field ]
 	);
 
-	const { isOpen, CardHeader } = useCardHeader( layout );
+	const { isOpen, CardHeader, touched, setTouched } = useCardHeader( layout );
 
 	const summaryFields = getSummaryFields< Item >( layout.summary, fields );
 
 	const visibleSummaryFields = summaryFields.filter( ( summaryField ) =>
 		isSummaryFieldVisible( summaryField, layout.summary, isOpen )
 	);
+
+	// Count invalid fields for validation badge
+	const invalidCount = countInvalidFields( validity );
+	const showValidationBadge = touched && invalidCount > 0;
+
+	// For non-collapsible cards, mark as touched when user interacts with fields
+	const handleBlurCapture = useCallback( () => {
+		if ( ! layout.isCollapsible ) {
+			setTouched( true );
+		}
+	}, [ layout.isCollapsible, setTouched ] );
 
 	const sizeCard = {
 		blockStart: 'medium' as const,
@@ -217,6 +272,15 @@ export default function FormCardField< Item >( {
 						<span className="dataforms-layouts-card__field-header-label">
 							{ field.label }
 						</span>
+						{ showValidationBadge && (
+							<Badge intent="error">
+								{ invalidCount }{ ' ' }
+								{ invalidCount === 1
+									? 'field needs'
+									: 'fields need' }{ ' ' }
+								attention
+							</Badge>
+						) }
 						{ visibleSummaryFields.length > 0 &&
 							layout.withHeader && (
 								<div className="dataforms-layouts-card__field-summary">
@@ -239,6 +303,7 @@ export default function FormCardField< Item >( {
 					<CardBody
 						size={ sizeCardBody }
 						className="dataforms-layouts-card__field-control"
+						onBlurCapture={ handleBlurCapture }
 					>
 						{ field.description && (
 							<div className="dataforms-layouts-card__field-description">
@@ -285,6 +350,15 @@ export default function FormCardField< Item >( {
 					<span className="dataforms-layouts-card__field-header-label">
 						{ fieldDefinition.label }
 					</span>
+					{ showValidationBadge && (
+						<Badge intent="error">
+							{ invalidCount }{ ' ' }
+							{ invalidCount === 1
+								? 'field needs'
+								: 'fields need' }{ ' ' }
+							attention
+						</Badge>
+					) }
 					{ visibleSummaryFields.length > 0 && layout.withHeader && (
 						<div className="dataforms-layouts-card__field-summary">
 							{ visibleSummaryFields.map( ( summaryField ) => (
@@ -304,6 +378,7 @@ export default function FormCardField< Item >( {
 				<CardBody
 					size={ sizeCardBody }
 					className="dataforms-layouts-card__field-control"
+					onBlurCapture={ handleBlurCapture }
 				>
 					<RegularLayout
 						data={ data }
