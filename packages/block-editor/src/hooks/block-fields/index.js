@@ -107,7 +107,6 @@ function BlockFields( {
 				id: fieldDef.id,
 				label: fieldDef.label,
 				type: fieldDef.type, // Use the field's type; DataForm will use built-in or custom Edit
-				hideLabelFromVision: fieldDef.id === 'content',
 			};
 
 			if ( fieldDef.mapping ) {
