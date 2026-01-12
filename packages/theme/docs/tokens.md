@@ -39,9 +39,6 @@ Do not edit directly.
 | `--wpds-color-bg-surface-caution-weak`                | Background color for surfaces with caution tone and weak emphasis.                                                                          |
 | `--wpds-color-bg-surface-error`                       | Background color for surfaces with error tone and normal emphasis.                                                                          |
 | `--wpds-color-bg-surface-error-weak`                  | Background color for surfaces with error tone and weak emphasis.                                                                            |
-| `--wpds-color-bg-interactive-neutral`                 | Background color for interactive elements with neutral tone and normal emphasis.                                                            |
-| `--wpds-color-bg-interactive-neutral-active`          | Background color for interactive elements with neutral tone and normal emphasis that are hovered, focused, or active.                       |
-| `--wpds-color-bg-interactive-neutral-disabled`        | Background color for interactive elements with neutral tone and normal emphasis, in their disabled state.                                   |
 | `--wpds-color-bg-interactive-neutral-strong`          | Background color for interactive elements with neutral tone and strong emphasis.                                                            |
 | `--wpds-color-bg-interactive-neutral-strong-active`   | Background color for interactive elements with neutral tone and strong emphasis that are hovered, focused, or active.                       |
 | `--wpds-color-bg-interactive-neutral-strong-disabled` | Background color for interactive elements with neutral tone and strong emphasis, in their disabled state.                                   |

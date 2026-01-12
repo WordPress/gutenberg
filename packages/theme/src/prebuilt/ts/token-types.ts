@@ -57,7 +57,6 @@ export type SurfaceBackgroundColor =
  * Background color variants for interactive elements.
  */
 export type InteractiveBackgroundColor =
-	| 'neutral'
 	| 'neutral-strong'
 	| 'neutral-weak'
 	| 'brand'

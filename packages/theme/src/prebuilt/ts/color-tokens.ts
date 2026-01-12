@@ -73,10 +73,7 @@ export default {
 	'error-stroke1': [ 'stroke-surface-error' ],
 	'bg-surface2': [ 'bg-surface-neutral' ],
 	'bg-surface5': [ 'bg-interactive-neutral-strong-disabled' ],
-	'bg-surface4': [
-		'bg-interactive-neutral-active',
-		'bg-interactive-neutral-weak-active',
-	],
+	'bg-surface4': [ 'bg-interactive-neutral-weak-active' ],
 	'bg-surface3': [ 'bg-surface-neutral-strong' ],
 	'bg-fgSurface4': [
 		'fg-content-neutral',
