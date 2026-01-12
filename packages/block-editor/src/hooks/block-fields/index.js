@@ -150,6 +150,12 @@ function BlockFields( {
 		} );
 	}, [ blockTypeFields, clientId ] );
 
+	if ( ! blockTypeFields?.length ) {
+		// TODO - we might still want to show a placeholder for blocks with no fields.
+		// for example, a way to select the block.
+		return null;
+	}
+
 	const handleToggleField = ( fieldId ) => {
 		setForm( ( prev ) => {
 			if ( prev.fields?.includes( fieldId ) ) {
@@ -165,12 +171,6 @@ function BlockFields( {
 			};
 		} );
 	};
-
-	if ( ! blockTypeFields?.length ) {
-		// TODO - we might still want to show a placeholder for blocks with no fields.
-		// for example, a way to select the block.
-		return null;
-	}
 
 	return (
 		<div className="block-editor-block-fields__container">
