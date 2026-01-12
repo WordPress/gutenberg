@@ -11,7 +11,7 @@ A theming package that's part of the WordPress Design System. It has two parts:
 
 ## Design Tokens
 
-In the **[Design Tokens Reference](docs/tokens.md)** document there is a complete reference of all available design tokens including colors, spacing, typography, and more.
+In the **[Design Tokens Reference](https://github.com/WordPress/gutenberg/blob/trunk/packages/theme/docs/tokens.md)** document there is a complete reference of all available design tokens including colors, spacing, typography, and more.
 
 ### Architecture
 
