@@ -401,7 +401,6 @@ export function RichTextWrapper(
 		selectionStart,
 		selectionEnd,
 		onSelectionChange,
-		placeholder: bindingsPlaceholder || placeholder,
 		__unstableIsSelected: isSelected,
 		__unstableDisableFormats: disableFormats,
 		preserveWhiteSpace,
@@ -524,7 +523,9 @@ export function RichTextWrapper(
 				data-wp-block-attribute-key={ identifier }
 				// Ensure placeholder is not empty so the paragraph does not
 				// collapse.
-				data-rich-text-placeholder={ placeholder || '\ufeff' }
+				data-rich-text-placeholder={
+					bindingsPlaceholder || placeholder || '\ufeff'
+				}
 			/>
 		</>
 	);
