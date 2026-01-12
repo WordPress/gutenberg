@@ -42,7 +42,6 @@ const stories = [
 	'../packages/theme/src/**/stories/*.story.@(tsx|mdx)',
 	'../packages/ui/src/**/stories/*.mdx',
 	'../packages/ui/src/**/stories/*.story.@(ts|tsx)',
-	'../packages/ui/src/**/stories/*.mdx',
 ].filter( Boolean );
 
 module.exports = {
