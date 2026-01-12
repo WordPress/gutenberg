@@ -323,6 +323,18 @@ export function toTree( {
 			append( getParent( pointer ), ZWNBSP );
 		}
 
+		// Insert a <br> for completely empty fields so browsers can place
+		// the caret and extend selection into them.
+		if ( isEditableTree && ! lastCharacter && i === text.length ) {
+			append( getParent( pointer ), {
+				type: 'br',
+				attributes: {
+					'data-rich-text-padding': 'true',
+				},
+				object: true,
+			} );
+		}
+
 		lastCharacterFormats = characterFormats;
 		lastCharacter = character;
 	}

@@ -1,11 +1,20 @@
 @use "@wordpress/base-styles/variables" as *;
 
 .rich-text {
-	&:empty::after {
-		content: attr(data-rich-text-placeholder);
-		// Use opacity to work in various editor styles.
-		// We don't specify the color here, because blocks or editor styles might provide their own.
-		opacity: 0.62;
+	&[data-empty="true"] {
+		position: relative;
+
+		&::after {
+			content: attr(data-rich-text-placeholder);
+			// Use opacity to work in various editor styles.
+			// We don't specify the color here, because blocks or editor styles might provide their own.
+			opacity: 0.62;
+			// Position absolutely so the placeholder doesn't flow after the <br> padding element.
+			position: absolute;
+			top: 0;
+			left: 0;
+			pointer-events: none;
+		}
 	}
 
 	&:focus {
@@ -16,7 +25,7 @@
 
 // Captions may have lighter (gray) text, or be shown on a range of different background luminosites.
 // To ensure legibility, we increase the default placeholder opacity to ensure contrast.
-figcaption.block-editor-rich-text__editable:empty::after {
+figcaption.block-editor-rich-text__editable[data-empty="true"]::after {
 	opacity: 0.8;
 }
 
