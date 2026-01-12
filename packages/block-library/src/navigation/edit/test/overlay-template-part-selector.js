@@ -60,7 +60,7 @@ const templatePart1 = {
 	title: {
 		rendered: 'My Overlay',
 	},
-	area: 'overlay',
+	area: 'navigation-overlay',
 };
 
 const templatePart2 = {
@@ -70,7 +70,7 @@ const templatePart2 = {
 	title: {
 		rendered: 'Another Overlay',
 	},
-	area: 'overlay',
+	area: 'navigation-overlay',
 };
 
 const templatePartOtherArea = {
@@ -470,7 +470,7 @@ describe( 'OverlayTemplatePartSelector', () => {
 				title: {
 					rendered: 'Overlay',
 				},
-				area: 'overlay',
+				area: 'navigation-overlay',
 			};
 
 			mockCreateOverlayTemplatePart.mockResolvedValue( newOverlay );

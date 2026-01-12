@@ -4,5 +4,9 @@
 	"compilerOptions": {
 		"types": [ "node" ]
 	},
-	"references": [ { "path": "../hooks" }, { "path": "../url" } ]
+	"references": [
+		{ "path": "../hooks" },
+		{ "path": "../undo-manager" },
+		{ "path": "../url" }
+	]
 }

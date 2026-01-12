@@ -83,7 +83,7 @@ if ( window.__experimentalContentOnlyInspectorFields ) {
 		},
 	];
 	settings[ formKey ] = {
-		fields: [ 'media' ],
+		fields: [ 'media', 'link' ],
 	};
 }
 

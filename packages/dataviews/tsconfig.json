@@ -2,12 +2,7 @@
 	"$schema": "https://json.schemastore.org/tsconfig.json",
 	"extends": "../../tsconfig.base.json",
 	"compilerOptions": {
-		"types": [
-			"gutenberg-env",
-			"gutenberg-test-env",
-			"jest",
-			"@testing-library/jest-dom"
-		]
+		"types": [ "gutenberg-env", "gutenberg-test-env", "jest" ]
 	},
 	"references": [
 		{ "path": "../components" },
@@ -27,6 +22,7 @@
 		{ "path": "../url" },
 		{ "path": "../warning" }
 	],
+	"files": [ "global.d.ts" ],
 	"exclude": [
 		"src/**/*.android.js",
 		"src/**/*.ios.js",
