@@ -11,7 +11,6 @@ import {
  * Internal dependencies
  */
 import { WithGlobalCSS } from './decorators/with-global-css';
-import { WithMarginChecker } from './decorators/with-margin-checker';
 import { WithMaxWidthWrapper } from './decorators/with-max-width-wrapper';
 import { WithRTL } from './decorators/with-rtl';
 import { WithTheme } from './decorators/with-theme';
@@ -61,19 +60,6 @@ export const globalTypes = {
 			],
 		},
 	},
-	marginChecker: {
-		name: 'Margin Checker',
-		description:
-			'Show a div before and after the component to check for unwanted margins.',
-		defaultValue: 'hide',
-		toolbar: {
-			icon: 'collapse',
-			items: [
-				{ value: 'hide', title: 'Hide' },
-				{ value: 'show', title: 'Show' },
-			],
-		},
-	},
 	maxWidthWrapper: {
 		name: 'Max-Width Wrapper',
 		description: 'Wrap the component in a div with a max-width.',
@@ -94,7 +80,6 @@ export const globalTypes = {
 
 export const decorators = [
 	WithGlobalCSS,
-	WithMarginChecker,
 	WithRTL,
 	WithMaxWidthWrapper,
 	WithTheme,
