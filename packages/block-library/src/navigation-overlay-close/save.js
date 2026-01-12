@@ -2,11 +2,15 @@
  * WordPress dependencies
  */
 import { useBlockProps, RichText } from '@wordpress/block-editor';
+import { __ } from '@wordpress/i18n';
 
 const saveBlockProps = useBlockProps.save;
 
 export default function NavigationOverlayCloseSave( { attributes } ) {
 	const { displayMode, text } = attributes;
+
+	const label = text || __( 'Close', 'gutenberg' );
+
 	const showIcon = displayMode === 'icon' || displayMode === 'both';
 	const showText = displayMode === 'text' || displayMode === 'both';
 
@@ -18,7 +22,7 @@ export default function NavigationOverlayCloseSave( { attributes } ) {
 		<button
 			{ ...blockProps }
 			type="button"
-			aria-label={ ! showText ? 'Close' : undefined }
+			aria-label={ ! showText ? label : undefined }
 		>
 			{ showIcon && (
 				<svg
@@ -35,7 +39,7 @@ export default function NavigationOverlayCloseSave( { attributes } ) {
 			{ showText && (
 				<RichText.Content
 					tagName="span"
-					value={ text }
+					value={ label }
 					className="wp-block-navigation-overlay-close__text"
 				/>
 			) }
