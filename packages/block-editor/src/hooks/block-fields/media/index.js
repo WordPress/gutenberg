@@ -85,8 +85,8 @@ export default function Media( { data, field, onChange, config = {} } ) {
 		isControl: true,
 	} );
 	const value = field.getValue( { item: data } );
-	const { allowedTypes = [], multiple = false } = field.config || {};
 	const { fieldDef } = config;
+	const { allowedTypes = [], multiple = false } = fieldDef.args || {};
 
 	// Check if featured image is supported by checking if it's in the mapping
 	const hasFeaturedImageSupport =
