@@ -326,7 +326,7 @@ export function toTree( {
 
 		// Insert a <br> for completely empty fields so browsers can place
 		// the caret and extend selection into them.
-		if ( isEditableTree && ! lastCharacter && i === text.length ) {
+		if ( isEditableTree && text.length === 0 ) {
 			append( getParent( pointer ), {
 				type: 'br',
 				attributes: {
