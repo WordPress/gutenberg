@@ -528,26 +528,20 @@ export const saveEntityRecord =
 			return;
 		}
 		const entityIdKey = entityConfig.key ?? DEFAULT_ENTITY_KEY;
-		const recordId = record[ entityIdKey ];
 		const isLocalStaged =
-			typeof recordId === 'string' &&
-			recordId.startsWith( STAGED_ID_PREFIX ) &&
+			typeof record[ entityIdKey ] === 'string' &&
+			record[ entityIdKey ].startsWith( STAGED_ID_PREFIX ) &&
 			record.__unstablePersistedId === undefined;
-		const serverRecordId = isLocalStaged
+		const recordId = isLocalStaged
 			? record.__unstablePersistedId
-			: recordId;
+			: record[ entityIdKey ];
+
 		// Treat records without a persisted ID as new records.
-		const isNewRecord = ! serverRecordId;
+		const isNewRecord = ! recordId;
 
 		const lock = await dispatch.__unstableAcquireStoreLock(
 			STORE_NAME,
-			[
-				'entities',
-				'records',
-				kind,
-				name,
-				serverRecordId || recordId || uuid(),
-			],
+			[ 'entities', 'records', kind, name, recordId || uuid() ],
 			{ exclusive: true }
 		);
 
@@ -597,9 +591,7 @@ export const saveEntityRecord =
 					'/templates';
 			}
 			try {
-				const path = `${ baseURL }${
-					serverRecordId ? '/' + serverRecordId : ''
-				}`;
+				const path = `${ baseURL }${ recordId ? '/' + recordId : '' }`;
 				// Skip the raw values check when creating a new record; they don't exist yet.
 				const persistedRecord = ! isNewRecord
 					? select.getRawEntityRecord( kind, name, recordId )
@@ -721,28 +713,25 @@ export const saveEntityRecord =
 
 					updatedRecord = await __unstableFetch( {
 						path,
-						method: serverRecordId ? 'PUT' : 'POST',
-						data: edits,
+						method: recordId ? 'PUT' : 'POST',
+						data: isLocalStaged
+							? { ...edits, id: undefined }
+							: edits,
 					} );
-
-					if ( isLocalStaged ) {
-						const updatedRecordId = updatedRecord?.[ entityIdKey ];
-						updatedRecord = {
-							...updatedRecord,
-							// Do NOT replace the local ID with the persisted one:
-							// changing IDs would cause UI re-mounts (keys change) and visual flicker.
-							[ entityIdKey ]: recordId,
-							__unstablePersistedId: updatedRecordId,
-						};
-					}
 
 					dispatch.receiveEntityRecords(
 						kind,
 						name,
-						updatedRecord,
+						isLocalStaged
+							? {
+									...updatedRecord,
+									__unstablePersistedId: updatedRecord.id,
+									id: edits.id,
+							  }
+							: updatedRecord,
 						undefined,
 						true,
-						edits
+						isLocalStaged ? { ...edits, id: undefined } : edits
 					);
 				}
 			} catch ( _error ) {

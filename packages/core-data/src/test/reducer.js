@@ -26,6 +26,7 @@ describe( 'entities', () => {
 			items: {},
 			queries: {},
 			itemIsComplete: {},
+			persistedIdMap: {},
 		} );
 	} );
 
@@ -55,6 +56,7 @@ describe( 'entities', () => {
 				},
 			},
 			queries: {},
+			persistedIdMap: {},
 		} );
 	} );
 
@@ -101,6 +103,7 @@ describe( 'entities', () => {
 				},
 			},
 			queries: {},
+			persistedIdMap: {},
 		} );
 	} );
 
@@ -161,6 +164,7 @@ describe( 'entities', () => {
 						},
 					},
 					queries: {},
+					persistedIdMap: {},
 				},
 			} );
 		} );
@@ -223,6 +227,7 @@ describe( 'entities', () => {
 						},
 					},
 					queries: {},
+					persistedIdMap: {},
 				},
 			} );
 		} );
@@ -274,6 +279,7 @@ describe( 'entities', () => {
 						},
 					},
 					queries: {},
+					persistedIdMap: {},
 				},
 			} );
 		} );
