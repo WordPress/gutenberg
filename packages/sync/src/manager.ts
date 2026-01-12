@@ -208,10 +208,17 @@ export function createSyncManager(): SyncManager {
 		recordMap.observeDeep( onRecordUpdate );
 		recordMetaMap.observe( onRecordMetaUpdate );
 
-		const onStateUpdate = createVersionObserver( ydoc, () => {
-			// Disconnect providers when outdated client is detected
-			unload();
-		} );
+		const onStateUpdate = createVersionObserver(
+			ydoc,
+			( currentVersion, remoteVersion ) => {
+				/* eslint-disable-next-line no-console */
+				console.log(
+					`Disconnecting due to version mismatch (local: ${ currentVersion }, remote: ${ remoteVersion })`
+				);
+
+				providerResults.forEach( ( result ) => result.destroy() );
+			}
+		);
 		stateMap.observe( onStateUpdate );
 
 		// Get and apply the persisted CRDT document, if it exists.
@@ -298,10 +305,18 @@ export function createSyncManager(): SyncManager {
 		// Attach observers.
 		recordMetaMap.observe( onRecordMetaUpdate );
 
-		const onStateUpdate = createVersionObserver( ydoc, () => {
-			// Disconnect providers when outdated client is detected
-			unload();
-		} );
+		const onStateUpdate = createVersionObserver(
+			ydoc,
+			( currentVersion, remoteVersion ) => {
+				// Disconnect providers when outdated client is detected
+				/* eslint-disable-next-line no-console */
+				console.log(
+					`Disconnecting due to version mismatch (local: ${ currentVersion }, remote: ${ remoteVersion })`
+				);
+
+				providerResults.forEach( ( result ) => result.destroy() );
+			}
+		);
 		stateMap.observe( onStateUpdate );
 
 		// Announce our CRDT version to the network
@@ -543,7 +558,10 @@ export function createSyncManager(): SyncManager {
 	 */
 	function createVersionObserver(
 		ydoc: CRDTDoc,
-		onOutdatedCallback: () => void
+		onOutdatedCallback: (
+			currentVersion: number,
+			remoteVersion: number
+		) => void
 	) {
 		return (
 			event: Y.YMapEvent< unknown >,
@@ -568,7 +586,17 @@ export function createSyncManager(): SyncManager {
 							remoteVersion !== undefined &&
 							remoteVersion > CRDT_DOC_VERSION
 						) {
-							onOutdatedCallback();
+							/*
+							 * Callback if the remote version is higher than the
+							 * current client's version.
+							 *
+							 * @param {number} currentVersion The current client's version.
+							 * @param {number} remoteVersion The remote version.
+							 */
+							onOutdatedCallback(
+								CRDT_DOC_VERSION,
+								remoteVersion
+							);
 						}
 						break;
 				}
