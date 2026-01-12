@@ -233,7 +233,7 @@ export default function BlockVisibilityModal( { clientIds, onClose } ) {
 						<li className="block-editor-block-visibility-modal__options-item block-editor-block-visibility-modal__options-item--everywhere">
 							<CheckboxControl
 								className="block-editor-block-visibility-modal__options-checkbox--everywhere"
-								label={ __( 'Hide from published content' ) }
+								label={ __( 'Omit from published content' ) }
 								checked={ hideEverywhere === true }
 								indeterminate={ hideEverywhere === null }
 								onChange={ ( checked ) => {
