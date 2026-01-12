@@ -358,7 +358,7 @@ export const getStagedEntityRecords = createSelector(
 				Object.prototype.hasOwnProperty.call( allItems, persistedId );
 			return (
 				typeof itemId === 'string' &&
-				itemId.startsWith( STAGED_ID_PREFIX ) === true &&
+				itemId.startsWith( STAGED_ID_PREFIX ) &&
 				( persistedId === undefined || ! hasPersistedRecord )
 			);
 		} );
