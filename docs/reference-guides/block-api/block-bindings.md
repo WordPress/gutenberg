@@ -36,12 +36,12 @@ Right now, not all block attributes are compatible with block bindings. There is
 
 ## Core Sources
 
-WordPress includes several built-in block bindings sources that you can use without any custom registration.
+WordPress includes several built-in block bindings sources that you can use without any custom registration:
 
-- [core/post-meta](#core-post-meta)
-- [core/post-data](#core-post-data)
-- [core/term-data](#core-term-data)
-- [core/pattern-overrides](#core-pattern-overrides)
+- `core/post-meta`
+- `core/post-data`
+- `core/term-data`
+- `core/pattern-overrides`
 
 ### core/post-meta
 
