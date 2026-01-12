@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import { useEffect } from '@wordpress/element';
-import basicStyles from '../global-basic.lazy.scss?raw';
-import wordPressStyles from '../global-wordpress.lazy.scss?raw';
+import basicStyles from '../global-basic.lazy.scss?inline';
+import wordPressStyles from '../global-wordpress.lazy.scss?inline';
 
 /**
  * A Storybook decorator to inject global CSS.

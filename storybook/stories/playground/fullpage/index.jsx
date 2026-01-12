@@ -13,7 +13,7 @@ import '@wordpress/format-library';
 /**
  * Internal dependencies
  */
-import styles from './style.lazy.scss?raw';
+import styles from './style.lazy.scss?inline';
 import { editorStyles } from '../editor-styles';
 
 export default function EditorFullPage() {
