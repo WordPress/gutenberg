@@ -149,11 +149,9 @@ export function toTree( {
 
 	for ( let i = 0; i < formatsLength; i++ ) {
 		const character = text.charAt( i );
-		// Pad the line if the field is empty or the previous character is a
-		// line break, otherwise the line break won't be visible and selection
-		// can't extend into empty elements.
-		const shouldInsertPadding =
-			isEditableTree && ( ! lastCharacter || lastCharacter === '\n' );
+		// Pad the line if the previous character is a line break, otherwise
+		// the line break won't be visible.
+		const shouldInsertPadding = isEditableTree && lastCharacter === '\n';
 
 		const characterFormats = formats[ i ];
 		let pointer = getLastChild( tree );

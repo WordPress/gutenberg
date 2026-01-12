@@ -521,8 +521,8 @@ export function RichTextWrapper(
 						: props.tabIndex
 				}
 				data-wp-block-attribute-key={ identifier }
-				// Used by CSS to show placeholder via ::after pseudo-element.
-				data-empty={ ! adjustedValue.length || undefined }
+				// Ensure placeholder is not empty so the paragraph does not
+				// collapse.
 				data-rich-text-placeholder={
 					bindingsPlaceholder || placeholder || '\ufeff'
 				}
