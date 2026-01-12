@@ -180,7 +180,7 @@ function denormalizeLinkValue( value, fieldDef ) {
  * @param {boolean}  props.isCollapsed   Whether the DataForm is rendered as 'collapsed' with only the first field
  *                                       displayed by default. When collapsed a dropdown is displayed to allow
  *                                       displaying additional fields. The block's title is displayed as the title.
- *                                       The collapsed mode is often used when multiple BlockForm's are shown together.
+ *                                       The collapsed mode is often used when multiple BlockForms are shown together.
  */
 function BlockFields( {
 	clientId,
