@@ -27,6 +27,7 @@ import {
 } from './utils';
 import { fetchBlockPatterns } from './fetch';
 import { mapRecordsToLocalIds } from './utils/persisted-id-map';
+import { isStagedId } from './utils/is-staged-id';
 
 /**
  * Requests authors from the REST API.
@@ -73,6 +74,9 @@ export const getEntityRecord =
 			( config ) => config.name === name && config.kind === kind
 		);
 		if ( ! entityConfig ) {
+			return;
+		}
+		if ( isStagedId( key ) ) {
 			return;
 		}
 

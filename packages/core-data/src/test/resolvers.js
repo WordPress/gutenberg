@@ -25,6 +25,7 @@ import {
 	getCurrentUser,
 } from '../resolvers';
 import { RECEIVE_INTERMEDIATE_RESULTS } from '../utils';
+import { STAGED_ID_PREFIX } from '../utils/is-staged-id';
 
 describe( 'getEntityRecord', () => {
 	const POST_TYPE = { slug: 'post' };
@@ -130,6 +131,17 @@ describe( 'getEntityRecord', () => {
 		expect( dispatch.__unstableReleaseStoreLock ).toHaveBeenCalledTimes(
 			1
 		);
+	} );
+
+	it( 'skips API fetch for staged IDs', async () => {
+		await getEntityRecord(
+			'root',
+			'postType',
+			`${ STAGED_ID_PREFIX }post`
+		)( { dispatch, registry, resolveSelect } );
+
+		expect( triggerFetch ).not.toHaveBeenCalled();
+		expect( dispatch.__unstableAcquireStoreLock ).not.toHaveBeenCalled();
 	} );
 
 	it( 'loads entity with sync manager when __experimentalEnableSync is true', async () => {

@@ -384,7 +384,9 @@ export const getStagedEntityRecords = createSelector(
 		const queryItemIds = new Set< string >();
 		const queriesForContext = queriedData?.queries?.[ context ] || {};
 		Object.values( queriesForContext ).forEach( ( queryResult ) => {
+			// @ts-expect-error
 			if ( Array.isArray( queryResult?.itemIds ) ) {
+				// @ts-expect-error
 				queryResult.itemIds.forEach( ( itemId ) =>
 					queryItemIds.add( String( itemId ) )
 				);
