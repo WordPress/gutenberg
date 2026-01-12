@@ -72,7 +72,7 @@ export default {
 	'error-stroke4': [ 'stroke-interactive-error-active' ],
 	'error-stroke1': [ 'stroke-surface-error' ],
 	'bg-surface2': [ 'bg-surface-neutral' ],
-	'bg-surface6': [
+	'bg-surface5': [
 		'bg-interactive-brand-strong-disabled',
 		'bg-interactive-error-strong-disabled',
 		'bg-interactive-neutral-strong-disabled',

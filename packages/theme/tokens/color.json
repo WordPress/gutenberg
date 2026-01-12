@@ -1184,7 +1184,7 @@
 					"$description": "Background color for interactive elements with neutral tone and strong emphasis that are hovered, focused, or active."
 				},
 				"neutral-strong-disabled": {
-					"$value": "{wpds-color.primitive.bg.surface6}",
+					"$value": "{wpds-color.primitive.bg.surface5}",
 					"$description": "Background color for interactive elements with neutral tone and strong emphasis, in their disabled state."
 				},
 				"neutral-weak": {
@@ -1236,7 +1236,7 @@
 					"$description": "Background color for interactive elements with brand tone and strong emphasis that are hovered, focused, or active."
 				},
 				"brand-strong-disabled": {
-					"$value": "{wpds-color.primitive.bg.surface6}",
+					"$value": "{wpds-color.primitive.bg.surface5}",
 					"$description": "Background color for interactive elements with brand tone and strong emphasis, in their disabled state."
 				},
 				"brand-weak": {
@@ -1288,7 +1288,7 @@
 					"$description": "Background color for interactive elements with error tone and strong emphasis that are hovered, focused, or active."
 				},
 				"error-strong-disabled": {
-					"$value": "{wpds-color.primitive.bg.surface6}",
+					"$value": "{wpds-color.primitive.bg.surface5}",
 					"$description": "Background color for interactive elements with error tone and strong emphasis, in their disabled state."
 				},
 				"error-weak": {
