@@ -28,9 +28,10 @@ jest.mock( '../use-create-overlay', () => ( {
 	default: jest.fn(),
 } ) );
 
-// Mock useDispatch specifically to avoid needing to set up full data store
+// Mock useDispatch and useSelect specifically to avoid needing to set up full data store
 jest.mock( '@wordpress/data', () => ( {
 	useDispatch: jest.fn(),
+	useSelect: jest.fn(),
 	createSelector: jest.fn( ( fn ) => fn ),
 	createRegistrySelector: jest.fn( ( fn ) => fn ),
 	createReduxStore: jest.fn( () => ( {} ) ),
@@ -92,6 +93,7 @@ const allTemplateParts = [
 describe( 'OverlayTemplatePartSelector', () => {
 	const mockCreateOverlayTemplatePart = jest.fn();
 	const mockCreateErrorNotice = jest.fn();
+	const { useSelect } = require( '@wordpress/data' );
 
 	beforeEach( () => {
 		jest.clearAllMocks();
@@ -106,6 +108,19 @@ describe( 'OverlayTemplatePartSelector', () => {
 		// Mock useDispatch to return createErrorNotice for noticesStore
 		useDispatch.mockReturnValue( {
 			createErrorNotice: mockCreateErrorNotice,
+		} );
+		// Mock useSelect to return current theme
+		// The component calls: select( coreStore ).getCurrentTheme()?.stylesheet
+		useSelect.mockImplementation( ( selector ) => {
+			if ( typeof selector === 'function' ) {
+				const mockSelect = () => ( {
+					getCurrentTheme: () => ( {
+						stylesheet: 'twentytwentyfive',
+					} ),
+				} );
+				return selector( mockSelect );
+			}
+			return 'twentytwentyfive';
 		} );
 	} );
 
@@ -195,7 +210,7 @@ describe( 'OverlayTemplatePartSelector', () => {
 			).toBeInTheDocument();
 		} );
 
-		it( 'should call set the overlay attribute when an overlay is selected', async () => {
+		it( 'should store slug only when an overlay is selected', async () => {
 			const user = userEvent.setup();
 
 			useEntityRecords.mockReturnValue( {
@@ -210,10 +225,10 @@ describe( 'OverlayTemplatePartSelector', () => {
 				name: 'Overlay template',
 			} );
 
-			await user.selectOptions( select, 'twentytwentyfive//my-overlay' );
+			await user.selectOptions( select, 'my-overlay' );
 
 			expect( mockSetAttributes ).toHaveBeenCalledWith( {
-				overlay: 'twentytwentyfive//my-overlay',
+				overlay: 'my-overlay',
 			} );
 		} );
 
@@ -229,7 +244,7 @@ describe( 'OverlayTemplatePartSelector', () => {
 			render(
 				<OverlayTemplatePartSelector
 					{ ...defaultProps }
-					overlay="twentytwentyfive//my-overlay"
+					overlay="my-overlay"
 				/>
 			);
 
@@ -244,7 +259,7 @@ describe( 'OverlayTemplatePartSelector', () => {
 			} );
 		} );
 
-		it( 'should display selected overlay', () => {
+		it( 'should display selected overlay by slug', () => {
 			useEntityRecords.mockReturnValue( {
 				records: [ templatePart1 ],
 				isResolving: false,
@@ -254,7 +269,7 @@ describe( 'OverlayTemplatePartSelector', () => {
 			render(
 				<OverlayTemplatePartSelector
 					{ ...defaultProps }
-					overlay="twentytwentyfive//my-overlay"
+					overlay="my-overlay"
 				/>
 			);
 
@@ -262,7 +277,7 @@ describe( 'OverlayTemplatePartSelector', () => {
 				name: 'Overlay template',
 			} );
 
-			expect( select ).toHaveValue( 'twentytwentyfive//my-overlay' );
+			expect( select ).toHaveValue( 'my-overlay' );
 		} );
 	} );
 
@@ -293,7 +308,7 @@ describe( 'OverlayTemplatePartSelector', () => {
 			render(
 				<OverlayTemplatePartSelector
 					{ ...defaultProps }
-					overlay="twentytwentyfive//my-overlay"
+					overlay="my-overlay"
 				/>
 			);
 
@@ -322,7 +337,7 @@ describe( 'OverlayTemplatePartSelector', () => {
 			render(
 				<OverlayTemplatePartSelector
 					{ ...defaultProps }
-					overlay="twentytwentyfive//my-overlay"
+					overlay="my-overlay"
 				/>
 			);
 
@@ -345,7 +360,7 @@ describe( 'OverlayTemplatePartSelector', () => {
 			render(
 				<OverlayTemplatePartSelector
 					{ ...defaultProps }
-					overlay="twentytwentyfive//my-overlay"
+					overlay="my-overlay"
 					onNavigateToEntityRecord={ undefined }
 				/>
 			);
@@ -359,7 +374,7 @@ describe( 'OverlayTemplatePartSelector', () => {
 			expect( editButton ).toHaveAttribute( 'aria-disabled', 'true' );
 		} );
 
-		it( 'should navigate to focused overlay editor when edit button is clicked', async () => {
+		it( 'should navigate to focused overlay editor with full ID when edit button is clicked', async () => {
 			const user = userEvent.setup();
 
 			useEntityRecords.mockReturnValue( {
@@ -371,7 +386,7 @@ describe( 'OverlayTemplatePartSelector', () => {
 			render(
 				<OverlayTemplatePartSelector
 					{ ...defaultProps }
-					overlay="twentytwentyfive//my-overlay"
+					overlay="my-overlay"
 				/>
 			);
 
@@ -382,6 +397,7 @@ describe( 'OverlayTemplatePartSelector', () => {
 
 			await user.click( editButton );
 
+			// Should construct full ID from theme and slug
 			expect( mockOnNavigateToEntityRecord ).toHaveBeenCalledWith( {
 				postId: 'twentytwentyfive//my-overlay',
 				postType: 'wp_template_part',
@@ -400,7 +416,7 @@ describe( 'OverlayTemplatePartSelector', () => {
 			render(
 				<OverlayTemplatePartSelector
 					{ ...defaultProps }
-					overlay="twentytwentyfive//my-overlay"
+					overlay="my-overlay"
 					onNavigateToEntityRecord={ undefined }
 				/>
 			);
@@ -461,7 +477,7 @@ describe( 'OverlayTemplatePartSelector', () => {
 	} );
 
 	describe( 'Create overlay', () => {
-		it( 'should call createOverlayTemplatePart when create button is clicked', async () => {
+		it( 'should store slug only and navigate with full ID when creating overlay', async () => {
 			const user = userEvent.setup();
 			const newOverlay = {
 				id: 'twentytwentyfive//overlay',
@@ -490,9 +506,11 @@ describe( 'OverlayTemplatePartSelector', () => {
 			await user.click( createButton );
 
 			expect( mockCreateOverlayTemplatePart ).toHaveBeenCalled();
+			// Should store slug only
 			expect( mockSetAttributes ).toHaveBeenCalledWith( {
-				overlay: 'twentytwentyfive//overlay',
+				overlay: 'overlay',
 			} );
+			// Should navigate with full ID constructed from theme and slug
 			expect( mockOnNavigateToEntityRecord ).toHaveBeenCalledWith( {
 				postId: 'twentytwentyfive//overlay',
 				postType: 'wp_template_part',
