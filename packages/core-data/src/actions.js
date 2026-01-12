@@ -528,20 +528,21 @@ export const saveEntityRecord =
 			return;
 		}
 		const entityIdKey = entityConfig.key ?? DEFAULT_ENTITY_KEY;
+		const stagedRecordId = record[ entityIdKey ];
 		const isLocalStaged =
-			typeof record[ entityIdKey ] === 'string' &&
-			record[ entityIdKey ].startsWith( STAGED_ID_PREFIX ) &&
-			record.__unstablePersistedId === undefined;
-		const recordId = isLocalStaged
+			typeof stagedRecordId === 'string' &&
+			stagedRecordId.startsWith( STAGED_ID_PREFIX );
+		const recordId = record.__unstablePersistedId
 			? record.__unstablePersistedId
-			: record[ entityIdKey ];
+			: stagedRecordId;
+		const localRecordId = isLocalStaged ? stagedRecordId : recordId;
 
 		// Treat records without a persisted ID as new records.
 		const isNewRecord = ! recordId;
 
 		const lock = await dispatch.__unstableAcquireStoreLock(
 			STORE_NAME,
-			[ 'entities', 'records', kind, name, recordId || uuid() ],
+			[ 'entities', 'records', kind, name, localRecordId || uuid() ],
 			{ exclusive: true }
 		);
 
@@ -551,12 +552,16 @@ export const saveEntityRecord =
 			for ( const [ key, value ] of Object.entries( record ) ) {
 				if ( typeof value === 'function' ) {
 					const evaluatedValue = value(
-						select.getEditedEntityRecord( kind, name, recordId )
+						select.getEditedEntityRecord(
+							kind,
+							name,
+							localRecordId
+						)
 					);
 					dispatch.editEntityRecord(
 						kind,
 						name,
-						recordId,
+						localRecordId,
 						{
 							[ key ]: evaluatedValue,
 						},
@@ -570,7 +575,7 @@ export const saveEntityRecord =
 				type: 'SAVE_ENTITY_RECORD_START',
 				kind,
 				name,
-				recordId,
+				recordId: localRecordId,
 				isAutosave,
 			} );
 			let updatedRecord;
@@ -594,7 +599,7 @@ export const saveEntityRecord =
 				const path = `${ baseURL }${ recordId ? '/' + recordId : '' }`;
 				// Skip the raw values check when creating a new record; they don't exist yet.
 				const persistedRecord = ! isNewRecord
-					? select.getRawEntityRecord( kind, name, recordId )
+					? select.getRawEntityRecord( kind, name, localRecordId )
 					: {};
 
 				if ( isAutosave ) {
@@ -715,23 +720,30 @@ export const saveEntityRecord =
 						path,
 						method: recordId ? 'PUT' : 'POST',
 						data: isLocalStaged
-							? { ...edits, id: undefined }
+							? { ...edits, [ entityIdKey ]: undefined }
 							: edits,
 					} );
+
+					const stagedEdits = isLocalStaged
+						? { ...edits, [ entityIdKey ]: undefined }
+						: edits;
+					const persistedId =
+						updatedRecord[ entityIdKey ] ?? updatedRecord.id;
+					const stagedRecord = isLocalStaged
+						? {
+								...updatedRecord,
+								__unstablePersistedId: persistedId,
+								[ entityIdKey ]: stagedRecordId,
+						  }
+						: updatedRecord;
 
 					dispatch.receiveEntityRecords(
 						kind,
 						name,
-						isLocalStaged
-							? {
-									...updatedRecord,
-									__unstablePersistedId: updatedRecord.id,
-									id: edits.id,
-							  }
-							: updatedRecord,
+						stagedRecord,
 						undefined,
 						true,
-						isLocalStaged ? { ...edits, id: undefined } : edits
+						stagedEdits
 					);
 				}
 			} catch ( _error ) {
@@ -742,7 +754,7 @@ export const saveEntityRecord =
 				type: 'SAVE_ENTITY_RECORD_FINISH',
 				kind,
 				name,
-				recordId,
+				recordId: localRecordId,
 				error,
 				isAutosave,
 			} );
