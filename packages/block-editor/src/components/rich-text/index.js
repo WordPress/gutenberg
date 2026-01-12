@@ -522,6 +522,9 @@ export function RichTextWrapper(
 						: props.tabIndex
 				}
 				data-wp-block-attribute-key={ identifier }
+				// Ensure placeholder is not empty so the paragraph does not
+				// collapse.
+				data-rich-text-placeholder={ placeholder || '\ufeff' }
 			/>
 		</>
 	);

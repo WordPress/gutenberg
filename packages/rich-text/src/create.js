@@ -611,11 +611,7 @@ function createFromElement( { element, range, isEditableTree } ) {
 
 		// Ignore any placeholders, but keep their content since the browser
 		// might insert text inside them when the editable element is flex.
-		if (
-			! format ||
-			node.getAttribute( 'data-rich-text-placeholder' ) ||
-			node.getAttribute( 'data-rich-text-bogus' )
-		) {
+		if ( ! format || node.getAttribute( 'data-rich-text-bogus' ) ) {
 			mergePair( accumulator, value );
 		} else if ( value.text.length === 0 ) {
 			if ( format.attributes ) {

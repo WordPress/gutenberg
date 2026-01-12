@@ -135,7 +135,6 @@ export function toTree( {
 	onStartIndex,
 	onEndIndex,
 	isEditableTree,
-	placeholder,
 } ) {
 	const { formats, replacements, text, start, end } = value;
 	const formatsLength = formats.length + 1;
@@ -144,20 +143,11 @@ export function toTree( {
 	const deepestActiveFormat = activeFormats[ activeFormats.length - 1 ];
 
 	let lastCharacterFormats;
-	let lastCharacter;
 
 	append( tree, '' );
 
 	for ( let i = 0; i < formatsLength; i++ ) {
 		const character = text.charAt( i );
-		const shouldInsertPadding =
-			isEditableTree &&
-			// Pad the line if the line is empty.
-			( ! lastCharacter ||
-				// Pad the line if the previous character is a line break, otherwise
-				// the line break won't be visible.
-				lastCharacter === '\n' );
-
 		const characterFormats = formats[ i ];
 		let pointer = getLastChild( tree );
 
@@ -324,26 +314,7 @@ export function toTree( {
 			onEndIndex( tree, pointer );
 		}
 
-		if ( shouldInsertPadding && i === text.length ) {
-			append( getParent( pointer ), ZWNBSP );
-
-			// We CANNOT use CSS to add a placeholder with pseudo elements on
-			// the main block wrappers because that could clash with theme CSS.
-			if ( placeholder && text.length === 0 ) {
-				append( getParent( pointer ), {
-					type: 'span',
-					attributes: {
-						'data-rich-text-placeholder': placeholder,
-						// Necessary to prevent the placeholder from catching
-						// selection and being editable.
-						style: 'pointer-events:none;user-select:none;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;',
-					},
-				} );
-			}
-		}
-
 		lastCharacterFormats = characterFormats;
-		lastCharacter = character;
 	}
 
 	return tree;
