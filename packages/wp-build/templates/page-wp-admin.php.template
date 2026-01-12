@@ -12,7 +12,7 @@
 
 // Global storage for {{PAGE_SLUG}} routes and menu items
 global ${{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_routes, ${{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_menu_items;
-${{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_routes = array();
+${{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_routes     = array();
 ${{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_menu_items = array();
 
 if ( ! function_exists( '{{PREFIX}}_register_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_route' ) ) {
