@@ -39,20 +39,19 @@ const CONTROLS = {
  * Creates a configured control component that wraps a custom control
  * and passes configuration as props.
  *
- * @param {Object} config         - The control configuration
- * @param {string} config.control - The control type (key in CONTROLS map)
+ * @param {Component} ControlComponent The React component for the control.
+ * @param {string}    type             The type of control.
+ * @param {Object}    config           The control configuration passed as a prop.
+ *
  * @return {Function} A wrapped control component
  */
-function createConfiguredControl( config ) {
-	const { control, ...controlConfig } = config;
-	const ControlComponent = CONTROLS[ control ];
-
+function createConfiguredControl( ControlComponent, type, config ) {
 	if ( ! ControlComponent ) {
-		throw new Error( `Control type "${ control }" not found` );
+		throw new Error( `Control type "${ type }" not found` );
 	}
 
 	return function ConfiguredControl( props ) {
-		return <ControlComponent { ...props } config={ controlConfig } />;
+		return <ControlComponent { ...props } config={ config } />;
 	};
 }
 
@@ -104,8 +103,6 @@ function BlockFields( {
 		}
 
 		return blockTypeFields.map( ( fieldDef ) => {
-			const ControlComponent = CONTROLS[ fieldDef.type ];
-
 			const field = {
 				id: fieldDef.id,
 				label: fieldDef.label,
@@ -136,13 +133,17 @@ function BlockFields( {
 			}
 
 			// Only add custom Edit component if one exists for this type
+			const ControlComponent = CONTROLS[ fieldDef.type ];
 			if ( ControlComponent ) {
 				// Use EditConfig pattern: Edit is an object with control type and config props
-				field.Edit = createConfiguredControl( {
-					control: fieldDef.type,
-					clientId,
-					fieldDef,
-				} );
+				field.Edit = createConfiguredControl(
+					ControlComponent,
+					fieldDef.type,
+					{
+						clientId,
+						fieldDef,
+					}
+				);
 			}
 
 			return field;
