@@ -14,11 +14,22 @@
 		width: $grid-unit-20;
 		height: $grid-unit-20;
 		object-fit: cover;
-		opacity: 0;
+		opacity: 1;
 		border-radius: 100%;
+	}
 
-		@media not (prefers-reduced-motion) {
-			transition: opacity 0.1s linear;
+	&.is-loading,
+	&.is-loaded {
+		img {
+			@media not (prefers-reduced-motion) {
+				transition: opacity 0.1s linear;
+			}
+		}
+	}
+
+	&.is-loading {
+		img {
+			opacity: 0;
 		}
 	}
 
