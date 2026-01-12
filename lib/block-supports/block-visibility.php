@@ -59,7 +59,7 @@ function gutenberg_render_block_visibility_support( $block_content, $block ) {
 		);
 
 		/*
-		 * Build media queries from breakpoint definitions using CSS range syntax.
+		 * Build media queries from breakpoint definitions using the CSS range syntax.
 		 * Could be absorbed into the style engine,
 		 * as well as classname building, and declaration of the display property, if required.
 		 */
@@ -71,13 +71,13 @@ function gutenberg_render_block_visibility_support( $block_content, $block ) {
 
 			// First item: width <= size.
 			if ( 0 === $index ) {
-				$breakpoint_queries[ $slug ] = '@media (width <= ' . $size . ')';
+				$breakpoint_queries[ $slug ] = "@media (width <= $size)";
 			} elseif ( count( $breakpoints ) - 1 === $index ) {
 				// Last item: width > previous size.
-				$breakpoint_queries[ $slug ] = '@media (width > ' . $previous_size . ')';
+				$breakpoint_queries[ $slug ] = "@media (width > $previous_size)";
 			} else {
 				// Middle items: previous size < width <= size.
-				$breakpoint_queries[ $slug ] = '@media (' . $previous_size . ' < width <= ' . $size . ')';
+				$breakpoint_queries[ $slug ] = "@media ($previous_size < width <= $size)";
 			}
 
 			$previous_size = $size;
