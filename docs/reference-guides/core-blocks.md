@@ -1123,6 +1123,47 @@ An advanced block that allows displaying taxonomy terms based on different query
 -	**Supports:** align (full, wide), anchor, interactivity, layout, ~~html~~
 -	**Attributes:** tagName, termQuery
 
+## Terms Query Pagination
+
+Displays pagination controls for the Terms Query block. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/terms-query-pagination))
+
+-	**Name:** core/terms-query-pagination
+-	**Category:** theme
+-	**Ancestor:** core/terms-query
+-	**Allowed Blocks:** core/terms-query-pagination-previous, core/terms-query-pagination-numbers, core/terms-query-pagination-next
+-	**Supports:** align, color (background, gradients, link, text), interactivity (clientNavigation), layout (default, ~~allowInheriting~~, ~~allowSwitching~~), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
+-	**Attributes:** paginationArrow, showLabel
+
+## Terms Query Next Page
+
+Displays the next terms page link. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/terms-query-pagination-next))
+
+-	**Name:** core/terms-query-pagination-next
+-	**Category:** theme
+-	**Parent:** core/terms-query-pagination
+-	**Supports:** color (background, gradients, ~~text~~), interactivity (clientNavigation), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
+-	**Attributes:** label
+
+## Terms Query Page Numbers
+
+Displays a list of page numbers for terms pagination. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/terms-query-pagination-numbers))
+
+-	**Name:** core/terms-query-pagination-numbers
+-	**Category:** theme
+-	**Parent:** core/terms-query-pagination
+-	**Supports:** color (background, gradients, ~~text~~), interactivity (clientNavigation), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
+-	**Attributes:** midSize
+
+## Terms Query Previous Page
+
+Displays the previous terms page link. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/terms-query-pagination-previous))
+
+-	**Name:** core/terms-query-pagination-previous
+-	**Category:** theme
+-	**Parent:** core/terms-query-pagination
+-	**Supports:** color (background, gradients, ~~text~~), interactivity (clientNavigation), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
+-	**Attributes:** label
+
 ## Text Columns (deprecated)
 
 This block is deprecated. Please use the Columns block instead. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/text-columns))

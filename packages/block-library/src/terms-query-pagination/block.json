@@ -1,0 +1,70 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "core/terms-query-pagination",
+	"title": "Terms Query Pagination",
+	"category": "theme",
+	"ancestor": [ "core/terms-query" ],
+	"allowedBlocks": [
+		"core/terms-query-pagination-previous",
+		"core/terms-query-pagination-numbers",
+		"core/terms-query-pagination-next"
+	],
+	"description": "Displays pagination controls for the Terms Query block.",
+	"textdomain": "default",
+	"attributes": {
+		"paginationArrow": {
+			"type": "string",
+			"default": "none"
+		},
+		"showLabel": {
+			"type": "boolean",
+			"default": true
+		}
+	},
+	"usesContext": [ "termQuery" ],
+	"providesContext": {
+		"paginationArrow": "paginationArrow",
+		"showLabel": "showLabel"
+	},
+	"supports": {
+		"align": true,
+		"reusable": false,
+		"html": false,
+		"color": {
+			"gradients": true,
+			"link": true,
+			"__experimentalDefaultControls": {
+				"background": true,
+				"text": true,
+				"link": true
+			}
+		},
+		"layout": {
+			"allowSwitching": false,
+			"allowInheriting": false,
+			"default": {
+				"type": "flex"
+			}
+		},
+		"typography": {
+			"fontSize": true,
+			"lineHeight": true,
+			"__experimentalFontFamily": true,
+			"__experimentalFontWeight": true,
+			"__experimentalFontStyle": true,
+			"__experimentalTextTransform": true,
+			"__experimentalTextDecoration": true,
+			"__experimentalLetterSpacing": true,
+			"__experimentalDefaultControls": {
+				"fontSize": true
+			}
+		},
+		"interactivity": {
+			"clientNavigation": true
+		}
+	},
+	"editorStyle": "terms-query-pagination-editor",
+	"style": "terms-query-pagination",
+	"editorScript": "file:./index.js"
+}
