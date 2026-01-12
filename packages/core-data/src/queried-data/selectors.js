@@ -13,6 +13,10 @@ import { createSelector } from '@wordpress/data';
  */
 import getQueryParts from './get-query-parts';
 import { setNestedValue } from '../utils';
+import {
+	getLocalIdForPersistedId,
+	mapPersistedIdsToLocalIds,
+} from '../utils/persisted-id-map';
 
 /**
  * Cache of state keys to EquivalentKeyMap where the inner map tracks queries
@@ -36,12 +40,7 @@ function getQueriedItemsUncached( state, query ) {
 		getQueryParts( query );
 	let itemIds;
 	const itemsById = state.items?.[ context ] || {};
-	const persistedIdMapForContext = state.persistedIdMap?.[ context ] || {};
-	const includeMapped = Array.isArray( include )
-		? include.map(
-				( itemId ) => persistedIdMapForContext[ itemId ] || itemId
-		  )
-		: null;
+	const persistedIdMapForContext = state.persistedIdMap?.[ context ];
 
 	if ( state.queries?.[ context ]?.[ stableKey ] ) {
 		itemIds = state.queries[ context ][ stableKey ].itemIds;
@@ -63,7 +62,13 @@ function getQueriedItemsUncached( state, query ) {
 		if ( itemId === undefined ) {
 			continue;
 		}
-		itemId = persistedIdMapForContext[ itemId ] || itemId;
+		const includeMapped = mapPersistedIdsToLocalIds(
+			include,
+			persistedIdMapForContext
+		);
+		itemId =
+			getLocalIdForPersistedId( persistedIdMapForContext, itemId ) ||
+			itemId;
 		if ( includeMapped && ! includeMapped.includes( itemId ) ) {
 			continue;
 		}

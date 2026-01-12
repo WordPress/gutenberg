@@ -26,41 +26,7 @@ import {
 	isNumericID,
 } from './utils';
 import { fetchBlockPatterns } from './fetch';
-
-function mapRecordsToStagedIds( records, persistedIdMap, entityIdKey ) {
-	if ( ! persistedIdMap || Object.keys( persistedIdMap ).length === 0 ) {
-		return records;
-	}
-
-	const mapRecord = ( record ) => {
-		const persistedId = record?.[ entityIdKey ];
-		const localId = persistedIdMap[ persistedId ];
-		if ( ! localId ) {
-			return record;
-		}
-
-		return {
-			...record,
-			[ entityIdKey ]: localId,
-			__unstablePersistedId: persistedId,
-		};
-	};
-
-	if ( Array.isArray( records ) ) {
-		let hasChanges = false;
-		const mappedRecords = records.map( ( record ) => {
-			const mappedRecord = mapRecord( record );
-			if ( mappedRecord !== record ) {
-				hasChanges = true;
-			}
-			return mappedRecord;
-		} );
-
-		return hasChanges ? mappedRecords : records;
-	}
-
-	return mapRecord( records );
-}
+import { mapRecordsToLocalIds } from './utils/persisted-id-map';
 
 /**
  * Requests authors from the REST API.
@@ -269,7 +235,7 @@ export const getEntityRecord =
 				name,
 				query
 			);
-			const mappedRecord = mapRecordsToStagedIds(
+			const mappedRecord = mapRecordsToLocalIds(
 				record,
 				persistedIdMap,
 				entityConfig.key ?? DEFAULT_ENTITY_KEY
@@ -449,7 +415,7 @@ export const getEntityRecords =
 					}
 
 					records.push( ...pageRecords );
-					const mappedRecords = mapRecordsToStagedIds(
+					const mappedRecords = mapRecordsToLocalIds(
 						records,
 						persistedIdMap,
 						key
@@ -495,7 +461,7 @@ export const getEntityRecords =
 			}
 
 			registry.batch( () => {
-				const mappedRecords = mapRecordsToStagedIds(
+				const mappedRecords = mapRecordsToLocalIds(
 					records,
 					persistedIdMap,
 					key
@@ -927,7 +893,7 @@ export const getNavigationFallbackId =
 			'postType',
 			'wp_navigation'
 		);
-		const mappedRecord = mapRecordsToStagedIds(
+		const mappedRecord = mapRecordsToLocalIds(
 			record,
 			persistedIdMap,
 			DEFAULT_ENTITY_KEY
@@ -988,7 +954,7 @@ export const getDefaultTemplateId =
 				'postType',
 				template.type
 			);
-			const mappedTemplate = mapRecordsToStagedIds(
+			const mappedTemplate = mapRecordsToLocalIds(
 				template,
 				persistedIdMap,
 				DEFAULT_ENTITY_KEY

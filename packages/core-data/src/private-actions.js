@@ -201,7 +201,7 @@ export const createStagedEntityRecord =
 		// Generate a unique staged ID
 		const stagedId = `${ STAGED_ID_PREFIX }${ uuid() }`;
 
-		// Create the record with the staged ID and a flag indicating it's local-only
+		// Create the record with a staged ID; staged IDs are treated as local-only.
 		const stagedRecord = {
 			...record,
 			[ entityIdKey ]: stagedId,

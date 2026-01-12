@@ -16,7 +16,8 @@ import { DEFAULT_ENTITY_KEY } from './entities';
 import { STORE_NAME } from './name';
 import { unlock } from './lock-unlock';
 import { getSyncManager } from './sync';
-import { STAGED_ID_PREFIX } from './utils/is-staged-id';
+import { isStagedId } from './utils/is-staged-id';
+import { createPersistedIdLookup } from './utils/persisted-id-map';
 import logEntityDeprecation from './utils/log-entity-deprecation';
 
 type EntityRecordKey = string | number;
@@ -378,12 +379,9 @@ export const getStagedEntityRecords = createSelector(
 			context,
 		} );
 		const persistedLocalIds = new Set( Object.values( persistedIdMap ) );
-		const persistedIdByLocalId = new Map(
-			Object.entries( persistedIdMap ).map(
-				( [ persistedId, localId ] ) => [ localId, persistedId ]
-			)
-		);
-		const queryItemIds = new Set();
+		const persistedIdByLocalId = createPersistedIdLookup( persistedIdMap );
+		// Track IDs already returned by queries to avoid duplicating staged items.
+		const queryItemIds = new Set< string >();
 		const queriesForContext = queriedData?.queries?.[ context ] || {};
 		Object.values( queriesForContext ).forEach( ( queryResult ) => {
 			if ( Array.isArray( queryResult?.itemIds ) ) {
@@ -395,10 +393,7 @@ export const getStagedEntityRecords = createSelector(
 
 		return Object.values( allItems ).filter( ( item ) => {
 			const itemId = item?.[ entityIdKey ];
-			if (
-				typeof itemId !== 'string' ||
-				! itemId.startsWith( STAGED_ID_PREFIX )
-			) {
+			if ( ! isStagedId( itemId ) ) {
 				return false;
 			}
 			if ( queryItemIds.has( itemId ) ) {
