@@ -180,7 +180,7 @@
 		"prepare": "husky install",
 		"prepublishOnly": "npm run build",
 		"start": "npm run dev",
-		"prestorybook:build": "npm run build",
+		"prestorybook:build": "npm run build -- --runtime-only",
 		"storybook:build": "storybook build -c ./storybook -o ./storybook/build",
 		"storybook:dev": "concurrently \"npm run dev\" \"wait-on .dev-ready && storybook dev -c ./storybook -p 50240\"",
 		"storybook:e2e:dev": "concurrently \"npm run dev\" \"wait-on .dev-ready && storybook dev -c test/storybook-playwright/storybook -p 50241\"",
