@@ -67,7 +67,7 @@ if ( window.__experimentalContentOnlyInspectorFields ) {
 			label: __( 'Background' ),
 			type: 'media',
 			mapping: {
-				type: 'backgroundType',
+				mediaType: 'backgroundType',
 				id: 'id',
 				url: 'url',
 				alt: 'alt',
