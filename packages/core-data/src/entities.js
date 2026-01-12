@@ -16,8 +16,6 @@ import { __ } from '@wordpress/i18n';
 import { getSyncManager } from './sync';
 import {
 	applyPostChangesToCRDTDoc,
-	defaultApplyChangesToCRDTDoc,
-	defaultGetChangesFromCRDTDoc,
 	getPostChangesFromCRDTDoc,
 } from './utils/crdt';
 
@@ -429,16 +427,6 @@ async function loadSiteEntity() {
 		baseURL: '/wp/v2/settings',
 		meta: {},
 	};
-
-	if ( globalThis.IS_GUTENBERG_PLUGIN ) {
-		/**
-		 * @type {import('@wordpress/sync').SyncConfig}
-		 */
-		entity.syncConfig = {
-			applyChangesToCRDTDoc: defaultApplyChangesToCRDTDoc,
-			getChangesFromCRDTDoc: defaultGetChangesFromCRDTDoc,
-		};
-	}
 
 	const site = await apiFetch( {
 		path: entity.baseURL,
