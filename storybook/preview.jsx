@@ -131,6 +131,8 @@ export const parameters = {
 					'Typography',
 				],
 				'Icons',
+				'Design System',
+				[ 'Introduction', 'Theme', 'Components', [ 'Introduction' ] ],
 			],
 		},
 	},
