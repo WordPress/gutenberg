@@ -42,9 +42,7 @@ export class TypedAwareness< State extends BaseState > extends Awareness {
  * extended to include additional state describing the user's current activity.
  * This state must be serializable and compact.
  */
-export interface BaseState {
-	//userInfo: UserInfo;
-}
+export interface BaseState {}
 
 /**
  * An enhanced state includes additional metadata about the user's connection
@@ -62,16 +60,7 @@ export type EqualityFieldCheck<
 > = ( value1?: State[ FieldName ], value2?: State[ FieldName ] ) => boolean;
 
 /**
- * The editor state includes information about the user's current selection.
- */
-export interface EditorState {
-	//selection: SelectionState;
-}
-
-/**
  * The post editor state extends the base state with information used to render
  * presence indicators in the post editor.
  */
-export interface PostEditorState extends BaseState {
-	editorState?: EditorState;
-}
+export interface PostEditorState extends BaseState {}
