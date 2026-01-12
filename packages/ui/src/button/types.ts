@@ -1,5 +1,8 @@
 import { type ReactNode, type HTMLAttributes } from 'react';
-import type { ButtonProps as _ButtonProps } from '@base-ui/react/button';
+import type { Button as _Button } from '@base-ui/react/button';
+import type { ComponentProps } from '../utils/types';
+
+type _ButtonProps = ComponentProps< typeof _Button >;
 
 export interface ButtonProps
 	extends Omit< _ButtonProps, 'disabled' | 'aria-pressed' > {
