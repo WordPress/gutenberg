@@ -396,7 +396,8 @@ export const getStagedEntityRecords = createSelector(
 			if ( ! isStagedId( itemId ) ) {
 				return false;
 			}
-			if ( queryItemIds.has( itemId ) ) {
+			const itemIdKey = String( itemId );
+			if ( queryItemIds.has( itemIdKey ) ) {
 				return false;
 			}
 			if ( ! persistedLocalIds.has( itemId ) ) {

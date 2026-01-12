@@ -66,6 +66,7 @@ function getQueriedItemsUncached( state, query ) {
 			include,
 			persistedIdMapForContext
 		);
+
 		itemId =
 			getLocalIdForPersistedId( persistedIdMapForContext, itemId ) ||
 			itemId;

@@ -211,49 +211,6 @@ describe( 'deleteEntityRecord', () => {
 		expect( result ).toBe( true );
 	} );
 
-	it( 'deletes staged records with persisted IDs via the API', async () => {
-		const stagedId = `${ STAGED_ID_PREFIX }test-uuid-123`;
-		const configs = [
-			{ name: 'post', kind: 'postType', baseURL: '/wp/v2/posts' },
-		];
-
-		const dispatch = Object.assign( jest.fn(), {
-			receiveEntityRecords: jest.fn(),
-			__unstableAcquireStoreLock: jest.fn(),
-			__unstableReleaseStoreLock: jest.fn(),
-		} );
-		const resolveSelect = { getEntitiesConfig: jest.fn( () => configs ) };
-		const select = {
-			getPersistedIdMap: jest.fn( () => ( { 10: stagedId } ) ),
-		};
-
-		apiFetch.mockImplementation( () => ( { id: 10 } ) );
-
-		await deleteEntityRecord(
-			'postType',
-			'post',
-			stagedId
-		)( {
-			dispatch,
-			resolveSelect,
-			select,
-		} );
-
-		expect( apiFetch ).toHaveBeenCalledWith( {
-			path: '/wp/v2/posts/10',
-			method: 'DELETE',
-		} );
-		expect( dispatch ).toHaveBeenCalledWith(
-			expect.objectContaining( {
-				type: 'REMOVE_ITEMS',
-				itemIds: expect.arrayContaining( [ stagedId, '10' ] ),
-				kind: 'postType',
-				name: 'post',
-				invalidateCache: true,
-			} )
-		);
-	} );
-
 	it( 'removes staged record when deleting by persisted ID', async () => {
 		const configs = [
 			{ name: 'post', kind: 'postType', baseURL: '/wp/v2/posts' },

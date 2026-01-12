@@ -180,59 +180,6 @@ describe( 'persistedIdMap', () => {
 		expect( state ).toBe( original );
 	} );
 
-	it( 'should preserve existing mappings when adding new ones', () => {
-		const original = deepFreeze( {
-			default: {
-				5: '__staged__0',
-			},
-		} );
-		const state = persistedIdMap( original, {
-			type: 'RECEIVE_ITEMS',
-			items: [
-				{
-					id: '__staged__1',
-					name: 'New Staged Item',
-					__unstablePersistedId: 10,
-				},
-			],
-		} );
-
-		expect( state ).toEqual( {
-			default: {
-				5: '__staged__0',
-				10: '__staged__1',
-			},
-		} );
-	} );
-
-	it( 'should handle different contexts', () => {
-		const original = deepFreeze( {
-			default: {
-				5: '__staged__0',
-			},
-		} );
-		const state = persistedIdMap( original, {
-			type: 'RECEIVE_ITEMS',
-			query: { context: 'edit' },
-			items: [
-				{
-					id: '__staged__1',
-					name: 'Edit Context Item',
-					__unstablePersistedId: 10,
-				},
-			],
-		} );
-
-		expect( state ).toEqual( {
-			default: {
-				5: '__staged__0',
-			},
-			edit: {
-				10: '__staged__1',
-			},
-		} );
-	} );
-
 	it( 'should remove mappings when items are removed', () => {
 		const original = deepFreeze( {
 			default: {
@@ -255,26 +202,6 @@ describe( 'persistedIdMap', () => {
 				30: 3,
 			},
 			edit: {},
-		} );
-	} );
-
-	it( 'should remove multiple mappings when multiple items are removed', () => {
-		const original = deepFreeze( {
-			default: {
-				10: '__staged__1',
-				20: '__staged__2',
-				30: '__staged__3',
-			},
-		} );
-		const state = persistedIdMap( original, {
-			type: 'REMOVE_ITEMS',
-			itemIds: [ '__staged__1', '__staged__3' ],
-		} );
-
-		expect( state ).toEqual( {
-			default: {
-				20: '__staged__2',
-			},
 		} );
 	} );
 

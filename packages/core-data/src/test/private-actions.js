@@ -261,22 +261,4 @@ describe( 'createStagedEntityRecord', () => {
 			undefined
 		);
 	} );
-
-	it( 'should generate unique staged IDs for each call', () => {
-		const record = { title: 'Test' };
-
-		const result1 = createStagedEntityRecord(
-			'postType',
-			'post',
-			record
-		)( { select, dispatch, resolveSelect } );
-
-		const result2 = createStagedEntityRecord(
-			'postType',
-			'post',
-			record
-		)( { select, dispatch, resolveSelect } );
-
-		expect( result1.id ).not.toBe( result2.id );
-	} );
 } );

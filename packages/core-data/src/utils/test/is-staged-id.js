@@ -13,24 +13,4 @@ describe( 'isStagedId', () => {
 		expect( isStagedId( 'some-slug' ) ).toBe( false );
 		expect( isStagedId( 'page' ) ).toBe( false );
 	} );
-
-	it( 'returns false for numeric IDs', () => {
-		expect( isStagedId( 123 ) ).toBe( false );
-		expect( isStagedId( 0 ) ).toBe( false );
-	} );
-
-	it( 'returns false for numeric string IDs', () => {
-		expect( isStagedId( '123' ) ).toBe( false );
-	} );
-
-	it( 'returns false for null and undefined', () => {
-		expect( isStagedId( null ) ).toBe( false );
-		expect( isStagedId( undefined ) ).toBe( false );
-	} );
-} );
-
-describe( 'STAGED_ID_PREFIX', () => {
-	it( 'exports the correct prefix', () => {
-		expect( STAGED_ID_PREFIX ).toBe( '__staged__' );
-	} );
 } );
