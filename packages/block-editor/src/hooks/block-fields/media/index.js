@@ -172,22 +172,10 @@ export default function Media( { data, field, onChange, config = {} } ) {
 				onSelect={ ( selectedMedia ) => {
 					if ( selectedMedia.id && selectedMedia.url ) {
 						// Build new value dynamically based on what's in the mapping
-						const newValue = {};
-
-						// Iterate over mapping keys and set values for supported properties
-						if ( fieldDef?.mapping ) {
-							Object.keys( fieldDef.mapping ).forEach(
-								( key ) => {
-									// Handle weird camel-casing.
-									if ( key === 'mediaType' ) {
-										newValue[ key ] =
-											selectedMedia.media_type;
-										return;
-									}
-									newValue[ key ] = selectedMedia[ key ];
-								}
-							);
-						}
+						const newValue = {
+							...selectedMedia,
+							mediaType: selectedMedia.media_type,
+						};
 
 						// Turn off featured image when manually selecting media
 						if ( hasFeaturedImageSupport ) {
