@@ -3,7 +3,6 @@
  */
 import { getActiveFormats } from '../../get-active-formats';
 import { updateFormats } from '../../update-formats';
-import { ZWNBSP } from '../../special-characters';
 
 /**
  * All inserting input types that would insert HTML into the DOM.
@@ -24,15 +23,6 @@ const EMPTY_ACTIVE_FORMATS = [];
 
 export default ( props ) => ( element ) => {
 	const { ownerDocument } = element;
-
-	// Initialize empty elements with ZWNBSP for multi-block selection support.
-	// This will be removed on focus for iOS Safari auto-capitalize.
-	if (
-		element.textContent === '' &&
-		ownerDocument.activeElement !== element
-	) {
-		element.textContent = ZWNBSP;
-	}
 
 	let isComposing = false;
 
@@ -184,12 +174,6 @@ export default ( props ) => ( element ) => {
 			return;
 		}
 
-		// Remove ZWNBSP padding on focus so iOS Safari auto-capitalize works.
-		// The padding will be re-added on blur for multi-block selection.
-		if ( element.textContent === ZWNBSP ) {
-			element.textContent = '';
-		}
-
 		if ( ! isSelected ) {
 			// We know for certain that on focus, the old selection is invalid.
 			// It will be recalculated on the next mouseup, keyup, or touchend
@@ -219,25 +203,15 @@ export default ( props ) => ( element ) => {
 		);
 	}
 
-	function onBlur() {
-		// Add ZWNBSP padding on blur so multi-block selection can extend into
-		// empty elements. This is removed again on focus for iOS auto-capitalize.
-		if ( element.textContent === '' ) {
-			element.textContent = ZWNBSP;
-		}
-	}
-
 	element.addEventListener( 'input', onInput );
 	element.addEventListener( 'compositionstart', onCompositionStart );
 	element.addEventListener( 'compositionend', onCompositionEnd );
 	element.addEventListener( 'focus', onFocus );
-	element.addEventListener( 'blur', onBlur );
 
 	return () => {
 		element.removeEventListener( 'input', onInput );
 		element.removeEventListener( 'compositionstart', onCompositionStart );
 		element.removeEventListener( 'compositionend', onCompositionEnd );
 		element.removeEventListener( 'focus', onFocus );
-		element.removeEventListener( 'blur', onBlur );
 	};
 };

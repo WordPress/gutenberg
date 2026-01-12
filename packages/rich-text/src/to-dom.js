@@ -144,6 +144,7 @@ export function toDom( {
 	isEditableTree = true,
 	placeholder,
 	doc = document,
+	isSelected,
 } ) {
 	let startPath = [];
 	let endPath = [];
@@ -189,6 +190,7 @@ export function toDom( {
 		},
 		isEditableTree,
 		placeholder,
+		isSelected,
 	} );
 
 	return {
@@ -207,6 +209,7 @@ export function toDom( {
  * @param {Function}      [$1.prepareEditableTree] Function to filter editorable formats.
  * @param {boolean}       [$1.__unstableDomOnly]   Only apply elements, no selection.
  * @param {string}        [$1.placeholder]         Placeholder text.
+ * @param {boolean}       [$1.isSelected]          Whether the rich text is selected.
  */
 export function apply( {
 	value,
@@ -214,6 +217,7 @@ export function apply( {
 	prepareEditableTree,
 	__unstableDomOnly,
 	placeholder,
+	isSelected,
 } ) {
 	// Construct a new element tree in memory.
 	const { body, selection } = toDom( {
@@ -221,6 +225,7 @@ export function apply( {
 		prepareEditableTree,
 		placeholder,
 		doc: current.ownerDocument,
+		isSelected,
 	} );
 
 	applyValue( body, current );

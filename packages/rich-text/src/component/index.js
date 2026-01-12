@@ -56,6 +56,7 @@ export function useRichText( {
 			prepareEditableTree: __unstableAddInvisibleFormats,
 			__unstableDomOnly: domOnly,
 			placeholder,
+			isSelected,
 		} );
 	}
 
@@ -217,7 +218,7 @@ export function useRichText( {
 		useRefEffect( () => {
 			applyFromProps();
 			didMountRef.current = true;
-		}, [ placeholder, ...__unstableDependencies ] ),
+		}, [ placeholder, isSelected, ...__unstableDependencies ] ),
 	] );
 
 	return {
