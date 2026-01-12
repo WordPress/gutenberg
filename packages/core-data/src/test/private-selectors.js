@@ -79,7 +79,7 @@ describe( 'getStagedEntityRecords', () => {
 		expect( result ).not.toContainEqual( persistedRecord );
 	} );
 
-	it( 'clears staged records once persisted records are present', () => {
+	it( 'filters out staged records when their persisted counterpart exists', () => {
 		const stagedRecord = {
 			id: draftId,
 			title: 'Staged Post',
