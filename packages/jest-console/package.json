@@ -28,13 +28,14 @@
 		"src",
 		"build",
 		"build-module",
-		"build-types"
+		"build-types",
+		"index.d.ts"
 	],
 	"main": "build/index.cjs",
 	"module": "build-module/index.mjs",
 	"exports": {
 		".": {
-			"types": "./build-types/index.d.ts",
+			"types": "./index.d.ts",
 			"import": "./build-module/index.mjs",
 			"require": "./build/index.cjs"
 		},
