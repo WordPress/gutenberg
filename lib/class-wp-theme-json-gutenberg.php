@@ -358,7 +358,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * @since 5.9.0
 	 */
 	const PROTECTED_PROPERTIES = array(
-		'spacing.blockGap' => array( 'spacing', 'blockGap' ),
+		'gap' => array( 'spacing', 'blockGap' ),
 	);
 
 	/**
@@ -2402,7 +2402,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * @param boolean $use_root_padding Whether to add custom properties at root level.
 	 * @return array  Returns the modified $declarations.
 	 */
-	protected static function compute_style_properties( $styles, $settings = array(), $properties = null, $theme_json = null, $selector = null, $use_root_padding = null ) {
+	protected static function compute_style_properties( $styles, $settings = array(), $properties = null, $theme_json = null, $selector = null, $use_root_padding = null, $include_protected_properties = false ) {
 		if ( empty( $styles ) ) {
 			return array();
 		}
@@ -2410,6 +2410,16 @@ class WP_Theme_JSON_Gutenberg {
 		if ( null === $properties ) {
 			$properties = static::PROPERTIES_METADATA;
 		}
+
+		// Include protected properties if requested.
+		if ( $include_protected_properties ) {
+			foreach ( static::PROTECTED_PROPERTIES as $key => $value_path ) {
+				if ( ! isset( $properties[ $key ] ) ) {
+					$properties[ $key ] = $value_path;
+				}
+			}
+		}
+
 		$declarations             = array();
 		$root_variable_duplicates = array();
 		$root_style_length        = strlen( '--wp--style--root--' );
@@ -2972,7 +2982,7 @@ class WP_Theme_JSON_Gutenberg {
 					$style_variation_declarations[ $combined_selectors ] = $new_declarations;
 				}
 				// Compute declarations for remaining styles not covered by feature level selectors.
-				$style_variation_declarations[ $style_variation['selector'] ] = static::compute_style_properties( $style_variation_node, $settings, null, $this->theme_json );
+				$style_variation_declarations[ $style_variation['selector'] ] = static::compute_style_properties( $style_variation_node, $settings, null, $this->theme_json, null, null, true );
 
 				// Process pseudo-selectors for this variation (e.g., :hover, :focus).
 				$block_name                    = $block_metadata['name'] ?? ( in_array( 'blocks', $block_metadata['path'], true ) && count( $block_metadata['path'] ) >= 3 ? static::get_block_name_from_metadata_path( $block_metadata ) : null );
