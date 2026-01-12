@@ -133,6 +133,7 @@ const test = base.extend<
 	{
 		requestUtils: RequestUtils;
 		lighthousePort: number;
+		isGutenbergPluginActive: boolean;
 	}
 >( {
 	admin: async ( { page, pageUtils, editor }, use ) => {
@@ -197,6 +198,19 @@ const test = base.extend<
 	metrics: async ( { page }, use ) => {
 		await use( new Metrics( { page } ) );
 	},
+	isGutenbergPluginActive: [
+		async ( { requestUtils }, use ) => {
+			const plugins = await requestUtils.rest( {
+				path: '/wp/v2/plugins',
+			} );
+			const gutenberg = plugins.find(
+				( p: { plugin: string; status: string } ) =>
+					p.plugin === 'gutenberg/gutenberg'
+			);
+			await use( gutenberg?.status === 'active' );
+		},
+		{ scope: 'worker' },
+	],
 } );
 
 export { test, expect };

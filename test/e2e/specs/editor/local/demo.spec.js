@@ -8,14 +8,8 @@ test.describe( 'New editor state', () => {
 		page,
 		admin,
 		editor,
-		requestUtils,
+		isGutenbergPluginActive,
 	} ) => {
-		const plugins = await requestUtils.rest( { path: '/wp/v2/plugins' } );
-		const gutenberg = plugins.find(
-			( p ) => p.plugin === 'gutenberg/gutenberg'
-		);
-		const isGutenbergPluginActive = gutenberg?.status === 'active';
-
 		// eslint-disable-next-line playwright/no-skipped-test
 		test.skip(
 			! isGutenbergPluginActive,
