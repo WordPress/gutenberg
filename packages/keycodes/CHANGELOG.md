@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 4.38.0-next.0 (2026-01-12)
+
 ### New features
 
 -   Add new `ariaKeyShortcut` function ([#74205](https://github.com/WordPress/gutenberg/pull/74205)).
