@@ -3,10 +3,18 @@
 	min-height: auto !important;
 }
 
-// Hide multiple sequential empty paragraphs' placeholders, but don't hide if a custom placeholder is set.
+// Hide multiple sequential paragraphs, but don't hide placeholders if a custom placeholder is set.
+.block-editor-block-list__block[data-empty="true"] {
+	[data-rich-text-placeholder] {
+		opacity: 1;
+	}
+}
+
 .block-editor-block-list__block[data-empty="true"] + .block-editor-block-list__block[data-empty="true"] {
-	&:not([data-custom-placeholder="true"])::after {
-		opacity: 0;
+	&:not([data-custom-placeholder="true"]) {
+		[data-rich-text-placeholder] {
+			opacity: 0;
+		}
 	}
 }
 
@@ -16,8 +24,10 @@
 }
 
 // Hide the placeholder when the editor is in zoomed out mode.
-.is-zoomed-out .block-editor-block-list__block[data-empty="true"]::after {
-	opacity: 0;
+.is-zoomed-out .block-editor-block-list__block[data-empty="true"] {
+	[data-rich-text-placeholder] {
+		opacity: 0;
+	}
 }
 
 // This is the equivalent of the `body.rtl` style.scss rule for RTL,

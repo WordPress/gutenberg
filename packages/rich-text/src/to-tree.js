@@ -135,6 +135,7 @@ export function toTree( {
 	onStartIndex,
 	onEndIndex,
 	isEditableTree,
+	placeholder,
 } ) {
 	const { formats, replacements, text, start, end } = value;
 	const formatsLength = formats.length + 1;
@@ -333,6 +334,22 @@ export function toTree( {
 				},
 				object: true,
 			} );
+
+			// We CANNOT use CSS to add a placeholder with pseudo elements on
+			// the main block wrappers because that could clash with theme CSS
+			// using ::before of ::after to style the elements (e.g. heading
+			// styling)
+			if ( placeholder ) {
+				append( getParent( pointer ), {
+					type: 'span',
+					attributes: {
+						'data-rich-text-placeholder': placeholder,
+						// Necessary to prevent the placeholder from catching
+						// selection and being editable.
+						style: 'pointer-events:none;user-select:none;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;',
+					},
+				} );
+			}
 		}
 
 		lastCharacterFormats = characterFormats;

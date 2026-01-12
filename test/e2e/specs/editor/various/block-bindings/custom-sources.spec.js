@@ -1165,8 +1165,8 @@ test.describe( 'Registered sources', () => {
 
 			await expect( paragraphBlock ).toBeEmpty();
 
-			// The placeholder is now on the element itself via CSS ::after
-			await expect( paragraphBlock ).toHaveAttribute(
+			const placeholder = paragraphBlock.locator( 'span' );
+			await expect( placeholder ).toHaveAttribute(
 				'data-rich-text-placeholder',
 				'Add Empty Field Label'
 			);
@@ -1193,8 +1193,8 @@ test.describe( 'Registered sources', () => {
 				name: 'empty_field',
 			} );
 			await expect( paragraphBlock ).toBeEmpty();
-			// The placeholder is now on the element itself via CSS ::after
-			await expect( paragraphBlock ).toHaveAttribute(
+			const placeholder = paragraphBlock.locator( 'span' );
+			await expect( placeholder ).toHaveAttribute(
 				'data-rich-text-placeholder',
 				'Can User Edit: False'
 			);
@@ -1224,8 +1224,8 @@ test.describe( 'Registered sources', () => {
 
 			await expect( paragraphBlock ).toBeEmpty();
 
-			// The placeholder is now on the element itself via CSS ::after
-			await expect( paragraphBlock ).toHaveAttribute(
+			const placeholder = paragraphBlock.locator( 'span' );
+			await expect( placeholder ).toHaveAttribute(
 				'data-rich-text-placeholder',
 				'My custom placeholder'
 			);
