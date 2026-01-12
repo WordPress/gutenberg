@@ -649,8 +649,8 @@ describe( 'DimensionsTool', () => {
 		} );
 	} );
 
-	describe( 'isResizable prop', () => {
-		it( 'shows AspectRatio tool but hides WidthHeight tool when isResizable is false', () => {
+	describe( 'tools prop', () => {
+		it( 'shows AspectRatio tool but hides WidthHeight tool when tools does not include widthHeight', () => {
 			const initialValue = {};
 			const onChange = jest.fn();
 
@@ -658,7 +658,7 @@ describe( 'DimensionsTool', () => {
 				<Example
 					initialValue={ initialValue }
 					onChange={ onChange }
-					isResizable={ false }
+					tools={ [ 'aspectRatio', 'scale' ] }
 				/>
 			);
 
@@ -676,7 +676,7 @@ describe( 'DimensionsTool', () => {
 			).not.toBeInTheDocument();
 		} );
 
-		it( 'shows WidthHeight tool when isResizable is true (default)', () => {
+		it( 'shows WidthHeight tool when tools includes widthHeight (default)', () => {
 			const initialValue = {};
 			const onChange = jest.fn();
 
@@ -684,7 +684,7 @@ describe( 'DimensionsTool', () => {
 				<Example
 					initialValue={ initialValue }
 					onChange={ onChange }
-					isResizable
+					tools={ [ 'aspectRatio', 'widthHeight', 'scale' ] }
 				/>
 			);
 

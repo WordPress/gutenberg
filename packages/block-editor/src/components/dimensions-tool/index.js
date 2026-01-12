@@ -59,7 +59,6 @@ function DimensionsTool( {
 	defaultScale = 'fill', // Match CSS default value for object-fit.
 	unitsOptions, // Default options handled by UnitControl.
 	tools = [ 'aspectRatio', 'widthHeight', 'scale' ],
-	isResizable = true,
 } ) {
 	// Coerce undefined and CSS default values to be null.
 	const width =
@@ -135,7 +134,7 @@ function DimensionsTool( {
 					} }
 				/>
 			) }
-			{ isResizable && tools.includes( 'widthHeight' ) && (
+			{ tools.includes( 'widthHeight' ) && (
 				<WidthHeightTool
 					panelId={ panelId }
 					units={ unitsOptions }
