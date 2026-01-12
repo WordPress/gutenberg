@@ -13,7 +13,10 @@ export interface ButtonProps
 	variant?: 'solid' | 'outline' | 'minimal' | 'unstyled';
 
 	/**
-	 * The tone of the button. Tone describes a semantic color intent.
+	 * The tone of the button, describing a semantic color intent:
+	 *
+	 * - `'brand': for the most prominent actions, using the brand colors.
+	 * - `'neutral'` for less prominent actions.
 	 *
 	 * @default "brand"
 	 */
