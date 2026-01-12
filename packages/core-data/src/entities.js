@@ -285,10 +285,12 @@ export const prePersistPostType = (
 			const objectType = `postType/${ name }`;
 			const objectId = persistedRecord.id;
 			const meta = getSyncManager()?.createMeta( objectType, objectId );
-			newEdits.meta = {
-				...edits.meta,
-				...meta,
-			};
+			if ( meta && Object.keys( meta ).length ) {
+				newEdits.meta = {
+					...edits.meta,
+					...meta,
+				};
+			}
 		}
 	}
 
