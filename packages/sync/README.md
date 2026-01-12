@@ -26,6 +26,10 @@ Root-level key for the CRDT document that holds the entity record data.
 
 The sync manager orchestrates the lifecycle of syncing entity records. It creates Yjs documents, connects to providers, creates awareness instances, and coordinates with the `core-data` store.
 
+### getPostEditorAwareness
+
+Undocumented declaration.
+
 ### LOCAL_EDITOR_ORIGIN
 
 Origin string for CRDT document changes originating from the local editor.
@@ -33,6 +37,10 @@ Origin string for CRDT document changes originating from the local editor.
 ### LOCAL_SYNC_MANAGER_ORIGIN
 
 Origin string for CRDT document changes originating from the sync manager.
+
+### setConnectionStatus
+
+Undocumented declaration.
 
 ### WORDPRESS_META_KEY_FOR_CRDT_DOC_PERSISTENCE
 

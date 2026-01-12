@@ -20,3 +20,7 @@ export {
 } from './config';
 export { createSyncManager } from './manager';
 export type * from './types';
+export {
+	setConnectionStatus,
+	getPostEditorAwareness,
+} from './awareness/awareness-manager';
