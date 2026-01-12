@@ -369,7 +369,6 @@ test.describe( 'Post Meta source', () => {
 	test.describe( 'Movie CPT post', () => {
 		test.beforeAll( async ( { requestUtils } ) => {
 			await requestUtils.setGutenbergExperiments( [
-				'gutenberg-content-only-pattern-insertion',
 				'gutenberg-content-only-inspector-fields',
 			] );
 		} );
@@ -548,7 +547,7 @@ test.describe( 'Post Meta source', () => {
 			).toHaveText( 'new value' );
 		} );
 
-		test( 'should be possible to edit the value of the connected custom fields in the inspector control registered by contentOnly experiments', async ( {
+		test( 'should be possible to edit the value of the connected custom fields in the inspector control registered by Block Fields experiment', async ( {
 			editor,
 			page,
 		} ) => {
