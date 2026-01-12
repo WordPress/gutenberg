@@ -39,15 +39,6 @@ describe( 'utils', () => {
 			expect( ydoc.meta ).toBeDefined();
 			expect( ydoc.meta?.size ).toBe( 0 );
 		} );
-
-		it( 'sets the CRDT document version in the state map', () => {
-			const ydoc = createYjsDoc( {} );
-			const stateMap = ydoc.getMap( CRDT_STATE_MAP_KEY );
-
-			expect( stateMap.get( CRDT_STATE_VERSION_KEY ) ).toBe(
-				CRDT_DOC_VERSION
-			);
-		} );
 	} );
 
 	describe( 'serializeCrdtDoc', () => {
@@ -135,17 +126,6 @@ describe( 'utils', () => {
 
 			expect( result ).toBeNull();
 		} );
-
-		it( 'preserves the CRDT state version', () => {
-			const deserialized = deserializeCrdtDoc( serialized );
-
-			expect( deserialized ).toBeInstanceOf( Y.Doc );
-
-			const stateMap = deserialized!.getMap( CRDT_STATE_MAP_KEY );
-			expect( stateMap.get( CRDT_STATE_VERSION_KEY ) ).toBe(
-				CRDT_DOC_VERSION
-			);
-		} );
 	} );
 
 	describe( 'serialization round-trip', () => {
@@ -185,6 +165,73 @@ describe( 'utils', () => {
 			expect( deserialized!.getMap( 'test' ).get( 'value' ) ).toBe(
 				'original'
 			);
+		} );
+	} );
+
+	describe( 'version announcement', () => {
+		it( 'does not set version in state map during createYjsDoc', () => {
+			const ydoc = createYjsDoc();
+			const stateMap = ydoc.getMap( CRDT_STATE_MAP_KEY );
+
+			// Version should not be set during document creation
+			expect( stateMap.get( CRDT_STATE_VERSION_KEY ) ).toBeUndefined();
+		} );
+
+		it( 'allows version to be set via transaction', () => {
+			const ydoc = createYjsDoc();
+			const stateMap = ydoc.getMap( CRDT_STATE_MAP_KEY );
+
+			// Simulate version announcement
+			ydoc.transact( () => {
+				stateMap.set( CRDT_STATE_VERSION_KEY, CRDT_DOC_VERSION );
+			} );
+
+			expect( stateMap.get( CRDT_STATE_VERSION_KEY ) ).toBe(
+				CRDT_DOC_VERSION
+			);
+		} );
+
+		it( 'detects version changes from remote clients', async () => {
+			const localDoc = createYjsDoc();
+			const remoteDoc = createYjsDoc();
+
+			const stateMap = localDoc.getMap( CRDT_STATE_MAP_KEY );
+
+			// Set up observer to detect version changes
+			const versionDetected = new Promise< number >( ( resolve ) => {
+				const observer = (
+					event: Y.YMapEvent< unknown >,
+					transaction: Y.Transaction
+				) => {
+					if ( transaction.local ) {
+						return;
+					}
+
+					event.keysChanged.forEach( ( key ) => {
+						if ( key === CRDT_STATE_VERSION_KEY ) {
+							const version = stateMap.get(
+								CRDT_STATE_VERSION_KEY
+							) as number;
+							resolve( version );
+						}
+					} );
+				};
+
+				stateMap.observe( observer );
+			} );
+
+			// Simulate remote client announcing a higher version
+			remoteDoc.transact( () => {
+				const remoteStateMap = remoteDoc.getMap( CRDT_STATE_MAP_KEY );
+				remoteStateMap.set( CRDT_STATE_VERSION_KEY, 2 );
+			} );
+
+			// Apply remote update to local doc
+			const update = Y.encodeStateAsUpdate( remoteDoc );
+			Y.applyUpdate( localDoc, update );
+
+			const version = await versionDetected;
+			expect( version ).toBe( 2 );
 		} );
 	} );
 } );
