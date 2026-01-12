@@ -16,6 +16,7 @@ import {
 	useState,
 } from '@wordpress/element';
 import { chevronDown, chevronUp } from '@wordpress/icons';
+import { sprintf, _n } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -274,11 +275,15 @@ export default function FormCardField< Item >( {
 						</span>
 						{ showValidationBadge && (
 							<Badge intent="error">
-								{ invalidCount }{ ' ' }
-								{ invalidCount === 1
-									? 'field needs'
-									: 'fields need' }{ ' ' }
-								attention
+								{ sprintf(
+									/* translators: %s: Number of fields that need attention */
+									_n(
+										'%s field needs attention',
+										'%s fields need attention',
+										invalidCount
+									),
+									invalidCount.toString()
+								) }
 							</Badge>
 						) }
 						{ visibleSummaryFields.length > 0 &&
@@ -352,11 +357,15 @@ export default function FormCardField< Item >( {
 					</span>
 					{ showValidationBadge && (
 						<Badge intent="error">
-							{ invalidCount }{ ' ' }
-							{ invalidCount === 1
-								? 'field needs'
-								: 'fields need' }{ ' ' }
-							attention
+							{ sprintf(
+								/* translators: %s: Number of fields that need attention */
+								_n(
+									'%s field needs attention',
+									'%s fields need attention',
+									invalidCount
+								),
+								invalidCount.toString()
+							) }
 						</Badge>
 					) }
 					{ visibleSummaryFields.length > 0 && layout.withHeader && (
