@@ -1219,14 +1219,6 @@
 					"$value": "{wpds-color.primitive.primary.surface2}",
 					"$description": "Background color for interactive elements with brand tone and normal emphasis that are hovered, focused, or active."
 				},
-				"brand-disabled": {
-					"$value": {
-						"colorSpace": "srgb",
-						"components": [ 0, 0, 0 ],
-						"alpha": 0
-					},
-					"$description": "Background color for interactive elements with brand tone and normal emphasis, in their disabled state."
-				},
 				"brand-strong": {
 					"$value": "{wpds-color.primitive.primary.bgFill1}",
 					"$description": "Background color for interactive elements with brand tone and strong emphasis."
@@ -1234,10 +1226,6 @@
 				"brand-strong-active": {
 					"$value": "{wpds-color.primitive.primary.bgFill2}",
 					"$description": "Background color for interactive elements with brand tone and strong emphasis that are hovered, focused, or active."
-				},
-				"brand-strong-disabled": {
-					"$value": "{wpds-color.primitive.bg.surface5}",
-					"$description": "Background color for interactive elements with brand tone and strong emphasis, in their disabled state."
 				},
 				"brand-weak": {
 					"$value": {
@@ -1251,14 +1239,6 @@
 					"$value": "{wpds-color.primitive.primary.surface4}",
 					"$description": "Background color for interactive elements with brand tone and weak emphasis that are hovered, focused, or active."
 				},
-				"brand-weak-disabled": {
-					"$value": {
-						"colorSpace": "srgb",
-						"components": [ 0, 0, 0 ],
-						"alpha": 0
-					},
-					"$description": "Background color for interactive elements with brand tone and weak emphasis, in their disabled state."
-				},
 				"error": {
 					"$value": {
 						"colorSpace": "srgb",
@@ -1271,14 +1251,6 @@
 					"$value": "{wpds-color.primitive.error.surface2}",
 					"$description": "Background color for interactive elements with error tone and normal emphasis that are hovered, focused, or active."
 				},
-				"error-disabled": {
-					"$value": {
-						"colorSpace": "srgb",
-						"components": [ 0, 0, 0 ],
-						"alpha": 0
-					},
-					"$description": "Background color for interactive elements with error tone and normal emphasis, in their disabled state."
-				},
 				"error-strong": {
 					"$value": "{wpds-color.primitive.error.bgFill1}",
 					"$description": "Background color for interactive elements with error tone and strong emphasis."
@@ -1286,10 +1258,6 @@
 				"error-strong-active": {
 					"$value": "{wpds-color.primitive.error.bgFill2}",
 					"$description": "Background color for interactive elements with error tone and strong emphasis that are hovered, focused, or active."
-				},
-				"error-strong-disabled": {
-					"$value": "{wpds-color.primitive.bg.surface5}",
-					"$description": "Background color for interactive elements with error tone and strong emphasis, in their disabled state."
 				},
 				"error-weak": {
 					"$value": {
@@ -1302,14 +1270,6 @@
 				"error-weak-active": {
 					"$value": "{wpds-color.primitive.error.surface4}",
 					"$description": "Background color for interactive elements with error tone and weak emphasis that are hovered, focused, or active."
-				},
-				"error-weak-disabled": {
-					"$value": {
-						"colorSpace": "srgb",
-						"components": [ 0, 0, 0 ],
-						"alpha": 0
-					},
-					"$description": "Background color for interactive elements with error tone and weak emphasis, in their disabled state."
 				}
 			},
 			"track": {
@@ -1440,10 +1400,6 @@
 					"$value": "{wpds-color.primitive.primary.fgSurface3}",
 					"$description": "Foreground color for interactive elements with brand tone and normal emphasis that are hovered, focused, or active."
 				},
-				"brand-disabled": {
-					"$value": "{wpds-color.primitive.bg.fgSurface2}",
-					"$description": "Foreground color for interactive elements with brand tone and normal emphasis, in their disabled state."
-				},
 				"brand-strong": {
 					"$value": "{wpds-color.primitive.primary.fgFill}",
 					"$description": "Foreground color for interactive elements with brand tone and strong emphasis."
@@ -1451,10 +1407,6 @@
 				"brand-strong-active": {
 					"$value": "{wpds-color.primitive.primary.fgFill}",
 					"$description": "Foreground color for interactive elements with brand tone and strong emphasis that are hovered, focused, or active."
-				},
-				"brand-strong-disabled": {
-					"$value": "{wpds-color.primitive.bg.fgSurface3}",
-					"$description": "Foreground color for interactive elements with brand tone and strong emphasis, in their disabled state."
 				},
 				"error": {
 					"$value": "{wpds-color.primitive.error.fgSurface3}",
@@ -1464,10 +1416,6 @@
 					"$value": "{wpds-color.primitive.error.fgSurface3}",
 					"$description": "Foreground color for interactive elements with error tone and normal emphasis that are hovered, focused, or active."
 				},
-				"error-disabled": {
-					"$value": "{wpds-color.primitive.bg.fgSurface2}",
-					"$description": "Foreground color for interactive elements with error tone and normal emphasis, in their disabled state."
-				},
 				"error-strong": {
 					"$value": "{wpds-color.primitive.error.fgFill}",
 					"$description": "Foreground color for interactive elements with error tone and strong emphasis."
@@ -1475,10 +1423,6 @@
 				"error-strong-active": {
 					"$value": "{wpds-color.primitive.error.fgFill}",
 					"$description": "Foreground color for interactive elements with error tone and strong emphasis that are hovered, focused, or active."
-				},
-				"error-strong-disabled": {
-					"$value": "{wpds-color.primitive.bg.fgSurface3}",
-					"$description": "Foreground color for interactive elements with error tone and strong emphasis, in their disabled state."
 				}
 			},
 			"$extensions": {

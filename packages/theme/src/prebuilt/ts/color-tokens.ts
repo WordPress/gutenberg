@@ -72,11 +72,7 @@ export default {
 	'error-stroke4': [ 'stroke-interactive-error-active' ],
 	'error-stroke1': [ 'stroke-surface-error' ],
 	'bg-surface2': [ 'bg-surface-neutral' ],
-	'bg-surface5': [
-		'bg-interactive-brand-strong-disabled',
-		'bg-interactive-error-strong-disabled',
-		'bg-interactive-neutral-strong-disabled',
-	],
+	'bg-surface5': [ 'bg-interactive-neutral-strong-disabled' ],
 	'bg-surface4': [
 		'bg-interactive-neutral-active',
 		'bg-interactive-neutral-weak-active',
@@ -89,14 +85,10 @@ export default {
 	],
 	'bg-fgSurface3': [
 		'fg-content-neutral-weak',
-		'fg-interactive-brand-strong-disabled',
-		'fg-interactive-error-strong-disabled',
 		'fg-interactive-neutral-strong-disabled',
 		'fg-interactive-neutral-weak',
 	],
 	'bg-fgSurface2': [
-		'fg-interactive-brand-disabled',
-		'fg-interactive-error-disabled',
 		'fg-interactive-neutral-disabled',
 		'fg-interactive-neutral-weak-disabled',
 	],

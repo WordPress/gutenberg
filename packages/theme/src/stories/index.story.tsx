@@ -233,7 +233,7 @@ const NestingDebug = ( { bg = '', primary = '', density = '' } ) => (
 				padding: 'var(--wpds-dimension-padding-surface-xs)',
 				borderRadius: '0.25rem',
 				backgroundColor:
-					'var(--wpds-color-bg-interactive-brand-weak-disabled)',
+					'var(--wpds-color-bg-interactive-neutral-weak-disabled)',
 				color: 'var(--wpds-color-fg-content-neutral)',
 			} }
 		>
