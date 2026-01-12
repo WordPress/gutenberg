@@ -106,22 +106,10 @@ function BlockFields( {
 		return blockTypeFields.map( ( fieldDef ) => {
 			const ControlComponent = CONTROLS[ fieldDef.type ];
 
-			const defaultValues = {};
-			if ( fieldDef.mapping && blockType?.attributes ) {
-				Object.entries( fieldDef.mapping ).forEach(
-					( [ key, attrKey ] ) => {
-						defaultValues[ key ] =
-							blockType.attributes[ attrKey ]?.defaultValue ??
-							undefined;
-					}
-				);
-			}
-
 			const field = {
 				id: fieldDef.id,
 				label: fieldDef.label,
 				type: fieldDef.type, // Use the field's type; DataForm will use built-in or custom Edit
-				config: { ...fieldDef.args, defaultValues },
 				hideLabelFromVision: fieldDef.id === 'content',
 			};
 
@@ -159,7 +147,7 @@ function BlockFields( {
 
 			return field;
 		} );
-	}, [ blockTypeFields, blockType?.attributes, clientId ] );
+	}, [ blockTypeFields, clientId ] );
 
 	const handleToggleField = ( fieldId ) => {
 		setForm( ( prev ) => {
