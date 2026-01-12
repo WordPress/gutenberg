@@ -150,15 +150,7 @@ class Gutenberg_REST_Templates_Controller_7_0 extends WP_REST_Templates_Controll
 	 */
 	public function prepare_item_for_response( $item, $request ) {
 		// Don't prepare the response body for HEAD requests.
-		/*
-		 * Gutenberg only. Do not backport this change to core.
-		 * Using the get_method() method to check the request method
-		 * to satisfy the minimum `GUTENBERG_MINIMUM_WP_VERSION` version requirement for WordPress 6.7 and above.
-		 * Once 6.9 is released, we can make Gutenberg's minimum version
-		 * requirement 6.8 and then use the is_method() method instead.
-		 * See: https://core.trac.wordpress.org/changeset/59899
-		 */
-		if ( 'HEAD' === $request->get_method() ) {
+		if ( $request->is_method( 'HEAD' ) ) {
 			return new WP_REST_Response( array() );
 		}
 

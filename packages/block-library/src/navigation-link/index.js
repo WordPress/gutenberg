@@ -112,7 +112,7 @@ if ( window.__experimentalContentOnlyInspectorFields ) {
 		},
 	];
 	settings[ formKey ] = {
-		fields: [ 'label' ],
+		fields: [ 'label', 'link' ],
 	};
 }
 
