@@ -106,8 +106,7 @@ const handleEntitySearch = async (
 export default function useSearchHandler(
 	suggestionsQuery,
 	allowDirectEntry,
-	withCreateSuggestion,
-	noEntitySearch = false
+	withCreateSuggestion
 ) {
 	const { fetchSearchSuggestions, pageOnFront, pageForPosts } = useSelect(
 		( select ) => {
@@ -126,6 +125,10 @@ export default function useSearchHandler(
 	const directEntryHandler = allowDirectEntry
 		? handleDirectEntry
 		: handleNoop;
+
+	// Extract noEntitySearch from suggestionsQuery if provided.
+	// This allows disabling entity search without changing the function signature.
+	const noEntitySearch = suggestionsQuery?.noEntitySearch ?? false;
 
 	return useCallback(
 		( val, { isInitialSuggestions } ) => {
