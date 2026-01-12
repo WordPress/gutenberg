@@ -170,6 +170,18 @@ function denormalizeLinkValue( value, fieldDef ) {
 	return result;
 }
 
+/**
+ * Component that renders a DataForm for a single block's attributes
+ * @param {Object}   props
+ * @param {string}   props.clientId      The clientId of the block.
+ * @param {Object}   props.blockType     The blockType definition.
+ * @param {Object}   props.attributes    The block's attribute values.
+ * @param {Function} props.setAttributes Action to set the block's attributes.
+ * @param {boolean}  props.isCollapsed   Whether the DataForm is rendered as 'collapsed' with only the first field
+ *                                       displayed by default. When collapsed a dropdown is displayed to allow
+ *                                       displaying additional fields. The block's title is displayed as the title.
+ *                                       The collapsed mode is often used when multiple BlockForm's are shown together.
+ */
 function BlockFields( {
 	clientId,
 	blockType,
