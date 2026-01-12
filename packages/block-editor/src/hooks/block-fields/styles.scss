@@ -30,4 +30,6 @@
 
 .block-editor-block-fields__header-title {
 	flex: 1;
+	// Override the default margin on a h2 element.
+	margin: 0 !important;
 }

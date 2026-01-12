@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/build",
-	"version": "0.5.1-next.ba3aee3a2.0",
+	"version": "0.5.0",
 	"description": "Build tool for WordPress plugins.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -48,7 +48,8 @@
 		"moment-timezone": "^0.5.40",
 		"postcss": "8.4.38",
 		"postcss-modules": "6.0.1",
-		"rtlcss": "4.3.0"
+		"rtlcss": "4.3.0",
+		"sass-embedded": "^1.97.2"
 	},
 	"devDependencies": {
 		"@types/node": "^20.17.10"

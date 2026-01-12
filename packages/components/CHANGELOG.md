@@ -2,8 +2,6 @@
 
 ## Unreleased
 
-## 32.0.0-next.0 (2026-01-09)
-
 ### Code Quality
 
 -   Fix missing dependencies. [#74310](https://github.com/WordPress/gutenberg/pull/74310)
@@ -56,6 +54,7 @@
 -   `AnglePickerControl`: Migrate styles from Emotion to a CSS module ([#73786](https://github.com/WordPress/gutenberg/pull/73786)).
 -   `Menu`: Clean up popover wrappers ([#74207](https://github.com/WordPress/gutenberg/pull/74207)).
 -   `Button`, `DateCalendar`, `DateRangeCalendar`, `CheckboxControl`, `Panel`, `Placeholder`: Remove outdated vendor prefix properties in CSS ([#74213](https://github.com/WordPress/gutenberg/pull/74213)).
+-    Updated `fast-deep-equal` imports for compatibility with strict Node.js resolution ([#74530](https://github.com/WordPress/gutenberg/pull/74530)).
 
 ## 30.9.0 (2025-11-26)
 

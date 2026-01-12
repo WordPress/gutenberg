@@ -2,7 +2,7 @@
  * External dependencies
  */
 import Mousetrap from 'mousetrap';
-import 'mousetrap/plugins/global-bind/mousetrap-global-bind';
+import 'mousetrap/plugins/global-bind/mousetrap-global-bind.js';
 
 /**
  * WordPress dependencies

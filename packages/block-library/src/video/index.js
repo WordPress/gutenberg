@@ -61,7 +61,7 @@ if ( window.__experimentalContentOnlyInspectorFields ) {
 		},
 	];
 	settings[ formKey ] = {
-		fields: [ 'video' ],
+		fields: [ 'video', 'caption' ],
 	};
 }
 

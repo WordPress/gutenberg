@@ -2,8 +2,6 @@
 
 ## Unreleased
 
-## 11.2.0-next.0 (2026-01-09)
-
 ### Code Quality
 
 - Replace HStack/VStack from `wordpress/components` by Stack from `wordpress/ui`. [#74174](https://github.com/WordPress/gutenberg/pull/74174)
@@ -15,6 +13,7 @@
 - Update DataForm stories. [#74196](https://github.com/WordPress/gutenberg/pull/74196)
 - Fix missing dependencies. [#74310](https://github.com/WordPress/gutenberg/pull/74310)
 - Add details layout to DataForm validation story. [#74445](https://github.com/WordPress/gutenberg/pull/74445)
+- Updated `fast-deep-equal` imports for compatibility with strict Node.js resolution ([#74530](https://github.com/WordPress/gutenberg/pull/74530))
 
 ### Bug Fixes
 
@@ -24,6 +23,7 @@
 - DataViews: Combined field alignment in table layout. [#73908](https://github.com/WordPress/gutenberg/pull/73908)
 - DataViews: Fix table row multiselection in Firefox [#73945](https://github.com/WordPress/gutenberg/pull/73945)
 - DataViews: `filterSortAndPaginate()` will ignore sorting on non-sortable fields [#73950](https://github.com/WordPress/gutenberg/pull/73950)
+- DataViews: Fix locked fields order when toggling visibility in properties section. [#74326](https://github.com/WordPress/gutenberg/pull/74326)
 
 ### Enhancements
 
