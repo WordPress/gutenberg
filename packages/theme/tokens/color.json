@@ -1185,7 +1185,7 @@
 						"components": [ 0, 0, 0 ],
 						"alpha": 0
 					},
-					"$description": "Background color for interactive elements with neutral tone and weak emphasis, in their disabled state."
+					"$description": "Background color for interactive elements with weak emphasis, in their disabled state, regardless of the tone."
 				},
 				"brand-strong": {
 					"$value": "{wpds-color.primitive.primary.bgFill1}",
@@ -1338,7 +1338,7 @@
 				},
 				"neutral-disabled": {
 					"$value": "{wpds-color.primitive.bg.fgSurface2}",
-					"$description": "Foreground color for interactive elements with neutral tone and normal emphasis, in their disabled state."
+					"$description": "Foreground color for interactive elements with normal emphasis, in their disabled state, regardless of the tone."
 				},
 				"neutral-strong": {
 					"$value": "{wpds-color.primitive.bg.fgFillInverted}",
@@ -1350,7 +1350,7 @@
 				},
 				"neutral-strong-disabled": {
 					"$value": "{wpds-color.primitive.bg.fgSurface2}",
-					"$description": "Foreground color for interactive elements with neutral tone and strong emphasis, in their disabled state."
+					"$description": "Foreground color for interactive elements with strong emphasis, in their disabled state, regardless of the tone."
 				},
 				"neutral-weak": {
 					"$value": "{wpds-color.primitive.bg.fgSurface3}",
@@ -1358,7 +1358,7 @@
 				},
 				"neutral-weak-disabled": {
 					"$value": "{wpds-color.primitive.bg.fgSurface2}",
-					"$description": "Foreground color for interactive elements with neutral tone and weak emphasis, in their disabled state."
+					"$description": "Foreground color for interactive elements with weak emphasis, in their disabled state, regardless of the tone."
 				},
 				"brand": {
 					"$value": "{wpds-color.primitive.primary.fgSurface3}",
@@ -1463,7 +1463,7 @@
 				},
 				"neutral-disabled": {
 					"$value": "{wpds-color.primitive.bg.stroke2}",
-					"$description": "Accessible stroke color used for interactive neutrally-toned elements with normal emphasis, in their disabled state."
+					"$description": "Accessible stroke color used for interactive elements with normal emphasis, in their disabled state, regardless of the tone."
 				},
 				"neutral-strong": {
 					"$value": "{wpds-color.primitive.bg.stroke4}",
