@@ -338,6 +338,11 @@ function BlockFields( {
 									{ blockTitle }
 								</Truncate>
 							</h2>
+							<FieldsDropdownMenu
+								fields={ dataFormFields }
+								visibleFields={ form.fields }
+								onToggleField={ handleToggleField }
+							/>
 						</>
 					) }
 					{ ! isCollapsed && (
@@ -345,11 +350,6 @@ function BlockFields( {
 							{ __( 'Content' ) }
 						</h2>
 					) }
-					<FieldsDropdownMenu
-						fields={ dataFormFields }
-						visibleFields={ form.fields }
-						onToggleField={ handleToggleField }
-					/>
 				</HStack>
 			</div>
 			<DataForm
