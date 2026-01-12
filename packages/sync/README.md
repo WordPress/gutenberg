@@ -28,7 +28,16 @@ The sync manager orchestrates the lifecycle of syncing entity records. It create
 
 ### getPostEditorAwareness
 
-Undocumented declaration.
+Get the post editor awareness instance for the given post ID and post type.
+
+_Parameters_
+
+-   _postId_ `number`: Post ID.
+-   _postType_ `string`: Post type.
+
+_Returns_
+
+-   `PostEditorAwarenessState | undefined`: Post editor awareness instance.
 
 ### LOCAL_EDITOR_ORIGIN
 
@@ -40,7 +49,13 @@ Origin string for CRDT document changes originating from the sync manager.
 
 ### setConnectionStatus
 
-Undocumented declaration.
+Set the current user's connection status in the awareness instance for the given object type and object ID.
+
+_Parameters_
+
+-   _objectType_ `ObjectType`: Object type.
+-   _objectId_ `ObjectID | null`: Object ID.
+-   _isConnected_ `boolean`: Connection status.
 
 ### WORDPRESS_META_KEY_FOR_CRDT_DOC_PERSISTENCE
 

@@ -26,6 +26,12 @@ function getAwarenessInstance(
 	return awarenessInstances.get( getAwarenessId( objectType, objectId ) );
 }
 
+/**
+ * Get the post editor awareness instance for the given post ID and post type.
+ * @param postId   Post ID.
+ * @param postType Post type.
+ * @return Post editor awareness instance.
+ */
 export function getPostEditorAwareness(
 	postId: number,
 	postType: string
@@ -41,6 +47,13 @@ export function getPostEditorAwareness(
 	return undefined;
 }
 
+/**
+ * Create an awareness instance for the given object type and object ID.
+ * @param objectType Object type.
+ * @param objectId   Object ID.
+ * @param ydoc       Yjs document.
+ * @return Awareness instance.
+ */
 export async function createAwareness(
 	objectType: ObjectType,
 	objectId: ObjectID | null,
@@ -60,6 +73,12 @@ export async function createAwareness(
 	return undefined;
 }
 
+/**
+ * Set the current user's connection status in the awareness instance for the given object type and object ID.
+ * @param objectType  Object type.
+ * @param objectId    Object ID.
+ * @param isConnected Connection status.
+ */
 export function setConnectionStatus(
 	objectType: ObjectType,
 	objectId: ObjectID | null,
