@@ -4,9 +4,6 @@
 import apiFetch from '@wordpress/api-fetch';
 
 jest.mock( '@wordpress/api-fetch' );
-jest.mock( '../sync', () => ( {
-	getSyncManager: jest.fn(),
-} ) );
 
 /**
  * Internal dependencies
