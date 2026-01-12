@@ -255,7 +255,7 @@ export function fromMatch( match: Match ): ShortcodeInstance {
  */
 class Shortcode implements ShortcodeInstance {
 	// Instance properties
-	tag?: string;
+	tag: string;
 	type?: 'self-closing' | 'closed' | 'single';
 	content?: string;
 	attrs: ShortcodeAttrs;
@@ -268,8 +268,8 @@ class Shortcode implements ShortcodeInstance {
 	static attrs = attrs;
 	static fromMatch = fromMatch;
 
-	constructor( options?: Partial< ShortcodeOptions > ) {
-		const { tag, attrs: attributes, type, content } = options || {};
+	constructor( options: ShortcodeOptions ) {
+		const { tag, attrs: attributes, type, content } = options;
 		this.tag = tag;
 		this.type = type;
 		this.content = content;

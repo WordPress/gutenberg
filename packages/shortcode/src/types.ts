@@ -20,7 +20,7 @@ export interface Shortcode {
 	/**
 	 * Shortcode tag.
 	 */
-	tag?: string;
+	tag: string;
 
 	/**
 	 * Shortcode attributes.
