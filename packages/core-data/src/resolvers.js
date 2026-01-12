@@ -155,13 +155,12 @@ export const getEntityRecord =
 			}
 
 			// Entity supports syncing.
-			if (
-				window.__experimentalEnableSync &&
-				entityConfig.syncConfig &&
-				isNumericID( key ) &&
-				! query
-			) {
-				if ( globalThis.IS_GUTENBERG_PLUGIN ) {
+			if ( globalThis.IS_GUTENBERG_PLUGIN ) {
+				if (
+					entityConfig.syncConfig &&
+					isNumericID( key ) &&
+					! query
+				) {
 					const objectType = `${ kind }/${ name }`;
 					const objectId = key;
 

@@ -411,8 +411,8 @@ export const editEntityRecord =
 				return acc;
 			}, {} ),
 		};
-		if ( window.__experimentalEnableSync && entityConfig.syncConfig ) {
-			if ( globalThis.IS_GUTENBERG_PLUGIN ) {
+		if ( globalThis.IS_GUTENBERG_PLUGIN ) {
+			if ( entityConfig.syncConfig ) {
 				const objectType = `${ kind }/${ name }`;
 				const objectId = recordId;
 
