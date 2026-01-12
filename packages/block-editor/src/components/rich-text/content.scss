@@ -18,7 +18,7 @@
 
 // Captions may have lighter (gray) text, or be shown on a range of different background luminosites.
 // To ensure legibility, we increase the default placeholder opacity to ensure contrast.
-figcaption.block-editor-rich-text__editable:empty::after {
+figcaption.block-editor-rich-text__editable[data-empty="true"]::after {
 	opacity: 0.8;
 }
 

@@ -25,7 +25,7 @@
 	}
 
 	// Increase placeholder opacity to meet contrast ratios.
-	&:empty::after {
+	&[data-empty="true"]::after {
 		opacity: 0.8;
 	}
 }
