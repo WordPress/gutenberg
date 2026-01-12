@@ -11,12 +11,11 @@ Relevant docs and discussions:
 
 ## Enable the experiment
 
-The real-time collaboration experiment must be enabled on the "Gutenberg > Experiments" page. A WebRTC provider with HTTP signaling is used to connect peers.
+The real-time collaboration experiment must be enabled on the "Gutenberg > Experiments" page.
 
 When it is enabled, the following global variables are defined::
 
 -   `window.__experimentalEnableSync` (`boolean`): Used by the `core-data` package to determine whether entity syncing is available.
--   `window.__experimentalCollaborativeEditingSecret` (`string`). A secret (stored in a WordPress option) used by the WebRTC provider to create a secure connection between peers.
 
 ## The data flow
 
