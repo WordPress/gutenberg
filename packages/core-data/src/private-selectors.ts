@@ -20,6 +20,7 @@ import { STAGED_ID_PREFIX } from './utils/is-staged-id';
 import logEntityDeprecation from './utils/log-entity-deprecation';
 
 type EntityRecordKey = string | number;
+const EMPTY_OBJECT = {};
 
 /**
  * Returns the previous edit from the current undo offset
@@ -138,6 +139,30 @@ export function getEntityRecordPermissions(
  */
 export function getRegisteredPostMeta( state: State, postType: string ) {
 	return state.registeredPostMeta?.[ postType ] ?? {};
+}
+
+/**
+ * Returns the map of persisted (server) IDs to local staged IDs for an entity.
+ *
+ * @param state State tree
+ * @param kind  Entity kind.
+ * @param name  Entity name.
+ * @param query Optional query (used for context).
+ *
+ * @return Map of persisted IDs to local IDs.
+ */
+export function getPersistedIdMap(
+	state: State,
+	kind: string,
+	name: string,
+	query?: Record< string, unknown >
+): Record< string | number, string > {
+	const context = query?.context ?? 'default';
+	const persistedIdMap =
+		state.entities.records?.[ kind ]?.[ name ]?.queriedData
+			?.persistedIdMap || EMPTY_OBJECT;
+	// @ts-expect-error
+	return persistedIdMap[ context ] || persistedIdMap.default || EMPTY_OBJECT;
 }
 
 function normalizePageId( value: number | string | undefined ): string | null {
@@ -341,6 +366,7 @@ export const getStagedEntityRecords = createSelector(
 	): any[] => {
 		const entityConfig = getEntityConfig( state, kind, name );
 		const entityIdKey = entityConfig?.key ?? DEFAULT_ENTITY_KEY;
+
 		const queriedData =
 			state.entities.records?.[ kind ]?.[ name ]?.queriedData;
 		const allItems = queriedData?.items?.[ context ];
@@ -348,18 +374,17 @@ export const getStagedEntityRecords = createSelector(
 		if ( ! allItems ) {
 			return [];
 		}
+		const persistedIdMap = getPersistedIdMap( state, kind, name, {
+			context,
+		} );
+		const persistedLocalIds = new Set( Object.values( persistedIdMap ) );
 
 		return Object.values( allItems ).filter( ( item ) => {
 			const itemId = item?.[ entityIdKey ];
-			// @ts-expect-error
-			const persistedId = item?.__unstablePersistedId;
-			const hasPersistedRecord =
-				persistedId !== undefined &&
-				Object.prototype.hasOwnProperty.call( allItems, persistedId );
 			return (
 				typeof itemId === 'string' &&
 				itemId.startsWith( STAGED_ID_PREFIX ) &&
-				( persistedId === undefined || ! hasPersistedRecord )
+				! persistedLocalIds.has( itemId )
 			);
 		} );
 	},

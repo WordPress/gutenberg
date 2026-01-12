@@ -27,6 +27,41 @@ import {
 } from './utils';
 import { fetchBlockPatterns } from './fetch';
 
+function mapRecordsToStagedIds( records, persistedIdMap, entityIdKey ) {
+	if ( ! persistedIdMap || Object.keys( persistedIdMap ).length === 0 ) {
+		return records;
+	}
+
+	const mapRecord = ( record ) => {
+		const persistedId = record?.[ entityIdKey ];
+		const localId = persistedIdMap[ persistedId ];
+		if ( ! localId ) {
+			return record;
+		}
+
+		return {
+			...record,
+			[ entityIdKey ]: localId,
+			__unstablePersistedId: persistedId,
+		};
+	};
+
+	if ( Array.isArray( records ) ) {
+		let hasChanges = false;
+		const mappedRecords = records.map( ( record ) => {
+			const mappedRecord = mapRecord( record );
+			if ( mappedRecord !== record ) {
+				hasChanges = true;
+			}
+			return mappedRecord;
+		} );
+
+		return hasChanges ? mappedRecords : records;
+	}
+
+	return mapRecord( records );
+}
+
 /**
  * Requests authors from the REST API.
  *
@@ -229,8 +264,24 @@ export const getEntityRecord =
 				}
 			}
 
+			const persistedIdMap = select.getPersistedIdMap(
+				kind,
+				name,
+				query
+			);
+			const mappedRecord = mapRecordsToStagedIds(
+				record,
+				persistedIdMap,
+				entityConfig.key ?? DEFAULT_ENTITY_KEY
+			);
+
 			registry.batch( () => {
-				dispatch.receiveEntityRecords( kind, name, record, query );
+				dispatch.receiveEntityRecords(
+					kind,
+					name,
+					mappedRecord,
+					query
+				);
 				dispatch.receiveUserPermissions( receiveUserPermissionArgs );
 				dispatch.finishResolutions( 'canUser', canUserResolutionsArgs );
 			} );
@@ -277,7 +328,7 @@ export const getEditedEntityRecord = forwardResolver( 'getEntityRecord' );
  */
 export const getEntityRecords =
 	( kind, name, query = {} ) =>
-	async ( { dispatch, registry, resolveSelect } ) => {
+	async ( { dispatch, registry, resolveSelect, select } ) => {
 		const configs = await resolveSelect.getEntitiesConfig( kind );
 		const entityConfig = configs.find(
 			( config ) => config.name === name && config.kind === kind
@@ -298,6 +349,7 @@ export const getEntityRecords =
 		// resolutions as finished.
 		const rawQuery = { ...query };
 		const key = entityConfig.key || DEFAULT_ENTITY_KEY;
+		const persistedIdMap = select.getPersistedIdMap( kind, name, query );
 
 		function getResolutionsArgs( records, recordsQuery ) {
 			const queryArgs = Object.fromEntries(
@@ -397,11 +449,16 @@ export const getEntityRecords =
 					}
 
 					records.push( ...pageRecords );
+					const mappedRecords = mapRecordsToStagedIds(
+						records,
+						persistedIdMap,
+						key
+					);
 					registry.batch( () => {
 						dispatch.receiveEntityRecords(
 							kind,
 							name,
-							records,
+							mappedRecords,
 							query,
 							false,
 							undefined,
@@ -438,10 +495,15 @@ export const getEntityRecords =
 			}
 
 			registry.batch( () => {
+				const mappedRecords = mapRecordsToStagedIds(
+					records,
+					persistedIdMap,
+					key
+				);
 				dispatch.receiveEntityRecords(
 					kind,
 					name,
-					records,
+					mappedRecords,
 					query,
 					false,
 					undefined,
@@ -861,11 +923,20 @@ export const getNavigationFallbackId =
 		} );
 
 		const record = fallback?._embedded?.self;
+		const persistedIdMap = select.getPersistedIdMap(
+			'postType',
+			'wp_navigation'
+		);
+		const mappedRecord = mapRecordsToStagedIds(
+			record,
+			persistedIdMap,
+			DEFAULT_ENTITY_KEY
+		);
 
 		registry.batch( () => {
 			dispatch.receiveNavigationFallbackId( fallback?.id );
 
-			if ( ! record ) {
+			if ( ! mappedRecord ) {
 				return;
 			}
 
@@ -881,7 +952,7 @@ export const getNavigationFallbackId =
 			dispatch.receiveEntityRecords(
 				'postType',
 				'wp_navigation',
-				record,
+				mappedRecord,
 				undefined,
 				invalidateNavigationQueries
 			);
@@ -897,7 +968,7 @@ export const getNavigationFallbackId =
 
 export const getDefaultTemplateId =
 	( query ) =>
-	async ( { dispatch, registry, resolveSelect } ) => {
+	async ( { dispatch, registry, resolveSelect, select } ) => {
 		const template = await apiFetch( {
 			path: addQueryArgs( '/wp/v2/templates/lookup', query ),
 		} );
@@ -913,10 +984,19 @@ export const getDefaultTemplateId =
 		// Endpoint may return an empty object if no template is found.
 		if ( id ) {
 			template.id = id;
+			const persistedIdMap = select.getPersistedIdMap(
+				'postType',
+				template.type
+			);
+			const mappedTemplate = mapRecordsToStagedIds(
+				template,
+				persistedIdMap,
+				DEFAULT_ENTITY_KEY
+			);
 			registry.batch( () => {
 				dispatch.receiveDefaultTemplateId( query, id );
 				dispatch.receiveEntityRecords( 'postType', template.type, [
-					template,
+					mappedTemplate,
 				] );
 				// Avoid further network requests.
 				dispatch.finishResolution( 'getEntityRecord', [

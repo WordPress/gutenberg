@@ -6,7 +6,10 @@ import deepFreeze from 'deep-freeze';
 /**
  * Internal dependencies
  */
-import { getStagedEntityRecords } from '../private-selectors';
+import {
+	getPersistedIdMap,
+	getStagedEntityRecords,
+} from '../private-selectors';
 import { getEditedEntityRecord } from '../selectors';
 import { STAGED_ID_PREFIX } from '../utils/is-staged-id';
 
@@ -286,6 +289,41 @@ describe( 'getStagedEntityRecords', () => {
 		expect(
 			getStagedEntityRecords( state, 'postType', 'post', 'edit' )
 		).toEqual( [ draftRecord ] );
+	} );
+} );
+
+describe( 'getPersistedIdMap', () => {
+	it( 'returns the persisted ID map for the requested context', () => {
+		const state = deepFreeze( {
+			entities: {
+				records: {
+					root: {
+						postType: {
+							queriedData: {
+								items: {},
+								itemIsComplete: {},
+								queries: {},
+								persistedIdMap: {
+									default: { 10: '__staged__1' },
+									edit: { 12: '__staged__2' },
+								},
+							},
+						},
+					},
+				},
+			},
+		} );
+
+		expect( getPersistedIdMap( state, 'root', 'postType' ) ).toEqual( {
+			10: '__staged__1',
+		} );
+		expect(
+			getPersistedIdMap( state, 'root', 'postType', {
+				context: 'edit',
+			} )
+		).toEqual( {
+			12: '__staged__2',
+		} );
 	} );
 } );
 

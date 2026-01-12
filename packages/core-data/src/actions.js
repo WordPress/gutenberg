@@ -23,6 +23,23 @@ import { LOCAL_EDITOR_ORIGIN, getSyncManager } from './sync';
 import { isStagedId } from './utils/is-staged-id';
 import logEntityDeprecation from './utils/log-entity-deprecation';
 
+function resolveRemovedItemIds( itemIds, persistedIdMap ) {
+	if ( ! persistedIdMap ) {
+		return itemIds;
+	}
+
+	const resolvedItemIds = new Set();
+	itemIds.forEach( ( itemId ) => {
+		resolvedItemIds.add( itemId );
+		const mappedId = persistedIdMap[ itemId ];
+		if ( mappedId !== undefined ) {
+			resolvedItemIds.add( mappedId );
+		}
+	} );
+
+	return Array.from( resolvedItemIds );
+}
+
 /**
  * Returns an action object used in signalling that authors have been received.
  * Ignored from documentation as it's internal to the data store.
@@ -287,7 +304,7 @@ export const deleteEntityRecord =
 		query,
 		{ __unstableFetch = apiFetch, throwOnError = false } = {}
 	) =>
-	async ( { dispatch, resolveSelect } ) => {
+	async ( { dispatch, resolveSelect, select } ) => {
 		logEntityDeprecation( kind, name, 'deleteEntityRecord' );
 		const configs = await resolveSelect.getEntitiesConfig( kind );
 		const entityConfig = configs.find(
@@ -317,12 +334,27 @@ export const deleteEntityRecord =
 			} );
 
 			let hasError = false;
+			const persistedIdMapByContext = select?.getPersistedIdMap
+				? select.getPersistedIdMap( kind, name, query )
+				: undefined;
+			const persistedIdForStaged = isLocalStaged
+				? Object.entries( persistedIdMapByContext || {} ).find(
+						( [ , localId ] ) => localId === recordId
+				  )?.[ 0 ]
+				: undefined;
+			const apiRecordId = persistedIdForStaged ?? recordId;
+			const resolvedItemIds = resolveRemovedItemIds(
+				persistedIdForStaged ? [ recordId, apiRecordId ] : [ recordId ],
+				persistedIdMapByContext
+			);
 
 			// For staged records that haven't been persisted, skip the API call
 			// and just remove them from the local store.
-			if ( isLocalStaged ) {
+			if ( isLocalStaged && ! persistedIdForStaged ) {
 				try {
-					await dispatch( removeItems( kind, name, recordId, true ) );
+					await dispatch(
+						removeItems( kind, name, resolvedItemIds, true )
+					);
 					deletedRecord = true;
 				} catch ( _error ) {
 					hasError = true;
@@ -333,9 +365,9 @@ export const deleteEntityRecord =
 				if (
 					kind === 'postType' &&
 					name === 'wp_template' &&
-					( ( recordId &&
-						typeof recordId === 'string' &&
-						! /^\d+$/.test( recordId ) ) ||
+					( ( apiRecordId &&
+						typeof apiRecordId === 'string' &&
+						! /^\d+$/.test( apiRecordId ) ) ||
 						! window?.__experimentalTemplateActivate )
 				) {
 					baseURL =
@@ -343,7 +375,7 @@ export const deleteEntityRecord =
 						'/templates';
 				}
 				try {
-					let path = `${ baseURL }/${ recordId }`;
+					let path = `${ baseURL }/${ apiRecordId }`;
 
 					if ( query ) {
 						path = addQueryArgs( path, query );
@@ -354,7 +386,9 @@ export const deleteEntityRecord =
 						method: 'DELETE',
 					} );
 
-					await dispatch( removeItems( kind, name, recordId, true ) );
+					await dispatch(
+						removeItems( kind, name, resolvedItemIds, true )
+					);
 				} catch ( _error ) {
 					hasError = true;
 					error = _error;

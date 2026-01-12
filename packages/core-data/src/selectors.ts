@@ -65,6 +65,7 @@ interface QueriedData {
 	items: Record< ET.Context, Record< number, ET.EntityRecord > >;
 	itemIsComplete: Record< ET.Context, Record< number, boolean > >;
 	queries: Record< ET.Context, Record< string, Array< number > > >;
+	persistedIdMap: Record< ET.Context, Record< string | number, string > >;
 }
 
 type RevisionRecord =
