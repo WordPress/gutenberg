@@ -2,9 +2,7 @@
 	"$schema": "https://json.schemastore.org/tsconfig.json",
 	"extends": "../../tsconfig.base.json",
 	"compilerOptions": {
-		"module": "CommonJS",
-		"rootDir": "rules",
-		"moduleResolution": "node"
+		"rootDir": "rules"
 	},
 	"references": [ { "path": "../prettier-config" } ],
 	// NOTE: This package is being progressively typed. You are encouraged to

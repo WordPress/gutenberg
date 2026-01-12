@@ -2,9 +2,7 @@
 	"$schema": "https://json.schemastore.org/tsconfig.json",
 	"extends": "../../tsconfig.base.json",
 	"compilerOptions": {
-		"module": "CommonJS",
-		"types": [ "jest" ],
-		"moduleResolution": "node"
+		"types": [ "jest" ]
 	},
 	"exclude": [ "src/__tests__", "src/__fixtures__" ]
 }
