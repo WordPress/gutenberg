@@ -143,11 +143,16 @@ export function toTree( {
 	const deepestActiveFormat = activeFormats[ activeFormats.length - 1 ];
 
 	let lastCharacterFormats;
+	let lastCharacter;
 
 	append( tree, '' );
 
 	for ( let i = 0; i < formatsLength; i++ ) {
 		const character = text.charAt( i );
+		// Pad the line if the previous character is a line break, otherwise
+		// the line break won't be visible.
+		const shouldInsertPadding = isEditableTree && lastCharacter === '\n';
+
 		const characterFormats = formats[ i ];
 		let pointer = getLastChild( tree );
 
@@ -314,7 +319,12 @@ export function toTree( {
 			onEndIndex( tree, pointer );
 		}
 
+		if ( shouldInsertPadding && i === text.length ) {
+			append( getParent( pointer ), ZWNBSP );
+		}
+
 		lastCharacterFormats = characterFormats;
+		lastCharacter = character;
 	}
 
 	return tree;
