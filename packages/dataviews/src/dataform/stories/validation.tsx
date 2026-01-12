@@ -973,6 +973,43 @@ const ValidationComponent = ( {
 			},
 		];
 
+		// Card layout with a non-collapsible example
+		const cardFields = [
+			{
+				id: 'textFields',
+				label: 'Text Fields (Non-collapsible)',
+				layout: { type: 'card' as const, isCollapsible: false },
+				children: [ 'password', 'text', 'textarea', 'customEdit' ],
+			},
+			{
+				id: 'numberFields',
+				label: 'Number Fields',
+				children: [ 'integer', 'number' ],
+			},
+			{
+				id: 'contactFields',
+				label: 'Contact Fields',
+				children: [ 'email', 'telephone', 'url' ],
+			},
+			{
+				id: 'selectFields',
+				label: 'Selection Fields',
+				children: [ 'select', 'textWithRadio' ],
+			},
+			{
+				id: 'booleanFields',
+				label: 'Boolean Fields',
+				children: [ 'boolean', 'toggle', 'toggleGroup' ],
+			},
+			{ id: 'color' },
+			{ id: 'array' },
+			{
+				id: 'dateFields',
+				label: 'Date Fields',
+				children: [ 'date', 'dateRange', 'datetime' ],
+			},
+		];
+
 		if ( layout === 'panel' ) {
 			return {
 				layout: { type: 'panel' as const },
@@ -989,7 +1026,7 @@ const ValidationComponent = ( {
 
 		return {
 			layout: { type: 'card' as const },
-			fields: groupedFields,
+			fields: cardFields,
 		};
 	}, [ layout ] );
 
