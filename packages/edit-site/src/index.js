@@ -67,12 +67,23 @@ export function initializeEditor( id, settings ) {
 		editorTool: 'edit',
 		fixedToolbar: false,
 		focusMode: false,
+		autoHideHeader: false,
 		inactivePanels: [],
 		keepCaretInsideBlock: false,
 		openPanels: [ 'post-status' ],
 		showBlockBreadcrumbs: true,
 		showListViewByDefault: false,
 		enableChoosePatternModal: true,
+		showSimpleTopbar: true,
+		showBlockHelpers: true,
+		distractionFreeConfig: {
+			fixedToolbar: true,
+			focusMode: false,
+			showBlockBreadcrumbs: false,
+			autoHideHeader: true,
+			showSimpleTopbar: false,
+			showBlockHelpers: false,
+		},
 	} );
 
 	if ( window.__experimentalMediaProcessing ) {

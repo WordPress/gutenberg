@@ -7,7 +7,6 @@ import { useEffect } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { square as zoomOutIcon } from '@wordpress/icons';
-import { store as preferencesStore } from '@wordpress/preferences';
 import {
 	useShortcut,
 	store as keyboardShortcutsStore,
@@ -18,20 +17,18 @@ import { isAppleOS } from '@wordpress/keycodes';
  * Internal dependencies
  */
 import { unlock } from '../../lock-unlock';
+import { store as editorStore } from '../../store';
 
 const ZoomOutToggle = ( { disabled } ) => {
-	const { isZoomOut, showIconLabels, isDistractionFree } = useSelect(
-		( select ) => ( {
-			isZoomOut: unlock( select( blockEditorStore ) ).isZoomOut(),
-			showIconLabels: select( preferencesStore ).get(
-				'core',
-				'showIconLabels'
-			),
-			isDistractionFree: select( preferencesStore ).get(
-				'core',
-				'distractionFree'
-			),
-		} )
+	const { isZoomOut, showIconLabels, showSimpleTopbar } = useSelect(
+		( select ) => {
+			const { getEditorUIPreference } = unlock( select( editorStore ) );
+			return {
+				isZoomOut: unlock( select( blockEditorStore ) ).isZoomOut(),
+				showIconLabels: getEditorUIPreference( 'showIconLabels' ),
+				showSimpleTopbar: getEditorUIPreference( 'showSimpleTopbar' ),
+			};
+		}
 	);
 
 	const { resetZoomLevel, setZoomLevel } = unlock(
@@ -68,7 +65,7 @@ const ZoomOutToggle = ( { disabled } ) => {
 			}
 		},
 		{
-			isDisabled: isDistractionFree,
+			isDisabled: ! showSimpleTopbar,
 		}
 	);
 

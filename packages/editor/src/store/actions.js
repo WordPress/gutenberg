@@ -913,16 +913,10 @@ export const toggleDistractionFree =
 		const isDistractionFree = registry
 			.select( preferencesStore )
 			.get( 'core', 'distractionFree' );
-		if ( isDistractionFree ) {
-			registry
-				.dispatch( preferencesStore )
-				.set( 'core', 'fixedToolbar', false );
-		}
+
+		// When entering distraction-free mode, close panels and reset zoom.
 		if ( ! isDistractionFree ) {
 			registry.batch( () => {
-				registry
-					.dispatch( preferencesStore )
-					.set( 'core', 'fixedToolbar', true );
 				dispatch.setIsInserterOpened( false );
 				dispatch.setIsListViewOpened( false );
 				unlock(
@@ -930,6 +924,7 @@ export const toggleDistractionFree =
 				).resetZoomLevel();
 			} );
 		}
+
 		registry.batch( () => {
 			registry
 				.dispatch( preferencesStore )
@@ -949,21 +944,12 @@ export const toggleDistractionFree =
 								{
 									label: __( 'Undo' ),
 									onClick: () => {
-										registry.batch( () => {
-											registry
-												.dispatch( preferencesStore )
-												.set(
-													'core',
-													'fixedToolbar',
-													isDistractionFree
-												);
-											registry
-												.dispatch( preferencesStore )
-												.toggle(
-													'core',
-													'distractionFree'
-												);
-										} );
+										registry
+											.dispatch( preferencesStore )
+											.toggle(
+												'core',
+												'distractionFree'
+											);
 									},
 								},
 							],

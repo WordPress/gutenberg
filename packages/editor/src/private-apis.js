@@ -18,6 +18,7 @@ import Editor from './components/editor';
 import PluginPostExcerpt from './components/post-excerpt/plugin';
 import PostCardPanel from './components/post-card-panel';
 import PreferencesModal from './components/preferences-modal';
+import DistractionFreeConfigControl from './components/preferences-modal/distraction-free-config-control';
 import { usePostActions } from './components/post-actions/actions';
 import usePostFields from './components/post-fields';
 import ToolsMoreMenuGroup from './components/more-menu/tools-more-menu-group';
@@ -47,6 +48,7 @@ lock( privateApis, {
 	PluginPostExcerpt,
 	PostCardPanel,
 	PreferencesModal,
+	DistractionFreeConfigControl,
 	usePostActions,
 	usePostFields,
 	ToolsMoreMenuGroup,

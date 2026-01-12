@@ -61,15 +61,15 @@ export default function EditorInterface( {
 		isDistractionFree,
 		isPreviewMode,
 		showBlockBreadcrumbs,
+		autoHideHeader,
 		postTypeLabel,
 		stylesPath,
 		showStylebook,
 	} = useSelect( ( select ) => {
 		const { get } = select( preferencesStore );
 		const { getEditorSettings, getPostTypeLabel } = select( editorStore );
-		const { getStylesPath, getShowStylebook } = unlock(
-			select( editorStore )
-		);
+		const { getStylesPath, getShowStylebook, getEditorUIPreference } =
+			unlock( select( editorStore ) );
 		const editorSettings = getEditorSettings();
 
 		let _mode = select( editorStore ).getEditorMode();
@@ -86,7 +86,8 @@ export default function EditorInterface( {
 			isListViewOpened: select( editorStore ).isListViewOpened(),
 			isDistractionFree: get( 'core', 'distractionFree' ),
 			isPreviewMode: editorSettings.isPreviewMode,
-			showBlockBreadcrumbs: get( 'core', 'showBlockBreadcrumbs' ),
+			showBlockBreadcrumbs: getEditorUIPreference( 'showBlockBreadcrumbs' ),
+			autoHideHeader: getEditorUIPreference( 'autoHideHeader' ),
 			postTypeLabel: getPostTypeLabel(),
 			stylesPath: getStylesPath(),
 			showStylebook: getShowStylebook(),
@@ -116,6 +117,7 @@ export default function EditorInterface( {
 	return (
 		<InterfaceSkeleton
 			isDistractionFree={ isDistractionFree }
+			autoHideHeader={ autoHideHeader }
 			className={ clsx( 'editor-editor-interface', className, {
 				'is-entity-save-view-open': !! entitiesSavedStatesCallback,
 				'is-distraction-free': isDistractionFree && ! isPreviewMode,
@@ -186,7 +188,6 @@ export default function EditorInterface( {
 			}
 			footer={
 				! isPreviewMode &&
-				! isDistractionFree &&
 				isLargeViewport &&
 				showBlockBreadcrumbs &&
 				mode === 'visual' && (

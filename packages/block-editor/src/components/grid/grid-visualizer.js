@@ -22,14 +22,13 @@ import ButtonBlockAppender from '../button-block-appender';
 import { unlock } from '../../lock-unlock';
 
 export function GridVisualizer( { clientId, contentRef, parentLayout } ) {
-	const isDistractionFree = useSelect(
-		( select ) =>
-			select( blockEditorStore ).getSettings().isDistractionFree,
-		[]
-	);
+	const showBlockHelpers = useSelect( ( select ) => {
+		const settings = select( blockEditorStore ).getSettings();
+		return settings.showBlockHelpers ?? true;
+	}, [] );
 	const gridElement = useBlockElement( clientId );
 
-	if ( isDistractionFree || ! gridElement ) {
+	if ( ! showBlockHelpers || ! gridElement ) {
 		return null;
 	}
 

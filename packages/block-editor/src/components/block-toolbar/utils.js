@@ -31,13 +31,12 @@ function useDebouncedShowGestures( {
 		useSelect( blockEditorStore );
 	const { toggleBlockHighlight } = useDispatch( blockEditorStore );
 	const timeoutRef = useRef();
-	const isDistractionFree = useSelect(
-		( select ) =>
-			select( blockEditorStore ).getSettings().isDistractionFree,
-		[]
-	);
+	const showBlockHelpers = useSelect( ( select ) => {
+		const settings = select( blockEditorStore ).getSettings();
+		return settings.showBlockHelpers ?? true;
+	}, [] );
 	const handleOnChange = ( nextIsFocused ) => {
-		if ( nextIsFocused && isDistractionFree ) {
+		if ( nextIsFocused && ! showBlockHelpers ) {
 			return;
 		}
 		const selectedBlockClientId = getSelectedBlockClientId();

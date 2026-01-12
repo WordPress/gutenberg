@@ -70,6 +70,7 @@ const headerVariants = {
 function InterfaceSkeleton(
 	{
 		isDistractionFree,
+		autoHideHeader,
 		footer,
 		header,
 		editorNotices,
@@ -82,6 +83,9 @@ function InterfaceSkeleton(
 	},
 	ref
 ) {
+	// Determine if header should auto-hide. If autoHideHeader is not explicitly set,
+	// fall back to isDistractionFree for backward compatibility.
+	const shouldAutoHideHeader = autoHideHeader ?? isDistractionFree;
 	const [ secondarySidebarResizeListener, secondarySidebarSize ] =
 		useResizeObserver();
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
@@ -127,22 +131,22 @@ function InterfaceSkeleton(
 							className="interface-interface-skeleton__header"
 							aria-label={ mergedLabels.header }
 							initial={
-								isDistractionFree && ! isMobileViewport
+								shouldAutoHideHeader && ! isMobileViewport
 									? 'distractionFreeHidden'
 									: 'hidden'
 							}
 							whileHover={
-								isDistractionFree && ! isMobileViewport
+								shouldAutoHideHeader && ! isMobileViewport
 									? 'distractionFreeHover'
 									: 'visible'
 							}
 							animate={
-								isDistractionFree && ! isMobileViewport
+								shouldAutoHideHeader && ! isMobileViewport
 									? 'distractionFreeDisabled'
 									: 'visible'
 							}
 							exit={
-								isDistractionFree && ! isMobileViewport
+								shouldAutoHideHeader && ! isMobileViewport
 									? 'distractionFreeHidden'
 									: 'hidden'
 							}
@@ -153,7 +157,7 @@ function InterfaceSkeleton(
 						</NavigableRegion>
 					) }
 				</AnimatePresence>
-				{ isDistractionFree && (
+				{ shouldAutoHideHeader && (
 					<div className="interface-interface-skeleton__header">
 						{ editorNotices }
 					</div>

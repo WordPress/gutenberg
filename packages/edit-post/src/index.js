@@ -64,6 +64,8 @@ export function initializeEditor(
 		editorMode: 'visual',
 		editorTool: 'edit',
 		fixedToolbar: false,
+		focusMode: false,
+		autoHideHeader: false,
 		hiddenBlockTypes: [],
 		inactivePanels: [],
 		openPanels: [ 'post-status' ],
@@ -72,6 +74,17 @@ export function initializeEditor(
 		showListViewByDefault: false,
 		enableChoosePatternModal: true,
 		isPublishSidebarEnabled: true,
+		showSimpleTopbar: true,
+		showBlockHelpers: true,
+		distractionFreeConfig: {
+			fixedToolbar: true,
+			focusMode: false,
+			showBlockBreadcrumbs: false,
+			autoHideHeader: true,
+			themeStyles: true,
+			showSimpleTopbar: false,
+			showBlockHelpers: false,
+		},
 	} );
 
 	if ( window.__experimentalMediaProcessing ) {

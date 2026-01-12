@@ -15,12 +15,13 @@ import { unlock } from '../../lock-unlock';
 
 export function useInBetweenInserter() {
 	const openRef = useContext( InsertionPointOpenRef );
-	const isInBetweenInserterDisabled = useSelect(
-		( select ) =>
-			select( blockEditorStore ).getSettings().isDistractionFree ||
-			unlock( select( blockEditorStore ) ).isZoomOut(),
-		[]
-	);
+	const isInBetweenInserterDisabled = useSelect( ( select ) => {
+		const settings = select( blockEditorStore ).getSettings();
+		return (
+			( settings.showBlockHelpers ?? true ) === false ||
+			unlock( select( blockEditorStore ) ).isZoomOut()
+		);
+	}, [] );
 	const {
 		getBlockListSettings,
 		getBlockIndex,

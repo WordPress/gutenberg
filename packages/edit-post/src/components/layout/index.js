@@ -84,9 +84,12 @@ const DESIGN_POST_TYPES = [
 
 function useEditorStyles( settings ) {
 	const { hasThemeStyleSupport } = useSelect( ( select ) => {
+		const { getEditorUIPreference } = unlock( select( editorStore ) );
 		return {
-			hasThemeStyleSupport:
-				select( editPostStore ).isFeatureActive( 'themeStyles' ),
+			hasThemeStyleSupport: getEditorUIPreference(
+				'themeStyles',
+				'core/edit-post'
+			),
 		};
 	}, [] );
 

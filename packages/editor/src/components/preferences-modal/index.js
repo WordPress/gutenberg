@@ -18,13 +18,13 @@ import { store as interfaceStore } from '@wordpress/interface';
 import EnablePanelOption from './enable-panel';
 import EnablePluginDocumentSettingPanelOption from './enable-plugin-document-setting-panel';
 import EnablePublishSidebarOption from './enable-publish-sidebar';
+import DistractionFreeConfigControl from './distraction-free-config-control';
 import BlockVisibility from '../block-visibility';
 import PostTaxonomies from '../post-taxonomies';
 import PostFeaturedImageCheck from '../post-featured-image/check';
 import PostExcerptCheck from '../post-excerpt/check';
 import PageAttributesCheck from '../page-attributes/check';
 import PostTypeSupportCheck from '../post-type-support-check';
-import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
 const {
@@ -53,25 +53,68 @@ export default function EditorPreferencesModal( { extraSections = {} } ) {
 	);
 }
 
+function AppearanceToggles( { Toggle, isLargeViewport } ) {
+	return (
+		<>
+			<Toggle
+				featureKey="fixedToolbar"
+				help={ __( 'Access all block and document tools in a single place.' ) }
+				label={ __( 'Top toolbar' ) }
+			/>
+			<Toggle
+				featureKey="focusMode"
+				help={ __( 'Highlights the current block and fades other content.' ) }
+				label={ __( 'Spotlight mode' ) }
+			/>
+			{ isLargeViewport && (
+				<Toggle
+					featureKey="showBlockBreadcrumbs"
+					help={ __( 'Display the block hierarchy trail at the bottom of the editor.' ) }
+					label={ __( 'Block breadcrumbs' ) }
+				/>
+			) }
+			<Toggle
+				featureKey="autoHideHeader"
+				help={ __( 'Hide the toolbar and show it on hover.' ) }
+				label={ __( 'Auto-hide header' ) }
+			/>
+			<Toggle
+				featureKey="showSimpleTopbar"
+				help={ __( 'Show the inserter, list view, and zoom out toggles.' ) }
+				label={ __( 'Simplified topbar' ) }
+			/>
+			<Toggle
+				featureKey="showBlockHelpers"
+				help={ __( 'Show insertion points and block helpers.' ) }
+				label={ __( 'Block helpers' ) }
+			/>
+		</>
+	);
+}
+
+function NormalModeToggle( { featureKey, help, label } ) {
+	return (
+		<PreferenceToggleControl
+			scope="core"
+			featureName={ featureKey }
+			help={ help }
+			label={ label }
+		/>
+	);
+}
+
+function DistractionFreeModeToggle( { featureKey, help, label } ) {
+	return (
+		<DistractionFreeConfigControl
+			configKey={ featureKey }
+			help={ help }
+			label={ label }
+		/>
+	);
+}
+
 function PreferencesModalContents( { extraSections = {} } ) {
 	const isLargeViewport = useViewportMatch( 'medium' );
-	const showBlockBreadcrumbsOption = useSelect(
-		( select ) => {
-			const { getEditorSettings } = select( editorStore );
-			const { get } = select( preferencesStore );
-			const isRichEditingEnabled = getEditorSettings().richEditingEnabled;
-			const isDistractionFreeEnabled = get( 'core', 'distractionFree' );
-			return (
-				! isDistractionFreeEnabled &&
-				isLargeViewport &&
-				isRichEditingEnabled
-			);
-		},
-		[ isLargeViewport ]
-	);
-	const { setIsListViewOpened, setIsInserterOpened } =
-		useDispatch( editorStore );
-	const { set: setPreference } = useDispatch( preferencesStore );
 
 	const sections = useMemo(
 		() =>
@@ -92,16 +135,6 @@ function PreferencesModalContents( { extraSections = {} } ) {
 									) }
 									label={ __( 'Always open List View' ) }
 								/>
-								{ showBlockBreadcrumbsOption && (
-									<PreferenceToggleControl
-										scope="core"
-										featureName="showBlockBreadcrumbs"
-										help={ __(
-											'Display the block hierarchy trail at the bottom of the editor.'
-										) }
-										label={ __( 'Show block breadcrumbs' ) }
-									/>
-								) }
 								<PreferenceToggleControl
 									scope="core"
 									featureName="allowRightClickOverrides"
@@ -185,54 +218,32 @@ function PreferencesModalContents( { extraSections = {} } ) {
 					name: 'appearance',
 					tabLabel: __( 'Appearance' ),
 					content: (
-						<PreferencesModalSection
-							title={ __( 'Appearance' ) }
-							description={ __(
-								'Customize the editor interface to suit your needs.'
-							) }
-						>
-							<PreferenceToggleControl
-								scope="core"
-								featureName="fixedToolbar"
-								onToggle={ () =>
-									setPreference(
-										'core',
-										'distractionFree',
-										false
-									)
-								}
-								help={ __(
-									'Access all block and document tools in a single place.'
+						<>
+							<PreferencesModalSection
+								title={ __( 'Normal mode' ) }
+								description={ __(
+									'Settings when distraction-free mode is off.'
 								) }
-								label={ __( 'Top toolbar' ) }
-							/>
-							<PreferenceToggleControl
-								scope="core"
-								featureName="distractionFree"
-								onToggle={ () => {
-									setPreference(
-										'core',
-										'fixedToolbar',
-										true
-									);
-									setIsInserterOpened( false );
-									setIsListViewOpened( false );
-								} }
-								help={ __(
-									'Reduce visual distractions by hiding the toolbar and other elements to focus on writing.'
+							>
+								<AppearanceToggles
+									Toggle={ NormalModeToggle }
+									isLargeViewport={ isLargeViewport }
+								/>
+								{ extraSections?.appearance }
+							</PreferencesModalSection>
+							<PreferencesModalSection
+								title={ __( 'Distraction-free mode' ) }
+								description={ __(
+									'Settings when distraction-free mode is on.'
 								) }
-								label={ __( 'Distraction free' ) }
-							/>
-							<PreferenceToggleControl
-								scope="core"
-								featureName="focusMode"
-								help={ __(
-									'Highlights the current block and fades other content.'
-								) }
-								label={ __( 'Spotlight mode' ) }
-							/>
-							{ extraSections?.appearance }
-						</PreferencesModalSection>
+							>
+								<AppearanceToggles
+									Toggle={ DistractionFreeModeToggle }
+									isLargeViewport={ isLargeViewport }
+								/>
+								{ extraSections?.distractionFreeAppearance }
+							</PreferencesModalSection>
+						</>
 					),
 				},
 				{
@@ -330,14 +341,7 @@ function PreferencesModalContents( { extraSections = {} } ) {
 					),
 				},
 			].filter( Boolean ),
-		[
-			showBlockBreadcrumbsOption,
-			extraSections,
-			setIsInserterOpened,
-			setIsListViewOpened,
-			setPreference,
-			isLargeViewport,
-		]
+		[ extraSections, isLargeViewport ]
 	);
 
 	return <PreferencesModalTabs sections={ sections } />;

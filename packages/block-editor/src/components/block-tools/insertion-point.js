@@ -43,7 +43,7 @@ function InbetweenInsertionPointPopover( {
 		nextClientId,
 		rootClientId,
 		isInserterShown,
-		isDistractionFree,
+		showBlockHelpers,
 		isZoomOutMode,
 	} = useSelect( ( select ) => {
 		const {
@@ -83,7 +83,7 @@ function InbetweenInsertionPointPopover( {
 				getBlockListSettings( insertionPoint.rootClientId )
 					?.orientation || 'vertical',
 			rootClientId: insertionPoint.rootClientId,
-			isDistractionFree: settings.isDistractionFree,
+			showBlockHelpers: settings.showBlockHelpers ?? true,
 			isInserterShown: insertionPoint?.__unstableWithInserter,
 			isZoomOutMode: isZoomOut(),
 		};
@@ -160,7 +160,7 @@ function InbetweenInsertionPointPopover( {
 		},
 	};
 
-	if ( isDistractionFree ) {
+	if ( ! showBlockHelpers ) {
 		return null;
 	}
 
