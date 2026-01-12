@@ -15,6 +15,7 @@ export class TypedAwareness< State extends BaseState > extends Awareness {
 
 	/**
 	 * Get a local state field from an awareness document.
+	 * @param field
 	 */
 	public getLocalStateField< FieldName extends keyof State >(
 		field: FieldName
@@ -25,6 +26,8 @@ export class TypedAwareness< State extends BaseState > extends Awareness {
 
 	/**
 	 * Set a local state field on an awareness document.
+	 * @param field
+	 * @param value
 	 */
 	public setLocalStateField< FieldName extends string & keyof State >(
 		field: FieldName,
@@ -53,10 +56,10 @@ export type EnhancedState< State extends BaseState > = State & {
 	isMe: boolean;
 };
 
-export type EqualityFieldCheck< State extends BaseState, FieldName extends keyof State > = (
-	value1?: State[ FieldName ],
-	value2?: State[ FieldName ]
-) => boolean;
+export type EqualityFieldCheck<
+	State extends BaseState,
+	FieldName extends keyof State,
+> = ( value1?: State[ FieldName ], value2?: State[ FieldName ] ) => boolean;
 
 /**
  * The editor state includes information about the user's current selection.
@@ -72,4 +75,3 @@ export interface EditorState {
 export interface PostEditorState extends BaseState {
 	editorState?: EditorState;
 }
-

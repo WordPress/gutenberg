@@ -74,7 +74,6 @@ export function getRecordValue< RecordType, Key extends keyof RecordType >(
 	key: Key
 ): RecordType[ Key ] | null {
 	if ( 'object' === typeof obj && null !== obj && key in obj ) {
-		// eslint-disable-next-line security/detect-object-injection
 		return ( obj as RecordType )[ key ];
 	}
 
@@ -99,7 +98,6 @@ export function areMapsEqual< Key, Value >(
 			return false;
 		}
 
-		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 		if ( ! comparatorFn( value1, map2.get( key )! ) ) {
 			return false;
 		}

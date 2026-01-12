@@ -1,12 +1,21 @@
-import { ObjectID, ObjectType } from "../types";
-import { AwarenessState } from "./awareness-state";
-import { PostEditorAwarenessState } from "./post-editor-awareness-state";
-
+/**
+ * External dependencies
+ */
 import type * as Y from 'yjs';
+
+/**
+ * Internal dependencies
+ */
+import type { ObjectID, ObjectType } from '../types';
+import type { AwarenessState } from './awareness-state';
+import { PostEditorAwarenessState } from './post-editor-awareness-state';
 
 const awarenessInstances: Map< string, AwarenessState > = new Map();
 
-function getAwarenessId( objectType: ObjectType, objectId: ObjectID | null ): string {
+function getAwarenessId(
+	objectType: ObjectType,
+	objectId: ObjectID | null
+): string {
 	return `${ objectType }:${ objectId }`;
 }
 
@@ -40,7 +49,10 @@ export async function createAwareness(
 	if ( objectId && objectType.startsWith( 'postType/' ) ) {
 		const awareness = new PostEditorAwarenessState( ydoc );
 		awareness.setUp();
-		awarenessInstances.set( getAwarenessId( objectType, objectId ), awareness );
+		awarenessInstances.set(
+			getAwarenessId( objectType, objectId ),
+			awareness
+		);
 
 		return awareness;
 	}
@@ -53,5 +65,7 @@ export function setConnectionStatus(
 	objectId: ObjectID | null,
 	isConnected: boolean
 ): void {
-	getAwarenessInstance( objectType, objectId )?.setConnectionStatus( isConnected );
+	getAwarenessInstance( objectType, objectId )?.setConnectionStatus(
+		isConnected
+	);
 }

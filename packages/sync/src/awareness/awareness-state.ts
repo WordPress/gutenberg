@@ -1,10 +1,12 @@
+/**
+ * Internal dependencies
+ */
 import {
 	TypedAwareness,
 	type BaseState,
 	type EnhancedState,
 	type EqualityFieldCheck,
 } from './awareness-types';
-
 import { getTypedKeys, areMapsEqual } from '../utils';
 import { REMOVAL_DELAY_IN_MS } from '../config';
 
@@ -19,26 +21,34 @@ interface AwarenessStateChange {
 abstract class AwarenessWithEqualityChecks<
 	State extends BaseState = BaseState,
 > extends TypedAwareness< State > {
-	/** OVERRIDDEN METHODS **/
+	/** OVERRIDDEN METHODS */
 
 	/**
 	 * Set a local state field on an awareness document. Calling this method may
 	 * trigger rerenders of any subscribed components.
 	 *
 	 * Equality checks are provided by the abstract `equalityFieldChecks` property.
+	 * @param field
+	 * @param value
 	 */
 	public setLocalStateField< FieldName extends string & keyof State >(
 		field: FieldName,
 		value: State[ FieldName ]
 	): void {
-		if ( this.isFieldEqual( field, value, this.getLocalStateField( field ) ?? undefined ) ) {
+		if (
+			this.isFieldEqual(
+				field,
+				value,
+				this.getLocalStateField( field ) ?? undefined
+			)
+		) {
 			return;
 		}
 
 		super.setLocalStateField( field, value );
 	}
 
-	/** ABSTRACT PROPERTIES **/
+	/** ABSTRACT PROPERTIES */
 
 	/**
 	 * Extending classes must implement equality checks for each awareness state
@@ -48,22 +58,26 @@ abstract class AwarenessWithEqualityChecks<
 		[ FieldName in keyof State ]: EqualityFieldCheck< State, FieldName >;
 	};
 
-	/** CUSTOM METHODS **/
+	/** CUSTOM METHODS */
 
 	/**
 	 * Determine if a field value has changed using the provided equality checks.
+	 * @param field
+	 * @param value1
+	 * @param value2
 	 */
 	protected isFieldEqual< FieldName extends keyof State >(
 		field: FieldName,
 		value1?: State[ FieldName ],
 		value2?: State[ FieldName ]
 	): boolean {
-		if ( [ 'clientId', 'isConnected', 'isMe' ].includes( field as string ) ) {
+		if (
+			[ 'clientId', 'isConnected', 'isMe' ].includes( field as string )
+		) {
 			return value1 === value2;
 		}
 
 		if ( field in this.equalityFieldChecks ) {
-			// eslint-disable-next-line security/detect-object-injection
 			const fn = this.equalityFieldChecks[ field ];
 			return fn( value1, value2 );
 		}
@@ -76,12 +90,16 @@ abstract class AwarenessWithEqualityChecks<
 	/**
 	 * Determine if two states are equal by comparing each field using the
 	 * provided equality checks.
+	 * @param state1
+	 * @param state2
 	 */
 	protected isStateEqual( state1: State, state2: State ): boolean {
 		return [
-			...new Set< keyof State >( [ ...getTypedKeys( state1 ), ...getTypedKeys( state2 ) ] ),
-		].every( field => {
-			/* eslint-disable security/detect-object-injection */
+			...new Set< keyof State >( [
+				...getTypedKeys( state1 ),
+				...getTypedKeys( state2 ),
+			] ),
+		].every( ( field ) => {
 			const value1 = state1[ field ];
 			const value2 = state2[ field ];
 
@@ -97,7 +115,7 @@ abstract class AwarenessWithEqualityChecks<
 export abstract class AwarenessState<
 	State extends BaseState = BaseState,
 > extends AwarenessWithEqualityChecks< State > {
-	/** CUSTOM PROPERTIES **/
+	/** CUSTOM PROPERTIES */
 
 	/**
 	 * We keep track of all seen states during the current session for two reasons:
@@ -115,7 +133,9 @@ export abstract class AwarenessState<
 	 * state values and avoid unnecessary updates to subscribers.
 	 */
 	private previousSnapshot = new Map< number, State >();
-	private stateSubscriptions: Array< ( newState: EnhancedState< State >[] ) => void > = [];
+	private stateSubscriptions: Array<
+		( newState: EnhancedState< State >[] ) => void
+	> = [];
 
 	/**
 	 * In some cases, we may want to throttle setting local state fields to avoid
@@ -126,7 +146,7 @@ export abstract class AwarenessState<
 	private myThrottledState: Partial< State > = {};
 	private throttleTimeouts: Map< string, NodeJS.Timeout > = new Map();
 
-	/** CUSTOM METHODS **/
+	/** CUSTOM METHODS */
 
 	/**
 	 * Set up.
@@ -134,38 +154,27 @@ export abstract class AwarenessState<
 	public setUp( /*userInfo: UserInfo */ ): void {
 		// this.setLocalStateField( 'userInfo', userInfo );
 
-		this.on( 'change', ( { added, removed, updated }: AwarenessStateChange ) => {
-			[ ...added, ...updated ].forEach( id => {
-				this.disconnectedUsers.delete( id );
-			} );
-
-			// added.forEach( id => {
-			// 	// Send notification for added users.
-			// 	const addedUserInfo = this.getStates().get( id )?.userInfo;
-			// 	if ( addedUserInfo ) {
-			// 		sendNotification( NotificationType.UserEntered, addedUserInfo, undefined, userInfo );
-			// 	}
-			// } );
-
-			removed.forEach( id => {
-				this.disconnectedUsers.add( id );
-
-				setTimeout( () => {
+		this.on(
+			'change',
+			( { added, removed, updated }: AwarenessStateChange ) => {
+				[ ...added, ...updated ].forEach( ( id ) => {
 					this.disconnectedUsers.delete( id );
-					this.updateSubscribers( true /* force update */ );
+				} );
 
-					// Send notification.
-					// const removedUserInfo = this.seenStates.get( id )?.userInfo;
-					// if ( removedUserInfo ) {
-					// 	sendNotification( NotificationType.UserExited, removedUserInfo );
-					// }
-				}, REMOVAL_DELAY_IN_MS );
-			} );
+				removed.forEach( ( id ) => {
+					this.disconnectedUsers.add( id );
 
-			// Do not force-update the store here, since this change handler can be
-			// called even when there are no actual state changes.
-			this.updateSubscribers();
-		} );
+					setTimeout( () => {
+						this.disconnectedUsers.delete( id );
+						this.updateSubscribers( true /* force update */ );
+					}, REMOVAL_DELAY_IN_MS );
+				} );
+
+				// Do not force-update the store here, since this change handler can be
+				// called even when there are no actual state changes.
+				this.updateSubscribers();
+			}
+		);
 	}
 
 	/**
@@ -177,24 +186,30 @@ export abstract class AwarenessState<
 
 	/**
 	 * Allow external code to subscribe to awareness state changes.
+	 * @param callback
 	 */
-	public onStateChange( callback: ( newState: EnhancedState< State >[] ) => void ): () => void {
+	public onStateChange(
+		callback: ( newState: EnhancedState< State >[] ) => void
+	): () => void {
 		this.stateSubscriptions.push( callback );
 
 		return () => {
-			this.stateSubscriptions = this.stateSubscriptions.filter( cb => cb !== callback );
+			this.stateSubscriptions = this.stateSubscriptions.filter(
+				( cb ) => cb !== callback
+			);
 		};
 	}
 
 	/**
 	 * Set a local state field on an awareness document with throttle. See caveats
 	 * of this.setLocalStateField.
+	 * @param field
+	 * @param value
+	 * @param wait
 	 */
-	public setThrottledLocalStateField< FieldName extends string & keyof State >(
-		field: FieldName,
-		value: State[ FieldName ],
-		wait: number
-	): void {
+	public setThrottledLocalStateField<
+		FieldName extends string & keyof State,
+	>( field: FieldName, value: State[ FieldName ], wait: number ): void {
 		if ( this.throttleTimeouts.has( field ) ) {
 			this.myThrottledState[ field ] = value;
 			this.updateSubscribers( true /* force update */ );
@@ -208,8 +223,11 @@ export abstract class AwarenessState<
 			setTimeout( () => {
 				this.throttleTimeouts.delete( field );
 				if ( this.myThrottledState[ field ] ) {
-					this.setLocalStateField( field, this.myThrottledState[ field ] );
-					// eslint-disable-next-line @typescript-eslint/no-dynamic-delete
+					this.setLocalStateField(
+						field,
+						this.myThrottledState[ field ]
+					);
+
 					delete this.myThrottledState[ field ];
 				}
 			}, wait )
@@ -218,6 +236,7 @@ export abstract class AwarenessState<
 
 	/**
 	 * Set the current user's connection status as awareness state.
+	 * @param isConnected
 	 */
 	public setConnectionStatus( isConnected: boolean ): void {
 		if ( isConnected ) {
@@ -231,6 +250,7 @@ export abstract class AwarenessState<
 
 	/**
 	 * Update all subscribed listeners with the latest awareness state.
+	 * @param forceUpdate
 	 */
 	protected updateSubscribers( forceUpdate = false ): void {
 		if ( ! this.stateSubscriptions.length ) {
@@ -245,21 +265,16 @@ export abstract class AwarenessState<
 		] );
 
 		const updatedStates = new Map< number, EnhancedState< State > >(
-			[ ...this.disconnectedUsers, ...states.keys() ]
-				// .filter( clientId => {
-				// 	// Exclude any users without `userInfo`.
-				// 	// This can happen from the Yjs inspector, which joins the awareness
-				// 	// state without providing user data.
-				// 	return Boolean( this.seenStates.get( clientId )?.userInfo );
-				// } )
-				.map( clientId => {
-					// The filter above ensures that seenStates has the clientId.
-					// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+			[ ...this.disconnectedUsers, ...states.keys() ].map(
+				( clientId ) => {
 					const rawState: State = this.seenStates.get( clientId )!;
 
-					const isConnected = ! this.disconnectedUsers.has( clientId );
+					const isConnected =
+						! this.disconnectedUsers.has( clientId );
 					const isMe = clientId === this.clientID;
-					const myState: Partial< State > = isMe ? this.myThrottledState : {};
+					const myState: Partial< State > = isMe
+						? this.myThrottledState
+						: {};
 					const state: EnhancedState< State > = {
 						...rawState,
 						...myState,
@@ -269,11 +284,18 @@ export abstract class AwarenessState<
 					};
 
 					return [ clientId, state ];
-				} )
+				}
+			)
 		);
 
 		if ( ! forceUpdate ) {
-			if ( areMapsEqual( this.previousSnapshot, updatedStates, this.isStateEqual.bind( this ) ) ) {
+			if (
+				areMapsEqual(
+					this.previousSnapshot,
+					updatedStates,
+					this.isStateEqual.bind( this )
+				)
+			) {
 				// Awareness state unchanged, do not update subscribers.
 				return;
 			}
@@ -281,9 +303,8 @@ export abstract class AwarenessState<
 
 		// Update subscribers.
 		this.previousSnapshot = updatedStates;
-		this.stateSubscriptions.forEach( callback => {
+		this.stateSubscriptions.forEach( ( callback ) => {
 			callback( Array.from( updatedStates.values() ) );
 		} );
 	}
 }
-
