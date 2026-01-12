@@ -20,7 +20,7 @@ import { DEFAULT_ENTITY_KEY } from './entities';
 import { createBatch } from './batch';
 import { STORE_NAME } from './name';
 import { LOCAL_EDITOR_ORIGIN, getSyncManager } from './sync';
-import { STAGED_ID_PREFIX } from './utils/is-staged-id';
+import { isStagedId } from './utils/is-staged-id';
 import logEntityDeprecation from './utils/log-entity-deprecation';
 
 /**
@@ -299,6 +299,9 @@ export const deleteEntityRecord =
 			return;
 		}
 
+		// Check if this is a staged record (local-only, not yet persisted)
+		const isLocalStaged = isStagedId( recordId );
+
 		const lock = await dispatch.__unstableAcquireStoreLock(
 			STORE_NAME,
 			[ 'entities', 'records', kind, name, recordId ],
@@ -314,35 +317,48 @@ export const deleteEntityRecord =
 			} );
 
 			let hasError = false;
-			let { baseURL } = entityConfig;
-			if (
-				kind === 'postType' &&
-				name === 'wp_template' &&
-				( ( recordId &&
-					typeof recordId === 'string' &&
-					! /^\d+$/.test( recordId ) ) ||
-					! window?.__experimentalTemplateActivate )
-			) {
-				baseURL =
-					baseURL.slice( 0, baseURL.lastIndexOf( '/' ) ) +
-					'/templates';
-			}
-			try {
-				let path = `${ baseURL }/${ recordId }`;
 
-				if ( query ) {
-					path = addQueryArgs( path, query );
+			// For staged records that haven't been persisted, skip the API call
+			// and just remove them from the local store.
+			if ( isLocalStaged ) {
+				try {
+					await dispatch( removeItems( kind, name, recordId, true ) );
+					deletedRecord = true;
+				} catch ( _error ) {
+					hasError = true;
+					error = _error;
 				}
+			} else {
+				let { baseURL } = entityConfig;
+				if (
+					kind === 'postType' &&
+					name === 'wp_template' &&
+					( ( recordId &&
+						typeof recordId === 'string' &&
+						! /^\d+$/.test( recordId ) ) ||
+						! window?.__experimentalTemplateActivate )
+				) {
+					baseURL =
+						baseURL.slice( 0, baseURL.lastIndexOf( '/' ) ) +
+						'/templates';
+				}
+				try {
+					let path = `${ baseURL }/${ recordId }`;
 
-				deletedRecord = await __unstableFetch( {
-					path,
-					method: 'DELETE',
-				} );
+					if ( query ) {
+						path = addQueryArgs( path, query );
+					}
 
-				await dispatch( removeItems( kind, name, recordId, true ) );
-			} catch ( _error ) {
-				hasError = true;
-				error = _error;
+					deletedRecord = await __unstableFetch( {
+						path,
+						method: 'DELETE',
+					} );
+
+					await dispatch( removeItems( kind, name, recordId, true ) );
+				} catch ( _error ) {
+					hasError = true;
+					error = _error;
+				}
 			}
 
 			dispatch( {
@@ -529,16 +545,16 @@ export const saveEntityRecord =
 		}
 		const entityIdKey = entityConfig.key ?? DEFAULT_ENTITY_KEY;
 		const stagedRecordId = record[ entityIdKey ];
-		const isLocalStaged =
-			typeof stagedRecordId === 'string' &&
-			stagedRecordId.startsWith( STAGED_ID_PREFIX );
-		const recordId = record.__unstablePersistedId
+		const isLocalStaged = isStagedId( stagedRecordId );
+		// For local staged records, the server record ID is the persisted ID (if any).
+		// For regular records, it's the record's ID field.
+		const serverRecordId = isLocalStaged
 			? record.__unstablePersistedId
 			: stagedRecordId;
-		const localRecordId = isLocalStaged ? stagedRecordId : recordId;
+		const localRecordId = isLocalStaged ? stagedRecordId : serverRecordId;
 
-		// Treat records without a persisted ID as new records.
-		const isNewRecord = ! recordId;
+		// A record is "new" if it doesn't have a server-side ID yet.
+		const isNewRecord = ! serverRecordId;
 
 		const lock = await dispatch.__unstableAcquireStoreLock(
 			STORE_NAME,
@@ -586,9 +602,9 @@ export const saveEntityRecord =
 			if (
 				kind === 'postType' &&
 				name === 'wp_template' &&
-				( ( recordId &&
-					typeof recordId === 'string' &&
-					! /^\d+$/.test( recordId ) ) ||
+				( ( serverRecordId &&
+					typeof serverRecordId === 'string' &&
+					! /^\d+$/.test( serverRecordId ) ) ||
 					! window?.__experimentalTemplateActivate )
 			) {
 				baseURL =
@@ -596,7 +612,9 @@ export const saveEntityRecord =
 					'/templates';
 			}
 			try {
-				const path = `${ baseURL }${ recordId ? '/' + recordId : '' }`;
+				const path = `${ baseURL }${
+					serverRecordId ? '/' + serverRecordId : ''
+				}`;
 				// Skip the raw values check when creating a new record; they don't exist yet.
 				const persistedRecord = ! isNewRecord
 					? select.getRawEntityRecord( kind, name, localRecordId )
@@ -716,17 +734,17 @@ export const saveEntityRecord =
 						};
 					}
 
-					updatedRecord = await __unstableFetch( {
-						path,
-						method: recordId ? 'PUT' : 'POST',
-						data: isLocalStaged
-							? { ...edits, [ entityIdKey ]: undefined }
-							: edits,
-					} );
-
-					const stagedEdits = isLocalStaged
+					// For staged records, strip the local ID from the data sent to server
+					const dataToSend = isLocalStaged
 						? { ...edits, [ entityIdKey ]: undefined }
 						: edits;
+
+					updatedRecord = await __unstableFetch( {
+						path,
+						method: serverRecordId ? 'PUT' : 'POST',
+						data: dataToSend,
+					} );
+
 					const persistedId =
 						updatedRecord[ entityIdKey ] ?? updatedRecord.id;
 					const stagedRecord = isLocalStaged
@@ -743,7 +761,7 @@ export const saveEntityRecord =
 						stagedRecord,
 						undefined,
 						true,
-						stagedEdits
+						edits
 					);
 				}
 			} catch ( _error ) {

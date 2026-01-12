@@ -169,6 +169,47 @@ describe( 'deleteEntityRecord', () => {
 			)( { dispatch, resolveSelect } )
 		).resolves.toBe( false );
 	} );
+
+	it( 'skips API call for staged records and removes locally', async () => {
+		const stagedId = `${ STAGED_ID_PREFIX }test-uuid-123`;
+		const configs = [
+			{ name: 'post', kind: 'postType', baseURL: '/wp/v2/posts' },
+		];
+
+		const dispatch = Object.assign( jest.fn(), {
+			receiveEntityRecords: jest.fn(),
+			__unstableAcquireStoreLock: jest.fn(),
+			__unstableReleaseStoreLock: jest.fn(),
+		} );
+		const resolveSelect = { getEntitiesConfig: jest.fn( () => configs ) };
+
+		const result = await deleteEntityRecord(
+			'postType',
+			'post',
+			stagedId
+		)( { dispatch, resolveSelect } );
+
+		// API should NOT be called for staged records
+		expect( apiFetch ).not.toHaveBeenCalled();
+
+		// Should dispatch start and finish actions
+		expect( dispatch ).toHaveBeenCalledWith( {
+			type: 'DELETE_ENTITY_RECORD_START',
+			kind: 'postType',
+			name: 'post',
+			recordId: stagedId,
+		} );
+		expect( dispatch ).toHaveBeenCalledWith( {
+			type: 'DELETE_ENTITY_RECORD_FINISH',
+			kind: 'postType',
+			name: 'post',
+			recordId: stagedId,
+			error: undefined,
+		} );
+
+		// Should return true to indicate successful deletion
+		expect( result ).toBe( true );
+	} );
 } );
 
 describe( 'saveEditedEntityRecord', () => {
@@ -550,7 +591,7 @@ describe( 'saveEntityRecord', () => {
 			},
 			undefined,
 			true,
-			{ title: 'Draft Post', status: 'draft' }
+			{ id: draftId, title: 'Draft Post', status: 'draft' }
 		);
 
 		expect( result ).toBe( savedRecord );

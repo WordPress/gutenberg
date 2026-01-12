@@ -6,7 +6,13 @@ import { createSelector, createRegistrySelector } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import { getDefaultTemplateId, getEntityRecord, type State } from './selectors';
+import {
+	getDefaultTemplateId,
+	getEntityConfig,
+	getEntityRecord,
+	type State,
+} from './selectors';
+import { DEFAULT_ENTITY_KEY } from './entities';
 import { STORE_NAME } from './name';
 import { unlock } from './lock-unlock';
 import { getSyncManager } from './sync';
@@ -319,35 +325,45 @@ export function getEditorAssets( state: State ): Record< string, any > | null {
  * been persisted to the server yet. Staged entities are identified by their
  * special staged ID prefix (`__staged__`).
  *
- * @param state State tree.
- * @param kind  Entity kind.
- * @param name  Entity name.
+ * @param state   State tree.
+ * @param kind    Entity kind.
+ * @param name    Entity name.
+ * @param context Optional context (defaults to 'default').
  *
  * @return Array of staged entity records, or empty array if none exist.
  */
 export const getStagedEntityRecords = createSelector(
-	( state: State, kind: string, name: string ): any[] => {
+	(
+		state: State,
+		kind: string,
+		name: string,
+		context: string = 'default'
+	): any[] => {
+		const entityConfig = getEntityConfig( state, kind, name );
+		const entityIdKey = entityConfig?.key ?? DEFAULT_ENTITY_KEY;
 		const queriedData =
 			state.entities.records?.[ kind ]?.[ name ]?.queriedData;
-		// @ts-expect-error
-		const allItems = queriedData?.items?.default;
+		const allItems = queriedData?.items?.[ context ];
 
 		if ( ! allItems ) {
 			return [];
 		}
 
-		return Object.values( allItems ).filter(
-			( item ) =>
-				// @ts-expect-error
-				typeof item.id === 'string' &&
-				// @ts-expect-error
-				item?.id.startsWith( STAGED_ID_PREFIX ) === true &&
-				// @ts-expect-error
-				item?.__unstablePersistedId === undefined
-		);
+		return Object.values( allItems ).filter( ( item ) => {
+			const itemId = item?.[ entityIdKey ];
+			// @ts-expect-error
+			const persistedId = item?.__unstablePersistedId;
+			const hasPersistedRecord =
+				persistedId !== undefined &&
+				Object.prototype.hasOwnProperty.call( allItems, persistedId );
+			return (
+				typeof itemId === 'string' &&
+				itemId.startsWith( STAGED_ID_PREFIX ) === true &&
+				( persistedId === undefined || ! hasPersistedRecord )
+			);
+		} );
 	},
 	( state: State, kind: string, name: string ) => [
-		// Watch the entire queriedData to detect any changes to items
 		state.entities.records?.[ kind ]?.[ name ]?.queriedData,
 	]
 );

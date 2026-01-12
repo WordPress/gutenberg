@@ -237,7 +237,9 @@ export function persistedIdMap( state = {}, action ) {
 					ctx,
 					Object.fromEntries(
 						Object.entries( contextMap ).filter(
-							( [ , localId ] ) => ! removedSet.has( localId )
+							( [ persistedId, localId ] ) =>
+								! removedSet.has( localId ) &&
+								! removedSet.has( persistedId )
 						)
 					),
 				] )

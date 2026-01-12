@@ -124,6 +124,44 @@ describe( 'getStagedEntityRecords', () => {
 		);
 	} );
 
+	it( 'keeps staged record while persisted record is not present', () => {
+		const stagedRecord = {
+			id: draftId,
+			title: 'Staged Post',
+			status: 'draft',
+			__unstablePersistedId: 10,
+		};
+
+		const state = deepFreeze( {
+			entities: {
+				config: [ { kind: 'postType', name: 'post', key: 'id' } ],
+				records: {
+					postType: {
+						post: {
+							queriedData: {
+								items: {
+									default: {
+										[ draftId ]: stagedRecord,
+									},
+								},
+								itemIsComplete: {
+									default: {
+										[ draftId ]: true,
+									},
+								},
+								queries: {},
+							},
+						},
+					},
+				},
+			},
+		} );
+
+		expect( getStagedEntityRecords( state, 'postType', 'post' ) ).toEqual( [
+			stagedRecord,
+		] );
+	} );
+
 	it( 'should return multiple staged records', () => {
 		const draftId2 = `${ STAGED_ID_PREFIX }test-uuid-2`;
 		const draftRecord1 = {
@@ -203,6 +241,51 @@ describe( 'getStagedEntityRecords', () => {
 		expect( getStagedEntityRecords( state, 'postType', 'post' ) ).toEqual(
 			[]
 		);
+	} );
+
+	it( 'should support custom context parameter', () => {
+		const draftRecord = {
+			id: draftId,
+			title: 'Edit Context Draft',
+			status: 'draft',
+		};
+
+		const state = deepFreeze( {
+			entities: {
+				config: [ { kind: 'postType', name: 'post', key: 'id' } ],
+				records: {
+					postType: {
+						post: {
+							queriedData: {
+								items: {
+									default: {},
+									edit: {
+										[ draftId ]: draftRecord,
+									},
+								},
+								itemIsComplete: {
+									default: {},
+									edit: {
+										[ draftId ]: true,
+									},
+								},
+								queries: {},
+							},
+						},
+					},
+				},
+			},
+		} );
+
+		// Should return empty for default context
+		expect( getStagedEntityRecords( state, 'postType', 'post' ) ).toEqual(
+			[]
+		);
+
+		// Should return the record for edit context
+		expect(
+			getStagedEntityRecords( state, 'postType', 'post', 'edit' )
+		).toEqual( [ draftRecord ] );
 	} );
 } );
 
