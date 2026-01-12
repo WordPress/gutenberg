@@ -1349,7 +1349,7 @@
 					"$description": "Foreground color for interactive elements with neutral tone and strong emphasis that are hovered, focused, or active."
 				},
 				"neutral-strong-disabled": {
-					"$value": "{wpds-color.primitive.bg.fgSurface3}",
+					"$value": "{wpds-color.primitive.bg.fgSurface2}",
 					"$description": "Foreground color for interactive elements with neutral tone and strong emphasis, in their disabled state."
 				},
 				"neutral-weak": {

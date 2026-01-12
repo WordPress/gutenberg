@@ -81,11 +81,11 @@ export default {
 	],
 	'bg-fgSurface3': [
 		'fg-content-neutral-weak',
-		'fg-interactive-neutral-strong-disabled',
 		'fg-interactive-neutral-weak',
 	],
 	'bg-fgSurface2': [
 		'fg-interactive-neutral-disabled',
+		'fg-interactive-neutral-strong-disabled',
 		'fg-interactive-neutral-weak-disabled',
 	],
 	'bg-stroke3': [
