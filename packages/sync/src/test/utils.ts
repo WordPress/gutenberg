@@ -14,7 +14,10 @@ import {
 	CRDT_DOC_VERSION,
 	CRDT_STATE_MAP_KEY,
 	CRDT_STATE_VERSION_KEY,
+	WORDPRESS_META_KEY_FOR_CRDT_DOC_PERSISTENCE,
 } from '../config';
+import { createVersionObserver } from '../manager';
+import { getPersistedCrdtDoc } from '../persistence';
 
 describe( 'utils', () => {
 	describe( 'createYjsDoc', () => {
@@ -232,6 +235,274 @@ describe( 'utils', () => {
 
 			const version = await versionDetected;
 			expect( version ).toBe( 2 );
+		} );
+	} );
+
+	describe( 'persisted document version handling', () => {
+		it( 'preserves version when serializing and deserializing', () => {
+			const doc = createYjsDoc();
+
+			// Set version 2 in the state map
+			doc.transact( () => {
+				const stateMap = doc.getMap( CRDT_STATE_MAP_KEY );
+				stateMap.set( CRDT_STATE_VERSION_KEY, 2 );
+			} );
+
+			// Serialize and deserialize
+			const serialized = serializeCrdtDoc( doc );
+			const deserialized = deserializeCrdtDoc( serialized );
+
+			expect( deserialized ).not.toBeNull();
+
+			// Version should be preserved in the deserialized doc
+			const stateMap = deserialized!.getMap( CRDT_STATE_MAP_KEY );
+			expect( stateMap.get( CRDT_STATE_VERSION_KEY ) ).toBe( 2 );
+		} );
+
+		it( 'can detect when persisted doc has higher version than local', () => {
+			// Simulate persisted doc with version 2
+			const persistedDoc = createYjsDoc();
+			persistedDoc.transact( () => {
+				const stateMap = persistedDoc.getMap( CRDT_STATE_MAP_KEY );
+				stateMap.set( CRDT_STATE_VERSION_KEY, CRDT_DOC_VERSION + 1 );
+			} );
+
+			const serialized = serializeCrdtDoc( persistedDoc );
+			const deserialized = deserializeCrdtDoc( serialized );
+
+			expect( deserialized ).not.toBeNull();
+
+			// Check if persisted version is higher than local
+			const stateMap = deserialized!.getMap( CRDT_STATE_MAP_KEY );
+			const persistedVersion = stateMap.get(
+				CRDT_STATE_VERSION_KEY
+			) as number;
+
+			expect( persistedVersion ).toBeGreaterThan( CRDT_DOC_VERSION );
+		} );
+
+		it( 'can detect when persisted doc has lower version than local', () => {
+			// Simulate persisted doc with version 0 (older than current)
+			const persistedDoc = createYjsDoc();
+			persistedDoc.transact( () => {
+				const stateMap = persistedDoc.getMap( CRDT_STATE_MAP_KEY );
+				// Use version 0 which should always be less than CRDT_DOC_VERSION
+				stateMap.set( CRDT_STATE_VERSION_KEY, 0 );
+			} );
+
+			const serialized = serializeCrdtDoc( persistedDoc );
+			const deserialized = deserializeCrdtDoc( serialized );
+
+			expect( deserialized ).not.toBeNull();
+
+			// Check if persisted version is lower than local
+			const stateMap = deserialized!.getMap( CRDT_STATE_MAP_KEY );
+			const persistedVersion = stateMap.get(
+				CRDT_STATE_VERSION_KEY
+			) as number;
+
+			expect( persistedVersion ).toBeLessThan( CRDT_DOC_VERSION );
+		} );
+
+		it( 'applying persisted doc with higher version triggers version observer', () => {
+			// Create local doc with version observer from manager.ts
+			const localDoc = createYjsDoc();
+			const stateMap = localDoc.getMap( CRDT_STATE_MAP_KEY );
+
+			const versionMismatches: Array< {
+				current: number;
+				persisted: number;
+			} > = [];
+
+			// Use the actual createVersionObserver from manager.ts
+			const observer = createVersionObserver(
+				localDoc,
+				( currentVersion, remoteVersion ) => {
+					versionMismatches.push( {
+						current: currentVersion,
+						persisted: remoteVersion,
+					} );
+				}
+			);
+
+			stateMap.observe( observer );
+
+			// Create persisted doc with higher version
+			const persistedDoc = createYjsDoc();
+			persistedDoc.transact( () => {
+				const persistedStateMap =
+					persistedDoc.getMap( CRDT_STATE_MAP_KEY );
+				persistedStateMap.set(
+					CRDT_STATE_VERSION_KEY,
+					CRDT_DOC_VERSION + 1
+				);
+				persistedDoc.getMap( 'data' ).set( 'test', 'value' );
+			} );
+
+			// Apply persisted doc update to local doc (simulating applyPersistedCrdtDoc)
+			const update = Y.encodeStateAsUpdateV2( persistedDoc );
+			Y.applyUpdateV2( localDoc, update );
+
+			// Should have detected the version mismatch
+			expect( versionMismatches.length ).toBe( 1 );
+			expect( versionMismatches[ 0 ].current ).toBe( CRDT_DOC_VERSION );
+			expect( versionMismatches[ 0 ].persisted ).toBe(
+				CRDT_DOC_VERSION + 1
+			);
+		} );
+
+		it( 'applying persisted doc with same or lower version does not trigger observer', () => {
+			const localDoc = createYjsDoc();
+			const stateMap = localDoc.getMap( CRDT_STATE_MAP_KEY );
+
+			const versionMismatches: Array< {
+				current: number;
+				persisted: number;
+			} > = [];
+
+			// Use the actual createVersionObserver from manager.ts
+			const observer = createVersionObserver(
+				localDoc,
+				( currentVersion, remoteVersion ) => {
+					versionMismatches.push( {
+						current: currentVersion,
+						persisted: remoteVersion,
+					} );
+				}
+			);
+
+			stateMap.observe( observer );
+
+			// Create persisted doc with SAME version
+			const persistedDocSame = createYjsDoc();
+			persistedDocSame.transact( () => {
+				const persistedStateMap =
+					persistedDocSame.getMap( CRDT_STATE_MAP_KEY );
+				persistedStateMap.set(
+					CRDT_STATE_VERSION_KEY,
+					CRDT_DOC_VERSION
+				);
+			} );
+
+			// Apply persisted doc with same version
+			let update = Y.encodeStateAsUpdateV2( persistedDocSame );
+			Y.applyUpdateV2( localDoc, update );
+
+			// Should NOT have triggered callback (same version)
+			expect( versionMismatches.length ).toBe( 0 );
+
+			// Create persisted doc with LOWER version
+			const persistedDocLower = createYjsDoc();
+			persistedDocLower.transact( () => {
+				const persistedStateMap =
+					persistedDocLower.getMap( CRDT_STATE_MAP_KEY );
+				persistedStateMap.set( CRDT_STATE_VERSION_KEY, 0 );
+			} );
+
+			// Apply persisted doc with lower version
+			update = Y.encodeStateAsUpdateV2( persistedDocLower );
+			Y.applyUpdateV2( localDoc, update );
+
+			// Should still NOT have triggered callback (lower version)
+			expect( versionMismatches.length ).toBe( 0 );
+		} );
+	} );
+
+	describe( 'getPersistedCrdtDoc', () => {
+		it( 'returns null when no persisted document exists', () => {
+			const record = { id: 1, title: 'Test' };
+			const result = getPersistedCrdtDoc( record );
+
+			expect( result ).toBeNull();
+		} );
+
+		it( 'returns document when persisted version matches local', () => {
+			// Create a doc with matching version
+			const doc = createYjsDoc();
+			doc.transact( () => {
+				const stateMap = doc.getMap( CRDT_STATE_MAP_KEY );
+				stateMap.set( CRDT_STATE_VERSION_KEY, CRDT_DOC_VERSION );
+				doc.getMap( 'data' ).set( 'test', 'value' );
+			} );
+
+			const serialized = serializeCrdtDoc( doc );
+			const record = {
+				id: 1,
+				meta: {
+					[ WORDPRESS_META_KEY_FOR_CRDT_DOC_PERSISTENCE ]: serialized,
+				},
+			};
+
+			const result = getPersistedCrdtDoc( record );
+
+			expect( result ).not.toBeNull();
+			expect( result!.getMap( 'data' ).get( 'test' ) ).toBe( 'value' );
+
+			// Clean up
+			result!.destroy();
+		} );
+
+		it( 'returns document when persisted version is lower than local', () => {
+			// Create a doc with lower version
+			const doc = createYjsDoc();
+			doc.transact( () => {
+				const stateMap = doc.getMap( CRDT_STATE_MAP_KEY );
+				stateMap.set( CRDT_STATE_VERSION_KEY, 0 );
+				doc.getMap( 'data' ).set( 'test', 'old' );
+			} );
+
+			const serialized = serializeCrdtDoc( doc );
+			const record = {
+				id: 1,
+				meta: {
+					[ WORDPRESS_META_KEY_FOR_CRDT_DOC_PERSISTENCE ]: serialized,
+				},
+			};
+
+			const result = getPersistedCrdtDoc( record );
+
+			expect( result ).not.toBeNull();
+			expect( result!.getMap( 'data' ).get( 'test' ) ).toBe( 'old' );
+
+			// Verify it has the old version
+			const stateMap = result!.getMap( CRDT_STATE_MAP_KEY );
+			expect( stateMap.get( CRDT_STATE_VERSION_KEY ) ).toBe( 0 );
+
+			// Clean up
+			result!.destroy();
+		} );
+
+		it( 'returns document even when persisted version is higher than local', () => {
+			// Create a doc with higher version
+			const doc = createYjsDoc();
+			doc.transact( () => {
+				const stateMap = doc.getMap( CRDT_STATE_MAP_KEY );
+				stateMap.set( CRDT_STATE_VERSION_KEY, CRDT_DOC_VERSION + 1 );
+				doc.getMap( 'data' ).set( 'test', 'future' );
+			} );
+
+			const serialized = serializeCrdtDoc( doc );
+			const record = {
+				id: 1,
+				meta: {
+					[ WORDPRESS_META_KEY_FOR_CRDT_DOC_PERSISTENCE ]: serialized,
+				},
+			};
+
+			const result = getPersistedCrdtDoc( record );
+
+			// Should return the document (version checking is done by caller)
+			expect( result ).not.toBeNull();
+			expect( result!.getMap( 'data' ).get( 'test' ) ).toBe( 'future' );
+
+			// Verify it has the higher version
+			const stateMap = result!.getMap( CRDT_STATE_MAP_KEY );
+			expect( stateMap.get( CRDT_STATE_VERSION_KEY ) ).toBe(
+				CRDT_DOC_VERSION + 1
+			);
+
+			// Clean up
+			result!.destroy();
 		} );
 	} );
 } );
