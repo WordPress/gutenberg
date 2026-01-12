@@ -654,7 +654,9 @@ class WP_Navigation_Block_Renderer {
 			'wp-block-navigation__responsive-container',
 			$is_hidden_by_default ? 'hidden-by-default' : '',
 			$has_custom_overlay ? 'disable-default-overlay' : '',
-			implode( ' ', $colors['overlay_css_classes'] ),
+			// Don't apply overlay color classes if using a custom overlay template part.
+			// The custom overlay is responsible for its own styling.
+			$has_custom_overlay ? '' : implode( ' ', $colors['overlay_css_classes'] ),
 		);
 		$open_button_classes          = array(
 			'wp-block-navigation__responsive-container-open',
@@ -705,7 +707,9 @@ class WP_Navigation_Block_Renderer {
 			';
 		}
 
-		$overlay_inline_styles = esc_attr( safecss_filter_attr( $colors['overlay_inline_styles'] ) );
+		// Don't apply overlay inline styles if using a custom overlay template part.
+		// The custom overlay is responsible for its own styling.
+		$overlay_inline_styles = $has_custom_overlay ? '' : esc_attr( safecss_filter_attr( $colors['overlay_inline_styles'] ) );
 
 		if ( $has_custom_overlay ) {
 			$custom_overlay_markup = sprintf(
