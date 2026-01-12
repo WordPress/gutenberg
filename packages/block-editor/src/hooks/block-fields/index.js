@@ -109,6 +109,12 @@ function BlockFields( {
 				type: fieldDef.type, // Use the field's type; DataForm will use built-in or custom Edit
 			};
 
+			// If the field defines a `mapping`, then custom `getValue` and `setValue`
+			// implementations are provided.
+			// These functions map from the inconsistent attribute keys found on blocks
+			// to consistent keys that the field can use internally (and back again).
+			// When `mapping` isn't provided, we can use the field API's default
+			// implementation of these functions.
 			if ( fieldDef.mapping ) {
 				field.getValue = ( { item } ) => {
 					// Extract mapped properties from the block attributes
