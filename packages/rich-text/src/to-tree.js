@@ -135,7 +135,6 @@ export function toTree( {
 	onStartIndex,
 	onEndIndex,
 	isEditableTree,
-	isSelected,
 } ) {
 	const { formats, replacements, text, start, end } = value;
 	const formatsLength = formats.length + 1;
@@ -150,13 +149,9 @@ export function toTree( {
 
 	for ( let i = 0; i < formatsLength; i++ ) {
 		const character = text.charAt( i );
-		// Pad empty fields when NOT selected (for multi-block selection to work).
-		// When selected, keep truly empty so iOS Safari auto-capitalize works.
-		// Also pad after line breaks so they're visible.
-		const shouldPadEmptyField =
-			isEditableTree && ! isSelected && ! lastCharacter;
-		const shouldPadLineBreak = isEditableTree && lastCharacter === '\n';
-		const shouldInsertPadding = shouldPadEmptyField || shouldPadLineBreak;
+		// Pad the line if the previous character is a line break, otherwise
+		// the line break won't be visible.
+		const shouldInsertPadding = isEditableTree && lastCharacter === '\n';
 
 		const characterFormats = formats[ i ];
 		let pointer = getLastChild( tree );
