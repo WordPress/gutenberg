@@ -1514,6 +1514,49 @@ test.describe( 'Navigation block', () => {
 			await expect( linkButton ).toContainText( 'Published' );
 		} );
 
+		test( 'marks taxonomy link as invalid when term is missing', async ( {
+			editor,
+			admin,
+			navigation,
+			requestUtils,
+		} ) => {
+			await test.step( 'Setup - Create navigation with missing taxonomy term', async () => {
+				await admin.createNewPost();
+
+				const nonExistentTermId = 99999;
+				const menu = await requestUtils.createNavigationMenu( {
+					title: 'Test Menu with Missing Term',
+					content: `<!-- wp:navigation-link {"label":"Unavailable Category","type":"category","id":${ nonExistentTermId },"kind":"taxonomy","metadata":{"bindings":{"url":{"source":"core/term-data","args":{"field":"link"}}}}} /-->`,
+				} );
+
+				await editor.insertBlock( {
+					name: 'core/navigation',
+					attributes: {
+						ref: menu.id,
+					},
+				} );
+			} );
+
+			await test.step( 'Verify Nav Link shows "Invalid" suffix for taxonomy term', async () => {
+				const navBlock = navigation.getNavBlock();
+				await editor.selectBlocks( navBlock );
+
+				const navLinkBlock = navBlock
+					.getByRole( 'document', {
+						name: 'Block: Category Link',
+					} )
+					.first();
+
+				await editor.selectBlocks( navLinkBlock );
+
+				const placeholderText = navLinkBlock.locator(
+					'.wp-block-navigation-link__placeholder-text'
+				);
+				await expect( placeholderText ).toBeVisible();
+				await expect( placeholderText ).toContainText( '(Invalid)' );
+			} );
+		} );
+
 		test( 'handles unavailable entity binding', async ( {
 			editor,
 			page,

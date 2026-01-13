@@ -104,12 +104,13 @@ const useIsDraggingWithin = ( elementRef ) => {
 const useIsInvalidLink = ( kind, type, id, enabled ) => {
 	const isPostType =
 		kind === 'post-type' || type === 'post' || type === 'page';
+	const isTaxonomy = kind === 'taxonomy';
 	const hasId = Number.isInteger( id );
 	const blockEditingMode = useBlockEditingMode();
 
 	const { postStatus, isDeleted } = useSelect(
 		( select ) => {
-			if ( ! isPostType ) {
+			if ( ! isPostType && ! isTaxonomy ) {
 				return { postStatus: null, isDeleted: false };
 			}
 
@@ -122,9 +123,10 @@ const useIsInvalidLink = ( kind, type, id, enabled ) => {
 
 			const { getEntityRecord, hasFinishedResolution } =
 				select( coreStore );
-			const entityRecord = getEntityRecord( 'postType', type, id );
+			const entityKind = isTaxonomy ? 'taxonomy' : 'postType';
+			const entityRecord = getEntityRecord( entityKind, type, id );
 			const hasResolved = hasFinishedResolution( 'getEntityRecord', [
-				'postType',
+				entityKind,
 				type,
 				id,
 			] );
@@ -133,26 +135,27 @@ const useIsInvalidLink = ( kind, type, id, enabled ) => {
 			const deleted = hasResolved && entityRecord === undefined;
 
 			return {
-				postStatus: entityRecord?.status,
+				postStatus: isPostType ? entityRecord?.status : null,
 				isDeleted: deleted,
 			};
 		},
-		[ isPostType, blockEditingMode, enabled, type, id ]
+		[ isPostType, isTaxonomy, blockEditingMode, enabled, type, id ]
 	);
 
 	// Check Navigation Link validity if:
-	// 1. Link is 'post-type'.
+	// 1. Link is 'post-type' or 'taxonomy'.
 	// 2. It has an id.
 	// 3. It's neither null, nor undefined, as valid items might be either of those while loading.
 	// If those conditions are met, check if
-	// 1. The post status is trash (trashed).
+	// 1. For post types, the post status is trash (trashed).
 	// 2. The entity doesn't exist (deleted).
 	// If either of those is true, invalidate.
 	const isInvalid =
-		isPostType &&
-		hasId &&
-		( isDeleted || ( postStatus && 'trash' === postStatus ) );
-	const isDraft = 'draft' === postStatus;
+		( isPostType &&
+			hasId &&
+			( isDeleted || ( postStatus && 'trash' === postStatus ) ) ) ||
+		( isTaxonomy && hasId && isDeleted );
+	const isDraft = isPostType && 'draft' === postStatus;
 
 	return [ isInvalid, isDraft ];
 };
