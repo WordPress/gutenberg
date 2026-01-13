@@ -309,3 +309,24 @@
 .dataviews-view-table col[class^="dataviews-view-table__col-"]:not(.dataviews-view-table__col-first-data):not(.dataviews-view-table__col-expand) {
 	width: 1%;
 }
+
+/* Loading overlay on existing rows */
+.dataviews-view-table.has-overlay {
+	tbody {
+		pointer-events: none;
+		position: relative;
+	}
+
+	tbody td {
+		position: relative;
+
+		&::after {
+			content: "";
+			position: absolute;
+			inset: 0;
+			z-index: 1;
+			backdrop-filter: blur(2px);
+			pointer-events: none;
+		}
+	}
+}

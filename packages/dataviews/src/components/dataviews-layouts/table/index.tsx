@@ -293,7 +293,6 @@ function ViewTable< Item >( {
 	const headerMenuToFocusRef = useRef< HTMLButtonElement >( undefined );
 	const [ nextHeaderMenuToFocus, setNextHeaderMenuToFocus ] =
 		useState< HTMLButtonElement >();
-	const hasBulkActions = useSomeItemHasAPossibleBulkAction( actions, data );
 	const [ contextMenuAnchor, setContextMenuAnchor ] = useState< {
 		getBoundingClientRect: () => DOMRect;
 	} | null >( null );
@@ -311,6 +310,24 @@ function ViewTable< Item >( {
 		scrollContainerRef: containerRef,
 		enabled: !! actions?.length,
 	} );
+
+	// Preserve previous loaded data to show them blurred and
+	// avoid flickering.
+	const previousDataRef = useRef< Item[] >( data );
+	useEffect( () => {
+		if ( ! isLoading ) {
+			previousDataRef.current = data;
+		}
+	}, [ data, isLoading ] );
+	const displayData =
+		isLoading && previousDataRef.current?.length
+			? previousDataRef.current
+			: data;
+
+	const hasBulkActions = useSomeItemHasAPossibleBulkAction(
+		actions,
+		displayData
+	);
 
 	if ( nextHeaderMenuToFocus ) {
 		// If we need to force focus, we short-circuit rendering here
@@ -351,7 +368,7 @@ function ViewTable< Item >( {
 		} );
 	};
 
-	const hasData = !! data?.length;
+	const hasData = !! displayData?.length;
 
 	const titleField = fields.find( ( field ) => field.id === view.titleField );
 	const mediaField = fields.find( ( field ) => field.id === view.mediaField );
@@ -362,7 +379,9 @@ function ViewTable< Item >( {
 	const groupField = view.groupBy?.field
 		? fields.find( ( f ) => f.id === view.groupBy?.field )
 		: null;
-	const dataByGroup = groupField ? getDataByGroup( data, groupField ) : null;
+	const dataByGroup = groupField
+		? getDataByGroup( displayData, groupField )
+		: null;
 	const { showTitle = true, showMedia = true, showDescription = true } = view;
 	const hasPrimaryColumn =
 		( titleField && showTitle ) ||
@@ -383,6 +402,9 @@ function ViewTable< Item >( {
 	const isInfiniteScroll = view.infiniteScrollEnabled && ! dataByGroup;
 	const isRtl = isRTL();
 
+	// If new data are loading but previous loaded data were empty,
+	// keep showing just the spinner.
+	const showOverlay = ! isInfiniteScroll && isLoading && hasData;
 	return (
 		<>
 			<table
@@ -393,10 +415,13 @@ function ViewTable< Item >( {
 							view.layout.density
 						),
 					'has-bulk-actions': hasBulkActions,
+					'has-overlay': showOverlay,
 				} ) }
 				aria-busy={ isLoading }
 				aria-describedby={ tableNoticeId }
 				role={ isInfiniteScroll ? 'feed' : undefined }
+				// @ts-ignore Reason: inert is a recent HTML attribute
+				inert={ showOverlay ? 'true' : undefined }
 			>
 				<colgroup>
 					{ hasBulkActions && (
@@ -599,7 +624,7 @@ function ViewTable< Item >( {
 				) : (
 					<tbody>
 						{ hasData &&
-							data.map( ( item, index ) => (
+							displayData.map( ( item, index ) => (
 								<TableRow
 									key={ getItemId( item ) }
 									item={ item }
@@ -649,7 +674,7 @@ function ViewTable< Item >( {
 					) : (
 						empty
 					) ) }
-				{ hasData && isLoading && (
+				{ isInfiniteScroll && hasData && isLoading && (
 					<p className="dataviews-loading-more">
 						<Spinner />
 					</p>
