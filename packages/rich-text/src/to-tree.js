@@ -324,13 +324,23 @@ export function toTree( {
 			append( getParent( pointer ), ZWNBSP );
 		}
 
-		// Insert a <br> for completely empty fields so browsers can place
-		// the caret and extend selection into them.
+		// Insert a <br> for empty fields so browsers can place the caret and
+		// extend selection into them, it can't be empty. We also can't use
+		// ZWNBSP or other characters because it causes iOS auto-capitalize
+		// issues.
 		if ( isEditableTree && text.length === 0 ) {
 			// We CANNOT use CSS to add a placeholder with pseudo elements on
-			// the main block wrappers because that could clash with theme CSS
-			// using ::before of ::after to style the elements (e.g. heading
-			// styling)
+			// the main block wrappers because:
+			// - that could clash with theme CSS using ::before or ::after to
+			//   style the elements (e.g. heading styling)
+			// - a <br> element is present and needed to allow multi-selection
+			//   into empty fields.
+			//
+			// Note that also shouldn't relatively position the rich text
+			// container because again that could clash with theme CSS. Instead,
+			// we relatively position the span and absolutely position the
+			// pseudo content. `display:contents` is used to make sure it
+			// doesn't affect the placeholder width.
 			if ( placeholder ) {
 				append( getParent( pointer ), {
 					type: 'span',
