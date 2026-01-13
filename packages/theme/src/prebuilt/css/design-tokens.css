@@ -45,7 +45,7 @@
 	--wpds-color-bg-surface-error: #f6e6e3; /* Background color for surfaces with error tone and normal emphasis. */
 	--wpds-color-bg-surface-error-weak: #fff6f4; /* Background color for surfaces with error tone and weak emphasis. */
 	--wpds-color-bg-surface-info: #deebfa; /* Background color for surfaces with info tone and normal emphasis. */
-	--wpds-color-bg-surface-info-weak: #f3f9ff; /* Background color for surfaces with info tone and weak emphasis. */
+	--wpds-color-bg-surface-info-weak: #f2f9ff; /* Background color for surfaces with info tone and weak emphasis. */
 	--wpds-color-bg-surface-neutral: #f8f8f8; /* Background color for surfaces with normal emphasis. */
 	--wpds-color-bg-surface-neutral-strong: #ffffff; /* Background color for surfaces with strong emphasis. */
 	--wpds-color-bg-surface-neutral-weak: #f0f0f0; /* Background color for surfaces with weak emphasis. */

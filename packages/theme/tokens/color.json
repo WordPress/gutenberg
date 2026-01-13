@@ -183,15 +183,15 @@
 				"surface2": {
 					"$value": {
 						"colorSpace": "srgb",
-						"components": [ 0.953, 0.976, 1 ],
-						"hex": "#f3f9ff"
+						"components": [ 0.949, 0.976, 1 ],
+						"hex": "#f2f9ff"
 					}
 				},
 				"surface6": {
 					"$value": {
 						"colorSpace": "srgb",
-						"components": [ 0.737, 0.835, 0.945 ],
-						"hex": "#bcd5f1"
+						"components": [ 0.737, 0.835, 0.949 ],
+						"hex": "#bcd5f2"
 					}
 				},
 				"surface5": {

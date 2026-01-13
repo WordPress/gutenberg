@@ -254,7 +254,6 @@ function Navigation( {
 
 	// These props are used by the navigation editor to override specific
 	// navigation block settings.
-	hasSubmenuIndicatorSetting = true,
 	customPlaceholder: CustomPlaceholder = null,
 	__unstableLayoutClassNames: layoutClassNames,
 } ) {
@@ -655,7 +654,7 @@ function Navigation( {
 	const stylingInspectorControls = (
 		<>
 			<InspectorControls>
-				{ hasSubmenuIndicatorSetting && (
+				{ ( ! isOverlayExperimentEnabled || hasSubmenus ) && (
 					<ToolsPanel
 						label={ __( 'Display' ) }
 						resetAll={ () => {

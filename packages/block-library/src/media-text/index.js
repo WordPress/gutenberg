@@ -62,7 +62,7 @@ if ( window.__experimentalContentOnlyInspectorFields ) {
 			type: 'media',
 			mapping: {
 				id: 'mediaId',
-				type: 'mediaType',
+				mediaType: 'mediaType',
 				url: 'mediaUrl',
 				link: 'mediaLink',
 			},
@@ -83,7 +83,7 @@ if ( window.__experimentalContentOnlyInspectorFields ) {
 		},
 	];
 	settings[ formKey ] = {
-		fields: [ 'media' ],
+		fields: [ 'media', 'link' ],
 	};
 }
 

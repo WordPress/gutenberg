@@ -21,7 +21,7 @@ import { ThemeProvider } from '../theme-provider';
 import '../prebuilt/css/design-tokens.css';
 
 const meta: Meta< typeof ThemeProvider > = {
-	title: 'Design System/Theme Provider',
+	title: 'Design System/Theme/Theme Provider',
 	component: ThemeProvider,
 	args: {
 		isRoot: true,
@@ -132,7 +132,7 @@ const DSTokensList = () => {
 
 	return (
 		<div style={ { color: 'var( --wpds-color-fg-content-neutral )' } }>
-			<h1>DS Color tokens</h1>
+			<h1>Design System Color tokens</h1>
 			<h2>Semantic tokens (can be consumed directly)</h2>
 			<ColorTokenTable tokens={ props.semanticProps } />
 			<h2>Legacy tokens (should not be consumed directly)</h2>

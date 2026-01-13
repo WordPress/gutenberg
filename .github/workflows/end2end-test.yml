@@ -42,7 +42,7 @@ jobs:
               uses: ./.github/setup-node
 
             - name: Npm build
-              run: npm run build
+              run: npm run build -- --fast
 
             - name: Install Playwright dependencies
               run: |
@@ -133,7 +133,7 @@ jobs:
               uses: ./.github/setup-node
 
             - name: Npm build
-              run: npm run build
+              run: npm run build -- --fast
 
             - name: Report flaky tests
               uses: ./packages/report-flaky-tests

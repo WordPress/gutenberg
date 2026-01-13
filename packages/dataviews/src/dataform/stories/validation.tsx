@@ -86,7 +86,7 @@ const ValidationComponent = ( {
 	custom: 'sync' | 'async' | 'none';
 	pattern: boolean;
 	minMax: boolean;
-	layout: 'regular' | 'panel' | 'card';
+	layout: 'regular' | 'panel' | 'card' | 'details';
 } ) => {
 	type ValidatedItem = {
 		text: string;
@@ -904,6 +904,13 @@ const ValidationComponent = ( {
 		if ( layout === 'panel' ) {
 			return {
 				layout: { type: 'panel' as const },
+				fields: groupedFields,
+			};
+		}
+
+		if ( layout === 'details' ) {
+			return {
+				layout: { type: 'details' as const },
 				fields: groupedFields,
 			};
 		}

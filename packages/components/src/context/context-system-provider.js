@@ -2,7 +2,7 @@
  * External dependencies
  */
 import deepmerge from 'deepmerge';
-import fastDeepEqual from 'fast-deep-equal/es6';
+import fastDeepEqual from 'fast-deep-equal/es6/index.js';
 import { isPlainObject } from 'is-plain-object';
 
 /**
