@@ -6,8 +6,8 @@ import {
 	Card,
 	CardBody,
 	CardHeader as OriginalCardHeader,
-	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
+import { Badge } from '@wordpress/ui';
 import {
 	useCallback,
 	useContext,
@@ -21,7 +21,6 @@ import { sprintf, _n } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { unlock } from '../../../lock-unlock';
 import { getFormFieldLayout } from '..';
 import DataFormContext from '../../dataform-context';
 import type {
@@ -35,8 +34,6 @@ import type {
 import { DataFormLayout } from '../data-form-layout';
 import { DEFAULT_LAYOUT } from '../normalize-form';
 import { getSummaryFields } from '../get-summary-fields';
-
-const { Badge } = unlock( componentsPrivateApis );
 
 function countInvalidFields( validity: FieldValidity | undefined ): number {
 	if ( ! validity ) {
@@ -274,7 +271,7 @@ export default function FormCardField< Item >( {
 							{ field.label }
 						</span>
 						{ showValidationBadge && (
-							<Badge intent="error">
+							<Badge intent="high">
 								{ sprintf(
 									/* translators: %s: Number of fields that need attention */
 									_n(
@@ -356,7 +353,7 @@ export default function FormCardField< Item >( {
 						{ fieldDefinition.label }
 					</span>
 					{ showValidationBadge && (
-						<Badge intent="error">
+						<Badge intent="high">
 							{ sprintf(
 								/* translators: %s: Number of fields that need attention */
 								_n(
