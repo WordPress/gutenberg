@@ -39,6 +39,7 @@ import {
 	useEntityBinding,
 	useIsInvalidLink,
 	InvalidDraftDisplay,
+	useEnableLinkStatusValidation,
 } from '../navigation-link/shared';
 import {
 	getColors,
@@ -167,7 +168,6 @@ export default function NavigationSubmenuEdit( {
 		hasChildren,
 		selectedBlockHasChildren,
 		onlyDescendantIsEmptyLink,
-		validateLinkStatus,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -196,16 +196,6 @@ export default function NavigationSubmenuEdit( {
 					! singleBlock?.attributes?.label;
 			}
 
-			const rootNavigationId = getBlockParentsByBlockName(
-				clientId,
-				'core/navigation'
-			)[ 0 ];
-
-			// Enable when the root Navigation block is selected or any of its inner blocks.
-			const enableLinkStatusValidation =
-				selectedBlockId === rootNavigationId ||
-				hasSelectedInnerBlock( rootNavigationId, true );
-
 			return {
 				parentCount: getBlockParentsByBlockName(
 					clientId,
@@ -222,11 +212,12 @@ export default function NavigationSubmenuEdit( {
 				hasChildren: !! getBlockCount( clientId ),
 				selectedBlockHasChildren: !! selectedBlockChildren?.length,
 				onlyDescendantIsEmptyLink: _onlyDescendantIsEmptyLink,
-				validateLinkStatus: enableLinkStatusValidation,
 			};
 		},
 		[ clientId ]
 	);
+
+	const validateLinkStatus = useEnableLinkStatusValidation( clientId );
 
 	const prevHasChildren = usePrevious( hasChildren );
 

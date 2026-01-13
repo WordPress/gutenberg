@@ -41,6 +41,7 @@ import {
 	useHandleLinkChange,
 	useIsInvalidLink,
 	InvalidDraftDisplay,
+	useEnableLinkStatusValidation,
 } from './shared';
 
 const DEFAULT_BLOCK = { name: 'core/navigation-link' };
@@ -167,7 +168,6 @@ export default function NavigationLinkEdit( {
 		isTopLevelLink,
 		isParentOfSelectedBlock,
 		hasChildren,
-		validateLinkStatus,
 		parentBlockClientId,
 		isSubmenu,
 	} = useSelect(
@@ -178,12 +178,10 @@ export default function NavigationLinkEdit( {
 				getBlockRootClientId,
 				hasSelectedInnerBlock,
 				getBlockParentsByBlockName,
-				getSelectedBlockClientId,
 			} = select( blockEditorStore );
 			const rootClientId = getBlockRootClientId( clientId );
 			const parentBlockName = getBlockName( rootClientId );
 			const isTopLevel = parentBlockName === 'core/navigation';
-			const selectedBlockClientId = getSelectedBlockClientId();
 			const rootNavigationClientId = isTopLevel
 				? rootClientId
 				: getBlockParentsByBlockName(
@@ -197,11 +195,6 @@ export default function NavigationLinkEdit( {
 					? rootClientId
 					: rootNavigationClientId;
 
-			// Enable when the root Navigation block is selected or any of its inner blocks.
-			const enableLinkStatusValidation =
-				selectedBlockClientId === rootNavigationClientId ||
-				hasSelectedInnerBlock( rootNavigationClientId, true );
-
 			return {
 				isAtMaxNesting:
 					getBlockParentsByBlockName( clientId, NESTING_BLOCK_NAMES )
@@ -212,13 +205,14 @@ export default function NavigationLinkEdit( {
 					true
 				),
 				hasChildren: !! getBlockCount( clientId ),
-				validateLinkStatus: enableLinkStatusValidation,
 				parentBlockClientId: parentBlockId,
 				isSubmenu: parentBlockName === 'core/navigation-submenu',
 			};
 		},
 		[ clientId, maxNestingLevel ]
 	);
+
+	const validateLinkStatus = useEnableLinkStatusValidation( clientId );
 	const { getBlocks } = useSelect( blockEditorStore );
 
 	// URL binding logic
