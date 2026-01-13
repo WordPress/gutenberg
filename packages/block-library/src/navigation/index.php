@@ -600,6 +600,34 @@ class WP_Navigation_Block_Renderer {
 	}
 
 	/**
+	 * Get responsive container classes for the navigation block.
+	 *
+	 * @since 7.0.0
+	 *
+	 * @param bool  $is_hidden_by_default Whether the responsive menu is hidden by default.
+	 * @param bool  $has_custom_overlay Whether a custom overlay is used.
+	 * @param array $colors The colors array.
+	 */
+	private static function get_responsive_container_classes( $is_hidden_by_default, $has_custom_overlay, $colors ) {
+		$responsive_container_classes = array('wp-block-navigation__responsive-container');
+
+		if ( $is_hidden_by_default ) {
+			$responsive_container_classes[] = 'hidden-by-default';
+		}
+
+		if ( $has_custom_overlay ) {
+			// Only add the disable-default-overlay class if experiment is enabled AND overlay blocks actually rendered.
+			$responsive_container_classes[] = 'disable-default-overlay';
+		} else {
+			// Don't apply overlay color classes if using a custom overlay template part.
+			// The custom overlay is responsible for its own styling.
+			$responsive_container_classes[] = implode( ' ', $colors['overlay_css_classes'] );
+		}
+
+		return $responsive_container_classes;
+	}
+
+	/**
 	 * Get the responsive container markup
 	 *
 	 * @since 6.5.0
@@ -649,15 +677,8 @@ class WP_Navigation_Block_Renderer {
 			$has_custom_overlay = ! empty( $overlay_blocks_html );
 		}
 
-		// Only add the disable-default-overlay class if experiment is enabled AND overlay blocks actually rendered.
-		$responsive_container_classes = array(
-			'wp-block-navigation__responsive-container',
-			$is_hidden_by_default ? 'hidden-by-default' : '',
-			$has_custom_overlay ? 'disable-default-overlay' : '',
-			// Don't apply overlay color classes if using a custom overlay template part.
-			// The custom overlay is responsible for its own styling.
-			$has_custom_overlay ? '' : implode( ' ', $colors['overlay_css_classes'] ),
-		);
+		$responsive_container_classes = get_responsive_container_classes( $is_hidden_by_default, $has_custom_overlay, $colors );
+
 		$open_button_classes          = array(
 			'wp-block-navigation__responsive-container-open',
 			$is_hidden_by_default ? 'always-shown' : '',
