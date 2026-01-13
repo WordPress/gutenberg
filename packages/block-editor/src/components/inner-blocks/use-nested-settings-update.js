@@ -44,6 +44,7 @@ function useShallowMemo( value ) {
  * @param {string}               parentLock
  * @param {string[]}             allowedBlocks              An array of block names which are permitted
  *                                                          in inner blocks.
+ * @param {boolean}              inheritAllowedBlocks       Whether to inherit the allowed blocks from the parent.
  * @param {string[]}             prioritizedInserterBlocks  Block names and/or block variations to be prioritized in the inserter, in the format {blockName}/{variationName}.
  * @param {?WPDirectInsertBlock} defaultBlock               The default block to insert: [ blockName, { blockAttributes } ].
  * @param {?boolean}             directInsert               If a default block should be inserted directly by the appender.
@@ -65,6 +66,7 @@ export default function useNestedSettingsUpdate(
 	clientId,
 	parentLock,
 	allowedBlocks,
+	inheritAllowedBlocks,
 	prioritizedInserterBlocks,
 	defaultBlock,
 	directInsert,
@@ -98,6 +100,7 @@ export default function useNestedSettingsUpdate(
 	useLayoutEffect( () => {
 		const newSettings = {
 			allowedBlocks: _allowedBlocks,
+			inheritAllowedBlocks,
 			prioritizedInserterBlocks: _prioritizedInserterBlocks,
 			templateLock: _templateLock,
 		};
@@ -175,6 +178,7 @@ export default function useNestedSettingsUpdate(
 	}, [
 		clientId,
 		_allowedBlocks,
+		inheritAllowedBlocks,
 		_prioritizedInserterBlocks,
 		_templateLock,
 		defaultBlock,

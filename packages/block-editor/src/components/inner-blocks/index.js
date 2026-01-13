@@ -56,6 +56,7 @@ function UncontrolledInnerBlocks( props ) {
 	const {
 		clientId,
 		allowedBlocks,
+		inheritAllowedBlocks,
 		prioritizedInserterBlocks,
 		defaultBlock,
 		directInsert,
@@ -81,6 +82,7 @@ function UncontrolledInnerBlocks( props ) {
 		clientId,
 		parentLock,
 		allowedBlocks,
+		inheritAllowedBlocks,
 		prioritizedInserterBlocks,
 		defaultBlock,
 		directInsert,
