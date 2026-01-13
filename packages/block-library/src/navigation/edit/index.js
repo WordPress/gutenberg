@@ -77,6 +77,7 @@ import AccessibleDescription from './accessible-description';
 import AccessibleMenuDescription from './accessible-menu-description';
 import { unlock } from '../../lock-unlock';
 import { useToolsPanelDropdownMenuProps } from '../../utils/hooks';
+import { isWithinNavigationOverlay } from '../../utils/is-within-overlay';
 import { DEFAULT_BLOCK } from '../constants';
 
 /**
@@ -271,6 +272,12 @@ function Navigation( {
 		hasIcon,
 		icon = 'handle',
 	} = attributes;
+
+	// Check if we're inside a navigation overlay template part.
+	const isNavigationOverlay = useSelect(
+		() => isWithinNavigationOverlay(),
+		[]
+	);
 
 	const ref = attributes.ref;
 
@@ -497,6 +504,7 @@ function Navigation( {
 				) ]: !! backgroundColor?.slug,
 				[ `has-text-decoration-${ textDecoration }` ]: textDecoration,
 				'block-editor-block-content-overlay': hasBlockOverlay,
+				'is-within-navigation-overlay': isNavigationOverlay,
 			},
 			layoutClassNames
 		),
