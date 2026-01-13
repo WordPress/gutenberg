@@ -54,13 +54,15 @@ export default function ResponsiveWrapper( {
 		}
 	);
 
-	const styles = ! hasCustomOverlay && {
-		color: ! overlayTextColor?.slug && overlayTextColor?.color,
-		backgroundColor:
-			! overlayBackgroundColor?.slug &&
-			overlayBackgroundColor?.color &&
-			overlayBackgroundColor.color,
-	};
+	const styles = ! hasCustomOverlay
+		? {
+				color: ! overlayTextColor?.slug && overlayTextColor?.color,
+				backgroundColor:
+					! overlayBackgroundColor?.slug &&
+					overlayBackgroundColor?.color &&
+					overlayBackgroundColor.color,
+		  }
+		: {};
 
 	const openButtonClasses = clsx(
 		'wp-block-navigation__responsive-container-open',
