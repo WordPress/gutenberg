@@ -51,6 +51,10 @@ export default function ResponsiveWrapper( {
 				'background-color',
 				overlayBackgroundColor?.slug
 			) ]: !! overlayBackgroundColor?.slug,
+		},
+		{
+			'is-menu-open': isOpen,
+			'hidden-by-default': isHiddenByDefault,
 		}
 	);
 
