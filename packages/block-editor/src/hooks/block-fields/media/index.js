@@ -24,9 +24,9 @@ import { useInspectorPopoverPlacement } from '../use-inspector-popover-placement
 import { getMediaSelectKey } from '../../../store/private-keys';
 import { store as blockEditorStore } from '../../../store';
 
-function MediaThumbnail( { data, field, attachment } ) {
-	const config = field.config || {};
-	const { allowedTypes = [], multiple = false } = config;
+function MediaThumbnail( { data, field, attachment, config } ) {
+	const { fieldDef } = config;
+	const { allowedTypes = [], multiple = false } = fieldDef.args || {};
 
 	if ( multiple ) {
 		return 'todo multiple';
@@ -53,7 +53,7 @@ function MediaThumbnail( { data, field, attachment } ) {
 		const value = field.getValue( { item: data } );
 		const url = value?.url;
 
-		if ( url ) {
+		if ( allowedTypes[ 0 ] === 'image' && url ) {
 			return (
 				<div className="block-editor-content-only-controls__media-thumbnail">
 					<img alt="" width={ 24 } height={ 24 } src={ url } />
@@ -208,6 +208,7 @@ export default function Media( { data, field, onChange, config = {} } ) {
 										attachment={ attachment }
 										field={ field }
 										data={ data }
+										config={ config }
 									/>
 									<span className="block-editor-content-only-controls__media-title">
 										{
