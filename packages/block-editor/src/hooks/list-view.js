@@ -5,13 +5,15 @@ import { __ } from '@wordpress/i18n';
 import { PanelBody } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { store as blocksStore, hasBlockSupport } from '@wordpress/blocks';
+import { useContext } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import InspectorControls from '../components/inspector-controls';
 import { store as blockEditorStore } from '../store';
 import { PrivateListView } from '../components/list-view';
+import { PrivateInspectorControlsFill } from '../components/inspector-controls/fill';
+import { PrivateBlockContext } from '../components/block-list/private-block-context';
 
 export const LIST_VIEW_SUPPORT_KEY = 'listView';
 
@@ -34,6 +36,8 @@ export function hasListViewSupport( nameOrType ) {
  * @return {Element|null} List view inspector controls or null.
  */
 export function ListViewPanel( { clientId, name } ) {
+	const { isSelectionWithinCurrentSection, isSelected } =
+		useContext( PrivateBlockContext );
 	const isEnabled = hasListViewSupport( name );
 	const { hasChildren, blockTitle } = useSelect(
 		( select ) => ( {
@@ -44,12 +48,29 @@ export function ListViewPanel( { clientId, name } ) {
 		[ clientId, name ]
 	);
 
-	if ( ! isEnabled ) {
+	const notSelected = ! isSelected && ! isSelectionWithinCurrentSection;
+
+	if ( notSelected || ! isEnabled ) {
 		return null;
 	}
 
+	if ( isSelectionWithinCurrentSection ) {
+		return (
+			<PrivateInspectorControlsFill group="list" forceDisplayControls>
+				<PanelBody title={ blockTitle }>
+					<PrivateListView
+						rootClientId={ clientId }
+						isExpanded
+						description={ blockTitle }
+						showAppender
+					/>
+				</PanelBody>
+			</PrivateInspectorControlsFill>
+		);
+	}
+
 	return (
-		<InspectorControls group="list">
+		<PrivateInspectorControlsFill group="list">
 			<PanelBody title={ null }>
 				{ ! hasChildren && (
 					<p className="block-editor-block-inspector__no-blocks">
@@ -63,7 +84,7 @@ export function ListViewPanel( { clientId, name } ) {
 					showAppender
 				/>
 			</PanelBody>
-		</InspectorControls>
+		</PrivateInspectorControlsFill>
 	);
 }
 
@@ -74,4 +95,5 @@ export default {
 	edit: ListViewPanel,
 	hasSupport: hasListViewSupport,
 	attributeKeys: [],
+	forceDisplayControls: true,
 };

@@ -534,8 +534,10 @@ export function createBlockEditFilter( features ) {
 						hasSupport,
 						attributeKeys = [],
 						shareWithChildBlocks,
+						forceDisplayControls,
 					} = feature;
 					const shouldDisplayControls =
+						forceDisplayControls ||
 						context[ mayDisplayControlsKey ] ||
 						( context[ mayDisplayParentControlsKey ] &&
 							shareWithChildBlocks );
