@@ -34,5 +34,10 @@ export default function hiddenCaretRangeFromPoint( doc, x, y, container ) {
 	container.style.zIndex = originalZIndex;
 	container.style.position = originalPosition;
 
+	// Validate range is inside container.
+	if ( range && ! container.contains( range.startContainer ) ) {
+		return null;
+	}
+
 	return range;
 }
