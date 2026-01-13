@@ -130,6 +130,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		restBlockPatternCategories,
 		sectionRootClientId,
 		deviceType,
+		imageSizes,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -150,6 +151,9 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 			} )
 				? getEntityRecord( 'root', 'site' )
 				: undefined;
+
+			// Fetch image sizes from REST API index for client-side media processing.
+			const baseData = getEntityRecord( 'root', '__unstableBase' );
 
 			function getSectionRootBlock() {
 				if ( renderingMode === 'template-locked' ) {
@@ -196,6 +200,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 				restBlockPatternCategories: getBlockPatternCategories(),
 				sectionRootClientId: getSectionRootBlock(),
 				deviceType: getDeviceType(),
+				imageSizes: baseData?.image_sizes,
 			};
 		},
 		[ postType, postId, isLargeViewport, renderingMode ]
@@ -338,6 +343,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 				: undefined,
 			mediaUpload: hasUploadPermissions ? mediaUpload : undefined,
 			mediaSideload: hasUploadPermissions ? mediaSideload : undefined,
+			imageSizes: hasUploadPermissions ? imageSizes : undefined,
 			__experimentalBlockPatterns: blockPatterns,
 			[ selectBlockPatternsKey ]: ( select ) => {
 				const { hasFinishedResolution, getBlockPatternsForPostType } =
@@ -421,6 +427,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		editMediaEntity,
 		wrappedOnNavigateToEntityRecord,
 		deviceType,
+		imageSizes,
 	] );
 }
 
