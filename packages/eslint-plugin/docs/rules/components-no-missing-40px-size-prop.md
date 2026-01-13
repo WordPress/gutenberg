@@ -1,4 +1,4 @@
-# Disallow missing \_\_next40pxDefaultSize prop (no-missing-40px-size-prop)
+# Disallow missing \_\_next40pxDefaultSize prop (components-no-missing-40px-size-prop)
 
 Enforces that specific components from `@wordpress/components` include the `__next40pxDefaultSize` prop to opt-in to the new 40px default size.
 
@@ -72,7 +72,7 @@ When set to `true`, the rule also checks components imported from relative paths
 
 ```json
 {
-	"@wordpress/no-missing-40px-size-prop": [
+	"@wordpress/components-no-missing-40px-size-prop": [
 		"error",
 		{ "checkLocalImports": true }
 	]

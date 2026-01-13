@@ -6,7 +6,7 @@ import { RuleTester } from 'eslint';
 /**
  * Internal dependencies
  */
-import rule from '../no-missing-40px-size-prop';
+import rule from '../components-no-missing-40px-size-prop';
 
 const ruleTester = new RuleTester( {
 	parserOptions: {
@@ -18,7 +18,7 @@ const ruleTester = new RuleTester( {
 	},
 } );
 
-ruleTester.run( 'no-missing-40px-size-prop', rule, {
+ruleTester.run( 'components-no-missing-40px-size-prop', rule, {
 	valid: [
 		// Component with __next40pxDefaultSize (boolean attribute)
 		{
@@ -296,7 +296,7 @@ ruleTester.run( 'no-missing-40px-size-prop', rule, {
 } );
 
 // Additional tests for checkLocalImports option
-ruleTester.run( 'no-missing-40px-size-prop (checkLocalImports)', rule, {
+ruleTester.run( 'components-no-missing-40px-size-prop (checkLocalImports)', rule, {
 	valid: [
 		// Relative import with correct props
 		{

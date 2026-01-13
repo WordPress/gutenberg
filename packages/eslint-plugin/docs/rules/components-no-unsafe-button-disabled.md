@@ -1,4 +1,4 @@
-# Disallow using disabled on Button without accessibleWhenDisabled (no-unsafe-button-disabled)
+# Disallow using disabled on Button without accessibleWhenDisabled (components-no-unsafe-button-disabled)
 
 Disabling a `Button` component without maintaining focusability can cause accessibility issues by hiding its presence from screen reader users, or preventing focus from returning to a trigger element.
 
@@ -34,7 +34,7 @@ When set to `true`, the rule also checks `Button` components imported from relat
 
 ```json
 {
-	"@wordpress/no-unsafe-button-disabled": [
+	"@wordpress/components-no-unsafe-button-disabled": [
 		"error",
 		{ "checkLocalImports": true }
 	]

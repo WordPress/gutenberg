@@ -6,7 +6,7 @@ import { RuleTester } from 'eslint';
 /**
  * Internal dependencies
  */
-import rule from '../no-unsafe-button-disabled';
+import rule from '../components-no-unsafe-button-disabled';
 
 const ruleTester = new RuleTester( {
 	parserOptions: {
@@ -18,7 +18,7 @@ const ruleTester = new RuleTester( {
 	},
 } );
 
-ruleTester.run( 'no-unsafe-button-disabled', rule, {
+ruleTester.run( 'components-no-unsafe-button-disabled', rule, {
 	valid: [
 		// Button with both disabled and accessibleWhenDisabled
 		{
@@ -166,7 +166,7 @@ ruleTester.run( 'no-unsafe-button-disabled', rule, {
 } );
 
 // Additional tests for checkLocalImports option
-ruleTester.run( 'no-unsafe-button-disabled (checkLocalImports)', rule, {
+ruleTester.run( 'components-no-unsafe-button-disabled (checkLocalImports)', rule, {
 	valid: [
 		// Relative import with correct props
 		{
