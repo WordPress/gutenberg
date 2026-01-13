@@ -81,6 +81,7 @@ export interface SyncManager {
 		objectType: ObjectType,
 		objectId: ObjectID
 	) => Record< string, string >;
+	isSyncEnabled: () => boolean;
 	load: (
 		syncConfig: SyncConfig,
 		objectType: ObjectType,
