@@ -14,7 +14,7 @@
  * @param WP_Block $block      The parsed block.
  * @return bool True if the item should render, false otherwise.
  */
-function block_core_navigation_item_should_render( $attributes, $block ) {
+function block_core_shared_navigation_item_should_render( $attributes, $block ) {
 	$navigation_link_has_id = isset( $attributes['id'] ) && is_numeric( $attributes['id'] );
 	$is_post_type           = isset( $attributes['kind'] ) && 'post-type' === $attributes['kind'];
 	$is_post_type           = $is_post_type || isset( $attributes['type'] ) && ( 'post' === $attributes['type'] || 'page' === $attributes['type'] );
