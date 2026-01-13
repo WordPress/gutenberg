@@ -8,7 +8,8 @@
       "Bash(python3:*)",
       "Bash(node -e:*)",
       "Bash(npx yaml-lint:*)",
-      "Bash(npx:*)"
+      "Bash(npx:*)",
+      "Bash(chmod:*)"
     ]
   }
 }

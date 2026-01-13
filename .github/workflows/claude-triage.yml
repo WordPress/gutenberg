@@ -32,6 +32,9 @@ jobs:
             - name: Install Playwright browsers
               run: npx playwright install --with-deps firefox
 
+            - name: Install WordPress Playground CLI
+              run: npm install -g @wp-playground/cli
+
             - name: Create MCP config for CI
               run: |
                   cat > /tmp/mcp-config.json << 'EOF'
@@ -56,4 +59,4 @@ jobs:
                   prompt: "/triage ${{ github.event.issue.number }}"
                   claude_args: |
                       --mcp-config /tmp/mcp-config.json
-                      --allowedTools "mcp__playwright,mcp__context7"
+                      --allowedTools "Bash,Read,Write,Edit,Glob,Grep,mcp__playwright,mcp__context7"
