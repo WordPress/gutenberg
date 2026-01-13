@@ -3,7 +3,6 @@
  */
 const { BundleAnalyzerPlugin } = require( 'webpack-bundle-analyzer' );
 const CopyWebpackPlugin = require( 'copy-webpack-plugin' );
-const { WebWorkerPlugin } = require( '@shopify/web-worker/webpack' );
 const webpack = require( 'webpack' );
 const browserslist = require( 'browserslist' );
 const MiniCSSExtractPlugin = require( 'mini-css-extract-plugin' );
@@ -108,9 +107,6 @@ const baseConfig = {
 		filename: '[name].js',
 		chunkFilename: '[name].js?ver=[chunkhash]',
 		path: resolve( process.cwd(), 'build' ),
-		// Use 'self' as globalObject for Web Worker compatibility.
-		// 'self' works in both browser windows and web workers.
-		globalObject: 'self',
 		// Clean output directory before emit, except when modules flag is enabled
 		// to prevent the 2 compilations from cleaning each other's output
 		...( ! hasExperimentalModulesFlag && {
@@ -324,9 +320,6 @@ const scriptConfig = {
 			'globalThis.SCRIPT_DEBUG': JSON.stringify( ! isProduction ),
 			SCRIPT_DEBUG: JSON.stringify( ! isProduction ),
 		} ),
-
-		// WebWorkerPlugin enables @shopify/web-worker for blob-based worker loading.
-		new WebWorkerPlugin(),
 
 		new PhpFilePathsPlugin( {
 			context: getProjectSourcePath(),
