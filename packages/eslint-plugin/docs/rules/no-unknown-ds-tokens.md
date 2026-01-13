@@ -2,7 +2,7 @@
 
 When using Design System tokens (CSS custom properties beginning with `--wpds-`), only valid public tokens should be used. Using non-existent tokens will result in broken styles since the CSS variable won't resolve to any value.
 
-This rule lints JSX inline styles. For CSS files, use the corresponding Stylelint rule from the `@wordpress/theme` package.
+This rule lints JSX inline styles. For CSS files, use the [corresponding Stylelint rule](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-theme/#stylelint-plugins) from the `@wordpress/theme` package.
 
 ## Rule details
 
