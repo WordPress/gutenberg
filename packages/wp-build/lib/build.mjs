@@ -1373,12 +1373,6 @@ async function buildRoute( routeName ) {
 	// Ensure output directory exists
 	await mkdir( outputDir, { recursive: true } );
 
-	// Copy package.json
-	await copyFile(
-		path.join( routeDir, 'package.json' ),
-		path.join( outputDir, 'package.json' )
-	);
-
 	const files = getRouteFiles( routeDir );
 
 	// Build route.js if it exists
