@@ -23,6 +23,11 @@ export default function AuthorView( {
 	const author = item?._embedded?.author?.[ 0 ];
 	const text = author?.name;
 	const imageUrl = author?.avatar_urls?.[ 48 ];
+
+	/*
+	 * Use three states to avoid fade-in animation for cached images:
+	 * 'instant' = image already cached, 'loading' = waiting, 'loaded' = just finished.
+	 */
 	const [ loadingState, setLoadingState ] = useState<
 		'instant' | 'loading' | 'loaded'
 	>( 'loading' );
