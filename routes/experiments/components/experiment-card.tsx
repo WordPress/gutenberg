@@ -11,7 +11,6 @@ import {
 	Card,
 	CardHeader,
 	CardBody,
-	CardFooter,
 	ToggleControl,
 	Spinner,
 	ExternalLink,
@@ -154,6 +153,14 @@ export default function ExperimentCard( {
 			<CardBody className="experiment-card__body">
 				<Text className="experiment-card__description">
 					{ description }
+					{ learnMore && (
+						<>
+							{ ' ' }
+							<ExternalLink href={ learnMore }>
+								{ __( 'Learn more' ) }
+							</ExternalLink>
+						</>
+					) }
 				</Text>
 				{ warning && (
 					<div className="experiment-card__warning">
@@ -161,13 +168,6 @@ export default function ExperimentCard( {
 					</div>
 				) }
 			</CardBody>
-			{ learnMore && (
-				<CardFooter className="experiment-card__footer">
-					<ExternalLink href={ learnMore }>
-						{ __( 'Learn more' ) }
-					</ExternalLink>
-				</CardFooter>
-			) }
 		</Card>
 	);
 }

@@ -260,23 +260,6 @@
 		}
 	}
 
-	// Use component class for specificity
-	&.components-card &__footer,
-	&__footer.components-card__footer {
-		padding: 12px 16px;
-		border-top: $border-width solid $gray-100;
-		background: $gray-100;
-
-		a {
-			font-size: 13px;
-			font-weight: 500;
-			transition: opacity 0.2s ease;
-
-			&:hover {
-				opacity: 0.8;
-			}
-		}
-	}
 }
 
 // Responsive adjustments
@@ -310,11 +293,6 @@
 		&.components-card .experiment-card__body,
 		.experiment-card__body.components-card__body {
 			padding: 12px;
-		}
-
-		&.components-card .experiment-card__footer,
-		.experiment-card__footer.components-card__footer {
-			padding: 10px 12px;
 		}
 	}
 }
