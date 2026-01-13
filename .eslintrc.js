@@ -258,47 +258,9 @@ module.exports = {
 				'**/*.@(native|ios|android).js',
 			],
 			rules: {
-				'no-restricted-syntax': [
-					'error',
-					...restrictedSyntax,
-					// Temporary rules until we're ready to officially default to the new size.
-					...[
-						'BorderBoxControl',
-						'BorderControl',
-						'BoxControl',
-						'Button',
-						'ComboboxControl',
-						'CustomSelectControl',
-
-						'FontAppearanceControl',
-						'FontFamilyControl',
-						'FontSizePicker',
-						'FormTokenField',
-						'InputControl',
-						'LetterSpacingControl',
-						'LineHeightControl',
-						'NumberControl',
-						'RangeControl',
-						'SelectControl',
-						'TextControl',
-						'ToggleGroupControl',
-						'UnitControl',
-					].map( ( componentName ) => ( {
-						// Falsy `__next40pxDefaultSize` without a non-default `size` prop.
-						selector: `JSXOpeningElement[name.name="${ componentName }"]:not(:has(JSXAttribute[name.name="__next40pxDefaultSize"][value.expression.value!=false])):not(:has(JSXAttribute[name.name="size"][value.value!="default"]))`,
-						message:
-							componentName +
-							' should have the `__next40pxDefaultSize` prop when using the default size.',
-					} ) ),
-					{
-						// Falsy `__next40pxDefaultSize` without a `render` prop.
-						selector:
-							'JSXOpeningElement[name.name="FormFileUpload"]:not(:has(JSXAttribute[name.name="__next40pxDefaultSize"][value.expression.value!=false])):not(:has(JSXAttribute[name.name="render"]))',
-						message:
-							'FormFileUpload should have the `__next40pxDefaultSize` prop to opt-in to the new default size.',
-					},
-				],
+				'no-restricted-syntax': [ 'error', ...restrictedSyntax ],
 				'@wordpress/no-unsafe-button-disabled': 'error',
+				'@wordpress/no-missing-40px-size-prop': 'error',
 
 			},
 		},
@@ -456,6 +418,12 @@ module.exports = {
 			excludedFiles: [ 'packages/components/src/**/@(test|stories)/**' ],
 			plugins: [ 'ssr-friendly' ],
 			extends: [ 'plugin:ssr-friendly/recommended' ],
+			rules: {
+				'@wordpress/no-missing-40px-size-prop': [
+					'error',
+					{ checkLocalImports: true },
+				],
+			},
 		},
 		{
 			files: [ 'packages/components/src/**', 'packages/ui/src/**' ],
