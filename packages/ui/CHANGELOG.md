@@ -13,4 +13,4 @@
 -   Add `Field` primitives ([#74190](https://github.com/WordPress/gutenberg/pull/74190)).
 -   Add `Fieldset` primitives ([#74296](https://github.com/WordPress/gutenberg/pull/74296)).
 -   Add `Icon` component ([#74311](https://github.com/WordPress/gutenberg/pull/74311)).
--   Add `Button` component ([#74415](https://github.com/WordPress/gutenberg/pull/74415), [#74416](https://github.com/WordPress/gutenberg/pull/74416) ).
+-   Add `Button` component ([#74415](https://github.com/WordPress/gutenberg/pull/74415), [#74416](https://github.com/WordPress/gutenberg/pull/74416), [#74470](https://github.com/WordPress/gutenberg/pull/74470)).
