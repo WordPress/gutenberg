@@ -73,8 +73,10 @@ function block_core_navigation_submenu_render_submenu_icon() {
  */
 function render_block_core_navigation_submenu( $attributes, $content, $block ) {
 	// Check if this navigation item should render based on post status.
-	if ( ! gutenberg_block_core_navigation_item_should_render( $attributes, $block ) ) {
-		return '';
+	if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
+		if ( ! gutenberg_block_core_navigation_item_should_render( $attributes, $block ) ) {
+			return '';
+		}
 	}
 
 	// Don't render the block's subtree if it has no label.
