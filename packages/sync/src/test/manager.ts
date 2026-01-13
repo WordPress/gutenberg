@@ -127,7 +127,7 @@ describe( 'SyncManager', () => {
 
 			await manager.load(
 				mockSyncConfig,
-				'post',
+				'postType/post',
 				'123',
 				mockRecord,
 				mockHandlers
@@ -135,7 +135,7 @@ describe( 'SyncManager', () => {
 
 			expect( mockProviderCreator ).toHaveBeenCalledTimes( 1 );
 			expect( mockProviderCreator ).toHaveBeenCalledWith(
-				'post',
+				'postType/post',
 				'123',
 				expect.any( Y.Doc ),
 				expect.any( Awareness )
