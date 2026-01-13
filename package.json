@@ -132,7 +132,8 @@
 		"wait-on": "8.0.1"
 	},
 	"overrides": {
-		"jsdom": "26.1.0"
+		"jsdom": "26.1.0",
+		"@testing-library/user-event": "14.4.3"
 	},
 	"scripts": {
 		"build": "node ./bin/build.mjs",
