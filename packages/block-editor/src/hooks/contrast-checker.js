@@ -80,18 +80,15 @@ function reducer( prevColors, newColors ) {
 	return hasChanged ? newColors : prevColors;
 }
 
-export default function BlockColorContrastChecker( { clientId } ) {
+export default function BlockColorContrastChecker( { clientId, name } ) {
 	const blockEl = useBlockElement( clientId );
 	const [ colors, setColors ] = useReducer( reducer, {} );
-	const blockName = blockEl?.getAttribute( 'data-type' );
 
 	const blockType = useSelect(
 		( select ) => {
-			return blockName
-				? select( blocksStore ).getBlockType( blockName )
-				: undefined;
+			return name ? select( blocksStore ).getBlockType( name ) : undefined;
 		},
-		[ blockName ]
+		[ name ]
 	);
 
 	// There are so many things that can change the color of a block
