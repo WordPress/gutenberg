@@ -7,7 +7,7 @@
 
 		display: flex;
 		height: 40px;
-		background-color: var(--wpds-color-bg-interactive-neutral);
+		background-color: var(--wpds-color-bg-interactive-neutral-weak);
 		border-width: var(--wpds-border-width-surface-xs);
 		border-style: solid;
 		border-color: var(--wpds-color-stroke-interactive-neutral);
@@ -34,7 +34,7 @@
 		}
 
 		&.is-disabled {
-			background-color: var(--wpds-color-bg-interactive-neutral-disabled);
+			background-color: var(--wpds-color-bg-interactive-neutral-weak-disabled);
 			border-color: var(--wpds-color-stroke-interactive-neutral-disabled);
 			color: var(--wpds-color-fg-interactive-neutral-disabled);
 
