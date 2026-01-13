@@ -14,6 +14,7 @@ import { useDispatch, useSelect } from '@wordpress/data';
  * Internal dependencies
  */
 import { store as noticesStore } from '../../store';
+import './style.scss';
 
 type InlineNoticesProps = {
 	children?: ReactNode;
@@ -40,7 +41,6 @@ export default function InlineNotices( {
 	return (
 		<>
 			<NoticeList
-				// @ts-expect-error - NoticeList is not typed properly.
 				notices={ nonDismissibleNotices }
 				className={ clsx(
 					'components-notices__pinned',
@@ -48,7 +48,6 @@ export default function InlineNotices( {
 				) }
 			/>
 			<NoticeList
-				// @ts-expect-error - NoticeList is not typed properly.
 				notices={ dismissibleNotices }
 				className={ clsx(
 					'components-notices__dismissible',
