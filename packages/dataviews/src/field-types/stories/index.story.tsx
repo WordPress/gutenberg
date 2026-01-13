@@ -661,7 +661,6 @@ const FieldTypeStory = ( {
 									resolve( {
 										elements: finalElements,
 										paginationInfo: {
-											totalItems: filteredElements.length,
 											totalPages:
 												partialResults &&
 												! hasIncludedElements

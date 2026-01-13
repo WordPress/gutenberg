@@ -10,8 +10,14 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import { useInstanceId, useDebouncedInput } from '@wordpress/compose';
-import { __, sprintf, _n } from '@wordpress/i18n';
-import { useState, useMemo } from '@wordpress/element';
+import { __, sprintf } from '@wordpress/i18n';
+import {
+	useState,
+	useMemo,
+	useCallback,
+	useRef,
+	useEffect,
+} from '@wordpress/element';
 import {
 	VisuallyHidden,
 	Icon,
@@ -43,23 +49,6 @@ function NoResultsFound() {
 	return (
 		<div className="dataviews-filters__search-widget-no-elements">
 			{ __( 'No elements found' ) }
-		</div>
-	);
-}
-
-function TotalResultsCount( { count }: { count: number } ) {
-	return (
-		<div
-			className="dataviews-filters__search-widget-results-count"
-			role="status"
-			aria-live="polite"
-			aria-atomic="true"
-		>
-			{ sprintf(
-				/* translators: %d: number of results. */
-				_n( '%d total result', '%d total results', count ),
-				count
-			) }
 		</div>
 	);
 }
@@ -251,9 +240,21 @@ function ComboboxList( { view, filter, onChangeView }: SearchWidgetProps ) {
 	const [ searchValue, setSearchValue, debouncedSearchValue ] =
 		useDebouncedInput( '' );
 
+	// Pagination state for infinite scroll.
+	const [ page, setPage ] = useState( 1 );
+	const [ accumulatedElements, setAccumulatedElements ] = useState<
+		Option[]
+	>( [] );
+	const [ isLoadingMore, setIsLoadingMore ] = useState( false );
+	const observerRef = useRef< IntersectionObserver | null >( null );
+	const loadMoreTriggerRef = useRef< HTMLDivElement | null >( null );
+
 	const query = useMemo(
-		() => ( { search: normalizeSearchInput( debouncedSearchValue ) } ),
-		[ debouncedSearchValue ]
+		() => ( {
+			search: normalizeSearchInput( debouncedSearchValue ),
+			page,
+		} ),
+		[ debouncedSearchValue, page ]
 	);
 	const { elements, isLoading, paginationInfo } = useElements( {
 		elements: filter.elements,
@@ -265,18 +266,87 @@ function ComboboxList( { view, filter, onChangeView }: SearchWidgetProps ) {
 	);
 	const currentValue = getCurrentValue( filter, currentFilter );
 
+	// Reset page when search changes.
+	const prevSearchRef = useRef( debouncedSearchValue );
+	useEffect( () => {
+		if ( prevSearchRef.current !== debouncedSearchValue ) {
+			setPage( 1 );
+			setAccumulatedElements( [] );
+			prevSearchRef.current = debouncedSearchValue;
+		}
+	}, [ debouncedSearchValue ] );
+
+	// Accumulate elements when new data arrives.
+	useEffect( () => {
+		if ( ! filter.getElements ) {
+			setAccumulatedElements( elements );
+			return;
+		}
+		if ( isLoading ) {
+			return;
+		}
+
+		if ( page === 1 ) {
+			setAccumulatedElements( elements );
+		} else {
+			setAccumulatedElements( ( prev ) => {
+				const existingValues = new Set(
+					prev.map( ( el ) => el.value )
+				);
+				const newElements = elements.filter(
+					( el ) => ! existingValues.has( el.value )
+				);
+				return [ ...prev, ...newElements ];
+			} );
+		}
+		setIsLoadingMore( false );
+	}, [ elements, page, isLoading, filter.getElements ] );
+
+	const hasMore = paginationInfo.totalPages > page;
+
+	const loadMore = useCallback( () => {
+		if ( ! hasMore || isLoading || isLoadingMore ) {
+			return;
+		}
+		setIsLoadingMore( true );
+		setPage( ( p ) => p + 1 );
+	}, [ hasMore, isLoading, isLoadingMore ] );
+
+	// Setup IntersectionObserver for infinite scroll.
+	useEffect( () => {
+		if ( ! filter.getElements || ! hasMore ) {
+			observerRef.current?.disconnect();
+			return;
+		}
+
+		observerRef.current = new IntersectionObserver( ( entries ) => {
+			if ( entries[ 0 ].isIntersecting ) {
+				loadMore();
+			}
+		} );
+
+		if ( loadMoreTriggerRef.current ) {
+			observerRef.current.observe( loadMoreTriggerRef.current );
+		}
+
+		return () => observerRef.current?.disconnect();
+	}, [ filter.getElements, hasMore, loadMore ] );
+
+	// Use accumulated elements when using getElements, otherwise use elements directly.
+	const displayElements = filter.getElements ? accumulatedElements : elements;
+
 	// Filter matches based on search. If `getElements` exists,
 	// elements are already filtered.
 	const matches = useMemo( () => {
 		const normalizedSearchTerm =
 			normalizeSearchInput( debouncedSearchValue );
 		if ( ! normalizedSearchTerm || filter.getElements ) {
-			return elements;
+			return displayElements;
 		}
-		return elements.filter( ( item ) =>
+		return displayElements.filter( ( item ) =>
 			normalizeSearchInput( item.label ).includes( normalizedSearchTerm )
 		);
-	}, [ elements, filter.getElements, debouncedSearchValue ] );
+	}, [ displayElements, filter.getElements, debouncedSearchValue ] );
 	return (
 		<Ariakit.ComboboxProvider
 			selectedValue={ currentValue }
@@ -383,8 +453,17 @@ function ComboboxList( { view, filter, onChangeView }: SearchWidgetProps ) {
 							</Ariakit.ComboboxItem>
 						);
 					} ) }
-				{ ! isLoading && !! paginationInfo.totalItems && (
-					<TotalResultsCount count={ paginationInfo.totalItems } />
+				{ filter.getElements && hasMore && (
+					<div
+						ref={ loadMoreTriggerRef }
+						className="dataviews-filters__search-widget-load-more-trigger"
+						aria-hidden="true"
+					/>
+				) }
+				{ isLoadingMore && (
+					<div className="dataviews-filters__search-widget-is-loading-more">
+						<Spinner />
+					</div>
 				) }
 			</Ariakit.ComboboxList>
 		</Ariakit.ComboboxProvider>

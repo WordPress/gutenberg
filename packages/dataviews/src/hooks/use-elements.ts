@@ -29,7 +29,6 @@ export default function useElements( {
 	const [ isLoading, setIsLoading ] = useState( false );
 	const [ paginationInfo, setPaginationInfo ] =
 		useState< GetElementsPaginationInfo >( {
-			totalItems: 0,
 			totalPages: 1,
 		} );
 
@@ -43,7 +42,6 @@ export default function useElements( {
 		if ( ! getElements ) {
 			setRecords( currentElements );
 			setPaginationInfo( {
-				totalItems: currentElements.length,
 				totalPages: 1,
 			} );
 			return;
@@ -61,9 +59,6 @@ export default function useElements( {
 							: EMPTY_ARRAY;
 					setRecords( fetchedElements );
 					setPaginationInfo( {
-						totalItems:
-							result.paginationInfo?.totalItems ??
-							fetchedElements.length,
 						totalPages: result.paginationInfo?.totalPages ?? 1,
 					} );
 				}
@@ -72,7 +67,6 @@ export default function useElements( {
 				if ( ! cancelled ) {
 					setRecords( currentElements );
 					setPaginationInfo( {
-						totalItems: currentElements.length,
 						totalPages: 1,
 					} );
 				}

@@ -20,13 +20,13 @@ export type GetElementsQuery = {
 	search?: string;
 	include?: ( string | number )[];
 	perPage?: number;
+	page?: number;
 };
 
 /**
  * Pagination information returned by getElements.
  */
 export type GetElementsPaginationInfo = {
-	totalItems: number;
 	totalPages: number;
 };
 
