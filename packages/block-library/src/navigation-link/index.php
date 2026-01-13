@@ -5,6 +5,13 @@
  * @package WordPress
  */
 
+// Path differs between source and build: './shared/helpers.php' in source, './navigation-link/shared/helpers.php' in build.
+if ( file_exists( __DIR__ . '/shared/helpers.php' ) ) {
+	require_once __DIR__ . '/shared/helpers.php';
+} else {
+	require_once __DIR__ . '/navigation-link/shared/helpers.php';
+}
+
 /**
  * Build an array with CSS classes and inline styles defining the colors
  * which will be applied to the navigation markup in the front-end.
@@ -170,31 +177,9 @@ function block_core_navigation_link_maybe_urldecode( $url ) {
  * @return string Returns the post content with the legacy widget added.
  */
 function render_block_core_navigation_link( $attributes, $content, $block ) {
-	$navigation_link_has_id = isset( $attributes['id'] ) && is_numeric( $attributes['id'] );
-	$is_post_type           = isset( $attributes['kind'] ) && 'post-type' === $attributes['kind'];
-	$is_post_type           = $is_post_type || isset( $attributes['type'] ) && ( 'post' === $attributes['type'] || 'page' === $attributes['type'] );
-
-	// Don't render the block's subtree if it is a draft or if the ID does not exist.
-	if ( $is_post_type && $navigation_link_has_id ) {
-		$post = get_post( $attributes['id'] );
-		/**
-		 * Filter allowed post_status for navigation link block to render.
-		 *
-		 * @since 6.8.0
-		 *
-		 * @param array $post_status
-		 * @param array $attributes
-		 * @param WP_Block $block
-		 */
-		$allowed_post_status = (array) apply_filters(
-			'render_block_core_navigation_link_allowed_post_status',
-			array( 'publish' ),
-			$attributes,
-			$block
-		);
-		if ( ! $post || ! in_array( $post->post_status, $allowed_post_status, true ) ) {
-			return '';
-		}
+	// Check if this navigation item should render based on post status.
+	if ( ! gutenberg_block_core_navigation_item_should_render( $attributes, $block ) ) {
+		return '';
 	}
 
 	// Don't render the block's subtree if it has no label.

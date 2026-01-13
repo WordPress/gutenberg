@@ -5,6 +5,13 @@
  * @package WordPress
  */
 
+// Path differs between source and build: '../navigation-link/shared/helpers.php' in source, './navigation-link/shared/helpers.php' in build.
+if ( file_exists( __DIR__ . '/../navigation-link/shared/helpers.php' ) ) {
+	require_once __DIR__ . '/../navigation-link/shared/helpers.php';
+} else {
+	require_once __DIR__ . '/navigation-link/shared/helpers.php';
+}
+
 /**
  * Build an array with CSS classes and inline styles defining the font sizes
  * which will be applied to the navigation markup in the front-end.
@@ -65,17 +72,9 @@ function block_core_navigation_submenu_render_submenu_icon() {
  * @return string Returns the post content with the legacy widget added.
  */
 function render_block_core_navigation_submenu( $attributes, $content, $block ) {
-	$navigation_link_has_id = isset( $attributes['id'] ) && is_numeric( $attributes['id'] );
-	$is_post_type           = isset( $attributes['kind'] ) && 'post-type' === $attributes['kind'];
-	$is_post_type           = $is_post_type || isset( $attributes['type'] ) && ( 'post' === $attributes['type'] || 'page' === $attributes['type'] );
-
-	// Don't render the block's subtree if the post doesn't exist or is not published.
-	if ( $is_post_type && $navigation_link_has_id ) {
-		$post_status = get_post_status( $attributes['id'] );
-		// If post doesn't exist (deleted) or is not published, don't render.
-		if ( ! $post_status || 'publish' !== $post_status ) {
-			return '';
-		}
+	// Check if this navigation item should render based on post status.
+	if ( ! gutenberg_block_core_navigation_item_should_render( $attributes, $block ) ) {
+		return '';
 	}
 
 	// Don't render the block's subtree if it has no label.
