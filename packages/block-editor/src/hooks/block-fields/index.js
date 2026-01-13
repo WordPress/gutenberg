@@ -1,13 +1,15 @@
 /**
  * WordPress dependencies
  */
-import { addFilter } from '@wordpress/hooks';
-import { privateApis as blocksPrivateApis } from '@wordpress/blocks';
+import {
+	privateApis as blocksPrivateApis,
+	getBlockType,
+} from '@wordpress/blocks';
 import {
 	__experimentalHStack as HStack,
 	__experimentalTruncate as Truncate,
 } from '@wordpress/components';
-import { createHigherOrderComponent } from '@wordpress/compose';
+import { useSelect } from '@wordpress/data';
 import { DataForm } from '@wordpress/dataviews';
 import { useContext, useState, useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
@@ -15,6 +17,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
+import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import BlockIcon from '../../components/block-icon';
 import useBlockDisplayTitle from '../../components/block-title/use-block-display-title';
@@ -49,7 +52,6 @@ function createConfiguredControl( ControlComponent, config = {} ) {
  * @param {Object}   props
  * @param {string}   props.clientId      The clientId of the block.
  * @param {Object}   props.blockType     The blockType definition.
- * @param {Object}   props.attributes    The block's attribute values.
  * @param {Function} props.setAttributes Action to set the block's attributes.
  * @param {boolean}  props.isCollapsed   Whether the DataForm is rendered as 'collapsed' with only the first field
  *                                       displayed by default. When collapsed a dropdown is displayed to allow
@@ -59,7 +61,6 @@ function createConfiguredControl( ControlComponent, config = {} ) {
 function BlockFields( {
 	clientId,
 	blockType,
-	attributes,
 	setAttributes,
 	isCollapsed = false,
 } ) {
@@ -70,6 +71,11 @@ function BlockFields( {
 	const blockInformation = useBlockDisplayInformation( clientId );
 
 	const blockTypeFields = blockType?.[ fieldsKey ];
+
+	const attributes = useSelect(
+		( select ) => select( blockEditorStore ).getBlockAttributes( clientId ),
+		[ clientId ]
+	);
 
 	const computedForm = useMemo( () => {
 		if ( ! isCollapsed ) {
@@ -187,53 +193,34 @@ function BlockFields( {
 	);
 }
 
-const withBlockFields = createHigherOrderComponent(
-	( BlockEdit ) => ( props ) => {
-		const {
-			blockType,
-			isSelectionWithinCurrentSection,
-			isSectionBlock,
-			blockEditingMode,
-			isSelected,
-		} = useContext( PrivateBlockContext );
+function hasBlockFieldsSupport( blockName ) {
+	return !! (
+		window?.__experimentalContentOnlyInspectorFields &&
+		getBlockType( blockName )?.[ fieldsKey ]
+	);
+}
 
-		const shouldShowBlockFields =
-			window?.__experimentalContentOnlyInspectorFields;
-		const blockTypeFields = blockType?.[ fieldsKey ];
+export function BlockFieldsPanel( props ) {
+	const { blockType, isSelectionWithinCurrentSection } =
+		useContext( PrivateBlockContext );
 
-		if ( ! shouldShowBlockFields || ! blockTypeFields?.length ) {
-			return <BlockEdit key="edit" { ...props } />;
-		}
+	return (
+		<InspectorControls group="content">
+			<BlockFields
+				{ ...props }
+				blockType={ blockType }
+				isCollapsed={ isSelectionWithinCurrentSection }
+			/>
+		</InspectorControls>
+	);
+}
 
-		return (
-			<>
-				<BlockEdit key="edit" { ...props } />
-				{
-					// Display the controls of all inner blocks for section/pattern editing.
-					isSelectionWithinCurrentSection &&
-						( isSectionBlock ||
-							blockEditingMode === 'contentOnly' ) && (
-							<InspectorControls group="content">
-								<BlockFields
-									{ ...props }
-									blockType={ blockType }
-									isCollapsed
-								/>
-							</InspectorControls>
-						)
-				}
-				{ ! isSelectionWithinCurrentSection && isSelected && (
-					<InspectorControls group="content">
-						<BlockFields { ...props } blockType={ blockType } />
-					</InspectorControls>
-				) }
-			</>
-		);
-	}
-);
-
-addFilter(
-	'editor.BlockEdit',
-	'core/content-only-controls/block-fields',
-	withBlockFields
-);
+/**
+ * Export block support definition.
+ */
+export default {
+	edit: BlockFieldsPanel,
+	hasSupport: hasBlockFieldsSupport,
+	attributeKeys: [],
+	supportsPatternEditing: true,
+};
