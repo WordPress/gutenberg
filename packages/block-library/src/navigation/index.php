@@ -607,6 +607,7 @@ class WP_Navigation_Block_Renderer {
 	 * @param bool  $is_hidden_by_default Whether the responsive menu is hidden by default.
 	 * @param bool  $has_custom_overlay Whether a custom overlay is used.
 	 * @param array $colors The colors array.
+	 * @return array Returns the responsive container classes.
 	 */
 	private static function get_responsive_container_classes( $is_hidden_by_default, $has_custom_overlay, $colors ) {
 		$responsive_container_classes = array('wp-block-navigation__responsive-container');
@@ -625,6 +626,19 @@ class WP_Navigation_Block_Renderer {
 		}
 
 		return $responsive_container_classes;
+	}
+
+	/**
+	 * Get overlay inline styles for the navigation block.
+	 *
+	 * @since 7.0.0
+	 *
+	 * @param array $colors The colors array.
+	 * @return string Returns the overlay inline styles.
+	 */
+	private static function get_overlay_inline_styles( $has_custom_overlay, $colors ) {
+		$overlay_inline_styles = $has_custom_overlay ? '' : esc_attr( safecss_filter_attr( $colors['overlay_inline_styles'] ) );
+		return ( ! empty( $overlay_inline_styles ) ) ? "style=\"$overlay_inline_styles\"" : '';
 	}
 
 	/**
@@ -677,7 +691,7 @@ class WP_Navigation_Block_Renderer {
 			$has_custom_overlay = ! empty( $overlay_blocks_html );
 		}
 
-		$responsive_container_classes = get_responsive_container_classes( $is_hidden_by_default, $has_custom_overlay, $colors );
+		$responsive_container_classes = static::get_responsive_container_classes( $is_hidden_by_default, $has_custom_overlay, $colors );
 
 		$open_button_classes          = array(
 			'wp-block-navigation__responsive-container-open',
@@ -730,7 +744,7 @@ class WP_Navigation_Block_Renderer {
 
 		// Don't apply overlay inline styles if using a custom overlay template part.
 		// The custom overlay is responsible for its own styling.
-		$overlay_inline_styles = $has_custom_overlay ? '' : esc_attr( safecss_filter_attr( $colors['overlay_inline_styles'] ) );
+		$overlay_inline_styles = static::get_overlay_inline_styles( $has_custom_overlay, $colors );
 
 		if ( $has_custom_overlay ) {
 			$custom_overlay_markup = sprintf(
@@ -769,7 +783,7 @@ class WP_Navigation_Block_Renderer {
 			$toggle_aria_label_close,
 			esc_attr( trim( implode( ' ', $responsive_container_classes ) ) ),
 			esc_attr( trim( implode( ' ', $open_button_classes ) ) ),
-			( ! empty( $overlay_inline_styles ) ) ? "style=\"$overlay_inline_styles\"" : '',
+			$overlay_inline_styles,
 			$toggle_button_content,
 			$toggle_close_button_content,
 			$open_button_directives,
