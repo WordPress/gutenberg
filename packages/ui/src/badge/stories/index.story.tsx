@@ -5,7 +5,6 @@ import { Badge } from '../index';
 const meta: Meta< typeof Badge > = {
 	title: 'Design System/Components/Badge',
 	component: Badge,
-	tags: [ 'status-experimental' ],
 };
 export default meta;
 
