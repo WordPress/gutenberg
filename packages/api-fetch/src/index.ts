@@ -157,7 +157,7 @@ interface apiFetch {
  * @param options The options for the fetch.
  * @return A promise representing the request processed via the registered middlewares.
  */
-const apiFetch: apiFetch = ( options ) => {
+export const apiFetch: apiFetch = ( options ) => {
 	// creates a nested function chain that calls all middlewares and finally the `fetchHandler`,
 	// converting `middlewares = [ m1, m2, m3 ]` into:
 	// ```
