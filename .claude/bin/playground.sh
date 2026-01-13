@@ -13,7 +13,7 @@ set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
-TRIAGE_DIR="$PROJECT_DIR/.claude/.triage"
+TRIAGE_DIR="/tmp/triage"
 PID_FILE="$TRIAGE_DIR/playground.pid"
 LOG_FILE="$TRIAGE_DIR/playground.log"
 URL_FILE="$TRIAGE_DIR/playground.url"
@@ -36,7 +36,7 @@ parse_args() {
     done
 }
 
-# Ensure .triage directory exists
+# Ensure /tmp/triage directory exists
 ensure_triage_dir() {
     mkdir -p "$TRIAGE_DIR"
 }

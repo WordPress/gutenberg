@@ -23,8 +23,8 @@ User: "Re-run reproduction for 73872 to verify the bug"
 ## Input
 
 **Required files:**
-- `.triage/<issue>/<issue>.parsed.json` - Parsed reproduction data (for steps)
-- `.triage/<issue>/<issue>.blueprint.json` - Playground blueprint
+- `/tmp/triage/<issue>/<issue>.parsed.json` - Parsed reproduction data (for steps)
+- `/tmp/triage/<issue>/<issue>.blueprint.json` - Playground blueprint
 
 **Required services:**
 - Playwright MCP server connected
@@ -36,9 +36,9 @@ User: "Re-run reproduction for 73872 to verify the bug"
 
 ## Output
 
-Writes to `.triage/<issue>/<issue>.findings.json`
+Writes to `/tmp/triage/<issue>/<issue>.findings.json`
 
-Screenshots saved to `.triage/<issue>/screenshots/`
+Screenshots saved to `/tmp/triage/<issue>/screenshots/`
 
 **Findings include:**
 - Reproduction result (reproduced/not_reproduced/inconclusive)
@@ -57,13 +57,13 @@ Screenshots saved to `.triage/<issue>/screenshots/`
 Create screenshots directory:
 
 ```bash
-mkdir -p .triage/<issue>/screenshots
+mkdir -p /tmp/triage/<issue>/screenshots
 ```
 
 Start Playground with the blueprint:
 
 ```bash
-.claude/bin/playground.sh start --blueprint=.triage/<issue>/<issue>.blueprint.json
+.claude/bin/playground.sh start --blueprint=/tmp/triage/<issue>/<issue>.blueprint.json
 ```
 
 Get Playground URL from running instance and initialize Playwright browser.
@@ -83,7 +83,7 @@ For each step in `reproduction.steps`, translate natural language into Playwrigh
 1. Use `mcp_playwright_browser_snapshot` to understand page structure
 2. Identify target element by role/label
 3. Perform action (navigate, type, click, etc.)
-4. Take screenshot: `.triage/<issue>/screenshots/0X-<description>.png`
+4. Take screenshot: `/tmp/triage/<issue>/screenshots/0X-<description>.png`
 
 ### 3. Collect evidence
 
@@ -128,8 +128,8 @@ Network Issues:
   - <failed requests with status codes>
 
 Screenshots:
-  📸 .triage/<issue>/screenshots/01-initial-page.png
-  📸 .triage/<issue>/screenshots/02-after-action.png
+  📸 /tmp/triage/<issue>/screenshots/01-initial-page.png
+  📸 /tmp/triage/<issue>/screenshots/02-after-action.png
   ...
 
 Observed Behavior:
@@ -223,7 +223,7 @@ Use `mcp_playwright_browser_snapshot` to discover the actual structure.
 ## Screenshot Naming Convention
 
 ```
-.triage/<issue>/screenshots/
+/tmp/triage/<issue>/screenshots/
   01-initial-page.png
   02-navigated-to-styles.png
   03-entered-input.png

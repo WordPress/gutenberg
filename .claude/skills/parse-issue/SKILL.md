@@ -28,7 +28,7 @@ User: "Parse issue 72364 and check if triage is needed"
 
 ## Output
 
-Writes to `.triage/<issue>/<issue>.parsed.json`
+Writes to `/tmp/triage/<issue>/<issue>.parsed.json`
 
 **Output includes:**
 
@@ -186,7 +186,7 @@ If issue needs triage (none of above conditions met):
 
 ### 10. Write parsed data
 
-Write to `.triage/<issue>.parsed.json`:
+Write to `/tmp/triage/<issue>/<issue>.parsed.json`:
 
 ```json
 {
@@ -285,7 +285,7 @@ ACTUAL: <what happens instead>
 AMBIGUITIES:
 - <any unclear steps>
 
-OUTPUT: .triage/<issue>.parsed.json
+OUTPUT: /tmp/triage/<issue>/<issue>.parsed.json
 ```
 
 ---

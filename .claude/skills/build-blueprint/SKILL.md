@@ -23,7 +23,7 @@ User: "Rebuild the blueprint for 73872 with latest parsed data"
 ## Input
 
 **Required files:**
-- `.triage/<issue>/<issue>.parsed.json` - Parsed issue data
+- `/tmp/triage/<issue>/<issue>.parsed.json` - Parsed issue data
 
 **Uses from parsed data:**
 - `environment.wordpress` - Target WordPress version
@@ -37,7 +37,7 @@ User: "Rebuild the blueprint for 73872 with latest parsed data"
 
 ## Output
 
-Writes to `.triage/<issue>/<issue>.blueprint.json`
+Writes to `/tmp/triage/<issue>/<issue>.blueprint.json`
 
 **Blueprint includes:**
 - WordPress version
@@ -52,7 +52,7 @@ Writes to `.triage/<issue>/<issue>.blueprint.json`
 
 ### 1. Load parsed issue data
 
-Read `.triage/<issue>.parsed.json` and extract:
+Read `/tmp/triage/<issue>/<issue>.parsed.json` and extract:
 - `environment.wordpress` - Target WP version
 - `environment.gutenberg` - Target Gutenberg version
 - `environment.theme` - Theme type (block/classic)
@@ -157,11 +157,11 @@ If reproduction requires existing content:
 
 ### 8. Write blueprint and report
 
-1. Write final blueprint to `.triage/<issue>.blueprint.json`
+1. Write final blueprint to `/tmp/triage/<issue>/<issue>.blueprint.json`
 2. Output summary:
 
 ```
-BLUEPRINT GENERATED: .triage/<issue>.blueprint.json
+BLUEPRINT GENERATED: /tmp/triage/<issue>/<issue>.blueprint.json
 
 CUSTOMIZATIONS APPLIED:
 - WordPress version: <version> (reason)
@@ -171,7 +171,7 @@ CUSTOMIZATIONS APPLIED:
 - Additional steps: <list if any>
 
 PLAYGROUND CLI COMMAND:
-.claude/bin/playground.sh start --blueprint=.triage/<issue>/<issue>.blueprint.json
+.claude/bin/playground.sh start --blueprint=/tmp/triage/<issue>/<issue>.blueprint.json
 ```
 
 ---

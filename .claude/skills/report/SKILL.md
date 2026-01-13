@@ -24,14 +24,14 @@ User: "Generate a report for issue 72364 using existing findings"
 This skill can be used standalone or as part of the triage pipeline.
 
 **Required files:**
-- `.triage/<issue>/<issue>.findings.json` - Reproduction results and evidence
+- `/tmp/triage/<issue>/<issue>.findings.json` - Reproduction results and evidence
 
 **Optional files (enhance the report):**
-- `.triage/<issue>/<issue>.parsed.json` - Issue context, labels, environment
-- `.triage/<issue>/screenshots/*.png` - Visual evidence
+- `/tmp/triage/<issue>/<issue>.parsed.json` - Issue context, labels, environment
+- `/tmp/triage/<issue>/screenshots/*.png` - Visual evidence
 
 **File locations:**
-- All triage data is stored in `.triage/<issue>/` directory
+- All triage data is stored in `/tmp/triage/<issue>/` directory
 - Issue number can be extracted from file path or provided as argument
 
 **If files don't exist:**
@@ -51,13 +51,13 @@ Console summary formatted as a GitHub comment (concise, markdown-formatted)
 Read the findings file:
 
 ```bash
-cat .triage/<issue>.findings.json
+cat /tmp/triage/<issue>/<issue>.findings.json
 ```
 
 Optionally read parsed issue for context:
 
 ```bash
-cat .triage/<issue>.parsed.json
+cat /tmp/triage/<issue>/<issue>.parsed.json
 ```
 
 ### 2. Extract key information
@@ -283,7 +283,7 @@ If `limitations` field has content:
 
 Screenshots captured during reproduction:
 
-- `.triage/<issue>/screenshots/<filename>.png`
+- `/tmp/triage/<issue>/screenshots/<filename>.png`
 ```
 
 ### 4. Output to console
