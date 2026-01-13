@@ -1,34 +1,40 @@
 /**
  * WordPress dependencies
  */
+import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
 import {
-	InspectorControls,
-	useBlockProps,
-	RichText,
-} from '@wordpress/block-editor';
-import {
+	Spinner,
+	TextControl,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
-import { Icon, close } from '@wordpress/icons';
+import { __, sprintf } from '@wordpress/i18n';
+import { useServerSideRender } from '@wordpress/server-side-render';
+import { useDisabled } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
+import HtmlRenderer from '../utils/html-renderer';
 
 export default function NavigationOverlayCloseEdit( {
 	attributes,
 	setAttributes,
+	name,
 } ) {
 	const { displayMode, text } = attributes;
-	const showIcon = displayMode === 'icon' || displayMode === 'both';
-	const showText = displayMode === 'text' || displayMode === 'both';
 
+	const { content, status, error } = useServerSideRender( {
+		attributes,
+		block: name,
+	} );
+
+	const disabledRef = useDisabled();
 	const blockProps = useBlockProps( {
+		ref: disabledRef,
 		className: 'wp-block-navigation-overlay-close',
 	} );
 
@@ -39,7 +45,9 @@ export default function NavigationOverlayCloseEdit( {
 			<InspectorControls>
 				<ToolsPanel
 					label={ __( 'Settings' ) }
-					resetAll={ () => setAttributes( { displayMode: 'icon' } ) }
+					resetAll={ () =>
+						setAttributes( { displayMode: 'icon', text: '' } )
+					}
 					dropdownMenuProps={ dropdownMenuProps }
 				>
 					<ToolsPanelItem
@@ -73,29 +81,44 @@ export default function NavigationOverlayCloseEdit( {
 							/>
 						</ToggleGroupControl>
 					</ToolsPanelItem>
+					<ToolsPanelItem
+						label={ __( 'Close Text' ) }
+						isShownByDefault
+						hasValue={ () => text !== '' }
+						onDeselect={ () => setAttributes( { text: '' } ) }
+					>
+						<TextControl
+							__next40pxDefaultSize
+							label={ __( 'Close Text' ) }
+							value={ text }
+							onChange={ ( value ) =>
+								setAttributes( { text: value } )
+							}
+							className="wp-block-navigation-overlay-close__text"
+							placeholder={ __( 'Close' ) }
+						/>
+					</ToolsPanelItem>
 				</ToolsPanel>
 			</InspectorControls>
-			<button
-				{ ...blockProps }
-				type="button"
-				aria-label={ ! showText ? __( 'Close' ) : undefined }
-			>
-				{ showIcon && <Icon icon={ close } /> }
-				{ showText && (
-					<RichText
-						identifier="text"
-						value={ text }
-						onChange={ ( value ) =>
-							setAttributes( { text: value } )
-						}
-						placeholder={ __( 'Close' ) }
-						withoutInteractiveFormatting
-						tagName="span"
-						className="wp-block-navigation-overlay-close__text"
-						allowedFormats={ [ 'core/bold', 'core/italic' ] }
-					/>
-				) }
-			</button>
+			{ status === 'loading' && (
+				<div { ...blockProps }>
+					<Spinner />
+				</div>
+			) }
+			{ status === 'error' && (
+				<div { ...blockProps }>
+					<p>
+						{ sprintf(
+							/* translators: %s: error message returned when rendering the block. */
+							__( 'Error: %s' ),
+							error
+						) }
+					</p>
+				</div>
+			) }
+			{ status === 'success' && (
+				<HtmlRenderer wrapperProps={ blockProps } html={ content } />
+			) }
 		</>
 	);
 }
