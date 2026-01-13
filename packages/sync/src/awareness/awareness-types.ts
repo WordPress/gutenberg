@@ -41,6 +41,8 @@ export class TypedAwareness< State extends BaseState > extends Awareness {
  * This base state represents the presence of the user. We expect it to be
  * extended to include additional state describing the user's current activity.
  * This state must be serializable and compact.
+ *
+ * TODO: Add in the user information.
  */
 export interface BaseState {}
 
@@ -62,5 +64,7 @@ export type EqualityFieldCheck<
 /**
  * The post editor state extends the base state with information used to render
  * presence indicators in the post editor.
+ *
+ * TODO: Add in the presence indicators.
  */
 export interface PostEditorState extends BaseState {}
