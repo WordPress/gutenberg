@@ -22,8 +22,9 @@ type SnackbarNoticesProps = {
 };
 
 export default function SnackbarNotices( { className }: SnackbarNoticesProps ) {
-	const notices = useSelect( ( select ) =>
-		select( noticesStore ).getNotices()
+	const notices = useSelect(
+		( select ) => select( noticesStore ).getNotices(),
+		[]
 	);
 	const { removeNotice } = useDispatch( noticesStore );
 	const snackbarNotices = notices
