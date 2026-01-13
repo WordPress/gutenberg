@@ -19,7 +19,7 @@ import {
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
-import { useContext } from '@wordpress/element';
+import { useContext, useMemo } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
 
 /**
@@ -42,46 +42,64 @@ export default function BlockBindingsAttributeControl( {
 	const isMobile = useViewportMatch( 'medium', '<' );
 
 	const blockContext = useContext( BlockContext );
-	const compatibleFields = useSelect(
+	const selected = useSelect(
 		( select ) => {
 			const {
 				getAllBlockBindingsSources,
 				getBlockBindingsSourceFieldsList,
 				getBlockType,
 			} = unlock( select( blocksStore ) );
-
 			const _attributeType =
 				getBlockType( blockName ).attributes?.[ attribute ]?.type;
-			const attributeType =
-				_attributeType === 'rich-text' ? 'string' : _attributeType;
 
-			const sourceFields = {};
-			Object.entries( getAllBlockBindingsSources() ).forEach(
-				( [ sourceName, source ] ) => {
-					const fieldsList = getBlockBindingsSourceFieldsList(
-						source,
-						blockContext
-					);
-					if ( ! fieldsList?.length ) {
-						return;
-					}
-					const compatibleFieldsList = fieldsList.filter(
-						( field ) => field.type === attributeType
-					);
-					if ( compatibleFieldsList.length ) {
-						sourceFields[ sourceName ] = compatibleFieldsList;
-					}
-				}
-			);
-			return sourceFields;
+			return {
+				attributeType:
+					_attributeType === 'rich-text' ? 'string' : _attributeType,
+				getBlockBindingsSourceFieldsList,
+				registeredSources: getAllBlockBindingsSources(),
+			};
 		},
-		[ attribute, blockName, blockContext ]
+		[ attribute, blockName ]
 	);
 
-	const { canUpdateBlockBindings } = useSelect( ( select ) => ( {
-		canUpdateBlockBindings:
-			select( blockEditorStore ).getSettings().canUpdateBlockBindings,
-	} ) );
+	const {
+		attributeType,
+		getBlockBindingsSourceFieldsList,
+		registeredSources,
+	} = selected;
+	const compatibleFields = useMemo( () => {
+		const sourceFields = {};
+		Object.entries( registeredSources ).forEach(
+			( [ sourceName, source ] ) => {
+				const fieldsList = getBlockBindingsSourceFieldsList(
+					source,
+					blockContext
+				);
+				if ( ! fieldsList?.length ) {
+					return;
+				}
+				const compatibleFieldsList = fieldsList.filter(
+					( field ) => field.type === attributeType
+				);
+				if ( compatibleFieldsList.length ) {
+					sourceFields[ sourceName ] = compatibleFieldsList;
+				}
+			}
+		);
+		return sourceFields;
+	}, [
+		attributeType,
+		blockContext,
+		getBlockBindingsSourceFieldsList,
+		registeredSources,
+	] );
+
+	const { canUpdateBlockBindings } = useSelect( ( select ) => {
+		return {
+			canUpdateBlockBindings:
+				select( blockEditorStore ).getSettings().canUpdateBlockBindings,
+		};
+	}, [] );
 
 	const hasCompatibleFields = Object.keys( compatibleFields ).length > 0;
 
