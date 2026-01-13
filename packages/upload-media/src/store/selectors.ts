@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import type { QueueItem, Settings, State } from './types';
+import type { ImageSizeCrop, QueueItem, Settings, State } from './types';
 
 /**
  * Returns all items currently being uploaded.
@@ -64,4 +64,30 @@ export function isUploadingById( state: State, attachmentId: number ): boolean {
  */
 export function getSettings( state: State ): Settings {
 	return state.settings;
+}
+
+/**
+ * Returns all registered image sizes.
+ *
+ * @param state Upload state.
+ *
+ * @return Image sizes record.
+ */
+export function getImageSizes( state: State ): Record< string, ImageSizeCrop > {
+	return state.settings.imageSizes ?? {};
+}
+
+/**
+ * Returns a specific image size by name.
+ *
+ * @param state Upload state.
+ * @param name  Image size name.
+ *
+ * @return Image size configuration or undefined if not found.
+ */
+export function getImageSize(
+	state: State,
+	name: string
+): ImageSizeCrop | undefined {
+	return state.settings.imageSizes?.[ name ];
 }
