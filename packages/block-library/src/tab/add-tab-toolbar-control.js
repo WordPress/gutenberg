@@ -61,22 +61,8 @@ export default function AddTabToolbarControl( { tabsClientId } ) {
 		const newTabBlock = createBlock( 'core/tab', {
 			anchor: 'tab-' + nextTabIndex,
 		} );
-		// Pass false for updateSelection to prevent focusing the newly created tab
-		insertBlock( newTabBlock, undefined, tabPanelsClientId, false );
-
-		// Set the new tab as the active editor tab (0-indexed, so nextTabIndex - 1)
-		// Mark as non-persistent so it doesn't add to undo history
-		if ( tabsClientId ) {
-			__unstableMarkNextChangeAsNotPersistent();
-			updateBlockAttributes( tabsClientId, {
-				editorActiveTabIndex: nextTabIndex - 1,
-			} );
-		}
-		// @TODO: Figure out a way to select and focus the tab-menu-item so it can handle label editing.
-		// // Select the tabs-menu so it can handle label editing
-		// if ( tabsMenuClientId ) {
-		// 	selectBlock( tabsMenuClientId );
-		// }
+		insertBlock( newTabBlock, undefined, tabPanelsClientId );
+		// @TODO: Possible select and focus the tabs-menu-item active tab RichText editor?
 	};
 
 	return (
