@@ -88,22 +88,20 @@ export default function useInspectorControlsTabs(
 		hasContentFills ||
 		!! ( contentClientIds && contentClientIds.length > 0 );
 
-	const hasListTab = hasListFills && ! isSectionBlock;
+	if ( hasContentTab ) {
+		tabs.push( TAB_CONTENT );
+	}
 
 	// Add the tabs in the order that they will default to if available.
 	// List View > Content > Settings > Styles.
-	if ( hasListTab ) {
+	if ( hasListFills ) {
 		tabs.push( TAB_LIST_VIEW );
-	}
-
-	if ( hasContentTab ) {
-		tabs.push( TAB_CONTENT );
 	}
 
 	if (
 		( settingsFills.length ||
 			// Advanded fills who up in settings tab if available or they blend into the default tab, if there's only one tab.
-			( advancedFills.length && ( hasContentTab || hasListTab ) ) ) &&
+			( advancedFills.length && ( hasContentTab || hasListFills ) ) ) &&
 		! isSectionBlock
 	) {
 		tabs.push( TAB_SETTINGS );
