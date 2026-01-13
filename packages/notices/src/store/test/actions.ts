@@ -16,7 +16,7 @@ import { DEFAULT_CONTEXT, DEFAULT_STATUS } from '../constants';
 describe( 'actions', () => {
 	describe( 'createNotice', () => {
 		const id = 'my-id';
-		const status = 'status';
+		const status = 'success';
 		const content = 'my message';
 
 		it( 'returns an action when options is empty', () => {
@@ -37,7 +37,7 @@ describe( 'actions', () => {
 		} );
 
 		it( 'normalizes content to string', () => {
-			const result = createNotice( status, <strong>Hello</strong> );
+			const result = createNotice( status, '<strong>Hello</strong>' );
 
 			expect( result ).toMatchObject( {
 				type: 'CREATE_NOTICE',

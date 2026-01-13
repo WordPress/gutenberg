@@ -2,48 +2,16 @@
  * Internal dependencies
  */
 import { DEFAULT_CONTEXT, DEFAULT_STATUS } from './constants';
-
-/**
- * @typedef {Object} WPNoticeAction Object describing a user action option associated with a notice.
- *
- * @property {string}    label   Message to use as action label.
- * @property {?string}   url     Optional URL of resource if action incurs
- *                               browser navigation.
- * @property {?Function} onClick Optional function to invoke when action is
- *                               triggered by user.
- */
+import type { NoticeOptions, ReducerAction } from './types';
 
 let uniqueId = 0;
 
 /**
  * Returns an action object used in signalling that a notice is to be created.
  *
- * @param {string|undefined}      status                       Notice status ("info" if undefined is passed).
- * @param {string}                content                      Notice message.
- * @param {Object}                [options]                    Notice options.
- * @param {string}                [options.context='global']   Context under which to
- *                                                             group notice.
- * @param {string}                [options.id]                 Identifier for notice.
- *                                                             Automatically assigned
- *                                                             if not specified.
- * @param {boolean}               [options.isDismissible=true] Whether the notice can
- *                                                             be dismissed by user.
- * @param {string}                [options.type='default']     Type of notice, one of
- *                                                             `default`, or `snackbar`.
- * @param {boolean}               [options.speak=true]         Whether the notice
- *                                                             content should be
- *                                                             announced to screen
- *                                                             readers.
- * @param {Array<WPNoticeAction>} [options.actions]            User actions to be
- *                                                             presented with notice.
- * @param {string}                [options.icon]               An icon displayed with the notice.
- *                                                             Only used when type is set to `snackbar`.
- * @param {boolean}               [options.explicitDismiss]    Whether the notice includes
- *                                                             an explicit dismiss button and
- *                                                             can't be dismissed by clicking
- *                                                             the body of the notice. Only applies
- *                                                             when type is set to `snackbar`.
- * @param {Function}              [options.onDismiss]          Called when the notice is dismissed.
+ * @param status  Notice status ("info" if undefined is passed).
+ * @param content Notice message.
+ * @param options Optional notice options.
  *
  * @example
  * ```js
@@ -64,9 +32,13 @@ let uniqueId = 0;
  * };
  * ```
  *
- * @return {Object} Action object.
+ * @return Action object.
  */
-export function createNotice( status = DEFAULT_STATUS, content, options = {} ) {
+export function createNotice(
+	status = DEFAULT_STATUS,
+	content: string,
+	options: NoticeOptions = {}
+): Extract< ReducerAction, { type: 'CREATE_NOTICE' } > {
 	const {
 		speak = true,
 		isDismissible = true,
@@ -110,8 +82,8 @@ export function createNotice( status = DEFAULT_STATUS, content, options = {} ) {
  *
  * @see createNotice
  *
- * @param {string} content   Notice message.
- * @param {Object} [options] Optional notice options.
+ * @param content Notice message.
+ * @param options Optional notice options.
  *
  * @example
  * ```js
@@ -137,9 +109,12 @@ export function createNotice( status = DEFAULT_STATUS, content, options = {} ) {
  * };
  * ```
  *
- * @return {Object} Action object.
+ * @return Action object.
  */
-export function createSuccessNotice( content, options ) {
+export function createSuccessNotice(
+	content: string,
+	options?: NoticeOptions
+) {
 	return createNotice( 'success', content, options );
 }
 
@@ -149,8 +124,8 @@ export function createSuccessNotice( content, options ) {
  *
  * @see createNotice
  *
- * @param {string} content   Notice message.
- * @param {Object} [options] Optional notice options.
+ * @param content Notice message.
+ * @param options Optional notice options.
  *
  * @example
  * ```js
@@ -175,9 +150,9 @@ export function createSuccessNotice( content, options ) {
  * };
  *```
  *
- * @return {Object} Action object.
+ * @return Action object.
  */
-export function createInfoNotice( content, options ) {
+export function createInfoNotice( content: string, options?: NoticeOptions ) {
 	return createNotice( 'info', content, options );
 }
 
@@ -187,8 +162,8 @@ export function createInfoNotice( content, options ) {
  *
  * @see createNotice
  *
- * @param {string} content   Notice message.
- * @param {Object} [options] Optional notice options.
+ * @param content Notice message.
+ * @param options Optional notice options.
  *
  * @example
  * ```js
@@ -216,9 +191,9 @@ export function createInfoNotice( content, options ) {
  * };
  * ```
  *
- * @return {Object} Action object.
+ * @return Action object.
  */
-export function createErrorNotice( content, options ) {
+export function createErrorNotice( content: string, options?: NoticeOptions ) {
 	return createNotice( 'error', content, options );
 }
 
@@ -228,8 +203,8 @@ export function createErrorNotice( content, options ) {
  *
  * @see createNotice
  *
- * @param {string} content   Notice message.
- * @param {Object} [options] Optional notice options.
+ * @param content Notice message.
+ * @param options Optional notice options.
  *
  * @example
  * ```js
@@ -258,18 +233,21 @@ export function createErrorNotice( content, options ) {
  * };
  * ```
  *
- * @return {Object} Action object.
+ * @return Action object.
  */
-export function createWarningNotice( content, options ) {
+export function createWarningNotice(
+	content: string,
+	options?: NoticeOptions
+) {
 	return createNotice( 'warning', content, options );
 }
 
 /**
  * Returns an action object used in signalling that a notice is to be removed.
  *
- * @param {string} id                 Notice unique identifier.
- * @param {string} [context='global'] Optional context (grouping) in which the notice is
- *                                    intended to appear. Defaults to default context.
+ * @param id      Notice unique identifier.
+ * @param context Optional context (grouping) in which the notice is
+ *                intended to appear. Defaults to 'default' context.
  *
  * @example
  * ```js
@@ -303,9 +281,12 @@ export function createWarningNotice( content, options ) {
  *};
  * ```
  *
- * @return {Object} Action object.
+ * @return Action object.
  */
-export function removeNotice( id, context = DEFAULT_CONTEXT ) {
+export function removeNotice(
+	id: string,
+	context: string = DEFAULT_CONTEXT
+): Extract< ReducerAction, { type: 'REMOVE_NOTICE' } > {
 	return {
 		type: 'REMOVE_NOTICE',
 		id,
@@ -316,8 +297,8 @@ export function removeNotice( id, context = DEFAULT_CONTEXT ) {
 /**
  * Removes all notices from a given context. Defaults to the default context.
  *
- * @param {string} noticeType The context to remove all notices from.
- * @param {string} context    The context to remove all notices from.
+ * @param noticeType The context to remove all notices from.
+ * @param context    The optional context to remove all notices from.
  *
  * @example
  * ```js
@@ -357,12 +338,12 @@ export function removeNotice( id, context = DEFAULT_CONTEXT ) {
  * };
  * ```
  *
- * @return {Object} 	   Action object.
+ * @return 	   Action object.
  */
 export function removeAllNotices(
 	noticeType = 'default',
-	context = DEFAULT_CONTEXT
-) {
+	context: string = DEFAULT_CONTEXT
+): Extract< ReducerAction, { type: 'REMOVE_ALL_NOTICES' } > {
 	return {
 		type: 'REMOVE_ALL_NOTICES',
 		noticeType,
@@ -373,9 +354,9 @@ export function removeAllNotices(
 /**
  * Returns an action object used in signalling that several notices are to be removed.
  *
- * @param {string[]} ids                List of unique notice identifiers.
- * @param {string}   [context='global'] Optional context (grouping) in which the notices are
- *                                      intended to appear. Defaults to default context.
+ * @param ids     List of unique notice identifiers.
+ * @param context Optional context (grouping) in which the notices are
+ *                intended to appear. Defaults to 'default' context.
  * @example
  * ```js
  * import { __ } from '@wordpress/i18n';
@@ -406,9 +387,12 @@ export function removeAllNotices(
  * 	);
  * };
  * ```
- * @return {Object} Action object.
+ * @return Action object.
  */
-export function removeNotices( ids, context = DEFAULT_CONTEXT ) {
+export function removeNotices(
+	ids: Array< string >,
+	context: string = DEFAULT_CONTEXT
+): Extract< ReducerAction, { type: 'REMOVE_NOTICES' } > {
 	return {
 		type: 'REMOVE_NOTICES',
 		ids,

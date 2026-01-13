@@ -1,18 +1,22 @@
 /**
  * Internal dependencies
  */
+import type { Notice, ReducerAction } from './types';
 import onSubKey from './utils/on-sub-key';
 
 /**
  * Reducer returning the next notices state. The notices state is an object
  * where each key is a context, its value an array of notice objects.
  *
- * @param {Object} state  Current state.
- * @param {Object} action Dispatched action.
+ * @param state  Current state.
+ * @param action Dispatched action.
  *
- * @return {Object} Updated state.
+ * @return Updated state.
  */
-const notices = onSubKey( 'context' )( ( state = [], action ) => {
+const notices = onSubKey( 'context' )< Array< Notice >, ReducerAction >( (
+	state = [],
+	action
+) => {
 	switch ( action.type ) {
 		case 'CREATE_NOTICE':
 			// Avoid duplicates on ID.
@@ -29,9 +33,10 @@ const notices = onSubKey( 'context' )( ( state = [], action ) => {
 
 		case 'REMOVE_ALL_NOTICES':
 			return state.filter( ( { type } ) => type !== action.noticeType );
-	}
 
-	return state;
+		default:
+			return state;
+	}
 } );
 
 export default notices;

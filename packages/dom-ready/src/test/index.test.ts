@@ -4,17 +4,13 @@
 import domReady from '../';
 
 describe( 'domReady', () => {
-	beforeAll( () => {
-		Object.defineProperty( document, 'readyState', {
-			value: 'loading',
-			writable: true,
-		} );
-	} );
-
 	describe( 'when document readystate is complete', () => {
 		it( 'should call the callback.', () => {
 			const callback = jest.fn( () => {} );
-			document.readyState = 'complete';
+			Object.defineProperty( document, 'readyState', {
+				get: () => 'complete',
+				configurable: true,
+			} );
 			domReady( callback );
 			expect( callback ).toHaveBeenCalled();
 		} );
@@ -23,7 +19,10 @@ describe( 'domReady', () => {
 	describe( 'when document readystate is interactive', () => {
 		it( 'should call the callback.', () => {
 			const callback = jest.fn( () => {} );
-			document.readyState = 'interactive';
+			Object.defineProperty( document, 'readyState', {
+				get: () => 'interactive',
+				configurable: true,
+			} );
 			domReady( callback );
 			expect( callback ).toHaveBeenCalled();
 		} );
@@ -32,7 +31,10 @@ describe( 'domReady', () => {
 	describe( 'when document readystate is still loading', () => {
 		it( 'should add the callback as an event listener to the DOMContentLoaded event.', () => {
 			const addEventListener = jest.fn( () => {} );
-			document.readyState = 'loading';
+			Object.defineProperty( document, 'readyState', {
+				get: () => 'loading',
+				configurable: true,
+			} );
 			Object.defineProperty( document, 'addEventListener', {
 				value: addEventListener,
 			} );

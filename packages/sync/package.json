@@ -46,17 +46,12 @@
 		"@wordpress/hooks": "file:../hooks",
 		"@wordpress/undo-manager": "file:../undo-manager",
 		"@wordpress/url": "file:../url",
-		"import-locals": "^2.0.0",
 		"lib0": "^0.2.42",
-		"simple-peer": "^9.11.0",
-		"y-indexeddb": "~9.0.11",
 		"y-protocols": "^1.0.5",
-		"y-webrtc": "~10.2.5",
 		"yjs": "~13.6.6"
 	},
 	"devDependencies": {
-		"@types/node": "^20.17.10",
-		"@types/simple-peer": "^9.11.5"
+		"@types/node": "^20.17.10"
 	},
 	"publishConfig": {
 		"access": "public"

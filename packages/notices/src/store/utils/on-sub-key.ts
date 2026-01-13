@@ -1,15 +1,22 @@
 /**
+ * External dependencies
+ */
+import type { Reducer, Action } from 'redux';
+
+/**
  * Higher-order reducer creator which creates a combined reducer object, keyed
  * by a property on the action object.
  *
- * @param {string} actionProperty Action property by which to key object.
+ * @param actionProperty Action property by which to key object.
  *
- * @return {Function} Higher-order reducer.
+ * @return Higher-order reducer.
  */
 export const onSubKey =
-	( actionProperty ) =>
-	( reducer ) =>
-	( state = {}, action ) => {
+	( actionProperty: string ) =>
+	< S, A extends Action & Record< string, any > >(
+		reducer: Reducer< S, A >
+	) =>
+	( state: Record< string, S > = {}, action: A ) => {
 		// Retrieve subkey from action. Do not track if undefined; useful for cases
 		// where reducer is scoped by action shape.
 		const key = action[ actionProperty ];

@@ -54,7 +54,7 @@ if ( window.__experimentalContentOnlyInspectorFields ) {
 		},
 	];
 	settings[ formKey ] = {
-		fields: [ 'value' ],
+		fields: [ 'value', 'citation' ],
 	};
 }
 

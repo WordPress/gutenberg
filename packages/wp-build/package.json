@@ -48,7 +48,8 @@
 		"moment-timezone": "^0.5.40",
 		"postcss": "8.4.38",
 		"postcss-modules": "6.0.1",
-		"rtlcss": "4.3.0"
+		"rtlcss": "4.3.0",
+		"sass-embedded": "^1.97.2"
 	},
 	"devDependencies": {
 		"@types/node": "^20.17.10"

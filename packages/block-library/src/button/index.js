@@ -69,7 +69,7 @@ if ( window.__experimentalContentOnlyInspectorFields ) {
 		},
 	];
 	settings[ formKey ] = {
-		fields: [ 'text' ],
+		fields: [ 'text', 'link' ],
 	};
 }
 

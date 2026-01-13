@@ -18,7 +18,7 @@ import { DEFAULT_CONTEXT } from '../constants';
 
 describe( 'reducer', () => {
 	it( 'should default to an empty object', () => {
-		const state = reducer( undefined, {} );
+		const state = reducer( undefined, { type: '@@UNKNOWN_ACTION' } );
 
 		expect( state ).toEqual( {} );
 	} );

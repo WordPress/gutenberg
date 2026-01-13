@@ -78,41 +78,26 @@ export function PropertiesSection( {
 			field: descriptionField,
 			isVisibleFlag: 'showDescription',
 		},
-	].filter( ( { field } ) => isDefined( field ) );
+	].filter( ( { field } ) => isDefined( field ) ) as Array< {
+		field: NormalizedField< any >;
+		isVisibleFlag: string;
+	} >;
 	const visibleFieldIds = view.fields ?? [];
 	const visibleRegularFieldsCount = regularFields.filter( ( f ) =>
 		visibleFieldIds.includes( f.id )
 	).length;
 
-	let visibleLockedFields = lockedFields.filter(
-		( { field, isVisibleFlag } ) =>
+	const visibleLockedFields = lockedFields.filter(
+		( { isVisibleFlag } ) =>
 			// @ts-expect-error
-			isDefined( field ) && ( view[ isVisibleFlag ] ?? true )
-	) as Array< {
-		field: NormalizedField< any >;
-		isVisibleFlag: string;
-	} >;
+			view[ isVisibleFlag ] ?? true
+	);
 
 	// If only one field (locked or regular) is visible, prevent it from being hidden
 	const totalVisibleFields =
 		visibleLockedFields.length + visibleRegularFieldsCount;
-	if ( totalVisibleFields === 1 ) {
-		if ( visibleLockedFields.length === 1 ) {
-			visibleLockedFields = visibleLockedFields.map( ( locked ) => ( {
-				...locked,
-				field: { ...locked.field, enableHiding: false },
-			} ) );
-		}
-	}
-
-	const hiddenLockedFields = lockedFields.filter(
-		( { field, isVisibleFlag } ) =>
-			// @ts-expect-error
-			isDefined( field ) && ! ( view[ isVisibleFlag ] ?? true )
-	) as Array< {
-		field: NormalizedField< any >;
-		isVisibleFlag: string;
-	} >;
+	const isSingleVisibleLockedField =
+		totalVisibleFields === 1 && visibleLockedFields.length === 1;
 
 	return (
 		<Stack direction="column" className="dataviews-field-control">
@@ -126,32 +111,23 @@ export function PropertiesSection( {
 				className="dataviews-view-config__properties"
 			>
 				<ItemGroup isBordered isSeparated size="medium">
-					{ visibleLockedFields.map( ( { field, isVisibleFlag } ) => {
-						return (
-							<FieldItem
-								key={ field.id }
-								field={ field }
-								isVisible
-								onToggleVisibility={ () => {
-									onChangeView( {
-										...view,
-										[ isVisibleFlag ]: false,
-									} );
-								} }
-							/>
-						);
-					} ) }
+					{ lockedFields.map( ( { field, isVisibleFlag } ) => {
+						// @ts-expect-error
+						const isVisible = view[ isVisibleFlag ] ?? true;
+						const fieldToRender =
+							isSingleVisibleLockedField && isVisible
+								? { ...field, enableHiding: false }
+								: field;
 
-					{ hiddenLockedFields.map( ( { field, isVisibleFlag } ) => {
 						return (
 							<FieldItem
 								key={ field.id }
-								field={ field }
-								isVisible={ false }
+								field={ fieldToRender }
+								isVisible={ isVisible }
 								onToggleVisibility={ () => {
 									onChangeView( {
 										...view,
-										[ isVisibleFlag ]: true,
+										[ isVisibleFlag ]: ! isVisible,
 									} );
 								} }
 							/>
@@ -161,11 +137,10 @@ export function PropertiesSection( {
 					{ regularFields.map( ( field ) => {
 						// Check if this is the last visible field to prevent hiding
 						const isVisible = visibleFieldIds.includes( field.id );
-						const isLastVisible =
-							totalVisibleFields === 1 && isVisible;
-						const fieldToRender = isLastVisible
-							? { ...field, enableHiding: false }
-							: field;
+						const fieldToRender =
+							totalVisibleFields === 1 && isVisible
+								? { ...field, enableHiding: false }
+								: field;
 
 						return (
 							<FieldItem

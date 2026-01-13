@@ -10,6 +10,7 @@ const BUNDLED_PACKAGES = [
 	'@wordpress/upload-media',
 	'@wordpress/fields',
 	'@wordpress/views',
+	'@wordpress/ui',
 ];
 
 /**

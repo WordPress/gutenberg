@@ -2,21 +2,17 @@
  * External dependencies
  */
 import AxePuppeteer from '@axe-core/puppeteer';
-
-/** @typedef {import('puppeteer-core').Page} Page */
-
-/** @typedef {import('axe-core').RunOptions} RunOptions */
-
-/** @typedef {import('axe-core').Spec} Spec */
+import type { Page } from 'puppeteer-core';
+import type { RunOptions, Spec, Result, NodeResult } from 'axe-core';
 
 /**
  * Formats the list of violations object returned by Axe analysis.
  *
- * @param {Object} violations The object with the errors found by Axe.
+ * @param {Array<Result>} violations The array with the errors found by Axe.
  *
  * @return {string} The user friendly message to display when the matcher fails.
  */
-function formatViolations( violations ) {
+function formatViolations( violations: Array< Result > ): string {
 	return violations
 		.map( ( { help, helpUrl, id, nodes } ) => {
 			let output =
@@ -24,7 +20,7 @@ function formatViolations( violations ) {
 				`Help: ${ helpUrl }\n` +
 				'Affected Nodes:\n';
 
-			nodes.forEach( ( node ) => {
+			nodes.forEach( ( node: NodeResult ) => {
 				if ( node.any.length ) {
 					output += `  ${ node.target }\n`;
 					output += '    Fix ANY of the following:\n';
@@ -54,31 +50,47 @@ function formatViolations( violations ) {
 		.join( '\n' );
 }
 
+interface AxeTestParams {
+	/**
+	 * CSS selector(s) to include in analysis.
+	 */
+	include?: string | string[];
+	/**
+	 * CSS selector(s) to exclude from analysis.
+	 */
+	exclude?: string | string[];
+	/**
+	 * List of Axe rules to skip from verification.
+	 */
+	disabledRules?: string[];
+	/**
+	 * Options to configure how Axe run operates.
+	 * @see https://github.com/dequelabs/axe-core/blob/HEAD/doc/API.md#options-parameter
+	 */
+	options?: RunOptions;
+	/**
+	 * Axe configuration object.
+	 * @see https://github.com/dequelabs/axe-core/blob/HEAD/doc/API.md#api-name-axeconfigure
+	 */
+	config?: Spec;
+}
+
 /**
  * Defines async matcher to check whether a given Puppeteer's page instance passes Axe accessibility tests.
  *
  * @see https://www.deque.com/axe/
  * It is possible to pass optional Axe API options to perform customized check.
- *
  * @see https://github.com/dequelabs/axe-core-npm/tree/develop/packages/puppeteer
  *
- * @param {Page}          page                 Puppeteer's page instance.
- * @param {?Object}       params               Optional params that allow better control over Axe API.
- * @param {?string|Array} params.include       CSS selector(s) to add to the list of elements
- *                                             to include in analysis.
- * @param {?string|Array} params.exclude       CSS selector(s) to add to the list of elements
- *                                             to exclude from analysis.
- * @param {?Array}        params.disabledRules The list of Axe rules to skip from verification.
- * @param {?RunOptions}   params.options       A flexible way to configure how Axe run operates,
- *                                             see https://github.com/dequelabs/axe-core/blob/HEAD/doc/API.md#options-parameter.
- * @param {?Spec}         params.config        Axe configuration object,
- *                                             see https://github.com/dequelabs/axe-core/blob/HEAD/doc/API.md#api-name-axeconfigure.
- *
- * @return {Object} A matcher object with two keys `pass` and `message`.
+ * @param {import('@jest/expect').MatcherContext} this   Matcher context from Jest.
+ * @param {Page}                                  page   Puppeteer's page instance.
+ * @param {AxeTestParams}                         params Optional params that allow better control over Axe API.
+ * @return A matcher object with two keys `pass` and `message`.
  */
 async function toPassAxeTests(
-	page,
-	{ include, exclude, disabledRules, options, config } = {}
+	this: jest.MatcherContext,
+	page: Page,
+	{ include, exclude, disabledRules, options, config }: AxeTestParams = {}
 ) {
 	const axe = new AxePuppeteer( page );
 

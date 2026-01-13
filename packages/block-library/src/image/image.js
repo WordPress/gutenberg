@@ -4,6 +4,7 @@
 import { isBlobURL } from '@wordpress/blob';
 import {
 	ExternalLink,
+	FocalPointPicker,
 	ResizableBox,
 	Spinner,
 	TextareaControl,
@@ -61,7 +62,7 @@ import {
 	SIZED_LAYOUTS,
 	DEFAULT_MEDIA_SIZE_SLUG,
 } from './constants';
-import { evalAspectRatio } from './utils';
+import { evalAspectRatio, mediaPosition } from './utils';
 
 const { DimensionsTool, ResolutionTool } = unlock( blockEditorPrivateApis );
 
@@ -279,6 +280,7 @@ export default function Image( {
 		height,
 		aspectRatio,
 		scale,
+		focalPoint,
 		linkTarget,
 		sizeSlug,
 		lightbox,
@@ -467,6 +469,15 @@ export default function Image( {
 	function updateAlt( newAlt ) {
 		setAttributes( { alt: newAlt } );
 	}
+
+	const imperativeFocalPointPreview = ( value ) => {
+		if ( imageElement ) {
+			imageElement.style.setProperty(
+				'object-position',
+				mediaPosition( value )
+			);
+		}
+	};
 
 	function updateImage( newSizeSlug ) {
 		const newUrl = image?.media_details?.sizes?.[ newSizeSlug ]?.source_url;
@@ -713,7 +724,6 @@ export default function Image( {
 		);
 
 	const hasDataFormBlockFields =
-		window?.__experimentalContentOnlyPatternInsertion &&
 		window?.__experimentalContentOnlyInspectorFields;
 
 	const controls = (
@@ -864,9 +874,36 @@ export default function Image( {
 					width: undefined,
 					height: undefined,
 					scale: undefined,
+					focalPoint: undefined,
 				} ) }
 			>
 				{ dimensionsControl }
+				{ url && scale && (
+					<ToolsPanelItem
+						label={ __( 'Focal point' ) }
+						isShownByDefault
+						hasValue={ () => !! focalPoint }
+						onDeselect={ () =>
+							setAttributes( {
+								focalPoint: undefined,
+							} )
+						}
+						panelId={ clientId }
+					>
+						<FocalPointPicker
+							label={ __( 'Focal point' ) }
+							url={ url }
+							value={ focalPoint }
+							onDragStart={ imperativeFocalPointPreview }
+							onDrag={ imperativeFocalPointPreview }
+							onChange={ ( newFocalPoint ) =>
+								setAttributes( {
+									focalPoint: newFocalPoint,
+								} )
+							}
+						/>
+					</ToolsPanelItem>
+				) }
 			</InspectorControls>
 			{ !! imageSizeOptions.length && (
 				<InspectorControls>
@@ -965,6 +1002,10 @@ export default function Image( {
 							  }
 							: { width, height } ),
 						objectFit: scale,
+						objectPosition:
+							focalPoint && scale
+								? mediaPosition( focalPoint )
+								: undefined,
 						...borderProps.style,
 						...shadowProps.style,
 					} }

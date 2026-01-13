@@ -776,6 +776,7 @@ If you set `supports.interactivity` to `true`, it is equivalent to setting both 
     -   `allowVerticalAlignment`: type `boolean`, default value `true`
     -   `allowJustification`: type `boolean`, default value `true`
     -   `allowOrientation`: type `boolean`, default value `true`
+    -   `allowWrap`: type `boolean`, default value `true`
     -   `allowCustomContentAndWideSize`: type `boolean`, default value `true`
 
 This value only applies to blocks that are containers for inner blocks. If set to `true` the layout type will be `flow`. For other layout types it's necessary to set the `type` explicitly inside the `default` object.
@@ -835,6 +836,13 @@ For the `flex` layout type, determines display of the justification control in t
 -   Default value: `true`
 
 For the `flex` layout type only, determines display of the orientation control in the block toolbar.
+
+### layout.allowWrap
+
+-   Type: `boolean`
+-   Default value: `true`
+
+For the `flex` layout type only, determines display of the "Allow to wrap to multiple lines" toggle in the block sidebar. When set to `false`, the wrap behavior is controlled by the `flexWrap` value in `layout.default`.
 
 ### layout.allowCustomContentAndWideSize
 

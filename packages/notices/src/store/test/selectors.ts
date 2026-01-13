@@ -21,7 +21,12 @@ describe( 'selectors', () => {
 				],
 			};
 
-			expect( getNotices( state ) ).toEqual( [
+			expect(
+				getNotices(
+					// @ts-expect-error Testing partial state
+					state
+				)
+			).toEqual( [
 				{ id: 'b', content: 'message 1' },
 				{ id: 'a', content: 'message 2' },
 			] );
@@ -32,9 +37,13 @@ describe( 'selectors', () => {
 				foo: [ { id: 'c', content: 'message 3' } ],
 			};
 
-			expect( getNotices( state, 'foo' ) ).toEqual( [
-				{ id: 'c', content: 'message 3' },
-			] );
+			expect(
+				getNotices(
+					// @ts-expect-error Testing partial state
+					state,
+					'foo'
+				)
+			).toEqual( [ { id: 'c', content: 'message 3' } ] );
 		} );
 	} );
 } );

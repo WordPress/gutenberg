@@ -43,7 +43,6 @@
 	"types": "build-types",
 	"sideEffects": false,
 	"dependencies": {
-		"@ariakit/react": "^0.4.15",
 		"@base-ui/react": "^1.0.0",
 		"@wordpress/a11y": "file:../a11y",
 		"@wordpress/element": "file:../element",
