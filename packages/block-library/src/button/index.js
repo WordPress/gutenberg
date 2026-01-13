@@ -55,12 +55,14 @@ if ( window.__experimentalContentOnlyInspectorFields ) {
 		{
 			id: 'text',
 			label: __( 'Content' ),
-			type: 'richtext',
+			type: 'text',
+			Edit: 'richtext', // TODO: replace with custom component
 		},
 		{
 			id: 'link',
 			label: __( 'Link' ),
-			type: 'link',
+			type: 'url',
+			Edit: 'link', // TODO: replace with custom component
 			mapping: {
 				url: 'url',
 				rel: 'rel',

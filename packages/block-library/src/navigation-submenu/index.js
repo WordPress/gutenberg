@@ -57,12 +57,14 @@ if ( window.__experimentalContentOnlyInspectorFields ) {
 		{
 			id: 'label',
 			label: __( 'Label' ),
-			type: 'richtext',
+			type: 'text',
+			Edit: 'richtext', //TODO: replace with custom component
 		},
 		{
 			id: 'link',
 			label: __( 'Link' ),
-			type: 'link',
+			type: 'url',
+			Edit: 'link', // TODO: replace with custom component
 			mapping: {
 				href: 'url',
 				rel: 'rel',

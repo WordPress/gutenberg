@@ -65,7 +65,8 @@ if ( window.__experimentalContentOnlyInspectorFields ) {
 		{
 			id: 'content',
 			label: __( 'Content' ),
-			type: 'richtext',
+			type: 'text',
+			Edit: 'richtext', // TODO: replace with custom component
 		},
 	];
 	settings[ formKey ] = {

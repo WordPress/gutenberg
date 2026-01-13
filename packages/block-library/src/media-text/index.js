@@ -60,21 +60,29 @@ if ( window.__experimentalContentOnlyInspectorFields ) {
 			id: 'media',
 			label: __( 'Media' ),
 			type: 'media',
-			mapping: {
-				id: 'mediaId',
-				mediaType: 'mediaType',
-				url: 'mediaUrl',
-				link: 'mediaLink',
-			},
-			args: {
+			Edit: {
+				control: 'media', // TODO: replace with custom component
 				allowedTypes: [ 'image', 'video' ],
 				multiple: false,
 			},
+			getValue: ( { item } ) => ( {
+				id: item.mediaId,
+				url: item.mediaUrl,
+				mediaType: item.mediaType,
+				link: item.mediaLink,
+			} ),
+			setValue: ( { value } ) => ( {
+				mediaId: value.id,
+				mediaUrl: value.url,
+				mediaType: value.mediaType,
+				mediaLink: value.link,
+			} ),
 		},
 		{
 			id: 'link',
 			label: __( 'Link' ),
-			type: 'link',
+			type: 'url',
+			Edit: 'link', // TODO: replace with custom component
 			mapping: {
 				url: 'href',
 				rel: 'rel',

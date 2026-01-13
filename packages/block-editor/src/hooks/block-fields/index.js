@@ -137,18 +137,31 @@ function BlockFields( {
 				};
 			}
 
-			// Only add custom Edit component if one exists for this type
-			const ControlComponent = CONTROLS[ fieldDef.type ];
-			if ( ControlComponent ) {
-				// Use EditConfig pattern: Edit is an object with control type and config props
-				field.Edit = createConfiguredControl(
-					ControlComponent,
-					fieldDef.type,
-					{
-						clientId,
-						fieldDef,
-					}
-				);
+			// These should be custom Edit components, not replaced here.
+			if ( 'string' === typeof fieldDef.Edit ) {
+				const ControlComponent = CONTROLS[ fieldDef.Edit ];
+				if ( ControlComponent ) {
+					field.Edit = createConfiguredControl(
+						ControlComponent,
+						fieldDef.type,
+						{
+							clientId,
+							fieldDef,
+						}
+					);
+				}
+			} else if ( 'object' === typeof fieldDef.Edit ) {
+				const ControlComponent = CONTROLS[ fieldDef.Edit.control ];
+				if ( ControlComponent ) {
+					field.Edit = createConfiguredControl(
+						ControlComponent,
+						fieldDef.Edit.control,
+						{
+							...fieldDef.Edit,
+							clientId,
+						}
+					);
+				}
 			}
 
 			return field;

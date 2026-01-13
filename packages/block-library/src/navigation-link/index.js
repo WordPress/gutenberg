@@ -98,12 +98,14 @@ if ( window.__experimentalContentOnlyInspectorFields ) {
 		{
 			id: 'label',
 			label: __( 'Label' ),
-			type: 'richtext',
+			type: 'text',
+			Edit: 'richtext',
 		},
 		{
 			id: 'link',
 			label: __( 'Link' ),
-			type: 'link',
+			type: 'url',
+			Edit: 'link',
 			mapping: {
 				href: 'url',
 				rel: 'rel',
