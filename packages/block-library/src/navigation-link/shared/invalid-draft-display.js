@@ -44,7 +44,14 @@ export function InvalidDraftDisplay( {
 			) }
 		>
 			<span>
-				{ `${ decodeEntities( label ) } (${ statusText })`.trim() }
+				{
+					// Some attributes are stored in an escaped form. It's a legacy issue.
+					// Ideally they would be stored in a raw, unescaped form.
+					// Unescape is used here to "recover" the escaped characters
+					// so they display without encoding.
+					// See `updateAttributes` for more details.
+					`${ decodeEntities( label ) } (${ statusText })`.trim()
+				}
 			</span>
 		</div>
 	);
