@@ -197,7 +197,7 @@ Displays the date on which the comment was posted. ([Source](https://github.com/
 -	**Name:** core/comment-date
 -	**Category:** theme
 -	**Ancestor:** core/comment-template
--	**Supports:** anchor, color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** anchor, color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight, textAlign), ~~html~~
 -	**Attributes:** format, isLink
 
 ## Comment Edit Link
