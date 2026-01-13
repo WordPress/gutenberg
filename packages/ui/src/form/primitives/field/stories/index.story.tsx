@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react-webpack5';
 import { useId } from '@wordpress/element';
 import '@wordpress/theme/design-tokens.css';
 import { Field } from '../../../..';

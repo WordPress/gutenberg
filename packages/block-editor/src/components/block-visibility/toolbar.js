@@ -75,7 +75,7 @@ export default function BlockVisibilityToolbar( { clientIds } ) {
 
 	return (
 		<>
-			<ToolbarGroup className="block-editor-block-lock-toolbar">
+			<ToolbarGroup>
 				<ToolbarButton
 					disabled={ ! canToggleBlockVisibility }
 					icon={ hasHiddenBlock ? unseen : seen }

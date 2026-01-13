@@ -108,6 +108,9 @@ _::-webkit-full-page-media, _:future, :root [data-has-multi-selection="true"] .b
 		height: 0;
 		border: none !important;
 		padding: 0 !important;
+		opacity: 0;
+		margin-top: 0 !important;
+		margin-bottom: 0 !important;
 	}
 
 	&.is-layout-flex:not(.is-vertical) > .is-block-hidden {
@@ -115,6 +118,8 @@ _::-webkit-full-page-media, _:future, :root [data-has-multi-selection="true"] .b
 		height: auto;
 		align-self: stretch;
 		white-space: nowrap !important;
+		margin-left: 0 !important;
+		margin-right: 0 !important;
 	}
 
 	// Re-enable it on components inside.

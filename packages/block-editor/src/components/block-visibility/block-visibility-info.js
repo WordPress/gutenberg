@@ -16,7 +16,6 @@ import { unseen } from '@wordpress/icons';
  */
 import { unlock } from '../../lock-unlock';
 import { store as blockEditorStore } from '../../store';
-import './styles.scss';
 
 const { Badge } = unlock( componentsPrivateApis );
 

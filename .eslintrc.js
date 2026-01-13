@@ -425,15 +425,12 @@ module.exports = {
 			files: [
 				'**/@(storybook|stories)/**',
 				'packages/components/src/**/*.tsx',
+				'packages/ui/src/**/*.tsx',
 			],
 			rules: {
 				// Useful to add story descriptions via JSDoc without specifying params,
 				// or in TypeScript files where params are likely already documented outside of the JSDoc.
 				'jsdoc/require-param': 'off',
-				// Disable this rule as eslint-plugin-storybook 0.9.0 doesn't recognize the new
-				// `storybook/test` import path introduced in Storybook 9.
-				// TODO: Remove this override when we upgrade to eslint-plugin-storybook >= 0.10.0.
-				'storybook/use-storybook-expect': 'off',
 			},
 		},
 		{
@@ -470,13 +467,13 @@ module.exports = {
 			extends: [ 'plugin:ssr-friendly/recommended' ],
 		},
 		{
-			files: [ 'packages/components/src/**' ],
+			files: [ 'packages/components/src/**', 'packages/ui/src/**' ],
 			rules: {
 				'no-restricted-imports': [
 					'error',
 					// The `ariakit` and `framer-motion` APIs are meant to be consumed via
-					// the `@wordpress/components` package, hence why importing those
-					// dependencies should be allowed in the components package.
+					// the `@wordpress/components` and @wordpress/ui` packages, hence why
+					// importing those imports should be allowed only in those packages.
 					{
 						paths: restrictedImports.filter(
 							( { name } ) =>

@@ -79,6 +79,11 @@
 		"react-native-webview": "13.6.1"
 	},
 	"devDependencies": {
+		"@babel/plugin-proposal-nullish-coalescing-operator": "^7.18.6",
+		"@babel/plugin-proposal-optional-chaining": "^7.21.0",
+		"@babel/plugin-transform-arrow-functions": "^7.27.1",
+		"@babel/plugin-transform-shorthand-properties": "^7.27.1",
+		"@babel/plugin-transform-template-literals": "^7.27.1",
 		"@react-native/babel-preset": "0.73.10",
 		"@react-native/metro-babel-transformer": "0.73.10",
 		"@react-native/metro-config": "0.73.4",
@@ -86,6 +91,9 @@
 		"babel-plugin-react-native-classname-to-style": "1.2.2",
 		"babel-plugin-react-native-platform-specific-extensions": "1.1.1",
 		"babel-plugin-transform-remove-console": "6.9.4",
+		"css-to-react-native-transform": "^2.1.0",
+		"jest-environment-jsdom": "^30.2.0",
+		"sass": "^1.54.0",
 		"webdriverio": "8.16.20"
 	},
 	"publishConfig": {
