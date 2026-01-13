@@ -17,6 +17,7 @@ jobs:
             contents: read
             issues: write
             pull-requests: write
+            id-token: write
         # Run on new issues OR when @claude is mentioned in a comment
         if: |
             github.event_name == 'issues' ||
