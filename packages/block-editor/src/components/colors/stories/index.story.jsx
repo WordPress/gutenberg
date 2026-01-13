@@ -7,7 +7,7 @@ import { BlockEditorProvider } from '@wordpress/block-editor';
 /**
  * Internal dependencies
  */
-import { withColors } from '../index';
+import { withColors, createCustomColorsHOC } from '../index';
 
 export default {
 	title: 'BlockEditor/Colors',
@@ -78,6 +78,64 @@ export const Default = {
 					}
 				/>
 			</BlockEditorProvider>
+		);
+	},
+};
+
+/**
+ * A custom component to demonstrate createCustomColorsHOC.
+ */
+function CustomBox( { backgroundColor, setBackgroundColor } ) {
+	return (
+		<div
+			style={ {
+				backgroundColor: backgroundColor?.color,
+				padding: '20px',
+				border: '1px solid #ccc',
+				textAlign: 'center',
+			} }
+		>
+			<p>
+				<strong>Current Slug: </strong>
+				{ backgroundColor?.slug || 'none' }
+			</p>
+			<button onClick={ () => setBackgroundColor( 'cyan' ) }>
+				Set Cyan
+			</button>
+			<button onClick={ () => setBackgroundColor( 'magenta' ) }>
+				Set Magenta
+			</button>
+			<button onClick={ () => setBackgroundColor( undefined ) }>
+				Clear
+			</button>
+		</div>
+	);
+}
+
+const CUSTOM_PALETTE = [
+	{ name: 'Cyan', slug: 'cyan', color: '#00ffff' },
+	{ name: 'Magenta', slug: 'magenta', color: '#ff00ff' },
+];
+
+const WrappedCustomBox =
+	createCustomColorsHOC( CUSTOM_PALETTE )( 'backgroundColor' )( CustomBox );
+
+export const CustomPalette = {
+	render: function Template() {
+		const [ attributes, setAttributes ] = useState( {} );
+
+		return (
+			<div>
+				<WrappedCustomBox
+					attributes={ attributes }
+					setAttributes={ ( newAttrs ) =>
+						setAttributes( ( prev ) => ( {
+							...prev,
+							...newAttrs,
+						} ) )
+					}
+				/>
+			</div>
 		);
 	},
 };
