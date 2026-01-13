@@ -2158,6 +2158,7 @@ const buildBlockTypeItem =
 			...inserterVariations,
 			// Built-in heading level variations have block scope but allow
 			// insertion via slash inserter.
+			// See https://github.com/WordPress/gutenberg/issues/74233.
 			...blockVariations
 				.filter(
 					( variation ) =>
