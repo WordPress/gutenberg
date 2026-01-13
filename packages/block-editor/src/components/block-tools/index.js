@@ -10,11 +10,11 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { isTextField } from '@wordpress/dom';
 import { Popover } from '@wordpress/components';
 import { __unstableUseShortcutEventMatch as useShortcutEventMatch } from '@wordpress/keyboard-shortcuts';
-import { useRef } from '@wordpress/element';
+import { useRef, useState } from '@wordpress/element';
 import {
 	switchToBlockType,
-	store as blocksStore,
 	hasBlockSupport,
+	store as blocksStore,
 } from '@wordpress/blocks';
 import { speak } from '@wordpress/a11y';
 import { __, sprintf, _n } from '@wordpress/i18n';
@@ -33,8 +33,9 @@ import usePopoverScroll from '../block-popover/use-popover-scroll';
 import ZoomOutModeInserters from './zoom-out-mode-inserters';
 import { useShowBlockTools } from './use-show-block-tools';
 import { unlock } from '../../lock-unlock';
-import { cleanEmptyObject } from '../../hooks/utils';
 import usePasteStyles from '../use-paste-styles';
+import { BlockVisibilityModal } from '../block-visibility';
+import { cleanEmptyObject } from '../../hooks/utils';
 
 function selector( select ) {
 	const {
@@ -74,14 +75,14 @@ export default function BlockTools( {
 } ) {
 	const { clientId, hasFixedToolbar, isTyping, isZoomOutMode, isDragging } =
 		useSelect( selector, [] );
-
+	const [ visibilityModalClientIds, setVisibilityModalClientIds ] =
+		useState( null );
 	const isMatch = useShortcutEventMatch();
 	const {
 		getBlocksByClientId,
 		getSelectedBlockClientIds,
 		getBlockRootClientId,
 		isGroupable,
-		getBlockName,
 		getEditedContentOnlySection,
 	} = unlock( useSelect( blockEditorStore ) );
 	const { getGroupingBlockName } = useSelect( blocksStore );
@@ -99,8 +100,8 @@ export default function BlockTools( {
 		moveBlocksUp,
 		moveBlocksDown,
 		expandBlock,
-		updateBlockAttributes,
 		stopEditingContentOnlySection,
+		updateBlockAttributes,
 	} = unlock( useDispatch( blockEditorStore ) );
 
 	function onKeyDown( event ) {
@@ -221,36 +222,41 @@ export default function BlockTools( {
 			if ( clientIds.length ) {
 				event.preventDefault();
 				const blocks = getBlocksByClientId( clientIds );
-				const canToggleBlockVisibility = blocks.every( ( block ) =>
-					hasBlockSupport(
-						getBlockName( block.clientId ),
-						'visibility',
-						true
-					)
+				const supportsBlockVisibility = blocks.every( ( block ) =>
+					hasBlockSupport( block.name, 'visibility', true )
 				);
-				if ( ! canToggleBlockVisibility ) {
+
+				if ( ! supportsBlockVisibility ) {
 					return;
 				}
-				const hasHiddenBlock = blocks.some(
-					( block ) =>
-						block.attributes.metadata?.blockVisibility === false
-				);
-				const attributesByClientId = Object.fromEntries(
-					blocks.map( ( { clientId: mapClientId, attributes } ) => [
-						mapClientId,
-						{
-							metadata: cleanEmptyObject( {
-								...attributes?.metadata,
-								blockVisibility: hasHiddenBlock
-									? undefined
-									: false,
-							} ),
-						},
-					] )
-				);
-				updateBlockAttributes( clientIds, attributesByClientId, {
-					uniqueByBlock: true,
-				} );
+
+				if ( window.__experimentalHideBlocksBasedOnScreenSize ) {
+					// Open the visibility breakpoints modal.
+					setVisibilityModalClientIds( clientIds );
+				} else {
+					const hasHiddenBlock = blocks.some(
+						( block ) =>
+							block.attributes.metadata?.blockVisibility === false
+					);
+					const attributesByClientId = Object.fromEntries(
+						blocks.map(
+							( { clientId: mapClientId, attributes } ) => [
+								mapClientId,
+								{
+									metadata: cleanEmptyObject( {
+										...attributes?.metadata,
+										blockVisibility: hasHiddenBlock
+											? undefined
+											: false,
+									} ),
+								},
+							]
+						)
+					);
+					updateBlockAttributes( clientIds, attributesByClientId, {
+						uniqueByBlock: true,
+					} );
+				}
 			}
 		}
 
@@ -317,6 +323,12 @@ export default function BlockTools( {
 					/>
 				) }
 			</InsertionPointOpenRef.Provider>
+			{ visibilityModalClientIds && (
+				<BlockVisibilityModal
+					clientIds={ visibilityModalClientIds }
+					onClose={ () => setVisibilityModalClientIds( null ) }
+				/>
+			) }
 		</div>
 	);
 }

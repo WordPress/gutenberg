@@ -203,15 +203,15 @@ async function dev() {
 		// Wait for wp-build to complete its initial build, then signal ready.
 		// Using .then() ensures cleanup handlers are registered before awaiting,
 		// so early termination still triggers cleanup.
-		const onStdoutData = ( data ) => {
+		let isReady = false;
+		buildWatch.stdout.on( 'data', ( data ) => {
 			const output = data.toString();
 			process.stdout.write( output );
-			if ( output.includes( 'Watching for changes' ) ) {
-				buildWatch.stdout.off( 'data', onStdoutData );
+			if ( ! isReady && output.includes( 'Watching for changes' ) ) {
+				isReady = true;
 				readyMarkerFile.create();
 			}
-		};
-		buildWatch.stdout.on( 'data', onStdoutData );
+		} );
 
 		// Keep the process running
 		await new Promise( () => {} );

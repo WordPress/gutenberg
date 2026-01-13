@@ -39,6 +39,7 @@
 -   Converted package to a compliant dual CJS/ESM module ([#73822](https://github.com/WordPress/gutenberg/pull/73822) and [#74348](https://github.com/WordPress/gutenberg/pull/74348)).
 -   `ToggleGroupControl`: Update visual design ([#74036](https://github.com/WordPress/gutenberg/pull/74036)).
 -   `Notice`: Add `disabled` prop to action buttons. Also allow `onClick` to work alongside `url` ([#74094](https://github.com/WordPress/gutenberg/pull/74094)).
+-   `Menu`: Remove animation on submenus ([#74548](https://github.com/WordPress/gutenberg/pull/74548)).
 
 ### Bug Fixes
 
@@ -54,6 +55,7 @@
 -   `AnglePickerControl`: Migrate styles from Emotion to a CSS module ([#73786](https://github.com/WordPress/gutenberg/pull/73786)).
 -   `Menu`: Clean up popover wrappers ([#74207](https://github.com/WordPress/gutenberg/pull/74207)).
 -   `Button`, `DateCalendar`, `DateRangeCalendar`, `CheckboxControl`, `Panel`, `Placeholder`: Remove outdated vendor prefix properties in CSS ([#74213](https://github.com/WordPress/gutenberg/pull/74213)).
+-    Updated `fast-deep-equal` imports for compatibility with strict Node.js resolution ([#74530](https://github.com/WordPress/gutenberg/pull/74530)).
 
 ## 30.9.0 (2025-11-26)
 

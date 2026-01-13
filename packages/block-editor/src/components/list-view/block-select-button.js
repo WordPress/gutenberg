@@ -66,7 +66,7 @@ function ListViewBlockSelectButton(
 			( select ) => {
 				const { getBlockName, getBlockAttributes } =
 					select( blockEditorStore );
-				const { isBlockHidden: _isBlockHidden } = unlock(
+				const { areBlocksHiddenAnywhere } = unlock(
 					select( blockEditorStore )
 				);
 				const blockAttributes = getBlockAttributes( clientId );
@@ -76,7 +76,7 @@ function ListViewBlockSelectButton(
 						'visibility',
 						true
 					),
-					isBlockHidden: _isBlockHidden( clientId ),
+					isBlockHidden: areBlocksHiddenAnywhere( [ clientId ] ),
 					hasPatternName: !! blockAttributes?.metadata?.patternName,
 				};
 			},

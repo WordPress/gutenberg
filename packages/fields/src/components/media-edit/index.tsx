@@ -8,7 +8,9 @@ import clsx from 'clsx';
  */
 import {
 	Button,
+	DropZone,
 	Icon,
+	Spinner,
 	__experimentalText as Text,
 	__experimentalTruncate as Truncate,
 	__experimentalVStack as VStack,
@@ -16,15 +18,18 @@ import {
 	Tooltip,
 	VisuallyHidden,
 } from '@wordpress/components';
+import { isBlobURL, getBlobTypeByURL } from '@wordpress/blob';
 import { store as coreStore, type Attachment } from '@wordpress/core-data';
-import { useSelect } from '@wordpress/data';
-import { useCallback, useState } from '@wordpress/element';
+import { useSelect, useDispatch } from '@wordpress/data';
+import { useCallback, useMemo, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { archive, audio, video, file, closeSmall } from '@wordpress/icons';
 import {
 	MediaUpload,
+	uploadMedia,
 	privateApis as mediaUtilsPrivateApis,
 } from '@wordpress/media-utils';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
@@ -33,6 +38,13 @@ import { unlock } from '../../lock-unlock';
 import type { MediaEditProps } from '../../types';
 
 const { MediaUploadModal } = unlock( mediaUtilsPrivateApis );
+
+type BlobItem = {
+	id: string;
+	source_url: string;
+	mime_type: string | undefined;
+	alt_text?: string;
+};
 
 /**
  * Conditional Media component that uses MediaUploadModal when experiment is enabled,
@@ -82,27 +94,54 @@ function MediaPickerButton( {
 	children,
 	label,
 	showTooltip = false,
+	onFilesDrop,
+	attachment,
+	isUploading = false,
 }: {
 	open: () => void;
 	children: React.ReactNode;
 	label: string;
 	showTooltip?: boolean;
+	onFilesDrop: MediaEditAttachmentsProps[ 'onFilesDrop' ];
+	attachment?: MediaEditAttachment;
+	isUploading?: boolean;
 } ) {
+	const isBlob = attachment && isBlobURL( attachment.source_url );
 	const mediaPickerButton = (
 		<div
 			className="fields__media-edit-picker-button"
 			role="button"
 			tabIndex={ 0 }
-			onClick={ open }
+			onClick={ () => {
+				if ( ! isUploading ) {
+					open();
+				}
+			} }
 			onKeyDown={ ( event ) => {
+				if ( isUploading ) {
+					return;
+				}
 				if ( event.key === 'Enter' || event.key === ' ' ) {
 					event.preventDefault();
 					open();
 				}
 			} }
 			aria-label={ label }
+			aria-disabled={ isUploading }
 		>
 			{ children }
+			{ isBlob && (
+				<span className="fields__media-edit-picker-button-spinner">
+					<Spinner />
+				</span>
+			) }
+			{ ! isUploading && (
+				<DropZone
+					onFilesDrop={ ( files ) =>
+						onFilesDrop( files, attachment?.id as number )
+					}
+				/>
+			) }
 		</div>
 	);
 	if ( ! showTooltip ) {
@@ -128,24 +167,25 @@ function MediaTitle( { attachment }: { attachment: Attachment< 'view' > } ) {
 	);
 }
 
-function MediaEditPlaceholder( {
-	open,
-	label,
-}: {
+function MediaEditPlaceholder( props: {
 	open: () => void;
 	label: string;
+	onFilesDrop: MediaEditAttachmentsProps[ 'onFilesDrop' ];
+	isUploading: boolean;
 } ) {
 	return (
-		<MediaPickerButton open={ open } label={ label }>
-			<span className="fields__media-edit-placeholder">{ label }</span>
+		<MediaPickerButton { ...props }>
+			<span className="fields__media-edit-placeholder">
+				{ props.label }
+			</span>
 		</MediaPickerButton>
 	);
 }
 
-function MediaPreview( { attachment }: { attachment: Attachment< 'view' > } ) {
+function MediaPreview( { attachment }: { attachment: MediaEditAttachment } ) {
 	const url = attachment.source_url;
-	const mimeType = attachment.mime_type;
-	if ( mimeType.startsWith( 'image/' ) ) {
+	const mimeType = attachment.mime_type || '';
+	if ( mimeType.startsWith( 'image' ) ) {
 		return (
 			<img
 				className="fields__media-edit-thumbnail"
@@ -153,9 +193,9 @@ function MediaPreview( { attachment }: { attachment: Attachment< 'view' > } ) {
 				src={ url }
 			/>
 		);
-	} else if ( mimeType.startsWith( 'audio/' ) ) {
+	} else if ( mimeType.startsWith( 'audio' ) ) {
 		return <Icon icon={ audio } />;
-	} else if ( mimeType.startsWith( 'video/' ) ) {
+	} else if ( mimeType.startsWith( 'video' ) ) {
 		return <Icon icon={ video } />;
 	} else if ( archiveMimeTypes.includes( mimeType ) ) {
 		return <Icon icon={ archive } />;
@@ -163,32 +203,38 @@ function MediaPreview( { attachment }: { attachment: Attachment< 'view' > } ) {
 	return <Icon icon={ file } />;
 }
 
+type MediaEditAttachment = Attachment< 'view' > | BlobItem;
 interface MediaEditAttachmentsProps {
-	attachments: Attachment< 'view' >[] | null;
+	allItems: Array< MediaEditAttachment > | null;
 	addButtonLabel: string;
 	multiple?: boolean;
 	removeItem: ( itemId: number ) => void;
 	open: () => void;
+	onFilesDrop: ( files: File[], attachmentId?: number ) => void;
+	isUploading: boolean;
 }
 
 function ExpandedMediaEditAttachments( {
-	attachments,
+	allItems,
 	addButtonLabel,
 	multiple,
 	removeItem,
 	open,
+	onFilesDrop,
+	isUploading,
 }: MediaEditAttachmentsProps ) {
 	return (
 		<div
 			className={ clsx( 'fields__media-edit-expanded', {
 				'is-multiple': multiple,
 				'is-single': ! multiple,
-				'is-empty': ! attachments?.length,
+				'is-empty': ! allItems?.length,
 			} ) }
 		>
-			{ attachments?.map( ( attachment ) => {
+			{ allItems?.map( ( attachment ) => {
 				const hasPreviewImage =
-					attachment.mime_type.startsWith( 'image/' );
+					attachment.mime_type?.startsWith( 'image' );
+				const isBlob = isBlobURL( attachment.source_url );
 				return (
 					<div
 						key={ attachment.id }
@@ -200,6 +246,9 @@ function ExpandedMediaEditAttachments( {
 							open={ open }
 							label={ __( 'Replace' ) }
 							showTooltip
+							onFilesDrop={ onFilesDrop }
+							attachment={ attachment }
+							isUploading={ isUploading }
 						>
 							<div className="fields__media-edit-expanded-preview">
 								<VStack
@@ -208,88 +257,137 @@ function ExpandedMediaEditAttachments( {
 									justify="center"
 									className="fields__media-edit-expanded-preview-stack"
 								>
-									<MediaPreview attachment={ attachment } />
-									{ ! hasPreviewImage ? (
-										<MediaTitle attachment={ attachment } />
-									) : (
-										<div className="fields__media-edit-expanded-title">
-											<MediaTitle
-												attachment={ attachment }
-											/>
-										</div>
+									{ ( ! isBlob || hasPreviewImage ) && (
+										<MediaPreview
+											attachment={ attachment }
+										/>
 									) }
+									{ ! isBlob &&
+										( ! hasPreviewImage ? (
+											<MediaTitle
+												attachment={
+													attachment as Attachment< 'view' >
+												}
+											/>
+										) : (
+											<div className="fields__media-edit-expanded-overlay">
+												<div className="fields__media-edit-expanded-title">
+													<MediaTitle
+														attachment={
+															attachment as Attachment< 'view' >
+														}
+													/>
+												</div>
+											</div>
+										) ) }
 								</VStack>
 							</div>
 						</MediaPickerButton>
-						<div className="fields__media-edit-expanded-overlay">
-							<Button
-								__next40pxDefaultSize
-								className="fields__media-edit-expanded-remove"
-								icon={ closeSmall }
-								label={ __( 'Remove' ) }
-								size="small"
-								onClick={ (
-									event: React.MouseEvent< HTMLButtonElement >
-								) => {
-									event.stopPropagation();
-									removeItem( attachment.id );
-								} }
-							/>
-						</div>
+						{ ! isBlob && (
+							<div className="fields__media-edit-expanded-overlay">
+								<Button
+									__next40pxDefaultSize
+									className="fields__media-edit-expanded-remove"
+									icon={ closeSmall }
+									label={ __( 'Remove' ) }
+									size="small"
+									disabled={ isUploading }
+									accessibleWhenDisabled
+									onClick={ (
+										event: React.MouseEvent< HTMLButtonElement >
+									) => {
+										event.stopPropagation();
+										removeItem( attachment.id as number );
+									} }
+								/>
+							</div>
+						) }
 					</div>
 				);
 			} ) }
-			{ ( multiple || ! attachments?.length ) && (
-				<MediaEditPlaceholder open={ open } label={ addButtonLabel } />
+			{ ( multiple || ! allItems?.length ) && (
+				<MediaEditPlaceholder
+					open={ open }
+					label={ addButtonLabel }
+					onFilesDrop={ onFilesDrop }
+					isUploading={ isUploading }
+				/>
 			) }
 		</div>
 	);
 }
 
 function CompactMediaEditAttachments( {
-	attachments,
+	allItems,
 	addButtonLabel,
 	multiple,
 	removeItem,
 	open,
+	onFilesDrop,
+	isUploading,
 }: MediaEditAttachmentsProps ) {
 	return (
 		<>
-			{ !! attachments?.length && (
+			{ !! allItems?.length && (
 				<VStack spacing={ 2 }>
-					{ attachments.map( ( attachment ) => (
-						<div
-							key={ attachment.id }
-							className="fields__media-edit-compact"
-						>
-							<MediaPickerButton
-								open={ open }
-								label={ __( 'Replace' ) }
-								showTooltip
+					{ allItems.map( ( attachment ) => {
+						const isBlob = isBlobURL( attachment.source_url );
+						return (
+							<div
+								key={ attachment.id }
+								className="fields__media-edit-compact"
 							>
-								<>
-									<MediaPreview attachment={ attachment } />
-									<MediaTitle attachment={ attachment } />
-								</>
-							</MediaPickerButton>
-							<Button
-								__next40pxDefaultSize
-								className="fields__media-edit-remove"
-								text={ __( 'Remove' ) }
-								variant="secondary"
-								onClick={ (
-									event: React.MouseEvent< HTMLButtonElement >
-								) => {
-									event.stopPropagation();
-									removeItem( attachment.id );
-								} }
-							/>
-						</div>
-					) ) }
+								<MediaPickerButton
+									open={ open }
+									label={ __( 'Replace' ) }
+									showTooltip
+									onFilesDrop={ onFilesDrop }
+									attachment={ attachment }
+									isUploading={ isUploading }
+								>
+									<>
+										<MediaPreview
+											attachment={ attachment }
+										/>
+										{ ! isBlob && (
+											<MediaTitle
+												attachment={
+													attachment as Attachment< 'view' >
+												}
+											/>
+										) }
+									</>
+								</MediaPickerButton>
+								<Button
+									__next40pxDefaultSize
+									className="fields__media-edit-remove"
+									text={ __( 'Remove' ) }
+									variant="secondary"
+									disabled={ isUploading }
+									accessibleWhenDisabled
+									onClick={ (
+										event: React.MouseEvent< HTMLButtonElement >
+									) => {
+										event.stopPropagation();
+										if (
+											typeof attachment.id === 'number'
+										) {
+											removeItem( attachment.id );
+										}
+									} }
+								/>
+							</div>
+						);
+					} ) }
 				</VStack>
 			) }
-			{ ( multiple || ! attachments?.length ) && (
-				<MediaEditPlaceholder open={ open } label={ addButtonLabel } />
+			{ ( multiple || ! allItems?.length ) && (
+				<MediaEditPlaceholder
+					open={ open }
+					label={ addButtonLabel }
+					onFilesDrop={ onFilesDrop }
+					isUploading={ isUploading }
+				/>
 			) }
 		</>
 	);
@@ -357,6 +455,10 @@ export default function MediaEdit< Item >( {
 		},
 		[ value ]
 	);
+	const { createErrorNotice } = useDispatch( noticesStore );
+	// Support one upload action at a time for now.
+	const [ replacementId, setReplacementId ] = useState< number >();
+	const [ blobs, setBlobs ] = useState< string[] >( [] );
 	const onChangeControl = useCallback(
 		( newValue: number | number[] | undefined ) =>
 			onChange( field.setValue( { item: data, value: newValue } ) ),
@@ -367,9 +469,97 @@ export default function MediaEdit< Item >( {
 		const newIds = currentIds.filter( ( id ) => id !== itemId );
 		onChangeControl( newIds.length ? newIds : undefined );
 	};
+	const onFilesDrop = useCallback(
+		( files: File[], _replacementId?: number ) => {
+			uploadMedia( {
+				allowedTypes: allowedTypes?.length ? allowedTypes : undefined,
+				filesList: files,
+				onFileChange( uploadedMedia: any[] ) {
+					setReplacementId( _replacementId );
+					const { blobItems, uploadedItems } = uploadedMedia.reduce(
+						( accumulator, item ) => {
+							if ( isBlobURL( item.url ) ) {
+								accumulator.blobItems.push( item.url );
+							} else {
+								accumulator.uploadedItems.push( item.id );
+							}
+							return accumulator;
+						},
+						{
+							blobItems: [] as string[],
+							uploadedItems: [] as number[],
+						}
+					);
+					setBlobs( blobItems );
+					// If all uploads are complete reset the replacementId.
+					if ( uploadedItems.length === uploadedMedia.length ) {
+						setReplacementId( undefined );
+					}
+					if ( ! uploadedItems.length ) {
+						return;
+					}
+					if ( ! multiple ) {
+						onChangeControl( uploadedItems[ 0 ] );
+						return;
+					}
+					if ( ! value ) {
+						onChangeControl( uploadedItems );
+						return;
+					}
+					const normalizedValue = Array.isArray( value )
+						? value
+						: [ value ];
+					const newIds = [
+						...( _replacementId
+							? normalizedValue.filter(
+									( id: any ) => id !== _replacementId
+							  )
+							: normalizedValue ),
+						...uploadedItems,
+					];
+					onChangeControl( newIds );
+				},
+				onError( error: Error ) {
+					setReplacementId( undefined );
+					setBlobs( [] );
+					createErrorNotice( error.message, { type: 'snackbar' } );
+				},
+				multiple: !! multiple,
+			} );
+		},
+		[ allowedTypes, value, multiple, createErrorNotice, onChangeControl ]
+	);
 	const addButtonLabel =
 		field.placeholder ||
 		( multiple ? __( 'Choose files' ) : __( 'Choose file' ) );
+	// Merge real attachments with any existing blob items that are being uploaded.
+	const allItems: Array< MediaEditAttachment > | null = useMemo( () => {
+		if ( ! blobs.length ) {
+			return attachments;
+		}
+		const items: Array< MediaEditAttachment > = [
+			...( attachments || [] ),
+		];
+		const blobItems = blobs.map( ( url ) => ( {
+			id: url,
+			source_url: url,
+			mime_type: getBlobTypeByURL( url ),
+		} ) );
+		const replacementIndex = items.findIndex(
+			( a ) => a.id === replacementId
+		);
+		// Place blobs at the replacement index, when files
+		// dropped in existing media item.
+		if ( replacementIndex !== -1 ) {
+			return [
+				...items.slice( 0, replacementIndex ),
+				...blobItems,
+				...items.slice( replacementIndex + 1 ),
+			];
+		}
+		items.push( ...blobItems );
+		return items;
+	}, [ attachments, replacementId, blobs ] );
 	return (
 		<fieldset className="fields__media-edit" data-field-id={ field.id }>
 			<ConditionalMediaUpload
@@ -404,11 +594,13 @@ export default function MediaEdit< Item >( {
 									</BaseControl.VisualLabel>
 								) ) }
 							<AttachmentsComponent
-								attachments={ attachments }
+								allItems={ allItems }
 								addButtonLabel={ addButtonLabel }
 								multiple={ multiple }
 								removeItem={ removeItem }
 								open={ open }
+								onFilesDrop={ onFilesDrop }
+								isUploading={ !! blobs.length }
 							/>
 							{ field.description && (
 								<Text variant="muted">

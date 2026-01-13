@@ -115,7 +115,7 @@
 		"resize-observer-polyfill": "1.5.1",
 		"rimraf": "5.0.10",
 		"sass": "^1.54.0",
-		"sass-embedded": "1.93.2",
+		"sass-embedded": "^1.97.2",
 		"sass-loader": "16.0.3",
 		"semver": "7.5.4",
 		"simple-git": "3.24.0",

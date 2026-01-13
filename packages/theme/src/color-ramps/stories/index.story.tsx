@@ -19,7 +19,7 @@ const ColorGen = ( props: {
 };
 
 const meta: Meta< typeof ColorGen > = {
-	title: 'Design System/Theme Provider/Color Scales',
+	title: 'Design System/Theme/Theme Provider/Color Scales',
 	component: ColorGen,
 	argTypes: {
 		background: {
