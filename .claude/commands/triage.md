@@ -21,13 +21,13 @@ Run the full end-to-end triage pipeline for a Gutenberg issue.
 Execute these steps in sequence:
 
 1. **Parse the issue**
-   - Fetch issue data and extract reproduction steps
+   - Fetch issue data using **parse-issue** skill and extract reproduction steps
    - Check if triage is needed (maintainers may have already confirmed)
    - Write to `.triage/<issue>.parsed.json`
    - **If `needs_triage: false`** → Exit early with explanation
 
 2. **Build a blueprint** (only if triage needed)
-   - Generate Playground blueprint from parsed data
+   - Generate Playground blueprint from parsed data using **build-blueprint** skill
    - Write to `.triage/<issue>.blueprint.json`
 
 3. **Reproduce the bug**

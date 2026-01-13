@@ -1,15 +1,24 @@
 {
   "permissions": {
     "allow": [
-      "WebFetch(domain:github.com)",
-      "WebFetch(domain:raw.githubusercontent.com)",
-      "Bash(gh issue view:*)",
+      "Read",
+      "Write",
+      "Edit",
+      "Glob",
+      "Grep",
+      "WebFetch",
+      "Bash(gh:*)",
       "Bash(brew list:*)",
       "Bash(python3:*)",
-      "Bash(node -e:*)",
-      "Bash(npx yaml-lint:*)",
+      "Bash(node:*)",
       "Bash(npx:*)",
-      "Bash(chmod:*)"
+      "Bash(chmod:*)",
+      "Bash(pkill:*)",
+      "Bash(curl:*)",
+      "Bash(ls:*)",
+      "Bash(mkdir:*)",
+      "Bash(cp:*)",
+      "mcp__playwright"
     ]
   }
 }
