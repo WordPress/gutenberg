@@ -568,6 +568,19 @@ _Returns_
 
 Returns the currently hovered block.
 
+### getInheritedAllowedBlocks
+
+Returns the inherited allowedBlocks from the nearest ancestor that has inheritAllowedBlocks enabled. Returns null if no ancestor has this setting.
+
+_Parameters_
+
+-   _state_ `Object`: Editor state.
+-   _rootClientId_ `?string`: Optional root client ID of block list.
+
+_Returns_
+
+-   `Array?`: The inherited allowed blocks array, or null if none.
+
 ### getInserterItems
 
 Determines the items that appear in the inserter. Includes both static items (e.g. a regular block type) and dynamic items (e.g. a reusable block).

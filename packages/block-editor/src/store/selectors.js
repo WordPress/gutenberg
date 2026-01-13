@@ -1763,6 +1763,23 @@ const canInsertBlockTypeUnmemoized = (
 		}
 	}
 
+	// Check for inherited allowedBlocks from ancestors with inheritAllowedBlocks enabled.
+	// Override the existing allowedBlocks for the current block with the ones provided for the parent.
+	const inheritedAllowedBlocks = getInheritedAllowedBlocks(
+		state,
+		rootClientId
+	);
+
+	if ( inheritedAllowedBlocks ) {
+		const isInheritedAllowed = checkAllowList(
+			inheritedAllowedBlocks,
+			blockName
+		);
+		if ( isInheritedAllowed === false ) {
+			return false;
+		}
+	}
+
 	const blockAllowedParentBlocks = blockType.parent;
 	const hasBlockAllowedParent = checkAllowList(
 		blockAllowedParentBlocks,
@@ -2754,6 +2771,35 @@ export const __experimentalGetPatternTransformItems = createRegistrySelector(
 export function getBlockListSettings( state, clientId ) {
 	return state.blockListSettings[ clientId ];
 }
+
+/**
+ * Returns the inherited allowedBlocks from the nearest ancestor that has
+ * inheritAllowedBlocks enabled. Returns null if no ancestor has this setting.
+ *
+ * @param {Object}  state        Editor state.
+ * @param {?string} rootClientId Optional root client ID of block list.
+ *
+ * @return {Array?} The inherited allowed blocks array, or null if none.
+ */
+export const getInheritedAllowedBlocks = createSelector(
+	( state, rootClientId ) => {
+		if ( ! rootClientId ) {
+			return null;
+		}
+
+		// Traverse up the tree starting from the parent
+		const parents = getBlockParents( state, rootClientId, true ); // ascending order (closest first)
+
+		for ( const parentId of parents ) {
+			const settings = getBlockListSettings( state, parentId );
+			if ( settings?.inheritAllowedBlocks && settings?.allowedBlocks ) {
+				return settings.allowedBlocks;
+			}
+		}
+		return null;
+	},
+	( state ) => [ state.blocks.parents, state.blockListSettings ]
+);
 
 /**
  * Returns the editor settings.
