@@ -32,7 +32,6 @@ export default function SnackbarNotices( { className }: SnackbarNoticesProps ) {
 
 	return (
 		<SnackbarList
-			// @ts-expect-error - SnackbarList is not typed properly.
 			notices={ snackbarNotices }
 			className={ clsx( 'components-notices__snackbar', className ) }
 			onRemove={ removeNotice }

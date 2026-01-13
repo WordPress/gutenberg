@@ -154,7 +154,7 @@ function Layout() {
 						</NavigableRegion>
 					) }
 
-					<SnackbarNotices className="components-notices__snackbar" />
+					<SnackbarNotices className="edit-site-layout__snackbar" />
 
 					{ isMobileViewport && areas.mobile && (
 						<div className="edit-site-layout__mobile">

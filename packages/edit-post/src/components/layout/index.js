@@ -658,7 +658,7 @@ function Layout( {
 						<PluginArea onError={ onPluginAreaError } />
 						<PostEditorMoreMenu />
 						{ backButton }
-						<SnackbarNotices className="components-notices__snackbar" />
+						<SnackbarNotices className="edit-post-layout__snackbar" />
 					</Editor>
 				</div>
 			</ErrorBoundary>
