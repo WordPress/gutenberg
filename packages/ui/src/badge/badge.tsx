@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { forwardRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { Box } from '../box';
 import { type BoxProps } from '../box/types';
 import { type BadgeProps } from './types';

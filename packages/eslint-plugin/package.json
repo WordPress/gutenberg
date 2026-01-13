@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/eslint-plugin",
-	"version": "22.22.0",
+	"version": "23.0.0",
 	"description": "ESLint plugin for WordPress development.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -57,6 +57,7 @@
 		"requireindex": "^1.2.0"
 	},
 	"devDependencies": {
+		"@types/eslint": "^8",
 		"@types/estree": "1.0.5"
 	},
 	"peerDependencies": {

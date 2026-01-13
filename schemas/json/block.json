@@ -492,6 +492,11 @@
 									"type": "boolean",
 									"default": true
 								},
+								"allowWrap": {
+									"description": "For the `flex` layout type only, determines display of the wrap toggle in the block sidebar.",
+									"type": "boolean",
+									"default": true
+								},
 								"allowCustomContentAndWideSize": {
 									"description": "For the `constrained` layout type only, determines display of the custom content and wide size controls in the block sidebar.",
 									"type": "boolean",

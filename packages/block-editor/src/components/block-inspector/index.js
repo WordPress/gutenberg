@@ -375,10 +375,8 @@ const BlockInspectorSingleBlock = ( {
 					{ hasBlockStyles && (
 						<BlockStyles clientId={ renderedBlockClientId } />
 					) }
-					<ContentTab
-						rootClientId={ renderedBlockClientId }
-						contentClientIds={ contentClientIds }
-					/>
+					<ContentTab contentClientIds={ contentClientIds } />
+					<InspectorControls.Slot group="content" />
 					{ ! isSectionBlock && (
 						<StyleInspectorSlots
 							blockName={ blockName }

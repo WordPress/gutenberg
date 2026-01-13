@@ -2,4 +2,5 @@ build
 build-style
 node_modules
 packages/stylelint-config/test
+packages/theme/src/prebuilt
 packages/theme/src/stylelint-plugins/test/fixtures
