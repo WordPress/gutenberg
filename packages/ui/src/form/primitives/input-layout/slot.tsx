@@ -29,7 +29,7 @@ export const InputLayoutSlot = forwardRef<
 			className={ clsx(
 				styles[ 'input-layout-slot' ],
 				styles[ `is-${ type }` ],
-				padding !== 'default' && styles[ `is-padding-${ padding }` ]
+				styles[ `is-padding-${ padding }` ]
 			) }
 			{ ...restProps }
 		/>
