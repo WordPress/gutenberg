@@ -327,6 +327,9 @@ export function processItem( id: QueueItemId ) {
 			// All other side-loaded items have been removed, so remove the parent too.
 			if ( parentId && batchId && select.isBatchUploaded( batchId ) ) {
 				const parentItem = select.getItem( parentId ) as QueueItem;
+				if ( ! parentItem ) {
+					return;
+				}
 
 				if ( attachment ) {
 					parentItem.onSuccess?.( [ attachment ] );
