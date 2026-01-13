@@ -63,6 +63,7 @@
 		"typography": {
 			"fontSize": true,
 			"__experimentalFontFamily": true,
+			"textAlign": true,
 			"__experimentalDefaultControls": {
 				"fontSize": true
 			}
@@ -74,8 +75,8 @@
 				"flexWrap": "nowrap"
 			},
 			"allowVerticalAlignment": true,
+			"allowJustification": true,
 			"allowSwitching": false,
-			"allowJustification": false,
 			"allowOrientation": false,
 			"allowWrap": false
 		},
