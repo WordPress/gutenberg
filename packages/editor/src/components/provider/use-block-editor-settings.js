@@ -72,6 +72,7 @@ const BLOCK_EDITOR_SETTINGS = [
 	'imageDefaultSize',
 	'imageDimensions',
 	'imageEditing',
+	'imageSizes',
 	'allImageSizes',
 	'isPreviewMode',
 	'isRTL',
