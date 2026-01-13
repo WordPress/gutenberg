@@ -158,6 +158,7 @@ export function addItem( {
 					url: blobUrl,
 				},
 				additionalData: {
+					generate_sub_sizes: false,
 					convert_format: false,
 					...additionalData,
 				},
