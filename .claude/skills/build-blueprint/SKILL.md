@@ -171,7 +171,7 @@ CUSTOMIZATIONS APPLIED:
 - Additional steps: <list if any>
 
 PLAYGROUND CLI COMMAND:
-./bin/playground.sh start --blueprint=.triage/<issue>.blueprint.json
+.claude/bin/playground.sh start --blueprint=.triage/<issue>/<issue>.blueprint.json
 ```
 
 ---

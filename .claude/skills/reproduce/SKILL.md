@@ -63,7 +63,7 @@ mkdir -p .triage/<issue>/screenshots
 Start Playground with the blueprint:
 
 ```bash
-.claude/bin/playground.sh start .triage/<issue>.blueprint.json
+.claude/bin/playground.sh start --blueprint=.triage/<issue>/<issue>.blueprint.json
 ```
 
 Get Playground URL from running instance and initialize Playwright browser.
@@ -150,7 +150,7 @@ CONCLUSION:
 Stop the Playground instance:
 
 ```bash
-./bin/playground.sh stop
+.claude/bin/playground.sh stop
 ```
 
 ---
