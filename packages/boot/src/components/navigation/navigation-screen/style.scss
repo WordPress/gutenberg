@@ -32,3 +32,10 @@
 	display: flex;
 	flex-shrink: 0;
 }
+
+.boot-navigation-screen__description {
+	padding: 0 variables.$grid-unit-20 variables.$grid-unit-15;
+	color: var(--wpds-color-fg-content-neutral-weak, #757575);
+	font-size: 13px;
+	line-height: 1.5;
+}

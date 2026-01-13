@@ -1,44 +1,45 @@
 /**
  * WordPress dependencies
  */
-import {
-	useState,
-	useCallback,
-	useMemo,
-	useRef,
-	useEffect,
-} from '@wordpress/element';
+import { useState, useCallback, useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { useEntityRecord } from '@wordpress/core-data';
-import {
-	Notice,
-	Spinner,
-	__experimentalVStack as VStack,
-} from '@wordpress/components';
+import { useEntityRecord, store as coreStore } from '@wordpress/core-data';
+import { useDispatch } from '@wordpress/data';
+import { store as noticesStore } from '@wordpress/notices';
+import { ExternalLink } from '@wordpress/components';
 import { Page } from '@wordpress/admin-ui';
+import { check, closeSmall } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
-import CategorySection from './components/category-section';
+import { DataViews, filterSortAndPaginate } from '@wordpress/dataviews';
+import type { View, Field, Action } from '@wordpress/dataviews';
 import './style.scss';
 
 /**
- * Category labels and order.
+ * Layout constant.
  */
-const CATEGORY_CONFIG = {
-	blocks: { label: __( 'Blocks' ) },
-	editor: { label: __( 'Editor' ) },
-	advanced: { label: __( 'Advanced' ) },
-};
-
-const CATEGORY_ORDER = [ 'blocks', 'editor', 'advanced' ];
+const LAYOUT_TABLE = 'table';
 
 /**
- * Get experiment definitions.
+ * Experiment type definition.
+ */
+interface Experiment {
+	id: string;
+	name: string;
+	description: string;
+	category: 'blocks' | 'editor' | 'advanced';
+	enabled: boolean;
+	warning?: string;
+	learnMore?: string;
+}
+
+/**
+ * Get experiment definitions from window.
  * These are registered via the init module.
  */
-function getExperimentDefinitions() {
+function getExperimentDefinitions(): Experiment[] {
 	return ( window as any ).gutenbergExperimentDefinitions || [];
 }
 
@@ -46,39 +47,37 @@ function getExperimentDefinitions() {
  * Main experiments page stage component.
  */
 function Stage() {
-	const [ savingIds, setSavingIds ] = useState< Set< string > >( new Set() );
-	const [ notice, setNotice ] = useState< {
-		status: 'success' | 'error';
-		message: string;
-	} | null >( null );
-	const [ recentlySaved, setRecentlySaved ] = useState<
-		Map< string, 'enabled' | 'disabled' >
-	>( new Map() );
-
+	const [ selection, setSelection ] = useState< string[] >( [] );
+	const { createSuccessNotice } = useDispatch( noticesStore );
+	const { saveEntityRecord } = useDispatch( coreStore );
 	const experimentDefs = getExperimentDefinitions();
 
-	// Track timeout IDs for cleanup on unmount.
-	const timeoutIdsRef = useRef<
-		Map< string, ReturnType< typeof setTimeout > >
-	>( new Map() );
+	// DataViews view state.
+	const [ view, setView ] = useState< View >( {
+		type: LAYOUT_TABLE,
+		search: '',
+		page: 1,
+		perPage: 50,
+		filters: [],
+		fields: [ 'status' ],
+		titleField: 'name',
+		descriptionField: 'description',
+		layout: {
+			styles: {
+				status: {
+					width: '1%',
+					minWidth: '80px',
+					maxWidth: '100px',
+				},
+			},
+		},
+	} );
 
-	// Cleanup all timeouts on unmount.
-	useEffect( () => {
-		const timeoutIds = timeoutIdsRef.current;
-		return () => {
-			timeoutIds.forEach( ( timeoutId ) => clearTimeout( timeoutId ) );
-			timeoutIds.clear();
-		};
-	}, [] );
-
-	// Use core-data to read/write the gutenberg-experiments setting.
-	const {
-		record: siteSettings,
-		hasResolved,
-		hasResolvedError,
-		save,
-		edit,
-	} = useEntityRecord( 'root', 'site' );
+	// Use core-data to read the gutenberg-experiments setting.
+	const { record: siteSettings, hasResolved } = useEntityRecord(
+		'root',
+		'site'
+	);
 
 	// Get current experiment values from settings.
 	const gutenbergExperiments = useMemo( () => {
@@ -86,131 +85,156 @@ function Stage() {
 	}, [ siteSettings ] );
 
 	// Merge experiment definitions with current values.
-	const experiments = useMemo( () => {
+	const experiments: Experiment[] = useMemo( () => {
 		if ( ! experimentDefs || ! hasResolved ) {
 			return [];
 		}
-		return experimentDefs.map( ( exp: any ) => ( {
+		return experimentDefs.map( ( exp ) => ( {
 			...exp,
 			enabled: Boolean( gutenbergExperiments[ exp.id ] ),
 		} ) );
 	}, [ experimentDefs, gutenbergExperiments, hasResolved ] );
 
-	// Update a single experiment.
-	const updateExperiment = useCallback(
-		async ( experimentId: string, enabled: boolean ) => {
-			setSavingIds( ( prev ) => new Set( prev ).add( experimentId ) );
+	// Bulk update experiments.
+	const updateExperiments = useCallback(
+		async ( experimentIds: string[], enabled: boolean ) => {
+			const newExperiments = { ...gutenbergExperiments };
 
-			try {
-				// Build the new experiments object.
-				const newExperiments = {
-					...gutenbergExperiments,
-					[ experimentId ]: enabled,
-				};
-
-				// If disabling, remove the key entirely (cleaner storage).
-				if ( ! enabled ) {
+			for ( const experimentId of experimentIds ) {
+				if ( enabled ) {
+					newExperiments[ experimentId ] = true;
+				} else {
 					delete newExperiments[ experimentId ];
 				}
-
-				// Use edit + save for core-data.
-				edit( { 'gutenberg-experiments': newExperiments } );
-				await save();
-
-				// Show success animation on the icon.
-				setRecentlySaved( ( prev ) => {
-					const next = new Map( prev );
-					next.set( experimentId, enabled ? 'enabled' : 'disabled' );
-					return next;
-				} );
-
-				// Clear any existing timeout for this experiment.
-				if ( timeoutIdsRef.current.has( experimentId ) ) {
-					clearTimeout( timeoutIdsRef.current.get( experimentId ) );
-				}
-
-				// Set timeout to clear the saved indicator.
-				const timeoutId = setTimeout( () => {
-					setRecentlySaved( ( prev ) => {
-						const next = new Map( prev );
-						next.delete( experimentId );
-						return next;
-					} );
-					timeoutIdsRef.current.delete( experimentId );
-				}, 1500 );
-
-				timeoutIdsRef.current.set( experimentId, timeoutId );
-			} catch ( error ) {
-				setNotice( {
-					status: 'error',
-					message: __( 'Failed to save setting.' ),
-				} );
-			} finally {
-				setSavingIds( ( prev ) => {
-					const next = new Set( prev );
-					next.delete( experimentId );
-					return next;
-				} );
 			}
+
+			// Save directly without going through edit() to avoid dirty tracking.
+			await saveEntityRecord( 'root', 'site', {
+				'gutenberg-experiments': newExperiments,
+			} );
+
+			// Show toast notification.
+			const count = experimentIds.length;
+			const message = enabled
+				? count === 1
+					? __( 'Experiment enabled.' )
+					: __( 'Experiments enabled.' )
+				: count === 1
+					? __( 'Experiment disabled.' )
+					: __( 'Experiments disabled.' );
+
+			createSuccessNotice( message, { type: 'snackbar' } );
+
+			// Clear selection after action.
+			setSelection( [] );
 		},
-		[ gutenbergExperiments, edit, save ]
+		[ gutenbergExperiments, saveEntityRecord, createSuccessNotice ]
 	);
 
-	// Handle toggle.
-	const handleToggle = useCallback(
-		( experimentId: string, newValue: boolean ) =>
-			updateExperiment( experimentId, newValue ),
-		[ updateExperiment ]
-	);
-
-	// Group experiments by category.
-	const groupedExperiments = useMemo( () => {
-		return CATEGORY_ORDER.reduce(
-			( acc, category ) => {
-				const categoryExperiments = experiments.filter(
-					( exp: any ) => exp.category === category
-				);
-				if ( categoryExperiments.length > 0 ) {
-					acc[ category ] = categoryExperiments;
-				}
-				return acc;
+	// Define actions - primary actions show on hover, bulk actions in footer.
+	const actions: Action< Experiment >[] = useMemo(
+		() => [
+			{
+				id: 'enable',
+				label: __( 'Enable' ),
+				icon: check,
+				isPrimary: true,
+				supportsBulk: true,
+				isEligible: ( item ) => ! item.enabled,
+				callback: async ( items ) => {
+					await updateExperiments(
+						items.map( ( item ) => item.id ),
+						true
+					);
+				},
 			},
-			{} as Record< string, any[] >
-		);
-	}, [ experiments ] );
+			{
+				id: 'disable',
+				label: __( 'Disable' ),
+				icon: closeSmall,
+				isPrimary: true,
+				supportsBulk: true,
+				isEligible: ( item ) => item.enabled,
+				callback: async ( items ) => {
+					await updateExperiments(
+						items.map( ( item ) => item.id ),
+						false
+					);
+				},
+			},
+		],
+		[ updateExperiments ]
+	);
 
-	// Count enabled experiments.
-	const enabledCount = experiments.filter(
-		( exp: any ) => exp.enabled
-	).length;
+	// Define fields for DataViews.
+	const fields: Field< Experiment >[] = useMemo(
+		() => [
+			{
+				id: 'name',
+				label: __( 'Experiment' ),
+				type: 'text' as const,
+				enableGlobalSearch: true,
+				enableHiding: false,
+				enableSorting: true,
+				getValue: ( { item }: { item: Experiment } ) => item.name,
+			},
+			{
+				id: 'description',
+				label: __( 'Description' ),
+				type: 'text' as const,
+				enableGlobalSearch: true,
+				enableHiding: true,
+				getValue: ( { item }: { item: Experiment } ) => {
+					let text = item.description;
+					if ( item.learnMore ) {
+						text += ` →`;
+					}
+					return text;
+				},
+				render: ( { item }: { item: Experiment } ) => (
+					<span className="experiments-description">
+						{ item.description }
+						{ item.learnMore && (
+							<>
+								{ ' ' }
+								<ExternalLink href={ item.learnMore }>
+									{ __( 'Learn more' ) }
+								</ExternalLink>
+							</>
+						) }
+					</span>
+				),
+			},
+			{
+				id: 'status',
+				label: __( 'Status' ),
+				type: 'text' as const,
+				enableHiding: false,
+				enableSorting: true,
+				getValue: ( { item }: { item: Experiment } ) =>
+					item.enabled ? 'enabled' : 'disabled',
+				render: ( { item }: { item: Experiment } ) => (
+					<span
+						className={ `experiments-status-cell experiments-status ${
+							item.enabled
+								? 'experiments-status--enabled'
+								: 'experiments-status--disabled'
+						}` }
+					>
+						{ item.enabled ? __( 'Enabled' ) : __( 'Disabled' ) }
+					</span>
+				),
+			},
+		],
+		[]
+	);
+
+	// Filter, sort, and paginate data.
+	const { data: processedData, paginationInfo } = useMemo( () => {
+		return filterSortAndPaginate( experiments, view, fields );
+	}, [ experiments, view, fields ] );
 
 	const isLoading = ! hasResolved;
-
-	// Handle error state when settings fail to load.
-	if ( hasResolved && hasResolvedError ) {
-		return (
-			<Page title={ __( 'Experimental Settings' ) } hasPadding>
-				<Notice status="error" isDismissible={ false }>
-					{ __(
-						'Could not load experiment settings. Please refresh the page or try again later.'
-					) }
-				</Notice>
-			</Page>
-		);
-	}
-
-	// Handle case where settings resolved but record is empty/invalid.
-	if ( hasResolved && ! siteSettings ) {
-		return (
-			<Page title={ __( 'Experimental Settings' ) } hasPadding>
-				<Notice status="error" isDismissible={ false }>
-					{ __(
-						'Unable to access site settings. Please ensure you have the required permissions.'
-					) }
-				</Notice>
-			</Page>
-		);
-	}
 
 	return (
 		<Page
@@ -218,67 +242,25 @@ function Stage() {
 			subTitle={ __(
 				"The block editor includes experimental features that are usable while they're in development. Select the ones you'd like to enable. These features are likely to change, so avoid using them in production."
 			) }
-			badges={
-				! isLoading ? (
-					<>
-						<span className="experiments-badge">
-							{ experiments.length } { __( 'experiments' ) }
-						</span>
-						<span className="experiments-badge experiments-badge--enabled">
-							{ enabledCount } { __( 'enabled' ) }
-						</span>
-					</>
-				) : null
-			}
 			className="experiments-page"
 		>
-			<div className="experiments-page__content">
-				{ notice && (
-					<Notice
-						status={ notice.status }
-						isDismissible
-						onRemove={ () => setNotice( null ) }
-						className="experiments-page__notice"
-					>
-						{ notice.message }
-					</Notice>
-				) }
-
-				{ isLoading ? (
-					<VStack
-						className="experiments-page__loading"
-						alignment="center"
-						justify="center"
-						spacing={ 4 }
-					>
-						<Spinner />
-						<span>{ __( 'Loading experiments…' ) }</span>
-					</VStack>
-				) : (
-					<VStack
-						className="experiments-page__categories"
-						spacing={ 8 }
-					>
-						{ Object.entries( groupedExperiments ).map(
-							( [ category, categoryExperiments ] ) => (
-								<CategorySection
-									key={ category }
-									categoryKey={ category }
-									categoryData={
-										CATEGORY_CONFIG[
-											category as keyof typeof CATEGORY_CONFIG
-										]
-									}
-									experiments={ categoryExperiments }
-									onToggle={ handleToggle }
-									savingIds={ savingIds }
-									recentlySaved={ recentlySaved }
-								/>
-							)
-						) }
-					</VStack>
-				) }
-			</div>
+					<DataViews
+						data={ processedData }
+						fields={ fields }
+						view={ view }
+						onChangeView={ setView }
+						paginationInfo={ paginationInfo }
+						defaultLayouts={ {
+							[ LAYOUT_TABLE ]: {},
+						} }
+						actions={ actions }
+						getItemId={ ( item ) => item.id }
+						isLoading={ isLoading }
+						search
+						searchLabel={ __( 'Search experiments' ) }
+						selection={ selection }
+						onChangeSelection={ setSelection }
+					/>
 		</Page>
 	);
 }

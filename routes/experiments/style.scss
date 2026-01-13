@@ -2,304 +2,51 @@
 @use "@wordpress/base-styles/colors" as *;
 @use "@wordpress/base-styles/variables" as *;
 
-// Animations
-@keyframes fadeInUp {
-	from {
-		opacity: 0;
-		transform: translateY(20px);
-	}
-	to {
-		opacity: 1;
-		transform: translateY(0);
-	}
-}
-
-@keyframes checkPop {
-	0% {
-		transform: scale(0);
-		opacity: 0;
-	}
-	50% {
-		transform: scale(1.2);
-	}
-	100% {
-		transform: scale(1);
-		opacity: 1;
-	}
-}
-
-// Badges in page header
-.experiments-badge {
-	display: inline-flex;
-	align-items: center;
-	font-size: 13px;
-	font-weight: 500;
-	padding: 4px 12px;
-	border-radius: 100px;
-	background: $gray-100;
-	color: $gray-700;
-	margin-right: 8px;
-
-	&--enabled {
-		color: var(--wp-admin-theme-color);
-	}
-}
-
+// Table adjustments
 .experiments-page {
-	&__content {
-		padding: 24px;
-		max-width: 1400px;
+	// Hide actions column header label
+	.dataviews-view-table__actions-column .dataviews-view-table-header {
+		visibility: hidden;
+		width: 0;
 	}
 
-	&__notice {
-		margin-bottom: 24px;
-		animation: fadeInUp 0.3s ease-out;
+	// Remove border before actions column
+	.dataviews-view-table__actions-column--stuck::after,
+	.dataviews-view-table__actions-column::after {
+		display: none !important;
 	}
 
-	&__loading {
-		padding: 80px;
-		color: $gray-700;
-	}
-
-	&__categories {
-		// VStack handles spacing via the spacing prop
+	// Allow description to wrap
+	.experiments-description {
+		white-space: normal;
 	}
 }
 
-.experiments-category {
-	&__header {
-		display: flex;
-		align-items: baseline;
-		gap: 12px;
-		margin-bottom: 16px;
-		padding-bottom: 8px;
-		border-bottom: 2px solid $gray-100;
-	}
+// Description field
+.experiments-description {
+	font-size: 13px;
+	color: $gray-700;
 
-	&__title {
-		font-size: 1.25rem;
-		font-weight: 600;
-		margin: 0;
-		color: $gray-900;
-	}
-
-	&__count {
+	.components-external-link {
 		font-size: 13px;
-		font-weight: 500;
-		color: $gray-700;
-		background: $gray-100;
-		padding: 2px 10px;
-		border-radius: 12px;
-	}
-
-	&__grid {
-		display: grid;
-		grid-template-columns: repeat(3, 1fr);
-		gap: 20px;
-
-		@media (max-width: 1200px) {
-			grid-template-columns: repeat(2, 1fr);
-		}
-
-		@media (max-width: 782px) {
-			grid-template-columns: 1fr;
-			gap: 16px;
-		}
 	}
 }
 
-.experiment-card {
-	height: 100%;
-	display: flex;
-	flex-direction: column;
-	transition: border-color 0.2s ease;
-	border: $border-width solid $gray-200;
-	border-radius: 8px;
-	overflow: hidden;
+// Status badge
+.experiments-status {
+	display: inline-block;
+	font-size: 12px;
+	font-weight: 500;
+	padding: 4px 10px;
+	border-radius: 4px;
 
 	&--enabled {
-		border-color: var(--wp-admin-theme-color);
+		background: rgba($alert-green, 0.1);
+		color: color.adjust($alert-green, $lightness: -15%);
 	}
 
-	&--saving {
-		pointer-events: none;
-	}
-
-	// Use component class for specificity
-	&.components-card &__header,
-	&__header.components-card__header {
-		padding: 16px;
+	&--disabled {
 		background: $gray-100;
-		border-bottom: $border-width solid $gray-100;
-	}
-
-	&__icon-wrapper {
-		flex-shrink: 0;
-	}
-
-	&__icon {
-		position: relative;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		width: 36px;
-		height: 36px;
-		border-radius: 8px;
-		background: $gray-200;
 		color: $gray-700;
-		transition: background 0.2s ease, color 0.2s ease;
-
-		svg {
-			fill: currentColor;
-		}
-
-		&--active {
-			background: var(--wp-admin-theme-color);
-			color: $white;
-		}
-	}
-
-	&__title-wrapper {
-		flex: 1;
-		min-width: 0;
-	}
-
-	&__title {
-		font-size: 14px;
-		font-weight: 600;
-		margin: 0;
-		line-height: 1.4;
-		color: $gray-900;
-	}
-
-	&__toggle-wrapper {
-		flex-shrink: 0;
-	}
-
-	&__toggle-container {
-		min-width: 50px;
-		min-height: 28px;
-		display: flex;
-		align-items: center;
-		justify-content: flex-end;
-
-		// Override default ToggleControl margin
-		.components-toggle-control {
-			margin-bottom: 0;
-		}
-
-		// Hide the label since we have our own title
-		.components-toggle-control__label {
-			display: none;
-		}
-	}
-
-	&__spinner {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-
-		.components-spinner {
-			margin: 0;
-		}
-	}
-
-	&__saved-indicator {
-		position: absolute;
-		bottom: -4px;
-		right: -4px;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		width: 18px;
-		height: 18px;
-		border-radius: 50%;
-		color: $white;
-		animation: checkPop 0.3s ease-out;
-		border: 2px solid $white;
-
-		svg {
-			fill: currentColor;
-		}
-
-		&--enabled {
-			background: $alert-green;
-		}
-
-		&--disabled {
-			background: var(--wp-admin-theme-color);
-		}
-	}
-
-	// Use component class for specificity
-	&.components-card &__body,
-	&__body.components-card__body {
-		flex: 1;
-		padding: 16px;
-	}
-
-	&__description {
-		font-size: 13px;
-		line-height: 1.5;
-		color: $gray-900;
-		opacity: 0.85;
-		display: block;
-	}
-
-	&__warning {
-		margin-top: 12px;
-		padding: 10px 12px;
-		background: rgba($alert-red, 0.06);
-		border-left: 3px solid $alert-red;
-		border-radius: 0 6px 6px 0;
-
-		.components-text {
-			font-size: 12px;
-			line-height: 1.4;
-			color: color.adjust($alert-red, $lightness: -15%);
-		}
-	}
-
-}
-
-// Responsive adjustments
-@media (max-width: 782px) {
-	.experiments-page__content {
-		padding: 16px;
-	}
-
-	.experiments-category {
-		&__header {
-			gap: 10px;
-			margin-bottom: 12px;
-		}
-
-		&__title {
-			font-size: 1.1rem;
-		}
-	}
-
-	.experiment-card {
-		&.components-card .experiment-card__header,
-		.experiment-card__header.components-card__header {
-			padding: 12px;
-		}
-
-		&__icon {
-			width: 32px;
-			height: 32px;
-		}
-
-		&.components-card .experiment-card__body,
-		.experiment-card__body.components-card__body {
-			padding: 12px;
-		}
-	}
-}
-
-// Reduced motion preference
-@media (prefers-reduced-motion: reduce) {
-	.experiment-card__saved-indicator {
-		animation: none;
 	}
 }
