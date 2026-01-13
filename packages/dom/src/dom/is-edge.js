@@ -41,6 +41,13 @@ export default function isEdge( container, isReverse, onlyVertical = false ) {
 		return true;
 	}
 
+	// If the container has no text content, the cursor is at both edges.
+	// This handles empty contenteditable elements where browsers may have
+	// difficulty determining caret position via caretRangeFromPoint.
+	if ( container.textContent === '' ) {
+		return true;
+	}
+
 	const { ownerDocument } = container;
 	const { defaultView } = ownerDocument;
 
