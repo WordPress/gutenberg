@@ -104,10 +104,4 @@ export const block = css`
 export const VisualLabelWrapper = styled.div`
 	// Makes the inline label be the correct height, equivalent to setting line-height: 0
 	display: flex;
-
-	> * {
-		overflow: hidden;
-		text-overflow: ellipsis;
-		white-space: nowrap;
-	}
 `;
