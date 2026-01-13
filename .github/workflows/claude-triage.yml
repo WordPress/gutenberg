@@ -1,0 +1,58 @@
+name: Claude Issue Triage
+
+on:
+    issues:
+        types: [opened]
+    issue_comment:
+        types: [created]
+
+# Disable permissions for all available scopes by default.
+# Any needed permissions should be configured at the job level.
+permissions: {}
+
+jobs:
+    triage:
+        runs-on: ubuntu-latest
+        permissions:
+            contents: read
+            issues: write
+            pull-requests: write
+        # Run on new issues OR when @claude is mentioned in a comment
+        if: |
+            github.event_name == 'issues' ||
+            (github.event_name == 'issue_comment' && contains(github.event.comment.body, '@claude'))
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+              with:
+                  fetch-depth: 1
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
+
+            - name: Install Playwright browsers
+              run: npx playwright install --with-deps firefox
+
+            - name: Create MCP config for CI
+              run: |
+                  cat > /tmp/mcp-config.json << 'EOF'
+                  {
+                    "mcpServers": {
+                      "playwright": {
+                        "command": "npx",
+                        "args": ["-y", "@playwright/mcp", "--headless", "--browser=firefox"]
+                      },
+                      "context7": {
+                        "command": "npx",
+                        "args": ["-y", "@context7/mcp"]
+                      }
+                    }
+                  }
+                  EOF
+
+            - name: Run Claude Triage
+              uses: anthropics/claude-code-action@v1
+              with:
+                  anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+                  prompt: "/triage ${{ github.event.issue.number }}"
+                  claude_args: |
+                      --mcp-config /tmp/mcp-config.json
+                      --allowedTools "mcp__playwright,mcp__context7"

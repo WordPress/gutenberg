@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "Bash(gh issue view:*)",
+      "Bash(brew list:*)",
+      "Bash(python3:*)",
+      "Bash(node -e:*)",
+      "Bash(npx yaml-lint:*)",
+      "Bash(npx:*)"
+    ]
+  }
+}
