@@ -72,7 +72,7 @@ const BLOCK_EDITOR_SETTINGS = [
 	'imageDefaultSize',
 	'imageDimensions',
 	'imageEditing',
-	'imageSizes',
+	'allImageSizes',
 	'isPreviewMode',
 	'isRTL',
 	'locale',
@@ -130,7 +130,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		restBlockPatternCategories,
 		sectionRootClientId,
 		deviceType,
-		imageSizes,
+		allImageSizes,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -200,7 +200,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 				restBlockPatternCategories: getBlockPatternCategories(),
 				sectionRootClientId: getSectionRootBlock(),
 				deviceType: getDeviceType(),
-				imageSizes: baseData?.image_sizes,
+				allImageSizes: baseData?.image_sizes,
 			};
 		},
 		[ postType, postId, isLargeViewport, renderingMode ]
@@ -343,7 +343,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 				: undefined,
 			mediaUpload: hasUploadPermissions ? mediaUpload : undefined,
 			mediaSideload: hasUploadPermissions ? mediaSideload : undefined,
-			imageSizes: hasUploadPermissions ? imageSizes : undefined,
+			allImageSizes: hasUploadPermissions ? allImageSizes : undefined,
 			__experimentalBlockPatterns: blockPatterns,
 			[ selectBlockPatternsKey ]: ( select ) => {
 				const { hasFinishedResolution, getBlockPatternsForPostType } =
@@ -427,7 +427,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		editMediaEntity,
 		wrappedOnNavigateToEntityRecord,
 		deviceType,
-		imageSizes,
+		allImageSizes,
 	] );
 }
 

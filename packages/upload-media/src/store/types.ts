@@ -157,7 +157,7 @@ export interface Settings {
 	// Maximum number of concurrent uploads.
 	maxConcurrentUploads: number;
 	// Registered image sizes from the server.
-	imageSizes?: Record< string, ImageSizeCrop >;
+	allImageSizes?: Record< string, ImageSizeCrop >;
 }
 
 // Must match the Attachment type from the media-utils package.

@@ -73,15 +73,17 @@ export function getSettings( state: State ): Settings {
  *
  * @return Image sizes record.
  */
-export function getImageSizes( state: State ): Record< string, ImageSizeCrop > {
-	return state.settings.imageSizes ?? {};
+export function getAllImageSizes(
+	state: State
+): Record< string, ImageSizeCrop > {
+	return state.settings.allImageSizes ?? {};
 }
 
 /**
  * Returns a specific image size by name.
  *
  * @param state Upload state.
- * @param name  Image size name.
+ * @param name  Image size name.z
  *
  * @return Image size configuration or undefined if not found.
  */
@@ -89,5 +91,5 @@ export function getImageSize(
 	state: State,
 	name: string
 ): ImageSizeCrop | undefined {
-	return state.settings.imageSizes?.[ name ];
+	return state.settings.allImageSizes?.[ name ];
 }
