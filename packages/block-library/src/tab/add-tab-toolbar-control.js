@@ -72,11 +72,11 @@ export default function AddTabToolbarControl( { tabsClientId } ) {
 				editorActiveTabIndex: nextTabIndex - 1,
 			} );
 		}
-
-		// Select the tabs-menu so it can handle label editing
-		if ( tabsMenuClientId ) {
-			selectBlock( tabsMenuClientId );
-		}
+		// @TODO: Figure out a way to select and focus the tab-menu-item so it can handle label editing.
+		// // Select the tabs-menu so it can handle label editing
+		// if ( tabsMenuClientId ) {
+		// 	selectBlock( tabsMenuClientId );
+		// }
 	};
 
 	return (

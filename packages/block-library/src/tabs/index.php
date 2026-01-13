@@ -88,7 +88,7 @@ function block_core_tabs_render_block_callback( array $attributes, string $conte
 	if ( empty( $title ) ) {
 		$title = 'Tab Contents';
 	}
-	$title = wp_sprintf( '<h3 class="tabs__title">%s</h3>', esc_html( $title ) );
+	$title = wp_sprintf( '<h3 class="wp-block-tabs__title">%s</h3>', esc_html( $title ) );
 
 	$tabs_list = $block->context['core/tabs-list'] ?? array();
 

@@ -1,8 +1,6 @@
 .wp-block-tabs {
 	box-sizing: border-box;
-	// CSS custom properties for child blocks to inherit
-	--tabs-divider-color: var(--custom-tab-active-color, #000);
-	.tabs__title {
+	.wp-block-tabs__title {
 		display: none;
 	}
 }

@@ -16,9 +16,7 @@ import AddTabToolbarControl from '../tab/add-tab-toolbar-control';
 const TAB_PANELS_TEMPLATE = [ [ 'core/tab', {} ] ];
 
 export default function Edit( { attributes, clientId } ) {
-	const blockProps = useBlockProps( {
-		className: 'wp-block-tab-panels',
-	} );
+	const blockProps = useBlockProps();
 
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		template: TAB_PANELS_TEMPLATE,

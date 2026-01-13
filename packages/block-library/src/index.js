@@ -138,6 +138,7 @@ import * as table from './table';
 import * as tableOfContents from './table-of-contents';
 import * as tabs from './tabs';
 import * as tabsMenu from './tabs-menu';
+import * as tabsMenuItem from './tabs-menu-item';
 import * as tagCloud from './tag-cloud';
 import * as templatePart from './template-part';
 import * as termCount from './term-count';
@@ -277,6 +278,7 @@ const getAllBlocks = () => {
 		blocks.push( tab );
 		blocks.push( tabs );
 		blocks.push( tabsMenu );
+		blocks.push( tabsMenuItem );
 		blocks.push( tabPanels );
 	}
 

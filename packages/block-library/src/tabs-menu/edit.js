@@ -6,70 +6,78 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import {
 	useBlockProps,
-	__experimentalUseBorderProps as useBorderProps,
-	__experimentalUseColorProps as useColorProps,
-	__experimentalGetSpacingClassesAndStyles as useSpacingProps,
-	__experimentalGetShadowClassesAndStyles as useShadowProps,
-	getTypographyClassesAndStyles as useTypographyProps,
-	withColors,
+	useInnerBlocksProps,
+	BlockContextProvider,
+	__experimentalUseBlockPreview as useBlockPreview,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { RichText } from '@wordpress/block-editor';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { decodeEntities } from '@wordpress/html-entities';
-import { RawHTML, useRef, useCallback, useState, useEffect, useMemo } from '@wordpress/element';
+import { memo, useMemo, useState, useEffect, useCallback } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import Controls from './controls';
 import AddTabToolbarControl from '../tab/add-tab-toolbar-control';
-import slugFromLabel from '../tab/slug-from-label';
 
-const { requestAnimationFrame, cancelAnimationFrame } = window;
+const TABS_MENU_ITEM_TEMPLATE = [ [ 'core/tabs-menu-item', {} ] ];
 
-function StaticLabel( { label, index } ) {
-	if ( label ) {
-		return (
-			<span>
-				<RawHTML>{ decodeEntities( label ) }</RawHTML>
-			</span>
-		);
-	}
+/**
+ * Preview component for non-active tab menu items.
+ * Uses useBlockPreview to cache the rendering.
+ */
+function TabsMenuItemPreview( {
+	blocks,
+	blockContextId,
+	isHidden,
+	setActiveBlockContextId,
+} ) {
+	const blockPreviewProps = useBlockPreview( { blocks } );
+
+	const handleOnClick = () => {
+		setActiveBlockContextId( blockContextId );
+	};
+
+	const style = {
+		display: isHidden ? 'none' : 'flex',
+	};
+
 	return (
-		<span>
-			{ sprintf(
-				/* translators: %d is the tab index + 1 */
-				__( 'Tab %d' ),
-				index + 1
-			) }
-		</span>
+		<div
+			{ ...blockPreviewProps }
+			tabIndex={ 0 }
+			role="button"
+			onClick={ handleOnClick }
+			onKeyDown={ handleOnClick }
+			style={ style }
+		/>
 	);
+}
+
+const MemoizedTabsMenuItemPreview = memo( TabsMenuItemPreview );
+
+/**
+ * The actual editable inner blocks for the active tab item.
+ */
+function TabsMenuItemTemplateBlocks( { wrapperProps = {} } ) {
+	const innerBlocksProps = useInnerBlocksProps( wrapperProps, {
+		template: TABS_MENU_ITEM_TEMPLATE,
+		templateLock: 'all',
+		renderAppender: false,
+	} );
+	return innerBlocksProps.children;
 }
 
 function Edit( {
 	attributes,
-	setAttributes,
 	context,
 	clientId,
-	activeBackgroundColor,
-	setActiveBackgroundColor,
-	activeTextColor,
-	setActiveTextColor,
-	hoverBackgroundColor,
-	setHoverBackgroundColor,
-	hoverTextColor,
-	setHoverTextColor,
-	isSelected,
 	__unstableLayoutClassNames: layoutClassNames,
 } ) {
 	const tabsList = context[ 'core/tabs-list' ] || [];
 	const tabsId = context[ 'core/tabs-id' ] || '';
-
-	// Consume tab indices from context
 	const activeTabIndex = context[ 'core/tabs-activeTabIndex' ] ?? 0;
 	const editorActiveTabIndex = context[ 'core/tabs-editorActiveTabIndex' ];
 
@@ -78,373 +86,124 @@ function Edit( {
 		return editorActiveTabIndex ?? activeTabIndex;
 	}, [ editorActiveTabIndex, activeTabIndex ] );
 
-	// Read orientation from tabs-menu's own layout
-	const layout = attributes.layout || {};
-	const orientation = layout.orientation || 'horizontal';
-	const isVertical = orientation === 'vertical';
-
-	const { selectBlock, __unstableMarkNextChangeAsNotPersistent } =
+	const { __unstableMarkNextChangeAsNotPersistent } =
 		useDispatch( blockEditorStore );
-	const focusRef = useRef();
-	const labelElementRef = useRef( null );
-	const prevTabsCountRef = useRef( tabsList.length );
-	const [ editingTabClientId, setEditingTabClientId ] = useState( null );
-	const [ editingLabel, setEditingLabel ] = useState( '' );
-
-	// Get style props using button pattern
-	const borderProps = useBorderProps( attributes );
-	const colorProps = useColorProps( attributes );
-	const shadowProps = useShadowProps( attributes );
-	const spacingProps = useSpacingProps( attributes );
-	const typographyProps = useTypographyProps( attributes );
-
-	// Get selection info and parent clientId
-	const { selectedTabClientId, tabsClientId } = useSelect(
-		( select ) => {
-			const { getBlockRootClientId, getSelectedBlockClientIds, hasSelectedInnerBlock } = select( blockEditorStore );
-			const _tabsClientId = getBlockRootClientId( clientId );
-			const selectedIds = getSelectedBlockClientIds();
-
-			// Find if any tab is selected
-			let selectedTab = null;
-			for ( const tab of tabsList ) {
-				if ( selectedIds.includes( tab.clientId ) || hasSelectedInnerBlock( tab.clientId, true ) ) {
-					selectedTab = tab.clientId;
-					break;
-				}
-			}
-
-			return {
-				selectedTabClientId: selectedTab,
-				tabsClientId: _tabsClientId,
-			};
-		},
-		[ clientId, tabsList ]
-	);
-
-	// Update tab label in the tab block and parent tabs block
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 
-	// Arrow key navigation handler
-	const handleKeyDown = useCallback(
-		( event, currentIndex ) => {
-			const { key } = event;
-			const tabsCount = tabsList.length;
+	// Track which tab context is "active" for editing (shows real inner blocks)
+	const [ activeBlockContextId, setActiveBlockContextId ] = useState( null );
 
-			// Don't handle navigation if editing a label (let RichText handle it)
-			if ( editingTabClientId ) {
-				return;
-			}
-
-			let nextIndex = currentIndex;
-
-			// Arrow key navigation (respects orientation)
-			if ( key === 'ArrowRight' && ! isVertical ) {
-				event.preventDefault();
-				nextIndex = ( currentIndex + 1 ) % tabsCount;
-			} else if ( key === 'ArrowLeft' && ! isVertical ) {
-				event.preventDefault();
-				nextIndex = ( currentIndex - 1 + tabsCount ) % tabsCount;
-			} else if ( key === 'ArrowDown' && isVertical ) {
-				event.preventDefault();
-				nextIndex = ( currentIndex + 1 ) % tabsCount;
-			} else if ( key === 'ArrowUp' && isVertical ) {
-				event.preventDefault();
-				nextIndex = ( currentIndex - 1 + tabsCount ) % tabsCount;
-			}
-			// Home/End keys
-			else if ( key === 'Home' ) {
-				event.preventDefault();
-				nextIndex = 0;
-			} else if ( key === 'End' ) {
-				event.preventDefault();
-				nextIndex = tabsCount - 1;
-			} else {
-				// Not a navigation key, let default behavior happen (including Tab)
-				return;
-			}
-
-			// Update active tab and focus
-			if ( nextIndex !== currentIndex && tabsList[ nextIndex ] ) {
-				const nextTab = tabsList[ nextIndex ];
-
-			// Update editorActiveTabIndex (non-undoable since it's ephemeral editor state)
-			if ( tabsClientId ) {
-				__unstableMarkNextChangeAsNotPersistent();
-				updateBlockAttributes( tabsClientId, {
-					editorActiveTabIndex: nextIndex,
-				} );
-			}
-
-				// Focus the next tab button
-				const nextTabButton = document.getElementById(
-					`${ nextTab.id || `tab-${ nextIndex }` }--tab`
-				);
-				if ( nextTabButton ) {
-					nextTabButton.focus();
-				}
-			}
+	// Get the inner blocks (the single tabs-menu-item template)
+	const { blocks, tabsClientId } = useSelect(
+		( select ) => {
+			const { getBlocks, getBlockRootClientId } = select( blockEditorStore );
+			return {
+				blocks: getBlocks( clientId ),
+				tabsClientId: getBlockRootClientId( clientId ),
+			};
 		},
-		[
-			isVertical,
-			tabsList,
-			editingTabClientId,
-			tabsClientId,
-			updateBlockAttributes,
-			__unstableMarkNextChangeAsNotPersistent,
-		]
+		[ clientId ]
 	);
 
-	// Update editor active tab index on parent tabs block when tab is clicked
-	const handleTabClick = useCallback(
-		( index, tabClientId ) => {
-			// Update the parent tabs block's editorActiveTabIndex (ephemeral, not persisted)
-			// Mark as non-persistent so it doesn't add to undo history
+	// Build block contexts for each tab
+	const blockContexts = useMemo( () => {
+		return tabsList.map( ( tab, index ) => ( {
+			'core/tabs-menu-item-index': index,
+			'core/tabs-menu-item-id': tab.id || `tab-${ index }`,
+			'core/tabs-menu-item-label': tab.label || '',
+			'core/tabs-menu-item-clientId': tab.clientId,
+			// Pass through parent context
+			'core/tabs-list': tabsList,
+			'core/tabs-id': tabsId,
+			'core/tabs-activeTabIndex': activeTabIndex,
+			'core/tabs-editorActiveTabIndex': editorActiveTabIndex,
+		} ) );
+	}, [ tabsList, tabsId, activeTabIndex, editorActiveTabIndex ] );
+
+	// Generate a unique ID for each block context
+	const getContextId = useCallback( ( blockContext ) => {
+		return `tab-context-${ blockContext[ 'core/tabs-menu-item-index' ] }`;
+	}, [] );
+
+	// Set the first tab as active by default
+	useEffect( () => {
+		if ( blockContexts.length > 0 && activeBlockContextId === null ) {
+			setActiveBlockContextId( getContextId( blockContexts[ 0 ] ) );
+		}
+	}, [ blockContexts, activeBlockContextId, getContextId ] );
+
+	// Update active context when editorActiveTabIndex changes
+	useEffect( () => {
+		if ( blockContexts.length > 0 && effectiveActiveIndex < blockContexts.length ) {
+			const newContextId = getContextId( blockContexts[ effectiveActiveIndex ] );
+			setActiveBlockContextId( ( prevId ) =>
+				prevId !== newContextId ? newContextId : prevId
+			);
+		}
+	}, [ effectiveActiveIndex, blockContexts, getContextId ] );
+
+	// Handle tab click to update parent tabs block's editorActiveTabIndex
+	const handleTabContextClick = useCallback(
+		( index ) => {
 			if ( tabsClientId && index !== effectiveActiveIndex ) {
 				__unstableMarkNextChangeAsNotPersistent();
 				updateBlockAttributes( tabsClientId, { editorActiveTabIndex: index } );
 			}
-
-			// Don't select block if we're editing this tab's label (to preserve RichText focus)
-			// But we still update editorActiveTabIndex above to keep the tab panel visible
-			if ( tabClientId === editingTabClientId ) {
-				return;
-			}
-
-			// If the tabs-menu is not selected, select it first instead of the tab
-			// This allows users to interact with the tabs-menu before drilling into individual tabs
-			if ( ! isSelected ) {
-				selectBlock( clientId );
-				return;
-			}
 		},
-		[ editingTabClientId, tabsClientId, effectiveActiveIndex, updateBlockAttributes, selectBlock, isSelected, clientId, __unstableMarkNextChangeAsNotPersistent ]
+		[ tabsClientId, effectiveActiveIndex, updateBlockAttributes, __unstableMarkNextChangeAsNotPersistent ]
 	);
-
-	const handleLabelChange = useCallback(
-		( tabClientId, newLabel, tabIndex ) => {
-			updateBlockAttributes( tabClientId, { label: newLabel, anchor: slugFromLabel( newLabel, tabIndex ) } );
-		},
-		[ updateBlockAttributes ]
-	);
-
-	// Callback ref for label RichText
-	const labelRef = useCallback(
-		( node ) => {
-			labelElementRef.current = node;
-			if ( node && editingTabClientId ) {
-				const animationId = requestAnimationFrame( () => {
-					if ( node ) {
-						node.focus();
-					}
-				} );
-				focusRef.current = animationId;
-			}
-		},
-		[ editingTabClientId ]
-	);
-
-	// Cleanup animation frames
-	useEffect( () => {
-		return () => {
-			if ( focusRef.current ) {
-				cancelAnimationFrame( focusRef.current );
-			}
-		};
-	}, [] );
-
-	// Auto-enter edit mode when a new tab is added
-	useEffect( () => {
-		const prevCount = prevTabsCountRef.current;
-		const currentCount = tabsList.length;
-
-		// If a tab was added (count increased)
-		if ( currentCount > prevCount && currentCount > 0 ) {
-			const lastTab = tabsList[ currentCount - 1 ];
-			if ( lastTab ) {
-				// Enter edit mode for the new tab's label
-				setEditingTabClientId( lastTab.clientId );
-				setEditingLabel( lastTab.label || '' );
-			}
-		}
-
-		prevTabsCountRef.current = currentCount;
-	}, [ tabsList ] );
-
-	// Build CSS custom properties for all color states (matching PHP render pattern)
-	// Only include properties that have values to preserve CSS fallback defaults
-	// Memoize to ensure it recalculates when effectiveActiveIndex changes (forces re-render)
-	const customColorStyles = useMemo( () => {
-		const styles = {};
-
-		// Base colors from core color supports (inactive state)
-		const baseBg = colorProps.style?.backgroundColor;
-		const baseText = colorProps.style?.color;
-
-		// Active/hover colors from custom attributes
-		const activeBg = activeBackgroundColor?.color || attributes.customActiveBackgroundColor;
-		const activeText = activeTextColor?.color || attributes.customActiveTextColor;
-		const hoverBg = hoverBackgroundColor?.color || attributes.customHoverBackgroundColor;
-		const hoverText = hoverTextColor?.color || attributes.customHoverTextColor;
-
-		// Apply base colors via CSS custom properties (not inline styles)
-		if ( baseBg ) {
-			styles[ '--tab-bg' ] = baseBg;
-		}
-		if ( baseText ) {
-			styles[ '--tab-text' ] = baseText;
-		}
-		if ( activeBg ) {
-			styles[ '--custom-tab-active-color' ] = activeBg;
-		}
-		if ( activeText ) {
-			styles[ '--custom-tab-active-text-color' ] = activeText;
-		}
-		if ( hoverBg ) {
-			styles[ '--custom-tab-hover-color' ] = hoverBg;
-		}
-		if ( hoverText ) {
-			styles[ '--custom-tab-hover-text-color' ] = hoverText;
-		}
-
-		return styles;
-	}, [
-		colorProps.style?.backgroundColor,
-		colorProps.style?.color,
-		activeBackgroundColor?.color,
-		attributes.customActiveBackgroundColor,
-		activeTextColor?.color,
-		attributes.customActiveTextColor,
-		hoverBackgroundColor?.color,
-		attributes.customHoverBackgroundColor,
-		hoverTextColor?.color,
-		attributes.customHoverTextColor,
-		effectiveActiveIndex, // Include to force recalculation when active tab changes
-	] );
 
 	const blockProps = useBlockProps( {
-		className: clsx( 'wp-block-tabs-menu', 'tabs__list', layoutClassNames ),
+		className: clsx( layoutClassNames ),
 		role: 'tablist',
-		style: customColorStyles,
 	} );
 
-	return (
-		<>
-			<AddTabToolbarControl
-				tabsClientId={ tabsClientId }
-			/>
-			<Controls
-				{ ...{
-					attributes,
-					setAttributes,
-					clientId,
-					activeBackgroundColor,
-					setActiveBackgroundColor,
-					activeTextColor,
-					setActiveTextColor,
-					hoverBackgroundColor,
-					setHoverBackgroundColor,
-					hoverTextColor,
-					setHoverTextColor,
-				} }
-			/>
-			<div { ...blockProps }>
-				{ tabsList.map( ( tab, index ) => {
-					const isActiveTab = index === effectiveActiveIndex;
-					const isSelectedTab = tab.clientId === selectedTabClientId;
-					const isEditing = tab.clientId === editingTabClientId;
-					const tabPanelId = tab.id || `tab-${ index }`;
-					const tabLabelId = `${ tabPanelId }--tab`;
-
-					return (
-						<button
-							key={ tab.clientId || index }
-							aria-controls={ tabPanelId }
-							aria-selected={ isActiveTab }
-							id={ tabLabelId }
-							role="tab"
-							className={ clsx(
-								'tabs__tab-label',
-								// Don't include colorProps.className - the has-*-background-color classes
-								// have high specificity that overrides our active/hover state CSS
-								borderProps.className,
-								shadowProps.className,
-								typographyProps.className,
-								{
-									'is-active': isActiveTab,
-									'is-selected': isSelectedTab,
-								}
-							) }
-							style={ {
-								// Don't spread colorProps.style - colors are handled via CSS custom properties
-								// to allow active/hover states to properly override base colors
-								...borderProps.style,
-								...shadowProps.style,
-								...spacingProps.style,
-								...typographyProps.style,
-							} }
-							tabIndex={ isActiveTab ? 0 : -1 }
-							onClick={ ( event ) => {
-								event.preventDefault();
-								handleTabClick( index, tab.clientId );
-							} }
-							onDoubleClick={ () => {
-								setEditingTabClientId( tab.clientId );
-								setEditingLabel( tab.label || '' );
-							} }
-							onKeyDown={ ( event ) => {
-								// Handle Enter key separately (activates tab)
-								if ( event.key === 'Enter' && ! event.shiftKey ) {
-									event.preventDefault();
-									handleTabClick( index, tab.clientId );
-									return;
-								}
-
-								// Handle arrow keys and Home/End (Tab key will have normal behavior)
-								handleKeyDown( event, index );
-							} }
-						>
-							{ isEditing ? (
-								<RichText
-									ref={ labelRef }
-									tagName="span"
-									withoutInteractiveFormatting
-									placeholder={ sprintf(
-										/* translators: %d is the tab index + 1 */
-										__( 'Tab %d…' ),
-										index + 1
-									) }
-									value={ decodeEntities( editingLabel ) }
-									onChange={ ( value ) => {
-										setEditingLabel( value );
-										handleLabelChange( tab.clientId, value, index );
-									} }
-									onBlur={ () => {
-										setEditingTabClientId( null );
-									} }
-								/>
-							) : (
-								<StaticLabel
-									label={ tab.label }
-									index={ index }
-								/>
-							) }
-						</button>
-					);
-				} ) }
-				{ tabsList.length === 0 && (
+	// If no tabs exist yet, show placeholder
+	if ( tabsList.length === 0 ) {
+		return (
+			<>
+				<AddTabToolbarControl tabsClientId={ tabsClientId } />
+				<div { ...blockProps }>
 					<span className="tabs__tab-label tabs__tab-label--placeholder">
 						{ __( 'Add tabs to display menu' ) }
 					</span>
-				) }
+				</div>
+			</>
+		);
+	}
+
+	return (
+		<>
+			<AddTabToolbarControl tabsClientId={ tabsClientId } />
+			<div { ...blockProps }>
+				{ blockContexts.map( ( blockContext, index ) => {
+					const contextId = getContextId( blockContext );
+					const isVisible = contextId === activeBlockContextId;
+
+					return (
+						<BlockContextProvider key={ contextId } value={ blockContext }>
+							{ isVisible ? (
+								<TabsMenuItemTemplateBlocks
+									wrapperProps={ {
+										onClick: () => handleTabContextClick( index ),
+									} }
+								/>
+							) : null }
+							<MemoizedTabsMenuItemPreview
+								blocks={ blocks }
+								blockContextId={ contextId }
+								setActiveBlockContextId={ ( id ) => {
+									setActiveBlockContextId( id );
+									handleTabContextClick( index );
+								} }
+								isHidden={ isVisible }
+							/>
+						</BlockContextProvider>
+					);
+				} ) }
 			</div>
 		</>
 	);
 }
 
-export default withColors(
-	'activeBackgroundColor',
-	'activeTextColor',
-	'hoverBackgroundColor',
-	'hoverTextColor'
-)( Edit );
+export default Edit;

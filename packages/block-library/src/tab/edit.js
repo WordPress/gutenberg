@@ -150,7 +150,7 @@ export default function Edit( {
 		role: 'tabpanel',
 		tabIndex: isSelectedTab ? 0 : -1,
 		className: clsx(
-			'tabs__tab-editor-content',
+			'wp-block-tab__editor-content',
 			layoutClassNames
 		),
 	} );
