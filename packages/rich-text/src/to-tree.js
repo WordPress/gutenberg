@@ -338,7 +338,7 @@ export function toTree( {
 						'data-rich-text-placeholder': placeholder,
 						// Necessary to prevent the placeholder from catching
 						// selection and being editable.
-						style: 'pointer-events:none;user-select:none;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;',
+						style: 'pointer-events:none;user-select:none;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;display:contents;position:relative;',
 					},
 				} );
 			}
