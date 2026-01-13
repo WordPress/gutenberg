@@ -42,7 +42,7 @@ jobs:
                     "mcpServers": {
                       "playwright": {
                         "command": "npx",
-                        "args": ["-y", "@playwright/mcp", "--headless", "--browser=firefox"]
+                        "args": ["-y", "@playwright/mcp", "--headless"]
                       },
                       "context7": {
                         "command": "npx",
