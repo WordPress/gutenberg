@@ -100,6 +100,7 @@
 - Fix sticky footer in DataViews grid view. [#73661](https://github.com/WordPress/gutenberg/pull/73661)
 - DataViews: Apply primary style to first column if there is no title field. [#73729](https://github.com/WordPress/gutenberg/pull/73729)
 - DataViews: Combined field alignment in table layout. [#73908](https://github.com/WordPress/gutenberg/pull/73908)
+- DataViews: Add overlay to `table` layout when loading to prevent flickering. [#74572](https://github.com/WordPress/gutenberg/pull/74572)
 - DataViews: Fix table row multiselection in Firefox [#73945](https://github.com/WordPress/gutenberg/pull/73945)
 - DataViews: `filterSortAndPaginate()` will ignore sorting on non-sortable fields [#73950](https://github.com/WordPress/gutenberg/pull/73950)
 - DataViews: Fix locked fields order when toggling visibility in properties section. [#74326](https://github.com/WordPress/gutenberg/pull/74326)
