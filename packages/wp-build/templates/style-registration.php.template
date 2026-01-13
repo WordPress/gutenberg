@@ -46,6 +46,7 @@ if ( ! function_exists( '{{PREFIX}}_register_package_styles' ) ) {
 		// Load build constants
 		$build_constants = require __DIR__ . '/constants.php';
 		$default_version = ! SCRIPT_DEBUG ? $build_constants['version'] : time();
+		$suffix          = SCRIPT_DEBUG ? '' : '.min';
 
 		$styles_dir  = __DIR__ . '/styles';
 		$styles_file = $styles_dir . '/index.php';
@@ -61,13 +62,14 @@ if ( ! function_exists( '{{PREFIX}}_register_package_styles' ) ) {
 			{{PREFIX}}_override_style(
 				$styles,
 				$style_data['handle'],
-				$build_constants['build_url'] . 'styles/' . $style_data['path'] . '.css',
+				$build_constants['build_url'] . 'styles/' . $style_data['path'] . $suffix . '.css',
 				$style_data['dependencies'],
 				$default_version
 			);
 
 			// Enable RTL support (WordPress automatically loads -rtl.css variant)
 			$styles->add_data( $style_data['handle'], 'rtl', 'replace' );
+			$styles->add_data( $style_data['handle'], 'suffix', $suffix );
 		}
 	}
 

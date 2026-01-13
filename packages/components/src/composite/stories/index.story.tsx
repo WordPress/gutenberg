@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react-webpack5';
 
 /**
  * WordPress dependencies
@@ -20,17 +20,11 @@ const meta: Meta< typeof Composite > = {
 	id: 'components-composite',
 	component: Composite,
 	subcomponents: {
-		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		'Composite.Group': Composite.Group,
-		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		'Composite.GroupLabel': Composite.GroupLabel,
-		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		'Composite.Row': Composite.Row,
-		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		'Composite.Item': Composite.Item,
-		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		'Composite.Hover': Composite.Hover,
-		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		'Composite.Typeahead': Composite.Typeahead,
 		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		'Composite.Context': Composite.Context,

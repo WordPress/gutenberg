@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { StoryFn } from '@storybook/react';
+import type { StoryFn } from '@storybook/react-webpack5';
 
 /**
  * WordPress dependencies

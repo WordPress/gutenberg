@@ -7,12 +7,14 @@ import {
 	createBlockSaveFilter,
 } from './utils';
 import './compat';
+import './cross-origin-isolation';
 import align from './align';
 import background from './background';
 import './lock';
 import allowedBlocks from './allowed-blocks';
 import anchor from './anchor';
 import ariaLabel from './aria-label';
+import './block-fields';
 import customClassName from './custom-class-name';
 import './generated-class-name';
 import style from './style';
@@ -36,6 +38,7 @@ import blockBindingsPanel from './block-bindings';
 import listView from './list-view';
 import './block-renaming';
 import './grid-visualizer';
+import autoInspectorControls from './auto-inspector-controls';
 
 createBlockEditFilter(
 	[
@@ -54,6 +57,7 @@ createBlockEditFilter(
 		childLayout,
 		allowedBlocks,
 		listView,
+		autoInspectorControls,
 	].filter( Boolean )
 );
 createBlockListBlockFilter( [

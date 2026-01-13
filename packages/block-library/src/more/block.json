@@ -19,11 +19,11 @@
 		}
 	},
 	"supports": {
-		"anchor": true,
 		"customClassName": false,
 		"className": false,
 		"html": false,
 		"multiple": false,
+		"visibility": false,
 		"interactivity": {
 			"clientNavigation": true
 		}

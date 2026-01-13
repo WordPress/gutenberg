@@ -29,13 +29,16 @@ import type {
 	Operation,
 	OperationFinishAction,
 	OperationStartAction,
+	PauseItemAction,
 	PauseQueueAction,
 	QueueItem,
 	QueueItemId,
+	ResumeItemAction,
 	ResumeQueueAction,
 	RevokeBlobUrlsAction,
 	Settings,
 	State,
+	UpdateProgressAction,
 	UpdateSettingsAction,
 } from './types';
 import { ItemStatus, OperationType, Type } from './types';
@@ -45,10 +48,13 @@ type ActionCreators = {
 	cancelItem: typeof cancelItem;
 	addItem: typeof addItem;
 	removeItem: typeof removeItem;
+	pauseItem: typeof pauseItem;
+	resumeItem: typeof resumeItem;
 	prepareItem: typeof prepareItem;
 	processItem: typeof processItem;
 	finishOperation: typeof finishOperation;
 	uploadItem: typeof uploadItem;
+	updateItemProgress: typeof updateItemProgress;
 	revokeBlobUrls: typeof revokeBlobUrls;
 	< T = Record< string, unknown > >( args: T ): void;
 };
@@ -185,6 +191,19 @@ export function processItem( id: QueueItemId ) {
 			? item.operations[ 0 ][ 0 ]
 			: item.operations?.[ 0 ];
 
+		/*
+		 * If the next operation is an upload, check concurrency limit.
+		 * If at capacity, the item remains queued and will be processed
+		 * when another upload completes.
+		 */
+		if ( operation === OperationType.Upload ) {
+			const settings = select.getSettings();
+			const activeCount = select.getActiveUploadCount();
+			if ( activeCount >= settings.maxConcurrentUploads ) {
+				return;
+			}
+		}
+
 		if ( attachment ) {
 			onChange?.( [ attachment ] );
 		}
@@ -270,6 +289,41 @@ export function resumeQueue() {
 }
 
 /**
+ * Pauses a specific item in the queue.
+ *
+ * @param id Item ID.
+ */
+export function pauseItem( id: QueueItemId ) {
+	return async ( { dispatch }: ThunkArgs ) => {
+		dispatch< PauseItemAction >( {
+			type: Type.PauseItem,
+			id,
+		} );
+	};
+}
+
+/**
+ * Resumes a specific paused item in the queue.
+ *
+ * @param id Item ID.
+ */
+export function resumeItem( id: QueueItemId ) {
+	return async ( { select, dispatch }: ThunkArgs ) => {
+		const item = select.getItem( id );
+		if ( ! item || item.status !== ItemStatus.Paused ) {
+			return;
+		}
+
+		dispatch< ResumeItemAction >( {
+			type: Type.ResumeItem,
+			id,
+		} );
+
+		dispatch.processItem( id );
+	};
+}
+
+/**
  * Removes a specific item from the queue.
  *
  * @param id Item ID.
@@ -298,7 +352,10 @@ export function finishOperation(
 	id: QueueItemId,
 	updates: Partial< QueueItem >
 ) {
-	return async ( { dispatch }: ThunkArgs ) => {
+	return async ( { select, dispatch }: ThunkArgs ) => {
+		const item = select.getItem( id );
+		const previousOperation = item?.currentOperation;
+
 		dispatch< OperationFinishAction >( {
 			type: Type.OperationFinish,
 			id,
@@ -306,6 +363,17 @@ export function finishOperation(
 		} );
 
 		dispatch.processItem( id );
+
+		/*
+		 * If an upload just finished, there may be items waiting in the queue
+		 * due to concurrency limits. Trigger processing for them.
+		 */
+		if ( previousOperation === OperationType.Upload ) {
+			const pendingUploads = select.getPendingUploads();
+			for ( const pendingItem of pendingUploads ) {
+				dispatch.processItem( pendingItem.id );
+			}
+		}
 	};
 }
 
@@ -385,6 +453,22 @@ export function revokeBlobUrls( id: QueueItemId ) {
 		dispatch< RevokeBlobUrlsAction >( {
 			type: Type.RevokeBlobUrls,
 			id,
+		} );
+	};
+}
+
+/**
+ * Updates the progress of an item.
+ *
+ * @param id       Item ID.
+ * @param progress Progress value (0-100).
+ */
+export function updateItemProgress( id: QueueItemId, progress: number ) {
+	return async ( { dispatch }: ThunkArgs ) => {
+		dispatch< UpdateProgressAction >( {
+			type: Type.UpdateProgress,
+			id,
+			progress,
 		} );
 	};
 }

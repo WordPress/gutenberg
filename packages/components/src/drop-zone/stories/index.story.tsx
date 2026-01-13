@@ -1,13 +1,13 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryFn } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react-webpack5';
 
 /**
  * WordPress dependencies
  */
 import { upload, media } from '@wordpress/icons';
-import { fn } from '@storybook/test';
+import { fn } from 'storybook/test';
 
 /**
  * Internal dependencies

@@ -81,33 +81,41 @@ export function getCommonDepthClientIds(
  * @param {?HTMLElement} treeGridElement The container element to search within.
  */
 export function focusListItem( focusClientId, treeGridElement ) {
-	const getFocusElement = () => {
-		const row = treeGridElement?.querySelector(
-			`[role=row][data-block="${ focusClientId }"]`
-		);
-		if ( ! row ) {
-			return null;
+	if ( ! treeGridElement ) {
+		return;
+	}
+
+	const selector = `[role=row][data-block="${ focusClientId }"]`;
+
+	return new Promise( ( resolve ) => {
+		if ( treeGridElement.querySelector( selector ) ) {
+			return resolve( treeGridElement.querySelector( selector ) );
 		}
-		// Focus the first focusable in the row, which is the ListViewBlockSelectButton.
-		return focus.focusable.find( row )[ 0 ];
-	};
 
-	let focusElement = getFocusElement();
-	if ( focusElement ) {
-		focusElement.focus();
-	} else {
-		// The element hasn't been painted yet. Defer focusing on the next frame.
-		// This could happen when all blocks have been deleted and the default block
-		// hasn't been added to the editor yet.
-		window.requestAnimationFrame( () => {
-			focusElement = getFocusElement();
-
-			// Ignore if the element still doesn't exist.
-			if ( focusElement ) {
-				focusElement.focus();
+		let timer = null;
+		// Wait for the element to be added to the DOM.
+		const observer = new window.MutationObserver( () => {
+			if ( treeGridElement.querySelector( selector ) ) {
+				clearTimeout( timer );
+				observer.disconnect();
+				resolve( treeGridElement.querySelector( selector ) );
 			}
 		} );
-	}
+
+		observer.observe( treeGridElement, {
+			childList: true,
+			subtree: true,
+		} );
+
+		// Stop trying after 3 seconds.
+		timer = setTimeout( () => {
+			observer.disconnect();
+			resolve( null );
+		}, 3000 );
+	} ).then( ( element ) => {
+		// Focus the first focusable in the row, which is the ListViewBlockSelectButton.
+		focus.focusable.find( element )?.[ 0 ]?.focus();
+	} );
 }
 
 /**

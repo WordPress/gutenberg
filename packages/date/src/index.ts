@@ -4,7 +4,7 @@
 import type { Moment } from 'moment';
 import momentLib from 'moment';
 import 'moment-timezone/moment-timezone';
-import 'moment-timezone/moment-timezone-utils';
+import 'moment-timezone/moment-timezone-utils.js';
 
 /**
  * WordPress dependencies

@@ -63,7 +63,7 @@ if ( window.__experimentalContentOnlyInspectorFields ) {
 		},
 	];
 	settings[ formKey ] = {
-		fields: [ 'file' ],
+		fields: [ 'file', 'fileName', 'downloadButtonText' ],
 	};
 }
 

@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { v4 as uuidv4 } from 'uuid';
-import fastDeepEqual from 'fast-deep-equal/es6';
+import fastDeepEqual from 'fast-deep-equal/es6/index.js';
 
 /**
  * WordPress dependencies

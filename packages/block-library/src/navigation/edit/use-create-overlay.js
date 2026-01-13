@@ -10,6 +10,7 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { getUniqueTemplatePartTitle, getCleanTemplatePartSlug } from './utils';
+import { NAVIGATION_OVERLAY_TEMPLATE_PART_AREA } from '../constants';
 
 /**
  * Hook to create a new overlay template part.
@@ -40,7 +41,7 @@ export default function useCreateOverlayTemplatePart( overlayTemplateParts ) {
 			{
 				slug: cleanSlug,
 				title: uniqueTitle,
-				area: 'overlay',
+				area: NAVIGATION_OVERLAY_TEMPLATE_PART_AREA,
 			},
 			{ throwOnError: true }
 		);

@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import clsx from 'clsx';
 import parse, { attributesToProps, domToReact } from 'html-react-parser';
 
 /**
@@ -13,6 +14,7 @@ import { safeHTML } from '@wordpress/dom';
  *
  * @param {Object} props              - The props for the component.
  * @param {Object} props.wrapperProps - The props to merge with the root element.
+ *                                    className and style are merged with the parsed HTML attributes.
  * @param {string} props.html         - The HTML content to render.
  * @return {JSX.Element} The rendered React elements.
  */
@@ -26,6 +28,14 @@ const HtmlRenderer = ( { wrapperProps = {}, html = '' } ) => {
 					const mergedProps = {
 						...parsedProps,
 						...wrapperProps,
+						className: clsx(
+							parsedProps.className,
+							wrapperProps.className
+						),
+						style: {
+							...( parsedProps.style || {} ),
+							...( wrapperProps.style || {} ),
+						},
 					};
 					return (
 						<TagName { ...mergedProps }>

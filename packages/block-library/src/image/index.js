@@ -106,7 +106,7 @@ if ( window.__experimentalContentOnlyInspectorFields ) {
 		},
 	];
 	settings[ formKey ] = {
-		fields: [ 'image' ],
+		fields: [ 'image', 'link', 'caption', 'alt' ],
 	};
 }
 
