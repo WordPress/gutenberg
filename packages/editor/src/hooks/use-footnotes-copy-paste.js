@@ -4,16 +4,22 @@
 import { useRefEffect } from '@wordpress/compose';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
-import { parse, serialize, createBlock } from '@wordpress/blocks';
-import {
-	extractFootnotesForCopy,
-	mergeFootnotesOnPaste,
-} from '@wordpress/core-data';
+import { parse, createBlock } from '@wordpress/blocks';
+import { RichTextData } from '@wordpress/rich-text';
+import { privateApis as coreDataPrivateApis } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
  */
 import { store as editorStore } from '../store';
+import { unlock } from '../lock-unlock';
+
+const {
+	extractFootnotesForCopy,
+	mergeFootnotesOnPaste,
+	getFootnotesOrder,
+	updateBlocksAttributesForNumbering,
+} = unlock( coreDataPrivateApis );
 
 /**
  * Hook to handle footnote copy/paste functionality.
@@ -72,8 +78,7 @@ export default function useFootnotesCopyPaste() {
 					return;
 				}
 
-				// Check if pasted blocks contain a footnotes block
-				// If so, extract its footnotes and remove it from pasted blocks
+				// Extract footnotes from any footnotes blocks in pasted content
 				const footnotesFromPastedBlocks = [];
 
 				function extractFootnotesBlock( blocks ) {
@@ -103,8 +108,7 @@ export default function useFootnotesCopyPaste() {
 
 				const blocksToPaste = extractFootnotesBlock( pastedBlocks );
 
-				// Merge footnotes from both sources (copied footnotes + footnotes from pasted footnotes block)
-				// Deduplicate by ID to avoid duplicates
+				// Merge footnotes from both sources and deduplicate
 				const allCopiedFootnotesMap = new Map();
 				[ ...copiedFootnotes, ...footnotesFromPastedBlocks ].forEach(
 					( fn ) => {
@@ -120,22 +124,118 @@ export default function useFootnotesCopyPaste() {
 				// Get destination blocks BEFORE paste
 				const destinationBlocks = getBlocks();
 
-				// Merge footnotes - this updates footnote IDs in pasted blocks
+				// Calculate ID mapping and new footnotes
 				const result = mergeFootnotesOnPaste(
 					blocksToPaste,
 					allCopiedFootnotes,
 					destinationBlocks
 				);
 
-				// Update clipboard HTML with blocks that have updated footnote IDs
-				// (excluding the footnotes block if it was in the pasted content)
-				const updatedHtml = serialize( result.blocks );
-				event.clipboardData.setData( 'text/html', updatedHtml );
+				// Store the ID mapping and new footnotes for use after paste completes
+				const idMapping = result.idMapping;
+				const newFootnotes = result.newFootnotes || [];
 
-				// Wait for paste to complete, then update footnotes block
-				// setTimeout ensures the block editor's paste handler has finished
-				// and blocks are actually inserted before we update
+				// Wait for paste to complete, then update pasted blocks and footnotes block
 				setTimeout( () => {
+					const currentBlocks = getBlocks();
+
+					// Helper to recursively update footnote IDs in block attributes
+					function updateBlockFootnoteIds( block ) {
+						const updatedAttributes = updateAttributeIds(
+							block.attributes
+						);
+						return {
+							...block,
+							attributes: updatedAttributes,
+							innerBlocks: block.innerBlocks
+								? block.innerBlocks.map(
+										updateBlockFootnoteIds
+								  )
+								: block.innerBlocks,
+						};
+					}
+
+					function updateAttributeIds( attributes ) {
+						if (
+							! attributes ||
+							Array.isArray( attributes ) ||
+							typeof attributes !== 'object'
+						) {
+							return attributes;
+						}
+
+						attributes = { ...attributes };
+
+						for ( const key in attributes ) {
+							const value = attributes[ key ];
+
+							if ( Array.isArray( value ) ) {
+								attributes[ key ] =
+									value.map( updateAttributeIds );
+								continue;
+							}
+
+							if (
+								typeof value !== 'string' &&
+								! ( value instanceof RichTextData )
+							) {
+								continue;
+							}
+
+							const richTextValue =
+								typeof value === 'string'
+									? RichTextData.fromHTMLString( value )
+									: new RichTextData( value );
+
+							let hasChanges = false;
+
+							richTextValue.replacements.forEach(
+								( replacement ) => {
+									if (
+										replacement?.type === 'core/footnote'
+									) {
+										const oldId =
+											replacement.attributes[ 'data-fn' ];
+										const newId = idMapping[ oldId ];
+
+										if ( newId && newId !== oldId ) {
+											// Update the footnote ID
+											replacement.attributes[
+												'data-fn'
+											] = newId;
+											// Update the innerHTML to reflect new ID in the link
+											replacement.innerHTML =
+												replacement.innerHTML.replace(
+													/href="#[^"]+"/,
+													`href="#${ newId }"`
+												);
+											replacement.innerHTML =
+												replacement.innerHTML.replace(
+													/id="[^"]+-link"/,
+													`id="${ newId }-link"`
+												);
+											hasChanges = true;
+										}
+									}
+								}
+							);
+
+							if ( hasChanges ) {
+								attributes[ key ] =
+									typeof value === 'string'
+										? richTextValue.toHTMLString()
+										: richTextValue;
+							}
+						}
+
+						return attributes;
+					}
+
+					// Update all blocks to fix footnote references in pasted content
+					let updatedBlocks = currentBlocks.map(
+						updateBlockFootnoteIds
+					);
+
 					// Helper to recursively find footnotes block
 					function findFootnotesBlockRecursive( blocks ) {
 						for ( const block of blocks ) {
@@ -154,102 +254,60 @@ export default function useFootnotesCopyPaste() {
 						return null;
 					}
 
-					// Get current blocks after paste - this includes any footnotes
-					// that were already added from previous pastes
-					const currentBlocks = getBlocks();
-
-					// Check if footnotes block already exists (search recursively)
+					// Find or create footnotes block
 					const existingFootnotesBlock =
-						findFootnotesBlockRecursive( currentBlocks );
-
-					// Get the NEW footnotes that were just added in this paste
-					// (not all footnotes from destinationBlocks, which includes existing ones)
-					const newFootnotesFromPaste = result.newFootnotes || [];
-
-					// Get current footnotes (if any) - these are the footnotes already in the editor
+						findFootnotesBlockRecursive( updatedBlocks );
 					const currentFootnotes =
 						existingFootnotesBlock?.attributes?.footnotes || [];
 
-					// Merge footnotes: start with current, add only the NEW ones
-					// Use a Map to ensure each ID appears only once
+					// Merge current footnotes with new ones, ensuring unique IDs
 					const footnotesMap = new Map();
 
-					// Add all current footnotes first (deduplicate if they have duplicates)
+					// Add existing footnotes first
 					currentFootnotes.forEach( ( fn ) => {
-						// Only keep the first occurrence of each ID
-						if ( ! footnotesMap.has( fn.id ) ) {
-							footnotesMap.set( fn.id, fn );
-						}
+						footnotesMap.set( fn.id, fn );
 					} );
 
-					// Add ONLY the new footnotes from this paste
-					// These already have unique IDs generated by mergeFootnotesOnPaste
-					newFootnotesFromPaste.forEach( ( fn ) => {
-						// Only add if ID doesn't exist (shouldn't happen, but safety check)
-						if ( ! footnotesMap.has( fn.id ) ) {
-							footnotesMap.set( fn.id, fn );
-						}
+					// Add new footnotes (these have unique IDs from mergeFootnotesOnPaste)
+					newFootnotes.forEach( ( fn ) => {
+						footnotesMap.set( fn.id, fn );
 					} );
 
-					// Convert to array - guaranteed unique IDs
-					// Final deduplication: ensure absolutely no duplicates by ID
-					// This is critical - React requires unique keys
-					const finalFootnotesMap = new Map();
-					Array.from( footnotesMap.values() ).forEach( ( fn ) => {
-						// If ID already exists, skip it (keep first occurrence)
-						if ( ! finalFootnotesMap.has( fn.id ) ) {
-							finalFootnotesMap.set( fn.id, fn );
-						}
-					} );
-					const deduplicatedFootnotes = Array.from(
-						finalFootnotesMap.values()
-					);
+					const mergedFootnotes = Array.from( footnotesMap.values() );
 
-					// Final safety check: verify no duplicates
-					const ids = new Set();
-					const trulyUniqueFootnotes = deduplicatedFootnotes.filter(
-						( fn ) => {
-							if ( ids.has( fn.id ) ) {
-								// Duplicate found - skip it
-								return false;
-							}
-							ids.add( fn.id );
-							return true;
-						}
-					);
-
-					// Merge the footnotes block into current blocks
+					// Update or create footnotes block
 					if ( existingFootnotesBlock ) {
-						// Update existing footnotes block
-						const updatedBlocks = currentBlocks.map( ( block ) => {
+						updatedBlocks = updatedBlocks.map( ( block ) => {
 							if ( block.name === 'core/footnotes' ) {
 								return {
 									...block,
 									attributes: {
 										...block.attributes,
-										footnotes: trulyUniqueFootnotes,
+										footnotes: mergedFootnotes,
 									},
 								};
 							}
 							return block;
 						} );
-						// Update all blocks through the entity editor to persist changes
-						resetEditorBlocks( updatedBlocks );
 					} else {
-						// Add new footnotes block at the end
 						const newFootnotesBlock = createBlock(
 							'core/footnotes',
 							{
-								footnotes: trulyUniqueFootnotes,
+								footnotes: mergedFootnotes,
 							}
 						);
-						const updatedBlocks = [
-							...currentBlocks,
-							newFootnotesBlock,
-						];
-						// Update all blocks through the entity editor to persist changes
-						resetEditorBlocks( updatedBlocks );
+						updatedBlocks = [ ...updatedBlocks, newFootnotesBlock ];
 					}
+
+					// Update footnote numbering based on the new order
+					const newOrder = getFootnotesOrder( updatedBlocks );
+					const finalBlocks = updateBlocksAttributesForNumbering(
+						updatedBlocks,
+						newOrder
+					);
+
+					// Apply all updates
+					resetEditorBlocks( finalBlocks );
 				}, 0 );
 			}
 

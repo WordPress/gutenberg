@@ -41,6 +41,7 @@ import {
 import { useZoomOutModeExit } from './use-zoom-out-mode-exit';
 import { usePaddingAppender } from './use-padding-appender';
 import { useEditContentOnlySectionExit } from './use-edit-content-only-section-exit';
+import useFootnotesCopyPaste from '../../hooks/use-footnotes-copy-paste';
 
 const {
 	LayoutStyle,
@@ -380,6 +381,7 @@ function VisualEditor( {
 	}, [ styles, enableResizing, calculatedMinHeight, paddingStyle ] );
 
 	const typewriterRef = useTypewriter();
+	const footnotesCopyPasteRef = useFootnotesCopyPaste();
 	contentRef = useMergeRefs( [
 		localRef,
 		contentRef,
@@ -393,6 +395,7 @@ function VisualEditor( {
 		useZoomOutModeExit(),
 		paddingAppenderRef,
 		useEditContentOnlySectionExit(),
+		footnotesCopyPasteRef,
 	] );
 
 	return (
