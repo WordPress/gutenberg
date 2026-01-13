@@ -56,7 +56,7 @@ export function ListViewPanel( { clientId, name } ) {
 
 	if ( isSelectionWithinCurrentSection ) {
 		return (
-			<PrivateInspectorControlsFill group="list" forceDisplayControls>
+			<PrivateInspectorControlsFill group="list">
 				<PanelBody title={ blockTitle }>
 					<PrivateListView
 						rootClientId={ clientId }
