@@ -52,12 +52,12 @@
 		"clsx": "^2.1.1"
 	},
 	"devDependencies": {
-		"@storybook/addon-docs": "^9.1.17",
+		"@storybook/addon-docs": "^10.1.11",
 		"@testing-library/jest-dom": "^6.6.3",
 		"@types/jest": "^29.5.14",
 		"@types/node": "^20.17.10",
 		"@wordpress/theme": "file:../theme",
-		"storybook": "^9.1.17"
+		"storybook": "^10.1.11"
 	},
 	"peerDependencies": {
 		"react": "^18.0.0",
