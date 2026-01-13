@@ -66,7 +66,7 @@ export default function getRectangleFromRange( range ) {
 		);
 	}
 
-	const { startContainer } = range;
+	const { startContainer, startOffset } = range;
 	const { ownerDocument } = startContainer;
 
 	// Correct invalid "BR" ranges. The cannot contain any children.
@@ -101,26 +101,28 @@ export default function getRectangleFromRange( range ) {
 	if ( ! rect || rect.height === 0 ) {
 		assertIsDefined( ownerDocument, 'ownerDocument' );
 		const padNode = ownerDocument.createTextNode( '\u200b' );
-		// Do not modify the live range.
-		range = range.cloneRange();
-
-		const { startContainer: container, startOffset: offset } = range;
 
 		// If the range is right after a BR, insert before the BR instead.
 		// The BR creates a new visual line, so inserting after it would
 		// give us a rect on the wrong line.
 		const previousSibling =
-			container.nodeType === container.ELEMENT_NODE &&
-			container.childNodes[ offset - 1 ];
-		if ( previousSibling && previousSibling.nodeName === 'BR' ) {
-			container.insertBefore( padNode, previousSibling );
+			startContainer.nodeType === startContainer.ELEMENT_NODE &&
+			startContainer.childNodes[ startOffset - 1 ];
+		if (
+			! startContainer.childNodes[ startOffset ] &&
+			previousSibling &&
+			previousSibling.nodeName === 'BR'
+		) {
+			startContainer.insertBefore( padNode, previousSibling );
 			// Create a new range around the padNode to get its rect.
 			const padRange = ownerDocument.createRange();
 			padRange.selectNode( padNode );
 			rect = padRange.getClientRects()[ 0 ];
 		} else {
-			range.insertNode( padNode );
-			rect = range.getClientRects()[ 0 ];
+			// Do not modify the live range.
+			const clonedRange = range.cloneRange();
+			clonedRange.insertNode( padNode );
+			rect = clonedRange.getClientRects()[ 0 ];
 		}
 		assertIsDefined( padNode.parentNode, 'padNode.parentNode' );
 		padNode.parentNode.removeChild( padNode );

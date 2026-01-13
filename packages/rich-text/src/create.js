@@ -540,11 +540,9 @@ function createFromElement( { element, range, isEditableTree } ) {
 
 		if (
 			isEditableTree &&
-			tagName === 'br' &&
 			// Ignore any line breaks that are not inserted by us.
-			( ! node.getAttribute( 'data-rich-text-line-break' ) ||
-				// Ignore padding line breaks for empty rich text.
-				node.getAttribute( 'data-rich-text-padding' ) )
+			tagName === 'br' &&
+			! node.getAttribute( 'data-rich-text-line-break' )
 		) {
 			accumulateSelection( accumulator, node, range, createEmptyValue() );
 			continue;

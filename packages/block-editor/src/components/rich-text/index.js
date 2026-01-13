@@ -522,9 +522,6 @@ export function RichTextWrapper(
 						: props.tabIndex
 				}
 				data-wp-block-attribute-key={ identifier }
-				data-empty={
-					! adjustedValue || adjustedValue.length === 0 || undefined
-				}
 			/>
 		</>
 	);
