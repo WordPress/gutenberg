@@ -23,7 +23,7 @@ This skill can be used in two ways:
 **Standalone usage examples:**
 ```
 User: "Use the parse-issue skill for issue 74447"
-User: "Parse issue https://github.com/WordPress/gutenberg/issues/73872"
+User: "Parse issue https://github.com/aagam-shah/gutenberg/issues/73872"
 User: "Parse issue 72364 and check if triage is needed"
 ```
 
@@ -57,7 +57,7 @@ Writes to `.triage/<issue>/<issue>.parsed.json`
 ### 1. Fetch the issue and comments
 
 ```bash
-gh issue view <number> --repo WordPress/gutenberg --json title,body,labels,state,comments,author
+gh issue view <number> --repo aagam-shah/gutenberg --json title,body,labels,state,comments,author
 ```
 
 Fetches issue body AND all comments (often contain critical context).
