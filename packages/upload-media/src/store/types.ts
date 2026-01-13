@@ -25,6 +25,7 @@ export interface QueueItem {
 	sourceUrl?: string;
 	sourceAttachmentId?: number;
 	abortController?: AbortController;
+	parentId?: QueueItemId;
 }
 
 export interface State {
@@ -129,15 +130,34 @@ interface UploadMediaArgs {
 	signal?: AbortSignal;
 }
 
+export interface SideloadMediaArgs {
+	// File to sideload.
+	file: File;
+	// Attachment ID to sideload to.
+	attachmentId: number;
+	// Additional data to include in the request.
+	additionalData?: AdditionalData;
+	// Function called when an error happens.
+	onError?: OnErrorHandler;
+	// Function called each time a file or a temporary representation of the file is available.
+	onFileChange?: OnChangeHandler;
+	// Abort signal.
+	signal?: AbortSignal;
+}
+
 export interface Settings {
 	// Function for uploading files to the server.
 	mediaUpload: ( args: UploadMediaArgs ) => void;
+	// Function for sideloading files to existing attachments.
+	mediaSideload?: ( args: SideloadMediaArgs ) => void;
 	// List of allowed mime types and file extensions.
 	allowedMimeTypes?: Record< string, string > | null;
 	// Maximum upload file size.
 	maxUploadFileSize?: number;
 	// Maximum number of concurrent uploads.
 	maxConcurrentUploads: number;
+	// Registered image sizes from the server.
+	imageSizes?: Record< string, ImageSizeCrop >;
 }
 
 // Must match the Attachment type from the media-utils package.
@@ -172,9 +192,22 @@ export enum ItemStatus {
 export enum OperationType {
 	Prepare = 'PREPARE',
 	Upload = 'UPLOAD',
+	ResizeCrop = 'RESIZE_CROP',
+	ThumbnailGeneration = 'THUMBNAIL_GENERATION',
 }
 
-export interface OperationArgs {}
+export interface ImageSizeCrop {
+	width: number;
+	height: number;
+	crop?:
+		| boolean
+		| [ 'left' | 'center' | 'right', 'top' | 'center' | 'bottom' ];
+	name?: string;
+}
+
+export interface OperationArgs {
+	[ OperationType.ResizeCrop ]: { resize: ImageSizeCrop };
+}
 
 type OperationWithArgs< T extends keyof OperationArgs = keyof OperationArgs > =
 	[ T, OperationArgs[ T ] ];
