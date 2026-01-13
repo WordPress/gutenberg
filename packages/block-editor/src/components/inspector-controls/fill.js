@@ -19,7 +19,7 @@ import {
 } from '../block-edit/context';
 import groups from './groups';
 
-export function PrivateInspectorControlsFill( {
+export default function InspectorControlsFill( {
 	children,
 	group = 'default',
 	__experimentalGroup,
@@ -68,23 +68,6 @@ export function PrivateInspectorControlsFill( {
 				} }
 			</Fill>
 		</StyleProvider>
-	);
-}
-
-export default function InspectorControlsFill( {
-	children,
-	group = 'default',
-	__experimentalGroup,
-	resetAllFilter,
-} ) {
-	return (
-		<PrivateInspectorControlsFill
-			group={ group }
-			__experimentalGroup={ __experimentalGroup }
-			resetAllFilter={ resetAllFilter }
-		>
-			{ children }
-		</PrivateInspectorControlsFill>
 	);
 }
 

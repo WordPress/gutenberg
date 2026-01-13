@@ -12,7 +12,7 @@ import { useContext } from '@wordpress/element';
  */
 import { store as blockEditorStore } from '../store';
 import { PrivateListView } from '../components/list-view';
-import { PrivateInspectorControlsFill } from '../components/inspector-controls/fill';
+import InspectorControls from '../components/inspector-controls/fill';
 import { PrivateBlockContext } from '../components/block-list/private-block-context';
 
 export const LIST_VIEW_SUPPORT_KEY = 'listView';
@@ -36,7 +36,7 @@ export function hasListViewSupport( nameOrType ) {
  * @return {Element|null} List view inspector controls or null.
  */
 export function ListViewPanel( { clientId, name } ) {
-	const { isSelectionWithinCurrentSection, isSelected } =
+	const { isSelectionWithinCurrentSection } =
 		useContext( PrivateBlockContext );
 	const isEnabled = hasListViewSupport( name );
 	const { hasChildren, blockTitle } = useSelect(
@@ -48,30 +48,15 @@ export function ListViewPanel( { clientId, name } ) {
 		[ clientId, name ]
 	);
 
-	const notSelected = ! isSelected && ! isSelectionWithinCurrentSection;
-
-	if ( notSelected || ! isEnabled ) {
+	if ( ! isEnabled ) {
 		return null;
 	}
 
-	if ( isSelectionWithinCurrentSection ) {
-		return (
-			<PrivateInspectorControlsFill group="list">
-				<PanelBody title={ blockTitle }>
-					<PrivateListView
-						rootClientId={ clientId }
-						isExpanded
-						description={ blockTitle }
-						showAppender
-					/>
-				</PanelBody>
-			</PrivateInspectorControlsFill>
-		);
-	}
+	const showBlockTitle = isSelectionWithinCurrentSection;
 
 	return (
-		<PrivateInspectorControlsFill group="list">
-			<PanelBody title={ null }>
+		<InspectorControls group="list">
+			<PanelBody title={ showBlockTitle ? blockTitle : undefined }>
 				{ ! hasChildren && (
 					<p className="block-editor-block-inspector__no-blocks">
 						{ __( 'No items yet.' ) }
@@ -84,7 +69,7 @@ export function ListViewPanel( { clientId, name } ) {
 					showAppender
 				/>
 			</PanelBody>
-		</PrivateInspectorControlsFill>
+		</InspectorControls>
 	);
 }
 
@@ -95,5 +80,5 @@ export default {
 	edit: ListViewPanel,
 	hasSupport: hasListViewSupport,
 	attributeKeys: [],
-	forceDisplayControls: true,
+	supportsPatternEditing: true,
 };

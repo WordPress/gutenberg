@@ -22,7 +22,7 @@ import useBlockDisplayInformation from '../../components/use-block-display-infor
 const { fieldsKey, formKey } = unlock( blocksPrivateApis );
 import FieldsDropdownMenu from './fields-dropdown-menu';
 import { PrivateBlockContext } from '../../components/block-list/private-block-context';
-import { PrivateInspectorControlsFill } from '../../components/inspector-controls/fill';
+import InspectorControls from '../../components/inspector-controls/fill';
 
 // controls
 import RichText from './rich-text';
@@ -213,19 +213,19 @@ const withBlockFields = createHigherOrderComponent(
 					isSelectionWithinCurrentSection &&
 						( isSectionBlock ||
 							blockEditingMode === 'contentOnly' ) && (
-							<PrivateInspectorControlsFill group="content">
+							<InspectorControls group="content">
 								<BlockFields
 									{ ...props }
 									blockType={ blockType }
 									isCollapsed
 								/>
-							</PrivateInspectorControlsFill>
+							</InspectorControls>
 						)
 				}
 				{ ! isSelectionWithinCurrentSection && isSelected && (
-					<PrivateInspectorControlsFill group="content">
+					<InspectorControls group="content">
 						<BlockFields { ...props } blockType={ blockType } />
-					</PrivateInspectorControlsFill>
+					</InspectorControls>
 				) }
 			</>
 		);
