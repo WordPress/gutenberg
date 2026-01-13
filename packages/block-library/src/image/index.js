@@ -95,12 +95,16 @@ if ( window.__experimentalContentOnlyInspectorFields ) {
 			label: __( 'Link' ),
 			type: 'url',
 			Edit: 'link', // TODO: replace with custom component
-			mapping: {
-				url: 'href',
-				rel: 'rel',
-				linkTarget: 'linkTarget',
-				destination: 'linkDestination',
-			},
+			getValue: ( { item } ) => ( {
+				url: item.href,
+				rel: item.rel,
+				linkTarget: item.linkTarget,
+			} ),
+			setValue: ( { value } ) => ( {
+				href: value.url,
+				rel: value.rel,
+				linkTarget: value.linkTarget,
+			} ),
 		},
 		{
 			id: 'caption',

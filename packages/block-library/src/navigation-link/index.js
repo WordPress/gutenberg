@@ -106,11 +106,14 @@ if ( window.__experimentalContentOnlyInspectorFields ) {
 			label: __( 'Link' ),
 			type: 'url',
 			Edit: 'link',
-			mapping: {
-				href: 'url',
-				rel: 'rel',
-				// TODO - opens in new tab? id?
-			},
+			getValue: ( { item } ) => ( {
+				url: item.href,
+				rel: item.rel,
+			} ),
+			setValue: ( { value } ) => ( {
+				href: value.url,
+				rel: value.rel,
+			} ),
 		},
 	];
 	settings[ formKey ] = {

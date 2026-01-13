@@ -33,10 +33,14 @@ if ( window.__experimentalContentOnlyInspectorFields ) {
 			label: __( 'Link' ),
 			type: 'url',
 			Edit: 'link', // TODO: replace with custom component
-			mapping: {
-				href: 'url',
-				rel: 'rel',
-			},
+			getValue: ( { item } ) => ( {
+				url: item.href,
+				rel: item.rel,
+			} ),
+			setValue: ( { value } ) => ( {
+				href: value.url,
+				rel: value.rel,
+			} ),
 		},
 		{
 			id: 'label',
