@@ -3,15 +3,14 @@
  */
 import { useLayoutEffect, useReducer } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
+import { store as blocksStore } from '@wordpress/blocks';
+import { getBlockSelector } from '@wordpress/global-styles-engine';
 
 /**
  * Internal dependencies
  */
 import ContrastChecker from '../components/contrast-checker';
 import { useBlockElement } from '../components/block-list/use-block-props/use-block-refs';
-import { store as blockEditorStore } from '../store';
-import { store as blocksStore } from '@wordpress/blocks';
-import { getBlockCSSSelector } from '../components/global-styles/get-block-css-selector';
 
 function getComputedValue( node, property ) {
 	return node.ownerDocument.defaultView
@@ -25,10 +24,10 @@ function getBlockElementColors( blockEl, blockType ) {
 	}
 
 	// Get color-specific selectors.
-	const textSelector = getBlockCSSSelector( blockType, 'color.text', {
+	const textSelector = getBlockSelector( blockType, 'color.text', {
 		fallback: true,
 	} );
-	const backgroundSelector = getBlockCSSSelector(
+	const backgroundSelector = getBlockSelector(
 		blockType,
 		'color.background',
 		{ fallback: true }
@@ -84,15 +83,15 @@ function reducer( prevColors, newColors ) {
 export default function BlockColorContrastChecker( { clientId } ) {
 	const blockEl = useBlockElement( clientId );
 	const [ colors, setColors ] = useReducer( reducer, {} );
+	const blockName = blockEl?.getAttribute( 'data-type' );
 
-	// Get the block type for selector resolution.
 	const blockType = useSelect(
 		( select ) => {
-			const blockName =
-				select( blockEditorStore ).getBlockName( clientId );
-			return select( blocksStore ).getBlockType( blockName );
+			return blockName
+				? select( blocksStore ).getBlockType( blockName )
+				: undefined;
 		},
-		[ clientId ]
+		[ blockName ]
 	);
 
 	// There are so many things that can change the color of a block
