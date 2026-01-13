@@ -108,16 +108,6 @@ const restrictedSyntax = [
 	},
 ];
 
-/** `no-restricted-syntax` rules for components. */
-const restrictedSyntaxComponents = [
-	{
-		selector:
-			'JSXOpeningElement[name.name="Button"]:not(:has(JSXAttribute[name.name="accessibleWhenDisabled"])) JSXAttribute[name.name="disabled"]',
-		message:
-			'`disabled` used without the `accessibleWhenDisabled` prop. Disabling a control without maintaining focusability can cause accessibility issues, by hiding their presence from screen reader users, or preventing focus from returning to a trigger element. (Ignore this error if you truly mean to disable.)',
-	},
-];
-
 module.exports = {
 	root: true,
 	extends: [
@@ -257,11 +247,8 @@ module.exports = {
 			],
 			excludedFiles: [ '**/*.native.js' ],
 			rules: {
-				'no-restricted-syntax': [
-					'error',
-					...restrictedSyntax,
-					...restrictedSyntaxComponents,
-				],
+				'no-restricted-syntax': [ 'error', ...restrictedSyntax ],
+				'@wordpress/no-unsafe-button-disabled': 'error',
 			},
 		},
 		{
@@ -274,7 +261,6 @@ module.exports = {
 				'no-restricted-syntax': [
 					'error',
 					...restrictedSyntax,
-					...restrictedSyntaxComponents,
 					// Temporary rules until we're ready to officially default to the new size.
 					...[
 						'BorderBoxControl',
@@ -312,6 +298,8 @@ module.exports = {
 							'FormFileUpload should have the `__next40pxDefaultSize` prop to opt-in to the new default size.',
 					},
 				],
+				'@wordpress/no-unsafe-button-disabled': 'error',
+
 			},
 		},
 		{
@@ -440,10 +428,13 @@ module.exports = {
 				'packages/components/src/theme/**',
 			],
 			rules: {
+				'@wordpress/no-unsafe-button-disabled': [
+					'error',
+					{ checkLocalImports: true },
+				],
 				'no-restricted-syntax': [
 					'error',
 					...restrictedSyntax,
-					...restrictedSyntaxComponents,
 					{
 						selector:
 							':matches(Literal[value=/--wp-admin-theme-/],TemplateElement[value.cooked=/--wp-admin-theme-/])',
