@@ -70,12 +70,14 @@
 		"layout": {
 			"default": {
 				"type": "flex",
-				"orientation": "vertical"
+				"orientation": "vertical",
+				"flexWrap": "nowrap"
 			},
 			"allowVerticalAlignment": true,
 			"allowSwitching": false,
 			"allowJustification": false,
-			"allowOrientation": false
+			"allowOrientation": false,
+			"allowWrap": false
 		},
 		"spacing": {
 			"padding": true,

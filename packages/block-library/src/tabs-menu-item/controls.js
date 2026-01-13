@@ -11,45 +11,7 @@ import {
 	InspectorControls,
 	__experimentalColorGradientSettingsDropdown as ColorGradientSettingsDropdown,
 	__experimentalUseMultipleOriginColorsAndGradients as useMultipleOriginColorsAndGradients,
-	ContrastChecker,
 } from '@wordpress/block-editor';
-
-function ContrastCheckerMatrix( { attributes, activeBackgroundColor, activeTextColor, hoverBackgroundColor, hoverTextColor } ) {
-	const {
-		customActiveBackgroundColor,
-		customActiveTextColor,
-		customHoverBackgroundColor,
-		customHoverTextColor,
-		backgroundColor,
-		textColor,
-		fontSize,
-	} = attributes;
-
-	const activeBackground = activeBackgroundColor?.color ?? customActiveBackgroundColor;
-	const activeText = activeTextColor?.color ?? customActiveTextColor;
-	const hoverBackground = hoverBackgroundColor?.color ?? customHoverBackgroundColor;
-	const hoverText = hoverTextColor?.color ?? customHoverTextColor;
-
-	return (
-		<>
-			<ContrastChecker
-				backgroundColor={ backgroundColor }
-				fontSize={ fontSize }
-				textColor={ textColor }
-			/>
-			<ContrastChecker
-				backgroundColor={ activeBackground }
-				fontSize={ fontSize }
-				textColor={ activeText }
-			/>
-			<ContrastChecker
-				backgroundColor={ hoverBackground }
-				fontSize={ fontSize }
-				textColor={ hoverText }
-			/>
-		</>
-	);
-}
 
 export default function Controls( {
 	attributes,
@@ -127,13 +89,6 @@ export default function Controls( {
 				__experimentalIsRenderedInSidebar
 				__next40pxDefaultSize
 				{ ...colorSettings }
-			/>
-			<ContrastCheckerMatrix
-				attributes={ attributes }
-				activeBackgroundColor={ activeBackgroundColor }
-				activeTextColor={ activeTextColor }
-				hoverBackgroundColor={ hoverBackgroundColor }
-				hoverTextColor={ hoverTextColor }
 			/>
 		</InspectorControls>
 	);

@@ -59,7 +59,7 @@ function block_core_tabs_menu_item_render_callback( array $attributes, string $c
 	// Replace the empty anchor content with the label
 	$output = preg_replace(
 		'/(<a[^>]*>)(<\/a>)/',
-		'$1' . html_entity_decode( $tab_label ) . '$2',
+		'$1' . '<span>' . html_entity_decode( $tab_label ) . '</span>' . '$2',
 		$output
 	);
 
