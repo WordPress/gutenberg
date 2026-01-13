@@ -3293,6 +3293,242 @@ describe( 'selectors', () => {
 				)
 			).toBe( false );
 		} );
+
+		it( 'should inherit allowedBlocks from ancestor with inheritAllowedBlocks', () => {
+			const state = {
+				blocks: {
+					byClientId: new Map(
+						Object.entries( {
+							block1: { name: 'core/test-block-a' },
+							block2: { name: 'core/test-block-ancestor' },
+						} )
+					),
+					attributes: new Map(
+						Object.entries( {
+							block1: {},
+							block2: {},
+						} )
+					),
+					parents: new Map(
+						Object.entries( {
+							block2: 'block1',
+						} )
+					),
+					order: new Map( [
+						[ '', [ 'block1' ] ],
+						[ 'block1', [ 'block2' ] ],
+					] ),
+				},
+				blockListSettings: {
+					block1: {
+						allowedBlocks: [
+							'core/test-block-ancestor',
+							'core/test-block-a',
+						],
+						inheritAllowedBlocks: true,
+					},
+					block2: {},
+				},
+				settings: {},
+				blockEditingModes: new Map(),
+			};
+			// core/test-block-b should be denied because it's not in the inherited allowedBlocks
+			expect(
+				canInsertBlockType( state, 'core/test-block-b', 'block2' )
+			).toBe( false );
+			// core/test-block-a should be allowed because it's in the inherited allowedBlocks
+			expect(
+				canInsertBlockType( state, 'core/test-block-a', 'block2' )
+			).toBe( true );
+		} );
+
+		it( 'should allow child explicit allowedBlocks to override inherited ones', () => {
+			const state = {
+				blocks: {
+					byClientId: new Map(
+						Object.entries( {
+							block1: { name: 'core/test-block-a' },
+							block2: { name: 'core/test-block-ancestor' },
+						} )
+					),
+					attributes: new Map(
+						Object.entries( {
+							block1: {},
+							block2: {},
+						} )
+					),
+					parents: new Map(
+						Object.entries( {
+							block2: 'block1',
+						} )
+					),
+					order: new Map( [
+						[ '', [ 'block1' ] ],
+						[ 'block1', [ 'block2' ] ],
+					] ),
+				},
+				blockListSettings: {
+					block1: {
+						allowedBlocks: [
+							'core/test-block-ancestor',
+							'core/test-block-a',
+						],
+						inheritAllowedBlocks: true,
+					},
+					block2: {
+						// Child explicitly sets its own allowedBlocks, overriding inheritance
+						allowedBlocks: [ 'core/test-block-b' ],
+					},
+				},
+				settings: {},
+				blockEditingModes: new Map(),
+			};
+			// core/test-block-b should be allowed because child has explicit allowedBlocks
+			expect(
+				canInsertBlockType( state, 'core/test-block-b', 'block2' )
+			).toBe( true );
+			// core/test-block-a should be denied because child overrides with its own list
+			expect(
+				canInsertBlockType( state, 'core/test-block-a', 'block2' )
+			).toBe( false );
+		} );
+
+		it( 'should not inherit allowedBlocks when inheritAllowedBlocks is false', () => {
+			const state = {
+				blocks: {
+					byClientId: new Map(
+						Object.entries( {
+							block1: { name: 'core/test-block-a' },
+							block2: { name: 'core/test-block-ancestor' },
+						} )
+					),
+					attributes: new Map(
+						Object.entries( {
+							block1: {},
+							block2: {},
+						} )
+					),
+					parents: new Map(
+						Object.entries( {
+							block2: 'block1',
+						} )
+					),
+					order: new Map( [
+						[ '', [ 'block1' ] ],
+						[ 'block1', [ 'block2' ] ],
+					] ),
+				},
+				blockListSettings: {
+					block1: {
+						allowedBlocks: [
+							'core/test-block-ancestor',
+							'core/test-block-a',
+						],
+						// inheritAllowedBlocks not set or false
+					},
+					block2: {},
+				},
+				settings: {},
+				blockEditingModes: new Map(),
+			};
+			// Should allow any block because inheritance is not enabled
+			expect(
+				canInsertBlockType( state, 'core/test-block-b', 'block2' )
+			).toBe( true );
+		} );
+
+		it( 'should inherit allowedBlocks even if child has allowedBlocks: true', () => {
+			const state = {
+				blocks: {
+					byClientId: new Map(
+						Object.entries( {
+							block1: { name: 'core/test-block-a' },
+							block2: { name: 'core/test-block-ancestor' },
+						} )
+					),
+					attributes: new Map(
+						Object.entries( {
+							block1: {},
+							block2: {},
+						} )
+					),
+					parents: new Map(
+						Object.entries( {
+							block2: 'block1',
+						} )
+					),
+					order: new Map( [
+						[ '', [ 'block1' ] ],
+						[ 'block1', [ 'block2' ] ],
+					] ),
+				},
+				blockListSettings: {
+					block1: {
+						allowedBlocks: [ 'core/test-block-ancestor' ],
+						inheritAllowedBlocks: true,
+					},
+					block2: {
+						allowedBlocks: true,
+					},
+				},
+				settings: {},
+				blockEditingModes: new Map(),
+			};
+			// core/test-block-b should be denied by ancestor
+			expect(
+				canInsertBlockType( state, 'core/test-block-b', 'block2' )
+			).toBe( false );
+		} );
+
+		it( 'should inherit allowedBlocks deeper down the tree (grandchild)', () => {
+			const state = {
+				blocks: {
+					byClientId: new Map(
+						Object.entries( {
+							block1: { name: 'core/test-block-a' },
+							block2: { name: 'core/test-block-ancestor' },
+							block3: { name: 'core/test-block-ancestor' },
+						} )
+					),
+					attributes: new Map(
+						Object.entries( {
+							block1: {},
+							block2: {},
+							block3: {},
+						} )
+					),
+					parents: new Map(
+						Object.entries( {
+							block2: 'block1',
+							block3: 'block2',
+						} )
+					),
+					order: new Map( [
+						[ '', [ 'block1' ] ],
+						[ 'block1', [ 'block2' ] ],
+						[ 'block2', [ 'block3' ] ],
+					] ),
+				},
+				blockListSettings: {
+					block1: {
+						allowedBlocks: [ 'core/test-block-ancestor' ],
+						inheritAllowedBlocks: true,
+					},
+					block2: {
+						allowedBlocks: true, // Group
+					},
+					block3: {
+						allowedBlocks: true, // Nested Group
+					},
+				},
+				settings: {},
+				blockEditingModes: new Map(),
+			};
+			// core/test-block-b should be denied by ancestor block1
+			expect(
+				canInsertBlockType( state, 'core/test-block-b', 'block3' )
+			).toBe( false );
+		} );
 	} );
 
 	describe( 'canInsertBlocks', () => {
