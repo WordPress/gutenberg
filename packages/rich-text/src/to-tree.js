@@ -327,14 +327,6 @@ export function toTree( {
 		// Insert a <br> for completely empty fields so browsers can place
 		// the caret and extend selection into them.
 		if ( isEditableTree && text.length === 0 ) {
-			append( getParent( pointer ), {
-				type: 'br',
-				attributes: {
-					'data-rich-text-padding': 'true',
-				},
-				object: true,
-			} );
-
 			// We CANNOT use CSS to add a placeholder with pseudo elements on
 			// the main block wrappers because that could clash with theme CSS
 			// using ::before of ::after to style the elements (e.g. heading
@@ -350,6 +342,13 @@ export function toTree( {
 					},
 				} );
 			}
+			append( getParent( pointer ), {
+				type: 'br',
+				attributes: {
+					'data-rich-text-padding': 'true',
+				},
+				object: true,
+			} );
 		}
 
 		lastCharacterFormats = characterFormats;
