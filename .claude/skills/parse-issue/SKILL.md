@@ -1,14 +1,3 @@
----
-name: parse-issue
-description: Parse a Gutenberg bug report into structured data
-allowed_args: issue
-allowedTools:
-  - Bash
-  - Write
-  - mcp__plugin_context7_context7__resolve-library-id
-  - mcp__plugin_context7_context7__query-docs
----
-
 # /parse-issue
 
 Parse a WordPress Gutenberg bug report into structured reproduction data.
@@ -21,6 +10,7 @@ This skill can be used in two ways:
 2. **Standalone:** Manually invoked to parse an issue
 
 **Standalone usage examples:**
+
 ```
 User: "Use the parse-issue skill for issue 74447"
 User: "Parse issue https://github.com/aagam-shah/gutenberg/issues/73872"
@@ -41,6 +31,7 @@ User: "Parse issue 72364 and check if triage is needed"
 Writes to `.triage/<issue>/<issue>.parsed.json`
 
 **Output includes:**
+
 - Issue metadata (number, title, state, author, url)
 - Labels with descriptions
 - Affected blocks and features
@@ -65,6 +56,7 @@ Fetches issue body AND all comments (often contain critical context).
 ### 2. Validate it's a bug report
 
 Check that:
+
 - Issue has the `[Type] Bug` label
 - Issue state is `open` (warn if closed but continue)
 
@@ -76,16 +68,17 @@ Gutenberg uses a structured label taxonomy. Extract ALL labels for context.
 
 **Label prefixes:**
 
-| Prefix | Purpose | Example |
-|--------|---------|---------|
-| `[Type]` | Issue type | `[Type] Bug` |
-| `[Status]` | Workflow state | `[Status] Needs Testing` |
-| `[Block]` | Affected block | `[Block] Navigation` |
-| `[Feature]` | Affected feature | `[Feature] Patterns` |
-| `[Package]` | npm package | `[Package] Components` |
-| `[Focus]` | Area of focus | `[Focus] Accessibility` |
+| Prefix      | Purpose          | Example                  |
+| ----------- | ---------------- | ------------------------ |
+| `[Type]`    | Issue type       | `[Type] Bug`             |
+| `[Status]`  | Workflow state   | `[Status] Needs Testing` |
+| `[Block]`   | Affected block   | `[Block] Navigation`     |
+| `[Feature]` | Affected feature | `[Feature] Patterns`     |
+| `[Package]` | npm package      | `[Package] Components`   |
+| `[Focus]`   | Area of focus    | `[Focus] Accessibility`  |
 
 **Use labels to disambiguate steps:**
+
 - If `[Block] More` is present and steps mention "the block", it's the More block
 - If `[Feature] Block Visibility` is present and steps say "set to Hide", it's the visibility toggle
 - Label descriptions often contain helpful context
@@ -95,6 +88,7 @@ Gutenberg uses a structured label taxonomy. Extract ALL labels for context.
 Comments often contain critical information missing from the original report.
 
 **Look for:**
+
 - **Feature names**: Maintainers often name the specific feature
 - **Technical explanations**: How the feature works
 - **Clarifications**: Reporter or maintainers clarifying steps
@@ -102,6 +96,7 @@ Comments often contain critical information missing from the original report.
 - **Reproduction confirmations**: Others confirming the bug
 
 **Comment signals:**
+
 - Comments from `MEMBER` or `CONTRIBUTOR` carry more weight
 - "This is related to..." or "This happens because..." explains root cause
 
@@ -109,13 +104,13 @@ Comments often contain critical information missing from the original report.
 
 Gutenberg bug template sections (identified by `### ` headings):
 
-| Section | Required | Content |
-|---------|----------|---------|
-| `### Description` | Yes | What the bug is |
-| `### Step-by-step reproduction instructions` | Yes | Numbered steps |
-| `### Screenshots, screen recording, code snippet` | No | Visual evidence |
-| `### Environment info` | Yes | WP/Gutenberg versions |
-| `### Please confirm...` | No | Checkboxes, ignore |
+| Section                                           | Required | Content               |
+| ------------------------------------------------- | -------- | --------------------- |
+| `### Description`                                 | Yes      | What the bug is       |
+| `### Step-by-step reproduction instructions`      | Yes      | Numbered steps        |
+| `### Screenshots, screen recording, code snippet` | No       | Visual evidence       |
+| `### Environment info`                            | Yes      | WP/Gutenberg versions |
+| `### Please confirm...`                           | No       | Checkboxes, ignore    |
 
 ### 6. Extract environment details
 
@@ -136,6 +131,7 @@ From `### Step-by-step reproduction instructions`:
 - Flag ambiguous steps
 
 **Ambiguity indicators:**
+
 - Vague actions: "click around", "navigate somewhere"
 - Missing specifics: "click the button" (which button?)
 - Assumes context: "in the editor" (which editor?)
@@ -144,6 +140,7 @@ From `### Step-by-step reproduction instructions`:
 ### 8. Identify expected vs actual
 
 Extract from `### Description` or explicit sections:
+
 - What should happen (expected)
 - What actually happens (actual)
 
@@ -154,11 +151,13 @@ Before proceeding with triage, check if maintainers have already confirmed and i
 **Skip triage if ANY of these conditions are met:**
 
 1. **Status indicates work in progress:**
+
    - Has `[Status] In Progress` label
    - Has `[Status] LGTM` label
    - Has linked PR (check for "linked a pull request" in timeline)
 
 2. **Maintainers have confirmed the bug:**
+
    - Comments from MEMBER or OWNER confirming reproduction
    - Comments identifying specific code location (file paths, line numbers)
    - Comments with "reproduced", "confirmed", "I can reproduce"
@@ -169,6 +168,7 @@ Before proceeding with triage, check if maintainers have already confirmed and i
    - Fix approach discussed
 
 **Set in parsed JSON:**
+
 ```json
 {
   "needs_triage": false,
@@ -177,6 +177,7 @@ Before proceeding with triage, check if maintainers have already confirmed and i
 ```
 
 If issue needs triage (none of above conditions met):
+
 ```json
 {
   "needs_triage": true
@@ -244,6 +245,7 @@ If specific features or components are mentioned, use Context7 to gather relevan
 - Issue mentions specific block → Query Context7: "WordPress [Block Name] block implementation"
 
 This helps understand:
+
 - How the feature is supposed to work
 - Common patterns and APIs used
 - Related functionality that might be affected
@@ -291,6 +293,7 @@ OUTPUT: .triage/<issue>.parsed.json
 ## Fallback: Non-template issues
 
 If issue doesn't follow template:
+
 1. Attempt best-effort extraction
 2. Look for keywords: "steps", "reproduce", "expected", "actual", "version"
 3. Flag as `parseable: false` with notes on what's missing

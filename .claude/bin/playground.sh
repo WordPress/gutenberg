@@ -3,17 +3,17 @@
 # Playground lifecycle management for Gutenberg Issue Triage
 #
 # Usage:
-#   ./bin/playground.sh start [--blueprint=path] [--port=9400]
-#   ./bin/playground.sh stop
-#   ./bin/playground.sh status
-#   ./bin/playground.sh url
+#   .claude/bin/playground.sh start [--blueprint=path] [--port=9400]
+#   .claude/bin/playground.sh stop
+#   .claude/bin/playground.sh status
+#   .claude/bin/playground.sh url
 #
 
 set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
-TRIAGE_DIR="$PROJECT_DIR/.triage"
+TRIAGE_DIR="$PROJECT_DIR/.claude/.triage"
 PID_FILE="$TRIAGE_DIR/playground.pid"
 LOG_FILE="$TRIAGE_DIR/playground.log"
 URL_FILE="$TRIAGE_DIR/playground.url"
