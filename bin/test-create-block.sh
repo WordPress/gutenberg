@@ -89,10 +89,6 @@ if [ "$expected" -ne "$actual" ]; then
     exit 1
 fi
 
-# Ensure monorepo prelint scripts have run (e.g., to build design tokens for ESLint).
-status "Running prelint..."
-( cd .. && npm run prelint )
-
 status "Linting CSS files..."
 ../node_modules/.bin/wp-scripts lint-style
 

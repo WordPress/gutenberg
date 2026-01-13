@@ -54,7 +54,7 @@
 		"access": "public"
 	},
 	"scripts": {
-		"prelint": "npm run build",
+		"prelint:js": "npm run build",
 		"prepare": "npm run build",
 		"build": "node lib/generate-library.cjs"
 	}

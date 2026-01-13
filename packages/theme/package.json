@@ -93,7 +93,7 @@
 		"access": "public"
 	},
 	"scripts": {
-		"prelint": "npx esbuild src/prebuilt/js/design-tokens.mjs --format=cjs --outfile=build/prebuilt/js/design-tokens.cjs && node -e \"\"",
+		"prelint:js": "npx esbuild src/prebuilt/js/design-tokens.mjs --format=cjs --outfile=build/prebuilt/js/design-tokens.cjs && node -e \"\"",
 		"build:default-ramps": "node --import=esbuild-esm-loader/register bin/generate-default-ramps/index.ts",
 		"build:tokens": "node --import=esbuild-esm-loader/register bin/generate-primitive-tokens/index.ts && cross-env NODE_OPTIONS=--import=esbuild-esm-loader/register tz build --config terrazzo.config.ts",
 		"build": "npm run build:tokens && npm run build:default-ramps",
