@@ -39,32 +39,24 @@ export default function ResponsiveWrapper( {
 
 	const responsiveContainerClasses = clsx(
 		'wp-block-navigation__responsive-container',
-		{
+		! hasCustomOverlay && {
 			'has-text-color':
-				! hasCustomOverlay &&
-				( !! overlayTextColor.color || !! overlayTextColor?.class ),
+				!! overlayTextColor.color || !! overlayTextColor?.class,
 			[ getColorClassName( 'color', overlayTextColor?.slug ) ]:
-				! hasCustomOverlay && !! overlayTextColor?.slug,
+				!! overlayTextColor?.slug,
 			'has-background':
-				! hasCustomOverlay &&
-				( !! overlayBackgroundColor.color ||
-					overlayBackgroundColor?.class ),
+				!! overlayBackgroundColor.color ||
+				overlayBackgroundColor?.class,
 			[ getColorClassName(
 				'background-color',
 				overlayBackgroundColor?.slug
-			) ]: ! hasCustomOverlay && !! overlayBackgroundColor?.slug,
-			'is-menu-open': isOpen,
-			'hidden-by-default': isHiddenByDefault,
+			) ]: !! overlayBackgroundColor?.slug,
 		}
 	);
 
-	const styles = {
-		color:
-			! hasCustomOverlay &&
-			! overlayTextColor?.slug &&
-			overlayTextColor?.color,
+	const styles = ! hasCustomOverlay && {
+		color: ! overlayTextColor?.slug && overlayTextColor?.color,
 		backgroundColor:
-			! hasCustomOverlay &&
 			! overlayBackgroundColor?.slug &&
 			overlayBackgroundColor?.color &&
 			overlayBackgroundColor.color,
