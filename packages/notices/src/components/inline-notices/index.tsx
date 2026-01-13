@@ -27,8 +27,9 @@ export default function InlineNotices( {
 	pinnedNoticesClassName,
 	dismissibleNoticesClassName,
 }: InlineNoticesProps ) {
-	const notices = useSelect( ( select ) =>
-		select( noticesStore ).getNotices()
+	const notices = useSelect(
+		( select ) => select( noticesStore ).getNotices(),
+		[]
 	);
 	const { removeNotice } = useDispatch( noticesStore );
 	const dismissibleNotices = notices.filter(
