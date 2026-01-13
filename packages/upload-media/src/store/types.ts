@@ -173,6 +173,7 @@ export interface Attachment {
 	mime_type: string;
 	featured_media?: number;
 	missing_image_sizes?: string[];
+	media_filename?: string;
 	poster?: string;
 }
 
@@ -215,5 +216,10 @@ type OperationWithArgs< T extends keyof OperationArgs = keyof OperationArgs > =
 export type Operation = OperationType | OperationWithArgs;
 
 export type AdditionalData = Record< string, unknown >;
+
+export interface SideloadAdditionalData extends AdditionalData {
+	post: number;
+	image_size: string;
+}
 
 export type ImageFormat = 'jpeg' | 'webp' | 'avif' | 'png' | 'gif';
