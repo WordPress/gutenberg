@@ -126,6 +126,7 @@ function gutenberg_get_experiment_definitions() {
 			'description' => __( 'Enables editable block inspector fields that are generated using a dataform.', 'gutenberg' ),
 			'category'    => 'advanced',
 			'icon'        => 'settings',
+			'requires'    => 'gutenberg-content-only-pattern-insertion',
 		),
 		array(
 			'id'          => 'gutenberg-hide-blocks-based-on-screen-size',

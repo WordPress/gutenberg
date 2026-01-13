@@ -126,6 +126,7 @@ const experimentDefinitions = [
 			'Enables editable block inspector fields that are generated using a dataform.',
 		category: 'advanced',
 		icon: 'settings',
+		requires: 'gutenberg-content-only-pattern-insertion',
 	},
 	{
 		id: 'gutenberg-hide-blocks-based-on-screen-size',
