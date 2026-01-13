@@ -27,26 +27,27 @@ const authorField: Field< BasePostWithEmbeddedAuthor > = {
 			search?: string;
 			include?: ( string | number )[];
 		} = {
-			per_page: perPage ?? 20,
+			per_page: perPage ?? 2,
 			search: search || undefined,
 		};
 		if ( include?.length ) {
 			queryArgs.include = include;
 		}
-		const getRecordsArgs = [ 'root', 'user', queryArgs ];
-		const [ authors, totalItems, totalPages ]: [
-			Author[],
-			number | null,
-			number | null,
-		] = await Promise.all( [
-			resolveSelect( coreDataStore ).getEntityRecords(
-				...getRecordsArgs
+		const [ authors, totalItems, totalPages ] = await Promise.all( [
+			resolveSelect( coreDataStore ).getEntityRecords< Author >(
+				'root',
+				'user',
+				queryArgs
 			),
 			resolveSelect( coreDataStore ).getEntityRecordsTotalItems(
-				...getRecordsArgs
+				'root',
+				'user',
+				queryArgs
 			),
 			resolveSelect( coreDataStore ).getEntityRecordsTotalPages(
-				...getRecordsArgs
+				'root',
+				'user',
+				queryArgs
 			),
 		] );
 

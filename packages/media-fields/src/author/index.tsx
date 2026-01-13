@@ -30,10 +30,11 @@ const authorField: Partial< Field< MediaItem > > = {
 					per_page: -1,
 				}
 			) ) ?? [];
-		return authors.map( ( { id, name } ) => ( {
+		const elements = authors.map( ( { id, name } ) => ( {
 			value: id,
 			label: name,
 		} ) );
+		return { elements };
 	},
 	render: AuthorView,
 	sort: ( a, b, direction ) => {
