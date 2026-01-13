@@ -40,16 +40,11 @@ const CONTROLS = {
  * and passes configuration as props.
  *
  * @param {Component} ControlComponent The React component for the control.
- * @param {string}    type             The type of control.
  * @param {Object}    config           The control configuration passed as a prop.
  *
  * @return {Function} A wrapped control component
  */
-function createConfiguredControl( ControlComponent, type, config ) {
-	if ( ! ControlComponent ) {
-		throw new Error( `Control type "${ type }" not found` );
-	}
-
+function createConfiguredControl( ControlComponent, config = {} ) {
 	return function ConfiguredControl( props ) {
 		return <ControlComponent { ...props } config={ config } />;
 	};
@@ -104,64 +99,36 @@ function BlockFields( {
 
 		return blockTypeFields.map( ( fieldDef ) => {
 			const field = {
-				id: fieldDef.id,
-				label: fieldDef.label,
-				type: fieldDef.type, // Use the field's type; DataForm will use built-in or custom Edit
+				...fieldDef,
 			};
 
-			// If the field defines a `mapping`, then custom `getValue` and `setValue`
-			// implementations are provided.
-			// These functions map from the inconsistent attribute keys found on blocks
-			// to consistent keys that the field can use internally (and back again).
-			// When `mapping` isn't provided, we can use the field API's default
-			// implementation of these functions.
-			if ( fieldDef.mapping ) {
-				field.getValue = ( { item } ) => {
-					// Extract mapped properties from the block attributes
-					const mappedValue = {};
-					Object.entries( fieldDef.mapping ).forEach(
-						( [ key, attrKey ] ) => {
-							mappedValue[ key ] = item[ attrKey ];
-						}
-					);
-					return mappedValue;
-				};
-				field.setValue = ( { value } ) => {
-					const attributeUpdates = {};
-					Object.entries( fieldDef.mapping ).forEach(
-						( [ key, attrKey ] ) => {
-							attributeUpdates[ attrKey ] = value[ key ];
-						}
-					);
-					return attributeUpdates;
-				};
-			}
-
 			// These should be custom Edit components, not replaced here.
-			if ( 'string' === typeof fieldDef.Edit ) {
-				const ControlComponent = CONTROLS[ fieldDef.Edit ];
-				if ( ControlComponent ) {
-					field.Edit = createConfiguredControl(
-						ControlComponent,
-						fieldDef.type,
-						{
-							clientId,
-							fieldDef,
-						}
-					);
-				}
-			} else if ( 'object' === typeof fieldDef.Edit ) {
-				const ControlComponent = CONTROLS[ fieldDef.Edit.control ];
-				if ( ControlComponent ) {
-					field.Edit = createConfiguredControl(
-						ControlComponent,
-						fieldDef.Edit.control,
-						{
-							...fieldDef.Edit,
-							clientId,
-						}
-					);
-				}
+			//
+			// - richtext control: it needs clientId
+			// - link control: does not need anything extra
+			// - media control: needs the Edit config
+			if (
+				'string' === typeof fieldDef.Edit &&
+				fieldDef.Edit === 'richtext'
+			) {
+				const RichText = CONTROLS[ 'richtext' ];
+				field.Edit = createConfiguredControl( RichText, {
+					clientId,
+				} );
+			} else if (
+				'string' === typeof fieldDef.Edit &&
+				fieldDef.Edit === 'link'
+			) {
+				const Link = CONTROLS[ 'link' ];
+				field.Edit = createConfiguredControl( Link );
+			} else if (
+				'object' === typeof fieldDef.Edit &&
+				fieldDef.Edit.control === 'media'
+			) {
+				const Media = CONTROLS[ 'media' ];
+				field.Edit = createConfiguredControl( Media, {
+					...fieldDef.Edit,
+				} );
 			}
 
 			return field;
