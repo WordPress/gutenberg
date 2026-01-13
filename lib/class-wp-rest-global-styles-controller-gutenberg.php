@@ -731,7 +731,7 @@ class WP_REST_Global_Styles_Controller_Gutenberg extends WP_REST_Posts_Controlle
 						'rest_custom_css_illegal_markup',
 						sprintf(
 							/* translators: %s is the CSS that was provided. */
-							__( 'The CSS must not end in "%s".' ),
+							__( 'The CSS must not end in "%s".', 'gutenberg' ),
 							esc_html( substr( $css, $at ) )
 						),
 						array( 'status' => 400 )
@@ -743,7 +743,7 @@ class WP_REST_Global_Styles_Controller_Gutenberg extends WP_REST_Posts_Controlle
 						'rest_custom_css_illegal_markup',
 						sprintf(
 							/* translators: %s is the CSS that was provided. */
-							__( 'The CSS must not contain "%s".' ),
+							__( 'The CSS must not contain "%s".', 'gutenberg' ),
 							esc_html( substr( $css, $at, 8 ) )
 						),
 						array( 'status' => 400 )
