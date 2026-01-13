@@ -72,7 +72,8 @@ export default function BlockEdit( {
 					[ mayDisplayControlsKey ]: mayDisplayControls,
 					[ mayDisplayParentControlsKey ]: mayDisplayParentControls,
 					[ mayDisplayPatternEditingControlsKey ]:
-						mayDisplayPatternEditingControls,
+						mayDisplayPatternEditingControls &&
+						blockEditingMode !== 'disabled',
 					[ blockEditingModeKey ]: blockEditingMode,
 					[ blockBindingsKey ]: bindings,
 					[ isPreviewModeKey ]: isPreviewMode,
