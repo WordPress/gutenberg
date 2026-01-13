@@ -42,13 +42,11 @@ export function WithDesignSystemTheme(
 		color = { bg: '#1e1e1e', primary: '#3858e9' };
 	}
 
-	const hasThemedBackground = colorTheme === 'dark';
-
 	return (
 		<ThemeProvider color={ color } density={ density } isRoot>
 			<div
 				style={
-					hasThemedBackground
+					color?.bg
 						? {
 								background:
 									'var(--wpds-color-bg-surface-neutral-strong)',
@@ -64,7 +62,7 @@ export function WithDesignSystemTheme(
 				}
 			>
 				<Story { ...context } />
-				{ hasThemedBackground && (
+				{ color?.bg && (
 					<small
 						style={ {
 							display: 'block',
