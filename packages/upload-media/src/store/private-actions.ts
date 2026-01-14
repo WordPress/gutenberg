@@ -694,8 +694,10 @@ export function generateThumbnails( id: QueueItemId ) {
 				: item.file;
 			const batchId = uuidv4();
 
+			const allImageSizes = select.getSettings().allImageSizes || {};
+
 			for ( const name of attachment.missing_image_sizes ) {
-				const imageSize = select.getImageSize( name );
+				const imageSize = allImageSizes[ name ];
 				if ( ! imageSize ) {
 					continue;
 				}
