@@ -56,6 +56,8 @@ jobs:
                   sudo apt-get update
                   sudo apt-get install -y chromium-browser
                   which chromium-browser && chromium-browser --version
+                  # Set Chrome path for MCP
+                  echo "CHROME_PATH=$(which chromium-browser)" >> $GITHUB_ENV
 
             - name: Install WordPress Playground CLI
               run: npm install -g @wp-playground/cli
