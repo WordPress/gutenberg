@@ -41,7 +41,6 @@ function block_core_tab_render( array $attributes, string $content ): string {
 		)
 	);
 
-
 	/**
 	 * Process accessibility and interactivity attributes.
 	 */

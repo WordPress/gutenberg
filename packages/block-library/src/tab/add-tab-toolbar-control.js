@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { sprintf } from '@wordpress/i18n';
 import { createBlock } from '@wordpress/blocks';
 import {
 	BlockControls,
@@ -60,6 +61,7 @@ export default function AddTabToolbarControl( { tabsClientId } ) {
 		}
 		const newTabBlock = createBlock( 'core/tab', {
 			anchor: 'tab-' + nextTabIndex,
+			label: sprintf( __( 'Tab %d', 'prc-block-library' ), nextTabIndex ),
 		} );
 		insertBlock( newTabBlock, undefined, tabPanelsClientId );
 		// @TODO: Possible select and focus the tabs-menu-item active tab RichText editor?
