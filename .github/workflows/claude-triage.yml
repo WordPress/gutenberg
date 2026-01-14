@@ -35,6 +35,20 @@ jobs:
             github.event_name == 'issues' ||
             (github.event_name == 'issue_comment' && contains(github.event.comment.body, '@claude'))
         steps:
+            # #region agent log
+            - name: Debug - Log workflow trigger info
+              run: |
+                echo "WORKFLOW_TRIGGER_DEBUG" >> /tmp/workflow-debug.log
+                echo "event_name: ${{ github.event_name }}" >> /tmp/workflow-debug.log
+                echo "issue_number: ${{ github.event.issue.number }}" >> /tmp/workflow-debug.log
+                echo "actor: ${{ github.actor }}" >> /tmp/workflow-debug.log
+                echo "comment_author: ${{ github.event.comment.user.login }}" >> /tmp/workflow-debug.log
+                echo "comment_body_preview: ${{ github.event.comment.body }}" >> /tmp/workflow-debug.log
+                echo "concurrency_group: claude-triage-${{ github.event.issue.number }}" >> /tmp/workflow-debug.log
+                echo "run_id: ${{ github.run_id }}" >> /tmp/workflow-debug.log
+                echo "run_number: ${{ github.run_number }}" >> /tmp/workflow-debug.log
+                cat /tmp/workflow-debug.log
+            # #endregion
             - name: Checkout repository
               uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
               with:
@@ -64,6 +78,14 @@ jobs:
                   }
                   EOF
 
+            # #region agent log
+            - name: Debug - Log before triage execution
+              run: |
+                echo "BEFORE_TRIAGE_EXECUTION" >> /tmp/workflow-debug.log
+                echo "timestamp: $(date -u +%Y-%m-%dT%H:%M:%SZ)" >> /tmp/workflow-debug.log
+                echo "run_id: ${{ github.run_id }}" >> /tmp/workflow-debug.log
+                cat /tmp/workflow-debug.log
+            # #endregion
             - name: Run Claude Triage
               uses: anthropics/claude-code-action@v1
               env:
@@ -85,3 +107,13 @@ jobs:
                   claude_args: |
                       --mcp-config /tmp/mcp-config.json
                       --allowedTools "Bash,Read,Write,Edit,Glob,Grep,Skill,mcp__playwright__browser_navigate,mcp__playwright__browser_snapshot,mcp__playwright__browser_click,mcp__playwright__browser_type,mcp__playwright__browser_press_key,mcp__playwright__browser_fill_form,mcp__playwright__browser_take_screenshot,mcp__playwright__browser_console_messages,mcp__playwright__browser_network_requests,mcp__playwright__browser_wait_for,mcp__playwright__browser_handle_dialog,mcp__playwright__browser_hover,mcp__playwright__browser_navigate_back,mcp__playwright__browser_close,mcp__context7"
+            # #region agent log
+            - name: Debug - Log after triage execution
+              if: always()
+              run: |
+                echo "AFTER_TRIAGE_EXECUTION" >> /tmp/workflow-debug.log
+                echo "timestamp: $(date -u +%Y-%m-%dT%H:%M:%SZ)" >> /tmp/workflow-debug.log
+                echo "run_id: ${{ github.run_id }}" >> /tmp/workflow-debug.log
+                echo "job_status: ${{ job.status }}" >> /tmp/workflow-debug.log
+                cat /tmp/workflow-debug.log
+            # #endregion
