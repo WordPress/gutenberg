@@ -10,6 +10,7 @@ const { promisify } = require( 'util' );
  * Internal dependencies
  */
 const { validateCollection } = require( './validate-collection.cjs' );
+const { validateJsonManifest } = require( './validate-manifest' );
 
 const execFileAsync = promisify( execFile );
 
@@ -18,6 +19,7 @@ const ICON_LIBRARY_DIR = path.join( __dirname, '..', 'src', 'library' );
 // - Find *.svg files in ./library
 // - For each, generate a sibling .tsx file
 // - Build an index of these at ./library/index.ts
+// - Build a JSON list of slugs ./library/index.json
 //
 // Note that the generated files are ignored by Git.
 
@@ -29,8 +31,9 @@ async function main() {
 	await ensureSvgFilesTracked();
 	await cleanup();
 	await generateTsxFiles();
-	await generateIndex();
+	await generateIndexes();
 	await validateCollection();
+	await validateJsonManifest();
 }
 
 // Before automatically generating TSX files from SVG ones, ensure that all
@@ -117,12 +120,13 @@ async function generateTsxFiles( svgFiles ) {
 }
 
 // Generate src/library/index.ts as a list of exports of the library's modules.
-async function generateIndex() {
+// Generate src/library/index.json as an array of icon slugs.
+async function generateIndexes() {
 	const tsxFiles = ( await readdir( ICON_LIBRARY_DIR ) ).filter( ( file ) =>
 		file.endsWith( '.tsx' )
 	);
 
-	let indexTemplate = tsxFiles
+	let indexJs = tsxFiles
 		.map( ( file ) => {
 			const importPath = path.basename( file, '.tsx' );
 
@@ -135,10 +139,18 @@ async function generateIndex() {
 		} )
 		.join( '\n' );
 
-	// Trailing newlines make ESLint happy
-	indexTemplate += '\n';
+	let indexJson = JSON.stringify(
+		tsxFiles.map( ( file ) => path.basename( file, '.tsx' ) + '.svg' ),
+		undefined,
+		2
+	);
 
-	await writeFile( path.join( ICON_LIBRARY_DIR, 'index.ts' ), indexTemplate );
+	// Trailing newlines make ESLint happy
+	indexJs += '\n';
+	indexJson += '\n';
+
+	await writeFile( path.join( ICON_LIBRARY_DIR, 'index.ts' ), indexJs );
+	await writeFile( path.join( ICON_LIBRARY_DIR, 'index.json' ), indexJson );
 }
 
 // "Transform" to TSX by interpolating the SVG source into a simple TS module
