@@ -146,6 +146,11 @@ export interface SideloadMediaArgs {
 }
 
 export interface Settings {
+	// Registered image sizes from the server.
+	allImageSizes?: Record<
+		string,
+		{ width: number; height: number; crop: boolean }
+	>;
 	// Function for uploading files to the server.
 	mediaUpload: ( args: UploadMediaArgs ) => void;
 	// Function for sideloading files to existing attachments.
@@ -156,8 +161,6 @@ export interface Settings {
 	maxUploadFileSize?: number;
 	// Maximum number of concurrent uploads.
 	maxConcurrentUploads: number;
-	// Registered image sizes from the server.
-	allImageSizes?: Record< string, ImageSizeCrop >;
 }
 
 // Must match the Attachment type from the media-utils package.

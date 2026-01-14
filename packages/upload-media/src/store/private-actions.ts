@@ -403,9 +403,12 @@ export function processItem( id: QueueItemId ) {
 					return;
 				}
 
-				debug.log( 'Removing parent item after all sideloads complete', {
-					parentId,
-				} );
+				debug.log(
+					'Removing parent item after all sideloads complete',
+					{
+						parentId,
+					}
+				);
 
 				if ( attachment ) {
 					parentItem.onSuccess?.( [ attachment ] );
@@ -584,7 +587,6 @@ export function finishOperation(
 							url: updates.attachment.url,
 							missing_image_sizes:
 								updates.attachment.missing_image_sizes,
-							registered_sizes: updates.attachment.registered_sizes,
 					  }
 					: undefined,
 			},
@@ -914,15 +916,16 @@ export function generateThumbnails( id: QueueItemId ) {
 				file,
 			} );
 
-			const settings = select.getSettings();
-			console.log( 'Settings in generateThumbnails:', settings );
-
-			const allImageSizes = settings.allImageSizes;
+			// Get all registered image sizes from settings.
+			const allImageSizes = select.getSettings().allImageSizes || {};
 
 			for ( const name of attachment.missing_image_sizes ) {
-				const imageSize = allImageSizes?.[ name as keyof typeof allImageSizes ];
+				const imageSize =
+					allImageSizes?.[ name as keyof typeof allImageSizes ];
 				if ( ! imageSize ) {
-					debug.warn( `Image size "${ name }" not found in settings, skipping` );
+					debug.warn(
+						`Image size "${ name }" not found in settings, skipping`
+					);
 					continue;
 				}
 
@@ -970,7 +973,9 @@ export function generateThumbnails( id: QueueItemId ) {
 				} );
 			}
 
-			debug.log( `Queued ${ attachment.missing_image_sizes.length } thumbnails for generation` );
+			debug.log(
+				`Queued ${ attachment.missing_image_sizes.length } thumbnails for generation`
+			);
 		} else {
 			debug.log( 'No thumbnails to generate', {
 				hasParentId: !! item.parentId,
