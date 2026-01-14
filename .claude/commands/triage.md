@@ -831,3 +831,25 @@ Format code references as:
 ## 4.5 Output to console
 
 Print the formatted markdown to console. Keep the output concise - aim for 50-100 lines maximum for GitHub comment readability.
+
+## 4.6 Post GitHub comment
+
+After generating the findings, post the comment to the GitHub issue:
+
+```bash
+gh issue comment <issue_number> --repo aagam-shah/gutenberg --body "$(cat <<'EOF'
+<formatted markdown from 4.3>
+EOF
+)"
+```
+
+**Important:**
+- Use the exact markdown format from section 4.3
+- The comment will be posted under the authenticated user's account
+- Confirm successful posting by checking the command output
+
+**Output after posting:**
+
+```
+COMMENT POSTED: https://github.com/aagam-shah/gutenberg/issues/<issue>#issuecomment-<id>
+```
