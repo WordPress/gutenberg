@@ -225,32 +225,41 @@ export function useEventHandlers( { clientId, isSelected } ) {
 				}
 
 				let hasStarted = false;
+				let lastClientX = originClientX;
+				let lastClientY = originClientY;
 
-				function over( e ) {
+				function dragOver( e ) {
+					// Only trigger `over` if the mouse has moved.
+					if (
+						e.clientX === lastClientX &&
+						e.clientY === lastClientY
+					) {
+						return;
+					}
+					lastClientX = e.clientX;
+					lastClientY = e.clientY;
+					over();
+				}
+
+				function over() {
 					if ( ! hasStarted ) {
 						hasStarted = true;
 						node.style.pointerEvents = 'none';
 					}
+					const pointerYDelta = lastClientY - originClientY;
+					const pointerXDelta = lastClientX - originClientX;
 					const scrollTop = defaultView.scrollY;
 					const scrollLeft = defaultView.scrollX;
-					node.style.top = `${
-						( e.clientY -
-							originClientY +
-							scrollTop -
-							originScrollTop ) *
-						inverted
-					}px`;
-					node.style.left = `${
-						( e.clientX -
-							originClientX +
-							scrollLeft -
-							originScrollLeft ) *
-						inverted
-					}px`;
+					const scrollTopDelta = scrollTop - originScrollTop;
+					const scrollLeftDelta = scrollLeft - originScrollLeft;
+					const topDelta = pointerYDelta + scrollTopDelta;
+					const leftDelta = pointerXDelta + scrollLeftDelta;
+					node.style.top = `${ topDelta * inverted }px`;
+					node.style.left = `${ leftDelta * inverted }px`;
 				}
 
 				function end() {
-					ownerDocument.removeEventListener( 'dragover', over );
+					ownerDocument.removeEventListener( 'dragover', dragOver );
 					ownerDocument.removeEventListener( 'dragend', end );
 					ownerDocument.removeEventListener( 'drop', end );
 					ownerDocument.removeEventListener( 'scroll', over );
@@ -271,7 +280,7 @@ export function useEventHandlers( { clientId, isSelected } ) {
 					);
 				}
 
-				ownerDocument.addEventListener( 'dragover', over );
+				ownerDocument.addEventListener( 'dragover', dragOver );
 				ownerDocument.addEventListener( 'dragend', end );
 				ownerDocument.addEventListener( 'drop', end );
 				ownerDocument.addEventListener( 'scroll', over );
