@@ -174,11 +174,17 @@ Execute the reporting instructions and post the GitHub comment.
 - For Playwright-based triage, use `/triage` instead
 - Only Step 3 uses a subagent - this is intentional for optimal cache/isolation balance
 
-## IMPORTANT: Do NOT use Playwright
+## IMPORTANT: Do NOT use Playwright or Other Browser Automation Fallbacks
 
 This workflow uses **Chrome DevTools MCP only**. Do NOT:
 - Read or reference `3-reproduce-playwright.md`
 - Use any `mcp__playwright__*` tools
 - Fall back to Playwright if DevTools fails
+- Use Puppeteer directly (via npm/npx or any other method)
+- Use Selenium, WebDriver, or any other browser automation library
+- Attempt to write custom browser automation scripts
 
-If Chrome DevTools MCP is unavailable, **fail fast** - do not attempt alternatives.
+If Chrome DevTools MCP is unavailable, **fail fast**:
+1. Write a findings.json with `result: "inconclusive"` and explain MCP was unavailable
+2. Post a GitHub comment explaining the failure
+3. **STOP** - do not attempt any alternatives or workarounds
