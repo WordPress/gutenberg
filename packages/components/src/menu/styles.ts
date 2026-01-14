@@ -72,32 +72,42 @@ export const Menu = styled( Ariakit.Menu )< Pick< ContextProps, 'variant' > >`
 			${ DROPDOWN_MOTION_CSS.FADE_EASING };
 		will-change: transform, opacity;
 
-		/* Regardless of the side, fade in and out. */
-		opacity: 0;
-		&[data-enter] {
-			opacity: 1;
-		}
+		&:not( [data-submenu] ) {
+			/* Regardless of the side, fade in and out. */
+			opacity: 0;
+			&[data-enter] {
+				opacity: 1;
+			}
 
-		/* Slide in the direction the menu is opening. */
-		&[data-side='bottom'] {
-			transform: translateY( -${ DROPDOWN_MOTION_CSS.SLIDE_DISTANCE } );
-		}
-		&[data-side='top'] {
-			transform: translateY( ${ DROPDOWN_MOTION_CSS.SLIDE_DISTANCE } );
-		}
-		&[data-side='left'] {
-			transform: translateX( ${ DROPDOWN_MOTION_CSS.SLIDE_DISTANCE } );
-		}
-		&[data-side='right'] {
-			transform: translateX( -${ DROPDOWN_MOTION_CSS.SLIDE_DISTANCE } );
-		}
-		&[data-enter][data-side='bottom'],
-		&[data-enter][data-side='top'] {
-			transform: translateY( 0 );
-		}
-		&[data-enter][data-side='left'],
-		&[data-enter][data-side='right'] {
-			transform: translateX( 0 );
+			/* Slide in the direction the menu is opening. */
+			&[data-side='bottom'] {
+				transform: translateY(
+					-${ DROPDOWN_MOTION_CSS.SLIDE_DISTANCE }
+				);
+			}
+			&[data-side='top'] {
+				transform: translateY(
+					${ DROPDOWN_MOTION_CSS.SLIDE_DISTANCE }
+				);
+			}
+			&[data-side='left'] {
+				transform: translateX(
+					${ DROPDOWN_MOTION_CSS.SLIDE_DISTANCE }
+				);
+			}
+			&[data-side='right'] {
+				transform: translateX(
+					-${ DROPDOWN_MOTION_CSS.SLIDE_DISTANCE }
+				);
+			}
+			&[data-enter][data-side='bottom'],
+			&[data-enter][data-side='top'] {
+				transform: translateY( 0 );
+			}
+			&[data-enter][data-side='left'],
+			&[data-enter][data-side='right'] {
+				transform: translateX( 0 );
+			}
 		}
 	}
 `;

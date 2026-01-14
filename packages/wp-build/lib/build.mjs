@@ -227,41 +227,36 @@ function transformPhpContent( content, transforms ) {
 function momentTimezoneAliasPlugin() {
 	return {
 		name: 'moment-timezone-alias',
-		async setup( build ) {
-			const { createRequire } = await import( 'module' );
-			const require = createRequire( import.meta.url );
-
-			// Cached paths - resolved lazily on first use
-			let preBuiltBundlePath;
-			const resolvePaths = () => {
-				if ( preBuiltBundlePath ) {
-					return;
-				}
-				preBuiltBundlePath = require.resolve(
-					'moment-timezone/builds/moment-timezone-with-data-1970-2030.js'
-				);
-			};
+		setup( build ) {
+			// Alias path that esbuild will resolve
+			const aliasPath =
+				'moment-timezone/builds/moment-timezone-with-data-1970-2030.js';
 
 			// Redirect main moment-timezone files to pre-built bundle
 			build.onResolve(
-				{ filter: /^moment-timezone\/moment-timezone$/ },
-				() => {
-					resolvePaths();
-					return { path: preBuiltBundlePath };
-				}
+				{ filter: /^moment-timezone\/moment-timezone\.js$/ },
+				( { importer, resolveDir, kind } ) =>
+					build.resolve( aliasPath, {
+						importer,
+						resolveDir,
+						kind,
+					} )
 			);
 
 			// Intercept the require('./') call inside moment-timezone-utils
 			// and redirect it to the pre-built bundle.
-			build.onResolve( { filter: /^\.\/$/ }, ( args ) => {
-				if (
-					args.importer &&
-					args.importer.includes( 'moment-timezone-utils' )
-				) {
-					resolvePaths();
-					return { path: preBuiltBundlePath };
+			build.onResolve(
+				{ filter: /^\.\/$/ },
+				( { importer, resolveDir, kind } ) => {
+					if ( importer.includes( 'moment-timezone-utils' ) ) {
+						return build.resolve( aliasPath, {
+							importer,
+							resolveDir,
+							kind,
+						} );
+					}
 				}
-			} );
+			);
 		},
 	};
 }

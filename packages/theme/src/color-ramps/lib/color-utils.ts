@@ -22,7 +22,8 @@ import './register-color-spaces';
  * @return String representation
  */
 export function getColorString( color: ColorTypes ): string {
-	return serialize( color, { format: 'hex', inGamut: true } );
+	const rgbRounded = serialize( to( color, sRGB ) );
+	return serialize( rgbRounded, { format: 'hex' } );
 }
 
 /**
