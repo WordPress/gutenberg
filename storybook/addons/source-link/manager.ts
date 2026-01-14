@@ -12,14 +12,11 @@ const ADDON_ID = '@wordpress/storybook-addon-source-link';
 const SourceLinkTool = () => {
 	const api = useStorybookApi();
 	const storyData = api.getCurrentStoryData();
-	if ( ! storyData ) {
-		return null;
-	}
 
 	let sourcePath;
-	if ( storyData.parameters?.sourceLink ) {
+	if ( storyData?.parameters?.sourceLink ) {
 		sourcePath = storyData.parameters.sourceLink;
-	} else if ( storyData.importPath ) {
+	} else if ( storyData?.importPath ) {
 		// importPath is like "../packages/components/src/button/stories/index.story.tsx"
 		// Convert to component directory path: "packages/components/src/button"
 		sourcePath = storyData.importPath
