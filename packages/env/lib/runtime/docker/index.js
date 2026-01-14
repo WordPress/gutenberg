@@ -22,6 +22,10 @@ const getHostUser = require( './get-host-user' );
 const downloadSources = require( './download-sources' );
 const downloadWPPHPUnit = require( './download-wp-phpunit' );
 const {
+	RUN_CONTAINERS,
+	validateRunContainer,
+} = require( './validate-run-container' );
+const {
 	checkDatabaseConnection,
 	configureWordPress,
 	resetDatabase,
@@ -467,6 +471,15 @@ class DockerRuntime {
 	}
 
 	/**
+	 * Get the list of valid container names for the run command.
+	 *
+	 * @return {string[]} Array of valid container names.
+	 */
+	getRunContainers() {
+		return RUN_CONTAINERS;
+	}
+
+	/**
 	 * Run a command in a Docker container.
 	 *
 	 * @param {WPConfig} config            The wp-env config object.
@@ -478,6 +491,9 @@ class DockerRuntime {
 	 * @param {boolean}  options.debug     True if debug mode is enabled.
 	 */
 	async run( config, { container, command, envCwd, spinner, debug } ) {
+		// Validate the container name (throws for deprecated containers)
+		validateRunContainer( container );
+
 		const fullConfig = await initConfig( { spinner, debug } );
 
 		// Shows a contextual tip for the given command.

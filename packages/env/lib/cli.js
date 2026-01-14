@@ -16,11 +16,8 @@ const env = require( './env' );
 const parseXdebugMode = require( './parse-xdebug-mode' );
 const parseSpxMode = require( './parse-spx-mode' );
 const {
-	RUN_CONTAINERS,
-	validateRunContainer,
-} = require( './validate-run-container' );
-const {
 	getAvailableRuntimes,
+	getRuntime,
 	UnsupportedCommandError,
 } = require( './runtime' );
 
@@ -216,6 +213,10 @@ module.exports = function cli() {
 		'$0 logs --no-watch --environment=tests',
 		'Displays the latest logs for the e2e test environment without watching.'
 	);
+	// Get run containers from Docker runtime (run command is Docker-only for now)
+	const dockerRuntime = getRuntime( 'docker' );
+	const runContainers = dockerRuntime.getRunContainers();
+
 	yargs.command(
 		'run <container> [command...]',
 		'Runs an arbitrary command in one of the underlying Docker containers. A double dash can be used to pass arguments to the container without parsing them. This is necessary if you are using an option that is defined below. You can use `bash` to open a shell session and both `composer` and `phpunit` are available in all WordPress and CLI containers. WP-CLI is also available in the CLI containers.',
@@ -231,8 +232,7 @@ module.exports = function cli() {
 				type: 'string',
 				describe:
 					'The underlying Docker service to run the command on.',
-				choices: RUN_CONTAINERS,
-				coerce: validateRunContainer,
+				choices: runContainers,
 			} );
 			args.positional( 'command', {
 				type: 'array',
