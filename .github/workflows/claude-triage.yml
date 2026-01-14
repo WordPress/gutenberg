@@ -10,9 +10,21 @@ on:
 # Any needed permissions should be configured at the job level.
 permissions: {}
 
+# Cancel in-progress runs when a new workflow is triggered on the same issue
+# This prevents duplicate runs when:
+# - An issue is created and then someone comments before it finishes
+# - Multiple comments are made quickly
+concurrency:
+    group: claude-triage-${{ github.event.issue.number }}
+    cancel-in-progress: true
+
 jobs:
     triage:
         runs-on: ubuntu-latest
+        # Use protected environment - protection rules configured in GitHub Settings
+        # This ensures only authorized users can trigger the workflow, even if
+        # someone modifies the workflow file in a PR
+        environment: triage-bot
         permissions:
             contents: read
             issues: write
