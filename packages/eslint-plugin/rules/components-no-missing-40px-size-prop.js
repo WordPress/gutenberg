@@ -16,19 +16,23 @@ const COMPONENTS_REQUIRING_40PX = new Set( [
 	'BorderControl',
 	'BoxControl',
 	'Button',
+	'ClipboardButton',
 	'ComboboxControl',
 	'CustomSelectControl',
 	'FontAppearanceControl',
 	'FontFamilyControl',
 	'FontSizePicker',
 	'FormTokenField',
+	'IconButton',
 	'InputControl',
 	'LetterSpacingControl',
 	'LineHeightControl',
 	'NumberControl',
+	'Radio',
 	'RangeControl',
 	'SelectControl',
 	'TextControl',
+	'TreeSelect',
 	'ToggleGroupControl',
 	'UnitControl',
 ] );
@@ -179,6 +183,37 @@ module.exports = {
 			);
 		}
 
+		/**
+		 * Check if the `variant` prop has the value "link".
+		 * Button with variant="link" doesn't need __next40pxDefaultSize.
+		 *
+		 * @param {Array} attributes - JSX attributes array
+		 * @return {boolean} Whether variant is "link"
+		 */
+		function hasLinkVariant( attributes ) {
+			const variantAttr = attributes.find(
+				( a ) =>
+					a.type === 'JSXAttribute' &&
+					a.name &&
+					a.name.name === 'variant'
+			);
+
+			if ( ! variantAttr ) {
+				return false;
+			}
+
+			// String value like `variant="link"`
+			if (
+				variantAttr.value &&
+				variantAttr.value.type === 'Literal' &&
+				variantAttr.value.value === 'link'
+			) {
+				return true;
+			}
+
+			return false;
+		}
+
 		return {
 			ImportDeclaration( node ) {
 				const source = node.source.value;
@@ -215,6 +250,14 @@ module.exports = {
 								inferComponentNameFromPath( source );
 							if ( inferredName ) {
 								trackedImports.set( localName, inferredName );
+								return;
+							}
+
+							// Support patterns like `import ClipboardButton from '.';`
+							// (common in component folder examples/tests).
+							// If the local name matches a tracked component, treat it as such.
+							if ( ALL_TRACKED_COMPONENTS.has( localName ) ) {
+								trackedImports.set( localName, localName );
 							}
 						}
 					} );
@@ -260,6 +303,14 @@ module.exports = {
 
 				// For other components, check if size prop has a non-default value
 				if ( hasNonDefaultSize( attributes ) ) {
+					return;
+				}
+
+				// Button with variant="link" doesn't need __next40pxDefaultSize
+				if (
+					importedName === 'Button' &&
+					hasLinkVariant( attributes )
+				) {
 					return;
 				}
 

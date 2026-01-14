@@ -53,6 +53,7 @@ export const VariantStates: StoryFn< typeof Button > = (
 				{ variants.map( ( variant ) => (
 					<td key={ variant ?? 'undefined' } style={ { padding: 4 } }>
 						<Button
+							__next40pxDefaultSize
 							{ ...props }
 							variant={ variant }
 							{ ...buttonProps }
@@ -149,13 +150,16 @@ Icon.args = {
 export const Dashicons: StoryFn< typeof Button > = ( props ) => {
 	return (
 		<div style={ { display: 'flex', gap: 8 } }>
-			<Button { ...props } />
-			<Button { ...props }>Children</Button>
-			<Button { ...props } iconPosition="right">
+			<Button __next40pxDefaultSize { ...props } />
+			<Button __next40pxDefaultSize { ...props }>
+				Children
+			</Button>
+			<Button __next40pxDefaultSize { ...props } iconPosition="right">
 				Children (icon right)
 			</Button>
-			<Button { ...props } text="Text" />
+			<Button __next40pxDefaultSize { ...props } text="Text" />
 			<Button
+				__next40pxDefaultSize
 				{ ...props }
 				text="Text (icon right)"
 				iconPosition="right"

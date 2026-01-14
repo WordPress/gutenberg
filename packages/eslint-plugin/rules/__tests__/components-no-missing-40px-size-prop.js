@@ -90,6 +90,13 @@ ruleTester.run( 'components-no-missing-40px-size-prop', rule, {
 				<Button size={buttonSize} />
 			`,
 		},
+		// Button with variant="link" (doesn't need __next40pxDefaultSize)
+		{
+			code: `
+				import { Button } from '@wordpress/components';
+				<Button variant="link" />
+			`,
+		},
 		// Non-targeted component (should not be checked)
 		{
 			code: `
