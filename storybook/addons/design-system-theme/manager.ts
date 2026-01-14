@@ -6,7 +6,7 @@ import { createElement, Fragment } from 'react';
 import { addons, types, useGlobals } from 'storybook/manager-api';
 import { MirrorIcon } from '@storybook/icons';
 import {
-	IconButton,
+	Button,
 	WithTooltip,
 	TooltipMessage,
 	TooltipLinkList,
@@ -76,9 +76,9 @@ const ThemeTool = () => {
 	);
 
 	const button = createElement(
-		IconButton,
-		{ title: 'Design System Theme', active: true },
-		createElement( MirrorIcon ),
+		Button,
+		{ ariaLabel: false },
+		createElement( MirrorIcon, { 'aria-hidden': true } ),
 		'Theme'
 	);
 
