@@ -85,7 +85,7 @@ jobs:
                     "mcpServers": {
                       "chrome-devtools": {
                         "command": "npx",
-                        "args": ["-y", "@anthropic-ai/chrome-devtools-mcp@latest", "--headless"],
+                        "args": ["-y", "chrome-devtools-mcp@latest", "--headless", "--isolated"],
                         "env": {
                           "CHROME_PATH": "${CHROME_PATH}"
                         }
