@@ -45,6 +45,7 @@ const BLOCK_EDITOR_SETTINGS = [
 	'__experimentalDiscussionSettings',
 	'__experimentalFeatures',
 	'__experimentalGlobalStylesBaseStyles',
+	'allImageSizes',
 	'alignWide',
 	'blockInspectorTabs',
 	'maxUploadFileSize',
@@ -74,7 +75,6 @@ const BLOCK_EDITOR_SETTINGS = [
 	'imageDimensions',
 	'imageEditing',
 	'imageSizes',
-	'allImageSizes',
 	'isPreviewMode',
 	'isRTL',
 	'locale',
@@ -116,6 +116,7 @@ const {
 function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const {
+		allImageSizes,
 		allowRightClickOverrides,
 		blockTypes,
 		focusMode,
@@ -132,7 +133,6 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		restBlockPatternCategories,
 		sectionRootClientId,
 		deviceType,
-		allImageSizes,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -171,6 +171,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 			}
 
 			return {
+				allImageSizes: baseData?.image_sizes,
 				allowRightClickOverrides: get(
 					'core',
 					'allowRightClickOverrides'
@@ -202,7 +203,6 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 				restBlockPatternCategories: getBlockPatternCategories(),
 				sectionRootClientId: getSectionRootBlock(),
 				deviceType: getDeviceType(),
-				allImageSizes: baseData?.image_sizes,
 			};
 		},
 		[ postType, postId, isLargeViewport, renderingMode ]
@@ -324,6 +324,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 			),
 			[ globalStylesDataKey ]: globalStylesData,
 			[ globalStylesLinksDataKey ]: globalStylesLinksData,
+			allImageSizes,
 			allowedBlockTypes,
 			allowRightClickOverrides,
 			focusMode: focusMode && ! forceDisableFocusMode,
@@ -345,7 +346,6 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 				: undefined,
 			mediaUpload: hasUploadPermissions ? mediaUpload : undefined,
 			mediaSideload: hasUploadPermissions ? mediaSideload : undefined,
-			allImageSizes: hasUploadPermissions ? allImageSizes : undefined,
 			__experimentalBlockPatterns: blockPatterns,
 			[ selectBlockPatternsKey ]: ( select ) => {
 				const { hasFinishedResolution, getBlockPatternsForPostType } =
