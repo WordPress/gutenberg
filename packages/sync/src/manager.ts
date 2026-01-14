@@ -335,7 +335,10 @@ export function createSyncManager(): SyncManager {
 	return {
 		createMeta: createEntityMeta,
 		load: loadEntity,
-		undoManager,
+		// Use getter to ensure we always return the current value of `undoManager`.
+		get undoManager(): SyncUndoManager | undefined {
+			return undoManager;
+		},
 		unload: unloadEntity,
 		update: updateCRDTDoc,
 	};
