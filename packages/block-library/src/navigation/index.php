@@ -610,7 +610,7 @@ class WP_Navigation_Block_Renderer {
 	 * @return array Returns the responsive container classes.
 	 */
 	private static function get_responsive_container_classes( $is_hidden_by_default, $has_custom_overlay, $colors ) {
-		$responsive_container_classes = array('wp-block-navigation__responsive-container');
+		$responsive_container_classes = array( 'wp-block-navigation__responsive-container' );
 
 		if ( $is_hidden_by_default ) {
 			$responsive_container_classes[] = 'hidden-by-default';
@@ -693,13 +693,13 @@ class WP_Navigation_Block_Renderer {
 
 		$responsive_container_classes = static::get_responsive_container_classes( $is_hidden_by_default, $has_custom_overlay, $colors );
 
-		$open_button_classes          = array(
+		$open_button_classes = array(
 			'wp-block-navigation__responsive-container-open',
 			$is_hidden_by_default ? 'always-shown' : '',
 		);
 
 		$should_display_icon_label = isset( $attributes['hasIcon'] ) && true === $attributes['hasIcon'];
-		$toggle_button_icon        = '<svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 7.5h16v1.5H4z"></path><path d="M4 15h16v1.5H4z"></path></svg>';
+		$toggle_button_icon = '<svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 7.5h16v1.5H4z"></path><path d="M4 15h16v1.5H4z"></path></svg>';
 		if ( isset( $attributes['icon'] ) ) {
 			if ( 'menu' === $attributes['icon'] ) {
 				$toggle_button_icon = '<svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M5 5v1.5h14V5H5z"></path><path d="M5 12.8h14v-1.5H5v1.5z"></path><path d="M5 19h14v-1.5H5V19z"></path></svg>';
