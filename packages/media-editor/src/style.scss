@@ -1,2 +1,2 @@
 // Import component styles
-@import "./components/media-preview/style.scss";
+@use "./components/media-preview/style.scss" as *;
