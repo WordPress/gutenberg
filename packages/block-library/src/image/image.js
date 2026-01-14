@@ -338,6 +338,7 @@ export default function Image( {
 		[ clientId ]
 	);
 	const { getBlock, getSettings } = useSelect( blockEditorStore );
+	const onNavigateToEntityRecord = getSettings().onNavigateToEntityRecord;
 
 	const { replaceBlocks, toggleSelection } = useDispatch( blockEditorStore );
 	const { createErrorNotice, createSuccessNotice } =
@@ -725,6 +726,26 @@ export default function Image( {
 
 	const hasDataFormBlockFields =
 		window?.__experimentalContentOnlyInspectorFields;
+
+	const editMediaButton = window?.__experimentalMediaEditor &&
+		id &&
+		isSingleSelected &&
+		! isExternalImage( id, url ) &&
+		! isEditingImage &&
+		onNavigateToEntityRecord && (
+			<BlockControls group="other">
+				<ToolbarButton
+					onClick={ () => {
+						onNavigateToEntityRecord( {
+							postId: id,
+							postType: 'attachment',
+						} );
+					} }
+				>
+					{ __( 'Edit media' ) }
+				</ToolbarButton>
+			</BlockControls>
+		);
 
 	const controls = (
 		<>
@@ -1199,6 +1220,7 @@ export default function Image( {
 
 	return (
 		<>
+			{ editMediaButton }
 			{ mediaReplaceFlow }
 			{ controls }
 			{ featuredImageControl }

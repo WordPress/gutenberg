@@ -355,6 +355,30 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 			return null;
 		}
 
+		const isAttachment =
+			post.type === 'attachment' && window?.__experimentalMediaEditor;
+
+		// Early return for attachments - no block editor needed
+		if ( isAttachment ) {
+			return (
+				<EntityProvider kind="root" type="site">
+					<EntityProvider
+						kind="postType"
+						type={ post.type }
+						id={ post.id }
+					>
+						{ children }
+						{ ! settings.isPreviewMode && (
+							<>
+								<EditorKeyboardShortcuts />
+								<KeyboardShortcutHelpModal />
+							</>
+						) }
+					</EntityProvider>
+				</EntityProvider>
+			);
+		}
+
 		return (
 			<EntityProvider kind="root" type="site">
 				<EntityProvider

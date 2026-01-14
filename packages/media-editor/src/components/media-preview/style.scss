@@ -1,3 +1,4 @@
+@use "@wordpress/base-styles/animations" as *;
 @use "@wordpress/base-styles/colors" as *;
 @use "@wordpress/base-styles/variables" as *;
 
@@ -10,6 +11,13 @@
 	padding: $grid-unit-40;
 	position: relative;
 
+	&__spinner {
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+	}
+
 	&--loading {
 		width: 100%;
 		height: 100%;
@@ -21,6 +29,11 @@
 		object-fit: contain;
 		width: auto;
 		height: auto;
+		opacity: 0;
+
+		&.loaded {
+			@include animation__fade-in();
+		}
 	}
 
 	&--video video {

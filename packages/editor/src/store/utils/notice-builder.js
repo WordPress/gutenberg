@@ -32,6 +32,10 @@ export function getNotificationArgumentsForSaveSuccess( data ) {
 	if ( willTrash ) {
 		noticeMessage = postType.labels.item_trashed;
 		shouldShowLink = false;
+	} else if ( post.type === 'attachment' ) {
+		// Attachments should always show a simple updated message because they don't have a draft state.
+		noticeMessage = __( 'Media updated.' );
+		shouldShowLink = false;
 	} else if ( ! isPublished && ! willPublish ) {
 		// If saving a non-published post, don't show notice.
 		noticeMessage = __( 'Draft saved.' );

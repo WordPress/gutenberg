@@ -18,6 +18,75 @@ export interface MediaPreviewProps {
 }
 
 /**
+ * Props for MediaPreviewContent component.
+ */
+interface MediaPreviewContentProps {
+	mediaType: { type: string };
+	mediaUrl: string;
+	altText?: string;
+	displayTitle?: string;
+	mimeType?: string;
+	onLoad: () => void;
+	onError: () => void;
+	loadingState: 'loading' | 'loaded' | 'error';
+}
+
+function MediaPreviewContent( {
+	mediaType,
+	mediaUrl,
+	altText,
+	displayTitle,
+	mimeType,
+	onLoad,
+	onError,
+	loadingState,
+}: MediaPreviewContentProps ) {
+	switch ( mediaType.type ) {
+		case 'image':
+			return (
+				<img
+					className={ loadingState === 'loaded' ? 'loaded' : '' }
+					src={ mediaUrl }
+					alt={ altText || '' }
+					onLoad={ onLoad }
+					onError={ onError }
+				/>
+			);
+		case 'video':
+			return (
+				<video src={ mediaUrl } controls onError={ onError }>
+					{ displayTitle }
+				</video>
+			);
+		case 'audio':
+			return (
+				<audio src={ mediaUrl } controls onError={ onError }>
+					{ displayTitle }
+				</audio>
+			);
+		default:
+			return (
+				<div className="media-editor-preview__file-info">
+					<p className="media-editor-preview__file-name">
+						{ displayTitle }
+					</p>
+					<p className="media-editor-preview__mime-type">
+						{ mimeType }
+					</p>
+					<a
+						href={ mediaUrl }
+						target="_blank"
+						rel="noopener noreferrer"
+						className="media-editor-preview__download-link"
+					>
+						View file
+					</a>
+				</div>
+			);
+	}
+}
+
+/**
  * MediaPreview component displays the media file in the editor canvas.
  * Supports images, videos, audio files, and generic file displays.
  *
@@ -47,14 +116,6 @@ export default function MediaPreview( props: MediaPreviewProps ) {
 		);
 	}
 
-	if ( mediaType.type === 'image' && loadingState === 'loading' ) {
-		return (
-			<div className="media-editor-preview media-editor-preview--loading">
-				<Spinner />
-			</div>
-		);
-	}
-
 	if ( loadingState === 'error' ) {
 		return (
 			<div className="media-editor-preview media-editor-preview--error">
@@ -67,75 +128,26 @@ export default function MediaPreview( props: MediaPreviewProps ) {
 	const displayTitle =
 		typeof title === 'string' ? title : title?.rendered || title?.raw;
 
-	// Render based on media type
-	switch ( mediaType.type ) {
-		case 'image':
-			return (
-				<div
-					{ ...props }
-					className="media-editor-preview media-editor-preview--image"
-				>
-					<img
-						src={ mediaUrl }
-						alt={ altText || '' }
-						onLoad={ () => setLoadingState( 'loaded' ) }
-						onError={ () => setLoadingState( 'error' ) }
-					/>
+	return (
+		<div
+			{ ...props }
+			className={ `media-editor-preview media-editor-preview--${ mediaType.type }` }
+		>
+			{ mediaType.type === 'image' && loadingState === 'loading' && (
+				<div className="media-editor-preview__spinner">
+					<Spinner />
 				</div>
-			);
-		case 'video':
-			return (
-				<div
-					{ ...props }
-					className="media-editor-preview media-editor-preview--video"
-				>
-					<video
-						src={ mediaUrl }
-						controls
-						onError={ () => setLoadingState( 'error' ) }
-					>
-						{ displayTitle }
-					</video>
-				</div>
-			);
-		case 'audio':
-			return (
-				<div
-					{ ...props }
-					className="media-editor-preview media-editor-preview--audio"
-				>
-					<audio
-						src={ mediaUrl }
-						controls
-						onError={ () => setLoadingState( 'error' ) }
-					>
-						{ displayTitle }
-					</audio>
-				</div>
-			);
-		default:
-			return (
-				<div
-					{ ...props }
-					className="media-editor-preview media-editor-preview--file"
-				>
-					<div className="media-editor-preview__file-info">
-						<p className="media-editor-preview__file-name">
-							{ displayTitle }
-						</p>
-						<p className="media-editor-preview__mime-type">
-							{ mimeType }
-						</p>
-						<a
-							href={ mediaUrl }
-							target="_blank"
-							rel="noopener noreferrer"
-							className="media-editor-preview__download-link"
-						>
-							View file
-						</a>
-					</div>
-				</div>
-			);
-	}
+			) }
+			<MediaPreviewContent
+				mediaType={ mediaType }
+				mediaUrl={ mediaUrl }
+				altText={ altText }
+				displayTitle={ displayTitle }
+				mimeType={ mimeType }
+				onLoad={ () => setLoadingState( 'loaded' ) }
+				onError={ () => setLoadingState( 'error' ) }
+				loadingState={ loadingState }
+			/>
+		</div>
+	);
 }

@@ -49,6 +49,7 @@ export default function PostSavedState( { forceIsDirty } ) {
 		showIconLabels,
 		postStatus,
 		postStatusHasChanged,
+		postType,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -77,6 +78,7 @@ export default function PostSavedState( { forceIsDirty } ) {
 				showIconLabels: get( 'core', 'showIconLabels' ),
 				postStatus: getEditedPostAttribute( 'status' ),
 				postStatusHasChanged: !! getPostEdits()?.status,
+				postType: select( editorStore ).getCurrentPostType(),
 			};
 		},
 		[ forceIsDirty ]
@@ -98,6 +100,11 @@ export default function PostSavedState( { forceIsDirty } ) {
 
 		return () => clearTimeout( timeoutId );
 	}, [ isSaving ] );
+
+	// Attachments don't support draft mode, so hide this button.
+	if ( postType === 'attachment' ) {
+		return null;
+	}
 
 	// Once the post has been submitted for review this button
 	// is not needed for the contributor role.

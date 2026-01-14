@@ -26,6 +26,8 @@
 		{ "path": "../i18n" },
 		{ "path": "../icons" },
 		{ "path": "../keycodes" },
+		{ "path": "../media-editor" },
+		{ "path": "../media-fields" },
 		{ "path": "../media-utils" },
 		{ "path": "../notices" },
 		{ "path": "../plugins" },

@@ -28,6 +28,7 @@ import SavePublishPanels from '../save-publish-panels';
 import TextEditor from '../text-editor';
 import VisualEditor from '../visual-editor';
 import StylesCanvas from '../styles-canvas';
+import { MediaPreview } from '../media';
 
 const interfaceLabels = {
 	/* translators: accessibility text for the editor top bar landmark region. */
@@ -56,6 +57,7 @@ export default function EditorInterface( {
 } ) {
 	const {
 		mode,
+		isAttachment,
 		isInserterOpened,
 		isListViewOpened,
 		isDistractionFree,
@@ -66,7 +68,8 @@ export default function EditorInterface( {
 		showStylebook,
 	} = useSelect( ( select ) => {
 		const { get } = select( preferencesStore );
-		const { getEditorSettings, getPostTypeLabel } = select( editorStore );
+		const { getEditorSettings, getPostTypeLabel, getCurrentPostType } =
+			select( editorStore );
 		const { getStylesPath, getShowStylebook } = unlock(
 			select( editorStore )
 		);
@@ -90,6 +93,9 @@ export default function EditorInterface( {
 			postTypeLabel: getPostTypeLabel(),
 			stylesPath: getStylesPath(),
 			showStylebook: getShowStylebook(),
+			isAttachment:
+				getCurrentPostType() === 'attachment' &&
+				window?.__experimentalMediaEditor,
 		};
 	}, [] );
 	const isLargeViewport = useViewportMatch( 'medium' );
@@ -138,6 +144,7 @@ export default function EditorInterface( {
 			}
 			editorNotices={ <EditorNotices /> }
 			secondarySidebar={
+				! isAttachment &&
 				! isPreviewMode &&
 				mode === 'visual' &&
 				( ( isInserterOpened && <InserterSidebar /> ) ||
@@ -152,34 +159,39 @@ export default function EditorInterface( {
 					{ ! isDistractionFree && ! isPreviewMode && (
 						<EditorNotices />
 					) }
-
-					{ shouldShowStylesCanvas ? (
-						<StylesCanvas />
-					) : (
+					{ isAttachment && <MediaPreview { ...iframeProps } /> }
+					{ ! isAttachment && (
 						<>
-							{ ! isPreviewMode && mode === 'text' && (
-								<TextEditor
-									// We should auto-focus the canvas (title) on load.
-									// eslint-disable-next-line jsx-a11y/no-autofocus
-									autoFocus={ autoFocus }
-								/>
-							) }
-							{ ! isPreviewMode &&
-								! isLargeViewport &&
-								mode === 'visual' && (
-									<BlockToolbar hideDragHandle />
-								) }
-							{ ( isPreviewMode || mode === 'visual' ) && (
-								<VisualEditor
-									contentRef={ contentRef }
-									disableIframe={ disableIframe }
-									// We should auto-focus the canvas (title) on load.
-									// eslint-disable-next-line jsx-a11y/no-autofocus
-									autoFocus={ autoFocus }
-									iframeProps={ iframeProps }
-								/>
-							) }
-							{ children }
+							{ shouldShowStylesCanvas ? (
+								<StylesCanvas />
+							) : (
+								<>
+									{ ! isPreviewMode && mode === 'text' && (
+										<TextEditor
+											// We should auto-focus the canvas (title) on load.
+											// eslint-disable-next-line jsx-a11y/no-autofocus
+											autoFocus={ autoFocus }
+										/>
+									) }
+									{ ! isPreviewMode &&
+										! isLargeViewport &&
+										mode === 'visual' && (
+											<BlockToolbar hideDragHandle />
+										) }
+									{ ( isPreviewMode ||
+										mode === 'visual' ) && (
+										<VisualEditor
+											contentRef={ contentRef }
+											disableIframe={ disableIframe }
+											// We should auto-focus the canvas (title) on load.
+											// eslint-disable-next-line jsx-a11y/no-autofocus
+											autoFocus={ autoFocus }
+											iframeProps={ iframeProps }
+										/>
+									) }
+									{ children }
+								</>
+							) }{ ' ' }
 						</>
 					) }
 				</>
