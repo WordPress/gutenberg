@@ -78,7 +78,7 @@ function exec( command, args = [], options = {} ) {
  * Main build orchestration function.
  */
 async function build() {
-	const runtimeOnly = process.argv.includes( '--runtime-only' );
+	const skipTypes = process.argv.includes( '--skip-types' );
 
 	console.log( '🔨 Starting build process...\n' );
 
@@ -97,7 +97,7 @@ async function build() {
 			{ silent: true }
 		);
 
-		if ( ! runtimeOnly ) {
+		if ( ! skipTypes ) {
 			// Step 3: Validate TypeScript version
 			console.log( '\n🔍 Validating TypeScript version...' );
 			await exec( 'node', [
@@ -128,7 +128,7 @@ async function build() {
 		console.log( '\n📦 Building packages (production mode)...' );
 		const buildArgs = process.argv
 			.slice( 2 )
-			.filter( ( arg ) => arg !== '--runtime-only' );
+			.filter( ( arg ) => arg !== '--skip-types' );
 		await exec( 'wp-build', buildArgs, {
 			env: { ...process.env, NODE_ENV: 'production' },
 		} );

@@ -70,7 +70,7 @@ status "Installing dependencies... 📦"
 npm cache verify
 npm ci
 status "Generating build... 👷‍♀️"
-npm run build -- --runtime-only
+npm run build -- --skip-types
 
 # Generate the plugin zip file.
 status "Creating archive... 🎁"
