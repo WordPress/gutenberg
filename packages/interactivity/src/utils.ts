@@ -91,16 +91,27 @@ export const splitTask =
 					taskChannel.port2.postMessage( null );
 				} );
 		  };
-
-export const postTask = < T extends unknown >( task: () => T ): Promise< T > =>
-	typeof window.scheduler?.postTask === 'function'
-		? window.scheduler.postTask( () => task() )
-		: new Promise( ( resolve ) => {
-				taskQueue.push( () => {
-					resolve( task() );
-				} );
-				taskChannel.port2.postMessage( null );
-		  } );
+/**
+ * Executes the passed callback on `DOMContentLoaded`, or immediately if that
+ * event has already been triggered.
+ *
+ * This function depends on `PerformanceNavigationTiming` (see
+ * https://developer.mozilla.org/en-US/docs/Web/API/PerformanceNavigationTiming) to
+ * detect whether the event has been dispatched.
+ *
+ * @param callback Function to execute on `DOMContentLoaded`.
+ */
+export const onDOMReady = ( callback: () => void ) => {
+	const [ navigation ] = performance.getEntriesByType( 'navigation' );
+	if (
+		( navigation as PerformanceNavigationTiming )
+			.domContentLoadedEventStart > 0
+	) {
+		callback();
+	} else {
+		document.addEventListener( 'DOMContentLoaded', callback );
+	}
+};
 
 /**
  * Creates a Flusher object that can be used to flush computed values and notify listeners.

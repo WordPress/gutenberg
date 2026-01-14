@@ -22,7 +22,7 @@ import { directive } from './hooks';
 import { getNamespace } from './namespaces';
 import { parseServerData, populateServerData } from './store';
 import { proxifyState } from './proxies';
-import { deepReadOnly, navigationSignal, postTask } from './utils';
+import { deepReadOnly, navigationSignal, onDOMReady } from './utils';
 
 export {
 	store,
@@ -75,10 +75,15 @@ export const privateApis = (
 	throw new Error( 'Forbidden access.' );
 };
 
-// Parse and populate the initial state and config.
-// All the core directives are registered at this point as well.
+// Parses and populates the initial state and config. All the core directives
+// are registered at this point as well.
 populateServerData( parseServerData() );
 registerDirectives();
 
-// Defer hydration to the end of the task queue.
-postTask( hydrateRegions );
+// Hydrates all interactive regions when `DOMContentLoaded` is dispatched, or as
+// soon as the `@wordpress/interactivity` module is evaluated in the case that
+// the event was already dispatched. This ensures synchronous modules had the
+// opportunity to register their stores before hydration takes place. For
+// asynchronous modules, or modules importing this module asynchronously, this
+// cannot be guaranteed.
+onDOMReady( hydrateRegions );
