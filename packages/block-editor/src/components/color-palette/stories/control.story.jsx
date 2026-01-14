@@ -47,7 +47,6 @@ export default {
 	},
 };
 
-/* eslint-disable react/jsx-filename-extension */
 export const Default = {
 	render: function Template( { onChange, ...args } ) {
 		const [ color, setColor ] = useState( args.value );
@@ -78,4 +77,3 @@ export const Default = {
 		],
 	},
 };
-/* eslint-enable react/jsx-filename-extension */
