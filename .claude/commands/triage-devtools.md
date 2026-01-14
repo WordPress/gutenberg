@@ -68,6 +68,35 @@ Main Agent
 
 ## Execution
 
+### Step 0: Pre-flight Check (REQUIRED)
+
+**BEFORE doing anything else**, verify Chrome DevTools MCP is available:
+
+```
+Call: mcp__chrome-devtools__list_pages
+```
+
+**If this fails or returns an error about MCP not being available:**
+1. **STOP IMMEDIATELY** - do not proceed to Step 1
+2. Post a GitHub comment explaining the failure:
+   ```
+   ## Triage Failed: Chrome DevTools MCP Unavailable
+
+   The Chrome DevTools MCP server failed to start. This is required for browser-based bug reproduction.
+
+   **Error:** [include error message]
+
+   **Next steps:**
+   - Check CI logs for MCP server startup errors
+   - Verify Chrome is installed in the CI environment
+   - Try running the triage manually
+   ```
+3. Exit with failure
+
+**Only proceed to Step 1 if the pre-flight check succeeds.**
+
+---
+
 ### Step 1: Parse Issue (Direct)
 
 **Read file:** `.claude/workflows/triage/1-parse.md`
@@ -91,7 +120,10 @@ Task tool with:
   prompt: |
     Reproduce the bug for issue #<issue> using Chrome DevTools MCP.
 
-    Read these files first:
+    FIRST: Verify Chrome DevTools MCP is available by calling mcp__chrome-devtools__list_pages.
+    If this fails, write a findings.json with result="inconclusive" and error="Chrome DevTools MCP unavailable", then stop.
+
+    Read these files:
     - Parsed issue: /tmp/triage/<issue>/<issue>.parsed.json
     - Blueprint: /tmp/triage/<issue>/<issue>.blueprint.json
     - Instructions: .claude/workflows/triage/3-reproduce-devtools.md
