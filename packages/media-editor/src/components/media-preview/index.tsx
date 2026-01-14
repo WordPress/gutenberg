@@ -111,7 +111,7 @@ export default function MediaPreview( props: MediaPreviewProps ) {
 	if ( ! mediaUrl ) {
 		return (
 			<div className="media-editor-preview media-editor-preview--empty">
-				<p>No media file available.</p>
+				<p>{ __( 'No media file available.' ) }</p>
 			</div>
 		);
 	}
