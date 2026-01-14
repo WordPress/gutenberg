@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-
-/**
- * WordPress dependencies
- */
 import { createRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import * as Tooltip from '../index';
 
 describe( 'Tooltip', () => {
