@@ -360,9 +360,17 @@ describe( 'apiFetch', () => {
 		await apiFetch( expectedOptions );
 	} );
 
-	it( 'should allow DELETE, PUT, and PATCH methods after removing httpV1Middleware', () => {
-		// Remove HTTP v1 middleware
-		apiFetch.removeHttpV1Middleware();
+	it( 'should allow DELETE, PUT, and PATCH methods after removing httpV1Middleware', async () => {
+		jest.resetModules();
+		const isolatedApiFetch = ( await import( '../' ) ).default;
+
+		globalThis.fetch.mockResolvedValue( {
+			ok: true,
+			status: 200,
+			json: () => Promise.resolve( {} ),
+		} );
+
+		isolatedApiFetch.removeHttpV1Middleware();
 
 		const methodTests = [
 			{ method: 'DELETE', path: '/wp/v2/posts/1' },
@@ -378,21 +386,22 @@ describe( 'apiFetch', () => {
 			},
 		];
 
-		methodTests.forEach( ( { method, path, data } ) => {
-			// Clear previous calls
-			window.fetch.mockClear();
+		for ( const { method, path, data } of methodTests ) {
+			globalThis.fetch.mockClear();
 
-			apiFetch( { path, method, ...( data ? { data } : {} ) } );
+			await isolatedApiFetch( {
+				path,
+				method,
+				...( data ? { data } : {} ),
+			} );
 
-			// Check if fetch was called with the correct method
-			expect( window.fetch ).toHaveBeenCalledWith(
+			expect( globalThis.fetch ).toHaveBeenCalledWith(
 				`${ path }?_locale=user`,
 				expect.objectContaining( {
 					method,
-					path,
 					...( data ? { body: JSON.stringify( data ) } : {} ),
 				} )
 			);
-		} );
+		}
 	} );
 } );

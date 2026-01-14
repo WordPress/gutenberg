@@ -149,6 +149,7 @@ interface apiFetch {
 	fetchAllMiddleware: typeof fetchAllMiddleware;
 	mediaUploadMiddleware: typeof mediaUploadMiddleware;
 	createThemePreviewMiddleware: typeof createThemePreviewMiddleware;
+	removeHttpV1Middleware: typeof removeHttpV1Middleware;
 }
 
 /**
