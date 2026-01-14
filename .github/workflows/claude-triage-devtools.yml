@@ -79,13 +79,26 @@ jobs:
 
             - name: Create MCP config for Chrome DevTools
               run: |
-                  # Create MCP config with CHROME_PATH passed to the server
+                  # Create MCP config with CHROME_PATH and permissive flags for CI sandbox
+                  # Uses --chrome-arg to pass Chrome flags (per chrome-devtools-mcp docs)
+                  # These flags grant maximum browser permissions since CI is isolated
                   cat > /tmp/mcp-config.json << EOF
                   {
                     "mcpServers": {
                       "chrome-devtools": {
                         "command": "npx",
-                        "args": ["-y", "chrome-devtools-mcp@latest", "--headless", "--isolated"],
+                        "args": [
+                          "-y", "chrome-devtools-mcp@latest",
+                          "--headless",
+                          "--isolated",
+                          "--accept-insecure-certs",
+                          "--chrome-arg=--no-sandbox",
+                          "--chrome-arg=--disable-setuid-sandbox",
+                          "--chrome-arg=--disable-web-security",
+                          "--chrome-arg=--disable-features=IsolateOrigins,site-per-process",
+                          "--chrome-arg=--allow-running-insecure-content",
+                          "--chrome-arg=--autoplay-policy=no-user-gesture-required"
+                        ],
                         "env": {
                           "CHROME_PATH": "${CHROME_PATH}"
                         }
@@ -124,4 +137,4 @@ jobs:
                       # Note: Using Chrome DevTools MCP with subagent architecture for token efficiency
                   claude_args: |
                       --mcp-config /tmp/mcp-config.json
-                      --allowedTools "Bash,Read,Write,Edit,Glob,Grep,Skill,Task,mcp__chrome-devtools__new_page,mcp__chrome-devtools__navigate_page,mcp__chrome-devtools__take_snapshot,mcp__chrome-devtools__take_screenshot,mcp__chrome-devtools__click,mcp__chrome-devtools__fill,mcp__chrome-devtools__fill_form,mcp__chrome-devtools__press_key,mcp__chrome-devtools__list_console_messages,mcp__chrome-devtools__list_network_requests,mcp__chrome-devtools__wait_for,mcp__chrome-devtools__handle_dialog,mcp__chrome-devtools__hover,mcp__chrome-devtools__close_page,mcp__chrome-devtools__list_pages,mcp__chrome-devtools__select_page,mcp__context7"
+                      --allowedTools "Bash,Read,Write,Edit,Glob,Grep,Skill,Task,mcp__chrome-devtools__click,mcp__chrome-devtools__close_page,mcp__chrome-devtools__drag,mcp__chrome-devtools__emulate,mcp__chrome-devtools__evaluate_script,mcp__chrome-devtools__fill,mcp__chrome-devtools__fill_form,mcp__chrome-devtools__get_console_message,mcp__chrome-devtools__get_network_request,mcp__chrome-devtools__handle_dialog,mcp__chrome-devtools__hover,mcp__chrome-devtools__list_console_messages,mcp__chrome-devtools__list_network_requests,mcp__chrome-devtools__list_pages,mcp__chrome-devtools__navigate_page,mcp__chrome-devtools__new_page,mcp__chrome-devtools__performance_analyze_insight,mcp__chrome-devtools__performance_start_trace,mcp__chrome-devtools__performance_stop_trace,mcp__chrome-devtools__press_key,mcp__chrome-devtools__resize_page,mcp__chrome-devtools__select_page,mcp__chrome-devtools__take_screenshot,mcp__chrome-devtools__take_snapshot,mcp__chrome-devtools__upload_file,mcp__chrome-devtools__wait_for,mcp__context7"
