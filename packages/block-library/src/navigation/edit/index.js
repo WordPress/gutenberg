@@ -34,6 +34,8 @@ import {
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 	ToggleControl,
+	__experimentalToggleGroupControl as ToggleGroupControl,
+	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 	Spinner,
 	Notice,
 	ToolbarButton,
@@ -277,6 +279,7 @@ function Navigation( {
 } ) {
 	const {
 		openSubmenusOnClick,
+		submenuVisibility,
 		overlayMenu,
 		overlay,
 		showSubmenuIcon,
@@ -756,30 +759,79 @@ function Navigation( {
 								<h3 className="wp-block-navigation__submenu-header">
 									{ __( 'Submenus' ) }
 								</h3>
-								<ToolsPanelItem
-									hasValue={ () => openSubmenusOnClick }
-									label={ __( 'Open on click' ) }
-									onDeselect={ () =>
-										setAttributes( {
-											openSubmenusOnClick: false,
-											showSubmenuIcon: true,
-										} )
-									}
-									isShownByDefault
-								>
-									<ToggleControl
-										checked={ openSubmenusOnClick }
-										onChange={ ( value ) => {
+								{ orientation === 'vertical' ? (
+									<ToolsPanelItem
+										hasValue={ () =>
+											submenuVisibility !== undefined
+										}
+										label={ __( 'Submenu Visibility' ) }
+										onDeselect={ () =>
 											setAttributes( {
-												openSubmenusOnClick: value,
-												...( value && {
-													showSubmenuIcon: true,
-												} ), // Make sure arrows are shown when we toggle this on.
-											} );
-										} }
+												submenuVisibility: undefined,
+											} )
+										}
+										isShownByDefault
+									>
+										<ToggleGroupControl
+											__nextHasNoMarginBottom
+											__next40pxDefaultSize
+											label={ __( 'Submenu Visibility' ) }
+											value={
+												submenuVisibility ||
+												( openSubmenusOnClick
+													? 'click'
+													: 'hover' )
+											}
+											onChange={ ( value ) => {
+												setAttributes( {
+													submenuVisibility: value,
+													// Sync old attribute for backward compatibility
+													openSubmenusOnClick:
+														value === 'click',
+												} );
+											} }
+											isBlock
+										>
+											<ToggleGroupControlOption
+												value="hover"
+												label={ __( 'Hover' ) }
+											/>
+											<ToggleGroupControlOption
+												value="click"
+												label={ __( 'Click' ) }
+											/>
+											<ToggleGroupControlOption
+												value="always"
+												label={ __( 'Always' ) }
+											/>
+										</ToggleGroupControl>
+									</ToolsPanelItem>
+								) : (
+									<ToolsPanelItem
+										hasValue={ () => openSubmenusOnClick }
 										label={ __( 'Open on click' ) }
-									/>
-								</ToolsPanelItem>
+										onDeselect={ () =>
+											setAttributes( {
+												openSubmenusOnClick: false,
+												showSubmenuIcon: true,
+											} )
+										}
+										isShownByDefault
+									>
+										<ToggleControl
+											checked={ openSubmenusOnClick }
+											onChange={ ( value ) => {
+												setAttributes( {
+													openSubmenusOnClick: value,
+													...( value && {
+														showSubmenuIcon: true,
+													} ), // Make sure arrows are shown when we toggle this on.
+												} );
+											} }
+											label={ __( 'Open on click' ) }
+										/>
+									</ToolsPanelItem>
+								) }
 
 								<ToolsPanelItem
 									hasValue={ () => ! showSubmenuIcon }

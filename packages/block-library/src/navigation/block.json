@@ -50,6 +50,10 @@
 			"type": "boolean",
 			"default": false
 		},
+		"submenuVisibility": {
+			"type": "string",
+			"enum": [ "hover", "click", "always" ]
+		},
 		"overlayMenu": {
 			"type": "string",
 			"default": "mobile"
@@ -102,6 +106,7 @@
 		"customFontSize": "customFontSize",
 		"showSubmenuIcon": "showSubmenuIcon",
 		"openSubmenusOnClick": "openSubmenusOnClick",
+		"submenuVisibility": "submenuVisibility",
 		"style": "style",
 		"maxNestingLevel": "maxNestingLevel"
 	},

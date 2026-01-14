@@ -88,6 +88,7 @@ export default function NavigationSubmenuEdit( {
 		showSubmenuIcon,
 		maxNestingLevel,
 		openSubmenusOnClick: contextOpenSubmenusOnClick,
+		submenuVisibility,
 	} = context;
 	const blockEditingMode = useBlockEditingMode();
 
@@ -246,6 +247,7 @@ export default function NavigationSubmenuEdit( {
 			[ getColorClassName( 'background-color', backgroundColor ) ]:
 				!! backgroundColor,
 			'open-on-click': openSubmenusOnClick,
+			'open-on-always': submenuVisibility === 'always',
 		} ),
 		style: {
 			color: ! textColor && customTextColor,
