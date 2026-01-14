@@ -29,6 +29,8 @@
  *
  * @see https://core.trac.wordpress.org/ticket/50544
  *
+ * @global WP_Customize_Manager $wp_customize
+ *
  * @param int   $menu_id         ID of the updated menu.
  * @param int   $menu_item_db_id ID of the new menu item.
  * @param array $args            An array of arguments used to update/add the menu item.
@@ -177,7 +179,7 @@ add_filter( 'wp_nav_menu_objects', 'gutenberg_remove_block_nav_menu_items', 10 )
  *
  * @param array $menu_items The menu items to convert, sorted by each menu item's menu order.
  * @param array $menu_items_by_parent_id All menu items, indexed by their parent's ID.
-
+ *
  * @return array Updated menu items, sorted by each menu item's menu order.
  */
 function gutenberg_convert_menu_items_to_blocks(
@@ -215,9 +217,7 @@ function gutenberg_convert_menu_items_to_blocks(
 		}
 
 		$block['innerBlocks'] = gutenberg_convert_menu_items_to_blocks(
-			isset( $menu_items_by_parent_id[ $menu_item->ID ] )
-					? $menu_items_by_parent_id[ $menu_item->ID ]
-					: array(),
+			$menu_items_by_parent_id[ $menu_item->ID ] ?? array(),
 			$menu_items_by_parent_id
 		);
 
@@ -314,9 +314,7 @@ function gutenberg_output_block_nav_menu( $output, $args ) {
 		'blockName'   => 'core/navigation',
 		'attrs'       => $block_attributes,
 		'innerBlocks' => gutenberg_convert_menu_items_to_blocks(
-			isset( $menu_items_by_parent_id[0] )
-				? $menu_items_by_parent_id[0]
-				: array(),
+			$menu_items_by_parent_id[0] ?? array(),
 			$menu_items_by_parent_id
 		),
 	);

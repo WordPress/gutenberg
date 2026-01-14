@@ -6,12 +6,6 @@ import deprecated from '@wordpress/deprecated';
 import { speak } from '@wordpress/a11y';
 import { __ } from '@wordpress/i18n';
 
-/**
- * Internal dependencies
- */
-import { store as blockEditorStore } from './index';
-import { unlock } from '../lock-unlock';
-
 const castArray = ( maybeArray ) =>
 	Array.isArray( maybeArray ) ? maybeArray : [ maybeArray ];
 
@@ -26,6 +20,7 @@ const castArray = ( maybeArray ) =>
 const privateSettings = [
 	'inserterMediaCategories',
 	'blockInspectorAnimation',
+	'mediaSideload',
 ];
 
 /**
@@ -280,19 +275,6 @@ export function setBlockRemovalRules( rules = false ) {
 	};
 }
 
-/**
- * Sets the client ID of the block settings menu that is currently open.
- *
- * @param {?string} clientId The block client ID.
- * @return {Object} Action object.
- */
-export function setOpenedBlockSettingsMenu( clientId ) {
-	return {
-		type: 'SET_OPENED_BLOCK_SETTINGS_MENU',
-		clientId,
-	};
-}
-
 export function setStyleOverride( id, style ) {
 	return {
 		type: 'SET_STYLE_OVERRIDE',
@@ -320,29 +302,6 @@ export function setLastFocus( lastFocus = null ) {
 	return {
 		type: 'LAST_FOCUS',
 		lastFocus,
-	};
-}
-
-/**
- * Action that stops temporarily editing as blocks.
- *
- * @param {string} clientId The block's clientId.
- */
-export function stopEditingAsBlocks( clientId ) {
-	return ( { select, dispatch, registry } ) => {
-		const focusModeToRevert = unlock(
-			registry.select( blockEditorStore )
-		).getTemporarilyEditingFocusModeToRevert();
-		dispatch.__unstableMarkNextChangeAsNotPersistent();
-		dispatch.updateBlockAttributes( clientId, {
-			templateLock: 'contentOnly',
-		} );
-		dispatch.updateBlockListSettings( clientId, {
-			...select.getBlockListSettings( clientId ),
-			templateLock: 'contentOnly',
-		} );
-		dispatch.updateSettings( { focusMode: focusModeToRevert } );
-		dispatch.__unstableSetTemporarilyEditingAsBlocks();
 	};
 }
 
@@ -395,29 +354,25 @@ export function setInsertionPoint( value ) {
 }
 
 /**
- * Temporarily modify/unlock the content-only block for editions.
+ * Mark a contentOnly section as being edited.
  *
  * @param {string} clientId The client id of the block.
  */
-export const modifyContentLockBlock =
-	( clientId ) =>
-	( { select, dispatch } ) => {
-		dispatch.selectBlock( clientId );
-		dispatch.__unstableMarkNextChangeAsNotPersistent();
-		dispatch.updateBlockAttributes( clientId, {
-			templateLock: undefined,
-		} );
-		dispatch.updateBlockListSettings( clientId, {
-			...select.getBlockListSettings( clientId ),
-			templateLock: false,
-		} );
-		const focusModeToRevert = select.getSettings().focusMode;
-		dispatch.updateSettings( { focusMode: true } );
-		dispatch.__unstableSetTemporarilyEditingAsBlocks(
-			clientId,
-			focusModeToRevert
-		);
+export function editContentOnlySection( clientId ) {
+	return {
+		type: 'EDIT_CONTENT_ONLY_SECTION',
+		clientId,
 	};
+}
+
+/**
+ * Action that stops editing a contentOnly section.
+ */
+export function stopEditingContentOnlySection() {
+	return {
+		type: 'EDIT_CONTENT_ONLY_SECTION',
+	};
+}
 
 /**
  * Sets the zoom level.
@@ -481,5 +436,20 @@ export const setZoomLevel =
 export function resetZoomLevel() {
 	return {
 		type: 'RESET_ZOOM_LEVEL',
+	};
+}
+
+/**
+ * Action that toggles the spotlighted block state.
+ *
+ * @param {string}  clientId          The block's clientId.
+ * @param {boolean} hasBlockSpotlight The spotlight state.
+ * @return {Object} Action object.
+ */
+export function toggleBlockSpotlight( clientId, hasBlockSpotlight ) {
+	return {
+		type: 'TOGGLE_BLOCK_SPOTLIGHT',
+		clientId,
+		hasBlockSpotlight,
 	};
 }

@@ -88,7 +88,7 @@ const LABEL_TYPE_MAPPING = {
 };
 
 /**
- * Mapping of label names to arbitary features in the release notes.
+ * Mapping of label names to arbitrary features in the release notes.
  *
  * Mapping a given label to a feature will guarantee it will be categorised
  * under that feature name in the changelog within each section.
@@ -96,6 +96,8 @@ const LABEL_TYPE_MAPPING = {
  * @type {Record<string,string>}
  */
 const LABEL_FEATURE_MAPPING = {
+	'[Feature] Real-time Collaboration': 'Collaboration',
+	'[Feature] Notes': 'Collaboration',
 	'[Feature] Widgets Screen': 'Widgets Editor',
 	'[Feature] Widgets Customizer': 'Widgets Editor',
 	'[Feature] Design Tools': 'Design Tools',
@@ -274,7 +276,7 @@ function mapLabelsToFeatures( labels ) {
  *
  * @param {string[]} labels Label names.
  *
- * @return {boolean} whether or not the issue's is labbeled as block specific
+ * @return {boolean} whether or not the issue's is labeled as block specific
  */
 function getIsBlockSpecificIssue( labels ) {
 	return !! labels.find( ( label ) => label.startsWith( '[Block] ' ) );
@@ -343,7 +345,7 @@ function getIssueFeature( issue ) {
 
 	// 1. Prefer explicit mapping of label to feature.
 	if ( featureCandidates.length ) {
-		// Get occurances of the feature labels.
+		// Get occurrences of the feature labels.
 		const featureCounts = featureCandidates.reduce(
 			/**
 			 * @param {Record<string,number>} acc     Accumulator
@@ -941,7 +943,7 @@ function skipCreatedByBots( pullRequests ) {
 }
 
 /**
- * Produces the formatted markdown for the contributor props seciton.
+ * Produces the formatted markdown for the contributor props section.
  *
  * @param {IssuesListForRepoResponseItem[]} pullRequests List of pull requests.
  *

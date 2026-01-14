@@ -149,7 +149,7 @@ describe( 'block serializer', () => {
 			expect( attributes ).toEqual( { fruit: 'bananas' } );
 		} );
 
-		it( 'should ingore local attributes', () => {
+		it( 'should ignore local attributes', () => {
 			const attributes = getCommentAttributes(
 				{
 					attributes: {
@@ -202,6 +202,18 @@ describe( 'block serializer', () => {
 		it( 'should replace quotation marks', () => {
 			expect( serializeAttributes( { a: '" and "' } ) ).toBe(
 				'{"a":"\\u0022 and \\u0022"}'
+			);
+		} );
+
+		it( 'should handle backslash and quote combinations', () => {
+			const orig = {
+				bs: '\\',
+				bsQuote: '\\"',
+				bsQuoteBs: '\\"\\',
+			};
+			expect( JSON.parse( serializeAttributes( orig ) ) ).toEqual( orig );
+			expect( serializeAttributes( orig ) ).toBe(
+				'{"bs":"\\u005c","bsQuote":"\\u005c\\u0022","bsQuoteBs":"\\u005c\\u0022\\u005c"}'
 			);
 		} );
 	} );

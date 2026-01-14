@@ -100,6 +100,14 @@ _Related_
 
 -   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-alignment-control/README.md>
 
+### BlockBindingsAttributeControl
+
+Internal dependencies
+
+### BlockBindingsSourceFieldsList
+
+Undocumented declaration.
+
 ### BlockBreadcrumb
 
 Block breadcrumb component, displaying the hierarchy of the current block selection as a breadcrumb.
@@ -384,6 +392,25 @@ _Returns_
 
 Undocumented declaration.
 
+### DimensionControl
+
+DimensionControl renders a linked unit control and range control for adjusting dimensions of a block.
+
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/dimension-control/README.md>
+
+_Parameters_
+
+-   _props_ `Object`:
+-   _props.label_ `?string`: A label for the control.
+-   _props.onChange_ `( value: string ) => void`: Called when the dimension value changes.
+-   _props.value_ `string`: The current dimension value.
+
+_Returns_
+
+-   `Component`: The component to be rendered.
+
 ### FontSizePicker
 
 _Related_
@@ -592,6 +619,8 @@ _Returns_
 
 ### HeightControl
 
+> **Deprecated** Use DimensionControl instead.
+
 HeightControl renders a linked unit control and range control for adjusting the height of a block.
 
 _Related_
@@ -659,6 +688,14 @@ _Related_
 
 -   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/line-height-control/README.md>
 
+### LinkControl
+
+Renders a link control. A link control is a controlled input which maintains a value associated with a link (HTML anchor element) and relevant settings for how that link is expected to behave.
+
+_Parameters_
+
+-   _props_ `WPLinkControlProps`: Component props.
+
 ### MediaPlaceholder
 
 _Related_
@@ -705,9 +742,49 @@ Undocumented declaration.
 
 ### PlainText
 
+Render an auto-growing textarea allow users to fill any textual content.
+
 _Related_
 
 -   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/plain-text/README.md>
+
+_Usage_
+
+```jsx
+import { registerBlockType } from '@wordpress/blocks';
+import { PlainText } from '@wordpress/block-editor';
+
+registerBlockType( 'my-plugin/example-block', {
+	// ...
+
+	attributes: {
+		content: {
+			type: 'string',
+		},
+	},
+
+	edit( { className, attributes, setAttributes } ) {
+		return (
+			<PlainText
+				className={ className }
+				value={ attributes.content }
+				onChange={ ( content ) => setAttributes( { content } ) }
+			/>
+		);
+	},
+} );
+```
+
+_Parameters_
+
+-   _props_ `Object`: Component props.
+-   _props.value_ `string`: String value of the textarea.
+-   _props.onChange_ `Function`: Function called when the text value changes.
+-   _props.ref_ `[Object]`: The component forwards the `ref` property to the `TextareaAutosize` component.
+
+_Returns_
+
+-   `Element`: Plain text component
 
 ### privateApis
 
@@ -801,7 +878,7 @@ _Related_
 
 ### ToolSelector
 
-Undocumented declaration.
+This component has been deprecated and no longer renders anything.
 
 ### transformStyles
 

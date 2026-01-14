@@ -20,8 +20,10 @@ const { checkPort, checkVersion, checkString } = require( './validate-config' );
  * @property {?number}                  mysqlPort        An override for the development environment's MySQL port.
  * @property {?number}                  testsPort        An override for the testing environment's port.
  * @property {?number}                  testsMysqlPort   An override for the testing environment's MySQL port.
+ * @property {?number}                  phpmyadminPort   An override for the development environment's phpMyAdmin port.
  * @property {?WPSource}                coreSource       An override for all environment's coreSource.
  * @property {?string}                  phpVersion       An override for all environment's PHP version.
+ * @property {?boolean}                 multisite        An override for if environmen should be multisite.
  * @property {?Object.<string, string>} lifecycleScripts An override for various lifecycle scripts.
  */
 
@@ -39,6 +41,12 @@ module.exports = function getConfigFromEnvironmentVars( cacheDirectoryPath ) {
 		testsPort: getPortFromEnvironmentVariable( 'WP_ENV_TESTS_PORT' ),
 		testsMysqlPort: getPortFromEnvironmentVariable(
 			'WP_ENV_TESTS_MYSQL_PORT'
+		),
+		phpmyadminPort: getPortFromEnvironmentVariable(
+			'WP_ENV_PHPMYADMIN_PORT'
+		),
+		testsPhpmyadminPort: getPortFromEnvironmentVariable(
+			'WP_ENV_TESTS_PHPMYADMIN_PORT'
 		),
 		lifecycleScripts: getLifecycleScriptOverrides(),
 	};
@@ -59,6 +67,10 @@ module.exports = function getConfigFromEnvironmentVars( cacheDirectoryPath ) {
 			process.env.WP_ENV_PHP_VERSION
 		);
 		environmentConfig.phpVersion = process.env.WP_ENV_PHP_VERSION;
+	}
+
+	if ( process.env.WP_ENV_MULTISITE ) {
+		environmentConfig.multisite = !! process.env.WP_ENV_MULTISITE;
 	}
 
 	return environmentConfig;

@@ -141,6 +141,7 @@ export default function Edit( props ) {
 	return (
 		<div>
 			<TextControl
+				__next40pxDefaultSize
 				label={ __( 'Record ID' ) }
 				value={ recordId }
 				onChange={ ( val ) =>

@@ -40,6 +40,10 @@ test.describe( 'Editing Navigation Menus', () => {
 				canvas: 'edit',
 			} );
 
+			await expect(
+				page.getByRole( 'button', { name: 'Document Overview' } )
+			).toBeVisible();
+
 			// Open List View.
 			await pageUtils.pressKeys( 'access+o' );
 
@@ -54,7 +58,7 @@ test.describe( 'Editing Navigation Menus', () => {
 			await expect( listView ).toBeVisible();
 
 			const navBlockNode = listView.getByRole( 'link', {
-				name: 'Navigation',
+				name: 'Primary Menu',
 				exact: true,
 			} );
 

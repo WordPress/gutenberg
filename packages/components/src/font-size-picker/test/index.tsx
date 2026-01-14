@@ -8,12 +8,16 @@ import { render } from '@ariakit/test/react';
 /**
  * Internal dependencies
  */
-import FontSizePicker from '../';
+import _FontSizePicker from '../';
 import type { FontSize } from '../types';
 /**
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
+
+const FontSizePicker = (
+	props: React.ComponentProps< typeof _FontSizePicker >
+) => <_FontSizePicker __next40pxDefaultSize { ...props } />;
 
 const ControlledFontSizePicker = ( {
 	onChange,
@@ -48,7 +52,9 @@ describe( 'FontSizePicker', () => {
 			await render(
 				<FontSizePicker value={ value } onChange={ onChange } />
 			);
-			const input = screen.getByLabelText( 'Custom' );
+			const input = screen.getByRole( 'spinbutton', {
+				name: 'Font size',
+			} );
 			await user.clear( input );
 			await user.type( input, '80' );
 			expect( onChange ).toHaveBeenCalledTimes( 3 ); // Once for the clear, then once per keystroke.
@@ -75,7 +81,9 @@ describe( 'FontSizePicker', () => {
 			await user.click(
 				screen.getByRole( 'button', { name: 'Set custom size' } )
 			);
-			const input = screen.getByLabelText( 'Custom' );
+			const input = screen.getByRole( 'spinbutton', {
+				name: 'Font size',
+			} );
 			await user.type( input, '80' );
 			expect( onChange ).toHaveBeenCalledTimes( 2 ); // Once per keystroke.
 			expect( onChange ).toHaveBeenCalledWith( expectedValue );
@@ -123,39 +131,24 @@ describe( 'FontSizePicker', () => {
 				screen.getByRole( 'combobox', { name: 'Font size' } )
 			);
 			const options = screen.getAllByRole( 'option' );
-			expect( options ).toHaveLength( 8 );
+			expect( options ).toHaveLength( 7 );
 			expect( options[ 0 ] ).toHaveAccessibleName( 'Default' );
-			expect( options[ 1 ] ).toHaveAccessibleName( 'Tiny 8' );
-			expect( options[ 2 ] ).toHaveAccessibleName( 'Small 12' );
-			expect( options[ 3 ] ).toHaveAccessibleName( 'Medium 16' );
-			expect( options[ 4 ] ).toHaveAccessibleName( 'Large 20' );
-			expect( options[ 5 ] ).toHaveAccessibleName( 'Extra Large 30' );
-			expect( options[ 6 ] ).toHaveAccessibleName( 'xx-large 40' );
-			expect( options[ 7 ] ).toHaveAccessibleName( 'Custom' );
+			expect( options[ 1 ] ).toHaveAccessibleName( 'Tiny 8px' );
+			expect( options[ 2 ] ).toHaveAccessibleName( 'Small 12px' );
+			expect( options[ 3 ] ).toHaveAccessibleName( 'Medium 16px' );
+			expect( options[ 4 ] ).toHaveAccessibleName( 'Large 20px' );
+			expect( options[ 5 ] ).toHaveAccessibleName( 'Extra Large 30px' );
+			expect( options[ 6 ] ).toHaveAccessibleName( 'xx-large 40px' );
 		} );
-
-		test.each( [
-			{ value: undefined, expectedLabel: 'Size (px)' },
-			{ value: '8px', expectedLabel: 'Size (px)' },
-			{ value: '3px', expectedLabel: 'Size Custom' },
-		] )(
-			'displays $expectedLabel as label when value is $value',
-			async ( { value, expectedLabel } ) => {
-				await render(
-					<FontSizePicker fontSizes={ fontSizes } value={ value } />
-				);
-				expect( screen.getByLabelText( expectedLabel ) ).toBeVisible();
-			}
-		);
 
 		test.each( [
 			{
 				option: 'Default',
 				value: '8px',
-				expectedArguments: [ undefined ],
+				expectedArguments: [ undefined, undefined ],
 			},
 			{
-				option: 'Tiny 8',
+				option: 'Tiny 8px',
 				value: undefined,
 				expectedArguments: [ '8px', fontSizes[ 0 ] ],
 			},
@@ -182,7 +175,6 @@ describe( 'FontSizePicker', () => {
 			}
 		);
 
-		commonSelectTests( fontSizes );
 		commonTests( fontSizes );
 	} );
 
@@ -227,7 +219,7 @@ describe( 'FontSizePicker', () => {
 				screen.getByRole( 'combobox', { name: 'Font size' } )
 			);
 			const options = screen.getAllByRole( 'option' );
-			expect( options ).toHaveLength( 8 );
+			expect( options ).toHaveLength( 7 );
 			expect( options[ 0 ] ).toHaveAccessibleName( 'Default' );
 			expect( options[ 1 ] ).toHaveAccessibleName( 'Tiny 8px' );
 			expect( options[ 2 ] ).toHaveAccessibleName( 'Small 1em' );
@@ -235,7 +227,6 @@ describe( 'FontSizePicker', () => {
 			expect( options[ 4 ] ).toHaveAccessibleName( 'Large' );
 			expect( options[ 5 ] ).toHaveAccessibleName( 'Extra Large 30px' );
 			expect( options[ 6 ] ).toHaveAccessibleName( 'xx-large 40px' );
-			expect( options[ 7 ] ).toHaveAccessibleName( 'Custom' );
 		} );
 
 		test.each( [
@@ -255,27 +246,10 @@ describe( 'FontSizePicker', () => {
 		);
 
 		test.each( [
-			{ value: undefined, expectedLabel: 'Size' },
-			{ value: '8px', expectedLabel: 'Size' },
-			{ value: '1em', expectedLabel: 'Size' },
-			{ value: '2rem', expectedLabel: 'Size' },
-			{ value: 'clamp(1.75rem, 3vw, 2.25rem)', expectedLabel: 'Size' },
-			{ value: '3px', expectedLabel: 'Size Custom' },
-		] )(
-			'displays $expectedLabel as label when value is $value',
-			async ( { value, expectedLabel } ) => {
-				await render(
-					<FontSizePicker fontSizes={ fontSizes } value={ value } />
-				);
-				expect( screen.getByLabelText( expectedLabel ) ).toBeVisible();
-			}
-		);
-
-		test.each( [
 			{
 				option: 'Default',
 				value: '8px',
-				expectedArguments: [ undefined ],
+				expectedArguments: [ undefined, undefined ],
 			},
 			{
 				option: 'Tiny 8px',
@@ -323,7 +297,6 @@ describe( 'FontSizePicker', () => {
 			}
 		);
 
-		commonSelectTests( fontSizes );
 		commonTests( fontSizes );
 	} );
 
@@ -372,20 +345,6 @@ describe( 'FontSizePicker', () => {
 			expect( options[ 4 ] ).toHaveAccessibleName( 'Gigantosaurus' );
 		} );
 
-		test.each( [
-			{ value: undefined, expectedLabel: 'Size' },
-			{ value: '12px', expectedLabel: 'Size Small' },
-			{ value: '40px', expectedLabel: 'Size Gigantosaurus' },
-		] )(
-			'displays $expectedLabel as label when value is $value',
-			async ( { value, expectedLabel } ) => {
-				await render(
-					<FontSizePicker fontSizes={ fontSizes } value={ value } />
-				);
-				expect( screen.getByLabelText( expectedLabel ) ).toBeVisible();
-			}
-		);
-
 		it( 'calls onChange when a font size is selected', async () => {
 			const user = userEvent.setup();
 			const onChange = jest.fn();
@@ -399,6 +358,98 @@ describe( 'FontSizePicker', () => {
 
 		commonToggleGroupTests( fontSizes );
 		commonTests( fontSizes );
+
+		describe( 'valueMode prop for toggle group', () => {
+			it( 'should find font size by size value when valueMode is literal', async () => {
+				await render(
+					<FontSizePicker
+						fontSizes={ fontSizes }
+						value="16px"
+						valueMode="literal"
+					/>
+				);
+				// Should select the medium option (16px)
+				expect(
+					screen.getByRole( 'radio', { checked: true } )
+				).toHaveAccessibleName( 'Medium' );
+			} );
+
+			it( 'should find font size by slug when valueMode is slug', async () => {
+				await render(
+					<FontSizePicker
+						fontSizes={ fontSizes }
+						value="medium"
+						valueMode="slug"
+					/>
+				);
+				// Should select the medium option
+				expect(
+					screen.getByRole( 'radio', { checked: true } )
+				).toHaveAccessibleName( 'Medium' );
+			} );
+
+			it( 'should handle multiple font sizes with same value in literal mode', async () => {
+				const fontSizesWithDuplicates = [
+					{
+						slug: 'small-1',
+						name: 'Small 1',
+						size: '12px',
+					},
+					{
+						slug: 'small-2',
+						name: 'Small 2',
+						size: '12px',
+					},
+					{
+						slug: 'medium',
+						name: 'Medium',
+						size: '16px',
+					},
+				];
+				await render(
+					<FontSizePicker
+						fontSizes={ fontSizesWithDuplicates }
+						value="12px"
+						valueMode="literal"
+					/>
+				);
+				// Should have no selection when there are multiple matches
+				expect(
+					screen.queryByRole( 'radio', { checked: true } )
+				).not.toBeInTheDocument();
+			} );
+
+			it( 'should handle multiple font sizes with same value in slug mode', async () => {
+				const fontSizesWithDuplicates = [
+					{
+						slug: 'small-1',
+						name: 'Small 1',
+						size: '12px',
+					},
+					{
+						slug: 'small-2',
+						name: 'Small 2',
+						size: '12px',
+					},
+					{
+						slug: 'medium',
+						name: 'Medium',
+						size: '16px',
+					},
+				];
+				await render(
+					<FontSizePicker
+						fontSizes={ fontSizesWithDuplicates }
+						value="small-1"
+						valueMode="slug"
+					/>
+				);
+				// Should select the specific font size by slug
+				expect(
+					screen.getByRole( 'radio', { checked: true } )
+				).toHaveAccessibleName( 'Small 1' );
+			} );
+		} );
 	} );
 
 	describe( 'with ≤ 5 heterogeneous font sizes', () => {
@@ -440,25 +491,6 @@ describe( 'FontSizePicker', () => {
 		} );
 
 		test.each( [
-			{ value: undefined, expectedLabel: 'Size' },
-			{ value: '12px', expectedLabel: 'Size Small' },
-			{ value: '1em', expectedLabel: 'Size Medium' },
-			{ value: '2rem', expectedLabel: 'Size Large' },
-			{
-				value: 'clamp(1.75rem, 3vw, 2.25rem)',
-				expectedLabel: 'Size Extra Large',
-			},
-		] )(
-			'displays $expectedLabel as label when value is $value',
-			async ( { value, expectedLabel } ) => {
-				await render(
-					<FontSizePicker fontSizes={ fontSizes } value={ value } />
-				);
-				expect( screen.getByLabelText( expectedLabel ) ).toBeVisible();
-			}
-		);
-
-		test.each( [
 			{ radio: 'Small', expectedArguments: [ '12px', fontSizes[ 0 ] ] },
 			{ radio: 'Medium', expectedArguments: [ '1em', fontSizes[ 1 ] ] },
 			{ radio: 'Large', expectedArguments: [ '2rem', fontSizes[ 2 ] ] },
@@ -490,6 +522,64 @@ describe( 'FontSizePicker', () => {
 
 		commonToggleGroupTests( fontSizes );
 		commonTests( fontSizes );
+
+		describe( 'valueMode prop for heterogeneous toggle group', () => {
+			it( 'should find font size by size value when valueMode is literal', async () => {
+				await render(
+					<FontSizePicker
+						fontSizes={ fontSizes }
+						value="1em"
+						valueMode="literal"
+					/>
+				);
+				// Should select the medium option (1em)
+				expect(
+					screen.getByRole( 'radio', { checked: true } )
+				).toHaveAccessibleName( 'Medium' );
+			} );
+
+			it( 'should find font size by slug when valueMode is slug', async () => {
+				await render(
+					<FontSizePicker
+						fontSizes={ fontSizes }
+						value="medium"
+						valueMode="slug"
+					/>
+				);
+				// Should select the medium option
+				expect(
+					screen.getByRole( 'radio', { checked: true } )
+				).toHaveAccessibleName( 'Medium' );
+			} );
+
+			it( 'should handle complex font size values in literal mode', async () => {
+				await render(
+					<FontSizePicker
+						fontSizes={ fontSizes }
+						value="clamp(1.75rem, 3vw, 2.25rem)"
+						valueMode="literal"
+					/>
+				);
+				// Should select the extra large option
+				expect(
+					screen.getByRole( 'radio', { checked: true } )
+				).toHaveAccessibleName( 'Extra Large' );
+			} );
+
+			it( 'should handle complex font size values in slug mode', async () => {
+				await render(
+					<FontSizePicker
+						fontSizes={ fontSizes }
+						value="x-large"
+						valueMode="slug"
+					/>
+				);
+				// Should select the extra large option
+				expect(
+					screen.getByRole( 'radio', { checked: true } )
+				).toHaveAccessibleName( 'Extra Large' );
+			} );
+		} );
 	} );
 
 	function commonToggleGroupTests( fontSizes: FontSize[] ) {
@@ -519,37 +609,23 @@ describe( 'FontSizePicker', () => {
 		);
 	}
 
-	function commonSelectTests( fontSizes: FontSize[] ) {
-		it( 'shows custom input when Custom is selected', async () => {
-			const user = userEvent.setup();
-			const onChange = jest.fn();
-			await render(
-				<FontSizePicker fontSizes={ fontSizes } onChange={ onChange } />
-			);
-			await user.click(
-				screen.getByRole( 'combobox', { name: 'Font size' } )
-			);
-			await user.click(
-				screen.getByRole( 'option', { name: 'Custom' } )
-			);
-			expect( screen.getByLabelText( 'Custom' ) ).toBeVisible();
-			expect( onChange ).not.toHaveBeenCalled();
-		} );
-	}
-
 	function commonTests( fontSizes: FontSize[] ) {
 		it( 'shows custom input when value is unknown', async () => {
 			await render(
 				<FontSizePicker fontSizes={ fontSizes } value="3px" />
 			);
-			expect( screen.getByLabelText( 'Custom' ) ).toBeVisible();
+			expect(
+				screen.getByRole( 'spinbutton', { name: 'Font size' } )
+			).toBeVisible();
 		} );
 
 		it( 'hides custom input when disableCustomFontSizes is set to `true` with a custom font size', async () => {
 			const { rerender } = await render(
 				<FontSizePicker fontSizes={ fontSizes } value="3px" />
 			);
-			expect( screen.getByLabelText( 'Custom' ) ).toBeVisible();
+			expect(
+				screen.getByRole( 'spinbutton', { name: 'Font size' } )
+			).toBeVisible();
 
 			rerender(
 				<FontSizePicker
@@ -567,7 +643,9 @@ describe( 'FontSizePicker', () => {
 			const { rerender } = await render(
 				<FontSizePicker fontSizes={ fontSizes } value="3px" />
 			);
-			expect( screen.getByLabelText( 'Custom' ) ).toBeVisible();
+			expect(
+				screen.getByRole( 'spinbutton', { name: 'Font size' } )
+			).toBeVisible();
 
 			rerender(
 				<FontSizePicker
@@ -575,7 +653,9 @@ describe( 'FontSizePicker', () => {
 					value={ fontSizes[ 0 ].size }
 				/>
 			);
-			expect( screen.getByLabelText( 'Custom' ) ).toBeVisible();
+			expect(
+				screen.getByRole( 'spinbutton', { name: 'Font size' } )
+			).toBeVisible();
 		} );
 
 		it( 'allows custom values by default', async () => {
@@ -587,7 +667,10 @@ describe( 'FontSizePicker', () => {
 			await user.click(
 				screen.getByRole( 'button', { name: 'Set custom size' } )
 			);
-			await user.type( screen.getByLabelText( 'Custom' ), '80' );
+			await user.type(
+				screen.getByRole( 'spinbutton', { name: 'Font size' } ),
+				'80'
+			);
 			expect( onChange ).toHaveBeenCalledTimes( 2 ); // Once per keystroke.
 			expect( onChange ).toHaveBeenCalledWith( '80px' );
 		} );
@@ -603,7 +686,10 @@ describe( 'FontSizePicker', () => {
 				screen.getByRole( 'button', { name: 'Set custom size' } )
 			);
 
-			await user.type( screen.getByLabelText( 'Custom' ), '80' );
+			await user.type(
+				screen.getByRole( 'spinbutton', { name: 'Font size' } ),
+				'80'
+			);
 
 			await user.click(
 				screen.getByRole( 'button', { name: 'Use size preset' } )
@@ -650,7 +736,9 @@ describe( 'FontSizePicker', () => {
 			await user.click(
 				screen.getByRole( 'button', { name: 'Set custom size' } )
 			);
-			const sliderInput = screen.getByLabelText( 'Custom Size' );
+			const sliderInput = screen.getByRole( 'slider', {
+				name: 'Font size',
+			} );
 			fireEvent.change( sliderInput, {
 				target: { value: 80 },
 			} );
@@ -715,4 +803,312 @@ describe( 'FontSizePicker', () => {
 			expect( units[ 2 ] ).toHaveAccessibleName( 'ex' );
 		} );
 	}
+
+	describe( 'valueMode prop', () => {
+		// Use 6 font sizes to trigger select control (> 5)
+		const fontSizes = [
+			{
+				slug: 'small',
+				name: 'Small',
+				size: '12px',
+			},
+			{
+				slug: 'medium',
+				name: 'Medium',
+				size: '16px',
+			},
+			{
+				slug: 'large',
+				name: 'Large',
+				size: '20px',
+			},
+			{
+				slug: 'x-large',
+				name: 'Extra Large',
+				size: '24px',
+			},
+			{
+				slug: 'xx-large',
+				name: 'XX Large',
+				size: '28px',
+			},
+			{
+				slug: 'huge',
+				name: 'Huge',
+				size: '32px',
+			},
+		];
+
+		describe( 'valueMode="literal" (default)', () => {
+			it( 'should find font size by size value when valueMode is literal', async () => {
+				await render(
+					<FontSizePicker
+						fontSizes={ fontSizes }
+						value="16px"
+						valueMode="literal"
+					/>
+				);
+				// Should select the medium option (16px)
+				expect(
+					screen.getByRole( 'combobox', { name: 'Font size' } )
+				).toHaveTextContent( 'Medium' );
+			} );
+
+			it( 'should call onChange with size value and FontSize object when valueMode is literal', async () => {
+				const user = userEvent.setup();
+				const onChange = jest.fn();
+				await render(
+					<FontSizePicker
+						fontSizes={ fontSizes }
+						onChange={ onChange }
+						valueMode="literal"
+					/>
+				);
+				await user.click(
+					screen.getByRole( 'combobox', { name: 'Font size' } )
+				);
+				await user.click(
+					screen.getByRole( 'option', { name: 'Medium 16px' } )
+				);
+				expect( onChange ).toHaveBeenCalledWith(
+					'16px',
+					fontSizes[ 1 ]
+				);
+			} );
+		} );
+
+		describe( 'valueMode="slug"', () => {
+			it( 'should find font size by slug when valueMode is slug', async () => {
+				await render(
+					<FontSizePicker
+						fontSizes={ fontSizes }
+						value="medium"
+						valueMode="slug"
+					/>
+				);
+				// Should select the medium option
+				expect(
+					screen.getByRole( 'combobox', { name: 'Font size' } )
+				).toHaveTextContent( 'Medium' );
+			} );
+
+			it( 'should call onChange with size value and FontSize object when valueMode is slug', async () => {
+				const user = userEvent.setup();
+				const onChange = jest.fn();
+				await render(
+					<FontSizePicker
+						fontSizes={ fontSizes }
+						onChange={ onChange }
+						valueMode="slug"
+					/>
+				);
+				await user.click(
+					screen.getByRole( 'combobox', { name: 'Font size' } )
+				);
+				await user.click(
+					screen.getByRole( 'option', { name: 'Large 20px' } )
+				);
+				expect( onChange ).toHaveBeenCalledWith(
+					'20px',
+					fontSizes[ 2 ]
+				);
+			} );
+
+			it( 'should handle undefined value when valueMode is slug', async () => {
+				await render(
+					<FontSizePicker
+						fontSizes={ fontSizes }
+						value={ undefined }
+						valueMode="slug"
+					/>
+				);
+				// Should show default option
+				expect(
+					screen.getByRole( 'combobox', { name: 'Font size' } )
+				).toHaveTextContent( 'Default' );
+			} );
+
+			it( 'should handle empty string value when valueMode is slug', async () => {
+				await render(
+					<FontSizePicker
+						fontSizes={ fontSizes }
+						value=""
+						valueMode="slug"
+					/>
+				);
+				// Should show default option
+				expect(
+					screen.getByRole( 'combobox', { name: 'Font size' } )
+				).toHaveTextContent( 'Default' );
+			} );
+		} );
+
+		describe( 'edge cases with valueMode', () => {
+			// Use 6 font sizes to trigger select control (> 5)
+			const fontSizesWithDuplicates = [
+				{
+					slug: 'small-1',
+					name: 'Small 1',
+					size: '12px',
+				},
+				{
+					slug: 'small-2',
+					name: 'Small 2',
+					size: '12px',
+				},
+				{
+					slug: 'medium',
+					name: 'Medium',
+					size: '16px',
+				},
+				{
+					slug: 'large',
+					name: 'Large',
+					size: '20px',
+				},
+				{
+					slug: 'x-large',
+					name: 'Extra Large',
+					size: '24px',
+				},
+				{
+					slug: 'huge',
+					name: 'Huge',
+					size: '28px',
+				},
+			];
+
+			it( 'should handle multiple font sizes with same value in literal mode', async () => {
+				await render(
+					<FontSizePicker
+						fontSizes={ fontSizesWithDuplicates }
+						value="12px"
+						valueMode="literal"
+					/>
+				);
+				// Should show the first matching font size when there are multiple matches
+				expect(
+					screen.getByRole( 'combobox', { name: 'Font size' } )
+				).toHaveTextContent( 'Small 1' );
+			} );
+
+			it( 'should handle multiple font sizes with same value in slug mode', async () => {
+				await render(
+					<FontSizePicker
+						fontSizes={ fontSizesWithDuplicates }
+						value="small-1"
+						valueMode="slug"
+					/>
+				);
+				// Should select the specific font size by slug
+				expect(
+					screen.getByRole( 'combobox', { name: 'Font size' } )
+				).toHaveTextContent( 'Small 1' );
+			} );
+		} );
+	} );
+
+	describe( 'onChange callback signature', () => {
+		// Use 6 font sizes to trigger select control (> 5)
+		const fontSizes = [
+			{
+				slug: 'small',
+				name: 'Small',
+				size: '12px',
+			},
+			{
+				slug: 'medium',
+				name: 'Medium',
+				size: '16px',
+			},
+			{
+				slug: 'large',
+				name: 'Large',
+				size: '20px',
+			},
+			{
+				slug: 'x-large',
+				name: 'Extra Large',
+				size: '24px',
+			},
+			{
+				slug: 'xx-large',
+				name: 'XX Large',
+				size: '28px',
+			},
+			{
+				slug: 'huge',
+				name: 'Huge',
+				size: '32px',
+			},
+		];
+
+		it( 'should call onChange with FontSize object as second parameter for select control', async () => {
+			const user = userEvent.setup();
+			const onChange = jest.fn();
+			await render(
+				<FontSizePicker fontSizes={ fontSizes } onChange={ onChange } />
+			);
+			await user.click(
+				screen.getByRole( 'combobox', { name: 'Font size' } )
+			);
+			await user.click(
+				screen.getByRole( 'option', { name: 'Small 12px' } )
+			);
+			expect( onChange ).toHaveBeenCalledWith( '12px', fontSizes[ 0 ] );
+		} );
+
+		it( 'should call onChange with undefined as second parameter for default option', async () => {
+			const user = userEvent.setup();
+			const onChange = jest.fn();
+			await render(
+				<FontSizePicker
+					fontSizes={ fontSizes }
+					value="16px" // Start with a selected value
+					onChange={ onChange }
+				/>
+			);
+			await user.click(
+				screen.getByRole( 'combobox', { name: 'Font size' } )
+			);
+			await user.click(
+				screen.getByRole( 'option', { name: 'Default' } )
+			);
+			expect( onChange ).toHaveBeenCalledWith( undefined, undefined );
+		} );
+
+		it( 'should call onChange with FontSize object as second parameter for toggle group control', async () => {
+			const user = userEvent.setup();
+			const onChange = jest.fn();
+			// Use fewer font sizes to trigger toggle group (≤ 5)
+			const toggleGroupFontSizes = [
+				{
+					slug: 'small',
+					name: 'Small',
+					size: '12px',
+				},
+				{
+					slug: 'medium',
+					name: 'Medium',
+					size: '16px',
+				},
+				{
+					slug: 'large',
+					name: 'Large',
+					size: '20px',
+				},
+			];
+			await render(
+				<FontSizePicker
+					fontSizes={ toggleGroupFontSizes }
+					onChange={ onChange }
+				/>
+			);
+			await user.click( screen.getByRole( 'radio', { name: 'Small' } ) );
+			expect( onChange ).toHaveBeenCalledWith(
+				'12px',
+				toggleGroupFontSizes[ 0 ]
+			);
+		} );
+	} );
 } );

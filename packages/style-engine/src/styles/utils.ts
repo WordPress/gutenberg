@@ -98,7 +98,7 @@ export function generateBoxRules(
 		rules.push( {
 			selector: options?.selector,
 			key: ruleKeys.default,
-			value: boxStyle,
+			value: getCSSValueFromRawStyle( boxStyle ),
 		} );
 	} else {
 		const sideRules = individualProperties.reduce(

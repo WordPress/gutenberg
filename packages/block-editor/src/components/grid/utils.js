@@ -160,6 +160,21 @@ export function getGridInfo( gridElement ) {
 		gridElement,
 		'grid-template-rows'
 	);
+	const borderTopWidth = getComputedCSS( gridElement, 'border-top-width' );
+	const borderRightWidth = getComputedCSS(
+		gridElement,
+		'border-right-width'
+	);
+	const borderBottomWidth = getComputedCSS(
+		gridElement,
+		'border-bottom-width'
+	);
+	const borderLeftWidth = getComputedCSS( gridElement, 'border-left-width' );
+	const paddingTop = getComputedCSS( gridElement, 'padding-top' );
+	const paddingRight = getComputedCSS( gridElement, 'padding-right' );
+	const paddingBottom = getComputedCSS( gridElement, 'padding-bottom' );
+	const paddingLeft = getComputedCSS( gridElement, 'padding-left' );
+
 	const numColumns = gridTemplateColumns.split( ' ' ).length;
 	const numRows = gridTemplateRows.split( ' ' ).length;
 	const numItems = numColumns * numRows;
@@ -172,7 +187,12 @@ export function getGridInfo( gridElement ) {
 			gridTemplateColumns,
 			gridTemplateRows,
 			gap: getComputedCSS( gridElement, 'gap' ),
-			padding: getComputedCSS( gridElement, 'padding' ),
+			inset: `
+				calc(${ paddingTop } + ${ borderTopWidth })
+				calc(${ paddingRight } + ${ borderRightWidth })
+				calc(${ paddingBottom } + ${ borderBottomWidth })
+				calc(${ paddingLeft } + ${ borderLeftWidth })
+			`,
 		},
 	};
 }

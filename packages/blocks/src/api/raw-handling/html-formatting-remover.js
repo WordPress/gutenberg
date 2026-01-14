@@ -61,7 +61,7 @@ export default function htmlFormattingRemover( node ) {
 	}
 
 	// Remove the trailing space if the text element is at the end of a block,
-	// is succeded by a line break element, or has a space in the next text
+	// is succeeded by a line break element, or has a space in the next text
 	// node.
 	if ( newData[ newData.length - 1 ] === ' ' ) {
 		const nextSibling = getSibling( node, 'next' );

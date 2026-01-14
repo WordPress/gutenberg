@@ -3,6 +3,7 @@
  */
 import { forwardRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -43,6 +44,7 @@ const LinkControlSearchInput = forwardRef(
 			createSuggestionButtonText,
 			hideLabelFromVision = false,
 			suffix,
+			isEntity = false,
 		},
 		ref
 	) => {
@@ -104,7 +106,13 @@ const LinkControlSearchInput = forwardRef(
 				allowDirectEntry ||
 				( suggestion && Object.keys( suggestion ).length >= 1 )
 			) {
-				const { id, url, ...restLinkProps } = currentLink ?? {};
+				// Strip out id, url, kind, and type from the current link to prevent
+				// entity metadata from persisting when switching to a different link type.
+				// For example, when changing from an entity link (kind: 'post-type', type: 'page')
+				// to a custom URL (type: 'link', no kind), we need to ensure the old 'kind'
+				// doesn't carry over. We do want to preserve other properites like title, though.
+				const { id, url, kind, type, ...restLinkProps } =
+					currentLink ?? {};
 				onSelect(
 					// Some direct entries don't have types or IDs, and we still need to clear the previous ones.
 					{ ...restLinkProps, ...suggestion },
@@ -113,18 +121,23 @@ const LinkControlSearchInput = forwardRef(
 			}
 		};
 
-		const inputLabel = placeholder ?? __( 'Search or type URL' );
+		const _placeholder = placeholder ?? __( 'Search or type URL' );
+
+		const label =
+			hideLabelFromVision && placeholder !== ''
+				? _placeholder
+				: __( 'Link' );
 
 		return (
 			<div className="block-editor-link-control__search-input-container">
 				<URLInput
 					disableSuggestions={ currentLink?.url === value }
-					label={ inputLabel }
+					label={ label }
 					hideLabelFromVision={ hideLabelFromVision }
 					className={ className }
 					value={ value }
 					onChange={ onInputChange }
-					placeholder={ inputLabel }
+					placeholder={ _placeholder }
 					__experimentalRenderSuggestions={
 						showSuggestions ? handleRenderSuggestions : null
 					}
@@ -146,8 +159,9 @@ const LinkControlSearchInput = forwardRef(
 							);
 						}
 					} }
-					ref={ ref }
+					inputRef={ ref }
 					suffix={ suffix }
+					disabled={ isEntity }
 				/>
 				{ children }
 			</div>
@@ -156,3 +170,11 @@ const LinkControlSearchInput = forwardRef(
 );
 
 export default LinkControlSearchInput;
+
+export const __experimentalLinkControlSearchInput = ( props ) => {
+	deprecated( 'wp.blockEditor.__experimentalLinkControlSearchInput', {
+		since: '6.8',
+	} );
+
+	return <LinkControlSearchInput { ...props } />;
+};

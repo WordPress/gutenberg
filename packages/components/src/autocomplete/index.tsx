@@ -40,35 +40,7 @@ import type {
 	UseAutocompleteProps,
 	WPCompleter,
 } from './types';
-
-const getNodeText = ( node: React.ReactNode ): string => {
-	if ( node === null ) {
-		return '';
-	}
-
-	switch ( typeof node ) {
-		case 'string':
-		case 'number':
-			return node.toString();
-			break;
-		case 'boolean':
-			return '';
-			break;
-		case 'object': {
-			if ( node instanceof Array ) {
-				return node.map( getNodeText ).join( '' );
-			}
-			if ( 'props' in node ) {
-				return getNodeText( node.props.children );
-			}
-			break;
-		}
-		default:
-			return '';
-	}
-
-	return '';
-};
+import getNodeText from '../utils/get-node-text';
 
 const EMPTY_FILTERED_OPTIONS: KeyedOption[] = [];
 
@@ -154,6 +126,10 @@ export function useAutocomplete( {
 		// Reset autocomplete state after insertion rather than before
 		// so insertion events don't cause the completion menu to redisplay.
 		reset();
+
+		// Make sure that the content remains focused after making a selection
+		// and that the text cursor position is not lost.
+		contentRef.current?.focus();
 	}
 
 	function reset() {
@@ -394,12 +370,13 @@ export function useAutocomplete( {
 		? `components-autocomplete-item-${ instanceId }-${ selectedKey }`
 		: null;
 	const hasSelection = record.start !== undefined;
+	const showPopover = !! textContent && hasSelection && !! AutocompleterUI;
 
 	return {
 		listBoxId,
 		activeId,
 		onKeyDown: withIgnoreIMEEvents( handleKeyDown ),
-		popover: hasSelection && AutocompleterUI && (
+		popover: showPopover && (
 			<AutocompleterUI
 				className={ className }
 				filterValue={ filterValue }

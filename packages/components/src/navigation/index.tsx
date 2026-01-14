@@ -6,6 +6,7 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
+import deprecated from '@wordpress/deprecated';
 import { useEffect, useRef, useState } from '@wordpress/element';
 import { isRTL } from '@wordpress/i18n';
 
@@ -78,6 +79,12 @@ export function Navigation( {
 	const [ slideOrigin, setSlideOrigin ] = useState< 'left' | 'right' >();
 	const navigationTree = useCreateNavigationTree();
 	const defaultSlideOrigin = isRTL() ? 'right' : 'left';
+
+	deprecated( 'wp.components.Navigation (and all subcomponents)', {
+		since: '6.8',
+		version: '7.1',
+		alternative: 'wp.components.Navigator',
+	} );
 
 	const setActiveMenu: NavigationContextType[ 'setActiveMenu' ] = (
 		menuId,

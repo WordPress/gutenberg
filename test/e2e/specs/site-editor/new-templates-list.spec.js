@@ -27,13 +27,7 @@ test.describe( 'Templates', () => {
 			page.locator( '[aria-label="Templates"]' )
 		).toBeVisible();
 
-		const firstTitle = page
-			.getByRole( 'region', {
-				name: 'Template',
-				includeHidden: true,
-			} )
-			.getByRole( 'link', { includeHidden: true } )
-			.first();
+		const firstTitle = page.locator( '.fields-field__title' ).first();
 
 		// Descending by title.
 		await page.getByRole( 'button', { name: 'View options' } ).click();
@@ -54,9 +48,7 @@ test.describe( 'Templates', () => {
 		await admin.visitSiteEditor( { postType: 'wp_template' } );
 		// Global search.
 		await page.getByRole( 'searchbox', { name: 'Search' } ).fill( 'tag' );
-		const titles = page
-			.getByRole( 'region', { name: 'Template' } )
-			.getByRole( 'link', { includeHidden: true } );
+		const titles = page.locator( '.fields-field__title' );
 		await expect( titles ).toHaveCount( 1 );
 		await expect( titles.first() ).toHaveText( 'Tag Archives' );
 		await page

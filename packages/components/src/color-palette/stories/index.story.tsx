@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryFn } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react-webpack5';
 
 /**
  * WordPress dependencies
@@ -14,12 +14,13 @@ import { useState } from '@wordpress/element';
 import ColorPalette from '..';
 
 const meta: Meta< typeof ColorPalette > = {
-	title: 'Components/ColorPalette',
+	title: 'Components/Selection & Input/Color/ColorPalette',
+	id: 'components-colorpalette',
 	component: ColorPalette,
 	argTypes: {
-		as: { control: { type: null } },
-		onChange: { action: 'onChange', control: { type: null } },
-		value: { control: { type: null } },
+		as: { control: false },
+		onChange: { action: 'onChange', control: false },
+		value: { control: false },
 	},
 	parameters: {
 		controls: { expanded: true },

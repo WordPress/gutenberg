@@ -85,12 +85,12 @@ describe( 'parseSourceString', () => {
 
 		it( 'should parse other sources', () => {
 			expect(
-				parseSourceString( 'http://test.com/testing.zip', options )
+				parseSourceString( 'http://example.com/testing.zip', options )
 			).toEqual( {
 				basename: 'testing',
 				path: '/test/cache/testing',
 				type: 'zip',
-				url: 'http://test.com/testing.zip',
+				url: 'http://example.com/testing.zip',
 			} );
 		} );
 	} );

@@ -5,6 +5,6 @@ export const BASE_QUERY = {
 
 export const AUTHORS_QUERY = {
 	who: 'authors',
-	per_page: 50,
+	per_page: 100,
 	...BASE_QUERY,
 };

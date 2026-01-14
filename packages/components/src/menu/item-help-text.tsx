@@ -1,19 +1,26 @@
 /**
  * WordPress dependencies
  */
-import { forwardRef } from '@wordpress/element';
+import { forwardRef, useContext } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import type { WordPressComponentProps } from '../context';
+import { Context } from './context';
 import * as Styled from './styles';
 
-export const MenuItemHelpText = forwardRef<
+export const ItemHelpText = forwardRef<
 	HTMLSpanElement,
 	WordPressComponentProps< { children: React.ReactNode }, 'span', true >
->( function MenuItemHelpText( props, ref ) {
-	return (
-		<Styled.MenuItemHelpText numberOfLines={ 2 } ref={ ref } { ...props } />
-	);
+>( function ItemHelpText( props, ref ) {
+	const menuContext = useContext( Context );
+
+	if ( ! menuContext?.store ) {
+		throw new Error(
+			'Menu.ItemHelpText can only be rendered inside a Menu component'
+		);
+	}
+
+	return <Styled.ItemHelpText numberOfLines={ 2 } ref={ ref } { ...props } />;
 } );

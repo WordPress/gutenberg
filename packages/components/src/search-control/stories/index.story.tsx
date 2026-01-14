@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryFn } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react-webpack5';
 
 /**
  * WordPress dependencies
@@ -14,11 +14,12 @@ import { useState } from '@wordpress/element';
 import SearchControl from '..';
 
 const meta: Meta< typeof SearchControl > = {
-	title: 'Components/SearchControl',
+	title: 'Components/Selection & Input/Common/SearchControl',
+	id: 'components-searchcontrol',
 	component: SearchControl,
 	argTypes: {
 		onChange: { action: 'onChange' },
-		value: { control: { type: null } },
+		value: { control: false },
 	},
 	parameters: {
 		controls: { expanded: true },
@@ -48,5 +49,4 @@ const Template: StoryFn< typeof SearchControl > = ( {
 export const Default = Template.bind( {} );
 Default.args = {
 	help: 'Help text to explain the input.',
-	__nextHasNoMarginBottom: true,
 };

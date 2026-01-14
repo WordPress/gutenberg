@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryFn } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react-webpack5';
 
 /**
  * WordPress dependencies
@@ -15,13 +15,14 @@ import RadioControl from '..';
 
 const meta: Meta< typeof RadioControl > = {
 	component: RadioControl,
-	title: 'Components/RadioControl',
+	title: 'Components/Selection & Input/Common/RadioControl',
+	id: 'components-radiocontrol',
 	argTypes: {
 		onChange: {
 			action: 'onChange',
 		},
 		selected: {
-			control: { type: null },
+			control: false,
 		},
 		label: {
 			control: { type: 'text' },

@@ -42,7 +42,7 @@ function useDeleteNavigationMenu() {
 					type: 'snackbar',
 				}
 			);
-			history.push( { postType: 'wp_navigation' } );
+			history.navigate( '/navigation' );
 		} catch ( error ) {
 			createErrorNotice(
 				sprintf(
@@ -165,7 +165,7 @@ function useDuplicateNavigationMenu() {
 				createSuccessNotice( __( 'Duplicated Navigation Menu' ), {
 					type: 'snackbar',
 				} );
-				history.push( { postType, postId: savedRecord.id } );
+				history.navigate( `/wp_navigation/${ savedRecord.id }` );
 			}
 		} catch ( error ) {
 			createErrorNotice(

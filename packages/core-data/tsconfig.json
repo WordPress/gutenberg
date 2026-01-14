@@ -2,8 +2,6 @@
 	"$schema": "https://json.schemastore.org/tsconfig.json",
 	"extends": "../../tsconfig.base.json",
 	"compilerOptions": {
-		"rootDir": "src",
-		"declarationDir": "build-types",
 		"checkJs": false,
 		"noImplicitAny": false
 	},
@@ -23,6 +21,5 @@
 		{ "path": "../undo-manager" },
 		{ "path": "../url" },
 		{ "path": "../warning" }
-	],
-	"include": [ "src/**/*" ]
+	]
 }

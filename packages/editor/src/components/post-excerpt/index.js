@@ -32,7 +32,7 @@ export default function PostExcerpt( {
 				select( editorStore );
 			const postType = getCurrentPostType();
 			// This special case is unfortunate, but the REST API of wp_template and wp_template_part
-			// support the excerpt field throught the "description" field rather than "excerpt".
+			// support the excerpt field through the "description" field rather than "excerpt".
 			const _usedAttribute = [
 				'wp_template',
 				'wp_template_part',
@@ -66,7 +66,6 @@ export default function PostExcerpt( {
 	return (
 		<div className="editor-post-excerpt">
 			<TextareaControl
-				__nextHasNoMarginBottom
 				label={ label }
 				hideLabelFromVision={ hideLabelFromVision }
 				className="editor-post-excerpt__textarea"

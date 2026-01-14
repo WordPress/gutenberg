@@ -23,6 +23,10 @@ declare module './base-entity-records' {
 			 */
 			page_on_front: number;
 			/**
+			 * The ID of the page that should display the latest posts
+			 */
+			page_for_posts: number;
+			/**
 			 * Site title.
 			 */
 			title: string;

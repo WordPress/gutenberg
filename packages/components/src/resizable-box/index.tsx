@@ -112,6 +112,16 @@ function UnforwardedResizableBox(
 				showHandle && 'has-show-handle',
 				className
 			) }
+			// Add a focusable element within the drag handle. Unfortunately,
+			// `re-resizable` does not make them properly focusable by default,
+			// causing focus to move the the block wrapper which triggers block
+			// drag.
+			handleComponent={ Object.fromEntries(
+				Object.keys( HANDLE_CLASSES ).map( ( key ) => [
+					key,
+					<div key={ key } tabIndex={ -1 } />,
+				] )
+			) }
 			handleClasses={ HANDLE_CLASSES }
 			handleStyles={ HANDLE_STYLES }
 			ref={ ref }

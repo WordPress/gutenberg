@@ -1,3 +1,7 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/z-index" as *;
+
 $color-palette-circle-size: 28px;
 $color-palette-circle-spacing: 12px;
 
@@ -35,9 +39,11 @@ $color-palette-circle-spacing: 12px;
 	width: $color-palette-circle-size;
 	vertical-align: top;
 	transform: scale(1);
-	transition: 100ms transform ease;
-	will-change: transform;
-	@include reduce-motion("transition");
+
+	@media not (prefers-reduced-motion) {
+		transition: 100ms transform ease;
+		will-change: transform;
+	}
 
 	&:hover {
 		transform: scale(1.2);
@@ -67,14 +73,17 @@ $color-palette-circle-spacing: 12px;
 .components-circular-option-picker__option {
 	display: inline-block;
 	vertical-align: top;
-	height: 100%;
-	width: 100%;
+	height: 100% !important;
+	aspect-ratio: 1;
 	border: none;
 	border-radius: $radius-round;
 	background: transparent;
 	box-shadow: inset 0 0 0 ($color-palette-circle-size * 0.5);
-	transition: 100ms box-shadow ease;
-	@include reduce-motion("transition");
+
+	@media not (prefers-reduced-motion) {
+		transition: 100ms box-shadow ease;
+	}
+
 	cursor: pointer;
 
 	&:hover {

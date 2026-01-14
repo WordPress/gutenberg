@@ -14,7 +14,7 @@ export function useHeading(
 	const {
 		as: asProp,
 		level = 2,
-		color = COLORS.gray[ 900 ],
+		color = COLORS.theme.foreground,
 		isBlock = true,
 		weight = CONFIG.fontWeightHeading as import('react').CSSProperties[ 'fontWeight' ],
 		...otherProps

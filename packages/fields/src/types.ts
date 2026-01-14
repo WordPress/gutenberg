@@ -1,5 +1,10 @@
+/**
+ * WordPress dependencies
+ */
+import type { DataFormControlProps } from '@wordpress/dataviews';
+
 type PostStatus =
-	| 'published'
+	| 'publish'
 	| 'draft'
 	| 'pending'
 	| 'private'
@@ -23,6 +28,19 @@ interface Links {
 	[ key: string ]: { href: string }[] | undefined;
 }
 
+interface Author {
+	id: number;
+	name: string;
+	avatar_urls: Record< string, string >;
+}
+
+interface EmbeddedAuthor {
+	author: Author[];
+}
+
+/**
+ * BasePost interface used for all post types.
+ */
 export interface BasePost extends CommonPost {
 	comment_status?: 'open' | 'closed';
 	excerpt?: string | { raw: string; rendered: string };
@@ -37,6 +55,31 @@ export interface BasePost extends CommonPost {
 	link?: string;
 	slug?: string;
 	permalink_template?: string;
+	date?: string;
+	modified?: string;
+	author?: number;
+}
+
+export interface BasePostWithEmbeddedAuthor extends BasePost {
+	_embedded: EmbeddedAuthor;
+}
+
+interface FeaturedMedia {
+	title: {
+		rendered: string;
+	};
+	source_url: string;
+	media_details: {
+		sizes: Record< string, { width: number; source_url: string } >;
+	};
+}
+
+interface EmbeddedFeaturedMedia {
+	'wp:featuredmedia': FeaturedMedia[];
+}
+
+export interface BasePostWithEmbeddedFeaturedMedia extends BasePost {
+	_embedded: EmbeddedFeaturedMedia;
 }
 
 export interface Template extends CommonPost {
@@ -74,6 +117,10 @@ export type PostWithPermissions = Post & {
 	};
 };
 
+interface EditorSupport {
+	notes?: boolean;
+}
+
 export interface PostType {
 	slug: string;
 	viewable: boolean;
@@ -81,8 +128,32 @@ export interface PostType {
 		'page-attributes'?: boolean;
 		title?: boolean;
 		revisions?: boolean;
+		author?: string;
+		thumbnail?: string;
+		comments?: string;
+		editor?: boolean | [ EditorSupport ];
+		trackbacks?: boolean;
 	};
 }
 
 // Will be unnecessary after typescript 5.0 upgrade.
 export type CoreDataError = { message?: string; code?: string };
+
+export interface MediaEditProps< Item >
+	extends Pick<
+		DataFormControlProps< Item >,
+		'data' | 'field' | 'onChange' | 'hideLabelFromVision'
+	> {
+	/**
+	 * Array of allowed media types (e.g., ['image', 'video']).
+	 *
+	 * @default ['image']
+	 */
+	allowedTypes?: string[];
+	/**
+	 * Whether to allow multiple media selections.
+	 *
+	 * @default false
+	 */
+	multiple?: boolean;
+}

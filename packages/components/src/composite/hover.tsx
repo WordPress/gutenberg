@@ -26,5 +26,5 @@ export const CompositeHover = forwardRef<
 	// obfuscated to discourage its use outside of the component's internals.
 	const store = ( props.store ?? context.store ) as Ariakit.CompositeStore;
 
-	return <Ariakit.CompositeGroup store={ store } { ...props } ref={ ref } />;
+	return <Ariakit.CompositeHover store={ store } { ...props } ref={ ref } />;
 } );

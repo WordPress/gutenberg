@@ -118,7 +118,7 @@ export default function ChangeDesign( { clientId } ) {
 					<BlockPatternsList
 						blockPatterns={ sameCategoryPatternsWithSingleWrapper }
 						onClickPattern={ onClickPattern }
-						showTitle={ false }
+						showTitlesAsTooltip
 					/>
 				</DropdownContentWrapper>
 			) }

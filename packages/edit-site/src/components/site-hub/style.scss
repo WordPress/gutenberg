@@ -1,10 +1,13 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
+
 .edit-site-site-hub {
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
 	gap: $grid-unit-10;
 	margin-right: $grid-unit-15;
-	height: $grid-unit-70;
+	height: $header-height;
 }
 
 .edit-site-site-hub__actions {
@@ -26,7 +29,7 @@
 	display: block;
 	flex-grow: 1;
 	font-size: 15px;
-	font-weight: 500;
+	font-weight: $font-weight-medium;
 	overflow: hidden;
 	// Add space for the ↗ to render.
 	padding-right: $grid-unit-20;
@@ -65,8 +68,10 @@
 		opacity: 0;
 		position: absolute;
 		right: 0;
-		transition: opacity 0.1s linear;
-		@include reduce-motion("transition");
+
+		@media not (prefers-reduced-motion) {
+			transition: opacity 0.1s linear;
+		}
 	}
 
 	&:hover::after,

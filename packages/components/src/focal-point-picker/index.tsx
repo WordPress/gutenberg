@@ -2,6 +2,7 @@
  * External dependencies
  */
 import clsx from 'clsx';
+import type { KeyboardEventHandler } from 'react';
 
 /**
  * WordPress dependencies
@@ -10,19 +11,18 @@ import { __ } from '@wordpress/i18n';
 import { useEffect, useRef, useState } from '@wordpress/element';
 import {
 	__experimentalUseDragging as useDragging,
-	useInstanceId,
 	useIsomorphicLayoutEffect,
 } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
-import BaseControl from '../base-control';
 import Controls from './controls';
 import FocalPoint from './focal-point';
 import Grid from './grid';
 import Media from './media';
 import {
+	Container,
 	MediaWrapper,
 	MediaContainer,
 } from './styles/focal-point-picker-style';
@@ -33,7 +33,11 @@ import type {
 	FocalPoint as FocalPointType,
 	FocalPointPickerProps,
 } from './types';
-import type { KeyboardEventHandler } from 'react';
+import {
+	StyledLabel,
+	StyledHelp,
+} from '../base-control/styles/base-control-styles';
+import { VisuallyHidden } from '../visually-hidden';
 
 const GRID_OVERLAY_TIMEOUT = 600;
 
@@ -70,7 +74,6 @@ const GRID_OVERLAY_TIMEOUT = 600;
  * 	return (
  * 		<>
  * 			<FocalPointPicker
- *        __nextHasNoMarginBottom
  * 				url={ url }
  * 				value={ focalPoint }
  * 				onDragStart={ setFocalPoint }
@@ -84,10 +87,12 @@ const GRID_OVERLAY_TIMEOUT = 600;
  * ```
  */
 export function FocalPointPicker( {
-	__nextHasNoMarginBottom,
+	// Prevent passing to internal component.
+	__nextHasNoMarginBottom: _,
 	autoPlay = true,
 	className,
 	help,
+	hideLabelFromVision,
 	label,
 	onChange,
 	onDrag,
@@ -233,9 +238,7 @@ export function FocalPointPicker( {
 	};
 
 	const classes = clsx( 'components-focal-point-picker-control', className );
-
-	const instanceId = useInstanceId( FocalPointPicker );
-	const id = `inspector-focal-point-picker-control-${ instanceId }`;
+	const Label = hideLabelFromVision ? VisuallyHidden : StyledLabel;
 
 	useUpdateEffect( () => {
 		setShowGridOverlay( true );
@@ -247,15 +250,8 @@ export function FocalPointPicker( {
 	}, [ x, y ] );
 
 	return (
-		<BaseControl
-			{ ...restProps }
-			__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
-			__associatedWPComponentName="FocalPointPicker"
-			label={ label }
-			id={ id }
-			help={ help }
-			className={ classes }
-		>
+		<Container { ...restProps } as="fieldset" className={ classes }>
+			{ !! label && <Label as="legend">{ label }</Label> }
 			<MediaWrapper className="components-focal-point-picker-wrapper">
 				<MediaContainer
 					className="components-focal-point-picker"
@@ -284,14 +280,14 @@ export function FocalPointPicker( {
 				</MediaContainer>
 			</MediaWrapper>
 			<Controls
-				__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
 				hasHelpText={ !! help }
 				point={ { x, y } }
 				onChange={ ( value ) => {
 					onChange?.( getFinalValue( value ) );
 				} }
 			/>
-		</BaseControl>
+			{ !! help && <StyledHelp>{ help }</StyledHelp> }
+		</Container>
 	);
 }
 

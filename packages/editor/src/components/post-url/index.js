@@ -32,9 +32,10 @@ import { store as editorStore } from '../../store';
  * <PostURL />
  * ```
  *
- * @param {Function} onClose Callback function to be executed when the popover is closed.
+ * @param {{ onClose: () => void }} props         The props for the component.
+ * @param {() => void}              props.onClose Callback function to be executed when the popover is closed.
  *
- * @return {Component} The rendered PostURL component.
+ * @return {React.ReactNode} The rendered PostURL component.
  */
 export default function PostURL( { onClose } ) {
 	const {

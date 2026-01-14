@@ -1,3 +1,5 @@
+@use "@wordpress/base-styles/mixins" as *;
+
 .wp-block-latest-posts {
 	// This block has customizable padding, border-box makes that more predictable.
 	box-sizing: border-box;
@@ -57,7 +59,8 @@
 	font-size: 0.8125em;
 }
 
-.wp-block-latest-posts__post-excerpt {
+.wp-block-latest-posts__post-excerpt,
+.wp-block-latest-posts__post-full-content {
 	margin-top: 0.5em;
 	margin-bottom: 1em;
 }

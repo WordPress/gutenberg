@@ -18,6 +18,7 @@ const POSITION_CLASSNAMES = {
 
 export const IMAGE_BACKGROUND_TYPE = 'image';
 export const VIDEO_BACKGROUND_TYPE = 'video';
+export const EMBED_VIDEO_BACKGROUND_TYPE = 'embed-video';
 export const COVER_MIN_HEIGHT = 50;
 export const COVER_MAX_HEIGHT = 1000;
 export const COVER_DEFAULT_HEIGHT = 300;
@@ -35,7 +36,7 @@ export function dimRatioToClass( ratio ) {
 }
 
 export function attributesFromMedia( media ) {
-	if ( ! media || ! media.url ) {
+	if ( ! media || ( ! media.url && ! media.src ) ) {
 		return {
 			url: undefined,
 			id: undefined,
@@ -52,23 +53,23 @@ export function attributesFromMedia( media ) {
 		if ( media.media_type === IMAGE_BACKGROUND_TYPE ) {
 			mediaType = IMAGE_BACKGROUND_TYPE;
 		} else {
-			// only images and videos are accepted so if the media_type is not an image we can assume it is a video.
+			// Only images and videos are accepted so if the media_type is not an image we can assume it is a video.
 			// Videos contain the media type of 'file' in the object returned from the rest api.
 			mediaType = VIDEO_BACKGROUND_TYPE;
 		}
-	} else {
 		// For media selections originated from existing files in the media library.
-		if (
-			media.type !== IMAGE_BACKGROUND_TYPE &&
-			media.type !== VIDEO_BACKGROUND_TYPE
-		) {
-			return;
-		}
+	} else if (
+		media.type &&
+		( media.type === IMAGE_BACKGROUND_TYPE ||
+			media.type === VIDEO_BACKGROUND_TYPE )
+	) {
 		mediaType = media.type;
+	} else {
+		return;
 	}
 
 	return {
-		url: media.url,
+		url: media.url || media.src,
 		id: media.id,
 		alt: media?.alt,
 		backgroundType: mediaType,

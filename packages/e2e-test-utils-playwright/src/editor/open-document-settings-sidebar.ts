@@ -14,6 +14,7 @@ export async function openDocumentSettingsSidebar( this: Editor ) {
 		.getByRole( 'region', { name: 'Editor top bar' } )
 		.getByRole( 'button', {
 			name: 'Settings',
+			exact: true,
 			disabled: false,
 		} );
 

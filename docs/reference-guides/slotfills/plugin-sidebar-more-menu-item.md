@@ -45,6 +45,7 @@ const PluginSidebarMoreMenuItemTest = () => {
 						) }
 					</p>
 					<TextControl
+						__next40pxDefaultSize
 						label={ __( 'Text Control' ) }
 						value={ text }
 						onChange={ ( newText ) => setText( newText ) }

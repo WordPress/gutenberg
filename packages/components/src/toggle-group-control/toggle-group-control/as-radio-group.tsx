@@ -3,7 +3,6 @@
  */
 import type { ForwardedRef } from 'react';
 import * as Ariakit from '@ariakit/react';
-import { useStoreState } from '@ariakit/react';
 
 /**
  * WordPress dependencies
@@ -70,7 +69,7 @@ function UnforwardedToggleGroupControlAsRadioGroup(
 		rtl: isRTL(),
 	} );
 
-	const selectedValue = useStoreState( radio, 'value' );
+	const selectedValue = Ariakit.useStoreState( radio, 'value' );
 	const setValue = radio.setValue;
 
 	// Ensures that the active id is also reset after the value is "reset" by the consumer.

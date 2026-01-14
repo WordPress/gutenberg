@@ -18,6 +18,7 @@ import { LINE_HEIGHT_SUPPORT_KEY } from './line-height';
 import { FONT_FAMILY_SUPPORT_KEY } from './font-family';
 import { FONT_SIZE_SUPPORT_KEY } from './font-size';
 import { TEXT_ALIGN_SUPPORT_KEY } from './text-align';
+import { FIT_TEXT_SUPPORT_KEY } from './fit-text';
 import { cleanEmptyObject } from './utils';
 import { store as blockEditorStore } from '../store';
 
@@ -27,12 +28,12 @@ function omit( object, keys ) {
 	);
 }
 
-const LETTER_SPACING_SUPPORT_KEY = 'typography.letterSpacing';
-const TEXT_TRANSFORM_SUPPORT_KEY = 'typography.textTransform';
-const TEXT_DECORATION_SUPPORT_KEY = 'typography.textDecoration';
+const LETTER_SPACING_SUPPORT_KEY = 'typography.__experimentalLetterSpacing';
+const TEXT_TRANSFORM_SUPPORT_KEY = 'typography.__experimentalTextTransform';
+const TEXT_DECORATION_SUPPORT_KEY = 'typography.__experimentalTextDecoration';
 const TEXT_COLUMNS_SUPPORT_KEY = 'typography.textColumns';
-const FONT_STYLE_SUPPORT_KEY = 'typography.fontStyle';
-const FONT_WEIGHT_SUPPORT_KEY = 'typography.fontWeight';
+const FONT_STYLE_SUPPORT_KEY = 'typography.__experimentalFontStyle';
+const FONT_WEIGHT_SUPPORT_KEY = 'typography.__experimentalFontWeight';
 const WRITING_MODE_SUPPORT_KEY = 'typography.__experimentalWritingMode';
 export const TYPOGRAPHY_SUPPORT_KEY = 'typography';
 export const TYPOGRAPHY_SUPPORT_KEYS = [
@@ -47,15 +48,18 @@ export const TYPOGRAPHY_SUPPORT_KEYS = [
 	WRITING_MODE_SUPPORT_KEY,
 	TEXT_TRANSFORM_SUPPORT_KEY,
 	LETTER_SPACING_SUPPORT_KEY,
+	FIT_TEXT_SUPPORT_KEY,
 ];
 
 function styleToAttributes( style ) {
 	const updatedStyle = { ...omit( style, [ 'fontFamily' ] ) };
 	const fontSizeValue = style?.typography?.fontSize;
 	const fontFamilyValue = style?.typography?.fontFamily;
-	const fontSizeSlug = fontSizeValue?.startsWith( 'var:preset|font-size|' )
-		? fontSizeValue.substring( 'var:preset|font-size|'.length )
-		: undefined;
+	const fontSizeSlug =
+		typeof fontSizeValue === 'string' &&
+		fontSizeValue?.startsWith( 'var:preset|font-size|' )
+			? fontSizeValue.substring( 'var:preset|font-size|'.length )
+			: undefined;
 	const fontFamilySlug = fontFamilyValue?.startsWith(
 		'var:preset|font-family|'
 	)
@@ -111,20 +115,45 @@ function TypographyInspectorControl( { children, resetAllFilter } ) {
 }
 
 export function TypographyPanel( { clientId, name, setAttributes, settings } ) {
-	function selector( select ) {
-		const { style, fontFamily, fontSize } =
-			select( blockEditorStore ).getBlockAttributes( clientId ) || {};
-		return { style, fontFamily, fontSize };
-	}
-	const { style, fontFamily, fontSize } = useSelect( selector, [ clientId ] );
 	const isEnabled = useHasTypographyPanel( settings );
+
+	const { style, fontFamily, fontSize, fitText } = useSelect(
+		( select ) => {
+			// Early return to avoid subscription when disabled.
+			if ( ! isEnabled ) {
+				return {};
+			}
+			const {
+				style: _style,
+				fontFamily: _fontFamily,
+				fontSize: _fontSize,
+				fitText: _fitText,
+			} = select( blockEditorStore ).getBlockAttributes( clientId ) || {};
+			return {
+				style: _style,
+				fontFamily: _fontFamily,
+				fontSize: _fontSize,
+				fitText: _fitText,
+			};
+		},
+		[ clientId, isEnabled ]
+	);
 	const value = useMemo(
 		() => attributesToStyle( { style, fontFamily, fontSize } ),
 		[ style, fontSize, fontFamily ]
 	);
 
 	const onChange = ( newStyle ) => {
-		setAttributes( styleToAttributes( newStyle ) );
+		const newAttributes = styleToAttributes( newStyle );
+
+		// If setting a font size and fitText is currently enabled, disable it
+		const hasFontSize =
+			newAttributes.fontSize || newAttributes.style?.typography?.fontSize;
+		if ( hasFontSize && fitText ) {
+			newAttributes.fitText = undefined;
+		}
+
+		setAttributes( newAttributes );
 	};
 
 	if ( ! isEnabled ) {

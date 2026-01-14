@@ -8,7 +8,7 @@ import { defineConfig } from '@playwright/test';
 /**
  * WordPress dependencies
  */
-const baseConfig = require( '@wordpress/scripts/config/playwright.config' );
+import baseConfig from '@wordpress/scripts/config/playwright.config.js';
 
 process.env.ASSETS_PATH = path.join( __dirname, 'assets' );
 

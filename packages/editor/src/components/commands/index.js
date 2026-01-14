@@ -2,33 +2,44 @@
  * WordPress dependencies
  */
 import { useSelect, useDispatch } from '@wordpress/data';
-import { __, isRTL } from '@wordpress/i18n';
+import { __, isRTL, sprintf } from '@wordpress/i18n';
 import {
 	blockDefault,
 	code,
 	drawerLeft,
 	drawerRight,
-	edit,
+	pencil,
 	formatListBullets,
 	listView,
 	external,
 	keyboard,
 	symbol,
+	page,
+	layout,
+	rotateRight,
+	rotateLeft,
 } from '@wordpress/icons';
 import { useCommandLoader } from '@wordpress/commands';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as blockEditorStore } from '@wordpress/block-editor';
-import { store as coreStore } from '@wordpress/core-data';
+import { store as coreStore, useEntityRecord } from '@wordpress/core-data';
 import { store as interfaceStore } from '@wordpress/interface';
+import { decodeEntities } from '@wordpress/html-entities';
 
 /**
  * Internal dependencies
  */
+import { unlock } from '../../lock-unlock';
 import { store as editorStore } from '../../store';
-import { PATTERN_POST_TYPE } from '../../store/constants';
+import {
+	PATTERN_POST_TYPE,
+	TEMPLATE_PART_POST_TYPE,
+	TEMPLATE_POST_TYPE,
+} from '../../store/constants';
 import { modalName as patternRenameModalName } from '../pattern-rename-modal';
 import { modalName as patternDuplicateModalName } from '../pattern-duplicate-modal';
+import isTemplateRevertable from '../../store/utils/is-template-revertable';
 
 const getEditorCommandLoader = () =>
 	function useEditorCommandLoader() {
@@ -198,7 +209,7 @@ const getEditorCommandLoader = () =>
 
 		commands.push( {
 			name: 'core/open-settings-sidebar',
-			label: __( 'Show or hide the Settings panel.' ),
+			label: __( 'Show or hide the Settings panel' ),
 			icon: isRTL() ? drawerLeft : drawerRight,
 			callback: ( { close } ) => {
 				const activeSidebar = getActiveComplementaryArea( 'core' );
@@ -282,7 +293,7 @@ const getEditedEntityContextualCommands = () =>
 			commands.push( {
 				name: 'core/rename-pattern',
 				label: __( 'Rename pattern' ),
-				icon: edit,
+				icon: pencil,
 				callback: ( { close } ) => {
 					openModal( patternRenameModalName );
 					close();
@@ -302,6 +313,144 @@ const getEditedEntityContextualCommands = () =>
 		return { isLoading: false, commands };
 	};
 
+const getPageContentFocusCommands = () =>
+	function usePageContentFocusCommands() {
+		const {
+			onNavigateToEntityRecord,
+			goBack,
+			templateId,
+			isPreviewMode,
+			canEditTemplate,
+		} = useSelect( ( select ) => {
+			const {
+				getRenderingMode,
+				getEditorSettings: _getEditorSettings,
+				getCurrentTemplateId,
+			} = unlock( select( editorStore ) );
+			const editorSettings = _getEditorSettings();
+			const _templateId = getCurrentTemplateId();
+			return {
+				isTemplateHidden: getRenderingMode() === 'post-only',
+				onNavigateToEntityRecord:
+					editorSettings.onNavigateToEntityRecord,
+				getEditorSettings: _getEditorSettings,
+				goBack: editorSettings.onNavigateToPreviousEntityRecord,
+				templateId: _templateId,
+				isPreviewMode: editorSettings.isPreviewMode,
+				canEditTemplate:
+					!! _templateId &&
+					select( coreStore ).canUser( 'update', {
+						kind: 'postType',
+						name: 'wp_template',
+						id: _templateId,
+					} ),
+			};
+		}, [] );
+		const { editedRecord: template, hasResolved } = useEntityRecord(
+			'postType',
+			'wp_template',
+			templateId
+		);
+
+		if ( isPreviewMode ) {
+			return { isLoading: false, commands: [] };
+		}
+
+		const commands = [];
+
+		if ( templateId && hasResolved && canEditTemplate ) {
+			commands.push( {
+				name: 'core/switch-to-template-focus',
+				label: sprintf(
+					/* translators: %s: template title */
+					__( 'Edit template: %s' ),
+					decodeEntities( template.title )
+				),
+				icon: layout,
+				callback: ( { close } ) => {
+					onNavigateToEntityRecord( {
+						postId: templateId,
+						postType: 'wp_template',
+					} );
+					close();
+				},
+			} );
+		}
+
+		if ( !! goBack ) {
+			commands.push( {
+				name: 'core/switch-to-previous-entity',
+				label: __( 'Go back' ),
+				icon: page,
+				callback: ( { close } ) => {
+					goBack();
+					close();
+				},
+			} );
+		}
+
+		return { isLoading: false, commands };
+	};
+
+const getManipulateDocumentCommands = () =>
+	function useManipulateDocumentCommands() {
+		const { postType, postId } = useSelect( ( select ) => {
+			const { getCurrentPostId, getCurrentPostType } =
+				select( editorStore );
+			return {
+				postType: getCurrentPostType(),
+				postId: getCurrentPostId(),
+			};
+		}, [] );
+		const { editedRecord: template, hasResolved } = useEntityRecord(
+			'postType',
+			postType,
+			postId
+		);
+		// eslint-disable-next-line @wordpress/no-unused-vars-before-return
+		const { revertTemplate } = unlock( useDispatch( editorStore ) );
+
+		if (
+			! hasResolved ||
+			! [ TEMPLATE_PART_POST_TYPE, TEMPLATE_POST_TYPE ].includes(
+				postType
+			)
+		) {
+			return { isLoading: true, commands: [] };
+		}
+
+		const commands = [];
+
+		if ( isTemplateRevertable( template ) ) {
+			const label =
+				template.type === TEMPLATE_POST_TYPE
+					? sprintf(
+							/* translators: %s: template title */
+							__( 'Reset template: %s' ),
+							decodeEntities( template.title )
+					  )
+					: sprintf(
+							/* translators: %s: template part title */
+							__( 'Reset template part: %s' ),
+							decodeEntities( template.title )
+					  );
+			commands.push( {
+				name: 'core/reset-template',
+				label,
+				icon: isRTL() ? rotateRight : rotateLeft,
+				callback: ( { close } ) => {
+					revertTemplate( template );
+					close();
+				},
+			} );
+		}
+
+		return {
+			isLoading: ! hasResolved,
+			commands,
+		};
+	};
+
 export default function useCommands() {
 	useCommandLoader( {
 		name: 'core/editor/edit-ui',
@@ -312,5 +461,16 @@ export default function useCommands() {
 		name: 'core/editor/contextual-commands',
 		hook: getEditedEntityContextualCommands(),
 		context: 'entity-edit',
+	} );
+
+	useCommandLoader( {
+		name: 'core/editor/page-content-focus',
+		hook: getPageContentFocusCommands(),
+		context: 'entity-edit',
+	} );
+
+	useCommandLoader( {
+		name: 'core/edit-site/manipulate-document',
+		hook: getManipulateDocumentCommands(),
 	} );
 }

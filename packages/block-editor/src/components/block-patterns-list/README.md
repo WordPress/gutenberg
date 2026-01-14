@@ -61,6 +61,14 @@ The aria label for the block patterns list.
 -   Required: No
 -   Default: `Block Patterns`
 
+#### showTitlesAsTooltip
+
+Whether to render the title of each pattern as a tooltip. User-defined patterns always show their visual title regardless of this prop.
+
+-   Type: `boolean`
+-   Required: No
+-   Default: `false`
+
 ## Related components
 
 Block Editor components are components that can be used to compose the UI of your block editor. Thus, they can only be used under a [`BlockEditorProvider`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/provider/README.md) in the components tree.

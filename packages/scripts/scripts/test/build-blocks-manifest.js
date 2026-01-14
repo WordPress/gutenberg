@@ -4,7 +4,7 @@
 const fs = require( 'fs' );
 const path = require( 'path' );
 const { execSync } = require( 'child_process' );
-const rimraf = require( 'rimraf' );
+const rimraf = require( 'rimraf' ).sync;
 
 const fixturesPath = path.join(
 	__dirname,
@@ -18,11 +18,11 @@ describe( 'build-blocks-manifest script', () => {
 		if ( ! fs.existsSync( outputPath ) ) {
 			fs.mkdirSync( outputPath, { recursive: true } );
 		}
-		rimraf.sync( outputPath );
+		rimraf( outputPath );
 	} );
 
 	afterAll( () => {
-		rimraf.sync( outputPath );
+		rimraf( outputPath );
 	} );
 
 	it( 'should generate expected blocks manifest', () => {

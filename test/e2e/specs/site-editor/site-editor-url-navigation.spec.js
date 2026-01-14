@@ -33,7 +33,10 @@ test.describe( 'Site editor url navigation', () => {
 
 		await admin.visitSiteEditor();
 		await page.click( 'role=button[name="Templates"]' );
-		await page.click( 'role=button[name="Add New Template"i]' );
+		await page.click( 'role=button[name="Add Template"i]' );
+		// Wait for network idle to avoid flaky tests.
+		// eslint-disable-next-line playwright/no-networkidle
+		await page.waitForLoadState( 'networkidle' );
 		await page
 			.getByRole( 'button', {
 				name: 'Single item: Post',
@@ -44,7 +47,7 @@ test.describe( 'Site editor url navigation', () => {
 			.click();
 		await page.getByRole( 'option', { name: 'Demo' } ).click();
 		await expect( page ).toHaveURL(
-			'/wp-admin/site-editor.php?postId=emptytheme%2F%2Fsingle-post-demo&postType=wp_template&canvas=edit'
+			'/wp-admin/site-editor.php?p=%2Fwp_template%2Femptytheme%2F%2Fsingle-post-demo&canvas=edit'
 		);
 	} );
 
@@ -54,16 +57,16 @@ test.describe( 'Site editor url navigation', () => {
 	} ) => {
 		await admin.visitSiteEditor();
 		await page.click( 'role=button[name="Patterns"i]' );
-		await page.click( 'role=button[name="add new pattern"i]' );
+		await page.click( 'role=button[name="add pattern"i]' );
 		await page
-			.getByRole( 'menu', { name: 'add new pattern' } )
-			.getByRole( 'menuitem', { name: 'add new template part' } )
+			.getByRole( 'menu', { name: 'add pattern' } )
+			.getByRole( 'menuitem', { name: 'add template part' } )
 			.click();
 		// Fill in a name in the dialog that pops up.
 		await page.type( 'role=dialog >> role=textbox[name="Name"i]', 'Demo' );
 		await page.keyboard.press( 'Enter' );
 		await expect( page ).toHaveURL(
-			'/wp-admin/site-editor.php?postId=emptytheme%2F%2Fdemo&postType=wp_template_part&canvas=edit'
+			'/wp-admin/site-editor.php?p=%2Fwp_template_part%2Femptytheme%2F%2Fdemo&canvas=edit'
 		);
 	} );
 
@@ -79,7 +82,7 @@ test.describe( 'Site editor url navigation', () => {
 		await navigation.getByRole( 'button', { name: 'General' } ).click();
 		await page
 			.getByRole( 'region', {
-				name: 'Patterns content',
+				name: 'General',
 			} )
 			.getByText( 'header', { exact: true } )
 			.click();

@@ -40,6 +40,13 @@ interface BaseProps {
 	 * @default false
 	 */
 	__next40pxDefaultSize?: boolean;
+	/**
+	 * Do not throw a warning for the deprecated 36px default size.
+	 * For internal components of other components that already throw the warning.
+	 *
+	 * @ignore
+	 */
+	__shouldNotWarnDeprecated36pxSize?: boolean;
 	__unstableInputWidth?: CSSProperties[ 'width' ];
 	/**
 	 * If true, the label will only be visible to screen readers.
@@ -129,7 +136,7 @@ export interface InputBaseProps extends BaseProps, FlexProps {
 	 * If you want to apply standard padding in accordance with the size variant, wrap the element in
 	 * the provided `<InputControlPrefixWrapper>` component.
 	 *
-	 * @example
+	 * ```jsx
 	 * import {
 	 *   __experimentalInputControl as InputControl,
 	 *   __experimentalInputControlPrefixWrapper as InputControlPrefixWrapper,
@@ -138,6 +145,7 @@ export interface InputBaseProps extends BaseProps, FlexProps {
 	 * <InputControl
 	 *   prefix={<InputControlPrefixWrapper>@</InputControlPrefixWrapper>}
 	 * />
+	 * ```
 	 */
 	prefix?: ReactNode;
 	/**
@@ -147,7 +155,7 @@ export interface InputBaseProps extends BaseProps, FlexProps {
 	 * If you want to apply standard padding in accordance with the size variant, wrap the element in
 	 * the provided `<InputControlSuffixWrapper>` component.
 	 *
-	 * @example
+	 * ```jsx
 	 * import {
 	 *   __experimentalInputControl as InputControl,
 	 *   __experimentalInputControlSuffixWrapper as InputControlSuffixWrapper,
@@ -156,6 +164,7 @@ export interface InputBaseProps extends BaseProps, FlexProps {
 	 * <InputControl
 	 *   suffix={<InputControlSuffixWrapper>%</InputControlSuffixWrapper>}
 	 * />
+	 * ```
 	 */
 	suffix?: ReactNode;
 	/**

@@ -4,6 +4,9 @@
 	"plugins": [ "." ],
 	"themes": [ "./test/emptytheme" ],
 	"env": {
+		"development": {
+			"phpmyadminPort": 9000
+		},
 		"tests": {
 			"mappings": {
 				"wp-content/plugins/gutenberg": ".",

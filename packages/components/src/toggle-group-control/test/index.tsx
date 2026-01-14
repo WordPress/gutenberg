@@ -28,7 +28,7 @@ const hoverOutside = async () => {
 };
 
 const ToggleGroupControl = ( props: ToggleGroupControlProps ) => {
-	return <_ToggleGroupControl { ...props } __nextHasNoMarginBottom />;
+	return <_ToggleGroupControl { ...props } __next40pxDefaultSize />;
 };
 
 const ControlledToggleGroupControl = ( {
@@ -51,9 +51,15 @@ const ControlledToggleGroupControl = ( {
 				} }
 				value={ value }
 			/>
-			<Button onClick={ () => setValue( undefined ) }>Reset</Button>
+			<Button
+				onClick={ () => setValue( undefined ) }
+				__next40pxDefaultSize
+			>
+				Reset
+			</Button>
 			{ extraButtonOptions?.map( ( obj ) => (
 				<Button
+					__next40pxDefaultSize
 					key={ obj.value }
 					onClick={ () => setValue( obj.value ) }
 				>

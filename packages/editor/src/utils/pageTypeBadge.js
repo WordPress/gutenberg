@@ -6,18 +6,13 @@ import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 
 /**
- * Internal dependencies
- */
-import { store as editorStore } from '../store';
-
-/**
  * Custom hook to get the page type badge for the current post on edit site view.
+ *
+ * @param {number|string} postId postId of the current post being edited.
  */
-export default function usePageTypeBadge() {
+export default function usePageTypeBadge( postId ) {
 	const { isFrontPage, isPostsPage } = useSelect( ( select ) => {
-		const { getCurrentPostId } = select( editorStore );
 		const { canUser, getEditedEntityRecord } = select( coreStore );
-		const postId = getCurrentPostId();
 		const siteSettings = canUser( 'read', {
 			kind: 'root',
 			name: 'site',
@@ -25,9 +20,11 @@ export default function usePageTypeBadge() {
 			? getEditedEntityRecord( 'root', 'site' )
 			: undefined;
 
+		const _postId = parseInt( postId, 10 );
+
 		return {
-			isFrontPage: siteSettings?.page_on_front === postId,
-			isPostsPage: siteSettings?.page_for_posts === postId,
+			isFrontPage: siteSettings?.page_on_front === _postId,
+			isPostsPage: siteSettings?.page_for_posts === _postId,
 		};
 	} );
 

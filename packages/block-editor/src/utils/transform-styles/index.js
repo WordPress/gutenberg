@@ -160,7 +160,7 @@ function transformStyle(
 /**
  * @typedef {Object} EditorStyle
  * @property {string}    css              the CSS block(s), as a single string.
- * @property {?string}   baseURL          the base URL to be used as the reference when rewritting urls.
+ * @property {?string}   baseURL          the base URL to be used as the reference when rewriting urls.
  * @property {?string[]} ignoredSelectors the selectors not to wrap.
  */
 

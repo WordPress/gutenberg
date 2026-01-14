@@ -69,7 +69,7 @@ export default function useEntityBlockEditor( kind, name, { id: _id } = {} ) {
 		}
 
 		// If there's an edit, cache the parsed blocks by the edit.
-		// If not, cache by the original enity record.
+		// If not, cache by the original entity record.
 		const edits = getEntityRecordEdits( kind, name, id );
 		const isUnedited = ! edits || ! Object.keys( edits ).length;
 		const cackeKey = isUnedited ? getEntityRecord( kind, name, id ) : edits;

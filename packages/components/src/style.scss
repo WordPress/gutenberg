@@ -1,56 +1,55 @@
+@use "@wordpress/base-styles/mixins" as *;
+@use "./animate/style.scss" as *;
+@use "./autocomplete/style.scss" as *;
+@use "./badge/styles.scss" as *;
+@use "./button-group/style.scss" as *;
+@use "./button/style.scss" as *;
+@use "./calendar/style.scss" as *;
+@use "./checkbox-control/style.scss" as *;
+@use "./circular-option-picker/style.scss" as *;
+@use "./palette-edit/style.scss" as *;
+@use "./color-indicator/style.scss" as *;
+@use "./combobox-control/style.scss" as *;
+@use "./color-palette/style.scss" as *;
+@use "./custom-gradient-picker/style.scss" as *;
+@use "./draggable/style.scss" as *;
+@use "./drop-zone/style.scss" as *;
+@use "./dropdown/style.scss" as *;
+@use "./dropdown-menu/style.scss" as *;
+@use "./duotone-picker/style.scss" as *;
+@use "./duotone-picker/color-list-picker/style.scss" as *;
+@use "./external-link/style.scss" as *;
+@use "./form-toggle/style.scss" as *;
+@use "./form-token-field/style.scss" as *;
+@use "./guide/style.scss" as *;
+@use "./higher-order/navigate-regions/style.scss" as *;
+@use "./menu-group/style.scss" as *;
+@use "./menu-item/style.scss" as *;
+@use "./menu-items-choice/style.scss" as *;
+@use "./modal/style.scss" as *;
+@use "./notice/style.scss" as *;
+@use "./panel/style.scss" as *;
+@use "./placeholder/style.scss" as *;
+@use "./popover/style.scss" as *;
+@use "./radio-control/style.scss" as *;
+@use "./resizable-box/style.scss" as *;
+@use "./responsive-wrapper/style.scss" as *;
+@use "./sandbox/style.scss" as *;
+@use "./scroll-lock/style.scss" as *;
+@use "./select-control/style.scss" as *;
+@use "./snackbar/style.scss" as *;
+@use "./tab-panel/style.scss" as *;
+@use "./text-control/style.scss" as *;
+@use "./tip/style.scss" as *;
+@use "./toggle-control/style.scss" as *;
+@use "./toolbar/toolbar/style.scss" as *;
+@use "./toolbar/toolbar-button/style.scss" as *;
+@use "./toolbar/toolbar-group/style.scss" as *;
+@use "./tooltip/style.scss" as *;
+@use "./validated-form-controls/style.scss" as *;
+
 // Include the default WP Components color variables.
 // TODO: Remove this once all admin-scheme variables are accounted for in the wp-components fallback values.
 :root {
-	@include admin-scheme(#3858e9);
+	@include admin-scheme( #3858e9 );
 }
-
-// Variables
-@import "./utils/theme-variables.scss";
-
-// Components
-@import "./animate/style.scss";
-@import "./autocomplete/style.scss";
-@import "./button-group/style.scss";
-@import "./button/style.scss";
-@import "./checkbox-control/style.scss";
-@import "./circular-option-picker/style.scss";
-@import "./palette-edit/style.scss";
-@import "./color-indicator/style.scss";
-@import "./combobox-control/style.scss";
-@import "./color-palette/style.scss";
-@import "./custom-gradient-picker/style.scss";
-@import "./dimension-control/style.scss";
-@import "./draggable/style.scss";
-@import "./drop-zone/style.scss";
-@import "./dropdown/style.scss";
-@import "./dropdown-menu/style.scss";
-@import "./duotone-picker/style.scss";
-@import "./duotone-picker/color-list-picker/style.scss";
-@import "./external-link/style.scss";
-@import "./form-toggle/style.scss";
-@import "./form-token-field/style.scss";
-@import "./guide/style.scss";
-@import "./higher-order/navigate-regions/style.scss";
-@import "./menu-group/style.scss";
-@import "./menu-item/style.scss";
-@import "./menu-items-choice/style.scss";
-@import "./modal/style.scss";
-@import "./notice/style.scss";
-@import "./panel/style.scss";
-@import "./placeholder/style.scss";
-@import "./popover/style.scss";
-@import "./radio-control/style.scss";
-@import "./resizable-box/style.scss";
-@import "./responsive-wrapper/style.scss";
-@import "./sandbox/style.scss";
-@import "./scroll-lock/style.scss";
-@import "./select-control/style.scss";
-@import "./snackbar/style.scss";
-@import "./tab-panel/style.scss";
-@import "./text-control/style.scss";
-@import "./tip/style.scss";
-@import "./toggle-control/style.scss";
-@import "./toolbar/toolbar/style.scss";
-@import "./toolbar/toolbar-button/style.scss";
-@import "./toolbar/toolbar-group/style.scss";
-@import "./tooltip/style.scss";

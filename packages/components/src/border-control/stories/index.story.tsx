@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryFn } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react-webpack5';
 import type { ComponentProps } from 'react';
 
 /**
@@ -23,7 +23,7 @@ const meta: Meta< typeof BorderControl > = {
 			action: 'onChange',
 		},
 		width: { control: { type: 'text' } },
-		value: { control: { type: null } },
+		value: { control: false },
 	},
 	parameters: {
 		controls: { expanded: true },

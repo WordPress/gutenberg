@@ -13,6 +13,7 @@ const initWPScripts = require( './init-wp-scripts' );
 const initWPEnv = require( './init-wp-env' );
 const { code, info, success, error } = require( './log' );
 const { writeOutputAsset, writeOutputTemplate } = require( './output' );
+const { getOutputTemplates, getOutputAssets } = require( './templates' );
 
 module.exports = async (
 	{ blockOutputTemplates, pluginOutputTemplates, outputAssets },
@@ -26,6 +27,7 @@ module.exports = async (
 		description,
 		dashicon,
 		category,
+		textdomain,
 		attributes,
 		supports,
 		author,
@@ -35,6 +37,9 @@ module.exports = async (
 		domainPath,
 		updateURI,
 		version,
+		requiresAtLeast,
+		requiresPHP,
+		testedUpTo,
 		wpScripts,
 		wpEnv,
 		npmDependencies,
@@ -54,16 +59,18 @@ module.exports = async (
 		customBlockJSON,
 		example,
 		transformer,
+		pluginTemplatesPath: variantPluginTemplatesPath,
+		blockTemplatesPath: variantBlockTemplatesPath,
+		assetsPath: variantAssetsPath,
 	}
 ) => {
 	slug = slug.toLowerCase();
-	namespace = namespace.toLowerCase();
 	const rootDirectory = join( process.cwd(), targetDir || slug );
 	const transformedValues = transformer( {
 		$schema,
 		apiVersion,
 		plugin,
-		namespace,
+		namespace: namespace.toLowerCase(),
 		slug,
 		title,
 		description,
@@ -78,12 +85,15 @@ module.exports = async (
 		domainPath,
 		updateURI,
 		version,
+		requiresAtLeast,
+		requiresPHP,
+		testedUpTo,
 		wpScripts,
 		wpEnv,
 		npmDependencies,
 		npmDevDependencies,
 		customScripts,
-		folderName,
+		folderName: folderName.replace( /\$slug/g, slug ),
 		editorScript,
 		editorStyle,
 		style,
@@ -95,7 +105,7 @@ module.exports = async (
 		customPackageJSON,
 		customBlockJSON,
 		example,
-		textdomain: slug,
+		textdomain: textdomain || slug,
 		rootDirectory,
 	} );
 
@@ -108,12 +118,37 @@ module.exports = async (
 		...variantVars,
 	};
 
-	/**
-	 * --no-plugin relies on the used template supporting the [blockTemplatesPath property](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-create-block/#blocktemplatespath).
-	 * If the blockOutputTemplates object has no properties, we can assume that there was a custom --template passed that
-	 * doesn't support it.
-	 */
+	// Check for the pluginTemplates path in the variant
+	if ( variantPluginTemplatesPath === null ) {
+		pluginOutputTemplates = {};
+	} else if ( variantPluginTemplatesPath ) {
+		pluginOutputTemplates = await getOutputTemplates(
+			variantPluginTemplatesPath
+		);
+	}
+
+	// Check for the blockTemplatesPath path in the variant
+	if ( variantBlockTemplatesPath === null ) {
+		blockOutputTemplates = {};
+	} else if ( variantBlockTemplatesPath ) {
+		blockOutputTemplates = await getOutputTemplates(
+			variantBlockTemplatesPath
+		);
+	}
+
+	// Check for the assetsPath
+	if ( variantAssetsPath === null ) {
+		outputAssets = {};
+	} else if ( variantAssetsPath ) {
+		outputAssets = await getOutputAssets( variantAssetsPath );
+	}
+
 	if ( ! plugin && Object.keys( blockOutputTemplates ) < 1 ) {
+		/**
+		 * --no-plugin relies on the used template supporting the [blockTemplatesPath property](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-create-block/#blocktemplatespath).
+		 * If the blockOutputTemplates object has no properties, we can assume that there was a custom --template passed that
+		 * doesn't support it.
+		 */
 		error(
 			'No block files found in the template. Please ensure that the template supports the blockTemplatesPath property.'
 		);

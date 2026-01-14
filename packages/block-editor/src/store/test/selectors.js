@@ -9,14 +9,12 @@ import {
 import { RawHTML } from '@wordpress/element';
 import { symbol } from '@wordpress/icons';
 import { select, dispatch } from '@wordpress/data';
-import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
  */
 import * as selectors from '../selectors';
 import { store } from '../';
-import { sectionRootClientIdKey } from '../private-keys';
 import { lock } from '../../lock-unlock';
 
 const {
@@ -2671,6 +2669,7 @@ describe( 'selectors', () => {
 				},
 				blockListSettings: {},
 				settings: {},
+				blockEditingModes: new Map(),
 			};
 			expect( canInsertBlockType( state, 'core/invalid' ) ).toBe( false );
 		} );
@@ -2685,6 +2684,7 @@ describe( 'selectors', () => {
 				settings: {
 					allowedBlockTypes: [],
 				},
+				blockEditingModes: new Map(),
 			};
 			expect( canInsertBlockType( state, 'core/test-block-a' ) ).toBe(
 				false
@@ -2721,6 +2721,7 @@ describe( 'selectors', () => {
 				settings: {
 					templateLock: 'all',
 				},
+				blockEditingModes: new Map(),
 			};
 			expect( canInsertBlockType( state, 'core/test-block-a' ) ).toBe(
 				false
@@ -3080,7 +3081,7 @@ describe( 'selectors', () => {
 					byClientId: new Map(
 						Object.entries( {
 							block1: { name: 'core/test-block-ancestor' },
-							block2: { name: 'core/block' },
+							block2: { name: 'core/group' },
 							block3: { name: 'core/test-block-parent' },
 						} )
 					),
@@ -3326,7 +3327,7 @@ describe( 'selectors', () => {
 				settings: {},
 				blockEditingModes: new Map(),
 			};
-			expect( canInsertBlocks( state, [ '2', '3' ], '1' ) ).toBe( true );
+			expect( canInsertBlocks( state, [ '2' ], '1' ) ).toBe( true );
 		} );
 
 		it( 'should deny blocks', () => {
@@ -3404,6 +3405,18 @@ describe( 'selectors', () => {
 				( item ) => item.id === 'core/block/1'
 			);
 			expect( reusableBlockItem ).toEqual( {
+				blocks: [
+					expect.objectContaining( {
+						attributes: {
+							metadata: expect.objectContaining( {
+								name: 'Reusable Block 1',
+								patternName: 'core/block/1',
+							} ),
+						},
+						isValid: true,
+						innerBlocks: [],
+					} ),
+				],
 				category: 'reusable',
 				content: '<!-- /wp:test-block-a -->',
 				frecency: 0,
@@ -3536,7 +3549,7 @@ describe( 'selectors', () => {
 		beforeAll( () => {
 			registerBlockType( 'core/with-tranforms-a', {
 				category: 'text',
-				title: 'Tranforms a',
+				title: 'Transforms a',
 				edit: () => {},
 				save: () => {},
 				transforms: {
@@ -3565,7 +3578,7 @@ describe( 'selectors', () => {
 			} );
 			registerBlockType( 'core/with-tranforms-b', {
 				category: 'text',
-				title: 'Tranforms b',
+				title: 'Transforms b',
 				edit: () => {},
 				save: () => {},
 				transforms: {
@@ -3580,7 +3593,7 @@ describe( 'selectors', () => {
 			} );
 			registerBlockType( 'core/with-tranforms-c', {
 				category: 'text',
-				title: 'Tranforms c',
+				title: 'Transforms c',
 				edit: () => {},
 				save: () => {},
 				transforms: {
@@ -3865,6 +3878,19 @@ describe( 'selectors', () => {
 			};
 
 			expect( getTemplateLock( state, 'chicken' ) ).toBe( 'insert' );
+		} );
+
+		it( 'should return false if the block has contentOnly template lock and is an edited section', () => {
+			const state = {
+				editedContentOnlySection: 'chicken',
+				blockListSettings: {
+					chicken: {
+						templateLock: 'contentOnly',
+					},
+				},
+			};
+
+			expect( getTemplateLock( state, 'chicken' ) ).toBe( false );
 		} );
 	} );
 
@@ -4382,115 +4408,22 @@ describe( '__unstableGetClientIdsTree', () => {
 
 describe( 'getBlockEditingMode', () => {
 	const baseState = {
-		settings: {},
-		blocks: {
-			byClientId: new Map( [
-				[
-					'6cf70164-9097-4460-bcbf-200560546988',
-					{ name: 'core/template-part' },
-				], // Header
-				[
-					'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337',
-					{ name: 'core/group' },
-				], // Group
-				[
-					'b26fc763-417d-4f01-b81c-2ec61e14a972',
-					{ name: 'core/post-title' },
-				], // |  Post Title
-				[
-					'9b9c5c3f-2e46-4f02-9e14-9fe9515b958f',
-					{ name: 'core/group' },
-				], // |  Group
-				[ 'b3247f75-fd94-4fef-97f9-5bfd162cc416', { name: 'core/p' } ], // | |  Paragraph
-				[ 'e178812d-ce5e-48c7-a945-8ae4ffcbbb7c', { name: 'core/p' } ], // | |  Paragraph
-				[
-					'9b9c5c3f-2e46-4f02-9e14-9fed515b958s',
-					{ name: 'core/group' },
-				], // | | Group
-			] ),
-			order: new Map( [
-				[
-					'',
-					[
-						'6cf70164-9097-4460-bcbf-200560546988',
-						'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337',
-					],
-				],
-				[ '6cf70164-9097-4460-bcbf-200560546988', [] ],
-				[
-					'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337',
-					[
-						'b26fc763-417d-4f01-b81c-2ec61e14a972',
-						'9b9c5c3f-2e46-4f02-9e14-9fe9515b958f',
-					],
-				],
-				[ 'b26fc763-417d-4f01-b81c-2ec61e14a972', [] ],
-				[
-					'9b9c5c3f-2e46-4f02-9e14-9fe9515b958f',
-					[
-						'b3247f75-fd94-4fef-97f9-5bfd162cc416',
-						'e178812d-ce5e-48c7-a945-8ae4ffcbbb7c',
-						'9b9c5c3f-2e46-4f02-9e14-9fed515b958s',
-					],
-				],
-				[ 'b3247f75-fd94-4fef-97f9-5bfd162cc416', [] ],
-				[ 'e178812d-ce5e-48c7-a945-8ae4ffcbbb7c', [] ],
-				[ '9b9c5c3f-2e46-4f02-9e14-9fed515b958s', [] ],
-			] ),
-			parents: new Map( [
-				[ '6cf70164-9097-4460-bcbf-200560546988', '' ],
-				[ 'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337', '' ],
-				[
-					'b26fc763-417d-4f01-b81c-2ec61e14a972',
-					'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337',
-				],
-				[
-					'9b9c5c3f-2e46-4f02-9e14-9fe9515b958f',
-					'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337',
-				],
-				[
-					'b3247f75-fd94-4fef-97f9-5bfd162cc416',
-					'9b9c5c3f-2e46-4f02-9e14-9fe9515b958f',
-				],
-				[
-					'e178812d-ce5e-48c7-a945-8ae4ffcbbb7c',
-					'9b9c5c3f-2e46-4f02-9e14-9fe9515b958f',
-				],
-				[
-					'9b9c5c3f-2e46-4f02-9e14-9fed515b958s',
-					'9b9c5c3f-2e46-4f02-9e14-9fe9515b958f',
-				],
-			] ),
-		},
-		blockListSettings: {
-			'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337': {},
-			'9b9c5c3f-2e46-4f02-9e14-9fe9515b958f': {},
-		},
 		blockEditingModes: new Map( [] ),
-	};
-
-	const navigationModeStateWithRootSection = {
-		...baseState,
-		settings: {
-			[ sectionRootClientIdKey ]: 'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337', // The group is the "main" container
-		},
+		derivedBlockEditingModes: new Map( [] ),
 	};
 
 	const hasContentRoleAttribute = jest.fn( () => false );
+	const get = jest.fn( () => 'edit' );
 
-	const fauxPrivateAPIs = {};
+	const mockedSelectors = { get };
 
-	lock( fauxPrivateAPIs, {
+	lock( mockedSelectors, {
 		hasContentRoleAttribute,
 	} );
 
 	getBlockEditingMode.registry = {
-		select: jest.fn( () => fauxPrivateAPIs ),
+		select: jest.fn( () => mockedSelectors ),
 	};
-
-	afterEach( () => {
-		dispatch( preferencesStore ).set( 'core', 'editorTool', undefined );
-	} );
 
 	it( 'should return default by default', () => {
 		expect(
@@ -4525,158 +4458,59 @@ describe( 'getBlockEditingMode', () => {
 		).toBe( 'contentOnly' );
 	} );
 
-	it( 'should return disabled if explicitly set on a parent', () => {
-		const state = {
-			...baseState,
-			blockEditingModes: new Map( [
-				[ 'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337', 'disabled' ],
-			] ),
-		};
-		expect(
-			getBlockEditingMode( state, 'b3247f75-fd94-4fef-97f9-5bfd162cc416' )
-		).toBe( 'disabled' );
-	} );
+	describe( 'derived block editing modes override standard block editing modes', () => {
+		it( 'should return default if explicitly set', () => {
+			const state = {
+				...baseState,
+				blockEditingModes: new Map( [
+					[ 'b3247f75-fd94-4fef-97f9-5bfd162cc416', 'contentOnly' ],
+				] ),
+				derivedBlockEditingModes: new Map( [
+					[ 'b3247f75-fd94-4fef-97f9-5bfd162cc416', 'default' ],
+				] ),
+			};
+			expect(
+				getBlockEditingMode(
+					state,
+					'b3247f75-fd94-4fef-97f9-5bfd162cc416'
+				)
+			).toBe( 'default' );
+		} );
 
-	it( 'should return default if parent is set to contentOnly', () => {
-		const state = {
-			...baseState,
-			blockEditingModes: new Map( [
-				[ 'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337', 'contentOnly' ],
-			] ),
-		};
-		expect(
-			getBlockEditingMode( state, 'b3247f75-fd94-4fef-97f9-5bfd162cc416' )
-		).toBe( 'default' );
-	} );
+		it( 'should return disabled if explicitly set', () => {
+			const state = {
+				...baseState,
+				blockEditingModes: new Map( [
+					[ 'b3247f75-fd94-4fef-97f9-5bfd162cc416', 'contentOnly' ],
+				] ),
+				derivedBlockEditingModes: new Map( [
+					[ 'b3247f75-fd94-4fef-97f9-5bfd162cc416', 'disabled' ],
+				] ),
+			};
+			expect(
+				getBlockEditingMode(
+					state,
+					'b3247f75-fd94-4fef-97f9-5bfd162cc416'
+				)
+			).toBe( 'disabled' );
+		} );
 
-	it( 'should return disabled if overridden by a parent', () => {
-		const state = {
-			...baseState,
-			blockEditingModes: new Map( [
-				[ '', 'disabled' ],
-				[ 'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337', 'default' ],
-				[ '9b9c5c3f-2e46-4f02-9e14-9fe9515b958f', 'disabled' ],
-			] ),
-		};
-		expect(
-			getBlockEditingMode( state, 'b3247f75-fd94-4fef-97f9-5bfd162cc416' )
-		).toBe( 'disabled' );
-	} );
-
-	it( 'should return disabled if explicitly set on root', () => {
-		const state = {
-			...baseState,
-			blockEditingModes: new Map( [ [ '', 'disabled' ] ] ),
-		};
-		expect(
-			getBlockEditingMode( state, 'b3247f75-fd94-4fef-97f9-5bfd162cc416' )
-		).toBe( 'disabled' );
-	} );
-
-	it( 'should return default if root is contentOnly', () => {
-		const state = {
-			...baseState,
-			blockEditingModes: new Map( [ [ '', 'contentOnly' ] ] ),
-		};
-		expect(
-			getBlockEditingMode( state, 'b3247f75-fd94-4fef-97f9-5bfd162cc416' )
-		).toBe( 'default' );
-	} );
-
-	it( 'should return disabled if parent is locked and the block has no content role', () => {
-		const state = {
-			...baseState,
-			blockListSettings: {
-				...baseState.blockListSettings,
-				'9b9c5c3f-2e46-4f02-9e14-9fe9515b958f': {
-					templateLock: 'contentOnly',
-				},
-			},
-		};
-		hasContentRoleAttribute.mockReturnValueOnce( false );
-		expect(
-			getBlockEditingMode( state, 'b3247f75-fd94-4fef-97f9-5bfd162cc416' )
-		).toBe( 'disabled' );
-	} );
-
-	it( 'should return contentOnly if parent is locked and the block has a content role', () => {
-		const state = {
-			...baseState,
-			blockListSettings: {
-				...baseState.blockListSettings,
-				'9b9c5c3f-2e46-4f02-9e14-9fe9515b958f': {
-					templateLock: 'contentOnly',
-				},
-			},
-		};
-		hasContentRoleAttribute.mockReturnValueOnce( true );
-		expect(
-			getBlockEditingMode( state, 'b3247f75-fd94-4fef-97f9-5bfd162cc416' )
-		).toBe( 'contentOnly' );
-	} );
-
-	it( 'in navigation mode, the root section container is default', () => {
-		dispatch( preferencesStore ).set( 'core', 'editorTool', 'navigation' );
-		expect(
-			getBlockEditingMode(
-				navigationModeStateWithRootSection,
-				'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337'
-			)
-		).toBe( 'default' );
-	} );
-
-	it( 'in navigation mode, anything outside the section container is disabled', () => {
-		dispatch( preferencesStore ).set( 'core', 'editorTool', 'navigation' );
-		expect(
-			getBlockEditingMode(
-				navigationModeStateWithRootSection,
-				'6cf70164-9097-4460-bcbf-200560546988'
-			)
-		).toBe( 'disabled' );
-	} );
-
-	it( 'in navigation mode, sections are contentOnly', () => {
-		dispatch( preferencesStore ).set( 'core', 'editorTool', 'navigation' );
-		expect(
-			getBlockEditingMode(
-				navigationModeStateWithRootSection,
-				'b26fc763-417d-4f01-b81c-2ec61e14a972'
-			)
-		).toBe( 'contentOnly' );
-		expect(
-			getBlockEditingMode(
-				navigationModeStateWithRootSection,
-				'9b9c5c3f-2e46-4f02-9e14-9fe9515b958f'
-			)
-		).toBe( 'contentOnly' );
-	} );
-
-	it( 'in navigation mode, blocks with content attributes within sections are contentOnly', () => {
-		dispatch( preferencesStore ).set( 'core', 'editorTool', 'navigation' );
-		hasContentRoleAttribute.mockReturnValueOnce( true );
-		expect(
-			getBlockEditingMode(
-				navigationModeStateWithRootSection,
-				'b3247f75-fd94-4fef-97f9-5bfd162cc416'
-			)
-		).toBe( 'contentOnly' );
-
-		hasContentRoleAttribute.mockReturnValueOnce( true );
-		expect(
-			getBlockEditingMode(
-				navigationModeStateWithRootSection,
-				'e178812d-ce5e-48c7-a945-8ae4ffcbbb7c'
-			)
-		).toBe( 'contentOnly' );
-	} );
-
-	it( 'in navigation mode, blocks without content attributes within sections are disabled', () => {
-		dispatch( preferencesStore ).set( 'core', 'editorTool', 'navigation' );
-		expect(
-			getBlockEditingMode(
-				navigationModeStateWithRootSection,
-				'9b9c5c3f-2e46-4f02-9e14-9fed515b958s'
-			)
-		).toBe( 'disabled' );
+		it( 'should return contentOnly if explicitly set', () => {
+			const state = {
+				...baseState,
+				blockEditingModes: new Map( [
+					[ 'b3247f75-fd94-4fef-97f9-5bfd162cc416', 'default' ],
+				] ),
+				derivedBlockEditingModes: new Map( [
+					[ 'b3247f75-fd94-4fef-97f9-5bfd162cc416', 'contentOnly' ],
+				] ),
+			};
+			expect(
+				getBlockEditingMode(
+					state,
+					'b3247f75-fd94-4fef-97f9-5bfd162cc416'
+				)
+			).toBe( 'contentOnly' );
+		} );
 	} );
 } );

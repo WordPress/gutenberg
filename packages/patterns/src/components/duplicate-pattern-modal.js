@@ -24,7 +24,7 @@ function getTermLabels( pattern, categories ) {
 
 	return categories.user
 		?.filter( ( category ) =>
-			pattern.wp_pattern_category.includes( category.id )
+			pattern.wp_pattern_category?.includes( category.id )
 		)
 		.map( ( category ) => category.label );
 }

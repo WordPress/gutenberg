@@ -16,9 +16,11 @@ import usePostContentBlocks from './use-post-content-blocks';
  */
 export default function DisableNonPageContentBlocks() {
 	const contentOnlyIds = usePostContentBlocks();
-	const templateParts = useSelect( ( select ) => {
+	const { templateParts } = useSelect( ( select ) => {
 		const { getBlocksByName } = select( blockEditorStore );
-		return getBlocksByName( 'core/template-part' );
+		return {
+			templateParts: getBlocksByName( 'core/template-part' ),
+		};
 	}, [] );
 	const disabledIds = useSelect(
 		( select ) => {
@@ -32,18 +34,68 @@ export default function DisableNonPageContentBlocks() {
 
 	const registry = useRegistry();
 
+	// The code here is split into multiple `useEffects` calls.
+	// This is done to avoid setting/unsetting block editing modes multiple times unnecessarily.
+	//
+	// For example, the block editing mode of the root block (clientId: '') only
+	// needs to be set once, not when `contentOnlyIds` or `disabledIds` change.
+	//
+	// It's also unlikely that these different types of blocks are being inserted
+	// or removed at the same time, so using different effects reflects that.
+	useEffect( () => {
+		const { setBlockEditingMode, unsetBlockEditingMode } =
+			registry.dispatch( blockEditorStore );
+
+		setBlockEditingMode( '', 'disabled' );
+
+		return () => {
+			unsetBlockEditingMode( '' );
+		};
+	}, [ registry ] );
+
 	useEffect( () => {
 		const { setBlockEditingMode, unsetBlockEditingMode } =
 			registry.dispatch( blockEditorStore );
 
 		registry.batch( () => {
-			setBlockEditingMode( '', 'disabled' );
 			for ( const clientId of contentOnlyIds ) {
 				setBlockEditingMode( clientId, 'contentOnly' );
 			}
+		} );
+
+		return () => {
+			registry.batch( () => {
+				for ( const clientId of contentOnlyIds ) {
+					unsetBlockEditingMode( clientId );
+				}
+			} );
+		};
+	}, [ contentOnlyIds, registry ] );
+
+	useEffect( () => {
+		const { setBlockEditingMode, unsetBlockEditingMode } =
+			registry.dispatch( blockEditorStore );
+
+		registry.batch( () => {
 			for ( const clientId of templateParts ) {
 				setBlockEditingMode( clientId, 'contentOnly' );
 			}
+		} );
+
+		return () => {
+			registry.batch( () => {
+				for ( const clientId of templateParts ) {
+					unsetBlockEditingMode( clientId );
+				}
+			} );
+		};
+	}, [ templateParts, registry ] );
+
+	useEffect( () => {
+		const { setBlockEditingMode, unsetBlockEditingMode } =
+			registry.dispatch( blockEditorStore );
+
+		registry.batch( () => {
 			for ( const clientId of disabledIds ) {
 				setBlockEditingMode( clientId, 'disabled' );
 			}
@@ -51,19 +103,12 @@ export default function DisableNonPageContentBlocks() {
 
 		return () => {
 			registry.batch( () => {
-				unsetBlockEditingMode( '' );
-				for ( const clientId of contentOnlyIds ) {
-					unsetBlockEditingMode( clientId );
-				}
-				for ( const clientId of templateParts ) {
-					unsetBlockEditingMode( clientId );
-				}
 				for ( const clientId of disabledIds ) {
 					unsetBlockEditingMode( clientId );
 				}
 			} );
 		};
-	}, [ templateParts, contentOnlyIds, disabledIds, registry ] );
+	}, [ disabledIds, registry ] );
 
 	return null;
 }

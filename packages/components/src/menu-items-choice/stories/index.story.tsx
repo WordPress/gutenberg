@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryFn } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react-webpack5';
 
 /**
  * WordPress dependencies
@@ -16,11 +16,12 @@ import MenuGroup from '../../menu-group';
 
 const meta: Meta< typeof MenuItemsChoice > = {
 	component: MenuItemsChoice,
-	title: 'Components/MenuItemsChoice',
+	title: 'Components/Actions/MenuItemsChoice',
+	id: 'components-menuitemschoice',
 	argTypes: {
 		onHover: { action: 'onHover' },
 		onSelect: { action: 'onSelect' },
-		value: { control: { type: null } },
+		value: { control: false },
 	},
 	parameters: {
 		controls: {

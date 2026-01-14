@@ -20,13 +20,19 @@ import { isAppleOS } from '@wordpress/keycodes';
 import { unlock } from '../../lock-unlock';
 
 const ZoomOutToggle = ( { disabled } ) => {
-	const { isZoomOut, showIconLabels } = useSelect( ( select ) => ( {
-		isZoomOut: unlock( select( blockEditorStore ) ).isZoomOut(),
-		showIconLabels: select( preferencesStore ).get(
-			'core',
-			'showIconLabels'
-		),
-	} ) );
+	const { isZoomOut, showIconLabels, isDistractionFree } = useSelect(
+		( select ) => ( {
+			isZoomOut: unlock( select( blockEditorStore ) ).isZoomOut(),
+			showIconLabels: select( preferencesStore ).get(
+				'core',
+				'showIconLabels'
+			),
+			isDistractionFree: select( preferencesStore ).get(
+				'core',
+				'distractionFree'
+			),
+		} )
+	);
 
 	const { resetZoomLevel, setZoomLevel } = unlock(
 		useDispatch( blockEditorStore )
@@ -52,13 +58,19 @@ const ZoomOutToggle = ( { disabled } ) => {
 		};
 	}, [ registerShortcut, unregisterShortcut ] );
 
-	useShortcut( 'core/editor/zoom', () => {
-		if ( isZoomOut ) {
-			resetZoomLevel();
-		} else {
-			setZoomLevel( 'auto-scaled' );
+	useShortcut(
+		'core/editor/zoom',
+		() => {
+			if ( isZoomOut ) {
+				resetZoomLevel();
+			} else {
+				setZoomLevel( 'auto-scaled' );
+			}
+		},
+		{
+			isDisabled: isDistractionFree,
 		}
-	} );
+	);
 
 	const handleZoomOut = () => {
 		if ( isZoomOut ) {
@@ -78,6 +90,7 @@ const ZoomOutToggle = ( { disabled } ) => {
 			isPressed={ isZoomOut }
 			size="compact"
 			showTooltip={ ! showIconLabels }
+			className="editor-zoom-out-toggle"
 		/>
 	);
 };

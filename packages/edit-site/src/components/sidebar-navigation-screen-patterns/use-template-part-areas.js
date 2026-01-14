@@ -1,9 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { useEntityRecords } from '@wordpress/core-data';
+import { useEntityRecords, store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
-import { store as editorStore } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -18,7 +17,8 @@ const useTemplatePartsGroupedByArea = ( items ) => {
 
 	const templatePartAreas = useSelect(
 		( select ) =>
-			select( editorStore ).__experimentalGetDefaultTemplatePartAreas(),
+			select( coreStore ).getCurrentTheme()
+				?.default_template_part_areas || [],
 		[]
 	);
 
@@ -29,6 +29,7 @@ const useTemplatePartsGroupedByArea = ( items ) => {
 		footer: {},
 		sidebar: {},
 		uncategorized: {},
+		overlay: {},
 	};
 
 	templatePartAreas.forEach(
@@ -43,7 +44,7 @@ const useTemplatePartsGroupedByArea = ( items ) => {
 		const key = accumulator[ item.area ]
 			? item.area
 			: TEMPLATE_PART_AREA_DEFAULT_CATEGORY;
-		accumulator[ key ].templateParts.push( item );
+		accumulator[ key ]?.templateParts?.push( item );
 		return accumulator;
 	}, knownAreas );
 

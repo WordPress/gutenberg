@@ -28,7 +28,7 @@ const MyFontFamilyControl = () => {
 			onChange={ ( newFontFamily ) => {
 				setFontFamily( newFontFamily );
 			} }
-			__nextHasNoMarginBottom
+			__next40pxDefaultSize
 		/>
 	);
 };
@@ -82,11 +82,3 @@ The rest of the props are passed down to the underlying `<SelectControl />` inst
 - Default: `false`
 
 Start opting into the larger default height that will become the default size in a future version.
-
-#### `__nextHasNoMarginBottom`
-
-- Type: `boolean`
-- Required: No
-- Default: `false`
-
-Start opting into the new margin-free styles that will become the default in a future version.

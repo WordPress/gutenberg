@@ -19,7 +19,7 @@ import { store as editorStore } from '../../store';
 /**
  * Renders the `PostURLPanel` component.
  *
- * @return {JSX.Element} The rendered PostURLPanel component.
+ * @return {React.ReactNode} The rendered PostURLPanel component.
  */
 export default function PostURLPanel() {
 	const { isFrontPage } = useSelect( ( select ) => {

@@ -38,7 +38,7 @@ export const buttonView = ( {
 	background: transparent;
 	border: none;
 	border-radius: ${ CONFIG.radiusXSmall };
-	color: ${ COLORS.gray[ 700 ] };
+	color: ${ COLORS.theme.gray[ 700 ] };
 	fill: currentColor;
 	cursor: pointer;
 	display: flex;
@@ -52,7 +52,6 @@ export const buttonView = ( {
 	text-align: center;
 	@media not ( prefers-reduced-motion ) {
 		transition:
-			background ${ CONFIG.transitionDurationFast } linear,
 			color ${ CONFIG.transitionDurationFast } linear,
 			font-weight 60ms linear;
 	}
@@ -69,8 +68,8 @@ export const buttonView = ( {
 		cursor: default;
 	}
 
-	&:active {
-		background: ${ CONFIG.controlBackgroundColor };
+	&:hover {
+		color: ${ COLORS.theme.gray[ 900 ] };
 	}
 
 	${ isDeselectable && deselectable }
@@ -79,21 +78,22 @@ export const buttonView = ( {
 `;
 
 const pressed = css`
-	color: ${ COLORS.white };
-
-	&:active {
-		background: transparent;
-	}
+	color: ${ COLORS.theme.foreground };
+	font-weight: ${ CONFIG.fontWeightMedium };
 `;
 
 const deselectable = css`
-	color: ${ COLORS.gray[ 900 ] };
+	color: ${ COLORS.theme.foreground };
 
 	&:focus {
-		box-shadow:
-			inset 0 0 0 1px ${ COLORS.white },
-			0 0 0 ${ CONFIG.borderWidthFocus } ${ COLORS.theme.accent };
-		outline: 2px solid transparent;
+		outline: ${ CONFIG.borderWidthFocus } solid ${ COLORS.ui.borderFocus };
+		outline-offset: 2px;
+
+		// Hide overlapping border
+		&[aria-pressed='false'] {
+			background: ${ COLORS.ui.background };
+			box-shadow: 0 0 0 2px ${ COLORS.ui.background };
+		}
 	}
 `;
 
@@ -107,12 +107,12 @@ const isIconStyles = ( {
 	size = 'default',
 }: Pick< ToggleGroupControlProps, 'size' > ) => {
 	const iconButtonSizes = {
-		default: '30px',
-		'__unstable-large': '32px',
+		default: '34px',
+		'__unstable-large': '38px',
 	};
 
 	return css`
-		color: ${ COLORS.gray[ 900 ] };
+		color: ${ COLORS.theme.foreground };
 		height: ${ iconButtonSizes[ size ] };
 		aspect-ratio: 1;
 		padding-left: 0;

@@ -7,7 +7,7 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useRef, useMemo, useEffect } from '@wordpress/element';
+import { useRef, useMemo } from '@wordpress/element';
 import {
 	useEntityRecord,
 	store as coreStore,
@@ -37,12 +37,10 @@ import { getBlockBindingsSource } from '@wordpress/blocks';
 /**
  * Internal dependencies
  */
-import { name as patternBlockName } from './index';
 import { unlock } from '../lock-unlock';
 
 const { useLayoutClasses } = unlock( blockEditorPrivateApis );
-const { isOverridableBlock, hasOverridableBlocks } =
-	unlock( patternsPrivateApis );
+const { isOverridableBlock } = unlock( patternsPrivateApis );
 
 const fullAlignments = [ 'full', 'wide', 'left', 'right' ];
 
@@ -74,22 +72,6 @@ const useInferredLayout = ( blocks, parentLayout ) => {
 		return { alignment, layout };
 	}, [ blocks, parentLayout ] );
 };
-
-function setBlockEditMode( setEditMode, blocks, mode ) {
-	blocks.forEach( ( block ) => {
-		const editMode =
-			mode ||
-			( isOverridableBlock( block ) ? 'contentOnly' : 'disabled' );
-		setEditMode( block.clientId, editMode );
-
-		setBlockEditMode(
-			setEditMode,
-			block.innerBlocks,
-			// Disable editing for nested patterns.
-			block.name === patternBlockName ? 'disabled' : mode
-		);
-	} );
-}
 
 function RecursionWarning() {
 	const blockProps = useBlockProps();
@@ -142,7 +124,7 @@ function ReusableBlockControl( {
 	return (
 		<>
 			{ canUserEdit && !! handleEditOriginal && (
-				<BlockControls>
+				<BlockControls group="other">
 					<ToolbarGroup>
 						<ToolbarButton onClick={ handleEditOriginal }>
 							{ __( 'Edit original' ) }
@@ -152,7 +134,7 @@ function ReusableBlockControl( {
 			) }
 
 			{ canOverrideBlocks && (
-				<BlockControls>
+				<BlockControls group="other">
 					<ToolbarGroup>
 						<ToolbarButton
 							onClick={ resetContent }
@@ -167,11 +149,12 @@ function ReusableBlockControl( {
 	);
 }
 
+const EMPTY_OBJECT = {};
+
 function ReusableBlockEdit( {
 	name,
 	attributes: { ref, content },
 	__unstableParentLayout: parentLayout,
-	clientId: patternClientId,
 	setAttributes,
 } ) {
 	const { record, hasResolved } = useEntityRecord(
@@ -184,53 +167,41 @@ function ReusableBlockEdit( {
 	} );
 	const isMissing = hasResolved && ! record;
 
-	const { setBlockEditingMode, __unstableMarkLastChangeAsPersistent } =
+	const { __unstableMarkLastChangeAsPersistent } =
 		useDispatch( blockEditorStore );
 
 	const {
-		innerBlocks,
 		onNavigateToEntityRecord,
-		editingMode,
 		hasPatternOverridesSource,
-	} = useSelect(
-		( select ) => {
-			const { getBlocks, getSettings, getBlockEditingMode } =
-				select( blockEditorStore );
-			// For editing link to the site editor if the theme and user permissions support it.
-			return {
-				innerBlocks: getBlocks( patternClientId ),
-				onNavigateToEntityRecord:
-					getSettings().onNavigateToEntityRecord,
-				editingMode: getBlockEditingMode( patternClientId ),
-				hasPatternOverridesSource: !! getBlockBindingsSource(
-					'core/pattern-overrides'
-				),
-			};
-		},
-		[ patternClientId ]
-	);
+		supportedBlockTypesRaw,
+	} = useSelect( ( select ) => {
+		const { getSettings } = select( blockEditorStore );
+		// For editing link to the site editor if the theme and user permissions support it.
+		return {
+			onNavigateToEntityRecord: getSettings().onNavigateToEntityRecord,
+			hasPatternOverridesSource: !! getBlockBindingsSource(
+				'core/pattern-overrides'
+			),
+			supportedBlockTypesRaw:
+				getSettings().__experimentalBlockBindingsSupportedAttributes ||
+				EMPTY_OBJECT,
+		};
+	}, [] );
 
-	// Sync the editing mode of the pattern block with the inner blocks.
-	useEffect( () => {
-		setBlockEditMode(
-			setBlockEditingMode,
-			innerBlocks,
-			// Disable editing if the pattern itself is disabled.
-			editingMode === 'disabled' || ! hasPatternOverridesSource
-				? 'disabled'
-				: undefined
-		);
-	}, [
-		editingMode,
-		innerBlocks,
-		setBlockEditingMode,
-		hasPatternOverridesSource,
-	] );
-
-	const canOverrideBlocks = useMemo(
-		() => hasPatternOverridesSource && hasOverridableBlocks( blocks ),
-		[ hasPatternOverridesSource, blocks ]
-	);
+	const canOverrideBlocks = useMemo( () => {
+		const supportedBlockTypes = Object.keys( supportedBlockTypesRaw );
+		const hasOverridableBlocks = ( _blocks ) =>
+			_blocks.some( ( block ) => {
+				if (
+					supportedBlockTypes.includes( block.name ) &&
+					isOverridableBlock( block )
+				) {
+					return true;
+				}
+				return hasOverridableBlocks( block.innerBlocks );
+			} );
+		return hasPatternOverridesSource && hasOverridableBlocks( blocks );
+	}, [ hasPatternOverridesSource, blocks, supportedBlockTypesRaw ] );
 
 	const { alignment, layout } = useInferredLayout( blocks, parentLayout );
 	const layoutClasses = useLayoutClasses( { layout }, name );
@@ -244,7 +215,6 @@ function ReusableBlockEdit( {
 	} );
 
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
-		templateLock: 'all',
 		layout,
 		value: blocks,
 		onInput: NOOP,

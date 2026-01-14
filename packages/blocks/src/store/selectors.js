@@ -102,7 +102,7 @@ export const getBlockTypes = createSelector(
  * };
  * ```
  *
- * @return {Object?} Block Type.
+ * @return {?Object} Block Type.
  */
 export function getBlockType( state, name ) {
 	return state.blockTypes[ name ];
@@ -295,6 +295,17 @@ export function getActiveBlockVariation( state, blockName, attributes, scope ) {
 			return match || variation;
 		}
 	}
+
+	// If no variation matches the isActive condition, we return the default variation,
+	// but only if it doesn't have an isActive condition that wasn't matched.
+	// This fallback is only applied for the 'block' and 'transform' scopes but not to
+	// the 'inserter', to avoid affecting block name display there.
+	if ( ! match && [ 'block', 'transform' ].includes( scope ) ) {
+		match = variations.find(
+			( variation ) =>
+				variation?.isDefault && ! Object.hasOwn( variation, 'isActive' )
+		);
+	}
 	return match;
 }
 
@@ -437,7 +448,7 @@ export function getCollections( state ) {
  * };
  * ```
  *
- * @return {string?} Default block name.
+ * @return {?string} Default block name.
  */
 export function getDefaultBlockName( state ) {
 	return state.defaultBlockName;
@@ -473,7 +484,7 @@ export function getDefaultBlockName( state ) {
  * };
  * ```
  *
- * @return {string?} Name of the block for handling non-block content.
+ * @return {?string} Name of the block for handling non-block content.
  */
 export function getFreeformFallbackBlockName( state ) {
 	return state.freeformFallbackBlockName;
@@ -509,7 +520,7 @@ export function getFreeformFallbackBlockName( state ) {
  * };
  * ```
  *
- * @return {string?} Name of the block for handling unregistered blocks.
+ * @return {?string} Name of the block for handling unregistered blocks.
  */
 export function getUnregisteredFallbackBlockName( state ) {
 	return state.unregisteredFallbackBlockName;
@@ -545,7 +556,7 @@ export function getUnregisteredFallbackBlockName( state ) {
  * };
  * ```
  *
- * @return {string?} Name of the block for handling the grouping of blocks.
+ * @return {?string} Name of the block for handling the grouping of blocks.
  */
 export function getGroupingBlockName( state ) {
 	return state.groupingBlockName;

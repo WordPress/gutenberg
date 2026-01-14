@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { Page } from '@wordpress/admin-ui';
 import { Button } from '@wordpress/components';
 import {
 	store as coreStore,
@@ -8,168 +9,36 @@ import {
 } from '@wordpress/core-data';
 import { useState, useMemo, useCallback, useEffect } from '@wordpress/element';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 import { DataViews, filterSortAndPaginate } from '@wordpress/dataviews';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { __ } from '@wordpress/i18n';
 import { drawerRight } from '@wordpress/icons';
+import { useEvent, usePrevious } from '@wordpress/compose';
+import { addQueryArgs } from '@wordpress/url';
+import { useView } from '@wordpress/views';
 
 /**
  * Internal dependencies
  */
-import Page from '../page';
-import {
-	useDefaultViews,
-	defaultLayouts,
-} from '../sidebar-dataviews/default-views';
 import {
 	OPERATOR_IS_ANY,
 	OPERATOR_IS_NONE,
+	OPERATOR_BEFORE,
+	OPERATOR_AFTER,
 	LAYOUT_LIST,
 } from '../../utils/constants';
 
 import AddNewPostModal from '../add-new-post';
 import { unlock } from '../../lock-unlock';
 import { useEditPostAction } from '../dataviews-actions';
-import { usePrevious } from '@wordpress/compose';
-import usePostFields from '../post-fields';
+import { defaultLayouts, getDefaultView } from './view-utils';
+import useNotesCount from './use-notes-count';
 
-const { usePostActions } = unlock( editorPrivateApis );
+const { usePostActions, usePostFields } = unlock( editorPrivateApis );
 const { useLocation, useHistory } = unlock( routerPrivateApis );
 const { useEntityRecordsWithPermissions } = unlock( coreDataPrivateApis );
 const EMPTY_ARRAY = [];
-
-const getDefaultView = ( defaultViews, activeView ) => {
-	return defaultViews.find( ( { slug } ) => slug === activeView )?.view;
-};
-
-const getCustomView = ( editedEntityRecord ) => {
-	if ( ! editedEntityRecord?.content ) {
-		return undefined;
-	}
-
-	const content = JSON.parse( editedEntityRecord.content );
-	if ( ! content ) {
-		return undefined;
-	}
-
-	return {
-		...content,
-		layout: defaultLayouts[ content.type ]?.layout,
-	};
-};
-
-/**
- * This function abstracts working with default & custom views by
- * providing a [ state, setState ] tuple based on the URL parameters.
- *
- * Consumers use the provided tuple to work with state
- * and don't have to deal with the specifics of default & custom views.
- *
- * @param {string} postType Post type to retrieve default views for.
- * @return {Array} The [ state, setState ] tuple.
- */
-function useView( postType ) {
-	const {
-		params: { activeView = 'all', isCustom = 'false', layout },
-	} = useLocation();
-	const history = useHistory();
-
-	const defaultViews = useDefaultViews( { postType } );
-	const { editEntityRecord } = useDispatch( coreStore );
-	const editedEntityRecord = useSelect(
-		( select ) => {
-			if ( isCustom !== 'true' ) {
-				return undefined;
-			}
-
-			const { getEditedEntityRecord } = select( coreStore );
-			return getEditedEntityRecord(
-				'postType',
-				'wp_dataviews',
-				Number( activeView )
-			);
-		},
-		[ activeView, isCustom ]
-	);
-	const [ view, setView ] = useState( () => {
-		let initialView;
-		if ( isCustom === 'true' ) {
-			initialView = getCustomView( editedEntityRecord ) ?? {
-				type: layout ?? LAYOUT_LIST,
-			};
-		} else {
-			initialView = getDefaultView( defaultViews, activeView ) ?? {
-				type: layout ?? LAYOUT_LIST,
-			};
-		}
-
-		const type = layout ?? initialView.type;
-		return {
-			...initialView,
-			type,
-		};
-	} );
-
-	const setViewWithUrlUpdate = useCallback(
-		( newView ) => {
-			const { params } = history.getLocationWithParams();
-
-			if ( newView.type === LAYOUT_LIST && ! params?.layout ) {
-				// Skip updating the layout URL param if
-				// it is not present and the newView.type is LAYOUT_LIST.
-			} else if ( newView.type !== params?.layout ) {
-				history.push( {
-					...params,
-					layout: newView.type,
-				} );
-			}
-
-			setView( newView );
-
-			if ( isCustom === 'true' && editedEntityRecord?.id ) {
-				editEntityRecord(
-					'postType',
-					'wp_dataviews',
-					editedEntityRecord?.id,
-					{
-						content: JSON.stringify( newView ),
-					}
-				);
-			}
-		},
-		[ history, isCustom, editEntityRecord, editedEntityRecord?.id ]
-	);
-
-	// When layout URL param changes, update the view type
-	// without affecting any other config.
-	useEffect( () => {
-		setView( ( prevView ) => ( {
-			...prevView,
-			type: layout ?? LAYOUT_LIST,
-		} ) );
-	}, [ layout ] );
-
-	// When activeView or isCustom URL parameters change, reset the view.
-	useEffect( () => {
-		let newView;
-		if ( isCustom === 'true' ) {
-			newView = getCustomView( editedEntityRecord );
-		} else {
-			newView = getDefaultView( defaultViews, activeView );
-		}
-
-		if ( newView ) {
-			const type = layout ?? newView.type;
-			setView( {
-				...newView,
-				type,
-			} );
-		}
-	}, [ activeView, isCustom, layout, defaultViews, editedEntityRecord ] );
-
-	return [ view, setViewWithUrlUpdate, setViewWithUrlUpdate ];
-}
 
 const DEFAULT_STATUSES = 'draft,future,pending,private,publish'; // All but 'trash'.
 
@@ -177,50 +46,65 @@ function getItemId( item ) {
 	return item.id.toString();
 }
 
+function getItemLevel( item ) {
+	return item.level;
+}
+
 export default function PostList( { postType } ) {
-	const [ view, setView ] = useView( postType );
-	const defaultViews = useDefaultViews( { postType } );
+	const { path, query } = useLocation();
+	const { activeView = 'all', postId, quickEdit = false } = query;
 	const history = useHistory();
-	const location = useLocation();
-	const {
-		postId,
-		quickEdit = false,
-		isCustom,
-		activeView = 'all',
-	} = location.params;
+	const postTypeObject = useSelect(
+		( select ) => {
+			const { getPostType } = select( coreStore );
+			return getPostType( postType );
+		},
+		[ postType ]
+	);
+	const { view, updateView, isModified, resetToDefault } = useView( {
+		kind: 'postType',
+		name: postType,
+		slug: activeView,
+		queryParams: {
+			page: query.pageNumber,
+			search: query.search,
+		},
+		onChangeQueryParams: ( newQueryParams ) => {
+			history.navigate(
+				addQueryArgs( path, {
+					...query,
+					pageNumber: newQueryParams.page,
+					search: newQueryParams.search || undefined,
+				} )
+			);
+		},
+		defaultView: getDefaultView( postTypeObject, activeView ),
+	} );
+
+	const onChangeView = useEvent( ( newView ) => {
+		if ( newView.type !== view.type ) {
+			// Retrigger the routing areas resolution.
+			history.invalidate();
+		}
+		updateView( newView );
+	} );
+
 	const [ selection, setSelection ] = useState( postId?.split( ',' ) ?? [] );
 	const onChangeSelection = useCallback(
 		( items ) => {
 			setSelection( items );
-			const { params } = history.getLocationWithParams();
-			if ( ( params.isCustom ?? 'false' ) === 'false' ) {
-				history.push( {
-					...params,
+			history.navigate(
+				addQueryArgs( path, {
 					postId: items.join( ',' ),
-				} );
-			}
+				} )
+			);
 		},
-		[ history ]
+		[ path, history ]
 	);
 
-	const getActiveViewFilters = ( views, match ) => {
-		const found = views.find( ( { slug } ) => slug === match );
-		return found?.filters ?? [];
-	};
-
-	const { isLoading: isLoadingFields, fields: _fields } = usePostFields();
-	const fields = useMemo( () => {
-		const activeViewFilters = getActiveViewFilters(
-			defaultViews,
-			activeView
-		).map( ( { field } ) => field );
-		return _fields.map( ( field ) => ( {
-			...field,
-			elements: activeViewFilters.includes( field.id )
-				? []
-				: field.elements,
-		} ) );
-	}, [ _fields, defaultViews, activeView ] );
+	const fields = usePostFields( {
+		postType,
+	} );
 
 	const queryArgs = useMemo( () => {
 		const filters = {};
@@ -242,30 +126,16 @@ export default function PostList( { postType } ) {
 			) {
 				filters.author_exclude = filter.value;
 			}
-		} );
-
-		// The bundled views want data filtered without displaying the filter.
-		const activeViewFilters = getActiveViewFilters(
-			defaultViews,
-			activeView
-		);
-		activeViewFilters.forEach( ( filter ) => {
-			if (
-				filter.field === 'status' &&
-				filter.operator === OPERATOR_IS_ANY
-			) {
-				filters.status = filter.value;
-			}
-			if (
-				filter.field === 'author' &&
-				filter.operator === OPERATOR_IS_ANY
-			) {
-				filters.author = filter.value;
-			} else if (
-				filter.field === 'author' &&
-				filter.operator === OPERATOR_IS_NONE
-			) {
-				filters.author_exclude = filter.value;
+			if ( filter.field === 'date' ) {
+				// Skip if no value is set yet
+				if ( ! filter.value ) {
+					return;
+				}
+				if ( filter.operator === OPERATOR_BEFORE ) {
+					filters.before = filter.value;
+				} else if ( filter.operator === OPERATOR_AFTER ) {
+					filters.after = filter.value;
+				}
 			}
 		} );
 
@@ -278,13 +148,14 @@ export default function PostList( { postType } ) {
 		return {
 			per_page: view.perPage,
 			page: view.page,
-			_embed: 'author',
+			_embed: 'author,wp:featuredmedia',
 			order: view.sort?.direction,
 			orderby: view.sort?.field,
+			orderby_hierarchy: !! view.showLevels,
 			search: view.search,
 			...filters,
 		};
-	}, [ view, activeView, defaultViews ] );
+	}, [ view ] );
 	const {
 		records,
 		isResolving: isLoadingData,
@@ -292,18 +163,34 @@ export default function PostList( { postType } ) {
 		totalPages,
 	} = useEntityRecordsWithPermissions( 'postType', postType, queryArgs );
 
+	const postIds = useMemo(
+		() => records?.map( ( record ) => record.id ) ?? [],
+		[ records ]
+	);
+	const { notesCount, isLoading: isLoadingNotesCount } =
+		useNotesCount( postIds );
+
 	// The REST API sort the authors by ID, but we want to sort them by name.
 	const data = useMemo( () => {
-		if ( ! isLoadingFields && view?.sort?.field === 'author' ) {
-			return filterSortAndPaginate(
+		let processedRecords = records;
+
+		if ( view?.sort?.field === 'author' ) {
+			processedRecords = filterSortAndPaginate(
 				records,
 				{ sort: { ...view.sort } },
 				fields
 			).data;
 		}
 
-		return records;
-	}, [ records, fields, isLoadingFields, view?.sort ] );
+		if ( processedRecords ) {
+			return processedRecords.map( ( record ) => ( {
+				...record,
+				notesCount: notesCount[ record.id ] ?? 0,
+			} ) );
+		}
+
+		return processedRecords;
+	}, [ records, fields, view?.sort, notesCount ] );
 
 	const ids = data?.map( ( record ) => getItemId( record ) ) ?? [];
 	const prevIds = usePrevious( ids ) ?? [];
@@ -312,12 +199,13 @@ export default function PostList( { postType } ) {
 
 	useEffect( () => {
 		if ( postIdWasDeleted ) {
-			history.push( {
-				...history.getLocationWithParams().params,
-				postId: undefined,
-			} );
+			history.navigate(
+				addQueryArgs( path, {
+					postId: undefined,
+				} )
+			);
 		}
-	}, [ postIdWasDeleted, history ] );
+	}, [ history, postIdWasDeleted, path ] );
 
 	const paginationInfo = useMemo(
 		() => ( {
@@ -356,11 +244,7 @@ export default function PostList( { postType } ) {
 	const openModal = () => setShowAddPostModal( true );
 	const closeModal = () => setShowAddPostModal( false );
 	const handleNewPage = ( { type, id } ) => {
-		history.push( {
-			postId: id,
-			postType: type,
-			canvas: 'edit',
-		} );
+		history.navigate( `/${ type }/${ id }?canvas=edit` );
 		closeModal();
 	};
 
@@ -368,47 +252,56 @@ export default function PostList( { postType } ) {
 		<Page
 			title={ labels?.name }
 			actions={
-				labels?.add_new_item &&
-				canCreateRecord && (
-					<>
+				<>
+					{ isModified && (
 						<Button
-							variant="primary"
-							onClick={ openModal }
 							__next40pxDefaultSize
+							onClick={ () => {
+								resetToDefault();
+								history.invalidate();
+							} }
 						>
-							{ labels.add_new_item }
+							{ __( 'Reset view' ) }
 						</Button>
-						{ showAddPostModal && (
-							<AddNewPostModal
-								postType={ postType }
-								onSave={ handleNewPage }
-								onClose={ closeModal }
-							/>
-						) }
-					</>
-				)
+					) }
+					{ labels?.add_new_item && canCreateRecord && (
+						<>
+							<Button
+								variant="primary"
+								onClick={ openModal }
+								__next40pxDefaultSize
+							>
+								{ labels.add_new_item }
+							</Button>
+							{ showAddPostModal && (
+								<AddNewPostModal
+									postType={ postType }
+									onSave={ handleNewPage }
+									onClose={ closeModal }
+								/>
+							) }
+						</>
+					) }
+				</>
 			}
 		>
 			<DataViews
-				key={ activeView + isCustom }
+				key={ activeView }
 				paginationInfo={ paginationInfo }
 				fields={ fields }
 				actions={ actions }
 				data={ data || EMPTY_ARRAY }
-				isLoading={ isLoadingData || isLoadingFields }
+				isLoading={ isLoadingData || isLoadingNotesCount }
 				view={ view }
-				onChangeView={ setView }
+				onChangeView={ onChangeView }
 				selection={ selection }
 				onChangeSelection={ onChangeSelection }
 				isItemClickable={ ( item ) => item.status !== 'trash' }
 				onClickItem={ ( { id } ) => {
-					history.push( {
-						postId: id,
-						postType,
-						canvas: 'edit',
-					} );
+					history.navigate( `/${ postType }/${ id }?canvas=edit` );
 				} }
 				getItemId={ getItemId }
+				getItemLevel={ getItemLevel }
 				defaultLayouts={ defaultLayouts }
 				header={
 					window.__experimentalQuickEditDataViews &&
@@ -420,10 +313,11 @@ export default function PostList( { postType } ) {
 							icon={ drawerRight }
 							label={ __( 'Details' ) }
 							onClick={ () => {
-								history.push( {
-									...location.params,
-									quickEdit: quickEdit ? undefined : true,
-								} );
+								history.navigate(
+									addQueryArgs( path, {
+										quickEdit: quickEdit ? undefined : true,
+									} )
+								);
 							} }
 						/>
 					)

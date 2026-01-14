@@ -23,28 +23,23 @@ export function useShowBlockTools() {
 			getBlock,
 			getBlockMode,
 			getSettings,
-			__unstableGetEditorMode,
 			isTyping,
+			isBlockInterfaceHidden,
 		} = unlock( select( blockEditorStore ) );
 
 		const clientId =
 			getSelectedBlockClientId() || getFirstMultiSelectedBlockClientId();
 
 		const block = getBlock( clientId );
-		const editorMode = __unstableGetEditorMode();
 		const hasSelectedBlock = !! clientId && !! block;
 		const isEmptyDefaultBlock =
 			hasSelectedBlock &&
-			isUnmodifiedDefaultBlock( block ) &&
+			isUnmodifiedDefaultBlock( block, 'content' ) &&
 			getBlockMode( clientId ) !== 'html';
 		const _showEmptyBlockSideInserter =
-			clientId &&
-			! isTyping() &&
-			// Hide the block inserter on the navigation mode.
-			// See https://github.com/WordPress/gutenberg/pull/66636#discussion_r1824728483.
-			editorMode !== 'navigation' &&
-			isEmptyDefaultBlock;
+			clientId && ! isTyping() && isEmptyDefaultBlock;
 		const _showBlockToolbarPopover =
+			! isBlockInterfaceHidden() &&
 			! getSettings().hasFixedToolbar &&
 			! _showEmptyBlockSideInserter &&
 			hasSelectedBlock &&

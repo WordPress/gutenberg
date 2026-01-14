@@ -11,6 +11,7 @@ There are two ways to register commands: static or dynamic. Both methods receive
 -   `icon`: An SVG icon
 -   `callback`: A callback function that is called when the command is selected
 -   `context`: (Optional) The context of the command
+-   `keywords`: (Optional) An array of keywords for search matching
 
 ### Static commands
 
@@ -55,6 +56,14 @@ npm install @wordpress/commands --save
 ```
 
 _This package assumes that your code will run in an **ES2015+** environment. If you're using an environment that has limited or no support for such language features and APIs, you should include [the polyfill shipped in `@wordpress/babel-preset-default`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/babel-preset-default#polyfill) in your code._
+
+_This package requires the following stylesheets to be included for proper styling:_
+
+```css
+/* From node_modules: */
+@import '@wordpress/components/build-style/style.css';
+@import '@wordpress/commands/build-style/style.css';
+```
 
 ## API
 
@@ -113,71 +122,107 @@ Attach a command loader to the command palette. Used for dynamic commands.
 _Usage_
 
 ```js
+import { __ } from '@wordpress/i18n';
+import { addQueryArgs } from '@wordpress/url';
 import { useCommandLoader } from '@wordpress/commands';
-import { post, page, layout, symbolFilled } from '@wordpress/icons';
-
-const icons = {
-    post,
-    page,
-    wp_template: layout,
-    wp_template_part: symbolFilled,
-};
+import { page } from '@wordpress/icons';
+import { useSelect } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
+import { useMemo } from '@wordpress/element';
 
 function usePageSearchCommandLoader( { search } ) {
-    // Retrieve the pages for the "search" term.
-    const { records, isLoading } = useSelect( ( select ) => {
-        const { getEntityRecords } = select( coreStore );
-        const query = {
-            search: !! search ? search : undefined,
-            per_page: 10,
-            orderby: search ? 'relevance' : 'date',
-        };
-        return {
-            records: getEntityRecords( 'postType', 'page', query ),
-            isLoading: ! select( coreStore ).hasFinishedResolution(
-                'getEntityRecords',
-                'postType', 'page', query ]
-            ),
-        };
-    }, [ search ] );
+	// Retrieve the pages for the "search" term.
+	const { records, isLoading } = useSelect(
+		( select ) => {
+			const { getEntityRecords } = select( coreStore );
+			const query = {
+				search: !! search ? search : undefined,
+				per_page: 10,
+				orderby: search ? 'relevance' : 'date',
+			};
+			return {
+				records: getEntityRecords( 'postType', 'page', query ),
+				isLoading: ! select( coreStore ).hasFinishedResolution(
+					'getEntityRecords',
+					[ 'postType', 'page', query ]
+				),
+			};
+		},
+		[ search ]
+	);
 
-    // Create the commands.
-    const commands = useMemo( () => {
-        return ( records ?? [] ).slice( 0, 10 ).map( ( record ) => {
-            return {
-                name: record.title?.rendered + ' ' + record.id,
-                label: record.title?.rendered
-                    ? record.title?.rendered
-                    : __( '(no title)' ),
-                icon: icons[ postType ],
-                callback: ( { close } ) => {
-                    const args = {
-                        postType,
-                        postId: record.id,
-                        ...extraArgs,
-                    };
-                    document.location = addQueryArgs( 'site-editor.php', args );
-                    close();
-                },
-            };
-        } );
-    }, [ records, history ] );
+	// Create the commands.
+	const commands = useMemo( () => {
+		return ( records ?? [] ).slice( 0, 10 ).map( ( record ) => {
+			return {
+				name: record.title?.rendered + ' ' + record.id,
+				label: record.title?.rendered
+					? record.title?.rendered
+					: __( '(no title)' ),
+				icon: page,
+				callback: ( { close } ) => {
+					const args = {
+						p: '/page',
+						postId: record.id,
+					};
+					document.location = addQueryArgs( 'site-editor.php', args );
+					close();
+				},
+			};
+		} );
+	}, [ records ] );
 
-    return {
-        commands,
-        isLoading,
-    };
+	return {
+		commands,
+		isLoading,
+	};
 }
 
 useCommandLoader( {
-    name: 'myplugin/page-search',
-    hook: usePageSearchCommandLoader,
+	name: 'myplugin/page-search',
+	hook: usePageSearchCommandLoader,
 } );
 ```
 
 _Parameters_
 
 -   _loader_ `import('../store/actions').WPCommandLoaderConfig`: command loader config.
+
+### useCommands
+
+Attach multiple commands to the command palette. Used for static commands.
+
+_Usage_
+
+```js
+import { useCommands } from '@wordpress/commands';
+import { plus, pencil } from '@wordpress/icons';
+
+useCommands( [
+	{
+		name: 'myplugin/add-post',
+		label: __( 'Add new post' ),
+		icon: plus,
+		callback: ( { close } ) => {
+			document.location.href = 'post-new.php';
+			close();
+		},
+	},
+	{
+		name: 'myplugin/edit-posts',
+		label: __( 'Edit posts' ),
+		icon: pencil,
+		callback: ( { close } ) => {
+			document.location.href = 'edit.php';
+			close();
+		},
+	},
+] );
+```
+
+_Parameters_
+
+-   _commands_ `import('../store/actions').WPCommandConfig[]`: Array of command configs.
 
 <!-- END TOKEN(Autogenerated API docs) -->
 

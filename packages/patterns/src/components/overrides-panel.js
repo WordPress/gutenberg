@@ -19,8 +19,15 @@ import { unlock } from '../lock-unlock';
 const { BlockQuickNavigation } = unlock( blockEditorPrivateApis );
 
 export default function OverridesPanel() {
-	const allClientIds = useSelect(
-		( select ) => select( blockEditorStore ).getClientIdsWithDescendants(),
+	const { allClientIds, supportedBlockTypes } = useSelect(
+		( select ) => ( {
+			allClientIds:
+				select( blockEditorStore ).getClientIdsWithDescendants(),
+			supportedBlockTypes: Object.keys(
+				select( blockEditorStore ).getSettings()
+					?.__experimentalBlockBindingsSupportedAttributes || {}
+			),
+		} ),
 		[]
 	);
 	const { getBlock } = useSelect( blockEditorStore );
@@ -28,9 +35,12 @@ export default function OverridesPanel() {
 		() =>
 			allClientIds.filter( ( clientId ) => {
 				const block = getBlock( clientId );
-				return isOverridableBlock( block );
+				return (
+					supportedBlockTypes.includes( block.name ) &&
+					isOverridableBlock( block )
+				);
 			} ),
-		[ allClientIds, getBlock ]
+		[ allClientIds, getBlock, supportedBlockTypes ]
 	);
 
 	if ( ! clientIdsWithOverrides?.length ) {

@@ -2,12 +2,9 @@
  * WordPress dependencies
  */
 import { Draggable } from '@wordpress/components';
-import {
-	createBlock,
-	serialize,
-	store as blocksStore,
-} from '@wordpress/blocks';
+import { createBlock, store as blocksStore } from '@wordpress/blocks';
 import { useDispatch, useSelect } from '@wordpress/data';
+import { useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -24,24 +21,27 @@ const InserterDraggableBlocks = ( {
 	children,
 	pattern,
 } ) => {
-	const transferData = {
-		type: 'inserter',
-		blocks,
-	};
-
+	const blockName = blocks.length === 1 ? blocks[ 0 ].name : undefined;
 	const blockTypeIcon = useSelect(
 		( select ) => {
-			const { getBlockType } = select( blocksStore );
 			return (
-				blocks.length === 1 && getBlockType( blocks[ 0 ].name )?.icon
+				blockName &&
+				select( blocksStore ).getBlockType( blockName )?.icon
 			);
 		},
-		[ blocks ]
+		[ blockName ]
 	);
 
 	const { startDragging, stopDragging } = unlock(
 		useDispatch( blockEditorStore )
 	);
+
+	const patternBlock = useMemo( () => {
+		return pattern?.type === INSERTER_PATTERN_TYPES.user &&
+			pattern?.syncStatus !== 'unsynced'
+			? [ createBlock( 'core/block', { ref: pattern.id } ) ]
+			: undefined;
+	}, [ pattern?.type, pattern?.syncStatus, pattern?.id ] );
 
 	if ( ! isEnabled ) {
 		return children( {
@@ -51,21 +51,31 @@ const InserterDraggableBlocks = ( {
 		} );
 	}
 
+	const draggableBlocks = patternBlock ?? blocks;
 	return (
 		<Draggable
 			__experimentalTransferDataType="wp-blocks"
-			transferData={ transferData }
+			transferData={ { type: 'inserter', blocks: draggableBlocks } }
 			onDragStart={ ( event ) => {
 				startDragging();
-				const parsedBlocks =
-					pattern?.type === INSERTER_PATTERN_TYPES.user &&
-					pattern?.syncStatus !== 'unsynced'
-						? [ createBlock( 'core/block', { ref: pattern.id } ) ]
-						: blocks;
-				event.dataTransfer.setData(
-					'text/html',
-					serialize( parsedBlocks )
-				);
+				const addedTypes = new Set();
+				for ( const block of draggableBlocks ) {
+					const type = `wp-block:${ block.name }`;
+					/*
+					 * Only add each block type once to avoid DataTransferItemList::add `NotSupportedError`
+					 * when patterns contain multiple blocks of the same type.
+					 */
+					if ( ! addedTypes.has( type ) ) {
+						/*
+						 * This will fill in the dataTransfer.types array so that
+						 * the drop zone can check if the draggable is eligible.
+						 * Unfortuantely, on drag start, we don't have access to the
+						 * actual data, only the data keys/types.
+						 */
+						event.dataTransfer.items.add( '', type );
+						addedTypes.add( type );
+					}
+				}
 			} }
 			onDragEnd={ () => {
 				stopDragging();

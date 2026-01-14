@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryFn } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react-webpack5';
+import { fn } from 'storybook/test';
 
 /**
  * WordPress dependencies
@@ -16,15 +17,19 @@ import { ConfirmDialog } from '../component';
 
 const meta: Meta< typeof ConfirmDialog > = {
 	component: ConfirmDialog,
-	title: 'Components (Experimental)/Overlays/ConfirmDialog',
-	id: 'components-experimental-confirmdialog',
+	title: 'Components/Overlays/ConfirmDialog',
+	id: 'components-confirmdialog',
 	argTypes: {
 		isOpen: {
-			control: { type: null },
+			control: false,
 		},
 	},
+	tags: [ 'status-experimental' ],
+	args: {
+		onCancel: fn(),
+		onConfirm: fn(),
+	},
 	parameters: {
-		actions: { argTypesRegex: '^on.*' },
 		controls: {
 			expanded: true,
 		},

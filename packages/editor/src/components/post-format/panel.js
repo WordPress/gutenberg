@@ -18,7 +18,7 @@ import { store as editorStore } from '../../store';
 /**
  * Renders the Post Author Panel component.
  *
- * @return {Component} The component to be rendered.
+ * @return {React.ReactNode} The rendered component.
  */
 function PostFormat() {
 	const { postFormat } = useSelect( ( select ) => {

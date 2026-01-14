@@ -9,7 +9,7 @@ import {
 	__unstableAnimatePresence as AnimatePresence,
 } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { useState } from '@wordpress/element';
 import { isBlobURL } from '@wordpress/blob';
@@ -260,7 +260,7 @@ export default function MaybeUploadMediaPanel() {
 						variant="primary"
 						onClick={ uploadImages }
 					>
-						{ __( 'Upload' ) }
+						{ _x( 'Upload', 'verb' ) }
 					</Button>
 				) }
 			</div>

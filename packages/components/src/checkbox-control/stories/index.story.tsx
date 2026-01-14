@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryFn } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react-webpack5';
 
 /**
  * WordPress dependencies
@@ -17,13 +17,14 @@ import { HStack } from '../../h-stack';
 
 const meta: Meta< typeof CheckboxControl > = {
 	component: CheckboxControl,
-	title: 'Components/CheckboxControl',
+	title: 'Components/Selection & Input/Common/CheckboxControl',
+	id: 'components-checkboxcontrol',
 	argTypes: {
 		onChange: {
 			action: 'onChange',
 		},
 		checked: {
-			control: { type: null },
+			control: false,
 		},
 		help: { control: { type: 'text' } },
 	},
@@ -59,7 +60,6 @@ export const Default: StoryFn< typeof CheckboxControl > = DefaultTemplate.bind(
 	{}
 );
 Default.args = {
-	__nextHasNoMarginBottom: true,
 	label: 'Is author',
 	help: 'Is the user an author or not?',
 };
@@ -89,7 +89,6 @@ export const Indeterminate: StoryFn< typeof CheckboxControl > = ( {
 				} }
 			/>
 			<CheckboxControl
-				__nextHasNoMarginBottom
 				label="Apple"
 				checked={ fruits.apple }
 				onChange={ ( apple ) =>
@@ -100,7 +99,6 @@ export const Indeterminate: StoryFn< typeof CheckboxControl > = ( {
 				}
 			/>
 			<CheckboxControl
-				__nextHasNoMarginBottom
 				label="Orange"
 				checked={ fruits.orange }
 				onChange={ ( orange ) =>
@@ -115,7 +113,6 @@ export const Indeterminate: StoryFn< typeof CheckboxControl > = ( {
 };
 Indeterminate.args = {
 	label: 'Select all',
-	__nextHasNoMarginBottom: true,
 };
 
 /**
@@ -159,7 +156,4 @@ export const WithCustomLabel: StoryFn< typeof CheckboxControl > = ( {
 			</VStack>
 		</HStack>
 	);
-};
-WithCustomLabel.args = {
-	__nextHasNoMarginBottom: true,
 };

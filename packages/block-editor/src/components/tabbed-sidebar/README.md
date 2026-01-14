@@ -1,21 +1,19 @@
-# Tabbed Panel
+# TabbedSidebar
 
-The `TabbedPanel` component is used to create the secondary panels in the editor.
+The `TabbedSidebar` component is used to create secondary panels in the editor with tabbed navigation.
 
 ## Development guidelines
 
-This acts as a wrapper for the `Tabs` component, but adding conventions that can be shared between all secondary panels, for example:
+This acts as a wrapper for the `Tabs` component, adding conventions that can be shared between all secondary panels, including:
 
 -   A close button
 -   Tabs that fill the panel
--   Custom scollbars
+-   Custom scrollbars
 
 ### Usage
 
-Renders a block alignment toolbar with alignments options.
-
 ```jsx
-import { TabbedSidebar } from '@wordpress/components';
+import { TabbedSidebar } from '@wordpress/block-editor';
 
 const MyTabbedSidebar = () => (
 	<TabbedSidebar
@@ -23,7 +21,7 @@ const MyTabbedSidebar = () => (
 			{
 				name: 'slug-1',
 				title: _x( 'Title 1', 'context' ),
-				panel: <PanelContents>,
+				panel: <PanelContents />,
 				panelRef: useRef('an-optional-ref'),
 			},
 			{
@@ -35,6 +33,8 @@ const MyTabbedSidebar = () => (
 		onClose={ onClickCloseButton }
 		onSelect={ onSelectTab }
 		defaultTabId="slug-1"
+		selectedTab="slug-1"
+		closeButtonLabel="Close sidebar"
 		ref={ tabsRef }
 	/>
 );
@@ -47,30 +47,41 @@ const MyTabbedSidebar = () => (
 -   **Type:** `String`
 -   **Default:** `undefined`
 
-This is passed to the `Tabs` component so it can handle the tab to select by default when it component renders.
+The ID of the tab to be selected by default when the component renders.
 
 ### `onClose`
 
 -   **Type:** `Function`
 
-The function that is called when the close button is clicked.
+Function called when the close button is clicked.
 
 ### `onSelect`
 
 -   **Type:** `Function`
 
-This is passed to the `Tabs` component - it will be called when a tab has been selected. It is passed the selected tab's ID as an argument.
+Function called when a tab is selected. Receives the selected tab's ID as an argument.
 
 ### `selectedTab`
 
 -   **Type:** `String`
 -   **Default:** `undefined`
 
-This is passed to the `Tabs` component - it will display this tab as selected.
+The ID of the currently selected tab.
 
 ### `tabs`
 
 -   **Type:** `Array`
 -   **Default:** `undefined`
 
-An array of tabs which will be rendered as `TabList` and `TabPanel` components.
+Array of tab objects. Each tab should have:
+
+- `name` (string): Unique identifier for the tab
+- `title` (string): Display title for the tab
+- `panel` (React.Node): Content to display in the tab panel
+- `panelRef` (React.Ref, optional): Reference to the tab panel element
+
+#### `closeButtonLabel`
+
+-   **Type:** `String`
+
+Accessibility label for the close button.

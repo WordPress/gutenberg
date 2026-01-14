@@ -18,9 +18,10 @@ const parentField: Field< BasePost > = {
 	Edit: ParentEdit,
 	render: ParentView,
 	enableSorting: true,
+	filterBy: false,
 };
 
 /**
- * This field is used to display the post parent.
+ * Parent field for BasePost.
  */
 export default parentField;

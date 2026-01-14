@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/plugins",
-	"version": "7.11.0",
+	"version": "7.36.0",
 	"description": "Plugins module for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -22,20 +22,35 @@
 		"node": ">=18.12.0",
 		"npm": ">=8.19.2"
 	},
-	"main": "build/index.js",
+	"files": [
+		"src",
+		"build",
+		"build-module",
+		"build-types",
+		"*.md"
+	],
+	"type": "module",
+	"main": "build/index.cjs",
 	"module": "build-module/index.js",
+	"exports": {
+		".": {
+			"types": "./build-types/index.d.ts",
+			"import": "./build-module/index.js",
+			"require": "./build/index.cjs"
+		},
+		"./package.json": "./package.json"
+	},
 	"react-native": "src/index",
 	"wpScript": true,
 	"types": "build-types",
 	"dependencies": {
-		"@babel/runtime": "7.25.7",
-		"@wordpress/components": "*",
-		"@wordpress/compose": "*",
-		"@wordpress/deprecated": "*",
-		"@wordpress/element": "*",
-		"@wordpress/hooks": "*",
-		"@wordpress/icons": "*",
-		"@wordpress/is-shallow-equal": "*",
+		"@wordpress/components": "file:../components",
+		"@wordpress/compose": "file:../compose",
+		"@wordpress/deprecated": "file:../deprecated",
+		"@wordpress/element": "file:../element",
+		"@wordpress/hooks": "file:../hooks",
+		"@wordpress/icons": "file:../icons",
+		"@wordpress/is-shallow-equal": "file:../is-shallow-equal",
 		"memize": "^2.0.1"
 	},
 	"peerDependencies": {

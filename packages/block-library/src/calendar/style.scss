@@ -1,3 +1,5 @@
+@use "@wordpress/base-styles/colors" as *;
+
 .wp-block-calendar {
 	text-align: center;
 
@@ -19,22 +21,22 @@
 		width: 100%;
 		border-collapse: collapse;
 
-		&:where(:not(.has-text-color)) {
-			color: #40464d;
-
-			// Keep the hard-coded border color for backward compatibility.
-			th,
-			td {
-				border-color: $gray-300;
-			}
-		}
-
 		&.has-background th {
 			background-color: inherit;
 		}
 
 		&.has-text-color th {
 			color: inherit;
+		}
+	}
+
+	:where(table:not(.has-text-color)) {
+		color: #40464d;
+
+		// Keep the hard-coded border color for backward compatibility.
+		th,
+		td {
+			border-color: $gray-300;
 		}
 	}
 }

@@ -1,5 +1,13 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/mixins" as *;
+
 .editor-post-featured-image {
 	padding: 0;
+
+	.hidden {
+		display: none;
+	}
 
 	.components-spinner {
 		position: absolute;
@@ -16,9 +24,14 @@
 	&:hover,
 	&:focus,
 	&:focus-within {
-		.editor-post-featured-image__actions {
+		.editor-post-featured-image__actions:not(.editor-post-featured-image__actions-is-requesting-image) {
 			opacity: 1;
 		}
+	}
+
+	.editor-post-featured-image__actions.editor-post-featured-image__actions-missing-image {
+		opacity: 1;
+		margin-top: $grid-unit-20;
 	}
 
 	.components-drop-zone__content {
@@ -53,6 +66,7 @@
 .editor-post-featured-image__preview {
 	height: auto !important;
 	outline: $border-width solid rgba($black, 0.1);
+	@include checkerboard-background( 12px );
 
 	.editor-post-featured-image__preview-image {
 		object-fit: cover;
@@ -72,17 +86,24 @@
 }
 
 .editor-post-featured-image__actions {
-	@include reduce-motion("transition");
-	bottom: 0;
-	opacity: 0; // Use opacity instead of visibility so that the buttons remain in the tab order.
-	padding: $grid-unit-10;
-	position: absolute;
-	transition: opacity 50ms ease-out;
-}
+	&:not(.editor-post-featured-image__actions-missing-image) {
+		bottom: 0;
+		opacity: 0; // Use opacity instead of visibility so that the buttons remain in the tab order.
+		padding: $grid-unit-10;
+		position: absolute;
 
-.editor-post-featured-image__action {
-	backdrop-filter: blur(16px) saturate(180%);
-	background: rgba(255, 255, 255, 0.75);
-	flex-grow: 1;
-	justify-content: center;
+		@media not (prefers-reduced-motion) {
+			transition: opacity 50ms ease-out;
+		}
+
+		.editor-post-featured-image__action {
+			backdrop-filter: blur(16px) saturate(180%);
+			background: rgba(255, 255, 255, 0.75);
+		}
+	}
+
+	.editor-post-featured-image__action {
+		flex-grow: 1;
+		justify-content: center;
+	}
 }

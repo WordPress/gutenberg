@@ -12,7 +12,7 @@ The elements highlighted are:
 
 1. **Inserter:** A panel for inserting blocks into the content canvas
 2. **Content canvas:** The content editor, which holds content created with blocks
-3. **Settings Panel** A panel for configuring a block’s settings when selected or the settings of the post
+3. **Settings Panel:** A panel for configuring a block’s settings when selected or the settings of the post
 
 Through the Block Editor, you create content modularly using blocks. Many [blocks](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/) are available in WordPress by default, and you can also [create your own](https://developer.wordpress.org/block-editor/getting-started/create-block/).
 
@@ -48,7 +48,7 @@ This handbook should be considered the canonical resource for all things related
 
 ## Are you in the right place?
 
-The Block Editor Handbook is designed for those looking to create and develop for the Block Editor. However, it's important to note that there are multiple other handbooks available within the [Developer Resources](http://developer.wordpress.org/) that you may find beneficial:
+The Block Editor Handbook is designed for those looking to create and develop for the Block Editor. However, it's important to note that there are multiple other handbooks available within the [Developer Resources](https://developer.wordpress.org/) that you may find beneficial:
 
 - [Theme Handbook](https://developer.wordpress.org/themes)
 - [Plugin Handbook](https://developer.wordpress.org/plugins)

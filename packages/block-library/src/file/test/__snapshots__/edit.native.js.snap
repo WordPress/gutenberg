@@ -132,7 +132,7 @@ exports[`File block renders file error state without crashing 1`] = `
         <Svg
           height={24}
           style={{}}
-          viewBox="-2 -2 24 24"
+          viewBox="0 0 24 24"
           width={24}
           xmlns="http://www.w3.org/2000/svg"
         >

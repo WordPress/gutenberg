@@ -6,6 +6,7 @@ import {
 	isReusableBlock,
 	createBlock,
 	serialize,
+	getBlockType,
 } from '@wordpress/blocks';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { useState, useCallback } from '@wordpress/element';
@@ -38,11 +39,13 @@ export default function PatternConvertButton( {
 	closeBlockSettingsMenu,
 } ) {
 	const { createSuccessNotice } = useDispatch( noticesStore );
-	const { replaceBlocks } = useDispatch( blockEditorStore );
+	const { replaceBlocks, updateBlockAttributes } =
+		useDispatch( blockEditorStore );
 	// Ignore reason: false positive of the lint rule.
 	// eslint-disable-next-line @wordpress/no-unused-vars-before-return
 	const { setEditingPattern } = unlock( useDispatch( patternsStore ) );
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
+	const { getBlockAttributes } = useSelect( blockEditorStore );
 	const canConvert = useSelect(
 		( select ) => {
 			const { canUser } = select( coreStore );
@@ -60,7 +63,16 @@ export default function PatternConvertButton( {
 
 			const blocks = getBlocksByClientId( clientIds ) ?? [];
 
-			const isReusable =
+			// Check if the block has reusable support defined.
+			const hasReusableBlockSupport = ( blockName ) => {
+				const blockType = getBlockType( blockName );
+				const hasParent = blockType && 'parent' in blockType;
+
+				// If the block has a parent, check with false as default, otherwise with true.
+				return hasBlockSupport( blockName, 'reusable', ! hasParent );
+			};
+
+			const isSyncedPattern =
 				blocks.length === 1 &&
 				blocks[ 0 ] &&
 				isReusableBlock( blocks[ 0 ] ) &&
@@ -70,9 +82,15 @@ export default function PatternConvertButton( {
 					blocks[ 0 ].attributes.ref
 				);
 
+			const isUnsyncedPattern =
+				window?.__experimentalContentOnlyPatternInsertion &&
+				blocks.length === 1 &&
+				blocks?.[ 0 ]?.attributes?.metadata?.patternName;
+
 			const _canConvert =
-				// Hide when this is already a synced pattern.
-				! isReusable &&
+				// Hide when this is already a pattern.
+				! isUnsyncedPattern &&
+				! isSyncedPattern &&
 				// Hide when patterns are disabled.
 				canInsertBlockType( 'core/block', rootId ) &&
 				blocks.every(
@@ -82,7 +100,7 @@ export default function PatternConvertButton( {
 						// Hide on invalid blocks.
 						block.isValid &&
 						// Hide when block doesn't support being made into a pattern.
-						hasBlockSupport( block.name, 'reusable', true )
+						hasReusableBlockSupport( block.name )
 				) &&
 				// Hide when current doesn't have permission to do that.
 				// Blocks refers to the wp_block post type, this checks the ability to create a post of that type.
@@ -106,7 +124,20 @@ export default function PatternConvertButton( {
 	}
 
 	const handleSuccess = ( { pattern } ) => {
-		if ( pattern.wp_pattern_sync_status !== PATTERN_SYNC_TYPES.unsynced ) {
+		if ( pattern.wp_pattern_sync_status === PATTERN_SYNC_TYPES.unsynced ) {
+			if ( clientIds?.length === 1 ) {
+				const existingAttributes = getBlockAttributes( clientIds[ 0 ] );
+				updateBlockAttributes( clientIds[ 0 ], {
+					metadata: {
+						...( existingAttributes?.metadata
+							? existingAttributes.metadata
+							: {} ),
+						patternName: `core/block/${ pattern.id }`,
+						name: pattern.title.raw,
+					},
+				} );
+			}
+		} else {
 			const newBlock = createBlock( 'core/block', {
 				ref: pattern.id,
 			} );

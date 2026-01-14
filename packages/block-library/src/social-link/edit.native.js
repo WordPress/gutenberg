@@ -20,10 +20,12 @@ import { compose } from '@wordpress/compose';
 import { __, sprintf } from '@wordpress/i18n';
 import { link, Icon } from '@wordpress/icons';
 import { withSelect } from '@wordpress/data';
+import { store as blocksStore } from '@wordpress/blocks';
+
 /**
  * Internal dependencies
  */
-import { getIconBySite, getNameBySite } from './social-list';
+import { getSocialService } from './social-list';
 import styles from './editor.scss';
 
 const DEFAULT_ACTIVE_ICON_STYLES = {
@@ -54,6 +56,7 @@ const SocialLinkEdit = ( {
 	isSelected,
 	onFocus,
 	name,
+	activeVariation,
 } ) => {
 	const { url, service = name } = attributes;
 	const [ isLinkSheetVisible, setIsLinkSheetVisible ] = useState( false );
@@ -64,8 +67,7 @@ const SocialLinkEdit = ( {
 		DEFAULT_ACTIVE_ICON_STYLES;
 	const animatedValue = useRef( new Animated.Value( 0 ) ).current;
 
-	const IconComponent = getIconBySite( service )();
-	const socialLinkName = getNameBySite( service );
+	const { icon, label: socialLinkName } = getSocialService( activeVariation );
 
 	// When new social icon is added link sheet is opened automatically.
 	useEffect( () => {
@@ -190,7 +192,7 @@ const SocialLinkEdit = ( {
 				>
 					<Icon
 						animated
-						icon={ IconComponent }
+						icon={ icon() }
 						style={ { color: activeIcon.color } }
 					/>
 				</Animated.View>
@@ -202,12 +204,16 @@ const SocialLinkEdit = ( {
 export default compose( [
 	withSelect( ( select, { clientId } ) => {
 		const { getBlock } = select( blockEditorStore );
+		const { getActiveBlockVariation } = select( blocksStore );
 
 		const block = getBlock( clientId );
 		const name = block?.name.substring( 17 );
 
 		return {
 			name,
+			activeVariation: block
+				? getActiveBlockVariation( block.name, block.attributes )
+				: undefined,
 		};
 	} ),
 ] )( SocialLinkEdit );

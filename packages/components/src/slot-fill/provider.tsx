@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import type { Component } from '@wordpress/element';
 import { useState } from '@wordpress/element';
 
 /**
@@ -9,111 +8,102 @@ import { useState } from '@wordpress/element';
  */
 import SlotFillContext from './context';
 import type {
-	FillComponentProps,
+	FillInstance,
+	FillChildren,
+	BaseSlotInstance,
 	BaseSlotFillContext,
-	BaseSlotComponentProps,
 	SlotFillProviderProps,
 	SlotKey,
 } from './types';
+import { observableMap } from '@wordpress/compose';
 
 function createSlotRegistry(): BaseSlotFillContext {
-	const slots: Record< SlotKey, Component< BaseSlotComponentProps > > = {};
-	const fills: Record< SlotKey, FillComponentProps[] > = {};
-	let listeners: Array< () => void > = [];
+	const slots = observableMap< SlotKey, BaseSlotInstance >();
+	const fills = observableMap<
+		SlotKey,
+		{ instance: FillInstance; children: FillChildren }[]
+	>();
 
-	function registerSlot(
-		name: SlotKey,
-		slot: Component< BaseSlotComponentProps >
-	) {
-		const previousSlot = slots[ name ];
-		slots[ name ] = slot;
-		triggerListeners();
-
-		// Sometimes the fills are registered after the initial render of slot
-		// But before the registerSlot call, we need to rerender the slot.
-		forceUpdateSlot( name );
-
-		// If a new instance of a slot is being mounted while another with the
-		// same name exists, force its update _after_ the new slot has been
-		// assigned into the instance, such that its own rendering of children
-		// will be empty (the new Slot will subsume all fills for this name).
-		if ( previousSlot ) {
-			previousSlot.forceUpdate();
-		}
+	function registerSlot( name: SlotKey, instance: BaseSlotInstance ) {
+		slots.set( name, instance );
 	}
 
-	function registerFill( name: SlotKey, instance: FillComponentProps ) {
-		fills[ name ] = [ ...( fills[ name ] || [] ), instance ];
-		forceUpdateSlot( name );
-	}
-
-	function unregisterSlot(
-		name: SlotKey,
-		instance: Component< BaseSlotComponentProps >
-	) {
+	function unregisterSlot( name: SlotKey, instance: BaseSlotInstance ) {
 		// If a previous instance of a Slot by this name unmounts, do nothing,
 		// as the slot and its fills should only be removed for the current
 		// known instance.
-		if ( slots[ name ] !== instance ) {
+		if ( slots.get( name ) !== instance ) {
 			return;
 		}
 
-		delete slots[ name ];
-		triggerListeners();
+		slots.delete( name );
 	}
 
-	function unregisterFill( name: SlotKey, instance: FillComponentProps ) {
-		fills[ name ] =
-			fills[ name ]?.filter( ( fill ) => fill !== instance ) ?? [];
-		forceUpdateSlot( name );
-	}
-
-	function getSlot(
-		name: SlotKey
-	): Component< BaseSlotComponentProps > | undefined {
-		return slots[ name ];
-	}
-
-	function getFills(
+	function registerFill(
 		name: SlotKey,
-		slotInstance: Component< BaseSlotComponentProps >
-	): FillComponentProps[] {
-		// Fills should only be returned for the current instance of the slot
-		// in which they occupy.
-		if ( slots[ name ] !== slotInstance ) {
-			return [];
+		instance: FillInstance,
+		children: FillChildren
+	) {
+		fills.set( name, [
+			...( fills.get( name ) || [] ),
+			{ instance, children },
+		] );
+	}
+
+	function unregisterFill( name: SlotKey, instance: FillInstance ) {
+		const fillsForName = fills.get( name );
+		if ( ! fillsForName ) {
+			return;
 		}
-		return fills[ name ];
+
+		fills.set(
+			name,
+			fillsForName.filter( ( fill ) => fill.instance !== instance )
+		);
 	}
 
-	function forceUpdateSlot( name: SlotKey ) {
-		const slot = getSlot( name );
-
-		if ( slot ) {
-			slot.forceUpdate();
+	function updateFill(
+		name: SlotKey,
+		instance: FillInstance,
+		children: FillChildren
+	) {
+		const fillsForName = fills.get( name );
+		if ( ! fillsForName ) {
+			return;
 		}
-	}
 
-	function triggerListeners() {
-		listeners.forEach( ( listener ) => listener() );
-	}
+		const fillForInstance = fillsForName.find(
+			( f ) => f.instance === instance
+		);
+		if ( ! fillForInstance ) {
+			return;
+		}
 
-	function subscribe( listener: () => void ) {
-		listeners.push( listener );
+		if ( fillForInstance.children === children ) {
+			return;
+		}
 
-		return () => {
-			listeners = listeners.filter( ( l ) => l !== listener );
-		};
+		fills.set(
+			name,
+			fillsForName.map( ( f ) => {
+				if ( f.instance === instance ) {
+					// Replace with new record with updated `children`.
+					return { instance, children };
+				}
+
+				return f;
+			} )
+		);
 	}
 
 	return {
+		slots,
+		fills,
 		registerSlot,
 		unregisterSlot,
 		registerFill,
 		unregisterFill,
-		getSlot,
-		getFills,
-		subscribe,
+		updateFill,
 	};
 }
 

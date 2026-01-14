@@ -41,13 +41,31 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 			},
 		} );
 
-		expect( await editor.getBlocks() ).toMatchObject( [
-			{ name: 'core/image' },
-			{ name: 'core/paragraph' },
-		] );
+		await expect
+			.poll( editor.getBlocks )
+			.toMatchObject( [
+				{ name: 'core/image' },
+				{ name: 'core/paragraph' },
+			] );
 
 		await expect(
 			editor.canvas.locator( '[data-type="core/paragraph"]' )
+		).toBeFocused();
+
+		// Clear block selection.
+		await editor.canvas
+			.getByRole( 'textbox', { name: 'Add title' } )
+			.focus();
+		await body.click( {
+			position: {
+				x: box.width / 2,
+				y: box.height - 10,
+			},
+		} );
+
+		await expect(
+			editor.canvas.locator( '[data-type="core/paragraph"]' ),
+			'should select and focus the newly inserted paragraph block on second click'
 		).toBeFocused();
 	} );
 
@@ -269,7 +287,7 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 			.click();
 		await page.getByRole( 'menuitem', { name: 'Create pattern' } ).click();
 		const createPatternDialog = page.getByRole( 'dialog', {
-			name: 'add new pattern',
+			name: 'add pattern',
 		} );
 		await createPatternDialog
 			.getByRole( 'textbox', { name: 'Name' } )
@@ -512,7 +530,7 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 			.click();
 		await page
 			.getByRole( 'listbox', { name: 'Text' } )
-			.getByRole( 'option', { name: 'Heading' } )
+			.getByRole( 'option', { name: 'Heading', exact: true } )
 			.hover();
 
 		await expect( insertingBlocksUtils.indicator ).toBeVisible();
@@ -553,7 +571,7 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 		await page.getByRole( 'button', { name: 'Browse All' } ).click();
 		await page
 			.getByRole( 'listbox', { name: 'Text' } )
-			.getByRole( 'option', { name: 'Paragraph' } )
+			.getByRole( 'option', { name: 'Paragraph', exact: true } )
 			.click();
 		await editor.canvas
 			.getByRole( 'document', { name: 'Empty block' } )
@@ -655,7 +673,7 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 			.click();
 		await page
 			.getByRole( 'listbox', { name: 'Text' } )
-			.getByRole( 'option', { name: 'Paragraph' } )
+			.getByRole( 'option', { name: 'Paragraph', exact: true } )
 			.hover();
 
 		await expect(

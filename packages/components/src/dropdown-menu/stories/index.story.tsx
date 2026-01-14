@@ -1,14 +1,8 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryObj } from '@storybook/react';
-
-/**
- * Internal dependencies
- */
-import { DropdownMenu } from '..';
-import MenuItem from '../../menu-item';
-import MenuGroup from '../../menu-group';
+import type { Meta, StoryObj } from '@storybook/react-webpack5';
+import { fn } from 'storybook/test';
 
 /**
  * WordPress dependencies
@@ -22,13 +16,23 @@ import {
 	trash,
 } from '@wordpress/icons';
 
+/**
+ * Internal dependencies
+ */
+import { DropdownMenu } from '..';
+import MenuItem from '../../menu-item';
+import MenuGroup from '../../menu-group';
+
 const meta: Meta< typeof DropdownMenu > = {
-	title: 'Components/DropdownMenu',
+	title: 'Components/Actions/DropdownMenu',
 	component: DropdownMenu,
+	id: 'components-dropdownmenu',
 	parameters: {
-		actions: { argTypesRegex: '^on.*' },
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
+	},
+	args: {
+		onToggle: fn(),
 	},
 	argTypes: {
 		icon: {
@@ -36,9 +40,9 @@ const meta: Meta< typeof DropdownMenu > = {
 			mapping: { menu, chevronDown, more },
 			control: { type: 'select' },
 		},
-		open: { control: { type: null } },
-		defaultOpen: { control: { type: null } },
-		onToggle: { control: { type: null } },
+		open: { control: false },
+		defaultOpen: { control: false },
+		onToggle: { control: false },
 	},
 };
 export default meta;

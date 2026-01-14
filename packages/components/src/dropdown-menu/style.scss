@@ -1,3 +1,6 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
+
 .components-dropdown-menu__toggle {
 	vertical-align: top;
 }
@@ -15,6 +18,7 @@
 		outline: none;
 		cursor: pointer;
 		white-space: nowrap;
+		font-weight: $font-weight-regular;
 
 		&.has-separator {
 			margin-top: 6px;
@@ -53,7 +57,7 @@
 
 	.components-menu-item__button,
 	.components-menu-item__button.components-button {
-		min-height: $button-size;
+		min-height: $grid-unit-40;
 		height: auto;
 		text-align: left;
 		padding-left: $grid-unit-10;

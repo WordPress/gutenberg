@@ -52,7 +52,7 @@ function UnforwardedToggleGroupControlOptionIcon(
  *
  * function Example() {
  *  return (
- *    <ToggleGroupControl __nextHasNoMarginBottom>
+ *    <ToggleGroupControl __next40pxDefaultSize>
  *      <ToggleGroupControlOptionIcon
  *        value="uppercase"
  *        label="Uppercase"

@@ -25,7 +25,7 @@ Check out the [Keeping up with Gutenberg Index](https://make.wordpress.org/core/
 
 ## Getting Started
 
-Get hands on: check out the [block editor live demo](https://wordpress.org/gutenberg/) to play with a test instance of the editor.
+Get hands-on: check out the [block editor live demo](https://wordpress.org/gutenberg/) to play with a test instance of the editor.
 
 ### Using Gutenberg
 

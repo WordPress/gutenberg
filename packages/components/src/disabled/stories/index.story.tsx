@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryFn } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react-webpack5';
 
 /**
  * WordPress dependencies
@@ -22,8 +22,8 @@ const meta: Meta< typeof Disabled > = {
 	id: 'components-disabled',
 	component: Disabled,
 	argTypes: {
-		as: { control: { type: null } },
-		children: { control: { type: null } },
+		as: { control: false },
+		children: { control: false },
 	},
 	parameters: {
 		controls: {
@@ -41,19 +41,18 @@ const Form = () => {
 	return (
 		<VStack>
 			<TextControl
-				__nextHasNoMarginBottom
+				__next40pxDefaultSize
 				label="Text Control"
 				value={ textControlValue }
 				onChange={ setTextControlValue }
 			/>
 			<TextareaControl
-				__nextHasNoMarginBottom
 				label="TextArea Control"
 				value={ textAreaValue }
 				onChange={ setTextAreaValue }
 			/>
 			<SelectControl
-				__nextHasNoMarginBottom
+				__next40pxDefaultSize
 				label="Select Control"
 				onChange={ () => {} }
 				options={ [
@@ -81,7 +80,7 @@ Default.args = {
 export const ContentEditable: StoryFn< typeof Disabled > = ( args ) => {
 	return (
 		<Disabled { ...args }>
-			<div contentEditable tabIndex={ 0 }>
+			<div contentEditable tabIndex={ 0 } suppressContentEditableWarning>
 				contentEditable
 			</div>
 		</Disabled>

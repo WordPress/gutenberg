@@ -11,7 +11,6 @@ import InnerSelectControl from '../select-control';
 import InnerRangeControl from '../range-control';
 import { space } from '../utils/space';
 import { boxSizingReset } from '../utils';
-import Button from '../button';
 import { Flex } from '../flex';
 import { HStack } from '../h-stack';
 import CONFIG from '../utils/config-values';
@@ -22,7 +21,6 @@ export const NumberControlWrapper = styled( NumberControl )`
 
 export const SelectControl = styled( InnerSelectControl )`
 	margin-left: ${ space( -2 ) };
-	width: 5em;
 `;
 
 export const RangeControl = styled( InnerRangeControl )`
@@ -93,6 +91,16 @@ export const ColorfulWrapper = styled.div`
 
 		// Shown instead of box-shadow to Windows high contrast mode.
 		outline: 2px solid transparent;
+
+		@media not ( prefers-reduced-motion ) {
+			transition: transform ${ CONFIG.transitionDurationFast } ease-in-out;
+		}
+	}
+
+	.react-colorful__interactive:focus .react-colorful__pointer {
+		box-shadow: 0 0 0 ${ CONFIG.borderWidthFocus } ${ CONFIG.surfaceColor };
+		border: ${ CONFIG.borderWidthFocus } solid black;
+		transform: translate( -50%, -50% ) scale( 1.5 );
 	}
 
 	.react-colorful__pointer-fill {
@@ -100,15 +108,4 @@ export const ColorfulWrapper = styled.div`
 	}
 
 	${ interactiveHueStyles }
-`;
-
-export const CopyButton = styled( Button )`
-	&&&&& {
-		min-width: ${ space( 6 ) };
-		padding: 0;
-
-		> svg {
-			margin-right: 0;
-		}
-	}
 `;

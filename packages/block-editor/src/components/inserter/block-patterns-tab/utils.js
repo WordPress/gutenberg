@@ -27,7 +27,7 @@ export const myPatternsCategory = {
 
 export const starterPatternsCategory = {
 	name: 'core/starter-content',
-	label: __( 'Starter Content' ),
+	label: __( 'Starter content' ),
 };
 
 export function isPatternFiltered( pattern, sourceFilter, syncFilter ) {

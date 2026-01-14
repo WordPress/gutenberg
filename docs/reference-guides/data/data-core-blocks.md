@@ -172,7 +172,7 @@ _Parameters_
 
 _Returns_
 
--   `Object?`: Block Type.
+-   `?Object`: Block Type.
 
 ### getBlockTypes
 
@@ -385,7 +385,7 @@ _Parameters_
 
 _Returns_
 
--   `string?`: Default block name.
+-   `?string`: Default block name.
 
 ### getDefaultBlockVariation
 
@@ -464,7 +464,7 @@ _Parameters_
 
 _Returns_
 
--   `string?`: Name of the block for handling non-block content.
+-   `?string`: Name of the block for handling non-block content.
 
 ### getGroupingBlockName
 
@@ -502,7 +502,7 @@ _Parameters_
 
 _Returns_
 
--   `string?`: Name of the block for handling the grouping of blocks.
+-   `?string`: Name of the block for handling the grouping of blocks.
 
 ### getUnregisteredFallbackBlockName
 
@@ -540,7 +540,7 @@ _Parameters_
 
 _Returns_
 
--   `string?`: Name of the block for handling unregistered blocks.
+-   `?string`: Name of the block for handling unregistered blocks.
 
 ### hasBlockSupport
 

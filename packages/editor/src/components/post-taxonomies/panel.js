@@ -11,6 +11,15 @@ import { store as editorStore } from '../../store';
 import PostTaxonomiesForm from './index';
 import PostTaxonomiesCheck from './check';
 
+/**
+ * Renders a panel for a specific taxonomy.
+ *
+ * @param {Object}          props          The component props.
+ * @param {Object}          props.taxonomy The taxonomy object.
+ * @param {React.ReactNode} props.children The child components.
+ *
+ * @return {React.ReactNode} The rendered taxonomy panel.
+ */
 function TaxonomyPanel( { taxonomy, children } ) {
 	const slug = taxonomy?.slug;
 	const panelName = slug ? `taxonomy-panel-${ slug }` : '';
@@ -47,7 +56,12 @@ function TaxonomyPanel( { taxonomy, children } ) {
 	);
 }
 
-function PostTaxonomies() {
+/**
+ * Component that renders the post taxonomies panel.
+ *
+ * @return {React.ReactNode} The rendered component.
+ */
+export default function PostTaxonomies() {
 	return (
 		<PostTaxonomiesCheck>
 			<PostTaxonomiesForm
@@ -62,14 +76,3 @@ function PostTaxonomies() {
 		</PostTaxonomiesCheck>
 	);
 }
-
-/**
- * Renders a panel for a specific taxonomy.
- *
- * @param {Object}  props          The component props.
- * @param {Object}  props.taxonomy The taxonomy object.
- * @param {Element} props.children The child components.
- *
- * @return {Component} The rendered taxonomy panel.
- */
-export default PostTaxonomies;

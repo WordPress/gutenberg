@@ -20,6 +20,8 @@ function ZoomOutModeInserters() {
 		setInserterIsOpened,
 		sectionRootClientId,
 		selectedBlockClientId,
+		blockInsertionPoint,
+		insertionPointVisible,
 	} = useSelect( ( select ) => {
 		const {
 			getSettings,
@@ -27,6 +29,8 @@ function ZoomOutModeInserters() {
 			getSelectionStart,
 			getSelectedBlockClientId,
 			getSectionRootClientId,
+			getBlockInsertionPoint,
+			isBlockInsertionPointVisible,
 		} = unlock( select( blockEditorStore ) );
 
 		const root = getSectionRootClientId();
@@ -38,6 +42,8 @@ function ZoomOutModeInserters() {
 			setInserterIsOpened:
 				getSettings().__experimentalSetIsInserterOpened,
 			selectedBlockClientId: getSelectedBlockClientId(),
+			blockInsertionPoint: getBlockInsertionPoint(),
+			insertionPointVisible: isBlockInsertionPointVisible(),
 		};
 	}, [] );
 
@@ -62,7 +68,19 @@ function ZoomOutModeInserters() {
 	const index = blockOrder.findIndex(
 		( clientId ) => selectedBlockClientId === clientId
 	);
-	const nextClientId = blockOrder[ index + 1 ];
+
+	const insertionIndex = index + 1;
+
+	const nextClientId = blockOrder[ insertionIndex ];
+
+	// If the block insertion point is visible, and the insertion
+	// Indices match then we don't need to render the inserter.
+	if (
+		insertionPointVisible &&
+		blockInsertionPoint?.index === insertionIndex
+	) {
+		return null;
+	}
 
 	return (
 		<BlockPopoverInbetween
@@ -73,11 +91,11 @@ function ZoomOutModeInserters() {
 				onClick={ () => {
 					setInserterIsOpened( {
 						rootClientId: sectionRootClientId,
-						insertionIndex: index + 1,
+						insertionIndex,
 						tab: 'patterns',
 						category: 'all',
 					} );
-					showInsertionPoint( sectionRootClientId, index + 1, {
+					showInsertionPoint( sectionRootClientId, insertionIndex, {
 						operation: 'insert',
 					} );
 				} }

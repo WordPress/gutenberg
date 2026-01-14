@@ -4,36 +4,44 @@
 import { useEntityRecords } from '@wordpress/core-data';
 import { useMemo } from '@wordpress/element';
 import { __experimentalItemGroup as ItemGroup } from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
+import { privateApis as routerPrivateApis } from '@wordpress/router';
+import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
  */
-import DataViewItem from '../sidebar-dataviews/dataview-item';
+import SidebarNavigationItem from '../sidebar-navigation-item';
 import { useAddedBy } from '../page-templates/hooks';
-import { layout } from '@wordpress/icons';
-import { TEMPLATE_POST_TYPE } from '../../utils/constants';
+import { commentAuthorAvatar, published } from '@wordpress/icons';
+import { unlock } from '../../lock-unlock';
+
+const { useLocation } = unlock( routerPrivateApis );
 
 const EMPTY_ARRAY = [];
 
 function TemplateDataviewItem( { template, isActive } ) {
 	const { text, icon } = useAddedBy( template.type, template.id );
+
 	return (
-		<DataViewItem
-			key={ text }
-			slug={ text }
-			title={ text }
+		<SidebarNavigationItem
+			to={ addQueryArgs( '/template', { activeView: text } ) }
 			icon={ icon }
-			isActive={ isActive }
-			isCustom={ false }
-		/>
+			aria-current={ isActive }
+		>
+			{ text }
+		</SidebarNavigationItem>
 	);
 }
 
-export default function DataviewsTemplatesSidebarContent( {
-	activeView,
-	title,
-} ) {
-	const { records } = useEntityRecords( 'postType', TEMPLATE_POST_TYPE, {
+export default function DataviewsTemplatesSidebarContent() {
+	const {
+		query: { activeView = 'active' },
+	} = useLocation();
+	const { records } = useEntityRecords( 'root', 'registeredTemplate', {
+		// This should not be needed, the endpoint returns all registered
+		// templates, but it's not possible right now to turn off pagination for
+		// entity configs.
 		per_page: -1,
 	} );
 	const firstItemPerAuthorText = useMemo( () => {
@@ -51,14 +59,27 @@ export default function DataviewsTemplatesSidebarContent( {
 	}, [ records ] );
 
 	return (
-		<ItemGroup>
-			<DataViewItem
-				slug="all"
-				title={ title }
-				icon={ layout }
-				isActive={ activeView === 'all' }
-				isCustom={ false }
-			/>
+		<ItemGroup className="edit-site-sidebar-navigation-screen-templates-browse">
+			<SidebarNavigationItem
+				to="/template"
+				icon={ published }
+				aria-current={ activeView === 'active' }
+			>
+				{ __( 'Active templates' ) }
+			</SidebarNavigationItem>
+			<SidebarNavigationItem
+				to={ addQueryArgs( '/template', { activeView: 'user' } ) }
+				icon={ commentAuthorAvatar }
+				aria-current={ activeView === 'user' }
+			>
+				{
+					// Let's avoid calling them "custom templates" to avoid
+					// confusion. "Created" is closest to meaning database
+					// templates, created by users.
+					// https://developer.wordpress.org/themes/classic-themes/templates/page-template-files/#creating-custom-page-templates-for-global-use
+					__( 'Created templates' )
+				}
+			</SidebarNavigationItem>
 			{ firstItemPerAuthorText.map( ( template ) => {
 				return (
 					<TemplateDataviewItem

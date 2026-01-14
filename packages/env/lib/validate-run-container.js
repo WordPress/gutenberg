@@ -10,6 +10,7 @@ const RUN_CONTAINERS = [
 	'tests-wordpress',
 	'cli',
 	'tests-cli',
+	'phpmyadmin',
 ];
 
 /**

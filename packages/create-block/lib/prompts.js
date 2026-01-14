@@ -11,7 +11,6 @@ const upperFirst = ( [ firstLetter, ...rest ] ) =>
 // Block metadata.
 const slug = {
 	type: 'input',
-	name: 'slug',
 	message:
 		'The block slug used for identification (also the output folder name):',
 	validate( input ) {
@@ -25,7 +24,6 @@ const slug = {
 
 const namespace = {
 	type: 'input',
-	name: 'namespace',
 	message:
 		'The internal namespace for the block name (something unique for your products):',
 	validate( input ) {
@@ -39,25 +37,22 @@ const namespace = {
 
 const title = {
 	type: 'input',
-	name: 'title',
 	message: 'The display title for your block:',
-	filter( input ) {
+	transformer( input ) {
 		return input && upperFirst( input );
 	},
 };
 
 const description = {
 	type: 'input',
-	name: 'description',
 	message: 'The short description for your block (optional):',
-	filter( input ) {
+	transformer( input ) {
 		return input && upperFirst( input );
 	},
 };
 
 const dashicon = {
 	type: 'input',
-	name: 'dashicon',
 	message:
 		'The dashicon to make it easier to identify your block (optional):',
 	validate( input ) {
@@ -67,29 +62,41 @@ const dashicon = {
 
 		return true;
 	},
-	filter( input ) {
+	transformer( input ) {
 		return input && input.replace( /dashicon(s)?-/, '' );
 	},
 };
 
 const category = {
-	type: 'list',
-	name: 'category',
+	type: 'select',
 	message: 'The category name to help users browse and discover your block:',
-	choices: [ 'text', 'media', 'design', 'widgets', 'theme', 'embed' ],
+	choices: [ 'text', 'media', 'design', 'widgets', 'theme', 'embed' ].map(
+		( value ) => ( { value } )
+	),
+};
+
+const textdomain = {
+	type: 'input',
+	message:
+		'The text domain used to make strings translatable in the block (optional):',
+	validate( input ) {
+		if ( input.length && ! /^[a-z][a-z0-9\-]*$/.test( input ) ) {
+			return 'Invalid text domain specified. Text domain can contain only lowercase alphanumeric characters or dashes, and start with a letter.';
+		}
+
+		return true;
+	},
 };
 
 // Plugin header fields.
 const pluginURI = {
 	type: 'input',
-	name: 'pluginURI',
 	message:
 		'The home page of the plugin (optional). Unique URL outside of WordPress.org:',
 };
 
 const version = {
 	type: 'input',
-	name: 'version',
 	message: 'The current version number of the plugin:',
 	validate( input ) {
 		// Regular expression was copied from https://semver.org.
@@ -105,32 +112,27 @@ const version = {
 
 const author = {
 	type: 'input',
-	name: 'author',
 	message:
 		'The name of the plugin author (optional). Multiple authors may be listed using commas:',
 };
 
 const license = {
 	type: 'input',
-	name: 'license',
 	message: 'The short name of the plugin’s license (optional):',
 };
 
 const licenseURI = {
 	type: 'input',
-	name: 'licenseURI',
 	message: 'A link to the full text of the license (optional):',
 };
 
 const domainPath = {
 	type: 'input',
-	name: 'domainPath',
 	message: 'A custom domain path for the translations (optional):',
 };
 
 const updateURI = {
 	type: 'input',
-	name: 'updateURI',
 	message: 'A custom update URI for the plugin (optional):',
 };
 
@@ -141,6 +143,7 @@ module.exports = {
 	description,
 	dashicon,
 	category,
+	textdomain,
 	pluginURI,
 	version,
 	author,

@@ -3,9 +3,9 @@
  */
 import { useSelect } from '@wordpress/data';
 import {
+	cloneBlock,
 	createBlock,
 	createBlocksFromInnerBlocksTemplate,
-	parse,
 	store as blocksStore,
 } from '@wordpress/blocks';
 import { useMemo } from '@wordpress/element';
@@ -23,12 +23,10 @@ import { orderInserterBlockItems } from '../utils/order-inserter-block-items';
 const noop = () => {};
 const SHOWN_BLOCK_TYPES = 9;
 
-/** @typedef {import('@wordpress/components').WPCompleter} WPCompleter */
-
 /**
  * Creates a blocks repeater for replacing the current block with a selected block type.
  *
- * @return {WPCompleter} A blocks completer.
+ * @return {Object} A blocks completer.
  */
 function createBlockCompleter() {
 	return {
@@ -127,21 +125,16 @@ function createBlockCompleter() {
 			return ! ( /\S/.test( before ) || /\S/.test( after ) );
 		},
 		getOptionCompletion( inserterItem ) {
-			const {
-				name,
-				initialAttributes,
-				innerBlocks,
-				syncStatus,
-				content,
-			} = inserterItem;
+			const { name, initialAttributes, innerBlocks, syncStatus, blocks } =
+				inserterItem;
 
 			return {
 				action: 'replace',
 				value:
 					syncStatus === 'unsynced'
-						? parse( content, {
-								__unstableSkipMigrationLogs: true,
-						  } )
+						? ( blocks ?? [] ).map( ( block ) =>
+								cloneBlock( block )
+						  )
 						: createBlock(
 								name,
 								initialAttributes,
@@ -157,6 +150,6 @@ function createBlockCompleter() {
 /**
  * Creates a blocks repeater for replacing the current block with a selected block type.
  *
- * @return {WPCompleter} A blocks completer.
+ * @return {Object} A blocks completer.
  */
 export default createBlockCompleter();

@@ -175,7 +175,7 @@ store( 'myFruitPlugin', {
 
 The derived state, regardless of whether it derives from the global state, local context, or both, can also be processed on the server by the Server Directive Processing.
 
-_Please, visit the [Understanding global state, local context and derived state](./undestanding-global-state-local-context-and-derived-state.md) guide to learn more about how derived state works in the Interactivity API._
+_Please, visit the [Understanding global state, local context and derived state](/docs/reference-guides/interactivity-api/core-concepts/undestanding-global-state-local-context-and-derived-state.md) guide to learn more about how derived state works in the Interactivity API._
 
 ### Derived state that can be defined statically
 

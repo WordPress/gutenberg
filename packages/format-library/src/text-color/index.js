@@ -75,7 +75,7 @@ function TextColorEdit( {
 		[ contentRef, value, colors ]
 	);
 
-	const hasColorsToChoose = colors.length || ! allowCustomControl;
+	const hasColorsToChoose = !! colors.length || allowCustomControl;
 	if ( ! hasColorsToChoose && ! isActive ) {
 		return null;
 	}

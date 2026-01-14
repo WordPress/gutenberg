@@ -15,3 +15,4 @@ export const RadioGroupContext = createContext< {
 	store: undefined,
 	disabled: undefined,
 } );
+RadioGroupContext.displayName = 'RadioGroupContext';

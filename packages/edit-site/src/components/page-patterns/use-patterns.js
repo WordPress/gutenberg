@@ -4,7 +4,6 @@
 import { parse } from '@wordpress/blocks';
 import { useSelect, createSelector } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-import { store as editorStore } from '@wordpress/editor';
 import { useMemo } from '@wordpress/element';
 
 /**
@@ -26,10 +25,12 @@ const EMPTY_PATTERN_LIST = [];
 
 const selectTemplateParts = createSelector(
 	( select, categoryId, search = '' ) => {
-		const { getEntityRecords, isResolving: isResolvingSelector } =
-			select( coreStore );
-		const { __experimentalGetDefaultTemplatePartAreas } =
-			select( editorStore );
+		const {
+			getEntityRecords,
+			getCurrentTheme,
+			isResolving: isResolvingSelector,
+		} = select( coreStore );
+
 		const query = { per_page: -1 };
 		const templateParts =
 			getEntityRecords( 'postType', TEMPLATE_PART_POST_TYPE, query ) ??
@@ -38,7 +39,8 @@ const selectTemplateParts = createSelector(
 		// In the case where a custom template part area has been removed we need
 		// the current list of areas to cross check against so orphaned template
 		// parts can be treated as uncategorized.
-		const knownAreas = __experimentalGetDefaultTemplatePartAreas() || [];
+		const knownAreas = getCurrentTheme()?.default_template_part_areas || [];
+
 		const templatePartAreas = knownAreas.map( ( area ) => area.area );
 
 		const templatePartHasCategory = ( item, category ) => {
@@ -78,7 +80,7 @@ const selectTemplateParts = createSelector(
 			TEMPLATE_PART_POST_TYPE,
 			{ per_page: -1 },
 		] ),
-		select( editorStore ).__experimentalGetDefaultTemplatePartAreas(),
+		select( coreStore ).getCurrentTheme()?.default_template_part_areas,
 	]
 );
 
@@ -156,7 +158,7 @@ const selectPatterns = createSelector(
 				categoryId,
 				hasCategory: ( item, currentCategory ) => {
 					if ( item.type === PATTERN_TYPES.user ) {
-						return item.wp_pattern_category.some(
+						return item.wp_pattern_category?.some(
 							( catId ) =>
 								userPatternCategories.find(
 									( cat ) => cat.id === catId
@@ -173,7 +175,7 @@ const selectPatterns = createSelector(
 						return (
 							userPatternCategories?.length &&
 							( ! item.wp_pattern_category?.length ||
-								! item.wp_pattern_category.some( ( catId ) =>
+								! item.wp_pattern_category?.some( ( catId ) =>
 									userPatternCategories.find(
 										( cat ) => cat.id === catId
 									)

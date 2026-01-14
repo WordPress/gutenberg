@@ -13,7 +13,11 @@ import { useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import UncontrolledCustomSelectControl from '..';
+import _CustomSelectControl from '..';
+
+const UncontrolledCustomSelectControl = (
+	props: React.ComponentProps< typeof _CustomSelectControl >
+) => <_CustomSelectControl __next40pxDefaultSize { ...props } />;
 
 const customClassName = 'amber-skies';
 const customStyles = {
@@ -716,7 +720,7 @@ describe( 'Type checking', () => {
 
 		const onChange = (): void => {};
 
-		<UncontrolledCustomSelectControl
+		<_CustomSelectControl
 			label="Label"
 			options={ options }
 			value={ {
@@ -726,7 +730,7 @@ describe( 'Type checking', () => {
 			onChange={ onChange }
 		/>;
 
-		<UncontrolledCustomSelectControl
+		<_CustomSelectControl
 			label="Label"
 			options={ options }
 			value={ {
@@ -736,7 +740,7 @@ describe( 'Type checking', () => {
 			onChange={ onChange }
 		/>;
 
-		<UncontrolledCustomSelectControl
+		<_CustomSelectControl
 			label="Label"
 			options={ options }
 			value={ {
@@ -748,7 +752,7 @@ describe( 'Type checking', () => {
 			onChange={ onChange }
 		/>;
 
-		<UncontrolledCustomSelectControl
+		<_CustomSelectControl
 			label="Label"
 			options={ options }
 			value={ {
@@ -764,7 +768,7 @@ describe( 'Type checking', () => {
 			}
 		/>;
 
-		<UncontrolledCustomSelectControl
+		<_CustomSelectControl
 			label="Label"
 			options={ optionsReadOnly }
 			value={ {
@@ -774,7 +778,7 @@ describe( 'Type checking', () => {
 			onChange={ onChange }
 		/>;
 
-		<UncontrolledCustomSelectControl
+		<_CustomSelectControl
 			label="Label"
 			options={ optionsReadOnly }
 			value={ {
@@ -785,7 +789,7 @@ describe( 'Type checking', () => {
 			onChange={ onChange }
 		/>;
 
-		<UncontrolledCustomSelectControl
+		<_CustomSelectControl
 			label="Label"
 			options={ optionsReadOnly }
 			value={ {
@@ -797,7 +801,7 @@ describe( 'Type checking', () => {
 			onChange={ onChange }
 		/>;
 
-		<UncontrolledCustomSelectControl
+		<_CustomSelectControl
 			label="Label"
 			options={ optionsReadOnly }
 			value={ {

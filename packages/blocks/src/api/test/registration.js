@@ -1,5 +1,3 @@
-/* eslint-disable react/forbid-elements */
-
 /**
  * WordPress dependencies
  */
@@ -141,6 +139,7 @@ describe( 'blocks', () => {
 			);
 			expect( console ).not.toHaveWarned();
 			expect( block ).toEqual( {
+				apiVersion: 1,
 				name: 'my-plugin/fancy-block-4',
 				icon: { src: BLOCK_ICON_DEFAULT },
 				attributes: {},
@@ -287,6 +286,7 @@ describe( 'blocks', () => {
 			} );
 
 			expect( getBlockType( 'core/test-block-with-defaults' ) ).toEqual( {
+				apiVersion: 1,
 				name: 'core/test-block-with-defaults',
 				title: 'block title',
 				category: 'text',
@@ -304,6 +304,46 @@ describe( 'blocks', () => {
 			} );
 		} );
 
+		it( 'should default to empty object when attributes is omitted and without warning', () => {
+			registerBlockType( 'core/test-block-omitted-attributes', {
+				title: 'block title',
+				category: 'text',
+				save: noop,
+			} );
+
+			// Verify no warning was shown (unlike when explicitly set to null/undefined)
+			expect( console ).not.toHaveWarned();
+
+			const blockType = getBlockType(
+				'core/test-block-omitted-attributes'
+			);
+			expect( blockType.attributes ).toEqual( {} );
+		} );
+
+		it.each( [
+			[ 'undefined', undefined ],
+			[ 'null', null ],
+		] )(
+			'should warn and default to empty object when attributes is %s',
+			( _label, value ) => {
+				registerBlockType( 'core/test-block-null-attributes', {
+					title: 'block title',
+					category: 'text',
+					save: noop,
+					attributes: value,
+				} );
+
+				expect( console ).toHaveWarnedWith(
+					'The block "core/test-block-null-attributes" is registering attributes as `null` or `undefined`. Use an empty object (`attributes: {}`) or exclude the `attributes` key.'
+				);
+
+				const blockType = getBlockType(
+					'core/test-block-null-attributes'
+				);
+				expect( blockType.attributes ).toEqual( {} );
+			}
+		);
+
 		it( 'should default to browser-initialized global attributes', () => {
 			const attributes = { ok: { type: 'boolean' } };
 			unstable__bootstrapServerSideBlockDefinitions( {
@@ -319,6 +359,7 @@ describe( 'blocks', () => {
 			registerBlockType( 'core/test-block-with-attributes', blockType );
 			expect( getBlockType( 'core/test-block-with-attributes' ) ).toEqual(
 				{
+					apiVersion: 1,
 					name: 'core/test-block-with-attributes',
 					settingName: 'settingValue',
 					save: noop,
@@ -359,6 +400,7 @@ describe( 'blocks', () => {
 			};
 			registerBlockType( blockName, blockType );
 			expect( getBlockType( blockName ) ).toEqual( {
+				apiVersion: 1,
 				name: blockName,
 				save: expect.any( Function ),
 				title: 'block title',
@@ -436,6 +478,7 @@ describe( 'blocks', () => {
 			};
 			registerBlockType( blockName, blockType );
 			expect( getBlockType( blockName ) ).toEqual( {
+				apiVersion: 1,
 				name: blockName,
 				save: expect.any( Function ),
 				title: 'block settings merge',
@@ -458,48 +501,6 @@ describe( 'blocks', () => {
 					{ name: 'bar', label: 'Bar' },
 				],
 				blockHooks: {},
-			} );
-		} );
-
-		// This test can be removed once the polyfill for blockHooks gets removed.
-		it( 'should polyfill blockHooks using metadata on the client when not set on the server', () => {
-			const blockName = 'tests/hooked-block';
-			unstable__bootstrapServerSideBlockDefinitions( {
-				[ blockName ]: {
-					category: 'widgets',
-				},
-			} );
-
-			const blockType = {
-				title: 'block title',
-			};
-			registerBlockType(
-				{
-					name: blockName,
-					blockHooks: {
-						'tests/block': 'firstChild',
-					},
-					category: 'ignored',
-				},
-				blockType
-			);
-			expect( getBlockType( blockName ) ).toEqual( {
-				name: blockName,
-				save: expect.any( Function ),
-				title: 'block title',
-				category: 'widgets',
-				icon: { src: BLOCK_ICON_DEFAULT },
-				attributes: {},
-				providesContext: {},
-				usesContext: [],
-				keywords: [],
-				selectors: {},
-				supports: {},
-				styles: [],
-				variations: [],
-				blockHooks: {
-					'tests/block': 'firstChild',
-				},
 			} );
 		} );
 
@@ -543,6 +544,7 @@ describe( 'blocks', () => {
 			expect(
 				getBlockType( 'core/test-block-icon-normalize-element' )
 			).toEqual( {
+				apiVersion: 1,
 				name: 'core/test-block-icon-normalize-element',
 				save: noop,
 				category: 'text',
@@ -587,6 +589,7 @@ describe( 'blocks', () => {
 			expect(
 				getBlockType( 'core/test-block-icon-normalize-string' )
 			).toEqual( {
+				apiVersion: 1,
 				name: 'core/test-block-icon-normalize-string',
 				save: noop,
 				category: 'text',
@@ -634,6 +637,7 @@ describe( 'blocks', () => {
 			expect(
 				getBlockType( 'core/test-block-icon-normalize-function' )
 			).toEqual( {
+				apiVersion: 1,
 				name: 'core/test-block-icon-normalize-function',
 				save: noop,
 				category: 'text',
@@ -681,6 +685,7 @@ describe( 'blocks', () => {
 			expect(
 				getBlockType( 'core/test-block-icon-normalize-background' )
 			).toEqual( {
+				apiVersion: 1,
 				name: 'core/test-block-icon-normalize-background',
 				save: noop,
 				category: 'text',
@@ -724,6 +729,7 @@ describe( 'blocks', () => {
 			registerBlockType( 'core/test-block-with-settings', blockType );
 			blockType.mutated = true;
 			expect( getBlockType( 'core/test-block-with-settings' ) ).toEqual( {
+				apiVersion: 1,
 				name: 'core/test-block-with-settings',
 				settingName: 'settingValue',
 				save: noop,
@@ -757,6 +763,7 @@ describe( 'blocks', () => {
 				'Parent must be undefined or an array of strings (block types), but it is a string.'
 			);
 			expect( block ).toEqual( {
+				apiVersion: 1,
 				name: 'core/test-block-parent-string',
 				save: noop,
 				category: 'text',
@@ -1013,6 +1020,7 @@ describe( 'blocks', () => {
 				}
 			);
 			expect( block ).toEqual( {
+				apiVersion: 1,
 				name: 'test/block-from-metadata',
 				title: 'Block from metadata',
 				category: 'text',
@@ -1081,6 +1089,7 @@ describe( 'blocks', () => {
 			);
 
 			expect( block ).toEqual( {
+				apiVersion: 1,
 				name: 'test/block-from-metadata-i18n',
 				title: 'I18n title from metadata (translated)',
 				description: 'I18n description from metadata (translated)',
@@ -1149,6 +1158,7 @@ describe( 'blocks', () => {
 			registerBlockType( 'core/test-block', defaultBlockSettings );
 			expect( getBlockTypes() ).toEqual( [
 				{
+					apiVersion: 1,
 					name: 'core/test-block',
 					save: noop,
 					category: 'text',
@@ -1168,6 +1178,7 @@ describe( 'blocks', () => {
 			const oldBlock = unregisterBlockType( 'core/test-block' );
 			expect( console ).not.toHaveWarned();
 			expect( oldBlock ).toEqual( {
+				apiVersion: 1,
 				name: 'core/test-block',
 				save: noop,
 				category: 'text',
@@ -1249,6 +1260,7 @@ describe( 'blocks', () => {
 		it( 'should return { name, save } for blocks with minimum settings', () => {
 			registerBlockType( 'core/test-block', defaultBlockSettings );
 			expect( getBlockType( 'core/test-block' ) ).toEqual( {
+				apiVersion: 1,
 				name: 'core/test-block',
 				save: noop,
 				category: 'text',
@@ -1275,6 +1287,7 @@ describe( 'blocks', () => {
 			};
 			registerBlockType( 'core/test-block-with-settings', blockType );
 			expect( getBlockType( 'core/test-block-with-settings' ) ).toEqual( {
+				apiVersion: 1,
 				name: 'core/test-block-with-settings',
 				settingName: 'settingValue',
 				save: noop,
@@ -1310,6 +1323,7 @@ describe( 'blocks', () => {
 			registerBlockType( 'core/test-block-with-settings', blockType );
 			expect( getBlockTypes() ).toEqual( [
 				{
+					apiVersion: 1,
 					name: 'core/test-block',
 					save: noop,
 					category: 'text',
@@ -1326,6 +1340,7 @@ describe( 'blocks', () => {
 					blockHooks: {},
 				},
 				{
+					apiVersion: 1,
 					name: 'core/test-block-with-settings',
 					settingName: 'settingValue',
 					save: noop,
@@ -1568,7 +1583,7 @@ describe( 'blocks', () => {
 				label: 'Client label',
 			} );
 			expect( console ).toHaveWarnedWith(
-				'Block bindings "core/testing" source label was overriden.'
+				'Block bindings "core/testing" source label was overridden.'
 			);
 			const source = getBlockBindingsSource( 'core/testing' );
 			unregisterBlockBindingsSource( 'core/testing' );
@@ -1718,9 +1733,6 @@ describe( 'blocks', () => {
 				getValues: () => 'value',
 				setValues: () => 'new values',
 				canUserEditValue: () => true,
-				getFieldsList: () => {
-					return { field: 'value' };
-				},
 			};
 			registerBlockBindingsSource( {
 				name: 'core/valid-source',
@@ -1781,5 +1793,3 @@ describe( 'blocks', () => {
 		} );
 	} );
 } );
-
-/* eslint-enable react/forbid-elements */

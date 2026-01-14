@@ -3,30 +3,41 @@
  */
 import { __experimentalItemGroup as ItemGroup } from '@wordpress/components';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
+import { useSelect } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
+import { useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import { useDefaultViews } from './default-views';
 import { unlock } from '../../lock-unlock';
 import DataViewItem from './dataview-item';
-import CustomDataViewsList from './custom-dataviews-list';
+import { getDefaultViews } from '../post-list/view-utils';
 
 const { useLocation } = unlock( routerPrivateApis );
 
-export default function DataViewsSidebarContent() {
+export default function DataViewsSidebarContent( { postType } ) {
 	const {
-		params: { postType, activeView = 'all', isCustom = 'false' },
+		query: { activeView = 'all' },
 	} = useLocation();
-	const defaultViews = useDefaultViews( { postType } );
+	const postTypeObject = useSelect(
+		( select ) => {
+			const { getPostType } = select( coreStore );
+			return getPostType( postType );
+		},
+		[ postType ]
+	);
+	const defaultViews = useMemo(
+		() => getDefaultViews( postTypeObject ),
+		[ postTypeObject ]
+	);
 	if ( ! postType ) {
 		return null;
 	}
-	const isCustomBoolean = isCustom === 'true';
 
 	return (
 		<>
-			<ItemGroup>
+			<ItemGroup className="edit-site-sidebar-dataviews">
 				{ defaultViews.map( ( dataview ) => {
 					return (
 						<DataViewItem
@@ -35,22 +46,11 @@ export default function DataViewsSidebarContent() {
 							title={ dataview.title }
 							icon={ dataview.icon }
 							type={ dataview.view.type }
-							isActive={
-								! isCustomBoolean &&
-								dataview.slug === activeView
-							}
-							isCustom={ false }
+							isActive={ dataview.slug === activeView }
 						/>
 					);
 				} ) }
 			</ItemGroup>
-			{ window?.__experimentalCustomViews && (
-				<CustomDataViewsList
-					activeView={ activeView }
-					type={ postType }
-					isCustom
-				/>
-			) }
 		</>
 	);
 }

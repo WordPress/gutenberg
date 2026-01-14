@@ -9,44 +9,34 @@ import { useEffect } from '@wordpress/element';
  */
 import { unlock } from '../../lock-unlock';
 import { store as siteEditorStore } from '../../store';
-import { homeViewRoute } from './home-view';
-import { homeEditRoute } from './home-edit';
-import { navigationViewRoute } from './navigation-view';
-import { navigationEditRoute } from './navigation-edit';
-import { navigationItemEditRoute } from './navigation-item-edit';
-import { navigationItemViewRoute } from './navigation-item-view';
-import { stylesEditRoute } from './styles-edit';
-import { stylesViewRoute } from './styles-view';
-import { patternsEditRoute } from './patterns-edit';
-import { patternsViewRoute } from './patterns-view';
-import { templatesEditRoute } from './templates-edit';
-import { templatesListViewRoute } from './templates-list-view';
-import { templatesViewRoute } from './templates-view';
-import { pagesViewRoute } from './pages-view';
-import { pagesEditRoute } from './pages-edit';
-import { pagesListViewRoute } from './pages-list-view';
-import { pagesListViewQuickEditRoute } from './pages-list-view-quick-edit';
-import { pagesViewQuickEditRoute } from './pages-view-quick-edit';
+import { homeRoute } from './home';
+import { stylesRoute } from './styles';
+import { navigationRoute } from './navigation';
+import { navigationItemRoute } from './navigation-item';
+import { patternsRoute } from './patterns';
+import { patternItemRoute } from './pattern-item';
+import { templatePartItemRoute } from './template-part-item';
+import { templatesRoute } from './templates';
+import { templateItemRoute } from './template-item';
+import { pagesRoute } from './pages';
+import { pageItemRoute } from './page-item';
+import { stylebookRoute } from './stylebook';
+import { notFoundRoute } from './notfound';
 
 const routes = [
-	pagesListViewQuickEditRoute,
-	pagesListViewRoute,
-	pagesViewQuickEditRoute,
-	pagesViewRoute,
-	pagesEditRoute,
-	templatesEditRoute,
-	templatesListViewRoute,
-	templatesViewRoute,
-	patternsViewRoute,
-	patternsEditRoute,
-	stylesViewRoute,
-	stylesEditRoute,
-	navigationItemViewRoute,
-	navigationItemEditRoute,
-	navigationViewRoute,
-	navigationEditRoute,
-	homeViewRoute,
-	homeEditRoute,
+	pageItemRoute,
+	pagesRoute,
+	templateItemRoute,
+	templatesRoute,
+	templatePartItemRoute,
+	patternItemRoute,
+	patternsRoute,
+	navigationItemRoute,
+	navigationRoute,
+	stylesRoute,
+	homeRoute,
+	stylebookRoute,
+	notFoundRoute,
 ];
 
 export function useRegisterSiteEditorRoutes() {

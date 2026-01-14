@@ -31,6 +31,7 @@ export const InputWithSlider = ( {
 	return (
 		<HStack spacing={ 4 }>
 			<NumberControlWrapper
+				__next40pxDefaultSize
 				min={ min }
 				max={ max }
 				label={ label }
@@ -45,10 +46,8 @@ export const InputWithSlider = ( {
 					</InputControlPrefixWrapper>
 				}
 				spinControls="none"
-				size="__unstable-large"
 			/>
 			<RangeControl
-				__nextHasNoMarginBottom
 				__next40pxDefaultSize
 				label={ label }
 				hideLabelFromVision

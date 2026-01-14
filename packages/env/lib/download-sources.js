@@ -13,7 +13,7 @@ const path = require( 'path' );
  */
 const pipeline = util.promisify( require( 'stream' ).pipeline );
 const extractZip = util.promisify( require( 'extract-zip' ) );
-const rimraf = util.promisify( require( 'rimraf' ) );
+const { rimraf } = require( 'rimraf' );
 
 /**
  * @typedef {import('./config').WPConfig} WPConfig
@@ -37,7 +37,7 @@ module.exports = function downloadSources( config, spinner ) {
 			Object.entries( progresses )
 				.map(
 					( [ key, value ] ) =>
-						`  - ${ key }: ${ ( value * 100 ).toFixed( 0 ) }/100%`
+						`  - ${ key }: ${ ( value * 100 ).toFixed( 0 ) }%`
 				)
 				.join( '\n' );
 	};

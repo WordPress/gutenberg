@@ -885,7 +885,7 @@ const v11 = {
 	migrate: migrateTag,
 };
 
-// Deprecation for blocks that renders fixed background as backgroud from the main block container.
+// Deprecation for blocks that renders fixed background as background from the main block container.
 const v10 = {
 	attributes: v8ToV11BlockAttributes,
 	supports: v7toV11BlockSupports,
@@ -1847,7 +1847,11 @@ const v3 = {
 			[
 				createBlock( 'core/paragraph', {
 					content: attributes.title,
-					align: attributes.contentAlign,
+					style: {
+						typography: {
+							textAlign: attributes.contentAlign,
+						},
+					},
 					fontSize: 'large',
 					placeholder: __( 'Write title…' ),
 				} ),
@@ -1933,7 +1937,11 @@ const v2 = {
 			[
 				createBlock( 'core/paragraph', {
 					content: attributes.title,
-					align: attributes.contentAlign,
+					style: {
+						typography: {
+							textAlign: attributes.contentAlign,
+						},
+					},
 					fontSize: 'large',
 					placeholder: __( 'Write title…' ),
 				} ),
@@ -1993,7 +2001,11 @@ const v1 = {
 			[
 				createBlock( 'core/paragraph', {
 					content: attributes.title,
-					align: attributes.contentAlign,
+					style: {
+						typography: {
+							textAlign: attributes.contentAlign,
+						},
+					},
 					fontSize: 'large',
 					placeholder: __( 'Write title…' ),
 				} ),

@@ -2,7 +2,7 @@
  * External dependencies
  */
 import type { CSSProperties } from 'react';
-import type { Meta, StoryFn } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react-webpack5';
 
 /**
  * Internal dependencies
@@ -13,11 +13,12 @@ import { ZStack } from '..';
 
 const meta: Meta< typeof ZStack > = {
 	component: ZStack,
-	title: 'Components (Experimental)/ZStack',
+	title: 'Components/ZStack',
 	argTypes: {
 		as: { control: { type: 'text' } },
-		children: { control: { type: null } },
+		children: { control: false },
 	},
+	tags: [ 'status-experimental' ],
 	parameters: {
 		controls: {
 			expanded: true,

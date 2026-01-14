@@ -1,14 +1,18 @@
+@use "sass:math";
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/colors" as *;
+
 // Must equal $color-palette-circle-size and $color-palette-circle-spacing from:
 // @wordpress/components/src/circular-option-picker/style.scss
 $swatch-size: 28px;
 $swatch-gap: 12px;
 
 $popover-width: 260px;
-$popover-padding: $grid-unit-20;
+$popover-padding: $grid-unit-10;
 
 $swatch-columns: math.floor(math.div($popover-width + $swatch-gap - 2 * $popover-padding, $swatch-size + $swatch-gap));
 
-.block-editor-duotone-control__popover {
+.block-editor-duotone-control__popover.components-popover {
 	> .components-popover__content {
 		padding: $popover-padding;
 		width: $popover-width;

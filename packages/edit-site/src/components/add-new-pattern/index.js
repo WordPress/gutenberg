@@ -25,7 +25,7 @@ import {
 	TEMPLATE_PART_POST_TYPE,
 } from '../../utils/constants';
 
-const { useHistory } = unlock( routerPrivateApis );
+const { useHistory, useLocation } = unlock( routerPrivateApis );
 const { CreatePatternModal, useAddPatternCategory } = unlock(
 	editPatternsPrivateApis
 );
@@ -33,6 +33,7 @@ const { CreateTemplatePartModal } = unlock( editorPrivateApis );
 
 export default function AddNewPattern() {
 	const history = useHistory();
+	const location = useLocation();
 	const [ showPatternModal, setShowPatternModal ] = useState( false );
 	const [ showTemplatePartModal, setShowTemplatePartModal ] =
 		useState( false );
@@ -69,23 +70,16 @@ export default function AddNewPattern() {
 
 	function handleCreatePattern( { pattern } ) {
 		setShowPatternModal( false );
-
-		history.push( {
-			postId: pattern.id,
-			postType: PATTERN_TYPES.user,
-			canvas: 'edit',
-		} );
+		history.navigate(
+			`/${ PATTERN_TYPES.user }/${ pattern.id }?canvas=edit`
+		);
 	}
 
 	function handleCreateTemplatePart( templatePart ) {
 		setShowTemplatePartModal( false );
-
-		// Navigate to the created template part editor.
-		history.push( {
-			postId: templatePart.id,
-			postType: TEMPLATE_PART_POST_TYPE,
-			canvas: 'edit',
-		} );
+		history.navigate(
+			`/${ TEMPLATE_PART_POST_TYPE }/${ templatePart.id }?canvas=edit`
+		);
 	}
 
 	function handleError() {
@@ -166,13 +160,12 @@ export default function AddNewPattern() {
 						return;
 					}
 					try {
-						const {
-							params: { postType, categoryId },
-						} = history.getLocationWithParams();
 						let currentCategoryId;
 						// When we're not handling template parts, we should
 						// add or create the proper pattern category.
-						if ( postType !== TEMPLATE_PART_POST_TYPE ) {
+						if (
+							location.query.postType !== TEMPLATE_PART_POST_TYPE
+						) {
 							/*
 							 * categoryMap.values() returns an iterator.
 							 * Iterator.prototype.find() is not yet widely supported.
@@ -180,7 +173,10 @@ export default function AddNewPattern() {
 							 */
 							const currentCategory = Array.from(
 								categoryMap.values()
-							).find( ( term ) => term.name === categoryId );
+							).find(
+								( term ) =>
+									term.name === location.query.categoryId
+							);
 							if ( currentCategory ) {
 								currentCategoryId =
 									currentCategory.id ||
@@ -201,12 +197,11 @@ export default function AddNewPattern() {
 						// category.
 						if (
 							! currentCategoryId &&
-							categoryId !== 'my-patterns'
+							location.query.categoryId !== 'my-patterns'
 						) {
-							history.push( {
-								postType: PATTERN_TYPES.user,
-								categoryId: PATTERN_DEFAULT_CATEGORY,
-							} );
+							history.navigate(
+								`/pattern?categoryId=${ PATTERN_DEFAULT_CATEGORY }`
+							);
 						}
 
 						createSuccessNotice(

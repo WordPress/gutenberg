@@ -68,10 +68,11 @@ const CommentsForm = ( { postId, postType } ) => {
 
 	const isSiteEditor = postType === undefined || postId === undefined;
 
-	const { defaultCommentStatus } = useSelect(
+	const defaultCommentStatus = useSelect(
 		( select ) =>
 			select( blockEditorStore ).getSettings()
-				.__experimentalDiscussionSettings
+				.__experimentalDiscussionSettings?.defaultCommentStatus,
+		[]
 	);
 
 	const postTypeSupportsComments = useSelect( ( select ) =>
@@ -106,7 +107,7 @@ const CommentsForm = ( { postId, postType } ) => {
 			return (
 				<Warning>
 					{ sprintf(
-						/* translators: 1: Post type (i.e. "post", "page") */
+						/* translators: %s: Post type (i.e. "post", "page") */
 						__(
 							'Post Comments Form block: Comments are not enabled for this post type (%s).'
 						),

@@ -1,49 +1,23 @@
 /**
- * External dependencies
- */
-import fastDeepEqual from 'fast-deep-equal/es6';
-
-/**
  * WordPress dependencies
  */
-import { useDebounce, usePrevious } from '@wordpress/compose';
-import { RawHTML, useEffect, useRef, useState } from '@wordpress/element';
+import {
+	RawHTML,
+	useEffect,
+	useState,
+	useRef,
+	useMemo,
+} from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
-import apiFetch from '@wordpress/api-fetch';
-import { addQueryArgs } from '@wordpress/url';
 import { Placeholder, Spinner } from '@wordpress/components';
-import { __experimentalSanitizeBlockAttributes } from '@wordpress/blocks';
+import { useSelect } from '@wordpress/data';
+
+/**
+ * Internal dependencies
+ */
+import { useServerSideRender } from './hook';
 
 const EMPTY_OBJECT = {};
-
-export function rendererPath( block, attributes = null, urlQueryArgs = {} ) {
-	return addQueryArgs( `/wp/v2/block-renderer/${ block }`, {
-		context: 'edit',
-		...( null !== attributes ? { attributes } : {} ),
-		...urlQueryArgs,
-	} );
-}
-
-export function removeBlockSupportAttributes( attributes ) {
-	const {
-		backgroundColor,
-		borderColor,
-		fontFamily,
-		fontSize,
-		gradient,
-		textColor,
-		className,
-		...restAttributes
-	} = attributes;
-
-	const { border, color, elements, spacing, typography, ...restStyles } =
-		attributes?.style || EMPTY_OBJECT;
-
-	return {
-		...restAttributes,
-		style: restStyles,
-	};
-}
 
 function DefaultEmptyResponsePlaceholder( { className } ) {
 	return (
@@ -53,16 +27,26 @@ function DefaultEmptyResponsePlaceholder( { className } ) {
 	);
 }
 
-function DefaultErrorResponsePlaceholder( { response, className } ) {
+function DefaultErrorResponsePlaceholder( { message, className } ) {
 	const errorMessage = sprintf(
 		// translators: %s: error message describing the problem
 		__( 'Error loading block: %s' ),
-		response.errorMsg
+		message
 	);
 	return <Placeholder className={ className }>{ errorMessage }</Placeholder>;
 }
 
-function DefaultLoadingResponsePlaceholder( { children, showLoader } ) {
+function DefaultLoadingResponsePlaceholder( { children } ) {
+	const [ showLoader, setShowLoader ] = useState( false );
+
+	useEffect( () => {
+		// Schedule showing the Spinner after 1 second.
+		const timeout = setTimeout( () => {
+			setShowLoader( true );
+		}, 1000 );
+		return () => clearTimeout( timeout );
+	}, [] );
+
 	return (
 		<div style={ { position: 'relative' } }>
 			{ showLoader && (
@@ -85,142 +69,111 @@ function DefaultLoadingResponsePlaceholder( { children, showLoader } ) {
 	);
 }
 
-export default function ServerSideRender( props ) {
+export function ServerSideRender( props ) {
+	const prevContentRef = useRef( '' );
 	const {
-		attributes,
-		block,
 		className,
-		httpMethod = 'GET',
-		urlQueryArgs,
-		skipBlockSupportAttributes = false,
 		EmptyResponsePlaceholder = DefaultEmptyResponsePlaceholder,
 		ErrorResponsePlaceholder = DefaultErrorResponsePlaceholder,
 		LoadingResponsePlaceholder = DefaultLoadingResponsePlaceholder,
+		...restProps
 	} = props;
 
-	const isMountedRef = useRef( false );
-	const [ showLoader, setShowLoader ] = useState( false );
-	const fetchRequestRef = useRef();
-	const [ response, setResponse ] = useState( null );
-	const prevProps = usePrevious( props );
-	const [ isLoading, setIsLoading ] = useState( false );
+	const { content, status, error } = useServerSideRender( restProps );
 
-	function fetchData() {
-		if ( ! isMountedRef.current ) {
-			return;
-		}
-
-		setIsLoading( true );
-
-		// Schedule showing the Spinner after 1 second.
-		const timeout = setTimeout( () => {
-			setShowLoader( true );
-		}, 1000 );
-
-		let sanitizedAttributes =
-			attributes &&
-			__experimentalSanitizeBlockAttributes( block, attributes );
-
-		if ( skipBlockSupportAttributes ) {
-			sanitizedAttributes =
-				removeBlockSupportAttributes( sanitizedAttributes );
-		}
-
-		// If httpMethod is 'POST', send the attributes in the request body instead of the URL.
-		// This allows sending a larger attributes object than in a GET request, where the attributes are in the URL.
-		const isPostRequest = 'POST' === httpMethod;
-		const urlAttributes = isPostRequest
-			? null
-			: sanitizedAttributes ?? null;
-		const path = rendererPath( block, urlAttributes, urlQueryArgs );
-		const data = isPostRequest
-			? { attributes: sanitizedAttributes ?? null }
-			: null;
-
-		// Store the latest fetch request so that when we process it, we can
-		// check if it is the current request, to avoid race conditions on slow networks.
-		const fetchRequest = ( fetchRequestRef.current = apiFetch( {
-			path,
-			data,
-			method: isPostRequest ? 'POST' : 'GET',
-		} )
-			.then( ( fetchResponse ) => {
-				if (
-					isMountedRef.current &&
-					fetchRequest === fetchRequestRef.current &&
-					fetchResponse
-				) {
-					setResponse( fetchResponse.rendered );
-				}
-			} )
-			.catch( ( error ) => {
-				if (
-					isMountedRef.current &&
-					fetchRequest === fetchRequestRef.current
-				) {
-					setResponse( {
-						error: true,
-						errorMsg: error.message,
-					} );
-				}
-			} )
-			.finally( () => {
-				if (
-					isMountedRef.current &&
-					fetchRequest === fetchRequestRef.current
-				) {
-					setIsLoading( false );
-					// Cancel the timeout to show the Spinner.
-					setShowLoader( false );
-					clearTimeout( timeout );
-				}
-			} ) );
-
-		return fetchRequest;
-	}
-
-	const debouncedFetchData = useDebounce( fetchData, 500 );
-
-	// When the component unmounts, set isMountedRef to false. This will
-	// let the async fetch callbacks know when to stop.
+	// Store the previous successful HTML response to show while loading.
 	useEffect( () => {
-		isMountedRef.current = true;
-		return () => {
-			isMountedRef.current = false;
-		};
-	}, [] );
-
-	useEffect( () => {
-		// Don't debounce the first fetch. This ensures that the first render
-		// shows data as soon as possible.
-		if ( prevProps === undefined ) {
-			fetchData();
-		} else if ( ! fastDeepEqual( prevProps, props ) ) {
-			debouncedFetchData();
+		if ( content ) {
+			prevContentRef.current = content;
 		}
-	} );
+	}, [ content ] );
 
-	const hasResponse = !! response;
-	const hasEmptyResponse = response === '';
-	const hasError = response?.error;
-
-	if ( isLoading ) {
+	if ( status === 'loading' ) {
 		return (
-			<LoadingResponsePlaceholder { ...props } showLoader={ showLoader }>
-				{ hasResponse && (
-					<RawHTML className={ className }>{ response }</RawHTML>
+			<LoadingResponsePlaceholder { ...props }>
+				{ !! prevContentRef.current && (
+					<RawHTML className={ className }>
+						{ prevContentRef.current }
+					</RawHTML>
 				) }
 			</LoadingResponsePlaceholder>
 		);
 	}
 
-	if ( hasEmptyResponse || ! hasResponse ) {
+	if ( status === 'success' && ! content ) {
 		return <EmptyResponsePlaceholder { ...props } />;
 	}
 
-	if ( hasError ) {
-		return <ErrorResponsePlaceholder response={ response } { ...props } />;
+	if ( status === 'error' ) {
+		return <ErrorResponsePlaceholder message={ error } { ...props } />;
 	}
 
-	return <RawHTML className={ className }>{ response }</RawHTML>;
+	return <RawHTML className={ className }>{ content }</RawHTML>;
+}
+
+/**
+ * A component that renders server-side content for blocks.
+ *
+ * Note: URL query will include the current post ID when applicable.
+ * This is useful for blocks that depend on the context of the current post for rendering.
+ *
+ * @example
+ * ```jsx
+ * import { ServerSideRender } from '@wordpress/server-side-render';
+ * // Legacy import for WordPress 6.8 and earlier
+ * // import { default as ServerSideRender } from '@wordpress/server-side-render';
+ *
+ * function Example() {
+ *   return (
+ *     <ServerSideRender
+ *       block="core/archives"
+ *       attributes={ { showPostCounts: true } }
+ *       urlQueryArgs={ { customArg: 'value' } }
+ *       className="custom-class"
+ *     />
+ *   );
+ * }
+ * ```
+ *
+ * @param {Object}   props                                    Component props.
+ * @param {string}   props.block                              The identifier of the block to be serverside rendered.
+ * @param {Object}   props.attributes                         The block attributes to be sent to the server for rendering.
+ * @param {string}   [props.className]                        Additional classes to apply to the wrapper element.
+ * @param {string}   [props.httpMethod='GET']                 The HTTP method to use ('GET' or 'POST'). Default is 'GET'
+ * @param {Object}   [props.urlQueryArgs]                     Additional query arguments to append to the request URL.
+ * @param {boolean}  [props.skipBlockSupportAttributes=false] Whether to remove block support attributes before sending.
+ * @param {Function} [props.EmptyResponsePlaceholder]         Component rendered when the API response is empty.
+ * @param {Function} [props.ErrorResponsePlaceholder]         Component rendered when the API response is an error.
+ * @param {Function} [props.LoadingResponsePlaceholder]       Component rendered while the API request is loading.
+ *
+ * @return {JSX.Element} The rendered server-side content.
+ */
+export function ServerSideRenderWithPostId( {
+	urlQueryArgs = EMPTY_OBJECT,
+	...props
+} ) {
+	const currentPostId = useSelect( ( select ) => {
+		// FIXME: @wordpress/server-side-render should not depend on @wordpress/editor.
+		// It is used by blocks that can be loaded into a *non-post* block editor.
+		// eslint-disable-next-line @wordpress/data-no-store-string-literals
+		const postId = select( 'core/editor' )?.getCurrentPostId();
+
+		// For templates and template parts we use a custom ID format.
+		// Since they aren't real posts, we don't want to use their ID
+		// for server-side rendering. Since they use a string based ID,
+		// we can assume real post IDs are numbers.
+		return postId && typeof postId === 'number' ? postId : null;
+	}, [] );
+
+	const newUrlQueryArgs = useMemo( () => {
+		if ( ! currentPostId ) {
+			return urlQueryArgs;
+		}
+		return {
+			post_id: currentPostId,
+			...urlQueryArgs,
+		};
+	}, [ currentPostId, urlQueryArgs ] );
+
+	return <ServerSideRender urlQueryArgs={ newUrlQueryArgs } { ...props } />;
 }

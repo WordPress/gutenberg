@@ -48,7 +48,13 @@ function useFocusReturn( onFocusReturn ) {
 				return;
 			}
 
-			focusedBeforeMount.current = node.ownerDocument.activeElement;
+			const activeDocument =
+				node.ownerDocument.activeElement instanceof
+				window.HTMLIFrameElement
+					? node.ownerDocument.activeElement.contentDocument
+					: node.ownerDocument;
+
+			focusedBeforeMount.current = activeDocument?.activeElement ?? null;
 		} else if ( focusedBeforeMount.current ) {
 			const isFocused = ref.current?.contains(
 				ref.current?.ownerDocument.activeElement

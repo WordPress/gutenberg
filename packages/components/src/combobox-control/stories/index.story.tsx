@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryFn } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react-webpack5';
+import { fn } from 'storybook/test';
 
 /**
  * WordPress dependencies
@@ -34,13 +35,17 @@ const countries = [
 ];
 
 const meta: Meta< typeof ComboboxControl > = {
-	title: 'Components/ComboboxControl',
+	title: 'Components/Selection & Input/Common/ComboboxControl',
+	id: 'components-comboboxcontrol',
 	component: ComboboxControl,
 	argTypes: {
-		value: { control: { type: null } },
+		value: { control: false },
+	},
+	args: {
+		onChange: fn(),
+		onFilterValueChange: fn(),
 	},
 	parameters: {
-		actions: { argTypesRegex: '^on.*' },
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
 	},
@@ -76,8 +81,7 @@ const Template: StoryFn< typeof ComboboxControl > = ( {
 };
 export const Default = Template.bind( {} );
 Default.args = {
-	__nextHasNoMarginBottom: true,
-	allowReset: false,
+	__next40pxDefaultSize: true,
 	label: 'Select a country',
 	options: countryOptions,
 };

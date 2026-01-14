@@ -1,6 +1,11 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/variables" as *;
+@use "../../utils/theme-variables" as *;
+
 .components-accessible-toolbar {
 	display: inline-flex;
-	border: $border-width solid $gray-900;
+	border: $border-width solid $components-color-foreground;
 	border-radius: $radius-small;
 	flex-shrink: 0;
 
@@ -14,13 +19,11 @@
 		& > .components-toolbar-group {
 			border-right: none;
 		}
-
 	}
 }
 
 .components-accessible-toolbar,
 .components-toolbar {
-
 	&[aria-orientation="vertical"] {
 		display: flex;
 		flex-direction: column;
@@ -56,9 +59,10 @@
 			z-index: -1;
 
 			// Animate in.
-			animation: components-button__appear-animation 0.1s ease;
-			animation-fill-mode: forwards;
-			@include reduce-motion("animation");
+			@media not ( prefers-reduced-motion ) {
+				animation: components-button__appear-animation 0.1s ease;
+				animation-fill-mode: forwards;
+			}
 		}
 
 		svg {
@@ -78,7 +82,7 @@
 			}
 
 			&::before {
-				background: $gray-900;
+				background: $components-color-foreground;
 			}
 		}
 
@@ -97,7 +101,6 @@
 		}
 	}
 }
-
 
 @keyframes components-button__appear-animation {
 	from {

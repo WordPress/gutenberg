@@ -27,6 +27,7 @@ import { useControlledState } from '../utils/hooks';
 import { escapeRegExp } from '../utils/strings';
 import type { UnitControlProps, UnitControlOnChangeCallback } from './types';
 import { useDeprecated36pxDefaultSizeProp } from '../utils/use-deprecated-props';
+import { maybeWarnDeprecated36pxSize } from '../utils/deprecated-36px-size';
 
 function UnforwardedUnitControl(
 	unitControlProps: WordPressComponentProps<
@@ -55,8 +56,16 @@ function UnforwardedUnitControl(
 		units: unitsProp = CSS_UNITS,
 		value: valueProp,
 		onFocus: onFocusProp,
+		__shouldNotWarnDeprecated36pxSize,
 		...props
 	} = useDeprecated36pxDefaultSizeProp( unitControlProps );
+
+	maybeWarnDeprecated36pxSize( {
+		componentName: 'UnitControl',
+		__next40pxDefaultSize: props.__next40pxDefaultSize,
+		size,
+		__shouldNotWarnDeprecated36pxSize,
+	} );
 
 	if ( 'unit' in unitControlProps ) {
 		deprecated( 'UnitControl unit prop', {
@@ -215,6 +224,7 @@ function UnforwardedUnitControl(
 	return (
 		<ValueInput
 			{ ...props }
+			__shouldNotWarnDeprecated36pxSize
 			autoComplete={ autoComplete }
 			className={ classes }
 			disabled={ disabled }
@@ -246,7 +256,7 @@ function UnforwardedUnitControl(
  * const Example = () => {
  *   const [ value, setValue ] = useState( '10px' );
  *
- *   return <UnitControl onChange={ setValue } value={ value } />;
+ *   return <UnitControl __next40pxDefaultSize onChange={ setValue } value={ value } />;
  * };
  * ```
  */

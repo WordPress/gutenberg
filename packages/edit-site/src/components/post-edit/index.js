@@ -6,6 +6,7 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
+import { Page } from '@wordpress/admin-ui';
 import { __ } from '@wordpress/i18n';
 import { DataForm } from '@wordpress/dataviews';
 import { useDispatch, useSelect } from '@wordpress/data';
@@ -13,44 +14,49 @@ import { store as coreDataStore } from '@wordpress/core-data';
 import { __experimentalVStack as VStack } from '@wordpress/components';
 import { useState, useMemo, useEffect } from '@wordpress/element';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
+import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
-import Page from '../page';
-import usePostFields from '../post-fields';
 import { unlock } from '../../lock-unlock';
+import usePatternSettings from '../page-patterns/use-pattern-settings';
 
-const { PostCardPanel } = unlock( editorPrivateApis );
+const { usePostFields, PostCardPanel } = unlock( editorPrivateApis );
 
 const fieldsWithBulkEditSupport = [
 	'title',
 	'status',
 	'date',
 	'author',
-	'comment_status',
+	'discussion',
 ];
 
 function PostEditForm( { postType, postId } ) {
 	const ids = useMemo( () => postId.split( ',' ), [ postId ] );
-	const { record } = useSelect(
+	const { record, hasFinishedResolution } = useSelect(
 		( select ) => {
+			const args = [ 'postType', postType, ids[ 0 ] ];
+
+			const {
+				getEditedEntityRecord,
+				hasFinishedResolution: hasFinished,
+			} = select( coreDataStore );
+
 			return {
 				record:
-					ids.length === 1
-						? select( coreDataStore ).getEditedEntityRecord(
-								'postType',
-								postType,
-								ids[ 0 ]
-						  )
-						: null,
+					ids.length === 1 ? getEditedEntityRecord( ...args ) : null,
+				hasFinishedResolution: hasFinished(
+					'getEditedEntityRecord',
+					args
+				),
 			};
 		},
 		[ postType, ids ]
 	);
 	const [ multiEdits, setMultiEdits ] = useState( {} );
 	const { editEntityRecord } = useDispatch( coreDataStore );
-	const { fields: _fields } = usePostFields();
+	const _fields = usePostFields( { postType } );
 	const fields = useMemo(
 		() =>
 			_fields?.map( ( field ) => {
@@ -69,30 +75,46 @@ function PostEditForm( { postType, postId } ) {
 
 	const form = useMemo(
 		() => ( {
-			type: 'panel',
+			layout: {
+				type: 'panel',
+			},
 			fields: [
-				'featured_media',
-				'title',
-				'status_and_visibility',
+				{
+					id: 'featured_media',
+					layout: {
+						type: 'regular',
+						labelPosition: 'none',
+					},
+				},
+				{
+					id: 'status',
+					label: __( 'Status & Visibility' ),
+					children: [ 'status', 'password' ],
+				},
 				'author',
 				'date',
 				'slug',
 				'parent',
-				'comment_status',
+				{
+					id: 'discussion',
+					label: __( 'Discussion' ),
+					children: [ 'comment_status', 'ping_status' ],
+				},
+				{
+					label: __( 'Template' ),
+					id: 'template',
+					layout: {
+						type: 'regular',
+						labelPosition: 'side',
+					},
+				},
 			].filter(
 				( field ) =>
 					ids.length === 1 ||
-					fieldsWithBulkEditSupport.includes( field )
+					fieldsWithBulkEditSupport.includes(
+						typeof field === 'string' ? field : field.id
+					)
 			),
-			combinedFields: [
-				{
-					id: 'status_and_visibility',
-					label: __( 'Status & Visibility' ),
-					children: [ 'status', 'password' ],
-					direction: 'vertical',
-					render: ( { item } ) => item.status,
-				},
-			],
 		} ),
 		[ ids ]
 	);
@@ -126,17 +148,43 @@ function PostEditForm( { postType, postId } ) {
 		setMultiEdits( {} );
 	}, [ ids ] );
 
+	const { ExperimentalBlockEditorProvider } = unlock(
+		blockEditorPrivateApis
+	);
+	const settings = usePatternSettings();
+
+	/**
+	 * The template field depends on the block editor settings.
+	 * This is a workaround to ensure that the block editor settings are available.
+	 * For more information, see: https://github.com/WordPress/gutenberg/issues/67521
+	 */
+	const fieldsWithDependency = useMemo( () => {
+		return fields.map( ( field ) => {
+			if ( field.id === 'template' ) {
+				return {
+					...field,
+					Edit: ( data ) => (
+						<ExperimentalBlockEditorProvider settings={ settings }>
+							<field.Edit { ...data } />
+						</ExperimentalBlockEditorProvider>
+					),
+				};
+			}
+			return field;
+		} );
+	}, [ fields, settings ] );
+
 	return (
 		<VStack spacing={ 4 }>
-			{ ids.length === 1 && (
-				<PostCardPanel postType={ postType } postId={ ids[ 0 ] } />
+			<PostCardPanel postType={ postType } postId={ ids } />
+			{ hasFinishedResolution && (
+				<DataForm
+					data={ ids.length === 1 ? record : multiEdits }
+					fields={ fieldsWithDependency }
+					form={ form }
+					onChange={ onChange }
+				/>
 			) }
-			<DataForm
-				data={ ids.length === 1 ? record : multiEdits }
-				fields={ fields }
-				form={ form }
-				onChange={ onChange }
-			/>
 		</VStack>
 	);
 }

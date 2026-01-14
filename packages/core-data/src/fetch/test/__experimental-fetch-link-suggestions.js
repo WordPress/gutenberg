@@ -393,6 +393,43 @@ describe( 'sortResults', () => {
 			6,
 		] );
 	} );
+
+	it( 'orders results to prefer direct matches over sub matches', () => {
+		const results = [
+			{
+				id: 1,
+				title: 'News',
+				url: 'http://wordpress.local/news/',
+				type: 'page',
+				kind: 'post-type',
+			},
+			{
+				id: 2,
+				title: 'Newspaper',
+				url: 'http://wordpress.local/newspaper/',
+				type: 'page',
+				kind: 'post-type',
+			},
+			{
+				id: 3,
+				title: 'News Flash News',
+				url: 'http://wordpress.local/news-flash-news/',
+				type: 'page',
+				kind: 'post-type',
+			},
+			{
+				id: 4,
+				title: 'News',
+				url: 'http://wordpress.local/news-2/',
+				type: 'page',
+				kind: 'post-type',
+			},
+		];
+		const order = sortResults( results, 'News' ).map(
+			( result ) => result.id
+		);
+		expect( order ).toEqual( [ 1, 4, 3, 2 ] );
+	} );
 } );
 
 describe( 'tokenize', () => {

@@ -17,6 +17,7 @@ const Example = () => {
 
 	return (
 		<InputControl
+			__next40pxDefaultSize
 			value={ value }
 			onChange={ ( nextValue ) => setValue( nextValue ?? '' ) }
 		/>

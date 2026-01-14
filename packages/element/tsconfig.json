@@ -2,12 +2,8 @@
 	"$schema": "https://json.schemastore.org/tsconfig.json",
 	"extends": "../../tsconfig.base.json",
 	"compilerOptions": {
-		"rootDir": "src",
-		"declarationDir": "build-types",
-
 		"noImplicitAny": false,
 		"strictNullChecks": false
 	},
-	"references": [ { "path": "../escape-html" } ],
-	"include": [ "src/**/*" ]
+	"references": [ { "path": "../escape-html" } ]
 }

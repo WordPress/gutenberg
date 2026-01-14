@@ -67,7 +67,7 @@ function actionC() {
 beforeEach( () => {
 	window.actionValue = '';
 	// Reset state in between tests (clear all callbacks, `didAction` counts,
-	// etc.)  Just reseting actions and filters is not enough
+	// etc.)  Just resetting actions and filters is not enough
 	// because the internal functions have references to the original objects.
 	[ actions, filters ].forEach( ( hooks ) => {
 		for ( const k in hooks ) {

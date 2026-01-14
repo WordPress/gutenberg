@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryFn } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react-webpack5';
 
 /**
  * WordPress dependencies
@@ -20,6 +20,8 @@ const meta: Meta< typeof Guide > = {
 	argTypes: {
 		contentLabel: { control: 'text' },
 		finishButtonText: { control: 'text' },
+		nextButtonText: { control: 'text' },
+		previousButtonText: { control: 'text' },
 		onFinish: { action: 'onFinish' },
 	},
 };

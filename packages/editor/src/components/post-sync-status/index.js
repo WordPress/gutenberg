@@ -13,7 +13,7 @@ import { store as editorStore } from '../../store';
 /**
  * Renders the sync status of a post.
  *
- * @return {JSX.Element|null} The rendered sync status component.
+ * @return {React.ReactNode} The rendered sync status component.
  */
 export default function PostSyncStatus() {
 	const { syncStatus, postType } = useSelect( ( select ) => {

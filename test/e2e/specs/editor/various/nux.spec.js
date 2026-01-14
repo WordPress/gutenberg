@@ -12,7 +12,7 @@ test.describe( 'New User Experience (NUX)', () => {
 		await admin.createNewPost( { showWelcomeGuide: true } );
 
 		const welcomeGuide = page.getByRole( 'dialog', {
-			name: 'Welcome to the block editor',
+			name: 'Welcome to the editor',
 		} );
 		const guideHeading = welcomeGuide.getByRole( 'heading', { level: 1 } );
 		const nextButton = welcomeGuide.getByRole( 'button', { name: 'Next' } );
@@ -20,36 +20,28 @@ test.describe( 'New User Experience (NUX)', () => {
 			name: 'Previous',
 		} );
 
-		await expect( guideHeading ).toHaveText(
-			'Welcome to the block editor'
-		);
+		await expect( guideHeading ).toHaveText( 'Welcome to the editor' );
 
 		await nextButton.click();
-		await expect( guideHeading ).toHaveText( 'Make each block your own' );
+		await expect( guideHeading ).toHaveText( 'Customize each block' );
 
 		await prevButton.click();
 		// Guide should be on page 1 of 4
-		await expect( guideHeading ).toHaveText(
-			'Welcome to the block editor'
-		);
+		await expect( guideHeading ).toHaveText( 'Welcome to the editor' );
 
 		// Press the button for Page 2.
 		await welcomeGuide
 			.getByRole( 'button', { name: 'Page 2 of 4' } )
 			.click();
-		await expect( guideHeading ).toHaveText( 'Make each block your own' );
+		await expect( guideHeading ).toHaveText( 'Customize each block' );
 
 		// Press the right arrow key for Page 3.
 		await page.keyboard.press( 'ArrowRight' );
-		await expect( guideHeading ).toHaveText(
-			'Get to know the block library'
-		);
+		await expect( guideHeading ).toHaveText( 'Explore all blocks' );
 
 		// Press the right arrow key for Page 4.
 		await page.keyboard.press( 'ArrowRight' );
-		await expect( guideHeading ).toHaveText(
-			'Learn how to use the block editor'
-		);
+		await expect( guideHeading ).toHaveText( 'Learn more' );
 
 		// Click on the *visible* 'Get started' button.
 		await welcomeGuide
@@ -77,7 +69,7 @@ test.describe( 'New User Experience (NUX)', () => {
 		await admin.createNewPost( { showWelcomeGuide: true } );
 
 		const welcomeGuide = page.getByRole( 'dialog', {
-			name: 'Welcome to the block editor',
+			name: 'Welcome to the editor',
 		} );
 
 		await expect( welcomeGuide ).toBeVisible();
@@ -100,7 +92,7 @@ test.describe( 'New User Experience (NUX)', () => {
 		await admin.createNewPost( { showWelcomeGuide: true } );
 
 		const welcomeGuide = page.getByRole( 'dialog', {
-			name: 'Welcome to the block editor',
+			name: 'Welcome to the editor',
 		} );
 
 		await expect( welcomeGuide ).toBeVisible();
@@ -117,7 +109,7 @@ test.describe( 'New User Experience (NUX)', () => {
 	} ) => {
 		await admin.createNewPost();
 		const welcomeGuide = page.getByRole( 'dialog', {
-			name: 'Welcome to the block editor',
+			name: 'Welcome to the editor',
 		} );
 
 		await expect( welcomeGuide ).toBeHidden();

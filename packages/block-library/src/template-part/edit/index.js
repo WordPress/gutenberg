@@ -95,7 +95,7 @@ function TemplatesList( { area, clientId, isEntityAvailable, onSelect } ) {
 				label={ __( 'Templates' ) }
 				blockPatterns={ blockPatterns }
 				onClickPattern={ onSelect }
-				showTitle={ false }
+				showTitlesAsTooltip
 			/>
 		</PanelBody>
 	);
@@ -240,14 +240,16 @@ export default function TemplatePartEdit( {
 					canUserEdit && (
 						<BlockControls group="other">
 							<ToolbarButton
-								onClick={ () =>
+								onClick={ () => {
 									onNavigateToEntityRecord( {
 										postId: templatePartId,
 										postType: 'wp_template_part',
-									} )
-								}
+									} );
+								} }
 							>
-								{ __( 'Edit' ) }
+								{ window?.__experimentalContentOnlyPatternInsertion
+									? __( 'Edit section' )
+									: __( 'Edit' ) }
 							</ToolbarButton>
 						</BlockControls>
 					) }
@@ -260,6 +262,7 @@ export default function TemplatePartEdit( {
 							templatePartId={ templatePartId }
 							defaultWrapper={ areaObject.tagName }
 							hasInnerBlocks={ hasInnerBlocks }
+							clientId={ clientId }
 						/>
 					</InspectorControls>
 				) }

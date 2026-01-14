@@ -72,7 +72,7 @@ export type WithToolTipProps = {
 
 export type ToggleGroupControlProps = Pick<
 	BaseControlProps,
-	'help' | '__nextHasNoMarginBottom'
+	'__nextHasNoMarginBottom' | 'help'
 > & {
 	/**
 	 * Label for the control.
@@ -128,6 +128,13 @@ export type ToggleGroupControlProps = Pick<
 	 * @default false
 	 */
 	__next40pxDefaultSize?: boolean;
+	/**
+	 * Do not throw a warning for the deprecated 36px default size.
+	 * For internal components of other components that already throw the warning.
+	 *
+	 * @ignore
+	 */
+	__shouldNotWarnDeprecated36pxSize?: boolean;
 };
 
 export type ToggleGroupControlContextProps = {

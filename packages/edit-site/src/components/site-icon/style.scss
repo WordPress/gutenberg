@@ -1,3 +1,6 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
+
 .edit-site-site-icon__icon {
 	fill: currentColor;
 	width: 100%;
@@ -18,5 +21,21 @@
 
 	.edit-site-layout.is-full-canvas & {
 		border-radius: 0;
+	}
+}
+
+.edit-site-editor__view-mode-toggle button:focus {
+	position: relative;
+
+	&::before {
+		content: "";
+		display: block;
+		position: absolute;
+		z-index: 1;
+		top: 0;
+		right: 0;
+		bottom: 0;
+		left: 0;
+		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color), inset 0 0 0 calc(#{ $border-width } + var(--wp-admin-border-width-focus)) $white;
 	}
 }

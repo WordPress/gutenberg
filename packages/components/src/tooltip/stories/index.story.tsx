@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryFn } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react-webpack5';
 
 /**
  * WordPress dependencies
@@ -19,7 +19,7 @@ const meta: Meta< typeof Tooltip > = {
 	id: 'components-tooltip',
 	component: Tooltip,
 	argTypes: {
-		children: { control: { type: null } },
+		children: { control: false },
 		position: {
 			control: { type: 'select' },
 			options: [

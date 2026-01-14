@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import clsx from 'clsx';
+
+/**
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
@@ -10,6 +15,7 @@ import {
 	withNotices,
 	withFilters,
 	__experimentalHStack as HStack,
+	Notice,
 } from '@wordpress/components';
 import { isBlobURL } from '@wordpress/blob';
 import { useState, useRef } from '@wordpress/element';
@@ -94,8 +100,9 @@ function PostFeaturedImage( {
 	postType,
 	noticeUI,
 	noticeOperations,
+	isRequestingFeaturedImageMedia,
 } ) {
-	const toggleRef = useRef();
+	const returnsFocusRef = useRef( false );
 	const [ isLoading, setIsLoading ] = useState( false );
 	const { getSettings } = useSelect( blockEditorStore );
 	const { mediaSourceUrl } = getMediaDetails( media, currentPostId );
@@ -118,6 +125,7 @@ function PostFeaturedImage( {
 				noticeOperations.removeAllNotices();
 				noticeOperations.createErrorNotice( message );
 			},
+			multiple: false,
 		} );
 	}
 
@@ -150,6 +158,16 @@ function PostFeaturedImage( {
 		);
 	}
 
+	function returnFocus( node ) {
+		if ( returnsFocusRef.current && node ) {
+			node.focus();
+			returnsFocusRef.current = false;
+		}
+	}
+
+	const isMissingMedia =
+		! isRequestingFeaturedImageMedia && !! featuredImageId && ! media;
+
 	return (
 		<PostFeaturedImageCheck>
 			{ noticeUI }
@@ -174,52 +192,83 @@ function PostFeaturedImage( {
 						modalClass="editor-post-featured-image__media-modal"
 						render={ ( { open } ) => (
 							<div className="editor-post-featured-image__container">
-								<Button
-									__next40pxDefaultSize
-									ref={ toggleRef }
-									className={
-										! featuredImageId
-											? 'editor-post-featured-image__toggle'
-											: 'editor-post-featured-image__preview'
-									}
-									onClick={ open }
-									aria-label={
-										! featuredImageId
-											? null
-											: __(
-													'Edit or replace the featured image'
-											  )
-									}
-									aria-describedby={
-										! featuredImageId
-											? null
-											: `editor-post-featured-image-${ featuredImageId }-describedby`
-									}
-									aria-haspopup="dialog"
-									disabled={ isLoading }
-									accessibleWhenDisabled
-								>
-									{ !! featuredImageId && media && (
-										<img
-											className="editor-post-featured-image__preview-image"
-											src={ mediaSourceUrl }
-											alt={ getImageDescription( media ) }
-										/>
-									) }
-									{ isLoading && <Spinner /> }
-									{ ! featuredImageId &&
-										! isLoading &&
-										( postType?.labels
-											?.set_featured_image ||
-											DEFAULT_SET_FEATURE_IMAGE_LABEL ) }
-								</Button>
+								{ isMissingMedia ? (
+									<Notice
+										status="warning"
+										isDismissible={ false }
+									>
+										{ __(
+											'Could not retrieve the featured image data.'
+										) }
+									</Notice>
+								) : (
+									<Button
+										__next40pxDefaultSize
+										ref={ returnFocus }
+										className={
+											! featuredImageId
+												? 'editor-post-featured-image__toggle'
+												: 'editor-post-featured-image__preview'
+										}
+										onClick={ open }
+										aria-label={
+											! featuredImageId
+												? null
+												: __(
+														'Edit or replace the featured image'
+												  )
+										}
+										aria-describedby={
+											! featuredImageId
+												? null
+												: `editor-post-featured-image-${ featuredImageId }-describedby`
+										}
+										aria-haspopup="dialog"
+										disabled={ isLoading }
+										accessibleWhenDisabled
+									>
+										{ !! featuredImageId && media && (
+											<img
+												className="editor-post-featured-image__preview-image"
+												src={ mediaSourceUrl }
+												alt={ getImageDescription(
+													media
+												) }
+											/>
+										) }
+										{ ( isLoading ||
+											isRequestingFeaturedImageMedia ) && (
+											<Spinner />
+										) }
+										{ ! featuredImageId &&
+											! isLoading &&
+											( postType?.labels
+												?.set_featured_image ||
+												DEFAULT_SET_FEATURE_IMAGE_LABEL ) }
+									</Button>
+								) }
 								{ !! featuredImageId && (
-									<HStack className="editor-post-featured-image__actions">
+									<HStack
+										className={ clsx(
+											'editor-post-featured-image__actions',
+											{
+												'editor-post-featured-image__actions-missing-image':
+													isMissingMedia,
+												'editor-post-featured-image__actions-is-requesting-image':
+													isRequestingFeaturedImageMedia,
+											}
+										) }
+									>
 										<Button
 											__next40pxDefaultSize
 											className="editor-post-featured-image__action"
 											onClick={ open }
 											aria-haspopup="dialog"
+											variant={
+												isMissingMedia
+													? 'secondary'
+													: undefined
+											}
 										>
 											{ __( 'Replace' ) }
 										</Button>
@@ -228,8 +277,17 @@ function PostFeaturedImage( {
 											className="editor-post-featured-image__action"
 											onClick={ () => {
 												onRemoveImage();
-												toggleRef.current.focus();
+												// Signal that the toggle button should be focused,
+												// when it is rendered. Can't focus it directly here
+												// because it's rendered conditionally.
+												returnsFocusRef.current = true;
 											} }
+											variant={
+												isMissingMedia
+													? 'secondary'
+													: undefined
+											}
+											isDestructive={ isMissingMedia }
 										>
 											{ __( 'Remove' ) }
 										</Button>
@@ -247,17 +305,28 @@ function PostFeaturedImage( {
 }
 
 const applyWithSelect = withSelect( ( select ) => {
-	const { getMedia, getPostType } = select( coreStore );
+	const { getEntityRecord, getPostType, hasFinishedResolution } =
+		select( coreStore );
 	const { getCurrentPostId, getEditedPostAttribute } = select( editorStore );
 	const featuredImageId = getEditedPostAttribute( 'featured_media' );
 
 	return {
 		media: featuredImageId
-			? getMedia( featuredImageId, { context: 'view' } )
+			? getEntityRecord( 'postType', 'attachment', featuredImageId, {
+					context: 'view',
+			  } )
 			: null,
 		currentPostId: getCurrentPostId(),
 		postType: getPostType( getEditedPostAttribute( 'type' ) ),
 		featuredImageId,
+		isRequestingFeaturedImageMedia:
+			!! featuredImageId &&
+			! hasFinishedResolution( 'getEntityRecord', [
+				'postType',
+				'attachment',
+				featuredImageId,
+				{ context: 'view' },
+			] ),
 	};
 } );
 
@@ -281,6 +350,7 @@ const applyWithDispatch = withDispatch(
 							noticeOperations.removeAllNotices();
 							noticeOperations.createErrorNotice( message );
 						},
+						multiple: false,
 					} );
 			},
 			onRemoveImage() {

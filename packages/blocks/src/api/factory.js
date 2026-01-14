@@ -17,6 +17,7 @@ import {
 	getGroupingBlockName,
 } from './registration';
 import {
+	isBlockRegistered,
 	normalizeBlockType,
 	__experimentalSanitizeBlockAttributes,
 } from './utils';
@@ -31,6 +32,14 @@ import {
  * @return {Object} Block object.
  */
 export function createBlock( name, attributes = {}, innerBlocks = [] ) {
+	if ( ! isBlockRegistered( name ) ) {
+		return createBlock( 'core/missing', {
+			originalName: name,
+			originalContent: '',
+			originalUndelimitedContent: '',
+		} );
+	}
+
 	const sanitizedAttributes = __experimentalSanitizeBlockAttributes(
 		name,
 		attributes
@@ -94,15 +103,22 @@ export function __experimentalCloneSanitizedBlock(
 	mergeAttributes = {},
 	newInnerBlocks
 ) {
+	const { name } = block;
+
+	if ( ! isBlockRegistered( name ) ) {
+		return createBlock( 'core/missing', {
+			originalName: name,
+			originalContent: '',
+			originalUndelimitedContent: '',
+		} );
+	}
+
 	const clientId = uuid();
 
-	const sanitizedAttributes = __experimentalSanitizeBlockAttributes(
-		block.name,
-		{
-			...block.attributes,
-			...mergeAttributes,
-		}
-	);
+	const sanitizedAttributes = __experimentalSanitizeBlockAttributes( name, {
+		...block.attributes,
+		...mergeAttributes,
+	} );
 
 	return {
 		...block,
@@ -583,20 +599,11 @@ export function switchToBlockType( blocks, name ) {
  *
  * @return {Object} block.
  */
-export const getBlockFromExample = ( name, example ) => {
-	try {
-		return createBlock(
-			name,
-			example.attributes,
-			( example.innerBlocks ?? [] ).map( ( innerBlock ) =>
-				getBlockFromExample( innerBlock.name, innerBlock )
-			)
-		);
-	} catch {
-		return createBlock( 'core/missing', {
-			originalName: name,
-			originalContent: '',
-			originalUndelimitedContent: '',
-		} );
-	}
-};
+export const getBlockFromExample = ( name, example ) =>
+	createBlock(
+		name,
+		example.attributes,
+		( example.innerBlocks ?? [] ).map( ( innerBlock ) =>
+			getBlockFromExample( innerBlock.name, innerBlock )
+		)
+	);

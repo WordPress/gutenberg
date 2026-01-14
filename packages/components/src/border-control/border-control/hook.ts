@@ -38,6 +38,7 @@ export function useBorderControl(
 		width,
 		__experimentalIsRenderedInSidebar = false,
 		__next40pxDefaultSize,
+		__shouldNotWarnDeprecated36pxSize,
 		...otherProps
 	} = useContextSystem( props, 'BorderControl' );
 
@@ -45,6 +46,7 @@ export function useBorderControl(
 		componentName: 'BorderControl',
 		__next40pxDefaultSize,
 		size,
+		__shouldNotWarnDeprecated36pxSize,
 	} );
 
 	const computedSize =

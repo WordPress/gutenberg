@@ -1,30 +1,10 @@
-.block-library-query-toolbar__popover .components-popover__content {
-	min-width: 230px;
-
-	.block-library-query-toolbar__popover-number-control {
-		margin-bottom: $grid-unit-10;
-	}
-}
-
-.wp-block-query__create-new-link {
-	padding: 0 $grid-unit-20 $grid-unit-20 52px;
-}
-
-.block-library-query__pattern-selection-content .block-editor-block-patterns-list {
-	display: grid;
-	grid-template-columns: 1fr 1fr 1fr;
-	grid-gap: $grid-unit-10;
-
-	.block-editor-block-patterns-list__list-item {
-		margin-bottom: 0;
-		.block-editor-block-preview__container {
-			max-height: 250px;
-		}
-	}
-}
+@use "@wordpress/base-styles/breakpoints" as *;
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/z-index" as *;
 
 .block-library-query-pattern__selection-modal {
-
 	.block-editor-block-patterns-list {
 		column-count: 2;
 		column-gap: $grid-unit-30;
@@ -55,6 +35,32 @@
 	}
 }
 
-.wp-block-query__enhanced-pagination-notice {
-	margin: 0;
+.block-editor-block-settings-menu__popover {
+	&.is-expanded {
+		overflow-y: scroll;
+	}
+	.block-library-query-pattern__selection-content {
+		height: 100%;
+	}
+	.block-editor-block-patterns-list {
+		display: grid;
+		grid-template-columns: 1fr;
+		@include break-small() {
+			grid-template-columns: 1fr 1fr;
+		}
+		grid-gap: $grid-unit-15;
+		min-width: $break-zoomed-in;
+		@include break-small() {
+			min-width: $break-mobile;
+		}
+	}
+	.block-editor-block-patterns-list__list-item {
+		margin-bottom: 0;
+	}
+}
+
+// Provide special styling for the placeholder.
+// @todo this particular minimal style of placeholder could be componentized further.
+.wp-block-query > .block-editor-media-placeholder.is-small {
+	min-height: 60px;
 }

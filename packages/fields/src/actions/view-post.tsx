@@ -27,4 +27,7 @@ const viewPost: Action< BasePost > = {
 	},
 };
 
+/**
+ * View post action for BasePost.
+ */
 export default viewPost;

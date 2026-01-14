@@ -16,7 +16,6 @@ import {
 	getBlockTypes,
 } from '@wordpress/blocks';
 import { RawHTML } from '@wordpress/element';
-import { layout, footer, header } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -125,6 +124,9 @@ selectorNames.forEach( ( name ) => {
 					labels: {
 						singular_name: postTypeLabel,
 					},
+					supports: {
+						autosave: state.postType !== 'without-autosave',
+					},
 				};
 			},
 
@@ -188,42 +190,10 @@ const {
 	isPostAutosavingLocked,
 	canUserUseUnfilteredHTML,
 	getPostTypeLabel,
-	__experimentalGetDefaultTemplateType,
-	__experimentalGetDefaultTemplateTypes,
-	__experimentalGetTemplateInfo,
-	__experimentalGetDefaultTemplatePartAreas,
 	isEditorPanelRemoved,
 	isInserterOpened,
 	isListViewOpened,
 } = selectors;
-
-const defaultTemplateTypes = [
-	{
-		title: 'Default (Index)',
-		description: 'Main template',
-		slug: 'index',
-	},
-	{
-		title: '404 (Not Found)',
-		description: 'Applied when content cannot be found',
-		slug: '404',
-	},
-];
-
-const defaultTemplatePartAreas = [
-	{
-		area: 'header',
-		label: 'Header',
-		description: 'Some description of a header',
-		icon: 'header',
-	},
-	{
-		area: 'footer',
-		label: 'Footer',
-		description: 'Some description of a footer',
-		icon: 'footer',
-	},
-];
 
 describe( 'selectors', () => {
 	let cachedSelectors;
@@ -1623,6 +1593,33 @@ describe( 'selectors', () => {
 
 			expect( isEditedPostAutosaveable( state ) ).toBe( false );
 		} );
+
+		it( 'should return false if post type does not support autosave', () => {
+			const state = {
+				editor: {
+					present: {
+						blocks: {
+							value: [],
+						},
+						edits: {},
+					},
+				},
+				initialEdits: {},
+				currentPost: {
+					title: 'sassel',
+				},
+				saving: {},
+				getCurrentUser() {},
+				hasFetchedAutosaves() {
+					return true;
+				},
+				getAutosave() {},
+				postAutosavingLock: {},
+				postType: 'without-autosave',
+			};
+
+			expect( isEditedPostAutosaveable( state ) ).toBe( false );
+		} );
 	} );
 
 	describe( 'isEditedPostEmpty', () => {
@@ -2763,228 +2760,6 @@ describe( 'selectors', () => {
 				},
 			};
 			expect( canUserUseUnfilteredHTML( state ) ).toBe( false );
-		} );
-	} );
-
-	describe( '__experimentalGetDefaultTemplateTypes', () => {
-		const state = { editorSettings: { defaultTemplateTypes } };
-
-		it( 'returns undefined if there are no default template types', () => {
-			const emptyState = { editorSettings: {} };
-			expect(
-				__experimentalGetDefaultTemplateTypes( emptyState )
-			).toBeUndefined();
-		} );
-
-		it( 'returns a list of default template types if present in state', () => {
-			expect(
-				__experimentalGetDefaultTemplateTypes( state )
-			).toHaveLength( 2 );
-		} );
-	} );
-
-	describe( '__experimentalGetDefaultTemplatePartAreas', () => {
-		const state = { editorSettings: { defaultTemplatePartAreas } };
-
-		it( 'returns empty array if there are no default template part areas', () => {
-			const emptyState = { editorSettings: {} };
-			expect(
-				__experimentalGetDefaultTemplatePartAreas( emptyState )
-			).toHaveLength( 0 );
-		} );
-
-		it( 'returns a list of default template part areas if present in state', () => {
-			expect(
-				__experimentalGetDefaultTemplatePartAreas( state )
-			).toHaveLength( 2 );
-		} );
-
-		it( 'assigns an icon to each area', () => {
-			const templatePartAreas =
-				__experimentalGetDefaultTemplatePartAreas( state );
-			templatePartAreas.forEach( ( area ) =>
-				expect( area.icon ).not.toBeNull()
-			);
-		} );
-	} );
-
-	describe( '__experimentalGetDefaultTemplateType', () => {
-		const state = { editorSettings: { defaultTemplateTypes } };
-
-		it( 'returns an empty object if there are no default template types', () => {
-			const emptyState = { editorSettings: {} };
-			expect(
-				__experimentalGetDefaultTemplateType( emptyState, 'slug' )
-			).toEqual( {} );
-		} );
-
-		it( 'returns an empty object if the requested slug is not found', () => {
-			expect(
-				__experimentalGetDefaultTemplateType( state, 'foobar' )
-			).toEqual( {} );
-		} );
-
-		it( 'returns the requested default template type', () => {
-			expect(
-				__experimentalGetDefaultTemplateType( state, 'index' )
-			).toEqual( {
-				title: 'Default (Index)',
-				description: 'Main template',
-				slug: 'index',
-			} );
-		} );
-
-		it( 'returns the requested default template type even when the slug is numeric', () => {
-			expect(
-				__experimentalGetDefaultTemplateType( state, '404' )
-			).toEqual( {
-				title: '404 (Not Found)',
-				description: 'Applied when content cannot be found',
-				slug: '404',
-			} );
-		} );
-	} );
-
-	describe( '__experimentalGetTemplateInfo', () => {
-		const state = {
-			editorSettings: { defaultTemplateTypes, defaultTemplatePartAreas },
-		};
-
-		it( 'should return an empty object if no template is passed', () => {
-			expect( __experimentalGetTemplateInfo( state, null ) ).toEqual(
-				{}
-			);
-			expect( __experimentalGetTemplateInfo( state, undefined ) ).toEqual(
-				{}
-			);
-			expect( __experimentalGetTemplateInfo( state, false ) ).toEqual(
-				{}
-			);
-		} );
-
-		it( 'should return the default title if none is defined on the template', () => {
-			expect(
-				__experimentalGetTemplateInfo( state, { slug: 'index' } ).title
-			).toEqual( 'Default (Index)' );
-		} );
-
-		it( 'should return the rendered title if defined on the template', () => {
-			expect(
-				__experimentalGetTemplateInfo( state, {
-					slug: 'index',
-					title: { rendered: 'test title' },
-				} ).title
-			).toEqual( 'test title' );
-		} );
-
-		it( 'should return the slug if no title is found', () => {
-			expect(
-				__experimentalGetTemplateInfo( state, {
-					slug: 'not a real template',
-				} ).title
-			).toEqual( 'not a real template' );
-		} );
-
-		it( 'should return the default description if none is defined on the template', () => {
-			expect(
-				__experimentalGetTemplateInfo( state, { slug: 'index' } )
-					.description
-			).toEqual( 'Main template' );
-		} );
-
-		it( 'should return the raw excerpt as description if defined on the template', () => {
-			expect(
-				__experimentalGetTemplateInfo( state, {
-					slug: 'index',
-					description: { raw: 'test description' },
-				} ).description
-			).toEqual( 'test description' );
-		} );
-
-		it( 'should return a title, description, and icon', () => {
-			expect(
-				__experimentalGetTemplateInfo( state, { slug: 'index' } )
-			).toEqual( {
-				title: 'Default (Index)',
-				description: 'Main template',
-				icon: layout,
-			} );
-
-			expect(
-				__experimentalGetTemplateInfo( state, {
-					slug: 'index',
-					title: { rendered: 'test title' },
-				} )
-			).toEqual( {
-				title: 'test title',
-				description: 'Main template',
-				icon: layout,
-			} );
-
-			expect(
-				__experimentalGetTemplateInfo( state, {
-					slug: 'index',
-					description: { raw: 'test description' },
-				} )
-			).toEqual( {
-				title: 'Default (Index)',
-				description: 'test description',
-				icon: layout,
-			} );
-
-			expect(
-				__experimentalGetTemplateInfo( state, {
-					slug: 'index',
-					title: { rendered: 'test title' },
-					description: { raw: 'test description' },
-				} )
-			).toEqual( {
-				title: 'test title',
-				description: 'test description',
-				icon: layout,
-			} );
-		} );
-
-		it( 'should return correct icon based on area', () => {
-			expect(
-				__experimentalGetTemplateInfo( state, {
-					slug: 'template part, area = uncategorized',
-					area: 'uncategorized',
-				} )
-			).toEqual( {
-				title: 'template part, area = uncategorized',
-				icon: layout,
-			} );
-
-			expect(
-				__experimentalGetTemplateInfo( state, {
-					slug: 'template part, area = invalid',
-					area: 'invalid',
-				} )
-			).toEqual( {
-				title: 'template part, area = invalid',
-				icon: layout,
-			} );
-
-			expect(
-				__experimentalGetTemplateInfo( state, {
-					slug: 'template part, area = header',
-					area: 'header',
-				} )
-			).toEqual( {
-				title: 'template part, area = header',
-				icon: header,
-			} );
-
-			expect(
-				__experimentalGetTemplateInfo( state, {
-					slug: 'template part, area = footer',
-					area: 'footer',
-				} )
-			).toEqual( {
-				title: 'template part, area = footer',
-				icon: footer,
-			} );
 		} );
 	} );
 

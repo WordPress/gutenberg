@@ -55,7 +55,7 @@ add_filter( 'block_type_metadata_settings', 'gutenberg_filter_block_type_metadat
  * @param string $field_name Field name to pick from metadata.
  * @param int    $index      Optional. Index of the script to register when multiple items passed.
  *                           Default 0.
- * @return string Module ID.
+ * @return string|false Module ID.
  */
 function gutenberg_register_block_module_id( $metadata, $field_name, $index = 0 ) {
 	if ( empty( $metadata[ $field_name ] ) ) {
@@ -83,13 +83,13 @@ function gutenberg_register_block_module_id( $metadata, $field_name, $index = 0 
 	$module_path_norm    = wp_normalize_path( realpath( $path . '/' . $module_path ) );
 	$module_uri          = get_block_asset_url( $module_path_norm );
 	$module_asset        = ! empty( $module_asset_path ) ? require $module_asset_path : array();
-	$module_dependencies = isset( $module_asset['dependencies'] ) ? $module_asset['dependencies'] : array();
+	$module_dependencies = $module_asset['dependencies'] ?? array();
 
 	wp_register_script_module(
 		$module_id,
 		$module_uri,
 		$module_dependencies,
-		isset( $module_asset['version'] ) ? $module_asset['version'] : false
+		$module_asset['version'] ?? false
 	);
 
 	return $module_id;

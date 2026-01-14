@@ -49,7 +49,7 @@ function getStoreName( storeNameOrDescriptor ) {
  * configurations.
  *
  * @param {Object}  storeConfigs Initial store configurations.
- * @param {Object?} parent       Parent registry.
+ * @param {?Object} parent       Parent registry.
  *
  * @return {WPDataRegistry} Data registry.
  */

@@ -1,11 +1,11 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryFn } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react-webpack5';
 /**
  * WordPress dependencies
  */
-import { useState, createContext, useContext } from '@wordpress/element';
+import { createContext, useContext, useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
@@ -17,26 +17,22 @@ const CircularOptionPickerStoryContext = createContext< {
 } >( {} );
 
 const meta: Meta< typeof CircularOptionPicker > = {
-	title: 'Components/CircularOptionPicker',
+	title: 'Components/Selection & Input/Color/CircularOptionPicker',
+	id: 'components-circularoptionpicker',
 	component: CircularOptionPicker,
 	subcomponents: {
-		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		'CircularOptionPicker.Option': CircularOptionPicker.Option,
-		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		'CircularOptionPicker.OptionGroup': CircularOptionPicker.OptionGroup,
-		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		'CircularOptionPicker.ButtonAction': CircularOptionPicker.ButtonAction,
-		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		'CircularOptionPicker.DropdownLinkAction':
 			CircularOptionPicker.DropdownLinkAction,
 	},
 	argTypes: {
-		actions: { control: { type: null } },
-		options: { control: { type: null } },
+		actions: { control: false },
+		options: { control: false },
 		children: { control: { type: 'text' } },
 	},
 	parameters: {
-		actions: { argTypesRegex: '^on.*' },
 		controls: { expanded: true },
 		docs: {
 			canvas: { sourceState: 'shown' },
@@ -86,7 +82,6 @@ const DefaultOptions = () => {
 						onClick={ () => {
 							setCurrentColor?.( color );
 						} }
-						aria-label={ name }
 					/>
 				);
 			} ) }
@@ -131,7 +126,7 @@ WithLoopingDisabled.parameters = {
 	docs: {
 		source: {
 			code: `<CircularOptionPicker
-  aria-label="${ WithLoopingDisabled.args[ 'aria-label' ] }"
+  'aria-label': 'Circular Option Picker',
   loop={false}
   options={<DefaultOptions />}
 />`,
@@ -152,7 +147,7 @@ WithDropdownLinkAction.args = {
 	actions: (
 		<CircularOptionPicker.DropdownLinkAction
 			dropdownProps={ {
-				popoverProps: { position: 'top right' },
+				popoverProps: { placement: 'top-end' },
 				renderContent: () => (
 					<div>This is an example of a DropdownLinkAction.</div>
 				),

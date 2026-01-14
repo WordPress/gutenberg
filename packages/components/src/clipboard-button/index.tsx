@@ -45,9 +45,11 @@ export default function ClipboardButton( {
 	} );
 
 	useEffect( () => {
-		if ( timeoutIdRef.current ) {
-			clearTimeout( timeoutIdRef.current );
-		}
+		return () => {
+			if ( timeoutIdRef.current ) {
+				clearTimeout( timeoutIdRef.current );
+			}
+		};
 	}, [] );
 
 	const classes = clsx( 'components-clipboard-button', className );

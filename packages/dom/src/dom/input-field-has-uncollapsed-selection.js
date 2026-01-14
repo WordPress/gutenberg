@@ -19,7 +19,7 @@ import isHTMLInputElement from './is-html-input-element';
  *
  * @param {Element} element The HTML element.
  *
- * @return {boolean} Whether the input/textareaa element has some "selection".
+ * @return {boolean} Whether the input/textarea element has some "selection".
  */
 export default function inputFieldHasUncollapsedSelection( element ) {
 	if ( ! isHTMLInputElement( element ) && ! isTextField( element ) ) {

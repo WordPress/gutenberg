@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryFn } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react-webpack5';
+import { fn } from 'storybook/test';
 
 /**
  * Internal dependencies
@@ -13,10 +14,13 @@ const meta: Meta< typeof NavigableMenu > = {
 	id: 'components-navigablemenu',
 	component: NavigableMenu,
 	argTypes: {
-		children: { control: { type: null } },
+		children: { control: false },
+	},
+	args: {
+		onKeyDown: fn(),
+		onNavigate: fn(),
 	},
 	parameters: {
-		actions: { argTypesRegex: '^on.*' },
 		controls: {
 			expanded: true,
 		},

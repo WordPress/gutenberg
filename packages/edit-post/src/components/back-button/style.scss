@@ -1,19 +1,27 @@
-// Developer notes: these rules are duplicated for the site editor.
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
+
+// Developer notes: these rules are copied from the site editor.
 // They need to be updated in both places.
 
-.edit-post-fullscreen-mode-close.components-button {
-	@include break-medium() {
+.edit-post-fullscreen-mode-close__view-mode-toggle {
+	top: 0;
+	left: 0;
+	height: $header-height;
+	width: $header-height;
+	z-index: 100;
+
+	.components-button {
+		color: $white;
+		height: 100%;
+		width: 100%;
+		border-radius: 0;
+		overflow: hidden;
+		padding: 0;
 		display: flex;
 		align-items: center;
-		align-self: stretch;
-		border: none;
-		background: $gray-900;
-		color: $white;
-		border-radius: 0;
-		height: $header-height;
-		width: $header-height;
-		position: relative;
-
+		justify-content: center;
+		&:hover,
 		&:active {
 			color: $white;
 		}
@@ -21,43 +29,68 @@
 		&:focus {
 			box-shadow: none;
 		}
-
-		&::before {
-			transition: box-shadow 0.1s ease;
-			@include reduce-motion("transition");
-			content: "";
-			display: block;
-			position: absolute;
-			top: 9px;
-			right: 9px;
-			bottom: 9px + $border-width; // Height of toolbar in edit-post (not edit-site) is 61px tall.
-			left: 9px;
-			border-radius: $radius-small + $border-width + $border-width;
-			box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) $gray-900;
-		}
-
-		// Hover color.
-		&:hover::before {
-			box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) $gray-700;
-		}
-
-		&.has-icon:hover::before {
-			box-shadow: none;
-		}
-
-		// Lightened spot color focus.
-		&:focus::before {
-			box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) rgba($white, 0.1), inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
-		}
 	}
 
-	.edit-post-fullscreen-mode-close_site-icon {
-		width: $button-size;
-		height: $button-size;
-		border-radius: $radius-small;
-		object-fit: cover;
-		// Compensate for the top-bar border.
-		margin-top: -($border-width);
+	.edit-post-fullscreen-mode-close__view-mode-toggle-icon {
+		svg,
+		img {
+			background: $gray-900;
+			display: block;
+		}
+	}
+}
+
+.edit-post-fullscreen-mode-close-site-icon__icon {
+	fill: currentColor;
+	width: 100%;
+	height: 100%;
+	padding: $grid-unit-15;
+}
+
+.edit-post-fullscreen-mode-close-site-icon__image {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	background: #333;
+	aspect-ratio: 1 / 1;
+}
+
+.edit-post-fullscreen-mode-close.components-button:focus {
+	position: relative;
+
+	&::before {
+		content: "";
+		display: block;
+		position: absolute;
+		z-index: 1;
+		top: 0;
+		right: 0;
+		bottom: 0;
+		left: 0;
+		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color), inset 0 0 0 calc(#{ $border-width } + var(--wp-admin-border-width-focus)) $white;
+	}
+}
+
+.edit-post-fullscreen-mode-close__back-icon {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: $header-height;
+	height: $header-height;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background-color: hsla(0, 0%, 80%);
+	pointer-events: none;
+
+	svg {
+		fill: currentColor;
+	}
+
+	&.has-site-icon {
+		background-color: hsla(0, 0%, 100%, 0.6);
+		-webkit-backdrop-filter: saturate(180%) blur(15px);
+		backdrop-filter: saturate(180%) blur(15px);
 	}
 }
 

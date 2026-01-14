@@ -2,11 +2,8 @@
 	"$schema": "https://json.schemastore.org/tsconfig.json",
 	"extends": "../../tsconfig.base.json",
 	"compilerOptions": {
-		"rootDir": "src",
-		"declarationDir": "build-types",
 		"types": [ "gutenberg-env" ],
 		"checkJs": false
 	},
-	"references": [ { "path": "../a11y" }, { "path": "../data" } ],
-	"include": [ "src/**/*" ]
+	"references": [ { "path": "../a11y" }, { "path": "../data" } ]
 }

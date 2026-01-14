@@ -1,3 +1,5 @@
+@use "@wordpress/base-styles/variables" as *;
+
 .rich-text {
 	[data-rich-text-placeholder] {
 		pointer-events: none;
@@ -13,16 +15,6 @@
 	&:focus {
 		// Removes outline added by the browser.
 		outline: none;
-
-		[data-rich-text-format-boundary] {
-			border-radius: $radius-small;
-		}
-	}
-}
-
-.block-editor-rich-text__editable {
-	> p:first-child {
-		margin-top: 0;
 	}
 }
 
@@ -39,4 +31,24 @@ figcaption.block-editor-rich-text__editable [data-rich-text-placeholder]::before
 		content: "</>";
 		background: rgb(255, 255, 0);
 	}
+}
+
+[data-rich-text-comment],
+[data-rich-text-format-boundary] {
+	border-radius: $radius-small;
+}
+
+[data-rich-text-comment] {
+	background-color: currentColor;
+
+	span {
+		filter: invert(100%);
+		color: currentColor;
+		padding: 0 2px;
+	}
+}
+
+// Hide selection within non-editable elements, we draw our own boundaries.
+.rich-text [contenteditable="false"]::selection {
+	background-color: transparent;
 }

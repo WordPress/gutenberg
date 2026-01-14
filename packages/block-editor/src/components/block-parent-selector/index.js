@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { getBlockType, store as blocksStore } from '@wordpress/blocks';
 import { ToolbarButton } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
@@ -24,31 +23,18 @@ import { unlock } from '../../lock-unlock';
  */
 export default function BlockParentSelector() {
 	const { selectBlock } = useDispatch( blockEditorStore );
-	const { parentClientId, isVisible } = useSelect( ( select ) => {
+	const { parentClientId } = useSelect( ( select ) => {
 		const {
-			getBlockName,
 			getBlockParents,
 			getSelectedBlockClientId,
-			getBlockEditingMode,
 			getParentSectionBlock,
 		} = unlock( select( blockEditorStore ) );
-		const { hasBlockSupport } = select( blocksStore );
 		const selectedBlockClientId = getSelectedBlockClientId();
 		const parentSection = getParentSectionBlock( selectedBlockClientId );
 		const parents = getBlockParents( selectedBlockClientId );
 		const _parentClientId = parentSection ?? parents[ parents.length - 1 ];
-		const parentBlockName = getBlockName( _parentClientId );
-		const _parentBlockType = getBlockType( parentBlockName );
 		return {
 			parentClientId: _parentClientId,
-			isVisible:
-				_parentClientId &&
-				getBlockEditingMode( _parentClientId ) !== 'disabled' &&
-				hasBlockSupport(
-					_parentBlockType,
-					'__experimentalParentSelector',
-					true
-				),
 		};
 	}, [] );
 	const blockInformation = useBlockDisplayInformation( parentClientId );
@@ -60,10 +46,6 @@ export default function BlockParentSelector() {
 		ref: nodeRef,
 		highlightParent: true,
 	} );
-
-	if ( ! isVisible ) {
-		return null;
-	}
 
 	return (
 		<div

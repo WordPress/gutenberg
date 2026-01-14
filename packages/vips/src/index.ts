@@ -4,15 +4,12 @@
 import Vips from 'wasm-vips';
 
 // @ts-expect-error
-// eslint-disable-next-line import/no-unresolved
 import VipsModule from 'wasm-vips/vips.wasm';
 
 // @ts-expect-error
-// eslint-disable-next-line import/no-unresolved
 import VipsHeifModule from 'wasm-vips/vips-heif.wasm';
 
 // @ts-expect-error
-// eslint-disable-next-line import/no-unresolved
 import VipsJxlModule from 'wasm-vips/vips-jxl.wasm';
 
 /**
@@ -122,7 +119,7 @@ export async function convertImageFormat(
 	outputType: string,
 	quality = 0.82,
 	interlaced = false
-): Promise< ArrayBuffer > {
+): Promise< ArrayBuffer | ArrayBufferLike > {
 	const ext = outputType.split( '/' )[ 1 ];
 
 	inProgressOperations.add( id );
@@ -186,7 +183,7 @@ export async function compressImage(
 	type: string,
 	quality = 0.82,
 	interlaced = false
-): Promise< ArrayBuffer > {
+): Promise< ArrayBuffer | ArrayBufferLike > {
 	return convertImageFormat( id, buffer, type, type, quality, interlaced );
 }
 
@@ -207,7 +204,7 @@ export async function resizeImage(
 	resize: ImageSizeCrop,
 	smartCrop = false
 ): Promise< {
-	buffer: ArrayBuffer;
+	buffer: ArrayBuffer | ArrayBufferLike;
 	width: number;
 	height: number;
 	originalWidth: number;

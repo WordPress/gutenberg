@@ -46,7 +46,7 @@ export const POST_FORMATS = [
  * <PostFormat />
  * ```
  *
- * @return {JSX.Element} The rendered PostFormat component.
+ * @return {React.ReactNode} The rendered PostFormat component.
  */
 export default function PostFormat() {
 	const instanceId = useInstanceId( PostFormat );

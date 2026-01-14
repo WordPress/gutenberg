@@ -7,6 +7,7 @@ import { createBlock } from '@wordpress/blocks';
  * Internal dependencies
  */
 import metadata from './block.json';
+import { removeAspectRatioClasses } from './util';
 
 const { name: EMBED_BLOCK } = metadata;
 
@@ -33,13 +34,14 @@ const transforms = {
 			type: 'block',
 			blocks: [ 'core/paragraph' ],
 			isMatch: ( { url } ) => !! url,
-			transform: ( { url, caption } ) => {
+			transform: ( { url, caption, className } ) => {
 				let value = `<a href="${ url }">${ url }</a>`;
 				if ( caption?.trim() ) {
 					value += `<br />${ caption }`;
 				}
 				return createBlock( 'core/paragraph', {
 					content: value,
+					className: removeAspectRatioClasses( className ),
 				} );
 			},
 		},

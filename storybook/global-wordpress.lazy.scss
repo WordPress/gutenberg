@@ -1,4 +1,4 @@
-@import "~@wordpress/base-styles/colors";
+@use "@wordpress/base-styles/colors" as *;
 
 // These `body` styles have different values defined in common.css,
 // but are overridden to these values within major UI sections that contain wp-components,

@@ -9,11 +9,19 @@ import clsx from 'clsx';
 import {
 	__experimentalHStack as HStack,
 	__experimentalTruncate as Truncate,
+	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { forwardRef } from '@wordpress/element';
-import { Icon, lockSmall as lock, pinSmall } from '@wordpress/icons';
+import {
+	Icon,
+	lockSmall as lock,
+	pinSmall,
+	unseen,
+	symbol,
+} from '@wordpress/icons';
 import { SPACE, ENTER } from '@wordpress/keycodes';
 import { useSelect } from '@wordpress/data';
+import { hasBlockSupport } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -25,6 +33,9 @@ import ListViewExpander from './expander';
 import { useBlockLock } from '../block-lock';
 import useListViewImages from './use-list-view-images';
 import { store as blockEditorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
+
+const { Badge } = unlock( componentsPrivateApis );
 
 function ListViewBlockSelectButton(
 	{
@@ -50,15 +61,30 @@ function ListViewBlockSelectButton(
 		context: 'list-view',
 	} );
 	const { isLocked } = useBlockLock( clientId );
-	const { isContentOnly } = useSelect(
-		( select ) => ( {
-			isContentOnly:
-				select( blockEditorStore ).getBlockEditingMode( clientId ) ===
-				'contentOnly',
-		} ),
-		[ clientId ]
-	);
-	const shouldShowLockIcon = isLocked && ! isContentOnly;
+	const { canToggleBlockVisibility, isBlockHidden, hasPatternName } =
+		useSelect(
+			( select ) => {
+				const { getBlockName, getBlockAttributes } =
+					select( blockEditorStore );
+				const { isBlockHidden: _isBlockHidden } = unlock(
+					select( blockEditorStore )
+				);
+				const blockAttributes = getBlockAttributes( clientId );
+				return {
+					canToggleBlockVisibility: hasBlockSupport(
+						getBlockName( clientId ),
+						'visibility',
+						true
+					),
+					isBlockHidden: _isBlockHidden( clientId ),
+					hasPatternName: !! blockAttributes?.metadata?.patternName,
+				};
+			},
+			[ clientId ]
+		);
+	const shouldShowLockIcon = isLocked;
+	const shouldShowBlockVisibilityIcon =
+		canToggleBlockVisibility && isBlockHidden;
 	const isSticky = blockInformation?.positionType === 'sticky';
 	const images = useListViewImages( { clientId, isExpanded } );
 
@@ -102,7 +128,7 @@ function ListViewBlockSelectButton(
 		>
 			<ListViewExpander onClick={ onToggleExpanded } />
 			<BlockIcon
-				icon={ blockInformation?.icon }
+				icon={ hasPatternName ? symbol : blockInformation?.icon }
 				showColors
 				context="list-view"
 			/>
@@ -117,12 +143,9 @@ function ListViewBlockSelectButton(
 				</span>
 				{ blockInformation?.anchor && (
 					<span className="block-editor-list-view-block-select-button__anchor-wrapper">
-						<Truncate
-							className="block-editor-list-view-block-select-button__anchor"
-							ellipsizeMode="auto"
-						>
+						<Badge className="block-editor-list-view-block-select-button__anchor">
 							{ blockInformation.anchor }
-						</Truncate>
+						</Badge>
 					</span>
 				) }
 				{ isSticky && (
@@ -147,6 +170,11 @@ function ListViewBlockSelectButton(
 						) ) }
 					</span>
 				) : null }
+				{ shouldShowBlockVisibilityIcon && (
+					<span className="block-editor-list-view-block-select-button__block-visibility">
+						<Icon icon={ unseen } />
+					</span>
+				) }
 				{ shouldShowLockIcon && (
 					<span className="block-editor-list-view-block-select-button__lock">
 						<Icon icon={ lock } />

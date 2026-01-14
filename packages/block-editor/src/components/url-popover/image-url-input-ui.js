@@ -2,7 +2,12 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useRef, useEffect, useState } from '@wordpress/element';
+import {
+	useRef,
+	useEffect,
+	useState,
+	createInterpolateElement,
+} from '@wordpress/element';
 import { focus } from '@wordpress/dom';
 import {
 	ToolbarButton,
@@ -12,6 +17,7 @@ import {
 	ToggleControl,
 	TextControl,
 	__experimentalVStack as VStack,
+	ExternalLink,
 } from '@wordpress/components';
 import {
 	Icon,
@@ -21,6 +27,7 @@ import {
 	fullscreen,
 	linkOff,
 } from '@wordpress/icons';
+import { prependHTTP } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -149,7 +156,7 @@ const ImageURLInputUI = ( {
 					)?.linkDestination || LINK_DESTINATION_CUSTOM;
 
 				onChangeUrl( {
-					href: urlInput,
+					href: prependHTTP( urlInput ),
 					linkDestination: selectedDestination,
 					lightbox: { enabled: false },
 				} );
@@ -221,21 +228,28 @@ const ImageURLInputUI = ( {
 	const advancedOptions = (
 		<VStack spacing="3">
 			<ToggleControl
-				__nextHasNoMarginBottom
 				label={ __( 'Open in new tab' ) }
 				onChange={ onSetNewTab }
 				checked={ linkTarget === '_blank' }
 			/>
 			<TextControl
 				__next40pxDefaultSize
-				__nextHasNoMarginBottom
-				label={ __( 'Link rel' ) }
+				label={ __( 'Link relation' ) }
 				value={ rel ?? '' }
 				onChange={ onSetLinkRel }
+				help={ createInterpolateElement(
+					__(
+						'The <a>Link Relation</a> attribute defines the relationship between a linked resource and the current document.'
+					),
+					{
+						a: (
+							<ExternalLink href="https://developer.mozilla.org/docs/Web/HTML/Attributes/rel" />
+						),
+					}
+				) }
 			/>
 			<TextControl
 				__next40pxDefaultSize
-				__nextHasNoMarginBottom
 				label={ __( 'Link CSS class' ) }
 				value={ linkClass || '' }
 				onChange={ onSetLinkClass }
@@ -265,14 +279,14 @@ const ImageURLInputUI = ( {
 				<div className="block-editor-url-popover__expand-on-click">
 					<Icon icon={ fullscreen } />
 					<div className="text">
-						<p>{ __( 'Expand on click' ) }</p>
+						<p>{ __( 'Enlarge on click' ) }</p>
 						<p className="description">
 							{ __( 'Scales the image with a lightbox effect' ) }
 						</p>
 					</div>
 					<Button
 						icon={ linkOff }
-						label={ __( 'Disable expand on click' ) }
+						label={ __( 'Disable enlarge on click' ) }
 						onClick={ () => {
 							onSetLightbox?.( false );
 						} }
@@ -372,7 +386,7 @@ const ImageURLInputUI = ( {
 											stopEditLink();
 										} }
 									>
-										{ __( 'Expand on click' ) }
+										{ __( 'Enlarge on click' ) }
 									</MenuItem>
 								) }
 							</NavigableMenu>

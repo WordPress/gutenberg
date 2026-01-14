@@ -10,12 +10,10 @@ import { decodeEntities } from '@wordpress/html-entities';
 
 const SHOWN_SUGGESTIONS = 10;
 
-/** @typedef {import('@wordpress/components').WPCompleter} WPCompleter */
-
 /**
  * Creates a suggestion list for links to posts or pages.
  *
- * @return {WPCompleter} A links completer.
+ * @return {Object} A links completer.
  */
 function createLinkCompleter() {
 	return {
@@ -60,6 +58,6 @@ function createLinkCompleter() {
 /**
  * Creates a suggestion list for links to posts or pages..
  *
- * @return {WPCompleter} A link completer.
+ * @return {Object} A link completer.
  */
 export default createLinkCompleter();

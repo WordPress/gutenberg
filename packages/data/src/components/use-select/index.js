@@ -9,7 +9,7 @@ import {
 	useSyncExternalStore,
 	useDebugValue,
 } from '@wordpress/element';
-import isShallowEqual from '@wordpress/is-shallow-equal';
+import { isShallowEqual } from '@wordpress/is-shallow-equal';
 
 /**
  * Internal dependencies
@@ -18,6 +18,25 @@ import useRegistry from '../registry-provider/use-registry';
 import useAsyncMode from '../async-mode-provider/use-async-mode';
 
 const renderQueue = createQueue();
+
+function warnOnUnstableReference( a, b ) {
+	if ( ! a || ! b ) {
+		return;
+	}
+
+	const keys =
+		typeof a === 'object' && typeof b === 'object'
+			? Object.keys( a ).filter( ( k ) => a[ k ] !== b[ k ] )
+			: [];
+
+	// eslint-disable-next-line no-console
+	console.warn(
+		'The `useSelect` hook returns different values when called with the same state and parameters.\n' +
+			'This can lead to unnecessary re-renders and performance issues if not fixed.\n\n' +
+			'Non-equal value keys: %s\n\n',
+		keys.join( ', ' )
+	);
+}
 
 /**
  * @typedef {import('../../types').StoreDescriptor<C>} StoreDescriptor
@@ -155,14 +174,11 @@ function Store( registry, suspense ) {
 				listeningStores
 			);
 
-			if ( process.env.NODE_ENV === 'development' ) {
+			if ( globalThis.SCRIPT_DEBUG ) {
 				if ( ! didWarnUnstableReference ) {
 					const secondMapResult = mapSelect( select, registry );
 					if ( ! isShallowEqual( mapResult, secondMapResult ) ) {
-						// eslint-disable-next-line no-console
-						console.warn(
-							`The 'useSelect' hook returns different values when called with the same state and parameters. This can lead to unnecessary rerenders.`
-						);
+						warnOnUnstableReference( mapResult, secondMapResult );
 						didWarnUnstableReference = true;
 					}
 				}
@@ -237,15 +253,15 @@ function _useMappingSelect( suspense, mapSelect, deps ) {
  * [rules of hooks](https://react.dev/reference/rules/rules-of-hooks).
  *
  * @template {MapSelect | StoreDescriptor<any>} T
- * @param {T}         mapSelect Function called on every state change. The returned value is
- *                              exposed to the component implementing this hook. The function
- *                              receives the `registry.select` method on the first argument
- *                              and the `registry` on the second argument.
- *                              When a store key is passed, all selectors for the store will be
- *                              returned. This is only meant for usage of these selectors in event
- *                              callbacks, not for data needed to create the element tree.
- * @param {unknown[]} deps      If provided, this memoizes the mapSelect so the same `mapSelect` is
- *                              invoked on every state change unless the dependencies change.
+ * @param {T}          mapSelect Function called on every state change. The returned value is
+ *                               exposed to the component implementing this hook. The function
+ *                               receives the `registry.select` method on the first argument
+ *                               and the `registry` on the second argument.
+ *                               When a store key is passed, all selectors for the store will be
+ *                               returned. This is only meant for usage of these selectors in event
+ *                               callbacks, not for data needed to create the element tree.
+ * @param {unknown[]=} deps      If provided, this memoizes the mapSelect so the same `mapSelect` is
+ *                               invoked on every state change unless the dependencies change.
  *
  * @example
  * ```js

@@ -260,7 +260,7 @@ describe( 'getIssueFeature', () => {
 					name: '[Package] This package',
 				},
 				{
-					name: '[Feature] Cool Feature', // Should have priority despite prescence of block specific label.
+					name: '[Feature] Cool Feature', // Should have priority despite presence of block specific label.
 				},
 				{
 					name: '[Package] Another One',

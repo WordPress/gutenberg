@@ -1,29 +1,23 @@
-.edit-site-sidebar-navigation-screen-dataviews__group-header {
-	margin-top: $grid-unit-40;
-	h2 {
-		font-size: 11px;
-		font-weight: 500;
-		text-transform: uppercase;
-	}
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
+
+.edit-site-sidebar-dataviews {
+	margin-left: -$grid-unit-20;
+	margin-right: -$grid-unit-20;
 }
 
 .edit-site-sidebar-dataviews-dataview-item {
 	border-radius: $radius-small;
-	padding-right: $grid-unit-10;
-
-	.edit-site-sidebar-dataviews-dataview-item__dropdown-menu {
-		min-width: initial;
-	}
 
 	&:hover,
 	&:focus,
 	&[aria-current] {
 		color: $gray-200;
-		background: $gray-800;
 	}
 
 	&.is-selected {
-		background: var(--wp-admin-theme-color);
+		background: $gray-800;
+		font-weight: $font-weight-medium;
 		color: $white;
 	}
 }

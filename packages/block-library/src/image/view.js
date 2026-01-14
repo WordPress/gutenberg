@@ -1,7 +1,18 @@
 /**
  * WordPress dependencies
  */
-import { store, getContext, getElement } from '@wordpress/interactivity';
+import {
+	store,
+	getContext,
+	getElement,
+	withSyncEvent,
+	withScope,
+} from '@wordpress/interactivity';
+
+/**
+ * Internal dependencies
+ */
+import { IMAGE_PRELOAD_DELAY } from './constants';
 
 /**
  * Tracks whether user is touching screen; used to differentiate behavior for
@@ -19,11 +30,36 @@ let isTouching = false;
  */
 let lastTouchTime = 0;
 
+/**
+ * Returns the appropriate src URL for an image.
+ *
+ * @param {string} uploadedSrc - Full size image src.
+ * @return {string} The source URL.
+ */
+function getImageSrc( { uploadedSrc } ) {
+	return (
+		uploadedSrc ||
+		'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs='
+	);
+}
+
+/**
+ * Returns the appropriate srcset for an image.
+ *
+ * @param {string} lightboxSrcset - Image srcset.
+ * @return {string} The srcset value.
+ */
+function getImageSrcset( { lightboxSrcset } ) {
+	return lightboxSrcset || '';
+}
+
 const { state, actions, callbacks } = store(
 	'core/image',
 	{
 		state: {
 			currentImageId: null,
+			preloadTimers: new Map(),
+			preloadedImageIds: new Set(),
 			get currentImage() {
 				return state.metadata[ state.currentImageId ];
 			},
@@ -37,10 +73,10 @@ const { state, actions, callbacks } = store(
 				return state.overlayOpened ? 'true' : null;
 			},
 			get enlargedSrc() {
-				return (
-					state.currentImage.uploadedSrc ||
-					'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs='
-				);
+				return getImageSrc( state.currentImage );
+			},
+			get enlargedSrcset() {
+				return getImageSrcset( state.currentImage );
 			},
 			get figureStyles() {
 				return (
@@ -105,9 +141,6 @@ const { state, actions, callbacks } = store(
 			},
 			hideLightbox() {
 				if ( state.overlayEnabled ) {
-					// Starts the overlay closing animation. The showClosingAnimation
-					// class is used to avoid showing it on page load.
-					state.showClosingAnimation = true;
 					state.overlayEnabled = false;
 
 					// Waits until the close animation has completed before allowing a
@@ -128,7 +161,7 @@ const { state, actions, callbacks } = store(
 					}, 450 );
 				}
 			},
-			handleKeydown( event ) {
+			handleKeydown: withSyncEvent( ( event ) => {
 				if ( state.overlayEnabled ) {
 					// Focuses the close button when the user presses the tab key.
 					if ( event.key === 'Tab' ) {
@@ -141,8 +174,8 @@ const { state, actions, callbacks } = store(
 						actions.hideLightbox();
 					}
 				}
-			},
-			handleTouchMove( event ) {
+			} ),
+			handleTouchMove: withSyncEvent( ( event ) => {
 				// On mobile devices, prevents triggering the scroll event because
 				// otherwise the page jumps around when it resets the scroll position.
 				// This also means that closing the lightbox requires that a user
@@ -152,7 +185,7 @@ const { state, actions, callbacks } = store(
 				if ( state.overlayEnabled ) {
 					event.preventDefault();
 				}
-			},
+			} ),
 			handleTouchStart() {
 				isTouching = true;
 			},
@@ -183,6 +216,55 @@ const { state, actions, callbacks } = store(
 							state.scrollTopReset
 						);
 					}
+				}
+			},
+			preloadImage() {
+				const { imageId } = getContext();
+
+				// Bails if it has already been preloaded. This could help
+				// prevent unnecessary preloading of the same image multiple times,
+				// leading to duplicate link elements in the document head.
+				if ( state.preloadedImageIds.has( imageId ) ) {
+					return;
+				}
+
+				// Link element to preload the image.
+				const imageMetadata = state.metadata[ imageId ];
+				const imageLink = document.createElement( 'link' );
+				imageLink.rel = 'preload';
+				imageLink.as = 'image';
+				imageLink.href = getImageSrc( imageMetadata );
+
+				// Apply srcset if available for responsive preloading
+				const srcset = getImageSrcset( imageMetadata );
+				if ( srcset ) {
+					imageLink.setAttribute( 'imagesrcset', srcset );
+					imageLink.setAttribute( 'imagesizes', '100vw' );
+				}
+
+				document.head.appendChild( imageLink );
+				state.preloadedImageIds.add( imageId );
+			},
+			preloadImageWithDelay() {
+				const { imageId } = getContext();
+
+				actions.cancelPreload();
+
+				// Set a new timer to preload the image after a short delay.
+				const timerId = setTimeout(
+					withScope( () => {
+						actions.preloadImage();
+						state.preloadTimers.delete( imageId );
+					} ),
+					IMAGE_PRELOAD_DELAY
+				);
+				state.preloadTimers.set( imageId, timerId );
+			},
+			cancelPreload() {
+				const { imageId } = getContext();
+				if ( state.preloadTimers.has( imageId ) ) {
+					clearTimeout( state.preloadTimers.get( imageId ) );
+					state.preloadTimers.delete( imageId );
 				}
 			},
 		},
@@ -341,7 +423,6 @@ const { state, actions, callbacks } = store(
 				// adding 1 pixel to the container width and height solves the problem,
 				// though this can be removed if the issue is fixed in the future.
 				state.overlayStyles = `
-				:root {
 					--wp--lightbox-initial-top-position: ${ screenPosY }px;
 					--wp--lightbox-initial-left-position: ${ screenPosX }px;
 					--wp--lightbox-container-width: ${ containerWidth + 1 }px;
@@ -352,12 +433,21 @@ const { state, actions, callbacks } = store(
 					--wp--lightbox-scrollbar-width: ${
 						window.innerWidth - document.documentElement.clientWidth
 					}px;
-				}
-			`;
+				`;
 			},
 			setButtonStyles() {
-				const { imageId } = getContext();
 				const { ref } = getElement();
+
+				// This guard prevents errors in images with the `srcset`
+				// attribute, which can dispatch `load` events even after DOM
+				// removal. Preact doesn't automatically clean up `load` event
+				// listeners on unmounted `img` elements (see
+				// https://github.com/preactjs/preact/issues/3141).
+				if ( ! ref ) {
+					return;
+				}
+
+				const { imageId } = getContext();
 
 				state.metadata[ imageId ].imageRef = ref;
 				state.metadata[ imageId ].currentSrc = ref.currentSrc;

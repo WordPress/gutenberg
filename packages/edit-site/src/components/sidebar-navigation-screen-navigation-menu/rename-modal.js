@@ -31,7 +31,6 @@ export default function RenameModal( { menuTitle, onClose, onSave } ) {
 			<form className="sidebar-navigation__rename-modal-form">
 				<VStack spacing="3">
 					<TextControl
-						__nextHasNoMarginBottom
 						__next40pxDefaultSize
 						value={ editedMenuTitle }
 						placeholder={ __( 'Navigation title' ) }

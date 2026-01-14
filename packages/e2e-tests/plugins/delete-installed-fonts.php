@@ -32,7 +32,7 @@ add_filter( 'font_dir', 'gutenberg_filter_e2e_font_dir' );
 
 /**
  * Deletes all user installed fonts, associated font files, the fonts directory, and user global styles typography
- * setings for the current theme so that we can test uploading/installing fonts in a clean environment.
+ * settings for the current theme so that we can test uploading/installing fonts in a clean environment.
  */
 function gutenberg_delete_installed_fonts() {
 	$font_family_ids = new WP_Query(

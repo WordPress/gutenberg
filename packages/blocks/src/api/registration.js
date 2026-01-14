@@ -8,7 +8,7 @@ import warning from '@wordpress/warning';
 /**
  * Internal dependencies
  */
-import i18nBlockSchema from './i18n-block.json';
+import i18nBlockSchema from './i18n-block.json' with { type: 'json' };
 import { store as blocksStore } from '../store';
 import { unlock } from '../lock-unlock';
 
@@ -121,6 +121,20 @@ import { unlock } from '../lock-unlock';
  * @property {Object}             [example]     Example provides structured data for
  *                                              the block preview. When not defined
  *                                              then no preview is shown.
+ */
+
+/**
+ * An object describing a Block Bindings source.
+ *
+ * @typedef {Object} WPBlockBindingsSource
+ *
+ * @property {string}   name               The unique and machine-readable name.
+ * @property {string}   [label]            Human-readable label. Optional when it is defined in the server.
+ * @property {Array}    [usesContext]      Optional array of context needed by the source only in the editor.
+ * @property {Function} [getValues]        Optional function to get the values from the source.
+ * @property {Function} [setValues]        Optional function to update multiple values connected to the source.
+ * @property {Function} [canUserEditValue] Optional function to determine if the user can edit the value.
+ * @property {Function} [getFieldsList]    Optional function that returns fields list that will be shown in the UI.
  */
 
 function isObject( object ) {
@@ -769,13 +783,7 @@ export const unregisterBlockVariation = ( blockName, variationName ) => {
  *
  * @since 6.7.0 Introduced in WordPress core.
  *
- * @param {Object}   source                    Properties of the source to be registered.
- * @param {string}   source.name               The unique and machine-readable name.
- * @param {string}   [source.label]            Human-readable label. Optional when it is defined in the server.
- * @param {Array}    [source.usesContext]      Optional array of context needed by the source only in the editor.
- * @param {Function} [source.getValues]        Optional function to get the values from the source.
- * @param {Function} [source.setValues]        Optional function to update multiple values connected to the source.
- * @param {Function} [source.canUserEditValue] Optional function to determine if the user can edit the value.
+ * @param {WPBlockBindingsSource} source Object describing a block bindings source.
  *
  * @example
  * ```js
@@ -866,7 +874,7 @@ export const registerBlockBindingsSource = ( source ) => {
 	}
 
 	if ( label && existingSource?.label && label !== existingSource?.label ) {
-		warning( 'Block bindings "' + name + '" source label was overriden.' );
+		warning( 'Block bindings "' + name + '" source label was overridden.' );
 	}
 
 	// Check the `usesContext` property is correct.
@@ -895,7 +903,6 @@ export const registerBlockBindingsSource = ( source ) => {
 
 	// Check the `getFieldsList` property is correct.
 	if ( getFieldsList && typeof getFieldsList !== 'function' ) {
-		// eslint-disable-next-line no-console
 		warning( 'Block bindings source getFieldsList must be a function.' );
 		return;
 	}

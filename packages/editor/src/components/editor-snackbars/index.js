@@ -11,7 +11,7 @@ const MAX_VISIBLE_NOTICES = -3;
 /**
  * Renders the editor snackbars component.
  *
- * @return {JSX.Element} The rendered component.
+ * @return {React.ReactNode} The rendered component.
  */
 export default function EditorSnackbars() {
 	const notices = useSelect(

@@ -2,7 +2,7 @@
 
 ## Areas
 
-When `canvasMode` is not `edit`, the areas avaliable to use are:
+When `canvasMode` is not `edit`, the areas available to use are:
 
 | Area | Non-mobile viewport | Mobile viewport |
 | --- | --- | --- |
@@ -12,7 +12,7 @@ When `canvasMode` is not `edit`, the areas avaliable to use are:
 | `edit` | Rendered if provided. | Not rendered. |
 | `mobile` | Not rendered | Rendered as full-screen, if provided. |
 
-When `canvasMode` is `edit`, the areas avaliable to use are:
+When `canvasMode` is `edit`, the areas available to use are:
 
 | Area | Non-mobile viewport | Mobile viewport |
 | --- | --- | --- |

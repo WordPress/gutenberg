@@ -1,7 +1,13 @@
 /**
  * External dependencies
  */
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import {
+	fireEvent,
+	render,
+	screen,
+	waitFor,
+	within,
+} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 /**
@@ -56,7 +62,7 @@ const getButton = ( name ) => {
 };
 
 const getColorOption = ( color ) => {
-	return screen.getByRole( 'option', { name: `Color: ${ color }` } );
+	return screen.getByRole( 'option', { name: `${ color }` } );
 };
 
 const queryButton = ( name ) => {
@@ -131,9 +137,11 @@ describe( 'BorderControl', () => {
 			await openPopover( user );
 
 			const customColorPicker = getButton( /Custom color picker/ );
-			const colorSwatchButtons = screen.getAllByRole( 'option', {
-				name: /^Color:/,
+			const circularOptionPicker = screen.getByRole( 'listbox', {
+				name: 'Custom color picker',
 			} );
+			const colorSwatchButtons =
+				within( circularOptionPicker ).getAllByRole( 'option' );
 			const styleLabel = screen.getByText( 'Style' );
 			const solidButton = getButton( 'Solid' );
 			const dashedButton = getButton( 'Dashed' );

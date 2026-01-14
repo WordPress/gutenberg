@@ -19,7 +19,7 @@ import PostTrashCheck from './check';
  * Displays the Post Trash Button and Confirm Dialog in the Editor.
  *
  * @param {?{onActionPerformed: Object}} An object containing the onActionPerformed function.
- * @return {JSX.Element|null} The rendered PostTrash component.
+ * @return {React.ReactNode} The rendered PostTrash component.
  */
 export default function PostTrash( { onActionPerformed } ) {
 	const registry = useRegistry();

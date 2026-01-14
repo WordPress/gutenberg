@@ -1,0 +1,24 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/variables" as *;
+
+.block-editor-content-only-controls__rich-text {
+	width: 100%;
+	// Override input style margin in WP forms.css.
+	margin: 0;
+	background: $white;
+	color: $gray-900;
+	@include input-control( var(--wp-admin-theme-color, #3858e9) );
+	border-color: $gray-600;
+
+	&::placeholder {
+		color: color-mix(in srgb, $gray-900, transparent 38%);
+	}
+
+	min-height: $grid-unit-50;
+
+	// Subtract 1px to account for the border, which isn't included on the element
+	// on newer components like InputControl, SelectControl, etc.
+	// These values should be shared with the `controlPaddingX` in ./utils/config-values.js
+	padding: $grid-unit-15;
+}

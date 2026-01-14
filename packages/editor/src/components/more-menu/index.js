@@ -112,8 +112,7 @@ export default function MoreMenu() {
 						<ModeSwitcher />
 						<ActionItem.Slot
 							name="core/plugin-more-menu"
-							label={ __( 'Plugins' ) }
-							as={ MenuGroup }
+							label={ __( 'Panels' ) }
 							fillProps={ { onClick: onClose } }
 						/>
 						<MenuGroup label={ __( 'Tools' ) }>

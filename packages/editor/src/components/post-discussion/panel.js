@@ -93,7 +93,7 @@ function PostDiscussionToggle( { isOpen, onClick } ) {
  * checks whether the current post has support for the
  * above and if the `discussion-panel` panel is enabled.
  *
- * @return {JSX.Element|null} The rendered PostDiscussionPanel component.
+ * @return {React.ReactNode} The rendered PostDiscussionPanel component.
  */
 export default function PostDiscussionPanel() {
 	const { isEnabled } = useSelect( ( select ) => {

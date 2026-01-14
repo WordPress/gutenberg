@@ -37,7 +37,7 @@ const postProcessConfig = require( './post-process-config' );
  *
  * @param {string} configDirectoryPath The directory we want to load the config from.
  *
- * @return {WPConfig} The config object we've loaded.
+ * @return {Promise<WPConfig>} The config object we've loaded.
  */
 module.exports = async function loadConfig( configDirectoryPath ) {
 	const configFilePath = getConfigFilePath( configDirectoryPath );

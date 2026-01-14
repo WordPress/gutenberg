@@ -42,13 +42,6 @@ const actions = {
 			discountPercent,
 		};
 	},
-
-	fetchFromAPI( path ) {
-		return {
-			type: 'FETCH_FROM_API',
-			path,
-		};
-	},
 };
 
 const store = createReduxStore( 'my-shop', {
@@ -84,17 +77,11 @@ const store = createReduxStore( 'my-shop', {
 		},
 	},
 
-	controls: {
-		FETCH_FROM_API( action ) {
-			return apiFetch( { path: action.path } );
-		},
-	},
-
 	resolvers: {
-		*getPrice( item ) {
+		getPrice: ( item ) => async ({ dispatch }) => { {
 			const path = '/wp/v2/prices/' + item;
-			const price = yield actions.fetchFromAPI( path );
-			return actions.setPrice( item, price );
+			const price = await apiFetch( { path } );
+			dispatch.setPrice( item, price );
 		},
 	},
 } );
@@ -133,13 +120,21 @@ A **resolver** is a side-effect for a selector. If your selector result may need
 
 The `resolvers` option should be passed as an object where each key is the name of the selector to act upon, the value a function which receives the same arguments passed to the selector, excluding the state argument. It can then dispatch as necessary to fulfill the requirements of the selector, taking advantage of the fact that most data consumers will subscribe to subsequent state changes (by `subscribe` or `withSelect`).
 
-#### `controls`
+Resolvers, in combination with [thunks](https://github.com/WordPress/gutenberg/blob/trunk/docs/how-to-guides/thunks.md#thunks-can-be-async), can be used to implement asynchronous data flows for your store.
 
-A **control** defines the execution flow behavior associated with a specific action type. This can be particularly useful in implementing asynchronous data flows for your store. By defining your action creator or resolvers as a generator which yields specific controlled action types, the execution will proceed as defined by the control handler.
+#### `controls` (deprecated)
 
-The `controls` option should be passed as an object where each key is the name of the action type to act upon, the value a function which receives the original action object. It should returns either a promise which is to resolve when evaluation of the action should continue, or a value. The value or resolved promise value is assigned on the return value of the yield assignment. If the control handler returns undefined, the execution is not continued.
+To handle asynchronous data flows, it is recommended to use [thunks](https://github.com/WordPress/gutenberg/blob/trunk/docs/how-to-guides/thunks.md#thunks-can-be-async) instead of `controls`.
 
-Refer to the [documentation of `@wordpress/redux-routine`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/redux-routine/README.md) for more information.
+<details>
+  <summary>View <em>controls</em> explanation</summary>
+<br>
+A <em>control</em> defines the execution flow behavior associated with a specific action type. Before <a href="https://github.com/WordPress/gutenberg/blob/trunk/docs/how-to-guides/thunks.md#thunks-can-be-async">thunks</a>, controls were used to implement asynchronous data flows for your store. By defining your action creator or resolvers as a generator which yields specific controlled action types, the execution will proceed as defined by the control handler.
+<br><br>
+The <em>controls</em> option should be passed as an object where each key is the name of the action type to act upon, the value a function which receives the original action object. It should returns either a promise which is to resolve when evaluation of the action should continue, or a value. The value or resolved promise value is assigned on the return value of the yield assignment. If the control handler returns undefined, the execution is not continued.
+<br><br>
+Refer to the <a href="https://github.com/WordPress/gutenberg/tree/HEAD/packages/redux-routine/README.md">documentation of <em>@wordpress/redux-routine</em></a> for more information.
+</details>
 
 #### `initialState`
 
@@ -262,7 +257,7 @@ The data module shares many of the same [core principles](https://redux.js.org/i
 
 The [higher-order components](#higher-order-components) were created to complement this distinction. The intention with splitting `withSelect` and `withDispatch` — where in React Redux they are combined under `connect` as `mapStateToProps` and `mapDispatchToProps` arguments — is to more accurately reflect that dispatch is not dependent upon a subscription to state changes, and to allow for state-derived values to be used in `withDispatch` (via [higher-order component composition](https://github.com/WordPress/gutenberg/tree/HEAD/packages/compose/README.md)).
 
-The data module also has built-in solutions for handling asynchronous side-effects, through [resolvers](#resolvers) and [controls](#controls). These differ slightly from [standard redux async solutions](https://redux.js.org/advanced/async-actions) like [`redux-thunk`](https://github.com/gaearon/redux-thunk) or [`redux-saga`](https://redux-saga.js.org/).
+The data module also has built-in solutions for handling asynchronous side-effects, through [resolvers](#resolvers) and [thunks](https://github.com/WordPress/gutenberg/blob/trunk/docs/how-to-guides/thunks.md#thunks-can-be-async). These differ slightly from [standard redux async solutions](https://redux.js.org/advanced/async-actions) like [`redux-thunk`](https://github.com/gaearon/redux-thunk) or [`redux-saga`](https://redux-saga.js.org/).
 
 Specific implementation differences from Redux and React Redux:
 
@@ -397,7 +392,7 @@ Creates a new store registry, given an optional object of initial store configur
 _Parameters_
 
 -   _storeConfigs_ `Object`: Initial store configurations.
--   _parent_ `Object?`: Parent registry.
+-   _parent_ `?Object`: Parent registry.
 
 _Returns_
 
@@ -423,11 +418,11 @@ When registering a control created with `createRegistryControl` with a store, th
 
 _Parameters_
 
--   _registryControl_ `Function`: Function receiving a registry object and returning a control.
+-   _registryControl_ `T & { isRegistryControl?: boolean; }`: Function receiving a registry object and returning a control.
 
 _Returns_
 
--   `Function`: Registry control that can be registered with a store.
+-   Registry control that can be registered with a store.
 
 ### createRegistrySelector
 
@@ -476,11 +471,11 @@ with a store.
 
 _Parameters_
 
--   _registrySelector_ `Function`: Function receiving a registry `select` function and returning a state selector.
+-   _registrySelector_ `( select:  ) => Selector`: Function receiving a registry `select` function and returning a state selector.
 
 _Returns_
 
--   `Function`: Registry selector that can be registered with a store.
+-   `RegistrySelector< Selector >`: Registry selector that can be registered with a store.
 
 ### createSelector
 
@@ -489,15 +484,6 @@ Creates a memoized selector that caches the computed values according to the arr
 _Related_
 
 -   The documentation for the `rememo` package from which the `createSelector` function is reexported.
-
-_Parameters_
-
--   _selector_ `Function`: Selector function that calculates a value from state and parameters.
--   _getDependants_ `Function`: Function that returns an array of "dependant" objects.
-
-_Returns_
-
--   `Function`: A memoized version of `selector` that caches the calculated return values.
 
 ### dispatch
 
@@ -529,10 +515,6 @@ Object of available plugins to use with a registry.
 _Related_
 
 -   [use](#use)
-
-_Type_
-
--   `Object`
 
 ### register
 
@@ -638,7 +620,7 @@ _Parameters_
 
 _Returns_
 
--   `Object`: Object containing the store's promise-wrapped selectors.
+-   `CurriedSelectorsResolveOf< T >`: Object containing the store's promise-wrapped selectors.
 
 ### select
 
@@ -790,7 +772,7 @@ const ParentProvidingRegistry = ( props ) => {
 
 _Returns_
 
--   `Function`: A custom react hook exposing the registry context value.
+-   `import('../../types').DataRegistry`: A custom react hook exposing the registry context value.
 
 ### useSelect
 
@@ -851,7 +833,7 @@ function Paste( { children } ) {
 _Parameters_
 
 -   _mapSelect_ `T`: Function called on every state change. The returned value is exposed to the component implementing this hook. The function receives the `registry.select` method on the first argument and the `registry` on the second argument. When a store key is passed, all selectors for the store will be returned. This is only meant for usage of these selectors in event callbacks, not for data needed to create the element tree.
--   _deps_ `unknown[]`: If provided, this memoizes the mapSelect so the same `mapSelect` is invoked on every state change unless the dependencies change.
+-   _deps_ `unknown[]=`: If provided, this memoizes the mapSelect so the same `mapSelect` is invoked on every state change unless the dependencies change.
 
 _Returns_
 
@@ -1018,12 +1000,13 @@ _Returns_
 
 ### batch
 
-As a response of `dispatch` calls, WordPress data based applications updates the connected components (Components using `useSelect` or `withSelect`). This update happens in two steps:
+The `batch` method allows multiple store updates to occur simultaneously, reducing unnecessary executions of selectors and component re-renders during sequential state changes.
 
--   The selectors are called with the update state.
--   If the selectors return values that are different than the previous (strict equality), the component rerenders.
+In WordPress data applications, dispatching consecutive actions typically triggers store listeners and runs selectors, which can lead to re-renders. The `batch` method pauses these listeners and only activates them once at the end, ensuring selectors run only once with the final state.
 
-As the application grows, this can become costful, so it's important to ensure that we avoid running both these if possible. One of these situations happen when an interaction requires multiple consecutive `dispatch` calls in order to update the state properly. To avoid rerendering the components each time we call `dispatch`, we can wrap the sequential dispatch calls in `batch` which will ensure that the components only call selectors and rerender once at the end of the sequence.
+This method is particularly effective for optimizing performance with expensive selectors, ensuring atomic operations across multiple stores, and creating single undo/redo entries for several synchronous updates.
+
+Unlike React’s built-in batching or React Redux’s `batch` function, `registry.batch` operates at the store listener level, completely avoiding unnecessary selector computations.
 
 _Usage_
 
@@ -1033,15 +1016,17 @@ import { useRegistry } from '@wordpress/data';
 function Component() {
 	const registry = useRegistry();
 
-	function callback() {
-		// This will only rerender the components once.
+	function handleComplexUpdate() {
+		// Without batch: listeners are called 3 times, which can result in multiple component re-renders.
+		// With batch: notifies listeners once, resulting in a single component re-render as needed.
 		registry.batch( () => {
-			registry.dispatch( someStore ).someAction();
-			registry.dispatch( someStore ).someOtherAction();
+			registry.dispatch( 'someStore' ).someAction();
+			registry.dispatch( 'someStore' ).someOtherAction();
+			registry.dispatch( 'someStore' ).thirdAction();
 		} );
 	}
 
-	return <button onClick={ callback }>Click me</button>;
+	return <button onClick={ handleComplexUpdate }>Update</button>;
 }
 ```
 

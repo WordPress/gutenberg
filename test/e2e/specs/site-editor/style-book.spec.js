@@ -32,9 +32,6 @@ test.describe( 'Style Book', () => {
 			page.locator( 'role=button[name="Block Inserter"i]' )
 		).toBeDisabled();
 		await expect(
-			page.locator( 'role=button[name="Tools"i]' )
-		).toBeDisabled();
-		await expect(
 			page.locator( 'role=button[name="Document Overview"i]' )
 		).toBeDisabled();
 	} );
@@ -99,7 +96,7 @@ test.describe( 'Style Book', () => {
 		await page
 			.frameLocator( '[name="style-book-canvas"]' )
 			.getByRole( 'button', {
-				name: 'Open Pullquote styles in Styles panel',
+				name: 'Open Buttons styles in Styles panel',
 			} )
 			.click();
 
@@ -183,6 +180,30 @@ test.describe( 'Style Book', () => {
 		await expect(
 			page.getByLabel( 'Search commands and settings' )
 		).toBeVisible();
+	} );
+} );
+
+test.describe( 'Style Book for classic themes', () => {
+	test( 'Should show Style Book for a theme that supports it', async ( {
+		page,
+		admin,
+		requestUtils,
+	} ) => {
+		// Make sure a classic theme is active.
+		await requestUtils.activateTheme( 'twentytwentyone' );
+		// Go to site editor.
+		await admin.visitAdminPage( 'site-editor.php' );
+
+		// Open the Style Book.
+		await page.getByRole( 'button', { name: 'Styles' } ).click();
+
+		// Block examples should be visible.
+		const blockExamples = page
+			.frameLocator( '[name="style-book-canvas"]' )
+			.getByRole( 'grid', {
+				name: 'Examples of blocks',
+			} );
+		await expect( blockExamples ).toBeVisible();
 	} );
 } );
 

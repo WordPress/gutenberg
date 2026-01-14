@@ -1,0 +1,12 @@
+diff --git a/node_modules/lighthouse/core/index.d.cts b/node_modules/lighthouse/core/index.d.cts
+index a3645a1..b105ca3 100644
+--- a/node_modules/lighthouse/core/index.d.cts
++++ b/node_modules/lighthouse/core/index.d.cts
+@@ -7,5 +7,7 @@ export = lighthouse;
+  * @property {import('./index.js')['snapshot']} snapshot
+  */
+ /** @type {import('./index.js')['default'] & ExportType} */
++// Otherwise TS is confused when using ES types in CJS.
++// @ts-ignore
+ declare const lighthouse: typeof import("./index.js")["default"] & ExportType;
+ //# sourceMappingURL=index.d.cts.map

@@ -54,6 +54,7 @@ function UnforwardedToolbarButton(
 				<Button
 					ref={ ref }
 					icon={ restProps.icon }
+					size="compact"
 					label={ title }
 					shortcut={ restProps.shortcut }
 					data-subscript={ restProps.subscript }
@@ -97,6 +98,7 @@ function UnforwardedToolbarButton(
 		>
 			{ ( toolbarItemProps ) => (
 				<Button
+					size="compact"
 					label={ title }
 					isPressed={ isActive }
 					{ ...toolbarItemProps }
@@ -114,13 +116,13 @@ function UnforwardedToolbarButton(
  *
  * ```jsx
  * import { Toolbar, ToolbarButton } from '@wordpress/components';
- * import { edit } from '@wordpress/icons';
+ * import { pencil } from '@wordpress/icons';
  *
  * function MyToolbar() {
  *   return (
  *		<Toolbar label="Options">
  *			<ToolbarButton
- *				icon={ edit }
+ *				icon={ pencil }
  *				label="Edit"
  *				onClick={ () => alert( 'Editing' ) }
  *			/>

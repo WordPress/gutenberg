@@ -35,29 +35,30 @@ function Slot(
 		as,
 		// `children` is not allowed. However, if it is passed,
 		// it will be displayed as is, so remove `children`.
-		// @ts-ignore
 		children,
 		...restProps
 	} = props;
 
-	const { registerSlot, unregisterSlot, ...registry } =
-		useContext( SlotFillContext );
+	const registry = useContext( SlotFillContext );
+
 	const ref = useRef< HTMLElement >( null );
 
+	// We don't want to unregister and register the slot whenever
+	// `fillProps` change, which would cause the fill to be re-mounted. Instead,
+	// we can just update the slot (see hook below).
+	// For more context, see https://github.com/WordPress/gutenberg/pull/44403#discussion_r994415973
+	const fillPropsRef = useRef( fillProps );
 	useLayoutEffect( () => {
-		registerSlot( name, ref, fillProps );
-		return () => {
-			unregisterSlot( name, ref );
-		};
-		// We don't want to unregister and register the slot whenever
-		// `fillProps` change, which would cause the fill to be re-mounted. Instead,
-		// we can just update the slot (see hook below).
-		// For more context, see https://github.com/WordPress/gutenberg/pull/44403#discussion_r994415973
-	}, [ registerSlot, unregisterSlot, name ] );
-	// fillProps may be an update that interacts with the layout, so we
-	// useLayoutEffect.
+		fillPropsRef.current = fillProps;
+	}, [ fillProps ] );
+
 	useLayoutEffect( () => {
-		registry.updateSlot( name, fillProps );
+		registry.registerSlot( name, ref, fillPropsRef.current );
+		return () => registry.unregisterSlot( name, ref );
+	}, [ registry, name ] );
+
+	useLayoutEffect( () => {
+		registry.updateSlot( name, ref, fillPropsRef.current );
 	} );
 
 	return (

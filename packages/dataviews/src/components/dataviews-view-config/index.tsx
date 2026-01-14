@@ -14,100 +14,99 @@ import {
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 	__experimentalToggleGroupControlOptionIcon as ToggleGroupControlOptionIcon,
 	SelectControl,
-	__experimentalItemGroup as ItemGroup,
-	__experimentalItem as Item,
 	__experimentalGrid as Grid,
-	__experimentalVStack as VStack,
-	__experimentalHStack as HStack,
 	__experimentalHeading as Heading,
 	__experimentalText as Text,
 	privateApis as componentsPrivateApis,
-	BaseControl,
 } from '@wordpress/components';
-import { __, _x, sprintf } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { memo, useContext, useMemo } from '@wordpress/element';
-import { chevronDown, chevronUp, cog, seen, unseen } from '@wordpress/icons';
+import { cog } from '@wordpress/icons';
 import warning from '@wordpress/warning';
 import { useInstanceId } from '@wordpress/compose';
+import { Stack } from '@wordpress/ui';
 
 /**
  * Internal dependencies
  */
-import {
-	SORTING_DIRECTIONS,
-	LAYOUT_GRID,
-	LAYOUT_TABLE,
-	sortIcons,
-	sortLabels,
-} from '../../constants';
-import {
-	VIEW_LAYOUTS,
-	getNotHidableFieldIds,
-	getVisibleFieldIds,
-	getHiddenFieldIds,
-} from '../../dataviews-layouts';
-import type { SupportedLayouts, View, Field } from '../../types';
+import { SORTING_DIRECTIONS, sortIcons, sortLabels } from '../../constants';
+import { VIEW_LAYOUTS } from '../dataviews-layouts';
+import type { View } from '../../types';
 import DataViewsContext from '../dataviews-context';
+import InfiniteScrollToggle from './infinite-scroll-toggle';
+import { PropertiesSection } from './properties-section';
 import { unlock } from '../../lock-unlock';
-import DensityPicker from '../../dataviews-layouts/grid/density-picker';
 
 const { Menu } = unlock( componentsPrivateApis );
 
-interface ViewTypeMenuProps {
-	defaultLayouts?: SupportedLayouts;
-}
+const DATAVIEWS_CONFIG_POPOVER_PROPS = {
+	className: 'dataviews-config__popover',
+	placement: 'bottom-end',
+	offset: 9,
+};
 
-const DATAVIEWS_CONFIG_POPOVER_PROPS = { placement: 'bottom-end', offset: 9 };
-
-function ViewTypeMenu( {
-	defaultLayouts = { list: {}, grid: {}, table: {} },
-}: ViewTypeMenuProps ) {
-	const { view, onChangeView } = useContext( DataViewsContext );
+export function ViewTypeMenu() {
+	const { view, onChangeView, defaultLayouts } =
+		useContext( DataViewsContext );
 	const availableLayouts = Object.keys( defaultLayouts );
 	if ( availableLayouts.length <= 1 ) {
 		return null;
 	}
 	const activeView = VIEW_LAYOUTS.find( ( v ) => view.type === v.type );
 	return (
-		<Menu
-			trigger={
-				<Button
-					size="compact"
-					icon={ activeView?.icon }
-					label={ __( 'Layout' ) }
-				/>
-			}
-		>
-			{ availableLayouts.map( ( layout ) => {
-				const config = VIEW_LAYOUTS.find( ( v ) => v.type === layout );
-				if ( ! config ) {
-					return null;
+		<Menu>
+			<Menu.TriggerButton
+				render={
+					<Button
+						size="compact"
+						icon={ activeView?.icon }
+						label={ __( 'Layout' ) }
+					/>
 				}
-				return (
-					<Menu.RadioItem
-						key={ layout }
-						value={ layout }
-						name="view-actions-available-view"
-						checked={ layout === view.type }
-						hideOnClick
-						onChange={ ( e: ChangeEvent< HTMLInputElement > ) => {
-							switch ( e.target.value ) {
-								case 'list':
-								case 'grid':
-								case 'table':
-									return onChangeView( {
-										...view,
-										type: e.target.value,
-										...defaultLayouts[ e.target.value ],
-									} );
-							}
-							warning( 'Invalid dataview' );
-						} }
-					>
-						<Menu.ItemLabel>{ config.label }</Menu.ItemLabel>
-					</Menu.RadioItem>
-				);
-			} ) }
+			/>
+			<Menu.Popover>
+				{ availableLayouts.map( ( layout ) => {
+					const config = VIEW_LAYOUTS.find(
+						( v ) => v.type === layout
+					);
+					if ( ! config ) {
+						return null;
+					}
+					return (
+						<Menu.RadioItem
+							key={ layout }
+							value={ layout }
+							name="view-actions-available-view"
+							checked={ layout === view.type }
+							hideOnClick
+							onChange={ (
+								e: ChangeEvent< HTMLInputElement >
+							) => {
+								switch ( e.target.value ) {
+									case 'list':
+									case 'grid':
+									case 'table':
+									case 'pickerGrid':
+									case 'pickerTable':
+									case 'activity':
+										const viewWithoutLayout = { ...view };
+										if ( 'layout' in viewWithoutLayout ) {
+											delete viewWithoutLayout.layout;
+										}
+										return onChangeView( {
+											...viewWithoutLayout,
+											type: e.target.value,
+											...defaultLayouts[ e.target.value ],
+										} as View );
+								}
+								warning( 'Invalid dataview' );
+							} }
+						>
+							<Menu.ItemLabel>{ config.label }</Menu.ItemLabel>
+						</Menu.RadioItem>
+					);
+				} ) }
+			</Menu.Popover>
 		</Menu>
 	);
 }
@@ -128,7 +127,6 @@ function SortFieldControl() {
 
 	return (
 		<SelectControl
-			__nextHasNoMarginBottom
 			__next40pxDefaultSize
 			label={ __( 'Sort by' ) }
 			value={ view.sort?.field }
@@ -140,6 +138,7 @@ function SortFieldControl() {
 						direction: view?.sort?.direction || 'desc',
 						field: value,
 					},
+					showLevels: false,
 				} );
 			} }
 		/>
@@ -163,7 +162,6 @@ function SortDirectionControl() {
 	return (
 		<ToggleGroupControl
 			className="dataviews-view-config__sort-direction"
-			__nextHasNoMarginBottom
 			__next40pxDefaultSize
 			isBlock
 			label={ __( 'Order' ) }
@@ -182,6 +180,7 @@ function SortDirectionControl() {
 								)?.id ||
 								'',
 						},
+						showLevels: false,
 					} );
 					return;
 				}
@@ -202,12 +201,21 @@ function SortDirectionControl() {
 	);
 }
 
-const PAGE_SIZE_VALUES = [ 10, 20, 50, 100 ];
 function ItemsPerPageControl() {
-	const { view, onChangeView } = useContext( DataViewsContext );
+	const { view, config, onChangeView } = useContext( DataViewsContext );
+	const { infiniteScrollEnabled } = view;
+	if (
+		! config ||
+		! config.perPageSizes ||
+		config.perPageSizes.length < 2 ||
+		config.perPageSizes.length > 6 ||
+		infiniteScrollEnabled
+	) {
+		return null;
+	}
+
 	return (
 		<ToggleGroupControl
-			__nextHasNoMarginBottom
 			__next40pxDefaultSize
 			isBlock
 			label={ __( 'Items per page' ) }
@@ -226,7 +234,7 @@ function ItemsPerPageControl() {
 				} );
 			} }
 		>
-			{ PAGE_SIZE_VALUES.map( ( value ) => {
+			{ config.perPageSizes.map( ( value ) => {
 				return (
 					<ToggleGroupControlOption
 						key={ value }
@@ -236,241 +244,6 @@ function ItemsPerPageControl() {
 				);
 			} ) }
 		</ToggleGroupControl>
-	);
-}
-
-interface FieldItemProps {
-	id: any;
-	label: string;
-	index: number;
-	isVisible: boolean;
-	isHidable: boolean;
-}
-
-function FieldItem( {
-	field: { id, label, index, isVisible, isHidable },
-	fields,
-	view,
-	onChangeView,
-}: {
-	field: FieldItemProps;
-	fields: Field< any >[];
-	view: View;
-	onChangeView: ( view: View ) => void;
-} ) {
-	const visibleFieldIds = getVisibleFieldIds( view, fields );
-
-	return (
-		<Item key={ id }>
-			<HStack
-				expanded
-				className={ `dataviews-field-control__field dataviews-field-control__field-${ id }` }
-			>
-				<span>{ label }</span>
-				<HStack
-					justify="flex-end"
-					expanded={ false }
-					className="dataviews-field-control__actions"
-				>
-					{ view.type === LAYOUT_TABLE && isVisible && (
-						<>
-							<Button
-								disabled={ index < 1 }
-								accessibleWhenDisabled
-								size="compact"
-								onClick={ () => {
-									onChangeView( {
-										...view,
-										fields: [
-											...( visibleFieldIds.slice(
-												0,
-												index - 1
-											) ?? [] ),
-											id,
-											visibleFieldIds[ index - 1 ],
-											...visibleFieldIds.slice(
-												index + 1
-											),
-										],
-									} );
-								} }
-								icon={ chevronUp }
-								label={ sprintf(
-									/* translators: %s: field label */
-									__( 'Move %s up' ),
-									label
-								) }
-							/>
-							<Button
-								disabled={ index >= visibleFieldIds.length - 1 }
-								accessibleWhenDisabled
-								size="compact"
-								onClick={ () => {
-									onChangeView( {
-										...view,
-										fields: [
-											...( visibleFieldIds.slice(
-												0,
-												index
-											) ?? [] ),
-											visibleFieldIds[ index + 1 ],
-											id,
-											...visibleFieldIds.slice(
-												index + 2
-											),
-										],
-									} );
-								} }
-								icon={ chevronDown }
-								label={ sprintf(
-									/* translators: %s: field label */
-									__( 'Move %s down' ),
-									label
-								) }
-							/>{ ' ' }
-						</>
-					) }
-					<Button
-						className="dataviews-field-control__field-visibility-button"
-						disabled={ ! isHidable }
-						accessibleWhenDisabled
-						size="compact"
-						onClick={ () => {
-							onChangeView( {
-								...view,
-								fields: isVisible
-									? visibleFieldIds.filter(
-											( fieldId ) => fieldId !== id
-									  )
-									: [ ...visibleFieldIds, id ],
-							} );
-							// Focus the visibility button to avoid focus loss.
-							// Our code is safe against the component being unmounted, so we don't need to worry about cleaning the timeout.
-							// eslint-disable-next-line @wordpress/react-no-unsafe-timeout
-							setTimeout( () => {
-								const element = document.querySelector(
-									`.dataviews-field-control__field-${ id } .dataviews-field-control__field-visibility-button`
-								);
-								if ( element instanceof HTMLElement ) {
-									element.focus();
-								}
-							}, 50 );
-						} }
-						icon={ isVisible ? unseen : seen }
-						label={
-							isVisible
-								? sprintf(
-										/* translators: %s: field label */
-										_x( 'Hide %s', 'field' ),
-										label
-								  )
-								: sprintf(
-										/* translators: %s: field label */
-										_x( 'Show %s', 'field' ),
-										label
-								  )
-						}
-					/>
-				</HStack>
-			</HStack>
-		</Item>
-	);
-}
-
-function FieldControl() {
-	const { view, fields, onChangeView } = useContext( DataViewsContext );
-
-	const visibleFieldIds = useMemo(
-		() => getVisibleFieldIds( view, fields ),
-		[ view, fields ]
-	);
-	const hiddenFieldIds = useMemo(
-		() => getHiddenFieldIds( view, fields ),
-		[ view, fields ]
-	);
-	const notHidableFieldIds = useMemo(
-		() => getNotHidableFieldIds( view ),
-		[ view ]
-	);
-
-	const visibleFields = fields
-		.filter( ( { id } ) => visibleFieldIds.includes( id ) )
-		.map( ( { id, label, enableHiding } ) => {
-			return {
-				id,
-				label,
-				index: visibleFieldIds.indexOf( id ),
-				isVisible: true,
-				isHidable: notHidableFieldIds.includes( id )
-					? false
-					: enableHiding,
-			};
-		} );
-	if ( view.type === LAYOUT_TABLE && view.layout?.combinedFields ) {
-		view.layout.combinedFields.forEach( ( { id, label } ) => {
-			visibleFields.push( {
-				id,
-				label,
-				index: visibleFieldIds.indexOf( id ),
-				isVisible: true,
-				isHidable: notHidableFieldIds.includes( id ),
-			} );
-		} );
-	}
-	visibleFields.sort( ( a, b ) => a.index - b.index );
-
-	const hiddenFields = fields
-		.filter( ( { id } ) => hiddenFieldIds.includes( id ) )
-		.map( ( { id, label, enableHiding }, index ) => {
-			return {
-				id,
-				label,
-				index,
-				isVisible: false,
-				isHidable: enableHiding,
-			};
-		} );
-
-	if ( ! visibleFields?.length && ! hiddenFields?.length ) {
-		return null;
-	}
-
-	return (
-		<VStack spacing={ 6 } className="dataviews-field-control">
-			{ !! visibleFields?.length && (
-				<ItemGroup isBordered isSeparated>
-					{ visibleFields.map( ( field ) => (
-						<FieldItem
-							key={ field.id }
-							field={ field }
-							fields={ fields }
-							view={ view }
-							onChangeView={ onChangeView }
-						/>
-					) ) }
-				</ItemGroup>
-			) }
-			{ !! hiddenFields?.length && (
-				<>
-					<VStack spacing={ 4 }>
-						<BaseControl.VisualLabel style={ { margin: 0 } }>
-							{ __( 'Hidden' ) }
-						</BaseControl.VisualLabel>
-						<ItemGroup isBordered isSeparated>
-							{ hiddenFields.map( ( field ) => (
-								<FieldItem
-									key={ field.id }
-									field={ field }
-									fields={ fields }
-									view={ view }
-									onChangeView={ onChangeView }
-								/>
-							) ) }
-						</ItemGroup>
-					</VStack>
-				</>
-			) }
-		</VStack>
 	);
 }
 
@@ -512,21 +285,18 @@ function SettingsSection( {
 	);
 }
 
-function DataviewsViewConfigDropdown( {
-	density,
-	setDensity,
-}: {
-	density: number;
-	setDensity: React.Dispatch< React.SetStateAction< number > >;
-} ) {
+export function DataviewsViewConfigDropdown() {
 	const { view } = useContext( DataViewsContext );
 	const popoverId = useInstanceId(
 		_DataViewsViewConfig,
 		'dataviews-view-config-dropdown'
 	);
-
+	const activeLayout = VIEW_LAYOUTS.find(
+		( layout ) => layout.type === view.type
+	);
 	return (
 		<Dropdown
+			expandOnMobile
 			popoverProps={ {
 				...DATAVIEWS_CONFIG_POPOVER_PROPS,
 				id: popoverId,
@@ -544,47 +314,43 @@ function DataviewsViewConfigDropdown( {
 				);
 			} }
 			renderContent={ () => (
-				<DropdownContentWrapper paddingSize="medium">
-					<VStack className="dataviews-view-config" spacing={ 6 }>
+				<DropdownContentWrapper
+					paddingSize="medium"
+					className="dataviews-config__popover-content-wrapper"
+				>
+					<Stack
+						direction="column"
+						className="dataviews-view-config"
+						gap="lg"
+					>
 						<SettingsSection title={ __( 'Appearance' ) }>
-							<HStack expanded className="is-divided-in-two">
+							<Stack
+								direction="row"
+								gap="xs"
+								className="is-divided-in-two"
+							>
 								<SortFieldControl />
 								<SortDirectionControl />
-							</HStack>
-							{ view.type === LAYOUT_GRID && (
-								<DensityPicker
-									density={ density }
-									setDensity={ setDensity }
-								/>
+							</Stack>
+							{ !! activeLayout?.viewConfigOptions && (
+								<activeLayout.viewConfigOptions />
 							) }
+							<InfiniteScrollToggle />
 							<ItemsPerPageControl />
+							<PropertiesSection />
 						</SettingsSection>
-						<SettingsSection title={ __( 'Properties' ) }>
-							<FieldControl />
-						</SettingsSection>
-					</VStack>
+					</Stack>
 				</DropdownContentWrapper>
 			) }
 		/>
 	);
 }
 
-function _DataViewsViewConfig( {
-	density,
-	setDensity,
-	defaultLayouts = { list: {}, grid: {}, table: {} },
-}: {
-	density: number;
-	setDensity: React.Dispatch< React.SetStateAction< number > >;
-	defaultLayouts?: SupportedLayouts;
-} ) {
+function _DataViewsViewConfig() {
 	return (
 		<>
-			<ViewTypeMenu defaultLayouts={ defaultLayouts } />
-			<DataviewsViewConfigDropdown
-				density={ density }
-				setDensity={ setDensity }
-			/>
+			<ViewTypeMenu />
+			<DataviewsViewConfigDropdown />
 		</>
 	);
 }

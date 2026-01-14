@@ -39,14 +39,15 @@ function BlockPattern( {
 	pattern,
 	onClick,
 	onHover,
-	showTitle = true,
-	showTooltip,
+	showTitlesAsTooltip,
 	category,
+	isSelected,
 } ) {
 	const [ isDragging, setIsDragging ] = useState( false );
 	const { blocks, viewportWidth } = pattern;
 	const instanceId = useInstanceId( BlockPattern );
 	const descriptionId = `block-editor-block-patterns-list__item-description-${ instanceId }`;
+	const isUserPattern = pattern.type === INSERTER_PATTERN_TYPES.user;
 
 	// When we have a selected category and the pattern is draggable, we need to update the
 	// pattern's categories in metadata to only contain the selected category, and pass this to
@@ -94,10 +95,7 @@ function BlockPattern( {
 					} }
 				>
 					<WithToolTip
-						showTooltip={
-							showTooltip &&
-							! pattern.type !== INSERTER_PATTERN_TYPES.user
-						}
+						showTooltip={ showTitlesAsTooltip && ! isUserPattern }
 						title={ pattern.title }
 					>
 						<Composite.Item
@@ -117,6 +115,7 @@ function BlockPattern( {
 												pattern.type ===
 													INSERTER_PATTERN_TYPES.user &&
 												! pattern.syncStatus,
+											'is-selected': isSelected,
 										}
 									) }
 								/>
@@ -142,29 +141,22 @@ function BlockPattern( {
 									viewportWidth={ viewportWidth }
 								/>
 							</BlockPreview.Async>
-
-							{ showTitle && (
+							{ ( ! showTitlesAsTooltip || isUserPattern ) && (
 								<HStack
 									className="block-editor-patterns__pattern-details"
 									spacing={ 2 }
 								>
-									{ pattern.type ===
-										INSERTER_PATTERN_TYPES.user &&
-										! pattern.syncStatus && (
-											<div className="block-editor-patterns__pattern-icon-wrapper">
-												<Icon
-													className="block-editor-patterns__pattern-icon"
-													icon={ symbol }
-												/>
-											</div>
-										) }
-									{ ( ! showTooltip ||
-										pattern.type ===
-											INSERTER_PATTERN_TYPES.user ) && (
-										<div className="block-editor-block-patterns-list__item-title">
-											{ pattern.title }
+									{ isUserPattern && ! pattern.syncStatus && (
+										<div className="block-editor-patterns__pattern-icon-wrapper">
+											<Icon
+												className="block-editor-patterns__pattern-icon"
+												icon={ symbol }
+											/>
 										</div>
 									) }
+									<div className="block-editor-block-patterns-list__item-title">
+										{ pattern.title }
+									</div>
 								</HStack>
 							) }
 
@@ -196,13 +188,13 @@ function BlockPatternsList(
 		orientation,
 		label = __( 'Block patterns' ),
 		category,
-		showTitle = true,
 		showTitlesAsTooltip,
 		pagingProps,
 	},
 	ref
 ) {
 	const [ activeCompositeId, setActiveCompositeId ] = useState( undefined );
+	const [ activePattern, setActivePattern ] = useState( null ); // State to track active pattern
 
 	useEffect( () => {
 		// Reset the active composite item whenever the available patterns change,
@@ -211,6 +203,11 @@ function BlockPatternsList(
 		const firstCompositeItemId = blockPatterns[ 0 ]?.name;
 		setActiveCompositeId( firstCompositeItemId );
 	}, [ blockPatterns ] );
+
+	const handleClickPattern = ( pattern, blocks ) => {
+		setActivePattern( pattern.name );
+		onClickPattern( pattern, blocks );
+	};
 
 	return (
 		<Composite
@@ -227,12 +224,14 @@ function BlockPatternsList(
 					key={ pattern.name }
 					id={ pattern.name }
 					pattern={ pattern }
-					onClick={ onClickPattern }
+					onClick={ handleClickPattern }
 					onHover={ onHover }
 					isDraggable={ isDraggable }
-					showTitle={ showTitle }
-					showTooltip={ showTitlesAsTooltip }
+					showTitlesAsTooltip={ showTitlesAsTooltip }
 					category={ category }
+					isSelected={
+						!! activePattern && activePattern === pattern.name
+					}
 				/>
 			) ) }
 			{ pagingProps && <BlockPatternsPaging { ...pagingProps } /> }

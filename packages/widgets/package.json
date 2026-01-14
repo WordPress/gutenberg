@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/widgets",
-	"version": "4.11.0",
+	"version": "4.36.0",
 	"description": "Functionality used by the widgets block editor in the Widgets screen and the Customizer.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -20,23 +20,63 @@
 		"node": ">=18.12.0",
 		"npm": ">=8.19.2"
 	},
-	"main": "build/index.js",
+	"files": [
+		"src",
+		"build",
+		"build-module",
+		"build-style",
+		"build-types",
+		"*.md"
+	],
+	"type": "module",
+	"main": "build/index.cjs",
 	"module": "build-module/index.js",
+	"exports": {
+		".": {
+			"import": "./build-module/index.js",
+			"require": "./build/index.cjs"
+		},
+		"./package.json": "./package.json"
+	},
 	"react-native": "src/index",
 	"wpScript": true,
+	"wpCopyFiles": {
+		"files": [
+			"src/blocks/**/*.php",
+			"src/blocks/*/block.json"
+		],
+		"transforms": {
+			"php": {
+				"functionPrefix": "gutenberg_",
+				"classSuffix": "_Gutenberg",
+				"prefixFunctions": [
+					"wp_apply_colors_support",
+					"wp_enqueue_block_support_styles",
+					"wp_get_typography_font_size_value",
+					"wp_style_engine_get_styles",
+					"wp_get_global_settings"
+				],
+				"suffixClasses": [
+					"WP_Navigation_Block_Renderer"
+				],
+				"addActionPriority": 20,
+				"flattenIndexFiles": true
+			}
+		}
+	},
 	"dependencies": {
-		"@babel/runtime": "7.25.7",
-		"@wordpress/api-fetch": "*",
-		"@wordpress/block-editor": "*",
-		"@wordpress/blocks": "*",
-		"@wordpress/components": "*",
-		"@wordpress/compose": "*",
-		"@wordpress/core-data": "*",
-		"@wordpress/data": "*",
-		"@wordpress/element": "*",
-		"@wordpress/i18n": "*",
-		"@wordpress/icons": "*",
-		"@wordpress/notices": "*",
+		"@wordpress/api-fetch": "file:../api-fetch",
+		"@wordpress/base-styles": "file:../base-styles",
+		"@wordpress/block-editor": "file:../block-editor",
+		"@wordpress/blocks": "file:../blocks",
+		"@wordpress/components": "file:../components",
+		"@wordpress/compose": "file:../compose",
+		"@wordpress/core-data": "file:../core-data",
+		"@wordpress/data": "file:../data",
+		"@wordpress/element": "file:../element",
+		"@wordpress/i18n": "file:../i18n",
+		"@wordpress/icons": "file:../icons",
+		"@wordpress/notices": "file:../notices",
 		"clsx": "^2.1.1"
 	},
 	"peerDependencies": {

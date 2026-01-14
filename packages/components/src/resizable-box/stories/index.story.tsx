@@ -1,24 +1,24 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryFn } from '@storybook/react';
-
-/**
- * Internal dependencies
- */
-import ResizableBox from '..';
+import type { Meta, StoryFn } from '@storybook/react-webpack5';
 
 /**
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
 
+/**
+ * Internal dependencies
+ */
+import ResizableBox from '..';
+
 const meta: Meta< typeof ResizableBox > = {
 	title: 'Components/Utilities/ResizableBox',
 	id: 'components-resizablebox',
 	component: ResizableBox,
 	argTypes: {
-		children: { control: { type: null } },
+		children: { control: false },
 		enable: { control: 'object' },
 		onResizeStop: { action: 'onResizeStop' },
 	},

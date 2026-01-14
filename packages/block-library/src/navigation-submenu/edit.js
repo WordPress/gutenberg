@@ -7,13 +7,7 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import { useSelect, useDispatch } from '@wordpress/data';
-import {
-	PanelBody,
-	TextControl,
-	TextareaControl,
-	ToolbarButton,
-	ToolbarGroup,
-} from '@wordpress/components';
+import { ToolbarButton, ToolbarGroup } from '@wordpress/components';
 import { displayShortcut, isKeyboardEvent } from '@wordpress/keycodes';
 import { __ } from '@wordpress/i18n';
 import {
@@ -23,6 +17,7 @@ import {
 	InspectorControls,
 	RichText,
 	useBlockProps,
+	useBlockEditingMode,
 	store as blockEditorStore,
 	getColorClassName,
 } from '@wordpress/block-editor';
@@ -37,22 +32,23 @@ import { useMergeRefs, usePrevious } from '@wordpress/compose';
  * Internal dependencies
  */
 import { ItemSubmenuIcon } from './icons';
-import { LinkUI } from '../navigation-link/link-ui';
-import { updateAttributes } from '../navigation-link/update-attributes';
+import {
+	Controls,
+	LinkUI,
+	updateAttributes,
+	useEntityBinding,
+} from '../navigation-link/shared';
 import {
 	getColors,
 	getNavigationChildBlockProps,
 } from '../navigation/edit/utils';
+import { DEFAULT_BLOCK } from '../navigation/constants';
 
 const ALLOWED_BLOCKS = [
 	'core/navigation-link',
 	'core/navigation-submenu',
 	'core/page-list',
 ];
-
-const DEFAULT_BLOCK = {
-	name: 'core/navigation-link',
-};
 
 /**
  * A React hook to determine if it's dragging within the target element.
@@ -121,7 +117,6 @@ const useIsDraggingWithin = ( elementRef ) => {
  * @property {number}               [id]            A post or term id.
  * @property {boolean}              [opensInNewTab] Sets link target to _blank when true.
  * @property {string}               [url]           Link href.
- * @property {string}               [title]         Link title attribute.
  */
 
 export default function NavigationSubmenuEdit( {
@@ -133,18 +128,28 @@ export default function NavigationSubmenuEdit( {
 	context,
 	clientId,
 } ) {
-	const { label, url, description, rel, title } = attributes;
-
-	const { showSubmenuIcon, maxNestingLevel, openSubmenusOnClick } = context;
+	const { label, url, description } = attributes;
 
 	const {
-		__unstableMarkNextChangeAsNotPersistent,
-		replaceBlock,
-		selectBlock,
-	} = useDispatch( blockEditorStore );
+		showSubmenuIcon,
+		maxNestingLevel,
+		openSubmenusOnClick: contextOpenSubmenusOnClick,
+	} = context;
+	const blockEditingMode = useBlockEditingMode();
+
+	// Force click-only behavior in contentOnly mode to prevent hover dropdowns
+	const openSubmenusOnClick =
+		blockEditingMode !== 'default' ? true : contextOpenSubmenusOnClick;
+
+	// URL binding logic
+	const { clearBinding, createBinding } = useEntityBinding( {
+		clientId,
+		attributes,
+	} );
+
+	const { __unstableMarkNextChangeAsNotPersistent, replaceBlock } =
+		useDispatch( blockEditorStore );
 	const [ isLinkOpen, setIsLinkOpen ] = useState( false );
-	// Store what element opened the popover, so we know where to return focus to (toolbar button vs navigation link text)
-	const [ openedBy, setOpenedBy ] = useState( null );
 	// Use internal state instead of a ref to make sure that the component
 	// re-renders when the popover's anchor updates.
 	const [ popoverAnchor, setPopoverAnchor ] = useState( null );
@@ -273,10 +278,9 @@ export default function NavigationSubmenuEdit( {
 			// as it shares the CMD+K shortcut.
 			// See https://github.com/WordPress/gutenberg/pull/59845.
 			event.preventDefault();
-			// If we don't stop propogation, this event bubbles up to the parent submenu item
+			// If we don't stop propagation, this event bubbles up to the parent submenu item
 			event.stopPropagation();
 			setIsLinkOpen( true );
-			setOpenedBy( ref.current );
 		}
 	}
 
@@ -363,9 +367,8 @@ export default function NavigationSubmenuEdit( {
 							icon={ linkIcon }
 							title={ __( 'Link' ) }
 							shortcut={ displayShortcut.primary( 'k' ) }
-							onClick={ ( event ) => {
+							onClick={ () => {
 								setIsLinkOpen( true );
-								setOpenedBy( event.currentTarget );
 							} }
 						/>
 					) }
@@ -380,74 +383,15 @@ export default function NavigationSubmenuEdit( {
 					/>
 				</ToolbarGroup>
 			</BlockControls>
-			{ /* Warning, this duplicated in packages/block-library/src/navigation-link/edit.js */ }
 			<InspectorControls>
-				<PanelBody title={ __( 'Settings' ) }>
-					<TextControl
-						__nextHasNoMarginBottom
-						__next40pxDefaultSize
-						value={ label || '' }
-						onChange={ ( labelValue ) => {
-							setAttributes( { label: labelValue } );
-						} }
-						label={ __( 'Text' ) }
-						autoComplete="off"
-					/>
-					<TextControl
-						__nextHasNoMarginBottom
-						__next40pxDefaultSize
-						value={ url || '' }
-						onChange={ ( urlValue ) => {
-							setAttributes( { url: urlValue } );
-						} }
-						label={ __( 'Link' ) }
-						autoComplete="off"
-					/>
-					<TextareaControl
-						__nextHasNoMarginBottom
-						value={ description || '' }
-						onChange={ ( descriptionValue ) => {
-							setAttributes( {
-								description: descriptionValue,
-							} );
-						} }
-						label={ __( 'Description' ) }
-						help={ __(
-							'The description will be displayed in the menu if the current theme supports it.'
-						) }
-					/>
-					<TextControl
-						__nextHasNoMarginBottom
-						__next40pxDefaultSize
-						value={ title || '' }
-						onChange={ ( titleValue ) => {
-							setAttributes( { title: titleValue } );
-						} }
-						label={ __( 'Title attribute' ) }
-						autoComplete="off"
-						help={ __(
-							'Additional information to help clarify the purpose of the link.'
-						) }
-					/>
-					<TextControl
-						__nextHasNoMarginBottom
-						__next40pxDefaultSize
-						value={ rel || '' }
-						onChange={ ( relValue ) => {
-							setAttributes( { rel: relValue } );
-						} }
-						label={ __( 'Rel attribute' ) }
-						autoComplete="off"
-						help={ __(
-							'The relationship of the linked URL as space-separated link types.'
-						) }
-					/>
-				</PanelBody>
+				<Controls
+					attributes={ attributes }
+					setAttributes={ setAttributes }
+					clientId={ clientId }
+				/>
 			</InspectorControls>
 			<div { ...blockProps }>
-				{ /* eslint-disable jsx-a11y/anchor-is-valid */ }
 				<ParentElement className="wp-block-navigation-item__content">
-					{ /* eslint-enable */ }
 					<RichText
 						ref={ ref }
 						identifier="label"
@@ -461,31 +405,23 @@ export default function NavigationSubmenuEdit( {
 						aria-label={ __( 'Navigation link text' ) }
 						placeholder={ itemLabelPlaceholder }
 						withoutInteractiveFormatting
-						allowedFormats={ [
-							'core/bold',
-							'core/italic',
-							'core/image',
-							'core/strikethrough',
-						] }
 						onClick={ () => {
 							if ( ! openSubmenusOnClick && ! url ) {
 								setIsLinkOpen( true );
-								setOpenedBy( ref.current );
 							}
 						} }
 					/>
+					{ description && (
+						<span className="wp-block-navigation-item__description">
+							{ description }
+						</span>
+					) }
 					{ ! openSubmenusOnClick && isLinkOpen && (
 						<LinkUI
 							clientId={ clientId }
 							link={ attributes }
 							onClose={ () => {
 								setIsLinkOpen( false );
-								if ( openedBy ) {
-									openedBy.focus();
-									setOpenedBy( null );
-								} else {
-									selectBlock( clientId );
-								}
 							} }
 							anchor={ popoverAnchor }
 							onRemove={ () => {
@@ -493,11 +429,24 @@ export default function NavigationSubmenuEdit( {
 								speak( __( 'Link removed.' ), 'assertive' );
 							} }
 							onChange={ ( updatedValue ) => {
-								updateAttributes(
+								// updateAttributes determines the final state and returns metadata
+								const {
+									isEntityLink,
+									attributes: updatedAttributes,
+								} = updateAttributes(
 									updatedValue,
 									setAttributes,
 									attributes
 								);
+
+								// Handle URL binding based on the final computed state
+								// Only create bindings for entity links (posts, pages, taxonomies)
+								// Never create bindings for custom links (manual URLs)
+								if ( isEntityLink ) {
+									createBinding( updatedAttributes );
+								} else {
+									clearBinding();
+								}
 							} }
 						/>
 					) }

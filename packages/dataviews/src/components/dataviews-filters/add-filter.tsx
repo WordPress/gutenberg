@@ -33,37 +33,40 @@ export function AddFilterMenu( {
 	view,
 	onChangeView,
 	setOpenedFilter,
-	trigger,
+	triggerProps,
 }: AddFilterProps & {
-	trigger: React.ReactNode;
+	triggerProps: React.ComponentProps< typeof Menu.TriggerButton >;
 } ) {
 	const inactiveFilters = filters.filter( ( filter ) => ! filter.isVisible );
 	return (
-		<Menu trigger={ trigger }>
-			{ inactiveFilters.map( ( filter ) => {
-				return (
-					<Menu.Item
-						key={ filter.field }
-						onClick={ () => {
-							setOpenedFilter( filter.field );
-							onChangeView( {
-								...view,
-								page: 1,
-								filters: [
-									...( view.filters || [] ),
-									{
-										field: filter.field,
-										value: undefined,
-										operator: filter.operators[ 0 ],
-									},
-								],
-							} );
-						} }
-					>
-						<Menu.ItemLabel>{ filter.name }</Menu.ItemLabel>
-					</Menu.Item>
-				);
-			} ) }
+		<Menu>
+			<Menu.TriggerButton { ...triggerProps } />
+			<Menu.Popover>
+				{ inactiveFilters.map( ( filter ) => {
+					return (
+						<Menu.Item
+							key={ filter.field }
+							onClick={ () => {
+								setOpenedFilter( filter.field );
+								onChangeView( {
+									...view,
+									page: 1,
+									filters: [
+										...( view.filters || [] ),
+										{
+											field: filter.field,
+											value: undefined,
+											operator: filter.operators[ 0 ],
+										},
+									],
+								} );
+							} }
+						>
+							<Menu.ItemLabel>{ filter.name }</Menu.ItemLabel>
+						</Menu.Item>
+					);
+				} ) }
+			</Menu.Popover>
 		</Menu>
 	);
 }
@@ -78,18 +81,19 @@ function AddFilter(
 	const inactiveFilters = filters.filter( ( filter ) => ! filter.isVisible );
 	return (
 		<AddFilterMenu
-			trigger={
-				<Button
-					accessibleWhenDisabled
-					size="compact"
-					className="dataviews-filters-button"
-					variant="tertiary"
-					disabled={ ! inactiveFilters.length }
-					ref={ ref }
-				>
-					{ __( 'Add filter' ) }
-				</Button>
-			}
+			triggerProps={ {
+				render: (
+					<Button
+						accessibleWhenDisabled
+						size="compact"
+						className="dataviews-filters-button"
+						variant="tertiary"
+						disabled={ ! inactiveFilters.length }
+						ref={ ref }
+					/>
+				),
+				children: __( 'Add filter' ),
+			} }
 			{ ...{ filters, view, onChangeView, setOpenedFilter } }
 		/>
 	);

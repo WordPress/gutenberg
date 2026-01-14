@@ -18,12 +18,11 @@ import {
 	doActionAsync,
 } from '@wordpress/hooks';
 import { store as preferencesStore } from '@wordpress/preferences';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
-import { TRASH_POST_NOTICE_ID } from './constants';
 import { localAutosaveSet } from './local-autosave';
 import {
 	getNotificationArgumentsForSaveSuccess,
@@ -35,9 +34,9 @@ import { unlock } from '../lock-unlock';
  * Returns an action generator used in signalling that editor has initialized with
  * the specified post object and editor settings.
  *
- * @param {Object} post     Post object.
- * @param {Object} edits    Initial edited attributes object.
- * @param {Array?} template Block Template.
+ * @param {Object} post       Post object.
+ * @param {Object} edits      Initial edited attributes object.
+ * @param {Array}  [template] Block Template.
  */
 export const setupEditor =
 	( post, edits, template ) =>
@@ -63,7 +62,7 @@ export const setupEditor =
 		}
 		if (
 			edits &&
-			Object.values( edits ).some(
+			Object.entries( edits ).some(
 				( [ key, edit ] ) =>
 					edit !== ( post[ key ]?.raw ?? post[ key ] )
 			)
@@ -157,28 +156,13 @@ export function setEditedPost( postType, postId ) {
  * Returns an action object used in signalling that attributes of the post have
  * been edited.
  *
- * @param {Object} edits   Post attributes to edit.
- * @param {Object} options Options for the edit.
+ * @param {Object} edits     Post attributes to edit.
+ * @param {Object} [options] Options for the edit.
  *
  * @example
  * ```js
  * // Update the post title
  * wp.data.dispatch( 'core/editor' ).editPost( { title: `${ newTitle }` } );
- * ```
- *
- * @example
- *```js
- * 	// Get specific media size based on the featured media ID
- * 	// Note: change sizes?.large for any registered size
- * 	const getFeaturedMediaUrl = useSelect( ( select ) => {
- * 		const getFeaturedMediaId =
- * 			select( 'core/editor' ).getEditedPostAttribute( 'featured_media' );
- * 		const getMedia = select( 'core' ).getMedia( getFeaturedMediaId );
- *
- * 		return (
- * 			getMedia?.media_details?.sizes?.large?.source_url || getMedia?.source_url || ''
- * 		);
- * }, [] );
  * ```
  *
  * @return {Object} Action object
@@ -195,7 +179,7 @@ export const editPost =
 /**
  * Action for saving the current post in the editor.
  *
- * @param {Object} options
+ * @param {Object} [options]
  */
 export const savePost =
 	( options = {} ) =>
@@ -280,7 +264,7 @@ export const savePost =
 			try {
 				await doActionAsync(
 					'editor.savePost',
-					{ id: previousRecord.id },
+					{ id: previousRecord.id, type: previousRecord.type },
 					options
 				);
 			} catch ( err ) {
@@ -288,6 +272,17 @@ export const savePost =
 			}
 		}
 		dispatch( { type: 'REQUEST_POST_UPDATE_FINISH', options } );
+
+		if (
+			typeof window !== 'undefined' &&
+			window.__experimentalTemplateActivate &&
+			! options.isAutosave &&
+			previousRecord.type === 'wp_template' &&
+			( typeof previousRecord.id === 'number' ||
+				/^\d+$/.test( previousRecord.id ) )
+		) {
+			templateActivationNotice( { select, dispatch, registry } );
+		}
 
 		if ( error ) {
 			const args = getNotificationArgumentsForSaveFail( {
@@ -323,6 +318,91 @@ export const savePost =
 		}
 	};
 
+async function templateActivationNotice( { select, registry } ) {
+	const editorSettings = select.getEditorSettings();
+
+	// Don't open for focused entity.
+	if ( editorSettings.onNavigateToPreviousEntityRecord ) {
+		return;
+	}
+
+	const { id, slug } = select.getCurrentPost();
+	const site = await registry
+		.select( coreStore )
+		.getEntityRecord( 'root', 'site' );
+
+	// Already active.
+	if ( site.active_templates[ slug ] === id ) {
+		return;
+	}
+
+	const currentTheme = await registry
+		.resolveSelect( coreStore )
+		.getCurrentTheme();
+	const templateType = currentTheme?.default_template_types.find(
+		( type ) => type.slug === slug
+	);
+
+	await registry.dispatch( noticesStore ).createNotice(
+		'info',
+		sprintf(
+			// translators: %s: The name (or slug) of the type of template.
+			__( 'Do you want to activate this "%s" template?' ),
+			templateType?.title ?? slug
+		),
+		{
+			id: 'template-activate-notice',
+			actions: [
+				{
+					label: __( 'Activate' ),
+					onClick: async () => {
+						await registry
+							.dispatch( noticesStore )
+							.createNotice(
+								'info',
+								__( 'Activating template…' ),
+								{ id: 'template-activate-notice' }
+							);
+						try {
+							const currentSite = await registry
+								.select( coreStore )
+								.getEntityRecord( 'root', 'site' );
+							await registry
+								.dispatch( coreStore )
+								.saveEntityRecord(
+									'root',
+									'site',
+									{
+										active_templates: {
+											...currentSite.active_templates,
+											[ slug ]: id,
+										},
+									},
+									{ throwOnError: true }
+								);
+							await registry
+								.dispatch( noticesStore )
+								.createSuccessNotice(
+									__( 'Template activated.' ),
+									{ id: 'template-activate-notice' }
+								);
+						} catch ( error ) {
+							await registry
+								.dispatch( noticesStore )
+								.createErrorNotice(
+									__( 'Template activation failed.' ),
+									{ id: 'template-activate-notice' }
+								);
+							// Rethrow for debugging.
+							throw error;
+						}
+					},
+				},
+			],
+		}
+	);
+}
+
 /**
  * Action for refreshing the current post.
  *
@@ -347,7 +427,6 @@ export const trashPost =
 		const postType = await registry
 			.resolveSelect( coreStore )
 			.getPostType( postTypeSlug );
-		registry.dispatch( noticesStore ).removeNotice( TRASH_POST_NOTICE_ID );
 		const { rest_base: restBase, rest_namespace: restNamespace = 'wp/v2' } =
 			postType;
 		dispatch( { type: 'REQUEST_POST_DELETE_START' } );
@@ -375,7 +454,8 @@ export const trashPost =
  * autosaving (e.g. on the Web, the post might be committed to Session
  * Storage).
  *
- * @param {Object?} options Extra flags to identify the autosave.
+ * @param {Object}  [options]       Extra flags to identify the autosave.
+ * @param {boolean} [options.local] Whether to perform a local autosave.
  */
 export const autosave =
 	( { local = false, ...options } = {} ) =>
@@ -398,6 +478,14 @@ export const autosave =
 		}
 	};
 
+/**
+ * Save for preview.
+ *
+ * @param {Object}  options                     Options object.
+ * @param {boolean} options.forceIsAutosaveable Whether to force the post to be autosaveable.
+ *
+ * @return {Function} Thunk that saves for preview and returns the preview link.
+ */
 export const __unstableSaveForPreview =
 	( { forceIsAutosaveable } = {} ) =>
 	async ( { select, dispatch } ) => {
@@ -598,8 +686,8 @@ export function unlockPostAutosaving( lockName ) {
 /**
  * Returns an action object used to signal that the blocks have been updated.
  *
- * @param {Array}   blocks  Block Array.
- * @param {?Object} options Optional options.
+ * @param {Array}  blocks    Block Array.
+ * @param {Object} [options] Optional options.
  */
 export const resetEditorBlocks =
 	( blocks, options = {} ) =>
@@ -656,7 +744,10 @@ export function updateEditorSettings( settings ) {
 export const setRenderingMode =
 	( mode ) =>
 	( { dispatch, registry, select } ) => {
-		if ( select.__unstableIsEditorReady() ) {
+		if (
+			select.__unstableIsEditorReady() &&
+			! select.getEditorSettings().isPreviewMode
+		) {
 			// We clear the block selection but we also need to clear the selection from the core store.
 			registry.dispatch( blockEditorStore ).clearSelectedBlock();
 			dispatch.editPost( { selection: undefined }, { undoIgnore: true } );
@@ -834,6 +925,9 @@ export const toggleDistractionFree =
 					.set( 'core', 'fixedToolbar', true );
 				dispatch.setIsInserterOpened( false );
 				dispatch.setIsListViewOpened( false );
+				unlock(
+					registry.dispatch( blockEditorStore )
+				).resetZoomLevel();
 			} );
 		}
 		registry.batch( () => {

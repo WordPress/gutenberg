@@ -10,6 +10,7 @@ import { ActionItem } from '@wordpress/interface';
  * The text within the component appears as the menu item label.
  *
  * @param {Object}                props                                 Component properties.
+ * @param {React.ReactNode}       [props.children]                      Children to be rendered.
  * @param {string}                [props.href]                          When `href` is provided, the menu item is rendered as an anchor instead of a button. It corresponds to the `href` attribute of the anchor.
  * @param {WPBlockTypeIconRender} [props.icon=inherits from the plugin] The icon to be rendered to the left of the menu item label. Can be a Dashicon slug or an SVG WP element.
  * @param {Function}              [props.onClick]                       The callback function to be executed when the user clicks the menu item.
@@ -38,7 +39,7 @@ import { ActionItem } from '@wordpress/interface';
  * } );
  * ```
  *
- * @return {Component} The rendered menu item component.
+ * @return {React.ReactNode} The rendered menu item component.
  */
 export default function PluginPreviewMenuItem( props ) {
 	const context = usePluginContext();

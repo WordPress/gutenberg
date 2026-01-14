@@ -19,7 +19,11 @@ import {
 	DropdownMenu,
 	Popover,
 } from '@wordpress/components';
-import { useViewportMatch } from '@wordpress/compose';
+import {
+	useMergeRefs,
+	useResizeObserver,
+	useViewportMatch,
+} from '@wordpress/compose';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	BlockControls,
@@ -34,13 +38,13 @@ import {
 	privateApis as blockEditorPrivateApis,
 	BlockSettingsMenuControls,
 } from '@wordpress/block-editor';
-import { useEffect, useMemo, useState, useRef } from '@wordpress/element';
+import { useCallback, useEffect, useMemo, useState } from '@wordpress/element';
 import { __, _x, sprintf, isRTL } from '@wordpress/i18n';
 import { getFilename } from '@wordpress/url';
 import { getBlockBindingsSource, switchToBlockType } from '@wordpress/blocks';
 import { crop, overlayText, upload, chevronDown } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
-import { store as coreStore, useEntityProp } from '@wordpress/core-data';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -49,12 +53,14 @@ import { unlock } from '../lock-unlock';
 import { createUpgradedEmbedBlock } from '../embed/util';
 import { isExternalImage } from './edit';
 import { Caption } from '../utils/caption';
-
-/**
- * Module constants
- */
+import { MediaControl } from '../utils/media-control';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
-import { MIN_SIZE, ALLOWED_MEDIA_TYPES } from './constants';
+import {
+	MIN_SIZE,
+	ALLOWED_MEDIA_TYPES,
+	SIZED_LAYOUTS,
+	DEFAULT_MEDIA_SIZE_SLUG,
+} from './constants';
 import { evalAspectRatio } from './utils';
 
 const { DimensionsTool, ResolutionTool } = unlock( blockEditorPrivateApis );
@@ -195,7 +201,6 @@ function ContentOnlyControls( {
 									</>
 								)
 							}
-							__nextHasNoMarginBottom
 						/>
 					</div>
 				</Popover>
@@ -212,7 +217,6 @@ function ContentOnlyControls( {
 						<TextControl
 							__next40pxDefaultSize
 							className="wp-block-image__toolbar_content_textarea"
-							__nextHasNoMarginBottom
 							label={ __( 'Title attribute' ) }
 							value={ attributes.title || '' }
 							onChange={ ( value ) =>
@@ -280,26 +284,40 @@ export default function Image( {
 		lightbox,
 		metadata,
 	} = attributes;
-
-	// The only supported unit is px, so we can parseInt to strip the px here.
-	const numericWidth = width ? parseInt( width, 10 ) : undefined;
-	const numericHeight = height ? parseInt( height, 10 ) : undefined;
-
-	const imageRef = useRef();
+	const [ imageElement, setImageElement ] = useState();
+	const [ resizeDelta, setResizeDelta ] = useState( null );
+	const [ pixelSize, setPixelSize ] = useState( {} );
+	const [ offsetTop, setOffsetTop ] = useState( 0 );
+	const setResizeObserved = useResizeObserver( ( [ entry ] ) => {
+		if ( ! resizeDelta ) {
+			const [ box ] = entry.borderBoxSize;
+			setPixelSize( { width: box.inlineSize, height: box.blockSize } );
+		}
+		// This is usually 0 unless the image height is less than the line-height.
+		setOffsetTop( entry.target.offsetTop );
+	} );
+	const effectResizeableBoxPlacement = useCallback( () => {
+		setOffsetTop( imageElement?.offsetTop ?? 0 );
+	}, [ imageElement ] );
+	const setRefs = useMergeRefs( [ setImageElement, setResizeObserved ] );
 	const { allowResize = true } = context;
-	const { getBlock, getSettings } = useSelect( blockEditorStore );
 
 	const image = useSelect(
 		( select ) =>
 			id && isSingleSelected
-				? select( coreStore ).getMedia( id, { context: 'view' } )
+				? select( coreStore ).getEntityRecord(
+						'postType',
+						'attachment',
+						id,
+						{ context: 'view' }
+				  )
 				: null,
 		[ id, isSingleSelected ]
 	);
 
 	const { canInsertCover, imageEditing, imageSizes, maxWidth } = useSelect(
 		( select ) => {
-			const { getBlockRootClientId, canInsertBlockType } =
+			const { getBlockRootClientId, canInsertBlockType, getSettings } =
 				select( blockEditorStore );
 
 			const rootClientId = getBlockRootClientId( clientId );
@@ -317,10 +335,13 @@ export default function Image( {
 		},
 		[ clientId ]
 	);
+	const { getBlock, getSettings } = useSelect( blockEditorStore );
 
 	const { replaceBlocks, toggleSelection } = useDispatch( blockEditorStore );
 	const { createErrorNotice, createSuccessNotice } =
 		useDispatch( noticesStore );
+	const { editEntityRecord } = useDispatch( coreStore );
+
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const isWideAligned = [ 'wide', 'full' ].includes( align );
 	const [
@@ -367,36 +388,20 @@ export default function Image( {
 			.then( ( blob ) => setExternalBlob( blob ) )
 			// Do nothing, cannot upload.
 			.catch( () => {} );
-	}, [ id, url, isSingleSelected, externalBlob ] );
+	}, [ id, url, isSingleSelected, externalBlob, getSettings ] );
 
-	// Get naturalWidth and naturalHeight from image ref, and fall back to loaded natural
+	// Get naturalWidth and naturalHeight from image, and fall back to loaded natural
 	// width and height. This resolves an issue in Safari where the loaded natural
 	// width and height is otherwise lost when switching between alignments.
 	// See: https://github.com/WordPress/gutenberg/pull/37210.
 	const { naturalWidth, naturalHeight } = useMemo( () => {
 		return {
 			naturalWidth:
-				imageRef.current?.naturalWidth ||
-				loadedNaturalWidth ||
-				undefined,
+				imageElement?.naturalWidth || loadedNaturalWidth || undefined,
 			naturalHeight:
-				imageRef.current?.naturalHeight ||
-				loadedNaturalHeight ||
-				undefined,
+				imageElement?.naturalHeight || loadedNaturalHeight || undefined,
 		};
-	}, [
-		loadedNaturalWidth,
-		loadedNaturalHeight,
-		imageRef.current?.complete,
-	] );
-
-	function onResizeStart() {
-		toggleSelection( false );
-	}
-
-	function onResizeStop() {
-		toggleSelection( true );
-	}
+	}, [ loadedNaturalWidth, loadedNaturalHeight, imageElement?.complete ] );
 
 	function onImageError() {
 		setHasImageErrored( true );
@@ -541,75 +546,58 @@ export default function Image( {
 
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
-	const dimensionsControl = (
-		<DimensionsTool
-			value={ { width, height, scale, aspectRatio } }
-			onChange={ ( {
-				width: newWidth,
-				height: newHeight,
-				scale: newScale,
-				aspectRatio: newAspectRatio,
-			} ) => {
-				// Rebuilding the object forces setting `undefined`
-				// for values that are removed since setAttributes
-				// doesn't do anything with keys that aren't set.
-				setAttributes( {
-					// CSS includes `height: auto`, but we need
-					// `width: auto` to fix the aspect ratio when
-					// only height is set due to the width and
-					// height attributes set via the server.
-					width: ! newWidth && newHeight ? 'auto' : newWidth,
+	const dimensionsControl =
+		isResizable &&
+		( SIZED_LAYOUTS.includes( parentLayoutType ) ? (
+			<DimensionsTool
+				panelId={ clientId }
+				value={ { aspectRatio } }
+				onChange={ ( { aspectRatio: newAspectRatio } ) => {
+					setAttributes( {
+						aspectRatio: newAspectRatio,
+						scale: 'cover',
+					} );
+				} }
+				defaultAspectRatio="auto"
+				tools={ [ 'aspectRatio' ] }
+			/>
+		) : (
+			<DimensionsTool
+				panelId={ clientId }
+				value={ { width, height, scale, aspectRatio } }
+				onChange={ ( {
+					width: newWidth,
 					height: newHeight,
 					scale: newScale,
 					aspectRatio: newAspectRatio,
-				} );
-			} }
-			defaultScale="cover"
-			defaultAspectRatio="auto"
-			scaleOptions={ scaleOptions }
-			unitsOptions={ dimensionsUnitsOptions }
-		/>
-	);
+				} ) => {
+					// Rebuilding the object forces setting `undefined`
+					// for values that are removed since setAttributes
+					// doesn't do anything with keys that aren't set.
+					setAttributes( {
+						// CSS includes `height: auto`, but we need
+						// `width: auto` to fix the aspect ratio when
+						// only height is set due to the width and
+						// height attributes set via the server.
+						width: ! newWidth && newHeight ? 'auto' : newWidth,
+						height: newHeight,
+						scale: newScale,
+						aspectRatio: newAspectRatio,
+					} );
+				} }
+				defaultScale="cover"
+				defaultAspectRatio="auto"
+				scaleOptions={ scaleOptions }
+				unitsOptions={ dimensionsUnitsOptions }
+			/>
+		) );
 
-	const aspectRatioControl = (
-		<DimensionsTool
-			value={ { aspectRatio } }
-			onChange={ ( { aspectRatio: newAspectRatio } ) => {
-				setAttributes( {
-					aspectRatio: newAspectRatio,
-					scale: 'cover',
-				} );
-			} }
-			defaultAspectRatio="auto"
-			tools={ [ 'aspectRatio' ] }
-		/>
-	);
-
-	const resetAll = () => {
+	const resetSettings = () => {
 		setAttributes( {
-			alt: undefined,
-			width: undefined,
-			height: undefined,
-			scale: undefined,
-			aspectRatio: undefined,
 			lightbox: undefined,
 		} );
+		updateImage( DEFAULT_MEDIA_SIZE_SLUG );
 	};
-
-	const sizeControls = (
-		<InspectorControls>
-			<ToolsPanel
-				label={ __( 'Settings' ) }
-				resetAll={ resetAll }
-				dropdownMenuProps={ dropdownMenuProps }
-			>
-				{ isResizable &&
-					( parentLayoutType === 'grid'
-						? aspectRatioControl
-						: dimensionsControl ) }
-			</ToolsPanel>
-		</InspectorControls>
-	);
 
 	const arePatternOverridesEnabled =
 		metadata?.bindings?.__default?.source === 'core/pattern-overrides';
@@ -621,7 +609,7 @@ export default function Image( {
 		lockAltControlsMessage,
 		lockTitleControls = false,
 		lockTitleControlsMessage,
-		lockCaption = false,
+		hideCaptionControls = false,
 	} = useSelect(
 		( select ) => {
 			if ( ! isSingleSelected ) {
@@ -631,6 +619,7 @@ export default function Image( {
 				url: urlBinding,
 				alt: altBinding,
 				title: titleBinding,
+				caption: captionBinding,
 			} = metadata?.bindings || {};
 			const hasParentPattern = !! context[ 'pattern/overrides' ];
 			const urlBindingSource = getBlockBindingsSource(
@@ -654,10 +643,7 @@ export default function Image( {
 					// Disable editing the link of the URL if the image is inside a pattern instance.
 					// This is a temporary solution until we support overriding the link on the frontend.
 					hasParentPattern || arePatternOverridesEnabled,
-				lockCaption:
-					// Disable editing the caption if the image is inside a pattern instance.
-					// This is a temporary solution until we support overriding the caption on the frontend.
-					hasParentPattern,
+				hideCaptionControls: !! captionBinding,
 				lockAltControls:
 					!! altBinding &&
 					! altBindingSource?.canUserEditValue?.( {
@@ -702,7 +688,8 @@ export default function Image( {
 		! lockHrefControls &&
 		! lockUrlControls;
 
-	const showCoverControls = isSingleSelected && canInsertCover;
+	const showCoverControls =
+		isSingleSelected && canInsertCover && ! isContentOnlyMode;
 
 	const showBlockControls = showUrlInput || allowCrop || showCoverControls;
 
@@ -715,12 +702,12 @@ export default function Image( {
 					mediaId={ id }
 					mediaURL={ url }
 					allowedTypes={ ALLOWED_MEDIA_TYPES }
-					accept="image/*"
 					onSelect={ onSelectImage }
 					onSelectURL={ onSelectURL }
 					onError={ onUploadError }
 					name={ ! url ? __( 'Add image' ) : __( 'Replace' ) }
 					onReset={ () => onSelectImage( undefined ) }
+					variant="toolbar"
 				/>
 			</BlockControls>
 		);
@@ -787,12 +774,38 @@ export default function Image( {
 					/>
 				</BlockControls>
 			) }
-			<InspectorControls>
+			<InspectorControls group="content">
 				<ToolsPanel
-					label={ __( 'Settings' ) }
-					resetAll={ resetAll }
+					label={ __( 'Media' ) }
+					resetAll={ () => onSelectImage( undefined ) }
 					dropdownMenuProps={ dropdownMenuProps }
 				>
+					{ isSingleSelected && ! lockUrlControls && (
+						<ToolsPanelItem
+							label={ __( 'Image' ) }
+							hasValue={ () => !! url }
+							onDeselect={ () => onSelectImage( undefined ) }
+							isShownByDefault
+						>
+							<MediaControl
+								mediaId={ id }
+								mediaUrl={ url }
+								alt={ alt }
+								filename={
+									image?.media_details?.sizes?.full?.file ||
+									image?.slug ||
+									getFilename( url )
+								}
+								allowedTypes={ ALLOWED_MEDIA_TYPES }
+								onSelect={ onSelectImage }
+								onSelectURL={ onSelectURL }
+								onError={ onUploadError }
+								onReset={ () => onSelectImage( undefined ) }
+								isUploading={ !! temporaryURL }
+								emptyLabel={ __( 'Add image' ) }
+							/>
+						</ToolsPanelItem>
+					) }
 					{ isSingleSelected && (
 						<ToolsPanelItem
 							label={ __( 'Alternative text' ) }
@@ -831,26 +844,41 @@ export default function Image( {
 										</>
 									)
 								}
-								__nextHasNoMarginBottom
 							/>
 						</ToolsPanelItem>
 					) }
-					{ isResizable &&
-						( parentLayoutType === 'grid'
-							? aspectRatioControl
-							: dimensionsControl ) }
-					{ !! imageSizeOptions.length && (
+				</ToolsPanel>
+			</InspectorControls>
+			<InspectorControls
+				group="dimensions"
+				resetAllFilter={ ( attrs ) => ( {
+					...attrs,
+					aspectRatio: undefined,
+					width: undefined,
+					height: undefined,
+					scale: undefined,
+				} ) }
+			>
+				{ dimensionsControl }
+			</InspectorControls>
+			{ !! imageSizeOptions.length && (
+				<InspectorControls>
+					<ToolsPanel
+						label={ __( 'Settings' ) }
+						resetAll={ resetSettings }
+						dropdownMenuProps={ dropdownMenuProps }
+					>
 						<ResolutionTool
 							value={ sizeSlug }
+							defaultValue={ DEFAULT_MEDIA_SIZE_SLUG }
 							onChange={ updateImage }
 							options={ imageSizeOptions }
 						/>
-					) }
-				</ToolsPanel>
-			</InspectorControls>
+					</ToolsPanel>
+				</InspectorControls>
+			) }
 			<InspectorControls group="advanced">
 				<TextControl
-					__nextHasNoMarginBottom
 					__next40pxDefaultSize
 					label={ __( 'Title attribute' ) }
 					value={ title || '' }
@@ -899,13 +927,6 @@ export default function Image( {
 	const { postType, postId, queryId } = context;
 	const isDescendentOfQueryLoop = Number.isFinite( queryId );
 
-	const [ , setFeaturedImage ] = useEntityProp(
-		'postType',
-		postType,
-		'featured_media',
-		postId
-	);
-
 	let img =
 		temporaryURL && hasImageErrored ? (
 			// Show a placeholder during upload when the blob URL can't be loaded. This can
@@ -917,26 +938,25 @@ export default function Image( {
 				<Spinner />
 			</Placeholder>
 		) : (
-			// Disable reason: Image itself is not meant to be interactive, but
-			// should direct focus to block.
-			/* eslint-disable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/click-events-have-key-events */
 			<>
 				<img
 					src={ temporaryURL || url }
 					alt={ defaultedAlt }
 					onError={ onImageError }
 					onLoad={ onImageLoad }
-					ref={ imageRef }
+					ref={ setRefs }
 					className={ borderProps.className }
+					width={ naturalWidth }
+					height={ naturalHeight }
 					style={ {
-						width:
-							( width && height ) || aspectRatio
-								? '100%'
-								: undefined,
-						height:
-							( width && height ) || aspectRatio
-								? '100%'
-								: undefined,
+						aspectRatio,
+						...( resizeDelta
+							? {
+									width: pixelSize.width + resizeDelta.width,
+									height:
+										pixelSize.height + resizeDelta.height,
+							  }
+							: { width, height } ),
 						objectFit: scale,
 						...borderProps.style,
 						...shadowProps.style,
@@ -944,7 +964,6 @@ export default function Image( {
 				/>
 				{ temporaryURL && <Spinner /> }
 			</>
-			/* eslint-enable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/click-events-have-key-events */
 		);
 
 	if ( canEditImage && isEditingImage ) {
@@ -953,8 +972,7 @@ export default function Image( {
 				<ImageEditor
 					id={ id }
 					url={ url }
-					width={ numericWidth }
-					height={ numericHeight }
+					{ ...pixelSize }
 					naturalHeight={ naturalHeight }
 					naturalWidth={ naturalWidth }
 					onSaveImage={ ( imageAttributes ) =>
@@ -967,26 +985,21 @@ export default function Image( {
 				/>
 			</ImageWrapper>
 		);
-	} else if ( ! isResizable || parentLayoutType === 'grid' ) {
-		img = (
-			<div style={ { width, height, aspectRatio } }>
-				<ImageWrapper href={ href }>{ img }</ImageWrapper>
-			</div>
-		);
 	} else {
+		img = <ImageWrapper href={ href }>{ img }</ImageWrapper>;
+	}
+
+	let resizableBox;
+	if (
+		isResizable &&
+		isSingleSelected &&
+		! isEditingImage &&
+		! SIZED_LAYOUTS.includes( parentLayoutType )
+	) {
 		const numericRatio = aspectRatio && evalAspectRatio( aspectRatio );
-		const customRatio = numericWidth / numericHeight;
+		const customRatio = pixelSize.width / pixelSize.height;
 		const naturalRatio = naturalWidth / naturalHeight;
 		const ratio = numericRatio || customRatio || naturalRatio || 1;
-		const currentWidth =
-			! numericWidth && numericHeight
-				? numericHeight * ratio
-				: numericWidth;
-		const currentHeight =
-			! numericHeight && numericWidth
-				? numericWidth / ratio
-				: numericHeight;
-
 		const minWidth =
 			naturalWidth < naturalHeight ? MIN_SIZE : MIN_SIZE * ratio;
 		const minHeight =
@@ -1032,21 +1045,17 @@ export default function Image( {
 			}
 		}
 		/* eslint-enable no-lonely-if */
-		img = (
+		resizableBox = (
 			<ResizableBox
+				ref={ effectResizeableBoxPlacement }
 				style={ {
-					display: 'block',
-					objectFit: scale,
-					aspectRatio:
-						! width && ! height && aspectRatio
-							? aspectRatio
-							: undefined,
+					position: 'absolute',
+					// To match the vertical-align: bottom of the img (from style.scss)
+					// syncs the top with the img. This matters when the img height is
+					// less than the line-height.
+					inset: `${ offsetTop }px 0 0 0`,
 				} }
-				size={ {
-					width: currentWidth ?? 'auto',
-					height: currentHeight ?? 'auto',
-				} }
-				showHandle={ isSingleSelected }
+				size={ pixelSize }
 				minWidth={ minWidth }
 				maxWidth={ maxResizeWidth }
 				minHeight={ minHeight }
@@ -1058,9 +1067,19 @@ export default function Image( {
 					bottom: true,
 					left: showLeftHandle,
 				} }
-				onResizeStart={ onResizeStart }
-				onResizeStop={ ( event, direction, elt ) => {
-					onResizeStop();
+				onResizeStart={ () => {
+					toggleSelection( false );
+				} }
+				onResize={ ( event, direction, elt, delta ) => {
+					setResizeDelta( delta );
+				} }
+				onResizeStop={ ( event, direction, elt, delta ) => {
+					toggleSelection( true );
+					setResizeDelta( null );
+					setPixelSize( ( current ) => ( {
+						width: current.width + delta.width,
+						height: current.height + delta.height,
+					} ) );
 
 					// Clear hardcoded width if the resized width is close to the max-content width.
 					if (
@@ -1091,9 +1110,7 @@ export default function Image( {
 					} );
 				} }
 				resizeRatio={ align === 'center' ? 2 : 1 }
-			>
-				<ImageWrapper href={ href }>{ img }</ImageWrapper>
-			</ResizableBox>
+			/>
 		);
 	}
 
@@ -1101,8 +1118,7 @@ export default function Image( {
 		return (
 			<>
 				{ mediaReplaceFlow }
-				{ /* Add all controls if the image attributes are connected. */ }
-				{ metadata?.bindings ? controls : sizeControls }
+				{ controls }
 			</>
 		);
 	}
@@ -1111,7 +1127,9 @@ export default function Image( {
 	 * Set the post's featured image with the current image.
 	 */
 	const setPostFeatureImage = () => {
-		setFeaturedImage( id );
+		editEntityRecord( 'postType', postType, postId, {
+			featured_media: id,
+		} );
 		createSuccessNotice( __( 'Post featured image updated.' ), {
 			type: 'snackbar',
 		} );
@@ -1126,7 +1144,7 @@ export default function Image( {
 				id &&
 				clientId === selectedClientIds[ 0 ] && (
 					<MenuItem onClick={ setPostFeatureImage }>
-						{ __( 'Set featured image' ) }
+						{ __( 'Set as featured image' ) }
 					</MenuItem>
 				)
 			}
@@ -1139,6 +1157,7 @@ export default function Image( {
 			{ controls }
 			{ featuredImageControl }
 			{ img }
+			{ resizableBox }
 
 			<Caption
 				attributes={ attributes }
@@ -1148,10 +1167,9 @@ export default function Image( {
 				label={ __( 'Image caption text' ) }
 				showToolbarButton={
 					isSingleSelected &&
-					hasNonContentControls &&
-					! arePatternOverridesEnabled
+					( hasNonContentControls || isContentOnlyMode ) &&
+					! hideCaptionControls
 				}
-				readOnly={ lockCaption }
 			/>
 		</>
 	);

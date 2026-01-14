@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/media-utils",
-	"version": "5.11.0",
+	"version": "5.36.0",
 	"description": "WordPress Media Upload Utils.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -23,17 +23,45 @@
 		"node": ">=18.12.0",
 		"npm": ">=8.19.2"
 	},
-	"main": "build/index.js",
+	"files": [
+		"src",
+		"build",
+		"build-module",
+		"build-style",
+		"build-types",
+		"*.md"
+	],
+	"type": "module",
+	"main": "build/index.cjs",
 	"module": "build-module/index.js",
+	"exports": {
+		".": {
+			"types": "./build-types/index.d.ts",
+			"import": "./build-module/index.js",
+			"require": "./build/index.cjs"
+		},
+		"./package.json": "./package.json"
+	},
 	"wpScript": true,
 	"types": "build-types",
+	"sideEffects": [
+		"build-style/**"
+	],
 	"dependencies": {
-		"@babel/runtime": "7.25.7",
-		"@wordpress/api-fetch": "*",
-		"@wordpress/blob": "*",
-		"@wordpress/element": "*",
-		"@wordpress/i18n": "*",
-		"@wordpress/private-apis": "*"
+		"@wordpress/api-fetch": "file:../api-fetch",
+		"@wordpress/blob": "file:../blob",
+		"@wordpress/components": "file:../components",
+		"@wordpress/core-data": "file:../core-data",
+		"@wordpress/data": "file:../data",
+		"@wordpress/dataviews": "file:../dataviews",
+		"@wordpress/element": "file:../element",
+		"@wordpress/i18n": "file:../i18n",
+		"@wordpress/icons": "file:../icons",
+		"@wordpress/media-fields": "file:../media-fields",
+		"@wordpress/private-apis": "file:../private-apis"
+	},
+	"peerDependencies": {
+		"react": "^18.0.0"
 	},
 	"publishConfig": {
 		"access": "public"

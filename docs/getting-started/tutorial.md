@@ -150,7 +150,7 @@ Update the [`supports`](https://developer.wordpress.org/block-editor/getting-sta
 
 Note that when you enable text color support with `"text": true`, the background color is also enabled by default. You are welcome to keep it enabled, but it's not required for this tutorial, so you can manually set `"background": false`.
 
-Save the file and select the block in the Editor. You will now see both Color and Typography panels in the Settings Sidebar. Try modifying the settings and see what happens.
+Save the file and select the block in the Editor. You will now see both Color and Typography panels in the Settings Panel. Try modifying the settings and see what happens.
 
 ![The block in the Editor with block supports](https://developer.wordpress.org/files/2023/12/block-tutorial-5.png)
 
@@ -480,6 +480,7 @@ export default function Edit( { attributes, setAttributes } ) {
 			<InspectorControls>
 				<PanelBody title={ __( 'Settings', 'copyright-date-block' ) }>
 					<TextControl
+						__next40pxDefaultSize
 						label={ __(
 							'Starting year',
 							'copyright-date-block'
@@ -540,6 +541,7 @@ export default function Edit( { attributes, setAttributes } ) {
 					/>
 					{ showStartingYear && (
 						<TextControl
+							__next40pxDefaultSize
 							label={ __(
 								'Starting year',
 								'copyright-date-block'
@@ -917,7 +919,7 @@ Save both the `block.json` and `save.js` files; you won't need to make any more 
 
 The `save()` function now uses the new `fallbackCurrentYear`, so it needs to be set somewhere. Let's use the `Edit()` function.
 
-Open the `edit.js` file and start by defining the `fallbackCurrentYear` variable at the top of the `Edit()` functional alongside the other attributes. Next, review what's happening in the function.
+Open the `edit.js` file and start by defining the `fallbackCurrentYear` variable at the top of the `Edit()` function alongside the other attributes. Next, review what's happening in the function.
 
 When the block loads in the Editor, the `currentYear` variable is defined. The function then uses this variable to set the content of the block.
 
