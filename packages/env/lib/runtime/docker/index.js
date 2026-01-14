@@ -30,9 +30,8 @@ const {
 	configureWordPress,
 	resetDatabase,
 	setupWordPressDirectories,
-	readWordPressVersion,
-	canAccessWPORG,
-} = require( '../../wordpress' );
+} = require( './wordpress' );
+const { readWordPressVersion, canAccessWPORG } = require( '../../wordpress' );
 const { didCacheChange, setCache } = require( '../../cache' );
 const md5 = require( '../../md5' );
 const retry = require( '../../retry' );
