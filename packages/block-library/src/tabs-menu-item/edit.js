@@ -232,6 +232,7 @@ function Edit( {
 					attributes,
 					setAttributes,
 					clientId,
+					tabsClientId,
 					activeBackgroundColor,
 					setActiveBackgroundColor,
 					activeTextColor,

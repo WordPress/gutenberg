@@ -8,10 +8,17 @@ import {
 	__experimentalUseMultipleOriginColorsAndGradients as useMultipleOriginColorsAndGradients,
 } from '@wordpress/block-editor';
 
+/**
+ * Internal dependencies
+ */
+import AddTabToolbarControl from '../tab/add-tab-toolbar-control';
+import RemoveTabToolbarControl from '../tab/remove-tab-toolbar-control';
+
 export default function Controls( {
 	attributes,
 	setAttributes,
 	clientId,
+	tabsClientId,
 	activeBackgroundColor,
 	setActiveBackgroundColor,
 	activeTextColor,
@@ -31,62 +38,66 @@ export default function Controls( {
 	const colorSettings = useMultipleOriginColorsAndGradients();
 
 	return (
-		<InspectorControls group="color">
-			<ColorGradientSettingsDropdown
-				settings={ [
-					{
-						label: __( 'Active Background' ),
-						colorValue:
-							activeBackgroundColor?.color ??
-							customActiveBackgroundColor,
-						onColorChange: ( value ) => {
-							setActiveBackgroundColor( value );
-							setAttributes( {
-								customActiveBackgroundColor: value,
-							} );
+		<>
+			<AddTabToolbarControl tabsClientId={ tabsClientId } />
+			<RemoveTabToolbarControl tabsClientId={ tabsClientId } />
+			<InspectorControls group="color">
+				<ColorGradientSettingsDropdown
+					settings={ [
+						{
+							label: __( 'Active Background' ),
+							colorValue:
+								activeBackgroundColor?.color ??
+								customActiveBackgroundColor,
+							onColorChange: ( value ) => {
+								setActiveBackgroundColor( value );
+								setAttributes( {
+									customActiveBackgroundColor: value,
+								} );
+							},
 						},
-					},
-					{
-						label: __( 'Active Text' ),
-						colorValue:
-							activeTextColor?.color ?? customActiveTextColor,
-						onColorChange: ( value ) => {
-							setActiveTextColor( value );
-							setAttributes( {
-								customActiveTextColor: value,
-							} );
+						{
+							label: __( 'Active Text' ),
+							colorValue:
+								activeTextColor?.color ?? customActiveTextColor,
+							onColorChange: ( value ) => {
+								setActiveTextColor( value );
+								setAttributes( {
+									customActiveTextColor: value,
+								} );
+							},
 						},
-					},
-					{
-						label: __( 'Hover Background' ),
-						colorValue:
-							hoverBackgroundColor?.color ??
-							customHoverBackgroundColor,
-						onColorChange: ( value ) => {
-							setHoverBackgroundColor( value );
-							setAttributes( {
-								customHoverBackgroundColor: value,
-							} );
+						{
+							label: __( 'Hover Background' ),
+							colorValue:
+								hoverBackgroundColor?.color ??
+								customHoverBackgroundColor,
+							onColorChange: ( value ) => {
+								setHoverBackgroundColor( value );
+								setAttributes( {
+									customHoverBackgroundColor: value,
+								} );
+							},
 						},
-					},
-					{
-						label: __( 'Hover Text' ),
-						colorValue:
-							hoverTextColor?.color ?? customHoverTextColor,
-						onColorChange: ( value ) => {
-							setHoverTextColor( value );
-							setAttributes( {
-								customHoverTextColor: value,
-							} );
+						{
+							label: __( 'Hover Text' ),
+							colorValue:
+								hoverTextColor?.color ?? customHoverTextColor,
+							onColorChange: ( value ) => {
+								setHoverTextColor( value );
+								setAttributes( {
+									customHoverTextColor: value,
+								} );
+							},
 						},
-					},
-				] }
-				panelId={ clientId }
-				disableCustomColors={ false }
-				__experimentalIsRenderedInSidebar
-				__next40pxDefaultSize
-				{ ...colorSettings }
-			/>
-		</InspectorControls>
+					] }
+					panelId={ clientId }
+					disableCustomColors={ false }
+					__experimentalIsRenderedInSidebar
+					__next40pxDefaultSize
+					{ ...colorSettings }
+				/>
+			</InspectorControls>
+		</>
 	);
 }

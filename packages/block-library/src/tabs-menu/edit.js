@@ -27,6 +27,7 @@ import {
  * Internal dependencies
  */
 import AddTabToolbarControl from '../tab/add-tab-toolbar-control';
+import AddTabRenderAppender from '../tab/add-tab-render-appender';
 import RemoveTabToolbarControl from '../tab/remove-tab-toolbar-control';
 
 const TABS_MENU_ITEM_TEMPLATE = [ [ 'core/tabs-menu-item', {} ] ];
@@ -89,6 +90,7 @@ function TabsMenuItemTemplateBlocks( { wrapperProps = {} } ) {
 function Edit( {
 	context,
 	clientId,
+	isSelected,
 	__unstableLayoutClassNames: layoutClassNames,
 } ) {
 	const tabsId = context[ 'core/tabs-id' ] || null;
@@ -196,6 +198,7 @@ function Edit( {
 					<span className="tabs__tab-label tabs__tab-label--placeholder">
 						{ __( 'Add tabs to display menu' ) }
 					</span>
+					<AddTabRenderAppender tabsClientId={ tabsClientId } />
 				</div>
 			</>
 		);
@@ -235,6 +238,7 @@ function Edit( {
 						</BlockContextProvider>
 					);
 				} ) }
+				<AddTabRenderAppender tabsClientId={ tabsClientId } />
 			</div>
 		</>
 	);
