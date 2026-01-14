@@ -9,7 +9,7 @@
 
 // Global storage for {{PAGE_SLUG}} routes and menu items
 global ${{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_routes, ${{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_menu_items;
-${{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_routes = array();
+${{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_routes     = array();
 ${{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_menu_items = array();
 
 if ( ! function_exists( '{{PREFIX}}_register_{{PAGE_SLUG_UNDERSCORE}}_route' ) ) {
