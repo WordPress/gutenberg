@@ -2,6 +2,43 @@
 
 Execute reproduction steps using Chrome DevTools MCP to verify Gutenberg bug reports.
 
+## ⚠️ COST OPTIMIZATION RULES (CRITICAL)
+
+**Each snapshot costs ~3K tokens. Minimize them aggressively.**
+
+| Rule | Why |
+|------|-----|
+| **Maximum 5 snapshots** | 20 snapshots = $1+ in token costs |
+| **Use `wait_for` over snapshot** | Check page state without 3K token cost |
+| **Use `evaluate_script` for simple clicks** | Direct JS is ~100 tokens vs 3K for snapshot+click |
+| **Batch actions between snapshots** | Do 3-5 actions per snapshot, not 1 |
+
+### Token-Efficient Patterns
+
+```javascript
+// ❌ EXPENSIVE: Snapshot for every click (3K tokens each)
+take_snapshot()  // 3K tokens
+click(uid)
+take_snapshot()  // 3K tokens
+click(uid)
+// Total: 6K+ tokens
+
+// ✅ CHEAP: Direct JavaScript (~100 tokens each)
+evaluate_script({ function: "document.querySelector('.save-btn').click()" })
+wait_for({ text: "Saved" })
+// Total: ~200 tokens
+```
+
+### When to Use Each Approach
+
+| Scenario | Use This |
+|----------|----------|
+| Check if page loaded | `wait_for({ text: "Expected text" })` |
+| Click a button with known selector | `evaluate_script` with querySelector |
+| Fill a form field | `fill` with uid from ONE snapshot |
+| Complex UI with unknown structure | `take_snapshot` (but only once!) |
+| Verify bug is visible | `take_snapshot` + `take_screenshot` |
+
 ## 3.1 Setup
 
 Create screenshots directory:
@@ -33,12 +70,22 @@ For each step in `reproduction.steps`, translate natural language into DevTools 
 | "Click the Save button" | `click` with uid |
 | "Notice that ..." | Check for element presence in snapshot |
 
-**Implementation flow:**
-1. Use `take_snapshot` to understand page structure (returns uid-based tree)
-2. Identify target element by uid from snapshot
-3. Perform action (navigate, fill, click, etc.)
-4. Don't snapshot after action unless needed for verification
-5. Only screenshot when bug/error is visible (see screenshot strategy below)
+**Implementation flow (COST-OPTIMIZED):**
+
+1. **Navigate to page** → Use `navigate_page`, then `wait_for` to confirm load (NOT snapshot)
+2. **First snapshot** → Take ONE snapshot to understand page structure
+3. **Batch multiple actions** → Use uids from that snapshot for 3-5 actions
+4. **Use evaluate_script for known patterns** → WordPress has predictable selectors:
+   - Save button: `document.querySelector('.editor-post-publish-button, .components-button.is-primary')`
+   - Block inserter: `document.querySelector('.block-editor-inserter__toggle')`
+   - Settings: `document.querySelector('[aria-label="Settings"]')`
+5. **Second snapshot** → Only if you need to find NEW elements not in first snapshot
+6. **Final snapshot + screenshot** → Only when bug is visible for evidence
+
+**Snapshot budget: 5 maximum**
+- Snapshot 1: Initial page structure
+- Snapshot 2-3: Only if navigating to completely different pages
+- Snapshot 4-5: Bug evidence (if reproduced)
 
 ## 3.3 Collect evidence
 
@@ -206,16 +253,67 @@ Stop the Playground instance:
 
 ## WordPress-Specific Patterns
 
-Common WordPress admin element patterns:
+### Direct JavaScript Selectors (USE THESE - No Snapshot Needed!)
 
-| Task | How to Find |
-|------|-------------|
-| Save button | Look for `button` with "Save" text in snapshot |
-| Settings input | Find `textbox` or `input` by label in snapshot |
-| Block inserter | Look for button with "Add" in name/description |
-| Site Editor navigation | Look for navigation landmarks in snapshot |
+```javascript
+// Block Editor - Common Actions
+evaluate_script({ function: `
+  // Publish/Update button
+  document.querySelector('.editor-post-publish-button')?.click()
+`})
 
-Use `take_snapshot` to discover the actual structure - returns compact uid-based tree.
+evaluate_script({ function: `
+  // Save draft
+  document.querySelector('.editor-post-save-draft')?.click()
+`})
+
+evaluate_script({ function: `
+  // Open block inserter
+  document.querySelector('.block-editor-inserter__toggle')?.click()
+`})
+
+evaluate_script({ function: `
+  // Open settings sidebar
+  document.querySelector('[aria-label="Settings"]')?.click()
+`})
+
+evaluate_script({ function: `
+  // Select a block by clicking it
+  document.querySelector('.wp-block-paragraph')?.click()
+`})
+
+// Site Editor - Common Actions
+evaluate_script({ function: `
+  // Save in Site Editor
+  document.querySelector('.edit-site-save-button__button')?.click()
+`})
+
+// Admin Pages
+evaluate_script({ function: `
+  // Submit form
+  document.querySelector('#submit, input[type="submit"]')?.click()
+`})
+```
+
+### When You DO Need a Snapshot
+
+| Situation | Why Snapshot is Needed |
+|-----------|----------------------|
+| Complex dynamic UI | Element IDs/classes are generated |
+| Need to read text content | Must inspect accessibility tree |
+| Unknown page structure | First time seeing this page |
+| Bug evidence | Need to capture exact UI state |
+
+### Fallback: Snapshot-Based Element Finding
+
+If evaluate_script doesn't work, THEN use snapshot:
+
+| Task | How to Find in Snapshot |
+|------|------------------------|
+| Save button | Look for `button` with "Save" text |
+| Settings input | Find `textbox` by label |
+| Block inserter | Look for button with "Add" in name |
+| Site Editor navigation | Look for navigation landmarks |
 
 ## Special Cases
 
