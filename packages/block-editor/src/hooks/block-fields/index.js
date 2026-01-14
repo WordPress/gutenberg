@@ -10,6 +10,7 @@ import {
 import { createHigherOrderComponent } from '@wordpress/compose';
 import { DataForm } from '@wordpress/dataviews';
 import { useContext, useState, useMemo } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -38,138 +39,41 @@ const CONTROLS = {
  * Creates a configured control component that wraps a custom control
  * and passes configuration as props.
  *
- * @param {Object} config         - The control configuration
- * @param {string} config.control - The control type (key in CONTROLS map)
+ * @param {Component} ControlComponent The React component for the control.
+ * @param {string}    type             The type of control.
+ * @param {Object}    config           The control configuration passed as a prop.
+ *
  * @return {Function} A wrapped control component
  */
-function createConfiguredControl( config ) {
-	const { control, ...controlConfig } = config;
-	const ControlComponent = CONTROLS[ control ];
-
+function createConfiguredControl( ControlComponent, type, config ) {
 	if ( ! ControlComponent ) {
-		throw new Error( `Control type "${ control }" not found` );
+		throw new Error( `Control type "${ type }" not found` );
 	}
 
 	return function ConfiguredControl( props ) {
-		return <ControlComponent { ...props } config={ controlConfig } />;
+		return <ControlComponent { ...props } config={ config } />;
 	};
 }
 
 /**
- * Normalize a media value to a canonical structure.
- * Only includes properties that are present in the field's mapping (if provided).
- *
- * @param {Object} value    - The mapped value from the block attributes (with canonical keys)
- * @param {Object} fieldDef - Optional field definition containing the mapping
- * @return {Object} Normalized media value with canonical properties
+ * Component that renders a DataForm for a single block's attributes
+ * @param {Object}   props
+ * @param {string}   props.clientId      The clientId of the block.
+ * @param {Object}   props.blockType     The blockType definition.
+ * @param {Object}   props.attributes    The block's attribute values.
+ * @param {Function} props.setAttributes Action to set the block's attributes.
+ * @param {boolean}  props.isCollapsed   Whether the DataForm is rendered as 'collapsed' with only the first field
+ *                                       displayed by default. When collapsed a dropdown is displayed to allow
+ *                                       displaying additional fields. The block's title is displayed as the title.
+ *                                       The collapsed mode is often used when multiple BlockForms are shown together.
  */
-function normalizeMediaValue( value, fieldDef ) {
-	const defaults = {
-		id: null,
-		url: '',
-		caption: '',
-		alt: '',
-		type: 'image',
-		poster: '',
-		featuredImage: false,
-		link: '',
-	};
-
-	const result = {};
-
-	// If there's a mapping, only include properties that are in it
-	if ( fieldDef?.mapping ) {
-		Object.keys( fieldDef.mapping ).forEach( ( key ) => {
-			result[ key ] = value?.[ key ] ?? defaults[ key ] ?? '';
-		} );
-		return result;
-	}
-
-	// Without mapping, include all default properties
-	Object.keys( defaults ).forEach( ( key ) => {
-		result[ key ] = value?.[ key ] ?? defaults[ key ];
-	} );
-	return result;
-}
-
-/**
- * Denormalize a media value from canonical structure back to mapped keys.
- * Only includes properties that are present in the field's mapping.
- *
- * @param {Object} value    - The normalized media value
- * @param {Object} fieldDef - The field definition containing the mapping
- * @return {Object} Value with only mapped properties
- */
-function denormalizeMediaValue( value, fieldDef ) {
-	if ( ! fieldDef.mapping ) {
-		return value;
-	}
-
-	const result = {};
-	Object.entries( fieldDef.mapping ).forEach( ( [ key ] ) => {
-		if ( key in value ) {
-			result[ key ] = value[ key ];
-		}
-	} );
-	return result;
-}
-
-/**
- * Normalize a link value to a canonical structure.
- * Only includes properties that are present in the field's mapping (if provided).
- *
- * @param {Object} value    - The mapped value from the block attributes (with canonical keys)
- * @param {Object} fieldDef - Optional field definition containing the mapping
- * @return {Object} Normalized link value with canonical properties
- */
-function normalizeLinkValue( value, fieldDef ) {
-	const defaults = {
-		url: '',
-		rel: '',
-		linkTarget: '',
-		destination: '',
-	};
-
-	const result = {};
-
-	// If there's a mapping, only include properties that are in it
-	if ( fieldDef?.mapping ) {
-		Object.keys( fieldDef.mapping ).forEach( ( key ) => {
-			result[ key ] = value?.[ key ] ?? defaults[ key ] ?? '';
-		} );
-		return result;
-	}
-
-	// Without mapping, include all default properties
-	Object.keys( defaults ).forEach( ( key ) => {
-		result[ key ] = value?.[ key ] ?? defaults[ key ];
-	} );
-	return result;
-}
-
-/**
- * Denormalize a link value from canonical structure back to mapped keys.
- * Only includes properties that are present in the field's mapping.
- *
- * @param {Object} value    - The normalized link value
- * @param {Object} fieldDef - The field definition containing the mapping
- * @return {Object} Value with only mapped properties
- */
-function denormalizeLinkValue( value, fieldDef ) {
-	if ( ! fieldDef.mapping ) {
-		return value;
-	}
-
-	const result = {};
-	Object.entries( fieldDef.mapping ).forEach( ( [ key ] ) => {
-		if ( key in value ) {
-			result[ key ] = value[ key ];
-		}
-	} );
-	return result;
-}
-
-function BlockFields( { clientId, blockType, attributes, setAttributes } ) {
+function BlockFields( {
+	clientId,
+	blockType,
+	attributes,
+	setAttributes,
+	isCollapsed = false,
+} ) {
 	const blockTitle = useBlockDisplayTitle( {
 		clientId,
 		context: 'list-view',
@@ -178,9 +82,19 @@ function BlockFields( { clientId, blockType, attributes, setAttributes } ) {
 
 	const blockTypeFields = blockType?.[ fieldsKey ];
 
-	const [ form, setForm ] = useState( () => {
-		return blockType?.[ formKey ];
-	} );
+	const computedForm = useMemo( () => {
+		if ( ! isCollapsed ) {
+			return blockType?.[ formKey ];
+		}
+
+		// For a collapsed form only show the first field by default.
+		return {
+			...blockType?.[ formKey ],
+			fields: [ blockType?.[ formKey ]?.fields?.[ 0 ] ],
+		};
+	}, [ blockType, isCollapsed ] );
+
+	const [ form, setForm ] = useState( computedForm );
 
 	// Build DataForm fields with proper structure
 	const dataFormFields = useMemo( () => {
@@ -189,100 +103,63 @@ function BlockFields( { clientId, blockType, attributes, setAttributes } ) {
 		}
 
 		return blockTypeFields.map( ( fieldDef ) => {
-			const ControlComponent = CONTROLS[ fieldDef.type ];
-
-			const defaultValues = {};
-			if ( fieldDef.mapping && blockType?.attributes ) {
-				Object.entries( fieldDef.mapping ).forEach(
-					( [ key, attrKey ] ) => {
-						defaultValues[ key ] =
-							blockType.attributes[ attrKey ]?.defaultValue ??
-							undefined;
-					}
-				);
-			}
-
 			const field = {
 				id: fieldDef.id,
 				label: fieldDef.label,
 				type: fieldDef.type, // Use the field's type; DataForm will use built-in or custom Edit
-				config: { ...fieldDef.args, defaultValues },
-				hideLabelFromVision: fieldDef.id === 'content',
-				// getValue and setValue handle the mapping to block attributes
-				getValue: ( { item } ) => {
-					if ( fieldDef.mapping ) {
-						// Extract mapped properties from the block attributes
-						const mappedValue = {};
-						Object.entries( fieldDef.mapping ).forEach(
-							( [ key, attrKey ] ) => {
-								mappedValue[ key ] = item[ attrKey ];
-							}
-						);
-
-						// Normalize to canonical structure based on field type
-						if ( fieldDef.type === 'media' ) {
-							return normalizeMediaValue( mappedValue, fieldDef );
-						}
-						if ( fieldDef.type === 'link' ) {
-							return normalizeLinkValue( mappedValue, fieldDef );
-						}
-
-						// For other types, return as-is
-						return mappedValue;
-					}
-					// For simple id-based fields, use the id as the attribute key
-					return item[ fieldDef.id ];
-				},
-				setValue: ( { item, value } ) => {
-					if ( fieldDef.mapping ) {
-						// Denormalize from canonical structure back to mapped keys
-						let denormalizedValue = value;
-						if ( fieldDef.type === 'media' ) {
-							denormalizedValue = denormalizeMediaValue(
-								value,
-								fieldDef
-							);
-						} else if ( fieldDef.type === 'link' ) {
-							denormalizedValue = denormalizeLinkValue(
-								value,
-								fieldDef
-							);
-						}
-
-						// Build an object with all mapped attributes
-						const updates = {};
-						Object.entries( fieldDef.mapping ).forEach(
-							( [ key, attrKey ] ) => {
-								// If key is explicitly in value, use it (even if undefined to allow clearing)
-								// Otherwise, preserve the old value
-								if ( key in denormalizedValue ) {
-									updates[ attrKey ] =
-										denormalizedValue[ key ];
-								} else {
-									updates[ attrKey ] = item[ attrKey ];
-								}
-							}
-						);
-						return updates;
-					}
-					// For simple id-based fields, use the id as the attribute key
-					return { [ fieldDef.id ]: value };
-				},
 			};
 
+			// If the field defines a `mapping`, then custom `getValue` and `setValue`
+			// implementations are provided.
+			// These functions map from the inconsistent attribute keys found on blocks
+			// to consistent keys that the field can use internally (and back again).
+			// When `mapping` isn't provided, we can use the field API's default
+			// implementation of these functions.
+			if ( fieldDef.mapping ) {
+				field.getValue = ( { item } ) => {
+					// Extract mapped properties from the block attributes
+					const mappedValue = {};
+					Object.entries( fieldDef.mapping ).forEach(
+						( [ key, attrKey ] ) => {
+							mappedValue[ key ] = item[ attrKey ];
+						}
+					);
+					return mappedValue;
+				};
+				field.setValue = ( { value } ) => {
+					const attributeUpdates = {};
+					Object.entries( fieldDef.mapping ).forEach(
+						( [ key, attrKey ] ) => {
+							attributeUpdates[ attrKey ] = value[ key ];
+						}
+					);
+					return attributeUpdates;
+				};
+			}
+
 			// Only add custom Edit component if one exists for this type
+			const ControlComponent = CONTROLS[ fieldDef.type ];
 			if ( ControlComponent ) {
 				// Use EditConfig pattern: Edit is an object with control type and config props
-				field.Edit = createConfiguredControl( {
-					control: fieldDef.type,
-					clientId,
-					fieldDef,
-				} );
+				field.Edit = createConfiguredControl(
+					ControlComponent,
+					fieldDef.type,
+					{
+						clientId,
+						fieldDef,
+					}
+				);
 			}
 
 			return field;
 		} );
-	}, [ blockTypeFields, blockType?.attributes, clientId ] );
+	}, [ blockTypeFields, clientId ] );
+
+	if ( ! blockTypeFields?.length ) {
+		// TODO - we might still want to show a placeholder for blocks with no fields.
+		// for example, a way to select the block.
+		return null;
+	}
 
 	const handleToggleField = ( fieldId ) => {
 		setForm( ( prev ) => {
@@ -300,31 +177,33 @@ function BlockFields( { clientId, blockType, attributes, setAttributes } ) {
 		} );
 	};
 
-	if ( ! blockTypeFields?.length ) {
-		// TODO - we might still want to show a placeholder for blocks with no fields.
-		// for example, a way to select the block.
-		return null;
-	}
-
 	return (
 		<div className="block-editor-block-fields__container">
 			<div className="block-editor-block-fields__header">
 				<HStack spacing={ 1 }>
-					<BlockIcon
-						className="block-editor-block-fields__header-icon"
-						icon={ blockInformation?.icon }
-					/>
-					<Truncate
-						className="block-editor-block-fields__header-title"
-						numberOfLines={ 1 }
-					>
-						{ blockTitle }
-					</Truncate>
-					<FieldsDropdownMenu
-						fields={ dataFormFields }
-						visibleFields={ form.fields }
-						onToggleField={ handleToggleField }
-					/>
+					{ isCollapsed && (
+						<>
+							<BlockIcon
+								className="block-editor-block-fields__header-icon"
+								icon={ blockInformation?.icon }
+							/>
+							<h2 className="block-editor-block-fields__header-title">
+								<Truncate numberOfLines={ 1 }>
+									{ blockTitle }
+								</Truncate>
+							</h2>
+							<FieldsDropdownMenu
+								fields={ dataFormFields }
+								visibleFields={ form.fields }
+								onToggleField={ handleToggleField }
+							/>
+						</>
+					) }
+					{ ! isCollapsed && (
+						<h2 className="block-editor-block-fields__header-title">
+							{ __( 'Content' ) }
+						</h2>
+					) }
 				</HStack>
 			</div>
 			<DataForm
@@ -348,7 +227,6 @@ const withBlockFields = createHigherOrderComponent(
 		} = useContext( PrivateBlockContext );
 
 		const shouldShowBlockFields =
-			window?.__experimentalContentOnlyPatternInsertion &&
 			window?.__experimentalContentOnlyInspectorFields;
 		const blockTypeFields = blockType?.[ fieldsKey ];
 
@@ -371,6 +249,7 @@ const withBlockFields = createHigherOrderComponent(
 								<BlockFields
 									{ ...props }
 									blockType={ blockType }
+									isCollapsed
 								/>
 							</PrivateInspectorControlsFill>
 						)

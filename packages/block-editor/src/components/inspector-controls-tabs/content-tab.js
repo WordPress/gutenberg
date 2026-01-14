@@ -15,7 +15,6 @@ const ContentTab = ( { contentClientIds } ) => {
 	}
 
 	const shouldShowBlockFields =
-		window?.__experimentalContentOnlyPatternInsertion &&
 		window?.__experimentalContentOnlyInspectorFields;
 
 	return (

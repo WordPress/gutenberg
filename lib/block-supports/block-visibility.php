@@ -37,8 +37,8 @@ function gutenberg_render_block_visibility_support( $block_content, $block ) {
 		 * as the feature is developed.
 		 *
 		 * Breakpoints as array items are defined sequentially. The first item's size is the max value.
-		 * Each subsequent item's min is calc(previous size + 1px), and its size is the max.
-		 * The last item's min is previous size plus 1px, and it has no max.
+		 * Each subsequent item starts after the previous size (using > operator), and its size is the max.
+		 * The last item starts after the previous size (using > operator), and it has no max.
 		 */
 		$breakpoints = array(
 			array(
@@ -59,31 +59,25 @@ function gutenberg_render_block_visibility_support( $block_content, $block ) {
 		);
 
 		/*
-		 * Build media queries from breakpoint definitions.
+		 * Build media queries from breakpoint definitions using the CSS range syntax.
 		 * Could be absorbed into the style engine,
 		 * as well as classname building, and declaration of the display property, if required.
 		 */
 		$breakpoint_queries = array();
 		$previous_size      = null;
 		foreach ( $breakpoints as $index => $breakpoint ) {
-			$slug        = $breakpoint['slug'];
-			$size        = $breakpoint['size'];
-			$query_parts = array();
+			$slug = $breakpoint['slug'];
+			$size = $breakpoint['size'];
 
-			// First item: max = size.
+			// First item: width <= size.
 			if ( 0 === $index ) {
-				$query_parts[] = '(max-width: ' . $size . ')';
+				$breakpoint_queries[ $slug ] = "@media (width <= $size)";
 			} elseif ( count( $breakpoints ) - 1 === $index ) {
-				// Last item: min = calc(previous size + 1px), no max.
-				$query_parts[] = '(min-width: calc(' . $previous_size . ' + 1px))';
+				// Last item: width > previous size.
+				$breakpoint_queries[ $slug ] = "@media (width > $previous_size)";
 			} else {
-				// Middle items: min = calc(previous size + 1px), max = size.
-				$query_parts[] = '(min-width: calc(' . $previous_size . ' + 1px))';
-				$query_parts[] = '(max-width: ' . $size . ')';
-			}
-
-			if ( ! empty( $query_parts ) ) {
-				$breakpoint_queries[ $slug ] = '@media ' . implode( ' and ', $query_parts );
+				// Middle items: previous size < width <= size.
+				$breakpoint_queries[ $slug ] = "@media ($previous_size < width <= $size)";
 			}
 
 			$previous_size = $size;
@@ -135,21 +129,19 @@ function gutenberg_render_block_visibility_support( $block_content, $block ) {
 			);
 		}
 
-		if ( ! empty( $css_rules ) ) {
-			gutenberg_style_engine_get_stylesheet_from_css_rules(
-				$css_rules,
-				array(
-					'context'  => 'block-supports',
-					'prettify' => false,
-				)
-			);
+		gutenberg_style_engine_get_stylesheet_from_css_rules(
+			$css_rules,
+			array(
+				'context'  => 'block-supports',
+				'prettify' => false,
+			)
+		);
 
-			if ( ! empty( $block_content ) ) {
-				$processor = new WP_HTML_Tag_Processor( $block_content );
-				if ( $processor->next_tag() ) {
-					$processor->add_class( implode( ' ', $class_names ) );
-					$block_content = $processor->get_updated_html();
-				}
+		if ( ! empty( $block_content ) ) {
+			$processor = new WP_HTML_Tag_Processor( $block_content );
+			if ( $processor->next_tag() ) {
+				$processor->add_class( implode( ' ', $class_names ) );
+				$block_content = $processor->get_updated_html();
 			}
 		}
 	}

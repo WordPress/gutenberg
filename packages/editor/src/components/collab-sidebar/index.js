@@ -80,7 +80,7 @@ function NotesSidebarContent( {
 	);
 }
 
-function NotesSidebar( { postId, mode } ) {
+function NotesSidebar( { postId } ) {
 	// Enum: 'closed' | 'creating' | 'open'
 	const [ newNoteFormState, setNewNoteFormState ] = useState( 'closed' );
 	const { getActiveComplementaryArea } = useSelect( interfaceStore );
@@ -89,7 +89,7 @@ function NotesSidebar( { postId, mode } ) {
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const commentSidebarRef = useRef( null );
 
-	const showFloatingSidebar = isLargeViewport && mode === 'post-only';
+	const showFloatingSidebar = isLargeViewport;
 
 	const { clientId, blockCommentId, isDistractionFree } = useSelect(
 		( select ) => {
@@ -130,8 +130,7 @@ function NotesSidebar( { postId, mode } ) {
 	const currentThread = blockCommentId
 		? resultComments.find( ( thread ) => thread.id === blockCommentId )
 		: null;
-	const showAllNotesSidebar =
-		resultComments.length > 0 || ! showFloatingSidebar;
+	const showAllNotesSidebar = resultComments.length > 0;
 
 	async function openTheSidebar() {
 		const prevArea = await getActiveComplementaryArea( 'core' );
@@ -228,12 +227,10 @@ function NotesSidebar( { postId, mode } ) {
 }
 
 export default function NotesSidebarContainer() {
-	const { postId, mode, editorMode } = useSelect( ( select ) => {
-		const { getCurrentPostId, getRenderingMode, getEditorMode } =
-			select( editorStore );
+	const { postId, editorMode } = useSelect( ( select ) => {
+		const { getCurrentPostId, getEditorMode } = select( editorStore );
 		return {
 			postId: getCurrentPostId(),
-			mode: getRenderingMode(),
 			editorMode: getEditorMode(),
 		};
 	}, [] );
@@ -249,7 +246,7 @@ export default function NotesSidebarContainer() {
 
 	return (
 		<PostTypeSupportCheck supportKeys="editor.notes">
-			<NotesSidebar postId={ postId } mode={ mode } />
+			<NotesSidebar postId={ postId } />
 		</PostTypeSupportCheck>
 	);
 }

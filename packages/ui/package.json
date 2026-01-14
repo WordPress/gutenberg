@@ -44,6 +44,7 @@
 	"sideEffects": false,
 	"dependencies": {
 		"@base-ui/react": "^1.0.0",
+		"@wordpress/a11y": "file:../a11y",
 		"@wordpress/element": "file:../element",
 		"@wordpress/i18n": "file:../i18n",
 		"@wordpress/icons": "file:../icons",

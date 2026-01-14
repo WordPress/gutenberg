@@ -1,5 +1,5 @@
 import { Meta } from '@storybook/addon-docs/blocks';
-import { RepoIcon } from '@storybook/icons';
+import { JumpToIcon } from '@storybook/icons';
 import { InlineIcon } from './inline-icon';
 
 <Meta title="Docs/Introduction" name="page" />
@@ -25,11 +25,9 @@ export default function MyButton() {
 
 ## How this site works
 
-The site shows the individual components in the sidebar and the Canvas on the right. Select the component you’d like to explore, and you’ll see the display on the **Canvas** tab. If the component also has controls/arguments, you can modify them on the **Controls** tab on the lower half of the screen.
+The site shows the components in the sidebar. Each component's entry point is its **Docs** page, which contains the documentation and interactive examples. You can also explore the individual stories (e.g. "Default", "Small") to view a single use case on the **Canvas**, where you can modify the **Controls** for each prop in the panel below.
 
-To view the documentation for each component use the **Docs** menu item in the top toolbar.
-
-To view the source code for the component and its stories on GitHub, click the <InlineIcon icon={ RepoIcon } /> View Source Repository button in the top right corner.
+To view the source code for the component and its stories on GitHub, click the <InlineIcon icon={ JumpToIcon } /> (Open source file) button in the top toolbar.
 
 To use it in your local development environment run the following command in the top level Gutenberg directory:
 

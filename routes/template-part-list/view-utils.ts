@@ -7,6 +7,13 @@ import { store as coreStore } from '@wordpress/core-data';
 import type { Type } from '@wordpress/core-data';
 import type { View } from '@wordpress/dataviews';
 
+/**
+ * Navigation overlay template part area constant.
+ * This should match NAVIGATION_OVERLAY_TEMPLATE_PART_AREA in
+ * packages/block-library/src/navigation/constants.js
+ */
+const NAVIGATION_OVERLAY_TEMPLATE_PART_AREA = 'navigation-overlay';
+
 const DEFAULT_VIEW: View = {
 	type: 'grid' as const,
 	sort: {
@@ -79,7 +86,7 @@ export const DEFAULT_VIEWS: {
 		},
 	},
 	{
-		slug: 'overlay',
+		slug: NAVIGATION_OVERLAY_TEMPLATE_PART_AREA,
 		label: 'Overlays',
 		view: {
 			...DEFAULT_VIEW,
@@ -87,7 +94,7 @@ export const DEFAULT_VIEWS: {
 				{
 					field: 'area',
 					operator: 'is',
-					value: 'overlay',
+					value: NAVIGATION_OVERLAY_TEMPLATE_PART_AREA,
 				},
 			],
 		},
