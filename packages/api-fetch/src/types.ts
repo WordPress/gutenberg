@@ -21,13 +21,3 @@ export type APIFetchMiddleware< Parse extends boolean = boolean > = (
 	options: APIFetchOptions< Parse >,
 	next: FetchHandler< Parse >
 ) => Promise< any >;
-
-declare function apiFetch<
-	T = unknown,
-	Parse extends boolean = true
->(
-	options: APIFetchOptions< Parse >
-): Promise< Parse extends true ? T : Response >;
-
-export { apiFetch };
-export default apiFetch;
