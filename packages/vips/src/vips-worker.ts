@@ -1,36 +1,44 @@
 /**
  * External dependencies
  */
-import { createWorkerFactory, terminate } from '@shopify/web-worker';
+import { wrap, terminate, type Remote } from '@wordpress/worker-threads';
 
 /**
  * Internal dependencies
  */
 import type { ItemId, ImageSizeCrop } from './types';
+import type { WorkerAPI } from './worker';
 
 /**
- * Creates a worker factory for the vips worker module.
- * The webpackChunkName comment ensures consistent naming of the worker chunk.
+ * The worker instance, lazily created on first use.
  */
-const createVipsWorker = createWorkerFactory(
-	() => import( /* webpackChunkName: 'vips' */ './worker' )
-);
+let worker: Worker | undefined;
 
-type WorkerCreator = ReturnType< typeof createVipsWorker >;
-
-let vipsWorker: WorkerCreator | undefined;
+/**
+ * The wrapped worker API for RPC calls.
+ */
+let workerAPI: Remote< WorkerAPI > | undefined;
 
 /**
  * Gets or creates the vips worker instance.
  * Uses lazy initialization to only create the worker when needed.
  *
- * @return The vips worker instance.
+ * @return The wrapped worker API.
  */
-function getVipsWorker(): WorkerCreator {
-	if ( vipsWorker === undefined ) {
-		vipsWorker = createVipsWorker();
+function getWorkerAPI(): Remote< WorkerAPI > {
+	if ( workerAPI === undefined ) {
+		// Create the worker using the bundled worker script.
+		// The URL pattern works with esbuild's bundling.
+		worker = new Worker(
+			new URL(
+				/* webpackIgnore: true */ './worker.mjs',
+				import.meta.url
+			),
+			{ type: 'module' }
+		);
+		workerAPI = wrap< WorkerAPI >( worker );
 	}
-	return vipsWorker;
+	return workerAPI;
 }
 
 /**
@@ -52,8 +60,8 @@ export async function vipsConvertImageFormat(
 	quality = 0.82,
 	interlaced = false
 ): Promise< ArrayBuffer | ArrayBufferLike > {
-	const worker = getVipsWorker();
-	return worker.convertImageFormat(
+	const api = getWorkerAPI();
+	return api.convertImageFormat(
 		id,
 		buffer,
 		inputType,
@@ -80,8 +88,8 @@ export async function vipsCompressImage(
 	quality = 0.82,
 	interlaced = false
 ): Promise< ArrayBuffer | ArrayBufferLike > {
-	const worker = getVipsWorker();
-	return worker.compressImage( id, buffer, type, quality, interlaced );
+	const api = getWorkerAPI();
+	return api.compressImage( id, buffer, type, quality, interlaced );
 }
 
 /**
@@ -107,8 +115,8 @@ export async function vipsResizeImage(
 	originalWidth: number;
 	originalHeight: number;
 } > {
-	const worker = getVipsWorker();
-	return worker.resizeImage( id, buffer, type, resize, smartCrop );
+	const api = getWorkerAPI();
+	return api.resizeImage( id, buffer, type, resize, smartCrop );
 }
 
 /**
@@ -120,8 +128,8 @@ export async function vipsResizeImage(
 export async function vipsHasTransparency(
 	buffer: ArrayBuffer
 ): Promise< boolean > {
-	const worker = getVipsWorker();
-	return worker.hasTransparency( buffer );
+	const api = getWorkerAPI();
+	return api.hasTransparency( buffer );
 }
 
 /**
@@ -131,8 +139,8 @@ export async function vipsHasTransparency(
  * @return Whether any operation was cancelled.
  */
 export async function vipsCancelOperations( id: ItemId ): Promise< boolean > {
-	const worker = getVipsWorker();
-	return worker.cancelOperations( id );
+	const api = getWorkerAPI();
+	return api.cancelOperations( id );
 }
 
 /**
@@ -140,8 +148,9 @@ export async function vipsCancelOperations( id: ItemId ): Promise< boolean > {
  * Call this to free up resources when vips processing is no longer needed.
  */
 export function terminateVipsWorker(): void {
-	if ( vipsWorker ) {
-		terminate( vipsWorker );
-		vipsWorker = undefined;
+	if ( workerAPI ) {
+		terminate( workerAPI );
+		workerAPI = undefined;
+		worker = undefined;
 	}
 }
