@@ -26,8 +26,11 @@ export function findTransferables( value: unknown ): Transferable[] {
 			return;
 		}
 
-		// Check for MessagePort.
-		if ( obj instanceof MessagePort ) {
+		// Check for MessagePort (may not exist in all environments).
+		if (
+			typeof MessagePort !== 'undefined' &&
+			obj instanceof MessagePort
+		) {
 			transferables.push( obj );
 			return;
 		}
