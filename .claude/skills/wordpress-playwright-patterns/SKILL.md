@@ -1,3 +1,8 @@
+---
+name: wordpress-playwright-patterns
+description: Efficient patterns and best practices for testing WordPress/Gutenberg with Playwright. Use JavaScript APIs for setup operations to minimize browser interactions, while preserving actual UI interactions for bug reproduction.
+---
+
 # WordPress Playwright Patterns
 
 Efficient patterns for Gutenberg testing extracted from `packages/e2e-test-utils-playwright/src/editor/`.

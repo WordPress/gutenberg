@@ -12,17 +12,14 @@ Browser actions are expensive (~1500 tokens each). **Target: 10-15 browser calls
 1. **JavaScript API for setup only** - Use `window.wp.data.dispatch()` for non-critical setup operations (inserting blocks, configuring initial state)
 2. **Actual UI interactions for bug reproduction** - Always use real clicks/typing for the specific actions that trigger the bug
 3. **Role selectors** - Use `role=button[name="..."]` patterns for UI interactions
-4. **CSS selectors** - Use documented patterns from wordpress-playwright-patterns.md
+4. **CSS selectors** - Use documented patterns from the `wordpress-playwright-patterns` skill
 5. **Snapshot as last resort** - Only when element location fails after 2 attempts
 
 **Critical distinction:**
 - **Setup operations** (inserting blocks, setting initial content): Use JS APIs to save clicks
 - **Bug reproduction steps** (the actual actions that trigger the bug): Use actual UI interactions to preserve real user behavior
 
-**Read the patterns file first:**
-```bash
-cat .claude/workflows/triage/wordpress-playwright-patterns.md
-```
+**Note**: The `wordpress-playwright-patterns` skill provides detailed code examples and patterns. It will be automatically available when working with Playwright testing tasks.
 
 ### 3.1.2 Pre-Reproduction Planning
 
@@ -77,7 +74,7 @@ For each step in `reproduction.steps`, translate natural language into Playwrigh
 | "Notice that ..." | Check for element presence/absence |
 
 **Implementation flow (efficiency-first):**
-1. **Read patterns file** - `cat .claude/workflows/triage/wordpress-playwright-patterns.md`
+1. **Use patterns skill** - The `wordpress-playwright-patterns` skill provides code examples automatically
 2. **Identify setup vs reproduction** - Separate setup operations from bug-triggering actions
 3. **Use JS APIs for setup** - Use `page.evaluate()` to batch setup operations (inserting blocks, initial content)
 4. **Use actual UI for reproduction** - Always click/type/interact for the specific actions mentioned in bug steps

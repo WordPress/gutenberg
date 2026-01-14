@@ -65,11 +65,9 @@ Execute the blueprint generation instructions.
 
 ### Step 3: Reproduce Bug
 
-**Read files (in order):**
-1. `.claude/workflows/triage/wordpress-playwright-patterns.md` - Efficiency patterns (read first!)
-2. `.claude/workflows/triage/3-reproduce.md` - Reproduction instructions
+**Read file:** `.claude/workflows/triage/3-reproduce.md`
 
-Execute the reproduction instructions using Playwright. Prioritize JavaScript APIs over UI clicks to minimize browser interactions (target: 10-15 calls maximum).
+Execute the reproduction instructions using Playwright. The `wordpress-playwright-patterns` skill will automatically provide efficiency patterns when needed. Prioritize JavaScript APIs over UI clicks to minimize browser interactions (target: 10-15 calls maximum).
 
 ### Step 4: Report Findings
 

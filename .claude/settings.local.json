@@ -18,7 +18,9 @@
       "Bash(ls:*)",
       "Bash(mkdir:*)",
       "Bash(cp:*)",
-      "mcp__playwright"
+      "mcp__playwright",
+      "Bash(/Users/davidsmith/Sites/aagam-shah-gutenberg/.claude/bin/playground.sh:*)",
+      "mcp__plugin_playwright_playwright__browser_navigate"
     ]
   }
 }
