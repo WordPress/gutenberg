@@ -11,6 +11,7 @@ import { formatListNumbered as icon } from '@wordpress/icons';
 import { insertObject } from '@wordpress/rich-text';
 import {
 	RichTextToolbarButton,
+	RichTextShortcut,
 	store as blockEditorStore,
 	privateApis,
 } from '@wordpress/block-editor';
@@ -219,12 +220,19 @@ export const format = {
 		}
 
 		return (
-			<RichTextToolbarButton
-				icon={ icon }
-				title={ __( 'Footnote' ) }
-				onClick={ onClick }
-				isActive={ isObjectActive }
-			/>
+			<>
+				<RichTextShortcut
+					type="primaryShift"
+					character="f"
+					onUse={ onClick }
+				/>
+				<RichTextToolbarButton
+					icon={ icon }
+					title={ __( 'Footnote' ) }
+					onClick={ onClick }
+					isActive={ isObjectActive }
+				/>
+			</>
 		);
 	},
 };
