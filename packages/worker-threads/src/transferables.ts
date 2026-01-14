@@ -31,7 +31,9 @@ export function findTransferables( value: unknown ): Transferable[] {
 			typeof MessagePort !== 'undefined' &&
 			obj instanceof MessagePort
 		) {
-			transferables.push( obj );
+			if ( ! transferables.includes( obj ) ) {
+				transferables.push( obj );
+			}
 			return;
 		}
 
@@ -40,7 +42,9 @@ export function findTransferables( value: unknown ): Transferable[] {
 			typeof ImageBitmap !== 'undefined' &&
 			obj instanceof ImageBitmap
 		) {
-			transferables.push( obj );
+			if ( ! transferables.includes( obj ) ) {
+				transferables.push( obj );
+			}
 			return;
 		}
 
@@ -49,7 +53,9 @@ export function findTransferables( value: unknown ): Transferable[] {
 			typeof OffscreenCanvas !== 'undefined' &&
 			obj instanceof OffscreenCanvas
 		) {
-			transferables.push( obj );
+			if ( ! transferables.includes( obj ) ) {
+				transferables.push( obj );
+			}
 			return;
 		}
 
@@ -58,7 +64,9 @@ export function findTransferables( value: unknown ): Transferable[] {
 			typeof ReadableStream !== 'undefined' &&
 			obj instanceof ReadableStream
 		) {
-			transferables.push( obj );
+			if ( ! transferables.includes( obj ) ) {
+				transferables.push( obj );
+			}
 			return;
 		}
 
@@ -67,7 +75,9 @@ export function findTransferables( value: unknown ): Transferable[] {
 			typeof WritableStream !== 'undefined' &&
 			obj instanceof WritableStream
 		) {
-			transferables.push( obj );
+			if ( ! transferables.includes( obj ) ) {
+				transferables.push( obj );
+			}
 			return;
 		}
 
@@ -76,7 +86,9 @@ export function findTransferables( value: unknown ): Transferable[] {
 			typeof TransformStream !== 'undefined' &&
 			obj instanceof TransformStream
 		) {
-			transferables.push( obj );
+			if ( ! transferables.includes( obj ) ) {
+				transferables.push( obj );
+			}
 			return;
 		}
 
