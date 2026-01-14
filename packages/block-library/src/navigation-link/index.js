@@ -99,7 +99,7 @@ if ( window.__experimentalContentOnlyInspectorFields ) {
 			id: 'label',
 			label: __( 'Label' ),
 			type: 'text',
-			Edit: 'richtext',
+			Edit: 'rich-text',
 		},
 		{
 			id: 'link',

@@ -60,7 +60,7 @@ if ( window.__experimentalContentOnlyInspectorFields ) {
 			id: 'caption',
 			label: __( 'Caption' ),
 			type: 'text',
-			Edit: 'richtext', // TODO: replace with custom component
+			Edit: 'rich-text', // TODO: replace with custom component
 		},
 	];
 	settings[ formKey ] = {

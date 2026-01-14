@@ -46,7 +46,7 @@ if ( window.__experimentalContentOnlyInspectorFields ) {
 			id: 'label',
 			label: __( 'Label' ),
 			type: 'text',
-			Edit: 'richtext', // TODO: replace with custom component
+			Edit: 'rich-text', // TODO: replace with custom component
 		},
 	];
 	settings[ formKey ] = {

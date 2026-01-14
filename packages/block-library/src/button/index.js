@@ -56,7 +56,7 @@ if ( window.__experimentalContentOnlyInspectorFields ) {
 			id: 'text',
 			label: __( 'Content' ),
 			type: 'text',
-			Edit: 'richtext', // TODO: replace with custom component
+			Edit: 'rich-text', // TODO: replace with custom component
 		},
 		{
 			id: 'link',

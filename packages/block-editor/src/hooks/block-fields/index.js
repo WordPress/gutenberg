@@ -29,12 +29,6 @@ import RichText from './rich-text';
 import Media from './media';
 import Link from './link';
 
-const CONTROLS = {
-	richtext: RichText,
-	media: Media,
-	link: Link,
-};
-
 /**
  * Creates a configured control component that wraps a custom control
  * and passes configuration as props.
@@ -104,14 +98,13 @@ function BlockFields( {
 
 			// These should be custom Edit components, not replaced here.
 			//
-			// - richtext control: it needs clientId
+			// - rich-text control: it needs clientId
 			// - link control: does not need anything extra
 			// - media control: needs the Edit config
 			if (
 				'string' === typeof fieldDef.Edit &&
-				fieldDef.Edit === 'richtext'
+				fieldDef.Edit === 'rich-text'
 			) {
-				const RichText = CONTROLS[ 'richtext' ];
 				field.Edit = createConfiguredControl( RichText, {
 					clientId,
 				} );
@@ -119,13 +112,11 @@ function BlockFields( {
 				'string' === typeof fieldDef.Edit &&
 				fieldDef.Edit === 'link'
 			) {
-				const Link = CONTROLS[ 'link' ];
 				field.Edit = createConfiguredControl( Link );
 			} else if (
 				'object' === typeof fieldDef.Edit &&
 				fieldDef.Edit.control === 'media'
 			) {
-				const Media = CONTROLS[ 'media' ];
 				field.Edit = createConfiguredControl( Media, {
 					...fieldDef.Edit,
 				} );
