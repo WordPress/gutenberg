@@ -315,6 +315,48 @@ If evaluate_script doesn't work, THEN use snapshot:
 | Block inserter | Look for button with "Add" in name |
 | Site Editor navigation | Look for navigation landmarks |
 
+## Gutenberg E2E Patterns (Reference)
+
+For detailed Gutenberg-specific patterns extracted from the official test suite, **read**:
+`.claude/workflows/triage/gutenberg-devtools-patterns.md`
+
+**Key patterns available** (load reference file when needed):
+- Wait conditions (wp.data ready, canvas loader)
+- Editor canvas iframe access
+- Block operations via wp.data API
+- Publish/save flows (exact Gutenberg behavior)
+- Welcome guide dismissal
+- Notice detection
+- Full page load sequence
+
+**Quick reference - most common patterns:**
+
+```javascript
+// Wait for WordPress ready
+evaluate_script({ function: `
+  return new Promise((resolve) => {
+    const check = () => {
+      if (window?.wp?.data) resolve(true);
+      else setTimeout(check, 100);
+    };
+    check();
+  });
+`})
+
+// Disable welcome guides
+evaluate_script({ function: `
+  wp.data.dispatch('core/preferences').set('core/edit-post', 'welcomeGuide', false);
+  return true;
+`})
+
+// Insert block via API (no UI needed)
+evaluate_script({ function: `
+  const block = wp.blocks.createBlock('core/paragraph', { content: 'Test' });
+  wp.data.dispatch('core/block-editor').insertBlock(block);
+  return true;
+`})
+```
+
 ## Special Cases
 
 ### Site Editor Issues

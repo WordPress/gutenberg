@@ -140,13 +140,22 @@ Task tool with:
     3. USE wait_for: Instead of snapshot to check if page loaded, use wait_for with expected text.
     4. BATCH ACTIONS: Do multiple actions before taking another snapshot.
 
+    KEY GUTENBERG PATTERNS (use these instead of blind exploration):
+    - Wait for wp.data ready: evaluate_script to check window?.wp?.data exists
+    - Disable welcome guides: wp.data.dispatch('core/preferences').set(...)
+    - Insert blocks via API: wp.blocks.createBlock() + wp.data.dispatch('core/block-editor').insertBlock()
+    - Canvas iframe: content is in iframe[name="editor-canvas"]
+    - Publish: find button in [aria-label="Editor top bar"], then handle publish panel
+    - Site Editor loader: wait for .edit-site-canvas-loader to be hidden
+    - Success notices: look for .components-snackbar with "published"/"saved" text
+
     FIRST: Verify Chrome DevTools MCP is available by calling mcp__chrome-devtools__list_pages.
     If this fails, write a findings.json with result="inconclusive" and error="Chrome DevTools MCP unavailable", then stop.
 
     Read these files:
     - Parsed issue: /tmp/triage/<issue>/<issue>.parsed.json
     - Blueprint: /tmp/triage/<issue>/<issue>.blueprint.json
-    - Instructions: .claude/workflows/triage/3-reproduce-devtools.md
+    - Instructions: .claude/workflows/triage/3-reproduce-devtools.md (contains detailed Gutenberg e2e patterns)
 
     Start Playground, execute reproduction steps, collect evidence, and write findings.
 
