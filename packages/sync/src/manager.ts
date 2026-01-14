@@ -18,7 +18,6 @@ import type {
 	ObjectID,
 	ObjectData,
 	ObjectType,
-	ProviderCreator,
 	RecordHandlers,
 	SyncConfig,
 	SyncManager,
@@ -60,7 +59,9 @@ export function createSyncManager(): SyncManager {
 		record: ObjectData,
 		handlers: RecordHandlers
 	): Promise< void > {
-		if ( ! isSyncEnabled() ) {
+		const providerCreators = getProviderCreators();
+
+		if ( 0 === providerCreators.length ) {
 			return; // No provider creators, so syncing is effectively disabled.
 		}
 
@@ -72,8 +73,6 @@ export function createSyncManager(): SyncManager {
 
 		const ydoc = createYjsDoc( { objectType } );
 		const recordMap = ydoc.getMap( RECORD_KEY );
-
-		const providerCreators: ProviderCreator[] = getProviderCreators();
 
 		// Clean up providers and in-memory state when the entity is unloaded.
 		const unload = (): void => {
@@ -300,15 +299,6 @@ export function createSyncManager(): SyncManager {
 		}
 
 		return createPersistedCRDTDoc( entityState.ydoc );
-	}
-
-	/**
-	 * Check if sync is enabled (i.e., if there are any provider creators registered).
-	 *
-	 * @return {boolean} Whether sync is enabled.
-	 */
-	function isSyncEnabled(): boolean {
-		return getProviderCreators().length > 0;
 	}
 
 	return {
