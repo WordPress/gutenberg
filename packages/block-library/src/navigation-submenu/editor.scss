@@ -1,6 +1,6 @@
 @use "@wordpress/base-styles/mixins" as *;
 
-.wp-block-navigation-submenu {
+:where(.wp-block-navigation:not(.is-custom-navigation-overlay)) .wp-block-navigation-submenu {
 	display: block;
 
 	.wp-block-navigation__submenu-container {

@@ -156,130 +156,133 @@ $navigation-icon-size: 24px;
 	}
 }
 
-// Styles for submenu flyout.
-// These are separated out with reduced specificity to allow better inheritance from Global Styles.
-.wp-block-navigation .has-child {
-	.wp-block-navigation__submenu-container {
-		background-color: inherit;
-		color: inherit;
-		position: absolute;
-		z-index: 2;
-		display: flex;
-		flex-direction: column;
-		align-items: normal;
+// Submenu flyout visibility styles.
+// These control when submenus appear as dropdowns/flyouts on the frontend.
+// Don't apply when rendering navigation overlay template parts - submenus should always be visible there.
+.wp-block-navigation:where(:not(.is-custom-navigation-overlay)) {
+	// Styles for submenu flyout.
+	// These are separated out with reduced specificity to allow better inheritance from Global Styles.
+	.has-child {
+		.wp-block-navigation__submenu-container {
+			background-color: inherit;
+			color: inherit;
+			position: absolute;
+			z-index: 2;
+			display: flex;
+			flex-direction: column;
+			align-items: normal;
 
-		// Hide until hover or focus within.
-		opacity: 0;
-		@media not (prefers-reduced-motion) {
-			transition: opacity 0.1s linear;
-		}
-		visibility: hidden;
+			// Hide until hover or focus within.
+			opacity: 0;
+			@media not (prefers-reduced-motion) {
+				transition: opacity 0.1s linear;
+			}
+			visibility: hidden;
 
-		// Don't take up space when the menu is collapsed.
-		width: 0;
-		height: 0;
-		overflow: hidden; // Overflow is necessary to set, otherwise submenu items will take up space.
+			// Don't take up space when the menu is collapsed.
+			width: 0;
+			height: 0;
+			overflow: hidden; // Overflow is necessary to set, otherwise submenu items will take up space.
 
-		// Submenu items.
-		> .wp-block-navigation-item {
-			> .wp-block-navigation-item__content {
-				display: flex;
-				flex-grow: 1;
-				padding: 0.5em 1em;
+			// Submenu items.
+			> .wp-block-navigation-item {
+				> .wp-block-navigation-item__content {
+					display: flex;
+					flex-grow: 1;
+					padding: 0.5em 1em;
 
-				// Right-align the chevron in submenus.
+					// Right-align the chevron in submenus.
+					.wp-block-navigation__submenu-icon {
+						margin-right: 0;
+						margin-left: auto;
+					}
+				}
+			}
+
+			// Spacing in all submenus.
+			.wp-block-navigation-item__content {
+				margin: 0;
+			}
+
+			// Submenu indentation when there's no background.
+			left: -1px; // Border width.
+			top: 100%;
+
+			// Indentation for all submenus.
+			// Nested submenus sit to the left on large breakpoints.
+			// On smaller breakpoints, they open vertically, accordion-style.
+			@include break-medium {
+				.wp-block-navigation__submenu-container {
+					left: 100%;
+					top: -1px; // Border width.
+
+					// Prevent the menu from disappearing when the mouse is over the gap
+					&::before {
+						content: "";
+						position: absolute;
+						right: 100%;
+						height: 100%;
+						display: block;
+						width: 0.5em;
+						background: transparent;
+					}
+				}
+
+				// Push inwards from right edge of submenu.
 				.wp-block-navigation__submenu-icon {
-					margin-right: 0;
-					margin-left: auto;
+					margin-right: 0.25em;
+				}
+
+				// Reset the submenu indicator for horizontal flyouts.
+				.wp-block-navigation__submenu-icon svg {
+					transform: rotate(-90deg);
 				}
 			}
 		}
 
-		// Spacing in all submenus.
-		.wp-block-navigation-item__content {
-			margin: 0;
+		// Custom menu items.
+		// Show submenus on hover unless they open on click.
+		&:not(.open-on-click):hover > .wp-block-navigation__submenu-container {
+			visibility: visible;
+			overflow: visible;
+			opacity: 1;
+			width: auto;
+			height: auto;
+			min-width: 200px;
 		}
 
-		// Submenu indentation when there's no background.
-		left: -1px; // Border width.
+		// Keep submenus open when focus is within.
+		&:not(.open-on-click):not(.open-on-hover-click):focus-within > .wp-block-navigation__submenu-container {
+			visibility: visible;
+			overflow: visible;
+			opacity: 1;
+			width: auto;
+			height: auto;
+			min-width: 200px;
+		}
+
+		// Show submenus on click.
+		.wp-block-navigation-submenu__toggle[aria-expanded="true"] ~ .wp-block-navigation__submenu-container {
+			visibility: visible;
+			overflow: visible;
+			opacity: 1;
+			width: auto;
+			height: auto;
+			min-width: 200px;
+		}
+	}
+
+	// Submenu indentation when there's a background.
+	&.has-background .has-child .wp-block-navigation__submenu-container {
+		left: 0;
 		top: 100%;
 
-		// Indentation for all submenus.
-		// Nested submenus sit to the left on large breakpoints.
-		// On smaller breakpoints, they open vertically, accordion-style.
+		// There's no border on submenus when there are backgrounds.
 		@include break-medium {
 			.wp-block-navigation__submenu-container {
 				left: 100%;
-				top: -1px; // Border width.
-
-				// Prevent the menu from disappearing when the mouse is over the gap
-				&::before {
-					content: "";
-					position: absolute;
-					right: 100%;
-					height: 100%;
-					display: block;
-					width: 0.5em;
-					background: transparent;
-				}
+				top: 0;
 			}
-
-			// Push inwards from right edge of submenu.
-			.wp-block-navigation__submenu-icon {
-				margin-right: 0.25em;
-			}
-
-			// Reset the submenu indicator for horizontal flyouts.
-			.wp-block-navigation__submenu-icon svg {
-				transform: rotate(-90deg);
-			}
-		}
-	}
-
-	// Custom menu items.
-	// Show submenus on hover unless they open on click.
-	&:not(.open-on-click):hover > .wp-block-navigation__submenu-container {
-		visibility: visible;
-		overflow: visible;
-		opacity: 1;
-		width: auto;
-		height: auto;
-		min-width: 200px;
-	}
-
-	// Keep submenus open when focus is within.
-	&:not(.open-on-click):not(.open-on-hover-click):focus-within > .wp-block-navigation__submenu-container {
-		visibility: visible;
-		overflow: visible;
-		opacity: 1;
-		width: auto;
-		height: auto;
-		min-width: 200px;
-	}
-
-	// Show submenus on click.
-	.wp-block-navigation-submenu__toggle[aria-expanded="true"] ~ .wp-block-navigation__submenu-container {
-		visibility: visible;
-		overflow: visible;
-		opacity: 1;
-		width: auto;
-		height: auto;
-		min-width: 200px;
-	}
-}
-
-// Submenu indentation when there's a background.
-.wp-block-navigation.has-background
-.has-child
-.wp-block-navigation__submenu-container {
-	left: 0;
-	top: 100%;
-
-	// There's no border on submenus when there are backgrounds.
-	@include break-medium {
-		.wp-block-navigation__submenu-container {
-			left: 100%;
-			top: 0;
 		}
 	}
 }
@@ -415,7 +418,8 @@ button.wp-block-navigation-item__content {
 }
 
 // Default background and font color.
-.wp-block-navigation:not(.has-background) .wp-block-navigation__submenu-container {
+// Don't apply when rendering navigation overlay template parts.
+.wp-block-navigation:where(:not(.is-custom-navigation-overlay)):not(.has-background) .wp-block-navigation__submenu-container {
 	// Set a background color for submenus so that they're not transparent.
 	// NOTE TO DEVS - if refactoring this code, please double-check that
 	// submenus have a default background color, this feature has regressed
@@ -425,13 +429,15 @@ button.wp-block-navigation-item__content {
 }
 
 // If we do have a background color selected, inherit it from the navigation block
-.wp-block-navigation.has-background {
+// Don't apply when rendering navigation overlay template parts.
+.wp-block-navigation:where(:not(.is-custom-navigation-overlay)).has-background {
 	.wp-block-navigation__submenu-container {
 		background-color: inherit;
 	}
 }
 
-.wp-block-navigation:not(.has-text-color) {
+// Don't apply when rendering navigation overlay template parts.
+.wp-block-navigation:where(:not(.is-custom-navigation-overlay)):not(.has-text-color) {
 	.wp-block-navigation__submenu-container {
 		// Set a default color for submenu text if none is selected
 		color: #000;
@@ -802,4 +808,21 @@ button.wp-block-navigation-item__content {
 // Prevent scrolling of the parent content when the modal is open.
 html.has-modal-open {
 	overflow: hidden;
+}
+
+// When rendering a navigation overlay template part, submenus should always be visible
+// in a vertical layout, similar to the responsive overlay menu when open.
+.wp-block-navigation.is-custom-navigation-overlay {
+	// Hide submenu icons since submenus are always expanded.
+	.wp-block-navigation__submenu-icon {
+		display: none;
+	}
+
+	// Display navigation items in a column layout.
+	.wp-block-navigation__container,
+	.wp-block-navigation-item,
+	.wp-block-page-list {
+		display: flex;
+		flex-direction: column;
+	}
 }

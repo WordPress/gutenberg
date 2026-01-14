@@ -46,8 +46,12 @@
 	background-color: inherit;
 }
 
+// Submenu flyout visibility styles.
+// These control when submenus appear as dropdowns/flyouts in the editor.
+// Don't apply when editing navigation overlay template parts - submenus should always be visible there.
+
 // Only show the flyout on hover if the parent menu item is selected.
-.wp-block-navigation:not(.is-selected):not(.has-child-selected) .has-child:hover {
+:where(.wp-block-navigation:not(.is-custom-navigation-overlay)):not(.is-selected):not(.has-child-selected) .has-child:hover {
 	> .wp-block-navigation__submenu-container {
 		opacity: 0;
 		visibility: hidden;
@@ -55,7 +59,7 @@
 }
 
 // Styles for submenu flyout.
-.has-child {
+:where(.wp-block-navigation:not(.is-custom-navigation-overlay)) .has-child {
 
 	&.is-selected,
 	&.has-child-selected {
@@ -69,7 +73,7 @@
 
 // Show a submenu when generally dragging (is-dragging-components-draggable) if that
 // submenu has children (has-child) and is being dragged within (is-dragging-within).
-.is-dragging-components-draggable .has-child.is-dragging-within {
+:where(.wp-block-navigation:not(.is-custom-navigation-overlay)) .is-dragging-components-draggable .has-child.is-dragging-within {
 	> .wp-block-navigation__submenu-container {
 		opacity: 1;
 		visibility: visible;
@@ -668,4 +672,38 @@ body.editor-styles-wrapper .wp-block-navigation__responsive-container.is-menu-op
 	top: -$grid-unit-05;
 	right: 0;
 	z-index: 1;
+}
+
+// When editing a navigation overlay template part, apply styles similar to the
+// responsive overlay menu on the frontend so submenus are always visible.
+.is-custom-navigation-overlay {
+	// Hide submenu icons since submenus are always expanded.
+	.wp-block-navigation__submenu-icon {
+		display: none;
+	}
+
+	.wp-block-navigation__submenu-container {
+		padding-top: var(--wp--style--block-gap, 2em);
+		padding-left: 2rem;
+		padding-right: 2rem;
+	}
+
+	// Display navigation items in a column layout.
+	.wp-block-navigation__container,
+	.wp-block-navigation-item,
+	.wp-block-page-list {
+		display: flex;
+		flex-direction: column;
+		align-items: var(--navigation-layout-justification-setting, initial);
+	}
+
+	// Remove background colors inside the overlay menu.
+	// Important needed to override global styles.
+	.wp-block-navigation-item .wp-block-navigation__submenu-container,
+	.wp-block-navigation__container,
+	.wp-block-navigation-item,
+	.wp-block-page-list {
+		color: inherit !important;
+		background: transparent !important;
+	}
 }

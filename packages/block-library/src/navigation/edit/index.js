@@ -504,7 +504,7 @@ function Navigation( {
 				) ]: !! backgroundColor?.slug,
 				[ `has-text-decoration-${ textDecoration }` ]: textDecoration,
 				'block-editor-block-content-overlay': hasBlockOverlay,
-				'is-within-navigation-overlay': isNavigationOverlay,
+				'is-custom-navigation-overlay': isNavigationOverlay,
 			},
 			layoutClassNames
 		),
