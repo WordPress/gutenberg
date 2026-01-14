@@ -11,6 +11,7 @@ import { decodeEntities } from '@wordpress/html-entities';
  * Internal dependencies
  */
 import { store as editorStore } from '../../store';
+import { ATTACHMENT_POST_TYPE } from '../../store/constants';
 import { unlock } from '../../lock-unlock';
 import { sidebars } from './constants';
 
@@ -22,7 +23,7 @@ const SidebarHeader = ( _, ref ) => {
 		return {
 			postTypeLabel: getPostTypeLabel(),
 			isAttachment:
-				getCurrentPostType() === 'attachment' &&
+				getCurrentPostType() === ATTACHMENT_POST_TYPE &&
 				window?.__experimentalMediaEditor,
 		};
 	}, [] );

@@ -37,6 +37,7 @@ import { sidebars } from './constants';
 import { unlock } from '../../lock-unlock';
 import { store as editorStore } from '../../store';
 import {
+	ATTACHMENT_POST_TYPE,
 	NAVIGATION_POST_TYPE,
 	TEMPLATE_PART_POST_TYPE,
 	TEMPLATE_POST_TYPE,
@@ -61,7 +62,7 @@ const SidebarContent = ( {
 	// need to forward the `Tabs` context so it can be passed through the
 	// underlying slot/fill.
 	const tabsContextValue = useContext( Tabs.Context );
-	const isAttachment = postType === 'attachment';
+	const isAttachment = postType === ATTACHMENT_POST_TYPE;
 
 	// This effect addresses a race condition caused by tabbing from the last
 	// block in the editor into the settings sidebar. Without this effect, the

@@ -53,7 +53,7 @@ import {
  * Internal dependencies
  */
 import { store as editorStore } from '../../store';
-import { DESIGN_POST_TYPES } from '../../store/constants';
+import { ATTACHMENT_POST_TYPE, DESIGN_POST_TYPES } from '../../store/constants';
 import postPreviewField from '../fields/content-preview';
 import { unlock } from '../../lock-unlock';
 
@@ -247,7 +247,7 @@ export const registerPostTypeSchema =
 		// Handle attachment post type separately with media-specific fields
 		let fields;
 
-		if ( postType === 'attachment' ) {
+		if ( postType === ATTACHMENT_POST_TYPE ) {
 			fields = ORDERED_MEDIA_FIELDS;
 		} else {
 			fields = [

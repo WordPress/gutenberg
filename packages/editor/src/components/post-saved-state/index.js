@@ -23,6 +23,7 @@ import { store as preferencesStore } from '@wordpress/preferences';
  */
 import { STATUS_OPTIONS } from '../../components/post-status';
 import { store as editorStore } from '../../store';
+import { ATTACHMENT_POST_TYPE } from '../../store/constants';
 
 /**
  * Component showing whether the post is saved or not and providing save
@@ -102,7 +103,7 @@ export default function PostSavedState( { forceIsDirty } ) {
 	}, [ isSaving ] );
 
 	// Attachments don't support draft mode, so hide this button.
-	if ( postType === 'attachment' ) {
+	if ( postType === ATTACHMENT_POST_TYPE ) {
 		return null;
 	}
 

@@ -23,6 +23,7 @@ import { createBlock } from '@wordpress/blocks';
  */
 import withRegistryProvider from './with-registry-provider';
 import { store as editorStore } from '../../store';
+import { ATTACHMENT_POST_TYPE } from '../../store/constants';
 import useBlockEditorSettings from './use-block-editor-settings';
 import { unlock } from '../../lock-unlock';
 import DisableNonPageContentBlocks from './disable-non-page-content-blocks';
@@ -356,7 +357,8 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 		}
 
 		const isAttachment =
-			post.type === 'attachment' && window?.__experimentalMediaEditor;
+			post.type === ATTACHMENT_POST_TYPE &&
+			window?.__experimentalMediaEditor;
 
 		// Early return for attachments - no block editor needed
 		if ( isAttachment ) {
