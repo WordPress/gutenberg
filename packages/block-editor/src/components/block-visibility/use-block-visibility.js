@@ -55,7 +55,7 @@ export default function useBlockVisibility( options = {} ) {
 
 		if (
 			window.__experimentalHideBlocksBasedOnScreenSize &&
-			blockVisibility?.[ currentViewport ] === false
+			blockVisibility?.viewport?.[ currentViewport ] === false
 		) {
 			return true;
 		}
