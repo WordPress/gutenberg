@@ -57,7 +57,7 @@ export type ProviderCreator = (
 	objectType: ObjectType,
 	objectId: ObjectID,
 	ydoc: Y.Doc,
-	awareness?: Awareness | undefined
+	awareness?: Awareness
 ) => Promise< ProviderCreatorResult >;
 
 export interface RecordHandlers {
