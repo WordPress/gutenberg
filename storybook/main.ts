@@ -1,10 +1,12 @@
-import { mergeConfig, transformWithEsbuild } from 'vite';
+import { type InlineConfig, mergeConfig, transformWithEsbuild } from 'vite';
 import react from '@vitejs/plugin-react';
 import type { StorybookConfig } from '@storybook/react-vite';
 
+const { NODE_ENV = 'development' } = process.env;
+
 const stories = [
-	process.env.NODE_ENV !== 'test' ? './stories/**/*.story.@(jsx|tsx)' : '',
-	process.env.NODE_ENV !== 'test' ? './stories/**/*.mdx' : '',
+	NODE_ENV !== 'test' ? './stories/**/*.story.@(jsx|tsx)' : '',
+	NODE_ENV !== 'test' ? './stories/**/*.mdx' : '',
 	'../packages/block-editor/src/**/stories/*.story.@(js|jsx|tsx|mdx)',
 	'../packages/components/src/**/stories/*.story.@(jsx|tsx)',
 	'../packages/components/src/**/stories/*.mdx',
@@ -84,7 +86,7 @@ export default {
 			define: {
 				// Ensures that `@wordpress/warning` can properly detect dev mode.
 				'globalThis.SCRIPT_DEBUG': JSON.stringify(
-					process.env.NODE_ENV === 'development'
+					NODE_ENV === 'development'
 				),
 			},
 			optimizeDeps: {
@@ -94,6 +96,6 @@ export default {
 					},
 				},
 			},
-		} );
+		} satisfies InlineConfig );
 	},
 } satisfies StorybookConfig;
