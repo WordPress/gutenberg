@@ -66,11 +66,11 @@ if ( window.__experimentalContentOnlyInspectorFields ) {
 			type: 'url',
 			Edit: 'link', // TODO: replace with custom component
 			getValue: ( { item } ) => ( {
-				url: item.href,
+				href: item.url,
 				rel: item.rel,
 			} ),
 			setValue: ( { value } ) => ( {
-				href: value.url,
+				url: value.href,
 				rel: value.rel,
 			} ),
 		},
