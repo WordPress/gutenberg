@@ -81,7 +81,8 @@ function PosterGrid( { items }: { items: typeof data } ) {
 										fontSize: '11px',
 										padding: '2px 8px',
 										borderRadius: '4px',
-										backgroundColor: 'rgba(255,255,255,0.2)',
+										backgroundColor:
+											'rgba(255,255,255,0.2)',
 									} }
 								>
 									{ cat }
