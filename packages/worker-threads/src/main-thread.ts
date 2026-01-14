@@ -1,43 +1,96 @@
 /**
- * External dependencies
- */
-import {
-	defineProxy,
-	type Adapter,
-	type SendMessage,
-	type OnMessage,
-} from 'comctx';
-
-/**
  * Internal dependencies
  */
-import { WORKER_SYMBOL, type Remote, type WithWorker } from './types';
+import {
+	MessageType,
+	WORKER_SYMBOL,
+	type Remote,
+	type WithWorker,
+	type ResultMessage,
+	type ErrorMessage,
+} from './types';
+import {
+	generateCallId,
+	createCallMessage,
+	isRPCMessage,
+	postRPCMessage,
+} from './rpc';
 
 /**
- * Adapter for injecting (main thread calling worker).
+ * Map of pending calls waiting for responses, keyed by call ID.
  */
-class WorkerInjectAdapter implements Adapter {
-	private worker: Worker;
-
-	constructor( worker: Worker ) {
-		this.worker = worker;
-	}
-
-	sendMessage: SendMessage = ( message, transfer ) => {
-		this.worker.postMessage( message, transfer );
-	};
-
-	onMessage: OnMessage = ( callback ) => {
-		const handler = ( event: MessageEvent ) => callback( event.data );
-		this.worker.addEventListener( 'message', handler );
-		return () => this.worker.removeEventListener( 'message', handler );
-	};
+interface PendingCall {
+	resolve: ( value: unknown ) => void;
+	reject: ( error: Error ) => void;
 }
 
 /**
- * WeakMap to store workers for each remote proxy.
+ * WeakMap to store pending calls for each worker.
  */
-const remoteWorkers = new WeakMap< object, Worker >();
+const workerPendingCalls = new WeakMap< Worker, Map< number, PendingCall > >();
+
+/**
+ * WeakMap to store message handlers for cleanup.
+ */
+const workerMessageHandlers = new WeakMap<
+	Worker,
+	( event: MessageEvent ) => void
+>();
+
+/**
+ * Creates a message handler for a worker.
+ *
+ * @param worker - The worker to handle messages for.
+ * @return The message handler function.
+ */
+function createMessageHandler(
+	worker: Worker
+): ( event: MessageEvent ) => void {
+	return ( event: MessageEvent ) => {
+		const data = event.data;
+
+		// Ignore non-RPC messages.
+		if ( ! isRPCMessage( data ) ) {
+			return;
+		}
+
+		// Only handle result and error messages on the main thread.
+		if (
+			data.type !== MessageType.RESULT &&
+			data.type !== MessageType.ERROR
+		) {
+			return;
+		}
+
+		const pendingCalls = workerPendingCalls.get( worker );
+		if ( ! pendingCalls ) {
+			return;
+		}
+
+		const pending = pendingCalls.get( data.id );
+		if ( ! pending ) {
+			return;
+		}
+
+		// Remove the pending call.
+		pendingCalls.delete( data.id );
+
+		if ( data.type === MessageType.RESULT ) {
+			const resultMessage = data as ResultMessage;
+			pending.resolve( resultMessage.result );
+		} else {
+			const errorMessage = data as ErrorMessage;
+			const error = new Error( errorMessage.error.message );
+			if ( errorMessage.error.name ) {
+				error.name = errorMessage.error.name;
+			}
+			if ( errorMessage.error.stack ) {
+				error.stack = errorMessage.error.stack;
+			}
+			pending.reject( error );
+		}
+	};
+}
 
 /**
  * Wraps a Worker to provide a type-safe RPC interface.
@@ -59,35 +112,50 @@ const remoteWorkers = new WeakMap< object, Worker >();
  * @return A proxy object with all exposed methods as async functions.
  */
 export function wrap< T extends object >( worker: Worker ): Remote< T > {
-	// Create the inject function using defineProxy with an empty object
-	// (the actual implementation is on the worker side).
-	const [ , inject ] = defineProxy( () => ( {} ) as T, {
-		namespace: '__wordpress_worker__',
-		heartbeatCheck: false,
-		transfer: true,
-	} );
+	// Initialize pending calls map for this worker.
+	if ( ! workerPendingCalls.has( worker ) ) {
+		workerPendingCalls.set( worker, new Map() );
 
-	// Create the proxy using the injector.
-	const comctxRemote = inject( new WorkerInjectAdapter( worker ) );
+		// Set up message handler.
+		const handler = createMessageHandler( worker );
+		workerMessageHandlers.set( worker, handler );
+		worker.addEventListener( 'message', handler );
+	}
 
-	// Store the worker reference.
-	remoteWorkers.set( comctxRemote as object, worker );
-
-	// Create a wrapper proxy that adds WORKER_SYMBOL support.
-	const proxy = new Proxy( comctxRemote as Remote< T > & WithWorker, {
-		get( target, prop: string | symbol ) {
+	// Create a proxy that intercepts method calls.
+	const proxy = new Proxy( {} as Remote< T > & WithWorker, {
+		get( _target, prop: string | symbol ) {
 			// Return the worker for the WORKER_SYMBOL.
 			if ( prop === WORKER_SYMBOL ) {
 				return worker;
 			}
 
-			// Delegate all other property access to the comctx remote.
-			return Reflect.get( target, prop );
+			// Ignore symbol properties (like Symbol.toStringTag).
+			if ( typeof prop === 'symbol' ) {
+				return undefined;
+			}
+
+			// Return a function that sends an RPC call.
+			return ( ...args: unknown[] ): Promise< unknown > => {
+				return new Promise( ( resolve, reject ) => {
+					const pendingCalls = workerPendingCalls.get( worker );
+
+					if ( ! pendingCalls ) {
+						reject( new Error( 'Worker has been terminated' ) );
+						return;
+					}
+
+					// Generate ID and store the pending call.
+					const id = generateCallId();
+					pendingCalls.set( id, { resolve, reject } );
+
+					// Send the call message.
+					const message = createCallMessage( id, prop, args );
+					postRPCMessage( worker, message );
+				} );
+			};
 		},
 	} );
-
-	// Store the worker for the proxy as well.
-	remoteWorkers.set( proxy, worker );
 
 	return proxy;
 }
@@ -115,8 +183,23 @@ export function terminate( remote: Remote< unknown > ): void {
 		return;
 	}
 
-	// Clean up the worker reference.
-	remoteWorkers.delete( remote as object );
+	// Clean up pending calls.
+	const pendingCalls = workerPendingCalls.get( worker );
+	if ( pendingCalls ) {
+		const error = new Error( 'Worker terminated' );
+		for ( const pending of pendingCalls.values() ) {
+			pending.reject( error );
+		}
+		pendingCalls.clear();
+		workerPendingCalls.delete( worker );
+	}
+
+	// Remove message handler.
+	const handler = workerMessageHandlers.get( worker );
+	if ( handler ) {
+		worker.removeEventListener( 'message', handler );
+		workerMessageHandlers.delete( worker );
+	}
 
 	// Terminate the worker.
 	worker.terminate();

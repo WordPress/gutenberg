@@ -1,27 +1,13 @@
 /**
- * External dependencies
+ * Internal dependencies
  */
+import { MessageType, type CallMessage } from './types';
 import {
-	defineProxy,
-	type Adapter,
-	type SendMessage,
-	type OnMessage,
-} from 'comctx';
-
-/**
- * Adapter for providing (worker exposing methods to main thread).
- */
-class WorkerProvideAdapter implements Adapter {
-	sendMessage: SendMessage = ( message, transfer ) => {
-		self.postMessage( message, { transfer } );
-	};
-
-	onMessage: OnMessage = ( callback ) => {
-		const handler = ( event: MessageEvent ) => callback( event.data );
-		self.addEventListener( 'message', handler );
-		return () => self.removeEventListener( 'message', handler );
-	};
-}
+	createResultMessage,
+	createErrorMessage,
+	isRPCMessage,
+	postRPCMessage,
+} from './rpc';
 
 /**
  * Exposes an object's methods to be called from the main thread.
@@ -55,13 +41,43 @@ class WorkerProvideAdapter implements Adapter {
  * @param target - Object containing methods to expose to the main thread.
  */
 export function expose< T extends object >( target: T ): void {
-	// Create the provide function using defineProxy with the target.
-	const [ provide ] = defineProxy( () => target, {
-		namespace: '__wordpress_worker__',
-		heartbeatCheck: false,
-		transfer: true,
-	} );
+	// Set up the message listener.
+	self.addEventListener( 'message', async ( event: MessageEvent ) => {
+		const data = event.data;
 
-	// Start providing the target through the adapter.
-	provide( new WorkerProvideAdapter() );
+		// Ignore non-RPC messages.
+		if ( ! isRPCMessage( data ) ) {
+			return;
+		}
+
+		// Only handle call messages in the worker.
+		if ( data.type !== MessageType.CALL ) {
+			return;
+		}
+
+		const callMessage = data as CallMessage;
+		const { id, method, args } = callMessage;
+
+		try {
+			// Get the method from the target.
+			const fn = ( target as Record< string, unknown > )[ method ];
+
+			if ( typeof fn !== 'function' ) {
+				throw new Error(
+					`Method "${ method }" is not a function or does not exist`
+				);
+			}
+
+			// Call the method with the provided arguments.
+			const result = await fn.apply( target, args );
+
+			// Send the result back to the main thread.
+			const resultMessage = createResultMessage( id, result );
+			postRPCMessage( self, resultMessage );
+		} catch ( error ) {
+			// Send the error back to the main thread.
+			const errorMessage = createErrorMessage( id, error );
+			postRPCMessage( self, errorMessage );
+		}
+	} );
 }

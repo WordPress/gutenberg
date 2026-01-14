@@ -49,9 +49,6 @@
 	},
 	"types": "build-types",
 	"sideEffects": false,
-	"dependencies": {
-		"comctx": "^1.4.3"
-	},
 	"publishConfig": {
 		"access": "public"
 	}
