@@ -389,10 +389,6 @@ module.exports = {
 				'packages/components/src/theme/**',
 			],
 			rules: {
-				'@wordpress/components-no-unsafe-button-disabled': [
-					'error',
-					{ checkLocalImports: true },
-				],
 				'no-restricted-syntax': [
 					'error',
 					...restrictedSyntax,
@@ -413,16 +409,26 @@ module.exports = {
 			},
 		},
 		{
+			// Override the @wordpress/components-* rules by adding the
+			// `checkLocalImports` flag, which adds the linting also to relative
+			// imports.
+			files: [ 'packages/components/src/**' ],
+			rules: {
+				'@wordpress/components-no-unsafe-button-disabled': [
+					'error',
+					{ checkLocalImports: true },
+				],
+				// '@wordpress/components-no-missing-40px-size-prop': [
+				// 	'error',
+				// 	{ checkLocalImports: true },
+				// ],
+			},
+		},
+		{
 			files: [ 'packages/components/src/**' ],
 			excludedFiles: [ 'packages/components/src/**/@(test|stories)/**' ],
 			plugins: [ 'ssr-friendly' ],
 			extends: [ 'plugin:ssr-friendly/recommended' ],
-			rules: {
-				'@wordpress/components-no-missing-40px-size-prop': [
-					'error',
-					{ checkLocalImports: true },
-				],
-			},
 		},
 		{
 			files: [ 'packages/components/src/**', 'packages/ui/src/**' ],
