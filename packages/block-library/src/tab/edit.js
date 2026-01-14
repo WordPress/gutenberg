@@ -25,7 +25,7 @@ const TEMPLATE = [
 	[
 		'core/paragraph',
 		{
-			placeholder: __( 'Type / to add a block to tab' ),
+			placeholder: __( 'Type / to choose a block' ),
 		},
 	],
 ];

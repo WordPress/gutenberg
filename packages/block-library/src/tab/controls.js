@@ -33,7 +33,7 @@ export default function Controls( {
 			<AddTabToolbarControl tabsClientId={ tabsClientId } />
 			<RemoveTabToolbarControl tabsClientId={ tabsClientId } />
 			<InspectorControls>
-				<PanelBody title={ __( 'Tab Settings' ) }>
+				<PanelBody title={ __( 'Settings' ) }>
 					<TextControl
 						label={ __( 'Tab Label' ) }
 						value={ decodeEntities( label ) }

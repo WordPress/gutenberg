@@ -23,7 +23,7 @@ export default function Controls( { attributes, setAttributes, clientId } ) {
 			<AddTabToolbarControl tabsClientId={ clientId } />
 			<RemoveTabToolbarControl tabsClientId={ clientId } />
 			<InspectorControls>
-				<PanelBody title={ __( 'Tabs Settings' ) }>
+				<PanelBody title={ __( 'Settings' ) }>
 					<TextControl
 						label={ __( 'Tabs Title' ) }
 						help={ __(
