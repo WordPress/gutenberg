@@ -32,7 +32,6 @@ function StatusIndicator() {
 		( select ) => select( blockEditorStore )?.isTyping(),
 		[]
 	);
-	/* eslint-disable react/jsx-filename-extension */
 	return (
 		<div>
 			<strong>isTyping State: </strong>
@@ -67,4 +66,3 @@ export const Default = {
 		);
 	},
 };
-/* eslint-enable react/jsx-filename-extension */
