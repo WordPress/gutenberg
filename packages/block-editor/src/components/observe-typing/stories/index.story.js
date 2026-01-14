@@ -8,6 +8,7 @@ import { BlockEditorProvider } from '@wordpress/block-editor';
  * Internal dependencies
  */
 import ObserveTyping from '../index';
+import { store as blockEditorStore } from '../../../store';
 
 export default {
 	title: 'BlockEditor/ObserveTyping',
@@ -27,7 +28,7 @@ export default {
  */
 function StatusIndicator() {
 	const isTyping = useSelect(
-		( select ) => select( 'core/block-editor' )?.isTyping(),
+		( select ) => select( blockEditorStore )?.isTyping(),
 		[]
 	);
 	/* eslint-disable react/jsx-filename-extension */
