@@ -54,7 +54,7 @@ import AriaReferencedText from './aria-referenced-text';
 import { unlock } from '../../lock-unlock';
 import usePasteStyles from '../use-paste-styles';
 import { cleanEmptyObject } from '../../hooks/utils';
-import { useBlockVisibility } from '../block-visibility';
+import { useBlockVisibility, BlockVisibilityModal } from '../block-visibility';
 import { deviceTypeKey } from '../../store/private-keys';
 import { BLOCK_VISIBILITY_VIEWPORTS } from '../block-visibility/constants';
 
@@ -136,7 +136,7 @@ function ListViewBlock( {
 
 				return {
 					block: getBlock( clientId ),
-					blockName: _getBlockName( clientId ),
+					blockName: getBlockName( clientId ),
 					allowRightClickOverrides:
 						getSettings().allowRightClickOverrides,
 					selectedDeviceType:

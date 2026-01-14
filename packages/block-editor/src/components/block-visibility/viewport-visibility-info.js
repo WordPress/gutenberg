@@ -16,10 +16,9 @@ import { unseen } from '@wordpress/icons';
  */
 import { unlock } from '../../lock-unlock';
 import { store as blockEditorStore } from '../../store';
-import { useBlockVisibility } from './use-block-visibility';
+import useBlockVisibility from './use-block-visibility';
 import { deviceTypeKey } from '../../store/private-keys';
 import { BLOCK_VISIBILITY_VIEWPORTS } from './constants';
-import './styles.scss';
 
 const { Badge } = unlock( componentsPrivateApis );
 const DEFAULT_VISIBILITY_STATE = {
@@ -29,35 +28,37 @@ const DEFAULT_VISIBILITY_STATE = {
 };
 
 export default function BlockVisibilityInfo( { clientId } ) {
-	const { blockVisibility, selectedDeviceType, hasParentHiddenEverywhere } =
-		useSelect(
-			( select ) => {
-				if ( ! clientId ) {
-					return DEFAULT_VISIBILITY_STATE;
-				}
-				const {
-					getBlockAttributes,
-					isBlockParentHiddenEverywhere,
-					getSettings,
-				} = unlock( select( blockEditorStore ) );
+	const {
+		currentBlockVisibility,
+		selectedDeviceType,
+		hasParentHiddenEverywhere,
+	} = useSelect(
+		( select ) => {
+			if ( ! clientId ) {
+				return DEFAULT_VISIBILITY_STATE;
+			}
+			const {
+				getBlockAttributes,
+				isBlockParentHiddenEverywhere,
+				getSettings,
+			} = unlock( select( blockEditorStore ) );
 
-				return {
-					currentBlockVisibility:
-						getBlockAttributes( clientId )?.metadata
-							?.blockVisibility,
-					selectedDeviceType:
-						getSettings()?.[ deviceTypeKey ]?.toLowerCase() ||
-						BLOCK_VISIBILITY_VIEWPORTS.desktop.value,
-					hasParentHiddenEverywhere:
-						isBlockParentHiddenEverywhere( clientId ),
-				};
-			},
-			[ clientId ]
-		);
+			return {
+				currentBlockVisibility:
+					getBlockAttributes( clientId )?.metadata?.blockVisibility,
+				selectedDeviceType:
+					getSettings()?.[ deviceTypeKey ]?.toLowerCase() ||
+					BLOCK_VISIBILITY_VIEWPORTS.desktop.value,
+				hasParentHiddenEverywhere:
+					isBlockParentHiddenEverywhere( clientId ),
+			};
+		},
+		[ clientId ]
+	);
 
 	// Use hook to get current viewport and if block is currently hidden (accurate viewport detection)
 	const { isBlockCurrentlyHidden, currentViewport } = useBlockVisibility( {
-		blockVisibility,
+		blockVisibility: currentBlockVisibility,
 		deviceType: selectedDeviceType,
 	} );
 
@@ -91,7 +92,7 @@ export default function BlockVisibilityInfo( { clientId } ) {
 	let label;
 	if ( isBlockCurrentlyHidden ) {
 		// Block is currently hidden - check if hidden everywhere or at specific viewport
-		if ( blockVisibility === false ) {
+		if ( currentBlockVisibility === false ) {
 			label = __( 'Block is hidden' );
 		} else {
 			const viewportLabel =

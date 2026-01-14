@@ -74,6 +74,7 @@ function ListViewBlockSelectButton(
 		},
 		[ clientId ]
 	);
+
 	const shouldShowLockIcon = isLocked;
 	const isSticky = blockInformation?.positionType === 'sticky';
 	const images = useListViewImages( { clientId, isExpanded } );
