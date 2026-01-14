@@ -1,39 +1,32 @@
-// Store the original self.
+/**
+ * Internal dependencies
+ */
+import { MessageType } from '../types';
+
+// Store the original self
 const originalSelf = globalThis.self;
 
-// Mock self for worker context.
+// Mock self for worker context
+let mockAddEventListener: jest.Mock;
 let mockPostMessage: jest.Mock;
-let messageListeners: Array< ( event: MessageEvent ) => void > = [];
+let messageHandler: ( ( event: MessageEvent ) => void ) | null = null;
 
 function setupMockSelf() {
+	mockAddEventListener = jest.fn(
+		( type: string, handler: ( event: MessageEvent ) => void ) => {
+			if ( type === 'message' ) {
+				messageHandler = handler;
+			}
+		}
+	);
 	mockPostMessage = jest.fn();
-	messageListeners = [];
 
-	// Override self with addEventListener pattern (matching comctx usage).
-	const mockSelf = {
-		postMessage: mockPostMessage,
-		addEventListener: (
-			type: string,
-			handler: ( event: MessageEvent ) => void
-		) => {
-			if ( type === 'message' ) {
-				messageListeners.push( handler );
-			}
-		},
-		removeEventListener: (
-			type: string,
-			handler: ( event: MessageEvent ) => void
-		) => {
-			if ( type === 'message' ) {
-				messageListeners = messageListeners.filter(
-					( h ) => h !== handler
-				);
-			}
-		},
-	};
-
+	// Override self
 	Object.defineProperty( globalThis, 'self', {
-		value: mockSelf,
+		value: {
+			addEventListener: mockAddEventListener,
+			postMessage: mockPostMessage,
+		},
 		writable: true,
 		configurable: true,
 	} );
@@ -45,7 +38,13 @@ function restoreSelf() {
 		writable: true,
 		configurable: true,
 	} );
-	messageListeners = [];
+	messageHandler = null;
+}
+
+function simulateMessage( data: unknown ) {
+	if ( messageHandler ) {
+		messageHandler( { data } as MessageEvent );
+	}
 }
 
 describe( 'worker-thread', () => {
@@ -59,60 +58,234 @@ describe( 'worker-thread', () => {
 	} );
 
 	describe( 'expose', () => {
-		it( 'should set up message handler', async () => {
+		it( 'should set up message event listener', async () => {
 			const { expose } = await import( '../worker-thread' );
 			const api = { method: jest.fn() };
 
 			expose( api );
 
-			expect( messageListeners.length ).toBeGreaterThan( 0 );
+			expect( mockAddEventListener ).toHaveBeenCalledWith(
+				'message',
+				expect.any( Function )
+			);
 		} );
 
-		it( 'should register handlers for all methods on target', async () => {
+		it( 'should call method when CALL message is received', async () => {
 			const { expose } = await import( '../worker-thread' );
-			const method1 = jest.fn();
-			const method2 = jest.fn();
-			const api = {
-				method1,
-				method2,
-				notAFunction: 'string value',
-			};
+			const mockMethod = jest.fn().mockReturnValue( 'result' );
+			const api = { testMethod: mockMethod };
 
-			// expose() should complete without error.
-			expect( () => expose( api ) ).not.toThrow();
+			expose( api );
+
+			simulateMessage( {
+				type: MessageType.CALL,
+				id: 1,
+				method: 'testMethod',
+				args: [ 'arg1', 42 ],
+			} );
+
+			// Wait for async handling
+			await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
+
+			expect( mockMethod ).toHaveBeenCalledWith( 'arg1', 42 );
 		} );
 
-		it( 'should only expose functions, not other properties', async () => {
+		it( 'should send RESULT message with return value', async () => {
 			const { expose } = await import( '../worker-thread' );
-			const api = {
-				validMethod: jest.fn(),
-				stringProp: 'not a function',
-				numberProp: 42,
-				objectProp: { nested: true },
-			};
+			const api = { calculate: () => 42 };
 
-			// Should not throw.
-			expect( () => expose( api ) ).not.toThrow();
+			expose( api );
+
+			simulateMessage( {
+				type: MessageType.CALL,
+				id: 5,
+				method: 'calculate',
+				args: [],
+			} );
+
+			await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
+
+			expect( mockPostMessage ).toHaveBeenCalledWith(
+				expect.objectContaining( {
+					type: MessageType.RESULT,
+					id: 5,
+					result: 42,
+				} ),
+				[]
+			);
 		} );
 
-		it( 'should handle empty object', async () => {
-			const { expose } = await import( '../worker-thread' );
-			const api = {};
-
-			// Should not throw.
-			expect( () => expose( api ) ).not.toThrow();
-		} );
-
-		it( 'should handle object with async methods', async () => {
+		it( 'should handle async methods', async () => {
 			const { expose } = await import( '../worker-thread' );
 			const api = {
 				asyncMethod: async () => {
 					return 'async result';
 				},
-				syncMethod: () => 'sync result',
 			};
 
-			expect( () => expose( api ) ).not.toThrow();
+			expose( api );
+
+			simulateMessage( {
+				type: MessageType.CALL,
+				id: 1,
+				method: 'asyncMethod',
+				args: [],
+			} );
+
+			await new Promise( ( resolve ) => setTimeout( resolve, 10 ) );
+
+			expect( mockPostMessage ).toHaveBeenCalledWith(
+				expect.objectContaining( {
+					type: MessageType.RESULT,
+					id: 1,
+					result: 'async result',
+				} ),
+				[]
+			);
+		} );
+
+		it( 'should send ERROR message when method throws', async () => {
+			const { expose } = await import( '../worker-thread' );
+			const api = {
+				throwingMethod: () => {
+					throw new Error( 'Test error' );
+				},
+			};
+
+			expose( api );
+
+			simulateMessage( {
+				type: MessageType.CALL,
+				id: 1,
+				method: 'throwingMethod',
+				args: [],
+			} );
+
+			await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
+
+			expect( mockPostMessage ).toHaveBeenCalledWith(
+				expect.objectContaining( {
+					type: MessageType.ERROR,
+					id: 1,
+					error: expect.objectContaining( {
+						message: 'Test error',
+					} ),
+				} ),
+				[]
+			);
+		} );
+
+		it( 'should send ERROR for non-existent method', async () => {
+			const { expose } = await import( '../worker-thread' );
+			const api = { existingMethod: () => {} };
+
+			expose( api );
+
+			simulateMessage( {
+				type: MessageType.CALL,
+				id: 1,
+				method: 'nonExistentMethod',
+				args: [],
+			} );
+
+			await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
+
+			expect( mockPostMessage ).toHaveBeenCalledWith(
+				expect.objectContaining( {
+					type: MessageType.ERROR,
+					id: 1,
+					error: expect.objectContaining( {
+						message: expect.stringContaining( 'nonExistentMethod' ),
+					} ),
+				} ),
+				[]
+			);
+		} );
+
+		it( 'should send ERROR for non-function property', async () => {
+			const { expose } = await import( '../worker-thread' );
+			const api = { notAFunction: 'string value' };
+
+			expose( api );
+
+			simulateMessage( {
+				type: MessageType.CALL,
+				id: 1,
+				method: 'notAFunction',
+				args: [],
+			} );
+
+			await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
+
+			expect( mockPostMessage ).toHaveBeenCalledWith(
+				expect.objectContaining( {
+					type: MessageType.ERROR,
+					id: 1,
+				} ),
+				[]
+			);
+		} );
+
+		it( 'should ignore non-RPC messages', async () => {
+			const { expose } = await import( '../worker-thread' );
+			const api = { method: jest.fn() };
+
+			expose( api );
+
+			simulateMessage( { someOther: 'data' } );
+
+			await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
+
+			expect( api.method ).not.toHaveBeenCalled();
+			expect( mockPostMessage ).not.toHaveBeenCalled();
+		} );
+
+		it( 'should ignore RESULT messages', async () => {
+			const { expose } = await import( '../worker-thread' );
+			const api = { method: jest.fn() };
+
+			expose( api );
+
+			simulateMessage( {
+				type: MessageType.RESULT,
+				id: 1,
+				result: 'should be ignored',
+			} );
+
+			await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
+
+			expect( mockPostMessage ).not.toHaveBeenCalled();
+		} );
+
+		it( 'should handle rejected promises', async () => {
+			const { expose } = await import( '../worker-thread' );
+			const api = {
+				asyncThrow: async () => {
+					throw new Error( 'Async error' );
+				},
+			};
+
+			expose( api );
+
+			simulateMessage( {
+				type: MessageType.CALL,
+				id: 1,
+				method: 'asyncThrow',
+				args: [],
+			} );
+
+			await new Promise( ( resolve ) => setTimeout( resolve, 10 ) );
+
+			expect( mockPostMessage ).toHaveBeenCalledWith(
+				expect.objectContaining( {
+					type: MessageType.ERROR,
+					id: 1,
+					error: expect.objectContaining( {
+						message: 'Async error',
+					} ),
+				} ),
+				[]
+			);
 		} );
 	} );
 } );
