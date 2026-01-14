@@ -14,8 +14,12 @@ permissions: {}
 # This prevents duplicate runs when:
 # - An issue is created and then someone comments before it finishes
 # - Multiple comments are made quickly
+#
+# FIX: Include comment author in concurrency group for comment events.
+# This prevents triage bot's own comments from cancelling legitimate runs.
+# Bot comments get a separate group, so they won't cancel human-triggered runs.
 concurrency:
-    group: claude-triage-${{ github.event.issue.number }}
+    group: claude-triage-${{ github.event.issue.number }}-${{ github.event_name == 'issue_comment' && (github.event.comment.user.type == 'Bot' && 'bot' || github.event.comment.user.login) || 'default' }}
     cancel-in-progress: true
 
 jobs:
@@ -31,9 +35,14 @@ jobs:
             pull-requests: write
             id-token: write
         # Run on new issues OR when @claude is mentioned in a comment
+        # FIX: Exclude bot comments to prevent self-triggering cancellation loop.
+        # Even though concurrency group prevents cancellation, this adds defense in depth.
         if: |
             github.event_name == 'issues' ||
-            (github.event_name == 'issue_comment' && contains(github.event.comment.body, '@claude'))
+            (github.event_name == 'issue_comment' &&
+             contains(github.event.comment.body, '@claude') &&
+             github.event.comment.user.type != 'Bot' &&
+             github.event.comment.user.login != 'github-actions[bot]')
         steps:
             # #region agent log
             - name: Debug - Log workflow trigger info
@@ -44,7 +53,7 @@ jobs:
                 echo "actor: ${{ github.actor }}" >> /tmp/workflow-debug.log
                 echo "comment_author: ${{ github.event.comment.user.login }}" >> /tmp/workflow-debug.log
                 echo "comment_body_preview: ${{ github.event.comment.body }}" >> /tmp/workflow-debug.log
-                echo "concurrency_group: claude-triage-${{ github.event.issue.number }}" >> /tmp/workflow-debug.log
+                echo "concurrency_group: claude-triage-${{ github.event.issue.number }}-${{ github.event_name == 'issue_comment' && (github.event.comment.user.type == 'Bot' && 'bot' || github.event.comment.user.login) || 'default' }}" >> /tmp/workflow-debug.log
                 echo "run_id: ${{ github.run_id }}" >> /tmp/workflow-debug.log
                 echo "run_number: ${{ github.run_number }}" >> /tmp/workflow-debug.log
                 cat /tmp/workflow-debug.log
