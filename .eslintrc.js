@@ -248,7 +248,7 @@ module.exports = {
 			excludedFiles: [ '**/*.native.js' ],
 			rules: {
 				'no-restricted-syntax': [ 'error', ...restrictedSyntax ],
-				'@wordpress/no-unsafe-button-disabled': 'error',
+				'@wordpress/components-no-unsafe-button-disabled': 'error',
 			},
 		},
 		{
@@ -259,8 +259,8 @@ module.exports = {
 			],
 			rules: {
 				'no-restricted-syntax': [ 'error', ...restrictedSyntax ],
-				'@wordpress/no-unsafe-button-disabled': 'error',
-				'@wordpress/no-missing-40px-size-prop': 'error',
+				'@wordpress/components-no-unsafe-button-disabled': 'error',
+				'@wordpress/components-no-missing-40px-size-prop': 'error',
 			},
 		},
 		{
@@ -389,7 +389,7 @@ module.exports = {
 				'packages/components/src/theme/**',
 			],
 			rules: {
-				'@wordpress/no-unsafe-button-disabled': [
+				'@wordpress/components-no-unsafe-button-disabled': [
 					'error',
 					{ checkLocalImports: true },
 				],
@@ -418,7 +418,7 @@ module.exports = {
 			plugins: [ 'ssr-friendly' ],
 			extends: [ 'plugin:ssr-friendly/recommended' ],
 			rules: {
-				'@wordpress/no-missing-40px-size-prop': [
+				'@wordpress/components-no-missing-40px-size-prop': [
 					'error',
 					{ checkLocalImports: true },
 				],
