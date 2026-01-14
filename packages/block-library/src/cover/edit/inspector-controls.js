@@ -179,8 +179,7 @@ export default function CoverInspectorControls( {
 	};
 
 	const showFocalPointPicker =
-		isVideoBackground ||
-		( isImageBackground && ( ! hasParallax || isRepeated ) );
+		isVideoBackground || ( isImageBackground && ! isRepeated );
 
 	const imperativeFocalPointPreview = ( value ) => {
 		const [ styleOfRef, property ] = mediaElement.current
@@ -270,6 +269,13 @@ export default function CoverInspectorControls( {
 										setAttributes( {
 											focalPoint: newFocalPoint,
 										} )
+									}
+									help={
+										hasParallax
+											? __(
+													'The focal point is used on mobile devices where fixed backgrounds are converted to scrolling.'
+											  )
+											: undefined
 									}
 								/>
 							</ToolsPanelItem>
