@@ -123,12 +123,22 @@ Execute the blueprint generation instructions.
 
 **IMPORTANT**: Spawn a subagent to isolate browser snapshot context from the main conversation.
 
+**CRITICAL COST OPTIMIZATION**: Use Haiku model and limit turns to control costs.
+
 ```
 Task tool with:
   subagent_type: "general-purpose"
+  model: "haiku"        # USE HAIKU - 10x cheaper than Sonnet for browser automation
+  max_turns: 20         # Limit turns to prevent runaway context accumulation
   description: "Reproduce bug with DevTools"
   prompt: |
     Reproduce the bug for issue #<issue> using Chrome DevTools MCP.
+
+    COST OPTIMIZATION RULES (CRITICAL):
+    1. MINIMIZE SNAPSHOTS: Only take_snapshot when you need to find an element. Maximum 5 snapshots.
+    2. USE evaluate_script: For simple interactions, use JavaScript directly instead of snapshot+click.
+    3. USE wait_for: Instead of snapshot to check if page loaded, use wait_for with expected text.
+    4. BATCH ACTIONS: Do multiple actions before taking another snapshot.
 
     FIRST: Verify Chrome DevTools MCP is available by calling mcp__chrome-devtools__list_pages.
     If this fails, write a findings.json with result="inconclusive" and error="Chrome DevTools MCP unavailable", then stop.
@@ -164,19 +174,54 @@ Execute the reporting instructions and post the GitHub comment.
 
 3. **Reduced overhead**: Only one subagent spawn instead of four
 
-## Token Savings Mechanism
+## Cost Optimization Strategy
 
-**Without subagent** (original approach):
-- Browser snapshots accumulate in main context
-- Each snapshot ~5-10KB of tokens
-- 10+ snapshots = 50-100KB+ accumulated
-- All this context is cached and re-read on each turn
+**Target cost: ~$0.20-0.30 per triage** (down from $2+ without optimization)
 
-**With subagent for Step 3**:
-- Browser snapshots stay in subagent context
-- Subagent completes and context is discarded
-- Main agent only sees final result summary
-- Steps 1, 2, 4 still benefit from caching
+### Key Optimizations:
+
+1. **Use Haiku for browser automation** (10x cheaper than Sonnet)
+   - Browser automation doesn't need Sonnet's reasoning power
+   - Haiku is sufficient for click/type/navigate operations
+   - Cost reduction: $2.00 → $0.20
+
+2. **Limit snapshots** (each snapshot = 2-5K tokens)
+   - Maximum 5 snapshots per reproduction
+   - Use `wait_for` instead of snapshot to check page state
+   - Use `evaluate_script` for direct DOM interaction
+
+3. **Limit subagent turns** (max_turns: 20)
+   - Prevents runaway context accumulation
+   - Each turn re-reads entire context (even cached = cost)
+
+4. **Subagent isolation** (still valuable)
+   - Browser snapshots stay in subagent context
+   - Main agent never sees the 50-100KB of snapshot data
+   - Subagent context discarded after completion
+
+### Why Snapshots Are Expensive:
+
+```
+Each snapshot = ~3K tokens
+20 snapshots = 60K tokens accumulated
+Each turn re-reads context (even cached)
+40 turns × 60K tokens = 2.4M cache reads
+2.4M × $0.30/1M = $0.72 just for cache reads!
+```
+
+### Token-Efficient Patterns:
+
+```javascript
+// EXPENSIVE: Snapshot → Find → Click (3K tokens per snapshot)
+take_snapshot()
+click(uid: "abc123")
+
+// CHEAP: Direct JavaScript (~100 tokens)
+evaluate_script({ function: "document.querySelector('button.save').click()" })
+
+// CHEAP: Wait for text instead of snapshot
+wait_for({ text: "Settings saved" })
+```
 
 ## Notes
 
