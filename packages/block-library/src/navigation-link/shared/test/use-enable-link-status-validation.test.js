@@ -23,6 +23,8 @@ jest.mock( '@wordpress/data', () => ( {
 		} );
 		return newState;
 	} ),
+	createSelector: jest.fn( ( fn ) => fn ),
+	createRegistrySelector: jest.fn( ( fn ) => fn ),
 } ) );
 
 describe( 'useEnableLinkStatusValidation', () => {
