@@ -11,6 +11,7 @@ import type { Field, View } from '@wordpress/dataviews';
 import {
 	altTextField,
 	attachedToField,
+	authorField,
 	captionField,
 	dateAddedField,
 	dateModifiedField,
@@ -109,6 +110,19 @@ const sampleMediaItem: MediaItem = {
 		},
 	},
 	missing_image_sizes: [],
+	_embedded: {
+		author: [
+			{
+				id: 1,
+				name: 'John Doe',
+				avatar_urls: {
+					'24': 'https://gravatar.com/avatar/?s=24&d=mm&r=g',
+					'48': 'https://gravatar.com/avatar/?s=48&d=mm&r=g',
+					'96': 'https://gravatar.com/avatar/?s=96&d=mm&r=g',
+				},
+			},
+		],
+	},
 };
 
 // Sample data for a non-image file (ZIP)
@@ -197,6 +211,17 @@ const sampleMediaItemZip: MediaItem = {
 				featured_media: 0,
 			},
 		],
+		author: [
+			{
+				id: 1,
+				name: 'Jane Smith',
+				avatar_urls: {
+					'24': 'https://gravatar.com/avatar/?s=24&d=mm&r=g',
+					'48': 'https://gravatar.com/avatar/?s=48&d=mm&r=g',
+					'96': 'https://gravatar.com/avatar/?s=96&d=mm&r=g',
+				},
+			},
+		],
 	},
 };
 
@@ -249,6 +274,19 @@ const sampleMediaItemBrokenImage: MediaItem = {
 		sizes: {},
 	},
 	missing_image_sizes: [],
+	_embedded: {
+		author: [
+			{
+				id: 1,
+				name: 'Admin User',
+				avatar_urls: {
+					'24': 'https://gravatar.com/avatar/?s=24&d=mm&r=g',
+					'48': 'https://gravatar.com/avatar/?s=48&d=mm&r=g',
+					'96': 'https://gravatar.com/avatar/?s=96&d=mm&r=g',
+				},
+			},
+		],
+	},
 };
 
 // Create a showcase of all media fields.
@@ -257,6 +295,7 @@ const showcaseFields = [
 	filenameField,
 	altTextField,
 	attachedToField,
+	authorField,
 	captionField,
 	dateAddedField,
 	dateModifiedField,
@@ -287,6 +326,7 @@ const DataFormsComponent = ( { type }: { type: 'regular' | 'panel' } ) => {
 			'mime_type',
 			'media_dimensions',
 			'filesize',
+			'author',
 			'date',
 			'modified',
 			'attached_to',

@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/ui",
-	"version": "0.5.1-next.06ee73755.0",
+	"version": "0.4.0",
 	"description": "Themeable React UI components for the WordPress Design System.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -43,7 +43,6 @@
 	"types": "build-types",
 	"sideEffects": false,
 	"dependencies": {
-		"@ariakit/react": "^0.4.15",
 		"@base-ui/react": "^1.0.0",
 		"@wordpress/a11y": "file:../a11y",
 		"@wordpress/element": "file:../element",

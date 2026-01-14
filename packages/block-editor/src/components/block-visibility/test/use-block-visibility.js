@@ -16,7 +16,7 @@ jest.mock( '@wordpress/compose', () => ( {
 /**
  * Internal dependencies
  */
-import { useBlockVisibility } from '../use-block-visibility';
+import useBlockVisibility from '../use-block-visibility';
 
 describe( 'useBlockVisibility', () => {
 	// Helper function to set up viewport matches
@@ -271,17 +271,31 @@ describe( 'useBlockVisibility', () => {
 		} );
 	} );
 
-	describe( 'Default values', () => {
-		it( 'should return false when no options are provided', () => {
-			setupViewport( {
-				isMobileOrLarger: true,
-				isMediumOrLarger: true,
-			} );
+	describe( 'Edge cases', () => {
+		it( 'should return false when no visibility settings are defined', () => {
+			setupViewport( { isMobileOrLarger: true } );
 
-			const { result } = renderHook( () => useBlockVisibility( {} ) );
+			const { result } = renderHook( () =>
+				useBlockVisibility( {
+					blockVisibility: true,
+					deviceType: 'desktop',
+				} )
+			);
 
 			expect( result.current.isBlockCurrentlyHidden ).toBe( false );
-			expect( result.current.currentViewport ).toBe( 'desktop' );
+		} );
+
+		it( 'should return false when blockVisibility is undefined', () => {
+			setupViewport( { isMobileOrLarger: true } );
+
+			const { result } = renderHook( () =>
+				useBlockVisibility( {
+					blockVisibility: undefined,
+					deviceType: 'desktop',
+				} )
+			);
+
+			expect( result.current.isBlockCurrentlyHidden ).toBe( false );
 		} );
 
 		it( 'should default to desktop deviceType when not provided', () => {
@@ -297,64 +311,6 @@ describe( 'useBlockVisibility', () => {
 			);
 
 			expect( result.current.isBlockCurrentlyHidden ).toBe( true );
-			expect( result.current.currentViewport ).toBe( 'desktop' );
-		} );
-
-		it( 'should default to undefined blockVisibility when not provided', () => {
-			setupViewport( {
-				isMobileOrLarger: true,
-				isMediumOrLarger: true,
-			} );
-
-			const { result } = renderHook( () =>
-				useBlockVisibility( {
-					deviceType: 'desktop',
-				} )
-			);
-
-			expect( result.current.isBlockCurrentlyHidden ).toBe( false );
-		} );
-	} );
-
-	describe( 'Edge cases', () => {
-		it( 'should return false when blockVisibility is an empty object', () => {
-			setupViewport( { isMobileOrLarger: true } );
-
-			const { result } = renderHook( () =>
-				useBlockVisibility( {
-					blockVisibility: {},
-					deviceType: 'desktop',
-				} )
-			);
-
-			expect( result.current.isBlockCurrentlyHidden ).toBe( false );
-		} );
-
-		it( 'should handle null blockVisibility', () => {
-			setupViewport( { isMobileOrLarger: true } );
-
-			const { result } = renderHook( () =>
-				useBlockVisibility( {
-					blockVisibility: null,
-					deviceType: 'desktop',
-				} )
-			);
-
-			expect( result.current.isBlockCurrentlyHidden ).toBe( false );
-		} );
-
-		it( 'should handle case-insensitive deviceType', () => {
-			setupViewport( { isMobileOrLarger: true } );
-
-			const { result } = renderHook( () =>
-				useBlockVisibility( {
-					blockVisibility: { mobile: false },
-					deviceType: 'MOBILE',
-				} )
-			);
-
-			// Should still work but viewport detection uses lowercase
-			expect( result.current.currentViewport ).toBe( 'desktop' );
 		} );
 	} );
 } );

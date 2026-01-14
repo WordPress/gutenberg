@@ -100,7 +100,7 @@ const getTemplatePartIcon = ( areaOrIconName: string ) => {
 		return footerIcon;
 	} else if ( 'sidebar' === areaOrIconName ) {
 		return sidebarIcon;
-	} else if ( 'navigation-overlay' === areaOrIconName ) {
+	} else if ( 'overlay' === areaOrIconName ) {
 		// TODO: Replace with a proper overlay icon when available.
 		// Using tableColumnAfter as a placeholder.
 		return overlayIcon;

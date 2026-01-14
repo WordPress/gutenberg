@@ -86,11 +86,6 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	require_once __DIR__ . '/experimental/kses-allowed-html.php';
 }
 
-// Experimental signaling server.
-if ( ! class_exists( 'Gutenberg_HTTP_Singling_Server' ) ) {
-	require_once __DIR__ . '/experimental/sync/class-gutenberg-http-signaling-server.php';
-}
-
 require_once __DIR__ . '/experimental/editor-settings.php';
 require_once __DIR__ . '/experimental/rest-api-overrides.php';
 

@@ -2100,7 +2100,7 @@
 		"parent": "packages"
 	},
 	{
-		"title": "@wordpress/wp-build",
+		"title": "@wordpress/build",
 		"slug": "packages-wp-build",
 		"markdown_source": "../packages/wp-build/README.md",
 		"parent": "packages"

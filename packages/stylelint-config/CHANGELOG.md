@@ -2,8 +2,6 @@
 
 ## Unreleased
 
-## 23.30.0-next.0 (2026-01-12)
-
 ### New Features
 
 -   Added `plugin-wpds/no-unknown-ds-tokens` and `plugin-wpds/no-setting-wpds-custom-properties` rules from `@wordpress/theme` to catch design token misuse ([#74226](https://github.com/WordPress/gutenberg/pull/74226)).

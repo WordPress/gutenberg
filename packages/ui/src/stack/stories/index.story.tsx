@@ -5,7 +5,6 @@ import { Box } from '../../box';
 const meta: Meta< typeof Stack > = {
 	title: 'Design System/Components/Stack',
 	component: Stack,
-	tags: [ 'status-experimental' ],
 };
 export default meta;
 

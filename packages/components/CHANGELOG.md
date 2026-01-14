@@ -2,8 +2,6 @@
 
 ## Unreleased
 
-## 32.0.0-next.0 (2026-01-12)
-
 ### Code Quality
 
 -   Fix missing dependencies. [#74310](https://github.com/WordPress/gutenberg/pull/74310)
@@ -41,6 +39,7 @@
 -   Converted package to a compliant dual CJS/ESM module ([#73822](https://github.com/WordPress/gutenberg/pull/73822) and [#74348](https://github.com/WordPress/gutenberg/pull/74348)).
 -   `ToggleGroupControl`: Update visual design ([#74036](https://github.com/WordPress/gutenberg/pull/74036)).
 -   `Notice`: Add `disabled` prop to action buttons. Also allow `onClick` to work alongside `url` ([#74094](https://github.com/WordPress/gutenberg/pull/74094)).
+-   `Menu`: Remove animation on submenus ([#74548](https://github.com/WordPress/gutenberg/pull/74548)).
 
 ### Bug Fixes
 
