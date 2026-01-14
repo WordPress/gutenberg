@@ -41,7 +41,7 @@ function StatusIndicator() {
 }
 
 export const Default = {
-	render: ( args ) => {
+	render: () => {
 		return (
 			<BlockEditorProvider>
 				<div
@@ -49,7 +49,7 @@ export const Default = {
 						maxWidth: '500px',
 					} }
 				>
-					<ObserveTyping { ...args }>
+					<ObserveTyping>
 						<textarea
 							style={ {
 								width: '100%',
