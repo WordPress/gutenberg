@@ -50,9 +50,6 @@ jobs:
                   fetch-depth: 1
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
 
-            - name: Install Playwright browsers
-              run: npx playwright install --with-deps firefox
-
             - name: Install WordPress Playground CLI
               run: npm install -g @wp-playground/cli
 
