@@ -9,20 +9,22 @@ allowedTools:
   - Glob
   - Grep
   - WebFetch
-  - mcp__playwright__browser_navigate
-  - mcp__playwright__browser_snapshot
-  - mcp__playwright__browser_click
-  - mcp__playwright__browser_type
-  - mcp__playwright__browser_press_key
-  - mcp__playwright__browser_fill_form
-  - mcp__playwright__browser_take_screenshot
-  - mcp__playwright__browser_console_messages
-  - mcp__playwright__browser_network_requests
-  - mcp__playwright__browser_wait_for
-  - mcp__playwright__browser_handle_dialog
-  - mcp__playwright__browser_hover
-  - mcp__playwright__browser_navigate_back
-  - mcp__playwright__browser_close
+  - mcp__chrome-devtools__new_page
+  - mcp__chrome-devtools__navigate_page
+  - mcp__chrome-devtools__take_snapshot
+  - mcp__chrome-devtools__take_screenshot
+  - mcp__chrome-devtools__click
+  - mcp__chrome-devtools__fill
+  - mcp__chrome-devtools__fill_form
+  - mcp__chrome-devtools__press_key
+  - mcp__chrome-devtools__list_console_messages
+  - mcp__chrome-devtools__list_network_requests
+  - mcp__chrome-devtools__wait_for
+  - mcp__chrome-devtools__handle_dialog
+  - mcp__chrome-devtools__hover
+  - mcp__chrome-devtools__close_page
+  - mcp__chrome-devtools__list_pages
+  - mcp__chrome-devtools__select_page
 ---
 
 # /triage
@@ -67,7 +69,7 @@ Execute the blueprint generation instructions.
 
 **Read file:** `.claude/workflows/triage/3-reproduce.md`
 
-Execute the reproduction instructions using Playwright.
+Execute the reproduction instructions using Chrome DevTools MCP.
 
 ### Step 4: Report Findings
 
