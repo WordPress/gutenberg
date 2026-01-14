@@ -1,7 +1,7 @@
 ---
 description: Run full triage pipeline for a Gutenberg bug report using Chrome DevTools MCP
-allowed_args: issue
-allowedTools:
+argument-hint: [issue-number]
+allowed-tools:
   - Bash
   - Read
   - Write
