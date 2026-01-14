@@ -25,7 +25,7 @@ import {
 	memo,
 } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { BACKSPACE, DELETE } from '@wordpress/keycodes';
 import { isShallowEqual } from '@wordpress/is-shallow-equal';
 import { __unstableUseShortcutEventMatch as useShortcutEventMatch } from '@wordpress/keyboard-shortcuts';
@@ -148,10 +148,30 @@ function ListViewBlock( {
 		);
 
 	// Use hook to get current viewport and if block is currently hidden (accurate viewport detection)
-	const { isBlockCurrentlyHidden } = useBlockVisibility( {
+	const { isBlockCurrentlyHidden, currentViewport } = useBlockVisibility( {
 		blockVisibility: block?.attributes?.metadata?.blockVisibility,
 		deviceType: selectedDeviceType,
 	} );
+
+	// Determine label based on whether block or parent is hidden
+	const blockVisibilityDescription = useMemo( () => {
+		if ( isBlockCurrentlyHidden ) {
+			if ( block?.attributes?.metadata?.blockVisibility === false ) {
+				return __( 'Block is hidden' );
+			}
+			return sprintf(
+				/* translators: %s: viewport name (Desktop, Tablet, Mobile) */
+				__( 'Block is hidden in %s' ),
+				BLOCK_VISIBILITY_VIEWPORTS[ currentViewport ]?.label ||
+					currentViewport
+			);
+		}
+		return null;
+	}, [
+		isBlockCurrentlyHidden,
+		block?.attributes?.metadata?.blockVisibility,
+		currentViewport,
+	] );
 
 	const showBlockActions =
 		// When a block hides its toolbar it also hides the block settings menu,
@@ -544,10 +564,6 @@ function ListViewBlock( {
 		blockInformation,
 		isLocked
 	);
-
-	const blockVisibilityDescription = isBlockCurrentlyHidden
-		? __( 'Block is hidden.' )
-		: null;
 
 	const hasSiblings = siblingBlockCount > 0;
 	const hasRenderedMovers = showBlockMovers && hasSiblings;
