@@ -418,10 +418,10 @@ module.exports = {
 					'error',
 					{ checkLocalImports: true },
 				],
-				// '@wordpress/components-no-missing-40px-size-prop': [
-				// 	'error',
-				// 	{ checkLocalImports: true },
-				// ],
+				'@wordpress/components-no-missing-40px-size-prop': [
+					'error',
+					{ checkLocalImports: true },
+				],
 			},
 		},
 		{
