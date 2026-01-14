@@ -609,7 +609,13 @@ export default function ViewList< Item >( props: ViewListProps< Item > ) {
 			<Composite
 				id={ baseId }
 				render={ <div /> }
-				className={ clsx( 'dataviews-view-list', className ) }
+				className={ clsx( 'dataviews-view-list', className, {
+					[ `has-${ view.layout?.density }-density` ]:
+						view.layout?.density &&
+						[ 'compact', 'comfortable' ].includes(
+							view.layout.density
+						),
+				} ) }
 				role={ view.infiniteScrollEnabled ? 'feed' : 'grid' }
 				activeId={ activeCompositeId }
 				setActiveId={ setActiveCompositeId }

@@ -59,9 +59,6 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 		require_once __DIR__ . '/experimental/class-wp-rest-block-editor-settings-controller.php';
 	}
 
-	// WordPress 6.8 compat.
-	require __DIR__ . '/compat/wordpress-6.8/rest-api.php';
-
 	// WordPress 6.9 compat.
 	require __DIR__ . '/compat/wordpress-6.9/class-gutenberg-rest-attachments-controller-6-9.php';
 	require __DIR__ . '/compat/wordpress-6.9/block-bindings.php';
@@ -89,11 +86,6 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	require_once __DIR__ . '/experimental/kses-allowed-html.php';
 }
 
-// Experimental signaling server.
-if ( ! class_exists( 'Gutenberg_HTTP_Singling_Server' ) ) {
-	require_once __DIR__ . '/experimental/sync/class-gutenberg-http-signaling-server.php';
-}
-
 require_once __DIR__ . '/experimental/editor-settings.php';
 require_once __DIR__ . '/experimental/rest-api-overrides.php';
 
@@ -101,15 +93,6 @@ require_once __DIR__ . '/experimental/rest-api-overrides.php';
 require __DIR__ . '/compat/plugin/edit-site-routes-backwards-compat.php';
 require __DIR__ . '/compat/plugin/fonts.php';
 
-// WordPress 6.8 compat.
-// Note: admin-bar.php (69271) was reverted in Gutenberg 20.8.0. See https://github.com/WordPress/gutenberg/pull/69974.
-require __DIR__ . '/compat/wordpress-6.8/preload.php';
-require __DIR__ . '/compat/wordpress-6.8/blocks.php';
-require __DIR__ . '/compat/wordpress-6.8/functions.php';
-require __DIR__ . '/compat/wordpress-6.8/site-editor.php';
-require __DIR__ . '/compat/wordpress-6.8/class-gutenberg-rest-user-controller.php';
-require __DIR__ . '/compat/wordpress-6.8/block-template-utils.php';
-require __DIR__ . '/compat/wordpress-6.8/site-preview.php';
 
 // WordPress 6.9 compat.
 require __DIR__ . '/compat/wordpress-6.9/customizer-preview-custom-css.php';
@@ -210,4 +193,9 @@ if ( gutenberg_is_experiment_enabled( 'gutenberg-media-processing' ) ) {
 if ( gutenberg_is_experiment_enabled( 'gutenberg-full-page-client-side-navigation' ) ) {
 	require __DIR__ . '/experimental/interactivity-api/class-gutenberg-interactivity-api-full-page-navigation.php';
 	Gutenberg_Interactivity_API_Full_Page_Navigation::instance();
+}
+
+// Block patterns (only load when navigation overlays experiment is enabled).
+if ( gutenberg_is_experiment_enabled( 'gutenberg-customizable-navigation-overlays' ) ) {
+	require __DIR__ . '/experimental/overlay-patterns.php';
 }

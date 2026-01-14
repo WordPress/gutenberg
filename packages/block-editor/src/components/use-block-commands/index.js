@@ -223,9 +223,10 @@ const getQuickActionsCommands = () =>
 		} );
 		const canRemove = canRemoveBlocks( clientIds );
 
-		const canToggleBlockVisibility = blocks.every( ( { clientId } ) =>
-			hasBlockSupport( getBlockName( clientId ), 'visibility', true )
-		);
+		const canToggleBlockVisibility =
+			blocks.every( ( { clientId } ) =>
+				hasBlockSupport( getBlockName( clientId ), 'visibility', true )
+			) && ! window.__experimentalHideBlocksBasedOnScreenSize;
 
 		const commands = [];
 

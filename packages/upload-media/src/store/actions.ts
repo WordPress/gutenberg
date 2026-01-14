@@ -21,6 +21,7 @@ import type {
 	OnErrorHandler,
 	OnSuccessHandler,
 	QueueItemId,
+	RetryItemAction,
 	State,
 } from './types';
 import { Type } from './types';
@@ -40,6 +41,7 @@ type ActionCreators = {
 	removeItem: typeof removeItem;
 	processItem: typeof processItem;
 	cancelItem: typeof cancelItem;
+	retryItem: typeof retryItem;
 	revokeBlobUrls: typeof revokeBlobUrls;
 	< T = Record< string, unknown > >( args: T ): void;
 };
@@ -179,5 +181,32 @@ export function cancelItem( id: QueueItemId, error: Error, silent = false ) {
 		if ( item.batchId && select.isBatchUploaded( item.batchId ) ) {
 			item.onBatchSuccess?.();
 		}
+	};
+}
+
+/**
+ * Retries a failed item in the queue.
+ *
+ * @param id Item ID.
+ */
+export function retryItem( id: QueueItemId ) {
+	return async ( { select, dispatch }: ThunkArgs ) => {
+		const item = select.getItem( id );
+
+		if ( ! item ) {
+			return;
+		}
+
+		// Only retry items that have an error.
+		if ( ! item.error ) {
+			return;
+		}
+
+		dispatch< RetryItemAction >( {
+			type: Type.RetryItem,
+			id,
+		} );
+
+		dispatch.processItem( id );
 	};
 }

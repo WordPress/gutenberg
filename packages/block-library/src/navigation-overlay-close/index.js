@@ -11,8 +11,8 @@ import { store as coreStore } from '@wordpress/core-data';
 import initBlock from '../utils/init-block';
 import edit from './edit';
 import metadata from './block.json';
-import save from './save';
 import icon from './icon';
+import { NAVIGATION_OVERLAY_TEMPLATE_PART_AREA } from '../navigation/constants';
 
 const { name } = metadata;
 
@@ -21,7 +21,6 @@ export { metadata, name };
 export const settings = {
 	icon,
 	edit,
-	save,
 };
 
 function isWithinOverlay() {
@@ -50,7 +49,9 @@ function isWithinOverlay() {
 			postId
 		);
 
-		return templatePartEntity?.area === 'overlay';
+		return (
+			templatePartEntity?.area === NAVIGATION_OVERLAY_TEMPLATE_PART_AREA
+		);
 	}
 
 	return false;

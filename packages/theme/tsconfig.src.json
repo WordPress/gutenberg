@@ -3,7 +3,8 @@
 	"extends": "../../tsconfig.base.json",
 	"compilerOptions": {
 		"moduleResolution": "bundler",
-		"types": [ "css-modules", "jest", "@testing-library/jest-dom" ]
+		"types": [ "css-modules" ]
 	},
+	"files": [ "global.d.ts" ],
 	"references": [ { "path": "../element" }, { "path": "../private-apis" } ]
 }
