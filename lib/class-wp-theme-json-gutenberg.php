@@ -242,6 +242,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * @since 6.3.0 Added `writing-mode` property.
 	 * @since 6.6.0 Added `background-[image|position|repeat|size]` properties.
 	 * @since 7.0.0 Added `dimensions.width` and `dimensions.height`.
+	 * @since 7.0.0 Added `gap` property.
 	 *
 	 * @var array
 	 */
@@ -310,6 +311,7 @@ class WP_Theme_JSON_Gutenberg {
 		'height'                            => array( 'dimensions', 'height' ),
 		'width'                             => array( 'dimensions', 'width' ),
 		'writing-mode'                      => array( 'typography', 'writingMode' ),
+		'gap'                               => array( 'spacing', 'blockGap' ),
 	);
 
 	/**
@@ -346,20 +348,7 @@ class WP_Theme_JSON_Gutenberg {
 		),
 	);
 
-	/**
-	 * Protected style properties.
-	 *
-	 * These style properties are only rendered if a setting enables it
-	 * via a value other than `null`.
-	 *
-	 * Each element maps the style property to the corresponding theme.json
-	 * setting key.
-	 *
-	 * @since 5.9.0
-	 */
-	const PROTECTED_PROPERTIES = array(
-		'gap' => array( 'spacing', 'blockGap' ),
-	);
+
 
 	/**
 	 * The top-level keys a theme.json can have.
@@ -2402,22 +2391,13 @@ class WP_Theme_JSON_Gutenberg {
 	 * @param boolean $use_root_padding Whether to add custom properties at root level.
 	 * @return array  Returns the modified $declarations.
 	 */
-	protected static function compute_style_properties( $styles, $settings = array(), $properties = null, $theme_json = null, $selector = null, $use_root_padding = null, $include_protected_properties = false ) {
+	protected static function compute_style_properties( $styles, $settings = array(), $properties = null, $theme_json = null, $selector = null, $use_root_padding = null ) {
 		if ( empty( $styles ) ) {
 			return array();
 		}
 
 		if ( null === $properties ) {
 			$properties = static::PROPERTIES_METADATA;
-		}
-
-		// Include protected properties if requested.
-		if ( $include_protected_properties ) {
-			foreach ( static::PROTECTED_PROPERTIES as $key => $value_path ) {
-				if ( ! isset( $properties[ $key ] ) ) {
-					$properties[ $key ] = $value_path;
-				}
-			}
 		}
 
 		$declarations             = array();
@@ -2473,16 +2453,6 @@ class WP_Theme_JSON_Gutenberg {
 			// Skip if empty and not "0" or value represents array of longhand values.
 			$has_missing_value = empty( $value ) && ! is_numeric( $value );
 			if ( $has_missing_value || is_array( $value ) ) {
-				continue;
-			}
-
-			// Look up protected properties, keyed by value path.
-			// Skip protected properties that are explicitly set to `null`.
-			$path_string = implode( '.', $value_path );
-			if (
-				isset( static::PROTECTED_PROPERTIES[ $path_string ] ) &&
-				_wp_array_get( $settings, static::PROTECTED_PROPERTIES[ $path_string ], null ) === null
-			) {
 				continue;
 			}
 
@@ -2982,7 +2952,7 @@ class WP_Theme_JSON_Gutenberg {
 					$style_variation_declarations[ $combined_selectors ] = $new_declarations;
 				}
 				// Compute declarations for remaining styles not covered by feature level selectors.
-				$style_variation_declarations[ $style_variation['selector'] ] = static::compute_style_properties( $style_variation_node, $settings, null, $this->theme_json, null, null, true );
+				$style_variation_declarations[ $style_variation['selector'] ] = static::compute_style_properties( $style_variation_node, $settings, null, $this->theme_json, null, null );
 
 				// Process pseudo-selectors for this variation (e.g., :hover, :focus).
 				$block_name                    = $block_metadata['name'] ?? ( in_array( 'blocks', $block_metadata['path'], true ) && count( $block_metadata['path'] ) >= 3 ? static::get_block_name_from_metadata_path( $block_metadata ) : null );
@@ -3245,7 +3215,7 @@ class WP_Theme_JSON_Gutenberg {
 			$css .= '.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }';
 		}
 
-		// Block gap styles will be output unless explicitly set to `null`. See static::PROTECTED_PROPERTIES.
+		// Block gap styles will be output unless explicitly set to `null`.
 		if ( isset( $this->theme_json['settings']['spacing']['blockGap'] ) ) {
 			$block_gap_value = static::get_property_value( $this->theme_json, array( 'styles', 'spacing', 'blockGap' ) );
 			$css            .= ":where(.wp-site-blocks) > * { margin-block-start: $block_gap_value; margin-block-end: 0; }";
