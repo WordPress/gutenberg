@@ -46,7 +46,7 @@ function render_block_core_categories( $attributes, $content, $block ) {
 			__( 'Select %s' ),
 			$taxonomy->labels->singular_name
 		);
-		
+
 		// Pre-select the current term if viewing a term archive page.
 		if ( is_tax( $attributes['taxonomy'] ) || is_category() || is_tag() ) {
 			$current_term = get_queried_object();
