@@ -15,6 +15,7 @@ export default {
 	component: ObserveTyping,
 	parameters: {
 		docs: {
+			canvas: { sourceState: 'shown' },
 			description: {
 				component:
 					'ObserveTyping wraps content to detect user activity. It sets an internal "isTyping" flag to true when the user types, and false when they move the mouse or lose focus.',
