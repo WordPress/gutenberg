@@ -1,0 +1,291 @@
+// Blocks panel styles - matching fonts library pattern
+
+.blocks-panel {
+}
+
+// Content container - centered with max-width
+.blocks-panel__content {
+	max-width: 640px;
+	margin: 0 auto;
+	padding: 24px;
+	width: 100%;
+	box-sizing: border-box;
+}
+
+// Search container
+.blocks-panel__search {
+	margin-bottom: 24px;
+
+	.components-search-control {
+		width: 100%;
+	}
+}
+
+// Section container (Common, All Blocks)
+.blocks-panel__section {
+	margin-bottom: 24px;
+
+	&:last-child {
+		margin-bottom: 0;
+	}
+}
+
+// List title (Common, All Blocks)
+.blocks-panel__list-title {
+	font-size: 11px;
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+	color: #1e1e1e;
+	margin: 0 0 8px;
+	padding: 0;
+}
+
+// Block list
+.blocks-panel__list {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	min-width: 400px;
+	max-width: 640px;
+	width: 100%;
+	border: 1px solid #e0e0e0;
+}
+
+.blocks-panel__list-item {
+	border-bottom: 1px solid #e0e0e0;
+	margin: 0;
+	padding: 0;
+
+	&:last-child {
+		border-bottom: none;
+	}
+}
+
+// Block card button - table style
+.blocks-panel__block-card {
+	box-sizing: border-box;
+	display: block;
+	width: 100%;
+	height: auto !important;
+	padding: 12px 16px;
+	margin: 0;
+	background: transparent;
+	border: none;
+	border-radius: 0;
+	cursor: pointer;
+	text-align: left;
+
+	&:hover {
+		background: #f6f7f7;
+	}
+
+	&:focus {
+		position: relative;
+		box-shadow: inset 0 0 0 1.5px var(--wp-admin-theme-color, #3858e9);
+		outline: none;
+	}
+
+	.components-flex {
+		width: 100%;
+	}
+}
+
+.blocks-panel__block-title {
+	font-size: 13px;
+	font-weight: 600;
+	color: #1e1e1e;
+}
+
+.blocks-panel__block-status {
+	font-size: 12px;
+	color: var(--wp-admin-theme-color, #3858e9);
+}
+
+// Chevron icon
+.blocks-panel__block-card svg {
+	fill: #757575;
+	flex-shrink: 0;
+}
+
+// Navigator screens
+.blocks-panel .components-navigator-screen {
+	padding: 0;
+	width: 100%;
+	box-sizing: border-box;
+}
+
+// Detail screen container
+.blocks-panel__detail-container {
+	max-width: 640px;
+	margin: 0 auto;
+	padding: 24px;
+}
+
+// Detail screen header
+.blocks-panel__detail-header {
+	display: flex;
+	align-items: center;
+	gap: 0;
+
+	.components-button:last-child {
+		margin-left: auto;
+	}
+}
+
+.blocks-panel__detail-title {
+	font-size: 13px;
+	font-weight: 500;
+	margin: 0;
+}
+
+// Block preview card
+.blocks-panel__block-preview {
+	display: flex;
+	gap: 12px;
+	padding: 16px;
+	background: #f6f7f7;
+	border: 1px solid #e0e0e0;
+	border-radius: 2px;
+}
+
+.blocks-panel__block-icon {
+	flex-shrink: 0;
+	width: 48px;
+	height: 48px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: #fff;
+	border: 1px solid #e0e0e0;
+	border-radius: 2px;
+
+	svg {
+		width: 24px;
+		height: 24px;
+		fill: #1e1e1e;
+	}
+
+	&.dashicons {
+		font-size: 24px;
+		color: #1e1e1e;
+	}
+}
+
+.blocks-panel__block-info {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+	min-width: 0;
+}
+
+.blocks-panel__block-name {
+	font-size: 11px;
+	font-family: monospace;
+	color: #757575;
+}
+
+.blocks-panel__block-description {
+	font-size: 13px;
+	line-height: 1.4;
+}
+
+// Divider with centered text
+.blocks-panel__divider {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	margin: 8px 0;
+
+	&::before,
+	&::after {
+		content: "";
+		flex: 1;
+		height: 1px;
+		background: #dcdcde;
+	}
+}
+
+.blocks-panel__divider-text {
+	font-size: 11px;
+	font-weight: 500;
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+	color: #949494;
+	white-space: nowrap;
+}
+
+// Back button area
+.blocks-panel .components-navigator__back-button {
+	margin-right: 8px;
+}
+
+// Form controls in detail view
+.blocks-panel .components-textarea-control {
+	.components-base-control__label {
+		font-size: 11px;
+		font-weight: 500;
+		text-transform: uppercase;
+		letter-spacing: 0.5px;
+		color: #757575;
+	}
+
+	textarea {
+		font-size: 13px;
+	}
+}
+
+// Loading state - centered in container
+.blocks-panel__loading {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	padding: 48px 24px;
+	gap: 16px;
+	flex-grow: 1;
+	min-height: 300px;
+}
+
+// Error state
+.blocks-panel__error {
+	color: #cc1818;
+}
+
+// Override WP admin default margins
+.blocks-panel dd,
+.blocks-panel li {
+	margin-bottom: 0;
+}
+
+// Empty state
+.blocks-panel__empty {
+	text-align: center;
+	padding: 24px;
+	color: #757575;
+}
+
+// Block count badge
+.blocks-panel__list-count {
+	font-size: 11px;
+	font-weight: 400;
+	color: #757575;
+	margin-left: 8px;
+}
+
+// Pagination
+.blocks-panel__pagination {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 12px;
+	padding: 16px;
+	border-top: 1px solid #e0e0e0;
+}
+
+.blocks-panel__pagination-info {
+	font-size: 13px;
+	color: #757575;
+	min-width: 50px;
+	text-align: center;
+}

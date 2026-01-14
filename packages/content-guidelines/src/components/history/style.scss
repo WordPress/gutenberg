@@ -1,0 +1,98 @@
+/**
+ * History Panel Styles
+ */
+
+.content-guidelines-history-modal {
+	.components-modal__content {
+		padding: 0;
+	}
+}
+
+.content-guidelines-history {
+	padding: 16px;
+	min-height: 200px;
+}
+
+.content-guidelines-history__loading,
+.content-guidelines-history__empty,
+.content-guidelines-history__restoring {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	padding: 48px;
+	text-align: center;
+	color: #757575;
+
+	.components-spinner {
+		margin-bottom: 16px;
+	}
+}
+
+.content-guidelines-history__list {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+.content-guidelines-history__item {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	padding: 12px;
+	border-bottom: 1px solid #e0e0e0;
+
+	&:last-child {
+		border-bottom: none;
+	}
+
+	&:hover {
+		background: #f6f7f7;
+	}
+}
+
+.content-guidelines-history__item-icon {
+	width: 32px;
+	height: 32px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: #f0f0f0;
+	border-radius: 50%;
+	color: #757575;
+
+	svg {
+		width: 18px;
+		height: 18px;
+	}
+}
+
+.content-guidelines-history__item-content {
+	flex: 1;
+}
+
+.content-guidelines-history__item-date {
+	font-weight: 500;
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
+.content-guidelines-history__current-badge {
+	font-size: 11px;
+	font-weight: 500;
+	padding: 2px 6px;
+	background: #d7f0df;
+	color: #1e4620;
+	border-radius: 3px;
+}
+
+.content-guidelines-history__item-author {
+	font-size: 13px;
+	color: #757575;
+}
+
+.content-guidelines-history__item-actions {
+	display: flex;
+	gap: 8px;
+}

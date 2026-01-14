@@ -1,8 +1,9 @@
 /**
  * WordPress dependencies
  */
-import { useRegistry, useDispatch } from '@wordpress/data';
+import { useRegistry, useDispatch, useSelect } from '@wordpress/data';
 import { useEffect } from '@wordpress/element';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -23,8 +24,9 @@ import { pageItemRoute } from './page-item';
 import { attachmentItemRoute } from './attachment-item';
 import { stylebookRoute } from './stylebook';
 import { notFoundRoute } from './notfound';
+import { guidelinesRoute } from './guidelines';
 
-const routes = [
+const baseRoutes = [
 	...( window?.__experimentalMediaEditor ? [ attachmentItemRoute ] : [] ),
 	pageItemRoute,
 	pagesRoute,
@@ -44,9 +46,26 @@ const routes = [
 export function useRegisterSiteEditorRoutes() {
 	const registry = useRegistry();
 	const { registerRoute } = unlock( useDispatch( siteEditorStore ) );
+
+	// Check if Content Guidelines experiment is enabled.
+	const isContentGuidelinesEnabled = useSelect( ( select ) => {
+		const settings = select( coreStore ).getEntityRecord(
+			'root',
+			'__unstableBase'
+		);
+		return settings?.contentGuidelinesEnabled ?? false;
+	}, [] );
+
 	useEffect( () => {
+		const routes = [ ...baseRoutes ];
+
+		// Add guidelines route if experiment is enabled.
+		if ( isContentGuidelinesEnabled ) {
+			routes.push( guidelinesRoute );
+		}
+
 		registry.batch( () => {
 			routes.forEach( registerRoute );
 		} );
-	}, [ registry, registerRoute ] );
+	}, [ registry, registerRoute, isContentGuidelinesEnabled ] );
 }

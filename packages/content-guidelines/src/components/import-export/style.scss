@@ -1,0 +1,26 @@
+.import-export-panel {
+	max-width: 480px;
+	margin: 0 auto;
+	padding: 24px;
+
+	&__title {
+		font-size: 20px;
+		font-weight: 500;
+	}
+
+	&__section {
+		padding: 20px;
+		background: #f9f9f9;
+		border-radius: 4px;
+	}
+
+	&__section-title {
+		font-size: 14px;
+		font-weight: 500;
+		margin-bottom: 4px;
+	}
+
+	&__section-desc {
+		font-size: 13px;
+	}
+}

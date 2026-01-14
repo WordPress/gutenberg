@@ -1,0 +1,69 @@
+.term-note-control {
+	&__label {
+		font-size: 11px;
+		font-weight: 500;
+		text-transform: uppercase;
+		margin-bottom: 8px;
+		display: block;
+	}
+
+	&__list {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		display: flex;
+		flex-wrap: wrap;
+		gap: 6px;
+		margin-bottom: 8px;
+	}
+
+	&__item {
+		display: inline-flex;
+		align-items: center;
+		padding: 4px 8px;
+		background: #dcdcde;
+		border-radius: 2px;
+		gap: 6px;
+		max-width: 100%;
+		font-size: 13px;
+		line-height: 1.4;
+
+		.components-button {
+			min-width: 20px;
+			height: 20px;
+			padding: 0;
+			flex-shrink: 0;
+		}
+	}
+
+	&__item-content {
+		display: flex;
+		flex-direction: column;
+		min-width: 0;
+	}
+
+	&__term {
+		font-weight: 500;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		color: #1e1e1e;
+	}
+
+	&__note {
+		font-size: 11px;
+		color: #757575;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		font-style: italic;
+	}
+
+	&__add {
+		margin-top: 4px;
+
+		.components-h-stack {
+			gap: 8px;
+		}
+	}
+}

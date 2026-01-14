@@ -196,3 +196,8 @@ if ( gutenberg_is_experiment_enabled( 'gutenberg-full-page-client-side-navigatio
 if ( gutenberg_is_experiment_enabled( 'gutenberg-customizable-navigation-overlays' ) ) {
 	require __DIR__ . '/experimental/overlay-patterns.php';
 }
+
+// Content Guidelines (site-level editorial voice and tone management).
+if ( gutenberg_is_experiment_enabled( 'gutenberg-content-guidelines' ) ) {
+	require __DIR__ . '/experimental/content-guidelines.php';
+}
