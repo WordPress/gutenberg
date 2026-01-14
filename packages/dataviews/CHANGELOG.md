@@ -14,6 +14,7 @@
 - Fix missing dependencies. [#74310](https://github.com/WordPress/gutenberg/pull/74310)
 - Add details layout to DataForm validation story. [#74445](https://github.com/WordPress/gutenberg/pull/74445)
 - Updated `fast-deep-equal` imports for compatibility with strict Node.js resolution ([#74530](https://github.com/WordPress/gutenberg/pull/74530))
+- Add "custom layout" story via "free form". [#74605](https://github.com/WordPress/gutenberg/pull/74605)
 
 ### Bug Fixes
 
