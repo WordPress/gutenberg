@@ -112,8 +112,7 @@ module.exports = {
 			const pascalCase = lastSegment
 				.split( '-' )
 				.map(
-					( part ) =>
-						part.charAt( 0 ).toUpperCase() + part.slice( 1 )
+					( part ) => part.charAt( 0 ).toUpperCase() + part.slice( 1 )
 				)
 				.join( '' );
 
@@ -279,7 +278,9 @@ module.exports = {
 				const attributes = node.attributes;
 
 				// Check if __next40pxDefaultSize has a truthy value
-				if ( hasTruthyAttribute( attributes, '__next40pxDefaultSize' ) ) {
+				if (
+					hasTruthyAttribute( attributes, '__next40pxDefaultSize' )
+				) {
 					return;
 				}
 

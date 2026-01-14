@@ -166,38 +166,42 @@ ruleTester.run( 'components-no-unsafe-button-disabled', rule, {
 } );
 
 // Additional tests for checkLocalImports option
-ruleTester.run( 'components-no-unsafe-button-disabled (checkLocalImports)', rule, {
-	valid: [
-		// Relative import with correct props
-		{
-			code: `
+ruleTester.run(
+	'components-no-unsafe-button-disabled (checkLocalImports)',
+	rule,
+	{
+		valid: [
+			// Relative import with correct props
+			{
+				code: `
 				import { Button } from '../button';
 				<Button disabled accessibleWhenDisabled />
 			`,
-			options: [ { checkLocalImports: true } ],
-		},
-		// Default import with correct props
-		{
-			code: `
+				options: [ { checkLocalImports: true } ],
+			},
+			// Default import with correct props
+			{
+				code: `
 				import Button from './button';
 				<Button disabled accessibleWhenDisabled />
 			`,
-			options: [ { checkLocalImports: true } ],
-		},
-		// Relative import without checkLocalImports (should not be checked)
-		{
-			code: `
+				options: [ { checkLocalImports: true } ],
+			},
+			// Relative import without checkLocalImports (should not be checked)
+			{
+				code: `
 				import { Button } from '../button';
 				<Button disabled />
 			`,
-		},
-		// Default import without checkLocalImports (should not be checked)
-		{
-			code: `
+			},
+			// Default import without checkLocalImports (should not be checked)
+			{
+				code: `
 				import Button from '../button';
 				<Button disabled />
 			`,
-		},
-	],
-	invalid: [],
-} );
+			},
+		],
+		invalid: [],
+	}
+);

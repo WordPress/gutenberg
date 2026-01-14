@@ -296,54 +296,58 @@ ruleTester.run( 'components-no-missing-40px-size-prop', rule, {
 } );
 
 // Additional tests for checkLocalImports option
-ruleTester.run( 'components-no-missing-40px-size-prop (checkLocalImports)', rule, {
-	valid: [
-		// Relative import with correct props
-		{
-			code: `
+ruleTester.run(
+	'components-no-missing-40px-size-prop (checkLocalImports)',
+	rule,
+	{
+		valid: [
+			// Relative import with correct props
+			{
+				code: `
 				import { Button } from '../button';
 				<Button __next40pxDefaultSize />
 			`,
-			options: [ { checkLocalImports: true } ],
-		},
-		// Default import with correct props
-		{
-			code: `
+				options: [ { checkLocalImports: true } ],
+			},
+			// Default import with correct props
+			{
+				code: `
 				import InputControl from './input-control';
 				<InputControl __next40pxDefaultSize />
 			`,
-			options: [ { checkLocalImports: true } ],
-		},
-		// Relative import with non-default size
-		{
-			code: `
+				options: [ { checkLocalImports: true } ],
+			},
+			// Relative import with non-default size
+			{
+				code: `
 				import { Button } from '../button';
 				<Button size="small" />
 			`,
-			options: [ { checkLocalImports: true } ],
-		},
-		// Relative import without checkLocalImports (should not be checked)
-		{
-			code: `
+				options: [ { checkLocalImports: true } ],
+			},
+			// Relative import without checkLocalImports (should not be checked)
+			{
+				code: `
 				import { Button } from '../button';
 				<Button />
 			`,
-		},
-		// Default import without checkLocalImports (should not be checked)
-		{
-			code: `
+			},
+			// Default import without checkLocalImports (should not be checked)
+			{
+				code: `
 				import InputControl from '../input-control';
 				<InputControl />
 			`,
-		},
-		// FormFileUpload relative import with render prop
-		{
-			code: `
+			},
+			// FormFileUpload relative import with render prop
+			{
+				code: `
 				import { FormFileUpload } from '../form-file-upload';
 				<FormFileUpload render={({ open }) => <button onClick={open}>Upload</button>} />
 			`,
-			options: [ { checkLocalImports: true } ],
-		},
-	],
-	invalid: [],
-} );
+				options: [ { checkLocalImports: true } ],
+			},
+		],
+		invalid: [],
+	}
+);

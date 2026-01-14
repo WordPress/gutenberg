@@ -261,7 +261,6 @@ module.exports = {
 				'no-restricted-syntax': [ 'error', ...restrictedSyntax ],
 				'@wordpress/no-unsafe-button-disabled': 'error',
 				'@wordpress/no-missing-40px-size-prop': 'error',
-
 			},
 		},
 		{
