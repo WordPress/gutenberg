@@ -21,7 +21,7 @@
  *
  * Worker thread usage:
  * ```typescript
- * import { expose } from '@wordpress/worker-threads/worker';
+ * import { expose } from '@wordpress/worker-threads';
  *
  * const api = {
  *   async processData(data: ArrayBuffer): Promise<ArrayBuffer> {
