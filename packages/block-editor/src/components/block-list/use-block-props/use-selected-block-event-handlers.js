@@ -128,15 +128,13 @@ export function useEventHandlers( { clientId, isSelected } ) {
 
 				const rect = node.getBoundingClientRect();
 
-				const clone = node.cloneNode( true );
-				clone.style.visibility = 'hidden';
-				// Maybe remove the clone now that it's relative?
-				clone.style.display = 'none';
-
-				// Remove the id and leave it on the clone so that drop target
-				// calculations are correct.
+				// Remove the id and leave it on a shallow clone so that drop
+				// target calculations are correct.
 				const id = node.id;
+				const clone = node.cloneNode();
+				clone.style.display = 'none';
 				node.id = null;
+				node.after( clone );
 
 				let _scale = 1;
 
@@ -153,8 +151,6 @@ export function useEventHandlers( { clientId, isSelected } ) {
 				}
 
 				const inverted = 1 / _scale;
-
-				node.after( clone );
 
 				const originalNodeProperties = {};
 				for ( const property of [
