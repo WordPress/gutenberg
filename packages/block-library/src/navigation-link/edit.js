@@ -102,18 +102,19 @@ const useIsDraggingWithin = ( elementRef ) => {
 };
 
 const useIsInvalidLink = ( kind, type, id, enabled ) => {
-	const isPostType =
-		kind === 'post-type' || type === 'post' || type === 'page';
+	const isPostType = kind === 'post-type';
+	const isTaxonomy = kind === 'taxonomy';
+	const isEntityLink = isPostType || isTaxonomy;
 	const hasId = Number.isInteger( id );
 	const blockEditingMode = useBlockEditingMode();
 
 	const { postStatus, isDeleted } = useSelect(
 		( select ) => {
-			if ( ! isPostType ) {
+			if ( ! isEntityLink ) {
 				return { postStatus: null, isDeleted: false };
 			}
 
-			// Fetching the posts status is an "expensive" operation. Especially for sites with large navigations.
+			// Fetching the entity status is an "expensive" operation. Especially for sites with large navigations.
 			// When the block is rendered in a template or other disabled contexts we can skip this check in order
 			// to avoid all these additional requests that don't really add any value in that mode.
 			if ( blockEditingMode === 'disabled' || ! enabled ) {
@@ -122,10 +123,20 @@ const useIsInvalidLink = ( kind, type, id, enabled ) => {
 
 			const { getEntityRecord, hasFinishedResolution } =
 				select( coreStore );
-			const entityRecord = getEntityRecord( 'postType', type, id );
+
+			// Use the correct entity type based on kind.
+			// For taxonomies, map 'tag' to 'post_tag' as that's the actual taxonomy slug.
+			const entityType = isTaxonomy ? 'taxonomy' : 'postType';
+			const entityTypeOrSlug =
+				isTaxonomy && type === 'tag' ? 'post_tag' : type;
+			const entityRecord = getEntityRecord(
+				entityType,
+				entityTypeOrSlug,
+				id
+			);
 			const hasResolved = hasFinishedResolution( 'getEntityRecord', [
-				'postType',
-				type,
+				entityType,
+				entityTypeOrSlug,
 				id,
 			] );
 
@@ -137,22 +148,22 @@ const useIsInvalidLink = ( kind, type, id, enabled ) => {
 				isDeleted: deleted,
 			};
 		},
-		[ isPostType, blockEditingMode, enabled, type, id ]
+		[ kind, isEntityLink, isTaxonomy, blockEditingMode, enabled, type, id ]
 	);
 
 	// Check Navigation Link validity if:
-	// 1. Link is 'post-type'.
+	// 1. Link is 'post-type' or 'taxonomy'.
 	// 2. It has an id.
 	// 3. It's neither null, nor undefined, as valid items might be either of those while loading.
 	// If those conditions are met, check if
-	// 1. The post status is trash (trashed).
-	// 2. The entity doesn't exist (deleted).
+	// 1. The entity doesn't exist (deleted).
+	// 2. For post types: The post status is trash (trashed).
 	// If either of those is true, invalidate.
 	const isInvalid =
-		isPostType &&
+		isEntityLink &&
 		hasId &&
-		( isDeleted || ( postStatus && 'trash' === postStatus ) );
-	const isDraft = 'draft' === postStatus;
+		( isDeleted || ( isPostType && postStatus && 'trash' === postStatus ) );
+	const isDraft = isPostType && 'draft' === postStatus;
 
 	return [ isInvalid, isDraft ];
 };
