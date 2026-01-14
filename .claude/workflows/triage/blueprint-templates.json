@@ -1,0 +1,277 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "Pre-built WordPress Playground blueprints for Gutenberg triage. Select template, customize only what's needed.",
+
+  "templates": {
+    "gutenberg-latest": {
+      "description": "Default: Latest WP + Latest Gutenberg plugin",
+      "use_when": "Most issues, general Gutenberg bugs",
+      "blueprint": {
+        "$schema": "https://playground.wordpress.net/blueprint-schema.json",
+        "landingPage": "/wp-admin/post-new.php",
+        "preferredVersions": {
+          "php": "8.2",
+          "wp": "latest"
+        },
+        "features": {
+          "networking": true
+        },
+        "steps": [
+          {
+            "step": "login",
+            "username": "admin",
+            "password": "password"
+          },
+          {
+            "step": "installPlugin",
+            "pluginData": {
+              "resource": "wordpress.org/plugins",
+              "slug": "gutenberg"
+            }
+          }
+        ]
+      }
+    },
+
+    "gutenberg-builtin": {
+      "description": "Core editor only, no Gutenberg plugin",
+      "use_when": "Issue specifies 'core only', 'no gutenberg plugin', 'built-in editor'",
+      "blueprint": {
+        "$schema": "https://playground.wordpress.net/blueprint-schema.json",
+        "landingPage": "/wp-admin/post-new.php",
+        "preferredVersions": {
+          "php": "8.2",
+          "wp": "latest"
+        },
+        "features": {
+          "networking": true
+        },
+        "steps": [
+          {
+            "step": "login",
+            "username": "admin",
+            "password": "password"
+          }
+        ]
+      }
+    },
+
+    "gutenberg-nightly": {
+      "description": "Gutenberg trunk/nightly build",
+      "use_when": "Issue mentions 'trunk', 'nightly', or testing unreleased features",
+      "blueprint": {
+        "$schema": "https://playground.wordpress.net/blueprint-schema.json",
+        "landingPage": "/wp-admin/post-new.php",
+        "preferredVersions": {
+          "php": "8.2",
+          "wp": "latest"
+        },
+        "features": {
+          "networking": true
+        },
+        "steps": [
+          {
+            "step": "login",
+            "username": "admin",
+            "password": "password"
+          },
+          {
+            "step": "installPlugin",
+            "pluginData": {
+              "resource": "url",
+              "url": "https://playground.wordpress.net/gutenberg.zip"
+            }
+          }
+        ]
+      }
+    },
+
+    "site-editor": {
+      "description": "Site Editor issues (FSE, templates, global styles)",
+      "use_when": "Issue mentions 'site editor', 'FSE', 'templates', 'global styles', 'theme.json'",
+      "blueprint": {
+        "$schema": "https://playground.wordpress.net/blueprint-schema.json",
+        "landingPage": "/wp-admin/site-editor.php",
+        "preferredVersions": {
+          "php": "8.2",
+          "wp": "latest"
+        },
+        "features": {
+          "networking": true
+        },
+        "steps": [
+          {
+            "step": "login",
+            "username": "admin",
+            "password": "password"
+          },
+          {
+            "step": "installPlugin",
+            "pluginData": {
+              "resource": "wordpress.org/plugins",
+              "slug": "gutenberg"
+            }
+          }
+        ]
+      }
+    },
+
+    "site-editor-styles": {
+      "description": "Global Styles / Additional CSS issues",
+      "use_when": "Issue mentions 'additional css', 'custom css', 'global styles panel'",
+      "blueprint": {
+        "$schema": "https://playground.wordpress.net/blueprint-schema.json",
+        "landingPage": "/wp-admin/site-editor.php?path=%2Fwp_global_styles",
+        "preferredVersions": {
+          "php": "8.2",
+          "wp": "latest"
+        },
+        "features": {
+          "networking": true
+        },
+        "steps": [
+          {
+            "step": "login",
+            "username": "admin",
+            "password": "password"
+          },
+          {
+            "step": "installPlugin",
+            "pluginData": {
+              "resource": "wordpress.org/plugins",
+              "slug": "gutenberg"
+            }
+          }
+        ]
+      }
+    },
+
+    "page-editor": {
+      "description": "Page editor issues",
+      "use_when": "Issue mentions editing pages specifically",
+      "blueprint": {
+        "$schema": "https://playground.wordpress.net/blueprint-schema.json",
+        "landingPage": "/wp-admin/post-new.php?post_type=page",
+        "preferredVersions": {
+          "php": "8.2",
+          "wp": "latest"
+        },
+        "features": {
+          "networking": true
+        },
+        "steps": [
+          {
+            "step": "login",
+            "username": "admin",
+            "password": "password"
+          },
+          {
+            "step": "installPlugin",
+            "pluginData": {
+              "resource": "wordpress.org/plugins",
+              "slug": "gutenberg"
+            }
+          }
+        ]
+      }
+    },
+
+    "classic-theme": {
+      "description": "Testing with classic (non-block) theme",
+      "use_when": "Issue mentions 'classic theme', 'non-block theme', or specific classic themes",
+      "blueprint": {
+        "$schema": "https://playground.wordpress.net/blueprint-schema.json",
+        "landingPage": "/wp-admin/post-new.php",
+        "preferredVersions": {
+          "php": "8.2",
+          "wp": "latest"
+        },
+        "features": {
+          "networking": true
+        },
+        "steps": [
+          {
+            "step": "login",
+            "username": "admin",
+            "password": "password"
+          },
+          {
+            "step": "installPlugin",
+            "pluginData": {
+              "resource": "wordpress.org/plugins",
+              "slug": "gutenberg"
+            }
+          },
+          {
+            "step": "installTheme",
+            "themeData": {
+              "resource": "wordpress.org/themes",
+              "slug": "flavor"
+            }
+          },
+          {
+            "step": "activateTheme",
+            "themeFolderName": "flavor"
+          }
+        ]
+      }
+    },
+
+    "with-test-post": {
+      "description": "Pre-created test post for editing scenarios",
+      "use_when": "Issue requires editing an existing post",
+      "blueprint": {
+        "$schema": "https://playground.wordpress.net/blueprint-schema.json",
+        "landingPage": "/wp-admin/edit.php",
+        "preferredVersions": {
+          "php": "8.2",
+          "wp": "latest"
+        },
+        "features": {
+          "networking": true
+        },
+        "steps": [
+          {
+            "step": "login",
+            "username": "admin",
+            "password": "password"
+          },
+          {
+            "step": "installPlugin",
+            "pluginData": {
+              "resource": "wordpress.org/plugins",
+              "slug": "gutenberg"
+            }
+          },
+          {
+            "step": "runPHP",
+            "code": "<?php require '/wordpress/wp-load.php'; wp_insert_post(['post_title' => 'Test Post', 'post_content' => '<!-- wp:paragraph --><p>Test content for reproduction.</p><!-- /wp:paragraph -->', 'post_status' => 'publish']); ?>"
+          }
+        ]
+      }
+    }
+  },
+
+  "customization_rules": {
+    "wp_version": {
+      "description": "Override wp version in preferredVersions",
+      "examples": ["6.7", "6.6", "nightly", "latest"]
+    },
+    "gutenberg_version": {
+      "description": "Replace installPlugin step with specific version",
+      "pattern": "https://downloads.wordpress.org/plugin/gutenberg.{VERSION}.zip"
+    },
+    "landing_page": {
+      "description": "Override landingPage based on first reproduction step",
+      "common_pages": {
+        "site_editor": "/wp-admin/site-editor.php",
+        "post_new": "/wp-admin/post-new.php",
+        "page_new": "/wp-admin/post-new.php?post_type=page",
+        "patterns": "/wp-admin/site-editor.php?postType=wp_block",
+        "navigation": "/wp-admin/site-editor.php?postType=wp_navigation",
+        "styles": "/wp-admin/site-editor.php?path=%2Fwp_global_styles",
+        "additional_css": "/wp-admin/site-editor.php?path=%2Fwp_global_styles&section=additional-css"
+      }
+    }
+  }
+}
