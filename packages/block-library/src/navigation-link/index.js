@@ -107,11 +107,11 @@ if ( window.__experimentalContentOnlyInspectorFields ) {
 			type: 'url',
 			Edit: 'link',
 			getValue: ( { item } ) => ( {
-				url: item.href,
+				href: item.url,
 				rel: item.rel,
 			} ),
 			setValue: ( { value } ) => ( {
-				href: value.url,
+				url: value.href,
 				rel: value.rel,
 			} ),
 		},
