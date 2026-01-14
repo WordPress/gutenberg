@@ -149,6 +149,8 @@ export default function EditorInterface( {
 	}, [ revisions ] );
 
 	const selectedRevision = sortedRevisions[ selectedRevisionIndex ] || null;
+	const previousRevision =
+		sortedRevisions[ selectedRevisionIndex + 1 ] || null;
 
 	const handleSelectRevisionIndex = useCallback( ( index ) => {
 		setSelectedRevisionIndex( index );
@@ -184,7 +186,12 @@ export default function EditorInterface( {
 						isLoading={ isRevisionsLoading }
 					/>
 				}
-				content={ <RevisionsCanvas revision={ selectedRevision } /> }
+				content={
+					<RevisionsCanvas
+						revision={ selectedRevision }
+						previousRevision={ previousRevision }
+					/>
+				}
 			/>
 		);
 	}
