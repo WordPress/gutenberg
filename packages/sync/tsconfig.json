@@ -5,6 +5,7 @@
 		"types": [ "node" ],
 		"moduleResolution": "node"
 	},
+	"exclude": [ "src/y-utilities/y-multidoc-undomanager.js" ],
 	"references": [
 		{ "path": "../hooks" },
 		{ "path": "../undo-manager" },
