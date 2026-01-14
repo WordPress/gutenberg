@@ -3,7 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { PanelBody } from '@wordpress/components';
-import { warning, info } from '@wordpress/icons';
+import { caution, info } from '@wordpress/icons';
 
 /**
  * Lint panel component.
@@ -22,22 +22,22 @@ export default function LintPanel( { results } ) {
 	const hasSuggestions = suggestions.length > 0;
 
 	const title = hasIssues
-		? __( 'Lint Checks', 'content-guidelines' ) +
+		? __( 'Lint Checks' ) +
 		  ` (${ issues.length } ${ issues.length === 1 ? 'issue' : 'issues' })`
-		: __( 'Lint Checks', 'content-guidelines' );
+		: __( 'Lint Checks' );
 
 	return (
 		<PanelBody title={ title } initialOpen={ hasIssues }>
 			{ ! hasIssues && ! hasSuggestions && (
 				<p className="content-guidelines-lint__success">
-					{ __( 'No issues found.', 'content-guidelines' ) }
+					{ __( 'No issues found.' ) }
 				</p>
 			) }
 
 			{ hasIssues && (
 				<div className="content-guidelines-lint__issues">
 					<h4 className="content-guidelines-lint__section-title">
-						{ __( 'Issues', 'content-guidelines' ) }
+						{ __( 'Issues' ) }
 					</h4>
 					<ul className="content-guidelines-lint__list">
 						{ issues.map( ( issue, index ) => (
@@ -67,7 +67,7 @@ export default function LintPanel( { results } ) {
 			{ hasSuggestions && (
 				<div className="content-guidelines-lint__suggestions">
 					<h4 className="content-guidelines-lint__section-title">
-						{ __( 'Suggestions', 'content-guidelines' ) }
+						{ __( 'Suggestions' ) }
 					</h4>
 					<ul className="content-guidelines-lint__list">
 						{ suggestions.map( ( suggestion, index ) => (
@@ -97,26 +97,24 @@ export default function LintPanel( { results } ) {
 			{ stats && Object.keys( stats ).length > 0 && (
 				<div className="content-guidelines-lint__stats">
 					<h4 className="content-guidelines-lint__section-title">
-						{ __( 'Stats', 'content-guidelines' ) }
+						{ __( 'Stats' ) }
 					</h4>
 					<dl className="content-guidelines-lint__stats-list">
 						{ stats.word_count !== undefined && (
 							<>
-								<dt>{ __( 'Words', 'content-guidelines' ) }</dt>
+								<dt>{ __( 'Words' ) }</dt>
 								<dd>{ stats.word_count }</dd>
 							</>
 						) }
 						{ stats.sentence_count !== undefined && (
 							<>
-								<dt>{ __( 'Sentences', 'content-guidelines' ) }</dt>
+								<dt>{ __( 'Sentences' ) }</dt>
 								<dd>{ stats.sentence_count }</dd>
 							</>
 						) }
 						{ stats.avg_words_per_sentence !== undefined && (
 							<>
-								<dt>
-									{ __( 'Avg. words/sentence', 'content-guidelines' ) }
-								</dt>
+								<dt>{ __( 'Avg. words/sentence' ) }</dt>
 								<dd>{ stats.avg_words_per_sentence }</dd>
 							</>
 						) }

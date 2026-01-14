@@ -20,20 +20,20 @@ import './style.scss';
 /**
  * TermNoteControl - Renders a list of {term, note} objects with add/remove.
  *
- * @param {Object}   props               Component props.
- * @param {string}   props.label         Label for the control.
- * @param {Array}    props.items         Array of {term, note} objects.
- * @param {Function} props.onChange      Callback when items change.
- * @param {string}   props.termPlaceholder   Placeholder for term input.
- * @param {string}   props.notePlaceholder   Placeholder for note input.
+ * @param {Object}   props                 Component props.
+ * @param {string}   props.label           Label for the control.
+ * @param {Array}    props.items           Array of {term, note} objects.
+ * @param {Function} props.onChange        Callback when items change.
+ * @param {string}   props.termPlaceholder Placeholder for term input.
+ * @param {string}   props.notePlaceholder Placeholder for note input.
  * @return {JSX.Element} TermNoteControl component.
  */
 export default function TermNoteControl( {
 	label,
 	items = [],
 	onChange,
-	termPlaceholder = __( 'Term', 'content-guidelines' ),
-	notePlaceholder = __( 'Why? (optional)', 'content-guidelines' ),
+	termPlaceholder = __( 'Term' ),
+	notePlaceholder = __( 'Why? (optional)' ),
 } ) {
 	const [ newTerm, setNewTerm ] = useState( '' );
 	const [ newNote, setNewNote ] = useState( '' );
@@ -97,7 +97,7 @@ export default function TermNoteControl( {
 								size="small"
 								isDestructive
 								onClick={ () => handleRemove( index ) }
-								label={ __( 'Remove', 'content-guidelines' ) }
+								label={ __( 'Remove' ) }
 							/>
 						</li>
 					) ) }
@@ -129,7 +129,7 @@ export default function TermNoteControl( {
 						variant="secondary"
 						onClick={ handleAdd }
 						disabled={ ! newTerm.trim() }
-						label={ __( 'Add', 'content-guidelines' ) }
+						label={ __( 'Add' ) }
 					/>
 				</HStack>
 			</div>

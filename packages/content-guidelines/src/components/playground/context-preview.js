@@ -26,58 +26,52 @@ export default function ContextPreview( { packet } ) {
 	}
 
 	return (
-		<PanelBody
-			title={ __( 'Context Preview', 'content-guidelines' ) }
-			initialOpen={ false }
-		>
+		<PanelBody title={ __( 'Context Preview' ) } initialOpen={ false }>
 			<div className="content-guidelines-context-preview">
 				<p className="content-guidelines-context-preview__description">
-					{ __(
-						'This is what would be sent to AI as context:',
-						'content-guidelines'
-					) }
+					{ __( 'This is what would be sent to AI as context:' ) }
 				</p>
 
 				<div className="content-guidelines-context-preview__meta">
 					{ packet.guidelines_id && (
 						<span>
-							{ __( 'Guidelines ID:', 'content-guidelines' ) }{ ' ' }
-							{ packet.guidelines_id }
+							{ __( 'Guidelines ID:' ) } { packet.guidelines_id }
 						</span>
 					) }
 					{ packet.revision_id && (
 						<span>
-							{ __( 'Revision:', 'content-guidelines' ) }{ ' ' }
-							{ packet.revision_id }
+							{ __( 'Revision:' ) } { packet.revision_id }
 						</span>
 					) }
 					{ packet.updated_at && (
 						<span>
-							{ __( 'Updated:', 'content-guidelines' ) }{ ' ' }
-							{ new Date( packet.updated_at ).toLocaleDateString() }
+							{ __( 'Updated:' ) }{ ' ' }
+							{ new Date(
+								packet.updated_at
+							).toLocaleDateString() }
 						</span>
 					) }
 				</div>
 
 				<pre className="content-guidelines-context-preview__text">
-					{ packet.packet_text || __( '(Empty)', 'content-guidelines' ) }
+					{ packet.packet_text || __( '(Empty)' ) }
 				</pre>
 
 				<div className="content-guidelines-context-preview__actions">
 					<Button ref={ copyRef } variant="secondary" size="small">
-						{ copied
-							? __( 'Copied!', 'content-guidelines' )
-							: __( 'Copy', 'content-guidelines' ) }
+						{ copied ? __( 'Copied!' ) : __( 'Copy' ) }
 					</Button>
 				</div>
 
 				{ packet.packet_structured && (
 					<details className="content-guidelines-context-preview__structured">
-						<summary>
-							{ __( 'Structured data', 'content-guidelines' ) }
-						</summary>
+						<summary>{ __( 'Structured data' ) }</summary>
 						<pre>
-							{ JSON.stringify( packet.packet_structured, null, 2 ) }
+							{ JSON.stringify(
+								packet.packet_structured,
+								null,
+								2
+							) }
 						</pre>
 					</details>
 				) }

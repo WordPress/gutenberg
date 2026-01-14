@@ -4,7 +4,7 @@
  * Site-level editorial guidelines for WordPress. While Global Styles define how
  * your site looks, Content Guidelines define how your site sounds.
  *
- * @package @wordpress/content-guidelines
+ * @package
  */
 
 /**
@@ -27,13 +27,21 @@ export { default as GuidelinesPage } from './components/guidelines-page';
 export { default as LibraryPanel } from './components/library-panel';
 export { default as BlocksPanel } from './components/blocks-panel';
 export { default as Playground } from './components/playground';
+export { default as ImportExport } from './components/import-export';
+export { default as HistoryPanel } from './components/history';
 
 /**
  * Export store name for data integration.
  */
-export { STORE_NAME } from './store';
+export { STORE_NAME, ENTITY_KIND, ENTITY_NAME, ENTITY_ID } from './store';
 
 /**
  * Export store for direct registration if needed.
  */
 export { store } from './store';
+
+/**
+ * Export the useGuidelines hook for canonical core-data access.
+ * This is the recommended way to interact with content guidelines.
+ */
+export { useGuidelines } from './hooks';

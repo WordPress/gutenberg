@@ -35,7 +35,8 @@ class REST_Controller {
 	 * Register REST API routes.
 	 */
 	public static function register_routes() {
-		// Get guidelines (active + draft + metadata).
+		// Get/Update guidelines (active + draft + metadata).
+		// PUT/POST is used by core-data's saveEditedEntityRecord for SaveHub integration.
 		register_rest_route(
 			self::REST_NAMESPACE,
 			'/' . self::REST_BASE,
@@ -44,6 +45,54 @@ class REST_Controller {
 					'methods'             => \WP_REST_Server::READABLE,
 					'callback'            => array( __CLASS__, 'get_guidelines' ),
 					'permission_callback' => array( __CLASS__, 'can_view' ),
+				),
+				array(
+					'methods'             => \WP_REST_Server::EDITABLE,
+					'callback'            => array( __CLASS__, 'save_and_publish' ),
+					'permission_callback' => array( __CLASS__, 'can_edit' ),
+					'args'                => array(
+						'guidelines' => array(
+							'type'              => 'object',
+							'sanitize_callback' => array( Post_Type::class, 'sanitize_guidelines' ),
+						),
+					),
+				),
+			)
+		);
+
+		// Entity record endpoint - core-data fetches from baseURL/{id}.
+		// This route supports the canonical pattern used by useEntityRecord.
+		// Only matches 'current' to avoid conflicts with other routes like /draft, /publish.
+		register_rest_route(
+			self::REST_NAMESPACE,
+			'/' . self::REST_BASE . '/(?P<id>current)',
+			array(
+				array(
+					'methods'             => \WP_REST_Server::READABLE,
+					'callback'            => array( __CLASS__, 'get_guidelines' ),
+					'permission_callback' => array( __CLASS__, 'can_view' ),
+					'args'                => array(
+						'id' => array(
+							'type'              => 'string',
+							'sanitize_callback' => 'sanitize_text_field',
+							'description'       => 'Entity record ID (always "current" for guidelines).',
+						),
+					),
+				),
+				array(
+					'methods'             => \WP_REST_Server::EDITABLE,
+					'callback'            => array( __CLASS__, 'save_and_publish' ),
+					'permission_callback' => array( __CLASS__, 'can_edit' ),
+					'args'                => array(
+						'id'         => array(
+							'type'              => 'string',
+							'sanitize_callback' => 'sanitize_text_field',
+						),
+						'guidelines' => array(
+							'type'              => 'object',
+							'sanitize_callback' => array( Post_Type::class, 'sanitize_guidelines' ),
+						),
+					),
 				),
 			)
 		);
@@ -291,15 +340,21 @@ class REST_Controller {
 	}
 
 	/**
-	 * Get guidelines (active + draft + metadata).
+	 * Get guidelines as a core-data entity record.
+	 *
+	 * Returns the guidelines in entity format for direct use with
+	 * core-data's useEntityRecord hook.
 	 *
 	 * @param \WP_REST_Request $request The request object.
 	 * @return \WP_REST_Response|\WP_Error Response or error.
 	 */
 	public static function get_guidelines( $request ) {
-		$post   = Post_Type::get_guidelines_post();
-		$active = Post_Type::get_active_guidelines();
-		$draft  = Post_Type::get_draft_guidelines();
+		$post       = Post_Type::get_guidelines_post();
+		$guidelines = Post_Type::get_active_guidelines();
+
+		if ( ! $guidelines ) {
+			$guidelines = Post_Type::get_default_guidelines();
+		}
 
 		$revision_count = 0;
 		if ( $post ) {
@@ -311,10 +366,20 @@ class REST_Controller {
 			}
 		}
 
+		// Build entity record with guidelines sections as top-level properties
 		$response = array(
-			'active'         => $active ? $active : Post_Type::get_default_guidelines(),
-			'draft'          => $draft,
-			'has_draft'      => ! empty( $draft ),
+			'id'             => 'current',
+			// Guidelines sections (flattened)
+			'brand_context'  => isset( $guidelines['brand_context'] ) ? $guidelines['brand_context'] : array(),
+			'voice_tone'     => isset( $guidelines['voice_tone'] ) ? $guidelines['voice_tone'] : array(),
+			'copy_rules'     => isset( $guidelines['copy_rules'] ) ? $guidelines['copy_rules'] : array(),
+			'vocabulary'     => isset( $guidelines['vocabulary'] ) ? $guidelines['vocabulary'] : array(),
+			'heuristics'     => isset( $guidelines['heuristics'] ) ? $guidelines['heuristics'] : array(),
+			'references'     => isset( $guidelines['references'] ) ? $guidelines['references'] : array(),
+			'images'         => isset( $guidelines['images'] ) ? $guidelines['images'] : array(),
+			'notes'          => isset( $guidelines['notes'] ) ? $guidelines['notes'] : '',
+			'blocks'         => isset( $guidelines['blocks'] ) ? $guidelines['blocks'] : array(),
+			// Metadata
 			'post_id'        => $post ? $post->ID : null,
 			'updated_at'     => $post ? $post->post_modified_gmt : null,
 			'revision_count' => $revision_count,
@@ -343,6 +408,52 @@ class REST_Controller {
 				'message' => __( 'Draft saved.', 'content-guidelines' ),
 			)
 		);
+	}
+
+	/**
+	 * Save guidelines directly (canonical core-data pattern).
+	 *
+	 * This endpoint is called by core-data's saveEditedEntityRecord
+	 * when the user clicks "Save" in the SaveHub. It receives the
+	 * full entity record and saves it directly.
+	 *
+	 * @param \WP_REST_Request $request The request object.
+	 * @return \WP_REST_Response|\WP_Error Response or error.
+	 */
+	public static function save_and_publish( $request ) {
+		$params = $request->get_json_params();
+
+		// Extract guidelines sections from the entity record
+		$guidelines = array(
+			'brand_context' => isset( $params['brand_context'] ) ? $params['brand_context'] : array(),
+			'voice_tone'    => isset( $params['voice_tone'] ) ? $params['voice_tone'] : array(),
+			'copy_rules'    => isset( $params['copy_rules'] ) ? $params['copy_rules'] : array(),
+			'vocabulary'    => isset( $params['vocabulary'] ) ? $params['vocabulary'] : array(),
+			'heuristics'    => isset( $params['heuristics'] ) ? $params['heuristics'] : array(),
+			'references'    => isset( $params['references'] ) ? $params['references'] : array(),
+			'images'        => isset( $params['images'] ) ? $params['images'] : array(),
+			'notes'         => isset( $params['notes'] ) ? $params['notes'] : '',
+			'blocks'        => isset( $params['blocks'] ) ? $params['blocks'] : array(),
+		);
+
+		// Sanitize the guidelines
+		$guidelines = Post_Type::sanitize_guidelines( $guidelines );
+
+		// Save directly to post content (creates revision automatically)
+		$result = Post_Type::save_guidelines( $guidelines );
+
+		if ( is_wp_error( $result ) ) {
+			return $result;
+		}
+
+		// Clear any legacy draft meta
+		$post = Post_Type::get_guidelines_post();
+		if ( $post ) {
+			delete_post_meta( $post->ID, '_wp_content_guidelines_draft' );
+		}
+
+		// Return the saved entity record
+		return self::get_guidelines( $request );
 	}
 
 	/**
@@ -420,11 +531,13 @@ class REST_Controller {
 				$date_mysql     = $date_gmt_mysql ? get_date_from_gmt( $date_gmt_mysql ) : '';
 				$date           = $date_mysql ? mysql_to_rfc3339( $date_mysql ) : '';
 
+				$author_id = ! empty( $entry['author_id'] ) ? absint( $entry['author_id'] ) : 0;
 				$items[] = array(
 					'id'          => absint( $entry['id'] ),
 					'author'      => array(
-						'id'   => ! empty( $entry['author_id'] ) ? absint( $entry['author_id'] ) : 0,
-						'name' => $author ? $author->display_name : __( 'Unknown', 'content-guidelines' ),
+						'id'     => $author_id,
+						'name'   => $author ? $author->display_name : __( 'Unknown', 'content-guidelines' ),
+						'avatar' => get_avatar_url( $author_id, array( 'size' => 48, 'default' => 'mystery' ) ),
 					),
 					'date'        => $date,
 					'date_gmt'    => $date_gmt,
@@ -452,8 +565,9 @@ class REST_Controller {
 		$items[] = array(
 			'id'          => $post->ID,
 			'author'      => array(
-				'id'   => absint( $post->post_author ),
-				'name' => $author ? $author->display_name : __( 'Unknown', 'content-guidelines' ),
+				'id'     => absint( $post->post_author ),
+				'name'   => $author ? $author->display_name : __( 'Unknown', 'content-guidelines' ),
+				'avatar' => get_avatar_url( $post->post_author, array( 'size' => 48, 'default' => 'mystery' ) ),
 			),
 			'date'        => mysql_to_rfc3339( $post->post_modified ),
 			'date_gmt'    => mysql_to_rfc3339( $post->post_modified_gmt ),
@@ -467,8 +581,9 @@ class REST_Controller {
 			$items[] = array(
 				'id'          => $revision->ID,
 				'author'      => array(
-					'id'   => $revision->post_author,
-					'name' => $author ? $author->display_name : __( 'Unknown', 'content-guidelines' ),
+					'id'     => $revision->post_author,
+					'name'   => $author ? $author->display_name : __( 'Unknown', 'content-guidelines' ),
+					'avatar' => get_avatar_url( $revision->post_author, array( 'size' => 48, 'default' => 'mystery' ) ),
 				),
 				'date'        => mysql_to_rfc3339( $revision->post_date ),
 				'date_gmt'    => mysql_to_rfc3339( $revision->post_date_gmt ),

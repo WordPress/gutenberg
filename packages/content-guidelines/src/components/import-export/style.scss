@@ -1,26 +1,22 @@
-.import-export-panel {
-	max-width: 480px;
-	margin: 0 auto;
+/**
+ * Import/Export Styles
+ *
+ * Matches the Playground card design pattern.
+ */
+
+.content-guidelines-import-export {
 	padding: 24px;
+	min-width: 400px;
+	max-width: 640px;
+	width: 100%;
+	margin: 24px auto;
+	box-sizing: border-box;
+	border: 1px solid #e0e0e0;
+	border-radius: 2px;
+}
 
-	&__title {
-		font-size: 20px;
-		font-weight: 500;
-	}
-
-	&__section {
-		padding: 20px;
-		background: #f9f9f9;
-		border-radius: 4px;
-	}
-
-	&__section-title {
-		font-size: 14px;
-		font-weight: 500;
-		margin-bottom: 4px;
-	}
-
-	&__section-desc {
-		font-size: 13px;
-	}
+.content-guidelines-import-export__section {
+	padding: 20px;
+	background: #f6f7f7;
+	border-radius: 4px;
 }

@@ -21,16 +21,12 @@ import SidebarNavigationScreen from '../sidebar-navigation-screen';
 import SidebarNavigationItem from '../sidebar-navigation-item';
 import { SidebarNavigationItemGlobalStyles } from '../sidebar-navigation-screen-global-styles';
 
-export function MainSidebarNavigationContent( { isBlockBasedTheme = true } ) {
-	// Check if Content Guidelines experiment is enabled.
-	const isContentGuidelinesEnabled = useSelect( ( select ) => {
-		const settings = select( coreStore ).getEntityRecord(
-			'root',
-			'__unstableBase'
-		);
-		return settings?.contentGuidelinesEnabled ?? false;
-	}, [] );
+// Check if Content Guidelines experiment is enabled via window global.
+const isContentGuidelinesEnabled =
+	typeof window !== 'undefined' &&
+	window.__experimentalEnableContentGuidelines === true;
 
+export function MainSidebarNavigationContent( { isBlockBasedTheme = true } ) {
 	return (
 		<ItemGroup className="edit-site-sidebar-navigation-screen-main">
 			{ isBlockBasedTheme && (

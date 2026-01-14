@@ -4,7 +4,7 @@
  * This entry point is enqueued across the entire WordPress admin
  * to register Content Guidelines commands in the admin-wide Command Palette.
  *
- * @package ContentGuidelines
+ * @package
  * @since 0.2.0
  */
 

@@ -2,19 +2,16 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useSelect, useDispatch } from '@wordpress/data';
-import { useState, useEffect } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 import {
 	Navigator,
 	useNavigator,
 	Button,
-	Spinner,
 	__experimentalVStack as VStack,
 	__experimentalHStack as HStack,
 	__experimentalHeading as Heading,
 	__experimentalSpacer as Spacer,
 	__experimentalText as Text,
-	__experimentalNumberControl as NumberControl,
 	Flex,
 	FlexItem,
 	TextareaControl,
@@ -29,7 +26,7 @@ import { isRTL } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { STORE_NAME } from '../../store';
+import { useGuidelines } from '../../hooks';
 import RepeaterControl from '../controls/repeater-control';
 import TermNoteControl from '../controls/term-note-control';
 import './style.scss';
@@ -40,43 +37,45 @@ import './style.scss';
 const SECTIONS = [
 	{
 		id: 'brand_context',
-		title: __( 'Brand & site context', 'content-guidelines' ),
-		description: __( 'Define what your site is about and who it serves.', 'content-guidelines' ),
+		title: __( 'Brand & site context' ),
+		description: __( 'Define what your site is about and who it serves.' ),
 	},
 	{
 		id: 'voice_tone',
-		title: __( 'Voice & tone', 'content-guidelines' ),
-		description: __( 'Set the personality and emotional feel of your content.', 'content-guidelines' ),
+		title: __( 'Voice & tone' ),
+		description: __(
+			'Set the personality and emotional feel of your content.'
+		),
 	},
 	{
 		id: 'copy_rules',
-		title: __( 'Copy rules', 'content-guidelines' ),
-		description: __( 'Specific dos and don\'ts for writing.', 'content-guidelines' ),
+		title: __( 'Copy rules' ),
+		description: __( "Specific dos and don'ts for writing." ),
 	},
 	{
 		id: 'vocabulary',
-		title: __( 'Vocabulary', 'content-guidelines' ),
-		description: __( 'Preferred terms and words to avoid.', 'content-guidelines' ),
+		title: __( 'Vocabulary' ),
+		description: __( 'Preferred terms and words to avoid.' ),
 	},
 	{
 		id: 'heuristics',
-		title: __( 'Heuristics', 'content-guidelines' ),
-		description: __( 'Target metrics for sentence length and structure.', 'content-guidelines' ),
+		title: __( 'Heuristics' ),
+		description: __( 'Target metrics for sentence length and structure.' ),
 	},
 	{
 		id: 'references',
-		title: __( 'References', 'content-guidelines' ),
-		description: __( 'Websites and content you want to emulate.', 'content-guidelines' ),
+		title: __( 'References' ),
+		description: __( 'Websites and content you want to emulate.' ),
 	},
 	{
 		id: 'images',
-		title: __( 'Images', 'content-guidelines' ),
-		description: __( 'Guidelines for image selection and alt text.', 'content-guidelines' ),
+		title: __( 'Images' ),
+		description: __( 'Guidelines for image selection and alt text.' ),
 	},
 	{
 		id: 'notes',
-		title: __( 'Additional notes', 'content-guidelines' ),
-		description: __( 'Any other guidelines or context.', 'content-guidelines' ),
+		title: __( 'Additional notes' ),
+		description: __( 'Any other guidelines or context.' ),
 	},
 ];
 
@@ -84,21 +83,33 @@ const SECTIONS = [
  * Goal options.
  */
 const GOAL_OPTIONS = [
-	{ value: '', label: __( 'Select a goal...', 'content-guidelines' ) },
-	{ value: 'subscribe', label: __( 'Get email subscribers', 'content-guidelines' ) },
-	{ value: 'sell', label: __( 'Sell products/services', 'content-guidelines' ) },
-	{ value: 'inform', label: __( 'Inform and educate', 'content-guidelines' ) },
-	{ value: 'community', label: __( 'Build community', 'content-guidelines' ) },
-	{ value: 'other', label: __( 'Other', 'content-guidelines' ) },
+	{ value: '', label: __( 'Select a goal…' ) },
+	{
+		value: 'subscribe',
+		label: __( 'Get email subscribers' ),
+	},
+	{
+		value: 'sell',
+		label: __( 'Sell products/services' ),
+	},
+	{
+		value: 'inform',
+		label: __( 'Inform and educate' ),
+	},
+	{
+		value: 'community',
+		label: __( 'Build community' ),
+	},
+	{ value: 'other', label: __( 'Other' ) },
 ];
 
 /**
  * Section card component.
  *
- * @param {Object}   props             Component props.
- * @param {Object}   props.section     Section definition.
- * @param {string}   props.statusText  Status text.
- * @param {Function} props.onClick     Click handler.
+ * @param {Object}   props            Component props.
+ * @param {Object}   props.section    Section definition.
+ * @param {string}   props.statusText Status text.
+ * @param {Function} props.onClick    Click handler.
  * @return {JSX.Element} Section card.
  */
 function SectionCard( { section, statusText, onClick } ) {
@@ -123,7 +134,10 @@ function SectionCard( { section, statusText, onClick } ) {
 						<Text className="library-panel__section-title">
 							{ section.title }
 						</Text>
-						<Text className="library-panel__section-description" variant="muted">
+						<Text
+							className="library-panel__section-description"
+							variant="muted"
+						>
 							{ section.description }
 						</Text>
 					</VStack>
@@ -131,7 +145,10 @@ function SectionCard( { section, statusText, onClick } ) {
 				<Flex justify="flex-end" gap={ 2 }>
 					{ statusText && (
 						<FlexItem>
-							<Text className="library-panel__section-status" variant="muted">
+							<Text
+								className="library-panel__section-status"
+								variant="muted"
+							>
 								{ statusText }
 							</Text>
 						</FlexItem>
@@ -191,12 +208,15 @@ function analyzeText( text ) {
 		wordCount: words.length,
 		sentenceCount: sentences.length,
 		paragraphCount: paragraphs.length,
-		avgWordsPerSentence: sentences.length > 0
-			? Math.round( ( words.length / sentences.length ) * 10 ) / 10
-			: 0,
-		avgSentencesPerParagraph: paragraphs.length > 0
-			? Math.round( ( sentences.length / paragraphs.length ) * 10 ) / 10
-			: 0,
+		avgWordsPerSentence:
+			sentences.length > 0
+				? Math.round( ( words.length / sentences.length ) * 10 ) / 10
+				: 0,
+		avgSentencesPerParagraph:
+			paragraphs.length > 0
+				? Math.round( ( sentences.length / paragraphs.length ) * 10 ) /
+				  10
+				: 0,
 	};
 }
 
@@ -223,18 +243,33 @@ function HeuristicsContent( { sectionData, onChange } ) {
 
 			if ( posts && posts.length > 0 ) {
 				const analyses = posts
-					.map( ( post ) => analyzeText( post.content?.rendered || '' ) )
+					.map( ( post ) =>
+						analyzeText( post.content?.rendered || '' )
+					)
 					.filter( Boolean );
 
 				if ( analyses.length > 0 ) {
 					const avgWords = Math.round(
-						analyses.reduce( ( sum, a ) => sum + a.avgWordsPerSentence, 0 ) / analyses.length
+						analyses.reduce(
+							( sum, a ) => sum + a.avgWordsPerSentence,
+							0
+						) / analyses.length
 					);
-					const avgSentences = Math.round(
-						analyses.reduce( ( sum, a ) => sum + a.avgSentencesPerParagraph, 0 ) / analyses.length * 10
-					) / 10;
+					const avgSentences =
+						Math.round(
+							( analyses.reduce(
+								( sum, a ) => sum + a.avgSentencesPerParagraph,
+								0
+							) /
+								analyses.length ) *
+								10
+						) / 10;
 
-					setAnalysisResult( { avgWords, avgSentences, postCount: analyses.length } );
+					setAnalysisResult( {
+						avgWords,
+						avgSentences,
+						postCount: analyses.length,
+					} );
 				}
 			}
 		} catch ( err ) {
@@ -259,18 +294,28 @@ function HeuristicsContent( { sectionData, onChange } ) {
 			<TextControl
 				__nextHasNoMarginBottom
 				type="number"
-				label={ __( 'Target words per sentence', 'content-guidelines' ) }
+				label={ __( 'Target words per sentence' ) }
 				value={ sectionData.words_per_sentence || '' }
-				onChange={ ( value ) => onChange( 'words_per_sentence', value ? parseInt( value, 10 ) : '' ) }
+				onChange={ ( value ) =>
+					onChange(
+						'words_per_sentence',
+						value ? parseInt( value, 10 ) : ''
+					)
+				}
 				min={ 1 }
 				max={ 50 }
 			/>
 			<TextControl
 				__nextHasNoMarginBottom
 				type="number"
-				label={ __( 'Target sentences per paragraph', 'content-guidelines' ) }
+				label={ __( 'Target sentences per paragraph' ) }
 				value={ sectionData.sentences_per_paragraph || '' }
-				onChange={ ( value ) => onChange( 'sentences_per_paragraph', value ? parseFloat( value ) : '' ) }
+				onChange={ ( value ) =>
+					onChange(
+						'sentences_per_paragraph',
+						value ? parseFloat( value ) : ''
+					)
+				}
 				min={ 1 }
 				max={ 20 }
 				step={ 0.5 }
@@ -278,55 +323,86 @@ function HeuristicsContent( { sectionData, onChange } ) {
 			<TextControl
 				__nextHasNoMarginBottom
 				type="number"
-				label={ __( 'Target paragraphs per section', 'content-guidelines' ) }
+				label={ __( 'Target paragraphs per section' ) }
 				value={ sectionData.paragraphs_per_section || '' }
-				onChange={ ( value ) => onChange( 'paragraphs_per_section', value ? parseInt( value, 10 ) : '' ) }
+				onChange={ ( value ) =>
+					onChange(
+						'paragraphs_per_section',
+						value ? parseInt( value, 10 ) : ''
+					)
+				}
 				min={ 1 }
 				max={ 20 }
 			/>
 
 			<div className="library-panel__divider">
 				<span className="library-panel__divider-text">
-					{ __( 'Reading level', 'content-guidelines' ) }
+					{ __( 'Reading level' ) }
 				</span>
 			</div>
 
 			<SelectControl
 				__nextHasNoMarginBottom
-				label={ __( 'Target reading level', 'content-guidelines' ) }
+				label={ __( 'Target reading level' ) }
 				value={ sectionData.reading_level || '' }
 				options={ [
-					{ value: '', label: __( 'Not specified', 'content-guidelines' ) },
-					{ value: 'simple', label: __( 'Simple (grade 6-8)', 'content-guidelines' ) },
-					{ value: 'standard', label: __( 'Standard (grade 9-12)', 'content-guidelines' ) },
-					{ value: 'advanced', label: __( 'Advanced (college+)', 'content-guidelines' ) },
-					{ value: 'custom', label: __( 'Custom', 'content-guidelines' ) },
+					{
+						value: '',
+						label: __( 'Not specified' ),
+					},
+					{
+						value: 'simple',
+						label: __( 'Simple (grade 6–8)' ),
+					},
+					{
+						value: 'standard',
+						label: __( 'Standard (grade 9–12)' ),
+					},
+					{
+						value: 'advanced',
+						label: __( 'Advanced (college+)' ),
+					},
+					{
+						value: 'custom',
+						label: __( 'Custom' ),
+					},
 				] }
 				onChange={ ( value ) => onChange( 'reading_level', value ) }
 			/>
 			{ isCustomReadingLevel && (
 				<TextControl
 					__nextHasNoMarginBottom
-					label={ __( 'Custom reading level', 'content-guidelines' ) }
+					label={ __( 'Custom reading level' ) }
 					value={ sectionData.reading_level_custom || '' }
-					onChange={ ( value ) => onChange( 'reading_level_custom', value ) }
-					placeholder={ __( 'e.g., Technical professionals, Medical audience', 'content-guidelines' ) }
+					onChange={ ( value ) =>
+						onChange( 'reading_level_custom', value )
+					}
+					placeholder={ __(
+						'e.g., Technical professionals, Medical audience'
+					) }
 				/>
 			) }
 			<TextControl
 				__nextHasNoMarginBottom
 				type="number"
-				label={ __( 'Maximum word length (syllables)', 'content-guidelines' ) }
-				help={ __( 'Prefer words with fewer syllables for simpler reading.', 'content-guidelines' ) }
+				label={ __( 'Maximum word length (syllables)' ) }
+				help={ __(
+					'Prefer words with fewer syllables for simpler reading.'
+				) }
 				value={ sectionData.max_syllables || '' }
-				onChange={ ( value ) => onChange( 'max_syllables', value ? parseInt( value, 10 ) : '' ) }
+				onChange={ ( value ) =>
+					onChange(
+						'max_syllables',
+						value ? parseInt( value, 10 ) : ''
+					)
+				}
 				min={ 1 }
 				max={ 10 }
 			/>
 
 			<div className="library-panel__divider">
 				<span className="library-panel__divider-text">
-					{ __( 'Analyze existing content', 'content-guidelines' ) }
+					{ __( 'Analyze existing content' ) }
 				</span>
 			</div>
 
@@ -337,20 +413,21 @@ function HeuristicsContent( { sectionData, onChange } ) {
 					disabled={ isAnalyzing }
 					isBusy={ isAnalyzing }
 				>
-					{ isAnalyzing ? __( 'Analyzing…', 'content-guidelines' ) : __( 'Analyze posts', 'content-guidelines' ) }
+					{ isAnalyzing ? __( 'Analyzing…' ) : __( 'Analyze posts' ) }
 				</Button>
 				{ analysisResult && (
 					<Button variant="primary" onClick={ applyAnalysis }>
-						{ __( 'Apply', 'content-guidelines' ) }
+						{ __( 'Apply' ) }
 					</Button>
 				) }
 			</HStack>
 
 			{ analysisResult && (
 				<Text variant="muted">
-					{ __( 'Based on', 'content-guidelines' ) } { analysisResult.postCount } { __( 'posts:', 'content-guidelines' ) }{ ' ' }
-					{ analysisResult.avgWords } { __( 'words/sentence,', 'content-guidelines' ) }{ ' ' }
-					{ analysisResult.avgSentences } { __( 'sentences/paragraph', 'content-guidelines' ) }
+					{ __( 'Based on' ) } { analysisResult.postCount }{ ' ' }
+					{ __( 'posts:' ) } { analysisResult.avgWords }{ ' ' }
+					{ __( 'words/sentence,' ) } { analysisResult.avgSentences }{ ' ' }
+					{ __( 'sentences/paragraph' ) }
 				</Text>
 			) }
 		</VStack>
@@ -368,12 +445,11 @@ function HeuristicsContent( { sectionData, onChange } ) {
 function ReferencesContent( { sectionData, onChange } ) {
 	const references = sectionData.references || [];
 
-	// Debug: Log what we're receiving to help diagnose data issues
-	// eslint-disable-next-line no-console
-	console.log( '[ReferencesContent] sectionData:', sectionData, 'references:', references );
-
 	const addReference = () => {
-		onChange( 'references', [ ...references, { type: 'website', title: '', url: '', notes: '' } ] );
+		onChange( 'references', [
+			...references,
+			{ type: 'website', title: '', url: '', notes: '' },
+		] );
 	};
 
 	const updateReference = ( index, field, value ) => {
@@ -383,7 +459,10 @@ function ReferencesContent( { sectionData, onChange } ) {
 	};
 
 	const removeReference = ( index ) => {
-		onChange( 'references', references.filter( ( _, i ) => i !== index ) );
+		onChange(
+			'references',
+			references.filter( ( _, i ) => i !== index )
+		);
 	};
 
 	return (
@@ -394,42 +473,74 @@ function ReferencesContent( { sectionData, onChange } ) {
 						<HStack spacing={ 2 }>
 							<SelectControl
 								__nextHasNoMarginBottom
-								label={ __( 'Type', 'content-guidelines' ) }
+								label={ __( 'Type' ) }
 								value={ ref.type || 'website' }
 								options={ [
-									{ value: 'website', label: __( 'Website', 'content-guidelines' ) },
-									{ value: 'article', label: __( 'Article', 'content-guidelines' ) },
-									{ value: 'book', label: __( 'Book', 'content-guidelines' ) },
-									{ value: 'document', label: __( 'Document', 'content-guidelines' ) },
-									{ value: 'competitor', label: __( 'Competitor', 'content-guidelines' ) },
-									{ value: 'other', label: __( 'Other', 'content-guidelines' ) },
+									{
+										value: 'website',
+										label: __( 'Website' ),
+									},
+									{
+										value: 'article',
+										label: __( 'Article' ),
+									},
+									{
+										value: 'book',
+										label: __( 'Book' ),
+									},
+									{
+										value: 'document',
+										label: __( 'Document' ),
+									},
+									{
+										value: 'competitor',
+										label: __( 'Competitor' ),
+									},
+									{
+										value: 'other',
+										label: __( 'Other' ),
+									},
 								] }
-								onChange={ ( value ) => updateReference( index, 'type', value ) }
+								onChange={ ( value ) =>
+									updateReference( index, 'type', value )
+								}
 							/>
 							<div style={ { flex: 1 } }>
 								<TextControl
 									__nextHasNoMarginBottom
-									label={ __( 'Title', 'content-guidelines' ) }
+									label={ __( 'Title' ) }
 									value={ ref.title || '' }
-									onChange={ ( value ) => updateReference( index, 'title', value ) }
-									placeholder={ __( 'Reference name', 'content-guidelines' ) }
+									onChange={ ( value ) =>
+										updateReference( index, 'title', value )
+									}
+									placeholder={ __( 'Reference name' ) }
 								/>
 							</div>
 						</HStack>
 						<TextControl
 							__nextHasNoMarginBottom
-							label={ __( 'URL / Location', 'content-guidelines' ) }
+							label={ __( 'URL / Location' ) }
 							value={ ref.url || '' }
-							onChange={ ( value ) => updateReference( index, 'url', value ) }
-							placeholder={ ref.type === 'book' ? __( 'ISBN or link', 'content-guidelines' ) : 'https://' }
+							onChange={ ( value ) =>
+								updateReference( index, 'url', value )
+							}
+							placeholder={
+								ref.type === 'book'
+									? __( 'ISBN or link' )
+									: 'https://'
+							}
 						/>
 						<TextareaControl
 							__nextHasNoMarginBottom
-							label={ __( 'Why you like it', 'content-guidelines' ) }
+							label={ __( 'Why you like it' ) }
 							value={ ref.notes || '' }
-							onChange={ ( value ) => updateReference( index, 'notes', value ) }
+							onChange={ ( value ) =>
+								updateReference( index, 'notes', value )
+							}
 							rows={ 2 }
-							placeholder={ __( 'What aspects do you want to emulate?', 'content-guidelines' ) }
+							placeholder={ __(
+								'What aspects do you want to emulate?'
+							) }
 						/>
 						<Button
 							variant="tertiary"
@@ -437,29 +548,31 @@ function ReferencesContent( { sectionData, onChange } ) {
 							size="small"
 							onClick={ () => removeReference( index ) }
 						>
-							{ __( 'Remove', 'content-guidelines' ) }
+							{ __( 'Remove' ) }
 						</Button>
 					</VStack>
 				</div>
 			) ) }
 
 			<Button variant="secondary" onClick={ addReference }>
-				{ __( 'Add reference', 'content-guidelines' ) }
+				{ __( 'Add reference' ) }
 			</Button>
 
 			<div className="library-panel__divider">
 				<span className="library-panel__divider-text">
-					{ __( 'General notes', 'content-guidelines' ) }
+					{ __( 'General notes' ) }
 				</span>
 			</div>
 
 			<TextareaControl
 				__nextHasNoMarginBottom
-				label={ __( 'Reference notes', 'content-guidelines' ) }
+				label={ __( 'Reference notes' ) }
 				value={ sectionData.notes || '' }
 				onChange={ ( value ) => onChange( 'notes', value ) }
 				rows={ 3 }
-				placeholder={ __( 'Any other notes about your content inspirations...', 'content-guidelines' ) }
+				placeholder={ __(
+					'Any other notes about your content inspirations…'
+				) }
 			/>
 		</VStack>
 	);
@@ -478,10 +591,10 @@ function ImagesContent( { sectionData, onChange } ) {
 
 	const openMediaLibrary = () => {
 		const frame = window.wp.media( {
-			title: __( 'Select Reference Images', 'content-guidelines' ),
+			title: __( 'Select Reference Images' ),
 			multiple: true,
 			library: { type: 'image' },
-			button: { text: __( 'Add Images', 'content-guidelines' ) },
+			button: { text: __( 'Add Images' ) },
 		} );
 
 		frame.on( 'select', () => {
@@ -495,7 +608,10 @@ function ImagesContent( { sectionData, onChange } ) {
 					notes: '',
 				};
 			} );
-			onChange( 'reference_images', [ ...referenceImages, ...newImages ] );
+			onChange( 'reference_images', [
+				...referenceImages,
+				...newImages,
+			] );
 		} );
 
 		frame.open();
@@ -508,44 +624,54 @@ function ImagesContent( { sectionData, onChange } ) {
 	};
 
 	const removeImage = ( index ) => {
-		onChange( 'reference_images', referenceImages.filter( ( _, i ) => i !== index ) );
+		onChange(
+			'reference_images',
+			referenceImages.filter( ( _, i ) => i !== index )
+		);
 	};
 
 	return (
 		<VStack spacing={ 4 }>
 			<TextareaControl
 				__nextHasNoMarginBottom
-				label={ __( 'Image style', 'content-guidelines' ) }
-				help={ __( 'Describe the visual style for images.', 'content-guidelines' ) }
+				label={ __( 'Image style' ) }
+				help={ __( 'Describe the visual style for images.' ) }
 				value={ sectionData.style || '' }
 				onChange={ ( value ) => onChange( 'style', value ) }
 				rows={ 2 }
 			/>
 			<TextareaControl
 				__nextHasNoMarginBottom
-				label={ __( 'Alt text guidelines', 'content-guidelines' ) }
-				help={ __( 'How should alt text be written?', 'content-guidelines' ) }
+				label={ __( 'Alt text guidelines' ) }
+				help={ __( 'How should alt text be written?' ) }
 				value={ sectionData.alt_text_guidelines || '' }
-				onChange={ ( value ) => onChange( 'alt_text_guidelines', value ) }
+				onChange={ ( value ) =>
+					onChange( 'alt_text_guidelines', value )
+				}
 				rows={ 2 }
 			/>
 
 			<div className="library-panel__divider">
 				<span className="library-panel__divider-text">
-					{ __( 'Reference images', 'content-guidelines' ) }
+					{ __( 'Reference images' ) }
 				</span>
 			</div>
 
 			{ referenceImages.length > 0 && (
 				<div className="library-panel__image-grid">
 					{ referenceImages.map( ( img, index ) => (
-						<div key={ img.id || index } className="library-panel__image-item">
+						<div
+							key={ img.id || index }
+							className="library-panel__image-item"
+						>
 							<img src={ img.url } alt={ img.alt || '' } />
 							<TextControl
 								__nextHasNoMarginBottom
-								placeholder={ __( 'Why this image?', 'content-guidelines' ) }
+								placeholder={ __( 'Why this image?' ) }
 								value={ img.notes || '' }
-								onChange={ ( value ) => updateImageNotes( index, value ) }
+								onChange={ ( value ) =>
+									updateImageNotes( index, value )
+								}
 							/>
 							<Button
 								variant="tertiary"
@@ -553,7 +679,7 @@ function ImagesContent( { sectionData, onChange } ) {
 								size="small"
 								onClick={ () => removeImage( index ) }
 							>
-								{ __( 'Remove', 'content-guidelines' ) }
+								{ __( 'Remove' ) }
 							</Button>
 						</div>
 					) ) }
@@ -561,101 +687,31 @@ function ImagesContent( { sectionData, onChange } ) {
 			) }
 
 			<Button variant="secondary" onClick={ openMediaLibrary }>
-				{ __( 'Add reference images', 'content-guidelines' ) }
+				{ __( 'Add reference images' ) }
 			</Button>
 		</VStack>
 	);
 }
 
 /**
- * Get empty section data structure.
- *
- * @param {string} sectionId Section ID.
- * @return {Object} Empty section data.
- */
-function getEmptySection( sectionId ) {
-	switch ( sectionId ) {
-		case 'brand_context':
-			return {
-				site_description: '',
-				audience: '',
-				primary_goal: '',
-				topics: [],
-			};
-		case 'voice_tone':
-			return {
-				description: '',
-				tone_traits: [],
-				tone_notes: '',
-				pov: '',
-				readability: '',
-			};
-		case 'copy_rules':
-			return {
-				dos: [],
-				donts: [],
-			};
-		case 'vocabulary':
-			return {
-				prefer: [],
-				avoid: [],
-				acronyms: [],
-				acronym_usage: 'expand_first',
-				custom_dictionary: [],
-				voice_corrections: [],
-			};
-		case 'heuristics':
-			return {
-				words_per_sentence: '',
-				sentences_per_paragraph: '',
-				paragraphs_per_section: '',
-				reading_level: '',
-				reading_level_custom: '',
-				max_syllables: '',
-			};
-		case 'references':
-			return {
-				references: [],
-				notes: '',
-			};
-		case 'images':
-			return {
-				style: '',
-				alt_text_guidelines: '',
-				reference_images: [],
-				dos: [],
-				donts: [],
-				text_policy: '',
-			};
-		default:
-			return {};
-	}
-}
-
-/**
  * Section detail screen component.
  *
- * @param {Object}   props           Component props.
- * @param {Object}   props.section   Section definition.
- * @param {Function} props.onBack    Back handler.
+ * @param {Object}   props         Component props.
+ * @param {Object}   props.section Section definition.
+ * @param {Function} props.onBack  Back handler.
  * @return {JSX.Element} Section detail screen.
  */
 function SectionDetailScreen( { section, onBack } ) {
-	const draft = useSelect( ( select ) => select( STORE_NAME ).getDraft() || {}, [] );
-	const { updateDraftSection, updateDraft } = useDispatch( STORE_NAME );
+	const { guidelines, setSection, edit, clearSection } = useGuidelines();
 
-	const sectionData = draft[ section.id ] || {};
-
-	// Debug: Log draft structure for troubleshooting
-	// eslint-disable-next-line no-console
-	console.log( '[SectionDetailScreen]', section.id, '- draft:', draft, 'sectionData:', sectionData );
+	const sectionData = guidelines?.[ section.id ] || {};
 
 	const handleChange = ( field, value ) => {
-		updateDraftSection( section.id, { [ field ]: value } );
+		setSection( section.id, { [ field ]: value } );
 	};
 
 	const handleTopLevelChange = ( field, value ) => {
-		updateDraft( { [ field ]: value } );
+		edit( { [ field ]: value } );
 	};
 
 	const renderContent = () => {
@@ -665,31 +721,41 @@ function SectionDetailScreen( { section, onBack } ) {
 					<VStack spacing={ 4 }>
 						<TextareaControl
 							__nextHasNoMarginBottom
-							label={ __( 'What is this site about?', 'content-guidelines' ) }
-							help={ __( 'A brief description of your site, business, or publication.', 'content-guidelines' ) }
+							label={ __( 'What is this site about?' ) }
+							help={ __(
+								'A brief description of your site, business, or publication.'
+							) }
 							value={ sectionData.site_description || '' }
-							onChange={ ( value ) => handleChange( 'site_description', value ) }
+							onChange={ ( value ) =>
+								handleChange( 'site_description', value )
+							}
 							rows={ 3 }
 						/>
 						<TextControl
 							__nextHasNoMarginBottom
-							label={ __( 'Target audience', 'content-guidelines' ) }
-							help={ __( 'Who are you writing for?', 'content-guidelines' ) }
+							label={ __( 'Target audience' ) }
+							help={ __( 'Who are you writing for?' ) }
 							value={ sectionData.audience || '' }
-							onChange={ ( value ) => handleChange( 'audience', value ) }
+							onChange={ ( value ) =>
+								handleChange( 'audience', value )
+							}
 						/>
 						<SelectControl
 							__nextHasNoMarginBottom
-							label={ __( 'Primary goal', 'content-guidelines' ) }
-							help={ __( 'What do you want visitors to do?', 'content-guidelines' ) }
+							label={ __( 'Primary goal' ) }
+							help={ __( 'What do you want visitors to do?' ) }
 							value={ sectionData.primary_goal || '' }
 							options={ GOAL_OPTIONS }
-							onChange={ ( value ) => handleChange( 'primary_goal', value ) }
+							onChange={ ( value ) =>
+								handleChange( 'primary_goal', value )
+							}
 						/>
 						<FormTokenField
-							label={ __( 'Topics / coverage areas', 'content-guidelines' ) }
+							label={ __( 'Topics / coverage areas' ) }
 							value={ sectionData.topics || [] }
-							onChange={ ( value ) => handleChange( 'topics', value ) }
+							onChange={ ( value ) =>
+								handleChange( 'topics', value )
+							}
 							__experimentalExpandOnFocus
 							__experimentalShowHowTo={ false }
 						/>
@@ -701,49 +767,87 @@ function SectionDetailScreen( { section, onBack } ) {
 					<VStack spacing={ 4 }>
 						<TextareaControl
 							__nextHasNoMarginBottom
-							label={ __( 'Voice description', 'content-guidelines' ) }
-							help={ __( 'How should your brand\'s personality come across?', 'content-guidelines' ) }
+							label={ __( 'Voice description' ) }
+							help={ __(
+								"How should your brand's personality come across?"
+							) }
 							value={ sectionData.description || '' }
-							onChange={ ( value ) => handleChange( 'description', value ) }
+							onChange={ ( value ) =>
+								handleChange( 'description', value )
+							}
 							rows={ 3 }
 						/>
 						<FormTokenField
-							label={ __( 'Voice attributes', 'content-guidelines' ) }
+							label={ __( 'Voice attributes' ) }
 							value={ sectionData.tone_traits || [] }
-							onChange={ ( value ) => handleChange( 'tone_traits', value ) }
+							onChange={ ( value ) =>
+								handleChange( 'tone_traits', value )
+							}
 							__experimentalExpandOnFocus
 							__experimentalShowHowTo={ false }
 						/>
 						<SelectControl
 							__nextHasNoMarginBottom
-							label={ __( 'Point of view', 'content-guidelines' ) }
+							label={ __( 'Point of view' ) }
 							value={ sectionData.pov || '' }
 							options={ [
-								{ value: '', label: __( 'Not specified', 'content-guidelines' ) },
-								{ value: 'we_you', label: __( 'We/You (conversational)', 'content-guidelines' ) },
-								{ value: 'i_you', label: __( 'I/You (personal)', 'content-guidelines' ) },
-								{ value: 'third_person', label: __( 'Third person (formal)', 'content-guidelines' ) },
+								{
+									value: '',
+									label: __( 'Not specified' ),
+								},
+								{
+									value: 'we_you',
+									label: __( 'We/You (conversational)' ),
+								},
+								{
+									value: 'i_you',
+									label: __( 'I/You (personal)' ),
+								},
+								{
+									value: 'third_person',
+									label: __( 'Third person (formal)' ),
+								},
 							] }
-							onChange={ ( value ) => handleChange( 'pov', value ) }
+							onChange={ ( value ) =>
+								handleChange( 'pov', value )
+							}
 						/>
 						<SelectControl
 							__nextHasNoMarginBottom
-							label={ __( 'Readability level', 'content-guidelines' ) }
+							label={ __( 'Readability level' ) }
 							value={ sectionData.readability || '' }
 							options={ [
-								{ value: '', label: __( 'Not specified', 'content-guidelines' ) },
-								{ value: 'simple', label: __( 'Simple (grade 6-8)', 'content-guidelines' ) },
-								{ value: 'general', label: __( 'General (grade 9-12)', 'content-guidelines' ) },
-								{ value: 'expert', label: __( 'Expert (college+)', 'content-guidelines' ) },
+								{
+									value: '',
+									label: __( 'Not specified' ),
+								},
+								{
+									value: 'simple',
+									label: __( 'Simple (grade 6–8)' ),
+								},
+								{
+									value: 'general',
+									label: __( 'General (grade 9–12)' ),
+								},
+								{
+									value: 'expert',
+									label: __( 'Expert (college+)' ),
+								},
 							] }
-							onChange={ ( value ) => handleChange( 'readability', value ) }
+							onChange={ ( value ) =>
+								handleChange( 'readability', value )
+							}
 						/>
 						<TextareaControl
 							__nextHasNoMarginBottom
-							label={ __( 'Tone notes', 'content-guidelines' ) }
-							help={ __( 'Any additional guidance on tone adjustments.', 'content-guidelines' ) }
+							label={ __( 'Tone notes' ) }
+							help={ __(
+								'Any additional guidance on tone adjustments.'
+							) }
 							value={ sectionData.tone_notes || '' }
-							onChange={ ( value ) => handleChange( 'tone_notes', value ) }
+							onChange={ ( value ) =>
+								handleChange( 'tone_notes', value )
+							}
 							rows={ 2 }
 						/>
 					</VStack>
@@ -753,16 +857,20 @@ function SectionDetailScreen( { section, onBack } ) {
 				return (
 					<VStack spacing={ 4 }>
 						<RepeaterControl
-							label={ __( 'Do', 'content-guidelines' ) }
+							label={ __( 'Do' ) }
 							items={ sectionData.dos || [] }
-							onChange={ ( value ) => handleChange( 'dos', value ) }
-							placeholder={ __( 'Add a rule...', 'content-guidelines' ) }
+							onChange={ ( value ) =>
+								handleChange( 'dos', value )
+							}
+							placeholder={ __( 'Add a rule…' ) }
 						/>
 						<RepeaterControl
-							label={ __( "Don't", 'content-guidelines' ) }
+							label={ __( "Don't" ) }
 							items={ sectionData.donts || [] }
-							onChange={ ( value ) => handleChange( 'donts', value ) }
-							placeholder={ __( 'Add a rule...', 'content-guidelines' ) }
+							onChange={ ( value ) =>
+								handleChange( 'donts', value )
+							}
+							placeholder={ __( 'Add a rule…' ) }
 						/>
 					</VStack>
 				);
@@ -771,84 +879,130 @@ function SectionDetailScreen( { section, onBack } ) {
 				return (
 					<VStack spacing={ 4 }>
 						<TermNoteControl
-							label={ __( 'Preferred terms', 'content-guidelines' ) }
+							label={ __( 'Preferred terms' ) }
 							items={ sectionData.prefer || [] }
-							onChange={ ( value ) => handleChange( 'prefer', value ) }
-							termPlaceholder={ __( 'Term to use', 'content-guidelines' ) }
-							notePlaceholder={ __( 'Usage note (optional)', 'content-guidelines' ) }
+							onChange={ ( value ) =>
+								handleChange( 'prefer', value )
+							}
+							termPlaceholder={ __( 'Term to use' ) }
+							notePlaceholder={ __( 'Usage note (optional)' ) }
 						/>
 						<TermNoteControl
-							label={ __( 'Terms to avoid', 'content-guidelines' ) }
+							label={ __( 'Terms to avoid' ) }
 							items={ sectionData.avoid || [] }
-							onChange={ ( value ) => handleChange( 'avoid', value ) }
-							termPlaceholder={ __( 'Term to avoid', 'content-guidelines' ) }
-							notePlaceholder={ __( 'Why? / Use instead (optional)', 'content-guidelines' ) }
+							onChange={ ( value ) =>
+								handleChange( 'avoid', value )
+							}
+							termPlaceholder={ __( 'Term to avoid' ) }
+							notePlaceholder={ __(
+								'Why? / Use instead (optional)'
+							) }
 						/>
 
 						<div className="library-panel__divider">
 							<span className="library-panel__divider-text">
-								{ __( 'Acronyms', 'content-guidelines' ) }
+								{ __( 'Acronyms' ) }
 							</span>
 						</div>
 
 						<RepeaterControl
-							label={ __( 'Definitions', 'content-guidelines' ) }
+							label={ __( 'Definitions' ) }
 							items={ sectionData.acronyms || [] }
-							onChange={ ( value ) => handleChange( 'acronyms', value ) }
-							placeholder={ __( 'API - Application Programming Interface', 'content-guidelines' ) }
+							onChange={ ( value ) =>
+								handleChange( 'acronyms', value )
+							}
+							placeholder={ __(
+								'API - Application Programming Interface'
+							) }
 						/>
 						<SelectControl
 							__nextHasNoMarginBottom
-							label={ __( 'Usage style', 'content-guidelines' ) }
-							value={ sectionData.acronym_usage || 'expand_first' }
+							label={ __( 'Usage style' ) }
+							value={
+								sectionData.acronym_usage || 'expand_first'
+							}
 							options={ [
-								{ value: 'expand_first', label: __( 'Expand on first use', 'content-guidelines' ) },
-								{ value: 'always_expand', label: __( 'Always include expansion', 'content-guidelines' ) },
-								{ value: 'acronym_only', label: __( 'Acronym only', 'content-guidelines' ) },
+								{
+									value: 'expand_first',
+									label: __( 'Expand on first use' ),
+								},
+								{
+									value: 'always_expand',
+									label: __( 'Always include expansion' ),
+								},
+								{
+									value: 'acronym_only',
+									label: __( 'Acronym only' ),
+								},
 							] }
-							onChange={ ( value ) => handleChange( 'acronym_usage', value ) }
+							onChange={ ( value ) =>
+								handleChange( 'acronym_usage', value )
+							}
 						/>
 
 						<div className="library-panel__divider">
 							<span className="library-panel__divider-text">
-								{ __( 'Custom dictionary', 'content-guidelines' ) }
+								{ __( 'Custom dictionary' ) }
 							</span>
 						</div>
 
 						<FormTokenField
-							label={ __( 'Industry terms & brand names', 'content-guidelines' ) }
+							label={ __( 'Industry terms & brand names' ) }
 							value={ sectionData.custom_dictionary || [] }
-							onChange={ ( value ) => handleChange( 'custom_dictionary', value ) }
+							onChange={ ( value ) =>
+								handleChange( 'custom_dictionary', value )
+							}
 							__experimentalExpandOnFocus
 							__experimentalShowHowTo={ false }
 						/>
 						<RepeaterControl
-							label={ __( 'Corrections', 'content-guidelines' ) }
+							label={ __( 'Corrections' ) }
 							items={ sectionData.voice_corrections || [] }
-							onChange={ ( value ) => handleChange( 'voice_corrections', value ) }
-							placeholder={ __( '"word press" → WordPress', 'content-guidelines' ) }
+							onChange={ ( value ) =>
+								handleChange( 'voice_corrections', value )
+							}
+							placeholder={ __( '"word press" → WordPress' ) }
 						/>
 					</VStack>
 				);
 
 			case 'heuristics':
-				return <HeuristicsContent sectionData={ sectionData } onChange={ handleChange } />;
+				return (
+					<HeuristicsContent
+						sectionData={ sectionData }
+						onChange={ handleChange }
+					/>
+				);
 
 			case 'references':
-				return <ReferencesContent sectionData={ sectionData } onChange={ handleChange } />;
+				return (
+					<ReferencesContent
+						sectionData={ sectionData }
+						onChange={ handleChange }
+					/>
+				);
 
 			case 'images':
-				return <ImagesContent sectionData={ sectionData } onChange={ handleChange } />;
+				return (
+					<ImagesContent
+						sectionData={ sectionData }
+						onChange={ handleChange }
+					/>
+				);
 
 			case 'notes':
 				return (
 					<VStack spacing={ 4 }>
 						<TextareaControl
 							__nextHasNoMarginBottom
-							label={ __( 'Additional notes', 'content-guidelines' ) }
-							help={ __( 'Any other guidelines or context that doesn\'t fit elsewhere.', 'content-guidelines' ) }
-							value={ draft.notes || '' }
-							onChange={ ( value ) => handleTopLevelChange( 'notes', value ) }
+							label={ __( 'Additional notes' ) }
+							help={ __(
+								"Any other guidelines or context that doesn't fit elsewhere."
+							) }
+							value={ guidelines?.notes || '' }
+							onChange={ ( value ) =>
+								handleTopLevelChange( 'notes', value )
+							}
 							rows={ 5 }
 						/>
 					</VStack>
@@ -860,11 +1014,7 @@ function SectionDetailScreen( { section, onBack } ) {
 	};
 
 	const handleClear = () => {
-		if ( section.id === 'notes' ) {
-			handleTopLevelChange( 'notes', '' );
-		} else {
-			updateDraftSection( section.id, getEmptySection( section.id ) );
-		}
+		clearSection( section.id );
 	};
 
 	return (
@@ -874,7 +1024,7 @@ function SectionDetailScreen( { section, onBack } ) {
 					icon={ isRTL() ? chevronRight : chevronLeft }
 					size="small"
 					onClick={ onBack }
-					label={ __( 'Back', 'content-guidelines' ) }
+					label={ __( 'Back' ) }
 				/>
 				<Heading
 					level={ 2 }
@@ -889,7 +1039,7 @@ function SectionDetailScreen( { section, onBack } ) {
 					size="small"
 					onClick={ handleClear }
 				>
-					{ __( 'Clear', 'content-guidelines' ) }
+					{ __( 'Clear' ) }
 				</Button>
 			</div>
 
@@ -929,17 +1079,21 @@ function hasContent( value ) {
 /**
  * Get status text for a section.
  *
- * @param {string} sectionId Section ID.
- * @param {Object} draft     Draft data.
+ * @param {string} sectionId  Section ID.
+ * @param {Object} guidelines Guidelines data.
  * @return {string|null} Status text.
  */
-function getSectionStatus( sectionId, draft ) {
-	// Notes is a top-level string, not a nested object.
-	if ( sectionId === 'notes' ) {
-		return hasContent( draft.notes ) ? __( 'Configured', 'content-guidelines' ) : null;
+function getSectionStatus( sectionId, guidelines ) {
+	if ( ! guidelines ) {
+		return null;
 	}
 
-	const sectionData = draft[ sectionId ];
+	// Notes is a top-level string, not a nested object.
+	if ( sectionId === 'notes' ) {
+		return hasContent( guidelines.notes ) ? __( 'Configured' ) : null;
+	}
+
+	const sectionData = guidelines[ sectionId ];
 	if ( ! sectionData || typeof sectionData !== 'object' ) {
 		return null;
 	}
@@ -947,7 +1101,7 @@ function getSectionStatus( sectionId, draft ) {
 	// Check if section has any meaningful data.
 	const hasData = Object.values( sectionData ).some( hasContent );
 
-	return hasData ? __( 'Configured', 'content-guidelines' ) : null;
+	return hasData ? __( 'Configured' ) : null;
 }
 
 /**
@@ -964,13 +1118,10 @@ export default function LibraryPanel( { initialSection, onSectionChange } ) {
 		? SECTIONS.find( ( s ) => s.id === initialSection ) || null
 		: null;
 
-	const [ selectedSection, setSelectedSection ] = useState( initialSectionObj );
+	const [ selectedSection, setSelectedSection ] =
+		useState( initialSectionObj );
 
-	const { draft } = useSelect( ( select ) => {
-		return {
-			draft: select( STORE_NAME ).getDraft() || {},
-		};
-	}, [] );
+	const { guidelines } = useGuidelines();
 
 	const handleSectionClick = ( section ) => {
 		setSelectedSection( section );
@@ -988,16 +1139,28 @@ export default function LibraryPanel( { initialSection, onSectionChange } ) {
 
 	return (
 		<div className="library-panel">
-			<Navigator initialPath={ selectedSection ? `/${ selectedSection.id }` : '/' }>
+			<Navigator
+				initialPath={
+					selectedSection ? `/${ selectedSection.id }` : '/'
+				}
+			>
 				<Navigator.Screen path="/">
 					<VStack spacing={ 0 }>
 						<ul role="list" className="library-panel__list">
 							{ SECTIONS.map( ( section ) => (
-								<li key={ section.id } className="library-panel__list-item">
+								<li
+									key={ section.id }
+									className="library-panel__list-item"
+								>
 									<SectionCard
 										section={ section }
-										statusText={ getSectionStatus( section.id, draft ) }
-										onClick={ () => handleSectionClick( section ) }
+										statusText={ getSectionStatus(
+											section.id,
+											guidelines
+										) }
+										onClick={ () =>
+											handleSectionClick( section )
+										}
 									/>
 								</li>
 							) ) }
@@ -1006,7 +1169,10 @@ export default function LibraryPanel( { initialSection, onSectionChange } ) {
 				</Navigator.Screen>
 
 				{ SECTIONS.map( ( section ) => (
-					<Navigator.Screen key={ section.id } path={ `/${ section.id }` }>
+					<Navigator.Screen
+						key={ section.id }
+						path={ `/${ section.id }` }
+					>
 						<SectionDetailScreen
 							section={ section }
 							onBack={ handleBack }

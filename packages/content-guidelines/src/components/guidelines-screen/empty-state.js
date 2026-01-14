@@ -3,19 +3,17 @@
  */
 import { __ } from '@wordpress/i18n';
 import { Button } from '@wordpress/components';
-import { useDispatch } from '@wordpress/data';
 import { pencil } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
-import { STORE_NAME } from '../../store';
+import { useGuidelines } from '../../hooks';
 
 /**
  * Default empty guidelines structure.
  */
 const DEFAULT_GUIDELINES = {
-	version: 1,
 	brand_context: {
 		site_description: '',
 		audience: '',
@@ -23,27 +21,46 @@ const DEFAULT_GUIDELINES = {
 		topics: [],
 	},
 	voice_tone: {
+		description: '',
 		tone_traits: [],
+		tone_notes: '',
 		pov: '',
-		readability: 'general',
-		example_good: '',
-		example_avoid: '',
+		readability: '',
 	},
 	copy_rules: {
 		dos: [],
 		donts: [],
-		formatting: [],
 	},
 	vocabulary: {
 		prefer: [],
 		avoid: [],
+		acronyms: [],
+		acronym_usage: 'expand_first',
+		custom_dictionary: [],
+		voice_corrections: [],
 	},
-	image_style: {
+	heuristics: {
+		words_per_sentence: '',
+		sentences_per_paragraph: '',
+		paragraphs_per_section: '',
+		reading_level: '',
+		reading_level_custom: '',
+		max_syllables: '',
+	},
+	references: {
+		references: [],
+		notes: '',
+	},
+	images: {
+		style: '',
+		alt_text_guidelines: '',
+		reference_images: [],
 		dos: [],
 		donts: [],
 		text_policy: '',
 	},
 	notes: '',
+	blocks: {},
 };
 
 /**
@@ -52,10 +69,10 @@ const DEFAULT_GUIDELINES = {
  * @return {JSX.Element} Empty state component.
  */
 export default function EmptyState() {
-	const { setDraft } = useDispatch( STORE_NAME );
+	const { edit } = useGuidelines();
 
 	const handleStartWriting = () => {
-		setDraft( { ...DEFAULT_GUIDELINES } );
+		edit( DEFAULT_GUIDELINES );
 	};
 
 	return (
@@ -67,13 +84,12 @@ export default function EmptyState() {
 			</div>
 
 			<h2 className="content-guidelines-empty-state__title">
-				{ __( 'Set Content Guidelines', 'content-guidelines' ) }
+				{ __( 'Set Content Guidelines' ) }
 			</h2>
 
 			<p className="content-guidelines-empty-state__description">
 				{ __(
-					'Guidelines keep AI outputs consistent with your site\'s voice and brand. Define your tone, rules, and vocabulary once, and AI features will use them automatically.',
-					'content-guidelines'
+					"Guidelines keep AI outputs consistent with your site's voice and brand. Define your tone, rules, and vocabulary once, and AI features will use them automatically."
 				) }
 			</p>
 
@@ -83,14 +99,13 @@ export default function EmptyState() {
 					icon={ pencil }
 					onClick={ handleStartWriting }
 				>
-					{ __( 'Start writing', 'content-guidelines' ) }
+					{ __( 'Start writing' ) }
 				</Button>
 			</div>
 
 			<p className="content-guidelines-empty-state__note">
 				{ __(
-					'AI-powered generation requires an AI provider plugin.',
-					'content-guidelines'
+					'AI-powered generation requires an AI provider plugin.'
 				) }
 			</p>
 		</div>

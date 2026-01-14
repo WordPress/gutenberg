@@ -10,7 +10,6 @@ import {
 	Spinner,
 	__experimentalConfirmDialog as ConfirmDialog,
 } from '@wordpress/components';
-import { backup } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -74,7 +73,7 @@ export default function HistoryPanel( { onClose } ) {
 
 	return (
 		<Modal
-			title={ __( 'Guidelines History', 'content-guidelines' ) }
+			title={ __( 'Guidelines History' ) }
 			onRequestClose={ onClose }
 			className="content-guidelines-history-modal"
 			size="medium"
@@ -83,7 +82,7 @@ export default function HistoryPanel( { onClose } ) {
 				{ isLoading && (
 					<div className="content-guidelines-history__loading">
 						<Spinner />
-						<p>{ __( 'Loading history...', 'content-guidelines' ) }</p>
+						<p>{ __( 'Loading history…' ) }</p>
 					</div>
 				) }
 
@@ -91,8 +90,7 @@ export default function HistoryPanel( { onClose } ) {
 					<div className="content-guidelines-history__empty">
 						<p>
 							{ __(
-								'No revision history yet. History is created when you publish changes.',
-								'content-guidelines'
+								'No revision history yet. History is created when you publish changes.'
 							) }
 						</p>
 					</div>
@@ -105,21 +103,25 @@ export default function HistoryPanel( { onClose } ) {
 								key={ revision.id }
 								className="content-guidelines-history__item"
 							>
-								<div className="content-guidelines-history__item-icon">
-									<backup />
+								<div className="content-guidelines-history__item-avatar">
+									<img
+										src={ revision.author?.avatar }
+										alt={ revision.author?.name || '' }
+										className="content-guidelines-history__avatar-img"
+									/>
 								</div>
 								<div className="content-guidelines-history__item-content">
 									<div className="content-guidelines-history__item-date">
 										{ formatDate( revision.date ) }
 										{ index === 0 && (
 											<span className="content-guidelines-history__current-badge">
-												{ __( 'Current', 'content-guidelines' ) }
+												{ __( 'Current' ) }
 											</span>
 										) }
 									</div>
 									<div className="content-guidelines-history__item-author">
 										{ revision.author?.name ||
-											__( 'Unknown', 'content-guidelines' ) }
+											__( 'Unknown' ) }
 									</div>
 								</div>
 								<div className="content-guidelines-history__item-actions">
@@ -132,7 +134,7 @@ export default function HistoryPanel( { onClose } ) {
 											}
 											disabled={ isRestoring }
 										>
-											{ __( 'Restore', 'content-guidelines' ) }
+											{ __( 'Restore' ) }
 										</Button>
 									) }
 								</div>
@@ -144,7 +146,7 @@ export default function HistoryPanel( { onClose } ) {
 				{ isRestoring && (
 					<div className="content-guidelines-history__restoring">
 						<Spinner />
-						<p>{ __( 'Restoring...', 'content-guidelines' ) }</p>
+						<p>{ __( 'Restoring…' ) }</p>
 					</div>
 				) }
 			</div>
@@ -155,8 +157,7 @@ export default function HistoryPanel( { onClose } ) {
 					onCancel={ () => setConfirmRestore( null ) }
 				>
 					{ __(
-						'Restore this version? This will become the new active guidelines.',
-						'content-guidelines'
+						'Restore this version? This will become the new active guidelines.'
 					) }
 				</ConfirmDialog>
 			) }

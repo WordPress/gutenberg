@@ -404,23 +404,38 @@ class Post_Type {
 	/**
 	 * Recursively sanitize an array.
 	 *
-	 * @param array $data The data to sanitize.
+	 * @param array  $data           The data to sanitize.
+	 * @param string $context        Optional context for key sanitization.
 	 * @return array Sanitized data.
 	 */
-	private static function deep_sanitize( $data ) {
+	private static function deep_sanitize( $data, $context = '' ) {
 		$sanitized = array();
 
 		foreach ( $data as $key => $value ) {
-			$key = sanitize_key( $key );
+			// For numeric keys (array indices), preserve as-is.
+			// For block names (e.g., 'core/list'), allow slashes.
+			// For other keys, use sanitize_key.
+			if ( is_int( $key ) ) {
+				$sanitized_key = $key;
+			} elseif ( 'blocks' === $context || preg_match( '#^[a-z0-9-]+/[a-z0-9-]+$#i', $key ) ) {
+				// Block names - allow slashes, just sanitize parts.
+				$sanitized_key = preg_replace( '/[^a-z0-9\/_-]/i', '', $key );
+			} else {
+				$sanitized_key = sanitize_key( $key );
+			}
 
 			if ( is_array( $value ) ) {
-				$sanitized[ $key ] = self::deep_sanitize( $value );
+				// Pass context for 'blocks' key to allow block names with slashes.
+				$child_context = ( 'blocks' === $key ) ? 'blocks' : $context;
+				$sanitized[ $sanitized_key ] = self::deep_sanitize( $value, $child_context );
 			} elseif ( is_string( $value ) ) {
-				$sanitized[ $key ] = sanitize_text_field( $value );
+				$sanitized[ $sanitized_key ] = sanitize_text_field( $value );
 			} elseif ( is_int( $value ) ) {
-				$sanitized[ $key ] = intval( $value );
+				$sanitized[ $sanitized_key ] = intval( $value );
+			} elseif ( is_float( $value ) ) {
+				$sanitized[ $sanitized_key ] = floatval( $value );
 			} elseif ( is_bool( $value ) ) {
-				$sanitized[ $key ] = (bool) $value;
+				$sanitized[ $sanitized_key ] = (bool) $value;
 			}
 		}
 
@@ -834,6 +849,9 @@ class Post_Type {
 			);
 		}
 
+		// Add to custom history before updating.
+		self::add_history_entry( $post->ID, $draft );
+
 		// Update post content with draft (creates a revision).
 		$result = wp_update_post(
 			array(
@@ -851,6 +869,80 @@ class Post_Type {
 		delete_post_meta( $post->ID, self::DRAFT_META_KEY );
 
 		return $result;
+	}
+
+	/**
+	 * Save guidelines directly (canonical core-data pattern).
+	 *
+	 * This method saves guidelines immediately without requiring a draft.
+	 * It's the standard save flow used by core-data's saveEntityRecord.
+	 *
+	 * @param array $guidelines The guidelines data to save.
+	 * @return int|\WP_Error The post ID or error.
+	 */
+	public static function save_guidelines( $guidelines ) {
+		$post = self::get_guidelines_post();
+
+		// Create the post if it doesn't exist
+		if ( ! $post ) {
+			$post_id = self::create_guidelines_post( $guidelines );
+			if ( is_wp_error( $post_id ) ) {
+				return $post_id;
+			}
+			return $post_id;
+		}
+
+		// Add to custom history before updating
+		self::add_history_entry( $post->ID, $guidelines );
+
+		// Update post content (creates a WordPress revision automatically)
+		$result = wp_update_post(
+			array(
+				'ID'           => $post->ID,
+				'post_content' => self::json_encode_unicode( $guidelines ),
+			),
+			true
+		);
+
+		if ( is_wp_error( $result ) ) {
+			return $result;
+		}
+
+		return $result;
+	}
+
+	/**
+	 * Add an entry to the custom history.
+	 *
+	 * @param int   $post_id    Post ID.
+	 * @param array $guidelines Guidelines data being published.
+	 * @return void
+	 */
+	private static function add_history_entry( $post_id, $guidelines ) {
+		$history = self::get_history( $post_id );
+
+		// Find the next ID.
+		$max_id = 0;
+		foreach ( $history as $entry ) {
+			if ( isset( $entry['id'] ) && $entry['id'] > $max_id ) {
+				$max_id = $entry['id'];
+			}
+		}
+
+		// Add new entry.
+		$history[] = array(
+			'id'         => $max_id + 1,
+			'author_id'  => get_current_user_id(),
+			'date_gmt'   => current_time( 'mysql', true ),
+			'guidelines' => self::sanitize_guidelines( $guidelines ),
+		);
+
+		// Keep only the last 50 entries to avoid bloat.
+		if ( count( $history ) > 50 ) {
+			$history = array_slice( $history, -50 );
+		}
+
+		update_post_meta( $post_id, self::HISTORY_META_KEY, $history );
 	}
 
 	/**

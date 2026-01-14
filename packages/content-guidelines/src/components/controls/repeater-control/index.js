@@ -77,7 +77,7 @@ export default function RepeaterControl( {
 						/>
 						<Button
 							icon={ closeSmall }
-							label={ __( 'Remove', 'content-guidelines' ) }
+							label={ __( 'Remove' ) }
 							onClick={ () => removeItem( index ) }
 							size="small"
 							className="repeater-control__remove"
@@ -95,7 +95,7 @@ export default function RepeaterControl( {
 					/>
 					<Button
 						icon={ plus }
-						label={ __( 'Add', 'content-guidelines' ) }
+						label={ __( 'Add' ) }
 						onClick={ addItem }
 						size="small"
 						className="repeater-control__add"

@@ -51,20 +51,17 @@
 	}
 }
 
-.content-guidelines-history__item-icon {
+.content-guidelines-history__item-avatar {
 	width: 32px;
 	height: 32px;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	background: #f0f0f0;
-	border-radius: 50%;
-	color: #757575;
+	flex-shrink: 0;
+}
 
-	svg {
-		width: 18px;
-		height: 18px;
-	}
+.content-guidelines-history__avatar-img {
+	width: 32px;
+	height: 32px;
+	border-radius: 50%;
+	object-fit: cover;
 }
 
 .content-guidelines-history__item-content {

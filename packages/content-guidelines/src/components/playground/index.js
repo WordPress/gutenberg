@@ -8,8 +8,6 @@ import {
 	Button,
 	SelectControl,
 	TextareaControl,
-	ToggleControl,
-	Panel,
 	PanelBody,
 	Spinner,
 	Notice,
@@ -29,15 +27,15 @@ import './style.scss';
 const TASK_OPTIONS = [
 	{
 		value: 'rewrite_intro',
-		label: __( 'Rewrite intro paragraph', 'content-guidelines' ),
+		label: __( 'Rewrite intro paragraph' ),
 	},
 	{
 		value: 'generate_headlines',
-		label: __( 'Generate 5 headline options', 'content-guidelines' ),
+		label: __( 'Generate 5 headline options' ),
 	},
 	{
 		value: 'write_cta',
-		label: __( 'Write a CTA paragraph', 'content-guidelines' ),
+		label: __( 'Write a CTA paragraph' ),
 	},
 ];
 
@@ -50,21 +48,15 @@ const TASK_OPTIONS = [
  */
 export default function Playground( { fixturePostId } ) {
 	const [ task, setTask ] = useState( 'rewrite_intro' );
-	const [ useDraft, setUseDraft ] = useState( true );
-	const [ compare, setCompare ] = useState( false );
 	const [ extraInstructions, setExtraInstructions ] = useState( '' );
 
-	const { testResults, isRunningTest, hasDraft, error } = useSelect(
-		( select ) => {
-			return {
-				testResults: select( STORE_NAME ).getTestResults(),
-				isRunningTest: select( STORE_NAME ).isRunningTest(),
-				hasDraft: select( STORE_NAME ).hasDraft(),
-				error: select( STORE_NAME ).getError(),
-			};
-		},
-		[]
-	);
+	const { testResults, isRunningTest, error } = useSelect( ( select ) => {
+		return {
+			testResults: select( STORE_NAME ).getTestResults(),
+			isRunningTest: select( STORE_NAME ).isRunningTest(),
+			error: select( STORE_NAME ).getError(),
+		};
+	}, [] );
 
 	const { runPlaygroundTest } = useDispatch( STORE_NAME );
 
@@ -76,8 +68,6 @@ export default function Playground( { fixturePostId } ) {
 		runPlaygroundTest( {
 			task,
 			fixture_post_id: fixturePostId,
-			use: useDraft ? 'draft' : 'active',
-			compare,
 			extra_instructions: extraInstructions,
 		} );
 	};
@@ -87,38 +77,20 @@ export default function Playground( { fixturePostId } ) {
 	return (
 		<div className="content-guidelines-playground">
 			<div className="content-guidelines-playground__controls">
-				{ hasDraft && (
-					<ToggleControl
-						label={ __( 'Use draft guidelines', 'content-guidelines' ) }
-						checked={ useDraft }
-						onChange={ setUseDraft }
-					/>
-				) }
-
-				{ hasDraft && (
-					<ToggleControl
-						label={ __( 'Compare draft vs active', 'content-guidelines' ) }
-						checked={ compare }
-						onChange={ setCompare }
-						disabled={ ! useDraft }
-					/>
-				) }
-
 				<SelectControl
-					label={ __( 'Task', 'content-guidelines' ) }
+					label={ __( 'Task' ) }
 					value={ task }
 					options={ TASK_OPTIONS }
 					onChange={ setTask }
 				/>
 
 				<TextareaControl
-					label={ __( 'Extra instructions (optional)', 'content-guidelines' ) }
+					label={ __( 'Extra instructions (optional)' ) }
 					value={ extraInstructions }
 					onChange={ setExtraInstructions }
 					rows={ 2 }
 					placeholder={ __(
-						'Any specific instructions for this test...',
-						'content-guidelines'
+						'Any specific instructions for this test…'
 					) }
 				/>
 
@@ -128,17 +100,12 @@ export default function Playground( { fixturePostId } ) {
 					disabled={ ! canRun }
 					isBusy={ isRunningTest }
 				>
-					{ isRunningTest
-						? __( 'Running...', 'content-guidelines' )
-						: __( 'Run', 'content-guidelines' ) }
+					{ isRunningTest ? __( 'Running…' ) : __( 'Run' ) }
 				</Button>
 
 				{ ! fixturePostId && (
 					<p className="content-guidelines-playground__note">
-						{ __(
-							'Select a post above to test against.',
-							'content-guidelines'
-						) }
+						{ __( 'Select a post above to test against.' ) }
 					</p>
 				) }
 			</div>
@@ -152,7 +119,7 @@ export default function Playground( { fixturePostId } ) {
 			{ isRunningTest && (
 				<div className="content-guidelines-playground__loading">
 					<Spinner />
-					<p>{ __( 'Running test...', 'content-guidelines' ) }</p>
+					<p>{ __( 'Running test…' ) }</p>
 				</div>
 			) }
 
@@ -161,26 +128,15 @@ export default function Playground( { fixturePostId } ) {
 					{ /* Lint Results */ }
 					<LintPanel results={ testResults.lint_results } />
 
-					{ /* Compare Lint Results */ }
-					{ testResults.compare?.lint_results && (
-						<div className="content-guidelines-playground__compare">
-							<h4>{ __( 'Active Guidelines Lint', 'content-guidelines' ) }</h4>
-							<LintPanel results={ testResults.compare.lint_results } />
-						</div>
-					) }
-
 					{ /* AI Result */ }
 					{ testResults.ai_result && (
-						<PanelBody
-							title={ __( 'AI Result', 'content-guidelines' ) }
-							initialOpen={ true }
-						>
+						<PanelBody title={ __( 'AI Result' ) } initialOpen>
 							<div className="content-guidelines-playground__ai-result">
 								{ testResults.ai_result.output }
 							</div>
 							{ testResults.ai_result.alternatives && (
 								<div className="content-guidelines-playground__alternatives">
-									<h5>{ __( 'Alternatives', 'content-guidelines' ) }</h5>
+									<h5>{ __( 'Alternatives' ) }</h5>
 									<ul>
 										{ testResults.ai_result.alternatives.map(
 											( alt, i ) => (
@@ -198,29 +154,13 @@ export default function Playground( { fixturePostId } ) {
 						<Notice status="info" isDismissible={ false }>
 							{ testResults.ai_message ||
 								__(
-									'No AI provider connected. Showing lint checks and context preview.',
-									'content-guidelines'
+									'No AI provider connected. Showing lint checks and context preview.'
 								) }
 						</Notice>
 					) }
 
 					{ /* Context Preview */ }
 					<ContextPreview packet={ testResults.context_packet } />
-
-					{ /* Compare Context */ }
-					{ testResults.compare?.context_packet && (
-						<div className="content-guidelines-playground__compare">
-							<h4>
-								{ __(
-									'Active Guidelines Context',
-									'content-guidelines'
-								) }
-							</h4>
-							<ContextPreview
-								packet={ testResults.compare.context_packet }
-							/>
-						</div>
-					) }
 				</div>
 			) }
 		</div>

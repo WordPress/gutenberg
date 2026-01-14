@@ -1,9 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { useRegistry, useDispatch, useSelect } from '@wordpress/data';
+import { useRegistry, useDispatch } from '@wordpress/data';
 import { useEffect } from '@wordpress/element';
-import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -43,18 +42,14 @@ const baseRoutes = [
 	notFoundRoute,
 ];
 
+// Check if Content Guidelines experiment is enabled via window global.
+const isContentGuidelinesEnabled =
+	typeof window !== 'undefined' &&
+	window.__experimentalEnableContentGuidelines === true;
+
 export function useRegisterSiteEditorRoutes() {
 	const registry = useRegistry();
 	const { registerRoute } = unlock( useDispatch( siteEditorStore ) );
-
-	// Check if Content Guidelines experiment is enabled.
-	const isContentGuidelinesEnabled = useSelect( ( select ) => {
-		const settings = select( coreStore ).getEntityRecord(
-			'root',
-			'__unstableBase'
-		);
-		return settings?.contentGuidelinesEnabled ?? false;
-	}, [] );
 
 	useEffect( () => {
 		const routes = [ ...baseRoutes ];
@@ -67,5 +62,5 @@ export function useRegisterSiteEditorRoutes() {
 		registry.batch( () => {
 			routes.forEach( registerRoute );
 		} );
-	}, [ registry, registerRoute, isContentGuidelinesEnabled ] );
+	}, [ registry, registerRoute ] );
 }
