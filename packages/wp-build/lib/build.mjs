@@ -1317,7 +1317,8 @@ async function transpilePackage( packageName ) {
 	if ( packageJson.wpWorkers ) {
 		const workerBuilds = [];
 		const workerEntries =
-			typeof packageJson.wpWorkers === 'object' && packageJson.wpWorkers !== null
+			typeof packageJson.wpWorkers === 'object' &&
+			packageJson.wpWorkers !== null
 				? Object.entries( packageJson.wpWorkers )
 				: [];
 		for ( const [ outputName, entryPath ] of workerEntries ) {
