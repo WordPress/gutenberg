@@ -345,7 +345,11 @@ export function mergeCrdtBlocks(
 						yblock.set( key, yInnerBlocks );
 					}
 
-					mergeCrdtBlocks( yInnerBlocks, value ?? [], lastSelection );
+					mergeCrdtBlocks(
+						yInnerBlocks,
+						value ?? [],
+						cursorPosition
+					);
 					break;
 				}
 
