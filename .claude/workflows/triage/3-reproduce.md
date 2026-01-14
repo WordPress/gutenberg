@@ -4,6 +4,46 @@ Execute reproduction steps using Playwright MCP to verify Gutenberg bug reports.
 
 ## 3.1 Setup
 
+### 3.1.1 Efficiency Rules (CRITICAL)
+
+Browser actions are expensive (~1500 tokens each). **Target: 10-15 browser calls maximum**.
+
+**Priority order:**
+1. **JavaScript API first** - Insert/modify blocks via `window.wp.data.dispatch()`
+2. **Role selectors second** - Use `role=button[name="..."]` patterns
+3. **CSS selectors third** - Use documented patterns from wordpress-playwright-patterns.md
+4. **Snapshot as last resort** - Only when element location fails after 2 attempts
+
+**Read the patterns file first:**
+```bash
+cat .claude/workflows/triage/wordpress-playwright-patterns.md
+```
+
+### 3.1.2 Pre-Reproduction Planning
+
+Before any browser interaction, create an action plan:
+
+```
+REPRODUCTION PLAN
+=================
+Issue: #<issue>
+
+Batch 1 - Setup:
+- Navigate to post editor
+- Use JS API to insert blocks: window.wp.data.dispatch(...)
+
+Batch 2 - Configure:
+- Use page.evaluate() to configure block settings
+
+Batch 3 - Verify:
+- Use JS API to get content state
+- Screenshot only if bug is visually evident
+
+Estimated browser calls: <target 10-15>
+```
+
+### 3.1.3 Environment Setup
+
 Create screenshots directory:
 
 ```bash
@@ -29,12 +69,19 @@ For each step in `reproduction.steps`, translate natural language into Playwrigh
 | "Click the Save button" | Find button, click |
 | "Notice that ..." | Check for element presence/absence |
 
-**Implementation flow:**
-1. Try targeted element query first (CSS selector, role, or text)
-2. If element not found, use `mcp__playwright__browser_snapshot` to locate
-3. Perform action (navigate, type, click, etc.)
-4. Don't snapshot after action unless needed for verification
-5. Only screenshot when bug/error is visible (see screenshot strategy below)
+**Implementation flow (efficiency-first):**
+1. **Read patterns file** - `cat .claude/workflows/triage/wordpress-playwright-patterns.md`
+2. **Plan using APIs** - Identify which steps can use JavaScript APIs instead of UI clicks
+3. **Execute via JS when possible** - Use `page.evaluate()` to batch multiple block operations
+4. **Use role selectors** - For UI interactions, prefer `role=button[name="..."]` over snapshot exploration
+5. **Verify via API when possible** - Use `getBlocks()` or `getEditedPostContent()` over screenshots
+6. **Screenshot only when needed** - Only capture when the bug/error is visually evident
+
+**API-first approach for common operations:**
+- **Adding blocks**: Use `wp.data.dispatch('core/block-editor').insertBlock()` instead of block inserter UI
+- **Setting content**: Use `wp.blocks.parse()` + `resetBlocks()` instead of typing
+- **Checking state**: Use `wp.data.select('core/block-editor').getBlocks()` instead of screenshots
+- **Selecting blocks**: Use `wp.data.dispatch('core/block-editor').selectBlock()` instead of clicking
 
 ## 3.3 Collect evidence
 
