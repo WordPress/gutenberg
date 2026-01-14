@@ -761,7 +761,11 @@ Use this concise format for GitHub comments:
 
 **Network:** `{method} {endpoint}` → {status}
 **Console:** {key errors if any}
-**Screenshots:** {count} captured
+
+**Screenshots:**
+
+![Initial state](data:image/png;base64,{base64_encoded_image_1})
+![Bug evidence](data:image/png;base64,{base64_encoded_image_2})
 
 </details>
 
@@ -832,19 +836,45 @@ Format code references as:
 
 Print the formatted markdown to console. Keep the output concise - aim for 50-100 lines maximum for GitHub comment readability.
 
-## 4.6 Post GitHub comment
+## 4.6 Encode screenshots as base64
 
-After generating the findings, post the comment to the GitHub issue:
+Before posting the comment, encode each screenshot as base64 for inline embedding:
+
+```bash
+base64 -w 0 /tmp/triage/<issue>/screenshots/<filename>.png
+```
+
+**Which screenshots to include (1-2 max):**
+- **Final state** - the screenshot that clearly shows the bug (required)
+- **Initial state** - before the bug occurs, for comparison (optional)
+- Skip intermediate navigation steps
+- Screenshots should be self-explanatory evidence of the issue
+
+**Technical guidelines:**
+- Use `-w 0` to output without line breaks
+- Each base64 image adds ~33% to file size (e.g., 100KB image → ~133KB base64)
+- GitHub comments have a size limit (~65KB rendered) - resize large images if needed
+
+**To resize images before encoding (if needed):**
+```bash
+# Resize to max 800px width while preserving aspect ratio
+convert /tmp/triage/<issue>/screenshots/<filename>.png -resize 800x /tmp/triage/<issue>/screenshots/<filename>-small.png
+```
+
+## 4.7 Post GitHub comment
+
+After generating the findings with embedded screenshots, post the comment to the GitHub issue:
 
 ```bash
 gh issue comment <issue_number> --repo aagam-shah/gutenberg --body "$(cat <<'EOF'
-<formatted markdown from 4.3>
+<formatted markdown from 4.3 with base64 images>
 EOF
 )"
 ```
 
 **Important:**
 - Use the exact markdown format from section 4.3
+- Include base64-encoded screenshots inline using `![description](data:image/png;base64,<base64_string>)`
 - The comment will be posted under the authenticated user's account
 - Confirm successful posting by checking the command output
 
