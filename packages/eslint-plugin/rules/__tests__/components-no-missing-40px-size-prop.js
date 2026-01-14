@@ -351,3 +351,140 @@ ruleTester.run(
 		invalid: [],
 	}
 );
+
+// Tests for compound components (e.g., CircularOptionPicker.Option)
+ruleTester.run(
+	'components-no-missing-40px-size-prop (compound components)',
+	rule,
+	{
+		valid: [
+			// Compound component with __next40pxDefaultSize
+			{
+				code: `
+				import { CircularOptionPicker } from '@wordpress/components';
+				<CircularOptionPicker.Option __next40pxDefaultSize />
+			`,
+			},
+			// Aliased namespace with compound component
+			{
+				code: `
+				import { CircularOptionPicker as COP } from '@wordpress/components';
+				<COP.Option __next40pxDefaultSize />
+			`,
+			},
+			// Compound component with non-default size
+			{
+				code: `
+				import { CircularOptionPicker } from '@wordpress/components';
+				<CircularOptionPicker.Option size="small" />
+			`,
+			},
+			// Non-tracked member of a namespace (should not be checked)
+			{
+				code: `
+				import { CircularOptionPicker } from '@wordpress/components';
+				<CircularOptionPicker.SomeOtherMember />
+			`,
+			},
+			// Same namespace name from different package (should not be checked)
+			{
+				code: `
+				import { CircularOptionPicker } from '@wordpress/ui';
+				<CircularOptionPicker.Option />
+			`,
+			},
+			// Local import of namespace (with checkLocalImports)
+			{
+				code: `
+				import { CircularOptionPicker } from '../circular-option-picker';
+				<CircularOptionPicker.Option __next40pxDefaultSize />
+			`,
+				options: [ { checkLocalImports: true } ],
+			},
+			// Local default import of namespace (with checkLocalImports)
+			{
+				code: `
+				import CircularOptionPicker from '../circular-option-picker';
+				<CircularOptionPicker.Option __next40pxDefaultSize />
+			`,
+				options: [ { checkLocalImports: true } ],
+			},
+			// Local import without checkLocalImports (should not be checked)
+			{
+				code: `
+				import { CircularOptionPicker } from '../circular-option-picker';
+				<CircularOptionPicker.Option />
+			`,
+			},
+		],
+		invalid: [
+			// Compound component without __next40pxDefaultSize
+			{
+				code: `
+				import { CircularOptionPicker } from '@wordpress/components';
+				<CircularOptionPicker.Option />
+			`,
+				errors: [
+					{
+						messageId: 'missingProp',
+						data: { component: 'CircularOptionPicker.Option' },
+					},
+				],
+			},
+			// Aliased namespace without __next40pxDefaultSize
+			{
+				code: `
+				import { CircularOptionPicker as COP } from '@wordpress/components';
+				<COP.Option />
+			`,
+				errors: [
+					{
+						messageId: 'missingProp',
+						data: { component: 'CircularOptionPicker.Option' },
+					},
+				],
+			},
+			// Compound component with __next40pxDefaultSize={false}
+			{
+				code: `
+				import { CircularOptionPicker } from '@wordpress/components';
+				<CircularOptionPicker.Option __next40pxDefaultSize={false} />
+			`,
+				errors: [
+					{
+						messageId: 'missingProp',
+						data: { component: 'CircularOptionPicker.Option' },
+					},
+				],
+			},
+			// Local import of namespace with checkLocalImports
+			{
+				code: `
+				import { CircularOptionPicker } from '../circular-option-picker';
+				<CircularOptionPicker.Option />
+			`,
+				options: [ { checkLocalImports: true } ],
+				errors: [
+					{
+						messageId: 'missingProp',
+						data: { component: 'CircularOptionPicker.Option' },
+					},
+				],
+			},
+			// Local default import of namespace with checkLocalImports
+			{
+				code: `
+				import CircularOptionPicker from '../circular-option-picker';
+				<CircularOptionPicker.Option />
+			`,
+				options: [ { checkLocalImports: true } ],
+				errors: [
+					{
+						messageId: 'missingProp',
+						data: { component: 'CircularOptionPicker.Option' },
+					},
+				],
+			},
+		],
+	}
+);
