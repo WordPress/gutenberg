@@ -9,6 +9,7 @@ import { createWorkerFactory, type WorkerCreator } from '@shopify/web-worker';
 import { ImageFile } from '../../image-file';
 import { getFileBasename } from '../../utils';
 import type { ImageSizeCrop, QueueItemId } from '../types';
+import { debug } from './debug';
 
 let vipsWorker:
 	| ReturnType< WorkerCreator< typeof import('@wordpress/vips') > >
@@ -122,6 +123,24 @@ export async function vipsResizeImage(
 	smartCrop: boolean,
 	addSuffix: boolean
 ) {
+	debug.group( `vipsResizeImage: ${ id }` );
+	debug.log( 'Starting VIPS resize operation', {
+		id,
+		file: {
+			name: file.name,
+			type: file.type,
+			size: `${ ( file.size / 1024 ).toFixed( 2 ) }KB`,
+		},
+		resize: {
+			width: resize.width,
+			height: resize.height,
+			crop: resize.crop,
+		},
+		smartCrop,
+		addSuffix,
+	} );
+	debug.time( `vips-resize-${ id }` );
+
 	const { buffer, width, height, originalWidth, originalHeight } =
 		await getVipsWorker().resizeImage(
 			id,
@@ -131,6 +150,14 @@ export async function vipsResizeImage(
 			smartCrop
 		);
 
+	debug.timeEnd( `vips-resize-${ id }` );
+	debug.log( 'VIPS resize complete', {
+		id,
+		originalDimensions: { width: originalWidth, height: originalHeight },
+		newDimensions: { width, height },
+		bufferSize: `${ ( ( buffer as ArrayBuffer ).byteLength / 1024 ).toFixed( 2 ) }KB`,
+	} );
+
 	let fileName = file.name;
 
 	if ( addSuffix && ( originalWidth > width || originalHeight > height ) ) {
@@ -139,9 +166,13 @@ export async function vipsResizeImage(
 			basename,
 			`${ basename }-${ width }x${ height }`
 		);
+		debug.log( 'Added dimension suffix to filename', {
+			original: file.name,
+			new: fileName,
+		} );
 	}
 
-	return new ImageFile(
+	const resultFile = new ImageFile(
 		new File(
 			[ new Blob( [ buffer as ArrayBuffer ], { type: file.type } ) ],
 			fileName,
@@ -154,6 +185,17 @@ export async function vipsResizeImage(
 		originalWidth,
 		originalHeight
 	);
+
+	debug.log( 'Created ImageFile', {
+		fileName,
+		width,
+		height,
+		originalWidth,
+		originalHeight,
+	} );
+	debug.groupEnd();
+
+	return resultFile;
 }
 
 /**

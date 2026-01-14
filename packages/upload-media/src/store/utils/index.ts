@@ -5,3 +5,5 @@ export {
 	vipsResizeImage,
 	vipsCancelOperations,
 } from './vips';
+
+export { debug } from './debug';

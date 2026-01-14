@@ -23,6 +23,7 @@ import type {
 	ThumbnailOptions,
 } from './types';
 import { supportsAnimation, supportsInterlace, supportsQuality } from './utils';
+import { debug } from './debug';
 
 interface EmscriptenModule {
 	setAutoDeleteLater: ( autoDelete: boolean ) => void;
@@ -199,11 +200,24 @@ export async function resizeImage(
 	originalWidth: number;
 	originalHeight: number;
 } > {
+	debug.group( `resizeImage: ${ id }` );
+	debug.log( 'Starting resize operation', {
+		id,
+		type,
+		bufferSize: buffer.byteLength,
+		requestedSize: { width: resize.width, height: resize.height },
+		crop: resize.crop,
+		smartCrop,
+	} );
+	debug.time( `resize-${ id }` );
+
 	const ext = type.split( '/' )[ 1 ];
 
 	inProgressOperations.add( id );
 
 	const vips = await getVips();
+	debug.log( 'VIPS instance ready' );
+
 	const thumbnailOptions: ThumbnailOptions = {
 		size: 'down',
 	};
@@ -217,11 +231,13 @@ export async function resizeImage(
 		strOptions = '[n=-1]';
 		thumbnailOptions.option_string = strOptions;
 		( loadOptions as LoadOptions< typeof type > ).n = -1;
+		debug.log( 'Animated image detected, loading all frames' );
 	}
 
 	// TODO: Report progress, see https://github.com/swissspidy/media-experiments/issues/327.
 	const onProgress = () => {
 		if ( ! inProgressOperations.has( id ) ) {
+			debug.log( 'Operation cancelled', { id } );
 			image.kill = true;
 		}
 	};
@@ -231,6 +247,7 @@ export async function resizeImage(
 	image.onProgress = onProgress;
 
 	const { width, pageHeight } = image;
+	debug.log( 'Original image dimensions', { width, height: pageHeight } );
 
 	// If resize.height is zero.
 	resize.height = resize.height || ( pageHeight / width ) * resize.width;
@@ -239,6 +256,7 @@ export async function resizeImage(
 	thumbnailOptions.height = resize.height;
 
 	if ( ! resize.crop ) {
+		debug.log( 'Resizing without crop (proportional)' );
 		image = vips.Image.thumbnailBuffer(
 			buffer,
 			resizeWidth,
@@ -247,6 +265,7 @@ export async function resizeImage(
 
 		image.onProgress = onProgress;
 	} else if ( true === resize.crop ) {
+		debug.log( 'Resizing with center crop', { smartCrop } );
 		thumbnailOptions.crop = smartCrop ? 'attention' : 'centre';
 
 		image = vips.Image.thumbnailBuffer(
@@ -257,6 +276,7 @@ export async function resizeImage(
 
 		image.onProgress = onProgress;
 	} else {
+		debug.log( 'Resizing with positional crop', { crop: resize.crop } );
 		// First resize, then do the cropping.
 		// This allows operating on the second bitmap with the correct dimensions.
 
@@ -310,6 +330,13 @@ export async function resizeImage(
 		resize.width = Math.min( image.width, resize.width );
 		resize.height = Math.min( image.height, resize.height );
 
+		debug.log( 'Applying crop', {
+			left,
+			top,
+			width: resize.width,
+			height: resize.height,
+		} );
+
 		image = image.crop( left, top, resize.width, resize.height );
 
 		image.onProgress = onProgress;
@@ -326,6 +353,15 @@ export async function resizeImage(
 		originalWidth: width,
 		originalHeight: pageHeight,
 	};
+
+	debug.timeEnd( `resize-${ id }` );
+	debug.log( 'Resize complete', {
+		id,
+		originalDimensions: { width, height: pageHeight },
+		newDimensions: { width: result.width, height: result.height },
+		outputBufferSize: result.buffer.byteLength,
+	} );
+	debug.groupEnd();
 
 	// Only call after `image` is no longer being used.
 	cleanup?.();

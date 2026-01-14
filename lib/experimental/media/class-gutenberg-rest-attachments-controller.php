@@ -9,6 +9,38 @@
  * Class Gutenberg_REST_Attachments_Controller.
  */
 class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controller {
+
+	/**
+	 * Debug logging helper.
+	 *
+	 * Enable debug logging by defining UPLOAD_MEDIA_DEBUG as true:
+	 * define( 'UPLOAD_MEDIA_DEBUG', true );
+	 *
+	 * Logs will be written to the WordPress debug log if WP_DEBUG_LOG is enabled,
+	 * or you can use a custom log file by defining UPLOAD_MEDIA_DEBUG_LOG.
+	 *
+	 * @param string $message The message to log.
+	 * @param array  $context Additional context data.
+	 */
+	private function debug_log( string $message, array $context = array() ): void {
+		if ( ! defined( 'UPLOAD_MEDIA_DEBUG' ) || ! UPLOAD_MEDIA_DEBUG ) {
+			return;
+		}
+
+		$log_message = '[upload-media-php] ' . $message;
+
+		if ( ! empty( $context ) ) {
+			$log_message .= ' | Context: ' . wp_json_encode( $context, JSON_UNESCAPED_SLASHES );
+		}
+
+		if ( defined( 'UPLOAD_MEDIA_DEBUG_LOG' ) && UPLOAD_MEDIA_DEBUG_LOG ) {
+			// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+			error_log( $log_message . PHP_EOL, 3, UPLOAD_MEDIA_DEBUG_LOG );
+		} elseif ( defined( 'WP_DEBUG_LOG' ) && WP_DEBUG_LOG ) {
+			// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+			error_log( $log_message );
+		}
+	}
 	/**
 	 * Registers the routes for attachments.
 	 *
@@ -92,6 +124,15 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 
 		$data = $response->get_data();
 
+		$this->debug_log(
+			'prepare_item_for_response: Preparing response',
+			array(
+				'attachment_id'       => $item->ID,
+				'mime_type'           => get_post_mime_type( $item ),
+				'missing_image_sizes' => $data['missing_image_sizes'] ?? array(),
+			)
+		);
+
 		// Handle missing image sizes for PDFs.
 
 		$fields = $this->get_fields_for_response( $request );
@@ -128,6 +169,16 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 
 				$missing_image_sizes         = array_diff( $merged_sizes, array_keys( $metadata['sizes'] ) );
 				$data['missing_image_sizes'] = $missing_image_sizes;
+				$this->debug_log(
+					'prepare_item_for_response: Computed missing_image_sizes for PDF',
+					array(
+						'attachment_id'       => $item->ID,
+						'fallback_sizes'      => $fallback_sizes,
+						'existing_sizes'      => array_keys( $metadata['sizes'] ),
+						'missing_image_sizes' => array_values( $missing_image_sizes ),
+						'registered_sizes'    => $registered_sizes,
+					)
+				);
 			}
 		}
 
@@ -155,13 +206,23 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 	 * @return WP_REST_Response|WP_Error Response object on success, WP_Error object on failure.
 	 */
 	public function create_item( $request ) {
+		$this->debug_log(
+			'create_item: Starting upload',
+			array(
+				'generate_sub_sizes' => $request['generate_sub_sizes'] ?? true,
+				'convert_format'     => $request['convert_format'] ?? true,
+			)
+		);
+
 		if ( ! $request['generate_sub_sizes'] ) {
+			$this->debug_log( 'create_item: Disabling server-side sub-size generation' );
 			add_filter( 'intermediate_image_sizes_advanced', '__return_empty_array', 100 );
 			add_filter( 'fallback_intermediate_image_sizes', '__return_empty_array', 100 );
 
 		}
 
 		if ( ! $request['convert_format'] ) {
+			$this->debug_log( 'create_item: Disabling format conversion' );
 			add_filter( 'image_editor_output_format', '__return_empty_array', 100 );
 		}
 
@@ -170,6 +231,25 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 		remove_filter( 'intermediate_image_sizes_advanced', '__return_empty_array', 100 );
 		remove_filter( 'fallback_intermediate_image_sizes', '__return_empty_array', 100 );
 		remove_filter( 'image_editor_output_format', '__return_empty_array', 100 );
+
+		if ( is_wp_error( $response ) ) {
+			$this->debug_log(
+				'create_item: Upload failed',
+				array(
+					'error' => $response->get_error_message(),
+				)
+			);
+		} else {
+			$data = $response->get_data();
+			$this->debug_log(
+				'create_item: Upload successful',
+				array(
+					'attachment_id'       => $data['id'] ?? 'N/A',
+					'mime_type'           => $data['mime_type'] ?? 'N/A',
+					'missing_image_sizes' => $data['missing_image_sizes'] ?? array(),
+				)
+			);
+		}
 
 		return $response;
 	}
@@ -243,17 +323,49 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 	 */
 	public function sideload_item( WP_REST_Request $request ) {
 		$attachment_id = $request['id'];
+		$image_size    = $request['image_size'];
+
+		$this->debug_log(
+			'sideload_item: Starting sideload request',
+			array(
+				'attachment_id' => $attachment_id,
+				'image_size'    => $image_size,
+			)
+		);
 
 		$post = $this->get_post( $attachment_id );
 
 		if ( is_wp_error( $post ) ) {
+			$this->debug_log(
+				'sideload_item: Failed to get post',
+				array(
+					'attachment_id' => $attachment_id,
+					'error'         => $post->get_error_message(),
+				)
+			);
 			return $post;
 		}
+
+		$this->debug_log(
+			'sideload_item: Post retrieved',
+			array(
+				'attachment_id' => $attachment_id,
+				'post_title'    => $post->post_title,
+				'mime_type'     => get_post_mime_type( $post ),
+			)
+		);
 
 		if (
 			! wp_attachment_is_image( $post ) &&
 			! wp_attachment_is( 'pdf', $post )
 		) {
+			$this->debug_log(
+				'sideload_item: Invalid attachment type',
+				array(
+					'attachment_id' => $attachment_id,
+					'mime_type'     => get_post_mime_type( $post ),
+				)
+			);
 			return new WP_Error(
 				'rest_post_invalid_id',
 				__( 'Invalid post ID, only images and PDFs can be sideloaded.', 'gutenberg' ),
@@ -269,6 +381,17 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 		// Get the file via $_FILES or raw data.
 		$files   = $request->get_file_params();
 		$headers = $request->get_headers();
+
+		$this->debug_log(
+			'sideload_item: File params received',
+			array(
+				'has_files'       => ! empty( $files ),
+				'file_name'       => ! empty( $files['file']['name'] ) ? $files['file']['name'] : 'N/A',
+				'file_size'       => ! empty( $files['file']['size'] ) ? $files['file']['size'] : 'N/A',
+				'content_type'    => $headers['content_type'][0] ?? 'N/A',
+				'content_length'  => $headers['content_length'][0] ?? 'N/A',
+			)
+		);
 
 		/*
 		 * wp_unique_filename() will always add numeric suffix if the name looks like a sub-size to avoid conflicts.
@@ -306,8 +429,10 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 		}
 
 		if ( ! empty( $files ) ) {
+			$this->debug_log( 'sideload_item: Uploading from file params' );
 			$file = $this->upload_from_file( $files, $headers, $time );
 		} else {
+			$this->debug_log( 'sideload_item: Uploading from raw data' );
 			$file = $this->upload_from_data( $request->get_body(), $headers, $time );
 		}
 
@@ -315,15 +440,41 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 		remove_filter( 'image_editor_output_format', '__return_empty_array', 100 );
 
 		if ( is_wp_error( $file ) ) {
+			$this->debug_log(
+				'sideload_item: Upload failed',
+				array(
+					'attachment_id' => $attachment_id,
+					'image_size'    => $image_size,
+					'error'         => $file->get_error_message(),
+				)
+			);
 			return $file;
 		}
 
 		$type = $file['type'];
 		$path = $file['file'];
 
+		$this->debug_log(
+			'sideload_item: File uploaded successfully',
+			array(
+				'path'      => $path,
+				'type'      => $type,
+				'file_size' => file_exists( $path ) ? filesize( $path ) : 'N/A',
+			)
+		);
+
 		$image_size = $request['image_size'];
 
 		$metadata = wp_get_attachment_metadata( $attachment_id, true );
+
+		$this->debug_log(
+			'sideload_item: Current attachment metadata',
+			array(
+				'attachment_id'  => $attachment_id,
+				'has_metadata'   => ! empty( $metadata ),
+				'existing_sizes' => ! empty( $metadata['sizes'] ) ? array_keys( $metadata['sizes'] ) : array(),
+			)
+		);
 
 		if ( ! $metadata ) {
 			$metadata = array();
@@ -331,6 +482,12 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 
 		if ( 'original' === $image_size ) {
 			$metadata['original_image'] = wp_basename( $path );
+			$this->debug_log(
+				'sideload_item: Set original_image in metadata',
+				array(
+					'original_image' => $metadata['original_image'],
+				)
+			);
 		} else {
 			$metadata['sizes'] = $metadata['sizes'] ?? array();
 
@@ -343,9 +500,33 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 				'mime-type' => $type,
 				'filesize'  => wp_filesize( $path ),
 			);
+
+			$this->debug_log(
+				'sideload_item: Added image size to metadata',
+				array(
+					'image_size'  => $image_size,
+					'dimensions'  => array(
+						'width'  => $size ? $size[0] : 0,
+						'height' => $size ? $size[1] : 0,
+					),
+					'file'        => wp_basename( $path ),
+					'mime_type'   => $type,
+					'file_size'   => wp_filesize( $path ),
+					'all_sizes'   => array_keys( $metadata['sizes'] ),
+				)
+			);
 		}
 
 		wp_update_attachment_metadata( $attachment_id, $metadata );
+
+		$this->debug_log(
+			'sideload_item: Metadata updated successfully',
+			array(
+				'attachment_id' => $attachment_id,
+				'image_size'    => $image_size,
+				'total_sizes'   => count( $metadata['sizes'] ?? array() ),
+			)
+		);
 
 		$response_request = new WP_REST_Request(
 			WP_REST_Server::READABLE,
