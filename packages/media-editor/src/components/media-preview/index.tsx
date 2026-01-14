@@ -119,7 +119,7 @@ export default function MediaPreview( props: MediaPreviewProps ) {
 	if ( loadingState === 'error' ) {
 		return (
 			<div className="media-editor-preview media-editor-preview--error">
-				<p>Failed to load media file.</p>
+				<p>{ __( 'Failed to load media file.' ) }</p>
 				<p className="media-editor-preview__url">{ mediaUrl }</p>
 			</div>
 		);
