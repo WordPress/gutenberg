@@ -51,25 +51,44 @@ jobs:
                   fetch-depth: 1
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
 
-            - name: Install Chrome dependencies
+            - name: Setup Chrome for DevTools MCP
               run: |
-                  sudo apt-get update
-                  sudo apt-get install -y chromium-browser
-                  which chromium-browser && chromium-browser --version
-                  # Set Chrome path for MCP
-                  echo "CHROME_PATH=$(which chromium-browser)" >> $GITHUB_ENV
+                  # GitHub runners have Chrome pre-installed - use it instead of snap chromium
+                  # Snap chromium has sandbox restrictions that break in CI environments
+                  if command -v google-chrome &> /dev/null; then
+                    CHROME_BIN=$(which google-chrome)
+                    echo "Using pre-installed Google Chrome: $CHROME_BIN"
+                    google-chrome --version
+                  elif command -v google-chrome-stable &> /dev/null; then
+                    CHROME_BIN=$(which google-chrome-stable)
+                    echo "Using pre-installed Google Chrome Stable: $CHROME_BIN"
+                    google-chrome-stable --version
+                  else
+                    # Fallback: Install Chrome from Google's repository
+                    echo "Installing Google Chrome from official repository..."
+                    wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
+                    echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" | sudo tee /etc/apt/sources.list.d/google-chrome.list
+                    sudo apt-get update
+                    sudo apt-get install -y google-chrome-stable
+                    CHROME_BIN=$(which google-chrome-stable)
+                  fi
+                  echo "CHROME_PATH=$CHROME_BIN" >> $GITHUB_ENV
 
             - name: Install WordPress Playground CLI
               run: npm install -g @wp-playground/cli
 
             - name: Create MCP config for Chrome DevTools
               run: |
-                  cat > /tmp/mcp-config.json << 'EOF'
+                  # Create MCP config with CHROME_PATH passed to the server
+                  cat > /tmp/mcp-config.json << EOF
                   {
                     "mcpServers": {
                       "chrome-devtools": {
                         "command": "npx",
-                        "args": ["-y", "@anthropic-ai/chrome-devtools-mcp@latest", "--headless"]
+                        "args": ["-y", "@anthropic-ai/chrome-devtools-mcp@latest", "--headless"],
+                        "env": {
+                          "CHROME_PATH": "${CHROME_PATH}"
+                        }
                       },
                       "context7": {
                         "command": "npx",
@@ -78,6 +97,8 @@ jobs:
                     }
                   }
                   EOF
+                  echo "MCP config created with CHROME_PATH: ${CHROME_PATH}"
+                  cat /tmp/mcp-config.json
 
             - name: Run Claude Triage (Chrome DevTools)
               uses: anthropics/claude-code-action@v1

@@ -173,3 +173,12 @@ Execute the reporting instructions and post the GitHub comment.
 - This command uses Chrome DevTools MCP for browser automation
 - For Playwright-based triage, use `/triage` instead
 - Only Step 3 uses a subagent - this is intentional for optimal cache/isolation balance
+
+## IMPORTANT: Do NOT use Playwright
+
+This workflow uses **Chrome DevTools MCP only**. Do NOT:
+- Read or reference `3-reproduce-playwright.md`
+- Use any `mcp__playwright__*` tools
+- Fall back to Playwright if DevTools fails
+
+If Chrome DevTools MCP is unavailable, **fail fast** - do not attempt alternatives.
