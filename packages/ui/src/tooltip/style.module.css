@@ -1,0 +1,19 @@
+@layer wp-ui-utilities, wp-ui-components, wp-ui-compositions, wp-ui-overrides;
+
+@layer wp-ui-components {
+	.positioner {
+		z-index: var( --wp-ui-tooltip-z-index, initial );
+	}
+
+	.popup {
+		background-color: var( --wpds-color-bg-surface-neutral-strong );
+		padding: var( --wpds-dimension-base )
+			calc( 2 * var( --wpds-dimension-base ) );
+		border-radius: var( --wpds-border-radius-surface-sm );
+		font-family: var( --wpds-font-family-body );
+		font-size: var( --wpds-font-size-sm );
+		line-height: 1.4;
+		color: var( --wpds-color-fg-content-neutral );
+		box-shadow: var( --wpds-elevation-small );
+	}
+}
