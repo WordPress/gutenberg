@@ -59,4 +59,4 @@ jobs:
                   prompt: "/triage ${{ github.event.issue.number }}"
                   claude_args: |
                       --mcp-config /tmp/mcp-config.json
-                      --allowedTools "Bash,Read,Write,Edit,Glob,Grep,mcp__playwright,mcp__context7"
+                      --allowedTools "Bash,Read,Write,Edit,Glob,Grep,Skill,mcp__playwright,mcp__context7"
