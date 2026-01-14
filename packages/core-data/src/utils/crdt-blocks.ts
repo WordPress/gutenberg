@@ -12,6 +12,11 @@ import { getBlockTypes } from '@wordpress/blocks';
 import { RichTextData } from '@wordpress/rich-text';
 import { Y, Delta } from '@wordpress/sync';
 
+/**
+ * Internal dependencies
+ */
+import { createYMap, type YMapRecord, type YMapWrap } from './crdt-utils';
+
 interface BlockAttributes {
 	[ key: string ]: unknown;
 }
@@ -21,34 +26,33 @@ interface BlockType {
 	attributes?: Record< string, { type?: string } >;
 }
 
+// A block as represented in Gutenberg's data store.
 export interface Block {
 	attributes: BlockAttributes;
 	clientId?: string;
 	innerBlocks: Block[];
-	originalContent?: string; // unserializable
+	isValid?: boolean;
+	name: string;
+	originalContent?: string;
 	validationIssues?: string[]; // unserializable
+}
+
+// A block as represented in the CRDT document (Y.Map).
+interface YBlockRecord extends YMapRecord {
+	attributes: YBlockAttributes;
+	clientId: string;
+	innerBlocks: YBlocks;
+	isValid?: boolean;
+	originalContent?: string;
 	name: string;
 }
 
-export type YBlock = Y.Map<
-	/* name, clientId, and originalContent are strings. */
-	| string
-	/* validationIssues? is an array of strings. */
-	| string[]
-	/* attributes is a Y.Map< unknown >. */
-	| YBlockAttributes
-	/* innerBlocks is a Y.Array< YBlock >. */
-	| YBlocks
->;
-
+export type YBlock = YMapWrap< YBlockRecord >;
 export type YBlocks = Y.Array< YBlock >;
-export type YBlockAttributes = Y.Map< Y.Text | unknown >;
 
-// The Y.Map type is not easy to work with. The generic type it accepts represents
-// the possible values of the map, which are varied in our case. This type is
-// accurate, but will require aggressive type narrowing when the map values are
-// accessed -- or type casting with `as`.
-// export type YBlock = Y.Map< Block[ keyof Block ] >;
+// Block attribute schema cannot be known at compile time, so we use Y.Map.
+// Attribute values will be typed as the union of `Y.Text` and `unknown`.
+export type YBlockAttributes = Y.Map< Y.Text | unknown >;
 
 const serializableBlocksCache = new WeakMap< WeakKey, Block[] >();
 
@@ -64,13 +68,10 @@ function makeBlockAttributesSerializable(
 	return newAttributes;
 }
 
-function makeBlocksSerializable( blocks: Block[] | YBlocks ): Block[] {
-	return blocks.map( ( block: Block | YBlock ) => {
-		const blockAsJson = block instanceof Y.Map ? block.toJSON() : block;
-		const { name, innerBlocks, attributes, ...rest } = blockAsJson;
+function makeBlocksSerializable( blocks: Block[] ): Block[] {
+	return blocks.map( ( block: Block ) => {
+		const { name, innerBlocks, attributes, ...rest } = block;
 		delete rest.validationIssues;
-		delete rest.originalContent;
-		// delete rest.isValid
 		return {
 			...rest,
 			name,
@@ -98,10 +99,10 @@ function areBlocksEqual( gblock: Block, yblock: YBlock ): boolean {
 		Object.assign( {}, yblockAsJson, overwrites )
 	);
 	const inners = gblock.innerBlocks || [];
-	const yinners = yblock.get( 'innerBlocks' ) as YBlocks;
+	const yinners = yblock.get( 'innerBlocks' );
 	return (
 		res &&
-		inners.length === yinners.length &&
+		inners.length === yinners?.length &&
 		inners.every( ( block: Block, i: number ) =>
 			areBlocksEqual( block, yinners.get( i ) )
 		)
@@ -143,35 +144,40 @@ function createNewYAttributeValue(
 }
 
 function createNewYBlock( block: Block ): YBlock {
-	return new Y.Map(
-		Object.entries( block ).map( ( [ key, value ] ) => {
-			switch ( key ) {
-				case 'attributes': {
-					return [ key, createNewYAttributeMap( block.name, value ) ];
-				}
+	return createYMap< YBlockRecord >(
+		Object.fromEntries(
+			Object.entries( block ).map( ( [ key, value ] ) => {
+				switch ( key ) {
+					case 'attributes': {
+						return [
+							key,
+							createNewYAttributeMap( block.name, value ),
+						];
+					}
 
-				case 'innerBlocks': {
-					const innerBlocks = new Y.Array();
+					case 'innerBlocks': {
+						const innerBlocks = new Y.Array();
 
-					// If not an array, set to empty Y.Array.
-					if ( ! Array.isArray( value ) ) {
+						// If not an array, set to empty Y.Array.
+						if ( ! Array.isArray( value ) ) {
+							return [ key, innerBlocks ];
+						}
+
+						innerBlocks.insert(
+							0,
+							value.map( ( innerBlock: Block ) =>
+								createNewYBlock( innerBlock )
+							)
+						);
+
 						return [ key, innerBlocks ];
 					}
 
-					innerBlocks.insert(
-						0,
-						value.map( ( innerBlock: Block ) =>
-							createNewYBlock( innerBlock )
-						)
-					);
-
-					return [ key, innerBlocks ];
+					default:
+						return [ key, value ];
 				}
-
-				default:
-					return [ key, value ];
-			}
-		} )
+			} )
+		)
 	);
 }
 
@@ -263,9 +269,7 @@ export function mergeCrdtBlocks(
 		Object.entries( block ).forEach( ( [ key, value ] ) => {
 			switch ( key ) {
 				case 'attributes': {
-					const currentAttributes = yblock.get(
-						key
-					) as YBlockAttributes;
+					const currentAttributes = yblock.get( key );
 
 					// If attributes are not set on the yblock, use the new values.
 					if ( ! currentAttributes ) {
@@ -287,6 +291,8 @@ export function mergeCrdtBlocks(
 								return;
 							}
 
+							const currentAttribute =
+								currentAttributes.get( attributeName );
 							const isRichText = isRichTextAttribute(
 								block.name,
 								attributeName
@@ -296,16 +302,12 @@ export function mergeCrdtBlocks(
 								isRichText &&
 								'string' === typeof attributeValue &&
 								currentAttributes.has( attributeName ) &&
-								currentAttributes.get(
-									attributeName
-								) instanceof Y.Text
+								currentAttribute instanceof Y.Text
 							) {
 								// Rich text values are stored as persistent Y.Text instances.
 								// Update the value with a delta in place.
 								mergeRichTextUpdate(
-									currentAttributes.get(
-										attributeName
-									) as Y.Text,
+									currentAttribute,
 									attributeValue,
 									cursorPosition
 								);
@@ -336,12 +338,14 @@ export function mergeCrdtBlocks(
 
 				case 'innerBlocks': {
 					// Recursively merge innerBlocks
-					const yInnerBlocks = yblock.get( key ) as Y.Array< YBlock >;
-					mergeCrdtBlocks(
-						yInnerBlocks,
-						value ?? [],
-						cursorPosition
-					);
+					let yInnerBlocks = yblock.get( key );
+
+					if ( ! ( yInnerBlocks instanceof Y.Array ) ) {
+						yInnerBlocks = new Y.Array< YBlock >();
+						yblock.set( key, yInnerBlocks );
+					}
+
+					mergeCrdtBlocks( yInnerBlocks, value ?? [], lastSelection );
 					break;
 				}
 
@@ -373,7 +377,11 @@ export function mergeCrdtBlocks(
 	for ( let j = 0; j < yblocks.length; j++ ) {
 		const yblock: YBlock = yblocks.get( j );
 
-		let clientId: string = yblock.get( 'clientId' ) as string;
+		let clientId = yblock.get( 'clientId' );
+
+		if ( ! clientId ) {
+			continue;
+		}
 
 		if ( knownClientIds.has( clientId ) ) {
 			clientId = uuidv4();
