@@ -23,25 +23,23 @@ if ( ! class_exists( 'WP_Icons_Registry' ) ) {
 				return;
 			}
 
-			$svg_files = glob( $icons_directory . '*.svg' );
-			if ( empty( $svg_files ) ) {
+			$collection = wp_json_file_decode( $icons_directory . 'index.json' );
+			if ( empty( $collection ) ) {
+				wp_trigger_error(
+					'WP_Icons_Registry::__construct',
+					'Core icon collection manifest is missing or empty',
+					E_USER_ERROR
+				);
 				return;
 			}
 
-			foreach ( $svg_files as $svg_file ) {
-
-				$icon_name   = basename( $svg_file, '.svg' );
-				$svg_content = file_get_contents( $svg_file );
-
-				if ( false === $svg_content ) {
-					continue;
-				}
-
+			foreach ( $collection as $svg_src ) {
+				$icon_name = basename( $svg_src, '.svg' );
 				$this->register(
 					'core/' . $icon_name,
 					array(
-						'name'    => $icon_name,
-						'content' => $svg_content,
+						'name'     => $icon_name,
+						'filePath' => $svg_src,
 					)
 				);
 			}
