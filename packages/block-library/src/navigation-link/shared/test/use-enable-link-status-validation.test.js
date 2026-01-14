@@ -4,28 +4,17 @@
 import { renderHook } from '@testing-library/react';
 
 /**
- * WordPress dependencies
- */
-import { useSelect } from '@wordpress/data';
-
-/**
  * Internal dependencies
  */
 import { useEnableLinkStatusValidation } from '../use-enable-link-status-validation';
 
-// Mock the @wordpress/data module
-jest.mock( '@wordpress/data', () => ( {
-	useSelect: jest.fn(),
-	combineReducers: jest.fn( ( reducers ) => ( state = {}, action ) => {
-		const newState = {};
-		Object.keys( reducers ).forEach( ( key ) => {
-			newState[ key ] = reducers[ key ]( state[ key ], action );
-		} );
-		return newState;
-	} ),
-	createSelector: jest.fn( ( fn ) => fn ),
-	createRegistrySelector: jest.fn( ( fn ) => fn ),
-} ) );
+// Mock useSelect directly at the implementation level to avoid loading complex dependencies
+jest.mock( '@wordpress/data/src/components/use-select', () => {
+	const mock = jest.fn();
+	return mock;
+} );
+
+const { useSelect } = require( '@wordpress/data' );
 
 describe( 'useEnableLinkStatusValidation', () => {
 	const mockClientId = 'test-client-id';
