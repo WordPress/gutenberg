@@ -10,12 +10,14 @@ describe( 'Tooltip', () => {
 		const popupRef = createRef< HTMLDivElement >();
 
 		render(
-			<Tooltip.Root>
-				<Tooltip.Trigger ref={ triggerRef }>
-					<span>Hover me</span>
-				</Tooltip.Trigger>
-				<Tooltip.Popup ref={ popupRef }>Tooltip text</Tooltip.Popup>
-			</Tooltip.Root>
+			<Tooltip.Provider delay={ 0 }>
+				<Tooltip.Root>
+					<Tooltip.Trigger ref={ triggerRef }>
+						<span>Hover me</span>
+					</Tooltip.Trigger>
+					<Tooltip.Popup ref={ popupRef }>Tooltip text</Tooltip.Popup>
+				</Tooltip.Root>
+			</Tooltip.Provider>
 		);
 
 		// Test trigger ref before interaction
@@ -34,10 +36,12 @@ describe( 'Tooltip', () => {
 		const user = userEvent.setup();
 
 		render(
-			<Tooltip.Root>
-				<Tooltip.Trigger>Hover me</Tooltip.Trigger>
-				<Tooltip.Popup>Tooltip content</Tooltip.Popup>
-			</Tooltip.Root>
+			<Tooltip.Provider delay={ 0 }>
+				<Tooltip.Root>
+					<Tooltip.Trigger>Hover me</Tooltip.Trigger>
+					<Tooltip.Popup>Tooltip content</Tooltip.Popup>
+				</Tooltip.Root>
+			</Tooltip.Provider>
 		);
 
 		const trigger = screen.getByRole( 'button', { name: 'Hover me' } );
@@ -52,17 +56,16 @@ describe( 'Tooltip', () => {
 		const user = userEvent.setup();
 
 		render(
-			<Tooltip.Root disabled>
-				<Tooltip.Trigger>Hover me</Tooltip.Trigger>
-				<Tooltip.Popup>Tooltip content</Tooltip.Popup>
-			</Tooltip.Root>
+			<Tooltip.Provider delay={ 0 }>
+				<Tooltip.Root disabled>
+					<Tooltip.Trigger>Hover me</Tooltip.Trigger>
+					<Tooltip.Popup>Tooltip content</Tooltip.Popup>
+				</Tooltip.Root>
+			</Tooltip.Provider>
 		);
 
 		const trigger = screen.getByRole( 'button', { name: 'Hover me' } );
 		await user.hover( trigger );
-
-		// Give it some time to potentially appear
-		await new Promise( ( resolve ) => setTimeout( resolve, 100 ) );
 
 		expect(
 			screen.queryByText( 'Tooltip content' )
