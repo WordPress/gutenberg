@@ -25,22 +25,21 @@
 		"npm": ">=8.19.2"
 	},
 	"files": [
-		"src",
 		"build",
 		"build-module",
-		"build-types"
+		"declarations.d.ts"
 	],
 	"main": "build/index.cjs",
 	"module": "build-module/index.mjs",
 	"exports": {
 		".": {
-			"types": "./build-types/index.d.ts",
+			"types": "./declarations.d.ts",
 			"import": "./build-module/index.mjs",
 			"require": "./build/index.cjs"
 		},
 		"./package.json": "./package.json"
 	},
-	"types": "index.d.ts",
+	"types": "declarations.d.ts",
 	"dependencies": {
 		"jest-matcher-utils": "^29.6.2",
 		"jest-mock": "^29.6.2"

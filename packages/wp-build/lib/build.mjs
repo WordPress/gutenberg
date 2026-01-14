@@ -1944,6 +1944,7 @@ async function main() {
 				default: 'plugin_dir_url( __FILE__ )',
 			},
 		},
+		strict: false,
 	} );
 
 	const baseUrlExpression = values[ 'base-url' ];

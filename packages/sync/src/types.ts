@@ -90,7 +90,8 @@ export interface SyncManager {
 		record: ObjectData,
 		handlers: RecordHandlers
 	) => Promise< void >;
-	undoManager: SyncUndoManager;
+	// undoManager is undefined until the first entity is loaded.
+	undoManager: SyncUndoManager | undefined;
 	unload: ( objectType: ObjectType, objectId: ObjectID ) => void;
 	update: (
 		objectType: ObjectType,

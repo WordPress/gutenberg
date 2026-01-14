@@ -48,6 +48,7 @@
 -   `DatePicker`: Fix missing scheduled events and current date indicators. ([#73887](https://github.com/WordPress/gutenberg/pull/73887))
 -   `DatePicker`: Fix handling of `currentDate` when passed values as Date or timestamp. ([#73887](https://github.com/WordPress/gutenberg/pull/73887))
 -   `Popover`: Fix bug where clicking outside nested popovers only closed the inner one. ([#74340](https://github.com/WordPress/gutenberg/pull/74340))
+-   `InputControl`: Allow label to wrap for long labels/translations. ([#74301](https://github.com/WordPress/gutenberg/pull/74301)).
 
 ### Internal
 
