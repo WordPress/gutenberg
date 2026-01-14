@@ -97,16 +97,6 @@ Form for editing media metadata using `DataForm` from `@wordpress/dataviews`.
 -   `form`: Optional form configuration (uses `Form` type from `@wordpress/dataviews`)
 -   `header`: Optional header content to display above the form
 
-### `useMediaEditorContext()`
-
-Hook to access media editor context. Must be used within a `MediaEditorProvider`.
-
-**Returns:**
-
--   `media`: Current media object
--   `onChange`: Update callback function
--   `fields`: Field definitions array
-
 ## TypeScript
 
 This package is written in TypeScript and exports all relevant types:
@@ -114,7 +104,6 @@ This package is written in TypeScript and exports all relevant types:
 ```typescript
 import type {
 	Media,
-	MediaEditorContextValue,
 	MediaEditorProviderProps,
 	MediaPreviewProps,
 	MediaFormProps,
