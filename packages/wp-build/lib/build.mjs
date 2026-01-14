@@ -1314,21 +1314,72 @@ async function transpilePackage( packageName ) {
 
 	// Build workers if wpWorkers is defined in package.json.
 	// Workers are bundled as self-contained files with all dependencies included.
-	await buildWorkers( packageDir, packageJson, {
-		buildDir,
-		buildModuleDir,
-		target,
-		wasmInlinePlugin,
-	} );
+	if ( packageJson.wpWorkers ) {
+		const workerBuilds = [];
+		const workerEntries =
+			typeof packageJson.wpWorkers === 'object'
+				? Object.entries( packageJson.wpWorkers )
+				: [];
 
-	// Generate inline worker code exports and re-transpile worker-code.ts.
-	await generateWorkerCode( packageDir, packageName, packageJson, {
-		srcDir,
-		buildDir,
-		buildModuleDir,
-		target,
-		plugins,
-	} );
+		for ( const [ outputName, entryPath ] of workerEntries ) {
+			const workerEntryPoint = path.join( packageDir, entryPath );
+			const workerOutputName = outputName.replace( /^\.\//, '' );
+
+			// Build ESM worker for build-module (primary for browser use).
+			if ( packageJson.module ) {
+				workerBuilds.push(
+					esbuild.build( {
+						entryPoints: [ workerEntryPoint ],
+						outfile: path.join(
+							buildModuleDir,
+							`${ workerOutputName }.mjs`
+						),
+						bundle: true,
+						format: 'esm',
+						platform: 'browser',
+						target,
+						sourcemap: true,
+						// Bundle everything - workers need to be self-contained.
+						external: [],
+						plugins: [ wasmInlinePlugin ],
+						define: {
+							'process.env.NODE_ENV': JSON.stringify(
+								process.env.NODE_ENV || 'production'
+							),
+						},
+					} )
+				);
+			}
+
+			// Build CJS worker for build directory (Node.js compatibility).
+			// Only build if package has a main field (CJS entry point).
+			if ( packageJson.main ) {
+				workerBuilds.push(
+					esbuild.build( {
+						entryPoints: [ workerEntryPoint ],
+						outfile: path.join(
+							buildDir,
+							`${ workerOutputName }.cjs`
+						),
+						bundle: true,
+						format: 'cjs',
+						platform: 'node',
+						target,
+						sourcemap: true,
+						external: [],
+						plugins: [ wasmInlinePlugin ],
+						define: {
+							'process.env.NODE_ENV': JSON.stringify(
+								process.env.NODE_ENV || 'production'
+							),
+						},
+					} )
+				);
+			}
+		}
+
+		await Promise.all( workerBuilds );
+	}
 
 	await compileStyles( packageName );
 
