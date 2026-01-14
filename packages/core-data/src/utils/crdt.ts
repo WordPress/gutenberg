@@ -26,7 +26,7 @@ import {
 	CRDT_RECORD_MAP_KEY,
 	WORDPRESS_META_KEY_FOR_CRDT_DOC_PERSISTENCE,
 } from '../sync';
-import type { WPBlockSelection, WPSelection } from '../types';
+import type { WPSelection } from '../types';
 import {
 	createYMap,
 	getRootMap,
@@ -61,9 +61,6 @@ export interface YPostRecord extends YMapRecord {
 	template: string;
 	title: string;
 }
-
-// Hold a reference to the last known selection to help compute Y.Text deltas.
-let lastSelection: WPBlockSelection | null = null;
 
 // Properties that are allowed to be synced for a post.
 const allowedPostProperties = new Set< string >( [
