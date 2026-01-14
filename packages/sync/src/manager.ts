@@ -42,7 +42,7 @@ interface EntityState {
  */
 export function createSyncManager(): SyncManager {
 	const entityStates: Map< EntityID, EntityState > = new Map();
-	const undoManager = createUndoManager();
+	let undoManager: ReturnType< typeof createUndoManager > | undefined;
 
 	/**
 	 * Load an entity for syncing and manage its lifecycle.
@@ -99,6 +99,10 @@ export function createSyncManager(): SyncManager {
 			void updateEntityRecord( objectType, objectId );
 		};
 
+		// Lazily create the undo manager when the first entity is loaded.
+		if ( ! undoManager ) {
+			undoManager = createUndoManager();
+		}
 		undoManager.addToScope( recordMap );
 
 		const entityState: EntityState = {
@@ -309,9 +313,11 @@ export function createSyncManager(): SyncManager {
 
 	return {
 		createMeta: createEntityMeta,
-		isSyncEnabled,
 		load: loadEntity,
-		undoManager,
+		// undoManager is undefined until the first entity is loaded.
+		get undoManager() {
+			return undoManager;
+		},
 		unload: unloadEntity,
 		update: updateCRDTDoc,
 	};

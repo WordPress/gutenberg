@@ -36,11 +36,8 @@ type EntityRecordKey = string | number;
  */
 export function getUndoManager( state: State ) {
 	if ( globalThis.IS_GUTENBERG_PLUGIN ) {
-		const syncManager = getSyncManager();
-		// Only use the sync undo manager if sync is enabled (providers registered).
-		if ( syncManager?.isSyncEnabled() ) {
-			return syncManager.undoManager;
-		}
+		// undoManager is undefined until the first sync-enabled entity is loaded.
+		return getSyncManager()?.undoManager ?? state.undoManager;
 	}
 
 	return state.undoManager;
