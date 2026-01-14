@@ -1,0 +1,95 @@
+name: Claude Issue Triage (Chrome DevTools)
+
+on:
+    # Manual trigger for testing
+    workflow_dispatch:
+        inputs:
+            issue_number:
+                description: 'Issue number to triage'
+                required: true
+
+    # Trigger when claude-devtools-test label is added
+    issues:
+        types: [labeled]
+
+    # Trigger on @claude-devtools mention in comments
+    issue_comment:
+        types: [created]
+
+# Disable permissions for all available scopes by default.
+# Any needed permissions should be configured at the job level.
+permissions: {}
+
+# Cancel in-progress runs when a new workflow is triggered on the same issue
+concurrency:
+    group: claude-triage-devtools-${{ github.event.issue.number || github.event.inputs.issue_number }}
+    cancel-in-progress: true
+
+jobs:
+    triage:
+        runs-on: ubuntu-latest
+        environment: triage-bot
+        permissions:
+            contents: read
+            issues: write
+            pull-requests: write
+            id-token: write
+
+        # Run when:
+        # - Manual trigger (workflow_dispatch)
+        # - Label 'claude-devtools-test' is added
+        # - Comment contains '@claude-devtools'
+        if: |
+            github.event_name == 'workflow_dispatch' ||
+            (github.event_name == 'issues' && github.event.action == 'labeled' && github.event.label.name == 'claude-devtools-test') ||
+            (github.event_name == 'issue_comment' && contains(github.event.comment.body, '@claude-devtools'))
+
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+              with:
+                  fetch-depth: 1
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
+
+            - name: Create MCP config for Chrome DevTools
+              run: |
+                  cat > /tmp/mcp-config.json << 'EOF'
+                  {
+                    "mcpServers": {
+                      "chrome-devtools": {
+                        "command": "npx",
+                        "args": ["-y", "@anthropic-ai/chrome-devtools-mcp@latest", "--headless"]
+                      },
+                      "context7": {
+                        "command": "npx",
+                        "args": ["-y", "@context7/mcp"]
+                      }
+                    }
+                  }
+                  EOF
+
+            - name: Run Claude Triage (Chrome DevTools)
+              uses: anthropics/claude-code-action@v1
+              env:
+                  GITHUB_REPOSITORY: ${{ github.repository }}
+                  GITHUB_EVENT_NAME: ${{ github.event_name }}
+                  GITHUB_ISSUE_NUMBER: ${{ github.event.issue.number || github.event.inputs.issue_number }}
+                  CLAUDE_CODE_ENABLE_TELEMETRY: '1'
+              with:
+                  anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+                  trigger_phrase: '@claude-devtools'
+                  show_full_output: true
+                  prompt: |
+                      # GitHub Context
+                      REPO: ${{ github.repository }}
+                      ISSUE NUMBER: ${{ github.event.issue.number || github.event.inputs.issue_number }}
+                      EVENT: ${{ github.event_name }}
+                      ACTOR: ${{ github.actor }}
+
+                      # Instructions
+                      Execute: /triage ${{ github.event.issue.number || github.event.inputs.issue_number }}
+
+                      # Note: Using Chrome DevTools MCP for token efficiency testing
+                  claude_args: |
+                      --mcp-config /tmp/mcp-config.json
+                      --allowedTools "Bash,Read,Write,Edit,Glob,Grep,Skill,mcp__chrome-devtools__new_page,mcp__chrome-devtools__navigate_page,mcp__chrome-devtools__take_snapshot,mcp__chrome-devtools__take_screenshot,mcp__chrome-devtools__click,mcp__chrome-devtools__fill,mcp__chrome-devtools__fill_form,mcp__chrome-devtools__press_key,mcp__chrome-devtools__list_console_messages,mcp__chrome-devtools__list_network_requests,mcp__chrome-devtools__wait_for,mcp__chrome-devtools__handle_dialog,mcp__chrome-devtools__hover,mcp__chrome-devtools__close_page,mcp__chrome-devtools__list_pages,mcp__chrome-devtools__select_page,mcp__context7"
