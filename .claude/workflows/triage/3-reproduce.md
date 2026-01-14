@@ -9,10 +9,15 @@ Execute reproduction steps using Playwright MCP to verify Gutenberg bug reports.
 Browser actions are expensive (~1500 tokens each). **Target: 10-15 browser calls maximum**.
 
 **Priority order:**
-1. **JavaScript API first** - Insert/modify blocks via `window.wp.data.dispatch()`
-2. **Role selectors second** - Use `role=button[name="..."]` patterns
-3. **CSS selectors third** - Use documented patterns from wordpress-playwright-patterns.md
-4. **Snapshot as last resort** - Only when element location fails after 2 attempts
+1. **JavaScript API for setup only** - Use `window.wp.data.dispatch()` for non-critical setup operations (inserting blocks, configuring initial state)
+2. **Actual UI interactions for bug reproduction** - Always use real clicks/typing for the specific actions that trigger the bug
+3. **Role selectors** - Use `role=button[name="..."]` patterns for UI interactions
+4. **CSS selectors** - Use documented patterns from wordpress-playwright-patterns.md
+5. **Snapshot as last resort** - Only when element location fails after 2 attempts
+
+**Critical distinction:**
+- **Setup operations** (inserting blocks, setting initial content): Use JS APIs to save clicks
+- **Bug reproduction steps** (the actual actions that trigger the bug): Use actual UI interactions to preserve real user behavior
 
 **Read the patterns file first:**
 ```bash
@@ -28,16 +33,18 @@ REPRODUCTION PLAN
 =================
 Issue: #<issue>
 
-Batch 1 - Setup:
+Batch 1 - Setup (use JS APIs):
 - Navigate to post editor
-- Use JS API to insert blocks: window.wp.data.dispatch(...)
+- Use JS API to insert setup blocks: window.wp.data.dispatch(...)
+- Use JS API to configure initial state if not part of bug
 
-Batch 2 - Configure:
-- Use page.evaluate() to configure block settings
+Batch 2 - Reproduction (use actual UI):
+- Click/type/interact with UI elements as described in bug steps
+- Preserve exact user interactions that trigger the bug
 
 Batch 3 - Verify:
-- Use JS API to get content state
-- Screenshot only if bug is visually evident
+- Use JS API to get content state (for non-visual checks)
+- Screenshot if bug is visually evident
 
 Estimated browser calls: <target 10-15>
 ```
@@ -71,17 +78,22 @@ For each step in `reproduction.steps`, translate natural language into Playwrigh
 
 **Implementation flow (efficiency-first):**
 1. **Read patterns file** - `cat .claude/workflows/triage/wordpress-playwright-patterns.md`
-2. **Plan using APIs** - Identify which steps can use JavaScript APIs instead of UI clicks
-3. **Execute via JS when possible** - Use `page.evaluate()` to batch multiple block operations
-4. **Use role selectors** - For UI interactions, prefer `role=button[name="..."]` over snapshot exploration
-5. **Verify via API when possible** - Use `getBlocks()` or `getEditedPostContent()` over screenshots
-6. **Screenshot only when needed** - Only capture when the bug/error is visually evident
+2. **Identify setup vs reproduction** - Separate setup operations from bug-triggering actions
+3. **Use JS APIs for setup** - Use `page.evaluate()` to batch setup operations (inserting blocks, initial content)
+4. **Use actual UI for reproduction** - Always click/type/interact for the specific actions mentioned in bug steps
+5. **Use role selectors** - For UI interactions, prefer `role=button[name="..."]` over snapshot exploration
+6. **Verify via API when possible** - Use `getBlocks()` or `getEditedPostContent()` for state checks (not visual bugs)
+7. **Screenshot only when needed** - Only capture when the bug/error is visually evident
 
-**API-first approach for common operations:**
-- **Adding blocks**: Use `wp.data.dispatch('core/block-editor').insertBlock()` instead of block inserter UI
-- **Setting content**: Use `wp.blocks.parse()` + `resetBlocks()` instead of typing
-- **Checking state**: Use `wp.data.select('core/block-editor').getBlocks()` instead of screenshots
-- **Selecting blocks**: Use `wp.data.dispatch('core/block-editor').selectBlock()` instead of clicking
+**When to use JS APIs (setup only):**
+- **Initial block insertion**: Use `wp.data.dispatch('core/block-editor').insertBlock()` for setup blocks
+- **Setting initial content**: Use `wp.blocks.parse()` + `resetBlocks()` for page setup
+- **Checking state**: Use `wp.data.select('core/block-editor').getBlocks()` for verification
+
+**When to use actual UI (bug reproduction):**
+- **Bug-triggering actions**: Always use real clicks/typing for actions mentioned in reproduction steps
+- **User interactions**: If bug involves clicking a button, typing in a field, etc., reproduce exactly
+- **Visual verification**: Use screenshots when bug is visual, not API calls
 
 ## 3.3 Collect evidence
 

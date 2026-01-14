@@ -2,7 +2,9 @@
 
 Efficient patterns for Gutenberg testing extracted from `packages/e2e-test-utils-playwright/src/editor/`.
 
-**Goal**: Minimize browser interactions by using JavaScript APIs instead of UI clicks.
+**Goal**: Minimize browser interactions by using JavaScript APIs for **setup and non-critical operations**, while preserving actual UI interactions for the **critical bug reproduction path**.
+
+**Important**: Always use actual UI clicks/interactions for the specific actions that trigger the bug. JavaScript APIs should only be used for setup operations (inserting blocks, configuring initial state) that are not part of the bug reproduction itself.
 
 ## Block Manipulation via JavaScript API
 
@@ -229,8 +231,20 @@ await page.getByRole('button', { name: 'Dismiss this notice' })
 
 Before writing reproduction steps, ask:
 
-1. **Can I use `insertBlock()` instead of clicking the block inserter?** - Saves 5-10 clicks
-2. **Can I use `setContent()` with HTML instead of building UI step-by-step?** - Saves 10-20 clicks
+1. **Setup vs Reproduction**: Is this operation part of setting up the test scenario, or is it the actual bug trigger?
+   - **Setup**: Use JS APIs (`insertBlock()`, `setContent()`) - Saves 5-20 clicks
+   - **Bug trigger**: Use actual UI interactions - Preserves real user behavior
+
+2. **Can I use `setContent()` with HTML for initial page state?** - Saves 10-20 setup clicks
+   - Only if the bug isn't about the insertion/creation process itself
+
 3. **Can I verify state via `getBlocks()` instead of screenshot?** - Saves snapshot tokens
+   - Use for verification, not for capturing visual bugs
+
 4. **Am I using role selectors instead of exploring snapshots?** - Eliminates exploration
-5. **Can I batch operations in a single `page.evaluate()`?** - Reduces round trips
+   - Use for both setup and reproduction steps
+
+5. **Can I batch setup operations in a single `page.evaluate()`?** - Reduces round trips
+   - Only for non-critical setup operations
+
+**Critical Rule**: If the bug report mentions clicking, typing, or interacting with specific UI elements, always reproduce those exact interactions. Don't bypass them with JS APIs.
