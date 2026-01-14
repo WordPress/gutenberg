@@ -21,9 +21,9 @@
  * @return mixed The value computed for the source.
  */
 function gutenberg_block_bindings_post_data_get_value_for_featured_image( mixed $value, string $name, array $source_args, WP_Block $block_instance ) {
-	if ( $name !== 'core/post-data' ) {
-        return $value;
-    }
+	if ( 'core/post-data' !== $name ) {
+		return $value;
+	}
 	if ( $value ) {
 		return $value;
 	}
