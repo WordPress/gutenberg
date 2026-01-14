@@ -127,9 +127,11 @@ export const LayoutCustomComponent = () => {
 			onChangeView={ setView }
 			defaultLayouts={ { table: {} } }
 		>
-			<DataViews.Search />
-			<PosterGrid items={ processedData } />
-			<DataViews.Pagination />
+			<div style={ { padding: '2px' } }>
+				<DataViews.Search />
+				<PosterGrid items={ processedData } />
+				<DataViews.Pagination />
+			</div>
 		</DataViews>
 	);
 };
