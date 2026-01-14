@@ -167,7 +167,7 @@ export const Disabled: Story = {
 	args: {
 		children: (
 			<>
-				<Select.Trigger disabled />
+				<Select.Trigger />
 				<Select.Popup>
 					<Select.Item value="Item 1" />
 					<Select.Item value="Item 2" />
@@ -175,6 +175,7 @@ export const Disabled: Story = {
 			</>
 		),
 		defaultValue: 'Item 1',
+		disabled: true,
 	},
 };
 

@@ -23,7 +23,6 @@ export const Trigger = forwardRef< HTMLButtonElement, SelectTriggerProps >(
 					className
 				) }
 				size={ size }
-				visuallyDisabled={ restProps.disabled }
 				isBorderless={ variant === 'minimal' }
 			>
 				<_Select.Trigger
@@ -33,6 +32,7 @@ export const Trigger = forwardRef< HTMLButtonElement, SelectTriggerProps >(
 						variant === 'minimal' &&
 							selectTriggerStyles[ 'is-minimal' ]
 					) }
+					data-can-disable-input-layout
 					ref={ ref }
 				>
 					<_Select.Value

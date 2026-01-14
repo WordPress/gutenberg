@@ -36,7 +36,7 @@
 			outline: none; /* handled by InputBase component */
 		}
 
-		&[aria-disabled="true"] {
+		&[data-disabled] {
 			background-color: var(--wpds-color-bg-interactive-neutral-weak-disabled);
 			color: var(--wpds-color-fg-interactive-neutral-disabled);
 		}
