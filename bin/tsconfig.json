@@ -41,6 +41,7 @@
 		"log-performance-results.js",
 		"packages/build-vendors.mjs",
 		"packages/build.mjs",
+		"packages/react-refresh-entry.js",
 		"packages/check-build-type-declaration-files.js",
 		"plugin/cli.js",
 		"plugin/commands/common.js",

@@ -145,14 +145,12 @@ async function bundleReactJsxRuntime() {
 async function bundleReactRefresh() {
 	console.log( '📦 Bundling React Refresh...' );
 
-	// Bundle react-refresh-entry
+	// Bundle react-refresh-entry using react-refresh
 	const entryDir = path.join( BUILD_DIR, 'react-refresh-entry' );
 	await mkdir( entryDir, { recursive: true } );
 
 	await esbuild.build( {
-		entryPoints: [
-			'@pmmmwh/react-refresh-webpack-plugin/client/ReactRefreshEntry.js',
-		],
+		entryPoints: [ path.join( __dirname, 'react-refresh-entry.js' ) ],
 		outfile: path.join( entryDir, 'index.min.js' ),
 		bundle: true,
 		format: 'iife',

@@ -45,7 +45,6 @@
 		"@inquirer/prompts": "7.2.0",
 		"@octokit/rest": "16.26.0",
 		"@playwright/test": "1.57.0",
-		"@pmmmwh/react-refresh-webpack-plugin": "0.5.11",
 		"@storybook/addon-a11y": "10.1.11",
 		"@storybook/addon-docs": "10.1.11",
 		"@storybook/icons": "2.0.1",
