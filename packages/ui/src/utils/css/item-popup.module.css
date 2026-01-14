@@ -56,6 +56,7 @@
 		}
 	}
 
+	/* TODO: Use padding token */
 	.item {
 		--wp-ui-popup-item-height: 40px;
 		--wp-ui-popup-item-padding-inline: 12px;
@@ -65,7 +66,7 @@
 		grid-template-columns: 24px 1fr;
 		align-items: center;
 		justify-content: flex-start;
-		gap: 4px;
+		gap: var(--wpds-dimension-gap-2xs);
 		min-height: var(--wp-ui-popup-item-height);
 		border-radius: var(--wpds-border-radius-surface-sm);
 		user-select: none;
