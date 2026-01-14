@@ -57,7 +57,7 @@ export default function AddTabToolbarControl( { tabsClientId } ) {
 	};
 
 	return (
-		<BlockControls group="block">
+		<BlockControls group="other">
 			<ToolbarGroup>
 				<ToolbarButton
 					className="components-toolbar__control"

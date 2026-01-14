@@ -87,7 +87,7 @@ export default function RemoveTabToolbarControl( { tabsClientId } ) {
 	const isDisabled = tabCount <= 1 || ! activeTabClientId;
 
 	return (
-		<BlockControls group="block">
+		<BlockControls group="other">
 			<ToolbarGroup>
 				<ToolbarButton
 					className="components-toolbar__control"
