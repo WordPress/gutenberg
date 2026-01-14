@@ -54,9 +54,21 @@ jobs:
 
             - name: Run Claude Triage
               uses: anthropics/claude-code-action@v1
+              env:
+                  GITHUB_REPOSITORY: ${{ github.repository }}
+                  GITHUB_EVENT_NAME: ${{ github.event_name }}
+                  GITHUB_ISSUE_NUMBER: ${{ github.event.issue.number }}
               with:
                   anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
-                  prompt: "/triage ${{ github.event.issue.number }}"
+                  prompt: |
+                      # GitHub Context
+                      REPO: ${{ github.repository }}
+                      ISSUE NUMBER: ${{ github.event.issue.number }}
+                      EVENT: ${{ github.event_name }}
+                      ACTOR: ${{ github.actor }}
+
+                      # Instructions
+                      Execute: /triage ${{ github.event.issue.number }}
                   claude_args: |
                       --mcp-config /tmp/mcp-config.json
-                      --allowedTools "Bash,Read,Write,Edit,Glob,Grep,Skill,mcp__playwright,mcp__context7"
+                      --allowedTools "Bash,Read,Write,Edit,Glob,Grep,Skill,mcp__playwright__browser_navigate,mcp__playwright__browser_snapshot,mcp__playwright__browser_click,mcp__playwright__browser_type,mcp__playwright__browser_press_key,mcp__playwright__browser_fill_form,mcp__playwright__browser_take_screenshot,mcp__playwright__browser_console_messages,mcp__playwright__browser_network_requests,mcp__playwright__browser_wait_for,mcp__playwright__browser_handle_dialog,mcp__playwright__browser_hover,mcp__playwright__browser_navigate_back,mcp__playwright__browser_close,mcp__context7"
