@@ -86,7 +86,9 @@ export default function BlockColorContrastChecker( { clientId, name } ) {
 
 	const blockType = useSelect(
 		( select ) => {
-			return name ? select( blocksStore ).getBlockType( name ) : undefined;
+			return name
+				? select( blocksStore ).getBlockType( name )
+				: undefined;
 		},
 		[ name ]
 	);
