@@ -1,0 +1,35 @@
+/**
+ * External dependencies
+ */
+import clsx from 'clsx';
+
+/**
+ * WordPress dependencies
+ */
+import { forwardRef } from '@wordpress/element';
+
+/**
+ * Internal dependencies
+ */
+import { Icon as IconComponent } from '../icon';
+import { Visual } from './visual';
+import type { EmptyStateIconProps } from './types';
+import styles from './style.module.css';
+
+/**
+ * An icon visual for empty states. Renders an icon with styling treatment for
+ * empty states.
+ */
+export const Icon = forwardRef< HTMLDivElement, EmptyStateIconProps >(
+	function EmptyStateIcon( { icon, className, ...restProps }, ref ) {
+		return (
+			<Visual
+				ref={ ref }
+				className={ clsx( styles.icon, className ) }
+				{ ...restProps }
+			>
+				<IconComponent icon={ icon } />
+			</Visual>
+		);
+	}
+);
