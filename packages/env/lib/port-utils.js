@@ -42,11 +42,11 @@ async function isPortAvailable( port ) {
 /**
  * Finds an available port, starting with the preferred port.
  *
- * @param {Object}  options               Options for finding a port.
- * @param {number}  options.preferredPort The preferred port to try first.
- * @param {?number} options.min           Minimum port number (default: 1024).
- * @param {?number} options.max           Maximum port number (default: 65535).
- * @param {number[]} options.exclude      Ports to exclude from selection.
+ * @param {Object}   options               Options for finding a port.
+ * @param {number}   options.preferredPort The preferred port to try first.
+ * @param {?number}  options.min           Minimum port number (default: 1024).
+ * @param {?number}  options.max           Maximum port number (default: 65535).
+ * @param {number[]} options.exclude       Ports to exclude from selection.
  * @return {Promise<number>} An available port number.
  * @throws {Error} If no available port is found within the range.
  */

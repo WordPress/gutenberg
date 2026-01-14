@@ -21,18 +21,18 @@ const {
  * Environment variable configuration.
  *
  * @typedef WPEnvironmentVariableConfig
- * @property {?number}                  port                An override for the development environment's port.
- * @property {?number}                  portRangeMin        Minimum port for development environment.
- * @property {?number}                  portRangeMax        Maximum port for development environment.
- * @property {?number}                  mysqlPort           An override for the development environment's MySQL port.
- * @property {?number}                  testsPort           An override for the testing environment's port.
- * @property {?number}                  testsPortRangeMin   Minimum port for testing environment.
- * @property {?number}                  testsPortRangeMax   Maximum port for testing environment.
- * @property {?number}                  testsMysqlPort      An override for the testing environment's MySQL port.
- * @property {?number}                  phpmyadminPort      An override for the development environment's phpMyAdmin port.
- * @property {?WPSource}                coreSource          An override for all environment's coreSource.
- * @property {?string}                  phpVersion          An override for all environment's PHP version.
- * @property {?Object.<string, string>} lifecycleScripts    An override for various lifecycle scripts.
+ * @property {?number}                  port              An override for the development environment's port.
+ * @property {?number}                  portRangeMin      Minimum port for development environment.
+ * @property {?number}                  portRangeMax      Maximum port for development environment.
+ * @property {?number}                  mysqlPort         An override for the development environment's MySQL port.
+ * @property {?number}                  testsPort         An override for the testing environment's port.
+ * @property {?number}                  testsPortRangeMin Minimum port for testing environment.
+ * @property {?number}                  testsPortRangeMax Maximum port for testing environment.
+ * @property {?number}                  testsMysqlPort    An override for the testing environment's MySQL port.
+ * @property {?number}                  phpmyadminPort    An override for the development environment's phpMyAdmin port.
+ * @property {?WPSource}                coreSource        An override for all environment's coreSource.
+ * @property {?string}                  phpVersion        An override for all environment's PHP version.
+ * @property {?Object.<string, string>} lifecycleScripts  An override for various lifecycle scripts.
  */
 
 /**

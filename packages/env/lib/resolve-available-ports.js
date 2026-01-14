@@ -153,13 +153,13 @@ async function resolveAvailablePorts( config, spinner ) {
 /**
  * Resolves a single port, finding an alternative if the preferred port is busy.
  *
- * @param {Object}   options           Options for port resolution.
+ * @param {Object}   options               Options for port resolution.
  * @param {number}   options.preferredPort The preferred port to use.
- * @param {?number}  options.min       Minimum port in range.
- * @param {?number}  options.max       Maximum port in range.
- * @param {number[]} options.exclude   Ports to exclude.
- * @param {string}   options.portName  Name of the port for messages.
- * @param {Object}   options.spinner   CLI spinner.
+ * @param {?number}  options.min           Minimum port in range.
+ * @param {?number}  options.max           Maximum port in range.
+ * @param {number[]} options.exclude       Ports to exclude.
+ * @param {string}   options.portName      Name of the port for messages.
+ * @param {Object}   options.spinner       CLI spinner.
  * @return {Promise<{port: number, changed: boolean, message: ?string}>} Resolution result.
  */
 async function resolvePort( {
