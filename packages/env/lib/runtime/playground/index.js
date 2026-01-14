@@ -203,13 +203,12 @@ class PlaygroundRuntime {
 					await this._waitForServer( port, 120000 );
 					spinner.text = `WordPress Playground started at ${ siteUrl }`;
 
+					const message =
+						'WordPress development site started at ' + siteUrl;
+
 					resolve( {
+						message,
 						siteUrl,
-						testsSiteUrl: null,
-						mySQLPort: null,
-						testsMySQLPort: null,
-						phpmyadminPort: null,
-						testsPhpmyadminPort: null,
 					} );
 				} catch ( error ) {
 					// Try to kill the process if it started but server never responded

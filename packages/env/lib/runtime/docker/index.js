@@ -2,21 +2,42 @@
 /**
  * External dependencies
  */
-const { spawn } = require( 'child_process' );
+const { spawn, execSync } = require( 'child_process' );
 const path = require( 'path' );
+const util = require( 'util' );
 const { v2: dockerCompose } = require( 'docker-compose' );
 const { rimraf } = require( 'rimraf' );
+
+/**
+ * Promisified dependencies
+ */
+const sleep = util.promisify( setTimeout );
+const exec = util.promisify( require( 'child_process' ).exec );
 
 /**
  * Internal dependencies
  */
 const initConfig = require( '../../init-config' );
-const getHostUser = require( '../../get-host-user' );
-const { configureWordPress, resetDatabase } = require( '../../wordpress' );
+const getHostUser = require( './get-host-user' );
+const downloadSources = require( './download-sources' );
+const downloadWPPHPUnit = require( './download-wp-phpunit' );
+const {
+	checkDatabaseConnection,
+	configureWordPress,
+	resetDatabase,
+	setupWordPressDirectories,
+	readWordPressVersion,
+	canAccessWPORG,
+} = require( '../../wordpress' );
+const { didCacheChange, setCache } = require( '../../cache' );
+const md5 = require( '../../md5' );
+const retry = require( '../../retry' );
 
 /**
  * @typedef {import('../../config').WPConfig} WPConfig
  */
+
+const CONFIG_CACHE_KEY = 'config_checksum';
 
 /**
  * Docker runtime implementation for wp-env.
@@ -57,13 +78,264 @@ class DockerRuntime {
 	 * @return {Promise<boolean>} True if Docker is available.
 	 */
 	async isAvailable() {
-		const { execSync } = require( 'child_process' );
 		try {
 			execSync( 'docker info', { stdio: 'ignore' } );
 			return true;
 		} catch {
 			return false;
 		}
+	}
+
+	/**
+	 * Start the Docker containers and configure WordPress.
+	 *
+	 * @param {WPConfig} config          The wp-env config object.
+	 * @param {Object}   options         Start options.
+	 * @param {Object}   options.spinner A CLI spinner which indicates progress.
+	 * @param {boolean}  options.update  If true, update sources.
+	 * @param {boolean}  options.debug   True if debug mode is enabled.
+	 * @return {Promise<Object>} Result object with message and siteUrl.
+	 */
+	async start( config, { spinner, update, debug } ) {
+		// Check if the hash of the config has changed. If so, run configuration.
+		const configHash = md5( config );
+		const { workDirectoryPath, dockerComposeConfigPath } = config;
+		const shouldConfigureWp =
+			( update ||
+				( await didCacheChange( CONFIG_CACHE_KEY, configHash, {
+					workDirectoryPath,
+				} ) ) ) &&
+			// Don't reconfigure everything when we can't connect to the internet because
+			// the majority of update tasks involve connecting to the internet. (Such
+			// as downloading sources and pulling docker images.)
+			( await canAccessWPORG() );
+
+		const dockerComposeConfig = {
+			config: dockerComposeConfigPath,
+			log: config.debug,
+		};
+
+		if ( ! ( await canAccessWPORG() ) ) {
+			spinner.info( 'wp-env is offline' );
+		}
+
+		/**
+		 * If the Docker image is already running and the `wp-env` files have been
+		 * deleted, the start command will not complete successfully. Stopping
+		 * the container before continuing allows the docker entrypoint script,
+		 * which restores the files, to run again when we start the containers.
+		 *
+		 * Additionally, this serves as a way to restart the container entirely
+		 * should the need arise.
+		 *
+		 * @see https://github.com/WordPress/gutenberg/pull/20253#issuecomment-587228440
+		 */
+		if ( shouldConfigureWp ) {
+			await this.stop( config, { spinner, debug } );
+			// Update the images before starting the services again.
+			spinner.text = 'Updating docker images.';
+
+			const directoryHash = path.basename( workDirectoryPath );
+
+			// Note: when the base docker image is updated, we want that operation to
+			// also update WordPress. Since we store wordpress/tests-wordpress files
+			// as docker volumes, simply updating the image will not change those
+			// files. Thus, we need to remove those volumes in order for the files
+			// to be updated when pulling the new images.
+			const volumesToRemove = `${ directoryHash }_wordpress ${ directoryHash }_tests-wordpress`;
+
+			try {
+				if ( config.debug ) {
+					spinner.text = `Removing the WordPress volumes: ${ volumesToRemove }`;
+				}
+				await exec( `docker volume rm ${ volumesToRemove }` );
+			} catch {
+				// Note: we do not care about this error condition because it will
+				// mostly happen when the volume already exists. This error would not
+				// stop wp-env from working correctly.
+			}
+
+			await dockerCompose.pullAll( dockerComposeConfig );
+			spinner.text = 'Downloading sources.';
+		}
+
+		await Promise.all( [
+			dockerCompose.upOne( 'mysql', {
+				...dockerComposeConfig,
+				commandOptions: shouldConfigureWp
+					? [ '--build', '--force-recreate' ]
+					: [],
+			} ),
+			shouldConfigureWp && downloadSources( config, spinner ),
+		] );
+
+		if ( shouldConfigureWp ) {
+			spinner.text = 'Setting up WordPress directories';
+
+			await setupWordPressDirectories( config );
+
+			// Use the WordPress versions to download the PHPUnit suite.
+			const wpVersions = await Promise.all( [
+				readWordPressVersion(
+					config.env.development.coreSource,
+					spinner,
+					debug
+				),
+				readWordPressVersion(
+					config.env.tests.coreSource,
+					spinner,
+					debug
+				),
+			] );
+			await downloadWPPHPUnit(
+				config,
+				{ development: wpVersions[ 0 ], tests: wpVersions[ 1 ] },
+				spinner,
+				debug
+			);
+		}
+
+		spinner.text = 'Starting WordPress.';
+
+		await dockerCompose.upMany(
+			[ 'wordpress', 'tests-wordpress', 'cli', 'tests-cli' ],
+			{
+				...dockerComposeConfig,
+				commandOptions: shouldConfigureWp
+					? [ '--build', '--force-recreate' ]
+					: [],
+			}
+		);
+
+		if ( config.env.development.phpmyadminPort ) {
+			await dockerCompose.upOne( 'phpmyadmin', {
+				...dockerComposeConfig,
+				commandOptions: shouldConfigureWp
+					? [ '--build', '--force-recreate' ]
+					: [],
+			} );
+		}
+
+		if ( config.env.tests.phpmyadminPort ) {
+			await dockerCompose.upOne( 'tests-phpmyadmin', {
+				...dockerComposeConfig,
+				commandOptions: shouldConfigureWp
+					? [ '--build', '--force-recreate' ]
+					: [],
+			} );
+		}
+
+		// Make sure we've consumed the custom CLI dockerfile.
+		if ( shouldConfigureWp ) {
+			await dockerCompose.buildOne( [ 'cli' ], {
+				...dockerComposeConfig,
+			} );
+		}
+
+		// Only run WordPress install/configuration when config has changed.
+		if ( shouldConfigureWp ) {
+			spinner.text = 'Configuring WordPress.';
+
+			try {
+				await checkDatabaseConnection( config );
+			} catch ( error ) {
+				// Wait 30 seconds for MySQL to accept connections.
+				await retry( () => checkDatabaseConnection( config ), {
+					times: 30,
+					delay: 1000,
+				} );
+
+				// It takes 3-4 seconds for MySQL to be ready after it starts accepting connections.
+				await sleep( 4000 );
+			}
+
+			// Retry WordPress installation in case MySQL *still* wasn't ready.
+			await Promise.all( [
+				retry(
+					() => configureWordPress( 'development', config, spinner ),
+					{
+						times: 2,
+					}
+				),
+				retry( () => configureWordPress( 'tests', config, spinner ), {
+					times: 2,
+				} ),
+			] );
+
+			// Set the cache key once everything has been configured.
+			await setCache( CONFIG_CACHE_KEY, configHash, {
+				workDirectoryPath,
+			} );
+		}
+
+		// Get port information for the result message
+		const siteUrl = config.env.development.config.WP_SITEURL;
+		const testsSiteUrl = config.env.tests.config.WP_SITEURL;
+
+		const mySQLPort = await this._getPublicDockerPort(
+			'mysql',
+			3306,
+			dockerComposeConfig
+		);
+
+		const testsMySQLPort = await this._getPublicDockerPort(
+			'tests-mysql',
+			3306,
+			dockerComposeConfig
+		);
+
+		const phpmyadminPort = config.env.development.phpmyadminPort
+			? await this._getPublicDockerPort(
+					'phpmyadmin',
+					80,
+					dockerComposeConfig
+			  )
+			: null;
+
+		const testsPhpmyadminPort = config.env.tests.phpmyadminPort
+			? await this._getPublicDockerPort(
+					'tests-phpmyadmin',
+					80,
+					dockerComposeConfig
+			  )
+			: null;
+
+		const message = [
+			'WordPress development site started' +
+				( siteUrl ? ` at ${ siteUrl }` : '.' ),
+			'WordPress test site started' +
+				( testsSiteUrl ? ` at ${ testsSiteUrl }` : '.' ),
+			`MySQL is listening on port ${ mySQLPort }`,
+			`MySQL for automated testing is listening on port ${ testsMySQLPort }`,
+			phpmyadminPort &&
+				`phpMyAdmin started at http://localhost:${ phpmyadminPort }`,
+			testsPhpmyadminPort &&
+				`phpMyAdmin for automated testing started at http://localhost:${ testsPhpmyadminPort }`,
+		]
+			.filter( Boolean )
+			.join( '\n' );
+
+		return {
+			message,
+			siteUrl,
+		};
+	}
+
+	/**
+	 * Get the public port for a Docker service.
+	 *
+	 * @param {string} service             The service name.
+	 * @param {number} containerPort       The container port.
+	 * @param {Object} dockerComposeConfig The docker-compose config.
+	 * @return {Promise<string>} The public port.
+	 */
+	async _getPublicDockerPort( service, containerPort, dockerComposeConfig ) {
+		const { out: address } = await dockerCompose.port(
+			service,
+			containerPort,
+			dockerComposeConfig
+		);
+		return address.split( ':' ).pop().trim();
 	}
 
 	/**

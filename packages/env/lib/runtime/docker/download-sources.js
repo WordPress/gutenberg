@@ -2,11 +2,11 @@
 /**
  * External dependencies
  */
-const util = require( 'util' );
-const SimpleGit = require( 'simple-git' );
 const fs = require( 'fs' );
-const got = require( 'got' );
 const path = require( 'path' );
+const util = require( 'util' );
+const got = require( 'got' );
+const SimpleGit = require( 'simple-git' );
 
 /**
  * Promisified dependencies
