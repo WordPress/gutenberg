@@ -16,6 +16,13 @@ import { useEnableLinkStatusValidation } from '../use-enable-link-status-validat
 // Mock the @wordpress/data module
 jest.mock( '@wordpress/data', () => ( {
 	useSelect: jest.fn(),
+	combineReducers: jest.fn( ( reducers ) => ( state = {}, action ) => {
+		const newState = {};
+		Object.keys( reducers ).forEach( ( key ) => {
+			newState[ key ] = reducers[ key ]( state[ key ], action );
+		} );
+		return newState;
+	} ),
 } ) );
 
 describe( 'useEnableLinkStatusValidation', () => {
