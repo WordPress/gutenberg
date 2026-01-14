@@ -198,7 +198,6 @@ function Edit( {
 					<span className="tabs__tab-label tabs__tab-label--placeholder">
 						{ __( 'Add tabs to display menu' ) }
 					</span>
-					<AddTabRenderAppender tabsClientId={ tabsClientId } />
 				</div>
 			</>
 		);
@@ -238,7 +237,6 @@ function Edit( {
 						</BlockContextProvider>
 					);
 				} ) }
-				<AddTabRenderAppender tabsClientId={ tabsClientId } />
 			</div>
 		</>
 	);
