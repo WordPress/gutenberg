@@ -47,15 +47,8 @@ function render_block_core_categories( $attributes, $content, $block ) {
 			$taxonomy->labels->singular_name
 		);
 
-		// Pre-select the current term if viewing a term archive page.
-		if ( is_tax( $attributes['taxonomy'] ) || is_category() || is_tag() ) {
-			$current_term = get_queried_object();
-			if ( $current_term && $current_term instanceof WP_Term ) {
-				if ( $current_term->taxonomy === $attributes['taxonomy'] ) {
-					$args['selected'] = $current_term->slug;
-				}
-			}
-		}
+		// Pre-select the current term using query var.
+		$args['selected'] = get_query_var( $taxonomy->query_var );
 
 		$show_label     = empty( $attributes['showLabel'] ) ? ' screen-reader-text' : '';
 		$default_label  = $taxonomy->label;
