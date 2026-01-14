@@ -13,32 +13,94 @@ import { data, fields } from './fixtures';
 import { LAYOUT_TABLE } from '../../constants';
 
 /**
- * Custom layout component that renders a simple list of titles.
+ * Poster/hero style layout that displays items as large image cards
+ * with overlaid text content.
  */
-function CustomList( { items }: { items: typeof data } ) {
+function PosterGrid( { items }: { items: typeof data } ) {
 	return (
-		<ul style={ { listStyle: 'none', padding: 0, margin: 0 } }>
+		<div
+			style={ {
+				display: 'grid',
+				gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+				gap: '16px',
+				padding: '16px 0',
+			} }
+		>
 			{ items.map( ( item ) => (
-				<li
+				<div
 					key={ item.id }
 					style={ {
-						padding: '8px 0',
-						borderBottom: '1px solid #ddd',
+						position: 'relative',
+						aspectRatio: '4 / 3',
+						borderRadius: '8px',
+						overflow: 'hidden',
+						backgroundImage: `url(${ item.image })`,
+						backgroundSize: 'cover',
+						backgroundPosition: 'center',
 					} }
 				>
-					{ item.name.title }
-				</li>
+					<div
+						style={ {
+							position: 'absolute',
+							bottom: 0,
+							left: 0,
+							right: 0,
+							padding: '48px 16px 16px',
+							background:
+								'linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.4) 60%, transparent 100%)',
+							color: 'white',
+						} }
+					>
+						<h3
+							style={ {
+								margin: '0 0 4px',
+								fontSize: '18px',
+								fontWeight: 600,
+								textShadow: '0 1px 2px rgba(0,0,0,0.5)',
+							} }
+						>
+							{ item.name.title }
+						</h3>
+						<p
+							style={ {
+								margin: '0 0 8px',
+								fontSize: '13px',
+								opacity: 0.9,
+								overflow: 'hidden',
+								textOverflow: 'ellipsis',
+								whiteSpace: 'nowrap',
+							} }
+						>
+							{ item.name.description }
+						</p>
+						<div style={ { display: 'flex', gap: '6px' } }>
+							{ item.categories.slice( 0, 2 ).map( ( cat ) => (
+								<span
+									key={ cat }
+									style={ {
+										fontSize: '11px',
+										padding: '2px 8px',
+										borderRadius: '4px',
+										backgroundColor: 'rgba(255,255,255,0.2)',
+									} }
+								>
+									{ cat }
+								</span>
+							) ) }
+						</div>
+					</div>
+				</div>
 			) ) }
-		</ul>
+		</div>
 	);
 }
 
 /**
- * Demonstrates a custom layout using free composition.
+ * Demonstrates a custom poster/hero layout using free composition.
  *
  * This story shows how to:
  * - Use `<DataViews>` as a context provider with custom children
- * - Render your own layout instead of using `<DataViews.Layout />`
+ * - Render a completely custom layout (poster grid) instead of `<DataViews.Layout />`
  * - Still leverage DataViews sub-components for search and pagination
  */
 export const LayoutCustomComponent = () => {
@@ -46,7 +108,7 @@ export const LayoutCustomComponent = () => {
 		type: LAYOUT_TABLE,
 		search: '',
 		page: 1,
-		perPage: 10,
+		perPage: 6,
 		filters: [],
 		fields: [],
 	} );
@@ -66,7 +128,7 @@ export const LayoutCustomComponent = () => {
 			defaultLayouts={ { table: {} } }
 		>
 			<DataViews.Search />
-			<CustomList items={ processedData } />
+			<PosterGrid items={ processedData } />
 			<DataViews.Pagination />
 		</DataViews>
 	);
