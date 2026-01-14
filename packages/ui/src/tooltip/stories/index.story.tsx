@@ -1,20 +1,13 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryObj } from '@storybook/react-vite';
-
-/**
- * Internal dependencies
- */
-import { Button, Tooltip } from '../../index';
+import { Button, Tooltip } from '../..';
 
 const meta: Meta< typeof Tooltip.Root > = {
 	title: 'Design System/Components/Tooltip',
 	component: Tooltip.Root,
 	subcomponents: {
-		'Tooltip.Provider': Tooltip.Provider,
-		'Tooltip.Trigger': Tooltip.Trigger,
-		'Tooltip.Popup': Tooltip.Popup,
+		Provider: Tooltip.Provider,
+		Trigger: Tooltip.Trigger,
+		Popup: Tooltip.Popup,
 	},
 };
 export default meta;
