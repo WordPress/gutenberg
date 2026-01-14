@@ -1,6 +1,6 @@
 # Step 3: Reproduce Bug
 
-Execute reproduction steps using Playwright MCP to verify Gutenberg bug reports.
+Execute reproduction steps using Chrome DevTools MCP to verify Gutenberg bug reports.
 
 ## 3.1 Setup
 
@@ -16,23 +16,27 @@ Start Playground with the blueprint:
 .claude/bin/playground.sh start --blueprint=/tmp/triage/<issue>/<issue>.blueprint.json
 ```
 
-Get Playground URL from running instance and initialize Playwright browser.
+Get Playground URL from running instance and open in Chrome DevTools:
+
+```
+mcp__chrome-devtools__new_page with url: <playground_url>
+```
 
 ## 3.2 Execute reproduction steps
 
-For each step in `reproduction.steps`, translate natural language into Playwright actions:
+For each step in `reproduction.steps`, translate natural language into DevTools actions:
 
-| Step Pattern | Playwright Action |
-|--------------|-------------------|
-| "Visit `/wp-admin/...`" | Navigate to `{playground_url}/wp-admin/...` |
-| "Enter `...` in the ... input" | Find input, type text |
-| "Click the Save button" | Find button, click |
-| "Notice that ..." | Check for element presence/absence |
+| Step Pattern | DevTools Action |
+|--------------|-----------------|
+| "Visit `/wp-admin/...`" | `navigate_page` with url |
+| "Enter `...` in the ... input" | `fill` with uid and value |
+| "Click the Save button" | `click` with uid |
+| "Notice that ..." | Check for element presence in snapshot |
 
 **Implementation flow:**
-1. Try targeted element query first (CSS selector, role, or text)
-2. If element not found, use `mcp__playwright__browser_snapshot` to locate
-3. Perform action (navigate, type, click, etc.)
+1. Use `take_snapshot` to understand page structure (returns uid-based tree)
+2. Identify target element by uid from snapshot
+3. Perform action (navigate, fill, click, etc.)
 4. Don't snapshot after action unless needed for verification
 5. Only screenshot when bug/error is visible (see screenshot strategy below)
 
@@ -58,12 +62,14 @@ For each step in `reproduction.steps`, translate natural language into Playwrigh
 **Evidence collection strategy:**
 
 - **Console errors**:
+  - Use `list_console_messages` (paginated - much more efficient)
   - Collect only errors (level="error", skip warnings/info)
   - Limit to top 5 most relevant errors
   - Filter by keywords from issue description if available
   - Only collect errors that occur during reproduction steps
 
 - **Network requests**:
+  - Use `list_network_requests` (focus on failed requests)
   - Only collect failed requests (status >= 400)
   - Limit to top 5 failed requests
   - Prioritize API endpoints related to bug (e.g., save endpoints for save bugs)
@@ -160,35 +166,43 @@ CONCLUSION:
 
 ## 3.7 Cleanup
 
+Close the browser page:
+
+```
+mcp__chrome-devtools__close_page
+```
+
 Stop the Playground instance:
 
 ```bash
 .claude/bin/playground.sh stop
 ```
 
-## Playwright MCP Tools Reference
+## Chrome DevTools MCP Tools Reference
 
 ### Navigation
-- `mcp__playwright__browser_navigate` - Go to URL
-- `mcp__playwright__browser_navigate_back` - Go back
+- `new_page` - Open URL in new page
+- `navigate_page` - Navigate current page (url, back, forward, reload)
 
 ### Page Analysis
-- `mcp__playwright__browser_snapshot` - Get accessibility tree (preferred for automation)
-- `mcp__playwright__browser_take_screenshot` - Capture visual evidence
+- `take_snapshot` - Get accessibility tree with uid identifiers (compact format)
+- `take_screenshot` - Capture visual evidence
 
 ### Interaction
-- `mcp__playwright__browser_click` - Click element
-- `mcp__playwright__browser_type` - Type text into input
-- `mcp__playwright__browser_press_key` - Press keyboard keys
-- `mcp__playwright__browser_fill_form` - Fill multiple fields at once
+- `click` - Click element by uid
+- `fill` - Type text into input by uid
+- `fill_form` - Fill multiple fields at once
+- `press_key` - Press keyboard keys
+- `hover` - Hover over element
 
 ### Evidence Collection
-- `mcp__playwright__browser_console_messages` - Get console logs/errors
-- `mcp__playwright__browser_network_requests` - Get network activity
+- `list_console_messages` - Get paginated console logs (efficient!)
+- `list_network_requests` - Get paginated network activity
 
 ### Utilities
-- `mcp__playwright__browser_wait_for` - Wait for text/time
-- `mcp__playwright__browser_handle_dialog` - Dismiss popups
+- `wait_for` - Wait for text to appear
+- `handle_dialog` - Accept/dismiss popups
+- `close_page` - Close browser page
 
 ## WordPress-Specific Patterns
 
@@ -196,31 +210,31 @@ Common WordPress admin element patterns:
 
 | Task | How to Find |
 |------|-------------|
-| Save button | `button[name="save"]`, `.editor-post-publish-button`, `button:has-text("Save")` |
-| Settings input | Look for `label` text, then find associated `input` |
-| Block inserter | `.block-editor-inserter__toggle`, `button[aria-label*="Add"]` |
-| Site Editor navigation | `.edit-site-*` classes, navigation landmarks |
+| Save button | Look for `button` with "Save" text in snapshot |
+| Settings input | Find `textbox` or `input` by label in snapshot |
+| Block inserter | Look for button with "Add" in name/description |
+| Site Editor navigation | Look for navigation landmarks in snapshot |
 
-Use `mcp__playwright__browser_snapshot` only as fallback when element cannot be located via targeted query (CSS selector, role, or text).
+Use `take_snapshot` to discover the actual structure - returns compact uid-based tree.
 
 ## Special Cases
 
 ### Site Editor Issues
-- Wait for Site Editor to fully load (look for `.edit-site-visual-editor`)
-- Canvas may be in an iframe - Playwright handles this automatically
+- Wait for Site Editor to fully load (look for editor elements in snapshot)
+- Canvas may be in an iframe - DevTools handles this automatically
 - Allow extra time for React to hydrate
 
 ### Block Editor Issues
-- Wait for editor to load (`.block-editor`)
-- Block controls appear on hover - use `mcp__playwright__browser_hover` first
+- Wait for editor to load (look for block-editor elements)
+- Block controls appear on hover - use `hover` first
 
 ## Error Handling
 
 | Error | Action |
 |-------|--------|
-| Element not found | Use `mcp__playwright__browser_snapshot` to locate, screenshot only if error is the bug itself, report as INCONCLUSIVE |
-| Page timeout | Check network/console for errors, screenshot only if timeout is the bug, report as INCONCLUSIVE |
-| Unexpected dialog | Use `mcp__playwright__browser_handle_dialog` to dismiss |
+| Element not found | Screenshot current state, report as INCONCLUSIVE |
+| Page timeout | Check network/console for errors, report as INCONCLUSIVE |
+| Unexpected dialog | Use `handle_dialog` to dismiss |
 | Ambiguous step | Note in findings, suggest manual verification |
 
 ## Screenshot Naming Convention

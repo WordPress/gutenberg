@@ -1,34 +1,55 @@
 ---
-description: Run full triage pipeline for a Gutenberg bug report using Chrome DevTools MCP with isolated subagents for token efficiency
+description: Run full triage pipeline for a Gutenberg bug report using Chrome DevTools MCP
 allowed_args: issue
 allowedTools:
   - Bash
   - Read
   - Write
+  - Edit
   - Task
+  - WebFetch
+  - Glob
+  - Grep
+  - mcp__chrome-devtools__new_page
+  - mcp__chrome-devtools__navigate_page
+  - mcp__chrome-devtools__take_snapshot
+  - mcp__chrome-devtools__take_screenshot
+  - mcp__chrome-devtools__click
+  - mcp__chrome-devtools__fill
+  - mcp__chrome-devtools__fill_form
+  - mcp__chrome-devtools__press_key
+  - mcp__chrome-devtools__list_console_messages
+  - mcp__chrome-devtools__list_network_requests
+  - mcp__chrome-devtools__wait_for
+  - mcp__chrome-devtools__handle_dialog
+  - mcp__chrome-devtools__hover
+  - mcp__chrome-devtools__close_page
+  - mcp__chrome-devtools__list_pages
+  - mcp__chrome-devtools__select_page
 ---
 
 # /triage-devtools
 
-Triage Gutenberg issue $ARGUMENTS using Chrome DevTools MCP with isolated subagents for token efficiency.
+Triage Gutenberg issue $ARGUMENTS using Chrome DevTools MCP.
 
-## Architecture
+## Architecture (Hybrid for Token Efficiency)
 
-Each step runs as a **separate subagent** with minimal context. Data passes between steps via files:
+Steps 1, 2, and 4 run directly (lightweight, benefit from caching).
+Step 3 runs as a **subagent** to isolate browser snapshot context (main token sink).
 
 ```
-Orchestrator (this command)
+Main Agent
     |
-    +---> Subagent 1: Parse Issue
+    +---> Step 1: Parse Issue (direct)
     |     Output: /tmp/triage/<issue>/<issue>.parsed.json
     |
-    +---> Subagent 2: Build Blueprint
+    +---> Step 2: Build Blueprint (direct)
     |     Output: /tmp/triage/<issue>/<issue>.blueprint.json
     |
-    +---> Subagent 3: Reproduce Bug (Chrome DevTools)
+    +---> Step 3: Reproduce Bug (SUBAGENT - isolates browser snapshots)
     |     Output: /tmp/triage/<issue>/<issue>.findings.json
     |
-    +---> Subagent 4: Report Findings
+    +---> Step 4: Report Findings (direct)
           Output: GitHub comment posted
 ```
 
@@ -36,48 +57,32 @@ Orchestrator (this command)
 
 `/tmp/triage/<issue>/`
 
+## Workflow Files
+
+| Step | Instruction File | Execution |
+|------|------------------|-----------|
+| 1. Parse Issue | `.claude/workflows/triage/1-parse.md` | Direct |
+| 2. Build Blueprint | `.claude/workflows/triage/2-blueprint.md` | Direct |
+| 3. Reproduce Bug | `.claude/workflows/triage/3-reproduce-devtools.md` | **Subagent** |
+| 4. Report Findings | `.claude/workflows/triage/4-report.md` | Direct |
+
 ## Execution
 
-Execute steps in sequence using the Task tool to spawn subagents.
+### Step 1: Parse Issue (Direct)
 
-### Step 1: Parse Issue
+**Read file:** `.claude/workflows/triage/1-parse.md`
 
-Spawn a subagent to parse the issue:
+Execute the parsing instructions. If `needs_triage=false` in the output, stop and report skip reason.
 
-```
-Task tool with:
-  subagent_type: "general-purpose"
-  description: "Parse Gutenberg issue"
-  prompt: |
-    Parse Gutenberg issue #<issue> following the instructions in .claude/workflows/triage/1-parse.md
+### Step 2: Build Blueprint (Direct)
 
-    Output the parsed data to /tmp/triage/<issue>/<issue>.parsed.json
+**Read file:** `.claude/workflows/triage/2-blueprint.md`
 
-    If needs_triage=false, return early with the skip reason.
-```
+Execute the blueprint generation instructions.
 
-After completion, read `/tmp/triage/<issue>/<issue>.parsed.json` to check if `needs_triage` is false. If so, stop and report skip reason.
+### Step 3: Reproduce Bug (Subagent)
 
-### Step 2: Build Blueprint
-
-Spawn a subagent to build the blueprint:
-
-```
-Task tool with:
-  subagent_type: "general-purpose"
-  description: "Build Playground blueprint"
-  prompt: |
-    Build a WordPress Playground blueprint for issue #<issue>.
-
-    Read the parsed issue data from: /tmp/triage/<issue>/<issue>.parsed.json
-    Follow the instructions in: .claude/workflows/triage/2-blueprint.md
-
-    Output the blueprint to: /tmp/triage/<issue>/<issue>.blueprint.json
-```
-
-### Step 3: Reproduce Bug
-
-Spawn a subagent with Chrome DevTools MCP tools to reproduce the bug:
+**IMPORTANT**: Spawn a subagent to isolate browser snapshot context from the main conversation.
 
 ```
 Task tool with:
@@ -89,63 +94,50 @@ Task tool with:
     Read these files first:
     - Parsed issue: /tmp/triage/<issue>/<issue>.parsed.json
     - Blueprint: /tmp/triage/<issue>/<issue>.blueprint.json
-    - Instructions: .claude/workflows/triage/3-reproduce.md
+    - Instructions: .claude/workflows/triage/3-reproduce-devtools.md
 
-    Available Chrome DevTools MCP tools:
-    - mcp__chrome-devtools__new_page
-    - mcp__chrome-devtools__navigate_page
-    - mcp__chrome-devtools__take_snapshot
-    - mcp__chrome-devtools__take_screenshot
-    - mcp__chrome-devtools__click
-    - mcp__chrome-devtools__fill
-    - mcp__chrome-devtools__fill_form
-    - mcp__chrome-devtools__press_key
-    - mcp__chrome-devtools__list_console_messages
-    - mcp__chrome-devtools__list_network_requests
-    - mcp__chrome-devtools__wait_for
-    - mcp__chrome-devtools__handle_dialog
-    - mcp__chrome-devtools__hover
-    - mcp__chrome-devtools__close_page
+    Start Playground, execute reproduction steps, collect evidence, and write findings.
 
     Output findings to: /tmp/triage/<issue>/<issue>.findings.json
+
+    When done, stop Playground and close the browser.
 ```
 
-### Step 4: Report Findings
+After subagent completes, read the findings file to continue.
 
-Spawn a subagent to generate and post the report:
+### Step 4: Report Findings (Direct)
 
-```
-Task tool with:
-  subagent_type: "general-purpose"
-  description: "Post triage report"
-  prompt: |
-    Generate and post the triage report for issue #<issue>.
+**Read file:** `.claude/workflows/triage/4-report.md`
 
-    Read these files:
-    - Parsed issue: /tmp/triage/<issue>/<issue>.parsed.json
-    - Blueprint: /tmp/triage/<issue>/<issue>.blueprint.json
-    - Findings: /tmp/triage/<issue>/<issue>.findings.json
-    - Instructions: .claude/workflows/triage/4-report.md
+Execute the reporting instructions and post the GitHub comment.
 
-    Post the report as a GitHub comment on the issue.
-```
+## Why Hybrid Architecture?
 
-## Benefits of Subagent Architecture
+1. **Cache efficiency**: Steps 1, 2, 4 are lightweight and benefit from prompt caching (90% discount on cache reads)
 
-1. **Isolated context**: Each subagent only sees what it needs
-2. **Reduced token usage**: No accumulation of browser snapshots across steps
-3. **Better debugging**: Each step's output is saved to disk
-4. **Parallelization potential**: Steps 1-2 could run in parallel in future
+2. **Context isolation where it matters**: Step 3 (browser automation) generates large snapshots that would accumulate in context. Running it as a subagent:
+   - Subagent context is discarded after completion
+   - Only the findings.json result persists
+   - Main agent never sees the browser snapshots
 
-## Error Handling
+3. **Reduced overhead**: Only one subagent spawn instead of four
 
-If any subagent fails:
-1. Read its output file to understand what happened
-2. Report the failure with context
-3. Do not proceed to subsequent steps
+## Token Savings Mechanism
+
+**Without subagent** (original approach):
+- Browser snapshots accumulate in main context
+- Each snapshot ~5-10KB of tokens
+- 10+ snapshots = 50-100KB+ accumulated
+- All this context is cached and re-read on each turn
+
+**With subagent for Step 3**:
+- Browser snapshots stay in subagent context
+- Subagent completes and context is discarded
+- Main agent only sees final result summary
+- Steps 1, 2, 4 still benefit from caching
 
 ## Notes
 
 - This command uses Chrome DevTools MCP for browser automation
 - For Playwright-based triage, use `/triage` instead
-- Subagents inherit tool permissions from this command's allowedTools plus their specific MCP tools
+- Only Step 3 uses a subagent - this is intentional for optimal cache/isolation balance
