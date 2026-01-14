@@ -18,6 +18,16 @@ const postDataFields = [
 		type: 'string',
 	},
 	{
+		label: __( 'Post Featured Media ID' ),
+		args: { field: 'featured_media.id' },
+		type: 'number',
+	},
+	{
+		label: __( 'Post Featured Media URL' ),
+		args: { field: 'featured_media.url' },
+		type: 'string',
+	},
+	{
 		label: __( 'Post Modified Date' ),
 		args: { field: 'modified' },
 		type: 'string',
@@ -56,7 +66,8 @@ export default {
 			postType = context?.postType;
 		}
 
-		const { getEditedEntityRecord } = select( coreDataStore );
+		const { getEditedEntityRecord, getEntityRecord } =
+			select( coreDataStore );
 		const entityDataValues = getEditedEntityRecord(
 			'postType',
 			postType,
@@ -65,6 +76,24 @@ export default {
 
 		const newValues = {};
 		for ( const [ attributeName, binding ] of Object.entries( bindings ) ) {
+			if ( binding.args.field === 'featured_media.id' ) {
+				newValues[ attributeName ] = entityDataValues?.featured_media;
+				continue;
+			}
+
+			if ( binding.args.field === 'featured_media.url' ) {
+				const featuredMedia = getEntityRecord(
+					'postType',
+					'attachment',
+					entityDataValues?.featured_media,
+					{
+						context: 'view',
+					}
+				);
+				newValues[ attributeName ] = featuredMedia?.source_url;
+				continue;
+			}
+
 			const postDataField = postDataFields.find(
 				( field ) => field.args.field === binding.args.field
 			);
@@ -139,12 +168,7 @@ export default {
 
 		return true;
 	},
-	getFieldsList( { context, select } ) {
-		const selectedBlock = select( blockEditorStore ).getSelectedBlock();
-		if ( selectedBlock?.name !== 'core/post-date' ) {
-			return [];
-		}
-
+	getFieldsList( { context } ) {
 		if ( ! context || ! context.postId || ! context.postType ) {
 			return [];
 		}
