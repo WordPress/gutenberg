@@ -2,11 +2,11 @@
 /**
  * External dependencies
  */
+const { execSync } = require( 'child_process' );
 const chalk = require( 'chalk' );
 const ora = require( 'ora' );
 const yargs = require( 'yargs' );
 const terminalLink = require( 'terminal-link' );
-const { execSync } = require( 'child_process' );
 
 /**
  * Internal dependencies
@@ -19,6 +19,10 @@ const {
 	RUN_CONTAINERS,
 	validateRunContainer,
 } = require( './validate-run-container' );
+const {
+	getAvailableRuntimes,
+	UnsupportedCommandError,
+} = require( './runtime' );
 
 // Colors.
 const boldWhite = chalk.bold.white;
@@ -45,7 +49,11 @@ const withSpinner =
 				process.exit( 0 );
 			},
 			( error ) => {
-				if (
+				if ( error instanceof UnsupportedCommandError ) {
+					// Error is an unsupported command in the current runtime.
+					spinner.fail( error.message );
+					process.exit( 1 );
+				} else if (
 					error instanceof env.ValidationError ||
 					error instanceof env.LifecycleScriptError
 				) {
@@ -149,6 +157,13 @@ module.exports = function cli() {
 				type: 'boolean',
 				describe: 'Execute any configured lifecycle scripts.',
 				default: true,
+			} );
+			args.option( 'runtime', {
+				type: 'string',
+				describe:
+					'The runtime environment to use. "docker" uses Docker containers, "playground" uses WordPress Playground (experimental).',
+				choices: getAvailableRuntimes(),
+				default: 'docker',
 			} );
 		},
 		withSpinner( env.start )

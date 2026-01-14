@@ -2,11 +2,11 @@
 /**
  * External dependencies
  */
-const { v2: dockerCompose } = require( 'docker-compose' );
-const util = require( 'util' );
-const path = require( 'path' );
 const fs = require( 'fs' ).promises;
+const path = require( 'path' );
+const util = require( 'util' );
 const { confirm } = require( '@inquirer/prompts' );
+const { v2: dockerCompose } = require( 'docker-compose' );
 
 /**
  * Promisified dependencies
@@ -33,6 +33,7 @@ const {
 const { didCacheChange, setCache } = require( '../cache' );
 const md5 = require( '../md5' );
 const { executeLifecycleScript } = require( '../execute-lifecycle-script' );
+const { getRuntime } = require( '../runtime' );
 
 /**
  * @typedef {import('../config').WPConfig} WPConfig
@@ -49,6 +50,7 @@ const CONFIG_CACHE_KEY = 'config_checksum';
  * @param {string}  options.spx     The SPX mode to set.
  * @param {boolean} options.scripts Indicates whether or not lifecycle scripts should be executed.
  * @param {boolean} options.debug   True if debug mode is enabled.
+ * @param {string}  options.runtime The runtime to use ('docker' or 'playground').
  */
 module.exports = async function start( {
 	spinner,
@@ -57,7 +59,19 @@ module.exports = async function start( {
 	spx,
 	scripts,
 	debug,
+	runtime: runtimeName = 'docker',
 } ) {
+	const runtime = getRuntime( runtimeName );
+
+	// Use Playground runtime if specified
+	if ( runtimeName === 'playground' ) {
+		return startPlayground( {
+			spinner,
+			scripts,
+			debug,
+			runtime,
+		} );
+	}
 	spinner.text = 'Reading configuration.';
 	await checkForLegacyInstall( spinner );
 
@@ -351,4 +365,50 @@ async function checkForLegacyInstall( spinner ) {
 		spinner.info( 'Old installs deleted successfully.' );
 	}
 	spinner.start();
+}
+
+/**
+ * Starts the WordPress Playground environment.
+ *
+ * @param {Object}  options
+ * @param {Object}  options.spinner A CLI spinner which indicates progress.
+ * @param {boolean} options.scripts Indicates whether or not lifecycle scripts should be executed.
+ * @param {boolean} options.debug   True if debug mode is enabled.
+ * @param {Object}  options.runtime The Playground runtime instance.
+ */
+async function startPlayground( { spinner, scripts, debug, runtime } ) {
+	spinner.text = 'Reading configuration.';
+
+	const config = await initConfig( {
+		spinner,
+		debug,
+		writeChanges: true,
+	} );
+
+	if ( ! config.detectedLocalConfig ) {
+		const { configDirectoryPath } = config;
+		spinner.warn(
+			`Warning: could not find a .wp-env.json configuration file and could not determine if '${ configDirectoryPath }' is a WordPress installation, a plugin, or a theme.`
+		);
+		spinner.start();
+	}
+
+	// Display info about Playground limitations
+	spinner.info(
+		'Note: Playground runtime does not support a separate tests environment. Only the development environment will be started.\n'
+	);
+	spinner.start();
+
+	const result = await runtime.start( config, { spinner, debug } );
+
+	if ( scripts ) {
+		await executeLifecycleScript( 'afterStart', config, spinner );
+	}
+
+	spinner.prefixText = [
+		'WordPress development site started' +
+			( result.siteUrl ? ` at ${ result.siteUrl }` : '.' ),
+	].join( '\n' );
+	spinner.prefixText += '\n\n';
+	spinner.text = 'Done!';
 }
