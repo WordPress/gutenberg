@@ -5,8 +5,8 @@
 	text-decoration: none;
 	cursor: pointer;
 	opacity: var(--tab-opacity, 0.5);
-	flex-basis: inherit!important;
-	flex-grow: inherit!important;
+	flex-basis: inherit !important;
+	flex-grow: inherit !important;
 
 	margin: 0;
 	padding-block: var(--tab-padding-block, var(--wp--preset--spacing--20, 0.5em));
@@ -40,6 +40,6 @@
 	&.is-active {
 		opacity: var(--tab-opacity-active, 1);
 		background-color: var(--custom-tab-active-color, #000) !important;
-		color: var(--custom-tab-active-text-color, #fff)  !important;
+		color: var(--custom-tab-active-text-color, #fff) !important;
 	}
 }

@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import clsx from 'clsx';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -22,28 +17,47 @@ import { useMemo, useEffect } from '@wordpress/element';
 import Controls from './controls';
 
 const TABS_TEMPLATE = [
-	[ 'core/tabs-menu', {
-		lock: {
-			remove: true,
-		}
-	} ],
-	[ 'core/tab-panels', {
-		lock: {
-			remove: true,
-		}
-	}, [
-		[ 'core/tab', {
-			anchor: 'tab-1',
-			label: 'Tab 1',
-		}, [
-			[ 'core/paragraph', {
-				placeholder: __( 'Type / to add a block to tab' ),
-			} ]
-		] ]
-	] ],
+	[
+		'core/tabs-menu',
+		{
+			lock: {
+				remove: true,
+			},
+		},
+	],
+	[
+		'core/tab-panels',
+		{
+			lock: {
+				remove: true,
+			},
+		},
+		[
+			[
+				'core/tab',
+				{
+					anchor: 'tab-1',
+					label: 'Tab 1',
+				},
+				[
+					[
+						'core/paragraph',
+						{
+							placeholder: __( 'Type / to add a block to tab' ),
+						},
+					],
+				],
+			],
+		],
+	],
 ];
 
-function Edit( { clientId, attributes, setAttributes, __unstableLayoutClassNames: layoutClassNames } ) {
+function Edit( {
+	clientId,
+	attributes,
+	setAttributes,
+	__unstableLayoutClassNames: layoutClassNames,
+} ) {
 	const { activeTabIndex, editorActiveTabIndex } = attributes;
 
 	/**

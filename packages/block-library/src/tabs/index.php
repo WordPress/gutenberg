@@ -56,13 +56,12 @@ function block_core_tabs_generate_tabs_list( array $innerblocks = array() ): arr
  * It is more performant to do this here, once, rather than in the tabs render and tabs context filters.
  * In this way core/tabs is both a provider and a consumer of the core/tabs-list context.
  *
- * @param array         $context      Default block context.
- * @param array         $parsed_block The block being rendered.
- * @param WP_Block|null $parent_block Parent block, if any.
+ * @param array $context      Default block context.
+ * @param array $parsed_block The block being rendered.
  *
  * @return array Modified context.
  */
-function block_core_tabs_provide_context( array $context, array $parsed_block, $parent_block ): array {
+function block_core_tabs_provide_context( array $context, array $parsed_block ): array {
 	if ( 'core/tabs' === $parsed_block['blockName'] ) {
 		$tabs_list                 = block_core_tabs_generate_tabs_list( $parsed_block['innerBlocks'] ?? array() );
 		$context['core/tabs-list'] = $tabs_list;
@@ -70,7 +69,7 @@ function block_core_tabs_provide_context( array $context, array $parsed_block, $
 
 	return $context;
 }
-add_filter( 'render_block_context', 'block_core_tabs_provide_context', 10, 3 );
+add_filter( 'render_block_context', 'block_core_tabs_provide_context', 10, 2 );
 
 /**
  * Render callback for core/tabs.

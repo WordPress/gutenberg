@@ -12,10 +12,11 @@ import { useSelect } from '@wordpress/data';
  * Internal dependencies
  */
 import AddTabToolbarControl from '../tab/add-tab-toolbar-control';
+import RemoveTabToolbarControl from '../tab/remove-tab-toolbar-control';
 
 const TAB_PANELS_TEMPLATE = [ [ 'core/tab', {} ] ];
 
-export default function Edit( { attributes, clientId } ) {
+export default function Edit( { clientId } ) {
 	const blockProps = useBlockProps();
 
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
@@ -35,9 +36,8 @@ export default function Edit( { attributes, clientId } ) {
 
 	return (
 		<>
-			<AddTabToolbarControl
-				tabsClientId={ tabsClientId }
-			/>
+			<AddTabToolbarControl tabsClientId={ tabsClientId } />
+			<RemoveTabToolbarControl tabsClientId={ tabsClientId } />
 			<div { ...innerBlocksProps } />
 		</>
 	);

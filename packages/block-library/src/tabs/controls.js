@@ -2,13 +2,14 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { ToggleControl, PanelBody, TextControl } from '@wordpress/components';
+import { PanelBody, TextControl } from '@wordpress/components';
 import { InspectorControls } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
 import AddTabToolbarControl from '../tab/add-tab-toolbar-control';
+import RemoveTabToolbarControl from '../tab/remove-tab-toolbar-control';
 
 export default function Controls( { attributes, setAttributes, clientId } ) {
 	const {
@@ -19,9 +20,8 @@ export default function Controls( { attributes, setAttributes, clientId } ) {
 
 	return (
 		<>
-			<AddTabToolbarControl
-				tabsClientId={ clientId }
-			/>
+			<AddTabToolbarControl tabsClientId={ clientId } />
+			<RemoveTabToolbarControl tabsClientId={ clientId } />
 			<InspectorControls>
 				<PanelBody title={ __( 'Tabs Settings' ) }>
 					<TextControl

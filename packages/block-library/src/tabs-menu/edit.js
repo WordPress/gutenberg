@@ -15,18 +15,31 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { memo, useMemo, useState, useEffect, useCallback } from '@wordpress/element';
+import {
+	memo,
+	useMemo,
+	useState,
+	useEffect,
+	useCallback,
+} from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import AddTabToolbarControl from '../tab/add-tab-toolbar-control';
+import RemoveTabToolbarControl from '../tab/remove-tab-toolbar-control';
 
 const TABS_MENU_ITEM_TEMPLATE = [ [ 'core/tabs-menu-item', {} ] ];
 
 /**
  * Preview component for non-active tab menu items.
  * Uses useBlockPreview to cache the rendering.
+ *
+ * @param {Object}   props                         Component props.
+ * @param {Array}    props.blocks                  The blocks to preview.
+ * @param {string}   props.blockContextId          The context ID for this block.
+ * @param {boolean}  props.isHidden                Whether the preview is hidden.
+ * @param {Function} props.setActiveBlockContextId Callback to set the active context ID.
  */
 function TabsMenuItemPreview( {
 	blocks,
@@ -60,6 +73,9 @@ const MemoizedTabsMenuItemPreview = memo( TabsMenuItemPreview );
 
 /**
  * The actual editable inner blocks for the active tab item.
+ *
+ * @param {Object} props              Component props.
+ * @param {Object} props.wrapperProps Props to pass to the wrapper element.
  */
 function TabsMenuItemTemplateBlocks( { wrapperProps = {} } ) {
 	const innerBlocksProps = useInnerBlocksProps( wrapperProps, {
@@ -71,7 +87,6 @@ function TabsMenuItemTemplateBlocks( { wrapperProps = {} } ) {
 }
 
 function Edit( {
-	attributes,
 	context,
 	clientId,
 	__unstableLayoutClassNames: layoutClassNames,
@@ -96,7 +111,8 @@ function Edit( {
 	// Get the inner blocks (the single tabs-menu-item template)
 	const { blocks, tabsClientId } = useSelect(
 		( select ) => {
-			const { getBlocks, getBlockRootClientId } = select( blockEditorStore );
+			const { getBlocks, getBlockRootClientId } =
+				select( blockEditorStore );
 			return {
 				blocks: getBlocks( clientId ),
 				tabsClientId: getBlockRootClientId( clientId ),
@@ -134,8 +150,13 @@ function Edit( {
 
 	// Update active context when editorActiveTabIndex changes
 	useEffect( () => {
-		if ( blockContexts.length > 0 && effectiveActiveIndex < blockContexts.length ) {
-			const newContextId = getContextId( blockContexts[ effectiveActiveIndex ] );
+		if (
+			blockContexts.length > 0 &&
+			effectiveActiveIndex < blockContexts.length
+		) {
+			const newContextId = getContextId(
+				blockContexts[ effectiveActiveIndex ]
+			);
 			setActiveBlockContextId( ( prevId ) =>
 				prevId !== newContextId ? newContextId : prevId
 			);
@@ -147,10 +168,17 @@ function Edit( {
 		( index ) => {
 			if ( tabsClientId && index !== effectiveActiveIndex ) {
 				__unstableMarkNextChangeAsNotPersistent();
-				updateBlockAttributes( tabsClientId, { editorActiveTabIndex: index } );
+				updateBlockAttributes( tabsClientId, {
+					editorActiveTabIndex: index,
+				} );
 			}
 		},
-		[ tabsClientId, effectiveActiveIndex, updateBlockAttributes, __unstableMarkNextChangeAsNotPersistent ]
+		[
+			tabsClientId,
+			effectiveActiveIndex,
+			updateBlockAttributes,
+			__unstableMarkNextChangeAsNotPersistent,
+		]
 	);
 
 	const blockProps = useBlockProps( {
@@ -163,6 +191,7 @@ function Edit( {
 		return (
 			<>
 				<AddTabToolbarControl tabsClientId={ tabsClientId } />
+				<RemoveTabToolbarControl tabsClientId={ tabsClientId } />
 				<div { ...blockProps }>
 					<span className="tabs__tab-label tabs__tab-label--placeholder">
 						{ __( 'Add tabs to display menu' ) }
@@ -175,17 +204,22 @@ function Edit( {
 	return (
 		<>
 			<AddTabToolbarControl tabsClientId={ tabsClientId } />
+			<RemoveTabToolbarControl tabsClientId={ tabsClientId } />
 			<div { ...blockProps }>
 				{ blockContexts.map( ( blockContext, index ) => {
 					const contextId = getContextId( blockContext );
 					const isVisible = contextId === activeBlockContextId;
 
 					return (
-						<BlockContextProvider key={ contextId } value={ blockContext }>
+						<BlockContextProvider
+							key={ contextId }
+							value={ blockContext }
+						>
 							{ isVisible ? (
 								<TabsMenuItemTemplateBlocks
 									wrapperProps={ {
-										onClick: () => handleTabContextClick( index ),
+										onClick: () =>
+											handleTabContextClick( index ),
 									} }
 								/>
 							) : null }

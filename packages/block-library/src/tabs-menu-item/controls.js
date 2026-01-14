@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import clsx from 'clsx';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -42,7 +37,8 @@ export default function Controls( {
 					{
 						label: __( 'Active Background' ),
 						colorValue:
-							activeBackgroundColor?.color ?? customActiveBackgroundColor,
+							activeBackgroundColor?.color ??
+							customActiveBackgroundColor,
 						onColorChange: ( value ) => {
 							setActiveBackgroundColor( value );
 							setAttributes( {
@@ -64,7 +60,8 @@ export default function Controls( {
 					{
 						label: __( 'Hover Background' ),
 						colorValue:
-							hoverBackgroundColor?.color ?? customHoverBackgroundColor,
+							hoverBackgroundColor?.color ??
+							customHoverBackgroundColor,
 						onColorChange: ( value ) => {
 							setHoverBackgroundColor( value );
 							setAttributes( {

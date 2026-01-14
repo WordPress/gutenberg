@@ -7,10 +7,10 @@
 }
 
 .block-editor-block-preview__live-content:has(.wp-block-tabs-menu-item) {
-	flex-basis: inherit!important;
-	flex-grow: inherit!important;
+	flex-basis: inherit !important;
+	flex-grow: inherit !important;
 	.wp-block-tabs-menu-item {
-		flex-basis: 100%!important;
+		flex-basis: 100% !important;
 	}
 	&:hover > .wp-block-tabs-menu-item {
 		opacity: var(--tab-opacity-hover, 1);

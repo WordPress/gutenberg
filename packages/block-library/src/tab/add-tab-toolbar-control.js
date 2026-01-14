@@ -1,14 +1,13 @@
 /**
  * WordPress dependencies
  */
-import { sprintf } from '@wordpress/i18n';
+import { sprintf, __ } from '@wordpress/i18n';
 import { createBlock } from '@wordpress/blocks';
 import {
 	BlockControls,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { ToolbarGroup, ToolbarButton } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
 
 /**
@@ -16,26 +15,19 @@ import { useDispatch, useSelect } from '@wordpress/data';
  * Inserts new tabs into the tab-panels block.
  *
  * @param {Object} props
- * @param {Object} props.attributes   The block attributes.
  * @param {string} props.tabsClientId The client ID of the parent tabs block.
  * @return {JSX.Element} The toolbar control element.
  */
 export default function AddTabToolbarControl( { tabsClientId } ) {
-	const {
-		insertBlock,
-		updateBlockAttributes,
-		selectBlock,
-		__unstableMarkNextChangeAsNotPersistent,
-	} = useDispatch( blockEditorStore );
+	const { insertBlock } = useDispatch( blockEditorStore );
 
-	// Find the tab-panels block and tabs-menu block within the tabs block
-	const { tabPanelsClientId, nextTabIndex, tabsMenuClientId } = useSelect(
+	// Find the tab-panels block within the tabs block
+	const { tabPanelsClientId, nextTabIndex } = useSelect(
 		( select ) => {
 			if ( ! tabsClientId ) {
 				return {
 					tabPanelsClientId: null,
 					nextTabIndex: 0,
-					tabsMenuClientId: null,
 				};
 			}
 			const { getBlocks } = select( blockEditorStore );
@@ -43,13 +35,9 @@ export default function AddTabToolbarControl( { tabsClientId } ) {
 			const tabPanels = innerBlocks.find(
 				( block ) => block.name === 'core/tab-panels'
 			);
-			const tabsMenu = innerBlocks.find(
-				( block ) => block.name === 'core/tabs-menu'
-			);
 			return {
 				tabPanelsClientId: tabPanels?.clientId || null,
 				nextTabIndex: ( tabPanels?.innerBlocks.length || 0 ) + 1,
-				tabsMenuClientId: tabsMenu?.clientId || null,
 			};
 		},
 		[ tabsClientId ]
@@ -61,7 +49,8 @@ export default function AddTabToolbarControl( { tabsClientId } ) {
 		}
 		const newTabBlock = createBlock( 'core/tab', {
 			anchor: 'tab-' + nextTabIndex,
-			label: sprintf( __( 'Tab %d', 'prc-block-library' ), nextTabIndex ),
+			/* translators: %d: tab number */
+			label: sprintf( __( 'Tab %d' ), nextTabIndex ),
 		} );
 		insertBlock( newTabBlock, undefined, tabPanelsClientId );
 		// @TODO: Possible select and focus the tabs-menu-item active tab RichText editor?

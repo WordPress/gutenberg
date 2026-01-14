@@ -7,7 +7,8 @@ import { createBlock } from '@wordpress/blocks';
 /**
  * The old attributes before restructuring.
  * Maintain during experimental phase to allow for migration.
- * @TODO: Should be removed after the experimental phase before release into main block library.
+ *
+ * TODO: Should be removed after the experimental phase before release into main block library.
  */
 const v1Attributes = {
 	tabsId: {
@@ -64,6 +65,9 @@ const v1Attributes = {
 /**
  * The old save function before restructuring.
  * This renders the tab blocks directly as children with a tabs list placeholder.
+ *
+ * @param {Object} root0            Component props.
+ * @param {Object} root0.attributes Block attributes.
  */
 function v1Save( { attributes } ) {
 	const blockProps = useBlockProps.save();
@@ -93,6 +97,9 @@ function v1Save( { attributes } ) {
  *   - core/tab-panels
  *     - core/tab
  *     - core/tab
+ *
+ * @param {Object} attributes  Block attributes.
+ * @param {Array}  innerBlocks Inner blocks array.
  */
 function v1Migrate( attributes, innerBlocks ) {
 	// Extract color attributes for tabs-menu
@@ -161,6 +168,9 @@ function v1Migrate( attributes, innerBlocks ) {
 
 /**
  * Check if block is using old structure (tab blocks directly as children).
+ *
+ * @param {Object} attributes  Block attributes.
+ * @param {Array}  innerBlocks Inner blocks array.
  */
 function v1IsEligible( attributes, innerBlocks ) {
 	// If there are any direct tab children (not wrapped in tab-panels), this is old structure
