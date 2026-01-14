@@ -9,6 +9,8 @@ import {
 } from '@wordpress/theme';
 import { type ComponentProps } from '../utils/types';
 
+type ElevationSize = 'x-small' | 'small' | 'medium' | 'large';
+
 type DimensionVariant< T > = {
 	block?: T;
 	blockStart?: T;
@@ -53,6 +55,11 @@ export interface BoxProps extends ComponentProps< 'div' > {
 	 * The surface border stroke color design token.
 	 */
 	borderColor?: SurfaceStrokeColor;
+
+	/**
+	 * The elevation design token for box shadow.
+	 */
+	elevation?: ElevationSize;
 
 	/**
 	 * The content to be rendered inside the component.

@@ -37,4 +37,34 @@ describe( 'Box', () => {
 			width: '10px',
 		} );
 	} );
+
+	it( 'applies elevation style', () => {
+		render( <Box elevation="small">Content</Box> );
+
+		const box = screen.getByText( 'Content' );
+
+		expect( box ).toHaveStyle( {
+			'box-shadow': 'var(--wpds-elevation-small)',
+		} );
+	} );
+
+	it( 'applies different elevation levels', () => {
+		const { rerender } = render( <Box elevation="x-small">Content</Box> );
+		let box = screen.getByText( 'Content' );
+		expect( box ).toHaveStyle( {
+			'box-shadow': 'var(--wpds-elevation-x-small)',
+		} );
+
+		rerender( <Box elevation="medium">Content</Box> );
+		box = screen.getByText( 'Content' );
+		expect( box ).toHaveStyle( {
+			'box-shadow': 'var(--wpds-elevation-medium)',
+		} );
+
+		rerender( <Box elevation="large">Content</Box> );
+		box = screen.getByText( 'Content' );
+		expect( box ).toHaveStyle( {
+			'box-shadow': 'var(--wpds-elevation-large)',
+		} );
+	} );
 } );

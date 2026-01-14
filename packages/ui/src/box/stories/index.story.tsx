@@ -39,3 +39,42 @@ export const DirectionalPadding: Story = {
 		},
 	},
 };
+
+export const WithElevation: Story = {
+	render: () => (
+		<div style={ { display: 'flex', gap: '24px', flexWrap: 'wrap' } }>
+			<Box
+				backgroundColor="neutral"
+				padding="md"
+				borderRadius="md"
+				elevation="x-small"
+			>
+				Elevation: x-small
+			</Box>
+			<Box
+				backgroundColor="neutral"
+				padding="md"
+				borderRadius="md"
+				elevation="small"
+			>
+				Elevation: small
+			</Box>
+			<Box
+				backgroundColor="neutral"
+				padding="md"
+				borderRadius="md"
+				elevation="medium"
+			>
+				Elevation: medium
+			</Box>
+			<Box
+				backgroundColor="neutral"
+				padding="md"
+				borderRadius="md"
+				elevation="large"
+			>
+				Elevation: large
+			</Box>
+		</div>
+	),
+};

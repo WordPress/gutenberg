@@ -73,6 +73,7 @@ export const Box = forwardRef< HTMLDivElement, BoxProps >( function Box(
 		borderRadius,
 		borderWidth,
 		borderColor,
+		elevation,
 		render = DEFAULT_RENDER,
 		...props
 	},
@@ -106,6 +107,10 @@ export const Box = forwardRef< HTMLDivElement, BoxProps >( function Box(
 
 	if ( borderColor ) {
 		style.borderColor = `var(--wpds-color-stroke-${ target }-${ borderColor }, var(--wpds-color-stroke-surface-${ borderColor }))`;
+	}
+
+	if ( elevation ) {
+		style.boxShadow = `var(--wpds-elevation-${ elevation })`;
 	}
 
 	const element = useRender( {
