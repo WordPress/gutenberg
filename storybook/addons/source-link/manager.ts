@@ -38,11 +38,7 @@ const SourceLinkTool = () => {
 			title: 'Open source file',
 			asChild: true,
 		},
-		createElement(
-			'a',
-			{ href },
-			createElement( JumpToIcon, { 'aria-hidden': true } )
-		)
+		createElement( 'a', { href }, createElement( JumpToIcon ) )
 	);
 };
 
