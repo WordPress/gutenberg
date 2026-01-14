@@ -83,6 +83,9 @@ export default {
 					},
 				},
 			],
+			build: {
+				minify: NODE_ENV === 'production',
+			},
 			define: {
 				// Ensures that `@wordpress/warning` can properly detect dev mode.
 				'globalThis.SCRIPT_DEBUG': JSON.stringify(
