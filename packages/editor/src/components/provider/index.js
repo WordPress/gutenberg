@@ -33,6 +33,7 @@ import BlockRemovalWarnings from '../block-removal-warnings';
 import StartPageOptions from '../start-page-options';
 import KeyboardShortcutHelpModal from '../keyboard-shortcut-help-modal';
 import StartTemplateOptions from '../start-template-options';
+import StartNavigationOverlayOptions from '../start-navigation-overlay-options';
 import EditorKeyboardShortcuts from '../global-keyboard-shortcuts';
 import PatternRenameModal from '../pattern-rename-modal';
 import PatternDuplicateModal from '../pattern-duplicate-modal';
@@ -387,6 +388,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 									<BlockRemovalWarnings />
 									<StartPageOptions />
 									<StartTemplateOptions />
+									<StartNavigationOverlayOptions />
 									<PatternRenameModal />
 									<PatternDuplicateModal />
 								</>
