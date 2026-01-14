@@ -51,6 +51,15 @@ jobs:
                   fetch-depth: 1
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
 
+            - name: Install Chrome dependencies
+              run: |
+                  sudo apt-get update
+                  sudo apt-get install -y chromium-browser
+                  which chromium-browser && chromium-browser --version
+
+            - name: Install WordPress Playground CLI
+              run: npm install -g @wp-playground/cli
+
             - name: Create MCP config for Chrome DevTools
               run: |
                   cat > /tmp/mcp-config.json << 'EOF'
