@@ -10,7 +10,7 @@ const { rimraf } = require( 'rimraf' );
 /**
  * Internal dependencies
  */
-const initConfig = require( '../init-config' );
+const { loadConfig } = require( '../config' );
 const { executeLifecycleScript } = require( '../execute-lifecycle-script' );
 const { getRuntime } = require( '../runtime' );
 
@@ -48,13 +48,8 @@ module.exports = async function start( {
 		await checkForLegacyInstall( spinner );
 	}
 
-	const config = await initConfig( {
-		spinner,
-		debug,
-		xdebug,
-		spx,
-		writeChanges: true,
-	} );
+	const config = await loadConfig( path.resolve( '.' ) );
+	config.debug = debug;
 
 	if ( ! config.detectedLocalConfig ) {
 		const { configDirectoryPath } = config;
@@ -75,6 +70,8 @@ module.exports = async function start( {
 	const result = await runtime.start( config, {
 		spinner,
 		update,
+		xdebug,
+		spx,
 		debug,
 	} );
 

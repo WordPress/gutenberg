@@ -17,7 +17,7 @@ const exec = util.promisify( require( 'child_process' ).exec );
 /**
  * Internal dependencies
  */
-const initConfig = require( '../../init-config' );
+const initConfig = require( './init-config' );
 const getHostUser = require( './get-host-user' );
 const downloadSources = require( './download-sources' );
 const downloadWPPHPUnit = require( './download-wp-phpunit' );
@@ -93,13 +93,24 @@ class DockerRuntime {
 	 * @param {Object}   options         Start options.
 	 * @param {Object}   options.spinner A CLI spinner which indicates progress.
 	 * @param {boolean}  options.update  If true, update sources.
+	 * @param {string}   options.xdebug  The Xdebug mode to set.
+	 * @param {string}   options.spx     The SPX mode to set.
 	 * @param {boolean}  options.debug   True if debug mode is enabled.
 	 * @return {Promise<Object>} Result object with message and siteUrl.
 	 */
-	async start( config, { spinner, update, debug } ) {
+	async start( config, { spinner, update, xdebug, spx, debug } ) {
+		// Initialize Docker-specific files (docker-compose.yml, Dockerfiles)
+		const fullConfig = await initConfig( {
+			spinner,
+			debug,
+			xdebug,
+			spx,
+			writeChanges: true,
+		} );
+
 		// Check if the hash of the config has changed. If so, run configuration.
-		const configHash = md5( config );
-		const { workDirectoryPath, dockerComposeConfigPath } = config;
+		const configHash = md5( fullConfig );
+		const { workDirectoryPath, dockerComposeConfigPath } = fullConfig;
 		const shouldConfigureWp =
 			( update ||
 				( await didCacheChange( CONFIG_CACHE_KEY, configHash, {
@@ -112,7 +123,7 @@ class DockerRuntime {
 
 		const dockerComposeConfig = {
 			config: dockerComposeConfigPath,
-			log: config.debug,
+			log: fullConfig.debug,
 		};
 
 		if ( ! ( await canAccessWPORG() ) ) {
@@ -131,7 +142,7 @@ class DockerRuntime {
 		 * @see https://github.com/WordPress/gutenberg/pull/20253#issuecomment-587228440
 		 */
 		if ( shouldConfigureWp ) {
-			await this.stop( config, { spinner, debug } );
+			await this.stop( fullConfig, { spinner, debug } );
 			// Update the images before starting the services again.
 			spinner.text = 'Updating docker images.';
 
@@ -145,7 +156,7 @@ class DockerRuntime {
 			const volumesToRemove = `${ directoryHash }_wordpress ${ directoryHash }_tests-wordpress`;
 
 			try {
-				if ( config.debug ) {
+				if ( fullConfig.debug ) {
 					spinner.text = `Removing the WordPress volumes: ${ volumesToRemove }`;
 				}
 				await exec( `docker volume rm ${ volumesToRemove }` );
@@ -166,29 +177,29 @@ class DockerRuntime {
 					? [ '--build', '--force-recreate' ]
 					: [],
 			} ),
-			shouldConfigureWp && downloadSources( config, spinner ),
+			shouldConfigureWp && downloadSources( fullConfig, spinner ),
 		] );
 
 		if ( shouldConfigureWp ) {
 			spinner.text = 'Setting up WordPress directories';
 
-			await setupWordPressDirectories( config );
+			await setupWordPressDirectories( fullConfig );
 
 			// Use the WordPress versions to download the PHPUnit suite.
 			const wpVersions = await Promise.all( [
 				readWordPressVersion(
-					config.env.development.coreSource,
+					fullConfig.env.development.coreSource,
 					spinner,
 					debug
 				),
 				readWordPressVersion(
-					config.env.tests.coreSource,
+					fullConfig.env.tests.coreSource,
 					spinner,
 					debug
 				),
 			] );
 			await downloadWPPHPUnit(
-				config,
+				fullConfig,
 				{ development: wpVersions[ 0 ], tests: wpVersions[ 1 ] },
 				spinner,
 				debug
@@ -207,7 +218,7 @@ class DockerRuntime {
 			}
 		);
 
-		if ( config.env.development.phpmyadminPort ) {
+		if ( fullConfig.env.development.phpmyadminPort ) {
 			await dockerCompose.upOne( 'phpmyadmin', {
 				...dockerComposeConfig,
 				commandOptions: shouldConfigureWp
@@ -216,7 +227,7 @@ class DockerRuntime {
 			} );
 		}
 
-		if ( config.env.tests.phpmyadminPort ) {
+		if ( fullConfig.env.tests.phpmyadminPort ) {
 			await dockerCompose.upOne( 'tests-phpmyadmin', {
 				...dockerComposeConfig,
 				commandOptions: shouldConfigureWp
@@ -237,10 +248,10 @@ class DockerRuntime {
 			spinner.text = 'Configuring WordPress.';
 
 			try {
-				await checkDatabaseConnection( config );
+				await checkDatabaseConnection( fullConfig );
 			} catch ( error ) {
 				// Wait 30 seconds for MySQL to accept connections.
-				await retry( () => checkDatabaseConnection( config ), {
+				await retry( () => checkDatabaseConnection( fullConfig ), {
 					times: 30,
 					delay: 1000,
 				} );
@@ -252,14 +263,22 @@ class DockerRuntime {
 			// Retry WordPress installation in case MySQL *still* wasn't ready.
 			await Promise.all( [
 				retry(
-					() => configureWordPress( 'development', config, spinner ),
+					() =>
+						configureWordPress(
+							'development',
+							fullConfig,
+							spinner
+						),
 					{
 						times: 2,
 					}
 				),
-				retry( () => configureWordPress( 'tests', config, spinner ), {
-					times: 2,
-				} ),
+				retry(
+					() => configureWordPress( 'tests', fullConfig, spinner ),
+					{
+						times: 2,
+					}
+				),
 			] );
 
 			// Set the cache key once everything has been configured.
@@ -269,8 +288,8 @@ class DockerRuntime {
 		}
 
 		// Get port information for the result message
-		const siteUrl = config.env.development.config.WP_SITEURL;
-		const testsSiteUrl = config.env.tests.config.WP_SITEURL;
+		const siteUrl = fullConfig.env.development.config.WP_SITEURL;
+		const testsSiteUrl = fullConfig.env.tests.config.WP_SITEURL;
 
 		const mySQLPort = await this._getPublicDockerPort(
 			'mysql',
@@ -284,7 +303,7 @@ class DockerRuntime {
 			dockerComposeConfig
 		);
 
-		const phpmyadminPort = config.env.development.phpmyadminPort
+		const phpmyadminPort = fullConfig.env.development.phpmyadminPort
 			? await this._getPublicDockerPort(
 					'phpmyadmin',
 					80,
@@ -292,7 +311,7 @@ class DockerRuntime {
 			  )
 			: null;
 
-		const testsPhpmyadminPort = config.env.tests.phpmyadminPort
+		const testsPhpmyadminPort = fullConfig.env.tests.phpmyadminPort
 			? await this._getPublicDockerPort(
 					'tests-phpmyadmin',
 					80,
