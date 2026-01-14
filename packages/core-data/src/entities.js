@@ -47,6 +47,7 @@ export const rootEntitiesConfig = [
 				'description',
 				'gmt_offset',
 				'home',
+				'image_sizes',
 				'name',
 				'site_icon',
 				'site_icon_url',
