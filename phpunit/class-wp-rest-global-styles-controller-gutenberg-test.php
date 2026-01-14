@@ -743,7 +743,12 @@ CSS;
 		$this->assertTrue( $validate( $custom_css ) );
 	}
 
-	public static function data_custom_css_allowed() {
+	/**
+	 * Data provider.
+	 *
+	 * @return array<string, string[]>
+	 */
+	public static function data_custom_css_allowed(): array {
 		return array(
 			'@property declaration'   => array(
 				'@property --prop { syntax: "<custom-ident>"; inherits: true; initial-value: false; }',
@@ -777,7 +782,12 @@ CSS;
 		$this->assertSame( $expected_error_message, $result->get_error_message() );
 	}
 
-	public static function data_custom_css_disallowed() {
+	/**
+	 * Data provider.
+	 *
+	 * @return array<string, string[]>
+	 */
+	public static function data_custom_css_disallowed(): array {
 		return array(
 			'style close tag'            => array( 'css…</style>…css', 'The CSS must not contain "&lt;/style&gt;".' ),
 			'style close tag upper case' => array( '</STYLE>', 'The CSS must not contain "&lt;/STYLE&gt;".' ),
