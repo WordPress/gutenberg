@@ -38,7 +38,9 @@ export default {
 		import.meta.resolve( './addons/design-system-theme/preset.ts' ),
 	],
 	framework: '@storybook/react-vite',
-	docs: {},
+	features: {
+		experimentalComponentsManifest: NODE_ENV === 'production',
+	},
 	typescript: {
 		reactDocgen: 'react-docgen-typescript',
 		// Should match defaults in Storybook except for the propFilter.
