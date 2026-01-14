@@ -31,7 +31,7 @@ export default {
 			options: { configureJSX: true },
 		},
 		'@storybook/addon-a11y',
-		'storybook-addon-source-link',
+		import.meta.resolve( './addons/source-link/preset.ts' ),
 		'storybook-addon-tag-badges',
 		import.meta.resolve( './addons/design-system-theme/preset.ts' ),
 	],

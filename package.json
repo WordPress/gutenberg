@@ -122,7 +122,6 @@
 		"snapshot-diff": "0.10.0",
 		"sprintf-js": "1.1.1",
 		"storybook": "^10.1.11",
-		"storybook-addon-source-link": "2.0.1",
 		"storybook-addon-tag-badges": "3.0.4",
 		"style-loader": "3.2.1",
 		"stylelint-plugin-logical-css": "^1.2.3",
