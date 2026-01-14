@@ -31,7 +31,7 @@ export default function EditorFullPage() {
 		document.head.appendChild( style );
 
 		return () => document.head.removeChild( style );
-	} );
+	}, [] );
 
 	return (
 		// eslint-disable-next-line jsx-a11y/no-static-element-interactions

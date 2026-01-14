@@ -47,7 +47,7 @@ export const WithGlobalCSS = ( Story, context ) => {
 		style.textContent = lazyStyles.join( '\n' );
 		document.head.appendChild( style );
 		return () => document.head.removeChild( style );
-	}, [ context.globals.css ] );
+	}, [ context.globals.css, lazyStyles ] );
 
 	return (
 		<div className={ clsx( classes ) }>
