@@ -21,6 +21,7 @@ import type {
 	RecordHandlers,
 	SyncConfig,
 	SyncManager,
+	SyncUndoManager,
 } from './types';
 import { createUndoManager } from './undo-manager';
 import { createYjsDoc } from './utils';
@@ -41,7 +42,37 @@ interface EntityState {
  */
 export function createSyncManager(): SyncManager {
 	const entityStates: Map< EntityID, EntityState > = new Map();
-	let undoManager: ReturnType< typeof createUndoManager > | undefined;
+
+	/**
+	 * A "sync-aware" undo manager for all synced entities. It is lazily created
+	 * when the first entity is loaded.
+	 *
+	 * IMPORTANT: In Gutenberg, the undo manager is effectively global and manages
+	 * undo/redo state for all entities. If the default WPUndoManager is used,
+	 * changes to entities are recorded in the `editEntityRecord` action:
+	 *
+	 * https://github.com/WordPress/gutenberg/blob/b63451e26e3c91b6bb291a2f9994722e3850417e/packages/core-data/src/actions.js#L428-L442
+	 *
+	 * In contrast, the `SyncUndoManager` only manages undo/redo for entities that
+	 * **are being synced by this sync manager**. The `addRecord` method is still
+	 * called in the code linked above, but it is a no-op. Yjs automatically tracks
+	 * changes to entities via the associated CRDT doc:
+	 *
+	 * https://github.com/WordPress/gutenberg/blob/b63451e26e3c91b6bb291a2f9994722e3850417e/packages/sync/src/undo-manager.ts#L42-L48
+	 *
+	 * This means that if at least one entity is being synced, then undo/redo
+	 * operations will be **restricted to synced entities only.**
+	 *
+	 * We could improve the `SyncUndoManager` to also track non-synced entities by
+	 * delegating to a secondary `WPUndoManager`, but this would add complexity
+	 * since we would need to maintain two separate undo/redo stacks and ensure
+	 * that they retain ordering and integrity.
+	 *
+	 * However, we also anticipate that most entities being edited in Gutenberg
+	 * will be synced entities (e.g. posts, pages, templates, template parts,
+	 * etc.), so this limitation may be temporary.
+	 */
+	let undoManager: SyncUndoManager | undefined;
 
 	/**
 	 * Load an entity for syncing and manage its lifecycle.
@@ -304,10 +335,7 @@ export function createSyncManager(): SyncManager {
 	return {
 		createMeta: createEntityMeta,
 		load: loadEntity,
-		// undoManager is undefined until the first entity is loaded.
-		get undoManager() {
-			return undoManager;
-		},
+		undoManager,
 		unload: unloadEntity,
 		update: updateCRDTDoc,
 	};
