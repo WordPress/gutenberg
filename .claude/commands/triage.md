@@ -539,19 +539,57 @@ For each step in `reproduction.steps`, translate natural language into Playwrigh
 | "Notice that ..." | Check for element presence/absence |
 
 **Implementation flow:**
-1. Use `mcp__playwright__browser_snapshot` to understand page structure
-2. Identify target element by role/label
+1. Try targeted element query first (CSS selector, role, or text)
+2. If element not found, use `mcp__playwright__browser_snapshot` to locate
 3. Perform action (navigate, type, click, etc.)
-4. Take screenshot: `/tmp/triage/<issue>/screenshots/0X-<description>.png`
+4. Don't snapshot after action unless needed for verification
+5. Only screenshot when bug/error is visible (see screenshot strategy below)
 
 ## 3.3 Collect evidence
 
-Throughout reproduction, collect:
+**Screenshot strategy:**
 
-- **Console errors**: `mcp__playwright__browser_console_messages` with level="error"
-- **Network requests**: `mcp__playwright__browser_network_requests` (focus on failed requests)
-- **Screenshots**: After each major action and at final state
-- **Page snapshots**: For understanding UI state
+- **Primary rule**: Only screenshot when the bug/error is visible on screen
+- **No initial state**: Skip screenshot after landing page loads (unless it shows the bug)
+- **No intermediate actions**: Skip screenshots during navigation, clicking, typing (unless showing bug progression)
+- **Multi-state bugs**: If bug requires showing multiple states to illustrate the problem:
+  - Take screenshot of each critical state that shows the bug
+  - Example: "State 1: Before clicking shows X, State 2: After clicking shows Y"
+- **Error screenshots**: Only if error is related to the reported bug
+- **If bug not reproduced**: No screenshots needed
+
+**Decision logic:**
+1. Execute reproduction steps without taking screenshots
+2. When bug is observed, take screenshot(s) of the bug
+3. If bug has multiple states, determine if all states are needed to illustrate the problem
+4. Only take multiple screenshots if each state adds unique evidence
+
+**Evidence collection strategy:**
+
+- **Console errors**:
+  - Collect only errors (level="error", skip warnings/info)
+  - Limit to top 5 most relevant errors
+  - Filter by keywords from issue description if available
+  - Only collect errors that occur during reproduction steps
+
+- **Network requests**:
+  - Only collect failed requests (status >= 400)
+  - Limit to top 5 failed requests
+  - Prioritize API endpoints related to bug (e.g., save endpoints for save bugs)
+  - Skip successful requests unless specifically relevant
+
+- **Page snapshots**:
+  - Only collect if needed for analysis (not after every action)
+  - Use for understanding UI state when bug occurs
+
+**Conditional evidence collection:**
+
+1. **During reproduction**: Execute steps without taking screenshots
+2. **When bug is observed**: Take screenshot(s) showing the bug
+3. **After determining result**:
+   - If **reproduced**: Collect evidence (console errors, network failures, bug screenshot(s))
+   - If **not_reproduced**: Skip all screenshots and detailed evidence
+   - If **inconclusive**: Only collect evidence explaining why (errors, timeouts) - screenshot only if error is visible
 
 ## 3.4 Determine reproduction result
 
@@ -582,7 +620,7 @@ Write to `/tmp/triage/<issue>/<issue>.findings.json`:
   "evidence": {
     "console_errors": ["error message 1", "error message 2"],
     "network_errors": [{ "method": "POST", "url": "...", "status": 500 }],
-    "screenshots": ["01-initial.png", "02-after-action.png"],
+    "screenshots": ["01-bug-evidence.png"],
     "observations": "Description of what was observed"
   },
   "limitations": "Any constraints or issues encountered"
@@ -613,9 +651,8 @@ Network Issues:
   - <failed requests with status codes>
 
 Screenshots:
-  📸 /tmp/triage/<issue>/screenshots/01-initial-page.png
-  📸 /tmp/triage/<issue>/screenshots/02-after-action.png
-  ...
+  📸 /tmp/triage/<issue>/screenshots/01-bug-evidence.png
+  (Only if bug reproduced - shows the bug/error)
 
 Observed Behavior:
   <description of what actually happened>
@@ -673,7 +710,7 @@ Common WordPress admin element patterns:
 | Block inserter | `.block-editor-inserter__toggle`, `button[aria-label*="Add"]` |
 | Site Editor navigation | `.edit-site-*` classes, navigation landmarks |
 
-Use `mcp__playwright__browser_snapshot` to discover the actual structure.
+Use `mcp__playwright__browser_snapshot` only as fallback when element cannot be located via targeted query (CSS selector, role, or text).
 
 ## Special Cases
 
@@ -690,8 +727,8 @@ Use `mcp__playwright__browser_snapshot` to discover the actual structure.
 
 | Error | Action |
 |-------|--------|
-| Element not found | Screenshot current state, report as INCONCLUSIVE |
-| Page timeout | Check network/console for errors, report as INCONCLUSIVE |
+| Element not found | Use `mcp__playwright__browser_snapshot` to locate, screenshot only if error is the bug itself, report as INCONCLUSIVE |
+| Page timeout | Check network/console for errors, screenshot only if timeout is the bug, report as INCONCLUSIVE |
 | Unexpected dialog | Use `mcp__playwright__browser_handle_dialog` to dismiss |
 | Ambiguous step | Note in findings, suggest manual verification |
 
@@ -699,12 +736,13 @@ Use `mcp__playwright__browser_snapshot` to discover the actual structure.
 
 ```
 /tmp/triage/<issue>/screenshots/
-  01-initial-page.png
-  02-navigated-to-styles.png
-  03-entered-input.png
-  04-clicked-save.png
-  05-final-state.png
+  01-bug-evidence.png          - Single screenshot showing the bug (most common case)
+  01-bug-state-1.png           - First state showing the bug (if multi-state)
+  02-bug-state-2.png           - Second state showing the bug (if multi-state)
+  01-error-state.png           - Error state (only if error is the bug itself)
 ```
+
+**Note**: Screenshots are only taken when the bug/error is visible. No intermediate navigation or action screenshots.
 
 ---
 
@@ -761,7 +799,7 @@ Use this concise format for GitHub comments:
 
 **Network:** `{method} {endpoint}` → {status}
 **Console:** {key errors if any}
-**Screenshots:** {count} captured
+**Screenshots:** {count} captured (only if bug reproduced and screenshots exist)
 
 </details>
 
