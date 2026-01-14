@@ -83,12 +83,11 @@ add_filter( 'render_block_context', 'block_core_tabs_provide_context', 10, 2 );
  */
 function block_core_tabs_render_block_callback( array $attributes, string $content, \WP_Block $block ): string {
 	$active_tab_index = $attributes['activeTabIndex'] ?? 0;
-	$tabs_list = $block->context['core/tabs-list'] ?? array();
-	$tabs_id = $block->context['core/tabs-id'] ?? null;
+	$tabs_list        = $block->context['core/tabs-list'] ?? array();
+	$tabs_id          = $block->context['core/tabs-id'] ?? null;
 
 	if ( empty( $tabs_id ) ) {
 		// If malformed tabs, return early to avoid errors.
-		// @TODO: What should we throw here, wp error, or warning?
 		return '';
 	}
 
