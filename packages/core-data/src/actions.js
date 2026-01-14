@@ -24,6 +24,16 @@ import { isStagedId } from './utils/is-staged-id';
 import { getPersistedIdForLocalId } from './utils/persisted-id-map';
 import logEntityDeprecation from './utils/log-entity-deprecation';
 
+/**
+ * Expands a list of item IDs to include persisted counterparts when available.
+ *
+ * For any staged/local IDs that have been persisted, this adds both the local
+ * and persisted IDs so callers can remove all relevant references.
+ *
+ * @param {Array<number|string>}          itemIds        Item IDs to resolve.
+ * @param {Object<string, number|string>} persistedIdMap Map of local ID -> persisted ID.
+ * @return {Array<number|string>} De-duplicated list including mapped IDs.
+ */
 function resolveRemovedItemIds( itemIds, persistedIdMap ) {
 	if ( ! persistedIdMap ) {
 		return itemIds;
@@ -41,12 +51,47 @@ function resolveRemovedItemIds( itemIds, persistedIdMap ) {
 	return Array.from( resolvedItemIds );
 }
 
+/**
+ * Normalizes staged vs persisted record IDs for internal consumers.
+ *
+ * @param {number|string}           stagedRecordId       The staged/local record ID.
+ * @param {number|string|undefined} persistedIdForStaged Persisted ID for the staged record.
+ * @return {Object} Normalized record ID context.
+ */
+function getStagedRecordIdContext( stagedRecordId, persistedIdForStaged ) {
+	const isLocalStaged = isStagedId( stagedRecordId );
+	const resolvedPersistedId = isLocalStaged
+		? persistedIdForStaged
+		: undefined;
+	const apiRecordId = resolvedPersistedId ?? stagedRecordId;
+	const localRecordId = isLocalStaged ? stagedRecordId : apiRecordId;
+	const serverRecordId = isLocalStaged ? resolvedPersistedId : apiRecordId;
+
+	return {
+		apiRecordId,
+		isLocalStaged,
+		localRecordId,
+		serverRecordId,
+		stagedRecordId,
+		persistedIdForStaged: resolvedPersistedId,
+	};
+}
+
+/**
+ * Builds context for deleting a record, handling staged/local IDs.
+ *
+ * @param {number|string}                 recordId                The record ID being deleted.
+ * @param {Object<string, number|string>} persistedIdMapByContext Map of local ID -> persisted ID.
+ * @return {Object} Context for deletion.
+ */
 function getDeleteRecordContext( recordId, persistedIdMapByContext ) {
-	const isLocalStaged = isStagedId( recordId );
-	const persistedIdForStaged = isLocalStaged
+	const persistedIdForStaged = isStagedId( recordId )
 		? getPersistedIdForLocalId( persistedIdMapByContext, recordId )
 		: undefined;
-	const apiRecordId = persistedIdForStaged ?? recordId;
+	const { apiRecordId, isLocalStaged } = getStagedRecordIdContext(
+		recordId,
+		persistedIdForStaged
+	);
 	const resolvedItemIds = resolveRemovedItemIds(
 		persistedIdForStaged ? [ recordId, apiRecordId ] : [ recordId ],
 		persistedIdMapByContext
@@ -60,22 +105,20 @@ function getDeleteRecordContext( recordId, persistedIdMapByContext ) {
 	};
 }
 
-// Preserve persisted ID metadata when saving staged records.
-function applyPersistedIdMetadata( record, persistedRecord ) {
-	if ( persistedRecord?.__unstablePersistedId !== undefined ) {
-		record.__unstablePersistedId = persistedRecord.__unstablePersistedId;
-	}
-
-	return record;
-}
-
+/**
+ * Builds context for saving a record, normalizing staged vs persisted IDs.
+ *
+ * @param {Object} record      The record to save.
+ * @param {string} entityIdKey Key for the record ID field.
+ * @return {Object} Context for saving.
+ */
 function getSaveRecordContext( record, entityIdKey ) {
 	const stagedRecordId = record[ entityIdKey ];
-	const isLocalStaged = isStagedId( stagedRecordId );
-	const serverRecordId = isLocalStaged
-		? record.__unstablePersistedId
-		: stagedRecordId;
-	const localRecordId = isLocalStaged ? stagedRecordId : serverRecordId;
+	const { isLocalStaged, localRecordId, serverRecordId } =
+		getStagedRecordIdContext(
+			stagedRecordId,
+			record.__unstablePersistedId
+		);
 
 	return {
 		isLocalStaged,
@@ -951,7 +994,10 @@ export const saveEditedEntityRecord =
 			recordId
 		);
 		const record = { [ entityIdKey ]: recordId, ...edits };
-		applyPersistedIdMetadata( record, persistedRecord );
+		if ( persistedRecord?.__unstablePersistedId !== undefined ) {
+			record.__unstablePersistedId =
+				persistedRecord.__unstablePersistedId;
+		}
 		return await dispatch.saveEntityRecord( kind, name, record, options );
 	};
 
@@ -1004,7 +1050,10 @@ export const __experimentalSaveSpecifiedEntityEdits =
 		// a new record and instead cause it to update the existing record.
 		if ( recordId ) {
 			editsToSave[ entityIdKey ] = recordId;
-			applyPersistedIdMetadata( editsToSave, persistedRecord );
+			if ( persistedRecord?.__unstablePersistedId !== undefined ) {
+				editsToSave.__unstablePersistedId =
+					persistedRecord.__unstablePersistedId;
+			}
 		}
 		return await dispatch.saveEntityRecord(
 			kind,
