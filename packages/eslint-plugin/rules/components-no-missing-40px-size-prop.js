@@ -10,11 +10,8 @@ const { hasTruthyJsxAttribute } = require( '../utils' );
 /**
  * Components that require the __next40pxDefaultSize prop.
  * These can be exempted if they have a non-default `size` prop.
- *
- * Supports both simple components ('Button') and compound components
- * ('CircularOptionPicker.Option').
  */
-const COMPONENTS_REQUIRING_40PX = [
+const COMPONENTS_REQUIRING_40PX = new Set( [
 	'BorderBoxControl',
 	'BorderControl',
 	'BoxControl',
@@ -38,61 +35,19 @@ const COMPONENTS_REQUIRING_40PX = [
 	'TreeSelect',
 	'ToggleGroupControl',
 	'UnitControl',
-];
+] );
 
 /**
  * Components that can use the `render` prop as an alternative to __next40pxDefaultSize.
  */
-const COMPONENTS_WITH_RENDER_EXEMPTION = [ 'FormFileUpload' ];
+const COMPONENTS_WITH_RENDER_EXEMPTION = new Set( [ 'FormFileUpload' ] );
 
 /**
- * Parse component entries into simple and compound components.
- *
- * @param {string[]} components - Array of component names (e.g., ['Button', 'CircularOptionPicker.Option'])
- * @return {{ simple: Set<string>, compound: Map<string, Set<string>> }}
- *         - simple: Set of simple component names
- *         - compound: Map of namespace -> Set of member names
+ * All tracked component names for path-based detection.
  */
-function parseComponentList( components ) {
-	const simple = new Set();
-	const compound = new Map();
-
-	for ( const component of components ) {
-		if ( component.includes( '.' ) ) {
-			const [ namespace, member ] = component.split( '.' );
-			if ( ! compound.has( namespace ) ) {
-				compound.set( namespace, new Set() );
-			}
-			compound.get( namespace ).add( member );
-		} else {
-			simple.add( component );
-		}
-	}
-
-	return { simple, compound };
-}
-
-// Parse component lists at module load time
-const { simple: SIMPLE_COMPONENTS, compound: COMPOUND_COMPONENTS } =
-	parseComponentList( COMPONENTS_REQUIRING_40PX );
-
-const { simple: SIMPLE_RENDER_EXEMPTION, compound: COMPOUND_RENDER_EXEMPTION } =
-	parseComponentList( COMPONENTS_WITH_RENDER_EXEMPTION );
-
-/**
- * All simple tracked component names (for path-based detection).
- */
-const ALL_SIMPLE_COMPONENTS = new Set( [
-	...SIMPLE_COMPONENTS,
-	...SIMPLE_RENDER_EXEMPTION,
-] );
-
-/**
- * All namespace names that have compound components.
- */
-const ALL_NAMESPACES = new Set( [
-	...COMPOUND_COMPONENTS.keys(),
-	...COMPOUND_RENDER_EXEMPTION.keys(),
+const ALL_TRACKED_COMPONENTS = new Set( [
+	...COMPONENTS_REQUIRING_40PX,
+	...COMPONENTS_WITH_RENDER_EXEMPTION,
 ] );
 
 module.exports = {
@@ -122,11 +77,9 @@ module.exports = {
 		const checkLocalImports =
 			context.options[ 0 ]?.checkLocalImports ?? false;
 
-		// Track local names of simple components: localName -> importedName
-		const trackedSimpleImports = new Map();
-
-		// Track local names of namespaces (for compound components): localName -> importedNamespace
-		const trackedNamespaceImports = new Map();
+		// Track local names of components imported from @wordpress/components
+		// Map: localName -> importedName
+		const trackedImports = new Map();
 
 		/**
 		 * Check if the import source should be tracked.
@@ -169,13 +122,8 @@ module.exports = {
 				)
 				.join( '' );
 
-			// Check if it's one of our tracked simple components
-			if ( ALL_SIMPLE_COMPONENTS.has( pascalCase ) ) {
-				return pascalCase;
-			}
-
-			// Check if it's a tracked namespace
-			if ( ALL_NAMESPACES.has( pascalCase ) ) {
+			// Check if it's one of our tracked components
+			if ( ALL_TRACKED_COMPONENTS.has( pascalCase ) ) {
 				return pascalCase;
 			}
 
@@ -236,23 +184,6 @@ module.exports = {
 		}
 
 		/**
-		 * Check if a component has a render exemption.
-		 *
-		 * @param {string}      importedName - The original imported component name
-		 * @param {string|null} memberName   - The member name for compound components, or null
-		 * @return {boolean} Whether this component has a render exemption
-		 */
-		function hasRenderExemption( importedName, memberName ) {
-			if ( memberName ) {
-				// Compound component: check if namespace.member has exemption
-				const members = COMPOUND_RENDER_EXEMPTION.get( importedName );
-				return members?.has( memberName ) ?? false;
-			}
-			// Simple component
-			return SIMPLE_RENDER_EXEMPTION.has( importedName );
-		}
-
-		/**
 		 * Check if the `variant` prop has the value "link".
 		 * Button with variant="link" doesn't need __next40pxDefaultSize.
 		 *
@@ -283,58 +214,6 @@ module.exports = {
 			return false;
 		}
 
-		/**
-		 * Report the missing prop error.
-		 *
-		 * @param {Object}      node         - The AST node
-		 * @param {string}      importedName - The original imported component name
-		 * @param {string|null} memberName   - The member name for compound components, or null
-		 * @param {Array}       attributes   - JSX attributes array
-		 */
-		function reportIfMissing( node, importedName, memberName, attributes ) {
-			// Check if __next40pxDefaultSize has a truthy value
-			if (
-				hasTruthyJsxAttribute( attributes, '__next40pxDefaultSize' )
-			) {
-				return;
-			}
-
-			const fullComponentName = memberName
-				? `${ importedName }.${ memberName }`
-				: importedName;
-
-			// Handle render exemption (like FormFileUpload)
-			if ( hasRenderExemption( importedName, memberName ) ) {
-				if ( hasRenderProp( attributes ) ) {
-					return;
-				}
-
-				context.report( {
-					node,
-					messageId: 'missingPropFormFileUpload',
-				} );
-				return;
-			}
-
-			// For other components, check if size prop has a non-default value
-			if ( hasNonDefaultSize( attributes ) ) {
-				return;
-			}
-
-			// Button with variant="link" doesn't need __next40pxDefaultSize
-			if ( importedName === 'Button' && hasLinkVariant( attributes ) ) {
-				return;
-			}
-
-			context.report( {
-				node,
-				messageId: 'missingProp',
-				data: {
-					component: fullComponentName,
-				},
-			} );
-		}
-
 		return {
 			ImportDeclaration( node ) {
 				const source = node.source.value;
@@ -352,17 +231,12 @@ module.exports = {
 					const importedName = specifier.imported.name;
 					const localName = specifier.local.name;
 
-					// Track simple components
+					// Track components that require the prop
 					if (
-						SIMPLE_COMPONENTS.has( importedName ) ||
-						SIMPLE_RENDER_EXEMPTION.has( importedName )
+						COMPONENTS_REQUIRING_40PX.has( importedName ) ||
+						COMPONENTS_WITH_RENDER_EXEMPTION.has( importedName )
 					) {
-						trackedSimpleImports.set( localName, importedName );
-					}
-
-					// Track namespaces for compound components
-					if ( ALL_NAMESPACES.has( importedName ) ) {
-						trackedNamespaceImports.set( localName, importedName );
+						trackedImports.set( localName, importedName );
 					}
 				} );
 
@@ -374,39 +248,16 @@ module.exports = {
 							const localName = specifier.local.name;
 							const inferredName =
 								inferComponentNameFromPath( source );
-
 							if ( inferredName ) {
-								if (
-									ALL_SIMPLE_COMPONENTS.has( inferredName )
-								) {
-									trackedSimpleImports.set(
-										localName,
-										inferredName
-									);
-								}
-								if ( ALL_NAMESPACES.has( inferredName ) ) {
-									trackedNamespaceImports.set(
-										localName,
-										inferredName
-									);
-								}
+								trackedImports.set( localName, inferredName );
 								return;
 							}
 
-							// Support patterns like `import Button from '.';`
-							// (common in component folder index files).
+							// Support patterns like `import ClipboardButton from '.';`
+							// (common in component folder examples/tests).
 							// If the local name matches a tracked component, treat it as such.
-							if ( ALL_SIMPLE_COMPONENTS.has( localName ) ) {
-								trackedSimpleImports.set(
-									localName,
-									localName
-								);
-							}
-							if ( ALL_NAMESPACES.has( localName ) ) {
-								trackedNamespaceImports.set(
-									localName,
-									localName
-								);
+							if ( ALL_TRACKED_COMPONENTS.has( localName ) ) {
+								trackedImports.set( localName, localName );
 							}
 						}
 					} );
@@ -414,53 +265,62 @@ module.exports = {
 			},
 
 			JSXOpeningElement( node ) {
-				const attributes = node.attributes;
-
-				// Handle simple components: <Button />
-				if ( node.name.type === 'JSXIdentifier' ) {
-					const elementName = node.name.name;
-					const importedName =
-						trackedSimpleImports.get( elementName );
-
-					if ( importedName ) {
-						reportIfMissing( node, importedName, null, attributes );
-					}
+				// Only check simple JSX element names (not member expressions)
+				if ( node.name.type !== 'JSXIdentifier' ) {
 					return;
 				}
 
-				// Handle compound components: <CircularOptionPicker.Option />
-				if ( node.name.type === 'JSXMemberExpression' ) {
-					// Only handle single-level member expressions (Namespace.Member)
-					if ( node.name.object.type !== 'JSXIdentifier' ) {
-						return;
-					}
+				const elementName = node.name.name;
+				const importedName = trackedImports.get( elementName );
 
-					const objectName = node.name.object.name;
-					const memberName = node.name.property.name;
-
-					const importedNamespace =
-						trackedNamespaceImports.get( objectName );
-
-					if ( ! importedNamespace ) {
-						return;
-					}
-
-					// Check if this namespace.member combination is tracked
-					const trackedMembers =
-						COMPOUND_COMPONENTS.get( importedNamespace ) ||
-						COMPOUND_RENDER_EXEMPTION.get( importedNamespace );
-
-					if ( ! trackedMembers?.has( memberName ) ) {
-						return;
-					}
-
-					reportIfMissing(
-						node,
-						importedNamespace,
-						memberName,
-						attributes
-					);
+				// Only check if this is a tracked component from @wordpress/components
+				if ( ! importedName ) {
+					return;
 				}
+
+				const attributes = node.attributes;
+
+				// Check if __next40pxDefaultSize has a truthy value
+				if (
+					hasTruthyJsxAttribute( attributes, '__next40pxDefaultSize' )
+				) {
+					return;
+				}
+
+				// Handle FormFileUpload special case
+				if ( COMPONENTS_WITH_RENDER_EXEMPTION.has( importedName ) ) {
+					// FormFileUpload is valid if it has a `render` prop
+					if ( hasRenderProp( attributes ) ) {
+						return;
+					}
+
+					context.report( {
+						node,
+						messageId: 'missingPropFormFileUpload',
+					} );
+					return;
+				}
+
+				// For other components, check if size prop has a non-default value
+				if ( hasNonDefaultSize( attributes ) ) {
+					return;
+				}
+
+				// Button with variant="link" doesn't need __next40pxDefaultSize
+				if (
+					importedName === 'Button' &&
+					hasLinkVariant( attributes )
+				) {
+					return;
+				}
+
+				context.report( {
+					node,
+					messageId: 'missingProp',
+					data: {
+						component: importedName,
+					},
+				} );
 			},
 		};
 	},

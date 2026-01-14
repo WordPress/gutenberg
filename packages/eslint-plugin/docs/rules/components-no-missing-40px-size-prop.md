@@ -12,7 +12,6 @@ The following components are checked by this rule:
 -   BorderControl
 -   BoxControl
 -   Button
--   CircularOptionPicker.Option (compound component)
 -   ComboboxControl
 -   CustomSelectControl
 -   FontAppearanceControl
@@ -33,45 +32,24 @@ The following components are checked by this rule:
 Examples of **incorrect** code for this rule:
 
 ```jsx
-import { Button, InputControl, CircularOptionPicker } from '@wordpress/components';
+import { Button, InputControl } from '@wordpress/components';
 
 <Button>Click me</Button>
 <InputControl value={value} onChange={onChange} />
 <Button __next40pxDefaultSize={false}>Click me</Button>
 <Button size="default">Click me</Button>
-<CircularOptionPicker.Option value={value} />
 ```
 
 Examples of **correct** code for this rule:
 
 ```jsx
-import { Button, InputControl, CircularOptionPicker } from '@wordpress/components';
+import { Button, InputControl } from '@wordpress/components';
 
 <Button __next40pxDefaultSize>Click me</Button>
 <Button __next40pxDefaultSize={true}>Click me</Button>
 <InputControl __next40pxDefaultSize value={value} onChange={onChange} />
 <Button size="small">Click me</Button>
 <Button size="compact">Click me</Button>
-<CircularOptionPicker.Option __next40pxDefaultSize value={value} />
-```
-
-## Compound components
-
-This rule supports compound components (e.g., `CircularOptionPicker.Option`). When a compound component like `CircularOptionPicker.Option` is added to the tracked list:
-
--   The rule tracks imports of the namespace (`CircularOptionPicker`) from `@wordpress/components`
--   It correctly handles aliased imports (e.g., `import { CircularOptionPicker as COP }` will flag `<COP.Option />`)
--   Only specific members are checked (e.g., `Option`), other members like `<CircularOptionPicker.Actions />` won't be flagged unless explicitly added
-
-```jsx
-// Aliased namespace - still correctly tracked
-import { CircularOptionPicker as COP } from '@wordpress/components';
-
-// Incorrect - will be flagged
-<COP.Option value={value} />
-
-// Correct
-<COP.Option __next40pxDefaultSize value={value} />
 ```
 
 ## FormFileUpload special case
