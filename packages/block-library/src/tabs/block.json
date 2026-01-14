@@ -13,10 +13,6 @@
 		"core/tab-panels"
 	],
 	"attributes": {
-		"tabsId": {
-			"type": "string",
-			"default": ""
-		},
 		"activeTabIndex": {
 			"type": "number",
 			"default": 0
@@ -28,6 +24,7 @@
 	},
 	"supports": {
 		"align": true,
+		"anchor": true,
 		"color": {
 			"text": false,
 			"background": false
@@ -103,12 +100,12 @@
 		]
 	},
 	"providesContext": {
-		"core/tabs-id": "tabsId",
 		"core/tabs-activeTabIndex": "activeTabIndex",
 		"core/tabs-editorActiveTabIndex": "editorActiveTabIndex"
 	},
 	"usesContext": [
-		"core/tabs-list"
+		"core/tabs-list",
+		"core/tabs-id"
 	],
 	"editorScript": "file:./index.js",
 	"editorStyle": "file:./index.css",

@@ -65,6 +65,7 @@ function block_core_tabs_provide_context( array $context, array $parsed_block ):
 	if ( 'core/tabs' === $parsed_block['blockName'] ) {
 		$tabs_list                 = block_core_tabs_generate_tabs_list( $parsed_block['innerBlocks'] ?? array() );
 		$context['core/tabs-list'] = $tabs_list;
+		$context['core/tabs-id']   = $parsed_block['attrs']['anchor'] ?? wp_unique_id( 'tabs_' ); // Generate a unique ID for each tabs instance. Used for 3rd party extensibility to identify the tabs instance.
 	}
 
 	return $context;
@@ -82,6 +83,14 @@ add_filter( 'render_block_context', 'block_core_tabs_provide_context', 10, 2 );
  */
 function block_core_tabs_render_block_callback( array $attributes, string $content, \WP_Block $block ): string {
 	$active_tab_index = $attributes['activeTabIndex'] ?? 0;
+	$tabs_list = $block->context['core/tabs-list'] ?? array();
+	$tabs_id = $block->context['core/tabs-id'] ?? null;
+
+	if ( empty( $tabs_id ) ) {
+		// If malformed tabs, return early to avoid errors.
+		// @TODO: What should we throw here, wp error, or warning?
+		return '';
+	}
 
 	$title = $attributes['metadata']['name'] ?? '';
 	if ( empty( $title ) ) {
@@ -89,25 +98,10 @@ function block_core_tabs_render_block_callback( array $attributes, string $conte
 	}
 	$title = wp_sprintf( '<h3 class="wp-block-tabs__title">%s</h3>', esc_html( $title ) );
 
-	$tabs_list = $block->context['core/tabs-list'] ?? array();
-
-	$tabs_id = wp_unique_id( 'tabs_' );
-
-	/**
-	 * Builds a client side state for just this tabs instance.
-	 * This allows 3rd party extensibility of tabs while retaining
-	 * client side state management per core/tabs instance, like context.
-	 */
-	wp_interactivity_state(
-		'core/tabs/private',
-		array(
-			$tabs_id => $tabs_list,
-		)
-	);
-
 	$is_vertical = false;
 
 	$tag_processor = new WP_HTML_Tag_Processor( $content );
+
 	$tag_processor->next_tag( array( 'class_name' => 'wp-block-tabs' ) );
 	$tag_processor->set_attribute( 'data-wp-interactive', 'core/tabs/private' );
 
@@ -138,6 +132,18 @@ function block_core_tabs_render_block_callback( array $attributes, string $conte
 
 	// Insert the title after the first opening tag.
 	$output = preg_replace( '/^(<[^>]+>)/', '$1' . $title, $output );
+
+	/**
+	 * Builds a client side state for just this tabs instance.
+	 * This allows 3rd party extensibility of tabs while retaining
+	 * client side state management per core/tabs instance, like context.
+	 */
+	wp_interactivity_state(
+		'core/tabs/private',
+		array(
+			$tabs_id => $tabs_list,
+		)
+	);
 
 	return $output;
 }

@@ -17,7 +17,6 @@
 		"core/tabs-menu-item-label",
 		"core/tabs-menu-item-clientId",
 		"core/tabs-list",
-		"core/tabs-id",
 		"core/tabs-activeTabIndex",
 		"core/tabs-editorActiveTabIndex"
 	],

@@ -91,8 +91,8 @@ function Edit( {
 	clientId,
 	__unstableLayoutClassNames: layoutClassNames,
 } ) {
+	const tabsId = context[ 'core/tabs-id' ] || null;
 	const tabsList = context[ 'core/tabs-list' ] || [];
-	const tabsId = context[ 'core/tabs-id' ] || '';
 	const activeTabIndex = context[ 'core/tabs-activeTabIndex' ] ?? 0;
 	const editorActiveTabIndex = context[ 'core/tabs-editorActiveTabIndex' ];
 
@@ -129,8 +129,8 @@ function Edit( {
 			'core/tabs-menu-item-label': tab.label || '',
 			'core/tabs-menu-item-clientId': tab.clientId,
 			// Pass through parent context
-			'core/tabs-list': tabsList,
 			'core/tabs-id': tabsId,
+			'core/tabs-list': tabsList,
 			'core/tabs-activeTabIndex': activeTabIndex,
 			'core/tabs-editorActiveTabIndex': editorActiveTabIndex,
 		} ) );

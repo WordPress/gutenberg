@@ -58,7 +58,7 @@ function Edit( {
 	setAttributes,
 	__unstableLayoutClassNames: layoutClassNames,
 } ) {
-	const { activeTabIndex, editorActiveTabIndex } = attributes;
+	const { anchor, activeTabIndex, editorActiveTabIndex } = attributes;
 
 	/**
 	 * Initialize editorActiveTabIndex to activeTabIndex on mount.
@@ -107,11 +107,11 @@ function Edit( {
 	const contextValue = useMemo(
 		() => ( {
 			'core/tabs-list': tabsList,
-			'core/tabs-id': attributes.tabsId || '',
+			'core/tabs-id': anchor,
 			'core/tabs-activeTabIndex': activeTabIndex,
 			'core/tabs-editorActiveTabIndex': editorActiveTabIndex,
 		} ),
-		[ tabsList, attributes.tabsId, activeTabIndex, editorActiveTabIndex ]
+		[ tabsList, anchor, activeTabIndex, editorActiveTabIndex ]
 	);
 
 	/**
