@@ -22,25 +22,11 @@ interface Flusher {
 	readonly dispose: () => void;
 }
 
-type TaskPriority = 'user-blocking' | 'user-visible' | 'background';
-
 declare global {
 	interface Window {
 		scheduler?: {
 			readonly yield?: () => Promise< void >;
-			readonly postTask: < R extends unknown >(
-				callback: () => R,
-				options?: {
-					priority?: TaskPriority;
-					signal?: TaskSignal | AbortSignal;
-					delay?: number;
-				}
-			) => Promise< R >;
 		};
-	}
-
-	interface TaskSignal extends AbortSignal {
-		priority: TaskPriority;
 	}
 }
 
@@ -69,14 +55,6 @@ const afterNextFrame = ( callback: () => void ) => {
 	} );
 };
 
-// TODO: consider initializing this only if required.
-const taskQueue: ( () => any )[] = [];
-const taskChannel = new MessageChannel();
-// Drain one task per message
-taskChannel.port1.onmessage = () => {
-	taskQueue.shift()?.();
-};
-
 /**
  * Returns a promise that resolves after yielding to main.
  *
@@ -86,9 +64,8 @@ export const splitTask =
 	typeof window.scheduler?.yield === 'function'
 		? window.scheduler.yield.bind( window.scheduler )
 		: () => {
-				return new Promise< void >( ( resolve ) => {
-					taskQueue.push( resolve );
-					taskChannel.port2.postMessage( null );
+				return new Promise( ( resolve ) => {
+					setTimeout( resolve, 0 );
 				} );
 		  };
 /**
