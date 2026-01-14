@@ -135,7 +135,7 @@ function setFetchHandler( newFetchHandler: FetchHandler ) {
 	fetchHandler = newFetchHandler;
 }
 
-interface apiFetch {
+export interface ApiFetch {
 	< T, Parse extends boolean = true >(
 		options: APIFetchOptions< Parse >
 	): Promise< Parse extends true ? T : Response >;
