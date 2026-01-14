@@ -252,7 +252,7 @@ function gutenberg_initialize_experiments_settings() {
 		'gutenberg-experiments',
 		'gutenberg_experiments_section',
 		array(
-			'label' => __( 'Enables the SVG Icon registarion API.', 'gutenberg' ),
+			'label' => __( 'Enables the SVG Icon registration API.', 'gutenberg' ),
 			'id'    => 'gutenberg-svg-icon-registry',
 		)
 	);
