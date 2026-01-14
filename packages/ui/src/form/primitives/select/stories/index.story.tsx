@@ -1,14 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import {
-	type ThemeProvider as ThemeProviderType,
-	privateApis as themePrivateApis,
-} from '@wordpress/theme';
 import '@wordpress/theme/design-tokens.css';
-import { unlock } from '../../../../lock-unlock';
 import { Select } from '../../../..';
-
-const ThemeProvider: typeof ThemeProviderType =
-	unlock( themePrivateApis ).ThemeProvider;
 
 const meta: Meta< typeof Select.Root > = {
 	title: 'Design System/Components/Form/Primitives/Select',
@@ -280,41 +272,4 @@ export const WithCustomZIndex: Story = {
 		),
 		defaultValue: 'Item 1',
 	},
-};
-
-export const WithManyOptions: Story = {
-	args: {
-		children: (
-			<>
-				<Select.Trigger />
-				<Select.Popup>
-					{ Array.from( { length: 2000 }, ( _, i ) => {
-						const randomValue = Math.random()
-							.toString( 36 )
-							.slice( 2, 10 );
-						return (
-							<Select.Item
-								key={ `option-${ i + 1 }` }
-								value={ randomValue }
-							/>
-						);
-					} ) }
-				</Select.Popup>
-			</>
-		),
-	},
-};
-
-export const ThemeInheritance: Story = {
-	args: {
-		...Default.args,
-		defaultValue: 'Item 1',
-	},
-	decorators: [
-		( Story ) => (
-			<ThemeProvider color={ { primary: 'magenta' } }>
-				<Story />
-			</ThemeProvider>
-		),
-	],
 };
