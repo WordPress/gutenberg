@@ -42,6 +42,6 @@ export const LOCAL_SYNC_MANAGER_ORIGIN = 'syncManager';
 export const WORDPRESS_META_KEY_FOR_CRDT_DOC_PERSISTENCE = '_crdt_document';
 
 /**
- * Delay in milliseconds before removing a user from the awareness document.
+ * Delay in milliseconds before removing a user from presence indicators.
  */
 export const REMOVAL_DELAY_IN_MS = 5000;
