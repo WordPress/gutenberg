@@ -592,6 +592,8 @@ const FieldTypeStory = ( {
 					return {
 						...field,
 						elements: undefined,
+						getTotalAvailableElementsCount: () =>
+							Promise.resolve( allElements.length ),
 						getElements: ( query ) =>
 							new Promise( ( resolve ) =>
 								setTimeout( () => {
@@ -671,7 +673,7 @@ const FieldTypeStory = ( {
 													: 1,
 										},
 									} );
-								}, 1500 )
+								}, 20 )
 							),
 					};
 				}

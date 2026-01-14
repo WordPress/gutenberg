@@ -283,8 +283,7 @@ export type Field< Item > = {
 	 * When implementing getElements, you should:
 	 *
 	 * 1. Return paginationInfo alongside with elements:
-	 *    - totalItems: Total number of available items
-	 *    - totalPages: Total number of pages (if pagination is supported)
+	 *    - totalPages: Total number of pages (for infinite scroll support)
 	 *
 	 * 2. Support the 'search' parameter:
 	 *    - Filter elements based on the user's search query
@@ -303,16 +302,19 @@ export type Field< Item > = {
 	 *    - Form controls (radio, select, toggle-group) will pass perPage: -1
 	 *    - Search/filter interfaces may use pagination (perPage: 20, etc.)
 	 *
+	 * 5. Support the 'page' parameter:
+	 *    - Indicates which page of results to return (1-indexed)
+	 *    - Used by infinite scroll to load subsequent pages
+	 *    - Works together with 'perPage' for pagination
+	 *
 	 * @example
 	 * ```typescript
-	 * getElements: async ({ search, include, perPage }) => {
+	 * getElements: async ({ search, include, perPage, page = 1 }) => {
 	 *   const params = new URLSearchParams();
 	 *   if (search) params.append('search', search);
 	 *   if (include?.length) params.append('include', include.join(','));
-	 *
-	 *   // Use perPage to control pagination
-	 *   const itemsPerPage = perPage ?? 20;
-	 *   params.append('per_page', itemsPerPage.toString());
+	 *   params.append('per_page', (perPage ?? 20).toString());
+	 *   params.append('page', page.toString());
 	 *
 	 *   const response = await fetch(`/api/elements?${params}`);
 	 *   const data = await response.json();
@@ -323,7 +325,6 @@ export type Field< Item > = {
 	 *       label: item.name,
 	 *     })),
 	 *     paginationInfo: {
-	 *       totalItems: data.total,
 	 *       totalPages: data.pages,
 	 *     },
 	 *   };
@@ -331,6 +332,31 @@ export type Field< Item > = {
 	 * ```
 	 */
 	getElements?: ( query?: GetElementsQuery ) => Promise< GetElementsResult >;
+
+	/**
+	 * Async function to get the total count of available elements.
+	 *
+	 * Used to determine UI component (ListBox vs Combobox) for async fields.
+	 * When implemented, the UI will call this once to determine which widget
+	 * to display. If the total is <= 10, a simple ListBox is shown;
+	 * otherwise, a searchable Combobox is used.
+	 *
+	 * Return `null` if the count cannot be determined (will default to Combobox).
+	 *
+	 * @example
+	 * ```typescript
+	 * getTotalAvailableElementsCount: async () =>
+	 *   resolveSelect( coreDataStore ).getEntityRecordsTotalItems(
+	 *     'root',
+	 *     'user',
+	 *     {
+	 *       per_page: 1,
+	 *       _fields: 'id',
+	 *     }
+	 *   ),
+	 * ```
+	 */
+	getTotalAvailableElementsCount?: () => Promise< number | null >;
 
 	/**
 	 * Filter config for the field.

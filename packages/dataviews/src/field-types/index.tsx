@@ -94,6 +94,8 @@ export default function normalizeFields< Item >(
 			setValue: field.setValue || setValueFromId( field.id ),
 			elements: field.elements,
 			getElements: field.getElements,
+			getTotalAvailableElementsCount:
+				field.getTotalAvailableElementsCount,
 			hasElements: hasElements( field ),
 			isVisible: field.isVisible,
 			enableHiding: field.enableHiding ?? true,

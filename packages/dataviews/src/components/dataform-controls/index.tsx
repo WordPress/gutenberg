@@ -24,6 +24,7 @@ import toggleGroup from './toggle-group';
 import array from './array';
 import color from './color';
 import password from './password';
+import searchWidget from './search-widget';
 import hasElements from '../../field-types/utils/has-elements';
 
 interface FormControls {
@@ -43,6 +44,7 @@ const FORM_CONTROLS: FormControls = {
 	number,
 	password,
 	radio,
+	searchWidget,
 	select,
 	text,
 	toggle,
@@ -87,7 +89,7 @@ export function getControl< Item >(
 	}
 
 	if ( hasElements( field ) && field.type !== 'array' ) {
-		return getControlByType( 'select' );
+		return getControlByType( 'searchWidget' );
 	}
 
 	if ( fallback === null ) {

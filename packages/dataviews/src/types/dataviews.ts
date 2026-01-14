@@ -68,6 +68,11 @@ export interface NormalizedFilter {
 	getElements?: ( query?: GetElementsQuery ) => Promise< GetElementsResult >;
 
 	/**
+	 * Retrieval function to get the total count of available elements.
+	 */
+	getTotalAvailableElementsCount?: () => Promise< number | null >;
+
+	/**
 	 * Whether the filter has elements.
 	 */
 	hasElements: boolean;

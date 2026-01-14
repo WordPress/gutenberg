@@ -21,25 +21,22 @@ const authorField: Field< BasePostWithEmbeddedAuthor > = {
 	label: __( 'Author' ),
 	id: 'author',
 	type: 'integer',
-	getElements: async ( { search, include, perPage } = {} ) => {
+	getElements: async ( { search, include, perPage, page = 1 } = {} ) => {
 		const queryArgs: {
 			per_page: number;
 			search?: string;
 			include?: ( string | number )[];
+			page?: number;
 		} = {
 			per_page: perPage ?? 2,
 			search: search || undefined,
+			page,
 		};
 		if ( include?.length ) {
 			queryArgs.include = include;
 		}
-		const [ authors, totalItems, totalPages ] = await Promise.all( [
+		const [ authors, totalPages ] = await Promise.all( [
 			resolveSelect( coreDataStore ).getEntityRecords< Author >(
-				'root',
-				'user',
-				queryArgs
-			),
-			resolveSelect( coreDataStore ).getEntityRecordsTotalItems(
 				'root',
 				'user',
 				queryArgs
@@ -57,11 +54,19 @@ const authorField: Field< BasePostWithEmbeddedAuthor > = {
 				label: name,
 			} ) ),
 			paginationInfo: {
-				totalItems: totalItems ?? 0,
 				totalPages: totalPages ?? 1,
 			},
 		};
 	},
+	getTotalAvailableElementsCount: async () =>
+		resolveSelect( coreDataStore ).getEntityRecordsTotalItems(
+			'root',
+			'user',
+			{
+				per_page: 1,
+				_fields: 'id',
+			}
+		),
 	setValue: ( { value } ) => ( { author: Number( value ) } ),
 	render: AuthorView,
 	sort: ( a, b, direction ) => {

@@ -22,8 +22,7 @@ import { Stack } from '@wordpress/ui';
 /**
  * Internal dependencies
  */
-import SearchWidget from './search-widget';
-import InputWidget from './input-widget';
+import FilterWidget from './filter-widget';
 import { getOperatorByName } from '../../utils/operators';
 import type {
 	Filter,
@@ -225,12 +224,17 @@ export default function Filter( {
 	} );
 
 	if ( selectedElements.length > 0 ) {
-		// When there are elements, we favor those
+		// Use string comparison because filter values from Ariakit are stored as strings,
+		// but element.value from getElements may be of different types.
 		activeElements = selectedElements.filter( ( element ) => {
 			if ( filter.singleSelection ) {
-				return element.value === filterInView?.value;
+				return (
+					String( element.value ) === String( filterInView?.value )
+				);
 			}
-			return filterInView?.value?.includes( element.value );
+			return filterInView?.value?.some(
+				( v: any ) => String( v ) === String( element.value )
+			);
 		} );
 	} else if ( Array.isArray( filterInView?.value ) ) {
 		// or, filterInView.value can also be array
@@ -372,17 +376,7 @@ export default function Filter( {
 				return (
 					<Stack direction="column" justify="flex-start">
 						<OperatorSelector { ...commonProps } />
-						{ commonProps.filter.hasElements ? (
-							<SearchWidget
-								{ ...commonProps }
-								filter={ {
-									...commonProps.filter,
-									elements: commonProps.filter.elements ?? [],
-								} }
-							/>
-						) : (
-							<InputWidget { ...commonProps } fields={ fields } />
-						) }
+						<FilterWidget { ...commonProps } fields={ fields } />
 					</Stack>
 				);
 			} }
