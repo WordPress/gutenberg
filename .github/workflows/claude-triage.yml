@@ -92,5 +92,6 @@ jobs:
                       # Instructions
                       Execute: /triage ${{ github.event.issue.number }}
                   claude_args: |
+                      --model haiku
                       --mcp-config /tmp/mcp-config.json
                       --allowedTools "Bash,Read,Write,Edit,Glob,Grep,Skill,mcp__playwright__browser_navigate,mcp__playwright__browser_snapshot,mcp__playwright__browser_click,mcp__playwright__browser_type,mcp__playwright__browser_press_key,mcp__playwright__browser_fill_form,mcp__playwright__browser_take_screenshot,mcp__playwright__browser_console_messages,mcp__playwright__browser_network_requests,mcp__playwright__browser_wait_for,mcp__playwright__browser_handle_dialog,mcp__playwright__browser_hover,mcp__playwright__browser_navigate_back,mcp__playwright__browser_close,mcp__context7"
