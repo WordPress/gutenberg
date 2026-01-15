@@ -3,7 +3,14 @@
 /**
  * External dependencies
  */
-import { readFile, writeFile, copyFile, mkdir, unlink } from 'fs/promises';
+import {
+	readFile,
+	writeFile,
+	copyFile,
+	mkdir,
+	unlink,
+	access,
+} from 'fs/promises';
 import path from 'path';
 import { parseArgs } from 'node:util';
 import esbuild from 'esbuild';
@@ -1102,6 +1109,31 @@ async function transpilePackage( packageName ) {
 	const target = browserslistToEsbuild();
 
 	const builds = [];
+
+	// Generate placeholder worker-code.ts if this package has wpWorkers defined
+	// and the file doesn't exist yet. This is needed because transpilation happens
+	// before worker bundling, but vips-worker.ts imports from worker-code.ts.
+	if ( packageJson.wpWorkers ) {
+		const workerCodeFile = path.join( packageDir, 'src', 'worker-code.ts' );
+		try {
+			await access( workerCodeFile );
+		} catch {
+			// File doesn't exist, create placeholder
+			const placeholderContent = `/**
+ * Worker code for inline Blob URL creation.
+ *
+ * This file is a placeholder that gets overwritten by the build process.
+ * If you see this placeholder content at runtime, run \`npm run build\` first.
+ *
+ * @package gutenberg
+ */
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export const workerCode = '/* Placeholder - run npm run build to generate actual worker code */';
+`;
+			await writeFile( workerCodeFile, placeholderContent );
+		}
+	}
 
 	// Check if this is the components package that needs emotion babel plugin.
 	// Ideally we should remove this exception and move away from emotion.
