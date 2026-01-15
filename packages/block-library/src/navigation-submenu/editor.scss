@@ -41,13 +41,4 @@
 			}
 		}
 	}
-
-	// Always show submenus when open-on-always class is present
-	&.open-on-always {
-
-		> .wp-block-navigation__submenu-container .block-list-appender .block-editor-button-block-appender {
-			margin-right: auto;
-			margin-left: 2em;
-		}
-	}
 }
