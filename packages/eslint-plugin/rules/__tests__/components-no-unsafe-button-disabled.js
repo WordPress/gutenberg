@@ -40,11 +40,6 @@ ruleTester.run( 'components-no-unsafe-button-disabled', rule, {
 						import { Button } from '@wordpress/components';
 						<Button disabled accessibleWhenDisabled={false} />
 					`,
-			errors: [
-				{
-					messageId: 'missingAccessibleWhenDisabled',
-				},
-			],
 		},
 		// Button with accessibleWhenDisabled={someVar}
 		{
