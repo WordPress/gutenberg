@@ -317,6 +317,17 @@ export default function Image( {
 		[ id, isSingleSelected ]
 	);
 
+	// Check edit permission from the entity's _links without making an additional API request.
+	// If image data isn't loaded yet, show the button (it will be hidden later if no permission).
+	// This maintains consistent toolbar positioning.
+	const isLoadingImageData = id && isSingleSelected && ! image;
+	const allowedMethods = image?._links?.self?.[ 0 ]?.targetHints?.allow;
+	const canUserEdit = isLoadingImageData
+		? true // Show button while loading to reserve toolbar space
+		: allowedMethods?.includes( 'PUT' ) ||
+		  allowedMethods?.includes( 'PATCH' ) ||
+		  false;
+
 	const { canInsertCover, imageEditing, imageSizes, maxWidth } = useSelect(
 		( select ) => {
 			const { getBlockRootClientId, canInsertBlockType, getSettings } =
@@ -730,6 +741,7 @@ export default function Image( {
 	const editMediaButton = window?.__experimentalMediaEditor &&
 		id &&
 		isSingleSelected &&
+		canUserEdit &&
 		! isExternalImage( id, url ) &&
 		! isEditingImage &&
 		onNavigateToEntityRecord && (
