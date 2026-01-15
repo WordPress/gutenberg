@@ -74,9 +74,9 @@ Context provider that supplies media data and actions to child components.
 
 **Props:**
 
--   `value`: Media object from the WordPress REST API
--   `onChange`: Callback when media is updated `(updates: Partial<Media>) => void`
--   `settings`: Optional settings object
+-   `value`: (optional) Media object from the WordPress REST API
+-   `onChange`: (optional) Callback when media is updated `(updates: Partial<Media>) => void`. If not provided, the MediaEditor can be used in a read-only mode, which is useful for preview-only scenarios where editing is not needed.
+-   `settings`: (optional) Configuration object
     -   `settings.fields`: Array of field definitions (uses `Field` type from `@wordpress/dataviews`)
 -   `children`: Child components
 

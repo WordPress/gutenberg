@@ -32,11 +32,20 @@ export interface MediaEditorContextValue {
  * Props for MediaEditorProvider.
  */
 export interface MediaEditorProviderProps {
+	/** The media object to edit. */
 	value?: Media;
+	/**
+	 * Callback when media is updated.
+	 *
+	 * Optional - if not provided, the MediaEditor can be used in a read-only mode,
+	 * useful for preview-only scenarios.
+	 */
 	onChange?: ( updates: Partial< Media > ) => void;
+	/** Configuration settings for the media editor. */
 	settings?: {
 		fields?: Field< Media >[];
 	};
+	/** Child components. */
 	children: ReactNode;
 }
 
@@ -68,7 +77,7 @@ export function MediaEditorProvider( {
  *
  * Must be used within a MediaEditorProvider component.
  *
- * @return Context value with media, onUpdate, isLoading, and fields.
+ * @return MediaEditorContextValue value with media, onChange, and fields, etc.
  */
 export function useMediaEditorContext(): MediaEditorContextValue {
 	const context = useContext( MediaEditorContext );
