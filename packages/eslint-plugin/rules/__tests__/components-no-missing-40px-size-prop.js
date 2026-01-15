@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import { RuleTester } from 'eslint';
-
-/**
- * Internal dependencies
- */
 import rule from '../components-no-missing-40px-size-prop';
 
 const ruleTester = new RuleTester( {

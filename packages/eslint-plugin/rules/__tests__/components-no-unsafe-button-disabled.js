@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import { RuleTester } from 'eslint';
-
-/**
- * Internal dependencies
- */
 import rule from '../components-no-unsafe-button-disabled';
 
 const ruleTester = new RuleTester( {
