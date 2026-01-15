@@ -11,6 +11,7 @@ allowed-tools:
   - WebFetch
   - Glob
   - Grep
+  - mcp__chrome-devtools__list_pages
   - mcp__chrome-devtools__click
   - mcp__chrome-devtools__close_page
   - mcp__chrome-devtools__drag
@@ -24,12 +25,8 @@ allowed-tools:
   - mcp__chrome-devtools__hover
   - mcp__chrome-devtools__list_console_messages
   - mcp__chrome-devtools__list_network_requests
-  - mcp__chrome-devtools__list_pages
   - mcp__chrome-devtools__navigate_page
   - mcp__chrome-devtools__new_page
-  - mcp__chrome-devtools__performance_analyze_insight
-  - mcp__chrome-devtools__performance_start_trace
-  - mcp__chrome-devtools__performance_stop_trace
   - mcp__chrome-devtools__press_key
   - mcp__chrome-devtools__resize_page
   - mcp__chrome-devtools__select_page
@@ -43,37 +40,39 @@ allowed-tools:
 
 Cost-optimized Gutenberg bug triage using Chrome DevTools MCP.
 
-## FILE SCOPE RESTRICTION (CRITICAL)
+## ARCHITECTURE (Critical for Cost Control)
 
-**ONLY read these DevTools-specific files:**
+```
+Haiku (main)     → Steps 0, 1, 2 + dispatch subagents
+Haiku (subagent) → Step 3 browser (ISOLATED - context discarded after)
+Sonnet (subagent) → Step 4 report (quality matters for GitHub comment)
+```
+
+**Why subagents?** Browser snapshots are 3K+ tokens each. Without isolation, 53 turns × accumulated snapshots = 2.5M tokens = $0.40+ wasted.
+
+## FILE SCOPE RESTRICTION
+
+**ONLY read these files:**
 - `.claude/workflows/triage/1-parse.md`
-- `.claude/workflows/triage/2-blueprint.md`
-- `.claude/workflows/triage/3-reproduce-devtools.md`
-- `.claude/workflows/triage/4-report.md`
-- `.claude/workflows/triage/gutenberg-devtools-patterns.md`
 - `.claude/workflows/triage/blueprint-templates.json`
 
-**DO NOT read or reference:**
-- `3-reproduce.md`, `3-reproduce-playwright.md`
-- Any Playwright, Puppeteer, or Selenium files
-- `.claude/skills/wordpress-playwright-patterns/`
+**DO NOT read:** `3-reproduce-devtools.md`, `gutenberg-devtools-patterns.md`, any Playwright files
 
 ## OUTPUT RULES
 
-- Be extremely concise. No explanations unless asked.
-- Use JSON for structured data, not prose.
+- Extremely concise. No explanations.
+- JSON for structured data.
 - No status updates between steps.
-- Don't repeat information from previous turns.
+
+---
 
 ## STEP 0: Pre-flight Check
-
-Verify Chrome DevTools MCP is available:
 
 ```
 Call: mcp__chrome-devtools__list_pages
 ```
 
-**If this fails:** Write findings.json with `result: "inconclusive"` and `error: "Chrome DevTools MCP unavailable"`, then skip to Step 4.
+**If fails:** Write `/tmp/triage/$ARGUMENTS/$ARGUMENTS.findings.json` with `{"result": "inconclusive", "error": "Chrome DevTools MCP unavailable"}`, skip to Step 4.
 
 ---
 
@@ -81,25 +80,18 @@ Call: mcp__chrome-devtools__list_pages
 
 **Read:** `.claude/workflows/triage/1-parse.md`
 
-Execute parsing. Output to `/tmp/triage/$ARGUMENTS/$ARGUMENTS.parsed.json`
+Execute parsing. Output: `/tmp/triage/$ARGUMENTS/$ARGUMENTS.parsed.json`
 
 ---
 
 ## FAST-FAIL CHECK
 
-After parsing, check for fast-fail conditions. **Skip Steps 2-3 if ANY of these are true:**
+**Skip Steps 2-3 if ANY:**
+- No reproduction steps → Step 4: "Issue lacks reproduction steps"
+- `needs_triage: false` → Step 4: Report skip reason
+- No `[Type] Bug` label → Step 4: "Not a bug report"
 
-| Condition | Action |
-|-----------|--------|
-| No reproduction steps | Skip to Step 4: "Issue lacks reproduction steps" |
-| `needs_triage: false` | Skip to Step 4: Report skip reason |
-| Feature request (no `[Type] Bug`) | Skip to Step 4: "Not a bug report" |
-| Missing all environment info | Skip to Step 4: "Needs environment info" |
-
-**If fast-fail triggered:**
-1. DO NOT read reproduce workflow
-2. DO NOT start browser or Playground
-3. Go directly to Step 4 with "needs more info" report
+**If fast-fail:** Write minimal findings.json, go directly to Step 4.
 
 ---
 
@@ -107,96 +99,78 @@ After parsing, check for fast-fail conditions. **Skip Steps 2-3 if ANY of these 
 
 **Read:** `.claude/workflows/triage/blueprint-templates.json`
 
-1. Select the best matching template based on parsed issue
-2. Customize only: `wp` version, `landingPage`, Gutenberg version if needed
-3. Output to `/tmp/triage/$ARGUMENTS/$ARGUMENTS.blueprint.json`
+1. Select matching template
+2. Customize: `wp` version, `landingPage`, Gutenberg version
+3. Output: `/tmp/triage/$ARGUMENTS/$ARGUMENTS.blueprint.json`
 
 ---
 
-## STEP 3: Reproduce Bug
+## STEP 3: Reproduce Bug (SUBAGENT - ISOLATED)
 
-### CRITICAL COST RULES
+**CRITICAL:** Spawn Haiku subagent to isolate browser context. All snapshots stay in subagent, discarded after.
 
-| Rule | Why |
-|------|-----|
-| **Max 3 snapshots** | Each snapshot = 3K tokens |
-| **Use evaluate_script first** | 100 tokens vs 3K for snapshot+click |
-| **Use wait_for over snapshot** | Check page state without cost |
-| **API-first setup** | wp.data for setup, UI only for bug trigger |
-| **Early termination** | Stop when bug reproduced or 3 steps fail |
+```
+Task tool with:
+  subagent_type: "general-purpose"
+  model: "haiku"
+  max_turns: 15
+  description: "Reproduce bug with DevTools"
+  prompt: |
+    Reproduce Gutenberg bug #$ARGUMENTS using Chrome DevTools MCP.
 
-### KNOWN SELECTORS (Use These First!)
+    HARD LIMITS (will be enforced):
+    - MAX 3 SNAPSHOTS total. After 3, use only evaluate_script.
+    - MAX 15 TURNS. Stop and write findings if approaching limit.
+    - STOP IMMEDIATELY when bug is reproduced or after 3 failed steps.
 
-```javascript
-// Wait for WordPress ready (ALWAYS do this first)
-evaluate_script({ function: `
-  return new Promise((resolve) => {
-    const check = () => {
-      if (window?.wp?.data) resolve(true);
-      else setTimeout(check, 100);
-    };
-    check();
-  });
-`})
+    COST RULES:
+    1. Use evaluate_script FIRST for all interactions
+    2. Use wait_for to check page state (not snapshot)
+    3. Snapshot ONLY when selectors fail or for bug evidence
+    4. API-first: wp.data for setup, UI only for bug trigger
 
-// Disable welcome guides
-evaluate_script({ function: `
-  wp.data.dispatch('core/preferences').set('core/edit-post', 'welcomeGuide', false);
-  wp.data.dispatch('core/preferences').set('core/edit-site', 'welcomeGuide', false);
-  return true;
-`})
+    KNOWN SELECTORS (use these, no snapshot needed):
+    - Wait for WP ready: window?.wp?.data exists
+    - Disable welcome: wp.data.dispatch('core/preferences').set(...)
+    - Insert block: wp.blocks.createBlock() + insertBlock()
+    - Publish: document.querySelector('.editor-post-publish-button')
+    - Settings: document.querySelector('[aria-label="Settings"]')
 
-// Insert block via API (NO UI needed)
-evaluate_script({ function: `
-  const block = wp.blocks.createBlock('core/paragraph', { content: 'Test' });
-  wp.data.dispatch('core/block-editor').insertBlock(block);
-  return true;
-`})
+    EXECUTION:
+    1. mkdir -p /tmp/triage/$ARGUMENTS/screenshots
+    2. Start: .claude/bin/playground.sh start --blueprint=/tmp/triage/$ARGUMENTS/$ARGUMENTS.blueprint.json
+    3. Read parsed issue: /tmp/triage/$ARGUMENTS/$ARGUMENTS.parsed.json
+    4. Open Playground URL with mcp__chrome-devtools__new_page
+    5. Wait for WP ready (evaluate_script)
+    6. Disable welcome guides (evaluate_script)
+    7. Execute reproduction steps from parsed.json
+    8. If bug observed: 1 screenshot, stop
+    9. Write findings: /tmp/triage/$ARGUMENTS/$ARGUMENTS.findings.json
+    10. Stop: .claude/bin/playground.sh stop
+    11. Close: mcp__chrome-devtools__close_page
 
-// Publish button
-evaluate_script({ function: `document.querySelector('.editor-post-publish-button')?.click()` })
-
-// Save draft
-evaluate_script({ function: `document.querySelector('.editor-post-save-draft')?.click()` })
-
-// Settings sidebar
-evaluate_script({ function: `document.querySelector('[aria-label="Settings"]')?.click()` })
-
-// Block inserter
-evaluate_script({ function: `document.querySelector('.block-editor-inserter__toggle')?.click()` })
+    FINDINGS FORMAT:
+    {
+      "result": "reproduced | not_reproduced | inconclusive",
+      "environment": { "wordpress": "...", "gutenberg": "...", "php": "8.2" },
+      "steps_executed": [{ "step": 1, "description": "...", "success": true }],
+      "evidence": {
+        "console_errors": [],
+        "screenshots": [],
+        "observations": "..."
+      },
+      "snapshots_used": <count>,
+      "turns_used": <count>
+    }
 ```
 
-### EXECUTION FLOW
-
-1. Create screenshots dir: `mkdir -p /tmp/triage/$ARGUMENTS/screenshots`
-2. Start Playground: `.claude/bin/playground.sh start --blueprint=/tmp/triage/$ARGUMENTS/$ARGUMENTS.blueprint.json`
-3. Open page: `mcp__chrome-devtools__new_page` with Playground URL
-4. Wait for WP ready (evaluate_script)
-5. Disable welcome guides (evaluate_script)
-6. Execute reproduction steps:
-   - **Setup steps:** Use wp.data API, not UI clicks
-   - **Bug trigger steps:** Use actual UI interactions
-   - **Verification:** Use wait_for or evaluate_script, not snapshot
-7. **If bug observed:** Take 1 screenshot, stop immediately
-8. **If 3 steps fail:** Mark inconclusive, stop
-9. Collect evidence (only errors, only if reproduced)
-10. Write `/tmp/triage/$ARGUMENTS/$ARGUMENTS.findings.json`
-11. Stop Playground: `.claude/bin/playground.sh stop`
-12. Close page: `mcp__chrome-devtools__close_page`
-
-### SNAPSHOT BUDGET
-
-- Snapshot 1: Only if selectors don't work
-- Snapshot 2: Only if navigating to completely different page
-- Snapshot 3: Bug evidence (if reproduced)
-
-**If stuck on patterns:** Read `.claude/workflows/triage/gutenberg-devtools-patterns.md`
+After subagent completes, read `/tmp/triage/$ARGUMENTS/$ARGUMENTS.findings.json` to continue.
 
 ---
 
-## STEP 4: Report Findings
+## STEP 4: Report Findings (SUBAGENT - SONNET)
 
-Spawn Sonnet subagent for quality final report:
+**Only spawn Sonnet if findings exist.** Sonnet produces quality GitHub comments.
 
 ```
 Task tool with:
@@ -205,21 +179,18 @@ Task tool with:
   max_turns: 5
   description: "Generate triage report"
   prompt: |
-    Generate concise GitHub comment for Gutenberg issue triage.
+    Generate concise GitHub comment for Gutenberg issue #$ARGUMENTS.
 
     Read:
     - /tmp/triage/$ARGUMENTS/$ARGUMENTS.findings.json
     - /tmp/triage/$ARGUMENTS/$ARGUMENTS.parsed.json
 
-    If result is "reproduced":
-      Search Gutenberg codebase for affected files using labels and error messages.
-      Include "Likely affected code" section with file paths.
+    RULES:
+    - If result is "reproduced": Search codebase for affected files, include in report
+    - If result is "not_reproduced" or "inconclusive": Skip code search entirely
+    - Keep comment to 15-25 lines max
 
-    If result is "not_reproduced" or "inconclusive":
-      Skip code search entirely.
-
-    Format (15-25 lines max):
-    ```
+    FORMAT:
     ## Triage Results
 
     **Result:** [emoji] [status]
@@ -229,19 +200,16 @@ Task tool with:
 
     <details>
     <summary>Evidence</summary>
-    {console errors, network failures - only if relevant}
+    {only if relevant errors/failures}
     </details>
 
     **Likely affected code:** (only if reproduced)
     - `path/to/file` - reason
 
-    **Suggested fix:** {1-2 sentences} (only if reproduced)
-
     ---
     <sub>Automated triage via WordPress Playground</sub>
-    ```
 
-    Post comment:
+    POST COMMENT:
     gh issue comment $ARGUMENTS --repo aagam-shah/gutenberg --body "..."
 ```
 
@@ -251,9 +219,8 @@ Task tool with:
 
 | Error | Action |
 |-------|--------|
-| MCP unavailable | findings.json with `result: "inconclusive"`, skip to Step 4 |
-| Element not found | Try evaluate_script first, then snapshot as fallback |
-| Page timeout | List console/network errors, mark inconclusive |
+| MCP unavailable | Write inconclusive findings, skip to Step 4 |
+| Subagent timeout | Read partial findings if exist, report as inconclusive |
 | 3+ step failures | Stop early, mark inconclusive |
 
 ---
@@ -262,17 +229,15 @@ Task tool with:
 
 | Scenario | Target Cost |
 |----------|-------------|
-| Full reproduction | $0.20-0.25 |
-| Fast-fail (no repro steps) | $0.05-0.10 |
-| Bug not reproduced | $0.15-0.20 |
+| Full reproduction | $0.25-0.35 |
+| Fast-fail | $0.05-0.10 |
+| Not reproduced | $0.15-0.25 |
 
 ---
 
-## DO NOT USE
+## DO NOT
 
-- Playwright MCP tools (`mcp__playwright__*`)
-- Puppeteer (npm/npx)
-- Selenium or WebDriver
-- Custom browser automation scripts
-
-If Chrome DevTools MCP fails, write inconclusive findings and report - do not attempt alternatives.
+- Use Playwright, Puppeteer, Selenium
+- Run browser automation in main agent (use subagent)
+- Take more than 3 snapshots
+- Read large workflow files (instructions are inline)
