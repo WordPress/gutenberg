@@ -215,7 +215,7 @@ export const getEntityRecord =
 									name,
 									key
 								),
-							// Refect the current entity record from the database.
+							// Refetch the current entity record from the database.
 							refetchRecord: async () => {
 								dispatch.receiveEntityRecords(
 									kind,
