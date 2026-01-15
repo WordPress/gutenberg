@@ -47,6 +47,9 @@ describe( 'Tooltip', () => {
 		const trigger = screen.getByRole( 'button', { name: 'Hover me' } );
 		await user.hover( trigger );
 
+		// waitFor is used intentionally: even with delay={0}, the popup appearing
+		// is conceptually async (state change → render → portal mount). This also
+		// makes the test resilient to future internal changes in base-ui.
 		await waitFor( () => {
 			expect( screen.getByText( 'Tooltip content' ) ).toBeVisible();
 		} );
