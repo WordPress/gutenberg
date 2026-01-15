@@ -51,7 +51,7 @@ class WP_Duotone_Gutenberg {
 	 *       …
 	 *  ]
 	 *
-	 * @var array
+	 * @var array|null
 	 */
 	private static $__global_styles_block_names = null;
 
@@ -91,7 +91,7 @@ class WP_Duotone_Gutenberg {
 	 *      …
 	 *  ]
 	 *
-	 * @var array|null
+	 * @var array
 	 */
 	private static $used_global_styles_presets = array();
 
