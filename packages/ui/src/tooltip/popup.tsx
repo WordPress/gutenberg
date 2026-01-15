@@ -38,6 +38,15 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function TooltipPopup(
 					styles.positioner
 				) }
 			>
+				{ /* This should ideally use whatever dark color makes sense,
+				and not be hardcoded to #1e1e1e. The solutions would be to:
+				  - review the design of the tooltip, in case we want to stop
+				    hardcoding it to a dark background
+				  - create new semantic tokens as needed (aliasing either the "inverted
+					  bg" or "perma-dark bg" private tokens) and have Tooltip.Popup use
+				    them;
+				  - remove the hardcoded `bg` setting from the `ThemeProvider` below
+					*/ }
 				<ThemeProvider color={ { bg: '#1e1e1e' } }>
 					<Tooltip.Popup
 						ref={ ref }
