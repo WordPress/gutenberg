@@ -88,12 +88,19 @@ async function generateWorkerPlaceholders() {
 
 	for ( const packageJsonPath of packageJsonPaths ) {
 		try {
-			const packageJsonContent = await readFile( packageJsonPath, 'utf8' );
+			const packageJsonContent = await readFile(
+				packageJsonPath,
+				'utf8'
+			);
 			const packageJson = JSON.parse( packageJsonContent );
 
 			if ( packageJson.wpWorkers ) {
 				const packageDir = path.dirname( packageJsonPath );
-				const workerCodeFile = path.join( packageDir, 'src', 'worker-code.ts' );
+				const workerCodeFile = path.join(
+					packageDir,
+					'src',
+					'worker-code.ts'
+				);
 
 				try {
 					await access( workerCodeFile );
@@ -112,7 +119,9 @@ async function generateWorkerPlaceholders() {
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const workerCode = '/* Placeholder - run npm run build to generate actual worker code */';
 `;
-					await mkdir( path.dirname( workerCodeFile ), { recursive: true } );
+					await mkdir( path.dirname( workerCodeFile ), {
+						recursive: true,
+					} );
 					await writeFile( workerCodeFile, placeholderContent );
 				}
 			}
