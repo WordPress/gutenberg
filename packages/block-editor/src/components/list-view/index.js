@@ -345,7 +345,15 @@ function ListViewComponent(
 
 	// If there are no blocks to show and we're not showing the appender, do not render the list view.
 	if ( ! clientIdsTree.length && ! showAppender ) {
-		return null;
+		return (
+			<div
+				git
+				ref={ dropZoneRef }
+				className="block-editor-list-view__empty-drop-zone"
+			>
+				{ __( 'Drag blocks here' ) }
+			</div>
+		);
 	}
 
 	const describedById =

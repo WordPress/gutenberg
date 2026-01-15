@@ -576,3 +576,11 @@ svg {
 .list-view-appender__description {
 	display: none;
 }
+.block-editor-list-view__empty-drop-zone {
+	padding: 12px;
+	margin: 8px;
+	border: 2px dashed #ccc;
+	border-radius: 4px;
+	text-align: center;
+	color: #555;
+}
