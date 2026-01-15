@@ -184,3 +184,11 @@ export type Operation = OperationType | OperationWithArgs;
 export type AdditionalData = Record< string, unknown >;
 
 export type ImageFormat = 'jpeg' | 'webp' | 'avif' | 'png' | 'gif';
+
+export interface ImageSizeCrop {
+	width: number;
+	height: number;
+	crop?:
+		| boolean
+		| [ 'left' | 'center' | 'right', 'top' | 'center' | 'bottom' ];
+}

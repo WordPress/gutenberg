@@ -1,21 +1,25 @@
 /**
+ * External dependencies
+ */
+
+// Mock the vips worker module.
+// The mock functions must be declared inside the factory to avoid hoisting issues.
+jest.mock( '@wordpress/vips/worker', () => ( {
+	vipsConvertImageFormat: jest.fn(),
+	vipsCompressImage: jest.fn(),
+	vipsHasTransparency: jest.fn(),
+	vipsResizeImage: jest.fn(),
+	vipsCancelOperations: jest.fn(),
+} ) );
+
+// Import the mocked module to get access to the mock functions.
+import * as vipsWorker from '@wordpress/vips/worker';
+
+/**
  * Internal dependencies
  */
 import { ImageFile } from '../../image-file';
 import type { ImageSizeCrop } from '../types';
-
-// Mock the web worker factory before importing the module.
-const mockWorker = {
-	convertImageFormat: jest.fn(),
-	compressImage: jest.fn(),
-	hasTransparency: jest.fn(),
-	resizeImage: jest.fn(),
-	cancelOperations: jest.fn(),
-};
-
-jest.mock( '@shopify/web-worker', () => ( {
-	createWorkerFactory: jest.fn( () => () => mockWorker ),
-} ) );
 
 // Import after mock is set up.
 import {
@@ -25,6 +29,13 @@ import {
 	vipsResizeImage,
 	vipsCancelOperations,
 } from '../utils/vips';
+
+// Cast to jest.Mock for type safety.
+const mockConvertImageFormat = vipsWorker.vipsConvertImageFormat as jest.Mock;
+const mockCompressImage = vipsWorker.vipsCompressImage as jest.Mock;
+const mockHasTransparency = vipsWorker.vipsHasTransparency as jest.Mock;
+const mockResizeImage = vipsWorker.vipsResizeImage as jest.Mock;
+const mockCancelOperations = vipsWorker.vipsCancelOperations as jest.Mock;
 
 const jpegFile = new File( [ 'test-content' ], 'test.jpg', {
 	type: 'image/jpeg',
@@ -43,9 +54,7 @@ describe( 'vips utilities', () => {
 
 	describe( 'vipsConvertImageFormat', () => {
 		it( 'converts image and returns new File with correct extension', async () => {
-			mockWorker.convertImageFormat.mockResolvedValue(
-				new ArrayBuffer( 10 )
-			);
+			mockConvertImageFormat.mockResolvedValue( new ArrayBuffer( 10 ) );
 
 			const result = await vipsConvertImageFormat(
 				'item-1',
@@ -56,25 +65,21 @@ describe( 'vips utilities', () => {
 
 			expect( result.name ).toBe( 'test.webp' );
 			expect( result.type ).toBe( 'image/webp' );
-			expect( mockWorker.convertImageFormat ).toHaveBeenCalledTimes( 1 );
-			expect( mockWorker.convertImageFormat.mock.calls[ 0 ][ 0 ] ).toBe(
+			expect( mockConvertImageFormat ).toHaveBeenCalledTimes( 1 );
+			expect( mockConvertImageFormat.mock.calls[ 0 ][ 0 ] ).toBe(
 				'item-1'
 			);
-			expect( mockWorker.convertImageFormat.mock.calls[ 0 ][ 2 ] ).toBe(
+			expect( mockConvertImageFormat.mock.calls[ 0 ][ 2 ] ).toBe(
 				'image/jpeg'
 			);
-			expect( mockWorker.convertImageFormat.mock.calls[ 0 ][ 3 ] ).toBe(
+			expect( mockConvertImageFormat.mock.calls[ 0 ][ 3 ] ).toBe(
 				'image/webp'
 			);
-			expect( mockWorker.convertImageFormat.mock.calls[ 0 ][ 4 ] ).toBe(
-				0.8
-			);
+			expect( mockConvertImageFormat.mock.calls[ 0 ][ 4 ] ).toBe( 0.8 );
 		} );
 
 		it( 'converts PNG to AVIF with interlacing', async () => {
-			mockWorker.convertImageFormat.mockResolvedValue(
-				new ArrayBuffer( 5 )
-			);
+			mockConvertImageFormat.mockResolvedValue( new ArrayBuffer( 5 ) );
 
 			const result = await vipsConvertImageFormat(
 				'item-2',
@@ -86,32 +91,28 @@ describe( 'vips utilities', () => {
 
 			expect( result.name ).toBe( 'image.avif' );
 			expect( result.type ).toBe( 'image/avif' );
-			expect( mockWorker.convertImageFormat.mock.calls[ 0 ][ 5 ] ).toBe(
-				true
-			);
+			expect( mockConvertImageFormat.mock.calls[ 0 ][ 5 ] ).toBe( true );
 		} );
 	} );
 
 	describe( 'vipsCompressImage', () => {
 		it( 'compresses image preserving filename and type', async () => {
-			mockWorker.compressImage.mockResolvedValue( new ArrayBuffer( 5 ) );
+			mockCompressImage.mockResolvedValue( new ArrayBuffer( 5 ) );
 
 			const result = await vipsCompressImage( 'item-1', jpegFile, 0.8 );
 
 			expect( result.name ).toBe( 'test.jpg' );
 			expect( result.type ).toBe( 'image/jpeg' );
-			expect( mockWorker.compressImage ).toHaveBeenCalledTimes( 1 );
-			expect( mockWorker.compressImage.mock.calls[ 0 ][ 0 ] ).toBe(
-				'item-1'
-			);
-			expect( mockWorker.compressImage.mock.calls[ 0 ][ 2 ] ).toBe(
+			expect( mockCompressImage ).toHaveBeenCalledTimes( 1 );
+			expect( mockCompressImage.mock.calls[ 0 ][ 0 ] ).toBe( 'item-1' );
+			expect( mockCompressImage.mock.calls[ 0 ][ 2 ] ).toBe(
 				'image/jpeg'
 			);
-			expect( mockWorker.compressImage.mock.calls[ 0 ][ 3 ] ).toBe( 0.8 );
+			expect( mockCompressImage.mock.calls[ 0 ][ 3 ] ).toBe( 0.8 );
 		} );
 
 		it( 'compresses image with interlacing option', async () => {
-			mockWorker.compressImage.mockResolvedValue( new ArrayBuffer( 5 ) );
+			mockCompressImage.mockResolvedValue( new ArrayBuffer( 5 ) );
 
 			const result = await vipsCompressImage(
 				'item-2',
@@ -121,31 +122,32 @@ describe( 'vips utilities', () => {
 			);
 
 			expect( result.name ).toBe( 'image.png' );
-			expect( mockWorker.compressImage.mock.calls[ 0 ][ 4 ] ).toBe(
-				true
-			);
+			expect( mockCompressImage.mock.calls[ 0 ][ 4 ] ).toBe( true );
 		} );
 	} );
 
 	describe( 'vipsHasTransparency', () => {
+		let mockFetch: jest.Mock;
+
 		beforeEach( () => {
-			jest.spyOn( global, 'fetch' ).mockResolvedValue( {
+			mockFetch = jest.fn().mockResolvedValue( {
 				arrayBuffer: () => Promise.resolve( new ArrayBuffer( 0 ) ),
 			} as Response );
+			window.fetch = mockFetch;
 		} );
 
 		it( 'returns true when image has transparency', async () => {
-			mockWorker.hasTransparency.mockResolvedValue( true );
+			mockHasTransparency.mockResolvedValue( true );
 
 			const result = await vipsHasTransparency( 'blob:test-url' );
 
 			expect( result ).toBe( true );
-			expect( global.fetch ).toHaveBeenCalledWith( 'blob:test-url' );
-			expect( mockWorker.hasTransparency ).toHaveBeenCalledTimes( 1 );
+			expect( mockFetch ).toHaveBeenCalledWith( 'blob:test-url' );
+			expect( mockHasTransparency ).toHaveBeenCalledTimes( 1 );
 		} );
 
 		it( 'returns false when image has no transparency', async () => {
-			mockWorker.hasTransparency.mockResolvedValue( false );
+			mockHasTransparency.mockResolvedValue( false );
 
 			const result = await vipsHasTransparency(
 				'https://example.com/img'
@@ -157,7 +159,7 @@ describe( 'vips utilities', () => {
 
 	describe( 'vipsResizeImage', () => {
 		it( 'resizes image and returns ImageFile with dimensions and suffix', async () => {
-			mockWorker.resizeImage.mockResolvedValue( {
+			mockResizeImage.mockResolvedValue( {
 				buffer: new ArrayBuffer( 10 ),
 				width: 150,
 				height: 150,
@@ -182,10 +184,13 @@ describe( 'vips utilities', () => {
 			expect( result.height ).toBe( 150 );
 			expect( result.originalWidth ).toBe( 300 );
 			expect( result.originalHeight ).toBe( 300 );
+
+			// Debug logging is expected.
+			expect( console ).toHaveLogged();
 		} );
 
 		it( 'does not add suffix when dimensions unchanged', async () => {
-			mockWorker.resizeImage.mockResolvedValue( {
+			mockResizeImage.mockResolvedValue( {
 				buffer: new ArrayBuffer( 10 ),
 				width: 300,
 				height: 300,
@@ -203,10 +208,13 @@ describe( 'vips utilities', () => {
 			);
 
 			expect( result.name ).toBe( 'test.jpg' );
+
+			// Debug logging is expected.
+			expect( console ).toHaveLogged();
 		} );
 
 		it( 'does not add suffix when addSuffix is false', async () => {
-			mockWorker.resizeImage.mockResolvedValue( {
+			mockResizeImage.mockResolvedValue( {
 				buffer: new ArrayBuffer( 10 ),
 				width: 150,
 				height: 150,
@@ -224,10 +232,13 @@ describe( 'vips utilities', () => {
 			);
 
 			expect( result.name ).toBe( 'test.jpg' );
+
+			// Debug logging is expected.
+			expect( console ).toHaveLogged();
 		} );
 
 		it( 'passes smart crop parameter to worker', async () => {
-			mockWorker.resizeImage.mockResolvedValue( {
+			mockResizeImage.mockResolvedValue( {
 				buffer: new ArrayBuffer( 10 ),
 				width: 100,
 				height: 100,
@@ -242,34 +253,29 @@ describe( 'vips utilities', () => {
 			};
 			await vipsResizeImage( 'item-1', jpegFile, resize, true, true );
 
-			expect( mockWorker.resizeImage ).toHaveBeenCalledTimes( 1 );
-			expect( mockWorker.resizeImage.mock.calls[ 0 ][ 0 ] ).toBe(
-				'item-1'
-			);
-			expect( mockWorker.resizeImage.mock.calls[ 0 ][ 2 ] ).toBe(
-				'image/jpeg'
-			);
-			expect( mockWorker.resizeImage.mock.calls[ 0 ][ 3 ] ).toEqual(
-				resize
-			);
-			expect( mockWorker.resizeImage.mock.calls[ 0 ][ 4 ] ).toBe( true );
+			expect( mockResizeImage ).toHaveBeenCalledTimes( 1 );
+			expect( mockResizeImage.mock.calls[ 0 ][ 0 ] ).toBe( 'item-1' );
+			expect( mockResizeImage.mock.calls[ 0 ][ 2 ] ).toBe( 'image/jpeg' );
+			expect( mockResizeImage.mock.calls[ 0 ][ 3 ] ).toEqual( resize );
+			expect( mockResizeImage.mock.calls[ 0 ][ 4 ] ).toBe( true );
+
+			// Debug logging is expected.
+			expect( console ).toHaveLogged();
 		} );
 	} );
 
 	describe( 'vipsCancelOperations', () => {
 		it( 'calls worker cancelOperations with item ID', async () => {
-			mockWorker.cancelOperations.mockResolvedValue( true );
+			mockCancelOperations.mockResolvedValue( true );
 
 			const result = await vipsCancelOperations( 'item-123' );
 
-			expect( mockWorker.cancelOperations ).toHaveBeenCalledWith(
-				'item-123'
-			);
+			expect( mockCancelOperations ).toHaveBeenCalledWith( 'item-123' );
 			expect( result ).toBe( true );
 		} );
 
 		it( 'returns false when no operations were cancelled', async () => {
-			mockWorker.cancelOperations.mockResolvedValue( false );
+			mockCancelOperations.mockResolvedValue( false );
 
 			const result = await vipsCancelOperations( 'item-456' );
 
