@@ -310,23 +310,37 @@
 	width: 1%;
 }
 
-/* Loading overlay on existing rows */
-.dataviews-view-table.has-overlay {
+@keyframes loadingpulse {
+	0% {
+		background-color: $gray-300;
+	}
+	50% {
+		background-color: $gray-100;
+	}
+	100% {
+		background-color: $gray-300;
+	}
+}
+
+@mixin skeleton() {
+	animation: loadingpulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.dataviews-view-table.is-refreshing {
 	tbody {
 		pointer-events: none;
 		position: relative;
 	}
 
-	tbody td {
+	tbody td > *:first-child {
 		position: relative;
 
 		&::after {
 			content: "";
 			position: absolute;
 			inset: 0;
-			z-index: 1;
-			backdrop-filter: blur(2px);
 			pointer-events: none;
+			@include skeleton();
 		}
 	}
 }

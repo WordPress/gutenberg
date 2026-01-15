@@ -311,8 +311,8 @@ function ViewTable< Item >( {
 		enabled: !! actions?.length,
 	} );
 
-	// Preserve previous loaded data to show them blurred and
-	// avoid flickering.
+	// Preserve previous loaded data to apply loading pulse animation
+	// while refreshing to avoid flickering.
 	const previousDataRef = useRef< Item[] >( data );
 	useEffect( () => {
 		if ( ! isLoading ) {
@@ -404,7 +404,7 @@ function ViewTable< Item >( {
 
 	// If new data are loading but previous loaded data were empty,
 	// keep showing just the spinner.
-	const showOverlay = ! isInfiniteScroll && isLoading && hasData;
+	const isRefreshing = ! isInfiniteScroll && isLoading && hasData;
 	return (
 		<>
 			<table
@@ -415,13 +415,13 @@ function ViewTable< Item >( {
 							view.layout.density
 						),
 					'has-bulk-actions': hasBulkActions,
-					'has-overlay': showOverlay,
+					'is-refreshing': isRefreshing,
 				} ) }
 				aria-busy={ isLoading }
 				aria-describedby={ tableNoticeId }
 				role={ isInfiniteScroll ? 'feed' : undefined }
 				// @ts-ignore Reason: inert is a recent HTML attribute
-				inert={ showOverlay ? 'true' : undefined }
+				inert={ isRefreshing ? 'true' : undefined }
 			>
 				<colgroup>
 					{ hasBulkActions && (
@@ -467,7 +467,7 @@ function ViewTable< Item >( {
 								<BulkSelectionCheckbox
 									selection={ selection }
 									onChangeSelection={ onChangeSelection }
-									data={ data }
+									data={ displayData }
 									actions={ actions }
 									getItemId={ getItemId }
 								/>
