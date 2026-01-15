@@ -1418,7 +1418,10 @@ export const workerCode = '/* Placeholder - run npm run build to generate actual
 			);
 
 			try {
-				const workerContent = await readFile( workerOutputPath, 'utf8' );
+				const workerContent = await readFile(
+					workerOutputPath,
+					'utf8'
+				);
 				const workerCodeFile = path.join(
 					packageDir,
 					'src',
