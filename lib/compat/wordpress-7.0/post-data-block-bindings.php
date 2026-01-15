@@ -24,7 +24,12 @@ function gutenberg_block_bindings_post_data_get_value_for_featured_image( $value
 	if ( 'core/post-data' !== $name ) {
 		return $value;
 	}
+	// Return early if we already have a value.
 	if ( $value ) {
+		return $value;
+	}
+	// Return early if no field is specified.
+	if ( empty( $source_args['field'] ) ) {
 		return $value;
 	}
 
