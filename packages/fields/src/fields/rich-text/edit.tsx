@@ -54,6 +54,7 @@ export default function RichTextEdit< Item >( {
 
 	return (
 		<RichTextControl
+			label={ field.label }
 			value={ field.getValue( { item: data } ) }
 			onChange={ ( value: string ) =>
 				onChange( field.setValue( { item: data, value } ) )
