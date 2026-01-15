@@ -688,7 +688,9 @@ function Navigation( {
 		submenuVisibility || ( openSubmenusOnClick ? 'click' : 'hover' );
 
 	const submenuAccessibilityNotice =
-		! showSubmenuIcon && effectiveSubmenuVisibility !== 'click'
+		! showSubmenuIcon &&
+		effectiveSubmenuVisibility !== 'click' &&
+		effectiveSubmenuVisibility !== 'always'
 			? __(
 					'The current menu options offer reduced accessibility for users and are not recommended. Enabling either "Open on Click" or "Show arrow" offers enhanced accessibility by allowing keyboard users to browse submenus selectively.'
 			  )
@@ -801,12 +803,13 @@ function Navigation( {
 											const newAttributes = {
 												submenuVisibility: value,
 											};
-											// If "always" is selected, switch to vertical orientation
+											// If "always" is selected, switch to vertical orientation and hide arrow
 											if ( value === 'always' ) {
 												newAttributes.layout = {
 													...attributes.layout,
 													orientation: 'vertical',
 												};
+												newAttributes.showSubmenuIcon = false;
 											}
 											setAttributes( newAttributes );
 										} }
@@ -836,7 +839,9 @@ function Navigation( {
 										} )
 									}
 									isDisabled={
-										effectiveSubmenuVisibility === 'click'
+										effectiveSubmenuVisibility ===
+											'click' ||
+										effectiveSubmenuVisibility === 'always'
 									}
 									isShownByDefault
 								>
@@ -849,7 +854,9 @@ function Navigation( {
 										} }
 										disabled={
 											effectiveSubmenuVisibility ===
-											'click'
+												'click' ||
+											effectiveSubmenuVisibility ===
+												'always'
 										}
 										label={ __( 'Show arrow' ) }
 									/>
