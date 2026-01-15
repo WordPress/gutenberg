@@ -1317,8 +1317,15 @@ export const workerCode = '/* Placeholder - run npm run build to generate actual
 				);
 			}
 
-			// Build CJS worker for build directory (Node.js compatibility).
-			// Only build if package has a main field (CJS entry point).
+			// Build CJS worker for the `build` directory (Node.js compatibility).
+			//
+			// Note: We only generate CJS worker bundles when the package exposes a
+			// CommonJS entry point via `packageJson.main`. Packages that are ESM-only
+			// or browser-focused (for example, packages that have removed their
+			// `main` field like `@wordpress/vips`) will not produce CJS worker
+			// outputs, and will instead rely solely on the ESM worker built into
+			// `build-module`. This conditional is intentional to avoid creating
+			// unused or misleading CJS artifacts.
 			if ( packageJson.main ) {
 				workerBuilds.push(
 					esbuild.build( {
