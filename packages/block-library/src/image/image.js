@@ -909,6 +909,10 @@ export default function Image( {
 					defaultValue={ DEFAULT_MEDIA_SIZE_SLUG }
 					onChange={ updateImage }
 					options={ imageSizeOptions }
+					panelId={ clientId }
+					resetAllFilter={ () => ( {
+						sizeSlug: DEFAULT_MEDIA_SIZE_SLUG,
+					} ) }
 				/>
 			</InspectorControls>
 		) }
