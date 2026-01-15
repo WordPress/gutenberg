@@ -26,6 +26,11 @@ export function InvalidDraftDisplay( {
 	isDraft,
 	className = 'wp-block-navigation-link__label',
 } ) {
+	// Only render if the link is invalid or a draft.
+	if ( ! isInvalid && ! isDraft ) {
+		return null;
+	}
+
 	const statusText = isInvalid
 		? /* translators: Indicating that the navigation link is Invalid. */
 		  __( 'Invalid' )
