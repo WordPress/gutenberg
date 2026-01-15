@@ -84,12 +84,12 @@ function Edit( {
 	const [ editingLabel, setEditingLabel ] = useState( '' );
 
 	// Get parent tabs clientId for updating editorActiveTabIndex
-	const { tabsClientId, selectedTabClientId } = useSelect(
+	const { tabsClientId, tabsMenuClientId, selectedTabClientId } = useSelect(
 		( select ) => {
 			const { getBlockRootClientId, getSelectedBlockClientIds, hasSelectedInnerBlock } = select( blockEditorStore );
 			// tabs-menu-item -> tabs-menu -> tabs
-			const tabsMenuClientId = getBlockRootClientId( clientId );
-			const _tabsClientId = tabsMenuClientId ? getBlockRootClientId( tabsMenuClientId ) : null;
+			const _tabsMenuClientId = getBlockRootClientId( clientId );
+			const _tabsClientId = _tabsMenuClientId ? getBlockRootClientId( _tabsMenuClientId ) : null;
 
 			const selectedIds = getSelectedBlockClientIds();
 
@@ -104,6 +104,7 @@ function Edit( {
 
 			return {
 				tabsClientId: _tabsClientId,
+				tabsMenuClientId: _tabsMenuClientId,
 				selectedTabClientId: selectedTab,
 			};
 		},
@@ -233,6 +234,10 @@ function Edit( {
 					setAttributes,
 					clientId,
 					tabsClientId,
+					tabClientId,
+					tabIndex,
+					tabsCount: tabsList.length,
+					tabsMenuClientId,
 					activeBackgroundColor,
 					setActiveBackgroundColor,
 					activeTextColor,
