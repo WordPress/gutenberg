@@ -4,9 +4,6 @@
 import EquivalentKeyMap from 'equivalent-key-map';
 import type { Reducer } from 'redux';
 
-/**
- * Internal dependencies
- */
 import type {
 	startResolution,
 	finishResolution,
