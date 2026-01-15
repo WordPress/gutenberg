@@ -258,6 +258,10 @@ $navigation-icon-size: 24px;
 		justify-content: var(--navigation-layout-justify, initial);
 		align-items: var(--navigation-layout-align, initial);
 
+		.wp-block-navigation-item {
+			justify-content: var(--navigation-layout-justify, initial);
+		}
+
 		> .wp-block-navigation-item__content,
 		.wp-block-navigation__submenu-container > .wp-block-navigation-item > .wp-block-navigation-item__content {
 			flex-grow: 0;
