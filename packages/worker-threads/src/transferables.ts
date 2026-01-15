@@ -10,6 +10,7 @@
  */
 export function findTransferables( value: unknown ): Transferable[] {
 	const transferables: Transferable[] = [];
+	const transferableSet = new Set< Transferable >();
 	const seen = new WeakSet< object >();
 
 	function walk( obj: unknown ): void {
@@ -20,7 +21,8 @@ export function findTransferables( value: unknown ): Transferable[] {
 
 		// Check for ArrayBuffer (most common transferable).
 		if ( obj instanceof ArrayBuffer ) {
-			if ( ! transferables.includes( obj ) ) {
+			if ( ! transferableSet.has( obj ) ) {
+				transferableSet.add( obj );
 				transferables.push( obj );
 			}
 			return;
@@ -31,7 +33,8 @@ export function findTransferables( value: unknown ): Transferable[] {
 			typeof MessagePort !== 'undefined' &&
 			obj instanceof MessagePort
 		) {
-			if ( ! transferables.includes( obj ) ) {
+			if ( ! transferableSet.has( obj ) ) {
+				transferableSet.add( obj );
 				transferables.push( obj );
 			}
 			return;
@@ -42,7 +45,8 @@ export function findTransferables( value: unknown ): Transferable[] {
 			typeof ImageBitmap !== 'undefined' &&
 			obj instanceof ImageBitmap
 		) {
-			if ( ! transferables.includes( obj ) ) {
+			if ( ! transferableSet.has( obj ) ) {
+				transferableSet.add( obj );
 				transferables.push( obj );
 			}
 			return;
@@ -53,7 +57,8 @@ export function findTransferables( value: unknown ): Transferable[] {
 			typeof OffscreenCanvas !== 'undefined' &&
 			obj instanceof OffscreenCanvas
 		) {
-			if ( ! transferables.includes( obj ) ) {
+			if ( ! transferableSet.has( obj ) ) {
+				transferableSet.add( obj );
 				transferables.push( obj );
 			}
 			return;
@@ -64,7 +69,8 @@ export function findTransferables( value: unknown ): Transferable[] {
 			typeof ReadableStream !== 'undefined' &&
 			obj instanceof ReadableStream
 		) {
-			if ( ! transferables.includes( obj ) ) {
+			if ( ! transferableSet.has( obj ) ) {
+				transferableSet.add( obj );
 				transferables.push( obj );
 			}
 			return;
@@ -75,7 +81,8 @@ export function findTransferables( value: unknown ): Transferable[] {
 			typeof WritableStream !== 'undefined' &&
 			obj instanceof WritableStream
 		) {
-			if ( ! transferables.includes( obj ) ) {
+			if ( ! transferableSet.has( obj ) ) {
+				transferableSet.add( obj );
 				transferables.push( obj );
 			}
 			return;
@@ -86,7 +93,8 @@ export function findTransferables( value: unknown ): Transferable[] {
 			typeof TransformStream !== 'undefined' &&
 			obj instanceof TransformStream
 		) {
-			if ( ! transferables.includes( obj ) ) {
+			if ( ! transferableSet.has( obj ) ) {
+				transferableSet.add( obj );
 				transferables.push( obj );
 			}
 			return;
@@ -103,8 +111,9 @@ export function findTransferables( value: unknown ): Transferable[] {
 			const buffer = obj.buffer;
 			if (
 				buffer instanceof ArrayBuffer &&
-				! transferables.includes( buffer )
+				! transferableSet.has( buffer )
 			) {
+				transferableSet.add( buffer );
 				transferables.push( buffer );
 			}
 			return;
