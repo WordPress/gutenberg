@@ -29,13 +29,9 @@ function getWorkerAPI(): Remote< WorkerAPI > {
 	if ( workerAPI === undefined ) {
 		// Create the worker using the bundled worker script.
 		// The URL pattern works with esbuild's bundling.
-		worker = new Worker(
-			new URL(
-				'./worker.mjs',
-				import.meta.url
-			),
-			{ type: 'module' }
-		);
+		worker = new Worker( new URL( './worker.mjs', import.meta.url ), {
+			type: 'module',
+		} );
 		workerAPI = wrap< WorkerAPI >( worker );
 	}
 	return workerAPI;
