@@ -34,11 +34,11 @@ if ( window.__experimentalContentOnlyInspectorFields ) {
 			type: 'url',
 			Edit: 'link', // TODO: replace with custom component
 			getValue: ( { item } ) => ( {
-				href: item.url,
+				url: item.url,
 				rel: item.rel,
 			} ),
 			setValue: ( { value } ) => ( {
-				url: value.href,
+				url: value.url,
 				rel: value.rel,
 			} ),
 		},
@@ -46,7 +46,6 @@ if ( window.__experimentalContentOnlyInspectorFields ) {
 			id: 'label',
 			label: __( 'Label' ),
 			type: 'text',
-			Edit: 'rich-text', // TODO: replace with custom component
 		},
 	];
 	settings[ formKey ] = {
