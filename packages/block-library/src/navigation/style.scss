@@ -253,8 +253,8 @@ $navigation-icon-size: 24px;
 
 	// Always show submenus when open-on-always class is present
 	&.open-on-always {
-		flex-wrap: wrap;
-		gap: 0.5em;
+		flex-direction: inherit;
+		align-items: inherit;
 
 		> .wp-block-navigation-item__content,
 		.wp-block-navigation__submenu-container > .wp-block-navigation-item > .wp-block-navigation-item__content {
@@ -269,21 +269,10 @@ $navigation-icon-size: 24px;
 			flex-basis: 100%;
 			visibility: visible;
 			opacity: 1;
-			display: flex;
-			flex-direction: column;
-			align-items: flex-start;
-			text-align: start;
 			position: static;
 			height: auto;
-			min-width: 0;
-			overflow: visible;
-			pointer-events: auto;
+			width: auto;
 			border: none;
-			left: auto;
-			top: auto;
-			transition: none;
-			padding-left: 2em;
-			padding-right: 2em;
 			background-color: transparent;
 			color: inherit;
 		}
