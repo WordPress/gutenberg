@@ -2,6 +2,16 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createRef } from '@wordpress/element';
 import * as Tooltip from '../index';
+import type { ProviderProps } from '../types';
+
+// Test wrapper that sets delay={0} to avoid real-time delays in tests.
+function TestProvider( { children, ...props }: ProviderProps ) {
+	return (
+		<Tooltip.Provider delay={ 0 } { ...props }>
+			{ children }
+		</Tooltip.Provider>
+	);
+}
 
 describe( 'Tooltip', () => {
 	it( 'forwards ref', async () => {
@@ -10,14 +20,14 @@ describe( 'Tooltip', () => {
 		const popupRef = createRef< HTMLDivElement >();
 
 		render(
-			<Tooltip.Provider delay={ 0 }>
+			<TestProvider>
 				<Tooltip.Root>
 					<Tooltip.Trigger ref={ triggerRef }>
 						<span>Hover me</span>
 					</Tooltip.Trigger>
 					<Tooltip.Popup ref={ popupRef }>Tooltip text</Tooltip.Popup>
 				</Tooltip.Root>
-			</Tooltip.Provider>
+			</TestProvider>
 		);
 
 		// Test trigger ref before interaction
@@ -36,12 +46,12 @@ describe( 'Tooltip', () => {
 		const user = userEvent.setup();
 
 		render(
-			<Tooltip.Provider delay={ 0 }>
+			<TestProvider>
 				<Tooltip.Root>
 					<Tooltip.Trigger>Hover me</Tooltip.Trigger>
 					<Tooltip.Popup>Tooltip content</Tooltip.Popup>
 				</Tooltip.Root>
-			</Tooltip.Provider>
+			</TestProvider>
 		);
 
 		const trigger = screen.getByRole( 'button', { name: 'Hover me' } );
@@ -59,12 +69,12 @@ describe( 'Tooltip', () => {
 		const user = userEvent.setup();
 
 		render(
-			<Tooltip.Provider delay={ 0 }>
+			<TestProvider>
 				<Tooltip.Root disabled>
 					<Tooltip.Trigger>Hover me</Tooltip.Trigger>
 					<Tooltip.Popup>Tooltip content</Tooltip.Popup>
 				</Tooltip.Root>
-			</Tooltip.Provider>
+			</TestProvider>
 		);
 
 		const trigger = screen.getByRole( 'button', { name: 'Hover me' } );
