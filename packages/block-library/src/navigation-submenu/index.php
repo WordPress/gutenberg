@@ -87,9 +87,15 @@ function render_block_core_navigation_submenu( $attributes, $content, $block ) {
 	$font_sizes      = block_core_navigation_submenu_build_css_font_sizes( $block->context );
 	$style_attribute = $font_sizes['inline_styles'];
 
-	$has_submenu = count( $block->inner_blocks ) > 0;
-	$kind        = empty( $attributes['kind'] ) ? 'post_type' : str_replace( '-', '_', $attributes['kind'] );
-	$is_active   = ! empty( $attributes['id'] ) && get_queried_object_id() === (int) $attributes['id'] && ! empty( get_queried_object()->$kind );
+	// Render inner blocks first to check if any menu items will actually display.
+	$inner_blocks_html = '';
+	foreach ( $block->inner_blocks as $inner_block ) {
+		$inner_blocks_html .= $inner_block->render();
+	}
+	$has_submenu = ! empty( trim( $inner_blocks_html ) );
+
+	$kind      = empty( $attributes['kind'] ) ? 'post_type' : str_replace( '-', '_', $attributes['kind'] );
+	$is_active = ! empty( $attributes['id'] ) && get_queried_object_id() === (int) $attributes['id'] && ! empty( get_queried_object()->$kind );
 
 	if ( is_post_type_archive() && ! empty( $attributes['url'] ) ) {
 		$queried_archive_link = get_post_type_archive_link( get_queried_object()->name );
@@ -195,7 +201,7 @@ function render_block_core_navigation_submenu( $attributes, $content, $block ) {
 		$html .= '</a>';
 		// End anchor tag content.
 
-		if ( $show_submenu_indicators ) {
+		if ( $show_submenu_indicators && $has_submenu ) {
 			// The submenu icon is rendered in a button here
 			// so that there's a clickable element to open the submenu.
 			$html .= '<button aria-label="' . esc_attr( $aria_label ) . '" class="wp-block-navigation__submenu-icon wp-block-navigation-submenu__toggle" aria-expanded="false">' . block_core_navigation_submenu_render_submenu_icon() . '</button>';
@@ -220,7 +226,9 @@ function render_block_core_navigation_submenu( $attributes, $content, $block ) {
 
 		$html .= '</button>';
 
-		$html .= '<span class="wp-block-navigation__submenu-icon">' . block_core_navigation_submenu_render_submenu_icon() . '</span>';
+		if ( $has_submenu ) {
+			$html .= '<span class="wp-block-navigation__submenu-icon">' . block_core_navigation_submenu_render_submenu_icon() . '</span>';
+		}
 
 	}
 
@@ -251,11 +259,6 @@ function render_block_core_navigation_submenu( $attributes, $content, $block ) {
 		$style_attribute = '';
 		if ( array_key_exists( 'style', $colors_supports ) ) {
 			$style_attribute = $colors_supports['style'];
-		}
-
-		$inner_blocks_html = '';
-		foreach ( $block->inner_blocks as $inner_block ) {
-			$inner_blocks_html .= $inner_block->render();
 		}
 
 		if ( strpos( $inner_blocks_html, 'current-menu-item' ) ) {
