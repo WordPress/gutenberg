@@ -54,31 +54,16 @@ const REVISION_DIFF_STYLES = `
 		color: color-mix(in srgb, currentColor 50%, #006400 50%);
 	}
 	.revision-diff-format-added {
-		background: repeating-linear-gradient(
-			45deg,
-			transparent,
-			transparent 2px,
-			color-mix(in srgb, currentColor 20%, #00a32a 15%) 2px,
-			color-mix(in srgb, currentColor 20%, #00a32a 15%) 4px
-		);
+		text-decoration: underline wavy color-mix(in srgb, currentColor 30%, #00a32a 70%);
+		text-decoration-thickness: 2px;
 	}
 	.revision-diff-format-removed {
-		background: repeating-linear-gradient(
-			45deg,
-			transparent,
-			transparent 2px,
-			color-mix(in srgb, currentColor 15%, #d63638 25%) 2px,
-			color-mix(in srgb, currentColor 15%, #d63638 25%) 4px
-		);
+		text-decoration: underline wavy color-mix(in srgb, currentColor 20%, #d63638 80%);
+		text-decoration-thickness: 2px;
 	}
 	.revision-diff-format-changed {
-		background: repeating-linear-gradient(
-			45deg,
-			transparent,
-			transparent 2px,
-			color-mix(in srgb, currentColor 20%, #dba617 15%) 2px,
-			color-mix(in srgb, currentColor 20%, #dba617 15%) 4px
-		);
+		text-decoration: underline wavy color-mix(in srgb, currentColor 30%, #dba617 70%);
+		text-decoration-thickness: 2px;
 	}
 `;
 
