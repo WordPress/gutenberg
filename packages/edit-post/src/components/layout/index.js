@@ -308,7 +308,9 @@ function MetaBoxesMain( { isLegacy } ) {
 	const getAriaValueNow = ( height ) =>
 		Math.round( ( ( height - min ) / ( max - min ) ) * 100 );
 	const usedAriaValueNow =
-		max === undefined || isAutoHeight ? 50 : getAriaValueNow( openHeight );
+		max === undefined || isAutoHeight
+			? 50
+			: getAriaValueNow( isOpen ? openHeight : min );
 
 	const persistIsOpen = ( to = ! isOpen ) =>
 		setPreference( 'core/edit-post', 'metaBoxesMainIsOpen', to );
