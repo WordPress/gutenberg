@@ -4,5 +4,6 @@ export * from './button';
 export * from './form/primitives';
 export * from './icon';
 export * from './stack';
+export * as Tabs from './tabs';
 export * as Tooltip from './tooltip';
 export * from './visually-hidden';
