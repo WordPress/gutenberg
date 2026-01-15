@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { RichTextData, create, toHTMLString } from '@wordpress/rich-text';
+import { RichTextData } from '@wordpress/rich-text';
 
 /**
  * Updates footnote numbering in rich text attributes across all blocks.
@@ -59,26 +59,15 @@ export default function updateBlocksAttributesForNumbering( blocks, newOrder ) {
 						return;
 					}
 					const expectedNumber = String( index + 1 );
-					const countValue = create( {
-						html: replacement.innerHTML,
-					} );
 
 					// Always recalculate numbering based on current order
 					// This is critical for undo scenarios where blocks are restored
 					// with potentially stale numbering
 					attributesChanged = true;
-					countValue.text = expectedNumber;
-					countValue.formats = Array.from(
-						{ length: countValue.text.length },
-						() => countValue.formats[ 0 ] || null
-					);
-					countValue.replacements = Array.from(
-						{ length: countValue.text.length },
-						() => countValue.replacements[ 0 ] || null
-					);
-					replacement.innerHTML = toHTMLString( {
-						value: countValue,
-					} );
+
+					// Reconstruct innerHTML with correct ID and number
+					// Use the current data-fn ID, not whatever was in old innerHTML
+					replacement.innerHTML = `<a href="#${ id }" id="${ id }-link">${ expectedNumber }</a>`;
 					hasFootnotes = true;
 				}
 			} );
