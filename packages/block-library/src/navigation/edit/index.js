@@ -130,6 +130,7 @@ function ColorTools( {
 	setOverlayBackgroundColor,
 	clientId,
 	navRef,
+	hasCustomOverlay,
 } ) {
 	const [ detectedBackgroundColor, setDetectedBackgroundColor ] = useState();
 	const [ detectedColor, setDetectedColor ] = useState();
@@ -201,7 +202,9 @@ function ColorTools( {
 					},
 					{
 						colorValue: overlayTextColor.color,
-						label: __( 'Submenu & overlay text' ),
+						label: hasCustomOverlay
+							? __( 'Submenu text' )
+							: __( 'Submenu & overlay text' ),
 						onColorChange: setOverlayTextColor,
 						resetAllFilter: () => setOverlayTextColor(),
 						clearable: true,
@@ -209,7 +212,9 @@ function ColorTools( {
 					},
 					{
 						colorValue: overlayBackgroundColor.color,
-						label: __( 'Submenu & overlay background' ),
+						label: hasCustomOverlay
+							? __( 'Submenu background' )
+							: __( 'Submenu & overlay background' ),
 						onColorChange: setOverlayBackgroundColor,
 						resetAllFilter: () => setOverlayBackgroundColor(),
 						clearable: true,
@@ -818,6 +823,7 @@ function Navigation( {
 					setOverlayBackgroundColor={ setOverlayBackgroundColor }
 					clientId={ clientId }
 					navRef={ navRef }
+					hasCustomOverlay={ !! overlay }
 				/>
 			</InspectorControls>
 		</>

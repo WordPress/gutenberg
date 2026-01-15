@@ -411,8 +411,8 @@ export const editEntityRecord =
 				return acc;
 			}, {} ),
 		};
-		if ( window.__experimentalEnableSync && entityConfig.syncConfig ) {
-			if ( globalThis.IS_GUTENBERG_PLUGIN ) {
+		if ( globalThis.IS_GUTENBERG_PLUGIN ) {
+			if ( entityConfig.syncConfig ) {
 				const objectType = `${ kind }/${ name }`;
 				const objectId = recordId;
 
@@ -714,6 +714,17 @@ export const saveEntityRecord =
 						true,
 						edits
 					);
+					if ( globalThis.IS_GUTENBERG_PLUGIN ) {
+						if ( entityConfig.syncConfig ) {
+							getSyncManager()?.update(
+								`${ kind }/${ name }`,
+								recordId,
+								updatedRecord,
+								LOCAL_EDITOR_ORIGIN,
+								true // isSave
+							);
+						}
+					}
 				}
 			} catch ( _error ) {
 				hasError = true;

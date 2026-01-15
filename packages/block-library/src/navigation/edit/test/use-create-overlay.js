@@ -23,6 +23,16 @@ jest.mock( '@wordpress/core-data', () => ( {
 	store: {},
 } ) );
 
+// Mock @wordpress/blocks
+jest.mock( '@wordpress/blocks', () => ( {
+	serialize: jest.fn( ( blocks ) => JSON.stringify( blocks ) ),
+	createBlock: jest.fn( ( name ) => ( {
+		name,
+		attributes: {},
+		innerBlocks: [],
+	} ) ),
+} ) );
+
 describe( 'useCreateOverlayTemplatePart', () => {
 	const mockSaveEntityRecord = jest.fn();
 
@@ -62,6 +72,7 @@ describe( 'useCreateOverlayTemplatePart', () => {
 			expect.objectContaining( {
 				slug: 'overlay',
 				title: 'Overlay',
+				content: expect.any( String ),
 				area: 'navigation-overlay',
 			} ),
 			{ throwOnError: true }
@@ -107,6 +118,7 @@ describe( 'useCreateOverlayTemplatePart', () => {
 			expect.objectContaining( {
 				title: 'Overlay 2',
 				slug: 'overlay-2',
+				content: expect.any( String ),
 				area: 'navigation-overlay',
 			} ),
 			{ throwOnError: true }

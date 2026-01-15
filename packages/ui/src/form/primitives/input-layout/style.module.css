@@ -1,0 +1,82 @@
+@layer wp-ui-utilities, wp-ui-components, wp-ui-compositions, wp-ui-overrides;
+
+@layer wp-ui-components {
+	.input-layout {
+		/* TODO: Use padding tokens */
+		--wp-ui-input-layout-padding-inline: calc(var(--wpds-dimension-base) * 3);
+
+		display: flex;
+		height: 40px;
+		background-color: var(--wpds-color-bg-interactive-neutral-weak);
+		border-width: var(--wpds-border-width-surface-xs);
+		border-style: solid;
+		border-color: var(--wpds-color-stroke-interactive-neutral);
+		border-radius: var(--wpds-border-radius-surface-sm);
+		font-family: var(--wpds-font-family-body);
+		font-size: max(var(--wpds-font-size-md), 16px); /* avoid mobile zoom */
+		line-height: 1;
+		color: var(--wpds-color-fg-interactive-neutral);
+
+		@media (min-width: 600px) {
+			font-size: var(--wpds-font-size-md);
+		}
+
+		&.is-size-compact {
+			/* TODO: Use padding tokens */
+			--wp-ui-input-layout-padding-inline: calc(var(--wpds-dimension-base) * 2);
+			height: 32px;
+		}
+
+		&.is-size-small {
+			/* TODO: Use padding tokens */
+			--wp-ui-input-layout-padding-inline: calc(var(--wpds-dimension-base) * 2);
+			height: 24px;
+		}
+
+		&.is-disabled {
+			background-color: var(--wpds-color-bg-interactive-neutral-weak-disabled);
+			border-color: var(--wpds-color-stroke-interactive-neutral-disabled);
+			color: var(--wpds-color-fg-interactive-neutral-disabled);
+
+			@media (forced-colors: active) {
+				border-color: GrayText;
+				color: GrayText;
+			}
+		}
+
+		&.is-borderless {
+			border-color: transparent;
+		}
+
+		/* Don't show focus ring when the focus is in the prefix or suffix slots */
+		&:has(.input-layout-slot:focus-within) {
+			outline: none;
+		}
+
+		&:hover:not(.is-disabled, .is-borderless) {
+			border-color: var(--wpds-color-stroke-interactive-neutral-active);
+		}
+	}
+
+	.input-layout-slot {
+		display: flex;
+		align-items: center;
+
+		&.is-padding-minimal {
+			--wp-ui-input-layout-prefix-padding-start:
+				calc(var(--wp-ui-input-layout-padding-inline) -
+				var(--wpds-dimension-base));
+			--wp-ui-input-layout-suffix-padding-end:
+				calc(var(--wp-ui-input-layout-padding-inline) -
+				var(--wpds-dimension-base));
+		}
+
+		&.is-prefix {
+			padding-inline-start: var(--wp-ui-input-layout-prefix-padding-start, var(--wp-ui-input-layout-padding-inline));
+		}
+
+		&.is-suffix {
+			padding-inline-end: var(--wp-ui-input-layout-suffix-padding-end, var(--wp-ui-input-layout-padding-inline));
+		}
+	}
+}

@@ -16,6 +16,8 @@ module.exports = {
 	moduleNameMapper: {
 		[ `@wordpress\\/(${ transpiledPackageNames.join( '|' ) })$` ]:
 			'packages/$1/src',
+		'@wordpress/theme/design-tokens.js':
+			'<rootDir>/packages/theme/src/prebuilt/js/design-tokens.mjs',
 		'.+\\.wasm$': '<rootDir>/test/unit/config/wasm-stub.js',
 	},
 	preset: '@wordpress/jest-preset-default',
@@ -45,7 +47,7 @@ module.exports = {
 	],
 	resolver: '<rootDir>/test/unit/scripts/resolver.js',
 	transform: {
-		'^.+\\.[jt]sx?$': '<rootDir>/test/unit/scripts/babel-transformer.js',
+		'^.+\\.m?[jt]sx?$': '<rootDir>/test/unit/scripts/babel-transformer.js',
 	},
 	transformIgnorePatterns: [
 		'/node_modules/(?!(docker-compose|yaml|preact|@preact|parsel-js)/)',

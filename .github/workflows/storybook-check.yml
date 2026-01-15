@@ -36,7 +36,7 @@ jobs:
 
             - name: Install test-runner and Playwright dependencies
               run: |
-                  npm install --no-save @storybook/test-runner@0.22.1
+                  npm install --no-save @storybook/test-runner@0.24.2
                   npx playwright install --with-deps
 
             - name: Serve Storybook and run tests
