@@ -1,14 +1,7 @@
-/**
- * External dependencies
- */
-import React, { useEffect, useState } from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { DirectionProvider } from '@base-ui/react/direction-provider';
-
-/**
- * Internal dependencies
- */
+import { useEffect, useState } from '@wordpress/element';
 import { Tabs } from '../..';
 import type { TabRootProps } from '../types';
 
