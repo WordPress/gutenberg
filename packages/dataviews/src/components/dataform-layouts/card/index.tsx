@@ -235,14 +235,8 @@ export default function FormCardField< Item >( {
 
 	// Count invalid fields for validation badge
 	const invalidCount = countInvalidFields( validity );
-	const showValidationBadge = touched && invalidCount > 0;
-
-	// For non-collapsible cards, mark as touched when user interacts with fields
-	const handleBlurCapture = useCallback( () => {
-		if ( ! layout.isCollapsible ) {
-			setTouched( true );
-		}
-	}, [ layout.isCollapsible, setTouched ] );
+	const showValidationBadge =
+		touched && invalidCount > 0 && layout.isCollapsible;
 
 	const sizeCard = {
 		blockStart: 'medium' as const,
@@ -305,7 +299,6 @@ export default function FormCardField< Item >( {
 					<CardBody
 						size={ sizeCardBody }
 						className="dataforms-layouts-card__field-control"
-						onBlurCapture={ handleBlurCapture }
 					>
 						{ field.description && (
 							<div className="dataforms-layouts-card__field-description">
@@ -384,7 +377,6 @@ export default function FormCardField< Item >( {
 				<CardBody
 					size={ sizeCardBody }
 					className="dataforms-layouts-card__field-control"
-					onBlurCapture={ handleBlurCapture }
 				>
 					<RegularLayout
 						data={ data }
