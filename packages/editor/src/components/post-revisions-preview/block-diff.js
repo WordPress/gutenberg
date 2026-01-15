@@ -57,7 +57,7 @@ function createBlockSignature( rawBlock ) {
 
 /**
  * Inject diff status into raw block as special attribute.
- * Also recursively mark innerBlocks with same status.
+ * Does NOT mark inner blocks - parent styling is sufficient for added/removed.
  *
  * @param {Object} rawBlock Raw block to inject status into.
  * @param {string} status   Diff status ('added' or 'removed').
@@ -74,10 +74,6 @@ function injectDiffStatus( rawBlock, status ) {
 			...rawBlock.attrs,
 			__revisionDiffStatus: status,
 		},
-		innerBlocks:
-			rawBlock.innerBlocks?.map( ( inner ) =>
-				injectDiffStatus( inner, status )
-			) || [],
 	};
 }
 

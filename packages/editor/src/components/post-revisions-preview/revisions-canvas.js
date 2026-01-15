@@ -26,19 +26,43 @@ import { diffRevisionContent } from './block-diff';
 
 const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
 
+// SVG filter for removed blocks: grayscale + red tint
+const REVISION_REMOVED_FILTER_SVG = `
+<svg
+	xmlns="http://www.w3.org/2000/svg"
+	viewBox="0 0 0 0"
+	width="0"
+	height="0"
+	focusable="false"
+	role="none"
+	aria-hidden="true"
+	style="visibility: hidden; position: absolute; left: -9999px; overflow: hidden;"
+>
+	<defs>
+		<filter id="revision-removed-filter" x="0" y="0" width="100%" height="100%">
+			<!-- Desaturate and add red tint -->
+			<feColorMatrix type="matrix"
+				values="0.5 0.3 0.2 0 0.15
+				        0.2 0.2 0.1 0 0
+				        0.2 0.2 0.1 0 0
+				        0   0   0   0.8 0"/>
+		</filter>
+	</defs>
+</svg>
+`;
+
 /**
  * CSS for revision diff indicators, injected into the iframe.
  * Uses color-mix() to blend diff colors with currentColor for better integration.
  */
 const REVISION_DIFF_STYLES = `
 	.is-revision-added {
-		outline: 2px solid color-mix(in srgb, currentColor 30%, #00a32a 70%) !important;
-		outline-offset: 2px;
+		background-color: color-mix(in srgb, currentColor 5%, #00a32a 15%);
+		color: color-mix(in srgb, currentColor 50%, #006400 50%);
 	}
 	.is-revision-removed {
-		outline: 2px solid color-mix(in srgb, currentColor 20%, #d63638 80%) !important;
-		outline-offset: 2px;
-		opacity: 0.5;
+		text-decoration: line-through;
+		filter: url(#revision-removed-filter);
 	}
 	.is-revision-modified {
 		outline: 2px solid color-mix(in srgb, currentColor 30%, #dba617 70%) !important;
@@ -166,11 +190,15 @@ export default function RevisionsCanvas( { revision, previousRevision } ) {
 		originalStylesRef.current = editorSettings.styles || [];
 	}
 
-	// Add diff styles to editor settings on mount, restore on unmount.
+	// Add diff styles and SVG filter to editor settings on mount, restore on unmount.
 	useEffect( () => {
 		const originalStyles = originalStylesRef.current;
 		updateEditorSettings( {
-			styles: [ ...originalStyles, { css: REVISION_DIFF_STYLES } ],
+			styles: [
+				...originalStyles,
+				{ css: REVISION_DIFF_STYLES },
+				{ assets: REVISION_REMOVED_FILTER_SVG, __unstableType: 'svgs' },
+			],
 		} );
 		return () => {
 			updateEditorSettings( { styles: originalStyles } );

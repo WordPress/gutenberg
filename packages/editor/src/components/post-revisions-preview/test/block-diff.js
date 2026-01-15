@@ -365,7 +365,7 @@ describe( 'diffRevisionContent', () => {
 			] );
 		} );
 
-		it( 'marks all inner blocks when container is added', () => {
+		it( 'does not mark inner blocks when container is added (parent styling is sufficient)', () => {
 			const previous = '';
 			const current = serialize( [
 				createBlock( 'core/group', {}, [
@@ -386,14 +386,14 @@ describe( 'diffRevisionContent', () => {
 							name: 'core/paragraph',
 							attributes: {
 								content: 'A',
-								__revisionDiffStatus: 'added',
+								__revisionDiffStatus: undefined,
 							},
 						},
 						{
 							name: 'core/paragraph',
 							attributes: {
 								content: 'B',
-								__revisionDiffStatus: 'added',
+								__revisionDiffStatus: undefined,
 							},
 						},
 					],
@@ -401,7 +401,7 @@ describe( 'diffRevisionContent', () => {
 			] );
 		} );
 
-		it( 'marks all inner blocks when container is removed', () => {
+		it( 'does not mark inner blocks when container is removed (parent styling is sufficient)', () => {
 			const previous = serialize( [
 				createBlock( 'core/group', {}, [
 					createBlock( 'core/paragraph', { content: 'A' } ),
@@ -422,14 +422,14 @@ describe( 'diffRevisionContent', () => {
 							name: 'core/paragraph',
 							attributes: {
 								content: 'A',
-								__revisionDiffStatus: 'removed',
+								__revisionDiffStatus: undefined,
 							},
 						},
 						{
 							name: 'core/paragraph',
 							attributes: {
 								content: 'B',
-								__revisionDiffStatus: 'removed',
+								__revisionDiffStatus: undefined,
 							},
 						},
 					],
