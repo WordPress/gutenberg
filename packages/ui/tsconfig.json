@@ -6,6 +6,7 @@
 	},
 	"references": [
 		{ "path": "../a11y" },
+		{ "path": "../compose" },
 		{ "path": "../element" },
 		{ "path": "../i18n" },
 		{ "path": "../icons" },
