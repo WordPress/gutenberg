@@ -34,12 +34,39 @@ ruleTester.run( 'components-no-unsafe-button-disabled', rule, {
 				<Button disabled accessibleWhenDisabled={true} />
 			`,
 		},
-		// Button with accessibleWhenDisabled={false} - still valid (prop is present)
+		// Button with accessibleWhenDisabled={false}
+		{
+			code: `
+						import { Button } from '@wordpress/components';
+						<Button disabled accessibleWhenDisabled={false} />
+					`,
+			errors: [
+				{
+					messageId: 'missingAccessibleWhenDisabled',
+				},
+			],
+		},
+		// Button with accessibleWhenDisabled={someVar}
 		{
 			code: `
 				import { Button } from '@wordpress/components';
-				<Button disabled accessibleWhenDisabled={false} />
+				<Button disabled accessibleWhenDisabled={someVar} />
 			`,
+		},
+		// Button with accessibleWhenDisabled={false} should error (handled in invalid)
+		// Button with disabled={false} should not require accessibleWhenDisabled
+		{
+			code: `
+				import { Button } from '@wordpress/components';
+				<Button disabled={false} />
+			`,
+		},
+		// Button with disabled={someVar} and accessibleWhenDisabled={someVar}
+		{
+			code: `
+						import { Button } from '@wordpress/components';
+						<Button disabled={isDisabled} accessibleWhenDisabled={someVar} />
+					`,
 		},
 		// Button without disabled prop
 		{
@@ -97,6 +124,18 @@ ruleTester.run( 'components-no-unsafe-button-disabled', rule, {
 				},
 			],
 		},
+		// Button with disabled={someVar} but no accessibleWhenDisabled
+		{
+			code: `
+				import { Button } from '@wordpress/components';
+				<Button disabled={isDisabled} />
+			`,
+			errors: [
+				{
+					messageId: 'missingAccessibleWhenDisabled',
+				},
+			],
+		},
 		// Button with disabled={true} but no accessibleWhenDisabled
 		{
 			code: `
@@ -130,32 +169,6 @@ ruleTester.run( 'components-no-unsafe-button-disabled', rule, {
 					<Button disabled />
 				</>
 			`,
-			errors: [
-				{
-					messageId: 'missingAccessibleWhenDisabled',
-				},
-			],
-		},
-		// Relative import with checkLocalImports enabled
-		{
-			code: `
-				import { Button } from '../button';
-				<Button disabled />
-			`,
-			options: [ { checkLocalImports: true } ],
-			errors: [
-				{
-					messageId: 'missingAccessibleWhenDisabled',
-				},
-			],
-		},
-		// Default import from button path with checkLocalImports enabled
-		{
-			code: `
-				import Button from '../button';
-				<Button disabled />
-			`,
-			options: [ { checkLocalImports: true } ],
 			errors: [
 				{
 					messageId: 'missingAccessibleWhenDisabled',
@@ -202,6 +215,33 @@ ruleTester.run(
 			`,
 			},
 		],
-		invalid: [],
+		invalid: [
+			// Relative import with checkLocalImports enabled
+			{
+				code: `
+				import { Button } from '../button';
+				<Button disabled />
+			`,
+				options: [ { checkLocalImports: true } ],
+				errors: [
+					{
+						messageId: 'missingAccessibleWhenDisabled',
+					},
+				],
+			},
+			// Default import from button path with checkLocalImports enabled
+			{
+				code: `
+				import Button from '../button';
+				<Button disabled />
+			`,
+				options: [ { checkLocalImports: true } ],
+				errors: [
+					{
+						messageId: 'missingAccessibleWhenDisabled',
+					},
+				],
+			},
+		],
 	}
 );

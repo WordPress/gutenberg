@@ -33,6 +33,47 @@ module.exports = {
 		const wpComponentsButtons = new Set();
 
 		/**
+		 * Check if an attribute exists and has a truthy value.
+		 *
+		 * @param {Array}  attributes - JSX attributes array
+		 * @param {string} attrName   - Attribute name to check
+		 * @return {boolean} Whether the attribute has a truthy value
+		 */
+		function hasTruthyAttribute( attributes, attrName ) {
+			const attr = attributes.find(
+				( a ) =>
+					a.type === 'JSXAttribute' &&
+					a.name &&
+					a.name.name === attrName
+			);
+
+			if ( ! attr ) {
+				return false;
+			}
+
+			// Boolean attribute without value (e.g., `disabled`)
+			if ( attr.value === null ) {
+				return true;
+			}
+
+			// Expression like `disabled={true}` or `disabled={false}`
+			if (
+				attr.value.type === 'JSXExpressionContainer' &&
+				attr.value.expression.type === 'Literal'
+			) {
+				return attr.value.expression.value !== false;
+			}
+
+			// String value - truthy if not empty
+			if ( attr.value.type === 'Literal' ) {
+				return Boolean( attr.value.value );
+			}
+
+			// For any other expression (variables, etc.), assume it could be truthy
+			return true;
+		}
+
+		/**
 		 * Check if the import source should be tracked.
 		 *
 		 * @param {string} source - The import source path
@@ -101,14 +142,7 @@ module.exports = {
 					return;
 				}
 
-				const hasDisabled = node.attributes.some(
-					( attr ) =>
-						attr.type === 'JSXAttribute' &&
-						attr.name &&
-						attr.name.name === 'disabled'
-				);
-
-				if ( ! hasDisabled ) {
+				if ( ! hasTruthyAttribute( node.attributes, 'disabled' ) ) {
 					return;
 				}
 

@@ -13,6 +13,8 @@ import { Button } from '@wordpress/components';
 
 <Button disabled>Click me</Button>
 <Button disabled={true}>Click me</Button>
+<Button disabled accessibleWhenDisabled={false}>Click me</Button>
+<Button disabled accessibleWhenDisabled={isAccessible}>Click me</Button>
 ```
 
 Examples of **correct** code for this rule:
@@ -22,7 +24,7 @@ import { Button } from '@wordpress/components';
 
 <Button disabled accessibleWhenDisabled>Click me</Button>
 <Button disabled accessibleWhenDisabled={true}>Click me</Button>
-<Button disabled accessibleWhenDisabled={false}>Click me</Button>
+<Button disabled={false}>Click me</Button>
 <Button onClick={handleClick}>Click me</Button>
 ```
 
