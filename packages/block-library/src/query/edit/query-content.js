@@ -142,17 +142,18 @@ export default function QueryContent( {
 				setAttributes={ setAttributes }
 				clientId={ clientId }
 			/>
-			<InspectorControls>
-				<QueryInspectorControls
-					name={ name }
-					attributes={ attributes }
-					setQuery={ updateQuery }
-					setAttributes={ setAttributes }
-					clientId={ clientId }
-					isSingular={ isSingular }
-				/>
-			</InspectorControls>
-			<InspectorControls group="advanced">
+		<InspectorControls>
+			<QueryInspectorControls
+				name={ name }
+				attributes={ attributes }
+				setQuery={ updateQuery }
+				setAttributes={ setAttributes }
+				clientId={ clientId }
+				isSingular={ isSingular }
+			/>
+		</InspectorControls>
+		<InspectorControls.Slot group="query/filters" label={ __( 'Filters' ) } />
+		<InspectorControls group="advanced">
 				<HTMLElementControl
 					tagName={ TagName }
 					onChange={ ( value ) =>

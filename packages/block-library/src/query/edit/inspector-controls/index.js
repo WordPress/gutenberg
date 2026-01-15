@@ -6,7 +6,6 @@ import {
 	SelectControl,
 	Notice,
 	__experimentalVStack as VStack,
-	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
@@ -16,6 +15,7 @@ import { store as coreStore } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
 import { debounce } from '@wordpress/compose';
 import { useState, useMemo } from '@wordpress/element';
+import { InspectorControls } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -37,7 +37,6 @@ import {
 	useTaxonomies,
 	useOrderByOptions,
 } from '../../utils';
-import { useToolsPanelDropdownMenuProps } from '../../../utils/hooks';
 
 export default function QueryInspectorControls( props ) {
 	const { attributes, setQuery, isSingular } = props;
@@ -177,7 +176,6 @@ export default function QueryInspectorControls( props ) {
 		showSearchControl ||
 		showParentControl ||
 		showFormatControl;
-	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
 	const showPostCountControl = isControlAllowed(
 		allowedControls,
@@ -196,18 +194,15 @@ export default function QueryInspectorControls( props ) {
 	return (
 		<>
 			{ showSettingsPanel && (
-				<ToolsPanel
-					label={ __( 'Settings' ) }
-					resetAll={ () => {
-						setQuery( {
-							postType: 'post',
-							order: 'desc',
-							orderBy: 'date',
-							sticky: '',
-							inherit: true,
-						} );
-					} }
-					dropdownMenuProps={ dropdownMenuProps }
+				<InspectorControls
+					group="settings"
+					resetAllFilter={ () => ( {
+						postType: 'post',
+						order: 'desc',
+						orderBy: 'date',
+						sticky: '',
+						inherit: true,
+					} ) }
 				>
 					{ showInheritControl && (
 						<ToolsPanelItem
@@ -330,22 +325,18 @@ export default function QueryInspectorControls( props ) {
 									setQuery( { sticky: value } )
 								}
 							/>
-						</ToolsPanelItem>
-					) }
-				</ToolsPanel>
-			) }
-			{ ! inherit && showDisplayPanel && (
-				<ToolsPanel
-					className="block-library-query-toolspanel__display"
-					label={ __( 'Display' ) }
-					resetAll={ () => {
-						setQuery( {
-							offset: 0,
-							pages: 0,
-						} );
-					} }
-					dropdownMenuProps={ dropdownMenuProps }
-				>
+					</ToolsPanelItem>
+				) }
+			</InspectorControls>
+		) }
+		{ ! inherit && showDisplayPanel && (
+			<InspectorControls
+				group="display"
+				resetAllFilter={ () => ( {
+					offset: 0,
+					pages: 0,
+				} ) }
+			>
 					<ToolsPanelItem
 						label={ __( 'Items per page' ) }
 						hasValue={ () => perPage > 0 }
@@ -371,26 +362,24 @@ export default function QueryInspectorControls( props ) {
 						hasValue={ () => pages > 0 }
 						onDeselect={ () => setQuery( { pages: 0 } ) }
 					>
-						<PagesControl pages={ pages } onChange={ setQuery } />
-					</ToolsPanelItem>
-				</ToolsPanel>
-			) }
-			{ ! inherit && showFiltersPanel && (
-				<ToolsPanel
-					className="block-library-query-toolspanel__filters" // unused but kept for backward compatibility
-					label={ __( 'Filters' ) }
-					resetAll={ () => {
-						setQuery( {
-							author: '',
-							parents: [],
-							search: '',
-							taxQuery: null,
-							format: [],
-						} );
-						setQuerySearch( '' );
-					} }
-					dropdownMenuProps={ dropdownMenuProps }
-				>
+					<PagesControl pages={ pages } onChange={ setQuery } />
+				</ToolsPanelItem>
+			</InspectorControls>
+		) }
+		{ ! inherit && showFiltersPanel && (
+			<InspectorControls
+				group="query/filters"
+				resetAllFilter={ () => {
+					setQuerySearch( '' );
+					return {
+						author: '',
+						parents: [],
+						search: '',
+						taxQuery: null,
+						format: [],
+					};
+				} }
+			>
 					{ showTaxControl && (
 						<ToolsPanelItem
 							label={ __( 'Taxonomies' ) }
@@ -465,10 +454,10 @@ export default function QueryInspectorControls( props ) {
 								onChange={ setQuery }
 								query={ query }
 							/>
-						</ToolsPanelItem>
-					) }
-				</ToolsPanel>
-			) }
-		</>
-	);
+					</ToolsPanelItem>
+				) }
+			</InspectorControls>
+		) }
+	</>
+);
 }
