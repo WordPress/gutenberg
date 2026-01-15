@@ -43,9 +43,12 @@
 	"types": "build-types",
 	"sideEffects": false,
 	"dependencies": {
+		"@types/diff": "7.0.2",
 		"@wordpress/hooks": "file:../hooks",
 		"@wordpress/undo-manager": "file:../undo-manager",
 		"@wordpress/url": "file:../url",
+		"diff": "4.0.2",
+		"fast-deep-equal": "3.1.3",
 		"lib0": "^0.2.42",
 		"y-protocols": "^1.0.5",
 		"yjs": "~13.6.6"

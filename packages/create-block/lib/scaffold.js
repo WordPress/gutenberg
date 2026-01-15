@@ -1,8 +1,8 @@
 /**
  * External dependencies
  */
-const { pascalCase, snakeCase } = require( 'change-case' );
 const { join } = require( 'path' );
+const { pascalCase, snakeCase } = require( 'change-case' );
 
 /**
  * Internal dependencies
@@ -16,7 +16,12 @@ const { writeOutputAsset, writeOutputTemplate } = require( './output' );
 const { getOutputTemplates, getOutputAssets } = require( './templates' );
 
 module.exports = async (
-	{ blockOutputTemplates, pluginOutputTemplates, outputAssets },
+	{
+		blockOutputTemplates,
+		pluginOutputTemplates,
+		outputAssets,
+		variantTemplates,
+	},
 	{
 		$schema,
 		apiVersion,
@@ -59,6 +64,7 @@ module.exports = async (
 		customBlockJSON,
 		example,
 		transformer,
+		variant,
 		pluginTemplatesPath: variantPluginTemplatesPath,
 		blockTemplatesPath: variantBlockTemplatesPath,
 		assetsPath: variantAssetsPath,
@@ -118,29 +124,49 @@ module.exports = async (
 		...variantVars,
 	};
 
-	// Check for the pluginTemplates path in the variant
-	if ( variantPluginTemplatesPath === null ) {
-		pluginOutputTemplates = {};
-	} else if ( variantPluginTemplatesPath ) {
-		pluginOutputTemplates = await getOutputTemplates(
-			variantPluginTemplatesPath
-		);
-	}
+	// Check for variant-specific templates
+	// If the variant has pre-processed templates, use them; otherwise fall back to path-based loading
+	if ( variant && variantTemplates && variantTemplates[ variant ] ) {
+		const variantTemplate = variantTemplates[ variant ];
 
-	// Check for the blockTemplatesPath path in the variant
-	if ( variantBlockTemplatesPath === null ) {
-		blockOutputTemplates = {};
-	} else if ( variantBlockTemplatesPath ) {
-		blockOutputTemplates = await getOutputTemplates(
-			variantBlockTemplatesPath
-		);
-	}
+		// null = use default from main template, {} or object = use variant's templates
+		if ( variantTemplate.pluginOutputTemplates !== null ) {
+			pluginOutputTemplates = variantTemplate.pluginOutputTemplates;
+		}
 
-	// Check for the assetsPath
-	if ( variantAssetsPath === null ) {
-		outputAssets = {};
-	} else if ( variantAssetsPath ) {
-		outputAssets = await getOutputAssets( variantAssetsPath );
+		if ( variantTemplate.blockOutputTemplates !== null ) {
+			blockOutputTemplates = variantTemplate.blockOutputTemplates;
+		}
+
+		if ( variantTemplate.outputAssets !== null ) {
+			outputAssets = variantTemplate.outputAssets;
+		}
+	} else {
+		// Fallback: legacy path-based loading for backward compatibility
+		// Check for the pluginTemplates path in the variant
+		if ( variantPluginTemplatesPath === null ) {
+			pluginOutputTemplates = {};
+		} else if ( variantPluginTemplatesPath ) {
+			pluginOutputTemplates = await getOutputTemplates(
+				variantPluginTemplatesPath
+			);
+		}
+
+		// Check for the blockTemplatesPath path in the variant
+		if ( variantBlockTemplatesPath === null ) {
+			blockOutputTemplates = {};
+		} else if ( variantBlockTemplatesPath ) {
+			blockOutputTemplates = await getOutputTemplates(
+				variantBlockTemplatesPath
+			);
+		}
+
+		// Check for the assetsPath
+		if ( variantAssetsPath === null ) {
+			outputAssets = {};
+		} else if ( variantAssetsPath ) {
+			outputAssets = await getOutputAssets( variantAssetsPath );
+		}
 	}
 
 	if ( ! plugin && Object.keys( blockOutputTemplates ) < 1 ) {
