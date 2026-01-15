@@ -17,7 +17,7 @@ import {
 	mayDisplayControlsKey,
 	mayDisplayPatternEditingControlsKey,
 } from '../block-edit/context';
-import groups from './groups';
+import { getGroup } from './groups';
 
 export default function InspectorControlsFill( {
 	children,
@@ -38,7 +38,8 @@ export default function InspectorControlsFill( {
 	}
 
 	const context = useBlockEditContext();
-	const Fill = groups[ group ]?.Fill;
+	const slotFill = getGroup( group );
+	const Fill = slotFill?.Fill;
 	if ( ! Fill ) {
 		warning( `Unknown InspectorControls group "${ group }" provided.` );
 		return null;

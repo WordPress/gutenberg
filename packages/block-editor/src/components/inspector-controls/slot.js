@@ -10,7 +10,7 @@ import deprecated from '@wordpress/deprecated';
  */
 import BlockSupportToolsPanel from './block-support-tools-panel';
 import BlockSupportSlotContainer from './block-support-slot-container';
-import groups from './groups';
+import { getGroup } from './groups';
 
 export default function InspectorControlsSlot( {
 	__experimentalGroup,
@@ -30,7 +30,7 @@ export default function InspectorControlsSlot( {
 		);
 		group = __experimentalGroup;
 	}
-	const slotFill = groups[ group ];
+	const slotFill = getGroup( group );
 	const fills = useSlotFills( slotFill?.name );
 
 	if ( ! slotFill ) {

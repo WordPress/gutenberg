@@ -47,6 +47,31 @@ const groups = {
 	typography: InspectorControlsTypography,
 };
 
+/**
+ * Gets or creates a SlotFill for the given group name.
+ * Supports namespaced groups (e.g., 'query/filters') by dynamically creating SlotFills.
+ *
+ * @param {string} groupName The group name.
+ * @return {Object|null} The SlotFill object or null if invalid.
+ */
+export function getGroup( groupName ) {
+	if ( groups[ groupName ] ) {
+		return groups[ groupName ];
+	}
+
+	// Support namespaced groups for block-specific panels
+	if ( groupName && groupName.includes( '/' ) ) {
+		if ( ! groups[ groupName ] ) {
+			groups[ groupName ] = createSlotFill(
+				`InspectorControls/${ groupName }`
+			);
+		}
+		return groups[ groupName ];
+	}
+
+	return null;
+}
+
 export default groups;
 
 // Private slot for allowed blocks control UI.
