@@ -25,6 +25,7 @@ export interface QueueItem {
 	sourceUrl?: string;
 	sourceAttachmentId?: number;
 	abortController?: AbortController;
+	parentId?: QueueItemId;
 }
 
 export interface State {
@@ -129,9 +130,31 @@ interface UploadMediaArgs {
 	signal?: AbortSignal;
 }
 
+export interface SideloadMediaArgs {
+	// File to sideload.
+	file: File;
+	// Attachment ID to sideload to.
+	attachmentId: number;
+	// Additional data to include in the request.
+	additionalData?: AdditionalData;
+	// Function called when an error happens.
+	onError?: OnErrorHandler;
+	// Function called each time a file or a temporary representation of the file is available.
+	onFileChange?: OnChangeHandler;
+	// Abort signal.
+	signal?: AbortSignal;
+}
+
 export interface Settings {
+	// Registered image sizes from the server.
+	allImageSizes?: Record<
+		string,
+		{ width: number; height: number; crop: boolean }
+	>;
 	// Function for uploading files to the server.
 	mediaUpload: ( args: UploadMediaArgs ) => void;
+	// Function for sideloading files to existing attachments.
+	mediaSideload?: ( args: SideloadMediaArgs ) => void;
 	// List of allowed mime types and file extensions.
 	allowedMimeTypes?: Record< string, string > | null;
 	// Maximum upload file size.
@@ -153,6 +176,7 @@ export interface Attachment {
 	mime_type: string;
 	featured_media?: number;
 	missing_image_sizes?: string[];
+	media_filename?: string;
 	poster?: string;
 }
 
@@ -172,9 +196,22 @@ export enum ItemStatus {
 export enum OperationType {
 	Prepare = 'PREPARE',
 	Upload = 'UPLOAD',
+	ResizeCrop = 'RESIZE_CROP',
+	ThumbnailGeneration = 'THUMBNAIL_GENERATION',
 }
 
-export interface OperationArgs {}
+export interface ImageSizeCrop {
+	width: number;
+	height: number;
+	crop?:
+		| boolean
+		| [ 'left' | 'center' | 'right', 'top' | 'center' | 'bottom' ];
+	name?: string;
+}
+
+export interface OperationArgs {
+	[ OperationType.ResizeCrop ]: { resize: ImageSizeCrop };
+}
 
 type OperationWithArgs< T extends keyof OperationArgs = keyof OperationArgs > =
 	[ T, OperationArgs[ T ] ];
@@ -183,12 +220,9 @@ export type Operation = OperationType | OperationWithArgs;
 
 export type AdditionalData = Record< string, unknown >;
 
-export type ImageFormat = 'jpeg' | 'webp' | 'avif' | 'png' | 'gif';
-
-export interface ImageSizeCrop {
-	width: number;
-	height: number;
-	crop?:
-		| boolean
-		| [ 'left' | 'center' | 'right', 'top' | 'center' | 'bottom' ];
+export interface SideloadAdditionalData extends AdditionalData {
+	post: number;
+	image_size: string;
 }
+
+export type ImageFormat = 'jpeg' | 'webp' | 'avif' | 'png' | 'gif';
