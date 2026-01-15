@@ -3,6 +3,7 @@
  */
 import { Spinner } from '@wordpress/components';
 import { useState } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -79,7 +80,7 @@ function MediaPreviewContent( {
 						rel="noopener noreferrer"
 						className="media-editor-preview__download-link"
 					>
-						View file
+						{ __( 'View file' ) }
 					</a>
 				</div>
 			);
