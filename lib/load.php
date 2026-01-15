@@ -96,6 +96,7 @@ require __DIR__ . '/compat/plugin/fonts.php';
 
 // WordPress 6.9 compat.
 require __DIR__ . '/compat/wordpress-6.9/customizer-preview-custom-css.php';
+require __DIR__ . '/compat/wordpress-6.9/custom-head-code.php';
 require __DIR__ . '/compat/wordpress-6.9/command-palette.php';
 require __DIR__ . '/compat/wordpress-6.9/client-assets.php';
 

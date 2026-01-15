@@ -14,11 +14,11 @@ import { store as coreStore } from '@wordpress/core-data';
 import { useGlobalStyles } from './hooks';
 
 /**
- * Action menu with Reset, Welcome Guide, and Additional CSS.
+ * Action menu with Reset, Welcome Guide, Additional CSS, and Custom Head Code.
  *
  * @param {Object}   props                  Component props.
  * @param {boolean}  props.hideWelcomeGuide Whether to hide the Welcome Guide option.
- * @param {Function} props.onChangePath     Callback for navigation to different paths (e.g., '/css').
+ * @param {Function} props.onChangePath     Callback for navigation to different paths (e.g., '/css', '/head-code').
  * @return {JSX.Element} The Global Styles Action Menu component.
  */
 export function GlobalStylesActionMenu( {
@@ -38,7 +38,7 @@ export function GlobalStylesActionMenu( {
 		setUser( { styles: {}, settings: {} } );
 	};
 	const { toggle } = useDispatch( preferencesStore );
-	const { canEditCSS } = useSelect( ( select ) => {
+	const { canEditCSS, canEditHeadCode } = useSelect( ( select ) => {
 		const { getEntityRecord, __experimentalGetCurrentGlobalStylesId } =
 			select( coreStore );
 
@@ -49,10 +49,15 @@ export function GlobalStylesActionMenu( {
 
 		return {
 			canEditCSS: !! globalStyles?._links?.[ 'wp:action-edit-css' ],
+			canEditHeadCode:
+				!! globalStyles?._links?.[ 'wp:action-edit-head-code' ],
 		};
 	}, [] );
 	const loadCustomCSS = () => {
 		onChangePath( '/css' );
+	};
+	const loadCustomHeadCode = () => {
+		onChangePath( '/head-code' );
 	};
 
 	return (
@@ -67,6 +72,11 @@ export function GlobalStylesActionMenu( {
 						{ canEditCSS && (
 							<MenuItem onClick={ loadCustomCSS }>
 								{ __( 'Additional CSS' ) }
+							</MenuItem>
+						) }
+						{ canEditHeadCode && (
+							<MenuItem onClick={ loadCustomHeadCode }>
+								{ __( 'Custom Head Code' ) }
 							</MenuItem>
 						) }
 						{ ! hideWelcomeGuide && (

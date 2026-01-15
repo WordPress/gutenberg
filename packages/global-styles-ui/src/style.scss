@@ -270,3 +270,15 @@
 .global-styles-ui-gradient-palette-panel {
 	padding: variables.$grid-unit-20;
 }
+
+/* Custom Head Code Screen Styles */
+.global-styles-ui-screen-head-code {
+	display: flex;
+	flex: 1 1 auto;
+	flex-direction: column;
+	margin: 16px;
+}
+
+.global-styles-ui-screen-head-code__textarea {
+	font-family: monospace;
+}
