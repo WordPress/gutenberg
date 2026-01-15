@@ -25,10 +25,6 @@ describe( 'Button', () => {
 
 		const onClickMock = jest.fn();
 		render(
-			// Disabling because this lint rule was meant for the
-			// `@wordpress/components` Button, but is being applied here.
-			// TODO: rework the lint rule so that it checks the package
-			// where the Button comes from.
 			<Button disabled onClick={ onClickMock }>
 				Click me
 			</Button>
@@ -56,7 +52,6 @@ describe( 'Button', () => {
 
 	it( 'can be enabled explicitly when loading', () => {
 		render(
-			// TODO: Additional improvement in the original lint rule: only error if disabled=true?
 			<Button loading disabled={ false }>
 				Click me
 			</Button>
