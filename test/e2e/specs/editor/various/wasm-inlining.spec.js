@@ -30,7 +30,7 @@ test.describe( 'WASM Inlining (build verification)', () => {
 		buildContent = fs.readFileSync( buildModulePath, 'utf8' );
 	} );
 
-	test( 'should inline vips.wasm as base64 data URL', async () => {
+	test( 'should inline vips.wasm as base64 data URL', () => {
 		// Verify the main vips.wasm is inlined
 		// Variable name: vips_default (from wasm-vips/vips.wasm)
 		expect( buildContent ).toMatch(
@@ -38,7 +38,7 @@ test.describe( 'WASM Inlining (build verification)', () => {
 		);
 	} );
 
-	test( 'should inline vips-heif.wasm as base64 data URL', async () => {
+	test( 'should inline vips-heif.wasm as base64 data URL', () => {
 		// Verify vips-heif.wasm is inlined
 		// Variable name: vips_heif_default (from wasm-vips/vips-heif.wasm)
 		expect( buildContent ).toMatch(
@@ -46,7 +46,7 @@ test.describe( 'WASM Inlining (build verification)', () => {
 		);
 	} );
 
-	test( 'should inline vips-jxl.wasm as base64 data URL', async () => {
+	test( 'should inline vips-jxl.wasm as base64 data URL', () => {
 		// Verify vips-jxl.wasm is inlined
 		// Variable name: vips_jxl_default (from wasm-vips/vips-jxl.wasm)
 		expect( buildContent ).toMatch(
@@ -54,7 +54,7 @@ test.describe( 'WASM Inlining (build verification)', () => {
 		);
 	} );
 
-	test( 'should have substantial inlined WASM data', async () => {
+	test( 'should have substantial inlined WASM data', () => {
 		// The inlined WASM should be large (original files are several MB)
 		// This ensures we're actually inlining the full WASM, not just a stub
 		// The built file should be at least 10MB due to the inlined WASM
