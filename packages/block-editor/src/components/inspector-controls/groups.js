@@ -15,7 +15,10 @@ const InspectorControlsFilter = createSlotFill( 'InspectorControlsFilter' );
 const InspectorControlsDimensions = createSlotFill(
 	'InspectorControlsDimensions'
 );
+const InspectorControlsDisplay = createSlotFill( 'InspectorControlsDisplay' );
+const InspectorControlsMedia = createSlotFill( 'InspectorControlsMedia' );
 const InspectorControlsPosition = createSlotFill( 'InspectorControlsPosition' );
+const InspectorControlsSettings = createSlotFill( 'InspectorControlsSettings' );
 const InspectorControlsTypography = createSlotFill(
 	'InspectorControlsTypography'
 );
@@ -33,11 +36,13 @@ const groups = {
 	color: InspectorControlsColor,
 	content: InspectorControlsContent,
 	dimensions: InspectorControlsDimensions,
+	display: InspectorControlsDisplay,
 	effects: InspectorControlsEffects,
 	filter: InspectorControlsFilter,
 	list: InspectorControlsListView,
+	media: InspectorControlsMedia,
 	position: InspectorControlsPosition,
-	settings: InspectorControlsDefault, // Alias for default.
+	settings: InspectorControlsSettings,
 	styles: InspectorControlsStyles,
 	typography: InspectorControlsTypography,
 };
