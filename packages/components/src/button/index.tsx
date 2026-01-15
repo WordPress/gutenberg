@@ -25,11 +25,13 @@ import Icon from '../icon';
 import { VisuallyHidden } from '../visually-hidden';
 import type { ButtonProps, DeprecatedButtonProps } from './types';
 import { positionToPlacement } from '../popover/utils';
+import { maybeWarnDeprecated36pxSize } from '../utils/deprecated-36px-size';
 
 const disabledEventsOnDisabledButton = [ 'onMouseDown', 'onClick' ] as const;
 
 function useDeprecatedProps( {
 	__experimentalIsFocusable,
+	__shouldNotWarnDeprecated36pxSize,
 	isDefault,
 	isPrimary,
 	isSecondary,
@@ -79,6 +81,15 @@ function useDeprecatedProps( {
 
 	if ( isLink ) {
 		computedVariant ??= 'link';
+	}
+
+	if ( computedVariant !== 'link' ) {
+		maybeWarnDeprecated36pxSize( {
+			componentName: 'Button',
+			size: computedSize,
+			__next40pxDefaultSize: otherProps.__next40pxDefaultSize,
+			__shouldNotWarnDeprecated36pxSize,
+		} );
 	}
 
 	return {
@@ -293,10 +304,11 @@ export function UnforwardedButton(
  *
  * ```jsx
  * import { Button } from '@wordpress/components';
- * const Mybutton = () => (
+ * const MyButton = () => (
  *   <Button
  *     variant="primary"
  *     onClick={ handleClick }
+ *     __next40pxDefaultSize
  *   >
  *     Click here
  *   </Button>

@@ -63,6 +63,7 @@ const Template: StoryFn< typeof Button > = ( props ) => {
 export const Default = Template.bind( {} );
 Default.args = {
 	children: 'Code is poetry',
+	__next40pxDefaultSize: true,
 };
 
 /**
@@ -113,10 +114,14 @@ IsDestructive.args = {
 	isDestructive: true,
 };
 
+/**
+ * In most cases, the `"compact"` size should be used for icon buttons.
+ */
 export const Icon = Template.bind( {} );
 Icon.args = {
 	label: 'Code is poetry',
 	icon: 'wordpress',
+	size: 'compact',
 };
 
 export const GroupedIcons = () => {
@@ -126,9 +131,9 @@ export const GroupedIcons = () => {
 
 	return (
 		<GroupContainer>
-			<Button icon={ formatBold } label="Bold" />
-			<Button icon={ formatItalic } label="Italic" />
-			<Button icon={ link } label="Link" />
+			<Button size="compact" icon={ formatBold } label="Bold" />
+			<Button size="compact" icon={ formatItalic } label="Italic" />
+			<Button size="compact" icon={ link } label="Link" />
 		</GroupContainer>
 	);
 };

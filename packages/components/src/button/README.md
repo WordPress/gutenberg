@@ -8,10 +8,11 @@ Lets users take actions and make choices with a single click or tap.
 
 ```jsx
 import { Button } from '@wordpress/components';
-const Mybutton = () => (
+const MyButton = () => (
   <Button
     variant="primary"
     onClick={ handleClick }
+    __next40pxDefaultSize
   >
     Click here
   </Button>
