@@ -40,7 +40,7 @@ function gutenberg_block_bindings_post_data_get_value_for_featured_image( $value
 	}
 
 	if ( 'featured_media.url' === $source_args['field'] ) {
-		if ( 'core/cover' === $block_instance->name ) {
+		if ( 'core/cover' === $block_instance->name && isset( $block_instance->attributes['sizeSlug'] ) ) {
 			$size_slug = $block_instance->attributes['sizeSlug'];
 			return get_the_post_thumbnail_url( $post_id, $size_slug );
 		}
