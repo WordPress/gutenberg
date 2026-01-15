@@ -6,7 +6,13 @@ import type { Field, FieldValidity } from './field-api';
 /**
  * DataForm layouts.
  */
-export type LayoutType = 'regular' | 'panel' | 'card' | 'row' | 'details';
+export type LayoutType =
+	| 'regular'
+	| 'panel'
+	| 'card'
+	| 'row'
+	| 'details'
+	| 'two-columns';
 export type LabelPosition = 'top' | 'side' | 'none';
 
 export type PanelSummaryField = string | string[];
@@ -106,18 +112,27 @@ export type NormalizedDetailsLayout = {
 	summary: string;
 };
 
+export type TwoColumnsLayout = {
+	type: 'two-columns';
+};
+export type NormalizedTwoColumnsLayout = {
+	type: 'two-columns';
+};
+
 export type Layout =
 	| RegularLayout
 	| PanelLayout
 	| CardLayout
 	| RowLayout
-	| DetailsLayout;
+	| DetailsLayout
+	| TwoColumnsLayout;
 export type NormalizedLayout =
 	| NormalizedRegularLayout
 	| NormalizedPanelLayout
 	| NormalizedCardLayout
 	| NormalizedRowLayout
-	| NormalizedDetailsLayout;
+	| NormalizedDetailsLayout
+	| NormalizedTwoColumnsLayout;
 
 export type NormalizedSummaryField =
 	| NormalizedPanelSummaryField

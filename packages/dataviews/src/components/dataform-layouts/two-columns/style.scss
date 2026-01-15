@@ -1,0 +1,52 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/mixins" as *;
+
+.dataforms-layouts-two-columns__field {
+	display: flex;
+	flex-direction: column;
+	gap: $grid-unit-20;
+	width: 100%;
+
+	@include break-medium() {
+		flex-direction: row;
+		gap: $grid-unit-30;
+		align-items: flex-start;
+	}
+}
+
+.dataforms-layouts-two-columns__left {
+	display: flex;
+	flex-direction: column;
+	gap: $grid-unit-10;
+	width: 100%;
+
+	@include break-medium() {
+		width: 40%;
+		flex-shrink: 0;
+	}
+}
+
+.dataforms-layouts-two-columns__right {
+	width: 100%;
+
+	@include break-medium() {
+		width: 60%;
+		flex: 1;
+	}
+}
+
+.dataforms-layouts-two-columns__description {
+	color: $gray-700;
+	display: block;
+	font-size: $font-size-medium;
+	line-height: 1.5;
+}
+
+.dataforms-layouts-two-columns__card {
+	width: 100%;
+}
+
+.dataforms-layouts-two-columns__card-body {
+	width: 100%;
+}
