@@ -207,7 +207,7 @@ function Header( {
 					/>
 				) }
 				{ customSaveButton }
-				<MoreMenu />
+				{ ! isAttachment && <MoreMenu /> }
 			</motion.div>
 		</div>
 	);
