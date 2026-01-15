@@ -15,7 +15,7 @@ require_once __DIR__ . '/init.php';
 require_once __DIR__ . '/upgrade.php';
 
 // Load auto-generated build registration.
-$build_registration = plugin_dir_path( __DIR__ ) . 'build/index.php';
+$build_registration = plugin_dir_path( __DIR__ ) . 'build/build.php';
 if ( file_exists( $build_registration ) ) {
 	require_once $build_registration;
 }
@@ -82,6 +82,7 @@ if ( ! class_exists( 'Gutenberg_HTTP_Singling_Server' ) ) {
 	require_once __DIR__ . '/experimental/sync/class-gutenberg-http-signaling-server.php';
 }
 
+require_once __DIR__ . '/remove-core-enqueue-scripts.php';
 require_once __DIR__ . '/experimental/editor-settings.php';
 require_once __DIR__ . '/experimental/rest-api-overrides.php';
 

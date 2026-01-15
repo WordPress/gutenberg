@@ -11,8 +11,8 @@ if ( ! function_exists( '{{PREFIX}}_register_script_modules' ) ) {
 	 * Register all script modules.
 	 */
 	function {{PREFIX}}_register_script_modules() {
-		$modules_dir = __DIR__ . '/modules';
-		$modules_file = $modules_dir . '/index.php';
+		$modules_dir  = __DIR__ . '/modules';
+		$modules_file = $modules_dir . '/registry.php';
 
 		if ( ! file_exists( $modules_file ) ) {
 			return;
