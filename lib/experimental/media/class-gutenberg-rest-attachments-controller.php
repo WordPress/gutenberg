@@ -113,7 +113,8 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 	/**
 	 * Prepares a single attachment output for response.
 	 *
-	 * Ensures 'missing_image_sizes' is set for PDFs and not just images.
+	 * Ensures 'missing_image_sizes' is set for images and PDFs when
+	 * server-side sub-size generation is disabled.
 	 *
 	 * @param WP_Post         $item    Attachment object.
 	 * @param WP_REST_Request $request Request object.
@@ -133,7 +134,7 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 			)
 		);
 
-		// Handle missing image sizes for PDFs.
+		// Handle missing image sizes for images and PDFs.
 
 		$fields = $this->get_fields_for_response( $request );
 
@@ -142,8 +143,10 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 			empty( $data['missing_image_sizes'] )
 		) {
 			$mime_type = get_post_mime_type( $item );
+			$is_pdf    = 'application/pdf' === $mime_type;
+			$is_image  = wp_attachment_is_image( $item );
 
-			if ( 'application/pdf' === $mime_type ) {
+			if ( $is_pdf || $is_image ) {
 				$metadata = wp_get_attachment_metadata( $item->ID, true );
 
 				if ( ! is_array( $metadata ) ) {
@@ -151,32 +154,35 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 				}
 
 				$metadata['sizes'] = $metadata['sizes'] ?? array();
+				$existing_sizes    = array_keys( $metadata['sizes'] );
+				$registered_sizes  = wp_get_registered_image_subsizes();
 
-				$fallback_sizes = array(
-					'thumbnail',
-					'medium',
-					'large',
-				);
+				if ( $is_pdf ) {
+					// The filter might have been added by ::create_item().
+					remove_filter( 'fallback_intermediate_image_sizes', '__return_empty_array', 100 );
 
-				// The filter might have been added by ::create_item().
-				remove_filter( 'fallback_intermediate_image_sizes', '__return_empty_array', 100 );
+					/** This filter is documented in wp-admin/includes/image.php */
+					$fallback_sizes = apply_filters( 'fallback_intermediate_image_sizes', array( 'thumbnail', 'medium', 'large' ), $metadata ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+					$possible_sizes = array_keys( array_intersect_key( $registered_sizes, array_flip( $fallback_sizes ) ) );
+				} else {
+					// The filter might have been added by ::create_item().
+					remove_filter( 'intermediate_image_sizes_advanced', '__return_empty_array', 100 );
 
-				/** This filter is documented in wp-admin/includes/image.php */
-				$fallback_sizes = apply_filters( 'fallback_intermediate_image_sizes', $fallback_sizes, $metadata ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+					$possible_sizes   = array_keys( $registered_sizes );
+					$existing_sizes[] = 'full';
+				}
 
-				$registered_sizes = wp_get_registered_image_subsizes();
-				$merged_sizes     = array_keys( array_intersect_key( $registered_sizes, array_flip( $fallback_sizes ) ) );
-
-				$missing_image_sizes         = array_diff( $merged_sizes, array_keys( $metadata['sizes'] ) );
+				$missing_image_sizes         = array_values( array_diff( $possible_sizes, $existing_sizes ) );
 				$data['missing_image_sizes'] = $missing_image_sizes;
+
 				$this->debug_log(
-					'prepare_item_for_response: Computed missing_image_sizes for PDF',
+					'prepare_item_for_response: Computed missing_image_sizes',
 					array(
 						'attachment_id'       => $item->ID,
-						'fallback_sizes'      => $fallback_sizes,
+						'mime_type'           => $mime_type,
 						'existing_sizes'      => array_keys( $metadata['sizes'] ),
-						'missing_image_sizes' => array_values( $missing_image_sizes ),
-						'registered_sizes'    => $registered_sizes,
+						'missing_image_sizes' => $missing_image_sizes,
+						'registered_sizes'    => array_keys( $registered_sizes ),
 					)
 				);
 			}
