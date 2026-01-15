@@ -5,8 +5,13 @@ import type { StorybookConfig } from '@storybook/react-vite';
 const { NODE_ENV = 'development' } = process.env;
 
 const stories = [
-	NODE_ENV !== 'test' ? './stories/**/*.story.@(jsx|tsx)' : '',
-	NODE_ENV !== 'test' ? './stories/**/*.mdx' : '',
+	// Smoke tests ensure that the stories are rendered without any errors, but
+	// we don't need to test everything:
+	// - `.mdx` documentation is generally plain text and unlikely to break.
+	// - Playground stories are complex renderings of many components, which is
+	//   both slow and redundant with individual component stories.
+	NODE_ENV === 'test' ? '' : './stories/playground/**/*.story.@(jsx|tsx)',
+	NODE_ENV === 'test' ? '' : './stories/**/*.mdx',
 	'../packages/block-editor/src/**/stories/*.story.@(js|jsx|tsx|mdx)',
 	'../packages/components/src/**/stories/*.story.@(jsx|tsx)',
 	'../packages/components/src/**/stories/*.mdx',
