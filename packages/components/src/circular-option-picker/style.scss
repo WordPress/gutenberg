@@ -86,9 +86,22 @@ $color-palette-circle-spacing: 12px;
 
 	cursor: pointer;
 
+	// In Windows High Contrast mode (forced-colors), box-shadow is ignored.
+	// Use background-color instead to ensure colors are visible.
+	// See https://blogs.windows.com/msedgedev/2020/09/17/styling-for-windows-high-contrast-with-new-standards-for-forced-colors/
+	@media ( forced-colors: active ) {
+		background-color: currentColor;
+		box-shadow: none;
+	}
+
 	&:hover {
 		// Override default button hover style.
 		box-shadow: inset 0 0 0 ($color-palette-circle-size * 0.5) !important;
+
+		@media ( forced-colors: active ) {
+			background-color: currentColor;
+			box-shadow: none;
+		}
 	}
 
 	&[aria-pressed="true"],
@@ -97,6 +110,14 @@ $color-palette-circle-spacing: 12px;
 		position: relative;
 		z-index: z-index(".components-circular-option-picker__option.is-pressed");
 		overflow: visible;
+
+		@media ( forced-colors: active ) {
+			// In forced-colors mode, show a thicker border to indicate selection
+			// since we can't use the inset box-shadow.
+			outline: 3px solid ButtonText;
+			outline-offset: -3px;
+			box-shadow: none;
+		}
 
 		& + svg {
 			position: absolute;

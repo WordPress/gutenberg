@@ -42,6 +42,7 @@
 
 ### Bug Fixes
 
+-   `CircularOptionPicker`: Fix color picker visibility in Windows High Contrast mode by using system colors instead of box-shadow. ([#74649](https://github.com/WordPress/gutenberg/pull/74649))
 -   `Modal`: Fix vertical scroll issue by reducing style specificity to allow overrides. ([#73739](https://github.com/WordPress/gutenberg/pull/73739))
 -   `Notice`: Fix notice component spacing issue when actions are present. ([#69430](https://github.com/WordPress/gutenberg/pull/69430))
 -   `DatePicker`: Fix missing scheduled events and current date indicators. ([#73887](https://github.com/WordPress/gutenberg/pull/73887))
