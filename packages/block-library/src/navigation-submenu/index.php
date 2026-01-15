@@ -107,8 +107,8 @@ function render_block_core_navigation_submenu( $attributes, $content, $block ) {
 	$show_submenu_indicators = isset( $block->context['showSubmenuIcon'] ) && $block->context['showSubmenuIcon'];
 	$submenu_visibility      = isset( $block->context['submenuVisibility'] ) ? $block->context['submenuVisibility'] : null;
 	// For backward compatibility, fall back to openSubmenusOnClick if submenuVisibility is not set
-	$open_on_click           = $submenu_visibility === 'click' || ( ! $submenu_visibility && isset( $block->context['openSubmenusOnClick'] ) && $block->context['openSubmenusOnClick'] );
-	$open_on_hover           = $submenu_visibility === 'hover' || ( ! $submenu_visibility && ( ! isset( $block->context['openSubmenusOnClick'] ) || ! $block->context['openSubmenusOnClick'] ) );
+	$open_on_click           = 'click' === $submenu_visibility || ( ! $submenu_visibility && isset( $block->context['openSubmenusOnClick'] ) && $block->context['openSubmenusOnClick'] );
+	$open_on_hover           = 'hover' === $submenu_visibility || ( ! $submenu_visibility && ( ! isset( $block->context['openSubmenusOnClick'] ) || ! $block->context['openSubmenusOnClick'] ) );
 	$open_on_hover_and_click = $open_on_hover && $show_submenu_indicators;
 
 	$classes = array(
@@ -127,7 +127,7 @@ function render_block_core_navigation_submenu( $attributes, $content, $block ) {
 	if ( $open_on_hover_and_click ) {
 		$classes[] = 'open-on-hover-click';
 	}
-	if ( $submenu_visibility === 'always' ) {
+	if ( 'always' === $submenu_visibility ) {
 		$classes[] = 'open-on-always';
 	}
 	if ( $is_active ) {
