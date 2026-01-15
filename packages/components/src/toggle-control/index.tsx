@@ -28,6 +28,7 @@ function UnforwardedToggleControl(
 		className,
 		onChange,
 		disabled,
+		togglePosition = 'start',
 	}: WordPressComponentProps< ToggleControlProps, 'input', false >,
 	ref: ForwardedRef< HTMLInputElement >
 ) {
@@ -54,36 +55,59 @@ function UnforwardedToggleControl(
 		}
 	}
 
+	const toggle = (
+		<FormToggle
+			id={ id }
+			checked={ checked }
+			onChange={ onChangeToggle }
+			aria-describedby={ describedBy }
+			disabled={ disabled }
+			ref={ ref }
+		/>
+	);
+
+	const labelElement = (
+		<FlexBlock
+			as="label"
+			htmlFor={ id }
+			className={ clsx( 'components-toggle-control__label', {
+				'is-disabled': disabled,
+			} ) }
+		>
+			{ label }
+		</FlexBlock>
+	);
+
 	return (
 		<BaseControl
 			id={ id }
 			help={
 				helpLabel && (
-					<span className="components-toggle-control__help">
+					<span
+						className={ clsx( 'components-toggle-control__help', {
+							'is-toggle-end': togglePosition === 'end',
+						} ) }
+					>
 						{ helpLabel }
 					</span>
 				)
 			}
-			className={ clsx( 'components-toggle-control', className ) }
+			className={ clsx( 'components-toggle-control', className, {
+				'is-toggle-end': togglePosition === 'end',
+			} ) }
 		>
 			<HStack justify="flex-start" spacing={ 2 }>
-				<FormToggle
-					id={ id }
-					checked={ checked }
-					onChange={ onChangeToggle }
-					aria-describedby={ describedBy }
-					disabled={ disabled }
-					ref={ ref }
-				/>
-				<FlexBlock
-					as="label"
-					htmlFor={ id }
-					className={ clsx( 'components-toggle-control__label', {
-						'is-disabled': disabled,
-					} ) }
-				>
-					{ label }
-				</FlexBlock>
+				{ togglePosition === 'start' ? (
+					<>
+						{ toggle }
+						{ labelElement }
+					</>
+				) : (
+					<>
+						{ labelElement }
+						{ toggle }
+					</>
+				) }
 			</HStack>
 		</BaseControl>
 	);

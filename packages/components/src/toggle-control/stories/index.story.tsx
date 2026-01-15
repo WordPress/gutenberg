@@ -22,6 +22,10 @@ const meta: Meta< typeof ToggleControl > = {
 		help: { control: { type: 'text' } },
 		label: { control: { type: 'text' } },
 		onChange: { action: 'onChange' },
+		togglePosition: {
+			control: { type: 'radio' },
+			options: [ 'start', 'end' ],
+		},
 	},
 	parameters: {
 		controls: { expanded: true },
@@ -56,4 +60,17 @@ export const WithHelpText = Template.bind( {} );
 WithHelpText.args = {
 	...Default.args,
 	help: 'This is some help text.',
+};
+
+export const ToggleAtEnd = Template.bind( {} );
+ToggleAtEnd.args = {
+	...Default.args,
+	togglePosition: 'end',
+};
+
+export const ToggleAtEndWithHelpText = Template.bind( {} );
+ToggleAtEndWithHelpText.args = {
+	...Default.args,
+	help: 'This is some help text.',
+	togglePosition: 'end',
 };

@@ -50,4 +50,54 @@ describe( 'ToggleControl', () => {
 			).toBeInTheDocument();
 		} );
 	} );
+
+	describe( 'togglePosition', () => {
+		it( 'should render without error when togglePosition is "start"', () => {
+			render(
+				<ToggleControl
+					label="My toggle"
+					onChange={ () => {} }
+					togglePosition="start"
+				/>
+			);
+			expect(
+				screen.getByRole( 'checkbox', { name: 'My toggle' } )
+			).toBeInTheDocument();
+		} );
+
+		it( 'should render without error when togglePosition is "end"', () => {
+			render(
+				<ToggleControl
+					label="My toggle"
+					onChange={ () => {} }
+					togglePosition="end"
+				/>
+			);
+			expect(
+				screen.getByRole( 'checkbox', { name: 'My toggle' } )
+			).toBeInTheDocument();
+		} );
+
+		it( 'should render different markup for start vs end positions', () => {
+			const { container: containerStart } = render(
+				<ToggleControl
+					label="Position test"
+					onChange={ () => {} }
+					togglePosition="start"
+				/>
+			);
+
+			const { container: containerEnd } = render(
+				<ToggleControl
+					label="Position test"
+					onChange={ () => {} }
+					togglePosition="end"
+				/>
+			);
+
+			expect( containerStart.innerHTML ).not.toBe(
+				containerEnd.innerHTML
+			);
+		} );
+	} );
 } );

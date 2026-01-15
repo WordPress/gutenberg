@@ -12,4 +12,8 @@
 .components-toggle-control__help {
 	display: inline-block;
 	margin-inline-start: form-toggle.$toggle-width + $grid-unit-10;
+
+	&.is-toggle-end {
+		margin-inline-start: 0;
+	}
 }
