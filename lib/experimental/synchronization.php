@@ -9,11 +9,6 @@
  * Registers post meta for persisting CRDT documents.
  */
 function gutenberg_rest_api_crdt_post_meta() {
-	$gutenberg_experiments = get_option( 'gutenberg-experiments' );
-	if ( ! $gutenberg_experiments || ! array_key_exists( 'gutenberg-sync-collaboration', $gutenberg_experiments ) ) {
-		return;
-	}
-
 	// This string must match WORDPRESS_META_KEY_FOR_CRDT_DOC_PERSISTENCE in @wordpress/sync.
 	$persisted_crdt_post_meta_key = '_crdt_document';
 
