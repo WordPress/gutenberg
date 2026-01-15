@@ -260,16 +260,17 @@ $navigation-icon-size: 24px;
 
 		.wp-block-navigation-item {
 			justify-content: var(--navigation-layout-justify, initial);
-			padding: 0 2em;
+		}
+
+		.wp-block-navigation__submenu-container .wp-block-navigation-item__content {
+			// Allows for natural indenting of submenus for any level of nesting with any layout orientation.
+			padding-left: 2em;
+			padding-right: 2em;
 		}
 
 		> .wp-block-navigation-item__content,
 		.wp-block-navigation__submenu-container > .wp-block-navigation-item > .wp-block-navigation-item__content {
 			flex-grow: 0;
-		}
-
-		.wp-block-navigation__submenu-icon svg {
-			transform: rotate(0deg);
 		}
 
 		> .wp-block-navigation__submenu-container {
@@ -278,11 +279,18 @@ $navigation-icon-size: 24px;
 			opacity: 1;
 			position: static;
 			height: auto;
-			width: auto;
 			border: none;
 			background-color: transparent;
 			color: inherit;
 		}
+	}
+}
+
+.wp-block-navigation:has(.open-on-always) {
+	.wp-block-navigation__container,
+	.wp-block-navigation-item,
+	.wp-block-navigation__submenu-container {
+		width: 100%;
 	}
 }
 

@@ -11,40 +11,6 @@
 }
 
 /**
- * Submenus.
- */
-
-// Show submenus above the sibling inserter.
-.wp-block-navigation .has-child {
-	cursor: pointer;
-
-	.wp-block-navigation__submenu-container {
-		z-index: z-index(".has-child .wp-block-navigation__submenu-container");
-	}
-
-	&:hover {
-		.wp-block-navigation__submenu-container {
-			z-index: z-index(".has-child:hover .wp-block-navigation__submenu-container");
-		}
-	}
-
-	// Show on editor selected, even if on frontend it only stays open on focus-within.
-	&.is-selected,
-	&.has-child-selected {
-		> .wp-block-navigation__submenu-container {
-			// We use important here because if the parent block is selected and submenus are present, they should always be visible.
-			visibility: visible !important;
-			opacity: 1 !important;
-			min-width: 200px !important;
-			height: auto !important;
-			width: auto !important;
-			overflow: visible !important;
-		}
-	}
-}
-
-
-/**
  * Navigation Items.
  */
 

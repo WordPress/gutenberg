@@ -1,10 +1,16 @@
 @use "@wordpress/base-styles/mixins" as *;
 
-.wp-block-navigation-submenu {
+.wp-block-navigation-submenu:where(:not(.open-on-always)) {
 	display: block;
 
 	.wp-block-navigation__submenu-container {
-		z-index: 28;
+		z-index: z-index(".has-child .wp-block-navigation__submenu-container");
+	}
+
+	&:hover {
+		.wp-block-navigation__submenu-container {
+			z-index: z-index(".has-child:hover .wp-block-navigation__submenu-container");
+		}
 	}
 
 	// Show on editor selected, even if on frontend it only stays open on focus-within.
