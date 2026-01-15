@@ -833,6 +833,10 @@ export const getNodesWithStyles = (
 			const blockStyles = pickStyleKeys( node );
 			const typedNode = node as BlockNode;
 
+			// Store variation data for later processing, but don't add to nodes yet.
+			// Variations should be processed AFTER the main block styles to match PHP order.
+			const variationNodesToAdd: typeof nodes = [];
+
 			if ( typedNode?.variations ) {
 				const variations: Record< string, any > = {};
 				Object.entries( typedNode.variations ).forEach(
@@ -860,7 +864,7 @@ export const getNodesWithStyles = (
 							typedVariation?.elements ?? {}
 						).forEach( ( [ element, elementStyles ] ) => {
 							if ( elementStyles && ELEMENTS[ element ] ) {
-								nodes.push( {
+								variationNodesToAdd.push( {
 									styles: elementStyles,
 									selector: scopeSelector(
 										variationSelector,
@@ -919,7 +923,7 @@ export const getNodesWithStyles = (
 									return;
 								}
 
-								nodes.push( {
+								variationNodesToAdd.push( {
 									selector: variationBlockSelector,
 									duotoneSelector: variationDuotoneSelector,
 									featureSelectors: variationFeatureSelectors,
@@ -945,7 +949,7 @@ export const getNodesWithStyles = (
 											variationBlockElementStyles &&
 											ELEMENTS[ variationBlockElement ]
 										) {
-											nodes.push( {
+											variationNodesToAdd.push( {
 												styles: variationBlockElementStyles,
 												selector: scopeSelector(
 													variationBlockSelector,
@@ -1009,6 +1013,10 @@ export const getNodesWithStyles = (
 					}
 				}
 			);
+
+			// Add variation nodes AFTER the main block and its elements
+			// to match PHP processing order.
+			nodes.push( ...variationNodesToAdd );
 		}
 	);
 
