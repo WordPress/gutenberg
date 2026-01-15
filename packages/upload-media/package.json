@@ -41,7 +41,6 @@
 	"types": "build-types",
 	"sideEffects": false,
 	"dependencies": {
-		"@shopify/web-worker": "^6.4.0",
 		"@wordpress/api-fetch": "file:../api-fetch",
 		"@wordpress/blob": "file:../blob",
 		"@wordpress/compose": "file:../compose",
@@ -51,7 +50,6 @@
 		"@wordpress/preferences": "file:../preferences",
 		"@wordpress/private-apis": "file:../private-apis",
 		"@wordpress/url": "file:../url",
-		"@wordpress/vips": "file:../vips",
 		"uuid": "^9.0.1"
 	},
 	"peerDependencies": {
