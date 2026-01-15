@@ -2,16 +2,18 @@
  * WordPress dependencies
  */
 import { useCallback } from '@wordpress/element';
-import { useDispatch } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
-import { serialize, createBlock } from '@wordpress/blocks';
+import { serialize, parse, createBlock } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
 import { getUniqueTemplatePartTitle, getCleanTemplatePartSlug } from './utils';
 import { NAVIGATION_OVERLAY_TEMPLATE_PART_AREA } from '../constants';
+import { unlock } from '../../lock-unlock';
 
 /**
  * Hook to create a new overlay template part.
@@ -22,6 +24,10 @@ import { NAVIGATION_OVERLAY_TEMPLATE_PART_AREA } from '../constants';
  */
 export default function useCreateOverlayTemplatePart( overlayTemplateParts ) {
 	const { saveEntityRecord } = useDispatch( coreStore );
+	const getPatternBySlug = useSelect(
+		( select ) => unlock( select( blockEditorStore ) ).getPatternBySlug,
+		[]
+	);
 
 	const createOverlayTemplatePart = useCallback( async () => {
 		// Generate unique name using only overlay area template parts
@@ -35,6 +41,21 @@ export default function useCreateOverlayTemplatePart( overlayTemplateParts ) {
 		);
 		const cleanSlug = getCleanTemplatePartSlug( uniqueTitle );
 
+		// Get the navigation overlay pattern
+		const pattern = getPatternBySlug( 'gutenberg/navigation-overlay' );
+		let initialContent = '';
+
+		if ( pattern?.content ) {
+			// Parse the pattern content into blocks and serialize it
+			const blocks = parse( pattern.content, {
+				__unstableSkipMigrationLogs: true,
+			} );
+			initialContent = serialize( blocks );
+		} else {
+			// Fallback to empty paragraph if pattern is not found
+			initialContent = serialize( [ createBlock( 'core/paragraph' ) ] );
+		}
+
 		// Create the template part
 		const templatePart = await saveEntityRecord(
 			'postType',
@@ -42,14 +63,14 @@ export default function useCreateOverlayTemplatePart( overlayTemplateParts ) {
 			{
 				slug: cleanSlug,
 				title: uniqueTitle,
-				content: serialize( [ createBlock( 'core/paragraph' ) ] ),
+				content: initialContent,
 				area: NAVIGATION_OVERLAY_TEMPLATE_PART_AREA,
 			},
 			{ throwOnError: true }
 		);
 
 		return templatePart;
-	}, [ overlayTemplateParts, saveEntityRecord ] );
+	}, [ overlayTemplateParts, saveEntityRecord, getPatternBySlug ] );
 
 	return createOverlayTemplatePart;
 }
