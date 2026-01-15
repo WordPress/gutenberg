@@ -4,6 +4,7 @@
 import type {
 	Field,
 	FieldTypeName,
+	EditConfig,
 	NormalizedField,
 	SortDirection,
 } from '../types';
@@ -62,6 +63,39 @@ function getFieldTypeByName< Item >( type?: FieldTypeName ): FieldType< Item > {
 	return noType;
 }
 
+function isEditConfig( value: unknown ): value is EditConfig {
+	return (
+		!! value &&
+		typeof value === 'object' &&
+		typeof ( value as EditConfig ).control === 'string'
+	);
+}
+
+function getFilterControl< Item >(
+	field: Field< Item >,
+	fallback: string | null
+) {
+	if ( ! isEditConfig( field.Edit ) ) {
+		return getControl( field, fallback );
+	}
+
+	// Filters should never be disabled via EditConfig.
+	// Remove the disabled flag before creating the configured control component.
+	// Note: getControl() will turn EditConfig into a component that closes over config.
+	// If we don't strip it here, we can't override it later in filter UI.
+	const filterConfig = { ...field.Edit } as EditConfig & {
+		disabled?: boolean;
+	};
+	delete filterConfig.disabled;
+	return getControl(
+		{
+			...field,
+			Edit: filterConfig as EditConfig,
+		},
+		fallback
+	);
+}
+
 /**
  * Apply default values and normalize the fields config.
  *
@@ -101,6 +135,7 @@ export default function normalizeFields< Item >(
 			type: fieldType.type,
 			render: field.render ?? fieldType.render,
 			Edit: getControl( field, fieldType.Edit ),
+			filter: getFilterControl( field, fieldType.Edit ),
 			sort,
 			enableSorting: field.enableSorting ?? fieldType.enableSorting,
 			enableGlobalSearch:

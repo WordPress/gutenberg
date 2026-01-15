@@ -20,7 +20,6 @@ import type {
 	NormalizedRules,
 } from '../../types';
 import { getCurrentValue } from './utils';
-import { getControlByType } from '../dataform-controls';
 
 interface UserInputWidgetProps {
 	view: View;
@@ -61,18 +60,10 @@ export default function InputWidget( {
 	const field = useMemo( () => {
 		const currentField = fields.find( ( f ) => f.id === filter.field );
 		if ( currentField ) {
-			// For filters, we need to ensure the Edit control is never disabled.
-			// We use the base control type based on the field type or elements.
-			let FilterEdit = currentField.Edit;
-
-			// If field has elements and isn't an array, use select control
-			// Otherwise use the control for the field type
-			if ( currentField.hasElements && currentField.type !== 'array' ) {
-				FilterEdit = getControlByType( 'select' );
-			} else if ( currentField.type ) {
-				FilterEdit =
-					getControlByType( currentField.type ) || currentField.Edit;
-			}
+			// In filter mode we reuse the field edit control, but without allowing
+			// EditConfig.disabled to make the filter UI non-interactive.
+			// NormalizedField.filter is created at normalization time for that purpose.
+			const FilterEdit = currentField.filter ?? currentField.Edit;
 
 			return {
 				...currentField,

@@ -366,6 +366,7 @@ export type NormalizedField< Item > = Omit<
 	setValue: ( args: { item: Item; value: any } ) => DeepPartial< Item >;
 	render: ComponentType< DataViewRenderFieldProps< Item > >;
 	Edit: ComponentType< DataFormControlProps< Item > > | null;
+	filter: ComponentType< DataFormControlProps< Item > > | null;
 	hasElements: boolean;
 	sort: ( a: Item, b: Item, direction: SortDirection ) => number;
 	isValid: NormalizedRules< Item >;
