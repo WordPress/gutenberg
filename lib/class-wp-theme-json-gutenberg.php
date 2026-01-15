@@ -482,7 +482,7 @@ class WP_Theme_JSON_Gutenberg {
 			'letterSpacing'    => null,
 			'lineHeight'       => null,
 			'textAlign'        => null,
-			'textColumns'      => null,
+			'textColumns'      => true,
 			'textDecoration'   => null,
 			'textTransform'    => null,
 			'writingMode'      => null,
@@ -790,6 +790,7 @@ class WP_Theme_JSON_Gutenberg {
 		array( 'spacing', 'margin' ),
 		array( 'spacing', 'padding' ),
 		array( 'typography', 'lineHeight' ),
+		array( 'typography', 'textColumns' ),
 	);
 
 	/**
