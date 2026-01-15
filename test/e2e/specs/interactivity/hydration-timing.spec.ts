@@ -17,6 +17,13 @@ test.describe( 'hydration timing', () => {
 				[ 'test/hydration-timing-slow' ],
 			],
 		} );
+
+		// Create a separate post with only the async block.
+		// This block dynamically imports @wordpress/interactivity on
+		// DOMContentLoaded, so there are no static imports of the library.
+		await utils.addPostWithBlock( 'test/hydration-timing-async', {
+			alias: 'hydration-timing-async',
+		} );
 	} );
 
 	test.afterAll( async ( { interactivityUtils: utils } ) => {
@@ -62,5 +69,32 @@ test.describe( 'hydration timing', () => {
 		);
 		await expect( contextInitialized ).toHaveText( 'true' );
 		await expect( slowContextInitialized ).toHaveText( 'true' );
+	} );
+
+	test( 'should hydrate when the Interactivity API is loaded asynchronously after DOMContentLoaded', async ( {
+		interactivityUtils: utils,
+		page,
+	} ) => {
+		// This test uses a block that dynamically imports @wordpress/interactivity
+		// on DOMContentLoaded. Since there are no static imports of the library
+		// on this page, the library will be loaded after DOMContentLoaded fires.
+		// This verifies that hydration is not skipped when the library is loaded
+		// after that event.
+		await page.goto( utils.getLink( 'hydration-timing-async' ) );
+
+		// Wait for the async hydration status element to be present.
+		const asyncHydrationStatus = page.getByTestId(
+			'async-hydration-status'
+		);
+		await expect( asyncHydrationStatus ).toBeVisible();
+
+		// The async module should have loaded after DOMContentLoaded.
+		const asyncModuleLoaded = page.getByTestId( 'async-module-loaded' );
+		await expect( asyncModuleLoaded ).toHaveText( 'yes' );
+
+		// Hydration should have occurred even though the library was loaded
+		// after DOMContentLoaded.
+		const asyncHydrated = page.getByTestId( 'async-hydrated' );
+		await expect( asyncHydrated ).toHaveText( 'true' );
 	} );
 } );
