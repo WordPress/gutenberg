@@ -180,6 +180,90 @@ registerBlockType( 'my-plugin/inspector-controls-example', {
 } );
 ```
 
+## InspectorControls Groups
+
+InspectorControls supports a `group` prop that allows you to target specific panels in the block inspector. This enables third-party developers to extend core blocks by adding controls to standardized panels.
+
+### Available Groups
+
+#### Settings Tab Groups
+
+- **`default`** - Renders directly in the Settings tab without a ToolsPanel wrapper
+- **`settings`** - Renders inside a "Settings" ToolsPanel
+- **`display`** - Renders inside a "Display" ToolsPanel
+- **`media`** - Renders inside a "Media" ToolsPanel
+- **`position`** - Position controls panel
+- **`bindings`** - Block bindings panel
+- **`advanced`** - Advanced controls panel
+
+#### Styles Tab Groups
+
+- **`color`** - Color panel
+- **`background`** - Background image panel
+- **`typography`** - Typography panel
+- **`dimensions`** - Dimensions panel
+- **`border`** - Border panel
+- **`effects`** - Effects panel
+- **`styles`** - General styles panel
+
+#### Other Groups
+
+- **`list`** - List view controls
+- **`content`** - Content-specific controls
+- **`filter`** - Filter controls (used in Styles tab)
+
+### Using Groups with ToolsPanelItem
+
+When using groups that render inside a ToolsPanel (like `settings`, `display`, `media`), you should use `ToolsPanelItem` components and provide a `resetAllFilter` function:
+
+```js
+import { __experimentalToolsPanelItem as ToolsPanelItem } from '@wordpress/components';
+import { InspectorControls } from '@wordpress/block-editor';
+
+function MyBlockEdit( { attributes, setAttributes } ) {
+	return (
+		<>
+			<InspectorControls
+				group="settings"
+				resetAllFilter={ () => ( {
+					width: undefined,
+					height: undefined,
+				} ) }
+			>
+				<ToolsPanelItem
+					label="Width"
+					hasValue={ () => !! attributes.width }
+					onDeselect={ () => setAttributes( { width: undefined } ) }
+					isShownByDefault
+				>
+					<RangeControl
+						label="Width"
+						value={ attributes.width }
+						onChange={ ( value ) => setAttributes( { width: value } ) }
+					/>
+				</ToolsPanelItem>
+			</InspectorControls>
+		</>
+	);
+}
+```
+
+### Namespaced Groups for Block-Specific Panels
+
+You can create block-specific extensible panels using namespaced groups (format: `blockname/panelname`). These require explicitly rendering the slot:
+
+```js
+// In your block's edit component, render the slot:
+<InspectorControls.Slot group="query/filters" label={ __( 'Filters' ) } />
+
+// Your block or third-party code can add controls:
+<InspectorControls group="query/filters">
+	<ToolsPanelItem label="Custom Filter">
+		{ /* Custom filter controls */ }
+	</ToolsPanelItem>
+</InspectorControls>
+```
+
 ## InspectorAdvancedControls
 
 <img src="https://user-images.githubusercontent.com/150562/94028603-df90bf00-fdb3-11ea-9e6f-eb15c5631d85.png" width="280" alt="inspector-advanced-controls">
