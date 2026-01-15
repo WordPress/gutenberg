@@ -385,11 +385,11 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 		$this->debug_log(
 			'sideload_item: File params received',
 			array(
-				'has_files'       => ! empty( $files ),
-				'file_name'       => ! empty( $files['file']['name'] ) ? $files['file']['name'] : 'N/A',
-				'file_size'       => ! empty( $files['file']['size'] ) ? $files['file']['size'] : 'N/A',
-				'content_type'    => $headers['content_type'][0] ?? 'N/A',
-				'content_length'  => $headers['content_length'][0] ?? 'N/A',
+				'has_files'      => ! empty( $files ),
+				'file_name'      => ! empty( $files['file']['name'] ) ? $files['file']['name'] : 'N/A',
+				'file_size'      => ! empty( $files['file']['size'] ) ? $files['file']['size'] : 'N/A',
+				'content_type'   => $headers['content_type'][0] ?? 'N/A',
+				'content_length' => $headers['content_length'][0] ?? 'N/A',
 			)
 		);
 
