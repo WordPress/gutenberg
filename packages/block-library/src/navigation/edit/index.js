@@ -80,6 +80,7 @@ import { unlock } from '../../lock-unlock';
 import { useToolsPanelDropdownMenuProps } from '../../utils/hooks';
 import { isWithinNavigationOverlay } from '../../utils/is-within-overlay';
 import { DEFAULT_BLOCK } from '../constants';
+import useMigrateAttributes from './use-migrate-attributes';
 
 /**
  * Component that renders the Add page button for the Navigation block.
@@ -301,6 +302,9 @@ function Navigation( {
 		},
 		[ setAttributes ]
 	);
+
+	// Migrate deprecated attributes
+	useMigrateAttributes( attributes, setAttributes );
 
 	const recursionId = `navigationMenu/${ ref }`;
 
@@ -671,8 +675,11 @@ function Navigation( {
 		{ open: overlayMenuPreview }
 	);
 
+	const effectiveSubmenuVisibility =
+		submenuVisibility || ( openSubmenusOnClick ? 'click' : 'hover' );
+
 	const submenuAccessibilityNotice =
-		! showSubmenuIcon && ! openSubmenusOnClick
+		! showSubmenuIcon && effectiveSubmenuVisibility !== 'click'
 			? __(
 					'The current menu options offer reduced accessibility for users and are not recommended. Enabling either "Open on Click" or "Show arrow" offers enhanced accessibility by allowing keyboard users to browse submenus selectively.'
 			  )
@@ -702,7 +709,7 @@ function Navigation( {
 						resetAll={ () => {
 							setAttributes( {
 								showSubmenuIcon: true,
-								openSubmenusOnClick: false,
+								submenuVisibility: undefined,
 								overlayMenu: 'mobile',
 								hasIcon: true,
 								icon: 'handle',
@@ -785,9 +792,6 @@ function Navigation( {
 											onChange={ ( value ) => {
 												setAttributes( {
 													submenuVisibility: value,
-													// Sync old attribute for backward compatibility
-													openSubmenusOnClick:
-														value === 'click',
 												} );
 											} }
 											isBlock
@@ -808,21 +812,32 @@ function Navigation( {
 									</ToolsPanelItem>
 								) : (
 									<ToolsPanelItem
-										hasValue={ () => openSubmenusOnClick }
+										hasValue={ () =>
+											submenuVisibility === 'click' ||
+											( submenuVisibility === undefined &&
+												openSubmenusOnClick )
+										}
 										label={ __( 'Open on click' ) }
 										onDeselect={ () =>
 											setAttributes( {
-												openSubmenusOnClick: false,
+												submenuVisibility: 'hover',
 												showSubmenuIcon: true,
 											} )
 										}
 										isShownByDefault
 									>
 										<ToggleControl
-											checked={ openSubmenusOnClick }
+											checked={
+												submenuVisibility === 'click' ||
+												( submenuVisibility ===
+													undefined &&
+													openSubmenusOnClick )
+											}
 											onChange={ ( value ) => {
 												setAttributes( {
-													openSubmenusOnClick: value,
+													submenuVisibility: value
+														? 'click'
+														: 'hover',
 													...( value && {
 														showSubmenuIcon: true,
 													} ), // Make sure arrows are shown when we toggle this on.
@@ -842,7 +857,7 @@ function Navigation( {
 										} )
 									}
 									isDisabled={
-										attributes.openSubmenusOnClick
+										effectiveSubmenuVisibility === 'click'
 									}
 									isShownByDefault
 								>
@@ -854,7 +869,8 @@ function Navigation( {
 											} );
 										} }
 										disabled={
-											attributes.openSubmenusOnClick
+											effectiveSubmenuVisibility ===
+											'click'
 										}
 										label={ __( 'Show arrow' ) }
 									/>

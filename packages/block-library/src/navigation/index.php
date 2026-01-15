@@ -121,7 +121,10 @@ class WP_Navigation_Block_Renderer {
 	private static function is_interactive( $attributes, $inner_blocks ) {
 		$has_submenus       = static::has_submenus( $inner_blocks );
 		$is_responsive_menu = static::is_responsive( $attributes );
-		return ( $has_submenus && ( $attributes['openSubmenusOnClick'] || $attributes['showSubmenuIcon'] ) ) || $is_responsive_menu;
+		$submenu_visibility = isset( $attributes['submenuVisibility'] ) ? $attributes['submenuVisibility'] : null;
+		// For backward compatibility, fall back to openSubmenusOnClick
+		$open_on_click      = $submenu_visibility === 'click' || ( ! $submenu_visibility && ! empty( $attributes['openSubmenusOnClick'] ) );
+		return ( $has_submenus && ( $open_on_click || $attributes['showSubmenuIcon'] ) ) || $is_responsive_menu;
 	}
 
 	/**
@@ -1120,7 +1123,11 @@ function block_core_navigation_add_directives_to_submenu( $tags, $block_attribut
 		// event.
 		$tags->set_attribute( 'tabindex', '-1' );
 
-		if ( ! isset( $block_attributes['openSubmenusOnClick'] ) || false === $block_attributes['openSubmenusOnClick'] ) {
+		$submenu_visibility = isset( $block_attributes['submenuVisibility'] ) ? $block_attributes['submenuVisibility'] : null;
+		// For backward compatibility, check openSubmenusOnClick if submenuVisibility is not set
+		$open_on_click      = $submenu_visibility === 'click' || ( ! $submenu_visibility && ! empty( $block_attributes['openSubmenusOnClick'] ) );
+
+		if ( ! $open_on_click && $submenu_visibility !== 'always' ) {
 			$tags->set_attribute( 'data-wp-on--mouseenter', 'actions.openMenuOnHover' );
 			$tags->set_attribute( 'data-wp-on--mouseleave', 'actions.closeMenuOnHover' );
 		}

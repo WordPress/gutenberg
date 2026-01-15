@@ -47,8 +47,7 @@
 			"default": true
 		},
 		"openSubmenusOnClick": {
-			"type": "boolean",
-			"default": false
+			"type": "boolean"
 		},
 		"submenuVisibility": {
 			"type": "string",
@@ -105,7 +104,6 @@
 		"fontSize": "fontSize",
 		"customFontSize": "customFontSize",
 		"showSubmenuIcon": "showSubmenuIcon",
-		"openSubmenusOnClick": "openSubmenusOnClick",
 		"submenuVisibility": "submenuVisibility",
 		"style": "style",
 		"maxNestingLevel": "maxNestingLevel"

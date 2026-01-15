@@ -92,9 +92,15 @@ export default function NavigationSubmenuEdit( {
 	} = context;
 	const blockEditingMode = useBlockEditingMode();
 
+	// Determine effective submenu visibility with backward compatibility
+	const effectiveSubmenuVisibility =
+		submenuVisibility || ( contextOpenSubmenusOnClick ? 'click' : 'hover' );
+
 	// Force click-only behavior in contentOnly mode to prevent hover dropdowns
 	const openSubmenusOnClick =
-		blockEditingMode !== 'default' ? true : contextOpenSubmenusOnClick;
+		blockEditingMode !== 'default'
+			? true
+			: effectiveSubmenuVisibility === 'click';
 
 	// URL binding logic
 	const { clearBinding, createBinding } = useEntityBinding( {

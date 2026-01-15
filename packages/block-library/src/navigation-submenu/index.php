@@ -105,10 +105,11 @@ function render_block_core_navigation_submenu( $attributes, $content, $block ) {
 	}
 
 	$show_submenu_indicators = isset( $block->context['showSubmenuIcon'] ) && $block->context['showSubmenuIcon'];
-	$open_on_click           = isset( $block->context['openSubmenusOnClick'] ) && $block->context['openSubmenusOnClick'];
 	$submenu_visibility      = isset( $block->context['submenuVisibility'] ) ? $block->context['submenuVisibility'] : null;
-	$open_on_hover_and_click = isset( $block->context['openSubmenusOnClick'] ) && ! $block->context['openSubmenusOnClick'] &&
-		$show_submenu_indicators;
+	// For backward compatibility, fall back to openSubmenusOnClick if submenuVisibility is not set
+	$open_on_click           = $submenu_visibility === 'click' || ( ! $submenu_visibility && isset( $block->context['openSubmenusOnClick'] ) && $block->context['openSubmenusOnClick'] );
+	$open_on_hover           = $submenu_visibility === 'hover' || ( ! $submenu_visibility && ( ! isset( $block->context['openSubmenusOnClick'] ) || ! $block->context['openSubmenusOnClick'] ) );
+	$open_on_hover_and_click = $open_on_hover && $show_submenu_indicators;
 
 	$classes = array(
 		'wp-block-navigation-item',
