@@ -2,6 +2,8 @@
 
 @layer wp-ui-utilities {
 	.popup {
+		composes: dropdown-motion from "./dropdown-motion.module.css";
+
 		--wp-ui-popup-padding: 4px;
 
 		display: grid;
@@ -18,15 +20,6 @@
 		font-size: var(--wpds-font-size-md);
 		line-height: 1.4;
 		color: var(--wpds-color-fg-interactive-neutral);
-
-		&[data-open] {
-			@media not ( prefers-reduced-motion ) {
-				animation-duration: 0.2s;
-				animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
-				animation-name: slide-down-and-fade;
-				will-change: transform, opacity;
-			}
-		}
 	}
 
 	.list {
@@ -131,15 +124,4 @@
 		}
 	}
 
-	@keyframes slide-down-and-fade {
-		from {
-			opacity: 0;
-			transform: translateY(-2px);
-		}
-
-		to {
-			opacity: 1;
-			transform: translateY(0);
-		}
-	}
 }
