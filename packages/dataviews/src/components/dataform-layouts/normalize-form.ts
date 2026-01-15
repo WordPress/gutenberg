@@ -12,6 +12,7 @@ import type {
 	NormalizedCardLayout,
 	NormalizedRowLayout,
 	NormalizedDetailsLayout,
+	NormalizedTwoColumnsLayout,
 	NormalizedCardSummaryField,
 	CardSummaryField,
 } from '../../types';
@@ -100,6 +101,10 @@ function normalizeLayout( layout?: Layout ): NormalizedLayout {
 			type: 'details',
 			summary: layout?.summary ?? '',
 		} satisfies NormalizedDetailsLayout;
+	} else if ( layout?.type === 'two-columns' ) {
+		normalizedLayout = {
+			type: 'two-columns',
+		} satisfies NormalizedTwoColumnsLayout;
 	}
 
 	return normalizedLayout;

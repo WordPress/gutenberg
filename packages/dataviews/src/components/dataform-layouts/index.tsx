@@ -12,6 +12,7 @@ import FormPanelField from './panel';
 import FormCardField from './card';
 import FormRowField from './row';
 import FormDetailsField from './details';
+import FormTwoColumnsField from './two-columns';
 
 const FORM_FIELD_LAYOUTS = [
 	{
@@ -83,6 +84,19 @@ const FORM_FIELD_LAYOUTS = [
 	{
 		type: 'details',
 		component: FormDetailsField,
+	},
+	{
+		type: 'two-columns',
+		component: FormTwoColumnsField,
+		wrapper: ( { children }: { children: React.ReactNode } ) => (
+			<Stack
+				direction="column"
+				className="dataforms-layouts__wrapper"
+				gap="lg"
+			>
+				{ children }
+			</Stack>
+		),
 	},
 ];
 
