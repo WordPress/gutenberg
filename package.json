@@ -46,10 +46,6 @@
 		"@octokit/rest": "16.26.0",
 		"@playwright/test": "1.57.0",
 		"@pmmmwh/react-refresh-webpack-plugin": "0.5.11",
-		"@storybook/addon-a11y": "10.1.11",
-		"@storybook/addon-docs": "10.1.11",
-		"@storybook/icons": "2.0.1",
-		"@storybook/react-vite": "10.1.11",
 		"@testing-library/jest-dom": "^6.6.3",
 		"@testing-library/react": "14.3.0",
 		"@testing-library/user-event": "14.4.3",
@@ -121,8 +117,6 @@
 		"simple-git": "3.24.0",
 		"snapshot-diff": "0.10.0",
 		"sprintf-js": "1.1.1",
-		"storybook": "^10.1.11",
-		"storybook-addon-tag-badges": "3.0.4",
 		"style-loader": "3.2.1",
 		"stylelint-plugin-logical-css": "^1.2.3",
 		"typescript": "5.9.3",
@@ -180,8 +174,8 @@
 		"prepublishOnly": "npm run build",
 		"start": "npm run dev",
 		"prestorybook:build": "npm run build -- --skip-types",
-		"storybook:build": "storybook build -c ./storybook -o ./storybook/build",
-		"storybook:dev": "concurrently \"npm run dev\" \"wait-on .dev-ready && storybook dev -c ./storybook -p 50240\"",
+		"storybook:build": "npm run --workspace @wordpress/storybook storybook:build",
+		"storybook:dev": "concurrently \"npm run dev\" \"wait-on .dev-ready && npm run --workspace @wordpress/storybook storybook:dev\"",
 		"storybook:e2e:dev": "concurrently \"npm run dev\" \"wait-on .dev-ready && storybook dev -c test/storybook-playwright/storybook -p 50241\"",
 		"test": "npm-run-all lint test:unit",
 		"test:create-block": "bash ./bin/test-create-block.sh",
@@ -253,6 +247,7 @@
 	},
 	"workspaces": [
 		"packages/*",
-		"routes/*"
+		"routes/*",
+		"storybook"
 	]
 }
