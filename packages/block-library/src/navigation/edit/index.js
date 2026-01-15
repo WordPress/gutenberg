@@ -75,9 +75,10 @@ import MenuInspectorControls from './menu-inspector-controls';
 import DeletedNavigationWarning from './deleted-navigation-warning';
 import AccessibleDescription from './accessible-description';
 import AccessibleMenuDescription from './accessible-menu-description';
+import { DEFAULT_BLOCK } from '../constants';
 import { unlock } from '../../lock-unlock';
 import { useToolsPanelDropdownMenuProps } from '../../utils/hooks';
-import { DEFAULT_BLOCK } from '../constants';
+import { isWithinNavigationOverlay } from '../../utils/is-within-overlay';
 
 /**
  * Component that renders the Add page button for the Navigation block.
@@ -139,6 +140,10 @@ function ColorTools( {
 		setDetectedOverlayBackgroundColor,
 	] = useState();
 	const [ detectedOverlayColor, setDetectedOverlayColor ] = useState();
+
+	// Detect if we're editing inside an overlay template part.
+	const isWithinOverlay = useSelect( () => isWithinNavigationOverlay(), [] );
+
 	// Turn on contrast checker for web only since it's not supported on mobile yet.
 	const enableContrastChecking = Platform.OS === 'web';
 	useEffect( () => {
@@ -179,48 +184,57 @@ function ColorTools( {
 	if ( ! colorGradientSettings.hasColorsOrGradients ) {
 		return null;
 	}
+
+	const colorSettings = [
+		{
+			colorValue: textColor.color,
+			label: __( 'Text' ),
+			onColorChange: setTextColor,
+			resetAllFilter: () => setTextColor(),
+			clearable: true,
+			enableAlpha: true,
+		},
+		{
+			colorValue: backgroundColor.color,
+			label: __( 'Background' ),
+			onColorChange: setBackgroundColor,
+			resetAllFilter: () => setBackgroundColor(),
+			clearable: true,
+			enableAlpha: true,
+		},
+	];
+
+	// Only show overlay controls when using the default overlay.
+	if ( ! hasCustomOverlay ) {
+		colorSettings.push(
+			{
+				colorValue: overlayTextColor.color,
+				label: isWithinOverlay
+					? __( 'Submenu text' )
+					: __( 'Submenu & overlay text' ),
+				onColorChange: setOverlayTextColor,
+				resetAllFilter: () => setOverlayTextColor(),
+				clearable: true,
+				enableAlpha: true,
+			},
+			{
+				colorValue: overlayBackgroundColor.color,
+				label: isWithinOverlay
+					? __( 'Submenu background' )
+					: __( 'Submenu & overlay background' ),
+				onColorChange: setOverlayBackgroundColor,
+				resetAllFilter: () => setOverlayBackgroundColor(),
+				clearable: true,
+				enableAlpha: true,
+			}
+		);
+	}
+
 	return (
 		<>
 			<ColorGradientSettingsDropdown
 				__experimentalIsRenderedInSidebar
-				settings={ [
-					{
-						colorValue: textColor.color,
-						label: __( 'Text' ),
-						onColorChange: setTextColor,
-						resetAllFilter: () => setTextColor(),
-						clearable: true,
-						enableAlpha: true,
-					},
-					{
-						colorValue: backgroundColor.color,
-						label: __( 'Background' ),
-						onColorChange: setBackgroundColor,
-						resetAllFilter: () => setBackgroundColor(),
-						clearable: true,
-						enableAlpha: true,
-					},
-					{
-						colorValue: overlayTextColor.color,
-						label: hasCustomOverlay
-							? __( 'Submenu text' )
-							: __( 'Submenu & overlay text' ),
-						onColorChange: setOverlayTextColor,
-						resetAllFilter: () => setOverlayTextColor(),
-						clearable: true,
-						enableAlpha: true,
-					},
-					{
-						colorValue: overlayBackgroundColor.color,
-						label: hasCustomOverlay
-							? __( 'Submenu background' )
-							: __( 'Submenu & overlay background' ),
-						onColorChange: setOverlayBackgroundColor,
-						resetAllFilter: () => setOverlayBackgroundColor(),
-						clearable: true,
-						enableAlpha: true,
-					},
-				] }
+				settings={ colorSettings }
 				panelId={ clientId }
 				{ ...colorGradientSettings }
 				gradients={ [] }
