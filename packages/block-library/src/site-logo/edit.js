@@ -22,7 +22,6 @@ import {
 	Placeholder,
 	Button,
 	DropZone,
-	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { useViewportMatch } from '@wordpress/compose';
@@ -46,7 +45,6 @@ import { store as noticesStore } from '@wordpress/notices';
  */
 import { MIN_SIZE } from '../image/constants';
 import { MediaControl, MediaControlPreview } from '../utils/media-control';
-import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
 
@@ -69,7 +67,6 @@ const SiteLogo = ( {
 	const [ { naturalWidth, naturalHeight }, setNaturalSize ] = useState( {} );
 	const [ isEditingImage, setIsEditingImage ] = useState( false );
 	const { toggleSelection } = useDispatch( blockEditorStore );
-	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
 	// Check if we're in contentOnly mode
 	const blockEditingMode = useBlockEditingMode();
@@ -283,94 +280,95 @@ const SiteLogo = ( {
 
 	return (
 		<>
-			<InspectorControls>
-				<ToolsPanel
-					label={ __( 'Settings' ) }
-					dropdownMenuProps={ dropdownMenuProps }
+			<InspectorControls
+				group="settings"
+				resetAllFilter={ () => ( {
+					width: undefined,
+					isLink: true,
+					linkTarget: '_self',
+					shouldSyncIcon: false,
+				} ) }
+			>
+				<ToolsPanelItem
+					isShownByDefault
+					hasValue={ () => !! width }
+					label={ __( 'Image width' ) }
+					onDeselect={ () => setAttributes( { width: undefined } ) }
 				>
+					<RangeControl
+						__next40pxDefaultSize
+						label={ __( 'Image width' ) }
+						onChange={ ( newWidth ) =>
+							setAttributes( { width: newWidth } )
+						}
+						min={ minWidth }
+						max={ maxWidthBuffer }
+						initialPosition={ Math.min(
+							defaultWidth,
+							maxWidthBuffer
+						) }
+						value={ width || '' }
+						disabled={ ! isResizable }
+					/>
+				</ToolsPanelItem>
+
+				<ToolsPanelItem
+					isShownByDefault
+					hasValue={ () => ! isLink }
+					label={ __( 'Link image to home' ) }
+					onDeselect={ () => setAttributes( { isLink: true } ) }
+				>
+					<ToggleControl
+						label={ __( 'Link image to home' ) }
+						onChange={ () =>
+							setAttributes( { isLink: ! isLink } )
+						}
+						checked={ isLink }
+					/>
+				</ToolsPanelItem>
+
+				{ isLink && (
 					<ToolsPanelItem
 						isShownByDefault
-						hasValue={ () => !! width }
-						label={ __( 'Image width' ) }
+						hasValue={ () => linkTarget === '_blank' }
+						label={ __( 'Open in new tab' ) }
 						onDeselect={ () =>
-							setAttributes( { width: undefined } )
+							setAttributes( { linkTarget: '_self' } )
 						}
 					>
-						<RangeControl
-							__next40pxDefaultSize
-							label={ __( 'Image width' ) }
-							onChange={ ( newWidth ) =>
-								setAttributes( { width: newWidth } )
+						<ToggleControl
+							label={ __( 'Open in new tab' ) }
+							onChange={ ( value ) =>
+								setAttributes( {
+									linkTarget: value ? '_blank' : '_self',
+								} )
 							}
-							min={ minWidth }
-							max={ maxWidthBuffer }
-							initialPosition={ Math.min(
-								defaultWidth,
-								maxWidthBuffer
-							) }
-							value={ width || '' }
-							disabled={ ! isResizable }
+							checked={ linkTarget === '_blank' }
 						/>
 					</ToolsPanelItem>
+				) }
 
+				{ canUserEdit && (
 					<ToolsPanelItem
 						isShownByDefault
-						hasValue={ () => ! isLink }
-						label={ __( 'Link image to home' ) }
-						onDeselect={ () => setAttributes( { isLink: true } ) }
+						hasValue={ () => !! shouldSyncIcon }
+						label={ __( 'Use as Site Icon' ) }
+						onDeselect={ () => {
+							setAttributes( { shouldSyncIcon: false } );
+							setIcon( undefined );
+						} }
 					>
 						<ToggleControl
-							label={ __( 'Link image to home' ) }
-							onChange={ () =>
-								setAttributes( { isLink: ! isLink } )
-							}
-							checked={ isLink }
+							label={ __( 'Use as Site Icon' ) }
+							onChange={ ( value ) => {
+								setAttributes( { shouldSyncIcon: value } );
+								setIcon( value ? logoId : undefined );
+							} }
+							checked={ !! shouldSyncIcon }
+							help={ syncSiteIconHelpText }
 						/>
 					</ToolsPanelItem>
-
-					{ isLink && (
-						<ToolsPanelItem
-							isShownByDefault
-							hasValue={ () => linkTarget === '_blank' }
-							label={ __( 'Open in new tab' ) }
-							onDeselect={ () =>
-								setAttributes( { linkTarget: '_self' } )
-							}
-						>
-							<ToggleControl
-								label={ __( 'Open in new tab' ) }
-								onChange={ ( value ) =>
-									setAttributes( {
-										linkTarget: value ? '_blank' : '_self',
-									} )
-								}
-								checked={ linkTarget === '_blank' }
-							/>
-						</ToolsPanelItem>
-					) }
-
-					{ canUserEdit && (
-						<ToolsPanelItem
-							isShownByDefault
-							hasValue={ () => !! shouldSyncIcon }
-							label={ __( 'Use as Site Icon' ) }
-							onDeselect={ () => {
-								setAttributes( { shouldSyncIcon: false } );
-								setIcon( undefined );
-							} }
-						>
-							<ToggleControl
-								label={ __( 'Use as Site Icon' ) }
-								onChange={ ( value ) => {
-									setAttributes( { shouldSyncIcon: value } );
-									setIcon( value ? logoId : undefined );
-								} }
-								checked={ !! shouldSyncIcon }
-								help={ syncSiteIconHelpText }
-							/>
-						</ToolsPanelItem>
-					) }
-				</ToolsPanel>
+				) }
 			</InspectorControls>
 			{ canEditImage &&
 				! isEditingImage &&
@@ -447,7 +445,6 @@ export default function LogoEdit( {
 	}, [] );
 	const { getSettings } = useSelect( blockEditorStore );
 	const [ temporaryURL, setTemporaryURL ] = useState();
-	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
 	const { editEntityRecord } = useDispatch( coreStore );
 
@@ -608,55 +605,50 @@ export default function LogoEdit( {
 	const blockProps = useBlockProps( { className: classes } );
 
 	const mediaInspectorPanel = ( canUserEdit || logoUrl ) && (
-		<InspectorControls>
-			<ToolsPanel
-				label={ __( 'Media' ) }
-				dropdownMenuProps={ dropdownMenuProps }
-			>
-				{ ! canUserEdit ? (
-					<div
-						className="block-library-site-logo__inspector-media-replace-container"
-						style={ { gridColumn: '1 / -1' } }
-					>
-						<MediaControlPreview
-							url={ mediaItemData?.source_url }
-							alt={ mediaItemData?.alt_text }
-							filename={
-								mediaItemData?.media_details?.sizes?.full
-									?.file || mediaItemData?.slug
-							}
-							itemGroupProps={ {
-								isBordered: true,
-								className:
-									'block-library-site-logo__inspector-readonly-logo-preview',
-							} }
-							className="block-library-site-logo__inspector-media-replace-title"
-						/>
-					</div>
-				) : (
-					<ToolsPanelItem
-						hasValue={ () => !! logoUrl }
-						label={ __( 'Logo' ) }
-						isShownByDefault
-					>
-						<MediaControl
-							mediaId={ siteLogoId }
-							mediaUrl={ logoUrl }
-							alt={ mediaItemData?.alt_text }
-							filename={
-								mediaItemData?.media_details?.sizes?.full
-									?.file || mediaItemData?.slug
-							}
-							allowedTypes={ ALLOWED_MEDIA_TYPES }
-							onSelect={ onSelectLogo }
-							onError={ onUploadError }
-							onReset={ onRemoveLogo }
-							isUploading={ !! temporaryURL }
-							emptyLabel={ __( 'Choose logo' ) }
-						/>
-					</ToolsPanelItem>
-				) }
-			</ToolsPanel>
+		<InspectorControls group="media">
+			{ ! canUserEdit ? (
+				<div
+					className="block-library-site-logo__inspector-media-replace-container"
+					style={ { gridColumn: '1 / -1' } }
+				>
+					<MediaControlPreview
+						url={ mediaItemData?.source_url }
+						alt={ mediaItemData?.alt_text }
+						filename={
+							mediaItemData?.media_details?.sizes?.full?.file ||
+							mediaItemData?.slug
+						}
+						itemGroupProps={ {
+							isBordered: true,
+							className:
+								'block-library-site-logo__inspector-readonly-logo-preview',
+						} }
+						className="block-library-site-logo__inspector-media-replace-title"
+					/>
+				</div>
+			) : (
+				<ToolsPanelItem
+					hasValue={ () => !! logoUrl }
+					label={ __( 'Logo' ) }
+					isShownByDefault
+				>
+					<MediaControl
+						mediaId={ siteLogoId }
+						mediaUrl={ logoUrl }
+						alt={ mediaItemData?.alt_text }
+						filename={
+							mediaItemData?.media_details?.sizes?.full?.file ||
+							mediaItemData?.slug
+						}
+						allowedTypes={ ALLOWED_MEDIA_TYPES }
+						onSelect={ onSelectLogo }
+						onError={ onUploadError }
+						onReset={ onRemoveLogo }
+						isUploading={ !! temporaryURL }
+						emptyLabel={ __( 'Choose logo' ) }
+					/>
+				</ToolsPanelItem>
+			) }
 		</InspectorControls>
 	);
 
