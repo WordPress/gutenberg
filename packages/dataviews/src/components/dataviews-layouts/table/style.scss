@@ -311,14 +311,8 @@
 }
 
 @keyframes loadingpulse {
-	0% {
-		background-color: $gray-300;
-	}
 	50% {
-		background-color: $gray-100;
-	}
-	100% {
-		background-color: $gray-300;
+		opacity: 0.5;
 	}
 }
 
@@ -334,12 +328,15 @@
 
 	tbody td > *:first-child {
 		position: relative;
+		visibility: hidden;
 
 		&::after {
 			content: "";
 			position: absolute;
-			inset: 0;
+			background-color: $gray-300;
+			inset: 4px 0;
 			pointer-events: none;
+			visibility: visible;
 			@include skeleton();
 		}
 	}
