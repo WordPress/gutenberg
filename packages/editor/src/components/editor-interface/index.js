@@ -191,7 +191,7 @@ export default function EditorInterface( {
 									) }
 									{ children }
 								</>
-							) }{ ' ' }
+							) }
 						</>
 					) }
 				</>

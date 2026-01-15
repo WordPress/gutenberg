@@ -29,7 +29,10 @@ export default function MediaMetadataPanel( { onActionPerformed } ) {
 		const currentPost = select( coreStore ).getEditedEntityRecord(
 			'postType',
 			_postType,
-			_postId
+			_postId,
+			{
+				_embed: 'author,wp:attached-to',
+			}
 		);
 		return {
 			media: currentPost,
