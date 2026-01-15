@@ -57,8 +57,7 @@ const REVISION_REMOVED_FILTER_SVG = `
  */
 const REVISION_DIFF_STYLES = `
 	.is-revision-added {
-		background-color: color-mix(in srgb, currentColor 5%, #00a32a 15%);
-		color: color-mix(in srgb, currentColor 50%, #006400 50%);
+		box-shadow: inset 0 0 0 9999px color-mix(in srgb, currentColor 5%, #00a32a 15%), 0 0 0 4px color-mix(in srgb, currentColor 5%, #00a32a 15%);
 	}
 	.is-revision-removed {
 		text-decoration: line-through;
