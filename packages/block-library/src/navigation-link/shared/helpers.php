@@ -8,7 +8,7 @@
 /**
  * Checks if a navigation item should render based on post status.
  *
- * @since 6.9.0
+ * @since 7.0.0
  *
  * @param array    $attributes The block attributes.
  * @param WP_Block $block      The parsed block.
