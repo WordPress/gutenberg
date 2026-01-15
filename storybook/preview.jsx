@@ -144,6 +144,12 @@ export const parameters = {
 				return [];
 			};
 
+			// Check if an entry is an MDX doc page ending at a specific path depth
+			const isMdxAtDepth = ( entry, path, depth ) =>
+				entry.type === 'docs' &&
+				path.length === depth + 1 &&
+				entry.importPath?.endsWith( '.mdx' );
+
 			const aPath = a.title.split( '/' );
 			const bPath = b.title.split( '/' );
 			const maxDepth = Math.max( aPath.length, bPath.length );
@@ -157,60 +163,44 @@ export const parameters = {
 				// If one path is shorter, check if the longer one is an MDX doc
 				// that should appear before stories at the parent level
 				if ( aSegment === undefined && bSegment !== undefined ) {
-					const bIsMdxAtThisLevel =
-						b.type === 'docs' &&
-						bPath.length === depth + 1 &&
-						b.importPath?.endsWith( '.mdx' );
 					// MDX subfolder comes before parent's stories
-					if ( a.type === 'story' && bIsMdxAtThisLevel ) {
+					if (
+						a.type === 'story' &&
+						isMdxAtDepth( b, bPath, depth )
+					) {
 						return 1;
 					}
 					return -1;
 				}
 				if ( aSegment !== undefined && bSegment === undefined ) {
-					const aIsMdxAtThisLevel =
-						a.type === 'docs' &&
-						aPath.length === depth + 1 &&
-						a.importPath?.endsWith( '.mdx' );
 					// MDX subfolder comes before parent's stories
-					if ( b.type === 'story' && aIsMdxAtThisLevel ) {
+					if (
+						b.type === 'story' &&
+						isMdxAtDepth( a, aPath, depth )
+					) {
 						return -1;
 					}
 					return 1;
 				}
 
 				if ( aSegment !== bSegment ) {
-					// Check if either entry is an MDX doc page at this level.
-					// MDX pages have importPath ending in .mdx, while component
-					// autodocs are generated from story files (.story.tsx, etc.)
-					const aIsMdxAtThisLevel =
-						a.type === 'docs' &&
-						aPath.length === depth + 1 &&
-						a.importPath?.endsWith( '.mdx' );
-					const bIsMdxAtThisLevel =
-						b.type === 'docs' &&
-						bPath.length === depth + 1 &&
-						b.importPath?.endsWith( '.mdx' );
+					// MDX pages (importPath ends in .mdx) come before components
+					// (whose autodocs are generated from .story.tsx files)
+					const aIsMdx = isMdxAtDepth( a, aPath, depth );
+					const bIsMdx = isMdxAtDepth( b, bPath, depth );
 
-					// MDX pages come before components/subfolders
-					if ( aIsMdxAtThisLevel && ! bIsMdxAtThisLevel ) {
-						return -1;
-					}
-					if ( ! aIsMdxAtThisLevel && bIsMdxAtThisLevel ) {
-						return 1;
+					if ( aIsMdx !== bIsMdx ) {
+						return aIsMdx ? -1 : 1;
 					}
 
 					// Among MDX pages, prioritize those in PRIORITIZED_MDX_DOCS
-					if ( aIsMdxAtThisLevel && bIsMdxAtThisLevel ) {
+					if ( aIsMdx && bIsMdx ) {
 						const aIsPrioritized =
 							PRIORITIZED_MDX_DOCS.includes( aSegment );
 						const bIsPrioritized =
 							PRIORITIZED_MDX_DOCS.includes( bSegment );
-						if ( aIsPrioritized && ! bIsPrioritized ) {
-							return -1;
-						}
-						if ( ! aIsPrioritized && bIsPrioritized ) {
-							return 1;
+						if ( aIsPrioritized !== bIsPrioritized ) {
+							return aIsPrioritized ? -1 : 1;
 						}
 					}
 
