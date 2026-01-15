@@ -25,6 +25,7 @@
 - DataViews: Fix table row multiselection in Firefox [#73945](https://github.com/WordPress/gutenberg/pull/73945)
 - DataViews: `filterSortAndPaginate()` will ignore sorting on non-sortable fields [#73950](https://github.com/WordPress/gutenberg/pull/73950)
 - DataViews: Fix locked fields order when toggling visibility in properties section. [#74326](https://github.com/WordPress/gutenberg/pull/74326)
+- DataViews: Fix Dataviews Table columns reorder in opposite direction on rtl languages. [#74644](https://github.com/WordPress/gutenberg/pull/74644)
 
 ### Enhancements
 
