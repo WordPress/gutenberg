@@ -4,18 +4,6 @@
 
 // Table adjustments
 .experiments-page {
-	// Hide actions column header label
-	.dataviews-view-table__actions-column .dataviews-view-table-header {
-		visibility: hidden;
-		width: 0;
-	}
-
-	// Remove border before actions column
-	.dataviews-view-table__actions-column--stuck::after,
-	.dataviews-view-table__actions-column::after {
-		display: none !important;
-	}
-
 	// Allow description to wrap
 	.experiments-description {
 		white-space: normal;

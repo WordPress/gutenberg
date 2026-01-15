@@ -43,6 +43,29 @@ import { useIsHorizontalScrollEnd } from './use-is-horizontal-scroll-end';
 import getDataByGroup from '../utils/get-data-by-group';
 import { PropertiesSection } from '../../dataviews-view-config/properties-section';
 
+/**
+ * Determines the index at which the actions column should be inserted within the fields array.
+ * Returns null if actions should be rendered at the end (default behavior).
+ *
+ * @param view        The current view configuration.
+ * @param columnsCount The number of field columns.
+ * @return The index to insert actions, or null for end position.
+ */
+function getActionsColumnIndex(
+	view: ViewTableType,
+	columnsCount: number
+): number | null {
+	const position = view.layout?.actionsPosition;
+	if ( position === undefined || position === 'end' ) {
+		return null; // Render at end (current behavior)
+	}
+	if ( position === 'start' ) {
+		return 0;
+	}
+	// Numeric position - clamp to valid range
+	return Math.max( 0, Math.min( position, columnsCount ) );
+}
+
 interface TableColumnFieldProps< Item > {
 	fields: NormalizedField< Item >[];
 	column: string;
@@ -73,6 +96,7 @@ interface TableRowProps< Item > {
 	) => ReactElement;
 	isActionsColumnSticky?: boolean;
 	posinset?: number;
+	actionsColumnIndex?: number | null;
 }
 
 function TableColumnField< Item >( {
@@ -118,6 +142,7 @@ function TableRow< Item >( {
 	onChangeSelection,
 	isActionsColumnSticky,
 	posinset,
+	actionsColumnIndex,
 }: TableRowProps< Item > ) {
 	const { paginationInfo } = useContext( DataViewsContext );
 	const hasPossibleBulkAction = useHasAPossibleBulkAction( actions, item );
@@ -137,6 +162,31 @@ function TableRow< Item >( {
 		( titleField && showTitle ) ||
 		( mediaField && showMedia ) ||
 		( descriptionField && showDescription );
+	const hasActions = !! actions?.length;
+
+	// Helper to render the actions cell
+	const renderActionsCell = () =>
+		hasActions ? (
+			// Disable reason: we are not making the element interactive,
+			// but preventing any click events from bubbling up to the
+			// table row. This allows us to add a click handler to the row
+			// itself (to toggle row selection) without erroneously
+			// intercepting click events from ItemActions.
+
+			/* eslint-disable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/click-events-have-key-events */
+			<td
+				key="actions-cell"
+				className={ clsx( 'dataviews-view-table__actions-column', {
+					'dataviews-view-table__actions-column--sticky': true,
+					'dataviews-view-table__actions-column--stuck':
+						isActionsColumnSticky,
+				} ) }
+				onClick={ ( e ) => e.stopPropagation() }
+			>
+				<ItemActions item={ item } actions={ actions } />
+			</td>
+			/* eslint-enable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/click-events-have-key-events */
+		) : null;
 
 	return (
 		<tr
@@ -221,12 +271,13 @@ function TableRow< Item >( {
 					/>
 				</td>
 			) }
-			{ columns.map( ( column: string ) => {
+			{ actionsColumnIndex === 0 && renderActionsCell() }
+			{ columns.flatMap( ( column: string, index: number ) => {
 				// Explicit picks the supported styles.
 				const { width, maxWidth, minWidth, align } =
 					view.layout?.styles?.[ column ] ?? {};
 
-				return (
+				const cellElement = (
 					<td
 						key={ column }
 						style={ {
@@ -243,27 +294,14 @@ function TableRow< Item >( {
 						/>
 					</td>
 				);
-			} ) }
-			{ !! actions?.length && (
-				// Disable reason: we are not making the element interactive,
-				// but preventing any click events from bubbling up to the
-				// table row. This allows us to add a click handler to the row
-				// itself (to toggle row selection) without erroneously
-				// intercepting click events from ItemActions.
 
-				/* eslint-disable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/click-events-have-key-events */
-				<td
-					className={ clsx( 'dataviews-view-table__actions-column', {
-						'dataviews-view-table__actions-column--sticky': true,
-						'dataviews-view-table__actions-column--stuck':
-							isActionsColumnSticky,
-					} ) }
-					onClick={ ( e ) => e.stopPropagation() }
-				>
-					<ItemActions item={ item } actions={ actions } />
-				</td>
-				/* eslint-enable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/click-events-have-key-events */
-			) }
+				// Insert actions after this column if position matches
+				if ( actionsColumnIndex === index + 1 ) {
+					return [ cellElement, renderActionsCell() ];
+				}
+				return [ cellElement ];
+			} ) }
+			{ actionsColumnIndex === null && renderActionsCell() }
 		</tr>
 	);
 }
@@ -369,6 +407,9 @@ function ViewTable< Item >( {
 		( mediaField && showMedia ) ||
 		( descriptionField && showDescription );
 	const columns = view.fields ?? [];
+	const actionsColumnIndex = getActionsColumnIndex( view, columns.length );
+	const hasActions = !! actions?.length;
+	const hideActionsHeader = view.layout?.hideActionsHeader ?? false;
 	const headerMenuRef =
 		( column: string, index: number ) => ( node: HTMLButtonElement ) => {
 			if ( node ) {
@@ -381,6 +422,34 @@ function ViewTable< Item >( {
 			}
 		};
 	const isInfiniteScroll = view.infiniteScrollEnabled && ! dataByGroup;
+
+	// Helper to render the actions column in colgroup
+	const renderActionsCol = () =>
+		hasActions ? (
+			<col
+				key="actions-col"
+				className="dataviews-view-table__col-actions"
+			/>
+		) : null;
+
+	// Helper to render the actions header cell
+	const renderActionsHeader = () =>
+		hasActions ? (
+			<th
+				key="actions-header"
+				className={ clsx( 'dataviews-view-table__actions-column', {
+					'dataviews-view-table__actions-column--sticky': true,
+					'dataviews-view-table__actions-column--stuck':
+						! isHorizontalScrollEnd,
+				} ) }
+			>
+				{ ! hideActionsHeader && (
+					<span className="dataviews-view-table-header">
+						{ __( 'Actions' ) }
+					</span>
+				) }
+			</th>
+		) : null;
 
 	return (
 		<>
@@ -404,21 +473,27 @@ function ViewTable< Item >( {
 					{ hasPrimaryColumn && (
 						<col className="dataviews-view-table__col-first-data" />
 					) }
-					{ columns.map( ( column, index ) => (
-						<col
-							key={ `col-${ column }` }
-							className={ clsx(
-								`dataviews-view-table__col-${ column }`,
-								{
-									'dataviews-view-table__col-first-data':
-										! hasPrimaryColumn && index === 0,
-								}
-							) }
-						/>
-					) ) }
-					{ !! actions?.length && (
-						<col className="dataviews-view-table__col-actions" />
-					) }
+					{ actionsColumnIndex === 0 && renderActionsCol() }
+					{ columns.flatMap( ( column, index ) => {
+						const colElement = (
+							<col
+								key={ `col-${ column }` }
+								className={ clsx(
+									`dataviews-view-table__col-${ column }`,
+									{
+										'dataviews-view-table__col-first-data':
+											! hasPrimaryColumn && index === 0,
+									}
+								) }
+							/>
+						);
+						// Insert actions after this column if position matches
+						if ( actionsColumnIndex === index + 1 ) {
+							return [ colElement, renderActionsCol() ];
+						}
+						return [ colElement ];
+					} ) }
+					{ actionsColumnIndex === null && renderActionsCol() }
 				</colgroup>
 				{ contextMenuAnchor && (
 					<Popover
@@ -469,13 +544,14 @@ function ViewTable< Item >( {
 								) }
 							</th>
 						) }
-						{ columns.map( ( column, index ) => {
+						{ actionsColumnIndex === 0 && renderActionsHeader() }
+						{ columns.flatMap( ( column, index ) => {
 							// Explicit picks the supported styles.
 							const { width, maxWidth, minWidth, align } =
 								view.layout?.styles?.[ column ] ?? {};
 							const canInsertOrMove =
 								view.layout?.enableMoving ?? true;
-							return (
+							const headerElement = (
 								<th
 									key={ column }
 									style={ {
@@ -506,24 +582,13 @@ function ViewTable< Item >( {
 									/>
 								</th>
 							);
+							// Insert actions after this column if position matches
+							if ( actionsColumnIndex === index + 1 ) {
+								return [ headerElement, renderActionsHeader() ];
+							}
+							return [ headerElement ];
 						} ) }
-						{ !! actions?.length && (
-							<th
-								className={ clsx(
-									'dataviews-view-table__actions-column',
-									{
-										'dataviews-view-table__actions-column--sticky':
-											true,
-										'dataviews-view-table__actions-column--stuck':
-											! isHorizontalScrollEnd,
-									}
-								) }
-							>
-								<span className="dataviews-view-table-header">
-									{ __( 'Actions' ) }
-								</span>
-							</th>
-						) }
+						{ actionsColumnIndex === null && renderActionsHeader() }
 					</tr>
 				</thead>
 				{ /* Render grouped data if groupBy is specified */ }
@@ -581,6 +646,7 @@ function ViewTable< Item >( {
 										isActionsColumnSticky={
 											! isHorizontalScrollEnd
 										}
+										actionsColumnIndex={ actionsColumnIndex }
 									/>
 								) ) }
 							</tbody>
@@ -619,6 +685,7 @@ function ViewTable< Item >( {
 									posinset={
 										isInfiniteScroll ? index + 1 : undefined
 									}
+									actionsColumnIndex={ actionsColumnIndex }
 								/>
 							) ) }
 					</tbody>

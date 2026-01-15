@@ -81,6 +81,8 @@ function Stage() {
 		titleField: 'name',
 		descriptionField: 'description',
 		layout: {
+			hideActionsHeader: true,
+			actionsPosition: 'start',
 			styles: {
 				status: {
 					width: '1%',

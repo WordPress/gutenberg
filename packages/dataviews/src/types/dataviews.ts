@@ -247,6 +247,20 @@ export interface ViewTable extends ViewBase {
 		 * Whether the view allows column moving.
 		 */
 		enableMoving?: boolean;
+
+		/**
+		 * Position of the actions column.
+		 * - 'end' (default): Actions column appears after all other columns
+		 * - 'start': Actions column appears immediately after the primary column
+		 * - number: Actions column appears at the specified index within the fields array
+		 */
+		actionsPosition?: 'end' | 'start' | number;
+
+		/**
+		 * Whether to hide the actions column header label.
+		 * When true, the header cell remains for layout purposes but the "Actions" text is hidden.
+		 */
+		hideActionsHeader?: boolean;
 	};
 }
 
@@ -322,6 +336,20 @@ export interface ViewPickerTable extends ViewBase {
 		 * Whether the view allows column moving.
 		 */
 		enableMoving?: boolean;
+
+		/**
+		 * Position of the actions column.
+		 * - 'end' (default): Actions column appears after all other columns
+		 * - 'start': Actions column appears immediately after the primary column
+		 * - number: Actions column appears at the specified index within the fields array
+		 */
+		actionsPosition?: 'end' | 'start' | number;
+
+		/**
+		 * Whether to hide the actions column header label.
+		 * When true, the header cell remains for layout purposes but the "Actions" text is hidden.
+		 */
+		hideActionsHeader?: boolean;
 	};
 }
 
