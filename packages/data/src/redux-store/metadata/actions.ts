@@ -5,7 +5,7 @@
  * @param selectorName Name of selector for which resolver triggered.
  * @param args         Arguments to associate for uniqueness.
  *
- * @return  Action object.
+ * @return Action object.
  */
 export function startResolution( selectorName: string, args: unknown[] ) {
 	return {
@@ -22,7 +22,7 @@ export function startResolution( selectorName: string, args: unknown[] ) {
  * @param selectorName Name of selector for which resolver triggered.
  * @param args         Arguments to associate for uniqueness.
  *
- * @return  Action object.
+ * @return Action object.
  */
 export function finishResolution( selectorName: string, args: unknown[] ) {
 	return {
@@ -63,7 +63,7 @@ export function failResolution(
  * @param args         Array of arguments to associate for uniqueness, each item
  *                     is associated to a resolution.
  *
- * @return  Action object.
+ * @return Action object.
  */
 export function startResolutions( selectorName: string, args: unknown[][] ) {
 	return {
@@ -135,7 +135,7 @@ export function invalidateResolution( selectorName: string, args: unknown[] ) {
  * Returns an action object used in signalling that the resolution
  * should be invalidated.
  *
- * @return  Action object.
+ * @return Action object.
  */
 export function invalidateResolutionForStore() {
 	return {
@@ -150,7 +150,7 @@ export function invalidateResolutionForStore() {
  * @param selectorName Name of selector for which all resolvers should
  *                     be invalidated.
  *
- * @return   Action object.
+ * @return Action object.
  */
 export function invalidateResolutionForStoreSelector( selectorName: string ) {
 	return {
