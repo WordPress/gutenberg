@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import type { Middleware } from 'redux';
 
 export default function createThunkMiddleware( args: unknown ): Middleware {
