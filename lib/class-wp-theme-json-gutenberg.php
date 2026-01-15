@@ -311,7 +311,6 @@ class WP_Theme_JSON_Gutenberg {
 		'height'                            => array( 'dimensions', 'height' ),
 		'width'                             => array( 'dimensions', 'width' ),
 		'writing-mode'                      => array( 'typography', 'writingMode' ),
-		'gap'                               => array( 'spacing', 'blockGap' ),
 	);
 
 	/**

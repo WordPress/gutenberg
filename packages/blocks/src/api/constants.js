@@ -243,10 +243,6 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 		},
 		useEngine: true,
 	},
-	gap: {
-		value: [ 'spacing', 'blockGap' ],
-		support: [ 'spacing', 'blockGap' ],
-	},
 	textAlign: {
 		value: [ 'typography', 'textAlign' ],
 		support: [ 'typography', 'textAlign' ],
