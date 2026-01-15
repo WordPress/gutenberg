@@ -8,6 +8,7 @@ import { wrap, terminate, type Remote } from '@wordpress/worker-threads';
  */
 import type { ItemId, ImageSizeCrop } from './types';
 import type { WorkerAPI } from './worker';
+import { workerCode } from './worker-code';
 
 /**
  * The worker instance, lazily created on first use.
@@ -20,18 +21,29 @@ let worker: Worker | undefined;
 let workerAPI: Remote< WorkerAPI > | undefined;
 
 /**
+ * The Blob URL for the worker, kept for cleanup.
+ */
+let workerBlobUrl: string | undefined;
+
+/**
  * Gets or creates the vips worker instance.
  * Uses lazy initialization to only create the worker when needed.
+ *
+ * The worker code is bundled inline and loaded via a Blob URL.
+ * This avoids issues with import.meta.url not being available
+ * when the code is bundled via webpack.
  *
  * @return The wrapped worker API.
  */
 function getWorkerAPI(): Remote< WorkerAPI > {
 	if ( workerAPI === undefined ) {
-		// Create the worker using the bundled worker script.
-		// The URL pattern works with esbuild's bundling.
-		worker = new Worker( new URL( './worker.mjs', import.meta.url ), {
-			type: 'module',
+		// Create worker from inline code via Blob URL.
+		// This approach works regardless of how the code is bundled.
+		const blob = new Blob( [ workerCode ], {
+			type: 'application/javascript',
 		} );
+		workerBlobUrl = URL.createObjectURL( blob );
+		worker = new Worker( workerBlobUrl );
 		workerAPI = wrap< WorkerAPI >( worker );
 	}
 	return workerAPI;
@@ -148,5 +160,9 @@ export function terminateVipsWorker(): void {
 		terminate( workerAPI );
 		workerAPI = undefined;
 		worker = undefined;
+	}
+	if ( workerBlobUrl ) {
+		URL.revokeObjectURL( workerBlobUrl );
+		workerBlobUrl = undefined;
 	}
 }
