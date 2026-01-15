@@ -1,3 +1,5 @@
+const { hasTruthyJsxAttribute } = require( '../utils' );
+
 /**
  * Enforces that specific components from @wordpress/components include the
  * `__next40pxDefaultSize` prop.
@@ -125,48 +127,6 @@ module.exports = {
 		}
 
 		/**
-		 * Check if an attribute exists and has a truthy value.
-		 * Returns true if the attribute exists with a truthy value.
-		 *
-		 * @param {Array}  attributes - JSX attributes array
-		 * @param {string} attrName   - Attribute name to check
-		 * @return {boolean} Whether the attribute has a truthy value
-		 */
-		function hasTruthyAttribute( attributes, attrName ) {
-			const attr = attributes.find(
-				( a ) =>
-					a.type === 'JSXAttribute' &&
-					a.name &&
-					a.name.name === attrName
-			);
-
-			if ( ! attr ) {
-				return false;
-			}
-
-			// Boolean attribute without value (e.g., `__next40pxDefaultSize`)
-			if ( attr.value === null ) {
-				return true;
-			}
-
-			// Expression like `__next40pxDefaultSize={true}` or `__next40pxDefaultSize={false}`
-			if (
-				attr.value.type === 'JSXExpressionContainer' &&
-				attr.value.expression.type === 'Literal'
-			) {
-				return attr.value.expression.value !== false;
-			}
-
-			// String value - truthy if not empty
-			if ( attr.value.type === 'Literal' ) {
-				return Boolean( attr.value.value );
-			}
-
-			// For any other expression (variables, etc.), assume it could be truthy
-			return true;
-		}
-
-		/**
 		 * Check if the `size` prop has a non-default value.
 		 *
 		 * @param {Array} attributes - JSX attributes array
@@ -279,7 +239,7 @@ module.exports = {
 
 				// Check if __next40pxDefaultSize has a truthy value
 				if (
-					hasTruthyAttribute( attributes, '__next40pxDefaultSize' )
+					hasTruthyJsxAttribute( attributes, '__next40pxDefaultSize' )
 				) {
 					return;
 				}
