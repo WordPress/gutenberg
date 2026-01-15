@@ -253,7 +253,10 @@ $navigation-icon-size: 24px;
 
 	// Always show submenus when open-on-always class is present
 	&.open-on-always {
-		flex-direction: inherit;
+		flex-wrap: var(--navigation-layout-wrap, wrap);
+		flex-direction: var(--navigation-layout-direction, initial);
+		justify-content: var(--navigation-layout-justify, initial);
+		align-items: var(--navigation-layout-align, initial);
 
 		> .wp-block-navigation-item__content,
 		.wp-block-navigation__submenu-container > .wp-block-navigation-item > .wp-block-navigation-item__content {
