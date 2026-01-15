@@ -31,7 +31,7 @@ function getWorkerAPI(): Remote< WorkerAPI > {
 		// The URL pattern works with esbuild's bundling.
 		worker = new Worker(
 			new URL(
-				/* webpackIgnore: true */ './worker.mjs',
+				'./worker.mjs',
 				import.meta.url
 			),
 			{ type: 'module' }
