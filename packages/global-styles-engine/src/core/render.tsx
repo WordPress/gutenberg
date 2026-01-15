@@ -4,6 +4,8 @@
 import {
 	__EXPERIMENTAL_STYLE_PROPERTY as STYLE_PROPERTY,
 	__EXPERIMENTAL_ELEMENTS as ELEMENTS,
+	getBlockSupport,
+	getBlockTypes,
 	store as blocksStore,
 	// @ts-expect-error - @wordpress/blocks module doesn't have TypeScript declarations
 } from '@wordpress/blocks';
@@ -1469,7 +1471,7 @@ export const getBlockSelectors = (
 		// Keep backwards compatibility for support.color.__experimentalDuotone.
 		if ( ! duotoneSelector ) {
 			const rootSelector = getBlockSelector( blockType );
-			const duotoneSupport = select( blocksStore ).getBlockSupport(
+			const duotoneSupport = getBlockSupport(
 				blockType,
 				'color.__experimentalDuotone',
 				false
@@ -1649,10 +1651,7 @@ export function generateGlobalStyles(
 	} = options;
 
 	// Use provided block types or fall back to getBlockTypes()
-	const blocks =
-		blockTypes.length > 0
-			? blockTypes
-			: select( blocksStore ).getBlockTypes();
+	const blocks = blockTypes.length > 0 ? blockTypes : getBlockTypes();
 
 	const blockGap = getSetting( config, 'spacing.blockGap' );
 	const hasBlockGapSupport = hasBlockGapSupportOption ?? blockGap !== null;
