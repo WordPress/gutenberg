@@ -36,7 +36,7 @@ const REVISION_DIFF_STYLES = `
 		outline-offset: 2px;
 	}
 	.is-revision-removed {
-		outline: 2px solid color-mix(in srgb, currentColor 30%, #d63638 70%) !important;
+		outline: 2px solid color-mix(in srgb, currentColor 20%, #d63638 80%) !important;
 		outline-offset: 2px;
 		opacity: 0.5;
 	}
@@ -46,8 +46,8 @@ const REVISION_DIFF_STYLES = `
 	}
 	.revision-diff-removed {
 		text-decoration: line-through;
-		background-color: color-mix(in srgb, currentColor 5%, #d63638 15%);
-		color: color-mix(in srgb, currentColor 50%, #8b0000 50%);
+		background-color: color-mix(in srgb, currentColor 5%, #d63638 25%);
+		color: color-mix(in srgb, currentColor 40%, #8b0000 60%);
 	}
 	.revision-diff-added {
 		background-color: color-mix(in srgb, currentColor 5%, #00a32a 15%);
@@ -67,8 +67,8 @@ const REVISION_DIFF_STYLES = `
 			45deg,
 			transparent,
 			transparent 2px,
-			color-mix(in srgb, currentColor 20%, #d63638 15%) 2px,
-			color-mix(in srgb, currentColor 20%, #d63638 15%) 4px
+			color-mix(in srgb, currentColor 15%, #d63638 25%) 2px,
+			color-mix(in srgb, currentColor 15%, #d63638 25%) 4px
 		);
 	}
 	.revision-diff-format-changed {
