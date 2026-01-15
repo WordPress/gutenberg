@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { BaseControl, useBaseControlProps } from '@wordpress/components';
 import { useMergeRefs } from '@wordpress/compose';
 import { useRegistry } from '@wordpress/data';
@@ -9,15 +6,13 @@ import {
 	__unstableUseRichText as useRichText,
 	removeFormat,
 } from '@wordpress/rich-text';
+import { useFormatTypes } from '../use-format-types';
+import { getAllowedFormats } from '../utils';
+import { useEventListeners } from '../event-listeners';
+import FormatEdit from '../format-edit';
+import { keyboardShortcutContext, inputEventContext } from '../';
 
-/**
- * Internal dependencies
- */
-import { useFormatTypes } from './use-format-types';
-import { getAllowedFormats } from './utils';
-import { useEventListeners } from './event-listeners';
-import FormatEdit from './format-edit';
-import { keyboardShortcutContext, inputEventContext } from './';
+import './style.scss';
 
 /**
  * A rich text control component that provides a contenteditable field with formatting capabilities.
@@ -166,7 +161,7 @@ export default function RichTextControl( {
 			) }
 			<BaseControl { ...baseControlProps }>
 				<div
-					className="block-editor-content-only-controls__rich-text"
+					className="block-editor-rich-text-control"
 					role="textbox"
 					aria-multiline={ ! disableLineBreaks }
 					ref={ useMergeRefs( [
