@@ -31,7 +31,6 @@ import type {
 	removeItem,
 	revokeBlobUrls,
 } from './private-actions';
-import { vipsCancelOperations } from './utils';
 import { validateMimeType } from '../validate-mime-type';
 import { validateMimeTypeForUser } from '../validate-mime-type-for-user';
 import { validateFileSize } from '../validate-file-size';
@@ -159,9 +158,6 @@ export function cancelItem( id: QueueItemId, error: Error, silent = false ) {
 		}
 
 		item.abortController?.abort();
-
-		// Cancel any ongoing vips operations for this item.
-		await vipsCancelOperations( id );
 
 		if ( ! silent ) {
 			const { onError } = item;

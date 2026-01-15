@@ -14,15 +14,12 @@ type WPDataRegistry = ReturnType< typeof createRegistry >;
 /**
  * Internal dependencies
  */
-import { cloneFile, convertBlobToFile, renameFile } from '../utils';
+import { cloneFile, convertBlobToFile } from '../utils';
 import { StubFile } from '../stub-file';
-import { UploadError } from '../upload-error';
-import { vipsResizeImage, debug } from './utils';
 import type {
 	AddAction,
 	AdditionalData,
 	AddOperationsAction,
-	Attachment,
 	BatchId,
 	CacheBlobUrlAction,
 	OnBatchSuccessHandler,
@@ -30,7 +27,6 @@ import type {
 	OnErrorHandler,
 	OnSuccessHandler,
 	Operation,
-	OperationArgs,
 	OperationFinishAction,
 	OperationStartAction,
 	PauseItemAction,
@@ -40,7 +36,6 @@ import type {
 	ResumeItemAction,
 	ResumeQueueAction,
 	RevokeBlobUrlsAction,
-	SideloadAdditionalData,
 	Settings,
 	State,
 	UpdateProgressAction,
@@ -52,7 +47,6 @@ import type { cancelItem } from './actions';
 type ActionCreators = {
 	cancelItem: typeof cancelItem;
 	addItem: typeof addItem;
-	addSideloadItem: typeof addSideloadItem;
 	removeItem: typeof removeItem;
 	pauseItem: typeof pauseItem;
 	resumeItem: typeof resumeItem;
@@ -60,9 +54,6 @@ type ActionCreators = {
 	processItem: typeof processItem;
 	finishOperation: typeof finishOperation;
 	uploadItem: typeof uploadItem;
-	sideloadItem: typeof sideloadItem;
-	resizeCropItem: typeof resizeCropItem;
-	generateThumbnails: typeof generateThumbnails;
 	updateItemProgress: typeof updateItemProgress;
 	revokeBlobUrls: typeof revokeBlobUrls;
 	< T = Record< string, unknown > >( args: T ): void;
@@ -130,17 +121,6 @@ export function addItem( {
 	return async ( { dispatch }: ThunkArgs ) => {
 		const itemId = uuidv4();
 
-		debug.group( `addItem: ${ itemId }` );
-		debug.log( 'Adding new item to queue', {
-			itemId,
-			batchId,
-			sourceUrl,
-			sourceAttachmentId,
-			operations,
-			additionalData,
-		} );
-		debug.log( 'File details:', fileOrBlob );
-
 		// Hardening in case a Blob is passed instead of a File.
 		// See https://github.com/WordPress/gutenberg/pull/65693 for an example.
 		const file = convertBlobToFile( fileOrBlob );
@@ -157,12 +137,6 @@ export function addItem( {
 			} );
 		}
 
-		debug.log( 'Dispatching Add action with operations:', {
-			operations: Array.isArray( operations )
-				? operations
-				: [ OperationType.Prepare ],
-		} );
-
 		dispatch< AddAction >( {
 			type: Type.Add,
 			item: {
@@ -175,7 +149,6 @@ export function addItem( {
 					url: blobUrl,
 				},
 				additionalData: {
-					generate_sub_sizes: false,
 					convert_format: false,
 					...additionalData,
 				},
@@ -192,77 +165,6 @@ export function addItem( {
 			},
 		} );
 
-		debug.log( 'Starting item processing' );
-		debug.groupEnd();
-		dispatch.processItem( itemId );
-	};
-}
-
-interface AddSideloadItemArgs {
-	file: File;
-	onChange?: OnChangeHandler;
-	additionalData?: AdditionalData;
-	operations?: Operation[];
-	batchId?: BatchId;
-	parentId?: QueueItemId;
-}
-
-/**
- * Adds a new item to the upload queue for sideloading.
- *
- * This is typically a client-side generated thumbnail.
- *
- * @param $0
- * @param $0.file             File
- * @param [$0.batchId]        Batch ID.
- * @param [$0.parentId]       Parent ID.
- * @param [$0.onChange]       Function called each time a file or a temporary representation of the file is available.
- * @param [$0.additionalData] Additional data to include in the request.
- * @param [$0.operations]     List of operations to perform. Defaults to automatically determined list, based on the file.
- */
-export function addSideloadItem( {
-	file,
-	onChange,
-	additionalData,
-	operations,
-	batchId,
-	parentId,
-}: AddSideloadItemArgs ) {
-	return async ( { dispatch }: ThunkArgs ) => {
-		const itemId = uuidv4();
-
-		debug.group( `addSideloadItem: ${ itemId }` );
-		debug.log( 'Adding sideload item (thumbnail)', {
-			itemId,
-			batchId,
-			parentId,
-			additionalData,
-		} );
-		debug.log( 'File details:', file );
-		debug.log( 'Operations:', operations );
-
-		dispatch< AddAction >( {
-			type: Type.Add,
-			item: {
-				id: itemId,
-				batchId,
-				status: ItemStatus.Processing,
-				sourceFile: cloneFile( file ),
-				file,
-				onChange,
-				additionalData: {
-					...additionalData,
-				},
-				parentId,
-				operations: Array.isArray( operations )
-					? operations
-					: [ OperationType.Prepare ],
-				abortController: new AbortController(),
-			},
-		} );
-
-		debug.log( 'Sideload item added, starting processing' );
-		debug.groupEnd();
 		dispatch.processItem( itemId );
 	};
 }
@@ -276,69 +178,18 @@ export function addSideloadItem( {
  */
 export function processItem( id: QueueItemId ) {
 	return async ( { select, dispatch }: ThunkArgs ) => {
-		debug.group( `processItem: ${ id }` );
-
 		if ( select.isPaused() ) {
-			debug.log( 'Queue is paused, skipping' );
-			debug.groupEnd();
 			return;
 		}
 
 		const item = select.getItem( id ) as QueueItem;
 
-		const {
-			attachment,
-			onChange,
-			onSuccess,
-			onBatchSuccess,
-			batchId,
-			parentId,
-		} = item;
+		const { attachment, onChange, onSuccess, onBatchSuccess, batchId } =
+			item;
 
 		const operation = Array.isArray( item.operations?.[ 0 ] )
 			? item.operations[ 0 ][ 0 ]
 			: item.operations?.[ 0 ];
-		const operationArgs = Array.isArray( item.operations?.[ 0 ] )
-			? item.operations[ 0 ][ 1 ]
-			: undefined;
-
-		debug.log( 'Processing item', {
-			id,
-			status: item.status,
-			parentId,
-			batchId,
-			currentOperation: operation,
-			operationArgs,
-			remainingOperations: item.operations,
-			file: item.file,
-		} );
-
-		// If we're sideloading a thumbnail, pause upload to avoid race conditions.
-		// It will be resumed after the previous upload finishes.
-		if (
-			operation === OperationType.Upload &&
-			item.parentId &&
-			item.additionalData.post
-		) {
-			const isAlreadyUploading = select.isUploadingToPost(
-				item.additionalData.post as number
-			);
-			if ( isAlreadyUploading ) {
-				debug.log(
-					'Pausing sideload item - parent is still uploading',
-					{
-						parentId: item.parentId,
-						post: item.additionalData.post,
-					}
-				);
-				debug.groupEnd();
-				dispatch< PauseItemAction >( {
-					type: Type.PauseItem,
-					id,
-				} );
-				return;
-			}
-		}
 
 		/*
 		 * If the next operation is an upload, check concurrency limit.
@@ -349,11 +200,6 @@ export function processItem( id: QueueItemId ) {
 			const settings = select.getSettings();
 			const activeCount = select.getActiveUploadCount();
 			if ( activeCount >= settings.maxConcurrentUploads ) {
-				debug.log( 'Concurrency limit reached, waiting', {
-					activeCount,
-					maxConcurrentUploads: settings.maxConcurrentUploads,
-				} );
-				debug.groupEnd();
 				return;
 			}
 		}
@@ -369,77 +215,29 @@ export function processItem( id: QueueItemId ) {
 		*/
 
 		if ( ! operation ) {
-			debug.log( 'No more operations for item', { id, parentId } );
-
-			if (
-				parentId ||
-				( ! parentId && ! select.isUploadingByParentId( id ) )
-			) {
-				debug.log( 'Item complete, removing from queue', {
-					id,
-					hasAttachment: !! attachment,
-					attachmentId: attachment?.id,
-				} );
-
-				if ( attachment ) {
-					onSuccess?.( [ attachment ] );
-				}
-
-				dispatch.removeItem( id );
-				dispatch.revokeBlobUrls( id );
-
-				if ( batchId && select.isBatchUploaded( batchId ) ) {
-					debug.log( 'Batch complete', { batchId } );
-					onBatchSuccess?.();
-				}
+			if ( attachment ) {
+				onSuccess?.( [ attachment ] );
 			}
 
-			// All other side-loaded items have been removed, so remove the parent too.
-			if ( parentId && batchId && select.isBatchUploaded( batchId ) ) {
-				const parentItem = select.getItem( parentId ) as QueueItem;
-				if ( ! parentItem ) {
-					debug.log( 'Parent item not found', { parentId } );
-					debug.groupEnd();
-					return;
-				}
+			// dispatch.removeItem( id );
+			dispatch.revokeBlobUrls( id );
 
-				debug.log(
-					'Removing parent item after all sideloads complete',
-					{
-						parentId,
-					}
-				);
-
-				if ( attachment ) {
-					parentItem.onSuccess?.( [ attachment ] );
-				}
-
-				dispatch.removeItem( parentId );
-				dispatch.revokeBlobUrls( parentId );
-
-				if (
-					parentItem.batchId &&
-					select.isBatchUploaded( parentItem.batchId )
-				) {
-					debug.log( 'Parent batch complete', {
-						batchId: parentItem.batchId,
-					} );
-					parentItem.onBatchSuccess?.();
-				}
+			if ( batchId && select.isBatchUploaded( batchId ) ) {
+				onBatchSuccess?.();
 			}
 
 			/*
 			 At this point we are dealing with a parent whose children haven't fully uploaded yet.
 			 Do nothing and let the removal happen once the last side-loaded item finishes.
 			 */
-			debug.groupEnd();
+
 			return;
 		}
 
-		debug.log( `Starting operation: ${ operation }`, {
-			id,
-			operationArgs,
-		} );
+		if ( ! operation ) {
+			// This shouldn't really happen.
+			return;
+		}
 
 		dispatch< OperationStartAction >( {
 			type: Type.OperationStart,
@@ -449,35 +247,13 @@ export function processItem( id: QueueItemId ) {
 
 		switch ( operation ) {
 			case OperationType.Prepare:
-				debug.log( 'Dispatching prepareItem' );
 				dispatch.prepareItem( item.id );
 				break;
 
-			case OperationType.ResizeCrop:
-				debug.log( 'Dispatching resizeCropItem', { operationArgs } );
-				dispatch.resizeCropItem(
-					item.id,
-					operationArgs as OperationArgs[ OperationType.ResizeCrop ]
-				);
-				break;
-
 			case OperationType.Upload:
-				if ( item.parentId ) {
-					debug.log( 'Dispatching sideloadItem (has parentId)' );
-					dispatch.sideloadItem( id );
-				} else {
-					debug.log( 'Dispatching uploadItem (no parentId)' );
-					dispatch.uploadItem( id );
-				}
-				break;
-
-			case OperationType.ThumbnailGeneration:
-				debug.log( 'Dispatching generateThumbnails' );
-				dispatch.generateThumbnails( id );
+				dispatch.uploadItem( id );
 				break;
 		}
-
-		debug.groupEnd();
 	};
 }
 
@@ -527,20 +303,23 @@ export function pauseItem( id: QueueItemId ) {
 }
 
 /**
- * Resumes processing for a given post/attachment ID.
+ * Resumes a specific paused item in the queue.
  *
- * @param postOrAttachmentId Post or attachment ID.
+ * @param id Item ID.
  */
-export function resumeItem( postOrAttachmentId: number ) {
+export function resumeItem( id: QueueItemId ) {
 	return async ( { select, dispatch }: ThunkArgs ) => {
-		const item = select.getPausedUploadForPost( postOrAttachmentId );
-		if ( item ) {
-			dispatch< ResumeItemAction >( {
-				type: Type.ResumeItem,
-				id: item.id,
-			} );
-			dispatch.processItem( item.id );
+		const item = select.getItem( id );
+		if ( ! item || item.status !== ItemStatus.Paused ) {
+			return;
 		}
+
+		dispatch< ResumeItemAction >( {
+			type: Type.ResumeItem,
+			id,
+		} );
+
+		dispatch.processItem( id );
 	};
 }
 
@@ -577,21 +356,6 @@ export function finishOperation(
 		const item = select.getItem( id );
 		const previousOperation = item?.currentOperation;
 
-		debug.log( `finishOperation: ${ id }`, {
-			previousOperation,
-			updates: {
-				...updates,
-				attachment: updates.attachment
-					? {
-							id: updates.attachment.id,
-							url: updates.attachment.url,
-							missing_image_sizes:
-								updates.attachment.missing_image_sizes,
-					  }
-					: undefined,
-			},
-		} );
-
 		dispatch< OperationFinishAction >( {
 			type: Type.OperationFinish,
 			id,
@@ -606,9 +370,6 @@ export function finishOperation(
 		 */
 		if ( previousOperation === OperationType.Upload ) {
 			const pendingUploads = select.getPendingUploads();
-			debug.log( 'Upload finished, processing pending uploads', {
-				pendingCount: pendingUploads.length,
-			} );
 			for ( const pendingItem of pendingUploads ) {
 				dispatch.processItem( pendingItem.id );
 			}
@@ -631,33 +392,8 @@ export function finishOperation(
  * @param id Item ID.
  */
 export function prepareItem( id: QueueItemId ) {
-	return async ( { select, dispatch }: ThunkArgs ) => {
-		const item = select.getItem( id ) as QueueItem;
-		const { file } = item;
-
-		debug.group( `prepareItem: ${ id }` );
-		debug.log( 'Preparing item', { file } );
-
-		const operations: Operation[] = [];
-
-		const isImage = file.type.startsWith( 'image/' );
-
-		// For images, add upload and thumbnail generation.
-		if ( isImage ) {
-			debug.log(
-				'Image detected, adding Upload and ThumbnailGeneration operations'
-			);
-			operations.push(
-				OperationType.Upload,
-				OperationType.ThumbnailGeneration
-			);
-		} else {
-			debug.log( 'Non-image file, adding Upload operation only' );
-			operations.push( OperationType.Upload );
-		}
-
-		debug.log( 'Operations to perform:', operations );
-		debug.groupEnd();
+	return async ( { dispatch }: ThunkArgs ) => {
+		const operations: Operation[] = [ OperationType.Upload ];
 
 		dispatch< AddOperationsAction >( {
 			type: Type.AddOperations,
@@ -678,25 +414,11 @@ export function uploadItem( id: QueueItemId ) {
 	return async ( { select, dispatch }: ThunkArgs ) => {
 		const item = select.getItem( id ) as QueueItem;
 
-		debug.group( `uploadItem: ${ id }` );
-		debug.log( 'Starting upload', {
-			file: item.file,
-			additionalData: item.additionalData,
-		} );
-		debug.time( `upload-${ id }` );
-
 		select.getSettings().mediaUpload( {
 			filesList: [ item.file ],
 			additionalData: item.additionalData,
 			signal: item.abortController?.signal,
 			onFileChange: ( [ attachment ] ) => {
-				debug.log( 'Upload onFileChange', {
-					id,
-					attachmentId: attachment.id,
-					url: attachment.url,
-					isBlobUrl: isBlobURL( attachment.url ),
-					missing_image_sizes: attachment.missing_image_sizes,
-				} );
 				if ( ! isBlobURL( attachment.url ) ) {
 					dispatch.finishOperation( id, {
 						attachment,
@@ -704,288 +426,14 @@ export function uploadItem( id: QueueItemId ) {
 				}
 			},
 			onSuccess: ( [ attachment ] ) => {
-				debug.timeEnd( `upload-${ id }` );
-				debug.log( 'Upload onSuccess', {
-					id,
-					attachmentId: attachment.id,
-					url: attachment.url,
-					missing_image_sizes: attachment.missing_image_sizes,
-				} );
-				debug.groupEnd();
 				dispatch.finishOperation( id, {
 					attachment,
 				} );
 			},
 			onError: ( error ) => {
-				debug.timeEnd( `upload-${ id }` );
-				debug.error( 'Upload failed', { id, error: error.message } );
-				debug.groupEnd();
 				dispatch.cancelItem( id, error );
 			},
 		} );
-	};
-}
-
-/**
- * Sideloads an item to the server.
- *
- * @param id Item ID.
- */
-export function sideloadItem( id: QueueItemId ) {
-	return async ( { select, dispatch }: ThunkArgs ) => {
-		const item = select.getItem( id ) as QueueItem;
-
-		const { post, ...additionalData } =
-			item.additionalData as SideloadAdditionalData;
-
-		debug.group( `sideloadItem: ${ id }` );
-		debug.log( 'Starting sideload (thumbnail upload)', {
-			file: item.file,
-			attachmentId: post,
-			image_size: additionalData.image_size,
-			parentId: item.parentId,
-		} );
-		debug.time( `sideload-${ id }` );
-
-		const mediaSideload = select.getSettings().mediaSideload;
-		if ( ! mediaSideload ) {
-			debug.warn( 'Sideloading not supported, skipping' );
-			debug.groupEnd();
-			// If sideloading is not supported, skip this operation.
-			dispatch.finishOperation( id, {} );
-			return;
-		}
-
-		mediaSideload( {
-			file: item.file,
-			attachmentId: post as number,
-			additionalData,
-			signal: item.abortController?.signal,
-			onFileChange: ( [ attachment ] ) => {
-				debug.timeEnd( `sideload-${ id }` );
-				debug.log( 'Sideload complete', {
-					id,
-					attachmentId: attachment.id,
-					image_size: additionalData.image_size,
-				} );
-				debug.groupEnd();
-				dispatch.finishOperation( id, { attachment } );
-				dispatch.resumeItem( post as number );
-			},
-			onError: ( error ) => {
-				debug.timeEnd( `sideload-${ id }` );
-				debug.error( 'Sideload failed', {
-					id,
-					error: error.message,
-					image_size: additionalData.image_size,
-				} );
-				debug.groupEnd();
-				dispatch.cancelItem( id, error );
-				dispatch.resumeItem( post as number );
-			},
-		} );
-	};
-}
-
-type ResizeCropItemArgs = OperationArgs[ OperationType.ResizeCrop ];
-
-/**
- * Resizes and crops an existing image item.
- *
- * @param id     Item ID.
- * @param [args] Additional arguments for the operation.
- */
-export function resizeCropItem( id: QueueItemId, args?: ResizeCropItemArgs ) {
-	return async ( { select, dispatch }: ThunkArgs ) => {
-		const item = select.getItem( id ) as QueueItem;
-
-		debug.group( `resizeCropItem: ${ id }` );
-		debug.log( 'Resizing/cropping image for thumbnail', {
-			file: item.file,
-			resize: args?.resize,
-			parentId: item.parentId,
-		} );
-
-		if ( ! args?.resize ) {
-			debug.log( 'No resize args provided, skipping resize' );
-			debug.groupEnd();
-			dispatch.finishOperation( id, {
-				file: item.file,
-			} );
-			return;
-		}
-
-		const addSuffix = Boolean( item.parentId );
-
-		debug.log( 'Resize parameters', {
-			width: args.resize.width,
-			height: args.resize.height,
-			crop: args.resize.crop,
-			addSuffix,
-		} );
-		debug.time( `resize-${ id }` );
-
-		try {
-			const file = await vipsResizeImage(
-				item.id,
-				item.file,
-				args.resize,
-				false, // smartCrop
-				addSuffix
-			);
-
-			debug.timeEnd( `resize-${ id }` );
-			debug.log( 'Resize complete', {
-				originalFile: item.file,
-				resizedFile: file,
-				dimensions: {
-					width: file.width,
-					height: file.height,
-					originalWidth: file.originalWidth,
-					originalHeight: file.originalHeight,
-				},
-			} );
-			debug.groupEnd();
-
-			const blobUrl = createBlobURL( file );
-			dispatch< CacheBlobUrlAction >( {
-				type: Type.CacheBlobUrl,
-				id,
-				blobUrl,
-			} );
-
-			dispatch.finishOperation( id, {
-				file,
-				attachment: {
-					url: blobUrl,
-				},
-			} );
-		} catch ( error ) {
-			debug.timeEnd( `resize-${ id }` );
-			debug.error( 'Resize failed', {
-				id,
-				error: error instanceof Error ? error.message : error,
-			} );
-			debug.groupEnd();
-			dispatch.cancelItem(
-				id,
-				new UploadError( {
-					code: 'IMAGE_TRANSCODING_ERROR',
-					message: 'File could not be uploaded',
-					file: item.file,
-					cause: error instanceof Error ? error : undefined,
-				} )
-			);
-		}
-	};
-}
-
-/**
- * Adds thumbnail versions to the queue for sideloading.
- *
- * @param id Item ID.
- */
-export function generateThumbnails( id: QueueItemId ) {
-	return async ( { select, dispatch }: ThunkArgs ) => {
-		const item = select.getItem( id ) as QueueItem;
-
-		const attachment: Attachment = item.attachment as Attachment;
-
-		debug.group( `generateThumbnails: ${ id }` );
-		debug.log( 'Starting thumbnail generation', {
-			attachmentId: attachment?.id,
-			parentId: item.parentId,
-			missing_image_sizes: attachment?.missing_image_sizes,
-			file: item.file,
-		} );
-
-		// Client-side thumbnail generation for images.
-		if (
-			! item.parentId &&
-			attachment.missing_image_sizes &&
-			attachment.missing_image_sizes.length > 0
-		) {
-			const file = attachment.media_filename
-				? renameFile( item.file, attachment.media_filename )
-				: item.file;
-			const batchId = uuidv4();
-
-			debug.log( 'Creating thumbnails for missing sizes', {
-				missingSizes: attachment.missing_image_sizes,
-				thumbnailBatchId: batchId,
-				file,
-			} );
-
-			// Get all registered image sizes from settings.
-			const allImageSizes = select.getSettings().allImageSizes || {};
-
-			for ( const name of attachment.missing_image_sizes ) {
-				const imageSize =
-					allImageSizes?.[ name as keyof typeof allImageSizes ];
-				if ( ! imageSize ) {
-					debug.warn(
-						`Image size "${ name }" not found in settings, skipping`
-					);
-					continue;
-				}
-
-				debug.log( `Creating thumbnail: ${ name }`, {
-					sizeName: name,
-					dimensions: {
-						width: imageSize.width,
-						height: imageSize.height,
-						crop: imageSize.crop,
-					},
-					attachmentId: attachment.id,
-				} );
-
-				dispatch.addSideloadItem( {
-					file,
-					onChange: ( [ updatedAttachment ] ) => {
-						// If the sub-size is still being generated, there is no need
-						// to invoke the callback below. It would just override
-						// the main image in the editor with the sub-size.
-						if ( isBlobURL( updatedAttachment.url ) ) {
-							return;
-						}
-
-						debug.log( `Thumbnail "${ name }" onChange callback`, {
-							attachmentId: updatedAttachment.id,
-						} );
-
-						// This might be confusing, but the idea is to update the original
-						// image item in the editor with the new one with the added sub-size.
-						item.onChange?.( [ updatedAttachment ] );
-					},
-					batchId,
-					parentId: item.id,
-					additionalData: {
-						// Sideloading does not use the parent post ID but the
-						// attachment ID as the image sizes need to be added to it.
-						post: attachment.id,
-						image_size: name,
-						convert_format: false,
-					},
-					operations: [
-						[ OperationType.ResizeCrop, { resize: imageSize } ],
-						OperationType.Upload,
-					],
-				} );
-			}
-
-			debug.log(
-				`Queued ${ attachment.missing_image_sizes.length } thumbnails for generation`
-			);
-		} else {
-			debug.log( 'No thumbnails to generate', {
-				hasParentId: !! item.parentId,
-				hasMissingSizes: !! attachment?.missing_image_sizes,
-				missingSizesCount: attachment?.missing_image_sizes?.length || 0,
-			} );
-		}
-
-		debug.groupEnd();
-		dispatch.finishOperation( id, {} );
 	};
 }
 
