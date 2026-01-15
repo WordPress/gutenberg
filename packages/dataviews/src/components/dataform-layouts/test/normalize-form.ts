@@ -351,10 +351,10 @@ describe( 'normalizeFormFields', () => {
 			};
 			const result = normalizeForm( form );
 			expect( result ).toEqual( {
-			labelMode: 'showRequired',
-			layout: {
-				type: 'regular',
-				labelPosition: 'top',
+				labelMode: 'showRequired',
+				layout: {
+					type: 'regular',
+					labelPosition: 'top',
 				},
 				fields: [
 					{

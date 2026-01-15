@@ -159,7 +159,11 @@ function CalendarDateTimeControl< Item >( {
 	let displayLabel = label;
 	if ( isValid?.required && ! markWhenOptional && ! hideLabelFromVision ) {
 		displayLabel = `${ label } (${ __( 'Required' ) })`;
-	} else if ( ! isValid?.required && markWhenOptional && ! hideLabelFromVision ) {
+	} else if (
+		! isValid?.required &&
+		markWhenOptional &&
+		! hideLabelFromVision
+	) {
 		displayLabel = `${ label } (${ __( 'Optional' ) })`;
 	}
 
