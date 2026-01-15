@@ -32,7 +32,6 @@ import { EntityProvider, store as coreStore } from '@wordpress/core-data';
 
 import { useDispatch, useSelect } from '@wordpress/data';
 import {
-	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 	ToggleControl,
 	Spinner,
@@ -76,7 +75,6 @@ import DeletedNavigationWarning from './deleted-navigation-warning';
 import AccessibleDescription from './accessible-description';
 import AccessibleMenuDescription from './accessible-menu-description';
 import { unlock } from '../../lock-unlock';
-import { useToolsPanelDropdownMenuProps } from '../../utils/hooks';
 import { DEFAULT_BLOCK } from '../constants';
 
 /**
@@ -654,141 +652,128 @@ function Navigation( {
 		`overlay-menu-preview`
 	);
 
-	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
-
 	const stylingInspectorControls = (
 		<>
-			<InspectorControls>
-				{ ( ! isOverlayExperimentEnabled || hasSubmenus ) && (
-					<ToolsPanel
-						label={ __( 'Display' ) }
-						resetAll={ () => {
-							setAttributes( {
-								showSubmenuIcon: true,
-								openSubmenusOnClick: false,
-								overlayMenu: 'mobile',
-								hasIcon: true,
-								icon: 'handle',
-							} );
-						} }
-						dropdownMenuProps={ dropdownMenuProps }
-					>
-						{ ! isOverlayExperimentEnabled && (
-							<>
-								{ isResponsive && (
-									<OverlayMenuPreviewButton
-										isResponsive={ isResponsive }
-										overlayMenuPreview={
-											overlayMenuPreview
-										}
-										setOverlayMenuPreview={
-											setOverlayMenuPreview
-										}
-										hasIcon={ hasIcon }
-										icon={ icon }
-										setAttributes={ setAttributes }
-										overlayMenuPreviewClasses={
-											overlayMenuPreviewClasses
-										}
-										overlayMenuPreviewId={
-											overlayMenuPreviewId
-										}
-										containerStyle={ {
-											gridColumn: 'span 2',
-										} }
-									/>
-								) }
-
-								<ToolsPanelItem
-									hasValue={ () => overlayMenu !== 'mobile' }
-									label={ __( 'Overlay Visibility' ) }
-									onDeselect={ () =>
-										setAttributes( {
-											overlayMenu: 'mobile',
-										} )
+			{ ( ! isOverlayExperimentEnabled || hasSubmenus ) && (
+				<InspectorControls
+					group="display"
+					resetAllFilter={ () => ( {
+						showSubmenuIcon: true,
+						openSubmenusOnClick: false,
+						overlayMenu: 'mobile',
+						hasIcon: true,
+						icon: 'handle',
+					} ) }
+				>
+					{ ! isOverlayExperimentEnabled && (
+						<>
+							{ isResponsive && (
+								<OverlayMenuPreviewButton
+									isResponsive={ isResponsive }
+									overlayMenuPreview={ overlayMenuPreview }
+									setOverlayMenuPreview={
+										setOverlayMenuPreview
 									}
-									isShownByDefault
-								>
-									<OverlayVisibilityControl
-										overlayMenu={ overlayMenu }
-										setAttributes={ setAttributes }
-									/>
-								</ToolsPanelItem>
-							</>
-						) }
+									hasIcon={ hasIcon }
+									icon={ icon }
+									setAttributes={ setAttributes }
+									overlayMenuPreviewClasses={
+										overlayMenuPreviewClasses
+									}
+									overlayMenuPreviewId={
+										overlayMenuPreviewId
+									}
+									containerStyle={ {
+										gridColumn: 'span 2',
+									} }
+								/>
+							) }
 
-						{ hasSubmenus && (
-							<>
-								<h3 className="wp-block-navigation__submenu-header">
-									{ __( 'Submenus' ) }
-								</h3>
-								<ToolsPanelItem
-									hasValue={ () => openSubmenusOnClick }
+							<ToolsPanelItem
+								hasValue={ () => overlayMenu !== 'mobile' }
+								label={ __( 'Overlay Visibility' ) }
+								onDeselect={ () =>
+									setAttributes( {
+										overlayMenu: 'mobile',
+									} )
+								}
+								isShownByDefault
+							>
+								<OverlayVisibilityControl
+									overlayMenu={ overlayMenu }
+									setAttributes={ setAttributes }
+								/>
+							</ToolsPanelItem>
+						</>
+					) }
+
+					{ hasSubmenus && (
+						<>
+							<h3 className="wp-block-navigation__submenu-header">
+								{ __( 'Submenus' ) }
+							</h3>
+							<ToolsPanelItem
+								hasValue={ () => openSubmenusOnClick }
+								label={ __( 'Open on click' ) }
+								onDeselect={ () =>
+									setAttributes( {
+										openSubmenusOnClick: false,
+										showSubmenuIcon: true,
+									} )
+								}
+								isShownByDefault
+							>
+								<ToggleControl
+									checked={ openSubmenusOnClick }
+									onChange={ ( value ) => {
+										setAttributes( {
+											openSubmenusOnClick: value,
+											...( value && {
+												showSubmenuIcon: true,
+											} ), // Make sure arrows are shown when we toggle this on.
+										} );
+									} }
 									label={ __( 'Open on click' ) }
-									onDeselect={ () =>
-										setAttributes( {
-											openSubmenusOnClick: false,
-											showSubmenuIcon: true,
-										} )
-									}
-									isShownByDefault
-								>
-									<ToggleControl
-										checked={ openSubmenusOnClick }
-										onChange={ ( value ) => {
-											setAttributes( {
-												openSubmenusOnClick: value,
-												...( value && {
-													showSubmenuIcon: true,
-												} ), // Make sure arrows are shown when we toggle this on.
-											} );
-										} }
-										label={ __( 'Open on click' ) }
-									/>
-								</ToolsPanelItem>
+								/>
+							</ToolsPanelItem>
 
-								<ToolsPanelItem
-									hasValue={ () => ! showSubmenuIcon }
+							<ToolsPanelItem
+								hasValue={ () => ! showSubmenuIcon }
+								label={ __( 'Show arrow' ) }
+								onDeselect={ () =>
+									setAttributes( {
+										showSubmenuIcon: true,
+									} )
+								}
+								isDisabled={ attributes.openSubmenusOnClick }
+								isShownByDefault
+							>
+								<ToggleControl
+									checked={ showSubmenuIcon }
+									onChange={ ( value ) => {
+										setAttributes( {
+											showSubmenuIcon: value,
+										} );
+									} }
+									disabled={ attributes.openSubmenusOnClick }
 									label={ __( 'Show arrow' ) }
-									onDeselect={ () =>
-										setAttributes( {
-											showSubmenuIcon: true,
-										} )
-									}
-									isDisabled={
-										attributes.openSubmenusOnClick
-									}
-									isShownByDefault
-								>
-									<ToggleControl
-										checked={ showSubmenuIcon }
-										onChange={ ( value ) => {
-											setAttributes( {
-												showSubmenuIcon: value,
-											} );
-										} }
-										disabled={
-											attributes.openSubmenusOnClick
-										}
-										label={ __( 'Show arrow' ) }
-									/>
-								</ToolsPanelItem>
+								/>
+							</ToolsPanelItem>
 
-								{ submenuAccessibilityNotice && (
-									<Notice
-										spokenMessage={ null }
-										status="warning"
-										isDismissible={ false }
-										className="wp-block-navigation__submenu-accessibility-notice"
-									>
-										{ submenuAccessibilityNotice }
-									</Notice>
-								) }
-							</>
-						) }
-					</ToolsPanel>
-				) }
-			</InspectorControls>
+							{ submenuAccessibilityNotice && (
+								<Notice
+									spokenMessage={ null }
+									status="warning"
+									isDismissible={ false }
+									className="wp-block-navigation__submenu-accessibility-notice"
+								>
+									{ submenuAccessibilityNotice }
+								</Notice>
+							) }
+						</>
+					) }
+				</InspectorControls>
+			) }
 			{ isOverlayExperimentEnabled && (
 				<InspectorControls>
 					<OverlayPanel
