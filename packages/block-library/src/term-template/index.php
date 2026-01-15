@@ -30,9 +30,8 @@ function render_block_core_term_template( $attributes, $content, $block ) {
 	}
 
 	if ( $page > 1 ) {
-		$query_args['offset'] = ($page - 1) * $query_args['number'];
+		$query_args['offset'] = ( $page - 1 ) * $query_args['number'];
 	}
-
 
 	$terms_query = new WP_Term_Query( $query_args );
 	$terms       = $terms_query->get_terms();

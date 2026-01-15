@@ -202,9 +202,7 @@ if ( ! function_exists( 'build_terms_query_vars_from_block' ) ) {
 			'hide_empty' => $query['hideEmpty'],
 		);
 
-		$inherit_query = isset( $query['inherit'] )
-		                 && $query['inherit']
-		                 && ( is_tax() || is_category() || is_tag() );
+		$inherit_query = isset( $query['inherit'] ) && $query['inherit'] && ( is_tax() || is_category() || is_tag() );
 
 		if ( $inherit_query ) {
 			// Get the current term and taxonomy from the queried object.
@@ -242,9 +240,19 @@ if ( ! function_exists( 'build_terms_query_vars_from_block' ) ) {
 	}
 }
 
-function terms_query_register_query_vars( $vars ) {
-	$vars[] = 'termspage';
-	return $vars;
+if ( ! function_exists( 'terms_query_register_query_vars' ) ) {
+	/**
+	 * Registers the 'termspage' query variable for terms pagination.
+	 *
+	 * @since 7.0.0
+	 *
+	 * @param array $vars The array of existing query variables.
+	 * @return array Modified query variables including 'termspage'.
+	 */
+	function terms_query_register_query_vars( $vars ) {
+		$vars[] = 'termspage';
+		return $vars;
+	}
 }
 
 add_filter( 'query_vars', 'terms_query_register_query_vars', 10, 1 );

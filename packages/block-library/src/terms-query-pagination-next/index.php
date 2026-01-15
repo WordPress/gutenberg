@@ -1,6 +1,4 @@
 <?php
-
-
 /**
  * Render callback for the Terms Query Pagination Next block.
  *
@@ -25,7 +23,7 @@ function render_block_core_terms_query_pagination_next( $attributes, $content, $
 	$total_terms = wp_count_terms( $query_vars );
 	$max_page    = max( 1, (int) ceil( $total_terms / $per_page ) );
 
-	if ( ! ($page < $max_page) ) {
+	if ( ! ( $page < $max_page ) ) {
 		return '';
 	}
 
