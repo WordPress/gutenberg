@@ -8,6 +8,7 @@ import LayoutMixedComponent from './layout-mixed';
 import LayoutRegularComponent from './layout-regular';
 import LayoutRowComponent from './layout-row';
 import LayoutPanelComponent from './layout-panel';
+import LayoutTwoColumnsComponent from './layout-two-columns';
 import DataAdapterComponent from './data-adapter';
 import ValidationComponent from './validation';
 import VisibilityComponent from './visibility';
@@ -88,6 +89,10 @@ export const LayoutRow = {
 	args: {
 		alignment: 'default',
 	},
+};
+
+export const LayoutTwoColumns = {
+	render: LayoutTwoColumnsComponent,
 };
 
 export const LayoutMixed = {
