@@ -1,22 +1,11 @@
-/**
- * External dependencies
- */
 import { fn } from 'storybook/test';
-import { useState, cloneElement } from 'react';
-
-/**
- * WordPress dependencies
- */
-import { wordpress, link, more } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
-import { Tooltip, Tabs } from '..';
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { useState } from '@wordpress/element';
+// import { link, more, wordpress } from '@wordpress/icons';
+import { Tabs } from '../..';
 
 const meta: Meta< typeof Tabs.Root > = {
-	title: 'Design System/Tabs',
+	title: 'Design System/Components/Tabs',
 	component: Tabs.Root,
 	subcomponents: {
 		'Tabs.List': Tabs.List,
@@ -249,74 +238,76 @@ export const WithDisabledTab: StoryObj< typeof Tabs.Root > = {
 	},
 };
 
-const LinkIcon = ( props: React.SVGProps< SVGSVGElement > ) => {
-	return cloneElement( link, props );
-};
+// const LinkIcon = ( props: React.SVGProps< SVGSVGElement > ) => {
+// 	return cloneElement( link, props );
+// };
 
-const MoreIcon = ( props: React.SVGProps< SVGSVGElement > ) => {
-	return cloneElement( more, props );
-};
+// const MoreIcon = ( props: React.SVGProps< SVGSVGElement > ) => {
+// 	return cloneElement( more, props );
+// };
 
-const WordpressIcon = ( props: React.SVGProps< SVGSVGElement > ) => {
-	return cloneElement( wordpress, props );
-};
+// const WordpressIcon = ( props: React.SVGProps< SVGSVGElement > ) => {
+// 	return cloneElement( wordpress, props );
+// };
 
-const tabWithIconsData = [
-	{
-		value: 'tab1',
-		label: 'Tab one',
-		icon: WordpressIcon,
-	},
-	{
-		value: 'tab2',
-		label: 'Tab two',
-		icon: LinkIcon,
-	},
-	{
-		value: 'tab3',
-		label: 'Tab three',
-		icon: MoreIcon,
-	},
-];
-export const WithTabIconsAndTooltips: StoryObj< typeof Tabs.Root > = {
-	args: {
-		...Default.args,
-		children: (
-			<>
-				<Tabs.List>
-					{ tabWithIconsData.map(
-						( { value, label, icon: Icon } ) => (
-							<Tooltip.Root key={ value }>
-								<Tooltip.Trigger
-									aria-label={ label }
-									render={ <Tabs.Tab value={ value } /> }
-								>
-									{ /* TODO: potentially refactor with new Icon component */ }
-									<Icon
-										style={ {
-											width: '20px',
-											height: '20px',
-										} }
-									/>
-								</Tooltip.Trigger>
-								<Tooltip.Popup align="center" side="top">
-									{ label }
-								</Tooltip.Popup>
-							</Tooltip.Root>
-						)
-					) }
-				</Tabs.List>
-				{ tabWithIconsData.map( ( { value, label } ) => (
-					<Tabs.Panel value={ value } key={ value }>
-						<ThemedParagraph>
-							Selected tab: { label }
-						</ThemedParagraph>
-					</Tabs.Panel>
-				) ) }
-			</>
-		),
-	},
-};
+// const tabWithIconsData = [
+// 	{
+// 		value: 'tab1',
+// 		label: 'Tab one',
+// 		icon: WordpressIcon,
+// 	},
+// 	{
+// 		value: 'tab2',
+// 		label: 'Tab two',
+// 		icon: LinkIcon,
+// 	},
+// 	{
+// 		value: 'tab3',
+// 		label: 'Tab three',
+// 		icon: MoreIcon,
+// 	},
+// ];
+
+// TODO: tooltip still not added to package
+// export const WithTabIconsAndTooltips: StoryObj< typeof Tabs.Root > = {
+// 	args: {
+// 		...Default.args,
+// 		children: (
+// 			<>
+// 				<Tabs.List>
+// 					{ tabWithIconsData.map(
+// 						( { value, label, icon: Icon } ) => (
+// 							<Tooltip.Root key={ value }>
+// 								<Tooltip.Trigger
+// 									aria-label={ label }
+// 									render={ <Tabs.Tab value={ value } /> }
+// 								>
+// 									{ /* TODO: potentially refactor with new Icon component */ }
+// 									<Icon
+// 										style={ {
+// 											width: '20px',
+// 											height: '20px',
+// 										} }
+// 									/>
+// 								</Tooltip.Trigger>
+// 								<Tooltip.Popup align="center" side="top">
+// 									{ label }
+// 								</Tooltip.Popup>
+// 							</Tooltip.Root>
+// 						)
+// 					) }
+// 				</Tabs.List>
+// 				{ tabWithIconsData.map( ( { value, label } ) => (
+// 					<Tabs.Panel value={ value } key={ value }>
+// 						<ThemedParagraph>
+// 							Selected tab: { label }
+// 						</ThemedParagraph>
+// 					</Tabs.Panel>
+// 				) ) }
+// 			</>
+// 		),
+// 	},
+// };
 
 export const WithPanelsAlwaysMounted: StoryObj< typeof Tabs.Root > = {
 	args: {

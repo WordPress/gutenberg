@@ -1,13 +1,6 @@
-/**
- * External dependencies
- */
-import { forwardRef } from 'react';
+import { forwardRef } from '@wordpress/element';
 import clsx from 'clsx';
 import { Tabs as BaseUITabs } from '@base-ui/react/tabs';
-
-/**
- * Internal dependencies
- */
 import styles from './style.module.css';
 import type { TabPanelProps } from './types';
 

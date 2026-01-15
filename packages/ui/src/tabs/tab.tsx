@@ -1,18 +1,7 @@
-/**
- * External dependencies
- */
-import { forwardRef, cloneElement } from 'react';
+import { cloneElement, forwardRef } from '@wordpress/element';
 import clsx from 'clsx';
 import { Tabs as BaseUITabs } from '@base-ui/react/tabs';
-
-/**
- * WordPress dependencies
- */
 import { chevronRight } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import styles from './style.module.css';
 import type { TabProps } from './types';
 

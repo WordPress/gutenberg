@@ -1,24 +1,13 @@
-/**
- * External dependencies
- */
 import {
-	forwardRef,
-	useState,
-	useEffect,
-	isValidElement,
 	cloneElement,
-} from 'react';
+	forwardRef,
+	isValidElement,
+	useEffect,
+	useState,
+} from '@wordpress/element';
 import clsx from 'clsx';
 import { Tabs as BaseUITabs } from '@base-ui/react/tabs';
-
-/**
- * WordPress dependencies
- */
 import { useMergeRefs } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import styles from './style.module.css';
 import type { TabListProps } from './types';
 

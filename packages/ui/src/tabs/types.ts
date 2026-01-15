@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import type { Tabs } from '@base-ui/react/tabs';
 
 export type TabRootProps = Omit< Tabs.Root.Props, 'className' > & {
