@@ -791,7 +791,12 @@ export default function Image( {
 						label={ __( 'Image' ) }
 						hasValue={ () => !! url }
 						onDeselect={ () => onSelectImage( undefined ) }
+						resetAllFilter={ () => ( {
+							url: undefined,
+							id: undefined,
+						} ) }
 						isShownByDefault
+						panelId={ clientId }
 					>
 						<MediaControl
 							mediaId={ id }
@@ -817,6 +822,10 @@ export default function Image( {
 					isShownByDefault
 					hasValue={ () => !! alt }
 					onDeselect={ () => setAttributes( { alt: undefined } ) }
+					resetAllFilter={ () => ( {
+						alt: undefined,
+					} ) }
+					panelId={ clientId }
 				>
 					<TextareaControl
 						label={ __( 'Alternative text' ) }

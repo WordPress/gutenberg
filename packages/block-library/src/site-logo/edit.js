@@ -289,12 +289,14 @@ const SiteLogo = ( {
 					shouldSyncIcon: false,
 				} ) }
 			>
-				<ToolsPanelItem
-					isShownByDefault
-					hasValue={ () => !! width }
-					label={ __( 'Image width' ) }
-					onDeselect={ () => setAttributes( { width: undefined } ) }
-				>
+			<ToolsPanelItem
+				isShownByDefault
+				hasValue={ () => !! width }
+				label={ __( 'Image width' ) }
+				onDeselect={ () => setAttributes( { width: undefined } ) }
+				resetAllFilter={ () => ( { width: undefined } ) }
+				panelId={ clientId }
+			>
 					<RangeControl
 						__next40pxDefaultSize
 						label={ __( 'Image width' ) }
@@ -312,12 +314,14 @@ const SiteLogo = ( {
 					/>
 				</ToolsPanelItem>
 
-				<ToolsPanelItem
-					isShownByDefault
-					hasValue={ () => ! isLink }
-					label={ __( 'Link image to home' ) }
-					onDeselect={ () => setAttributes( { isLink: true } ) }
-				>
+			<ToolsPanelItem
+				isShownByDefault
+				hasValue={ () => ! isLink }
+				label={ __( 'Link image to home' ) }
+				onDeselect={ () => setAttributes( { isLink: true } ) }
+				resetAllFilter={ () => ( { isLink: true } ) }
+				panelId={ clientId }
+			>
 					<ToggleControl
 						label={ __( 'Link image to home' ) }
 						onChange={ () =>
@@ -328,14 +332,16 @@ const SiteLogo = ( {
 				</ToolsPanelItem>
 
 				{ isLink && (
-					<ToolsPanelItem
-						isShownByDefault
-						hasValue={ () => linkTarget === '_blank' }
-						label={ __( 'Open in new tab' ) }
-						onDeselect={ () =>
-							setAttributes( { linkTarget: '_self' } )
-						}
-					>
+				<ToolsPanelItem
+					isShownByDefault
+					hasValue={ () => linkTarget === '_blank' }
+					label={ __( 'Open in new tab' ) }
+					onDeselect={ () =>
+						setAttributes( { linkTarget: '_self' } )
+					}
+					resetAllFilter={ () => ( { linkTarget: '_self' } ) }
+					panelId={ clientId }
+				>
 						<ToggleControl
 							label={ __( 'Open in new tab' ) }
 							onChange={ ( value ) =>
@@ -349,15 +355,17 @@ const SiteLogo = ( {
 				) }
 
 				{ canUserEdit && (
-					<ToolsPanelItem
-						isShownByDefault
-						hasValue={ () => !! shouldSyncIcon }
-						label={ __( 'Use as Site Icon' ) }
-						onDeselect={ () => {
-							setAttributes( { shouldSyncIcon: false } );
-							setIcon( undefined );
-						} }
-					>
+				<ToolsPanelItem
+					isShownByDefault
+					hasValue={ () => !! shouldSyncIcon }
+					label={ __( 'Use as Site Icon' ) }
+					onDeselect={ () => {
+						setAttributes( { shouldSyncIcon: false } );
+						setIcon( undefined );
+					} }
+					resetAllFilter={ () => ( { shouldSyncIcon: false } ) }
+					panelId={ clientId }
+				>
 						<ToggleControl
 							label={ __( 'Use as Site Icon' ) }
 							onChange={ ( value ) => {
@@ -627,11 +635,13 @@ export default function LogoEdit( {
 					/>
 				</div>
 			) : (
-				<ToolsPanelItem
-					hasValue={ () => !! logoUrl }
-					label={ __( 'Logo' ) }
-					isShownByDefault
-				>
+			<ToolsPanelItem
+				hasValue={ () => !! logoUrl }
+				label={ __( 'Logo' ) }
+				isShownByDefault
+				resetAllFilter={ () => ( { url: undefined } ) }
+				panelId={ clientId }
+			>
 					<MediaControl
 						mediaId={ siteLogoId }
 						mediaUrl={ logoUrl }
