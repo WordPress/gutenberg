@@ -111,17 +111,7 @@ describe( 'OverlayTemplatePartSelector', () => {
 		} );
 		// Mock useSelect to return current theme
 		// The component calls: select( coreStore ).getCurrentTheme()?.stylesheet
-		useSelect.mockImplementation( ( selector ) => {
-			if ( typeof selector === 'function' ) {
-				const mockSelect = () => ( {
-					getCurrentTheme: () => ( {
-						stylesheet: 'twentytwentyfive',
-					} ),
-				} );
-				return selector( mockSelect );
-			}
-			return 'twentytwentyfive';
-		} );
+		useSelect.mockReturnValue( 'twentytwentyfive' );
 	} );
 
 	describe( 'Loading state', () => {
