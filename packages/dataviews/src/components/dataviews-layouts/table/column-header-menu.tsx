@@ -6,7 +6,7 @@ import type { ReactNode, Ref, PropsWithoutRef, RefAttributes } from 'react';
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, isRTL } from '@wordpress/i18n';
 import { arrowLeft, arrowRight, unseen, funnel } from '@wordpress/icons';
 import {
 	Button,
@@ -112,6 +112,8 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
 	);
 	const canInsert =
 		( canInsertLeft || canInsertRight ) && !! hiddenFields.length;
+
+	const isRtl = isRTL();
 
 	return (
 		<Menu>
@@ -267,30 +269,35 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
 										</Menu.ItemLabel>
 									</Menu.SubmenuTriggerItem>
 									<Menu.Popover>
-										{ hiddenFields.map( ( hiddenField ) => (
-											<Menu.Item
-												key={ hiddenField.id }
-												onClick={ () => {
-													onChangeView( {
-														...view,
-														fields: [
-															...visibleFieldIds.slice(
-																0,
-																index
-															),
-															hiddenField.id,
-															...visibleFieldIds.slice(
-																index
-															),
-														],
-													} );
-												} }
-											>
-												<Menu.ItemLabel>
-													{ hiddenField.label }
-												</Menu.ItemLabel>
-											</Menu.Item>
-										) ) }
+										{ hiddenFields.map( ( hiddenField ) => {
+											const insertIndex = isRtl
+												? index + 1
+												: index;
+											return (
+												<Menu.Item
+													key={ hiddenField.id }
+													onClick={ () => {
+														onChangeView( {
+															...view,
+															fields: [
+																...visibleFieldIds.slice(
+																	0,
+																	insertIndex
+																),
+																hiddenField.id,
+																...visibleFieldIds.slice(
+																	insertIndex
+																),
+															],
+														} );
+													} }
+												>
+													<Menu.ItemLabel>
+														{ hiddenField.label }
+													</Menu.ItemLabel>
+												</Menu.Item>
+											);
+										} ) }
 									</Menu.Popover>
 								</Menu>
 							) }
@@ -302,30 +309,35 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
 										</Menu.ItemLabel>
 									</Menu.SubmenuTriggerItem>
 									<Menu.Popover>
-										{ hiddenFields.map( ( hiddenField ) => (
-											<Menu.Item
-												key={ hiddenField.id }
-												onClick={ () => {
-													onChangeView( {
-														...view,
-														fields: [
-															...visibleFieldIds.slice(
-																0,
-																index + 1
-															),
-															hiddenField.id,
-															...visibleFieldIds.slice(
-																index + 1
-															),
-														],
-													} );
-												} }
-											>
-												<Menu.ItemLabel>
-													{ hiddenField.label }
-												</Menu.ItemLabel>
-											</Menu.Item>
-										) ) }
+										{ hiddenFields.map( ( hiddenField ) => {
+											const insertIndex = isRtl
+												? index
+												: index + 1;
+											return (
+												<Menu.Item
+													key={ hiddenField.id }
+													onClick={ () => {
+														onChangeView( {
+															...view,
+															fields: [
+																...visibleFieldIds.slice(
+																	0,
+																	insertIndex
+																),
+																hiddenField.id,
+																...visibleFieldIds.slice(
+																	insertIndex
+																),
+															],
+														} );
+													} }
+												>
+													<Menu.ItemLabel>
+														{ hiddenField.label }
+													</Menu.ItemLabel>
+												</Menu.Item>
+											);
+										} ) }
 									</Menu.Popover>
 								</Menu>
 							) }
