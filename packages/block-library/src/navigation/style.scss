@@ -260,6 +260,7 @@ $navigation-icon-size: 24px;
 
 		.wp-block-navigation-item {
 			justify-content: var(--navigation-layout-justify, initial);
+			padding: 0 2em;
 		}
 
 		> .wp-block-navigation-item__content,
