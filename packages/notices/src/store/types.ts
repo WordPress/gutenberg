@@ -16,6 +16,27 @@ export type NoticeAction = {
 	 * Optional function to invoke when action is triggered by user.
 	 */
 	onClick?: VoidFunction;
+
+	/**
+	 * A CSS class to add to the action button.
+	 */
+	className?: string;
+
+	/**
+	 * Whether to remove default styling from the action button.
+	 */
+	noDefaultClasses?: boolean;
+
+	/**
+	 * The variant of the action button.
+	 */
+	variant?: 'primary' | 'secondary' | 'link';
+
+	/**
+	 * Whether the action button is disabled.
+	 */
+	disabled?: boolean;
+
 };
 
 /**
