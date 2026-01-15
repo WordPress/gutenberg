@@ -28,41 +28,57 @@ const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
 
 /**
  * CSS for revision diff indicators, injected into the iframe.
+ * Uses color-mix() to blend diff colors with currentColor for better integration.
  */
 const REVISION_DIFF_STYLES = `
 	.is-revision-added {
-		outline: 2px solid #00a32a !important;
+		outline: 2px solid color-mix(in srgb, currentColor 30%, #00a32a 70%) !important;
 		outline-offset: 2px;
 	}
 	.is-revision-removed {
-		outline: 2px solid #d63638 !important;
+		outline: 2px solid color-mix(in srgb, currentColor 30%, #d63638 70%) !important;
 		outline-offset: 2px;
 		opacity: 0.5;
 	}
 	.is-revision-modified {
-		outline: 2px solid #dba617 !important;
+		outline: 2px solid color-mix(in srgb, currentColor 30%, #dba617 70%) !important;
 		outline-offset: 2px;
 	}
 	.revision-diff-removed {
 		text-decoration: line-through;
-		background-color: rgba(214, 54, 56, 0.2);
-		color: #8b0000;
+		background-color: color-mix(in srgb, currentColor 5%, #d63638 15%);
+		color: color-mix(in srgb, currentColor 50%, #8b0000 50%);
 	}
 	.revision-diff-added {
-		background-color: rgba(0, 163, 42, 0.2);
-		color: #006400;
+		background-color: color-mix(in srgb, currentColor 5%, #00a32a 15%);
+		color: color-mix(in srgb, currentColor 50%, #006400 50%);
 	}
 	.revision-diff-format-added {
-		outline: 2px dotted #00a32a;
-		background-color: transparent;
+		background: repeating-linear-gradient(
+			45deg,
+			transparent,
+			transparent 2px,
+			color-mix(in srgb, currentColor 20%, #00a32a 15%) 2px,
+			color-mix(in srgb, currentColor 20%, #00a32a 15%) 4px
+		);
 	}
 	.revision-diff-format-removed {
-		outline: 2px dotted #d63638;
-		background-color: transparent;
+		background: repeating-linear-gradient(
+			45deg,
+			transparent,
+			transparent 2px,
+			color-mix(in srgb, currentColor 20%, #d63638 15%) 2px,
+			color-mix(in srgb, currentColor 20%, #d63638 15%) 4px
+		);
 	}
 	.revision-diff-format-changed {
-		outline: 2px dotted #dba617;
-		background-color: transparent;
+		background: repeating-linear-gradient(
+			45deg,
+			transparent,
+			transparent 2px,
+			color-mix(in srgb, currentColor 20%, #dba617 15%) 2px,
+			color-mix(in srgb, currentColor 20%, #dba617 15%) 4px
+		);
 	}
 `;
 
