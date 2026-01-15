@@ -10,10 +10,12 @@ import { __ } from '@wordpress/i18n';
 import type { CommonPost } from '../../types';
 import { getItemTitle } from '../../actions/utils';
 import TitleView from './view';
+import RichTextEdit from '../rich-text/edit';
 
 const titleField: Field< CommonPost > = {
 	type: 'text',
 	id: 'title',
+	Edit: RichTextEdit,
 	label: __( 'Title' ),
 	placeholder: __( 'No title' ),
 	getValue: ( { item } ) => getItemTitle( item ),
