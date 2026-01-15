@@ -30,6 +30,7 @@
 		"*.md"
 	],
 	"main": "build/index.cjs",
+	"wpScript": true,
 	"module": "build-module/index.mjs",
 	"exports": {
 		".": {

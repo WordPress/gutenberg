@@ -38,13 +38,36 @@ export class TypedAwareness< State extends BaseState > extends Awareness {
 }
 
 /**
+ * This base user info is a subset of the User interface from @wordpress/core-data.
+ *
+ * In order to avoid circular dependencies, we define it here instead of importing
+ * the User interface from @wordpress/core-data.
+ *
+ * The avatarUrl is an additional field that is not part of the User interface.
+ */
+export interface WordPressUserInfo {
+	id: number;
+	name: string;
+	avatarUrl?: string;
+}
+
+/**
+ * The user info interface extends the base user info with additional fields used for presence
+ * indicators.
+ */
+export interface UserInfo extends WordPressUserInfo {
+	browserType: string;
+	enteredAt: number;
+}
+
+/**
  * This base state represents the presence of the user. We expect it to be
  * extended to include additional state describing the user's current activity.
  * This state must be serializable and compact.
- *
- * TODO: Add in the user information.
  */
-export interface BaseState {}
+export interface BaseState {
+	userInfo: UserInfo;
+}
 
 /**
  * An enhanced state includes additional metadata about the user's connection
