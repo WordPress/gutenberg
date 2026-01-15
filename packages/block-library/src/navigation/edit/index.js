@@ -810,6 +810,12 @@ function Navigation( {
 													orientation: 'vertical',
 												};
 												newAttributes.showSubmenuIcon = false;
+											} else if ( value === 'click' ) {
+												// When switching to "click", arrow must be shown (needed for clicking)
+												newAttributes.showSubmenuIcon = true;
+											} else {
+												// When switching to "hover", show the arrow to avoid showing the accessibility notice
+												newAttributes.showSubmenuIcon = true;
 											}
 											setAttributes( newAttributes );
 										} }
