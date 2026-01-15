@@ -50,6 +50,7 @@ import {
 import {
 	useEvent,
 	useMediaQuery,
+	useMergeRefs,
 	useRefEffect,
 	useViewportMatch,
 } from '@wordpress/compose';
@@ -150,7 +151,7 @@ function MetaBoxesMain( { isLegacy } ) {
 		];
 	}, [] );
 	const { set: setPreference } = useDispatch( preferencesStore );
-	const metaBoxesMainRef = useRef();
+
 	const isShort = useMediaQuery( '(max-height: 549px)' );
 
 	const [ { min, max }, setHeightConstraints ] = useState( () => ( {} ) );
@@ -186,6 +187,11 @@ function MetaBoxesMain( { isLegacy } ) {
 		}
 		return () => observer.disconnect();
 	}, [] );
+	const metaBoxesMainRef = useRef();
+	const setMainRefs = useMergeRefs( [
+		metaBoxesMainRef,
+		effectSizeConstraints,
+	] );
 
 	const separatorRef = useRef();
 	const separatorHelpId = useId();
@@ -365,14 +371,13 @@ function MetaBoxesMain( { isLegacy } ) {
 	return (
 		<NavigableRegion
 			aria-label={ paneLabel }
-			ref={ metaBoxesMainRef }
+			ref={ setMainRefs }
 			className={ clsx(
 				'edit-post-meta-boxes-main',
 				! isShort && 'is-resizable'
 			) }
 			style={ { height: isOpen ? openHeight : min } }
 		>
-			<meta ref={ effectSizeConstraints } />
 			<div className="edit-post-meta-boxes-main__presenter">
 				{ toggle }
 				{ separator }
