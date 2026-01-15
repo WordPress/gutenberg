@@ -20,9 +20,6 @@ module.exports = {
 		'@wordpress/theme/design-tokens.js':
 			'<rootDir>/packages/theme/src/prebuilt/js/design-tokens.mjs',
 		'.+\\.wasm$': '<rootDir>/test/unit/config/wasm-stub.js',
-		// Handle @shopify/web-worker babel plugin transformed imports
-		'.*@shopify/web-worker/build/cjs/webpack-parts/loader.*':
-			'<rootDir>/test/unit/config/shopify-web-worker-stub.js',
 	},
 	preset: '@wordpress/jest-preset-default',
 	setupFiles: [
