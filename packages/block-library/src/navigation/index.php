@@ -1139,9 +1139,12 @@ function block_core_navigation_add_directives_to_submenu( $tags, $block_attribut
 				'class_name' => 'wp-block-navigation-submenu__toggle',
 			)
 		) ) {
-			$tags->set_attribute( 'data-wp-on--click', 'actions.toggleMenuOnClick' );
-			$tags->set_attribute( 'data-wp-bind--aria-expanded', 'state.isMenuOpen' );
-			// The `aria-expanded` attribute for SSR is already added in the submenu block.
+			// Don't add interactive directives when submenus are always visible.
+			if ( 'always' !== $submenu_visibility ) {
+				$tags->set_attribute( 'data-wp-on--click', 'actions.toggleMenuOnClick' );
+				$tags->set_attribute( 'data-wp-bind--aria-expanded', 'state.isMenuOpen' );
+				// The `aria-expanded` attribute for SSR is already added in the submenu block.
+			}
 		}
 		// Add directives to the submenu.
 		if ( $tags->next_tag(
