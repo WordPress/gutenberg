@@ -149,10 +149,11 @@ async function bundleReactRefresh() {
 	const entryDir = path.join( BUILD_DIR, 'react-refresh-entry' );
 	await mkdir( entryDir, { recursive: true } );
 
+	// The entry file uses ReactRefreshRuntime global, so no bundling needed
 	await esbuild.build( {
 		entryPoints: [ path.join( __dirname, 'react-refresh-entry.js' ) ],
 		outfile: path.join( entryDir, 'index.min.js' ),
-		bundle: true,
+		bundle: false,
 		format: 'iife',
 		target: 'es2015',
 		platform: 'browser',
