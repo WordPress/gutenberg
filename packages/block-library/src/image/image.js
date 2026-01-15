@@ -11,7 +11,6 @@ import {
 	TextControl,
 	ToolbarButton,
 	ToolbarGroup,
-	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 	__experimentalUseCustomUnits as useCustomUnits,
 	Placeholder,
@@ -55,7 +54,6 @@ import { createUpgradedEmbedBlock } from '../embed/util';
 import { isExternalImage } from './edit';
 import { Caption } from '../utils/caption';
 import { MediaControl } from '../utils/media-control';
-import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 import {
 	MIN_SIZE,
 	ALLOWED_MEDIA_TYPES,
@@ -555,8 +553,6 @@ export default function Image( {
 	const lightboxChecked =
 		!! lightbox?.enabled || ( ! lightbox && !! lightboxSetting?.enabled );
 
-	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
-
 	const dimensionsControl =
 		isResizable &&
 		( SIZED_LAYOUTS.includes( parentLayoutType ) ? (
@@ -602,13 +598,6 @@ export default function Image( {
 				unitsOptions={ dimensionsUnitsOptions }
 			/>
 		) );
-
-	const resetSettings = () => {
-		setAttributes( {
-			lightbox: undefined,
-		} );
-		updateImage( DEFAULT_MEDIA_SIZE_SLUG );
-	};
 
 	const arePatternOverridesEnabled =
 		metadata?.bindings?.__default?.source === 'core/pattern-overrides';
@@ -788,82 +777,78 @@ export default function Image( {
 					/>
 				</BlockControls>
 			) }
-			{ ! hasDataFormBlockFields && isSingleSelected && (
-				<InspectorControls group="content">
-					<ToolsPanel
-						label={ __( 'Media' ) }
-						resetAll={ () => onSelectImage( undefined ) }
-						dropdownMenuProps={ dropdownMenuProps }
+		{ ! hasDataFormBlockFields && isSingleSelected && (
+			<InspectorControls
+				group="media"
+				resetAllFilter={ () => ( {
+					url: undefined,
+					alt: undefined,
+					id: undefined,
+				} ) }
+			>
+				{ ! lockUrlControls && (
+					<ToolsPanelItem
+						label={ __( 'Image' ) }
+						hasValue={ () => !! url }
+						onDeselect={ () => onSelectImage( undefined ) }
+						isShownByDefault
 					>
-						{ ! lockUrlControls && (
-							<ToolsPanelItem
-								label={ __( 'Image' ) }
-								hasValue={ () => !! url }
-								onDeselect={ () => onSelectImage( undefined ) }
-								isShownByDefault
-							>
-								<MediaControl
-									mediaId={ id }
-									mediaUrl={ url }
-									alt={ alt }
-									filename={
-										image?.media_details?.sizes?.full
-											?.file ||
-										image?.slug ||
-										getFilename( url )
-									}
-									allowedTypes={ ALLOWED_MEDIA_TYPES }
-									onSelect={ onSelectImage }
-									onSelectURL={ onSelectURL }
-									onError={ onUploadError }
-									onReset={ () => onSelectImage( undefined ) }
-									isUploading={ !! temporaryURL }
-									emptyLabel={ __( 'Add image' ) }
-								/>
-							</ToolsPanelItem>
-						) }
-						<ToolsPanelItem
-							label={ __( 'Alternative text' ) }
-							isShownByDefault
-							hasValue={ () => !! alt }
-							onDeselect={ () =>
-								setAttributes( { alt: undefined } )
+						<MediaControl
+							mediaId={ id }
+							mediaUrl={ url }
+							alt={ alt }
+							filename={
+								image?.media_details?.sizes?.full?.file ||
+								image?.slug ||
+								getFilename( url )
 							}
-						>
-							<TextareaControl
-								label={ __( 'Alternative text' ) }
-								value={ alt || '' }
-								onChange={ updateAlt }
-								readOnly={ lockAltControls }
-								help={
-									lockAltControls ? (
-										<>{ lockAltControlsMessage }</>
-									) : (
-										<>
-											<ExternalLink
-												href={
-													// translators: Localized tutorial, if one exists. W3C Web Accessibility Initiative link has list of existing translations.
-													__(
-														'https://www.w3.org/WAI/tutorials/images/decision-tree/'
-													)
-												}
-											>
-												{ __(
-													'Describe the purpose of the image.'
-												) }
-											</ExternalLink>
-											<br />
-											{ __(
-												'Leave empty if decorative.'
-											) }
-										</>
-									)
-								}
-							/>
-						</ToolsPanelItem>
-					</ToolsPanel>
-				</InspectorControls>
-			) }
+							allowedTypes={ ALLOWED_MEDIA_TYPES }
+							onSelect={ onSelectImage }
+							onSelectURL={ onSelectURL }
+							onError={ onUploadError }
+							onReset={ () => onSelectImage( undefined ) }
+							isUploading={ !! temporaryURL }
+							emptyLabel={ __( 'Add image' ) }
+						/>
+					</ToolsPanelItem>
+				) }
+				<ToolsPanelItem
+					label={ __( 'Alternative text' ) }
+					isShownByDefault
+					hasValue={ () => !! alt }
+					onDeselect={ () => setAttributes( { alt: undefined } ) }
+				>
+					<TextareaControl
+						label={ __( 'Alternative text' ) }
+						value={ alt || '' }
+						onChange={ updateAlt }
+						readOnly={ lockAltControls }
+						help={
+							lockAltControls ? (
+								<>{ lockAltControlsMessage }</>
+							) : (
+								<>
+									<ExternalLink
+										href={
+											// translators: Localized tutorial, if one exists. W3C Web Accessibility Initiative link has list of existing translations.
+											__(
+												'https://www.w3.org/WAI/tutorials/images/decision-tree/'
+											)
+										}
+									>
+										{ __(
+											'Describe the purpose of the image.'
+										) }
+									</ExternalLink>
+									<br />
+									{ __( 'Leave empty if decorative.' ) }
+								</>
+							)
+						}
+					/>
+				</ToolsPanelItem>
+			</InspectorControls>
+		) }
 			<InspectorControls
 				group="dimensions"
 				resetAllFilter={ ( attrs ) => ( {
@@ -903,22 +888,21 @@ export default function Image( {
 					</ToolsPanelItem>
 				) }
 			</InspectorControls>
-			{ !! imageSizeOptions.length && (
-				<InspectorControls>
-					<ToolsPanel
-						label={ __( 'Settings' ) }
-						resetAll={ resetSettings }
-						dropdownMenuProps={ dropdownMenuProps }
-					>
-						<ResolutionTool
-							value={ sizeSlug }
-							defaultValue={ DEFAULT_MEDIA_SIZE_SLUG }
-							onChange={ updateImage }
-							options={ imageSizeOptions }
-						/>
-					</ToolsPanel>
-				</InspectorControls>
-			) }
+		{ !! imageSizeOptions.length && (
+			<InspectorControls
+				group="settings"
+				resetAllFilter={ () => ( {
+					sizeSlug: DEFAULT_MEDIA_SIZE_SLUG,
+				} ) }
+			>
+				<ResolutionTool
+					value={ sizeSlug }
+					defaultValue={ DEFAULT_MEDIA_SIZE_SLUG }
+					onChange={ updateImage }
+					options={ imageSizeOptions }
+				/>
+			</InspectorControls>
+		) }
 			<InspectorControls group="advanced">
 				<TextControl
 					__next40pxDefaultSize
