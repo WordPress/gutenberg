@@ -47,10 +47,7 @@ function getPostType( name ) {
 		postType = 'page';
 	} else if ( name === 'post-item' || name === 'posts' ) {
 		postType = 'post';
-	} else if (
-		name === 'attachment-item' &&
-		window?.__experimentalMediaEditor
-	) {
+	} else if ( name === 'attachment-item' ) {
 		postType = ATTACHMENT_POST_TYPE;
 	}
 
