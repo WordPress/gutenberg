@@ -219,10 +219,11 @@ function MetaBoxesMain( { isLegacy } ) {
 				'metaBoxesMainOpenHeight',
 				candidateHeight
 			);
-		} else {
+		}
+		// Applies imperative DOM updates only when not persisting the value
+		// because otherwise it's done by the subsequent render.
+		else {
 			metaBoxesMainRef.current.style.height = styleHeight;
-			// Updates aria-valuenow only when not persisting the value because otherwise
-			// it's done by the render that persisting the value causes.
 			if ( ! isShort ) {
 				separatorRef.current.ariaValueNow =
 					getAriaValueNow( candidateHeight );
