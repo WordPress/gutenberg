@@ -578,89 +578,92 @@ button.wp-block-navigation-item__content {
 			padding-top: calc(2rem + #{ $navigation-icon-size });
 		}
 
-		.wp-block-navigation__responsive-container-content {
-			// Don't crop the focus style.
-			overflow: visible;
+		&:where(:not(.disable-default-overlay)) {
 
-			// Override the container flex layout settings
-			// because we want overlay menu to always display
-			// as a column.
-			display: flex;
-			flex-direction: column;
-			flex-wrap: nowrap;
+			.wp-block-navigation__responsive-container-content {
+				// Don't crop the focus style.
+				overflow: visible;
 
-			// Inherit alignment settings from container.
-			align-items: var(--navigation-layout-justification-setting, inherit);
+				// Override the container flex layout settings
+				// because we want overlay menu to always display
+				// as a column.
+				display: flex;
+				flex-direction: column;
+				flex-wrap: nowrap;
 
-			// Always align the contents of the menu to the top.
-			&,
-			.wp-block-page-list,
-			.wp-block-navigation__container {
-				justify-content: flex-start;
+				// Inherit alignment settings from container.
+				align-items: var(--navigation-layout-justification-setting, inherit);
+
+				// Always align the contents of the menu to the top.
+				&,
+				.wp-block-page-list,
+				.wp-block-navigation__container {
+					justify-content: flex-start;
+				}
+
+				.wp-block-navigation__submenu-icon {
+					display: none;
+				}
+
+				// Always expand/unfold submenus inside the modal.
+				.has-child .wp-block-navigation__submenu-container {
+					// Unset CSS that hides dropdown menus.
+					opacity: 1;
+					visibility: visible;
+					height: auto;
+					width: auto;
+					overflow: initial;
+					min-width: 200px;
+
+					// Position and style.
+					position: static;
+					border: none;
+					padding-left: 2rem;
+					padding-right: 2rem;
+				}
+
+				// Space unfolded items using gap and padding for submenus.
+				.wp-block-navigation__submenu-container,
+				.wp-block-navigation__container {
+					gap: inherit;
+				}
+
+				// Apply top padding to nested submenus.
+				.wp-block-navigation__submenu-container {
+					padding-top: var(--wp--style--block-gap, 2em);
+				}
+
+				// A default padding is added to submenu items. It's not appropriate inside the modal.
+				.wp-block-navigation-item__content {
+					padding: 0;
+				}
+
+				// Default column display for overlay menu contents.
+				.wp-block-navigation__container,
+				.wp-block-navigation-item,
+				.wp-block-page-list {
+					display: flex;
+					flex-direction: column;
+					// Inherit alignment settings from container.
+					align-items: var(--navigation-layout-justification-setting, initial);
+				}
 			}
 
-			.wp-block-navigation__submenu-icon {
-				display: none;
-			}
-
-			// Always expand/unfold submenus inside the modal.
-			.has-child .wp-block-navigation__submenu-container {
-				// Unset CSS that hides dropdown menus.
-				opacity: 1;
-				visibility: visible;
-				height: auto;
-				width: auto;
-				overflow: initial;
-				min-width: 200px;
-
-				// Position and style.
-				position: static;
-				border: none;
-				padding-left: 2rem;
-				padding-right: 2rem;
-			}
-
-			// Space unfolded items using gap and padding for submenus.
-			.wp-block-navigation__submenu-container,
-			.wp-block-navigation__container {
-				gap: inherit;
-			}
-
-			// Apply top padding to nested submenus.
-			.wp-block-navigation__submenu-container {
-				padding-top: var(--wp--style--block-gap, 2em);
-			}
-
-			// A default padding is added to submenu items. It's not appropriate inside the modal.
-			.wp-block-navigation-item__content {
-				padding: 0;
-			}
-
-			// Default column display for overlay menu contents.
+			// Remove background colors for items inside the overlay menu.
+			// Has to be !important to override global styles.
+			.wp-block-navigation-item .wp-block-navigation__submenu-container,
 			.wp-block-navigation__container,
 			.wp-block-navigation-item,
 			.wp-block-page-list {
-				display: flex;
-				flex-direction: column;
-				// Inherit alignment settings from container.
-				align-items: var(--navigation-layout-justification-setting, initial);
+				color: inherit !important;
+				background: transparent !important;
 			}
-		}
 
-		// Remove background colors for items inside the overlay menu.
-		// Has to be !important to override global styles.
-		.wp-block-navigation-item .wp-block-navigation__submenu-container,
-		.wp-block-navigation__container,
-		.wp-block-navigation-item,
-		.wp-block-page-list {
-			color: inherit !important;
-			background: transparent !important;
-		}
-
-		// Override justification dropdown menu positioning rules.
-		.wp-block-navigation__submenu-container.wp-block-navigation__submenu-container.wp-block-navigation__submenu-container.wp-block-navigation__submenu-container {
-			right: auto;
-			left: auto;
+			// Override justification dropdown menu positioning rules.
+			.wp-block-navigation__submenu-container.wp-block-navigation__submenu-container.wp-block-navigation__submenu-container.wp-block-navigation__submenu-container {
+				right: auto;
+				left: auto;
+			}
 		}
 	}
 
