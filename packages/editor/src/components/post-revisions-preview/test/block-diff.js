@@ -84,21 +84,21 @@ describe( 'diffRevisionContent', () => {
 		registerFormatType( 'revision/diff-format-added', {
 			name: 'revision/diff-format-added',
 			title: 'Format Added',
-			tagName: 'mark',
+			tagName: 'span',
 			className: 'revision-diff-format-added',
 			edit: () => null,
 		} );
 		registerFormatType( 'revision/diff-format-removed', {
 			name: 'revision/diff-format-removed',
 			title: 'Format Removed',
-			tagName: 'mark',
+			tagName: 'span',
 			className: 'revision-diff-format-removed',
 			edit: () => null,
 		} );
 		registerFormatType( 'revision/diff-format-changed', {
 			name: 'revision/diff-format-changed',
 			title: 'Format Changed',
-			tagName: 'mark',
+			tagName: 'span',
 			className: 'revision-diff-format-changed',
 			edit: () => null,
 		} );
@@ -621,7 +621,7 @@ describe( 'diffRevisionContent', () => {
 					name: 'core/paragraph',
 					attributes: {
 						content:
-							'Hello <strong><mark title="Format added" class="revision-diff-format-added">world</mark></strong>',
+							'Hello <strong><span title="Format added" class="revision-diff-format-added">world</span></strong>',
 						__revisionDiffStatus: 'modified',
 					},
 				},
@@ -697,7 +697,7 @@ describe( 'diffRevisionContent', () => {
 					name: 'core/paragraph',
 					attributes: {
 						content:
-							'Visit <a href="https://new-site.com"><mark title="Format changed" class="revision-diff-format-changed">our site</mark></a> today',
+							'Visit <a href="https://new-site.com"><span title="Format changed" class="revision-diff-format-changed">our site</span></a> today',
 						__revisionDiffStatus: 'modified',
 					},
 				},
@@ -773,7 +773,7 @@ describe( 'diffRevisionContent', () => {
 					name: 'core/paragraph',
 					attributes: {
 						content:
-							'<mark title="Format removed" class="revision-diff-format-removed">Bold</mark> and <mark title="Format removed" class="revision-diff-format-removed">italic</mark> text',
+							'<span title="Format removed" class="revision-diff-format-removed">Bold</span> and <span title="Format removed" class="revision-diff-format-removed">italic</span> text',
 						__revisionDiffStatus: 'modified',
 					},
 				},

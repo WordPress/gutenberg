@@ -88,7 +88,7 @@ registerFormatType( 'revision/diff-added', {
 registerFormatType( 'revision/diff-format-added', {
 	name: 'revision/diff-format-added',
 	title: 'Format Added',
-	tagName: 'mark',
+	tagName: 'span',
 	className: 'revision-diff-format-added',
 	attributes: { title: 'title' },
 	edit: () => null,
@@ -97,7 +97,7 @@ registerFormatType( 'revision/diff-format-added', {
 registerFormatType( 'revision/diff-format-removed', {
 	name: 'revision/diff-format-removed',
 	title: 'Format Removed',
-	tagName: 'mark',
+	tagName: 'span',
 	className: 'revision-diff-format-removed',
 	attributes: { title: 'title' },
 	edit: () => null,
@@ -106,7 +106,7 @@ registerFormatType( 'revision/diff-format-removed', {
 registerFormatType( 'revision/diff-format-changed', {
 	name: 'revision/diff-format-changed',
 	title: 'Format Changed',
-	tagName: 'mark',
+	tagName: 'span',
 	className: 'revision-diff-format-changed',
 	attributes: { title: 'title' },
 	edit: () => null,
