@@ -2,7 +2,7 @@
 
 Enforces that specific components from `@wordpress/components` include the `__next40pxDefaultSize` prop to opt-in to the new 40px default size.
 
-This is a temporary rule to help migrate components to the new default size. Once all components have been updated, this rule can be removed.
+This is a temporary rule to help migrate components to the new default size. Once the grace period is over and all components default to the new 40px size, this rule can be removed.
 
 ## Rule details
 
