@@ -300,3 +300,35 @@ export function getShowStylebook( state ) {
 export function getCanvasMinHeight( state ) {
 	return state.canvasMinHeight;
 }
+
+/**
+ * Returns the effective value of an editor UI preference based on the current mode.
+ * When distraction-free mode is enabled, returns the distraction-free config value.
+ * Otherwise, returns the normal mode preference value.
+ *
+ * This selector should only be used for preferences that have both a normal mode
+ * and distraction-free mode variant: fixedToolbar, focusMode, showBlockBreadcrumbs,
+ * autoHideHeader, themeStyles.
+ *
+ * @param {Object} state          Global application state.
+ * @param {string} preferenceName The name of the preference to get.
+ * @param {string} scope          Optional scope for the preference. Defaults to 'core'.
+ *
+ * @return {*} The effective preference value.
+ */
+export const getEditorUIPreference = createRegistrySelector(
+	( select ) =>
+		( state, preferenceName, scope = 'core' ) => {
+			const { get } = select( preferencesStore );
+			const isDistractionFree = get( 'core', 'distractionFree' );
+
+			if ( isDistractionFree ) {
+				const config = get( 'core', 'distractionFreeConfig' ) || {};
+				if ( preferenceName in config ) {
+					return config[ preferenceName ];
+				}
+			}
+
+			return get( scope, preferenceName );
+		}
+);

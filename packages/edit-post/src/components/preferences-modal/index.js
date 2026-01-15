@@ -13,7 +13,8 @@ import { unlock } from '../../lock-unlock';
 import MetaBoxesSection from './meta-boxes-section';
 
 const { PreferenceToggleControl } = unlock( preferencesPrivateApis );
-const { PreferencesModal } = unlock( editorPrivateApis );
+const { PreferencesModal, DistractionFreeConfigControl } =
+	unlock( editorPrivateApis );
 
 export default function EditPostPreferencesModal() {
 	const extraSections = {
@@ -22,6 +23,13 @@ export default function EditPostPreferencesModal() {
 			<PreferenceToggleControl
 				scope="core/edit-post"
 				featureName="themeStyles"
+				help={ __( 'Make the editor look like your theme.' ) }
+				label={ __( 'Use theme styles' ) }
+			/>
+		),
+		distractionFreeAppearance: (
+			<DistractionFreeConfigControl
+				configKey="themeStyles"
 				help={ __( 'Make the editor look like your theme.' ) }
 				label={ __( 'Use theme styles' ) }
 			/>

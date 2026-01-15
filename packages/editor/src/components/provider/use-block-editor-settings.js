@@ -141,7 +141,8 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 			} = select( coreStore );
 			const { get } = select( preferencesStore );
 			const { getBlockTypes } = select( blocksStore );
-			const { getDeviceType } = unlock( select( editorStore ) );
+			const { getDeviceType } = select( editorStore );
+			const { getEditorUIPreference } = unlock( select( editorStore ) );
 			const { getBlocksByName, getBlockAttributes } =
 				select( blockEditorStore );
 			const siteSettings = canUser( 'read', {
@@ -175,11 +176,11 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 					postType,
 					postId
 				)?._links?.hasOwnProperty( 'wp:action-unfiltered-html' ),
-				focusMode: get( 'core', 'focusMode' ),
+				focusMode: getEditorUIPreference( 'focusMode' ),
 				hasFixedToolbar:
-					get( 'core', 'fixedToolbar' ) || ! isLargeViewport,
+					getEditorUIPreference( 'fixedToolbar' ) || ! isLargeViewport,
 				hiddenBlockTypes: get( 'core', 'hiddenBlockTypes' ),
-				isDistractionFree: get( 'core', 'distractionFree' ),
+				showBlockHelpers: getEditorUIPreference( 'showBlockHelpers' ),
 				keepCaretInsideBlock: get( 'core', 'keepCaretInsideBlock' ),
 				hasUploadPermissions:
 					canUser( 'create', {

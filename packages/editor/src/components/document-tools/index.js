@@ -14,7 +14,6 @@ import { ToolbarButton, ToolbarItem } from '@wordpress/components';
 import { listView, plus } from '@wordpress/icons';
 import { useCallback } from '@wordpress/element';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
-import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
@@ -28,7 +27,7 @@ function DocumentTools( { className, disableBlockTools = false } ) {
 	const { setIsInserterOpened, setIsListViewOpened } =
 		useDispatch( editorStore );
 	const {
-		isDistractionFree,
+		showSimpleTopbar,
 		isInserterOpened,
 		isListViewOpen,
 		listViewShortcut,
@@ -36,13 +35,13 @@ function DocumentTools( { className, disableBlockTools = false } ) {
 		listViewToggleRef,
 		showIconLabels,
 	} = useSelect( ( select ) => {
-		const { get } = select( preferencesStore );
 		const {
 			isListViewOpened,
 			getEditorMode,
 			getInserterSidebarToggleRef,
 			getListViewToggleRef,
 		} = unlock( select( editorStore ) );
+		const { getEditorUIPreference } = unlock( select( editorStore ) );
 		const { getShortcutRepresentation } = select( keyboardShortcutsStore );
 
 		return {
@@ -53,8 +52,8 @@ function DocumentTools( { className, disableBlockTools = false } ) {
 			),
 			inserterSidebarToggleRef: getInserterSidebarToggleRef(),
 			listViewToggleRef: getListViewToggleRef(),
-			showIconLabels: get( 'core', 'showIconLabels' ),
-			isDistractionFree: get( 'core', 'distractionFree' ),
+			showIconLabels: getEditorUIPreference( 'showIconLabels' ),
+			showSimpleTopbar: getEditorUIPreference( 'showSimpleTopbar' ),
 			isVisualMode: getEditorMode() === 'visual',
 		};
 	}, [] );
@@ -109,7 +108,7 @@ function DocumentTools( { className, disableBlockTools = false } ) {
 			variant="unstyled"
 		>
 			<div className="editor-document-tools__left">
-				{ ! isDistractionFree && (
+				{ showSimpleTopbar && (
 					<ToolbarButton
 						ref={ inserterSidebarToggleRef }
 						className="editor-document-tools__inserter-toggle"
@@ -138,7 +137,7 @@ function DocumentTools( { className, disableBlockTools = false } ) {
 							variant={ showIconLabels ? 'tertiary' : undefined }
 							size="compact"
 						/>
-						{ ! isDistractionFree && (
+						{ showSimpleTopbar && (
 							<ToolbarButton
 								className="editor-document-tools__document-overview-toggle"
 								icon={ listView }
