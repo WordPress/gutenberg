@@ -278,8 +278,7 @@ function MetaBoxesMain( { isLegacy } ) {
 			persistIsOpen( nextIsOpen );
 			// Persists height only if still open. This is so that when closed by a drag the
 			// prior height can be restored by the toggle button instead of having to drag
-			// the pane open again. Also, if already at minimum height, a click on the
-			// separator won’t set the persisted height to the closed height.
+			// the pane open again.
 			applyHeight( heightRef.current, nextIsOpen );
 		},
 		{ delay: 200, threshold: 5, keyboardDisplacement: 20 }
