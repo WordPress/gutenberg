@@ -1,0 +1,140 @@
+/**
+ * Recursively finds all transferable objects within a value.
+ *
+ * This function traverses arrays and plain objects to find nested
+ * transferable objects like ArrayBuffers, which can then be passed
+ * to postMessage for zero-copy transfer.
+ *
+ * @param value - The value to search for transferables.
+ * @return Array of all transferable objects found.
+ */
+export function findTransferables( value: unknown ): Transferable[] {
+	const transferables: Transferable[] = [];
+	const transferableSet = new Set< Transferable >();
+	const seen = new WeakSet< object >();
+
+	function walk( obj: unknown ): void {
+		// Handle null/undefined and non-objects.
+		if ( obj === null || obj === undefined || typeof obj !== 'object' ) {
+			return;
+		}
+
+		// Check for ArrayBuffer (most common transferable).
+		if ( obj instanceof ArrayBuffer ) {
+			if ( ! transferableSet.has( obj ) ) {
+				transferableSet.add( obj );
+				transferables.push( obj );
+			}
+			return;
+		}
+
+		// Check for MessagePort (may not exist in all environments).
+		if (
+			typeof MessagePort !== 'undefined' &&
+			obj instanceof MessagePort
+		) {
+			if ( ! transferableSet.has( obj ) ) {
+				transferableSet.add( obj );
+				transferables.push( obj );
+			}
+			return;
+		}
+
+		// Check for ImageBitmap (may not exist in all environments).
+		if (
+			typeof ImageBitmap !== 'undefined' &&
+			obj instanceof ImageBitmap
+		) {
+			if ( ! transferableSet.has( obj ) ) {
+				transferableSet.add( obj );
+				transferables.push( obj );
+			}
+			return;
+		}
+
+		// Check for OffscreenCanvas (may not exist in all environments).
+		if (
+			typeof OffscreenCanvas !== 'undefined' &&
+			obj instanceof OffscreenCanvas
+		) {
+			if ( ! transferableSet.has( obj ) ) {
+				transferableSet.add( obj );
+				transferables.push( obj );
+			}
+			return;
+		}
+
+		// Check for ReadableStream (may not exist in all environments).
+		if (
+			typeof ReadableStream !== 'undefined' &&
+			obj instanceof ReadableStream
+		) {
+			if ( ! transferableSet.has( obj ) ) {
+				transferableSet.add( obj );
+				transferables.push( obj );
+			}
+			return;
+		}
+
+		// Check for WritableStream (may not exist in all environments).
+		if (
+			typeof WritableStream !== 'undefined' &&
+			obj instanceof WritableStream
+		) {
+			if ( ! transferableSet.has( obj ) ) {
+				transferableSet.add( obj );
+				transferables.push( obj );
+			}
+			return;
+		}
+
+		// Check for TransformStream (may not exist in all environments).
+		if (
+			typeof TransformStream !== 'undefined' &&
+			obj instanceof TransformStream
+		) {
+			if ( ! transferableSet.has( obj ) ) {
+				transferableSet.add( obj );
+				transferables.push( obj );
+			}
+			return;
+		}
+
+		// Avoid circular references.
+		if ( seen.has( obj ) ) {
+			return;
+		}
+		seen.add( obj );
+
+		// Handle TypedArrays - get their underlying buffer.
+		if ( ArrayBuffer.isView( obj ) ) {
+			const buffer = obj.buffer;
+			if (
+				buffer instanceof ArrayBuffer &&
+				! transferableSet.has( buffer )
+			) {
+				transferableSet.add( buffer );
+				transferables.push( buffer );
+			}
+			return;
+		}
+
+		// Handle arrays.
+		if ( Array.isArray( obj ) ) {
+			const arr = obj as unknown[];
+			for ( let i = 0; i < arr.length; i++ ) {
+				walk( arr[ i ] );
+			}
+			return;
+		}
+
+		// Handle plain objects.
+		const keys = Object.keys( obj );
+		for ( let i = 0; i < keys.length; i++ ) {
+			walk( ( obj as Record< string, unknown > )[ keys[ i ] ] );
+		}
+	}
+
+	walk( value );
+	return transferables;
+}
