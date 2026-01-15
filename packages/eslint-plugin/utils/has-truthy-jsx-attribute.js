@@ -17,8 +17,7 @@
  */
 function hasTruthyJsxAttribute( attributes, attrName ) {
 	const attr = attributes.find(
-		( a ) =>
-			a.type === 'JSXAttribute' && a.name && a.name.name === attrName
+		( a ) => a.type === 'JSXAttribute' && a.name && a.name.name === attrName
 	);
 
 	if ( ! attr ) {
