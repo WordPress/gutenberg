@@ -81,6 +81,20 @@ describe( 'diffRevisionContent', () => {
 			className: 'revision-diff-added',
 			edit: () => null,
 		} );
+		registerFormatType( 'revision/diff-format-added', {
+			name: 'revision/diff-format-added',
+			title: 'Format Added',
+			tagName: 'mark',
+			className: 'revision-diff-format-added',
+			edit: () => null,
+		} );
+		registerFormatType( 'revision/diff-format-removed', {
+			name: 'revision/diff-format-removed',
+			title: 'Format Removed',
+			tagName: 'mark',
+			className: 'revision-diff-format-removed',
+			edit: () => null,
+		} );
 		registerFormatType( 'revision/diff-format-changed', {
 			name: 'revision/diff-format-changed',
 			title: 'Format Changed',
@@ -101,6 +115,8 @@ describe( 'diffRevisionContent', () => {
 		// Unregister format types.
 		unregisterFormatType( 'revision/diff-removed' );
 		unregisterFormatType( 'revision/diff-added' );
+		unregisterFormatType( 'revision/diff-format-added' );
+		unregisterFormatType( 'revision/diff-format-removed' );
 		unregisterFormatType( 'revision/diff-format-changed' );
 	} );
 
@@ -605,7 +621,7 @@ describe( 'diffRevisionContent', () => {
 					name: 'core/paragraph',
 					attributes: {
 						content:
-							'Hello <strong><mark class="revision-diff-format-changed">world</mark></strong>',
+							'Hello <strong><mark title="Format added" class="revision-diff-format-added">world</mark></strong>',
 						__revisionDiffStatus: 'modified',
 					},
 				},
@@ -631,7 +647,7 @@ describe( 'diffRevisionContent', () => {
 					name: 'core/paragraph',
 					attributes: {
 						content:
-							'Hello <strong><del class="revision-diff-removed">world</del><ins class="revision-diff-added">everyone</ins></strong>',
+							'Hello <strong><del title="Removed" class="revision-diff-removed">world</del><ins title="Added" class="revision-diff-added">everyone</ins></strong>',
 						__revisionDiffStatus: 'modified',
 					},
 				},
@@ -681,7 +697,7 @@ describe( 'diffRevisionContent', () => {
 					name: 'core/paragraph',
 					attributes: {
 						content:
-							'Visit <a href="https://new-site.com"><mark class="revision-diff-format-changed">our site</mark></a> today',
+							'Visit <a href="https://new-site.com"><mark title="Format changed" class="revision-diff-format-changed">our site</mark></a> today',
 						__revisionDiffStatus: 'modified',
 					},
 				},
@@ -709,7 +725,7 @@ describe( 'diffRevisionContent', () => {
 					name: 'core/paragraph',
 					attributes: {
 						content:
-							'Visit <a href="https://example.com"><del class="revision-diff-removed">our</del><ins class="revision-diff-added">the</ins> <del class="revision-diff-removed">site</del><ins class="revision-diff-added">website</ins></a> today',
+							'Visit <a href="https://example.com"><del title="Removed" class="revision-diff-removed">our</del><ins title="Added" class="revision-diff-added">the</ins> <del title="Removed" class="revision-diff-removed">site</del><ins title="Added" class="revision-diff-added">website</ins></a> today',
 						__revisionDiffStatus: 'modified',
 					},
 				},
@@ -757,7 +773,7 @@ describe( 'diffRevisionContent', () => {
 					name: 'core/paragraph',
 					attributes: {
 						content:
-							'<mark class="revision-diff-format-changed">Bold</mark> and <mark class="revision-diff-format-changed">italic</mark> text',
+							'<mark title="Format removed" class="revision-diff-format-removed">Bold</mark> and <mark title="Format removed" class="revision-diff-format-removed">italic</mark> text',
 						__revisionDiffStatus: 'modified',
 					},
 				},
@@ -802,7 +818,7 @@ describe( 'diffRevisionContent', () => {
 					name: 'core/paragraph',
 					attributes: {
 						content:
-							'<del class="revision-diff-removed">Hello</del><ins class="revision-diff-added">Goodbye</ins> <strong>world</strong>!',
+							'<del title="Removed" class="revision-diff-removed">Hello</del><ins title="Added" class="revision-diff-added">Goodbye</ins> <strong>world</strong>!',
 						__revisionDiffStatus: 'modified',
 					},
 				},
@@ -838,7 +854,7 @@ describe( 'diffRevisionContent', () => {
 							name: 'core/paragraph',
 							attributes: {
 								content:
-									'<del class="revision-diff-removed">Hello</del><ins class="revision-diff-added">Goodbye</ins> <strong><del class="revision-diff-removed">world</del><ins class="revision-diff-added">everyone</ins></strong>',
+									'<del title="Removed" class="revision-diff-removed">Hello</del><ins title="Added" class="revision-diff-added">Goodbye</ins> <strong><del title="Removed" class="revision-diff-removed">world</del><ins title="Added" class="revision-diff-added">everyone</ins></strong>',
 								__revisionDiffStatus: 'modified',
 							},
 						},

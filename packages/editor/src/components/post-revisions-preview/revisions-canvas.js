@@ -52,9 +52,17 @@ const REVISION_DIFF_STYLES = `
 		background-color: rgba(0, 163, 42, 0.2);
 		color: #006400;
 	}
+	.revision-diff-format-added {
+		outline: 2px dotted #00a32a;
+		background-color: transparent;
+	}
+	.revision-diff-format-removed {
+		outline: 2px dotted #d63638;
+		background-color: transparent;
+	}
 	.revision-diff-format-changed {
-		background-color: rgba(219, 166, 23, 0.2);
-		color: inherit;
+		outline: 2px dotted #dba617;
+		background-color: transparent;
 	}
 `;
 
@@ -64,6 +72,7 @@ registerFormatType( 'revision/diff-removed', {
 	title: 'Removed',
 	tagName: 'del',
 	className: 'revision-diff-removed',
+	attributes: { title: 'title' },
 	edit: () => null,
 } );
 
@@ -72,6 +81,25 @@ registerFormatType( 'revision/diff-added', {
 	title: 'Added',
 	tagName: 'ins',
 	className: 'revision-diff-added',
+	attributes: { title: 'title' },
+	edit: () => null,
+} );
+
+registerFormatType( 'revision/diff-format-added', {
+	name: 'revision/diff-format-added',
+	title: 'Format Added',
+	tagName: 'mark',
+	className: 'revision-diff-format-added',
+	attributes: { title: 'title' },
+	edit: () => null,
+} );
+
+registerFormatType( 'revision/diff-format-removed', {
+	name: 'revision/diff-format-removed',
+	title: 'Format Removed',
+	tagName: 'mark',
+	className: 'revision-diff-format-removed',
+	attributes: { title: 'title' },
 	edit: () => null,
 } );
 
@@ -80,6 +108,7 @@ registerFormatType( 'revision/diff-format-changed', {
 	title: 'Format Changed',
 	tagName: 'mark',
 	className: 'revision-diff-format-changed',
+	attributes: { title: 'title' },
 	edit: () => null,
 } );
 

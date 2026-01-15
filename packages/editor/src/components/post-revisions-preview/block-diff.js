@@ -249,6 +249,96 @@ function hasFormatChangedAtIndex(
 }
 
 /**
+ * Get a human-readable label for a format type.
+ *
+ * @param {string} formatType The format type (e.g., 'core/bold').
+ * @return {string} Human-readable label.
+ */
+function getFormatLabel( formatType ) {
+	const labels = {
+		'core/bold': 'Bold',
+		'core/italic': 'Italic',
+		'core/link': 'Link',
+		'core/code': 'Code',
+		'core/strikethrough': 'Strikethrough',
+		'core/underline': 'Underline',
+		'core/subscript': 'Subscript',
+		'core/superscript': 'Superscript',
+	};
+	return labels[ formatType ] || formatType?.split( '/' )[ 1 ] || 'Format';
+}
+
+/**
+ * Analyze what formatting changed between two character positions.
+ * Returns both the change type (for styling) and a description (for tooltip).
+ *
+ * @param {Array}  currentFormats  Current formats array.
+ * @param {Array}  previousFormats Previous formats array.
+ * @param {number} currIdx         Character index in current.
+ * @param {number} prevIdx         Character index in previous.
+ * @return {{ type: 'added'|'removed'|'changed', description: string }} Change info.
+ */
+function describeFormatChange(
+	currentFormats,
+	previousFormats,
+	currIdx,
+	prevIdx
+) {
+	const currFmts = currentFormats[ currIdx ] || [];
+	const prevFmts = previousFormats[ prevIdx ] || [];
+
+	const added = [];
+	const removed = [];
+	const changed = [];
+
+	// Find added formats and attribute changes
+	for ( const fmt of currFmts ) {
+		const match = prevFmts.find( ( pf ) => pf.type === fmt.type );
+		if ( ! match ) {
+			added.push( getFormatLabel( fmt.type ) );
+		} else if (
+			JSON.stringify( fmt.attributes ) !==
+			JSON.stringify( match.attributes )
+		) {
+			changed.push( getFormatLabel( fmt.type ) );
+		}
+	}
+
+	// Find removed formats
+	for ( const fmt of prevFmts ) {
+		const match = currFmts.find( ( cf ) => cf.type === fmt.type );
+		if ( ! match ) {
+			removed.push( getFormatLabel( fmt.type ) );
+		}
+	}
+
+	// Determine primary change type for styling
+	if ( added.length > 0 && removed.length === 0 && changed.length === 0 ) {
+		return {
+			type: 'added',
+			description: added.join( ', ' ) + ' added',
+		};
+	}
+	if ( removed.length > 0 && added.length === 0 && changed.length === 0 ) {
+		return {
+			type: 'removed',
+			description: removed.join( ', ' ) + ' removed',
+		};
+	}
+
+	// Mixed or attribute-only changes
+	const parts = [
+		...added.map( ( f ) => f + ' added' ),
+		...removed.map( ( f ) => f + ' removed' ),
+		...changed.map( ( f ) => f + ' changed' ),
+	];
+	return {
+		type: 'changed',
+		description: parts.join( ', ' ) || 'Formatting changed',
+	};
+}
+
+/**
  * Apply inline diff formatting comparing two RichTextData values.
  * - Text changes: apply revision/diff-removed and revision/diff-added formats
  * - Format-only changes (text unchanged): apply revision/diff-format-changed format
@@ -278,7 +368,10 @@ function applyRichTextDiff( currentRichText, previousRichText ) {
 			);
 			const formatted = applyFormat(
 				removedSlice,
-				{ type: 'revision/diff-removed' },
+				{
+					type: 'revision/diff-removed',
+					attributes: { title: 'Removed' },
+				},
 				0,
 				part.value.length
 			);
@@ -293,7 +386,10 @@ function applyRichTextDiff( currentRichText, previousRichText ) {
 			);
 			const formatted = applyFormat(
 				addedSlice,
-				{ type: 'revision/diff-added' },
+				{
+					type: 'revision/diff-added',
+					attributes: { title: 'Added' },
+				},
 				0,
 				part.value.length
 			);
@@ -331,9 +427,27 @@ function applyRichTextDiff( currentRichText, previousRichText ) {
 					);
 
 					if ( rangeFormatChanged ) {
+						// Get type and description of what changed
+						const { type, description } = describeFormatChange(
+							currentFormats,
+							previousFormats,
+							currentIdx + rangeStart,
+							previousIdx + rangeStart
+						);
+
+						// Map change type to format type for styling
+						const formatType = {
+							added: 'revision/diff-format-added',
+							removed: 'revision/diff-format-removed',
+							changed: 'revision/diff-format-changed',
+						}[ type ];
+
 						const marked = applyFormat(
 							rangeSlice,
-							{ type: 'revision/diff-format-changed' },
+							{
+								type: formatType,
+								attributes: { title: description },
+							},
 							0,
 							i - rangeStart
 						);
