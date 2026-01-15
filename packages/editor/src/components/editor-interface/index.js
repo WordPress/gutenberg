@@ -102,8 +102,12 @@ export default function EditorInterface( {
 	const secondarySidebarLabel = isListViewOpened
 		? __( 'Document Overview' )
 		: __( 'Block Library' );
+	const shouldShowMediaEditor = !! isAttachment;
 	const shouldShowStylesCanvas =
-		showStylebook || stylesPath?.startsWith( '/revisions' );
+		! isAttachment &&
+		( showStylebook || stylesPath?.startsWith( '/revisions' ) );
+	const shouldShowBlockEditor =
+		! shouldShowMediaEditor && ! shouldShowStylesCanvas;
 
 	// Local state for save panel.
 	// Note 'truthy' callback implies an open panel.
@@ -159,39 +163,35 @@ export default function EditorInterface( {
 					{ ! isDistractionFree && ! isPreviewMode && (
 						<EditorNotices />
 					) }
-					{ isAttachment && <MediaPreview { ...iframeProps } /> }
-					{ ! isAttachment && (
+					{ shouldShowMediaEditor && (
+						<MediaPreview { ...iframeProps } />
+					) }
+					{ shouldShowStylesCanvas && <StylesCanvas /> }
+					{ shouldShowBlockEditor && (
 						<>
-							{ shouldShowStylesCanvas ? (
-								<StylesCanvas />
-							) : (
-								<>
-									{ ! isPreviewMode && mode === 'text' && (
-										<TextEditor
-											// We should auto-focus the canvas (title) on load.
-											// eslint-disable-next-line jsx-a11y/no-autofocus
-											autoFocus={ autoFocus }
-										/>
-									) }
-									{ ! isPreviewMode &&
-										! isLargeViewport &&
-										mode === 'visual' && (
-											<BlockToolbar hideDragHandle />
-										) }
-									{ ( isPreviewMode ||
-										mode === 'visual' ) && (
-										<VisualEditor
-											contentRef={ contentRef }
-											disableIframe={ disableIframe }
-											// We should auto-focus the canvas (title) on load.
-											// eslint-disable-next-line jsx-a11y/no-autofocus
-											autoFocus={ autoFocus }
-											iframeProps={ iframeProps }
-										/>
-									) }
-									{ children }
-								</>
+							{ ! isPreviewMode && mode === 'text' && (
+								<TextEditor
+									// We should auto-focus the canvas (title) on load.
+									// eslint-disable-next-line jsx-a11y/no-autofocus
+									autoFocus={ autoFocus }
+								/>
 							) }
+							{ ! isPreviewMode &&
+								! isLargeViewport &&
+								mode === 'visual' && (
+									<BlockToolbar hideDragHandle />
+								) }
+							{ ( isPreviewMode || mode === 'visual' ) && (
+								<VisualEditor
+									contentRef={ contentRef }
+									disableIframe={ disableIframe }
+									// We should auto-focus the canvas (title) on load.
+									// eslint-disable-next-line jsx-a11y/no-autofocus
+									autoFocus={ autoFocus }
+									iframeProps={ iframeProps }
+								/>
+							) }
+							{ children }
 						</>
 					) }
 				</>
