@@ -8,7 +8,11 @@ import {
 	getBlockType,
 	serialize,
 } from '@wordpress/blocks';
-import { RichTextData } from '@wordpress/rich-text';
+import {
+	RichTextData,
+	registerFormatType,
+	unregisterFormatType,
+} from '@wordpress/rich-text';
 import * as paragraphBlock from '@wordpress/block-library/src/paragraph';
 import * as groupBlock from '@wordpress/block-library/src/group';
 
@@ -61,6 +65,29 @@ describe( 'diffRevisionContent', () => {
 				groupBlock.settings
 			);
 		}
+
+		// Register custom format types for revision diff.
+		registerFormatType( 'revision/diff-removed', {
+			name: 'revision/diff-removed',
+			title: 'Removed',
+			tagName: 'del',
+			className: 'revision-diff-removed',
+			edit: () => null,
+		} );
+		registerFormatType( 'revision/diff-added', {
+			name: 'revision/diff-added',
+			title: 'Added',
+			tagName: 'ins',
+			className: 'revision-diff-added',
+			edit: () => null,
+		} );
+		registerFormatType( 'revision/diff-format-changed', {
+			name: 'revision/diff-format-changed',
+			title: 'Format Changed',
+			tagName: 'mark',
+			className: 'revision-diff-format-changed',
+			edit: () => null,
+		} );
 	} );
 
 	afterAll( () => {
@@ -70,6 +97,11 @@ describe( 'diffRevisionContent', () => {
 		if ( getBlockType( 'core/group' ) ) {
 			unregisterBlockType( 'core/group' );
 		}
+
+		// Unregister format types.
+		unregisterFormatType( 'revision/diff-removed' );
+		unregisterFormatType( 'revision/diff-added' );
+		unregisterFormatType( 'revision/diff-format-changed' );
 	} );
 
 	it( 'marks all blocks as added when no previous content', () => {
@@ -566,20 +598,18 @@ describe( 'diffRevisionContent', () => {
 			] );
 			const blocks = diffRevisionContent( current, previous );
 
+			// Format-only change: only "world" is marked (where bold was added).
+			// "Hello " is not marked since its formatting didn't change.
 			expect( normalizeBlockTree( blocks ) ).toMatchObject( [
 				{
 					name: 'core/paragraph',
 					attributes: {
 						content:
-							'Hello <ins class="revision-diff-added"><strong></strong></ins><strong>world<!--<ins class="revision-diff-added"-->strong&gt;<!--</ins-->p&gt;</strong>',
+							'Hello <strong><mark class="revision-diff-format-changed">world</mark></strong>',
 						__revisionDiffStatus: 'modified',
 					},
 				},
 			] );
-
-			// Inline diff HTML triggers block validation warnings.
-			expect( console ).toHaveWarned();
-			expect( console ).toHaveErrored();
 		} );
 
 		it( 'detects changed text within bold formatting as modification', () => {
@@ -595,12 +625,13 @@ describe( 'diffRevisionContent', () => {
 			] );
 			const blocks = diffRevisionContent( current, previous );
 
+			// Word-level diff: "world" changed to "everyone" within bold formatting.
 			expect( normalizeBlockTree( blocks ) ).toMatchObject( [
 				{
 					name: 'core/paragraph',
 					attributes: {
 						content:
-							'Hello <strong><del class="revision-diff-removed">w</del><ins class="revision-diff-added">every</ins>o<del class="revision-diff-removed">rld</del><ins class="revision-diff-added">ne</ins></strong>',
+							'Hello <strong><del class="revision-diff-removed">world</del><ins class="revision-diff-added">everyone</ins></strong>',
 						__revisionDiffStatus: 'modified',
 					},
 				},
@@ -643,20 +674,18 @@ describe( 'diffRevisionContent', () => {
 			] );
 			const blocks = diffRevisionContent( current, previous );
 
+			// Format-only change: only the link text is marked (where URL changed).
+			// "Visit " and " today" are not marked.
 			expect( normalizeBlockTree( blocks ) ).toMatchObject( [
 				{
 					name: 'core/paragraph',
 					attributes: {
 						content:
-							'Visit <a href="https://<del class=" revision-diff-removed"="">old<ins class="revision-diff-added">new</ins>-site.com"&gt;our site</a> today',
+							'Visit <a href="https://new-site.com"><mark class="revision-diff-format-changed">our site</mark></a> today',
 						__revisionDiffStatus: 'modified',
 					},
 				},
 			] );
-
-			// Inline diff HTML triggers block validation warnings.
-			expect( console ).toHaveWarned();
-			expect( console ).toHaveErrored();
 		} );
 
 		it( 'detects changed link text as modification', () => {
@@ -674,12 +703,13 @@ describe( 'diffRevisionContent', () => {
 			] );
 			const blocks = diffRevisionContent( current, previous );
 
+			// Word-level diff: "our site" changed to "the website" within link.
 			expect( normalizeBlockTree( blocks ) ).toMatchObject( [
 				{
 					name: 'core/paragraph',
 					attributes: {
 						content:
-							'Visit <a href="https://example.com"><del class="revision-diff-removed">our</del><ins class="revision-diff-added">the</ins> <ins class="revision-diff-added">web</ins>site</a> today',
+							'Visit <a href="https://example.com"><del class="revision-diff-removed">our</del><ins class="revision-diff-added">the</ins> <del class="revision-diff-removed">site</del><ins class="revision-diff-added">website</ins></a> today',
 						__revisionDiffStatus: 'modified',
 					},
 				},
@@ -720,20 +750,18 @@ describe( 'diffRevisionContent', () => {
 			] );
 			const blocks = diffRevisionContent( current, previous );
 
+			// Format-only change: only "Bold" and "italic" are marked (where formatting was removed).
+			// " and " and " text" are not marked since they never had formatting.
 			expect( normalizeBlockTree( blocks ) ).toMatchObject( [
 				{
 					name: 'core/paragraph',
 					attributes: {
 						content:
-							'<del class="revision-diff-removed"><strong></strong></del><strong>Bold<del class="revision-diff-removed"></del></strong> and <del class="revision-diff-removed"><em></em></del><em>italic<del class="revision-diff-removed"></del></em> text',
+							'<mark class="revision-diff-format-changed">Bold</mark> and <mark class="revision-diff-format-changed">italic</mark> text',
 						__revisionDiffStatus: 'modified',
 					},
 				},
 			] );
-
-			// Inline diff HTML triggers block validation warnings.
-			expect( console ).toHaveWarned();
-			expect( console ).toHaveErrored();
 		} );
 
 		it( 'detects unchanged paragraph with inline code', () => {
@@ -768,14 +796,53 @@ describe( 'diffRevisionContent', () => {
 			] );
 			const blocks = diffRevisionContent( current, previous );
 
+			// Word-level diff: "Hello" changed to "Goodbye" outside the bold formatting.
 			expect( normalizeBlockTree( blocks ) ).toMatchObject( [
 				{
 					name: 'core/paragraph',
 					attributes: {
 						content:
-							'<del class="revision-diff-removed">H</del><ins class="revision-diff-added">Goodby</ins>e<del class="revision-diff-removed">llo</del> <strong>world</strong>!',
+							'<del class="revision-diff-removed">Hello</del><ins class="revision-diff-added">Goodbye</ins> <strong>world</strong>!',
 						__revisionDiffStatus: 'modified',
 					},
+				},
+			] );
+		} );
+
+		it( 'applies rich text diff to nested block content', () => {
+			const previous = serialize( [
+				createBlock( 'core/group', {}, [
+					createBlock( 'core/paragraph', {
+						content: 'Hello <strong>world</strong>',
+					} ),
+				] ),
+			] );
+			const current = serialize( [
+				createBlock( 'core/group', {}, [
+					createBlock( 'core/paragraph', {
+						content: 'Goodbye <strong>everyone</strong>',
+					} ),
+				] ),
+			] );
+			const blocks = diffRevisionContent( current, previous );
+
+			// Word-level diff applied to nested paragraph content.
+			expect( normalizeBlockTree( blocks ) ).toMatchObject( [
+				{
+					name: 'core/group',
+					attributes: {
+						__revisionDiffStatus: undefined,
+					},
+					innerBlocks: [
+						{
+							name: 'core/paragraph',
+							attributes: {
+								content:
+									'<del class="revision-diff-removed">Hello</del><ins class="revision-diff-added">Goodbye</ins> <strong><del class="revision-diff-removed">world</del><ins class="revision-diff-added">everyone</ins></strong>',
+								__revisionDiffStatus: 'modified',
+							},
+						},
+					],
 				},
 			] );
 		} );

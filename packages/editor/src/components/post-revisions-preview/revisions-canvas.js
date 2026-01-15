@@ -14,6 +14,7 @@ import {
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useMemo, useEffect, useRef } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
+import { registerFormatType } from '@wordpress/rich-text';
 import { store as editorStore } from '../../store';
 
 /**
@@ -51,7 +52,36 @@ const REVISION_DIFF_STYLES = `
 		background-color: rgba(0, 163, 42, 0.2);
 		color: #006400;
 	}
+	.revision-diff-format-changed {
+		background-color: rgba(219, 166, 23, 0.2);
+		color: inherit;
+	}
 `;
+
+// Register custom format types for revision diff at module level.
+registerFormatType( 'revision/diff-removed', {
+	name: 'revision/diff-removed',
+	title: 'Removed',
+	tagName: 'del',
+	className: 'revision-diff-removed',
+	edit: () => null,
+} );
+
+registerFormatType( 'revision/diff-added', {
+	name: 'revision/diff-added',
+	title: 'Added',
+	tagName: 'ins',
+	className: 'revision-diff-added',
+	edit: () => null,
+} );
+
+registerFormatType( 'revision/diff-format-changed', {
+	name: 'revision/diff-format-changed',
+	title: 'Format Changed',
+	tagName: 'mark',
+	className: 'revision-diff-format-changed',
+	edit: () => null,
+} );
 
 /**
  * Filter to add diff status CSS classes to blocks.
