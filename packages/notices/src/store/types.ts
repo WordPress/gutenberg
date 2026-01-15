@@ -36,7 +36,6 @@ export type NoticeAction = {
 	 * Whether the action button is disabled.
 	 */
 	disabled?: boolean;
-
 };
 
 /**
