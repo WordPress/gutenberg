@@ -780,6 +780,32 @@ describe( 'diffRevisionContent', () => {
 			] );
 		} );
 
+		it( 'detects bold replaced by italic as modification', () => {
+			const previous = serialize( [
+				createBlock( 'core/paragraph', {
+					content: 'Hello <strong>world</strong>',
+				} ),
+			] );
+			const current = serialize( [
+				createBlock( 'core/paragraph', {
+					content: 'Hello <em>world</em>',
+				} ),
+			] );
+			const blocks = diffRevisionContent( current, previous );
+
+			// Mixed change: bold removed AND italic added = "changed" type (yellow outline).
+			expect( normalizeBlockTree( blocks ) ).toMatchObject( [
+				{
+					name: 'core/paragraph',
+					attributes: {
+						content:
+							'Hello <em><span title="Format added, Format removed" class="revision-diff-format-changed">world</span></em>',
+						__revisionDiffStatus: 'modified',
+					},
+				},
+			] );
+		} );
+
 		it( 'detects unchanged paragraph with inline code', () => {
 			const content = serialize( [
 				createBlock( 'core/paragraph', {
