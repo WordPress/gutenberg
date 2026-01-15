@@ -354,7 +354,7 @@ const applyWithDispatch = withDispatch(
 					} );
 			},
 			onRemoveImage() {
-				editPost( { featured_media: 0 } );
+				editPost( { featured_media: null } );
 			},
 		};
 	}
