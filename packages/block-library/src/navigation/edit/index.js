@@ -306,6 +306,15 @@ function Navigation( {
 	// Migrate deprecated attributes
 	useMigrateAttributes( attributes, setAttributes );
 
+	// Reset submenuVisibility to default if orientation changes to horizontal while "always" is selected
+	useEffect( () => {
+		if ( orientation === 'horizontal' && submenuVisibility === 'always' ) {
+			setAttributes( {
+				submenuVisibility: undefined,
+			} );
+		}
+	}, [ orientation, submenuVisibility, setAttributes ] );
+
 	const recursionId = `navigationMenu/${ ref }`;
 
 	// Skip recursion check when in preview mode.
@@ -766,87 +775,57 @@ function Navigation( {
 								<h3 className="wp-block-navigation__submenu-header">
 									{ __( 'Submenus' ) }
 								</h3>
-								{ orientation === 'vertical' ? (
-									<ToolsPanelItem
-										hasValue={ () =>
-											submenuVisibility !== undefined
-										}
+								<ToolsPanelItem
+									hasValue={ () =>
+										submenuVisibility !== undefined
+									}
+									label={ __( 'Submenu Visibility' ) }
+									onDeselect={ () =>
+										setAttributes( {
+											submenuVisibility: undefined,
+										} )
+									}
+									isShownByDefault
+								>
+									<ToggleGroupControl
+										__nextHasNoMarginBottom
+										__next40pxDefaultSize
 										label={ __( 'Submenu Visibility' ) }
-										onDeselect={ () =>
-											setAttributes( {
-												submenuVisibility: undefined,
-											} )
+										value={
+											submenuVisibility ||
+											( openSubmenusOnClick
+												? 'click'
+												: 'hover' )
 										}
-										isShownByDefault
-									>
-										<ToggleGroupControl
-											__nextHasNoMarginBottom
-											__next40pxDefaultSize
-											label={ __( 'Submenu Visibility' ) }
-											value={
-												submenuVisibility ||
-												( openSubmenusOnClick
-													? 'click'
-													: 'hover' )
+										onChange={ ( value ) => {
+											const newAttributes = {
+												submenuVisibility: value,
+											};
+											// If "always" is selected, switch to vertical orientation
+											if ( value === 'always' ) {
+												newAttributes.layout = {
+													...attributes.layout,
+													orientation: 'vertical',
+												};
 											}
-											onChange={ ( value ) => {
-												setAttributes( {
-													submenuVisibility: value,
-												} );
-											} }
-											isBlock
-										>
-											<ToggleGroupControlOption
-												value="hover"
-												label={ __( 'Hover' ) }
-											/>
-											<ToggleGroupControlOption
-												value="click"
-												label={ __( 'Click' ) }
-											/>
-											<ToggleGroupControlOption
-												value="always"
-												label={ __( 'Always' ) }
-											/>
-										</ToggleGroupControl>
-									</ToolsPanelItem>
-								) : (
-									<ToolsPanelItem
-										hasValue={ () =>
-											submenuVisibility === 'click' ||
-											( submenuVisibility === undefined &&
-												openSubmenusOnClick )
-										}
-										label={ __( 'Open on click' ) }
-										onDeselect={ () =>
-											setAttributes( {
-												submenuVisibility: 'hover',
-												showSubmenuIcon: true,
-											} )
-										}
-										isShownByDefault
+											setAttributes( newAttributes );
+										} }
+										isBlock
 									>
-										<ToggleControl
-											checked={
-												submenuVisibility === 'click' ||
-												( submenuVisibility ===
-													undefined &&
-													openSubmenusOnClick )
-											}
-											onChange={ ( value ) => {
-												setAttributes( {
-													submenuVisibility: value
-														? 'click'
-														: 'hover',
-													...( value && {
-														showSubmenuIcon: true,
-													} ), // Make sure arrows are shown when we toggle this on.
-												} );
-											} }
-											label={ __( 'Open on click' ) }
+										<ToggleGroupControlOption
+											value="hover"
+											label={ __( 'Hover' ) }
 										/>
-									</ToolsPanelItem>
-								) }
+										<ToggleGroupControlOption
+											value="click"
+											label={ __( 'Click' ) }
+										/>
+										<ToggleGroupControlOption
+											value="always"
+											label={ __( 'Always' ) }
+										/>
+									</ToggleGroupControl>
+								</ToolsPanelItem>
 
 								<ToolsPanelItem
 									hasValue={ () => ! showSubmenuIcon }
