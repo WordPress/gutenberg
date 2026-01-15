@@ -225,7 +225,7 @@ export default function FormCardField< Item >( {
 		[ field ]
 	);
 
-	const { isOpen, CardHeader, touched, setTouched } = useCardHeader( layout );
+	const { isOpen, CardHeader, touched } = useCardHeader( layout );
 
 	const summaryFields = getSummaryFields< Item >( layout.summary, fields );
 
