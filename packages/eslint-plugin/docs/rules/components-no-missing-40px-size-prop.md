@@ -1,4 +1,4 @@
-# Disallow missing \_\_next40pxDefaultSize prop (components-no-missing-40px-size-prop)
+# Disallow missing `__next40pxDefaultSize` prop (components-no-missing-40px-size-prop)
 
 Enforces that specific components from `@wordpress/components` include the `__next40pxDefaultSize` prop to opt-in to the new 40px default size.
 
