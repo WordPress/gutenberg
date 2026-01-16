@@ -63,11 +63,11 @@ function gutenberg_render_block_visibility_support( $block_content, $block ) {
 				'name' => 'Desktop',
 				'slug' => 'desktop',
 				/*
-				 * Note: the last item in the $viewport_sizes array does not technically require a size,
+				 * Note: the last item in the $viewport_sizes array does not technically require a 'size' key,
 				 * as the last item's media query is calculated using `width > previous size`.
-				 * It's included for consistency and as a record of the "official" breakpoint size.
+				 * The last item is present for validating the attribute values, and in order to indicate
+				 * that this is the final viewport size, and to calculate the previous media query accordingly.
 				 */
-				'size' => '960px',
 			),
 		);
 
@@ -79,21 +79,18 @@ function gutenberg_render_block_visibility_support( $block_content, $block ) {
 		$viewport_media_queries = array();
 		$previous_size          = null;
 		foreach ( $viewport_sizes as $index => $viewport_size ) {
-			$slug = $viewport_size['slug'];
-			$size = $viewport_size['size'];
-
 			// First item: width <= size.
 			if ( 0 === $index ) {
-				$viewport_media_queries[ $slug ] = "@media (width <= $size)";
-			} elseif ( count( $viewport_sizes ) - 1 === $index ) {
+				$viewport_media_queries[ $viewport_size['slug'] ] = "@media (width <= {$viewport_size['size']})";
+			} elseif ( count( $viewport_sizes ) - 1 === $index && $previous_size ) {
 				// Last item: width > previous size.
-				$viewport_media_queries[ $slug ] = "@media (width > $previous_size)";
+				$viewport_media_queries[ $viewport_size['slug'] ] = "@media (width > $previous_size)";
 			} else {
 				// Middle items: previous size < width <= size.
-				$viewport_media_queries[ $slug ] = "@media ($previous_size < width <= $size)";
+				$viewport_media_queries[ $viewport_size['slug'] ] = "@media ({$previous_size} < width <= {$viewport_size['size']})";
 			}
 
-			$previous_size = $size;
+			$previous_size = $viewport_size['size'] ?? null;
 		}
 
 		$hidden_on = array();
