@@ -37,6 +37,9 @@ import {
 	LinkUI,
 	updateAttributes,
 	useEntityBinding,
+	useIsInvalidLink,
+	InvalidDraftDisplay,
+	useEnableLinkStatusValidation,
 } from '../navigation-link/shared';
 import {
 	getColors,
@@ -128,7 +131,7 @@ export default function NavigationSubmenuEdit( {
 	context,
 	clientId,
 } ) {
-	const { label, url, description } = attributes;
+	const { label, url, description, kind, type, id } = attributes;
 
 	const {
 		showSubmenuIcon,
@@ -214,7 +217,17 @@ export default function NavigationSubmenuEdit( {
 		[ clientId ]
 	);
 
+	const validateLinkStatus = useEnableLinkStatusValidation( clientId );
+
 	const prevHasChildren = usePrevious( hasChildren );
+
+	// Check if the submenu's parent link is invalid or draft
+	const [ isInvalid, isDraft ] = useIsInvalidLink(
+		kind,
+		type,
+		id,
+		validateLinkStatus
+	);
 
 	// Show the LinkControl on mount if the URL is empty
 	// ( When adding a new menu item)
@@ -392,29 +405,41 @@ export default function NavigationSubmenuEdit( {
 			</InspectorControls>
 			<div { ...blockProps }>
 				<ParentElement className="wp-block-navigation-item__content">
-					<RichText
-						ref={ ref }
-						identifier="label"
-						className="wp-block-navigation-item__label"
-						value={ label }
-						onChange={ ( labelValue ) =>
-							setAttributes( { label: labelValue } )
-						}
-						onMerge={ mergeBlocks }
-						onReplace={ onReplace }
-						aria-label={ __( 'Navigation link text' ) }
-						placeholder={ itemLabelPlaceholder }
-						withoutInteractiveFormatting
-						onClick={ () => {
-							if ( ! openSubmenusOnClick && ! url ) {
-								setIsLinkOpen( true );
-							}
-						} }
-					/>
-					{ description && (
-						<span className="wp-block-navigation-item__description">
-							{ description }
-						</span>
+					{ ! isInvalid && ! isDraft && (
+						<>
+							<RichText
+								ref={ ref }
+								identifier="label"
+								className="wp-block-navigation-item__label"
+								value={ label }
+								onChange={ ( labelValue ) =>
+									setAttributes( { label: labelValue } )
+								}
+								onMerge={ mergeBlocks }
+								onReplace={ onReplace }
+								aria-label={ __( 'Navigation link text' ) }
+								placeholder={ itemLabelPlaceholder }
+								withoutInteractiveFormatting
+								onClick={ () => {
+									if ( ! openSubmenusOnClick && ! url ) {
+										setIsLinkOpen( true );
+									}
+								} }
+							/>
+							{ description && (
+								<span className="wp-block-navigation-item__description">
+									{ description }
+								</span>
+							) }
+						</>
+					) }
+					{ ( isInvalid || isDraft ) && (
+						<InvalidDraftDisplay
+							label={ label }
+							isInvalid={ isInvalid }
+							isDraft={ isDraft }
+							className="wp-block-navigation-item__label"
+						/>
 					) }
 					{ ! openSubmenusOnClick && isLinkOpen && (
 						<LinkUI

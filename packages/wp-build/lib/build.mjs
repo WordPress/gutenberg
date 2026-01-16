@@ -30,6 +30,7 @@ import {
 import {
 	generatePhpFromTemplate,
 	getPhpReplacements,
+	renderTemplateToString,
 } from './php-generator.mjs';
 import { getPackageInfo, getPackageInfoFromFile } from './package-utils.mjs';
 import { createWordpressExternalsPlugin } from './wordpress-externals-plugin.mjs';
@@ -227,41 +228,36 @@ function transformPhpContent( content, transforms ) {
 function momentTimezoneAliasPlugin() {
 	return {
 		name: 'moment-timezone-alias',
-		async setup( build ) {
-			const { createRequire } = await import( 'module' );
-			const require = createRequire( import.meta.url );
-
-			// Cached paths - resolved lazily on first use
-			let preBuiltBundlePath;
-			const resolvePaths = () => {
-				if ( preBuiltBundlePath ) {
-					return;
-				}
-				preBuiltBundlePath = require.resolve(
-					'moment-timezone/builds/moment-timezone-with-data-1970-2030.js'
-				);
-			};
+		setup( build ) {
+			// Alias path that esbuild will resolve
+			const aliasPath =
+				'moment-timezone/builds/moment-timezone-with-data-1970-2030.js';
 
 			// Redirect main moment-timezone files to pre-built bundle
 			build.onResolve(
-				{ filter: /^moment-timezone\/moment-timezone$/ },
-				() => {
-					resolvePaths();
-					return { path: preBuiltBundlePath };
-				}
+				{ filter: /^moment-timezone\/moment-timezone\.js$/ },
+				( { importer, resolveDir, kind } ) =>
+					build.resolve( aliasPath, {
+						importer,
+						resolveDir,
+						kind,
+					} )
 			);
 
 			// Intercept the require('./') call inside moment-timezone-utils
 			// and redirect it to the pre-built bundle.
-			build.onResolve( { filter: /^\.\/$/ }, ( args ) => {
-				if (
-					args.importer &&
-					args.importer.includes( 'moment-timezone-utils' )
-				) {
-					resolvePaths();
-					return { path: preBuiltBundlePath };
+			build.onResolve(
+				{ filter: /^\.\/$/ },
+				( { importer, resolveDir, kind } ) => {
+					if ( importer.includes( 'moment-timezone-utils' ) ) {
+						return build.resolve( aliasPath, {
+							importer,
+							resolveDir,
+							kind,
+						} );
+					}
 				}
-			} );
+			);
 		},
 	};
 }
@@ -748,7 +744,7 @@ async function generateModuleRegistrationPhp( modules, replacements ) {
 	await Promise.all( [
 		generatePhpFromTemplate(
 			'module-registry.php.template',
-			path.join( BUILD_DIR, 'modules', 'index.php' ),
+			path.join( BUILD_DIR, 'modules', 'registry.php' ),
 			{ ...replacements, '{{MODULES}}': modulesArray }
 		),
 		generatePhpFromTemplate(
@@ -781,7 +777,7 @@ async function generateScriptRegistrationPhp( scripts, replacements ) {
 	await Promise.all( [
 		generatePhpFromTemplate(
 			'script-registry.php.template',
-			path.join( BUILD_DIR, 'scripts', 'index.php' ),
+			path.join( BUILD_DIR, 'scripts', 'registry.php' ),
 			{ ...replacements, '{{SCRIPTS}}': scriptsArray }
 		),
 		generatePhpFromTemplate(
@@ -829,7 +825,7 @@ async function generateStyleRegistrationPhp( styles, replacements ) {
 	await Promise.all( [
 		generatePhpFromTemplate(
 			'style-registry.php.template',
-			path.join( BUILD_DIR, 'styles', 'index.php' ),
+			path.join( BUILD_DIR, 'styles', 'registry.php' ),
 			{ ...replacements, '{{STYLES}}': stylesArray }
 		),
 		generatePhpFromTemplate(
@@ -841,14 +837,14 @@ async function generateStyleRegistrationPhp( styles, replacements ) {
 }
 
 /**
- * Generate main index.php that loads both modules and scripts.
+ * Generate main build.php that loads both modules and scripts.
  *
  * @param {Record<string, string>} replacements PHP template replacements.
  */
-async function generateMainIndexPhp( replacements ) {
+async function generateMainBuildPhp( replacements ) {
 	await generatePhpFromTemplate(
-		'index.php.template',
-		path.join( BUILD_DIR, 'index.php' ),
+		'build.php.template',
+		path.join( BUILD_DIR, 'build.php' ),
 		replacements
 	);
 }
@@ -881,10 +877,10 @@ async function generateRoutesRegistry( routes, replacements ) {
 		} )
 		.join( ',\n' );
 
-	// Generate single global registry at build/routes/index.php
+	// Generate single global registry at build/routes/registry.php
 	await generatePhpFromTemplate(
 		'route-registry.php.template',
-		path.join( BUILD_DIR, 'routes', 'index.php' ),
+		path.join( BUILD_DIR, 'routes', 'registry.php' ),
 		{ ...replacements, '{{ROUTES}}': routeEntries }
 	);
 }
@@ -902,11 +898,35 @@ async function generateRoutesPhp( routes, replacements ) {
 		return;
 	}
 
-	// Generate routes.php from template
+	// Get unique pages from routes
+	const pages = [ ...new Set( routes.map( ( route ) => route.page ) ) ];
+
+	// Generate page-specific functions for each page
+	const pageFunctionsPromises = pages.map( async ( pageSlug ) => {
+		const pageSlugUnderscore = pageSlug.replace( /-/g, '_' );
+		const pageReplacements = {
+			...replacements,
+			'{{PAGE_SLUG}}': pageSlug,
+			'{{PAGE_SLUG_UNDERSCORE}}': pageSlugUnderscore,
+		};
+		return renderTemplateToString(
+			'routes-page-functions.php.template',
+			pageReplacements
+		);
+	} );
+
+	const pageFunctions = await Promise.all( pageFunctionsPromises );
+	const pageRouteFunctionsCode = pageFunctions.join( '\n' );
+
+	// Generate routes.php from template with injected page functions
 	await generatePhpFromTemplate(
 		'routes-registration.php.template',
 		path.join( BUILD_DIR, 'routes.php' ),
-		{ ...replacements, '{{HANDLE_PREFIX}}': HANDLE_PREFIX }
+		{
+			...replacements,
+			'{{HANDLE_PREFIX}}': HANDLE_PREFIX,
+			'{{PAGE_ROUTE_FUNCTIONS}}': pageRouteFunctionsCode,
+		}
 	);
 }
 
@@ -1348,12 +1368,6 @@ async function buildRoute( routeName ) {
 	// Ensure output directory exists
 	await mkdir( outputDir, { recursive: true } );
 
-	// Copy package.json
-	await copyFile(
-		path.join( routeDir, 'package.json' ),
-		path.join( outputDir, 'package.json' )
-	);
-
 	const files = getRouteFiles( routeDir );
 
 	// Build route.js if it exists
@@ -1651,7 +1665,7 @@ async function buildAll( baseUrlExpression ) {
 		baseUrlExpression
 	);
 	await Promise.all( [
-		generateMainIndexPhp( phpReplacements ),
+		generateMainBuildPhp( phpReplacements ),
 		generateModuleRegistrationPhp( modules, phpReplacements ),
 		generateScriptRegistrationPhp( scripts, phpReplacements ),
 		generateStyleRegistrationPhp( styles, phpReplacements ),
@@ -1660,13 +1674,14 @@ async function buildAll( baseUrlExpression ) {
 		generateRoutesPhp( routes, phpReplacements ),
 		generatePagesPhp( pageData, phpReplacements ),
 	] );
+	console.log( '   ✔ Generated build/build.php' );
 	console.log( '   ✔ Generated build/modules.php' );
-	console.log( '   ✔ Generated build/modules/index.php' );
+	console.log( '   ✔ Generated build/modules/registry.php' );
 	console.log( '   ✔ Generated build/scripts.php' );
-	console.log( '   ✔ Generated build/scripts/index.php' );
+	console.log( '   ✔ Generated build/scripts/registry.php' );
 	console.log( '   ✔ Generated build/styles.php' );
-	console.log( '   ✔ Generated build/styles/index.php' );
-	console.log( '   ✔ Generated build/version.php' );
+	console.log( '   ✔ Generated build/styles/registry.php' );
+	console.log( '   ✔ Generated build/constants.php' );
 	console.log( '   ✔ Generated build/routes.php' );
 	if ( pageData.length > 0 ) {
 		console.log( '   ✔ Generated build/pages.php' );
@@ -1679,7 +1694,6 @@ async function buildAll( baseUrlExpression ) {
 			);
 		}
 	}
-	console.log( '   ✔ Generated build/index.php' );
 
 	const totalTime = Date.now() - startTime;
 	console.log(
@@ -1949,6 +1963,7 @@ async function main() {
 				default: 'plugin_dir_url( __FILE__ )',
 			},
 		},
+		strict: false,
 	} );
 
 	const baseUrlExpression = values[ 'base-url' ];

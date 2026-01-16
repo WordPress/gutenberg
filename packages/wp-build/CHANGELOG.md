@@ -2,6 +2,20 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+- Renamed generated PHP files to avoid `index.php` naming conflicts:
+  - `build/index.php` → `build/build.php`
+  - `build/modules/index.php` → `build/modules/registry.php`
+  - `build/scripts/index.php` → `build/scripts/registry.php`
+  - `build/styles/index.php` → `build/styles/registry.php`
+  - `build/routes/index.php` → `build/routes/registry.php`
+- All generated page functions now include the `{{PREFIX}}` (from `wpPlugin.name`) at the beginning:
+  - `register_my_page_route()` → `my_plugin_register_my_page_route()`
+  - `my_page_render_page()` → `my_plugin_my_page_render_page()`
+  - And similarly for all other page functions
+- Route registration now uses named functions instead of anonymous closures, allowing third-party developers to unhook them
+
 ## 0.4.0 (2025-11-26)
 
 ## 0.3.0 (2025-11-12)

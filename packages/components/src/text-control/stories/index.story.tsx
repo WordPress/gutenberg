@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryFn } from '@storybook/react-webpack5';
+import type { Meta, StoryFn } from '@storybook/react-vite';
 
 /**
  * WordPress dependencies
@@ -40,6 +40,7 @@ const DefaultTemplate: StoryFn< typeof TextControl > = ( {
 
 	return (
 		<TextControl
+			__next40pxDefaultSize
 			{ ...args }
 			value={ value }
 			onChange={ ( v ) => {

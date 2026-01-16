@@ -28,6 +28,8 @@ jobs:
               uses: ./.github/setup-node
 
             - name: Build Storybook
+              env:
+                  NODE_ENV: production
               run: npm run storybook:build
 
             - name: Deploy
