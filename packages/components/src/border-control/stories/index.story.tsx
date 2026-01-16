@@ -82,6 +82,7 @@ const Template: StoryFn< typeof BorderControl > = ( {
 
 	return (
 		<BorderControl
+			__next40pxDefaultSize
 			onChange={ onChangeMerged }
 			value={ border }
 			{ ...props }

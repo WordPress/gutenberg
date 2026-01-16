@@ -42,6 +42,7 @@ const SelectControlWithState: StoryFn< typeof SelectControl > = ( props ) => {
 	if ( props.multiple ) {
 		return (
 			<SelectControl
+				__next40pxDefaultSize
 				{ ...props }
 				multiple
 				value={ selection }
@@ -55,6 +56,7 @@ const SelectControlWithState: StoryFn< typeof SelectControl > = ( props ) => {
 
 	return (
 		<SelectControl
+			__next40pxDefaultSize
 			{ ...props }
 			multiple={ false }
 			value={ selection?.[ 0 ] }

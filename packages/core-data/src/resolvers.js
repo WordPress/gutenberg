@@ -215,6 +215,15 @@ export const getEntityRecord =
 									name,
 									key
 								),
+							// Refetch the current entity record from the database.
+							refetchRecord: async () => {
+								dispatch.receiveEntityRecords(
+									kind,
+									name,
+									await apiFetch( { path, parse: true } ),
+									query
+								);
+							},
 							// Save the current entity record's unsaved edits.
 							saveRecord: () => {
 								dispatch.saveEditedEntityRecord(

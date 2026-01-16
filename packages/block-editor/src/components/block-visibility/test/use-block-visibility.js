@@ -52,7 +52,7 @@ describe( 'useBlockVisibility', () => {
 
 			const { result } = renderHook( () =>
 				useBlockVisibility( {
-					blockVisibility: { mobile: false },
+					blockVisibility: { viewport: { mobile: false } },
 					deviceType: 'mobile',
 				} )
 			);
@@ -66,9 +66,11 @@ describe( 'useBlockVisibility', () => {
 			const { result } = renderHook( () =>
 				useBlockVisibility( {
 					blockVisibility: {
-						mobile: true,
-						tablet: false,
-						desktop: false,
+						viewport: {
+							mobile: true,
+							tablet: false,
+							desktop: false,
+						},
 					},
 					deviceType: 'mobile',
 				} )
@@ -82,7 +84,7 @@ describe( 'useBlockVisibility', () => {
 
 			const { result } = renderHook( () =>
 				useBlockVisibility( {
-					blockVisibility: { tablet: false },
+					blockVisibility: { viewport: { tablet: false } },
 					deviceType: 'tablet',
 				} )
 			);
@@ -98,7 +100,7 @@ describe( 'useBlockVisibility', () => {
 
 			const { result } = renderHook( () =>
 				useBlockVisibility( {
-					blockVisibility: { desktop: false },
+					blockVisibility: { viewport: { desktop: false } },
 					deviceType: 'desktop',
 				} )
 			);
@@ -116,7 +118,7 @@ describe( 'useBlockVisibility', () => {
 
 			const { result } = renderHook( () =>
 				useBlockVisibility( {
-					blockVisibility: { mobile: false },
+					blockVisibility: { viewport: { mobile: false } },
 					deviceType: 'desktop',
 				} )
 			);
@@ -133,9 +135,11 @@ describe( 'useBlockVisibility', () => {
 			const { result } = renderHook( () =>
 				useBlockVisibility( {
 					blockVisibility: {
-						mobile: true,
-						tablet: false,
-						desktop: false,
+						viewport: {
+							mobile: true,
+							tablet: false,
+							desktop: false,
+						},
 					},
 					deviceType: 'desktop',
 				} )
@@ -152,7 +156,7 @@ describe( 'useBlockVisibility', () => {
 
 			const { result } = renderHook( () =>
 				useBlockVisibility( {
-					blockVisibility: { tablet: false },
+					blockVisibility: { viewport: { tablet: false } },
 					deviceType: 'desktop',
 				} )
 			);
@@ -169,9 +173,11 @@ describe( 'useBlockVisibility', () => {
 			const { result } = renderHook( () =>
 				useBlockVisibility( {
 					blockVisibility: {
-						mobile: false,
-						tablet: true,
-						desktop: false,
+						viewport: {
+							mobile: false,
+							tablet: true,
+							desktop: false,
+						},
 					},
 					deviceType: 'desktop',
 				} )
@@ -188,7 +194,7 @@ describe( 'useBlockVisibility', () => {
 
 			const { result } = renderHook( () =>
 				useBlockVisibility( {
-					blockVisibility: { desktop: false },
+					blockVisibility: { viewport: { desktop: false } },
 					deviceType: 'desktop',
 				} )
 			);
@@ -205,9 +211,11 @@ describe( 'useBlockVisibility', () => {
 			const { result } = renderHook( () =>
 				useBlockVisibility( {
 					blockVisibility: {
-						mobile: false,
-						tablet: false,
-						desktop: true,
+						viewport: {
+							mobile: false,
+							tablet: false,
+							desktop: true,
+						},
 					},
 					deviceType: 'desktop',
 				} )
@@ -306,7 +314,7 @@ describe( 'useBlockVisibility', () => {
 
 			const { result } = renderHook( () =>
 				useBlockVisibility( {
-					blockVisibility: { desktop: false },
+					blockVisibility: { viewport: { desktop: false } },
 				} )
 			);
 

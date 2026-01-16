@@ -32,6 +32,7 @@ export const ControlledStateStory: StoryFn< typeof Navigation > = ( {
 		children: React.ReactNode;
 	} ) => (
 		<Button
+			__next40pxDefaultSize
 			href={ href }
 			// Since we're not actually navigating pages, simulate it with onClick.
 			onClick={
@@ -121,6 +122,7 @@ export const ControlledStateStory: StoryFn< typeof Navigation > = ( {
 				</p>
 				<p>
 					<Button
+						__next40pxDefaultSize
 						variant="secondary"
 						onClick={ () => {
 							setActiveMenu( 'nested-sub-menu' );
@@ -131,6 +133,7 @@ export const ControlledStateStory: StoryFn< typeof Navigation > = ( {
 				</p>
 				<p>
 					<Button
+						__next40pxDefaultSize
 						variant="secondary"
 						onClick={ () => {
 							setActiveItem( 'child-2' );

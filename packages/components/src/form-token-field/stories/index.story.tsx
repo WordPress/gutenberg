@@ -50,6 +50,7 @@ const DefaultTemplate: StoryFn< typeof FormTokenField > = ( { ...args } ) => {
 
 	return (
 		<FormTokenField
+			__next40pxDefaultSize
 			{ ...args }
 			value={ selectedContinents }
 			onChange={ ( tokens ) => setSelectedContinents( tokens ) }
@@ -90,6 +91,7 @@ export const Async: StoryFn< typeof FormTokenField > = ( {
 
 	return (
 		<FormTokenField
+			__next40pxDefaultSize
 			{ ...args }
 			value={ selectedContinents }
 			suggestions={ availableContinents }

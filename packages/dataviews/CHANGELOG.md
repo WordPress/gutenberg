@@ -26,6 +26,7 @@
 - DataViews: `filterSortAndPaginate()` will ignore sorting on non-sortable fields [#73950](https://github.com/WordPress/gutenberg/pull/73950)
 - DataViews: Fix locked fields order when toggling visibility in properties section. [#74326](https://github.com/WordPress/gutenberg/pull/74326)
 - Dataviews: Fix column header move item in RTL moves in the opposite direction to the arrow. [#74644](https://github.com/WordPress/gutenberg/pull/74644)
+- Dataviews: Fix insert left and right handling in table layout for RTL languages. [#74681](https://github.com/WordPress/gutenberg/pull/74681)
 
 ### Enhancements
 

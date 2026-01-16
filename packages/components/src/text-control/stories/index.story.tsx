@@ -40,6 +40,7 @@ const DefaultTemplate: StoryFn< typeof TextControl > = ( {
 
 	return (
 		<TextControl
+			__next40pxDefaultSize
 			{ ...args }
 			value={ value }
 			onChange={ ( v ) => {

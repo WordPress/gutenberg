@@ -20,6 +20,7 @@ import { store as preferencesStore } from '@wordpress/preferences';
  * Internal dependencies
  */
 import {
+	ATTACHMENT_POST_TYPE,
 	EDIT_MERGE_PROPERTIES,
 	PERMALINK_POSTNAME_REGEX,
 	ONE_MINUTE_IN_MS,
@@ -485,6 +486,11 @@ export function isEditedPostPublishable( state ) {
 	// being saveable. Currently this restriction is imposed at UI.
 	//
 	//  See: <PostPublishButton /> (`isButtonEnabled` assigned by `isSaveable`).
+
+	// Attachments should only be publishable if they have unsaved changes.
+	if ( post.type === ATTACHMENT_POST_TYPE ) {
+		return isEditedPostDirty( state );
+	}
 
 	return (
 		isEditedPostDirty( state ) ||

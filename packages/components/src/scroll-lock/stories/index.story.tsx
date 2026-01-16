@@ -81,7 +81,11 @@ export const Default: StoryFn< typeof ScrollLock > = () => {
 						this &quot;scroll bleed&quot; from happening.
 					</div>
 					<ToggleContainer>
-						<Button variant="primary" onClick={ toggleLock }>
+						<Button
+							__next40pxDefaultSize
+							variant="primary"
+							onClick={ toggleLock }
+						>
 							Toggle Scroll Lock
 						</Button>
 						{ isScrollLocked && <ScrollLock /> }

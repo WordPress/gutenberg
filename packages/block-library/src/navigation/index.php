@@ -354,13 +354,17 @@ class WP_Navigation_Block_Renderer {
 		}
 
 		// Parse the template part ID (format: "theme//slug").
+		// If it's just a slug, construct the full ID using the current theme.
 		$parts = explode( '//', $overlay_template_part_id, 2 );
-		if ( count( $parts ) !== 2 ) {
-			return new WP_Block_List( array(), $attributes );
+		if ( count( $parts ) === 2 ) {
+			// Already in "theme//slug" format (backward compatibility).
+			$theme = $parts[0];
+			$slug  = $parts[1];
+		} else {
+			// Just a slug, use current theme.
+			$theme = get_stylesheet();
+			$slug  = $overlay_template_part_id;
 		}
-
-		$theme = $parts[0];
-		$slug  = $parts[1];
 
 		// Only query for template parts from the active theme.
 		if ( get_stylesheet() !== $theme ) {
@@ -390,7 +394,9 @@ class WP_Navigation_Block_Renderer {
 
 		if ( ! $template_part_post ) {
 			// Try to get from theme file if not in database.
-			$block_template = get_block_file_template( $overlay_template_part_id, 'wp_template_part' );
+			// Construct the full template part ID for get_block_file_template.
+			$full_template_part_id = $theme . '//' . $slug;
+			$block_template        = get_block_file_template( $full_template_part_id, 'wp_template_part' );
 			if ( isset( $block_template->content ) ) {
 				$parsed_blocks = parse_blocks( $block_template->content );
 				$blocks        = block_core_navigation_filter_out_empty_blocks( $parsed_blocks );

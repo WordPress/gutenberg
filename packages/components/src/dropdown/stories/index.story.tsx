@@ -49,6 +49,7 @@ export const Default: StoryObj< typeof Dropdown > = {
 	args: {
 		renderToggle: ( { isOpen, onToggle } ) => (
 			<Button
+				__next40pxDefaultSize
 				onClick={ onToggle }
 				aria-expanded={ isOpen }
 				variant="primary"
