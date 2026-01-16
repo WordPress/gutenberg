@@ -408,7 +408,10 @@ class ColorControl {
 		// Switch to settings tab.
 		await this.page.getByRole( 'tab', { name: 'Settings' } ).click();
 		// Set it to always be the mobile view, but don't save this setting so we can still check all the frontend colors.
-		await this.page.getByRole( 'radio', { name: 'Always' } ).click();
+		await this.page
+			.getByRole( 'radiogroup', { name: 'Configure overlay visibility' } )
+			.getByRole( 'radio', { name: 'Always' } )
+			.click();
 		await this.editor.canvas
 			.getByRole( 'button', { name: 'Open menu' } )
 			.click();
