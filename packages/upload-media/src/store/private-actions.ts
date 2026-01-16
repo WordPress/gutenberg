@@ -754,9 +754,11 @@ export function generateThumbnails( id: QueueItemId ) {
 			attachment.missing_image_sizes &&
 			attachment.missing_image_sizes.length > 0
 		) {
+			// Use sourceFile for thumbnail generation to preserve quality.
+			// WordPress core generates thumbnails from the original (unscaled) image.
 			const file = attachment.media_filename
-				? renameFile( item.file, attachment.media_filename )
-				: item.file;
+				? renameFile( item.sourceFile, attachment.media_filename )
+				: item.sourceFile;
 			const batchId = uuidv4();
 
 			const allImageSizes = select.getSettings().allImageSizes || {};
