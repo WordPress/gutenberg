@@ -53,14 +53,15 @@ describe( 'prePersistPostType', () => {
 		expect( prePersistPostType( record, edits, 'post', false ) ).toEqual( {
 			status: 'draft',
 			title: '',
+			meta: {},
 		} );
 
 		record = {
 			status: 'publish',
 		};
-		expect( prePersistPostType( record, edits, 'post', false ) ).toEqual(
-			{}
-		);
+		expect( prePersistPostType( record, edits, 'post', false ) ).toEqual( {
+			meta: {},
+		} );
 
 		record = {
 			status: 'auto-draft',
@@ -69,15 +70,16 @@ describe( 'prePersistPostType', () => {
 		expect( prePersistPostType( record, edits, 'post', false ) ).toEqual( {
 			status: 'draft',
 			title: '',
+			meta: {},
 		} );
 
 		record = {
 			status: 'publish',
 			title: 'My Title',
 		};
-		expect( prePersistPostType( record, edits, 'post', false ) ).toEqual(
-			{}
-		);
+		expect( prePersistPostType( record, edits, 'post', false ) ).toEqual( {
+			meta: {},
+		} );
 	} );
 
 	it( 'does not set the status to draft and empty the title when saving templates', () => {
@@ -86,9 +88,9 @@ describe( 'prePersistPostType', () => {
 			title: 'Auto Draft',
 		};
 		const edits = {};
-		expect( prePersistPostType( record, edits, 'post', true ) ).toEqual(
-			{}
-		);
+		expect( prePersistPostType( record, edits, 'post', true ) ).toEqual( {
+			meta: {},
+		} );
 	} );
 } );
 

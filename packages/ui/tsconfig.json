@@ -2,12 +2,17 @@
 	"$schema": "https://json.schemastore.org/tsconfig.json",
 	"extends": "../../tsconfig.base.json",
 	"compilerOptions": {
-		"types": [ "node", "jest", "@testing-library/jest-dom" ]
+		"types": [ "node", "jest" ]
 	},
 	"references": [
+		{ "path": "../a11y" },
 		{ "path": "../element" },
 		{ "path": "../i18n" },
+		{ "path": "../icons" },
+		{ "path": "../primitives" },
+		{ "path": "../private-apis" },
 		{ "path": "../theme" }
 	],
+	"files": [ "global.d.ts" ],
 	"exclude": []
 }

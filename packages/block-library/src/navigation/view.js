@@ -18,6 +18,28 @@ const focusableSelectors = [
 	'[tabindex]:not([tabindex^="-"])',
 ];
 
+/**
+ * Gets all visible focusable elements within a container.
+ * Filters out elements that are hidden.
+ *
+ * @param {HTMLElement} ref - The container element to search within
+ * @return {HTMLElement[]} Array of visible focusable elements
+ */
+function getFocusableElements( ref ) {
+	const focusableElements = ref.querySelectorAll( focusableSelectors );
+	return Array.from( focusableElements ).filter( ( element ) => {
+		// Use modern checkVisibility API if available (Chrome 105+, Firefox 106+, Safari 17.4+)
+		if ( typeof element.checkVisibility === 'function' ) {
+			return element.checkVisibility( {
+				checkOpacity: false,
+				checkVisibilityCSS: true,
+			} );
+		}
+		// Fallback for older browsers
+		return element.offsetParent !== null;
+	} );
+}
+
 // This is a fix for Safari in iOS/iPadOS. Without it, Safari doesn't focus out
 // when the user taps in the body. It can be removed once we add an overlay to
 // capture the clicks, instead of relying on the focusout event.
@@ -198,8 +220,7 @@ const { state, actions } = store(
 				const ctx = getContext();
 				const { ref } = getElement();
 				if ( state.isMenuOpen ) {
-					const focusableElements =
-						ref.querySelectorAll( focusableSelectors );
+					const focusableElements = getFocusableElements( ref );
 					ctx.modal = ref;
 					ctx.firstFocusableElement = focusableElements[ 0 ];
 					ctx.lastFocusableElement =
@@ -209,8 +230,7 @@ const { state, actions } = store(
 			focusFirstElement() {
 				const { ref } = getElement();
 				if ( state.isMenuOpen ) {
-					const focusableElements =
-						ref.querySelectorAll( focusableSelectors );
+					const focusableElements = getFocusableElements( ref );
 					focusableElements?.[ 0 ]?.focus();
 				}
 			},

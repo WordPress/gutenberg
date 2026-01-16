@@ -18,6 +18,7 @@ import {
 	getEmbedInfoByProvider,
 	removeAspectRatioClasses,
 	hasAspectRatioClass,
+	hasInlineResponsivePadding,
 } from '../util';
 import { embedInstagramIcon } from '../icons';
 import variations from '../variations';
@@ -101,7 +102,53 @@ describe( 'utils', () => {
 				)
 			).toEqual( expected );
 		} );
+
+		it( 'should not add aspect ratio classes when HTML already contains responsive wrapper with padding-bottom', () => {
+			// Flickr embeds come with their own responsive wrapper
+			const html =
+				'<div style="padding-bottom: 56.25%;"><iframe width="1024" height="576"></iframe></div>';
+			const existingClassNames = 'wp-block-embed';
+			// Should not add wp-embed-aspect-16-9 and wp-has-aspect-ratio
+			// because the HTML already has responsive styling
+			expect( getClassNames( html, existingClassNames, true ) ).toEqual(
+				existingClassNames
+			);
+		} );
+
+		it( 'should not add aspect ratio classes when HTML already contains responsive wrapper with padding-top', () => {
+			const html =
+				'<div style="padding-top: 56.25%;"><iframe width="1024" height="576"></iframe></div>';
+			const existingClassNames = 'wp-block-embed';
+			expect( getClassNames( html, existingClassNames, true ) ).toEqual(
+				existingClassNames
+			);
+		} );
 	} );
+	describe( 'hasInlineResponsivePadding', () => {
+		it( 'should return true when HTML contains padding-bottom percentage', () => {
+			const html =
+				'<div style="padding-bottom: 56.25%;"><iframe></iframe></div>';
+			expect( hasInlineResponsivePadding( html ) ).toBe( true );
+		} );
+
+		it( 'should return true when HTML contains padding-top percentage', () => {
+			const html =
+				'<div style="padding-top: 75%;"><iframe></iframe></div>';
+			expect( hasInlineResponsivePadding( html ) ).toBe( true );
+		} );
+
+		it( 'should return false when HTML has no padding percentage', () => {
+			const html = '<iframe width="640" height="360"></iframe>';
+			expect( hasInlineResponsivePadding( html ) ).toBe( false );
+		} );
+
+		it( 'should return false when padding uses pixels instead of percentage', () => {
+			const html =
+				'<div style="padding-bottom: 20px;"><iframe></iframe></div>';
+			expect( hasInlineResponsivePadding( html ) ).toBe( false );
+		} );
+	} );
+
 	describe( 'hasAspectRatioClass', () => {
 		it( 'should return false if an aspect ratio class does not exist', () => {
 			const existingClassNames = 'wp-block-embed is-type-video';
