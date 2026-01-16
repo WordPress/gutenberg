@@ -12,6 +12,10 @@ import { getItemTitle } from '../../actions/utils';
 import TitleView from './view';
 import RichTextEdit from '../rich-text/edit';
 
+// function ConfiguredRichTextEdit( { ...props } ) {
+// 	return <RichTextEdit { ...props } />;
+// }
+
 const titleField: Field< CommonPost > = {
 	type: 'text',
 	id: 'title',

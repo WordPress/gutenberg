@@ -3,10 +3,7 @@
  */
 // @ts-expect-error block-editor is not typed correctly.
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
-import type {
-	DataFormControlProps,
-	NormalizedField,
-} from '@wordpress/dataviews';
+import type { DataFormControlProps } from '@wordpress/dataviews';
 
 /**
  * Internal dependencies
@@ -21,6 +18,7 @@ const { RichTextControl } = unlock( blockEditorPrivateApis );
  * but it's used in practice. This should ideally be added to the upstream Field type.
  */
 interface RichTextFieldConfig {
+	clientId?: string;
 	placeholder?: string;
 	allowedFormats?: string[];
 	disableFormats?: boolean;
@@ -29,29 +27,21 @@ interface RichTextFieldConfig {
 	disableLineBreaks?: boolean;
 }
 
-/**
- * Extended field type that includes the config property.
- */
-interface RichTextField< Item > extends NormalizedField< Item > {
-	config?: RichTextFieldConfig;
-}
-
 interface RichTextEditProps< Item >
-	extends Omit< DataFormControlProps< Item >, 'field' > {
-	field: RichTextField< Item >;
+	extends Pick<
+		DataFormControlProps< Item >,
+		'data' | 'field' | 'onChange' | 'hideLabelFromVision'
+	> {
+	config: RichTextFieldConfig;
 }
 
 export default function RichTextEdit< Item >( {
 	data,
 	field,
-	hideLabelFromVision,
 	onChange,
+	hideLabelFromVision,
 	config,
 }: RichTextEditProps< Item > ) {
-	const fieldConfig = field.config || {};
-	// TODO: clientId is passed via config but isn't part of the standard DataFormControlProps config type.
-	const clientId = ( config as any )?.clientId;
-
 	return (
 		<RichTextControl
 			label={ field.label }
@@ -59,17 +49,17 @@ export default function RichTextEdit< Item >( {
 			onChange={ ( value: string ) =>
 				onChange( field.setValue( { item: data, value } ) )
 			}
-			placeholder={ fieldConfig?.placeholder }
+			placeholder={ config?.placeholder }
 			id={ field.id }
-			clientId={ clientId }
+			clientId={ config?.clientId }
 			hideLabelFromVision={ hideLabelFromVision }
-			allowedFormats={ fieldConfig?.allowedFormats }
-			disableFormats={ fieldConfig?.disableFormats }
+			allowedFormats={ config?.allowedFormats }
+			disableFormats={ config?.disableFormats }
 			withoutInteractiveFormatting={
-				fieldConfig?.withoutInteractiveFormatting
+				config?.withoutInteractiveFormatting
 			}
-			preserveWhiteSpace={ fieldConfig?.preserveWhiteSpace }
-			disableLineBreaks={ fieldConfig?.disableLineBreaks }
+			preserveWhiteSpace={ config?.preserveWhiteSpace }
+			disableLineBreaks={ config?.disableLineBreaks }
 		/>
 	);
 }
