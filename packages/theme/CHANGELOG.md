@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.5.0 (2026-01-16)
+
 ### Breaking changes
 
 -   Removed the following tokens ([#74470](https://github.com/WordPress/gutenberg/pull/74470)):
