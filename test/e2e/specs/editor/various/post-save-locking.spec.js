@@ -208,6 +208,249 @@ test.describe( 'Post save locking during image upload', () => {
 		await expect( publishButton ).toBeEnabled();
 	} );
 
+	test( 'should keep post saving locked until all multiple image uploads complete', async ( {
+		editor,
+		page,
+	} ) => {
+		// Track upload resolvers for multiple uploads.
+		const uploadResolvers = [];
+		let uploadCount = 0;
+
+		// Intercept the media upload requests and hold them.
+		await page.route(
+			( url ) =>
+				url.href.includes( '/wp/v2/media' ) ||
+				url.href.includes(
+					`rest_route=${ encodeURIComponent( '/wp/v2/media' ) }`
+				),
+			async ( route, request ) => {
+				if ( request.method() === 'POST' ) {
+					uploadCount++;
+					// Wait for the test to signal the request should complete.
+					await new Promise( ( resolve ) => {
+						uploadResolvers.push( resolve );
+					} );
+					await route.continue();
+				} else {
+					await route.continue();
+				}
+			}
+		);
+
+		// Insert two image blocks.
+		await editor.insertBlock( { name: 'core/image' } );
+		await editor.insertBlock( { name: 'core/image' } );
+
+		const imageBlocks = editor.canvas.locator(
+			'role=document[name="Block: Image"i]'
+		);
+		await expect( imageBlocks ).toHaveCount( 2 );
+
+		// Add a title so the post can be published.
+		await editor.canvas
+			.getByRole( 'textbox', { name: 'Add title' } )
+			.fill( 'Test Post with Multiple Image Uploads' );
+
+		// Prepare the test image files.
+		const basePath = path.join( __dirname, '..', '..', '..', 'assets' );
+		const testImagePath = path.join(
+			basePath,
+			'10x10_e2e_test_image_z9T8jK.png'
+		);
+		const tmpDirectory = await fs.mkdtemp(
+			path.join( os.tmpdir(), 'gutenberg-test-image-' )
+		);
+
+		const fileName1 = uuid();
+		const tmpFileName1 = path.join( tmpDirectory, fileName1 + '.png' );
+		await fs.copyFile( testImagePath, tmpFileName1 );
+
+		const fileName2 = uuid();
+		const tmpFileName2 = path.join( tmpDirectory, fileName2 + '.png' );
+		await fs.copyFile( testImagePath, tmpFileName2 );
+
+		// Start both uploads.
+		const inputElements = imageBlocks.locator(
+			'data-testid=form-file-upload-input'
+		);
+		await inputElements.nth( 0 ).setInputFiles( tmpFileName1 );
+		await inputElements.nth( 1 ).setInputFiles( tmpFileName2 );
+
+		// Wait for both upload requests to be intercepted.
+		await expect.poll( () => uploadCount ).toBe( 2 );
+
+		// Verify that post saving is locked during uploads.
+		await expect
+			.poll( () =>
+				page.evaluate( () =>
+					window.wp.data.select( 'core/editor' ).isPostSavingLocked()
+				)
+			)
+			.toBe( true );
+
+		// Complete the first upload.
+		uploadResolvers[ 0 ]();
+
+		// Wait for the first image to appear.
+		const firstImage = imageBlocks
+			.nth( 0 )
+			.getByRole( 'img', {
+				name: 'This image has an empty alt attribute',
+			} );
+		await expect( firstImage ).toBeVisible();
+
+		// Verify that post saving is STILL locked (second upload in progress).
+		const isStillLocked = await page.evaluate( () =>
+			window.wp.data.select( 'core/editor' ).isPostSavingLocked()
+		);
+		expect( isStillLocked ).toBe( true );
+
+		// Complete the second upload.
+		uploadResolvers[ 1 ]();
+
+		// Wait for the second image to appear.
+		const secondImage = imageBlocks
+			.nth( 1 )
+			.getByRole( 'img', {
+				name: 'This image has an empty alt attribute',
+			} );
+		await expect( secondImage ).toBeVisible();
+
+		// Verify that post saving is now unlocked (all uploads complete).
+		await expect
+			.poll( () =>
+				page.evaluate( () =>
+					window.wp.data.select( 'core/editor' ).isPostSavingLocked()
+				)
+			)
+			.toBe( false );
+	} );
+
+	test( 'should unlock post saving after all uploads complete or fail with mixed results', async ( {
+		editor,
+		page,
+	} ) => {
+		// Track upload resolvers for multiple uploads.
+		const uploadHandlers = [];
+		let uploadCount = 0;
+
+		// Intercept the media upload requests.
+		await page.route(
+			( url ) =>
+				url.href.includes( '/wp/v2/media' ) ||
+				url.href.includes(
+					`rest_route=${ encodeURIComponent( '/wp/v2/media' ) }`
+				),
+			async ( route, request ) => {
+				if ( request.method() === 'POST' ) {
+					const currentIndex = uploadCount++;
+					// Wait for the test to signal how to handle this request.
+					const handler = await new Promise( ( resolve ) => {
+						uploadHandlers[ currentIndex ] = { resolve, route };
+					} );
+					if ( handler.shouldFail ) {
+						await route.fulfill( {
+							status: 500,
+							contentType: 'application/json',
+							body: JSON.stringify( {
+								code: 'upload_error',
+								message: 'Upload failed',
+								data: { status: 500 },
+							} ),
+						} );
+					} else {
+						await route.continue();
+					}
+				} else {
+					await route.continue();
+				}
+			}
+		);
+
+		// Insert two image blocks.
+		await editor.insertBlock( { name: 'core/image' } );
+		await editor.insertBlock( { name: 'core/image' } );
+
+		const imageBlocks = editor.canvas.locator(
+			'role=document[name="Block: Image"i]'
+		);
+		await expect( imageBlocks ).toHaveCount( 2 );
+
+		// Add a title so the post can be published.
+		await editor.canvas
+			.getByRole( 'textbox', { name: 'Add title' } )
+			.fill( 'Test Post with Mixed Upload Results' );
+
+		// Prepare the test image files.
+		const basePath = path.join( __dirname, '..', '..', '..', 'assets' );
+		const testImagePath = path.join(
+			basePath,
+			'10x10_e2e_test_image_z9T8jK.png'
+		);
+		const tmpDirectory = await fs.mkdtemp(
+			path.join( os.tmpdir(), 'gutenberg-test-image-' )
+		);
+
+		const fileName1 = uuid();
+		const tmpFileName1 = path.join( tmpDirectory, fileName1 + '.png' );
+		await fs.copyFile( testImagePath, tmpFileName1 );
+
+		const fileName2 = uuid();
+		const tmpFileName2 = path.join( tmpDirectory, fileName2 + '.png' );
+		await fs.copyFile( testImagePath, tmpFileName2 );
+
+		// Start both uploads.
+		const inputElements = imageBlocks.locator(
+			'data-testid=form-file-upload-input'
+		);
+		await inputElements.nth( 0 ).setInputFiles( tmpFileName1 );
+		await inputElements.nth( 1 ).setInputFiles( tmpFileName2 );
+
+		// Wait for both upload requests to be intercepted.
+		await expect.poll( () => uploadCount ).toBe( 2 );
+
+		// Verify that post saving is locked during uploads.
+		await expect
+			.poll( () =>
+				page.evaluate( () =>
+					window.wp.data.select( 'core/editor' ).isPostSavingLocked()
+				)
+			)
+			.toBe( true );
+
+		// Fail the first upload.
+		uploadHandlers[ 0 ].resolve( { shouldFail: true } );
+
+		// Wait a moment for the failure to process.
+		await page.waitForTimeout( 500 );
+
+		// Verify that post saving is STILL locked (second upload in progress).
+		const isStillLocked = await page.evaluate( () =>
+			window.wp.data.select( 'core/editor' ).isPostSavingLocked()
+		);
+		expect( isStillLocked ).toBe( true );
+
+		// Complete the second upload successfully.
+		uploadHandlers[ 1 ].resolve( { shouldFail: false } );
+
+		// Wait for the second image to appear.
+		const secondImage = imageBlocks
+			.nth( 1 )
+			.getByRole( 'img', {
+				name: 'This image has an empty alt attribute',
+			} );
+		await expect( secondImage ).toBeVisible();
+
+		// Verify that post saving is now unlocked (all uploads resolved).
+		await expect
+			.poll( () =>
+				page.evaluate( () =>
+					window.wp.data.select( 'core/editor' ).isPostSavingLocked()
+				)
+			)
+			.toBe( false );
+	} );
+
 	test( 'should disable save keyboard shortcut while an image is uploading', async ( {
 		editor,
 		page,
